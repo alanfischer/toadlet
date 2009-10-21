@@ -6,6 +6,7 @@
 
 set (WS2BTH_FOUND "NO")
 
+# Win32 Only
 if (WIN32)
 	if (WINCE)
 		# Add default search paths for each supported winmo SDK
