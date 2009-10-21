@@ -34,7 +34,7 @@
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/Renderer.h>
-#include <toadlet/peeper/TextureSection.h>
+//#include <toadlet/peeper/TextureSection.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/entity/CameraEntity.h>
@@ -118,8 +118,8 @@ public:
 	inline void setOrientation(bool vector){mOrientation=vector;}
 	inline bool getOrientation() const{return mOrientation;}
 
-	inline void setTextureSection(peeper::TextureSection::ptr textureSection){mTextureSection=textureSection;}
-	inline peeper::TextureSection::ptr getTextureSection() const{return mTextureSection;}
+//	inline void setTextureSection(peeper::TextureSection::ptr textureSection){mTextureSection=textureSection;}
+//	inline peeper::TextureSection::ptr getTextureSection() const{return mTextureSection;}
 
 	inline void setIndividualAttributes(bool individual){mIndividualAttributes=individual;}
 	inline bool getIndividualAttributes() const{return mIndividualAttributes;}
@@ -188,7 +188,7 @@ protected:
 	scalar mStartScale;
 	scalar mEndScale;
 
-	peeper::TextureSection::ptr mTextureSection;
+//	peeper::TextureSection::ptr mTextureSection;
 	Material::ptr mMaterial;
 	peeper::VertexBuffer::ptr mVertexBuffer;
 	peeper::VertexData::ptr mVertexData;

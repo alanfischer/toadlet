@@ -51,17 +51,17 @@ public:
 	static int parseInt(const char *string);
 	static egg::String makeInt(int i);
 
-	static Material *loadMaterial(mxml_node_t *node,int version,ResourceManager *textureManager);
-	static mxml_node_t *saveMaterial(Material *material,int version);
+	static Material::ptr loadMaterial(mxml_node_t *node,int version,ResourceManager *textureManager);
+	static mxml_node_t *saveMaterial(Material::ptr material,int version);
 
-	static Mesh *loadMesh(mxml_node_t *node,int version,ResourceManager *bufferManager,ResourceManager *materialManager,ResourceManager *textureManager);
-	static mxml_node_t *saveMesh(Mesh *mesh,int version);
+	static Mesh::ptr loadMesh(mxml_node_t *node,int version,ResourceManager *bufferManager,ResourceManager *materialManager,ResourceManager *textureManager);
+	static mxml_node_t *saveMesh(Mesh::ptr mesh,int version);
 
-	static MeshSkeleton *loadSkeleton(mxml_node_t *node,int version);
-	static mxml_node_t *saveSkeleton(MeshSkeleton *skeleton,int version);
+	static MeshSkeleton::ptr loadSkeleton(mxml_node_t *node,int version);
+	static mxml_node_t *saveSkeleton(MeshSkeleton::ptr skeleton,int version);
 
-	static MeshSkeletonSequence *loadSequence(mxml_node_t *node,int version);
-	static mxml_node_t *saveSequence(MeshSkeletonSequence *sequence,int version);
+	static MeshSkeletonSequence::ptr loadSequence(mxml_node_t *node,int version);
+	static mxml_node_t *saveSequence(MeshSkeletonSequence::ptr sequence,int version);
 };
 
 }

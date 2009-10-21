@@ -27,22 +27,36 @@
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
+using namespace toadlet::egg::image;
 using namespace toadlet::peeper;
 
 namespace toadlet{
 namespace tadpole{
 
-TextureManager::TextureManager(Engine *engine):ContextResourceManager<peeper::TexturePeer,TextureSemantics>(engine){
+TextureManager::TextureManager(Engine *engine):ResourceManager(engine){
 	mEngine=engine;
+}
+
+Texture::ptr TextureManager::createTexture(const Image::ptr &image){
+	Texture::ptr texture(mEngine->getRenderer()->createTexture());
+	texture->create(image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth());
+	texture->load(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),image->getData());
+	return texture;
+}
+
+Image::ptr TextureManager::createImage(const Texture::ptr &texture){
+	Image::ptr image(new Image(texture->getDimension(),texture->getFormat(),texture->getWidth(),texture->getHeight(),texture->getDepth()));
+	texture->read(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),image->getData());
+	return image;
 }
 
 void TextureManager::resourceLoaded(const Resource::ptr &resource){
 	Texture::ptr texture=shared_static_cast<Texture>(resource);
 
-	texture->setAutoGenerateMipMaps(true);
-	texture->setMinFilter(Texture::Filter_LINEAR);
-	texture->setMipFilter(Texture::Filter_NEAREST);
-	texture->setMagFilter(Texture::Filter_LINEAR);
+//	texture->setAutoGenerateMipMaps(true);
+//	texture->setMinFilter(Texture::Filter_LINEAR);
+//	texture->setMipFilter(Texture::Filter_NEAREST);
+//	texture->setMagFilter(Texture::Filter_LINEAR);
 }
 
 }

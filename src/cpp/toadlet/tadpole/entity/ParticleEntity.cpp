@@ -106,7 +106,7 @@ Entity *ParticleEntity::create(Engine *engine){
 	mStartScale=0;
 	mEndScale=0;
 
-	mTextureSection=NULL;
+//	mTextureSection=NULL;
 	mMaterial=NULL;
 	mVertexBuffer=NULL;
 	mVertexData=NULL;
@@ -158,9 +158,9 @@ bool ParticleEntity::start(int particlesPerBeam,int numParticles,bool hasColor,c
 	mParticlesPerBeam=particlesPerBeam;
 
 	int numFrames=1;
-	if(mTextureSection!=NULL){
-		numFrames=mTextureSection->getNumFrames();
-	}
+//	if(mTextureSection!=NULL){
+//		numFrames=mTextureSection->getNumFrames();
+//	}
 
 	uint32 startColor=mStartColor.getABGR();
 	uint32 endColor=mEndColor.getABGR();
@@ -531,11 +531,11 @@ void ParticleEntity::updateVertexBuffer(const Matrix4x4 &viewTransform){
 
 		if(mParticlesPerBeam<2){
 			int frameOffset=0,widthFrames=1,heightFrames=1;
-			if(mTextureSection!=NULL){
-				frameOffset=mTextureSection->getFrameOffset();
-				widthFrames=mTextureSection->getWidthFrames();
-				heightFrames=mTextureSection->getHeightFrames();
-			}
+//			if(mTextureSection!=NULL){
+//				frameOffset=mTextureSection->getFrameOffset();
+//				widthFrames=mTextureSection->getWidthFrames();
+//				heightFrames=mTextureSection->getHeightFrames();
+//			}
 
 			for(i=mParticles.size()-1;i>=0;--i){
 				const Particle &p=mParticles[i];

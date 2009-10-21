@@ -3,14 +3,14 @@ set (PEEPER_GLRENDERER_SRC
 	GLBufferPeer.cpp
 	GLRenderTargetPeer.cpp
 	GLRenderer.cpp
-	GLTexturePeer.cpp
+	GLTexture.cpp
 )
 if (NOT TOADLET_PLATFORM_WINCE)
-	set (PEEPER_GLRENDERER_SRC ${PEEPER_GLRENDERER_SRC} GLFBORenderTexturePeer.cpp)
+#	set (PEEPER_GLRENDERER_SRC ${PEEPER_GLRENDERER_SRC} GLFBORenderTexturePeer.cpp)
 endif (NOT TOADLET_PLATFORM_WINCE)
 
 set (PEEPER_GLRENDERER_PLATFORM_AGL_SRC
-	platform/agl/AGLPBufferRenderTexturePeer.cpp
+#	platform/agl/AGLPBufferRenderTexturePeer.cpp
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_EAGL_SRC
@@ -18,14 +18,14 @@ set (PEEPER_GLRENDERER_PLATFORM_EAGL_SRC
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_EGL_SRC
-	platform/egl/EGLPBufferRenderTexturePeer.cpp
+#	platform/egl/EGLPBufferRenderTexturePeer.cpp
 	platform/egl/EGLRenderContextPeer.cpp
 	platform/egl/EGLRenderTargetPeer.cpp
 	platform/egl/glesem/glesem.c
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_GLX_SRC
-	platform/glx/GLXPBufferRenderTexturePeer.cpp
+#	platform/glx/GLXPBufferRenderTexturePeer.cpp
 	platform/glx/GLXWindowRenderContextPeer.cpp
 )
 
@@ -34,7 +34,7 @@ set (PEEPER_GLRENDERER_PLATFORM_NSGL_SRC
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_WGL_SRC
-	platform/wgl/WGLPBufferRenderTexturePeer.cpp
+#	platform/wgl/WGLPBufferRenderTexturePeer.cpp
 	platform/wgl/WGLWindowRenderContextPeer.cpp
 )
 
@@ -43,14 +43,14 @@ set (PEEPER_GLRENDERER_PLATFORM_WGL_SRC
 set (PEEPER_GLRENDERER_HEADERS
 	GLIncludes.h
 	GLRenderer.h
-	GLTexturePeer.h
+	GLTexture.h
 	GLSLShaderPeer.h
 	GLRenderTargetPeer.h
 	GLSLProgramPeer.h
 	GLBufferPeer.h
 )
 if (NOT TOADLET_PLATFORM_WINCE)
-	set (PEEPER_GLRENDERER_HEADERS ${PEEPER_GLRENDERER_HEADERS} GLFBORenderTexturePeer.h)
+#	set (PEEPER_GLRENDERER_HEADERS ${PEEPER_GLRENDERER_HEADERS} GLFBORenderTexturePeer.h)
 endif (NOT TOADLET_PLATFORM_WINCE)
 
 set (PEEPER_GLRENDERER_PLATFORM_AGL_HEADERS

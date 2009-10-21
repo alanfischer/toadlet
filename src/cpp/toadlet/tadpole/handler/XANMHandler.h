@@ -42,14 +42,14 @@ public:
 
 	XANMHandler();
 
-	egg::Resource *load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
-	bool save(MeshSkeletonSequence *resource,egg::io::OutputStream::ptr out);
+	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
+	bool save(MeshSkeletonSequence::ptr resource,egg::io::OutputStream::ptr out);
 
 protected:
-	MeshSkeletonSequence *loadSequenceVersion1(mxml_node_t *root);
-	MeshSkeletonSequence *loadSequenceVersion2Up(mxml_node_t *root,int version);
-	bool saveSequenceVersion1(mxml_node_t *root,MeshSkeletonSequence *sequence);
-	bool saveSequenceVersion2Up(mxml_node_t *root,MeshSkeletonSequence *sequence,int version);
+	MeshSkeletonSequence::ptr loadSequenceVersion1(mxml_node_t *root);
+	MeshSkeletonSequence::ptr loadSequenceVersion2Up(mxml_node_t *root,int version);
+	bool saveSequenceVersion1(mxml_node_t *root,MeshSkeletonSequence::ptr sequence);
+	bool saveSequenceVersion2Up(mxml_node_t *root,MeshSkeletonSequence::ptr sequence,int version);
 };
 
 }

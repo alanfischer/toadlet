@@ -22,7 +22,7 @@
  * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
  *
  ********** Copyright header - do not remove **********/
-
+/*
 #include "WGLPBufferRenderTexturePeer.h"
 #include "../../GLRenderer.h"
 #include <toadlet/egg/Logger.h>
@@ -228,3 +228,4 @@ bool WGLPBufferRenderTexturePeer::isValid() const{
 }
 }
 
+*/

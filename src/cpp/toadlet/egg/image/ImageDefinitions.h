@@ -43,6 +43,7 @@ public:
 		Dimension_D2,
 		Dimension_D3,
 		Dimension_CUBEMAP,
+		Dimension_D2_RESTRICTED,
 	};
 
 	enum CubemapSide{

@@ -28,7 +28,7 @@
 
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/FontData.h>
-#include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/tadpole/TextureManager.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -40,13 +40,13 @@ namespace handler{
 
 class TOADLET_API Win32FontHandler{
 public:
-	Win32FontHandler(ResourceManager *textureManager);
+	Win32FontHandler(TextureManager *textureManager);
 	virtual ~Win32FontHandler(){}
 
 	egg::Resource *load(const ResourceHandlerData *handlerData);
 
 protected:
-	ResourceManager *mTextureManager;
+	TextureManager *mTextureManager;
 };
 
 }

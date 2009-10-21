@@ -22,7 +22,7 @@
  * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
  *
  ********** Copyright header - do not remove **********/
-
+/*
 #include "GLRenderer.h"
 #include "GLFBORenderTexturePeer.h"
 #include <toadlet/egg/Error.h>
@@ -170,3 +170,4 @@ bool GLFBORenderTexturePeer::isValid() const{
 }
 }
 
+*/

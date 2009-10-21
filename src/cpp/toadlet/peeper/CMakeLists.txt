@@ -1,6 +1,5 @@
 # Source files for toadlet_peeper
 set (PEEPER_SRC
-	AnimatedTexture.cpp
 	Buffer.cpp
 	IndexBuffer.cpp
 	IndexBufferAccessor.cpp
@@ -8,11 +7,7 @@ set (PEEPER_SRC
 	Light.cpp
 	Program.cpp
 	RenderTarget.cpp
-	RenderTexture.cpp
 	Shader.cpp
-	Texture.cpp
-	TextureSection.cpp
-	TextureSequence.cpp
 	TextureStage.cpp
 	VertexBuffer.cpp
 	VertexBufferAccessor.cpp
@@ -25,7 +20,6 @@ set (PEEPER_SRC
 
 # Headers
 set (PEEPER_HEADERS
-	AnimatedTexture.h
 	Blend.h
 	Buffer.h
 	CapabilitySet.h
@@ -39,14 +33,11 @@ set (PEEPER_HEADERS
 	Program.h
 	RenderContext.h
 	RenderTarget.h
-	RenderTexture.h
 	Renderer.h
 	Shader.h
 	StatisticsSet.h
 	Texture.h
 	TextureBlend.h
-	TextureSection.h
-	TextureSequence.h
 	TextureStage.h
 	Types.h
 	VertexBuffer.h

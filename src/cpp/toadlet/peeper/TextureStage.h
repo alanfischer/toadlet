@@ -36,6 +36,19 @@ class TOADLET_API TextureStage{
 public:
 	TOADLET_SHARED_POINTERS(TextureStage,TextureStage);
 
+	enum AddressMode{
+		AddressMode_REPEAT,
+		AddressMode_CLAMP_TO_EDGE,
+		AddressMode_CLAMP_TO_BORDER,
+		AddressMode_MIRRORED_REPEAT,
+	};
+
+	enum Filter{
+		Filter_NONE,
+		Filter_NEAREST,
+		Filter_LINEAR,
+	};
+
 	TextureStage();
 	TextureStage(const Texture::ptr &texture);
 	virtual ~TextureStage(){}
@@ -49,20 +62,20 @@ public:
 	void setBlend(const TextureBlend &blend){mBlend.set(blend);}
 	inline const TextureBlend &getBlend() const{return mBlend;}
 
-	void setSAddressMode(Texture::AddressMode addressMode);
-	inline Texture::AddressMode getSAddressMode() const{return mSAddressMode;}
-	void setTAddressMode(Texture::AddressMode addressMode);
-	inline Texture::AddressMode getTAddressMode() const{return mTAddressMode;}
-	void setRAddressMode(Texture::AddressMode addressMode);
-	inline Texture::AddressMode getRAddressMode() const{return mRAddressMode;}
+	void setSAddressMode(AddressMode addressMode);
+	inline AddressMode getSAddressMode() const{return mSAddressMode;}
+	void setTAddressMode(AddressMode addressMode);
+	inline AddressMode getTAddressMode() const{return mTAddressMode;}
+	void setRAddressMode(AddressMode addressMode);
+	inline AddressMode getRAddressMode() const{return mRAddressMode;}
 	inline bool getAddressModeSpecified() const{return mAddressModeSpecified;}
 
-	void setMinFilter(Texture::Filter minFilter);
-	inline Texture::Filter getMinFilter() const{return mMinFilter;}
-	void setMipFilter(Texture::Filter mipFilter);
-	inline Texture::Filter getMipFilter() const{return mMipFilter;}
-	void setMagFilter(Texture::Filter magFilter);
-	inline Texture::Filter getMagFilter() const{return mMagFilter;}
+	void setMinFilter(Filter minFilter);
+	inline Filter getMinFilter() const{return mMinFilter;}
+	void setMipFilter(Filter mipFilter);
+	inline Filter getMipFilter() const{return mMipFilter;}
+	void setMagFilter(Filter magFilter);
+	inline Filter getMagFilter() const{return mMagFilter;}
 	inline bool getFilterSpecified() const{return mFilterSpecified;}
 
 	void setTexCoordIndex(int index){mTexCoordIndex=index;}
@@ -79,14 +92,14 @@ protected:
 
 	TextureBlend mBlend;
 
-	Texture::AddressMode mSAddressMode;
-	Texture::AddressMode mTAddressMode;
-	Texture::AddressMode mRAddressMode;
+	AddressMode mSAddressMode;
+	AddressMode mTAddressMode;
+	AddressMode mRAddressMode;
 	bool mAddressModeSpecified;
 
-	Texture::Filter mMinFilter;
-	Texture::Filter mMipFilter;
-	Texture::Filter mMagFilter;
+	Filter mMinFilter;
+	Filter mMipFilter;
+	Filter mMagFilter;
 	bool mFilterSpecified;
 
 	int mTexCoordIndex;

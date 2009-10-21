@@ -3,7 +3,7 @@ set (PEEPER_D3D9RENDERER_SRC
 	D3D9IndexBufferPeer.cpp
 	D3D9RenderTexturePeer.cpp
 	D3D9Renderer.cpp
-	D3D9TexturePeer.cpp
+	D3D9Texture.cpp
 	D3D9VertexBufferPeer.cpp
 	D3D9WindowRenderContextPeer.cpp
 )
@@ -17,7 +17,7 @@ set (PEEPER_D3D9RENDERER_HEADERS
 	D3D9RenderTargetPeer.h
 	D3D9RenderTexturePeer.h
 	D3D9Renderer.h
-	D3D9TexturePeer.h
+	D3D9Texture.h
 	D3D9VertexBufferPeer.h
 	D3D9WindowRenderContextPeer.h
 )

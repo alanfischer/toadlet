@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_HANDLER_GIFHANDLER_H
 
 #include <toadlet/egg/image/GIFHandler.h>
-#include <toadlet/peeper/TextureSequence.h>
+//#include <toadlet/peeper/TextureSequence.h>
 #include <toadlet/tadpole/ResourceHandler.h>
 
 namespace toadlet{
@@ -38,11 +38,9 @@ class TOADLET_API GIFHandler:public ResourceHandler{
 public:
 	TOADLET_SHARED_POINTERS(GIFHandler,ResourceHandler);
 
-	GIFHandler(ResourceManager *textureManager){
-		mTextureManager=textureManager;
-	}
+	GIFHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 
-	egg::Resource *load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData){
+	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData){
 		egg::Collection<egg::image::Image*> images;
 		egg::Collection<int> delayMilliseconds;
 
@@ -52,10 +50,10 @@ public:
 			return NULL;
 		}
 		else if(images.size()==1){
-			return new peeper::Texture(egg::image::Image::ptr(images[0]));
+			return mTextureManager->createTexture(egg::image::Image::ptr(images[0]));
 		}
 		else{
-			peeper::TextureSequence *textureSequence=new peeper::TextureSequence();
+/*			peeper::TextureSequence *textureSequence=new peeper::TextureSequence();
 			textureSequence->setNumFrames(images.size());
 
 			int i;
@@ -67,16 +65,18 @@ public:
 			}
 
 			return textureSequence;
+*/
+return NULL;
 		}
 	}
 
-	bool save(peeper::Texture *resource,egg::io::OutputStream::ptr out){
-		return mHandler.saveImage(resource->getImage(),out);
+	bool save(peeper::Texture::ptr resource,egg::io::OutputStream::ptr out){
+		return mHandler.saveImage(mTextureManager->createImage(resource),out);
 	}
 
 protected:
+	TextureManager *mTextureManager;
 	egg::image::GIFHandler mHandler;
-	ResourceManager *mTextureManager;
 };
 
 }
