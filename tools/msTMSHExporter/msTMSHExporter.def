@@ -1,7 +1,0 @@
-DESCRIPTION 'MilkShape 3D Toadlet MSH Exporter'
-
-VERSION     1.0
-
-LIBRARY      "msTMSHExporter"
-EXPORTS
-    CreatePlugIn
