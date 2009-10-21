@@ -93,18 +93,18 @@ void SpriteWidget::load(scalar fractionalWidth,scalar fractionalHeight,const Tex
 		return;
 	}
 
-	if(mTexture->getType()==Texture::Type_ANIMATED){
-		mAnimatedTexture=shared_static_cast<AnimatedTexture>(texture);
-	}
-	else{
-		mAnimatedTexture=NULL;
+//	if(mTexture->getType()==Texture::Type_ANIMATED){
+//		mAnimatedTexture=shared_static_cast<AnimatedTexture>(texture);
+//	}
+//	else{
+//		mAnimatedTexture=NULL;
 		mTextureMatrix.set(Math::IDENTITY_MATRIX4X4);
 		TextureStage::ptr textureStage(new TextureStage(mTexture));
-		textureStage->setSAddressMode(Texture::AddressMode_CLAMP_TO_EDGE);
-		textureStage->setTAddressMode(Texture::AddressMode_CLAMP_TO_EDGE);
+		textureStage->setSAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
+		textureStage->setTAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
 		textureStage->setTextureMatrix(mTextureMatrix);
 		mTextureStage=textureStage;
-	}
+//	}
 
 	setFractionalSize(fractionalWidth,fractionalHeight,false,true);
 
@@ -118,9 +118,9 @@ void SpriteWidget::setFrame(int frame){
 
 int SpriteWidget::getNumFrames() const{
 	int numFrames=1;
-	if(mAnimatedTexture!=NULL){
-		numFrames=mAnimatedTexture->getNumFrames();
-	}
+//	if(mAnimatedTexture!=NULL){
+//		numFrames=mAnimatedTexture->getNumFrames();
+//	}
 	return numFrames;
 }
 
@@ -131,14 +131,14 @@ void SpriteWidget::render(Renderer *renderer){
 }
 
 void SpriteWidget::updateFrame(){
-	if(mAnimatedTexture!=NULL){
-		mAnimatedTexture->getMatrix4x4ForFrame(mFrame,mTextureMatrix);
-		TextureStage::ptr textureStage(new TextureStage(mAnimatedTexture->getTextureForFrame(mFrame)));
-		textureStage->setSAddressMode(Texture::AddressMode_CLAMP_TO_EDGE);
-		textureStage->setTAddressMode(Texture::AddressMode_CLAMP_TO_EDGE);
-		textureStage->setTextureMatrix(mTextureMatrix);
-		mTextureStage=textureStage;
-	}
+//	if(mAnimatedTexture!=NULL){
+//		mAnimatedTexture->getMatrix4x4ForFrame(mFrame,mTextureMatrix);
+//		TextureStage::ptr textureStage(new TextureStage(mAnimatedTexture->getTextureForFrame(mFrame)));
+//		textureStage->setSAddressMode(Texture::AddressMode_CLAMP_TO_EDGE);
+//		textureStage->setTAddressMode(Texture::AddressMode_CLAMP_TO_EDGE);
+//		textureStage->setTextureMatrix(mTextureMatrix);
+//		mTextureStage=textureStage;
+//	}
 }
 
 }

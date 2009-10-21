@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include "GLRenderer.h"
-#include "GLTexturePeer.h"
+#include "GLTexture.h"
 #include "GLBufferPeer.h"
 #include "GLSLProgramPeer.h"
 #include "GLSLShaderPeer.h"
@@ -41,7 +41,6 @@
 #include <toadlet/peeper/Light.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/peeper/RenderContext.h>
-#include <toadlet/peeper/RenderTexture.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::image;
@@ -56,11 +55,11 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-extern bool GLPBufferRenderTexturePeer_available(GLRenderer *renderer);
-extern GLTexturePeer *new_GLPBufferRenderTexturePeer(GLRenderer *renderer,RenderTexture *texture);
+//extern bool GLPBufferRenderTexturePeer_available(GLRenderer *renderer);
+//extern GLTexturePeer *new_GLPBufferRenderTexturePeer(GLRenderer *renderer,RenderTexture *texture);
 
-extern bool GLFBORenderTexturePeer_available(GLRenderer *renderer);
-extern GLTexturePeer *new_GLFBORenderTexturePeer(GLRenderer *renderer,RenderTexture *texture);
+//extern bool GLFBORenderTexturePeer_available(GLRenderer *renderer);
+//extern GLTexturePeer *new_GLFBORenderTexturePeer(GLRenderer *renderer,RenderTexture *texture);
 
 TOADLET_C_API Renderer* new_GLRenderer(){
 	return new GLRenderer();
@@ -232,9 +231,9 @@ bool GLRenderer::startup(RenderContext *renderContext,int *options){
 	}
 	mCapabilitySet.maxLights=maxLights;
 
-	mPBufferRenderToTexture=usePBuffers && GLPBufferRenderTexturePeer_available(this);
+//	mPBufferRenderToTexture=usePBuffers && GLPBufferRenderTexturePeer_available(this);
 	#if defined(TOADLET_HAS_GLEW) || defined(TOADLET_HAS_EAGL)
-		mFBORenderToTexture=useFBOs && GLFBORenderTexturePeer_available(this);
+//		mFBORenderToTexture=useFBOs && GLFBORenderTexturePeer_available(this);
 	#else
 		mFBORenderToTexture=false;
 	#endif
@@ -318,13 +317,9 @@ bool GLRenderer::reset(){
 }
 
 // Resource operations
-TexturePeer *GLRenderer::createTexturePeer(Texture *texture){
-	if(texture==NULL){
-		Error::nullPointer(Categories::TOADLET_PEEPER,
-			"Texture is NULL");
-		return NULL;
-	}
-
+Texture *GLRenderer::createTexture(){
+	return new GLTexture(this);
+/*
 	switch(texture->getType()){
 		case Texture::Type_NORMAL:{
 			return new GLTexturePeer(this,texture);
@@ -333,22 +328,22 @@ TexturePeer *GLRenderer::createTexturePeer(Texture *texture){
 			RenderTexture *renderTexture=(RenderTexture*)texture;
 			#if defined(TOADLET_HAS_GLEW)
 				if(mFBORenderToTexture){
-					GLTexturePeer *peer=new_GLFBORenderTexturePeer(this,renderTexture);
-					if(peer->isValid()==false){
-						delete peer;
-						peer=NULL;
-					}
-					return peer;
+//					GLTexturePeer *peer=new_GLFBORenderTexturePeer(this,renderTexture);
+//					if(peer->isValid()==false){
+//						delete peer;
+//						peer=NULL;
+//					}
+//					return peer;
 				}
 				else
 			#endif
 			if(mPBufferRenderToTexture){
-				GLTexturePeer *peer=new_GLPBufferRenderTexturePeer(this,renderTexture);
-				if(peer->isValid()==false){
-					delete peer;
-					peer=NULL;
-				}
-				return peer;
+//				GLTexturePeer *peer=new_GLPBufferRenderTexturePeer(this,renderTexture);
+//				if(peer->isValid()==false){
+//					delete peer;
+//					peer=NULL;
+//				}
+//				return peer;
 			}
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"TT_RENDER specified, but no render to texture support");
@@ -361,6 +356,7 @@ TexturePeer *GLRenderer::createTexturePeer(Texture *texture){
 		default:
 			return NULL;
 	}
+*/
 }
 
 BufferPeer *GLRenderer::createBufferPeer(Buffer *buffer){
@@ -687,7 +683,7 @@ void GLRenderer::endScene(){
 	for(i=0;i<mCapabilitySet.maxTextureStages;++i){
 		setTextureStage(i,NULL);
 	}
-
+/*
 	if(mRenderTarget!=NULL){
 		Texture *texture=mRenderTarget->castToTexture();
 		if(texture!=NULL && texture->getAutoGenerateMipMaps()){
@@ -697,7 +693,7 @@ void GLRenderer::endScene(){
 			}
 		}
 	}
-
+*/
 	TOADLET_CHECK_GLERROR("endScene");
 }
 
@@ -1312,24 +1308,19 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 	}
 
 	if(textureStage!=NULL){
-		Texture *texture=textureStage->getTexture();
+		Texture *texture=textureStage->getTexture()->getRootTexture();
 		GLuint textureTarget=0;
-		if(texture!=NULL && texture->internal_getTexturePeer()!=NULL){
-			GLTexturePeer *peer=(GLTexturePeer*)texture->internal_getTexturePeer();
+		if(texture!=NULL){
+			GLTexture *gltexture=(GLTexture*)texture;
 
-			textureTarget=peer->textureTarget;
+			textureTarget=gltexture->mTarget;
 
 			if(mLastTextures[stage]!=texture){
-				glBindTexture(textureTarget,peer->textureHandle);
+				glBindTexture(textureTarget,gltexture->mHandle);
 				mLastTextures[stage]=texture;
 			}
 
-			if(textureStage->getTextureMatrixIdentity()==false
-				|| texture->getType()==Texture::Type_RENDER
-				#if defined(TOADLET_HAS_GLEW)
-					|| textureTarget==GL_TEXTURE_RECTANGLE_ARB
-				#endif
-			){
+			if(textureStage->getTextureMatrixIdentity()==false || texture->getDimension()==Texture::Dimension_D2_RESTRICTED){
 				if(mMatrixMode!=GL_TEXTURE){
 					mMatrixMode=GL_TEXTURE;
 					glMatrixMode(mMatrixMode);
@@ -1337,14 +1328,14 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 				#if defined(TOADLET_FIXED_POINT)
 					#if defined(TOADLET_HAS_GLES)
 						glLoadMatrixx(textureStage->getTextureMatrix().getData());
-						glMultMatrixx(peer->textureMatrix.getData());
+						glMultMatrixx(gltexture->textureMatrix.getData());
 					#else
 						glLoadMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,textureStage->getTextureMatrix()).getData());
-						glMultMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,peer->textureMatrix).getData());
+						glMultMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,gltexture->textureMatrix).getData());
 					#endif
 				#else
 					glLoadMatrixf(textureStage->getTextureMatrix().getData());
-					glMultMatrixf(peer->textureMatrix.getData());
+					glMultMatrixf(gltexture->mMatrix.getData());
 				#endif
 			}
 			else{
@@ -1394,60 +1385,39 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 			}
 			
 			if(blend.source1==TextureBlend::Source_UNSPECIFIED || blend.source2==TextureBlend::Source_UNSPECIFIED){
-				#if defined(TOADLET_HAS_GLES)
-					glTexEnvx(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,mode);
-				#else
-					glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,mode);
-				#endif
+				glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,mode);
 			}
 			else{
-				#if defined(TOADLET_HAS_GLES)
-					glTexEnvx(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_COMBINE);
-					glTexEnvx(GL_TEXTURE_ENV,GL_COMBINE_RGB,mode);
-					glTexEnvx(GL_TEXTURE_ENV,GL_SRC0_RGB,GLTexturePeer::getGLTextureBlendSource(blend.source1));
-					glTexEnvx(GL_TEXTURE_ENV,GL_SRC1_RGB,GLTexturePeer::getGLTextureBlendSource(blend.source2));
-					glTexEnvx(GL_TEXTURE_ENV,GL_SRC2_RGB,GL_CONSTANT);
-				#else
-					glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_COMBINE);
-					glTexEnvi(GL_TEXTURE_ENV,GL_COMBINE_RGB,mode);
-					glTexEnvi(GL_TEXTURE_ENV,GL_SRC0_RGB,GLTexturePeer::getGLTextureBlendSource(blend.source1));
-					glTexEnvi(GL_TEXTURE_ENV,GL_SRC1_RGB,GLTexturePeer::getGLTextureBlendSource(blend.source2));
-					glTexEnvi(GL_TEXTURE_ENV,GL_SRC2_RGB,GL_CONSTANT);
-				#endif
+				glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_COMBINE);
+				glTexEnvi(GL_TEXTURE_ENV,GL_COMBINE_RGB,mode);
+				glTexEnvi(GL_TEXTURE_ENV,GL_SRC0_RGB,GLTexture::getGLTextureBlendSource(blend.source1));
+				glTexEnvi(GL_TEXTURE_ENV,GL_SRC1_RGB,GLTexture::getGLTextureBlendSource(blend.source2));
+				glTexEnvi(GL_TEXTURE_ENV,GL_SRC2_RGB,GL_CONSTANT);
 			}
 		}
 		else{
-			#if defined(TOADLET_HAS_GLES)
-				glTexEnvx(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
-			#else
-				glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
-			#endif
+			glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
 		}
 
 		if(textureStage->getAddressModeSpecified()){
-			#if defined(TOADLET_HAS_GLES)
-				glTexParameterx(textureTarget,GL_TEXTURE_WRAP_S,GLTexturePeer::getGLWrap(textureStage->getSAddressMode()));
-				glTexParameterx(textureTarget,GL_TEXTURE_WRAP_T,GLTexturePeer::getGLWrap(textureStage->getTAddressMode()));
-			#else
-				bool hasClampToEdge=gl_version>=12;
-				glTexParameteri(textureTarget,GL_TEXTURE_WRAP_S,GLTexturePeer::getGLWrap(textureStage->getSAddressMode(),hasClampToEdge));
-				glTexParameteri(textureTarget,GL_TEXTURE_WRAP_T,GLTexturePeer::getGLWrap(textureStage->getTAddressMode(),hasClampToEdge));
-				#if defined(TOADLET_HAS_GL_12)
-				if(gl_version>=12){
-					glTexParameteri(textureTarget,GL_TEXTURE_WRAP_R,GLTexturePeer::getGLWrap(textureStage->getRAddressMode(),hasClampToEdge));
-				}
+			bool hasClampToEdge=
+				#if defined(TOADLET_HAS_GLES)
+					true;
+				#else
+					gl_version>=12;
 				#endif
+			glTexParameteri(textureTarget,GL_TEXTURE_WRAP_S,GLTexture::getGLWrap(textureStage->getSAddressMode(),hasClampToEdge));
+			glTexParameteri(textureTarget,GL_TEXTURE_WRAP_T,GLTexture::getGLWrap(textureStage->getTAddressMode(),hasClampToEdge));
+			#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_12)
+			if(gl_version>=12){
+				glTexParameteri(textureTarget,GL_TEXTURE_WRAP_R,GLTexture::getGLWrap(textureStage->getRAddressMode(),hasClampToEdge));
+			}
 			#endif
 		}
 
 		if(textureStage->getFilterSpecified()){
-			#if defined(TOADLET_HAS_GLES)
-				glTexParameterx(textureTarget,GL_TEXTURE_MIN_FILTER,GLTexturePeer::getGLMinFilter(textureStage->getMinFilter(),textureStage->getMipFilter()));
-				glTexParameterx(textureTarget,GL_TEXTURE_MAG_FILTER,GLTexturePeer::getGLMagFilter(textureStage->getMagFilter()));
-			#else
-				glTexParameteri(textureTarget,GL_TEXTURE_MIN_FILTER,GLTexturePeer::getGLMinFilter(textureStage->getMinFilter(),textureStage->getMipFilter()));
-				glTexParameteri(textureTarget,GL_TEXTURE_MAG_FILTER,GLTexturePeer::getGLMagFilter(textureStage->getMagFilter()));
-			#endif
+			glTexParameteri(textureTarget,GL_TEXTURE_MIN_FILTER,GLTexture::getGLMinFilter(textureStage->getMinFilter(),textureStage->getMipFilter()));
+			glTexParameteri(textureTarget,GL_TEXTURE_MAG_FILTER,GLTexture::getGLMagFilter(textureStage->getMagFilter()));
 		}
 
 		#if !defined(TOADLET_HAS_GLES)
@@ -1744,6 +1714,7 @@ void GLRenderer::setMirrorY(bool mirrorY){
 }
 
 void GLRenderer::copyFrameBufferToTexture(Texture *texture){
+/*
 	GLTexturePeer *peer=(GLTexturePeer*)texture->internal_getTexturePeer();
 	if(peer==NULL){
 		Error::unknown(Categories::TOADLET_PEEPER,
@@ -1764,6 +1735,7 @@ void GLRenderer::copyFrameBufferToTexture(Texture *texture){
 	glBindTexture(peer->textureTarget,0);
 
 	TOADLET_CHECK_GLERROR("copyBufferToTexture");
+*/
 }
 
 const StatisticsSet &GLRenderer::getStatisticsSet(){

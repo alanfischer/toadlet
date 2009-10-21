@@ -1,0 +1,292 @@
+/********** Copyright header - do not remove **********
+ *
+ * The Toadlet Engine
+ *
+ * Copyright 2009, Lightning Toads Productions, LLC
+ *
+ * Author(s): Alan Fischer, Andrew Fischer
+ *
+ * This file is part of The Toadlet Engine.
+ *
+ * The Toadlet Engine is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * The Toadlet Engine is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ ********** Copyright header - do not remove **********/
+
+#include "D3D9Renderer.h"
+#include "D3D9Texture.h"
+#include <toadlet/egg/Error.h>
+#include <toadlet/egg/Logger.h>
+
+using namespace toadlet::egg;
+using namespace toadlet::egg::image;
+
+namespace toadlet{
+namespace peeper{
+
+D3D9Texture::D3D9Texture(D3D9Renderer *renderer):
+	mRenderer(NULL),
+
+	mDimension(Dimension_UNKNOWN),
+	mFormat(0),
+	mWidth(0),
+	mHeight(0),
+	mDepth(0),
+
+	mTexture(NULL)
+{
+	mRenderer=renderer;
+}
+
+D3D9Texture::~D3D9Texture(){
+	if(mTexture!=NULL){
+		destroy();
+	}
+}
+
+void D3D9Texture::create(Dimension dimension,int format,int width,int height,int depth){
+	destroy();
+
+	if((Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || Math::isPowerOf2(depth)==false) &&
+		mRenderer->getCapabilitySet().textureNonPowerOf2==false &&
+		(mRenderer->getCapabilitySet().textureNonPowerOf2==false || dimension!=Dimension_D2_RESTRICTED))
+	{
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"D3D9Texture: Cannot load a non power of 2 texture");
+		return false;
+	}
+
+	mDimension=dimension;
+	mFormat=format;
+	mWidth=width;
+	mHeight=height;
+	mDepth=depth;
+	
+	IDirect3DDevice9 *device=renderer->getDirect3DDevice9();
+	IDirect3D9 *d3d=NULL; device->GetDirect3D(&d3d);
+	D3DFORMAT d3dformat=getD3DFORMAT(textureFormat);
+	if(!isD3DFORMATValid(d3d,d3dformat,D3DFMT_X8R8G8B8)){
+		d3dformat=D3DFMT_X8R8G8B8;
+	}
+	
+	HRESULT result=E_FAIL;
+	UINT levels=mAutoGenerateMipMaps?0:1;
+	DWORD usage=0; // TODO: Add renderTexture usage
+	D3DPOOL pool=D3DPOOL_MANAGED;
+	switch(dimension){
+		case Texture::Dimension_D1:
+		case Texture::Dimension_D2:{
+			IDirect3DTexture9 *texture=NULL;
+			result=device->CreateTexture(mWidth,mHeight,levels,usage,d3dformat,pool,&texture,NULL);
+			mTexture=texture;
+		}break;
+		case Texture::Dimension_D3:{
+			IDirect3DVolumeTexture9 *texture=NULL;
+			result=device->CreateVolumeTexture(mWidth,mHeight,depth,levels,usage,d3dformat,pool,&texture,NULL);
+			mTexture=texture;
+		}break;
+		case Texture::Dimension_CUBEMAP:{
+			IDirect3DCubeTexture9 *texture=NULL;
+			result=device->CreateCubeTexture(mWidth,levels,usage,d3dformat,pool,&texture,NULL);
+			mTexture=texture;
+		}break;
+	}
+
+	if(FAILED(result)){
+		TOADLET_CHECK_D3D9ERROR(result,"CreateTexture");
+		return false;
+	}
+
+	return true;
+}
+
+void D3D9Texture::destroy(){
+	if(mTexture!=NULL){
+		HRESULT result=mTexture->Release();
+		mTexture=NULL;
+
+		if(FAILED(result)){
+			TOADLET_CHECK_D3D9ERROR(result,"CreateTexture");
+			return;
+		}
+	}
+}
+
+void D3D9Texture::load(int format,int width,int height,int depth,uint8 *data){
+	if(width!=mWidth || height!=mHeight || depth!=mDepth){
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"D3D9Texture: Texture data of incorrect dimensions");
+		return;
+	}
+
+	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2 || mDimension==Texture::Dimension_D2_RESTRICTED){
+		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
+
+		D3DLOCKED_RECT rect={0};
+		result=texture->LockRect(0,&rect,NULL,D3DLOCK_DISCARD);
+		if(FAILED(result)){
+			TOADLET_CHECK_D3D9ERROR(result,"LockRect");
+			return;
+		}
+
+		int pixelSize=ImageFormatConversion::getPixelSize(format);
+		unsigned char *dst=(unsigned char*)rect.pBits;
+		unsigned char *src=(unsigned char*)data;
+
+		int i,j;
+		if(textureFormat==Texture::Format_A_8 && d3dformat==D3DFMT_A8L8){
+			for(i=0;i<height;++i){
+				for(j=0;j<width;++j){
+					*(uint16*)(dst+rect.Pitch*i+j*2)=A8toA8L8(*(uint8*)(src+width*pixelSize*i+j*1));
+				}
+			}
+		}
+		else if(textureFormat==Texture::Format_RGBA_8 && d3dformat==D3DFMT_A8R8G8B8){
+			for(i=0;i<height;++i){
+				for(j=0;j<width;++j){
+					*(uint32*)(dst+rect.Pitch*i+j*4)=RGBA8toA8R8G8B8(*(uint32*)(src+width*pixelSize*i+j*pixelSize));
+				}
+			}
+		}
+		else if(textureFormat==Texture::Format_RGB_8 && d3dformat==D3DFMT_X8R8G8B8){
+			for(i=0;i<height;++i){
+				for(j=0;j<width;++j){
+					*(uint32*)(dst+rect.Pitch*i+j*4)=RGB8toX8R8G8B8(src+width*pixelSize*i+j*pixelSize);
+				}
+			}
+		}
+		else{
+			for(i=0;i<height;++i){
+				memcpy(dst+rect.Pitch*i,src+width*pixelSize*i,width*pixelSize);
+			}
+		}
+
+		texture->UnlockRect(0);
+	}
+	else{
+		Error::unimplemented(Categories::TOADLET_PEEPER,
+			"D3D9Texture: Volume & Cube loading not yet implemented");
+		return;
+	}
+}
+
+bool D3D9Texture::read(int format,int width,int height,int depth,uint8 *data){
+	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2 || mDimension==Texture::Dimension_D2_RESTRICTED){
+		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
+
+		D3DLOCKED_RECT rect={0};
+		result=texture->LockRect(0,&rect,NULL,D3DLOCK_READONLY);
+		
+		// TODO: convert & copy back, inverse of above
+		
+		texture->UnlockRect(0);
+
+		return true;
+	}
+	else{
+		Error::unimplemented(Categories::TOADLET_PEEPER,
+			"D3D9Texture: Volume & Cube reading not yet implemented");
+		return;
+	}
+}
+
+void D3D9TexturePeer::setAutoGenerateMipMaps(bool mipmaps){
+	mAutoGenerateMipMaps=mipmaps;
+}
+
+bool D3D9TexturePeer::isD3DFORMATValid(IDirect3D9 *d3d,D3DFORMAT textureFormat,D3DFORMAT adapterFormat){
+	return SUCCEEDED(d3d->CheckDeviceFormat(D3DADAPTER_DEFAULT,D3DDEVTYPE_HAL,adapterFormat,0,D3DRTYPE_TEXTURE,textureFormat));
+}
+
+D3DFORMAT D3D9TexturePeer::getD3DFORMAT(int textureFormat){
+	D3DFORMAT format=D3DFMT_UNKNOWN;
+
+	if(textureFormat==Texture::Format_L_8){
+		format=D3DFMT_L8;
+	}
+	else if(textureFormat==Texture::Format_A_8){
+		format=D3DFMT_A8L8; // Use A8L8 and fill L8 with white
+	}
+	else if(textureFormat==Texture::Format_LA_8){
+		format=D3DFMT_A8L8;
+	}
+	else if(textureFormat==Texture::Format_RGB_8){
+		format=D3DFMT_R8G8B8;
+	}
+	else if(textureFormat==Texture::Format_RGBA_8){
+		format=D3DFMT_A8R8G8B8;
+	}
+	else if(textureFormat==Texture::Format_RGB_5_6_5){
+		format=D3DFMT_R5G6B5;
+	}
+	else if(textureFormat==Texture::Format_RGBA_5_5_5_1){
+		format=D3DFMT_A1R5G5B5;
+	}
+	else if(textureFormat==Texture::Format_RGBA_4_4_4_4){
+		format=D3DFMT_A4R4G4B4;
+	}
+
+	if(format==D3DFMT_UNKNOWN){
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"D3D9TexturePeer::getD3DFORMAT: Invalid type");
+	}
+
+	return format;
+}
+
+DWORD D3D9TexturePeer::getD3DTADDRESS(Texture::AddressMode addressMode){
+	DWORD taddress=0;
+
+	switch(addressMode){
+		case Texture::AddressMode_REPEAT:
+			taddress=D3DTADDRESS_WRAP;
+		break;
+		case Texture::AddressMode_CLAMP_TO_EDGE:
+			taddress=D3DTADDRESS_CLAMP;
+		break;
+		case Texture::AddressMode_CLAMP_TO_BORDER:
+			taddress=D3DTADDRESS_BORDER;
+		break;
+		case Texture::AddressMode_MIRRORED_REPEAT:
+			taddress=D3DTADDRESS_MIRROR;
+		break;
+	}
+
+	if(taddress==0){
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"D3D9TexturePeer::getD3DTADDRESS: Invalid address mode");
+	}
+
+	return taddress;
+}
+
+DWORD D3D9TexturePeer::getD3DTEXF(Texture::Filter filter){
+	DWORD texf=D3DTEXF_NONE;
+
+	switch(filter){
+		case Texture::Filter_NONE:
+			texf=D3DTEXF_NONE;
+		break;
+		case Texture::Filter_NEAREST:
+			texf=D3DTEXF_POINT;
+		break;
+		case Texture::Filter_LINEAR:
+			texf=D3DTEXF_LINEAR;
+		break;
+	}
+
+	return texf;
+}
+
+}
+}

@@ -26,7 +26,7 @@
 #ifndef TOADLET_TADPOLE_WIDGET_SPRITEWIDGET_H
 #define TOADLET_TADPOLE_WIDGET_SPRITEWIDGET_H
 
-#include <toadlet/peeper/AnimatedTexture.h>
+//#include <toadlet/peeper/AnimatedTexture.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/tadpole/Material.h>
@@ -59,7 +59,7 @@ protected:
 	void updateFrame();
 
 	peeper::Texture::ptr mTexture;
-	peeper::AnimatedTexture::ptr mAnimatedTexture;
+//	peeper::AnimatedTexture::ptr mAnimatedTexture;
 	Matrix4x4 mTextureMatrix;
 
 	int mFrame;
