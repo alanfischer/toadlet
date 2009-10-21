@@ -1,0 +1,25 @@
+I need to re-examine the milkshape .xanm exporter.  As of January 18th, 2007, the rake-setter does not export correctly.
+
+If I export an .xanm of rake-setter-throw1, and then re-import, its hosed.
+
+If I export an .xanm of rake-setter-throw2, and then add it to a .xmsh and play it, its hosed (extra set on the end).
+
+
+
+
+
+
+(04:08:52 PM) Bus: the only thing wrong is the toadlet importer
+(04:08:59 PM) Bus: it cuts the total frames down to 30
+(04:09:03 PM) isanythingnotakn: hmmm
+(04:09:07 PM) Bus: all 40 frames were still there in the ms3d model
+(04:09:34 PM) Bus: becuase there were keyframes beyond the 30'th frame
+(04:09:45 PM) Bus: so even if you set the model to have only 30, milkshape remembers the rest
+(04:09:55 PM) Bus: and when I exported, i got the full 40
+(04:10:08 PM) isanythingnotakn: oooh
+(04:10:10 PM) isanythingnotakn: interesting
+(04:10:22 PM) isanythingnotakn: so somethings hosed on the toadlet importer?
+(04:10:59 PM) Bus: well, the animation length in the exported .xanms is 1.33
+(04:11:14 PM) Bus: and the importer appears to cut off anything beyond 1
+(04:11:22 PM) isanythingnotakn: ok
+(04:11:32 PM) Bus: out of this whole mess, that is the only problem

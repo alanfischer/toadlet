@@ -1,0 +1,53 @@
+<!-- Define all properties, variables and paths here -->
+<project name="defines" basedir="../..">
+	
+	<!-- Global properties -->
+	<property environment="env"/>
+	<property name="class.name" value="LawnDarts"/>
+	<property name="src" location="src/java"/>
+	<property name="components" location="components"/>
+	<property name="jads" location="jads"/>
+	<property name="wtk.home" value="${env.WTK_HOME}"/>
+	<property name="wtk.proguard.home" value="${env.JTOADLET_DEPS_DIR}"/>
+
+	<!-- Optional signing properties -->
+	<property name="keystore.sign" value="${env.JTOADLET_DEPS_DIR}/signing/sprint.sks"/>
+	<property name="keypass.sign" value="parrot1"/>
+	<property name="certalias.sign" value="cert"/>
+	
+	<!-- Classpaths for additional jars -->
+	<property name="iden.classpath" value="${env.JTOADLET_DEPS_DIR}/lib/iden.jar"/>
+	<property name="jsr184.classpath" value="${env.WTK_HOME}/lib/jsr184.jar"/>
+	<property name="se.classpath" value="${env.JTOADLET_DEPS_DIR}/lib/se.jar"/>
+	<property name="sprint.classpath" value="${env.JTOADLET_DEPS_DIR}/lib/sprint.zip"/>
+	<property name="mmapi.classpath" value="${env.WTK_HOME}/lib/mmapi.jar"/>
+	<property name="jsr82.classpath" value="${env.WTK_HOME}/lib/jsr082.jar"/>
+	<property name="nokia.classpath" value="${env.JTOADLET_DEPS_DIR}/lib/nokia.jar"/>
+
+	<!-- Antenna and ant-contrib are required -->
+	<taskdef resource="antenna.properties" classpath="${env.JTOADLET_DEPS_DIR}/lib/antenna-bin-0.9.12.jar"/>
+	<taskdef resource="net/sf/antcontrib/antlib.xml" classpath="${env.JTOADLET_DEPS_DIR}/lib/ant-contrib.jar"/>
+	
+	<!--
+		Mutable variables - these may be changed using ant-contrib 
+		Values seen here are the defaults
+		Convention:
+		.name vars are used as labels for files/directories or string comparison
+		.list vars are delimited lists of files, arguments, etc 
+	-->
+	<var name="midlet.name" value="3D Lawn Darts"/>
+	<var name="app.name" value="3DLawnDarts"/>
+	<var name="cldc.name" value="1.0"/>
+	<var name="midp.name" value="2.0"/>
+	<var name="build.name" value=""/>
+	<var name="classpath.list" value=""/>
+	<var name="exactmanifest.name" value=""/>
+	<var name="jadpermissions.list" value=""/>
+	<var name="jtoadlet.version" value=""/>
+	<var name="phone.name" value=""/>
+	<var name="preprocessargs.list" value=""/>
+	<var name="resourcedirs.list" value="${components}/base"/>
+	<var name="resourcetypes.list" value="**/*.bmp,**/*.png,**/*.clt"/>
+	<var name="screensize.args" value=""/>
+	
+</project>

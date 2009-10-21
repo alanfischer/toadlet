@@ -1,0 +1,13 @@
+Sprites in Mascot Capsule can have 2 scale modes:
+
+POINT_SPRITE_LOCAL_SIZE
+POINT_SPRITE_PIXEL_SIZE
+
+In theory we should be able to just use LOCAL_SIZE and have mascot sprite
+projections work the same as software & c++ sprites.
+
+However, LOCAL_SIZE seems to have problems when paired with PARALLEL_PROJECTION.
+That or the scales are not yet understood properly.
+
+So we currently use PIXEL_SIZE, and set the sprite to be the same size as the
+frameWidth & frameHeight, so mascot sprites should act the same as JSR sprites.

@@ -1,0 +1,133 @@
+<!-- Phone manufacterer and carrier targets, used to set the necessary options -->
+<project name="platforms" basedir="../..">
+	
+	<!-- Select phone my manufacterer -->
+	
+	<target name="iden">
+		<property name="platform" value="BUILD_PLATFORM_IDEN"/>
+		<echo message="Setting platform=${platform}"/>
+		<var name="preprocessargs.list" value="${platform}"/>
+		<var name="resourcedirs.list" value="${components}/base,${components}/iden"/>
+		<property name="idenjadattributes" value="true"/>
+		
+		<!-- HACK because ant-contribs runtarget task is fuked -->
+		<if>
+			<equals arg1="${classpath.list}" arg2=""/>
+			<then>
+				<var name="classpath.list" value="${iden.classpath}"/>
+			</then>
+			<else>
+				<var name="classpath.list" value="${classpath.list};${iden.classpath}"/>
+			</else>
+		</if>
+	</target>
+	
+	<target name="lg">
+		<property name="platform" value="BUILD_PLATFORM_LG"/>
+		<echo message="Setting platform=${platform}"/>
+		<var name="preprocessargs.list" value="${platform}"/>
+		<var name="resourcedirs.list" value="${components}/base,${components}/lg"/>
+	</target>
+	
+	<target name="motorola">
+		<property name="platform" value="BUILD_PLATFORM_MOTOROLA"/>
+		<echo message="Setting platform=${platform}"/>
+		<var name="preprocessargs.list" value="${platform}"/>
+		<var name="resourcedirs.list" value="${components}/base,${components}/motorola"/>
+	</target>
+	
+	<target name="nokia">
+		<property name="platform" value="BUILD_PLATFORM_NOKIA"/>
+		<echo message="Setting platform=${platform}"/>
+		<var name="preprocessargs.list" value="${platform}"/>
+		<var name="resourcedirs.list" value="${components}/base,${components}/nokia"/>
+		
+		<!-- HACK because ant-contribs runtarget task is fuked -->
+		<if>
+			<equals arg1="${classpath.list}" arg2=""/>
+			<then>
+				<var name="classpath.list" value="${nokia.classpath}"/>
+			</then>
+			<else>
+				<var name="classpath.list" value="${classpath.list};${nokia.classpath}"/>
+			</else>
+		</if>
+	</target>
+	
+	<target name="sonyericsson">
+		<property name="platform" value="BUILD_PLATFORM_SE"/>
+		<echo message="Setting platform=${platform}"/>
+		<var name="preprocessargs.list" value="${platform}"/>
+		<var name="resourcedirs.list" value="${components}/base,${components}/se"/>
+		
+		<!-- HACK because ant-contribs runtarget task is fuked -->
+		<if>
+			<equals arg1="${classpath.list}" arg2=""/>
+			<then>
+				<var name="classpath.list" value="${se.classpath}"/>
+			</then>
+			<else>
+				<var name="classpath.list" value="${classpath.list};${se.classpath}"/>
+			</else>
+		</if>
+	</target>
+	
+	<target name="samsung">
+		<property name="platform" value="BUILD_PLATFORM_SAMSUNG"/>
+		<echo message="Setting platform=${platform}"/>
+		<var name="preprocessargs.list" value="${platform}"/>
+		<var name="resourcedirs.list" value="${components}/base,${components}/samsung"/>
+	</target>
+	
+	<target name="sanyo">
+		<property name="platform" value="BUILD_PLATFORM_SANYO"/>
+		<echo message="Setting platform=${platform}"/>
+		<var name="preprocessargs.list" value="${platform}"/>
+		<var name="resourcedirs.list" value="${components}/base,${components}/sanyo"/>
+	</target>
+	
+	<!-- Set carrier, when it makes a difference -->
+	
+	<target name="generic">
+		<property name="carrier" value="BUILD_CARRIER_GENERIC"/>
+		<echo message="Setting carrier=${carrier}"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${carrier}"/>
+	</target>
+	
+	<target name="sprint">
+		<property name="carrier" value="BUILD_CARRIER_SPRINT"/>
+		<echo message="Setting carrier=${carrier}"/>
+		<var name="exactmanifest.name" value="true"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${carrier}"/>
+		<var name="resourcedirs.list" value="${resourcedirs.list},${components}/sprint"/>
+		
+		<!-- HACK because ant-contribs runtarget task is fuked -->
+		<if>
+			<equals arg1="${classpath.list}" arg2=""/>
+			<then>
+				<var name="classpath.list" value="${sprint.classpath}"/>
+			</then>
+			<else>
+				<var name="classpath.list" value="${classpath.list};${sprint.classpath}"/>
+			</else>
+		</if>
+		
+		<!-- HACK because ant-contribs runtarget task is fuked -->
+		<if>
+			<equals arg1="${jadpermissions.list}" arg2=""/>
+			<then>
+				<var name="jadpermissions.list" value="javax.microedition.media.Manager, javax.microedition.media.Player, javax.microedition.media.control.RecordControl, javax.microedition.media.protocol.Datasource"/>
+			</then>
+			<else>
+				<var name="jadpermissions.list" value="${jadpermissions.list}, javax.microedition.media.Manager, javax.microedition.media.Player, javax.microedition.media.control.RecordControl, javax.microedition.media.protocol.Datasource"/>
+			</else>
+		</if>
+	</target>
+	
+	<target name="tmobile">
+		<property name="carrier" value="BUILD_CARRIER_TMOBILE"/>
+		<echo message="Setting carrier=${carrier}"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${carrier}"/>
+	</target>
+	
+</project>

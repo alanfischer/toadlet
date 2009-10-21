@@ -1,0 +1,50 @@
+<!-- All 3d specific setup and tasks are contained here -->
+<project name="3dapis" basedir="../..">
+	
+	<target name="3d_iden">
+		<var name="3dapi.args" value="JTOADLETFIXED_IDEN,JTOADLETFIXED_MASCOTV3"/>
+		<echo message="Setting 3dapi=${3dapi.args}"/>
+		<var name="jtoadlet.version" value="jtoadletfixed_iden"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${3dapi.args}"/>
+	</target>
+	
+	<target name="3d_jsr184">
+		<var name="3dapi.args" value="JTOADLETFIXED_JSR184"/>
+		<echo message="Setting 3dapi=${3dapi.args}"/>
+		<var name="jtoadlet.version" value="jtoadletfixed_jsr184"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${3dapi.args}"/>
+		
+		<!-- HACK because ant-contribs runtarget task is fuked -->
+		<if>
+			<equals arg1="${classpath.list}" arg2=""/>
+			<then>
+				<var name="classpath.list" value="${jsr184.classpath}"/>
+			</then>
+			<else>
+				<var name="classpath.list" value="${classpath.list};${jsr184.classpath}"/>
+			</else>
+		</if>
+	</target>
+	
+	<target name="3d_se">
+		<var name="3dapi.args" value="JTOADLETFIXED_SE,JTOADLETFIXED_MASCOTV3"/>
+		<echo message="Setting 3dapi.args=${3dapi.args}"/>
+		<var name="jtoadlet.version" value="jtoadletfixed_se"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${3dapi.args}"/>
+	</target>
+	
+	<target name="3d_sprint">
+		<var name="3dapi.args" value="JTOADLETFIXED_SPRINT,JTOADLETFIXED_MASCOTV3"/>
+		<echo message="Setting 3dapi=${3dapi.args}"/>
+		<var name="jtoadlet.version" value="jtoadletfixed_sprint"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${3dapi.args}"/>
+	</target>
+	
+	<target name="3d_stub">
+		<var name="3dapi.args" value="JTOADLETFIXED_STUB"/>
+		<echo message="Setting 3dapi=${3dapi.args}"/>
+		<var name="jtoadlet.version" value="jtoadletfixed_stub"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${3dapi.args}"/>
+	</target>
+	
+</project>

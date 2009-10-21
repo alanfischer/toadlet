@@ -1,0 +1,66 @@
+/********** Copyright header - do not remove **********
+ *
+ * The Toadlet Engine
+ *
+ * Copyright 2009, Lightning Toads Productions, LLC
+ *
+ * Author(s): Alan Fischer, Andrew Fischer
+ *
+ * This file is part of The Toadlet Engine.
+ *
+ * The Toadlet Engine is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * The Toadlet Engine is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ ********** Copyright header - do not remove **********/
+
+#ifndef TOADLET_EGG_NET_WIN32BluetoothSERVERQUERY_H
+#define TOADLET_EGG_NET_WIN32BluetoothSERVERQUERY_H
+
+#include <toadlet/egg/Collection.h>
+#include <toadlet/egg/Mutex.h>
+#include <toadlet/egg/net/BluetoothServerQuery.h>
+#include <toadlet/egg/net/platform/win32/Win32BluetoothIncludes.h>
+
+namespace toadlet{
+namespace egg{
+namespace net{
+
+class Win32BluetoothServerQuery:public BluetoothServerQuery{
+public:
+	Win32BluetoothServerQuery(const String &guid);
+	virtual ~Win32BluetoothServerQuery();
+
+	int startQuery();
+	void cancelQuery();
+
+	int getNumServers();
+	const String &getServerName(int i);
+	BluetoothAddress *getServerAddress(int i);
+
+	String cacheName;
+
+protected:
+	void clearServers();
+
+	HANDLE mLookup;
+	GUID mGUID;
+	Mutex mLock;
+	Collection<String> mServerNames;
+	Collection<BluetoothAddress*> mServers;
+};
+
+}
+}
+}
+
+#endif

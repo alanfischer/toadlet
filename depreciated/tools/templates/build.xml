@@ -1,0 +1,118 @@
+<project name="3DLawnDarts" default="help" basedir="../..">
+	<description>
+		Builds 3D Lawn Darts
+	</description>
+
+	<!-- Include build files for all project includes, options, and targets -->
+	<import file="defines.xml"/>
+	<import file="3dapis.xml"/>
+	<import file="display.xml"/>
+	<import file="platforms.xml"/>
+	<import file="options.xml"/>
+	<import file="compile.xml"/>
+	<import file="generics.xml"/>
+	<import file="phones.xml"/>
+
+	<!-- The default help shows useful options and all viable targets -->
+	<target name="help" description="help and settings">
+		<echo message=" To list available targets type: ant -projecthelp"/>
+		<echo message=" To build the game type the name of the target"/>
+		<echo message=" platform you wish to build from that list."/>
+		<echo message=" "/>
+		<echo message=" Several command line options are avaliable as well."/>
+		<echo message=" They are as follows:"/>
+		<echo message="   -DDEBUG=true"/>
+		<echo message="   -DDEMO=true"/>
+		<echo message="   -DSIGNJAD=true"/>
+		<echo message="   -DTIMESTAMP=true"/>
+		<echo message=" As an example, the following would build debug demo version, sign it, and add a timestamp to the name:"/>
+		<echo message="   ant -DDEBUG=true -DDEMO=true -DSIGNJAD=true -DTIMESTAMP=true target"/>
+		<echo message=" "/>
+		<echo message=" Mandatory environment variables that MUST be set for the build to work:"/>
+		<echo message=" JTOADLETFIXED_INSTALL_DIR = The install directory of the jtoadletfixed engine jars"/>
+		<echo message=" JTOADLET_DEPS_DIR = The base install of jtoadletDeps"/>
+		<echo message=" WTK_HOME = The base install of Sun's Wireless Toolkit (2.2 or greater)"/>
+		<echo message=" JAVA_HOME = The base install of Sun's JDK (1.4 or greater)"/>
+		<echo message=" PATH = JTOADLET_DEPS_DIR/YOUR_OS_TYPE/bin/ For the fpcomp executable - make sure it is executable!"/>
+		<echo message=" PATH = JAVA_HOME/bin/ For the jad executable"/>
+		<echo message=" "/>
+		<echo message=" "/>
+		<echo message=" *** All viable build targets are listed below *** "/>
+		<echo message=" "/>
+		<echo message="   iDEN Generics:"/>
+		<echo message=" iden-generic-130x130-3d"/>
+		<echo message=" iden-generic-130x130-3d-bluetooth"/>
+		<echo message=" iden-generic-176x208-3d"/>
+		<echo message=" iden-generic-176x208-3d-bluetooth"/>
+		<echo message=" iden-sprint-128x160-3d"/>
+		<echo message=" iden-sprint-240x320-3d-bluetooth"/>
+		<echo message=" "/>
+		<echo message="   iDEN Specific Devices:"/>
+		<echo message=" iden-i880-generic  (uses: iden-generic-176x208-3d-bluetooth)"/>
+		<echo message=" iden-i87X-generic  (uses: iden-generic-176x208-3d-bluetooth)"/>
+		<echo message=" iden-i860-generic  (uses: iden-generic-176x208-3d)"/>
+		<echo message=" iden-i85X-generic  (uses: iden-generic-176x208-3d-bluetooth)"/>
+		<echo message=" iden-i83X-generic  (uses: iden-generic-130x130-3d)"/>
+		<echo message=" iden-i760-generic  (uses: iden-generic-176x208-3d-bluetooth)"/>
+		<echo message=" iden-i73X-generic  (uses: iden-generic-130x130-3d-bluetooth)"/>
+		<echo message=" iden-i670-generic  (uses: iden-generic-130x130-3d-bluetooth)"/>
+		<echo message=" iden-i615-generic  (uses: iden-generic-176x208-3d)"/>
+		<echo message=" iden-i605-generic  (uses: iden-generic-176x208-3d-bluetooth)"/>
+		<echo message=" iden-i580-generic  (uses: iden-generic-176x208-3d)"/>
+		<echo message=" iden-i560-generic  (uses: iden-generic-130x130-3d-bluetooth)"/>
+		<echo message=" iden-ic902-sprint  (uses: iden-sprint-240x320-3d-bluetooth)"/>
+		<echo message=" iden-ic502-sprint  (uses: iden-sprint-128x160-3d)"/>
+		<echo message=" iden-ic402-sprint  (uses: iden-sprint-128x160-3d)"/>
+		<echo message=" "/>
+		<echo message="   LG Generics:"/>
+		<echo message=" lg-sprint-128x160-3d-camera"/>
+		<echo message=" lg-sprint-1176x220-3d-camera"/>
+		<echo message=" lg-sprint-176x220-3d-bluetooth-camera"/>
+		<echo message=" "/>
+		<echo message="   LG Specific Devices:"/>
+		<echo message=" lg-550-sprint  (uses: lg-sprint-176x220-3d-bluetooth-camera)"/>
+		<echo message=" lg-fusic2-sprint  (uses: lg-sprint-176x220-3d-bluetooth-camera)"/>
+		<echo message=" lg-535-sprint  (uses: lg-sprint-176x220-3d-camera)"/>
+		<echo message=" lg-350-sprint  (uses: lg-sprint-128x160-3d-camera)"/>
+		<echo message=" "/>
+		<echo message="   Motorola Generics:"/>
+		<echo message=" motorola-sprint-176x220-3d-camera"/>
+		<echo message=" motorola-sprint-240x320-3d-bluetooth-camera"/>
+		<echo message=" "/>
+		<echo message="   Motorola Specific Devices:"/>
+		<echo message=" motorola-razrv3m-sprint  (uses: motorola-sprint-176x220-3d-camera)"/>
+		<echo message=" motorola-krazrk1m-sprint  (uses: motorola-sprint-176x220-3d-camera)"/>
+		<echo message=" motorola-slvr-sprint  (uses: motorola-sprint-176x220-3d-camera)"/>
+		<echo message=" motorola-razr2v9-sprint  (uses: motorola-sprint-240x320-3d-bluetooth-camera)"/>
+		<echo message=" "/>
+		<echo message="   Samsung Generics:"/>
+		<echo message=" samsung-sprint-176x220-3d-camera"/>
+		<echo message=" samsung-sprint-240x320-3d-camera"/>
+		<echo message=" "/>
+		<echo message="   Samsung Specific Devices:"/>
+		<echo message=" samsung-a900-sprint  (uses: samsung-sprint-240x320-3d-camera)"/>
+		<echo message=" samsung-m610-sprint  (uses: samsung-sprint-240x320-3d-camera)"/>
+		<echo message=" samsung-a920-sprint  (uses: samsung-sprint-176x220-3d-camera)"/>
+		<echo message=" samsung-a960-sprint  (uses: samsung-sprint-176x220-3d-camera)"/>
+		<echo message=" samsung-a880-sprint  (uses: samsung-sprint-176x220-3d-camera)"/>
+		<echo message=" samsung-a800-sprint  (uses: samsung-sprint-176x220-3d-camera)"/>
+		<echo message=" samsung-m500-sprint  (uses: samsung-sprint-176x220-3d-camera)"/>
+		<echo message=" samsung-upstage-sprint  (uses: samsung-sprint-176x220-3d-camera)"/>
+		<echo message=" "/>
+		<echo message="   Sanyo Generics:"/>
+		<echo message=" sanyo-sprint-176x220-3d-camera"/>
+		<echo message=" sanyo-sprint-240x320-3d-camera"/>
+		<echo message=" "/>
+		<echo message="   Sanyo Specific Devices:"/>
+		<echo message=" sanyo-m1-sprint  (uses: sanyo-sprint-240x320-3d-camera)"/>
+		<echo message=" sanyo-9000-sprint  (uses: sanyo-sprint-240x320-3d-camera)"/>
+		<echo message=" sanyo-8400-sprint  (uses: sanyo-sprint-240x320-3d-camera)"/>
+		<echo message=" sanyo-katana2-sprint  (uses: sanyo-sprint-240x320-3d-camera)"/>
+		<echo message=" sanyo-katana-sprint  (uses: sanyo-sprint-240x320-3d-camera)"/>
+		<echo message=" sanyo-5600-sprint  (uses: sanyo-sprint-240x320-3d-camera)"/>
+		<echo message=" sanyo-8300-sprint  (uses: sanyo-sprint-176x220-3d-camera)"/>
+		<echo message=" sanyo-7500-sprint  (uses: sanyo-sprint-176x220-3d-camera)"/>
+		<echo message=" sanyo-7400-sprint  (uses: sanyo-sprint-176x220-3d-camera)"/>
+      </target>
+
+</project>

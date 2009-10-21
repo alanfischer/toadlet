@@ -1,0 +1,43 @@
+# Source files for toadlet_peeper_d3d9renderer
+set (PEEPER_D3D9RENDERER_SRC
+	D3D9IndexBufferPeer.cpp
+	D3D9RenderTexturePeer.cpp
+	D3D9Renderer.cpp
+	D3D9TexturePeer.cpp
+	D3D9VertexBufferPeer.cpp
+	D3D9WindowRenderContextPeer.cpp
+)
+
+
+# Headers
+set (PEEPER_D3D9RENDERER_HEADERS
+	D3D9Includes.h
+	D3D9IndexBufferPeer.h
+	D3D9RenderContextPeer.h
+	D3D9RenderTargetPeer.h
+	D3D9RenderTexturePeer.h
+	D3D9Renderer.h
+	D3D9TexturePeer.h
+	D3D9VertexBufferPeer.h
+	D3D9WindowRenderContextPeer.h
+)
+
+
+# Dependencies - note that D3D9 has already been found
+include_directories (${D3D9_INCLUDE_PATH})
+set (PEEPER_D3D9RENDERER_LIBS ${D3D9_LIBRARIES})
+
+
+# Dynamic library
+add_library (toadlet_peeper_d3d9renderer SHARED ${PEEPER_D3D9RENDERER_SRC} ${PEEPER_D3D9RENDERER_HEADERS})
+set_target_properties (toadlet_peeper_d3d9renderer PROPERTIES ${DYNAMIC_LIB_PROPS})
+target_link_libraries (toadlet_peeper_d3d9renderer toadlet_peeper ${PEEPER_D3D9RENDERER_LIBS})
+install (TARGETS toadlet_peeper_d3d9renderer DESTINATION lib)
+
+
+# Static library
+add_library (toadlet_peeper_d3d9renderer_s STATIC ${PEEPER_D3D9RENDERER_SRC} ${PEEPER_D3D9RENDERER_HEADERS})
+set_target_properties (toadlet_peeper_d3d9renderer_s PROPERTIES ${STATIC_LIB_PROPS})
+target_link_libraries (toadlet_peeper_d3d9renderer_s toadlet_peeper_s ${PEEPER_D3D9RENDERER_LIBS})
+install (TARGETS toadlet_peeper_d3d9renderer_s DESTINATION lib)
+

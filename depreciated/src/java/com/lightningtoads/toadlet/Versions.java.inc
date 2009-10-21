@@ -1,0 +1,10 @@
+// toadlet versions
+
+public static final int TOADLET_TADPOLE_VERSION_MAJOR=	1;
+public static final int TOADLET_TADPOLE_VERSION_MINOR=	0;
+public static final int TOADLET_TADPOLE_VERSION_BUILD=	1;
+public static final int TOADLET_TADPOLE_VERSION_REVISION=	0;
+public static final String TOADLET_TADPOLE_VERSION_STRING=
+	TOADLET_TADPOLE_VERSION_MAJOR+"."+
+	TOADLET_TADPOLE_VERSION_MINOR+"."+
+	TOADLET_TADPOLE_VERSION_BUILD;

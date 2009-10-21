@@ -1,0 +1,49 @@
+MascotClipping:
+
+
+
+For the most part, by simply using the setViewport method of the CameraEntity, these quirks will be hidden for you.
+
+Except for the following special cases:
+
+SE JP3 & Emulator:
+	if((clipHeight-viewportY)<(viewportY+viewportHeight) || (clipWidth-viewportX)<(viewportX+viewportWidth)){
+		Problematic viewport for SonyEricsson JP3.  (clipHeight-viewportY) must be greater than (viewportY+viewportHeight)
+	}
+
+Sprint:
+	if(clipX!=viewportX || clipY!=viewportY || clipWidth!=viewportWidth || clipHeight!=viewportHeight){
+		Problematic viewport for a Sprint device.  Bottom & right will be clipped if on a GameCanvas, otherwise no clipping will occur
+	}
+
+
+
+These are the exact behavior for what to send setClip when working with mascot capsule.
+
+iDEN:
+	g.setClip(viewportX,viewportY,viewportWidth-1,viewportHeight-1)
+
+SE JP5:
+	g.setClip(viewportX,viewportY,viewportWidth,viewportHeight)
+
+SE JP3 & Emulator:
+	int clipX=g.getClipX();
+	int clipY=g.getClipY();
+	int clipWidth=g.getClipWidth();
+	int clipHeight=g.getClipHeight();
+	if((clipHeight-viewportY)<(viewportY+viewportHeight) || (clipWidth-viewportX)<(viewportX+viewportWidth)){
+		(clipHeight-viewportY) must be greater than (viewportY+viewportHeight)
+	}
+	else{
+		g.setClip(viewportX,viewportY,viewportX+viewportWidth+1,viewportY+viewportHeight+1);
+	}
+
+Sprint:
+	GameCanvas:
+		Clipping only works on the bottom & right sides
+		g.setClip(viewportX,viewportY,viewportX+viewportWidth,viewportY+viewportHeight);
+	Canvas:
+		No clipping available
+
+Sprint Emulator:
+	g.setClip(viewportX,viewportY,viewportWidth,viewportHeight)

@@ -1,0 +1,115 @@
+/********** Copyright header - do not remove **********
+ *
+ * The Toadlet Engine
+ *
+ * Copyright 2009, Lightning Toads Productions, LLC
+ *
+ * Author(s): Alan Fischer, Andrew Fischer
+ *
+ * This file is part of The Toadlet Engine.
+ *
+ * The Toadlet Engine is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * The Toadlet Engine is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ ********** Copyright header - do not remove **********/
+
+#ifndef TOADLET_EGG_MATH_PLANE_H
+#define TOADLET_EGG_MATH_PLANE_H
+
+#include <toadlet/egg/math/Vector3.h>
+
+namespace toadlet{
+namespace egg{
+namespace math{
+
+class TOADLET_API Plane{
+public:
+	inline Plane():d(0){}
+	
+	inline Plane(const Vector3 &normal1,real d1):normal(normal1),d(d1){}
+	
+	inline Plane(real x1,real y1,real z1,real d1):normal(x1,y1,z1),d(d1){}
+
+	Plane(const Vector3 &point,const Vector3 &normal1);
+
+	Plane(const Vector3 &point1,const Vector3 &point2,const Vector3 &point3);
+
+	inline Plane &set(const Plane &p){
+		normal.x=p.normal.x;
+		normal.y=p.normal.y;
+		normal.z=p.normal.z;
+
+		d=p.d;
+
+		return *this;
+	}
+
+	inline Plane &set(const Vector3 &normal1,real d1){
+		normal.x=normal1.x;
+		normal.y=normal1.y;
+		normal.z=normal1.z;
+
+		d=d1;
+
+		return *this;
+	}
+	
+	inline Plane &set(real x1,real y1,real z1,real d1){
+		normal.x=x1;
+		normal.y=y1;
+		normal.z=z1;
+
+		d=d1;
+
+		return *this;
+	}
+
+	Plane &set(const Vector3 &point,const Vector3 &normal1);
+
+	Plane &set(const Vector3 &point1,const Vector3 &point2,const Vector3 &point3);
+
+	inline Plane &reset(){
+		normal.x=0;
+		normal.y=0;
+		normal.z=0;
+
+		d=0;
+
+		return *this;
+	}
+
+	inline bool isPointOutside(const Vector3 &point,real epsilon=0) const{
+		return normal.x*point.x+normal.y*point.y+normal.z*point.z-d>epsilon;
+	}
+
+	inline bool equals(const Plane &plane) const{
+		return (plane.normal.equals(normal) && plane.d==d);
+	}
+
+	inline bool operator==(const Plane &plane) const{
+		return (plane.normal==normal && plane.d==d);
+	}
+
+	inline bool operator!=(const Plane &plane) const{
+		return (plane.normal!=normal || plane.d!=d);
+	}
+
+	Vector3 normal;
+	real d;
+};
+
+}
+}
+}
+
+#endif

@@ -1,0 +1,139 @@
+/********** Copyright header - do not remove **********
+ *
+ * The Toadlet Engine
+ *
+ * Copyright 2009, Lightning Toads Productions, LLC
+ *
+ * Author(s): Alan Fischer, Andrew Fischer
+ *
+ * This file is part of The Toadlet Engine.
+ *
+ * The Toadlet Engine is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * The Toadlet Engine is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ ********** Copyright header - do not remove **********/
+
+#ifndef TOADLET_KNOT_PEERPACKETCONNECTION_H
+#define TOADLET_KNOT_PEERPACKETCONNECTION_H
+
+#include <toadlet/egg/String.h>
+#include <toadlet/egg/Mutex.h>
+#include <toadlet/egg/Thread.h>
+#include <toadlet/egg/Runnable.h>
+#include <toadlet/egg/Random.h>
+#include <toadlet/egg/io/DataOutputStream.h>
+#include <toadlet/egg/io/MemoryOutputStream.h>
+#include <toadlet/egg/io/DataInputStream.h>
+#include <toadlet/egg/io/MemoryInputStream.h>
+#include <toadlet/egg/net/Socket.h>
+#include <toadlet/knot/Connection.h>
+#include <toadlet/knot/PeerPacket.h>
+
+namespace toadlet{
+namespace knot{
+
+class TOADLET_API PeerPacketConnection:public Connection,egg::Runnable{
+public:
+	TOADLET_SHARED_POINTERS(PeerPacketConnection,Connection);
+
+	PeerPacketConnection(egg::net::Socket::ptr socket);
+	virtual ~PeerPacketConnection();
+
+	void setPacketResendTime(int time);
+	inline int getPacketResendTime() const{return mPacketResendTime;}
+
+	void setNumExtraPackets(int extraPackets);
+	inline int getNumExtraPackets() const{return mNumExtraPackets;}
+
+	void setPingWeighting(float weighting);
+	inline float getPingWeighting() const{return mPingWeighting;}
+
+	bool connect(const egg::String &address,int port);
+	bool accept();
+	bool disconnect();
+
+	int send(const char *data,int length);
+	int receive(char *data,int length);
+
+	/// This is not an accurate ping value.  Since the soonest an acknowledgement of a received packet can be sent is
+	///  dependent on the logic dt of the application, the sum of the ping value of both peers will always be greater
+	///  the logic dt.
+	/// So if your logic dt is 100 ms, you can be playing locally, and the ping on one client will be reported as
+	///  anywhere from 0 - 100 ms, on average about 50.
+	int getPing() const{return mPing;}
+
+	void output();
+
+	void run();
+
+	/// Debug methods
+	void debugSetPacketDelayTime(int time);
+	void debugSetPacketDropAmount(float amount);
+	void debugDropNextPacket();
+
+protected:
+	const static int CONNECTION_FRAME;
+	const static char *CONNECTION_PACKET;
+	const static int CONNECTION_PACKET_LENGTH;
+	const static int CONNECTION_VERSION;
+
+	int buildConnectionPacket(egg::io::DataOutputStream *out);
+	bool verifyConnectionPacket(egg::io::DataInputStream *in);
+
+	egg::String toBinaryString(int n);
+	inline int frameToIndex(int frame){return frame-mMasterFrame-1 + mHalfWindowSize;}
+
+	bool updatePacketReceive();
+	bool updatePacketResend();
+	void updatePacketInfo(PeerPacket *packet);
+
+	int sendPacketsToSocket(const egg::Collection<PeerPacket::ptr> &packets,int numPackets);
+	int receivePacketsFromSocket(const egg::Collection<PeerPacket::ptr> &packets,int numPackets);
+
+	egg::net::Socket::ptr mSocket;
+	egg::io::MemoryOutputStream::ptr mOutPacket;
+	egg::io::DataOutputStream::ptr mDataOutPacket;
+	egg::io::MemoryInputStream::ptr mInPacket;
+	egg::io::DataInputStream::ptr mDataInPacket;
+
+	egg::Mutex::ptr mMutex;
+	egg::Thread::ptr mThread;
+	bool mRun;
+
+	int mPacketResendTime;
+	int mPing;
+	float mPingWeighting;
+
+	int mLocalFrame;
+	int mMasterFrame;
+	int mWindowSize;
+	int mHalfWindowSize;
+	int mNewFrameBits;
+	int mReceivedFrameBits;
+	int mRemoteReceivedFrameBits;
+	int mNumExtraPackets;
+	egg::Collection<PeerPacket::ptr> mLocalPackets;
+	egg::Collection<PeerPacket::ptr> mRemotePackets;
+	egg::Collection<PeerPacket::ptr> mSendingPackets;
+	egg::Collection<PeerPacket::ptr> mReceivingPackets;
+
+	egg::Random mDebugRandom;
+	int mDebugPacketDelayTime;
+	float mDebugPacketDropAmount;
+	bool mDebugDropNextPacket;
+};
+
+}
+}
+
+#endif

@@ -1,0 +1,13 @@
+The current Mascot projection calculations, of:
+
+px=stuff(rx)*mLastAspect;
+py=stuff(ry);
+
+Reproduce JSR184 projections.
+
+If we wanted it to do the default Mascot FOV projection, it would be:
+px=stuff(rx)*mLastAspect;
+py=stuff(rx)*viewportAspect;
+
+A problem appears on sprint hardware however, the setProjection(near,far,width,height), does not work
+so we only allow fovX projections, and use arctan to get the correct FOV to feed

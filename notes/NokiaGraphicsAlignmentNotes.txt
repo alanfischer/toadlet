@@ -1,0 +1,1 @@
+Avoid using Graphics.BOTTOM, and Graphics.RIGHT.  Those have off by 1 errors on some phones.
