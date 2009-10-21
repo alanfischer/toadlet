@@ -1,0 +1,6 @@
+Fairly simple, but if lighting does not appear to be working, make sure that the mesh isn't getting run through
+the vertexLighing program, since that disables future lighting on that mesh.
+
+Mascot defaults to full bright for lit models if no light is in scene.
+
+JSR184 defaults to dark for lit models if no light is in scene.

@@ -1,0 +1,145 @@
+<project name="toadlet" default="help" basedir="../../..">
+	<description>
+		Builds the toadlet engine
+	</description>
+
+	<!-- Global properties -->
+	<property name="src" location="src/as"/>
+	<property environment="env"/>
+	<property name="FLEX_HOME" value="${env.FLEX_HOME}"/>
+	<taskdef resource="net/sf/antcontrib/antlib.xml" classpath="${env.TOADLET_DEPS_DIR}/java/lib/ant-contrib.jar"/>
+	<taskdef resource="flexTasks.tasks" classpath="${basedir}/flexTasks/lib/flexTasks.jar" />
+
+	<!-- KEEP THIS UP TO DATE - and try to come up with a task that lists them automatically -->
+	<property name="toadlet.classes" value="com.lightningtoads.toadlet.tadpole.MeshBone com.lightningtoads.toadlet.tadpole.Mesh com.lightningtoads.toadlet.tadpole.Engine com.lightningtoads.toadlet.tadpole.millihop.Manager com.lightningtoads.toadlet.tadpole.millihop.HopEntity com.lightningtoads.toadlet.tadpole.millihop.Shape com.lightningtoads.toadlet.tadpole.millihop.CollisionListener com.lightningtoads.toadlet.tadpole.millihop.HopSceneManager com.lightningtoads.toadlet.tadpole.millihop.Collision com.lightningtoads.toadlet.tadpole.AnimationTrack com.lightningtoads.toadlet.tadpole.sg.MeshEntityBone com.lightningtoads.toadlet.tadpole.sg.LightEntity com.lightningtoads.toadlet.tadpole.sg.SceneManager com.lightningtoads.toadlet.tadpole.sg.NodeEntity com.lightningtoads.toadlet.tadpole.sg.SpriteEntity com.lightningtoads.toadlet.tadpole.sg.BeamEntity com.lightningtoads.toadlet.tadpole.sg.Entity com.lightningtoads.toadlet.tadpole.sg.MeshEntity com.lightningtoads.toadlet.tadpole.sg.RenderableEntity com.lightningtoads.toadlet.tadpole.sg.CameraEntity com.lightningtoads.toadlet.tadpole.MeshSubMesh com.lightningtoads.toadlet.tadpole.Matrix4x3 com.lightningtoads.toadlet.tadpole.VertexData com.lightningtoads.toadlet.tadpole.Sprite com.lightningtoads.toadlet.tadpole.Renderer com.lightningtoads.toadlet.tadpole.Triangle com.lightningtoads.toadlet.tadpole.AnimationKeyFrame com.lightningtoads.toadlet.tadpole.Animation com.lightningtoads.toadlet.egg.Logger com.lightningtoads.toadlet.egg.mathfixed.Quaternion com.lightningtoads.toadlet.egg.mathfixed.tMath com.lightningtoads.toadlet.egg.mathfixed.Capsule com.lightningtoads.toadlet.egg.mathfixed.AABox com.lightningtoads.toadlet.egg.mathfixed.Matrix3x3 com.lightningtoads.toadlet.egg.mathfixed.Vector3 com.lightningtoads.toadlet.egg.mathfixed.Sphere com.lightningtoads.toadlet.egg.mathfixed.Segment"/>
+
+	<!-- Standard targets -->
+
+	<!-- The default shows our options -->
+	<target name="help" description="help and settings"> 
+		<echo message=" To list available targets type: ant -projecthelp"/> 
+		<echo message=" "/> 
+		<echo message=" Be sure to place flexTasks.jar into the lib directory of your Ant installation!"/>
+		<echo message=" "/> 
+		<echo message=" Environment variables and settings:"/> 
+		<echo message=" TOADLET_INSTALL_DIR = The directory to install the toadlet engine into"/> 
+		<echo message=" TOADLET_DEPS_DIR = The base install of toadletDeps"/> 
+		<echo message=" WTK_HOME = The base install of Sun's Wireless Toolkit 2.X"/> 
+		<echo message=" FLEX_HOME = The base install of the Flex SDK"/> 
+		<echo message=" PATH must include: TOADLET_DEPS_DIR/YOUR_OS_TYPE/bin/ For the fpcomp executable - make sure fpcomp's executable bit is set!"/>
+		<echo message=" PATH must include: FLEX_HOME/bin"/>
+	</target>
+
+	<!-- Clean deletes all build related directories -->
+	<target name="clean" description="clean up build files">
+		<delete includeemptydirs="true">
+			<fileset dir="build/flex" excludes="build.xml"/>
+		</delete>
+	</target>
+
+	<!-- Cloober calls clean and removes the compiled lib -->
+	<target name="clobber" description="calls clean and deletes installed libs">
+		<subant target="clean" buildpath="build/flex"/>
+		<delete>
+			<fileset dir="${env.TOADLET_INSTALL_DIR}/lib" includes="toadlet*.swc"/>
+		</delete>
+	</target>
+
+	<!-- Set debug -->
+	<target name="debug">
+		<property name="debug" value="TOADLET_DEBUG"/>
+		<echo message="Setting debug=${debug}"/>
+	</target>
+	
+	<!-- Create directories -->
+	<target name="init">
+		<condition property="debug.suffix" value="_d" else="">
+			<equals arg1="${debug}" arg2="TOADLET_DEBUG"/>
+		</condition>
+		<condition property="debug.args" value="-D${debug}=true" else="">
+			<equals arg1="${debug}" arg2="TOADLET_DEBUG"/>
+		</condition>
+
+		<property name="preprocess" location="build/flex/preprocess${debug.suffix}"/>
+		<property name="build" location="build/flex/build${debug.suffix}"/>
+		<property name="dist" location="build/flex/dist${debug.suffix}"/>
+
+		<property name="swc.suffix" value="${debug.suffix}.swc"/>
+		
+		<mkdir dir="${build}"/>
+		<mkdir dir="${dist}"/>
+		<mkdir dir="${env.TOADLET_INSTALL_DIR}/lib"/>
+	</target>
+	
+	<!-- Calls gpp on each file for preprocessing-->
+	<target name="gpp">
+		<propertyregex property="outfile"
+			input="${infile}"
+			regexp="preprocess"
+			replace="build"
+			casesensitive="false" 
+		/>
+		
+		<echo message="Preprocessing infile=${infile}"/>
+		<echo message="To outfile=${outfile}"/>
+		
+		<exec executable="gpp.exe">
+			<arg value="-o"/>
+			<arg value="${outfile}"/>
+			<arg value="-x"/>
+			<arg value="--nocurinc"/>
+			<arg value="--nostdinc"/>
+			<arg value="${debug.args}"/>
+			<arg value="${infile}"/>
+		</exec>
+	</target>
+	
+	<!-- Preprocess -->
+	<target name="toadlet-preprocess" depends="init">
+		<echo message="Copy files over for preprocessing"/>
+		<copy todir="${preprocess}">
+			<fileset dir="${src}">
+				<include name="**/*.as"/>
+			</fileset>
+		</copy>
+		
+		<echo message="Building preprocess directory structure"/>
+		<copy todir="${build}">
+			<fileset dir="${preprocess}">
+				<exclude name="**/*.as"/>
+			</fileset>
+		</copy>
+	
+		<echo message="Calling gpp on toadlet"/>
+		<foreach target="gpp" param="infile">
+			<param name="debug.args" value="${debug.args}"/>
+			<fileset dir="${preprocess}">
+				<include name="**/*.as"/>
+			</fileset>
+		</foreach>
+	</target>
+	
+	<!-- Build -->
+	<target name="toadlet-build" depends="toadlet-preprocess">
+		<compc output="${dist}/toadlet${swc.suffix}" include-classes="${toadlet.classes}">
+			<source-path path-element="${build}"/>
+		</compc>
+	</target>
+	
+	<!-- Install -->
+	<target name="toadlet-install" depends="toadlet-build">
+		<copy file="${dist}/toadlet${swc.suffix}" todir="${env.TOADLET_INSTALL_DIR}/lib"/>
+	</target>
+	
+	<!-- toadlet targets -->
+	<target name="toadlet-debug" depends="debug,toadlet-install" description="Build debug toadlet .swc library">
+		<echo message="Debug toadlet .swc complete"/>
+	</target>
+	<target name="toadlet-release" depends="toadlet-install" description="Build release toadlet .swc library">
+		<echo message="Release toadlet .swc complete"/>
+	</target>
+	<target name="all" description="Build all debug and release versions of engine">
+		<subant target="toadlet-debug" buildpath="build/flex"/>
+		<subant target="toadlet-release" buildpath="build/flex"/>
+	</target>
+</project>

@@ -1,0 +1,7 @@
+DESCRIPTION 'Toadlet MSH Importer'
+
+VERSION     1.0
+
+LIBRARY      "msTMSHImporter"
+EXPORTS
+    CreatePlugIn

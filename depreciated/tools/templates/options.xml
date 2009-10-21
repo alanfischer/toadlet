@@ -1,0 +1,236 @@
+<!-- Optional targets for adding/removal of various features -->
+<project name="options" basedir="../..">
+	
+	<!-- Add bluetooth networking -->
+	<target name="bluetooth">
+		<var name="bluetooth.args" value="BUILD_USE_BLUETOOTH"/>
+		<echo message="Setting bluetooth.args=${bluetooth.args}"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${bluetooth.args}"/>
+		
+		<!-- HACK because ant-contribs runtarget task is fuked -->
+		<if>
+			<equals arg1="${classpath.list}" arg2=""/>
+			<then>
+				<var name="classpath.list" value="${jsr82.classpath}"/>
+			</then>
+			<else>
+				<var name="classpath.list" value="${classpath.list};${jsr82.classpath}"/>
+			</else>
+		</if>
+		
+		<!-- HACK because ant-contribs runtarget task is fuked -->
+		<if>
+			<equals arg1="${jadpermissions.list}" arg2=""/>
+			<then>
+				<var name="jadpermissions.list" value="javax.microedition.io.Connector.bluetooth.client, javax.microedition.io.Connector.bluetooth.server"/>
+			</then>
+			<else>
+				<var name="jadpermissions.list" value="${jadpermissions.list}, javax.microedition.io.Connector.bluetooth.client, javax.microedition.io.Connector.bluetooth.server"/>
+			</else>
+		</if>
+	</target>
+
+	<!-- Adds the camera functionality -->
+	<target name="camera">
+		<var name="cldc.name" value="1.1"/>
+		<echo message="Setting cldc.name=${cldc.name}"/>
+		<if>
+			<equals arg1="${carrier}" arg2="BUILD_CARRIER_SPRINT"/>
+			<then>
+				<if>
+					<equals arg1="${sprint.test}" arg2="SPRINT_TEST_SOUND_AND_CAMERA"/>
+					<then>
+						<var name="camera.args" value="BUILD_USE_CAMERA"/>
+					</then>
+					<else>
+						<var name="camera.args" value="BUILD_USE_CAMERA,BUILD_USE_SOUNDORCAMERA"/>
+					</else>
+				</if>
+			</then>
+			<else>
+				<var name="camera.args" value="BUILD_USE_CAMERA,BUILD_USE_SETPERMISSIONS"/>
+			</else>
+		</if>
+		<echo message="Setting camera.args=${camera.args}"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${camera.args}"/>
+		<var name="resourcedirs.list" value="${resourcedirs.list},${components}/camera_${screensize.args}"/>
+		
+		<!-- HACK because ant-contribs runtarget task is fuked -->
+		<if>
+			<equals arg1="${classpath.list}" arg2=""/>
+			<then>
+				<var name="classpath.list" value="${mmapi.classpath}"/>
+			</then>
+			<else>
+				<var name="classpath.list" value="${classpath.list};${mmapi.classpath}"/>
+			</else>
+		</if>
+		
+		<!-- HACK because ant-contribs runtarget task is fuked -->
+		<if>
+			<equals arg1="${jadpermissions.list}" arg2=""/>
+			<then>
+				<var name="jadpermissions.list" value="javax.microedition.media.control.VideoControl.getSnapshot"/>
+			</then>
+			<else>
+				<var name="jadpermissions.list" value="${jadpermissions.list}, javax.microedition.media.control.VideoControl.getSnapshot"/>
+			</else>
+		</if>
+	</target>
+
+	<!-- Set debugging symbols -->
+	<target name="debug">
+		<var name="debug.args" value="BUILD_DEBUG"/>
+		<echo message="Setting debug.args=${debug.args}"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${debug.args}"/>
+		<var name="jtoadlet.version" value="${jtoadlet.version}_d"/>
+	</target>
+
+	<!-- Set full demo version -->
+	<target name="demo">
+		<var name="demo.args" value="BUILD_DEMO"/>
+		<echo message="Setting demo.args=${demo.args}"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${demo.args}"/>
+	</target>
+
+	<!-- Set low memory version-->
+	<target name="lowmem">
+		<var name="lowmem.args" value="BUILD_USE_LOWMEM"/>
+		<echo message="Setting lowmem.args=${lowmem.args}"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${lowmem.args}"/>
+	</target>
+	
+	<!-- Set special motorola lowmem version for v series devices -->
+	<target name="lowmem_motorola_v_series">
+		<var name="lowmem.args" value="BUILD_USE_LOWMEM,BUILD_USE_LOWMEM_MOTOROLA_V_SERIES"/>
+		<echo message="Setting lowmem.args=${lowmem.args}"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${lowmem.args}"/>
+		<var name="resourcedirs.list" value="${resourcedirs.list},${components}/lowmem_motorola_v_series"/>
+	</target>
+	
+	<!-- Add m3g models -->
+	<target name="m3g">
+		<echo message="Using m3g models"/>
+		<var name="resourcedirs.list" value="${resourcedirs.list},${components}/m3g"/>
+		<var name="resourcetypes.list" value="${resourcetypes.list},**/*.m3g"/>
+	</target>
+	
+	<!-- Add lowmem m3g models -->
+	<target name="m3g_lowmem">
+		<echo message="Using lowmem m3g models"/>
+		<var name="resourcedirs.list" value="${resourcedirs.list},${components}/m3g_lowmem"/>
+		<var name="resourcetypes.list" value="${resourcetypes.list},**/*.m3g"/>
+	</target>
+	
+	<!-- Add mascotv3 models and textures-->
+	<target name="mascotv3">
+		<echo message="Using mascotv3 models"/>
+		<var name="resourcedirs.list" value="${resourcedirs.list},${components}/mascotv3"/>
+		<var name="resourcetypes.list" value="${resourcetypes.list},**/*.mbac,**/*.mtra"/>
+	</target>
+	
+	<!-- Add midi music -->
+	<target name="midi">
+		<var name="midi.args" value="BUILD_USE_MUSIC"/>
+		<echo message="Setting midi.args=${midi.args}"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${midi.args}"/>
+		<var name="resourcedirs.list" value="${resourcedirs.list},${components}/midis"/>
+		<var name="resourcetypes.list" value="${resourcetypes.list},**/*.mid"/>
+		
+		<!-- HACK because ant-contribs runtarget task is fuked -->
+		<if>
+			<equals arg1="${classpath.list}" arg2=""/>
+			<then>
+				<var name="classpath.list" value="${mmapi.classpath}"/>
+			</then>
+			<else>
+				<var name="classpath.list" value="${classpath.list};${mmapi.classpath}"/>
+			</else>
+		</if>
+	</target>
+	
+	<!-- Set platform edition for Nokia phones only -->
+	<target name="nokia_s60_2e">
+		<var name="nokiaedition.args" value="BUILD_PLATFORM_NOKIA_S60_2E"/>
+		<echo message="Setting nokiaedition.args=${nokiaedition.args}"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${nokiaedition.args}"/>
+	</target>
+	<target name="nokia_s40_3e">
+		<var name="nokiaedition.args" value="BUILD_PLATFORM_NOKIA_S40_3E"/>
+		<echo message="Setting nokiaedition.args=${nokiaedition.args}"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${nokiaedition.args}"/>
+	</target>
+	<target name="nokia_s60_3e">
+		<var name="nokiaedition.args" value="BUILD_PLATFORM_NOKIA_S60_3E"/>
+		<echo message="Setting nokiaedition.args=${nokiaedition.args}"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${nokiaedition.args}"/>
+	</target>
+	
+	<!-- Add png sprites and textures -->
+	<target name="png">
+		<echo message="Using png sprites and textures"/>
+		<var name="resourcedirs.list" value="${resourcedirs.list},${components}/png"/>
+	</target>
+	
+	<!-- Add lowmem png sprites and textures -->
+	<target name="png_lowmem">
+		<echo message="Using lowmem png sprites and textures"/>
+		<var name="resourcedirs.list" value="${resourcedirs.list},${components}/png_lowmem"/>
+	</target>
+	
+	<!-- Set JP version for Sony Ericsson phones -->
+	<target name="se_jp3">
+		<var name="sejp.args" value="BUILD_PLATFORM_SE_JP3"/>
+		<echo message="Setting se.jp.args=${sejp.args}"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${sejp.args}"/>
+	</target>
+	<target name="se_jp5">
+		<var name="sejp.args" value="BUILD_PLATFORM_SE_JP5"/>
+		<echo message="Setting sejp.args=${sejp.args}"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${sejp.args}"/>
+	</target>
+	
+	<!-- Add sound effects -->
+	<target name="sfx">
+		<var name="sfx.args" value="BUILD_USE_SFX"/>
+		<echo message="Setting sfx.args=${sfx.args}"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${sfx.args}"/>
+		<var name="resourcedirs.list" value="${resourcedirs.list},${components}/sounds"/>
+		<var name="resourcetypes.list" value="${resourcetypes.list},**/*.wav"/>
+		
+		<!-- HACK because ant-contribs runtarget task is fuked -->
+		<if>
+			<equals arg1="${classpath.list}" arg2=""/>
+			<then>
+				<var name="classpath.list" value="${mmapi.classpath}"/>
+			</then>
+			<else>
+				<var name="classpath.list" value="${classpath.list};${mmapi.classpath}"/>
+			</else>
+		</if>
+	</target>
+
+	<!-- Use a small build for low jar size devices -->
+	<target name="smalljar">
+		<var name="smalljar.args" value="BUILD_USE_SMALLJAR"/>
+		<echo message="Setting smalljar.args=${smalljar.args}"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},${smalljar.args}"/>
+	</target>
+
+	<!-- Special test cases for sprint -->
+	<target name="sprinttest">
+		<property name="sprint.test" value="TEST_SPRINT_SOUND_AND_CAMERA"/>
+		<echo message="Setting sprint.test.args=${sprint.test}"/>
+	</target>
+	
+	<!-- Add a timestamp to the app name; usually needed for sprint devices -->
+	<target name="timestamp">
+		<tstamp>
+			<format property="NAMESTAMP" pattern="yyMMddhhmm"/>
+		</tstamp>
+		<var name="app.name" value="${app.name}-${NAMESTAMP}"/>
+		<echo message="Setting app.name=${app.name} with timestamp"/>
+		<var name="midlet.name" value="${midlet.name} ${NAMESTAMP}"/>
+		<echo message="Setting midlet.name=${midlet.name} with timestamp"/>
+	</target>
+</project>

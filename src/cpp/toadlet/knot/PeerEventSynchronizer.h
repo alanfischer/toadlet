@@ -1,0 +1,134 @@
+/********** Copyright header - do not remove **********
+ *
+ * The Toadlet Engine
+ *
+ * Copyright 2009, Lightning Toads Productions, LLC
+ *
+ * Author(s): Alan Fischer, Andrew Fischer
+ *
+ * This file is part of The Toadlet Engine.
+ *
+ * The Toadlet Engine is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * The Toadlet Engine is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ ********** Copyright header - do not remove **********/
+
+#ifndef TOADLET_KNOT_PEEREVENTSYNCHRONIZER_H
+#define TOADLET_KNOT_PEEREVENTSYNCHRONIZER_H
+
+#include <toadlet/egg/Collection.h>
+#include <toadlet/egg/EventFactory.h>
+#include <toadlet/egg/io/DataInputStream.h>
+#include <toadlet/egg/io/MemoryInputStream.h>
+#include <toadlet/egg/io/DataOutputStream.h>
+#include <toadlet/egg/io/MemoryOutputStream.h>
+#include <toadlet/knot/Connection.h>
+
+namespace toadlet{
+namespace knot{
+
+class TOADLET_API PeerEventSynchronizer{
+public:
+	TOADLET_SHARED_POINTERS(PeerEventSynchronizer,PeerEventSynchronizer);
+
+	enum PeerStatus{
+		PeerStatus_FRAME_OK,
+		PeerStatus_FRAME_MISSING,
+		PeerStatus_FRAME_BAD,
+	};
+
+	const static int CONTROL_EVENT_FLAG=0x4000; // Switch to 0x4000 from 0x8000 since setting the sign bit for a short ended up confusing the bit operations in java
+	const static int CONTROL_EVENT_FRAMEBUFFER=1;
+	const static int MAX_FRAME_DIFFERENCE=1000;
+
+	PeerEventSynchronizer(Connection::ptr connection=NULL,egg::EventFactory *factory=NULL);
+
+	void reset(int frameBuffer,int frameGroupSize);
+	void setConnection(Connection::ptr connection);
+	void setEventFactory(egg::EventFactory *factory);
+
+	void requestFrameBuffer(int frameBuffer,int frameGroupSize);
+	inline int getFrameBuffer() const{return mFrameBuffer;}
+	inline int getFrameGroupSize() const{return mFrameGroupSize;}
+
+	void pushEvent(egg::Event::ptr event);
+	egg::Event::ptr popEvent();
+
+	PeerStatus update();
+
+protected:
+	class EventGroup:public egg::Collection<egg::Event::ptr>{
+	public:
+		TOADLET_SHARED_POINTERS(EventGroup,egg::Collection<egg::Event::ptr>);
+
+		EventGroup():egg::Collection<egg::Event::ptr>(),
+			mFrameBuffer(0),
+			mFrameGroup(0)
+		{}
+
+		EventGroup(EventGroup::ptr eventGroup):egg::Collection<egg::Event::ptr>(eventGroup),
+			mFrameBuffer(eventGroup->getFrameBuffer()),
+			mFrameGroup(eventGroup->getFrameGroup())
+		{}
+
+		void set(EventGroup::ptr eventGroup){
+			egg::Collection<egg::Event::ptr>::clear();
+			egg::Collection<egg::Event::ptr>::addAll(eventGroup);
+			mFrameBuffer=eventGroup->getFrameBuffer();
+			mFrameGroup=eventGroup->getFrameGroup();
+		}
+
+		void clear(){
+			egg::Collection<egg::Event::ptr>::clear();
+			mFrameBuffer=0;
+			mFrameGroup=0;
+		}
+
+		void setFrameBuffer(int buffer,int group){mFrameBuffer=buffer;mFrameGroup=group;}
+		inline bool hasFrameBufferInfo() const{return mFrameBuffer!=0 || mFrameGroup!=0;}
+		inline int getFrameBuffer() const{return mFrameBuffer;}
+		inline int getFrameGroup() const{return mFrameGroup;}
+
+	protected:
+		int mFrameBuffer;
+		int mFrameGroup;
+	};
+
+	bool adjustFrameBuffer(int frameBuffer,int frameGroupSize,bool force);
+
+	Connection::ptr mConnection;
+	egg::EventFactory *mEventFactory;
+
+	egg::io::MemoryInputStream::ptr mPacketIn;
+	egg::io::DataInputStream::ptr mDataPacketIn;
+	egg::io::MemoryOutputStream::ptr mPacketOut;
+	egg::io::DataOutputStream::ptr mDataPacketOut;
+
+	int mFrame;
+	int mFrameBuffer;
+	int mSkipAtFrame;
+	int mSkipReceivingFrames;
+	int mSkipSendingFrames;
+	int mFrameGroupSize;
+	int mFrameGroupCount;
+	EventGroup::ptr mIncomingEvents;
+	EventGroup::ptr mOutgoingEvents;
+	egg::Collection<EventGroup::ptr> mLocalEventGroups;
+	egg::Collection<EventGroup::ptr> mRemoteEventGroups;
+	egg::Collection<EventGroup::ptr> mFreeEventGroups;
+};
+
+}
+}
+
+#endif

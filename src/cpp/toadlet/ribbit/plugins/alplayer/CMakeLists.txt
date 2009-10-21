@@ -1,0 +1,150 @@
+# Source files for toadlet_ribbit_alplayer
+set (RIBBIT_ALPLAYER_SRC
+	ALAudioBufferPeer.cpp
+	ALAudioPeer.cpp
+	ALPlayer.cpp
+)
+
+set (RIBBIT_ALPLAYER_ALEM_SRC
+	alem/alem.c
+)
+
+set (RIBBIT_ALPLAYER_PLATFORM_OSX_SRC
+	platform/osx/CoreAudioPeer.cpp
+)
+
+set (RIBBIT_DECODERS_COREAUDIODECODER_SRC
+	../decoders/coreaudiodecoder/CoreAudioDecoder.cpp
+)
+
+set (RIBBIT_DECODERS_OGGVORBISDECODER_SRC
+	../decoders/oggvorbisdecoder/OggVorbisDecoder.cpp
+)
+
+set (RIBBIT_DECODERS_WAVEDECODER_SRC
+	../decoders/wavedecoder/WaveDecoder.cpp
+)
+
+
+# Headers
+set (RIBBIT_ALPLAYER_HEADERS
+	ALAudioBufferPeer.h
+	ALAudioPeer.h
+	ALIncludes.h
+	ALPlayer.h
+)
+
+set (RIBBIT_ALPLAYER_ALEM_HEADERS
+	alem/alem.h
+)
+
+set (RIBBIT_ALPLAYER_PLATFORM_OSX_HEADERS
+	platform/osx/CoreAudioPeer.h
+)
+
+set (RIBBIT_DECODERS_COREAUDIODECODER_HEADERS
+	../decoders/coreaudiodecoder/CoreAudioDecoder.h
+)
+
+set (RIBBIT_DECODERS_OGGVORBISDECODER_HEADERS
+	../decoders/oggvorbisdecoder/OggVorbisDecoder.h
+)
+
+set (RIBBIT_DECODERS_WAVEDECODER_HEADERS
+	../decoders/wavedecoder/WaveDecoder.h
+)
+
+
+# Dependencies - note that OpenAL has already been found
+include_directories (${OPENAL_INCLUDES})
+
+# Dynamic libs
+set (RIBBIT_ALPLAYER_LIBS ${OPENAL_LIBRARY})
+set (RIBBIT_ALPLAYER_DEFS "ALEM_BUILD")
+
+# Static libs
+# Note we never link with static openal (so no _s)
+set (RIBBIT_ALPLAYER_LIBS_S libopenal)
+set (RIBBIT_ALPLAYER_DEFS_S "ALEM_BUILD" "ALEM_STATIC")
+
+
+# Platform specific files
+if (TOADLET_PLATFORM_OSX OR TOADLET_PLATFORM_IPHONE)
+	find_library (COREAUDIO_LIBS CoreAudio)
+	find_library (COREFOUNDATION_LIBS CoreFoundation)
+	find_library (AUDIOTOOLBOX_LIBS AudioToolbox)
+	if (COREAUDIO_LIBS AND COREFOUNDATION_LIBS AND AUDIOTOOLBOX_LIBS)
+		source_group ("Source Files\\\\platform\\\\osx" FILES ${RIBBIT_ALPLAYER_PLATFORM_OSX_SRC})
+		source_group ("Source Files\\\\decoders\\\\coreaudiodecoder" FILES ${RIBBIT_DECODERS_COREAUDIODECODER_SRC})
+		source_group ("Header Files\\\\platform\\\\osx" FILES ${RIBBIT_ALPLAYER_PLATFORM_OSX_HEADERS})
+		source_group ("Header Files\\\\decoders\\\\coreaudiodecoder" FILES ${RIBBIT_DECODERS_COREAUDIODECODER_HEADERS})
+		set (RIBBIT_ALPLAYER_SRC ${RIBBIT_ALPLAYER_SRC} ${RIBBIT_ALPLAYER_PLATFORM_OSX_SRC} ${RIBBIT_DECODERS_COREAUDIODECODER_SRC})
+		set (RIBBIT_ALPLAYER_HEADERS ${RIBBIT_ALPLAYER_HEADERS} ${RIBBIT_ALPLAYER_PLATFORM_OSX_HEADERS} ${RIBBIT_DECODERS_COREAUDIODECODER_HEADERS})
+		set (RIBBIT_ALPLAYER_LIBS ${RIBBIT_ALPLAYER_LIBS} ${COREAUDIO_LIBS} ${COREFOUNDATION_LIBS} ${AUDIOTOOLBOX_LIBS})
+		set (RIBBIT_ALPLAYER_LIBS_S ${RIBBIT_ALPLAYER_LIBS_S} ${COREAUDIO_LIBS} ${COREFOUNDATION_LIBS} ${AUDIOTOOLBOX_LIBS})
+	else (COREAUDIO_LIBS AND COREFOUNDATION_LIBS AND AUDIOTOOLBOX_LIBS)
+		message ("One of CoreAudio, CoreFoundation, or AudioToolbox were not found, so the ribbit_alplayer will not be built")
+	endif (COREAUDIO_LIBS AND COREFOUNDATION_LIBS AND AUDIOTOOLBOX_LIBS)
+elseif (TOADLET_PLATFORM_WIN32 OR TOADLET_PLATFORM_POSIX)
+	source_group ("Source Files\\\\decoders\\\\wavedecoder" FILES ${RIBBIT_DECODERS_WAVEDECODER_SRC})
+	source_group ("Header Files\\\\decoders\\\\wavedecoder" FILES ${RIBBIT_DECODERS_WAVEDECODER_HEADERS})
+	set (RIBBIT_ALPLAYER_SRC ${RIBBIT_ALPLAYER_SRC} ${RIBBIT_DECODERS_WAVEDECODER_SRC})
+	set (RIBBIT_ALPLAYER_HEADERS ${RIBBIT_ALPLAYER_HEADERS} ${RIBBIT_DECODERS_WAVEDECODER_HEADERS})
+	if(TOADLET_PLATFORM_WIN32)
+		source_group ("Source Files\\\\alem" FILES ${RIBBIT_ALPLAYER_ALEM_SRC})
+		source_group ("Header Files\\\\alem" FILES ${RIBBIT_ALPLAYER_ALEM_HEADERS})
+		set (RIBBIT_ALPLAYER_SRC ${RIBBIT_ALPLAYER_SRC} ${RIBBIT_ALPLAYER_ALEM_SRC})
+		set (RIBBIT_ALPLAYER_HEADERS ${RIBBIT_ALPLAYER_HEADERS} ${RIBBIT_ALPLAYER_ALEM_HEADERS})
+	endif (TOADLET_PLATFORM_WIN32)
+	find_package (OggVorbis)
+	if (OGGVORBIS_FOUND)
+		source_group ("Source Files\\\\decoders\\\\oggvorbisdecoder" FILES ${RIBBIT_DECODERS_OGGVORBISDECODER_SRC})
+		source_group ("Header Files\\\\decoders\\\\oggvorbisdecoder" FILES ${RIBBIT_DECODERS_OGGVORBISDECODER_HEADERS})
+		set (RIBBIT_ALPLAYER_SRC ${RIBBIT_ALPLAYER_SRC} ${RIBBIT_DECODERS_OGGVORBISDECODER_SRC})
+		set (RIBBIT_ALPLAYER_HEADERS ${RIBBIT_ALPLAYER_HEADERS} ${RIBBIT_DECODERS_OGGVORBISDECODER_HEADERS})
+		include_directories (${OGGVORBIS_INCLUDES})
+
+		# Dynamic libs
+		set (RIBBIT_ALPLAYER_DEFS ${RIBBIT_ALPLAYER_DEFS} TOADLET_LIBOGG_NAME="${OGG_LIBRARY}" TOADLET_LIBVORBIS_NAME="${VORBIS_LIBRARY}" TOADLET_LIBVORBISFILE_NAME="${VORBISFILE_LIBRARY}" TOADLET_LIBVORBISENC_NAME="${VORBISENC_LIBRARY}")
+		set (RIBBIT_ALPLAYER_LIBS ${RIBBIT_ALPLAYER_LIBS} ${OGGVORBIS_LIBRARIES})
+
+		# Static libs are ugly since we add references to external static libraries in toadlet
+		add_library (libogg_s STATIC IMPORTED)
+		add_library (libvorbis_s STATIC IMPORTED)
+		add_library (libvorbisfile_s STATIC IMPORTED)
+		add_library (libvorbisenc_s STATIC IMPORTED)
+		if (TOADLET_DEPENDENCY_EXTENSION_NAMES)
+			string (REPLACE ".lib" "_s.lib" OGG_LIBRARY ${OGG_LIBRARY})
+			string (REPLACE ".lib" "_s.lib" VORBIS_LIBRARY ${VORBIS_LIBRARY})
+			string (REPLACE ".lib" "_s.lib" VORBISFILE_LIBRARY ${VORBISFILE_LIBRARY})
+			string (REPLACE ".lib" "_s.lib" VORBISENC_LIBRARY ${VORBISENC_LIBRARY})
+		endif (TOADLET_DEPENDENCY_EXTENSION_NAMES)
+		set_property (TARGET libogg_s PROPERTY IMPORTED_LOCATION ${OGG_LIBRARY})
+		set_property (TARGET libvorbis_s PROPERTY IMPORTED_LOCATION ${VORBIS_LIBRARY})
+		set_property (TARGET libvorbisfile_s PROPERTY IMPORTED_LOCATION ${VORBISFILE_LIBRARY})
+		set_property (TARGET libvorbisenc_s PROPERTY IMPORTED_LOCATION ${VORBISENC_LIBRARY})
+		set (RIBBIT_ALPLAYER_DEFS_S ${RIBBIT_ALPLAYER_DEFS_S} TOADLET_LIBOGG_NAME="${OGG_LIBRARY}" TOADLET_LIBVORBIS_NAME="${VORBIS_LIBRARY}" TOADLET_LIBVORBISFILE_NAME="${VORBISFILE_LIBRARY}" TOADLET_LIBVORBISENC_NAME="${VORBISENC_LIBRARY}")
+		set (RIBBIT_ALPLAYER_LIBS_S ${RIBBIT_ALPLAYER_LIBS_S} libogg_s libvorbis_s libvorbisfile_s libvorbisenc_s)
+	else (OGGVORBIS_FOUND)
+		message ("The ribbit_alplayer will not have Ogg Vorbis support")
+	endif (OGGVORBIS_FOUND)
+endif (TOADLET_PLATFORM_OSX OR TOADLET_PLATFORM_IPHONE)
+
+
+# Dynamic library
+if (NOT TOADLET_PLATFORM_IPHONE)
+	add_library (toadlet_ribbit_alplayer SHARED ${RIBBIT_ALPLAYER_SRC} ${RIBBIT_ALPLAYER_HEADERS})
+	set_target_properties (toadlet_ribbit_alplayer PROPERTIES ${DYNAMIC_LIB_PROPS})
+	set_property (TARGET toadlet_ribbit_alplayer APPEND PROPERTY COMPILE_DEFINITIONS ${RIBBIT_ALPLAYER_DEFS})
+	target_link_libraries (toadlet_ribbit_alplayer toadlet_ribbit ${RIBBIT_ALPLAYER_LIBS})
+	install (TARGETS toadlet_ribbit_alplayer DESTINATION lib)
+endif (NOT TOADLET_PLATFORM_IPHONE)
+
+
+# Static library
+add_library (toadlet_ribbit_alplayer_s STATIC ${RIBBIT_ALPLAYER_SRC} ${RIBBIT_ALPLAYER_HEADERS})
+set_target_properties (toadlet_ribbit_alplayer_s PROPERTIES ${STATIC_LIB_PROPS})
+set_property (TARGET toadlet_ribbit_alplayer_s APPEND PROPERTY COMPILE_DEFINITIONS ${RIBBIT_ALPLAYER_DEFS_S})
+target_link_libraries (toadlet_ribbit_alplayer_s toadlet_ribbit_s ${RIBBIT_ALPLAYER_LIBS_S})
+install (TARGETS toadlet_ribbit_alplayer_s DESTINATION lib)
+

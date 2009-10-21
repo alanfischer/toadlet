@@ -1,0 +1,92 @@
+<!-- Set display specific setting here -->
+<project name="display" basedir="../..">
+	
+	<!-- Set Screen size -->
+	<target name="128x128">
+		<var name="screensize.args" value="128x128"/>
+		<var name="backgroundsize.name" value="backgrounds_small_png"/>
+		<runtarget target="screensize_finish"/>
+	</target>
+	<target name="128x160">
+		<var name="screensize.args" value="128x160"/>
+		<var name="backgroundsize.name" value="backgrounds_png"/>
+		<runtarget target="screensize_finish"/>
+	</target>
+	<target name="130x130">
+		<var name="screensize.args" value="130x130"/>
+		<var name="backgroundsize.name" value="backgrounds_small_png"/>
+		<runtarget target="screensize_finish"/>
+	</target>
+	<target name="176x208">
+		<var name="screensize.args" value="176x208"/>
+		<var name="backgroundsize.name" value="backgrounds_png"/>
+		<runtarget target="screensize_finish"/>
+	</target>
+	<target name="176x209">
+		<var name="screensize.args" value="176x209"/>
+		<var name="backgroundsize.name" value="backgrounds_png"/>
+		<runtarget target="screensize_finish"/>
+	</target>
+	<target name="176x220">
+		<var name="screensize.args" value="176x220"/>
+		<var name="backgroundsize.name" value="backgrounds_png"/>
+		<runtarget target="screensize_finish"/>
+	</target>
+	<target name="208x208">
+		<var name="screensize.args" value="208x208"/>
+		<var name="backgroundsize.name" value="backgrounds_png"/>
+		<runtarget target="screensize_finish"/>
+	</target>
+	<target name="240x320">
+		<var name="screensize.args" value="240x320"/>
+		<var name="backgroundsize.name" value="backgrounds_large_png"/>
+		<runtarget target="screensize_finish"/>
+	</target>
+	<target name="320x240">
+		<var name="screensize.args" value="320x240"/>
+		<var name="backgroundsize.name" value="backgrounds_png"/>
+		<runtarget target="screensize_finish"/>
+	</target>
+	<target name="352x416">
+		<var name="screensize.args" value="352x416"/>
+		<var name="backgroundsize.name" value="backgrounds_large_png"/>
+		<runtarget target="screensize_finish"/>
+	</target>
+	
+	<!-- Common target for all screensize setups -->
+	<target name="screensize_finish">
+		<echo message="Setting screensize=${screensize.args}"/>
+		<var name="preprocessargs.list" value="${preprocessargs.list},BUILD_SCREENSIZE_${screensize.args}"/>
+		<var name="resourcedirs.list" value="${resourcedirs.list},${components}/display_${screensize.args},${components}/${backgroundsize.name}"/>
+	</target>
+	
+	<!-- Include 2d sprites for specific screensizes -->
+	<target name="2d">
+		<echo message="Setting 2d version for screensize=${screensize.args}"/>
+		<var name="resourcedirs.list" value="${resourcedirs.list},${components}/display_${screensize.args}_2d"/>
+	</target>
+	
+	<!-- Icon targets -->
+	<target name="icon_iden">
+		<var name="resourcedirs.list" value="${resourcedirs.list},${components}/icon_iden"/>
+	</target>
+	<target name="icon_iden_small">
+		<var name="resourcedirs.list" value="${resourcedirs.list},${components}/icon_iden_small"/>
+	</target>
+	<target name="icon_13x13">
+		<var name="resourcedirs.list" value="${resourcedirs.list},${components}/icon_13x13"/>
+	</target>
+	<target name="icon_15x15">
+		<var name="resourcedirs.list" value="${resourcedirs.list},${components}/icon_15x15"/>
+	</target>
+	<target name="icon_23x23">
+		<var name="resourcedirs.list" value="${resourcedirs.list},${components}/icon_23x23"/>
+	</target>
+	<target name="icon_29x29">
+		<var name="resourcedirs.list" value="${resourcedirs.list},${components}/icon_29x29"/>
+	</target>
+	<target name="icon_48x48">
+		<var name="resourcedirs.list" value="${resourcedirs.list},${components}/icon_48x48"/>
+	</target>
+	
+</project>

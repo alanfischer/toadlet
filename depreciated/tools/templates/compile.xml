@@ -1,0 +1,278 @@
+<!-- Targets to compile the collected files into jar/jad combos -->
+<project name="compile" basedir="../..">
+	
+	<!-- Clean deletes all build related directories -->
+	<target name="clean" description="delete all build directories">
+		<delete includeemptydirs="true">
+			<fileset dir="build/ant" excludes="**/*.xml"/>
+		</delete>
+	</target>
+
+	<!-- Clobber deletes all build directories and the output binaries -->
+	<target name="clobber" depends="clean" description="delete all build and binary directories">
+		<delete includeemptydirs="true" dir="bin/"/>
+	</target>
+
+	<!-- Setup additional directories -->
+	<target name="setup">
+		<if>
+			<equals arg1="${DEBUG}" arg2="true"/>
+			<then>
+				<property name="dir.name" value="debug"/>
+			</then>
+			<else>
+				<property name="dir.name" value="release"/>
+			</else>
+		</if>
+
+		<property name="preprocess" location="build/ant/${dir.name}/preprocess_${build.name}"/>
+		<property name="build" location="build/ant/${dir.name}/build_${build.name}"/>
+		<property name="res" location="build/ant/${dir.name}/res_${build.name}"/>
+		<property name="dist" location="build/ant/${dir.name}/dist_${build.name}"/>
+		<property name="bin" location="bin/${dir.name}/${build.name}"/>
+		
+		<mkdir dir="${preprocess}"/>
+		<mkdir dir="${build}"/>
+		<mkdir dir="${res}"/>
+		<mkdir dir="${dist}"/>
+		<mkdir dir="${bin}"/>
+	</target>
+	
+	<!-- Nested copy for the copy_resources task -->
+	<target name="copy_dir">
+		<patternset id="res.include.files" includes="${types}"/>
+		<echo message="Copying from resource directory=${resource}"/>
+		<copy todir="${dest}" overwrite="true">
+			<fileset dir="${resource}">
+				<patternset includes="${types}"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<!-- Copy over the needed resources -->
+	<target name="copy_resources" depends="setup">
+		<echo message="Copying file types=${resourcetypes.list}"/>
+		<foreach list="${resourcedirs.list}" delimiter="," target="copy_dir" param="resource">
+			<param name="dest" value="${res}"/>
+			<param name="types" value="${resourcetypes.list}"/>
+		</foreach>
+	</target>
+
+	<!-- Compile the source code -->
+	<target name="build" depends="copy_resources">
+		<echo message="Preprocess symbols=${preprocessargs.list}"/>
+		
+		<wtkpreprocess symbols="${preprocessargs.list}" srcdir="${src}" destdir="${preprocess}">
+			<depend targetdir="${preprocess}"/>
+		</wtkpreprocess>
+		
+		<wtkbuild srcdir="${preprocess}" destdir="${build}" target="1.1" source="1.2" preverify="false">
+			<classpath>
+				<pathelement location="${env.JTOADLETFIXED_INSTALL_DIR}/lib/${jtoadlet.version}.jar"/>
+				<pathelement path="${classpath.list}"/>
+			</classpath>
+		</wtkbuild>
+		
+		<echo message="Classpath=${env.CLASSPATH}"/>
+		<echo message="Using jtoadletfixed library: ${env.JTOADLETFIXED_INSTALL_DIR}/lib/${jtoadlet.version}.jar"/>
+	</target>
+
+	<!-- Package source and resources-->
+	<target name="package" depends="build">
+		<wtkjad jadfile="${dist}/${app.name}.jad" jarfile="${dist}/${app.name}.jar" manifest="${dist}/MANIFEST.MF" name="${midlet.name}">
+			<midlet name="${midlet.name}" icon="/LawnDarts.png" class="${class.name}"/>
+			<attribute name="MIDlet-Icon" value="LawnDarts.png"/>
+			<attribute name="MIDlet-Jar-Size" value="000000"/>
+			<attribute name="MIDlet-Jar-URL" value="${app.name}.jar"/>
+			<attribute name="MIDlet-Name" value="${midlet.name}"/>
+			<attribute name="MIDlet-Vendor" value="Concrete Software, Inc."/>
+			<attribute name="MIDlet-Version" value="1.0.1"/>
+			<attribute name="MicroEdition-Configuration" value="CLDC-${cldc.name}"/>
+			<attribute name="MicroEdition-Profile" value="MIDP-${midp.name}"/>
+			<attribute name="MIDlet-Permissions" value="${jadpermissions.list}"/>
+			<attribute name="Content-Folder" value="games"/>
+			<attribute name="iDEN-Graphics-Acceleration" value="on" if="idenjadattributes"/>
+			<attribute name="iDEN-MIDlet-miniJIT" value="on" if="idenjadattributes"/>
+		</wtkjad>
+	
+		<wtkpackage jarfile="${dist}/${app.name}.jar" basedir="${build}" jadfile="${dist}/${app.name}.jad" preverify="false" manifest="${dist}/MANIFEST.MF" obfuscate="false">
+			<classpath>
+				<pathelement path="${classpath.list}"/>
+			</classpath>
+			<zipfileset src="${env.JTOADLETFIXED_INSTALL_DIR}/lib/${jtoadlet.version}.jar"/>
+			<zipfileset dir="${res}">
+				<patternset includes="${resourcetypes.list}"/>
+			</zipfileset>
+		</wtkpackage>
+
+		<copy file="${dist}/${app.name}.jad" todir="${bin}"/>
+		<copy file="${dist}/${app.name}.jar" todir="${bin}"/>
+	</target>
+
+	<!-- Obfuscate the code -->
+	<target name="obfuscate">
+		<wtkobfuscate jarfile="${bin}/${app.name}.jar" jadfile="${bin}/${app.name}.jad" obfuscator="proguard">
+			<classpath>
+				<pathelement path="${classpath.list}"/>
+			</classpath>
+			<argument value="-defaultpackage"/>
+			<argument value="-dontusemixedcaseclassnames"/>
+			<argument value="-printseeds"/>
+			<argument value="-keep 'public class * extends javax.microedition.midlet.MIDlet'"/>
+		</wtkobfuscate>
+	</target>
+
+	<!-- Create the game unobfuscated version -->
+	<target name="preverify">
+		<wtkpreverify jarfile="${bin}/${app.name}.jar" jadfile="${bin}/${app.name}.jad"> 
+			<classpath>
+				<pathelement path="${classpath.list}"/>
+			</classpath>
+		</wtkpreverify>
+	</target>
+	
+	<!-- Exact Manifest -->
+	<target name="exact_manifest">
+		<echo message="Creating forced MANIFEST.MF"/>
+		<mkdir dir="${bin}/tmp"/>
+		<unjar src="${bin}/${app.name}.jar" dest="${bin}/tmp"/>
+		<delete file="${bin}/${app.name}.jar"/>
+		<copy file="${dist}/MANIFEST.MF" todir="${bin}/tmp/META-INF" overwrite="true"/>
+		<zip destfile="${bin}/${app.name}.jar" basedir="${bin}/tmp"/>
+		<delete dir="${bin}/tmp"/>
+		<wtkjad jadfile="${bin}/${app.name}.jad" jarfile="${bin}/${app.name}.jar" update="yes"/>
+	</target>
+
+	<!-- Sign Jad -->
+	<target name="sign_jad">
+		<echo message="Adding certificate 1"/>
+		<exec executable="java">
+			<arg value="-jar"/>
+			<arg value="${env.WTK_HOME}/bin/JadTool.jar"/>
+			<arg value="-addcert"/>
+			<arg value="-alias"/>
+			<arg value="${certalias.sign}"/>
+			<arg value="-keystore"/>
+			<arg value="${keystore.sign}"/>
+			<arg value="-certnum"/>
+			<arg value="1"/>
+			<arg value="-chainnum"/>
+			<arg value="1"/>
+			<arg value="-inputjad"/>
+			<arg value="${bin}/${app.name}.jad"/>
+			<arg value="-outputjad"/>
+			<arg value="${bin}/${app.name}.jad"/>
+		</exec>
+		<echo message="Adding certificate 2"/>
+		<exec executable="java">
+			<arg value="-jar"/>
+			<arg value="${env.WTK_HOME}/bin/JadTool.jar"/>
+			<arg value="-addcert"/>
+			<arg value="-alias"/>
+			<arg value="${certalias.sign}"/>
+			<arg value="-keystore"/>
+			<arg value="${keystore.sign}"/>
+			<arg value="-certnum"/>
+			<arg value="2"/>
+			<arg value="-chainnum"/>
+			<arg value="1"/>
+			<arg value="-inputjad"/>
+			<arg value="${bin}/${app.name}.jad"/>
+			<arg value="-outputjad"/>
+			<arg value="${bin}/${app.name}.jad"/>
+		</exec>
+		<echo message="Adding signature"/>
+		<exec executable="java">
+			<arg value="-jar"/>
+			<arg value="${env.WTK_HOME}/bin/JadTool.jar"/>
+			<arg value="-addjarsig"/>
+			<arg value="-jarfile"/>
+			<arg value="${bin}/${app.name}.jar"/>
+			<arg value="-alias"/>
+			<arg value="${certalias.sign}"/>
+			<arg value="-keystore"/>
+			<arg value="${keystore.sign}"/>
+			<arg value="-keypass"/>
+			<arg value="${keypass.sign}"/>
+			<arg value="-inputjad"/>
+			<arg value="${bin}/${app.name}.jad"/>
+			<arg value="-outputjad"/>
+			<arg value="${bin}/${app.name}.jad"/>
+		</exec>
+	</target>
+	
+	<!-- Compile actually performs all the heavy lifting here -->
+	<target name="compile">
+		<property name="wtk.cldc.version" value="${cldc.name}"/>
+		<property name="wtk.midp.version" value="${midp.name}"/>
+		
+		<!-- Check ant command line options for debug, demo, and/or timestamp settings -->
+		<if>
+			<equals arg1="${DEBUG}" arg2="true"/>
+			<then>
+				<runtarget target="debug"/>
+				<echo message="resourcetypes.list=${resourcetypes.list}"/>
+				<echo message="resourcedirs.list=${resourcedirs.list}"/>
+				<echo message="classpath.list=${classpath.list}"/>
+				<echo message="jadpermissions.list=${jadpermissions.list}"/>
+			</then>
+		</if>
+		<if>
+			<equals arg1="${DEMO}" arg2="true"/>
+			<then>
+				<runtarget target="demo"/>
+			</then>
+		</if>
+		<if>
+			<equals arg1="${TIMESTAMP}" arg2="true"/>
+			<then>
+				<runtarget target="timestamp"/>
+			</then>
+		</if>
+		
+		<!-- If the phone name was specified use it as the build label. Otherwise use the constructed build name -->
+		<if>
+			<equals arg1="${phone.name}" arg2=""/>
+			<then>
+				<echo message="No particular phone model specified, using generic name."/>
+			</then>
+			<else>
+				<var name="build.name" value="${phone.name}"/>
+			</else>
+		</if>
+		
+		<!-- compile and package up the result -->
+		<runtarget target="package"/>
+		
+		<!-- Don't obfuscate debug builds -->
+		<if>
+			<equals arg1="${DEBUG}" arg2="true"/>
+			<then>
+				<echo message="Debug builds are not obfuscated by default"/>
+			</then>
+			<else>
+				<runtarget target="obfuscate"/>
+			</else>
+		</if>
+		
+		<!-- Preverify the jar/jad combo -->
+		<runtarget target="preverify"/>
+		
+		<!-- If an exact manifest is required, use it -->
+		<if>
+			<equals arg1="${exactmanifest.name}" arg2="true"/>
+			<then>
+				<runtarget target="exact_manifest"/>
+			</then>
+		</if>
+
+		<!-- Check ant command line options for signing -->
+		<if>
+			<equals arg1="${SIGNJAD}" arg2="true"/>
+			<then>
+				<runtarget target="sign_jad"/>
+			</then>
+		</if>
+	</target>
+	
+</project>

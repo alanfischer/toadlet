@@ -1,0 +1,129 @@
+<project name="tadpoletest" default="help" basedir=".">
+	<description>
+		Builds the tadpoletest
+	</description>
+
+	<!-- Global properties -->
+	<property name="app.name" value="toadletTest"/>
+	<property name="src" location="."/>
+	<property environment="env"/>
+	<property name="FLEX_HOME" value="${env.FLEX_HOME}"/>
+	<taskdef resource="net/sf/antcontrib/antlib.xml" classpath="${env.TOADLET_DEPS_DIR}/java/lib/ant-contrib.jar"/>
+	<taskdef resource="flexTasks.tasks" classpath="${basedir}/flexTasks/lib/flexTasks.jar" />
+	
+	<!-- Standard targets -->
+
+	<!-- The default shows our options -->
+	<target name="help" description="help and settings"> 
+		<echo message=" To list available targets type: ant -projecthelp"/> 
+		<echo message=" "/> 
+		<echo message=" Be sure to place flexTasks.jar into the lib directory of your Ant installation!"/>
+		<echo message=" "/> 
+		<echo message=" Environment variables and settings:"/> 
+		<echo message=" TOADLET_INSTALL_DIR = The directory to install the toadlet engine into"/> 
+		<echo message=" TOADLET_DEPS_DIR = The base install of toadletDeps"/> 
+		<echo message=" FLEX_HOME = The base install of the Flex SDK"/> 
+		<echo message=" PATH must include: TOADLET_DEPS_DIR/YOUR_OS_TYPE/bin/ For the fpcomp executable - make sure fpcomp's executable bit is set!"/>
+		<echo message=" PATH must include: FLEX_HOME/bin"/>
+	</target>
+
+	<!-- Clean deletes all build related directories -->
+	<target name="clean" description="clean up build files">
+		<delete file="toadletTest.swf"/>
+	</target>
+
+	<!-- Cloober calls clean and removes the compiled lib -->
+	<target name="clobber" description="calls clean and deletes installed libs">
+		<subant target="clean" buildpath="build/flex"/>
+	</target>
+
+	<!-- Set debug -->
+	<target name="debug">
+		<property name="debug" value="TOADLET_DEBUG"/>
+		<echo message="Setting debug=${debug}"/>
+	</target>
+	
+	<!-- Create directories -->
+	<target name="init">
+		<condition property="debug.suffix" value="_d" else="">
+			<equals arg1="${debug}" arg2="TOADLET_DEBUG"/>
+		</condition>
+
+		<property name="preprocess" location="preprocess${debug.suffix}"/>
+		<property name="build" location="build${debug.suffix}"/>
+
+		<property name="swf.suffix" value="${debug.suffix}.swf"/>
+		
+		<mkdir dir="${preprocess}"/>
+		<mkdir dir="${build}"/>
+		<mkdir dir="${env.TOADLET_INSTALL_DIR}/lib"/>
+	</target>
+	
+	<!-- Calls gpp on each file for preprocessing-->
+	<target name="gpp">
+		<propertyregex property="outfile"
+			input="${infile}"
+			regexp="preprocess"
+			replace="build"
+			casesensitive="false" 
+		/>
+
+		<echo message="Preprocessing infile=${infile}"/>
+		<echo message="To outfile=${outfile}"/>
+
+		<exec executable="gpp.exe">
+			<arg value="-o"/>
+			<arg value="${outfile}"/>
+			<arg value="-x"/>
+			<arg value="--nocurinc"/>
+			<arg value="--nostdinc"/>
+			<arg value="${infile}"/>
+		</exec>
+	</target>
+	
+	<!-- Preprocess -->
+	<target name="preprocess" depends="init">
+		<echo message="Copy files over for preprocessing"/>
+		<copy todir="${preprocess}">
+			<fileset dir="${src}">
+				<include name="*.as"/>
+			</fileset>
+		</copy>
+		
+		<echo message="Calling gpp "/>
+		<foreach target="gpp" param="infile">
+			<fileset dir="${preprocess}">
+				<include name="*.as"/>
+			</fileset>
+		</foreach>
+	</target>
+	
+	<!-- Build -->
+	<target name="build" depends="preprocess">
+		<mxmlc 
+			file="tadpoleTest.as" 
+			output="${app.name}${swf.suffix}"
+			actionscript-file-encoding="UTF-8"
+			keep-generated-actionscript="true"
+			incremental="true"
+		>
+			<library-path dir="${env.TOADLET_INSTALL_DIR}/lib" append="true">
+				<include name="toadlet${debug.suffix}.swc"/>
+			</library-path>
+			
+			<!--library-path dir="${env.TOADLET_INSTALL_DIR}/toadlet${debug.suffix}.swc" append="true"/-->
+		</mxmlc>
+	</target>
+	
+	<!-- Usable targets -->
+	<target name="build-debug" depends="debug,build" description="Build debug version">
+		<echo message="Debug .swf complete"/>
+	</target>
+	<target name="build-release" depends="build" description="Build release version">
+		<echo message="Release .swf complete"/>
+	</target>
+	<target name="all" description="Build debug and release version">
+		<subant target="build-debug" buildpath="."/>
+		<subant target="build-release" buildpath="."/>
+	</target>
+</project>

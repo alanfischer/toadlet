@@ -1,0 +1,196 @@
+<!-- The most generic targets you can call to create game builds -->
+<project name="generics" basedir="../..">
+	
+	<!--
+		The build.name var will determine what directory name your output gets
+		Format is as follows:
+		target name="manufacterer-carrier-screensize-options(that differentiate)" depends="manufacterer,carrier,screensize,3d_version,options,in,order,described,by,the,name,compile(must be last)" description="name"
+	-->
+	
+	<!-- iDEN generic devices -->
+	<target name="iden-generic-130x130-3d" depends="iden,generic,130x130,3d_iden,icon_iden_small,mascotv3,midi,sfx" description="generic iden">
+		<var name="build.name" value="iden-generic-130x130-3d"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="iden-generic-130x130-3d-bluetooth" depends="iden,generic,130x130,3d_iden,bluetooth,icon_iden_small,mascotv3,midi,sfx" description="generic iden">
+		<var name="build.name" value="iden-generic-130x130-3d-bluetooth"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="iden-generic-176x208-3d" depends="iden,generic,176x208,3d_iden,icon_iden,mascotv3,midi,sfx" description="generic iden">
+		<var name="build.name" value="iden-generic-176x208-3d"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="iden-generic-176x208-3d-bluetooth" depends="iden,generic,176x208,3d_iden,bluetooth,icon_iden,mascotv3,midi,sfx" description="generic iden">
+		<var name="build.name" value="iden-generic-176x208-3d-bluetooth"/>
+		<runtarget target="compile"/>
+	</target>
+	
+	<!-- iDEN sprint devices -->
+	<target name="iden-sprint-128x160-3d" depends="iden,sprint,128x160,3d_sprint,icon_iden_small,mascotv3,midi,sfx" description="sprint iden">
+		<var name="build.name" value="iden-sprint-128x160-3d"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="iden-sprint-240x320-3d-bluetooth" depends="iden,sprint,240x320,3d_sprint,bluetooth,icon_iden,mascotv3,midi,sfx" description="sprint iden">
+		<var name="build.name" value="iden-sprint-240x320-3d-bluetooth"/>
+		<runtarget target="compile"/>
+	</target>
+	
+	<!-- LG sprint devices -->
+	<target name="lg-sprint-128x160-3d-camera" depends="lg,sprint,128x160,3d_sprint,bluetooth,camera,icon_13x13,mascotv3,sfx" description="sprint lg">
+		<var name="build.name" value="lg-sprint-128x160-3d"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="lg-sprint-1176x220-3d-camera" depends="lg,sprint,176x220,3d_sprint,bluetooth,camera,icon_13x13,mascotv3,sfx" description="sprint lg">
+		<var name="build.name" value="lg-sprint-176x220-3d"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="lg-sprint-176x220-3d-bluetooth-camera" depends="lg,sprint,176x220,3d_sprint,bluetooth,camera,icon_13x13,mascotv3,sfx" description="sprint lg">
+		<var name="build.name" value="lg-sprint-176x220-3d-bluetooth"/>
+		<runtarget target="compile"/>
+	</target>
+
+	<!-- Motorola generic devices -->
+	<target name="motorola-generic-240x320-3d-camera" depends="motorola,generic,240x320,3d_jsr184,camera,icon_15x15,lowmem,m3g_lowmem,midi,png_lowmem,sfx" description="generic motorola">
+		<var name="build.name" value="motorola-generic-240x320-3d-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="motorola-generic-240x320-3d-bluetooth-camera" depends="motorola,generic,240x320,3d_jsr184,bluetooth,camera,icon_15x15,lowmem,m3g_lowmem,midi,png_lowmem,sfx" description="generic motorola">
+		<var name="build.name" value="motorola-generic-240x320-3d-bluetooth-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	
+	<!-- Motorola sprint devices -->
+	<target name="motorola-sprint-176x220-3d-camera" depends="motorola,sprint,176x220,3d_jsr184,camera,icon_15x15,lowmem,m3g_lowmem,png_lowmem,sfx" description="sprint motorola">
+		<var name="build.name" value="motorola-sprint-176x220-3d-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="motorola-sprint-240x320-3d-bluetooth-camera" depends="motorola,sprint,240x320,3d_jsr184,bluetooth,camera,icon_15x15,m3g,png,sfx" description="sprint motorola">
+		<var name="build.name" value="motorola-sprint-240x320-3d-bluetooth-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	
+	<!-- Motorola t-mobile devices -->
+	<target name="motorola-tmobile-128x160-2d" depends="motorola,tmobile,128x160,3d_stub,2d,icon_15x15,lowmem,midi,smalljar" description="t-mobile motorola">
+		<var name="build.name" value="motorola-tmobile-128x160-2d"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="motorola-tmobile-176x220-2d" depends="motorola,tmobile,176x220,3d_stub,2d,icon_15x15,lowmem_motorola_v_series,midi,smalljar" description="t-mobile motorola">
+		<var name="build.name" value="motorola-tmobile-176x220-2d"/>
+		<runtarget target="compile"/>
+	</target>
+
+	<!-- Nokia generic devices -->
+	<target name="nokia-s60-2e-generic-176x208-3d-camera" depends="nokia,generic,176x208,3d_jsr184,camera,icon_29x29,lowmem,m3g_lowmem,midi,nokia_s60_2e,png_lowmem" description="generic nokia">
+		<var name="build.name" value="nokia-s60-2e-generic-176x208-3d-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="nokia-s60-2e-generic-176x208-3d-bluetooth-camera" depends="nokia,generic,176x208,3d_jsr184,bluetooth,camera,icon_29x29,lowmem,m3g_lowmem,midi,nokia_s60_2e,png_lowmem" description="generic nokia">
+		<var name="build.name" value="nokia-s60-2e-generic-176x208-3d-bluetooth-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="nokia-s40-3e-generic-128x160-3d-camera" depends="nokia,generic,128x160,3d_jsr184,camera,icon_29x29,lowmem,m3g_lowmem,nokia_s40_3e,png_lowmem,sfx" description="generic nokia">
+		<var name="build.name" value="nokia-s40-3e-generic-128x160-3d-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="nokia-s40-3e-generic-128x160-3d-bluetooth-camera" depends="nokia,generic,128x160,3d_jsr184,bluetooth,camera,icon_29x29,lowmem,m3g_lowmem,png_lowmem,sfx,nokia_s40_3e,png_lowmem,sfx" description="generic nokia">
+		<var name="build.name" value="nokia-s40-3e-generic-128x160-3d-bluetooth-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="nokia-s40-3e-generic-176x208-3d-camera" depends="nokia,generic,176x208,3d_jsr184,camera,icon_29x29,lowmem,m3g_lowmem,nokia_s40_3e,png_lowmem,sfx" description="generic nokia">
+		<var name="build.name" value="nokia-s40-3e-generic-176x208-3d-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="nokia-s40-3e-generic-176x208-3d-bluetooth-camera" depends="nokia,generic,176x208,3d_jsr184,bluetooth,camera,icon_29x29,lowmem,m3g_lowmem,nokia_s40_3e,png_lowmem,sfx" description="generic nokia">
+		<var name="build.name" value="nokia-s40-3e-generic-176x208-3d-bluetooth-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="nokia-s40-3e-generic-208x208-3d-bluetooth-camera" depends="nokia,generic,208x208,3d_jsr184,bluetooth,camera,icon_29x29,lowmem,m3g_lowmem,nokia_s40_3e,png_lowmem,sfx" description="generic nokia">
+		<var name="build.name" value="nokia-s40-3e-generic-208x208-3d-bluetooth-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="nokia-s40-3e-generic-240x320-3d-camera" depends="nokia,generic,240x320,3d_jsr184,camera,icon_48x48,lowmem,m3g_lowmem,nokia_s40_3e,png_lowmem,sfx" description="generic nokia">
+		<var name="build.name" value="nokia-s40-3e-generic-240x320-3d-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="nokia-s40-3e-generic-240x320-3d-bluetooth-camera" depends="nokia,generic,240x320,3d_jsr184,bluetooth,camera,icon_48x48,lowmem,m3g_lowmem,nokia_s40_3e,png_lowmem,sfx" description="generic nokia">
+		<var name="build.name" value="nokia-s40-3e-generic-240x320-3d-bluetooth-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="nokia-s60-3e-generic-176x208-3d-bluetooth-camera" depends="nokia,generic,176x208,3d_jsr184,bluetooth,camera,icon_29x29,lowmem,m3g_lowmem,nokia_s60_3e,png_lowmem,sfx" description="generic nokia">
+		<var name="build.name" value="nokia-s60-3e-generic-176x208-3d-bluetooth-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="nokia-s60-3e-generic-208x208-3d-bluetooth-camera" depends="nokia,generic,208x208,3d_jsr184,bluetooth,camera,icon_29x29,lowmem,m3g_lowmem,nokia_s60_3e,png_lowmem,sfx" description="generic nokia">
+		<var name="build.name" value="nokia-s60-3e-generic-208x208-3d-bluetooth-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="nokia-s60-3e-generic-240x320-3d-bluetooth-camera" depends="nokia,generic,240x320,3d_jsr184,bluetooth,camera,icon_48x48,lowmem,m3g_lowmem,nokia_s60_3e,png_lowmem,sfx" description="generic nokia">
+		<var name="build.name" value="nokia-s60-3e-generic-240x320-3d-bluetooth-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="nokia-s60-3e-generic-320x240-3d-bluetooth-camera" depends="nokia,generic,320x240,3d_jsr184,bluetooth,camera,icon_48x48,lowmem,m3g_lowmem,nokia_s60_3e,png_lowmem,sfx" description="generic nokia">
+		<var name="build.name" value="nokia-s60-3e-generic-320x240-3d-bluetooth-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="nokia-s60-3e-generic-352x416-3d-bluetooth-camera" depends="nokia,generic,352x416,3d_jsr184,bluetooth,camera,icon_48x48,lowmem,m3g_lowmem,nokia_s60_3e,png_lowmem,sfx" description="generic nokia">
+		<var name="build.name" value="nokia-s60-3e-generic-352x416-3d-bluetooth-camera"/>
+		<runtarget target="compile"/>
+	</target>
+
+	<!-- Samsung sprint devices -->
+	<target name="samsung-sprint-176x220-3d-camera" depends="samsung,sprint,176x220,3d_sprint,camera,icon_13x13,mascotv3,sfx" description="sprint samsung">
+		<var name="build.name" value="samsung-sprint-176x220-3d-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="samsung-sprint-240x320-3d-camera" depends="samsung,sprint,240x320,3d_sprint,camera,icon_13x13,mascotv3,sfx" description="sprint samsung">
+		<var name="build.name" value="samsung-sprint-240x320-3d-camera"/>
+		<runtarget target="compile"/>
+	</target>
+
+	<!-- Samsung t-mobile devices -->
+	<target name="samsung-tmobile-128x160-2d" depends="samsung,tmobile,128x160,3d_stub,2d,icon_13x13,smalljar,midi,sfx" description="generic samsung">
+		<var name="build.name" value="samsung-tmobile-128x160-2d"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="samsung-tmobile-176x220-2d-camera" depends="samsung,tmobile,176x208,3d_stub,2d,camera,icon_13x13,smalljar,midi,sfx" description="generic samsung">
+		<var name="build.name" value="samsung-tmobile-176x220-2d-camera"/>
+		<runtarget target="compile"/>
+	</target>
+
+	<!-- Sanyo sprint devices -->
+	<target name="sanyo-sprint-176x220-3d-camera" depends="sanyo,sprint,176x220,3d_sprint,camera,icon_13x13,mascotv3,sfx" description="sprint sanyo">
+		<var name="build.name" value="sanyo-sprint-176x220-3d-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="sanyo-sprint-240x320-3d-camera" depends="sanyo,sprint,240x320,3d_sprint,camera,icon_13x13,mascotv3,sfx" description="sprint sanyo">
+		<var name="build.name" value="sanyo-sprint-240x320-3d-camera"/>
+		<runtarget target="compile"/>
+	</target>
+
+	<!-- Sony Ericsson generic devices -->
+	<target name="se-jp3-generic-128x160-3d-camera" depends="sonyericsson,generic,128x160,3d_se,camera,icon_13x13,mascotv3,midi,se_jp3,sfx" description="generic Sony Ericsson ">
+		<var name="build.name" value="se-jp3-generic-128x160-3d-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="se-jp3-generic-176x208-3d-camera" depends="sonyericsson,generic,176x208,3d_se,camera,icon_13x13,mascotv3,midi,se_jp3,sfx" description="generic Sony Ericsson ">
+		<var name="build.name" value="se-jp3-generic-176x208-3d-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="se-jp5-generic-128x160-3d-camera" depends="sonyericsson,generic,128x160,3d_se,camera,icon_13x13,mascotv3,midi,se_jp5,sfx" description="generic Sony Ericsson ">
+		<var name="build.name" value="se-jp5-generic-128x160-3d-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="se-jp5-generic-128x160-3d-bluetooth-camera" depends="sonyericsson,generic,128x160,3d_se,bluetooth,camera,icon_13x13,mascotv3,midi,se_jp5,sfx" description="generic Sony Ericsson ">
+		<var name="build.name" value="se-jp5-generic-128x160-3d-bluetooth-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="se-jp5-generic-176x208-3d-bluetooth-camera" depends="sonyericsson,generic,176x208,3d_se,bluetooth,camera,icon_13x13,mascotv3,midi,se_jp5,sfx" description="generic Sony Ericsson ">
+		<var name="build.name" value="se-jp5-generic-176x208-3d-bluetooth-camera"/>
+		<runtarget target="compile"/>
+	</target>
+	<target name="se-jp5-generic-240x320-3d-bluetooth-camera" depends="sonyericsson,generic,240x320,3d_se,bluetooth,camera,icon_13x13,mascotv3,midi,se_jp5,sfx" description="generic Sony Ericsson ">
+		<var name="build.name" value="se-jp5-generic-240x320-3d-bluetooth-camera"/>
+		<runtarget target="compile"/>
+	</target>
+</project>	
+

@@ -1,0 +1,137 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_PANEL DIALOGEX 0, 0, 162, 175
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
+    WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+FONT 8, "MS Sans Serif"
+BEGIN
+    CTEXT           "Toadlet Mesh Exporter v1.0\nLightning Toads Productions, LLC\nCopyright 2006",
+                    IDC_STATIC,18,7,125,28
+    GROUPBOX        "Options",IDC_STATIC,5,35,150,110
+    PUSHBUTTON      "OK",IDOK,7,154,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,105,154,50,14
+    CONTROL         "Skeleton",IDC_SKELETON,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,20,55,44,10
+    CONTROL         "Animation",IDC_ANIMATION,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,20,70,47,10
+    CONTROL         "Geometry",IDC_GEOMETRY,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,20,85,46,10
+    CONTROL         "Vertex Normals",IDC_VERTEXNORMAL,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,75,55,63,10
+    CONTROL         "Vertex Colors",IDC_VERTEXCOLOR,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,75,70,57,10
+    CONTROL         "Texture Coordinates",IDC_TEXTURECOORD,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,75,85,79,10
+    CONTROL         "Materials",IDC_MATERIAL,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,20,100,44,10
+    CONTROL         "Preview Result",IDC_PREVIEW,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,50,115,63,10
+    CONTROL         "Skip Null Materials",IDC_SKIPNULLMAT,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,75,100,74,10
+    EDITTEXT        IDC_EDIT1,53,130,68,12,ES_AUTOHSCROLL
+    CTEXT           "Preview Texture Path",IDC_STATIC,7,127,45,17
+    PUSHBUTTON      "Browse",IDC_BUTTON1,123,130,26,12
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_PANEL, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 155
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 168
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_LIBDESCRIPTION      "Export to Toadlet mesh format"
+    IDS_CATEGORY            "exporter"
+    IDS_CLASS_NAME          "MaxTMSHExporter"
+    IDS_PARAMS              "Parameters"
+    IDS_SPIN                "Spin"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

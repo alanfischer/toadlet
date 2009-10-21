@@ -1,0 +1,318 @@
+<project name="toadlet" default="help" basedir="../../..">
+	<description>
+		Builds the toadlet engine
+	</description>
+
+	<!-- Setup -->
+
+	<!-- Global properties -->
+	<property name="src" location="src/java/com/lightningtoads/toadlet"/>
+	<property environment="env"/>
+	<property name="wtk.home" value="${env.WTK_HOME}"/>
+	<property name="wtk.proguard.home" value="${env.TOADLET_DEPS_DIR}/java"/>
+	<property name="wtk.cldc.version" value="1.1"/>
+	<property name="wtk.midp.version" value="2.0"/>
+	<taskdef resource="antenna.properties" classpath="${env.TOADLET_DEPS_DIR}/java/lib/antenna-bin-0.9.12.jar"/>
+
+	<!-- Classpaths for external jars-->
+	<path id="iden.classpath" location="${env.TOADLET_DEPS_DIR}/java/lib/iden.jar"/>
+	<path id="se.classpath" location="${env.TOADLET_DEPS_DIR}/java/lib/se.jar"/>
+	<path id="sprint.classpath" location="${env.TOADLET_DEPS_DIR}/java/lib/sprint.zip"/>
+	<path id="jsr184.classpath" location="${env.WTK_HOME}/lib/jsr184.jar"/>
+	<path id="android.classpath" location="${env.ANDROID_HOME}/android.jar"/>
+	<path id="blackberry.classpath" location="${env.BLACKBERRY_HOME}/lib/net_rim_api.jar"/>
+	<path id="j2me.classpath" location=""/>
+	<path id="mmapi.classpath" location="${env.WTK_HOME}/lib/mmapi.jar"/>
+	<path id="jsr082.classpath" location="${env.WTK_HOME}/lib/jsr082.jar"/>
+	<path id="jsr256.classpath" location="${env.TOADLET_DEPS_DIR}/java/lib/jsr256.jar"/>
+
+	<!-- 3D api targets -->
+
+	<!-- Set IDEN 3dapi -->
+	<target name="iden-3dapi">
+		<property name="3dapi" value="TOADLET_PLATFORM_IDEN"/>
+		<echo message="Setting 3dapi=${3dapi}"/>
+		<path id="3dapi.classpath" refid="iden.classpath"/>
+		<property name="tadpole-3dapi-src" location="${src}/tadpole/platform/iden"/>
+		<property name="3d.suffix" value="_iden"/>
+	</target>
+
+	<!-- Set Sony Ericsson 3dapi -->
+	<target name="se-3dapi">
+		<property name="3dapi" value="TOADLET_PLATFORM_SE"/>
+		<echo message="Setting 3dapi=${3dapi}"/>
+		<path id="3dapi.classpath" refid="se.classpath"/>
+		<property name="tadpole-3dapi-src" location="${src}/tadpole/platform/se_sprint"/>
+		<property name="3d.suffix" value="_se"/>
+	</target>
+
+	<!-- Set Sprint 3dapi -->
+	<target name="sprint-3dapi">
+		<property name="3dapi" value="TOADLET_PLATFORM_SPRINT"/>
+		<echo message="Setting 3dapi=${3dapi}"/>
+		<path id="3dapi.classpath" refid="sprint.classpath"/>
+		<property name="tadpole-3dapi-src" location="${src}/tadpole/platform/se_sprint"/>
+		<property name="3d.suffix" value="_sprint"/>
+	</target>
+
+	<!-- Set JSR-184 3dapi -->
+	<target name="jsr184-3dapi">
+		<property name="3dapi" value="TOADLET_PLATFORM_JSR184"/>
+		<echo message="Setting 3dapi=${3dapi}"/>
+		<path id="3dapi.classpath" refid="jsr184.classpath"/>
+		<property name="tadpole-3dapi-src" location="${src}/tadpole/platform/jsr184"/>
+		<property name="3d.suffix" value="_jsr184"/>
+	</target>
+
+	<!-- Set Android 3dapi -->
+	<target name="android-3dapi">
+		<property name="3dapi" value="TOADLET_PLATFORM_ANDROID"/>
+		<echo message="Setting 3dapi=${3dapi}"/>
+		<path id="3dapi.classpath" refid="android.classpath"/>
+		<property name="tadpole-3dapi-src" location="${src}/tadpole/platform/gles"/>
+		<property name="3d.suffix" value="_android"/>
+	</target>
+
+	<!-- Set blackberry 3dapi -->
+	<target name="blackberry-3dapi">
+		<property name="3dapi" value="TOADLET_PLATFORM_BLACKBERRY"/>
+		<echo message="Setting 3dapi=${3dapi}"/>
+		<path id="3dapi.classpath" refid="blackberry.classpath"/>
+		<property name="tadpole-3dapi-src" location="${src}/tadpole/platform/software"/>
+		<property name="3d.suffix" value="_blackberry"/>
+	</target>
+
+	<!-- Set j2me software 3dapi -->
+	<target name="j2me-3dapi">
+		<property name="3dapi" value="TOADLET_PLATFORM_J2ME"/>
+		<echo message="Setting 3dapi=${3dapi}"/>
+		<path id="3dapi.classpath" refid="j2me.classpath"/>
+		<property name="tadpole-3dapi-src" location="${src}/tadpole/platform/software"/>
+		<property name="3d.suffix" value="_j2me"/>
+	</target>
+
+
+	<!-- Standard targets -->
+
+	<!-- The default shows our options -->
+	<target name="help" description="help and settings"> 
+		<echo message=" To list available targets type: ant -projecthelp"/> 
+		<echo message=" Typically you choose complete versions based"/>
+		<echo message=" on the 3dapi being used. Examples:" /> 
+		<echo message=" ant dist-iden, ant dist-jsr184, ant dist-se"/> 
+		<echo message=" "/> 
+		<echo message=" Environment variables and settings:"/> 
+		<echo message=" TOADLET_INSTALL_DIR = The directory to install the toadlet engine into"/> 
+		<echo message=" TOADLET_DEPS_DIR = The base install of toadletDeps"/> 
+		<echo message=" WTK_HOME = The base install of Sun's Wireless Toolkit 2.X"/> 
+		<echo message=" ANDROID_HOME = The base install of the Android SDK"/>
+		<echo message=" BLACKBERRY_HOME = The base install of your Blackberry JDK"/>
+		<echo message=" PATH = TOADLET_DEPS_DIR/YOUR_OS_TYPE/bin/ For the fpcomp executable - make sure fpcomp's executable bit is set!"/>
+	</target>
+
+	<!-- Clean deletes all build related directories -->
+	<target name="clean" description="clean up">
+		<delete includeemptydirs="true">
+			<fileset dir="build/ant" excludes="build.xml toadlet.pro"/>
+		</delete>
+	</target>
+
+	<!-- Cloober calls clean -->
+	<target name="clobber">
+		<subant target="clean" buildpath="build/ant"/>
+	</target>
+
+	<!-- Set debug -->
+	<target name="debug">
+		<property name="debug" value="TOADLET_DEBUG"/>
+		<echo message="Setting debug=${debug}"/>
+	</target>
+
+	<!-- Create directories -->
+	<target name="init">
+		<condition property="debug.suffix" value="_d" else="">
+			<equals arg1="${debug}" arg2="TOADLET_DEBUG"/>
+		</condition>
+
+		<property name="jar.suffix" value="${3d.suffix}${debug.suffix}.jar"/>
+
+		<property name="preprocess" location="build/ant/preprocess${jar.suffix}"/>
+		<property name="build" location="build/ant/build${jar.suffix}"/>
+		<property name="dist" location="build/ant/dist${jar.suffix}"/>
+
+		<mkdir dir="${build}"/>
+		<mkdir dir="${preprocess}"/>
+		<mkdir dir="${dist}"/>
+		<mkdir dir="${env.TOADLET_INSTALL_DIR}/lib"/>
+	</target>
+
+	<!-- toadlet targets -->
+
+	<!-- egg -->
+	<target name="toadlet-egg" depends="init">
+		<wtkpreprocess symbols="${debug},${3dapi}" srcdir="${src}/egg" destdir="${preprocess}/egg">
+			<depend targetdir="${preprocess}/egg"/>
+		</wtkpreprocess>
+
+		<wtkbuild srcdir="${preprocess}/egg" destdir="${build}" target="1.1" source="1.2" preverify="false">
+			<classpath>
+				<path refid="3dapi.classpath"/>
+			</classpath>
+		</wtkbuild>
+	</target>
+
+	<!-- tadpole -->
+	<target name="toadlet-tadpole" depends="toadlet-egg">
+		<wtkpreprocess symbols="${debug},${3dapi}" srcdir="${src}/tadpole/microhop" destdir="${preprocess}/tadpole/microhop">
+			<depend targetdir="${preprocess}/tadpole/microhop"/>
+		</wtkpreprocess>
+		
+		<wtkpreprocess symbols="${debug},${3dapi}" srcdir="${src}/tadpole/millihop" destdir="${preprocess}/tadpole/millihop">
+			<depend targetdir="${preprocess}/tadpole/millihop"/>
+		</wtkpreprocess>
+
+		<wtkpreprocess symbols="${debug},${3dapi}" srcdir="${tadpole-3dapi-src}" destdir="${preprocess}/tadpole">
+			<depend targetdir="${preprocess}/tadpole"/>
+		</wtkpreprocess>
+		
+		<wtkbuild srcdir="${preprocess}/tadpole" destdir="${build}" target="1.1" source="1.2" preverify="false">
+			<classpath>
+				<path refid="3dapi.classpath"/>
+			</classpath>
+		</wtkbuild>
+	</target>
+
+	<!-- flick -->
+	<target name="toadlet-flick" depends="toadlet-egg">
+		<wtkpreprocess symbols="${debug},${3dapi}" srcdir="${src}/flick" destdir="${preprocess}/flick">
+			<depend targetdir="${preprocess}/flick"/>
+		</wtkpreprocess>
+
+		<wtkbuild srcdir="${preprocess}/flick" destdir="${build}" target="1.1" source="1.2" preverify="false">
+			<classpath>
+				<path refid="mmapi.classpath"/>
+				<path refid="jsr256.classpath"/>
+			</classpath>
+		</wtkbuild>
+	</target>
+
+	<!-- Package toadlet -->
+	<target name="toadlet-package">
+		<jar jarfile="${dist}/toadlet${jar.suffix}" basedir="${build}"/>
+
+		<wtkobfuscate jarfile="${dist}/toadlet${jar.suffix}" obfuscator="proguard" if="OBFUSCATE">
+			<classpath>
+				<path refid="3dapi.classpath"/>
+				<path refid="mmapi.classpath"/>
+			</classpath>
+			<argument value="-include build/ant/toadlet.pro"/>
+		</wtkobfuscate>
+	</target>
+	
+	<!-- Preverify for Blackberry devices -->
+	<target name="preverify-blackberry">
+		<property name="output" location="build/ant/output${jar.suffix}"/>
+		<mkdir dir="${output}"/>
+		
+		<echo message="Preverifying with Blackberry tools..."/>
+		<exec executable="${env.BLACKBERRY_HOME}/bin/preverify.exe">
+			<arg value="-classpath"/>
+			<arg value="${env.BLACKBERRY_HOME}/lib/net_rim_api.jar"/>
+			<arg value="-d"/>
+			<arg value="${output}"/>
+			<arg value="${dist}/toadlet${jar.suffix}"/>
+		</exec>
+		<echo message="Done!"/>
+		
+		<copy file="${output}/toadlet${jar.suffix}" todir="${dist}" overwrite="true"/>
+	</target>
+	
+	<!-- Install -->
+	<target name="toadlet-install">
+		<copy file="${dist}/toadlet${jar.suffix}" todir="${env.TOADLET_INSTALL_DIR}/lib"/>
+	</target>
+
+	<!-- IDEN targets -->
+	<target name="dist-iden-debug" depends="iden-3dapi,debug,toadlet-tadpole,toadlet-package,toadlet-install" description="Build toadlet for IDEN phones">
+		<echo message="toadlet for IDEN phones complete"/>
+	</target>
+	<target name="dist-iden-release" depends="iden-3dapi,toadlet-tadpole,toadlet-package,toadlet-install" description="Build toadlet for IDEN phones - release version">
+		<echo message="toadlet for IDEN phones complete - release version"/>
+	</target>
+
+	<!-- Sony Ericsson targets -->
+	<target name="dist-se-debug" depends="se-3dapi,debug,toadlet-tadpole,toadlet-flick,toadlet-package,toadlet-install" description="Build toadlet for Sony Ericsson phones">
+		<echo message="toadlet for Sony Ericsson phones complete"/>
+	</target>
+	<target name="dist-se-release" depends="se-3dapi,toadlet-tadpole,toadlet-flick,toadlet-package,toadlet-install" description="Build toadlet for Sony Ericsson phones - release version">
+		<echo message="toadlet for Sony Ericsson phones complete - release version"/>
+	</target>
+
+	<!-- Sprint targets -->
+	<target name="dist-sprint-debug" depends="sprint-3dapi,debug,toadlet-tadpole,toadlet-flick,toadlet-package,toadlet-install" description="Build toadlet for Sprint phones">
+		<echo message="toadlet for Sprint phones complete"/>
+	</target>
+	<target name="dist-sprint-release" depends="sprint-3dapi,toadlet-tadpole,toadlet-flick,toadlet-package,toadlet-install" description="Build toadlet for Sprint phones - release version">
+		<echo message="toadlet for Sprint phones complete - release version"/>
+	</target>
+
+	<!-- JSR 184 targets -->
+	<target name="dist-jsr184-debug" depends="jsr184-3dapi,debug,toadlet-tadpole,toadlet-flick,toadlet-package,toadlet-install" description="Build toadlet for JSR-184 phones">
+		<echo message="toadlet for JSR-184 phones complete"/>
+	</target>
+	<target name="dist-jsr184-release" depends="jsr184-3dapi,toadlet-tadpole,toadlet-flick,toadlet-package,toadlet-install" description="Build toadlet for JSR-184 phones - release version">
+		<echo message="toadlet for JSR-184 phones complete - release version"/>
+	</target>
+
+	<!-- Android targets -->
+	<target name="dist-android-debug" depends="android-3dapi,debug,toadlet-tadpole,toadlet-package,toadlet-install" description="Build toadlet for Google Android phones">
+		<echo message="toadlet for Google Android phones complete"/>
+	</target>
+	<target name="dist-android-release" depends="android-3dapi,toadlet-tadpole,toadlet-package,toadlet-install" description="Build toadlet for Google Android phones - release version">
+		<echo message="toadlet for Google Android phones complete - release version"/>
+	</target>
+
+	<!-- Blackberry targets -->
+	<target name="dist-blackberry-debug" depends="blackberry-3dapi,debug,toadlet-tadpole,toadlet-package,preverify-blackberry,toadlet-install" description="Build toadlet for blackberry phones">
+		<echo message="toadlet for blackberry phones complete"/>
+	</target>
+	<target name="dist-blackberry-release" depends="blackberry-3dapi,toadlet-tadpole,toadlet-package,preverify-blackberry,toadlet-install" description="Build toadlet for blackberry phones - release version">
+		<echo message="toadlet for blackberry phones complete - release version"/>
+	</target>
+
+	<!-- j2me software targets -->
+	<target name="dist-j2me-debug" depends="j2me-3dapi,debug,toadlet-tadpole,toadlet-package,toadlet-install" description="Build toadlet for j2me software phones">
+		<echo message="toadlet for j2me software phones complete"/>
+	</target>
+	<target name="dist-j2me-release" depends="j2me-3dapi,toadlet-tadpole,toadlet-package,toadlet-install" description="Build toadlet for j2me software phones - release version">
+		<echo message="toadlet for j2me software phones complete - release version"/>
+	</target>
+
+
+	<!-- ALL targets -->
+	<target name="all-release" description="Build all versions of engine in release mode">
+		<subant target="dist-iden-release" buildpath="build/ant"/>
+		<subant target="dist-se-release" buildpath="build/ant"/>
+		<subant target="dist-sprint-release" buildpath="build/ant"/>
+		<subant target="dist-jsr184-release" buildpath="build/ant"/>
+		<subant target="dist-android-release" buildpath="build/ant"/>
+		<subant target="dist-blackberry-release" buildpath="build/ant"/>
+		<subant target="dist-j2me-release" buildpath="build/ant"/>
+		<echo message="toadlet release version for all api's complete"/>
+	</target>
+	<target name="all-debug" description="Build all versions of engine in debug mode">
+		<subant target="dist-iden-debug" buildpath="build/ant"/>
+		<subant target="dist-se-debug" buildpath="build/ant"/>
+		<subant target="dist-sprint-debug" buildpath="build/ant"/>
+		<subant target="dist-jsr184-debug" buildpath="build/ant"/>
+		<subant target="dist-android-debug" buildpath="build/ant"/>
+		<subant target="dist-blackberry-debug" buildpath="build/ant"/>
+		<subant target="dist-j2me-debug" buildpath="build/ant"/>
+		<echo message="toadlet debug version for all api's complete"/>
+	</target>
+	<target name="all-all" description="Build all debug and release versions of engine">
+		<subant target="all-debug" buildpath="build/ant"/>
+		<subant target="all-release" buildpath="build/ant"/>
+	</target>
+	
+</project>

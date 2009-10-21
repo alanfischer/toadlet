@@ -1,0 +1,184 @@
+<!-- Phone specific targets go here -->
+<project name="phones" basedir="../..">
+	
+	<!--
+		These are just the phone names for easy targeting of the build process. 
+		The phone.name var will determine what directory name your output gets
+		The runtarget gives you the actual target being used
+		Format is as follows:
+		target name="manufacterer-name-carrier" depends="manufacterer-carrier-screensize-options_in_alphabetical_order)" description="phone name"
+	-->
+
+	<!-- iDEN generic phones -->
+	<target name="iden-i880-generic" description="iDEN i880">
+		<var name="phone.name" value="iden-i880-generic"/>
+		<runtarget target="iden-generic-176x208-3d-bluetooth"/>
+	</target>
+	<target name="iden-i87X-generic" description="iDEN i87X">
+		<var name="phone.name" value="iden-i87X-generic"/>
+		<runtarget target="iden-generic-176x208-3d-bluetooth"/>
+	</target>
+	<target name="iden-i860-generic" description="iDEN i860">
+		<var name="phone.name" value="iden-i860-generic"/>
+		<runtarget target="iden-generic-176x208-3d"/>
+	</target>
+	<target name="iden-i85X-generic" description="iDEN i85X">
+		<var name="phone.name" value="iden-i85X-generic"/>
+		<runtarget target="iden-generic-176x208-3d-bluetooth"/>
+	</target>
+	<target name="iden-i83X-generic" description="iDEN i83X">
+		<var name="phone.name" value="iden-i83X-generic"/>
+		<runtarget target="iden-generic-130x130-3d"/>
+	</target>
+	<target name="iden-i760-generic" description="iDEN i760">
+		<var name="phone.name" value="iden-i760-generic"/>
+		<runtarget target="iden-generic-176x208-3d-bluetooth"/>
+	</target>
+	<target name="iden-i73X-generic" description="iDEN i73X">
+		<var name="phone.name" value="iden-i73X-generic"/>
+		<runtarget target="iden-generic-130x130-3d-bluetooth"/>
+	</target>
+	<target name="iden-i670-generic" description="iDEN i670">
+		<var name="phone.name" value="iden-i670-generic"/>
+		<runtarget target="iden-generic-130x130-3d-bluetooth"/>
+	</target>
+	<target name="iden-i615-generic" description="iDEN i615">
+		<var name="phone.name" value="iden-i615-generic"/>
+		<runtarget target="iden-generic-176x208-3d"/>
+	</target>
+	<target name="iden-i605-generic" description="iDEN i605">
+		<var name="phone.name" value="iden-i605-generic"/>
+		<runtarget target="iden-generic-176x208-3d-bluetooth"/>
+	</target>
+	<target name="iden-i580-generic" description="iDEN i580">
+		<var name="phone.name" value="iden-i580-generic"/>
+		<runtarget target="iden-generic-176x208-3d"/>
+	</target>
+	<target name="iden-i560-generic" description="iDEN i560">
+		<var name="phone.name" value="iden-i560-generic"/>
+		<runtarget target="iden-generic-130x130-3d-bluetooth"/>
+	</target>
+	
+	<!-- iDEN sprint phones -->
+	<target name="iden-ic902-sprint" description="iDEN ic902">
+		<var name="phone.name" value="iden-ic902-sprint"/>
+		<runtarget target="iden-sprint-240x320-3d-bluetooth"/>
+	</target>
+	<target name="iden-ic502-sprint" description="iDEN ic502">
+		<var name="phone.name" value="iden-ic502-sprint"/>
+		<runtarget target="iden-sprint-128x160-3d"/>
+	</target>
+	<target name="iden-ic402-sprint" description="iDEN ic402">
+		<var name="phone.name" value="iden-ic402-sprint"/>
+		<runtarget target="iden-sprint-128x160-3d"/>
+	</target>
+	
+	<!-- LG sprint phones -->
+	<target name="lg-550-sprint" description="LG 550">
+		<var name="phone.name" value="lg-550-sprint"/>
+		<runtarget target="lg-sprint-176x220-3d-bluetooth-camera"/>
+	</target>
+	<target name="lg-fusic2-sprint" description="LG Fusic II">
+		<var name="phone.name" value="lg-fusic2-sprint"/>
+		<runtarget target="lg-sprint-176x220-3d-bluetooth-camera"/>
+	</target>
+	<target name="lg-535-sprint" description="LG 535">
+		<var name="phone.name" value="lg-535-sprint"/>
+		<runtarget target="lg-sprint-176x220-3d-camera"/>
+	</target>
+	<target name="lg-350-sprint" description="LG 350">
+		<var name="phone.name" value="lg-350-sprint"/>
+		<runtarget target="lg-sprint-128x160-3d-camera"/>
+	</target>
+	
+	<!-- Motorola sprint phones -->
+	<target name="motorola-razrv3m-sprint" description="Motorola RAZR v3m">
+		<var name="phone.name" value="motorola-razrv3m-sprint"/>
+		<runtarget target="motorola-sprint-176x220-3d-camera"/>
+	</target>
+	<target name="motorola-krazrk1m-sprint" description="Motorola KRAZR k1m">
+		<var name="phone.name" value="motorola-krazrk1m-sprint"/>
+		<runtarget target="motorola-sprint-176x220-3d-camera"/>
+	</target>
+	<target name="motorola-slvr-sprint" description="Motorola SLVR">
+		<var name="phone.name" value="motorola-slvr-sprint"/>
+		<runtarget target="motorola-sprint-176x220-3d-camera"/>
+	</target>
+	<target name="motorola-razr2v9-sprint" description="Motorola RAZR2 v9">
+		<var name="phone.name" value="motorol-razr2v9-sprint"/>
+		<runtarget target="motorola-sprint-240x320-3d-bluetooth-camera"/>
+	</target>
+	
+	<!-- Samsung sprint phones -->
+	<target name="samsung-a900-sprint" description="Samsung A900">
+		<var name="phone.name" value="samsung-a900-sprint"/>
+		<runtarget target="samsung-sprint-240x320-3d-camera"/>
+	</target>
+	<target name="samsung-m610-sprint" description="Samsung M610">
+		<var name="phone.name" value="samsung-m610-sprint"/>
+		<runtarget target="samsung-sprint-240x320-3d-camera"/>
+	</target>
+	<target name="samsung-a920-sprint" description="Samsung A920">
+		<var name="phone.name" value="samsung-a920-sprint"/>
+		<runtarget target="samsung-sprint-176x220-3d-camera"/>
+	</target>
+	<target name="samsung-a960-sprint" description="Samsung A960">
+		<var name="phone.name" value="samsung-a960-sprint"/>
+		<runtarget target="samsung-sprint-176x220-3d-camera"/>
+	</target>
+	<target name="samsung-a880-sprint" description="Samsung A880">
+		<var name="phone.name" value="samsung-a880-sprint"/>
+		<runtarget target="samsung-sprint-176x220-3d-camera"/>
+	</target>
+	<target name="samsung-a800-sprint" description="Samsung A800">
+		<var name="phone.name" value="samsung-a800-sprint"/>
+		<runtarget target="samsung-sprint-176x220-3d-camera"/>
+	</target>
+	<target name="samsung-m500-sprint" description="Samsung M500">
+		<var name="phone.name" value="samsung-m500-sprint"/>
+		<runtarget target="samsung-sprint-176x220-3d-camera"/>
+	</target>
+	<target name="samsung-upstage-sprint" description="Samsung Upstage">
+		<var name="phone.name" value="samsung-upstage-sprint"/>
+		<runtarget target="samsung-sprint-176x220-3d-camera"/>
+	</target>
+	
+	<!-- Sanyo sprint phones -->
+	<target name="sanyo-m1-sprint" description="Sanyo M1">
+		<var name="phone.name" value="sanyo-m1-sprint"/>
+		<runtarget target="sanyo-sprint-240x320-3d-camera"/>
+	</target>
+	<target name="sanyo-9000-sprint" description="Sanyo 9000">
+		<var name="phone.name" value="sanyo-9000-sprint"/>
+		<runtarget target="sanyo-sprint-240x320-3d-camera"/>
+	</target>
+	<target name="sanyo-8400-sprint" description="Sanyo 8400">
+		<var name="phone.name" value="sanyo-8400-sprint"/>
+		<runtarget target="sanyo-sprint-240x320-3d-camera"/>
+	</target>
+	<target name="sanyo-katana2-sprint" description="Sanyo Katana">
+		<var name="phone.name" value="sanyo-katana2-sprint"/>
+		<runtarget target="sanyo-sprint-240x320-3d-camera"/>
+	</target>
+	<target name="sanyo-katana-sprint" description="Sanyo Katana">
+		<var name="phone.name" value="sanyo-katana-sprint"/>
+		<runtarget target="sanyo-sprint-240x320-3d-camera"/>
+	</target>
+	<target name="sanyo-5600-sprint" description="Sanyo 5600">
+		<var name="phone.name" value="sanyo-5600-sprint"/>
+		<runtarget target="sanyo-sprint-240x320-3d-camera"/>
+	</target>
+	<target name="sanyo-8300-sprint" description="Sanyo 8300">
+		<var name="phone.name" value="sanyo-8300-sprint"/>
+		<runtarget target="sanyo-sprint-176x220-3d-camera"/>
+	</target>
+	<target name="sanyo-7500-sprint" description="Sanyo 7500">
+		<var name="phone.name" value="sanyo-7500-sprint"/>
+		<runtarget target="sanyo-sprint-176x220-3d-camera"/>
+	</target>
+	<target name="sanyo-7400-sprint" description="Sanyo 7400">
+		<var name="phone.name" value="sanyo-7400-sprint"/>
+		<runtarget target="sanyo-sprint-176x220-3d-camera"/>
+	</target>
+
+</project>
