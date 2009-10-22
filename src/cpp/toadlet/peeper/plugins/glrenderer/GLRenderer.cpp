@@ -1320,7 +1320,7 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 				mLastTextures[stage]=texture;
 			}
 
-			if(textureStage->getTextureMatrixIdentity()==false || texture->getDimension()==Texture::Dimension_D2_RESTRICTED){
+			if(textureStage->getTextureMatrixIdentity()==false || (gltexture->mUsageFlags&Texture::UsageFlags_NPOT_RESTRICTED)>0){
 				if(mMatrixMode!=GL_TEXTURE){
 					mMatrixMode=GL_TEXTURE;
 					glMatrixMode(mMatrixMode);

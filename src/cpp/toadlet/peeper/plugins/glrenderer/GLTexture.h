@@ -43,9 +43,10 @@ public:
 
 	virtual Texture *getRootTexture(){return this;}
 
-	virtual bool create(Dimension dimension,int format,int width,int height,int depth);
+	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth);
 	virtual void destroy();
 
+	virtual int getUsageFlags() const{return mUsageFlags;}
 	virtual Dimension getDimension() const{return mDimension;}
 	virtual int getFormat() const{return mFormat;}
 	virtual int getWidth() const{return mWidth;}
@@ -74,6 +75,7 @@ protected:
 
 	GLRenderer *mRenderer;
 
+	int mUsageFlags;
 	Dimension mDimension;
 	int mFormat;
 	int mWidth;

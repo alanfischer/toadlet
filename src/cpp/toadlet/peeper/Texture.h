@@ -33,19 +33,24 @@
 namespace toadlet{
 namespace peeper{
 
-// TODO: Make Texture also extend Buffer, and inherit its Usage functions, and use those in create(), plus it will let us specify RenderTexture
-// TODO: Also add a NPOT_RESTRICTED flag to Usage, so I dont have to have the D2_RESTRICTED thing
 class Texture:public egg::Resource,public egg::image::ImageDefinitions{
 public:
 	TOADLET_SHARED_POINTERS(Texture,egg::Resource);
+
+	enum UsageFlags{
+		UsageFlags_NONE=			0,
+		UsageFlags_NPOT_RESTRICTED=	1<<0,
+		UsageFlags_RENDERTARGET=	1<<1,
+	};
 
 	virtual ~Texture(){}
 
 	virtual Texture *getRootTexture()=0; // Return the base texture in the texture decorator chain
 
-	virtual bool create(Dimension dimension,int format,int width,int height,int depth)=0;
+	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth)=0;
 	virtual void destroy()=0;
 
+	virtual int getUsageFlags() const=0;
 	virtual Dimension getDimension() const=0;
 	virtual int getFormat() const=0;
 	virtual int getWidth() const=0;

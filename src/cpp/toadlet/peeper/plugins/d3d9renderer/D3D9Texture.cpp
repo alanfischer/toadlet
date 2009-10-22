@@ -37,6 +37,7 @@ namespace peeper{
 D3D9Texture::D3D9Texture(D3D9Renderer *renderer):
 	mRenderer(NULL),
 
+	mUsageFlags(UsageFlags_NONE),
 	mDimension(Dimension_UNKNOWN),
 	mFormat(0),
 	mWidth(0),
@@ -55,18 +56,19 @@ D3D9Texture::~D3D9Texture(){
 	}
 }
 
-bool D3D9Texture::create(Dimension dimension,int format,int width,int height,int depth){
+bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width,int height,int depth){
 	destroy();
 
 	if((Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || Math::isPowerOf2(depth)==false) &&
 		mRenderer->getCapabilitySet().textureNonPowerOf2==false &&
-		(mRenderer->getCapabilitySet().textureNonPowerOf2==false || dimension!=Dimension_D2_RESTRICTED))
+		(mRenderer->getCapabilitySet().textureNonPowerOf2==false || (usageFlags&UsageFlags_NPOT_RESTRICTED)==0))
 	{
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"D3D9Texture: Cannot load a non power of 2 texture");
 		return false;
 	}
 
+	mUsageFlags=usageFlags;
 	mDimension=dimension;
 	mFormat=format;
 	mWidth=width;
@@ -82,7 +84,7 @@ bool D3D9Texture::create(Dimension dimension,int format,int width,int height,int
 	
 	HRESULT result=E_FAIL;
 	UINT levels=mAutoGenerateMipMaps?0:1;
-	DWORD usage=0; // TODO: Add renderTexture usage
+	DWORD usage=(mUsageFlags&UsageFlags_RENDERTARGET)>0 ? D3DUSAGE_RENDERTARGET : 0;
 	D3DPOOL pool=D3DPOOL_MANAGED;
 	switch(dimension){
 		case Texture::Dimension_D1:
@@ -132,7 +134,7 @@ void D3D9Texture::load(int format,int width,int height,int depth,uint8 *data){
 
 	D3DFORMAT d3dformat=getD3DFORMAT(mFormat);
 	HRESULT result;
-	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2 || mDimension==Texture::Dimension_D2_RESTRICTED){
+	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
 		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
 
 		D3DLOCKED_RECT rect={0};
@@ -184,7 +186,7 @@ void D3D9Texture::load(int format,int width,int height,int depth,uint8 *data){
 }
 
 bool D3D9Texture::read(int format,int width,int height,int depth,uint8 *data){
-	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2 || mDimension==Texture::Dimension_D2_RESTRICTED){
+	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
 		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
 
 		D3DLOCKED_RECT rect={0};
