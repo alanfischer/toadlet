@@ -22,9 +22,8 @@
  * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
  *
  ********** Copyright header - do not remove **********/
-/*
-#include "GLRenderer.h"
-#include "GLFBORenderTexturePeer.h"
+
+#include "GLFBOSurfaceRenderTarget.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 
@@ -34,140 +33,165 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-bool GLFBORenderTexturePeer_available(GLRenderer *renderer){
-	return GLFBORenderTexturePeer::available(renderer);
-}
-
-GLTexturePeer *new_GLFBORenderTexturePeer(GLRenderer *renderer,RenderTexture *texture){
-	return new GLFBORenderTexturePeer(renderer,texture);
-}
-
-bool GLFBORenderTexturePeer::available(GLRenderer *renderer){
-#	if defined(TOADLET_HAS_GLEW)
+bool GLFBOSurfaceRenderTarget::available(GLRenderer *renderer){
+	#if defined(TOADLET_HAS_GLEW)
 		return GLEW_EXT_framebuffer_object>0;
-#	elif defined(TOADLET_HAS_EAGL)
+	#elif defined(TOADLET_HAS_EAGL)
 		return true;
-#	else
+	#else
 		return false;
-#	endif
+	#endif
 }
 
-GLFBORenderTexturePeer::GLFBORenderTexturePeer(GLRenderer *renderer,RenderTexture *texture):GLRenderTargetPeer(),GLTexturePeer(renderer,texture),
-	renderTexture(NULL),
-	width(0),
-	height(0),
-	framebufferHandle(0),
-	depthRenderbufferHandle(0)
+GLFBOSurfaceRenderTarget::GLFBOSurfaceRenderTarget(GLRenderer *renderer):GLRenderTarget(),
+	mRenderer(NULL),
+	mWidth(0),
+	mHeight(0),
+	mHandle(0)
+	//mSurfaces
 {
-	const CapabilitySet &capabilitySet=renderer->getCapabilitySet();
+	mRenderer=renderer;
+}
 
-	renderTexture=texture;
+GLFBOSurfaceRenderTarget::~GLFBOSurfaceRenderTarget(){
+	destroy();
+}
 
-	initialized=true;
+bool GLFBOSurfaceRenderTarget::create(){
+	destroy();
 
-	width=texture->getWidth();
-	height=texture->getHeight();
+	glGenFramebuffers(1,&mHandle);
+	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 
-	textureTarget=getGLTarget(texture,capabilitySet);
-	GLuint format=getGLFormat(texture->getFormat());
-	GLuint internalFormat=format;
-	GLuint type=getGLType(texture->getFormat());
+	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::create");
+}
 
-	glTexImage2D(textureTarget,0,internalFormat,width,height,0,format,type,NULL);
-	glGenFramebuffers(1,&framebufferHandle);
-	glBindFramebuffer(GL_FRAMEBUFFER,framebufferHandle);
-
-	if((texture->getFormat()&Texture::Format_BIT_DEPTH)>0){
-		// If its a depth texture, we just use the depth texture as the framebuffer target
-		glFramebufferTexture2D(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,textureTarget,textureHandle,0);
-		#if !defined(TOADLET_HAS_GLES)
-			glDrawBuffer(GL_NONE);
-			glReadBuffer(GL_NONE);
-		#endif
+void GLFBOSurfaceRenderTarget::destroy(){
+	int i;
+	for(i=0;i<mOwnedSurfaces;++i){
+		mOwnedSurfaces[i]->destroy();
 	}
-	else{
-		// If its a color texture, we use the color texture as the framebuffer target
-		glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,textureTarget,textureHandle,0);
+	mOwnedSurfaces.clear();
 
-		if(renderTexture->hasDepthBuffer()){
-			// And then we generate a depth buffer and tell the framebuffer to use it for the depth data
-			glGenRenderbuffers(1,&depthRenderbufferHandle);
-			glBindRenderbuffer(GL_RENDERBUFFER,depthRenderbufferHandle);
-			glRenderbufferStorage(GL_RENDERBUFFER,GL_DEPTH_COMPONENT24,width,height);
-			glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_RENDERBUFFER,depthRenderbufferHandle);
+	if(mHandle!=0){
+		glDeleteFramebuffers(1,&mHandle);
+		mHandle=0;
+
+		TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::destroy");
+	}
+}
+
+bool GLFBOSurfaceRenderTarget::current(){
+	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
+
+	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::current");
+
+	return true;
+}
+
+bool GLFBOSurfaceRenderTarget::swap(){
+	glBindFramebuffer(GL_FRAMEBUFFER,0);
+
+	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::swap");
+
+	return true;
+}
+
+bool GLFBOSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
+	GLSurface *glsurface=(GLSurface*)surface->getRootSurface();
+
+	GLTextureMipSurface *textureSurface=glsurface->castToGLTextureMipSurface();
+	GLFBORenderbufferSurface *renderbufferSurface=glsurface->castToGLFBORenderbufferSurface();
+
+	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
+	if(textureSurface!=NULL){
+		GLuint handle=textureSurface->getTexture()->getHandle();
+		GLuint level=textureSurface->getLevel();
+	
+		glFramebufferTexture2D(GL_FRAMEBUFFER,getGLAttachment(attachment),handle,level);
+		// TODO: Figure out EXACTLY when we need these and when we dont, I think we just need them if its ONLY a SHADOWMAP
+//		#if !defined(TOADLET_HAS_GLES)
+//			glDrawBuffer(GL_NONE);
+//			glReadBuffer(GL_NONE);
+//		#endif
+	}
+	else if(renderbufferSurface!=NULL){
+		GLuint handle=renderbufferSurface->getHandle();
+
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER,getGLAttachment(attachment),GL_RENDERBUFFER,handle);
+	}
+	
+	GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if(status!=GL_FRAMEBUFFER_COMPLETE){
+		Logger::log(Categories::TOADLET_PEEPER,Logger::LEVEL_WARNING,
+			getGLFBOMessage(status);
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER,0);
+
+	mSurfaces.add(surface);
+	mSurfaceAttachments.add(attachment);
+
+	return true;
+}
+
+bool GLFBOSurfaceRenderTarget::remove(Surface::ptr surface){
+	int i;
+	for(i=0;i<mSurfaces.size();++i){
+		if(mSurfaces[i]==surface){
+			break;
 		}
+	}
+	if(i==mSurfaces.size()){
+		return false;
+	}
+
+	GLSurface *glsurface=(GLSurface*)surface->getRootSurface();
+
+	GLTextureMipSurface *textureSurface=glsurface->castToGLTextureMipSurface();
+	GLFBORenderbufferSurface *renderbufferSurface=glsurface->castToGLFBORenderbufferSurface();
+
+	Attachment attachment=mSurfaceAttachments[i];
+
+	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
+	if(textureSurface!=NULL){
+		glFramebufferTexture2D(GL_FRAMEBUFFER,getGLAttachment(attachment),0,0);
+	}
+	else if(renderbufferSurface!=NULL){
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER,getGLAttachment(attachment),GL_RENDERBUFFER,0);
 	}
 
 	GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
-	glBindFramebuffer(GL_FRAMEBUFFER,0);
-
 	if(status!=GL_FRAMEBUFFER_COMPLETE){
-		String error;
-		switch(status){
-			case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-				error="GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
-			break;
-			case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-				error="GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT";
-			break;
-			case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
-				error="GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS";
-			break;
-			case GL_FRAMEBUFFER_INCOMPLETE_FORMATS:
-				error="GL_FRAMEBUFFER_INCOMPLETE_FORMATS";
-			break;
-			#if !defined(TOADLET_HAS_GLES)
-				case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-					error="GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER";
-				break;
-				case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-					error="GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER";
-				break;
-			#endif
-		}
-		Error::unknown(Categories::TOADLET_PEEPER,error);
-		return;
+		Logger::log(Categories::TOADLET_PEEPER,Logger::LEVEL_WARNING,
+			getGLFBOMessage(status);
 	}
-
-	TOADLET_CHECK_GLERROR("GLFBORenderTexturePeer::GLFBORenderTexturePeer");
-}
-
-GLFBORenderTexturePeer::~GLFBORenderTexturePeer(){
-	if(framebufferHandle!=0){
-		glDeleteFramebuffers(1,&framebufferHandle);
-		framebufferHandle=0;
-	}
-
-	if(depthRenderbufferHandle!=0){
-		glDeleteRenderbuffers(1,&depthRenderbufferHandle);
-		depthRenderbufferHandle=0;
-	}
-
-	TOADLET_CHECK_GLERROR("GLFBORenderTexturePeer::~GLFBORenderTexturePeer");
-}
-
-void GLFBORenderTexturePeer::makeCurrent(){
-	glBindFramebuffer(GL_FRAMEBUFFER,framebufferHandle);
-}
-
-void GLFBORenderTexturePeer::swap(){
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
+
+	return true;
 }
 
-int GLFBORenderTexturePeer::getWidth() const{
-	return width;
+const char *GLFBOSurfaceRenderTarget::getFBOMessage(GLenum status){
+	switch(status){
+		case GL_FRAMEBUFFER_COMPLETE:
+			return "GL_FRAMEBUFFER_COMPLETE";
+		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+			return "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
+		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+			return "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT";
+		case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
+			return "GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS";
+		case GL_FRAMEBUFFER_INCOMPLETE_FORMATS:
+			return "GL_FRAMEBUFFER_INCOMPLETE_FORMATS";
+		#if !defined(TOADLET_HAS_GLES)
+			case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+				return "GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER";
+			case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+				return "GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER";
+		#endif
+		default:
+			return "UNKNOWN";
+	}
 }
 
-int GLFBORenderTexturePeer::getHeight() const{
-	return height;
-}
-
-bool GLFBORenderTexturePeer::isValid() const{
-	return framebufferHandle!=0;
-}
-
 }
 }
-
-*/

@@ -23,36 +23,45 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_SURFACERENDERTARGET_H
-#define TOADLET_PEEPER_SURFACERENDERTARGET_H
-
-#include <toadlet/peeper/RenderTarget.h>
+#include "GLFBORenderbufferSurface.h"
 
 namespace toadlet{
 namespace peeper{
 
-class SurfaceRenderTarget:public RenderTarget{
-public:
-	TOADLET_SHARED_POINTER(SurfaceRenderTarget,RenderTarget);
+GLFBORenderbufferSurface::GLFBORenderbufferSurface(GLFBORenderTarget *target):GLSurface(),
+	mTarget(NULL),
+	mHandle(0)
+	mFormat(0),
+	mWidth(0),
+	mHeight(0)
+{
+	mTarget=target;
+}
 
-	enum Attachment{
-		Attachment_DEPTH_STENCIL,
-		Attachment_COLOR_0,
-		Attachment_COLOR_1,
-		Attachment_COLOR_2,
-		Attachment_COLOR_3,
-	};
+bool GLFBORenderbufferSurface::create(int format,int width,int height){
+	mFormat=format;
+	mWidth=width;
+	mHeight=height;
 
-	virtual ~SurfaceRenderTarget(){}
+	glGenRenderbuffers(1,&mHandle);
+	glBindRenderbuffer(GL_RENDERBUFFER,mHandle);
+	glRenderbufferStorage(GL_RENDERBUFFER,GLTexture::getGLFormat(mFormat),mWidth,mHeight);
 
-	virtual bool create();
-	virtual bool destroy();
-	
-	virtual bool attach(Surface::ptr surface,Attachment attachment)=0;
-	virtual bool remove(Surface::ptr surface)=0;
-};
+	TOADLET_CHECK_GLERROR("GLFBORenderbufferSurface::create");
+
+	return true;
+}
+
+bool GLFBORenderbufferSurface::destroy(){
+	if(mHandle!=0){
+		glDeleteRenderbuffers(1,&mHandle);
+		mHandle=0;
+
+		TOADLET_CHECK_GLERROR("GLFBORenderbufferSurface::destroy");
+	}
+
+	return true;
+}
 
 }
 }
-
-#endif

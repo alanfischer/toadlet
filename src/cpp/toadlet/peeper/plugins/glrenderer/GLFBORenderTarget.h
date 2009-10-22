@@ -48,18 +48,23 @@ public:
 	virtual bool current();
 	virtual bool swap();
 
-	virtual bool attach(Surface::ptr surface);
+	virtual Surface::ptr createBufferSurface(int format,int width,int height);
+	virtual bool attach(Surface::ptr surface,Attachment attachment);
 	virtual bool remove(Surface::ptr surface);
 	
 	virtual bool isPrimary() const{return false;}
 	virtual int getWidth() const{return mWidth;}
 	virtual int getHeight() const{return mHeight;}
-	
+
 protected:
+	const char *getFBOMessage(GLenum status);
+
+	GLRenderer *mRenderer;
 	int mWidth;
 	int mHeight;
 	GLuint mFramebufferHandle;
 	egg::Collection<Surface::ptr> mSurfaces;
+	egg::Collection<Surface::ptr> mOwnedSurfaces;
 };
 
 }

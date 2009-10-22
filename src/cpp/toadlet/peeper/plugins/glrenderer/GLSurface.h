@@ -23,33 +23,24 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_SURFACERENDERTARGET_H
-#define TOADLET_PEEPER_SURFACERENDERTARGET_H
+#ifndef TOADLET_PEEPER_GLSURFACE_H
+#define TOADLET_PEEPER_GLSURFACE_H
 
-#include <toadlet/peeper/RenderTarget.h>
+#include "GLIncludes.h"
+#include <toadlet/peeper/Surface.h>
 
 namespace toadlet{
 namespace peeper{
 
-class SurfaceRenderTarget:public RenderTarget{
+class GLTextureMipSurface;
+class GLFBORenderbufferSurface;
+
+class GLSurface:public Surface{
 public:
-	TOADLET_SHARED_POINTER(SurfaceRenderTarget,RenderTarget);
+	virtual ~GLSurface(){}
 
-	enum Attachment{
-		Attachment_DEPTH_STENCIL,
-		Attachment_COLOR_0,
-		Attachment_COLOR_1,
-		Attachment_COLOR_2,
-		Attachment_COLOR_3,
-	};
-
-	virtual ~SurfaceRenderTarget(){}
-
-	virtual bool create();
-	virtual bool destroy();
-	
-	virtual bool attach(Surface::ptr surface,Attachment attachment)=0;
-	virtual bool remove(Surface::ptr surface)=0;
+	virtual GLTextureMipSurface *castToGLTextureMipSurface()=0;
+	virtual GLFBORenderbufferSurface *castToGLFBORenderbufferSurface()=0;
 };
 
 }

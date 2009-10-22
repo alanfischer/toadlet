@@ -91,10 +91,45 @@ bool GLTexture::create(int usageFlags,Dimension dimension,int format,int width,i
 	glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 	glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
 
-	setNumMipMaps(mMipMaps.size());
-	setAutoGenerateMipMaps(mAutoGenerateMipMaps);
+	// Allocate space for texture
+	GLint glformat=getGLFormat(format);
+	GLint glinternalFormat=glformat;
+	GLint gltype=getGLType(format);
+	switch(mTarget){
+		#if !defined(TOADLET_HAS_GLES)
+			case GL_TEXTURE_1D:
+				glTexImage1D(mTarget,0,glinternalFormat,width,0,glformat,gltype,NULL);
+			break;
+		#endif
+		case GL_TEXTURE_2D:
+			glTexImage2D(mTarget,0,glinternalFormat,width,height,0,glformat,gltype,NULL);
+		break;
+		#if !defined(TOADLET_HAS_GLES)
+			case GL_TEXTURE_3D:
+				glTexImage3D(mTarget,0,glinternalFormat,width,height,depth,0,glformat,gltype,NULL);
+			break;
+			case GL_TEXTURE_CUBE_MAP:{
+				// TODO: Is the following required?
+				glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+				glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 
-	TOADLET_CHECK_GLERROR("GLTexture::GLTexture");
+				int i;
+				for(i=0;i<6;++i){
+					glTexImage2D(GLCubeFaces[i],0,glinternalFormat,width,height,0,glformat,gltype,NULL);
+				}
+			}break;
+			case GL_TEXTURE_RECTANGLE_ARB:
+				// Set up rectangle scale matrix
+				Math::setMatrix4x4FromScale(mMatrix,width,height,Math::ONE);
+
+				glTexImage2D(mTarget,0,glinternalFormat,width,height,0,glformat,gltype,NULL);
+			break;
+		#endif
+	}
+
+	setNumMipLevels(mMipLevels.size(),mGenerateMipMaps);
+
+	TOADLET_CHECK_GLERROR("GLTexture::create");
 
 	return true;
 }
@@ -118,56 +153,34 @@ void GLTexture::load(int format,int width,int height,int depth,uint8 *data){
 	glBindTexture(mTarget,mHandle);
 
 	GLint glformat=getGLFormat(format);
-	GLint glinternalFormat=glformat;
 	GLint gltype=getGLType(format);
-
-	#if !defined(TOADLET_HAS_GLES)
-		if(mTarget==GL_TEXTURE_CUBE_MAP){
-			glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-			glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-
-			int targets[6]={
-				GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-				GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-				GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-				GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-				GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-				GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
-			};
-
-			int i;
-			for(i=0;i<6;++i){
-				glTexImage2D(targets[i],0,glinternalFormat,width,height,0,glformat,gltype,
-					data+(width*height*ImageFormatConversion::getPixelSize(format)*i));
-			}
-		}
-		else if(mTarget==GL_TEXTURE_RECTANGLE_ARB){
-			glTexImage2D(mTarget,0,glinternalFormat,width,height,0,glformat,gltype,data);
-
-			Math::setMatrix4x4FromScale(mMatrix,width,height,Math::ONE);
-		}
-		else
-	#endif
-	{
-		switch(mTarget){
-			#if !defined(TOADLET_HAS_GLES)
-				case GL_TEXTURE_1D:
-					glTexImage1D(mTarget,0,glinternalFormat,width,0,glformat,gltype,data);
-				break;
-			#endif
-			case GL_TEXTURE_2D:
-				glTexImage2D(mTarget,0,glinternalFormat,width,height,0,glformat,gltype,data);
+	switch(mTarget){
+		#if !defined(TOADLET_HAS_GLES)
+			case GL_TEXTURE_1D:
+				glTexSubImage1D(mTarget,0,0,0,width,0,glformat,gltype,data);
 			break;
-			#if !defined(TOADLET_HAS_GLES)
-				case GL_TEXTURE_3D:
-					glTexImage3D(mTarget,0,glinternalFormat,width,height,depth,0,glformat,gltype,data);
-				break;
-			#endif
-		}
+		#endif
+		case GL_TEXTURE_2D:
+			glTexSubImage2D(mTarget,0,0,0,width,height,0,glformat,gltype,data);
+		break;
+		#if !defined(TOADLET_HAS_GLES)
+			case GL_TEXTURE_3D:
+				glTexSubImage3D(mTarget,0,0,0,width,height,depth,0,glformat,gltype,data);
+			break;
+			case GL_TEXTURE_CUBE_MAP:
+				for(int i=0;i<6;++i){
+					glTexSubImage2D(GLCubeFaces[i],0,0,0,width,height,0,glformat,gltype,
+						data+(width*height*ImageFormatConversion::getPixelSize(format)*i));
+				}
+			break;
+			case GL_TEXTURE_RECTANGLE_ARB:
+				glTexSubImage2D(mTarget,0,0,0,width,height,0,glformat,gltype,data);
+			break;
+		#endif
+	}
 
-		if(mManuallyGenerateMipMaps){
-			generateMipMaps();
-		}
+	if(mManuallyGenerateMipMaps){
+		generateMipMaps();
 	}
 }
 
@@ -186,7 +199,7 @@ bool GLTexture::read(int format,int width,int height,int depth,uint8 *data){
 	#endif
 }
 
-void GLTexture::setNumMipLevels(int numMipLevels){
+void GLTexture::setNumMipLevels(int numMipLevels,bool generate){
 	if(numMipLevels==0){
 		int width=mWidth;
 		int height=mHeight;
@@ -199,10 +212,17 @@ void GLTexture::setNumMipLevels(int numMipLevels){
 
 	mMipLevels.resize(numMipLevels);
 	if(mHandle!=0){
+		int width=mWidth;
+		int height=mHeight;
 		for(i=0;i<numMipLevels;++i){
 			if(mMipLevels[i]==NULL){
-				mMipLevels[i]=GLTextureMipSurface::ptr(new GLTextureMipSurface(this,i));
+				mMipLevels[i]=GLTextureMipSurface::ptr(new GLTextureMipSurface(this,i,width,height));
 			}
+			else{
+				mMipLevels[i]->resize(i,width,height);
+			}
+			width/=2;
+			height/=2;
 		}
 	}
 	
