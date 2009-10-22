@@ -83,6 +83,10 @@ public:
 	// The data variable provides a non-peered method of storing data
 	inline uint8 *internal_getData() const{return mData;}
 
+// HACK: Temporary
+void setName(const egg::String &name){}
+const egg::String &getName() const{static egg::String s;return s;}
+
 protected:
 	Type mType;
 	UsageType mUsageType;

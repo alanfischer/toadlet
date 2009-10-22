@@ -81,6 +81,9 @@ public:
 	int getStringHeight(const egg::String &string) const{return getStringHeight(string,0,string.length());}
 	int getStringHeight(const egg::String &string,int start,int end) const;
 
+	void setName(const egg::String &name){mName=name;}
+	const egg::String &getName() const{return mName;}
+
 	inline float getPointWidth() const{return mPointWidth;}
 	inline float getPointHeight() const{return mPointHeight;}
 	inline int getHeight() const{return mHeight;}
@@ -91,6 +94,7 @@ public:
 	peeper::VertexBufferAccessor vba;
 
 protected:
+	egg::String mName;
 	float mPointWidth;
 	float mPointHeight;
 	int mHeight; // TODO: Perhaps somehow mHeight should be depreciated, and we force all the font loaders to actually have a consistant mPointHeight

@@ -217,7 +217,6 @@ Resource *Win32FontHandler::load(const ResourceHandlerData *handlerData){
 	}
 
 	Texture::ptr texture=mTextureManager->createTexture(image);
-	texture->setAutoGenerateMipMaps(false);
 
 	Font *font=new Font(fontData->width,fontData->height,fontData->height,0,shared_static_cast<Texture>(mTextureManager->load(texture)),charArray,&glyphs[0],glyphs.size());
 

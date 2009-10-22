@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_GLFBOSURFACERENDERTARGET_H
 
 #include "GLRenderTarget.h"
+#include <toadlet/peeper/SurfaceRenderTarget.h>
 
 namespace toadlet{
 namespace peeper{
@@ -38,7 +39,7 @@ public:
 	static bool available(GLRenderer *renderer);
 
 	GLFBOSurfaceRenderTarget(GLRenderer *renderer);
-	virtual ~GLFBORenderTexturePeer();
+	virtual ~GLFBOSurfaceRenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return this;}
 
