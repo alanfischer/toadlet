@@ -43,8 +43,8 @@ void AudioBufferHandler::setAudioPlayer(AudioPlayer *player){
 	mAudioPlayer=player;
 }
 
-Resource *AudioBufferHandler::load(InputStream::ptr in,const ResourceHandlerData *handlerData){
-	AudioBuffer *audioBuffer=NULL;
+Resource::ptr AudioBufferHandler::load(InputStream::ptr in,const ResourceHandlerData *handlerData){
+	AudioBuffer::ptr audioBuffer=NULL;
 	if(mAudioPlayer!=NULL){
 		String mimeType;
 		AudioBufferData *audioBufferData=(AudioBufferData*)handlerData;
@@ -55,7 +55,7 @@ Resource *AudioBufferHandler::load(InputStream::ptr in,const ResourceHandlerData
 		else{
 			mimeType=audioBufferData->mimeType;
 		}
-		audioBuffer=new AudioBuffer(mAudioPlayer,in,mimeType);
+		audioBuffer=AudioBuffer::ptr(new AudioBuffer(mAudioPlayer,in,mimeType));
 	}
 	return audioBuffer;
 }

@@ -113,6 +113,11 @@
 	#endif
 #endif
 
+#if defined(TOADLET_HAS_GLES)
+	#define glTexEnvi glTexEnvx
+	#define glTexParameteri glTexParameterx
+#endif
+
 #if !defined(GL_SRC0_RGB)
 	#define GL_SRC0_RGB GL_SOURCE0_RGB 
 #endif

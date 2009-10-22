@@ -48,7 +48,7 @@ inline int floatToFixed26_6(float f){
 
 static String defaultCharacterSet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()_+|{}:\"'<>?`-=\\/[];,. \t");
 
-FreeTypeHandler::FreeTypeHandler(ResourceManager *textureManager){
+FreeTypeHandler::FreeTypeHandler(TextureManager *textureManager){
 	mTextureManager=textureManager;
 
 	if(FT_Init_FreeType(&mLibrary)){
@@ -64,7 +64,7 @@ FreeTypeHandler::~FreeTypeHandler(){
 	}
 }
 
-Resource *FreeTypeHandler::load(InputStream::ptr in,const ResourceHandlerData *handlerData){
+Resource::ptr FreeTypeHandler::load(InputStream::ptr in,const ResourceHandlerData *handlerData){
 	FontData *fontData=(FontData*)handlerData;
 	if(fontData==NULL){
 		Error::nullPointer(Categories::TOADLET_TADPOLE,
@@ -182,12 +182,10 @@ Resource *FreeTypeHandler::load(InputStream::ptr in,const ResourceHandlerData *h
 		}
 	}
 
-	Texture::ptr texture(new Texture(image));
+	Texture::ptr texture=mTextureManager->createTexture(image);
 	texture->setAutoGenerateMipMaps(false);
-	texture->setMagFilter(Texture::Filter_NEAREST);
-	texture->setMinFilter(Texture::Filter_NEAREST);
 
-	Font *font=new Font(fontData->width,fontData->height,maxHeight,0,shared_static_cast<Texture>(mTextureManager->load(texture)),charArray,&glyphs[0],glyphs.size());
+	Font::ptr font(new Font(fontData->width,fontData->height,maxHeight,0,shared_static_cast<Texture>(mTextureManager->load(texture)),charArray,&glyphs[0],glyphs.size()));
 
 	// Clean up FreeType data
 	for(i=0;i<bitmapGlyphs.size();++i){

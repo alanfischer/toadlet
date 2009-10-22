@@ -46,7 +46,7 @@ MMSHHandler::MMSHHandler(ResourceManager *bufferManager,Engine *engine){
 }
 
 // TODO: Calculate a boundingRadius for the Mesh
-Resource *MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandlerData *handlerData){
+Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandlerData *handlerData){
 	DataInputStream::ptr in(new DataInputStream(inputStream));
 
 	char signature[4];
@@ -64,7 +64,7 @@ Resource *MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandlerDa
 		return NULL;
 	}
 
-	Mesh *mesh=new Mesh();
+	Mesh::ptr mesh(new Mesh());
 
 	int i,j;
 

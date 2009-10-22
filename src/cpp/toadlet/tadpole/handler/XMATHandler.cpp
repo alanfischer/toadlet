@@ -39,8 +39,8 @@ XMATHandler::XMATHandler(ResourceManager *textureManager){
 	mTextureManager=textureManager;
 }
 
-Resource *XMATHandler::load(InputStream::ptr in,const ResourceHandlerData *handlerData){
-	Material *material=NULL;
+Resource::ptr XMATHandler::load(InputStream::ptr in,const ResourceHandlerData *handlerData){
+	Material::ptr material=NULL;
 
 	// TODO: Replace the following when mxml implements custom load/save callbacks
 	char buffer[1025];
@@ -76,7 +76,7 @@ Resource *XMATHandler::load(InputStream::ptr in,const ResourceHandlerData *handl
 	return material;
 }
 
-bool XMATHandler::save(Material *material,OutputStream::ptr out){
+bool XMATHandler::save(Material::ptr material,OutputStream::ptr out){
 	mxml_node_t *root=mxmlNewElement(MXML_NO_PARENT,"XMAT");
 
 	int version=XMLMeshUtilities::version;
@@ -101,8 +101,8 @@ bool XMATHandler::save(Material *material,OutputStream::ptr out){
 	return true;
 }
 
-Material *XMATHandler::loadMaterial(mxml_node_t *root,int version){
-	Material *material=NULL;
+Material::ptr XMATHandler::loadMaterial(mxml_node_t *root,int version){
+	Material::ptr material=NULL;
 
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
@@ -114,7 +114,7 @@ Material *XMATHandler::loadMaterial(mxml_node_t *root,int version){
 	return material;
 }
 
-bool XMATHandler::saveMaterial(mxml_node_t *root,Material *material,int version){
+bool XMATHandler::saveMaterial(mxml_node_t *root,Material::ptr material,int version){
 	if(material!=NULL){
 		mxml_node_t *node=XMLMeshUtilities::saveMaterial(material,version);
 		mxmlSetElement(node,"Material");

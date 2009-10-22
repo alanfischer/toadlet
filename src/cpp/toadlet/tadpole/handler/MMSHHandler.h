@@ -46,7 +46,7 @@ public:
 	/// @todo  Replace the Engine here with a custom BufferResourceManager which could have a getIdealVertexFormatBit() function.
 	MMSHHandler(ResourceManager *bufferManager,Engine *engine);
 
-	egg::Resource *load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
+	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
 
 protected:
 	// Blocks for the mmsh format

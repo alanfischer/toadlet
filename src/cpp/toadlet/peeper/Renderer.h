@@ -135,7 +135,7 @@ public:
 	virtual bool reset()=0;
 
 	// Resource operations
-	virtual TexturePeer *createTexturePeer(Texture *texture)=0;
+	virtual Texture *createTexture()=0;
 	virtual BufferPeer *createBufferPeer(Buffer *buffer)=0;
 	virtual ProgramPeer *createProgramPeer(Program *program)=0;
 	virtual ShaderPeer *createShaderPeer(Shader *shader)=0;

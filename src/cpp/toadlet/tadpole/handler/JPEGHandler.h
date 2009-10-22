@@ -29,6 +29,7 @@
 #include <toadlet/egg/image/JPEGHandler.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/tadpole/ResourceHandler.h>
+#include <toadlet/tadpole/TextureManager.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -38,21 +39,24 @@ class TOADLET_API JPEGHandler:public ResourceHandler{
 public:
 	TOADLET_SHARED_POINTERS(JPEGHandler,ResourceHandler);
 
-	egg::Resource *load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData){
-		egg::image::Image *image=mHandler.loadImage(in);
+	JPEGHandler(TextureManager *textureManager){mTextureManager=textureManager;}
+
+	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData){
+		egg::image::Image::ptr image(mHandler.loadImage(in));
 		if(image!=NULL){
-			return new peeper::Texture(egg::image::Image::ptr(image));
+			return mTextureManager->createTexture(image);
 		}
 		else{
 			return NULL;
 		}
 	}
 
-	bool save(peeper::Texture *resource,egg::io::OutputStream::ptr out){
-		return mHandler.saveImage(resource->getImage(),out);
+	bool save(peeper::Texture::ptr resource,egg::io::OutputStream::ptr out){
+		return mHandler.saveImage(mTextureManager->createImage(resource),out);
 	}
 
 protected:
+	TextureManager *mTextureManager;
 	egg::image::JPEGHandler mHandler;
 };
 
