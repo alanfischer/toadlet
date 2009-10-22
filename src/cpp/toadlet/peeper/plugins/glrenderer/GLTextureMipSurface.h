@@ -23,33 +23,45 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_SURFACERENDERTARGET_H
-#define TOADLET_PEEPER_SURFACERENDERTARGET_H
+#ifndef TOADLET_PEEPER_GLTEXTUREMIPSURFACE_H
+#define TOADLET_PEEPER_GLTEXTUREMIPSURFACE_H
 
-#include <toadlet/peeper/RenderTarget.h>
+#include "GLIncludes.h"
+#include "GLSurface.h"
 
 namespace toadlet{
 namespace peeper{
 
-class SurfaceRenderTarget:public RenderTarget{
+class GLTexture;
+class GLRenderer;
+
+class TOADLET_API GLTextureMipSurface:public GLSurface{
+protected:
+	GLTextureMipSurface(GLTexture *texture,GLuint level);
+
 public:
-	TOADLET_SHARED_POINTER(SurfaceRenderTarget,RenderTarget);
+	virtual ~GLTextureMipSurface();
 
-	enum Attachment{
-		Attachment_DEPTH_STENCIL,
-		Attachment_COLOR_0,
-		Attachment_COLOR_1,
-		Attachment_COLOR_2,
-		Attachment_COLOR_3,
-	};
+	virtual Surface *getRootSurface(){return this;}
+	virtual GLTextureMipSurface *castToGLTextureMipSurface(){return this;}
+	virtual GLFBORenderbufferSurface *castToGLFBORenderbufferSurface(){return NULL;}
 
-	virtual ~SurfaceRenderTarget(){}
+	virtual int getWidth(){return mWidth;}
+	virtual int getHeight(){return mHeight;}
 
-	virtual bool create();
-	virtual bool destroy();
-	
-	virtual bool attach(Surface::ptr surface,Attachment attachment)=0;
-	virtual bool remove(Surface::ptr surface)=0;
+	void resize(GLuint level,int width,int height);
+
+	inline GLTexture *getTexture() const{return mTexture;}
+	inline GLuint getLevel() const{return mLevel;}
+
+protected:
+	GLTexture *mTexture;
+	GLuint mLevel;
+	int mWidth;
+	int mHeight;
+
+	friend GLTexture;
+	friend GLRenderer;
 };
 
 }

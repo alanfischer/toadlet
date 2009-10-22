@@ -39,7 +39,6 @@ class GLRenderer;
 class TOADLET_API GLTexture:public Texture{
 public:
 	GLTexture(GLRenderer *renderer);
-
 	virtual ~GLTexture();
 
 	virtual Texture *getRootTexture(){return this;}
@@ -63,6 +62,9 @@ public:
 	virtual void setName(const egg::String &name){mName=name;}
 	virtual const egg::String &getName() const{return mName;}
 
+	inline GLuint getHandle() const{return mHandle;}
+	inline GLenum getTarget() const{return mTarget;}
+	
 protected:
 	void generateMipLevels();
 	GLuint getGLTarget();
@@ -73,6 +75,14 @@ protected:
 	static GLuint getGLMinFilter(TextureStage::Filter minFilter,TextureStage::Filter mipFilter);
 	static GLuint getGLMagFilter(TextureStage::Filter magFilter);
 	static GLuint getGLTextureBlendSource(TextureBlend::Source blend);
+	static GLuint GLCubeFaces[6]={
+		GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+	};
 
 	GLRenderer *mRenderer;
 

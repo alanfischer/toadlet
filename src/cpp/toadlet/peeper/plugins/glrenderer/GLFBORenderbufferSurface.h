@@ -23,33 +23,37 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_SURFACERENDERTARGET_H
-#define TOADLET_PEEPER_SURFACERENDERTARGET_H
+#ifndef TOADLET_PEEPER_GLFBORENDERBUFFERSURFACE_H
+#define TOADLET_PEEPER_GLFBORENDERBUFFERSURFACE_H
 
-#include <toadlet/peeper/RenderTarget.h>
+#include "GLSurface.h"
 
 namespace toadlet{
 namespace peeper{
 
-class SurfaceRenderTarget:public RenderTarget{
-public:
-	TOADLET_SHARED_POINTER(SurfaceRenderTarget,RenderTarget);
+class GLFBORenderbufferSurface:public GLSurface{
+protected:
+	GLFBORenderbufferSurface(GLFBORenderTarget *target);
 
-	enum Attachment{
-		Attachment_DEPTH_STENCIL,
-		Attachment_COLOR_0,
-		Attachment_COLOR_1,
-		Attachment_COLOR_2,
-		Attachment_COLOR_3,
-	};
-
-	virtual ~SurfaceRenderTarget(){}
-
-	virtual bool create();
+	virtual bool create(int format,int width,int height);
 	virtual bool destroy();
-	
-	virtual bool attach(Surface::ptr surface,Attachment attachment)=0;
-	virtual bool remove(Surface::ptr surface)=0;
+
+public:
+	virtual ~GLFBORenderbufferSurface();
+
+	virtual Surface *getRootSurface(){return this;}
+	virtual GLTextureMipSurface *castToGLTextureMipSurface(){return NULL;}
+	virtual GLFBORenderbufferSurface *castToGLFBORenderbufferSurface(){return this;}
+
+	virtual int getWidth(){return mWidth;}
+	virtual int getHeight(){return mHeight;}
+
+protected:
+	GLFBORenderTarget *mTarget;
+	int mHandle;
+	int mFormat;
+	int mWidth;
+	int mHeight;
 };
 
 }
