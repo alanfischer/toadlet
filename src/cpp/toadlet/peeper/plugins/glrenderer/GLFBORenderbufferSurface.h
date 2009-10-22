@@ -31,6 +31,8 @@
 namespace toadlet{
 namespace peeper{
 
+class GLFBORenderTarget;
+
 class GLFBORenderbufferSurface:public GLSurface{
 protected:
 	GLFBORenderbufferSurface(GLFBORenderTarget *target);
@@ -50,7 +52,7 @@ public:
 
 protected:
 	GLFBORenderTarget *mTarget;
-	int mHandle;
+	GLuint mHandle;
 	int mFormat;
 	int mWidth;
 	int mHeight;

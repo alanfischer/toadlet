@@ -33,7 +33,7 @@ namespace peeper{
 
 class Surface{
 public:
-	TOADLET_SHARED_POINTER(Surface,Surface);
+	TOADLET_SHARED_POINTERS(Surface,Surface);
 
 	virtual ~Surface(){}
 

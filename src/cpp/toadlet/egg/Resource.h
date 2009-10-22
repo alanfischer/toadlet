@@ -38,8 +38,9 @@ public:
 
 	virtual ~Resource(){}
 
-	virtual void setName(const String &name)=0;
-	virtual const String &getName() const=0;
+// TODO: See if we need these
+//	virtual void setName(const String &name)=0;
+//	virtual const String &getName() const=0;
 };
 
 }

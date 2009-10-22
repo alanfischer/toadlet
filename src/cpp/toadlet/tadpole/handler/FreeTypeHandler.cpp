@@ -183,7 +183,6 @@ Resource::ptr FreeTypeHandler::load(InputStream::ptr in,const ResourceHandlerDat
 	}
 
 	Texture::ptr texture=mTextureManager->createTexture(image);
-	texture->setAutoGenerateMipMaps(false);
 
 	Font::ptr font(new Font(fontData->width,fontData->height,maxHeight,0,shared_static_cast<Texture>(mTextureManager->load(texture)),charArray,&glyphs[0],glyphs.size()));
 

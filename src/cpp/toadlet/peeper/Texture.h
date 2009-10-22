@@ -29,6 +29,7 @@
 #include <toadlet/egg/Resource.h>
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/image/Image.h>
+#include <toadlet/peeper/Surface.h>
 
 namespace toadlet{
 namespace peeper{
@@ -46,6 +47,10 @@ public:
 	virtual ~Texture(){}
 
 	virtual Texture *getRootTexture()=0;
+
+	// TODO: Remove these if we add it back in Resource
+	virtual void setName(const egg::String &name)=0;
+	virtual const egg::String &getName() const=0;
 
 	// Lifecycle
 	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth)=0;

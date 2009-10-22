@@ -36,6 +36,7 @@ namespace toadlet{
 namespace tadpole{
 
 Font::Font(float pointWidth,float pointHeight,int height,int innerSpace,Texture::ptr texture,const wchar *charSet,Glyph **glyphs,int numChars):
+	//mName,
 	mPointWidth(0),
 	mPointHeight(0),
 	mHeight(0),

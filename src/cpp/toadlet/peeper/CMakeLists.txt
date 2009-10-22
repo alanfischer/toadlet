@@ -6,7 +6,6 @@ set (PEEPER_SRC
 	IndexData.cpp
 	Light.cpp
 	Program.cpp
-	RenderTarget.cpp
 	Shader.cpp
 	TextureStage.cpp
 	VertexBuffer.cpp
@@ -36,6 +35,7 @@ set (PEEPER_HEADERS
 	Renderer.h
 	Shader.h
 	StatisticsSet.h
+	Surface.h
 	Texture.h
 	TextureBlend.h
 	TextureStage.h
