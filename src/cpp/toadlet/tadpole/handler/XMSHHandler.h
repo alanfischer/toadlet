@@ -43,15 +43,15 @@ public:
 
 	XMSHHandler(ResourceManager *bufferManager,ResourceManager *materialManager,ResourceManager *textureManager);
 
-	egg::Resource *load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
+	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
 
-	bool save(Mesh *resource,egg::io::OutputStream::ptr out);
+	bool save(Mesh::ptr resource,egg::io::OutputStream::ptr out);
 
 protected:
-	Mesh *loadMeshVersion1(mxml_node_t *root);
-	Mesh *loadMeshVersion2Up(mxml_node_t *root,int version);
-	bool saveMeshVersion1(mxml_node_t *root,Mesh *mesh);
-	bool saveMeshVersion2Up(mxml_node_t *root,Mesh *mesh,int version);
+	Mesh::ptr loadMeshVersion1(mxml_node_t *root);
+	Mesh::ptr loadMeshVersion2Up(mxml_node_t *root,int version);
+	bool saveMeshVersion1(mxml_node_t *root,Mesh::ptr mesh);
+	bool saveMeshVersion2Up(mxml_node_t *root,Mesh::ptr mesh,int version);
 
 	ResourceManager *mBufferManager;
 	ResourceManager *mMaterialManager;

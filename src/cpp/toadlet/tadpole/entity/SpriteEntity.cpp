@@ -51,7 +51,7 @@ Entity *SpriteEntity::create(Engine *engine){
 	super::create(engine);
 
 	mTexture=NULL;
-	mAnimatedTexture=NULL;
+//	mAnimatedTexture=NULL;
 	mTextureMatrix.reset();
 
 	mFrame=0;
@@ -123,18 +123,18 @@ void SpriteEntity::load(scalar width,scalar height,bool scaled,Texture::ptr text
 		return;
 	}
 
-	if(mTexture->getType()==Texture::Type_ANIMATED){
-		mAnimatedTexture=shared_static_cast<AnimatedTexture>(texture);
-	}
-	else{
-		mAnimatedTexture=NULL;
+//	if(mTexture->getType()==Texture::Type_ANIMATED){
+//		mAnimatedTexture=shared_static_cast<AnimatedTexture>(texture);
+//	}
+//	else{
+//		mAnimatedTexture=NULL;
 		mTextureMatrix.set(Math::IDENTITY_MATRIX4X4);
 		TextureStage::ptr textureStage(new TextureStage(mTexture));
-		textureStage->setSAddressMode(Texture::AddressMode_CLAMP_TO_EDGE);
-		textureStage->setTAddressMode(Texture::AddressMode_CLAMP_TO_EDGE);
+		textureStage->setSAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
+		textureStage->setTAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
 		textureStage->setTextureMatrix(mTextureMatrix);
 		mMaterial->setTextureStage(0,textureStage);
-	}
+//	}
 
 	if(scaled){
 		scalar hw=width/2;
@@ -159,9 +159,9 @@ void SpriteEntity::setFrame(int frame){
 
 int SpriteEntity::getNumFrames() const{
 	int numFrames=1;
-	if(mAnimatedTexture!=NULL){
-		numFrames=mAnimatedTexture->getNumFrames();
-	}
+//	if(mAnimatedTexture!=NULL){
+//		numFrames=mAnimatedTexture->getNumFrames();
+//	}
 	return numFrames;
 }
 
@@ -222,14 +222,14 @@ void SpriteEntity::render(Renderer *renderer) const{
 }
 
 void SpriteEntity::updateFrame(){
-	if(mAnimatedTexture!=NULL){
-		mAnimatedTexture->getMatrix4x4ForFrame(mFrame,mTextureMatrix);
-		TextureStage::ptr textureStage(new TextureStage(mAnimatedTexture->getTextureForFrame(mFrame)));
-		textureStage->setSAddressMode(Texture::AddressMode_CLAMP_TO_EDGE);
-		textureStage->setTAddressMode(Texture::AddressMode_CLAMP_TO_EDGE);
-		textureStage->setTextureMatrix(mTextureMatrix);
-		mMaterial->setTextureStage(0,textureStage);
-	}
+//	if(mAnimatedTexture!=NULL){
+//		mAnimatedTexture->getMatrix4x4ForFrame(mFrame,mTextureMatrix);
+//		TextureStage::ptr textureStage(new TextureStage(mAnimatedTexture->getTextureForFrame(mFrame)));
+//		textureStage->setSAddressMode(Texture::AddressMode_CLAMP_TO_EDGE);
+//		textureStage->setTAddressMode(Texture::AddressMode_CLAMP_TO_EDGE);
+//		textureStage->setTextureMatrix(mTextureMatrix);
+//		mMaterial->setTextureStage(0,textureStage);
+//	}
 }
 
 }

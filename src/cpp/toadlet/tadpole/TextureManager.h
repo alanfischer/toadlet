@@ -26,22 +26,20 @@
 #ifndef TOADLET_TADPOLE_TEXTUREMANAGER_H
 #define TOADLET_TADPOLE_TEXTUREMANAGER_H
 
-#include <toadlet/tadpole/ContextResourceManager.h>
+#include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/tadpole/Engine.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TextureSemantics{
-public:
-	static inline peeper::TexturePeer *getResourcePeer(egg::Resource *resource){return ((peeper::Texture*)resource)->internal_getTexturePeer();}
-};
-
-class TextureManager:public ContextResourceManager<peeper::TexturePeer,TextureSemantics>{
+class TextureManager:public ResourceManager{
 public:
 	TextureManager(Engine *engine);
 
+	peeper::Texture::ptr createTexture(const egg::image::Image::ptr &image);
+	egg::image::Image::ptr createImage(const peeper::Texture::ptr &texture);
+	
 	void resourceLoaded(const egg::Resource::ptr &resource);
 
 protected:

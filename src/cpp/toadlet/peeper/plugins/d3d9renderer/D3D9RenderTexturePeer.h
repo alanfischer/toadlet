@@ -22,7 +22,7 @@
  * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
  *
  ********** Copyright header - do not remove **********/
-
+/*
 #ifndef TOADLET_PEEPER_D3D9RENDERTEXTUREPEER_H
 #define TOADLET_PEEPER_D3D9RENDERTEXTUREPEER_H
 
@@ -54,3 +54,4 @@ public:
 }
 
 #endif
+*/

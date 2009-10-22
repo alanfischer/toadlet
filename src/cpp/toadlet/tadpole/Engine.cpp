@@ -106,9 +106,9 @@ Engine::Engine():
 		"Engine: adding all handlers");
 
 	// Texture handlers
-	mTextureManager->addHandler(BMPHandler::ptr(new BMPHandler()),"bmp");
+	mTextureManager->addHandler(BMPHandler::ptr(new BMPHandler(mTextureManager)),"bmp");
 
-	mTextureManager->addHandler(RGBHandler::ptr(new RGBHandler()),"rgb");
+	mTextureManager->addHandler(RGBHandler::ptr(new RGBHandler(mTextureManager)),"rgb");
 
 	mTextureManager->addHandler(SPRHandler::ptr(new SPRHandler(mTextureManager)),"spr");
 
@@ -117,13 +117,13 @@ Engine::Engine():
 	#endif
 
 	#if defined(TOADLET_HAS_JPEG)
-		JPEGHandler::ptr jpegHandler(new JPEGHandler());
+		JPEGHandler::ptr jpegHandler(new JPEGHandler(mTextureManager));
 		mTextureManager->addHandler(jpegHandler,"jpeg");
 		mTextureManager->addHandler(jpegHandler,"jpg");
 	#endif
 
 	#if defined(TOADLET_HAS_PNG)
-		mTextureManager->addHandler(PNGHandler::ptr(new PNGHandler()),"png");
+		mTextureManager->addHandler(PNGHandler::ptr(new PNGHandler(mTextureManager)),"png");
 	#elif defined(TOADLET_PLATFORM_OSX)
 		mTextureManager->addHandler(OSXTextureHandler::ptr(new OSXTextureHandler()),"png");
 	#endif
@@ -362,11 +362,11 @@ void Engine::contextActivate(Renderer *renderer){
 	Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_DEBUG,
 		"Engine::contextActivate");
 
-	TextureManager::ResourcePtrMap &textureResourceMap=mTextureManager->getResourcePtrMap();
-	TextureManager::ResourcePtrMap::iterator textureIt;
+//	TextureManager::ResourcePtrMap &textureResourceMap=mTextureManager->getResourcePtrMap();
+//	TextureManager::ResourcePtrMap::iterator textureIt;
 
 	int numTexturesLoaded=0;
-	for(textureIt=textureResourceMap.begin();textureIt!=textureResourceMap.end();++textureIt){
+/*	for(textureIt=textureResourceMap.begin();textureIt!=textureResourceMap.end();++textureIt){
 		Texture *resource=(Texture*)textureIt->second->resource.get();
 		if(resource!=NULL){
 			TOADLET_ASSERT(resource->internal_getTexturePeer()==NULL);
@@ -379,7 +379,7 @@ void Engine::contextActivate(Renderer *renderer){
 	}
 
 	mTextureManager->getContextResourcesToLoad().clear();
-
+*/
 
 	BufferManager::ResourcePtrMap &bufferResourceMap=mBufferManager->getResourcePtrMap();
 	BufferManager::ResourcePtrMap::iterator bufferIt;
@@ -415,12 +415,12 @@ void Engine::contextDeactivate(Renderer *renderer){
 		"Engine::contextDeactivate");
 
 	int i;
-	TextureManager::ResourcePeerCollection &textureResourcePeersToUnload=mTextureManager->getContextResourcePeersToUnload();
-	TextureManager::ResourcePtrMap &textureResourceMap=mTextureManager->getResourcePtrMap();
-	TextureManager::ResourcePtrMap::iterator textureIt;
+//	TextureManager::ResourcePeerCollection &textureResourcePeersToUnload=mTextureManager->getContextResourcePeersToUnload();
+//	TextureManager::ResourcePtrMap &textureResourceMap=mTextureManager->getResourcePtrMap();
+//	TextureManager::ResourcePtrMap::iterator textureIt;
 
 	int numTexturePeersUnloaded=0;
-	for(i=0;i<textureResourcePeersToUnload.size();++i){
+/*	for(i=0;i<textureResourcePeersToUnload.size();++i){
 		delete textureResourcePeersToUnload[i];
 		numTexturePeersUnloaded++;
 	}
@@ -440,7 +440,7 @@ void Engine::contextDeactivate(Renderer *renderer){
 			}
 		}
 	}
-
+*/
 
 	BufferManager::ResourcePeerCollection &bufferResourcePeersToUnload=mBufferManager->getContextResourcePeersToUnload();
 	BufferManager::ResourcePtrMap &bufferResourceMap=mBufferManager->getResourcePtrMap();
@@ -476,18 +476,18 @@ void Engine::contextUpdate(Renderer *renderer){
 	TOADLET_ASSERT(renderer!=NULL);
 
 	int i;
-	TextureManager::ResourcePeerCollection &textureResourcePeersToUnload=mTextureManager->getContextResourcePeersToUnload();
-	TextureManager::ResourceCollection &textureResourcesToLoad=mTextureManager->getContextResourcesToLoad();
+//	TextureManager::ResourcePeerCollection &textureResourcePeersToUnload=mTextureManager->getContextResourcePeersToUnload();
+//	TextureManager::ResourceCollection &textureResourcesToLoad=mTextureManager->getContextResourcesToLoad();
 
 	int numTexturePeersUnloaded=0;
-	for(i=0;i<textureResourcePeersToUnload.size();++i){
+/*	for(i=0;i<textureResourcePeersToUnload.size();++i){
 		delete textureResourcePeersToUnload[i];
 		numTexturePeersUnloaded++;
 	}
 	textureResourcePeersToUnload.clear();
-
+*/
 	int numTexturesLoaded=0;
-	for(i=0;i<textureResourcesToLoad.size();++i){
+/*	for(i=0;i<textureResourcesToLoad.size();++i){
 		Texture *resource=(Texture*)textureResourcesToLoad[i].get();
 		if(resource!=NULL){
 			TOADLET_ASSERT(resource->internal_getTexturePeer()==NULL);
@@ -504,7 +504,7 @@ void Engine::contextUpdate(Renderer *renderer){
 		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_EXCESSIVE,
 			String("contextUpdate: Unloaded ")+numTexturePeersUnloaded+" texture peers, loaded "+numTexturesLoaded+" textures");
 	}
-
+*/
 	BufferManager::ResourcePeerCollection &bufferResourcePeersToUnload=mBufferManager->getContextResourcePeersToUnload();
 	BufferManager::ResourceCollection &bufferResourcesToLoad=mBufferManager->getContextResourcesToLoad();
 

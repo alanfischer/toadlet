@@ -28,7 +28,7 @@
 
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/ResourceHandler.h>
-#include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/tadpole/TextureManager.h>
 
 extern "C" {
 #	define USE_FREETYPE2_STATIC
@@ -47,13 +47,13 @@ class FreeTypeHandler:public ResourceHandler{
 public:
 	TOADLET_SHARED_POINTERS(FreeTypeHandler,ResourceHandler);
 
-	FreeTypeHandler(ResourceManager *textureManager);
+	FreeTypeHandler(TextureManager *textureManager);
 	virtual ~FreeTypeHandler();
 
-	egg::Resource *load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
+	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
 
 protected:
-	ResourceManager *mTextureManager;
+	TextureManager *mTextureManager;
 	FT_Library mLibrary;
 };
 

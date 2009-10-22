@@ -181,6 +181,12 @@ void Win32Application::create(){
 	if(mAudioPlayer!=NULL){
 		mEngine->setAudioPlayer(mAudioPlayer);
 	}
+
+//HACK
+createWindow();
+mRendererPlugin=mChangeRendererPlugin;
+createContextAndRenderer(mRendererPlugin);
+mActive=true;
 }
 
 void Win32Application::destroy(){
@@ -208,8 +214,101 @@ void Win32Application::destroy(){
 }
 
 bool Win32Application::start(bool runEventLoop){
-	destroyWindow();
+// HACK
+//	destroyWindow();
 
+//	createWindow();
+resized(mWidth,mHeight);
+
+	mRun=true;
+
+	activate();
+
+	uint64 lastTime=System::mtime();
+	while(runEventLoop && mRun){
+		stepEventLoop();
+
+		if(mActive){
+			uint64 currentTime=System::mtime();
+			update(currentTime-lastTime);
+			if(mRenderer!=NULL){
+				render(mRenderer);
+			}
+			lastTime=currentTime;
+		}
+
+		System::msleep(10);
+	}
+
+	deactivate();
+
+	return true;
+}
+
+void Win32Application::stepEventLoop(){
+	MSG msg;
+	while(PeekMessage(&msg,NULL,0,0,PM_REMOVE)){
+		if(msg.message==WM_QUIT){
+			mRun=false;
+		}
+		else{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}
+
+	if(mChangeRendererPlugin!=mRendererPlugin){
+		mRendererPlugin=mChangeRendererPlugin;
+
+		destroyRendererAndContext();
+
+		createContextAndRenderer(mRendererPlugin);
+	}
+}
+
+void Win32Application::stop(){
+	mRun=false;
+}
+
+void Win32Application::setAutoActivate(bool autoActivate){
+	mAutoActivate=autoActivate;
+}
+
+void Win32Application::activate(){
+	if(mActive==false){
+		mActive=true;
+
+		if(mFullscreen){
+			#if defined(TOADLET_PLATFORM_WINCE)
+				// On WinCE, we need to hide the extra screen items
+				SHFullScreen(win32->mWnd,SHFS_HIDESIPBUTTON|SHFS_HIDETASKBAR|SHFS_HIDESTARTICON);
+			#endif
+		}
+		#if !defined(TOADLET_PLAFORM_WINCE)
+			// On Win32, we need to call resized, since it is apparently not called
+			resized(mWidth,mHeight);
+		#endif
+
+		createContextAndRenderer(mRendererPlugin);
+	}
+}
+
+void Win32Application::deactivate(){
+	if(mActive==true){
+		mActive=false;
+
+		destroyRendererAndContext();
+
+		if(mFullscreen){
+			#if defined(TOADLET_PLATFORM_WINCE)
+				// On WinCE, we need to show the extra screen items
+				SHFullScreen(win32->mWnd,SHFS_SHOWSIPBUTTON|SHFS_SHOWTASKBAR|SHFS_SHOWSTARTICON);
+			#endif
+		}
+	}
+}
+
+bool Win32Application::createWindow(){
 	int screenWidth=GetSystemMetrics(SM_CXSCREEN);
 	int screenHeight=GetSystemMetrics(SM_CYSCREEN);
 	bool adjustSize=true;
@@ -318,92 +417,7 @@ bool Win32Application::start(bool runEventLoop){
 	SetForegroundWindow(win32->mWnd);
 	SetFocus(win32->mWnd);
 
-	mRun=true;
-
-	activate();
-
-	uint64 lastTime=System::mtime();
-	while(runEventLoop && mRun){
-		stepEventLoop();
-
-		if(mActive){
-			uint64 currentTime=System::mtime();
-			update(currentTime-lastTime);
-			if(mRenderer!=NULL){
-				render(mRenderer);
-			}
-			lastTime=currentTime;
-		}
-
-		System::msleep(10);
-	}
-
-	deactivate();
-
 	return true;
-}
-
-void Win32Application::stepEventLoop(){
-	MSG msg;
-	while(PeekMessage(&msg,NULL,0,0,PM_REMOVE)){
-		if(msg.message==WM_QUIT){
-			mRun=false;
-		}
-		else{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-	}
-
-	if(mChangeRendererPlugin!=mRendererPlugin){
-		mRendererPlugin=mChangeRendererPlugin;
-
-		destroyRendererAndContext();
-
-		createContextAndRenderer(mRendererPlugin);
-	}
-}
-
-void Win32Application::stop(){
-	mRun=false;
-}
-
-void Win32Application::setAutoActivate(bool autoActivate){
-	mAutoActivate=autoActivate;
-}
-
-void Win32Application::activate(){
-	if(mActive==false){
-		mActive=true;
-
-		if(mFullscreen){
-			#if defined(TOADLET_PLATFORM_WINCE)
-				// On WinCE, we need to hide the extra screen items
-				SHFullScreen(win32->mWnd,SHFS_HIDESIPBUTTON|SHFS_HIDETASKBAR|SHFS_HIDESTARTICON);
-			#endif
-		}
-		#if !defined(TOADLET_PLAFORM_WINCE)
-			// On Win32, we need to call resized, since it is apparently not called
-			resized(mWidth,mHeight);
-		#endif
-
-		createContextAndRenderer(mRendererPlugin);
-	}
-}
-
-void Win32Application::deactivate(){
-	if(mActive==true){
-		mActive=false;
-
-		destroyRendererAndContext();
-
-		if(mFullscreen){
-			#if defined(TOADLET_PLATFORM_WINCE)
-				// On WinCE, we need to show the extra screen items
-				SHFullScreen(win32->mWnd,SHFS_SHOWSIPBUTTON|SHFS_SHOWTASKBAR|SHFS_SHOWSTARTICON);
-			#endif
-		}
-	}
 }
 
 void Win32Application::destroyWindow(){

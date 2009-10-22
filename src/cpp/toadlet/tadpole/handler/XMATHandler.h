@@ -43,12 +43,12 @@ public:
 
 	XMATHandler(ResourceManager *textureManager);
 
-	egg::Resource *load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
-	bool save(Material *resource,egg::io::OutputStream::ptr out);
+	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
+	bool save(Material::ptr resource,egg::io::OutputStream::ptr out);
 
 protected:
-	Material *loadMaterial(mxml_node_t *root,int version);
-	bool saveMaterial(mxml_node_t *root,Material *sequence,int version);
+	Material::ptr loadMaterial(mxml_node_t *root,int version);
+	bool saveMaterial(mxml_node_t *root,Material::ptr jmaterial,int version);
 
 	ResourceManager *mTextureManager;
 };

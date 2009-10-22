@@ -22,7 +22,7 @@
  * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
  *
  ********** Copyright header - do not remove **********/
-
+/*
 #ifndef TOADLET_PEEPER_GLFBORENDERTEXTUREPEER_H
 #define TOADLET_PEEPER_GLFBORENDERTEXTUREPEER_H
 
@@ -67,3 +67,4 @@ public:
 
 #endif
 
+*/

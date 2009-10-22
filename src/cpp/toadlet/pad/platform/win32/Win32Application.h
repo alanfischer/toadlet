@@ -109,6 +109,7 @@ public:
 	static int translateKey(int key);
 
 protected:
+	bool createWindow();
 	void destroyWindow();
 	peeper::RenderTargetPeer *makeRenderTargetPeer(int plugin);
 	peeper::Renderer *makeRenderer(int plugin);

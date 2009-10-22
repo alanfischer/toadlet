@@ -243,8 +243,8 @@ const char *MAP_NAMES[]={
 
 int MAX_MAP=8;
 
-Material *XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,ResourceManager *textureManager){
-	Material *material=new Material();
+Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,ResourceManager *textureManager){
+	Material::ptr material(new Material());
 
 	const char *prop=mxmlElementGetAttr(node,"Name");
 	if(prop!=NULL){
@@ -433,7 +433,7 @@ Material *XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,ResourceM
 	return material;
 }
 
-mxml_node_t *XMLMeshUtilities::saveMaterial(Material *material,int version){
+mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version){
 	mxml_node_t *materialNode=mxmlNewElement(MXML_NO_PARENT,"Material");
 
 	mxmlElementSetAttr(materialNode,"Name",material->getName());
@@ -561,8 +561,8 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material *material,int version){
 	return materialNode;
 }
 
-Mesh *XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,ResourceManager *bufferManager,ResourceManager *materialManager,ResourceManager *textureManager){
-	Mesh *mesh=new Mesh();
+Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,ResourceManager *bufferManager,ResourceManager *materialManager,ResourceManager *textureManager){
+	Mesh::ptr mesh(new Mesh());
 	const char *prop=NULL;
 
 	mxml_node_t *vertexNode=mxmlFindChild(node,"Vertexes");
@@ -815,7 +815,7 @@ Mesh *XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,ResourceManager *
 	return mesh;
 }
 
-mxml_node_t *XMLMeshUtilities::saveMesh(Mesh *mesh,int version){
+mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version){
 	mxml_node_t *meshNode=NULL;
 	if(version<=2){
 		meshNode=mxmlNewElement(MXML_NO_PARENT,"MeshData");
@@ -907,7 +907,7 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh *mesh,int version){
 
 	int i;
 	for(i=0;i<mesh->subMeshes.size();++i){
-		const Mesh::SubMesh *subMesh=mesh->subMeshes[i];
+		Mesh::SubMesh::ptr subMesh=mesh->subMeshes[i];
 
 		mxml_node_t *subMeshNode=NULL;
 		if(version<=2){
@@ -943,7 +943,7 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh *mesh,int version){
 				mxmlNewOpaque(indexNode,line);
 			}
 
-			Material *material=subMesh->material;
+			Material::ptr material=subMesh->material;
 			if(material!=NULL && material->getSaveLocally()){
 				mxmlAddChild(subMeshNode,saveMaterial(material,version));
 			}
@@ -965,8 +965,8 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh *mesh,int version){
 	return meshNode;
 }
 
-MeshSkeleton *XMLMeshUtilities::loadSkeleton(mxml_node_t *node,int version){
-	MeshSkeleton *skeleton=new MeshSkeleton();
+MeshSkeleton::ptr XMLMeshUtilities::loadSkeleton(mxml_node_t *node,int version){
+	MeshSkeleton::ptr skeleton(new MeshSkeleton());
 
 	const char *prop=NULL;
 	mxml_node_t *boneNode=node->child;
@@ -1025,7 +1025,7 @@ MeshSkeleton *XMLMeshUtilities::loadSkeleton(mxml_node_t *node,int version){
 	return skeleton;
 }
 
-mxml_node_t *XMLMeshUtilities::saveSkeleton(MeshSkeleton *skeleton,int version){
+mxml_node_t *XMLMeshUtilities::saveSkeleton(MeshSkeleton::ptr skeleton,int version){
 	mxml_node_t *skeletonNode=NULL;
 	if(version<=2){
 		skeletonNode=mxmlNewElement(MXML_NO_PARENT,"SkeletonData");
@@ -1076,8 +1076,8 @@ mxml_node_t *XMLMeshUtilities::saveSkeleton(MeshSkeleton *skeleton,int version){
 	return skeletonNode;
 }
 
-MeshSkeletonSequence *XMLMeshUtilities::loadSequence(mxml_node_t *node,int version){
-	MeshSkeletonSequence *sequence=new MeshSkeletonSequence();
+MeshSkeletonSequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int version){
+	MeshSkeletonSequence::ptr sequence(new MeshSkeletonSequence());
 
 	const char *prop=NULL;
 	prop=mxmlElementGetAttr(node,"Name");
@@ -1143,7 +1143,7 @@ MeshSkeletonSequence *XMLMeshUtilities::loadSequence(mxml_node_t *node,int versi
 	return sequence;
 }
 
-mxml_node_t *XMLMeshUtilities::saveSequence(MeshSkeletonSequence *sequence,int version){
+mxml_node_t *XMLMeshUtilities::saveSequence(MeshSkeletonSequence::ptr sequence,int version){
 	mxml_node_t *sequenceNode=NULL;
 	if(version<=2){
 		sequenceNode=mxmlNewElement(MXML_NO_PARENT,"AnimationData");

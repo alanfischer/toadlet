@@ -38,7 +38,7 @@ namespace handler{
 
 static String defaultCharacterSet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()_+|{}:\"'<>?`-=\\/[];,. \t");
 
-Win32FontHandler::Win32FontHandler(ResourceManager *textureManager){
+Win32FontHandler::Win32FontHandler(TextureManager *textureManager){
 	mTextureManager=textureManager;
 }
 
@@ -201,9 +201,9 @@ Resource *Win32FontHandler::load(const ResourceHandlerData *handlerData){
 		}
 	}
 
-#	if !defined(TOADLET_PLATFORM_WINCE)
+	#if !defined(TOADLET_PLATFORM_WINCE)
 		GdiFlush();
-#	endif
+	#endif
 
 	Image::ptr image(new Image(Image::Dimension_D2,Image::Format_RGB_5_6_5,textureWidth,textureHeight));
 	uint8 *imageData=image->getData();
@@ -216,10 +216,8 @@ Resource *Win32FontHandler::load(const ResourceHandlerData *handlerData){
 		memcpy(imageData+imageStride*(textureHeight-i-1),buffer+bitmapStride*i,bitmapStride);
 	}
 
-	Texture::ptr texture(new Texture(image));
+	Texture::ptr texture=mTextureManager->createTexture(image);
 	texture->setAutoGenerateMipMaps(false);
-	texture->setMagFilter(Texture::Filter_NEAREST);
-	texture->setMinFilter(Texture::Filter_NEAREST);
 
 	Font *font=new Font(fontData->width,fontData->height,fontData->height,0,shared_static_cast<Texture>(mTextureManager->load(texture)),charArray,&glyphs[0],glyphs.size());
 

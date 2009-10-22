@@ -39,7 +39,7 @@ public:
 
 	virtual ~ResourceHandler(){}
 
-	virtual egg::Resource *load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData)=0;
+	virtual egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData)=0;
 };
 
 }

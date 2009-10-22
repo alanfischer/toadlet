@@ -33,14 +33,14 @@ TextureStage::TextureStage():
 
 	//mBlend,
 
-	mSAddressMode(Texture::AddressMode_REPEAT),
-	mTAddressMode(Texture::AddressMode_REPEAT),
-	mRAddressMode(Texture::AddressMode_REPEAT),
+	mSAddressMode(AddressMode_REPEAT),
+	mTAddressMode(AddressMode_REPEAT),
+	mRAddressMode(AddressMode_REPEAT),
 	mAddressModeSpecified(false),
 
-	mMinFilter(Texture::Filter_NEAREST),
-	mMipFilter(Texture::Filter_NONE),
-	mMagFilter(Texture::Filter_NEAREST),
+	mMinFilter(Filter_NEAREST),
+	mMipFilter(Filter_NONE),
+	mMagFilter(Filter_NEAREST),
 	mFilterSpecified(false),
 
 	mTexCoordIndex(0),
@@ -55,14 +55,14 @@ TextureStage::TextureStage(const Texture::ptr &texture):
 
 	//mBlend,
 
-	mSAddressMode(Texture::AddressMode_REPEAT),
-	mTAddressMode(Texture::AddressMode_REPEAT),
-	mRAddressMode(Texture::AddressMode_REPEAT),
+	mSAddressMode(AddressMode_REPEAT),
+	mTAddressMode(AddressMode_REPEAT),
+	mRAddressMode(AddressMode_REPEAT),
 	mAddressModeSpecified(false),
 
-	mMinFilter(Texture::Filter_NEAREST),
-	mMipFilter(Texture::Filter_NONE),
-	mMagFilter(Texture::Filter_NEAREST),
+	mMinFilter(Filter_NEAREST),
+	mMipFilter(Filter_NONE),
+	mMagFilter(Filter_NEAREST),
 	mFilterSpecified(false),
 
 	mTexCoordIndex(0),
@@ -73,32 +73,32 @@ TextureStage::TextureStage(const Texture::ptr &texture):
 	mTexture=texture;
 }
 	
-void TextureStage::setSAddressMode(Texture::AddressMode addressMode){
+void TextureStage::setSAddressMode(AddressMode addressMode){
 	mSAddressMode=addressMode;
 	mAddressModeSpecified=true;
 }
 
-void TextureStage::setTAddressMode(Texture::AddressMode addressMode){
+void TextureStage::setTAddressMode(AddressMode addressMode){
 	mTAddressMode=addressMode;
 	mAddressModeSpecified=true;
 }
 
-void TextureStage::setRAddressMode(Texture::AddressMode addressMode){
+void TextureStage::setRAddressMode(AddressMode addressMode){
 	mRAddressMode=addressMode;
 	mAddressModeSpecified=true;
 }
 
-void TextureStage::setMinFilter(Texture::Filter minFilter){
+void TextureStage::setMinFilter(Filter minFilter){
 	mMinFilter=minFilter;
 	mFilterSpecified=true;
 }
 
-void TextureStage::setMipFilter(Texture::Filter mipFilter){
+void TextureStage::setMipFilter(Filter mipFilter){
 	mMipFilter=mipFilter;
 	mFilterSpecified=true;
 }
 
-void TextureStage::setMagFilter(Texture::Filter magFilter){
+void TextureStage::setMagFilter(Filter magFilter){
 	mMagFilter=magFilter;
 	mFilterSpecified=true;
 }

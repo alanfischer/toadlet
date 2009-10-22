@@ -26,7 +26,7 @@
 #ifndef TOADLET_TADPOLE_ENTITY_SPRITEENTITY_H
 #define TOADLET_TADPOLE_ENTITY_SPRITEENTITY_H
 
-#include <toadlet/peeper/AnimatedTexture.h>
+//#include <toadlet/peeper/AnimatedTexture.h>
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
@@ -82,7 +82,7 @@ protected:
 #endif
 
 	peeper::Texture::ptr mTexture;
-	peeper::AnimatedTexture::ptr mAnimatedTexture;
+//	peeper::AnimatedTexture::ptr mAnimatedTexture;
 	Matrix4x4 mTextureMatrix;
 
 	int mFrame;
