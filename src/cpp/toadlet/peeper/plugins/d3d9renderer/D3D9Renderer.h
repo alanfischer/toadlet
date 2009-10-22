@@ -52,7 +52,7 @@ public:
 	bool reset();
 
 	// Resource operations
-	TexturePeer *createTexturePeer(Texture *texture);
+	Texture *createTexture();
 	BufferPeer *createBufferPeer(Buffer *buffer);
 	ProgramPeer *createProgramPeer(Program *program);
 	ShaderPeer *createShaderPeer(Shader *shader);

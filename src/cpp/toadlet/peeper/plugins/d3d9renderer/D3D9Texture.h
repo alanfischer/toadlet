@@ -41,9 +41,9 @@ public:
 
 	virtual ~D3D9Texture();
 
-	virtual Texture *getRootTexture() const{return this;}
+	virtual Texture *getRootTexture(){return this;}
 
-	virtual void create(Dimension dimension,int format,int width,int height,int depth);
+	virtual bool create(Dimension dimension,int format,int width,int height,int depth);
 	virtual void destroy();
 
 	virtual Dimension getDimension() const{return mDimension;}
@@ -79,6 +79,7 @@ protected:
 	egg::String mName;
 	
 	IDirect3DBaseTexture9 *mTexture;
+	bool mAutoGenerateMipMaps;
 
 	friend D3D9Renderer;
 };

@@ -74,9 +74,9 @@ using namespace toadlet::tadpole;
 	extern "C" Renderer *new_D3DMRenderer();
 	extern "C" RenderTargetPeer *new_D3DMWindowRenderContextPeer(HWND wnd,const Visual &visual);
 #elif defined(TOADLET_HAS_DIRECT3D9)
-//	#pragma comment(lib,"toadlet_peeper_d3d9renderer" TOADLET_LIBRARY_EXTENSION)
-//	extern "C" Renderer *new_D3D9Renderer();
-//	extern "C" RenderTargetPeer *new_D3D9WindowRenderContextPeer(HWND wnd,const Visual &visual);
+	#pragma comment(lib,"toadlet_peeper_d3d9renderer" TOADLET_LIBRARY_EXTENSION)
+	extern "C" Renderer *new_D3D9Renderer();
+	extern "C" RenderTargetPeer *new_D3D9WindowRenderContextPeer(HWND wnd,const Visual &visual);
 #endif
 #if defined(TOADLET_PLATFORM_WIN32)
 	#pragma comment(lib,"toadlet_ribbit_win32player" TOADLET_LIBRARY_EXTENSION)
@@ -601,7 +601,7 @@ RenderTargetPeer *Win32Application::makeRenderTargetPeer(int rendererPlugin){
 		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 			peer=new_D3DMWindowRenderContextPeer(win32->mWnd,mVisual);
 		#elif defined(TOADLET_HAS_DIRECT3D9)
-//			peer=new_D3D9WindowRenderContextPeer(win32->mWnd,mVisual);
+			peer=new_D3D9WindowRenderContextPeer(win32->mWnd,mVisual);
 		#endif
 	}
 	if(peer!=NULL && peer->isValid()==false){
@@ -622,7 +622,7 @@ Renderer *Win32Application::makeRenderer(int plugin){
 		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 			renderer=new_D3DMRenderer();
 		#elif defined(TOADLET_HAS_DIRECT3D9)
-//			renderer=new_D3D9Renderer();
+			renderer=new_D3D9Renderer();
 		#endif
 	}
 	return renderer;
