@@ -186,25 +186,37 @@ void Shape::getBound(AABox &box) const{
 		break;
 		case Type_CONVEXSOLID:
 		{
-			Vector3 t;
-			for(int i=mConvexSolid.planes.size()-1;i>=0;--i){
-				t.set(mConvexSolid.planes[i].normal);
-				Math::mul(t,mConvexSolid.planes[i].d);
-				if(i==0){
-					box.mins.x=t.x;
-					box.maxs.x=t.x;
-					box.mins.y=t.y;
-					box.maxs.y=t.y;
-					box.mins.z=t.z;
-					box.maxs.z=t.z;
-				}
-				else{
-					if(t.x<box.mins.x) box.mins.x=t.x;
-					if(t.x>box.maxs.x) box.maxs.x=t.x;
-					if(t.y<box.mins.y) box.mins.y=t.y;
-					if(t.y>box.maxs.y) box.maxs.y=t.y;
-					if(t.z<box.mins.z) box.mins.z=t.z;
-					if(t.z>box.maxs.z) box.maxs.z=t.z;
+			Vector3 r;
+			int i,j,k;
+			scalar epsilon;
+			#if defined(TOADLET_FIXED_POINT)
+				epsilon=1<<4;
+			#else
+				epsilon=0.0001;
+			#endif
+			box.reset();
+			for(i=0;i<mConvexSolid.planes.size()-2;++i){
+				for(j=i+1;j<mConvexSolid.planes.size()-2;++j){
+					for(k=j+1;k<mConvexSolid.planes.size()-2;++k){
+						if(Math::getIntersectionOfThreePlanes(r,mConvexSolid.planes[i],mConvexSolid.planes[j],mConvexSolid.planes[k],epsilon)){
+							if(i==0 && j==1 && k==2){
+								box.mins.x=r.x;
+								box.maxs.x=r.x;
+								box.mins.y=r.y;
+								box.maxs.y=r.y;
+								box.mins.z=r.z;
+								box.maxs.z=r.z;
+							}
+							else{
+								if(r.x<box.mins.x) box.mins.x=r.x;
+								if(r.x>box.maxs.x) box.maxs.x=r.x;
+								if(r.y<box.mins.y) box.mins.y=r.y;
+								if(r.y>box.maxs.y) box.maxs.y=r.y;
+								if(r.z<box.mins.z) box.mins.z=r.z;
+								if(r.z>box.maxs.z) box.maxs.z=r.z;
+							}
+						}	
+					}
 				}
 			}
 		}
