@@ -37,6 +37,7 @@ namespace peeper{
 GLTexture::GLTexture(GLRenderer *renderer):
 	mRenderer(NULL),
 
+	mUsageFlags(UsageFlags_NONE),
 	mDimension(Dimension_UNKNOWN),
 	mFormat(0),
 	mWidth(0),
@@ -58,18 +59,19 @@ GLTexture::~GLTexture(){
 	}
 }
 
-bool GLTexture::create(Dimension dimension,int format,int width,int height,int depth){
+bool GLTexture::create(int usageFlags,Dimension dimension,int format,int width,int height,int depth){
 	destroy();
 
 	if((Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || Math::isPowerOf2(depth)==false) &&
 		mRenderer->getCapabilitySet().textureNonPowerOf2==false &&
-		(mRenderer->getCapabilitySet().textureNonPowerOf2==false || dimension!=Dimension_D2_RESTRICTED))
+		(mRenderer->getCapabilitySet().textureNonPowerOf2==false || (usageFlags&UsageFlags_NPOT_RESTRICTED)==0))
 	{
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"GLTexture: Cannot load a non power of 2 texture");
 		return false;
 	}
 
+	mUsageFlags=usageFlags;
 	mDimension=dimension;
 	mFormat=format;
 	mWidth=width;
@@ -225,6 +227,11 @@ GLuint GLTexture::getGLTarget(){
 			break;
 		#endif
 		case Texture::Dimension_D2:
+			#if !defined(TOADLET_HAS_GLES)
+				if((mUsageFlags&UsageFlags_NPOT_RESTRICTED)>0){
+					return GL_TEXTURE_RECTANGLE_ARB;
+				}
+			#endif
 			return GL_TEXTURE_2D;
 		break;
 		#if !defined(TOADLET_HAS_GLES)
@@ -233,9 +240,6 @@ GLuint GLTexture::getGLTarget(){
 			break;
 			case Texture::Dimension_CUBEMAP:
 				return GL_TEXTURE_CUBE_MAP;
-			break;
-			case Texture::Dimension_D2_RESTRICTED:
-				return GL_TEXTURE_RECTANGLE_ARB;
 			break;
 		#endif
 		default:
