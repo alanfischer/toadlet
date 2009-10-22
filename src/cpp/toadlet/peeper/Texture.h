@@ -41,9 +41,9 @@ public:
 
 	virtual ~Texture(){}
 
-	virtual Texture *getRootTexture() const=0; // Return the base texture in the texture decorator chain
+	virtual Texture *getRootTexture()=0; // Return the base texture in the texture decorator chain
 
-	virtual void create(Dimension dimension,int format,int width,int height,int depth)=0;
+	virtual bool create(Dimension dimension,int format,int width,int height,int depth)=0;
 	virtual void destroy()=0;
 
 	virtual Dimension getDimension() const=0;

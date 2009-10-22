@@ -22,7 +22,7 @@
  * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
  *
  ********** Copyright header - do not remove **********/
-
+/*
 #include "D3D9Renderer.h"
 #include "D3D9RenderTexturePeer.h"
 #include <toadlet/egg/Error.h>
@@ -143,4 +143,4 @@ void D3D9RenderTexturePeer::makeCurrent(IDirect3DDevice9 *device){
 
 }
 }
-
+*/

@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include "D3D9Renderer.h"
-#include "D3D9TexturePeer.h"
+#include "D3D9Texture.h"
 #include "D3D9RenderTexturePeer.h"
 #include "D3D9VertexBufferPeer.h"
 #include "D3D9IndexBufferPeer.h"
@@ -175,7 +175,9 @@ bool D3D9Renderer::reset(){
 	return true;
 }
 
-TexturePeer *D3D9Renderer::createTexturePeer(Texture *texture){
+Texture *D3D9Renderer::createTexture(){
+	return new D3D9Texture(this);
+/*
 	if(texture==NULL){
 		Error::nullPointer(Categories::TOADLET_PEEPER,
 			"Texture is NULL");
@@ -202,6 +204,7 @@ TexturePeer *D3D9Renderer::createTexturePeer(Texture *texture){
 	}
 
 	return NULL;
+*/
 }
 
 BufferPeer *D3D9Renderer::createBufferPeer(Buffer *buffer){
@@ -742,11 +745,11 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 	HRESULT result=S_OK;
 
 	if(textureStage!=NULL){
-		Texture *texture=textureStage->getTexture();
-		if(texture!=NULL && texture->internal_getTexturePeer()!=NULL){
-			D3D9TexturePeer *peer=(D3D9TexturePeer*)texture->internal_getTexturePeer();
+		Texture *texture=textureStage->getTexture()->getRootTexture();
+		if(texture!=NULL){
+			D3D9Texture *d3dtexture=(D3D9Texture*)texture;
 
-			result=mD3DDevice->SetTexture(stage,peer->baseTexture);
+			result=mD3DDevice->SetTexture(stage,d3dtexture->mTexture);
 			TOADLET_CHECK_D3D9ERROR(result,"SetTexture");
 		}
 		else{
@@ -802,15 +805,15 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 		}
 
 		if(textureStage->getAddressModeSpecified()){
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSU,D3D9TexturePeer::getD3DTADDRESS(textureStage->getSAddressMode()));
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSV,D3D9TexturePeer::getD3DTADDRESS(textureStage->getTAddressMode()));
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSW,D3D9TexturePeer::getD3DTADDRESS(textureStage->getRAddressMode()));
+			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSU,D3D9Texture::getD3DTADDRESS(textureStage->getSAddressMode()));
+			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSV,D3D9Texture::getD3DTADDRESS(textureStage->getTAddressMode()));
+			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSW,D3D9Texture::getD3DTADDRESS(textureStage->getRAddressMode()));
 		}
 
 		if(textureStage->getFilterSpecified()){
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_MINFILTER,D3D9TexturePeer::getD3DTEXF(textureStage->getMinFilter()));
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_MIPFILTER,D3D9TexturePeer::getD3DTEXF(textureStage->getMipFilter()));
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_MAGFILTER,D3D9TexturePeer::getD3DTEXF(textureStage->getMagFilter()));
+			mD3DDevice->SetSamplerState(stage,D3DSAMP_MINFILTER,D3D9Texture::getD3DTEXF(textureStage->getMinFilter()));
+			mD3DDevice->SetSamplerState(stage,D3DSAMP_MIPFILTER,D3D9Texture::getD3DTEXF(textureStage->getMipFilter()));
+			mD3DDevice->SetSamplerState(stage,D3DSAMP_MAGFILTER,D3D9Texture::getD3DTEXF(textureStage->getMagFilter()));
 		}
 	}
 	else{

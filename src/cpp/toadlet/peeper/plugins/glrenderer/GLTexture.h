@@ -41,9 +41,9 @@ public:
 
 	virtual ~GLTexture();
 
-	virtual Texture *getRootTexture() const{return this;}
+	virtual Texture *getRootTexture(){return this;}
 
-	virtual void create(Dimension dimension,int format,int width,int height,int depth);
+	virtual bool create(Dimension dimension,int format,int width,int height,int depth);
 	virtual void destroy();
 
 	virtual Dimension getDimension() const{return mDimension;}
