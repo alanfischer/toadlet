@@ -47,8 +47,9 @@ GLTexture::GLTexture(GLRenderer *renderer):
 	mHandle(0),
 	mTarget(0),
 	//mMatrix,
-	mAutoGenerateMipMaps(false),
-	mManuallyGenerateMipMaps(false)
+	mGenerateMipLevels(false),
+	mManuallyGenerateMipLevels(false)
+	//mSurfaces
 {
 	mRenderer=renderer;
 }
@@ -90,6 +91,7 @@ bool GLTexture::create(int usageFlags,Dimension dimension,int format,int width,i
 	glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 	glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
 
+	setNumMipMaps(mMipMaps.size());
 	setAutoGenerateMipMaps(mAutoGenerateMipMaps);
 
 	TOADLET_CHECK_GLERROR("GLTexture::GLTexture");
@@ -184,7 +186,27 @@ bool GLTexture::read(int format,int width,int height,int depth,uint8 *data){
 	#endif
 }
 
-void GLTexture::setAutoGenerateMipMaps(bool mipmaps){
+void GLTexture::setNumMipLevels(int numMipLevels){
+	if(numMipLevels==0){
+		int width=mWidth;
+		int height=mHeight;
+		while(width>0 && height>0){
+			numMipLevels++;
+			width/=2;
+			height/=2;
+		}
+	}
+
+	mMipLevels.resize(numMipLevels);
+	if(mHandle!=0){
+		for(i=0;i<numMipLevels;++i){
+			if(mMipLevels[i]==NULL){
+				mMipLevels[i]=GLTextureMipSurface::ptr(new GLTextureMipSurface(this,i));
+			}
+		}
+	}
+	
+	mGenerateMipLevels=generate;
 	if(mHandle!=0){
 		if(
 		#if defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_11)
@@ -193,8 +215,8 @@ void GLTexture::setAutoGenerateMipMaps(bool mipmaps){
 			mRenderer->gl_version>=14
 		#endif
 		){
-			glTexParameteri(mTarget,GL_GENERATE_MIPMAP,mAutoGenerateMipMaps);
-			mManuallyGenerateMipMaps=false;
+			glTexParameteri(mTarget,GL_GENERATE_MIPMAP,mGenerateMipLevels);
+			mManuallyGenerateMipLevels=false;
 		}
 	}
 }

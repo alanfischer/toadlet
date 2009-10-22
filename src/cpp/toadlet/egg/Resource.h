@@ -27,6 +27,7 @@
 #define TOADLET_EGG_RESOURCE_H
 
 #include <toadlet/egg/WeakPointer.h>
+#include <toadlet/egg/String.h>
 
 namespace toadlet{
 namespace egg{
@@ -36,6 +37,9 @@ public:
 	TOADLET_SHARED_POINTERS(Resource,Resource);
 
 	virtual ~Resource(){}
+
+	virtual void setName(const String &name)=0;
+	virtual const String &getName() const=0;
 };
 
 }

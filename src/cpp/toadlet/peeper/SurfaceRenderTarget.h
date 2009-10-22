@@ -22,49 +22,26 @@
  * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
  *
  ********** Copyright header - do not remove **********/
-/*
-#ifndef TOADLET_PEEPER_GLFBORENDERTEXTUREPEER_H
-#define TOADLET_PEEPER_GLFBORENDERTEXTUREPEER_H
 
-#include "GLRenderTargetPeer.h"
-#include "GLTexturePeer.h"
-#include <toadlet/peeper/RenderTexture.h>
+#ifndef TOADLET_PEEPER_SURFACERENDERTARGET_H
+#define TOADLET_PEEPER_SURFACERENDERTARGET_H
+
+#include <toadlet/peeper/RenderTarget.h>
 
 namespace toadlet{
 namespace peeper{
 
-class GLRenderer;
-
-class TOADLET_API GLFBORenderTexturePeer:public GLRenderTargetPeer,public GLTexturePeer{
+class SurfaceRenderTarget:public RenderTarget{
 public:
-	static bool available(GLRenderer *renderer);
+	TOADLET_SHARED_POINTER(SurfaceRenderTarget,RenderTarget);
 
-	GLFBORenderTexturePeer(GLRenderer *renderer,RenderTexture *texture);
-
-	virtual ~GLFBORenderTexturePeer();
-
-	TexturePeer *castToTexturePeer(){return this;}
-	RenderTargetPeer *castToRenderTargetPeer(){return this;}
-
-	void makeCurrent();
-
-	void swap();
-
-	int getWidth() const;
-	int getHeight() const;
-
-	bool isValid() const;
-
-	RenderTexture *renderTexture;
-	int width;
-	int height;
-	GLuint framebufferHandle;
-	GLuint depthRenderbufferHandle;
+	virtual ~SurfaceRenderTarget(){}
+	
+	virtual bool attach(Surface::ptr surface)=0;
+	virtual bool remove(Surface::ptr surface)=0;
 };
 
 }
 }
 
 #endif
-
-*/

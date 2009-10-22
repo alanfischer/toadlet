@@ -23,29 +23,27 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/peeper/RenderTarget.h>
+#ifndef TOADLET_PEEPER_SURFACE_H
+#define TOADLET_PEEPER_SURFACE_H
+
+#include <toadlet/peeper/Types.h>
 
 namespace toadlet{
 namespace peeper{
 
-RenderTarget::RenderTarget(){
-	mRenderTargetPeer=NULL;
-	mOwnsRenderTargetPeer=false;
-}
+class Surface{
+public:
+	TOADLET_SHARED_POINTER(Surface,Surface);
 
-RenderTarget::~RenderTarget(){
-	if(mOwnsRenderTargetPeer && mRenderTargetPeer!=NULL){
-		delete mRenderTargetPeer;
-	}
-}
+	virtual ~Surface(){}
 
-void RenderTarget::internal_setRenderTargetPeer(RenderTargetPeer *renderTargetPeer,bool own){
-	if(mOwnsRenderTargetPeer && mRenderTargetPeer!=NULL){
-		delete mRenderTargetPeer;
-	}
-	mRenderTargetPeer=renderTargetPeer;
-	mOwnsRenderTargetPeer=own;
-}
+	virtual Surface *getRootSurface()=0;
+
+	virtual int getWidth()=0;
+	virtual int getHeight()=0;
+};
 
 }
 }
+
+#endif

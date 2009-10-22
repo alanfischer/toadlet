@@ -27,45 +27,21 @@
 #define TOADLET_PEEPER_RENDERTARGET_H
 
 #include <toadlet/peeper/Types.h>
-#include <toadlet/egg/SharedPointer.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TexturePeer;
-
-class RenderTargetPeer{
+class RenderTarget{
 public:
-	virtual ~RenderTargetPeer(){}
+	TOADLET_SHARED_POINTER(RenderTarget,RenderTarget);
 
-	virtual TexturePeer *castToTexturePeer(){return NULL;}
+	virtual ~RenderTarget(){}
 
-	virtual bool isValid() const=0;
+	virtual RenderTarget *getRootRenderTarget()=0;
 
+	virtual bool isPrimary() const=0;
 	virtual int getWidth() const=0;
 	virtual int getHeight() const=0;
-};
-
-class Texture;
-
-class TOADLET_API RenderTarget{
-public:
-	RenderTarget();
-
-	virtual ~RenderTarget();
-
-	virtual Texture *castToTexture(){return NULL;}
-
-	virtual int getWidth() const{return mRenderTargetPeer!=NULL?mRenderTargetPeer->getWidth():0;}
-	virtual int getHeight() const{return mRenderTargetPeer!=NULL?mRenderTargetPeer->getHeight():0;}
-
-	virtual void internal_setRenderTargetPeer(RenderTargetPeer *renderTargetPeer,bool own);
-	inline RenderTargetPeer *internal_getRenderTargetPeer() const{return mRenderTargetPeer;}
-	inline bool internal_ownsRenderTargetPeer() const{return mOwnsRenderTargetPeer;}
-
-protected:
-	RenderTargetPeer *mRenderTargetPeer;
-	bool mOwnsRenderTargetPeer;
 };
 
 }

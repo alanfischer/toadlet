@@ -29,6 +29,7 @@
 #include <toadlet/Types.h>
 #include <toadlet/egg/mathfixed/Math.h>
 #include <toadlet/egg/math/Math.h>
+#include <toadlet/egg/SharedPointer.h>
 
 namespace toadlet{
 namespace peeper{

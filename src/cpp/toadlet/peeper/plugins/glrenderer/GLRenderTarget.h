@@ -23,22 +23,24 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "GLRenderTargetPeer.h"
+#ifndef TOADLET_PEEPER_GLRENDERTARGET_H
+#define TOADLET_PEEPER_GLRENDERTARGET_H
+
+#include "GLIncludes.h"
+#include <toadlet/peeper/RenderTarget.h>
 
 namespace toadlet{
 namespace peeper{
 
-GLRenderTargetPeer::GLRenderTargetPeer():RenderTargetPeer(),
-	initialized(false)
-{
-}
+class GLRenderTarget:public RenderTarget{
+public:
+	virtual ~GLRenderTarget(){}
 
-GLRenderTargetPeer::~GLRenderTargetPeer(){
-}
-	
-bool GLRenderTargetPeer::getAntialiased() const{
-	return false;
-}
+	virtual void current()=0;
+	virtual void swap()=0;
+};
 
 }
 }
+
+#endif
