@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_GLTEXTURE_H
 
 #include "GLIncludes.h"
+#include "GLTextureMipSurface.h"
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/peeper/TextureBlend.h>
 
@@ -53,17 +54,17 @@ public:
 	virtual int getHeight() const{return mHeight;}
 	virtual int getDepth() const{return mDepth;}
 
+	virtual void setNumMipLevels(int mipLevels,bool generate);
+	virtual Surface::ptr getMipSuface(int i) const{return mMipLevels[i];}
+	virtual bool getGenerateMipLevels() const{return mGenerateMipLevels;}
 	virtual void load(int format,int width,int height,int depth,uint8 *data);
 	virtual bool read(int format,int width,int height,int depth,uint8 *data);
-
-	virtual void setAutoGenerateMipMaps(bool mipmaps);
-	virtual bool getAutoGenerateMipMaps() const{return mAutoGenerateMipMaps;}
 
 	virtual void setName(const egg::String &name){mName=name;}
 	virtual const egg::String &getName() const{return mName;}
 
 protected:
-	void generateMipMaps();
+	void generateMipLevels();
 	GLuint getGLTarget();
 
 	static GLuint getGLFormat(int textureFormat);
@@ -87,8 +88,9 @@ protected:
 	GLuint mHandle;
 	GLenum mTarget;
 	Matrix4x4 mMatrix;
-	bool mAutoGenerateMipMaps;
-	bool mManuallyGenerateMipMaps;
+	bool mGenerateMipLevels;
+	bool mManuallyGenerateMipLevels;
+	egg::Collection<GLTextureMipSurface::ptr> mMipLevels;
 
 	friend GLRenderer;
 };

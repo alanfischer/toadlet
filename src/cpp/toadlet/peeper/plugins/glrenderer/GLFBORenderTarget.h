@@ -23,31 +23,48 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_GLRENDERTARGET_H
-#define TOADLET_PEEPER_GLRENDERTARGET_H
+#ifndef TOADLET_PEEPER_GLFBOSURFACERENDERTARGET_H
+#define TOADLET_PEEPER_GLFBOSURFACERENDERTARGET_H
 
-#include "GLIncludes.h"
-#include <toadlet/peeper/RenderTarget.h>
+#include "GLRenderTarget.h"
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API GLRenderTargetPeer:public RenderTargetPeer{
+class GLRenderer;
+
+class TOADLET_API GLFBOSurfaceRenderTarget:public GLRenderTarget,public SurfaceRenderTarget{
 public:
-	GLRenderTargetPeer();
+	static bool available(GLRenderer *renderer);
 
-	virtual ~GLRenderTargetPeer();
+	GLFBOSurfaceRenderTarget(GLRenderer *renderer);
+	virtual ~GLFBORenderTexturePeer();
 
-	virtual void makeCurrent()=0;
+	virtual RenderTarget *getRootRenderTarget(){return this;}
 
-	virtual bool getAntialiased() const;
+	virtual void create();
+	virtual void destroy();
 
-	virtual void swap()=0;
+	virtual bool current();
+	virtual bool swap();
 
-	bool initialized;
+	virtual bool attach(Surface::ptr surface);
+	virtual bool remove(Surface::ptr surface);
+	
+	virtual bool isPrimary() const{return false;}
+	virtual int getWidth() const{return mWidth;}
+	virtual int getHeight() const{return mHeight;}
+	
+protected:
+	int mWidth;
+	int mHeight;
+	GLuint mFramebufferHandle;
+	egg::Collection<Surface::ptr> mSurfaces;
 };
 
 }
 }
 
 #endif
+
+*/
