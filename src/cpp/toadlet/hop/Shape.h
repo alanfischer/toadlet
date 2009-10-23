@@ -79,6 +79,8 @@ protected:
 	ConvexSolid mConvexSolid;
 	Solid *mSolid;
 
+	Vector3 cache_getBound_r;
+	
 	friend class Solid;
 	friend class Simulator;
 };
