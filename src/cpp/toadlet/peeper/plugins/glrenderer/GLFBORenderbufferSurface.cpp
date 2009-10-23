@@ -24,15 +24,15 @@
  ********** Copyright header - do not remove **********/
 
 #include "GLFBORenderbufferSurface.h"
-#include "GLFBORenderTarget.h"
+#include "GLFBOSurfaceRenderTarget.h"
 #include "GLTexture.h"
 
 namespace toadlet{
 namespace peeper{
 
-GLFBORenderbufferSurface::GLFBORenderbufferSurface(GLFBORenderTarget *target):GLSurface(),
+GLFBORenderbufferSurface::GLFBORenderbufferSurface(GLFBOSurfaceRenderTarget *target):GLSurface(),
 	mTarget(NULL),
-	mHandle(0)
+	mHandle(0),
 	mFormat(0),
 	mWidth(0),
 	mHeight(0)

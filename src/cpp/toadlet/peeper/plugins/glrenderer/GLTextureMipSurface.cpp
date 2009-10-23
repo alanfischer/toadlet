@@ -28,11 +28,11 @@
 namespace toadlet{
 namespace peeper{
 
-GLTextureMipSurface::GLTextureMipSurface(GLTexture *texture,int level,int width,int height):GLSurface(),
+GLTextureMipSurface::GLTextureMipSurface(GLTexture *texture,GLuint level,int width,int height):GLSurface(),
 	mTexture(NULL),
-	mLevel(0)
+	mLevel(0),
 	mWidth(0),
-	mHeight(0),
+	mHeight(0)
 {
 	mTexture=texture;
 	mLevel=level;
@@ -40,7 +40,7 @@ GLTextureMipSurface::GLTextureMipSurface(GLTexture *texture,int level,int width,
 	mHeight=height;
 }
 
-void GLTextureMipSurfaces::resize(int level,int width,int height){
+void GLTextureMipSurface::resize(GLuint level,int width,int height){
 	mLevel=level;
 	mWidth=width;
 	mHeight=height;
@@ -48,5 +48,3 @@ void GLTextureMipSurfaces::resize(int level,int width,int height){
 
 }
 }
-
-#endif

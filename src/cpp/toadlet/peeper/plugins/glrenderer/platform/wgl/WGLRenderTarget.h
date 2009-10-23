@@ -23,38 +23,31 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_WGLWINDOWRENDERCONTEXTPEER_H
-#define TOADLET_PEEPER_WGLWINDOWRENDERCONTEXTPEER_H
+#ifndef TOADLET_PEEPER_WGLRENDERTARGET_H
+#define TOADLET_PEEPER_WGLRENDERTARGET_H
 
-#include "WGLRenderTargetPeer.h"
-#include <toadlet/peeper/Visual.h>
+#include "../../GLIncludes.h"
+#include "../../GLRenderTarget.h"
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API WGLWindowRenderContextPeer:public WGLRenderTargetPeer{
+class TOADLET_API WGLRenderTarget:public GLRenderTarget{
 public:
-	WGLWindowRenderContextPeer();
-	WGLWindowRenderContextPeer(HWND wnd,const Visual &visual,int pixelFormat=0);
-	virtual ~WGLWindowRenderContextPeer();
+	WGLRenderTarget();
+	virtual ~WGLRenderTarget(){}
 
-	virtual bool createContext(HWND wnd,const Visual &visual,int pixelFormat=0);
+	bool current();
 
-	virtual bool destroyContext();
+	inline HGLRC getGLRC() const{return mGLRC;}
+	inline HDC getDC() const{return mDC;}
 
-	virtual int getWidth() const;
-
-	virtual int getHeight() const;
-
-	virtual void swap();
-
-	inline bool isValid() const{return mGLRC!=0;}
+	// We can't use GLEW for this, since calls to this are done before the context is initialized
+	static bool wglIsExtensionSupported(const char *extension);
 
 protected:
-	int checkDefaultColorBits(int colorBits) const;
-
-	HWND mWnd;
-	PIXELFORMATDESCRIPTOR mPFD;
+	HGLRC mGLRC;
+	HDC mDC;
 };
 
 }

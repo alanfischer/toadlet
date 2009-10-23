@@ -127,7 +127,7 @@ bool GLTexture::create(int usageFlags,Dimension dimension,int format,int width,i
 		#endif
 	}
 
-	setNumMipLevels(mMipLevels.size(),mGenerateMipMaps);
+	setNumMipLevels(mMipLevels.size(),mGenerateMipLevels);
 
 	TOADLET_CHECK_GLERROR("GLTexture::create");
 
@@ -157,30 +157,30 @@ void GLTexture::load(int format,int width,int height,int depth,uint8 *data){
 	switch(mTarget){
 		#if !defined(TOADLET_HAS_GLES)
 			case GL_TEXTURE_1D:
-				glTexSubImage1D(mTarget,0,0,0,width,0,glformat,gltype,data);
+				glTexSubImage1D(mTarget,0,0,width,glformat,gltype,data);
 			break;
 		#endif
 		case GL_TEXTURE_2D:
-			glTexSubImage2D(mTarget,0,0,0,width,height,0,glformat,gltype,data);
+			glTexSubImage2D(mTarget,0,0,0,width,height,glformat,gltype,data);
 		break;
 		#if !defined(TOADLET_HAS_GLES)
 			case GL_TEXTURE_3D:
-				glTexSubImage3D(mTarget,0,0,0,width,height,depth,0,glformat,gltype,data);
+				glTexSubImage3D(mTarget,0,0,0,0,width,height,depth,glformat,gltype,data);
 			break;
 			case GL_TEXTURE_CUBE_MAP:
 				for(int i=0;i<6;++i){
-					glTexSubImage2D(GLCubeFaces[i],0,0,0,width,height,0,glformat,gltype,
+					glTexSubImage2D(GLCubeFaces[i],0,0,0,width,height,glformat,gltype,
 						data+(width*height*ImageFormatConversion::getPixelSize(format)*i));
 				}
 			break;
 			case GL_TEXTURE_RECTANGLE_ARB:
-				glTexSubImage2D(mTarget,0,0,0,width,height,0,glformat,gltype,data);
+				glTexSubImage2D(mTarget,0,0,0,width,height,glformat,gltype,data);
 			break;
 		#endif
 	}
 
-	if(mManuallyGenerateMipMaps){
-		generateMipMaps();
+	if(mGenerateMipLevels){
+		generateMipLevels();
 	}
 }
 
@@ -214,6 +214,7 @@ void GLTexture::setNumMipLevels(int numMipLevels,bool generate){
 	if(mHandle!=0){
 		int width=mWidth;
 		int height=mHeight;
+		int i;
 		for(i=0;i<numMipLevels;++i){
 			if(mMipLevels[i]==NULL){
 				mMipLevels[i]=GLTextureMipSurface::ptr(new GLTextureMipSurface(this,i,width,height));
@@ -241,7 +242,7 @@ void GLTexture::setNumMipLevels(int numMipLevels,bool generate){
 	}
 }
 
-void GLTexture::generateMipMaps(){
+void GLTexture::generateMipLevels(){
 	#if defined(TOADLET_HAS_GLEW) && defined(GL_EXT_framebuffer_object)
 	if(GLEW_EXT_framebuffer_object){
 		// Set some items to make ATI cards happier
@@ -454,6 +455,15 @@ GLuint GLTexture::getGLTextureBlendSource(TextureBlend::Source blend){
 			return 0;
 	}
 }
+
+GLuint GLTexture::GLCubeFaces[6]={
+	GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+	GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+	GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+	GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+	GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+	GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+};
 
 }
 }

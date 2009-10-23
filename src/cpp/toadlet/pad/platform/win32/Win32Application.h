@@ -111,7 +111,7 @@ public:
 protected:
 	bool createWindow();
 	void destroyWindow();
-	peeper::RenderTargetPeer *makeRenderTargetPeer(int plugin);
+	peeper::RenderTarget *makeRenderTarget(int plugin);
 	peeper::Renderer *makeRenderer(int plugin);
 	bool createContextAndRenderer(int plugin);
 	bool destroyRendererAndContext();

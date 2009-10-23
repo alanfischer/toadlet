@@ -31,11 +31,14 @@
 namespace toadlet{
 namespace peeper{
 
-class GLFBORenderTarget;
+class GLFBOSurfaceRenderTarget;
 
 class GLFBORenderbufferSurface:public GLSurface{
+public:
+	TOADLET_SHARED_POINTERS(GLFBORenderbufferSurface,GLSurface);
+
 protected:
-	GLFBORenderbufferSurface(GLFBORenderTarget *target);
+	GLFBORenderbufferSurface(GLFBOSurfaceRenderTarget *target);
 
 	virtual bool create(int format,int width,int height);
 	virtual bool destroy();
@@ -47,15 +50,18 @@ public:
 	virtual GLTextureMipSurface *castToGLTextureMipSurface(){return NULL;}
 	virtual GLFBORenderbufferSurface *castToGLFBORenderbufferSurface(){return this;}
 
-	virtual int getWidth(){return mWidth;}
-	virtual int getHeight(){return mHeight;}
+	virtual int getWidth() const{return mWidth;}
+	virtual int getHeight() const{return mHeight;}
+	inline GLuint getHandle() const{return mHandle;}
 
 protected:
-	GLFBORenderTarget *mTarget;
+	GLFBOSurfaceRenderTarget *mTarget;
 	GLuint mHandle;
 	int mFormat;
 	int mWidth;
 	int mHeight;
+
+	friend GLFBOSurfaceRenderTarget;
 };
 
 }
