@@ -143,7 +143,7 @@ public final class Shape{
 
 	public Capsule getCapsule(){return mCapsule;}
 
-	public ConvexSolid setConvexSolid(ConvexSolid convexSolid){
+	public void setConvexSolid(ConvexSolid convexSolid){
 		mAABox=null;
 		mSphere=null;
 		mCapsule=null;
@@ -217,7 +217,7 @@ public final class Shape{
 			break;
 			case CONVEXSOLID:
 			{
-				Vector3 r;
+				Vector3 r=new Vector3();
 				int i,j,k;
 				scalar epsilon;
 				#if defined(TOADLET_FIXED_POINT)
@@ -226,9 +226,9 @@ public final class Shape{
 					epsilon=0.0001f;
 				#endif
 				box.reset();
-				for(i=0;i<mConvexSolid.planes.size()-2;++i){
-					for(j=i+1;j<mConvexSolid.planes.size()-2;++j){
-						for(k=j+1;k<mConvexSolid.planes.size()-2;++k){
+				for(i=0;i<mConvexSolid.numPlanes-2;++i){
+					for(j=i+1;j<mConvexSolid.numPlanes-2;++j){
+						for(k=j+1;k<mConvexSolid.numPlanes-2;++k){
 							if(Math.getIntersectionOfThreePlanes(r,mConvexSolid.planes[i],mConvexSolid.planes[j],mConvexSolid.planes[k],epsilon)){
 								if(i==0 && j==1 && k==2){
 									box.mins.x=r.x;
@@ -272,5 +272,6 @@ public final class Shape{
 	AABox mAABox;
 	Sphere mSphere;
 	Capsule mCapsule;
+	ConvexSolid mConvexSolid;
 	Solid mSolid=null;
 }
