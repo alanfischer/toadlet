@@ -217,7 +217,7 @@ public final class Shape{
 			break;
 			case CONVEXSOLID:
 			{
-				Vector3 r=new Vector3();
+				Vector3 r=cache_getBound_r;
 				int i,j,k;
 				scalar epsilon;
 				#if defined(TOADLET_FIXED_POINT)
@@ -274,4 +274,6 @@ public final class Shape{
 	Capsule mCapsule;
 	ConvexSolid mConvexSolid;
 	Solid mSolid=null;
+	
+	Vector3 cache_getBound_r=new Vector3();
 }
