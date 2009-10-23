@@ -36,8 +36,11 @@ class GLTexture;
 class GLRenderer;
 
 class TOADLET_API GLTextureMipSurface:public GLSurface{
+public:
+	TOADLET_SHARED_POINTERS(GLTextureMipSurface,Surface);
+
 protected:
-	GLTextureMipSurface(GLTexture *texture,GLuint level);
+	GLTextureMipSurface(GLTexture *texture,GLuint level,int width,int height);
 
 public:
 	virtual ~GLTextureMipSurface();

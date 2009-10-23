@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_GLFBOSURFACERENDERTARGET_H
 
 #include "GLRenderTarget.h"
+#include "GLFBORenderbufferSurface.h"
 #include <toadlet/peeper/SurfaceRenderTarget.h>
 
 namespace toadlet{
@@ -41,10 +42,10 @@ public:
 	GLFBOSurfaceRenderTarget(GLRenderer *renderer);
 	virtual ~GLFBOSurfaceRenderTarget();
 
-	virtual RenderTarget *getRootRenderTarget(){return this;}
+	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
-	virtual void create();
-	virtual void destroy();
+	virtual bool create();
+	virtual bool destroy();
 
 	virtual bool current();
 	virtual bool swap();
@@ -58,19 +59,19 @@ public:
 	virtual int getHeight() const{return mHeight;}
 
 protected:
-	const char *getFBOMessage(GLenum status);
+	static GLenum getGLAttachment(Attachment attachment);
+	static const char *getFBOMessage(GLenum status);
 
 	GLRenderer *mRenderer;
 	int mWidth;
 	int mHeight;
-	GLuint mFramebufferHandle;
+	GLuint mHandle;
 	egg::Collection<Surface::ptr> mSurfaces;
-	egg::Collection<Surface::ptr> mOwnedSurfaces;
+	egg::Collection<Attachment> mSurfaceAttachments;
+	egg::Collection<GLFBORenderbufferSurface::ptr> mOwnedSurfaces;
 };
 
 }
 }
 
 #endif
-
-*/

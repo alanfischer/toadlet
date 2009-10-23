@@ -64,19 +64,19 @@ using namespace toadlet::tadpole;
 	#pragma comment(lib,"toadlet_peeper_glrenderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_GLRenderer();
 	#if defined(TOADLET_PLATFORM_WINCE)
-		extern "C" RenderTargetPeer *new_EGLRenderContextPeer(void *nativeSurface,const Visual &visual);
+		extern "C" RenderTarget *new_EGLRenderTarget(void *nativeSurface,const Visual &visual);
 	#else
-		extern "C" RenderTargetPeer *new_WGLWindowRenderContextPeer(HWND wnd,const Visual &visual);
+		extern "C" RenderTarget *new_WGLWindowRenderTarget(HWND wnd,const Visual &visual);
 	#endif
 #endif
 #if defined(TOADLET_HAS_DIRECT3DMOBILE)
 	#pragma comment(lib,"toadlet_peeper_d3dmrenderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_D3DMRenderer();
-	extern "C" RenderTargetPeer *new_D3DMWindowRenderContextPeer(HWND wnd,const Visual &visual);
+	extern "C" RenderTarget *new_D3DMWindowRenderTarget(HWND wnd,const Visual &visual);
 #elif defined(TOADLET_HAS_DIRECT3D9)
 	#pragma comment(lib,"toadlet_peeper_d3d9renderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_D3D9Renderer();
-	extern "C" RenderTargetPeer *new_D3D9WindowRenderContextPeer(HWND wnd,const Visual &visual);
+	extern "C" RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,const Visual &visual);
 #endif
 #if defined(TOADLET_PLATFORM_WIN32)
 	#pragma comment(lib,"toadlet_ribbit_win32player" TOADLET_LIBRARY_EXTENSION)
@@ -586,29 +586,29 @@ void Win32Application::setIcon(void *icon){
 void *Win32Application::getHINSTANCE() const{return win32->mInstance;}
 void *Win32Application::getHWND() const{return win32->mWnd;}
 
-RenderTargetPeer *Win32Application::makeRenderTargetPeer(int rendererPlugin){
-	RenderTargetPeer *peer=NULL;
+RenderTarget *Win32Application::makeRenderTarget(int rendererPlugin){
+	RenderTarget *target=NULL;
 	if(rendererPlugin==RendererPlugin_OPENGL){
 		#if defined(TOADLET_HAS_OPENGL)
 			#if defined(TOADLET_PLATFORM_WINCE)
-				peer=new_EGLRenderContextPeer(win32->mWnd,mVisual);
+				target=new_EGLRenderTarget(win32->mWnd,mVisual);
 			#else
-				peer=new_WGLWindowRenderContextPeer(win32->mWnd,mVisual);
+				target=new_WGLWindowRenderTarget(win32->mWnd,mVisual);
 			#endif
 		#endif
 	}
 	else if(rendererPlugin==RendererPlugin_DIRECT3D){
 		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-			peer=new_D3DMWindowRenderContextPeer(win32->mWnd,mVisual);
+			target=new_D3DMWindowRenderTarget(win32->mWnd,mVisual);
 		#elif defined(TOADLET_HAS_DIRECT3D9)
-			peer=new_D3D9WindowRenderContextPeer(win32->mWnd,mVisual);
+			target=new_D3D9WindowRenderTarget(win32->mWnd,mVisual);
 		#endif
 	}
-	if(peer!=NULL && peer->isValid()==false){
-		delete peer;
-		peer=NULL;
+	if(target!=NULL && target->isValid()==false){
+		delete target;
+		target=NULL;
 	}
-	return peer;
+	return target;
 }
 
 Renderer *Win32Application::makeRenderer(int plugin){
@@ -636,9 +636,9 @@ bool Win32Application::createContextAndRenderer(int plugin){
 	Logger::log(Categories::TOADLET_PAD,Logger::Level_DEBUG,
 		"Win32Application: creating context and renderer");
 
-	RenderTargetPeer *renderTargetPeer=makeRenderTargetPeer(plugin);
-	if(renderTargetPeer!=NULL){
-		internal_setRenderTargetPeer(renderTargetPeer,true);
+	RenderTarget *renderTarget=makeRenderTarget(plugin);
+	if(renderTarget!=NULL){
+		internal_setRenderTarget(renderTargetPeer,true);
 
 		mRenderer=makeRenderer(plugin);
 		if(mRenderer!=NULL){

@@ -24,11 +24,11 @@
  ********** Copyright header - do not remove **********/
 
 #include "GLFBOSurfaceRenderTarget.h"
+#include "GLTexture.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 
 using namespace toadlet::egg;
-using namespace toadlet::egg::image;
 
 namespace toadlet{
 namespace peeper{
@@ -64,11 +64,13 @@ bool GLFBOSurfaceRenderTarget::create(){
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 
 	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::create");
+
+	return true;
 }
 
-void GLFBOSurfaceRenderTarget::destroy(){
+bool GLFBOSurfaceRenderTarget::destroy(){
 	int i;
-	for(i=0;i<mOwnedSurfaces;++i){
+	for(i=0;i<mOwnedSurfaces.size();++i){
 		mOwnedSurfaces[i]->destroy();
 	}
 	mOwnedSurfaces.clear();
@@ -79,6 +81,8 @@ void GLFBOSurfaceRenderTarget::destroy(){
 
 		TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::destroy");
 	}
+
+	return true;
 }
 
 bool GLFBOSurfaceRenderTarget::current(){
@@ -106,9 +110,10 @@ bool GLFBOSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	if(textureSurface!=NULL){
 		GLuint handle=textureSurface->getTexture()->getHandle();
+		GLenum target=textureSurface->getTexture()->getTarget();
 		GLuint level=textureSurface->getLevel();
 	
-		glFramebufferTexture2D(GL_FRAMEBUFFER,getGLAttachment(attachment),handle,level);
+		glFramebufferTexture2D(GL_FRAMEBUFFER,getGLAttachment(attachment),target,handle,level);
 		// TODO: Figure out EXACTLY when we need these and when we dont, I think we just need them if its ONLY a SHADOWMAP
 //		#if !defined(TOADLET_HAS_GLES)
 //			glDrawBuffer(GL_NONE);
@@ -123,8 +128,7 @@ bool GLFBOSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment
 	
 	GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if(status!=GL_FRAMEBUFFER_COMPLETE){
-		Logger::log(Categories::TOADLET_PEEPER,Logger::LEVEL_WARNING,
-			getGLFBOMessage(status);
+		Logger::log(Categories::TOADLET_PEEPER,Logger::Level_WARNING,getFBOMessage(status));
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 
@@ -154,7 +158,7 @@ bool GLFBOSurfaceRenderTarget::remove(Surface::ptr surface){
 
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	if(textureSurface!=NULL){
-		glFramebufferTexture2D(GL_FRAMEBUFFER,getGLAttachment(attachment),0,0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER,getGLAttachment(attachment),0,0,0);
 	}
 	else if(renderbufferSurface!=NULL){
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER,getGLAttachment(attachment),GL_RENDERBUFFER,0);
@@ -162,12 +166,30 @@ bool GLFBOSurfaceRenderTarget::remove(Surface::ptr surface){
 
 	GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if(status!=GL_FRAMEBUFFER_COMPLETE){
-		Logger::log(Categories::TOADLET_PEEPER,Logger::LEVEL_WARNING,
-			getGLFBOMessage(status);
+		Logger::log(Categories::TOADLET_PEEPER,Logger::Level_WARNING,getFBOMessage(status));
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 
 	return true;
+}
+
+GLenum GLFBOSurfaceRenderTarget::getGLAttachment(Attachment attachment){
+	switch(attachment){
+		case Attachment_DEPTH_STENCIL:
+			return GL_DEPTH_ATTACHMENT_EXT;
+		case Attachment_COLOR_0:
+			return GL_COLOR_ATTACHMENT0_EXT;
+		case Attachment_COLOR_1:
+			return GL_COLOR_ATTACHMENT1_EXT;
+		case Attachment_COLOR_2:
+			return GL_COLOR_ATTACHMENT2_EXT;
+		case Attachment_COLOR_3:
+			return GL_COLOR_ATTACHMENT3_EXT;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"GLFBOSurfaceRenderTarget::getGLAttachment: Invalid attachment");
+			return 0;
+	};
 }
 
 const char *GLFBOSurfaceRenderTarget::getFBOMessage(GLenum status){

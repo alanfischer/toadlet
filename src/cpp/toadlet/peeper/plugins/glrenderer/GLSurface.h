@@ -37,6 +37,8 @@ class GLFBORenderbufferSurface;
 
 class GLSurface:public Surface{
 public:
+	TOADLET_SHARED_POINTERS(GLSurface,Surface);
+
 	virtual ~GLSurface(){}
 
 	virtual GLTextureMipSurface *castToGLTextureMipSurface()=0;

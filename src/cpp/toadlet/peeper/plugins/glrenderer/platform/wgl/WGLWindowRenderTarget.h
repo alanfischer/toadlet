@@ -23,19 +23,41 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_RENDERCONTEXT_H
-#define TOADLET_PEEPER_RENDERCONTEXT_H
+#ifndef TOADLET_PEEPER_WGLWINDOWRENDERTARGET_H
+#define TOADLET_PEEPER_WGLWINDOWRENDERTARGET_H
 
-#include <toadlet/peeper/RenderTarget.h>
+#include "WGLRenderTarget.h"
+#include <toadlet/peeper/Visual.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API RenderContext:public RenderTarget{
+class TOADLET_API WGLWindowRenderTarget:public WGLRenderTarget{
 public:
-	RenderContext():RenderTarget(){}
+	WGLWindowRenderTarget();
+	WGLWindowRenderTarget(HWND wnd,const Visual &visual,int pixelFormat=0);
+	virtual ~WGLWindowRenderTarget();
 
-	virtual ~RenderContext(){}
+	virtual bool isPrimary() const{return true;}
+	virtual RenderTarget *getRootRenderTarget(){return this;}
+
+	virtual bool createContext(HWND wnd,const Visual &visual,int pixelFormat=0);
+
+	virtual bool destroyContext();
+
+	virtual int getWidth() const;
+
+	virtual int getHeight() const;
+
+	virtual bool swap();
+
+	inline bool isValid() const{return mGLRC!=0;}
+
+protected:
+	int checkDefaultColorBits(int colorBits) const;
+
+	HWND mWnd;
+	PIXELFORMATDESCRIPTOR mPFD;
 };
 
 }

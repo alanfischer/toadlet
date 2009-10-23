@@ -23,8 +23,9 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "WGLWindowRenderContextPeer.h"
+#include "WGLWindowRenderTarget.h"
 #include <toadlet/egg/image/ImageFormatConversion.h>
+#include <toadlet/egg/Error.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::image;
@@ -32,17 +33,16 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTargetPeer *new_WGLWindowRenderContextPeer(HWND wnd,const Visual &visual){
-	return new WGLWindowRenderContextPeer(wnd,visual,0);
+TOADLET_C_API RenderTarget *new_WGLWindowRenderTarget(HWND wnd,const Visual &visual){
+	return new WGLWindowRenderTarget(wnd,visual,0);
 }
 
-WGLWindowRenderContextPeer::WGLWindowRenderContextPeer():WGLRenderTargetPeer(),
+WGLWindowRenderTarget::WGLWindowRenderTarget():WGLRenderTarget(),
 	mWnd(NULL)
 	//mPFD
-{
-}
+{}
 
-WGLWindowRenderContextPeer::WGLWindowRenderContextPeer(HWND wnd,const Visual &visual,int pixelFormat):WGLRenderTargetPeer(),
+WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,const Visual &visual,int pixelFormat):WGLRenderTarget(),
 	mWnd(wnd)
 	//mPFD
 {
@@ -87,11 +87,11 @@ WGLWindowRenderContextPeer::WGLWindowRenderContextPeer(HWND wnd,const Visual &vi
 	createContext(wnd,visual,pixelFormat);
 }
 
-WGLWindowRenderContextPeer::~WGLWindowRenderContextPeer(){
+WGLWindowRenderTarget::~WGLWindowRenderTarget(){
 	destroyContext();
 }
 
-bool WGLWindowRenderContextPeer::createContext(HWND wnd,const Visual &visual,int pixelFormat){
+bool WGLWindowRenderTarget::createContext(HWND wnd,const Visual &visual,int pixelFormat){
 	BOOL result=0;
 
 	mDC=GetDC(mWnd);
@@ -169,7 +169,7 @@ bool WGLWindowRenderContextPeer::createContext(HWND wnd,const Visual &visual,int
 	return true;
 }
 
-bool WGLWindowRenderContextPeer::destroyContext(){
+bool WGLWindowRenderTarget::destroyContext(){
 	if(mGLRC!=0){
 		wglMakeCurrent(NULL,NULL);
 		wglDeleteContext(mGLRC);
@@ -189,23 +189,23 @@ bool WGLWindowRenderContextPeer::destroyContext(){
 	return true;
 }
 
-int WGLWindowRenderContextPeer::getWidth() const{
+int WGLWindowRenderTarget::getWidth() const{
 	RECT rect;
 	GetClientRect(mWnd,&rect);
 	return rect.right-rect.left;
 }
 
-int WGLWindowRenderContextPeer::getHeight() const{
+int WGLWindowRenderTarget::getHeight() const{
 	RECT rect;
 	GetClientRect(mWnd,&rect);
 	return rect.bottom-rect.top;
 }
 
-void WGLWindowRenderContextPeer::swap(){
-	SwapBuffers(mDC);
+bool WGLWindowRenderTarget::swap(){
+	return SwapBuffers(mDC)==TRUE;
 }
 
-int WGLWindowRenderContextPeer::checkDefaultColorBits(int colorBits) const{
+int WGLWindowRenderTarget::checkDefaultColorBits(int colorBits) const{
 	if(colorBits==0){
 		colorBits=24;
 	}

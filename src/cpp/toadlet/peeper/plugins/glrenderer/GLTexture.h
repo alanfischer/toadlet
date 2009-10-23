@@ -29,7 +29,7 @@
 #include "GLIncludes.h"
 #include "GLTextureMipSurface.h"
 #include <toadlet/peeper/Texture.h>
-#include <toadlet/peeper/TextureBlend.h>
+#include <toadlet/peeper/TextureStage.h>
 
 namespace toadlet{
 namespace peeper{
@@ -64,10 +64,6 @@ public:
 
 	inline GLuint getHandle() const{return mHandle;}
 	inline GLenum getTarget() const{return mTarget;}
-	
-protected:
-	void generateMipLevels();
-	GLuint getGLTarget();
 
 	static GLuint getGLFormat(int textureFormat);
 	static GLuint getGLType(int textureFormat);
@@ -75,14 +71,11 @@ protected:
 	static GLuint getGLMinFilter(TextureStage::Filter minFilter,TextureStage::Filter mipFilter);
 	static GLuint getGLMagFilter(TextureStage::Filter magFilter);
 	static GLuint getGLTextureBlendSource(TextureBlend::Source blend);
-	static GLuint GLCubeFaces[6]={
-		GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-		GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-		GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
-	};
+	static GLuint GLCubeFaces[6];
+
+protected:
+	void generateMipLevels();
+	GLuint getGLTarget();
 
 	GLRenderer *mRenderer;
 

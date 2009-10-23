@@ -27,13 +27,14 @@
 #define TOADLET_PEEPER_SURFACERENDERTARGET_H
 
 #include <toadlet/peeper/RenderTarget.h>
+#include <toadlet/peeper/Surface.h>
 
 namespace toadlet{
 namespace peeper{
 
 class SurfaceRenderTarget:public RenderTarget{
 public:
-	TOADLET_SHARED_POINTER(SurfaceRenderTarget,RenderTarget);
+	TOADLET_SHARED_POINTERS(SurfaceRenderTarget,RenderTarget);
 
 	enum Attachment{
 		Attachment_DEPTH_STENCIL,
@@ -45,8 +46,8 @@ public:
 
 	virtual ~SurfaceRenderTarget(){}
 
-	virtual bool create();
-	virtual bool destroy();
+	virtual bool create()=0;
+	virtual bool destroy()=0;
 	
 	virtual bool attach(Surface::ptr surface,Attachment attachment)=0;
 	virtual bool remove(Surface::ptr surface)=0;
