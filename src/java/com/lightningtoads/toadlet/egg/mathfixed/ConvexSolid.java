@@ -28,7 +28,7 @@ package com.lightningtoads.toadlet.egg.mathfixed;
 #include <com/lightningtoads/toadlet/Types.h>
 
 public final class ConvexSolid{
-	public ConvexSolid(){};
+	public ConvexSolid(){}
 
 	public ConvexSolid(ConvexSolid cs){
 		int i;
@@ -47,6 +47,7 @@ public final class ConvexSolid{
 				planes[i].set(cs.planes[i]);
 			}
 		}
+		return this;
 	}
 
 	public void addPlane(Plane plane){
