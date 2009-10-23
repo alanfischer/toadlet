@@ -32,6 +32,7 @@ public final class Shape{
 		AABOX,
 		SPHERE,
 		CAPSULE,
+		CONVEXSOLID,
 	};
 
 	public Shape(){
@@ -52,6 +53,11 @@ public final class Shape{
 	public Shape(Capsule capsule){
 		mCapsule=new Capsule(capsule);
 		mType=Type.CAPSULE;
+	}
+
+	public Shape(ConvexSolid convexSolid){
+		mConvexSolid=new ConvexSolid(convexSolid);
+		mType=Type.CONVEXSOLID;
 	}
 
 	public void reset(){
@@ -79,6 +85,7 @@ public final class Shape{
 	public void setAABox(AABox box){
 		mSphere=null;
 		mCapsule=null;
+		mConvexSolid=null;
 
 		mType=Type.AABOX;
 		if(mAABox==null){
@@ -99,6 +106,7 @@ public final class Shape{
 	public void setSphere(Sphere sphere){
 		mAABox=null;
 		mCapsule=null;
+		mConvexSolid=null;
 
 		mType=Type.SPHERE;
 		if(mSphere==null){
@@ -118,6 +126,7 @@ public final class Shape{
 	public void setCapsule(Capsule capsule){
 		mAABox=null;
 		mSphere=null;
+		mConvexSolid=null;
 
 		mType=Type.CAPSULE;
 		if(mCapsule==null){
@@ -133,6 +142,26 @@ public final class Shape{
 	}
 
 	public Capsule getCapsule(){return mCapsule;}
+
+	public void setConvexSolid(ConvexSolid convexSolid){
+		mAABox=null;
+		mSphere=null;
+		mCapsule=null;
+
+		mType=Type.CONVEXSOLID;
+		if(mConvexSolid==null){
+			mConvexSolid=new ConvexSolid(convexSolid);
+		}
+		else{
+			mConvexSolid.set(convexSolid);
+		}
+
+		if(mSolid!=null){
+			mSolid.updateLocalBound();
+		}
+	}
+
+	public ConvexSolid getConvexSolid(){return mConvexSolid;}
 
 	public Type getType(){return mType;}
 
@@ -186,6 +215,43 @@ public final class Shape{
 				Math.add(box,mCapsule.origin);
 			}
 			break;
+			case CONVEXSOLID:
+			{
+				Vector3 r=cache_getBound_r;
+				int i,j,k;
+				scalar epsilon;
+				#if defined(TOADLET_FIXED_POINT)
+					epsilon=1<<4;
+				#else
+					epsilon=0.0001f;
+				#endif
+				box.reset();
+				for(i=0;i<mConvexSolid.numPlanes-2;++i){
+					for(j=i+1;j<mConvexSolid.numPlanes-2;++j){
+						for(k=j+1;k<mConvexSolid.numPlanes-2;++k){
+							if(Math.getIntersectionOfThreePlanes(r,mConvexSolid.planes[i],mConvexSolid.planes[j],mConvexSolid.planes[k],epsilon)){
+								if(i==0 && j==1 && k==2){
+									box.mins.x=r.x;
+									box.maxs.x=r.x;
+									box.mins.y=r.y;
+									box.maxs.y=r.y;
+									box.mins.z=r.z;
+									box.maxs.z=r.z;
+								}
+								else{
+									if(r.x<box.mins.x) box.mins.x=r.x;
+									if(r.x>box.maxs.x) box.maxs.x=r.x;
+									if(r.y<box.mins.y) box.mins.y=r.y;
+									if(r.y>box.maxs.y) box.maxs.y=r.y;
+									if(r.z<box.mins.z) box.mins.z=r.z;
+									if(r.z>box.maxs.z) box.maxs.z=r.z;
+								}
+							}
+						}
+					}
+				}
+			}
+			break;
 		}
 	}
 
@@ -206,5 +272,8 @@ public final class Shape{
 	AABox mAABox;
 	Sphere mSphere;
 	Capsule mCapsule;
+	ConvexSolid mConvexSolid;
 	Solid mSolid=null;
+	
+	Vector3 cache_getBound_r=new Vector3();
 }

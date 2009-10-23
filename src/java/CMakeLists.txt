@@ -70,6 +70,7 @@ set (EGG_MATH_SRC
 	${JAVA_SRC_DIR}/egg/math/Capsule.java
 	${JAVA_SRC_DIR}/egg/math/Segment.java
 	${JAVA_SRC_DIR}/egg/math/Vector3.java
+	${JAVA_SRC_DIR}/egg/math/ConvexSolid.java
 )
 set (EGG_MATHFIXED_SRC
 	${JAVA_SRC_DIR}/egg/mathfixed/Plane.java
@@ -85,6 +86,7 @@ set (EGG_MATHFIXED_SRC
 	${JAVA_SRC_DIR}/egg/mathfixed/Capsule.java
 	${JAVA_SRC_DIR}/egg/mathfixed/Segment.java
 	${JAVA_SRC_DIR}/egg/mathfixed/Vector3.java
+	${JAVA_SRC_DIR}/egg/mathfixed/ConvexSolid.java
 )
 
 # Bundle source files
