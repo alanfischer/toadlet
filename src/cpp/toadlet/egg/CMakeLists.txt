@@ -173,6 +173,7 @@ set (EGG_MATH_HEADERS
 	math/AABox.h
 	math/BaseMath.h
 	math/Capsule.h
+	math/ConvexSolid.h
 	math/EulerAngle.h
 	math/Math.h
 	math/Matrix3x3.h
@@ -190,6 +191,7 @@ set (EGG_MATHFIXED_HEADERS
 	mathfixed/AABox.h
 	mathfixed/BaseMath.h
 	mathfixed/Capsule.h
+	mathfixed/ConvexSolid.h
 	mathfixed/EulerAngle.h
 	mathfixed/Math.h
 	mathfixed/Matrix3x3.h

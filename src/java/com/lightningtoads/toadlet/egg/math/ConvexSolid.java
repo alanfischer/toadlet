@@ -32,23 +32,32 @@ public final class ConvexSolid{
 
 	public ConvexSolid(ConvexSolid cs){
 		int i;
-		for(i=0;i>cs.numPlanes;++i);
-		planes=cs.planes;
+		for(i=0;i<cs.numPlanes;++i){
+			addPlane(cs.planes[i]);
+		}
 	}
 
 	public ConvexSolid set(ConvexSolid cs){
-		planes=cs.planes;
+		int i;
+		for(i=0;i<cs.numPlanes;++i){
+			if(i>=numPlanes){
+				addPlane(cs.planes[i]);
+			}
+			else{
+				planes[i].set(cs.planes[i]);
+			}
+		}
 	}
 
 	public void addPlane(Plane plane){
-                if(mPlanes==null || mPlanes.length<numPlanes+1){
+                if(planes==null || planes.length<numPlanes+1){
                         Plane[] planes=new Plane[numPlanes+1];
-                        if(mPlanes!=null){
-                                System.arraycopy(mPlanes,0,planes,0,mPlanes.length);
+                        if(planes!=null){
+                                System.arraycopy(planes,0,planes,0,planes.length);
                         }
-                        mPlanes=planes;
+                        planes=planes;
                 }
-                mPlanes[numPlanes++]=plane;
+                planes[numPlanes++]=plane;
         }
 
         public void removePlane(Plane plane){
@@ -57,11 +66,11 @@ public final class ConvexSolid{
 
                 int i;
                 for(i=0;i<numPlanes;++i){
-                        if(mPlanes[i]==plane)break;
+                        if(planes[i]==plane)break;
                 }
                 if(i!=numPlanes){
-                        System.arraycopy(mPlanes,i+1,mPlanes,i,numPlanes-(i+1));
-                        mPlanes[--numPlanes]=null;
+                        System.arraycopy(planes,i+1,planes,i,numPlanes-(i+1));
+                        planes[--numPlanes]=null;
                 }
         }
 
