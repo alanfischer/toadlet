@@ -43,14 +43,14 @@ protected:
 	GLTextureMipSurface(GLTexture *texture,GLuint level,int width,int height);
 
 public:
-	virtual ~GLTextureMipSurface();
+	virtual ~GLTextureMipSurface(){}
 
 	virtual Surface *getRootSurface(){return this;}
 	virtual GLTextureMipSurface *castToGLTextureMipSurface(){return this;}
 	virtual GLFBORenderbufferSurface *castToGLFBORenderbufferSurface(){return NULL;}
 
-	virtual int getWidth(){return mWidth;}
-	virtual int getHeight(){return mHeight;}
+	virtual int getWidth() const{return mWidth;}
+	virtual int getHeight() const{return mHeight;}
 
 	void resize(GLuint level,int width,int height);
 

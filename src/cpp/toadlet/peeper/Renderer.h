@@ -44,7 +44,6 @@ class LightEffect;
 class Program;
 class ProgramPeer;
 class RenderTarget;
-class RenderContext;
 class Shader;
 class ShaderPeer;
 class StatisticsSet;
@@ -129,7 +128,7 @@ public:
 	virtual ~Renderer(){}
 
 	// Startup/Shutdown
-	virtual bool startup(RenderContext *renderContext,int *options)=0;
+	virtual bool startup(RenderTarget *renderTarget,int *options)=0;
 	virtual bool shutdown()=0;
 	virtual RendererStatus getStatus()=0;
 	virtual bool reset()=0;
@@ -146,7 +145,7 @@ public:
 	virtual void setProjectionMatrix(const Matrix4x4 &matrix)=0;
 
 	// Rendering operations
-	virtual RenderContext *getRenderContext()=0;
+	virtual RenderTarget *getPrimaryRenderTarget()=0;
 	virtual bool setRenderTarget(RenderTarget *target)=0;
 	virtual RenderTarget *getRenderTarget()=0;
 	virtual void setViewport(const Viewport &viewport)=0;

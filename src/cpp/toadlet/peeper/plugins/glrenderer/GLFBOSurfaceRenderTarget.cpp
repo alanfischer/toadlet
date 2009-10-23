@@ -101,6 +101,15 @@ bool GLFBOSurfaceRenderTarget::swap(){
 	return true;
 }
 
+Surface::ptr GLFBOSurfaceRenderTarget::createBufferSurface(int format,int width,int height){
+	GLFBORenderbufferSurface::ptr surface(new GLFBORenderbufferSurface(this));
+	if(surface->create(format,width,height)==false){
+		return NULL;
+	}
+	mOwnedSurfaces.add(surface);
+	return surface;
+}
+
 bool GLFBOSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
 	GLSurface *glsurface=(GLSurface*)surface->getRootSurface();
 

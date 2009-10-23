@@ -54,7 +54,7 @@ public:
 	virtual ~GLRenderer();
 
 	// Startup/Shutdown
-	bool startup(RenderContext *renderContext,int *options);
+	bool startup(RenderTarget *renderTarget,int *options);
 	bool shutdown();
 	RendererStatus getStatus();
 	bool reset();
@@ -71,9 +71,9 @@ public:
 	void setProjectionMatrix(const Matrix4x4 &matrix);
 
 	// Rendering operations
-	RenderContext *getRenderContext();
+	RenderTarget *getPrimaryRenderTarget(){return mPrimaryRenderTarget;}
 	bool setRenderTarget(RenderTarget *target);
-	RenderTarget *getRenderTarget();
+	RenderTarget *getRenderTarget(){return mRenderTarget;}
 	void setViewport(const Viewport &viewport);
 	void clear(int clearFlags,const Color &clearColor);
 	void swap();
@@ -188,7 +188,7 @@ protected:
 	StatisticsSet mStatisticsSet;
 	CapabilitySet mCapabilitySet;
 
-	RenderContext *mRenderContext;
+	RenderTarget *mPrimaryRenderTarget;
 	RenderTarget *mRenderTarget;
 
 	class ScratchBuffer{

@@ -82,6 +82,10 @@ public:
 	virtual peeper::Renderer *getRenderer() const{return mRenderer;}
 	virtual ribbit::AudioPlayer *getAudioPlayer() const{return mAudioPlayer;}
 
+	virtual peeper::RenderTarget *getRootRenderTarget(){return mRenderTarget;}
+	virtual bool isPrimary() const{return mRenderTarget->isPrimary();}
+	virtual bool isValid() const{return mRenderTarget->isValid();}
+
 	virtual void resized(int width,int height);
 	virtual void focusGained();
 	virtual void focusLost();
@@ -125,6 +129,7 @@ protected:
 	ApplicationListener *mApplicationListener;
 
 	tadpole::Engine *mEngine;
+	peeper::RenderTarget *mRenderTarget;
 	peeper::Renderer *mRenderer;
 	int mRendererPlugin;
 	int mChangeRendererPlugin;

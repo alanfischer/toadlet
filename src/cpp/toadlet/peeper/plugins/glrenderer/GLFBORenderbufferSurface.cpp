@@ -40,6 +40,10 @@ GLFBORenderbufferSurface::GLFBORenderbufferSurface(GLFBOSurfaceRenderTarget *tar
 	mTarget=target;
 }
 
+GLFBORenderbufferSurface::~GLFBORenderbufferSurface(){
+	destroy();
+}
+
 bool GLFBORenderbufferSurface::create(int format,int width,int height){
 	mFormat=format;
 	mWidth=width;

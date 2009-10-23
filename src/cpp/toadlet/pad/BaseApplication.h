@@ -26,7 +26,7 @@
 #ifndef TOADLET_PAD_BASEAPPLICATION_H
 #define TOADLET_PAD_BASEAPPLICATION_H
 
-#include <toadlet/peeper/RenderContext.h>
+#include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/Visual.h>
 #include <toadlet/ribbit/AudioPlayer.h>
@@ -37,7 +37,7 @@ namespace pad{
 
 class ApplicationListener;
 
-class BaseApplication:public peeper::RenderContext{
+class BaseApplication:public peeper::RenderTarget{
 public:
 	enum Key{
 		Key_ENTER=10,
