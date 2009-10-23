@@ -61,9 +61,6 @@ public final class ConvexSolid{
         }
 
         public void removePlane(Plane plane){
-                mActive=true;
-                mDeactivateCount=0;
-
                 int i;
                 for(i=0;i<numPlanes;++i){
                         if(planes[i]==plane)break;
