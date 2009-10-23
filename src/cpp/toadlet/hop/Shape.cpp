@@ -186,7 +186,7 @@ void Shape::getBound(AABox &box) const{
 		break;
 		case Type_CONVEXSOLID:
 		{
-			Vector3 &r=cache_getBound_r;
+			Vector3 &r=const_cast<Vector3&>(cache_getBound_r);
 			int i,j,k;
 			scalar epsilon;
 			#if defined(TOADLET_FIXED_POINT)
