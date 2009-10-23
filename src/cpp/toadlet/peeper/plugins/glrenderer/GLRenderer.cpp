@@ -28,7 +28,7 @@
 #include "GLBufferPeer.h"
 #include "GLSLProgramPeer.h"
 #include "GLSLShaderPeer.h"
-#include "GLRenderTargetPeer.h"
+#include "GLRenderTarget.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/IndexData.h>
@@ -40,7 +40,6 @@
 #include <toadlet/peeper/Shader.h>
 #include <toadlet/peeper/Light.h>
 #include <toadlet/peeper/Texture.h>
-#include <toadlet/peeper/RenderContext.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::image;
@@ -108,7 +107,7 @@ GLRenderer::GLRenderer():
 	//mStatisticsSet,
 	//mCapabilitySet,
 
-	mRenderContext(NULL),
+	mPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL)
 
 	#if defined(TOADLET_DEBUG)
@@ -126,7 +125,7 @@ GLRenderer::~GLRenderer(){
 	}
 }
 
-bool GLRenderer::startup(RenderContext *renderContext,int *options){
+bool GLRenderer::startup(RenderTarget *renderTarget,int *options){
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
 		"GLRenderer: Startup started");
 
@@ -187,8 +186,8 @@ bool GLRenderer::startup(RenderContext *renderContext,int *options){
 
 	mShutdown=false;
 
-	mRenderContext=renderContext;
-	mRenderTarget=renderContext;
+	mPrimaryRenderTarget=renderTarget;
+	mRenderTarget=renderTarget;
 
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
 		String("GL_VENDOR:") + glGetString(GL_VENDOR));
@@ -516,10 +515,6 @@ void GLRenderer::setProjectionMatrix(const Matrix4x4 &matrix){
 	TOADLET_CHECK_GLERROR("setProjectionMatrix");
 }
 
-RenderContext *GLRenderer::getRenderContext(){
-	return mRenderContext;
-}
-
 bool GLRenderer::setRenderTarget(RenderTarget *target){
 	TOADLET_CHECK_GLERROR("before setRenderTarget");
 
@@ -530,20 +525,15 @@ bool GLRenderer::setRenderTarget(RenderTarget *target){
 		return false;
 	}
 
-	#if defined(TOADLET_RTTI)
-		GLRenderTargetPeer *peer=dynamic_cast<GLRenderTargetPeer*>(target->internal_getRenderTargetPeer());
-	#else
-		GLRenderTargetPeer *peer=(GLRenderTargetPeer*)target->internal_getRenderTargetPeer();
-	#endif
-	if(peer!=NULL){
-		peer->makeCurrent();
+	GLRenderTarget *gltarget=(GLRenderTarget*)target->getRootRenderTarget();
+	if(gltarget!=NULL){
+		gltarget->current();
 
-		if(peer->initialized==false){
-			setDefaultStates();
-			peer->initialized=true;
-		}
+		// TODO: Move this to the create method of the Target!
+		setDefaultStates();
 
 		// It is known that GL_LINE_SMOOTH or GL_POLYGON_SMOOTH cause software rendering on some devices, so disable antialiasing
+		// TODO: Add in antialiasing somewhere proper
 		/*
 		if(peer->getAntialiased()){
 			glEnable(GL_LINE_SMOOTH);
@@ -583,10 +573,6 @@ bool GLRenderer::setRenderTarget(RenderTarget *target){
 	TOADLET_CHECK_GLERROR("setRenderTarget");
 
 	return true;
-}
-
-RenderTarget *GLRenderer::getRenderTarget(){
-	return mRenderTarget;
 }
 
 void GLRenderer::setViewport(const Viewport &viewport){
@@ -634,8 +620,10 @@ void GLRenderer::clear(int clearFlags,const Color &clearColor){
 }
 
 void GLRenderer::swap(){
-	if(mRenderTarget!=NULL && mRenderTarget->internal_getRenderTargetPeer()!=NULL){
-		((GLRenderTargetPeer*)mRenderTarget->internal_getRenderTargetPeer())->swap();
+	if(mRenderTarget!=NULL){
+		// TODO: store the gltarget from setRenderTarget, so we don't have to recall getRootRenderTarget
+		GLRenderTarget *gltarget=(GLRenderTarget*)mRenderTarget->getRootRenderTarget();
+		gltarget->swap();
 	}
 
 	TOADLET_CHECK_GLERROR("swap");

@@ -35,7 +35,7 @@ class GLFBOSurfaceRenderTarget;
 
 class GLFBORenderbufferSurface:public GLSurface{
 public:
-	TOADLET_SHARED_POINTERS(GLFBORenderbufferSurface,GLSurface);
+	TOADLET_SHARED_POINTERS(GLFBORenderbufferSurface,Surface);
 
 protected:
 	GLFBORenderbufferSurface(GLFBOSurfaceRenderTarget *target);

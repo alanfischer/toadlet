@@ -1,6 +1,7 @@
 # Source files for toadlet_peeper_glrenderer
 set (PEEPER_GLRENDERER_SRC
 	GLBufferPeer.cpp
+	GLRenderer.cpp
 	GLTexture.cpp
 	GLTextureMipSurface.cpp
 )
