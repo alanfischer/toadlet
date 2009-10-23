@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-package com.lightningtoads.toadlet.egg.math;
+package com.lightningtoads.toadlet.egg.mathfixed;
 
 #include <com/lightningtoads/toadlet/Types.h>
 
@@ -31,22 +31,33 @@ public final class ConvexSolid{
 	public ConvexSolid(){};
 
 	public ConvexSolid(ConvexSolid cs){
-		planes=cs.planes;
+		int i;
+		for(i=0;i<cs.numPlanes;++i){
+			addPlane(cs.planes[i]);
+		}
 	}
 
 	public ConvexSolid set(ConvexSolid cs){
-		planes=cs.planes;
+		int i;
+		for(i=0;i<cs.numPlanes;++i){
+			if(i>=numPlanes){
+				addPlane(cs.planes[i]);
+			}
+			else{
+				planes[i].set(cs.planes[i]);
+			}
+		}
 	}
 
 	public void addPlane(Plane plane){
-                if(mPlanes==null || mPlanes.length<mNumPlanes+1){
-                        Plane[] planes=new Plane[mNumPlanes+1];
-                        if(mPlanes!=null){
-                                System.arraycopy(mPlanes,0,planes,0,mPlanes.length);
+                if(planes==null || planes.length<numPlanes+1){
+                        Plane[] planes=new Plane[numPlanes+1];
+                        if(planes!=null){
+                                System.arraycopy(planes,0,planes,0,planes.length);
                         }
-                        mPlanes=planes;
+                        planes=planes;
                 }
-                mPlanes[mNumPlanes++]=plane;
+                planes[numPlanes++]=plane;
         }
 
         public void removePlane(Plane plane){
@@ -54,12 +65,12 @@ public final class ConvexSolid{
                 mDeactivateCount=0;
 
                 int i;
-                for(i=0;i<mNumPlanes;++i){
-                        if(mPlanes[i]==plane)break;
+                for(i=0;i<numPlanes;++i){
+                        if(planes[i]==plane)break;
                 }
-                if(i!=mNumPlanes){
-                        System.arraycopy(mPlanes,i+1,mPlanes,i,mNumPlanes-(i+1));
-                        mPlanes[--mNumPlanes]=null;
+                if(i!=numPlanes){
+                        System.arraycopy(planes,i+1,planes,i,numPlanes-(i+1));
+                        planes[--numPlanes]=null;
                 }
         }
 
