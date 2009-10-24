@@ -62,6 +62,7 @@ public:
 
 	// Resource operations
 	Texture *createTexture();
+	SurfaceRenderTarget *createSurfaceRenderTarget();
 	BufferPeer *createBufferPeer(Buffer *buffer);
 	ProgramPeer *createProgramPeer(Program *program);
 	ShaderPeer *createShaderPeer(Shader *shader);
@@ -148,8 +149,8 @@ protected:
 	bool mShutdown;
 	int mMatrixMode;
 
-	bool mFBORenderToTexture;
-	bool mPBufferRenderToTexture;
+	bool mPBuffersAvailable;
+	bool mFBOsAvailable;
 
 	// Cached render state attributes
 	AlphaTest mAlphaTest;

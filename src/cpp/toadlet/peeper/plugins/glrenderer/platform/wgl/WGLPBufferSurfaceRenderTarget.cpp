@@ -26,6 +26,7 @@
 #include "WGLPBufferSurfaceRenderTarget.h"
 #include "../../GLRenderer.h"
 #include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Error.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::image;
@@ -103,7 +104,7 @@ bool WGLPBufferSurfaceRenderTarget::makeCurrent(){
 bool WGLPBufferSurfaceRenderTarget::swap(){
 	if(mBound==false){
 		mBound=true;
-		glBindTexture(textureTarget,textureHandle);
+		glBindTexture(mTexture->getTarget(),mTexture->getHandle());
 		wglBindTexImageARB(mPBuffer,WGL_FRONT_LEFT_ARB);
 		TOADLET_CHECK_GLERROR("wglBindTexImageARB");
 	}
@@ -111,20 +112,31 @@ bool WGLPBufferSurfaceRenderTarget::swap(){
 	return true;
 }
 
-bool WGLPBufferRenderTexturePeer::createBuffer(){
-	WGLTextureMipSurface *gltextureSurface=((GLSurface*)mSurface)->castToGLTextureMipSurface();
+bool WGLPBufferSurfaceRenderTarget::remove(Surface::ptr surface){
+	// Unimplemented currently
+	return true;
+}
 
-	if((texture->getFormat()&Texture::Format_BIT_DEPTH)>0){
+bool WGLPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
+	GLTextureMipSurface *gltextureSurface=((GLSurface*)surface->getRootSurface())->castToGLTextureMipSurface();
+	mTexture=gltextureSurface->getTexture();
+
+	if((mTexture->getFormat()&Texture::Format_BIT_DEPTH)>0){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
 			"Format_BIT_DEPTH not available for pbuffers");
-		return;
+		return false;
 	}
 
 	createBuffer();
 
+	return true;
+}
 
-	int width=gltextureSurface->getWidth();
-	int height=gltextureSurface->getHeight();
+bool WGLPBufferSurfaceRenderTarget::createBuffer(){
+	destroyBuffer();
+
+	int width=mTexture->getWidth();
+	int height=mTexture->getHeight();
 
 	HDC hdc=wglGetCurrentDC();
 	HGLRC context=wglGetCurrentContext();
@@ -133,11 +145,11 @@ bool WGLPBufferRenderTexturePeer::createBuffer(){
     int pixelType=WGL_TYPE_RGBA_ARB;
 	int texFormat=WGL_TEXTURE_RGB_ARB;
 
-	int format=gltextureSurface->getTexture()->getFormat();
+	int format=mTexture->getFormat();
 	int redBits=ImageFormatConversion::getRedBits(format);
 	int greenBits=ImageFormatConversion::getGreenBits(format);
 	int blueBits=ImageFormatConversion::getBlueBits(format);
-	int depthBits=mTexture->hasDepthBuffer()?16:0;
+	int depthBits=16;
 
 	int iAttributes[]={
 		WGL_COLOR_BITS_ARB,redBits+greenBits+blueBits,
@@ -226,7 +238,7 @@ bool WGLPBufferRenderTexturePeer::createBuffer(){
 	return true;
 }
 
-bool WGLPBufferRenderTexturePeer::destroyBuffer(){
+bool WGLPBufferSurfaceRenderTarget::destroyBuffer(){
 	if(mGLRC!=0){
 		wglDeleteContext(mGLRC);
 		mGLRC=0;

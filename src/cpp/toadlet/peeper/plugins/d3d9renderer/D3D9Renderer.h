@@ -53,6 +53,7 @@ public:
 
 	// Resource operations
 	Texture *createTexture();
+	SurfaceRenderTarget *createSurfaceRenderTarget();
 	BufferPeer *createBufferPeer(Buffer *buffer);
 	ProgramPeer *createProgramPeer(Program *program);
 	ShaderPeer *createShaderPeer(Shader *shader);

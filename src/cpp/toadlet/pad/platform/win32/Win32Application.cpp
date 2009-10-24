@@ -138,7 +138,7 @@ Win32Application::Win32Application():
 	win32->mWnd=0;
 	win32->mIcon=0;
 
-	changeRendererPlugin(RendererPlugin_DIRECT3D); // OpenGL By default
+	changeRendererPlugin(RendererPlugin_OPENGL); // OpenGL By default
 
 	win32->mInstance=GetModuleHandle(NULL);
 }

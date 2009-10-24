@@ -63,7 +63,6 @@ public:
 			VertexBuffer::ptr quadVertexBuffer=mEngine->loadVertexBuffer(VertexBuffer::ptr(new VertexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,4)));
 			{
 				VertexBufferAccessor a(quadVertexBuffer,Buffer::LockType_WRITE_ONLY);
-
 				a.set3(0,0, -Math::ONE,Math::ONE,0);
 				a.set3(1,0, -Math::ONE,-Math::ONE,0);
 				a.set3(2,0, Math::ONE,Math::ONE,0);

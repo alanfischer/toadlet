@@ -188,6 +188,10 @@ Texture *D3D9Renderer::createTexture(){
 */
 }
 
+SurfaceRenderTarget *D3D9Renderer::createSurfaceRenderTarget(){
+	return NULL;
+}
+
 BufferPeer *D3D9Renderer::createBufferPeer(Buffer *buffer){
 	if(buffer==NULL){
 		Error::nullPointer(Categories::TOADLET_PEEPER,
