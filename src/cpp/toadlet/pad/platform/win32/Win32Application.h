@@ -119,6 +119,8 @@ protected:
 	peeper::Renderer *makeRenderer(int plugin);
 	bool createContextAndRenderer(int plugin);
 	bool destroyRendererAndContext();
+	bool createAudioPlayer();
+	bool destroyAudioPlayer();
 	bool changeVideoMode(int width,int height,int colorBits);
 
 	egg::String mTitle;

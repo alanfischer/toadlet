@@ -13,6 +13,9 @@ public:
 	RenderToTexture():Application(){}
 
 	void create(){
+		int options[]={1,0,2,0,0};
+		setRendererOptions(options,3);
+
 		Application::create();
 
 		triVertexBuffer=VertexBuffer::ptr(new VertexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_COLOR,3));
