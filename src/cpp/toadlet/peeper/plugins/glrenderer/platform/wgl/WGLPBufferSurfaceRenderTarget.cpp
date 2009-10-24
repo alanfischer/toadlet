@@ -22,8 +22,8 @@
  * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
  *
  ********** Copyright header - do not remove **********/
-/*
-#include "WGLPBufferRenderTexturePeer.h"
+
+#include "WGLPBufferSurfaceRenderTarget.h"
 #include "../../GLRenderer.h"
 #include <toadlet/egg/Logger.h>
 
@@ -33,28 +33,86 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-bool GLPBufferRenderTexturePeer_available(GLRenderer *renderer){
-	return WGLPBufferRenderTexturePeer::available(renderer);
+bool GLPBufferSurfaceRenderTarget_available(GLRenderer *renderer){
+	return WGLPBufferSurfaceRenderTarget::available(renderer);
 }
 
-GLTexturePeer *new_GLPBufferRenderTexturePeer(GLRenderer *renderer,RenderTexture *texture){
-	return new WGLPBufferRenderTexturePeer(renderer,texture);
+SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer){
+	return new WGLPBufferSurfaceRenderTarget(renderer);
 }
 
-bool WGLPBufferRenderTexturePeer::available(GLRenderer *renderer){
-#	if defined(TOADLET_HAS_GLEW)
+bool WGLPBufferSurfaceRenderTarget::available(GLRenderer *renderer){
+	#if defined(TOADLET_HAS_GLEW)
 		return WGLEW_ARB_render_texture>0;
-#	else
+	#else
 		return false;
-#	endif
+	#endif
 }
 
-WGLPBufferRenderTexturePeer::WGLPBufferRenderTexturePeer(GLRenderer *renderer,RenderTexture *texture):WGLRenderTargetPeer(),GLTexturePeer(renderer,texture){
-	mTexture=texture;
-	mPBuffer=NULL;
-	mWidth=0;
-	mHeight=0;
-	mBound=false;
+WGLPBufferSurfaceRenderTarget::WGLPBufferSurfaceRenderTarget(GLRenderer *renderer):WGLRenderTarget(),
+	//mSurface,
+	mPBuffer(NULL),
+	mWidth(0),
+	mHeight(0),
+	mBound(false),
+	mInitialized(false)
+{
+	mRenderer=renderer;
+}
+
+WGLPBufferSurfaceRenderTarget::~WGLPBufferSurfaceRenderTarget(){
+	destroy();
+}
+
+bool WGLPBufferSurfaceRenderTarget::create(){
+	// Nothing yet, all done after an attach
+	return true;
+}
+
+bool WGLPBufferSurfaceRenderTarget::destroy(){
+	destroyBuffer();
+
+	if(mBound){
+		mBound=false;
+		wglReleaseTexImageARB(mPBuffer,WGL_FRONT_LEFT_ARB);
+		TOADLET_CHECK_GLERROR("wglReleaseTexImageARB");
+	}
+
+	mInitialized=false;
+
+	return true;
+}
+
+bool WGLPBufferSurfaceRenderTarget::makeCurrent(){
+	if(mBound){
+		mBound=false;
+		wglReleaseTexImageARB(mPBuffer,WGL_FRONT_LEFT_ARB);
+		TOADLET_CHECK_GLERROR("wglReleaseTexImageARB");
+	}
+
+	WGLRenderTarget::makeCurrent();
+
+	if(mInitialized==false){
+		mRenderer->setDefaultStates();
+		mInitialized=true;
+	}
+
+	return true;
+}
+
+bool WGLPBufferSurfaceRenderTarget::swap(){
+	if(mBound==false){
+		mBound=true;
+		glBindTexture(textureTarget,textureHandle);
+		wglBindTexImageARB(mPBuffer,WGL_FRONT_LEFT_ARB);
+		TOADLET_CHECK_GLERROR("wglBindTexImageARB");
+	}
+
+	return true;
+}
+
+bool WGLPBufferRenderTexturePeer::createBuffer(){
+	WGLTextureMipSurface *gltextureSurface=((GLSurface*)mSurface)->castToGLTextureMipSurface();
 
 	if((texture->getFormat()&Texture::Format_BIT_DEPTH)>0){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
@@ -63,39 +121,10 @@ WGLPBufferRenderTexturePeer::WGLPBufferRenderTexturePeer(GLRenderer *renderer,Re
 	}
 
 	createBuffer();
-}
 
-WGLPBufferRenderTexturePeer::~WGLPBufferRenderTexturePeer(){
-	if(mBound){
-		wglReleaseTexImageARB(mPBuffer,WGL_FRONT_LEFT_ARB);
-		TOADLET_CHECK_GLERROR("wglReleaseTexImageARB");
-	}
 
-	destroyBuffer();
-}
-
-void WGLPBufferRenderTexturePeer::makeCurrent(){
-	if(mBound){
-		mBound=false;
-		wglReleaseTexImageARB(mPBuffer,WGL_FRONT_LEFT_ARB);
-		TOADLET_CHECK_GLERROR("wglReleaseTexImageARB");
-	}
-
-	WGLRenderTargetPeer::makeCurrent();
-}
-
-void WGLPBufferRenderTexturePeer::swap(){
-	if(mBound==false){
-		mBound=true;
-		glBindTexture(textureTarget,textureHandle);
-		wglBindTexImageARB(mPBuffer,WGL_FRONT_LEFT_ARB);
-		TOADLET_CHECK_GLERROR("wglBindTexImageARB");
-	}
-}
-
-bool WGLPBufferRenderTexturePeer::createBuffer(){
-	int width=((Texture*)mTexture)->getWidth();
-	int height=((Texture*)mTexture)->getHeight();
+	int width=gltextureSurface->getWidth();
+	int height=gltextureSurface->getHeight();
 
 	HDC hdc=wglGetCurrentDC();
 	HGLRC context=wglGetCurrentContext();
@@ -104,7 +133,7 @@ bool WGLPBufferRenderTexturePeer::createBuffer(){
     int pixelType=WGL_TYPE_RGBA_ARB;
 	int texFormat=WGL_TEXTURE_RGB_ARB;
 
-	int format=mTexture->getFormat();
+	int format=gltextureSurface->getTexture()->getFormat();
 	int redBits=ImageFormatConversion::getRedBits(format);
 	int greenBits=ImageFormatConversion::getGreenBits(format);
 	int blueBits=ImageFormatConversion::getBlueBits(format);
@@ -213,19 +242,5 @@ bool WGLPBufferRenderTexturePeer::destroyBuffer(){
 	return true;
 }
 
-int WGLPBufferRenderTexturePeer::getWidth() const{
-	return mWidth;
-}
-
-int WGLPBufferRenderTexturePeer::getHeight() const{
-	return mHeight;
-}
-
-bool WGLPBufferRenderTexturePeer::isValid() const{
-	return mGLRC!=NULL && mPBuffer!=NULL;
-}
-
 }
 }
-
-*/

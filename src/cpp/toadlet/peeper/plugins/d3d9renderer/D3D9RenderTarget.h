@@ -23,34 +23,26 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_SURFACERENDERTARGET_H
-#define TOADLET_PEEPER_SURFACERENDERTARGET_H
+#ifndef TOADLET_PEEPER_D3D9RENDERTARGET_H
+#define TOADLET_PEEPER_D3D9RENDERTARGET_H
 
+#include "D3D9Includes.h"
 #include <toadlet/peeper/RenderTarget.h>
-#include <toadlet/peeper/Surface.h>
 
 namespace toadlet{
 namespace peeper{
 
-class SurfaceRenderTarget:public RenderTarget{
+class TOADLET_API D3D9RenderTarget:public RenderTarget{
 public:
-	TOADLET_SHARED_POINTERS(SurfaceRenderTarget,RenderTarget);
+	D3D9RenderTarget():RenderTarget(){}
 
-	enum Attachment{
-		Attachment_DEPTH_STENCIL,
-		Attachment_COLOR_0,
-		Attachment_COLOR_1,
-		Attachment_COLOR_2,
-		Attachment_COLOR_3,
-	};
+	virtual ~D3D9RenderTarget(){}
 
-	virtual ~SurfaceRenderTarget(){}
+	virtual bool makeCurrent(IDirect3DDevice9 *device)=0;
 
-	virtual bool create()=0;
-	virtual bool destroy()=0;
+	virtual void reset()=0;
 
-	virtual bool attach(Surface::ptr surface,Attachment attachment)=0;
-	virtual bool remove(Surface::ptr surface)=0;
+	virtual IDirect3DDevice9 *getDirect3DDevice9() const=0;
 };
 
 }

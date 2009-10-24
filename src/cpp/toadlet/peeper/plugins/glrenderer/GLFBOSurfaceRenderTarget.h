@@ -47,18 +47,19 @@ public:
 	virtual bool create();
 	virtual bool destroy();
 
-	virtual bool current();
+	virtual bool makeCurrent();
 	virtual bool swap();
 
-	virtual Surface::ptr createBufferSurface(int format,int width,int height);
 	virtual bool attach(Surface::ptr surface,Attachment attachment);
 	virtual bool remove(Surface::ptr surface);
-	
+
 	virtual bool isPrimary() const{return false;}
 	virtual int getWidth() const{return mWidth;}
 	virtual int getHeight() const{return mHeight;}
 
 protected:
+	Surface::ptr createBufferSurface(int format,int width,int height);
+
 	static GLenum getGLAttachment(Attachment attachment);
 	static const char *getFBOMessage(GLenum status);
 

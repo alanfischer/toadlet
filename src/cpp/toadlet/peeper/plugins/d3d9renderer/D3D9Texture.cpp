@@ -25,6 +25,7 @@
 
 #include "D3D9Renderer.h"
 #include "D3D9Texture.h"
+#include "D3D9Surface.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 
@@ -45,7 +46,7 @@ D3D9Texture::D3D9Texture(D3D9Renderer *renderer):
 	mDepth(0),
 
 	mTexture(NULL),
-	mAutoGenerateMipMaps(false)
+	mManuallyGenerateMipLevels(false)
 {
 	mRenderer=renderer;
 }
@@ -56,7 +57,7 @@ D3D9Texture::~D3D9Texture(){
 	}
 }
 
-bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width,int height,int depth){
+bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels){
 	destroy();
 
 	if((Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || Math::isPowerOf2(depth)==false) &&
@@ -77,30 +78,37 @@ bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width
 	
 	IDirect3DDevice9 *device=mRenderer->getDirect3DDevice9();
 	IDirect3D9 *d3d=NULL; device->GetDirect3D(&d3d);
+
 	D3DFORMAT d3dformat=getD3DFORMAT(mFormat);
-	if(!isD3DFORMATValid(d3d,d3dformat,D3DFMT_X8R8G8B8)){
+	if(!isD3DFORMATValid(d3d,D3DFMT_X8R8G8B8,d3dformat,0)){
 		d3dformat=D3DFMT_X8R8G8B8;
 	}
 	
-	HRESULT result=E_FAIL;
-	UINT levels=mAutoGenerateMipMaps?0:1;
 	DWORD usage=(mUsageFlags&UsageFlags_RENDERTARGET)>0 ? D3DUSAGE_RENDERTARGET : 0;
+	mManuallyGenerateMipLevels=(usageFlags&UsageFlags_AUTOGEN_MIPMAPS)>0;
+	if(mManuallyGenerateMipLevels && isD3DFORMATValid(d3d,D3DFMT_X8R8G8B8,d3dformat,D3DUSAGE_AUTOGENMIPMAP)){
+		usage|=D3DUSAGE_AUTOGENMIPMAP;
+		mManuallyGenerateMipLevels=false;
+	}
+
 	D3DPOOL pool=D3DPOOL_MANAGED;
+
+	HRESULT result=E_FAIL;
 	switch(dimension){
 		case Texture::Dimension_D1:
 		case Texture::Dimension_D2:{
 			IDirect3DTexture9 *texture=NULL;
-			result=device->CreateTexture(mWidth,mHeight,levels,usage,d3dformat,pool,&texture,NULL);
+			result=device->CreateTexture(mWidth,mHeight,mipLevels,usage,d3dformat,pool,&texture,NULL);
 			mTexture=texture;
 		}break;
 		case Texture::Dimension_D3:{
 			IDirect3DVolumeTexture9 *texture=NULL;
-			result=device->CreateVolumeTexture(mWidth,mHeight,depth,levels,usage,d3dformat,pool,&texture,NULL);
+			result=device->CreateVolumeTexture(mWidth,mHeight,depth,mipLevels,usage,d3dformat,pool,&texture,NULL);
 			mTexture=texture;
 		}break;
 		case Texture::Dimension_CUBEMAP:{
 			IDirect3DCubeTexture9 *texture=NULL;
-			result=device->CreateCubeTexture(mWidth,levels,usage,d3dformat,pool,&texture,NULL);
+			result=device->CreateCubeTexture(mWidth,mipLevels,usage,d3dformat,pool,&texture,NULL);
 			mTexture=texture;
 		}break;
 	}
@@ -122,6 +130,22 @@ void D3D9Texture::destroy(){
 			TOADLET_CHECK_D3D9ERROR(result,"CreateTexture");
 			return;
 		}
+	}
+}
+
+Surface::ptr D3D9Texture::getMipSuface(int i) const{
+	IDirect3DSurface9 *surface=NULL;
+
+	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
+		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
+		texture->GetSurfaceLevel(i,&surface);
+	}
+
+	if(surface!=NULL){
+		return Surface::ptr(new D3D9Surface(surface));
+	}
+	else{
+		return NULL;
 	}
 }
 
@@ -147,6 +171,7 @@ void D3D9Texture::load(int format,int width,int height,int depth,uint8 *data){
 		int pixelSize=ImageFormatConversion::getPixelSize(format);
 		unsigned char *dst=(unsigned char*)rect.pBits;
 		unsigned char *src=(unsigned char*)data;
+Logger::log("LOADING DATAS");
 
 		int i,j;
 		if(mFormat==Texture::Format_A_8 && d3dformat==D3DFMT_A8L8){
@@ -183,6 +208,12 @@ void D3D9Texture::load(int format,int width,int height,int depth,uint8 *data){
 			"D3D9Texture: Volume & Cube loading not yet implemented");
 		return;
 	}
+
+	// TODO: I dont think this will work if the driver doesnt support autogen mipmaps, so for this & GL, we should probably
+	//  replace it with a custom routine of ours
+	if(mManuallyGenerateMipLevels){
+		mTexture->GenerateMipSubLevels();
+	}
 }
 
 bool D3D9Texture::read(int format,int width,int height,int depth,uint8 *data){
@@ -205,12 +236,8 @@ bool D3D9Texture::read(int format,int width,int height,int depth,uint8 *data){
 	}
 }
 
-void D3D9Texture::setAutoGenerateMipMaps(bool mipmaps){
-	mAutoGenerateMipMaps=mipmaps;
-}
-
-bool D3D9Texture::isD3DFORMATValid(IDirect3D9 *d3d,D3DFORMAT textureFormat,D3DFORMAT adapterFormat){
-	return SUCCEEDED(d3d->CheckDeviceFormat(D3DADAPTER_DEFAULT,D3DDEVTYPE_HAL,adapterFormat,0,D3DRTYPE_TEXTURE,textureFormat));
+bool D3D9Texture::isD3DFORMATValid(IDirect3D9 *d3d,D3DFORMAT adapterFormat,D3DFORMAT textureFormat,DWORD usage){
+	return SUCCEEDED(d3d->CheckDeviceFormat(D3DADAPTER_DEFAULT,D3DDEVTYPE_HAL,adapterFormat,usage,D3DRTYPE_TEXTURE,textureFormat));
 }
 
 D3DFORMAT D3D9Texture::getD3DFORMAT(int textureFormat){

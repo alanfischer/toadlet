@@ -40,7 +40,7 @@ public:
 	TOADLET_SHARED_POINTERS(GLTextureMipSurface,Surface);
 
 protected:
-	GLTextureMipSurface(GLTexture *texture,GLuint level,int width,int height);
+	GLTextureMipSurface(GLTexture *texture,GLuint level);
 
 public:
 	virtual ~GLTextureMipSurface(){}
@@ -51,8 +51,6 @@ public:
 
 	virtual int getWidth() const{return mWidth;}
 	virtual int getHeight() const{return mHeight;}
-
-	void resize(GLuint level,int width,int height);
 
 	inline GLTexture *getTexture() const{return mTexture;}
 	inline GLuint getLevel() const{return mLevel;}

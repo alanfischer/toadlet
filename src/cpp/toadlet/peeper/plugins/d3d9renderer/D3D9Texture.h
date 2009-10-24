@@ -43,7 +43,7 @@ public:
 
 	virtual Texture *getRootTexture(){return this;}
 
-	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth);
+	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels);
 	virtual void destroy();
 
 	virtual int getUsageFlags() const{return mUsageFlags;}
@@ -52,18 +52,17 @@ public:
 	virtual int getWidth() const{return mWidth;}
 	virtual int getHeight() const{return mHeight;}
 	virtual int getDepth() const{return mDepth;}
+	virtual int getNumMipLevels() const{return mTexture==NULL?0:mTexture->GetLevelCount();}
 
+	virtual Surface::ptr getMipSuface(int i) const;
 	virtual void load(int format,int width,int height,int depth,uint8 *data);
 	virtual bool read(int format,int width,int height,int depth,uint8 *data);
-
-	virtual void setAutoGenerateMipMaps(bool mipmaps);
-	virtual bool getAutoGenerateMipMaps() const{return mAutoGenerateMipMaps;}
 
 	virtual void setName(const egg::String &name){mName=name;}
 	virtual const egg::String &getName() const{return mName;}
 
 protected:
-	static bool isD3DFORMATValid(IDirect3D9 *d3d,D3DFORMAT textureFormat,D3DFORMAT adapterFormat);
+	static bool isD3DFORMATValid(IDirect3D9 *d3d,D3DFORMAT adapterFormat,D3DFORMAT textureFormat,DWORD usage);
 
 	static D3DFORMAT getD3DFORMAT(int textureFormat);
 	static DWORD getD3DTADDRESS(TextureStage::AddressMode addressMode);
@@ -81,7 +80,7 @@ protected:
 	egg::String mName;
 	
 	IDirect3DBaseTexture9 *mTexture;
-	bool mAutoGenerateMipMaps;
+	bool mManuallyGenerateMipLevels;
 
 	friend D3D9Renderer;
 };

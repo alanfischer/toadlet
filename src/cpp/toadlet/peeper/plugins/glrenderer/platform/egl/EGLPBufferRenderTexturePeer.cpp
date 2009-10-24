@@ -83,6 +83,11 @@ void EGLPBufferRenderTexturePeer::makeCurrent(){
 	}
 
 	EGLRenderTargetPeer::makeCurrent();
+
+	if(mInitialized==false){
+		mRenderer->setDefaultStates();
+		mInitialized=true;
+	}
 }
 
 void EGLPBufferRenderTexturePeer::swap(){

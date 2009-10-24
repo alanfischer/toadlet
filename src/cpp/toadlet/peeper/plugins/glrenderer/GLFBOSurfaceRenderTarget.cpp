@@ -85,7 +85,7 @@ bool GLFBOSurfaceRenderTarget::destroy(){
 	return true;
 }
 
-bool GLFBOSurfaceRenderTarget::current(){
+bool GLFBOSurfaceRenderTarget::makeCurrent(){
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 
 	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::current");
@@ -99,15 +99,6 @@ bool GLFBOSurfaceRenderTarget::swap(){
 	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::swap");
 
 	return true;
-}
-
-Surface::ptr GLFBOSurfaceRenderTarget::createBufferSurface(int format,int width,int height){
-	GLFBORenderbufferSurface::ptr surface(new GLFBORenderbufferSurface(this));
-	if(surface->create(format,width,height)==false){
-		return NULL;
-	}
-	mOwnedSurfaces.add(surface);
-	return surface;
 }
 
 bool GLFBOSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
@@ -180,6 +171,15 @@ bool GLFBOSurfaceRenderTarget::remove(Surface::ptr surface){
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 
 	return true;
+}
+
+Surface::ptr GLFBOSurfaceRenderTarget::createBufferSurface(int format,int width,int height){
+	GLFBORenderbufferSurface::ptr surface(new GLFBORenderbufferSurface(this));
+	if(surface->create(format,width,height)==false){
+		return NULL;
+	}
+	mOwnedSurfaces.add(surface);
+	return surface;
 }
 
 GLenum GLFBOSurfaceRenderTarget::getGLAttachment(Attachment attachment){

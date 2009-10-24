@@ -25,16 +25,14 @@
 
 #include "D3D9Renderer.h"
 #include "D3D9Texture.h"
-#include "D3D9RenderTexturePeer.h"
+#include "D3D9RenderTarget.h"
 #include "D3D9VertexBufferPeer.h"
 #include "D3D9IndexBufferPeer.h"
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/peeper/Texture.h>
 #include <toadlet/peeper/LightEffect.h>
 #include <toadlet/peeper/Light.h>
 #include <toadlet/peeper/IndexBuffer.h>
-#include <toadlet/peeper/RenderContext.h>
 #include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/Viewport.h>
@@ -58,8 +56,7 @@ TOADLET_C_API Renderer* new_D3D9Renderer(){
 D3D9Renderer::D3D9Renderer():
 	mD3DDevice(NULL),
 	//mD3DCaps,
-	mD3DRenderContextPeer(NULL),
-	mRenderContext(NULL),
+	mPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL),
 	mShutdown(true),
 
@@ -86,39 +83,29 @@ D3D9Renderer::~D3D9Renderer(){
 	TOADLET_ASSERT(mShutdown);
 }
 
-bool D3D9Renderer::startup(RenderContext *renderContext,int *options){
+bool D3D9Renderer::startup(RenderTarget *target,int *options){
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
 		"D3D9Renderer: Startup started");
 
-	if(renderContext==NULL){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"D3D9Renderer: RenderContext passed in is NULL");
-		return false;
-	}
-		
-	#if defined(TOADLET_RTTI)
-		D3D9RenderContextPeer *d3dRenderContextPeer=dynamic_cast<D3D9RenderContextPeer*>(renderContext->internal_getRenderTargetPeer());
-	#else
-		D3D9RenderContextPeer *d3dRenderContextPeer=(D3D9RenderContextPeer*)renderContext->internal_getRenderTargetPeer();
-	#endif
-	if(d3dRenderContextPeer==NULL){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"D3D9Renderer: RenderContext peer passed in does not have a D3D9RenderContextPeer");
+	if(target==NULL){
+		Error::nullPointer(Categories::TOADLET_PEEPER,
+			"D3D9Renderer: NULL RenderTarget");
 		return false;
 	}
 
-	mShutdown=false;
-
-	mD3DRenderContextPeer=d3dRenderContextPeer;
-	mRenderContext=renderContext;
-	mRenderTarget=renderContext;
-
-	mD3DDevice=mD3DRenderContextPeer->getDirect3DDevice9();
+	D3D9RenderTarget *d3dtarget=(D3D9RenderTarget*)target->getRootRenderTarget();
+	mD3DDevice=d3dtarget->getDirect3DDevice9();
 	if(mD3DDevice==NULL){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"D3DMRenderer: Invalid Direct3DDevice9");
 		return false;
 	}
+
+	mShutdown=false;
+	mPrimaryRenderTarget=target;
+	mD3DPrimaryRenderTarget=d3dtarget;
+	mRenderTarget=target;
+	mD3DRenderTarget=d3dtarget;
 
 	ZeroMemory(&mD3DCaps,sizeof(D3DCAPS9));
 	HRESULT result=mD3DDevice->GetDeviceCaps(&mD3DCaps);
@@ -168,7 +155,7 @@ Renderer::RendererStatus D3D9Renderer::getStatus(){
 }
 
 bool D3D9Renderer::reset(){
-	mD3DRenderContextPeer->reset();
+	mD3DPrimaryRenderTarget->reset();
 
 	setDefaultStates();
 
@@ -178,12 +165,6 @@ bool D3D9Renderer::reset(){
 Texture *D3D9Renderer::createTexture(){
 	return new D3D9Texture(this);
 /*
-	if(texture==NULL){
-		Error::nullPointer(Categories::TOADLET_PEEPER,
-			"Texture is NULL");
-		return NULL;
-	}
-
 	switch(texture->getType()){
 		case Texture::Type_NORMAL:{
 			return new D3D9TexturePeer(this,texture);
@@ -241,6 +222,28 @@ ShaderPeer *D3D9Renderer::createShaderPeer(Shader *shader){
 	return NULL;
 }
 
+bool D3D9Renderer::setRenderTarget(RenderTarget *target){
+	if(target==NULL){
+		Error::nullPointer(Categories::TOADLET_PEEPER,
+			"RenderTarget is NULL");
+		return false;
+	}
+
+	D3D9RenderTarget *d3dtarget=(D3D9RenderTarget*)target->getRootRenderTarget();
+	if(d3dtarget==NULL){
+		Error::nullPointer(Categories::TOADLET_PEEPER,
+			"RenderTarget is not a D3D9RenderTarget");
+		return false;
+	}
+
+	mRenderTarget=target;
+	mD3DRenderTarget=d3dtarget;
+
+	mD3DRenderTarget->makeCurrent(mD3DDevice);
+
+	return true;
+}
+
 void D3D9Renderer::setViewport(const Viewport &viewport){
 	D3DVIEWPORT9 d3dviewport;
 	d3dviewport.X=viewport.x;
@@ -273,34 +276,6 @@ void D3D9Renderer::clear(int clearFlags,const Color &clearColor){
 void D3D9Renderer::swap(){
 	HRESULT result=mD3DDevice->Present(NULL,NULL,NULL,NULL);
 	TOADLET_CHECK_D3D9ERROR(result,"swapBuffers");
-}
-
-RenderContext *D3D9Renderer::getRenderContext(){
-	return mRenderContext;
-}
-
-bool D3D9Renderer::setRenderTarget(RenderTarget *target){
-	#if defined(TOADLET_RTTI)
-		D3D9RenderTargetPeer *peer=dynamic_cast<D3D9RenderTargetPeer*>(target->internal_getRenderTargetPeer());
-	#else
-		D3D9RenderTargetPeer *peer=(D3D9RenderTargetPeer*)target->internal_getRenderTargetPeer();
-	#endif
-	if(peer!=NULL){
-		peer->makeCurrent(mD3DDevice);
-	}
-	else{
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"D3D9Renderer: Null render target peer, or incorrect peer type");
-		return false;
-	}
-
-	mRenderTarget=target;
-
-	return true;
-}
-
-RenderTarget *D3D9Renderer::getRenderTarget(){
-	return mRenderTarget;
 }
 
 void D3D9Renderer::setModelMatrix(const Matrix4x4 &matrix){

@@ -27,7 +27,7 @@
 #define TOADLET_PEEPER_D3D9RENDERER_H
 
 #include "D3D9Includes.h"
-#include "D3D9RenderContextPeer.h"
+#include "D3D9RenderTarget.h"
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/Blend.h>
 #include <toadlet/peeper/LightEffect.h>
@@ -46,7 +46,7 @@ public:
 	virtual ~D3D9Renderer();
 
 	// Startup/Shutdown
-	bool startup(RenderContext *renderContext,int *options);
+	bool startup(RenderTarget *target,int *options);
 	bool shutdown();
 	RendererStatus getStatus();
 	bool reset();
@@ -63,9 +63,9 @@ public:
 	void setProjectionMatrix(const Matrix4x4 &matrix);
 
 	// Rendering operations
-	RenderContext *getRenderContext();
+	RenderTarget *getPrimaryRenderTarget(){return mPrimaryRenderTarget;}
 	bool setRenderTarget(RenderTarget *target);
-	RenderTarget *getRenderTarget();
+	RenderTarget *getRenderTarget(){return mRenderTarget;}
 	void setViewport(const Viewport &viewport);
 	void clear(int clearFlags,const Color &clearcolor);
 	void swap();
@@ -123,9 +123,10 @@ protected:
 
 	IDirect3DDevice9 *mD3DDevice;
 	D3DCAPS9 mD3DCaps;
-	D3D9RenderContextPeer *mD3DRenderContextPeer;
-	RenderContext *mRenderContext;
+	RenderTarget *mPrimaryRenderTarget;
+	D3D9RenderTarget *mD3DPrimaryRenderTarget;
 	RenderTarget *mRenderTarget;
+	D3D9RenderTarget *mD3DRenderTarget;
 	bool mShutdown;
 
 	// Cached render state attributes

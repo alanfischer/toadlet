@@ -26,6 +26,8 @@
 #ifndef TOADLET_PEEPER_GLRENDERER_H
 #define TOADLET_PEEPER_GLRENDERER_H
 
+#include "GLIncludes.h"
+#include "GLRenderTarget.h"
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/Blend.h>
 #include <toadlet/peeper/LightEffect.h>
@@ -33,7 +35,6 @@
 #include <toadlet/peeper/StatisticsSet.h>
 #include <toadlet/peeper/CapabilitySet.h>
 #include <toadlet/peeper/VertexElement.h>
-#include "GLIncludes.h"
 
 namespace toadlet{
 namespace peeper{
@@ -54,7 +55,7 @@ public:
 	virtual ~GLRenderer();
 
 	// Startup/Shutdown
-	bool startup(RenderTarget *renderTarget,int *options);
+	bool startup(RenderTarget *target,int *options);
 	bool shutdown();
 	RendererStatus getStatus();
 	bool reset();
@@ -189,7 +190,9 @@ protected:
 	CapabilitySet mCapabilitySet;
 
 	RenderTarget *mPrimaryRenderTarget;
+	GLRenderTarget *mGLPrimaryRenderTarget;
 	RenderTarget *mRenderTarget;
+	GLRenderTarget *mGLRenderTarget;
 
 	class ScratchBuffer{
 	public:

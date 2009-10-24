@@ -39,7 +39,6 @@
 #include <toadlet/peeper/Program.h>
 #include <toadlet/peeper/Shader.h>
 #include <toadlet/peeper/Light.h>
-#include <toadlet/peeper/Texture.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::image;
@@ -125,9 +124,15 @@ GLRenderer::~GLRenderer(){
 	}
 }
 
-bool GLRenderer::startup(RenderTarget *renderTarget,int *options){
+bool GLRenderer::startup(RenderTarget *target,int *options){
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
 		"GLRenderer: Startup started");
+
+	if(target==NULL){
+		Error::nullPointer(Categories::TOADLET_PEEPER,
+			"GLRenderer: NULL RenderTarget");
+		return false;
+	}
 
 	bool usePBuffers=true;
 	bool useFBOs=true;
@@ -184,10 +189,13 @@ bool GLRenderer::startup(RenderTarget *renderTarget,int *options){
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
 		String("CALCULATED GL VERSION:")+(gl_version/10)+"."+(gl_version%10));
 
-	mShutdown=false;
+	GLRenderTarget *gltarget=(GLRenderTarget*)target->getRootRenderTarget();
 
-	mPrimaryRenderTarget=renderTarget;
-	mRenderTarget=renderTarget;
+	mShutdown=false;
+	mPrimaryRenderTarget=target;
+	mGLPrimaryRenderTarget=gltarget;
+	mRenderTarget=target;
+	mGLRenderTarget=gltarget;
 
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
 		String("GL_VENDOR:") + glGetString(GL_VENDOR));
@@ -519,56 +527,22 @@ bool GLRenderer::setRenderTarget(RenderTarget *target){
 	TOADLET_CHECK_GLERROR("before setRenderTarget");
 
 	if(target==NULL){
-		mRenderTarget=NULL;
 		Error::nullPointer(Categories::TOADLET_PEEPER,
 			"RenderTarget is NULL");
 		return false;
 	}
 
 	GLRenderTarget *gltarget=(GLRenderTarget*)target->getRootRenderTarget();
-	if(gltarget!=NULL){
-		gltarget->current();
-
-		// TODO: Move this to the create method of the Target!
-		setDefaultStates();
-
-		// It is known that GL_LINE_SMOOTH or GL_POLYGON_SMOOTH cause software rendering on some devices, so disable antialiasing
-		// TODO: Add in antialiasing somewhere proper
-		/*
-		if(peer->getAntialiased()){
-			glEnable(GL_LINE_SMOOTH);
-			#if defined(TOADLET_HAS_GLEW)
-				glEnable(GL_POLYGON_SMOOTH);
-				if(GLEW_ARB_multisample){
-					glEnable(GL_MULTISAMPLE_ARB);
-				}
-				if(GLEW_NV_multisample_filter_hint){
-					glHint(GL_MULTISAMPLE_FILTER_HINT_NV,GL_NICEST);
-				}
-			#endif
-		}
-		else{
-			glDisable(GL_LINE_SMOOTH);
-			#if defined(TOADLET_HAS_GLEW)
-				glDisable(GL_POLYGON_SMOOTH);
-				if(GLEW_ARB_multisample){
-					glDisable(GL_MULTISAMPLE_ARB);
-				}
-				if(GLEW_NV_multisample_filter_hint){
-					glHint(GL_MULTISAMPLE_FILTER_HINT_NV,GL_FASTEST);
-				}
-			#endif
-		}
-		*/
-	}
-	else{
-		mRenderTarget=NULL;
-		Error::invalidParameters(Categories::TOADLET_PEEPER,
-			"setRenderTarget: target peer is not a GLRenderTargetPeer");
+	if(gltarget==NULL){
+		Error::nullPointer(Categories::TOADLET_PEEPER,
+			"RenderTarget is not a GLRenderTarget");
 		return false;
 	}
 
 	mRenderTarget=target;
+	mGLRenderTarget=gltarget;
+
+	mGLRenderTarget->makeCurrent();
 
 	TOADLET_CHECK_GLERROR("setRenderTarget");
 
@@ -620,10 +594,8 @@ void GLRenderer::clear(int clearFlags,const Color &clearColor){
 }
 
 void GLRenderer::swap(){
-	if(mRenderTarget!=NULL){
-		// TODO: store the gltarget from setRenderTarget, so we don't have to recall getRootRenderTarget
-		GLRenderTarget *gltarget=(GLRenderTarget*)mRenderTarget->getRootRenderTarget();
-		gltarget->swap();
+	if(mGLRenderTarget!=NULL){
+		mGLRenderTarget->swap();
 	}
 
 	TOADLET_CHECK_GLERROR("swap");

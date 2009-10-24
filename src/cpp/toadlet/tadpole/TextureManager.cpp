@@ -39,7 +39,7 @@ TextureManager::TextureManager(Engine *engine):ResourceManager(engine){
 
 Texture::ptr TextureManager::createTexture(const Image::ptr &image){
 	Texture::ptr texture(mEngine->getRenderer()->createTexture());
-	texture->create(Texture::UsageFlags_NONE,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth());
+	texture->create(Texture::UsageFlags_AUTOGEN_MIPMAPS,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0);
 	texture->load(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),image->getData());
 	return texture;
 }
