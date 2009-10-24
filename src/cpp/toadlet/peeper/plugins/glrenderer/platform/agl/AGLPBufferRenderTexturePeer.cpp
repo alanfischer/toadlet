@@ -82,7 +82,13 @@ void AGLPBufferRenderTexturePeer::makeCurrent(){
 			String("Error in aglSetPBuffer:")+(int)aglGetError());
 		return;
 	}
+
+	if(mInitialized==false){
+		mRenderer->setDefaultStates();
+		mInitialized=true;
+	}
 }
+
 void AGLPBufferRenderTexturePeer::swap(){
 	glBindTexture(textureTarget,textureHandle);
 	AGLRenderTargetPeer *renderTargetPeer=(AGLRenderTargetPeer*)mRenderer->getRenderContext()->internal_getRenderTargetPeer();

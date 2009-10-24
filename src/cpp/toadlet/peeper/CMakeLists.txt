@@ -35,6 +35,7 @@ set (PEEPER_HEADERS
 	Shader.h
 	StatisticsSet.h
 	Surface.h
+	SurfaceRenderTarget.h
 	Texture.h
 	TextureBlend.h
 	TextureStage.h

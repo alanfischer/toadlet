@@ -128,7 +128,7 @@ public:
 	virtual ~Renderer(){}
 
 	// Startup/Shutdown
-	virtual bool startup(RenderTarget *renderTarget,int *options)=0;
+	virtual bool startup(RenderTarget *target,int *options)=0;
 	virtual bool shutdown()=0;
 	virtual RendererStatus getStatus()=0;
 	virtual bool reset()=0;

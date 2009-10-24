@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "D3D9WindowRenderContextPeer.h"
+#include "D3D9WindowRenderTarget.h"
 #include <toadlet/egg/Error.h>
 
 using namespace toadlet::egg;
@@ -31,11 +31,11 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTargetPeer *new_D3D9WindowRenderContextPeer(HWND wnd,const Visual &visual){
-	return new D3D9WindowRenderContextPeer(wnd,visual);
+TOADLET_C_API RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,const Visual &visual){
+	return new D3D9WindowRenderTarget(wnd,visual);
 }
 
-D3D9WindowRenderContextPeer::D3D9WindowRenderContextPeer():D3D9RenderContextPeer(),
+D3D9WindowRenderTarget::D3D9WindowRenderTarget():D3D9RenderTarget(),
 	mLibrary(0),
 	mD3D(NULL),
 	mD3DDevice(NULL),
@@ -47,7 +47,7 @@ D3D9WindowRenderContextPeer::D3D9WindowRenderContextPeer():D3D9RenderContextPeer
 {
 }
 
-D3D9WindowRenderContextPeer::D3D9WindowRenderContextPeer(HWND wnd,const Visual &visual):D3D9RenderContextPeer(),
+D3D9WindowRenderTarget::D3D9WindowRenderTarget(HWND wnd,const Visual &visual):D3D9RenderTarget(),
 	mLibrary(0),
 	mD3D(NULL),
 	mD3DDevice(NULL),
@@ -59,19 +59,21 @@ D3D9WindowRenderContextPeer::D3D9WindowRenderContextPeer(HWND wnd,const Visual &
 	createContext(wnd,visual);
 }
 
-D3D9WindowRenderContextPeer::~D3D9WindowRenderContextPeer(){
+D3D9WindowRenderTarget::~D3D9WindowRenderTarget(){
 	destroyContext();
 }
 
-void D3D9WindowRenderContextPeer::makeCurrent(IDirect3DDevice9 *device){
+bool D3D9WindowRenderTarget::makeCurrent(IDirect3DDevice9 *device){
 	HRESULT result=device->SetRenderTarget(0,mColorSurface);
 	TOADLET_CHECK_D3D9ERROR(result,"Error in SetRenderTarget");
 
 	result=device->SetDepthStencilSurface(mDepthSurface);
 	TOADLET_CHECK_D3D9ERROR(result,"Error in SetDepthStencilSurface");
+
+	return true;
 }
 
-void D3D9WindowRenderContextPeer::reset(){
+void D3D9WindowRenderTarget::reset(){
 	if(mColorSurface!=NULL){
 		mColorSurface->Release();
 		mColorSurface=NULL;
@@ -91,7 +93,7 @@ void D3D9WindowRenderContextPeer::reset(){
 	mD3DDevice->GetDepthStencilSurface(&mDepthSurface);
 }
 
-bool D3D9WindowRenderContextPeer::createContext(HWND wnd,const Visual &visual){
+bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual){
 	HRESULT result;
 
 	mLibrary=LoadLibrary(TEXT("D3D9.dll"));
@@ -177,7 +179,7 @@ bool D3D9WindowRenderContextPeer::createContext(HWND wnd,const Visual &visual){
 	return true;
 }
 
-bool D3D9WindowRenderContextPeer::destroyContext(){
+bool D3D9WindowRenderTarget::destroyContext(){
 	if(mColorSurface!=NULL){
 		mColorSurface->Release();
 		mColorSurface=NULL;
@@ -206,7 +208,7 @@ bool D3D9WindowRenderContextPeer::destroyContext(){
 	return true;
 }
 
-void D3D9WindowRenderContextPeer::fillPresentParameters(D3DPRESENT_PARAMETERS &presentParameters){
+void D3D9WindowRenderTarget::fillPresentParameters(D3DPRESENT_PARAMETERS &presentParameters){
 	RECT rect={0};
 	GetClientRect(mWindow,&rect);
 	mWidth=rect.right-rect.left;

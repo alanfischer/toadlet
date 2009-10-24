@@ -34,7 +34,7 @@ WGLRenderTarget::WGLRenderTarget():GLRenderTarget(),
 	mDC(0)
 {}
 
-bool WGLRenderTarget::current(){
+bool WGLRenderTarget::makeCurrent(){
 	BOOL result=wglMakeCurrent(mDC,mGLRC);
 	if(result==FALSE){
 		egg::Error::unknown(egg::Categories::TOADLET_PEEPER,

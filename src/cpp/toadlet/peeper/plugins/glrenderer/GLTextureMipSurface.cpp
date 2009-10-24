@@ -24,11 +24,12 @@
  ********** Copyright header - do not remove **********/
 
 #include "GLTextureMipSurface.h"
+#include "GLTexture.h"
 
 namespace toadlet{
 namespace peeper{
 
-GLTextureMipSurface::GLTextureMipSurface(GLTexture *texture,GLuint level,int width,int height):GLSurface(),
+GLTextureMipSurface::GLTextureMipSurface(GLTexture *texture,GLuint level):GLSurface(),
 	mTexture(NULL),
 	mLevel(0),
 	mWidth(0),
@@ -36,14 +37,15 @@ GLTextureMipSurface::GLTextureMipSurface(GLTexture *texture,GLuint level,int wid
 {
 	mTexture=texture;
 	mLevel=level;
-	mWidth=width;
-	mHeight=height;
-}
 
-void GLTextureMipSurface::resize(GLuint level,int width,int height){
-	mLevel=level;
-	mWidth=width;
-	mHeight=height;
+	int l=level;
+	int w=texture->getWidth(),h=texture->getHeight();
+	while(l>0){
+		w/=2; h/=2;
+		l--;
+	}
+	mWidth=w;
+	mHeight=h;
 }
 
 }

@@ -36,7 +36,7 @@ class GLRenderTarget:public RenderTarget{
 public:
 	virtual ~GLRenderTarget(){}
 
-	virtual bool current()=0;
+	virtual bool makeCurrent()=0;
 	virtual bool swap()=0;
 };
 

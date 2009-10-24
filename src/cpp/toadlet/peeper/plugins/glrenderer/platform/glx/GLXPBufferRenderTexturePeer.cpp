@@ -75,6 +75,11 @@ GLXPBufferRenderTexturePeer::~GLXPBufferRenderTexturePeer(){
 
 void GLXPBufferRenderTexturePeer::makeCurrent(){
 	GLXRenderTargetPeer::makeCurrent();
+
+	if(mInitialized==false){
+		mRenderer->setDefaultStates();
+		mInitialized=true;
+	}
 }
 
 void GLXPBufferRenderTexturePeer::swap(){

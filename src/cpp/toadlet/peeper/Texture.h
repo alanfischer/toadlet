@@ -42,6 +42,7 @@ public:
 		UsageFlags_NONE=			0,
 		UsageFlags_NPOT_RESTRICTED=	1<<0,
 		UsageFlags_RENDERTARGET=	1<<1,
+		UsageFlags_AUTOGEN_MIPMAPS=	1<<2,
 	};
 
 	virtual ~Texture(){}
@@ -53,7 +54,7 @@ public:
 	virtual const egg::String &getName() const=0;
 
 	// Lifecycle
-	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth)=0;
+	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels)=0;
 	virtual void destroy()=0;
 
 	// Information
@@ -63,11 +64,10 @@ public:
 	virtual int getWidth() const=0;
 	virtual int getHeight() const=0;
 	virtual int getDepth() const=0;
+	virtual int getNumMipLevels() const=0;
 
 	// Pixeldata
-	virtual void setNumMipLevels(int mipLevels,bool generate)=0;
 	virtual Surface::ptr getMipSuface(int i) const=0;
-	virtual bool getGenerateMipLevels() const=0;
 	virtual void load(int format,int width,int height,int depth,uint8 *data)=0;
 	virtual bool read(int format,int width,int height,int depth,uint8 *data)=0;
 };

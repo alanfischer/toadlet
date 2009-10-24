@@ -23,26 +23,41 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_D3D9RENDERCONTEXTPEER_H
-#define TOADLET_PEEPER_D3D9RENDERCONTEXTPEER_H
+#ifndef TOADLET_PEEPER_D3D9SURFACE_H
+#define TOADLET_PEEPER_D3D9SURFACE_H
 
-#include "D3D9RenderTargetPeer.h"
+#include "D3D9Includes.h"
+#include <toadlet/peeper/Surface.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API D3D9RenderContextPeer:public D3D9RenderTargetPeer{
+class D3D9Renderer;
+
+class TOADLET_API D3D9Surface:public Surface{
 public:
-	D3D9RenderContextPeer():D3D9RenderTargetPeer(){}
-	virtual ~D3D9RenderContextPeer(){}
+	TOADLET_SHARED_POINTERS(D3D9Surface,Surface);
 
-	virtual void reset()=0;
+	D3D9Surface(IDirect3DSurface9 *surface);
+	virtual ~D3D9Surface();
 
-	virtual IDirect3DDevice9 *getDirect3DDevice9() const=0;
+	virtual Surface *getRootSurface(){return this;}
+
+	virtual bool destroy();
+
+	virtual int getWidth() const{return mWidth;}
+	virtual int getHeight() const{return mHeight;}
+	inline IDirect3DSurface9 *getSurface() const{return mSurface;}
+
+protected:
+	IDirect3DSurface9 *mSurface;
+	int mWidth;
+	int mHeight;
+
+	friend D3D9Renderer;
 };
 
 }
 }
 
 #endif
-

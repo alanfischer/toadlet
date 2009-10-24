@@ -43,7 +43,7 @@ public:
 
 	virtual Texture *getRootTexture(){return this;}
 
-	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth);
+	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels);
 	virtual void destroy();
 
 	virtual int getUsageFlags() const{return mUsageFlags;}
@@ -52,10 +52,9 @@ public:
 	virtual int getWidth() const{return mWidth;}
 	virtual int getHeight() const{return mHeight;}
 	virtual int getDepth() const{return mDepth;}
+	virtual int getNumMipLevels() const{return mMipLevels;}
 
-	virtual void setNumMipLevels(int mipLevels,bool generate);
-	virtual Surface::ptr getMipSuface(int i) const{return mMipLevels[i];}
-	virtual bool getGenerateMipLevels() const{return mGenerateMipLevels;}
+	virtual Surface::ptr getMipSuface(int i) const;
 	virtual void load(int format,int width,int height,int depth,uint8 *data);
 	virtual bool read(int format,int width,int height,int depth,uint8 *data);
 
@@ -85,15 +84,14 @@ protected:
 	int mWidth;
 	int mHeight;
 	int mDepth;
+	int mMipLevels;
 
 	egg::String mName;
 
 	GLuint mHandle;
 	GLenum mTarget;
 	Matrix4x4 mMatrix;
-	bool mGenerateMipLevels;
 	bool mManuallyGenerateMipLevels;
-	egg::Collection<GLTextureMipSurface::ptr> mMipLevels;
 
 	friend GLRenderer;
 };

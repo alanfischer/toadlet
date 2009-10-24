@@ -22,56 +22,57 @@
  * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
  *
  ********** Copyright header - do not remove **********/
-/*
-#ifndef TOADLET_PEEPER_WGLPBUFFERRENDERTEXTUREPEER_H
-#define TOADLET_PEEPER_WGLPBUFFERRENDERTEXTUREPEER_H
 
-#include "WGLRenderTargetPeer.h"
-#include "../../GLTexturePeer.h"
-#include <toadlet/peeper/RenderTexture.h>
+#ifndef TOADLET_PEEPER_WGLPBUFFERSURFACERENDERTARGET_H
+#define TOADLET_PEEPER_WGLPBUFFERSURFACERENDERTARGET_H
+
+#include "WGLRenderTarget.h"
+#include "../../GLTexture.h"
+#include <toadlet/peeper/SurfaceRenderTarget.h>
 
 namespace toadlet{
 namespace peeper{
 
 class GLRenderer;
 
-class WGLPBufferRenderTexturePeer:public WGLRenderTargetPeer,public GLTexturePeer{
+class WGLPBufferSurfaceRenderTarget:public WGLRenderTarget,public SurfaceRenderTarget{
 public:
 	static bool available(GLRenderer *renderer);
 
-	WGLPBufferRenderTexturePeer(GLRenderer *renderer,RenderTexture *texture);
+	WGLPBufferSurfaceRenderTarget(GLRenderer *renderer);
+	virtual ~WGLPBufferSurfaceRenderTarget();
 
-	virtual ~WGLPBufferRenderTexturePeer();
+	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
-	TexturePeer *castToTexturePeer(){return this;}
-	RenderTargetPeer *castToRenderTargetPeer(){return this;}
+	virtual bool create();
+	virtual bool destroy();
 
-	void makeCurrent();
+	virtual bool makeCurrent();
+	virtual bool swap();
 
-	void swap();
+	virtual bool attach(Surface::ptr surface,Attachment attachment);
+	virtual bool remove(Surface::ptr surface);
 
-	bool createBuffer();
-
-	bool destroyBuffer();
-
-	int getWidth() const;
-	int getHeight() const;
-
-	bool isValid() const;
-
+	virtual bool isPrimary() const{return false;}
+	virtual int getWidth() const{return mWidth;}
+	virtual int getHeight() const{return mHeight;}
+	virtual bool isValid() const{return mGLRC!=NULL && mPBuffer!=NULL;}
 	inline HPBUFFERARB getHPBUFFER() const{return mPBuffer;}
 
 protected:
-	RenderTexture *mTexture;
+	virtual bool createBuffer();
+	virtual bool destroyBuffer();
+
+	GLRenderer *mRenderer;
+	Surface::ptr mTexture;
 	HPBUFFERARB mPBuffer;
 	int mWidth;
 	int mHeight;
 	bool mBound;
+	bool mInitialized;
 };
 
 }
 }
 
 #endif
-
-*/

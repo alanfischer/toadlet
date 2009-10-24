@@ -76,7 +76,7 @@ using namespace toadlet::tadpole;
 #elif defined(TOADLET_HAS_DIRECT3D9)
 	#pragma comment(lib,"toadlet_peeper_d3d9renderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_D3D9Renderer();
-//	extern "C" RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,const Visual &visual);
+	extern "C" RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,const Visual &visual);
 #endif
 #if defined(TOADLET_PLATFORM_WIN32)
 	#pragma comment(lib,"toadlet_ribbit_win32player" TOADLET_LIBRARY_EXTENSION)
@@ -138,7 +138,7 @@ Win32Application::Win32Application():
 	win32->mWnd=0;
 	win32->mIcon=0;
 
-	changeRendererPlugin(RendererPlugin_OPENGL); // OpenGL By default
+	changeRendererPlugin(RendererPlugin_DIRECT3D); // OpenGL By default
 
 	win32->mInstance=GetModuleHandle(NULL);
 }
@@ -601,7 +601,7 @@ RenderTarget *Win32Application::makeRenderTarget(int rendererPlugin){
 		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 			target=new_D3DMWindowRenderTarget(win32->mWnd,mVisual);
 		#elif defined(TOADLET_HAS_DIRECT3D9)
-//			target=new_D3D9WindowRenderTarget(win32->mWnd,mVisual);
+			target=new_D3D9WindowRenderTarget(win32->mWnd,mVisual);
 		#endif
 	}
 	if(target!=NULL && target->isValid()==false){

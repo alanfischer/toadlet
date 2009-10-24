@@ -34,7 +34,7 @@ set (PEEPER_GLRENDERER_PLATFORM_NSGL_SRC
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_WGL_SRC
-#	platform/wgl/WGLPBufferRenderTexturePeer.cpp
+	platform/wgl/WGLPBufferSurfaceRenderTarget.cpp
 	platform/wgl/WGLRenderTarget.cpp
 	platform/wgl/WGLWindowRenderTarget.cpp
 )
@@ -83,7 +83,7 @@ set (PEEPER_GLRENDERER_PLATFORM_NSGL_HEADERS
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_WGL_HEADERS
-	platform/wgl/WGLPBufferRenderTexturePeer.h
+	platform/wgl/WGLPBufferSurfaceRenderTarget.h
 	platform/wgl/WGLRenderTarget.h
 	platform/wgl/WGLWindowRenderTarget.h
 )

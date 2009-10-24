@@ -23,20 +23,24 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_D3D9WINDOWRENDERCONTEXTPEER_H
-#define TOADLET_PEEPER_D3D9WINDOWRENDERCONTEXTPEER_H
+#ifndef TOADLET_PEEPER_D3D9WINDOWRENDERTARGET_H
+#define TOADLET_PEEPER_D3D9WINDOWRENDERTARGET_H
 
-#include "D3D9RenderContextPeer.h"
+#include "D3D9RenderTarget.h"
 #include <toadlet/peeper/Visual.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API D3D9WindowRenderContextPeer:public D3D9RenderContextPeer{
+class TOADLET_API D3D9WindowRenderTarget:public D3D9RenderTarget{
 public:
-	D3D9WindowRenderContextPeer();
-	D3D9WindowRenderContextPeer(HWND wnd,const Visual &visual);
-	virtual ~D3D9WindowRenderContextPeer();
+	D3D9WindowRenderTarget();
+	D3D9WindowRenderTarget(HWND wnd,const Visual &visual);
+	virtual ~D3D9WindowRenderTarget();
+
+	virtual RenderTarget *getRootRenderTarget(){return this;}
+	virtual bool isPrimary() const{return true;}
+	virtual bool isValid() const{return mD3DDevice!=NULL;}
 
 	virtual bool createContext(HWND wnd,const Visual &visual);
 
@@ -46,11 +50,9 @@ public:
 
 	virtual int getHeight() const{return mHeight;}
 
-	virtual void makeCurrent(IDirect3DDevice9 *device);
+	virtual bool makeCurrent(IDirect3DDevice9 *device);
 
 	virtual void reset();
-
-	inline bool isValid() const{return mD3DDevice!=NULL;}
 
 	inline IDirect3DDevice9 *getDirect3DDevice9() const{return mD3DDevice;}
 	inline const D3DPRESENT_PARAMETERS &getPresentParameters() const{return mPresentParameters;}
