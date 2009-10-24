@@ -44,6 +44,7 @@ class LightEffect;
 class Program;
 class ProgramPeer;
 class RenderTarget;
+class SurfaceRenderTarget;
 class Shader;
 class ShaderPeer;
 class StatisticsSet;
@@ -135,6 +136,7 @@ public:
 
 	// Resource operations
 	virtual Texture *createTexture()=0;
+	virtual SurfaceRenderTarget *createSurfaceRenderTarget()=0;
 	virtual BufferPeer *createBufferPeer(Buffer *buffer)=0;
 	virtual ProgramPeer *createProgramPeer(Program *program)=0;
 	virtual ShaderPeer *createShaderPeer(Shader *shader)=0;

@@ -54,6 +54,7 @@ public:
 	virtual bool remove(Surface::ptr surface);
 
 	virtual bool isPrimary() const{return false;}
+	virtual bool isValid() const{return mHandle!=0;}
 	virtual int getWidth() const{return mWidth;}
 	virtual int getHeight() const{return mHeight;}
 

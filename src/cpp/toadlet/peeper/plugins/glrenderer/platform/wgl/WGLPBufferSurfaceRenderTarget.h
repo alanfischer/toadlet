@@ -54,9 +54,9 @@ public:
 	virtual bool remove(Surface::ptr surface);
 
 	virtual bool isPrimary() const{return false;}
+	virtual bool isValid() const{return mGLRC!=NULL && mPBuffer!=NULL;}
 	virtual int getWidth() const{return mWidth;}
 	virtual int getHeight() const{return mHeight;}
-	virtual bool isValid() const{return mGLRC!=NULL && mPBuffer!=NULL;}
 	inline HPBUFFERARB getHPBUFFER() const{return mPBuffer;}
 
 protected:
@@ -64,7 +64,7 @@ protected:
 	virtual bool destroyBuffer();
 
 	GLRenderer *mRenderer;
-	Surface::ptr mTexture;
+	GLTexture *mTexture;
 	HPBUFFERARB mPBuffer;
 	int mWidth;
 	int mHeight;

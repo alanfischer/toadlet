@@ -65,6 +65,8 @@ bool GLFBOSurfaceRenderTarget::create(){
 
 	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::create");
 
+	attach(this->createBufferSurface(Texture::Format_DEPTH_8,256,256),Attachment_DEPTH_STENCIL);
+
 	return true;
 }
 
@@ -112,13 +114,13 @@ bool GLFBOSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment
 		GLuint handle=textureSurface->getTexture()->getHandle();
 		GLenum target=textureSurface->getTexture()->getTarget();
 		GLuint level=textureSurface->getLevel();
-	
+
 		glFramebufferTexture2D(GL_FRAMEBUFFER,getGLAttachment(attachment),target,handle,level);
 		// TODO: Figure out EXACTLY when we need these and when we dont, I think we just need them if its ONLY a SHADOWMAP
-//		#if !defined(TOADLET_HAS_GLES)
-//			glDrawBuffer(GL_NONE);
-//			glReadBuffer(GL_NONE);
-//		#endif
+		#if !defined(TOADLET_HAS_GLES)
+			//glDrawBuffer(GL_NONE);
+			//glReadBuffer(GL_NONE);
+		#endif
 	}
 	else if(renderbufferSurface!=NULL){
 		GLuint handle=renderbufferSurface->getHandle();
@@ -127,13 +129,17 @@ bool GLFBOSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment
 	}
 	
 	GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
+Logger::log("LOL!");
 	if(status!=GL_FRAMEBUFFER_COMPLETE){
+Logger::log("ga busted!");
 		Logger::log(Categories::TOADLET_PEEPER,Logger::Level_WARNING,getFBOMessage(status));
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 
 	mSurfaces.add(surface);
 	mSurfaceAttachments.add(attachment);
+
+	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::attach");
 
 	return true;
 }
@@ -169,6 +175,8 @@ bool GLFBOSurfaceRenderTarget::remove(Surface::ptr surface){
 		Logger::log(Categories::TOADLET_PEEPER,Logger::Level_WARNING,getFBOMessage(status));
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
+
+	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::remove");
 
 	return true;
 }

@@ -29,6 +29,9 @@
 #include "GLSLProgramPeer.h"
 #include "GLSLShaderPeer.h"
 #include "GLRenderTarget.h"
+#if defined(TOADLET_HAS_GLFBOS)
+	#include "GLFBOSurfaceRenderTarget.h"
+#endif
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/IndexData.h>
@@ -53,11 +56,8 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-//extern bool GLPBufferRenderTexturePeer_available(GLRenderer *renderer);
-//extern GLTexturePeer *new_GLPBufferRenderTexturePeer(GLRenderer *renderer,RenderTexture *texture);
-
-//extern bool GLFBORenderTexturePeer_available(GLRenderer *renderer);
-//extern GLTexturePeer *new_GLFBORenderTexturePeer(GLRenderer *renderer,RenderTexture *texture);
+extern bool GLPBufferSurfaceRenderTarget_available(GLRenderer *renderer);
+extern SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer);
 
 TOADLET_C_API Renderer* new_GLRenderer(){
 	return new GLRenderer();
@@ -73,8 +73,8 @@ GLRenderer::GLRenderer():
 	mShutdown(true),
 	mMatrixMode(-1),
 
-	mFBORenderToTexture(false),
-	mPBufferRenderToTexture(false),
+	mPBuffersAvailable(false),
+	mFBOsAvailable(false),
 
 	mAlphaTest(AlphaTest_NONE),
 	mAlphaCutoff(0),
@@ -238,16 +238,16 @@ bool GLRenderer::startup(RenderTarget *target,int *options){
 	}
 	mCapabilitySet.maxLights=maxLights;
 
-//	mPBufferRenderToTexture=usePBuffers && GLPBufferRenderTexturePeer_available(this);
-	#if defined(TOADLET_HAS_GLEW) || defined(TOADLET_HAS_EAGL)
-//		mFBORenderToTexture=useFBOs && GLFBORenderTexturePeer_available(this);
+	mPBuffersAvailable=usePBuffers && GLPBufferSurfaceRenderTarget_available(this);
+	#if defined(TOADLET_HAS_GLFBOS)
+		mFBOsAvailable=useFBOs && GLFBOSurfaceRenderTarget::available(this);
 	#else
-		mFBORenderToTexture=false;
+		mFBOsAvailable=false;
 	#endif
 
-	mCapabilitySet.renderToTexture=mPBufferRenderToTexture || mFBORenderToTexture;
+	mCapabilitySet.renderToTexture=mPBuffersAvailable || mFBOsAvailable;
 
-	mCapabilitySet.renderToDepthTexture=mFBORenderToTexture;
+	mCapabilitySet.renderToDepthTexture=mFBOsAvailable;
 
 	#if defined(TOADLET_HAS_GLEW)
 		mCapabilitySet.textureDot3=(GLEW_ARB_texture_env_dot3!=0);
@@ -258,7 +258,7 @@ bool GLRenderer::startup(RenderTarget *target,int *options){
 	#if defined(TOADLET_HAS_GLEW)
 		// Usefully, GL_TEXTURE_RECTANGLE_ARB == GL_TEXTURE_RECTANGLE_EXT == GL_TEXTURE_RECTANGLE_NV
 		mCapabilitySet.textureNonPowerOf2Restricted=(GLEW_ARB_texture_rectangle!=0) || (GLEW_EXT_texture_rectangle!=0) || (GLEW_NV_texture_rectangle!=0);
-		mCapabilitySet.renderToTextureNonPowerOf2Restricted=mFBORenderToTexture && mCapabilitySet.textureNonPowerOf2Restricted;
+		mCapabilitySet.renderToTextureNonPowerOf2Restricted=mFBOsAvailable && mCapabilitySet.textureNonPowerOf2Restricted;
 		mCapabilitySet.textureNonPowerOf2=(GLEW_ARB_texture_non_power_of_two!=0);
 	#endif
 
@@ -292,9 +292,6 @@ bool GLRenderer::startup(RenderTarget *target,int *options){
 
 	setDefaultStates();
 
-	// TODO: After we clean up the render targets/peers we should have the primary target be initialized here,
-	//  so we don't initialize it later on
-
 	TOADLET_CHECK_GLERROR("startup");
 
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
@@ -326,44 +323,20 @@ bool GLRenderer::reset(){
 // Resource operations
 Texture *GLRenderer::createTexture(){
 	return new GLTexture(this);
-/*
-	switch(texture->getType()){
-		case Texture::Type_NORMAL:{
-			return new GLTexturePeer(this,texture);
+}
+
+SurfaceRenderTarget *GLRenderer::createSurfaceRenderTarget(){
+	#if defined(TOADLET_HAS_GLFBOS)
+		if(mFBOsAvailable){
+			return new GLFBOSurfaceRenderTarget(this);
 		}
-		case Texture::Type_RENDER:{
-			RenderTexture *renderTexture=(RenderTexture*)texture;
-			#if defined(TOADLET_HAS_GLEW)
-				if(mFBORenderToTexture){
-//					GLTexturePeer *peer=new_GLFBORenderTexturePeer(this,renderTexture);
-//					if(peer->isValid()==false){
-//						delete peer;
-//						peer=NULL;
-//					}
-//					return peer;
-				}
-				else
-			#endif
-			if(mPBufferRenderToTexture){
-//				GLTexturePeer *peer=new_GLPBufferRenderTexturePeer(this,renderTexture);
-//				if(peer->isValid()==false){
-//					delete peer;
-//					peer=NULL;
-//				}
-//				return peer;
-			}
-			Error::unknown(Categories::TOADLET_PEEPER,
-				"TT_RENDER specified, but no render to texture support");
-			return NULL;
-		}
-		case Texture::Type_ANIMATED:{
-			// Dont load animated textures, since they are just a collection of normal textures
-			return NULL;
-		}
-		default:
-			return NULL;
+	#endif
+	if(mPBuffersAvailable){
+		return new_GLPBufferSurfaceRenderTarget(this);
 	}
-*/
+	else{
+		return NULL;
+	}
 }
 
 BufferPeer *GLRenderer::createBufferPeer(Buffer *buffer){
