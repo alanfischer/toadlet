@@ -152,41 +152,9 @@ Win32Application::~Win32Application(){
 void Win32Application::create(){
 	mEngine=new Engine();
 
-	#if defined(TOADLET_HAS_OPENAL)
-		if(mAudioPlayer==NULL){
-			mAudioPlayer=new_ALPlayer();
-			bool result=false;
-			TOADLET_TRY
-				result=mAudioPlayer->startup(NULL);
-			TOADLET_CATCH(const Exception &){result=false;}
-			if(result==false){
-				delete mAudioPlayer;
-				mAudioPlayer=NULL;
-			}
-		}
-	#endif
-	#if defined(TOADLET_PLATFORM_WIN32)
-		if(mAudioPlayer==NULL){
-			mAudioPlayer=new_Win32Player();
-			bool result=false;
-			TOADLET_TRY
-				result=mAudioPlayer->startup(NULL);
-			TOADLET_CATCH(const Exception &){result=false;}
-			if(result==false){
-				delete mAudioPlayer;
-				mAudioPlayer=NULL;
-			}
-		}
-	#endif
-	if(mAudioPlayer!=NULL){
-		mEngine->setAudioPlayer(mAudioPlayer);
-	}
-
-//HACK
-createWindow();
-mRendererPlugin=mChangeRendererPlugin;
-createContextAndRenderer(mRendererPlugin);
-mActive=true;
+	createAudioPlayer();
+	createWindow();
+	activate();
 }
 
 void Win32Application::destroy(){
@@ -196,16 +164,9 @@ void Win32Application::destroy(){
 
 	mDestroyed=true;
 
-	if(mAudioPlayer!=NULL){
-		mEngine->setAudioPlayer(NULL);
-		mAudioPlayer->shutdown();
-		delete mAudioPlayer;
-		mAudioPlayer=NULL;
-	}
-
 	deactivate();
-
 	destroyWindow();
+	destroyAudioPlayer();
 
 	if(mEngine!=NULL){
 		delete mEngine;
@@ -214,15 +175,9 @@ void Win32Application::destroy(){
 }
 
 bool Win32Application::start(bool runEventLoop){
-// HACK
-//	destroyWindow();
-
-//	createWindow();
-resized(mWidth,mHeight);
+	resized(mWidth,mHeight);
 
 	mRun=true;
-
-	activate();
 
 	uint64 lastTime=System::mtime();
 	while(runEventLoop && mRun){
@@ -240,8 +195,6 @@ resized(mWidth,mHeight);
 		System::msleep(10);
 	}
 
-	deactivate();
-
 	return true;
 }
 
@@ -258,10 +211,8 @@ void Win32Application::stepEventLoop(){
 	}
 
 	if(mChangeRendererPlugin!=mRendererPlugin){
-		mRendererPlugin=mChangeRendererPlugin;
-
 		destroyRendererAndContext();
-
+		mRendererPlugin=mChangeRendererPlugin;
 		createContextAndRenderer(mRendererPlugin);
 	}
 }
@@ -289,6 +240,7 @@ void Win32Application::activate(){
 			resized(mWidth,mHeight);
 		#endif
 
+		mRendererPlugin=mChangeRendererPlugin;
 		createContextAndRenderer(mRendererPlugin);
 	}
 }
@@ -714,6 +666,49 @@ bool Win32Application::changeVideoMode(int width,int height,int colorBits){
 	#endif
 
 	return result;
+}
+
+bool Win32Application::createAudioPlayer(){
+	#if defined(TOADLET_HAS_OPENAL)
+		if(mAudioPlayer==NULL){
+			mAudioPlayer=new_ALPlayer();
+			bool result=false;
+			TOADLET_TRY
+				result=mAudioPlayer->startup(NULL);
+			TOADLET_CATCH(const Exception &){result=false;}
+			if(result==false){
+				delete mAudioPlayer;
+				mAudioPlayer=NULL;
+			}
+		}
+	#endif
+	#if defined(TOADLET_PLATFORM_WIN32)
+		if(mAudioPlayer==NULL){
+			mAudioPlayer=new_Win32Player();
+			bool result=false;
+			TOADLET_TRY
+				result=mAudioPlayer->startup(NULL);
+			TOADLET_CATCH(const Exception &){result=false;}
+			if(result==false){
+				delete mAudioPlayer;
+				mAudioPlayer=NULL;
+			}
+		}
+	#endif
+	if(mAudioPlayer!=NULL){
+		mEngine->setAudioPlayer(mAudioPlayer);
+	}
+	return true;
+}
+
+bool Win32Application::destroyAudioPlayer(){
+	if(mAudioPlayer!=NULL){
+		mEngine->setAudioPlayer(NULL);
+		mAudioPlayer->shutdown();
+		delete mAudioPlayer;
+		mAudioPlayer=NULL;
+	}
+	return true;
 }
 
 void Win32Application::internal_resize(int width,int height){
