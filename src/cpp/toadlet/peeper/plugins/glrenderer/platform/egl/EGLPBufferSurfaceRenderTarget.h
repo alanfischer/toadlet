@@ -23,47 +23,51 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_EGLPBUFFERRENDERTEXTUREPEER_H
-#define TOADLET_PEEPER_EGLPBUFFERRENDERTEXTUREPEER_H
+#ifndef TOADLET_PEEPER_EGLPBUFFERSURFACERENDERTARGET_H
+#define TOADLET_PEEPER_EGLPBUFFERSURFACERENDERTARGET_H
 
-#include "EGLRenderTargetPeer.h"
-#include "../../GLTexturePeer.h"
-#include <toadlet/peeper/RenderTexture.h>
+#include "EGLRenderTarget.h"
+#include "../../GLTexture.h"
+#include <toadlet/peeper/SurfaceRenderTarget.h>
 
 namespace toadlet{
 namespace peeper{
 
 class GLRenderer;
 
-class EGLPBufferRenderTexturePeer:public EGLRenderTargetPeer,public GLTexturePeer{
+class EGLPBufferSurfaceRenderTarget:public EGLRenderTarget,public SurfaceRenderTarget{
 public:
 	static bool available(GLRenderer *renderer);
 
-	EGLPBufferRenderTexturePeer(GLRenderer *renderer,RenderTexture *texture);
+	EGLPBufferSurfaceRenderTarget(GLRenderer *renderer);
+	virtual ~EGLPBufferSurfaceRenderTarget();
 
-	virtual ~EGLPBufferRenderTexturePeer();
+	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
-	void makeCurrent();
+	virtual bool create();
+	virtual bool destroy();
 
-	void swap();
+	virtual bool makeCurrent();
+	virtual bool swap();
 
-	TexturePeer *castToTexturePeer(){return this;}
-	RenderTargetPeer *castToRenderTargetPeer(){return this;}
+	virtual bool attach(Surface::ptr surface,Attachment attachment);
+	virtual bool remove(Surface::ptr surface);
 
-	bool createBuffer();
-
-	bool destroyBuffer();
-
-	int getWidth() const;
-	int getHeight() const;
-
-	bool isValid() const{return mContext!=NULL && mSurface!=NULL;}
+	virtual bool isPrimary() const{return false;}
+	virtual bool isValid() const{return mContext!=NULL && mSurface!=NULL;}
+	virtual int getWidth() const{return mWidth;}
+	virtual int getHeight() const{return mHeight;}
 
 protected:
-	RenderTexture *mTexture;
+	virtual bool createBuffer();
+	virtual bool destroyBuffer();
+
+	GLRenderer *mRenderer;
+	GLTexture *mTexture;
 	int mWidth;
 	int mHeight;
 	bool mBound;
+	bool mInitialized;
 };
 
 }

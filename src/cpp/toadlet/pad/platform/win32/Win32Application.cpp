@@ -64,16 +64,12 @@ using namespace toadlet::tadpole;
 	#pragma comment(lib,"toadlet_peeper_glrenderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_GLRenderer();
 	#if defined(TOADLET_PLATFORM_WINCE)
-		extern "C" RenderTarget *new_EGLRenderTarget(void *nativeSurface,const Visual &visual);
+		extern "C" RenderTarget *new_EGLWindowRenderTarget(void *nativeSurface,const Visual &visual);
 	#else
 		extern "C" RenderTarget *new_WGLWindowRenderTarget(HWND wnd,const Visual &visual);
 	#endif
 #endif
-#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-	#pragma comment(lib,"toadlet_peeper_d3dmrenderer" TOADLET_LIBRARY_EXTENSION)
-	extern "C" Renderer *new_D3DMRenderer();
-	extern "C" RenderTarget *new_D3DMWindowRenderTarget(HWND wnd,const Visual &visual);
-#elif defined(TOADLET_HAS_DIRECT3D9)
+#if defined(TOADLET_HAS_DIRECT3DMOBILE) || defined(TOADLET_HAS_DIRECT3D9)
 	#pragma comment(lib,"toadlet_peeper_d3d9renderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_D3D9Renderer();
 	extern "C" RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,const Visual &visual);
@@ -543,16 +539,14 @@ RenderTarget *Win32Application::makeRenderTarget(int rendererPlugin){
 	if(rendererPlugin==RendererPlugin_OPENGL){
 		#if defined(TOADLET_HAS_OPENGL)
 			#if defined(TOADLET_PLATFORM_WINCE)
-				target=new_EGLRenderTarget(win32->mWnd,mVisual);
+				target=new_EGLWindowRenderTarget(win32->mWnd,mVisual);
 			#else
 				target=new_WGLWindowRenderTarget(win32->mWnd,mVisual);
 			#endif
 		#endif
 	}
 	else if(rendererPlugin==RendererPlugin_DIRECT3D){
-		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-			target=new_D3DMWindowRenderTarget(win32->mWnd,mVisual);
-		#elif defined(TOADLET_HAS_DIRECT3D9)
+		#if defined(TOADLET_HAS_DIRECT3D9) || defined(TOADLET_HAS_DIRECT3DMOBILE)
 			target=new_D3D9WindowRenderTarget(win32->mWnd,mVisual);
 		#endif
 	}
@@ -571,9 +565,7 @@ Renderer *Win32Application::makeRenderer(int plugin){
 		#endif
 	}
 	else if(plugin==RendererPlugin_DIRECT3D){
-		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-			renderer=new_D3DMRenderer();
-		#elif defined(TOADLET_HAS_DIRECT3D9)
+		#if defined(TOADLET_HAS_DIRECT3D9) || defined(TOADLET_HAS_DIRECT3DMOBILE)
 			renderer=new_D3D9Renderer();
 		#endif
 	}

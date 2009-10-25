@@ -31,76 +31,119 @@
 #include <toadlet/egg/Logger.h>
 #include <windows.h>
 #include <commctrl.h>
-#include <d3d9.h>
-#include <dxerr9.h>
+#if defined(TOADLET_HAS_DIRECT3D_MOBILE)
+	#include <d3dm.h>
+#else
+	#include <d3d9.h>
+#endif
 
 #include <toadlet/egg/EndianConversion.h>
 
 namespace toadlet{
 namespace peeper{
 
-#if defined(TOADLET_FIXED_POINT)
-inline D3DCOLORVALUE toD3DCOLORVALUE(const Color &color){
-	D3DCOLORVALUE value;
-	value.r=egg::mathfixed::Math::toFloat(color.r);
-	value.g=egg::mathfixed::Math::toFloat(color.g);
-	value.b=egg::mathfixed::Math::toFloat(color.b);
-	value.a=egg::mathfixed::Math::toFloat(color.a);
-	return value;
-}
+#if defined(TOADLET_HAS_DIRECT3D_MOBILE)
+	inline D3DMCOLOR toD3DCOLOR(const Color &c){
+		return D3DMCOLOR_RGBA(Math::toInt(c.r*255),Math::toInt(c.g*255),Math::toInt(c.b*255),Math::toInt(c.a*255));
+	}
 #else
-inline const D3DCOLORVALUE &toD3DCOLORVALUE(const Color &color){ return *(D3DCOLORVALUE*)&color; }
+	inline D3DCOLOR toD3DCOLOR(const Color &c){
+		return D3DCOLOR_RGBA(Math::toInt(c.r*255),Math::toInt(c.g*255),Math::toInt(c.b*255),Math::toInt(c.a*255));
+	}
 #endif
 
-inline void toD3DVECTOR(D3DVECTOR &result,const egg::math::Vector3 &src){
-	result.x=src.x;
-	result.y=src.y;
-	result.z=src.z;
-}
+#if defined(TOADLET_HAS_DIRECT3D_MOBILE)
+	inline void toD3DCOLORVALUE(D3DMCOLORVALUE &r,const Color &c){
+		r.r=c.r; r.g=c.g; r.b=c.b; r.a=c.a;
+	}
+#else
+	#if defined(TOADLET_FIXED_POINT)
+		inline void toD3DCOLORVALUE(D3DCOLORVALUE &r,const Color &c){
+			r.r=Math::toFloat(c.r); r.g=Math::toFloat(c.g); r.b=Math::toFloat(c.b); c.a=Math::toFloat(c.a);
+		}
+	#else
+		inline void toD3DCOLORVALUE(D3DCOLORVALUE &r,const Color &c){
+			r.r=c.r; r.g=c.g; r.b=c.b; r.a=c.a;
+		}
+	#endif
+#endif
 
-inline void toD3DVECTOR(D3DVECTOR &result,const egg::mathfixed::Vector3 &src){
-	result.x=egg::mathfixed::Math::toFloat(src.x);
-	result.y=egg::mathfixed::Math::toFloat(src.y);
-	result.z=egg::mathfixed::Math::toFloat(src.z);
-}
+#if defined(TOADLET_HAS_DIRECT3D_MOBILE)
+	inline void toD3DVECTOR(D3DMVECTOR &r,const Vector3 &s){
+		r.x=s.x; r.y=s.y; r.z=s.z;
+	}
+#else
+	#if defined(TOADLET_FIXED_POINT)
+		inline void toD3DVECTOR(D3DVECTOR &r,const Vector3 &s){
+			r.x=Math::toFloat(s.x); r.y=Math::toFloat(s.y); r.z=Math::toFloat(s.z);
+		}
+	#else
+		inline void toD3DVECTOR(D3DVECTOR &r,const Vector3 &s){
+			r.x=s.x; r.y=s.y; r.z=s.z;
+		}
+	#endif
+#endif
 
-inline void toD3DMATRIX(D3DMATRIX &result,const egg::math::Matrix4x4 &src){
-	result.m[0][0]=src.at(0,0);
-	result.m[1][0]=src.at(0,1);
-	result.m[2][0]=src.at(0,2);
-	result.m[3][0]=src.at(0,3);
-	result.m[0][1]=src.at(1,0);
-	result.m[1][1]=src.at(1,1);
-	result.m[2][1]=src.at(1,2);
-	result.m[3][1]=src.at(1,3);
-	result.m[0][2]=src.at(2,0);
-	result.m[1][2]=src.at(2,1);
-	result.m[2][2]=src.at(2,2);
-	result.m[3][2]=src.at(2,3);
-	result.m[0][3]=src.at(3,0);
-	result.m[1][3]=src.at(3,1);
-	result.m[2][3]=src.at(3,2);
-	result.m[3][3]=src.at(3,3);
-}
-
-inline void toD3DMATRIX(D3DMATRIX &result,const egg::mathfixed::Matrix4x4 &src){
-	result.m[0][0]=egg::mathfixed::Math::toFloat(src.at(0,0));
-	result.m[1][0]=egg::mathfixed::Math::toFloat(src.at(0,1));
-	result.m[2][0]=egg::mathfixed::Math::toFloat(src.at(0,2));
-	result.m[3][0]=egg::mathfixed::Math::toFloat(src.at(0,3));
-	result.m[0][1]=egg::mathfixed::Math::toFloat(src.at(1,0));
-	result.m[1][1]=egg::mathfixed::Math::toFloat(src.at(1,1));
-	result.m[2][1]=egg::mathfixed::Math::toFloat(src.at(1,2));
-	result.m[3][1]=egg::mathfixed::Math::toFloat(src.at(1,3));
-	result.m[0][2]=egg::mathfixed::Math::toFloat(src.at(2,0));
-	result.m[1][2]=egg::mathfixed::Math::toFloat(src.at(2,1));
-	result.m[2][2]=egg::mathfixed::Math::toFloat(src.at(2,2));
-	result.m[3][2]=egg::mathfixed::Math::toFloat(src.at(2,3));
-	result.m[0][3]=egg::mathfixed::Math::toFloat(src.at(3,0));
-	result.m[1][3]=egg::mathfixed::Math::toFloat(src.at(3,1));
-	result.m[2][3]=egg::mathfixed::Math::toFloat(src.at(3,2));
-	result.m[3][3]=egg::mathfixed::Math::toFloat(src.at(3,3));
-}
+#if defined(TOADLET_HAS_DIRECT3D_MOBILE)
+	inline void toD3DMATRIX(D3DMMATRIX &r,const Matrix4x4 &s){
+		r.m[0][0]=s.at(0,0);
+		r.m[1][0]=s.at(0,1);
+		r.m[2][0]=s.at(0,2);
+		r.m[3][0]=s.at(0,3);
+		r.m[0][1]=s.at(1,0);
+		r.m[1][1]=s.at(1,1);
+		r.m[2][1]=s.at(1,2);
+		r.m[3][1]=s.at(1,3);
+		r.m[0][2]=s.at(2,0);
+		r.m[1][2]=s.at(2,1);
+		r.m[2][2]=s.at(2,2);
+		r.m[3][2]=s.at(2,3);
+		r.m[0][3]=s.at(3,0);
+		r.m[1][3]=s.at(3,1);
+		r.m[2][3]=s.at(3,2);
+		r.m[3][3]=s.at(3,3);
+	}
+#else
+	#if defined(TOADLET_FIXED_POINT)
+		inline void toD3DMATRIX(D3DMATRIX &r,const Matrix4x4 &s){
+			r.m[0][0]=Math::toFloat(s.at(0,0));
+			r.m[1][0]=Math::toFloat(s.at(0,1));
+			r.m[2][0]=Math::toFloat(s.at(0,2));
+			r.m[3][0]=Math::toFloat(s.at(0,3));
+			r.m[0][1]=Math::toFloat(s.at(1,0));
+			r.m[1][1]=Math::toFloat(s.at(1,1));
+			r.m[2][1]=Math::toFloat(s.at(1,2));
+			r.m[3][1]=Math::toFloat(s.at(1,3));
+			r.m[0][2]=Math::toFloat(s.at(2,0));
+			r.m[1][2]=Math::toFloat(s.at(2,1));
+			r.m[2][2]=Math::toFloat(s.at(2,2));
+			r.m[3][2]=Math::toFloat(s.at(2,3));
+			r.m[0][3]=Math::toFloat(s.at(3,0));
+			r.m[1][3]=Math::toFloat(s.at(3,1));
+			r.m[2][3]=Math::toFloat(s.at(3,2));
+			r.m[3][3]=Math::toFloat(s.at(3,3));
+		}
+	#else
+		inline void toD3DMATRIX(D3DMATRIX &r,const Matrix4x4 &s){
+			r.m[0][0]=s.at(0,0);
+			r.m[1][0]=s.at(0,1);
+			r.m[2][0]=s.at(0,2);
+			r.m[3][0]=s.at(0,3);
+			r.m[0][1]=s.at(1,0);
+			r.m[1][1]=s.at(1,1);
+			r.m[2][1]=s.at(1,2);
+			r.m[3][1]=s.at(1,3);
+			r.m[0][2]=s.at(2,0);
+			r.m[1][2]=s.at(2,1);
+			r.m[2][2]=s.at(2,2);
+			r.m[3][2]=s.at(2,3);
+			r.m[0][3]=s.at(3,0);
+			r.m[1][3]=s.at(3,1);
+			r.m[2][3]=s.at(3,2);
+			r.m[3][3]=s.at(3,3);
+		}
+	#endif
+#endif
 
 inline uint16 A8toA8L8(const uint8 a){
 	return (a<<8)|0xFF;

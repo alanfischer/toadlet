@@ -1261,7 +1261,7 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 				#if defined(TOADLET_FIXED_POINT)
 					#if defined(TOADLET_HAS_GLES)
 						glLoadMatrixx(textureStage->getTextureMatrix().getData());
-						glMultMatrixx(gltexture->textureMatrix.getData());
+						glMultMatrixx(gltexture->mMatrix.getData());
 					#else
 						glLoadMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,textureStage->getTextureMatrix()).getData());
 						glMultMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,gltexture->textureMatrix).getData());

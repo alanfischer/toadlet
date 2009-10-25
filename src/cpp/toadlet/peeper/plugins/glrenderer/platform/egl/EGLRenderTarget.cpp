@@ -23,16 +23,14 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "EGLRenderTargetPeer.h"
+#include "EGLWindowRenderTarget.h"
 #include <toadlet/egg/Error.h>
 #include <malloc.h>
-
-using namespace toadlet::egg;
 
 namespace toadlet{
 namespace peeper{
 
-EGLRenderTargetPeer::EGLRenderTargetPeer():GLRenderTargetPeer(),
+EGLRenderTarget::EGLRenderTarget():GLRenderTarget(),
 	egl_version(0),
 
 	mDisplay(EGL_NO_DISPLAY),
@@ -40,15 +38,11 @@ EGLRenderTargetPeer::EGLRenderTargetPeer():GLRenderTargetPeer(),
 	mContext(EGL_NO_CONTEXT)
 {}
 
-void EGLRenderTargetPeer::makeCurrent(){
-	EGLBoolean result=eglMakeCurrent(mDisplay,mSurface,mSurface,mContext);
-	if(result==EGL_FALSE){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"eglMakeCurrent failed");
-	}
+bool EGLRenderTarget::makeCurrent(){
+	return eglMakeCurrent(mDisplay,mSurface,mSurface,mContext)==EGL_TRUE;
 }
 
-EGLConfig EGLRenderTargetPeer::chooseEGLConfig(EGLDisplay display,int redBits,int greenBits,int blueBits,int alphaBits,int depthBits,int stencilBits,bool window,bool pixmap,bool pbuffer,int fsaaCount){
+EGLConfig EGLRenderTarget::chooseEGLConfig(EGLDisplay display,int redBits,int greenBits,int blueBits,int alphaBits,int depthBits,int stencilBits,bool window,bool pixmap,bool pbuffer,int fsaaCount){
     EGLint configOptions[32];
 	int i=0;
 
@@ -134,7 +128,7 @@ EGLConfig EGLRenderTargetPeer::chooseEGLConfig(EGLDisplay display,int redBits,in
 	return chooseEGLConfigFromConfigOptions(display,configOptions);
 }
 
-EGLConfig EGLRenderTargetPeer::chooseEGLConfigFromConfigOptions(EGLDisplay display,const EGLint *configOptions){
+EGLConfig EGLRenderTarget::chooseEGLConfigFromConfigOptions(EGLDisplay display,const EGLint *configOptions){
 	if(configOptions==NULL){
 		return NULL;
 	}
@@ -173,7 +167,7 @@ EGLConfig EGLRenderTargetPeer::chooseEGLConfigFromConfigOptions(EGLDisplay displ
 	return result;
 }
 
-EGLConfig EGLRenderTargetPeer::pickEGLConfig(EGLDisplay display,EGLConfig oldConfig,EGLConfig newConfig){
+EGLConfig EGLRenderTarget::pickEGLConfig(EGLDisplay display,EGLConfig oldConfig,EGLConfig newConfig){
 	// Check for better colorbuffer type
 	EGLint oldBufType;
 	EGLint newBufType;

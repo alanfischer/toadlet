@@ -42,7 +42,8 @@ public:
 
 	virtual void reset()=0;
 
-	virtual IDirect3DDevice9 *getDirect3DDevice9() const=0;
+	virtual IDirect3DDevice9 *getDirect3DDevice() const=0;
+	virtual IDirect3D9 *getDirect3D() const=0;
 };
 
 }

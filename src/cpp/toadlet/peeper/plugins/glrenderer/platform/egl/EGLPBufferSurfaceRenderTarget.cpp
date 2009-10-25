@@ -23,10 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "EGLPBufferRenderTexturePeer.h"
-#include "EGLRenderContextPeer.h"
+#include "EGLPBufferSurfaceRenderTarget.h"
 #include "../../GLRenderer.h"
-#include "../../../../RenderContext.h"
 #include <toadlet/egg/Error.h>
 
 using namespace toadlet::egg;
@@ -35,73 +33,110 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-bool GLPBufferRenderTexturePeer_available(GLRenderer *renderer){
-	return EGLPBufferRenderTexturePeer::available(renderer);
+bool GLPBufferSurfaceRenderTarget_available(GLRenderer *renderer){
+	return EGLPBufferSurfaceRenderTarget::available(renderer);
 }
 
-GLTexturePeer *new_GLPBufferRenderTexturePeer(GLRenderer *renderer,RenderTexture *texture){
-	return new EGLPBufferRenderTexturePeer(renderer,texture);
+SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer){
+	return new EGLPBufferSurfaceRenderTarget(renderer);
 }
 
-bool EGLPBufferRenderTexturePeer::available(GLRenderer *renderer){
-	return ((EGLRenderContextPeer*)renderer->getRenderContext()->internal_getRenderTargetPeer())->egl_version>=11;
+bool EGLPBufferSurfaceRenderTarget::available(GLRenderer *renderer){
+	return ((EGLRenderTarget*)renderer->getPrimaryRenderTarget()->getRootRenderTarget())->egl_version>=11;
 }
 
-EGLPBufferRenderTexturePeer::EGLPBufferRenderTexturePeer(GLRenderer *renderer,RenderTexture *texture):EGLRenderTargetPeer(),GLTexturePeer(renderer,texture){
-	egl_version=((EGLRenderContextPeer*)renderer->getRenderContext()->internal_getRenderTargetPeer())->egl_version;
-	mTexture=texture;
-	mWidth=0;
-	mHeight=0;
-	mBound=false;
-
-	if((texture->getFormat()&Image::Format_BIT_DEPTH)>0){
-		Error::invalidParameters(Categories::TOADLET_PEEPER,
-			"Format_BIT_DEPTH not available for pbuffers");
-		return;
-	}
-
-	createBuffer();
-
-	Math::setMatrix4x4FromScale(textureMatrix,Vector3(Math::ONE,-Math::ONE,Math::ONE));
-	Math::setMatrix4x4FromTranslate(textureMatrix,Vector3(0,Math::ONE,0));
+EGLPBufferSurfaceRenderTarget::EGLPBufferSurfaceRenderTarget(GLRenderer *renderer):EGLRenderTarget(),
+	mRenderer(NULL),
+	mTexture(NULL),
+	mWidth(0),
+	mHeight(0),
+	mBound(false),
+	mInitialized(false)
+{
+	egl_version=((EGLRenderTarget*)renderer->getPrimaryRenderTarget()->getRootRenderTarget())->egl_version;
 }
 
-EGLPBufferRenderTexturePeer::~EGLPBufferRenderTexturePeer(){
-	if(mBound){
-		eglReleaseTexImage(mDisplay,mSurface,EGL_BACK_BUFFER);
-		TOADLET_CHECK_EGLERROR("eglReleaseTexImage");
-	}
+EGLPBufferSurfaceRenderTarget::~EGLPBufferSurfaceRenderTarget(){
+	destroy();
+}
 
+bool EGLPBufferSurfaceRenderTarget::create(){
+	// Nothing yet, all done after an attach
+	return true;
+}
+
+bool EGLPBufferSurfaceRenderTarget::destroy(){
 	destroyBuffer();
-}
 
-void EGLPBufferRenderTexturePeer::makeCurrent(){
 	if(mBound){
 		mBound=false;
 		eglReleaseTexImage(mDisplay,mSurface,EGL_BACK_BUFFER);
 		TOADLET_CHECK_EGLERROR("eglReleaseTexImage");
 	}
 
-	EGLRenderTargetPeer::makeCurrent();
+	mInitialized=false;
+
+	return true;
+}
+
+bool EGLPBufferSurfaceRenderTarget::makeCurrent(){
+	if(mBound){
+		mBound=false;
+		eglReleaseTexImage(mDisplay,mSurface,EGL_BACK_BUFFER);
+		TOADLET_CHECK_EGLERROR("eglReleaseTexImage");
+	}
+
+	EGLRenderTarget::makeCurrent();
 
 	if(mInitialized==false){
 		mRenderer->setDefaultStates();
 		mInitialized=true;
 	}
+
+	return true;
 }
 
-void EGLPBufferRenderTexturePeer::swap(){
+bool EGLPBufferSurfaceRenderTarget::swap(){
 	if(mBound==false){
 		mBound=true;
-		glBindTexture(textureTarget,textureHandle);
+		glBindTexture(mTexture->getTarget(),mTexture->getHandle());
 		eglBindTexImage(mDisplay,mSurface,EGL_BACK_BUFFER);
 		TOADLET_CHECK_EGLERROR("eglBindTexImage");
 	}
+
+	return true;
 }
 
-bool EGLPBufferRenderTexturePeer::createBuffer(){
-	int width=((Texture*)mTexture)->getWidth();
-	int height=((Texture*)mTexture)->getHeight();
+bool EGLPBufferSurfaceRenderTarget::remove(Surface::ptr surface){
+	// Unimplemented currently
+	return true;
+}
+
+bool EGLPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
+	GLTextureMipSurface *gltextureSurface=((GLSurface*)surface->getRootSurface())->castToGLTextureMipSurface();
+	mTexture=gltextureSurface->getTexture();
+
+	if((mTexture->getFormat()&Texture::Format_BIT_DEPTH)>0){
+		Error::invalidParameters(Categories::TOADLET_PEEPER,
+			"Format_BIT_DEPTH not available for pbuffers");
+		return false;
+	}
+
+	createBuffer();
+
+	Matrix4x4 matrix;
+	Math::setMatrix4x4FromScale(matrix,Math::ONE,-Math::ONE,Math::ONE);
+	Math::setMatrix4x4FromTranslate(matrix,0,Math::ONE,0);
+	mTexture->setMatrix(matrix);
+
+	return true;
+}
+
+bool EGLPBufferSurfaceRenderTarget::createBuffer(){
+	destroyBuffer();
+
+	int width=mTexture->getWidth();
+	int height=mTexture->getHeight();
 
 	mDisplay=eglGetDisplay(EGL_DEFAULT_DISPLAY);
 	if(mDisplay==EGL_NO_DISPLAY){
@@ -115,7 +150,7 @@ bool EGLPBufferRenderTexturePeer::createBuffer(){
 	int greenBits=ImageFormatConversion::getGreenBits(format);
 	int blueBits=ImageFormatConversion::getBlueBits(format);
 	int alphaBits=ImageFormatConversion::getAlphaBits(format);
-	int depthBits=mTexture->hasDepthBuffer()?16:0;
+	int depthBits=16;
 
 	EGLConfig config=chooseEGLConfig(mDisplay,redBits,greenBits,blueBits,alphaBits,depthBits,0,false,false,true,false);
 	TOADLET_CHECK_EGLERROR("chooseEGLConfig");
@@ -161,17 +196,14 @@ bool EGLPBufferRenderTexturePeer::createBuffer(){
 	eglQuerySurface(mDisplay,mSurface,EGL_HEIGHT,(int*)&mHeight);
 	if(mWidth!=width || mHeight!=height){
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"EGLPBufferRenderTexturePeer::createBuffer: width or height not as expected");
+			"EGLPBufferSurfaceRenderTarget::createBuffer: width or height not as expected");
 		return false;
 	}
 
 	return true;
 }
 
-bool EGLPBufferRenderTexturePeer::destroyBuffer(){
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
-		"Destroying context");
-
+bool EGLPBufferSurfaceRenderTarget::destroyBuffer(){
 	if(eglMakeCurrent==NULL){
 		return true;
 	}
@@ -191,14 +223,6 @@ bool EGLPBufferRenderTexturePeer::destroyBuffer(){
 	}
 
 	return true;
-}
-
-int EGLPBufferRenderTexturePeer::getWidth() const{
-	return mWidth;
-}
-
-int EGLPBufferRenderTexturePeer::getHeight() const{
-	return mHeight;
 }
 
 }

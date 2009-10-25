@@ -90,7 +90,7 @@ public:
 	void setColorWrite(bool color);
 	void setNormalize(const Normalize &normalize);
 	void setDepthBias(scalar constant,scalar slope);
-	void setTexturePerspective(bool texturePerspective){}
+	void setTexturePerspective(bool texturePerspective);
 	void setPointParameters(bool sprite,scalar size,bool attenuated,scalar constant,scalar linear,scalar quadratic,scalar minSize,scalar maxSize);
 	void setTextureStage(int stage,TextureStage *textureStage);
 	void setProgram(const Program *program);
@@ -122,6 +122,7 @@ protected:
 	static D3DBLEND getD3DBlendOperation(Blend::Operation blend);
 	static void getPrimitiveTypeAndCount(D3DPRIMITIVETYPE &d3dpt,int &count,IndexData::Primitive prim,int numIndexes);
 
+	IDirect3D9 *mD3D;
 	IDirect3DDevice9 *mD3DDevice;
 	D3DCAPS9 mD3DCaps;
 	RenderTarget *mPrimaryRenderTarget;
@@ -142,6 +143,7 @@ protected:
 	bool mLighting;
 	Normalize mNormalize;
 	Shading mShading;
+	bool mTexturePerspective;
 
 	bool mMirrorY;
 

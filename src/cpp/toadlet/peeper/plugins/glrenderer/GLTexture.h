@@ -72,6 +72,8 @@ public:
 	static GLuint getGLTextureBlendSource(TextureBlend::Source blend);
 	static GLuint GLCubeFaces[6];
 
+	inline void setMatrix(const Matrix4x4 &matrix){mMatrix.set(matrix);}
+
 protected:
 	void generateMipLevels();
 	GLuint getGLTarget();

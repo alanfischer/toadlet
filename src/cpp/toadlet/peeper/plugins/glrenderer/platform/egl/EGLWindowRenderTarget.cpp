@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "EGLRenderContextPeer.h"
+#include "EGLWIndowRenderTarget.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/image/ImageFormatConversion.h>
 
@@ -33,28 +33,27 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTargetPeer *new_EGLRenderContextPeer(void *nativeSurface,const Visual &visual){
-	return new EGLRenderContextPeer(nativeSurface,visual);
+TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *nativeSurface,const Visual &visual){
+	return new EGLWindowRenderTarget(nativeSurface,visual);
 }
 
-EGLRenderContextPeer::EGLRenderContextPeer():EGLRenderTargetPeer(),
+EGLWindowRenderTarget::EGLWindowRenderTarget():EGLRenderTarget(),
 	mConfig(0),
 	mPixmap(false)
-{
-}
+{}
 
-EGLRenderContextPeer::EGLRenderContextPeer(void *nativeSurface,const Visual &visual,bool pixmap):EGLRenderTargetPeer(),
+EGLWindowRenderTarget::EGLWindowRenderTarget(void *nativeSurface,const Visual &visual,bool pixmap):EGLRenderTarget(),
 	mConfig(0),
 	mPixmap(false)
 {
 	createContext(nativeSurface,visual,pixmap);
 }
 
-EGLRenderContextPeer::~EGLRenderContextPeer(){
+EGLWindowRenderTarget::~EGLWindowRenderTarget(){
 	destroyContext();
 }
 
-bool EGLRenderContextPeer::createContext(void *nativeSurface,const Visual &visual,bool pixmap){
+bool EGLWindowRenderTarget::createContext(void *nativeSurface,const Visual &visual,bool pixmap){
 	if(mContext!=EGL_NO_CONTEXT){
 		return true;
 	}
@@ -162,7 +161,7 @@ bool EGLRenderContextPeer::createContext(void *nativeSurface,const Visual &visua
 	return true;
 }
 
-bool EGLRenderContextPeer::destroyContext(){
+bool EGLWindowRenderTarget::destroyContext(){
 	if(mDisplay!=EGL_NO_DISPLAY){
 		eglMakeCurrent(mDisplay,EGL_NO_SURFACE,EGL_NO_SURFACE,EGL_NO_CONTEXT);
 
@@ -193,25 +192,27 @@ bool EGLRenderContextPeer::destroyContext(){
 	return true;
 }
 
-int EGLRenderContextPeer::getWidth() const{
-	int width=0;
-	eglQuerySurface(mDisplay,mSurface,EGL_WIDTH,&width);
-	return width;
-}
-
-int EGLRenderContextPeer::getHeight() const{
-	int height=0;
-	eglQuerySurface(mDisplay,mSurface,EGL_HEIGHT,&height);
-	return height;
-}
-
-void EGLRenderContextPeer::swap(){
+bool EGLWindowRenderTarget::swap(){
 	if(mPixmap){
 		eglWaitGL();
 	}
 	else{
 		eglSwapBuffers(mDisplay,mSurface);
 	}
+
+	return true;
+}
+
+int EGLWindowRenderTarget::getWidth() const{
+	int width=0;
+	eglQuerySurface(mDisplay,mSurface,EGL_WIDTH,&width);
+	return width;
+}
+
+int EGLWindowRenderTarget::getHeight() const{
+	int height=0;
+	eglQuerySurface(mDisplay,mSurface,EGL_HEIGHT,&height);
+	return height;
 }
 
 }

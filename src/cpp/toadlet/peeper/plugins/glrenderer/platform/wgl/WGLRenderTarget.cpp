@@ -35,13 +35,7 @@ WGLRenderTarget::WGLRenderTarget():GLRenderTarget(),
 {}
 
 bool WGLRenderTarget::makeCurrent(){
-	BOOL result=wglMakeCurrent(mDC,mGLRC);
-	if(result==FALSE){
-		egg::Error::unknown(egg::Categories::TOADLET_PEEPER,
-			"wglMakeCurrent failed");
-		return false;
-	}
-	return true;
+	return wglMakeCurrent(mDC,mGLRC)==TRUE;
 }
 
 bool WGLRenderTarget::wglIsExtensionSupported(const char *extension){

@@ -189,6 +189,17 @@ bool WGLWindowRenderTarget::destroyContext(){
 	return true;
 }
 
+bool WGLWindowRenderTarget::swap(){
+	return SwapBuffers(mDC)==TRUE;
+}
+
+int WGLWindowRenderTarget::checkDefaultColorBits(int colorBits) const{
+	if(colorBits==0){
+		colorBits=24;
+	}
+	return colorBits;
+}
+
 int WGLWindowRenderTarget::getWidth() const{
 	RECT rect;
 	GetClientRect(mWnd,&rect);
@@ -199,17 +210,6 @@ int WGLWindowRenderTarget::getHeight() const{
 	RECT rect;
 	GetClientRect(mWnd,&rect);
 	return rect.bottom-rect.top;
-}
-
-bool WGLWindowRenderTarget::swap(){
-	return SwapBuffers(mDC)==TRUE;
-}
-
-int WGLWindowRenderTarget::checkDefaultColorBits(int colorBits) const{
-	if(colorBits==0){
-		colorBits=24;
-	}
-	return colorBits;
 }
 
 }
