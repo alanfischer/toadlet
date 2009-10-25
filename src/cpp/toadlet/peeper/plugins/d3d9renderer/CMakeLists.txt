@@ -25,8 +25,13 @@ set (PEEPER_D3D9RENDERER_HEADERS
 
 
 # Dependencies - note that D3D9 has already been found
-include_directories (${D3D9_INCLUDE_PATH})
-set (PEEPER_D3D9RENDERER_LIBS ${D3D9_LIBRARIES})
+if (TOADLET_HAS_DIRECT3DMOBILE)
+	include_directories (${D3D9_INCLUDE_PATH})
+	set (PEEPER_D3D9RENDERER_LIBS ${D3D9_LIBRARIES})
+else (TOADLET_HAS_DIRECT3DMOBILE)
+	include_directories (${D3DM_INCLUDE_PATH})
+	set (PEEPER_D3D9RENDERER_LIBS ${D3DM_LIBRARIES})
+endif (TOADLET_HAS_DIRECT3DMOBILE)
 
 
 # Dynamic library

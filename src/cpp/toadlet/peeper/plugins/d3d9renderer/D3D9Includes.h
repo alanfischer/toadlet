@@ -31,7 +31,7 @@
 #include <toadlet/egg/Logger.h>
 #include <windows.h>
 #include <commctrl.h>
-#if defined(TOADLET_HAS_DIRECT3D_MOBILE)
+#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 	#include <d3dm.h>
 #else
 	#include <d3d9.h>
@@ -42,7 +42,7 @@
 namespace toadlet{
 namespace peeper{
 
-#if defined(TOADLET_HAS_DIRECT3D_MOBILE)
+#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 	inline D3DMCOLOR toD3DCOLOR(const Color &c){
 		return D3DMCOLOR_RGBA(Math::toInt(c.r*255),Math::toInt(c.g*255),Math::toInt(c.b*255),Math::toInt(c.a*255));
 	}
@@ -52,7 +52,7 @@ namespace peeper{
 	}
 #endif
 
-#if defined(TOADLET_HAS_DIRECT3D_MOBILE)
+#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 	inline void toD3DCOLORVALUE(D3DMCOLORVALUE &r,const Color &c){
 		r.r=c.r; r.g=c.g; r.b=c.b; r.a=c.a;
 	}
@@ -68,7 +68,7 @@ namespace peeper{
 	#endif
 #endif
 
-#if defined(TOADLET_HAS_DIRECT3D_MOBILE)
+#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 	inline void toD3DVECTOR(D3DMVECTOR &r,const Vector3 &s){
 		r.x=s.x; r.y=s.y; r.z=s.z;
 	}
@@ -84,7 +84,7 @@ namespace peeper{
 	#endif
 #endif
 
-#if defined(TOADLET_HAS_DIRECT3D_MOBILE)
+#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 	inline void toD3DMATRIX(D3DMMATRIX &r,const Matrix4x4 &s){
 		r.m[0][0]=s.at(0,0);
 		r.m[1][0]=s.at(0,1);
@@ -156,6 +156,35 @@ inline uint32 RGBA8toA8R8G8B8(uint32 rgba){
 inline uint32 RGB8toX8R8G8B8(uint8 *rgb){
 	return (*(rgb+0)<<16) | (*(rgb+1)<<8) | (*(rgb+3)<<0);
 }
+
+#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#define D3DFORMAT D3DMFORMAT
+	#define D3DCAPS9 D3DMCAPS
+	#define D3DMATRIX D3DMMATRIX
+	#define D3DBLEND D3DMBLEND
+	#define D3DPOOL D3DMPOOL
+	#define D3DPRIMITIVETYPE D3DMPRIMITIVETYPE
+	#define D3DVIEWPORT9 D3DMVIEWPORT
+	#define D3DCOLOR D3DMCOLOR
+
+	#define D3DERR_DEVICELOST D3DMERR_DEVICELOST
+	#define D3DERR_DEVICENOTRESET D3DMERR_DEVICENOTRESET
+	#define D3DERR_DRIVERINTERNALERROR D3DMERR_DRIVERINTERNALERROR
+
+	#define D3DCLEAR_TARGET D3DMCLEAR_TARGET
+	#define D3DCLEAR_ZBUFFER D3DMCLEAR_ZBUFFER
+	#define D3DCLEAR_STENCIL D3DMCLEAR_STENCIL
+
+	#define D3DTS_WORLD D3DMTS_WORLD
+	#define D3DTS_VIEW D3DMTS_VIEW
+	#define D3DTS_PROJECTION D3DMTS_PROJECTION
+
+	#define IDirect3D9 IDirect3DMobile
+	#define IDirect3DDevice9 IDirect3DMobileDevice
+	#define IDirect3DIndexBuffer9 IDirect3DMobileIndexBuffer
+	#define IDirect3DVertexBuffer9 IDirect3DMobileVertexBuffer
+	#define IDirect3DBaseTexture9 IDirect3DMobileBaseTexture
+#endif
 
 #if defined(TOADLET_DEBUG)
 	#define TOADLET_CHECK_D3D9ERROR(result,function) \

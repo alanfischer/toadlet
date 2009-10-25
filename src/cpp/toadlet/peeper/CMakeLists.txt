@@ -73,7 +73,7 @@ if (TOADLET_PLATFORM_WINCE)
 	if (D3DM_FOUND)
 		set (TOADLET_HAS_DIRECT3DMOBILE ON PARENT_SCOPE)
 		add_subdirectory (plugins/d3d9renderer)
-	else (D3DM_FOUND)		
+	else (D3DM_FOUND)
 		message ("Direct 3D mobile was not found. The peeper_d3d9renderer will not be built")
 	endif (D3DM_FOUND)
 	# Wince always has opengles
