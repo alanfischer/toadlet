@@ -50,12 +50,25 @@ D3D9VertexBufferPeer::D3D9VertexBufferPeer(D3D9Renderer *renderer,VertexBuffer *
 
 	fvf=getFVF(buffer,&colorElements);
 
+	// TODO: Try to unify this
 	DWORD d3dUsage=0;
-	D3DPOOL d3dPool=D3DPOOL_MANAGED;
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		D3DMPOOL d3dPool=D3DMPOOL_SYSTEMMEM;
+	#else
+		D3DPOOL d3dPool=D3DPOOL_MANAGED;
+	#endif
 	if(buffer->getUsageType()==Buffer::UsageType_DYNAMIC){
 		d3dUsage|=D3DUSAGE_DYNAMIC;
-		d3dPool=D3DPOOL_DEFAULT;
+		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+			d3dPool=D3DPOOL_DEFAULT;
+		#endif
 	}
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		else if(renderer->getD3DCAPS9().SurfaceCaps & D3DMSURFCAPS_VIDVERTEXBUFFER){
+			d3dPool=D3DMPOOL_VIDEOMEM;
+		}
+	#endif
+
 	if(buffer->getAccessType()==Buffer::AccessType_WRITE_ONLY){
 		d3dUsage|=D3DUSAGE_WRITEONLY;
 	}
@@ -63,7 +76,7 @@ D3D9VertexBufferPeer::D3D9VertexBufferPeer(D3D9Renderer *renderer,VertexBuffer *
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_EXCESSIVE,
 		String("Allocating D3D9VertexBufferPeer of size:")+buffer->getBufferSize());
 
-	HRESULT result=renderer->getDirect3DDevice9()->CreateVertexBuffer(buffer->getBufferSize(),d3dUsage,fvf,d3dPool,&vertexBuffer,NULL);
+	HRESULT result=renderer->getDirect3DDevice9()->CreateVertexBuffer(buffer->getBufferSize(),d3dUsage,fvf,d3dPool,&vertexBuffer TOADLET_SHAREDHANDLE);
 	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBufferPeer: CreateVertexBuffer");
 
 	uint8 *bufferData=buffer->internal_getData();
@@ -157,18 +170,20 @@ DWORD D3D9VertexBufferPeer::getFVF(VertexBuffer *buffer,Collection<VertexElement
 		case 4:
 			fvf|=D3DFVF_TEX4;
 		break;
-		case 5:
-			fvf|=D3DFVF_TEX5;
-		break;
-		case 6:
-			fvf|=D3DFVF_TEX6;
-		break;
-		case 7:
-			fvf|=D3DFVF_TEX7;
-		break;
-		case 8:
-			fvf|=D3DFVF_TEX8;
-		break;
+		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+			case 5:
+				fvf|=D3DFVF_TEX5;
+			break;
+			case 6:
+				fvf|=D3DFVF_TEX6;
+			break;
+			case 7:
+				fvf|=D3DFVF_TEX7;
+			break;
+			case 8:
+				fvf|=D3DFVF_TEX8;
+			break;
+		#endif
 		default:
 			Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ERROR,
 				String("D3DVertexBufferPeer: Invalid tex coord number")+(vertexFormat->getMaxTexCoordIndex()+1));
@@ -178,12 +193,27 @@ DWORD D3D9VertexBufferPeer::getFVF(VertexBuffer *buffer,Collection<VertexElement
 	int texCoordCount=0;
 	for(i=0;i<vertexFormat->getNumVertexElements();++i){
 		const VertexElement &element=vertexFormat->getVertexElement(i);
-		if(element.type==VertexElement::Type_POSITION && element.format==(VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3)){
-			fvf|=D3DFVF_XYZ;
-		}
-		else if(element.type==VertexElement::Type_NORMAL && element.format==(VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3)){
-			fvf|=D3DFVF_NORMAL;
-		}
+		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+			if(element.type==VertexElement::Type_POSITION && element.format==(VertexElement::Format_BIT_FIXED_32|VertexElement::Format_BIT_COUNT_3)){
+				fvf|=D3DMFVF_XYZ_FIXED;
+			}
+			else if(element.type==VertexElement::Type_POSITION && element.format==(VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3)){
+				fvf|=D3DMFVF_XYZ_FLOAT;
+			}
+			else if(element.type==VertexElement::Type_NORMAL && element.format==(VertexElement::Format_BIT_FIXED_32|VertexElement::Format_BIT_COUNT_3)){
+				fvf|=D3DMFVF_NORMAL_FIXED;
+			}
+			else if(element.type==VertexElement::Type_NORMAL && element.format==(VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3)){
+				fvf|=D3DMFVF_NORMAL_FLOAT;
+			}
+		#else
+			if(element.type==VertexElement::Type_POSITION && element.format==(VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3)){
+				fvf|=D3DFVF_XYZ;
+			}
+			else if(element.type==VertexElement::Type_NORMAL && element.format==(VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3)){
+				fvf|=D3DFVF_NORMAL;
+			}
+		#endif
 		else if(element.type==VertexElement::Type_COLOR && element.format==VertexElement::Format_COLOR_RGBA){
 			fvf|=D3DFVF_DIFFUSE;
 			if(colorElements!=NULL){
@@ -201,8 +231,22 @@ DWORD D3D9VertexBufferPeer::getFVF(VertexBuffer *buffer,Collection<VertexElement
 				fvf|=D3DFVF_TEXCOORDSIZE3(texCoordCount);
 			}
 			else if((element.format&VertexElement::Format_BIT_COUNT_4)>0){
-				fvf|=D3DFVF_TEXCOORDSIZE4(texCoordCount);
+				#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+					Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ERROR,
+						"D3D9VertexBufferPeer: Invalid tex coord count");
+				#else
+					fvf|=D3DFVF_TEXCOORDSIZE4(texCoordCount);
+				#endif
 			}
+
+			#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+				if((element.format&VertexElement::Format_BIT_FIXED_32)>0){
+					fvf|=D3DMFVF_TEXCOORDFIXED(texCoordCount);
+				}
+				else if((element.format&VertexElement::Format_BIT_FLOAT_32)>0){
+					fvf|=D3DMFVF_TEXCOORDFLOAT(texCoordCount);
+				}
+			#endif
 
 			texCoordCount++;
 		}

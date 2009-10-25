@@ -64,11 +64,16 @@ D3D9WindowRenderTarget::~D3D9WindowRenderTarget(){
 }
 
 bool D3D9WindowRenderTarget::makeCurrent(IDirect3DDevice9 *device){
-	HRESULT result=device->SetRenderTarget(0,mColorSurface);
-	TOADLET_CHECK_D3D9ERROR(result,"Error in SetRenderTarget");
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		HRESULT result=device->SetRenderTarget(mColorSurface,mDepthSurface);
+		TOADLET_CHECK_D3D9ERROR(result,"Error in SetRenderTarget");
+	#else
+		HRESULT result=device->SetRenderTarget(0,mColorSurface);
+		TOADLET_CHECK_D3D9ERROR(result,"Error in SetRenderTarget");
 
-	result=device->SetDepthStencilSurface(mDepthSurface);
-	TOADLET_CHECK_D3D9ERROR(result,"Error in SetDepthStencilSurface");
+		result=device->SetDepthStencilSurface(mDepthSurface);
+		TOADLET_CHECK_D3D9ERROR(result,"Error in SetDepthStencilSurface");
+	#endif
 
 	return true;
 }
@@ -89,24 +94,28 @@ void D3D9WindowRenderTarget::reset(){
 	HRESULT result=mD3DDevice->Reset(&mPresentParameters);
 	TOADLET_CHECK_D3D9ERROR(result,"reset");
 
-	mD3DDevice->GetRenderTarget(0,&mColorSurface);
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		mD3DDevice->GetRenderTarget(&mColorSurface);
+	#else
+		mD3DDevice->GetRenderTarget(0,&mColorSurface);
+	#endif
 	mD3DDevice->GetDepthStencilSurface(&mDepthSurface);
 }
 
 bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual){
 	HRESULT result;
 
-	mLibrary=LoadLibrary(TEXT("D3D9.dll"));
+	mLibrary=LoadLibrary(TOADLET_D3D_DLL_NAME);
 	if(mLibrary==0){
 		Error::libraryNotFound(Categories::TOADLET_PEEPER,
-			"D3D9RenderWindow: Error loading D3D9.dll");
+			String("D3D9RenderWindow: Error loading ")+TOADLET_D3D_DLL_NAME);
 		return false;
 	}
 
-	void *symbol=GetProcAddress(mLibrary,TEXT("Direct3DCreate9"));
+	void *symbol=GetProcAddress(mLibrary,TOADLET_D3D_CREATE_NAME);
 	if(symbol==NULL){
 		Error::symbolNotFound(Categories::TOADLET_PEEPER,
-			"D3D9RenderWindow: Error finding Direct3DMobileCreate");
+			String("D3D9RenderWindow: Error finding ")+TOADLET_D3D_CREATE_NAME);
 		return NULL;
 	}
 
@@ -114,66 +123,82 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual){
 	mD3D=((Direct3DCreate9)symbol)(D3D_SDK_VERSION);
 	if(mD3D==NULL){
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"D3D9RenderWindow: Error creating Direct3D9 object");
+			"D3D9RenderWindow: Error creating Direct3D object");
 		return false;
 	}
 
+	UINT adaptor=D3DADAPTER_DEFAULT;
 	D3DADAPTER_IDENTIFIER9 identifier={0};
-	mD3D->GetAdapterIdentifier(D3DADAPTER_DEFAULT,0,&identifier);
+	mD3D->GetAdapterIdentifier(adaptor,0,&identifier);
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
-		String("D3D9 Driver:") + identifier.Driver);
+		String("D3D Driver:") + identifier.Driver);
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
-		String("D3D9 Description:") + identifier.Description);
+		String("D3D Description:") + identifier.Description);
 
-	result=mD3D->CheckDeviceType(D3DADAPTER_DEFAULT,D3DDEVTYPE_HAL,D3DFMT_X8R8G8B8,D3DFMT_X8R8G8B8,FALSE);
-	if(FAILED(result)){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"D3D9RenderWindow: Error creating 8,8,8 bit back buffer");
-		return false;
-	}
-
-	result=mD3D->CheckDeviceFormat(D3DADAPTER_DEFAULT,D3DDEVTYPE_HAL,D3DFMT_X8R8G8B8,D3DUSAGE_DEPTHSTENCIL,D3DRTYPE_SURFACE,D3DFMT_D24S8);
-	if(FAILED(result)){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"D3D9RenderWindow: Error creating 16 bit depth, 8 bit stencil back buffer");
-		return false;
-	}
-
-	D3DCAPS9 caps;
-	ZeroMemory(&caps,sizeof(D3DCAPS9));
-	result=mD3D->GetDeviceCaps(D3DADAPTER_DEFAULT,D3DDEVTYPE_HAL,&caps);
-	if(FAILED(result)){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"D3D9RenderWindow: Error getting device caps");
-		return false;
-	}
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		D3DMDEVTYPE devtype=D3DMDEVTYPE_DEFAULT;
+	#else
+		D3DDEVTYPE devtype=D3DDEVTYPE_HAL;
+	#endif
 
 	DWORD flags=0;
-	if(caps.VertexProcessingCaps!=0){
-		flags=D3DCREATE_HARDWARE_VERTEXPROCESSING;
-	}
-	else{
-		flags=D3DCREATE_SOFTWARE_VERTEXPROCESSING;
-	}
+
+	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+		result=mD3D->CheckDeviceType(adaptor,devtype,D3DFMT_X8R8G8B8,D3DFMT_X8R8G8B8,FALSE);
+		if(FAILED(result)){
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"D3D9RenderWindow: Error creating 8,8,8 bit back buffer");
+			return false;
+		}
+
+		result=mD3D->CheckDeviceFormat(adaptor,devtype,D3DFMT_X8R8G8B8,D3DUSAGE_DEPTHSTENCIL,D3DRTYPE_SURFACE,D3DFMT_D24S8);
+		if(FAILED(result)){
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"D3D9RenderWindow: Error creating 16 bit depth, 8 bit stencil back buffer");
+			return false;
+		}
+
+		D3DCAPS9 caps;
+		ZeroMemory(&caps,sizeof(D3DCAPS9));
+		result=mD3D->GetDeviceCaps(adaptor,devtype,&caps);
+		if(FAILED(result)){
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"D3D9RenderWindow: Error getting device caps");
+			return false;
+		}
+
+		if(caps.VertexProcessingCaps!=0){
+			flags=D3DCREATE_HARDWARE_VERTEXPROCESSING;
+		}
+		else{
+			flags=D3DCREATE_SOFTWARE_VERTEXPROCESSING;
+		}
+	#endif
 
 	mWindow=wnd;
 
 	fillPresentParameters(mPresentParameters);
 
-	if(visual.vsync){
-		mPresentParameters.PresentationInterval=D3DPRESENT_INTERVAL_DEFAULT;
-	}
-	else{
-		mPresentParameters.PresentationInterval=D3DPRESENT_INTERVAL_IMMEDIATE;
-	}
+	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+		if(visual.vsync){
+			mPresentParameters.PresentationInterval=D3DPRESENT_INTERVAL_DEFAULT;
+		}
+		else{
+			mPresentParameters.PresentationInterval=D3DPRESENT_INTERVAL_IMMEDIATE;
+		}
+	#endif
 
-	result=mD3D->CreateDevice(D3DADAPTER_DEFAULT,D3DDEVTYPE_HAL,wnd,flags,&mPresentParameters,&mD3DDevice);
+	result=mD3D->CreateDevice(adaptor,devtype,wnd,flags,&mPresentParameters,&mD3DDevice);
 	if(FAILED(result)){
 		TOADLET_CHECK_D3D9ERROR(result,"Error creating D3D Device");
 		return false;
 	}
 
-	mD3DDevice->GetRenderTarget(0,&mColorSurface);
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		mD3DDevice->GetRenderTarget(&mColorSurface);
+	#else
+		mD3DDevice->GetRenderTarget(0,&mColorSurface);
+	#endif
 	mD3DDevice->GetDepthStencilSurface(&mDepthSurface);
 
 	return true;
@@ -215,13 +240,21 @@ void D3D9WindowRenderTarget::fillPresentParameters(D3DPRESENT_PARAMETERS &presen
 	mHeight=rect.bottom-rect.top;
 
 	memset(&presentParameters,0,sizeof(presentParameters));
-	presentParameters.AutoDepthStencilFormat=D3DFMT_D24S8;
-	presentParameters.EnableAutoDepthStencil=TRUE;
-	presentParameters.Windowed			=TRUE;
-	presentParameters.SwapEffect		=D3DSWAPEFFECT_DISCARD;
-	presentParameters.BackBufferWidth	=mWidth;
-    presentParameters.BackBufferHeight	=mHeight;
-    presentParameters.BackBufferFormat	=D3DFMT_X8R8G8B8;
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		presentParameters.AutoDepthStencilFormat=D3DMFMT_D16;
+		presentParameters.EnableAutoDepthStencil=TRUE;
+		presentParameters.Windowed			=TRUE;
+		presentParameters.SwapEffect		=D3DMSWAPEFFECT_DISCARD;
+		presentParameters.BackBufferFormat	=D3DMFMT_UNKNOWN;
+	#else
+		presentParameters.AutoDepthStencilFormat=D3DFMT_D24S8;
+		presentParameters.EnableAutoDepthStencil=TRUE;
+		presentParameters.Windowed			=TRUE;
+		presentParameters.SwapEffect		=D3DSWAPEFFECT_DISCARD;
+		presentParameters.BackBufferWidth	=mWidth;
+		presentParameters.BackBufferHeight	=mHeight;
+		presentParameters.BackBufferFormat	=D3DFMT_X8R8G8B8;
+	#endif
 }
 
 }
