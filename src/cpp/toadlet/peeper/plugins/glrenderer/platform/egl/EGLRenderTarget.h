@@ -27,23 +27,23 @@
 #define TOADLET_PEEPER_EGLRENDERTARGETPEER_H
 
 #include "../../GLIncludes.h"
-#include "../../GLRenderTargetPeer.h"
+#include "../../GLRenderTarget.h"
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API EGLRenderTargetPeer:public GLRenderTargetPeer{
+class TOADLET_API EGLRenderTarget:public GLRenderTarget{
 public:
 	int egl_version;
 
-	EGLRenderTargetPeer();
-	virtual ~EGLRenderTargetPeer(){}
+	EGLRenderTarget();
+	virtual ~EGLRenderTarget(){}
+
+	virtual bool makeCurrent();
 
 	inline EGLDisplay getEGLDisplay() const{return mDisplay;}
 	inline EGLSurface getEGLSurface() const{return mSurface;}
 	inline EGLContext getEGLContext() const{return mContext;}
-
-	void makeCurrent();
 
 protected:
 	EGLConfig chooseEGLConfig(EGLDisplay display,int redBits,int greenBits,int blueBits,int alphaBits,int depthBits,int stencilBits,bool window,bool pixmap,bool pbuffer,int fsaaCount);

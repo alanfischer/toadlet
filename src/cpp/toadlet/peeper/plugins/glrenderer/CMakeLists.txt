@@ -18,9 +18,9 @@ set (PEEPER_GLRENDERER_PLATFORM_EAGL_SRC
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_EGL_SRC
-	platform/egl/EGLPBufferRenderTexturePeer.cpp
-	platform/egl/EGLRenderContextPeer.cpp
-	platform/egl/EGLRenderTargetPeer.cpp
+	platform/egl/EGLPBufferSurfaceRenderTarget.cpp
+	platform/egl/EGLWindowRenderTarget.cpp
+	platform/egl/EGLRenderTarget.cpp
 	platform/egl/glesem/glesem.c
 )
 
@@ -66,9 +66,9 @@ set (PEEPER_GLRENDERER_PLATFORM_EAGL_HEADERS
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_EGL_HEADERS
-	platform/egl/EGLPBufferRenderTexturePeer.h
-	platform/egl/EGLRenderContextPeer.h
-	platform/egl/EGLRenderTargetPeer.h
+	platform/egl/EGLPBufferSurfaceRenderTarget.h
+	platform/egl/EGLWindowRenderTarget.h
+	platform/egl/EGLRenderTarget.h
 	platform/egl/glesem/glesem.h
 )
 

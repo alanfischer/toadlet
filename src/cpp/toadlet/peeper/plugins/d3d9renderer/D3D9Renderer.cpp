@@ -40,6 +40,16 @@
 using namespace toadlet::egg;
 using namespace toadlet::egg::MathConversion;
 
+#if defined(TOADLET_HAS_DIRECT3D_MOBILE)
+	#if defined(TOADLET_FIXED_POINT)
+		#define	TOADLET_D3DMFMT ,D3DMFMT_D3DMVALUE_FIXED
+	#else
+		#define	TOADLET_D3DMFMT ,D3DMFMT_D3DMVALUE_FLOAT
+	#endif
+#else
+	#define	TOADLET_D3DMFMT
+#endif
+
 namespace toadlet{
 namespace peeper{
 
@@ -54,6 +64,7 @@ TOADLET_C_API Renderer* new_D3D9Renderer(){
 #endif
 
 D3D9Renderer::D3D9Renderer():
+	mD3D(NULL),
 	mD3DDevice(NULL),
 	//mD3DCaps,
 	mPrimaryRenderTarget(NULL),
@@ -71,6 +82,7 @@ D3D9Renderer::D3D9Renderer():
 	mLighting(false),
 	mNormalize(Normalize_NONE),
 	mShading(Shading_SMOOTH),
+	mTexturePerspective(false),
 
 	mMirrorY(false)
 
@@ -94,10 +106,11 @@ bool D3D9Renderer::startup(RenderTarget *target,int *options){
 	}
 
 	D3D9RenderTarget *d3dtarget=(D3D9RenderTarget*)target->getRootRenderTarget();
-	mD3DDevice=d3dtarget->getDirect3DDevice9();
+	mD3D=d3dtarget->getDirect3D();
+	mD3DDevice=d3dtarget->getDirect3DDevice();
 	if(mD3DDevice==NULL){
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"D3DMRenderer: Invalid Direct3DDevice9");
+			"D3D9Renderer: Invalid Device");
 		return false;
 	}
 
@@ -107,21 +120,21 @@ bool D3D9Renderer::startup(RenderTarget *target,int *options){
 	mRenderTarget=target;
 	mD3DRenderTarget=d3dtarget;
 
-	ZeroMemory(&mD3DCaps,sizeof(D3DCAPS9));
+	ZeroMemory(&mD3DCaps,sizeof(mD3DCaps));
 	HRESULT result=mD3DDevice->GetDeviceCaps(&mD3DCaps);
 	TOADLET_CHECK_D3D9ERROR(result,"Error getting caps");
 
-	IDirect3D9 *d3d=NULL;
-	mD3DDevice->GetDirect3D(&d3d);
-
-	HRESULT renderToTextureResult=d3d->CheckDeviceFormat(	D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8,
-		D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE, D3DFMT_X8R8G8B8);
-
-	HRESULT renderToDepthTextureResult=d3d->CheckDeviceFormat(	D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8,
-		D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, D3DFMT_D24S8);
-
-	d3d->Release();
-	d3d=NULL;
+	#if defined(TOADLET_HAS_DIRECT3D_MOBILE)
+		HRESULT renderToTextureResult=mD3D->CheckDeviceFormat( D3DMADAPTER_DEFAULT, D3DMDEVTYPE_HAL, D3DMFMT_X8R8G8B8,
+			D3DMUSAGE_RENDERTARGET, D3DMRTYPE_TEXTURE, D3DMFMT_X8R8G8B8);
+		HRESULT renderToDepthTextureResult=mD3D->CheckDeviceFormat(	D3DMADAPTER_DEFAULT, D3DMDEVTYPE_HAL, D3DMFMT_X8R8G8B8,
+			D3DMUSAGE_DEPTHSTENCIL, D3DMRTYPE_TEXTURE, D3DMFMT_D24S8);
+	#else
+		HRESULT renderToTextureResult=mD3D->CheckDeviceFormat( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8,
+			D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE, D3DFMT_X8R8G8B8);
+		HRESULT renderToDepthTextureResult=mD3D->CheckDeviceFormat(	D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8,
+			D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, D3DFMT_D24S8);
+	#endif
 
 	setCapabilitySetFromCaps(mCapabilitySet,mD3DCaps,SUCCEEDED(renderToTextureResult),SUCCEEDED(renderToDepthTextureResult));
 
@@ -164,28 +177,6 @@ bool D3D9Renderer::reset(){
 
 Texture *D3D9Renderer::createTexture(){
 	return new D3D9Texture(this);
-/*
-	switch(texture->getType()){
-		case Texture::Type_NORMAL:{
-			return new D3D9TexturePeer(this,texture);
-		}
-		case Texture::Type_RENDER:{
-			RenderTexture *renderTexture=(RenderTexture*)texture;
-			D3D9RenderTexturePeer *peer=new D3D9RenderTexturePeer(this,renderTexture);
-			if(peer->isValid()==false){
-				delete peer;
-				peer=NULL;
-			}
-			return peer;
-		}
-		case Texture::Type_ANIMATED:{
-			// Dont load animated textures, since they are just a collection of normal textures
-			return NULL;
-		}
-	}
-
-	return NULL;
-*/
 }
 
 SurfaceRenderTarget *D3D9Renderer::createSurfaceRenderTarget(){
@@ -274,25 +265,26 @@ void D3D9Renderer::clear(int clearFlags,const Color &clearColor){
 		d3dclear|=D3DCLEAR_STENCIL;
 	}
 
-	mD3DDevice->Clear(0,NULL,d3dclear,D3DCOLOR_COLORVALUE(scalarToFloat(clearColor.r),scalarToFloat(clearColor.g),scalarToFloat(clearColor.b),scalarToFloat(clearColor.a)),1.0f,0);
+	D3DCOLOR color=toD3DCOLOR(clearColor);
+	mD3DDevice->Clear(0,NULL,d3dclear,color,1.0f,0);
 }
 
 void D3D9Renderer::swap(){
 	HRESULT result=mD3DDevice->Present(NULL,NULL,NULL,NULL);
-	TOADLET_CHECK_D3D9ERROR(result,"swapBuffers");
+	TOADLET_CHECK_D3D9ERROR(result,"swap");
 }
 
 void D3D9Renderer::setModelMatrix(const Matrix4x4 &matrix){
 	toD3DMATRIX(cacheD3DMatrix,matrix);
 
-	HRESULT result=mD3DDevice->SetTransform(D3DTS_WORLD,&cacheD3DMatrix);
+	HRESULT result=mD3DDevice->SetTransform(D3DTS_WORLD,&cacheD3DMatrix TOADLET_D3DMFMT);
 	TOADLET_CHECK_D3D9ERROR(result,"setModelMatrix");
 }
 
 void D3D9Renderer::setViewMatrix(const Matrix4x4 &matrix){
 	toD3DMATRIX(cacheD3DMatrix,matrix);
 
-	HRESULT result=mD3DDevice->SetTransform(D3DTS_VIEW,&cacheD3DMatrix);
+	HRESULT result=mD3DDevice->SetTransform(D3DTS_VIEW,&cacheD3DMatrix TOADLET_D3DMFMT);
 	TOADLET_CHECK_D3D9ERROR(result,"setViewMatrix");
 }
 
@@ -309,7 +301,7 @@ void D3D9Renderer::setProjectionMatrix(const Matrix4x4 &matrix){
 		toD3DMATRIX(cacheD3DMatrix,matrix);
 	}
 
-	HRESULT result=mD3DDevice->SetTransform(D3DTS_PROJECTION,&cacheD3DMatrix);
+	HRESULT result=mD3DDevice->SetTransform(D3DTS_PROJECTION,&cacheD3DMatrix TOADLET_D3DMFMT);
 	TOADLET_CHECK_D3D9ERROR(result,"setProjectionMatrix");
 }
 
@@ -434,6 +426,7 @@ void D3D9Renderer::setDefaultStates(){
 	mBlend=Blend(Blend::Combination_ALPHA);
 	mShading=Shading_FLAT;
 	mNormalize=Normalize_NONE;
+	mTexturePerspective=false;
 
 	setAlphaTest(AlphaTest_NONE,0.5);
 	setDepthWrite(true);
@@ -445,6 +438,7 @@ void D3D9Renderer::setDefaultStates(){
 	setBlend(Blend::Combination_DISABLED);
 	setShading(Shading_SMOOTH);
 	setNormalize(Normalize_RESCALE);
+	setTexturePerspective(true);
 
 	int i;
 	for(i=0;i<mCapabilitySet.maxTextureStages;++i){
@@ -627,23 +621,26 @@ void D3D9Renderer::setFogParameters(const Fog &fog,scalar nearDistance,scalar fa
 	
 		mD3DDevice->SetRenderState(D3DRS_FOGENABLE,TRUE);
 	    mD3DDevice->SetRenderState(D3DRS_FOGCOLOR,D3DCOLOR_COLORVALUE(scalarToFloat(color.r),scalarToFloat(color.g),scalarToFloat(color.b),scalarToFloat(color.a)));
-
         mD3DDevice->SetRenderState(D3DRS_FOGVERTEXMODE,D3DFOG_LINEAR);
-        mD3DDevice->SetRenderState(D3DRS_FOGSTART,*(DWORD*)(&fNearDistance));
-        mD3DDevice->SetRenderState(D3DRS_FOGEND,*(DWORD*)(&fFarDistance));
+		mD3DDevice->SetRenderState(D3DRS_FOGSTART,*(DWORD*)(&fNearDistance));
+		mD3DDevice->SetRenderState(D3DRS_FOGEND,*(DWORD*)(&fFarDistance));
 	}
 }
 
 void D3D9Renderer::setLightEffect(const LightEffect &lightEffect){
 	D3DMATERIAL9 material;
 
-	material.Ambient=toD3DCOLORVALUE(lightEffect.ambient);
-	material.Diffuse=toD3DCOLORVALUE(lightEffect.diffuse);
-	material.Specular=toD3DCOLORVALUE(lightEffect.specular);
-	material.Power=lightEffect.shininess;
-	material.Emissive=toD3DCOLORVALUE(lightEffect.emissive);
+	toD3DCOLORVALUE(material.Ambient,lightEffect.ambient);
+	toD3DCOLORVALUE(material.Diffuse,lightEffect.diffuse);
+	toD3DCOLORVALUE(material.Specular,lightEffect.specular);
+	#if !defined(TOADLET_HAS_DIRECT3D_MOBILE) && defined(TOADLET_FIXED_POINT)
+		material.Power=scalarToFloat(lightEffect.shininess);
+	#else
+		material.Power=lightEffect.shininess;
+	#endif
+	toD3DCOLORVALUE(material.Emissive,lightEffect.emissive);
 
-	mD3DDevice->SetMaterial(&material);
+	mD3DDevice->SetMaterial(&material TOADLET_D3DMFMT);
 
 	mD3DDevice->SetRenderState(D3DRS_COLORVERTEX,lightEffect.trackColor);
 	if(lightEffect.trackColor){
@@ -718,6 +715,18 @@ void D3D9Renderer::setPointParameters(bool sprite,scalar size,bool attenuated,sc
 		mD3DDevice->SetRenderState(D3DRS_POINTSCALE_A,*(DWORD*)(&fLinear));
 		mD3DDevice->SetRenderState(D3DRS_POINTSCALE_A,*(DWORD*)(&fQuadratic));
 	}
+}
+
+void D3D9Renderer::setTexturePerspective(bool texturePerspective){
+	if(mTexturePerspective==texturePerspective){
+		return;
+	}
+
+	#if defined(TOADLET_HAS_DIRECT3D_MOBILE)
+		mD3DDevice->SetRenderState(D3DMRS_TEXTUREPERSPECTIVE,texturePerspective);
+	#endif
+
+	mTexturePerspective=texturePerspective;
 }
 
 void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
@@ -918,8 +927,8 @@ void D3D9Renderer::setLight(int i,Light *light){
 		}
 	}
 
-	d3dlight.Diffuse=toD3DCOLORVALUE(light->getDiffuseColor());
-	d3dlight.Specular=toD3DCOLORVALUE(light->getSpecularColor());
+	toD3DCOLORVALUE(d3dlight.Diffuse,light->getDiffuseColor());
+	toD3DCOLORVALUE(d3dlight.Specular,light->getSpecularColor());
 	d3dlight.Attenuation1=scalarToFloat(light->getLinearAttenuation());
 	d3dlight.Range=scalarToFloat(light->getRadius());
 

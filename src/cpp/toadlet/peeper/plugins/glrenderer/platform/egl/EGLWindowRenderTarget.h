@@ -23,32 +23,32 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_EGLRENDERCONTEXTPEER_H
-#define TOADLET_PEEPER_EGLRENDERCONTEXTPEER_H
+#ifndef TOADLET_PEEPER_EGLWINDOWRENDERTARGET_H
+#define TOADLET_PEEPER_EGLWINDOWRENDERTARGET_H
 
-#include "EGLRenderTargetPeer.h"
+#include "EGLRenderTarget.h"
 #include <toadlet/peeper/Visual.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API EGLRenderContextPeer:public EGLRenderTargetPeer{
+class TOADLET_API EGLWindowRenderTarget:public EGLRenderTarget{
 public:
-	EGLRenderContextPeer();
-	EGLRenderContextPeer(void *nativeSurface,const Visual &visual,bool pixmap=false);
-	virtual ~EGLRenderContextPeer();
+	EGLWindowRenderTarget();
+	EGLWindowRenderTarget(void *nativeSurface,const Visual &visual,bool pixmap=false);
+	virtual ~EGLWindowRenderTarget();
+
+	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
 	virtual bool createContext(void *nativeSurface,const Visual &visual,bool pixmap=false);
-
 	virtual bool destroyContext();
+	
+	virtual bool swap();
 
+	virtual bool isPrimary() const{return true;}
+	virtual bool isValid() const{return mContext!=NULL && mSurface!=NULL;}
 	virtual int getWidth() const;
-	
 	virtual int getHeight() const;
-	
-	virtual void swap();
-
-	inline bool isValid() const{return mContext!=EGL_NO_CONTEXT;}
 
 protected:
 	EGLConfig mConfig;
