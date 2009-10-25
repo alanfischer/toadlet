@@ -40,7 +40,7 @@
 using namespace toadlet::egg;
 using namespace toadlet::egg::MathConversion;
 
-#if defined(TOADLET_HAS_DIRECT3D_MOBILE)
+#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 	#if defined(TOADLET_FIXED_POINT)
 		#define	TOADLET_D3DMFMT ,D3DMFMT_D3DMVALUE_FIXED
 	#else
@@ -124,11 +124,10 @@ bool D3D9Renderer::startup(RenderTarget *target,int *options){
 	HRESULT result=mD3DDevice->GetDeviceCaps(&mD3DCaps);
 	TOADLET_CHECK_D3D9ERROR(result,"Error getting caps");
 
-	#if defined(TOADLET_HAS_DIRECT3D_MOBILE)
-		HRESULT renderToTextureResult=mD3D->CheckDeviceFormat( D3DMADAPTER_DEFAULT, D3DMDEVTYPE_HAL, D3DMFMT_X8R8G8B8,
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		HRESULT renderToTextureResult=mD3D->CheckDeviceFormat( D3DMADAPTER_DEFAULT, D3DMDEVTYPE_DEFAULT, D3DMFMT_X8R8G8B8,
 			D3DMUSAGE_RENDERTARGET, D3DMRTYPE_TEXTURE, D3DMFMT_X8R8G8B8);
-		HRESULT renderToDepthTextureResult=mD3D->CheckDeviceFormat(	D3DMADAPTER_DEFAULT, D3DMDEVTYPE_HAL, D3DMFMT_X8R8G8B8,
-			D3DMUSAGE_DEPTHSTENCIL, D3DMRTYPE_TEXTURE, D3DMFMT_D24S8);
+		HRESULT renderToDepthTextureResult=E_FAIL;
 	#else
 		HRESULT renderToTextureResult=mD3D->CheckDeviceFormat( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8,
 			D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE, D3DFMT_X8R8G8B8);
@@ -633,7 +632,7 @@ void D3D9Renderer::setLightEffect(const LightEffect &lightEffect){
 	toD3DCOLORVALUE(material.Ambient,lightEffect.ambient);
 	toD3DCOLORVALUE(material.Diffuse,lightEffect.diffuse);
 	toD3DCOLORVALUE(material.Specular,lightEffect.specular);
-	#if !defined(TOADLET_HAS_DIRECT3D_MOBILE) && defined(TOADLET_FIXED_POINT)
+	#if !defined(TOADLET_HAS_DIRECT3DMOBILE) && defined(TOADLET_FIXED_POINT)
 		material.Power=scalarToFloat(lightEffect.shininess);
 	#else
 		material.Power=lightEffect.shininess;
@@ -722,7 +721,7 @@ void D3D9Renderer::setTexturePerspective(bool texturePerspective){
 		return;
 	}
 
-	#if defined(TOADLET_HAS_DIRECT3D_MOBILE)
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 		mD3DDevice->SetRenderState(D3DMRS_TEXTUREPERSPECTIVE,texturePerspective);
 	#endif
 
