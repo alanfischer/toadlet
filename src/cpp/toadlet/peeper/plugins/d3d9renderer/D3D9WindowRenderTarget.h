@@ -54,8 +54,8 @@ public:
 
 	virtual void reset();
 
-	inline IDirect3DDevice9 *getDirect3DDevice() const{return mD3DDevice;}
-	inline IDirect3D9 *getDirect3D() const{return mD3D;}
+	inline IDirect3DDevice9 *getDirect3DDevice9() const{return mD3DDevice;}
+	inline IDirect3D9 *getDirect3D9() const{return mD3D;}
 	inline const D3DPRESENT_PARAMETERS &getPresentParameters() const{return mPresentParameters;}
 
 protected:

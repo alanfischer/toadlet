@@ -106,8 +106,8 @@ bool D3D9Renderer::startup(RenderTarget *target,int *options){
 	}
 
 	D3D9RenderTarget *d3dtarget=(D3D9RenderTarget*)target->getRootRenderTarget();
-	mD3D=d3dtarget->getDirect3D();
-	mD3DDevice=d3dtarget->getDirect3DDevice();
+	mD3D=d3dtarget->getDirect3D9();
+	mD3DDevice=d3dtarget->getDirect3DDevice9();
 	if(mD3DDevice==NULL){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"D3D9Renderer: Invalid Device");
@@ -352,10 +352,16 @@ void D3D9Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Index
 					numVertexes=vertexBuffer->getSize();
 				}
 				D3D9VertexBufferPeer *peer=(D3D9VertexBufferPeer*)vertexBuffer->internal_getBufferPeer();
-				result=mD3DDevice->SetStreamSource(i,peer->vertexBuffer,0,vertexBuffer->getVertexFormat()->getVertexSize());
+				#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+					result=mD3DDevice->SetStreamSource(i,peer->vertexBuffer,vertexBuffer->getVertexFormat()->getVertexSize());
+				#else
+					result=mD3DDevice->SetStreamSource(i,peer->vertexBuffer,0,vertexBuffer->getVertexFormat()->getVertexSize());
+				#endif
 				TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: SetStreamSource");
-				result=mD3DDevice->SetFVF(peer->fvf);
-				TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: SetFVF");
+				#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+					result=mD3DDevice->SetFVF(peer->fvf);
+					TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: SetFVF");
+				#endif
 			}
 
 			IndexBuffer *indexBuffer=indexData->getIndexBuffer();
@@ -372,44 +378,46 @@ void D3D9Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Index
 				TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: DrawPrimitive");
 			}
 		}
-		else{
-			// Warning: This path is very unoptimized.  Use buffer peers if at all possible
-			VertexBuffer *vertexBuffer=vertexData->getVertexBuffer(0);
-
-			int numVertexes=vertexBuffer->getSize();
-			int vertexSize=vertexBuffer->getVertexFormat()->getVertexSize();
-
-			Collection<VertexElement> colorElements;
-			result=mD3DDevice->SetFVF(D3D9VertexBufferPeer::getFVF(vertexBuffer,&colorElements));
-			TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: SetFVF");
-
-			int i,j;
-			for(i=0;i<colorElements.size();++i){
-				const VertexElement &vertexElement=colorElements[i];
-				for(j=0;j<numVertexes;++j){
-					uint32 &color=*(uint32*)(vertexBuffer->internal_getData()+vertexSize*j+vertexElement.offset);
-					color=(color&0xFF000000)|((color&0x000000FF)<<16)|(color&0x0000FF00)|((color&0x00FF0000)>>16);
-				}
-			}
-
-			IndexBuffer *indexBuffer=indexData->getIndexBuffer();
-			if(indexBuffer!=NULL){
-				result=mD3DDevice->DrawIndexedPrimitiveUP(d3dpt,0,numVertexes,count,indexBuffer->internal_getData()+indexData->getStart()*indexBuffer->getIndexFormat(),D3D9IndexBufferPeer::getD3DFORMAT(indexBuffer->getIndexFormat()),vertexBuffer->internal_getData(),vertexSize);
-				TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: DrawIndexedPrimitiveUP");
-			}
+		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
 			else{
-				result=mD3DDevice->DrawPrimitiveUP(d3dpt,count,vertexBuffer->internal_getData()+indexData->getStart()*vertexSize,vertexSize);
-				TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: DrawPrimitiveUP");
-			}
+				// Warning: This path is very unoptimized.  Use buffer peers if at all possible
+				VertexBuffer *vertexBuffer=vertexData->getVertexBuffer(0);
 
-			for(i=0;i<colorElements.size();++i){
-				const VertexElement &vertexElement=colorElements[i];
-				for(j=0;j<numVertexes;++j){
-					uint32 &color=*(uint32*)(vertexBuffer->internal_getData()+vertexSize*j+vertexElement.offset);
-					color=(color&0xFF000000)|((color&0x000000FF)<<16)|(color&0x0000FF00)|((color&0x00FF0000)>>16);
+				int numVertexes=vertexBuffer->getSize();
+				int vertexSize=vertexBuffer->getVertexFormat()->getVertexSize();
+
+				Collection<VertexElement> colorElements;
+				result=mD3DDevice->SetFVF(D3D9VertexBufferPeer::getFVF(vertexBuffer,&colorElements));
+				TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: SetFVF");
+
+				int i,j;
+				for(i=0;i<colorElements.size();++i){
+					const VertexElement &vertexElement=colorElements[i];
+					for(j=0;j<numVertexes;++j){
+						uint32 &color=*(uint32*)(vertexBuffer->internal_getData()+vertexSize*j+vertexElement.offset);
+						color=(color&0xFF000000)|((color&0x000000FF)<<16)|(color&0x0000FF00)|((color&0x00FF0000)>>16);
+					}
+				}
+
+				IndexBuffer *indexBuffer=indexData->getIndexBuffer();
+				if(indexBuffer!=NULL){
+					result=mD3DDevice->DrawIndexedPrimitiveUP(d3dpt,0,numVertexes,count,indexBuffer->internal_getData()+indexData->getStart()*indexBuffer->getIndexFormat(),D3D9IndexBufferPeer::getD3DFORMAT(indexBuffer->getIndexFormat()),vertexBuffer->internal_getData(),vertexSize);
+					TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: DrawIndexedPrimitiveUP");
+				}
+				else{
+					result=mD3DDevice->DrawPrimitiveUP(d3dpt,count,vertexBuffer->internal_getData()+indexData->getStart()*vertexSize,vertexSize);
+					TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: DrawPrimitiveUP");
+				}
+
+				for(i=0;i<colorElements.size();++i){
+					const VertexElement &vertexElement=colorElements[i];
+					for(j=0;j<numVertexes;++j){
+						uint32 &color=*(uint32*)(vertexBuffer->internal_getData()+vertexSize*j+vertexElement.offset);
+						color=(color&0xFF000000)|((color&0x000000FF)<<16)|(color&0x0000FF00)|((color&0x00FF0000)>>16);
+					}
 				}
 			}
-		}
+		#endif
 	}
 }
 
@@ -619,7 +627,7 @@ void D3D9Renderer::setFogParameters(const Fog &fog,scalar nearDistance,scalar fa
 		float fFarDistance=scalarToFloat(farDistance);
 	
 		mD3DDevice->SetRenderState(D3DRS_FOGENABLE,TRUE);
-	    mD3DDevice->SetRenderState(D3DRS_FOGCOLOR,D3DCOLOR_COLORVALUE(scalarToFloat(color.r),scalarToFloat(color.g),scalarToFloat(color.b),scalarToFloat(color.a)));
+	    mD3DDevice->SetRenderState(D3DRS_FOGCOLOR,toD3DCOLOR(color));
         mD3DDevice->SetRenderState(D3DRS_FOGVERTEXMODE,D3DFOG_LINEAR);
 		mD3DDevice->SetRenderState(D3DRS_FOGSTART,*(DWORD*)(&fNearDistance));
 		mD3DDevice->SetRenderState(D3DRS_FOGEND,*(DWORD*)(&fFarDistance));
@@ -637,7 +645,9 @@ void D3D9Renderer::setLightEffect(const LightEffect &lightEffect){
 	#else
 		material.Power=lightEffect.shininess;
 	#endif
-	toD3DCOLORVALUE(material.Emissive,lightEffect.emissive);
+	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+		toD3DCOLORVALUE(material.Emissive,lightEffect.emissive);
+	#endif
 
 	mD3DDevice->SetMaterial(&material TOADLET_D3DMFMT);
 
@@ -695,25 +705,27 @@ void D3D9Renderer::setDepthBias(scalar constant,scalar slope){
 void D3D9Renderer::setPointParameters(bool sprite,scalar size,bool attenuated,scalar constant,scalar linear,scalar quadratic,scalar minSize,scalar maxSize){
 	HRESULT result=S_OK;
 
-	// pointsize = size / sqrt(constant + linear*d + quadratic*d*d)
-	// if a&b = 0, then quadratic = 1/(C*C) where C = first component of projMatrix * 1/2 screen width
-	if(mCapabilitySet.pointSprites){
-		mD3DDevice->SetRenderState(D3DRS_POINTSPRITEENABLE,sprite);
-		mD3DDevice->SetRenderState(D3DRS_POINTSCALEENABLE,sprite);
-	}
+	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+		// pointsize = size / sqrt(constant + linear*d + quadratic*d*d)
+		// if a&b = 0, then quadratic = 1/(C*C) where C = first component of projMatrix * 1/2 screen width
+		if(mCapabilitySet.pointSprites){
+			mD3DDevice->SetRenderState(D3DRS_POINTSPRITEENABLE,sprite);
+			mD3DDevice->SetRenderState(D3DRS_POINTSCALEENABLE,sprite);
+		}
 
-	float fSize=MathConversion::scalarToFloat(size);
-	mD3DDevice->SetRenderState(D3DRS_POINTSIZE,*(DWORD*)(&fSize));
-	
-	if(attenuated){
-		float fConstant=MathConversion::scalarToFloat(constant);
-		float fLinear=MathConversion::scalarToFloat(linear);
-		float fQuadratic=MathConversion::scalarToFloat(quadratic);
+		float fSize=MathConversion::scalarToFloat(size);
+		mD3DDevice->SetRenderState(D3DRS_POINTSIZE,*(DWORD*)(&fSize));
+		
+		if(attenuated){
+			float fConstant=MathConversion::scalarToFloat(constant);
+			float fLinear=MathConversion::scalarToFloat(linear);
+			float fQuadratic=MathConversion::scalarToFloat(quadratic);
 
-		mD3DDevice->SetRenderState(D3DRS_POINTSCALE_A,*(DWORD*)(&fConstant));
-		mD3DDevice->SetRenderState(D3DRS_POINTSCALE_A,*(DWORD*)(&fLinear));
-		mD3DDevice->SetRenderState(D3DRS_POINTSCALE_A,*(DWORD*)(&fQuadratic));
-	}
+			mD3DDevice->SetRenderState(D3DRS_POINTSCALE_A,*(DWORD*)(&fConstant));
+			mD3DDevice->SetRenderState(D3DRS_POINTSCALE_A,*(DWORD*)(&fLinear));
+			mD3DDevice->SetRenderState(D3DRS_POINTSCALE_A,*(DWORD*)(&fQuadratic));
+		}
+	#endif
 }
 
 void D3D9Renderer::setTexturePerspective(bool texturePerspective){
@@ -753,7 +765,7 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 			TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
 
 			toD3DMATRIX(cacheD3DMatrix,textureStage->getTextureMatrix());
-			result=mD3DDevice->SetTransform((D3DTRANSFORMSTATETYPE)(D3DTS_TEXTURE0+stage),&cacheD3DMatrix);
+			result=mD3DDevice->SetTransform((D3DTRANSFORMSTATETYPE)(D3DTS_TEXTURE0+stage),&cacheD3DMatrix TOADLET_D3DMFMT);
 			TOADLET_CHECK_D3D9ERROR(result,"SetTransform");
 		}
 
@@ -791,17 +803,31 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 			TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
 		}
 
-		if(textureStage->getAddressModeSpecified()){
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSU,D3D9Texture::getD3DTADDRESS(textureStage->getSAddressMode()));
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSV,D3D9Texture::getD3DTADDRESS(textureStage->getTAddressMode()));
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSW,D3D9Texture::getD3DTADDRESS(textureStage->getRAddressMode()));
-		}
+		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+			if(textureStage->getAddressModeSpecified()){
+				mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSU,D3D9Texture::getD3DTADDRESS(textureStage->getSAddressMode()));
+				mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSV,D3D9Texture::getD3DTADDRESS(textureStage->getTAddressMode()));
+				mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSW,D3D9Texture::getD3DTADDRESS(textureStage->getRAddressMode()));
+			}
 
-		if(textureStage->getFilterSpecified()){
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_MINFILTER,D3D9Texture::getD3DTEXF(textureStage->getMinFilter()));
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_MIPFILTER,D3D9Texture::getD3DTEXF(textureStage->getMipFilter()));
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_MAGFILTER,D3D9Texture::getD3DTEXF(textureStage->getMagFilter()));
-		}
+			if(textureStage->getFilterSpecified()){
+				mD3DDevice->SetTextureStageState(stage,D3DMTSS_MINFILTER,D3D9Texture::getD3DTEXF(textureStage->getMinFilter()));
+				mD3DDevice->SetTextureStageState(stage,D3DMTSS_MIPFILTER,D3D9Texture::getD3DTEXF(textureStage->getMipFilter()));
+				mD3DDevice->SetTextureStageState(stage,D3DMTSS_MAGFILTER,D3D9Texture::getD3DTEXF(textureStage->getMagFilter()));
+			}
+		#else
+			if(textureStage->getAddressModeSpecified()){
+				mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSU,D3D9Texture::getD3DTADDRESS(textureStage->getSAddressMode()));
+				mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSV,D3D9Texture::getD3DTADDRESS(textureStage->getTAddressMode()));
+				mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSW,D3D9Texture::getD3DTADDRESS(textureStage->getRAddressMode()));
+			}
+
+			if(textureStage->getFilterSpecified()){
+				mD3DDevice->SetSamplerState(stage,D3DSAMP_MINFILTER,D3D9Texture::getD3DTEXF(textureStage->getMinFilter()));
+				mD3DDevice->SetSamplerState(stage,D3DSAMP_MIPFILTER,D3D9Texture::getD3DTEXF(textureStage->getMipFilter()));
+				mD3DDevice->SetSamplerState(stage,D3DSAMP_MAGFILTER,D3D9Texture::getD3DTEXF(textureStage->getMagFilter()));
+			}
+		#endif
 	}
 	else{
 		result=mD3DDevice->SetTexture(stage,NULL);
@@ -872,14 +898,14 @@ void D3D9Renderer::setTexCoordGen(int stage,const TexCoordGen &texCoordGen,const
 			mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT4|D3DTTFF_PROJECTED);
 
 			// TODO: This will interfear with setTextureStage
-			mD3DDevice->SetTransform((D3DTRANSFORMSTATETYPE)(D3DTS_TEXTURE0+stage),&cacheD3DMatrix);
+			mD3DDevice->SetTransform((D3DTRANSFORMSTATETYPE)(D3DTS_TEXTURE0+stage),&cacheD3DMatrix TOADLET_D3DMFMT);
 		break;
 		case TexCoordGen_CAMERASPACE:
 			mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXCOORDINDEX,D3DTSS_TCI_CAMERASPACEPOSITION);
 			mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT4|D3DTTFF_PROJECTED);
 
 			// TODO: This will interfear with setTextureStage
-			mD3DDevice->SetTransform((D3DTRANSFORMSTATETYPE)(D3DTS_TEXTURE0+stage),&cacheD3DMatrix);
+			mD3DDevice->SetTransform((D3DTRANSFORMSTATETYPE)(D3DTS_TEXTURE0+stage),&cacheD3DMatrix TOADLET_D3DMFMT);
 		break;
 	}
 }
@@ -920,8 +946,10 @@ void D3D9Renderer::setLight(int i,Light *light){
 			break;
 		}
 		case Light::Type_SPOT:{
-			d3dlight.Type=D3DLIGHT_SPOT;
-			toD3DVECTOR(d3dlight.Position,light->getPosition());
+			#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+				d3dlight.Type=D3DLIGHT_SPOT;
+				toD3DVECTOR(d3dlight.Position,light->getPosition());
+			#endif
 			break;
 		}
 	}
@@ -931,7 +959,7 @@ void D3D9Renderer::setLight(int i,Light *light){
 	d3dlight.Attenuation1=scalarToFloat(light->getLinearAttenuation());
 	d3dlight.Range=scalarToFloat(light->getRadius());
 
-	mD3DDevice->SetLight(i,&d3dlight);
+	mD3DDevice->SetLight(i,&d3dlight TOADLET_D3DMFMT);
 }
 
 void D3D9Renderer::setLightEnabled(int i,bool enable){
@@ -939,7 +967,7 @@ void D3D9Renderer::setLightEnabled(int i,bool enable){
 }
 
 void D3D9Renderer::setAmbientColor(const Color &ambient){
-	mD3DDevice->SetRenderState(D3DRS_AMBIENT,D3DCOLOR_COLORVALUE(scalarToFloat(ambient.r),scalarToFloat(ambient.g),scalarToFloat(ambient.b),scalarToFloat(ambient.a)));
+	mD3DDevice->SetRenderState(D3DRS_AMBIENT,toD3DCOLOR(ambient));
 }
 
 const StatisticsSet &D3D9Renderer::getStatisticsSet(){
@@ -955,17 +983,34 @@ void D3D9Renderer::setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D
 	capabilitySet.hardwareTextures=true;
 	capabilitySet.hardwareIndexBuffers=true;
 	capabilitySet.hardwareVertexBuffers=true;
-	capabilitySet.pointSprites=(caps.FVFCaps & D3DFVFCAPS_PSIZE)!=0 && caps.MaxPointSize>1.0f;
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		capabilitySet.pointSprites=false;
+	#else
+		capabilitySet.pointSprites=(caps.FVFCaps & D3DFVFCAPS_PSIZE)!=0 && caps.MaxPointSize>1.0f;
+	#endif
 	capabilitySet.maxLights=caps.MaxActiveLights;
 	capabilitySet.maxTextureStages=caps.MaxTextureBlendStages;
 	capabilitySet.maxTextureSize=math::Math::minVal(caps.MaxTextureWidth,caps.MaxTextureHeight);
 	capabilitySet.textureDot3=(caps.TextureOpCaps & D3DTEXOPCAPS_DOTPRODUCT3)!=0;
 	capabilitySet.textureNonPowerOf2=(caps.TextureCaps & D3DPTEXTURECAPS_POW2)==0 && (caps.TextureCaps & D3DPTEXTURECAPS_SQUAREONLY)==0;
-	capabilitySet.textureNonPowerOf2Restricted=(caps.TextureCaps & D3DPTEXTURECAPS_NONPOW2CONDITIONAL)!=0;
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		capabilitySet.textureNonPowerOf2Restricted=false;
+	#else
+		capabilitySet.textureNonPowerOf2Restricted=(caps.TextureCaps & D3DPTEXTURECAPS_NONPOW2CONDITIONAL)!=0;
+	#endif
 	capabilitySet.renderToTexture=renderToTexture;
 	capabilitySet.renderToDepthTexture=renderToDepthTexture;
 	capabilitySet.renderToTextureNonPowerOf2Restricted=capabilitySet.textureNonPowerOf2Restricted && capabilitySet.renderToTexture;
-	capabilitySet.idealFormatBit=VertexElement::Format_BIT_FLOAT_32;
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE) && defined(TOADLET_FIXED_POINT)
+		capabilitySet.idealFormatBit=VertexElement::Format_BIT_FIXED_32;
+	#else
+		capabilitySet.idealFormatBit=VertexElement::Format_BIT_FLOAT_32;
+	#endif
+
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+			String("D3DM has lockable textures:")+((caps.SurfaceCaps & D3DMSURFCAPS_LOCKTEXTURE)>0));
+	#endif
 }
 
 DWORD D3D9Renderer::getD3DTextureBlendSource(TextureBlend::Source blend){
@@ -1004,7 +1049,7 @@ D3DBLEND D3D9Renderer::getD3DBlendOperation(Blend::Operation blend){
 		case Blend::Operation_ONE_MINUS_SOURCE_ALPHA:
 			return D3DBLEND_INVSRCALPHA;
 		default:
-			return D3DBLEND_FORCE_DWORD;
+			return (D3DBLEND)0;
 	}
 }
 

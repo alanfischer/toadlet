@@ -284,7 +284,7 @@ int glesem_getAccelerated(){
 	return glesem_accelerated;
 }
 
-int glesem_eglInitialize(EGLDisplay display){
+GLESEMAPI int GLESEMAPIENTRY glesem_eglInitialize(EGLDisplay display){
 	EGLBoolean result=eglInitialize(display,&glesem_egl_majorVersion,&glesem_egl_minorVersion);
 	if(result==0){
 		return 0;

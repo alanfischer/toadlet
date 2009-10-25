@@ -85,11 +85,16 @@ bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width
 	}
 	
 	DWORD usage=(mUsageFlags&UsageFlags_RENDERTARGET)>0 ? D3DUSAGE_RENDERTARGET : 0;
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		usage|=D3DUSAGE_LOCKABLE;
+	#endif
 	mManuallyGenerateMipLevels=(usageFlags&UsageFlags_AUTOGEN_MIPMAPS)>0;
-	if(mManuallyGenerateMipLevels && isD3DFORMATValid(d3d,D3DFMT_X8R8G8B8,d3dformat,D3DUSAGE_AUTOGENMIPMAP)){
-		usage|=D3DUSAGE_AUTOGENMIPMAP;
-		mManuallyGenerateMipLevels=false;
-	}
+	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+		if(mManuallyGenerateMipLevels && isD3DFORMATValid(d3d,D3DFMT_X8R8G8B8,d3dformat,D3DUSAGE_AUTOGENMIPMAP)){
+			usage|=D3DUSAGE_AUTOGENMIPMAP;
+			mManuallyGenerateMipLevels=false;
+		}
+	#endif
 
 	D3DPOOL pool=D3DPOOL_MANAGED;
 
@@ -98,19 +103,21 @@ bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width
 		case Texture::Dimension_D1:
 		case Texture::Dimension_D2:{
 			IDirect3DTexture9 *texture=NULL;
-			result=device->CreateTexture(mWidth,mHeight,mipLevels,usage,d3dformat,pool,&texture,NULL);
+			result=device->CreateTexture(mWidth,mHeight,mipLevels,usage,d3dformat,pool,&texture TOADLET_SHAREDHANDLE);
 			mTexture=texture;
 		}break;
-		case Texture::Dimension_D3:{
-			IDirect3DVolumeTexture9 *texture=NULL;
-			result=device->CreateVolumeTexture(mWidth,mHeight,depth,mipLevels,usage,d3dformat,pool,&texture,NULL);
-			mTexture=texture;
-		}break;
-		case Texture::Dimension_CUBEMAP:{
-			IDirect3DCubeTexture9 *texture=NULL;
-			result=device->CreateCubeTexture(mWidth,mipLevels,usage,d3dformat,pool,&texture,NULL);
-			mTexture=texture;
-		}break;
+		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+			case Texture::Dimension_D3:{
+				IDirect3DVolumeTexture9 *texture=NULL;
+				result=device->CreateVolumeTexture(mWidth,mHeight,depth,mipLevels,usage,d3dformat,pool,&texture TOADLET_SHAREDHANDLE);
+				mTexture=texture;
+			}break;
+			case Texture::Dimension_CUBEMAP:{
+				IDirect3DCubeTexture9 *texture=NULL;
+				result=device->CreateCubeTexture(mWidth,mipLevels,usage,d3dformat,pool,&texture TOADLET_SHAREDHANDLE);
+				mTexture=texture;
+			}break;
+		#endif
 	}
 
 	if(FAILED(result)){
@@ -171,30 +178,60 @@ void D3D9Texture::load(int format,int width,int height,int depth,uint8 *data){
 		int pixelSize=ImageFormatConversion::getPixelSize(format);
 		unsigned char *dst=(unsigned char*)rect.pBits;
 		unsigned char *src=(unsigned char*)data;
-Logger::log("LOADING DATAS");
 
 		int i,j;
-		if(mFormat==Texture::Format_A_8 && d3dformat==D3DFMT_A8L8){
-			for(i=0;i<height;++i){
-				for(j=0;j<width;++j){
-					*(uint16*)(dst+rect.Pitch*i+j*2)=A8toA8L8(*(uint8*)(src+width*pixelSize*i+j*1));
+		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+			if(mFormat==Texture::Format_RGBA_8 && d3dformat==D3DMFMT_A8R8G8B8){
+				for(i=0;i<height;++i){
+					for(j=0;j<width;++j){
+						*(uint32*)(dst+rect.Pitch*i+j*4)=RGBA8toA8R8G8B8(*(uint32*)(src+width*pixelSize*i+j*pixelSize));
+					}
 				}
 			}
-		}
-		else if(mFormat==Texture::Format_RGBA_8 && d3dformat==D3DFMT_A8R8G8B8){
-			for(i=0;i<height;++i){
-				for(j=0;j<width;++j){
-					*(uint32*)(dst+rect.Pitch*i+j*4)=RGBA8toA8R8G8B8(*(uint32*)(src+width*pixelSize*i+j*pixelSize));
+			else if(mFormat==Texture::Format_L_8 && d3dformat==D3DMFMT_R8G8B8){
+				for(i=0;i<height;++i){
+					for(j=0;j<width;++j){
+						*(uint16*)(dst+rect.Pitch*i+j*2)=L8toR8G8B8(*(uint8*)(src+width*pixelSize*i+j*pixelSize));
+					}
 				}
 			}
-		}
-		else if(mFormat==Texture::Format_RGB_8 && d3dformat==D3DFMT_X8R8G8B8){
-			for(i=0;i<height;++i){
-				for(j=0;j<width;++j){
-					*(uint32*)(dst+rect.Pitch*i+j*4)=RGB8toX8R8G8B8(src+width*pixelSize*i+j*pixelSize);
+			else if(mFormat==Texture::Format_A_8 && d3dformat==D3DMFMT_A8R8G8B8){
+				for(i=0;i<height;++i){
+					for(j=0;j<width;++j){
+						*(uint16*)(dst+rect.Pitch*i+j*2)=A8toA8R8G8B8(*(uint8*)(src+width*pixelSize*i+j*pixelSize));
+					}
 				}
 			}
-		}
+			else if(mFormat==Texture::Format_LA_8 && d3dformat==D3DMFMT_A8R8G8B8){
+				for(i=0;i<height;++i){
+					for(j=0;j<width;++j){
+						*(uint16*)(dst+rect.Pitch*i+j*2)=LA8toA8R8G8B8(*(uint16*)(src+width*pixelSize*i+j*pixelSize));
+					}
+				}
+			}
+		#else
+			if(mFormat==Texture::Format_A_8 && d3dformat==D3DFMT_A8L8){
+				for(i=0;i<height;++i){
+					for(j=0;j<width;++j){
+						*(uint16*)(dst+rect.Pitch*i+j*2)=A8toA8L8(*(uint8*)(src+width*pixelSize*i+j*1));
+					}
+				}
+			}
+			else if(mFormat==Texture::Format_RGBA_8 && d3dformat==D3DFMT_A8R8G8B8){
+				for(i=0;i<height;++i){
+					for(j=0;j<width;++j){
+						*(uint32*)(dst+rect.Pitch*i+j*4)=RGBA8toA8R8G8B8(*(uint32*)(src+width*pixelSize*i+j*pixelSize));
+					}
+				}
+			}
+			else if(mFormat==Texture::Format_RGB_8 && d3dformat==D3DFMT_X8R8G8B8){
+				for(i=0;i<height;++i){
+					for(j=0;j<width;++j){
+						*(uint32*)(dst+rect.Pitch*i+j*4)=RGB8toX8R8G8B8(src+width*pixelSize*i+j*pixelSize);
+					}
+				}
+			}
+		#endif
 		else{
 			for(i=0;i<height;++i){
 				memcpy(dst+rect.Pitch*i,src+width*pixelSize*i,width*pixelSize);
@@ -212,7 +249,9 @@ Logger::log("LOADING DATAS");
 	// TODO: I dont think this will work if the driver doesnt support autogen mipmaps, so for this & GL, we should probably
 	//  replace it with a custom routine of ours
 	if(mManuallyGenerateMipLevels){
-		mTexture->GenerateMipSubLevels();
+		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+			mTexture->GenerateMipSubLevels();
+		#endif
 	}
 }
 
@@ -237,20 +276,36 @@ bool D3D9Texture::read(int format,int width,int height,int depth,uint8 *data){
 }
 
 bool D3D9Texture::isD3DFORMATValid(IDirect3D9 *d3d,D3DFORMAT adapterFormat,D3DFORMAT textureFormat,DWORD usage){
-	return SUCCEEDED(d3d->CheckDeviceFormat(D3DADAPTER_DEFAULT,D3DDEVTYPE_HAL,adapterFormat,usage,D3DRTYPE_TEXTURE,textureFormat));
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		return SUCCEEDED(d3d->CheckDeviceFormat(D3DMADAPTER_DEFAULT,D3DMDEVTYPE_DEFAULT,adapterFormat,usage,D3DMRTYPE_TEXTURE,textureFormat));
+	#else
+		return SUCCEEDED(d3d->CheckDeviceFormat(D3DADAPTER_DEFAULT,D3DDEVTYPE_HAL,adapterFormat,usage,D3DRTYPE_TEXTURE,textureFormat));
+	#endif
 }
 
 D3DFORMAT D3D9Texture::getD3DFORMAT(int textureFormat){
 	D3DFORMAT format=D3DFMT_UNKNOWN;
 
 	if(textureFormat==Texture::Format_L_8){
-		format=D3DFMT_L8;
+		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+			format=D3DMFMT_R5G6B5;
+		#else
+			format=D3DFMT_L8;
+		#endif
 	}
 	else if(textureFormat==Texture::Format_A_8){
-		format=D3DFMT_A8L8; // Use A8L8 and fill L8 with white
+		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+			format=D3DMFMT_A8R8G8B8;
+		#else
+			format=D3DFMT_A8L8; // Use A8L8 and fill L8 with white
+		#endif
 	}
 	else if(textureFormat==Texture::Format_LA_8){
-		format=D3DFMT_A8L8;
+		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+			format=D3DMFMT_A8R8G8B8;
+		#else
+			format=D3DFMT_A8L8;
+		#endif
 	}
 	else if(textureFormat==Texture::Format_RGB_8){
 		format=D3DFMT_R8G8B8;

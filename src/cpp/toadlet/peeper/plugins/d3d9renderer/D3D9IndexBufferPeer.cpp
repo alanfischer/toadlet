@@ -49,12 +49,25 @@ D3D9IndexBufferPeer::D3D9IndexBufferPeer(D3D9Renderer *renderer,IndexBuffer *buf
 	format=buffer->getIndexFormat();
 	D3DFORMAT d3dFormat=getD3DFORMAT(format);
 
+	// TODO: Try to unify this
 	DWORD d3dUsage=0;
-	D3DPOOL d3dPool=D3DPOOL_MANAGED;
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		D3DMPOOL d3dPool=D3DMPOOL_SYSTEMMEM;
+	#else
+		D3DPOOL d3dPool=D3DPOOL_MANAGED;
+	#endif
 	if(buffer->getUsageType()==Buffer::UsageType_DYNAMIC){
 		d3dUsage|=D3DUSAGE_DYNAMIC;
-		d3dPool=D3DPOOL_DEFAULT;
+		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+			d3dPool=D3DPOOL_DEFAULT;
+		#endif
 	}
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		else if(renderer->getD3DCAPS9().SurfaceCaps & D3DMSURFCAPS_VIDINDEXBUFFER){
+			d3dPool=D3DMPOOL_VIDEOMEM;
+		}
+	#endif
+
 	if(buffer->getAccessType()==Buffer::AccessType_WRITE_ONLY){
 		d3dUsage|=D3DUSAGE_WRITEONLY;
 	}
@@ -64,7 +77,7 @@ D3D9IndexBufferPeer::D3D9IndexBufferPeer(D3D9Renderer *renderer,IndexBuffer *buf
 
 	int bufferSize=buffer->getBufferSize();
 	if(format==IndexBuffer::IndexFormat_UINT_8) bufferSize*=2;
-	HRESULT result=renderer->getDirect3DDevice9()->CreateIndexBuffer(bufferSize,d3dUsage,d3dFormat,d3dPool,&indexBuffer,NULL);
+	HRESULT result=renderer->getDirect3DDevice9()->CreateIndexBuffer(bufferSize,d3dUsage,d3dFormat,d3dPool,&indexBuffer TOADLET_SHAREDHANDLE);
 	TOADLET_CHECK_D3D9ERROR(result,"D3D9IndexBufferPeer: CreateIndexBuffer");
 
 	uint8 *bufferData=buffer->internal_getData();
