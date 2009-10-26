@@ -33,14 +33,8 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
-class GLRenderer;
-class GLTexturePeer;
-class RenderTexture;
-	
-bool GLPBufferRenderTexturePeer_available(GLRenderer *renderer){return false;}
-GLTexturePeer *new_GLPBufferRenderTexturePeer(GLRenderer *renderer,RenderTexture *texture){return NULL;}
-
-EAGLRenderContextPeer::EAGLRenderContextPeer():
+EAGLRenderContext::EAGLRenderContext():
+	mDrawable(nil),
 	mContext(nil),
 
 	mRenderBuffer(0),
@@ -49,7 +43,8 @@ EAGLRenderContextPeer::EAGLRenderContextPeer():
 {
 }
 
-EAGLRenderContextPeer::EAGLRenderContextPeer(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat):
+EAGLRenderContext::EAGLRenderContext(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat):
+	mDrawable(nil),
 	mContext(nil),
 
 	mRenderBuffer(0),
@@ -59,11 +54,11 @@ EAGLRenderContextPeer::EAGLRenderContextPeer(CAEAGLLayer *drawable,const Visual 
 	createContext(drawable,visual,colorFormat);
 }
 
-EAGLRenderContextPeer::~EAGLRenderContextPeer(){
+EAGLRenderContext::~EAGLRenderContext(){
 	destroyContext();
 }
 
-bool EAGLRenderContextPeer::createContext(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat){
+bool EAGLRenderContext::createContext(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat){
 	mDrawable=drawable;
 
 	mDrawable.drawableProperties=[NSDictionary dictionaryWithObjectsAndKeys:
@@ -110,7 +105,7 @@ bool EAGLRenderContextPeer::createContext(CAEAGLLayer *drawable,const Visual &vi
 	return true;
 }
 
-bool EAGLRenderContextPeer::destroyContext(){
+bool EAGLRenderContext::destroyContext(){
 	if(mContext!=nil){
 		EAGLContext *oldContext=[EAGLContext currentContext];
 
@@ -144,11 +139,13 @@ bool EAGLRenderContextPeer::destroyContext(){
 	return true;
 }
 
-void EAGLRenderContextPeer::makeCurrent(){
-	if(![EAGLContext setCurrentContext:mContext]){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"Failed to make context current");
-	}
+bool EAGLRenderContext::makeCurrent(){
+	return [EAGLContext setCurrentContext:mContext];
+}
+
+bool EAGLRenderContextPeer::swap(){
+	glBindRenderbuffer(GL_RENDERBUFFER,mRenderBuffer);
+	return [mContext presentRenderbuffer:GL_RENDERBUFFER];
 }
 
 int EAGLRenderContextPeer::getWidth() const{
@@ -157,14 +154,6 @@ int EAGLRenderContextPeer::getWidth() const{
 
 int EAGLRenderContextPeer::getHeight() const{
 	return [mDrawable bounds].size.height;
-}
-
-void EAGLRenderContextPeer::swap(){
-	glBindRenderbuffer(GL_RENDERBUFFER,mRenderBuffer);
-	if(![mContext presentRenderbuffer:GL_RENDERBUFFER]){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"Failed to present renderbuffer");
-	}
 }
 
 }

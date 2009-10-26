@@ -23,11 +23,11 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_EAGLRENDERCONTEXTPEER_H
-#define TOADLET_PEEPER_EAGLRENDERCONTEXTPEER_H
+#ifndef TOADLET_PEEPER_EAGLRENDERCONTEXT_H
+#define TOADLET_PEEPER_EAGLRENDERCONTEXT_H
 
 #include "../../GLIncludes.h"
-#include "../../GLRenderTargetPeer.h"
+#include "../../GLRenderTarget.h"
 #include <toadlet/peeper/Visual.h>
 #include <toadlet/egg/Logger.h>
 
@@ -39,25 +39,24 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API EAGLRenderContextPeer:public GLRenderTargetPeer{
+class TOADLET_API EAGLRenderContext:public GLRenderTarget{
 public:
-	EAGLRenderContextPeer();
-	EAGLRenderContextPeer(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat=nil);
-	virtual ~EAGLRenderContextPeer();
+	EAGLRenderContext();
+	EAGLRenderContext(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat=nil);
+	virtual ~EAGLRenderContext();
+
+	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
 	virtual bool createContext(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat=nil);
-
 	virtual bool destroyContext();
 
-	virtual void makeCurrent();
+	virtual bool makeCurrent();
+	virtual bool swap();
 	
+	virtual bool isPrimary() const{return true;}
+	virtual bool isValid() const{return mContext!=nil && mRenderBuffer!=0;}
 	virtual int getWidth() const;
-
 	virtual int getHeight() const;
-
-	virtual void swap();
-
-	inline bool isValid() const{return mContext!=nil && mRenderBuffer!=0;}
 
 protected:
 	CAEAGLLayer *mDrawable;
