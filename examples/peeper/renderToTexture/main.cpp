@@ -13,8 +13,9 @@ public:
 	RenderToTexture():Application(){}
 
 	void create(){
-		int options[]={1,0,2,0,0};
+		int options[]={2,0,0};
 		setRendererOptions(options,3);
+		changeRendererPlugin(RendererPlugin_DIRECT3D);
 
 		Application::create();
 

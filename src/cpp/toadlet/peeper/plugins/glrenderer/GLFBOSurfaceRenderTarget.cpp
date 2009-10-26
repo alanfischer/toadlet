@@ -178,6 +178,9 @@ bool GLFBOSurfaceRenderTarget::remove(Surface::ptr surface){
 
 	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::remove");
 
+	mSurfaces.remove(i);
+	mSurfaceAttachments.remove(i);
+
 	return true;
 }
 
