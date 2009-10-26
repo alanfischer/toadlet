@@ -126,7 +126,7 @@ Win32Application::Win32Application():
 		mAutoActivate(false),
 	#endif
 	mActive(false),
-	smDestroyed(false),
+	mDestroyed(false),
 	win32(NULL)
 {
 	win32=new Win32Attributes();
@@ -855,7 +855,7 @@ LRESULT CALLBACK wndProc(HWND wnd,UINT msg,WPARAM wParam,LPARAM lParam){
 			return 0;
 		case WM_RBUTTONUP:
 			application->mouseReleased(LOWORD(lParam),HIWORD(lParam),2);
-			return 0r
+			return 0;
 		case WM_MOUSEWHEEL:
 			application->mouseScrolled(LOWORD(lParam),HIWORD(lParam),wParam);
 			return 0;

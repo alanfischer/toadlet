@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "NSGLRenderTargetPeer.h"
+#include "NSGLRenderTarget.h"
 #include <toadlet/egg/Logger.h>
 
 using namespace toadlet::egg;
@@ -31,14 +31,13 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
-NSGLRenderTargetPeer::NSGLRenderTargetPeer():
+NSGLRenderTarget::NSGLRenderTarget():
 	mView(nil),
 	mPixelFormat(nil),
 	mContext(nil)
-{
-}
+{}
 
-NSGLRenderTargetPeer::NSGLRenderTargetPeer(NSView *view,const Visual &visual,NSOpenGLPixelFormat *pixelFormat):
+NSGLRenderTarget::NSGLRenderTarget(NSView *view,const Visual &visual,NSOpenGLPixelFormat *pixelFormat):GLRenderTarget(),
 	mView(nil),
 	mPixelFormat(nil),
 	mContext(nil)
@@ -46,7 +45,7 @@ NSGLRenderTargetPeer::NSGLRenderTargetPeer(NSView *view,const Visual &visual,NSO
 	createContext(view,visual,pixelFormat);
 }
 
-NSGLRenderTargetPeer::NSGLRenderTargetPeer(NSOpenGLContext *context):
+NSGLRenderTarget::NSGLRenderTarget(NSOpenGLContext *context):GLRenderTarget(),
 	mView(nil),
 	mPixelFormat(nil),
 	mContext(nil)
@@ -54,11 +53,11 @@ NSGLRenderTargetPeer::NSGLRenderTargetPeer(NSOpenGLContext *context):
 	mContext=[context retain];
 }
 
-NSGLRenderTargetPeer::~NSGLRenderTargetPeer(){
+NSGLRenderTarget::~NSGLRenderTarget(){
 	destroyContext();
 }
 
-bool NSGLRenderTargetPeer::createContext(NSView *view,const Visual &visual,NSOpenGLPixelFormat *pixelFormat){
+bool NSGLRenderTarget::createContext(NSView *view,const Visual &visual,NSOpenGLPixelFormat *pixelFormat){
 	if(pixelFormat==nil){
 		NSOpenGLPixelFormatAttribute attrs[]={
 			NSOpenGLPFADoubleBuffer,
@@ -83,14 +82,16 @@ bool NSGLRenderTargetPeer::createContext(NSView *view,const Visual &visual,NSOpe
 	return mContext!=nil;
 }
 
-void NSGLRenderTargetPeer::destroyContext(){
+bool NSGLRenderTargetPeer::destroyContext(){
 	if(mContext!=nil){
 		[mContext release];
 		mContext=nil;
 	}
+	
+	returm true;
 }
 
-void NSGLRenderTargetPeer::makeCurrent(){
+bool NSGLRenderTargetPeer::makeCurrent(){
 	// If setView is called before the view is ready, this will fail
 	//  so we check to see if it needs to be done each time.
 	if([mContext view]==nil && mView!=nil){
@@ -98,6 +99,14 @@ void NSGLRenderTargetPeer::makeCurrent(){
 	}
 
 	[mContext makeCurrentContext];
+	
+	return true;
+}
+
+bool NSGLRenderTargetPeer::swap(){
+	[mContext flushBuffer];
+	
+	return true;
 }
 
 int NSGLRenderTargetPeer::getWidth() const{
@@ -106,10 +115,6 @@ int NSGLRenderTargetPeer::getWidth() const{
 
 int NSGLRenderTargetPeer::getHeight() const{
 	return [[mContext view] bounds].size.height;
-}
-
-void NSGLRenderTargetPeer::swap(){
-	[mContext flushBuffer];
 }
 
 }

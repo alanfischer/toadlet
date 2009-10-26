@@ -23,11 +23,11 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_NSGLRENDERTARGETPEER_H
-#define TOADLET_PEEPER_NSGLRENDERTARGETPEER_H
+#ifndef TOADLET_PEEPER_NSGLRENDERTARGET_H
+#define TOADLET_PEEPER_NSGLRENDERTARGET_H
 
 #include "../../GLIncludes.h"
-#include "../../GLRenderTargetPeer.h"
+#include "../../GLRenderTarget.h"
 #include <toadlet/peeper/Visual.h>
 #include <toadlet/egg/Error.h>
 
@@ -36,27 +36,25 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API NSGLRenderTargetPeer:public GLRenderTargetPeer{
+class TOADLET_API NSGLRenderTarget:public GLRenderTarget{
 public:
-	NSGLRenderTargetPeer();
-	NSGLRenderTargetPeer(NSView *view,const Visual &visual,NSOpenGLPixelFormat *pixelFormat=nil);
-	NSGLRenderTargetPeer(NSOpenGLContext *context);
-	virtual ~NSGLRenderTargetPeer();
+	NSGLRenderTarget();
+	NSGLRenderTarget(NSView *view,const Visual &visual,NSOpenGLPixelFormat *pixelFormat=nil);
+	NSGLRenderTarget(NSOpenGLContext *context);
+	virtual ~NSGLRenderTarget();
 
+	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
+	
 	virtual bool createContext(NSView *view,const Visual &visual,NSOpenGLPixelFormat *pixelFormat=nil);
+	virtual bool destroyContext();
 
-	virtual void destroyContext();
+	virtual bool makeCurrent();
+	virtual bool swap();
 
-	virtual void makeCurrent();
-
+	virtual bool isPrimary() const{return true;}
+	virtual bool isValid() const{return mContext!=NULL;}
 	virtual int getHeight() const;
-
 	virtual int getWidth() const;
-
-	virtual void swap();
-
-	inline bool isValid() const{return mContext!=NULL;}
-
 	inline NSOpenGLContext *getContext() const{return mContext;}
 
 protected:

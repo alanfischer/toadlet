@@ -108,6 +108,11 @@ bool GLXPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attac
 
 	createBuffer();
 
+	Matrix4x4 matrix;
+	Math::setMatrix4x4FromScale(matrix,Math::ONE,-Math::ONE,Math::ONE);
+	Math::setMatrix4x4FromTranslate(matrix,0,Math::ONE,0);
+	mTexture->setMatrix(matrix);
+
 	return true;
 }
 
