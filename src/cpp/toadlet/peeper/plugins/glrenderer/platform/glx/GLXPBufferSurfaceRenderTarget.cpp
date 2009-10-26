@@ -162,7 +162,6 @@ bool GLXPBufferSurfaceRenderTarget::createBuffer(){
 		None
 	};
 
-
 	int nConfigs=0;
 	GLXFBConfigSGIX *fbConfigs=glXChooseFBConfigSGIX(mDisplay,XDefaultScreen(mDisplay),fbAttribs,&nConfigs);
 	if(nConfigs==0 || fbConfigs==NULL){
@@ -182,8 +181,6 @@ bool GLXPBufferSurfaceRenderTarget::createBuffer(){
 		}
 	}
 
-	XFree(fbConfigs);
-
 	if(mPBuffer==None){
 		destroyBuffer();
 		Error::unknown(Categories::TOADLET_PEEPER,
@@ -192,7 +189,7 @@ bool GLXPBufferSurfaceRenderTarget::createBuffer(){
 	}
 
 	XSetErrorHandler(oldHandler);
-
+/*
 	XVisualInfo *visInfo=glXGetVisualFromFBConfigSGIX(mDisplay,fbConfig);
 	if(visInfo==NULL){
 		destroyBuffer();
@@ -200,10 +197,12 @@ bool GLXPBufferSurfaceRenderTarget::createBuffer(){
 			"Error getting visInfo");
 		return false;
 	}
-
-	mContext=glXCreateContext(mDisplay,visInfo,renderTarget->getGLXContext(),True);
+*/
+//	mContext=glXCreateContext(mDisplay,visInfo,renderTarget->getGLXContext(),True);
+mContext=glXCreateNewContext(mDisplay,fbConfig,GLX_RGBA_BIT,renderTarget->getGLXContext(),True);
 	if(mContext==NULL){
-		mContext=glXCreateContext(mDisplay,visInfo,renderTarget->getGLXContext(),False);
+//		mContext=glXCreateContext(mDisplay,visInfo,renderTarget->getGLXContext(),False);
+mContext=glXCreateNewContext(mDisplay,fbConfig,GLX_RGBA_BIT,renderTarget->getGLXContext(),False);
 		if(mContext==NULL){
 			destroyBuffer();
 			Error::unknown(Categories::TOADLET_PEEPER,
@@ -216,11 +215,14 @@ bool GLXPBufferSurfaceRenderTarget::createBuffer(){
 		}
 	}
 
+	XFree(fbConfigs);
+//	XFree(visInfo);
+
 	glXMakeCurrent(mDisplay,mPBuffer,mContext);
 
 	mDrawable=mPBuffer;
 
-	unsigned int uwidth=0,uheight=0;
+	unsigned int uwidth=width,uheight=height;
 	glXQueryGLXPbufferSGIX(mDisplay,mPBuffer,GLX_WIDTH_SGIX,&uwidth);
 	glXQueryGLXPbufferSGIX(mDisplay,mPBuffer,GLX_HEIGHT_SGIX,&uheight);
 	mWidth=uwidth;mHeight=uheight;
