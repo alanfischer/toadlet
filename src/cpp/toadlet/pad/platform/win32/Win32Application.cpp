@@ -126,7 +126,7 @@ Win32Application::Win32Application():
 		mAutoActivate(false),
 	#endif
 	mActive(false),
-	mDestroyed(false),
+	smDestroyed(false),
 	win32(NULL)
 {
 	win32=new Win32Attributes();
@@ -517,7 +517,7 @@ void Win32Application::changeRendererPlugin(int rendererPlugin){
 
 void Win32Application::setRendererOptions(int *options,int length){
 	if(mRendererOptions!=NULL){
-		delete mRendererOptions;
+		delete[] mRendererOptions;
 	}
 
 	mRendererOptions=new int[length];
@@ -589,7 +589,6 @@ bool Win32Application::createContextAndRenderer(int plugin){
 			if(mRenderer->startup(this,mRendererOptions)==false){
 				delete mRenderer;
 				mRenderer=NULL;
-
 				Error::unknown(Categories::TOADLET_PAD,
 					"Error starting Renderer");
 				return false;
@@ -608,7 +607,7 @@ bool Win32Application::createContextAndRenderer(int plugin){
 	}
 	else{
 		Error::unknown(Categories::TOADLET_PAD,
-			"Error creating RenderTargetPeer");
+			"Error creating RenderTarget");
 		return false;
 	}
 
@@ -856,7 +855,7 @@ LRESULT CALLBACK wndProc(HWND wnd,UINT msg,WPARAM wParam,LPARAM lParam){
 			return 0;
 		case WM_RBUTTONUP:
 			application->mouseReleased(LOWORD(lParam),HIWORD(lParam),2);
-			return 0;
+			return 0r
 		case WM_MOUSEWHEEL:
 			application->mouseScrolled(LOWORD(lParam),HIWORD(lParam),wParam);
 			return 0;

@@ -23,56 +23,38 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_GLXPBUFFERRENDERTEXTUREPEER_H
-#define TOADLET_PEEPER_GLXPBUFFERRENDERTEXTUREPEER_H
+#ifndef TOADLET_PEEPER_GLXWINDOWRENDERTARGET_H
+#define TOADLET_PEEPER_GLXWINDOWRENDERTARGET_H
 
-#include "../../GLTexturePeer.h"
-#include <toadlet/egg/Error.h>
-#include <toadlet/peeper/RenderTexture.h>
-#include "GLXRenderTargetPeer.h"
+#include "GLXRenderTarget.h"
+#include <toadlet/peeper/Visual.h>
 
 namespace toadlet{
 namespace peeper{
 
-class GLRenderer;
-	
-class GLXPBufferRenderTexturePeer:public GLXRenderTargetPeer,public GLTexturePeer{
+class TOADLET_API GLXWindowRenderTarget:public GLXRenderTarget{
 public:
-	static bool available(GLRenderer *renderer);
+	GLXWindowRenderTarget();
+	GLXWindowRenderTarget(GLXDrawable drawable,Display *display,XVisualInfo *visualInfo);
+	virtual ~GLXWindowRenderTarget();
 
-	GLXPBufferRenderTexturePeer(GLRenderer *renderer,RenderTexture *texture);
+	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
-	virtual ~GLXPBufferRenderTexturePeer();
+	virtual bool createContext(GLXDrawable drawable,Display *display,XVisualInfo *visualInfo);
+	virtual bool destroyContext();
 
-	TexturePeer *castToTexturePeer(){return this;}
-	RenderTargetPeer *castToRenderTargetPeer(){return this;}
+	virtual bool swap();
 
-	void makeCurrent();
-
-	void swap();
-
-	void createBuffer(GLRenderer *renderer);
-
-	void destroyBuffer();
-
-	int getWidth() const;
-	int getHeight() const;
-
-	bool isValid() const;
-
-	inline GLXPbuffer getGLXPbuffer() const{return mPBuffer;}
+	virtual bool isPrimary() const{return true;}
+	virtual bool isValid() const{return mContext!=0;}
+	virtual int getWidth() const;
+	virtual int getHeight() const;
 
 protected:
-	RenderTexture *mTexture;
-	GLXPbuffer mPBuffer;
-	int mWidth;
-	int mHeight;
-	bool mBound;
-	bool mShare;
+	XVisualInfo *mVisualInfo;
 };
 
 }
 }
 
 #endif
-

@@ -33,7 +33,7 @@ LDFLAGS	= -o
 ### Include and Library paths ###
 
 INCLUDES	= -I$(TOADLET_BASE_DIR)/include
-LIBS		= -L$(TOADLET_BASE_DIR)/lib -ltoadlet_egg -ltoadlet_peeper -ltoadlet_peeper_glrenderer 
+LIBS		= -L$(TOADLET_BASE_DIR)/lib -ltoadlet_egg_d -ltoadlet_peeper_d -ltoadlet_ribbit_d -ltoadlet_tadpole_d -ltoadlet_pad_d
 APP_NAME	= renderToTexture
 
 ### Making application ###

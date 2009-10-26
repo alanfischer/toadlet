@@ -25,8 +25,9 @@ set (PEEPER_GLRENDERER_PLATFORM_EGL_SRC
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_GLX_SRC
-	platform/glx/GLXPBufferRenderTexturePeer.cpp
-	platform/glx/GLXWindowRenderContextPeer.cpp
+	platform/glx/GLXPBufferSurfaceRenderTarget.cpp
+	platform/glx/GLXRenderTarget.cpp
+	platform/glx/GLXWindowRenderTarget.cpp
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_NSGL_SRC
@@ -73,9 +74,9 @@ set (PEEPER_GLRENDERER_PLATFORM_EGL_HEADERS
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_GLX_HEADERS
-	platform/glx/GLXPBufferRenderTexturePeer.h
-	platform/glx/GLXRenderTargetPeer.h
-	platform/glx/GLXWindowRenderContextPeer.h
+	platform/glx/GLXPBufferSurfaceRenderTarget.h
+	platform/glx/GLXRenderTarget.h
+	platform/glx/GLXWindowRenderTarget.h
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_NSGL_HEADERS
