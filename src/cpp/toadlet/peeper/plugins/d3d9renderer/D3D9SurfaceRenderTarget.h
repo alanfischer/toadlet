@@ -22,36 +22,53 @@
  * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
  *
  ********** Copyright header - do not remove **********/
-/*
-#ifndef TOADLET_PEEPER_D3D9RENDERTEXTUREPEER_H
-#define TOADLET_PEEPER_D3D9RENDERTEXTUREPEER_H
 
-#include "D3D9RenderTargetPeer.h"
-#include "D3D9TexturePeer.h"
-#include <toadlet/peeper/RenderTexture.h>
+#ifndef TOADLET_PEEPER_D3D9SURFACERENDERTARGET_H
+#define TOADLET_PEEPER_D3D9SURFACERENDERTARGET_H
+
+#include "D3D9RenderTarget.h"
+#include "D3D9Surface.h"
+#include <toadlet/peeper/SurfaceRenderTarget.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API D3D9RenderTexturePeer:public D3D9RenderTargetPeer,public D3D9TexturePeer{
+class TOADLET_API D3D9SurfaceRenderTarget:public D3D9RenderTarget,public SurfaceRenderTarget{
 public:
-	D3D9RenderTexturePeer(D3D9Renderer *renderer,RenderTexture *renderTexture);
+	D3D9SurfaceRenderTarget(D3D9Renderer *renderer);
+	virtual ~D3D9SurfaceRenderTarget();
 
-	virtual ~D3D9RenderTexturePeer();
+	virtual RenderTarget *getRootRenderTarget(){return (D3D9RenderTarget*)this;}
 
-	int getWidth() const;
-	int getHeight() const;
+	virtual bool create();
+	virtual bool destroy();
 
-	bool isValid() const;
+	virtual bool makeCurrent(IDirect3DDevice9 *device);
+	virtual void reset(){}
 
-	void makeCurrent(IDirect3DDevice9 *device);
+	virtual bool attach(Surface::ptr surface,Attachment attachment);
+	virtual bool remove(Surface::ptr surface);
 
-	IDirect3DSurface9 *colorSurface;
-	IDirect3DSurface9 *depthSurface;	
+	virtual bool isPrimary() const{return false;}
+	virtual bool isValid() const{return true;}
+	virtual int getWidth() const{return mWidth;}
+	virtual int getHeight() const{return mHeight;}
+
+	virtual IDirect3D9 *getDirect3D9() const{return NULL;}
+	virtual IDirect3DDevice9 *getDirect3DDevice9() const{return NULL;}
+
+protected:
+	Surface::ptr createBufferSurface(int format,int width,int height);
+
+	D3D9Renderer *mRenderer;
+	int mWidth;
+	int mHeight;
+	egg::Collection<Surface::ptr> mSurfaces;
+	egg::Collection<Attachment> mSurfaceAttachments;
+	egg::Collection<D3D9Surface::ptr> mOwnedSurfaces;
 };
 
 }
 }
 
 #endif
-*/

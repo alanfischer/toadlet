@@ -26,6 +26,7 @@
 #include "D3D9Renderer.h"
 #include "D3D9Texture.h"
 #include "D3D9RenderTarget.h"
+#include "D3D9SurfaceRenderTarget.h"
 #include "D3D9VertexBufferPeer.h"
 #include "D3D9IndexBufferPeer.h"
 #include <toadlet/egg/MathConversion.h>
@@ -179,7 +180,7 @@ Texture *D3D9Renderer::createTexture(){
 }
 
 SurfaceRenderTarget *D3D9Renderer::createSurfaceRenderTarget(){
-	return NULL;
+	return new D3D9SurfaceRenderTarget(this);
 }
 
 BufferPeer *D3D9Renderer::createBufferPeer(Buffer *buffer){

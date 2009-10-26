@@ -22,9 +22,9 @@
  * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
  *
  ********** Copyright header - do not remove **********/
-/*
+
 #include "D3D9Renderer.h"
-#include "D3D9RenderTexturePeer.h"
+#include "D3D9SurfaceRenderTarget.h"
 #include <toadlet/egg/Error.h>
 
 using namespace toadlet::egg;
@@ -33,114 +33,111 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-D3D9RenderTexturePeer::D3D9RenderTexturePeer(D3D9Renderer *renderer,RenderTexture *renderTexture):D3D9RenderTargetPeer(),D3D9TexturePeer(renderer,renderTexture),
-	colorSurface(NULL)
-	,depthSurface(NULL)
+D3D9SurfaceRenderTarget::D3D9SurfaceRenderTarget(D3D9Renderer *renderer):D3D9RenderTarget(),
+	mRenderer(NULL),
+	mWidth(0),
+	mHeight(0)
+	//mSurfaces,
+	//mSurfaceAttachments,
+	//mOwnedSurfaces
 {
-	const CapabilitySet &capabilitySet=renderer->getCapabilitySet();
-	IDirect3DDevice9 *device=renderer->getDirect3DDevice9();
+	mRenderer=renderer;
+}
 
-	int width=renderTexture->getWidth();
-	int height=renderTexture->getHeight();
+D3D9SurfaceRenderTarget::~D3D9SurfaceRenderTarget(){
+	destroy();
+}
 
-	if((renderTexture->getFormat()&Texture::Format_BIT_DEPTH)>0){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"D3D9TexturePeer: Render to depth texture not currently supported");
-		return;
+bool D3D9SurfaceRenderTarget::create(){
+	attach(this->createBufferSurface(Texture::Format_DEPTH_8,256,256),Attachment_DEPTH_STENCIL);
+
+	return true;
+}
+
+bool D3D9SurfaceRenderTarget::destroy(){
+	int i;
+	for(i=0;i<mOwnedSurfaces.size();++i){
+		mOwnedSurfaces[i]->destroy();
+	}
+	mOwnedSurfaces.clear();
+
+	return true;
+}
+
+bool D3D9SurfaceRenderTarget::makeCurrent(IDirect3DDevice9 *device){
+	int i;
+	for(i=0;i<mSurfaces.size();++i){
+		D3D9Surface *surface=(D3D9Surface*)mSurfaces[i].get();
+		Attachment attachment=mSurfaceAttachments[i];
+		if(attachment==Attachment_DEPTH_STENCIL){
+			device->SetDepthStencilSurface(surface->getSurface());
+		}
+		else{
+			device->SetRenderTarget(0,surface->getSurface());
+		}
 	}
 
-	HRESULT result=E_FAIL;
+	return true;
+}
 
-	UINT levels=renderTexture->getAutoGenerateMipMaps()?0:1;
-	DWORD usage=D3DUSAGE_RENDERTARGET;
-	D3DFORMAT format=D3DFMT_R5G6B5;
-	D3DPOOL pool=D3DPOOL_DEFAULT;
+bool D3D9SurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
+	mSurfaces.add(surface);
+	mSurfaceAttachments.add(attachment);
 
-	IDirect3DTexture9 *texture=NULL;
-	result=device->CreateTexture(width,height,levels,usage,format,pool,&texture,NULL);
-	baseTexture=texture;
+	mWidth=surface->getWidth();
+	mHeight=surface->getHeight();
+
+	return true;
+}
+
+bool D3D9SurfaceRenderTarget::remove(Surface::ptr surface){
+	int i;
+	for(i=0;i<mSurfaces.size();++i){
+		if(mSurfaces[i]==surface){
+			break;
+		}
+	}
+	if(i==mSurfaces.size()){
+		return false;
+	}
+
+	mSurfaces.remove(i);
+	mSurfaceAttachments.remove(i);
+
+	return true;
+}
+
+// TODO: Make this do more than just clone depth.  Create color, and create varying depths
+Surface::ptr D3D9SurfaceRenderTarget::createBufferSurface(int format,int width,int height){
+#if 1
+	IDirect3DDevice9 *device=mRenderer->getDirect3DDevice9();
+	IDirect3DSurface9 *deviceDepthSurface=NULL;
+	HRESULT result=device->GetDepthStencilSurface(&deviceDepthSurface);
 	if(FAILED(result)){
-		TOADLET_CHECK_D3D9ERROR(result,"CreateTexture");
-		return;
+		TOADLET_CHECK_D3D9ERROR(result,"GetDepthStencilSurface");
+		return NULL;
 	}
-	
-	result=texture->GetSurfaceLevel(0,&colorSurface);
+
+	D3DSURFACE_DESC desc;
+	result=deviceDepthSurface->GetDesc(&desc);
+	deviceDepthSurface->Release();
 	if(FAILED(result)){
-		TOADLET_CHECK_D3D9ERROR(result,"GetSurfaceLevel");
-		return;
+		TOADLET_CHECK_D3D9ERROR(result,"GetDesc");
+		return NULL;
 	}
 
-	// Build depth surface
-	{
-		IDirect3DSurface9 *deviceDepthSurface=NULL;
-		result=device->GetDepthStencilSurface(&deviceDepthSurface);
-		if(FAILED(result)){
-			TOADLET_CHECK_D3D9ERROR(result,"GetDepthStencilSurface");
-			return;
-		}
-
-		D3DSURFACE_DESC desc;
-		result=deviceDepthSurface->GetDesc(&desc);
-		deviceDepthSurface->Release();
-		if(FAILED(result)){
-			TOADLET_CHECK_D3D9ERROR(result,"GetDesc");
-			return;
-		}
-
-		result=device->CreateDepthStencilSurface(width,height,desc.Format,desc.MultiSampleType,NULL,FALSE,&depthSurface,NULL);
-		if(FAILED(result)){
-			TOADLET_CHECK_D3D9ERROR(result,"CreateDepthStencilSurface");
-			return;
-		}
+	IDirect3DSurface9 *d3dsurface=NULL;
+	result=device->CreateDepthStencilSurface(width,height,desc.Format,desc.MultiSampleType,NULL,FALSE,&d3dsurface,NULL);
+	if(FAILED(result)){
+		TOADLET_CHECK_D3D9ERROR(result,"CreateDepthStencilSurface");
+		return NULL;
 	}
-}
+#endif
 
-D3D9RenderTexturePeer::~D3D9RenderTexturePeer(){
-	if(colorSurface!=NULL){
-		colorSurface->Release();
-		colorSurface=NULL;
-	}
-
-	if(depthSurface!=NULL){
-		depthSurface->Release();
-		depthSurface=NULL;
-	}
-}
-
-int D3D9RenderTexturePeer::getWidth() const{
-	if(colorSurface!=NULL){
-		D3DSURFACE_DESC desc;
-		colorSurface->GetDesc(&desc);
-		return desc.Width;
-	}
-	else{
-		return 0;
-	}
-}
-
-int D3D9RenderTexturePeer::getHeight() const{
-	if(colorSurface!=NULL){
-		D3DSURFACE_DESC desc;
-		colorSurface->GetDesc(&desc);
-		return desc.Height;
-	}
-	else{
-		return 0;
-	}
-}
-
-bool D3D9RenderTexturePeer::isValid() const{
-	return colorSurface!=NULL || depthSurface!=NULL;
-}
-
-void D3D9RenderTexturePeer::makeCurrent(IDirect3DDevice9 *device){
-	HRESULT result=device->SetRenderTarget(0,colorSurface);
-	TOADLET_CHECK_D3D9ERROR(result,"Error in SetRenderTarget");
-
-	result=device->SetDepthStencilSurface(depthSurface);
-	TOADLET_CHECK_D3D9ERROR(result,"Error in SetDepthStencilSurface");
+	D3D9Surface::ptr surface(new D3D9Surface(d3dsurface));
+	mOwnedSurfaces.add(surface);
+	return surface;
 }
 
 }
 }
-*/
