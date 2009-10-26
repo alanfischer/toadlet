@@ -23,48 +23,21 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_GLXRENDERTARGETPEER_H
-#define TOADLET_PEEPER_GLXRENDERTARGETPEER_H
-
-#include "../../GLIncludes.h"
-#include "../../GLRenderTargetPeer.h"
-#include <toadlet/egg/Error.h>
-#include <X11/Xlib.h>
+#include "GLXRenderTarget.h"
 
 namespace toadlet{
 namespace peeper{
 
-class GLXRenderTargetPeer:public GLRenderTargetPeer{
-public:
-	GLXRenderTargetPeer():GLRenderTargetPeer(){
-		mDisplay=NULL;
-		mDrawable=None;
-		mContext=None;
-	}
+GLXRenderTarget::GLXRenderTarget():GLRenderTarget(),
+	mDisplay(NULL),
+	mDrawable(None),
+	mContext(None)
+{}
 
-	virtual ~GLXRenderTargetPeer(){}
-
-	virtual void makeCurrent(){
-		Bool result=glXMakeCurrent(mDisplay,mDrawable,mContext);
-		if(result==False){
-			egg::Error::unknown(egg::Categories::TOADLET_PEEPER,
-				"glXMakeCurrent failed");
-		}
-	}
-
-	inline Display *getDisplay() const{return mDisplay;}
-
-	inline GLXDrawable getGLXDrawable() const{return mDrawable;}
-
-	inline GLXContext getGLXContext() const{return mContext;}
-
-protected:
-	Display *mDisplay;
-	GLXDrawable mDrawable;
-	GLXContext mContext;
-};
+bool GLXRenderTarget::makeCurrent(){
+	return glXMakeCurrent(mDisplay,mDrawable,mContext)==True;
+}
 
 }
 }
 
-#endif

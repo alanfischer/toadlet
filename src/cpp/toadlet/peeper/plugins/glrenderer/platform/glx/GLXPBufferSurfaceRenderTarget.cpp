@@ -23,10 +23,10 @@
  *
  ********** Copyright header - do not remove **********/
 
-// Include GLRenderer first due to collisions with the Status enum & X windows
+#include "GLXPBufferSurfaceRenderTarget.h"
 #include "../../GLRenderer.h"
-#include "../../../../RenderContext.h"
-#include "GLXPBufferRenderTexturePeer.h"
+#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Error.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::image;
@@ -34,57 +34,81 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-bool GLPBufferRenderTexturePeer_available(GLRenderer *renderer){
-	return GLXPBufferRenderTexturePeer::available(renderer);
+bool GLPBufferSurfaceRenderTarget_available(GLRenderer *renderer){
+	return GLXPBufferSurfaceRenderTarget::available(renderer);
 }
 
-GLTexturePeer *new_GLPBufferRenderTexturePeer(GLRenderer *renderer,RenderTexture *texture){
-	return new GLXPBufferRenderTexturePeer(renderer,texture);
+SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer){
+	return new GLXPBufferSurfaceRenderTarget(renderer);
 }
 
-bool GLXPBufferRenderTexturePeer::available(GLRenderer *renderer){
-#	if defined(TOADLET_HAS_GLEW)
+bool GLXPBufferSurfaceRenderTarget::available(GLRenderer *renderer){
+	#if defined(TOADLET_HAS_GLEW)
 		return GLXEW_SGIX_pbuffer>0;
-#	else
+	#else
 		return false;
-#	endif
+	#endif
 }
 
-GLXPBufferRenderTexturePeer::GLXPBufferRenderTexturePeer(GLRenderer *renderer,RenderTexture *texture):GLXRenderTargetPeer(),GLTexturePeer(renderer,texture){
-	mTexture=texture;
-	mPBuffer=0;
-	mWidth=0;
-	mHeight=0;
-	mBound=false;
-	mShare=false;//true;
-
-	if((texture->getFormat()&Texture::Format_BIT_DEPTH)>0){
-		Error::invalidParameters(Categories::TOADLET_EGG,
-			"Format_BIT_DEPTH not available for pbuffers");
-		return;
-	}
-
-	glTexImage2D(textureTarget,0,GL_RGB,((Texture*)texture)->getWidth(),((Texture*)texture)->getHeight(),0,GL_RGB,GL_UNSIGNED_BYTE,NULL);
-
-	createBuffer(renderer);
+GLXPBufferSurfaceRenderTarget::GLXPBufferSurfaceRenderTarget(GLRenderer *renderer):GLXRenderTarget(),
+	mRenderer(NULL),
+	mTexture(NULL),
+	mPBuffer(NULL),
+	mWidth(0),
+	mHeight(0),
+	mBound(false),
+	mInitialized(false)
+{
+	mRenderer=renderer;
 }
 
-GLXPBufferRenderTexturePeer::~GLXPBufferRenderTexturePeer(){
+GLXPBufferSurfaceRenderTarget::~GLXPBufferSurfaceRenderTarget(){
+	destroy();
+}
+
+bool GLXPBufferSurfaceRenderTarget::create(){
+	return true;
+}
+
+bool GLXPBufferSurfaceRenderTarget::destroy(){
 	destroyBuffer();
+	return true;
 }
 
-void GLXPBufferRenderTexturePeer::makeCurrent(){
-	GLXRenderTargetPeer::makeCurrent();
+bool GLXPBufferSurfaceRenderTarget::makeCurrent(){
+	GLXRenderTarget::makeCurrent();
 
 	if(mInitialized==false){
 		mRenderer->setDefaultStates();
 		mInitialized=true;
 	}
+
+	return true;
 }
 
-void GLXPBufferRenderTexturePeer::swap(){
-	glBindTexture(textureTarget,textureHandle);
-	glCopyTexSubImage2D(textureTarget,0,0,0,0,0,mWidth,mHeight);
+bool GLXPBufferSurfaceRenderTarget::swap(){
+	glBindTexture(mTexture->getTarget(),mTexture->getHandle());
+	glCopyTexSubImage2D(mTexture->getTarget(),0,0,0,0,0,mWidth,mHeight);
+}
+
+bool GLXPBufferSurfaceRenderTarget::remove(Surface::ptr surface){
+	// Unimplemented currently
+	return false;
+}
+
+bool GLXPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
+	GLTextureMipSurface *gltextureSurface=((GLSurface*)surface->getRootSurface())->castToGLTextureMipSurface();
+	mTexture=gltextureSurface->getTexture();
+
+	if((mTexture->getFormat()&Texture::Format_BIT_DEPTH)>0){
+		Error::invalidParameters(Categories::TOADLET_PEEPER,
+			"Format_BIT_DEPTH not available for pbuffers");
+		return false;
+	}
+
+	createBuffer();
+
+	return true;
 }
 
 static int xError=0;
@@ -94,18 +118,20 @@ static int handleXError(Display *,XErrorEvent *){
 	return 0;
 }
 
-void GLXPBufferRenderTexturePeer::createBuffer(GLRenderer *renderer){
-	int width=((Texture*)mTexture)->getWidth();
-	int height=((Texture*)mTexture)->getHeight();
+bool GLXPBufferSurfaceRenderTarget::createBuffer(){
+	destroyBuffer();
 
-	GLXRenderTargetPeer *renderContextPeer=(GLXRenderTargetPeer*)renderer->getRenderContext()->internal_getRenderTargetPeer();
+	int width=mTexture->getWidth();
+	int height=mTexture->getHeight();
+
+	GLXRenderTarget *renderTarget=(GLXRenderTarget*)(mRenderer->getPrimaryRenderTarget()->getRootRenderTarget());
 
 	mDisplay=XOpenDisplay(NULL);
 	if(mDisplay==None){
 		destroyBuffer();
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"DISPLAY bad value; couldn't open display");
-		return;
+		return false;
 	}
 
 	int (*oldHandler)(Display*,XErrorEvent*);
@@ -115,7 +141,7 @@ void GLXPBufferRenderTexturePeer::createBuffer(GLRenderer *renderer){
 	int redBits=ImageFormatConversion::getRedBits(format);
 	int greenBits=ImageFormatConversion::getGreenBits(format);
 	int blueBits=ImageFormatConversion::getBlueBits(format);
-	int depthBits=mTexture->hasDepthBuffer()?16:0;
+	int depthBits=16;
 
 	int fbAttribs[]={
 		/* Single buffered, with depth buffer */
@@ -142,7 +168,7 @@ void GLXPBufferRenderTexturePeer::createBuffer(GLRenderer *renderer){
 	if(nConfigs==0 || fbConfigs==NULL){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"Error getting FBConfig");
-		return;
+		return false;
 	}
 
 	GLXFBConfigSGIX fbConfig=0;
@@ -162,7 +188,7 @@ void GLXPBufferRenderTexturePeer::createBuffer(GLRenderer *renderer){
 		destroyBuffer();
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"Error creating pbuffer");
-		return;
+		return false;
 	}
 
 	XSetErrorHandler(oldHandler);
@@ -172,17 +198,17 @@ void GLXPBufferRenderTexturePeer::createBuffer(GLRenderer *renderer){
 		destroyBuffer();
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"Error getting visInfo");
-		return;
+		return false;
 	}
 
-	mContext=glXCreateContext(mDisplay,visInfo,renderContextPeer->getGLXContext(),True);
+	mContext=glXCreateContext(mDisplay,visInfo,renderTarget->getGLXContext(),True);
 	if(mContext==NULL){
-		mContext=glXCreateContext(mDisplay,visInfo,renderContextPeer->getGLXContext(),False);
+		mContext=glXCreateContext(mDisplay,visInfo,renderTarget->getGLXContext(),False);
 		if(mContext==NULL){
 			destroyBuffer();
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"Error getting visInfo");
-			return;
+			return false;
 		}
 		else{
 			Logger::log(Categories::TOADLET_PEEPER,Logger::Level_WARNING,
@@ -200,12 +226,15 @@ void GLXPBufferRenderTexturePeer::createBuffer(GLRenderer *renderer){
 	mWidth=uwidth;mHeight=uheight;
 	if(mWidth!=width || mHeight!=height){
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"GLXPBufferRenderTexturePeer::createBuffer: width or height not as expected");
+			"width or height not as expected");
+		return false;
 	}
+
+	return true;
 }
 
-void GLXPBufferRenderTexturePeer::destroyBuffer(){
-	if(mContext!=0 && mShare==false){
+bool GLXPBufferSurfaceRenderTarget::destroyBuffer(){
+	if(mContext!=0){
 		glXDestroyContext(mDisplay,mContext);
 		mContext=0;
 	}
@@ -217,18 +246,7 @@ void GLXPBufferRenderTexturePeer::destroyBuffer(){
 		XCloseDisplay(mDisplay);
 		mDisplay=None;
 	}
-}
-
-int GLXPBufferRenderTexturePeer::getWidth() const{
-	return mWidth;
-}
-
-int GLXPBufferRenderTexturePeer::getHeight() const{
-	return mHeight;
-}
-
-bool GLXPBufferRenderTexturePeer::isValid() const{
-	return mPBuffer!=0;
+	return true;
 }
 
 }

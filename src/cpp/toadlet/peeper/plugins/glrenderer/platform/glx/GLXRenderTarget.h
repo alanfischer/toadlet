@@ -23,35 +23,32 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_GOO_GLXWINDOWRENDERCONTEXTPEER_H
-#define TOADLET_GOO_GLXWINDOWRENDERCONTEXTPEER_H
+#ifndef TOADLET_PEEPER_GLXRENDERTARGET_H
+#define TOADLET_PEEPER_GLXRENDERTARGET_H
 
-#include <toadlet/peeper/Visual.h>
-#include "GLXRenderTargetPeer.h"
+#include "../../GLIncludes.h"
+#include "../../GLRenderTarget.h"
+#include <toadlet/egg/Error.h>
+#include <X11/Xlib.h>
 
 namespace toadlet{
 namespace peeper{
 
-class GLXWindowRenderContextPeer:public GLXRenderTargetPeer{
+class GLXRenderTarget:public GLRenderTarget{
 public:
-	GLXWindowRenderContextPeer();
-	GLXWindowRenderContextPeer(GLXDrawable drawable,Display *display,XVisualInfo *visualInfo);
-	virtual ~GLXWindowRenderContextPeer();
+	GLXRenderTarget();
+	virtual ~GLXRenderTarget(){}
 
-	virtual bool createContext(GLXDrawable drawable,Display *display,XVisualInfo *visualInfo);
+	virtual bool makeCurrent();
 
-	virtual bool destroyContext();
-
-	virtual int getWidth() const;
-
-	virtual int getHeight() const;
-
-	virtual void swap();
-
-	inline bool isValid() const{return mContext!=0;}
+	inline Display *getDisplay() const{return mDisplay;}
+	inline GLXDrawable getGLXDrawable() const{return mDrawable;}
+	inline GLXContext getGLXContext() const{return mContext;}
 
 protected:
-	XVisualInfo *mVisualInfo;
+	Display *mDisplay;
+	GLXDrawable mDrawable;
+	GLXContext mContext;
 };
 
 }

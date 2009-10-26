@@ -23,48 +23,57 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_GLFBORENDERBUFFERSURFACE_H
-#define TOADLET_PEEPER_GLFBORENDERBUFFERSURFACE_H
+#ifndef TOADLET_PEEPER_GLXPBUFFERSURFACERENDERTARGET_H
+#define TOADLET_PEEPER_GLXPBUFFERSURFACERENDERTARGET_H
 
-#include "GLSurface.h"
+#include "GLXRenderTarget.h"
+#include "../../GLTexture.h"
+#include <toadlet/peeper/SurfaceRenderTarget.h>
 
 namespace toadlet{
 namespace peeper{
 
-class GLFBOSurfaceRenderTarget;
+class GLRenderer;
 
-class GLFBORenderbufferSurface:public GLSurface{
+class GLXPBufferSurfaceRenderTarget:public GLXRenderTarget,public SurfaceRenderTarget{
 public:
-	TOADLET_SHARED_POINTERS(GLFBORenderbufferSurface,Surface);
+	static bool available(GLRenderer *renderer);
 
-protected:
-	GLFBORenderbufferSurface(GLFBOSurfaceRenderTarget *target);
+	GLXPBufferSurfaceRenderTarget(GLRenderer *renderer);
+	virtual ~GLXPBufferSurfaceRenderTarget();
 
-	virtual bool create(int format,int width,int height);
+	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
+
+	virtual bool create();
 	virtual bool destroy();
 
-public:
-	virtual ~GLFBORenderbufferSurface();
+	virtual bool makeCurrent();
+	virtual bool swap();
 
-	virtual Surface *getRootSurface(){return this;}
-	virtual GLTextureMipSurface *castToGLTextureMipSurface(){return NULL;}
-	virtual GLFBORenderbufferSurface *castToGLFBORenderbufferSurface(){return this;}
+	virtual bool attach(Surface::ptr surface,Attachment attachment);
+	virtual bool remove(Surface::ptr surface);
 
+	virtual bool isPrimary() const{return false;}
+	virtual bool isValid() const{return mPBuffer!=0;}
 	virtual int getWidth() const{return mWidth;}
 	virtual int getHeight() const{return mHeight;}
-	inline GLuint getHandle() const{return mHandle;}
+	inline GLXPbuffer getGLXPbuffer() const{return mPBuffer;}
 
 protected:
-	GLFBOSurfaceRenderTarget *mTarget;
-	GLuint mHandle;
-	int mFormat;
+	bool createBuffer();
+	bool destroyBuffer();
+
+	GLRenderer *mRenderer;
+	GLTexture *mTexture;
+	GLXPbuffer mPBuffer;
 	int mWidth;
 	int mHeight;
-
-	friend class GLFBOSurfaceRenderTarget;
+	bool mBound;
+	bool mInitialized;
 };
 
 }
 }
 
 #endif
+

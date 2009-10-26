@@ -95,7 +95,7 @@ protected:
 	Matrix4x4 mMatrix;
 	bool mManuallyGenerateMipLevels;
 
-	friend GLRenderer;
+	friend class GLRenderer;
 };
 
 }

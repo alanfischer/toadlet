@@ -15,7 +15,7 @@ public:
 	void create(){
 		int options[]={2,0,0};
 		setRendererOptions(options,3);
-		changeRendererPlugin(RendererPlugin_DIRECT3D);
+	//	changeRendererPlugin(RendererPlugin_DIRECT3D);
 
 		Application::create();
 

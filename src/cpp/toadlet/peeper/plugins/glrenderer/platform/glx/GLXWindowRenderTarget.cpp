@@ -23,29 +23,28 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "GLXWindowRenderContextPeer.h"
+#include "GLXWindowRenderTarget.h"
 
 using namespace toadlet::egg;
 
 namespace toadlet{
 namespace peeper{
 
-GLXWindowRenderContextPeer::GLXWindowRenderContextPeer():GLXRenderTargetPeer()
-	//mVisualInfo
-{
-}
+GLXWindowRenderTarget::GLXWindowRenderTarget():GLXRenderTarget(),
+	mVisualInfo(NULL)
+{}
 
-GLXWindowRenderContextPeer::GLXWindowRenderContextPeer(GLXDrawable drawable,Display *display,XVisualInfo *visualInfo):GLXRenderTargetPeer()
-	//mVisualInfo
+GLXWindowRenderTarget::GLXWindowRenderTarget(GLXDrawable drawable,Display *display,XVisualInfo *visualInfo):GLXRenderTarget(),
+	mVisualInfo(NULL)
 {
 	createContext(drawable,display,visualInfo);
 }
 
-GLXWindowRenderContextPeer::~GLXWindowRenderContextPeer(){
+GLXWindowRenderTarget::~GLXWindowRenderTarget(){
 	destroyContext();
 }
 
-bool GLXWindowRenderContextPeer::createContext(GLXDrawable drawable,Display *display,XVisualInfo *visualInfo){
+bool GLXWindowRenderTarget::createContext(GLXDrawable drawable,Display *display,XVisualInfo *visualInfo){
 	mDrawable=drawable;
 	mDisplay=display;
 	mVisualInfo=visualInfo;
@@ -71,7 +70,7 @@ bool GLXWindowRenderContextPeer::createContext(GLXDrawable drawable,Display *dis
 	return true;
 }
 
-bool GLXWindowRenderContextPeer::destroyContext(){
+bool GLXWindowRenderTarget::destroyContext(){
 	if(mContext!=NULL){
 		glXMakeCurrent(mDisplay,None,NULL);
 		glXDestroyContext(mDisplay,mContext);
@@ -81,17 +80,18 @@ bool GLXWindowRenderContextPeer::destroyContext(){
 	return true;
 }
 
-void GLXWindowRenderContextPeer::swap(){
+bool GLXWindowRenderTarget::swap(){
 	glXSwapBuffers(mDisplay,mDrawable);
+	return true;
 }
 
-int GLXWindowRenderContextPeer::getWidth() const{
+int GLXWindowRenderTarget::getWidth() const{
 	unsigned int width=0;
 	glXQueryDrawable(mDisplay,mDrawable,GLX_WIDTH,&width);
 	return width;
 }
 
-int GLXWindowRenderContextPeer::getHeight() const{
+int GLXWindowRenderTarget::getHeight() const{
 	unsigned int height=0;
 	glXQueryDrawable(mDisplay,mDrawable,GLX_HEIGHT,&height);
 	return height;
