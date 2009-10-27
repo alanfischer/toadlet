@@ -538,11 +538,9 @@ void D3D9Renderer::setFaceCulling(const FaceCulling &culling){
 		case FaceCulling_NONE:
 			mD3DDevice->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE);
 		break;
-		case FaceCulling_CCW:
 		case FaceCulling_FRONT:
 			mD3DDevice->SetRenderState(D3DRS_CULLMODE,mMirrorY?D3DCULL_CW:D3DCULL_CCW);
 		break;
-		case FaceCulling_CW:
 		case FaceCulling_BACK:
 			mD3DDevice->SetRenderState(D3DRS_CULLMODE,mMirrorY?D3DCULL_CCW:D3DCULL_CW);
 		break;

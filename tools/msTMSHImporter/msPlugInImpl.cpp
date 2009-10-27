@@ -227,7 +227,7 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 	}
 
 	XMSHHandler::ptr handler(new XMSHHandler(NULL,NULL,NULL));
-	Mesh::ptr mesh((Mesh*)handler->load(fin,NULL));
+	Mesh::ptr mesh=shared_static_cast<Mesh>(handler->load(fin,NULL));
 	if(mesh==NULL){
 		::AfxMessageBox("Error loading file");
 		return -1;
@@ -497,7 +497,7 @@ cPlugIn::importAnimation(msModel *pModel,const String &name,int flags){
 	}
 
 	XANMHandler::ptr handler(new XANMHandler());
- 	MeshSkeletonSequence::ptr sequence((MeshSkeletonSequence*)handler->load(fin,NULL));
+	MeshSkeletonSequence::ptr sequence=shared_static_cast<MeshSkeletonSequence>(handler->load(fin,NULL));
 	if(sequence==NULL){
 		::AfxMessageBox("Error loading file");
 		return -1;

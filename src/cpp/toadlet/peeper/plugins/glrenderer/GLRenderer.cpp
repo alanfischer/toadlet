@@ -890,11 +890,9 @@ void GLRenderer::setFaceCulling(const FaceCulling &faceCulling){
 	}
 	else{
 		switch(faceCulling){
-			case FaceCulling_CCW:
 			case FaceCulling_FRONT:
 				glCullFace(mMirrorY?GL_BACK:GL_FRONT);
 			break;
-			case FaceCulling_CW:
 			case FaceCulling_BACK:
 				glCullFace(mMirrorY?GL_FRONT:GL_BACK);
 			break;

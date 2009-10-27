@@ -115,7 +115,7 @@ int main(int argc,char **argv){
 				return 0;
 			}
 			XANMHandler::ptr handler(new XANMHandler());
-			MeshSkeletonSequence::ptr sequence((MeshSkeletonSequence*)handler->load(fin,NULL));
+			MeshSkeletonSequence::ptr sequence=shared_static_cast<MeshSkeletonSequence>(handler->load(fin,NULL));
 			skeleton->sequences.add(sequence);
 		}
 
