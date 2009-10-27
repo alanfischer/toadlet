@@ -82,16 +82,16 @@ bool NSGLRenderTarget::createContext(NSView *view,const Visual &visual,NSOpenGLP
 	return mContext!=nil;
 }
 
-bool NSGLRenderTargetPeer::destroyContext(){
+bool NSGLRenderTarget::destroyContext(){
 	if(mContext!=nil){
 		[mContext release];
 		mContext=nil;
 	}
 	
-	returm true;
+	return true;
 }
 
-bool NSGLRenderTargetPeer::makeCurrent(){
+bool NSGLRenderTarget::makeCurrent(){
 	// If setView is called before the view is ready, this will fail
 	//  so we check to see if it needs to be done each time.
 	if([mContext view]==nil && mView!=nil){
@@ -103,17 +103,17 @@ bool NSGLRenderTargetPeer::makeCurrent(){
 	return true;
 }
 
-bool NSGLRenderTargetPeer::swap(){
+bool NSGLRenderTarget::swap(){
 	[mContext flushBuffer];
 	
 	return true;
 }
 
-int NSGLRenderTargetPeer::getWidth() const{
+int NSGLRenderTarget::getWidth() const{
 	return [[mContext view] bounds].size.width;
 }
 
-int NSGLRenderTargetPeer::getHeight() const{
+int NSGLRenderTarget::getHeight() const{
 	return [[mContext view] bounds].size.height;
 }
 
