@@ -67,6 +67,8 @@ public:
 protected:
 	class Packet{
 	public:
+		TOADLET_SHARED_POINTERS(Packet,Packet);
+
 		Packet():length(0),debugDeliverTime(0){}
 
 		void reset(){
@@ -74,11 +76,9 @@ protected:
 			debugDeliverTime=0;
 		}
 
-		TOADLET_SHARED_POINTERS(Packet,Packet);
 		char data[1024];
 		int length;
-
-		int debugDeliverTime;
+		uint64 debugDeliverTime;
 	};
 
 	const static int CONNECTION_FRAME;
