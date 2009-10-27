@@ -69,8 +69,6 @@ public:
 
 	enum FaceCulling{
 		FaceCulling_NONE,
-		FaceCulling_CCW,
-		FaceCulling_CW,
 		FaceCulling_FRONT,
 		FaceCulling_BACK,
 	};
