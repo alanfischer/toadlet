@@ -42,7 +42,7 @@ namespace tadpole{
 //  Also, context resources have Peers, and these resources use a mapping of Resource<->Peer, combined
 //   with a PointerQueue callback for the WeakPointer associated with the Resource, so the Peer can
 //   be inserted into a queue to unload from the context
-class ResourceManager:public egg::PointerQueue<egg::Resource>{
+class TOADLET_API ResourceManager:public egg::PointerQueue<egg::Resource>{
 public:
 	class ResourceCache{
 	public:
