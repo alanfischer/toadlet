@@ -152,7 +152,6 @@ protected:
 
 	Vector3 cache_update_oldPosition;
 	Vector3 cache_update_newPosition;
-	Vector3 cache_update_offset;
 	Vector3 cache_update_velocity;
 	Vector3 cache_update_temp;
 	Vector3 cache_update_t;
