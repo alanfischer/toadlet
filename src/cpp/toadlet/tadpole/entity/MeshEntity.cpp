@@ -57,9 +57,8 @@ MeshEntity::MeshAnimationController::MeshAnimationController(MeshEntity *entity)
 {
 	mMeshEntity=entity;
 	mAnimation=SkeletonAnimation::ptr(new SkeletonAnimation());
-	attachAnimation(mAnimation);
-
 	mAnimation->setTarget(mMeshEntity->getSkeleton());
+	attachAnimation(mAnimation);
 }
 
 void MeshEntity::MeshAnimationController::setSequenceIndex(int index){
