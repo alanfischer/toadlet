@@ -309,7 +309,7 @@ AudioPeer *ALPlayer::createBufferedAudioPeer(Audio *audio,AudioBuffer::ptr buffe
 
 	if(mSourcePool.size()>0){
 		peer->setSourceHandle(mSourcePool[0]);
-		mSourcePool.remove(0);
+		mSourcePool.removeAt(0);
 		mAudioPeers.add(peer);
 	}
 	else{
@@ -353,7 +353,7 @@ AudioPeer *ALPlayer::createStreamingAudioPeer(Audio *audio,InputStream::ptr in,c
 
 	if(mSourcePool.size()>0){
 		peer->setSourceHandle(mSourcePool[0]);
-		mSourcePool.remove(0);
+		mSourcePool.removeAt(0);
 		mAudioPeers.add(peer);
 	}
 	else{

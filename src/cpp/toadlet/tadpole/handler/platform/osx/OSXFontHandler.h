@@ -28,7 +28,7 @@
 
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/FontData.h>
-#include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/tadpole/TextureManager.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -39,13 +39,13 @@ namespace handler{
 
 class TOADLET_API OSXFontHandler:public ResourceHandler{
 public:
-	OSXFontHandler(ResourceManager *textureManager);
+	OSXFontHandler(TextureManager *textureManager);
 	virtual ~OSXFontHandler(){}
 
-	egg::Resource *load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
+	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
 
 protected:
-	ResourceManager *mTextureManager;
+	TextureManager *mTextureManager;
 };
 
 }
