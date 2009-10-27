@@ -257,7 +257,6 @@ void Simulator::removeConstraint(Constraint *constraint){
 void Simulator::update(int dt){
 	Vector3 &oldPosition=cache_update_oldPosition;
 	Vector3 &newPosition=cache_update_newPosition;
-	Vector3 &offset=cache_update_offset;
 	Vector3 &velocity=cache_update_velocity;
 	Vector3 &temp=cache_update_temp;
 	Vector3 &t=cache_update_t;
@@ -589,27 +588,10 @@ void Simulator::update(int dt){
 					clampPosition(c.point);
 				#endif
 
-				// Different offset options
-				#define TOADLET_OFFSET_1
-				#if defined(TOADLET_OFFSET_1)
-					temp.set(c.normal);
-					convertToEpsilonOffset(temp);
-					add(temp,c.point);
-				#elif defined(TOADLET_OFFSET_2)
-					sub(offset,oldPosition,c.point);
-					convertToEpsilonOffset(offset);
-					temp.set(offset);
-					add(temp,c.point);
-				#elif defined(TOADLET_OFFSET_3)
-					sub(offset,oldPosition,c.point);
-					convertToEpsilonOffset(offset);
-					temp.set(c.normal);
-					convertToEpsilonOffset(temp);
-					add(temp,c.point);
-					add(temp,offset);
-				#else
-					temp.set(c.point);
-				#endif
+				// Offset our point slightly from the wall
+				temp.set(c.normal);
+				convertToEpsilonOffset(temp);
+				add(temp,c.point);
 
 				// Calculate left over amount
 				sub(leftOver,newPosition,temp);
