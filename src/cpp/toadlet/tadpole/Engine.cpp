@@ -125,7 +125,7 @@ Engine::Engine():
 	#if defined(TOADLET_HAS_PNG)
 		mTextureManager->addHandler(PNGHandler::ptr(new PNGHandler(mTextureManager)),"png");
 	#elif defined(TOADLET_PLATFORM_OSX)
-		mTextureManager->addHandler(OSXTextureHandler::ptr(new OSXTextureHandler()),"png");
+		mTextureManager->addHandler(OSXTextureHandler::ptr(new OSXTextureHandler(mTextureManager)),"png");
 	#endif
 
 	// Font handlers

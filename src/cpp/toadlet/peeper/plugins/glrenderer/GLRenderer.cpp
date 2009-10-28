@@ -56,8 +56,10 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-extern bool GLPBufferSurfaceRenderTarget_available(GLRenderer *renderer);
-extern SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer);
+#if defined(TOADLET_HAS_GLPBUFFERS)
+	extern bool GLPBufferSurfaceRenderTarget_available(GLRenderer *renderer);
+	extern SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer);
+#endif
 
 TOADLET_C_API Renderer* new_GLRenderer(){
 	return new GLRenderer();
@@ -238,7 +240,11 @@ bool GLRenderer::startup(RenderTarget *target,int *options){
 	}
 	mCapabilitySet.maxLights=maxLights;
 
-	mPBuffersAvailable=usePBuffers && GLPBufferSurfaceRenderTarget_available(this);
+	#if defined(TOADLET_HAS_GLPBUFFERS)
+		mPBuffersAvailable=usePBuffers && GLPBufferSurfaceRenderTarget_available(this);
+	#else
+		mPBuffersAvailable=false;
+	#endif
 	#if defined(TOADLET_HAS_GLFBOS)
 		mFBOsAvailable=useFBOs && GLFBOSurfaceRenderTarget::available(this);
 	#else
@@ -331,12 +337,12 @@ SurfaceRenderTarget *GLRenderer::createSurfaceRenderTarget(){
 			return new GLFBOSurfaceRenderTarget(this);
 		}
 	#endif
-	if(mPBuffersAvailable){
-		return new_GLPBufferSurfaceRenderTarget(this);
-	}
-	else{
-		return NULL;
-	}
+	#if defined(TOADLET_HAS_GLPBUFFERS)
+		if(mPBuffersAvailable){
+			return new_GLPBufferSurfaceRenderTarget(this);
+		}
+	#endif
+	return NULL;
 }
 
 BufferPeer *GLRenderer::createBufferPeer(Buffer *buffer){

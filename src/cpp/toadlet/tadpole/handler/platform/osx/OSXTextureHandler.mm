@@ -57,10 +57,11 @@ void TextureStreamRewind(void *info){
 	((InputStream*)info)->reset();
 }
 	
-OSXTextureHandler::OSXTextureHandler(){
+OSXTextureHandler::OSXTextureHandler(TextureManager *textureManager){
+	mTextureManager=textureManager;
 }
 
-Resource *OSXTextureHandler::load(InputStream::ptr in,const ResourceHandlerData *handlerData){
+Resource::ptr OSXTextureHandler::load(InputStream::ptr in,const ResourceHandlerData *handlerData){
 	CGDataProviderSequentialCallbacks callbacks={0};
 	callbacks.version=0;
 	callbacks.getBytes=TextureStreamGetBytes;
@@ -105,7 +106,7 @@ Resource *OSXTextureHandler::load(InputStream::ptr in,const ResourceHandlerData 
 	int imageStride=textureWidth*image->getPixelSize();
 	memcpy(imageData,data,imageStride*textureHeight);
 
-	Texture *texture(new Texture(image));
+	Texture::ptr texture=mTextureManager->createTexture(image);
 
 	CGContextRelease(context);
 	free(data);
