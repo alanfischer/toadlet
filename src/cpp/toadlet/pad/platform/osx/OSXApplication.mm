@@ -340,7 +340,7 @@ void OSXApplication::destroy(){
 bool OSXApplication::start(bool runEventLoop){
 	mRun=true;
 
-	activate();
+	resized([(ApplicationView*)mView bounds].size.width,[(ApplicationView*)mView bounds].size.height);
 
 	return true;
 }

@@ -1,12 +1,19 @@
 #include "Logo.h"
 
+Logo::Logo(const String &resPath):Application(){
+	resourcePath=resPath;
+}
+
+Logo::~Logo(){
+}
+
 void Logo::create(){
 	Application::create();
 
 	getEngine()->setScene((Scene*)((new Scene())->create(getEngine())));
 
 	meshEntity=(MeshEntity*)((new MeshEntity())->create(getEngine()));
-	meshEntity->load(getEngine()->cacheMesh("../../data/lt.xmsh"));
+	meshEntity->load(getEngine()->cacheMesh(resourcePath));
 	meshEntity->getAnimationController()->start();
 	getEngine()->getScene()->attach(meshEntity);
 
