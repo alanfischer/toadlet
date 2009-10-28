@@ -63,7 +63,7 @@ void FontStreamRewind(void *info){
 typedef void (*CGFontGetGlyphsForUnicharsPtr)(CGFontRef, const UniChar[], const CGGlyph[], size_t);
 static CGFontGetGlyphsForUnicharsPtr CGFontGetGlyphsForUnichars=NULL;
 
-OSXFontHandler::OSXFontHandler(ResourceManager *textureManager){
+OSXFontHandler::OSXFontHandler(TextureManager *textureManager){
 	// Unfortunately we need access to a private function to get the character -> glyph conversion needed to
 	// allow us to use CGContextShowGlyphsWithAdvances
 	// Note that on > 10.5, the function is called CGFontGetGlyphsForUnicodes, so we need to detect and deal
@@ -78,7 +78,7 @@ OSXFontHandler::OSXFontHandler(ResourceManager *textureManager){
 	mTextureManager=textureManager;
 }
 
-Resource *OSXFontHandler::load(InputStream::ptr in,const ResourceHandlerData *handlerData){
+Resource::ptr OSXFontHandler::load(InputStream::ptr in,const ResourceHandlerData *handlerData){
 	if(!CGFontGetGlyphsForUnichars){
 		Error::nullPointer(Categories::TOADLET_TADPOLE,
 			"error finding CGFontGetGlyphsForUnichars");
@@ -228,13 +228,10 @@ Resource *OSXFontHandler::load(InputStream::ptr in,const ResourceHandlerData *ha
 
 	memcpy(imageData,data,imageStride*charmapHeight);
 
-	Texture::ptr texture(new Texture(image));
-	texture->setAutoGenerateMipMaps(false);
-	texture->setMagFilter(Texture::Filter_NEAREST);
-	texture->setMinFilter(Texture::Filter_NEAREST);
+	Texture::ptr texture=mTextureManager->createTexture(image);
 
 	// Build font
-	Font *font=new Font(fontData->width,fontData->height,fontData->height/2,0,shared_static_cast<Texture>(mTextureManager->load(texture)),wcharArray,glyphs.begin(),glyphs.size());
+	Font::ptr font(new Font(fontData->width,fontData->height,fontData->height/2,0,shared_static_cast<Texture>(mTextureManager->load(texture)),wcharArray,glyphs.begin(),glyphs.size()));
 
 	CGContextRelease(context);
 	free(data);
