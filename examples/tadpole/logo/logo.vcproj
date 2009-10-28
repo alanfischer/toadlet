@@ -109,6 +109,94 @@
 			/>
 		</Configuration>
 		<Configuration
+			Name="Debug|Pocket PC 2003 (ARMV4)"
+			OutputDirectory="Pocket PC 2003 (ARMV4)\$(ConfigurationName)"
+			IntermediateDirectory="Pocket PC 2003 (ARMV4)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="1"
+			WholeProgramOptimization="0"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+				CommandLine="copy &quot;$(OutDir)\$(ProjectName).exe&quot; build\unsigned\debug\full&#x0D;&#x0A;"
+				Outputs="build\unsigned\debug\full\$(ProjectName).exe"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="1"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				ExecutionBucket="7"
+				Optimization="0"
+				PreprocessorDefinitions="_WIN32_WCE=$(CEVER);UNDER_CE=$(CEVER);WINCE;$(PLATFORMDEFINES);_DEBUG;DEBUG;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE"
+				MinimalRebuild="true"
+				ExceptionHandling="0"
+				RuntimeLibrary="1"
+				BufferSecurityCheck="false"
+				TreatWChar_tAsBuiltInType="false"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				AdditionalOptions="-n"
+				PreprocessorDefinitions="_DEBUG;_UNICODE;UNICODE;_WIN32_WCE;UNDER_CE;BUILD_DEBUG"
+				Culture="1033"
+				AdditionalIncludeDirectories="$(IntDir)"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/subsystem:$(CESubsystem) /MACHINE:ARM "
+				OutputFile="$(OutDir)/logo.exe"
+				LinkIncremental="2"
+				DelayLoadDLLs="$(NOINHERIT)"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(OutDir)/logo.pdb"
+				SubSystem="0"
+				TargetMachine="0"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCCodeSignTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+			<DeploymentTool
+				ForceDirty="-1"
+				RemoteDirectory=""
+				RegisterOutput="0"
+				AdditionalFiles=""
+			/>
+			<DebuggerTool
+			/>
+		</Configuration>
+		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
@@ -196,94 +284,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Debug|Pocket PC 2003 (ARMV4)"
-			OutputDirectory="Pocket PC 2003 (ARMV4)\$(ConfigurationName)"
-			IntermediateDirectory="Pocket PC 2003 (ARMV4)\$(ConfigurationName)"
-			ConfigurationType="1"
-			CharacterSet="1"
-			WholeProgramOptimization="0"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-				CommandLine="copy &quot;$(OutDir)\$(ProjectName).exe&quot; build\unsigned\debug\full&#x0D;&#x0A;"
-				Outputs="build\unsigned\debug\full\$(ProjectName).exe"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				TargetEnvironment="1"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				ExecutionBucket="7"
-				Optimization="0"
-				PreprocessorDefinitions="_WIN32_WCE=$(CEVER);UNDER_CE=$(CEVER);WINCE;$(PLATFORMDEFINES);_DEBUG;DEBUG;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE"
-				MinimalRebuild="true"
-				ExceptionHandling="0"
-				RuntimeLibrary="1"
-				BufferSecurityCheck="false"
-				TreatWChar_tAsBuiltInType="false"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				AdditionalOptions="-n"
-				PreprocessorDefinitions="_DEBUG;_UNICODE;UNICODE;_WIN32_WCE;UNDER_CE;BUILD_DEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions="/subsystem:$(CESubsystem) /MACHINE:ARM "
-				OutputFile="$(OutDir)/logo.exe"
-				LinkIncremental="2"
-				DelayLoadDLLs="$(NOINHERIT)"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/logo.pdb"
-				SubSystem="0"
-				TargetMachine="0"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCCodeSignTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-			<DeploymentTool
-				ForceDirty="-1"
-				RemoteDirectory=""
-				RegisterOutput="0"
-				AdditionalFiles=""
-			/>
-			<DebuggerTool
 			/>
 		</Configuration>
 		<Configuration
@@ -653,6 +653,14 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
+			<File
+				RelativePath=".\Logo.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Logo.h"
+				>
+			</File>
 			<File
 				RelativePath=".\main.cpp"
 				>
