@@ -13,14 +13,15 @@ using namespace toadlet::pad;
 
 class Logo:public Application{
 public:
-	Logo():Application(){}
-	virtual ~Logo(){}
+	Logo(const String &respath);
+	virtual ~Logo();
 
 	void create();
 	void resized(int width,int height);
 	void render(Renderer *renderer);
 	void update(int dt);
 
+	String resourcePath;
 	CameraEntity::ptr cameraEntity;
 	MeshEntity::ptr meshEntity;
 };
