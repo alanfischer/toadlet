@@ -9,12 +9,8 @@ if (NOT TOADLET_PLATFORM_WINCE)
 	set (PEEPER_GLRENDERER_SRC ${PEEPER_GLRENDERER_SRC} GLFBOSurfaceRenderTarget.cpp GLFBORenderbufferSurface.cpp)
 endif (NOT TOADLET_PLATFORM_WINCE)
 
-set (PEEPER_GLRENDERER_PLATFORM_AGL_SRC
-	platform/agl/AGLPBufferRenderTexturePeer.cpp
-)
-
 set (PEEPER_GLRENDERER_PLATFORM_EAGL_SRC
-	platform/eagl/EAGLRenderContextPeer.mm
+	platform/eagl/EAGLRenderContext.mm
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_EGL_SRC
@@ -25,12 +21,13 @@ set (PEEPER_GLRENDERER_PLATFORM_EGL_SRC
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_GLX_SRC
-	platform/glx/GLXPBufferRenderTexturePeer.cpp
-	platform/glx/GLXWindowRenderContextPeer.cpp
+	platform/glx/GLXPBufferSurfaceRenderTarget.cpp
+	platform/glx/GLXRenderTarget.cpp
+	platform/glx/GLXWindowRenderTarget.cpp
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_NSGL_SRC
-	platform/nsgl/NSGLRenderTargetPeer.mm
+	platform/nsgl/NSGLRenderTarget.mm
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_WGL_SRC
@@ -56,13 +53,8 @@ if (NOT TOADLET_PLATFORM_WINCE)
 	set (PEEPER_GLRENDERER_HEADERS ${PEEPER_GLRENDERER_HEADERS} GLFBOSurfaceRenderTarget.h GLFBORenderbufferSurface.h)
 endif (NOT TOADLET_PLATFORM_WINCE)
 
-set (PEEPER_GLRENDERER_PLATFORM_AGL_HEADERS
-	platform/agl/AGLPBufferRenderTexturePeer.h
-	platform/agl/AGLRenderTargetPeer.h
-)
-
 set (PEEPER_GLRENDERER_PLATFORM_EAGL_HEADERS
-	platform/eagl/EAGLRenderContextPeer.h
+	platform/eagl/EAGLRenderContext.h
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_EGL_HEADERS
@@ -73,13 +65,13 @@ set (PEEPER_GLRENDERER_PLATFORM_EGL_HEADERS
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_GLX_HEADERS
-	platform/glx/GLXPBufferRenderTexturePeer.h
-	platform/glx/GLXRenderTargetPeer.h
-	platform/glx/GLXWindowRenderContextPeer.h
+	platform/glx/GLXPBufferSurfaceRenderTarget.h
+	platform/glx/GLXRenderTarget.h
+	platform/glx/GLXWindowRenderTarget.h
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_NSGL_HEADERS
-	platform/nsgl/NSGLRenderTargetPeer.h
+	platform/nsgl/NSGLRenderTarget.h
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_WGL_HEADERS
@@ -96,12 +88,10 @@ if (TOADLET_PLATFORM_IPHONE)
 	set (PEEPER_GLRENDERER_SRC ${PEEPER_GLRENDERER_SRC} ${PEEPER_GLRENDERER_PLATFORM_EAGL_SRC})
 	set (PEEPER_GLRENDERER_HEADERS ${PEEPER_GLRENDERER_HEADERS} ${PEEPER_GLRENDERER_PLATFORM_EAGL_HEADERS})
 elseif (TOADLET_PLATFORM_OSX)
-	source_group ("Source Files\\\\platform\\\\agl" FILES ${PEEPER_GLRENDERER_PLATFORM_AGL_SRC})
-	source_group ("Header Files\\\\platform\\\\agl" FILES ${PEEPER_GLRENDERER_PLATFORM_AGL_HEADERS})
 	source_group ("Source Files\\\\platform\\\\nsgl" FILES ${PEEPER_GLRENDERER_PLATFORM_NSGL_SRC})
 	source_group ("Header Files\\\\platform\\\\nsgl" FILES ${PEEPER_GLRENDERER_PLATFORM_NSGL_HEADERS})
-	set (PEEPER_GLRENDERER_SRC ${PEEPER_GLRENDERER_SRC} ${PEEPER_GLRENDERER_PLATFORM_AGL_SRC} ${PEEPER_GLRENDERER_PLATFORM_NSGL_SRC})
-	set (PEEPER_GLRENDERER_HEADERS ${PEEPER_GLRENDERER_HEADERS} ${PEEPER_GLRENDERER_PLATFORM_AGL_HEADERS} ${PEEPER_GLRENDERER_PLATFORM_NSGL_HEADERS})
+	set (PEEPER_GLRENDERER_SRC ${PEEPER_GLRENDERER_SRC} ${PEEPER_GLRENDERER_PLATFORM_NSGL_SRC})
+	set (PEEPER_GLRENDERER_HEADERS ${PEEPER_GLRENDERER_HEADERS} ${PEEPER_GLRENDERER_PLATFORM_NSGL_HEADERS})
 elseif (TOADLET_PLATFORM_POSIX)
 	source_group ("Source Files\\\\platform\\\\glx" FILES ${PEEPER_GLRENDERER_PLATFORM_GLX_SRC})
 	source_group ("Header Files\\\\platform\\\\glx" FILES ${PEEPER_GLRENDERER_PLATFORM_GLX_HEADERS})

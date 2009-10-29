@@ -76,29 +76,37 @@ public:
 	virtual peeper::Renderer *getRenderer() const{return mRenderer;}
 	virtual ribbit::AudioPlayer *getAudioPlayer() const{return mAudioPlayer;}
 
+	virtual peeper::RenderTarget *getRootRenderTarget(){return mRenderTarget;}
+	virtual bool isPrimary() const{return mRenderTarget->isPrimary();}
+	virtual bool isValid() const{return mRenderTarget->isValid();}
+
 	virtual void resized(int width,int height);
 	virtual void focusGained();
 	virtual void focusLost();
 	virtual void keyPressed(int key);
 	virtual void keyReleased(int key);
-	virtual void mouseMoved(int x,int y);
 	virtual void mousePressed(int x,int y,int button);
+	virtual void mouseMoved(int x,int y);
 	virtual void mouseReleased(int x,int y,int button);
 	virtual void mouseScrolled(int x,int y,int scroll);
 	virtual void update(int dt);
 	virtual void render(peeper::Renderer *renderer);
 
-	virtual void *getDisplay() const;
-	virtual void *getWindow() const;
-	virtual void *getVisualInfo() const;
+	void setRendererOptions(int *options,int length);
+
+	void *getDisplay() const;
+	void *getWindow() const;
+	void *getVisualInfo() const;
 
 protected:
-	virtual peeper::RenderTargetPeer *makeRenderTargetPeer();
-	virtual peeper::Renderer *makeRenderer();
-	virtual bool createContextAndRenderer();
-	virtual bool destroyRendererAndContext();
-
+	bool createWindow();
 	void destroyWindow();
+	peeper::RenderTarget *makeRenderTarget();
+	peeper::Renderer *makeRenderer();
+	bool createContextAndRenderer();
+	bool destroyRendererAndContext();
+	bool createAudioPlayer();
+	bool destroyAudioPlayer();
 	void originalResolution();
 	void originalEnv();
 
@@ -114,7 +122,9 @@ protected:
 	ApplicationListener *mApplicationListener;
 
 	tadpole::Engine *mEngine;
+	peeper::RenderTarget *mRenderTarget;
 	peeper::Renderer *mRenderer;
+	int *mRendererOptions;
 	ribbit::AudioPlayer *mAudioPlayer;
 
 	bool mRun;

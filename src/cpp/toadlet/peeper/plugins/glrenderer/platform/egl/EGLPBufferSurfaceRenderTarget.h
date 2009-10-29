@@ -59,8 +59,8 @@ public:
 	virtual int getHeight() const{return mHeight;}
 
 protected:
-	virtual bool createBuffer();
-	virtual bool destroyBuffer();
+	bool createBuffer();
+	bool destroyBuffer();
 
 	GLRenderer *mRenderer;
 	GLTexture *mTexture;

@@ -90,8 +90,8 @@ public:
 		mFrameBitsReferenceFrame=referenceFrame;
 	}
 
-	inline int getTimeHandled() const{return mTimeHandled;}
-	void setTimeHandled(int time){
+	inline uint64 getTimeHandled() const{return mTimeHandled;}
+	void setTimeHandled(uint64 time){
 		mTimeHandled=time;
 	}
 
@@ -104,7 +104,7 @@ protected:
 	int mFrameBits;
 	int mFrameBitsReferenceFrame;
 
-	int mTimeHandled;
+	uint64 mTimeHandled;
 };
 
 }

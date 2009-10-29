@@ -517,7 +517,7 @@ void Win32Application::changeRendererPlugin(int rendererPlugin){
 
 void Win32Application::setRendererOptions(int *options,int length){
 	if(mRendererOptions!=NULL){
-		delete mRendererOptions;
+		delete[] mRendererOptions;
 	}
 
 	mRendererOptions=new int[length];
@@ -589,7 +589,6 @@ bool Win32Application::createContextAndRenderer(int plugin){
 			if(mRenderer->create(this,mRendererOptions)==false){
 				delete mRenderer;
 				mRenderer=NULL;
-
 				Error::unknown(Categories::TOADLET_PAD,
 					"Error starting Renderer");
 				return false;
@@ -608,7 +607,7 @@ bool Win32Application::createContextAndRenderer(int plugin){
 	}
 	else{
 		Error::unknown(Categories::TOADLET_PAD,
-			"Error creating RenderTargetPeer");
+			"Error creating RenderTarget");
 		return false;
 	}
 

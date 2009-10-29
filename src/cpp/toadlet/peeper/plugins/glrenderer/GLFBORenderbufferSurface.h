@@ -61,7 +61,7 @@ protected:
 	int mWidth;
 	int mHeight;
 
-	friend GLFBOSurfaceRenderTarget;
+	friend class GLFBOSurfaceRenderTarget;
 };
 
 }

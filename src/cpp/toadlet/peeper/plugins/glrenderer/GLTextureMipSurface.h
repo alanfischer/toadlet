@@ -61,8 +61,8 @@ protected:
 	int mWidth;
 	int mHeight;
 
-	friend GLTexture;
-	friend GLRenderer;
+	friend class GLTexture;
+	friend class GLRenderer;
 };
 
 }

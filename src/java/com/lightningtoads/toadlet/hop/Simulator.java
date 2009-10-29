@@ -260,7 +260,6 @@ public final class Simulator{
 	public void update(int dt){ // milliseconds
 		Vector3 oldPosition=cache_update_oldPosition;
 		Vector3 newPosition=cache_update_newPosition;
-		Vector3 offset=cache_update_offset;
 		Vector3 velocity=cache_update_velocity;
 		Vector3 temp=cache_update_temp;
 		Vector3 t=cache_update_t;
@@ -595,27 +594,10 @@ public final class Simulator{
 						clampPosition(c.point);
 					#endif
 
-					// Different offset options
-					#define TOADLET_OFFSET_1
-					#if defined(TOADLET_OFFSET_1)
-						temp.set(c.normal);
-						convertToEpsilonOffset(temp);
-						add_vv(temp,c.point);
-					#elif defined(TOADLET_OFFSET_2)
-						sub_vvv(offset,oldPosition,c.point);
-						convertToEpsilonOffset(offset);
-						temp.set(offset);
-						add_vv(temp,c.point);
-					#elif defined(TOADLET_OFFSET_3)
-						sub_vvv(offset,oldPosition,c.point);
-						convertToEpsilonOffset(offset);
-						temp.set(c.normal);
-						convertToEpsilonOffset(temp);
-						add_vv(temp,c.point);
-						add_vv(temp,offset);
-					#else
-						temp.set(c.point);
-					#endif
+					// Offset our point slightly from the wall
+					temp.set(c.normal);
+					convertToEpsilonOffset(temp);
+					add(temp,c.point);
 
 					// Calculate left over amount
 					sub_vvv(leftOver,newPosition,temp);
@@ -1413,7 +1395,6 @@ public final class Simulator{
 
 	Vector3 cache_update_oldPosition=new Vector3();
 	Vector3 cache_update_newPosition=new Vector3();
-	Vector3 cache_update_offset=new Vector3();
 	Vector3 cache_update_velocity=new Vector3();
 	Vector3 cache_update_temp=new Vector3();
 	Vector3 cache_update_t=new Vector3();

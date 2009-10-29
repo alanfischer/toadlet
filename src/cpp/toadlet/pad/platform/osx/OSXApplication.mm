@@ -34,9 +34,9 @@
 #if defined(TOADLET_HAS_OPENGL)
 	#include <toadlet/peeper/plugins/glrenderer/GLRenderer.h>
 	#if defined(TOADLET_HAS_UIKIT)
-		#include <toadlet/peeper/plugins/glrenderer/platform/eagl/EAGLRenderContextPeer.h>
+		#include <toadlet/peeper/plugins/glrenderer/platform/eagl/EAGLRenderContext.h>
 	#else
-		#include <toadlet/peeper/plugins/glrenderer/platform/nsgl/NSGLRenderTargetPeer.h>
+		#include <toadlet/peeper/plugins/glrenderer/platform/nsgl/NSGLRenderTarget.h>
 	#endif
 #endif
 #if defined(TOADLET_HAS_OPENAL)
@@ -265,6 +265,7 @@ OSXApplication::OSXApplication():
 
 	mEngine(NULL),
 	mRenderer(NULL),
+	mRenderTarget(NULL),
 	mAudioPlayer(NULL),
 
 	mRun(false),
@@ -295,61 +296,24 @@ void OSXApplication::create(){
 
 	mEngine=new Engine();
 
-	#if defined(TOADLET_HAS_OPENAL)
-		mAudioPlayer=new ALPlayer();
-	#endif
-	if(mAudioPlayer!=NULL){
-		// Fade in buffers over 100 ms, reduces popping
-		int options[]={1,100,0};
-		mAudioPlayer->startup(options);
-		mEngine->setAudioPlayer(mAudioPlayer);
-	}
+	createAudioPlayer();
 	
 	#if defined(TOADLET_HAS_UIKIT)
 		mWidth=[(UIWindow*)mWindow bounds].size.width;
 		mHeight=[(UIWindow*)mWindow bounds].size.height;
+		CGRect rect;
 	#else
 		NSView *view=[(NSWindow*)mWindow contentView];
 		if(view!=nil){
 			mWidth=[view bounds].size.width;
 			mHeight=[view bounds].size.height;
 		}
-	#endif
-}
-
-void OSXApplication::destroy(){
-	if(mAudioPlayer!=NULL){
-		mEngine->setAudioPlayer(NULL);
-		mAudioPlayer->shutdown();
-		delete mAudioPlayer;
-		mAudioPlayer=NULL;
-	}
-
-	destroyRendererAndContext();
-	
-	if(mEngine!=NULL){
-		delete mEngine;
-		mEngine=NULL;
-	}
-}
-	
-bool OSXApplication::start(bool runEventLoop){
-	#if defined(TOADLET_HAS_UIKIT)
-		CGRect rect;
-	#else
 		NSRect rect;
 	#endif
 	rect.origin.x=mPositionX;
 	rect.origin.y=mPositionY;
 	rect.size.width=mWidth;
 	rect.size.height=mHeight;
-
-	if(mWindow==nil){
-		Error::unknown(Categories::TOADLET_PAD,
-			"window is nil");
-		return false;
-	}
-
 	mView=(void*)[[ApplicationView alloc] initWithApplication:this frame:rect];
 	#if defined(TOADLET_HAS_UIKIT)
 		[(UIWindow*)mWindow addSubview:(ApplicationView*)mView];
@@ -359,9 +323,24 @@ bool OSXApplication::start(bool runEventLoop){
 		// Need to call the initial resized on osx
 		[(ApplicationView*)mView windowResized:nil];
 	#endif
-
-	mRun=true;
+	
 	activate();
+}
+
+void OSXApplication::destroy(){
+	deactivate();
+	destroyAudioPlayer();
+	
+	if(mEngine!=NULL){
+		delete mEngine;
+		mEngine=NULL;
+	}
+}
+	
+bool OSXApplication::start(bool runEventLoop){
+	mRun=true;
+
+	resized([(ApplicationView*)mView bounds].size.width,[(ApplicationView*)mView bounds].size.height);
 
 	return true;
 }
@@ -452,12 +431,12 @@ ApplicationListener *OSXApplication::getApplicationListener() const{
 	return mApplicationListener;
 }
 
-RenderTargetPeer *OSXApplication::makeRenderTargetPeer(){
+RenderTarget *OSXApplication::makeRenderTarget(){
 	#if defined(TOADLET_HAS_OPENGL)
 		#if defined(TOADLET_HAS_UIKIT)
-			return new EAGLRenderContextPeer((CAEAGLLayer*)[(UIView*)mView layer],mVisual);
+			return new EAGLRenderTarget((CAEAGLLayer*)[(UIView*)mView layer],mVisual);
 		#else
-			return new NSGLRenderTargetPeer((NSView*)mView,mVisual);
+			return new NSGLRenderTarget((NSView*)mView,mVisual);
 	#endif
 	#else
 		return NULL;
@@ -473,9 +452,9 @@ Renderer *OSXApplication::makeRenderer(){
 }
 
 bool OSXApplication::createContextAndRenderer(){
-	RenderTargetPeer *renderTargetPeer=makeRenderTargetPeer();
-	if(renderTargetPeer!=NULL){
-		internal_setRenderTargetPeer(renderTargetPeer,true);
+	RenderTarget *renderTarget=makeRenderTarget();
+	if(renderTarget!=NULL){
+		mRenderTarget=renderTarget;
 
 		mRenderer=makeRenderer();
 		if(mRenderer!=NULL){
@@ -494,7 +473,8 @@ bool OSXApplication::createContextAndRenderer(){
 		}
 
 		if(mRenderer==NULL){
-			internal_setRenderTargetPeer(NULL,false);
+			delete mRenderTarget;
+			mRenderTarget=NULL;
 		}
 	}
 	else{
@@ -519,8 +499,41 @@ bool OSXApplication::destroyRendererAndContext(){
 		mRenderer=NULL;
 	}
 
-	internal_setRenderTargetPeer(NULL,false);
+	if(mRenderTarget!=NULL){
+		delete mRenderTarget;
+		mRenderTarget=NULL;
+	}
 
+	return true;
+}
+
+bool OSXApplication::createAudioPlayer(){
+	#if defined(TOADLET_HAS_OPENAL)
+		mAudioPlayer=new ALPlayer();
+		// Fade in buffers over 100 ms, reduces popping
+		int options[]={1,100,0};
+		bool result=false;
+		TOADLET_TRY
+			result=mAudioPlayer->startup(options);
+		TOADLET_CATCH(const Exception &){result=false;}
+		if(result==false){
+			delete mAudioPlayer;
+			mAudioPlayer=NULL;
+		}
+	#endif
+	if(mAudioPlayer!=NULL){
+		mEngine->setAudioPlayer(mAudioPlayer);
+	}
+	return true;
+}
+	
+bool OSXApplication::destroyAudioPlayer(){
+	if(mAudioPlayer!=NULL){
+		mEngine->setAudioPlayer(NULL);
+		mAudioPlayer->shutdown();
+		delete mAudioPlayer;
+		mAudioPlayer=NULL;
+	}
 	return true;
 }
 
@@ -554,15 +567,15 @@ void OSXApplication::keyReleased(int key){
 	}
 }
 
-void OSXApplication::mouseMoved(int x,int y){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->mouseMoved(x,y);
-	}
-}
-
 void OSXApplication::mousePressed(int x,int y,int button){
 	if(mApplicationListener!=NULL){
 		mApplicationListener->mousePressed(x,y,button);
+	}
+}
+	
+void OSXApplication::mouseMoved(int x,int y){
+	if(mApplicationListener!=NULL){
+		mApplicationListener->mouseMoved(x,y);
 	}
 }
 
