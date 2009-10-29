@@ -654,15 +654,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\Logo.cpp"
+				RelativePath="..\Logo.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Logo.h"
+				RelativePath="..\Logo.h"
 				>
 			</File>
 			<File
-				RelativePath=".\main.cpp"
+				RelativePath="..\main.cpp"
 				>
 			</File>
 		</Filter>

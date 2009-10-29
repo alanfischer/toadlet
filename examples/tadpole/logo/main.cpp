@@ -1,7 +1,7 @@
 #include "Logo.h"
 
 int main(int argc,char **argv){
-	Logo app;
+	Logo app("../lt.xmsh");
 	app.setSize(640,480);
 	app.setFullscreen(false);
 	app.create();
