@@ -1,7 +1,5 @@
 # Source files for toadlet_ribbit
 set (RIBBIT_SRC
-	Audio.cpp
-	AudioBuffer.cpp
 	Version.cpp
 )
 

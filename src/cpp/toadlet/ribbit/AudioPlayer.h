@@ -38,13 +38,12 @@ class AudioPlayer{
 public:
 	virtual ~AudioPlayer(){}
 
-	virtual bool startup(int *options)=0;
-	virtual bool shutdown()=0;
-	virtual bool isStarted() const=0;
+	virtual bool create(int *options)=0;
+	virtual bool destroy()=0;
 
-	virtual AudioBufferPeer *createAudioBufferPeer(AudioBuffer *audioBuffer)=0;
-	virtual AudioPeer *createBufferedAudioPeer(Audio *audio,AudioBuffer::ptr buffer)=0;
-	virtual AudioPeer *createStreamingAudioPeer(Audio *audio,egg::io::InputStream::ptr in,const egg::String &extension)=0;
+	virtual AudioBuffer *createAudioBuffer()=0;
+	virtual Audio *createBufferedAudio()=0;
+	virtual Audio *createStreamingAudio()=0;
 
 	virtual void update(int dt)=0; // milliseconds
 
@@ -53,16 +52,11 @@ public:
 	virtual void setListenerVelocity(const ribbit::Vector3 &velocity)=0; // Prefix with ribbit for vc6 compatability
 	virtual void setListenerGain(scalar gain)=0;
 
-	virtual void setGroupGain(const egg::String &group,scalar gain)=0;
-	virtual scalar getGroupGain(const egg::String &group)=0;
-	virtual void removeGroup(const egg::String &group)=0;
-
 	virtual void suspend()=0;
 	virtual void resume()=0;
 
 	virtual void setDopplerFactor(scalar factor)=0;
 	virtual void setDopplerVelocity(scalar velocity)=0;
-
 	virtual void setDefaultRolloffFactor(scalar factor)=0;
 
 	virtual const CapabilitySet &getCapabilitySet()=0;

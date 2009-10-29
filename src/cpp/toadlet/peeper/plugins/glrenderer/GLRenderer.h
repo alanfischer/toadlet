@@ -55,9 +55,9 @@ public:
 	virtual ~GLRenderer();
 
 	// Startup/Shutdown
-	bool startup(RenderTarget *target,int *options);
-	bool shutdown();
-	RendererStatus getStatus();
+	bool create(RenderTarget *target,int *options);
+	bool destroy();
+	RendererStatus getStatus(){return RendererStatus_OK;}
 	bool reset();
 
 	// Resource operations

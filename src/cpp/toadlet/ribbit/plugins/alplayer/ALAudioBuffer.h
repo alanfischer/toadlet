@@ -23,45 +23,38 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "ALAudioBufferPeer.h"
-#include "ALPlayer.h"
+#ifndef TOADLET_RIBBIT_ALAUDIOBUFFER_H
+#define TOADLET_RIBBIT_ALAUDIOBUFFER_H
 
-using namespace toadlet::egg;
+#include "ALIncludes.h"
+#include <toadlet/ribbit/AudioBuffer.h>
 
 namespace toadlet{
 namespace ribbit{
 
-ALAudioBufferPeer::ALAudioBufferPeer(ALenum format,int sps,char *buffer,int length){
-	bufferHandle=0;
-	bufferStatic=NULL;
+class ALPlayer;
 
-	alGenBuffers(1,&bufferHandle);
-	if(toadlet_alBufferDataStatic!=NULL){
-		bufferStatic=buffer;
-		toadlet_alBufferDataStatic(bufferHandle,format,bufferStatic,length,sps);
-	}
-	else{
-		alBufferData(bufferHandle,format,buffer,length,sps);
-	}
+class TOADLET_API ALAudioBuffer:public AudioBuffer{
+public:
+	ALAudioBuffer(ALPlayer *player);
+	virtual ~ALAudioBuffer();
 
-	TOADLET_CHECK_ALERROR("ALAudioBufferPeer::ALAudioBufferPeer");
-}
+	AudioBuffer *getRootAudioBuffer(){return this;}
 
-ALAudioBufferPeer::~ALAudioBufferPeer(){
-	if(bufferHandle!=0){
-		alDeleteBuffers(1,&bufferHandle);
-		bufferHandle=0;
-	}
+	bool create(egg::io::InputStream::ptr inputStream,const egg::String &mimeType);
+	bool destroy();
 
-	if(bufferStatic!=NULL){
-		delete[] bufferStatic;
-		bufferStatic=NULL;
-	}
+	inline ALuint getHandle() const{return mHandle;}
 
-	// Checking of proper deletion removed to avoid errors when a resource is destroyed after the context is destroyed
-	//  There should be no leaks in this case, since the context should clean up any resources it has
-	//TOADLET_CHECK_ALERROR("ALAudioBufferPeer::~ALAudioBufferPeer");
-}
+protected:
+	ALPlayer *mAudioPlayer;
+	ALuint mHandle;
+	char *mStaticData;
+
+	friend class ALPlayer;
+};
 
 }
 }
+
+#endif

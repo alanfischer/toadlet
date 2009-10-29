@@ -41,9 +41,9 @@
 namespace toadlet{
 namespace ribbit{
 	
-class ALAudioPeer;
+class ALAudio;
 #if defined(TOADLET_PLATFORM_OSX)
-	class CoreAudioPeer;
+	class CoreAudio;
 #endif
 
 typedef void (*proc_alBufferDataStatic)(ALuint buffer,ALenum format,ALvoid *data,ALsizei size,ALsizei freq);
@@ -57,13 +57,12 @@ public:
 	ALPlayer();
 	virtual ~ALPlayer();
 
-	bool startup(int *options);
-	bool shutdown();
-	bool isStarted() const{return mStarted;}
+	bool create(int *options);
+	bool destroy();
 
-	AudioBufferPeer *createAudioBufferPeer(AudioBuffer *audioBuffer);
-	AudioPeer *createBufferedAudioPeer(Audio *audio,AudioBuffer::ptr buffer);
-	AudioPeer *createStreamingAudioPeer(Audio *audio,egg::io::InputStream::ptr in,const egg::String &mimeType);
+	AudioBuffer *createAudioBuffer();
+	Audio *createBufferedAudio();
+	Audio *createStreamingAudio();
 
 	void update(int dt); // milliseconds
 
@@ -77,65 +76,44 @@ public:
 
 	void setDopplerFactor(scalar factor);
 	void setDopplerVelocity(scalar velocity);
-
 	void setDefaultRolloffFactor(scalar factor);
-	scalar getDefaultRolloffFactor(){return mDefaultRolloffFactor;}
-
-	void setGroupGain(const egg::String &group,scalar gain);
-	scalar getGroupGain(const egg::String &group);
-	void removeGroup(const egg::String &group);
 
 	const CapabilitySet &getCapabilitySet();
 
 	// Methods not part of the AudioPlayer interface
-	void update(ALAudioPeer *audioPeer,int dt);
-#	if defined(TOADLET_PLATFORM_OSX)
-		void update(CoreAudioPeer *audioPeer,int dt);
-#	endif
 	AudioStream::ptr startAudioStream(egg::io::InputStream::ptr in,const egg::String &mimeType);
+	void decodeStream(AudioStream *decoder,char *&finalBuffer,int &finalLength);
+	ALuint checkoutSourceHandle(ALAudio *audio);
+	void checkinSourceHandle(ALAudio *audio,ALuint source);
+	int getBufferFadeInTime() const{return mBufferFadeInTime;}
 
 	void lock(){mMutex.lock();}
 	void unlock(){mMutex.unlock();}
 
-	scalar internal_getGroupGain(const egg::String &group);
-	void internal_audioPeerDestroy(ALAudioPeer *audioPeer);
-#	if defined(TOADLET_PLATFORM_OSX)
-		void internal_audioPeerDestroy(CoreAudioPeer *audioPeer);
-#	endif
+	static ALenum getALFormat(int bitsPerSample,int channels);
 
 	egg::math::Vector3 cacheVector3;
 
 protected:
 	void run();
 
-	void decodeStream(AudioStream *decoder,char *&finalBuffer,int &finalLength);
-	int readAudioData(ALAudioPeer *peer,unsigned char *buffer,int bsize);
-
-	static ALenum getALFormat(int bitsPerSample,int channels);
-
 	ALCdevice *mDevice;
 	ALCcontext *mContext;
-	egg::Collection<ALAudioPeer*> mAudioPeers;
+	egg::Collection<ALAudio*> mAudios;
 	egg::Collection<unsigned int> mSourcePool;
 	egg::Collection<unsigned int> mAllSources;
 	scalar mDefaultRolloffFactor;
 	int mBufferFadeInTime;
 
-	egg::Map<egg::String,scalar> mGainGroup;
 	bool mStopThread;
 	egg::Thread *mThread;
 	egg::Mutex mMutex;
 
 	CapabilitySet mCapabilitySet;
 
-#	if defined(TOADLET_PLATFORM_OSX)
-		egg::Collection<CoreAudioPeer*> mCoreAudioPeers;
-#	endif
-
-	const static int bufferSize=4096*4;
-	const static int numBuffers=8;
-
-	bool mStarted;
+	#if defined(TOADLET_PLATFORM_OSX)
+		egg::Collection<CoreAudio*> mCoreAudios;
+	#endif
 };
 
 }

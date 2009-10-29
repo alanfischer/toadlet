@@ -38,21 +38,20 @@
 namespace toadlet{
 namespace ribbit{
 
-class Win32AudioPeer;
-class Win32AudioBufferPeer;
+class Win32Audio;
+class Win32AudioBuffer;
 
 class TOADLET_API Win32Player:public AudioPlayer{
 public:
 	Win32Player();
 	virtual ~Win32Player();
 
-	bool startup(int *options);
-	bool shutdown();
-	bool isStarted() const{return true;}
+	bool create(int *options);
+	bool destroy();
 
-	AudioBufferPeer *createAudioBufferPeer(AudioBuffer *audioBuffer);
-	AudioPeer *createBufferedAudioPeer(Audio *audio,AudioBuffer::ptr buffer);
-	AudioPeer *createStreamingAudioPeer(Audio *audio,egg::io::InputStream::ptr in,const egg::String &mimeType);
+	AudioBuffer *createAudioBuffer();
+	Audio *createBufferedAudio();
+	Audio *createStreamingAudio();
 
 	void update(int dt){} // milliseconds
 
@@ -62,8 +61,8 @@ public:
 	void setListenerTranslate(const Vector3 &translate){}
 	void setListenerRotate(const Matrix3x3 &rotate){}
 	void setListenerVelocity(const Vector3 &velocity){}
-	void setListenerGain(scalar gain);
-	scalar getListenerGain() const;
+	void setListenerGain(scalar gain){}
+	scalar getListenerGain() const{return 0;}
 
 	void setDopplerFactor(scalar factor){}
 	void setDopplerVelocity(scalar velocity){}
@@ -71,26 +70,23 @@ public:
 	void setDefaultRolloffFactor(scalar factor){}
 	scalar getDefaultRolloffFactor(){return 0;}
 
-	void setGroupGain(const egg::String &group,scalar gain){}
-	scalar getGroupGain(const egg::String &group){return 0;}
-	void removeGroup(const egg::String &group){}
-
 	const CapabilitySet &getCapabilitySet(){return mCapabilitySet;}
 
 	AudioStream::ptr startAudioStream(egg::io::InputStream::ptr in,const egg::String &mimeType);
-
-	HWAVEOUT getWaveOut();
-	bool canPlaySound();
-	void playedSound(int time);
-	void internal_audioPeerDestroy(Win32AudioPeer *audioPeer);
-
-protected:
 	void decodeStream(AudioStream *decoder,char *&finalBuffer,int &finalLength);
 
+	void setWaveOut(HWAVEOUT waveOut){mWaveOut=waveOut;}
+	HWAVEOUT getWaveOut() const{return mWaveOut;}
+	bool canPlaySound();
+	void playedSound(int time);
+
+	void internal_audioCreate(Win32Audio *audio);
+	void internal_audioDestroy(Win32Audio *audio);
+
+protected:
 	CapabilitySet mCapabilitySet;
 
-	egg::Collection<Win32AudioPeer*> mAudioPeers;
-	egg::Collection<Win32AudioBufferPeer*> mAudioBufferPeers;
+	egg::Collection<Win32Audio*> mAudios;
 
 	HWAVEOUT mWaveOut;
 	int64 mNextSoundTime;

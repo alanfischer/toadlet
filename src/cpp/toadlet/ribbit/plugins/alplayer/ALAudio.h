@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_ALAUDIOPEER_H
-#define TOADLET_RIBBIT_ALAUDIOPEER_H
+#ifndef TOADLET_RIBBIT_ALAUDIO_H
+#define TOADLET_RIBBIT_ALAUDIO_H
 
 #include <toadlet/ribbit/Types.h>
 #include <toadlet/ribbit/Audio.h>
@@ -35,25 +35,23 @@ namespace ribbit{
 
 class ALPlayer;
 
-class TOADLET_API ALAudioPeer:public AudioPeer{
+class TOADLET_API ALAudio:public Audio{
 public:
-	ALAudioPeer(ALPlayer *player);
-	virtual ~ALAudioPeer();
+	ALAudio(ALPlayer *audioPlayer);
+	virtual ~ALAudio();
 
-	void setAudio(Audio *audio);
-
-	bool loadAudioBuffer(AudioBuffer::ptr buffer);
-	bool loadAudioStream(AudioStream::ptr stream);
+	bool create(AudioBuffer::ptr buffer);
+	bool create(egg::io::InputStream::ptr in,const egg::String &mimeType);
+	bool destroy();
 
 	bool play();
 	bool stop();
 	bool getPlaying() const;
+	bool getFinished() const;
 
 	void setGain(scalar gain);
 	void fadeToGain(scalar gain,int time);
-	scalar getGain() const;
-	scalar getTargetGain() const;
-	int getFadeTime();
+	scalar getGain() const{return mGain;}
 
 	void setRolloffFactor(scalar factor);
 	scalar getRolloffFactor() const;
@@ -62,48 +60,34 @@ public:
 	bool getLooping() const;
 
 	void setGlobal(bool global);
-	bool getGlobal() const;
+	bool getGlobal() const{return mGlobal;}
 
 	void setPitch(scalar pitch);
 	scalar getPitch() const;
 
-	void setGroup(const egg::String &group);
-	const egg::String &getGroup() const;
-
 	void setPosition(const Vector3 &position);
-	Vector3 getPosition() const;
-
 	void setVelocity(const Vector3 &velocity);
 
-	bool getFinished() const;
-
-	void setSourceHandle(int handle);
-	int getSourceHandle();
-
-	void setStream(AudioStream::ptr stream);
-	AudioStream::ptr getStream();
-
-	void setStreamingBuffers(unsigned int *buffers);
-	unsigned int *getStreamingBuffers();
-
-	void setTotalBuffersPlayed(int buffersPlayed);
-	int getTotalBuffersPlayed();
-
-	void internal_setGain(scalar gain);
-	void internal_playerShutdown();
+	inline ALuint getHandle() const{return mHandle;}
 
 protected:
+	void update(int dt);
+	int readAudioData(unsigned char *buffer,int bsize);
+	void setImmediateGain(scalar gain);
+
+	ALPlayer *mAudioPlayer;
 	bool mGlobal;
 	bool mLooping;
-	ALuint mSourceHandle;
-	ALPlayer *mALPlayer;
-	AudioStream::ptr mStream;
+	ALuint mHandle;
 	unsigned int *mStreamingBuffers;
 	int mTotalBuffersPlayed;
 	scalar mTargetGain;
 	scalar mGain;
 	int mFadeTime;
-	egg::String mGroup;
+	AudioBuffer::ptr mAudioBuffer;
+	AudioStream::ptr mAudioStream;
+
+	friend class ALPlayer;
 };
 
 }

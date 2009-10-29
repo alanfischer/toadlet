@@ -211,16 +211,6 @@ void AudierePlayer::setListenerVelocity(const Vector3 &velocity){
 void AudierePlayer::setListenerGain(scalar gain){
 }
 
-void AudierePlayer::setGroupGain(const String &group,scalar gain){
-}
-
-void AudierePlayer::removeGroup(const String &group){
-}
-
-scalar AudierePlayer::getGroupGain(const String &group){
-	return 0;
-}
-
 void AudierePlayer::setDopplerFactor(scalar factor){
 }
 

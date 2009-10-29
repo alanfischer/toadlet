@@ -70,7 +70,6 @@ D3D9Renderer::D3D9Renderer():
 	//mD3DCaps,
 	mPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL),
-	mShutdown(true),
 
 	mAlphaTest(AlphaTest_NONE),
 	mAlphaCutoff(0),
@@ -93,16 +92,16 @@ D3D9Renderer::D3D9Renderer():
 }
 
 D3D9Renderer::~D3D9Renderer(){
-	TOADLET_ASSERT(mShutdown);
+	destroy();
 }
 
-bool D3D9Renderer::startup(RenderTarget *target,int *options){
+bool D3D9Renderer::create(RenderTarget *target,int *options){
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
-		"D3D9Renderer: Startup started");
+		"creating D3D9Renderer");
 
 	if(target==NULL){
 		Error::nullPointer(Categories::TOADLET_PEEPER,
-			"D3D9Renderer: NULL RenderTarget");
+			"NULL RenderTarget");
 		return false;
 	}
 
@@ -111,11 +110,10 @@ bool D3D9Renderer::startup(RenderTarget *target,int *options){
 	mD3DDevice=d3dtarget->getDirect3DDevice9();
 	if(mD3DDevice==NULL){
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"D3D9Renderer: Invalid Device");
+			"invalid device");
 		return false;
 	}
 
-	mShutdown=false;
 	mPrimaryRenderTarget=target;
 	mD3DPrimaryRenderTarget=d3dtarget;
 	mRenderTarget=target;
@@ -141,14 +139,12 @@ bool D3D9Renderer::startup(RenderTarget *target,int *options){
 	setDefaultStates();
 
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
-		"D3D9Renderer: Startup finished");
+		"created D3D9Renderer");
 
 	return true;
 }
 
-bool D3D9Renderer::shutdown(){
-	mShutdown=true;
-
+bool D3D9Renderer::destroy(){
 	return true;
 }
 

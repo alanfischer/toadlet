@@ -46,8 +46,8 @@ public:
 	virtual ~D3D9Renderer();
 
 	// Startup/Shutdown
-	bool startup(RenderTarget *target,int *options);
-	bool shutdown();
+	bool create(RenderTarget *target,int *options);
+	bool destroy();
 	RendererStatus getStatus();
 	bool reset();
 

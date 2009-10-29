@@ -586,7 +586,7 @@ bool Win32Application::createContextAndRenderer(int plugin){
 
 		mRenderer=makeRenderer(plugin);
 		if(mRenderer!=NULL){
-			if(mRenderer->startup(this,mRendererOptions)==false){
+			if(mRenderer->create(this,mRendererOptions)==false){
 				delete mRenderer;
 				mRenderer=NULL;
 
@@ -626,8 +626,7 @@ bool Win32Application::destroyRendererAndContext(){
 
 	if(mRenderer!=NULL){
 		mEngine->setRenderer(NULL);
-
-		mRenderer->shutdown();
+		mRenderer->destroy();
 		delete mRenderer;
 		mRenderer=NULL;
 	}
@@ -666,7 +665,7 @@ bool Win32Application::createAudioPlayer(){
 			mAudioPlayer=new_ALPlayer();
 			bool result=false;
 			TOADLET_TRY
-				result=mAudioPlayer->startup(NULL);
+				result=mAudioPlayer->create(NULL);
 			TOADLET_CATCH(const Exception &){result=false;}
 			if(result==false){
 				delete mAudioPlayer;
@@ -679,7 +678,7 @@ bool Win32Application::createAudioPlayer(){
 			mAudioPlayer=new_Win32Player();
 			bool result=false;
 			TOADLET_TRY
-				result=mAudioPlayer->startup(NULL);
+				result=mAudioPlayer->create(NULL);
 			TOADLET_CATCH(const Exception &){result=false;}
 			if(result==false){
 				delete mAudioPlayer;
@@ -696,7 +695,7 @@ bool Win32Application::createAudioPlayer(){
 bool Win32Application::destroyAudioPlayer(){
 	if(mAudioPlayer!=NULL){
 		mEngine->setAudioPlayer(NULL);
-		mAudioPlayer->shutdown();
+		mAudioPlayer->destroy();
 		delete mAudioPlayer;
 		mAudioPlayer=NULL;
 	}

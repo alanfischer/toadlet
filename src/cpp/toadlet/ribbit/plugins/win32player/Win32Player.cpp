@@ -24,8 +24,8 @@
  ********** Copyright header - do not remove **********/
 
 #include "Win32Player.h"
-#include "Win32AudioPeer.h"
-#include "Win32AudioBufferPeer.h"
+#include "Win32Audio.h"
+#include "Win32AudioBuffer.h"
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Error.h>
@@ -64,85 +64,37 @@ Win32Player::Win32Player():
 }
 
 Win32Player::~Win32Player(){
-	int i;
-	for(i=0;i<mAudioPeers.size();++i){
-		mAudioPeers[i]->internal_playerDestroy();
-	}
+	destroy();
 }
 
-bool Win32Player::startup(int *options){
+bool Win32Player::create(int *options){
 	return true;
 }
 
-bool Win32Player::shutdown(){
+bool Win32Player::destroy(){
 	if(mWaveOut!=NULL){
 		waveOutClose(mWaveOut);
 		mWaveOut=NULL;
 	}
 
+	int i;
+	for(i=0;i<mAudios.size();++i){
+		mAudios[i]->destroy();
+	}
+
 	return true;
 }
 
-AudioBufferPeer *Win32Player::createAudioBufferPeer(AudioBuffer *audioBuffer){
-	AudioStream::ptr decoder=startAudioStream(audioBuffer->getInputStream(),audioBuffer->getMimeType());
-
-	if(decoder==NULL){
-		return NULL;
-	}
-
-	char *buffer=0;
-	int length=0;
-	int channels=decoder->getChannels();
-	int sps=decoder->getSamplesPerSecond();
-	int bps=decoder->getBitsPerSample();
-
-	decodeStream(decoder,buffer,length);
-
-	audioBuffer->setStream(NULL,NULL);
-
-	Win32AudioBufferPeer *peer=new Win32AudioBufferPeer(bps,channels,sps,buffer,length,this);
-
-	HRESULT hr=0;
-	if(mWaveOut==NULL){
-		hr=waveOutOpen(&mWaveOut,WAVE_MAPPER,&peer->waveFormat,NULL,NULL,CALLBACK_NULL);
-		if(hr!=MMSYSERR_NOERROR){
-			Error::unknown(Categories::TOADLET_RIBBIT,
-				"error in waveOutOpen");
-			return NULL;
-		}
-	}
-
-	hr=waveOutPrepareHeader(mWaveOut,&peer->waveHDR,sizeof(peer->waveHDR));
-	if(hr!=MMSYSERR_NOERROR){
-		Error::unknown(Categories::TOADLET_RIBBIT,
-			"error in waveOutPrepareHeader");
-		return NULL;
-	}
-
-	return peer;
+AudioBuffer *Win32Player::createAudioBuffer(){
+	return new Win32AudioBuffer(this);
 }
 
-AudioPeer *Win32Player::createBufferedAudioPeer(Audio *audio,AudioBuffer::ptr buffer){
-	Win32AudioPeer *peer=new Win32AudioPeer(this);
-
-	peer->loadAudioBuffer(buffer);
-
-	return peer;
+Audio *Win32Player::createBufferedAudio(){
+	return new Win32Audio(this);
 }
 
-AudioPeer *Win32Player::createStreamingAudioPeer(Audio *audio,InputStream::ptr in,const String &mimeType){
+Audio *Win32Player::createStreamingAudio(){
 	return NULL;
-}
-
-void Win32Player::setListenerGain(scalar gain){
-}
-
-scalar Win32Player::getListenerGain() const{
-	return 0;
-}
-
-HWAVEOUT Win32Player::getWaveOut(){
-	return mWaveOut;
 }
 
 bool Win32Player::canPlaySound(){
@@ -161,11 +113,11 @@ AudioStream::ptr Win32Player::startAudioStream(io::InputStream::ptr in,const Str
 	}
 
 	AudioStream::ptr decoder;
-#	if defined(TOADLET_HAS_OGG_VORBIS)
+	#if defined(TOADLET_HAS_OGG_VORBIS)
 		if(mimeType=="application/ogg"){
 			decoder=AudioStream::ptr(new_OggVorbisDecoder());
 		}
-#	endif
+	#endif
 	if(mimeType=="audio/x-wav"){
 		decoder=AudioStream::ptr(new_WaveDecoder());
 	}
@@ -216,7 +168,7 @@ void Win32Player::decodeStream(AudioStream *decoder,char *&finalBuffer,int &fina
 		delete[] buffers[i];
 	}
 
-#	if !defined(TOADLET_NATIVE_FORMAT)
+	#if !defined(TOADLET_NATIVE_FORMAT)
 		int bps=decoder->getBitsPerSample();
 		if(bps==16){
 			int i=0;
@@ -225,11 +177,15 @@ void Win32Player::decodeStream(AudioStream *decoder,char *&finalBuffer,int &fina
 				i+=2;
 			}
 		}
-#	endif
+	#endif
 }
 
-void Win32Player::internal_audioPeerDestroy(Win32AudioPeer *audioPeer){
-	mAudioPeers.remove(audioPeer);
+void Win32Player::internal_audioCreate(Win32Audio *audio){
+	mAudios.add(audio);
+}
+
+void Win32Player::internal_audioDestroy(Win32Audio *audio){
+	mAudios.remove(audio);
 }
 
 }

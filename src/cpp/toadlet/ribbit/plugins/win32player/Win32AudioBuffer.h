@@ -23,37 +23,37 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "Win32AudioBufferPeer.h"
+#ifndef TOADLET_RIBBIT_WIN32AUDIOBUFFERPEER_H
+#define TOADLET_RIBBIT_WIN32AUDIOBUFFERPEER_H
+
+#include "Win32Player.h"
+#include <toadlet/ribbit/AudioBuffer.h>
 
 namespace toadlet{
 namespace ribbit{
 
-Win32AudioBufferPeer::Win32AudioBufferPeer(int bps,int channels,int sps,char *buffer,int length,Win32Player *player):
-	//waveFormat,
-	//waveHDR,
-	time(0)
-{
-	memset(&waveFormat,0,sizeof(waveFormat));
-	waveFormat.wFormatTag=WAVE_FORMAT_PCM;
-	waveFormat.nChannels=channels;
-	waveFormat.nSamplesPerSec=sps;
-    waveFormat.wBitsPerSample=bps;
-	waveFormat.nBlockAlign=channels*bps/8;
-	waveFormat.nAvgBytesPerSec=sps*waveFormat.nBlockAlign;
+class TOADLET_API Win32AudioBuffer:public AudioBuffer{
+public:
+	Win32AudioBuffer(Win32Player *player);
+	virtual ~Win32AudioBuffer();
 
-	memset(&waveHDR,0,sizeof(waveHDR));
-	waveHDR.lpData=buffer;
-	waveHDR.dwBufferLength=length;
+	AudioBuffer *getRootAudioBuffer(){return this;}
 
-	time=length*1000*8/(channels*bps*sps);
-}
+	bool create(egg::io::InputStream::ptr inputStream,const egg::String &mimeType);
+	bool destroy();
 
-Win32AudioBufferPeer::~Win32AudioBufferPeer(){
-	if(waveHDR.lpData!=NULL){
-		delete[] waveHDR.lpData;
-		waveHDR.lpData=NULL;
-	}
-}
+	inline WAVEFORMATEX *getLPWAVEFORMATEX(){return &mWaveFormat;}
+	inline WAVEHDR *getLPWAVEHDR(){return &mWaveHDR;}
+	inline int getTime() const{return mTime;}
+
+protected:
+	Win32Player *mAudioPlayer;
+	WAVEFORMATEX mWaveFormat;
+	WAVEHDR mWaveHDR;
+	int mTime;
+};
 
 }
 }
+
+#endif

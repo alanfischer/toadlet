@@ -28,6 +28,7 @@
 
 #include <toadlet/tadpole/ResourceHandler.h>
 #include <toadlet/ribbit/AudioBuffer.h>
+#include <toadlet/ribbit/AudioPlayer.h>
 
 namespace toadlet{
 namespace tadpole{

@@ -37,16 +37,35 @@ AudioEntity::AudioEntity():Entity(){}
 
 Entity *AudioEntity::create(Engine *engine){
 	super::create(engine);
-
-	mAudio=Audio::ptr(new Audio(engine->getAudioPlayer()));
-
 	return this;
 }
 
 void AudioEntity::destroy(){
-	mAudio=NULL;
+	mAudio->destroy();
 
 	super::destroy();
+}
+
+bool AudioEntity::loadAudioBuffer(const AudioBuffer::ptr &audioBuffer){
+	if(mAudio!=NULL){
+		mAudio->destroy();
+	}
+
+	mAudio=Audio::ptr(mEngine->getAudioPlayer()->createBufferedAudio());
+	mAudio->create(audioBuffer);
+
+	return true;
+}
+
+bool AudioEntity::loadAudioStream(egg::io::InputStream::ptr in,const egg::String &extension){
+	if(mAudio!=NULL){
+		mAudio->destroy();
+	}
+
+	mAudio=Audio::ptr(mEngine->getAudioPlayer()->createStreamingAudio());
+	mAudio->create(in,extension);
+
+	return true;
 }
 
 }

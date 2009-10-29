@@ -81,6 +81,10 @@ bool AudiereAudioPeer::getPlaying() const{
 	}
 }
 
+bool AudiereAudioPeer::getFinished() const{
+	return false;
+}
+
 void AudiereAudioPeer::setGain(scalar gain){
 	mGain=gain;
 	if(mStream){
@@ -163,26 +167,10 @@ scalar AudiereAudioPeer::getPitch() const{
 	}
 }
 
-void AudiereAudioPeer::setGroup(const String &group){
-	mGroup=group;
-}
-
-const String &AudiereAudioPeer::getGroup() const{
-	return mGroup;
-}
-
 void AudiereAudioPeer::setPosition(const Vector3 &position){
 }
 
-Vector3 AudiereAudioPeer::getPosition() const{
-	return Math::ZERO_VECTOR3;
-}
-
 void AudiereAudioPeer::setVelocity(const Vector3 &velocity){
-}
-
-bool AudiereAudioPeer::getFinished() const{
-	return false;
 }
 
 }

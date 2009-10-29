@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_WIN32AUDIOPEER_H
-#define TOADLET_RIBBIT_WIN32AUDIOPEER_H
+#ifndef TOADLET_RIBBIT_WIN32AUDIO_H
+#define TOADLET_RIBBIT_WIN32AUDIO_H
 
 #include "Win32Player.h"
 #include <toadlet/ribbit/Audio.h>
@@ -33,45 +33,41 @@
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API Win32AudioPeer:public AudioPeer{
+class TOADLET_API Win32Audio:public Audio{
 public:
-	Win32AudioPeer(Win32Player *player);
-	virtual ~Win32AudioPeer();
+	Win32Audio(Win32Player *player);
+	virtual ~Win32Audio();
 
-	bool loadAudioBuffer(AudioBuffer::ptr audioBuffer);
-	bool loadAudioStream(egg::io::InputStream::ptr in,const egg::String &mimeType);
+	virtual bool create(AudioBuffer::ptr audioBuffer);
+	virtual bool create(egg::io::InputStream::ptr in,const egg::String &mimeType);
+	virtual bool destroy();
 
-	bool play();
-	bool stop();
-	bool getPlaying() const{return false;}
+	virtual bool play();
+	virtual bool stop();
+	virtual bool getPlaying() const{return false;}
+	virtual bool getFinished() const{return false;}
 
-	void setGain(scalar gain){}
-	void fadeToGain(scalar gain,int time){}
-	scalar getGain() const{return 0;}
+	virtual void setGain(scalar gain){}
+	virtual void fadeToGain(scalar gain,int time){}
+	virtual scalar getGain() const{return 0;}
 
-	void setLooping(bool looping){}
-	bool getLooping() const{return 0;}
+	virtual void setLooping(bool looping){}
+	virtual bool getLooping() const{return 0;}
 
-	void setPitch(scalar pitch){mPitch=pitch;}
-	scalar getPitch() const{return mPitch;}
+	virtual void setPitch(scalar pitch){mPitch=pitch;}
+	virtual scalar getPitch() const{return mPitch;}
 
-	void setGroup(const egg::String &group){}
-	const egg::String &getGroup() const{static egg::String empty; return empty;}
-	
-	void setGlobal(bool global){}
-	bool getGlobal() const{return false;}
+	virtual void setGlobal(bool global){}
+	virtual bool getGlobal() const{return false;}
 
-	void setRolloffFactor(scalar r){}
-	scalar getRolloffFactor() const{return 0;}
+	virtual void setRolloffFactor(scalar r){}
+	virtual scalar getRolloffFactor() const{return 0;}
 
-	void setPosition(const Vector3 &position){}
-	Vector3 getPosition() const{return Math::ZERO_VECTOR3;}
+	virtual void setPosition(const Vector3 &position){}
+	virtual const Vector3 &getPosition() const{return Math::ZERO_VECTOR3;}
 
-	void setVelocity(const Vector3 &velocity){}
-
-	bool getFinished() const{return false;}
-
-	void internal_playerDestroy();
+	virtual void setVelocity(const Vector3 &velocity){}
+	virtual const Vector3 &getVelocity() const{return Math::ZERO_VECTOR3;}
 
 protected:
 	Win32Player *mPlayer;
