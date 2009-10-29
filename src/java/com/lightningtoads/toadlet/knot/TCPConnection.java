@@ -56,7 +56,7 @@ public class TCPConnection implements Connection,Runnable{
 		int remotePort=port;
 
 		Logger.log(Categories.TOADLET_KNOT,Logger.Level.DEBUG,
-			("connect: protocol ")+CONNECTION_PACKET);
+			("connect: protocol ")+new String(CONNECTION_PACKET));
 
 		boolean result=false;
 		int amount=0;
@@ -105,7 +105,7 @@ public class TCPConnection implements Connection,Runnable{
 
 	public boolean accept(){
 		Logger.log(Categories.TOADLET_KNOT,Logger.Level.DEBUG,
-			("accept: protocol ")+CONNECTION_PACKET);
+			("accept: protocol ")+new String(CONNECTION_PACKET));
 
 		boolean result=false;
 		try{

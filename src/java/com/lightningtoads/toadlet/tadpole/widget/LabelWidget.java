@@ -234,7 +234,7 @@ public class LabelWidget extends RenderableWidget{
 	protected String mText;
 	protected Font mFont=null;
 	protected Color mColor=new Color(Colors.WHITE);
-	protected boolean mWordWrap=false;
+	protected boolean mWordWrap=true;
 
 	protected VertexData mVertexData=null;
 	protected IndexData mIndexData=null;

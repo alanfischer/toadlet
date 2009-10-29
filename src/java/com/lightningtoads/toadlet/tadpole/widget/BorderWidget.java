@@ -150,8 +150,8 @@ public class BorderWidget extends RenderableWidget{
 		vba.unlock();
 	}
 
-	protected Color mLightColor=new Color();
-	protected Color mDarkColor=new Color();
+	protected Color mLightColor=new Color(Colors.WHITE);
+	protected Color mDarkColor=new Color(Colors.GREY);
 	protected VertexData mVertexData=null;
 	protected IndexData mIndexData=null;
 
