@@ -47,6 +47,10 @@
 	}
 #endif
 
+#ifdef TOADLET_LITTLE_ENDIAN
+	#define TOADLET_NATIVE_FORMAT
+#endif
+
 #if defined(TOADLET_DEBUG)
 	#define TOADLET_CHECK_ALERROR(function) \
 		{ int error=alGetError(); \

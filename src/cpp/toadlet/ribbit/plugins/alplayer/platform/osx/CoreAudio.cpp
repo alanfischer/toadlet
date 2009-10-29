@@ -26,7 +26,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/MathConversion.h>
 #include "../../ALPlayer.h"
-#include "CoreAudioPeer.h"
+#include "CoreAudio.h"
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
@@ -34,31 +34,42 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace ribbit{
 
-CoreAudioPeer::CoreAudioPeer(ALPlayer *player){
-	mALPlayer=player;
-	mLooping=false;
-	mTargetGain=Math::ONE;
-	mGain=Math::ONE;
-	mFadeTime=0;
+const static int numBuffers=3;
 
-	mAudioQueue=0;
-	mNumPacketsToRead=0;
-	mCurrentPacket=0;
-	mPacketDescs=NULL;
-	mFileDataSize=0;
+CoreAudio::CoreAudio(ALPlayer *audioPlayer):
+	mLooping(false),
+	mAudioPlayer(NULL),
+	//mAudioStream,
+	mTargetGain(0),
+	mGain(0),
+	mFadeTime(0),
+
+	mAudioQueue(0),
+	//mBuffers[numBuffers],
+	//mBuffersToDispose,
+	mNumPacketsToRead(0),
+	mCurrentPacket(0),
+	mPacketDescs(NULL),
+	mFileDataSize(0)
+{
+	mAudioPlayer=player;
+
+	setGain(Math::ONE);
 }
 
-CoreAudioPeer::~CoreAudioPeer(){
-	if(mALPlayer!=NULL){
-		mALPlayer->internal_audioPeerDestroy(this);
-	}
-
-	if(mAudioQueue!=NULL){
-		AudioQueueDispose(mAudioQueue,true);
-	}
+CoreAudio::~CoreAudio(){
+	destroy();
 }
 
-bool CoreAudioPeer::loadAudioStream(AudioStream::ptr stream){
+mCoreAudios.add(audio);
+
+mCoreAudios.remove(audio);
+
+if(mAudioQueue!=NULL){
+	AudioQueueDispose(mAudioQueue,true);
+}
+
+bool CoreAudio::loadAudioStream(AudioStream::ptr stream){
 	if(mALPlayer!=NULL){
 		mStream=shared_static_cast<CoreAudioDecoder>(stream);
 
@@ -71,7 +82,7 @@ bool CoreAudioPeer::loadAudioStream(AudioStream::ptr stream){
 	return false;
 }
 
-bool CoreAudioPeer::play(){
+bool CoreAudio::play(){
 	OSStatus result=AudioQueuePrime(mAudioQueue,1,NULL);
 	if(result!=0){
 		Error::unknown(Categories::TOADLET_RIBBIT,
@@ -89,7 +100,7 @@ bool CoreAudioPeer::play(){
 	return true;
 }
 
-bool CoreAudioPeer::stop(){
+bool CoreAudio::stop(){
 	OSStatus result=AudioQueueStop(mAudioQueue,true);
 	if(result!=0){
 		Error::unknown(Categories::TOADLET_RIBBIT,
@@ -100,7 +111,7 @@ bool CoreAudioPeer::stop(){
 	return true;
 }
 
-bool CoreAudioPeer::getPlaying() const{
+bool CoreAudio::getPlaying() const{
 	UInt32 isRunning=0;
 	OSStatus result=AudioQueueGetParameter(mAudioQueue,kAudioQueueProperty_IsRunning,(AudioQueueParameterValue*)&isRunning);
 	if(result!=0){
@@ -112,7 +123,11 @@ bool CoreAudioPeer::getPlaying() const{
 	return isRunning!=0;
 }
 
-void CoreAudioPeer::setGain(scalar gain){
+bool CoreAudio::getFinished() const{
+	return false; // TODO FINISH ME
+}
+
+void CoreAudio::setGain(scalar gain){
 	if(mALPlayer!=NULL){
 		mALPlayer->lock();
 
@@ -124,7 +139,7 @@ void CoreAudioPeer::setGain(scalar gain){
 	}
 }
 
-void CoreAudioPeer::fadeToGain(scalar gain,int time){
+void CoreAudio::fadeToGain(scalar gain,int time){
 	if(mALPlayer!=NULL){
 		mALPlayer->lock();
 
@@ -135,46 +150,50 @@ void CoreAudioPeer::fadeToGain(scalar gain,int time){
 	}
 }
 
-scalar CoreAudioPeer::getGain() const{
+scalar CoreAudio::getGain() const{
 	return mGain;
 }
 
-scalar CoreAudioPeer::getTargetGain() const{
+scalar CoreAudio::getTargetGain() const{
 	return mTargetGain;
 }
 
-int CoreAudioPeer::getFadeTime(){
+int CoreAudio::getFadeTime(){
 	return mFadeTime;
 }
 
-void CoreAudioPeer::setLooping(bool looping){
+void CoreAudio::setLooping(bool looping){
 	mLooping=looping;
 }
 
-void CoreAudioPeer::setGroup(const String &group){
-	mGroup=group;
-	setGain(mTargetGain);
+void CoreAudio::update(int dt){
+	scalar fdt=Math::fromMilli(dt);
+	if(mGain!=mTargetGain){
+		scalar speed=Math::mul(mFadeTime,fdt);
+		if(mGain<mTargetGain){
+			mGain+=mFadeTime;
+			if(mGain>mTargetGain){
+				mGain=mTargetGain;
+			}
+		}
+		else{
+			mGain-=speed;
+			if(mGain<mTargetGain){
+				mGain=mTargetGain;
+			}
+		}
+
+		setImmediateGain(mGain);
+	}
 }
 
-bool CoreAudioPeer::getFinished() const{
-	return false; // TODO FINISH ME
-}
-
-void CoreAudioPeer::internal_setGain(scalar gain){
+void CoreAudio::setImmediateGain(scalar gain){
 	mGain=gain;
-
-	scalar groupGain=mALPlayer->internal_getGroupGain(mGroup);
-
-	gain=Math::mul(gain,groupGain);
 
 	AudioQueueSetParameter(mAudioQueue,kAudioQueueParam_Volume,MathConversion::scalarToFloat(gain));
 }
 
-void CoreAudioPeer::internal_playerShutdown(){
-	mALPlayer=NULL;
-}
-
-void CoreAudioPeer::calculateBytesForTime(const AudioStreamBasicDescription streamDescription,UInt32 maxPacketSize,Float64 seconds,UInt32 *bufferSize,UInt32 *numPackets){
+void CoreAudio::calculateBytesForTime(const AudioStreamBasicDescription streamDescription,UInt32 maxPacketSize,Float64 seconds,UInt32 *bufferSize,UInt32 *numPackets){
 	static const UInt32 maxBufferSize = 0x10000; // limit size to 64K
 	static const UInt32 minBufferSize = 0x4000; // limit size to 16K
 
@@ -201,7 +220,7 @@ void CoreAudioPeer::calculateBytesForTime(const AudioStreamBasicDescription stre
 	*numPackets=*bufferSize / maxPacketSize;
 }
 
-bool CoreAudioPeer::disposeBuffer(AudioQueueRef audioQueue,egg::Collection<AudioQueueBufferRef> bufferDisposeList,AudioQueueBufferRef bufferToDispose){
+bool CoreAudio::disposeBuffer(AudioQueueRef audioQueue,egg::Collection<AudioQueueBufferRef> bufferDisposeList,AudioQueueBufferRef bufferToDispose){
 	int i;
 	for(i=0;i<bufferDisposeList.size();++i){
 		if(bufferToDispose==bufferDisposeList[i]){
@@ -216,18 +235,18 @@ bool CoreAudioPeer::disposeBuffer(AudioQueueRef audioQueue,egg::Collection<Audio
 	return false;
 }
 
-void CoreAudioPeer::queueCallback(void *userData,AudioQueueRef audioQueue,AudioQueueBufferRef audioQueueBuffer){
+void CoreAudio::queueCallback(void *userData,AudioQueueRef audioQueue,AudioQueueBufferRef audioQueueBuffer){
 	OSStatus result=0;
-	CoreAudioPeer *peer=(CoreAudioPeer*)userData;
+	CoreAudio *audio=(CoreAudio*)userData;
 
 	// dispose of the buffer if no longer in use
-	if(disposeBuffer(audioQueue,peer->mBuffersToDispose,audioQueueBuffer)){
+	if(disposeBuffer(audioQueue,audio->mBuffersToDispose,audioQueueBuffer)){
 		return;
 	}
 
 	UInt32 numBytes=0;
-	UInt32 numPackets=peer->mNumPacketsToRead;
-	result=AudioFileReadPackets(peer->mStream->getAudioFileID(),false,&numBytes,peer->mPacketDescs,peer->mCurrentPacket,&numPackets,audioQueueBuffer->mAudioData);
+	UInt32 numPackets=audio->mNumPacketsToRead;
+	result=AudioFileReadPackets(audio->mStream->getAudioFileID(),false,&numBytes,audio->mPacketDescs,audio->mCurrentPacket,&numPackets,audioQueueBuffer->mAudioData);
 	if(result!=0){
 		Logger::log(Categories::TOADLET_RIBBIT,Logger::Level_ERROR,
 			"Error reading file data");
@@ -236,11 +255,11 @@ void CoreAudioPeer::queueCallback(void *userData,AudioQueueRef audioQueue,AudioQ
 
 	// If we just played the final buffer
 	if(numPackets==0){
-		if(audioQueueBuffer==peer->mBuffers[numBuffers-1]){
-			if(peer->mLooping){
-				numPackets=peer->mNumPacketsToRead;
-				peer->mCurrentPacket=0;
-				result=AudioFileReadPackets(peer->mStream->getAudioFileID(),false,&numBytes,peer->mPacketDescs,peer->mCurrentPacket,&numPackets,audioQueueBuffer->mAudioData);
+		if(audioQueueBuffer==audio->mBuffers[numBuffers-1]){
+			if(audio->mLooping){
+				numPackets=audio->mNumPacketsToRead;
+				audio->mCurrentPacket=0;
+				result=AudioFileReadPackets(audio->mStream->getAudioFileID(),false,&numBytes,audio->mPacketDescs,audio->mCurrentPacket,&numPackets,audioQueueBuffer->mAudioData);
 				audioQueueBuffer->mAudioDataByteSize=numBytes;
 
 				if(result!=0){
@@ -257,16 +276,16 @@ void CoreAudioPeer::queueCallback(void *userData,AudioQueueRef audioQueue,AudioQ
 		}
 	}
 
-	result=AudioQueueEnqueueBuffer(audioQueue,audioQueueBuffer,peer->mPacketDescs?numPackets:0,peer->mPacketDescs);
+	result=AudioQueueEnqueueBuffer(audioQueue,audioQueueBuffer,audio->mPacketDescs?numPackets:0,audio->mPacketDescs);
 	if(result!=0){
 		Logger::log(Categories::TOADLET_RIBBIT,Logger::Level_ERROR,
 			String("Error enqueuing new buffer:")+(int)result);
 	}
 
-	peer->mCurrentPacket+=numPackets;
+	audio->mCurrentPacket+=numPackets;
 }
 
-bool CoreAudioPeer::setupQueue(){
+bool CoreAudio::setupQueue(){
 	UInt32 propertySize=0;
 	OSStatus result=0;
 
@@ -328,7 +347,7 @@ bool CoreAudioPeer::setupQueue(){
 	return true;
 }
 
-bool CoreAudioPeer::setupBuffers(){
+bool CoreAudio::setupBuffers(){
 	int numBuffersToQueue=numBuffers;
 	OSStatus result=0;
 	UInt32 maxPacketSize;

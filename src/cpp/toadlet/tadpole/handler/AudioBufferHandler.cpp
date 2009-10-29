@@ -55,7 +55,8 @@ Resource::ptr AudioBufferHandler::load(InputStream::ptr in,const ResourceHandler
 		else{
 			mimeType=audioBufferData->mimeType;
 		}
-		audioBuffer=AudioBuffer::ptr(new AudioBuffer(mAudioPlayer,in,mimeType));
+		audioBuffer=AudioBuffer::ptr(mAudioPlayer->createAudioBuffer());
+		audioBuffer->create(in,mimeType);
 	}
 	return audioBuffer;
 }

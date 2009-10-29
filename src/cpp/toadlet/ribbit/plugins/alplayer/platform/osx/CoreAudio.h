@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_COREAUDIOPEER_H
-#define TOADLET_RIBBIT_COREAUDIOPEER_H
+#ifndef TOADLET_RIBBIT_COREAUDIO_H
+#define TOADLET_RIBBIT_COREAUDIO_H
 
 #include <toadlet/ribbit/Types.h>
 #include <toadlet/ribbit/Audio.h>
@@ -36,24 +36,21 @@ namespace ribbit{
 
 class AudioStream;
 
-class TOADLET_API CoreAudioPeer:public AudioPeer{
+class TOADLET_API CoreAudio:public Audio{
 public:
-	CoreAudioPeer(ALPlayer *player);
-	virtual ~CoreAudioPeer();
-
-	void setAudio(Audio *audio);
+	CoreAudio(ALPlayer *audioPlayer);
+	virtual ~CoreAudio();
 
 	bool loadAudioStream(AudioStream::ptr stream);
 
 	bool play();
 	bool stop();
 	bool getPlaying() const;
+	bool getFinished() const;
 
 	void setGain(scalar gain);
 	void fadeToGain(scalar gain,int time);
 	scalar getGain() const;
-	scalar getTargetGain() const;
-	int getFadeTime();
 
 	void setRolloffFactor(scalar factor){}
 	scalar getRolloffFactor() const{return 0;}
@@ -67,20 +64,13 @@ public:
 	void setPitch(scalar pitch){}
 	scalar getPitch() const{return 0;}
 
-	void setGroup(const egg::String &group);
-	const egg::String &getGroup() const{return mGroup;}
-
 	void setPosition(const Vector3 &position){}
-
 	void setVelocity(const Vector3 &velocity){}
-
-	bool getFinished() const;
 
 	void setSourceHandle(int handle);
 	int getSourceHandle();
 
-	void internal_setGain(scalar gain);
-	void internal_playerShutdown();
+	void setImmediateGain(scalar gain);
 
 protected:
 	bool setupQueue();
@@ -91,14 +81,11 @@ protected:
 	static void queueCallback(void *userData,AudioQueueRef audioQueue,AudioQueueBufferRef audioQueueBuffer);
 
 	bool mLooping;
-	ALPlayer *mALPlayer;
-	CoreAudioDecoder::ptr mStream;
+	ALPlayer *mAudioPlayer;
+	CoreAudioDecoder::ptr mAudioStream;
 	scalar mTargetGain;
 	scalar mGain;
 	int mFadeTime;
-	egg::String mGroup;
-
-	const static int numBuffers=3;
 
 	AudioQueueRef mAudioQueue;
 	AudioQueueBufferRef mBuffers[numBuffers];

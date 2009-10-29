@@ -1,7 +1,7 @@
 # Source files for toadlet_ribbit_win32player
 set (RIBBIT_WIN32PLAYER_SRC
-	Win32AudioBufferPeer.cpp
-	Win32AudioPeer.cpp
+	Win32AudioBuffer.cpp
+	Win32Audio.cpp
 	Win32Player.cpp
 )
 
@@ -12,8 +12,8 @@ set (RIBBIT_DECODERS_WAVEDECODER_SRC
 
 # Headers
 set (RIBBIT_WIN32PLAYER_HEADERS
-	Win32AudioBufferPeer.h
-	Win32AudioPeer.h
+	Win32AudioBuffer.h
+	Win32Audio.h
 	Win32Player.h
 )
 

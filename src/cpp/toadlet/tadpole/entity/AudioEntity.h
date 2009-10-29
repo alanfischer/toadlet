@@ -42,13 +42,13 @@ public:
 	virtual Entity *create(Engine *engine);
 	virtual void destroy();
 
-	inline bool loadAudioBuffer(const ribbit::AudioBuffer::ptr &audioBuffer){return mAudio->loadAudioBuffer(audioBuffer);}
-	inline bool loadAudioStream(egg::io::InputStream::ptr in,const egg::String &extension){return mAudio->loadAudioStream(in,extension);}
-	inline ribbit::AudioBuffer::ptr getAudioBuffer() const{return mAudio->getAudioBuffer();}
+	bool loadAudioBuffer(const ribbit::AudioBuffer::ptr &audioBuffer);
+	bool loadAudioStream(egg::io::InputStream::ptr in,const egg::String &extension);
 
 	inline bool play(){return mAudio->play();}
 	inline bool stop(){return mAudio->stop();}
 	inline bool getPlaying() const{return mAudio->getPlaying();}
+	inline bool getFinished() const{return mAudio->getFinished();}
 
 	inline void setGain(scalar gain){mAudio->setGain(gain);}
 	inline void fadeToGain(scalar gain,int time){mAudio->fadeToGain(gain,time);}
@@ -63,17 +63,10 @@ public:
 	inline void setGlobal(bool global){mAudio->setGlobal(global);}
 	inline bool getGlobal() const{return mAudio->getGlobal();}
 
-	inline void setGroup(const egg::String &name){mAudio->setGroup(name);}
-	inline const egg::String &getGroup() const{return mAudio->getGroup();}
-
 	inline void setRolloffFactor(scalar f){mAudio->setRolloffFactor(f);}
 	inline scalar getRolloffFactor() const{return mAudio->getRolloffFactor();}
 
-	inline bool getFinished() const{return mAudio->getFinished();}
-
 	inline void setVelocity(const Vector3 &velocity){mAudio->setVelocity(velocity);}
-
-	inline ribbit::Audio *internal_getAudio(){return mAudio;}
 
 protected:
 	ribbit::Audio::ptr mAudio;

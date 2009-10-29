@@ -34,36 +34,16 @@
 namespace toadlet{
 namespace ribbit{
 
-class AudioPlayer;
-
-class AudioBufferPeer{
-public:
-	virtual ~AudioBufferPeer(){}
-};
-
-class TOADLET_API AudioBuffer:public egg::Resource{
+class AudioBuffer:public egg::Resource{
 public:
 	TOADLET_SHARED_POINTERS(AudioBuffer,egg::Resource);
 
-	AudioBuffer();
-	AudioBuffer(AudioPlayer *player,egg::io::InputStream::ptr in,const egg::String &mimeType);
+	virtual ~AudioBuffer(){}
 
-	virtual ~AudioBuffer();
+	virtual AudioBuffer *getRootAudioBuffer()=0;
 
-	void setStream(egg::io::InputStream::ptr in,const egg::String &mimeType);
-	egg::io::InputStream::ptr getInputStream() const;
-	const egg::String &getMimeType() const;
-
-	virtual void internal_setAudioBufferPeer(AudioBufferPeer *audioBufferPeer,bool owns);
-	inline AudioBufferPeer *internal_getAudioBufferPeer() const{return mAudioBufferPeer;}
-	inline bool internal_ownsAudioBufferPeer() const{return mOwnsAudioBufferPeer;}
-
-protected:
-	egg::io::InputStream::ptr mIn;
-	egg::String mMimeType;
-
-	AudioBufferPeer *mAudioBufferPeer;
-	bool mOwnsAudioBufferPeer;
+	virtual bool create(egg::io::InputStream::ptr inputStream,const egg::String &mimeType)=0;
+	virtual bool destroy()=0;
 };
 
 }

@@ -112,25 +112,19 @@ GLRenderer::GLRenderer():
 	#if defined(TOADLET_DEBUG)
 		,mBeginEndCounter(0)
 	#endif
-{
-}
+{}
 
 GLRenderer::~GLRenderer(){
-	TOADLET_ASSERT(mShutdown);
-
-	int i;
-	for(i=0;i<mScratchBuffers.size();++i){
-		delete mScratchBuffers[i].data;
-	}
+	destroy();
 }
 
-bool GLRenderer::startup(RenderTarget *target,int *options){
+bool GLRenderer::create(RenderTarget *target,int *options){
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
-		"GLRenderer: Startup started");
+		"creating GLRenderer");
 
 	if(target==NULL){
 		Error::nullPointer(Categories::TOADLET_PEEPER,
-			"GLRenderer: NULL RenderTarget");
+			"NULL RenderTarget");
 		return false;
 	}
 
@@ -295,21 +289,19 @@ bool GLRenderer::startup(RenderTarget *target,int *options){
 	TOADLET_CHECK_GLERROR("startup");
 
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
-		"GLRenderer: Startup finished");
+		"created GLRenderer");
 
 	return true;
 }
 
-bool GLRenderer::shutdown(){
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
-		"GLRenderer: Shutdown finished");
+bool GLRenderer::destroy(){
+	int i;
+	for(i=0;i<mScratchBuffers.size();++i){
+		delete mScratchBuffers[i].data;
+	}
+	mScratchBuffers.clear();
 
-	mShutdown=true;
 	return true;
-}
-
-Renderer::RendererStatus GLRenderer::getStatus(){
-	return RendererStatus_OK;
 }
 
 bool GLRenderer::reset(){

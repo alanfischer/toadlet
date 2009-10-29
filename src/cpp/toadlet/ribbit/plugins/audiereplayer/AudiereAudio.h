@@ -47,6 +47,7 @@ public:
 	bool play();
 	bool stop();
 	bool getPlaying() const;
+	bool getFinished() const;
 
 	void setGain(scalar gain);
 	void fadeToGain(scalar gain,int time);
@@ -66,15 +67,8 @@ public:
 	void setPitch(scalar pitch);
 	scalar getPitch() const;
 
-	void setGroup(const egg::String &group);
-	const egg::String &getGroup() const;
-
 	void setPosition(const Vector3 &position);
-	Vector3 getPosition() const;
-
 	void setVelocity(const Vector3 &velocity);
-
-	bool getFinished() const;
 
 protected:
 	Audio *mAudio;

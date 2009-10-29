@@ -1,7 +1,7 @@
 # Source files for toadlet_ribbit_alplayer
 set (RIBBIT_ALPLAYER_SRC
-	ALAudioBufferPeer.cpp
-	ALAudioPeer.cpp
+	ALAudioBuffer.cpp
+	ALAudio.cpp
 	ALPlayer.cpp
 )
 
@@ -10,7 +10,7 @@ set (RIBBIT_ALPLAYER_ALEM_SRC
 )
 
 set (RIBBIT_ALPLAYER_PLATFORM_OSX_SRC
-	platform/osx/CoreAudioPeer.cpp
+	platform/osx/CoreAudio.cpp
 )
 
 set (RIBBIT_DECODERS_COREAUDIODECODER_SRC
@@ -28,8 +28,8 @@ set (RIBBIT_DECODERS_WAVEDECODER_SRC
 
 # Headers
 set (RIBBIT_ALPLAYER_HEADERS
-	ALAudioBufferPeer.h
-	ALAudioPeer.h
+	ALAudioBuffer.h
+	ALAudio.h
 	ALIncludes.h
 	ALPlayer.h
 )
@@ -39,7 +39,7 @@ set (RIBBIT_ALPLAYER_ALEM_HEADERS
 )
 
 set (RIBBIT_ALPLAYER_PLATFORM_OSX_HEADERS
-	platform/osx/CoreAudioPeer.h
+	platform/osx/CoreAudio.h
 )
 
 set (RIBBIT_DECODERS_COREAUDIODECODER_HEADERS

@@ -71,10 +71,6 @@ public:
 	void setDefaultRolloffFactor(scalar factor);
 	scalar getDefaultRolloffFactor(){return 0;}
 
-	void setGroupGain(const egg::String &group,scalar gain);
-	scalar getGroupGain(const egg::String &group);
-	void removeGroup(const egg::String &group);
-
 	const CapabilitySet &getCapabilitySet();
 
 	audiere::OutputStreamPtr makeStreamFromAudioBuffer(AudioBuffer *audioBuffer);

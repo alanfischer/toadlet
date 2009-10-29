@@ -24,12 +24,12 @@
  ********** Copyright header - do not remove **********/
 
 #include "ALPlayer.h"
-#include "ALAudioPeer.h"
-#include "ALAudioBufferPeer.h"
-#include <toadlet/egg/EndianConversion.h>
+#include "ALAudio.h"
+#include "ALAudioBuffer.h"
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Extents.h>
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/EndianConversion.h>
 #include <stdlib.h>
 #if defined(TOADLET_PLATFORM_POSIX)
 	#include <string.h>
@@ -37,17 +37,13 @@
 
 #if defined(TOADLET_PLATFORM_OSX)
 	#include "../decoders/coreaudiodecoder/CoreAudioDecoder.h"
-	#include "platform/osx/CoreAudioPeer.h"
+	#include "platform/osx/CoreAudio.h"
 #endif
 
 #if defined(TOADLET_PLATFORM_WIN32)
 	#if defined(TOADLET_LIBOPENAL_NAME)
 		#pragma comment(lib,TOADLET_LIBOPENAL_NAME)
 	#endif
-#endif
-
-#ifdef TOADLET_LITTLE_ENDIAN
-	#define TOADLET_NATIVE_FORMAT
 #endif
 
 using namespace toadlet::egg;
@@ -78,20 +74,29 @@ TOADLET_C_API AudioPlayer* new_ALPlayer(){
 
 proc_alBufferDataStatic toadlet_alBufferDataStatic=NULL;
 
-ALPlayer::ALPlayer(){
-	mBufferFadeInTime=0;
-	mStopThread=false;
-	mThread=NULL;
-	mStarted=false;
-}
+ALPlayer::ALPlayer():
+	mDevice(NULL),
+	mContext(NULL),
+	//mAudios,
+	//mSourcePool,
+	//mAllSources,
+	mDefaultRolloffFactor(0),
+	mBufferFadeInTime(0),
+
+	mStopThread(false),
+	mThread(NULL)
+	//mMutex,
+
+	//mCapabilitySet,
+{}
 
 ALPlayer::~ALPlayer(){
-	TOADLET_ASSERT(mStarted==false);
+	destroy();
 }
 
-bool ALPlayer::startup(int *options){
+bool ALPlayer::create(int *options){
 	Logger::log(Categories::TOADLET_RIBBIT,Logger::Level_ALERT,
-		"ALPlayer: Startup started");
+		"creating ALPlayer");
 
 	if(options!=NULL){
 		int i=0;
@@ -100,7 +105,7 @@ bool ALPlayer::startup(int *options){
 				case Option_FADE_IN_BUFFER_TIME:
 					mBufferFadeInTime=options[i++];
 					Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
-								String("Setting BufferFadeInTime to:")+mBufferFadeInTime);
+						String("Setting BufferFadeInTime to:")+mBufferFadeInTime);
 					break;
 			}
 		}
@@ -127,7 +132,7 @@ bool ALPlayer::startup(int *options){
 
 	if(mDevice==NULL){
 		Error::unknown(Categories::TOADLET_RIBBIT,
-			"ALPlayer::startup: Invalid device");
+			"invalid device");
 		return false;
 	}
 
@@ -141,11 +146,10 @@ bool ALPlayer::startup(int *options){
 	TOADLET_CHECK_ALERROR("alcCreateContext");
 
 	if(mContext==NULL){
-		Error::unknown(Categories::TOADLET_RIBBIT,
-			"ALPlayer::startup: Invalid context");
-
 		alcCloseDevice(mDevice);
 		mDevice=NULL;
+		Error::unknown(Categories::TOADLET_RIBBIT,
+			"invalid context");
 		return false;
 	}
 
@@ -190,25 +194,21 @@ bool ALPlayer::startup(int *options){
 	TOADLET_CHECK_ALERROR("Initialize sources");
 
 	Logger::log(Categories::TOADLET_RIBBIT,Logger::Level_DEBUG,
-		"ALPlayer: starting thread");
+		"starting thread");
 
 	mStopThread=false;
 	mThread=new Thread(this);
 	mThread->start();
 
 	Logger::log(Categories::TOADLET_RIBBIT,Logger::Level_ALERT,
-		"ALPlayer: Startup completed");
-
-	mStarted=true;
+		"created ALPlayer");
 
 	return true;
 }
 
-bool ALPlayer::shutdown(){
+bool ALPlayer::destroy(){
 	Logger::log(Categories::TOADLET_RIBBIT,Logger::Level_ALERT,
-		"ALPlayer: Shutdown started");
-	Logger::log(Categories::TOADLET_RIBBIT,Logger::Level_DEBUG,
-		"ALPlayer: Stopping thread");
+		"shutingdown ALPlayer");
 
 	mStopThread=true;
 	if(mThread!=NULL){
@@ -219,10 +219,20 @@ bool ALPlayer::shutdown(){
 		mThread=NULL;
 	}
 
-	Logger::log(Categories::TOADLET_RIBBIT,Logger::Level_ALERT,
-		"ALPlayer: Thread stopped");
+	int i;
+	for(i=0;i<mAudios.size();++i){
+		mAudios[i]->mAudioPlayer=NULL;
+	}
+	#if defined(TOADLET_PLATFORM_OSX)
+		for(i=0;i<mCoreAudios.size();++i){
+			mCoreAudios[i]->mAudioPlayer=NULL;
+		}
+	#endif
 
-	alDeleteSources(mAllSources.size(),&mAllSources[0]);
+	if(mAllSources.size()>0){
+		alDeleteSources(mAllSources.size(),&mAllSources[0]);
+		mAllSources.clear();
+	}
 
 	if(mContext!=NULL){
 		alcDestroyContext(mContext);
@@ -234,137 +244,26 @@ bool ALPlayer::shutdown(){
 		mDevice=NULL;
 	}
 
-	int i;
-	for(i=0;i<mAudioPeers.size();++i){
-		mAudioPeers[i]->internal_playerShutdown();
-	}
-	#if defined(TOADLET_PLATFORM_OSX)
-		for(i=0;i<mCoreAudioPeers.size();++i){
-			mCoreAudioPeers[i]->internal_playerShutdown();
-		}
-	#endif
-
 	Logger::log(Categories::TOADLET_RIBBIT,Logger::Level_ALERT,
-		"ALPlayer: Shutdown completed");
-
-	mStarted=false;
+		"shutdown ALPlayer");
 
 	return true;
 }
 
-AudioBufferPeer *ALPlayer::createAudioBufferPeer(AudioBuffer *audioBuffer){
-	AudioStream::ptr decoder=startAudioStream(audioBuffer->getInputStream(),audioBuffer->getMimeType());
-
-	if(decoder==NULL){
-		return NULL;
-	}
-
-	#if defined(TOADLET_PLATFORM_OSX)
-		if(((CoreAudioDecoder*)decoder.get())->isVariableBitRate()){
-			Error::unknown(Categories::TOADLET_RIBBIT,
-				"Variable bit rate streams not supported as Audio Buffers");
-			return NULL;
-		}
-	#endif
-
-	char *buffer=0;
-	int length=0;
-	int channels=decoder->getChannels();
-	int sps=decoder->getSamplesPerSecond();
-	int bps=decoder->getBitsPerSample();
-
-	decodeStream(decoder,buffer,length);
-
-	audioBuffer->setStream(NULL,NULL);
-
-	ALenum format=getALFormat(bps,channels);
-
-	// Lets us programatically reduce popping on some platforms
-	if(mBufferFadeInTime>0){
-		int stf=sps*mBufferFadeInTime/1000;
-		int ns=length/channels/(bps/8);
-		if(stf>ns){stf=ns;}
-		int sampsize=channels*(bps/8);
-
-		int i,j;
-		for(i=0;i<stf;++i){
-			for(j=0;j<sampsize;++j){
-				buffer[i*sampsize+j]=(char)(((int)buffer[i*sampsize+j])*i/stf);
-			}
-		}
-	}
-	
-	ALAudioBufferPeer *peer=new ALAudioBufferPeer(format,sps,buffer,length);
-	if(peer->ownsBuffer()==false){
-		delete[] buffer;
-	}
-
-	return peer;
+AudioBuffer *ALPlayer::createAudioBuffer(){
+	return new ALAudioBuffer(this);
 }
 
-AudioPeer *ALPlayer::createBufferedAudioPeer(Audio *audio,AudioBuffer::ptr buffer){
-	lock();
-
-	ALAudioPeer *peer=new ALAudioPeer(this);
-
-	if(mSourcePool.size()>0){
-		peer->setSourceHandle(mSourcePool[0]);
-		mSourcePool.remove(0);
-		mAudioPeers.add(peer);
-	}
-	else{
-		peer->setSourceHandle(0);
-	}
-
-	unlock();
-
-	// Reset the gain so it takes into account the group gain
-	peer->setGain(peer->getGain());
-
-	peer->loadAudioBuffer(buffer);
-
-	return peer;
+Audio *ALPlayer::createBufferedAudio(){
+	return new ALAudio(this);
 }
 
-AudioPeer *ALPlayer::createStreamingAudioPeer(Audio *audio,InputStream::ptr in,const String &mimeType){
-	AudioStream::ptr decoder=startAudioStream(in,mimeType);
-
-	if(decoder==NULL){
-		return NULL;
-	}
-
+Audio *ALPlayer::createStreamingAudio(){
 	#if defined(TOADLET_PLATFORM_OSX)
-		if(((CoreAudioDecoder*)decoder.get())->isVariableBitRate()){
-			CoreAudioPeer *peer=new CoreAudioPeer(this);
-
-			lock();
-			mCoreAudioPeers.add(peer);
-			unlock();
-
-			peer->loadAudioStream(decoder);
-
-			return peer;
-		}
+		return new CoreAudio(this);
+	#else
+		return new ALAudio(this);
 	#endif
-
-	lock();
-
-	ALAudioPeer *peer=new ALAudioPeer(this);
-
-	if(mSourcePool.size()>0){
-		peer->setSourceHandle(mSourcePool[0]);
-		mSourcePool.remove(0);
-		mAudioPeers.add(peer);
-	}
-	else{
-		peer->setSourceHandle(0);
-	}
-
-	unlock();
-
-	peer->loadAudioStream(decoder);
-
-	return peer;
 }
 
 void ALPlayer::suspend(){
@@ -388,14 +287,14 @@ void ALPlayer::run(){
 		uint64 diff=curTime-startTime;
 		if(diff>=dt){
 			lock();
-			for(i=0;i<mAudioPeers.size();++i){
-				update(mAudioPeers[i],dt);
-			}
-			#if defined(TOADLET_PLATFORM_OSX)
-				for(i=0;i<mCoreAudioPeers.size();++i){
-					update(mCoreAudioPeers[i],dt);
+				for(i=0;i<mAudios.size();++i){
+					mAudios[i]->update(dt);
 				}
-			#endif
+				#if defined(TOADLET_PLATFORM_OSX)
+					for(i=0;i<mCoreAudios.size();++i){
+						mCoreAudios[i]->update(dt);
+					}
+				#endif
 			unlock();
 			// I realize that this won't correctly keep count of the 'extra' chunks of time
 			// in an update, but doing that is unnecessary for audio at least
@@ -403,155 +302,6 @@ void ALPlayer::run(){
 		}
 		System::msleep(10);
 	}
-}
-
-void ALPlayer::update(ALAudioPeer *audioPeer,int dt){
-	scalar fdt=Math::fromMilli(dt);
-
-	scalar gain=audioPeer->getGain();
-	scalar target=audioPeer->getTargetGain();
-	scalar speed=audioPeer->getFadeTime();
-	if(gain!=target){
-		speed=Math::mul(speed,fdt);
-		if(gain<target){
-			gain+=speed;
-			if(gain>target){
-				gain=target;
-			}
-		}
-		else{
-			gain-=speed;
-			if(gain<target){
-				gain=target;
-			}
-		}
-
-		audioPeer->internal_setGain(gain);
-	}
-
-	if(audioPeer->getStream()){
-		unsigned char buffer[bufferSize];
-		ALenum format=getALFormat(audioPeer->getStream()->getBitsPerSample(),audioPeer->getStream()->getChannels());
-		int total=0;
-		if(audioPeer->getStreamingBuffers()==NULL){
-			audioPeer->setStreamingBuffers(new unsigned int[numBuffers]);
-			alGenBuffers(numBuffers,audioPeer->getStreamingBuffers());
-			TOADLET_CHECK_ALERROR("update::alGenBuffers");
-
-			int i;
-			for(i=0;i<numBuffers;++i){
-				int amount=readAudioData(audioPeer,buffer,bufferSize);
-				total=total+amount;
-				alBufferData(audioPeer->getStreamingBuffers()[i],format,buffer,amount,audioPeer->getStream()->getSamplesPerSecond());
-				TOADLET_CHECK_ALERROR("update::alBufferData");
-			}
-			if(total==0){
-				Error::unknown(Categories::TOADLET_RIBBIT,
-					"ALPlayer: Bad audio stream");
-				return;
-			}
-
-			audioPeer->setTotalBuffersPlayed(numBuffers);
-
-			alSourceQueueBuffers(audioPeer->getSourceHandle(),numBuffers,audioPeer->getStreamingBuffers());
-			TOADLET_CHECK_ALERROR("update::alSourceQueueBuffers");
-
-			alSourcePlay(audioPeer->getSourceHandle());
-			TOADLET_CHECK_ALERROR("update::alSourcePlay");
-		}
-		else{
-			int processed=0;
-
-			alGetSourcei(audioPeer->getSourceHandle(),AL_BUFFERS_PROCESSED,&processed);
-			TOADLET_CHECK_ALERROR("update::alGetSourcei");
-
-			if(audioPeer->getTotalBuffersPlayed()>processed && processed>0){
-				unsigned char buffer[bufferSize];
-
-				int i;
-				for(i=(audioPeer->getTotalBuffersPlayed()-processed);i<audioPeer->getTotalBuffersPlayed();++i){
-					unsigned int bufferID=audioPeer->getStreamingBuffers()[i % numBuffers];
-					
-					alSourceUnqueueBuffers(audioPeer->getSourceHandle(),1,&bufferID);
-					TOADLET_CHECK_ALERROR("update::alSourceUnqueueBuffers");
-
-					int amount=readAudioData(audioPeer,buffer,bufferSize);
-					total=total+amount;
-					if(amount>0){
-						alBufferData(bufferID,format,buffer,amount,audioPeer->getStream()->getSamplesPerSecond());
-						TOADLET_CHECK_ALERROR("update::alBufferData");
-						alSourceQueueBuffers(audioPeer->getSourceHandle(),1,&bufferID);
-						TOADLET_CHECK_ALERROR("update::alSourceQueueBuffers");
-					}
-				}
-			}
-
-			audioPeer->setTotalBuffersPlayed(audioPeer->getTotalBuffersPlayed() + processed);
-
-			if(processed>=numBuffers){
-				alSourcePlay(audioPeer->getSourceHandle());
-				TOADLET_CHECK_ALERROR("update::alSourcePlay");
-			}
-			else if(processed>0 && total==0){
-				alSourceStop(audioPeer->getSourceHandle());
-				TOADLET_CHECK_ALERROR("update::alSourceStop");
-				alDeleteBuffers(numBuffers,audioPeer->getStreamingBuffers());
-				TOADLET_CHECK_ALERROR("update::alDeleteBuffers");
-
-				delete[] audioPeer->getStreamingBuffers();
-				audioPeer->setStreamingBuffers(NULL);
-
-				audioPeer->setStream(NULL);
-			}
-		}
-	}
-}
-
-#if defined(TOADLET_PLATFORM_OSX)
-void ALPlayer::update(CoreAudioPeer *audioPeer,int dt){
-	scalar fdt=Math::fromMilli(dt);
-
-	scalar gain=audioPeer->getGain();
-	scalar target=audioPeer->getTargetGain();
-	scalar speed=audioPeer->getFadeTime();
-	if(gain!=target){
-		speed=Math::mul(speed,fdt);
-		if(gain<target){
-			gain+=speed;
-			if(gain>target){
-				gain=target;
-			}
-		}
-		else{
-			gain-=speed;
-			if(gain<target){
-				gain=target;
-			}
-		}
-
-		audioPeer->internal_setGain(gain);
-	}
-}
-#endif
-
-int ALPlayer::readAudioData(ALAudioPeer *peer,unsigned char *buffer,int bsize){
-	int amount=peer->getStream()->read((char*)buffer,bsize);
-	if(amount==0 && peer->getLooping()){
-		peer->getStream()->reset();
-		amount=peer->getStream()->read((char*)buffer,bsize);
-	}
-
-	#if !defined(TOADLET_NATIVE_FORMAT)
-		if(peer->getStream()->getBitsPerSample()==16){
-			int j=0;
-			while(j<amount){
-				littleInt16InPlace((int16&)buffer[j]);
-				j+=2;
-			}
-		}
-	#endif
-
-	return amount;
 }
 
 void ALPlayer::decodeStream(AudioStream *decoder,char *&finalBuffer,int &finalLength){
@@ -708,55 +458,6 @@ void ALPlayer::setListenerGain(scalar gain){
 	TOADLET_CHECK_ALERROR("setListenerGain");
 }
 
-void ALPlayer::setGroupGain(const String &group,scalar gain){
-	lock();
-	mGainGroup[group]=gain;
-	unlock();
-	int i;
-	for(i=0;i<mAudioPeers.size();i++){
-		if(mAudioPeers[i]->getGroup()==group){
-			// Update the Audio's gain with respect to the group
-			mAudioPeers[i]->setGroup(group); 
-		}
-	}
-
-	TOADLET_CHECK_ALERROR("setGroupGain");
-}
-
-void ALPlayer::removeGroup(const String &group){
-	lock();
-	Map<String,scalar>::iterator it=mGainGroup.find(group);
-	if(it!=mGainGroup.end()){
-		mGainGroup.erase(it);
-	}
-	unlock();
-	int i;
-	for(i=0;i<mAudioPeers.size();i++){
-		if(mAudioPeers[i]->getGroup()==group){
-			// Reset the Audio's gain with respect to this group
-			mAudioPeers[i]->setGroup(group);
-		}
-	}
-	
-	TOADLET_CHECK_ALERROR("removeGroup");
-}
-
-scalar ALPlayer::getGroupGain(const String &group){
-	scalar gain=Math::ONE;
-	lock();
-	gain=internal_getGroupGain(group);
-	unlock();
-	return gain;
-}
-
-scalar ALPlayer::internal_getGroupGain(const String &group){
-	Map<String,scalar>::iterator it=mGainGroup.find(group);
-	if(it!=mGainGroup.end()){
-		return it->second;
-	}
-	return Math::ONE;
-}
-
 void ALPlayer::setDopplerFactor(scalar factor){
 	alDopplerFactor(factor);
 
@@ -783,34 +484,19 @@ const CapabilitySet &ALPlayer::getCapabilitySet(){
 	return mCapabilitySet;
 }
 
-void ALPlayer::internal_audioPeerDestroy(ALAudioPeer *audioPeer){
-	lock();
+ALuint ALPlayer::checkoutSourceHandle(ALAudio *audio){
+	mAudios.add(audio);
 
-	if(audioPeer!=NULL && audioPeer->getSourceHandle()){
-		int source=audioPeer->getSourceHandle();
-		if(alIsSource(source)){
-			alSourceStop(source);
-			alSourcei(source,AL_BUFFER,0);
-		}
-		mSourcePool.add(source);
-	}
-
-	mAudioPeers.remove(audioPeer);
-
-	unlock();
-
-	TOADLET_CHECK_ALERROR("internal_audioPeerDestroy");
+	ALuint handle=mSourcePool[0];
+	mSourcePool.removeAt(0);
+	return handle;
 }
 
-#if defined(TOADLET_PLATFORM_OSX)
-void ALPlayer::internal_audioPeerDestroy(CoreAudioPeer *audioPeer){
-	lock();
+void ALPlayer::checkinSourceHandle(ALAudio *audio,ALuint source){
+	mSourcePool.add(source);
 
-	mCoreAudioPeers.remove(audioPeer);
-
-	unlock();
+	mAudios.remove(audio);
 }
-#endif
 
 }
 }

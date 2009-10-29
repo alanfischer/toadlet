@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "Win32AudioPeer.h"
-#include "Win32AudioBufferPeer.h"
+#include "Win32Audio.h"
+#include "Win32AudioBuffer.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/MathConversion.h>
@@ -34,7 +34,7 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace ribbit{
 
-Win32AudioPeer::Win32AudioPeer(Win32Player *player):
+Win32Audio::Win32Audio(Win32Player *player):
 	mPlayer(NULL),
 	//mAudioBuffer,
 	mPitch(Math::ONE)
@@ -42,33 +42,41 @@ Win32AudioPeer::Win32AudioPeer(Win32Player *player):
 	mPlayer=player;
 }
 
-Win32AudioPeer::~Win32AudioPeer(){
+Win32Audio::~Win32Audio(){
+	destroy();
 }
 
-bool Win32AudioPeer::loadAudioBuffer(AudioBuffer::ptr audioBuffer){
-	Win32AudioBufferPeer *audioBufferPeer=(Win32AudioBufferPeer*)audioBuffer->internal_getAudioBufferPeer();
-	if(audioBufferPeer!=NULL){
-		mAudioBuffer=audioBuffer;
-	}
+bool Win32Audio::create(AudioBuffer::ptr audioBuffer){
+	destroy();
 
+	mPlayer->internal_audioCreate(this);
+	mAudioBuffer=audioBuffer;
 	return true;
 }
 
-bool Win32AudioPeer::loadAudioStream(egg::io::InputStream::ptr in,const egg::String &mimeType){
+bool Win32Audio::create(egg::io::InputStream::ptr in,const egg::String &mimeType){
+	destroy();
+
 	return false;
 }
 
-bool Win32AudioPeer::play(){
+bool Win32Audio::destroy(){
+	mPlayer->internal_audioDestroy(this);
+	return true;
+}
+
+bool Win32Audio::play(){
 	if(mAudioBuffer==NULL || !mPlayer->canPlaySound()){
 		return false;
 	}
+
+	Win32AudioBuffer *audioBuffer=((Win32AudioBuffer*)mAudioBuffer->getRootAudioBuffer());
 
 	stop();
 
 	HRESULT hr=waveOutSetPitch(mPlayer->getWaveOut(),MathConversion::scalarToFixed(mPitch));
 
-	Win32AudioBufferPeer *audioBufferPeer=(Win32AudioBufferPeer*)mAudioBuffer->internal_getAudioBufferPeer();
-	hr=waveOutWrite(mPlayer->getWaveOut(),&audioBufferPeer->waveHDR,sizeof(WAVEHDR)); 
+	hr=waveOutWrite(mPlayer->getWaveOut(),audioBuffer->getLPWAVEHDR(),sizeof(WAVEHDR)); 
 	if(hr!=MMSYSERR_NOERROR){
 		Error::unknown(Categories::TOADLET_RIBBIT,
 			"error in waveOutWrite");
@@ -76,20 +84,16 @@ bool Win32AudioPeer::play(){
 	}
 
 	// We'll just use a set time of 400 ms between allowed sounds, otherwise it gets too quiet
-	//  Alternatly, we could use audioBufferPeer->time, which would be the whole sound time
+	//  Alternatly, we could use audioBuffer->time, which would be the whole sound time
 	mPlayer->playedSound(400);
 
 	return true;
 }
 
-bool Win32AudioPeer::stop(){
+bool Win32Audio::stop(){
 	waveOutReset(mPlayer->getWaveOut());
 
 	return true;
-}
-
-void Win32AudioPeer::internal_playerDestroy(){
-	mPlayer=NULL;
 }
 
 }

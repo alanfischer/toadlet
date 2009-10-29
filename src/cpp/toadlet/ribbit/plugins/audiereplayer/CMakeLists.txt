@@ -1,14 +1,14 @@
 # Source files for toadlet_ribbit_audiereplayer
 set (RIBBIT_AUDIEREPLAYER_SRC
-	AudiereAudioPeer.cpp
+	AudiereAudio.cpp
 	AudierePlayer.cpp
 )
 
 
 # Headers
 set (RIBBIT_AUDIEREPLAYER_HEADERS
-	AudiereAudioBufferPeer.h
-	AudiereAudioPeer.h
+	AudiereAudioBuffer.h
+	AudiereAudio.h
 	AudierePlayer.h
 )
 
