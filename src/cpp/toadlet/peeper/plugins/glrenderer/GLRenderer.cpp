@@ -56,8 +56,10 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-extern bool GLPBufferSurfaceRenderTarget_available(GLRenderer *renderer);
-extern SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer);
+#if defined(TOADLET_HAS_GLPBUFFERS)
+	extern bool GLPBufferSurfaceRenderTarget_available(GLRenderer *renderer);
+	extern SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer);
+#endif
 
 TOADLET_C_API Renderer* new_GLRenderer(){
 	return new GLRenderer();
@@ -232,7 +234,11 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 	}
 	mCapabilitySet.maxLights=maxLights;
 
-	mPBuffersAvailable=usePBuffers && GLPBufferSurfaceRenderTarget_available(this);
+	#if defined(TOADLET_HAS_GLPBUFFERS)
+		mPBuffersAvailable=usePBuffers && GLPBufferSurfaceRenderTarget_available(this);
+	#else
+		mPBuffersAvailable=false;
+	#endif
 	#if defined(TOADLET_HAS_GLFBOS)
 		mFBOsAvailable=useFBOs && GLFBOSurfaceRenderTarget::available(this);
 	#else
@@ -323,12 +329,12 @@ SurfaceRenderTarget *GLRenderer::createSurfaceRenderTarget(){
 			return new GLFBOSurfaceRenderTarget(this);
 		}
 	#endif
-	if(mPBuffersAvailable){
-		return new_GLPBufferSurfaceRenderTarget(this);
-	}
-	else{
-		return NULL;
-	}
+	#if defined(TOADLET_HAS_GLPBUFFERS)
+		if(mPBuffersAvailable){
+			return new_GLPBufferSurfaceRenderTarget(this);
+		}
+	#endif
+	return NULL;
 }
 
 BufferPeer *GLRenderer::createBufferPeer(Buffer *buffer){
@@ -882,11 +888,9 @@ void GLRenderer::setFaceCulling(const FaceCulling &faceCulling){
 	}
 	else{
 		switch(faceCulling){
-			case FaceCulling_CCW:
 			case FaceCulling_FRONT:
 				glCullFace(mMirrorY?GL_BACK:GL_FRONT);
 			break;
-			case FaceCulling_CW:
 			case FaceCulling_BACK:
 				glCullFace(mMirrorY?GL_FRONT:GL_BACK);
 			break;
@@ -1245,7 +1249,7 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 				mLastTextures[stage]=texture;
 			}
 
-			if(textureStage->getTextureMatrixIdentity()==false || (gltexture->mUsageFlags&Texture::UsageFlags_NPOT_RESTRICTED)>0){
+			if(textureStage->getTextureMatrixIdentity()==false || (gltexture->mUsageFlags&(Texture::UsageFlags_NPOT_RESTRICTED|Texture::UsageFlags_RENDERTARGET))>0){
 				if(mMatrixMode!=GL_TEXTURE){
 					mMatrixMode=GL_TEXTURE;
 					glMatrixMode(mMatrixMode);

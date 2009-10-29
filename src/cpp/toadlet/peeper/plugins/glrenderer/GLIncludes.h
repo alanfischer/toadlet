@@ -227,6 +227,10 @@
 	#endif
 #endif
 
+#if defined(TOADLET_PLATFORM_WIN32) || defined(TOADLET_PLATFORM_WINCE) || \
+	(defined(TOADLET_PLATFORM_POSIX) && !defined(TOADLET_PLATFORM_OSX) && !defined(TOADLET_PLATFORM_IPHONE))
+	#define TOADLET_HAS_GLPBUFFERS
+#endif
 #if defined(TOADLET_HAS_GLEW) || defined(TOADLET_HAS_EAGL)
 	#define TOADLET_HAS_GLFBOS
 #endif

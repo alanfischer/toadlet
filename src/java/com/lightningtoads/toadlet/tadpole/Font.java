@@ -160,6 +160,12 @@ public class Font implements Resource{
 					vba.setABGR(i4+3,colorElement,abgr);
 				}
 			}
+			else{
+				vba.set3(i4+0,positionElement,0,0,0);
+				vba.set3(i4+1,positionElement,0,0,0);
+				vba.set3(i4+2,positionElement,0,0,0);
+				vba.set3(i4+3,positionElement,0,0,0);
+			}
 		}
 
 		// Zero out the rest of the vertex buffer

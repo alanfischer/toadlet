@@ -32,16 +32,16 @@ public:
 		quadVertexBuffer=VertexBuffer::ptr(new VertexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,4));
 		{
 			VertexBufferAccessor a(quadVertexBuffer,Buffer::LockType_WRITE_ONLY);
-			a.set3(0,0, -Math::ONE,Math::ONE,0);	a.set2(0,1, 0,Math::ONE);
-			a.set3(1,0, -Math::ONE,-Math::ONE,0);	a.set2(1,1, 0,0);
-			a.set3(2,0, Math::ONE,Math::ONE,0);		a.set2(2,1, Math::ONE,Math::ONE);
-			a.set3(3,0, Math::ONE,-Math::ONE,0);	a.set2(3,1, Math::ONE,0);
+			a.set3(0,0, -Math::ONE,Math::ONE,0);	a.set2(0,1, 0,0);
+			a.set3(1,0, -Math::ONE,-Math::ONE,0);	a.set2(1,1, 0,Math::ONE);
+			a.set3(2,0, Math::ONE,Math::ONE,0);		a.set2(2,1, Math::ONE,0);
+			a.set3(3,0, Math::ONE,-Math::ONE,0);	a.set2(3,1, Math::ONE,Math::ONE);
 		}
 		quadVertexData=VertexData::ptr(new VertexData(quadVertexBuffer));
 		quadIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,4));
 
 		renderTexture=Texture::ptr(getRenderer()->createTexture());
-		renderTexture->create(Texture::UsageFlags_RENDERTARGET,Texture::Dimension_D2,Texture::Format_RGB_8,256,256,0,0);
+		renderTexture->create(Texture::UsageFlags_RENDERTARGET,Texture::Dimension_D2,Texture::Format_RGB_5_6_5,256,256,0,0);
 
 		surfaceRenderTarget=SurfaceRenderTarget::ptr(getRenderer()->createSurfaceRenderTarget());
 		surfaceRenderTarget->create();

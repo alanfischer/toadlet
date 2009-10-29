@@ -109,7 +109,7 @@ bool EGLPBufferSurfaceRenderTarget::swap(){
 
 bool EGLPBufferSurfaceRenderTarget::remove(Surface::ptr surface){
 	// Unimplemented currently
-	return true;
+	return false;
 }
 
 bool EGLPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
@@ -123,11 +123,6 @@ bool EGLPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attac
 	}
 
 	createBuffer();
-
-	Matrix4x4 matrix;
-	Math::setMatrix4x4FromScale(matrix,Math::ONE,-Math::ONE,Math::ONE);
-	Math::setMatrix4x4FromTranslate(matrix,0,Math::ONE,0);
-	mTexture->setMatrix(matrix);
 
 	return true;
 }
@@ -196,7 +191,7 @@ bool EGLPBufferSurfaceRenderTarget::createBuffer(){
 	eglQuerySurface(mDisplay,mSurface,EGL_HEIGHT,(int*)&mHeight);
 	if(mWidth!=width || mHeight!=height){
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"EGLPBufferSurfaceRenderTarget::createBuffer: width or height not as expected");
+			"width or height not as expected");
 		return false;
 	}
 

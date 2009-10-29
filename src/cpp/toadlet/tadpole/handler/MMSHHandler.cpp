@@ -235,7 +235,12 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 					Material::ptr material(new Material());
 					sub->material=material;
 
+					material->setSaveLocally(true);
+
 					uint8 faceCulling=in->readUInt8();
+					if(faceCulling>Renderer::FaceCulling_BACK){
+						faceCulling=Renderer::FaceCulling_BACK;
+					}
 					material->setFaceCulling((Renderer::FaceCulling)faceCulling);
 
 					uint8 hasTexture=in->readUInt8();

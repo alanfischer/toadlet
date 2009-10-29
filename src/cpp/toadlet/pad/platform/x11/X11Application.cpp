@@ -23,11 +23,11 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/System.h>
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/System.h>
 #if defined(TOADLET_HAS_OPENGL)
 	#include <toadlet/peeper/plugins/glrenderer/GLRenderer.h>
-	#include <toadlet/peeper/plugins/glrenderer/platform/glx/GLXWindowRenderContextPeer.h>
+	#include <toadlet/peeper/plugins/glrenderer/platform/glx/GLXWindowRenderTarget.h>
 #endif
 #if defined(TOADLET_HAS_OPENAL)
 	#include <toadlet/ribbit/plugins/alplayer/ALPlayer.h>
@@ -83,6 +83,7 @@ X11Application::X11Application():
 
 	mEngine(NULL),
 	mRenderer(NULL),
+	mRendererOptions(NULL),
 	mAudioPlayer(NULL),
 
 	mRun(false),
@@ -96,33 +97,30 @@ X11Application::X11Application():
 }
 
 X11Application::~X11Application(){
+	delete[] mRendererOptions;
+
 	delete x11;
 }
 
 void X11Application::create(){
 	mEngine=new Engine();
 
-	#if defined(TOADLET_HAS_OPENAL)
-		mAudioPlayer=new ALPlayer();
-	#endif
-	if(mAudioPlayer!=NULL){
-		mAudioPlayer->startup(NULL);
-		mEngine->setAudioPlayer(mAudioPlayer);
-	}
+	createAudioPlayer();
+	createWindow();
+	activate();
 }
 
 void X11Application::destroy(){
-	if(mAudioPlayer!=NULL){
-		mEngine->setAudioPlayer(NULL);
-		mAudioPlayer->shutdown();
-		delete mAudioPlayer;
-		mAudioPlayer=NULL;
+	if(mDestroyed){
+		return;
 	}
 
-	destroyRendererAndContext();
+	mDestroyed=true;
 
+	deactivate();
 	destroyWindow();
-	
+	destroyAudioPlayer();
+
 	if(mEngine!=NULL){
 		delete mEngine;
 		mEngine=NULL;
@@ -130,8 +128,130 @@ void X11Application::destroy(){
 }
 
 bool X11Application::start(bool runEventLoop){
-	destroyWindow();
+	resized(mWidth,mHeight);
 
+	mRun=true;
+
+	uint64 lastTime=System::mtime();
+	while(runEventLoop && mRun){
+		stepEventLoop();
+
+		uint64 currentTime=System::mtime();
+		update(currentTime-lastTime);
+		if(mRenderer!=NULL){
+			render(mRenderer);
+		}
+		lastTime=currentTime;
+
+		System::msleep(10);
+	}
+
+	return true;
+}
+
+void X11Application::stepEventLoop(){
+	XEvent event;
+	KeySym key;
+
+	while(XPending(x11->mDisplay)){
+		XNextEvent(x11->mDisplay,&event);
+		switch(event.type){
+			case ClientMessage:
+				if(event.xclient.data.l[0]==x11->mDeleteWindow){
+					stop();
+					break;
+				}
+				break;
+			case DestroyNotify:
+				stop();
+				break;
+			case Expose:
+				break;
+			case FocusIn:
+				focusGained();
+				break;
+			case FocusOut:
+				focusLost();
+				break;
+			case ConfigureNotify:
+				configured(event.xconfigure.x,event.xconfigure.y,event.xconfigure.width,event.xconfigure.height);
+				break;
+			case KeyRelease:
+				key=XKeycodeToKeysym(x11->mDisplay,event.xkey.keycode,0);
+				keyReleased(translateKey(key));
+				break;
+			case KeyPress:
+				key=XKeycodeToKeysym(x11->mDisplay,event.xkey.keycode,0);
+				keyPressed(translateKey(key));
+				break;
+			case MotionNotify:
+				mouseMoved(event.xmotion.x,event.xmotion.y);
+				break;
+			case ButtonPress:
+				switch(event.xbutton.button){
+					case Button1:
+						mousePressed(event.xmotion.x,event.xmotion.y,0);
+						break;
+					case Button2:
+						mousePressed(event.xmotion.x,event.xmotion.y,1);
+						break;
+					case Button3:
+						mousePressed(event.xmotion.x,event.xmotion.y,2);
+						break;
+					case Button4:
+						mouseScrolled(event.xmotion.x,event.xmotion.y,1);
+						break;
+					case Button5:
+						mouseScrolled(event.xmotion.x,event.xmotion.y,-1);
+						break;
+				}
+				break;
+			case ButtonRelease:
+				switch(event.xbutton.button){
+					case Button1:
+						mouseReleased(event.xmotion.x,event.xmotion.y,0);
+						break;
+					case Button2:
+						mouseReleased(event.xmotion.x,event.xmotion.y,1);
+						break;
+					case Button3:
+						mouseReleased(event.xmotion.x,event.xmotion.y,2);
+						break;
+					case Button4:
+						break;
+					case Button5:
+						break;
+				}
+				break;
+		}
+	}
+}
+
+void X11Application::stop(){
+	mRun=false;
+}
+
+void X11Application::setAutoActivate(bool autoActivate){
+	mAutoActivate=autoActivate;
+}
+
+void X11Application::activate(){
+	if(mActive==false){
+		mActive=true;
+
+		createContextAndRenderer();
+	}
+}
+
+void X11Application::deactivate(){
+	if(mActive==true){
+		mActive=false;
+
+		destroyRendererAndContext();
+	}
+}
+
+bool X11Application::createWindow(){
 	x11->mDisplay=XOpenDisplay(getenv("DISPLAY"));
 	if(x11->mDisplay==None){
 		Error::unknown(Categories::TOADLET_PAD,
@@ -165,7 +285,7 @@ bool X11Application::start(bool runEventLoop){
 	#endif
 
 	#if !defined(TOADLET_PLATFORM_IRIX)
-		// Antialiasing should work with an nvidia card and nvidia glx
+		// Antialiasing should work with an nvidia card and nvidia glxvpenis
 		x11->mOriginalEnv.antialiasing = getenv("__GL_FSAA_MODE");
 		if(x11->mOriginalEnv.antialiasing==NULL){
 			if(mVisual.multisamples>1){
@@ -189,7 +309,6 @@ bool X11Application::start(bool runEventLoop){
 			}
 		}
 	#endif
-
 
 	XSetWindowAttributes attr;
 	unsigned long mask;
@@ -333,132 +452,7 @@ bool X11Application::start(bool runEventLoop){
 	x11->mDeleteWindow=XInternAtom(x11->mDisplay,"WM_DELETE_WINDOW",false);
 	XSetWMProtocols(x11->mDisplay,x11->mWindow,&x11->mDeleteWindow,1);
 
-	// If we set the width & height to zero, this should let the configured call trigger successfully
-	mWidth=0;
-	mHeight=0;
-
-	mActive=true;
-	mRun=true;
-
-	createContextAndRenderer();
-
-	uint64 lastTime=System::mtime();
-	while(runEventLoop && mRun){
-		stepEventLoop();
-
-		uint64 currentTime=System::mtime();
-		update(currentTime-lastTime);
-		if(mRenderer!=NULL){
-			render(mRenderer);
-		}
-		lastTime=currentTime;
-
-		System::msleep(10);
-	}
-
 	return true;
-}
-
-void X11Application::stepEventLoop(){
-	XEvent event;
-	KeySym key;
-
-	while(XPending(x11->mDisplay)){
-		XNextEvent(x11->mDisplay,&event);
-		switch(event.type){
-			case ClientMessage:
-				if(event.xclient.data.l[0]==x11->mDeleteWindow){
-					stop();
-					break;
-				}
-				break;
-			case DestroyNotify:
-				stop();
-				break;
-			case Expose:
-				break;
-			case FocusIn:
-				focusGained();
-				break;
-			case FocusOut:
-				focusLost();
-				break;
-			case ConfigureNotify:
-				configured(event.xconfigure.x,event.xconfigure.y,event.xconfigure.width,event.xconfigure.height);
-				break;
-			case KeyRelease:
-				key=XKeycodeToKeysym(x11->mDisplay,event.xkey.keycode,0);
-				keyReleased(translateKey(key));
-				break;
-			case KeyPress:
-				key=XKeycodeToKeysym(x11->mDisplay,event.xkey.keycode,0);
-				keyPressed(translateKey(key));
-				break;
-			case MotionNotify:
-				mouseMoved(event.xmotion.x,event.xmotion.y);
-				break;
-			case ButtonPress:
-				switch(event.xbutton.button){
-					case Button1:
-						mousePressed(event.xmotion.x,event.xmotion.y,0);
-						break;
-					case Button2:
-						mousePressed(event.xmotion.x,event.xmotion.y,1);
-						break;
-					case Button3:
-						mousePressed(event.xmotion.x,event.xmotion.y,2);
-						break;
-					case Button4:
-						mouseScrolled(event.xmotion.x,event.xmotion.y,1);
-						break;
-					case Button5:
-						mouseScrolled(event.xmotion.x,event.xmotion.y,-1);
-						break;
-				}
-				break;
-			case ButtonRelease:
-				switch(event.xbutton.button){
-					case Button1:
-						mouseReleased(event.xmotion.x,event.xmotion.y,0);
-						break;
-					case Button2:
-						mouseReleased(event.xmotion.x,event.xmotion.y,1);
-						break;
-					case Button3:
-						mouseReleased(event.xmotion.x,event.xmotion.y,2);
-						break;
-					case Button4:
-						break;
-					case Button5:
-						break;
-				}
-				break;
-		}
-	}
-}
-
-void X11Application::stop(){
-	mRun=false;
-}
-
-void X11Application::setAutoActivate(bool autoActivate){
-	mAutoActivate=autoActivate;
-}
-
-void X11Application::activate(){
-	if(mActive==false){
-		mActive=true;
-
-		createContextAndRenderer();
-	}
-}
-
-void X11Application::deactivate(){
-	if(mActive==true){
-		mActive=false;
-
-		destroyRendererAndContext();
-	}
 }
 
 void X11Application::destroyWindow(){
@@ -581,9 +575,9 @@ ApplicationListener *X11Application::getApplicationListener() const{
 	return mApplicationListener;
 }
 
-RenderTargetPeer *X11Application::makeRenderTargetPeer(){
+RenderTarget *X11Application::makeRenderTarget(){
 	#if defined(TOADLET_HAS_OPENGL)
-		return new GLXWindowRenderContextPeer(x11->mWindow,x11->mDisplay,x11->mVisualInfo);
+		return new GLXWindowRenderTarget(x11->mWindow,x11->mDisplay,x11->mVisualInfo);
 	#else
 		return NULL;
 	#endif
@@ -598,13 +592,13 @@ Renderer *X11Application::makeRenderer(){
 }
 
 bool X11Application::createContextAndRenderer(){
-	RenderTargetPeer *renderTargetPeer=makeRenderTargetPeer();
-	if(renderTargetPeer!=NULL){
-		internal_setRenderTargetPeer(renderTargetPeer,true);
+	RenderTarget *renderTarget=makeRenderTarget();
+	if(renderTarget!=NULL){
+		mRenderTarget=renderTarget;
 
 		mRenderer=makeRenderer();
 		if(mRenderer!=NULL){
-			if(mRenderer->startup(this,NULL)==false){
+			if(mRenderer->startup(this,mRendererOptions)==false){
 				delete mRenderer;
 				mRenderer=NULL;
 				Error::unknown(Categories::TOADLET_PAD,
@@ -619,16 +613,18 @@ bool X11Application::createContextAndRenderer(){
 		}
 
 		if(mRenderer==NULL){
-			internal_setRenderTargetPeer(NULL,false);
+			delete mRenderTarget;
+			mRenderTarget=NULL;
 		}
 	}
 	else{
 		Error::unknown(Categories::TOADLET_PAD,
-			"Error creating RenderTargetPeer");
+			"Error creating RenderTarget");
 		return false;
 	}
 
 	if(mRenderer!=NULL){
+		mRenderer->setRenderTarget(this);
 		mEngine->setRenderer(mRenderer);
 	}
 
@@ -644,8 +640,39 @@ bool X11Application::destroyRendererAndContext(){
 		mRenderer=NULL;
 	}
 
-	internal_setRenderTargetPeer(NULL,false);
+	if(mRenderTarget!=NULL){
+		delete mRenderTarget;
+		mRenderTarget=NULL;
+	}
 
+	return true;
+}
+
+bool X11Application::createAudioPlayer(){
+	#if defined(TOADLET_HAS_OPENAL)
+		mAudioPlayer=new ALPlayer();
+		bool result=false;
+		TOADLET_TRY
+			result=mAudioPlayer->startup(NULL);
+		TOADLET_CATCH(const Exception &){result=false;}
+		if(result=false){
+			delete mAudioPlayer;
+			mAudioPlayer=NULL;
+		}
+	#endif
+	if(mAudioPlayer!=NULL){
+		mEngine->setAudioPlayer(mAudioPlayer);
+	}
+	return true;
+}
+
+bool X11Application::destroyAudioPlayer(){
+	if(mAudioPlayer!=NULL){
+		mEngine->setAudioPlayer(NULL);
+		mAudioPlayer->shutdown();
+		delete mAudioPlayer;
+		mAudioPlayer=NULL;
+	}
 	return true;
 }
 
@@ -702,15 +729,15 @@ void X11Application::keyReleased(int key){
 	}
 }
 
-void X11Application::mouseMoved(int x,int y){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->mouseMoved(x,y);
-	}
-}
-
 void X11Application::mousePressed(int x,int y,int button){
 	if(mApplicationListener!=NULL){
 		mApplicationListener->mousePressed(x,y,button);
+	}
+}
+
+void X11Application::mouseMoved(int x,int y){
+	if(mApplicationListener!=NULL){
+		mApplicationListener->mouseMoved(x,y);
 	}
 }
 
@@ -736,6 +763,15 @@ void X11Application::render(Renderer *renderer){
 	if(mApplicationListener!=NULL){
 		mApplicationListener->render(renderer);
 	}
+}
+
+void X11Application::setRendererOptions(int *options,int length){
+	if(mRendererOptions!=NULL){
+		delete[] mRendererOptions;
+	}
+
+	mRendererOptions=new int[length];
+	memcpy(mRendererOptions,options,length*sizeof(int));
 }
 
 void *X11Application::getDisplay() const{return x11->mDisplay;}

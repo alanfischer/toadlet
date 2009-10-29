@@ -51,7 +51,8 @@ bool WGLPBufferSurfaceRenderTarget::available(GLRenderer *renderer){
 }
 
 WGLPBufferSurfaceRenderTarget::WGLPBufferSurfaceRenderTarget(GLRenderer *renderer):WGLRenderTarget(),
-	//mSurface,
+	mRenderer(NULL),
+	mTexture(NULL),
 	mPBuffer(NULL),
 	mWidth(0),
 	mHeight(0),
@@ -114,7 +115,7 @@ bool WGLPBufferSurfaceRenderTarget::swap(){
 
 bool WGLPBufferSurfaceRenderTarget::remove(Surface::ptr surface){
 	// Unimplemented currently
-	return true;
+	return false;
 }
 
 bool WGLPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
@@ -129,6 +130,11 @@ bool WGLPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attac
 
 	createBuffer();
 
+	Matrix4x4 matrix;
+	Math::setMatrix4x4FromScale(matrix,Math::ONE,-Math::ONE,Math::ONE);
+	Math::setMatrix4x4FromTranslate(matrix,0,Math::ONE,0);
+	mTexture->setMatrix(matrix);
+
 	return true;
 }
 
@@ -142,7 +148,7 @@ bool WGLPBufferSurfaceRenderTarget::createBuffer(){
 	HGLRC context=wglGetCurrentContext();
 
 	int bindType=WGL_BIND_TO_TEXTURE_RGB_ARB;
-    int pixelType=WGL_TYPE_RGBA_ARB;
+	int pixelType=WGL_TYPE_RGBA_ARB;
 	int texFormat=WGL_TEXTURE_RGB_ARB;
 
 	int format=mTexture->getFormat();
@@ -179,7 +185,7 @@ bool WGLPBufferSurfaceRenderTarget::createBuffer(){
 
 	if(count==0){
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"WGLPBufferRenderTexturePeer::createBuffer: wglChoosePixelFormatARB() failed");
+			"wglChoosePixelFormatARB() failed");
 		return false;
 	}
 
@@ -193,14 +199,14 @@ bool WGLPBufferSurfaceRenderTarget::createBuffer(){
 	wglGetPixelFormatAttribivARB(hdc,wglformat,0,sizeof(piAttributes)/sizeof(const int),piAttributes,piValues);
 
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
-		String("WGLPBufferRenderTexturePeer: Format RGBA=")+
+		String("Format RGBA=")+
 		piValues[0] + "," + piValues[1] + "," + piValues[2] + "," + piValues[3] + " Depth=" +
 		piValues[4] + " Stencil=" + piValues[5] + " Width=" + width + " Height=" + height);
 	
 	mPBuffer=wglCreatePbufferARB(hdc,wglformat,width,height,pAttributes);
 	if(!mPBuffer){
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"WGLPBufferRenderTexturePeer::createBuffer: wglCreatePbufferARB() failed");
+			"wglCreatePbufferARB() failed");
 		return false;
 	}
 
@@ -208,7 +214,7 @@ bool WGLPBufferSurfaceRenderTarget::createBuffer(){
 	if(!mDC){
 		destroyBuffer();
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"WGLPBufferRenderTexturePeer::createBuffer: wglGetPbufferDCARB() failed");
+			"wglGetPbufferDCARB() failed");
 		return false;
 	}
 		
@@ -216,14 +222,14 @@ bool WGLPBufferSurfaceRenderTarget::createBuffer(){
 	if(!mGLRC){
 		destroyBuffer();
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"WGLPBufferRenderTexturePeer::createBuffer: wglCreateContext() failed");
+			"wglCreateContext() failed");
 		return false;
 	}
 
 	if(!wglShareLists(context,mGLRC)){
 		destroyBuffer();
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"WGLPBufferRenderTexturePeer::createBuffer: wglShareLists() failed");
+			"wglShareLists() failed");
 		return false;
 	}
 
@@ -231,7 +237,7 @@ bool WGLPBufferSurfaceRenderTarget::createBuffer(){
 	wglQueryPbufferARB(mPBuffer,WGL_PBUFFER_HEIGHT_ARB,(int*)&mHeight);
 	if(mWidth!=width || mHeight!=height){
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"WGLPBufferRenderTexturePeer::createBuffer: width or height not as expected");
+			"width or height not as expected");
 		return false;
 	}
 

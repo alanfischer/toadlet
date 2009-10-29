@@ -241,8 +241,6 @@ void GLTexture::generateMipLevels(){
 }
 
 GLuint GLTexture::getGLTarget(){
-	const CapabilitySet &capabilitySet=mRenderer->getCapabilitySet();
-
 	switch(mDimension){
 		#if !defined(TOADLET_HAS_GLES)
 			case Texture::Dimension_D1:
