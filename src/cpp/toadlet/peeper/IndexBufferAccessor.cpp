@@ -38,24 +38,24 @@ IndexBufferAccessor::IndexBufferAccessor():
 {
 }
 
-IndexBufferAccessor::IndexBufferAccessor(IndexBuffer *indexBuffer,Buffer::LockType lockType):
+IndexBufferAccessor::IndexBufferAccessor(IndexBuffer *indexBuffer,Buffer::AccessType accessType):
 	mIndexBuffer(NULL),
 	mIndexFormat(IndexBuffer::IndexFormat_UINT_8),
 	mData(NULL)
 {
-	lock(indexBuffer,lockType);
+	lock(indexBuffer,accessType);
 }
 
 IndexBufferAccessor::~IndexBufferAccessor(){
 	unlock();
 }
 
-void IndexBufferAccessor::lock(IndexBuffer *indexBuffer,Buffer::LockType lockType){
+void IndexBufferAccessor::lock(IndexBuffer *indexBuffer,Buffer::AccessType accessType){
 	unlock();
 
 	mIndexBuffer=indexBuffer;
 	mIndexFormat=mIndexBuffer->getIndexFormat();
-	mData=mIndexBuffer->lock(lockType);
+	mData=mIndexBuffer->lock(accessType);
 }
 
 void IndexBufferAccessor::unlock(){

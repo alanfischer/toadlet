@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_D3D9VERTEXBUFFERPEER_H
-#define TOADLET_PEEPER_D3D9VERTEXBUFFERPEER_H
+#ifndef TOADLET_PEEPER_D3D9VERTEXBUFFER_H
+#define TOADLET_PEEPER_D3D9VERTEXBUFFER_H
 
 #include "D3D9Includes.h"
 #include <toadlet/peeper/VertexBuffer.h>
@@ -35,31 +35,44 @@ namespace peeper{
 
 class D3D9Renderer;
 
-class TOADLET_API D3D9VertexBufferPeer:public BufferPeer{
+class TOADLET_API D3D9VertexBuffer:public VertexBuffer{
 public:
-	D3D9VertexBufferPeer(D3D9Renderer *renderer,VertexBuffer *buffer);
+	D3D9VertexBuffer(D3D9Renderer *renderer);
+	virtual ~D3D9VertexBuffer();
 
-	virtual ~D3D9VertexBufferPeer();
+	VertexBuffer *getRootVertexBuffer(){return this;}
 
-	uint8 *lock(Buffer::LockType lockType);
+	// Lifecycle
+	virtual bool create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size);
+	virtual bool destroy();
 
-	bool unlock();
+	virtual int getUsageFlags() const{return mUsageFlags;}
+	virtual AccessType getAccessType() const{return mAccessType;}
+	virtual int getDataSize() const{return mDataSize;}
+	virtual VertexFormat::ptr getVertexFormat(){return mVertexFormat;}
+	virtual int getSize() const{return mSize;}
 
-	bool supportsRead(){return true;}
+	virtual uint8 *lock(AccessType accessType);
+	virtual bool unlock();
 
-	inline bool isValid() const{return vertexBuffer!=NULL;}
+protected:
+	static DWORD getFVF(VertexFormat *vertexFormat,egg::Collection<VertexElement> *colorElements);
 
-	static DWORD getFVF(VertexBuffer *buffer,egg::Collection<VertexElement> *colorElements);
+	D3D9Renderer *mRenderer;
 
-	Buffer::UsageType usageType;
-	IDirect3DVertexBuffer9 *vertexBuffer;
-	DWORD fvf;
-	uint8 *data;
+	int mUsageFlags;
+	AccessType mAccessType;
+	VertexFormat::ptr mVertexFormat;
+	int mSize;
+	short mVertexSize;
+	int mDataSize;
 
-	Buffer::LockType lockType;
-	int size;
-	short vertexSize;
-	egg::Collection<VertexElement> colorElements;
+	IDirect3DVertexBuffer9 *mVertexBuffer;
+	DWORD mFVF;
+	egg::Collection<VertexElement> mColorElements;
+
+	uint8 *mData;
+	AccessType mLockType;
 };
 
 }

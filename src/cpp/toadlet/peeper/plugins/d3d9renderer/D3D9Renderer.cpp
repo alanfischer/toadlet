@@ -27,8 +27,8 @@
 #include "D3D9Texture.h"
 #include "D3D9RenderTarget.h"
 #include "D3D9SurfaceRenderTarget.h"
-#include "D3D9VertexBufferPeer.h"
-#include "D3D9IndexBufferPeer.h"
+#include "D3D9VertexBuffer.h"
+#include "D3D9IndexBuffer.h"
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/LightEffect.h>

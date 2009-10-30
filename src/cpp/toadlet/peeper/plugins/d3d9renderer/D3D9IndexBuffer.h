@@ -23,45 +23,43 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/peeper/Shader.h>
-#include <toadlet/egg/Logger.h>
+#ifndef TOADLET_PEEPER_D3D9INDEXBUFFER_H
+#define TOADLET_PEEPER_D3D9INDEXBUFFER_H
 
-using namespace toadlet::egg;
+#include "D3D9Includes.h"
+#include <toadlet/peeper/IndexBuffer.h>
 
 namespace toadlet{
 namespace peeper{
 
-Shader::Shader(Type type,Language language){
-	mType=type;
-	mLanguage=language;
+class D3D9Renderer;
 
-	mShaderPeer=NULL;
-	mOwnsShaderPeer=false;
-}
+class TOADLET_API D3D9IndexBuffer:public IndexBuffer{
+public:
+	D3D9IndexBuffer(D3D9Renderer *renderer,IndexBuffer *buffer);
 
-Shader::Shader(Renderer *renderer,Type type,Language language){
-	mType=type;
-	mLanguage=language;
+	virtual ~D3D9IndexBuffer();
 
-	mShaderPeer=renderer->createShaderPeer(this);
-	mOwnsShaderPeer=true;
-}
+	uint8 *lock(Buffer::LockType lockType);
 
-Shader::~Shader(){
-	internal_setShaderPeer(NULL,false);
-}
+	bool unlock();
 
-void Shader::addCode(const String &string){
-	mCode=mCode+string;
-}
+	bool supportsRead(){return true;}
 
-void Shader::internal_setShaderPeer(ShaderPeer *shaderPeer,bool own){
-	if(mOwnsShaderPeer && mShaderPeer!=NULL){
-		delete mShaderPeer;
-	}
-	mShaderPeer=shaderPeer;
-	mOwnsShaderPeer=own;
-}
+	inline bool isValid() const{return indexBuffer!=NULL;}
+
+	static D3DFORMAT getD3DFORMAT(IndexBuffer::IndexFormat format);
+
+	Buffer::UsageType usageType;
+	IDirect3DIndexBuffer9 *indexBuffer;
+	uint8 *data;
+
+	Buffer::LockType lockType;
+	int size;
+	IndexBuffer::IndexFormat format;
+};
 
 }
 }
+
+#endif

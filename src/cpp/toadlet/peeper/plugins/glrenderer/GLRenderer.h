@@ -63,9 +63,10 @@ public:
 	// Resource operations
 	Texture *createTexture();
 	SurfaceRenderTarget *createSurfaceRenderTarget();
-	BufferPeer *createBufferPeer(Buffer *buffer);
-	ProgramPeer *createProgramPeer(Program *program);
-	ShaderPeer *createShaderPeer(Shader *shader);
+	VertexBuffer *createVertexBuffer();
+	IndexBuffer *createIndexBuffer();
+	Program *createProgram();
+	Shader *createShader();
 
 	// Matrix operations
 	void setModelMatrix(const Matrix4x4 &matrix);

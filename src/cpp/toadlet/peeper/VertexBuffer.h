@@ -28,33 +28,24 @@
 
 #include <toadlet/peeper/Buffer.h>
 #include <toadlet/peeper/VertexFormat.h>
-#include <toadlet/peeper/Color.h>
 
 namespace toadlet{
 namespace peeper{
 
-class Renderer;
-
 class TOADLET_API VertexBuffer:public Buffer{
 public:
-	TOADLET_SHARED_POINTERS(VertexBuffer,egg::Resource);
-
-	VertexBuffer(UsageType usageType,AccessType accessType,VertexFormat::ptr vertexFormat,int size);
-	VertexBuffer(Renderer *renderer,UsageType usageType,AccessType accessType,VertexFormat::ptr vertexFormat,int size);
+	TOADLET_SHARED_POINTERS(VertexBuffer,Buffer);
 
 	virtual ~VertexBuffer(){}
 
-	inline VertexFormat::ptr getVertexFormat(){return mVertexFormat;}
+	virtual VertexBuffer *getRootVertexBuffer()=0;
 
-	inline int getSize() const{return mSize;}
+	// Lifecycle
+	virtual bool create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size)=0;
+	virtual bool destroy()=0;
 
-	VertexBuffer *clone();
-
-	VertexBuffer *cloneWithNewParameters(UsageType usageType,AccessType accessType,VertexFormat::ptr vertexFormat,int size);
-
-protected:
-	VertexFormat::ptr mVertexFormat;
-	int mSize;
+	virtual VertexFormat::ptr getVertexFormat()=0;
+	virtual int getSize() const=0;
 };
 
 }

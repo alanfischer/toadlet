@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "D3D9VertexBufferPeer.h"
+#include "D3D9VertexBuffer.h"
 #include "D3D9Renderer.h"
 #include <toadlet/peeper/CapabilitySet.h>
 #include <toadlet/egg/Logger.h>
@@ -33,22 +33,39 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
-D3D9VertexBufferPeer::D3D9VertexBufferPeer(D3D9Renderer *renderer,VertexBuffer *buffer):
-	usageType(Buffer::UsageType_STATIC)
-	,vertexBuffer(NULL)
-	,fvf(0)
-	,data(NULL)
+D3D9VertexBuffer::D3D9VertexBuffer(D3D9Renderer *renderer):
+	mRenderer(NULL),
 
-	,lockType(Buffer::LockType_READ_ONLY)
-	,size(0)
-	,vertexSize(0)
-	//,colorElements
+	mUsageFlags(0),
+	mAccessType(AccessType_NO_ACCESS),
+	mDataSize(0),
+	//mVertexFormat,
+	mSize(0),
+
+	mVertexBuffer(NULL),
+	mFVF(0),
+	mData(NULL),
+	mVertexSize(0)
+	//mColorElements
 {
-	usageType=buffer->getUsageType();
-	size=buffer->getSize();
-	vertexSize=buffer->getVertexFormat()->getVertexSize();
+	mRenderer=renderer;
+}
 
-	fvf=getFVF(buffer,&colorElements);
+D3D9VertexBuffer::~D3D9VertexBuffer(){
+	destroy();
+}
+
+bool D3D9VertexBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size){
+	destroy();
+
+	mUsageFlags=usageFlags;
+	mAccessType=accessType;
+	mVertexFormat=vertexFormat;
+	mSize=size;
+	mDataSize=mVertexSize*mSize;
+
+	mVertexSize=mVertexFormat->getVertexSize();
+	mFVF=getFVF(mVertexFormat,&mColorElements);
 
 	// TODO: Try to unify this
 	DWORD d3dUsage=0;
@@ -57,101 +74,94 @@ D3D9VertexBufferPeer::D3D9VertexBufferPeer(D3D9Renderer *renderer,VertexBuffer *
 	#else
 		D3DPOOL d3dPool=D3DPOOL_MANAGED;
 	#endif
-	if(buffer->getUsageType()==Buffer::UsageType_DYNAMIC){
+	if((mUsageFlags&UsageFlags_DYNAMIC)>0){
 		d3dUsage|=D3DUSAGE_DYNAMIC;
 		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
 			d3dPool=D3DPOOL_DEFAULT;
 		#endif
 	}
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		else if(renderer->getD3DCAPS9().SurfaceCaps & D3DMSURFCAPS_VIDVERTEXBUFFER){
+		else if(mRenderer->getD3DCAPS9().SurfaceCaps & D3DMSURFCAPS_VIDVERTEXBUFFER){
 			d3dPool=D3DMPOOL_VIDEOMEM;
 		}
 	#endif
 
-	if(buffer->getAccessType()==Buffer::AccessType_WRITE_ONLY){
+	if(mAccessType==AccessType_WRITE_ONLY){
 		d3dUsage|=D3DUSAGE_WRITEONLY;
 	}
 
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_EXCESSIVE,
-		String("Allocating D3D9VertexBufferPeer of size:")+buffer->getBufferSize());
+		String("Allocating D3D9VertexBuffer of size:")+mDataSize);
 
-	HRESULT result=renderer->getDirect3DDevice9()->CreateVertexBuffer(buffer->getBufferSize(),d3dUsage,fvf,d3dPool,&vertexBuffer TOADLET_SHAREDHANDLE);
-	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBufferPeer: CreateVertexBuffer");
+	HRESULT result=mRenderer->getDirect3DDevice9()->CreateVertexBuffer(mDataSize,d3dUsage,mFVF,d3dPool,&mVertexBuffer TOADLET_SHAREDHANDLE);
+	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: CreateVertexBuffer");
 
-	uint8 *bufferData=buffer->internal_getData();
-	if(bufferData!=NULL){
-		uint8 *data=lock(Buffer::LockType_WRITE_ONLY);
-		if(data!=NULL){
-			memcpy(data,bufferData,buffer->getBufferSize());
-		}
-		unlock();
-	}
+	return SUCCEEDED(result);
 }
 
-D3D9VertexBufferPeer::~D3D9VertexBufferPeer(){
-	if(vertexBuffer!=NULL){
-		vertexBuffer->Release();
-		vertexBuffer=NULL;
+bool D3D9VertexBuffer::destroy(){
+	if(mVertexBuffer!=NULL){
+		mVertexBuffer->Release();
+		mVertexBuffer=NULL;
 	}
+	return true;
 }
 
-uint8 *D3D9VertexBufferPeer::lock(Buffer::LockType lockType){
-	DWORD flags=0;
-	switch(lockType){
-		case Buffer::LockType_WRITE_ONLY:
-			if(usageType==Buffer::UsageType_DYNAMIC){
-				flags|=D3DLOCK_DISCARD;
+uint8 *D3D9VertexBuffer::lock(AccessType lockType){
+	mLockType=lockType;
+
+	DWORD d3dflags=0;
+	switch(mLockType){
+		case AccessType_WRITE_ONLY:
+			if((mUsageFlags&UsageFlags_DYNAMIC)>0){
+				d3dflags|=D3DLOCK_DISCARD;
 			}
 		break;
-		case Buffer::LockType_READ_WRITE:
-			flags|=D3DLOCK_READONLY;
+		case AccessType_READ_WRITE:
+			d3dflags|=D3DLOCK_READONLY;
 		break;
 	}
 
-	this->lockType=lockType;
-	HRESULT result=vertexBuffer->Lock(0,0,(void**)&data,flags);
-	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBufferPeer: Lock");
+	HRESULT result=mVertexBuffer->Lock(0,0,(void**)&mData,d3dflags);
+	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: Lock");
 
-	if(data!=NULL){
-		if(lockType!=Buffer::LockType_WRITE_ONLY){
+	if(mData!=NULL){
+		if(mLockType!=AccessType_WRITE_ONLY){
 			int i,j;
-			for(i=0;i<colorElements.size();++i){
-				const VertexElement &vertexElement=colorElements[i];
-				for(j=0;j<size;++j){
-					uint32 &color=*(uint32*)(data+vertexSize*j+vertexElement.offset);
+			for(i=0;i<mColorElements.size();++i){
+				const VertexElement &vertexElement=mColorElements[i];
+				for(j=0;j<mSize;++j){
+					uint32 &color=*(uint32*)(mData+mVertexSize*j+vertexElement.offset);
 					color=(color&0xFF000000)|((color&0x000000FF)<<16)|(color&0x0000FF00)|((color&0x00FF0000)>>16);
 				}
 			}
 		}
 	}
 
-	return data;
+	return mData;
 }
 
-bool D3D9VertexBufferPeer::unlock(){
-	if(lockType!=Buffer::LockType_READ_ONLY){
+bool D3D9VertexBuffer::unlock(){
+	if(mLockType!=AccessType_READ_ONLY){
 		int i,j;
-		for(i=0;i<colorElements.size();++i){
-			const VertexElement &vertexElement=colorElements[i];
-			for(j=0;j<size;++j){
-				uint32 &color=*(uint32*)(data+vertexSize*j+vertexElement.offset);
+		for(i=0;i<mColorElements.size();++i){
+			const VertexElement &vertexElement=mColorElements[i];
+			for(j=0;j<mSize;++j){
+				uint32 &color=*(uint32*)(mData+mVertexSize*j+vertexElement.offset);
 				color=(color&0xFF000000)|((color&0x000000FF)<<16)|(color&0x0000FF00)|((color&0x00FF0000)>>16);
 			}
 		}
 	}
 
-	HRESULT result=vertexBuffer->Unlock();
-	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBufferPeer: Unlock");
+	HRESULT result=mVertexBuffer->Unlock();
+	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: Unlock");
 
-	data=NULL;
+	mData=NULL;
 
 	return true;
 }
 
-DWORD D3D9VertexBufferPeer::getFVF(VertexBuffer *buffer,Collection<VertexElement> *colorElements){
-	VertexFormat *vertexFormat=buffer->getVertexFormat();
-
+DWORD D3D9VertexBuffer::getFVF(VertexFormat *vertexFormat,Collection<VertexElement> *colorElements){
 	DWORD fvf=0;
 
 	switch(vertexFormat->getMaxTexCoordIndex()+1){
@@ -186,7 +196,7 @@ DWORD D3D9VertexBufferPeer::getFVF(VertexBuffer *buffer,Collection<VertexElement
 		#endif
 		default:
 			Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ERROR,
-				String("D3DVertexBufferPeer: Invalid tex coord number")+(vertexFormat->getMaxTexCoordIndex()+1));
+				String("D3DVertexBuffer: Invalid tex coord number")+(vertexFormat->getMaxTexCoordIndex()+1));
 	}
 
 	int i;
@@ -233,7 +243,7 @@ DWORD D3D9VertexBufferPeer::getFVF(VertexBuffer *buffer,Collection<VertexElement
 			else if((element.format&VertexElement::Format_BIT_COUNT_4)>0){
 				#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 					Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ERROR,
-						"D3D9VertexBufferPeer: Invalid tex coord count");
+						"D3D9VertexBuffer: Invalid tex coord count");
 				#else
 					fvf|=D3DFVF_TEXCOORDSIZE4(texCoordCount);
 				#endif
@@ -252,7 +262,7 @@ DWORD D3D9VertexBufferPeer::getFVF(VertexBuffer *buffer,Collection<VertexElement
 		}
 		else{
 			Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ERROR,
-				String("D3DVertexBufferPeer: Invalid vertex element:")+element.type+","+element.format);
+				String("D3DVertexBuffer: Invalid vertex element:")+element.type+","+element.format);
 		}
 	}
 

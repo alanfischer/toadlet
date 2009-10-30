@@ -1,14 +1,9 @@
 # Source files for toadlet_peeper
 set (PEEPER_SRC
-	Buffer.cpp
-	IndexBuffer.cpp
 	IndexBufferAccessor.cpp
 	IndexData.cpp
 	Light.cpp
-	Program.cpp
-	Shader.cpp
 	TextureStage.cpp
-	VertexBuffer.cpp
 	VertexBufferAccessor.cpp
 	VertexData.cpp
 	VertexElement.cpp
