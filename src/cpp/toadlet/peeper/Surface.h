@@ -26,12 +26,12 @@
 #ifndef TOADLET_PEEPER_SURFACE_H
 #define TOADLET_PEEPER_SURFACE_H
 
-#include <toadlet/peeper/Types.h>
+#include <toadlet/peeper/Buffer.h>
 
 namespace toadlet{
 namespace peeper{
 
-class Surface{
+class TOADLET_API Surface:public Buffer{
 public:
 	TOADLET_SHARED_POINTERS(Surface,Surface);
 

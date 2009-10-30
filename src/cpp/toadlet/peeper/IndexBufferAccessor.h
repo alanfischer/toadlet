@@ -37,11 +37,11 @@ namespace peeper{
 class TOADLET_API IndexBufferAccessor{
 public:
 	IndexBufferAccessor();
-	IndexBufferAccessor(IndexBuffer *indexBuffer,Buffer::LockType lockType=Buffer::LockType_READ_WRITE);
+	IndexBufferAccessor(IndexBuffer *indexBuffer,Buffer::AccessType accessType=Buffer::AccessType_READ_WRITE);
 
 	virtual ~IndexBufferAccessor();
 
-	void lock(IndexBuffer *indexBuffer,Buffer::LockType lockType=Buffer::LockType_READ_WRITE);
+	void lock(IndexBuffer *indexBuffer,Buffer::AccessType accessType=Buffer::AccessType_READ_WRITE);
 	void unlock();
 
 	inline int getSize() const{return mIndexBuffer->getSize();}

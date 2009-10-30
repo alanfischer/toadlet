@@ -37,20 +37,17 @@ namespace peeper{
 
 class Blend;
 class CapabilitySet;
-class Buffer;
-class BufferPeer;
+class IndexBuffer;
 class Light;
 class LightEffect;
 class Program;
-class ProgramPeer;
 class RenderTarget;
 class SurfaceRenderTarget;
 class Shader;
-class ShaderPeer;
 class StatisticsSet;
 class Texture;
-class TexturePeer;
 class TextureStage;
+class VertexBuffer;
 class Viewport;
 
 class Renderer{
@@ -135,9 +132,10 @@ public:
 	// Resource operations
 	virtual Texture *createTexture()=0;
 	virtual SurfaceRenderTarget *createSurfaceRenderTarget()=0;
-	virtual BufferPeer *createBufferPeer(Buffer *buffer)=0;
-	virtual ProgramPeer *createProgramPeer(Program *program)=0;
-	virtual ShaderPeer *createShaderPeer(Shader *shader)=0;
+	virtual VertexBuffer *createVertexBuffer()=0;
+	virtual IndexBuffer *createIndexBuffer()=0;
+	virtual Program *createProgram()=0;
+	virtual Shader *createShader()=0;
 
 	// Matrix operations
 	virtual void setModelMatrix(const Matrix4x4 &matrix)=0;

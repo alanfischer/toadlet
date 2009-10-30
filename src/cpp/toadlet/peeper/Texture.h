@@ -40,9 +40,9 @@ public:
 
 	enum UsageFlags{
 		UsageFlags_NONE=			0,
-		UsageFlags_NPOT_RESTRICTED=	1<<0,
-		UsageFlags_RENDERTARGET=	1<<1,
-		UsageFlags_AUTOGEN_MIPMAPS=	1<<2,
+		UsageFlags_NPOT_RESTRICTED=	1<<0,	// Texture is a size thats non-power-of-two, but restricted in usage
+		UsageFlags_RENDERTARGET=	1<<1,	// Texture will have its surfaces used by a SurfaceRenderTarget
+		UsageFlags_AUTOGEN_MIPMAPS=	1<<2,	// Texture autogenerates its mipmap levels
 	};
 
 	virtual ~Texture(){}

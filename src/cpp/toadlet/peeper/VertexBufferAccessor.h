@@ -27,9 +27,10 @@
 #define TOADLET_PEEPER_VERTEXBUFFERACCESSOR_H
 
 #include <toadlet/egg/Logger.h>
-#include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/egg/math/Math.h>
 #include <toadlet/egg/mathfixed/Math.h>
+#include <toadlet/peeper/VertexBuffer.h>
+#include <toadlet/peeper/Color.h>
 #if defined(TOADLET_DEBUG)
 	#include <toadlet/egg/Error.h>
 #endif
@@ -40,11 +41,11 @@ namespace peeper{
 class TOADLET_API VertexBufferAccessor{
 public:
 	VertexBufferAccessor();
-	VertexBufferAccessor(VertexBuffer *vertexBuffer,Buffer::LockType lockType=Buffer::LockType_READ_WRITE);
+	VertexBufferAccessor(VertexBuffer *vertexBuffer,Buffer::AccessType accessType=Buffer::AccessType_READ_WRITE);
 
 	virtual ~VertexBufferAccessor();
 
-	void lock(VertexBuffer *vertexBuffer,Buffer::LockType lockType=Buffer::LockType_READ_WRITE);
+	void lock(VertexBuffer *vertexBuffer,Buffer::AccessType accessType=Buffer::AccessType_READ_WRITE);
 	void unlock();
 
 	inline int getSize() const{return mVertexBuffer->getSize();}
@@ -320,7 +321,7 @@ protected:
 
 	inline int offset(int vertex,int element){
 		#if defined(TOADLET_DEBUG)
-			if(vertex<0 || element<0 || (vertex*mVertexSize32 + mElementOffsets32[element])*sizeof(int32)>=(uint32)mVertexBuffer->getBufferSize()){
+			if(vertex<0 || element<0 || (vertex*mVertexSize32 + mElementOffsets32[element])*sizeof(int32)>=(uint32)mVertexBuffer->getDataSize()){
 				egg::Error::unknown(egg::Categories::TOADLET_PEEPER,"vertex out of bounds");
 				return 0;
 			}

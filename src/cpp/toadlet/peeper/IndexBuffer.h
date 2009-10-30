@@ -31,11 +31,9 @@
 namespace toadlet{
 namespace peeper{
 
-class Renderer;
-
 class TOADLET_API IndexBuffer:public Buffer{
 public:
-	TOADLET_SHARED_POINTERS(IndexBuffer,egg::Resource);
+	TOADLET_SHARED_POINTERS(IndexBuffer,Buffer);
 
 	// Convinently equals size of index
 	enum IndexFormat{
@@ -44,22 +42,16 @@ public:
 		IndexFormat_UINT_32=4,
 	};
 
-	IndexBuffer(UsageType usageType,AccessType accessType,IndexFormat indexFormat,int size);
-	IndexBuffer(Renderer *renderer,UsageType usageType,AccessType accessType,IndexFormat indexFormat,int size);
-
 	virtual ~IndexBuffer(){}
 
-	IndexFormat getIndexFormat() const{return mIndexFormat;}
+	virtual IndexBuffer *getRootIndexBuffer()=0;
 
-	int getSize() const{return mSize;}
+	// Lifecycle
+	virtual bool create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size)=0;
+	virtual void destroy()=0;
 
-	IndexBuffer *clone();
-
-	IndexBuffer *cloneWithNewParameters(UsageType usageType,AccessType accessType,IndexFormat indexFormat,int size);
-
-protected:
-	IndexFormat mIndexFormat;
-	int mSize;
+	virtual IndexFormat getIndexFormat()=0;
+	virtual int getSize() const=0;
 };
 
 }
