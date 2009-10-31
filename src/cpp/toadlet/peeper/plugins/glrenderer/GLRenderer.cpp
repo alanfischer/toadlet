@@ -1237,10 +1237,10 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 	}
 
 	if(textureStage!=NULL){
-		Texture *texture=textureStage->getTexture()->getRootTexture();
+		Texture *texture=textureStage->getTexture();
 		GLuint textureTarget=0;
 		if(texture!=NULL){
-			GLTexture *gltexture=(GLTexture*)texture;
+			GLTexture *gltexture=(GLTexture*)texture->getRootTexture();
 
 			textureTarget=gltexture->mTarget;
 

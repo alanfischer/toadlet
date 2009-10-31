@@ -515,8 +515,6 @@ void ParticleEntity::updateVertexBuffer(const Matrix4x4 &viewTransform){
 	int i=0,j=0;
 
 	Vector3 &viewUp=cache_updateVertexBuffer_viewUp.reset(),&viewRight=cache_updateVertexBuffer_viewRight.reset(),&viewForward=cache_updateVertexBuffer_viewForward.reset();
-// TODO FIX ME FOR NEW AXIS STUFF
-//	Math::setVectorsFromMatrix4x4(viewTransform,viewRight,viewUp,viewForward);
 	Math::setAxesFromMatrix4x4(viewTransform,viewRight,viewUp,viewForward);
 
 	Vector3 &up=cache_updateVertexBuffer_up.reset(),&right=cache_updateVertexBuffer_right.reset(),&forward=cache_updateVertexBuffer_forward.reset();
