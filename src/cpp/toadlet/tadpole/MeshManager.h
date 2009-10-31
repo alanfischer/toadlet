@@ -38,7 +38,7 @@ public:
 	MeshManager(Engine *engine);
 
 	Mesh::ptr createBox(const AABox &box);
-	Mesh::ptr createSkyBox(scalar size);
+	Mesh::ptr createSkyBox(scalar size,bool unfolded);
 	Mesh::ptr createSphere(const Sphere &sphere,int numSegments=16,int numRings=16);
 	Mesh::ptr createGeoSphere(const Sphere &sphere,int depth,bool icosahedron);
 
