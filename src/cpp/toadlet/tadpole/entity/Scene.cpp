@@ -48,7 +48,6 @@ Scene::Scene():ParentEntity(),
 	mVisualFrame(0),
 
 	//mBackground,
-	//mOverlay,
 
 	mUpdateListener(NULL),
 
@@ -77,25 +76,14 @@ Entity *Scene::create(Engine *engine){
 	}
 
 	mBackground=(ParentEntity*)(new ParentEntity())->create(mEngine);
-	attach(mBackground);
-
-	mOverlay=(ParentEntity*)(new ParentEntity())->create(mEngine);
-	attach(mOverlay);
 
 	return this;
 }
 
 void Scene::destroy(){
 	if(mBackground!=NULL){
-		super::remove(mBackground);
 		mBackground->destroy();
 		mBackground=NULL;
-	}
-
-	if(mOverlay!=NULL){
-		super::remove(mOverlay);
-		mOverlay->destroy();
-		mOverlay=NULL;
 	}
 
 	super::destroy();
@@ -200,6 +188,9 @@ void Scene::logicUpdate(int dt){
 	mLogicFrame++;
 
 	logicUpdate(this,dt);
+	if(mBackground->getNumChildren()>0){
+		logicUpdate(mBackground,dt);
+	}
 }
 
 void Scene::logicUpdate(Entity::ptr entity,int dt){
@@ -236,6 +227,9 @@ void Scene::visualUpdate(int dt){
 
 	mLight=NULL;
 	visualUpdate(this,dt);
+	if(mBackground->getNumChildren()>0){
+		visualUpdate(mBackground,dt);
+	}
 }
 
 void Scene::visualUpdate(Entity::ptr entity,int dt){
@@ -313,14 +307,6 @@ void Scene::render(Renderer *renderer,CameraEntity *camera){
 	mCamera->updateFramesPerSecond();
 	mCamera->updateViewTransform();
 
-	if(mBackground->getNumChildren()>0){
-		Math::setMatrix4x4FromTranslate(mBackground->mVisualWorldTransform,mCamera->getVisualWorldTranslate());
-	}
-
-	if(mOverlay->getNumChildren()>0){
-		mOverlay->mVisualWorldTransform.set(mCamera->getVisualWorldTransform());
-	}
-
 	if(mCamera->getViewportSet()){
 		renderer->setViewport(mCamera->getViewport());
 	}
@@ -354,6 +340,11 @@ void Scene::render(Renderer *renderer,CameraEntity *camera){
 
 	mCamera->mNumCulledEntities=0;
 
+	if(mBackground->getNumChildren()>0){
+		mBackground->setTranslate(mCamera->getVisualWorldTranslate());
+		visualUpdate(mBackground,0);
+		queueRenderables(mBackground);
+	}
 	queueRenderables(this);
 
 	bool renderedLayer=false;
