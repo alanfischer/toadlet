@@ -52,5 +52,31 @@ bool D3D9Surface::destroy(){
 	return true;
 }
 
+uint8 *D3D9Surface::lock(AccessType accessType){
+	D3DLOCKED_RECT d3drect={0};
+
+	RECT rect={0};
+	rect.top=0;
+	rect.left=0;
+	rect.bottom=mHeight;
+	rect.right=mWidth;
+
+	DWORD d3dflags=0;
+	if(accessType==AccessType_READ_ONLY){
+		d3dflags|=D3DLOCK_READONLY;
+	}
+
+	HRESULT result=mSurface->LockRect(&d3drect,&rect,d3dflags);
+	TOADLET_CHECK_D3D9ERROR(result,"D3D9Surface: LockRect");
+
+	return (uint8*)d3drect.pBits;
+}
+
+bool D3D9Surface::unlock(){
+	HRESULT result=mSurface->UnlockRect();
+	TOADLET_CHECK_D3D9ERROR(result,"D3D9Surface: UnlockRect");
+	return SUCCEEDED(result);
+}
+
 }
 }

@@ -179,37 +179,19 @@ SurfaceRenderTarget *D3D9Renderer::createSurfaceRenderTarget(){
 	return new D3D9SurfaceRenderTarget(this);
 }
 
-BufferPeer *D3D9Renderer::createBufferPeer(Buffer *buffer){
-	if(buffer==NULL){
-		Error::nullPointer(Categories::TOADLET_PEEPER,
-			"Buffer is NULL");
-		return NULL;
-	}
-	if(buffer->getType()==Buffer::Type_INDEX && mCapabilitySet.hardwareIndexBuffers==true){
-		D3D9IndexBufferPeer *peer=new D3D9IndexBufferPeer(this,(IndexBuffer*)buffer);
-		if(peer->isValid()==false){
-			delete peer;
-			peer=NULL;
-		}
-		return peer;
-	}
-	else if(buffer->getType()==Buffer::Type_VERTEX && mCapabilitySet.hardwareVertexBuffers==true){
-		D3D9VertexBufferPeer *peer=new D3D9VertexBufferPeer(this,(VertexBuffer*)buffer);
-		if(peer->isValid()==false){
-			delete peer;
-			peer=NULL;
-		}
-		return peer;
-	}
+VertexBuffer *D3D9Renderer::createVertexBuffer(){
+	return new D3D9VertexBuffer(this);
+}
 
+IndexBuffer *D3D9Renderer::createIndexBuffer(){
+	return new D3D9IndexBuffer(this);
+}
+
+Program *D3D9Renderer::createProgram(){
 	return NULL;
 }
 
-ProgramPeer *D3D9Renderer::createProgramPeer(Program *program){
-	return NULL;
-}
-
-ShaderPeer *D3D9Renderer::createShaderPeer(Shader *shader){
+Shader *D3D9Renderer::createShader(){
 	return NULL;
 }
 
@@ -339,82 +321,39 @@ void D3D9Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Index
 
 	// TODO: Remove redundant setting of vertex data
 	if(vertexData->getNumVertexBuffers()>0){
-		// First check to see if the buffers have peers
-		if(vertexData->getVertexBuffer(0)->internal_getBufferPeer()!=NULL && (indexData->getIndexBuffer()==NULL || indexData->getIndexBuffer()->internal_getBufferPeer()!=NULL)){
-			int numVertexes=0;
-			int i;
-			for(i=0;i<vertexData->getNumVertexBuffers();++i){
-				VertexBuffer *vertexBuffer=vertexData->getVertexBuffer(i);
-				if(numVertexes==0){
-					numVertexes=vertexBuffer->getSize();
-				}
-				D3D9VertexBufferPeer *peer=(D3D9VertexBufferPeer*)vertexBuffer->internal_getBufferPeer();
-				#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-					result=mD3DDevice->SetStreamSource(i,peer->vertexBuffer,vertexBuffer->getVertexFormat()->getVertexSize());
-				#else
-					result=mD3DDevice->SetStreamSource(i,peer->vertexBuffer,0,vertexBuffer->getVertexFormat()->getVertexSize());
-				#endif
-				TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: SetStreamSource");
-				#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
-					result=mD3DDevice->SetFVF(peer->fvf);
-					TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: SetFVF");
-				#endif
+		int numVertexes=0;
+		int i;
+		for(i=0;i<vertexData->getNumVertexBuffers();++i){
+			VertexBuffer *vertexBuffer=vertexData->getVertexBuffer(i);
+			if(numVertexes==0){
+				numVertexes=vertexBuffer->getSize();
 			}
-
-			IndexBuffer *indexBuffer=indexData->getIndexBuffer();
-			if(indexBuffer!=NULL){
-				D3D9IndexBufferPeer *peer=(D3D9IndexBufferPeer*)indexBuffer->internal_getBufferPeer();
-				result=mD3DDevice->SetIndices(peer->indexBuffer);
-				TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: SetIndices");
-
-				result=mD3DDevice->DrawIndexedPrimitive(d3dpt,0,0,numVertexes,indexData->getStart(),count);
-				TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: DrawIndexedPrimitive");
-			}
-			else{
-				result=mD3DDevice->DrawPrimitive(d3dpt,indexData->getStart(),count);
-				TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: DrawPrimitive");
-			}
-		}
-		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
-			else{
-				// Warning: This path is very unoptimized.  Use buffer peers if at all possible
-				VertexBuffer *vertexBuffer=vertexData->getVertexBuffer(0);
-
-				int numVertexes=vertexBuffer->getSize();
-				int vertexSize=vertexBuffer->getVertexFormat()->getVertexSize();
-
-				Collection<VertexElement> colorElements;
-				result=mD3DDevice->SetFVF(D3D9VertexBufferPeer::getFVF(vertexBuffer,&colorElements));
+			D3D9VertexBuffer *d3dvertexBuffer=(D3D9VertexBuffer*)vertexBuffer->getRootVertexBuffer();
+			#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+				result=mD3DDevice->SetStreamSource(i,d3dvertexBuffer->mVertexBuffer,d3dvertexBuffer->mVertexSize);
+			#else
+				result=mD3DDevice->SetStreamSource(i,d3dvertexBuffer->mVertexBuffer,0,d3dvertexBuffer->mVertexSize);
+			#endif
+			TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: SetStreamSource");
+			#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+				result=mD3DDevice->SetFVF(d3dvertexBuffer->mFVF);
 				TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: SetFVF");
+			#endif
+		}
 
-				int i,j;
-				for(i=0;i<colorElements.size();++i){
-					const VertexElement &vertexElement=colorElements[i];
-					for(j=0;j<numVertexes;++j){
-						uint32 &color=*(uint32*)(vertexBuffer->internal_getData()+vertexSize*j+vertexElement.offset);
-						color=(color&0xFF000000)|((color&0x000000FF)<<16)|(color&0x0000FF00)|((color&0x00FF0000)>>16);
-					}
-				}
+		IndexBuffer *indexBuffer=indexData->getIndexBuffer();
+		if(indexBuffer!=NULL){
+			D3D9IndexBuffer *d3dindexBuffer=(D3D9IndexBuffer*)indexBuffer->getRootIndexBuffer();
+			result=mD3DDevice->SetIndices(d3dindexBuffer->mIndexBuffer);
+			TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: SetIndices");
 
-				IndexBuffer *indexBuffer=indexData->getIndexBuffer();
-				if(indexBuffer!=NULL){
-					result=mD3DDevice->DrawIndexedPrimitiveUP(d3dpt,0,numVertexes,count,indexBuffer->internal_getData()+indexData->getStart()*indexBuffer->getIndexFormat(),D3D9IndexBufferPeer::getD3DFORMAT(indexBuffer->getIndexFormat()),vertexBuffer->internal_getData(),vertexSize);
-					TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: DrawIndexedPrimitiveUP");
-				}
-				else{
-					result=mD3DDevice->DrawPrimitiveUP(d3dpt,count,vertexBuffer->internal_getData()+indexData->getStart()*vertexSize,vertexSize);
-					TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: DrawPrimitiveUP");
-				}
-
-				for(i=0;i<colorElements.size();++i){
-					const VertexElement &vertexElement=colorElements[i];
-					for(j=0;j<numVertexes;++j){
-						uint32 &color=*(uint32*)(vertexBuffer->internal_getData()+vertexSize*j+vertexElement.offset);
-						color=(color&0xFF000000)|((color&0x000000FF)<<16)|(color&0x0000FF00)|((color&0x00FF0000)>>16);
-					}
-				}
-			}
-		#endif
+			result=mD3DDevice->DrawIndexedPrimitive(d3dpt,0,0,numVertexes,indexData->getStart(),count);
+			TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: DrawIndexedPrimitive");
+		}
+		else{
+			result=mD3DDevice->DrawPrimitive(d3dpt,indexData->getStart(),count);
+			TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: DrawPrimitive");
+		}
 	}
 }
 

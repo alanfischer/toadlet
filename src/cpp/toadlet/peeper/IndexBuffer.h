@@ -48,7 +48,7 @@ public:
 
 	// Lifecycle
 	virtual bool create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size)=0;
-	virtual void destroy()=0;
+	virtual bool destroy()=0;
 
 	virtual IndexFormat getIndexFormat()=0;
 	virtual int getSize() const=0;
