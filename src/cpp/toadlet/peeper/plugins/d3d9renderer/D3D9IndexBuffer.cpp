@@ -23,10 +23,9 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "D3D9IndexBufferPeer.h"
+#include "D3D9IndexBuffer.h"
 #include "D3D9Renderer.h"
 #include <toadlet/peeper/CapabilitySet.h>
-#include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 
 using namespace toadlet::egg;
@@ -34,20 +33,37 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
-D3D9IndexBufferPeer::D3D9IndexBufferPeer(D3D9Renderer *renderer,IndexBuffer *buffer):
-	usageType(Buffer::UsageType_STATIC),
-	indexBuffer(NULL),
-	data(NULL),
+D3D9IndexBuffer::D3D9IndexBuffer(D3D9Renderer *renderer):
+	mRenderer(NULL),
 
-	lockType(Buffer::LockType_READ_ONLY),
-	size(0),
-	format(IndexBuffer::IndexFormat_UINT_8)
+	mUsageFlags(0),
+	mAccessType(AccessType_NO_ACCESS),
+	mIndexFormat(IndexFormat_UINT_8),
+	mSize(0),
+	mDataSize(0),
+
+	mIndexBuffer(NULL),
+
+	mData(NULL),
+	mLockType(AccessType_NO_ACCESS)
 {
-	usageType=buffer->getUsageType();
+	mRenderer=renderer;
+}
 
-	size=buffer->getSize();
-	format=buffer->getIndexFormat();
-	D3DFORMAT d3dFormat=getD3DFORMAT(format);
+D3D9IndexBuffer::~D3D9IndexBuffer(){
+	destroy();
+}
+
+bool D3D9IndexBuffer::create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size){
+	destroy();
+
+	mUsageFlags=usageFlags;
+	mAccessType=accessType;
+	mIndexFormat=indexFormat;
+	mSize=size;
+	D3DFORMAT d3dFormat=getD3DFORMAT(mIndexFormat);
+	mDataSize=mIndexFormat*mSize;
+	if(indexFormat==IndexFormat_UINT_8) mDataSize*=2;
 
 	// TODO: Try to unify this
 	DWORD d3dUsage=0;
@@ -56,107 +72,100 @@ D3D9IndexBufferPeer::D3D9IndexBufferPeer(D3D9Renderer *renderer,IndexBuffer *buf
 	#else
 		D3DPOOL d3dPool=D3DPOOL_MANAGED;
 	#endif
-	if(buffer->getUsageType()==Buffer::UsageType_DYNAMIC){
+	if((mUsageFlags&UsageFlags_DYNAMIC)>0){
 		d3dUsage|=D3DUSAGE_DYNAMIC;
 		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
 			d3dPool=D3DPOOL_DEFAULT;
 		#endif
 	}
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		else if(renderer->getD3DCAPS9().SurfaceCaps & D3DMSURFCAPS_VIDINDEXBUFFER){
+		else if(mRenderer->getD3DCAPS9().SurfaceCaps & D3DMSURFCAPS_VIDVERTEXBUFFER){
 			d3dPool=D3DMPOOL_VIDEOMEM;
 		}
 	#endif
 
-	if(buffer->getAccessType()==Buffer::AccessType_WRITE_ONLY){
+	if(mAccessType==AccessType_WRITE_ONLY){
 		d3dUsage|=D3DUSAGE_WRITEONLY;
 	}
 
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_EXCESSIVE,
-		String("Allocating D3D9IndexBufferPeer of size:")+buffer->getBufferSize());
+		String("Allocating D3D9IndexBuffer of size:")+mDataSize);
 
-	int bufferSize=buffer->getBufferSize();
-	if(format==IndexBuffer::IndexFormat_UINT_8) bufferSize*=2;
-	HRESULT result=renderer->getDirect3DDevice9()->CreateIndexBuffer(bufferSize,d3dUsage,d3dFormat,d3dPool,&indexBuffer TOADLET_SHAREDHANDLE);
-	TOADLET_CHECK_D3D9ERROR(result,"D3D9IndexBufferPeer: CreateIndexBuffer");
+	HRESULT result=mRenderer->getDirect3DDevice9()->CreateIndexBuffer(mDataSize,d3dUsage,d3dFormat,d3dPool,&mIndexBuffer TOADLET_SHAREDHANDLE);
+	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: CreateVertexBuffer");
 
-	uint8 *bufferData=buffer->internal_getData();
-	if(bufferData!=NULL){
-		uint8 *data=lock(Buffer::LockType_WRITE_ONLY);
-		if(data!=NULL){
-			memcpy(data,bufferData,buffer->getBufferSize());
-		}
-		unlock();
-	}
+	return SUCCEEDED(result);
 }
 
-D3D9IndexBufferPeer::~D3D9IndexBufferPeer(){
-	if(indexBuffer!=NULL){
-		indexBuffer->Release();
-		indexBuffer=NULL;
+bool D3D9IndexBuffer::destroy(){
+	if(mIndexBuffer!=NULL){
+		mIndexBuffer->Release();
+		mIndexBuffer=NULL;
 	}
-}
-
-uint8 *D3D9IndexBufferPeer::lock(Buffer::LockType lockType){
-	DWORD flags=0;
-	switch(lockType){
-		case Buffer::LockType_WRITE_ONLY:
-			if(usageType==Buffer::UsageType_DYNAMIC){
-				flags|=D3DLOCK_DISCARD;
-			}
-		break;
-		case Buffer::LockType_READ_WRITE:
-			flags|=D3DLOCK_READONLY;
-		break;
-	}
-
-	this->lockType=lockType;
-	HRESULT result=indexBuffer->Lock(0,0,(void**)&data,flags);
-	TOADLET_CHECK_D3D9ERROR(result,"D3D9IndexBufferPeer: Lock");
-
-	// Pack the indexes
-	if(lockType!=Buffer::LockType_WRITE_ONLY && format==IndexBuffer::IndexFormat_UINT_8){
-		uint16 *data16=(uint16*)data;
-		int i;
-		for(i=0;i<size;++i){
-			data[i]=data16[i];
-		}
-	}
-
-	return data;
-}
-
-bool D3D9IndexBufferPeer::unlock(){
-	// Unpack the indexes
-	if(lockType!=Buffer::LockType_READ_ONLY && format==IndexBuffer::IndexFormat_UINT_8){
-		uint16 *data16=(uint16*)data;
-		int i;
-		for(i=size-1;i>=0;--i){
-			data16[i]=data[i];
-		}
-	}
-
-	HRESULT result=indexBuffer->Unlock();
-	TOADLET_CHECK_D3D9ERROR(result,"D3D9IndexBufferPeer: Unlock");
-
-	data=NULL;
-
 	return true;
 }
 
-D3DFORMAT D3D9IndexBufferPeer::getD3DFORMAT(IndexBuffer::IndexFormat format){
+uint8 *D3D9IndexBuffer::lock(AccessType lockType){
+	mLockType=lockType;
+
+	DWORD d3dflags=0;
+	switch(mLockType){
+		case AccessType_WRITE_ONLY:
+			if((mUsageFlags&UsageFlags_DYNAMIC)>0){
+				d3dflags|=D3DLOCK_DISCARD;
+			}
+		break;
+		case AccessType_READ_WRITE:
+			d3dflags|=D3DLOCK_READONLY;
+		break;
+	}
+
+	HRESULT result=mIndexBuffer->Lock(0,0,(void**)&mData,d3dflags);
+	TOADLET_CHECK_D3D9ERROR(result,"D3D9IndexBuffer: Lock");
+
+	if(mData!=NULL && mLockType!=AccessType_WRITE_ONLY && mIndexFormat==IndexFormat_UINT_8){
+		// Pack the indexes
+		uint16 *data16=(uint16*)mData;
+		int i;
+		for(i=0;i<mSize;++i){
+			mData[i]=data16[i];
+		}
+	}
+
+	return mData;
+}
+
+bool D3D9IndexBuffer::unlock(){
+	if(mData!=NULL && mLockType!=AccessType_READ_ONLY && mIndexFormat==IndexFormat_UINT_8){
+		// Unpack the indexes
+		uint16 *data16=(uint16*)mData;
+		int i;
+		for(i=mSize-1;i>=0;--i){
+			data16[i]=mData[i];
+		}
+	}
+
+	HRESULT result=mIndexBuffer->Unlock();
+	TOADLET_CHECK_D3D9ERROR(result,"D3D9IndexBuffer: Unlock");
+
+	mData=NULL;
+
+	return SUCCEEDED(result);
+}
+
+D3DFORMAT D3D9IndexBuffer::getD3DFORMAT(IndexFormat format){
 	D3DFORMAT d3dFormat=(D3DFORMAT)0;
 	switch(format){
-		case IndexBuffer::IndexFormat_UINT_8:
-		case IndexBuffer::IndexFormat_UINT_16:
+		case IndexFormat_UINT_8:
+		case IndexFormat_UINT_16:
 			d3dFormat=D3DFMT_INDEX16;
 		break;
-		case IndexBuffer::IndexFormat_UINT_32:
+		case IndexFormat_UINT_32:
 			d3dFormat=D3DFMT_INDEX32;
 		break;
 		default:
-			Error::unknown(Categories::TOADLET_PEEPER,
-				"D3D9IndexBufferPeer::getD3DFORMAT: Invalid format");
+			Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ERROR,
+				"D3D9IndexBuffer::getD3DFORMAT: Invalid format");
 			return (D3DFORMAT)0;
 		break;
 	}

@@ -36,27 +36,40 @@ class D3D9Renderer;
 
 class TOADLET_API D3D9IndexBuffer:public IndexBuffer{
 public:
-	D3D9IndexBuffer(D3D9Renderer *renderer,IndexBuffer *buffer);
-
+	D3D9IndexBuffer(D3D9Renderer *renderer);
 	virtual ~D3D9IndexBuffer();
 
-	uint8 *lock(Buffer::LockType lockType);
+	IndexBuffer *getRootIndexBuffer(){return this;}
 
-	bool unlock();
+	virtual bool create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size);
+	virtual bool destroy();
 
-	bool supportsRead(){return true;}
+	virtual int getUsageFlags() const{return mUsageFlags;}
+	virtual AccessType getAccessType() const{return mAccessType;}
+	virtual int getDataSize() const{return mDataSize;}
+	virtual IndexFormat getIndexFormat(){return mIndexFormat;}
+	virtual int getSize() const{return mSize;}
 
-	inline bool isValid() const{return indexBuffer!=NULL;}
+	virtual uint8 *lock(AccessType accessType);
+	virtual bool unlock();
 
-	static D3DFORMAT getD3DFORMAT(IndexBuffer::IndexFormat format);
+protected:
+	static D3DFORMAT getD3DFORMAT(IndexFormat format);
 
-	Buffer::UsageType usageType;
-	IDirect3DIndexBuffer9 *indexBuffer;
-	uint8 *data;
+	D3D9Renderer *mRenderer;
 
-	Buffer::LockType lockType;
-	int size;
-	IndexBuffer::IndexFormat format;
+	int mUsageFlags;
+	AccessType mAccessType;
+	IndexFormat mIndexFormat;
+	int mSize;
+	int mDataSize;
+
+	IDirect3DIndexBuffer9 *mIndexBuffer;
+
+	uint8 *mData;
+	AccessType mLockType;
+
+	friend D3D9Renderer;
 };
 
 }

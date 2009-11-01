@@ -42,7 +42,6 @@ public:
 
 	VertexBuffer *getRootVertexBuffer(){return this;}
 
-	// Lifecycle
 	virtual bool create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size);
 	virtual bool destroy();
 
@@ -73,6 +72,8 @@ protected:
 
 	uint8 *mData;
 	AccessType mLockType;
+
+	friend D3D9Renderer;
 };
 
 }

@@ -38,15 +38,17 @@ D3D9VertexBuffer::D3D9VertexBuffer(D3D9Renderer *renderer):
 
 	mUsageFlags(0),
 	mAccessType(AccessType_NO_ACCESS),
-	mDataSize(0),
 	//mVertexFormat,
 	mSize(0),
+	mVertexSize(0),
+	mDataSize(0),
 
 	mVertexBuffer(NULL),
 	mFVF(0),
+	//mColorElements,
+
 	mData(NULL),
-	mVertexSize(0)
-	//mColorElements
+	mLockType(AccessType_NO_ACCESS)
 {
 	mRenderer=renderer;
 }
@@ -62,10 +64,9 @@ bool D3D9VertexBuffer::create(int usageFlags,AccessType accessType,VertexFormat:
 	mAccessType=accessType;
 	mVertexFormat=vertexFormat;
 	mSize=size;
-	mDataSize=mVertexSize*mSize;
-
-	mVertexSize=mVertexFormat->getVertexSize();
 	mFVF=getFVF(mVertexFormat,&mColorElements);
+	mVertexSize=mVertexFormat->getVertexSize();
+	mDataSize=mVertexSize*mSize;
 
 	// TODO: Try to unify this
 	DWORD d3dUsage=0;
@@ -125,15 +126,13 @@ uint8 *D3D9VertexBuffer::lock(AccessType lockType){
 	HRESULT result=mVertexBuffer->Lock(0,0,(void**)&mData,d3dflags);
 	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: Lock");
 
-	if(mData!=NULL){
-		if(mLockType!=AccessType_WRITE_ONLY){
-			int i,j;
-			for(i=0;i<mColorElements.size();++i){
-				const VertexElement &vertexElement=mColorElements[i];
-				for(j=0;j<mSize;++j){
-					uint32 &color=*(uint32*)(mData+mVertexSize*j+vertexElement.offset);
-					color=(color&0xFF000000)|((color&0x000000FF)<<16)|(color&0x0000FF00)|((color&0x00FF0000)>>16);
-				}
+	if(mData!=NULL && mLockType!=AccessType_WRITE_ONLY){
+		int i,j;
+		for(i=0;i<mColorElements.size();++i){
+			const VertexElement &vertexElement=mColorElements[i];
+			for(j=0;j<mSize;++j){
+				uint32 &color=*(uint32*)(mData+mVertexSize*j+vertexElement.offset);
+				color=(color&0xFF000000)|((color&0x000000FF)<<16)|(color&0x0000FF00)|((color&0x00FF0000)>>16);
 			}
 		}
 	}
@@ -142,7 +141,7 @@ uint8 *D3D9VertexBuffer::lock(AccessType lockType){
 }
 
 bool D3D9VertexBuffer::unlock(){
-	if(mLockType!=AccessType_READ_ONLY){
+	if(mData!=NULL && mLockType!=AccessType_READ_ONLY){
 		int i,j;
 		for(i=0;i<mColorElements.size();++i){
 			const VertexElement &vertexElement=mColorElements[i];
@@ -158,7 +157,7 @@ bool D3D9VertexBuffer::unlock(){
 
 	mData=NULL;
 
-	return true;
+	return SUCCEEDED(result);
 }
 
 DWORD D3D9VertexBuffer::getFVF(VertexFormat *vertexFormat,Collection<VertexElement> *colorElements){
