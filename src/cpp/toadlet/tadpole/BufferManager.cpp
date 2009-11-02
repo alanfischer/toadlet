@@ -48,6 +48,79 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usageFlags,Buffer::Acces
 	return vertexBuffer;
 }
 
+IndexBuffer::ptr BufferManager::cloneIndexBuffer(IndexBuffer::ptr oldIndexBuffer,int usageFlags,Buffer::AccessType accessType,IndexBuffer::IndexFormat indexFormat,int size){
+	IndexBuffer::IndexFormat oldIndexFormat=oldIndexBuffer->getIndexFormat();
+	int oldSize=oldIndexBuffer->getSize();
+
+	#if defined(TOADLET_DEBUG)
+		if(indexFormat!=oldIndexFormat){
+			Error::invalidParameters(Categories::TOADLET_TADPOLE,
+				"cloneWithNewParameters does not support changing size of elements");
+			return NULL;
+		}
+	#endif
+
+	IndexBuffer::ptr indexBuffer=createIndexBuffer(usageFlags,accessType,indexFormat,size);
+
+	int numElements=oldSize<size?oldSize:size;
+	uint8 *srcData=oldIndexBuffer->lock(Buffer::AccessType_READ_ONLY);
+	uint8 *dstData=indexBuffer->lock(Buffer::AccessType_WRITE_ONLY);
+
+	memcpy(dstData,srcData,indexFormat*numElements);
+
+	indexBuffer->unlock();
+	oldIndexBuffer->unlock();
+
+	return indexBuffer;
+}
+
+VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBuffer,int usageFlags,Buffer::AccessType accessType,VertexFormat::ptr vertexFormat,int size){
+	int i,j;
+
+	VertexFormat::ptr oldVertexFormat=oldVertexBuffer->getVertexFormat();
+	int oldSize=oldVertexBuffer->getSize();
+
+	#if defined(TOADLET_DEBUG)
+		for(i=0;i<vertexFormat->getNumVertexElements();++i){
+			const VertexElement &dstElement=vertexFormat->getVertexElement(i);
+			int dstElementSize=dstElement.getSize();
+			if(oldVertexFormat->hasVertexElementOfType(dstElement.type,dstElement.index)){
+				const VertexElement &srcElement=oldVertexFormat->getVertexElementOfType(dstElement.type,dstElement.index);
+				int srcElementSize=srcElement.getSize();
+				if(dstElementSize!=srcElementSize){
+					Error::invalidParameters(Categories::TOADLET_TADPOLE,
+						"cloneWithNewParameters does not support changing size of elements");
+					return NULL;
+				}
+			}
+		}
+	#endif
+
+	VertexBuffer::ptr vertexBuffer=createVertexBuffer(usageFlags,accessType,vertexFormat,size);
+
+	uint8 *srcData=oldVertexBuffer->lock(Buffer::AccessType_READ_ONLY);
+	uint8 *dstData=vertexBuffer->lock(Buffer::AccessType_WRITE_ONLY);
+
+	int numVerts=oldSize<size?oldSize:size;
+	int srcVertSize=oldVertexFormat->getVertexSize();
+	int dstVertSize=vertexFormat->getVertexSize();
+	for(i=0;i<vertexFormat->getNumVertexElements();++i){
+		const VertexElement &dstElement=vertexFormat->getVertexElement(i);
+		int elementSize=dstElement.getSize();
+		if(oldVertexFormat->hasVertexElementOfType(dstElement.type,dstElement.index)){
+			const VertexElement &srcElement=oldVertexFormat->getVertexElementOfType(dstElement.type,dstElement.index);
+			for(j=0;j<numVerts;++j){
+				memcpy(dstData+dstVertSize*j+dstElement.offset,srcData+srcVertSize*j+srcElement.offset,elementSize);
+			}
+		}
+	}
+
+	vertexBuffer->unlock();
+	oldVertexBuffer->unlock();
+
+	return vertexBuffer;
+}
+
 }
 }
 

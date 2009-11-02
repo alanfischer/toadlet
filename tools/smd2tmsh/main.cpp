@@ -68,7 +68,9 @@ int main(int argc,char **argv){
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_WARNING);
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_TADPOLE,Logger::Level_WARNING);
 
-	SMDConverter smd;
+	Engine *engine=new Engine();
+
+	SMDConverter smd(engine);
 	smd.setPositionEpsilon(positionEpsilon);
 	smd.setNormalEpsilon(normalEpsilon);
 	smd.setTexCoordEpsilon(texCoordEpsilon);
@@ -115,6 +117,8 @@ int main(int argc,char **argv){
 		std::cout << "error loading file" << std::endl;
 	}
 	
+	delete engine;
+
 	return 1;
 }
 

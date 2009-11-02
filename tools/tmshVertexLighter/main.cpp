@@ -141,7 +141,7 @@ int main(int argc,char **argv){
 
 		// Relight specified submeshes to full brightness
 		VertexBuffer::ptr vertexBuffer=mesh->staticVertexData->getVertexBuffer(0);
-		VertexBufferAccessor vba(vertexBuffer,Buffer::LockType_READ_ONLY);
+		VertexBufferAccessor vba(vertexBuffer);
 
 		int ci=vertexBuffer->getVertexFormat()->getVertexElementIndexOfType(VertexElement::Type_COLOR);
 		TOADLET_ASSERT(ci>=0);
@@ -151,7 +151,7 @@ int main(int argc,char **argv){
 			if(skip[j]>=0 && skip[j]<mesh->subMeshes.size()){
 				Mesh::SubMesh::ptr sub=mesh->subMeshes[skip[j]];
 				IndexBuffer::ptr indexBuffer=sub->indexData->getIndexBuffer();
-				IndexBufferAccessor iba(indexBuffer,Buffer::LockType_READ_ONLY);
+				IndexBufferAccessor iba(indexBuffer);
 
 				int k;
 				for(k=0;k<indexBuffer->getSize();++k){

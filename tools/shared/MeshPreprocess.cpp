@@ -48,7 +48,7 @@ void MeshPreprocess::adjustTexCoords(Mesh *mesh,float texCoordAdjust){
 	VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
 	int texCoordIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_TEX_COORD);
 
-	VertexBufferAccessor vba(vertexBuffer,Buffer::LockType_READ_ONLY);
+	VertexBufferAccessor vba(vertexBuffer);
 	if(texCoordAdjust>0 && texCoordIndex>=0){
 		TOADLET_ASSERT(vertexFormat->getVertexElementOfType(VertexElement::Type_TEX_COORD).format==(VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_2));
 
@@ -60,7 +60,7 @@ void MeshPreprocess::adjustTexCoords(Mesh *mesh,float texCoordAdjust){
 			Mesh::SubMesh::ptr sub=mesh->subMeshes[i];
 			IndexData::ptr indexData=sub->indexData;
 			IndexBuffer::ptr indexBuffer=indexData->getIndexBuffer();
-			IndexBufferAccessor iba(indexBuffer,Buffer::LockType_READ_ONLY);
+			IndexBufferAccessor iba(indexBuffer);
 
 			TOADLET_ASSERT(indexBuffer->getIndexFormat()==IndexBuffer::IndexFormat_UINT_16);
 
@@ -120,14 +120,14 @@ void MeshPreprocess::adjustPositions(Mesh *mesh,float positionAdjust){
 	VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
 	int positionIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_POSITION);
 
-	VertexBufferAccessor vba(vertexBuffer,Buffer::LockType_READ_ONLY);
+	VertexBufferAccessor vba(vertexBuffer);
 	if(positionAdjust!=0){
 		int i;
 		for(i=0;i<mesh->subMeshes.size();++i){
 			Mesh::SubMesh::ptr sub=mesh->subMeshes[i];
 			IndexData::ptr indexData=sub->indexData;
 			IndexBuffer::ptr indexBuffer=indexData->getIndexBuffer();
-			IndexBufferAccessor iba(indexBuffer,Buffer::LockType_READ_ONLY);
+			IndexBufferAccessor iba(indexBuffer);
 
 			TOADLET_ASSERT(indexBuffer->getIndexFormat()==IndexBuffer::IndexFormat_UINT_16);
 
