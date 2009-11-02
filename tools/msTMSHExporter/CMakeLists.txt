@@ -2,21 +2,15 @@
 
 # Windows Platforms Only!
 if (TOADLET_PLATFORM_WIN32)
+	# Find Milkshape 3D and it's SDK
+	find_package (Milkshape3D REQUIRED)
+
 	# Includes
-	set (MS_INCLUDE "C:/Program Files/MilkShape 3D 1.8.4/msLib")
-	set (MSTMSHEXPORTER_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR} ${TOADLET_INCLUDE_DIR} ${MS_INCLUDE})
+	set (MSTMSHEXPORTER_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR} ${TOADLET_INCLUDE_DIR} ${MS3D_SDK_DIR})
 	include_directories (${MSTMSHEXPORTER_INCLUDES})
 
 	# Libraries
-	set (MSMODELLIB "NO")
-	find_program (MS_EXE ms3d PATHS "C:/Program Files/MilkShape 3D 1.8.4")
-	get_filename_component (MS_LIB ${MS_EXE} PATH)
-	find_library (MSMODELLIB msModelLib PATHS "C:/Program Files/MilkShape 3D 1.8.4/msLib/lib")
-	message ("MSMODELLIB=${MSMODELLIB}")
-	set (MSTMSHEXPORTER_LIBS ${MSMODELLIB} ${TOADLET_EGG_LIB_S} ${TOADLET_PEEPER_LIB_S} ${TOADLET_RIBBIT_LIB_S} ${TOADLET_TADPOLE_LIB_S})
-	if (NOT MSMODELLIB)
-		message (FATAL_ERROR "Could NOT find Milkshape SDK")
-	endif (NOT MSMODELLIB)
+	set (MSTMSHEXPORTER_LIBS ${MS3D_SDK_LIB} ${TOADLET_EGG_LIB_S} ${TOADLET_PEEPER_LIB_S} ${TOADLET_RIBBIT_LIB_S} ${TOADLET_TADPOLE_LIB_S})
 
 	# Source files
 	set (MSTMSHEXPORTER_SRC
@@ -34,6 +28,6 @@ if (TOADLET_PLATFORM_WIN32)
 	add_library (msTMSHExporter ${MSTMSHEXPORTER_SRC} ${MSTMSHEXPORTER_H})
 	set_target_properties (msTMSHExporter PROPERTIES COMPILE_FLAGS "/MT")
 	target_link_libraries (msTMSHExporter ${MSTMSHEXPORTER_LIBS})
-	install (TARGETS msTMSHExporter DESTINATION ${MS_LIB})
+	install (TARGETS msTMSHExporter DESTINATION ${MS3D_DIR})
 endif (TOADLET_PLATFORM_WIN32)
 
