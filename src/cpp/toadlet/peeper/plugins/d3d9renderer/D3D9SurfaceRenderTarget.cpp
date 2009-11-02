@@ -65,24 +65,47 @@ bool D3D9SurfaceRenderTarget::destroy(){
 }
 
 bool D3D9SurfaceRenderTarget::makeCurrent(IDirect3DDevice9 *device){
-	int i;
-	for(i=0;i<mSurfaces.size();++i){
-		D3D9Surface *surface=(D3D9Surface*)mSurfaces[i].get();
-		Attachment attachment=mSurfaceAttachments[i];
-		if(attachment==Attachment_DEPTH_STENCIL){
-			device->SetDepthStencilSurface(surface->getSurface());
+	bool result=false;
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		if(mSurfaces.size()>=2 && mSurfaces[0]!=NULL && mSurfaces[1]!=NULL){
+			D3D9Surface *renderSurface=(D3D9Surface*)mSurfaces[0]->getRootSurface();
+			D3D9Surface *depthSurface=(D3D9Surface*)mSurfaces[1]->getRootSurface();
+			device->SetRenderTarget(renderSurface->getSurface(),depthSurface->getSurface());
+			result=true;
 		}
-		else{
-			device->SetRenderTarget(0,surface->getSurface());
+	#else
+		int i;
+		for(i=0;i<mSurfaces.size();++i){
+			D3D9Surface *surface=(D3D9Surface*)mSurfaces[i]->getRootSurface();
+			Attachment attachment=mSurfaceAttachments[i];
+			if(attachment==Attachment_DEPTH_STENCIL){
+				device->SetDepthStencilSurface(surface->getSurface());
+			}
+			else{
+				device->SetRenderTarget(0,surface->getSurface());
+			}
 		}
-	}
-
-	return true;
+		result=true;
+	#endif
+	return result;
 }
 
 bool D3D9SurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
-	mSurfaces.add(surface);
-	mSurfaceAttachments.add(attachment);
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		mSurfaces.resize(2);
+		mSurfaceAttachments.resize(2);
+		if(attachment==Attachment_DEPTH_STENCIL){
+			mSurfaces.setAt(1,surface);
+			mSurfaceAttachments.setAt(1,attachment);
+		}
+		else{
+			mSurfaces.setAt(0,surface);
+			mSurfaceAttachments.setAt(0,attachment);
+		}
+	#else
+		mSurfaces.add(surface);
+		mSurfaceAttachments.add(attachment);
+	#endif
 
 	mWidth=surface->getWidth();
 	mHeight=surface->getHeight();
@@ -127,7 +150,11 @@ Surface::ptr D3D9SurfaceRenderTarget::createBufferSurface(int format,int width,i
 	}
 
 	IDirect3DSurface9 *d3dsurface=NULL;
-	result=device->CreateDepthStencilSurface(width,height,desc.Format,desc.MultiSampleType,NULL,FALSE,&d3dsurface,NULL);
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		result=device->CreateDepthStencilSurface(width,height,desc.Format,desc.MultiSampleType,&d3dsurface TOADLET_SHAREDHANDLE);
+	#else
+		result=device->CreateDepthStencilSurface(width,height,desc.Format,desc.MultiSampleType,NULL,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
+	#endif
 	if(FAILED(result)){
 		TOADLET_CHECK_D3D9ERROR(result,"CreateDepthStencilSurface");
 		return NULL;

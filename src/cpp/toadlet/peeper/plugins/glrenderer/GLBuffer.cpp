@@ -113,7 +113,12 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr ver
 		}
 	#endif
 
-	mMapping=mRenderer->getCapabilitySet().hardwareVertexBuffers && mRenderer->useMapping();
+	mMapping=
+		#if defined(TOADLET_HAS_GLES)
+			false;
+		#else
+			mRenderer->getCapabilitySet().hardwareVertexBuffers && mRenderer->useMapping();
+		#endif
 	if(mMapping==false){
 		mData=new uint8[mDataSize];
 		mBacking=true;
@@ -141,23 +146,25 @@ uint8 *GLBuffer::lock(AccessType accessType){
 
 	mLockType=accessType;
 
-	if(mMapping){
-		GLenum lock=0;
-		switch(accessType){
-			case AccessType_READ_ONLY:
-				lock=GL_READ_ONLY;
-			break;
-			case AccessType_WRITE_ONLY:
-				lock=GL_WRITE_ONLY;
-			break;
-			case AccessType_READ_WRITE:
-				lock=GL_READ_WRITE;
-			break;
-		}
+	#if !defined(TOADLET_HAS_GLES)
+		if(mMapping){
+			GLenum lock=0;
+			switch(accessType){
+				case AccessType_READ_ONLY:
+					lock=GL_READ_ONLY;
+				break;
+				case AccessType_WRITE_ONLY:
+					lock=GL_WRITE_ONLY;
+				break;
+				case AccessType_READ_WRITE:
+					lock=GL_READ_WRITE;
+				break;
+			}
 
-		glBindBuffer(mTarget,mHandle);
-		mData=(uint8*)glMapBuffer(mTarget,lock);
-	}
+			glBindBuffer(mTarget,mHandle);
+			mData=(uint8*)glMapBuffer(mTarget,lock);
+		}
+	#endif
 
 	#if defined(TOADLET_BIG_ENDIAN)
 		if(mLockType!=AccessType_WRITE_ONLY){
@@ -187,12 +194,15 @@ bool GLBuffer::unlock(){
 		}
 	#endif
 
-	if(mMapping){
-		glBindBuffer(mTarget,mHandle);
-		glUnmapBuffer(mTarget);
-		mData=NULL;
-	}
-	else{
+	#if !defined(TOADLET_HAS_GLES)
+		if(mMapping){
+			glBindBuffer(mTarget,mHandle);
+			glUnmapBuffer(mTarget);
+			mData=NULL;
+		}
+		else
+	#endif
+	{
 		glBindBuffer(mTarget,mHandle);
 		glBufferSubData(mTarget,0,mDataSize,mData);
 	}

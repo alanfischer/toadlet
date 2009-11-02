@@ -233,12 +233,11 @@ Mesh::ptr MeshManager::createSphere(const Sphere &sphere,int numSegments,int num
 			// Generate the group of segments for the current ring
 			int seg;
 			for(seg=0;seg<=numSegments;seg++){
-				scalar x0=Math::mul(r0,Math::sin(Math::mul(seg,deltaSegAngle)));
-				scalar z0=Math::mul(r0,Math::cos(Math::mul(seg,deltaSegAngle)));
+				scalar x0=Math::mul(r0,Math::sin(Math::mul(Math::fromInt(seg),deltaSegAngle)));
+				scalar z0=Math::mul(r0,Math::cos(Math::mul(Math::fromInt(seg),deltaSegAngle)));
 
 				// Add one vertex to the strip which makes up the sphere
 				vba.set3(verticeIndex,0,sphere.origin.x+x0,sphere.origin.y+y0,sphere.origin.z+z0);
-
 				normal.set(x0,y0,z0);
 				Math::normalize(normal);
 				vba.set3(verticeIndex,1,normal.x,normal.y,normal.z);

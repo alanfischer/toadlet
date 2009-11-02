@@ -96,7 +96,12 @@ bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width
 		}
 	#endif
 
-	D3DPOOL pool=(mUsageFlags&UsageFlags_RENDERTARGET)>0 ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
+	D3DPOOL pool=
+		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+			D3DPOOL_MANAGED;
+		#else
+			(mUsageFlags&UsageFlags_RENDERTARGET)>0 ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
+		#endif
 
 	HRESULT result=E_FAIL;
 	switch(dimension){
