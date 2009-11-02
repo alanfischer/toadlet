@@ -37,9 +37,9 @@ MeshManager::MeshManager(Engine *engine):ResourceManager(engine){
 }
 
 Mesh::ptr MeshManager::createBox(const AABox &box){
-	VertexBuffer::ptr vertexBuffer=mEngine->loadVertexBuffer(VertexBuffer::ptr(new VertexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_COLOR,8)));
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_COLOR,8);
 	{
-		vba.lock(vertexBuffer,Buffer::LockType_WRITE_ONLY);
+		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
 
 		int i=0;
 		vba.set3(i,0,box.mins.x,box.mins.y,box.mins.z); vba.setRGBA(i,1,0xFF0000FF); i++;
@@ -54,9 +54,9 @@ Mesh::ptr MeshManager::createBox(const AABox &box){
 		vba.unlock();
 	}
 
-	IndexBuffer::ptr indexBuffer=mEngine->loadIndexBuffer(IndexBuffer::ptr(new IndexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_8,36)));
+	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_8,36);
 	{
-		iba.lock(indexBuffer,Buffer::LockType_WRITE_ONLY);
+		iba.lock(indexBuffer,Buffer::AccessType_WRITE_ONLY);
 
 		int i=0;
 		// Bottom
@@ -98,13 +98,13 @@ Mesh::ptr MeshManager::createBox(const AABox &box){
 }
 
 Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded){
-	VertexBuffer::ptr vertexBuffer=mEngine->loadVertexBuffer(VertexBuffer::ptr(new VertexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,24)));
-	IndexBuffer::ptr indexBuffer=mEngine->loadIndexBuffer(IndexBuffer::ptr(new IndexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_8,36)));
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,24);
+	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_8,36);
 	{
 		VertexBufferAccessor vba;
-		vba.lock(vertexBuffer,Buffer::LockType_WRITE_ONLY);
+		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
 		IndexBufferAccessor iba;
-		iba.lock(indexBuffer,Buffer::LockType_WRITE_ONLY);
+		iba.lock(indexBuffer,Buffer::AccessType_WRITE_ONLY);
 
 		int vi=0,ii=0;
 		scalar one=Math::ONE;
@@ -208,14 +208,14 @@ Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded){
 // Thanks to Ogre3D for this sphere routine
 Mesh::ptr MeshManager::createSphere(const Sphere &sphere,int numSegments,int numRings){
 	int numVertexes=(numRings+1)*(numSegments+1);
-	VertexBuffer::ptr vertexBuffer=mEngine->loadVertexBuffer(VertexBuffer::ptr(new VertexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,numVertexes)));
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,numVertexes);
 
 	int numIndexes=6*numRings*(numSegments+1);
-	IndexBuffer::ptr indexBuffer=mEngine->loadIndexBuffer(IndexBuffer::ptr(new IndexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,numIndexes)));
+	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,numIndexes);
 
 	{
-		vba.lock(vertexBuffer,Buffer::LockType_WRITE_ONLY);
-		iba.lock(indexBuffer,Buffer::LockType_WRITE_ONLY);
+		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
+		iba.lock(indexBuffer,Buffer::AccessType_WRITE_ONLY);
 
 		scalar deltaRingAngle=Math::div(Math::PI,Math::fromInt(numRings));
 		scalar deltaSegAngle=Math::div(Math::TWO_PI,Math::fromInt(numSegments));
@@ -284,8 +284,8 @@ Mesh::ptr MeshManager::createGeoSphere(const Sphere &sphere,int depth,bool icosa
 	int vertQuantity = initialTriangleCount * (((1 << (depth * 2)) - 1) / (4 - 1) - 1) + initialVertexCount;
 
 	currentSphere=sphere;
-	VertexBuffer::ptr vertexBuffer=mEngine->loadVertexBuffer(VertexBuffer::ptr(new VertexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,vertQuantity)));
-	vba.lock(vertexBuffer,Buffer::LockType_WRITE_ONLY);
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,vertQuantity);
+	vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
 
 	int vertexIndex=0;
 	int i,j;
@@ -408,8 +408,8 @@ Mesh::ptr MeshManager::createGeoSphere(const Sphere &sphere,int depth,bool icosa
 
 	vba.unlock();
 
-	IndexBuffer::ptr indexBuffer=mEngine->loadIndexBuffer(IndexBuffer::ptr(new IndexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,triangleQuantity*3)));
-	iba.lock(indexBuffer,Buffer::LockType_WRITE_ONLY);
+	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,triangleQuantity*3);
+	iba.lock(indexBuffer,Buffer::AccessType_WRITE_ONLY);
 	for(i=0;i<old.size();++i){
 		for(j=0;j<3;++j){
 			iba.set(i*3+j,old[i].index[j]);

@@ -28,7 +28,8 @@
 
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/Mesh.h>
-#include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/tadpole/BufferManager.h>
+#include <toadlet/tadpole/TextureManager.h>
 #include <mxml.h>
 
 #define mxmlGetElementName(x) ((x->type==MXML_ELEMENT)?x->value.element.name:"")
@@ -54,7 +55,7 @@ public:
 	static Material::ptr loadMaterial(mxml_node_t *node,int version,ResourceManager *textureManager);
 	static mxml_node_t *saveMaterial(Material::ptr material,int version);
 
-	static Mesh::ptr loadMesh(mxml_node_t *node,int version,ResourceManager *bufferManager,ResourceManager *materialManager,ResourceManager *textureManager);
+	static Mesh::ptr loadMesh(mxml_node_t *node,int version,BufferManager *bufferManager,ResourceManager *materialManager,TextureManager *textureManager);
 	static mxml_node_t *saveMesh(Mesh::ptr mesh,int version);
 
 	static MeshSkeleton::ptr loadSkeleton(mxml_node_t *node,int version);

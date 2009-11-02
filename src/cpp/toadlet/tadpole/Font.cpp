@@ -110,7 +110,7 @@ bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const Stri
 		y-=height/2;
 	}
 
-	vba.lock(vertexBuffer,Buffer::LockType_WRITE_ONLY);
+	vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
 
 	int lineLength=0;
 	char c=(char)10; // The first loop will add mHeight, but we work from the baseline of the letters, so that is correct

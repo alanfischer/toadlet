@@ -49,7 +49,7 @@ GLBuffer::GLBuffer(GLRenderer *renderer):
 	mHandle(0),
 	mTarget(0),
 	mLockType(AccessType_NO_ACCESS),
-	mBackingData(false),
+	mBacking(false),
 	mData(NULL)
 {
 	mRenderer=renderer;
@@ -85,7 +85,7 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,IndexFormat indexForm
 	return true;
 }
 
-bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat;:ptr vertexFormat,int size){
+bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size){
 	destroy();
 
 	mUsageFlags=usageFlags;
@@ -123,21 +123,23 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat;:ptr ver
 }
 
 bool GLBuffer::destroy(){
-	if(bufferHandle!=0){
-		glDeleteBuffers(1,&bufferHandle);
-		bufferHandle=0;
+	if(mHandle!=0){
+		glDeleteBuffers(1,&mHandle);
+		mHandle=0;
 	}
 	
-	if(mData!=NULL && mBackingData){
+	if(mData!=NULL && mBacking){
 		delete[] mData;
 		mData=NULL;
 	}
+
+	return true;
 }
 
 uint8 *GLBuffer::lock(AccessType accessType){
 	mRenderer->internal_getStatisticsSet().bufferLockCount++;
 
-	mLockType=lockType;
+	mLockType=accessType;
 
 	if(mMapping){
 		GLenum lock=0;
@@ -188,13 +190,12 @@ bool GLBuffer::unlock(){
 	if(mMapping){
 		glBindBuffer(mTarget,mHandle);
 		glUnmapBuffer(mTarget);
+		mData=NULL;
 	}
 	else{
 		glBindBuffer(mTarget,mHandle);
 		glBufferSubData(mTarget,0,mDataSize,mData);
 	}
-
-	mData=NULL;
 
 	return true;
 }

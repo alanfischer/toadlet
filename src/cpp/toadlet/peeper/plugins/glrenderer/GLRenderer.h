@@ -122,6 +122,9 @@ public:
 
 	inline StatisticsSet &internal_getStatisticsSet(){return mStatisticsSet;}
 
+	// TODO: Have this be enabled on some platforms, depending some conditions...
+	inline bool useMapping() const{return false;}
+
 	inline egg::mathfixed::fixed *colorArray(egg::mathfixed::fixed result[],const Color &src){result[0]=egg::MathConversion::scalarToFixed(src.r);result[1]=egg::MathConversion::scalarToFixed(src.g);result[2]=egg::MathConversion::scalarToFixed(src.b);result[3]=egg::MathConversion::scalarToFixed(src.a);return result;}
 	inline float *colorArray(float result[],const Color &src){result[0]=egg::MathConversion::scalarToFloat(src.r);result[1]=egg::MathConversion::scalarToFloat(src.g);result[2]=egg::MathConversion::scalarToFloat(src.b);result[3]=egg::MathConversion::scalarToFloat(src.a);return result;}
 	inline egg::mathfixed::fixed *lightDirArray(egg::mathfixed::fixed result[],const Vector3 &src){result[0]=egg::MathConversion::scalarToFixed(-src.x);result[1]=egg::MathConversion::scalarToFixed(-src.y);result[2]=egg::MathConversion::scalarToFixed(-src.z);result[3]=0;return result;}

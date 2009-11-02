@@ -27,7 +27,6 @@
 #define TOADLET_PEEPER_GLBUFFER_H
 
 #include "GLIncludes.h"
-#include <toadlet/peeper/Buffer.h>
 #include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/egg/Collection.h>
@@ -38,7 +37,7 @@ namespace peeper{
 class GLRenderer;
 
 // Currently this class inherits all possible types, but perhaps it should just inherit Buffer, and then there would exist subclasses for each type of Buffer
-class TOADLET_API GLBuffer:public Buffer,public IndexBuffer,public VertexBuffer{
+class TOADLET_API GLBuffer:public IndexBuffer,public VertexBuffer{
 public:
 	GLBuffer(GLRenderer *renderer);
 	virtual ~GLBuffer();
@@ -55,7 +54,7 @@ public:
 	virtual int getDataSize() const{return mDataSize;}
 	virtual int getSize() const{return mSize;}
 
-	virtual Indexformat getIndexFormat(){return mIndexFormat;}
+	virtual IndexFormat getIndexFormat(){return mIndexFormat;}
 	virtual VertexFormat::ptr getVertexFormat(){return mVertexFormat;}
 
 	virtual uint8 *lock(AccessType accessType);
@@ -74,7 +73,7 @@ protected:
 	IndexFormat mIndexFormat;
 	VertexFormat::ptr mVertexFormat;
 	short mVertexSize;
-	egg::Collection<VertexElement&> mColorElements;
+	egg::Collection<VertexElement> mColorElements;
 
 	GLuint mHandle;
 	GLenum mTarget;
@@ -82,6 +81,8 @@ protected:
 	bool mMapping;
 	bool mBacking;
 	uint8 *mData;
+
+	friend GLRenderer;
 };
 
 }

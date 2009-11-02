@@ -55,6 +55,13 @@ public:
 	inline GLTexture *getTexture() const{return mTexture;}
 	inline GLuint getLevel() const{return mLevel;}
 
+	// TODO: Implement these
+	virtual int getUsageFlags() const{return 0;}
+	virtual AccessType getAccessType() const{return AccessType_NO_ACCESS;}
+	virtual int getDataSize() const{return 0;}
+	virtual uint8 *lock(AccessType accessType){return NULL;}
+	virtual bool unlock(){return false;}
+
 protected:
 	GLTexture *mTexture;
 	GLuint mLevel;

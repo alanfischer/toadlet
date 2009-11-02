@@ -196,12 +196,12 @@ void HopScene::setRenderCollisionVolumes(bool volumes,bool interpolate,int layer
 	if(volumes){
 		getRenderLayer(mCollisionVolumeLayer)->forceRender=true;
 		if(mCollisionVolumeVertexData==NULL){
-			VertexBuffer::ptr vertexBuffer=mEngine->loadVertexBuffer(VertexBuffer::ptr(new VertexBuffer(Buffer::UsageType_DYNAMIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_COLOR,16)));
+			VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_DYNAMIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_COLOR,16);
 			scalar scale=Math::ONE;
 			uint32 color=Colors::WHITE.getABGR();
 			{
 				VertexBufferAccessor vba;
-				vba.lock(vertexBuffer,Buffer::LockType_WRITE_ONLY);
+				vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
 
 				vba.set3(0,0,	-scale,-scale,-scale);
 				vba.setABGR(0,1,color);

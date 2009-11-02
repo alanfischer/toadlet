@@ -25,9 +25,7 @@
 
 #include "GLRenderer.h"
 #include "GLTexture.h"
-#include "GLBufferPeer.h"
-#include "GLSLProgramPeer.h"
-#include "GLSLShaderPeer.h"
+#include "GLBuffer.h"
 #include "GLRenderTarget.h"
 #if defined(TOADLET_HAS_GLFBOS)
 	#include "GLFBOSurfaceRenderTarget.h"
@@ -337,52 +335,19 @@ SurfaceRenderTarget *GLRenderer::createSurfaceRenderTarget(){
 	return NULL;
 }
 
-BufferPeer *GLRenderer::createBufferPeer(Buffer *buffer){
-	if(buffer==NULL){
-		Error::nullPointer(Categories::TOADLET_PEEPER,
-			"Buffer is NULL");
-		return NULL;
-	}
+VertexBuffer *GLRenderer::createVertexBuffer(){
+	return new GLBuffer(this);
+}
 
-	if(	(buffer->getType()==Buffer::Type_INDEX && mCapabilitySet.hardwareIndexBuffers==true) ||
-		(buffer->getType()==Buffer::Type_VERTEX && mCapabilitySet.hardwareVertexBuffers==true) ){
-		GLBufferPeer *peer=new GLBufferPeer(this,buffer);
-		if(peer->isValid()==false){
-			delete peer;
-			peer=NULL;
-		}
-		return peer;
-	}
+IndexBuffer *GLRenderer::createIndexBuffer(){
+	return new GLBuffer(this);
+}
 
+Program *GLRenderer::createProgram(){
 	return NULL;
 }
 
-ProgramPeer *GLRenderer::createProgramPeer(Program *program){
-	if(program==NULL){
-		Error::nullPointer(Categories::TOADLET_PEEPER,
-			"Program is NULL");
-		return NULL;
-	}
-
-	if(mCapabilitySet.vertexShaders==true || mCapabilitySet.fragmentShaders==true){
-		return new GLSLProgramPeer(this,program);
-	}
-
-	return NULL;
-}
-
-ShaderPeer *GLRenderer::createShaderPeer(Shader *shader){
-	if(shader==NULL){
-		Error::nullPointer(Categories::TOADLET_PEEPER,
-			"Shader is NULL");
-		return NULL;
-	}
-
-	if(	(shader->getType()==Shader::Type_VERTEX && mCapabilitySet.vertexShaders==true) ||
-		(shader->getType()==Shader::Type_FRAGMENT && mCapabilitySet.fragmentShaders==true) ){
-		return new GLSLShaderPeer(this,shader);
-	}
-
+Shader *GLRenderer::createShader(){
 	return NULL;
 }
 
@@ -720,18 +685,18 @@ TOADLET_CHECK_GLERROR("renderPrimtive:START");
 			break;
 		}
 
-		GLBufferPeer *indexBufferPeer=(GLBufferPeer*)indexBuffer->internal_getBufferPeer();
+		GLBuffer *glindexBuffer=(GLBuffer*)indexBuffer->getRootIndexBuffer();
 		uint8 *basePointer=NULL;
-		if(indexBufferPeer==NULL){
+		if(glindexBuffer->mHandle==0){
 			if(mCapabilitySet.hardwareIndexBuffers){
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+				glBindBuffer(glindexBuffer->mTarget,0);
 			}
-			basePointer=indexBuffer->internal_getData();
+			basePointer=glindexBuffer->mData;
 		}
 		else{
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,indexBufferPeer->bufferHandle);
+			glBindBuffer(glindexBuffer->mTarget,glindexBuffer->mHandle);
 		}
-		basePointer+=indexData->getStart()*indexBuffer->getIndexFormat();
+		basePointer+=indexData->getStart()*glindexBuffer->getIndexFormat();
 
 		TOADLET_CHECK_GLERROR("setupIndexData");
 
@@ -1738,21 +1703,20 @@ void GLRenderer::setVertexData(const VertexData *vertexData){
 	int numVertexBuffers=vertexData->getNumVertexBuffers();
 	int i,j;
 	for(i=0;i<numVertexBuffers;++i){
-		VertexBuffer *vertexBuffer=vertexData->getVertexBuffer(i);
-		GLBufferPeer *vertexBufferPeer=(GLBufferPeer*)vertexBuffer->internal_getBufferPeer();
+		GLBuffer *glvertexBuffer=(GLBuffer*)vertexData->getVertexBuffer(i)->getRootVertexBuffer();
 
 		uint8 *basePointer=NULL;
-		if(vertexBufferPeer==NULL){
+		if(glvertexBuffer->mHandle==0){
 			if(mCapabilitySet.hardwareVertexBuffers){
-				glBindBuffer(GL_ARRAY_BUFFER,0);
+				glBindBuffer(glvertexBuffer->mTarget,0);
 			}
-			basePointer=vertexBuffer->internal_getData();
+			basePointer=glvertexBuffer->mData;
 		}
 		else{
-			glBindBuffer(GL_ARRAY_BUFFER,vertexBufferPeer->bufferHandle);
+			glBindBuffer(glvertexBuffer->mTarget,glvertexBuffer->mHandle);
 		}
 
-		VertexFormat *vertexFormat=vertexBuffer->getVertexFormat();
+		VertexFormat *vertexFormat=glvertexBuffer->getVertexFormat();
 		GLsizei vertexSize=vertexFormat->getVertexSize();
 		int numVertexElements=vertexFormat->getNumVertexElements();
 		for(j=0;j<numVertexElements;++j){
