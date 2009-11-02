@@ -25,7 +25,7 @@ if (TOADLET_PLATFORM_WIN32)
 	)
 
 	# Library
-	add_library (msTMSHExporter ${MSTMSHEXPORTER_SRC} ${MSTMSHEXPORTER_H})
+	add_library (msTMSHExporter SHARED ${MSTMSHEXPORTER_SRC} ${MSTMSHEXPORTER_H})
 	set_target_properties (msTMSHExporter PROPERTIES COMPILE_FLAGS "/MT")
 	target_link_libraries (msTMSHExporter ${MSTMSHEXPORTER_LIBS})
 	install (TARGETS msTMSHExporter DESTINATION ${MS3D_DIR})
