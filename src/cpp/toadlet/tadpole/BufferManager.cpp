@@ -25,6 +25,7 @@
 
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/Engine.h>
+#include <string.h> //memcpy
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;

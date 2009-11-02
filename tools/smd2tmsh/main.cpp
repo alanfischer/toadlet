@@ -81,14 +81,14 @@ int main(int argc,char **argv){
 	for(i=0;i<files.size();++i){
 		String fileName=files[i];
 
-		std::cout << "Loading " << fileName << std::endl;
+		std::cout << "Loading " << (const char*)fileName << std::endl;
 
 		FileInputStream::ptr in(new FileInputStream(fileName));
 		if(in->isOpen()){
 			smd.load(in);
 		}
 		else{
-			std::cout << "Error opening " << fileName << std::endl;
+			std::cout << "Error opening " << (const char*)fileName << std::endl;
 		}
 		in->close();
 	}
@@ -98,7 +98,7 @@ int main(int argc,char **argv){
 		int p=outputName.rfind('.');
 		outputName=outputName.substr(0,p)+".xmsh";
 
-		std::cout << "Saving " << outputName << std::endl;
+		std::cout << "Saving " << (const char*)outputName << std::endl;
 
 		FileOutputStream::ptr out(new FileOutputStream(outputName));
 		if(out->isOpen()){
