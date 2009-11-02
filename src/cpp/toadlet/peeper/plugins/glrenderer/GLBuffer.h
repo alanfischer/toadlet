@@ -82,7 +82,7 @@ protected:
 	bool mBacking;
 	uint8 *mData;
 
-	friend GLRenderer;
+	friend class GLRenderer;
 };
 
 }
