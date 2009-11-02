@@ -678,9 +678,9 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 	HRESULT result=S_OK;
 
 	if(textureStage!=NULL){
-		Texture *texture=textureStage->getTexture()->getRootTexture();
+		Texture *texture=textureStage->getTexture();
 		if(texture!=NULL){
-			D3D9Texture *d3dtexture=(D3D9Texture*)texture;
+			D3D9Texture *d3dtexture=(D3D9Texture*)texture->getRootTexture();
 
 			result=mD3DDevice->SetTexture(stage,d3dtexture->mTexture);
 			TOADLET_CHECK_D3D9ERROR(result,"SetTexture");

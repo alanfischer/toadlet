@@ -362,19 +362,19 @@ void GLRenderer::setModelMatrix(const Matrix4x4 &matrix){
 		#if defined(TOADLET_HAS_GLES)
 			mModelMatrix.set(matrix);
 
-			glLoadMatrixx(mViewMatrix.getData());
-			glMultMatrixx(mModelMatrix.getData());
+			glLoadMatrixx(mViewMatrix.data);
+			glMultMatrixx(mModelMatrix.data);
 		#else
 			MathConversion::scalarToFloat(mModelMatrix,matrix);
 
-			glLoadMatrixf(mViewMatrix.getData());
-			glMultMatrixf(mModelMatrix.getData());
+			glLoadMatrixf(mViewMatrix.data);
+			glMultMatrixf(mModelMatrix.data);
 		#endif
 	#else
 		mModelMatrix.set(matrix);
 
-		glLoadMatrixf(mViewMatrix.getData());
-		glMultMatrixf(mModelMatrix.getData());
+		glLoadMatrixf(mViewMatrix.data);
+		glMultMatrixf(mModelMatrix.data);
 	#endif
 
 	TOADLET_CHECK_GLERROR("setModelMatrix");
@@ -390,19 +390,19 @@ void GLRenderer::setViewMatrix(const Matrix4x4 &matrix){
 		#if defined(TOADLET_HAS_GLES)
 			mViewMatrix.set(matrix);
 
-			glLoadMatrixx(mViewMatrix.getData());
-			glMultMatrixx(mModelMatrix.getData());
+			glLoadMatrixx(mViewMatrix.data);
+			glMultMatrixx(mModelMatrix.data);
 		#else
 			MathConversion::scalarToFloat(mViewMatrix,matrix);
 
-			glLoadMatrixf(mViewMatrix.getData());
-			glMultMatrixf(mModelMatrix.getData());
+			glLoadMatrixf(mViewMatrix.data);
+			glMultMatrixf(mModelMatrix.data);
 		#endif
 	#else
 		mViewMatrix.set(matrix);
 
-		glLoadMatrixf(mViewMatrix.getData());
-		glMultMatrixf(mModelMatrix.getData());
+		glLoadMatrixf(mViewMatrix.data);
+		glMultMatrixf(mModelMatrix.data);
 	#endif
 
 	TOADLET_CHECK_GLERROR("setViewMatrix");
@@ -423,7 +423,7 @@ void GLRenderer::setProjectionMatrix(const Matrix4x4 &matrix){
 				cacheMatrix4x4.setAt(1,2,-cacheMatrix4x4.at(1,2));
 				cacheMatrix4x4.setAt(1,3,-cacheMatrix4x4.at(1,3));
 
-				glLoadMatrixx(cacheMatrix4x4.getData());
+				glLoadMatrixx(cacheMatrix4x4.data);
 			#else
 				MathConversion::scalarToFloat(cacheMatrix4x4,matrix);
 				cacheMatrix4x4.setAt(1,0,-cacheMatrix4x4.at(1,0));
@@ -431,7 +431,7 @@ void GLRenderer::setProjectionMatrix(const Matrix4x4 &matrix){
 				cacheMatrix4x4.setAt(1,2,-cacheMatrix4x4.at(1,2));
 				cacheMatrix4x4.setAt(1,3,-cacheMatrix4x4.at(1,3));
 
-				glLoadMatrixf(cacheMatrix4x4.getData());
+				glLoadMatrixf(cacheMatrix4x4.data);
 			#endif
 		#else
 			cacheMatrix4x4.set(matrix);
@@ -440,19 +440,19 @@ void GLRenderer::setProjectionMatrix(const Matrix4x4 &matrix){
 			cacheMatrix4x4.setAt(1,2,-cacheMatrix4x4.at(1,2));
 			cacheMatrix4x4.setAt(1,3,-cacheMatrix4x4.at(1,3));
 
-			glLoadMatrixf(cacheMatrix4x4.getData());
+			glLoadMatrixf(cacheMatrix4x4.data);
 		#endif
 	}
 	else{
 		#if defined(TOADLET_FIXED_POINT)
 			#if defined(TOADLET_HAS_GLES)
-				glLoadMatrixx(matrix.getData());
+				glLoadMatrixx(matrix.data);
 			#else
 				MathConversion::scalarToFloat(cacheMatrix4x4,matrix);
-				glLoadMatrixf(cacheMatrix4x4.getData());
+				glLoadMatrixf(cacheMatrix4x4.data);
 			#endif
 		#else
-			glLoadMatrixf(matrix.getData());
+			glLoadMatrixf(matrix.data);
 		#endif
 	}
 
@@ -1221,15 +1221,15 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 				}
 				#if defined(TOADLET_FIXED_POINT)
 					#if defined(TOADLET_HAS_GLES)
-						glLoadMatrixx(textureStage->getTextureMatrix().getData());
-						glMultMatrixx(gltexture->mMatrix.getData());
+						glLoadMatrixx(textureStage->getTextureMatrix().data);
+						glMultMatrixx(gltexture->mMatrix.data);
 					#else
-						glLoadMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,textureStage->getTextureMatrix()).getData());
-						glMultMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,gltexture->textureMatrix).getData());
+						glLoadMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,textureStage->getTextureMatrix()).data);
+						glMultMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,gltexture->mMatrix).data);
 					#endif
 				#else
-					glLoadMatrixf(textureStage->getTextureMatrix().getData());
-					glMultMatrixf(gltexture->mMatrix.getData());
+					glLoadMatrixf(textureStage->getTextureMatrix().data);
+					glMultMatrixf(gltexture->mMatrix.data);
 				#endif
 			}
 			else{
@@ -1466,9 +1466,9 @@ void GLRenderer::setLight(int i,Light *light){
 
 	glPushMatrix();
 	#if	defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
-		glLoadMatrixx(mViewMatrix.getData());
+		glLoadMatrixx(mViewMatrix.data);
 	#else
-		glLoadMatrixf(mViewMatrix.getData());
+		glLoadMatrixf(mViewMatrix.data);
 	#endif
 
 	switch(light->getType()){

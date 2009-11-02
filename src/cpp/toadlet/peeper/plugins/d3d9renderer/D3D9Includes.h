@@ -71,7 +71,7 @@ namespace peeper{
 #else
 	#if defined(TOADLET_FIXED_POINT)
 		inline void toD3DCOLORVALUE(D3DCOLORVALUE &r,const Color &c){
-			r.r=Math::toFloat(c.r); r.g=Math::toFloat(c.g); r.b=Math::toFloat(c.b); c.a=Math::toFloat(c.a);
+			r.r=Math::toFloat(c.r); r.g=Math::toFloat(c.g); r.b=Math::toFloat(c.b); r.a=Math::toFloat(c.a);
 		}
 	#else
 		inline void toD3DCOLORVALUE(D3DCOLORVALUE &r,const Color &c){
