@@ -275,10 +275,6 @@ protected:
 	ShaderManager *mShaderManager;
 
 	// Program
-	class ProgramSemantics{
-	public:
-		static inline peeper::ProgramPeer *getResourcePeer(egg::Resource *resource){return ((peeper::Program*)resource)->internal_getProgramPeer();}
-	};
 
 	typedef ContextResourceManager<peeper::ProgramPeer,ProgramSemantics> ProgramManager;
 	ProgramManager *mProgramManager;

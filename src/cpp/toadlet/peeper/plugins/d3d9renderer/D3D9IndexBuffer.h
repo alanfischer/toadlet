@@ -60,14 +60,13 @@ protected:
 
 	int mUsageFlags;
 	AccessType mAccessType;
-	IndexFormat mIndexFormat;
 	int mSize;
+	IndexFormat mIndexFormat;
 	int mDataSize;
 
 	IDirect3DIndexBuffer9 *mIndexBuffer;
-
-	uint8 *mData;
 	AccessType mLockType;
+	uint8 *mData;
 
 	friend D3D9Renderer;
 };
