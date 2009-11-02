@@ -62,7 +62,6 @@ public:
 	virtual void destroy();
 
 	inline const ParentEntity::ptr &getBackground() const{return mBackground;}
-	inline const ParentEntity::ptr &getOverlay() const{return mOverlay;}
 
 	virtual void setAmbientColor(peeper::Color ambientColor);
 	const peeper::Color &getAmbientColor(){return mAmbientColor;}
@@ -148,7 +147,6 @@ protected:
 	int mVisualFrame;
 
 	ParentEntity::ptr mBackground;
-	ParentEntity::ptr mOverlay;
 
 	egg::Collection<Entity::ptr> mUpdateEntities;
 	UpdateListener *mUpdateListener;

@@ -598,7 +598,7 @@ bool X11Application::createContextAndRenderer(){
 
 		mRenderer=makeRenderer();
 		if(mRenderer!=NULL){
-			if(mRenderer->startup(this,mRendererOptions)==false){
+			if(mRenderer->create(this,mRendererOptions)==false){
 				delete mRenderer;
 				mRenderer=NULL;
 				Error::unknown(Categories::TOADLET_PAD,
@@ -635,7 +635,7 @@ bool X11Application::destroyRendererAndContext(){
 	if(mRenderer!=NULL){
 		mEngine->setRenderer(NULL);
 
-		mRenderer->shutdown();
+		mRenderer->destroy();
 		delete mRenderer;
 		mRenderer=NULL;
 	}
@@ -653,7 +653,7 @@ bool X11Application::createAudioPlayer(){
 		mAudioPlayer=new ALPlayer();
 		bool result=false;
 		TOADLET_TRY
-			result=mAudioPlayer->startup(NULL);
+			result=mAudioPlayer->create(NULL);
 		TOADLET_CATCH(const Exception &){result=false;}
 		if(result=false){
 			delete mAudioPlayer;
@@ -669,7 +669,7 @@ bool X11Application::createAudioPlayer(){
 bool X11Application::destroyAudioPlayer(){
 	if(mAudioPlayer!=NULL){
 		mEngine->setAudioPlayer(NULL);
-		mAudioPlayer->shutdown();
+		mAudioPlayer->destroy();
 		delete mAudioPlayer;
 		mAudioPlayer=NULL;
 	}
