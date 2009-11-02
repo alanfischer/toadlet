@@ -36,17 +36,15 @@ TextureStage::TextureStage():
 	mSAddressMode(AddressMode_REPEAT),
 	mTAddressMode(AddressMode_REPEAT),
 	mRAddressMode(AddressMode_REPEAT),
-	mAddressModeSpecified(false),
 
 	mMinFilter(Filter_NEAREST),
 	mMipFilter(Filter_NONE),
 	mMagFilter(Filter_NEAREST),
-	mFilterSpecified(false),
 
 	mTexCoordIndex(0),
 
-	//mTextureMatrix,
-	mTextureMatrixIdentity(true)
+	mCalculation(Calculation_DISABLED)
+	//mMatrix,
 {
 }
 
@@ -58,54 +56,22 @@ TextureStage::TextureStage(const Texture::ptr &texture):
 	mSAddressMode(AddressMode_REPEAT),
 	mTAddressMode(AddressMode_REPEAT),
 	mRAddressMode(AddressMode_REPEAT),
-	mAddressModeSpecified(false),
 
 	mMinFilter(Filter_NEAREST),
 	mMipFilter(Filter_NONE),
 	mMagFilter(Filter_NEAREST),
-	mFilterSpecified(false),
 
 	mTexCoordIndex(0),
 
-	//mTextureMatrix,
-	mTextureMatrixIdentity(true)
+	mCalculation(Calculation_DISABLED)
+	//mMatrix,
 {
 	mTexture=texture;
 }
 	
-void TextureStage::setSAddressMode(AddressMode addressMode){
-	mSAddressMode=addressMode;
-	mAddressModeSpecified=true;
-}
-
-void TextureStage::setTAddressMode(AddressMode addressMode){
-	mTAddressMode=addressMode;
-	mAddressModeSpecified=true;
-}
-
-void TextureStage::setRAddressMode(AddressMode addressMode){
-	mRAddressMode=addressMode;
-	mAddressModeSpecified=true;
-}
-
-void TextureStage::setMinFilter(Filter minFilter){
-	mMinFilter=minFilter;
-	mFilterSpecified=true;
-}
-
-void TextureStage::setMipFilter(Filter mipFilter){
-	mMipFilter=mipFilter;
-	mFilterSpecified=true;
-}
-
-void TextureStage::setMagFilter(Filter magFilter){
-	mMagFilter=magFilter;
-	mFilterSpecified=true;
-}
-
-void TextureStage::setTextureMatrix(const Matrix4x4 &matrix){
-	mTextureMatrix.set(matrix);
-	mTextureMatrixIdentity=false;
+void TextureStage::setCalculation(Calculation calculation,const Matrix4x4 &matrix){
+	mCalculation=calculation;
+	mMatrix.set(matrix);
 }
 
 }

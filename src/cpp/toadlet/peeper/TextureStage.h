@@ -49,6 +49,13 @@ public:
 		Filter_LINEAR,
 	};
 
+	enum Calculation{
+		Calculation_DISABLED,
+		Calculation_NORMAL,
+		Calculation_OBJECTSPACE,
+		Calculation_CAMERASPACE,
+	};
+
 	TextureStage();
 	TextureStage(const Texture::ptr &texture);
 	virtual ~TextureStage(){}
@@ -62,29 +69,26 @@ public:
 	void setBlend(const TextureBlend &blend){mBlend.set(blend);}
 	inline const TextureBlend &getBlend() const{return mBlend;}
 
-	void setSAddressMode(AddressMode addressMode);
+	void setSAddressMode(AddressMode addressMode){mSAddressMode=addressMode;}
 	inline AddressMode getSAddressMode() const{return mSAddressMode;}
-	void setTAddressMode(AddressMode addressMode);
+	void setTAddressMode(AddressMode addressMode){mTAddressMode=addressMode;}
 	inline AddressMode getTAddressMode() const{return mTAddressMode;}
-	void setRAddressMode(AddressMode addressMode);
+	void setRAddressMode(AddressMode addressMode){mRAddressMode=addressMode;}
 	inline AddressMode getRAddressMode() const{return mRAddressMode;}
-	inline bool getAddressModeSpecified() const{return mAddressModeSpecified;}
 
-	void setMinFilter(Filter minFilter);
+	void setMinFilter(Filter minFilter){mMinFilter=minFilter;}
 	inline Filter getMinFilter() const{return mMinFilter;}
-	void setMipFilter(Filter mipFilter);
+	void setMipFilter(Filter mipFilter){mMipFilter=mipFilter;}
 	inline Filter getMipFilter() const{return mMipFilter;}
-	void setMagFilter(Filter magFilter);
+	void setMagFilter(Filter magFilter){mMagFilter=magFilter;}
 	inline Filter getMagFilter() const{return mMagFilter;}
-	inline bool getFilterSpecified() const{return mFilterSpecified;}
 
 	void setTexCoordIndex(int index){mTexCoordIndex=index;}
 	inline int getTexCoordIndex() const{return mTexCoordIndex;}
 
-	void setTextureMatrix(const Matrix4x4 &matrix);
-	inline const Matrix4x4 &getTextureMatrix() const{return mTextureMatrix;}
-
-	inline bool getTextureMatrixIdentity() const{return mTextureMatrixIdentity;}
+	void setCalculation(Calculation calculation,const Matrix4x4 &matrix);
+	inline Calculation getCalculation() const{return mCalculation;}
+	inline const Matrix4x4 &getMatrix() const{return mMatrix;}
 
 protected:
 	Texture::ptr mTexture;
@@ -95,18 +99,15 @@ protected:
 	AddressMode mSAddressMode;
 	AddressMode mTAddressMode;
 	AddressMode mRAddressMode;
-	bool mAddressModeSpecified;
 
 	Filter mMinFilter;
 	Filter mMipFilter;
 	Filter mMagFilter;
-	bool mFilterSpecified;
 
 	int mTexCoordIndex;
 
-	///@todo  Change this so it could be on the heap, and NULL would mean identity.  Would save mem & translate to java fine
-	Matrix4x4 mTextureMatrix;
-	bool mTextureMatrixIdentity;
+	Calculation mCalculation;
+	Matrix4x4 mMatrix;
 };
 
 }

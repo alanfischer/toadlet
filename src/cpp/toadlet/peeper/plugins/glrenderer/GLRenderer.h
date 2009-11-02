@@ -104,7 +104,6 @@ public:
 	void setPointParameters(bool sprite,scalar size,bool attenuated,scalar constant,scalar linear,scalar quadratic,scalar minSize,scalar maxSize);
 	void setTextureStage(int stage,TextureStage *textureStage);
 	void setProgram(const Program *program);
-	void setTexCoordGen(int stage,const TexCoordGen &texCoordGen,const Matrix4x4 &matrix);
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
 	void setShadowComparisonMethod(bool enabled);
 
@@ -169,6 +168,7 @@ protected:
 	Normalize mNormalize;
 	Shading mShading;
 	bool mTexturePerspective;
+	bool mInTexGen;
 
 	egg::Collection<Texture*> mLastTextures;
 
