@@ -62,15 +62,15 @@ void VertexLighter::lightMesh(Mesh *mesh){
 		newVertexFormat->addVertexElement(VertexElement(VertexElement::Type_COLOR,VertexElement::Format_COLOR_RGBA,0));
 	}
 
-	VertexBuffer::ptr newVertexBuffer=VertexBuffer::ptr(vertexBuffer->cloneWithNewParameters(Buffer::UsageType_STATIC,Buffer::AccessType_READ_WRITE,newVertexFormat,vertexBuffer->getSize()));
+	VertexBuffer::ptr newVertexBuffer=mEngine->getBufferManager()->cloneVertexBuffer(vertexBuffer,Buffer::UsageFlags_STATIC,Buffer::AccessType_READ_WRITE,newVertexFormat,vertexBuffer->getSize());
 	mesh->staticVertexData=VertexData::ptr(new VertexData(newVertexBuffer));
 
 	int pi=newVertexFormat->getVertexElementIndexOfType(VertexElement::Type_POSITION);
 	int ni=newVertexFormat->getVertexElementIndexOfType(VertexElement::Type_NORMAL);
 	int ci=newVertexFormat->getVertexElementIndexOfType(VertexElement::Type_TEX_COORD);
 
-	VertexBufferAccessor vba(vertexBuffer,Buffer::LockType_READ_WRITE);
-	VertexBufferAccessor nvba(newVertexBuffer,Buffer::LockType_READ_WRITE);
+	VertexBufferAccessor vba;(vertexBuffer);
+	VertexBufferAccessor nvba(newVertexBuffer);
 
 	Collection<char> touchedVertexes(vertexBuffer->getSize());
 	memset(&touchedVertexes[0],0,touchedVertexes.size());
@@ -120,7 +120,7 @@ void VertexLighter::lightMesh(Mesh *mesh){
 		}
 
 		IndexBuffer::ptr indexBuffer(mesh->subMeshes[i]->indexData->getIndexBuffer());
-		IndexBufferAccessor iba(indexBuffer,Buffer::LockType_READ_ONLY);
+		IndexBufferAccessor iba(indexBuffer);
 
 		int j;
 		for(j=0;j<iba.getSize();++j){

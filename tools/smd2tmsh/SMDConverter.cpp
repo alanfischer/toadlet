@@ -40,13 +40,16 @@ public:
 	Vertex verts[3];
 };
 
-SMDConverter::SMDConverter():
+SMDConverter::SMDConverter(Engine *engine):
+	mEngine(NULL),
 	mPositionEpsilon(Math::fromMilli(10)),
 	mNormalEpsilon(Math::fromMilli(10)),
 	mTexCoordEpsilon(Math::fromMilli(10)),
 	mRemoveSkeleton(false),
 	mInvertFaces(false)
-{}
+{
+	mEngine=engine;
+}
 
 void SMDConverter::load(toadlet::egg::io::InputStream *in){
 	int block=Block_NONE;
@@ -245,7 +248,7 @@ void SMDConverter::load(toadlet::egg::io::InputStream *in){
 		vertexFormat->addVertexElement(VertexElement(VertexElement::Type_POSITION,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3));
 		vertexFormat->addVertexElement(VertexElement(VertexElement::Type_NORMAL,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3));
 		vertexFormat->addVertexElement(VertexElement(VertexElement::Type_TEX_COORD,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_2));
-		VertexBuffer::ptr vertexBuffer(new VertexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,verts.size()));
+		VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,verts.size());
 		{
 			VertexBufferAccessor vba(vertexBuffer);
 			for(i=0;i<verts.size();++i){
@@ -270,7 +273,7 @@ void SMDConverter::load(toadlet::egg::io::InputStream *in){
 			const String &materialName=materialIndexLists.at(j).first;
 			const Collection<int> &indexList=materialIndexLists.at(j).second;
 
-			IndexBuffer::ptr indexBuffer(new IndexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,indexList.size()));
+			IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,indexList.size());
 			{
 				IndexBufferAccessor iba(indexBuffer);
 

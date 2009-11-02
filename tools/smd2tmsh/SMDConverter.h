@@ -3,6 +3,7 @@
 
 #include <toadlet/egg/io/InputStream.h>
 #include <toadlet/tadpole/Mesh.h>
+#include <toadlet/tadpole/Engine.h>
 
 class Vertex;
 using toadlet::scalar;
@@ -16,7 +17,7 @@ public:
 		Block_TRIANGLES,
 	};
 
-	SMDConverter();
+	SMDConverter(toadlet::tadpole::Engine *engine);
 
 	void load(toadlet::egg::io::InputStream *in);
 
@@ -41,6 +42,8 @@ protected:
 	toadlet::egg::String readLine(toadlet::egg::io::InputStream *in);
 	void setQuaternionFromXYZ(toadlet::tadpole::Quaternion &r,scalar x,scalar y,scalar z);
 	bool vertsEqual(const Vertex &v1,const Vertex &v2);
+
+	toadlet::tadpole::Engine *mEngine;
 
 	toadlet::tadpole::Mesh::ptr mMesh;
 	toadlet::tadpole::MeshSkeleton::ptr mSkeleton;
