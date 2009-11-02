@@ -206,18 +206,14 @@ void LabelWidget::rebuild(){
 	if(mVertexData==NULL || mVertexData->getVertexBuffer(0)->getSize()/4<length){
 		int i,ix;
 
-		VertexBuffer::ptr vertexBuffer=mEngine->loadVertexBuffer(VertexBuffer::ptr(new VertexBuffer(Buffer::UsageType_DYNAMIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_COLOR_TEX_COORD,length*4)));
-		// Any time our contents would be lost, should be followed up with a resize so they should get restored
-		// realistically I should be able to ensure this in Window somehow, but for now we'll just trust its the truth
-		// TODO: Why if I turn it off in BorderWidget does it not work?  Maybe i'm incorrect?
-		vertexBuffer->setRememberContents(false);
+		VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_DYNAMIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_COLOR_TEX_COORD,length*4);
 		mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 
-		IndexBuffer::ptr indexBuffer=mEngine->loadIndexBuffer(IndexBuffer::ptr(new IndexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,length*6)));
+		IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,length*6);
 		mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,length*6));
 
 		{
-			uint16 *data=(uint16*)indexBuffer->lock(Buffer::LockType_WRITE_ONLY);
+			uint16 *data=(uint16*)indexBuffer->lock(Buffer::AccessType_WRITE_ONLY);
 			for(i=0;i<length;i++){
 				ix=i*6;
 				data[ix+0]=i*4+0;

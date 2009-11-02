@@ -340,16 +340,10 @@ void ParticleEntity::startSimulating(ParticleSimulator::ptr particleSimulator){
 	// Disable the bounding radius, cause they may very well bounce out of it
 	mBoundingRadius=-Math::ONE;
 
-	if(mVertexData!=NULL && mVertexData->getNumVertexBuffers()>0){
-		mVertexData->getVertexBuffer(0)->setRememberContents(false);
-	}
 	setReceiveUpdates(true);
 }
 
 void ParticleEntity::stopSimulating(){
-	if(mVertexData!=NULL && mVertexData->getNumVertexBuffers()>0){
-		mVertexData->getVertexBuffer(0)->setRememberContents(true);
-	}
 	setReceiveUpdates(false);
 
 	mParticleSimulator=NULL;
@@ -441,7 +435,7 @@ void ParticleEntity::createVertexBuffer(){
 		numVertexes=(numParticles/mParticlesPerBeam)*((mParticlesPerBeam-2)*2+8);
 	}
 
-	VertexBuffer::ptr vertexBuffer=mEngine->loadVertexBuffer(VertexBuffer::ptr(new VertexBuffer(Buffer::UsageType_DYNAMIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,numVertexes)));
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_DYNAMIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,numVertexes);
 	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 
 	int numIndexes=0;
@@ -453,12 +447,12 @@ void ParticleEntity::createVertexBuffer(){
 		numIndexes=(numParticles/mParticlesPerBeam)*((mParticlesPerBeam-2)*2+6)*3;
 	}
 
-	IndexBuffer::ptr indexBuffer=mEngine->loadIndexBuffer(IndexBuffer::ptr(new IndexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,numVertexes<256?IndexBuffer::IndexFormat_UINT_8:IndexBuffer::IndexFormat_UINT_16,numIndexes)));
+	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,numVertexes<256?IndexBuffer::IndexFormat_UINT_8:IndexBuffer::IndexFormat_UINT_16,numIndexes);
 	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,numIndexes));
 	mLineIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,NULL,0,numParticles));
 
 	{
-		iba.lock(indexBuffer,Buffer::LockType_WRITE_ONLY);
+		iba.lock(indexBuffer,Buffer::AccessType_WRITE_ONLY);
 
 		if(mParticlesPerBeam<2){
 			for(i=0;i<numParticles;++i){
@@ -525,7 +519,7 @@ void ParticleEntity::updateVertexBuffer(const Matrix4x4 &viewTransform){
 	scalar endScale=mEndScale/2;
 	scalar scale=startScale;
 	{
-		vba.lock(mVertexData->getVertexBuffer(0),Buffer::LockType_WRITE_ONLY);
+		vba.lock(mVertexData->getVertexBuffer(0),Buffer::AccessType_WRITE_ONLY);
 
 		if(mParticlesPerBeam<2){
 			int frameOffset=0,widthFrames=1,heightFrames=1;

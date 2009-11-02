@@ -40,7 +40,7 @@ namespace Math{
 	using namespace toadlet::egg::mathfixed::Math;
 }
 
-MMSHHandler::MMSHHandler(ResourceManager *bufferManager,Engine *engine){
+MMSHHandler::MMSHHandler(BufferManager *bufferManager,Engine *engine){
 	mBufferManager=bufferManager;
 	mEngine=engine;
 }
@@ -108,13 +108,14 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 			// HACK: Due to a bug in reading back vertexes from a hardware buffer in OGLES, we only load the static VertexBuffer of a Mesh if its not animated.
 			VertexBuffer::ptr vertexBuffer;
 			if((vertexType&VT_BONE)>0){
-				vertexBuffer=VertexBuffer::ptr(new VertexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_READ_WRITE,vertexFormat,numVertexes));
+				vertexBuffer=mBufferManager->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_READ_WRITE,vertexFormat,numVertexes);
 			}
 			else{
-				vertexBuffer=shared_static_cast<VertexBuffer>(mBufferManager->load(VertexBuffer::ptr(new VertexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,numVertexes))));
+				vertexBuffer=mBufferManager->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,numVertexes);
 			}
 
-			VertexBufferAccessor vba(vertexBuffer,Buffer::LockType_WRITE_ONLY);
+			VertexBufferAccessor vba;
+			vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
 
 			if((vertexType&VT_POSITION)>0){
 				uint8 bytes=in->readUInt8();
@@ -286,9 +287,9 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 					newNumIndexes+=(stripLengths[j]-2)*3;
 				}
 
-				IndexBuffer::ptr indexBuffer=shared_static_cast<IndexBuffer>(mBufferManager->load(IndexBuffer::ptr(new IndexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,newNumIndexes))));
+				IndexBuffer::ptr indexBuffer=mBufferManager->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,newNumIndexes);
 				{
-					uint16 *indexData=(uint16*)indexBuffer->lock(Buffer::LockType_WRITE_ONLY);
+					uint16 *indexData=(uint16*)indexBuffer->lock(Buffer::AccessType_WRITE_ONLY);
 					int ipo=0;
 					int ipn=0;
 					for(j=0;j<numStrips;++j){

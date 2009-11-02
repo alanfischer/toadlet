@@ -53,11 +53,11 @@ SpriteWidget::SpriteWidget(Engine *engine):RenderableWidget(engine),
 {
 	mType|=Type_SPRITE;
 
-	VertexBuffer::ptr vertexBuffer=engine->loadVertexBuffer(VertexBuffer::ptr(new VertexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,4)));
+	VertexBuffer::ptr vertexBuffer=engine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,4);
 	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 	{
 		VertexBufferAccessor vba;
-		vba.lock(vertexBuffer,Buffer::LockType_WRITE_ONLY);
+		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
 
 		vba.set3(	0,0, 0,Math::ONE,0);
 		vba.set2(	0,1, 0,0);

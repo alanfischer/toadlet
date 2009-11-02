@@ -95,11 +95,11 @@ Engine::Engine():
 
 	mMaterialManager=new MaterialManager(this,mTextureManager);
 
-	mFontManager=new FontManager(this);
+	mFontManager=new ResourceManager(this);
 
 	mMeshManager=new MeshManager(this);
 
-	mAudioBufferManager=new AudioBufferManager(this);
+	mAudioBufferManager=new ResourceManager(this);
 
 
 	Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_DEBUG,
@@ -361,51 +361,6 @@ void Engine::contextActivate(Renderer *renderer){
 
 	Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_DEBUG,
 		"Engine::contextActivate");
-
-//	TextureManager::ResourcePtrMap &textureResourceMap=mTextureManager->getResourcePtrMap();
-//	TextureManager::ResourcePtrMap::iterator textureIt;
-
-	int numTexturesLoaded=0;
-/*	for(textureIt=textureResourceMap.begin();textureIt!=textureResourceMap.end();++textureIt){
-		Texture *resource=(Texture*)textureIt->second->resource.get();
-		if(resource!=NULL){
-			TOADLET_ASSERT(resource->internal_getTexturePeer()==NULL);
-			TexturePeer *peer=renderer->createTexturePeer(resource);
-			if(peer!=NULL){
-				resource->internal_setTexturePeer(peer,false);
-				numTexturesLoaded++;
-			}
-		}
-	}
-
-	mTextureManager->getContextResourcesToLoad().clear();
-*/
-
-	BufferManager::ResourcePtrMap &bufferResourceMap=mBufferManager->getResourcePtrMap();
-	BufferManager::ResourcePtrMap::iterator bufferIt;
-
-	int numBuffersLoaded=0;
-	for(bufferIt=bufferResourceMap.begin();bufferIt!=bufferResourceMap.end();++bufferIt){
-		Buffer *resource=(Buffer*)bufferIt->second->resource.get();
-		if(resource!=NULL){
-			TOADLET_ASSERT(resource->internal_getBufferPeer()==NULL);
-			BufferPeer *peer=NULL;
-			if(resource->getBufferSize()>0){
-				peer=renderer->createBufferPeer(resource);
-			}
-			if(peer!=NULL){
-				resource->internal_setBufferPeer(peer,false);
-				numBuffersLoaded++;
-			}
-		}
-	}
-
-	mBufferManager->getContextResourcesToLoad().clear();
-
-	if((numTexturesLoaded>0 || numBuffersLoaded>0) && Logger::getInstance()->getMasterCategoryReportingLevel(Categories::TOADLET_TADPOLE)>=Logger::Level_EXCESSIVE){
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_EXCESSIVE,
-			String("contextActivate: Loaded ")+numTexturesLoaded+" textures, loaded "+numBuffersLoaded+" buffers");
-	}
 }
 
 void Engine::contextDeactivate(Renderer *renderer){
@@ -413,129 +368,11 @@ void Engine::contextDeactivate(Renderer *renderer){
 
 	Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_DEBUG,
 		"Engine::contextDeactivate");
-
-	int i;
-//	TextureManager::ResourcePeerCollection &textureResourcePeersToUnload=mTextureManager->getContextResourcePeersToUnload();
-//	TextureManager::ResourcePtrMap &textureResourceMap=mTextureManager->getResourcePtrMap();
-//	TextureManager::ResourcePtrMap::iterator textureIt;
-
-	int numTexturePeersUnloaded=0;
-/*	for(i=0;i<textureResourcePeersToUnload.size();++i){
-		delete textureResourcePeersToUnload[i];
-		numTexturePeersUnloaded++;
-	}
-	textureResourcePeersToUnload.clear();
-
-	for(textureIt=textureResourceMap.begin();textureIt!=textureResourceMap.end();++textureIt){
-		Texture *resource=(Texture*)textureIt->second->resource.get();
-		if(resource!=NULL){
-			TexturePeer *peer=resource->internal_getTexturePeer();
-			if(peer!=NULL){
-				// TODO: Modify Texture so it reads back the texture data and stores it internally?
-				//  This would let us deactivate a context and reactivate it.
-				//  The Buffer already does this
-				resource->internal_setTexturePeer(NULL,false);
-				delete peer;
-				numTexturePeersUnloaded++;
-			}
-		}
-	}
-*/
-
-	BufferManager::ResourcePeerCollection &bufferResourcePeersToUnload=mBufferManager->getContextResourcePeersToUnload();
-	BufferManager::ResourcePtrMap &bufferResourceMap=mBufferManager->getResourcePtrMap();
-	BufferManager::ResourcePtrMap::iterator bufferIt;
-
-	int numBufferPeersUnloaded=0;
-	for(i=0;i<bufferResourcePeersToUnload.size();++i){
-		delete bufferResourcePeersToUnload[i];
-		numBufferPeersUnloaded++;
-	}
-	bufferResourcePeersToUnload.clear();
-
-	for(bufferIt=bufferResourceMap.begin();bufferIt!=bufferResourceMap.end();++bufferIt){
-		Buffer *resource=(Buffer*)bufferIt->second->resource.get();
-		if(resource!=NULL){
-			BufferPeer *peer=resource->internal_getBufferPeer();
-			if(peer!=NULL){
-				resource->internal_setBufferPeer(NULL,false);
-				delete peer;
-				numBufferPeersUnloaded++;
-			}
-		}
-	}
-
-	if((numTexturePeersUnloaded>0 || numBufferPeersUnloaded>0) && Logger::getInstance()->getMasterCategoryReportingLevel(Categories::TOADLET_TADPOLE)>=Logger::Level_EXCESSIVE){
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_EXCESSIVE,
-			String("contextDeactivate: Unloaded ")+numTexturePeersUnloaded+" texture peers, unloaded "+numBufferPeersUnloaded+" buffer peers");
-	}
 }
 
 /// @todo   I have to implement the resource freeing after context loading, and then have a method of reloading the resource data if the context is destroyed.  Possibily getting it from its file handle, or letting the user supply some other factory method
 void Engine::contextUpdate(Renderer *renderer){
 	TOADLET_ASSERT(renderer!=NULL);
-
-	int i;
-//	TextureManager::ResourcePeerCollection &textureResourcePeersToUnload=mTextureManager->getContextResourcePeersToUnload();
-//	TextureManager::ResourceCollection &textureResourcesToLoad=mTextureManager->getContextResourcesToLoad();
-
-	int numTexturePeersUnloaded=0;
-/*	for(i=0;i<textureResourcePeersToUnload.size();++i){
-		delete textureResourcePeersToUnload[i];
-		numTexturePeersUnloaded++;
-	}
-	textureResourcePeersToUnload.clear();
-*/
-	int numTexturesLoaded=0;
-/*	for(i=0;i<textureResourcesToLoad.size();++i){
-		Texture *resource=(Texture*)textureResourcesToLoad[i].get();
-		if(resource!=NULL){
-			TOADLET_ASSERT(resource->internal_getTexturePeer()==NULL);
-			TexturePeer *peer=renderer->createTexturePeer(resource);
-			if(peer!=NULL){
-				resource->internal_setTexturePeer(peer,false);
-				numTexturesLoaded++;
-			}
-		}
-	}
-	textureResourcesToLoad.clear();
-
-	if((numTexturePeersUnloaded>0 || numTexturesLoaded>0) && Logger::getInstance()->getMasterCategoryReportingLevel(Categories::TOADLET_TADPOLE)>=Logger::Level_EXCESSIVE){
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_EXCESSIVE,
-			String("contextUpdate: Unloaded ")+numTexturePeersUnloaded+" texture peers, loaded "+numTexturesLoaded+" textures");
-	}
-*/
-	BufferManager::ResourcePeerCollection &bufferResourcePeersToUnload=mBufferManager->getContextResourcePeersToUnload();
-	BufferManager::ResourceCollection &bufferResourcesToLoad=mBufferManager->getContextResourcesToLoad();
-
-	int numBufferPeersUnloaded=0;
-	for(i=0;i<bufferResourcePeersToUnload.size();++i){
-		delete bufferResourcePeersToUnload[i];
-		numBufferPeersUnloaded++;
-	}
-	bufferResourcePeersToUnload.clear();
-
-	int numBuffersLoaded=0;
-	for(i=0;i<bufferResourcesToLoad.size();++i){
-		Buffer *resource=(Buffer*)bufferResourcesToLoad[i].get();
-		if(resource!=NULL){
-			TOADLET_ASSERT(resource->internal_getBufferPeer()==NULL);
-			BufferPeer *peer=NULL;
-			if(resource->getBufferSize()>0){
-				peer=renderer->createBufferPeer(resource);
-			}
-			if(peer!=NULL){
-				resource->internal_setBufferPeer(peer,false);
-				numBuffersLoaded++;
-			}
-		}
-	}
-	bufferResourcesToLoad.clear();
-
-	if((numBufferPeersUnloaded>0 || numBuffersLoaded>0) && Logger::getInstance()->getMasterCategoryReportingLevel(Categories::TOADLET_TADPOLE)>=Logger::Level_EXCESSIVE){
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_EXCESSIVE,
-			String("contextUpdate: Unloaded ")+numBufferPeersUnloaded+" buffer peers, loaded "+numBuffersLoaded+" buffers");
-	}
 }
 
 // Resource methods
@@ -585,61 +422,6 @@ Texture::ptr Engine::getTexture(const String &name) const{
 }
 
 // Buffer
-IndexBuffer::ptr Engine::loadIndexBuffer(const IndexBuffer::ptr &resource){
-	return shared_static_cast<IndexBuffer>(mBufferManager->load(resource));
-}
-
-IndexBuffer::ptr Engine::loadIndexBuffer(const String &name,const IndexBuffer::ptr &resource){
-	return shared_static_cast<IndexBuffer>(mBufferManager->load(name,resource));
-}
-
-VertexBuffer::ptr Engine::loadVertexBuffer(const VertexBuffer::ptr &resource){
-	return shared_static_cast<VertexBuffer>(mBufferManager->load(resource));
-}
-
-VertexBuffer::ptr Engine::loadVertexBuffer(const String &name,const VertexBuffer::ptr &resource){
-	return shared_static_cast<VertexBuffer>(mBufferManager->load(name,resource));
-}
-
-IndexBuffer::ptr Engine::cacheIndexBuffer(const IndexBuffer::ptr &resource){
-	return shared_static_cast<IndexBuffer>(mBufferManager->cache(resource));
-}
-
-IndexBuffer::ptr Engine::cacheIndexBuffer(const String &name,const IndexBuffer::ptr &resource){
-	return shared_static_cast<IndexBuffer>(mBufferManager->cache(name,resource));
-}
-
-VertexBuffer::ptr Engine::cacheVertexBuffer(const VertexBuffer::ptr &resource){
-	return shared_static_cast<VertexBuffer>(mBufferManager->cache(resource));
-}
-
-VertexBuffer::ptr Engine::cacheVertexBuffer(const String &name,const VertexBuffer::ptr &resource){
-	return shared_static_cast<VertexBuffer>(mBufferManager->cache(name,resource));
-}
-
-bool Engine::uncacheIndexBuffer(const String &name){
-	return mBufferManager->uncache(name);
-}
-
-bool Engine::uncacheIndexBuffer(const IndexBuffer::ptr &resource){
-	return mBufferManager->uncache(resource);
-}
-
-bool Engine::uncacheVertexBuffer(const String &name){
-	return mBufferManager->uncache(name);
-}
-
-bool Engine::uncacheVertexBuffer(const VertexBuffer::ptr &resource){
-	return mBufferManager->uncache(resource);
-}
-
-IndexBuffer::ptr Engine::getIndexBuffer(const String &name) const{
-	return shared_static_cast<IndexBuffer>(mBufferManager->get(name));
-}
-
-VertexBuffer::ptr Engine::getVertexBuffer(const String &name) const{
-	return shared_static_cast<VertexBuffer>(mBufferManager->get(name));
-}
 
 // Shader
 Shader::ptr Engine::loadShader(const String &name){

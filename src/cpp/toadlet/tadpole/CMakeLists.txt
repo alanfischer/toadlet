@@ -1,5 +1,6 @@
 # Source files for toadlet_tadpole
 set (TADPOLE_SRC
+	BufferManager.cpp
 	Engine.cpp
 	Font.cpp
 	Material.cpp
@@ -79,6 +80,7 @@ set (TADPOLE_WIDGET_SRC
 # Headers
 set (TADPOLE_HEADERS
 	AudioBufferData.h
+	BufferManager.h
 	ContextResourceManager.h
 	Engine.h
 	Font.h

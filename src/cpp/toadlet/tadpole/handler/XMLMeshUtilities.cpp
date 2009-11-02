@@ -561,7 +561,7 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version){
 	return materialNode;
 }
 
-Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,ResourceManager *bufferManager,ResourceManager *materialManager,ResourceManager *textureManager){
+Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager *bufferManager,ResourceManager *materialManager,TextureManager *textureManager){
 	Mesh::ptr mesh(new Mesh());
 	const char *prop=NULL;
 
@@ -622,13 +622,10 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,ResourceManag
 		// HACK: Due to a bug in reading back vertexes from a hardware buffer in OGLES, we only load the static VertexBuffer of a Mesh if its not animated.
 		VertexBuffer::ptr vertexBuffer;
 		if(mesh->vertexBoneAssignments.size()>0){
-			vertexBuffer=VertexBuffer::ptr(new VertexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_READ_WRITE,vertexFormat,count));
+			vertexBuffer=bufferManager->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_READ_WRITE,vertexFormat,count);
 		}
 		else{
-			vertexBuffer=VertexBuffer::ptr(new VertexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,count));
-			if(bufferManager!=NULL){
-				vertexBuffer=shared_static_cast<VertexBuffer>(bufferManager->load(vertexBuffer));
-			}
+			vertexBuffer=bufferManager->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,count);
 		}
 
 		int pi=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_POSITION);
@@ -636,7 +633,8 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,ResourceManag
 		int ti=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_TEX_COORD);
 		int ci=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_COLOR);
 
-		VertexBufferAccessor vba(vertexBuffer,Buffer::LockType_WRITE_ONLY);
+		VertexBufferAccessor vba;
+		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
 
 		const char *cdata=mxmlGetOpaque(vertexNode->child);
 		if(cdata!=NULL){
@@ -713,6 +711,8 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,ResourceManag
 			}
 		}
 
+		vba.unlock();
+
 		mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 	}
 
@@ -745,13 +745,11 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,ResourceManag
 				count=parseInt(prop);
 			}
 
-			IndexBuffer::ptr indexBuffer(new IndexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,count));
-			if(bufferManager!=NULL){
-				indexBuffer=shared_static_cast<IndexBuffer>(bufferManager->load(indexBuffer));
-			}
+			IndexBuffer::ptr indexBuffer=bufferManager->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,count);
 			subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,count));
 
-			IndexBufferAccessor iba(indexBuffer,Buffer::LockType_WRITE_ONLY);
+			IndexBufferAccessor iba;
+			iba.lock(indexBuffer,Buffer::AccessType_WRITE_ONLY);
 
 			const char *cdata=mxmlGetOpaque(indexesNode->child);
 			if(cdata!=NULL){
@@ -775,6 +773,8 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,ResourceManag
 					}
 				}
 			}
+
+			iba.unlock();
 		}
 
 		mxml_node_t *materialNode=subMeshNode->child;
@@ -865,7 +865,8 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version){
 		int ti=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_TEX_COORD);
 		int ci=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_COLOR);
 
-		VertexBufferAccessor vba(vertexBuffer,Buffer::LockType_WRITE_ONLY);
+		VertexBufferAccessor vba;
+		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
 
 		Vector3 v3;
 		Vector2 v2;
@@ -902,6 +903,8 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version){
 			data+=line;
 		}
 
+		vba.unlock();
+
 		mxmlNewOpaque(vertexNode,data);
 	}
 
@@ -924,7 +927,8 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version){
 			const IndexData::ptr &indexData=subMesh->indexData;
 			const IndexBuffer::ptr &indexBuffer=indexData->getIndexBuffer();
 
-			IndexBufferAccessor iba(indexBuffer,Buffer::LockType_WRITE_ONLY);
+			IndexBufferAccessor iba;
+			iba.lock(indexBuffer,Buffer::AccessType_WRITE_ONLY);
 
 			mxml_node_t *indexNode=mxmlNewElement(subMeshNode,"Indexes");
 			{
@@ -959,6 +963,8 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version){
 				mxml_node_t *materialNode=mxmlNewElement(subMeshNode,"Material");
 				mxmlElementSetAttr(materialNode,"File",materialName);
 			}
+
+			iba.unlock();
 		}
 	}
 

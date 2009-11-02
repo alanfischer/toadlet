@@ -54,6 +54,13 @@ public:
 	virtual int getHeight() const{return mHeight;}
 	inline GLuint getHandle() const{return mHandle;}
 
+	// TODO: Implement these
+	virtual int getUsageFlags() const{return 0;}
+	virtual AccessType getAccessType() const{return AccessType_NO_ACCESS;}
+	virtual int getDataSize() const{return 0;}
+	virtual uint8 *lock(AccessType accessType){return NULL;}
+	virtual bool unlock(){return false;}
+
 protected:
 	GLFBOSurfaceRenderTarget *mTarget;
 	GLuint mHandle;

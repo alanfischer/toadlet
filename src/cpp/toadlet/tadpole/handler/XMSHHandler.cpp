@@ -35,7 +35,7 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-XMSHHandler::XMSHHandler(ResourceManager *bufferManager,ResourceManager *materialManager,ResourceManager *textureManager){
+XMSHHandler::XMSHHandler(BufferManager *bufferManager,ResourceManager *materialManager,TextureManager *textureManager){
 	mBufferManager=bufferManager;
 	mMaterialManager=materialManager;
 	mTextureManager=textureManager;

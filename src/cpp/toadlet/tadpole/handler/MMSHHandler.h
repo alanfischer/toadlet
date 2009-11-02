@@ -44,7 +44,7 @@ public:
 
 	/// Engine is for getting ideal vertex format.
 	/// @todo  Replace the Engine here with a custom BufferResourceManager which could have a getIdealVertexFormatBit() function.
-	MMSHHandler(ResourceManager *bufferManager,Engine *engine);
+	MMSHHandler(BufferManager *bufferManager,Engine *engine);
 
 	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
 
@@ -65,7 +65,7 @@ protected:
 		VT_TEXCOORD1=1<<8,
 	};
 
-	ResourceManager *mBufferManager;
+	BufferManager *mBufferManager;
 	Engine *mEngine;
 };
 

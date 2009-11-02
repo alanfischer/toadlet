@@ -41,6 +41,7 @@
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/FontData.h>
 #include <toadlet/tadpole/VertexFormats.h>
+#include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/ContextResourceManager.h>
 #include <toadlet/tadpole/entity/Scene.h>
@@ -116,28 +117,10 @@ public:
 	TextureManager *getTextureManager() const{return mTextureManager;}
 
 	//  Buffer
-	peeper::IndexBuffer::ptr loadIndexBuffer(const peeper::IndexBuffer::ptr &resource);
-	peeper::IndexBuffer::ptr loadIndexBuffer(const egg::String &name,const peeper::IndexBuffer::ptr &resource);
-	peeper::VertexBuffer::ptr loadVertexBuffer(const peeper::VertexBuffer::ptr &resource);
-	peeper::VertexBuffer::ptr loadVertexBuffer(const egg::String &name,const peeper::VertexBuffer::ptr &resource);
-
-	peeper::IndexBuffer::ptr cacheIndexBuffer(const peeper::IndexBuffer::ptr &resource);
-	peeper::IndexBuffer::ptr cacheIndexBuffer(const egg::String &name,const peeper::IndexBuffer::ptr &resource);
-	peeper::VertexBuffer::ptr cacheVertexBuffer(const peeper::VertexBuffer::ptr &resource);
-	peeper::VertexBuffer::ptr cacheVertexBuffer(const egg::String &name,const peeper::VertexBuffer::ptr &resource);
-
-	bool uncacheIndexBuffer(const egg::String &name);
-	bool uncacheIndexBuffer(const peeper::IndexBuffer::ptr &resource);
-	bool uncacheVertexBuffer(const egg::String &name);
-	bool uncacheVertexBuffer(const peeper::VertexBuffer::ptr &resource);
-
-	peeper::IndexBuffer::ptr getIndexBuffer(const egg::String &name) const;
-	peeper::VertexBuffer::ptr getVertexBuffer(const egg::String &name) const;
-
 	int getIdealFormatBit() const{return mIdealFormatBit;}
 	const VertexFormats &getVertexFormats() const{return mVertexFormats;}
 
-	ResourceManager *getBufferManager() const{return mBufferManager;}
+	BufferManager *getBufferManager() const{return mBufferManager;}
 
 	//  Shader
 	peeper::Shader::ptr loadShader(const egg::String &name);
@@ -250,49 +233,31 @@ protected:
 	peeper::Renderer *mRenderer;
 	ribbit::AudioPlayer *mAudioPlayer;
 
-	// Resource members
 	// Texture
 	TextureManager *mTextureManager;
 
 	// Buffer
-	class BufferSemantics{
-	public:
-		static inline peeper::BufferPeer *getResourcePeer(egg::Resource *resource){return ((peeper::Buffer*)resource)->internal_getBufferPeer();}
-	};
-
-	typedef ContextResourceManager<peeper::BufferPeer,BufferSemantics> BufferManager;
 	BufferManager *mBufferManager;
 	int mIdealFormatBit;
 	VertexFormats mVertexFormats;
 
 	// Shader
-	class ShaderSemantics{
-	public:
-		static inline peeper::ShaderPeer *getResourcePeer(egg::Resource *resource){return ((peeper::Shader*)resource)->internal_getShaderPeer();}
-	};
-
-	typedef ContextResourceManager<peeper::ShaderPeer,ShaderSemantics> ShaderManager;
-	ShaderManager *mShaderManager;
+	ResourceManager *mShaderManager;
 
 	// Program
-
-	typedef ContextResourceManager<peeper::ProgramPeer,ProgramSemantics> ProgramManager;
-	ProgramManager *mProgramManager;
+	ResourceManager *mProgramManager;
 
 	// Material
 	MaterialManager *mMaterialManager;
 
 	// Font
-	typedef ResourceManager FontManager;
-	FontManager *mFontManager;
+	ResourceManager *mFontManager;
 
 	// Mesh
 	MeshManager *mMeshManager;
 
-
 	// AudioBuffer
-	typedef ResourceManager AudioBufferManager;
-	AudioBufferManager *mAudioBufferManager;
+	ResourceManager *mAudioBufferManager;
 	handler::AudioBufferHandler::ptr mAudioBufferHandler;
 };
 

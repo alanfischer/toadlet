@@ -46,13 +46,13 @@ BorderWidget::BorderWidget(Engine *engine):RenderableWidget(engine),
 
 	setLayout(Layout_FILL);
 
-	VertexBuffer::ptr vertexBuffer=mEngine->loadVertexBuffer(VertexBuffer::ptr(new VertexBuffer(Buffer::UsageType_DYNAMIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_COLOR,12)));
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_DYNAMIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_COLOR,12);
 	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 
-	IndexBuffer::ptr indexBuffer=mEngine->loadIndexBuffer(IndexBuffer::ptr(new IndexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,24)));
+	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,24);
 	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexBuffer->getSize()));
 	{
-		uint16 *data=(uint16*)indexBuffer->lock(Buffer::LockType_WRITE_ONLY);
+		uint16 *data=(uint16*)indexBuffer->lock(Buffer::AccessType_WRITE_ONLY);
 
 		int i=0;
 		data[i++]=0;
@@ -115,7 +115,7 @@ void BorderWidget::rebuild(){
 	scalar bottom=Math::fromInt(mHeight);
 	scalar thick=-Math::fromInt(2);
 
-	vba.lock(mVertexData->getVertexBuffer(0),Buffer::LockType_WRITE_ONLY);
+	vba.lock(mVertexData->getVertexBuffer(0),Buffer::AccessType_WRITE_ONLY);
 
 	vba.set3(	0,0, left,bottom,0);
 	vba.setABGR(0,1, lightColor);
