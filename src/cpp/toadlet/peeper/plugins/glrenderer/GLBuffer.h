@@ -23,56 +23,65 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_D3D9VERTEXBUFFER_H
-#define TOADLET_PEEPER_D3D9VERTEXBUFFER_H
+#ifndef TOADLET_PEEPER_GLBUFFER_H
+#define TOADLET_PEEPER_GLBUFFER_H
 
-#include "D3D9Includes.h"
+#include "GLIncludes.h"
+#include <toadlet/peeper/Buffer.h>
+#include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/egg/Collection.h>
 
 namespace toadlet{
 namespace peeper{
 
-class D3D9Renderer;
+class GLRenderer;
 
-class TOADLET_API D3D9VertexBuffer:public VertexBuffer{
+// Currently this class inherits all possible types, but perhaps it should just inherit Buffer, and then there would exist subclasses for each type of Buffer
+class TOADLET_API GLBuffer:public Buffer,public IndexBuffer,public VertexBuffer{
 public:
-	D3D9VertexBuffer(D3D9Renderer *renderer);
-	virtual ~D3D9VertexBuffer();
+	GLBuffer(GLRenderer *renderer);
+	virtual ~GLBuffer();
 
+	IndexBuffer *getRootIndexBuffer(){return this;}
 	VertexBuffer *getRootVertexBuffer(){return this;}
 
+	virtual bool create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size);
 	virtual bool create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size);
 	virtual bool destroy();
 
 	virtual int getUsageFlags() const{return mUsageFlags;}
 	virtual AccessType getAccessType() const{return mAccessType;}
 	virtual int getDataSize() const{return mDataSize;}
-	virtual VertexFormat::ptr getVertexFormat(){return mVertexFormat;}
 	virtual int getSize() const{return mSize;}
+
+	virtual Indexformat getIndexFormat(){return mIndexFormat;}
+	virtual VertexFormat::ptr getVertexFormat(){return mVertexFormat;}
 
 	virtual uint8 *lock(AccessType accessType);
 	virtual bool unlock();
 
 protected:
-	static DWORD getFVF(VertexFormat *vertexFormat,egg::Collection<VertexElement> *colorElements);
+	static GLenum getBufferUsage(int usageFlags,AccessType accessType);
 
-	D3D9Renderer *mRenderer;
+	GLRenderer *mRenderer;
 
 	int mUsageFlags;
 	AccessType mAccessType;
 	int mSize;
-	VertexFormat::ptr mVertexFormat;
-	short mVertexSize;
 	int mDataSize;
 
-	IDirect3DVertexBuffer9 *mVertexBuffer;
-	DWORD mFVF;
-	egg::Collection<VertexElement> mColorElements;
-	AccessType mLockType;
-	uint8 *mData;
+	IndexFormat mIndexFormat;
+	VertexFormat::ptr mVertexFormat;
+	short mVertexSize;
+	egg::Collection<VertexElement&> mColorElements;
 
-	friend D3D9Renderer;
+	GLuint mHandle;
+	GLenum mTarget;
+	AccessType mLockType;
+	bool mMapping;
+	bool mBacking;
+	uint8 *mData;
 };
 
 }

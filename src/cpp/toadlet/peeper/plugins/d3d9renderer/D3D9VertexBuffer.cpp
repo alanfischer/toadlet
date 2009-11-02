@@ -38,17 +38,16 @@ D3D9VertexBuffer::D3D9VertexBuffer(D3D9Renderer *renderer):
 
 	mUsageFlags(0),
 	mAccessType(AccessType_NO_ACCESS),
-	//mVertexFormat,
 	mSize(0),
+	//mVertexFormat,
 	mVertexSize(0),
 	mDataSize(0),
 
 	mVertexBuffer(NULL),
 	mFVF(0),
 	//mColorElements,
-
-	mData(NULL),
-	mLockType(AccessType_NO_ACCESS)
+	mLockType(AccessType_NO_ACCESS),
+	mData(NULL)
 {
 	mRenderer=renderer;
 }
@@ -62,8 +61,8 @@ bool D3D9VertexBuffer::create(int usageFlags,AccessType accessType,VertexFormat:
 
 	mUsageFlags=usageFlags;
 	mAccessType=accessType;
-	mVertexFormat=vertexFormat;
 	mSize=size;
+	mVertexFormat=vertexFormat;
 	mFVF=getFVF(mVertexFormat,&mColorElements);
 	mVertexSize=mVertexFormat->getVertexSize();
 	mDataSize=mVertexSize*mSize;

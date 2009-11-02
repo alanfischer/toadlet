@@ -28,6 +28,7 @@
 
 #include <toadlet/tadpole/widget/ParentWidget.h>
 #include <toadlet/tadpole/Font.h>
+#include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/LightEffect.h>
 
 namespace toadlet{

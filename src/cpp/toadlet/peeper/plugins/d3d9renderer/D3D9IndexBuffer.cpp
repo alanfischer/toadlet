@@ -38,14 +38,13 @@ D3D9IndexBuffer::D3D9IndexBuffer(D3D9Renderer *renderer):
 
 	mUsageFlags(0),
 	mAccessType(AccessType_NO_ACCESS),
-	mIndexFormat(IndexFormat_UINT_8),
 	mSize(0),
+	mIndexFormat(IndexFormat_UINT_8),
 	mDataSize(0),
 
 	mIndexBuffer(NULL),
-
-	mData(NULL),
-	mLockType(AccessType_NO_ACCESS)
+	mLockType(AccessType_NO_ACCESS),
+	mData(NULL)
 {
 	mRenderer=renderer;
 }
@@ -59,8 +58,8 @@ bool D3D9IndexBuffer::create(int usageFlags,AccessType accessType,IndexFormat in
 
 	mUsageFlags=usageFlags;
 	mAccessType=accessType;
-	mIndexFormat=indexFormat;
 	mSize=size;
+	mIndexFormat=indexFormat;
 	D3DFORMAT d3dFormat=getD3DFORMAT(mIndexFormat);
 	mDataSize=mIndexFormat*mSize;
 	if(indexFormat==IndexFormat_UINT_8) mDataSize*=2;
