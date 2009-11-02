@@ -36,7 +36,7 @@ MeshManager::MeshManager(Engine *engine):ResourceManager(engine){
 	mEngine=engine;
 }
 
-Mesh::ptr MeshManager::makeBox(const AABox &box){
+Mesh::ptr MeshManager::createBox(const AABox &box){
 	VertexBuffer::ptr vertexBuffer=mEngine->loadVertexBuffer(VertexBuffer::ptr(new VertexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_COLOR,8)));
 	{
 		vba.lock(vertexBuffer,Buffer::LockType_WRITE_ONLY);
@@ -94,6 +94,114 @@ Mesh::ptr MeshManager::makeBox(const AABox &box){
 	mesh->subMeshes[0]=subMesh;
 	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 
+	return mesh;
+}
+
+Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded){
+	VertexBuffer::ptr vertexBuffer=mEngine->loadVertexBuffer(VertexBuffer::ptr(new VertexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,24)));
+	IndexBuffer::ptr indexBuffer=mEngine->loadIndexBuffer(IndexBuffer::ptr(new IndexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_8,36)));
+	{
+		VertexBufferAccessor vba;
+		vba.lock(vertexBuffer,Buffer::LockType_WRITE_ONLY);
+		IndexBufferAccessor iba;
+		iba.lock(indexBuffer,Buffer::LockType_WRITE_ONLY);
+
+		int vi=0,ii=0;
+		scalar one=Math::ONE;
+		scalar epsilon=Math::ONE/1024;
+		scalar third=Math::ONE/3 + epsilon;
+		scalar third2=Math::ONE*2/3 - epsilon;
+		scalar quarter=Math::ONE/4;
+		scalar half=Math::ONE/2;
+		scalar quarter3=Math::ONE*3/4;
+
+		// Bottom
+		vba.set3(vi,0,-size,-size,-size); if(unfolded) vba.set2(vi,1, quarter, one);	else vba.set2(vi,1, one, one);	vi++;
+		vba.set3(vi,0, size,-size,-size); if(unfolded) vba.set2(vi,1, half, one);		else vba.set2(vi,1, 0, one);	vi++;
+		vba.set3(vi,0, size, size,-size); if(unfolded) vba.set2(vi,1, half, third2);	else vba.set2(vi,1, 0, 0);		vi++;
+		vba.set3(vi,0,-size, size,-size); if(unfolded) vba.set2(vi,1, quarter, third2);	else vba.set2(vi,1, one, 0);	vi++;
+
+		iba.set(ii++,1);		iba.set(ii++,0);		iba.set(ii++,2);
+		iba.set(ii++,3);		iba.set(ii++,2);		iba.set(ii++,0);
+
+		// Top
+		vba.set3(vi,0,-size,-size, size); if(unfolded) vba.set2(vi,1, quarter, 0);		else vba.set2(vi,1, one, one);	vi++;
+		vba.set3(vi,0, size,-size, size); if(unfolded) vba.set2(vi,1, half, 0);			else vba.set2(vi,1, 0, one);	vi++;
+		vba.set3(vi,0, size, size, size); if(unfolded) vba.set2(vi,1, half, third);		else vba.set2(vi,1, 0, 0);		vi++;
+		vba.set3(vi,0,-size, size, size); if(unfolded) vba.set2(vi,1, quarter, third);	else vba.set2(vi,1, one, 0);	vi++;
+
+		iba.set(ii++,4);		iba.set(ii++,5);		iba.set(ii++,6);
+		iba.set(ii++,6);		iba.set(ii++,7);		iba.set(ii++,4);
+
+		// Left
+		vba.set3(vi,0,-size,-size,-size); if(unfolded) vba.set2(vi,1, 0, third2);		else vba.set2(vi,1, 0, one);	vi++;
+		vba.set3(vi,0,-size, size,-size); if(unfolded) vba.set2(vi,1, quarter, third2);	else vba.set2(vi,1, one, one);	vi++;
+		vba.set3(vi,0,-size, size, size); if(unfolded) vba.set2(vi,1, quarter, third);	else vba.set2(vi,1, one, 0);	vi++;
+		vba.set3(vi,0,-size,-size, size); if(unfolded) vba.set2(vi,1, 0, third);		else vba.set2(vi,1, 0, 0);		vi++;
+
+		iba.set(ii++,10);		iba.set(ii++,9);		iba.set(ii++,8);
+		iba.set(ii++,10);		iba.set(ii++,8);		iba.set(ii++,11);
+
+		// Right
+		vba.set3(vi,0, size,-size,-size); if(unfolded) vba.set2(vi,1, quarter3, third2);else vba.set2(vi,1, one, one);	vi++;
+		vba.set3(vi,0, size, size,-size); if(unfolded) vba.set2(vi,1, half, third2);	else vba.set2(vi,1, 0, one);	vi++;
+		vba.set3(vi,0, size, size, size); if(unfolded) vba.set2(vi,1, half, third);		else vba.set2(vi,1, 0, 0);		vi++;
+		vba.set3(vi,0, size,-size, size); if(unfolded) vba.set2(vi,1, quarter3, third);	else vba.set2(vi,1, one, 0);	vi++;
+
+		iba.set(ii++,13);		iba.set(ii++,14);		iba.set(ii++,12);
+		iba.set(ii++,12);		iba.set(ii++,14);		iba.set(ii++,15);
+
+		// Back
+		vba.set3(vi,0,-size,-size,-size); if(unfolded) vba.set2(vi,1, one, third2);		else vba.set2(vi,1, one, one);	vi++;
+		vba.set3(vi,0, size,-size,-size); if(unfolded) vba.set2(vi,1, quarter3, third2);else vba.set2(vi,1, 0, one);	vi++;
+		vba.set3(vi,0, size,-size, size); if(unfolded) vba.set2(vi,1, quarter3, third);	else vba.set2(vi,1, 0, 0);		vi++;
+		vba.set3(vi,0,-size,-size, size); if(unfolded) vba.set2(vi,1, one, third);		else vba.set2(vi,1, one, 0);	vi++;
+
+		iba.set(ii++,17);		iba.set(ii++,18);		iba.set(ii++,16);
+		iba.set(ii++,16);		iba.set(ii++,18);		iba.set(ii++,19);
+
+		// Front
+		vba.set3(vi,0,-size, size,-size); if(unfolded) vba.set2(vi,1, quarter, third2);	else vba.set2(vi,1, 0, one);	vi++;
+		vba.set3(vi,0, size, size,-size); if(unfolded) vba.set2(vi,1, half, third2);	else vba.set2(vi,1, one, one);	vi++;
+		vba.set3(vi,0, size, size, size); if(unfolded) vba.set2(vi,1, half, third);		else vba.set2(vi,1, one, 0);	vi++;
+		vba.set3(vi,0,-size, size, size); if(unfolded) vba.set2(vi,1, quarter, third);	else vba.set2(vi,1, 0, 0);		vi++;
+
+		iba.set(ii++,22);		iba.set(ii++,21);		iba.set(ii++,20);
+		iba.set(ii++,22);		iba.set(ii++,20);		iba.set(ii++,23);
+
+		iba.unlock();
+		vba.unlock();
+	}
+
+	Mesh::ptr mesh(new Mesh());
+	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+
+	if(unfolded){
+		mesh->subMeshes.add(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
+		mesh->subMeshes[0]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
+	}
+	else{
+		mesh->subMeshes.add(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
+		mesh->subMeshes[0]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,6));
+		mesh->subMeshes.add(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
+		mesh->subMeshes[1]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,6,6));
+		mesh->subMeshes.add(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
+		mesh->subMeshes[2]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,12,6));
+		mesh->subMeshes.add(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
+		mesh->subMeshes[3]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,18,6));
+		mesh->subMeshes.add(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
+		mesh->subMeshes[4]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,24,6));
+		mesh->subMeshes.add(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
+		mesh->subMeshes[5]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,30,6));
+	}
+
+	int i;
+	for(i=0;i<mesh->subMeshes.size();++i){
+		mesh->subMeshes[i]->material=Material::ptr(new Material());
+		mesh->subMeshes[i]->material->setFaceCulling(Renderer::FaceCulling_NONE);
+		mesh->subMeshes[i]->material->setDepthWrite(false);
+	}
+	
 	return mesh;
 }
 
