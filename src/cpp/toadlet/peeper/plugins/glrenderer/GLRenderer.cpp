@@ -88,6 +88,7 @@ GLRenderer::GLRenderer():
 	mNormalize(Normalize_NONE),
 	mShading(Shading_SMOOTH),
 	mTexturePerspective(false),
+	mInTexGen(false),
 
 	mMaxTexCoordIndex(0),
 	//mTexCoordIndexes,
@@ -1214,22 +1215,90 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 				mLastTextures[stage]=texture;
 			}
 
-			if(textureStage->getTextureMatrixIdentity()==false || (gltexture->mUsageFlags&(Texture::UsageFlags_NPOT_RESTRICTED|Texture::UsageFlags_RENDERTARGET))>0){
+			TextureStage::Calculation calculation=textureStage->getCalculation();
+			if(calculation!=TextureStage::Calculation_DISABLED || (gltexture->mUsageFlags&(Texture::UsageFlags_NPOT_RESTRICTED|Texture::UsageFlags_RENDERTARGET))>0){
 				if(mMatrixMode!=GL_TEXTURE){
 					mMatrixMode=GL_TEXTURE;
 					glMatrixMode(mMatrixMode);
 				}
+
+				const Matrix4x4 &matrix=textureStage->getMatrix();
+
+				if(calculation==TextureStage::Calculation_NORMAL){
+					#if defined(TOADLET_FIXED_POINT)
+						#if defined(TOADLET_HAS_GLES)
+							glLoadMatrixx(matrix.data);
+						#else
+							glLoadMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,matrix).data);
+						#endif
+					#else
+						glLoadMatrixf(matrix.data);
+					#endif
+				}
+				else{
+					glLoadIdentity();
+				}
+
 				#if defined(TOADLET_FIXED_POINT)
 					#if defined(TOADLET_HAS_GLES)
-						glLoadMatrixx(textureStage->getTextureMatrix().data);
 						glMultMatrixx(gltexture->mMatrix.data);
 					#else
-						glLoadMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,textureStage->getTextureMatrix()).data);
 						glMultMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,gltexture->mMatrix).data);
 					#endif
 				#else
-					glLoadMatrixf(textureStage->getTextureMatrix().data);
 					glMultMatrixf(gltexture->mMatrix.data);
+				#endif
+
+				#if !defined(TOADLET_HAS_GLES)
+					if(calculation!=TextureStage::Calculation_NORMAL){
+						if(mMatrixMode!=GL_MODELVIEW){
+							mMatrixMode=GL_MODELVIEW;
+							glMatrixMode(mMatrixMode);
+						}
+
+						glPushMatrix();
+						glLoadIdentity();
+
+						GLint gltg=0;
+						GLint glpl=0;
+						switch(calculation){
+							case TextureStage::Calculation_OBJECTSPACE:
+								gltg=GL_OBJECT_LINEAR;
+								glpl=GL_OBJECT_PLANE;
+							break;
+							case TextureStage::Calculation_CAMERASPACE:
+								gltg=GL_EYE_LINEAR;
+								glpl=GL_EYE_PLANE;
+							break;
+							default:
+							break;
+						}
+
+						// Set up texgen
+						glTexGeni(GL_S,GL_TEXTURE_GEN_MODE,gltg);
+						cacheArray[0]=matrix.at(0,0);cacheArray[1]=matrix.at(0,1);cacheArray[2]=matrix.at(0,2);cacheArray[3]=matrix.at(0,3);
+						glTexGenfv(GL_S,glpl,cacheArray);
+						glEnable(GL_TEXTURE_GEN_S);
+
+						glTexGeni(GL_T,GL_TEXTURE_GEN_MODE,gltg);
+						cacheArray[0]=matrix.at(1,0);cacheArray[1]=matrix.at(1,1);cacheArray[2]=matrix.at(1,2);cacheArray[3]=matrix.at(1,3);
+						glTexGenfv(GL_T,glpl,cacheArray);
+						glEnable(GL_TEXTURE_GEN_T);
+
+						glTexGeni(GL_R,GL_TEXTURE_GEN_MODE,gltg);
+						cacheArray[0]=matrix.at(2,0);cacheArray[1]=matrix.at(2,1);cacheArray[2]=matrix.at(2,2);cacheArray[3]=matrix.at(2,3);
+						glTexGenfv(GL_R,glpl,cacheArray);
+						glEnable(GL_TEXTURE_GEN_R);
+
+						glTexGeni(GL_Q,GL_TEXTURE_GEN_MODE,gltg);
+						cacheArray[0]=matrix.at(3,0);cacheArray[1]=matrix.at(3,1);cacheArray[2]=matrix.at(3,2);cacheArray[3]=matrix.at(3,3);
+						glTexGenfv(GL_Q,glpl,cacheArray);
+						glEnable(GL_TEXTURE_GEN_Q);
+
+						glPopMatrix();
+
+						mInTexGen=true;
+					}
 				#endif
 			}
 			else{
@@ -1239,6 +1308,17 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 				}
 				glLoadIdentity();
 			}
+
+			#if !defined(TOADLET_HAS_GLES)
+				if(mInTexGen && calculation<=TextureStage::Calculation_NORMAL){
+					mInTexGen=false;
+
+					glDisable(GL_TEXTURE_GEN_S);
+					glDisable(GL_TEXTURE_GEN_T);
+					glDisable(GL_TEXTURE_GEN_R);
+					glDisable(GL_TEXTURE_GEN_Q);
+				}
+			#endif
 		}
 		else{
 			textureTarget=GL_TEXTURE_2D;
@@ -1293,26 +1373,22 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 			glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
 		}
 
-		if(textureStage->getAddressModeSpecified()){
-			bool hasClampToEdge=
-				#if defined(TOADLET_HAS_GLES)
-					true;
-				#else
-					gl_version>=12;
-				#endif
-			glTexParameteri(textureTarget,GL_TEXTURE_WRAP_S,GLTexture::getGLWrap(textureStage->getSAddressMode(),hasClampToEdge));
-			glTexParameteri(textureTarget,GL_TEXTURE_WRAP_T,GLTexture::getGLWrap(textureStage->getTAddressMode(),hasClampToEdge));
-			#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_12)
-			if(gl_version>=12){
-				glTexParameteri(textureTarget,GL_TEXTURE_WRAP_R,GLTexture::getGLWrap(textureStage->getRAddressMode(),hasClampToEdge));
-			}
+		bool hasClampToEdge=
+			#if defined(TOADLET_HAS_GLES)
+				true;
+			#else
+				gl_version>=12;
 			#endif
+		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_S,GLTexture::getGLWrap(textureStage->getSAddressMode(),hasClampToEdge));
+		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_T,GLTexture::getGLWrap(textureStage->getTAddressMode(),hasClampToEdge));
+		#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_12)
+		if(gl_version>=12){
+			glTexParameteri(textureTarget,GL_TEXTURE_WRAP_R,GLTexture::getGLWrap(textureStage->getRAddressMode(),hasClampToEdge));
 		}
+		#endif
 
-		if(textureStage->getFilterSpecified()){
-			glTexParameteri(textureTarget,GL_TEXTURE_MIN_FILTER,GLTexture::getGLMinFilter(textureStage->getMinFilter(),textureStage->getMipFilter()));
-			glTexParameteri(textureTarget,GL_TEXTURE_MAG_FILTER,GLTexture::getGLMagFilter(textureStage->getMagFilter()));
-		}
+		glTexParameteri(textureTarget,GL_TEXTURE_MIN_FILTER,GLTexture::getGLMinFilter(textureStage->getMinFilter(),textureStage->getMipFilter()));
+		glTexParameteri(textureTarget,GL_TEXTURE_MAG_FILTER,GLTexture::getGLMagFilter(textureStage->getMagFilter()));
 
 		#if !defined(TOADLET_HAS_GLES)
 			if(gl_version>=14){
@@ -1365,79 +1441,6 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 }
 
 void GLRenderer::setProgram(const Program *program){
-}
-
-void GLRenderer::setTexCoordGen(int stage,const TexCoordGen &texCoordGen,const Matrix4x4 &matrix){
-	#if defined(TOADLET_HAS_GLES)
-		Error::unimplemented(Categories::TOADLET_PEEPER,
-			"GLRenderer::setTexCoordGen: unimplemented");
-	#else
-		if(mCapabilitySet.maxTextureStages>1){
-			glActiveTexture(GL_TEXTURE0+stage);
-		}
-
-		if(texCoordGen!=TexCoordGen_DISABLED){
-			if(mMatrixMode!=GL_MODELVIEW){
-				mMatrixMode=GL_MODELVIEW;
-				glMatrixMode(mMatrixMode);
-			}
-
-			glPushMatrix();
-
-			glLoadIdentity();
-
-			GLint gltg=0;
-			GLint glpl=0;
-			switch(texCoordGen){
-				case TexCoordGen_OBJECTSPACE:
-					gltg=GL_OBJECT_LINEAR;
-					glpl=GL_OBJECT_PLANE;
-				break;
-				case TexCoordGen_CAMERASPACE:
-					gltg=GL_EYE_LINEAR;
-					glpl=GL_EYE_PLANE;
-				break;
-				default:
-				break;
-			}
-
-			// Set up texgen
-			glTexGeni(GL_S,GL_TEXTURE_GEN_MODE,gltg);
-			cacheArray[0]=matrix.at(0,0);cacheArray[1]=matrix.at(0,1);cacheArray[2]=matrix.at(0,2);cacheArray[3]=matrix.at(0,3);
-			glTexGenfv(GL_S,glpl,cacheArray);
-			glEnable(GL_TEXTURE_GEN_S);
-
-			glTexGeni(GL_T,GL_TEXTURE_GEN_MODE,gltg);
-			cacheArray[0]=matrix.at(1,0);cacheArray[1]=matrix.at(1,1);cacheArray[2]=matrix.at(1,2);cacheArray[3]=matrix.at(1,3);
-			glTexGenfv(GL_T,glpl,cacheArray);
-			glEnable(GL_TEXTURE_GEN_T);
-
-			glTexGeni(GL_R,GL_TEXTURE_GEN_MODE,gltg);
-			cacheArray[0]=matrix.at(2,0);cacheArray[1]=matrix.at(2,1);cacheArray[2]=matrix.at(2,2);cacheArray[3]=matrix.at(2,3);
-			glTexGenfv(GL_R,glpl,cacheArray);
-			glEnable(GL_TEXTURE_GEN_R);
-
-			glTexGeni(GL_Q,GL_TEXTURE_GEN_MODE,gltg);
-			cacheArray[0]=matrix.at(3,0);cacheArray[1]=matrix.at(3,1);cacheArray[2]=matrix.at(3,2);cacheArray[3]=matrix.at(3,3);
-			glTexGenfv(GL_Q,glpl,cacheArray);
-			glEnable(GL_TEXTURE_GEN_Q);
-
-			glPopMatrix();
-		}
-		else{
-			// Disable texgen
-			glDisable(GL_TEXTURE_GEN_S);
-			glDisable(GL_TEXTURE_GEN_T);
-			glDisable(GL_TEXTURE_GEN_R);
-			glDisable(GL_TEXTURE_GEN_Q);
-		}
-
-		if(mCapabilitySet.maxTextureStages>1){
-			glActiveTexture(GL_TEXTURE0);
-		}
-
-		TOADLET_CHECK_GLERROR("setTexCoordGen");
-	#endif
 }
 
 void GLRenderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){

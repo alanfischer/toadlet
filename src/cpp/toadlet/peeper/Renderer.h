@@ -93,12 +93,6 @@ public:
 		AlphaTest_ALWAYS,
 	};
 
-	enum TexCoordGen{
-		TexCoordGen_DISABLED,
-		TexCoordGen_OBJECTSPACE,
-		TexCoordGen_CAMERASPACE,
-	};
-
 	enum Fog{
 		Fog_NONE,
 		Fog_LINEAR,
@@ -173,7 +167,6 @@ public:
 	virtual void setPointParameters(bool sprite,scalar size,bool attenuated,scalar constant,scalar linear,scalar quadratic,scalar minSize,scalar maxSize)=0;
 	virtual void setTextureStage(int stage,TextureStage *textureStage)=0;
 	virtual void setProgram(const Program *program)=0;
-	virtual void setTexCoordGen(int stage,const TexCoordGen &texCoordGen,const Matrix4x4 &matrix)=0;
 	virtual void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result)=0;
 	 // A workaround here, since OpenGL & Direct3D have different shadow comparison methods
 	virtual void setShadowComparisonMethod(bool enabled)=0;

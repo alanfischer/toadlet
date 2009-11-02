@@ -693,14 +693,38 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 		result=mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXCOORDINDEX,textureStage->getTexCoordIndex());
 		TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
 
-		// TODO: Only if the texture matrix is set, and we're not using shaders
-		{
-			result=mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT2);
-			TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
+		// TODO: Only if we're not using shaders
+		TextureStage::Calculation calculation=textureStage->getCalculation();
+		if(calculation!=TextureStage::Calculation_DISABLED){
+			if(calculation==TextureStage::Calculation_NORMAL){
+				result=mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT2);
+				TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
 
-			toD3DMATRIX(cacheD3DMatrix,textureStage->getTextureMatrix());
+				toD3DMATRIX(cacheD3DMatrix,textureStage->getMatrix());
+				#if defined(TOADLET_HAS_DIRECT3DMOBILE) && defined(TOADLET_FIXED_POINT)
+					scalar t;
+				#else
+					float t;
+				#endif
+				t=cacheD3DMatrix._31; cacheD3DMatrix._31=cacheD3DMatrix._41; cacheD3DMatrix._41=t;
+				t=cacheD3DMatrix._32; cacheD3DMatrix._32=cacheD3DMatrix._42; cacheD3DMatrix._42=t;
+				t=cacheD3DMatrix._33; cacheD3DMatrix._33=cacheD3DMatrix._43; cacheD3DMatrix._43=t;
+				t=cacheD3DMatrix._34; cacheD3DMatrix._34=cacheD3DMatrix._44; cacheD3DMatrix._44=t;
+			}
+			else if(calculation==TextureStage::Calculation_OBJECTSPACE){
+				mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXCOORDINDEX,D3DTSS_TCI_PASSTHRU);
+				mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT4|D3DTTFF_PROJECTED);
+			}
+			else if(calculation==TextureStage::Calculation_CAMERASPACE){
+				mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXCOORDINDEX,D3DTSS_TCI_CAMERASPACEPOSITION);
+				mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT4|D3DTTFF_PROJECTED);
+			}
+
 			result=mD3DDevice->SetTransform((D3DTRANSFORMSTATETYPE)(D3DTS_TEXTURE0+stage),&cacheD3DMatrix TOADLET_D3DMFMT);
 			TOADLET_CHECK_D3D9ERROR(result,"SetTransform");
+		}
+		else{
+			mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_DISABLE);
 		}
 
 		const TextureBlend &blend=textureStage->getBlend();
@@ -738,29 +762,21 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 		}
 
 		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-			if(textureStage->getAddressModeSpecified()){
-				mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSU,D3D9Texture::getD3DTADDRESS(textureStage->getSAddressMode()));
-				mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSV,D3D9Texture::getD3DTADDRESS(textureStage->getTAddressMode()));
-				mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSW,D3D9Texture::getD3DTADDRESS(textureStage->getRAddressMode()));
-			}
+			mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSU,D3D9Texture::getD3DTADDRESS(textureStage->getSAddressMode()));
+			mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSV,D3D9Texture::getD3DTADDRESS(textureStage->getTAddressMode()));
+			mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSW,D3D9Texture::getD3DTADDRESS(textureStage->getRAddressMode()));
 
-			if(textureStage->getFilterSpecified()){
-				mD3DDevice->SetTextureStageState(stage,D3DMTSS_MINFILTER,D3D9Texture::getD3DTEXF(textureStage->getMinFilter()));
-				mD3DDevice->SetTextureStageState(stage,D3DMTSS_MIPFILTER,D3D9Texture::getD3DTEXF(textureStage->getMipFilter()));
-				mD3DDevice->SetTextureStageState(stage,D3DMTSS_MAGFILTER,D3D9Texture::getD3DTEXF(textureStage->getMagFilter()));
-			}
+			mD3DDevice->SetTextureStageState(stage,D3DMTSS_MINFILTER,D3D9Texture::getD3DTEXF(textureStage->getMinFilter()));
+			mD3DDevice->SetTextureStageState(stage,D3DMTSS_MIPFILTER,D3D9Texture::getD3DTEXF(textureStage->getMipFilter()));
+			mD3DDevice->SetTextureStageState(stage,D3DMTSS_MAGFILTER,D3D9Texture::getD3DTEXF(textureStage->getMagFilter()));
 		#else
-			if(textureStage->getAddressModeSpecified()){
-				mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSU,D3D9Texture::getD3DTADDRESS(textureStage->getSAddressMode()));
-				mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSV,D3D9Texture::getD3DTADDRESS(textureStage->getTAddressMode()));
-				mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSW,D3D9Texture::getD3DTADDRESS(textureStage->getRAddressMode()));
-			}
+			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSU,D3D9Texture::getD3DTADDRESS(textureStage->getSAddressMode()));
+			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSV,D3D9Texture::getD3DTADDRESS(textureStage->getTAddressMode()));
+			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSW,D3D9Texture::getD3DTADDRESS(textureStage->getRAddressMode()));
 
-			if(textureStage->getFilterSpecified()){
-				mD3DDevice->SetSamplerState(stage,D3DSAMP_MINFILTER,D3D9Texture::getD3DTEXF(textureStage->getMinFilter()));
-				mD3DDevice->SetSamplerState(stage,D3DSAMP_MIPFILTER,D3D9Texture::getD3DTEXF(textureStage->getMipFilter()));
-				mD3DDevice->SetSamplerState(stage,D3DSAMP_MAGFILTER,D3D9Texture::getD3DTEXF(textureStage->getMagFilter()));
-			}
+			mD3DDevice->SetSamplerState(stage,D3DSAMP_MINFILTER,D3D9Texture::getD3DTEXF(textureStage->getMinFilter()));
+			mD3DDevice->SetSamplerState(stage,D3DSAMP_MIPFILTER,D3D9Texture::getD3DTEXF(textureStage->getMipFilter()));
+			mD3DDevice->SetSamplerState(stage,D3DSAMP_MAGFILTER,D3D9Texture::getD3DTEXF(textureStage->getMagFilter()));
 		#endif
 	}
 	else{
@@ -819,31 +835,6 @@ void D3D9Renderer::setNormalize(const Normalize &normalize){
 	mNormalize=normalize;
 }
 
-void D3D9Renderer::setTexCoordGen(int stage,const TexCoordGen &texCoordGen,const Matrix4x4 &matrix){
-	toD3DMATRIX(cacheD3DMatrix,matrix);
-
-	switch(texCoordGen){
-		case TexCoordGen_DISABLED:
-			mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXCOORDINDEX,0); // TODO: Replace TexCoordIndex stage?
-			mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_DISABLE);
-		break;
-		case TexCoordGen_OBJECTSPACE:
-			mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXCOORDINDEX,D3DTSS_TCI_PASSTHRU);
-			mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT4|D3DTTFF_PROJECTED);
-
-			// TODO: This will interfear with setTextureStage
-			mD3DDevice->SetTransform((D3DTRANSFORMSTATETYPE)(D3DTS_TEXTURE0+stage),&cacheD3DMatrix TOADLET_D3DMFMT);
-		break;
-		case TexCoordGen_CAMERASPACE:
-			mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXCOORDINDEX,D3DTSS_TCI_CAMERASPACEPOSITION);
-			mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT4|D3DTTFF_PROJECTED);
-
-			// TODO: This will interfear with setTextureStage
-			mD3DDevice->SetTransform((D3DTRANSFORMSTATETYPE)(D3DTS_TEXTURE0+stage),&cacheD3DMatrix TOADLET_D3DMFMT);
-		break;
-	}
-}
-
 void D3D9Renderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){
 	int width=shadowTexture->getWidth();
 	int height=shadowTexture->getHeight();
@@ -890,8 +881,13 @@ void D3D9Renderer::setLight(int i,Light *light){
 
 	toD3DCOLORVALUE(d3dlight.Diffuse,light->getDiffuseColor());
 	toD3DCOLORVALUE(d3dlight.Specular,light->getSpecularColor());
-	d3dlight.Attenuation1=scalarToFloat(light->getLinearAttenuation());
-	d3dlight.Range=scalarToFloat(light->getRadius());
+	#if !defined(TOADLET_HAS_DIRECT3DMOBILE) && defined(TOADLET_FIXED_POINT)
+		d3dlight.Attenuation1=scalarToFloat(light->getLinearAttenuation());
+		d3dlight.Range=scalarToFloat(light->getRadius());
+	#else
+		d3dlight.Attenuation1=light->getLinearAttenuation();
+		d3dlight.Range=light->getRadius();
+	#endif
 
 	mD3DDevice->SetLight(i,&d3dlight TOADLET_D3DMFMT);
 }

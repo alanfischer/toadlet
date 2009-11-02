@@ -102,7 +102,7 @@ void SpriteWidget::load(scalar fractionalWidth,scalar fractionalHeight,const Tex
 		TextureStage::ptr textureStage(new TextureStage(mTexture));
 		textureStage->setSAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
 		textureStage->setTAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
-		textureStage->setTextureMatrix(mTextureMatrix);
+		textureStage->setCalculation(TextureStage::Calculation_NORMAL,mTextureMatrix);
 		mTextureStage=textureStage;
 //	}
 
