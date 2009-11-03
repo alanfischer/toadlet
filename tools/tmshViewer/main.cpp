@@ -1,5 +1,6 @@
 #include "Viewer.h"
 #include <iostream>
+#include <stdlib.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::tadpole;

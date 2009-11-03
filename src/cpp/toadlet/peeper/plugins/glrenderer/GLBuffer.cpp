@@ -27,6 +27,7 @@
 #include "GLRenderer.h"
 #include <toadlet/peeper/CapabilitySet.h>
 #include <toadlet/egg/Logger.h>
+#include <string.h>
 
 using namespace toadlet::egg;
 
