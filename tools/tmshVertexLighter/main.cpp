@@ -124,17 +124,17 @@ int main(int argc,char **argv){
 	for(i=0;i<files.size();++i){
 		String mshFileName=files[i];
 
-		std::cout << "Lighting " << mshFileName << std::endl;
+		std::cout << "Lighting " << (const char*)mshFileName << std::endl;
 		
 		// Load the mesh data
 		Mesh::ptr mesh=engine->loadMesh(mshFileName);
 		if(mesh==NULL){
-			std::cerr << "Error loading \"" << mshFileName << "\" failed!  File invalid or not found." << std::endl;
+			std::cerr << "Error loading \"" << (const char*)mshFileName << "\" failed!  File invalid or not found." << std::endl;
 			result=false;
 			continue;
 		}
 
-		std::cout << "Lighting mesh " << mshFileName << std::endl;
+		std::cout << "Lighting mesh " << (const char*)mshFileName << std::endl;
 
 		// Light meshes
 		lighter.lightMesh(mesh);
@@ -173,7 +173,7 @@ int main(int argc,char **argv){
 			handler.save(mesh,fout);
 		}
 		else{
-			std::cerr << "Error saving \"" << mshFileName << "\"" << std::endl;
+			std::cerr << "Error saving \"" << (const char*)mshFileName << "\"" << std::endl;
 		}
 	}
 

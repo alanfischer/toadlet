@@ -53,7 +53,7 @@ int main(int argc,char **argv){
 
 	std::cout << "--tmshModifier--" << std::endl;
 
-	std::cout << "Modifiying " << mshFileName << std::endl;
+	std::cout << "Modifiying " << (const char*)mshFileName << std::endl;
 
 	// Create a toadlet engine
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG_LOGGER,Logger::Level_DISABLED);
@@ -64,7 +64,7 @@ int main(int argc,char **argv){
 	// Load the mesh data
 	Mesh::ptr mesh=engine->cacheMesh(mshFileName);
 	if(mesh==NULL){
-		std::cout << "Error loading file: " << mshFileName << std::endl;
+		std::cout << "Error loading file: " << (const char*)mshFileName << std::endl;
 		return 0;
 	}
 
@@ -86,11 +86,11 @@ int main(int argc,char **argv){
 				name=String("unnamed-") + i + ".xanm";
 			}
 
-			std::cout << "Extracting " << name << std::endl;
+			std::cout << "Extracting " << (const char*)name << std::endl;
 
 			FileOutputStream::ptr fout(new FileOutputStream(name));
 			if(fout->isOpen()==false){
-				std::cout << "Error opening " << name << std::endl;
+				std::cout << "Error opening " << (const char*)name << std::endl;
 				return 0;
 			}
 			XANMHandler::ptr handler(new XANMHandler());
@@ -121,7 +121,7 @@ int main(int argc,char **argv){
 
 		FileOutputStream::ptr fout(new FileOutputStream(mshFileName));
 		if(fout->isOpen()==false){
-			std::cout << "Error opening " << mshFileName << std::endl;
+			std::cout << "Error opening " << (const char*)mshFileName << std::endl;
 			return 0;
 		}
 		XMSHHandler::ptr handler(new XMSHHandler(NULL,NULL,NULL));
@@ -157,7 +157,7 @@ int main(int argc,char **argv){
 
 		FileOutputStream::ptr fout(new FileOutputStream(mshFileName));
 		if(fout->isOpen()==false){
-			std::cout << "Error opening " << mshFileName << std::endl;
+			std::cout << "Error opening " << (const char*)mshFileName << std::endl;
 			return 0;
 		}
 		XMSHHandler::ptr handler(new XMSHHandler(NULL,NULL,NULL));

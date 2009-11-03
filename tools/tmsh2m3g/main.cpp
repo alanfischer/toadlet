@@ -79,7 +79,7 @@ int main(int argc,char **argv){
 	String mshFileName=argv[argc-1];
 
 	std::cout << "--tmsh2m3g--" << std::endl;
-	std::cout << "Converting " << mshFileName.c_str() << std::endl;
+	std::cout << "Converting " << (const char*)mshFileName << std::endl;
 
 	// Create a toadlet engine
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG_LOGGER,Logger::Level_DISABLED);
@@ -90,7 +90,7 @@ int main(int argc,char **argv){
 	// Load the mesh data
 	Mesh::ptr mesh=engine->cacheMesh(mshFileName);
 	if(mesh==NULL){
-		std::cout << "Error loading file: " << mshFileName.c_str() << std::endl;
+		std::cout << "Error loading file: " << (const char*)mshFileName << std::endl;
 		return 0;
 	}
 

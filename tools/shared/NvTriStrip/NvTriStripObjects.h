@@ -3,7 +3,9 @@
 #define NV_TRISTRIP_OBJECTS_H
 
 #include <assert.h>
-#include <windows.h>
+//#include <windows.h>
+#define UINT unsigned int
+#define WORD unsigned short
 #include <vector>
 #include <list>
 #include "VertexCache.h"
@@ -238,7 +240,7 @@ protected:
 	
 	// let our strip info classes and the other classes get
 	// to these protected stripificaton methods if they want
-	friend NvStripInfo;
+	friend class NvStripInfo;
 };
 
 #endif
