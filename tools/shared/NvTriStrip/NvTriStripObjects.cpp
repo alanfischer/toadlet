@@ -5,6 +5,8 @@
 #include <set>
 #include "NvTriStripObjects.h"
 #include "VertexCache.h"
+#include <stdio.h>
+#define max std::max
 
 #define CACHE_INEFFICIENCY 6
 

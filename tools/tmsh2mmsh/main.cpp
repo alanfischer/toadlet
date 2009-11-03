@@ -60,7 +60,7 @@ int main(int argc,char **argv){
 			}
         }
 		else if(i!=argc-1){
-			std::cout << "Error unknown command: " << arg << std::endl;
+			std::cout << "Error unknown command: " << (const char*)arg << std::endl;
 			return -1;
 		}
 	}
@@ -68,7 +68,7 @@ int main(int argc,char **argv){
 	String mshFileName=argv[argc-1];
 
 	std::cout << "--tmsh2mmsh--" << std::endl;
-	std::cout << "Converting " << mshFileName << std::endl;
+	std::cout << "Converting " << (const char*)mshFileName << std::endl;
 
 	// Create a toadlet engine
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG_LOGGER,Logger::Level_DISABLED);
@@ -79,7 +79,7 @@ int main(int argc,char **argv){
 	// Load the mesh data
 	Mesh::ptr mesh=engine->loadMesh(mshFileName);
 	if(mesh==NULL){
-		std::cout << "Error loading file: " << mshFileName << std::endl;
+		std::cout << "Error loading file: " << (const char*)mshFileName << std::endl;
 		return 0;
 	}
 

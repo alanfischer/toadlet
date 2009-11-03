@@ -332,7 +332,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 				m->lighting=material->getLighting();
 
 				Texture *texture=material->getNumTextureStages()==0?NULL:material->getTextureStage(0)->getTexture();
-				String name=material->getNumTextureStages()==0?NULL:material->getTextureStage(0)->getTextureName();
+				String name=material->getNumTextureStages()==0?(char*)NULL:material->getTextureStage(0)->getTextureName();
 				if(name.length()>0){
 					int width=256,height=256;
 					if(texture!=NULL){

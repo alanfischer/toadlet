@@ -160,7 +160,7 @@ int main(int argc,char **argv){
 	for(i=0;i<files.size();++i){
 		String mshFileName=files[i];
 
-		std::cout << "Converting " << mshFileName << std::endl;
+		std::cout << "Converting " << (const char*)mshFileName << std::endl;
 
 		int last=Math::maxVal(mshFileName.rfind('/'),mshFileName.rfind('\\'));
 		if(last>0){
@@ -173,7 +173,7 @@ int main(int argc,char **argv){
 		// Load the mesh data
 		Mesh::ptr mesh=engine->cacheMesh(mshFileName);
 		if(mesh==NULL){
-			std::cerr << "Error loading \"" << mshFileName << "\" failed!  File invalid or not found." << std::endl;
+			std::cerr << "Error loading \"" << (const char*)mshFileName << "\" failed!  File invalid or not found." << std::endl;
 			continue;
 		}
 
@@ -182,7 +182,7 @@ int main(int argc,char **argv){
 		String bacFileName=mshFileName.substr(0,loc)+String(".bac");
 		FileOutputStream fout(bacFileName);
 
-		std::cout << "Writing mesh " << bacFileName << std::endl;
+		std::cout << "Writing mesh " << (const char*)bacFileName << std::endl;
 
 		// Convert to .bac format
 		BACConverter bac(engine);
@@ -205,10 +205,10 @@ int main(int argc,char **argv){
 				}
 				else{
 					std::stringstream ss;
-					ss << mshFileName.substr(0,loc) << "_" << j << ".tra";
+					ss << (const char*)mshFileName.substr(0,loc) << "_" << j << ".tra";
 					traFileName=ss.str().c_str();
 				}
-				std::cout << "Writing animation " << traFileName << std::endl;
+				std::cout << "Writing animation " << (const char*)traFileName << std::endl;
 				FileOutputStream aout(traFileName);
 
 				if(bac.convertAnimation(mesh,mesh->skeleton->sequences[j],&aout,(version==3)?4:3)==false){

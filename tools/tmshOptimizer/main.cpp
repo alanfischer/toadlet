@@ -33,7 +33,7 @@ int main(int argc,char **argv){
             }
         }
 		else if(i!=argc-1){
-			std::cout << "Error unknown command: " << arg.c_str() << std::endl;
+			std::cout << "Error unknown command: " << (const char*)arg << std::endl;
 			return 0;
 		}
 	}
@@ -41,7 +41,7 @@ int main(int argc,char **argv){
 	String mshFileName=argv[argc-1];
 
 	std::cout << "--meshOptimizer--" << std::endl;
-	std::cout << "Optimizing " << mshFileName << std::endl;
+	std::cout << "Optimizing " << (const char*)mshFileName << std::endl;
 
 	// Create a toadlet engine
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG_LOGGER,Logger::Level_DISABLED);
@@ -52,7 +52,7 @@ int main(int argc,char **argv){
 	// Load the mesh data
 	Mesh::ptr mesh=engine->cacheMesh(mshFileName);
 	if(mesh==NULL){
-		std::cout << "Error loading file: " << mshFileName << std::endl;
+		std::cout << "Error loading file: " << (const char*)mshFileName << std::endl;
 		return 0;
 	}
 
@@ -61,7 +61,7 @@ int main(int argc,char **argv){
 
 	FileOutputStream::ptr fout(new FileOutputStream(mshFileName));
 	if(fout->isOpen()==false){
-		std::cout << "Error opening " << mshFileName << std::endl;
+		std::cout << "Error opening " << (const char*)mshFileName << std::endl;
 		return 0;
 	}
 	XMSHHandler::ptr handler(new XMSHHandler(NULL,NULL,NULL));

@@ -42,7 +42,7 @@ int main(int argc,char **argv){
 
 	Mesh::ptr mesh=engine->cacheMesh(meshName);
 	if(mesh==NULL){
-		std::cout << "Error loading " << meshName << std::endl;
+		std::cout << "Error loading " << (const char*)meshName << std::endl;
 
 		viewer->destroy();
 		delete viewer;
