@@ -78,7 +78,8 @@ protected:
 	int mDepth;
 
 	egg::String mName;
-	
+
+	D3DFORMAT mD3DFormat;
 	IDirect3DBaseTexture9 *mTexture;
 	bool mManuallyGenerateMipLevels;
 

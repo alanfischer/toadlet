@@ -69,12 +69,7 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,IndexFormat indexForm
 	mDataSize=mIndexFormat*mSize;
 	
 	mTarget=GL_ELEMENT_ARRAY_BUFFER;
-	if(mRenderer->getCapabilitySet().hardwareIndexBuffers){
-		glGenBuffers(1,&mHandle);
-		glBindBuffer(mTarget,mHandle);
-		GLenum usage=getBufferUsage(mUsageFlags,mAccessType);
-		glBufferData(mTarget,mDataSize,NULL,usage);
-	}
+	createContext();
 
 	mMapping=mRenderer->useMapping();
 	if(mRenderer->getCapabilitySet().hardwareIndexBuffers==false || mMapping==false){
@@ -96,12 +91,7 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr ver
 	mDataSize=mVertexSize*mSize;
 	
 	mTarget=GL_ARRAY_BUFFER;
-	if(mRenderer->getCapabilitySet().hardwareVertexBuffers){
-		glGenBuffers(1,&mHandle);
-		glBindBuffer(mTarget,mHandle);
-		GLenum usage=getBufferUsage(mUsageFlags,mAccessType);
-		glBufferData(mTarget,mDataSize,NULL,usage);
-	}
+	createContext();
 
 	#if defined(TOADLET_BIG_ENDIAN)
 		int i;
@@ -128,17 +118,55 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr ver
 }
 
 bool GLBuffer::destroy(){
-	if(mHandle!=0){
-		glDeleteBuffers(1,&mHandle);
-		mHandle=0;
-	}
-	
-	if(mData!=NULL && mBacking){
+	destroyContext(false);
+
+	if(mData!=NULL){
 		delete[] mData;
 		mData=NULL;
 	}
 
 	return true;
+}
+
+void GLBuffer::createContext(){
+	if((mTarget==GL_ELEMENT_ARRAY_BUFFER && mRenderer->getCapabilitySet().hardwareIndexBuffers) ||
+		(mTarget==GL_ARRAY_BUFFER && mRenderer->getCapabilitySet().hardwareIndexBuffers))
+	{
+		glGenBuffers(1,&mHandle);
+		glBindBuffer(mTarget,mHandle);
+		GLenum usage=getBufferUsage(mUsageFlags,mAccessType);
+		glBufferData(mTarget,mDataSize,NULL,usage);
+	}
+
+	#if !defined(TOADLET_HAS_GLES)
+		if(mMapping && mBacking){
+			uint8 *data=lock(AccessType_WRITE_ONLY);
+			memcpy(data,mData,mDataSize);
+			unlock();
+
+			delete[] mData;
+			mData=NULL;
+			mBacking=true;
+		}
+	#endif
+}
+
+void GLBuffer::destroyContext(bool backData){
+	#if !defined(TOADLET_HAS_GLES)
+		if(mMapping && backData){
+			mData=new uint8[mDataSize];
+			mBacking=true;
+
+			uint8 *data=lock(AccessType_READ_ONLY);
+			memcpy(mData,data,mDataSize);
+			unlock();
+		}
+	#endif
+
+	if(mHandle!=0){
+		glDeleteBuffers(1,&mHandle);
+		mHandle=0;
+	}
 }
 
 uint8 *GLBuffer::lock(AccessType accessType){

@@ -44,6 +44,9 @@ public:
 	virtual bool create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size);
 	virtual bool destroy();
 
+	virtual void createContext();
+	virtual void destroyContext(bool backData);
+
 	virtual int getUsageFlags() const{return mUsageFlags;}
 	virtual AccessType getAccessType() const{return mAccessType;}
 	virtual int getDataSize() const{return mDataSize;}
@@ -67,6 +70,8 @@ protected:
 	IDirect3DIndexBuffer9 *mIndexBuffer;
 	AccessType mLockType;
 	uint8 *mData;
+	bool mBacking;
+	uint8 *mBackingData;
 
 	friend D3D9Renderer;
 };
