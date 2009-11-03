@@ -43,10 +43,11 @@ public:
 	VertexBuffer *getRootVertexBuffer(){return this;}
 
 	virtual bool create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size);
-	virtual bool destroy();
+	virtual void destroy();
 
-	virtual void createContext();
+	virtual bool createContext();
 	virtual void destroyContext(bool backData);
+	virtual bool contextNeedsReset();
 
 	virtual int getUsageFlags() const{return mUsageFlags;}
 	virtual AccessType getAccessType() const{return mAccessType;}
@@ -69,8 +70,10 @@ protected:
 	short mVertexSize;
 	int mDataSize;
 
-	IDirect3DVertexBuffer9 *mVertexBuffer;
 	DWORD mFVF;
+	DWORD mD3DUsage;
+	D3DPOOL mD3DPool;
+	IDirect3DVertexBuffer9 *mVertexBuffer;
 	egg::Collection<VertexElement> mColorElements;
 	AccessType mLockType;
 	uint8 *mData;

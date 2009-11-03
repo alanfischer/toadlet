@@ -26,14 +26,15 @@
 #ifndef TOADLET_PEEPER_INDEXBUFFER_H
 #define TOADLET_PEEPER_INDEXBUFFER_H
 
+#include <toadlet/egg/Resource.h>
 #include <toadlet/peeper/Buffer.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API IndexBuffer:public Buffer{
+class TOADLET_API IndexBuffer:public egg::Resource,public Buffer{
 public:
-	TOADLET_SHARED_POINTERS(IndexBuffer,Buffer);
+	TOADLET_SHARED_POINTERS(IndexBuffer,egg::Resource);
 
 	// Convinently equals size of index
 	enum IndexFormat{
@@ -47,10 +48,11 @@ public:
 	virtual IndexBuffer *getRootIndexBuffer()=0;
 
 	virtual bool create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size)=0;
-	virtual bool destroy()=0;
+	virtual void destroy()=0;
 
-	virtual void createContext()=0;
+	virtual bool createContext()=0;
 	virtual void destroyContext(bool backData)=0;
+	virtual bool contextNeedsReset()=0;
 
 	virtual IndexFormat getIndexFormat()=0;
 	virtual int getSize() const=0;

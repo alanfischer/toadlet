@@ -77,7 +77,8 @@ float BACQuad::computeSP(){
 	return sp;
 }
 
-BACConverter::BACConverter(){
+BACConverter::BACConverter(Engine *engine){
+	mEngine=engine;
 	mPositionEpsilon=0.1f;
 	mNormalEpsilon=0.05f;
 	mTexCoordEpsilon=0.005f;
@@ -380,7 +381,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 		mBones.add(bone);
 	}
 	else{
-		MeshEntity::ptr meshEntity=(MeshEntity*)(new MeshEntity())->create(NULL);
+		MeshEntity::ptr meshEntity=(MeshEntity*)(new MeshEntity())->create(mEngine);
 		meshEntity->load(mesh);
 		buildBones(mesh,meshEntity,0);
 		meshEntity->destroy();

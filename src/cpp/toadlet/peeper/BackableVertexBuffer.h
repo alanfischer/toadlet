@@ -23,61 +23,51 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_D3D9INDEXBUFFER_H
-#define TOADLET_PEEPER_D3D9INDEXBUFFER_H
+#ifndef TOADLET_PEEPER_BACKABLEVERTEXBUFFER_H
+#define TOADLET_PEEPER_BACKABLEVERTEXBUFFER_H
 
-#include "D3D9Includes.h"
-#include <toadlet/peeper/IndexBuffer.h>
+#include <toadlet/peeper/VertexBuffer.h>
 
 namespace toadlet{
 namespace peeper{
 
-class D3D9Renderer;
-
-class TOADLET_API D3D9IndexBuffer:public IndexBuffer{
+class TOADLET_API BackableVertexBuffer:public VertexBuffer{
 public:
-	D3D9IndexBuffer(D3D9Renderer *renderer);
-	virtual ~D3D9IndexBuffer();
+	TOADLET_SHARED_POINTERS(BackableVertexBuffer,egg::Resource);
 
-	IndexBuffer *getRootIndexBuffer(){return this;}
+	BackableVertexBuffer();
+	virtual ~BackableVertexBuffer();
 
-	virtual bool create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size);
+	virtual VertexBuffer *getRootVertexBuffer(){return mBack;}
+
+	virtual bool create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size);
 	virtual void destroy();
 
-	virtual bool createContext();
-	virtual void destroyContext(bool backData);
-	virtual bool contextNeedsReset();
+	virtual bool createContext(){return mBack->createContext();}
+	virtual void destroyContext(bool backData){mBack->destroyContext(backData);}
+	virtual bool contextNeedsReset(){return mBack->contextNeedsReset();}
 
 	virtual int getUsageFlags() const{return mUsageFlags;}
 	virtual AccessType getAccessType() const{return mAccessType;}
 	virtual int getDataSize() const{return mDataSize;}
-	virtual IndexFormat getIndexFormat(){return mIndexFormat;}
+	virtual VertexFormat::ptr getVertexFormat(){return mVertexFormat;}
 	virtual int getSize() const{return mSize;}
 
 	virtual uint8 *lock(AccessType accessType);
 	virtual bool unlock();
 
+	virtual void setBack(VertexBuffer::ptr back);
+	virtual VertexBuffer::ptr getBack(){return mBack;}
+	
 protected:
-	static D3DFORMAT getD3DFORMAT(IndexFormat format);
-
-	D3D9Renderer *mRenderer;
-
 	int mUsageFlags;
 	AccessType mAccessType;
-	int mSize;
-	IndexFormat mIndexFormat;
 	int mDataSize;
+	VertexFormat::ptr mVertexFormat;
+	int mSize;
 
-	D3DFORMAT mD3DFormat;
-	DWORD mD3DUsage;
-	D3DPOOL mD3DPool;
-	IDirect3DIndexBuffer9 *mIndexBuffer;
-	AccessType mLockType;
 	uint8 *mData;
-	bool mBacking;
-	uint8 *mBackingData;
-
-	friend D3D9Renderer;
+	VertexBuffer::ptr mBack;
 };
 
 }

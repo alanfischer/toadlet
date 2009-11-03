@@ -23,25 +23,25 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_D3D9TEXTURE_H
-#define TOADLET_PEEPER_D3D9TEXTURE_H
+#ifndef TOADLET_PEEPER_BACKABLETEXTURE_H
+#define TOADLET_PEEPER_BACKABLETEXTURE_H
 
-#include "D3D9Includes.h"
 #include <toadlet/peeper/Texture.h>
-#include <toadlet/peeper/TextureBlend.h>
 
 namespace toadlet{
 namespace peeper{
 
-class D3D9Renderer;
-
-class TOADLET_API D3D9Texture:public Texture{
+class TOADLET_API BackableTexture:public Texture{
 public:
-	D3D9Texture(D3D9Renderer *renderer);
+	TOADLET_SHARED_POINTERS(BackableTexture,egg::Resource);
 
-	virtual ~D3D9Texture();
+	BackableTexture();
+	virtual ~BackableTexture();
 
-	virtual Texture *getRootTexture(){return this;}
+	virtual Texture *getRootTexture(){return mBack;}
+
+	virtual void setName(const egg::String &name){mName=name;}
+	virtual const egg::String &getName() const{return mName;}
 
 	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels);
 	virtual void destroy();
@@ -52,40 +52,28 @@ public:
 	virtual int getWidth() const{return mWidth;}
 	virtual int getHeight() const{return mHeight;}
 	virtual int getDepth() const{return mDepth;}
-	virtual int getNumMipLevels() const{return mTexture==NULL?0:mTexture->GetLevelCount();}
+	virtual int getNumMipLevels() const{return mMipLevels;}
 
 	virtual Surface::ptr getMipSuface(int i) const;
 	virtual bool load(int format,int width,int height,int depth,uint8 *data);
 	virtual bool read(int format,int width,int height,int depth,uint8 *data);
 
-	virtual void setName(const egg::String &name){mName=name;}
-	virtual const egg::String &getName() const{return mName;}
-
+	virtual void setBack(Texture::ptr back);
+	virtual Texture::ptr getBack(){return mBack;}
+	
 protected:
-	static bool isD3DFORMATValid(IDirect3D9 *d3d,D3DFORMAT adapterFormat,D3DFORMAT textureFormat,DWORD usage);
-
-	static D3DFORMAT getD3DFORMAT(int textureFormat);
-	static DWORD getD3DTADDRESS(TextureStage::AddressMode addressMode);
-	static DWORD getD3DTEXF(TextureStage::Filter filter);
-
-	D3D9Renderer *mRenderer;
-
+	egg::String mName;
 	int mUsageFlags;
 	Dimension mDimension;
 	int mFormat;
 	int mWidth;
 	int mHeight;
 	int mDepth;
+	int mMipLevels;
 
-	egg::String mName;
-
-	D3DFORMAT mD3DFormat;
-	DWORD mD3DUsage;
-	D3DPOOL mD3DPool;
-	IDirect3DBaseTexture9 *mTexture;
-	bool mManuallyGenerateMipLevels;
-
-	friend D3D9Renderer;
+	int mDataSize;
+	uint8 *mData;
+	Texture::ptr mBack;
 };
 
 }

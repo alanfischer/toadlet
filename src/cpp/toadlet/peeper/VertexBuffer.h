@@ -26,25 +26,27 @@
 #ifndef TOADLET_PEEPER_VERTEXBUFFER_H
 #define TOADLET_PEEPER_VERTEXBUFFER_H
 
+#include <toadlet/egg/Resource.h>
 #include <toadlet/peeper/Buffer.h>
 #include <toadlet/peeper/VertexFormat.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API VertexBuffer:public Buffer{
+class TOADLET_API VertexBuffer:public egg::Resource,public Buffer{
 public:
-	TOADLET_SHARED_POINTERS(VertexBuffer,Buffer);
+	TOADLET_SHARED_POINTERS(VertexBuffer,egg::Resource);
 
 	virtual ~VertexBuffer(){}
 
 	virtual VertexBuffer *getRootVertexBuffer()=0;
 
 	virtual bool create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size)=0;
-	virtual bool destroy()=0;
+	virtual void destroy()=0;
 
-	virtual void createContext()=0;
+	virtual bool createContext()=0;
 	virtual void destroyContext(bool backData)=0;
+	virtual bool contextNeedsReset()=0;
 
 	virtual VertexFormat::ptr getVertexFormat()=0;
 	virtual int getSize() const=0;

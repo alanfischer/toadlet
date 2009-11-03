@@ -111,7 +111,7 @@ public:
 
 class BACConverter{
 public:
-	BACConverter();
+	BACConverter(toadlet::tadpole::Engine *engine);
 	virtual ~BACConverter();
 
 	bool convertMesh(toadlet::tadpole::Mesh::ptr mesh,toadlet::egg::io::OutputStream *out,bool submeshes=true,bool quads=true,float adjust=0,int version=6);
@@ -172,6 +172,7 @@ protected:
 	bool mHasNormal;
 	bool mHasBone;
 
+	toadlet::tadpole::Engine *mEngine;
 	toadlet::egg::String mName;
 	toadlet::egg::Collection<BACVertex *> mVertices;
 	toadlet::egg::Collection<BACTexCoord *> mTexCoords;

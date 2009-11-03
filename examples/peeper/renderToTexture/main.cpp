@@ -12,16 +12,16 @@ class RenderToTexture:public Application{
 public:
 	RenderToTexture():Application(){}
 
+	void keyPressed(int key){if(key=='g')changeRendererPlugin(RendererPlugin_OPENGL);if(key=='d')changeRendererPlugin(RendererPlugin_DIRECT3D);}
 	void create(){
 		int options[]={2,0,0};
 		setRendererOptions(options,3);
-		changeRendererPlugin(RendererPlugin_DIRECT3D);
 
 		Application::create();
 
-		triVertexBuffer=VertexBuffer::ptr(new VertexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_COLOR,3));
+		triVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_COLOR,3);
 		{
-			VertexBufferAccessor a(triVertexBuffer,Buffer::LockType_WRITE_ONLY);
+			VertexBufferAccessor a(triVertexBuffer);
 			a.set3(0,0, 0,Math::ONE,0);				a.setABGR(0,1, 0x000000FF);
 			a.set3(1,0, -Math::ONE,-Math::ONE,0);	a.setABGR(1,1, 0x0000FF00);
 			a.set3(2,0, Math::ONE,-Math::ONE,0);	a.setABGR(2,1, 0x00FF0000);
@@ -29,9 +29,9 @@ public:
 		triVertexData=VertexData::ptr(new VertexData(triVertexBuffer));
 		triIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIFAN,NULL,0,3));
 
-		quadVertexBuffer=VertexBuffer::ptr(new VertexBuffer(Buffer::UsageType_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,4));
+		quadVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,4);
 		{
-			VertexBufferAccessor a(quadVertexBuffer,Buffer::LockType_WRITE_ONLY);
+			VertexBufferAccessor a(quadVertexBuffer);
 			a.set3(0,0, -Math::ONE,Math::ONE,0);	a.set2(0,1, 0,0);
 			a.set3(1,0, -Math::ONE,-Math::ONE,0);	a.set2(1,1, 0,Math::ONE);
 			a.set3(2,0, Math::ONE,Math::ONE,0);		a.set2(2,1, Math::ONE,0);
@@ -40,8 +40,7 @@ public:
 		quadVertexData=VertexData::ptr(new VertexData(quadVertexBuffer));
 		quadIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,4));
 
-		renderTexture=Texture::ptr(getRenderer()->createTexture());
-		renderTexture->create(Texture::UsageFlags_RENDERTARGET,Texture::Dimension_D2,Texture::Format_RGB_5_6_5,256,256,0,0);
+		renderTexture=mEngine->getTextureManager()->createTexture(Texture::UsageFlags_RENDERTARGET,Texture::Dimension_D2,Texture::Format_RGB_5_6_5,256,256,0,0);
 
 		surfaceRenderTarget=SurfaceRenderTarget::ptr(getRenderer()->createSurfaceRenderTarget());
 		surfaceRenderTarget->create();

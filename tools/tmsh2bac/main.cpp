@@ -185,7 +185,7 @@ int main(int argc,char **argv){
 		std::cout << "Writing mesh " << bacFileName << std::endl;
 
 		// Convert to .bac format
-		BACConverter bac;
+		BACConverter bac(engine);
 		bac.setPositionEpsilon(positionEpsilon);
 		bac.setNormalEpsilon(normalEpsilon);
 		bac.setTexCoordEpsilon(texCoordEpsilon);

@@ -27,8 +27,9 @@
 #define TOADLET_TADPOLE_BUFFERMANAGER_H
 
 #include <toadlet/tadpole/ResourceManager.h>
-#include <toadlet/peeper/IndexBuffer.h>
-#include <toadlet/peeper/VertexBuffer.h>
+#include <toadlet/peeper/BackableIndexBuffer.h>
+#include <toadlet/peeper/BackableVertexBuffer.h>
+#include <toadlet/peeper/Renderer.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -44,7 +45,16 @@ public:
 	virtual peeper::IndexBuffer::ptr cloneIndexBuffer(peeper::IndexBuffer::ptr oldIndexBuffer,int usageFlags,peeper::Buffer::AccessType accessType,peeper::IndexBuffer::IndexFormat indexFormat,int size);
 	virtual peeper::VertexBuffer::ptr cloneVertexBuffer(peeper::VertexBuffer::ptr oldVertexBuffer,int usageFlags,peeper::Buffer::AccessType accessType,peeper::VertexFormat::ptr vertexFormat,int size);
 
+	virtual void contextActivate(peeper::Renderer *renderer);
+	virtual void contextDeactivate(peeper::Renderer *renderer);
+	virtual void contextUpdate(peeper::Renderer *renderer);
+	virtual void preContextReset(peeper::Renderer *renderer);
+	virtual void postContextReset(peeper::Renderer *renderer);
+
 protected:
+	egg::Collection<peeper::BackableIndexBuffer::ptr> mIndexBuffers;
+	egg::Collection<peeper::BackableVertexBuffer::ptr> mVertexBuffers;
+
 	Engine *mEngine;
 };
 

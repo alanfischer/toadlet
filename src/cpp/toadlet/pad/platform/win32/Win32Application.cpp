@@ -183,6 +183,10 @@ bool Win32Application::start(bool runEventLoop){
 			uint64 currentTime=System::mtime();
 			update(currentTime-lastTime);
 			if(mRenderer!=NULL){
+				if(mRenderer->getStatus()==Renderer::RendererStatus_NEEDSRESET){
+					mEngine->contextReset(mRenderer);
+				}
+
 				render(mRenderer);
 			}
 			lastTime=currentTime;
@@ -714,11 +718,7 @@ void Win32Application::internal_resize(int width,int height){
 
 	if(mActive && mRenderer!=NULL){
 		if(mRenderer->getCapabilitySet().resetOnResize){
-			mEngine->setRenderer(NULL);
-
-			mRenderer->reset();
-
-			mEngine->setRenderer(mRenderer);
+			mEngine->contextReset(mRenderer);
 		}
 		render(mRenderer);
 	}
