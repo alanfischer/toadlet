@@ -1250,7 +1250,7 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 				#endif
 
 				#if !defined(TOADLET_HAS_GLES)
-					if(calculation!=TextureStage::Calculation_NORMAL){
+					if(calculation>TextureStage::Calculation_NORMAL){
 						if(mMatrixMode!=GL_MODELVIEW){
 							mMatrixMode=GL_MODELVIEW;
 							glMatrixMode(mMatrixMode);
@@ -1437,7 +1437,7 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 		glActiveTexture(GL_TEXTURE0);
 	}
 
-	TOADLET_CHECK_GLERROR("setTextureStage:END");
+	TOADLET_CHECK_GLERROR("setTextureStage");
 }
 
 void GLRenderer::setProgram(const Program *program){

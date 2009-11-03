@@ -65,7 +65,7 @@ public:
 	virtual int getNumMipLevels() const=0;
 
 	virtual Surface::ptr getMipSuface(int i) const=0;
-	virtual void load(int format,int width,int height,int depth,uint8 *data)=0;
+	virtual bool load(int format,int width,int height,int depth,uint8 *data)=0;
 	virtual bool read(int format,int width,int height,int depth,uint8 *data)=0;
 };
 

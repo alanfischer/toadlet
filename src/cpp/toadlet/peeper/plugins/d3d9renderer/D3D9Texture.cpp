@@ -46,6 +46,8 @@ D3D9Texture::D3D9Texture(D3D9Renderer *renderer):
 	mDepth(0),
 
 	mD3DFormat(D3DFMT_X8R8G8B8),
+	mD3DUsage(0),
+	mD3DPool(D3DPOOL_DEFAULT),
 	mTexture(NULL),
 	mManuallyGenerateMipLevels(false)
 {
@@ -85,19 +87,19 @@ bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width
 		mD3DFormat=D3DFMT_X8R8G8B8;
 	}
 	
-	DWORD usage=(mUsageFlags&UsageFlags_RENDERTARGET)>0 ? D3DUSAGE_RENDERTARGET : 0;
+	mD3DUsage=(mUsageFlags&UsageFlags_RENDERTARGET)>0 ? D3DUSAGE_RENDERTARGET : 0;
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		usage|=D3DUSAGE_LOCKABLE;
+		mD3DUsage|=D3DUSAGE_LOCKABLE;
 	#endif
 	mManuallyGenerateMipLevels=(usageFlags&UsageFlags_AUTOGEN_MIPMAPS)>0;
 	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
 		if(mManuallyGenerateMipLevels && isD3DFORMATValid(d3d,D3DFMT_X8R8G8B8,mD3DFormat,D3DUSAGE_AUTOGENMIPMAP)){
-			usage|=D3DUSAGE_AUTOGENMIPMAP;
+			mD3DUsage|=D3DUSAGE_AUTOGENMIPMAP;
 			mManuallyGenerateMipLevels=false;
 		}
 	#endif
 
-	D3DPOOL pool=
+	mD3DPool=
 		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 			D3DPOOL_MANAGED;
 		#else
@@ -109,18 +111,18 @@ bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width
 		case Texture::Dimension_D1:
 		case Texture::Dimension_D2:{
 			IDirect3DTexture9 *texture=NULL;
-			result=device->CreateTexture(mWidth,mHeight,mipLevels,usage,mD3DFormat,pool,&texture TOADLET_SHAREDHANDLE);
+			result=device->CreateTexture(mWidth,mHeight,mipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
 			mTexture=texture;
 		}break;
 		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
 			case Texture::Dimension_D3:{
 				IDirect3DVolumeTexture9 *texture=NULL;
-				result=device->CreateVolumeTexture(mWidth,mHeight,depth,mipLevels,usage,mD3DFormat,pool,&texture TOADLET_SHAREDHANDLE);
+				result=device->CreateVolumeTexture(mWidth,mHeight,depth,mipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
 				mTexture=texture;
 			}break;
 			case Texture::Dimension_CUBEMAP:{
 				IDirect3DCubeTexture9 *texture=NULL;
-				result=device->CreateCubeTexture(mWidth,mipLevels,usage,mD3DFormat,pool,&texture TOADLET_SHAREDHANDLE);
+				result=device->CreateCubeTexture(mWidth,mipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
 				mTexture=texture;
 			}break;
 		#endif
@@ -162,11 +164,11 @@ Surface::ptr D3D9Texture::getMipSuface(int i) const{
 	}
 }
 
-void D3D9Texture::load(int format,int width,int height,int depth,uint8 *data){
+bool D3D9Texture::load(int format,int width,int height,int depth,uint8 *data){
 	if(width!=mWidth || height!=mHeight || depth!=mDepth){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"D3D9Texture: Texture data of incorrect dimensions");
-		return;
+		return false;
 	}
 
 	HRESULT result;
@@ -177,7 +179,7 @@ void D3D9Texture::load(int format,int width,int height,int depth,uint8 *data){
 		result=texture->LockRect(0,&rect,NULL,D3DLOCK_DISCARD);
 		if(FAILED(result)){
 			TOADLET_CHECK_D3D9ERROR(result,"LockRect");
-			return;
+			return false;
 		}
 
 		int pixelSize=ImageFormatConversion::getPixelSize(format);
@@ -248,7 +250,7 @@ void D3D9Texture::load(int format,int width,int height,int depth,uint8 *data){
 	else{
 		Error::unimplemented(Categories::TOADLET_PEEPER,
 			"D3D9Texture: Volume & Cube loading not yet implemented");
-		return;
+		return false;
 	}
 
 	// TODO: I dont think this will work if the driver doesnt support autogen mipmaps, so for this & GL, we should probably
@@ -258,6 +260,8 @@ void D3D9Texture::load(int format,int width,int height,int depth,uint8 *data){
 			mTexture->GenerateMipSubLevels();
 		#endif
 	}
+
+	return true;
 }
 
 bool D3D9Texture::read(int format,int width,int height,int depth,uint8 *data){

@@ -47,10 +47,11 @@ public:
 
 	virtual bool create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size);
 	virtual bool create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size);
-	virtual bool destroy();
+	virtual void destroy();
 
-	virtual void createContext();
+	virtual bool createContext();
 	virtual void destroyContext(bool backData);
+	virtual bool contextNeedsReset(){return false;}
 
 	virtual int getUsageFlags() const{return mUsageFlags;}
 	virtual AccessType getAccessType() const{return mAccessType;}

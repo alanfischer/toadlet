@@ -42,17 +42,15 @@
 #include <toadlet/tadpole/FontData.h>
 #include <toadlet/tadpole/VertexFormats.h>
 #include <toadlet/tadpole/BufferManager.h>
+#include <toadlet/tadpole/TextureManager.h>
+#include <toadlet/tadpole/MaterialManager.h>
+#include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/ResourceManager.h>
-#include <toadlet/tadpole/ContextResourceManager.h>
 #include <toadlet/tadpole/entity/Scene.h>
 #include <toadlet/tadpole/handler/AudioBufferHandler.h>
 
 namespace toadlet{
 namespace tadpole{
-
-class MaterialManager;
-class MeshManager;
-class TextureManager;
 
 class TOADLET_API Engine:public egg::io::InputStreamFactory{
 public:
@@ -92,10 +90,10 @@ public:
 	void freeEntity(entity::Entity *entity){}
 
 	// Context methods
+	void contextReset(peeper::Renderer *renderer);
 	void contextActivate(peeper::Renderer *renderer);
 	void contextDeactivate(peeper::Renderer *renderer);
 	void contextUpdate(peeper::Renderer *renderer);
-
 
 	// Resource methods
 	//  Texture

@@ -27,20 +27,27 @@
 #define TOADLET_TADPOLE_TEXTUREMANAGER_H
 
 #include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/Texture.h>
-#include <toadlet/tadpole/Engine.h>
 
 namespace toadlet{
 namespace tadpole{
+
+class Engine;
 
 class TextureManager:public ResourceManager{
 public:
 	TextureManager(Engine *engine);
 
 	peeper::Texture::ptr createTexture(const egg::image::Image::ptr &image);
+	peeper::Texture::ptr createTexture(int usageFlags,peeper::Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels);
 	egg::image::Image::ptr createImage(const peeper::Texture::ptr &texture);
-	
-	void resourceLoaded(const egg::Resource::ptr &resource);
+
+	virtual void contextActivate(peeper::Renderer *renderer){}
+	virtual void contextDeactivate(peeper::Renderer *renderer){}
+	virtual void contextUpdate(peeper::Renderer *renderer){}
+	virtual void preContextReset(peeper::Renderer *renderer){}
+	virtual void postContextReset(peeper::Renderer *renderer){}
 
 protected:
 	Engine *mEngine;

@@ -78,7 +78,7 @@ int main(int argc,char **argv){
 
 	String mshFileName=argv[argc-1];
 
-	std::cout << "--msh2m3g--" << std::endl;
+	std::cout << "--tmsh2m3g--" << std::endl;
 	std::cout << "Converting " << mshFileName.c_str() << std::endl;
 
 	// Create a toadlet engine
@@ -88,7 +88,7 @@ int main(int argc,char **argv){
 	Engine *engine=new Engine();
 
 	// Load the mesh data
-	Mesh::ptr mesh=shared_static_cast<Mesh>(engine->getMeshManager()->load(mshFileName,NULL,false));
+	Mesh::ptr mesh=engine->cacheMesh(mshFileName);
 	if(mesh==NULL){
 		std::cout << "Error loading file: " << mshFileName.c_str() << std::endl;
 		return 0;

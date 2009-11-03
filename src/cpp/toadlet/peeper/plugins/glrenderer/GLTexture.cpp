@@ -166,11 +166,11 @@ Surface::ptr GLTexture::getMipSuface(int i) const{
 	return Surface::ptr(new GLTextureMipSurface(const_cast<GLTexture*>(this),i));
 }
 
-void GLTexture::load(int format,int width,int height,int depth,uint8 *data){
+bool GLTexture::load(int format,int width,int height,int depth,uint8 *data){
 	if(width!=mWidth || height!=mHeight || depth!=mDepth){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"GLTexture: Texture data of incorrect dimensions");
-		return;
+		return false;
 	}
 
 	glBindTexture(mTarget,mHandle);
@@ -205,6 +205,8 @@ void GLTexture::load(int format,int width,int height,int depth,uint8 *data){
 	if(mManuallyGenerateMipLevels){
 		generateMipLevels();
 	}
+
+	return true;
 }
 
 bool GLTexture::read(int format,int width,int height,int depth,uint8 *data){

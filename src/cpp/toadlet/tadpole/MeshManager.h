@@ -28,10 +28,13 @@
 
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/Mesh.h>
-#include <toadlet/tadpole/Engine.h>
+#include <toadlet/peeper/IndexBufferAccessor.h>
+#include <toadlet/peeper/VertexBufferAccessor.h>
 
 namespace toadlet{
 namespace tadpole{
+
+class Engine;
 
 class MeshManager:public ResourceManager{
 public:

@@ -356,23 +356,29 @@ InputStream::ptr Engine::makeInputStream(const String &name){
 
 
 // Context methods
-void Engine::contextActivate(Renderer *renderer){
-	TOADLET_ASSERT(renderer!=NULL);
+void Engine::contextReset(peeper::Renderer *renderer){
+	mBufferManager->preContextReset(renderer);
+	mTextureManager->preContextReset(renderer);
 
-	Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_DEBUG,
-		"Engine::contextActivate");
+	renderer->reset();
+
+	mBufferManager->postContextReset(renderer);
+	mTextureManager->postContextReset(renderer);
+}
+
+void Engine::contextActivate(Renderer *renderer){
+	mBufferManager->contextActivate(renderer);
+	mTextureManager->contextActivate(renderer);
 }
 
 void Engine::contextDeactivate(Renderer *renderer){
-	TOADLET_ASSERT(renderer!=NULL);
-
-	Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_DEBUG,
-		"Engine::contextDeactivate");
+	mBufferManager->contextDeactivate(renderer);
+	mTextureManager->contextDeactivate(renderer);
 }
 
-/// @todo   I have to implement the resource freeing after context loading, and then have a method of reloading the resource data if the context is destroyed.  Possibily getting it from its file handle, or letting the user supply some other factory method
 void Engine::contextUpdate(Renderer *renderer){
-	TOADLET_ASSERT(renderer!=NULL);
+	mBufferManager->contextUpdate(renderer);
+	mTextureManager->contextUpdate(renderer);
 }
 
 // Resource methods

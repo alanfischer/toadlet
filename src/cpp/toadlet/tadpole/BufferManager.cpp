@@ -25,6 +25,8 @@
 
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/Engine.h>
+#include <toadlet/peeper/BackableIndexBuffer.h>
+#include <toadlet/peeper/BackableVertexBuffer.h>
 #include <string.h> //memcpy
 
 using namespace toadlet::egg;
@@ -38,14 +40,26 @@ BufferManager::BufferManager(Engine *engine):ResourceManager(engine){
 }
 
 IndexBuffer::ptr BufferManager::createIndexBuffer(int usageFlags,Buffer::AccessType accessType,IndexBuffer::IndexFormat indexFormat,int size){
-	IndexBuffer::ptr indexBuffer(mEngine->getRenderer()->createIndexBuffer());
+	BackableIndexBuffer::ptr indexBuffer(new BackableIndexBuffer());
 	indexBuffer->create(usageFlags,accessType,indexFormat,size);
+	if(mEngine->getRenderer()!=NULL){
+		IndexBuffer::ptr back(mEngine->getRenderer()->createIndexBuffer());
+		back->create(usageFlags,accessType,indexFormat,size);
+		indexBuffer->setBack(back);
+	}
+	mIndexBuffers.add(indexBuffer);
 	return indexBuffer;
 }
 
 VertexBuffer::ptr BufferManager::createVertexBuffer(int usageFlags,Buffer::AccessType accessType,VertexFormat::ptr vertexFormat,int size){
-	VertexBuffer::ptr vertexBuffer(mEngine->getRenderer()->createVertexBuffer());
+	BackableVertexBuffer::ptr vertexBuffer(new BackableVertexBuffer());
 	vertexBuffer->create(usageFlags,accessType,vertexFormat,size);
+	if(mEngine->getRenderer()!=NULL){
+		VertexBuffer::ptr back(mEngine->getRenderer()->createVertexBuffer());
+		back->create(usageFlags,accessType,vertexFormat,size);
+		vertexBuffer->setBack(back);
+	}
+	mVertexBuffers.add(vertexBuffer);
 	return vertexBuffer;
 }
 
@@ -120,6 +134,83 @@ VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBu
 	oldVertexBuffer->unlock();
 
 	return vertexBuffer;
+}
+
+void BufferManager::contextActivate(Renderer *renderer){
+	int i;
+	for(i=0;i<mIndexBuffers.size();++i){
+		BackableIndexBuffer::ptr indexBuffer=mIndexBuffers[i];
+		IndexBuffer::ptr back(renderer->createIndexBuffer());
+		back->create(indexBuffer->getUsageFlags(),indexBuffer->getAccessType(),indexBuffer->getIndexFormat(),indexBuffer->getSize());
+		indexBuffer->setBack(back);
+	}
+	for(i=0;i<mVertexBuffers.size();++i){
+		BackableVertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
+		VertexBuffer::ptr back(renderer->createVertexBuffer());
+		back->create(vertexBuffer->getUsageFlags(),vertexBuffer->getAccessType(),vertexBuffer->getVertexFormat(),vertexBuffer->getSize());
+		vertexBuffer->setBack(back);
+	}
+}
+
+void BufferManager::contextDeactivate(Renderer *renderer){
+	int i;
+	for(i=0;i<mIndexBuffers.size();++i){
+		BackableIndexBuffer::ptr indexBuffer=mIndexBuffers[i];
+		indexBuffer->setBack(NULL);
+	}
+	for(i=0;i<mVertexBuffers.size();++i){
+		BackableVertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
+		vertexBuffer->setBack(NULL);
+	}
+}
+
+// Duh, make this not suck and run through everything all the time.  the managers are just being hacked to get them to work currently
+void BufferManager::contextUpdate(Renderer *renderer){
+	int i;
+	for(i=0;i<mIndexBuffers.size();++i){
+		BackableIndexBuffer::ptr indexBuffer=mIndexBuffers[i];
+		if(indexBuffer->getBack()==NULL){
+			IndexBuffer::ptr back(renderer->createIndexBuffer());
+			back->create(indexBuffer->getUsageFlags(),indexBuffer->getAccessType(),indexBuffer->getIndexFormat(),indexBuffer->getSize());
+			indexBuffer->setBack(back);
+		}
+	}
+	for(i=0;i<mVertexBuffers.size();++i){
+		BackableVertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
+		if(vertexBuffer->getBack()==NULL){
+			VertexBuffer::ptr back(renderer->createVertexBuffer());
+			back->create(vertexBuffer->getUsageFlags(),vertexBuffer->getAccessType(),vertexBuffer->getVertexFormat(),vertexBuffer->getSize());
+			vertexBuffer->setBack(back);
+		}
+	}
+}
+
+void BufferManager::preContextReset(Renderer *renderer){
+	int i;
+	for(i=0;i<mIndexBuffers.size();++i){
+		if(mIndexBuffers[i]->contextNeedsReset()){
+			mIndexBuffers[i]->destroyContext(true);
+		}
+	}
+	for(i=0;i<mVertexBuffers.size();++i){
+		if(mVertexBuffers[i]->contextNeedsReset()){
+			mVertexBuffers[i]->destroyContext(true);
+		}
+	}
+}
+
+void BufferManager::postContextReset(Renderer *renderer){
+	int i;
+	for(i=0;i<mIndexBuffers.size();++i){
+		if(mIndexBuffers[i]->contextNeedsReset()){
+			mIndexBuffers[i]->createContext();
+		}
+	}
+	for(i=0;i<mVertexBuffers.size();++i){
+		if(mVertexBuffers[i]->contextNeedsReset()){
+			mVertexBuffers[i]->createContext();
+		}
+	}
 }
 
 }

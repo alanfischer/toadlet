@@ -70,7 +70,7 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,IndexFormat indexForm
 	mDataSize=mIndexFormat*mSize;
 	
 	mTarget=GL_ELEMENT_ARRAY_BUFFER;
-	createContext();
+	bool result=createContext();
 
 	mMapping=mRenderer->useMapping();
 	if(mRenderer->getCapabilitySet().hardwareIndexBuffers==false || mMapping==false){
@@ -78,7 +78,7 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,IndexFormat indexForm
 		mBacking=true;
 	}
 	
-	return true;
+	return result;
 }
 
 bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size){
@@ -118,18 +118,16 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr ver
 	return true;
 }
 
-bool GLBuffer::destroy(){
+void GLBuffer::destroy(){
 	destroyContext(false);
 
 	if(mData!=NULL){
 		delete[] mData;
 		mData=NULL;
 	}
-
-	return true;
 }
 
-void GLBuffer::createContext(){
+bool GLBuffer::createContext(){
 	if((mTarget==GL_ELEMENT_ARRAY_BUFFER && mRenderer->getCapabilitySet().hardwareIndexBuffers) ||
 		(mTarget==GL_ARRAY_BUFFER && mRenderer->getCapabilitySet().hardwareIndexBuffers))
 	{
@@ -150,6 +148,10 @@ void GLBuffer::createContext(){
 			mBacking=true;
 		}
 	#endif
+
+	TOADLET_CHECK_GLERROR("createContext");
+
+	return true;
 }
 
 void GLBuffer::destroyContext(bool backData){
@@ -168,6 +170,8 @@ void GLBuffer::destroyContext(bool backData){
 		glDeleteBuffers(1,&mHandle);
 		mHandle=0;
 	}
+
+	TOADLET_CHECK_GLERROR("destroyContext");
 }
 
 uint8 *GLBuffer::lock(AccessType accessType){

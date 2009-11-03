@@ -24,6 +24,8 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/TextureManager.h>
+#include <toadlet/tadpole/Engine.h>
+#include <toadlet/peeper/BackableTexture.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
@@ -38,9 +40,26 @@ TextureManager::TextureManager(Engine *engine):ResourceManager(engine){
 }
 
 Texture::ptr TextureManager::createTexture(const Image::ptr &image){
-	Texture::ptr texture(mEngine->getRenderer()->createTexture());
+	BackableTexture::ptr texture(new BackableTexture());
 	texture->create(Texture::UsageFlags_AUTOGEN_MIPMAPS,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0);
-	texture->load(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),image->getData());
+	if(mEngine->getRenderer()!=NULL){
+		Texture::ptr back(mEngine->getRenderer()->createTexture());
+		back->create(Texture::UsageFlags_AUTOGEN_MIPMAPS,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0);
+		texture->setBack(back);
+	}
+//	mIndexBuffers.add(indexBuffer);
+	return texture;
+}
+
+Texture::ptr TextureManager::createTexture(int usageFlags,Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels){
+	BackableTexture::ptr texture(new BackableTexture());
+	texture->create(usageFlags,dimension,format,width,height,depth,mipLevels);
+	if(mEngine->getRenderer()!=NULL){
+		Texture::ptr back(mEngine->getRenderer()->createTexture());
+		back->create(usageFlags,dimension,format,width,height,depth,mipLevels);
+		texture->setBack(back);
+	}
+//	mIndexBuffers.add(indexBuffer);
 	return texture;
 }
 
@@ -48,15 +67,6 @@ Image::ptr TextureManager::createImage(const Texture::ptr &texture){
 	Image::ptr image(new Image(texture->getDimension(),texture->getFormat(),texture->getWidth(),texture->getHeight(),texture->getDepth()));
 	texture->read(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),image->getData());
 	return image;
-}
-
-void TextureManager::resourceLoaded(const Resource::ptr &resource){
-	Texture::ptr texture=shared_static_cast<Texture>(resource);
-
-//	texture->setAutoGenerateMipMaps(true);
-//	texture->setMinFilter(Texture::Filter_LINEAR);
-//	texture->setMipFilter(Texture::Filter_NEAREST);
-//	texture->setMagFilter(Texture::Filter_LINEAR);
 }
 
 }

@@ -1,5 +1,8 @@
 # Source files for toadlet_peeper
 set (PEEPER_SRC
+	BackableIndexBuffer.cpp
+	BackableVertexBuffer.cpp
+	BackableTexture.cpp
 	IndexBufferAccessor.cpp
 	IndexData.cpp
 	Light.cpp
@@ -14,6 +17,9 @@ set (PEEPER_SRC
 
 # Headers
 set (PEEPER_HEADERS
+	BackableIndexBuffer.h
+	BackableVertexBuffer.h
+	BackableTexture.h
 	Blend.h
 	Buffer.h
 	CapabilitySet.h

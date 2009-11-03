@@ -42,6 +42,9 @@ D3D9IndexBuffer::D3D9IndexBuffer(D3D9Renderer *renderer):
 	mIndexFormat(IndexFormat_UINT_8),
 	mDataSize(0),
 
+	mD3DFormat(D3DFMT_INDEX16),
+	mD3DUsage(0),
+	mD3DPool(D3DPOOL_DEFAULT),
 	mIndexBuffer(NULL),
 	mLockType(AccessType_NO_ACCESS),
 	mData(NULL),
@@ -64,52 +67,45 @@ bool D3D9IndexBuffer::create(int usageFlags,AccessType accessType,IndexFormat in
 	mIndexFormat=indexFormat;
 	mDataSize=mIndexFormat*mSize;
 	if(indexFormat==IndexFormat_UINT_8) mDataSize*=2;
+	mD3DFormat=getD3DFORMAT(mIndexFormat);
 
 	createContext();
 
 	return true;
 }
 
-bool D3D9IndexBuffer::destroy(){
+void D3D9IndexBuffer::destroy(){
 	destroyContext(false);
 
 	if(mBackingData!=NULL){
 		delete[] mBackingData;
 		mBackingData=NULL;
 	}
-
-	return true;
 }
 
-void D3D9IndexBuffer::createContext(){
-	// TODO: Try to unify this
-	D3DFORMAT d3dFormat=getD3DFORMAT(mIndexFormat);
-	DWORD d3dUsage=0;
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		D3DMPOOL d3dPool=D3DMPOOL_SYSTEMMEM;
-	#else
-		D3DPOOL d3dPool=D3DPOOL_MANAGED;
-	#endif
+bool D3D9IndexBuffer::createContext(){
+	mD3DUsage=0;
+	mD3DPool=D3DPOOL_MANAGED;
 	if((mUsageFlags&UsageFlags_DYNAMIC)>0){
-		d3dUsage|=D3DUSAGE_DYNAMIC;
+		mD3DUsage|=D3DUSAGE_DYNAMIC;
 		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
-			d3dPool=D3DPOOL_DEFAULT;
+			mD3DPool=D3DPOOL_DEFAULT;
 		#endif
 	}
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 		else if(mRenderer->getD3DCAPS9().SurfaceCaps & D3DMSURFCAPS_VIDVERTEXBUFFER){
-			d3dPool=D3DMPOOL_VIDEOMEM;
+			mD3DPool=D3DMPOOL_VIDEOMEM;
 		}
 	#endif
 
 	if(mAccessType==AccessType_WRITE_ONLY){
-		d3dUsage|=D3DUSAGE_WRITEONLY;
+		mD3DUsage|=D3DUSAGE_WRITEONLY;
 	}
 
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_EXCESSIVE,
 		String("Allocating D3D9IndexBuffer of size:")+mDataSize);
 
-	HRESULT result=mRenderer->getDirect3DDevice9()->CreateIndexBuffer(mDataSize,d3dUsage,d3dFormat,d3dPool,&mIndexBuffer TOADLET_SHAREDHANDLE);
+	HRESULT result=mRenderer->getDirect3DDevice9()->CreateIndexBuffer(mDataSize,mD3DUsage,mD3DFormat,mD3DPool,&mIndexBuffer TOADLET_SHAREDHANDLE);
 	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: CreateVertexBuffer");
 
 	if(mBacking){
@@ -121,6 +117,8 @@ void D3D9IndexBuffer::createContext(){
 		mBackingData=NULL;
 		mBacking=true;
 	}
+
+	return SUCCEEDED(result);
 }
 
 void D3D9IndexBuffer::destroyContext(bool backData){
@@ -137,6 +135,10 @@ void D3D9IndexBuffer::destroyContext(bool backData){
 		mIndexBuffer->Release();
 		mIndexBuffer=NULL;
 	}
+}
+
+bool D3D9IndexBuffer::contextNeedsReset(){
+	return mD3DPool==D3DPOOL_DEFAULT;
 }
 
 uint8 *D3D9IndexBuffer::lock(AccessType lockType){

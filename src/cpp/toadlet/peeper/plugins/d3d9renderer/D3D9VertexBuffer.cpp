@@ -43,8 +43,10 @@ D3D9VertexBuffer::D3D9VertexBuffer(D3D9Renderer *renderer):
 	mVertexSize(0),
 	mDataSize(0),
 
-	mVertexBuffer(NULL),
 	mFVF(0),
+	mD3DUsage(0),
+	mD3DPool(D3DPOOL_DEFAULT),
+	mVertexBuffer(NULL),
 	//mColorElements,
 	mLockType(AccessType_NO_ACCESS),
 	mData(NULL),
@@ -65,55 +67,48 @@ bool D3D9VertexBuffer::create(int usageFlags,AccessType accessType,VertexFormat:
 	mAccessType=accessType;
 	mSize=size;
 	mVertexFormat=vertexFormat;
-	mFVF=getFVF(mVertexFormat,&mColorElements);
 	mVertexSize=mVertexFormat->getVertexSize();
 	mDataSize=mVertexSize*mSize;
+	mFVF=getFVF(mVertexFormat,&mColorElements);
 
-	createContext();
-
-	return true;
+	return createContext();
 }
 
-bool D3D9VertexBuffer::destroy(){
+void D3D9VertexBuffer::destroy(){
 	destroyContext(false);
 
 	if(mBackingData!=NULL){
 		delete[] mBackingData;
 		mBackingData=NULL;
 	}
-
-	return true;
 }
 
-void D3D9VertexBuffer::createContext(){
-	// TODO: Try to unify this
-	DWORD d3dUsage=0;
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		D3DMPOOL d3dPool=D3DMPOOL_SYSTEMMEM;
-	#else
-		D3DPOOL d3dPool=D3DPOOL_MANAGED;
-	#endif
+bool D3D9VertexBuffer::createContext(){
+	mD3DUsage=0;
+	mD3DPool=D3DPOOL_MANAGED;
 	if((mUsageFlags&UsageFlags_DYNAMIC)>0){
-		d3dUsage|=D3DUSAGE_DYNAMIC;
+		mD3DUsage|=D3DUSAGE_DYNAMIC;
 		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
-			d3dPool=D3DPOOL_DEFAULT;
+			mD3DPool=D3DPOOL_DEFAULT;
 		#endif
 	}
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 		else if(mRenderer->getD3DCAPS9().SurfaceCaps & D3DMSURFCAPS_VIDVERTEXBUFFER){
-			d3dPool=D3DMPOOL_VIDEOMEM;
+			mD3DPool=D3DMPOOL_VIDEOMEM;
 		}
 	#endif
 
 	if(mAccessType==AccessType_WRITE_ONLY){
-		d3dUsage|=D3DUSAGE_WRITEONLY;
+		mD3DUsage|=D3DUSAGE_WRITEONLY;
 	}
 
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_EXCESSIVE,
 		String("Allocating D3D9VertexBuffer of size:")+mDataSize);
 
-	HRESULT result=mRenderer->getDirect3DDevice9()->CreateVertexBuffer(mDataSize,d3dUsage,mFVF,d3dPool,&mVertexBuffer TOADLET_SHAREDHANDLE);
+	HRESULT result=mRenderer->getDirect3DDevice9()->CreateVertexBuffer(mDataSize,mD3DUsage,mFVF,mD3DPool,&mVertexBuffer TOADLET_SHAREDHANDLE);
 	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: CreateVertexBuffer");
+
+	return SUCCEEDED(result);
 }
 
 void D3D9VertexBuffer::destroyContext(bool backData){
@@ -130,6 +125,10 @@ void D3D9VertexBuffer::destroyContext(bool backData){
 		mVertexBuffer->Release();
 		mVertexBuffer=NULL;
 	}
+}
+
+bool D3D9VertexBuffer::contextNeedsReset(){
+	return mD3DPool==D3DPOOL_DEFAULT;
 }
 
 uint8 *D3D9VertexBuffer::lock(AccessType lockType){

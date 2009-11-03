@@ -23,30 +23,29 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_D3D9INDEXBUFFER_H
-#define TOADLET_PEEPER_D3D9INDEXBUFFER_H
+#ifndef TOADLET_PEEPER_BACKABLEINDEXBUFFER_H
+#define TOADLET_PEEPER_BACKABLEINDEXBUFFER_H
 
-#include "D3D9Includes.h"
 #include <toadlet/peeper/IndexBuffer.h>
 
 namespace toadlet{
 namespace peeper{
 
-class D3D9Renderer;
-
-class TOADLET_API D3D9IndexBuffer:public IndexBuffer{
+class TOADLET_API BackableIndexBuffer:public IndexBuffer{
 public:
-	D3D9IndexBuffer(D3D9Renderer *renderer);
-	virtual ~D3D9IndexBuffer();
+	TOADLET_SHARED_POINTERS(BackableIndexBuffer,egg::Resource);
 
-	IndexBuffer *getRootIndexBuffer(){return this;}
+	BackableIndexBuffer();
+	virtual ~BackableIndexBuffer();
+
+	virtual IndexBuffer *getRootIndexBuffer(){return mBack;}
 
 	virtual bool create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size);
 	virtual void destroy();
 
-	virtual bool createContext();
-	virtual void destroyContext(bool backData);
-	virtual bool contextNeedsReset();
+	virtual bool createContext(){return mBack->createContext();}
+	virtual void destroyContext(bool backData){mBack->destroyContext(backData);}
+	virtual bool contextNeedsReset(){return mBack->contextNeedsReset();}
 
 	virtual int getUsageFlags() const{return mUsageFlags;}
 	virtual AccessType getAccessType() const{return mAccessType;}
@@ -57,27 +56,18 @@ public:
 	virtual uint8 *lock(AccessType accessType);
 	virtual bool unlock();
 
+	virtual void setBack(IndexBuffer::ptr back);
+	virtual IndexBuffer::ptr getBack(){return mBack;}
+	
 protected:
-	static D3DFORMAT getD3DFORMAT(IndexFormat format);
-
-	D3D9Renderer *mRenderer;
-
 	int mUsageFlags;
 	AccessType mAccessType;
-	int mSize;
-	IndexFormat mIndexFormat;
 	int mDataSize;
+	IndexFormat mIndexFormat;
+	int mSize;
 
-	D3DFORMAT mD3DFormat;
-	DWORD mD3DUsage;
-	D3DPOOL mD3DPool;
-	IDirect3DIndexBuffer9 *mIndexBuffer;
-	AccessType mLockType;
 	uint8 *mData;
-	bool mBacking;
-	uint8 *mBackingData;
-
-	friend D3D9Renderer;
+	IndexBuffer::ptr mBack;
 };
 
 }
