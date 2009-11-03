@@ -46,9 +46,11 @@ public:
 
 	virtual IndexBuffer *getRootIndexBuffer()=0;
 
-	// Lifecycle
 	virtual bool create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size)=0;
 	virtual bool destroy()=0;
+
+	virtual void createContext()=0;
+	virtual void destroyContext(bool backData)=0;
 
 	virtual IndexFormat getIndexFormat()=0;
 	virtual int getSize() const=0;

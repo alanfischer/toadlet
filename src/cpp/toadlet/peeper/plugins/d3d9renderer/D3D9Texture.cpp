@@ -45,6 +45,7 @@ D3D9Texture::D3D9Texture(D3D9Renderer *renderer):
 	mHeight(0),
 	mDepth(0),
 
+	mD3DFormat(D3DFMT_X8R8G8B8),
 	mTexture(NULL),
 	mManuallyGenerateMipLevels(false)
 {
@@ -79,9 +80,9 @@ bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width
 	IDirect3DDevice9 *device=mRenderer->getDirect3DDevice9();
 	IDirect3D9 *d3d=NULL; device->GetDirect3D(&d3d);
 
-	D3DFORMAT d3dformat=getD3DFORMAT(mFormat);
-	if(!isD3DFORMATValid(d3d,D3DFMT_X8R8G8B8,d3dformat,0)){
-		d3dformat=D3DFMT_X8R8G8B8;
+	mD3DFormat=getD3DFORMAT(mFormat);
+	if(!isD3DFORMATValid(d3d,D3DFMT_X8R8G8B8,mD3DFormat,0)){
+		mD3DFormat=D3DFMT_X8R8G8B8;
 	}
 	
 	DWORD usage=(mUsageFlags&UsageFlags_RENDERTARGET)>0 ? D3DUSAGE_RENDERTARGET : 0;
@@ -90,7 +91,7 @@ bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width
 	#endif
 	mManuallyGenerateMipLevels=(usageFlags&UsageFlags_AUTOGEN_MIPMAPS)>0;
 	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
-		if(mManuallyGenerateMipLevels && isD3DFORMATValid(d3d,D3DFMT_X8R8G8B8,d3dformat,D3DUSAGE_AUTOGENMIPMAP)){
+		if(mManuallyGenerateMipLevels && isD3DFORMATValid(d3d,D3DFMT_X8R8G8B8,mD3DFormat,D3DUSAGE_AUTOGENMIPMAP)){
 			usage|=D3DUSAGE_AUTOGENMIPMAP;
 			mManuallyGenerateMipLevels=false;
 		}
@@ -108,18 +109,18 @@ bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width
 		case Texture::Dimension_D1:
 		case Texture::Dimension_D2:{
 			IDirect3DTexture9 *texture=NULL;
-			result=device->CreateTexture(mWidth,mHeight,mipLevels,usage,d3dformat,pool,&texture TOADLET_SHAREDHANDLE);
+			result=device->CreateTexture(mWidth,mHeight,mipLevels,usage,mD3DFormat,pool,&texture TOADLET_SHAREDHANDLE);
 			mTexture=texture;
 		}break;
 		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
 			case Texture::Dimension_D3:{
 				IDirect3DVolumeTexture9 *texture=NULL;
-				result=device->CreateVolumeTexture(mWidth,mHeight,depth,mipLevels,usage,d3dformat,pool,&texture TOADLET_SHAREDHANDLE);
+				result=device->CreateVolumeTexture(mWidth,mHeight,depth,mipLevels,usage,mD3DFormat,pool,&texture TOADLET_SHAREDHANDLE);
 				mTexture=texture;
 			}break;
 			case Texture::Dimension_CUBEMAP:{
 				IDirect3DCubeTexture9 *texture=NULL;
-				result=device->CreateCubeTexture(mWidth,mipLevels,usage,d3dformat,pool,&texture TOADLET_SHAREDHANDLE);
+				result=device->CreateCubeTexture(mWidth,mipLevels,usage,mD3DFormat,pool,&texture TOADLET_SHAREDHANDLE);
 				mTexture=texture;
 			}break;
 		#endif
@@ -168,7 +169,6 @@ void D3D9Texture::load(int format,int width,int height,int depth,uint8 *data){
 		return;
 	}
 
-	D3DFORMAT d3dformat=getD3DFORMAT(mFormat);
 	HRESULT result;
 	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
 		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
@@ -186,28 +186,28 @@ void D3D9Texture::load(int format,int width,int height,int depth,uint8 *data){
 
 		int i,j;
 		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-			if(mFormat==Texture::Format_RGBA_8 && d3dformat==D3DMFMT_A8R8G8B8){
+			if(mFormat==Texture::Format_RGBA_8 && mD3DFormat==D3DMFMT_A8R8G8B8){
 				for(i=0;i<height;++i){
 					for(j=0;j<width;++j){
 						*(uint32*)(dst+rect.Pitch*i+j*4)=RGBA8toA8R8G8B8(*(uint32*)(src+width*pixelSize*i+j*pixelSize));
 					}
 				}
 			}
-			else if(mFormat==Texture::Format_L_8 && d3dformat==D3DMFMT_R8G8B8){
+			else if(mFormat==Texture::Format_L_8 && mD3DFormat==D3DMFMT_R8G8B8){
 				for(i=0;i<height;++i){
 					for(j=0;j<width;++j){
 						*(uint16*)(dst+rect.Pitch*i+j*2)=L8toR8G8B8(*(uint8*)(src+width*pixelSize*i+j*pixelSize));
 					}
 				}
 			}
-			else if(mFormat==Texture::Format_A_8 && d3dformat==D3DMFMT_A8R8G8B8){
+			else if(mFormat==Texture::Format_A_8 && mD3DFormat==D3DMFMT_A8R8G8B8){
 				for(i=0;i<height;++i){
 					for(j=0;j<width;++j){
 						*(uint16*)(dst+rect.Pitch*i+j*2)=A8toA8R8G8B8(*(uint8*)(src+width*pixelSize*i+j*pixelSize));
 					}
 				}
 			}
-			else if(mFormat==Texture::Format_LA_8 && d3dformat==D3DMFMT_A8R8G8B8){
+			else if(mFormat==Texture::Format_LA_8 && mD3DFormat==D3DMFMT_A8R8G8B8){
 				for(i=0;i<height;++i){
 					for(j=0;j<width;++j){
 						*(uint16*)(dst+rect.Pitch*i+j*2)=LA8toA8R8G8B8(*(uint16*)(src+width*pixelSize*i+j*pixelSize));
@@ -215,21 +215,21 @@ void D3D9Texture::load(int format,int width,int height,int depth,uint8 *data){
 				}
 			}
 		#else
-			if(mFormat==Texture::Format_A_8 && d3dformat==D3DFMT_A8L8){
+			if(mFormat==Texture::Format_A_8 && mD3DFormat==D3DFMT_A8L8){
 				for(i=0;i<height;++i){
 					for(j=0;j<width;++j){
 						*(uint16*)(dst+rect.Pitch*i+j*2)=A8toA8L8(*(uint8*)(src+width*pixelSize*i+j*1));
 					}
 				}
 			}
-			else if(mFormat==Texture::Format_RGBA_8 && d3dformat==D3DFMT_A8R8G8B8){
+			else if(mFormat==Texture::Format_RGBA_8 && mD3DFormat==D3DFMT_A8R8G8B8){
 				for(i=0;i<height;++i){
 					for(j=0;j<width;++j){
 						*(uint32*)(dst+rect.Pitch*i+j*4)=RGBA8toA8R8G8B8(*(uint32*)(src+width*pixelSize*i+j*pixelSize));
 					}
 				}
 			}
-			else if(mFormat==Texture::Format_RGB_8 && d3dformat==D3DFMT_X8R8G8B8){
+			else if(mFormat==Texture::Format_RGB_8 && mD3DFormat==D3DFMT_X8R8G8B8){
 				for(i=0;i<height;++i){
 					for(j=0;j<width;++j){
 						*(uint32*)(dst+rect.Pitch*i+j*4)=RGB8toX8R8G8B8(src+width*pixelSize*i+j*pixelSize);

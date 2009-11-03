@@ -53,11 +53,9 @@ public:
 	virtual void setName(const egg::String &name)=0;
 	virtual const egg::String &getName() const=0;
 
-	// Lifecycle
 	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels)=0;
 	virtual void destroy()=0;
 
-	// Information
 	virtual int getUsageFlags() const=0;
 	virtual Dimension getDimension() const=0;
 	virtual int getFormat() const=0;
@@ -66,7 +64,6 @@ public:
 	virtual int getDepth() const=0;
 	virtual int getNumMipLevels() const=0;
 
-	// Pixeldata
 	virtual Surface::ptr getMipSuface(int i) const=0;
 	virtual void load(int format,int width,int height,int depth,uint8 *data)=0;
 	virtual bool read(int format,int width,int height,int depth,uint8 *data)=0;

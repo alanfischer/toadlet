@@ -45,6 +45,9 @@ public:
 	virtual bool create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size);
 	virtual bool destroy();
 
+	virtual void createContext();
+	virtual void destroyContext(bool backData);
+
 	virtual int getUsageFlags() const{return mUsageFlags;}
 	virtual AccessType getAccessType() const{return mAccessType;}
 	virtual int getDataSize() const{return mDataSize;}
@@ -71,6 +74,8 @@ protected:
 	egg::Collection<VertexElement> mColorElements;
 	AccessType mLockType;
 	uint8 *mData;
+	bool mBacking;
+	uint8 *mBackingData;
 
 	friend D3D9Renderer;
 };

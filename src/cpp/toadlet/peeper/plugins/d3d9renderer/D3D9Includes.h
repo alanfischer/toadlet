@@ -166,7 +166,7 @@ inline uint32 RGBA8toA8R8G8B8(uint32 rgba){
 }
 
 inline uint32 RGB8toX8R8G8B8(uint8 *rgb){
-	return (*(rgb+0)<<16) | (*(rgb+1)<<8) | (*(rgb+3)<<0);
+	return (*(rgb+0)<<16) | (*(rgb+1)<<8) | (*(rgb+2)<<0);
 }
 
 inline uint16 A8toA8R8G8B8(const uint8 a){

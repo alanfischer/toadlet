@@ -44,7 +44,9 @@ D3D9IndexBuffer::D3D9IndexBuffer(D3D9Renderer *renderer):
 
 	mIndexBuffer(NULL),
 	mLockType(AccessType_NO_ACCESS),
-	mData(NULL)
+	mData(NULL),
+	mBacking(false),
+	mBackingData(NULL)
 {
 	mRenderer=renderer;
 }
@@ -60,11 +62,28 @@ bool D3D9IndexBuffer::create(int usageFlags,AccessType accessType,IndexFormat in
 	mAccessType=accessType;
 	mSize=size;
 	mIndexFormat=indexFormat;
-	D3DFORMAT d3dFormat=getD3DFORMAT(mIndexFormat);
 	mDataSize=mIndexFormat*mSize;
 	if(indexFormat==IndexFormat_UINT_8) mDataSize*=2;
 
+	createContext();
+
+	return true;
+}
+
+bool D3D9IndexBuffer::destroy(){
+	destroyContext(false);
+
+	if(mBackingData!=NULL){
+		delete[] mBackingData;
+		mBackingData=NULL;
+	}
+
+	return true;
+}
+
+void D3D9IndexBuffer::createContext(){
 	// TODO: Try to unify this
+	D3DFORMAT d3dFormat=getD3DFORMAT(mIndexFormat);
 	DWORD d3dUsage=0;
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 		D3DMPOOL d3dPool=D3DMPOOL_SYSTEMMEM;
@@ -93,15 +112,31 @@ bool D3D9IndexBuffer::create(int usageFlags,AccessType accessType,IndexFormat in
 	HRESULT result=mRenderer->getDirect3DDevice9()->CreateIndexBuffer(mDataSize,d3dUsage,d3dFormat,d3dPool,&mIndexBuffer TOADLET_SHAREDHANDLE);
 	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: CreateVertexBuffer");
 
-	return SUCCEEDED(result);
+	if(mBacking){
+		uint8 *data=lock(AccessType_WRITE_ONLY);
+		memcpy(data,mBackingData,mDataSize);
+		unlock();
+
+		delete[] mBackingData;
+		mBackingData=NULL;
+		mBacking=true;
+	}
 }
 
-bool D3D9IndexBuffer::destroy(){
+void D3D9IndexBuffer::destroyContext(bool backData){
+	if(backData){
+		mBackingData=new uint8[mDataSize];
+		mBacking=true;
+
+		uint8 *data=lock(AccessType_READ_ONLY);
+		memcpy(mBackingData,data,mDataSize);
+		unlock();
+	}
+
 	if(mIndexBuffer!=NULL){
 		mIndexBuffer->Release();
 		mIndexBuffer=NULL;
 	}
-	return true;
 }
 
 uint8 *D3D9IndexBuffer::lock(AccessType lockType){
