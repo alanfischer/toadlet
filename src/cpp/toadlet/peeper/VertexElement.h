@@ -34,13 +34,21 @@ namespace peeper{
 class TOADLET_API VertexElement{
 public:
 	enum Type{
-		Type_UNKNOWN=0,
-		Type_POSITION=1<<0,
-		Type_BLEND_WEIGHTS=1<<1,
-		Type_BLEND_INDICES=1<<2,
-		Type_NORMAL=1<<3,
-		Type_COLOR=1<<4,
-		Type_TEX_COORD,
+		Type_UNKNOWN=			0,
+		Type_POSITION=			1<<0,
+		Type_BLEND_WEIGHTS=		1<<1,
+		Type_BLEND_INDICES=		1<<2,
+		Type_NORMAL=			1<<3,
+		Type_COLOR_DIFFUSE=		1<<5,
+		Type_COLOR_SPECULAR=	1<<6,
+		Type_TEX_COORD=			1<<10,
+		Type_TEX_COORD_2=		1<<11,
+		Type_TEX_COORD_3=		1<<12,
+		Type_TEX_COORD_4=		1<<13,
+		Type_TEX_COORD_5=		1<<14,
+		Type_TEX_COORD_6=		1<<15,
+		Type_TEX_COORD_7=		1<<16,
+		Type_TEX_COORD_8=		1<<17,
 	};
 
 	enum Format{
@@ -53,11 +61,13 @@ public:
 		Format_BIT_FIXED_32=	1<<4,
 		Format_BIT_FLOAT_32=	1<<5,
 		Format_BIT_DOUBLE_64=	1<<6,
+		Format_MASK_TYPES=		0x3FF,
 		// Format counts
 		Format_BIT_COUNT_1=		1<<10,
 		Format_BIT_COUNT_2=		1<<11,
 		Format_BIT_COUNT_3=		1<<12,
 		Format_BIT_COUNT_4=		1<<13,
+		Format_MASK_COUNTS=		0xFFC00,
 		// Formats
 		Format_COLOR_RGBA=		1<<20,
 	};
@@ -65,21 +75,18 @@ public:
 	VertexElement():
 		type(Type_UNKNOWN),
 		format(Format_UNKNOWN),
-		index(0),
 		offset(0)
 	{}
 
-	VertexElement(Type type1,int format1,short index1=0):
+	VertexElement(Type type1,int format1):
 		type(type1),
 		format(format1),
-		index(index1),
 		offset(0)
 	{}
 
 	void set(const VertexElement &vertexElement){
 		type=vertexElement.type;
 		format=vertexElement.format;
-		index=vertexElement.index;
 		offset=vertexElement.offset;
 	}
 
@@ -90,7 +97,6 @@ public:
 
 	Type type;
 	int format;
-	short index;
 	int offset;
 };
 

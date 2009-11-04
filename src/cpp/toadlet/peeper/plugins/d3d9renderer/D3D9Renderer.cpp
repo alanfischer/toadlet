@@ -884,14 +884,6 @@ void D3D9Renderer::setAmbientColor(const Color &ambient){
 	mD3DDevice->SetRenderState(D3DRS_AMBIENT,toD3DCOLOR(ambient));
 }
 
-const StatisticsSet &D3D9Renderer::getStatisticsSet(){
-	return mStatisticsSet;
-}
-
-const CapabilitySet &D3D9Renderer::getCapabilitySet(){
-	return mCapabilitySet;
-}
-
 void D3D9Renderer::setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D3DCAPS9 &caps,bool renderToTexture,bool renderToDepthTexture){
 	capabilitySet.resetOnResize=true;
 	capabilitySet.hardwareTextures=true;

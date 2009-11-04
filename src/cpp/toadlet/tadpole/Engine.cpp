@@ -268,7 +268,7 @@ void Engine::updateVertexFormats(){
 
 	VertexElement position(VertexElement::Type_POSITION,formatBit|VertexElement::Format_BIT_COUNT_3);
 	VertexElement normal(VertexElement::Type_NORMAL,formatBit|VertexElement::Format_BIT_COUNT_3);
-	VertexElement color(VertexElement::Type_COLOR,VertexElement::Format_COLOR_RGBA);
+	VertexElement color(VertexElement::Type_COLOR_DIFFUSE,VertexElement::Format_COLOR_RGBA);
 	VertexElement texCoord(VertexElement::Type_TEX_COORD,formatBit|VertexElement::Format_BIT_COUNT_2);
 
 	VertexFormat::ptr format;

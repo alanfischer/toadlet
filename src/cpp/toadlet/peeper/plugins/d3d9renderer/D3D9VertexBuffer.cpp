@@ -67,7 +67,7 @@ bool D3D9VertexBuffer::create(int usageFlags,AccessType accessType,VertexFormat:
 	mAccessType=accessType;
 	mSize=size;
 	mVertexFormat=vertexFormat;
-	mVertexSize=mVertexFormat->getVertexSize();
+	mVertexSize=mVertexFormat->vertexSize;
 	mDataSize=mVertexSize*mSize;
 	mFVF=getFVF(mVertexFormat,&mColorElements);
 
@@ -186,45 +186,10 @@ bool D3D9VertexBuffer::unlock(){
 DWORD D3D9VertexBuffer::getFVF(VertexFormat *vertexFormat,Collection<VertexElement> *colorElements){
 	DWORD fvf=0;
 
-	switch(vertexFormat->getMaxTexCoordIndex()+1){
-		case 0:
-			fvf|=D3DFVF_TEX0;
-		break;
-		case 1:
-			fvf|=D3DFVF_TEX1;
-		break;
-		case 2:
-			fvf|=D3DFVF_TEX2;
-		break;
-		case 3:
-			fvf|=D3DFVF_TEX3;
-		break;
-		case 4:
-			fvf|=D3DFVF_TEX4;
-		break;
-		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
-			case 5:
-				fvf|=D3DFVF_TEX5;
-			break;
-			case 6:
-				fvf|=D3DFVF_TEX6;
-			break;
-			case 7:
-				fvf|=D3DFVF_TEX7;
-			break;
-			case 8:
-				fvf|=D3DFVF_TEX8;
-			break;
-		#endif
-		default:
-			Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ERROR,
-				String("D3DVertexBuffer: Invalid tex coord number")+(vertexFormat->getMaxTexCoordIndex()+1));
-	}
-
 	int i;
 	int texCoordCount=0;
-	for(i=0;i<vertexFormat->getNumVertexElements();++i){
-		const VertexElement &element=vertexFormat->getVertexElement(i);
+	for(i=0;i<vertexFormat->vertexElements.size();++i){
+		const VertexElement &element=vertexFormat->vertexElements[i];
 		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 			if(element.type==VertexElement::Type_POSITION && element.format==(VertexElement::Format_BIT_FIXED_32|VertexElement::Format_BIT_COUNT_3)){
 				fvf|=D3DMFVF_XYZ_FIXED;
@@ -246,13 +211,15 @@ DWORD D3D9VertexBuffer::getFVF(VertexFormat *vertexFormat,Collection<VertexEleme
 				fvf|=D3DFVF_NORMAL;
 			}
 		#endif
-		else if(element.type==VertexElement::Type_COLOR && element.format==VertexElement::Format_COLOR_RGBA){
+		else if(element.type==VertexElement::Type_COLOR_DIFFUSE && element.format==VertexElement::Format_COLOR_RGBA){
 			fvf|=D3DFVF_DIFFUSE;
-			if(colorElements!=NULL){
-				colorElements->add(element);
-			}
+			colorElements->add(element);
 		}
-		else if(element.type==VertexElement::Type_TEX_COORD){
+		else if(element.type==VertexElement::Type_COLOR_SPECULAR && element.format==VertexElement::Format_COLOR_RGBA){
+			fvf|=D3DFVF_SPECULAR;
+			colorElements->add(element);
+		}
+		else if(element.type>=VertexElement::Type_TEX_COORD){
 			if((element.format&VertexElement::Format_BIT_COUNT_1)>0){
 				fvf|=D3DFVF_TEXCOORDSIZE1(texCoordCount);
 			}
@@ -286,6 +253,41 @@ DWORD D3D9VertexBuffer::getFVF(VertexFormat *vertexFormat,Collection<VertexEleme
 			Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ERROR,
 				String("D3DVertexBuffer: Invalid vertex element:")+element.type+","+element.format);
 		}
+	}
+
+	switch(texCoordCount){
+		case 0:
+			fvf|=D3DFVF_TEX0;
+		break;
+		case 1:
+			fvf|=D3DFVF_TEX1;
+		break;
+		case 2:
+			fvf|=D3DFVF_TEX2;
+		break;
+		case 3:
+			fvf|=D3DFVF_TEX3;
+		break;
+		case 4:
+			fvf|=D3DFVF_TEX4;
+		break;
+		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+			case 5:
+				fvf|=D3DFVF_TEX5;
+			break;
+			case 6:
+				fvf|=D3DFVF_TEX6;
+			break;
+			case 7:
+				fvf|=D3DFVF_TEX7;
+			break;
+			case 8:
+				fvf|=D3DFVF_TEX8;
+			break;
+		#endif
+		default:
+			Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ERROR,
+				String("D3DVertexBuffer: Invalid tex coord number")+texCoordCount);
 	}
 
 	return fvf;

@@ -600,7 +600,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 					vertexFormat->addVertexElement(VertexElement(VertexElement::Type_TEX_COORD,VertexElement::Format(VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_2)));
 				}
 				else if(t=="Color"){
-					vertexFormat->addVertexElement(VertexElement(VertexElement::Type_COLOR,VertexElement::Format_COLOR_RGBA));
+					vertexFormat->addVertexElement(VertexElement(VertexElement::Type_COLOR_DIFFUSE,VertexElement::Format_COLOR_RGBA));
 				}
 				else if(t=="Bone"){
 					mesh->vertexBoneAssignments.resize(count);
@@ -631,7 +631,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 		int pi=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_POSITION);
 		int ni=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_NORMAL);
 		int ti=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_TEX_COORD);
-		int ci=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_COLOR);
+		int ci=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_COLOR_DIFFUSE);
 
 		VertexBufferAccessor vba;
 		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
@@ -688,7 +688,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 						else if(vertexFormat->getVertexElement(c).type==VertexElement::Type_TEX_COORD){
 							vba.set2(l,ti,parseVector2(element));
 						}
-						else if(vertexFormat->getVertexElement(c).type==VertexElement::Type_COLOR){
+						else if(vertexFormat->getVertexElement(c).type==VertexElement::Type_COLOR_DIFFUSE){
 							vba.setRGBA(l,ci,parseColor(element).getRGBA());
 						}
 						else if(mesh->vertexBoneAssignments.size()>0){
@@ -847,7 +847,7 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version){
 		if(vertexFormat->hasVertexElementOfType(VertexElement::Type_TEX_COORD)){
 			type+="TexCoord,";
 		}
-		if(vertexFormat->hasVertexElementOfType(VertexElement::Type_COLOR)){
+		if(vertexFormat->hasVertexElementOfType(VertexElement::Type_COLOR_DIFFUSE)){
 			type+="Color,";
 		}
 		if(mesh->vertexBoneAssignments.size()>0){
@@ -863,7 +863,7 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version){
 		int pi=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_POSITION);
 		int ni=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_NORMAL);
 		int ti=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_TEX_COORD);
-		int ci=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_COLOR);
+		int ci=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_COLOR_DIFFUSE);
 
 		VertexBufferAccessor vba;
 		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
@@ -890,7 +890,7 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version){
 			if(vertexFormat->hasVertexElementOfType(VertexElement::Type_TEX_COORD)){
 				vba.get2(i,ti,v2); strcat(line,makeVector2(buffer,v2));
 			}
-			if(vertexFormat->hasVertexElementOfType(VertexElement::Type_COLOR)){
+			if(vertexFormat->hasVertexElementOfType(VertexElement::Type_COLOR_DIFFUSE)){
 				strcat(line,makeColor(buffer,Color::rgba(vba.getRGBA(i,ci))));
 			}
 			if(mesh->vertexBoneAssignments.size()>0){

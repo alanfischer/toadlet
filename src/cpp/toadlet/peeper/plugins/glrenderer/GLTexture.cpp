@@ -358,17 +358,13 @@ GLuint GLTexture::getGLWrap(TextureStage::AddressMode addressMode,bool hasClampT
 }
 
 GLuint GLTexture::getGLMinFilter(TextureStage::Filter minFilter,TextureStage::Filter mipFilter){
-	GLuint filter=0;
-
 	switch(mipFilter){
 		case TextureStage::Filter_NONE:
 			switch(minFilter){
 				case TextureStage::Filter_NEAREST:
-					filter=GL_NEAREST;
-				break;
+					return GL_NEAREST;
 				case TextureStage::Filter_LINEAR:
-					filter=GL_LINEAR;
-				break;
+					return GL_LINEAR;
 				default:
 				break;
 			}
@@ -376,11 +372,9 @@ GLuint GLTexture::getGLMinFilter(TextureStage::Filter minFilter,TextureStage::Fi
 		case TextureStage::Filter_NEAREST:
 			switch(minFilter){
 				case TextureStage::Filter_NEAREST:
-					filter=GL_NEAREST_MIPMAP_NEAREST;
-				break;
+					return GL_NEAREST_MIPMAP_NEAREST;
 				case TextureStage::Filter_LINEAR:
-					filter=GL_NEAREST_MIPMAP_LINEAR;
-				break;
+					return GL_NEAREST_MIPMAP_LINEAR;
 				default:
 				break;
 			}
@@ -388,24 +382,18 @@ GLuint GLTexture::getGLMinFilter(TextureStage::Filter minFilter,TextureStage::Fi
 		case TextureStage::Filter_LINEAR:
 			switch(minFilter){
 				case TextureStage::Filter_NEAREST:
-					filter=GL_LINEAR_MIPMAP_NEAREST;
-				break;
+					return GL_LINEAR_MIPMAP_NEAREST;
 				case TextureStage::Filter_LINEAR:
-					filter=GL_LINEAR_MIPMAP_LINEAR;
-				break;
+					return GL_LINEAR_MIPMAP_LINEAR;
 				default:
 				break;
 			}
 		break;
 	}
 
-	if(filter==0){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"GLTexture::getGLMinFilter: Invalid filter");
-		return 0;
-	}
-
-	return filter;
+	Error::unknown(Categories::TOADLET_PEEPER,
+		"GLTexture::getGLMinFilter: Invalid filter");
+	return 0;
 }
 
 GLuint GLTexture::getGLMagFilter(TextureStage::Filter magFilter){

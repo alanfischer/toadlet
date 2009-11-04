@@ -29,104 +29,36 @@ namespace toadlet{
 namespace peeper{
 
 VertexFormat::VertexFormat(int numVertexElements):
-	//mVertexElements,
-	mVertexSize(0),
-	mMaxColorIndex(0),
-	mMaxTexCoordIndex(0)
+	//vertexElements,
+	vertexSize(0)
+	//vertexElementsByType
 {
-	mVertexElements.reserve(numVertexElements);
+	vertexElements.reserve(numVertexElements);
 }
 
 const VertexElement &VertexFormat::addVertexElement(const VertexElement &element){
-	short index=mVertexElements.size();
+	short index=vertexElements.size();
 
-	mVertexElements.add(element);
-	mVertexElements[index].offset=mVertexSize;
+	vertexElements.add(element);
+	vertexElements[index].offset=vertexSize;
 
-	mVertexSize+=element.getSize();
+	vertexSize+=element.getSize();
 
-	if(element.type==VertexElement::Type_COLOR){
-		if(element.index>=mColorElementsByIndex.size()){
-			mColorElementsByIndex.resize(element.index+1,-1);
-		}
-		mColorElementsByIndex[element.index]=index;
+	if(element.type>=vertexElementsByType.size()){
+		vertexElementsByType.resize(element.type+1,-1);
 	}
-	else if(element.type==VertexElement::Type_TEX_COORD){
-		if(element.index>=mTexCoordElementsByIndex.size()){
-			mTexCoordElementsByIndex.resize(element.index+1,-1);
-		}
-		mTexCoordElementsByIndex[element.index]=index;
-	}
-	else{
-		if(element.type>=mVertexElementsByType.size()){
-			mVertexElementsByType.resize(element.type+1,-1);
-		}
-		mVertexElementsByType[element.type]=index;
-	}
+	vertexElementsByType[element.type]=index;
 
-	return mVertexElements[index];
-}
-
-bool VertexFormat::hasVertexElementOfType(VertexElement::Type type,int index) const{
-	if(type==VertexElement::Type_COLOR){
-		return mColorElementsByIndex.size()>index && mColorElementsByIndex[index]!=-1;
-	}
-	else if(type==VertexElement::Type_TEX_COORD){
-		return mTexCoordElementsByIndex.size()>index && mTexCoordElementsByIndex[index]!=-1;
-	}
-	else{
-		return mVertexElementsByType.size()>type && mVertexElementsByType[type]!=-1;
-	}
-}
-
-const VertexElement &VertexFormat::getVertexElementOfType(VertexElement::Type type,int index) const{
-	TOADLET_ASSERT(hasVertexElementOfType(type,index));
-
-	if(type==VertexElement::Type_COLOR){
-		return mVertexElements[mColorElementsByIndex[index]];
-	}
-	else if(type==VertexElement::Type_TEX_COORD){
-		return mVertexElements[mTexCoordElementsByIndex[index]];
-	}
-	else{
-		return mVertexElements[mVertexElementsByType[type]];
-	}
-}
-
-int VertexFormat::getVertexElementIndexOfType(VertexElement::Type type,int index) const{
-	if(type==VertexElement::Type_COLOR){
-		if(mColorElementsByIndex.size()>index){
-			return mColorElementsByIndex[index];
-		}
-		else{
-			return -1;
-		}
-	}
-	else if(type==VertexElement::Type_TEX_COORD){
-		if(mTexCoordElementsByIndex.size()>index){
-			return mTexCoordElementsByIndex[index];
-		}
-		else{
-			return -1;
-		}
-	}
-	else{
-		if(mVertexElementsByType.size()>type){
-			return mVertexElementsByType[type];
-		}
-		else{
-			return -1;
-		}
-	}
+	return vertexElements[index];
 }
 
 bool VertexFormat::equals(const VertexFormat &format) const{
-	if(format.mVertexElements.size()!=mVertexElements.size()){
+	if(format.vertexElements.size()!=vertexElements.size()){
 		return false;
 	}
 	int i;
-	for(i=0;i<mVertexElements.size();++i){
-		if(format.mVertexElements[i].equals(mVertexElements[i])==false){
+	for(i=0;i<vertexElements.size();++i){
+		if(format.vertexElements[i].equals(vertexElements[i])==false){
 			return false;
 		}
 	}

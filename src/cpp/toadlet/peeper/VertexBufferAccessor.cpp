@@ -32,7 +32,6 @@ namespace peeper{
 VertexBufferAccessor::VertexBufferAccessor():
 	mVertexBuffer(NULL),
 	mVertexSize32(0),
-	mNativeFloat(false),
 	mNativeFixed(false),
 	mData(NULL),
 	mFixedData(NULL),
@@ -44,7 +43,6 @@ VertexBufferAccessor::VertexBufferAccessor():
 VertexBufferAccessor::VertexBufferAccessor(VertexBuffer *vertexBuffer,Buffer::AccessType accessType):
 	mVertexBuffer(NULL),
 	mVertexSize32(0),
-	mNativeFloat(false),
 	mNativeFixed(false),
 	mData(NULL),
 	mFixedData(NULL),
@@ -62,20 +60,18 @@ void VertexBufferAccessor::lock(VertexBuffer *vertexBuffer,Buffer::AccessType ac
 	unlock();
 
 	mVertexBuffer=vertexBuffer;
-
 	VertexFormat *vertexFormat=mVertexBuffer->getVertexFormat();
-	mVertexSize32=vertexFormat->getVertexSize()/sizeof(int32);
-	TOADLET_ASSERT(vertexFormat->getNumVertexElements()<16/*mElementOffsets*/);
-	for(int i=0;i<vertexFormat->getNumVertexElements();++i){
-		mElementOffsets32[i]=vertexFormat->getVertexElement(i).offset/sizeof(int32);
+	mVertexSize32=vertexFormat->vertexSize/sizeof(int32);
+	TOADLET_ASSERT(vertexFormat->vertexElements.size()>0 && vertexFormat->vertexElements.size()<16);
+	for(int i=0;i<vertexFormat->vertexElements.size();++i){
+		mElementOffsets32[i]=vertexFormat->vertexElements[i].offset/sizeof(int32);
 	}
 
-	const VertexElement &position=vertexFormat->getVertexElementOfType(VertexElement::Type_POSITION);
-	if((position.format&VertexElement::Format_BIT_FLOAT_32)>0){
-		mNativeFloat=true;
-	}
-	else if((position.format&VertexElement::Format_BIT_FIXED_32)>0){
+	if((vertexFormat->vertexElements[0].format&VertexElement::Format_BIT_FIXED_32)>0){
 		mNativeFixed=true;
+	}
+	else{
+		mNativeFixed=false;
 	}
 
 	mData=mVertexBuffer->lock(accessType);
@@ -85,7 +81,7 @@ void VertexBufferAccessor::lock(VertexBuffer *vertexBuffer,Buffer::AccessType ac
 	else{
 		mFloatData=(float*)mData;
 	}
-	if(vertexFormat->hasVertexElementOfType(VertexElement::Type_COLOR)){
+	if(vertexFormat->hasVertexElementOfType(VertexElement::Type_COLOR_DIFFUSE)){
 		mColorData=(uint32*)mData;
 	}
 }

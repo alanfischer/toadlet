@@ -333,7 +333,6 @@ protected:
 	int mVertexSize32;
 	int mElementOffsets32[16];
 
-	bool mNativeFloat;
 	bool mNativeFixed;
 	uint8 *mData;
 	int32 *mFixedData;
