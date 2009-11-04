@@ -104,7 +104,6 @@ public:
 	void setPointParameters(bool sprite,scalar size,bool attenuated,scalar constant,scalar linear,scalar quadratic,scalar minSize,scalar maxSize);
 	void setTextureStage(int stage,TextureStage *textureStage);
 	void setProgram(const Program *program);
-	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
 	void setShadowComparisonMethod(bool enabled);
 
 	// Light operations
@@ -114,12 +113,10 @@ public:
 
 	// Misc operations
 	void setMirrorY(bool mirrorY);
-	void copyFrameBufferToTexture(Texture *texture);
+	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
 
 	const StatisticsSet &getStatisticsSet();
 	const CapabilitySet &getCapabilitySet();
-
-	inline StatisticsSet &internal_getStatisticsSet(){return mStatisticsSet;}
 
 	// TODO: Have this be enabled on some platforms, depending some conditions...
 	inline bool useMapping() const{return false;}
@@ -138,9 +135,6 @@ public:
 		egg::math::Matrix4x4 cacheMatrix4x4;
 		float cacheArray[4];
 	#endif
-
-	uint8 *allocScratchBuffer(int size);
-	void freeScratchBuffer(uint8 *data);
 
 protected:
 	inline int getGLBlendOperation(Blend::Operation blend);
@@ -210,6 +204,8 @@ protected:
 	#if defined(TOADLET_DEBUG)
 		int mBeginEndCounter;
 	#endif
+
+	friend class GLBuffer;
 };
 
 }

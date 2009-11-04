@@ -175,7 +175,7 @@ void GLBuffer::destroyContext(bool backData){
 }
 
 uint8 *GLBuffer::lock(AccessType accessType){
-	mRenderer->internal_getStatisticsSet().bufferLockCount++;
+	mRenderer->mStatisticsSet.bufferLockCount++;
 
 	mLockType=accessType;
 
