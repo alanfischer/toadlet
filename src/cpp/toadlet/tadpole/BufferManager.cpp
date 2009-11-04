@@ -99,8 +99,9 @@ VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBu
 		for(i=0;i<vertexFormat->getNumVertexElements();++i){
 			const VertexElement &dstElement=vertexFormat->getVertexElement(i);
 			int dstElementSize=dstElement.getSize();
-			if(oldVertexFormat->hasVertexElementOfType(dstElement.type,dstElement.index)){
-				const VertexElement &srcElement=oldVertexFormat->getVertexElementOfType(dstElement.type,dstElement.index);
+			int oldElementIndex=oldVertexFormat->getVertexElementIndexOfType(dstElement.type);
+			if(oldElementIndex>0){
+				const VertexElement &srcElement=oldVertexFormat->vertexElements[oldElementIndex];
 				int srcElementSize=srcElement.getSize();
 				if(dstElementSize!=srcElementSize){
 					Error::invalidParameters(Categories::TOADLET_TADPOLE,
@@ -122,8 +123,9 @@ VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBu
 	for(i=0;i<vertexFormat->getNumVertexElements();++i){
 		const VertexElement &dstElement=vertexFormat->getVertexElement(i);
 		int elementSize=dstElement.getSize();
-		if(oldVertexFormat->hasVertexElementOfType(dstElement.type,dstElement.index)){
-			const VertexElement &srcElement=oldVertexFormat->getVertexElementOfType(dstElement.type,dstElement.index);
+		int oldElementIndex=oldVertexFormat->getVertexElementIndexOfType(dstElement.type);
+		if(oldElementIndex>0){
+			const VertexElement &srcElement=oldVertexFormat->vertexElements[oldElementIndex];
 			for(j=0;j<numVerts;++j){
 				memcpy(dstData+dstVertSize*j+dstElement.offset,srcData+srcVertSize*j+srcElement.offset,elementSize);
 			}

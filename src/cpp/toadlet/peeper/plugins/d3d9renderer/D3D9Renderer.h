@@ -106,8 +106,8 @@ public:
 	void setMirrorY(bool mirrorY);
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
 
-	const StatisticsSet &getStatisticsSet();
-	const CapabilitySet &getCapabilitySet();
+	const StatisticsSet &getStatisticsSet(){return mStatisticsSet;}
+	const CapabilitySet &getCapabilitySet(){return mCapabilitySet;}
 
 	inline IDirect3DDevice9 *getDirect3DDevice9(){return mD3DDevice;}
 	inline const D3DCAPS9 &getD3DCAPS9() const{return mD3DCaps;}

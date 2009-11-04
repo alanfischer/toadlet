@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_VERTEXFormat_H
-#define TOADLET_PEEPER_VERTEXFormat_H
+#ifndef TOADLET_PEEPER_VERTEXFORMAT_H
+#define TOADLET_PEEPER_VERTEXFORMAT_H
 
 #include <toadlet/egg/Collection.h>
 #include <toadlet/peeper/VertexElement.h>
@@ -39,41 +39,19 @@ public:
 	VertexFormat(int numVertexElements=0);
 
 	const VertexElement &addVertexElement(const VertexElement &element);
-
-	inline int getNumVertexElements() const{return mVertexElements.size();}
-
-	inline const VertexElement &getVertexElement(int index) const{return mVertexElements[index];}
-
-	inline short getVertexSize() const{return mVertexSize;}
-
-	bool hasVertexElementOfType(VertexElement::Type type,int index=0) const;
-
-	const VertexElement &getVertexElementOfType(VertexElement::Type type,int index=0) const;
-
-	int getVertexElementIndexOfType(VertexElement::Type type,int index=0) const;
-
-	inline short getMaxColorIndex() const{return mColorElementsByIndex.size()-1;}
-
-	inline short getMaxTexCoordIndex() const{return mTexCoordElementsByIndex.size()-1;}
-
-	inline const VertexElement &getColorElementByIndex(int colorIndex) const{return mVertexElements[mColorElementsByIndex[colorIndex]];}
-
-	inline const VertexElement &getTexCoordElementByIndex(int texCoordIndex) const{return mVertexElements[mTexCoordElementsByIndex[texCoordIndex]];}
+	inline int getNumVertexElements() const{return vertexElements.size();}
+	inline const VertexElement &getVertexElement(int index) const{return vertexElements[index];}
+	inline short getVertexSize() const{return vertexSize;}
+	inline bool hasVertexElementOfType(VertexElement::Type type) const{return vertexElementsByType.size()>type && vertexElementsByType[type]!=-1;}
+	inline int getVertexElementIndexOfType(VertexElement::Type type) const{return vertexElementsByType.size()>type ? vertexElementsByType[type] : -1;}
 
 	bool equals(const VertexFormat &format) const;
 	inline bool equals(const VertexFormat::ptr &format) const{return equals(*format);}
 	inline bool operator==(const VertexFormat &format) const{return equals(format);}
 
-private:
-	egg::Collection<VertexElement> mVertexElements;
-	short mVertexSize;
-	egg::Collection<short> mVertexElementsByType;
-
-	short mMaxColorIndex;
-	egg::Collection<short> mColorElementsByIndex;
-
-	short mMaxTexCoordIndex;
-	egg::Collection<short> mTexCoordElementsByIndex;
+	egg::Collection<VertexElement> vertexElements;
+	short vertexSize;
+	egg::Collection<short> vertexElementsByType;
 };
 
 }

@@ -76,6 +76,8 @@ protected:
 
 	IndexFormat mIndexFormat;
 	VertexFormat::ptr mVertexFormat;
+	egg::Collection<GLenum> mElementTypes;
+	egg::Collection<GLint> mElementCounts;
 	short mVertexSize;
 	egg::Collection<VertexElement> mColorElements;
 

@@ -115,8 +115,8 @@ public:
 	void setMirrorY(bool mirrorY);
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
 
-	const StatisticsSet &getStatisticsSet();
-	const CapabilitySet &getCapabilitySet();
+	const StatisticsSet &getStatisticsSet(){return mStatisticsSet;}
+	const CapabilitySet &getCapabilitySet(){return mCapabilitySet;}
 
 	// TODO: Have this be enabled on some platforms, depending some conditions...
 	inline bool useMapping() const{return false;}
@@ -136,12 +136,14 @@ public:
 		float cacheArray[4];
 	#endif
 
+	static GLenum getGLDepthFunc(DepthTest alphaTest);
+	static GLenum getGLAlphaFunc(AlphaTest alphaTest);
+	static GLenum getGLBlendOperation(Blend::Operation blend);
+	static GLint getGLElementCount(int format);
+	static GLenum getGLDataType(int format);
+
 protected:
-	inline int getGLBlendOperation(Blend::Operation blend);
-	inline void setVertexData(const VertexData *vertexData);
-	inline void unsetVertexData(const VertexData *vertexData);
-	inline GLint getGLElementCount(int format);
-	inline GLenum getGLDataType(int format);
+	inline void setVertexData(const VertexData *vertexData,const VertexData *lastVertexData);
 
 	bool mShutdown;
 	int mMatrixMode;

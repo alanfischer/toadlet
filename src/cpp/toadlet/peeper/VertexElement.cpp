@@ -61,7 +61,7 @@ int VertexElement::getSize() const{
 }
 
 bool VertexElement::equals(const VertexElement &element) const{
-	return element.type==type && element.format==format && element.index==index && element.offset==offset;
+	return element.type==type && element.format==format && element.offset==offset;
 }
 
 }

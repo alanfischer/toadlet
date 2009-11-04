@@ -560,7 +560,7 @@ void GLRenderer::endScene(){
 	#endif
 
 	if(mLastVertexData!=NULL){
-		unsetVertexData(mLastVertexData);
+		setVertexData(NULL,mLastVertexData);
 		mLastVertexData=VertexData::wptr();
 	}
 	if(mCapabilitySet.hardwareVertexBuffers){
@@ -641,12 +641,7 @@ void GLRenderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexDa
 		}
 	}
 	if(rebind){
-		if(mLastVertexData==NULL){
-			setVertexData(vertexData,0);
-		}
-		else{
-			setVertexData(vertexData,mLastVertexData->vertexFormat->getFormatBits());
-		}
+		setVertexData(vertexData,mLastVertexData);
 		mLastVertexData=vertexData;
 	}
 
@@ -670,21 +665,17 @@ void GLRenderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexDa
 		}
 
 		GLBuffer *glindexBuffer=(GLBuffer*)indexBuffer->getRootIndexBuffer();
-		uint8 *basePointer=NULL;
 		if(glindexBuffer->mHandle==0){
 			if(mCapabilitySet.hardwareIndexBuffers){
 				glBindBuffer(glindexBuffer->mTarget,0);
 			}
-			basePointer=glindexBuffer->mData;
+			glDrawElements(type,indexData->count,indexType,glindexBuffer->mData+indexData->start*glindexBuffer->mIndexFormat);
 		}
 		else{
 			glBindBuffer(glindexBuffer->mTarget,glindexBuffer->mHandle);
+
+			glDrawElements(type,indexData->count,indexType,(void*)(indexData->start*glindexBuffer->mIndexFormat));
 		}
-		basePointer+=indexData->start*glindexBuffer->mIndexFormat;
-
-		TOADLET_CHECK_GLERROR("setupIndexData");
-
-		glDrawElements(type,indexData->count,indexType,basePointer);
 
 		TOADLET_CHECK_GLERROR("glDrawElements");
 	}
@@ -759,32 +750,7 @@ void GLRenderer::setAlphaTest(const AlphaTest &alphaTest,scalar cutoff){
 		glDisable(GL_ALPHA_TEST);
 	}
 	else{
-		GLenum func=0;
-		switch(alphaTest){
-			case AlphaTest_LESS:
-				func=GL_LESS;
-			break;
-			case AlphaTest_EQUAL:
-				func=GL_EQUAL;
-			break;
-			case AlphaTest_LEQUAL:
-				func=GL_LEQUAL;
-			break;
-			case AlphaTest_GREATER:
-				func=GL_GREATER;
-			break;
-			case AlphaTest_NOTEQUAL:
-				func=GL_NOTEQUAL;
-			break;
-			case AlphaTest_GEQUAL:
-				func=GL_GEQUAL;
-			break;
-			case AlphaTest_ALWAYS:
-				func=GL_ALWAYS;
-			break;
-			default:
-			break;
-		}
+		GLenum func=getGLAlphaFunc(alphaTest);
 
 		#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
 			glAlphaFuncx(func,cutoff);
@@ -866,34 +832,7 @@ void GLRenderer::setDepthTest(const DepthTest &depthTest){
 		glDisable(GL_DEPTH_TEST);
 	}
 	else{
-		switch(depthTest){
-			case DepthTest_NEVER:
-				glDepthFunc(GL_NEVER);
-			break;
-			case DepthTest_LESS:
-				glDepthFunc(GL_LESS);
-			break;
-			case DepthTest_EQUAL:
-				glDepthFunc(GL_EQUAL);
-			break;
-			case DepthTest_LEQUAL:
-				glDepthFunc(GL_LEQUAL);
-			break;
-			case DepthTest_GREATER:
-				glDepthFunc(GL_GREATER);
-			break;
-			case DepthTest_NOTEQUAL:
-				glDepthFunc(GL_NOTEQUAL);
-			break;
-			case DepthTest_GEQUAL:
-				glDepthFunc(GL_GEQUAL);
-			break;
-			case DepthTest_ALWAYS:
-				glDepthFunc(GL_ALWAYS);
-			break;
-			default:
-			break;
-		}
+		glDepthFunc(getGLDepthFunc(depthTest));
 
 		if(mDepthTest==DepthTest_NONE){
 			glEnable(GL_DEPTH_TEST);
@@ -1386,8 +1325,7 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 			}
 		#endif
 
-		int texCoordIndex=textureStage->texCoordIndex;
-		mTexCoordIndexes[stage]=texCoordIndex;
+		mTexCoordIndexes[stage]=textureStage->texCoordIndex;
 
 		if(stage>=mMaxTexCoordIndex){
 			mMaxTexCoordIndex=stage+1;
@@ -1581,15 +1519,51 @@ void GLRenderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &res
 				0,          0,          0,          Math::ONE);
 }
 
-const StatisticsSet &GLRenderer::getStatisticsSet(){
-	return mStatisticsSet;
+GLenum GLRenderer::getGLDepthFunc(DepthTest depthTest){
+	switch(depthTest){
+		case DepthTest_NEVER:
+			return GL_NEVER;
+		case DepthTest_LESS:
+			return GL_LESS;
+		case DepthTest_EQUAL:
+			return GL_EQUAL;
+		case DepthTest_LEQUAL:
+			return GL_LEQUAL;
+		case DepthTest_GREATER:
+			return GL_GREATER;
+		case DepthTest_NOTEQUAL:
+			return GL_NOTEQUAL;
+		case DepthTest_GEQUAL:
+			return GL_GEQUAL;
+		case DepthTest_ALWAYS:
+			return GL_ALWAYS;
+		default:
+			return 0;
+	}
 }
 
-const CapabilitySet &GLRenderer::getCapabilitySet(){
-	return mCapabilitySet;
+GLenum GLRenderer::getGLAlphaFunc(AlphaTest alphaTest){
+	switch(alphaTest){
+		case AlphaTest_LESS:
+			return GL_LESS;
+		case AlphaTest_EQUAL:
+			return GL_EQUAL;
+		case AlphaTest_LEQUAL:
+			return GL_LEQUAL;
+		case AlphaTest_GREATER:
+			return GL_GREATER;
+		case AlphaTest_NOTEQUAL:
+			return GL_NOTEQUAL;
+		case AlphaTest_GEQUAL:
+			return GL_GEQUAL;
+		case AlphaTest_ALWAYS:
+			return GL_ALWAYS;
+		default:
+			return 0;
+	}
 }
 
-int GLRenderer::getGLBlendOperation(Blend::Operation blend){
+GLenum GLRenderer::getGLBlendOperation(Blend::Operation blend){
 	switch(blend){
 		case Blend::Operation_ONE:
 			return GL_ONE;
@@ -1616,33 +1590,77 @@ int GLRenderer::getGLBlendOperation(Blend::Operation blend){
 	}
 }
 
-void GLRenderer::setVertexData(const VertexData *vertexData,int lastFormatBits){
-	int i,j;
-	bool hasColorData=false;
-	int numVertexBuffers=vertexData->vertexBuffers.size();
-	for(i=0;i<numVertexBuffers;++i){
-		GLBuffer *glvertexBuffer=(GLBuffer*)vertexData->vertexBuffer[i]->getRootVertexBuffer();
+GLint GLRenderer::getGLElementCount(int format){
+	switch(format&~VertexElement::Format_MASK_TYPES){ // Mask out the types
+		case VertexElement::Format_BIT_COUNT_1:
+			return 1;
+		case VertexElement::Format_BIT_COUNT_2:
+			return 2;
+		case VertexElement::Format_BIT_COUNT_3:
+			return 3;
+		case VertexElement::Format_BIT_COUNT_4:
+		case VertexElement::Format_COLOR_RGBA:
+			return 4;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"getGLElementCount: Invalid element count");
+			return 0;
+	}
+}
 
-		uint8 *basePointer=NULL;
+GLenum GLRenderer::getGLDataType(int format){
+	switch(format&~VertexElement::Format_MASK_COUNTS){ // Mask out the counts
+		case VertexElement::Format_BIT_UINT_8:
+		case VertexElement::Format_COLOR_RGBA:
+			return GL_UNSIGNED_BYTE;
+		case VertexElement::Format_BIT_INT_8:
+			return GL_BYTE;
+		case VertexElement::Format_BIT_INT_16:
+			return GL_SHORT;
+		case VertexElement::Format_BIT_FLOAT_32:
+			return GL_FLOAT;
+		#if !defined(TOADLET_HAS_GLES)
+			case VertexElement::Format_BIT_INT_32:
+				return GL_INT;
+			case VertexElement::Format_BIT_DOUBLE_64:
+				return GL_DOUBLE;
+		#else
+			case VertexElement::Format_BIT_FIXED_32:
+				return GL_FIXED;
+		#endif
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"getGLDataType: Invalid data type");
+			return 0;
+	}
+}
+
+void GLRenderer::setVertexData(const VertexData *vertexData,const VertexData *lastVertexData){
+	bool hasColorData=false;
+
+	int numVertexBuffers=vertexData->vertexBuffers.size();
+
+	int i,j;
+	for(i=0;i<numVertexBuffers;++i){
+		GLBuffer *glvertexBuffer=(GLBuffer*)vertexData->vertexBuffers[i]->getRootVertexBuffer();
+
+		VertexFormat *vertexFormat=glvertexBuffer->mVertexFormat;
+		GLsizei vertexSize=vertexFormat->vertexSize;
+		int numVertexElements=vertexFormat->vertexElements.size();
+
 		if(glvertexBuffer->mHandle==0){
 			if(mCapabilitySet.hardwareVertexBuffers){
 				glBindBuffer(glvertexBuffer->mTarget,0);
 			}
-			basePointer=glvertexBuffer->mData;
 		}
 		else{
 			glBindBuffer(glvertexBuffer->mTarget,glvertexBuffer->mHandle);
 		}
 
-		VertexFormat *vertexFormat=glvertexBuffer->mVertexFormat;
-		GLsizei vertexSize=vertexFormat->getVertexSize();
-		int numVertexElements=vertexFormat->getNumVertexElements();
 		for(j=0;j<numVertexElements;++j){
-			const VertexElement &vertexElement=vertexFormat->getVertexElement(j);
-
-			GLint elementCount=getGLElementCount(vertexElement.format);
-			GLenum dataType=getGLDataType(vertexElement.format);
-			uint8 *pointer=basePointer+vertexElement.offset;
+			GLint elementCount=glvertexBuffer->mElementCounts[j];
+			GLenum dataType=glvertexBuffer->mElementTypes[j];
+uint8 *pointer=basePointer+vertexElement.offset;
 
 			switch(vertexElement.type){
 				case VertexElement::Type_POSITION:
@@ -1653,14 +1671,13 @@ void GLRenderer::setVertexData(const VertexData *vertexData,int lastFormatBits){
 					glEnableClientState(GL_NORMAL_ARRAY);
 					glNormalPointer(dataType,vertexSize,pointer);
 				break;
-				case VertexElement::Type_COLOR:
+				case VertexElement::Type_COLOR_DIFFUSE:
 					glEnableClientState(GL_COLOR_ARRAY);
 					glColorPointer(elementCount,dataType,vertexSize,pointer);
 					hasColorData=true;
 				break;
 				case VertexElement::Type_TEX_COORD:
-					for(
-					glClientActiveTexture(GL_TEXTURE0+vertexElement.index);
+					glClientActiveTexture(GL_TEXTURE0);
 					glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 					glTexCoordPointer(elementCount,dataType,vertexSize,pointer);
 				default:
@@ -1693,112 +1710,6 @@ void GLRenderer::setVertexData(const VertexData *vertexData,int lastFormatBits){
 	}
 
 	TOADLET_CHECK_GLERROR("setVertexData");
-}
-
-void GLRenderer::unsetVertexData(const VertexData *vertexData){
-	int numVertexBuffers=vertexData->vertexBuffers.size();
-	int i,j;
-	for(i=0;i<numVertexBuffers;++i){
-		VertexBuffer *vertexBuffer=vertexData->getVertexBuffer(i);
-
-		VertexFormat *vertexFormat=vertexBuffer->getVertexFormat();
-		int numVertexElements=vertexFormat->getNumVertexElements();
-		for(j=0;j<numVertexElements;++j){
-			const VertexElement &vertexElement=vertexFormat->getVertexElement(j);
-
-			switch(vertexElement.type){
-				case VertexElement::Type_POSITION:
-					glDisableClientState(GL_VERTEX_ARRAY);
-				break;
-				case VertexElement::Type_NORMAL:
-					glDisableClientState(GL_NORMAL_ARRAY);
-				break;
-				case VertexElement::Type_COLOR:
-					glDisableClientState(GL_COLOR_ARRAY);
-				break;
-				default:
-				break;
-			}
-		}
-
-		// Unbind Tex Coords separately because they depend on the texture units currently used
-		for(j=0;j<mLastMaxTexCoordIndex;++j){
-			int texCoordSet=mLastTexCoordIndexes[j];
-			mLastTexCoordIndexes[j]=-1;
-
-			if(texCoordSet>=0 && texCoordSet<=vertexFormat->getMaxTexCoordIndex()){
-				glClientActiveTexture(GL_TEXTURE0+j);
-				glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-			}
-		}
-	}
-
-	TOADLET_CHECK_GLERROR("unsetVertexData");
-}
-
-GLint GLRenderer::getGLElementCount(int format){
-	GLint count=0;
-
-	if((format&VertexElement::Format_BIT_COUNT_1)>0){
-		count=1;
-	}
-	else if((format&VertexElement::Format_BIT_COUNT_2)>0){
-		count=2;
-	}
-	else if((format&VertexElement::Format_BIT_COUNT_3)>0){
-		count=3;
-	}
-	else if((format&(VertexElement::Format_BIT_COUNT_4|VertexElement::Format_COLOR_RGBA))>0){
-		count=4;
-	}
-
-	if(count==0){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"getGLElementCount: Invalid element count");
-		return 0;
-	}
-
-	return count;
-}
-
-GLenum GLRenderer::getGLDataType(int format){
-	GLenum type=0;
-
-	if((format&(VertexElement::Format_BIT_UINT_8|VertexElement::Format_COLOR_RGBA))>0){
-		type=GL_UNSIGNED_BYTE;
-	}
-	else if((format&VertexElement::Format_BIT_INT_8)>0){
-		type=GL_BYTE;
-	}
-	else if((format&VertexElement::Format_BIT_INT_16)>0){
-		type=GL_SHORT;
-	}
-	#if !defined(TOADLET_HAS_GLES)
-		else if((format&VertexElement::Format_BIT_INT_32)>0){
-			type=GL_INT;
-		}
-	#endif
-	#if defined(TOADLET_HAS_GLES)
-		else if((format&VertexElement::Format_BIT_FIXED_32)>0){
-			type=GL_FIXED;
-		}
-	#endif
-	else if((format&VertexElement::Format_BIT_FLOAT_32)>0){
-		type=GL_FLOAT;
-	}
-	#if !defined(TOADLET_HAS_GLES)
-		else if((format&VertexElement::Format_BIT_DOUBLE_64)>0){
-			type=GL_DOUBLE;
-		}
-	#endif
-
-	if(type==0){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"getGLDataType: Invalid data type");
-		return 0;
-	}
-
-	return type;
 }
 
 }

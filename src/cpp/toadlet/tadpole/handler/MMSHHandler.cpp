@@ -93,7 +93,7 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 			int colorElement=normalElement;
 			if((vertexType&VT_COLOR)>0){
 				colorElement++;
-				vertexFormat->addVertexElement(VertexElement(VertexElement::Type_COLOR,VertexElement::Format_COLOR_RGBA));
+				vertexFormat->addVertexElement(VertexElement(VertexElement::Type_COLOR_DIFFUSE,VertexElement::Format_COLOR_RGBA));
 			}
 			int texCoordElement=colorElement;
 			if((vertexType&VT_TEXCOORD1)>0){

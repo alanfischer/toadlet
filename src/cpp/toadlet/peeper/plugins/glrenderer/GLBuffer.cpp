@@ -88,17 +88,27 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr ver
 	mAccessType=accessType;
 	mSize=size;
 	mVertexFormat=vertexFormat;
-	mVertexSize=vertexFormat->getVertexSize();
+	mVertexSize=vertexFormat->vertexSize;
 	mDataSize=mVertexSize*mSize;
 	
 	mTarget=GL_ARRAY_BUFFER;
 	createContext();
 
+	int numVertexElements=vertexFormat->vertexElements.size();
+	mElementTypes.resize(numVertexElements);
+	mElementCounts.resize(numVertexElements);
+	int i;
+	for(i=0;i<numVertexElements;++i){
+		int format=vertexFormat->vertexElements[i].format;
+		mElementTypes[i]=GLRenderer::getGLDataType(format);
+		mElementCounts[i]=GLRenderer::getGLDataType(format);
+	}
+
 	#if defined(TOADLET_BIG_ENDIAN)
 		int i;
-		for(i=0;i<mVertexFormat.getNumVertexElements();++i){
-			const VertexElement &vertexElement=mVertexFormat.getVertexElement(i);
-			if(vertexElement.type==VertexElement::Type_COLOR && vertexElement.format==VertexElement::Format_COLOR_RGBA){
+		for(i=0;i<mVertexFormat->vertexElements.size();++i){
+			const VertexElement &vertexElement=mVertexFormat->vertexElements[i];
+			if(vertexElement.format==VertexElement::Format_COLOR_RGBA){
 				mColorElementsToEndianSwap.add(vertexElement);
 			}
 		}

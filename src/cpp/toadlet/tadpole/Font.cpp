@@ -76,7 +76,7 @@ bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const Stri
 
 	int positionElement=format->getVertexElementIndexOfType(VertexElement::Type_POSITION);
 	int texCoordElement=format->getVertexElementIndexOfType(VertexElement::Type_TEX_COORD);
-	int colorElement=format->getVertexElementIndexOfType(VertexElement::Type_COLOR);
+	int colorElement=format->getVertexElementIndexOfType(VertexElement::Type_COLOR_DIFFUSE);
 
 	if(positionElement<0 || texCoordElement<0){
 		Error::unknown(Categories::TOADLET_TADPOLE,
