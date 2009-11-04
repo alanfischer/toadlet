@@ -300,12 +300,6 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 }
 
 bool GLRenderer::destroy(){
-	int i;
-	for(i=0;i<mScratchBuffers.size();++i){
-		delete mScratchBuffers[i].data;
-	}
-	mScratchBuffers.clear();
-
 	return true;
 }
 
@@ -653,8 +647,6 @@ void GLRenderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexDa
 		else{
 			setVertexData(vertexData,mLastVertexData->vertexFormat->getFormatBits());
 		}
-
-		setVertexData(vertexData);
 		mLastVertexData=vertexData;
 	}
 
@@ -918,12 +910,7 @@ void GLRenderer::setDepthWrite(bool depthWrite){
 		return;
 	}
 
-	if(depthWrite){
-		glDepthMask(GL_TRUE);
-	}
-	else{
-		glDepthMask(GL_FALSE);
-	}
+	glDepthMask(depthWrite?GL_TRUE:GL_FALSE);
 
 	mDepthWrite=depthWrite;
 
@@ -1157,8 +1144,9 @@ void GLRenderer::setPointParameters(bool sprite,scalar size,bool attenuated,scal
 			glDisable(GL_POINT_SPRITE);
 			value=0;
 		}
-		int i;
-		for(i=0;i<mCapabilitySet.maxTextureStages;++i){
+		int stage;
+		for(stage=0;stage<mCapabilitySet.maxTextureStages;++stage){
+			glActiveTexture(GL_TEXTURE0+stage);
 			glTexEnvi(GL_POINT_SPRITE,GL_COORD_REPLACE,value);
 		}
 	}
@@ -1189,9 +1177,7 @@ void GLRenderer::setPointParameters(bool sprite,scalar size,bool attenuated,scal
 void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 	mStatisticsSet.textureChangeCount++;
 
-	if(mCapabilitySet.maxTextureStages>1){
-		glActiveTexture(GL_TEXTURE0+stage);
-	}
+	glActiveTexture(GL_TEXTURE0+stage);
 
 	if(textureStage!=NULL){
 		Texture *texture=textureStage->texture;
@@ -1401,9 +1387,7 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 		#endif
 
 		int texCoordIndex=textureStage->texCoordIndex;
-		if(mTexCoordIndexes[stage]!=texCoordIndex){
-			mTexCoordIndexes[stage]=texCoordIndex;
-		}
+		mTexCoordIndexes[stage]=texCoordIndex;
 
 		if(stage>=mMaxTexCoordIndex){
 			mMaxTexCoordIndex=stage+1;
@@ -1428,13 +1412,6 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 }
 
 void GLRenderer::setProgram(const Program *program){
-}
-
-void GLRenderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){
-	result.set( Math::HALF, 0,          0,          Math::HALF,
-				0,          Math::HALF, 0,          Math::HALF,
-				0,          0,          Math::HALF, Math::HALF,
-				0,          0,          0,          Math::ONE);
 }
 
 void GLRenderer::setShadowComparisonMethod(bool enabled){
@@ -1597,29 +1574,11 @@ void GLRenderer::setMirrorY(bool mirrorY){
 	setFaceCulling(faceCulling);
 }
 
-void GLRenderer::copyFrameBufferToTexture(Texture *texture){
-/*
-	GLTexturePeer *peer=(GLTexturePeer*)texture->internal_getTexturePeer();
-	if(peer==NULL){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"GLRenderer::copyBufferToTexture: invalid peer");
-		return;
-	}
-
-	int width=texture->getWidth();
-	int height=texture->getHeight();
-
-	glBindTexture(peer->textureTarget,peer->textureHandle);
-	glCopyTexSubImage2D(peer->textureTarget,0,0,0,0,0,width,height);
-
-	if(texture->getAutoGenerateMipMaps()){
-		peer->generateMipMaps();
-	}
-
-	glBindTexture(peer->textureTarget,0);
-
-	TOADLET_CHECK_GLERROR("copyBufferToTexture");
-*/
+void GLRenderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){
+	result.set( Math::HALF, 0,          0,          Math::HALF,
+				0,          Math::HALF, 0,          Math::HALF,
+				0,          0,          Math::HALF, Math::HALF,
+				0,          0,          0,          Math::ONE);
 }
 
 const StatisticsSet &GLRenderer::getStatisticsSet(){
@@ -1628,37 +1587,6 @@ const StatisticsSet &GLRenderer::getStatisticsSet(){
 
 const CapabilitySet &GLRenderer::getCapabilitySet(){
 	return mCapabilitySet;
-}
-
-uint8 *GLRenderer::allocScratchBuffer(int size){
-	int i;
-	for(i=0;i<mScratchBuffers.size();++i){
-		ScratchBuffer &buffer=mScratchBuffers[i];
-		if(buffer.free && buffer.size>=size){
-			buffer.free=false;
-			return buffer.data;
-		}
-	}
-
-	ScratchBuffer buffer;
-	buffer.size=size;
-	buffer.free=false;
-	buffer.data=new uint8[size];
-	mScratchBuffers.add(buffer);
-
-	return buffer.data;
-}
-
-void GLRenderer::freeScratchBuffer(uint8 *data){
-	int i;
-	for(i=0;i<mScratchBuffers.size();++i){
-		if(mScratchBuffers[i].data==data){
-			mScratchBuffers[i].free=true;
-			return;
-		}
-	}
-
-	Error::unknown("invalid scratch buffer freed");
 }
 
 int GLRenderer::getGLBlendOperation(Blend::Operation blend){
@@ -1730,6 +1658,11 @@ void GLRenderer::setVertexData(const VertexData *vertexData,int lastFormatBits){
 					glColorPointer(elementCount,dataType,vertexSize,pointer);
 					hasColorData=true;
 				break;
+				case VertexElement::Type_TEX_COORD:
+					for(
+					glClientActiveTexture(GL_TEXTURE0+vertexElement.index);
+					glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+					glTexCoordPointer(elementCount,dataType,vertexSize,pointer);
 				default:
 				break;
 			}
@@ -1744,10 +1677,7 @@ void GLRenderer::setVertexData(const VertexData *vertexData,int lastFormatBits){
 			if(texCoordSet>=0 && texCoordSet<=vertexFormat->getMaxTexCoordIndex()){
 				const VertexElement &vertexElement=vertexFormat->getTexCoordElementByIndex(texCoordSet);
 
-				if(mCapabilitySet.maxTextureStages>1){
-					glClientActiveTexture(GL_TEXTURE0+j);
-				}
-
+				glClientActiveTexture(GL_TEXTURE0+j);
 				glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 				glTexCoordPointer(
@@ -1797,10 +1727,7 @@ void GLRenderer::unsetVertexData(const VertexData *vertexData){
 			mLastTexCoordIndexes[j]=-1;
 
 			if(texCoordSet>=0 && texCoordSet<=vertexFormat->getMaxTexCoordIndex()){
-				if(mCapabilitySet.maxTextureStages>1){
-					glClientActiveTexture(GL_TEXTURE0+j);
-				}
-
+				glClientActiveTexture(GL_TEXTURE0+j);
 				glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 			}
 		}

@@ -167,7 +167,6 @@ public:
 	virtual void setPointParameters(bool sprite,scalar size,bool attenuated,scalar constant,scalar linear,scalar quadratic,scalar minSize,scalar maxSize)=0;
 	virtual void setTextureStage(int stage,TextureStage *textureStage)=0;
 	virtual void setProgram(const Program *program)=0;
-	virtual void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result)=0;
 	 // A workaround here, since OpenGL & Direct3D have different shadow comparison methods
 	virtual void setShadowComparisonMethod(bool enabled)=0;
 
@@ -178,7 +177,7 @@ public:
 
 	// Misc operations
 	virtual void setMirrorY(bool mirrorY)=0;
-	virtual void copyFrameBufferToTexture(Texture *texture)=0;
+	virtual void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result)=0;
 
 	virtual const StatisticsSet &getStatisticsSet()=0;
 	virtual const CapabilitySet &getCapabilitySet()=0;

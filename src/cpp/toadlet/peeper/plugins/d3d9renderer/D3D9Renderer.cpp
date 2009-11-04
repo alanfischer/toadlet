@@ -322,11 +322,10 @@ void D3D9Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Index
 	int numVertexes=0;
 	int numVertexBuffers=vertexData->vertexBuffers.size();
 	for(i=0;i<numVertexBuffers;++i){
-		VertexBuffer *vertexBuffer=vertexData->vertexBuffers[i];
+		D3D9VertexBuffer *d3dvertexBuffer=(D3D9VertexBuffer*)vertexData->vertexBuffers[i]->getRootVertexBuffer();
 		if(numVertexes==0){
-			numVertexes=vertexBuffer->getSize();
+			numVertexes=d3dvertexBuffer->mSize;
 		}
-		D3D9VertexBuffer *d3dvertexBuffer=(D3D9VertexBuffer*)vertexBuffer->getRootVertexBuffer();
 		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 			result=mD3DDevice->SetStreamSource(i,d3dvertexBuffer->mVertexBuffer,d3dvertexBuffer->mVertexSize);
 		#else
@@ -678,7 +677,6 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 		Texture *texture=textureStage->texture;
 		if(texture!=NULL){
 			D3D9Texture *d3dtexture=(D3D9Texture*)texture->getRootTexture();
-
 			result=mD3DDevice->SetTexture(stage,d3dtexture->mTexture);
 			TOADLET_CHECK_D3D9ERROR(result,"SetTexture");
 		}
@@ -830,17 +828,6 @@ void D3D9Renderer::setNormalize(const Normalize &normalize){
 	}
 
 	mNormalize=normalize;
-}
-
-void D3D9Renderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){
-	int width=shadowTexture->getWidth();
-	int height=shadowTexture->getHeight();
-	scalar xoff=Math::HALF+Math::div(Math::HALF,Math::fromInt(width));
-	scalar yoff=Math::HALF+Math::div(Math::HALF,Math::fromInt(height));
-	result.set( Math::HALF, 0,           0,         xoff,
-				0,          -Math::HALF, 0,         yoff,
-				0,          0,           Math::ONE, 0,
-				0,          0,           0,         Math::ONE);
 }
 
 void D3D9Renderer::setShadowComparisonMethod(bool enabled){
@@ -1017,27 +1004,15 @@ void D3D9Renderer::setMirrorY(bool mirrorY){
 	setFaceCulling(faceCulling);
 }
 
-void D3D9Renderer::copyFrameBufferToTexture(Texture *texture){
-/*
-	D3D9TexturePeer *peer=(D3D9TexturePeer*)texture->getTexturePeer();
-	if(peer==NULL){
-		throw std::runtime_error("invalid peer in copyBufferToTexture");
-	}
-
-	int width,height;
-	texture->getSize(width,height);
-
-	glBindTexture(peer->dimension,peer->textureHandle);
-	glCopyTexSubImage2D(peer->dimension,0,0,0,0,0,width,height);
-
-	if(texture->getMipMap() && glGenerateMipmapEXT!=NULL){
-		glGenerateMipmapEXT(peer->dimension);
-	}
-
-	glBindTexture(peer->dimension,0);
-
-	TOADLET_CHECK_ERROR("copyBufferToTexture");
-*/
+void D3D9Renderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){
+	int width=shadowTexture->getWidth();
+	int height=shadowTexture->getHeight();
+	scalar xoff=Math::HALF+Math::div(Math::HALF,Math::fromInt(width));
+	scalar yoff=Math::HALF+Math::div(Math::HALF,Math::fromInt(height));
+	result.set( Math::HALF, 0,           0,         xoff,
+				0,          -Math::HALF, 0,         yoff,
+				0,          0,           Math::ONE, 0,
+				0,          0,           0,         Math::ONE);
 }
 
 }
