@@ -28,18 +28,18 @@
 namespace toadlet{
 namespace peeper{
 
-IndexData::IndexData(Primitive primitive,IndexBuffer::ptr indexBuffer):
-	mPrimitive(primitive),
-	mIndexBuffer(indexBuffer),
-	mStart(0),
-	mCount(indexBuffer->getSize())
+IndexData::IndexData(Primitive primitive1,IndexBuffer::ptr indexBuffer1):
+	primitive(primitive1),
+	indexBuffer(indexBuffer1),
+	start(0),
+	count(indexBuffer1->getSize())
 {}
 
-IndexData::IndexData(Primitive primitive,IndexBuffer::ptr indexBuffer,int start,int count):
-	mPrimitive(primitive),
-	mIndexBuffer(indexBuffer),
-	mStart(start),
-	mCount(count)
+IndexData::IndexData(Primitive primitive1,IndexBuffer::ptr indexBuffer1,int start1,int count1):
+	primitive(primitive1),
+	indexBuffer(indexBuffer1),
+	start(start1),
+	count(count1)
 {}
 
 }

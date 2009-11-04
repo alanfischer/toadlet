@@ -44,39 +44,38 @@ public:
 
 	Light();
 
-	inline void setSpecularColor(const Color &specularColor){mSpecularColor.set(specularColor);}
-	inline const Color &getSpecularColor() const{return mSpecularColor;}
+	inline void setSpecularColor(const Color &color){specularColor.set(color);}
+	inline const Color &getSpecularColor() const{return specularColor;}
 
-	inline void setDiffuseColor(const Color &diffuseColor){mDiffuseColor.set(diffuseColor);}
-	inline const Color &getDiffuseColor() const{return mDiffuseColor;}
+	inline void setDiffuseColor(const Color &color){diffuseColor.set(color);}
+	inline const Color &getDiffuseColor() const{return diffuseColor;}
 
-	inline void setType(Type type){mType=type;}
-	inline Type getType() const{return mType;}
+	inline void setType(Type type1){type=type1;}
+	inline Type getType() const{return type;}
 
-	inline void setLinearAttenuation(scalar attenuation){mLinearAttenuation=attenuation;}
-	inline scalar getLinearAttenuation() const{return mLinearAttenuation;}
+	inline void setLinearAttenuation(scalar attenuation){linearAttenuation=attenuation;}
+	inline scalar getLinearAttenuation() const{return linearAttenuation;}
 
-	inline void setSpotCutoff(scalar cutoff){mSpotCutoff=cutoff;}
-	inline scalar getSpotCutoff() const{return mSpotCutoff;}
+	inline void setSpotCutoff(scalar cutoff){spotCutoff=cutoff;}
+	inline scalar getSpotCutoff() const{return spotCutoff;}
 
-	inline void setRadius(scalar radius){mRadius=radius;}
-	inline scalar getRadius() const{return mRadius;}
+	inline void setRadius(scalar radius1){radius=radius1;}
+	inline scalar getRadius() const{return radius;}
 
-	inline void setDirection(const Vector3 &direction){mDirection.set(direction);}
-	inline const Vector3 &getDirection() const{return mDirection;}
+	inline void setDirection(const Vector3 &direction1){direction.set(direction1);}
+	inline const Vector3 &getDirection() const{return direction;}
 
-	inline void setPosition(const Vector3 &position){mPosition.set(position);}
-	inline const Vector3 &getPosition() const{return mPosition;}
+	inline void setPosition(const Vector3 &position1){position.set(position1);}
+	inline const Vector3 &getPosition() const{return position;}
 
-protected:
-	Color mSpecularColor;
-	Color mDiffuseColor;
-	Type mType;
-	scalar mLinearAttenuation;
-	scalar mSpotCutoff;
-	scalar mRadius;
-	Vector3 mPosition;
-	Vector3 mDirection;
+	Color specularColor;
+	Color diffuseColor;
+	Type type;
+	scalar linearAttenuation;
+	scalar spotCutoff;
+	scalar radius;
+	Vector3 position;
+	Vector3 direction;
 };
 
 }

@@ -29,49 +29,51 @@ namespace toadlet{
 namespace peeper{
 
 TextureStage::TextureStage():
-	//mTexture,
+	//texture,
+	//textureName
 
-	//mBlend,
+	//blend,
 
-	mSAddressMode(AddressMode_REPEAT),
-	mTAddressMode(AddressMode_REPEAT),
-	mRAddressMode(AddressMode_REPEAT),
+	sAddressMode(AddressMode_REPEAT),
+	tAddressMode(AddressMode_REPEAT),
+	rAddressMode(AddressMode_REPEAT),
 
-	mMinFilter(Filter_NEAREST),
-	mMipFilter(Filter_NONE),
-	mMagFilter(Filter_NEAREST),
+	minFilter(Filter_NEAREST),
+	mipFilter(Filter_NONE),
+	magFilter(Filter_NEAREST),
 
-	mTexCoordIndex(0),
+	texCoordIndex(0),
 
-	mCalculation(Calculation_DISABLED)
-	//mMatrix,
+	calculation(Calculation_DISABLED)
+	//matrix,
 {
 }
 
-TextureStage::TextureStage(const Texture::ptr &texture):
-	//mTexture,
+TextureStage::TextureStage(const Texture::ptr &texture1):
+	//texture,
+	//textureName
 
-	//mBlend,
+	//blend,
 
-	mSAddressMode(AddressMode_REPEAT),
-	mTAddressMode(AddressMode_REPEAT),
-	mRAddressMode(AddressMode_REPEAT),
+	sAddressMode(AddressMode_REPEAT),
+	tAddressMode(AddressMode_REPEAT),
+	rAddressMode(AddressMode_REPEAT),
 
-	mMinFilter(Filter_NEAREST),
-	mMipFilter(Filter_NONE),
-	mMagFilter(Filter_NEAREST),
+	minFilter(Filter_NEAREST),
+	mipFilter(Filter_NONE),
+	magFilter(Filter_NEAREST),
 
-	mTexCoordIndex(0),
+	texCoordIndex(0),
 
-	mCalculation(Calculation_DISABLED)
+	calculation(Calculation_DISABLED)
 	//mMatrix,
 {
-	mTexture=texture;
+	texture=texture1;
 }
 	
-void TextureStage::setCalculation(Calculation calculation,const Matrix4x4 &matrix){
-	mCalculation=calculation;
-	mMatrix.set(matrix);
+void TextureStage::setCalculation(Calculation calculation1,const Matrix4x4 &matrix1){
+	calculation=calculation1;
+	matrix.set(matrix1);
 }
 
 }
