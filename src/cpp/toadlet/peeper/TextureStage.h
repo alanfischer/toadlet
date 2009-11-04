@@ -57,57 +57,55 @@ public:
 	};
 
 	TextureStage();
-	TextureStage(const Texture::ptr &texture);
+	TextureStage(const Texture::ptr &texture1);
 	virtual ~TextureStage(){}
 
-	void setTexture(const Texture::ptr &texture){mTexture=texture;}
-	inline const Texture::ptr &getTexture() const{return mTexture;}
+	void setTexture(const Texture::ptr &texture1){texture=texture1;}
+	inline const Texture::ptr &getTexture() const{return texture;}
+	void setTextureName(const egg::String &name){textureName=name;}
+	inline const egg::String &getTextureName() const{return textureName;}
 
-	void setTextureName(const egg::String &textureName){mTextureName=textureName;}
-	inline const egg::String &getTextureName() const{return mTextureName;}
+	void setBlend(const TextureBlend &blend1){blend.set(blend1);}
+	inline const TextureBlend &getBlend() const{return blend;}
 
-	void setBlend(const TextureBlend &blend){mBlend.set(blend);}
-	inline const TextureBlend &getBlend() const{return mBlend;}
+	void setSAddressMode(AddressMode addressMode){sAddressMode=addressMode;}
+	inline AddressMode getSAddressMode() const{return sAddressMode;}
+	void setTAddressMode(AddressMode addressMode){tAddressMode=addressMode;}
+	inline AddressMode getTAddressMode() const{return tAddressMode;}
+	void setRAddressMode(AddressMode addressMode){rAddressMode=addressMode;}
+	inline AddressMode getRAddressMode() const{return rAddressMode;}
 
-	void setSAddressMode(AddressMode addressMode){mSAddressMode=addressMode;}
-	inline AddressMode getSAddressMode() const{return mSAddressMode;}
-	void setTAddressMode(AddressMode addressMode){mTAddressMode=addressMode;}
-	inline AddressMode getTAddressMode() const{return mTAddressMode;}
-	void setRAddressMode(AddressMode addressMode){mRAddressMode=addressMode;}
-	inline AddressMode getRAddressMode() const{return mRAddressMode;}
+	void setMinFilter(Filter minf){minFilter=minf;}
+	inline Filter getMinFilter() const{return minFilter;}
+	void setMipFilter(Filter mipf){mipFilter=mipf;}
+	inline Filter getMipFilter() const{return mipFilter;}
+	void setMagFilter(Filter magf){magFilter=magf;}
+	inline Filter getMagFilter() const{return magFilter;}
 
-	void setMinFilter(Filter minFilter){mMinFilter=minFilter;}
-	inline Filter getMinFilter() const{return mMinFilter;}
-	void setMipFilter(Filter mipFilter){mMipFilter=mipFilter;}
-	inline Filter getMipFilter() const{return mMipFilter;}
-	void setMagFilter(Filter magFilter){mMagFilter=magFilter;}
-	inline Filter getMagFilter() const{return mMagFilter;}
+	void setTexCoordIndex(int index){texCoordIndex=index;}
+	inline int getTexCoordIndex() const{return texCoordIndex;}
 
-	void setTexCoordIndex(int index){mTexCoordIndex=index;}
-	inline int getTexCoordIndex() const{return mTexCoordIndex;}
+	void setCalculation(Calculation calculation1,const Matrix4x4 &matrix1);
+	inline Calculation getCalculation() const{return calculation;}
+	inline const Matrix4x4 &getMatrix() const{return matrix;}
 
-	void setCalculation(Calculation calculation,const Matrix4x4 &matrix);
-	inline Calculation getCalculation() const{return mCalculation;}
-	inline const Matrix4x4 &getMatrix() const{return mMatrix;}
+	Texture::ptr texture;
+	egg::String textureName;
 
-protected:
-	Texture::ptr mTexture;
-	egg::String mTextureName;
+	TextureBlend blend;
 
-	TextureBlend mBlend;
+	AddressMode sAddressMode;
+	AddressMode tAddressMode;
+	AddressMode rAddressMode;
 
-	AddressMode mSAddressMode;
-	AddressMode mTAddressMode;
-	AddressMode mRAddressMode;
+	Filter minFilter;
+	Filter mipFilter;
+	Filter magFilter;
 
-	Filter mMinFilter;
-	Filter mMipFilter;
-	Filter mMagFilter;
+	int texCoordIndex;
 
-	int mTexCoordIndex;
-
-	Calculation mCalculation;
-	Matrix4x4 mMatrix;
+	Calculation calculation;
+	Matrix4x4 matrix;
 };
 
 }

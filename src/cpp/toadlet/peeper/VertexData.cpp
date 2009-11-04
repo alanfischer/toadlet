@@ -29,37 +29,37 @@ namespace toadlet{
 namespace peeper{
 
 VertexData::VertexData(int numVertexBuffers)
-	//mVertexFormat,
-	//mVertexBuffers
+	//vertexFormat,
+	//vertexBuffers
 {
-	mVertexBuffers.reserve(numVertexBuffers);
+	vertexBuffers.reserve(numVertexBuffers);
 }
 
 VertexData::VertexData(const VertexBuffer::ptr &vertexBuffer)
-	//mVertexFormat,
-	//mVertexBuffers
+	//vertexFormat,
+	//vertexBuffers
 {
 	addVertexBuffer(vertexBuffer);
 }
 
 void VertexData::addVertexBuffer(const VertexBuffer::ptr &vertexBuffer){
-	if(mVertexBuffers.size()==0){
-		mVertexFormat=vertexBuffer->getVertexFormat();
+	if(vertexBuffers.size()==0){
+		vertexFormat=vertexBuffer->getVertexFormat();
 	}
 	else{
-		if(mVertexBuffers.size()==1){
-			mVertexFormat=VertexFormat::ptr(new VertexFormat());
+		if(vertexBuffers.size()==1){
+			vertexFormat=VertexFormat::ptr(new VertexFormat());
 		}
 
-		VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
+		VertexFormat::ptr bufferFormat=vertexBuffer->getVertexFormat();
 
 		int i;
-		for(i=0;i<vertexFormat->getNumVertexElements();++i){
-			mVertexFormat->addVertexElement(vertexFormat->getVertexElement(i));
+		for(i=0;i<bufferFormat->getNumVertexElements();++i){
+			vertexFormat->addVertexElement(vertexFormat->getVertexElement(i));
 		}
 	}
 
-	mVertexBuffers.add(vertexBuffer);
+	vertexBuffers.add(vertexBuffer);
 }
 
 }

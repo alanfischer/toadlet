@@ -47,23 +47,22 @@ public:
 	IndexData(Primitive primitive,IndexBuffer::ptr indexBuffer);
 	IndexData(Primitive primitive,IndexBuffer::ptr indexBuffer,int start,int count);
 
-	inline void setPrimitive(Primitive primitive){mPrimitive=primitive;}
-	inline Primitive getPrimitive() const{return mPrimitive;}
+	inline void setPrimitive(Primitive primitive1){primitive=primitive1;}
+	inline Primitive getPrimitive() const{return primitive;}
 
-	inline void setIndexBuffer(IndexBuffer::ptr indexBuffer){mIndexBuffer=indexBuffer;}
-	inline const IndexBuffer::ptr &getIndexBuffer() const{return mIndexBuffer;}
+	inline void setIndexBuffer(IndexBuffer::ptr buffer){indexBuffer=buffer;}
+	inline const IndexBuffer::ptr &getIndexBuffer() const{return indexBuffer;}
 
-	inline void setStart(int start){mStart=start;}
-	inline int getStart() const{return mStart;}
+	inline void setStart(int start1){start=start1;}
+	inline int getStart() const{return start;}
 
-	inline void setCount(int count){mCount=count;}
-	inline int getCount() const{return mCount;}
+	inline void setCount(int count1){count=count1;}
+	inline int getCount() const{return count;}
 
-protected:
-	Primitive mPrimitive;
-	IndexBuffer::ptr mIndexBuffer;
-	int mStart;
-	int mCount;
+	Primitive primitive;
+	IndexBuffer::ptr indexBuffer;
+	int start;
+	int count;
 };
 
 }

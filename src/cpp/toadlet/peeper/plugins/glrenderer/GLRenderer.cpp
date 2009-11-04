@@ -580,22 +580,11 @@ void GLRenderer::endScene(){
 	for(i=0;i<mCapabilitySet.maxTextureStages;++i){
 		setTextureStage(i,NULL);
 	}
-/*
-	if(mRenderTarget!=NULL){
-		Texture *texture=mRenderTarget->castToTexture();
-		if(texture!=NULL && texture->getAutoGenerateMipMaps()){
-			GLTexturePeer *peer=(GLTexturePeer*)texture->internal_getTexturePeer();
-			if(peer->manuallyBuildMipMaps){
-				peer->generateMipMaps();
-			}
-		}
-	}
-*/
+
 	TOADLET_CHECK_GLERROR("endScene");
 }
 
 void GLRenderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData){
-TOADLET_CHECK_GLERROR("renderPrimtive:START");
 	#if defined(TOADLET_DEBUG)
 		if(mBeginEndCounter!=1){
 			Error::unknown(Categories::TOADLET_PEEPER,
@@ -609,39 +598,37 @@ TOADLET_CHECK_GLERROR("renderPrimtive:START");
 		return;
 	}
 
-	int count=indexData->getCount();
-
-	if(count<=0){
+	if(indexData->count<=0){
 		return;
 	}
 
-	IndexData::Primitive primitive=indexData->getPrimitive();
+	IndexData::Primitive primitive=indexData->primitive;
 
 	GLenum type=0;
 	switch(primitive){
 		case IndexData::Primitive_POINTS:
 			type=GL_POINTS;
-			mStatisticsSet.pointCount+=count;
+			mStatisticsSet.pointCount+=indexData->count;
 		break;
 		case IndexData::Primitive_LINES:
 			type=GL_LINES;
-			mStatisticsSet.lineCount+=count/2;
+			mStatisticsSet.lineCount+=indexData->count/2;
 		break;
 		case IndexData::Primitive_LINESTRIP:
 			type=GL_LINE_STRIP;
-			mStatisticsSet.lineCount+=count-1;
+			mStatisticsSet.lineCount+=indexData->count-1;
 		break;
 		case IndexData::Primitive_TRIS:
 			type=GL_TRIANGLES;
-			mStatisticsSet.triangleCount+=count/3;
+			mStatisticsSet.triangleCount+=indexData->count/3;
 		break;
 		case IndexData::Primitive_TRISTRIP:
 			type=GL_TRIANGLE_STRIP;
-			mStatisticsSet.triangleCount+=count-2;
+			mStatisticsSet.triangleCount+=indexData->count-2;
 		break;
 		case IndexData::Primitive_TRIFAN:
 			type=GL_TRIANGLE_FAN;
-			mStatisticsSet.triangleCount+=count-2;
+			mStatisticsSet.triangleCount+=indexData->count-2;
 		break;
 	}
 
@@ -650,6 +637,7 @@ TOADLET_CHECK_GLERROR("renderPrimtive:START");
 		rebind=true;
 	}
 	else{
+		// See if we need to rebind it due to the texCoordIndex portions of the TextureStages changing
 		int i;
 		for(i=0;i<mMaxTexCoordIndex;++i){
 			if(mLastTexCoordIndexes[i]!=mTexCoordIndexes[i]){
@@ -659,15 +647,18 @@ TOADLET_CHECK_GLERROR("renderPrimtive:START");
 		}
 	}
 	if(rebind){
-		if(mLastVertexData!=NULL){
-			unsetVertexData(mLastVertexData);
+		if(mLastVertexData==NULL){
+			setVertexData(vertexData,0);
+		}
+		else{
+			setVertexData(vertexData,mLastVertexData->vertexFormat->getFormatBits());
 		}
 
 		setVertexData(vertexData);
 		mLastVertexData=vertexData;
 	}
 
-	IndexBuffer *indexBuffer=indexData->getIndexBuffer();
+	IndexBuffer *indexBuffer=indexData->indexBuffer;
 	if(indexBuffer!=NULL){
 		GLenum indexType=0;
 		switch(indexBuffer->getIndexFormat()){
@@ -697,16 +688,16 @@ TOADLET_CHECK_GLERROR("renderPrimtive:START");
 		else{
 			glBindBuffer(glindexBuffer->mTarget,glindexBuffer->mHandle);
 		}
-		basePointer+=indexData->getStart()*glindexBuffer->getIndexFormat();
+		basePointer+=indexData->start*glindexBuffer->mIndexFormat;
 
 		TOADLET_CHECK_GLERROR("setupIndexData");
 
-		glDrawElements(type,indexData->getCount(),indexType,basePointer);
+		glDrawElements(type,indexData->count,indexType,basePointer);
 
 		TOADLET_CHECK_GLERROR("glDrawElements");
 	}
 	else{
-		glDrawArrays(type,indexData->getStart(),indexData->getCount());
+		glDrawArrays(type,indexData->start,indexData->count);
 
 		TOADLET_CHECK_GLERROR("glDrawArrays");
 	}
@@ -1203,7 +1194,7 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 	}
 
 	if(textureStage!=NULL){
-		Texture *texture=textureStage->getTexture();
+		Texture *texture=textureStage->texture;
 		GLuint textureTarget=0;
 		if(texture!=NULL){
 			GLTexture *gltexture=(GLTexture*)texture->getRootTexture();
@@ -1215,14 +1206,14 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 				mLastTextures[stage]=texture;
 			}
 
-			TextureStage::Calculation calculation=textureStage->getCalculation();
+			TextureStage::Calculation calculation=textureStage->calculation;
 			if(calculation!=TextureStage::Calculation_DISABLED || (gltexture->mUsageFlags&(Texture::UsageFlags_NPOT_RESTRICTED|Texture::UsageFlags_RENDERTARGET))>0){
 				if(mMatrixMode!=GL_TEXTURE){
 					mMatrixMode=GL_TEXTURE;
 					glMatrixMode(mMatrixMode);
 				}
 
-				const Matrix4x4 &matrix=textureStage->getMatrix();
+				const Matrix4x4 &matrix=textureStage->matrix;
 
 				if(calculation==TextureStage::Calculation_NORMAL){
 					#if defined(TOADLET_FIXED_POINT)
@@ -1338,7 +1329,7 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 			mLastTexTargets[stage]=textureTarget;
 		}
 
-		const TextureBlend &blend=textureStage->getBlend();
+		const TextureBlend &blend=textureStage->blend;
 		if(blend.operation!=TextureBlend::Operation_UNSPECIFIED){
 			int mode=0;
 			switch(blend.operation){
@@ -1379,16 +1370,16 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 			#else
 				gl_version>=12;
 			#endif
-		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_S,GLTexture::getGLWrap(textureStage->getSAddressMode(),hasClampToEdge));
-		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_T,GLTexture::getGLWrap(textureStage->getTAddressMode(),hasClampToEdge));
+		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_S,GLTexture::getGLWrap(textureStage->sAddressMode,hasClampToEdge));
+		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_T,GLTexture::getGLWrap(textureStage->tAddressMode,hasClampToEdge));
 		#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_12)
 		if(gl_version>=12){
-			glTexParameteri(textureTarget,GL_TEXTURE_WRAP_R,GLTexture::getGLWrap(textureStage->getRAddressMode(),hasClampToEdge));
+			glTexParameteri(textureTarget,GL_TEXTURE_WRAP_R,GLTexture::getGLWrap(textureStage->rAddressMode,hasClampToEdge));
 		}
 		#endif
 
-		glTexParameteri(textureTarget,GL_TEXTURE_MIN_FILTER,GLTexture::getGLMinFilter(textureStage->getMinFilter(),textureStage->getMipFilter()));
-		glTexParameteri(textureTarget,GL_TEXTURE_MAG_FILTER,GLTexture::getGLMagFilter(textureStage->getMagFilter()));
+		glTexParameteri(textureTarget,GL_TEXTURE_MIN_FILTER,GLTexture::getGLMinFilter(textureStage->minFilter,textureStage->mipFilter));
+		glTexParameteri(textureTarget,GL_TEXTURE_MAG_FILTER,GLTexture::getGLMagFilter(textureStage->magFilter));
 
 		#if !defined(TOADLET_HAS_GLES)
 			if(gl_version>=14){
@@ -1409,7 +1400,7 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 			}
 		#endif
 
-		int texCoordIndex=textureStage->getTexCoordIndex();
+		int texCoordIndex=textureStage->texCoordIndex;
 		if(mTexCoordIndexes[stage]!=texCoordIndex){
 			mTexCoordIndexes[stage]=texCoordIndex;
 		}
@@ -1431,10 +1422,6 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 		while(mMaxTexCoordIndex>0 && mLastTexTargets[mMaxTexCoordIndex-1]==0){
 			mMaxTexCoordIndex--;
 		}
-	}
-
-	if(mCapabilitySet.maxTextureStages>1){
-		glActiveTexture(GL_TEXTURE0);
 	}
 
 	TOADLET_CHECK_GLERROR("setTextureStage");
@@ -1477,7 +1464,7 @@ void GLRenderer::setLight(int i,Light *light){
 	switch(light->getType()){
 		case Light::Type_DIRECTION:{
 			#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
-				glLightxv(l,GL_POSITION,lightDirArray(cacheArray,light->getDirection()));
+				glLightxv(l,GL_POSITION,lightDirArray(cacheArray,light->direction));
 
 				glLightx(l,GL_CONSTANT_ATTENUATION,Math::ONE);
 				glLightx(l,GL_LINEAR_ATTENUATION,0);
@@ -1487,7 +1474,7 @@ void GLRenderer::setLight(int i,Light *light){
 				glLightx(l,GL_SPOT_EXPONENT,0);
 
 			#else
-				glLightfv(l,GL_POSITION,lightDirArray(cacheArray,light->getDirection()));
+				glLightfv(l,GL_POSITION,lightDirArray(cacheArray,light->direction));
 
 				glLightf(l,GL_CONSTANT_ATTENUATION,Math::ONE);
 				glLightf(l,GL_LINEAR_ATTENUATION,0);
@@ -1501,20 +1488,20 @@ void GLRenderer::setLight(int i,Light *light){
 		}
 		case Light::Type_POSITION:{
 			#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
-				glLightxv(l,GL_POSITION,lightPosArray(cacheArray,light->getPosition()));
+				glLightxv(l,GL_POSITION,lightPosArray(cacheArray,light->position));
 
 				glLightx(l,GL_CONSTANT_ATTENUATION,0);
-				glLightx(l,GL_LINEAR_ATTENUATION,light->getLinearAttenuation());
-				glLightx(l,GL_QUADRATIC_ATTENUATION,light->getLinearAttenuation());
+				glLightx(l,GL_LINEAR_ATTENUATION,light->linearAttenuation);
+				glLightx(l,GL_QUADRATIC_ATTENUATION,light->linearAttenuation);
 
 				glLightx(l,GL_SPOT_CUTOFF,Math::ONE*180);
 				glLightx(l,GL_SPOT_EXPONENT,0);
 			#else
-				glLightfv(l,GL_POSITION,lightPosArray(cacheArray,light->getPosition()));
+				glLightfv(l,GL_POSITION,lightPosArray(cacheArray,light->position));
 
 				glLightf(l,GL_CONSTANT_ATTENUATION,0);
-				glLightf(l,GL_LINEAR_ATTENUATION,MathConversion::scalarToFloat(light->getLinearAttenuation()));
-				glLightf(l,GL_QUADRATIC_ATTENUATION,MathConversion::scalarToFloat(light->getLinearAttenuation()));
+				glLightf(l,GL_LINEAR_ATTENUATION,MathConversion::scalarToFloat(light->linearAttenuation));
+				glLightf(l,GL_QUADRATIC_ATTENUATION,MathConversion::scalarToFloat(light->linearAttenuation));
 
 				glLightf(l,GL_SPOT_CUTOFF,MathConversion::scalarToFloat(Math::ONE)*180);
 				glLightf(l,GL_SPOT_EXPONENT,0);
@@ -1523,28 +1510,28 @@ void GLRenderer::setLight(int i,Light *light){
 		}
 		case Light::Type_SPOT:{
 			#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
-				glLightxv(l,GL_POSITION,lightPosArray(cacheArray,light->getPosition()));
+				glLightxv(l,GL_POSITION,lightPosArray(cacheArray,light->position));
 
 				glLightx(l,GL_CONSTANT_ATTENUATION,0);
-				glLightx(l,GL_LINEAR_ATTENUATION,light->getLinearAttenuation());
-				glLightx(l,GL_QUADRATIC_ATTENUATION,light->getLinearAttenuation());
+				glLightx(l,GL_LINEAR_ATTENUATION,light->linearAttenuation);
+				glLightx(l,GL_QUADRATIC_ATTENUATION,light->linearAttenuation);
 			#else
-				glLightfv(l,GL_POSITION,lightPosArray(cacheArray,light->getPosition()));
+				glLightfv(l,GL_POSITION,lightPosArray(cacheArray,light->position));
 
 				glLightf(l,GL_CONSTANT_ATTENUATION,0);
-				glLightf(l,GL_LINEAR_ATTENUATION,MathConversion::scalarToFloat(light->getLinearAttenuation()));
-				glLightf(l,GL_QUADRATIC_ATTENUATION,MathConversion::scalarToFloat(light->getLinearAttenuation()));
+				glLightf(l,GL_LINEAR_ATTENUATION,MathConversion::scalarToFloat(light->linearAttenuation));
+				glLightf(l,GL_QUADRATIC_ATTENUATION,MathConversion::scalarToFloat(light->linearAttenuation));
 			#endif
 
 			#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
-				glLightxv(l,GL_SPOT_DIRECTION,lightPosArray(cacheArray,light->getDirection()));
+				glLightxv(l,GL_SPOT_DIRECTION,lightPosArray(cacheArray,light->direction));
 
-				glLightx(l,GL_SPOT_CUTOFF,(Math::ONE-light->getSpotCutoff())*90);
+				glLightx(l,GL_SPOT_CUTOFF,(Math::ONE-light->spotCutoff)*90);
 				glLightx(l,GL_SPOT_EXPONENT,Math::ONE*5);
 			#else
-				glLightfv(l,GL_SPOT_DIRECTION,lightPosArray(cacheArray,light->getDirection()));
+				glLightfv(l,GL_SPOT_DIRECTION,lightPosArray(cacheArray,light->direction));
 
-				glLightf(l,GL_SPOT_CUTOFF,MathConversion::scalarToFloat(Math::ONE-light->getSpotCutoff())*90);
+				glLightf(l,GL_SPOT_CUTOFF,MathConversion::scalarToFloat(Math::ONE-light->spotCutoff)*90);
 				glLightf(l,GL_SPOT_EXPONENT,MathConversion::scalarToFloat(Math::ONE)*5);
 			#endif
 
@@ -1556,19 +1543,19 @@ void GLRenderer::setLight(int i,Light *light){
 
 	#if defined(TOADLET_FIXED_POINT)
 		#if defined(TOADLET_HAS_GLES)
-			glLightxv(l,GL_SPECULAR,light->getSpecularColor().getData());
-			glLightxv(l,GL_DIFFUSE,light->getDiffuseColor().getData());
+			glLightxv(l,GL_SPECULAR,light->specularColor.getData());
+			glLightxv(l,GL_DIFFUSE,light->diffuseColor.getData());
 			// Ambient lighting works through the GL_LIGHT_MODEL_AMBIENT
 			glLightxv(l,GL_AMBIENT,Colors::BLACK.getData());
 		#else
-			glLightfv(l,GL_SPECULAR,colorArray(cacheArray,light->getSpecularColor()));
-			glLightfv(l,GL_DIFFUSE,colorArray(cacheArray,light->getDiffuseColor()));
+			glLightfv(l,GL_SPECULAR,colorArray(cacheArray,light->specularColor));
+			glLightfv(l,GL_DIFFUSE,colorArray(cacheArray,light->diffuseColor));
 			// Ambient lighting works through the GL_LIGHT_MODEL_AMBIENT
 			glLightfv(l,GL_AMBIENT,colorArray(cacheArray,Colors::BLACK));
 		#endif
 	#else
-		glLightfv(l,GL_SPECULAR,light->getSpecularColor().getData());
-		glLightfv(l,GL_DIFFUSE,light->getDiffuseColor().getData());
+		glLightfv(l,GL_SPECULAR,light->specularColor.getData());
+		glLightfv(l,GL_DIFFUSE,light->diffuseColor.getData());
 		// Ambient lighting works through the GL_LIGHT_MODEL_AMBIENT
 		glLightfv(l,GL_AMBIENT,Colors::BLACK.getData());
 	#endif
@@ -1701,12 +1688,12 @@ int GLRenderer::getGLBlendOperation(Blend::Operation blend){
 	}
 }
 
-void GLRenderer::setVertexData(const VertexData *vertexData){
-	bool hasColorData=false;
-	int numVertexBuffers=vertexData->getNumVertexBuffers();
+void GLRenderer::setVertexData(const VertexData *vertexData,int lastFormatBits){
 	int i,j;
+	bool hasColorData=false;
+	int numVertexBuffers=vertexData->vertexBuffers.size();
 	for(i=0;i<numVertexBuffers;++i){
-		GLBuffer *glvertexBuffer=(GLBuffer*)vertexData->getVertexBuffer(i)->getRootVertexBuffer();
+		GLBuffer *glvertexBuffer=(GLBuffer*)vertexData->vertexBuffer[i]->getRootVertexBuffer();
 
 		uint8 *basePointer=NULL;
 		if(glvertexBuffer->mHandle==0){
@@ -1719,7 +1706,7 @@ void GLRenderer::setVertexData(const VertexData *vertexData){
 			glBindBuffer(glvertexBuffer->mTarget,glvertexBuffer->mHandle);
 		}
 
-		VertexFormat *vertexFormat=glvertexBuffer->getVertexFormat();
+		VertexFormat *vertexFormat=glvertexBuffer->mVertexFormat;
 		GLsizei vertexSize=vertexFormat->getVertexSize();
 		int numVertexElements=vertexFormat->getNumVertexElements();
 		for(j=0;j<numVertexElements;++j){
@@ -1771,10 +1758,6 @@ void GLRenderer::setVertexData(const VertexData *vertexData){
 		}
 	}
 
-	if(mCapabilitySet.maxTextureStages>1){
-		glClientActiveTexture(GL_TEXTURE0);
-	}
-
 	if(hasColorData==false){
 		glColor4f(1.0f,1.0f,1.0f,1.0f);
 	}
@@ -1783,7 +1766,7 @@ void GLRenderer::setVertexData(const VertexData *vertexData){
 }
 
 void GLRenderer::unsetVertexData(const VertexData *vertexData){
-	int numVertexBuffers=vertexData->getNumVertexBuffers();
+	int numVertexBuffers=vertexData->vertexBuffers.size();
 	int i,j;
 	for(i=0;i<numVertexBuffers;++i){
 		VertexBuffer *vertexBuffer=vertexData->getVertexBuffer(i);
@@ -1814,9 +1797,6 @@ void GLRenderer::unsetVertexData(const VertexData *vertexData){
 			mLastTexCoordIndexes[j]=-1;
 
 			if(texCoordSet>=0 && texCoordSet<=vertexFormat->getMaxTexCoordIndex()){
-				// Unused
-				//const VertexElement &vertexElement=vertexFormat->getTexCoordElementByIndex(texCoordSet);
-
 				if(mCapabilitySet.maxTextureStages>1){
 					glClientActiveTexture(GL_TEXTURE0+j);
 				}
@@ -1824,10 +1804,6 @@ void GLRenderer::unsetVertexData(const VertexData *vertexData){
 				glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 			}
 		}
-	}
-
-	if(mCapabilitySet.maxTextureStages>1){
-		glClientActiveTexture(GL_TEXTURE0);
 	}
 
 	TOADLET_CHECK_GLERROR("unsetVertexData");

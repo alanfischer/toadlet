@@ -34,15 +34,13 @@ namespace peeper{
 class TOADLET_API VertexElement{
 public:
 	enum Type{
-		Type_UNKNOWN,
-		Type_POSITION,
-		Type_BLEND_WEIGHTS,
-		Type_BLEND_INDICES,
-		Type_NORMAL,
-		Type_COLOR,
+		Type_UNKNOWN=0,
+		Type_POSITION=1<<0,
+		Type_BLEND_WEIGHTS=1<<1,
+		Type_BLEND_INDICES=1<<2,
+		Type_NORMAL=1<<3,
+		Type_COLOR=1<<4,
 		Type_TEX_COORD,
-		Type_BINORMAL,
-		Type_TANGENT,
 	};
 
 	enum Format{

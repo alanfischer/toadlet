@@ -39,16 +39,15 @@ public:
 
 	VertexData(const VertexBuffer::ptr &vertexBuffer);
 
-	inline VertexFormat::ptr getVertexFormat(){return mVertexFormat;}
+	void addVertexBuffer(const VertexBuffer::ptr &vertexBuffer1);
 
-	void addVertexBuffer(const VertexBuffer::ptr &vertexBuffer);
+	inline int getNumVertexBuffers() const{return vertexBuffers.size();}
+	inline const VertexBuffer::ptr &getVertexBuffer(int index) const{return vertexBuffers[index];}
 
-	inline int getNumVertexBuffers() const{return mVertexBuffers.size();}
-	inline const VertexBuffer::ptr &getVertexBuffer(int index) const{return mVertexBuffers[index];}
+	inline VertexFormat::ptr getVertexFormat(){return vertexFormat;}
 
-protected:
-	VertexFormat::ptr mVertexFormat;
-	egg::Collection<VertexBuffer::ptr> mVertexBuffers;
+	egg::Collection<VertexBuffer::ptr> vertexBuffers;
+	VertexFormat::ptr vertexFormat;
 };
 
 }

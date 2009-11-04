@@ -33,18 +33,18 @@ namespace toadlet{
 namespace peeper{
 
 Light::Light():
-	mSpecularColor(Colors::BLACK),
-	mDiffuseColor(Colors::WHITE),
-	mType(Type_DIRECTION),
-	mLinearAttenuation(0),
-	mSpotCutoff(0),
+	specularColor(Colors::BLACK),
+	diffuseColor(Colors::WHITE),
+	type(Type_DIRECTION),
+	linearAttenuation(0),
+	spotCutoff(0),
 	#if defined(TOADLET_FIXED_POINT)
-		mRadius(Math::sqrt(Extents::MAX_FIXED>>1)),
+		radius(Math::sqrt(Extents::MAX_FIXED>>1)),
 	#else
-		mRadius(Math::sqrt(Extents::MAX_FLOAT)),
+		radius(Math::sqrt(Extents::MAX_FLOAT)),
 	#endif
-	//mPosition,
-	mDirection(0,0,-Math::ONE)
+	//position,
+	direction(0,0,-Math::ONE)
 {
 }
 
