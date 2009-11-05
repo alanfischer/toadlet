@@ -7,9 +7,17 @@ set (JAVA_GPP_DIR ${CMAKE_CURRENT_BINARY_DIR}/gpp)
 # Note we include the JAVA_GPP_DIR files since those have been preprocessed
 include_directories (${JAVA_GPP_DIR}/com/lightningtoads ${ANDROID_JAR})
 
-# Configure and copy the types file
+# Configure and copy the Config and Types file
 configure_file (${JAVA_SRC_DIR}/Config.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/Config.h)
 configure_file (${JAVA_SRC_DIR}/Types.h ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/Types.h COPYONLY)
+
+# Configure and copy the Version files
+configure_file (${JAVA_SRC_DIR}/egg/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/egg/Version.h)
+configure_file (${JAVA_SRC_DIR}/hop/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/hop/Version.h)
+configure_file (${JAVA_SRC_DIR}/knot/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/knot/Version.h)
+configure_file (${JAVA_SRC_DIR}/peeper/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/peeper/Version.h)
+configure_file (${JAVA_SRC_DIR}/tadpole/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/tadpole/Version.h)
+configure_file (${JAVA_SRC_DIR}/pad/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/pad/Version.h)
 
 # Special setup for java cmake compiling - MAKE THESE AN OVERRIDE FILE?
 set (CMAKE_Java_FLAGS "-sourcepath \"${JAVA_GPP_DIR}\"")
@@ -111,11 +119,10 @@ foreach (SRCFILE ${EGG_SRC})
 	set (EGG_SRC_GPP ${EGG_SRC_GPP} ${JAVA_GPP_DIR}/${SRCFILE})
 endforeach (SRCFILE)
 
-# NOTE: Currently all toadlet libraries are bundled into a single jar
 #  Jar library
-#add_library (toadlet_egg ${EGG_SRC_GPP})
-#set_target_properties (toadlet_egg PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-#install (TARGETS toadlet_egg DESTINATION lib)
+add_library (toadlet_egg ${EGG_SRC_GPP})
+set_target_properties (toadlet_egg PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+install (TARGETS toadlet_egg DESTINATION lib)
 
 
 # Building toadlet_hop
@@ -148,12 +155,11 @@ foreach (SRCFILE ${HOP_SRC})
 	set (HOP_SRC_GPP ${HOP_SRC_GPP} ${JAVA_GPP_DIR}/${SRCFILE})
 endforeach (SRCFILE)
 
-# NOTE: Currently all toadlet libraries are bundled into a single jar
 #  Jar library
-#add_library (toadlet_hop ${HOP_SRC_GPP})
-#set_target_properties (toadlet_hop PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-#add_dependencies (toadlet_hop toadlet_egg)
-#install (TARGETS toadlet_hop DESTINATION lib)
+add_library (toadlet_hop ${HOP_SRC_GPP})
+set_target_properties (toadlet_hop PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+add_dependencies (toadlet_hop toadlet_egg)
+install (TARGETS toadlet_hop DESTINATION lib)
 
 
 # Building toadlet_knot
@@ -179,12 +185,11 @@ foreach (SRCFILE ${KNOT_SRC})
 	set (KNOT_SRC_GPP ${KNOT_SRC_GPP} ${JAVA_GPP_DIR}/${SRCFILE})
 endforeach (SRCFILE)
 
-# NOTE: Currently all toadlet libraries are bundled into a single jar
 #  Jar library
-#add_library (toadlet_knot ${KNOT_SRC_GPP})
-#set_target_properties (toadlet_knot PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-#add_dependencies (toadlet_knot toadlet_egg)
-#install (TARGETS toadlet_knot DESTINATION lib)
+add_library (toadlet_knot ${KNOT_SRC_GPP})
+set_target_properties (toadlet_knot PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+add_dependencies (toadlet_knot toadlet_egg)
+install (TARGETS toadlet_knot DESTINATION lib)
 
 
 # Building toadlet_peeper
@@ -238,12 +243,7 @@ foreach (SRCFILE ${PEEPER_SRC})
 	set (PEEPER_SRC_GPP ${PEEPER_SRC_GPP} ${JAVA_GPP_DIR}/${SRCFILE})
 endforeach (SRCFILE)
 
-# NOTE: Currently all toadlet libraries are bundled into a single jar
-#  Jar library
-#add_library (toadlet_peeper ${PEEPER_SRC_GPP})
-#set_target_properties (toadlet_peeper PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-#dd_dependencies (toadlet_peeper toadlet_egg)
-#nstall (TARGETS toadlet_peeper DESTINATION lib)
+# Jar library is combined with peeper plugins
 
 
 # Building toadlet_peeper_glrenderer
@@ -272,12 +272,11 @@ foreach (SRCFILE ${PEEPER_GLRENDERER_SRC})
 	set (PEEPER_GLRENDERER_SRC_GPP ${PEEPER_GLRENDERER_SRC_GPP} ${JAVA_GPP_DIR}/${SRCFILE})
 endforeach (SRCFILE)
 
-# NOTE: Currently all toadlet libraries are bundled into a single jar
-#  Jar library
-#add_library (toadlet_peeper_glrenderer ${PEEPER_GLRENDERER_SRC_GPP})
-#set_target_properties (toadlet_peeper_glrenderer PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-#add_dependencies (toadlet_peeper_glrenderer toadlet_egg toadlet_peeper)
-#install (TARGETS toadlet_peeper_glrenderer DESTINATION lib)
+#  Jar library for peeper and it's plugins
+add_library (toadlet_peeper ${PEEPER_SRC_GPP} ${PEEPER_GLRENDERER_SRC_GPP})
+set_target_properties (toadlet_peeper PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+add_dependencies (toadlet_peeper toadlet_egg)
+install (TARGETS toadlet_peeper DESTINATION lib)
 
 
 # Building toadlet_tadpole
@@ -372,41 +371,10 @@ foreach (SRCFILE ${TADPOLE_SRC})
 endforeach (SRCFILE)
 
 #  Jar library
-# NOTE: Currently all toadlet libraries are bundled into a single jar
-#add_library (toadlet_tadpole ${TADPOLE_SRC_GPP})
-#set_target_properties (toadlet_tadpole PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-#add_dependencies (toadlet_tadpole toadlet_egg toadlet_peeper)
-#install (TARGETS toadlet_tadpole DESTINATION lib)
-
-
-# Building toadlet_pad
-
-# Source files
-set (PAD_SRC
-	${JAVA_SRC_DIR}/pad/Application.java
-	${JAVA_SRC_DIR}/pad/ApplicationListener.java
-	${JAVA_SRC_DIR}/pad/Version.java
-)
-
-# Bundle source files
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/com/lightningtoads/toadlet/pad)
-
-# Copy over source files and run gpp
-foreach (SRCFILE ${PAD_SRC})
-	add_custom_command (
-		OUTPUT ${JAVA_GPP_DIR}/${SRCFILE}
-		COMMAND ${GPP_COMMAND} -o ${JAVA_GPP_DIR}/${SRCFILE} -I${JAVA_GPP_DIR} -I${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${SRCFILE}
-		DEPENDS ${SRCFILE}
-	)
-	set (PAD_SRC_GPP ${PAD_SRC_GPP} ${JAVA_GPP_DIR}/${SRCFILE})
-endforeach (SRCFILE)
-
-# NOTE: Currently all toadlet libraries are bundled into a single jar
-#  Jar library
-#add_library (toadlet_peeper_glrenderer ${PEEPER_GLRENDERER_SRC_GPP})
-#set_target_properties (toadlet_peeper_glrenderer PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-#add_dependencies (toadlet_peeper_glrenderer toadlet_egg toadlet_peeper)
-#install (TARGETS toadlet_peeper_glrenderer DESTINATION lib)
+add_library (toadlet_tadpole ${TADPOLE_SRC_GPP})
+set_target_properties (toadlet_tadpole PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+add_dependencies (toadlet_tadpole toadlet_egg toadlet_peeper)
+install (TARGETS toadlet_tadpole DESTINATION lib)
 
 
 # Building toadlet_tadpole_hop
@@ -434,17 +402,44 @@ foreach (SRCFILE ${TADPOLE_HOP_SRC})
 	set (TADPOLE_HOP_SRC_GPP ${TADPOLE_HOP_SRC_GPP} ${JAVA_GPP_DIR}/${SRCFILE})
 endforeach (SRCFILE)
 
-# NOTE: Currently all toadlet libraries are bundled into a single jar
 #  Jar library
-#add_library (toadlet_peeper_glrenderer ${PEEPER_GLRENDERER_SRC_GPP})
-#set_target_properties (toadlet_peeper_glrenderer PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-#add_dependencies (toadlet_peeper_glrenderer toadlet_egg toadlet_peeper)
-#install (TARGETS toadlet_peeper_glrenderer DESTINATION lib)
+add_library (toadlet_tadpole_hop ${TADPOLE_HOP_SRC_GPP})
+set_target_properties (toadlet_tadpole_hop PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+add_dependencies (toadlet_tadpole_hop toadlet_egg toadlet_hop toadlet_tadpole)
+install (TARGETS toadlet_tadpole_hop DESTINATION lib)
 
 
+# Building toadlet_pad
 
-# Generate toadlet jar
-add_library (toadlet ${EGG_SRC_GPP} ${HOP_SRC_GPP} ${KNOT_SRC_GPP} ${PEEPER_SRC_GPP} ${PEEPER_GLRENDERER_SRC_GPP} ${TADPOLE_SRC_GPP} ${TADPOLE_HOP_SRC_GPP} ${PAD_SRC_GPP})
-set_target_properties (toadlet PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-install (TARGETS toadlet DESTINATION lib)
+# Source files
+set (PAD_SRC
+	${JAVA_SRC_DIR}/pad/Application.java
+	${JAVA_SRC_DIR}/pad/ApplicationListener.java
+	${JAVA_SRC_DIR}/pad/Version.java
+)
+
+# Bundle source files
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/com/lightningtoads/toadlet/pad)
+
+# Copy over source files and run gpp
+foreach (SRCFILE ${PAD_SRC})
+	add_custom_command (
+		OUTPUT ${JAVA_GPP_DIR}/${SRCFILE}
+		COMMAND ${GPP_COMMAND} -o ${JAVA_GPP_DIR}/${SRCFILE} -I${JAVA_GPP_DIR} -I${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${SRCFILE}
+		DEPENDS ${SRCFILE}
+	)
+	set (PAD_SRC_GPP ${PAD_SRC_GPP} ${JAVA_GPP_DIR}/${SRCFILE})
+endforeach (SRCFILE)
+
+#  Jar library
+add_library (toadlet_pad ${PAD_SRC_GPP})
+set_target_properties (toadlet_pad PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+add_dependencies (toadlet_pad toadlet_egg toadlet_peeper toadlet_tadpole)
+install (TARGETS toadlet_pad DESTINATION lib)
+
+
+# Generate the all encompassing toadlet jar
+#add_library (toadlet ${EGG_SRC_GPP} ${HOP_SRC_GPP} ${KNOT_SRC_GPP} ${PEEPER_SRC_GPP} ${PEEPER_GLRENDERER_SRC_GPP} ${TADPOLE_SRC_GPP} ${TADPOLE_HOP_SRC_GPP} ${PAD_SRC_GPP})
+#set_target_properties (toadlet PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+#install (TARGETS toadlet DESTINATION lib)
 
