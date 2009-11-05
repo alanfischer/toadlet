@@ -93,10 +93,8 @@ GLRenderer::GLRenderer():
 	mMaxTexCoordIndex(0),
 	//mTexCoordIndexes,
 	//mLastTexTargets,
-
 	//mLastVertexData,
-	//mLastIndexData,
-	mLastMaxTexCoordIndex(0),
+	mLastTypeBits(0),
 	//mLastTexCoordIndexes,
 
 	mMirrorY(false),
@@ -560,7 +558,7 @@ void GLRenderer::endScene(){
 	#endif
 
 	if(mLastVertexData!=NULL){
-		setVertexData(NULL,mLastVertexData);
+		mLastTypeBits=setVertexData(NULL,mLastTypeBits);
 		mLastVertexData=VertexData::wptr();
 	}
 	if(mCapabilitySet.hardwareVertexBuffers){
@@ -641,7 +639,7 @@ void GLRenderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexDa
 		}
 	}
 	if(rebind){
-		setVertexData(vertexData,mLastVertexData);
+		mLastTypeBits=setVertexData(vertexData,mLastTypeBits);
 		mLastVertexData=vertexData;
 	}
 
@@ -673,7 +671,6 @@ void GLRenderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexDa
 		}
 		else{
 			glBindBuffer(glindexBuffer->mTarget,glindexBuffer->mHandle);
-
 			glDrawElements(type,indexData->count,indexType,(void*)(indexData->start*glindexBuffer->mIndexFormat));
 		}
 
@@ -1635,12 +1632,26 @@ GLenum GLRenderer::getGLDataType(int format){
 	}
 }
 
-void GLRenderer::setVertexData(const VertexData *vertexData,const VertexData *lastVertexData){
-	bool hasColorData=false;
+GLuint GLClientStates[6]={
+	GL_VERTEX_ARRAY,
+	0, // Blend Weights - TODO
+	0, // Blend Indices - TODO
+	GL_NORMAL_ARRAY,
+	GL_COLOR_ARRAY,
+	GL_SECONDARY_COLOR_ARRAY,
+};
 
-	int numVertexBuffers=vertexData->vertexBuffers.size();
+int GLRenderer::setVertexData(const VertexData *vertexData,int lastTypeBits){
+	int numVertexBuffers=0;
+	// Type bits are a bitfield covering all the non-texture element types,
+	//  bitwise ORed with which texture stages are enabled.
+	int typeBits=0;
 
-	int i,j;
+	if(vertexData!=NULL){
+		numVertexBuffers=vertexData->vertexBuffers.size();
+	}
+
+	int i,j,k;
 	for(i=0;i<numVertexBuffers;++i){
 		GLBuffer *glvertexBuffer=(GLBuffer*)vertexData->vertexBuffers[i]->getRootVertexBuffer();
 
@@ -1658,58 +1669,112 @@ void GLRenderer::setVertexData(const VertexData *vertexData,const VertexData *la
 		}
 
 		for(j=0;j<numVertexElements;++j){
-			GLint elementCount=glvertexBuffer->mElementCounts[j];
-			GLenum dataType=glvertexBuffer->mElementTypes[j];
-uint8 *pointer=basePointer+vertexElement.offset;
-
-			switch(vertexElement.type){
+			int type=vertexFormat->vertexElements[j].type;
+			switch(type){
 				case VertexElement::Type_POSITION:
-					glEnableClientState(GL_VERTEX_ARRAY);
-					glVertexPointer(elementCount,dataType,vertexSize,pointer);
+					typeBits|=(1<<type);
+					glVertexPointer(
+						glvertexBuffer->mElementCounts[j],
+						glvertexBuffer->mElementTypes[j],
+						vertexSize,
+						glvertexBuffer->mElementOffsets[j]);
 				break;
 				case VertexElement::Type_NORMAL:
-					glEnableClientState(GL_NORMAL_ARRAY);
-					glNormalPointer(dataType,vertexSize,pointer);
+					typeBits|=(1<<type);
+					glNormalPointer(
+						glvertexBuffer->mElementTypes[j],
+						vertexSize,
+						glvertexBuffer->mElementOffsets[j]);
 				break;
 				case VertexElement::Type_COLOR_DIFFUSE:
-					glEnableClientState(GL_COLOR_ARRAY);
-					glColorPointer(elementCount,dataType,vertexSize,pointer);
-					hasColorData=true;
+					typeBits|=(1<<type);
+					glColorPointer(
+						glvertexBuffer->mElementCounts[j],
+						glvertexBuffer->mElementTypes[j],
+						vertexSize,
+						glvertexBuffer->mElementOffsets[j]);
 				break;
-				case VertexElement::Type_TEX_COORD:
-					glClientActiveTexture(GL_TEXTURE0);
-					glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-					glTexCoordPointer(elementCount,dataType,vertexSize,pointer);
-				default:
+				case VertexElement::Type_COLOR_SPECULAR:
+					#if defined(TOADLET_HAS_GLEW)
+						if(GLEW_EXT_secondary_color){
+							typeBits|=(1<<type);
+	 						glSecondaryColorPointerEXT(
+								glvertexBuffer->mElementCounts[j],
+								glvertexBuffer->mElementTypes[j],
+								vertexSize,
+								glvertexBuffer->mElementOffsets[j]);
+						}
+					#endif
 				break;
-			}
-		}
-
-		// Bind Tex Coords separately because they depend on the texture units currently used
-		mLastMaxTexCoordIndex=mMaxTexCoordIndex;
-		for(j=0;j<mMaxTexCoordIndex;++j){
-			int texCoordSet=mTexCoordIndexes[j];
-			mLastTexCoordIndexes[j]=texCoordSet;
-
-			if(texCoordSet>=0 && texCoordSet<=vertexFormat->getMaxTexCoordIndex()){
-				const VertexElement &vertexElement=vertexFormat->getTexCoordElementByIndex(texCoordSet);
-
-				glClientActiveTexture(GL_TEXTURE0+j);
-				glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-				glTexCoordPointer(
-					getGLElementCount(vertexElement.format),
-					getGLDataType(vertexElement.format),
-					vertexSize,basePointer+vertexElement.offset);
+				default:{
+					int texCoordIndex=type-VertexElement::Type_TEX_COORD;
+					for(k=0;k<mMaxTexCoordIndex;++k){
+						if(mTexCoordIndexes[k]==texCoordIndex){
+							typeBits|=(1<<(k+VertexElement::Type_TEX_COORD));
+							glClientActiveTexture(GL_TEXTURE0+k);
+							glTexCoordPointer(
+								glvertexBuffer->mElementCounts[j],
+								glvertexBuffer->mElementTypes[j],
+								vertexSize,
+								glvertexBuffer->mElementOffsets[j]);
+							mLastTexCoordIndexes[k]=texCoordIndex;
+						}
+					}
+				}break;
 			}
 		}
 	}
 
-	if(hasColorData==false){
+	if(typeBits!=lastTypeBits){
+		// Go through all the non-texture VertexElement types, check to see if the enabling state between now and last were different.
+		//  If so check to see if the state needs to be enabled or disabled.
+		int state=0;
+		int tb=(typeBits&VertexElement::Type_MASK_NON_TEX_COORD),ltb=(lastTypeBits&VertexElement::Type_MASK_NON_TEX_COORD);
+		while(tb>0 || ltb>0){
+			if((tb&1)!=(ltb&1)){
+				if((tb&1)>(ltb&1)){
+					glEnableClientState(GLClientStates[state]);
+				}
+				else{
+					glDisableClientState(GLClientStates[state]);
+				}
+			}
+			tb>>=1;
+			ltb>>=1;
+			state++;
+		}
+
+		// Go through all used texture stages, and see if the enabling state betwen now and last were different.
+		//  If so check to see if the state needs to be enabled or disabled.
+		tb=typeBits>>VertexElement::Type_TEX_COORD;
+		ltb=lastTypeBits>>VertexElement::Type_TEX_COORD;
+		int stci; // Shifted Tex Coord Indexes
+		for(i=0;i<mMaxTexCoordIndex;++i){
+			stci=(1<<i);
+			if((tb&stci)!=(ltb&stci)){
+				glClientActiveTexture(GL_TEXTURE0+i);
+				if((tb&stci)>(ltb&stci)){
+					glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+				}
+				else{
+					glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+				}
+			}
+		}
+	}
+
+	if((typeBits&(1<<VertexElement::Type_COLOR_DIFFUSE))>0){
 		glColor4f(1.0f,1.0f,1.0f,1.0f);
 	}
+	#if defined(TOADLET_HAS_GLEW)
+		if((typeBits&(1<<VertexElement::Type_COLOR_SPECULAR))>0 && GLEW_EXT_secondary_color){
+			glSecondaryColor3fEXT(1.0f,1.0f,1.0f);
+		}
+	#endif
 
 	TOADLET_CHECK_GLERROR("setVertexData");
+
+	return typeBits;
 }
 
 }

@@ -97,11 +97,18 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr ver
 	int numVertexElements=vertexFormat->vertexElements.size();
 	mElementTypes.resize(numVertexElements);
 	mElementCounts.resize(numVertexElements);
+	mElementOffsets.resize(numVertexElements);
 	int i;
 	for(i=0;i<numVertexElements;++i){
-		int format=vertexFormat->vertexElements[i].format;
-		mElementTypes[i]=GLRenderer::getGLDataType(format);
-		mElementCounts[i]=GLRenderer::getGLDataType(format);
+		const VertexElement &element=vertexFormat->vertexElements[i];
+		mElementTypes[i]=GLRenderer::getGLDataType(element.format);
+		mElementCounts[i]=GLRenderer::getGLElementCount(element.format);
+		if(mHandle!=0){
+			mElementOffsets[i]=(uint8*)element.offset;
+		}
+		else{
+			mElementOffsets[i]=mData+element.offset;
+		}
 	}
 
 	#if defined(TOADLET_BIG_ENDIAN)

@@ -143,7 +143,7 @@ public:
 	static GLenum getGLDataType(int format);
 
 protected:
-	inline void setVertexData(const VertexData *vertexData,const VertexData *lastVertexData);
+	inline int setVertexData(const VertexData *vertexData,int lastTypeBits);
 
 	bool mShutdown;
 	int mMatrixMode;
@@ -171,10 +171,8 @@ protected:
 	unsigned short mMaxTexCoordIndex;
 	egg::Collection<short> mTexCoordIndexes;
 	egg::Collection<GLenum> mLastTexTargets;
-
 	VertexData::wptr mLastVertexData;
-	IndexData::wptr mLastIndexData;
-	unsigned short mLastMaxTexCoordIndex;
+	int mLastTypeBits;
 	egg::Collection<short> mLastTexCoordIndexes;
 
 	bool mMirrorY;

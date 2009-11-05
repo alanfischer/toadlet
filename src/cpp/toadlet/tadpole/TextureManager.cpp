@@ -47,7 +47,8 @@ Texture::ptr TextureManager::createTexture(const Image::ptr &image){
 		back->create(Texture::UsageFlags_AUTOGEN_MIPMAPS,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0);
 		texture->setBack(back);
 	}
-//	mIndexBuffers.add(indexBuffer);
+	texture->load(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),image->getData());
+	mTextures.add(texture);
 	return texture;
 }
 
@@ -59,7 +60,7 @@ Texture::ptr TextureManager::createTexture(int usageFlags,Texture::Dimension dim
 		back->create(usageFlags,dimension,format,width,height,depth,mipLevels);
 		texture->setBack(back);
 	}
-//	mIndexBuffers.add(indexBuffer);
+	mTextures.add(texture);
 	return texture;
 }
 
@@ -67,6 +68,42 @@ Image::ptr TextureManager::createImage(const Texture::ptr &texture){
 	Image::ptr image(new Image(texture->getDimension(),texture->getFormat(),texture->getWidth(),texture->getHeight(),texture->getDepth()));
 	texture->read(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),image->getData());
 	return image;
+}
+
+void TextureManager::contextActivate(peeper::Renderer *renderer){
+	int i;
+	for(i=0;i<mTextures.size();++i){
+		BackableTexture::ptr texture=mTextures[i];
+		Texture::ptr back(renderer->createTexture());
+		back->create(texture->getUsageFlags(),texture->getDimension(),texture->getFormat(),texture->getWidth(),texture->getHeight(),texture->getDepth(),0);
+		texture->setBack(back);
+	}
+}
+
+void TextureManager::contextDeactivate(peeper::Renderer *renderer){
+	int i;
+	for(i=0;i<mTextures.size();++i){
+		BackableTexture::ptr texture=mTextures[i];
+		texture->setBack(NULL);
+	}
+}
+
+void TextureManager::contextUpdate(peeper::Renderer *renderer){
+	int i;
+	for(i=0;i<mTextures.size();++i){
+		BackableTexture::ptr texture=mTextures[i];
+		if(texture->getBack()==NULL){
+			Texture::ptr back(renderer->createTexture());
+			back->create(texture->getUsageFlags(),texture->getDimension(),texture->getFormat(),texture->getWidth(),texture->getHeight(),texture->getDepth(),0);
+			texture->setBack(back);
+		}
+	}
+}
+
+void TextureManager::preContextReset(peeper::Renderer *renderer){
+}
+
+void TextureManager::postContextReset(peeper::Renderer *renderer){
 }
 
 }

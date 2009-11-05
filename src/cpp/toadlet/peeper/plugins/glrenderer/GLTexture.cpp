@@ -247,7 +247,6 @@ GLuint GLTexture::getGLTarget(){
 		#if !defined(TOADLET_HAS_GLES)
 			case Texture::Dimension_D1:
 				return GL_TEXTURE_1D;
-			break;
 		#endif
 		case Texture::Dimension_D2:
 			#if !defined(TOADLET_HAS_GLES)
@@ -260,10 +259,8 @@ GLuint GLTexture::getGLTarget(){
 		#if !defined(TOADLET_HAS_GLES)
 			case Texture::Dimension_D3:
 				return GL_TEXTURE_3D;
-			break;
 			case Texture::Dimension_CUBEMAP:
 				return GL_TEXTURE_CUBE_MAP;
-			break;
 		#endif
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
