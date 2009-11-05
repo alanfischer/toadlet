@@ -179,6 +179,5 @@ cmake java do not work well at all. Instead use the nmake
 generators an run command line builds. It is so much
 nicer to use.
 
-   "C:\Program Files\Microsoft Visual Studio 8\VC\bin\vcvars32.bat"
    cmake -G"NMake Makefiles" -DCMAKE_INSTALL_PREFIX=$HOME/toadlet/android -DTOADLET_PLATFORM_ANDROID=ON -DANDROID_JAR=$HOME/android/android.jar -DTOADLET_FIXED_POINT=ON ..
 
