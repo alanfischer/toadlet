@@ -94,3 +94,15 @@ install (FILES ${toadlet_BINARY_DIR}/src/cpp/toadlet/Config.h DESTINATION includ
 
 # Setup toadlet configure file
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Config.h.in ${CMAKE_CURRENT_BINARY_DIR}/Config.h)
+
+# Setup all versioning files
+
+
+
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/flick/Version.h ${CMAKE_CURRENT_BINARY_DIR}/flick/Version.h.in
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/hop/Version.h ${CMAKE_CURRENT_BINARY_DIR}/hop/Version.h.in
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/knot/Version.h ${CMAKE_CURRENT_BINARY_DIR}/knot/Version.h.in
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/peeper/Version.h ${CMAKE_CURRENT_BINARY_DIR}/peeper/Version.h.in
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/ribbit/Version.h ${CMAKE_CURRENT_BINARY_DIR}/ribbit/Version.h.in
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/tadpole/Version.h ${CMAKE_CURRENT_BINARY_DIR}/tadpole/Version.h.in
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/pad/Version.h ${CMAKE_CURRENT_BINARY_DIR}/pad/Version.h.in

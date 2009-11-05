@@ -1,3 +1,7 @@
+# Setup Versions
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.in ${CMAKE_CURRENT_BINARY_DIR}/Version.h
+
+
 # Source files for toadlet_peeper
 set (PEEPER_SRC
 	BackableIndexBuffer.cpp
