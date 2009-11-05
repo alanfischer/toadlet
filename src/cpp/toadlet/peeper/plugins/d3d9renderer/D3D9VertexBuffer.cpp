@@ -45,7 +45,7 @@ D3D9VertexBuffer::D3D9VertexBuffer(D3D9Renderer *renderer):
 
 	mFVF(0),
 	mD3DUsage(0),
-	mD3DPool(D3DPOOL_DEFAULT),
+	mD3DPool(D3DPOOL_SYSTEMMEM),
 	mVertexBuffer(NULL),
 	//mColorElements,
 	mLockType(AccessType_NO_ACCESS),

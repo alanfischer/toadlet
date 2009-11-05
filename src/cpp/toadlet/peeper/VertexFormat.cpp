@@ -30,7 +30,8 @@ namespace peeper{
 
 VertexFormat::VertexFormat(int numVertexElements):
 	//vertexElements,
-	vertexSize(0)
+	vertexSize(0),
+	typeBits(0)
 	//vertexElementsByType
 {
 	vertexElements.reserve(numVertexElements);
@@ -43,6 +44,7 @@ const VertexElement &VertexFormat::addVertexElement(const VertexElement &element
 	vertexElements[index].offset=vertexSize;
 
 	vertexSize+=element.getSize();
+	typeBits|=element.type;
 
 	if(element.type>=vertexElementsByType.size()){
 		vertexElementsByType.resize(element.type+1,-1);

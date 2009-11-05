@@ -117,7 +117,7 @@ bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width
 		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
 			case Texture::Dimension_D3:{
 				IDirect3DVolumeTexture9 *texture=NULL;
-				result=device->CreateVolumeTexture(mWidth,mHeight,depth,mipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
+				result=device->CreateVolumeTexture(mWidth,mHeight,mDepth,mipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
 				mTexture=texture;
 			}break;
 			case Texture::Dimension_CUBEMAP:{

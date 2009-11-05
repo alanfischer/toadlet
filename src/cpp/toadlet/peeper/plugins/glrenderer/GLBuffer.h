@@ -78,6 +78,7 @@ protected:
 	VertexFormat::ptr mVertexFormat;
 	egg::Collection<GLenum> mElementTypes;
 	egg::Collection<GLint> mElementCounts;
+	egg::Collection<uint8*> mElementOffsets;
 	short mVertexSize;
 	egg::Collection<VertexElement> mColorElements;
 

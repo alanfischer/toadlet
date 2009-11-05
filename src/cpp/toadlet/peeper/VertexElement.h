@@ -34,25 +34,29 @@ namespace peeper{
 class TOADLET_API VertexElement{
 public:
 	enum Type{
-		Type_UNKNOWN=			0,
-		Type_POSITION=			1<<0,
-		Type_BLEND_WEIGHTS=		1<<1,
-		Type_BLEND_INDICES=		1<<2,
-		Type_NORMAL=			1<<3,
-		Type_COLOR_DIFFUSE=		1<<5,
-		Type_COLOR_SPECULAR=	1<<6,
-		Type_TEX_COORD=			1<<10,
-		Type_TEX_COORD_2=		1<<11,
-		Type_TEX_COORD_3=		1<<12,
-		Type_TEX_COORD_4=		1<<13,
-		Type_TEX_COORD_5=		1<<14,
-		Type_TEX_COORD_6=		1<<15,
-		Type_TEX_COORD_7=		1<<16,
-		Type_TEX_COORD_8=		1<<17,
+		Type_UNKNOWN=			-1,
+
+		Type_POSITION=			0,
+		Type_BLEND_WEIGHTS=		1,
+		Type_BLEND_INDICES=		2,
+		Type_NORMAL=			3,
+		Type_COLOR_DIFFUSE=		4,
+		Type_COLOR_SPECULAR=	5,
+		Type_MASK_NON_TEX_COORD=0x3FF,
+
+		Type_TEX_COORD=			10,
+		Type_TEX_COORD_2=		11,
+		Type_TEX_COORD_3=		12,
+		Type_TEX_COORD_4=		13,
+		Type_TEX_COORD_5=		14,
+		Type_TEX_COORD_6=		15,
+		Type_TEX_COORD_7=		16,
+		Type_TEX_COORD_8=		17,
 	};
 
 	enum Format{
 		Format_UNKNOWN=			0,
+
 		// Format types
 		Format_BIT_UINT_8=		1<<0,
 		Format_BIT_INT_8=		1<<1,
@@ -62,7 +66,9 @@ public:
 		Format_BIT_FLOAT_32=	1<<5,
 		Format_BIT_DOUBLE_64=	1<<6,
 		Format_MASK_TYPES=		0x3FF,
+
 		// Format counts
+		Format_COUNT_SHIFT=		10,
 		Format_BIT_COUNT_1=		1<<10,
 		Format_BIT_COUNT_2=		1<<11,
 		Format_BIT_COUNT_3=		1<<12,
@@ -78,7 +84,7 @@ public:
 		offset(0)
 	{}
 
-	VertexElement(Type type1,int format1):
+	VertexElement(int type1,int format1):
 		type(type1),
 		format(format1),
 		offset(0)
@@ -95,7 +101,7 @@ public:
 	bool equals(const VertexElement &element) const;
 	inline bool operator==(const VertexElement &element) const{return equals(element);}
 
-	Type type;
+	int type;
 	int format;
 	int offset;
 };

@@ -41,9 +41,10 @@ public:
 	const VertexElement &addVertexElement(const VertexElement &element);
 	inline int getNumVertexElements() const{return vertexElements.size();}
 	inline const VertexElement &getVertexElement(int index) const{return vertexElements[index];}
+	inline bool hasVertexElementOfType(int type) const{return vertexElementsByType.size()>type && vertexElementsByType[type]!=-1;}
+	inline int getVertexElementIndexOfType(int type) const{return vertexElementsByType.size()>type ? vertexElementsByType[type] : -1;}
 	inline short getVertexSize() const{return vertexSize;}
-	inline bool hasVertexElementOfType(VertexElement::Type type) const{return vertexElementsByType.size()>type && vertexElementsByType[type]!=-1;}
-	inline int getVertexElementIndexOfType(VertexElement::Type type) const{return vertexElementsByType.size()>type ? vertexElementsByType[type] : -1;}
+	inline int getTypeBits() const{return typeBits;}
 
 	bool equals(const VertexFormat &format) const;
 	inline bool equals(const VertexFormat::ptr &format) const{return equals(*format);}
@@ -51,6 +52,7 @@ public:
 
 	egg::Collection<VertexElement> vertexElements;
 	short vertexSize;
+	int typeBits;
 	egg::Collection<short> vertexElementsByType;
 };
 

@@ -28,7 +28,7 @@
 
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/peeper/Renderer.h>
-#include <toadlet/peeper/Texture.h>
+#include <toadlet/peeper/BackableTexture.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -43,14 +43,15 @@ public:
 	peeper::Texture::ptr createTexture(int usageFlags,peeper::Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels);
 	egg::image::Image::ptr createImage(const peeper::Texture::ptr &texture);
 
-	virtual void contextActivate(peeper::Renderer *renderer){}
-	virtual void contextDeactivate(peeper::Renderer *renderer){}
-	virtual void contextUpdate(peeper::Renderer *renderer){}
-	virtual void preContextReset(peeper::Renderer *renderer){}
-	virtual void postContextReset(peeper::Renderer *renderer){}
+	virtual void contextActivate(peeper::Renderer *renderer);
+	virtual void contextDeactivate(peeper::Renderer *renderer);
+	virtual void contextUpdate(peeper::Renderer *renderer);
+	virtual void preContextReset(peeper::Renderer *renderer);
+	virtual void postContextReset(peeper::Renderer *renderer);
 
 protected:
 	Engine *mEngine;
+	egg::Collection<peeper::BackableTexture::ptr> mTextures;
 };
 
 }

@@ -35,9 +35,22 @@
 	#include <toadlet/egg/Error.h>
 #endif
 
+#if defined(TOADLET_FIXED_POINT)
+	#define TOADLET_TOFIXED(x) x
+	#define TOADLET_TOFLOAT(x) toadlet::egg::mathfixed::Math::toFloat(x)
+	#define TOADLET_FROMFIXED(x) x
+	#define TOADLET_FROMFLOAT(x) toadlet::egg::mathfixed::Math::fromFloat(x)
+#else
+	#define TOADLET_TOFIXED(x) toadlet::egg::mathfixed::Math::fromFloat(x)
+	#define TOADLET_TOFLOAT(x) x
+	#define TOADLET_FROMFIXED(x) toadlet::egg::mathfixed::Math::toFloat(x)
+	#define TOADLET_FROMFLOAT(x) x
+#endif
+
 namespace toadlet{
 namespace peeper{
 
+// TODO: Replace toFixed & toFloat with macros so they will get inlined in java
 class TOADLET_API VertexBufferAccessor{
 public:
 	VertexBufferAccessor();
@@ -55,136 +68,136 @@ public:
 	inline void set(int i,int e,scalar x){
 		i=offset(i,e);
 		if(mNativeFixed){
-			mFixedData[i]=toFixed(x);
+			mFixedData[i]=TOADLET_TOFIXED(x);
 		}
 		else{
-			mFloatData[i]=toFloat(x);
+			mFloatData[i]=TOADLET_TOFLOAT(x);
 		}
 	}
 
 	inline void set2(int i,int e,scalar x,scalar y){
 		i=offset(i,e);
 		if(mNativeFixed){
-			mFixedData[i]=toFixed(x);
-			mFixedData[i+1]=toFixed(y);
+			mFixedData[i]=TOADLET_TOFIXED(x);
+			mFixedData[i+1]=TOADLET_TOFIXED(y);
 		}
 		else{
-			mFloatData[i]=toFloat(x);
-			mFloatData[i+1]=toFloat(y);
+			mFloatData[i]=TOADLET_TOFLOAT(x);
+			mFloatData[i+1]=TOADLET_TOFLOAT(y);
 		}
 	}
 
 	inline void set3(int i,int e,scalar x,scalar y,scalar z){
 		i=offset(i,e);
 		if(mNativeFixed){
-			mFixedData[i]=toFixed(x);
-			mFixedData[i+1]=toFixed(y);
-			mFixedData[i+2]=toFixed(z);
+			mFixedData[i]=TOADLET_TOFIXED(x);
+			mFixedData[i+1]=TOADLET_TOFIXED(y);
+			mFixedData[i+2]=TOADLET_TOFIXED(z);
 		}
 		else{
-			mFloatData[i]=toFloat(x);
-			mFloatData[i+1]=toFloat(y);
-			mFloatData[i+2]=toFloat(z);
+			mFloatData[i]=TOADLET_TOFLOAT(x);
+			mFloatData[i+1]=TOADLET_TOFLOAT(y);
+			mFloatData[i+2]=TOADLET_TOFLOAT(z);
 		}
 	}
 
 	inline void set4(int i,int e,scalar x,scalar y,scalar z,scalar w){
 		i=offset(i,e);
 		if(mNativeFixed){
-			mFixedData[i]=toFixed(x);
-			mFixedData[i+1]=toFixed(y);
-			mFixedData[i+2]=toFixed(z);
-			mFixedData[i+3]=toFixed(w);
+			mFixedData[i]=TOADLET_TOFIXED(x);
+			mFixedData[i+1]=TOADLET_TOFIXED(y);
+			mFixedData[i+2]=TOADLET_TOFIXED(z);
+			mFixedData[i+3]=TOADLET_TOFIXED(w);
 		}
 		else{
-			mFloatData[i]=toFloat(x);
-			mFloatData[i+1]=toFloat(y);
-			mFloatData[i+2]=toFloat(z);
-			mFloatData[i+3]=toFloat(w);
+			mFloatData[i]=TOADLET_TOFLOAT(x);
+			mFloatData[i+1]=TOADLET_TOFLOAT(y);
+			mFloatData[i+2]=TOADLET_TOFLOAT(z);
+			mFloatData[i+3]=TOADLET_TOFLOAT(w);
 		}
 	}
 
 	inline void set2(int i,int e,scalar x[]){
 		i=offset(i,e);
 		if(mNativeFixed){
-			mFixedData[i]=toFixed(x[0]);
-			mFixedData[i+1]=toFixed(x[1]);
+			mFixedData[i]=TOADLET_TOFIXED(x[0]);
+			mFixedData[i+1]=TOADLET_TOFIXED(x[1]);
 		}
 		else{
-			mFloatData[i]=toFloat(x[0]);
-			mFloatData[i+1]=toFloat(x[1]);
+			mFloatData[i]=TOADLET_TOFLOAT(x[0]);
+			mFloatData[i+1]=TOADLET_TOFLOAT(x[1]);
 		}
 	}
 
 	inline void set3(int i,int e,scalar x[]){
 		i=offset(i,e);
 		if(mNativeFixed){
-			mFixedData[i]=toFixed(x[0]);
-			mFixedData[i+1]=toFixed(x[1]);
-			mFixedData[i+2]=toFixed(x[2]);
+			mFixedData[i]=TOADLET_TOFIXED(x[0]);
+			mFixedData[i+1]=TOADLET_TOFIXED(x[1]);
+			mFixedData[i+2]=TOADLET_TOFIXED(x[2]);
 		}
 		else{
-			mFloatData[i]=toFloat(x[0]);
-			mFloatData[i+1]=toFloat(x[1]);
-			mFloatData[i+2]=toFloat(x[2]);
+			mFloatData[i]=TOADLET_TOFLOAT(x[0]);
+			mFloatData[i+1]=TOADLET_TOFLOAT(x[1]);
+			mFloatData[i+2]=TOADLET_TOFLOAT(x[2]);
 		}
 	}
 
 	inline void set4(int i,int e,scalar x[]){
 		i=offset(i,e);
 		if(mNativeFixed){
-			mFixedData[i]=toFixed(x[0]);
-			mFixedData[i+1]=toFixed(x[1]);
-			mFixedData[i+2]=toFixed(x[2]);
-			mFixedData[i+3]=toFixed(x[3]);
+			mFixedData[i]=TOADLET_TOFIXED(x[0]);
+			mFixedData[i+1]=TOADLET_TOFIXED(x[1]);
+			mFixedData[i+2]=TOADLET_TOFIXED(x[2]);
+			mFixedData[i+3]=TOADLET_TOFIXED(x[3]);
 		}
 		else{
-			mFloatData[i]=toFloat(x[0]);
-			mFloatData[i+1]=toFloat(x[1]);
-			mFloatData[i+2]=toFloat(x[2]);
-			mFloatData[i+3]=toFloat(x[3]);
+			mFloatData[i]=TOADLET_TOFLOAT(x[0]);
+			mFloatData[i+1]=TOADLET_TOFLOAT(x[1]);
+			mFloatData[i+2]=TOADLET_TOFLOAT(x[2]);
+			mFloatData[i+3]=TOADLET_TOFLOAT(x[3]);
 		}
 	}
 
 	inline void set2(int i,int e,const Vector2 &v){
 		i=offset(i,e);
 		if(mNativeFixed){
-			mFixedData[i]=toFixed(v.x);
-			mFixedData[i+1]=toFixed(v.y);
+			mFixedData[i]=TOADLET_TOFIXED(v.x);
+			mFixedData[i+1]=TOADLET_TOFIXED(v.y);
 		}
 		else{
-			mFloatData[i]=toFloat(v.x);
-			mFloatData[i+1]=toFloat(v.y);
+			mFloatData[i]=TOADLET_TOFLOAT(v.x);
+			mFloatData[i+1]=TOADLET_TOFLOAT(v.y);
 		}
 	}
 
 	inline void set3(int i,int e,const Vector3 &v){
 		i=offset(i,e);
 		if(mNativeFixed){
-			mFixedData[i]=toFixed(v.x);
-			mFixedData[i+1]=toFixed(v.y);
-			mFixedData[i+2]=toFixed(v.z);
+			mFixedData[i]=TOADLET_TOFIXED(v.x);
+			mFixedData[i+1]=TOADLET_TOFIXED(v.y);
+			mFixedData[i+2]=TOADLET_TOFIXED(v.z);
 		}
 		else{
-			mFloatData[i]=toFloat(v.x);
-			mFloatData[i+1]=toFloat(v.y);
-			mFloatData[i+2]=toFloat(v.z);
+			mFloatData[i]=TOADLET_TOFLOAT(v.x);
+			mFloatData[i+1]=TOADLET_TOFLOAT(v.y);
+			mFloatData[i+2]=TOADLET_TOFLOAT(v.z);
 		}
 	}
 
 	inline void set4(int i,int e,const Vector4 &v){
 		i=offset(i,e);
 		if(mNativeFixed){
-			mFixedData[i]=toFixed(v.x);
-			mFixedData[i+1]=toFixed(v.y);
-			mFixedData[i+2]=toFixed(v.z);
-			mFixedData[i+3]=toFixed(v.w);
+			mFixedData[i]=TOADLET_TOFIXED(v.x);
+			mFixedData[i+1]=TOADLET_TOFIXED(v.y);
+			mFixedData[i+2]=TOADLET_TOFIXED(v.z);
+			mFixedData[i+3]=TOADLET_TOFIXED(v.w);
 		}
 		else{
-			mFloatData[i]=toFloat(v.x);
-			mFloatData[i+1]=toFloat(v.y);
-			mFloatData[i+2]=toFloat(v.z);
-			mFloatData[i+3]=toFloat(v.w);
+			mFloatData[i]=TOADLET_TOFLOAT(v.x);
+			mFloatData[i+1]=TOADLET_TOFLOAT(v.y);
+			mFloatData[i+2]=TOADLET_TOFLOAT(v.z);
+			mFloatData[i+3]=TOADLET_TOFLOAT(v.w);
 		}
 	}
 
@@ -203,94 +216,94 @@ public:
 	inline scalar get(int i,int e){
 		i=offset(i,e);
 		if(mNativeFixed){
-			return fromFixed(mFixedData[i]);
+			return TOADLET_FROMFIXED(mFixedData[i]);
 		}
 		else{
-			return fromFloat(mFloatData[i]);
+			return TOADLET_FROMFLOAT(mFloatData[i]);
 		}
 	}
 
 	inline void get2(int i,int e,scalar x[]){
 		i=offset(i,e);
 		if(mNativeFixed){
-			x[0]=fromFixed(mFixedData[i]);
-			x[1]=fromFixed(mFixedData[i+1]);
+			x[0]=TOADLET_FROMFIXED(mFixedData[i]);
+			x[1]=TOADLET_FROMFIXED(mFixedData[i+1]);
 		}
 		else{
-			x[0]=fromFloat(mFloatData[i]);
-			x[1]=fromFloat(mFloatData[i+1]);
+			x[0]=TOADLET_FROMFLOAT(mFloatData[i]);
+			x[1]=TOADLET_FROMFLOAT(mFloatData[i+1]);
 		}
 	}
 
 	inline void get3(int i,int e,scalar x[]){
 		i=offset(i,e);
 		if(mNativeFixed){
-			x[0]=fromFixed(mFixedData[i]);
-			x[1]=fromFixed(mFixedData[i+1]);
-			x[2]=fromFixed(mFixedData[i+2]);
+			x[0]=TOADLET_FROMFIXED(mFixedData[i]);
+			x[1]=TOADLET_FROMFIXED(mFixedData[i+1]);
+			x[2]=TOADLET_FROMFIXED(mFixedData[i+2]);
 		}
 		else{
-			x[0]=fromFloat(mFloatData[i]);
-			x[1]=fromFloat(mFloatData[i+1]);
-			x[2]=fromFloat(mFloatData[i+2]);
+			x[0]=TOADLET_FROMFLOAT(mFloatData[i]);
+			x[1]=TOADLET_FROMFLOAT(mFloatData[i+1]);
+			x[2]=TOADLET_FROMFLOAT(mFloatData[i+2]);
 		}
 	}
 
 	inline void get4(int i,int e,scalar x[]){
 		i=offset(i,e);
 		if(mNativeFixed){
-			x[0]=fromFixed(mFixedData[i]);
-			x[1]=fromFixed(mFixedData[i+1]);
-			x[2]=fromFixed(mFixedData[i+2]);
-			x[3]=fromFixed(mFixedData[i+3]);
+			x[0]=TOADLET_FROMFIXED(mFixedData[i]);
+			x[1]=TOADLET_FROMFIXED(mFixedData[i+1]);
+			x[2]=TOADLET_FROMFIXED(mFixedData[i+2]);
+			x[3]=TOADLET_FROMFIXED(mFixedData[i+3]);
 		}
 		else{
-			x[0]=fromFloat(mFloatData[i]);
-			x[1]=fromFloat(mFloatData[i+1]);
-			x[2]=fromFloat(mFloatData[i+2]);
-			x[3]=fromFloat(mFloatData[i+3]);
+			x[0]=TOADLET_FROMFLOAT(mFloatData[i]);
+			x[1]=TOADLET_FROMFLOAT(mFloatData[i+1]);
+			x[2]=TOADLET_FROMFLOAT(mFloatData[i+2]);
+			x[3]=TOADLET_FROMFLOAT(mFloatData[i+3]);
 		}
 	}
 
 	inline void get2(int i,int e,Vector2 &v){
 		i=offset(i,e);
 		if(mNativeFixed){
-			v.x=fromFixed(mFixedData[i]);
-			v.y=fromFixed(mFixedData[i+1]);
+			v.x=TOADLET_FROMFIXED(mFixedData[i]);
+			v.y=TOADLET_FROMFIXED(mFixedData[i+1]);
 		}
 		else{
-			v.x=fromFloat(mFloatData[i]);
-			v.y=fromFloat(mFloatData[i+1]);
+			v.x=TOADLET_FROMFLOAT(mFloatData[i]);
+			v.y=TOADLET_FROMFLOAT(mFloatData[i+1]);
 		}
 	}
 
 	inline void get3(int i,int e,Vector3 &v){
 		i=offset(i,e);
 		if(mNativeFixed){
-			v.x=fromFixed(mFixedData[i]);
-			v.y=fromFixed(mFixedData[i+1]);
-			v.z=fromFixed(mFixedData[i+2]);
+			v.x=TOADLET_FROMFIXED(mFixedData[i]);
+			v.y=TOADLET_FROMFIXED(mFixedData[i+1]);
+			v.z=TOADLET_FROMFIXED(mFixedData[i+2]);
 		}
 		else{
-			v.x=fromFloat(mFloatData[i]);
-			v.y=fromFloat(mFloatData[i+1]);
-			v.z=fromFloat(mFloatData[i+2]);
+			v.x=TOADLET_FROMFLOAT(mFloatData[i]);
+			v.y=TOADLET_FROMFLOAT(mFloatData[i+1]);
+			v.z=TOADLET_FROMFLOAT(mFloatData[i+2]);
 		}
 	}
 
 	inline void get4(int i,int e,Vector4 &v){
 		i=offset(i,e);
 		if(mNativeFixed){
-			v.x=fromFixed(mFixedData[i]);
-			v.y=fromFixed(mFixedData[i+1]);
-			v.z=fromFixed(mFixedData[i+2]);
-			v.w=fromFixed(mFixedData[i+3]);
+			v.x=TOADLET_FROMFIXED(mFixedData[i]);
+			v.y=TOADLET_FROMFIXED(mFixedData[i+1]);
+			v.z=TOADLET_FROMFIXED(mFixedData[i+2]);
+			v.w=TOADLET_FROMFIXED(mFixedData[i+3]);
 		}
 		else{
-			v.x=fromFloat(mFloatData[i]);
-			v.y=fromFloat(mFloatData[i+1]);
-			v.z=fromFloat(mFloatData[i+2]);
-			v.w=fromFloat(mFloatData[i+3]);
+			v.x=TOADLET_FROMFLOAT(mFloatData[i]);
+			v.y=TOADLET_FROMFLOAT(mFloatData[i+1]);
+			v.z=TOADLET_FROMFLOAT(mFloatData[i+2]);
+			v.w=TOADLET_FROMFLOAT(mFloatData[i+3]);
 		}
 	}
 
@@ -307,18 +320,6 @@ public:
 	}
 
 protected:
-	#if defined(TOADLET_FIXED_POINT)
-		static inline egg::mathfixed::fixed toFixed(scalar s){return s;}
-		static inline float toFloat(scalar s){return egg::mathfixed::Math::toFloat(s);}
-		static inline scalar fromFixed(egg::mathfixed::fixed x){return x;}
-		static inline scalar fromFloat(float s){return egg::mathfixed::Math::fromFloat(s);}
-	#else
-		static inline egg::mathfixed::fixed toFixed(scalar s){return egg::mathfixed::Math::fromFloat(s);}
-		static inline float toFloat(scalar s){return s;}
-		static inline scalar fromFixed(egg::mathfixed::fixed x){return egg::mathfixed::Math::toFloat(x);}
-		static inline scalar fromFloat(float s){return s;}
-	#endif
-
 	inline int offset(int vertex,int element){
 		#if defined(TOADLET_DEBUG)
 			if(vertex<0 || element<0 || (vertex*mVertexSize32 + mElementOffsets32[element])*sizeof(int32)>=(uint32)mVertexBuffer->getDataSize()){
