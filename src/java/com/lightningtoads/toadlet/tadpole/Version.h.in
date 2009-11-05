@@ -23,14 +23,11 @@
  *
  ********** Copyright header - do not remove **********/
 
-package com.lightningtoads.toadlet.peeper;
+#ifndef TOADLET_TADPOLE_VERSION_H
+#define TOADLET_TADPOLE_VERSION_H
 
-#include <com/lightningtoads/toadlet/peeper/Version.h>
+#define TOADLET_BUILD_VERSION_TADPOLE_MAJOR ${TOADLET_BUILD_VERSION_TADPOLE_MAJOR}
+#define TOADLET_BUILD_VERSION_TADPOLE_MINOR ${TOADLET_BUILD_VERSION_TADPOLE_MINOR}
+#define TOADLET_BUILD_VERSION_TADPOLE_MICRO ${TOADLET_BUILD_VERSION_TADPOLE_MICRO}
 
-public class Version{
-	public static final int MAJOR=TOADLET_BUILD_VERSION_PEEPER_MAJOR;
-	public static final int MINOR=TOADLET_BUILD_VERSION_PEEPER_MINOR;
-	public static final int MICRO=TOADLET_BUILD_VERSION_PEEPER_MICRO;
-
-	public static final String STRING=TOADLET_BUILD_VERSION_PEEPER_MAJOR+"."+TOADLET_BUILD_VERSION_PEEPER_MINOR+"."+TOADLET_BUILD_VERSION_PEEPER_MICRO;
-};
+#endif

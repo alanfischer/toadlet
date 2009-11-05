@@ -25,9 +25,7 @@
 
 package com.lightningtoads.toadlet.tadpole;
 
-#define TOADLET_BUILD_VERSION_TADPOLE_MAJOR 0
-#define TOADLET_BUILD_VERSION_TADPOLE_MINOR 1
-#define TOADLET_BUILD_VERSION_TADPOLE_MICRO 0
+#include <com/lightningtoads/toadlet/tadpole/Version.h>
 
 public class Version{
 	public static final int MAJOR=TOADLET_BUILD_VERSION_TADPOLE_MAJOR;

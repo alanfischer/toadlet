@@ -25,9 +25,7 @@
 
 package com.lightningtoads.toadlet.egg;
 
-#define TOADLET_BUILD_VERSION_EGG_MAJOR 0
-#define TOADLET_BUILD_VERSION_EGG_MINOR 1
-#define TOADLET_BUILD_VERSION_EGG_MICRO 0
+#include <com/lightningtoads/toadlet/egg/Version.h>
 
 public class Version{
 	public static final int MAJOR=TOADLET_BUILD_VERSION_EGG_MAJOR;
