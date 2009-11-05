@@ -25,9 +25,7 @@
 
 package com.lightningtoads.toadlet.pad;
 
-#define TOADLET_BUILD_VERSION_PAD_MAJOR 0
-#define TOADLET_BUILD_VERSION_PAD_MINOR 1
-#define TOADLET_BUILD_VERSION_PAD_MICRO 0
+#include <com/lightningtoads/toadlet/pad/Version.h>
 
 public class Version{
 	public static final int MAJOR=TOADLET_BUILD_VERSION_PAD_MAJOR;

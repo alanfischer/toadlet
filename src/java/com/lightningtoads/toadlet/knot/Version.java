@@ -25,9 +25,7 @@
 
 package com.lightningtoads.toadlet.knot;
 
-#define TOADLET_BUILD_VERSION_KNOT_MAJOR 0
-#define TOADLET_BUILD_VERSION_KNOT_MINOR 1
-#define TOADLET_BUILD_VERSION_KNOT_MICRO 0
+#include <com/lightningtoads/toadlet/knot/Version.h>
 
 public class Version{
 	public static final int MAJOR=TOADLET_BUILD_VERSION_KNOT_MAJOR;
