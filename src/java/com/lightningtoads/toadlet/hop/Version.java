@@ -23,14 +23,14 @@
  *
  ********** Copyright header - do not remove **********/
 
-package com.lightningtoads.toadlet.egg;
+package com.lightningtoads.toadlet.hop;
 
 #include <com/lightningtoads/toadlet/hop/Version.h>
 
 public class Version{
-	public static final int MAJOR=TOADLET_BUILD_VERSION_EGG_MAJOR;
-	public static final int MINOR=TOADLET_BUILD_VERSION_EGG_MINOR;
-	public static final int MICRO=TOADLET_BUILD_VERSION_EGG_MICRO;
+	public static final int MAJOR=TOADLET_BUILD_VERSION_HOP_MAJOR;
+	public static final int MINOR=TOADLET_BUILD_VERSION_HOP_MINOR;
+	public static final int MICRO=TOADLET_BUILD_VERSION_HOP_MICRO;
 
-	public static final String STRING=TOADLET_BUILD_VERSION_EGG_MAJOR+"."+TOADLET_BUILD_VERSION_EGG_MINOR+"."+TOADLET_BUILD_VERSION_EGG_MICRO;
+	public static final String STRING=TOADLET_BUILD_VERSION_HOP_MAJOR+"."+TOADLET_BUILD_VERSION_HOP_MINOR+"."+TOADLET_BUILD_VERSION_HOP_MICRO;
 };
