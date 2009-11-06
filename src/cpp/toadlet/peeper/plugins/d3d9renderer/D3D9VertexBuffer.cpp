@@ -45,7 +45,7 @@ D3D9VertexBuffer::D3D9VertexBuffer(D3D9Renderer *renderer):
 
 	mFVF(0),
 	mD3DUsage(0),
-	mD3DPool(D3DPOOL_SYSTEMMEM),
+	mD3DPool(D3DPOOL_MANAGED),
 	mVertexBuffer(NULL),
 	//mColorElements,
 	mLockType(AccessType_NO_ACCESS),
@@ -92,11 +92,6 @@ bool D3D9VertexBuffer::createContext(){
 			mD3DPool=D3DPOOL_DEFAULT;
 		#endif
 	}
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		else if(mRenderer->getD3DCAPS9().SurfaceCaps & D3DMSURFCAPS_VIDVERTEXBUFFER){
-			mD3DPool=D3DMPOOL_VIDEOMEM;
-		}
-	#endif
 
 	if(mAccessType==AccessType_WRITE_ONLY){
 		mD3DUsage|=D3DUSAGE_WRITEONLY;
@@ -128,7 +123,11 @@ void D3D9VertexBuffer::destroyContext(bool backData){
 }
 
 bool D3D9VertexBuffer::contextNeedsReset(){
-	return mD3DPool==D3DPOOL_DEFAULT;
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		return false;
+	#else
+		return mD3DPool==D3DPOOL_DEFAULT;
+	#endif
 }
 
 uint8 *D3D9VertexBuffer::lock(AccessType lockType){

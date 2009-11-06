@@ -50,7 +50,7 @@ void MeshPreprocess::adjustTexCoords(Mesh *mesh,float texCoordAdjust){
 
 	VertexBufferAccessor vba(vertexBuffer);
 	if(texCoordAdjust>0 && texCoordIndex>=0){
-		TOADLET_ASSERT(vertexFormat->getVertexElementOfType(VertexElement::Type_TEX_COORD).format==(VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_2));
+		TOADLET_ASSERT(vertexFormat->getVertexElement(texCoordIndex).format==(VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_2));
 
 		Collection<Collection<int> > texCoordFriends;
 		texCoordFriends.resize(vertexBuffer->getSize());

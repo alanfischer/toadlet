@@ -58,8 +58,8 @@ void VertexLighter::lightMesh(Mesh *mesh){
 			newVertexFormat->addVertexElement(vertexFormat->getVertexElement(i));
 		}
 	}
-	if(vertexFormat->hasVertexElementOfType(VertexElement::Type_COLOR)==false){
-		newVertexFormat->addVertexElement(VertexElement(VertexElement::Type_COLOR,VertexElement::Format_COLOR_RGBA,0));
+	if(vertexFormat->hasVertexElementOfType(VertexElement::Type_COLOR_DIFFUSE)==false){
+		newVertexFormat->addVertexElement(VertexElement(VertexElement::Type_COLOR_DIFFUSE,VertexElement::Format_COLOR_RGBA));
 	}
 
 	VertexBuffer::ptr newVertexBuffer=mEngine->getBufferManager()->cloneVertexBuffer(vertexBuffer,Buffer::UsageFlags_STATIC,Buffer::AccessType_READ_WRITE,newVertexFormat,vertexBuffer->getSize());

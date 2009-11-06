@@ -1638,7 +1638,11 @@ GLuint GLClientStates[6]={
 	0, // Blend Indices - TODO
 	GL_NORMAL_ARRAY,
 	GL_COLOR_ARRAY,
-	GL_SECONDARY_COLOR_ARRAY,
+	#if defined(TOADLET_HAS_GLEW)
+		GL_SECONDARY_COLOR_ARRAY,
+	#else
+		0,
+	#endif
 };
 
 int GLRenderer::setVertexData(const VertexData *vertexData,int lastTypeBits){

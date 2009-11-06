@@ -91,7 +91,7 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 	VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
 	int positionIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_POSITION);
 	int normalIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_NORMAL);
-	int colorIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_COLOR);
+	int colorIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_COLOR_DIFFUSE);
 	int texCoordIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_TEX_COORD);
 	if(texCoordIndex>=0){
 		Collection<uint8> vertHasTex;

@@ -81,8 +81,8 @@ typedef DWORD (WINAPI * PFN_HTCSensorGetDataOutput)(HANDLE, LPVOID);
 #define ORIENTATION_FACE_DOWN           4
 #define ORIENTATION_FACE_UP             5
 
-#define SN_GSENSOR          1 // TODO: Modify this value to your needs
-#define WM_STATECHANGE      (WM_USER + 1) // TODO: Modify this value to your needs
+#define SN_GSENSOR          1
+#define WM_STATECHANGE      (WM_USER + 1)
 
 // -- Notifications for gestures around the d-pad -----------------
 #define HTCAPI_DLL      L"HTCAPI.dll"
