@@ -47,7 +47,7 @@ D3D9Texture::D3D9Texture(D3D9Renderer *renderer):
 
 	mD3DFormat(D3DFMT_X8R8G8B8),
 	mD3DUsage(0),
-	mD3DPool(D3DPOOL_DEFAULT),
+	mD3DPool(D3DPOOL_MANAGED),
 	mTexture(NULL),
 	mManuallyGenerateMipLevels(false)
 {

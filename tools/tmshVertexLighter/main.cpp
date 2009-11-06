@@ -143,7 +143,7 @@ int main(int argc,char **argv){
 		VertexBuffer::ptr vertexBuffer=mesh->staticVertexData->getVertexBuffer(0);
 		VertexBufferAccessor vba(vertexBuffer);
 
-		int ci=vertexBuffer->getVertexFormat()->getVertexElementIndexOfType(VertexElement::Type_COLOR);
+		int ci=vertexBuffer->getVertexFormat()->getVertexElementIndexOfType(VertexElement::Type_COLOR_DIFFUSE);
 		TOADLET_ASSERT(ci>=0);
 
 		int j;

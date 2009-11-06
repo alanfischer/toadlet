@@ -1816,11 +1816,11 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 		VertexBuffer::ptr vertexBuffer=toadletMesh->staticVertexData->getVertexBuffer(0);
 		VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
 		int positionIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_POSITION);
-		int positionOffset=vertexFormat->getVertexElementOfType(VertexElement::Type_POSITION).offset;
+		int positionOffset=positionIndex>=0?vertexFormat->getVertexElement(positionIndex).offset:0;
 		int normalIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_NORMAL);
-		int colorIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_COLOR);
+		int colorIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_COLOR_DIFFUSE);
 		int texCoordIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_TEX_COORD);
-		int texCoordOffset=vertexFormat->getVertexElementOfType(VertexElement::Type_TEX_COORD).offset;
+		int texCoordOffset=texCoordIndex>=0?vertexFormat->getVertexElement(texCoordIndex).offset:0;
 
 		int numVertexes=vertexBuffer->getSize();
 		VertexBufferAccessor vba(vertexBuffer);

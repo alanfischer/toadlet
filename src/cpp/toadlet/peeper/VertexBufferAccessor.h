@@ -50,7 +50,6 @@
 namespace toadlet{
 namespace peeper{
 
-// TODO: Replace toFixed & toFloat with macros so they will get inlined in java
 class TOADLET_API VertexBufferAccessor{
 public:
 	VertexBufferAccessor();

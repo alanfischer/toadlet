@@ -44,7 +44,7 @@ D3D9IndexBuffer::D3D9IndexBuffer(D3D9Renderer *renderer):
 
 	mD3DFormat(D3DFMT_INDEX16),
 	mD3DUsage(0),
-	mD3DPool(D3DPOOL_DEFAULT),
+	mD3DPool(D3DPOOL_MANAGED),
 	mIndexBuffer(NULL),
 	mLockType(AccessType_NO_ACCESS),
 	mData(NULL),
@@ -92,11 +92,6 @@ bool D3D9IndexBuffer::createContext(){
 			mD3DPool=D3DPOOL_DEFAULT;
 		#endif
 	}
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		else if(mRenderer->getD3DCAPS9().SurfaceCaps & D3DMSURFCAPS_VIDVERTEXBUFFER){
-			mD3DPool=D3DMPOOL_VIDEOMEM;
-		}
-	#endif
 
 	if(mAccessType==AccessType_WRITE_ONLY){
 		mD3DUsage|=D3DUSAGE_WRITEONLY;
@@ -138,7 +133,11 @@ void D3D9IndexBuffer::destroyContext(bool backData){
 }
 
 bool D3D9IndexBuffer::contextNeedsReset(){
-	return mD3DPool==D3DPOOL_DEFAULT;
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		return false;
+	#else
+		return mD3DPool==D3DPOOL_DEFAULT;
+	#endif
 }
 
 uint8 *D3D9IndexBuffer::lock(AccessType lockType){
