@@ -26,6 +26,7 @@
 #include <toadlet/hop/Shape.h>
 #include <toadlet/hop/Solid.h>
 #include <toadlet/hop/Simulator.h>
+#include <toadlet/egg/Logger.h>
 
 namespace toadlet{
 namespace hop{
@@ -203,7 +204,7 @@ void Shape::getBound(AABox &box) const{
 							for(l=0;l<mConvexSolid.planes.size();++l){
 								if(l!=i && l!=j && l!=k){
 									const Plane &plane=mConvexSolid.planes[l];
-									if((Math::dot(plane.normal,r)-plane.d) < epsilon){
+									if((Math::dot(plane.normal,r)-plane.d) > epsilon){
 										legal=false;
 										break;
 									}

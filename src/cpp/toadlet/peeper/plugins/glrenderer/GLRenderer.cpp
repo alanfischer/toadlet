@@ -671,7 +671,7 @@ void GLRenderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexDa
 		}
 		else{
 			glBindBuffer(glindexBuffer->mTarget,glindexBuffer->mHandle);
-			glDrawElements(type,indexData->count,indexType,(void*)(indexData->start*glindexBuffer->mIndexFormat));
+			glDrawElements(type,indexData->count,indexType,(uint8*)(indexData->start*glindexBuffer->mIndexFormat));
 		}
 
 		TOADLET_CHECK_GLERROR("glDrawElements");
@@ -1677,7 +1677,6 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastTypeBits){
 			switch(type){
 				case VertexElement::Type_POSITION:
 					typeBits|=(1<<type);
-Logger::log(String("glvertexpointer:")+(int)glvertexBuffer->mElementCounts[j]+","+(int)glvertexBuffer->mElementTypes[j]+","+(int)vertexSize+","+(int)glvertexBuffer->mElementOffsets[j]);
 					glVertexPointer(
 						glvertexBuffer->mElementCounts[j],
 						glvertexBuffer->mElementTypes[j],
@@ -1729,7 +1728,7 @@ Logger::log(String("glvertexpointer:")+(int)glvertexBuffer->mElementCounts[j]+",
 			}
 		}
 	}
-/*
+
 	if(typeBits!=lastTypeBits){
 		// Go through all the non-texture VertexElement types, check to see if the enabling state between now and last were different.
 		//  If so check to see if the state needs to be enabled or disabled.
@@ -1767,8 +1766,7 @@ Logger::log(String("glvertexpointer:")+(int)glvertexBuffer->mElementCounts[j]+",
 			}
 		}
 	}
-*/
-glEnableClientState(GL_VERTEX_ARRAY);
+
 	if((typeBits&(1<<VertexElement::Type_COLOR_DIFFUSE))>0){
 		glColor4f(1.0f,1.0f,1.0f,1.0f);
 	}

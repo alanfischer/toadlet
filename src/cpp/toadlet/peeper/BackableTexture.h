@@ -58,7 +58,7 @@ public:
 	virtual bool load(int format,int width,int height,int depth,uint8 *data);
 	virtual bool read(int format,int width,int height,int depth,uint8 *data);
 
-	virtual void setBack(Texture::ptr back);
+	virtual void setBack(Texture::ptr back,bool initial=false);
 	virtual Texture::ptr getBack(){return mBack;}
 	
 protected:

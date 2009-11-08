@@ -158,7 +158,8 @@ uint8 *D3D9IndexBuffer::lock(AccessType lockType){
 	HRESULT result=mIndexBuffer->Lock(0,0,(void**)&mData,d3dflags);
 	TOADLET_CHECK_D3D9ERROR(result,"D3D9IndexBuffer: Lock");
 
-	if(mData!=NULL && mLockType!=AccessType_WRITE_ONLY && mIndexFormat==IndexFormat_UINT_8){
+	// We do this even if its write only, since the unlocking will write it back, it would get messed up if we didn't swap in all situations
+	if(mData!=NULL && mIndexFormat==IndexFormat_UINT_8){
 		// Pack the indexes
 		uint16 *data16=(uint16*)mData;
 		int i;
@@ -171,7 +172,8 @@ uint8 *D3D9IndexBuffer::lock(AccessType lockType){
 }
 
 bool D3D9IndexBuffer::unlock(){
-	if(mData!=NULL && mLockType!=AccessType_READ_ONLY && mIndexFormat==IndexFormat_UINT_8){
+	// We do this even if its read only, since we have to do it in all situations for locking
+	if(mData!=NULL && mIndexFormat==IndexFormat_UINT_8){
 		// Unpack the indexes
 		uint16 *data16=(uint16*)mData;
 		int i;
