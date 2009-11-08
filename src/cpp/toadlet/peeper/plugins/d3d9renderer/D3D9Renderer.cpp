@@ -71,19 +71,7 @@ D3D9Renderer::D3D9Renderer():
 	mPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL),
 
-	mAlphaTest(AlphaTest_NONE),
-	mAlphaCutoff(0),
-	//mBlend,
-	mDepthTest(DepthTest_NONE),
-	mDepthWrite(false),
-	mDithering(false),
 	mFaceCulling(FaceCulling_NONE),
-	mFill(Fill_SOLID),
-	mLighting(false),
-	mNormalize(Normalize_NONE),
-	mShading(Shading_SMOOTH),
-	mTexturePerspective(false),
-
 	mMirrorY(false)
 
 	//mStatisticsSet,
@@ -354,30 +342,19 @@ void D3D9Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Index
 }
 
 void D3D9Renderer::setDefaultStates(){
-	// General states
-	mAlphaTest=AlphaTest_GEQUAL;
-	mAlphaCutoff=0;
-	mDepthWrite=false;
-	mDepthTest=DepthTest_NONE;
-	mDithering=true;
-	mFaceCulling=FaceCulling_NONE;
-	mLighting=true;
-	mBlend=Blend(Blend::Combination_ALPHA);
-	mShading=Shading_FLAT;
-	mNormalize=Normalize_NONE;
-	mTexturePerspective=false;
-
 	setAlphaTest(AlphaTest_NONE,0.5);
+	setBlend(Blend::Combination_DISABLED);
 	setDepthWrite(true);
 	setDepthTest(DepthTest_LEQUAL);
 	setDithering(false);
 	setFaceCulling(FaceCulling_BACK);
 	setFogParameters(Fog_NONE,0,1.0,Colors::BLACK);
 	setLighting(false);
-	setBlend(Blend::Combination_DISABLED);
 	setShading(Shading_SMOOTH);
 	setNormalize(Normalize_RESCALE);
-	setTexturePerspective(true);
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		setTexturePerspective(true);
+	#endif
 
 	int i;
 	for(i=0;i<mCapabilitySet.maxTextureStages;++i){
@@ -396,10 +373,6 @@ void D3D9Renderer::setDefaultStates(){
 }
 
 void D3D9Renderer::setAlphaTest(const AlphaTest &alphaTest,scalar cutoff){
-	if(mAlphaTest==alphaTest && mAlphaCutoff==cutoff){
-		return;
-	}
-
 	if(alphaTest==AlphaTest_NONE){
 		mD3DDevice->SetRenderState(D3DRS_ALPHATESTENABLE,false);
 	}
@@ -432,16 +405,9 @@ void D3D9Renderer::setAlphaTest(const AlphaTest &alphaTest,scalar cutoff){
 			break;
 		}
 	}
-
-	mAlphaTest=alphaTest;
-	mAlphaCutoff=cutoff;
 }
 
 void D3D9Renderer::setBlend(const Blend &blend){
-	if(mBlend==blend){
-		return;
-	}
-
 	if(blend.equals(Blend::Combination_DISABLED)){
 		mD3DDevice->SetRenderState(D3DRS_SRCBLEND,D3DBLEND_ONE);
 		mD3DDevice->SetRenderState(D3DRS_DESTBLEND,D3DBLEND_ZERO);
@@ -456,35 +422,9 @@ void D3D9Renderer::setBlend(const Blend &blend){
 		hr=mD3DDevice->SetRenderState(D3DRS_DESTBLEND,dest);
 		TOADLET_CHECK_D3D9ERROR(hr,"setBlendFunction");
 	}
-
-	mBlend.set(blend);
-}
-
-void D3D9Renderer::setFaceCulling(const FaceCulling &culling){
-	if(mFaceCulling==culling){
-		return;
-	}
-
-	switch(culling){
-		case FaceCulling_NONE:
-			mD3DDevice->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE);
-		break;
-		case FaceCulling_FRONT:
-			mD3DDevice->SetRenderState(D3DRS_CULLMODE,mMirrorY?D3DCULL_CW:D3DCULL_CCW);
-		break;
-		case FaceCulling_BACK:
-			mD3DDevice->SetRenderState(D3DRS_CULLMODE,mMirrorY?D3DCULL_CCW:D3DCULL_CW);
-		break;
-	}
-
-	mFaceCulling=culling;
 }
 
 void D3D9Renderer::setDepthTest(const DepthTest &depthTest){
-	if(mDepthTest==depthTest){
-		return;
-	}
-
 	if(depthTest==DepthTest_NONE){
 		mD3DDevice->SetRenderState(D3DRS_ZENABLE,D3DZB_FALSE);
 	}
@@ -520,32 +460,35 @@ void D3D9Renderer::setDepthTest(const DepthTest &depthTest){
 			break;
 		}
 
-		mD3DDevice->SetRenderState(D3DRS_ZFUNC,func);
+		HRESULT hr=mD3DDevice->SetRenderState(D3DRS_ZFUNC,func);
+		TOADLET_CHECK_D3D9ERROR(hr,"setDepthTest");
 	}
-
-	mDepthTest=depthTest;
 }
 
 void D3D9Renderer::setDepthWrite(bool enable){
-	if(mDepthWrite==enable){
-		return;
-	}
-
-	mD3DDevice->SetRenderState(D3DRS_ZWRITEENABLE,enable);
-
-	mDepthWrite=enable;
+	HRESULT hr=mD3DDevice->SetRenderState(D3DRS_ZWRITEENABLE,enable);
+	TOADLET_CHECK_D3D9ERROR(hr,"setDepthWrite");
 }
 
 void D3D9Renderer::setDithering(bool dithering){
-	if(mDithering==dithering){
-		return;
+	HRESULT hr=mD3DDevice->SetRenderState(D3DRS_DITHERENABLE,dithering);
+	TOADLET_CHECK_D3D9ERROR(hr,"setDithering");
+}
+
+void D3D9Renderer::setFaceCulling(const FaceCulling &culling){
+	switch(culling){
+		case FaceCulling_NONE:
+			mD3DDevice->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE);
+		break;
+		case FaceCulling_FRONT:
+			mD3DDevice->SetRenderState(D3DRS_CULLMODE,mMirrorY?D3DCULL_CW:D3DCULL_CCW);
+		break;
+		case FaceCulling_BACK:
+			mD3DDevice->SetRenderState(D3DRS_CULLMODE,mMirrorY?D3DCULL_CCW:D3DCULL_CW);
+		break;
 	}
 
-	HRESULT result=mD3DDevice->SetRenderState(D3DRS_DITHERENABLE,dithering);
-
-	mDithering=dithering;
-
-	TOADLET_CHECK_D3D9ERROR(result,"setDithering");
+	mFaceCulling=culling;
 }
 
 void D3D9Renderer::setFogParameters(const Fog &fog,scalar nearDistance,scalar farDistance,const Color &color){
@@ -562,6 +505,27 @@ void D3D9Renderer::setFogParameters(const Fog &fog,scalar nearDistance,scalar fa
 		mD3DDevice->SetRenderState(D3DRS_FOGSTART,*(DWORD*)(&fNearDistance));
 		mD3DDevice->SetRenderState(D3DRS_FOGEND,*(DWORD*)(&fFarDistance));
 	}
+}
+
+void D3D9Renderer::setFill(const Fill &fill){
+	DWORD d3dfill;
+	if(fill==Fill_POINT){
+		d3dfill=D3DFILL_POINT;
+	}
+	else if(fill==Fill_LINE){
+		d3dfill=D3DFILL_WIREFRAME;
+	}
+	else{
+		d3dfill=D3DFILL_SOLID;
+	}
+
+	HRESULT hr=mD3DDevice->SetRenderState(D3DRS_FILLMODE,d3dfill);
+	TOADLET_CHECK_D3D9ERROR(hr,"setFill");
+}
+
+void D3D9Renderer::setLighting(bool lighting){
+	HRESULT hr=mD3DDevice->SetRenderState(D3DRS_LIGHTING,lighting);
+	TOADLET_CHECK_D3D9ERROR(hr,"setLighting");
 }
 
 void D3D9Renderer::setLightEffect(const LightEffect &lightEffect){
@@ -590,37 +554,6 @@ void D3D9Renderer::setLightEffect(const LightEffect &lightEffect){
 		mD3DDevice->SetRenderState(D3DRS_AMBIENTMATERIALSOURCE,D3DMCS_MATERIAL);
 		mD3DDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE,D3DMCS_MATERIAL);
 	}
-}
-
-void D3D9Renderer::setFill(const Fill &fill){
-	if(mFill==fill){
-		return;
-	}
-
-	DWORD d3dfill;
-	if(fill==Fill_POINT){
-		d3dfill=D3DFILL_POINT;
-	}
-	else if(fill==Fill_LINE){
-		d3dfill=D3DFILL_WIREFRAME;
-	}
-	else{
-		d3dfill=D3DFILL_SOLID;
-	}
-
-	mD3DDevice->SetRenderState(D3DRS_FILLMODE,d3dfill);
-
-	mFill=fill;
-}
-
-void D3D9Renderer::setLighting(bool lighting){
-	if(mLighting==lighting){
-		return;
-	}
-
-	mD3DDevice->SetRenderState(D3DRS_LIGHTING,lighting);
-
-	mLighting=lighting;
 }
 
 void D3D9Renderer::setDepthBias(scalar constant,scalar slope){
@@ -659,15 +592,10 @@ void D3D9Renderer::setPointParameters(bool sprite,scalar size,bool attenuated,sc
 }
 
 void D3D9Renderer::setTexturePerspective(bool texturePerspective){
-	if(mTexturePerspective==texturePerspective){
-		return;
-	}
-
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		mD3DDevice->SetRenderState(D3DMRS_TEXTUREPERSPECTIVE,texturePerspective);
+		HRESULT hr=mD3DDevice->SetRenderState(D3DMRS_TEXTUREPERSPECTIVE,texturePerspective);
+		TOADLET_CHECK_D3D9ERROR(hr,"setTexturePerspective");
 	#endif
-
-	mTexturePerspective=texturePerspective;
 }
 
 void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
@@ -787,10 +715,6 @@ void D3D9Renderer::setProgram(const Program *program){
 }
 
 void D3D9Renderer::setShading(const Shading &shading){
-	if(mShading==shading){
-		return;
-	}
-
 	switch(shading){
 		case Shading_FLAT:
 			mD3DDevice->SetRenderState(D3DRS_SHADEMODE,D3DSHADE_FLAT);
@@ -799,8 +723,6 @@ void D3D9Renderer::setShading(const Shading &shading){
 			mD3DDevice->SetRenderState(D3DRS_SHADEMODE,D3DSHADE_GOURAUD);
 		break;
 	}
-
-	mShading=shading;
 }
 
 void D3D9Renderer::setColorWrite(bool color){
@@ -816,18 +738,12 @@ void D3D9Renderer::setColorWrite(bool color){
 }
 
 void D3D9Renderer::setNormalize(const Normalize &normalize){
-	if(mNormalize==normalize){
-		return;
-	}
-
 	if(normalize!=Normalize_NONE){
 		mD3DDevice->SetRenderState(D3DRS_NORMALIZENORMALS,TRUE);
 	}
 	else{
 		mD3DDevice->SetRenderState(D3DRS_NORMALIZENORMALS,FALSE);
 	}
-
-	mNormalize=normalize;
 }
 
 void D3D9Renderer::setShadowComparisonMethod(bool enabled){
@@ -877,11 +793,13 @@ void D3D9Renderer::setLight(int i,Light *light){
 }
 
 void D3D9Renderer::setLightEnabled(int i,bool enable){
-	mD3DDevice->LightEnable(i,enable);
+	HRESULT hr=mD3DDevice->LightEnable(i,enable);
+	TOADLET_CHECK_D3D9ERROR(hr,"setLightEnabled");
 }
 
 void D3D9Renderer::setAmbientColor(const Color &ambient){
-	mD3DDevice->SetRenderState(D3DRS_AMBIENT,toD3DCOLOR(ambient));
+	HRESULT hr=mD3DDevice->SetRenderState(D3DRS_AMBIENT,toD3DCOLOR(ambient));
+	TOADLET_CHECK_D3D9ERROR(hr,"setAmbientColor");
 }
 
 void D3D9Renderer::setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D3DCAPS9 &caps,bool renderToTexture,bool renderToDepthTexture){

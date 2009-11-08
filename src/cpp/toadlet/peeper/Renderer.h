@@ -151,14 +151,14 @@ public:
 	virtual void setDefaultStates()=0;
 	virtual void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff)=0;
 	virtual void setBlend(const Blend &blend)=0;
-	virtual void setFaceCulling(const FaceCulling &faceCulling)=0;
 	virtual void setDepthTest(const DepthTest &depthTest)=0;
 	virtual void setDepthWrite(bool depthWrite)=0;
 	virtual void setDithering(bool dithering)=0;
+	virtual void setFaceCulling(const FaceCulling &faceCulling)=0;
 	virtual void setFogParameters(const Fog &fog,scalar nearDistance,scalar farDistance,const Color &color)=0;
+	virtual void setLighting(bool lighting)=0;
 	virtual void setLightEffect(const LightEffect &lightEffect)=0;
 	virtual void setFill(const Fill &fill)=0;
-	virtual void setLighting(bool lighting)=0;
 	virtual void setShading(const Shading &shading)=0;
 	virtual void setColorWrite(bool color)=0;
 	virtual void setNormalize(const Normalize &normalize)=0;

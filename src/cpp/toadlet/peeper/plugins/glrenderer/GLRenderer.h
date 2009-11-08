@@ -87,10 +87,10 @@ public:
 	void setDefaultStates();
 	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff);
 	void setBlend(const Blend &blend);
-	void setFaceCulling(const FaceCulling &faceCulling);
 	void setDepthTest(const DepthTest &depthTest);
 	void setDepthWrite(bool depthWrite);
 	void setDithering(bool dithering);
+	void setFaceCulling(const FaceCulling &faceCulling);
 	void setFogParameters(const Fog &fog,scalar nearDistance,scalar farDistance,const Color &color);
 	void setLightEffect(const LightEffect &lightEffect);
 	void setFill(const Fill &fill);
@@ -143,37 +143,22 @@ public:
 protected:
 	inline int setVertexData(const VertexData *vertexData,int lastTypeBits);
 
-	bool mShutdown;
 	int mMatrixMode;
 
 	bool mPBuffersAvailable;
 	bool mFBOsAvailable;
 
 	// Cached render state attributes
-	AlphaTest mAlphaTest;
-	scalar mAlphaCutoff;
-	Blend mBlend;
-	DepthTest mDepthTest;
-	bool mDepthWrite;
-	bool mDithering;
 	FaceCulling mFaceCulling;
-	Fill mFill;
-	bool mLighting;
-	Normalize mNormalize;
-	Shading mShading;
-	bool mTexturePerspective;
 	bool mInTexGen;
-
+	bool mMirrorY;
 	egg::Collection<Texture*> mLastTextures;
-
 	unsigned short mMaxTexCoordIndex;
 	egg::Collection<short> mTexCoordIndexes;
 	egg::Collection<GLenum> mLastTexTargets;
 	VertexData::wptr mLastVertexData;
 	int mLastTypeBits;
 	egg::Collection<short> mLastTexCoordIndexes;
-
-	bool mMirrorY;
 
 	#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
 		egg::mathfixed::Matrix4x4 mModelMatrix;

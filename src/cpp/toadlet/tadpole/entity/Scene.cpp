@@ -321,10 +321,9 @@ void Scene::render(Renderer *renderer,CameraEntity *camera){
 		renderer->clear(clearFlags,mCamera->getClearColor());
 	}
 
+	renderer->setDefaultStates();
 	renderer->setProjectionMatrix(mCamera->mProjectionTransform);
-
 	renderer->setViewMatrix(mCamera->mViewTransform);
-
 	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
 
 	// TODO: Gather lights in queueRenderables
