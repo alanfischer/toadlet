@@ -114,6 +114,12 @@ public:
 	virtual void setCoefficientOfEffectiveDrag(scalar coeff);
 	virtual scalar getCoefficientOfEffectiveDrag() const{return mSolid->getCoefficientOfEffectiveDrag();}
 
+	virtual void addShape(hop::Shape::ptr shape);
+	virtual void removeShape(hop::Shape *shape);
+	virtual void removeAllShapes();
+	virtual hop::Shape::ptr getShape(int i) const{return mSolid->getShape(i);}
+	virtual int getNumShapes() const{return mSolid->getNumShapes();}
+
 	inline HopScene::ptr getScene() const{return mScene;}
 	inline hop::Solid::ptr getSolid() const{return mSolid;}
 	virtual HopEntity::ptr getTouching() const;
@@ -139,11 +145,15 @@ public:
 
 	virtual void collision(const hop::Collision &c);
 
-protected:
+//protected:
 	virtual void preLogicUpdateLoop(int dt);
 	virtual void postLogicUpdate(int dt);
 	virtual void interpolatePhysicalParameters(scalar f);
+
+protected:
 	virtual void castShadow();
+	virtual void showCollisionVolumes(bool show);
+	virtual void updateVolumes(bool interpolate);
 
 	int mNextThink;
 	hop::Solid::ptr mSolid;
@@ -161,6 +171,8 @@ protected:
 	Mesh::ptr mShadowMesh;
 	Material::ptr mShadowMaterial;
 	entity::MeshEntity::ptr mShadowEntity;
+
+	entity::ParentEntity::ptr mVolumeNode;
 
 	Vector3 cache_setVelocity_velocity;
 	Vector3 cache_interpolatePhysicalParameters_interpolate;

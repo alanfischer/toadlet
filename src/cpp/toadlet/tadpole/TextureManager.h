@@ -35,7 +35,7 @@ namespace tadpole{
 
 class Engine;
 
-class TextureManager:public ResourceManager{
+class TOADLET_API TextureManager:public ResourceManager{
 public:
 	TextureManager(Engine *engine);
 

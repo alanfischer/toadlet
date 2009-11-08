@@ -99,7 +99,7 @@ void BackableIndexBuffer::setBack(IndexBuffer::ptr back){
 	mBack=back;
 	
 	if(mBack!=NULL && mData!=NULL){
-		uint8 *backData=mBack->lock(AccessType_READ_ONLY);
+		uint8 *backData=mBack->lock(AccessType_WRITE_ONLY);
 		memcpy(backData,mData,mDataSize);
 		mBack->unlock();
 		delete[] mData;

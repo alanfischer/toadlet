@@ -66,7 +66,7 @@ bool D3D9IndexBuffer::create(int usageFlags,AccessType accessType,IndexFormat in
 	mSize=size;
 	mIndexFormat=indexFormat;
 	mDataSize=mIndexFormat*mSize;
-	if(indexFormat==IndexFormat_UINT_8) mDataSize*=2;
+	if(mIndexFormat==IndexFormat_UINT_8) mDataSize*=2;
 	mD3DFormat=getD3DFORMAT(mIndexFormat);
 
 	createContext();

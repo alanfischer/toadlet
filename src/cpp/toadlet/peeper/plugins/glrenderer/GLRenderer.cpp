@@ -289,7 +289,7 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 
 	setDefaultStates();
 
-	TOADLET_CHECK_GLERROR("startup");
+	TOADLET_CHECK_GLERROR("create");
 
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
 		"created GLRenderer");
@@ -787,7 +787,7 @@ void GLRenderer::setBlend(const Blend &blend){
 
 	mBlend.set(blend);
 
-	TOADLET_CHECK_GLERROR("setBlendFunction");
+	TOADLET_CHECK_GLERROR("setBlend");
 }
 
 void GLRenderer::setFaceCulling(const FaceCulling &faceCulling){
@@ -1107,7 +1107,7 @@ void GLRenderer::setPointParameters(bool sprite,scalar size,bool attenuated,scal
 		}
 	#endif
 
-	TOADLET_CHECK_GLERROR("setPointSprite");
+	TOADLET_CHECK_GLERROR("setPointParameters");
 }
 
 void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
@@ -1677,6 +1677,7 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastTypeBits){
 			switch(type){
 				case VertexElement::Type_POSITION:
 					typeBits|=(1<<type);
+Logger::log(String("glvertexpointer:")+(int)glvertexBuffer->mElementCounts[j]+","+(int)glvertexBuffer->mElementTypes[j]+","+(int)vertexSize+","+(int)glvertexBuffer->mElementOffsets[j]);
 					glVertexPointer(
 						glvertexBuffer->mElementCounts[j],
 						glvertexBuffer->mElementTypes[j],
@@ -1728,7 +1729,7 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastTypeBits){
 			}
 		}
 	}
-
+/*
 	if(typeBits!=lastTypeBits){
 		// Go through all the non-texture VertexElement types, check to see if the enabling state between now and last were different.
 		//  If so check to see if the state needs to be enabled or disabled.
@@ -1766,7 +1767,8 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastTypeBits){
 			}
 		}
 	}
-
+*/
+glEnableClientState(GL_VERTEX_ARRAY);
 	if((typeBits&(1<<VertexElement::Type_COLOR_DIFFUSE))>0){
 		glColor4f(1.0f,1.0f,1.0f,1.0f);
 	}

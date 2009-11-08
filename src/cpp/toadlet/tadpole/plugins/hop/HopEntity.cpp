@@ -211,6 +211,30 @@ void HopEntity::setCoefficientOfEffectiveDrag(scalar coeff){
 	mModifiedFields|=ENTITY_BIT_CO_EFFECTIVEDRAG;
 }
 
+void HopEntity::addShape(hop::Shape::ptr shape){
+	mSolid->addShape(shape);
+
+	if(mVolumeNode!=NULL){
+		showCollisionVolumes(true);
+	}
+}
+
+void HopEntity::removeShape(Shape *shape){
+	mSolid->removeShape(shape);
+
+	if(mVolumeNode!=NULL){
+		showCollisionVolumes(true);
+	}
+}
+
+void HopEntity::removeAllShapes(){
+	mSolid->removeAllShapes();
+
+	if(mVolumeNode!=NULL){
+		showCollisionVolumes(true);
+	}
+}
+
 HopEntity::ptr HopEntity::getTouching() const{
 	HopEntity::ptr ent;
 	Solid *solid=mSolid->getTouching();
@@ -353,6 +377,63 @@ void HopEntity::castShadow(){
 	else{
 		LightEffect le(Colors::TRANSPARENT_BLACK);
 		mShadowMaterial->setLightEffect(le);
+	}
+}
+
+void HopEntity::showCollisionVolumes(bool show){
+	if(show){
+		if(mVolumeNode==NULL){
+			mVolumeNode=(ParentEntity*)((new ParentEntity())->create(mEngine));
+			mScene->attach(mVolumeNode);
+		}
+		else{
+			while(mVolumeNode->getNumChildren()>0){
+				mVolumeNode->remove(mVolumeNode->getChild(0));
+			}
+		}
+
+		int i;
+		for(i=0;i<mSolid->getNumShapes();++i){
+			Mesh::ptr mesh;
+
+			Shape *shape=mSolid->getShape(i);
+			switch(shape->getType()){
+				case Shape::Type_AABOX:
+					mesh=mEngine->getMeshManager()->createBox(shape->getAABox());
+				break;
+				case Shape::Type_SPHERE:
+					mesh=mEngine->getMeshManager()->createSphere(shape->getSphere());
+				break;
+				default:{
+					AABox box;
+					shape->getBound(box);
+					mesh=mEngine->getMeshManager()->createBox(box);
+				}break;
+			}
+
+//			mesh->subMeshes[0]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,mesh->subMeshes[0]->indexData->indexBuffer));
+
+			MeshEntity *meshNode=(MeshEntity*)(new MeshEntity)->create(mEngine);
+			meshNode->load(mesh);
+			mVolumeNode->attach(meshNode);
+		}
+	}
+	else{
+		if(mVolumeNode!=NULL){
+			mVolumeNode->destroy();
+			mVolumeNode=NULL;
+		}
+	}
+}
+
+void HopEntity::updateVolumes(bool interpolate){
+	if(interpolate){
+		Vector3 translate;
+		Math::setVector3FromMatrix4x4(translate,mVisualTransform);
+		mVolumeNode->setTranslate(translate);
+	}
+	else{
+		mVolumeNode->setTranslate(getTranslate());
 	}
 }
 

@@ -36,7 +36,7 @@ namespace tadpole{
 
 class Engine;
 
-class MeshManager:public ResourceManager{
+class TOADLET_API MeshManager:public ResourceManager{
 public:
 	MeshManager(Engine *engine);
 

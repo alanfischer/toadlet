@@ -187,7 +187,7 @@ void Shape::getBound(AABox &box) const{
 		case Type_CONVEXSOLID:
 		{
 			Vector3 &r=const_cast<Vector3&>(cache_getBound_r);
-			int i,j,k;
+			int i,j,k,l;
 			scalar epsilon;
 			#if defined(TOADLET_FIXED_POINT)
 				epsilon=1<<4;
@@ -196,24 +196,37 @@ void Shape::getBound(AABox &box) const{
 			#endif
 			box.reset();
 			for(i=0;i<mConvexSolid.planes.size()-2;++i){
-				for(j=i+1;j<mConvexSolid.planes.size()-2;++j){
-					for(k=j+1;k<mConvexSolid.planes.size()-2;++k){
+				for(j=i+1;j<mConvexSolid.planes.size()-1;++j){
+					for(k=j+1;k<mConvexSolid.planes.size();++k){
 						if(Math::getIntersectionOfThreePlanes(r,mConvexSolid.planes[i],mConvexSolid.planes[j],mConvexSolid.planes[k],epsilon)){
-							if(i==0 && j==1 && k==2){
-								box.mins.x=r.x;
-								box.maxs.x=r.x;
-								box.mins.y=r.y;
-								box.maxs.y=r.y;
-								box.mins.z=r.z;
-								box.maxs.z=r.z;
+							bool legal=true;
+							for(l=0;l<mConvexSolid.planes.size();++l){
+								if(l!=i && l!=j && l!=k){
+									const Plane &plane=mConvexSolid.planes[l];
+									if((Math::dot(plane.normal,r)-plane.d) < epsilon){
+										legal=false;
+										break;
+									}
+								}
 							}
-							else{
-								if(r.x<box.mins.x) box.mins.x=r.x;
-								if(r.x>box.maxs.x) box.maxs.x=r.x;
-								if(r.y<box.mins.y) box.mins.y=r.y;
-								if(r.y>box.maxs.y) box.maxs.y=r.y;
-								if(r.z<box.mins.z) box.mins.z=r.z;
-								if(r.z>box.maxs.z) box.maxs.z=r.z;
+
+							if(legal){
+								if(i==0 && j==1 && k==2){
+									box.mins.x=r.x;
+									box.maxs.x=r.x;
+									box.mins.y=r.y;
+									box.maxs.y=r.y;
+									box.mins.z=r.z;
+									box.maxs.z=r.z;
+								}
+								else{
+									if(r.x<box.mins.x) box.mins.x=r.x;
+									if(r.x>box.maxs.x) box.maxs.x=r.x;
+									if(r.y<box.mins.y) box.mins.y=r.y;
+									if(r.y>box.maxs.y) box.maxs.y=r.y;
+									if(r.z<box.mins.z) box.mins.z=r.z;
+									if(r.z>box.maxs.z) box.maxs.z=r.z;
+								}
 							}
 						}	
 					}

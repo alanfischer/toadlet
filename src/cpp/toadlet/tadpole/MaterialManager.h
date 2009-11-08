@@ -32,7 +32,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class MaterialManager:public ResourceManager{
+class TOADLET_API MaterialManager:public ResourceManager{
 public:
 	MaterialManager(egg::io::InputStreamFactory *inputStreamFactory,ResourceManager *textureManager);
 

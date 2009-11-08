@@ -94,23 +94,6 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr ver
 	mTarget=GL_ARRAY_BUFFER;
 	createContext();
 
-	int numVertexElements=vertexFormat->vertexElements.size();
-	mElementTypes.resize(numVertexElements);
-	mElementCounts.resize(numVertexElements);
-	mElementOffsets.resize(numVertexElements);
-	int i;
-	for(i=0;i<numVertexElements;++i){
-		const VertexElement &element=vertexFormat->vertexElements[i];
-		mElementTypes[i]=GLRenderer::getGLDataType(element.format);
-		mElementCounts[i]=GLRenderer::getGLElementCount(element.format);
-		if(mHandle!=0){
-			mElementOffsets[i]=(uint8*)element.offset;
-		}
-		else{
-			mElementOffsets[i]=mData+element.offset;
-		}
-	}
-
 	#if defined(TOADLET_BIG_ENDIAN)
 		int i;
 		for(i=0;i<mVertexFormat->vertexElements.size();++i){
@@ -131,7 +114,24 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr ver
 		mData=new uint8[mDataSize];
 		mBacking=true;
 	}
-	
+
+	int numVertexElements=mVertexFormat->vertexElements.size();
+	mElementTypes.resize(numVertexElements);
+	mElementCounts.resize(numVertexElements);
+	mElementOffsets.resize(numVertexElements);
+	int i;
+	for(i=0;i<numVertexElements;++i){
+		const VertexElement &element=mVertexFormat->vertexElements[i];
+		mElementTypes[i]=GLRenderer::getGLDataType(element.format);
+		mElementCounts[i]=GLRenderer::getGLElementCount(element.format);
+		if(mHandle!=0){
+			mElementOffsets[i]=(uint8*)element.offset;
+		}
+		else{
+			mElementOffsets[i]=mData+element.offset;
+		}
+	}
+
 	return true;
 }
 
@@ -142,6 +142,10 @@ void GLBuffer::destroy(){
 		delete[] mData;
 		mData=NULL;
 	}
+
+	mElementTypes.clear();
+	mElementCounts.clear();
+	mElementOffsets.clear();
 }
 
 bool GLBuffer::createContext(){
@@ -228,6 +232,8 @@ uint8 *GLBuffer::lock(AccessType accessType){
 		}
 	#endif
 
+	TOADLET_CHECK_GLERROR("lock");
+
 	return mData;
 }
 
@@ -252,10 +258,12 @@ bool GLBuffer::unlock(){
 		}
 		else
 	#endif
-	{
+	if(mHandle!=0){
 		glBindBuffer(mTarget,mHandle);
 		glBufferSubData(mTarget,0,mDataSize,mData);
 	}
+
+	TOADLET_CHECK_GLERROR("unlock");
 
 	return true;
 }
