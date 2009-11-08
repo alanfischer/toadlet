@@ -23,20 +23,22 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/MeshSkeleton.h>
+#include <toadlet/tadpole/mesh/Skeleton.h>
 
 namespace toadlet{
 namespace tadpole{
+namespace mesh{
 
-MeshSkeleton::MeshSkeleton(){
+Skeleton::Skeleton(){
 }
 
-MeshSkeleton::~MeshSkeleton(){
+Skeleton::~Skeleton(){
 }
 
-void MeshSkeleton::compile(){
+void Skeleton::compile(){
 	// Currently does nothing
 }
 
+}
 }
 }

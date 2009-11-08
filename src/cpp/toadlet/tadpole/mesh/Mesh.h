@@ -23,27 +23,19 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_MESH_H
-#define TOADLET_TADPOLE_MESH_H
+#ifndef TOADLET_TADPOLE_MESH_MESH_H
+#define TOADLET_TADPOLE_MESH_MESH_H
 
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/egg/Resource.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
-#include <toadlet/tadpole/MeshSkeleton.h>
+#include <toadlet/tadpole/Mesh/Skeleton.h>
 
 namespace toadlet{
 namespace tadpole{
-
-/// @todo:  Move Mesh to mesh::Mesh, MeshSkeleton to mesh::Skeleton and MeshSkeletonSequence to mesh::Sequence
-///  And possibly MeshEntitySkeleton to something else, but not sure what.
-///  This would let the 'toadlet mesh' system be more separate, so if a users wishes to replace it or integrate a new
-///   mesh system, it would be easier.
-
-/// @todo: Replace Mesh::SubMesh::material/materialName & TextureStage::texture/textureName with a "dummy resource?"
-///  Bonus: If it was a reloadable resource, then it could even just load up dummy resources in place and load in the full
-///   when the system gets to it.
+namespace mesh{
 
 class TOADLET_API Mesh:public egg::Resource{
 public:
@@ -93,10 +85,11 @@ public:
 	egg::Collection<SubMesh::ptr> subMeshes;
 	peeper::VertexData::ptr staticVertexData;
 
-	MeshSkeleton::ptr skeleton;
+	Skeleton::ptr skeleton;
 	egg::Collection<VertexBoneAssignmentList> vertexBoneAssignments;
 };
 
+}
 }
 }
 
