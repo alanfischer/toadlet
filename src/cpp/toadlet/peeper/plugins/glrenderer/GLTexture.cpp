@@ -214,7 +214,8 @@ bool GLTexture::read(int format,int width,int height,int depth,uint8 *data){
 		GLint glformat=getGLFormat(format);
 		GLint gltype=getGLType(format);
 
-		glGetTexImage(mTarget,0,glformat,gltype,data);
+		// TODO: This seems to crash on some ATI cards.  Either fix it, or disable it
+		//glGetTexImage(mTarget,0,glformat,gltype,data);
 
 		return true;
 	#else

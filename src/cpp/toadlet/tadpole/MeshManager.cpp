@@ -38,19 +38,19 @@ MeshManager::MeshManager(Engine *engine):ResourceManager(engine){
 }
 
 Mesh::ptr MeshManager::createBox(const AABox &box){
-	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_COLOR,8);
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,8);
 	{
 		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
 
 		int i=0;
-		vba.set3(i,0,box.mins.x,box.mins.y,box.mins.z); vba.setRGBA(i,1,0xFF0000FF); i++;
-		vba.set3(i,0,box.maxs.x,box.mins.y,box.mins.z); vba.setRGBA(i,1,0x00FF00FF); i++;
-		vba.set3(i,0,box.mins.x,box.maxs.y,box.mins.z); vba.setRGBA(i,1,0x0000FFFF); i++;
-		vba.set3(i,0,box.maxs.x,box.maxs.y,box.mins.z); vba.setRGBA(i,1,0xFFFF00FF); i++;
-		vba.set3(i,0,box.mins.x,box.mins.y,box.maxs.z); vba.setRGBA(i,1,0xFF00FFFF); i++;
-		vba.set3(i,0,box.maxs.x,box.mins.y,box.maxs.z); vba.setRGBA(i,1,0x00FFFFFF); i++;
-		vba.set3(i,0,box.mins.x,box.maxs.y,box.maxs.z); vba.setRGBA(i,1,0xFFFFFFFF); i++;
-		vba.set3(i,0,box.maxs.x,box.maxs.y,box.maxs.z); vba.setRGBA(i,1,0x000000FF); i++;
+		vba.set3(i,0,box.mins.x,box.mins.y,box.mins.z); vba.set3(i,1,Math::Z_UNIT_VECTOR3); vba.set2(i,2,Math::ZERO_VECTOR2); ++i;
+		vba.set3(i,0,box.maxs.x,box.mins.y,box.mins.z); vba.set3(i,1,Math::Z_UNIT_VECTOR3); vba.set2(i,2,Math::ZERO_VECTOR2); ++i;
+		vba.set3(i,0,box.mins.x,box.maxs.y,box.mins.z); vba.set3(i,1,Math::Z_UNIT_VECTOR3); vba.set2(i,2,Math::ZERO_VECTOR2); ++i;
+		vba.set3(i,0,box.maxs.x,box.maxs.y,box.mins.z); vba.set3(i,1,Math::Z_UNIT_VECTOR3); vba.set2(i,2,Math::ZERO_VECTOR2); ++i;
+		vba.set3(i,0,box.mins.x,box.mins.y,box.maxs.z); vba.set3(i,1,Math::Z_UNIT_VECTOR3); vba.set2(i,2,Math::ZERO_VECTOR2); ++i;
+		vba.set3(i,0,box.maxs.x,box.mins.y,box.maxs.z); vba.set3(i,1,Math::Z_UNIT_VECTOR3); vba.set2(i,2,Math::ZERO_VECTOR2); ++i;
+		vba.set3(i,0,box.mins.x,box.maxs.y,box.maxs.z); vba.set3(i,1,Math::Z_UNIT_VECTOR3); vba.set2(i,2,Math::ZERO_VECTOR2); ++i;
+		vba.set3(i,0,box.maxs.x,box.maxs.y,box.maxs.z); vba.set3(i,1,Math::Z_UNIT_VECTOR3); vba.set2(i,2,Math::ZERO_VECTOR2); ++i;
 
 		vba.unlock();
 	}
@@ -61,34 +61,35 @@ Mesh::ptr MeshManager::createBox(const AABox &box){
 
 		int i=0;
 		// Bottom
-		iba.set(i++,2);	iba.set(i++,1); iba.set(i++,0);
 		iba.set(i++,3);	iba.set(i++,1); iba.set(i++,2);
+		iba.set(i++,2);	iba.set(i++,1); iba.set(i++,0);
 
-		// Top
-		iba.set(i++,4); iba.set(i++,5); iba.set(i++,6);
-		iba.set(i++,6); iba.set(i++,5); iba.set(i++,7);
+		// Back
+		iba.set(i++,7); iba.set(i++,3); iba.set(i++,6);
+		iba.set(i++,6); iba.set(i++,3); iba.set(i++,2);
 
 		// Left
-		iba.set(i++,4);	iba.set(i++,2); iba.set(i++,0);
 		iba.set(i++,6);	iba.set(i++,2); iba.set(i++,4);
-
-		// Right
-		iba.set(i++,1);	iba.set(i++,3); iba.set(i++,5);
-		iba.set(i++,5);	iba.set(i++,3);	iba.set(i++,7);
+		iba.set(i++,4);	iba.set(i++,2); iba.set(i++,0);
 
 		// Front
 		iba.set(i++,0);	iba.set(i++,1);	iba.set(i++,4);
 		iba.set(i++,4);	iba.set(i++,1);	iba.set(i++,5);
 
-		// Back
-		iba.set(i++,6); iba.set(i++,3); iba.set(i++,2);
-		iba.set(i++,7); iba.set(i++,3); iba.set(i++,6);
+		// Right
+		iba.set(i++,1);	iba.set(i++,3); iba.set(i++,5);
+		iba.set(i++,5);	iba.set(i++,3);	iba.set(i++,7);
+
+		// Top
+		iba.set(i++,4); iba.set(i++,5); iba.set(i++,6);
+		iba.set(i++,6); iba.set(i++,5); iba.set(i++,7);
 	}
 
 	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
 	subMesh->material=Material::ptr(new Material());
 	subMesh->material->setFaceCulling(Renderer::FaceCulling_BACK);
+	subMesh->material->setLighting(true);
 
 	Mesh::ptr mesh(new Mesh());
 	mesh->subMeshes.resize(1);
@@ -210,7 +211,6 @@ Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded){
 Mesh::ptr MeshManager::createSphere(const Sphere &sphere,int numSegments,int numRings){
 	int numVertexes=(numRings+1)*(numSegments+1);
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,numVertexes);
-
 	int numIndexes=6*numRings*(numSegments+1);
 	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,numIndexes);
 

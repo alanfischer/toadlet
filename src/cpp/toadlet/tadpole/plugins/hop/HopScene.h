@@ -66,11 +66,9 @@ public:
 
 	virtual void setHopEntityFactory(HopEntityFactory *factory);
 
-	virtual void setRenderCollisionVolumes(bool volumes,bool interpolate,int layer);
+	virtual void showCollisionVolumes(bool show,bool interpolate);
 
 	inline hop::Simulator *getSimulator(){return mSimulator;}
-
-	virtual bool postLayerRender(peeper::Renderer *renderer,int layer);
 
 	virtual entity::ParticleEntity::ParticleSimulator::ptr newParticleSimulator(entity::ParticleEntity *particleEntity);
 	virtual void registerHopEntity(HopEntity *entity);
@@ -90,6 +88,8 @@ protected:
 	void castShadow(peeper::Renderer *renderer,HopEntity *entity);
 
 	egg::Collection<HopEntity*> mHopEntities;
+	bool mShowCollisionVolumes;
+	bool mInterpolateCollisionVolumes;
 
 	int mExcessiveDT;
 	hop::Simulator *mSimulator;
@@ -99,14 +99,6 @@ protected:
 	HopEntityFactory *mHopEntityFactory;
 
 	egg::Collection<hop::Solid*> mSolidCollection;
-
-	bool mRenderCollisionVolumes;
-	bool mInterpolateCollisionVolumes;
-	peeper::VertexData::ptr mCollisionVolumeVertexData;
-	peeper::IndexData::ptr mCollisionVolumeIndexData;
-	int mCollisionVolumeLayer;
-	Matrix4x4 mCollisionVolumeMatrix;
-	Material::ptr mCollisionVolumeMaterial;
 
 	friend class HopEntity;
 };

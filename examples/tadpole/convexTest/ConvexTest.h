@@ -19,9 +19,6 @@ public:
 protected:
 	void setupTest();
 
-	static toadlet::tadpole::Mesh::ptr makeConvexSolid(toadlet::tadpole::Engine *engine);
-	static toadlet::tadpole::Mesh::ptr makeSphere(toadlet::tadpole::Engine *engine,int bandPower);
-
 	toadlet::tadpole::HopScene::ptr mScene;
 	toadlet::tadpole::entity::CameraEntity::ptr mCamera;
 	toadlet::tadpole::entity::ParentEntity::ptr mNode;
