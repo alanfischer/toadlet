@@ -28,12 +28,12 @@
 
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
-#include <toadlet/tadpole/Mesh.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/entity/RenderableEntity.h>
 #include <toadlet/tadpole/entity/MeshEntitySkeleton.h>
 #include <toadlet/tadpole/animation/AnimationController.h>
 #include <toadlet/tadpole/animation/SkeletonAnimation.h>
+#include <toadlet/tadpole/mesh/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -49,7 +49,7 @@ public:
 	public:
 		TOADLET_SHARED_POINTERS(SubMesh,Renderable);
 
-		SubMesh(MeshEntity *meshEntity,Mesh::SubMesh *meshSubMesh);
+		SubMesh(MeshEntity *meshEntity,mesh::Mesh::SubMesh *meshSubMesh);
 
 		const Matrix4x4 &getRenderTransform() const{return meshEntity->getVisualWorldTransform();}
 		const Material::ptr &getRenderMaterial() const{return material;}
@@ -59,7 +59,7 @@ public:
 		peeper::IndexData::ptr indexData;
 		peeper::VertexData::ptr vertexData;
 		MeshEntity *meshEntity;
-		Mesh::SubMesh *meshSubMesh;
+		mesh::Mesh::SubMesh *meshSubMesh;
 	};
 
 	/// Specialization of the AnimationController that allows for easy access to playing single sequences.
@@ -91,9 +91,9 @@ public:
 	virtual void destroy();
 
 	void load(const egg::String &name);
-	void load(Mesh::ptr mesh);
+	void load(mesh::Mesh::ptr mesh);
 
-	inline const Mesh::ptr &getMesh() const{return mMesh;}
+	inline const mesh::Mesh::ptr &getMesh() const{return mMesh;}
 
 	inline int getNumSubMeshes() const{return mSubMeshes.size();}
 	SubMesh *getSubMesh(int i){return mSubMeshes[i];}
@@ -115,7 +115,7 @@ public:
 	void updateVertexBuffer();
 
 protected:
-	Mesh::ptr mMesh;
+	mesh::Mesh::ptr mMesh;
 	egg::Collection<SubMesh::ptr> mSubMeshes;
 	MeshEntitySkeleton::ptr mSkeleton;
 	peeper::VertexData::ptr mDynamicVertexData;

@@ -67,6 +67,7 @@ using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 using namespace toadlet::tadpole::entity;
 using namespace toadlet::tadpole::handler;
+using namespace toadlet::tadpole::mesh;
 
 namespace toadlet{
 namespace tadpole{

@@ -29,10 +29,10 @@
 #include <toadlet/egg/io/DataInputStream.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
-#include <toadlet/tadpole/Mesh.h>
 #include <toadlet/tadpole/ResourceHandler.h>
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/mesh/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{

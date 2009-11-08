@@ -31,12 +31,13 @@
 using namespace toadlet;
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
+using namespace toadlet::tadpole::mesh;
 
 namespace toadlet{
 namespace tadpole{
 namespace entity{
 
-MeshEntitySkeleton::MeshEntitySkeleton(MeshEntity* entity,MeshSkeleton::ptr skeleton):
+MeshEntitySkeleton::MeshEntitySkeleton(MeshEntity* entity,Skeleton::ptr skeleton):
 	//mSkeleton,
 	//mBones,
 	mLastVisualUpdateFrame(-1),
@@ -136,7 +137,7 @@ int MeshEntitySkeleton::updateBoneTransformation(Bone *bone){
 void MeshEntitySkeleton::updateBone(Bone *bone){
 	int updateFlags=BoneSpaceUpdate_NONE;
 
-	MeshSkeleton::Bone *sbone=mSkeleton->bones[bone->index];
+	Skeleton::Bone *sbone=mSkeleton->bones[bone->index];
 
 	if(bone->controller==NULL){
 		updateFlags=updateBoneTransformation(bone);

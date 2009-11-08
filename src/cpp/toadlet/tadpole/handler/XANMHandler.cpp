@@ -29,6 +29,7 @@
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
+using namespace toadlet::tadpole::mesh;
 
 namespace toadlet{
 namespace tadpole{
@@ -38,7 +39,7 @@ XANMHandler::XANMHandler(){
 }
 
 Resource::ptr XANMHandler::load(InputStream::ptr in,const ResourceHandlerData *handlerData){
-	MeshSkeletonSequence::ptr sequence=NULL;
+	Sequence::ptr sequence=NULL;
 
 	// TODO: Replace the following when mxml implements custom load/save callbacks
 	char buffer[1025];
@@ -77,7 +78,7 @@ Resource::ptr XANMHandler::load(InputStream::ptr in,const ResourceHandlerData *h
 	return sequence;
 }
 
-bool XANMHandler::save(MeshSkeletonSequence::ptr sequence,OutputStream::ptr out){
+bool XANMHandler::save(Sequence::ptr sequence,OutputStream::ptr out){
 	mxml_node_t *root=mxmlNewElement(MXML_NO_PARENT,"XANM");
 
 	int version=XMLMeshUtilities::version;
@@ -105,8 +106,8 @@ bool XANMHandler::save(MeshSkeletonSequence::ptr sequence,OutputStream::ptr out)
 	return true;
 }
 
-MeshSkeletonSequence::ptr XANMHandler::loadSequenceVersion1(mxml_node_t *root){
-	MeshSkeletonSequence::ptr sequence=NULL;
+Sequence::ptr XANMHandler::loadSequenceVersion1(mxml_node_t *root){
+	Sequence::ptr sequence=NULL;
 
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
@@ -118,8 +119,8 @@ MeshSkeletonSequence::ptr XANMHandler::loadSequenceVersion1(mxml_node_t *root){
 	return sequence;
 }
 
-MeshSkeletonSequence::ptr XANMHandler::loadSequenceVersion2Up(mxml_node_t *root,int version){
-	MeshSkeletonSequence::ptr sequence=NULL;
+Sequence::ptr XANMHandler::loadSequenceVersion2Up(mxml_node_t *root,int version){
+	Sequence::ptr sequence=NULL;
 
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
@@ -131,7 +132,7 @@ MeshSkeletonSequence::ptr XANMHandler::loadSequenceVersion2Up(mxml_node_t *root,
 	return sequence;
 }
 
-bool XANMHandler::saveSequenceVersion1(mxml_node_t *root,MeshSkeletonSequence::ptr sequence){
+bool XANMHandler::saveSequenceVersion1(mxml_node_t *root,Sequence::ptr sequence){
 	if(sequence!=NULL){
 		mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,1);
 		mxmlSetElement(node,"AnimationData");
@@ -141,7 +142,7 @@ bool XANMHandler::saveSequenceVersion1(mxml_node_t *root,MeshSkeletonSequence::p
 	return true;
 }
 
-bool XANMHandler::saveSequenceVersion2Up(mxml_node_t *root,MeshSkeletonSequence::ptr sequence,int version){
+bool XANMHandler::saveSequenceVersion2Up(mxml_node_t *root,Sequence::ptr sequence,int version){
 	if(sequence!=NULL){
 		mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,version);
 		mxmlSetElement(node,"Sequence");
