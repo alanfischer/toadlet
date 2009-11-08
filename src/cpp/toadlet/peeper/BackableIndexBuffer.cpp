@@ -88,7 +88,7 @@ bool BackableIndexBuffer::unlock(){
 	}
 }
 
-void BackableIndexBuffer::setBack(IndexBuffer::ptr back){
+void BackableIndexBuffer::setBack(IndexBuffer::ptr back,bool initial){
 	if(back!=mBack && mBack!=NULL){
 		mData=new uint8[mDataSize];
 		uint8 *backData=mBack->lock(AccessType_READ_ONLY);
@@ -98,7 +98,7 @@ void BackableIndexBuffer::setBack(IndexBuffer::ptr back){
 
 	mBack=back;
 	
-	if(mBack!=NULL && mData!=NULL){
+	if(initial==false && mBack!=NULL && mData!=NULL){
 		uint8 *backData=mBack->lock(AccessType_WRITE_ONLY);
 		memcpy(backData,mData,mDataSize);
 		mBack->unlock();

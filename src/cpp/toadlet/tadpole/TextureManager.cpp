@@ -45,7 +45,7 @@ Texture::ptr TextureManager::createTexture(const Image::ptr &image){
 	if(mEngine->getRenderer()!=NULL){
 		Texture::ptr back(mEngine->getRenderer()->createTexture());
 		back->create(Texture::UsageFlags_AUTOGEN_MIPMAPS,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0);
-		texture->setBack(back);
+		texture->setBack(back,true);
 	}
 	texture->load(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),image->getData());
 	mTextures.add(texture);

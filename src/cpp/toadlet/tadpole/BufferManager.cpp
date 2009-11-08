@@ -45,7 +45,7 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usageFlags,Buffer::AccessT
 	if(mEngine->getRenderer()!=NULL){
 		IndexBuffer::ptr back(mEngine->getRenderer()->createIndexBuffer());
 		back->create(usageFlags,accessType,indexFormat,size);
-		indexBuffer->setBack(back);
+		indexBuffer->setBack(back,true);
 	}
 	mIndexBuffers.add(indexBuffer);
 	return indexBuffer;
@@ -57,7 +57,7 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usageFlags,Buffer::Acces
 	if(mEngine->getRenderer()!=NULL){
 		VertexBuffer::ptr back(mEngine->getRenderer()->createVertexBuffer());
 		back->create(usageFlags,accessType,vertexFormat,size);
-		vertexBuffer->setBack(back);
+		vertexBuffer->setBack(back,true);
 	}
 	mVertexBuffers.add(vertexBuffer);
 	return vertexBuffer;

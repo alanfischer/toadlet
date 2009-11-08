@@ -106,7 +106,7 @@ bool BackableTexture::read(int format,int width,int height,int depth,uint8 *data
 	}
 }
 
-void BackableTexture::setBack(Texture::ptr back){
+void BackableTexture::setBack(Texture::ptr back,bool initial){
 	if(back!=mBack && mBack!=NULL){
 		mData=new uint8[mDataSize];
 		mBack->read(mFormat,mWidth,mHeight,mDepth,mData);
@@ -114,7 +114,7 @@ void BackableTexture::setBack(Texture::ptr back){
 
 	mBack=back;
 	
-	if(mBack!=NULL && mData!=NULL){
+	if(initial==false && mBack!=NULL && mData!=NULL){
 		mBack->load(mFormat,mWidth,mHeight,mDepth,mData);
 		delete[] mData;
 		mData=NULL;

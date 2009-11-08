@@ -56,7 +56,7 @@ public:
 	virtual uint8 *lock(AccessType accessType);
 	virtual bool unlock();
 
-	virtual void setBack(VertexBuffer::ptr back);
+	virtual void setBack(VertexBuffer::ptr back,bool initial=false);
 	virtual VertexBuffer::ptr getBack(){return mBack;}
 	
 protected:

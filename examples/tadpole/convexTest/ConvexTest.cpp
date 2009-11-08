@@ -36,7 +36,7 @@ void ConvexTest::create(){
 	mEngine->setScene(mScene);
 
 	mCamera=(CameraEntity*)(new CameraEntity())->create(mEngine);
-	mCamera->setLookAt(Vector3(0,-Math::fromInt(25),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
+	mCamera->setLookAt(Vector3(-Math::fromInt(25),0,0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
 	mScene->attach(mCamera);
 
 	setupTest();
@@ -88,22 +88,19 @@ void ConvexTest::setupTest(){
 
 	Shape::ptr sphere(new Shape(Sphere(Math::HALF)));
 	HopEntity::ptr sphereEntity=(HopEntity*)(new HopEntity())->create(mEngine);
-//	sphereEntity->addShape(sphere);
-	sphereEntity->addShape(Shape::ptr(new Shape(AABox(-Math::HALF,-Math::HALF,-Math::HALF,Math::HALF,Math::HALF,Math::HALF))));
+	sphereEntity->addShape(sphere);
 	sphereEntity->setCoefficientOfRestitution(0.9);
 	sphereEntity->setTranslate(Vector3(0.0,0.0,2.0));
 	mScene->attach(sphereEntity);
 
-	AABox cs(-Math::HALF,-Math::HALF,-Math::HALF,Math::HALF,Math::HALF,Math::HALF);
-//	Sphere cs(Math::ONE);
-/*	ConvexSolid cs;
+	ConvexSolid cs;
 	cs.planes.add(Plane(Vector3(1.0,0.0,0.0),0.5));
 	cs.planes.add(Plane(Vector3(-1.0,0.0,0.0),0.5));
 	cs.planes.add(Plane(Vector3(0.0,1.0,0.0),0.5));
 	cs.planes.add(Plane(Vector3(0.0,-1.0,0.0),0.5));
 	cs.planes.add(Plane(Vector3(1.0,1.0,1.0),0.5));
 	cs.planes.add(Plane(Vector3(0.0,0.0,-1.0),0.5));
-*/	Shape::ptr cshape(new Shape(cs));
+	Shape::ptr cshape(new Shape(cs));
 	HopEntity::ptr convexEntity=(HopEntity*)(new HopEntity())->create(mEngine);
 	convexEntity->addShape(cshape);
 	convexEntity->setLocalGravity(Math::ZERO_VECTOR3);

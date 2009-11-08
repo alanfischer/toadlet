@@ -83,6 +83,8 @@ Mesh::ptr MeshManager::createBox(const AABox &box){
 		// Top
 		iba.set(i++,4); iba.set(i++,5); iba.set(i++,6);
 		iba.set(i++,6); iba.set(i++,5); iba.set(i++,7);
+
+		iba.unlock();
 	}
 
 	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());

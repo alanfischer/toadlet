@@ -221,13 +221,12 @@ uint8 *GLBuffer::lock(AccessType accessType){
 	#endif
 
 	#if defined(TOADLET_BIG_ENDIAN)
-		if(mLockType!=AccessType_WRITE_ONLY){
-			int i,j;
-			for(i=0;i<mColorElementsToEndianSwap.size();++i){
-				const VertexElement &vertexElement=mColorElementsToEndianSwap[i];
-				for(j=0;j<numVertexes;++j){
-					littleUInt32InPlace(*(ByteColor*)(mData+vertexSize*j+vertexElement.offset));
-				}
+		// We do this even if its write only, since the unlocking will write it back, it would get messed up if we didn't swap in all situations
+		int i,j;
+		for(i=0;i<mColorElementsToEndianSwap.size();++i){
+			const VertexElement &vertexElement=mColorElementsToEndianSwap[i];
+			for(j=0;j<numVertexes;++j){
+				littleUInt32InPlace(*(ByteColor*)(mData+vertexSize*j+vertexElement.offset));
 			}
 		}
 	#endif
@@ -239,13 +238,12 @@ uint8 *GLBuffer::lock(AccessType accessType){
 
 bool GLBuffer::unlock(){
 	#if defined(TOADLET_BIG_ENDIAN)
-		if(mLockType!=AccessType_READ_ONLY){
-			int i,j;
-			for(i=0;i<mColorElementsToEndianSwap.size();++i){
-				const VertexElement &vertexElement=mColorElementsToEndianSwap[i];
-				for(j=0;j<numVertexes;++j){
-					littleUInt32InPlace(*(ByteColor*)(mData+vertexSize*j+vertexElement.offset));
-				}
+		// We do this even if its read only, since we have to do it in all situations for locking
+		int i,j;
+		for(i=0;i<mColorElementsToEndianSwap.size();++i){
+			const VertexElement &vertexElement=mColorElementsToEndianSwap[i];
+			for(j=0;j<numVertexes;++j){
+				littleUInt32InPlace(*(ByteColor*)(mData+vertexSize*j+vertexElement.offset));
 			}
 		}
 	#endif
@@ -258,7 +256,7 @@ bool GLBuffer::unlock(){
 		}
 		else
 	#endif
-	if(mHandle!=0){
+	if(mLockType!=AccessType_READ_ONLY && mHandle!=0){
 		glBindBuffer(mTarget,mHandle);
 		glBufferSubData(mTarget,0,mDataSize,mData);
 	}
