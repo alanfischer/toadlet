@@ -70,34 +70,20 @@ TOADLET_C_API Renderer* new_GLRenderer(){
 #endif
 
 GLRenderer::GLRenderer():
-	mShutdown(true),
 	mMatrixMode(-1),
 
 	mPBuffersAvailable(false),
 	mFBOsAvailable(false),
 
-	mAlphaTest(AlphaTest_NONE),
-	mAlphaCutoff(0),
-	//mBlend,
-	mDepthTest(DepthTest_NONE),
-	mDepthWrite(false),
-	mDithering(false),
 	mFaceCulling(FaceCulling_NONE),
-	mFill(Fill_SOLID),
-	mLighting(false),
-	mNormalize(Normalize_NONE),
-	mShading(Shading_SMOOTH),
-	mTexturePerspective(false),
 	mInTexGen(false),
-
+	mMirrorY(false),
 	mMaxTexCoordIndex(0),
 	//mTexCoordIndexes,
 	//mLastTexTargets,
 	//mLastVertexData,
 	mLastTypeBits(0),
 	//mLastTexCoordIndexes,
-
-	mMirrorY(false),
 
 	//mModelMatrix,
 	//mViewMatrix,
@@ -184,7 +170,6 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 
 	GLRenderTarget *gltarget=(GLRenderTarget*)target->getRootRenderTarget();
 
-	mShutdown=false;
 	mPrimaryRenderTarget=target;
 	mGLPrimaryRenderTarget=gltarget;
 	mRenderTarget=target;
@@ -685,26 +670,16 @@ void GLRenderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexDa
 
 void GLRenderer::setDefaultStates(){
 	// General states
-	mAlphaTest=AlphaTest_GEQUAL;
-	mAlphaCutoff=0;
-	mDepthWrite=false;
-	mDepthTest=DepthTest_NONE;
-	mDithering=true;
-	mFaceCulling=FaceCulling_NONE;
-	mLighting=true;
-	mBlend=Blend(Blend::Combination_ALPHA);
-	mShading=Shading_FLAT;
-	mNormalize=Normalize_NONE;
-	mTexturePerspective=false;
+	mInTexGen=false;
 
 	setAlphaTest(AlphaTest_NONE,Math::HALF);
+	setBlend(Blend::Combination_DISABLED);
 	setDepthWrite(true);
 	setDepthTest(DepthTest_LEQUAL);
 	setDithering(false);
 	setFaceCulling(FaceCulling_BACK);
 	setFogParameters(Fog_NONE,0,Math::ONE,Colors::BLACK);
 	setLighting(false);
-	setBlend(Blend::Combination_DISABLED);
 	setShading(Shading_SMOOTH);
 	setNormalize(Normalize_RESCALE);
 	#if defined(TOADLET_HAS_GLES)
@@ -739,10 +714,6 @@ void GLRenderer::setDefaultStates(){
 }
 
 void GLRenderer::setAlphaTest(const AlphaTest &alphaTest,scalar cutoff){
-	if(mAlphaTest==alphaTest && mAlphaCutoff==cutoff){
-		return;
-	}
-
 	if(alphaTest==AlphaTest_NONE){
 		glDisable(GL_ALPHA_TEST);
 	}
@@ -755,22 +726,13 @@ void GLRenderer::setAlphaTest(const AlphaTest &alphaTest,scalar cutoff){
 			glAlphaFunc(func,MathConversion::scalarToFloat(cutoff));
 		#endif
 
-		if(mAlphaTest==AlphaTest_NONE){
-			glEnable(GL_ALPHA_TEST);
-		}
+		glEnable(GL_ALPHA_TEST);
 	}
-
-	mAlphaTest=alphaTest;
-	mAlphaCutoff=cutoff;
 
 	TOADLET_CHECK_GLERROR("setAlphaTest");
 }
 
 void GLRenderer::setBlend(const Blend &blend){
-	if(mBlend==blend){
-		return;
-	}
-
 	if(blend.equals(Blend::Combination_DISABLED)){
 		glDisable(GL_BLEND);
 	}
@@ -779,22 +741,42 @@ void GLRenderer::setBlend(const Blend &blend){
 		int dest=getGLBlendOperation(blend.dest);
 
 		glBlendFunc(src,dest);
-
-		if(mBlend.equals(Blend::Combination_DISABLED)){
-			glEnable(GL_BLEND);
-		}
+		glEnable(GL_BLEND);
 	}
-
-	mBlend.set(blend);
 
 	TOADLET_CHECK_GLERROR("setBlend");
 }
 
-void GLRenderer::setFaceCulling(const FaceCulling &faceCulling){
-	if(mFaceCulling==faceCulling){
-		return;
+void GLRenderer::setDepthTest(const DepthTest &depthTest){
+	if(depthTest==DepthTest_NONE){
+		glDisable(GL_DEPTH_TEST);
+	}
+	else{
+		glDepthFunc(getGLDepthFunc(depthTest));
+		glEnable(GL_DEPTH_TEST);
 	}
 
+	TOADLET_CHECK_GLERROR("setDepthTest");
+}
+
+void GLRenderer::setDepthWrite(bool depthWrite){
+	glDepthMask(depthWrite?GL_TRUE:GL_FALSE);
+
+	TOADLET_CHECK_GLERROR("setDepthWrite");
+}
+
+void GLRenderer::setDithering(bool dithering){
+	if(dithering){
+		glEnable(GL_DITHER);
+	}
+	else{
+		glDisable(GL_DITHER);
+	}
+
+	TOADLET_CHECK_GLERROR("setDithering");
+}
+
+void GLRenderer::setFaceCulling(const FaceCulling &faceCulling){
 	if(faceCulling==FaceCulling_NONE){
 		glDisable(GL_CULL_FACE);
 	}
@@ -810,64 +792,10 @@ void GLRenderer::setFaceCulling(const FaceCulling &faceCulling){
 			break;
 		}
 
-		if(mFaceCulling==FaceCulling_NONE){
-			glEnable(GL_CULL_FACE);
-		}
+		glEnable(GL_CULL_FACE);
 	}
-
-	mFaceCulling=faceCulling;
 
 	TOADLET_CHECK_GLERROR("setFaceCulling");
-}
-
-void GLRenderer::setDepthTest(const DepthTest &depthTest){
-	if(mDepthTest==depthTest){
-		return;
-	}
-
-	if(depthTest==DepthTest_NONE){
-		glDisable(GL_DEPTH_TEST);
-	}
-	else{
-		glDepthFunc(getGLDepthFunc(depthTest));
-
-		if(mDepthTest==DepthTest_NONE){
-			glEnable(GL_DEPTH_TEST);
-		}
-	}
-
-	mDepthTest=depthTest;
-
-	TOADLET_CHECK_GLERROR("setDepthTest");
-}
-
-void GLRenderer::setDepthWrite(bool depthWrite){
-	if(mDepthWrite==depthWrite){
-		return;
-	}
-
-	glDepthMask(depthWrite?GL_TRUE:GL_FALSE);
-
-	mDepthWrite=depthWrite;
-
-	TOADLET_CHECK_GLERROR("setDepthWrite");
-}
-
-void GLRenderer::setDithering(bool dithering){
-	if(mDithering==dithering){
-		return;
-	}
-
-	if(dithering){
-		glEnable(GL_DITHER);
-	}
-	else{
-		glDisable(GL_DITHER);
-	}
-
-	mDithering=dithering;
-
-	TOADLET_CHECK_GLERROR("setDithering");
 }
 
 void GLRenderer::setFogParameters(const Fog &fog,scalar nearDistance,scalar farDistance,const Color &color){
@@ -940,10 +868,6 @@ void GLRenderer::setFill(const Fill &fill){
 		Error::unimplemented(Categories::TOADLET_PEEPER,
 			"GLRenderer::setFill: unimplemented");
 	#else
-		if(mFill==fill){
-			return;
-		}
-
 		if(fill==Fill_POINT){
 			glPolygonMode(GL_FRONT_AND_BACK,GL_POINT);
 		}
@@ -954,17 +878,11 @@ void GLRenderer::setFill(const Fill &fill){
 			glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 		}
 
-		mFill=fill;
-
 		TOADLET_CHECK_GLERROR("setFill");
 	#endif
 }
 
 void GLRenderer::setLighting(bool lighting){
-	if(mLighting==lighting){
-		return;
-	}
-
 	if(lighting){
 		glEnable(GL_LIGHTING);
 	}
@@ -972,16 +890,10 @@ void GLRenderer::setLighting(bool lighting){
 		glDisable(GL_LIGHTING);
 	}
 
-	mLighting=lighting;
-
 	TOADLET_CHECK_GLERROR("setLighting");
 }
 
 void GLRenderer::setShading(const Shading &shading){
-	if(mShading==shading){
-		return;
-	}
-
 	switch(shading){
 		case Shading_FLAT:
 			glShadeModel(GL_FLAT);
@@ -990,8 +902,6 @@ void GLRenderer::setShading(const Shading &shading){
 			glShadeModel(GL_SMOOTH);
 		break;
 	}
-
-	mShading=shading;
 
 	TOADLET_CHECK_GLERROR("setShading");
 }
@@ -1008,10 +918,6 @@ void GLRenderer::setColorWrite(bool color){
 }
 
 void GLRenderer::setNormalize(const Normalize &normalize){
-	if(mNormalize==normalize){
-		return;
-	}
-
 	switch(normalize){
 		case Normalize_NONE:
 			glDisable(GL_NORMALIZE);
@@ -1026,8 +932,6 @@ void GLRenderer::setNormalize(const Normalize &normalize){
 			glDisable(GL_RESCALE_NORMAL);
 		break;
 	}
-
-	mNormalize=normalize;
 
 	TOADLET_CHECK_GLERROR("setNormalize");
 }
@@ -1055,13 +959,7 @@ void GLRenderer::setTexturePerspective(bool texturePerspective){
 		Error::unimplemented(Categories::TOADLET_PEEPER,
 			"GLRenderer::setTexturePerspective: unimplemented");
 	#else
-		if(mTexturePerspective==texturePerspective){
-			return;
-		}
-
 		glHint(GL_PERSPECTIVE_CORRECTION_HINT,texturePerspective?GL_NICEST:GL_FASTEST);
-
-		mTexturePerspective=texturePerspective;
 
 		TOADLET_CHECK_GLERROR("setTexturePerspective");
 	#endif

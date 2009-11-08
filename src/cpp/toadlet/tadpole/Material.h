@@ -49,32 +49,32 @@ public:
 
 	Material::ptr clone() const;
 
-	void setLightEffect(const peeper::LightEffect &lightEffect);
-	inline const peeper::LightEffect &getLightEffect() const{return mLightEffect;}
-
-	void setLighting(bool lighting);
+	void setLighting(bool lighting){mLighting=lighting;}
 	inline bool getLighting() const{return mLighting;}
 
-	void setFaceCulling(const peeper::Renderer::FaceCulling &faceCulling);
+	void setLightEffect(const peeper::LightEffect &lightEffect){mLightEffect.set(lightEffect);}
+	inline const peeper::LightEffect &getLightEffect() const{return mLightEffect;}
+
+	void setFaceCulling(const peeper::Renderer::FaceCulling &faceCulling){mFaceCulling=faceCulling;}
 	inline const peeper::Renderer::FaceCulling &getFaceCulling() const{return mFaceCulling;}
 
 	void setAlphaTest(peeper::Renderer::AlphaTest alphaTest,scalar cutoff);
 	inline const peeper::Renderer::AlphaTest &getAlphaTest() const{return mAlphaTest;}
 	inline scalar getAlphaTestCutoff() const{return mAlphaTestCutoff;}
 
-	void setBlend(const peeper::Blend &blend);
+	void setBlend(const peeper::Blend &blend){mBlend=blend;}
 	inline const peeper::Blend &getBlend() const{return mBlend;}
 
-	void setDepthWrite(bool depthWrite);
+	void setDepthWrite(bool depthWrite){mDepthWrite=depthWrite;}
 	inline bool getDepthWrite() const{return mDepthWrite;}
 
-	void setDepthTest(peeper::Renderer::DepthTest depthTest);
+	void setDepthTest(peeper::Renderer::DepthTest depthTest){mDepthTest=depthTest;}
 	inline peeper::Renderer::DepthTest getDepthTest() const{return mDepthTest;}
 
 	void setFill(peeper::Renderer::Fill fill);
 	inline peeper::Renderer::Fill getFill() const{return mFill;}
 
-	void setLayer(int layer);
+	void setLayer(int layer){mLayer=layer;}
 	inline int getLayer() const{return mLayer;}
 
 	inline int getNumTextureStages() const{return mTextureStages.size();}

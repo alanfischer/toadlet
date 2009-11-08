@@ -79,14 +79,14 @@ public:
 	void setDefaultStates();
 	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff);
 	void setBlend(const Blend &blend);
-	void setFaceCulling(const FaceCulling &faceCulling);
 	void setDepthTest(const DepthTest &depthTest);
 	void setDepthWrite(bool depthWrite);
 	void setDithering(bool dithering);
+	void setFaceCulling(const FaceCulling &faceCulling);
 	void setFogParameters(const Fog &fog,scalar nearDistance,scalar farDistance,const Color &color);
+	void setLighting(bool lighting);
 	void setLightEffect(const LightEffect &lightEffect);
 	void setFill(const Fill &fill);
-	void setLighting(bool lighting);
 	void setShading(const Shading &shading);
 	void setColorWrite(bool color);
 	void setNormalize(const Normalize &normalize);
@@ -130,20 +130,7 @@ protected:
 	D3D9RenderTarget *mD3DRenderTarget;
 	bool mShutdown;
 
-	// Cached render state attributes
-	AlphaTest mAlphaTest;
-	scalar mAlphaCutoff;
-	Blend mBlend;
-	DepthTest mDepthTest;
-	bool mDepthWrite;
-	bool mDithering;
 	FaceCulling mFaceCulling;
-	Fill mFill;
-	bool mLighting;
-	Normalize mNormalize;
-	Shading mShading;
-	bool mTexturePerspective;
-
 	bool mMirrorY;
 
 	StatisticsSet mStatisticsSet;
