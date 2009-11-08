@@ -29,23 +29,21 @@
 #include <string.h>
 #include <ctype.h>
 
-#if defined(TOADLET_PLATFORM_POSIX) || defined(TOADLET_PLATFORM_NDS)
+#if defined(TOADLET_PLATFORM_POSIX)
 	#include <wchar.h>
 	#include <wctype.h>
 #endif
 
-// TODO: Move the snwprintf/printf stuff to the same way we did the scanf
 #if defined(TOADLET_PLATFORM_WIN32)
-	#define TOADLET_SNWPRINTF _snwprintf
+	#define TOADLET_SPRINTF(str,fmt,x) \
+		str.mLength=_snwprintf((wchar_t*)(str).mData,(str).mLength,L##fmt,x)
 	#define TOADLET_SSCANF(str,fmt,x) \
-		swscanf(str->wc_str(),L##fmt,x)
+		swscanf((wchar_t*)(str).mData,L##fmt,x)
 #elif defined(TOADLET_PLATFORM_POSIX)
-	#define TOADLET_SNWPRINTF swprintf
+	#define TOADLET_SPRINTF(str,fmt,x) \
+		str.mLength=swprintf((wchar_t*)(str).mData,(str).mLength,L##fmt,x)
 	#define TOADLET_SSCANF(str,fmt,x) \
-		swscanf(str->wc_str(),L##fmt,x)
-#else
-	#define TOADLET_SSCANF(str,fmt,x) \
-		sscanf(str->c_str(),fmt,x)
+		swscanf((wchar_t*)(str).mData,L##fmt,x)
 #endif
 
 namespace toadlet{
@@ -371,37 +369,37 @@ String String::trimRight() const{
 
 int32 String::toInt32() const{
 	int32 i=0;
-	TOADLET_SSCANF(this,"%d",&i);
+	TOADLET_SSCANF(*this,"%d",&i);
 	return i;
 }
 
 uint32 String::toUInt32() const{
 	uint32 i=0;
-	TOADLET_SSCANF(this,"%u",&i);
+	TOADLET_SSCANF(*this,"%u",&i);
 	return i;
 }
 
 int64 String::toInt64() const{
 	int64 i=0;
-	TOADLET_SSCANF(this,"%lld",&i);
+	TOADLET_SSCANF(*this,"%lld",&i);
 	return i;
 }
 
 uint64 String::toUInt64() const{
 	uint64 i=0;
-	TOADLET_SSCANF(this,"%llu",&i);
+	TOADLET_SSCANF(*this,"%llu",&i);
 	return i;
 }
 
 float String::toFloat() const{
 	float f=0;
-	TOADLET_SSCANF(this,"%f",&f);
+	TOADLET_SSCANF(*this,"%f",&f);
 	return f;
 }
 
 double String::toDouble() const{
 	double f=0;
-	TOADLET_SSCANF(this,"%Lf",&f);
+	TOADLET_SSCANF(*this,"%Lf",&f);
 	return f;
 }
 
@@ -475,160 +473,39 @@ String String::operator+(bool b) const{
 }
 
 String String::operator+(int32 i) const{
-	#if defined(TOADLET_SNWPRINTF)
-		stringchar buffer[128];
-		TOADLET_SNWPRINTF((wchar_t*)buffer,128,L"%d",i);
-		int size=wcslen((wchar_t*)buffer);
-
-		String s(mLength+size);
-		wcsncpy((wchar_t*)s.mData,(wchar_t*)mData,mLength);
-		wcsncpy((wchar_t*)s.mData+mLength,(wchar_t*)buffer,size);
-		s.mData[s.mLength]=0;
-		return s;
-	#else
-		char buffer[128];
-		snprintf(buffer,128,"%d",i);
-		int size=strlen(buffer);
-
-		String s(mLength+size);
-		wcsncpy((wchar_t*)s.mData,(wchar_t*)mData,mLength);
-		stringchar *dest=s.mData+mLength;
-		char *src=buffer;
-		while((*dest++=*src++)!=0);
-		s.mData[s.mLength]=0;
-		return s;
-	#endif
+	String result(128);
+	TOADLET_SPRINTF(result,"%d",i);
+	return (*this)+result;
 }
 
 String String::operator+(uint32 i) const{
-	#if defined(TOADLET_SNWPRINTF)
-		stringchar buffer[128];
-		TOADLET_SNWPRINTF((wchar_t*)buffer,128,L"%u",i);
-		int size=wcslen((wchar_t*)buffer);
-
-		String s(mLength+size);
-		wcsncpy((wchar_t*)s.mData,(wchar_t*)mData,mLength);
-		wcsncpy((wchar_t*)s.mData+mLength,(wchar_t*)buffer,size);
-		s.mData[s.mLength]=0;
-		return s;
-	#else
-		char buffer[128];
-		snprintf(buffer,128,"%u",i);
-		int size=strlen(buffer);
-
-		String s(mLength+size);
-		wcsncpy((wchar_t*)s.mData,(wchar_t*)mData,mLength);
-		stringchar *dest=s.mData+mLength;
-		char *src=buffer;
-		while((*dest++=*src++)!=0);
-		s.mData[s.mLength]=0;
-		return s;
-	#endif
+	String result(128);
+	TOADLET_SPRINTF(result,"%u",i);
+	return (*this)+result;
 }
 
-
 String String::operator+(int64 i) const{
-	#if defined(TOADLET_SNWPRINTF)
-		stringchar buffer[128];
-		TOADLET_SNWPRINTF((wchar_t*)buffer,128,L"%lld",i);
-		int size=wcslen((wchar_t*)buffer);
-
-		String s(mLength+size);
-		wcsncpy((wchar_t*)s.mData,(wchar_t*)mData,mLength);
-		wcsncpy((wchar_t*)s.mData+mLength,(wchar_t*)buffer,size);
-		s.mData[s.mLength]=0;
-		return s;
-	#else
-		char buffer[128];
-		snprintf(buffer,128,"%lld",i);
-		int size=strlen(buffer);
-
-		String s(mLength+size);
-		wcsncpy((wchar_t*)s.mData,(wchar_t*)mData,mLength);
-		stringchar *dest=s.mData+mLength;
-		char *src=buffer;
-		while((*dest++=*src++)!=0);
-		s.mData[s.mLength]=0;
-		return s;
-	#endif
+	String result(128);
+	TOADLET_SPRINTF(result,"%lld",i);
+	return (*this)+result;
 }
 
 String String::operator+(uint64 i) const{
-	#if defined(TOADLET_SNWPRINTF)
-		stringchar buffer[128];
-		TOADLET_SNWPRINTF((wchar_t*)buffer,128,L"%llu",i);
-		int size=wcslen((wchar_t*)buffer);
-
-		String s(mLength+size);
-		wcsncpy((wchar_t*)s.mData,(wchar_t*)mData,mLength);
-		wcsncpy((wchar_t*)s.mData+mLength,(wchar_t*)buffer,size);
-		s.mData[s.mLength]=0;
-		return s;
-	#else
-		char buffer[128];
-		snprintf(buffer,128,"%llu",i);
-		int size=strlen(buffer);
-
-		String s(mLength+size);
-		wcsncpy((wchar_t*)s.mData,(wchar_t*)mData,mLength);
-		stringchar *dest=s.mData+mLength;
-		char *src=buffer;
-		while((*dest++=*src++)!=0);
-		s.mData[s.mLength]=0;
-		return s;
-	#endif
+	String result(128);
+	TOADLET_SPRINTF(result,"%llu",i);
+	return (*this)+result;
 }
 
 String String::operator+(float f) const{
-	#if defined(TOADLET_SNWPRINTF)
-		stringchar buffer[128];
-		TOADLET_SNWPRINTF((wchar_t*)buffer,128,L"%f",f);
-		int size=wcslen((wchar_t*)buffer);
-
-		String s(mLength+size);
-		wcsncpy((wchar_t*)s.mData,(wchar_t*)mData,mLength);
-		wcsncpy((wchar_t*)s.mData+mLength,(wchar_t*)buffer,size);
-		s.mData[s.mLength]=0;
-		return s;
-	#else
-		char buffer[128];
-		snprintf(buffer,128,"%f",f);
-		int size=strlen(buffer);
-
-		String s(mLength+size);
-		wcsncpy((wchar_t*)s.mData,(wchar_t*)mData,mLength);
-		stringchar *dest=s.mData+mLength;
-		char *src=buffer;
-		while((*dest++=*src++)!=0);
-		s.mData[s.mLength]=0;
-		return s;
-	#endif
+	String result(128);
+	TOADLET_SPRINTF(result,"%f",f);
+	return (*this)+result;
 }
 
 String String::operator+(double f) const{
-	#if defined(TOADLET_SNWPRINTF)
-		stringchar buffer[128];
-		TOADLET_SNWPRINTF((wchar_t*)buffer,128,L"%Lf",f);
-		int size=wcslen((wchar_t*)buffer);
-
-		String s(mLength+size);
-		wcsncpy((wchar_t*)s.mData,(wchar_t*)mData,mLength);
-		wcsncpy((wchar_t*)s.mData+mLength,(wchar_t*)buffer,size);
-		s.mData[s.mLength]=0;
-		return s;
-	#else
-		char buffer[128];
-		snprintf(buffer,128,"%Lf",f);
-		int size=strlen(buffer);
-
-		String s(mLength+size);
-		wcsncpy((wchar_t*)s.mData,(wchar_t*)mData,mLength);
-		stringchar *dest=s.mData+mLength;
-		char *src=buffer;
-		while((*dest++=*src++)!=0);
-		s.mData[s.mLength]=0;
-		return s;
-	#endif
+	String result(128);
+	TOADLET_SPRINTF(result,"%Lf",f);
+	return (*this)+result;
 }
 
 void String::operator+=(const String &string){
@@ -797,159 +674,39 @@ String operator+(bool b,const String &string){
 }
 
 String operator+(int32 i,const String &string){
-	#if defined(TOADLET_SNWPRINTF)
-		stringchar buffer[128];
-		TOADLET_SNWPRINTF((wchar_t*)buffer,128,L"%d",i);
-		int size=wcslen((wchar_t*)buffer);
-
-		String s(string.mLength+size);
-		wcsncpy((wchar_t*)s.mData,(wchar_t*)buffer,size);
-		wcsncpy((wchar_t*)s.mData+size,(wchar_t*)string.mData,string.mLength);
-		s.mData[s.mLength]=0;
-		return s;
-	#else
-		char buffer[128];
-		snprintf(buffer,128,"%d",i);
-		int size=strlen(buffer);
-
-		String s(string.mLength+size);
-		stringchar *dest=s.mData;
-		char *src=buffer;
-		while((*dest++=*src++)!=0);
-		wcsncpy((wchar_t*)s.mData+size,(wchar_t*)string.mData,string.mLength);
-		s.mData[s.mLength]=0;
-		return s;
-	#endif
+	String result(128);
+	TOADLET_SPRINTF(result,"%d",i);
+	return result+string;
 }
 
 String operator+(uint32 i,const String &string){
-	#if defined(TOADLET_SNWPRINTF)
-		stringchar buffer[128];
-		TOADLET_SNWPRINTF((wchar_t*)buffer,128,L"%u",i);
-		int size=wcslen((wchar_t*)buffer);
-
-		String s(string.mLength+size);
-		wcsncpy((wchar_t*)s.mData,(wchar_t*)buffer,size);
-		wcsncpy((wchar_t*)s.mData+size,(wchar_t*)string.mData,string.mLength);
-		s.mData[s.mLength]=0;
-		return s;
-	#else
-		char buffer[128];
-		snprintf(buffer,128,"%u",i);
-		int size=strlen(buffer);
-
-		String s(string.mLength+size);
-		stringchar *dest=s.mData;
-		char *src=buffer;
-		while((*dest++=*src++)!=0);
-		wcsncpy((wchar_t*)s.mData+size,(wchar_t*)string.mData,string.mLength);
-		s.mData[s.mLength]=0;
-		return s;
-	#endif
+	String result(128);
+	TOADLET_SPRINTF(result,"%u",i);
+	return result+string;
 }
 
 String operator+(int64 i,const String &string){
-	#if defined(TOADLET_SNWPRINTF)
-		stringchar buffer[128];
-		TOADLET_SNWPRINTF((wchar_t*)buffer,128,L"%lld",i);
-		int size=wcslen((wchar_t*)buffer);
-
-		String s(string.mLength+size);
-		wcsncpy((wchar_t*)s.mData,(wchar_t*)buffer,size);
-		wcsncpy((wchar_t*)s.mData+size,(wchar_t*)string.mData,string.mLength);
-		s.mData[s.mLength]=0;
-		return s;
-	#else
-		char buffer[128];
-		snprintf(buffer,128,"%lld",i);
-		int size=strlen(buffer);
-
-		String s(string.mLength+size);
-		stringchar *dest=s.mData;
-		char *src=buffer;
-		while((*dest++=*src++)!=0);
-		wcsncpy((wchar_t*)s.mData+size,(wchar_t*)string.mData,string.mLength);
-		s.mData[s.mLength]=0;
-		return s;
-	#endif
+	String result(128);
+	TOADLET_SPRINTF(result,"%lld",i);
+	return result+string;
 }
 
 String operator+(uint64 i,const String &string){
-	#if defined(TOADLET_SNWPRINTF)
-		stringchar buffer[128];
-		TOADLET_SNWPRINTF((wchar_t*)buffer,128,L"%llu",i);
-		int size=wcslen((wchar_t*)buffer);
-
-		String s(string.mLength+size);
-		wcsncpy((wchar_t*)s.mData,(wchar_t*)buffer,size);
-		wcsncpy((wchar_t*)s.mData+size,(wchar_t*)string.mData,string.mLength);
-		s.mData[s.mLength]=0;
-		return s;
-	#else
-		char buffer[128];
-		snprintf(buffer,128,"%llu",i);
-		int size=strlen(buffer);
-
-		String s(string.mLength+size);
-		stringchar *dest=s.mData;
-		char *src=buffer;
-		while((*dest++=*src++)!=0);
-		wcsncpy((wchar_t*)s.mData+size,(wchar_t*)string.mData,string.mLength);
-		s.mData[s.mLength]=0;
-		return s;
-	#endif
+	String result(128);
+	TOADLET_SPRINTF(result,"%llu",i);
+	return result+string;
 }
 
 String operator+(float f,const String &string){
-	#if defined(TOADLET_SNWPRINTF)
-		stringchar buffer[128];
-		TOADLET_SNWPRINTF((wchar_t*)buffer,128,L"%f",f);
-		int size=wcslen((wchar_t*)buffer);
-
-		String s(string.mLength+size);
-		wcsncpy((wchar_t*)s.mData,(wchar_t*)buffer,size);
-		wcsncpy((wchar_t*)s.mData+size,(wchar_t*)string.mData,string.mLength);
-		s.mData[s.mLength]=0;
-		return s;
-	#else
-		char buffer[128];
-		snprintf(buffer,128,"%f",f);
-		int size=strlen(buffer);
-
-		String s(string.mLength+size);
-		stringchar *dest=s.mData;
-		char *src=buffer;
-		while((*dest++=*src++)!=0);
-		wcsncpy((wchar_t*)s.mData+size,(wchar_t*)string.mData,string.mLength);
-		s.mData[s.mLength]=0;
-		return s;
-	#endif
+	String result(128);
+	TOADLET_SPRINTF(result,"%f",f);
+	return result+string;
 }
 
 String operator+(double f,const String &string){
-	#if defined(TOADLET_SNWPRINTF)
-		stringchar buffer[128];
-		TOADLET_SNWPRINTF((wchar_t*)buffer,128,L"%Lf",f);
-		int size=wcslen((wchar_t*)buffer);
-
-		String s(string.mLength+size);
-		wcsncpy((wchar_t*)s.mData,(wchar_t*)buffer,size);
-		wcsncpy((wchar_t*)s.mData+size,(wchar_t*)string.mData,string.mLength);
-		s.mData[s.mLength]=0;
-		return s;
-	#else
-		char buffer[128];
-		snprintf(buffer,128,"%Lf",f);
-		int size=strlen(buffer);
-
-		String s(string.mLength+size);
-		stringchar *dest=s.mData;
-		char *src=buffer;
-		while((*dest++=*src++)!=0);
-		wcsncpy((wchar_t*)s.mData+size,(wchar_t*)string.mData,string.mLength);
-		s.mData[s.mLength]=0;
-		return s;
-	#endif
+	String result(128);
+	TOADLET_SPRINTF(result,"%Lf",f);
+	return result+string;
 }
 
 }
