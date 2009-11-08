@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_MESHSKELETONSEQUENCE_H
-#define TOADLET_TADPOLE_MESHSKELETONSEQUENCE_H
+#ifndef TOADLET_TADPOLE_MESH_SEQUENCE_H
+#define TOADLET_TADPOLE_MESH_SEQUENCE_H
 
 #include <toadlet/egg/Resource.h>
 #include <toadlet/egg/String.h>
@@ -32,13 +32,14 @@
 
 namespace toadlet{
 namespace tadpole{
+namespace mesh{
 
-class TOADLET_API MeshSkeletonSequence:public egg::Resource{
+class TOADLET_API Sequence:public egg::Resource{
 public:
-	TOADLET_SHARED_POINTERS(MeshSkeletonSequence,egg::Resource);
+	TOADLET_SHARED_POINTERS(Sequence,egg::Resource);
 
-	MeshSkeletonSequence();
-	virtual ~MeshSkeletonSequence();
+	Sequence();
+	virtual ~Sequence();
 
 	void compile();
 
@@ -49,6 +50,7 @@ public:
 	scalar length; // calculated by compile
 };
 
+}
 }
 }
 

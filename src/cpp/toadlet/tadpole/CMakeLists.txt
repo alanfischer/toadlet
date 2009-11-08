@@ -68,6 +68,12 @@ set (TADPOLE_HANDLER_PLATFORM_WIN32_SRC
 	handler/platform/win32/Win32FontHandler.cpp
 )
 
+set (TADPOLE_MESH_SRC
+	mesh/Mesh.cpp
+	mesh/Sequence.cpp
+	mesh/Skeleton.cpp
+)
+
 set (TADPOLE_WIDGET_SRC
 	widget/AnimationControllerWidget.cpp
 	widget/BorderWidget.cpp
@@ -166,6 +172,12 @@ set (TADPOLE_HANDLER_PLATFORM_WIN32_HEADERS
 	handler/platform/win32/Win32FontHandler.h
 ) 
 
+set (TADPOLE_MESH_HEADERS
+	mesh/Mesh.h
+	mesh/Sequence.h
+	mesh/Skeleton.h
+)
+
 set (TADPOLE_WIDGET_HEADERS
 	widget/ActionListener.h
 	widget/AnimationControllerWidget.h
@@ -185,6 +197,7 @@ set (TADPOLE_WIDGET_HEADERS
 source_group ("Source Files\\\\animation" FILES ${TADPOLE_ANIMATION_SRC})
 source_group ("Source Files\\\\entity" FILES ${TADPOLE_ENTITY_SRC})
 source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_SRC})
+source_group ("Source Files\\\\mesh" FILES ${TADPOLE_MESH_SRC})
 source_group ("Source Files\\\\widget" FILES ${TADPOLE_WIDGET_SRC})
 
 
@@ -192,12 +205,13 @@ source_group ("Source Files\\\\widget" FILES ${TADPOLE_WIDGET_SRC})
 source_group ("Header Files\\\\animation" FILES ${TADPOLE_ANIMATION_HEADERS})
 source_group ("Header Files\\\\entity" FILES ${TADPOLE_ENTITY_HEADERS})
 source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_HEADERS})
+source_group ("Header Files\\\\mesh" FILES ${TADPOLE_MESH_HEADERS})
 source_group ("Header Files\\\\widget" FILES ${TADPOLE_WIDGET_HEADERS})
 
 
 # Source and headers
-set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_ENTITY_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_WIDGET_SRC})
-set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_ENTITY_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_WIDGET_HEADERS})
+set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_ENTITY_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MESH_SRC} ${TADPOLE_WIDGET_SRC})
+set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_ENTITY_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_MESH_HEADERS} ${TADPOLE_WIDGET_HEADERS})
 
 
 # Dependencies for toadlet_tadpole

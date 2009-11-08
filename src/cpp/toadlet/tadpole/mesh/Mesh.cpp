@@ -23,54 +23,27 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_MESHSKELETON_H
-#define TOADLET_TADPOLE_MESHSKELETON_H
+#include <toadlet/egg/Logger.h>
+#include <toadlet/tadpole/mesh/Mesh.h>
 
-#include <toadlet/tadpole/Types.h>
-#include <toadlet/egg/Resource.h>
-#include <toadlet/tadpole/MeshSkeletonSequence.h>
+using namespace toadlet::egg;
 
 namespace toadlet{
 namespace tadpole{
+namespace mesh{
 
-class TOADLET_API MeshSkeleton:public egg::Resource{
-public:
-	TOADLET_SHARED_POINTERS(MeshSkeleton,egg::Resource);
+Mesh::Mesh():
+	boundingRadius(-Math::ONE),
+	worldScale(Math::ONE)
+{}
 
-	class TOADLET_API Bone{
-	public:
-		TOADLET_SHARED_POINTERS(Bone,Bone);
+Mesh::~Mesh(){
+}
 
-		Bone():
-			index(-1),
-			parentIndex(-1),
-			scale(Math::ONE,Math::ONE,Math::ONE){}
-
-		int index;
-		int parentIndex;
-
-		Vector3 translate;
-		Quaternion rotate;
-		Vector3 scale; // TODO: Implement bone scaling
-
-		Vector3 worldToBoneTranslate;
-		Quaternion worldToBoneRotate;
-
-		egg::String name;
-	};
-
-	MeshSkeleton();
-	virtual ~MeshSkeleton();
-
-	void compile();
-
-	egg::String name;
-
-	egg::Collection<Bone::ptr> bones;
-	egg::Collection<MeshSkeletonSequence::ptr> sequences;
-};
+void Mesh::compile(){
+	// Currently does nothing
+}
 
 }
 }
-
-#endif
+}

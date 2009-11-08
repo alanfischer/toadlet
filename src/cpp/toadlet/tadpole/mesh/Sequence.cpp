@@ -23,25 +23,44 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Logger.h>
-#include <toadlet/tadpole/Mesh.h>
+#include <toadlet/tadpole/mesh/Sequence.h>
 
 using namespace toadlet::egg;
 
 namespace toadlet{
 namespace tadpole{
+namespace mesh{
 
-Mesh::Mesh():
-	boundingRadius(-Math::ONE),
-	worldScale(Math::ONE)
-{}
-
-Mesh::~Mesh(){
+Sequence::Sequence():
+	hasScale(false),
+	length(0)
+{
 }
 
-void Mesh::compile(){
-	// Currently does nothing
+Sequence::~Sequence(){
 }
 
+void Sequence::compile(){
+	int i,j;
+
+	hasScale=false;
+	length=0;
+	for(i=0;i<tracks.size();++i){
+		Track *track=tracks[i];
+
+		track->compile();
+
+		if(length<track->length){
+			length=track->length;
+		}
+
+		for(j=0;j<track->keyFrames.size();++j){
+			const Vector3 &scale=track->keyFrames[j].scale;
+			hasScale|=(scale.x!=Math::ONE || scale.y!=Math::ONE || scale.z!=Math::ONE);
+		}
+	}
+}
+
+}
 }
 }
