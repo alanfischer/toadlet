@@ -37,7 +37,6 @@
 #include <toadlet/ribbit/AudioPlayer.h>
 #include <toadlet/ribbit/AudioBuffer.h>
 #include <toadlet/tadpole/AudioBufferData.h>
-#include <toadlet/tadpole/Mesh.h>
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/FontData.h>
 #include <toadlet/tadpole/VertexFormats.h>
@@ -48,6 +47,7 @@
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/entity/Scene.h>
 #include <toadlet/tadpole/handler/AudioBufferHandler.h>
+#include <toadlet/tadpole/mesh/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -189,20 +189,20 @@ public:
 	ResourceManager *getFontManager() const{return mFontManager;}
 
 	//  Mesh
-	Mesh::ptr loadMesh(const egg::String &name);
-	Mesh::ptr loadMesh(const egg::String &name,const egg::String &file);
-	Mesh::ptr loadMesh(const Mesh::ptr &resource);
-	Mesh::ptr loadMesh(const egg::String &name,const Mesh::ptr &resource);
+	mesh::Mesh::ptr loadMesh(const egg::String &name);
+	mesh::Mesh::ptr loadMesh(const egg::String &name,const egg::String &file);
+	mesh::Mesh::ptr loadMesh(const mesh::Mesh::ptr &resource);
+	mesh::Mesh::ptr loadMesh(const egg::String &name,const mesh::Mesh::ptr &resource);
 
-	Mesh::ptr cacheMesh(const egg::String &name);
-	Mesh::ptr cacheMesh(const egg::String &name,const egg::String &file);
-	Mesh::ptr cacheMesh(const Mesh::ptr &resource);
-	Mesh::ptr cacheMesh(const egg::String &name,const Mesh::ptr &resource);
+	mesh::Mesh::ptr cacheMesh(const egg::String &name);
+	mesh::Mesh::ptr cacheMesh(const egg::String &name,const egg::String &file);
+	mesh::Mesh::ptr cacheMesh(const mesh::Mesh::ptr &resource);
+	mesh::Mesh::ptr cacheMesh(const egg::String &name,const mesh::Mesh::ptr &resource);
 
 	bool uncacheMesh(const egg::String &name);
-	bool uncacheMesh(const Mesh::ptr &resource);
+	bool uncacheMesh(const mesh::Mesh::ptr &resource);
 
-	Mesh::ptr getMesh(const egg::String &name) const;
+	mesh::Mesh::ptr getMesh(const egg::String &name) const;
 
 	MeshManager *getMeshManager() const{return mMeshManager;}
 

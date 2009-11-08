@@ -27,8 +27,8 @@
 #define TOADLET_TADPOLE_ENTITY_MESHENTITYSKELETON_H
 
 #include <toadlet/tadpole/Types.h>
-#include <toadlet/tadpole/MeshSkeleton.h>
 #include <toadlet/tadpole/Renderable.h>
+#include <toadlet/tadpole/mesh/Skeleton.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -99,7 +99,7 @@ public:
 		bool useMatrixTransforms;
 	};
 
-	MeshEntitySkeleton(MeshEntity *entity,MeshSkeleton::ptr skeleton);
+	MeshEntitySkeleton(MeshEntity *entity,mesh::Skeleton::ptr skeleton);
 
 	void updateBones();
 	void updateBones(int sequenceIndex,scalar sequenceTime);
@@ -112,7 +112,7 @@ public:
 	egg::String getBoneName(int index) const;
 	egg::String getBoneName(Bone *bone) const;
 
-	inline MeshSkeleton::ptr getSkeleton() const{return mSkeleton;}
+	inline mesh::Skeleton::ptr getSkeleton() const{return mSkeleton;}
 
 	void setRenderable(bool renderable);
 	void updateVertexData();
@@ -125,11 +125,11 @@ protected:
 	void updateBone(Bone *bone);
 
 	MeshEntity *mEntity;
-	MeshSkeleton::ptr mSkeleton;
+	mesh::Skeleton::ptr mSkeleton;
 	egg::Collection<Bone::ptr> mBones;
 	int mLastVisualUpdateFrame;
 
-	MeshSkeletonSequence::ptr mSequence;
+	mesh::Sequence::ptr mSequence;
 	scalar mSequenceTime;
 	egg::Collection<int> mTrackHints;
 

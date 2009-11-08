@@ -36,6 +36,7 @@
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole::animation;
+using namespace toadlet::tadpole::mesh;
 
 namespace toadlet{
 namespace tadpole{

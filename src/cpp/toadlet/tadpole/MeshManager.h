@@ -26,10 +26,10 @@
 #ifndef TOADLET_TADPOLE_MESHMANAGER_H
 #define TOADLET_TADPOLE_MESHMANAGER_H
 
-#include <toadlet/tadpole/ResourceManager.h>
-#include <toadlet/tadpole/Mesh.h>
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
+#include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/tadpole/mesh/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -40,10 +40,10 @@ class TOADLET_API MeshManager:public ResourceManager{
 public:
 	MeshManager(Engine *engine);
 
-	Mesh::ptr createBox(const AABox &box);
-	Mesh::ptr createSkyBox(scalar size,bool unfolded);
-	Mesh::ptr createSphere(const Sphere &sphere,int numSegments=16,int numRings=16);
-	Mesh::ptr createGeoSphere(const Sphere &sphere,int depth,bool icosahedron);
+	mesh::Mesh::ptr createBox(const AABox &box);
+	mesh::Mesh::ptr createSkyBox(scalar size,bool unfolded);
+	mesh::Mesh::ptr createSphere(const Sphere &sphere,int numSegments=16,int numRings=16);
+	mesh::Mesh::ptr createGeoSphere(const Sphere &sphere,int depth,bool icosahedron);
 
 protected:
 	class IndexTri{

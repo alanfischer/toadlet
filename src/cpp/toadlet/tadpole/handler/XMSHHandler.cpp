@@ -30,6 +30,7 @@
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
+using namespace toadlet::tadpole::mesh;
 
 namespace toadlet{
 namespace tadpole{
@@ -118,10 +119,10 @@ Mesh::ptr XMSHHandler::loadMeshVersion1(mxml_node_t *root){
 			mesh=XMLMeshUtilities::loadMesh(block,1,mBufferManager,mMaterialManager,mTextureManager);
 		}
 		else if(strcmp(mxmlGetElementName(block),"SkeletonData")==0){
-			mesh->skeleton=MeshSkeleton::ptr(XMLMeshUtilities::loadSkeleton(block,1));
+			mesh->skeleton=Skeleton::ptr(XMLMeshUtilities::loadSkeleton(block,1));
 		}
 		else if(strcmp(mxmlGetElementName(block),"AnimationData")==0){
-			mesh->skeleton->sequences.add(MeshSkeletonSequence::ptr(XMLMeshUtilities::loadSequence(block,1)));
+			mesh->skeleton->sequences.add(Sequence::ptr(XMLMeshUtilities::loadSequence(block,1)));
 		}
 	}
 
@@ -137,10 +138,10 @@ Mesh::ptr XMSHHandler::loadMeshVersion2Up(mxml_node_t *root,int version){
 			mesh=XMLMeshUtilities::loadMesh(block,version,mBufferManager,mMaterialManager,mTextureManager);
 		}
 		else if(strcmp(mxmlGetElementName(block),"Skeleton")==0){
-			mesh->skeleton=MeshSkeleton::ptr(XMLMeshUtilities::loadSkeleton(block,version));
+			mesh->skeleton=Skeleton::ptr(XMLMeshUtilities::loadSkeleton(block,version));
 		}
 		else if(strcmp(mxmlGetElementName(block),"Sequence")==0){
-			mesh->skeleton->sequences.add(MeshSkeletonSequence::ptr(XMLMeshUtilities::loadSequence(block,version)));
+			mesh->skeleton->sequences.add(Sequence::ptr(XMLMeshUtilities::loadSequence(block,version)));
 		}
 	}
 
@@ -160,7 +161,7 @@ bool XMSHHandler::saveMeshVersion1(mxml_node_t *root,Mesh::ptr mesh){
 
 		int i;
 		for(i=0;i<mesh->skeleton->sequences.size();++i){
-			MeshSkeletonSequence::ptr sequence=mesh->skeleton->sequences[i];
+			Sequence::ptr sequence=mesh->skeleton->sequences[i];
 			mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,1);
 			mxmlSetElement(node,"AnimationData");
 			mxmlAddChild(root,node);
@@ -183,7 +184,7 @@ bool XMSHHandler::saveMeshVersion2Up(mxml_node_t *root,Mesh::ptr mesh,int versio
 
 		int i;
 		for(i=0;i<mesh->skeleton->sequences.size();++i){
-			MeshSkeletonSequence::ptr sequence=mesh->skeleton->sequences[i];
+			Sequence::ptr sequence=mesh->skeleton->sequences[i];
 			mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,version);
 			mxmlSetElement(node,"Sequence");
 			mxmlAddChild(root,node);

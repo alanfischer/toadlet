@@ -138,8 +138,8 @@ public:
 	void addModifiedFields(int fields){mModifiedFields|=fields;}
 	inline int getModifiedFields() const{return mModifiedFields;}
 
-	void setShadowMesh(Mesh::ptr shadow,scalar scale,scalar testLength,scalar offset);
-	inline Mesh::ptr setShadowMesh() const{return mShadowMesh;}
+	void setShadowMesh(mesh::Mesh::ptr shadow,scalar scale,scalar testLength,scalar offset);
+	inline mesh::Mesh::ptr setShadowMesh() const{return mShadowMesh;}
 
 	virtual void parentChanged(entity::ParentEntity *newParent);
 
@@ -168,7 +168,7 @@ protected:
 
 	scalar mShadowTestLength;
 	scalar mShadowOffset;
-	Mesh::ptr mShadowMesh;
+	mesh::Mesh::ptr mShadowMesh;
 	Material::ptr mShadowMaterial;
 	entity::MeshEntity::ptr mShadowEntity;
 

@@ -38,6 +38,7 @@
 using namespace toadlet::egg;
 using namespace toadlet::egg::MathConversion;
 using namespace toadlet::peeper;
+using namespace toadlet::tadpole::mesh;
 
 namespace toadlet{
 namespace tadpole{
@@ -971,8 +972,8 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version){
 	return meshNode;
 }
 
-MeshSkeleton::ptr XMLMeshUtilities::loadSkeleton(mxml_node_t *node,int version){
-	MeshSkeleton::ptr skeleton(new MeshSkeleton());
+Skeleton::ptr XMLMeshUtilities::loadSkeleton(mxml_node_t *node,int version){
+	Skeleton::ptr skeleton(new Skeleton());
 
 	const char *prop=NULL;
 	mxml_node_t *boneNode=node->child;
@@ -981,7 +982,7 @@ MeshSkeleton::ptr XMLMeshUtilities::loadSkeleton(mxml_node_t *node,int version){
 			continue;
 		}
 
-		MeshSkeleton::Bone::ptr bone(new MeshSkeleton::Bone());
+		Skeleton::Bone::ptr bone(new Skeleton::Bone());
 
 		prop=mxmlElementGetAttr(boneNode,"Index");
 		if(prop!=NULL){
@@ -1031,7 +1032,7 @@ MeshSkeleton::ptr XMLMeshUtilities::loadSkeleton(mxml_node_t *node,int version){
 	return skeleton;
 }
 
-mxml_node_t *XMLMeshUtilities::saveSkeleton(MeshSkeleton::ptr skeleton,int version){
+mxml_node_t *XMLMeshUtilities::saveSkeleton(Skeleton::ptr skeleton,int version){
 	mxml_node_t *skeletonNode=NULL;
 	if(version<=2){
 		skeletonNode=mxmlNewElement(MXML_NO_PARENT,"SkeletonData");
@@ -1042,7 +1043,7 @@ mxml_node_t *XMLMeshUtilities::saveSkeleton(MeshSkeleton::ptr skeleton,int versi
 
 	int i;
 	for(i=0;i<skeleton->bones.size();++i){
-		MeshSkeleton::Bone::ptr bone=skeleton->bones[i];
+		Skeleton::Bone::ptr bone=skeleton->bones[i];
 
 		mxml_node_t *boneNode=mxmlNewElement(skeletonNode,"Bone");
 		{
@@ -1082,8 +1083,8 @@ mxml_node_t *XMLMeshUtilities::saveSkeleton(MeshSkeleton::ptr skeleton,int versi
 	return skeletonNode;
 }
 
-MeshSkeletonSequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int version){
-	MeshSkeletonSequence::ptr sequence(new MeshSkeletonSequence());
+Sequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int version){
+	Sequence::ptr sequence(new Sequence());
 
 	const char *prop=NULL;
 	prop=mxmlElementGetAttr(node,"Name");
@@ -1149,13 +1150,13 @@ MeshSkeletonSequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int v
 	return sequence;
 }
 
-mxml_node_t *XMLMeshUtilities::saveSequence(MeshSkeletonSequence::ptr sequence,int version){
+mxml_node_t *XMLMeshUtilities::saveSequence(Sequence::ptr sequence,int version){
 	mxml_node_t *sequenceNode=NULL;
 	if(version<=2){
 		sequenceNode=mxmlNewElement(MXML_NO_PARENT,"AnimationData");
 	}
 	else{
-		sequenceNode=mxmlNewElement(MXML_NO_PARENT,"Animation");
+		sequenceNode=mxmlNewElement(MXML_NO_PARENT,"Sequence");
 	}
 
 	if(sequence->name!=(char*)NULL){

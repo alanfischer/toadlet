@@ -8,9 +8,6 @@ set (TADPOLE_SRC
 	Engine.cpp
 	Font.cpp
 	Material.cpp
-	Mesh.cpp
-	MeshSkeleton.cpp
-	MeshSkeletonSequence.cpp
 	TPKGInputStreamFactory.cpp
 	Track.cpp
 	ResourceManager.cpp
@@ -97,9 +94,6 @@ set (TADPOLE_HEADERS
 	FontData.h
 	KeyFrame.h
 	Material.h
-	Mesh.h
-	MeshSkeleton.h
-	MeshSkeletonSequence.h
 	Renderable.h
 	ResourceHandler.h
 	ResourceHandlerData.h

@@ -31,6 +31,7 @@
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
 using namespace toadlet::peeper;
+using namespace toadlet::tadpole::mesh;
 
 namespace toadlet{
 namespace tadpole{
@@ -317,7 +318,7 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 			}
 		}
 		else if(block==SKELETON_BLOCK){
-			MeshSkeleton::ptr skeleton(new MeshSkeleton());
+			Skeleton::ptr skeleton(new Skeleton());
 
 			int numBones=in->readUInt8();
 			skeleton->bones.resize(numBones);
@@ -332,7 +333,7 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 			mathfixed::fixed translateScale=in->readBigInt32();
 
 			for(i=0;i<numBones;++i){
-				MeshSkeleton::Bone::ptr bone(new MeshSkeleton::Bone());
+				Skeleton::Bone::ptr bone(new Skeleton::Bone());
 				skeleton->bones[i]=bone;
 				bone->index=i;
 
@@ -390,7 +391,7 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 			mesh->skeleton=skeleton;
 		}
 		else if(block==ANIMATION_BLOCK){
-			MeshSkeletonSequence::ptr sequence(new MeshSkeletonSequence());
+			Sequence::ptr sequence(new Sequence());
 
 			scalar length=MathConversion::fixedToScalar(in->readBigInt32());
 
