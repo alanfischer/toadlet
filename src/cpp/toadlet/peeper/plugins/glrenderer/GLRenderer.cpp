@@ -1516,6 +1516,11 @@ void GLRenderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &res
 				0,          0,          0,          Math::ONE);
 }
 
+// Thanks to Ogre3D for this threshold
+bool GLRenderer::useMapping(GLBuffer *buffer) const{
+	return buffer->mDataSize>(1024 * 32);
+}
+
 GLenum GLRenderer::getGLDepthFunc(DepthTest depthTest){
 	switch(depthTest){
 		case DepthTest_NEVER:

@@ -34,7 +34,6 @@ namespace entity{
 
 class Scene;
 
-// TODO: Rename VisualEntity?
 class TOADLET_API RenderableEntity:public Entity{
 public:
 	TOADLET_ENTITY(RenderableEntity,Entity);

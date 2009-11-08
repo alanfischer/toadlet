@@ -39,8 +39,7 @@
 namespace toadlet{
 namespace peeper{
 
-class VertexBuffer;
-class GLBufferPeer;
+class GLBuffer;
 
 class TOADLET_API GLRenderer:public Renderer{
 public:
@@ -118,8 +117,7 @@ public:
 	const StatisticsSet &getStatisticsSet(){return mStatisticsSet;}
 	const CapabilitySet &getCapabilitySet(){return mCapabilitySet;}
 
-	// TODO: Have this be enabled on some platforms, depending some conditions...
-	inline bool useMapping() const{return false;}
+	bool useMapping(GLBuffer *buffer) const;
 
 	inline egg::mathfixed::fixed *colorArray(egg::mathfixed::fixed result[],const Color &src){result[0]=egg::MathConversion::scalarToFixed(src.r);result[1]=egg::MathConversion::scalarToFixed(src.g);result[2]=egg::MathConversion::scalarToFixed(src.b);result[3]=egg::MathConversion::scalarToFixed(src.a);return result;}
 	inline float *colorArray(float result[],const Color &src){result[0]=egg::MathConversion::scalarToFloat(src.r);result[1]=egg::MathConversion::scalarToFloat(src.g);result[2]=egg::MathConversion::scalarToFloat(src.b);result[3]=egg::MathConversion::scalarToFloat(src.a);return result;}
