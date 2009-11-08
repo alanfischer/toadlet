@@ -26,7 +26,6 @@
 #include <toadlet/hop/Shape.h>
 #include <toadlet/hop/Solid.h>
 #include <toadlet/hop/Simulator.h>
-#include <toadlet/egg/Logger.h>
 
 namespace toadlet{
 namespace hop{
