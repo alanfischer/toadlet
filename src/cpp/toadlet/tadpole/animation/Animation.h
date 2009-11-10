@@ -37,7 +37,7 @@ class AnimationController;
 
 class Animation{
 public:
-	TOADLET_SHARED_POINTERS(Animation,Animation);
+	TOADLET_SHARED_POINTERS(Animation);
 
 	virtual ~Animation(){}
 

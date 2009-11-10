@@ -35,7 +35,7 @@ namespace egg{
 template<typename Type>
 class Collection{
 public:
-	TOADLET_SHARED_POINTERS(Collection,Collection);
+	TOADLET_SHARED_POINTERS(Collection);
 
 	typedef Type* iterator;
 	typedef const Type* const_iterator;

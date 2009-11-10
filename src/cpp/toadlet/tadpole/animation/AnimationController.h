@@ -36,7 +36,7 @@ namespace animation{
 
 class TOADLET_API AnimationController{
 public:
-	TOADLET_SHARED_POINTERS(AnimationController,AnimationController);
+	TOADLET_SHARED_POINTERS(AnimationController);
 
 	enum Interpolation{
 		Interpolation_LINEAR,

@@ -35,7 +35,7 @@ namespace tadpole{
 namespace widget{
 
 Widget::Widget(Engine *engine):
-	mCounter(new PointerCounter<Widget>(0)),
+	mCounter(new PointerCounter(0)),
 	mDestroyed(false),
 	mEngine(engine),
 	mType(0),

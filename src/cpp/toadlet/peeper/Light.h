@@ -34,7 +34,7 @@ namespace peeper{
 
 class TOADLET_API Light{
 public:
-	TOADLET_SHARED_POINTERS(Light,Light);
+	TOADLET_SHARED_POINTERS(Light);
 
 	enum Type{
 		Type_POSITION,

@@ -44,7 +44,7 @@ namespace knot{
 
 class TOADLET_API PeerPacketConnection:public Connection,egg::Runnable{
 public:
-	TOADLET_SHARED_POINTERS(PeerPacketConnection,Connection);
+	TOADLET_SHARED_POINTERS(PeerPacketConnection);
 
 	PeerPacketConnection(egg::net::Socket::ptr socket);
 	virtual ~PeerPacketConnection();

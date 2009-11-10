@@ -33,7 +33,7 @@ namespace peeper{
 
 class TOADLET_API Surface:public Buffer{
 public:
-	TOADLET_SHARED_POINTERS(Surface,Surface);
+	TOADLET_SHARED_POINTERS(Surface);
 
 	virtual ~Surface(){}
 

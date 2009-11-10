@@ -35,7 +35,7 @@ namespace io{
 
 class TOADLET_API MemoryOutputStream:public OutputStream{
 public:
-	TOADLET_SHARED_POINTERS(MemoryOutputStream,OutputStream);
+	TOADLET_SHARED_POINTERS(MemoryOutputStream);
 
 	MemoryOutputStream(char *data,int length,bool ownsData);
 	MemoryOutputStream();

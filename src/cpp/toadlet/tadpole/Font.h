@@ -36,7 +36,7 @@ namespace tadpole{
 
 class TOADLET_API Font:public egg::Resource{
 public:
-	TOADLET_SHARED_POINTERS(Font,egg::Resource);
+	TOADLET_SHARED_POINTERS(Font);
 
 	class Glyph{
 	public:

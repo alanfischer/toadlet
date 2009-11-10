@@ -35,7 +35,7 @@ namespace animation{
 
 class TOADLET_API CameraProjectionAnimation:public Animation{
 public:
-	TOADLET_SHARED_POINTERS(CameraProjectionAnimation,Animation);
+	TOADLET_SHARED_POINTERS(CameraProjectionAnimation);
 
 	CameraProjectionAnimation(entity::CameraEntity::ptr target);
 	virtual ~CameraProjectionAnimation(){}

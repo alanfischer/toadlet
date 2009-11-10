@@ -39,7 +39,7 @@ class Simulator;
 
 class TOADLET_API Solid{
 public:
-	TOADLET_SHARED_POINTERS(Solid,Solid);
+	TOADLET_SHARED_POINTERS(Solid);
 
 	const static scalar INFINITE_MASS;	
 

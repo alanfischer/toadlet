@@ -36,7 +36,7 @@ namespace animation{
 
 class TOADLET_API EntityPathAnimation:public Animation{
 public:
-	TOADLET_SHARED_POINTERS(EntityPathAnimation,Animation);
+	TOADLET_SHARED_POINTERS(EntityPathAnimation);
 
 	EntityPathAnimation(entity::Entity::ptr target);
 	virtual ~EntityPathAnimation(){}

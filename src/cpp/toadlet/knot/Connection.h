@@ -32,7 +32,7 @@ namespace knot{
 /// A connection delivers packets of data.
 class Connection{
 public:
-	TOADLET_SHARED_POINTERS(Connection,Connection);
+	TOADLET_SHARED_POINTERS(Connection);
 
 	virtual ~Connection(){}
 

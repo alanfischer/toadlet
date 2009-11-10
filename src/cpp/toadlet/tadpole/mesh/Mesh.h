@@ -39,11 +39,11 @@ namespace mesh{
 
 class TOADLET_API Mesh:public egg::Resource{
 public:
-	TOADLET_SHARED_POINTERS(Mesh,egg::Resource);
+	TOADLET_SHARED_POINTERS(Mesh);
 
 	class TOADLET_API SubMesh{
 	public:
-		TOADLET_SHARED_POINTERS(SubMesh,SubMesh);
+		TOADLET_SHARED_POINTERS(SubMesh);
 
 		SubMesh(){}
 		virtual ~SubMesh(){}

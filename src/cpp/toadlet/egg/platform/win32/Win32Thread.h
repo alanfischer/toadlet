@@ -38,7 +38,7 @@ namespace egg{
 
 class TOADLET_API Win32Thread{
 public:
-	TOADLET_SHARED_POINTERS(Win32Thread,Win32Thread);
+	TOADLET_SHARED_POINTERS(Win32Thread);
 
 	Win32Thread();
 	Win32Thread(Runnable *r);

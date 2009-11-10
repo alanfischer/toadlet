@@ -34,7 +34,7 @@ namespace egg{
 
 class Resource{
 public:
-	TOADLET_SHARED_POINTERS(Resource,Resource);
+	TOADLET_SHARED_POINTERS(Resource);
 
 	virtual ~Resource(){}
 
