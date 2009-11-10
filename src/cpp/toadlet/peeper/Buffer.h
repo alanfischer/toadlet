@@ -33,7 +33,7 @@ namespace peeper{
 
 class TOADLET_API Buffer{
 public:
-	TOADLET_SHARED_POINTERS(Buffer,Buffer);
+	TOADLET_SHARED_POINTERS(Buffer);
 
 	enum UsageFlags{
 		UsageFlags_NONE=		0,

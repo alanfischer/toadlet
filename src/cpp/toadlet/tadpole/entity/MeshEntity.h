@@ -47,7 +47,7 @@ public:
 
 	class TOADLET_API SubMesh:public Renderable{
 	public:
-		TOADLET_SHARED_POINTERS(SubMesh,Renderable);
+		TOADLET_SHARED_POINTERS(SubMesh);
 
 		SubMesh(MeshEntity *meshEntity,mesh::Mesh::SubMesh *meshSubMesh);
 
@@ -65,7 +65,7 @@ public:
 	/// Specialization of the AnimationController that allows for easy access to playing single sequences.
 	class TOADLET_API MeshAnimationController:public animation::AnimationController{
 	public:
-		TOADLET_SHARED_POINTERS(MeshAnimationController,animation::AnimationController);
+		TOADLET_SHARED_POINTERS(MeshAnimationController);
 
 		MeshAnimationController(MeshEntity *entity);
 

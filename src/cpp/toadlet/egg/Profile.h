@@ -49,7 +49,7 @@ public:
 protected:
 	class Timing{
 	public:
-		TOADLET_SHARED_POINTERS(Timing,Timing);
+		TOADLET_SHARED_POINTERS(Timing);
 
 		Timing(const String &name):
 			total(0),

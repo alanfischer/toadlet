@@ -34,7 +34,7 @@ namespace egg{
 
 class TOADLET_API Random{
 public:
-	TOADLET_SHARED_POINTERS(Random,Random);
+	TOADLET_SHARED_POINTERS(Random);
 
 	Random();
 

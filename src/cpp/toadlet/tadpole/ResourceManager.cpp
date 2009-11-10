@@ -39,13 +39,6 @@ ResourceManager::ResourceManager(InputStreamFactory *inputStreamFactory){
 }
 
 ResourceManager::~ResourceManager(){
-	mResourceNameMap.clear();
-
-	ResourcePtrMap::iterator it;
-	for(it=mResourcePtrMap.begin();it!=mResourcePtrMap.end();++it){
-		it->second->resource.setPointerQueue(NULL);
-	}
-	mResourcePtrMap.clear();
 }
 
 void ResourceManager::setInputStreamFactory(InputStreamFactory *inputStreamFactory){
@@ -103,7 +96,7 @@ Resource::ptr ResourceManager::cache(const Resource::ptr &resource){
 bool ResourceManager::uncache(const String &name){
 	ResourceNameMap::iterator it=mResourceNameMap.find(name);
 	if(it!=mResourceNameMap.end()){
-		uncache(it->second);
+		uncache((ResourceCache*)it->second);
 		return true;
 	}
 	return false;
@@ -112,7 +105,7 @@ bool ResourceManager::uncache(const String &name){
 bool ResourceManager::uncache(const Resource::ptr &resource){
 	ResourcePtrMap::iterator it=mResourcePtrMap.find(resource);
 	if(it!=mResourcePtrMap.end()){
-		uncache(it->second);
+		uncache((ResourceCache*)it->second);
 		return true;
 	}
 	return false;
@@ -306,7 +299,6 @@ Resource::ptr ResourceManager::load(bool cache,const String &name,const String &
 			}
 		}
 		resCache=ResourceCache::ptr(new ResourceCache(resource,name));
-		resCache->resource.setPointerQueue(this);
 		if(cache){
 			resCache->cachedResource=resource;
 		}

@@ -35,7 +35,7 @@ namespace io{
 
 class TOADLET_API PushbackInputStream:public InputStream{
 public:
-	TOADLET_SHARED_POINTERS(PushbackInputStream,InputStream);
+	TOADLET_SHARED_POINTERS(PushbackInputStream);
 
 	PushbackInputStream(InputStream::ptr in);
 	PushbackInputStream(InputStream::ptr in,int size);

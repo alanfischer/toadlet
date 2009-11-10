@@ -33,7 +33,7 @@ namespace tadpole{
 
 class ResourceHandlerData{
 public:
-	TOADLET_SHARED_POINTERS(ResourceHandlerData,ResourceHandlerData);
+	TOADLET_SHARED_POINTERS(ResourceHandlerData);
 
 	virtual ~ResourceHandlerData(){}
 };

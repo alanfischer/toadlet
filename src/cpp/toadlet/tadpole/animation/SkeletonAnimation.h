@@ -35,7 +35,7 @@ namespace animation{
 
 class SkeletonAnimation:public Animation{
 public:
-	TOADLET_SHARED_POINTERS(SkeletonAnimation,Animation);
+	TOADLET_SHARED_POINTERS(SkeletonAnimation);
 
 	SkeletonAnimation();
 	virtual ~SkeletonAnimation();

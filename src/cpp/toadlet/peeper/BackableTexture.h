@@ -33,7 +33,7 @@ namespace peeper{
 
 class TOADLET_API BackableTexture:public Texture{
 public:
-	TOADLET_SHARED_POINTERS(BackableTexture,egg::Resource);
+	TOADLET_SHARED_POINTERS(BackableTexture);
 
 	BackableTexture();
 	virtual ~BackableTexture();

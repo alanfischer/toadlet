@@ -35,7 +35,7 @@ namespace tadpole{
 namespace entity{
 
 Entity::Entity():
-	mCounter(new PointerCounter<Entity>(0)),
+	mCounter(new PointerCounter(0)),
 	mManaged(false),
 
 	mCreated(false),

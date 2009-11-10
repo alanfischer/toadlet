@@ -34,7 +34,7 @@ namespace peeper{
 
 class TOADLET_API IndexBuffer:public egg::Resource,public Buffer{
 public:
-	TOADLET_SHARED_POINTERS(IndexBuffer,egg::Resource);
+	TOADLET_SHARED_POINTERS(IndexBuffer);
 
 	// Convinently equals size of index
 	enum IndexFormat{

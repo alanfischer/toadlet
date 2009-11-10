@@ -37,7 +37,7 @@ namespace egg{
 
 class TOADLET_API Win32WaitCondition{
 public:
-	TOADLET_SHARED_POINTERS(Win32WaitCondition,Win32WaitCondition);
+	TOADLET_SHARED_POINTERS(Win32WaitCondition);
 
 	Win32WaitCondition();
 	~Win32WaitCondition();

@@ -35,7 +35,7 @@ namespace net{
 
 class BluetoothAddress{
 public:
-	TOADLET_SHARED_POINTERS(BluetoothAddress,BluetoothAddress);
+	TOADLET_SHARED_POINTERS(BluetoothAddress);
 
 	BluetoothAddress(uint64 address,int port){
 		mAddress=address;

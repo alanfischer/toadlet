@@ -34,7 +34,7 @@ namespace net{
 
 class BluetoothClient{
 public:
-	TOADLET_SHARED_POINTERS(BluetoothClient,BluetoothClient);
+	TOADLET_SHARED_POINTERS(BluetoothClient);
 
 	virtual ~BluetoothClient(){}
 

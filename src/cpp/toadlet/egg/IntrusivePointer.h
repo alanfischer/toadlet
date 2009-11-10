@@ -37,38 +37,32 @@ public:
 		return type->getCounter()->incSharedCount();
 	}
 
-	template<typename Type,typename BaseType> static int releaseReference(Type *type,BaseType *baseType){
-		PointerCounter<BaseType> *counter=type->getCounter();
-		PointerQueue<BaseType> *queue=counter->getPointerQueue();
+	template<typename Type> static int releaseReference(Type *type){
+		PointerCounter *counter=type->getCounter();
 		int count=counter->decSharedCount();
 		if(count<1){
-			if(queue!=NULL){
-				queue->addToPointerQueue(type);
-			}
-			else{
-				delete type;
-			}
+			delete type;
 		}
 		return count;
 	}
 
 	// Only necessary if you wish to use a WeakPointer with an IntrusivePointer
-	template<typename BaseType> static PointerCounter<BaseType> *getCount(BaseType *type){
+	template<typename Type> static PointerCounter *getCount(Type *type){
 		return type->getCounter();
 	}
 };
 
 #if(defined(TOADLET_COMPILER_VC5) || defined(TOADLET_COMPILER_VC6))
-	template<typename Type,typename BaseType,typename PointerSemantics,typename Dummy=DefaultIntrusiveSemantics>
+	template<typename Type,typename PointerSemantics,typename Dummy=DefaultIntrusiveSemantics>
 #else
-	template<typename Type,typename BaseType,typename PointerSemantics>
+	template<typename Type,typename PointerSemantics>
 #endif
 class WeakPointer;
 
 #if(defined(TOADLET_COMPILER_VC5) || defined(TOADLET_COMPILER_VC6))
-	template<typename Type,typename BaseType,typename PointerSemantics=DefaultIntrusiveSemantics,typename Dummy=DefaultIntrusiveSemantics>
+	template<typename Type,typename PointerSemantics=DefaultIntrusiveSemantics,typename Dummy=DefaultIntrusiveSemantics>
 #else
-	template<typename Type,typename BaseType,typename PointerSemantics=DefaultIntrusiveSemantics>
+	template<typename Type,typename PointerSemantics=DefaultIntrusiveSemantics>
 #endif
 class IntrusivePointer{
 public:
@@ -83,7 +77,7 @@ public:
 		mPointer=NULL;
 	}
 
-	template<typename Type2> inline IntrusivePointer(const IntrusivePointer<Type2,BaseType,PointerSemantics> &pointer){
+	template<typename Type2> inline IntrusivePointer(const IntrusivePointer<Type2,PointerSemantics> &pointer){
 		mPointer=const_cast<Type2*>(pointer.get());
 		if(mPointer!=NULL){
 			PointerSemantics::addReference(mPointer);
@@ -91,14 +85,14 @@ public:
 	}
 
 	// The specialized version of this function must come after the above one
-	inline IntrusivePointer(const IntrusivePointer<Type,BaseType,PointerSemantics> &pointer){
+	inline IntrusivePointer(const IntrusivePointer<Type,PointerSemantics> &pointer){
 		mPointer=const_cast<Type*>(pointer.get());
 		if(mPointer!=NULL){
 			PointerSemantics::addReference(mPointer);
 		}
 	}
 
-	template<typename Type2> inline IntrusivePointer(const WeakPointer<Type2,BaseType,PointerSemantics> &pointer){
+	template<typename Type2> inline IntrusivePointer(const WeakPointer<Type2,PointerSemantics> &pointer){
 		mPointer=const_cast<Type2*>(pointer.get());
 		if(mPointer!=NULL){
 			PointerSemantics::addReference(mPointer);
@@ -106,7 +100,7 @@ public:
 	}
 
 	// The specialized version of this function must come after the above one
-	inline IntrusivePointer(const WeakPointer<Type,BaseType,PointerSemantics> &pointer){
+	inline IntrusivePointer(const WeakPointer<Type,PointerSemantics> &pointer){
 		mPointer=const_cast<Type*>(pointer.get());
 		if(mPointer!=NULL){
 			PointerSemantics::addReference(mPointer);
@@ -118,13 +112,13 @@ public:
 	}
 
 	#if(defined(TOADLET_COMPILER_VC5) || defined(TOADLET_COMPILER_VC6))
-		inline IntrusivePointer<Type,BaseType,PointerSemantics> &operator=(const int null){
+		inline IntrusivePointer<Type,PointerSemantics> &operator=(const int null){
 			Error__Cannot_assign_pointer_to_IntrusivePointer;
 		}
 	#endif
 
-	template<typename Type2> IntrusivePointer<Type,BaseType,PointerSemantics> &operator=(const IntrusivePointer<Type2,BaseType,PointerSemantics> &pointer){
-		if(this==(IntrusivePointer<Type,BaseType,PointerSemantics>*)&pointer){
+	template<typename Type2> IntrusivePointer<Type,PointerSemantics> &operator=(const IntrusivePointer<Type2,PointerSemantics> &pointer){
+		if(this==(IntrusivePointer<Type,PointerSemantics>*)&pointer){
 			return *this;
 		}
 
@@ -139,7 +133,7 @@ public:
 	}
 
 	// The specialized version of this function must come after the above one
-	inline IntrusivePointer<Type,BaseType,PointerSemantics> &operator=(const IntrusivePointer<Type,BaseType,PointerSemantics> &pointer){
+	inline IntrusivePointer<Type,PointerSemantics> &operator=(const IntrusivePointer<Type,PointerSemantics> &pointer){
 		if(this==&pointer){
 			return *this;
 		}
@@ -154,7 +148,7 @@ public:
 		return *this;
 	}
 
-	template<typename Type2> IntrusivePointer<Type,BaseType,PointerSemantics> &operator=(const WeakPointer<Type2,BaseType,PointerSemantics> &pointer){
+	template<typename Type2> IntrusivePointer<Type,PointerSemantics> &operator=(const WeakPointer<Type2,PointerSemantics> &pointer){
 		cleanup();
 
 		mPointer=const_cast<Type2*>(pointer.get());
@@ -166,7 +160,7 @@ public:
 	}
 
 	// The specialized version of this function must come after the above one
-	inline IntrusivePointer<Type,BaseType,PointerSemantics> &operator=(const WeakPointer<Type,BaseType,PointerSemantics> &pointer){
+	inline IntrusivePointer<Type,PointerSemantics> &operator=(const WeakPointer<Type,PointerSemantics> &pointer){
 		cleanup();
 
 		mPointer=const_cast<Type*>(pointer.get());
@@ -181,11 +175,11 @@ public:
 		return mPointer;
 	}
 
-	inline bool operator==(const IntrusivePointer<Type,BaseType,PointerSemantics> &pointer) const{
+	inline bool operator==(const IntrusivePointer<Type,PointerSemantics> &pointer) const{
 		return mPointer==pointer.mPointer;
 	}
 
-	inline bool operator!=(const IntrusivePointer<Type,BaseType,PointerSemantics> &pointer) const{
+	inline bool operator!=(const IntrusivePointer<Type,PointerSemantics> &pointer) const{
 		return mPointer!=pointer.mPointer;
 	}
 
@@ -219,7 +213,7 @@ public:
 	}
 
 	// For map useage
-	inline bool operator<(const WeakPointer<Type,BaseType,PointerSemantics> &pointer) const{
+	inline bool operator<(const WeakPointer<Type,PointerSemantics> &pointer) const{
 		return get()<pointer.get();
 	}
 
@@ -230,7 +224,7 @@ public:
 protected:
 	void cleanup(){
 		if(mPointer!=NULL){
-			PointerSemantics::releaseReference(mPointer,(BaseType*)mPointer);
+			PointerSemantics::releaseReference(mPointer);
 			mPointer=NULL;
 		}
 	}
@@ -238,8 +232,8 @@ protected:
 	Type *mPointer;
 };
 
-template<typename Type,typename Type2,typename BaseType,typename PointerSemantics> inline IntrusivePointer<Type,BaseType,PointerSemantics> shared_dynamic_cast(const IntrusivePointer<Type2,BaseType,PointerSemantics> &pointer){
-	IntrusivePointer<Type,BaseType,PointerSemantics> p;
+template<typename Type,typename Type2,typename PointerSemantics> inline IntrusivePointer<Type,PointerSemantics> shared_dynamic_cast(const IntrusivePointer<Type2,PointerSemantics> &pointer){
+	IntrusivePointer<Type,PointerSemantics> p;
 	p.internal_setPointer(dynamic_cast<Type*>(const_cast<Type2*>(pointer.get())));
 	if(p.get()!=NULL){
 		PointerSemantics::addReference(p.get());
@@ -248,8 +242,8 @@ template<typename Type,typename Type2,typename BaseType,typename PointerSemantic
 	return p;
 }
 
-template<typename Type,typename Type2,typename BaseType,typename PointerSemantics> inline IntrusivePointer<Type,BaseType,PointerSemantics> shared_dynamic_cast(const WeakPointer<Type2,BaseType,PointerSemantics> &pointer){
-	IntrusivePointer<Type,BaseType,PointerSemantics> p;
+template<typename Type,typename Type2,typename PointerSemantics> inline IntrusivePointer<Type,PointerSemantics> shared_dynamic_cast(const WeakPointer<Type2,PointerSemantics> &pointer){
+	IntrusivePointer<Type,PointerSemantics> p;
 	p.internal_setPointer(dynamic_cast<Type*>(const_cast<Type2*>(pointer.get())));
 	if(p.get()!=NULL){
 		PointerSemantics::addReference(p.get());
@@ -258,8 +252,8 @@ template<typename Type,typename Type2,typename BaseType,typename PointerSemantic
 	return p;
 }
 
-template<typename Type,typename Type2,typename BaseType,typename PointerSemantics> inline IntrusivePointer<Type,BaseType,PointerSemantics> shared_static_cast(const IntrusivePointer<Type2,BaseType,PointerSemantics> &pointer){
-	IntrusivePointer<Type,BaseType,PointerSemantics> p;
+template<typename Type,typename Type2,typename PointerSemantics> inline IntrusivePointer<Type,PointerSemantics> shared_static_cast(const IntrusivePointer<Type2,PointerSemantics> &pointer){
+	IntrusivePointer<Type,PointerSemantics> p;
 	p.internal_setPointer((Type*)pointer.get());
 	if(p.get()!=NULL){
 		PointerSemantics::addReference(p.get());
@@ -268,8 +262,8 @@ template<typename Type,typename Type2,typename BaseType,typename PointerSemantic
 	return p;
 }
 
-template<typename Type,typename Type2,typename BaseType,typename PointerSemantics> inline IntrusivePointer<Type,BaseType,PointerSemantics> shared_static_cast(const WeakPointer<Type2,BaseType,PointerSemantics> &pointer){
-	IntrusivePointer<Type,BaseType,PointerSemantics> p;
+template<typename Type,typename Type2,typename PointerSemantics> inline IntrusivePointer<Type,PointerSemantics> shared_static_cast(const WeakPointer<Type2,PointerSemantics> &pointer){
+	IntrusivePointer<Type,PointerSemantics> p;
 	p.internal_setPointer((Type*)pointer.get());
 	if(p.get()!=NULL){
 		PointerSemantics::addReference(p.get());

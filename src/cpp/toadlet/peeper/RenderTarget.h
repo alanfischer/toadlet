@@ -33,7 +33,7 @@ namespace peeper{
 
 class RenderTarget{
 public:
-	TOADLET_SHARED_POINTERS(RenderTarget,RenderTarget);
+	TOADLET_SHARED_POINTERS(RenderTarget);
 
 	virtual ~RenderTarget(){}
 

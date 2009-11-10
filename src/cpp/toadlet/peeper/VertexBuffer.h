@@ -35,7 +35,7 @@ namespace peeper{
 
 class TOADLET_API VertexBuffer:public egg::Resource,public Buffer{
 public:
-	TOADLET_SHARED_POINTERS(VertexBuffer,egg::Resource);
+	TOADLET_SHARED_POINTERS(VertexBuffer);
 
 	virtual ~VertexBuffer(){}
 

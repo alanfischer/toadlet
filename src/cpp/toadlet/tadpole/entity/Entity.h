@@ -34,7 +34,7 @@
 #ifndef TOADLET_ENTITY
 	#define TOADLET_ENTITY(Class,SuperClass) \
 		typedef SuperClass super; \
-		TOADLET_INTRUSIVE_POINTERS(Class,toadlet::tadpole::entity::Entity)
+		TOADLET_INTRUSIVE_POINTERS(Class)
 #endif
 
 namespace toadlet{
@@ -49,7 +49,7 @@ class Scene;
 
 class TOADLET_API Entity{
 public:
-	TOADLET_INTRUSIVE_POINTERS(Entity,Entity);
+	TOADLET_INTRUSIVE_POINTERS(Entity);
 
 	Entity();
 	virtual ~Entity();
@@ -102,7 +102,7 @@ public:
 
 	inline Engine *getEngine() const{return mEngine;}
 
-	inline egg::PointerCounter<Entity> *getCounter() const{return mCounter;}
+	inline egg::PointerCounter *getCounter() const{return mCounter;}
 	inline const Matrix4x4 &getVisualTransform() const{return mVisualTransform;}
 	inline const Matrix4x4 &getVisualWorldTransform() const{return mVisualWorldTransform;}
 
@@ -114,7 +114,7 @@ protected:
 	void setVisualTransformRotateScale(const Matrix3x3 &rotate,const Vector3 &scale);
 
 	// Allocation items
-	egg::PointerCounter<Entity> *mCounter;
+	egg::PointerCounter *mCounter;
 	bool mManaged;
 
 	// Engine items
@@ -125,7 +125,7 @@ protected:
 	EntityDestroyedListener *mEntityDestroyedListener;
 	bool mOwnsEntityDestroyedListener;
 
-	egg::IntrusivePointer<ParentEntity,Entity> mParent;
+	egg::IntrusivePointer<ParentEntity> mParent;
 
 	bool mIdentityTransform;
 	Vector3 mTranslate;

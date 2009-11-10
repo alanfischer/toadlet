@@ -36,7 +36,7 @@ namespace peeper{
 
 class Texture:public egg::Resource,public egg::image::ImageDefinitions{
 public:
-	TOADLET_SHARED_POINTERS(Texture,egg::Resource);
+	TOADLET_SHARED_POINTERS(Texture);
 
 	enum UsageFlags{
 		UsageFlags_NONE=			0,

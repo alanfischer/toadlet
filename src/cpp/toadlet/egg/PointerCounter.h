@@ -26,18 +26,16 @@
 #ifndef TOADLET_EGG_POINTERCOUNTER_H
 #define TOADLET_EGG_POINTERCOUNTER_H
 
-#include <toadlet/egg/PointerQueue.h>
+#include <toadlet/Types.h>
 
 namespace toadlet{
 namespace egg{
 
-template<typename Type>
 class PointerCounter{
 public:
 	PointerCounter(int c){
 		mSharedCount=c;
 		mTotalCount=c;
-		mPointerQueue=NULL;
 	}
 
 	virtual ~PointerCounter(){}
@@ -80,14 +78,6 @@ public:
 		return mTotalCount;
 	}
 
-	inline void setPointerQueue(PointerQueue<Type> *queue){
-		mPointerQueue=queue;
-	}
-
-	inline PointerQueue<Type> *getPointerQueue() const{
-		return mPointerQueue;
-	}
-
 protected:
 	virtual void destroy(){
 		delete this;
@@ -95,7 +85,6 @@ protected:
 
 	int mSharedCount;
 	int mTotalCount;
-	PointerQueue<Type> *mPointerQueue;
 };
 
 }
