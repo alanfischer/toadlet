@@ -77,17 +77,12 @@ public:
 	egg::io::InputStream::ptr makeInputStream(const egg::String &name);
 
 	// Entity methods
-	entity::Entity *allocEntity(){return NULL;}
+	entity::Entity *allocEntity(const egg::BaseType<entity::Entity> &type);
+	entity::Entity *createEntity(const egg::BaseType<entity::Entity> &type);
+	void destroyEntity(entity::Entity *entity);
+	void freeEntity(entity::Entity *entity);
 
-	entity::Entity *createEntity(){return NULL;}
-
-	void destroyEntity(entity::Entity *entity){
-		if(entity->destroyed()==false){
-			entity->destroy();
-		}
-	}
-
-	void freeEntity(entity::Entity *entity){}
+	template<typename Type> Type *createEntityType(const egg::Type<Type,entity::Entity> &type){return (Type*)createEntity(type);}
 
 	// Context methods
 	void contextReset(peeper::Renderer *renderer);

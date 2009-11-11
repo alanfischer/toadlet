@@ -34,6 +34,8 @@ namespace toadlet{
 namespace tadpole{
 namespace entity{
 
+TOADLET_ENTITY_IMPLEMENT(CameraEntity,"toadlet::tadpole::entity::CameraEntity");
+
 CameraEntity::CameraEntity():Entity(),
 	mProjectionType(ProjectionType_FOVX),
 	mFov(0),mAspect(0),

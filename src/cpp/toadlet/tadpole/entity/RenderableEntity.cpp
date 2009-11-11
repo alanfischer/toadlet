@@ -30,6 +30,8 @@ namespace toadlet{
 namespace tadpole{
 namespace entity{
 
+TOADLET_ENTITY_IMPLEMENT(RenderableEntity,"toadlet::tadpole::entity::RenderableEntity");
+
 RenderableEntity::RenderableEntity():Entity(),
 	mVisible(false)
 {}

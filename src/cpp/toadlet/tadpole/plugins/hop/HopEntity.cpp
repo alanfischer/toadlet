@@ -36,6 +36,8 @@ using namespace toadlet::tadpole::mesh;
 namespace toadlet{
 namespace tadpole{
 
+TOADLET_ENTITY_IMPLEMENT(HopEntity,"toadlet::tadpole::HopEntity");
+
 HopEntity::HopEntity():ParentEntity(),
 	mNextThink(0),
 	mSolid(new Solid()),
@@ -265,7 +267,7 @@ void HopEntity::setShadowMesh(Mesh::ptr shadow,scalar scale,scalar testLength,sc
 	mShadowOffset=offset;
 	if(mShadowMesh!=NULL){
 		if(mShadowEntity==NULL){
-			mShadowEntity=(MeshEntity*)((new MeshEntity())->create(mEngine));
+			mShadowEntity=mEngine->createEntityType(MeshEntity::type());
 			mScene->attach(mShadowEntity);
 		}
 		mShadowEntity->load(mShadowMesh);
@@ -384,7 +386,7 @@ void HopEntity::castShadow(){
 void HopEntity::showCollisionVolumes(bool show){
 	if(show){
 		if(mVolumeNode==NULL){
-			mVolumeNode=(ParentEntity*)((new ParentEntity())->create(mEngine));
+			mVolumeNode=mEngine->createEntityType(ParentEntity::type());
 			mScene->attach(mVolumeNode);
 		}
 		else{
@@ -414,7 +416,7 @@ void HopEntity::showCollisionVolumes(bool show){
 
 //			mesh->subMeshes[0]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,mesh->subMeshes[0]->indexData->indexBuffer));
 
-			MeshEntity *meshNode=(MeshEntity*)(new MeshEntity)->create(mEngine);
+			MeshEntity *meshNode=mEngine->createEntityType(MeshEntity::type());
 			meshNode->load(mesh);
 			mVolumeNode->attach(meshNode);
 		}

@@ -36,6 +36,8 @@ namespace toadlet{
 namespace tadpole{
 namespace entity{
 
+TOADLET_ENTITY_IMPLEMENT(SpriteEntity,"toadlet::tadpole::entity::SpriteEntity");
+
 SpriteEntity::SpriteEntity():RenderableEntity(),
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
 	renderable(this),

@@ -38,6 +38,8 @@ namespace toadlet{
 namespace tadpole{
 namespace entity{
 
+TOADLET_ENTITY_IMPLEMENT(ParticleEntity,"toadlet::tadpole::entity::ParticleEntity");
+
 ParticleEntity::ParticleEntity():RenderableEntity(),
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
 	renderable(this),

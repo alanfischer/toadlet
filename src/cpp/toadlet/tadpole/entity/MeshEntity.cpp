@@ -42,6 +42,8 @@ namespace toadlet{
 namespace tadpole{
 namespace entity{
 
+TOADLET_ENTITY_IMPLEMENT(MeshEntity,"toadlet::tadpole::entity::MeshEntity");
+
 MeshEntity::SubMesh::SubMesh(MeshEntity *meshEntity,Mesh::SubMesh *meshSubMesh){
 	this->meshEntity=meshEntity;
 	this->meshSubMesh=meshSubMesh;

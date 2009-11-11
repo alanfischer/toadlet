@@ -34,6 +34,8 @@ namespace toadlet{
 namespace tadpole{
 namespace entity{
 
+TOADLET_ENTITY_IMPLEMENT(Entity,"toadlet::tadpole::entity::Entity");
+
 Entity::Entity():
 	mCounter(new PointerCounter<Entity>(0)),
 	mManaged(false),

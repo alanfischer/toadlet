@@ -29,12 +29,20 @@
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/egg/IntrusivePointer.h>
 #include <toadlet/egg/WeakPointer.h>
+#include <toadlet/egg/Type.h>
 #include <toadlet/tadpole/entity/EntityDestroyedListener.h>
 
 #ifndef TOADLET_ENTITY
 	#define TOADLET_ENTITY(Class,SuperClass) \
 		typedef SuperClass super; \
+		typedef toadlet::egg::Type<Class,toadlet::tadpole::entity::Entity> ThisType; \
+		static const ThisType &type(); \
 		TOADLET_INTRUSIVE_POINTERS(Class,toadlet::tadpole::entity::Entity)
+#endif
+
+#ifndef TOADLET_ENTITY_IMPLEMENT
+	#define TOADLET_ENTITY_IMPLEMENT(Class,FullName) \
+		const Class::ThisType &Class::type(){static ThisType t(FullName);return t;}
 #endif
 
 namespace toadlet{
@@ -49,7 +57,7 @@ class Scene;
 
 class TOADLET_API Entity{
 public:
-	TOADLET_INTRUSIVE_POINTERS(Entity,Entity);
+	TOADLET_ENTITY(Entity,Entity);
 
 	Entity();
 	virtual ~Entity();

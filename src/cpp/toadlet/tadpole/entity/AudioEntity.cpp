@@ -33,6 +33,8 @@ namespace toadlet{
 namespace tadpole{
 namespace entity{
 
+TOADLET_ENTITY_IMPLEMENT(AudioEntity,"toadlet::tadpole::entity::AudioEntity");
+
 AudioEntity::AudioEntity():Entity(){}
 
 Entity *AudioEntity::create(Engine *engine){
