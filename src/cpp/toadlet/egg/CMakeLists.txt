@@ -126,6 +126,7 @@ set (EGG_HEADERS
 	String.h
 	System.h
 	Thread.h
+	Type.h
 	WaitCondition.h
 	WeakPointer.h
 	Version.h

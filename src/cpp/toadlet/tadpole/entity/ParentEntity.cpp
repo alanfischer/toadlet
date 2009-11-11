@@ -32,6 +32,8 @@ namespace toadlet{
 namespace tadpole{
 namespace entity{
 
+TOADLET_ENTITY_IMPLEMENT(ParentEntity,"toadlet::tadpole::entity::ParentEntity");
+
 ParentEntity::ParentEntity():Entity(),
 	mShadowChildrenDirty(false)
 {

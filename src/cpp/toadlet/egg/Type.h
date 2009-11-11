@@ -23,37 +23,34 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/entity/LightEntity.h>
-#include <toadlet/tadpole/entity/ParentEntity.h>
-#include <toadlet/tadpole/Engine.h>
+#ifndef TOADLET_EGG_TYPE_H
+#define TOADLET_EGG_TYPE_H
 
-using namespace toadlet::peeper;
+#include <toadlet/egg/String.h>
 
 namespace toadlet{
-namespace tadpole{
-namespace entity{
+namespace egg{
 
-TOADLET_ENTITY_IMPLEMENT(LightEntity,"toadlet::tadpole::entity::LightEntity");
+template<typename Class>
+class BaseType{
+public:
+	virtual const char *getFullName() const=0;
+	virtual Class *newInstance() const=0;
+};
 
-LightEntity::LightEntity():Entity()
-	//mLight
-{
-}
+template<typename Class,typename BaseClass>
+class TOADLET_API Type:public BaseType<BaseClass>{
+public:
+	Type(const char *fullName):mFullName(fullName){}
 
-Entity *LightEntity::create(Engine *engine){
-	super::create(engine);
+	const char *getFullName() const{return mFullName;}
+	BaseClass *newInstance() const{return new Class();}
 
-	mLight=Light::ptr(new Light());
-
-	return this;
-}
-
-void LightEntity::destroy(){
-	mLight=NULL;
-
-	super::destroy();
-}
+protected:
+	String mFullName;
+};
 
 }
 }
-}
+
+#endif

@@ -32,6 +32,8 @@ namespace toadlet{
 namespace tadpole{
 namespace entity{
 
+TOADLET_ENTITY_IMPLEMENT(SkeletonParentEntity,"toadlet::tadpole::entity::SkeletonParentEntity");
+
 SkeletonParentEntity::SkeletonParentEntity():ParentEntity(){}
 
 void SkeletonParentEntity::setSkeleton(MeshEntitySkeleton::ptr skeleton){

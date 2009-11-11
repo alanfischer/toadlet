@@ -12,12 +12,12 @@ void Logo::create(){
 
 	getEngine()->setScene((Scene*)((new Scene())->create(getEngine())));
 
-	meshEntity=(MeshEntity*)((new MeshEntity())->create(getEngine()));
+	meshEntity=mEngine->createEntityType(MeshEntity::type());
 	meshEntity->load(getEngine()->cacheMesh(resourcePath));
 	meshEntity->getAnimationController()->start();
 	getEngine()->getScene()->attach(meshEntity);
 
-	cameraEntity=(CameraEntity*)((new CameraEntity())->create(getEngine()));
+	cameraEntity=mEngine->createEntityType(CameraEntity::type());
 	cameraEntity->setLookDir(Vector3(Math::fromInt(25),-Math::fromInt(100),0),Math::Y_UNIT_VECTOR3,Math::Z_UNIT_VECTOR3);
 	cameraEntity->setClearColor(Colors::BLUE);
 	getEngine()->getScene()->attach(cameraEntity);

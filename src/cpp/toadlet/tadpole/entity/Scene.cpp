@@ -75,7 +75,7 @@ Entity *Scene::create(Engine *engine){
 		return this;
 	}
 
-	mBackground=(ParentEntity*)(new ParentEntity())->create(mEngine);
+	mBackground=mEngine->createEntityType(ParentEntity::type());
 
 	return this;
 }

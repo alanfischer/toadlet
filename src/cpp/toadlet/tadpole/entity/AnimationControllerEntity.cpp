@@ -34,6 +34,8 @@ namespace toadlet{
 namespace tadpole{
 namespace entity{
 
+TOADLET_ENTITY_IMPLEMENT(AnimationControllerEntity,"toadlet::tadpole::entity::AnimationControllerEntity");
+
 AnimationControllerEntity::AnimationControllerEntity():Entity(),
 	//mAnimationController,
 	mStartingFrame(0),

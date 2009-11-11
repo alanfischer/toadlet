@@ -46,7 +46,7 @@ public:
 	virtual void setVisible(bool visible);
 	inline bool getVisible() const{return mVisible;}
 
-	virtual void queueRenderables(Scene *scene)=0;
+	virtual void queueRenderables(Scene *scene){}
 
 protected:
 	bool mVisible;

@@ -355,6 +355,34 @@ InputStream::ptr Engine::makeInputStream(const String &name){
 	return in;
 }
 
+// TODO: Use a pool for these entities
+Entity *Engine::allocEntity(const BaseType<Entity> &type){
+	Entity *entity=type.newInstance();
+	entity->internal_setManaged(true);
+	return entity;
+}
+
+Entity *Engine::createEntity(const BaseType<Entity> &type){
+	Entity *entity=allocEntity(type);
+	entity->create(this);
+	return entity;
+}
+
+void Engine::destroyEntity(Entity *entity){
+	if(entity->destroyed()==false){
+		entity->destroy();
+	}
+}
+
+void Engine::freeEntity(Entity *entity){
+	if(entity->destroyed()==false){
+		Error::unknown("freeing undestroyed entity");
+		return;
+	}
+	if(entity->internal_getManaged()){
+		entity->internal_setManaged(false);
+	}
+}
 
 // Context methods
 void Engine::contextReset(peeper::Renderer *renderer){
