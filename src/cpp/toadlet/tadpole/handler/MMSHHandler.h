@@ -40,7 +40,7 @@ namespace handler{
 
 class TOADLET_API MMSHHandler:public ResourceHandler{
 public:
-	TOADLET_SHARED_POINTERS(MMSHHandler,ResourceHandler);
+	TOADLET_SHARED_POINTERS(MMSHHandler);
 
 	/// Engine is for getting ideal vertex format.
 	/// @todo  Replace the Engine here with a custom BufferResourceManager which could have a getIdealVertexFormatBit() function.

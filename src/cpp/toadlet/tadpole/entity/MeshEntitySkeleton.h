@@ -38,7 +38,7 @@ class MeshEntity;
 
 class TOADLET_API MeshEntitySkeleton:public Renderable{
 public:
-	TOADLET_SHARED_POINTERS(MeshEntitySkeleton,MeshEntitySkeleton);
+	TOADLET_SHARED_POINTERS(MeshEntitySkeleton);
 
 	// BoneSpaceUpdate flags
 	const static int BoneSpaceUpdate_NONE=				0;
@@ -57,7 +57,7 @@ public:
 
 	class TOADLET_API Bone{
 	public:
-		TOADLET_SHARED_POINTERS(Bone,Bone);
+		TOADLET_SHARED_POINTERS(Bone);
 
 		Bone(int index):
 			index(0),

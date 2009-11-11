@@ -33,42 +33,36 @@ namespace egg{
 
 class DefaultSharedSemantics{
 public:
-	template<typename Type,typename BaseType> static int addReference(PointerCounter<BaseType> *counter,Type *type){
+	template<typename Type> static int addReference(PointerCounter *counter,Type *type){
 		return counter->incSharedCount();
 	}
 
-	template<typename Type,typename BaseType> static int releasePointer(PointerCounter<BaseType> *counter,Type *type){
-		PointerQueue<BaseType> *queue=counter->getPointerQueue();
+	template<typename Type> static int releasePointer(PointerCounter *counter,Type *type){
 		int count=counter->decSharedCount();
 		if(count<1){
-			if(queue!=NULL){
-				queue->addToPointerQueue(type);
-			}
-			else{
-				delete type;
-			}
+			delete type;
 		}
 		return count;
 	}
 };
 
 #if(defined(TOADLET_COMPILER_VC5) || defined(TOADLET_COMPILER_VC6))
-	template<typename Type,typename BaseType,typename PointerSemantics,typename Dummy=DefaultSharedSemantics>
+	template<typename Type,typename PointerSemantics,typename Dummy=DefaultSharedSemantics>
 #else
-	template<typename Type,typename BaseType,typename PointerSemantics>
+	template<typename Type,typename PointerSemantics>
 #endif
 class WeakPointer;
 
 #if(defined(TOADLET_COMPILER_VC5) || defined(TOADLET_COMPILER_VC6))
-	template<typename Type,typename BaseType=Type,typename PointerSemantics=DefaultSharedSemantics,typename Dummy=DefaultSharedSemantics>
+	template<typename Type,typename PointerSemantics=DefaultSharedSemantics,typename Dummy=DefaultSharedSemantics>
 #else
-	template<typename Type,typename BaseType=Type,typename PointerSemantics=DefaultSharedSemantics>
+	template<typename Type,typename PointerSemantics=DefaultSharedSemantics>
 #endif
 class SharedPointer{
 public:
 	explicit inline SharedPointer(Type *pointer){
 		mPointer=pointer;
-		mCount=new PointerCounter<BaseType>(1);
+		mCount=new PointerCounter(1);
 	}
 
 	inline SharedPointer(){
@@ -76,7 +70,7 @@ public:
 		mCount=NULL;
 	}
 
-	template<typename Type2> inline SharedPointer(const SharedPointer<Type2,BaseType,PointerSemantics> &pointer){
+	template<typename Type2> inline SharedPointer(const SharedPointer<Type2,PointerSemantics> &pointer){
 		mPointer=const_cast<Type2*>(pointer.get());
 		mCount=pointer.internal_getCount();
 		if(mCount!=NULL){
@@ -85,7 +79,7 @@ public:
 	}
 
 	// The specialized version of this function must come after the above one
-	inline SharedPointer(const SharedPointer<Type,BaseType,PointerSemantics> &pointer){
+	inline SharedPointer(const SharedPointer<Type,PointerSemantics> &pointer){
 		mPointer=const_cast<Type*>(pointer.get());
 		mCount=pointer.internal_getCount();
 		if(mCount!=NULL){
@@ -93,7 +87,7 @@ public:
 		}
 	}
 
-	template<typename Type2> inline SharedPointer(const WeakPointer<Type2,BaseType,PointerSemantics> &pointer){
+	template<typename Type2> inline SharedPointer(const WeakPointer<Type2,PointerSemantics> &pointer){
 		mPointer=const_cast<Type2*>(pointer.get());
 		mCount=pointer.internal_getCount();
 		if(mCount!=NULL){
@@ -102,7 +96,7 @@ public:
 	}
 
 	// The specialized version of this function must come after the above one
-	inline SharedPointer(const WeakPointer<Type,BaseType,PointerSemantics> &pointer){
+	inline SharedPointer(const WeakPointer<Type,PointerSemantics> &pointer){
 		mPointer=const_cast<Type*>(pointer.get());
 		mCount=pointer.internal_getCount();
 		if(mCount!=NULL){
@@ -120,8 +114,8 @@ public:
 		cleanup();
 	}
 
-	template<typename Type2> SharedPointer<Type,BaseType,PointerSemantics> &operator=(const SharedPointer<Type2,BaseType,PointerSemantics> &pointer){
-		if(this==(SharedPointer<Type,BaseType,PointerSemantics>*)&pointer){
+	template<typename Type2> SharedPointer<Type,PointerSemantics> &operator=(const SharedPointer<Type2,PointerSemantics> &pointer){
+		if(this==(SharedPointer<Type,PointerSemantics>*)&pointer){
 			return *this;
 		}
 
@@ -137,7 +131,7 @@ public:
 	}
 
 	// The specialized version of this function must come after the above one
-	inline SharedPointer<Type,BaseType,PointerSemantics> &operator=(const SharedPointer<Type,BaseType,PointerSemantics> &pointer){
+	inline SharedPointer<Type,PointerSemantics> &operator=(const SharedPointer<Type,PointerSemantics> &pointer){
 		if(this==&pointer){
 			return *this;
 		}
@@ -153,7 +147,7 @@ public:
 		return *this;
 	}
 
-	template<typename Type2> SharedPointer<Type,BaseType,PointerSemantics> &operator=(const WeakPointer<Type2,BaseType,PointerSemantics> &pointer){
+	template<typename Type2> SharedPointer<Type,PointerSemantics> &operator=(const WeakPointer<Type2,PointerSemantics> &pointer){
 		cleanup();
 
 		mPointer=const_cast<Type2*>(pointer.get());
@@ -166,7 +160,7 @@ public:
 	}
 
 	// The specialized version of this function must come after the above one
-	inline SharedPointer<Type,BaseType,PointerSemantics> &operator=(const WeakPointer<Type,BaseType,PointerSemantics> &pointer){
+	inline SharedPointer<Type,PointerSemantics> &operator=(const WeakPointer<Type,PointerSemantics> &pointer){
 		cleanup();
 
 		mPointer=const_cast<Type*>(pointer.get());
@@ -178,7 +172,7 @@ public:
 		return *this;
 	}
 
-	inline SharedPointer<Type,BaseType,PointerSemantics> &operator=(int null){
+	inline SharedPointer<Type,PointerSemantics> &operator=(int null){
 		TOADLET_ASSERT(null==0);
 		cleanup();
 
@@ -192,11 +186,11 @@ public:
 		return mPointer;
 	}
 
-	inline bool operator==(const SharedPointer<Type,BaseType,PointerSemantics> &pointer) const{
+	inline bool operator==(const SharedPointer<Type,PointerSemantics> &pointer) const{
 		return mPointer==pointer.mPointer;
 	}
 
-	inline bool operator!=(const SharedPointer<Type,BaseType,PointerSemantics> &pointer) const{
+	inline bool operator!=(const SharedPointer<Type,PointerSemantics> &pointer) const{
 		return mPointer!=pointer.mPointer;
 	}
 
@@ -229,20 +223,12 @@ public:
 		return mPointer;
 	}
 
-	inline void setPointerQueue(PointerQueue<BaseType> *queue){
-		mCount->setPointerQueue(queue);
-	}
-
-	inline PointerQueue<BaseType> *getPointerQueue() const{
-		return mCount->getPointerQueue();
-	}
-
 	// For map useage
-	inline bool operator<(const WeakPointer<Type,BaseType,PointerSemantics> &pointer) const{
+	inline bool operator<(const WeakPointer<Type,PointerSemantics> &pointer) const{
 		return get()<pointer.get();
 	}
 
-	inline PointerCounter<BaseType> *internal_getCount() const{
+	inline PointerCounter *internal_getCount() const{
 		return mCount;
 	}
 
@@ -250,7 +236,7 @@ public:
 		mPointer=pointer;
 	}
 
-	inline void internal_setCount(PointerCounter<BaseType> *count){
+	inline void internal_setCount(PointerCounter *count){
 		mCount=count;
 	}
 
@@ -264,14 +250,14 @@ protected:
 	}
 
 	Type *mPointer;
-	PointerCounter<BaseType> *mCount;
+	PointerCounter *mCount;
 };
 
-template<typename Type,typename Type2,typename BaseType,typename PointerSemantics> inline SharedPointer<Type,BaseType,PointerSemantics> shared_dynamic_cast(const SharedPointer<Type2,BaseType,PointerSemantics> &pointer){
-	SharedPointer<Type,BaseType,PointerSemantics> p;
+template<typename Type,typename Type2,typename PointerSemantics> inline SharedPointer<Type,PointerSemantics> shared_dynamic_cast(const SharedPointer<Type2,PointerSemantics> &pointer){
+	SharedPointer<Type,PointerSemantics> p;
 	p.internal_setPointer(dynamic_cast<Type*>(const_cast<Type2*>(pointer.get())));
 	if(p.get()!=NULL){
-		PointerCounter<BaseType> *count=pointer.internal_getCount();
+		PointerCounter *count=pointer.internal_getCount();
 		p.internal_setCount(count);
 		if(count!=NULL){
 			PointerSemantics::addReference(count,p.get());
@@ -281,11 +267,11 @@ template<typename Type,typename Type2,typename BaseType,typename PointerSemantic
 	return p;
 }
 
-template<typename Type,typename Type2,typename BaseType,typename PointerSemantics> inline SharedPointer<Type,BaseType,PointerSemantics> shared_dynamic_cast(const WeakPointer<Type2,BaseType,PointerSemantics> &pointer){
-	SharedPointer<Type,BaseType,PointerSemantics> p;
+template<typename Type,typename Type2,typename PointerSemantics> inline SharedPointer<Type,PointerSemantics> shared_dynamic_cast(const WeakPointer<Type2,PointerSemantics> &pointer){
+	SharedPointer<Type,PointerSemantics> p;
 	p.internal_setPointer(dynamic_cast<Type*>(const_cast<Type2*>(pointer.get())));
 	if(p.get()!=NULL){
-		PointerCounter<BaseType> *count=pointer.internal_getCount();
+		PointerCounter *count=pointer.internal_getCount();
 		p.internal_setCount(count);
 		if(count!=NULL){
 			PointerSemantics::addReference(count,p.get());
@@ -295,11 +281,11 @@ template<typename Type,typename Type2,typename BaseType,typename PointerSemantic
 	return p;
 }
 
-template<typename Type,typename Type2,typename BaseType,typename PointerSemantics> inline SharedPointer<Type,BaseType,PointerSemantics> shared_static_cast(const SharedPointer<Type2,BaseType,PointerSemantics> &pointer){
-	SharedPointer<Type,BaseType,PointerSemantics> p;
+template<typename Type,typename Type2,typename PointerSemantics> inline SharedPointer<Type,PointerSemantics> shared_static_cast(const SharedPointer<Type2,PointerSemantics> &pointer){
+	SharedPointer<Type,PointerSemantics> p;
 	p.internal_setPointer((Type*)pointer.get());
 	if(p.get()!=NULL){
-		PointerCounter<BaseType> *count=pointer.internal_getCount();
+		PointerCounter *count=pointer.internal_getCount();
 		p.internal_setCount(count);
 		if(count!=NULL){
 			PointerSemantics::addReference(count,p.get());
@@ -309,11 +295,11 @@ template<typename Type,typename Type2,typename BaseType,typename PointerSemantic
 	return p;
 }
 
-template<typename Type,typename Type2,typename BaseType,typename PointerSemantics> inline SharedPointer<Type,BaseType,PointerSemantics> shared_static_cast(const WeakPointer<Type2,BaseType,PointerSemantics> &pointer){
-	SharedPointer<Type,BaseType,PointerSemantics> p;
+template<typename Type,typename Type2,typename PointerSemantics> inline SharedPointer<Type,PointerSemantics> shared_static_cast(const WeakPointer<Type2,PointerSemantics> &pointer){
+	SharedPointer<Type,PointerSemantics> p;
 	p.internal_setPointer((Type*)pointer.get());
 	if(p.get()!=NULL){
-		PointerCounter<BaseType> *count=pointer.internal_getCount();
+		PointerCounter *count=pointer.internal_getCount();
 		p.internal_setCount(count);
 		if(count!=NULL){
 			PointerSemantics::addReference(count,p.get());

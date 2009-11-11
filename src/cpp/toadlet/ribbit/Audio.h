@@ -33,7 +33,7 @@ namespace ribbit{
 
 class Audio{
 public:
-	TOADLET_SHARED_POINTERS(Audio,Audio);
+	TOADLET_SHARED_POINTERS(Audio);
 
 	virtual ~Audio(){}
 

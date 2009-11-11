@@ -35,7 +35,7 @@ namespace io{
 
 class TOADLET_API DataInputStream:public InputStream{
 public:
-	TOADLET_SHARED_POINTERS(DataInputStream,InputStream);
+	TOADLET_SHARED_POINTERS(DataInputStream);
 
 	DataInputStream(InputStream *in);
 	DataInputStream(InputStream::ptr in);

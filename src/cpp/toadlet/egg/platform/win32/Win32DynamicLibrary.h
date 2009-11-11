@@ -38,7 +38,7 @@ namespace egg{
 
 class TOADLET_API Win32DynamicLibrary{
 public:
-	TOADLET_SHARED_POINTERS(Win32DynamicLibrary,Win32DynamicLibrary);
+	TOADLET_SHARED_POINTERS(Win32DynamicLibrary);
 
 	Win32DynamicLibrary();
 	~Win32DynamicLibrary();

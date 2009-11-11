@@ -36,7 +36,7 @@ namespace handler{
 
 class TOADLET_API PNGHandler:public ResourceHandler{
 public:
-	TOADLET_SHARED_POINTERS(PNGHandler,ResourceHandler);
+	TOADLET_SHARED_POINTERS(PNGHandler);
 
 	PNGHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 

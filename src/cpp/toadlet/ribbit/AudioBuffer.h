@@ -36,7 +36,7 @@ namespace ribbit{
 
 class AudioBuffer:public egg::Resource{
 public:
-	TOADLET_SHARED_POINTERS(AudioBuffer,egg::Resource);
+	TOADLET_SHARED_POINTERS(AudioBuffer);
 
 	virtual ~AudioBuffer(){}
 

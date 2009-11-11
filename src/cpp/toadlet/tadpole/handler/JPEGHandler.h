@@ -37,7 +37,7 @@ namespace handler{
 
 class TOADLET_API JPEGHandler:public ResourceHandler{
 public:
-	TOADLET_SHARED_POINTERS(JPEGHandler,ResourceHandler);
+	TOADLET_SHARED_POINTERS(JPEGHandler);
 
 	JPEGHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 

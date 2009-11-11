@@ -43,7 +43,7 @@ namespace knot{
 
 class TOADLET_API TCPConnection:public Connection,egg::Runnable{
 public:
-	TOADLET_SHARED_POINTERS(TCPConnection,Connection);
+	TOADLET_SHARED_POINTERS(TCPConnection);
 
 	TCPConnection(egg::net::Socket::ptr socket);
 	virtual ~TCPConnection();
@@ -67,7 +67,7 @@ public:
 protected:
 	class Packet{
 	public:
-		TOADLET_SHARED_POINTERS(Packet,Packet);
+		TOADLET_SHARED_POINTERS(Packet);
 
 		Packet():length(0),debugDeliverTime(0){}
 

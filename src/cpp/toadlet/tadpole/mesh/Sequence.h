@@ -36,7 +36,7 @@ namespace mesh{
 
 class TOADLET_API Sequence:public egg::Resource{
 public:
-	TOADLET_SHARED_POINTERS(Sequence,egg::Resource);
+	TOADLET_SHARED_POINTERS(Sequence);
 
 	Sequence();
 	virtual ~Sequence();

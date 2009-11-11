@@ -40,7 +40,7 @@ class Win32Event;
 
 class TOADLET_API Win32Mutex{
 public:
-	TOADLET_SHARED_POINTERS(Win32Mutex,Win32Mutex);
+	TOADLET_SHARED_POINTERS(Win32Mutex);
 
 	Win32Mutex();
 	~Win32Mutex();

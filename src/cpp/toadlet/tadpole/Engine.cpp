@@ -425,7 +425,7 @@ Texture::ptr Engine::loadTexture(const Texture::ptr &resource){
 }
 
 Texture::ptr Engine::loadTexture(const String &name,const Texture::ptr &resource){
-	return shared_static_cast<Texture>(mTextureManager->load(name,resource));
+	return shared_static_cast<Texture>(mTextureManager->load(name,(Resource::ptr)resource));
 }
 
 Texture::ptr Engine::cacheTexture(const String &name){
@@ -441,7 +441,7 @@ Texture::ptr Engine::cacheTexture(const Texture::ptr &resource){
 }
 
 Texture::ptr Engine::cacheTexture(const String &name,const Texture::ptr &resource){
-	return shared_static_cast<Texture>(mTextureManager->cache(name,resource));
+	return shared_static_cast<Texture>(mTextureManager->cache(name,(Resource::ptr)resource));
 }
 
 bool Engine::uncacheTexture(const String &name){
@@ -472,7 +472,7 @@ Shader::ptr Engine::loadShader(const Shader::ptr &resource){
 }
 
 Shader::ptr Engine::loadShader(const String &name,const Shader::ptr &resource){
-	return shared_static_cast<Shader>(mShaderManager->load(name,resource));
+	return shared_static_cast<Shader>(mShaderManager->load(name,(Resource::ptr)resource));
 }
 
 Shader::ptr Engine::cacheShader(const String &name){
@@ -488,7 +488,7 @@ Shader::ptr Engine::cacheShader(const Shader::ptr &resource){
 }
 
 Shader::ptr Engine::cacheShader(const String &name,const Shader::ptr &resource){
-	return shared_static_cast<Shader>(mShaderManager->cache(name,resource));
+	return shared_static_cast<Shader>(mShaderManager->cache(name,(Resource::ptr)resource));
 }
 
 bool Engine::uncacheShader(const String &name){
@@ -517,7 +517,7 @@ Program::ptr Engine::loadProgram(const Program::ptr &resource){
 }
 
 Program::ptr Engine::loadProgram(const String &name,const Program::ptr &resource){
-	return shared_static_cast<Program>(mProgramManager->load(name,resource));
+	return shared_static_cast<Program>(mProgramManager->load(name,(Resource::ptr)resource));
 }
 
 Program::ptr Engine::cacheProgram(const String &name){
@@ -533,7 +533,7 @@ Program::ptr Engine::cacheProgram(const Program::ptr &resource){
 }
 
 Program::ptr Engine::cacheProgram(const String &name,const Program::ptr &resource){
-	return shared_static_cast<Program>(mProgramManager->cache(name,resource));
+	return shared_static_cast<Program>(mProgramManager->cache(name,(Resource::ptr)resource));
 }
 
 bool Engine::uncacheProgram(const String &name){
@@ -550,7 +550,7 @@ Program::ptr Engine::getProgram(const String &name) const{
 
 // Font
 Font::ptr Engine::loadFont(const String &name,const FontData::ptr &data){
-	return shared_static_cast<Font>(mFontManager->load(name,data));
+	return shared_static_cast<Font>(mFontManager->load(name,(ResourceHandlerData::ptr)data));
 }
 
 Font::ptr Engine::loadFont(const String &name,const String &file,const FontData::ptr &data){
@@ -562,7 +562,7 @@ Font::ptr Engine::loadFont(const Font::ptr &resource){
 }
 
 Font::ptr Engine::cacheFont(const String &name,const FontData::ptr &data){
-	return shared_static_cast<Font>(mFontManager->cache(name,data));
+	return shared_static_cast<Font>(mFontManager->cache(name,(ResourceHandlerData::ptr)data));
 }
 
 Font::ptr Engine::cacheFont(const String &name,const String &file,const FontData::ptr &data){
@@ -636,7 +636,7 @@ Mesh::ptr Engine::loadMesh(const Mesh::ptr &resource){
 }
 
 Mesh::ptr Engine::loadMesh(const String &name,const Mesh::ptr &resource){
-	return shared_static_cast<Mesh>(mMeshManager->load(name,resource));
+	return shared_static_cast<Mesh>(mMeshManager->load(name,(Resource::ptr)resource));
 }
 
 Mesh::ptr Engine::cacheMesh(const String &name){
@@ -652,7 +652,7 @@ Mesh::ptr Engine::cacheMesh(const Mesh::ptr &resource){
 }
 
 Mesh::ptr Engine::cacheMesh(const String &name,const Mesh::ptr &resource){
-	return shared_static_cast<Mesh>(mMeshManager->cache(name,resource));
+	return shared_static_cast<Mesh>(mMeshManager->cache(name,(Resource::ptr)resource));
 }
 
 bool Engine::uncacheMesh(const String &name){
@@ -669,7 +669,7 @@ Mesh::ptr Engine::getMesh(const String &name) const{
 
 // AudioBuffer
 AudioBuffer::ptr Engine::loadAudioBuffer(const String &name,const AudioBufferData::ptr &data){
-	return shared_static_cast<AudioBuffer>(mAudioBufferManager->load(name,data));
+	return shared_static_cast<AudioBuffer>(mAudioBufferManager->load(name,(ResourceHandlerData::ptr)data));
 }
 
 AudioBuffer::ptr Engine::loadAudioBuffer(const String &name,const String &file,const AudioBufferData::ptr &data){
@@ -681,11 +681,11 @@ AudioBuffer::ptr Engine::loadAudioBuffer(const AudioBuffer::ptr &resource){
 }
 
 AudioBuffer::ptr Engine::loadAudioBuffer(const String &name,const AudioBuffer::ptr &resource){
-	return shared_static_cast<AudioBuffer>(mAudioBufferManager->load(name,resource));
+	return shared_static_cast<AudioBuffer>(mAudioBufferManager->load(name,(Resource::ptr)resource));
 }
 
 AudioBuffer::ptr Engine::cacheAudioBuffer(const String &name,const AudioBufferData::ptr &data){
-	return shared_static_cast<AudioBuffer>(mAudioBufferManager->cache(name,data));
+	return shared_static_cast<AudioBuffer>(mAudioBufferManager->cache(name,(ResourceHandlerData::ptr)data));
 }
 
 AudioBuffer::ptr Engine::cacheAudioBuffer(const String &name,const String &file,const AudioBufferData::ptr &data){
@@ -697,7 +697,7 @@ AudioBuffer::ptr Engine::cacheAudioBuffer(const AudioBuffer::ptr &resource){
 }
 
 AudioBuffer::ptr Engine::cacheAudioBuffer(const String &name,const AudioBuffer::ptr &resource){
-	return shared_static_cast<AudioBuffer>(mAudioBufferManager->cache(name,resource));
+	return shared_static_cast<AudioBuffer>(mAudioBufferManager->cache(name,(Resource::ptr)resource));
 }
 
 bool Engine::uncacheAudioBuffer(const String &name){

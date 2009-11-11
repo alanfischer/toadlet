@@ -36,7 +36,7 @@ namespace handler{
 
 class TOADLET_API RGBHandler:public ResourceHandler{
 public:
-	TOADLET_SHARED_POINTERS(RGBHandler,ResourceHandler);
+	TOADLET_SHARED_POINTERS(RGBHandler);
 
 	RGBHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 

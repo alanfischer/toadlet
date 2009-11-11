@@ -37,7 +37,7 @@ class ProgramPeer{
 
 class Program:public egg::Resource{
 public:
-	TOADLET_SHARED_POINTERS(Program,egg::Resource);
+	TOADLET_SHARED_POINTERS(Program);
 
 	Program();
 	Program(Renderer *renderer);

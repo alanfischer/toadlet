@@ -36,11 +36,11 @@ namespace mesh{
 
 class TOADLET_API Skeleton:public egg::Resource{
 public:
-	TOADLET_SHARED_POINTERS(Skeleton,egg::Resource);
+	TOADLET_SHARED_POINTERS(Skeleton);
 
 	class TOADLET_API Bone{
 	public:
-		TOADLET_SHARED_POINTERS(Bone,Bone);
+		TOADLET_SHARED_POINTERS(Bone);
 
 		Bone():
 			index(-1),

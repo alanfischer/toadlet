@@ -33,9 +33,9 @@ namespace toadlet{
 namespace egg{
 
 #if(defined(TOADLET_COMPILER_VC5) || defined(TOADLET_COMPILER_VC6))
-	template<typename Type,typename BaseType,typename PointerSemantics,typename Dummy>
+	template<typename Type,typename PointerSemantics,typename Dummy>
 #else
-	template<typename Type,typename BaseType,typename PointerSemantics>
+	template<typename Type,typename PointerSemantics>
 #endif
 class WeakPointer{
 public:
@@ -44,7 +44,7 @@ public:
 		mCount=NULL;
 	}
 
-	template<typename Type2> inline WeakPointer(const SharedPointer<Type2,BaseType,PointerSemantics> &pointer){
+	template<typename Type2> inline WeakPointer(const SharedPointer<Type2,PointerSemantics> &pointer){
 		mPointer=const_cast<Type2*>(pointer.get());
 		mCount=pointer.internal_getCount();
 		if(mCount){
@@ -53,7 +53,7 @@ public:
 	}
 
 	// The specialized version of this function must come after the above one
-	inline WeakPointer(const SharedPointer<Type,BaseType,PointerSemantics> &pointer){
+	inline WeakPointer(const SharedPointer<Type,PointerSemantics> &pointer){
 		mPointer=const_cast<Type*>(pointer.get());
 		mCount=pointer.internal_getCount();
 		if(mCount){
@@ -61,10 +61,10 @@ public:
 		}
 	}
 
-	template<typename Type2> inline WeakPointer(const IntrusivePointer<Type2,BaseType,PointerSemantics> &pointer){
+	template<typename Type2> inline WeakPointer(const IntrusivePointer<Type2,PointerSemantics> &pointer){
 		mPointer=const_cast<Type2*>(pointer.get());
 		if(mPointer!=NULL){
-			mCount=PointerSemantics::getCount((BaseType*)mPointer);
+			mCount=PointerSemantics::getCount(mPointer);
 			mCount->incTotalCount();
 		}
 		else{
@@ -73,10 +73,10 @@ public:
 	}
 
 	// The specialized version of this function must come after the above one
-	inline WeakPointer(const IntrusivePointer<Type,BaseType,PointerSemantics> &pointer){
+	inline WeakPointer(const IntrusivePointer<Type,PointerSemantics> &pointer){
 		mPointer=const_cast<Type*>(pointer.get());
 		if(mPointer!=NULL){
-			mCount=PointerSemantics::getCount((BaseType*)mPointer);
+			mCount=PointerSemantics::getCount(mPointer);
 			mCount->incTotalCount();
 		}
 		else{
@@ -84,7 +84,7 @@ public:
 		}
 	}
 
-	template<typename Type2> inline WeakPointer(const WeakPointer<Type2,BaseType,PointerSemantics> &pointer){
+	template<typename Type2> inline WeakPointer(const WeakPointer<Type2,PointerSemantics> &pointer){
 		mPointer=const_cast<Type2*>(pointer.get());
 		mCount=pointer.internal_getCount();
 		if(mCount){
@@ -93,7 +93,7 @@ public:
 	}
 
 	// The specialized version of this function must come after the above one
-	inline WeakPointer(const WeakPointer<Type,BaseType,PointerSemantics> &pointer){
+	inline WeakPointer(const WeakPointer<Type,PointerSemantics> &pointer){
 		mPointer=const_cast<Type*>(pointer.get());
 		mCount=pointer.internal_getCount();
 		if(mCount){
@@ -106,12 +106,12 @@ public:
 	}
 
 #	if(defined(TOADLET_COMPILER_VC5) || defined(TOADLET_COMPILER_VC6))
-		inline WeakPointer<Type,BaseType,PointerSemantics> &operator=(const int null){
+		inline WeakPointer<Type,PointerSemantics> &operator=(const int null){
 			Error__Cannot_assign_pointer_to_WeakPointer;
 		}
 #	endif
 
-	template<typename Type2> inline WeakPointer<Type,BaseType,PointerSemantics> &operator=(const SharedPointer<Type2,BaseType,PointerSemantics> &pointer){
+	template<typename Type2> inline WeakPointer<Type,PointerSemantics> &operator=(const SharedPointer<Type2,PointerSemantics> &pointer){
 		cleanup();
 
 		mPointer=const_cast<Type2*>(pointer.get());
@@ -124,7 +124,7 @@ public:
 	}
 
 	// The specialized version of this function must come after the above one
-	inline WeakPointer<Type,BaseType,PointerSemantics> &operator=(const SharedPointer<Type,BaseType,PointerSemantics> &pointer){
+	inline WeakPointer<Type,PointerSemantics> &operator=(const SharedPointer<Type,PointerSemantics> &pointer){
 		cleanup();
 
 		mPointer=const_cast<Type*>(pointer.get());
@@ -136,12 +136,12 @@ public:
 		return *this;
 	}
 
-	template<typename Type2> inline WeakPointer<Type,BaseType,PointerSemantics> &operator=(const IntrusivePointer<Type2,BaseType,PointerSemantics> &pointer){
+	template<typename Type2> inline WeakPointer<Type,PointerSemantics> &operator=(const IntrusivePointer<Type2,PointerSemantics> &pointer){
 		cleanup();
 
 		mPointer=const_cast<Type2*>(pointer.get());
 		if(mPointer!=NULL){
-			mCount=PointerSemantics::getCount((BaseType*)mPointer);
+			mCount=PointerSemantics::getCount(mPointer);
 			mCount->incTotalCount();
 		}
 		else{
@@ -152,12 +152,12 @@ public:
 	}
 
 	// The specialized version of this function must come after the above one
-	inline WeakPointer<Type,BaseType,PointerSemantics> &operator=(const IntrusivePointer<Type,BaseType,PointerSemantics> &pointer){
+	inline WeakPointer<Type,PointerSemantics> &operator=(const IntrusivePointer<Type,PointerSemantics> &pointer){
 		cleanup();
 
 		mPointer=const_cast<Type*>(pointer.get());
 		if(mPointer!=NULL){
-			mCount=PointerSemantics::getCount((BaseType*)mPointer);
+			mCount=PointerSemantics::getCount(mPointer);
 			mCount->incTotalCount();
 		}
 		else{
@@ -167,7 +167,7 @@ public:
 		return *this;
 	}
 
-	template<typename Type2> inline WeakPointer<Type,BaseType,PointerSemantics> &operator=(const WeakPointer<Type2,BaseType,PointerSemantics> &pointer){
+	template<typename Type2> inline WeakPointer<Type,PointerSemantics> &operator=(const WeakPointer<Type2,PointerSemantics> &pointer){
 		if(mPointer==pointer.get()){
 			return *this;
 		}
@@ -184,7 +184,7 @@ public:
 	}
 
 	// The specialized version of this function must come after the above one
-	inline WeakPointer<Type,BaseType,PointerSemantics> &operator=(const WeakPointer<Type,BaseType,PointerSemantics> &pointer){
+	inline WeakPointer<Type,PointerSemantics> &operator=(const WeakPointer<Type,PointerSemantics> &pointer){
 		if(mPointer==pointer.get()){
 			return *this;
 		}
@@ -209,11 +209,11 @@ public:
 		}
 	}
 
-	inline bool operator==(const WeakPointer<Type,BaseType,PointerSemantics> &pointer) const{
+	inline bool operator==(const WeakPointer<Type,PointerSemantics> &pointer) const{
 		return get()==pointer.get();
 	}
 
-	inline bool operator!=(const WeakPointer<Type,BaseType,PointerSemantics> &pointer) const{
+	inline bool operator!=(const WeakPointer<Type,PointerSemantics> &pointer) const{
 		return get()!=pointer.get();
 	}
 
@@ -246,20 +246,12 @@ public:
 		return get();
 	}
 
-	inline void setPointerQueue(PointerQueue<BaseType> *queue){
-		mCount->setPointerQueue(queue);
-	}
-
-	inline PointerQueue<BaseType> *getPointerQueue() const{
-		return mCount->getPointerQueue();
-	}
-
 	// For map useage
-	inline bool operator<(const WeakPointer<Type,BaseType,PointerSemantics> &pointer) const{
+	inline bool operator<(const WeakPointer<Type,PointerSemantics> &pointer) const{
 		return get()<pointer.get();
 	}
 
-	inline PointerCounter<BaseType> *internal_getCount() const{
+	inline PointerCounter *internal_getCount() const{
 		return mCount;
 	}
 
@@ -275,18 +267,18 @@ protected:
 	}
 
 	Type *mPointer;
-	PointerCounter<BaseType> *mCount;
+	PointerCounter *mCount;
 };
 
 }
 }
 
-#define TOADLET_SHARED_POINTERS(Class,BaseClass) \
-	typedef toadlet::egg::SharedPointer<Class,BaseClass> ptr; \
-	typedef toadlet::egg::WeakPointer<Class,BaseClass,toadlet::egg::DefaultSharedSemantics> wptr
+#define TOADLET_SHARED_POINTERS(Class) \
+	typedef toadlet::egg::SharedPointer<Class> ptr; \
+	typedef toadlet::egg::WeakPointer<Class,toadlet::egg::DefaultSharedSemantics> wptr
 
-#define TOADLET_INTRUSIVE_POINTERS(Class,BaseClass) \
-	typedef toadlet::egg::IntrusivePointer<Class,BaseClass> ptr; \
-	typedef toadlet::egg::WeakPointer<Class,BaseClass,toadlet::egg::DefaultIntrusiveSemantics> wptr
+#define TOADLET_INTRUSIVE_POINTERS(Class) \
+	typedef toadlet::egg::IntrusivePointer<Class> ptr; \
+	typedef toadlet::egg::WeakPointer<Class,toadlet::egg::DefaultIntrusiveSemantics> wptr
 
 #endif

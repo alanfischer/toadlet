@@ -43,7 +43,7 @@ namespace knot{
 
 class TOADLET_API RFCOMMConnection:public Connection,egg::Runnable{
 public:
-	TOADLET_SHARED_POINTERS(RFCOMMConnection,Connection);
+	TOADLET_SHARED_POINTERS(RFCOMMConnection);
 
 	RFCOMMConnection(egg::net::BluetoothClient::ptr client);
 	RFCOMMConnection(egg::net::BluetoothServer::ptr server);
@@ -63,7 +63,7 @@ public:
 protected:
 	class Packet{
 	public:
-		TOADLET_SHARED_POINTERS(Packet,Packet);
+		TOADLET_SHARED_POINTERS(Packet);
 		char data[1024];
 		int length;
 	};

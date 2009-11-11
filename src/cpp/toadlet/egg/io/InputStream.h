@@ -35,7 +35,7 @@ namespace io{
 
 class InputStream{
 public:
-	TOADLET_SHARED_POINTERS(InputStream,InputStream);
+	TOADLET_SHARED_POINTERS(InputStream);
 
 	virtual ~InputStream(){}
 

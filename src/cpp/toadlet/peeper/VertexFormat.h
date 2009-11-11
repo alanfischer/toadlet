@@ -34,7 +34,7 @@ namespace peeper{
 
 class TOADLET_API VertexFormat{
 public:
-	TOADLET_SHARED_POINTERS(VertexFormat,VertexFormat);
+	TOADLET_SHARED_POINTERS(VertexFormat);
 
 	VertexFormat(int numVertexElements=0);
 

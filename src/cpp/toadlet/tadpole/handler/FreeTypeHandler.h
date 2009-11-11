@@ -45,7 +45,7 @@ namespace handler{
 
 class FreeTypeHandler:public ResourceHandler{
 public:
-	TOADLET_SHARED_POINTERS(FreeTypeHandler,ResourceHandler);
+	TOADLET_SHARED_POINTERS(FreeTypeHandler);
 
 	FreeTypeHandler(TextureManager *textureManager);
 	virtual ~FreeTypeHandler();

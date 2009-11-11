@@ -34,7 +34,7 @@ namespace peeper{
 
 class SurfaceRenderTarget:public RenderTarget{
 public:
-	TOADLET_SHARED_POINTERS(SurfaceRenderTarget,RenderTarget);
+	TOADLET_SHARED_POINTERS(SurfaceRenderTarget);
 
 	enum Attachment{
 		Attachment_DEPTH_STENCIL,
