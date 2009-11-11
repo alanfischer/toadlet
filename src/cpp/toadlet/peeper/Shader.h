@@ -38,7 +38,7 @@ class ShaderPeer{
 
 class Shader:public egg::Resource{
 public:
-	TOADLET_SHARED_POINTERS(Shader,egg::Resource);
+	TOADLET_SHARED_POINTERS(Shader);
 
 	enum Type{
 		Type_VERTEX,

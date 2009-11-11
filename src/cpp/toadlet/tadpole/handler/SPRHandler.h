@@ -37,7 +37,7 @@ namespace handler{
 
 class TOADLET_API SPRHandler:public ResourceHandler{
 public:
-	TOADLET_SHARED_POINTERS(SPRHandler,ResourceHandler);
+	TOADLET_SHARED_POINTERS(SPRHandler);
 
 	SPRHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 

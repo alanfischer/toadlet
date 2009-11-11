@@ -33,7 +33,7 @@ namespace peeper{
 
 class TOADLET_API VertexData{
 public:
-	TOADLET_SHARED_POINTERS(VertexData,VertexData);
+	TOADLET_SHARED_POINTERS(VertexData);
 
 	VertexData(int numVertexBuffers=0);
 

@@ -51,9 +51,9 @@ public:
 	virtual void setGravity(const Vector3 &gravity);
 	virtual const Vector3 &getGravity() const;
 
-	virtual void findHopEntitiesInAABox(const AABox &box,egg::Collection<egg::IntrusivePointer<HopEntity,entity::Entity> > &entities);
-	virtual void findHopEntitiesInSphere(const Sphere &sphere,egg::Collection<egg::IntrusivePointer<HopEntity,entity::Entity> > &entities);
-	virtual void findHopEntitiesInSolids(egg::Collection<egg::IntrusivePointer<HopEntity,entity::Entity> > &entities,hop::Solid *solids[],int numSolids);
+	virtual void findHopEntitiesInAABox(const AABox &box,egg::Collection<egg::IntrusivePointer<HopEntity> > &entities);
+	virtual void findHopEntitiesInSphere(const Sphere &sphere,egg::Collection<egg::IntrusivePointer<HopEntity> > &entities);
+	virtual void findHopEntitiesInSolids(egg::Collection<egg::IntrusivePointer<HopEntity> > &entities,hop::Solid *solids[],int numSolids);
 
 	virtual void traceSegment(HopCollision &result,const Segment &segment,int collideWithBits,HopEntity *ignore);
 
@@ -95,7 +95,7 @@ protected:
 	hop::Simulator *mSimulator;
 
 	egg::Collection<int> mFreeNetworkIDs;
-	egg::Collection<egg::IntrusivePointer<HopEntity,entity::Entity> > mNetworkIDMap;
+	egg::Collection<egg::IntrusivePointer<HopEntity> > mNetworkIDMap;
 	HopEntityFactory *mHopEntityFactory;
 
 	egg::Collection<hop::Solid*> mSolidCollection;

@@ -39,7 +39,7 @@ namespace handler{
 
 class TOADLET_API XMATHandler:public ResourceHandler{
 public:
-	TOADLET_SHARED_POINTERS(XMATHandler,ResourceHandler);
+	TOADLET_SHARED_POINTERS(XMATHandler);
 
 	XMATHandler(ResourceManager *textureManager);
 

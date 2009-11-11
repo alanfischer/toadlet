@@ -37,7 +37,7 @@ class GLFBORenderbufferSurface;
 
 class GLSurface:public Surface{
 public:
-	TOADLET_SHARED_POINTERS(GLSurface,Surface);
+	TOADLET_SHARED_POINTERS(GLSurface);
 
 	virtual ~GLSurface(){}
 

@@ -80,7 +80,7 @@ inline Pair<T1,T2> make_pair (const T1& a, const T2& b){
 template <typename K, typename V>
 class Map : public Collection<Pair<K,V> > {
 public:
-	TOADLET_SHARED_POINTERS(Map,Map);
+	TOADLET_SHARED_POINTERS(Map);
 
 	typedef K										key_type;
 	typedef V										data_type;

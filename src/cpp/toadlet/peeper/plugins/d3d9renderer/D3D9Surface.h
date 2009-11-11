@@ -36,7 +36,7 @@ class D3D9Renderer;
 
 class TOADLET_API D3D9Surface:public Surface{
 public:
-	TOADLET_SHARED_POINTERS(D3D9Surface,Surface);
+	TOADLET_SHARED_POINTERS(D3D9Surface);
 
 	D3D9Surface(IDirect3DSurface9 *surface);
 	virtual ~D3D9Surface();

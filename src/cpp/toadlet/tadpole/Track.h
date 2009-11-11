@@ -35,7 +35,7 @@ namespace tadpole{
 
 class TOADLET_API Track{
 public:
-	TOADLET_SHARED_POINTERS(Track,Track);
+	TOADLET_SHARED_POINTERS(Track);
 
 	Track();
 

@@ -34,7 +34,7 @@ namespace knot{
 
 class PeerPacket{
 public:
-	TOADLET_SHARED_POINTERS(PeerPacket,PeerPacket);
+	TOADLET_SHARED_POINTERS(PeerPacket);
 
 	PeerPacket():
 		mData(NULL),

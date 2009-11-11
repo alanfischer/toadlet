@@ -34,7 +34,7 @@ namespace egg{
 
 class Event{
 public:
-	TOADLET_SHARED_POINTERS(Event,Event);
+	TOADLET_SHARED_POINTERS(Event);
 
 	Event():mType(0){}
 	Event(int type):mType(type){}

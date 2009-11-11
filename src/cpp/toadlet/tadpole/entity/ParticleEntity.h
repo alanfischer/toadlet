@@ -76,7 +76,7 @@ public:
 
 	class ParticleSimulator{
 	public:
-		TOADLET_SHARED_POINTERS(ParticleSimulator,ParticleSimulator);
+		TOADLET_SHARED_POINTERS(ParticleSimulator);
 
 		virtual ~ParticleSimulator(){}
 

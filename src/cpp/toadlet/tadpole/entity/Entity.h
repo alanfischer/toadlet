@@ -37,7 +37,7 @@
 		typedef SuperClass super; \
 		typedef toadlet::egg::Type<Class,toadlet::tadpole::entity::Entity> ThisType; \
 		static const ThisType &type(); \
-		TOADLET_INTRUSIVE_POINTERS(Class,toadlet::tadpole::entity::Entity)
+		TOADLET_INTRUSIVE_POINTERS(Class)
 #endif
 
 #ifndef TOADLET_ENTITY_IMPLEMENT
@@ -110,7 +110,7 @@ public:
 
 	inline Engine *getEngine() const{return mEngine;}
 
-	inline egg::PointerCounter<Entity> *getCounter() const{return mCounter;}
+	inline egg::PointerCounter *getCounter() const{return mCounter;}
 	inline const Matrix4x4 &getVisualTransform() const{return mVisualTransform;}
 	inline const Matrix4x4 &getVisualWorldTransform() const{return mVisualWorldTransform;}
 
@@ -122,7 +122,7 @@ protected:
 	void setVisualTransformRotateScale(const Matrix3x3 &rotate,const Vector3 &scale);
 
 	// Allocation items
-	egg::PointerCounter<Entity> *mCounter;
+	egg::PointerCounter *mCounter;
 	bool mManaged;
 
 	// Engine items
@@ -133,7 +133,7 @@ protected:
 	EntityDestroyedListener *mEntityDestroyedListener;
 	bool mOwnsEntityDestroyedListener;
 
-	egg::IntrusivePointer<ParentEntity,Entity> mParent;
+	egg::IntrusivePointer<ParentEntity> mParent;
 
 	bool mIdentityTransform;
 	Vector3 mTranslate;

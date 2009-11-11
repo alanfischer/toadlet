@@ -34,7 +34,7 @@ namespace peeper{
 
 class TOADLET_API TextureStage{
 public:
-	TOADLET_SHARED_POINTERS(TextureStage,TextureStage);
+	TOADLET_SHARED_POINTERS(TextureStage);
 
 	enum AddressMode{
 		AddressMode_REPEAT,

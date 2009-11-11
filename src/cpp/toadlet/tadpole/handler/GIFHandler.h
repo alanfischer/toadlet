@@ -36,7 +36,7 @@ namespace handler{
 
 class TOADLET_API GIFHandler:public ResourceHandler{
 public:
-	TOADLET_SHARED_POINTERS(GIFHandler,ResourceHandler);
+	TOADLET_SHARED_POINTERS(GIFHandler);
 
 	GIFHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 

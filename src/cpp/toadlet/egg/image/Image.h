@@ -56,8 +56,7 @@ public:
 
 class TOADLET_API Image:public ImageDefinitions{
 public:
-	typedef SharedPointer<Image> ptr;
-	typedef WeakPointer<Image,Image,DefaultSharedSemantics> wptr;
+	TOADLET_SHARED_POINTERS(Image);
 
 	Image();
 	Image(Dimension dimension,int format,unsigned int width,unsigned int height=1,unsigned int depth=1);

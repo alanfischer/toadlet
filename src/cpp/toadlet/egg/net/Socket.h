@@ -61,7 +61,7 @@ namespace net{
 
 class TOADLET_API Socket{
 public:
-	TOADLET_SHARED_POINTERS(Socket,Socket);
+	TOADLET_SHARED_POINTERS(Socket);
 
 	Socket();
 	Socket(int domain,int type,int protocol);

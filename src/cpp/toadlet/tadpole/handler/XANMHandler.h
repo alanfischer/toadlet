@@ -38,7 +38,7 @@ namespace handler{
 
 class TOADLET_API XANMHandler:public ResourceHandler{
 public:
-	TOADLET_SHARED_POINTERS(XANMHandler,ResourceHandler);
+	TOADLET_SHARED_POINTERS(XANMHandler);
 
 	XANMHandler();
 

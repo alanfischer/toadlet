@@ -36,7 +36,7 @@ namespace handler{
 
 class TOADLET_API BMPHandler:public ResourceHandler{
 public:
-	TOADLET_SHARED_POINTERS(BMPHandler,ResourceHandler);
+	TOADLET_SHARED_POINTERS(BMPHandler);
 
 	BMPHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 

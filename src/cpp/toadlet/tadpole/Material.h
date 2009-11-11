@@ -38,7 +38,7 @@ namespace tadpole{
 
 class TOADLET_API Material:public egg::Resource{
 public:
-	TOADLET_SHARED_POINTERS(Material,egg::Resource);
+	TOADLET_SHARED_POINTERS(Material);
 
 	// Min/Max Layers
 	const static int MIN_LAYER=-63;

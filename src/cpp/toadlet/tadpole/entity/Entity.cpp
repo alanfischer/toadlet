@@ -37,7 +37,7 @@ namespace entity{
 TOADLET_ENTITY_IMPLEMENT(Entity,"toadlet::tadpole::entity::Entity");
 
 Entity::Entity():
-	mCounter(new PointerCounter<Entity>(0)),
+	mCounter(new PointerCounter(0)),
 	mManaged(false),
 
 	mCreated(false),

@@ -37,7 +37,7 @@ namespace io{
 
 class TOADLET_API FileInputStream:public InputStream{
 public:
-	TOADLET_SHARED_POINTERS(FileInputStream,InputStream);
+	TOADLET_SHARED_POINTERS(FileInputStream);
 
 	FileInputStream(const String &filename);
 	virtual ~FileInputStream();

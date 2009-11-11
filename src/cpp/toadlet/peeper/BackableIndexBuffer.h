@@ -33,7 +33,7 @@ namespace peeper{
 
 class TOADLET_API BackableIndexBuffer:public IndexBuffer{
 public:
-	TOADLET_SHARED_POINTERS(BackableIndexBuffer,egg::Resource);
+	TOADLET_SHARED_POINTERS(BackableIndexBuffer);
 
 	BackableIndexBuffer();
 	virtual ~BackableIndexBuffer();

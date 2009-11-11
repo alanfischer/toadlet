@@ -39,7 +39,7 @@ namespace handler{
 
 class TOADLET_API XMSHHandler:public ResourceHandler{
 public:
-	TOADLET_SHARED_POINTERS(XMSHHandler,ResourceHandler);
+	TOADLET_SHARED_POINTERS(XMSHHandler);
 
 	XMSHHandler(BufferManager *bufferManager,ResourceManager *materialManager,TextureManager *textureManager);
 

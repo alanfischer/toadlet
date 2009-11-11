@@ -35,7 +35,7 @@ namespace io{
 
 class TOADLET_API StringInputStream:public InputStream{
 public:
-	TOADLET_SHARED_POINTERS(StringInputStream,InputStream);
+	TOADLET_SHARED_POINTERS(StringInputStream);
 
 	StringInputStream(const String &string);
 	virtual ~StringInputStream();

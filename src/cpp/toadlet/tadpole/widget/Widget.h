@@ -35,7 +35,7 @@
 #ifndef TOADLET_WIDGET
 #	define TOADLET_WIDGET(Class,SuperClass) \
 		typedef SuperClass Super; \
-		TOADLET_INTRUSIVE_POINTERS(Class,toadlet::tadpole::widget::Widget)
+		TOADLET_INTRUSIVE_POINTERS(Class)
 #endif
 
 namespace toadlet{
@@ -50,7 +50,7 @@ class Window;
 
 class TOADLET_API Widget{
 public:
-	TOADLET_INTRUSIVE_POINTERS(Widget,Widget);
+	TOADLET_INTRUSIVE_POINTERS(Widget);
 
 	// Types
 	const static int Type_PARENT=		1<<0;
@@ -133,10 +133,10 @@ public:
 
 	inline Engine *getEngine() const{return mEngine;}
 
-	inline egg::PointerCounter<Widget> *getCounter() const{return mCounter;}
+	inline egg::PointerCounter *getCounter() const{return mCounter;}
 
 protected:
-	egg::PointerCounter<Widget> *mCounter;
+	egg::PointerCounter *mCounter;
 	bool mDestroyed;
 	Engine *mEngine;
 	uint64 mType;
@@ -144,7 +144,7 @@ protected:
 	WidgetDestroyedListener *mWidgetDestroyedListener;
 	bool mOwnsWidgetDestroyedListener;
 
-	egg::IntrusivePointer<ParentWidget,Widget> mParent;
+	egg::IntrusivePointer<ParentWidget> mParent;
 
 	int mPositionX,mPositionY;
 	scalar mFractionalPositionX,mFractionalPositionY;

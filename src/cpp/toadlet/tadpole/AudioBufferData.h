@@ -35,7 +35,7 @@ namespace tadpole{
 
 class TOADLET_API AudioBufferData:public ResourceHandlerData{
 public:
-	TOADLET_SHARED_POINTERS(AudioBufferData,ResourceHandlerData);
+	TOADLET_SHARED_POINTERS(AudioBufferData);
 
 	AudioBufferData(const egg::String &mimeType){
 		this->mimeType=mimeType;

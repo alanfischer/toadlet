@@ -117,7 +117,6 @@ set (EGG_HEADERS
 	Map.h
 	Mutex.h
 	PointerCounter.h
-	PointerQueue.h
 	Profile.h
 	Random.h
 	Resource.h
