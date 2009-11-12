@@ -28,6 +28,8 @@
 
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/egg/Map.h>
+#include <toadlet/egg/Resource.h>
+#include <toadlet/egg/ResourceFullyReleasedListener.h>
 #include <toadlet/egg/io/InputStream.h>
 #include <toadlet/egg/io/OutputStream.h>
 #include <toadlet/egg/io/InputStreamFactory.h>
@@ -36,93 +38,40 @@
 namespace toadlet{
 namespace tadpole{
 
-//  There are 2 basic ways of using resource management.
-//   1. cacheResource, and use it as you see fit, and when you are finished, uncacheResource
-//   2. loadResource, and when the sharedPointer goes out of scope, it will be destroyed.
-//  Also, context resources have Peers, and these resources use a mapping of Resource<->Peer, combined
-//   with a PointerQueue callback for the WeakPointer associated with the Resource, so the Peer can
-//   be inserted into a queue to unload from the context
-class TOADLET_API ResourceManager{
+class TOADLET_API ResourceManager:public egg::ResourceFullyReleasedListener{
 public:
-	class ResourceCache{
-	public:
-		TOADLET_SHARED_POINTERS(ResourceCache);
-
-		ResourceCache(egg::Resource::wptr resource,const egg::String &name){
-			this->resource=resource;
-			this->name=name;
-			count=1;
-		}
-
-		egg::Resource::wptr resource;
-		egg::Resource::ptr cachedResource;
-		egg::String name;
-		int count;
-	};
-
-	typedef egg::Map<egg::Resource*,ResourceCache::ptr> ResourcePtrMap;
-	typedef egg::Map<egg::String,ResourceCache::ptr> ResourceNameMap;
-
 	ResourceManager(egg::io::InputStreamFactory *inputStreamFactory);
 	virtual ~ResourceManager();
 
-	void setInputStreamFactory(egg::io::InputStreamFactory *inputStreamFactory);
+	virtual egg::Resource::ptr get(const egg::String &name);
+	virtual egg::Resource::ptr find(const egg::String &name,ResourceHandlerData::ptr handlerData=NULL);
+	virtual egg::Resource::ptr manage(const egg::Resource::ptr &resource);
 
-	egg::Resource::ptr load(const egg::String &name);
-	egg::Resource::ptr load(const egg::String &name,const egg::String &file);
-	egg::Resource::ptr load(const egg::String &name,ResourceHandlerData::ptr handlerData);
-	egg::Resource::ptr load(const egg::String &name,const egg::String &file,ResourceHandlerData::ptr handlerData);
-	egg::Resource::ptr load(const egg::String &name,const egg::Resource::ptr &resource);
-	egg::Resource::ptr load(const egg::Resource::ptr &resource);
+	virtual void setHandler(ResourceHandler::ptr handler,const egg::String &extension);
+	virtual ResourceHandler::ptr getHandler(const egg::String &extension);
 
-	egg::Resource::ptr cache(const egg::String &name);
-	egg::Resource::ptr cache(const egg::String &name,const egg::String &file);
-	egg::Resource::ptr cache(const egg::String &name,ResourceHandlerData::ptr handlerData);
-	egg::Resource::ptr cache(const egg::String &name,const egg::String &file,ResourceHandlerData::ptr handlerData);
-	egg::Resource::ptr cache(const egg::String &name,const egg::Resource::ptr &resource);
-	egg::Resource::ptr cache(const egg::Resource::ptr &resource);
+	virtual void setDefaultHandler(ResourceHandler::ptr handler){mDefaultHandler=handler;}
+	virtual ResourceHandler::ptr getDefaultHandler(){return mDefaultHandler;}
 
-	bool uncache(const egg::String &name);
-	bool uncache(const egg::Resource::ptr &resource);
+	virtual void setDefaultExtension(const egg::String &extension){mDefaultExtension=extension;}
+	virtual const egg::String &getDefaultExtension(){return mDefaultExtension;}
 
-	egg::Resource::ptr get(const egg::String &name);
-
-	virtual void resourceLoaded(const egg::Resource::ptr &resource);
-
-	virtual void resourceUnloaded(egg::Resource *resource);
-
-	virtual void addToPointerQueue(egg::Resource *resource);
-
-	inline ResourcePtrMap &getResourcePtrMap(){return mResourcePtrMap;}
+	virtual void resourceFullyReleased(egg::Resource *resource);
 
 	static egg::String cleanFilename(const egg::String &name);
 
-	void addHandler(ResourceHandler::ptr handler,const egg::String &extension);
-
-	void removeHandler(const egg::String &extension);
-
-	ResourceHandler::ptr getHandler(const egg::String &extension);
-
-	void setDefaultHandler(ResourceHandler::ptr handler);
-	ResourceHandler::ptr getDefaultHandler();
-
-	void setDefaultExtension(const egg::String &extension);
-
 protected:
+	typedef egg::Map<egg::String,egg::Resource::ptr> NameResourceMap;
 	typedef egg::Map<egg::String,ResourceHandler::ptr> ExtensionHandlerMap;
 
-	virtual egg::Resource::ptr load(bool cache,const egg::String &name,const egg::String &file,egg::Resource::ptr resource,ResourceHandlerData::ptr handlerData);
-
-	virtual egg::Resource::ptr loadFromFile(const egg::String &name,const ResourceHandlerData *handlerData);
-
-	virtual egg::Resource *unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData);
-	
-	void uncache(ResourceCache *resCache);
-
-	ResourcePtrMap mResourcePtrMap;
-	ResourceNameMap mResourceNameMap;
+	virtual void resourceLoaded(const egg::Resource::ptr &resource){}
+	virtual void resourceUnloaded(const egg::Resource::ptr &resource){}
 
 	egg::io::InputStreamFactory *mInputStreamFactory;
+
+	egg::Collection<egg::Resource::ptr> mResources;
+	NameResourceMap mNameResourceMap;
+
 	ExtensionHandlerMap mExtensionHandlerMap;
 	ResourceHandler::ptr mDefaultHandler;
 	egg::String mDefaultExtension;

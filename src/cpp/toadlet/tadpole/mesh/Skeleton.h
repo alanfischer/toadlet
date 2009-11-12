@@ -26,15 +26,14 @@
 #ifndef TOADLET_TADPOLE_MESH_SKELETON_H
 #define TOADLET_TADPOLE_MESH_SKELETON_H
 
-#include <toadlet/tadpole/Types.h>
-#include <toadlet/egg/Resource.h>
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/tadpole/mesh/Sequence.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace mesh{
 
-class TOADLET_API Skeleton:public egg::Resource{
+class TOADLET_API Skeleton:public egg::BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(Skeleton);
 
@@ -63,9 +62,8 @@ public:
 	Skeleton();
 	virtual ~Skeleton();
 
+	void destroy();
 	void compile();
-
-	egg::String name;
 
 	egg::Collection<Bone::ptr> bones;
 	egg::Collection<Sequence::ptr> sequences;

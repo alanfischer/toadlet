@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_MATERIAL_H
 
 #include <toadlet/tadpole/Types.h>
-#include <toadlet/egg/Resource.h>
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/LightEffect.h>
 #include <toadlet/peeper/Blend.h>
 #include <toadlet/peeper/TextureStage.h>
@@ -36,7 +36,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API Material:public egg::Resource{
+class TOADLET_API Material:public egg::BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(Material);
 
@@ -47,6 +47,7 @@ public:
 	Material();
 	virtual ~Material();
 
+	void destroy();
 	Material::ptr clone() const;
 
 	void setLighting(bool lighting){mLighting=lighting;}
@@ -81,9 +82,6 @@ public:
 	bool setTextureStage(int stage,const peeper::TextureStage::ptr &textureStage);
 	inline const peeper::TextureStage::ptr &getTextureStage(int stage) const{return mTextureStages[stage];}
 
-	void setName(const egg::String &name){mName=name;}
-	const egg::String &getName() const{return mName;}
-
 	void setSaveLocally(bool local){mSaveLocally=local;}
 	bool getSaveLocally() const{return mSaveLocally;}
 
@@ -101,8 +99,6 @@ protected:
 	peeper::Renderer::Fill mFill;
 	int mLayer;
 	egg::Collection<peeper::TextureStage::ptr> mTextureStages;
-
-	egg::String mName;
 	bool mSaveLocally;
 };
 

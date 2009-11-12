@@ -32,10 +32,10 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace ribbit{
 
-Win32AudioBuffer::Win32AudioBuffer(Win32Player *player):
+Win32AudioBuffer::Win32AudioBuffer(Win32Player *player):BaseResource(),
 	mAudioPlayer(NULL),
-	//mWaveFormat,
-	//mWaveHDR,
+	//mWaveFormat(0),
+	//mWaveHDR(0),
 	mTime(0)
 {
 	memset(&mWaveFormat,0,sizeof(mWaveFormat));
@@ -98,13 +98,11 @@ bool Win32AudioBuffer::create(InputStream::ptr inputStream,const String &mimeTyp
 	return true;
 }
 
-bool Win32AudioBuffer::destroy(){
+void Win32AudioBuffer::destroy(){
 	if(mWaveHDR.lpData!=NULL){
 		delete[] mWaveHDR.lpData;
 		mWaveHDR.lpData=NULL;
 	}
-
-	return true;
 }
 
 }

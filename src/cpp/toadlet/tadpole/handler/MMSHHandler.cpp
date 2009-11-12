@@ -79,7 +79,7 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 
 			uint16 numVertexes=in->readBigUInt16();
 			uint16 vertexType=in->readBigUInt16();
-			int formatBit=mEngine->getIdealFormatBit();
+			int formatBit=mEngine->getIdealVertexFormatBit();
 
 			VertexFormat::ptr vertexFormat(new VertexFormat());
 			int positionElement=0;

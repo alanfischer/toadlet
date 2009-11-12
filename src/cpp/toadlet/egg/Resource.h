@@ -32,15 +32,23 @@
 namespace toadlet{
 namespace egg{
 
+class ResourceFullyReleasedListener;
+
 class Resource{
 public:
 	TOADLET_SHARED_POINTERS(Resource);
 
 	virtual ~Resource(){}
 
-// TODO: See if we need these
-//	virtual void setName(const String &name)=0;
-//	virtual const String &getName() const=0;
+	virtual void destroy()=0;
+
+	virtual void retain()=0;
+	virtual void release()=0;
+
+	virtual void setFullyReleasedListener(ResourceFullyReleasedListener *listener)=0;
+	
+	virtual void setName(const String &name)=0;
+	virtual const String &getName() const=0;
 };
 
 }

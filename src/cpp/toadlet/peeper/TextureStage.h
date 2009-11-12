@@ -58,9 +58,12 @@ public:
 
 	TextureStage();
 	TextureStage(const Texture::ptr &texture1);
-	virtual ~TextureStage(){}
+	virtual ~TextureStage();
 
-	void setTexture(const Texture::ptr &texture1){texture=texture1;}
+	virtual void destroy();
+	TextureStage::ptr clone() const;
+
+	void setTexture(const Texture::ptr &texture1);
 	inline const Texture::ptr &getTexture() const{return texture;}
 	void setTextureName(const egg::String &name){textureName=name;}
 	inline const egg::String &getTextureName() const{return textureName;}

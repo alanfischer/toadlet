@@ -23,37 +23,21 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_WIDGET_WIDGETDESTROYEDLISTENER_H
-#define TOADLET_TADPOLE_WIDGET_WIDGETDESTROYEDLISTENER_H
+#ifndef TOADLET_EGG_RESOURCEFULLYRELEASEDLISTENER_H
+#define TOADLET_EGG_RESOURCEFULLYRELEASEDLISTENER_H
 
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/egg/Resource.h>
 
 namespace toadlet{
-namespace tadpole{
-namespace widget{
+namespace egg{
 
-class Widget;
-
-class WidgetDestroyedListener{
+class ResourceFullyReleasedListener{
 public:
-	virtual ~WidgetDestroyedListener(){}
+	virtual ~ResourceFullyReleasedListener(){}
 
-	virtual void widgetDestroyed(Widget *widget)=0;
+	virtual void resourceFullyReleased(Resource *resource)=0;
 };
 
-template<class Type>
-class WidgetDestroyedFunctor:public WidgetDestroyedListener{
-public:
-	WidgetDestroyedFunctor(Type *obj,void (Type::*func)(void)):mObject(obj),mFunction(func){}
-
-	virtual void widgetDestroyed(Widget *widget){(mObject->*mFunction)();}
-
-protected:
-	Type *mObject;
-	void (Type::*mFunction)(void);
-};
-
-}
 }
 }
 

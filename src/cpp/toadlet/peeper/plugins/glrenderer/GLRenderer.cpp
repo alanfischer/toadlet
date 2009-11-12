@@ -267,9 +267,9 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 	#endif
 
 	#if defined(TOADLET_HAS_GLES) && defined(TOADLET_FIXED_POINT)
-		mCapabilitySet.idealFormatBit=VertexElement::Format_BIT_FIXED_32;
+		mCapabilitySet.idealVertexFormatBit=VertexElement::Format_BIT_FIXED_32;
 	#else
-		mCapabilitySet.idealFormatBit=VertexElement::Format_BIT_FLOAT_32;
+		mCapabilitySet.idealVertexFormatBit=VertexElement::Format_BIT_FLOAT_32;
 	#endif
 
 	setDefaultStates();

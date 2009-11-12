@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_D3D9TEXTURE_H
 
 #include "D3D9Includes.h"
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/peeper/TextureBlend.h>
 
@@ -35,7 +36,8 @@ namespace peeper{
 
 class D3D9Renderer;
 
-class TOADLET_API D3D9Texture:public Texture{
+class TOADLET_API D3D9Texture:protected egg::BaseResource,public Texture{
+	TOADLET_BASERESOURCE_PASSTHROUGH();
 public:
 	D3D9Texture(D3D9Renderer *renderer);
 
@@ -58,9 +60,6 @@ public:
 	virtual bool load(int format,int width,int height,int depth,uint8 *data);
 	virtual bool read(int format,int width,int height,int depth,uint8 *data);
 
-	virtual void setName(const egg::String &name){mName=name;}
-	virtual const egg::String &getName() const{return mName;}
-
 protected:
 	static bool isD3DFORMATValid(IDirect3D9 *d3d,D3DFORMAT adapterFormat,D3DFORMAT textureFormat,DWORD usage);
 
@@ -76,8 +75,6 @@ protected:
 	int mWidth;
 	int mHeight;
 	int mDepth;
-
-	egg::String mName;
 
 	D3DFORMAT mD3DFormat;
 	DWORD mD3DUsage;

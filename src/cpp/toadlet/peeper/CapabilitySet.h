@@ -52,7 +52,7 @@ public:
 		textureDot3(false),
 		textureNonPowerOf2Restricted(false),
 		textureNonPowerOf2(false),
-		idealFormatBit(VertexElement::Format_BIT_FLOAT_32)
+		idealVertexFormatBit(VertexElement::Format_BIT_FLOAT_32)
 	{}
 
 	bool resetOnResize;
@@ -73,7 +73,7 @@ public:
 	bool textureDot3;
 	bool textureNonPowerOf2Restricted;
 	bool textureNonPowerOf2;
-	int idealFormatBit;
+	int idealVertexFormatBit;
 };
 
 }

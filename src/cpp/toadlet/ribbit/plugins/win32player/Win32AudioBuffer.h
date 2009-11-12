@@ -27,12 +27,14 @@
 #define TOADLET_RIBBIT_WIN32AUDIOBUFFERPEER_H
 
 #include "Win32Player.h"
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/ribbit/AudioBuffer.h>
 
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API Win32AudioBuffer:public AudioBuffer{
+class TOADLET_API Win32AudioBuffer:protected egg::BaseResource,public AudioBuffer{
+	TOADLET_BASERESOURCE_PASSTHROUGH();
 public:
 	Win32AudioBuffer(Win32Player *player);
 	virtual ~Win32AudioBuffer();
@@ -40,7 +42,7 @@ public:
 	AudioBuffer *getRootAudioBuffer(){return this;}
 
 	bool create(egg::io::InputStream::ptr inputStream,const egg::String &mimeType);
-	bool destroy();
+	void destroy();
 
 	inline WAVEFORMATEX *getLPWAVEFORMATEX(){return &mWaveFormat;}
 	inline WAVEHDR *getLPWAVEHDR(){return &mWaveHDR;}

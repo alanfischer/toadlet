@@ -86,9 +86,9 @@ Engine::Engine():
 
 	// Make a guess at what the ideal format is.
 	#if defined(TOADLET_FIXED_POINT) && (defined(TOADLET_PLATFORM_WINCE) || defined(TOADLET_PLATFORM_IPHONE) || defined(TOADLET_PLATFORM_ANDROID))
-		mIdealFormatBit=VertexElement::Format_BIT_FIXED_32;
+		mIdealVertexFormatBit=VertexElement::Format_BIT_FIXED_32;
 	#else
-		mIdealFormatBit=VertexElement::Format_BIT_FLOAT_32;
+		mIdealVertexFormatBit=VertexElement::Format_BIT_FLOAT_32;
 	#endif
 	updateVertexFormats();
 
@@ -107,50 +107,50 @@ Engine::Engine():
 		"Engine: adding all handlers");
 
 	// Texture handlers
-	mTextureManager->addHandler(BMPHandler::ptr(new BMPHandler(mTextureManager)),"bmp");
+	mTextureManager->setHandler(BMPHandler::ptr(new BMPHandler(mTextureManager)),"bmp");
 
-	mTextureManager->addHandler(RGBHandler::ptr(new RGBHandler(mTextureManager)),"rgb");
+	mTextureManager->setHandler(RGBHandler::ptr(new RGBHandler(mTextureManager)),"rgb");
 
-	mTextureManager->addHandler(SPRHandler::ptr(new SPRHandler(mTextureManager)),"spr");
+	mTextureManager->setHandler(SPRHandler::ptr(new SPRHandler(mTextureManager)),"spr");
 
 	#if defined(TOADLET_HAS_GIF)
-		mTextureManager->addHandler(GIFHandler::ptr(new GIFHandler(mTextureManager)),"gif");
+		mTextureManager->setHandler(GIFHandler::ptr(new GIFHandler(mTextureManager)),"gif");
 	#endif
 
 	#if defined(TOADLET_HAS_JPEG)
 		JPEGHandler::ptr jpegHandler(new JPEGHandler(mTextureManager));
-		mTextureManager->addHandler(jpegHandler,"jpeg");
-		mTextureManager->addHandler(jpegHandler,"jpg");
+		mTextureManager->setHandler(jpegHandler,"jpeg");
+		mTextureManager->setHandler(jpegHandler,"jpg");
 	#endif
 
 	#if defined(TOADLET_HAS_PNG)
-		mTextureManager->addHandler(PNGHandler::ptr(new PNGHandler(mTextureManager)),"png");
+		mTextureManager->setHandler(PNGHandler::ptr(new PNGHandler(mTextureManager)),"png");
 	#elif defined(TOADLET_PLATFORM_OSX)
-		mTextureManager->addHandler(OSXTextureHandler::ptr(new OSXTextureHandler(mTextureManager)),"png");
+		mTextureManager->setHandler(OSXTextureHandler::ptr(new OSXTextureHandler(mTextureManager)),"png");
 	#endif
 
 	// Font handlers
 	#if defined(TOADLET_PLATFORM_OSX)
 		OSXFontHandler::ptr osxFontHandler(new OSXFontHandler(mTextureManager));
-		mFontManager->addHandler(osxFontHandler,"ttf");
-		mFontManager->addHandler(osxFontHandler,"dfont");
+		mFontManager->setHandler(osxFontHandler,"ttf");
+		mFontManager->setHandler(osxFontHandler,"dfont");
 	#elif defined(TOADLET_HAS_FREETYPE)
 		FreeTypeHandler::ptr freeTypeHandler(new FreeTypeHandler(mTextureManager));
-		mFontManager->addHandler(freeTypeHandler,"ttf");
-		mFontManager->addHandler(freeTypeHandler,"dfont");
+		mFontManager->setHandler(freeTypeHandler,"ttf");
+		mFontManager->setHandler(freeTypeHandler,"dfont");
 	#endif
 
 	// Material handlers
 	#if defined(TOADLET_HAS_MXML)
-		mMaterialManager->addHandler(XMATHandler::ptr(new XMATHandler(mTextureManager)),"xmat");
+		mMaterialManager->setHandler(XMATHandler::ptr(new XMATHandler(mTextureManager)),"xmat");
 	#endif
 
 	// Mesh handlers
 	#if defined(TOADLET_HAS_MXML)
-		mMeshManager->addHandler(XMSHHandler::ptr(new XMSHHandler(mBufferManager,mMaterialManager,mTextureManager)),"xmsh");
+		mMeshManager->setHandler(XMSHHandler::ptr(new XMSHHandler(mBufferManager,mMaterialManager,mTextureManager)),"xmsh");
 	#endif
 
-	mMeshManager->addHandler(MMSHHandler::ptr(new MMSHHandler(mBufferManager,this)),"mmsh");
+	mMeshManager->setHandler(MMSHHandler::ptr(new MMSHHandler(mBufferManager,this)),"mmsh");
 
 	// AudioBuffer handlers
 	mAudioBufferHandler=AudioBufferHandler::ptr(new AudioBufferHandler(mAudioPlayer));
@@ -253,7 +253,7 @@ void Engine::setRenderer(Renderer *renderer){
 	if(renderer!=mRenderer && renderer!=NULL){
 		contextActivate(renderer);
 
-		mIdealFormatBit=renderer->getCapabilitySet().idealFormatBit;
+		mIdealVertexFormatBit=renderer->getCapabilitySet().idealVertexFormatBit;
 		updateVertexFormats();
 	}
 
@@ -265,7 +265,7 @@ Renderer *Engine::getRenderer() const{
 }
 
 void Engine::updateVertexFormats(){
-	int formatBit=mIdealFormatBit;
+	int formatBit=mIdealVertexFormatBit;
 
 	VertexElement position(VertexElement::Type_POSITION,formatBit|VertexElement::Format_BIT_COUNT_3);
 	VertexElement normal(VertexElement::Type_NORMAL,formatBit|VertexElement::Format_BIT_COUNT_3);
@@ -408,308 +408,6 @@ void Engine::contextDeactivate(Renderer *renderer){
 void Engine::contextUpdate(Renderer *renderer){
 	mBufferManager->contextUpdate(renderer);
 	mTextureManager->contextUpdate(renderer);
-}
-
-// Resource methods
-// Texture
-Texture::ptr Engine::loadTexture(const String &name){
-	return shared_static_cast<Texture>(mTextureManager->load(name));
-}
-
-Texture::ptr Engine::loadTexture(const String &name,const String &file){
-	return shared_static_cast<Texture>(mTextureManager->load(name,file));
-}
-
-Texture::ptr Engine::loadTexture(const Texture::ptr &resource){
-	return shared_static_cast<Texture>(mTextureManager->load(resource));
-}
-
-Texture::ptr Engine::loadTexture(const String &name,const Texture::ptr &resource){
-	return shared_static_cast<Texture>(mTextureManager->load(name,(Resource::ptr)resource));
-}
-
-Texture::ptr Engine::cacheTexture(const String &name){
-	return shared_static_cast<Texture>(mTextureManager->cache(name));
-}
-
-Texture::ptr Engine::cacheTexture(const String &name,const String &file){
-	return shared_static_cast<Texture>(mTextureManager->cache(name,file));
-}
-
-Texture::ptr Engine::cacheTexture(const Texture::ptr &resource){
-	return shared_static_cast<Texture>(mTextureManager->cache(resource));
-}
-
-Texture::ptr Engine::cacheTexture(const String &name,const Texture::ptr &resource){
-	return shared_static_cast<Texture>(mTextureManager->cache(name,(Resource::ptr)resource));
-}
-
-bool Engine::uncacheTexture(const String &name){
-	return mTextureManager->uncache(name);
-}
-
-bool Engine::uncacheTexture(const Texture::ptr &resource){
-	return mTextureManager->uncache(resource);
-}
-
-Texture::ptr Engine::getTexture(const String &name) const{
-	return shared_static_cast<Texture>(mTextureManager->get(name));
-}
-
-// Buffer
-
-// Shader
-Shader::ptr Engine::loadShader(const String &name){
-	return shared_static_cast<Shader>(mShaderManager->load(name));
-}
-
-Shader::ptr Engine::loadShader(const String &name,const String &file){
-	return shared_static_cast<Shader>(mShaderManager->load(name,file));
-}
-
-Shader::ptr Engine::loadShader(const Shader::ptr &resource){
-	return shared_static_cast<Shader>(mShaderManager->load(resource));
-}
-
-Shader::ptr Engine::loadShader(const String &name,const Shader::ptr &resource){
-	return shared_static_cast<Shader>(mShaderManager->load(name,(Resource::ptr)resource));
-}
-
-Shader::ptr Engine::cacheShader(const String &name){
-	return shared_static_cast<Shader>(mShaderManager->cache(name));
-}
-
-Shader::ptr Engine::cacheShader(const String &name,const String &file){
-	return shared_static_cast<Shader>(mShaderManager->cache(name,file));
-}
-
-Shader::ptr Engine::cacheShader(const Shader::ptr &resource){
-	return shared_static_cast<Shader>(mShaderManager->cache(resource));
-}
-
-Shader::ptr Engine::cacheShader(const String &name,const Shader::ptr &resource){
-	return shared_static_cast<Shader>(mShaderManager->cache(name,(Resource::ptr)resource));
-}
-
-bool Engine::uncacheShader(const String &name){
-	return mShaderManager->uncache(name);
-}
-
-bool Engine::uncacheShader(const Shader::ptr &resource){
-	return mShaderManager->uncache(resource);
-}
-
-Shader::ptr Engine::getShader(const String &name) const{
-	return shared_static_cast<Shader>(mShaderManager->get(name));
-}
-
-// Program
-Program::ptr Engine::loadProgram(const String &name){
-	return shared_static_cast<Program>(mProgramManager->load(name));
-}
-
-Program::ptr Engine::loadProgram(const String &name,const String &file){
-	return shared_static_cast<Program>(mProgramManager->load(name,file));
-}
-
-Program::ptr Engine::loadProgram(const Program::ptr &resource){
-	return shared_static_cast<Program>(mProgramManager->load(resource));
-}
-
-Program::ptr Engine::loadProgram(const String &name,const Program::ptr &resource){
-	return shared_static_cast<Program>(mProgramManager->load(name,(Resource::ptr)resource));
-}
-
-Program::ptr Engine::cacheProgram(const String &name){
-	return shared_static_cast<Program>(mProgramManager->cache(name));
-}
-
-Program::ptr Engine::cacheProgram(const String &name,const String &file){
-	return shared_static_cast<Program>(mProgramManager->cache(name,file));
-}
-
-Program::ptr Engine::cacheProgram(const Program::ptr &resource){
-	return shared_static_cast<Program>(mProgramManager->cache(resource));
-}
-
-Program::ptr Engine::cacheProgram(const String &name,const Program::ptr &resource){
-	return shared_static_cast<Program>(mProgramManager->cache(name,(Resource::ptr)resource));
-}
-
-bool Engine::uncacheProgram(const String &name){
-	return mProgramManager->uncache(name);
-}
-
-bool Engine::uncacheProgram(const Program::ptr &resource){
-	return mProgramManager->uncache(resource);
-}
-
-Program::ptr Engine::getProgram(const String &name) const{
-	return shared_static_cast<Program>(mProgramManager->get(name));
-}
-
-// Font
-Font::ptr Engine::loadFont(const String &name,const FontData::ptr &data){
-	return shared_static_cast<Font>(mFontManager->load(name,(ResourceHandlerData::ptr)data));
-}
-
-Font::ptr Engine::loadFont(const String &name,const String &file,const FontData::ptr &data){
-	return shared_static_cast<Font>(mFontManager->load(name,file,data));
-}
-
-Font::ptr Engine::loadFont(const Font::ptr &resource){
-	return shared_static_cast<Font>(mFontManager->load(resource));
-}
-
-Font::ptr Engine::cacheFont(const String &name,const FontData::ptr &data){
-	return shared_static_cast<Font>(mFontManager->cache(name,(ResourceHandlerData::ptr)data));
-}
-
-Font::ptr Engine::cacheFont(const String &name,const String &file,const FontData::ptr &data){
-	return shared_static_cast<Font>(mFontManager->cache(name,file,data));
-}
-
-Font::ptr Engine::cacheFont(const Font::ptr &resource){
-	return shared_static_cast<Font>(mFontManager->cache(resource));
-}
-
-bool Engine::uncacheFont(const String &name){
-	return mFontManager->uncache(name);
-}
-
-bool Engine::uncacheFont(const Font::ptr &resource){
-	return mFontManager->uncache(resource);
-}
-
-Font::ptr Engine::getFont(const String &name) const{
-	return shared_static_cast<Font>(mFontManager->get(name));
-}
-
-// Material
-Material::ptr Engine::loadMaterial(const String &name){
-	return shared_static_cast<Material>(mMaterialManager->load(name));
-}
-
-Material::ptr Engine::loadMaterial(const String &name,const String &file){
-	return shared_static_cast<Material>(mMaterialManager->load(name,file));
-}
-
-Material::ptr Engine::loadMaterial(const Material::ptr &resource){
-	return shared_static_cast<Material>(mMaterialManager->load(resource));
-}
-
-Material::ptr Engine::cacheMaterial(const String &name){
-	return shared_static_cast<Material>(mMaterialManager->cache(name));
-}
-
-Material::ptr Engine::cacheMaterial(const String &name,const String &file){
-	return shared_static_cast<Material>(mMaterialManager->cache(name,file));
-}
-
-Material::ptr Engine::cacheMaterial(const Material::ptr &resource){
-	return shared_static_cast<Material>(mMaterialManager->cache(resource));
-}
-
-bool Engine::uncacheMaterial(const String &name){
-	return mMaterialManager->uncache(name);
-}
-
-bool Engine::uncacheMaterial(const Material::ptr &resource){
-	return mMaterialManager->uncache(resource);
-}
-
-Material::ptr Engine::getMaterial(const String &name) const{
-	return shared_static_cast<Material>(mMaterialManager->get(name));
-}
-
-// Mesh
-Mesh::ptr Engine::loadMesh(const String &name){
-	return shared_static_cast<Mesh>(mMeshManager->load(name));
-}
-
-Mesh::ptr Engine::loadMesh(const String &name,const String &file){
-	return shared_static_cast<Mesh>(mMeshManager->load(name,file));
-}
-
-Mesh::ptr Engine::loadMesh(const Mesh::ptr &resource){
-	return shared_static_cast<Mesh>(mMeshManager->load(resource));
-}
-
-Mesh::ptr Engine::loadMesh(const String &name,const Mesh::ptr &resource){
-	return shared_static_cast<Mesh>(mMeshManager->load(name,(Resource::ptr)resource));
-}
-
-Mesh::ptr Engine::cacheMesh(const String &name){
-	return shared_static_cast<Mesh>(mMeshManager->cache(name));
-}
-
-Mesh::ptr Engine::cacheMesh(const String &name,const String &file){
-	return shared_static_cast<Mesh>(mMeshManager->cache(name,file));
-}
-
-Mesh::ptr Engine::cacheMesh(const Mesh::ptr &resource){
-	return shared_static_cast<Mesh>(mMeshManager->cache(resource));
-}
-
-Mesh::ptr Engine::cacheMesh(const String &name,const Mesh::ptr &resource){
-	return shared_static_cast<Mesh>(mMeshManager->cache(name,(Resource::ptr)resource));
-}
-
-bool Engine::uncacheMesh(const String &name){
-	return mMeshManager->uncache(name);
-}
-
-bool Engine::uncacheMesh(const Mesh::ptr &resource){
-	return mMeshManager->uncache(resource);
-}
-
-Mesh::ptr Engine::getMesh(const String &name) const{
-	return shared_static_cast<Mesh>(mMeshManager->get(name));
-}
-
-// AudioBuffer
-AudioBuffer::ptr Engine::loadAudioBuffer(const String &name,const AudioBufferData::ptr &data){
-	return shared_static_cast<AudioBuffer>(mAudioBufferManager->load(name,(ResourceHandlerData::ptr)data));
-}
-
-AudioBuffer::ptr Engine::loadAudioBuffer(const String &name,const String &file,const AudioBufferData::ptr &data){
-	return shared_static_cast<AudioBuffer>(mAudioBufferManager->load(name,file,data));
-}
-
-AudioBuffer::ptr Engine::loadAudioBuffer(const AudioBuffer::ptr &resource){
-	return shared_static_cast<AudioBuffer>(mAudioBufferManager->load(resource));
-}
-
-AudioBuffer::ptr Engine::loadAudioBuffer(const String &name,const AudioBuffer::ptr &resource){
-	return shared_static_cast<AudioBuffer>(mAudioBufferManager->load(name,(Resource::ptr)resource));
-}
-
-AudioBuffer::ptr Engine::cacheAudioBuffer(const String &name,const AudioBufferData::ptr &data){
-	return shared_static_cast<AudioBuffer>(mAudioBufferManager->cache(name,(ResourceHandlerData::ptr)data));
-}
-
-AudioBuffer::ptr Engine::cacheAudioBuffer(const String &name,const String &file,const AudioBufferData::ptr &data){
-	return shared_static_cast<AudioBuffer>(mAudioBufferManager->cache(name,file,data));
-}
-
-AudioBuffer::ptr Engine::cacheAudioBuffer(const AudioBuffer::ptr &resource){
-	return shared_static_cast<AudioBuffer>(mAudioBufferManager->cache(resource));
-}
-
-AudioBuffer::ptr Engine::cacheAudioBuffer(const String &name,const AudioBuffer::ptr &resource){
-	return shared_static_cast<AudioBuffer>(mAudioBufferManager->cache(name,(Resource::ptr)resource));
-}
-
-bool Engine::uncacheAudioBuffer(const String &name){
-	return mAudioBufferManager->uncache(name);
-}
-
-bool Engine::uncacheAudioBuffer(const AudioBuffer::ptr &resource){
-	return mAudioBufferManager->uncache(resource);
-}
-
-AudioBuffer::ptr Engine::getAudioBuffer(const String &name) const{
-	return shared_static_cast<AudioBuffer>(mAudioBufferManager->get(name));
 }
 
 }

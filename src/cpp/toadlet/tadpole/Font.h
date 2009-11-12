@@ -27,14 +27,14 @@
 #define TOADLET_TADPOLE_FONT_H
 
 #include <toadlet/tadpole/Types.h>
-#include <toadlet/egg/Resource.h>
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API Font:public egg::Resource{
+class TOADLET_API Font:public egg::BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(Font);
 
@@ -73,6 +73,8 @@ public:
 	Font(float pointWidth,float pointHeight,int height,int innerSpace,peeper::Texture::ptr texture,const wchar *charSet,Glyph **glyphs,int numChars);
 	virtual ~Font();
 
+	void destroy();
+
 	bool updateVertexBufferForString(peeper::VertexBuffer::ptr vertexBuffer,const egg::String &string,const peeper::Color &color,int alignment);
 
 	int getStringWidth(const egg::String &string) const{return getStringWidth(string,0,string.length());}
@@ -80,9 +82,6 @@ public:
 
 	int getStringHeight(const egg::String &string) const{return getStringHeight(string,0,string.length());}
 	int getStringHeight(const egg::String &string,int start,int end) const;
-
-	void setName(const egg::String &name){mName=name;}
-	const egg::String &getName() const{return mName;}
 
 	inline float getPointWidth() const{return mPointWidth;}
 	inline float getPointHeight() const{return mPointHeight;}
@@ -94,7 +93,6 @@ public:
 	peeper::VertexBufferAccessor vba;
 
 protected:
-	egg::String mName;
 	float mPointWidth;
 	float mPointHeight;
 	int mHeight; // TODO: Perhaps somehow mHeight should be depreciated, and we force all the font loaders to actually have a consistant mPointHeight

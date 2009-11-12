@@ -101,6 +101,7 @@ set (EGG_PLATFORM_WIN32_SRC
 
 # Headers
 set (EGG_HEADERS
+	BaseResource.h
 	Collection.h
 	Categories.h
 	DynamicLibrary.h
@@ -120,6 +121,7 @@ set (EGG_HEADERS
 	Profile.h
 	Random.h
 	Resource.h
+	ResourceFullyReleasedListener.h
 	Runnable.h
 	SharedPointer.h
 	String.h

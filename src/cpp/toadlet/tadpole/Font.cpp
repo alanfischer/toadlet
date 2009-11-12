@@ -35,8 +35,7 @@ using namespace toadlet::peeper;
 namespace toadlet{
 namespace tadpole{
 
-Font::Font(float pointWidth,float pointHeight,int height,int innerSpace,Texture::ptr texture,const wchar *charSet,Glyph **glyphs,int numChars):
-	//mName,
+Font::Font(float pointWidth,float pointHeight,int height,int innerSpace,Texture::ptr texture,const wchar *charSet,Glyph **glyphs,int numChars):BaseResource(),
 	mPointWidth(0),
 	mPointHeight(0),
 	mHeight(0),
@@ -62,12 +61,21 @@ Font::Font(float pointWidth,float pointHeight,int height,int innerSpace,Texture:
 }
 
 Font::~Font(){
+	destroy();
+
 	int i;
 	for(i=0;i<mGlyphs.size();++i){
 		if(mGlyphs[i]!=NULL){
 			delete mGlyphs[i];
 			mGlyphs[i]=NULL;
 		}
+	}
+}
+
+void Font::destroy(){
+	if(mTexture!=NULL){
+		mTexture->release();
+		mTexture=NULL;
 	}
 }
 

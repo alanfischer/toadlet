@@ -29,14 +29,22 @@ namespace toadlet{
 namespace tadpole{
 namespace mesh{
 
-Skeleton::Skeleton(){
+Skeleton::Skeleton():BaseResource(){
 }
 
 Skeleton::~Skeleton(){
+	destroy();
+}
+
+void Skeleton::destroy(){
+	int i;
+	for(i=0;i<sequences.size();++i){
+		sequences[i]->release();
+	}
+	sequences.clear();
 }
 
 void Skeleton::compile(){
-	// Currently does nothing
 }
 
 }

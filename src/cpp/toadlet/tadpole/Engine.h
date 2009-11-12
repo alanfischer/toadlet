@@ -90,134 +90,17 @@ public:
 	void contextDeactivate(peeper::Renderer *renderer);
 	void contextUpdate(peeper::Renderer *renderer);
 
-	// Resource methods
-	//  Texture
-	peeper::Texture::ptr loadTexture(const egg::String &name);
-	peeper::Texture::ptr loadTexture(const egg::String &name,const egg::String &file);
-	peeper::Texture::ptr loadTexture(const peeper::Texture::ptr &resource);
-	peeper::Texture::ptr loadTexture(const egg::String &name,const peeper::Texture::ptr &resource);
-
-	peeper::Texture::ptr cacheTexture(const egg::String &name);
-	peeper::Texture::ptr cacheTexture(const egg::String &name,const egg::String &file);
-	peeper::Texture::ptr cacheTexture(const peeper::Texture::ptr &resource);
-	peeper::Texture::ptr cacheTexture(const egg::String &name,const peeper::Texture::ptr &resource);
-
-	bool uncacheTexture(const egg::String &name);
-	bool uncacheTexture(const peeper::Texture::ptr &resource);
-
-	peeper::Texture::ptr getTexture(const egg::String &name) const;
-
-	TextureManager *getTextureManager() const{return mTextureManager;}
-
-	//  Buffer
-	int getIdealFormatBit() const{return mIdealFormatBit;}
+	int getIdealVertexFormatBit() const{return mIdealVertexFormatBit;}
 	const VertexFormats &getVertexFormats() const{return mVertexFormats;}
 
-	BufferManager *getBufferManager() const{return mBufferManager;}
-
-	//  Shader
-	peeper::Shader::ptr loadShader(const egg::String &name);
-	peeper::Shader::ptr loadShader(const egg::String &name,const egg::String &file);
-	peeper::Shader::ptr loadShader(const peeper::Shader::ptr &resource);
-	peeper::Shader::ptr loadShader(const egg::String &name,const peeper::Shader::ptr &resource);
-
-	peeper::Shader::ptr cacheShader(const egg::String &name);
-	peeper::Shader::ptr cacheShader(const egg::String &name,const egg::String &file);
-	peeper::Shader::ptr cacheShader(const peeper::Shader::ptr &resource);
-	peeper::Shader::ptr cacheShader(const egg::String &name,const peeper::Shader::ptr &resource);
-
-	bool uncacheShader(const egg::String &name);
-	bool uncacheShader(const peeper::Shader::ptr &resource);
-
-	peeper::Shader::ptr getShader(const egg::String &name) const;
-
-	ResourceManager *getShaderManager() const{return mShaderManager;}
-
-	//  Program
-	peeper::Program::ptr loadProgram(const egg::String &name);
-	peeper::Program::ptr loadProgram(const egg::String &name,const egg::String &file);
-	peeper::Program::ptr loadProgram(const peeper::Program::ptr &resource);
-	peeper::Program::ptr loadProgram(const egg::String &name,const peeper::Program::ptr &resource);
-
-	peeper::Program::ptr cacheProgram(const egg::String &name);
-	peeper::Program::ptr cacheProgram(const egg::String &name,const egg::String &file);
-	peeper::Program::ptr cacheProgram(const peeper::Program::ptr &resource);
-	peeper::Program::ptr cacheProgram(const egg::String &name,const peeper::Program::ptr &resource);
-
-	bool uncacheProgram(const egg::String &name);
-	bool uncacheProgram(const peeper::Program::ptr &resource);
-
-	peeper::Program::ptr getProgram(const egg::String &name) const;
-
-	ResourceManager *getProgramManager() const{return mProgramManager;}
-
-	//  Material
-	Material::ptr loadMaterial(const egg::String &name);
-	Material::ptr loadMaterial(const egg::String &name,const egg::String &file);
-	Material::ptr loadMaterial(const Material::ptr &resource);
-
-	Material::ptr cacheMaterial(const egg::String &name);
-	Material::ptr cacheMaterial(const egg::String &name,const egg::String &file);
-	Material::ptr cacheMaterial(const Material::ptr &resource);
-
-	bool uncacheMaterial(const egg::String &name);
-	bool uncacheMaterial(const Material::ptr &resource);
-
-	Material::ptr getMaterial(const egg::String &name) const;
-
-	MaterialManager *getMaterialManager() const{return  mMaterialManager;}
-
-	//  Font
-	Font::ptr loadFont(const egg::String &name,const FontData::ptr &data);
-	Font::ptr loadFont(const egg::String &name,const egg::String &file,const FontData::ptr &data);
-	Font::ptr loadFont(const Font::ptr &resource);
-
-	Font::ptr cacheFont(const egg::String &name,const FontData::ptr &data);
-	Font::ptr cacheFont(const egg::String &name,const egg::String &file,const FontData::ptr &data);
-	Font::ptr cacheFont(const Font::ptr &resource);
-
-	bool uncacheFont(const egg::String &name);
-	bool uncacheFont(const Font::ptr &resource);
-
-	Font::ptr getFont(const egg::String &name) const;
-
-	ResourceManager *getFontManager() const{return mFontManager;}
-
-	//  Mesh
-	mesh::Mesh::ptr loadMesh(const egg::String &name);
-	mesh::Mesh::ptr loadMesh(const egg::String &name,const egg::String &file);
-	mesh::Mesh::ptr loadMesh(const mesh::Mesh::ptr &resource);
-	mesh::Mesh::ptr loadMesh(const egg::String &name,const mesh::Mesh::ptr &resource);
-
-	mesh::Mesh::ptr cacheMesh(const egg::String &name);
-	mesh::Mesh::ptr cacheMesh(const egg::String &name,const egg::String &file);
-	mesh::Mesh::ptr cacheMesh(const mesh::Mesh::ptr &resource);
-	mesh::Mesh::ptr cacheMesh(const egg::String &name,const mesh::Mesh::ptr &resource);
-
-	bool uncacheMesh(const egg::String &name);
-	bool uncacheMesh(const mesh::Mesh::ptr &resource);
-
-	mesh::Mesh::ptr getMesh(const egg::String &name) const;
-
-	MeshManager *getMeshManager() const{return mMeshManager;}
-
-	// AudioBuffer
-	ribbit::AudioBuffer::ptr loadAudioBuffer(const egg::String &name,const AudioBufferData::ptr &data);
-	ribbit::AudioBuffer::ptr loadAudioBuffer(const egg::String &name,const egg::String &file,const AudioBufferData::ptr &data);
-	ribbit::AudioBuffer::ptr loadAudioBuffer(const ribbit::AudioBuffer::ptr &resource);
-	ribbit::AudioBuffer::ptr loadAudioBuffer(const egg::String &name,const ribbit::AudioBuffer::ptr &resource);
-
-	ribbit::AudioBuffer::ptr cacheAudioBuffer(const egg::String &name,const AudioBufferData::ptr &data);
-	ribbit::AudioBuffer::ptr cacheAudioBuffer(const egg::String &name,const egg::String &file,const AudioBufferData::ptr &data);
-	ribbit::AudioBuffer::ptr cacheAudioBuffer(const ribbit::AudioBuffer::ptr &resource);
-	ribbit::AudioBuffer::ptr cacheAudioBuffer(const egg::String &name,const ribbit::AudioBuffer::ptr &resource);
-
-	bool uncacheAudioBuffer(const egg::String &name);
-	bool uncacheAudioBuffer(const ribbit::AudioBuffer::ptr &resource);
-
-	ribbit::AudioBuffer::ptr getAudioBuffer(const egg::String &name) const;
-
-	ResourceManager *getAudioBufferManager() const{return mAudioBufferManager;}
+	inline TextureManager *getTextureManager() const{return mTextureManager;}
+	inline BufferManager *getBufferManager() const{return mBufferManager;}
+	inline ResourceManager *getShaderManager() const{return mShaderManager;}
+	inline ResourceManager *getProgramManager() const{return mProgramManager;}
+	inline MaterialManager *getMaterialManager() const{return  mMaterialManager;}
+	inline ResourceManager *getFontManager() const{return mFontManager;}
+	inline MeshManager *getMeshManager() const{return mMeshManager;}
+	inline ResourceManager *getAudioBufferManager() const{return mAudioBufferManager;}
 
 protected:
 	egg::String mDirectory;
@@ -226,30 +109,16 @@ protected:
 	peeper::Renderer *mRenderer;
 	ribbit::AudioPlayer *mAudioPlayer;
 
-	// Texture
-	TextureManager *mTextureManager;
-
-	// Buffer
-	BufferManager *mBufferManager;
-	int mIdealFormatBit;
+	int mIdealVertexFormatBit;
 	VertexFormats mVertexFormats;
 
-	// Shader
+	TextureManager *mTextureManager;
+	BufferManager *mBufferManager;
 	ResourceManager *mShaderManager;
-
-	// Program
 	ResourceManager *mProgramManager;
-
-	// Material
 	MaterialManager *mMaterialManager;
-
-	// Font
 	ResourceManager *mFontManager;
-
-	// Mesh
 	MeshManager *mMeshManager;
-
-	// AudioBuffer
 	ResourceManager *mAudioBufferManager;
 	handler::AudioBufferHandler::ptr mAudioBufferHandler;
 };

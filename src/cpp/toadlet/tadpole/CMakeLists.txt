@@ -71,24 +71,11 @@ set (TADPOLE_MESH_SRC
 	mesh/Skeleton.cpp
 )
 
-set (TADPOLE_WIDGET_SRC
-	widget/AnimationControllerWidget.cpp
-	widget/BorderWidget.cpp
-	widget/ButtonWidget.cpp
-	widget/LabelWidget.cpp
-	widget/ParentWidget.cpp
-	widget/RenderableWidget.cpp
-	widget/SpriteWidget.cpp
-	widget/Widget.cpp
-	widget/Window.cpp
-)
-
 
 # Headers
 set (TADPOLE_HEADERS
 	AudioBufferData.h
 	BufferManager.h
-	ContextResourceManager.h
 	Engine.h
 	Font.h
 	FontData.h
@@ -172,27 +159,12 @@ set (TADPOLE_MESH_HEADERS
 	mesh/Skeleton.h
 )
 
-set (TADPOLE_WIDGET_HEADERS
-	widget/ActionListener.h
-	widget/AnimationControllerWidget.h
-	widget/BorderWidget.h
-	widget/ButtonWidget.h
-	widget/LabelWidget.h
-	widget/ParentWidget.h
-	widget/RenderableWidget.h
-	widget/SpriteWidget.h
-	widget/Widget.h
-	widget/WidgetDestroyedListener.h
-	widget/Window.h
-) 
-
 
 # Bundle source
 source_group ("Source Files\\\\animation" FILES ${TADPOLE_ANIMATION_SRC})
 source_group ("Source Files\\\\entity" FILES ${TADPOLE_ENTITY_SRC})
 source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_SRC})
 source_group ("Source Files\\\\mesh" FILES ${TADPOLE_MESH_SRC})
-source_group ("Source Files\\\\widget" FILES ${TADPOLE_WIDGET_SRC})
 
 
 # Bundle headers
@@ -200,12 +172,11 @@ source_group ("Header Files\\\\animation" FILES ${TADPOLE_ANIMATION_HEADERS})
 source_group ("Header Files\\\\entity" FILES ${TADPOLE_ENTITY_HEADERS})
 source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_HEADERS})
 source_group ("Header Files\\\\mesh" FILES ${TADPOLE_MESH_HEADERS})
-source_group ("Header Files\\\\widget" FILES ${TADPOLE_WIDGET_HEADERS})
 
 
 # Source and headers
-set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_ENTITY_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MESH_SRC} ${TADPOLE_WIDGET_SRC})
-set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_ENTITY_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_MESH_HEADERS} ${TADPOLE_WIDGET_HEADERS})
+set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_ENTITY_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MESH_SRC})
+set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_ENTITY_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_MESH_HEADERS})
 
 
 # Dependencies for toadlet_tadpole

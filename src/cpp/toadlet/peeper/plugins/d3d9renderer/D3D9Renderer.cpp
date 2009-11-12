@@ -826,9 +826,9 @@ void D3D9Renderer::setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D
 	capabilitySet.renderToDepthTexture=renderToDepthTexture;
 	capabilitySet.renderToTextureNonPowerOf2Restricted=capabilitySet.textureNonPowerOf2Restricted && capabilitySet.renderToTexture;
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE) && defined(TOADLET_FIXED_POINT)
-		capabilitySet.idealFormatBit=VertexElement::Format_BIT_FIXED_32;
+		capabilitySet.idealVertexFormatBit=VertexElement::Format_BIT_FIXED_32;
 	#else
-		capabilitySet.idealFormatBit=VertexElement::Format_BIT_FLOAT_32;
+		capabilitySet.idealVertexFormatBit=VertexElement::Format_BIT_FLOAT_32;
 	#endif
 
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)

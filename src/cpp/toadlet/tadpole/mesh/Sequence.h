@@ -26,24 +26,22 @@
 #ifndef TOADLET_TADPOLE_MESH_SEQUENCE_H
 #define TOADLET_TADPOLE_MESH_SEQUENCE_H
 
-#include <toadlet/egg/Resource.h>
-#include <toadlet/egg/String.h>
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/tadpole/Track.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace mesh{
 
-class TOADLET_API Sequence:public egg::Resource{
+class TOADLET_API Sequence:public egg::BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(Sequence);
 
 	Sequence();
 	virtual ~Sequence();
 
+	void destroy();
 	void compile();
-
-	egg::String name;
 
 	egg::Collection<Track::ptr> tracks;
 	bool hasScale; // calculated by compile

@@ -216,9 +216,7 @@ Resource *Win32FontHandler::load(const ResourceHandlerData *handlerData){
 		memcpy(imageData+imageStride*(textureHeight-i-1),buffer+bitmapStride*i,bitmapStride);
 	}
 
-	Texture::ptr texture=mTextureManager->createTexture(image);
-
-	Font *font=new Font(fontData->width,fontData->height,fontData->height,0,shared_static_cast<Texture>(mTextureManager->load(texture)),charArray,&glyphs[0],glyphs.size());
+	Font *font=new Font(fontData->width,fontData->height,fontData->height,0,shared_static_cast<Texture>(mTextureManager->createTexture(image)),charArray,&glyphs[0],glyphs.size());
 
 	SelectObject(cdc,oldBitmap);
 	DeleteObject(bitmap);

@@ -32,7 +32,7 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace ribbit{
 
-ALAudioBuffer::ALAudioBuffer(ALPlayer *player):
+ALAudioBuffer::ALAudioBuffer(ALPlayer *player):BaseResource(),
 	mAudioPlayer(NULL),
 	mHandle(0),
 	mStaticData(NULL)
@@ -99,7 +99,7 @@ bool ALAudioBuffer::create(InputStream::ptr inputStream,const String &mimeType){
 	return true;
 }
 
-bool ALAudioBuffer::destroy(){
+void ALAudioBuffer::destroy(){
 	if(mHandle!=0){
 		alDeleteBuffers(1,&mHandle);
 		mHandle=0;
@@ -111,8 +111,6 @@ bool ALAudioBuffer::destroy(){
 	}
 
 	TOADLET_CHECK_ALERROR("alDeleteBuffers::destroy");
-
-	return true;
 }
 
 }

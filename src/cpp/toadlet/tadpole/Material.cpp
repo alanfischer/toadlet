@@ -33,7 +33,7 @@ using namespace toadlet::peeper;
 namespace toadlet{
 namespace tadpole{
 
-Material::Material():
+Material::Material():BaseResource(),
 	mLighting(false),
 	mFaceCulling(Renderer::FaceCulling_BACK),
 	mAlphaTest(Renderer::AlphaTest_NONE),
@@ -46,6 +46,15 @@ Material::Material():
 }
 
 Material::~Material(){
+	destroy();
+}
+
+void Material::destroy(){
+	int i;
+	for(i=0;i<mTextureStages.size();++i){
+		mTextureStages[i]->destroy();
+	}
+	mTextureStages.clear();
 }
 
 Material::ptr Material::clone() const{
@@ -62,7 +71,7 @@ Material::ptr Material::clone() const{
 
 	int i;
 	for(i=0;i<mTextureStages.size();++i){
-		material->setTextureStage(i,mTextureStages[i]);
+		material->setTextureStage(i,mTextureStages[i]->clone());
 	}
 
 	return material;
@@ -76,6 +85,10 @@ void Material::setAlphaTest(Renderer::AlphaTest alphaTest,scalar cutoff){
 bool Material::setTextureStage(int stage,const TextureStage::ptr &textureStage){
 	if(mTextureStages.size()<=stage){
 		mTextureStages.resize(stage+1);
+	}
+
+	if(mTextureStages[stage]!=NULL){
+		mTextureStages[stage]->destroy();
 	}
 
 	mTextureStages[stage]=textureStage;

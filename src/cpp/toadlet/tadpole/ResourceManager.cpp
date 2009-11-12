@@ -41,151 +41,28 @@ ResourceManager::ResourceManager(InputStreamFactory *inputStreamFactory){
 ResourceManager::~ResourceManager(){
 }
 
-void ResourceManager::setInputStreamFactory(InputStreamFactory *inputStreamFactory){
-	mInputStreamFactory=inputStreamFactory;
-}
-
-Resource::ptr ResourceManager::load(const String &name){
-	return load(false,name,name,NULL,NULL);
-}
-
-Resource::ptr ResourceManager::load(const String &name,const String &file){
-	return load(false,name,file,NULL,NULL);
-}
-
-Resource::ptr ResourceManager::load(const String &name,ResourceHandlerData::ptr data){
-	return load(false,name,name,NULL,data);
-}
-
-Resource::ptr ResourceManager::load(const String &name,const String &file,ResourceHandlerData::ptr data){
-	return load(false,name,file,NULL,data);
-}
-
-Resource::ptr ResourceManager::load(const String &name,const Resource::ptr &resource){
-	return load(false,name,NULL,resource,NULL);
-}
-
-Resource::ptr ResourceManager::load(const Resource::ptr &resource){
-	return load(false,NULL,NULL,resource,NULL);
-}
-
-Resource::ptr ResourceManager::cache(const String &name){
-	return load(true,name,name,NULL,NULL);
-}
-
-Resource::ptr ResourceManager::cache(const String &name,const String &file){
-	return load(true,name,file,NULL,NULL);
-}
-
-Resource::ptr ResourceManager::cache(const String &name,ResourceHandlerData::ptr data){
-	return load(true,name,name,NULL,data);
-}
-
-Resource::ptr ResourceManager::cache(const String &name,const String &file,ResourceHandlerData::ptr data){
-	return load(true,name,file,NULL,data);
-}
-
-Resource::ptr ResourceManager::cache(const String &name,const Resource::ptr &resource){
-	return load(true,name,NULL,resource,NULL);
-}
-
-Resource::ptr ResourceManager::cache(const Resource::ptr &resource){
-	return load(true,NULL,NULL,resource,NULL);
-}
-
-bool ResourceManager::uncache(const String &name){
-	ResourceNameMap::iterator it=mResourceNameMap.find(name);
-	if(it!=mResourceNameMap.end()){
-		uncache((ResourceCache*)it->second);
-		return true;
-	}
-	return false;
-}
-
-bool ResourceManager::uncache(const Resource::ptr &resource){
-	ResourcePtrMap::iterator it=mResourcePtrMap.find(resource);
-	if(it!=mResourcePtrMap.end()){
-		uncache((ResourceCache*)it->second);
-		return true;
-	}
-	return false;
-}
-
 Resource::ptr ResourceManager::get(const String &name){
-	ResourceNameMap::iterator it=mResourceNameMap.find(name);
-	if(it!=mResourceNameMap.end()){
-		return it->second->resource;
+	NameResourceMap::iterator it=mNameResourceMap.find(name);
+	if(it!=mNameResourceMap.end()){
+		return it->second;
 	}
 	else{
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_DEBUG,
-			"Resource "+name+" not found");
 		return NULL;
 	}
 }
 
-void ResourceManager::resourceLoaded(const Resource::ptr &resource){}
-
-void ResourceManager::resourceUnloaded(Resource *resource){}
-
-void ResourceManager::addToPointerQueue(Resource *resource){
-	resourceUnloaded(resource);
-
-	ResourcePtrMap::iterator it=mResourcePtrMap.find(resource);
-	if(it!=mResourcePtrMap.end()){
-		ResourceNameMap::iterator it2=mResourceNameMap.find(it->second->name);
-		if(it2!=mResourceNameMap.end()){
-			mResourceNameMap.erase(it2);
-		}
-		mResourcePtrMap.erase(it);
-	}
-
-	delete resource;
+Resource::ptr ResourceManager::find(const egg::String &name,ResourceHandlerData::ptr handlerData=NULL){
 }
 
-String ResourceManager::cleanFilename(const String &name){
-	char *temp=new char[name.length()+1];
-	memcpy(temp,name.c_str(),name.length()+1);
+Resource::ptr ResourceManager::manage(const egg::Resource::ptr &resource){
+	mResources.add(resource);
 
-	// Eliminate all ".." from the name
-	char *p=0;
-	while((p=strstr(temp,".."))!=0){
-		char *p2=p;
-		while(*p2!='/' && p2>=temp){
-			p2--;
-		}
-
-		char *p3=p2-1;
-		while(*p3!='/' && p3>=temp){
-			p3--;
-		}
-
-		if(p2>=temp && p3>=temp){
-			*p3=0;
-			strcpy(p3,p+2);
-		}
-		else{
-			break;
-		}
+	String name=resource->getName();
+	if(name!=(char*)NULL){
+		mNameResourceMap[name]=mResources;
 	}
 
-	// Remove any starting ./'s
-	if(strncmp(temp,"./",2)==0 || strncmp(temp,".\\",2)==0){
-		int len=strlen(temp+2)+1;
-		memmove(temp,temp+2,len);
-	}
-
-	// Replace any \ with /
-	for(p=temp;(*p)!=0;p++){
-		if((*p)=='\\'){
-			(*p)='/';
-		}
-	}
-
-	String cleanName=temp;
-
-	delete[] temp;
-
-	return cleanName;
+	return resource;
 }
 
 void ResourceManager::addHandler(ResourceHandler::ptr handler,const String &extension){
@@ -225,18 +102,6 @@ ResourceHandler::ptr ResourceManager::getHandler(const String &extension){
 	else{
 		return NULL;
 	}
-}
-
-void ResourceManager::setDefaultHandler(ResourceHandler::ptr handler){
-	mDefaultHandler=handler;
-}
-
-ResourceHandler::ptr ResourceManager::getDefaultHandler(){
-	return mDefaultHandler;
-}
-
-void ResourceManager::setDefaultExtension(const String &extension){
-	mDefaultExtension=extension;
 }
 
 Resource::ptr ResourceManager::load(bool cache,const String &name,const String &file,Resource::ptr resource,ResourceHandlerData::ptr handlerData){
@@ -372,6 +237,7 @@ Resource *ResourceManager::unableToFindHandler(const String &name,const Resource
 	return NULL;
 }
 
+
 void ResourceManager::uncache(ResourceCache *resCache){
 	if(resCache!=NULL){
 		resCache->count--;
@@ -379,6 +245,52 @@ void ResourceManager::uncache(ResourceCache *resCache){
 			resCache->cachedResource=NULL;
 		}
 	}
+}
+
+String ResourceManager::cleanFilename(const String &name){
+	char *temp=new char[name.length()+1];
+	memcpy(temp,name.c_str(),name.length()+1);
+
+	// Eliminate all ".." from the name
+	char *p=0;
+	while((p=strstr(temp,".."))!=0){
+		char *p2=p;
+		while(*p2!='/' && p2>=temp){
+			p2--;
+		}
+
+		char *p3=p2-1;
+		while(*p3!='/' && p3>=temp){
+			p3--;
+		}
+
+		if(p2>=temp && p3>=temp){
+			*p3=0;
+			strcpy(p3,p+2);
+		}
+		else{
+			break;
+		}
+	}
+
+	// Remove any starting ./'s
+	if(strncmp(temp,"./",2)==0 || strncmp(temp,".\\",2)==0){
+		int len=strlen(temp+2)+1;
+		memmove(temp,temp+2,len);
+	}
+
+	// Replace any \ with /
+	for(p=temp;(*p)!=0;p++){
+		if((*p)=='\\'){
+			(*p)='/';
+		}
+	}
+
+	String cleanName=temp;
+
+	delete[] temp;
+
+	return cleanName;
 }
 
 }

@@ -69,8 +69,57 @@ TextureStage::TextureStage(const Texture::ptr &texture1):
 	//mMatrix,
 {
 	texture=texture1;
+
+	if(texture!=NULL){
+		texture->retain();
+	}
 }
-	
+
+TextureStage::~TextureStage(){
+	destroy();
+}
+
+void TextureStage::destroy(){
+	if(texture!=NULL){
+		texture->release();
+		texture=NULL;
+	}
+}
+
+TextureStage::ptr TextureStage::clone() const{
+	TextureStage::ptr textureStage(new TextureStage(texture));
+	textureStage->textureName=textureName;
+
+	textureStage->blend.set(blend);
+
+	textureStage->sAddressMode=sAddressMode;
+	textureStage->tAddressMode=tAddressMode;
+	textureStage->rAddressMode=rAddressMode;
+
+	textureStage->minFilter=minFilter;
+	textureStage->mipFilter=mipFilter;
+	textureStage->magFilter=magFilter;
+
+	textureStage->texCoordIndex=texCoordIndex;
+
+	textureStage->calculation=calculation;
+	textureStage->matrix.set(matrix);
+
+	return textureStage;
+}
+
+void TextureStage::setTexture(const Texture::ptr &texture1){
+	if(texture!=NULL){
+		texture->release();
+	}
+
+	texture=texture1;
+
+	if(texture!=NULL){
+		texture->retain();
+	}
+}
+
 void TextureStage::setCalculation(Calculation calculation1,const Matrix4x4 &matrix1){
 	calculation=calculation1;
 	matrix.set(matrix1);

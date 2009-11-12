@@ -26,14 +26,13 @@
 #ifndef TOADLET_PEEPER_VERTEXBUFFER_H
 #define TOADLET_PEEPER_VERTEXBUFFER_H
 
-#include <toadlet/egg/Resource.h>
 #include <toadlet/peeper/Buffer.h>
 #include <toadlet/peeper/VertexFormat.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API VertexBuffer:public egg::Resource,public Buffer{
+class TOADLET_API VertexBuffer:public Buffer{
 public:
 	TOADLET_SHARED_POINTERS(VertexBuffer);
 

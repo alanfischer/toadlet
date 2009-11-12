@@ -133,20 +133,31 @@ Entity *MeshEntity::create(Engine *engine){
 }
 
 void MeshEntity::destroy(){
+	mSubMeshes.clear();
+
 	if(mAnimationController!=NULL){
 		mAnimationController->stop();
 		mAnimationController=NULL;
+	}
+
+	if(mDynamicVertexData!=NULL){
+		mDynamicVertexData->destroy();
+		mDynamicVertexData=NULL;
 	}
 
 	super::destroy();
 }
 
 void MeshEntity::load(const String &name){
-	load(mEngine->getMesh(name));
+	load(mEngine->getMeshManager()->findMesh(name));
 }
 
 void MeshEntity::load(Mesh::ptr mesh){
 	mSubMeshes.clear();
+
+	if(mMesh!=NULL){
+		mMesh->release();
+	}
 
 	mMesh=mesh;
 
@@ -155,16 +166,19 @@ void MeshEntity::load(Mesh::ptr mesh){
 			"Invalid Mesh");
 		return;
 	}
+	else{
+		mMesh->retain();
+	}
 
-	if(mesh->boundingRadius!=Math::ONE){
-		mBoundingRadius=Math::mul(mesh->worldScale,mesh->boundingRadius);
+	if(mMesh->boundingRadius!=Math::ONE){
+		mBoundingRadius=Math::mul(mMesh->worldScale,mMesh->boundingRadius);
 	}
 	else{
 		mBoundingRadius=-Math::ONE;
 	}
 
-	if(mesh->skeleton!=NULL){
-		mSkeleton=MeshEntitySkeleton::ptr(new MeshEntitySkeleton(this,mesh->skeleton));
+	if(mMesh->skeleton!=NULL){
+		mSkeleton=MeshEntitySkeleton::ptr(new MeshEntitySkeleton(this,mMesh->skeleton));
 
 		createVertexBuffer();
 	}
