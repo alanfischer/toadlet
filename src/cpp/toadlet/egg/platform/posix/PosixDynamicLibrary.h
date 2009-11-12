@@ -42,7 +42,7 @@ namespace egg{
 
 class PosixDynamicLibrary{
 public:
-	TOADLET_SHARED_POINTERS(PosixDynamicLibrary,PosixDynamicLibrary);
+	TOADLET_SHARED_POINTERS(PosixDynamicLibrary);
 
 	PosixDynamicLibrary();
 	~PosixDynamicLibrary();

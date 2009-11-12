@@ -35,7 +35,7 @@ namespace egg{
 
 class PosixThread:public Runnable{
 public:
-	TOADLET_SHARED_POINTERS(PosixThread,PosixThread);
+	TOADLET_SHARED_POINTERS(PosixThread);
 
 	PosixThread();
 	PosixThread(Runnable *r);
