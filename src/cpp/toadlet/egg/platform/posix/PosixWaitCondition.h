@@ -34,6 +34,8 @@ namespace egg{
 
 class PosixWaitCondition{
 public:
+	TOADLET_SHARED_POINTERS(PosixWaitCondition);
+
 	PosixWaitCondition();
 	~PosixWaitCondition();
 
