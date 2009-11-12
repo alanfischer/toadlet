@@ -51,7 +51,7 @@ Texture::ptr TextureManager::createTexture(const Image::ptr &image){
 
 	texture->load(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),image->getData());
 
-	manage(shared_static_cast<BaseResource>(texture));
+	manage(shared_static_cast<Texture>(texture));
 
 	return texture;
 }
@@ -66,7 +66,7 @@ Texture::ptr TextureManager::createTexture(int usageFlags,Texture::Dimension dim
 	}
 	mBackableTexturesToLoad.add(texture);
 
-	manage(shared_static_cast<BaseResource>(texture));
+	manage(shared_static_cast<Texture>(texture));
 
 	return texture;
 }
@@ -97,7 +97,7 @@ void TextureManager::contextDeactivate(peeper::Renderer *renderer){
 	for(i=0;i<mResources.size();++i){
 		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
 		if(texture->getRootTexture()!=texture){
-//			shared_static_cast<BackableTexture>(texture)->setBack(NULL);
+			shared_static_cast<BackableTexture>(texture)->setBack(NULL);
 		}
 		else{
 			// TODO: move destroyContext to Texture so it can be called from here

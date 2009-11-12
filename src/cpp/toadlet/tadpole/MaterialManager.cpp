@@ -39,6 +39,12 @@ MaterialManager::MaterialManager(InputStreamFactory *inputStreamFactory,TextureM
 	mTextureManager=textureManager;
 }
 
+Material::ptr MaterialManager::createMaterial(){
+	Material::ptr material(new Material());
+	manage(material);
+	return material;
+}
+
 Resource::ptr MaterialManager::unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData){
 	Texture::ptr texture=mTextureManager->findTexture(name);
 	if(texture!=NULL){

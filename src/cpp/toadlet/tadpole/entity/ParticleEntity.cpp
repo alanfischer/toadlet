@@ -149,6 +149,11 @@ void ParticleEntity::destroy(){
 		mIndexBuffer=NULL;
 	}
 
+	if(mMaterial!=NULL){
+		mMaterial->release();
+		mMaterial=NULL;
+	}
+
 	super::destroy();
 }
 
@@ -332,6 +337,18 @@ void ParticleEntity::setWorldSpace(bool worldSpace){
 		p.x=x;
 		p.y=y;
 		p.z=z;
+	}
+}
+
+void ParticleEntity::setRenderMaterial(const Material::ptr &material){
+	if(mMaterial!=NULL){
+		mMaterial->release();
+	}
+
+	mMaterial=material;
+
+	if(mMaterial!=NULL){
+		mMaterial->retain();
 	}
 }
 

@@ -87,7 +87,9 @@ Entity *SpriteEntity::create(Engine *engine){
 
 	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,4));
 
-	mMaterial=Material::ptr(new Material());
+	mMaterial=engine->getMaterialManager()->createMaterial();
+	mMaterial->retain();
+
 	mMaterial->setFaceCulling(Renderer::FaceCulling_NONE);
 	mMaterial->setDepthWrite(false);
 
@@ -106,7 +108,7 @@ void SpriteEntity::destroy(){
 	}
 	
 	if(mMaterial!=NULL){
-		mMaterial->destroy();
+		mMaterial->release();
 		mMaterial=NULL;
 	}
 

@@ -37,6 +37,8 @@ class TOADLET_API MaterialManager:public ResourceManager{
 public:
 	MaterialManager(egg::io::InputStreamFactory *inputStreamFactory,TextureManager *textureManager);
 
+	Material::ptr createMaterial();
+
 	Material::ptr findMaterial(const egg::String &name){return egg::shared_static_cast<Material>(ResourceManager::find(name));}
 
 	virtual egg::Resource::ptr unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData);

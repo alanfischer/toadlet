@@ -90,7 +90,8 @@ Mesh::ptr MeshManager::createBox(const AABox &box){
 
 	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
-	subMesh->material=Material::ptr(new Material());
+	subMesh->material=mEngine->getMaterialManager()->createMaterial();
+	subMesh->material->retain();
 	subMesh->material->setFaceCulling(Renderer::FaceCulling_BACK);
 	subMesh->material->setLighting(true);
 
@@ -202,9 +203,11 @@ Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded){
 
 	int i;
 	for(i=0;i<mesh->subMeshes.size();++i){
-		mesh->subMeshes[i]->material=Material::ptr(new Material());
-		mesh->subMeshes[i]->material->setFaceCulling(Renderer::FaceCulling_NONE);
-		mesh->subMeshes[i]->material->setDepthWrite(false);
+		Material::ptr material=mEngine->getMaterialManager()->createMaterial();
+		material->retain();
+		material->setFaceCulling(Renderer::FaceCulling_NONE);
+		material->setDepthWrite(false);
+		mesh->subMeshes[i]->material=material;
 	}
 	
 	return mesh;
@@ -266,7 +269,8 @@ Mesh::ptr MeshManager::createSphere(const Sphere &sphere,int numSegments,int num
 
 	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
-	subMesh->material=Material::ptr(new Material());
+	subMesh->material=mEngine->getMaterialManager()->createMaterial();
+	subMesh->material->retain();
 	subMesh->material->setFaceCulling(Renderer::FaceCulling_BACK);
 	subMesh->material->setLighting(true);
 
@@ -422,7 +426,8 @@ Mesh::ptr MeshManager::createGeoSphere(const Sphere &sphere,int depth,bool icosa
 
 	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
-	subMesh->material=Material::ptr(new Material());
+	subMesh->material=mEngine->getMaterialManager()->createMaterial();
+	subMesh->material->retain();
 	subMesh->material->setFaceCulling(Renderer::FaceCulling_BACK);
 	subMesh->material->setLighting(true);
 

@@ -145,6 +145,10 @@ void MeshEntity::destroy(){
 		mDynamicVertexData=NULL;
 	}
 
+	if(mMesh!=NULL){
+		mMesh->release();
+	}
+
 	super::destroy();
 }
 

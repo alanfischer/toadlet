@@ -130,7 +130,7 @@ public:
 	inline bool hadPoints() const{return mHadPoints;}
 	inline bool hadAges() const{return mHadAges;}
 
-	virtual void setRenderMaterial(const Material::ptr &material){mMaterial=material;}
+	virtual void setRenderMaterial(const Material::ptr &material);
 
 	inline void setDestroyOnFinish(bool destroy){mDestroyOnFinish=destroy;}
 	inline bool getDestroyOnFinish() const{return mDestroyOnFinish;}

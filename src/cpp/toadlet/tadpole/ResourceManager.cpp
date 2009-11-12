@@ -75,6 +75,8 @@ Resource::ptr ResourceManager::manage(const Resource::ptr &resource){
 		if(name!=(char*)NULL){
 			mNameResourceMap[name]=resource;
 		}
+
+		resource->setFullyReleasedListener(this);
 	}
 
 	return resource;
