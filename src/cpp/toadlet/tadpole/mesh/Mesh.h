@@ -31,7 +31,7 @@
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
-#include <toadlet/tadpole/Mesh/Skeleton.h>
+#include <toadlet/tadpole/mesh/Skeleton.h>
 
 namespace toadlet{
 namespace tadpole{
