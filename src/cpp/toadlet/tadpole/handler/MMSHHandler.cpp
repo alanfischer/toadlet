@@ -41,8 +41,9 @@ namespace Math{
 	using namespace toadlet::egg::mathfixed::Math;
 }
 
-MMSHHandler::MMSHHandler(BufferManager *bufferManager,Engine *engine){
-	mBufferManager=bufferManager;
+MMSHHandler::MMSHHandler(Engine *engine){
+	mBufferManager=engine->getBufferManager();
+	mMaterialManager=engine->getMaterialManager();
 	mEngine=engine;
 }
 
@@ -234,7 +235,8 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 
 				// Material
 				{
-					Material::ptr material(new Material());
+					Material::ptr material=mMaterialManager->createMaterial();
+					material->retain();
 					sub->material=material;
 
 					material->setSaveLocally(true);

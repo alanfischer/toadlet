@@ -274,7 +274,8 @@ void MeshEntitySkeleton::setRenderable(bool renderable){
 	if(renderable){
 		Engine *engine=mEntity->getEngine();
 		int i;
-		mMaterial=Material::ptr(new Material());
+		mMaterial=engine->getMaterialManager()->createMaterial();
+		mMaterial->retain();
 		mMaterial->setLighting(true);
 		LightEffect lightEffect(Colors::GREEN);
 		lightEffect.emissive.set(Colors::GREEN);

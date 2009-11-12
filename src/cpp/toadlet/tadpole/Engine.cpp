@@ -150,7 +150,7 @@ Engine::Engine():
 		mMeshManager->setHandler(XMSHHandler::ptr(new XMSHHandler(mBufferManager,mMaterialManager,mTextureManager)),"xmsh");
 	#endif
 
-	mMeshManager->setHandler(MMSHHandler::ptr(new MMSHHandler(mBufferManager,this)),"mmsh");
+	mMeshManager->setHandler(MMSHHandler::ptr(new MMSHHandler(this)),"mmsh");
 
 	// AudioBuffer handlers
 	mAudioBufferHandler=AudioBufferHandler::ptr(new AudioBufferHandler(mAudioPlayer));

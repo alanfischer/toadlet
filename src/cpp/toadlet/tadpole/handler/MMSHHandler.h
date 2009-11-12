@@ -42,9 +42,7 @@ class TOADLET_API MMSHHandler:public ResourceHandler{
 public:
 	TOADLET_SHARED_POINTERS(MMSHHandler);
 
-	/// Engine is for getting ideal vertex format.
-	/// @todo  Replace the Engine here with a custom BufferResourceManager which could have a getIdealVertexFormatBit() function.
-	MMSHHandler(BufferManager *bufferManager,Engine *engine);
+	MMSHHandler(Engine *engine);
 
 	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
 
@@ -66,6 +64,7 @@ protected:
 	};
 
 	BufferManager *mBufferManager;
+	MaterialManager *mMaterialManager;
 	Engine *mEngine;
 };
 
