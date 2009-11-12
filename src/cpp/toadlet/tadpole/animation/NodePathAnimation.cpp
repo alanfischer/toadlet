@@ -23,17 +23,17 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/animation/EntityPathAnimation.h>
-#include <toadlet/tadpole/entity/ParentEntity.h>
+#include <toadlet/tadpole/animation/NodePathAnimation.h>
+#include <toadlet/tadpole/node/ParentNode.h>
 
 using namespace toadlet::egg;
-using namespace toadlet::tadpole::entity;
+using namespace toadlet::tadpole::node;
 
 namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-EntityPathAnimation::EntityPathAnimation(Entity::ptr target):
+NodePathAnimation::NodePathAnimation(Node::ptr target):
 	//mTarget,
 	//mTrack,
 	mHint(0)
@@ -41,15 +41,15 @@ EntityPathAnimation::EntityPathAnimation(Entity::ptr target):
 	mTarget=target;
 }
 
-void EntityPathAnimation::setTarget(Entity::ptr target){
+void NodePathAnimation::setTarget(Node::ptr target){
 	mTarget=target;
 }
 
-void EntityPathAnimation::setTrack(Track::ptr track){
+void NodePathAnimation::setTrack(Track::ptr track){
 	mTrack=track;
 }
 
-void EntityPathAnimation::set(scalar value){
+void NodePathAnimation::set(scalar value){
 	const KeyFrame *f1=NULL,*f2=NULL;
 	scalar t=mTrack->getKeyFramesAtTime(value,f1,f2,mHint);
 
@@ -65,11 +65,11 @@ void EntityPathAnimation::set(scalar value){
 	mTarget->setRotate(rotateMatrix);
 }
 
-scalar EntityPathAnimation::getMin() const{
+scalar NodePathAnimation::getMin() const{
 	return 0;
 }
 
-scalar EntityPathAnimation::getMax() const{
+scalar NodePathAnimation::getMax() const{
 	return mTrack->length;
 }
 

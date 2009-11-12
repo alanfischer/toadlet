@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/entity/AnimationControllerEntity.h>
-#include <toadlet/tadpole/entity/ParentEntity.h>
+#include <toadlet/tadpole/node/AnimationControllerNode.h>
+#include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet::egg;
@@ -32,17 +32,17 @@ using namespace toadlet::tadpole::animation;
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
-TOADLET_ENTITY_IMPLEMENT(AnimationControllerEntity,"toadlet::tadpole::entity::AnimationControllerEntity");
+TOADLET_NODE_IMPLEMENT(AnimationControllerNode,"toadlet::tadpole::node::AnimationControllerNode");
 
-AnimationControllerEntity::AnimationControllerEntity():Entity(),
+AnimationControllerNode::AnimationControllerNode():Node(),
 	//mAnimationController,
 	mStartingFrame(0),
 	mDestroyOnFinish(false)
 {}
 
-Entity *AnimationControllerEntity::create(Engine *engine){
+Node *AnimationControllerNode::create(Engine *engine){
 	super::create(engine);
 
 	mStartingFrame=0;
@@ -54,7 +54,7 @@ Entity *AnimationControllerEntity::create(Engine *engine){
 	return this;
 }
 
-void AnimationControllerEntity::destroy(){
+void AnimationControllerNode::destroy(){
 	if(mAnimationController!=NULL){
 		mAnimationController->setAnimationControllerFinishedListener(NULL);
 		mAnimationController=NULL;
@@ -63,11 +63,11 @@ void AnimationControllerEntity::destroy(){
 	super::destroy();
 }
 
-void AnimationControllerEntity::setDestroyOnFinish(bool destroy){
+void AnimationControllerNode::setDestroyOnFinish(bool destroy){
 	mDestroyOnFinish=destroy;
 }
 
-void AnimationControllerEntity::start(){
+void AnimationControllerNode::start(){
 	if(mAnimationController->isRunning()){
 		stop();
 	}
@@ -80,7 +80,7 @@ void AnimationControllerEntity::start(){
 	}
 }
 
-void AnimationControllerEntity::stop(){
+void AnimationControllerNode::stop(){
 	if(mAnimationController->isRunning()==false){
 		return;
 	}
@@ -90,17 +90,17 @@ void AnimationControllerEntity::stop(){
 	mAnimationController->stop();
 }
 
-void AnimationControllerEntity::logicUpdate(int dt){
+void AnimationControllerNode::logicUpdate(int dt){
 	if(mEngine->getScene()==NULL || mStartingFrame!=mEngine->getScene()->getLogicFrame()){
 		mAnimationController->logicUpdate(dt);
 	}
 }
 
-void AnimationControllerEntity::visualUpdate(int dt){
+void AnimationControllerNode::visualUpdate(int dt){
 	mAnimationController->visualUpdate(dt);
 }
 
-void AnimationControllerEntity::controllerFinished(AnimationController *controller){
+void AnimationControllerNode::controllerFinished(AnimationController *controller){
 	if(mDestroyOnFinish){
 		destroy();
 	}

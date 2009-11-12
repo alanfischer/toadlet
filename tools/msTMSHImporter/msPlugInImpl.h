@@ -16,10 +16,11 @@
 #include "resource.h"
 #include "msPlugIn.h"
 #include "msLib.h"
-#include <toadlet/tadpole/Mesh.h>
+#include <toadlet/tadpole/mesh/Mesh.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::tadpole;
+using namespace toadlet::tadpole::mesh;
 
 /////////////////////////////////////////////////////////////////////////////
 // CMsPlugInApp
@@ -58,7 +59,7 @@ class cPlugIn : public cMsPlugIn
 	void convertMSVec3ToVector3(const msVec3 &msvec,Vector3 &tvec,bool rotate);
 	void convertMSVec3ToQuaternion(const msVec3 &msvec,Quaternion &quat,bool rotate);
 	int importMesh(msModel *pModel,const String &name,int flags);
-	MeshSkeleton::ptr buildSkeleton(msModel *pModel);
+	Skeleton::ptr buildSkeleton(msModel *pModel);
 	int importAnimation(msModel *pModel,const String &name,int flags);
 
 public:

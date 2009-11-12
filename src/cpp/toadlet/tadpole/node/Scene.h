@@ -23,27 +23,27 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ENTITY_SCENE_H
-#define TOADLET_TADPOLE_ENTITY_SCENE_H
+#ifndef TOADLET_TADPOLE_NODE_SCENE_H
+#define TOADLET_TADPOLE_NODE_SCENE_H
 
 #include <toadlet/peeper/Color.h>
 #include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/peeper/TextureStage.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/UpdateListener.h>
-#include <toadlet/tadpole/entity/ParentEntity.h>
-#include <toadlet/tadpole/entity/LightEntity.h>
-#include <toadlet/tadpole/entity/ParticleEntity.h>
+#include <toadlet/tadpole/node/ParentNode.h>
+#include <toadlet/tadpole/node/LightNode.h>
+#include <toadlet/tadpole/node/ParticleNode.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
-class CameraEntity;
+class CameraNode;
 
 /// @todo  I think a good way to let us use EventKeyFrames with the Controller framework is to:
 ///   1: Have a way of ensuring that the EventKeyFrames are aligned on LogicDT times.
-///   2: Have the AnimationControllerEntity not issue a visualUpdate until we have enough logicUpdates to keep up with it.
+///   2: Have the AnimationControllerNode not issue a visualUpdate until we have enough logicUpdates to keep up with it.
 ///  That way, entities without EventKeyFrames should update smoothly if something keeps the logic from flowing, but
 ///   we will still be able to have any logic dependent stuff happen at the correct times.
 ///
@@ -52,16 +52,16 @@ class CameraEntity;
 ///   Down sides are that its harder to do logic based updating, since you'd have to handle the checking to see if its
 ///    been a logicDT yourself.
 
-class TOADLET_API Scene:public ParentEntity{
+class TOADLET_API Scene:public ParentNode{
 public:
-	TOADLET_ENTITY(Scene,ParentEntity);
+	TOADLET_NODE(Scene,ParentNode);
 
 	Scene();
 	virtual ~Scene();
-	virtual Entity *create(Engine *engine);
+	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
-	inline const ParentEntity::ptr &getBackground() const{return mBackground;}
+	inline const ParentNode::ptr &getBackground() const{return mBackground;}
 
 	virtual void setAmbientColor(peeper::Color ambientColor);
 	const peeper::Color &getAmbientColor(){return mAmbientColor;}
@@ -89,17 +89,15 @@ public:
 	virtual void postLogicUpdateLoop(int dt);
 	virtual void visualUpdate(int dt);
 
-	virtual void render(peeper::Renderer *renderer,CameraEntity *cameraEntity);
+	virtual void render(peeper::Renderer *renderer,CameraNode *cameraNode);
 
 	virtual void queueRenderable(Renderable *renderable);
-	inline CameraEntity *getCamera() const{return mCamera;} // Only valid during rendering operations
+	inline CameraNode *getCamera() const{return mCamera;} // Only valid during rendering operations
 
 	virtual void setUpdateListener(UpdateListener *updateListener);
 	inline UpdateListener *getUpdateListener() const{return mUpdateListener;}
 
-	virtual ParticleEntity::ParticleSimulator::ptr newParticleSimulator(ParticleEntity *particleEntity){return NULL;}
-
-	virtual bool remove(Entity *entity);
+	virtual ParticleNode::ParticleSimulator::ptr newParticleSimulator(ParticleNode *particleNode){return NULL;}
 
 protected:
 	class RenderLayer{
@@ -128,13 +126,13 @@ protected:
 		return renderLayer;
 	}
 
-	void resetModifiedFrames(Entity *entity);
+	void resetModifiedFrames(Node *node);
 
-	void logicUpdate(Entity::ptr entity,int dt);
-	void visualUpdate(Entity::ptr entity,int dt);
+	void logicUpdate(Node::ptr node,int dt);
+	void visualUpdate(Node::ptr node,int dt);
 
-	void queueRenderables(Entity *entity);
-	bool culled(Entity *entity);
+	void queueRenderables(Node *node);
+	bool culled(Node *node);
 
 	virtual bool preLayerRender(peeper::Renderer *renderer,int layer);
 	virtual bool postLayerRender(peeper::Renderer *renderer,int layer);
@@ -146,17 +144,17 @@ protected:
 	int mAccumulatedDT;
 	int mVisualFrame;
 
-	ParentEntity::ptr mBackground;
+	ParentNode::ptr mBackground;
 
-	egg::Collection<Entity::ptr> mUpdateEntities;
+	egg::Collection<Node::ptr> mUpdateEntities;
 	UpdateListener *mUpdateListener;
 
 	peeper::Color mAmbientColor;
-	LightEntity::ptr mLight;
+	LightNode::ptr mLight;
 
 	Matrix4x4 mIdealParticleViewTransform;
 
-	CameraEntity *mCamera;
+	CameraNode *mCamera;
 	Material *mPreviousMaterial;
 
 	egg::Collection<RenderLayer*> mRenderLayers;

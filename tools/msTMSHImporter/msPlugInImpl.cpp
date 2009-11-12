@@ -383,12 +383,12 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 	}
 
 	if((flags & eBones) && mesh->skeleton!=NULL){
-		MeshSkeleton::ptr skeleton=mesh->skeleton;
+		Skeleton::ptr skeleton=mesh->skeleton;
 		
 		msVec3 position;
 		msVec3 rotation;
 		for(i=0;i<skeleton->bones.size();++i){
-			MeshSkeleton::Bone::ptr bone=skeleton->bones[i];
+			Skeleton::Bone::ptr bone=skeleton->bones[i];
 			msBone *msbone=msModel_GetBoneAt(pModel,msModel_AddBone(pModel));
 
 			String boneName=bone->name;
@@ -420,13 +420,13 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 	return 0;
 }
 
-MeshSkeleton::ptr
+Skeleton::ptr
 cPlugIn::buildSkeleton(msModel *pModel){
-	MeshSkeleton::ptr skeleton(new MeshSkeleton());
+	Skeleton::ptr skeleton(new Skeleton());
 
 	int i;
 	for(i=0;i<msModel_GetBoneCount(pModel);++i){
-		MeshSkeleton::Bone::ptr bone(new MeshSkeleton::Bone());
+		Skeleton::Bone::ptr bone(new Skeleton::Bone());
 		skeleton->bones.add(bone);
 
 		msBone *msbone=msModel_GetBoneAt(pModel,i);
@@ -457,7 +457,7 @@ cPlugIn::buildSkeleton(msModel *pModel){
 
 		Vector3 wtbtranslation(bone->translate);
 		Quaternion wtbrotation(bone->rotate);
-		MeshSkeleton::Bone::ptr parentBone=bone;
+		Skeleton::Bone::ptr parentBone=bone;
 		while(parentBone!=NULL){
 			if(parentBone->parentIndex==-1){
 				parentBone=NULL;
@@ -488,7 +488,7 @@ cPlugIn::buildSkeleton(msModel *pModel){
 
 int
 cPlugIn::importAnimation(msModel *pModel,const String &name,int flags){
-	MeshSkeleton::ptr skeleton=buildSkeleton(pModel);
+	Skeleton::ptr skeleton=buildSkeleton(pModel);
 
 	FileInputStream::ptr fin(new FileInputStream(name));
 	if(fin->isOpen()==false){
@@ -497,7 +497,7 @@ cPlugIn::importAnimation(msModel *pModel,const String &name,int flags){
 	}
 
 	XANMHandler::ptr handler(new XANMHandler());
-	MeshSkeletonSequence::ptr sequence=shared_static_cast<MeshSkeletonSequence>(handler->load(fin,NULL));
+	Sequence::ptr sequence=shared_static_cast<Sequence>(handler->load(fin,NULL));
 	if(sequence==NULL){
 		::AfxMessageBox("Error loading file");
 		return -1;

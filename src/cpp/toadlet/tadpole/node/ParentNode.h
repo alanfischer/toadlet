@@ -23,46 +23,43 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_ENTITYPATHANIMATION_H
-#define TOADLET_TADPOLE_ANIMATION_ENTITYPATHANIMATION_H
+#ifndef TOADLET_TADPOLE_NODE_PARENTNODE_H
+#define TOADLET_TADPOLE_NODE_PARENTNODE_H
 
-#include <toadlet/tadpole/Track.h>
-#include <toadlet/tadpole/animation/Animation.h>
-#include <toadlet/tadpole/entity/Entity.h>
+#include <toadlet/egg/Collection.h>
+#include <toadlet/tadpole/node/Node.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
+namespace node{
 
-class TOADLET_API EntityPathAnimation:public Animation{
+class TOADLET_API ParentNode:public Node{
 public:
-	TOADLET_SHARED_POINTERS(EntityPathAnimation);
+	TOADLET_NODE(ParentNode,Node);
 
-	EntityPathAnimation(entity::Entity::ptr target);
-	virtual ~EntityPathAnimation(){}
+	ParentNode();
+	virtual Node *create(Engine *engine);
+	virtual void destroy();
 
-	void setTarget(entity::Entity::ptr target);
-	inline entity::Entity::ptr getTarget() const{return mTarget;}
+	virtual bool isParent() const{return true;}
 
-	void setTrack(Track::ptr track);
-	inline Track::ptr getTrack() const{return mTrack;}
+	virtual void removeAllNodeDestroyedListeners();
 
-	void set(scalar value);
+	virtual bool attach(Node *node);
+	virtual bool remove(Node *node);
 
-	scalar getMin() const;
-	scalar getMax() const;
-
-	void attached(AnimationController *){}
-	void removed(AnimationController *){}
+	inline int getNumChildren() const{return mChildren.size();}
+	inline Node *getChild(int i) const{return mChildren[i];}
 
 protected:
-	entity::Entity::ptr mTarget;
-	Track::ptr mTrack;
-	int mHint;
+	void updateShadowChildren();
 
-	Vector3 cache_set_translate;
-	Quaternion cache_set_rotate;
-	Matrix3x3 cache_set_rotateMatrix;
+	egg::Collection<Node::ptr> mChildren;
+
+	bool mShadowChildrenDirty;
+	egg::Collection<Node::ptr> mShadowChildren;
+
+	friend class Scene;
 };
 
 }
@@ -70,4 +67,3 @@ protected:
 }
 
 #endif
-

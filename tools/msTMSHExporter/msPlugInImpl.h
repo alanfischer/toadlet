@@ -3,10 +3,11 @@
 
 #include "msPlugIn.h"
 #include "msLib.h"
-#include <toadlet/tadpole/Mesh.h>
+#include <toadlet/tadpole/mesh/Mesh.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::tadpole;
+using namespace toadlet::tadpole::mesh;
 
 struct msModel;
 class cPlugIn : public cMsPlugIn
@@ -32,7 +33,7 @@ class cPlugIn : public cMsPlugIn
 
 	void convertMSVec3ToVector3(const msVec3 &msvec,Vector3 &tvec,bool rotate);
 	void convertMSVec3ToQuaternion(const msVec3 &msvec,Quaternion &quat,bool rotate);
-	MeshSkeleton::ptr buildSkeleton(msModel *pModel,const Collection<int> &emptyBones);
+	Skeleton::ptr buildSkeleton(msModel *pModel,const Collection<int> &emptyBones);
 	int exportMesh(msModel *pModel,const String &sname);
 	int exportAnimation(msModel *pModel,const String &sname);
 	void findEmptyBones(msModel *pModel,Collection<int> &emptyBones);

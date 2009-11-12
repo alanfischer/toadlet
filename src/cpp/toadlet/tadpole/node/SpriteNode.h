@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ENTITY_SPRITEENTITY_H
-#define TOADLET_TADPOLE_ENTITY_SPRITEENTITY_H
+#ifndef TOADLET_TADPOLE_NODE_SPRITENODE_H
+#define TOADLET_TADPOLE_NODE_SPRITENODE_H
 
 //#include <toadlet/peeper/AnimatedTexture.h>
 #include <toadlet/peeper/IndexBufferAccessor.h>
@@ -33,31 +33,31 @@
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/Renderable.h>
-#include <toadlet/tadpole/entity/RenderableEntity.h>
+#include <toadlet/tadpole/node/RenderableNode.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
 class Scene;
 
-class TOADLET_API SpriteEntity:public RenderableEntity,public Renderable{
+class TOADLET_API SpriteNode:public RenderableNode,public Renderable{
 public:
-	TOADLET_ENTITY(SpriteEntity,RenderableEntity);
+	TOADLET_NODE(SpriteNode,RenderableNode);
 
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
 	class RenderableWorkaround:public Renderable{
 	public:
-		RenderableWorkaround(SpriteEntity *entity):renderableEntity(entity){}
-		SpriteEntity *renderableEntity;
-		const Material::ptr &getRenderMaterial() const{return renderableEntity->getRenderMaterial();}
-		const Matrix4x4 &getRenderTransform() const{return renderableEntity->getRenderTransform();}
-		void render(peeper::Renderer *renderer) const{renderableEntity->render(renderer);}
+		RenderableWorkaround(SpriteNode *node):renderableNode(node){}
+		SpriteNode *renderableNode;
+		const Material::ptr &getRenderMaterial() const{return renderableNode->getRenderMaterial();}
+		const Matrix4x4 &getRenderTransform() const{return renderableNode->getRenderTransform();}
+		void render(peeper::Renderer *renderer) const{renderableNode->render(renderer);}
 	};
 #endif
 
-	SpriteEntity();
-	virtual Entity *create(Engine *engine);
+	SpriteNode();
+	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
 	void load(scalar width,scalar height,bool scaled,const egg::String &name);

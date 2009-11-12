@@ -23,20 +23,20 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ENTITY_CAMERAENTITY_H
-#define TOADLET_TADPOLE_ENTITY_CAMERAENTITY_H
+#ifndef TOADLET_TADPOLE_NODE_CAMERANODE_H
+#define TOADLET_TADPOLE_NODE_CAMERANODE_H
 
-#include <toadlet/tadpole/entity/Entity.h>
+#include <toadlet/tadpole/node/Node.h>
 #include <toadlet/peeper/Color.h>
 #include <toadlet/peeper/Viewport.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
-class TOADLET_API CameraEntity:public Entity{
+class TOADLET_API CameraNode:public Node{
 public:
-	TOADLET_ENTITY(CameraEntity,Entity);
+	TOADLET_NODE(CameraNode,Node);
 
 	enum ProjectionType{
 		ProjectionType_FOVX=0,
@@ -46,8 +46,8 @@ public:
 		ProjectionType_MATRIX
 	};
 
-	CameraEntity();
-	virtual Entity *create(Engine *engine);
+	CameraNode();
+	virtual Node *create(Engine *engine);
 
 	void setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,scalar farDist);
 	void setProjectionFovY(scalar fovy,scalar aspect,scalar nearDist,scalar farDist);

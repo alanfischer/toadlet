@@ -23,25 +23,25 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ENTITY_ENTITY_H
-#define TOADLET_TADPOLE_ENTITY_ENTITY_H
+#ifndef TOADLET_TADPOLE_NODE_NODE_H
+#define TOADLET_TADPOLE_NODE_NODE_H
 
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/egg/IntrusivePointer.h>
 #include <toadlet/egg/WeakPointer.h>
 #include <toadlet/egg/Type.h>
-#include <toadlet/tadpole/entity/EntityDestroyedListener.h>
+#include <toadlet/tadpole/node/NodeDestroyedListener.h>
 
-#ifndef TOADLET_ENTITY
-	#define TOADLET_ENTITY(Class,SuperClass) \
+#ifndef TOADLET_NODE
+	#define TOADLET_NODE(Class,SuperClass) \
 		typedef SuperClass super; \
-		typedef toadlet::egg::Type<Class,toadlet::tadpole::entity::Entity> ThisType; \
+		typedef toadlet::egg::Type<Class,toadlet::tadpole::node::Node> ThisType; \
 		static const ThisType &type(); \
 		TOADLET_INTRUSIVE_POINTERS(Class)
 #endif
 
-#ifndef TOADLET_ENTITY_IMPLEMENT
-	#define TOADLET_ENTITY_IMPLEMENT(Class,FullName) \
+#ifndef TOADLET_NODE_IMPLEMENT
+	#define TOADLET_NODE_IMPLEMENT(Class,FullName) \
 		const Class::ThisType &Class::type(){static ThisType t(FullName);return t;}
 #endif
 
@@ -50,31 +50,31 @@ namespace tadpole{
 
 class Engine;
 
-namespace entity{
+namespace node{
 
-class ParentEntity;
+class ParentNode;
 class Scene;
 
-class TOADLET_API Entity{
+class TOADLET_API Node{
 public:
-	TOADLET_ENTITY(Entity,Entity);
+	TOADLET_NODE(Node,Node);
 
-	Entity();
-	virtual ~Entity();
-	virtual Entity *create(Engine *engine);
+	Node();
+	virtual ~Node();
+	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
 	inline bool destroyed() const{return !mCreated;}
 	virtual bool isParent() const{return false;}
 	virtual bool isRenderable() const{return false;}
-	virtual bool isLight() const{return false;} // This one at least should be moved out to visualUpdate() in the LightEntity
+	virtual bool isLight() const{return false;} // This one at least should be moved out to visualUpdate() in the LightNode
 
-	virtual void setEntityDestroyedListener(EntityDestroyedListener *listener,bool owns);
-	inline EntityDestroyedListener *getEntityDestroyedListener() const{return mEntityDestroyedListener;}
-	virtual void removeAllEntityDestroyedListeners();
+	virtual void setNodeDestroyedListener(NodeDestroyedListener *listener,bool owns);
+	inline NodeDestroyedListener *getNodeDestroyedListener() const{return mNodeDestroyedListener;}
+	virtual void removeAllNodeDestroyedListeners();
 
-	virtual void parentChanged(ParentEntity *newParent){mParent=newParent;}
-	inline ParentEntity *getParent() const{return mParent;}
+	virtual void parentChanged(ParentNode *newParent){mParent=newParent;}
+	inline ParentNode *getParent() const{return mParent;}
 
 	virtual void setTranslate(const Vector3 &translate);
 	virtual void setTranslate(scalar x,scalar y,scalar z);
@@ -99,8 +99,8 @@ public:
 	virtual void setReceiveUpdates(bool receiveUpdates);
 	inline bool getReceiveUpdates() const{return mReceiveUpdates;}
 
-	/// Only called if the Entity registers itself with the Scene in registerUpdateEntity.
-	/// Dont forget to call unregisterUpdateEntity in its destroy.
+	/// Only called if the Node registers itself with the Scene in registerUpdateNode.
+	/// Dont forget to call unregisterUpdateNode in its destroy.
 	virtual void logicUpdate(int dt){}
 	virtual void visualUpdate(int dt){}
 
@@ -129,11 +129,11 @@ protected:
 	bool mCreated;
 	Engine *mEngine;
 
-	// Entity items
-	EntityDestroyedListener *mEntityDestroyedListener;
-	bool mOwnsEntityDestroyedListener;
+	// Node items
+	NodeDestroyedListener *mNodeDestroyedListener;
+	bool mOwnsNodeDestroyedListener;
 
-	egg::IntrusivePointer<ParentEntity> mParent;
+	egg::IntrusivePointer<ParentNode> mParent;
 
 	bool mIdentityTransform;
 	Vector3 mTranslate;

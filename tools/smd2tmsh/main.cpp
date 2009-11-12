@@ -3,7 +3,7 @@
 #include <toadlet/egg/io/FileInputStream.h>
 #include <toadlet/egg/io/FileOutputStream.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/Mesh.h>
+#include <toadlet/tadpole/mesh/Mesh.h>
 #include <toadlet/tadpole/handler/XMSHHandler.h>
 #include <iostream>
 #include "SMDConverter.h"

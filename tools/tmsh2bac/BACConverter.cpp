@@ -24,7 +24,8 @@
 #include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/peeper/Color.h>
-#include <toadlet/tadpole/entity/ParentEntity.h>
+#include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/node/ParentNode.h>
 #include <iostream>
 #include <sstream>
 #include <string.h>
@@ -36,7 +37,8 @@ using namespace toadlet::egg::math;
 using namespace toadlet::egg::math::Math;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::entity;
+using namespace toadlet::tadpole::mesh;
+using namespace toadlet::tadpole::node;
 
 const int EXPORT_FPS=30;
 
@@ -130,7 +132,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 	Collection<int> vertexMap;
 	Collection<int> texCoordMap;
 
-	mName=mesh->name;
+	mName=mesh->getName();
 	int loc=mName.rfind('.');
 	if(loc!=String::npos){
 		mName=mName.substr(0,loc);
@@ -381,18 +383,18 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 		mBones.add(bone);
 	}
 	else{
-		MeshEntity::ptr meshEntity=(MeshEntity*)(new MeshEntity())->create(mEngine);
-		meshEntity->load(mesh);
-		buildBones(mesh,meshEntity,0);
-		meshEntity->destroy();
+		MeshNode::ptr meshNode=mEngine->createNodeType(MeshNode::type());
+		meshNode->load(mesh);
+		buildBones(mesh,meshNode,0);
+		meshNode->destroy();
 	}
 
 	return true;
 }
 
-void BACConverter::buildBones(Mesh *mesh,MeshEntity *meshEntity,int bone){
-	MeshSkeleton *skeleton=mesh->skeleton;
-	MeshSkeleton::Bone *meshBone=skeleton->bones[bone];
+void BACConverter::buildBones(Mesh *mesh,MeshNode *meshNode,int bone){
+	Skeleton *skeleton=mesh->skeleton;
+	Skeleton::Bone *meshBone=skeleton->bones[bone];
 	int i;
 
 	int nextChild=-1;
@@ -409,9 +411,9 @@ void BACConverter::buildBones(Mesh *mesh,MeshEntity *meshEntity,int bone){
 		bacBone->name=meshBone->name;
 	}
 
-	Vector3 worldTranslate=meshEntity->getSkeleton()->getBone(bone)->worldTranslate;
+	Vector3 worldTranslate=meshNode->getSkeleton()->getBone(bone)->worldTranslate;
 	Matrix3x3 worldRotateMatrix;
-	Math::setMatrix3x3FromQuaternion(worldRotateMatrix,meshEntity->getSkeleton()->getBone(bone)->worldRotate);
+	Math::setMatrix3x3FromQuaternion(worldRotateMatrix,meshNode->getSkeleton()->getBone(bone)->worldRotate);
 	Vector3 worldRotate=Vector3(worldRotateMatrix.at(0,2),
 								worldRotateMatrix.at(1,2),
 								worldRotateMatrix.at(2,2));
@@ -433,7 +435,7 @@ void BACConverter::buildBones(Mesh *mesh,MeshEntity *meshEntity,int bone){
 	}
 
 	if(meshBone->parentIndex!=-1){
-		MeshSkeleton::Bone *parentBone=skeleton->bones[meshBone->parentIndex];
+		Skeleton::Bone *parentBone=skeleton->bones[meshBone->parentIndex];
 		for(i=bone+1;i<skeleton->bones.size();++i) if(skeleton->bones[i]->parentIndex==meshBone->parentIndex) break;
 		if(i<skeleton->bones.size()){
 			bacBone->hasBrother=true;
@@ -458,10 +460,10 @@ void BACConverter::buildBones(Mesh *mesh,MeshEntity *meshEntity,int bone){
 	mBones.add(bacBone);
 
 	if(nextChild!=-1){
-		buildBones(mesh,meshEntity,nextChild);
+		buildBones(mesh,meshNode,nextChild);
 	}
 	if(nextBrother!=-1){
-		buildBones(mesh,meshEntity,nextBrother);
+		buildBones(mesh,meshNode,nextBrother);
 	}
 }
 
@@ -1150,7 +1152,7 @@ void BACConverter::writeOutModelVersion5(OutputStream *tout){
 	delete out;
 }
 
-bool BACConverter::convertAnimation(Mesh::ptr mesh,MeshSkeletonSequence *animation,OutputStream *out,int version){
+bool BACConverter::convertAnimation(Mesh::ptr mesh,Sequence *animation,OutputStream *out,int version){
 	extractAnimationData(mesh,animation);
 
 	if(version==4){
@@ -1165,7 +1167,7 @@ bool BACConverter::convertAnimation(Mesh::ptr mesh,MeshSkeletonSequence *animati
 	return true;
 }
 
-void BACConverter::extractAnimationData(Mesh *mesh,MeshSkeletonSequence *animation){
+void BACConverter::extractAnimationData(Mesh *mesh,Sequence *animation){
 	int i,j;
 
 	mTotalFrame=(animation->length*EXPORT_FPS)/1000+1; // Must add 1 so we are above the max keyFrame.time*EXPORT_FPS
@@ -1174,7 +1176,7 @@ void BACConverter::extractAnimationData(Mesh *mesh,MeshSkeletonSequence *animati
 		Track *track=animation->tracks[i];
 
 		int boneIndex=track->index;
-		MeshSkeleton::Bone *meshbone=mesh->skeleton->bones[boneIndex];
+		Skeleton::Bone *meshbone=mesh->skeleton->bones[boneIndex];
 
 		if(track->keyFrames.size()>0){
 			BACAnimationBone *bacbone=new BACAnimationBone();

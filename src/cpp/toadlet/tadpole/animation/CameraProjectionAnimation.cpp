@@ -24,22 +24,22 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/animation/CameraProjectionAnimation.h>
-#include <toadlet/tadpole/entity/ParentEntity.h>
+#include <toadlet/tadpole/node/ParentNode.h>
 
 using namespace toadlet::egg;
-using namespace toadlet::tadpole::entity;
+using namespace toadlet::tadpole::node;
 
 namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-CameraProjectionAnimation::CameraProjectionAnimation(CameraEntity::ptr target)
+CameraProjectionAnimation::CameraProjectionAnimation(CameraNode::ptr target)
 	//mTarget
 {
 	mTarget=target;
 }
 
-void CameraProjectionAnimation::setTarget(CameraEntity::ptr target){
+void CameraProjectionAnimation::setTarget(CameraNode::ptr target){
 	mTarget=target;
 }
 

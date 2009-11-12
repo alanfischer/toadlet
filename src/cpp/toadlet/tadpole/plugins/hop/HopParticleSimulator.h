@@ -28,16 +28,16 @@
 
 #include <toadlet/egg/Random.h>
 #include <toadlet/hop/Collision.h>
-#include <toadlet/tadpole/entity/ParticleEntity.h>
+#include <toadlet/tadpole/node/ParticleNode.h>
 
 namespace toadlet{
 namespace tadpole{
 
 class HopScene;
 
-class TOADLET_API HopParticleSimulator:public entity::ParticleEntity::ParticleSimulator{
+class TOADLET_API HopParticleSimulator:public node::ParticleNode::ParticleSimulator{
 public:
-	HopParticleSimulator(HopScene *scene,entity::ParticleEntity *entity);
+	HopParticleSimulator(HopScene *scene,node::ParticleNode *node);
 	virtual ~HopParticleSimulator();
 	
 	void setParticleLife(int life);
@@ -49,7 +49,7 @@ public:
 
 protected:
 	HopScene *mScene;
-	entity::ParticleEntity *mParticleEntity;
+	node::ParticleNode *mParticleNode;
 	int mParticleLife;
 	bool mSpawnExistingParticles;
 	AABox mSpawnAABox;

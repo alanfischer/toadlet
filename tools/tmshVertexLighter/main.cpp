@@ -13,6 +13,7 @@ using namespace toadlet::egg::io;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole;
 using namespace toadlet::tadpole::handler;
+using namespace toadlet::tadpole::mesh;
 
 int main(int argc,char **argv){
 	String arg;
@@ -127,7 +128,7 @@ int main(int argc,char **argv){
 		std::cout << "Lighting " << (const char*)mshFileName << std::endl;
 		
 		// Load the mesh data
-		Mesh::ptr mesh=engine->loadMesh(mshFileName);
+		Mesh::ptr mesh=engine->getMeshManager()->findMesh(mshFileName);
 		if(mesh==NULL){
 			std::cerr << "Error loading \"" << (const char*)mshFileName << "\" failed!  File invalid or not found." << std::endl;
 			result=false;

@@ -4,13 +4,13 @@ using namespace toadlet;
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::entity;
+using namespace toadlet::tadpole::node;
 using namespace toadlet::pad;
 
 /*
-class Axis:public Entity,Renderable{
+class Axis:public Node,Renderable{
 public:
-	TOADLET_ENTITY(Axis,Entity);
+	TOADLET_NODE(Axis,Node);
 
 	void create(){
 		Super::create();
@@ -68,20 +68,20 @@ Viewer::Viewer():Application(),
 	mZoom(false)
 {}
 
-void Viewer::start(MeshEntity::ptr meshEntity){
+void Viewer::start(MeshNode::ptr meshNode){
 	mEngine->setScene((Scene*)(new Scene())->create(mEngine));
-	mParent=(ParentEntity*)(new ParentEntity())->create(mEngine);
+	mParent=mEngine->createNodeType(ParentNode::type());
 	mEngine->getScene()->attach(mParent);
-	mParent->attach(meshEntity);
+	mParent->attach(meshNode);
 
-	mCamera=(CameraEntity*)(new CameraEntity())->create(mEngine);
+	mCamera=mEngine->createNodeType(CameraNode::type());
 	mEngine->getScene()->attach(mCamera);
 
-	mDistance=meshEntity->getBoundingRadius()*2;
+	mDistance=meshNode->getBoundingRadius()*2;
 
 	mEngine->getScene()->setAmbientColor(Color(Math::QUARTER,Math::QUARTER,Math::QUARTER,Math::ONE));
 
-	mLight=(LightEntity*)(new LightEntity())->create(mEngine);
+	mLight=mEngine->createNodeType(LightNode::type());
 	mLight->setLightType(Light::Type_DIRECTION);
 	mLight->setDirection(Math::Y_UNIT_VECTOR3);
 	mLight->setDiffuseColor(Colors::WHITE);

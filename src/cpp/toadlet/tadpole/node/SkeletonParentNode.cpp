@@ -23,35 +23,51 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/entity/LightEntity.h>
-#include <toadlet/tadpole/entity/ParentEntity.h>
-#include <toadlet/tadpole/Engine.h>
+#include <toadlet/egg/Error.h>
+#include <toadlet/tadpole/node/SkeletonParentNode.h>
 
-using namespace toadlet::peeper;
+using namespace toadlet::egg;
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
-TOADLET_ENTITY_IMPLEMENT(LightEntity,"toadlet::tadpole::entity::LightEntity");
+TOADLET_NODE_IMPLEMENT(SkeletonParentNode,"toadlet::tadpole::node::SkeletonParentNode");
 
-LightEntity::LightEntity():Entity()
-	//mLight
-{
+SkeletonParentNode::SkeletonParentNode():ParentNode(){}
+
+void SkeletonParentNode::setSkeleton(MeshNodeSkeleton::ptr skeleton){
+	mSkeleton=skeleton;
+
+	setReceiveUpdates(mSkeleton!=NULL);
 }
 
-Entity *LightEntity::create(Engine *engine){
-	super::create(engine);
-
-	mLight=Light::ptr(new Light());
-
-	return this;
+bool SkeletonParentNode::attach(Node *node,int bone){
+	bool result=super::attach(node);
+	if(result){
+		mChildrenBones.add(bone);
+	}
+	return result;
 }
 
-void LightEntity::destroy(){
-	mLight=NULL;
+bool SkeletonParentNode::remove(Node *node){
+	int i;
+	for(i=0;i<mChildren.size();++i){
+		if(mChildren[i]==node){
+			mChildrenBones.removeAt(i);
+			break;
+		}
+	}
+	return super::remove(node);
+}
 
-	super::destroy();
+void SkeletonParentNode::visualUpdate(int dt){
+	int i;
+	for(i=0;i<mChildren.size();++i){
+		MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(mChildrenBones[i]);
+		mChildren[i]->setTranslate(bone->worldTranslate);
+		mChildren[i]->setRotate(bone->worldRotateMatrix);
+	}
 }
 
 }

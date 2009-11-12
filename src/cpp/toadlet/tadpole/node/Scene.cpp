@@ -26,9 +26,9 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Profile.h>
-#include <toadlet/tadpole/entity/Scene.h>
-#include <toadlet/tadpole/entity/CameraEntity.h>
-#include <toadlet/tadpole/entity/RenderableEntity.h>
+#include <toadlet/tadpole/node/Scene.h>
+#include <toadlet/tadpole/node/CameraNode.h>
+#include <toadlet/tadpole/node/RenderableNode.h>
 #include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet::egg;
@@ -37,9 +37,9 @@ using namespace toadlet::ribbit;
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
-Scene::Scene():ParentEntity(),
+Scene::Scene():ParentNode(),
 	mExcessiveDT(5000),
 	mLogicDT(100), // 10 fps
 	mLogicTime(0),
@@ -67,7 +67,7 @@ Scene::~Scene(){
 	mRenderLayers.clear();
 }
 
-Entity *Scene::create(Engine *engine){
+Node *Scene::create(Engine *engine){
 	super::create(engine);
 
 	if(mManaged){
@@ -75,7 +75,7 @@ Entity *Scene::create(Engine *engine){
 		return this;
 	}
 
-	mBackground=mEngine->createEntityType(ParentEntity::type());
+	mBackground=mEngine->createNodeType(ParentNode::type());
 
 	return this;
 }
@@ -118,14 +118,14 @@ void Scene::setLogicTimeAndFrame(int time,int frame){
 	resetModifiedFrames(this);
 }
 
-void Scene::resetModifiedFrames(Entity *entity){
-	entity->mModifiedLogicFrame=-1;
-	entity->mModifiedVisualFrame=-1;
-	entity->mWorldModifiedLogicFrame=-1;
-	entity->mWorldModifiedVisualFrame=-1;
+void Scene::resetModifiedFrames(Node *node){
+	node->mModifiedLogicFrame=-1;
+	node->mModifiedVisualFrame=-1;
+	node->mWorldModifiedLogicFrame=-1;
+	node->mWorldModifiedVisualFrame=-1;
 
-	if(entity->isParent()){
-		ParentEntity *parent=(ParentEntity*)entity;
+	if(node->isParent()){
+		ParentNode *parent=(ParentNode*)node;
 		int numChildren=parent->mChildren.size();
 		int i;
 		for(i=0;i<numChildren;++i){
@@ -193,20 +193,20 @@ void Scene::logicUpdate(int dt){
 	}
 }
 
-void Scene::logicUpdate(Entity::ptr entity,int dt){
-	if(entity->mReceiveUpdates){
-		entity->logicUpdate(dt);
+void Scene::logicUpdate(Node::ptr node,int dt){
+	if(node->mReceiveUpdates){
+		node->logicUpdate(dt);
 	}
 
-	entity->mWorldModifiedLogicFrame=entity->mModifiedLogicFrame;
+	node->mWorldModifiedLogicFrame=node->mModifiedLogicFrame;
 
-	if(entity->isParent()){
-		ParentEntity *parent=(ParentEntity*)entity.get();
+	if(node->isParent()){
+		ParentNode *parent=(ParentNode*)node.get();
 		if(parent->mShadowChildrenDirty){
 			parent->updateShadowChildren();
 		}
 
-		Entity *child;
+		Node *child;
 		int numChildren=parent->mShadowChildren.size();
 		int i;
 		for(i=0;i<numChildren;++i){
@@ -232,30 +232,30 @@ void Scene::visualUpdate(int dt){
 	}
 }
 
-void Scene::visualUpdate(Entity::ptr entity,int dt){
-	if(entity->mReceiveUpdates){
-		entity->visualUpdate(dt);
+void Scene::visualUpdate(Node::ptr node,int dt){
+	if(node->mReceiveUpdates){
+		node->visualUpdate(dt);
 	}
 
-	if(entity->mParent==NULL){
-		entity->mVisualWorldTransform.set(entity->mVisualTransform);
+	if(node->mParent==NULL){
+		node->mVisualWorldTransform.set(node->mVisualTransform);
 	}
-	else if(entity->mIdentityTransform){
-		entity->mVisualWorldTransform.set(entity->mParent->mVisualWorldTransform);
+	else if(node->mIdentityTransform){
+		node->mVisualWorldTransform.set(node->mParent->mVisualWorldTransform);
 	}
 	else{
-		Math::mul(entity->mVisualWorldTransform,entity->mParent->mVisualWorldTransform,entity->mVisualTransform);
+		Math::mul(node->mVisualWorldTransform,node->mParent->mVisualWorldTransform,node->mVisualTransform);
 	}
 
-	entity->mWorldModifiedVisualFrame=entity->mModifiedVisualFrame;
+	node->mWorldModifiedVisualFrame=node->mModifiedVisualFrame;
 
-	if(entity->isParent()){
-		ParentEntity *parent=(ParentEntity*)entity.get();
+	if(node->isParent()){
+		ParentNode *parent=(ParentNode*)node.get();
 		if(parent->mShadowChildrenDirty){
 			parent->updateShadowChildren();
 		}
 
-		Entity *child;
+		Node *child;
 		int numChildren=parent->mShadowChildren.size();
 		int i;
 		for(i=0;i<numChildren;++i){
@@ -276,23 +276,23 @@ void Scene::visualUpdate(Entity::ptr entity,int dt){
 			parent->mWorldModifiedVisualFrame=parent->mWorldModifiedVisualFrame>child->mWorldModifiedVisualFrame?parent->mWorldModifiedVisualFrame:child->mWorldModifiedVisualFrame;
 		}
 	}
-	else if(entity->isLight()){
+	else if(node->isLight()){
 		// TODO: Find the best light
-		mLight=shared_static_cast<LightEntity>(entity);
+		mLight=shared_static_cast<LightNode>(node);
 	}
 	else{
-		Math::setVector3FromMatrix4x4(entity->mVisualWorldBound.origin,entity->mVisualWorldTransform);
-		if(entity->mIdentityTransform==false){
-			scalar scale=Math::maxVal(entity->getScale().x,Math::maxVal(entity->getScale().y,entity->getScale().z));
-			entity->mVisualWorldBound.radius=Math::mul(scale,entity->mBoundingRadius);
+		Math::setVector3FromMatrix4x4(node->mVisualWorldBound.origin,node->mVisualWorldTransform);
+		if(node->mIdentityTransform==false){
+			scalar scale=Math::maxVal(node->getScale().x,Math::maxVal(node->getScale().y,node->getScale().z));
+			node->mVisualWorldBound.radius=Math::mul(scale,node->mBoundingRadius);
 		}
 		else{
-			entity->mVisualWorldBound.radius=entity->mBoundingRadius;
+			node->mVisualWorldBound.radius=node->mBoundingRadius;
 		}
 	}
 }
 
-void Scene::render(Renderer *renderer,CameraEntity *camera){
+void Scene::render(Renderer *renderer,CameraNode *camera){
 	#if defined(TOADLET_DEBUG)
 		if(destroyed()){
 			Error::unknown(Categories::TOADLET_TADPOLE,
@@ -398,50 +398,38 @@ void Scene::setUpdateListener(UpdateListener *updateListener){
 	mUpdateListener=updateListener;
 }
 
-bool Scene::remove(Entity *entity){
-	bool result=super::remove(entity);
-
-	if(entity==mBackground){
-		Error::unknown(Categories::TOADLET_TADPOLE,
-			"can not remove background entity");
-		return false;
-	}
-
-	return result;
-}
-
-void Scene::queueRenderables(Entity *entity){
-	if((entity->mScope&mCamera->mScope)==0){
+void Scene::queueRenderables(Node *node){
+	if((node->mScope&mCamera->mScope)==0){
 		return;
 	}
 
-	if(culled(entity)){
+	if(culled(node)){
 		mCamera->mNumCulledEntities++;
 		return;
 	}
 
-	if(entity->isParent()){
-		ParentEntity *parent=(ParentEntity*)entity;
+	if(node->isParent()){
+		ParentNode *parent=(ParentNode*)node;
 		int numChildren=parent->mChildren.size();
 		int i;
 		for(i=0;i<numChildren;++i){
 			queueRenderables(parent->mChildren[i]);
 		}
 	}
-	else if(entity->isRenderable()){
-		RenderableEntity *renderable=(RenderableEntity*)entity;
+	else if(node->isRenderable()){
+		RenderableNode *renderable=(RenderableNode*)node;
 		if(renderable->mVisible){
 			renderable->queueRenderables(this);
 		}
 	}
 }
 
-bool Scene::culled(Entity *entity){
-	if(entity->mVisualWorldBound.radius<0){
+bool Scene::culled(Node *node){
+	if(node->mVisualWorldBound.radius<0){
 		return false;
 	}
 
-	return mCamera->culled(entity->mVisualWorldBound);
+	return mCamera->culled(node->mVisualWorldBound);
 }
 
 bool Scene::preLayerRender(Renderer *renderer,int layer){

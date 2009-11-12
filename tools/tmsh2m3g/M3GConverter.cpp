@@ -39,6 +39,7 @@ using namespace toadlet::egg::math::Math;
 using namespace toadlet::egg::io;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole;
+using namespace toadlet::tadpole::mesh;
 
 class M3GProxy{
 public:
@@ -1527,7 +1528,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 	}
 
 	if(toadletMesh->skeleton!=NULL && toadletMesh->vertexBoneAssignments.size()>0){
-		MeshSkeleton::ptr toadletSkeleton=toadletMesh->skeleton;
+		Skeleton::ptr toadletSkeleton=toadletMesh->skeleton;
 
 		Collection<Collection<int> > boneverts;
 		boneverts.resize(toadletSkeleton->bones.size());
@@ -1556,7 +1557,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 
 		Collection<M3GGroup*> bones;
 		for(i=0;i<toadletSkeleton->bones.size();++i){
-			MeshSkeleton::Bone *toadletBone=toadletSkeleton->bones[i];
+			Skeleton::Bone *toadletBone=toadletSkeleton->bones[i];
 			M3GGroup *bone=new M3GGroup();
 			bones.add(bone);
 
@@ -1600,7 +1601,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 		skinnedMesh->userParameters.resize(toadletSkeleton->sequences.size());
 
 		for(i=0;i<toadletSkeleton->sequences.size();++i){
-			MeshSkeletonSequence *sequence=toadletSkeleton->sequences[i];
+			Sequence *sequence=toadletSkeleton->sequences[i];
 
 			M3GAnimationController *animationController=new M3GAnimationController();
 			animationController->speed=1.0f;

@@ -23,9 +23,9 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/entity/MeshEntitySkeleton.h>
-#include <toadlet/tadpole/entity/MeshEntity.h>
-#include <toadlet/tadpole/entity/Scene.h>
+#include <toadlet/tadpole/node/MeshNodeSkeleton.h>
+#include <toadlet/tadpole/node/MeshNode.h>
+#include <toadlet/tadpole/node/Scene.h>
 #include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet;
@@ -35,9 +35,9 @@ using namespace toadlet::tadpole::mesh;
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
-MeshEntitySkeleton::MeshEntitySkeleton(MeshEntity* entity,Skeleton::ptr skeleton):
+MeshNodeSkeleton::MeshNodeSkeleton(MeshNode* node,Skeleton::ptr skeleton):
 	//mSkeleton,
 	//mBones,
 	mLastVisualUpdateFrame(-1),
@@ -45,7 +45,7 @@ MeshEntitySkeleton::MeshEntitySkeleton(MeshEntity* entity,Skeleton::ptr skeleton
 	//mSequence,
 	mSequenceTime(0)
 {
-	mEntity=entity;
+	mNode=node;
 	mSkeleton=skeleton;
 
 	mBones.resize(skeleton->bones.size());
@@ -59,7 +59,7 @@ MeshEntitySkeleton::MeshEntitySkeleton(MeshEntity* entity,Skeleton::ptr skeleton
 	updateBones();
 }
 
-void MeshEntitySkeleton::updateBones(){
+void MeshNodeSkeleton::updateBones(){
 	int i;
 	for(i=0;i<mBones.size();++i){
 		updateBone(mBones[i]);
@@ -69,15 +69,15 @@ void MeshEntitySkeleton::updateBones(){
 		updateVertexData();
 	}
 
-	if(mEntity!=NULL && mEntity->getEngine()!=NULL && mEntity->getEngine()->getScene()!=NULL){
-		mLastVisualUpdateFrame=mEntity->getEngine()->getScene()->getVisualFrame();
+	if(mNode!=NULL && mNode->getEngine()!=NULL && mNode->getEngine()->getScene()!=NULL){
+		mLastVisualUpdateFrame=mNode->getEngine()->getScene()->getVisualFrame();
 	}
 	else{
 		mLastVisualUpdateFrame=-1;
 	}
 }
 
-void MeshEntitySkeleton::updateBones(int sequenceIndex,scalar sequenceTime){
+void MeshNodeSkeleton::updateBones(int sequenceIndex,scalar sequenceTime){
 	if(sequenceIndex>=0 && sequenceIndex<mSkeleton->sequences.size()){
 		mSequence=mSkeleton->sequences[sequenceIndex];
 		mSequenceTime=sequenceTime;
@@ -86,7 +86,7 @@ void MeshEntitySkeleton::updateBones(int sequenceIndex,scalar sequenceTime){
 	updateBones();
 }
 
-MeshEntitySkeleton::Bone *MeshEntitySkeleton::getBone(const String &name) const{
+MeshNodeSkeleton::Bone *MeshNodeSkeleton::getBone(const String &name) const{
 	int i;
 	for(i=0;i<mSkeleton->bones.size();++i){
 		if(mSkeleton->bones[i]->name.equals(name)){
@@ -97,7 +97,7 @@ MeshEntitySkeleton::Bone *MeshEntitySkeleton::getBone(const String &name) const{
 	return NULL;
 }
 
-String MeshEntitySkeleton::getBoneName(int index) const{
+String MeshNodeSkeleton::getBoneName(int index) const{
 	if(index>=0 && index<mSkeleton->bones.size()){
 		return mSkeleton->bones[index]->name;
 	}
@@ -106,11 +106,11 @@ String MeshEntitySkeleton::getBoneName(int index) const{
 	}
 }
 
-String MeshEntitySkeleton::getBoneName(Bone *bone) const{
+String MeshNodeSkeleton::getBoneName(Bone *bone) const{
 	return mSkeleton->bones[bone->index]->name;
 }
 
-int MeshEntitySkeleton::updateBoneTransformation(Bone *bone){
+int MeshNodeSkeleton::updateBoneTransformation(Bone *bone){
 	if(mSequence!=NULL){
 		Track *track=mSequence->tracks[bone->index];
 		scalar time=mSequenceTime;
@@ -134,7 +134,7 @@ int MeshEntitySkeleton::updateBoneTransformation(Bone *bone){
 	return bone->dontUpdateFlags;
 }
 
-void MeshEntitySkeleton::updateBone(Bone *bone){
+void MeshNodeSkeleton::updateBone(Bone *bone){
 	int updateFlags=BoneSpaceUpdate_NONE;
 
 	Skeleton::Bone *sbone=mSkeleton->bones[bone->index];
@@ -270,9 +270,9 @@ void MeshEntitySkeleton::updateBone(Bone *bone){
 	}
 }
 
-void MeshEntitySkeleton::setRenderable(bool renderable){
+void MeshNodeSkeleton::setRenderable(bool renderable){
 	if(renderable){
-		Engine *engine=mEntity->getEngine();
+		Engine *engine=mNode->getEngine();
 		int i;
 		mMaterial=engine->getMaterialManager()->createMaterial();
 		mMaterial->retain();
@@ -307,7 +307,7 @@ void MeshEntitySkeleton::setRenderable(bool renderable){
 	}
 }
 
-void MeshEntitySkeleton::updateVertexData(){
+void MeshNodeSkeleton::updateVertexData(){
 	VertexBufferAccessor vba;
 	vba.lock(mVertexData->getVertexBuffer(0),Buffer::AccessType_WRITE_ONLY);
 	int i;
@@ -317,11 +317,11 @@ void MeshEntitySkeleton::updateVertexData(){
 	vba.unlock();
 }
 
-const Matrix4x4 &MeshEntitySkeleton::getRenderTransform() const{
-	return mEntity!=NULL?mEntity->getVisualWorldTransform():Math::IDENTITY_MATRIX4X4;
+const Matrix4x4 &MeshNodeSkeleton::getRenderTransform() const{
+	return mNode!=NULL?mNode->getVisualWorldTransform():Math::IDENTITY_MATRIX4X4;
 }
 
-void MeshEntitySkeleton::render(Renderer *renderer) const{
+void MeshNodeSkeleton::render(Renderer *renderer) const{
 	renderer->renderPrimitive(mVertexData,mIndexData);
 }
 

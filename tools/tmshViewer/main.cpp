@@ -4,7 +4,8 @@
 
 using namespace toadlet::egg;
 using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::entity;
+using namespace toadlet::tadpole::node;
+using namespace toadlet::tadpole::mesh;
 
 int main(int argc,char **argv){
 	String arg;
@@ -40,7 +41,7 @@ int main(int argc,char **argv){
 		meshName=meshName.substr(loc+1,meshName.length());
 	}
 
-	Mesh::ptr mesh=engine->cacheMesh(meshName);
+	Mesh::ptr mesh=engine->getMeshManager()->findMesh(meshName);
 	if(mesh==NULL){
 		std::cout << "Error loading " << (const char*)meshName << std::endl;
 
@@ -50,13 +51,13 @@ int main(int argc,char **argv){
 		return -1;
 	}
 
-	MeshEntity::ptr meshEntity=(MeshEntity*)(new MeshEntity())->create(engine);
-	meshEntity->load(mesh);
+	MeshNode::ptr meshNode=engine->createNodeType(MeshNode::type());
+	meshNode->load(mesh);
 
 	if(mesh->skeleton!=NULL){
 		std::cout << "Has skeleton" << std::endl;
 
-		meshEntity->getSkeleton()->setRenderable(true);
+		meshNode->getSkeleton()->setRenderable(true);
 
 		int numSequences=mesh->skeleton->sequences.size();
 		std::cout << "Number of sequences:" << numSequences << std::endl;
@@ -64,10 +65,10 @@ int main(int argc,char **argv){
 		if(argc>=3 && numSequences>0){
 			int sequence=atoi(argv[2]);
 			if(sequence>=0 && sequence<numSequences){
-				meshEntity->getAnimationController()->setSequenceIndex(sequence);
-				meshEntity->getAnimationController()->setLoop(true);
-				meshEntity->getAnimationController()->setTimeScale(Math::ONE);
-				meshEntity->getAnimationController()->start();
+				meshNode->getAnimationController()->setSequenceIndex(sequence);
+				meshNode->getAnimationController()->setLoop(true);
+				meshNode->getAnimationController()->setTimeScale(Math::ONE);
+				meshNode->getAnimationController()->start();
 			}
 			else{
 				std::cout << "Invalid sequence number:" << sequence << std::endl;
@@ -75,7 +76,7 @@ int main(int argc,char **argv){
 		}
 	}
 
-	viewer->start(meshEntity);
+	viewer->start(meshNode);
 
 	delete viewer;
 

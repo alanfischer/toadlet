@@ -26,9 +26,9 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Profile.h>
-#include <toadlet/tadpole/entity/ParticleEntity.h>
-#include <toadlet/tadpole/entity/ParentEntity.h>
-#include <toadlet/tadpole/entity/CameraEntity.h>
+#include <toadlet/tadpole/node/ParticleNode.h>
+#include <toadlet/tadpole/node/ParentNode.h>
+#include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet::egg;
@@ -36,11 +36,11 @@ using namespace toadlet::peeper;
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
-TOADLET_ENTITY_IMPLEMENT(ParticleEntity,"toadlet::tadpole::entity::ParticleEntity");
+TOADLET_NODE_IMPLEMENT(ParticleNode,"toadlet::tadpole::node::ParticleNode");
 
-ParticleEntity::ParticleEntity():RenderableEntity(),
+ParticleNode::ParticleNode():RenderableNode(),
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
 	renderable(this),
 #endif
@@ -86,7 +86,7 @@ ParticleEntity::ParticleEntity():RenderableEntity(),
 	mEpsilon(0)
 {}
 
-Entity *ParticleEntity::create(Engine *engine){
+Node *ParticleNode::create(Engine *engine){
 	super::create(engine);
 
 	mDestroyNextLogicFrame=false;
@@ -136,7 +136,7 @@ Entity *ParticleEntity::create(Engine *engine){
 	return this;
 }
 
-void ParticleEntity::destroy(){
+void ParticleNode::destroy(){
 	stopSimulating();
 
 	if(mVertexBuffer!=NULL){
@@ -157,7 +157,7 @@ void ParticleEntity::destroy(){
 	super::destroy();
 }
 
-bool ParticleEntity::start(int particlesPerBeam,int numParticles,bool hasColor,const Vector3 points[],const scalar ages[],scalar defaultAge,bool visible){
+bool ParticleNode::start(int particlesPerBeam,int numParticles,bool hasColor,const Vector3 points[],const scalar ages[],scalar defaultAge,bool visible){
 	if(particlesPerBeam>1 && (numParticles%particlesPerBeam)!=0){
 		Error::invalidParameters(Categories::TOADLET_TADPOLE,
 			"startParticles: Must specify a number of particles divisible by particlesPerBeam");
@@ -267,63 +267,63 @@ bool ParticleEntity::start(int particlesPerBeam,int numParticles,bool hasColor,c
 	return true;
 }
 
-int ParticleEntity::randomColor(){
+int ParticleNode::randomColor(){
 	return 0xFF000000 | (mRandom.nextInt(0xFF)<<16) | (mRandom.nextInt(0xFF)<<8) | mRandom.nextInt(0xFF);
 }
 
-void ParticleEntity::setStartColor(const Color &startColor){
+void ParticleNode::setStartColor(const Color &startColor){
 	mStartColor.set(startColor);
 
 	mUpdateParticles=true;
 }
 
-void ParticleEntity::setEndColor(const Color &endColor){
+void ParticleNode::setEndColor(const Color &endColor){
 	mEndColor.set(endColor);
 
 	mUpdateParticles=true;
 }
 
-void ParticleEntity::setColor(const Color &startColor,const Color &endColor){
+void ParticleNode::setColor(const Color &startColor,const Color &endColor){
 	mStartColor.set(startColor);
 	mEndColor.set(endColor);
 
 	mUpdateParticles=true;
 }
 
-void ParticleEntity::setColor(const Color &color){
+void ParticleNode::setColor(const Color &color){
 	mStartColor.set(color);
 	mEndColor.set(color);
 
 	mUpdateParticles=true;
 }
 
-void ParticleEntity::setStartScale(scalar startScale){
+void ParticleNode::setStartScale(scalar startScale){
 	mStartScale=startScale;
 
 	mUpdateParticles=true;
 }
 
-void ParticleEntity::setEndScale(scalar endScale){
+void ParticleNode::setEndScale(scalar endScale){
 	mEndScale=endScale;
 
 	mUpdateParticles=true;
 }
 
-void ParticleEntity::setScale(scalar startScale,scalar endScale){
+void ParticleNode::setScale(scalar startScale,scalar endScale){
 	mStartScale=startScale;
 	mEndScale=endScale;
 
 	mUpdateParticles=true;
 }
 
-void ParticleEntity::setScale(scalar scale){
+void ParticleNode::setScale(scalar scale){
 	mStartScale=scale;
 	mEndScale=scale;
 
 	mUpdateParticles=true;
 }
 
-void ParticleEntity::setWorldSpace(bool worldSpace){
+void ParticleNode::setWorldSpace(bool worldSpace){
 	mWorldSpace=worldSpace;
 
 	updateWorldTransform(this);
@@ -340,7 +340,7 @@ void ParticleEntity::setWorldSpace(bool worldSpace){
 	}
 }
 
-void ParticleEntity::setRenderMaterial(const Material::ptr &material){
+void ParticleNode::setRenderMaterial(const Material::ptr &material){
 	if(mMaterial!=NULL){
 		mMaterial->release();
 	}
@@ -352,7 +352,7 @@ void ParticleEntity::setRenderMaterial(const Material::ptr &material){
 	}
 }
 
-void ParticleEntity::startSimulating(ParticleSimulator::ptr particleSimulator){
+void ParticleNode::startSimulating(ParticleSimulator::ptr particleSimulator){
 	if(particleSimulator==NULL){
 		particleSimulator=mEngine->getScene()->newParticleSimulator(this);
 	}
@@ -364,13 +364,13 @@ void ParticleEntity::startSimulating(ParticleSimulator::ptr particleSimulator){
 	setReceiveUpdates(true);
 }
 
-void ParticleEntity::stopSimulating(){
+void ParticleNode::stopSimulating(){
 	setReceiveUpdates(false);
 
 	mParticleSimulator=NULL;
 }
 
-void ParticleEntity::logicUpdate(int dt){
+void ParticleNode::logicUpdate(int dt){
 	super::logicUpdate(dt);
 
 	if(mDestroyNextLogicFrame){
@@ -378,7 +378,7 @@ void ParticleEntity::logicUpdate(int dt){
 	}
 }
 	
-void ParticleEntity::visualUpdate(int dt){
+void ParticleNode::visualUpdate(int dt){
 	if(mParticleSimulator!=NULL){
 		if(mWorldSpace){
 			Math::mul(mVisualWorldTransform,mParent->getVisualWorldTransform(),mVisualTransform);
@@ -391,7 +391,7 @@ void ParticleEntity::visualUpdate(int dt){
 	}
 }
 	
-void ParticleEntity::queueRenderables(Scene *scene){
+void ParticleNode::queueRenderables(Scene *scene){
 	if(mUpdateParticles){
 		if(mHasIdealViewTransform){
 			updateVertexBuffer(mIdealViewTransform);
@@ -409,7 +409,7 @@ void ParticleEntity::queueRenderables(Scene *scene){
 #endif
 }
 
-const Matrix4x4 &ParticleEntity::getRenderTransform() const{
+const Matrix4x4 &ParticleNode::getRenderTransform() const{
 	if(mWorldSpace){
 		return Math::IDENTITY_MATRIX4X4;
 	}
@@ -418,29 +418,29 @@ const Matrix4x4 &ParticleEntity::getRenderTransform() const{
 	}
 }
 
-void ParticleEntity::render(Renderer *renderer) const{
+void ParticleNode::render(Renderer *renderer) const{
 	renderer->renderPrimitive(mVertexData,mLineBeams?mLineIndexData:mIndexData);
 }
 
-void ParticleEntity::updateWorldTransform(Entity *entity){
-	if(entity->getParent()==NULL){
-		Math::setMatrix4x4FromTranslateRotateScale(mWorldTransform,entity->getTranslate(),entity->getRotate(),entity->getScale());
+void ParticleNode::updateWorldTransform(Node *node){
+	if(node->getParent()==NULL){
+		Math::setMatrix4x4FromTranslateRotateScale(mWorldTransform,node->getTranslate(),node->getRotate(),node->getScale());
 	}
 	else{
-		updateWorldTransform(entity->getParent());
+		updateWorldTransform(node->getParent());
 
-		if(entity->isIdentityTransform()==false){
+		if(node->isIdentityTransform()==false){
 			Matrix4x4 &temp1=cache_updateWorldTransform_temp1;
 			Matrix4x4 &temp2=cache_updateWorldTransform_temp2;
 
-			Math::setMatrix4x4FromTranslateRotateScale(temp1,entity->getTranslate(),entity->getRotate(),entity->getScale());
+			Math::setMatrix4x4FromTranslateRotateScale(temp1,node->getTranslate(),node->getRotate(),node->getScale());
 			Math::mul(temp2,mWorldTransform,temp1);
 			mWorldTransform.set(temp2);
 		}
 	}
 }
 
-void ParticleEntity::createVertexBuffer(){
+void ParticleNode::createVertexBuffer(){
 	int i,j,ii,vi;
 
 	int numParticles=mParticles.size();
@@ -524,8 +524,8 @@ void ParticleEntity::createVertexBuffer(){
 	}
 }
 
-void ParticleEntity::updateVertexBuffer(const Matrix4x4 &viewTransform){
-	TOADLET_PROFILE_BEGINSECTION(ParticleEntity::updateVertexBuffer);
+void ParticleNode::updateVertexBuffer(const Matrix4x4 &viewTransform){
+	TOADLET_PROFILE_BEGINSECTION(ParticleNode::updateVertexBuffer);
 
 	int i=0,j=0;
 
@@ -891,7 +891,7 @@ void ParticleEntity::updateVertexBuffer(const Matrix4x4 &viewTransform){
 		vba.unlock();
 	}
 
-	TOADLET_PROFILE_ENDSECTION(ParticleEntity::updateVertexBuffer);
+	TOADLET_PROFILE_ENDSECTION(ParticleNode::updateVertexBuffer);
 }
 
 }

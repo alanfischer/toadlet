@@ -9,7 +9,7 @@ public:
 	MeshOptimizer();
 	~MeshOptimizer();
 
-	bool optimizeMesh(toadlet::tadpole::Mesh *mesh,toadlet::tadpole::Engine *engine);
+	bool optimizeMesh(toadlet::tadpole::mesh::Mesh *mesh,toadlet::tadpole::Engine *engine);
 
 protected:
 	float mEpsilon;

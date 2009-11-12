@@ -23,25 +23,25 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ENTITY_LIGHTENTITY_H
-#define TOADLET_TADPOLE_ENTITY_LIGHTENTITY_H
+#ifndef TOADLET_TADPOLE_NODE_LIGHTNODE_H
+#define TOADLET_TADPOLE_NODE_LIGHTNODE_H
 
-#include <toadlet/tadpole/entity/Entity.h>
+#include <toadlet/tadpole/node/Node.h>
 #include <toadlet/peeper/Light.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
 class Scene;
 
-/// @todo: Add proper world position & direction updating of the Light, same with AudioEntity
-class TOADLET_API LightEntity:public Entity{
+/// @todo: Add proper world position & direction updating of the Light, same with AudioNode
+class TOADLET_API LightNode:public Node{
 public:
-	TOADLET_ENTITY(LightEntity,Entity);
+	TOADLET_NODE(LightNode,Node);
 
-	LightEntity();
-	virtual Entity *create(Engine *engine);
+	LightNode();
+	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
 	virtual bool isLight() const{return true;}

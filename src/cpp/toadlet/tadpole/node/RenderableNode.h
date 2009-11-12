@@ -23,32 +23,39 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/entity/RenderableEntity.h>
-#include <toadlet/tadpole/entity/ParentEntity.h>
+#ifndef TOADLET_TADPOLE_NODE_RENDERABLENODE_H
+#define TOADLET_TADPOLE_NODE_RENDERABLENODE_H
+
+#include <toadlet/tadpole/node/Node.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
-TOADLET_ENTITY_IMPLEMENT(RenderableEntity,"toadlet::tadpole::entity::RenderableEntity");
+class Scene;
 
-RenderableEntity::RenderableEntity():Entity(),
-	mVisible(false)
-{}
+class TOADLET_API RenderableNode:public Node{
+public:
+	TOADLET_NODE(RenderableNode,Node);
 
-Entity *RenderableEntity::create(Engine *engine){
-	super::create(engine);
+	RenderableNode();
+	Node *create(Engine *engine);
 
-	mBoundingRadius=-Math::ONE;
-	mVisible=true;
+	virtual bool isRenderable() const{return true;}
 
-	return this;
+	virtual void setVisible(bool visible);
+	inline bool getVisible() const{return mVisible;}
+
+	virtual void queueRenderables(Scene *scene){}
+
+protected:
+	bool mVisible;
+
+	friend class Scene;
+};
+
+}
+}
 }
 
-void RenderableEntity::setVisible(bool visible){
-	mVisible=visible;
-}
-
-}
-}
-}
+#endif

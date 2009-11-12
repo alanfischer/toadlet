@@ -20,24 +20,24 @@ set (TADPOLE_SRC
 set (TADPOLE_ANIMATION_SRC
 	animation/AnimationController.cpp
 	animation/CameraProjectionAnimation.cpp
-	animation/EntityPathAnimation.cpp
+	animation/NodePathAnimation.cpp
 	animation/SkeletonAnimation.cpp
 )
 
-set (TADPOLE_ENTITY_SRC
-	entity/AnimationControllerEntity.cpp
-	entity/AudioEntity.cpp
-	entity/CameraEntity.cpp
-	entity/Entity.cpp
-	entity/LightEntity.cpp
-	entity/MeshEntity.cpp
-	entity/MeshEntitySkeleton.cpp
-	entity/ParentEntity.cpp
-	entity/ParticleEntity.cpp
-	entity/RenderableEntity.cpp
-	entity/Scene.cpp
-	entity/SkeletonParentEntity.cpp
-	entity/SpriteEntity.cpp
+set (TADPOLE_NODE_SRC
+	node/AnimationControllerNode.cpp
+	node/AudioNode.cpp
+	node/CameraNode.cpp
+	node/Node.cpp
+	node/LightNode.cpp
+	node/MeshNode.cpp
+	node/MeshNodeSkeleton.cpp
+	node/ParentNode.cpp
+	node/ParticleNode.cpp
+	node/RenderableNode.cpp
+	node/Scene.cpp
+	node/SkeletonParentNode.cpp
+	node/SpriteNode.cpp
 )
 
 set (TADPOLE_HANDLER_SRC
@@ -101,25 +101,25 @@ set (TADPOLE_ANIMATION_HEADERS
 	animation/AnimationController.h
 	animation/AnimationControllerFinishedListener.h
 	animation/CameraProjectionAnimation.h
-	animation/EntityPathAnimation.h
+	animation/NodePathAnimation.h
 	animation/SkeletonAnimation.h
 )
 
-set (TADPOLE_ENTITY_HEADERS
-	entity/AnimationControllerEntity.h
-	entity/AudioEntity.h
-	entity/CameraEntity.h
-	entity/Entity.h
-	entity/EntityDestroyedListener.h
-	entity/LightEntity.h
-	entity/MeshEntity.h
-	entity/MeshEntitySkeleton.h
-	entity/ParentEntity.h
-	entity/ParticleEntity.h
-	entity/RenderableEntity.h
-	entity/Scene.h
-	entity/SkeletonParentEntity.h
-	entity/SpriteEntity.h
+set (TADPOLE_NODE_HEADERS
+	node/AnimationControllerNode.h
+	node/AudioNode.h
+	node/CameraNode.h
+	node/Node.h
+	node/NodeDestroyedListener.h
+	node/LightNode.h
+	node/MeshNode.h
+	node/MeshNodeSkeleton.h
+	node/ParentNode.h
+	node/ParticleNode.h
+	node/RenderableNode.h
+	node/Scene.h
+	node/SkeletonParentNode.h
+	node/SpriteNode.h
 )
 
 set (TADPOLE_HANDLER_HEADERS
@@ -162,21 +162,21 @@ set (TADPOLE_MESH_HEADERS
 
 # Bundle source
 source_group ("Source Files\\\\animation" FILES ${TADPOLE_ANIMATION_SRC})
-source_group ("Source Files\\\\entity" FILES ${TADPOLE_ENTITY_SRC})
+source_group ("Source Files\\\\node" FILES ${TADPOLE_NODE_SRC})
 source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_SRC})
 source_group ("Source Files\\\\mesh" FILES ${TADPOLE_MESH_SRC})
 
 
 # Bundle headers
 source_group ("Header Files\\\\animation" FILES ${TADPOLE_ANIMATION_HEADERS})
-source_group ("Header Files\\\\entity" FILES ${TADPOLE_ENTITY_HEADERS})
+source_group ("Header Files\\\\node" FILES ${TADPOLE_NODE_HEADERS})
 source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_HEADERS})
 source_group ("Header Files\\\\mesh" FILES ${TADPOLE_MESH_HEADERS})
 
 
 # Source and headers
-set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_ENTITY_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MESH_SRC})
-set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_ENTITY_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_MESH_HEADERS})
+set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_NODE_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MESH_SRC})
+set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_MESH_HEADERS})
 
 
 # Dependencies for toadlet_tadpole

@@ -12,6 +12,7 @@
 using namespace toadlet::egg::io;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole::handler;
+using namespace toadlet::tadpole::mesh;
 
 BOOL APIENTRY DllMain( HANDLE hModule, 
                        DWORD  ul_reason_for_call, 
@@ -386,9 +387,9 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 	return 0;
 }
 
-MeshSkeleton::ptr
+Skeleton::ptr
 cPlugIn::buildSkeleton(msModel *pModel,const Collection<int> &emptyBones){
-	MeshSkeleton::ptr skeleton(new MeshSkeleton());
+	Skeleton::ptr skeleton(new Skeleton());
 
 	int i,j;
 	for(i=0;i<msModel_GetBoneCount(pModel);++i){
@@ -405,7 +406,7 @@ cPlugIn::buildSkeleton(msModel *pModel,const Collection<int> &emptyBones){
 			continue;
 		}
 
-		MeshSkeleton::Bone::ptr bone(new MeshSkeleton::Bone());
+		Skeleton::Bone::ptr bone(new Skeleton::Bone());
 		skeleton->bones.add(bone);
 
 		msBone *msbone=msModel_GetBoneAt(pModel,i);
@@ -441,7 +442,7 @@ cPlugIn::buildSkeleton(msModel *pModel,const Collection<int> &emptyBones){
 
 		Vector3 wtbtranslation(bone->translate);
 		Quaternion wtbrotation(bone->rotate);
-		MeshSkeleton::Bone::ptr parentBone=bone;
+		Skeleton::Bone::ptr parentBone=bone;
 		while(parentBone!=NULL){
 			if(parentBone->parentIndex==-1){
 				parentBone=NULL;
@@ -477,7 +478,7 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 	Collection<int> emptyBones;
 	findEmptyBones(pModel,emptyBones);
 
-	MeshSkeletonSequence::ptr sequence(new MeshSkeletonSequence());
+	Sequence::ptr sequence(new Sequence());
 
 	int s1=name.rfind('/');
 	if(s1==String::npos){s1=0;}
@@ -487,12 +488,12 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 	int end=name.rfind('.');
 	if(end<0){end=name.length();}
 	
-	sequence->name=name.substr(start,end-start);
+	sequence->setName(name.substr(start,end-start));
 
 	float maxTime=0;
 	float fps=30.0f;
 
-	MeshSkeleton::ptr skeleton=buildSkeleton(pModel,emptyBones);
+	Skeleton::ptr skeleton=buildSkeleton(pModel,emptyBones);
 
 	int i,j,k;
 	for(i=0;i<msModel_GetBoneCount(pModel);++i){

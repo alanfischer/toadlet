@@ -15,6 +15,7 @@ using namespace toadlet::egg::math;
 using namespace toadlet::egg::math::Math;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole;
+using namespace toadlet::tadpole::mesh;
 
 const static float MAXIMUM_ACCEPTABLE_SCALE=100.0f;
 const static float MINIMUM_ACCEPTABLE_SCALE=0.01f;
@@ -359,7 +360,7 @@ bool MicroMeshConverter::convertMesh(Mesh *mesh,OutputStream *outStream,float me
 		}
 	}
 	if(mesh->skeleton!=NULL){
-		MeshSkeleton::ptr skeleton=mesh->skeleton;
+		Skeleton::ptr skeleton=mesh->skeleton;
 
 		out->writeUInt8((char)SKELETON_BLOCK);
 
@@ -411,7 +412,7 @@ bool MicroMeshConverter::convertMesh(Mesh *mesh,OutputStream *outStream,float me
 		out->writeBigInt32(mathfixed::Math::floatToFixed(translateScaleScalar));
 
 		for(i=0;i<skeleton->bones.size();++i){
-			MeshSkeleton::Bone::ptr b=skeleton->bones[i];
+			Skeleton::Bone::ptr b=skeleton->bones[i];
 
 			if(translateBytes==1){
 				out->writeInt8((b->translate.x * scaleModifier - translateBias.x)/translateScaleScalar);
@@ -449,7 +450,7 @@ bool MicroMeshConverter::convertMesh(Mesh *mesh,OutputStream *outStream,float me
 		}
 
 		for(i=0;i<skeleton->sequences.size();++i){
-			MeshSkeletonSequence::ptr sequence=skeleton->sequences[i];
+			Sequence::ptr sequence=skeleton->sequences[i];
 
 			out->writeUInt8((char)ANIMATION_BLOCK);
 
