@@ -26,12 +26,14 @@
 #ifndef TOADLET_PEEPER_BACKABLETEXTURE_H
 #define TOADLET_PEEPER_BACKABLETEXTURE_H
 
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/Texture.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API BackableTexture:public Texture{
+class TOADLET_API BackableTexture:public egg::BaseResource,public Texture{
+	TOADLET_BASERESOURCE_PASSTHROUGH();
 public:
 	TOADLET_SHARED_POINTERS(BackableTexture);
 
@@ -39,9 +41,6 @@ public:
 	virtual ~BackableTexture();
 
 	virtual Texture *getRootTexture(){return mBack;}
-
-	virtual void setName(const egg::String &name){mName=name;}
-	virtual const egg::String &getName() const{return mName;}
 
 	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels);
 	virtual void destroy();
@@ -60,9 +59,8 @@ public:
 
 	virtual void setBack(Texture::ptr back,bool initial=false);
 	virtual Texture::ptr getBack(){return mBack;}
-	
+
 protected:
-	egg::String mName;
 	int mUsageFlags;
 	Dimension mDimension;
 	int mFormat;

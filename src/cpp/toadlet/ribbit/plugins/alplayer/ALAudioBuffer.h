@@ -27,6 +27,7 @@
 #define TOADLET_RIBBIT_ALAUDIOBUFFER_H
 
 #include "ALIncludes.h"
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/ribbit/AudioBuffer.h>
 
 namespace toadlet{
@@ -34,7 +35,8 @@ namespace ribbit{
 
 class ALPlayer;
 
-class TOADLET_API ALAudioBuffer:public AudioBuffer{
+class TOADLET_API ALAudioBuffer:protected egg::BaseResource,public AudioBuffer{
+	TOADLET_BASERESOURCE_PASSTHROUGH();
 public:
 	ALAudioBuffer(ALPlayer *player);
 	virtual ~ALAudioBuffer();
@@ -42,7 +44,7 @@ public:
 	AudioBuffer *getRootAudioBuffer(){return this;}
 
 	bool create(egg::io::InputStream::ptr inputStream,const egg::String &mimeType);
-	bool destroy();
+	void destroy();
 
 	inline ALuint getHandle() const{return mHandle;}
 

@@ -26,13 +26,13 @@
 #include <toadlet/peeper/BackableTexture.h>
 #include <string.h>
 
+using namespace toadlet::egg;
 using namespace toadlet::egg::image;
 
 namespace toadlet{
 namespace peeper{
 
-BackableTexture::BackableTexture():
-	//mName,
+BackableTexture::BackableTexture():BaseResource(),
 	mUsageFlags(0),
 	mDimension(Dimension_UNKNOWN),
 	mFormat(0),

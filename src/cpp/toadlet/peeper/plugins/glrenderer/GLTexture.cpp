@@ -34,7 +34,7 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-GLTexture::GLTexture(GLRenderer *renderer):
+GLTexture::GLTexture(GLRenderer *renderer):BaseResource(),
 	mRenderer(NULL),
 
 	mUsageFlags(UsageFlags_NONE),

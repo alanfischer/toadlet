@@ -26,13 +26,12 @@
 #ifndef TOADLET_PEEPER_INDEXBUFFER_H
 #define TOADLET_PEEPER_INDEXBUFFER_H
 
-#include <toadlet/egg/Resource.h>
 #include <toadlet/peeper/Buffer.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API IndexBuffer:public egg::Resource,public Buffer{
+class TOADLET_API IndexBuffer:public Buffer{
 public:
 	TOADLET_SHARED_POINTERS(IndexBuffer);
 

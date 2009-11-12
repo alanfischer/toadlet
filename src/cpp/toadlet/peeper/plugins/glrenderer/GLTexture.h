@@ -28,6 +28,7 @@
 
 #include "GLIncludes.h"
 #include "GLTextureMipSurface.h"
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/peeper/TextureStage.h>
 
@@ -36,7 +37,8 @@ namespace peeper{
 
 class GLRenderer;
 
-class TOADLET_API GLTexture:public Texture{
+class TOADLET_API GLTexture:protected egg::BaseResource,public Texture{
+	TOADLET_BASERESOURCE_PASSTHROUGH();
 public:
 	GLTexture(GLRenderer *renderer);
 	virtual ~GLTexture();
@@ -57,9 +59,6 @@ public:
 	virtual Surface::ptr getMipSuface(int i) const;
 	virtual bool load(int format,int width,int height,int depth,uint8 *data);
 	virtual bool read(int format,int width,int height,int depth,uint8 *data);
-
-	virtual void setName(const egg::String &name){mName=name;}
-	virtual const egg::String &getName() const{return mName;}
 
 	inline GLuint getHandle() const{return mHandle;}
 	inline GLenum getTarget() const{return mTarget;}
@@ -87,8 +86,6 @@ protected:
 	int mHeight;
 	int mDepth;
 	int mMipLevels;
-
-	egg::String mName;
 
 	GLuint mHandle;
 	GLenum mTarget;

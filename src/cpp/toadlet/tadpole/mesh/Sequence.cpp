@@ -38,6 +38,10 @@ Sequence::Sequence():
 }
 
 Sequence::~Sequence(){
+	destroy();
+}
+
+void Sequence::destroy(){
 }
 
 void Sequence::compile(){

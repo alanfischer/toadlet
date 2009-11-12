@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_MESH_MESH_H
 
 #include <toadlet/tadpole/Types.h>
-#include <toadlet/egg/Resource.h>
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
@@ -37,7 +37,7 @@ namespace toadlet{
 namespace tadpole{
 namespace mesh{
 
-class TOADLET_API Mesh:public egg::Resource{
+class TOADLET_API Mesh:public egg::BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(Mesh);
 
@@ -75,9 +75,8 @@ public:
 	Mesh();
 	virtual ~Mesh();
 
+	void destroy();
 	void compile();
-
-	egg::String name;
 
 	scalar boundingRadius; // Before world scale
 	scalar worldScale;

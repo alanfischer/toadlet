@@ -35,7 +35,7 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-D3D9Texture::D3D9Texture(D3D9Renderer *renderer):
+D3D9Texture::D3D9Texture(D3D9Renderer *renderer):BaseResource(),
 	mRenderer(NULL),
 
 	mUsageFlags(UsageFlags_NONE),

@@ -182,9 +182,7 @@ Resource::ptr FreeTypeHandler::load(InputStream::ptr in,const ResourceHandlerDat
 		}
 	}
 
-	Texture::ptr texture=mTextureManager->createTexture(image);
-
-	Font::ptr font(new Font(fontData->width,fontData->height,maxHeight,0,shared_static_cast<Texture>(mTextureManager->load(texture)),charArray,&glyphs[0],glyphs.size()));
+	Font::ptr font(new Font(fontData->width,fontData->height,maxHeight,0,mTextureManager->createTexture(image),charArray,&glyphs[0],glyphs.size()));
 
 	// Clean up FreeType data
 	for(i=0;i<bitmapGlyphs.size();++i){

@@ -49,10 +49,6 @@ public:
 
 	virtual Texture *getRootTexture()=0;
 
-	// TODO: Remove these if we add it back in Resource
-	virtual void setName(const egg::String &name)=0;
-	virtual const egg::String &getName() const=0;
-
 	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels)=0;
 	virtual void destroy()=0;
 

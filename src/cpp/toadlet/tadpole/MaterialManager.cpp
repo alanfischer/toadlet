@@ -40,12 +40,11 @@ MaterialManager::MaterialManager(InputStreamFactory *inputStreamFactory,Resource
 }
 
 Resource *MaterialManager::unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData){
-	Texture::ptr texture=shared_static_cast<Texture>(mTextureManager->load(name));
+	Texture::ptr texture=mTextureManager->findTexture(name);
 	if(texture!=NULL){
 		Material *material=new Material();
 		
-		TextureStage::ptr textureStage(new TextureStage(texture));
-		material->setTextureStage(0,textureStage);
+		material->setTextureStage(0,TextureStage::ptr(new TextureStage(texture)));
 		
 		material->setLighting(true);
 		

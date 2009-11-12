@@ -32,16 +32,39 @@ namespace toadlet{
 namespace tadpole{
 namespace mesh{
 
-Mesh::Mesh():
+Mesh::Mesh():BaseResource(),
 	boundingRadius(-Math::ONE),
 	worldScale(Math::ONE)
 {}
 
 Mesh::~Mesh(){
+	destroy();
+}
+
+void Mesh::destroy(){
+	if(staticVertexData!=NULL){
+		staticVertexData->destroy();
+	}
+
+	int i;
+	for(i=0;i<subMeshes.size();++i){
+		SubMesh *subMesh=subMeshes[i];
+		if(subMesh->indexData!=NULL){
+			subMesh->indexData->destroy();
+		}
+		if(subMesh->material!=NULL){
+			subMesh->material->release();
+		}
+	}
+	subMeshes.clear();
+
+	if(skeleton!=NULL){
+		skeleton->release();
+		skeleton=NULL;
+	}
 }
 
 void Mesh::compile(){
-	// Currently does nothing
 }
 
 }

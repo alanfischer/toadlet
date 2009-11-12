@@ -36,8 +36,10 @@ public:
 	TOADLET_SHARED_POINTERS(VertexData);
 
 	VertexData(int numVertexBuffers=0);
-
 	VertexData(const VertexBuffer::ptr &vertexBuffer);
+	virtual ~VertexData();
+
+	void destroy();
 
 	void addVertexBuffer(const VertexBuffer::ptr &vertexBuffer1);
 

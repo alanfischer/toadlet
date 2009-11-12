@@ -96,16 +96,17 @@ Entity *SpriteEntity::create(Engine *engine){
 
 void SpriteEntity::destroy(){
 	if(mVertexData!=NULL){
-//		mVertexData->destroy();
+		mVertexData->destroy();
 		mVertexData=NULL;
 	}
 	
 	if(mIndexData!=NULL){
-//		mIndexData->destroy();
+		mIndexData->destroy();
 		mIndexData=NULL;
 	}
 	
 	if(mMaterial!=NULL){
+		mMaterial->destroy();
 		mMaterial=NULL;
 	}
 
@@ -113,7 +114,7 @@ void SpriteEntity::destroy(){
 }
 
 void SpriteEntity::load(scalar width,scalar height,bool scaled,const String &name){
-	load(width,height,scaled,mEngine->getTexture(name));
+	load(width,height,scaled,mEngine->getTextureManager()->findTexture(name));
 }
 
 void SpriteEntity::load(scalar width,scalar height,bool scaled,Texture::ptr texture){

@@ -393,8 +393,7 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Resou
 
 				if(textureManager!=NULL){
 					textureManager->cleanFilename(file);
-					Texture::ptr texture=shared_static_cast<Texture>(textureManager->load(file));
-					material->setTextureStage(0,TextureStage::ptr(new TextureStage(texture)));
+					material->setTextureStage(0,TextureStage::ptr(new TextureStage(textureManager->findTexture(file))));
 				}
 			}
 		}
@@ -417,7 +416,7 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Resou
 					String textureName=prop;
 					if(textureManager!=NULL){
 						textureManager->cleanFilename(textureName);
-						texture=shared_static_cast<Texture>(textureManager->load(textureName));
+						texture=textureManager->findTexture(textureName);
 						textureStage->setTexture(texture);
 					}
 					if(texture!=NULL){
@@ -791,7 +790,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 			if(prop!=NULL){
 				materialName=prop;
 				if(materialManager!=NULL){
-					material=shared_static_cast<Material>(materialManager->load(materialName));
+					material=materialManager->findMaterial(materialName);
 				}
 			}
 			else{
@@ -1089,7 +1088,7 @@ Sequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int version){
 	const char *prop=NULL;
 	prop=mxmlElementGetAttr(node,"Name");
 	if(prop!=NULL){
-		sequence->name=prop;
+		sequence->setName(prop);
 	}
 
 	scalar sequenceLength=0;
@@ -1159,8 +1158,8 @@ mxml_node_t *XMLMeshUtilities::saveSequence(Sequence::ptr sequence,int version){
 		sequenceNode=mxmlNewElement(MXML_NO_PARENT,"Sequence");
 	}
 
-	if(sequence->name!=(char*)NULL){
-		mxmlElementSetAttr(sequenceNode,"Name",sequence->name);
+	if(sequence->getName()!=(char*)NULL){
+		mxmlElementSetAttr(sequenceNode,"Name",sequence->getName());
 	}
 
 	mxmlElementSetAttr(sequenceNode,"Length",makeScalar(sequence->length));

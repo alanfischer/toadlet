@@ -43,7 +43,7 @@ public:
 	virtual AudioBuffer *getRootAudioBuffer()=0;
 
 	virtual bool create(egg::io::InputStream::ptr inputStream,const egg::String &mimeType)=0;
-	virtual bool destroy()=0;
+	virtual void destroy()=0;
 };
 
 }
