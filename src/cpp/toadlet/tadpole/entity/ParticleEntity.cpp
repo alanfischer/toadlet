@@ -140,10 +140,12 @@ void ParticleEntity::destroy(){
 	stopSimulating();
 
 	if(mVertexBuffer!=NULL){
+		mVertexBuffer->destroy();
 		mVertexBuffer=NULL;
 	}
 	
 	if(mIndexBuffer!=NULL){
+		mIndexBuffer->destroy();
 		mIndexBuffer=NULL;
 	}
 

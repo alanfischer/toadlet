@@ -29,7 +29,7 @@
 #include <toadlet/egg/io/OutputStream.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/ResourceHandler.h>
-#include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/tadpole/TextureManager.h>
 
 typedef struct mxml_node_s mxml_node_t;
 
@@ -41,7 +41,7 @@ class TOADLET_API XMATHandler:public ResourceHandler{
 public:
 	TOADLET_SHARED_POINTERS(XMATHandler);
 
-	XMATHandler(ResourceManager *textureManager);
+	XMATHandler(TextureManager *textureManager);
 
 	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
 	bool save(Material::ptr resource,egg::io::OutputStream::ptr out);
@@ -50,7 +50,7 @@ protected:
 	Material::ptr loadMaterial(mxml_node_t *root,int version);
 	bool saveMaterial(mxml_node_t *root,Material::ptr jmaterial,int version);
 
-	ResourceManager *mTextureManager;
+	TextureManager *mTextureManager;
 };
 
 }

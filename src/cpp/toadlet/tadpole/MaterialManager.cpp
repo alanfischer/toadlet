@@ -35,14 +35,14 @@ using namespace toadlet::peeper;
 namespace toadlet{
 namespace tadpole{
 
-MaterialManager::MaterialManager(InputStreamFactory *inputStreamFactory,ResourceManager *textureManager):ResourceManager(inputStreamFactory){
+MaterialManager::MaterialManager(InputStreamFactory *inputStreamFactory,TextureManager *textureManager):ResourceManager(inputStreamFactory){
 	mTextureManager=textureManager;
 }
 
-Resource *MaterialManager::unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData){
+Resource::ptr MaterialManager::unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData){
 	Texture::ptr texture=mTextureManager->findTexture(name);
 	if(texture!=NULL){
-		Material *material=new Material();
+		Material::ptr material(new Material());
 		
 		material->setTextureStage(0,TextureStage::ptr(new TextureStage(texture)));
 		

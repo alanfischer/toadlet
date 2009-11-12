@@ -43,6 +43,8 @@ public:
 	peeper::Texture::ptr createTexture(int usageFlags,peeper::Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels);
 	egg::image::Image::ptr createImage(const peeper::Texture::ptr &texture);
 
+	peeper::Texture::ptr findTexture(const egg::String &name){return egg::shared_static_cast<peeper::Texture>(ResourceManager::find(name));}
+
 	virtual void contextActivate(peeper::Renderer *renderer);
 	virtual void contextDeactivate(peeper::Renderer *renderer);
 	virtual void contextUpdate(peeper::Renderer *renderer);
@@ -50,8 +52,9 @@ public:
 	virtual void postContextReset(peeper::Renderer *renderer);
 
 protected:
+	egg::Collection<peeper::BackableTexture::ptr> mBackableTexturesToLoad;
+
 	Engine *mEngine;
-	egg::Collection<peeper::BackableTexture::ptr> mTextures;
 };
 
 }

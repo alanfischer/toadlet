@@ -40,6 +40,8 @@ class TOADLET_API MeshManager:public ResourceManager{
 public:
 	MeshManager(Engine *engine);
 
+	mesh::Mesh::ptr findMesh(const egg::String &name){return egg::shared_static_cast<mesh::Mesh>(ResourceManager::find(name));}
+
 	mesh::Mesh::ptr createBox(const AABox &box);
 	mesh::Mesh::ptr createSkyBox(scalar size,bool unfolded);
 	mesh::Mesh::ptr createSphere(const Sphere &sphere,int numSegments=16,int numRings=16);

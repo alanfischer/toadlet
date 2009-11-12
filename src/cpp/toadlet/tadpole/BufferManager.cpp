@@ -35,7 +35,7 @@ using namespace toadlet::peeper;
 namespace toadlet{
 namespace tadpole{
 
-BufferManager::BufferManager(Engine *engine):ResourceManager(engine){
+BufferManager::BufferManager(Engine *engine){
 	mEngine=engine;
 }
 
@@ -48,6 +48,8 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usageFlags,Buffer::AccessT
 		indexBuffer->setBack(back,true);
 	}
 	mIndexBuffers.add(indexBuffer);
+	mIndexBuffersToLoad.add(indexBuffer);
+
 	return indexBuffer;
 }
 
@@ -60,6 +62,8 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usageFlags,Buffer::Acces
 		vertexBuffer->setBack(back,true);
 	}
 	mVertexBuffers.add(vertexBuffer);
+	mVertexBuffersToLoad.add(vertexBuffer);
+
 	return vertexBuffer;
 }
 
@@ -166,25 +170,27 @@ void BufferManager::contextDeactivate(Renderer *renderer){
 	}
 }
 
-// Duh, make this not suck and run through everything all the time.  the managers are just being hacked to get them to work currently
 void BufferManager::contextUpdate(Renderer *renderer){
 	int i;
-	for(i=0;i<mIndexBuffers.size();++i){
-		BackableIndexBuffer::ptr indexBuffer=mIndexBuffers[i];
+	for(i=0;i<mIndexBuffersToLoad.size();++i){
+		BackableIndexBuffer::ptr indexBuffer=mIndexBuffersToLoad[i];
 		if(indexBuffer->getBack()==NULL){
 			IndexBuffer::ptr back(renderer->createIndexBuffer());
 			back->create(indexBuffer->getUsageFlags(),indexBuffer->getAccessType(),indexBuffer->getIndexFormat(),indexBuffer->getSize());
 			indexBuffer->setBack(back);
 		}
 	}
-	for(i=0;i<mVertexBuffers.size();++i){
-		BackableVertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
+	mIndexBuffersToLoad.clear();
+
+	for(i=0;i<mVertexBuffersToLoad.size();++i){
+		BackableVertexBuffer::ptr vertexBuffer=mVertexBuffersToLoad[i];
 		if(vertexBuffer->getBack()==NULL){
 			VertexBuffer::ptr back(renderer->createVertexBuffer());
 			back->create(vertexBuffer->getUsageFlags(),vertexBuffer->getAccessType(),vertexBuffer->getVertexFormat(),vertexBuffer->getSize());
 			vertexBuffer->setBack(back);
 		}
 	}
+	mVertexBuffersToLoad.clear();
 }
 
 void BufferManager::preContextReset(Renderer *renderer){

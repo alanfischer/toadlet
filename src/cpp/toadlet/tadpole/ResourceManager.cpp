@@ -51,46 +51,62 @@ Resource::ptr ResourceManager::get(const String &name){
 	}
 }
 
-Resource::ptr ResourceManager::find(const egg::String &name,ResourceHandlerData::ptr handlerData=NULL){
-}
-
-Resource::ptr ResourceManager::manage(const egg::Resource::ptr &resource){
-	mResources.add(resource);
-
-	String name=resource->getName();
-	if(name!=(char*)NULL){
-		mNameResourceMap[name]=mResources;
+Resource::ptr ResourceManager::find(const egg::String &name,ResourceHandlerData::ptr handlerData){
+	Resource::ptr resource=get(name);
+	if(resource==NULL){
+		if(Logger::getInstance()->getMasterCategoryReportingLevel(Categories::TOADLET_TADPOLE)>=Logger::Level_EXCESSIVE){
+			Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_EXCESSIVE,
+				String("Finding ")+name);
+		}
+		
+		resource=findFromFile(name,handlerData);
+		resource->setName(name);
+		manage(resource);
 	}
 
 	return resource;
 }
 
-void ResourceManager::addHandler(ResourceHandler::ptr handler,const String &extension){
-	ExtensionHandlerMap::iterator it=mExtensionHandlerMap.find(extension);
-	if(it!=mExtensionHandlerMap.end()){
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_DEBUG,
-			"Removing handler for extension "+extension);
+Resource::ptr ResourceManager::manage(const Resource::ptr &resource){
+	if(mResources.contains(resource)==false){
+		mResources.add(resource);
 
-		it->second=NULL;
+		String name=resource->getName();
+		if(name!=(char*)NULL){
+			mNameResourceMap[name]=resource;
+		}
 	}
 
-	Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_DEBUG,
-		"Adding handler for extension "+extension);
-	mExtensionHandlerMap[extension]=handler;
+	return resource;
 }
 
-void ResourceManager::removeHandler(const String &extension){
+void ResourceManager::unmanage(Resource *resource){
+	mResources.remove(resource);
+
+	String name=resource->getName();
+	if(name!=(char*)NULL){
+		NameResourceMap::iterator it=mNameResourceMap.find(name);
+		if(it!=mNameResourceMap.end()){
+			mNameResourceMap.erase(it);
+		}
+	}
+
+	resource->destroy();
+}
+
+void ResourceManager::setHandler(ResourceHandler::ptr handler,const String &extension){
 	ExtensionHandlerMap::iterator it=mExtensionHandlerMap.find(extension);
 	if(it!=mExtensionHandlerMap.end()){
 		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_DEBUG,
 			"Removing handler for extension "+extension);
 
 		it->second=NULL;
-		mExtensionHandlerMap.remove(*it);
 	}
-	else{
+
+	if(handler!=NULL){
 		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_DEBUG,
-			"Handler not found for extension "+extension);
+			"Adding handler for extension "+extension);
+		mExtensionHandlerMap[extension]=handler;
 	}
 }
 
@@ -104,147 +120,8 @@ ResourceHandler::ptr ResourceManager::getHandler(const String &extension){
 	}
 }
 
-Resource::ptr ResourceManager::load(bool cache,const String &name,const String &file,Resource::ptr resource,ResourceHandlerData::ptr handlerData){
-	if(Logger::getInstance()->getMasterCategoryReportingLevel(Categories::TOADLET_TADPOLE)>=Logger::Level_EXCESSIVE){
-		String description=cache?"Caching":"Loading";
-		description=description+" resource ";
-		if(file!=(char*)NULL){
-			description=description+file+" ";
-		}
-		if(name!=(char*)NULL){
-			description=description+"as "+name;
-		}
-		else{
-			description=description+"anonymously";
-		}
-
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_EXCESSIVE,
-			description);
-	}
-
-	ResourceCache::ptr resCache;
-	if(name!=(char*)NULL){
-		ResourceNameMap::iterator it=mResourceNameMap.find(name);
-		if(it!=mResourceNameMap.end()){
-			resCache=it->second;
-		}
-	}
-
-	if(resCache!=NULL){
-		if(resource!=NULL && resCache->resource.get()!=resource){
-			Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_WARNING,
-				"Replacing previous resource of same name, previous resource is becoming anonymous");
-
-			resCache->name=String();
-			ResourceNameMap::iterator it=mResourceNameMap.find(name);
-			if(it!=mResourceNameMap.end()){
-				mResourceNameMap.erase(it);
-			}
-			resCache=NULL;
-		}
-		else if(cache){
-			resCache->count++;
-		}
-	}
-
-	if(resCache==NULL){
-		if(resource==NULL){
-			if(file!=(char*)NULL){
-				TOADLET_TRY
-					resource=loadFromFile(file,handlerData);
-				TOADLET_CATCH(const Exception &){
-					resource=NULL;
-				}
-				if(resource==NULL){
-					return resource;
-				}
-			}
-			else{
-				return resource;
-			}
-		}
-		resCache=ResourceCache::ptr(new ResourceCache(resource,name));
-		if(cache){
-			resCache->cachedResource=resource;
-		}
-		if(name!=(char*)NULL){
-			mResourceNameMap[name]=resCache;
-		}
-		mResourcePtrMap[resource]=resCache;
-
-		resourceLoaded(resCache->resource);
-	}
-
-	return resCache->resource;
-}
-
-Resource::ptr ResourceManager::loadFromFile(const String &name,const ResourceHandlerData *handlerData){
-	String filename=cleanFilename(name);
-
-	String extension;
-	int i=filename.rfind('.');
-	if(i!=String::npos){
-		extension=filename.substr(i+1,filename.length()).toLower();
-	}
-	else if(mDefaultExtension.length()>0){
-		extension=mDefaultExtension;
-		filename+="."+extension;
-	}
-	if(extension!=(char*)NULL){
-		ExtensionHandlerMap::iterator it=mExtensionHandlerMap.find(extension);
-		if(it!=mExtensionHandlerMap.end()){
-			InputStream::ptr in=mInputStreamFactory->makeInputStream(filename);
-			if(in!=NULL){
-				return Resource::ptr(it->second->load(in,handlerData));
-			}
-			else{
-				Error::unknown(Categories::TOADLET_TADPOLE,
-					"File "+filename+" not found");
-				return NULL;
-			}
-		}
-		else if(mDefaultHandler!=NULL){
-			InputStream::ptr in=mInputStreamFactory->makeInputStream(filename);
-			if(in!=NULL){
-				return Resource::ptr(mDefaultHandler->load(in,handlerData));
-			}
-			else{
-				Error::unknown(Categories::TOADLET_TADPOLE,
-					"File "+filename+" not found");
-				return NULL;
-			}
-		}
-		else{
-			return Resource::ptr(unableToFindHandler(name,handlerData));
-		}
-	}
-	else{
-		Error::unknown(Categories::TOADLET_TADPOLE,
-			"Extension not found on file");
-		return NULL;
-	}
-}
-
-Resource *ResourceManager::unableToFindHandler(const String &name,const ResourceHandlerData *handlerData){
-	String extension;
-	int i=name.rfind('.');
-	if(i!=String::npos){
-		extension=name.substr(i+1,name.length()).toLower();
-	}
-
-	Error::unknown(Categories::TOADLET_TADPOLE,
-		"Handler for extension \""+extension+"\" not found");
-	return NULL;
-}
-
-
-void ResourceManager::uncache(ResourceCache *resCache){
-	if(resCache!=NULL){
-		resCache->count--;
-		if(resCache->count<=0){
-			resCache->cachedResource=NULL;
-		}
-	}
+void ResourceManager::resourceFullyReleased(Resource *resource){
+	unmanage(resource);
 }
 
 String ResourceManager::cleanFilename(const String &name){
@@ -291,6 +168,59 @@ String ResourceManager::cleanFilename(const String &name){
 	delete[] temp;
 
 	return cleanName;
+}
+
+Resource::ptr ResourceManager::unableToFindHandler(const String &name,const ResourceHandlerData *handlerData){
+	Error::unknown(Categories::TOADLET_TADPOLE,
+		"Handler for \""+name+"\" not found");
+	return NULL;
+}
+
+Resource::ptr ResourceManager::findFromFile(const String &name,const ResourceHandlerData *handlerData){
+	String filename=cleanFilename(name);
+
+	String extension;
+	int i=filename.rfind('.');
+	if(i!=String::npos){
+		extension=filename.substr(i+1,filename.length()).toLower();
+	}
+	else if(mDefaultExtension.length()>0){
+		extension=mDefaultExtension;
+		filename+="."+extension;
+	}
+	if(extension!=(char*)NULL){
+		ExtensionHandlerMap::iterator it=mExtensionHandlerMap.find(extension);
+		if(it!=mExtensionHandlerMap.end()){
+			InputStream::ptr in=mInputStreamFactory->makeInputStream(filename);
+			if(in!=NULL){
+				return Resource::ptr(it->second->load(in,handlerData));
+			}
+			else{
+				Error::unknown(Categories::TOADLET_TADPOLE,
+					"File "+filename+" not found");
+				return NULL;
+			}
+		}
+		else if(mDefaultHandler!=NULL){
+			InputStream::ptr in=mInputStreamFactory->makeInputStream(filename);
+			if(in!=NULL){
+				return Resource::ptr(mDefaultHandler->load(in,handlerData));
+			}
+			else{
+				Error::unknown(Categories::TOADLET_TADPOLE,
+					"File "+filename+" not found");
+				return NULL;
+			}
+		}
+		else{
+			return Resource::ptr(unableToFindHandler(name,handlerData));
+		}
+	}
+	else{
+		Error::unknown(Categories::TOADLET_TADPOLE,
+			"Extension not found on file");
+		return NULL;
+	}
 }
 
 }
