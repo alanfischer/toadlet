@@ -26,7 +26,6 @@
 #ifndef TOADLET_TADPOLE_BUFFERMANAGER_H
 #define TOADLET_TADPOLE_BUFFERMANAGER_H
 
-#include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/peeper/BackableIndexBuffer.h>
 #include <toadlet/peeper/BackableVertexBuffer.h>
 #include <toadlet/peeper/Renderer.h>
@@ -36,7 +35,7 @@ namespace tadpole{
 
 class Engine;
 
-class TOADLET_API BufferManager:public ResourceManager{
+class TOADLET_API BufferManager{
 public:
 	BufferManager(Engine *engine);
 
@@ -54,6 +53,8 @@ public:
 protected:
 	egg::Collection<peeper::BackableIndexBuffer::ptr> mIndexBuffers;
 	egg::Collection<peeper::BackableVertexBuffer::ptr> mVertexBuffers;
+	egg::Collection<peeper::BackableIndexBuffer::ptr> mIndexBuffersToLoad;
+	egg::Collection<peeper::BackableVertexBuffer::ptr> mVertexBuffersToLoad;
 
 	Engine *mEngine;
 };

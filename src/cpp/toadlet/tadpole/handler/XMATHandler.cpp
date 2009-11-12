@@ -35,7 +35,7 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-XMATHandler::XMATHandler(ResourceManager *textureManager){
+XMATHandler::XMATHandler(TextureManager *textureManager){
 	mTextureManager=textureManager;
 }
 

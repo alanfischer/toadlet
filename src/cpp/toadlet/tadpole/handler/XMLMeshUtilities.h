@@ -28,6 +28,7 @@
 
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/BufferManager.h>
+#include <toadlet/tadpole/MaterialManager.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/mesh/Mesh.h>
 #include <mxml.h>
@@ -52,10 +53,10 @@ public:
 	static int parseInt(const char *string);
 	static egg::String makeInt(int i);
 
-	static Material::ptr loadMaterial(mxml_node_t *node,int version,ResourceManager *textureManager);
+	static Material::ptr loadMaterial(mxml_node_t *node,int version,TextureManager *textureManager);
 	static mxml_node_t *saveMaterial(Material::ptr material,int version);
 
-	static mesh::Mesh::ptr loadMesh(mxml_node_t *node,int version,BufferManager *bufferManager,ResourceManager *materialManager,TextureManager *textureManager);
+	static mesh::Mesh::ptr loadMesh(mxml_node_t *node,int version,BufferManager *bufferManager,MaterialManager *materialManager,TextureManager *textureManager);
 	static mxml_node_t *saveMesh(mesh::Mesh::ptr mesh,int version);
 
 	static mesh::Skeleton::ptr loadSkeleton(mxml_node_t *node,int version);

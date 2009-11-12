@@ -26,20 +26,23 @@
 #ifndef TOADLET_TADPOLE_MATERIALMANAGER_H
 #define TOADLET_TADPOLE_MATERIALMANAGER_H
 
-#include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/Material.h>
+#include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/tadpole/TextureManager.h>
 
 namespace toadlet{
 namespace tadpole{
 
 class TOADLET_API MaterialManager:public ResourceManager{
 public:
-	MaterialManager(egg::io::InputStreamFactory *inputStreamFactory,ResourceManager *textureManager);
+	MaterialManager(egg::io::InputStreamFactory *inputStreamFactory,TextureManager *textureManager);
 
-	virtual egg::Resource *unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData);
+	Material::ptr findMaterial(const egg::String &name){return egg::shared_static_cast<Material>(ResourceManager::find(name));}
+
+	virtual egg::Resource::ptr unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData);
 
 protected:
-	ResourceManager *mTextureManager;
+	TextureManager *mTextureManager;
 };
 
 }

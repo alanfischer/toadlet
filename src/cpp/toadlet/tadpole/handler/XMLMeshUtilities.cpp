@@ -244,7 +244,7 @@ const char *MAP_NAMES[]={
 
 int MAX_MAP=8;
 
-Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,ResourceManager *textureManager){
+Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,TextureManager *textureManager){
 	Material::ptr material(new Material());
 
 	const char *prop=mxmlElementGetAttr(node,"Name");
@@ -561,7 +561,7 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version){
 	return materialNode;
 }
 
-Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager *bufferManager,ResourceManager *materialManager,TextureManager *textureManager){
+Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager *bufferManager,MaterialManager *materialManager,TextureManager *textureManager){
 	Mesh::ptr mesh(new Mesh());
 	const char *prop=NULL;
 

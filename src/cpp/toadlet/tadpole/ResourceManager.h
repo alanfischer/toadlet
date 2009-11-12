@@ -47,6 +47,8 @@ public:
 	virtual egg::Resource::ptr find(const egg::String &name,ResourceHandlerData::ptr handlerData=NULL);
 	virtual egg::Resource::ptr manage(const egg::Resource::ptr &resource);
 
+	virtual void unmanage(egg::Resource *resource);
+
 	virtual void setHandler(ResourceHandler::ptr handler,const egg::String &extension);
 	virtual ResourceHandler::ptr getHandler(const egg::String &extension);
 
@@ -63,6 +65,9 @@ public:
 protected:
 	typedef egg::Map<egg::String,egg::Resource::ptr> NameResourceMap;
 	typedef egg::Map<egg::String,ResourceHandler::ptr> ExtensionHandlerMap;
+
+	virtual egg::Resource::ptr unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData);
+	virtual egg::Resource::ptr findFromFile(const egg::String &name,const ResourceHandlerData *handlerData);
 
 	virtual void resourceLoaded(const egg::Resource::ptr &resource){}
 	virtual void resourceUnloaded(const egg::Resource::ptr &resource){}
