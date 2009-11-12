@@ -2,8 +2,8 @@
 #define SMDCONVERTER_H
 
 #include <toadlet/egg/io/InputStream.h>
-#include <toadlet/tadpole/Mesh.h>
 #include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/mesh/Mesh.h>
 
 class Vertex;
 using toadlet::scalar;
@@ -21,7 +21,7 @@ public:
 
 	void load(toadlet::egg::io::InputStream *in);
 
-	toadlet::tadpole::Mesh::ptr getMesh(){return mMesh;}
+	toadlet::tadpole::mesh::Mesh::ptr getMesh(){return mMesh;}
 
 	void setPositionEpsilon(scalar epsilon){mPositionEpsilon=epsilon;}
 	scalar getPositionEpsilon() const{return mPositionEpsilon;}
@@ -45,9 +45,9 @@ protected:
 
 	toadlet::tadpole::Engine *mEngine;
 
-	toadlet::tadpole::Mesh::ptr mMesh;
-	toadlet::tadpole::MeshSkeleton::ptr mSkeleton;
-	toadlet::tadpole::MeshSkeletonSequence::ptr mSequence;
+	toadlet::tadpole::mesh::Mesh::ptr mMesh;
+	toadlet::tadpole::mesh::Skeleton::ptr mSkeleton;
+	toadlet::tadpole::mesh::Sequence::ptr mSequence;
 
 	scalar mPositionEpsilon;
 	scalar mNormalEpsilon;

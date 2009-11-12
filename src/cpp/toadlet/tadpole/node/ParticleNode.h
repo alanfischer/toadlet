@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ENTITY_PARTICLEENTITY_H
-#define TOADLET_TADPOLE_ENTITY_PARTICLEENTITY_H
+#ifndef TOADLET_TADPOLE_NODE_PARTICLENODE_H
+#define TOADLET_TADPOLE_NODE_PARTICLENODE_H
 
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/Random.h>
@@ -37,28 +37,28 @@
 //#include <toadlet/peeper/TextureSection.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/Renderable.h>
-#include <toadlet/tadpole/entity/CameraEntity.h>
-#include <toadlet/tadpole/entity/RenderableEntity.h>
+#include <toadlet/tadpole/node/CameraNode.h>
+#include <toadlet/tadpole/node/RenderableNode.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
 class Scene;
-class CameraEntity;
+class CameraNode;
 
-class TOADLET_API ParticleEntity:public RenderableEntity,public Renderable{
+class TOADLET_API ParticleNode:public RenderableNode,public Renderable{
 public:
-	TOADLET_ENTITY(ParticleEntity,RenderableEntity);
+	TOADLET_NODE(ParticleNode,RenderableNode);
 
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
 	class RenderableWorkaround:public Renderable{
 	public:
-		RenderableWorkaround(ParticleEntity *entity):renderableEntity(entity){}
-		ParticleEntity *renderableEntity;
-		const Material::ptr &getRenderMaterial() const{return renderableEntity->getRenderMaterial();}
-		const Matrix4x4 &getRenderTransform() const{return renderableEntity->getRenderTransform();}
-		void render(peeper::Renderer *renderer) const{renderableEntity->render(renderer);}
+		RenderableWorkaround(ParticleNode *node):renderableNode(node){}
+		ParticleNode *renderableNode;
+		const Material::ptr &getRenderMaterial() const{return renderableNode->getRenderMaterial();}
+		const Matrix4x4 &getRenderTransform() const{return renderableNode->getRenderTransform();}
+		void render(peeper::Renderer *renderer) const{renderableNode->render(renderer);}
 	};
 #endif
 
@@ -88,8 +88,8 @@ public:
 		virtual void updateParticles(int dt,const Matrix4x4 &transform)=0;
 	};
 
-	ParticleEntity();
-	virtual Entity *create(Engine *engine);
+	ParticleNode();
+	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
 	virtual void setScale(scalar x,scalar y,scalar z){super::setScale(x,y,z);}
@@ -160,7 +160,7 @@ protected:
 
 	int randomColor();
 
-	void updateWorldTransform(Entity *entity);
+	void updateWorldTransform(Node *node);
 
 	void createVertexBuffer();
 	void updateVertexBuffer(const Matrix4x4 &viewTransform);

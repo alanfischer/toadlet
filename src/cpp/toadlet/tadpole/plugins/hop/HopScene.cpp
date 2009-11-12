@@ -36,7 +36,7 @@
 using namespace toadlet::egg;
 using namespace toadlet::hop;
 using namespace toadlet::peeper;
-using namespace toadlet::tadpole::entity;
+using namespace toadlet::tadpole::node;
 
 namespace toadlet{
 namespace tadpole{
@@ -63,7 +63,7 @@ HopScene::~HopScene(){
 	}
 }
 
-Entity *HopScene::create(Engine *engine){
+Node *HopScene::create(Engine *engine){
 	super::create(engine);
 
 	resetNetworkIDs();
@@ -183,8 +183,8 @@ void HopScene::showCollisionVolumes(bool show,bool interpolate){
 	}
 }
 
-ParticleEntity::ParticleSimulator::ptr HopScene::newParticleSimulator(ParticleEntity *particleEntity){
-	return ParticleEntity::ParticleSimulator::ptr(new HopParticleSimulator(this,particleEntity));
+ParticleNode::ParticleSimulator::ptr HopScene::newParticleSimulator(ParticleNode *particleNode){
+	return ParticleNode::ParticleSimulator::ptr(new HopParticleSimulator(this,particleNode));
 }
 
 void HopScene::registerHopEntity(HopEntity *entity){

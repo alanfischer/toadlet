@@ -25,11 +25,11 @@
 
 #include <toadlet/tadpole/animation/SkeletonAnimation.h>
 #include <toadlet/tadpole/animation/AnimationController.h>
-#include <toadlet/tadpole/entity/MeshEntitySkeleton.h>
+#include <toadlet/tadpole/node/MeshNodeSkeleton.h>
 #include <toadlet/egg/Error.h>
 
 using namespace toadlet::egg;
-using namespace toadlet::tadpole::entity;
+using namespace toadlet::tadpole::node;
 
 namespace toadlet{
 namespace tadpole{
@@ -44,7 +44,7 @@ SkeletonAnimation::SkeletonAnimation():
 SkeletonAnimation::~SkeletonAnimation(){
 }
 
-void SkeletonAnimation::setTarget(MeshEntitySkeleton::ptr target){
+void SkeletonAnimation::setTarget(MeshNodeSkeleton::ptr target){
 	mTarget=target;
 }
 

@@ -23,24 +23,24 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ENTITY_ANIMATIONCONTROLLERENTITY_H
-#define TOADLET_TADPOLE_ENTITY_ANIMATIONCONTROLLERENTITY_H
+#ifndef TOADLET_TADPOLE_NODE_ANIMATIONCONTROLLERNODE_H
+#define TOADLET_TADPOLE_NODE_ANIMATIONCONTROLLERNODE_H
 
-#include <toadlet/tadpole/entity/Entity.h>
+#include <toadlet/tadpole/node/Node.h>
 #include <toadlet/tadpole/animation/AnimationController.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
 class Scene;
 
-class TOADLET_API AnimationControllerEntity:public Entity,public animation::AnimationControllerFinishedListener{
+class TOADLET_API AnimationControllerNode:public Node,public animation::AnimationControllerFinishedListener{
 public:
-	TOADLET_ENTITY(AnimationControllerEntity,Entity);
+	TOADLET_NODE(AnimationControllerNode,Node);
 
-	AnimationControllerEntity();
-	virtual Entity *create(Engine *engine);
+	AnimationControllerNode();
+	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
 	inline void setTime(int time,bool setagain=true){mAnimationController->setTime(time,setagain);}

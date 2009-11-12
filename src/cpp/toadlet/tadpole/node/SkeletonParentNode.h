@@ -23,41 +23,36 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_SKELETONANIMATION_H
-#define TOADLET_TADPOLE_ANIMATION_SKELETONANIMATION_H
+#ifndef TOADLET_TADPOLE_NODE_SKELETONPARENTNODE_H
+#define TOADLET_TADPOLE_NODE_SKELETONPARENTNODE_H
 
-#include <toadlet/tadpole/animation/Animation.h>
+#include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/MeshNodeSkeleton.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
+namespace node{
 
-class SkeletonAnimation:public Animation{
+/// WARNING: This class is not currently logic-safe.  Avoid using the locations of these nodes in logic calculations.
+class TOADLET_API SkeletonParentNode:public ParentNode{
 public:
-	TOADLET_SHARED_POINTERS(SkeletonAnimation);
+	TOADLET_NODE(SkeletonParentNode,ParentNode);
 
-	SkeletonAnimation();
-	virtual ~SkeletonAnimation();
+	SkeletonParentNode();
 
-	void setTarget(node::MeshNodeSkeleton::ptr target);
-	inline node::MeshNodeSkeleton::ptr getTarget() const{return mTarget;}
+	virtual void setSkeleton(MeshNodeSkeleton::ptr skeleton);
 
-	void setSequenceIndex(int sequenceIndex);
-	inline int getSequenceIndex() const{return mSequenceIndex;}
+	virtual bool attach(Node *node,int bone);
+	virtual bool remove(Node *node);
 
-	void set(scalar value);
-
-	scalar getMin() const;
-	scalar getMax() const;
-
-	void attached(AnimationController *controller);
-	void removed(AnimationController *controller);
+	virtual void visualUpdate(int dt);
 
 protected:
-	AnimationController *mController;
-	node::MeshNodeSkeleton::ptr mTarget;
-	int mSequenceIndex;
+	MeshNodeSkeleton::ptr mSkeleton;
+
+	egg::Collection<int> mChildrenBones;
+
+	friend class Scene;
 };
 
 }

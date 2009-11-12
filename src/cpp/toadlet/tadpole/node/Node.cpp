@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/entity/Entity.h>
-#include <toadlet/tadpole/entity/ParentEntity.h>
+#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/egg/Error.h>
 
@@ -32,19 +32,19 @@ using namespace toadlet::egg;
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
-TOADLET_ENTITY_IMPLEMENT(Entity,"toadlet::tadpole::entity::Entity");
+TOADLET_NODE_IMPLEMENT(Node,"toadlet::tadpole::node::Node");
 
-Entity::Entity():
+Node::Node():
 	mCounter(new PointerCounter(0)),
 	mManaged(false),
 
 	mCreated(false),
 	mEngine(NULL),
 
-	mEntityDestroyedListener(NULL),
-	mOwnsEntityDestroyedListener(false),
+	mNodeDestroyedListener(NULL),
+	mOwnsNodeDestroyedListener(false),
 
 	//mParent,
 
@@ -61,11 +61,11 @@ Entity::Entity():
 {
 }
 
-Entity::~Entity(){
+Node::~Node(){
 	TOADLET_ASSERT(!mCreated);
 }
 
-Entity *Entity::create(Engine *engine){
+Node *Node::create(Engine *engine){
 	if(mCreated){
 		return this;
 	}
@@ -73,8 +73,8 @@ Entity *Entity::create(Engine *engine){
 	mCreated=true;
 	mEngine=engine;
 
-	mEntityDestroyedListener=NULL;
-	mOwnsEntityDestroyedListener=false;
+	mNodeDestroyedListener=NULL;
+	mOwnsNodeDestroyedListener=false;
 
 	mParent=NULL;
 
@@ -98,12 +98,12 @@ Entity *Entity::create(Engine *engine){
 	return this;
 }
 
-void Entity::destroy(){
+void Node::destroy(){
 	if(mCreated==false){
 		return;
 	}
 
-	Entity::ptr reference(this); // To make sure that the object is not deleted right away
+	Node::ptr reference(this); // To make sure that the object is not deleted right away
 
 	mCreated=false;
 
@@ -112,30 +112,30 @@ void Entity::destroy(){
 		mParent=NULL;
 	}
 
-	if(mEntityDestroyedListener!=NULL){
-		mEntityDestroyedListener->entityDestroyed(this);
-		setEntityDestroyedListener(NULL,false);
+	if(mNodeDestroyedListener!=NULL){
+		mNodeDestroyedListener->nodeDestroyed(this);
+		setNodeDestroyedListener(NULL,false);
 	}
 
 	mReceiveUpdates=false;
 
-	mEngine->freeEntity(this);
+	mEngine->freeNode(this);
 	mEngine=NULL;
 }
 
-void Entity::setEntityDestroyedListener(EntityDestroyedListener *listener,bool owns){
-	if(mOwnsEntityDestroyedListener && mEntityDestroyedListener!=NULL){
-		delete mEntityDestroyedListener;
+void Node::setNodeDestroyedListener(NodeDestroyedListener *listener,bool owns){
+	if(mOwnsNodeDestroyedListener && mNodeDestroyedListener!=NULL){
+		delete mNodeDestroyedListener;
 	}
-	mEntityDestroyedListener=listener;
-	mOwnsEntityDestroyedListener=owns;
+	mNodeDestroyedListener=listener;
+	mOwnsNodeDestroyedListener=owns;
 }
 
-void Entity::removeAllEntityDestroyedListeners(){
-	setEntityDestroyedListener(NULL,false);
+void Node::removeAllNodeDestroyedListeners(){
+	setNodeDestroyedListener(NULL,false);
 }
 
-void Entity::setTranslate(const Vector3 &translate){
+void Node::setTranslate(const Vector3 &translate){
 	mTranslate.set(translate);
 
 	setVisualTransformTranslate(mTranslate);
@@ -144,7 +144,7 @@ void Entity::setTranslate(const Vector3 &translate){
 	modified();
 }
 
-void Entity::setTranslate(scalar x,scalar y,scalar z){
+void Node::setTranslate(scalar x,scalar y,scalar z){
 	mTranslate.set(x,y,z);
 
 	setVisualTransformTranslate(mTranslate);
@@ -153,7 +153,7 @@ void Entity::setTranslate(scalar x,scalar y,scalar z){
 	modified();
 }
 
-void Entity::setRotate(const Matrix3x3 &rotate){
+void Node::setRotate(const Matrix3x3 &rotate){
 	mRotate.set(rotate);
 
 	setVisualTransformRotateScale(mRotate,mScale);
@@ -162,7 +162,7 @@ void Entity::setRotate(const Matrix3x3 &rotate){
 	modified();
 }
 
-void Entity::setRotate(scalar x,scalar y,scalar z,scalar angle){
+void Node::setRotate(scalar x,scalar y,scalar z,scalar angle){
 	Math::setMatrix3x3FromAxisAngle(mRotate,cache_setRotate_vector.set(x,y,z),angle);
 
 	setVisualTransformRotateScale(mRotate,mScale);
@@ -171,7 +171,7 @@ void Entity::setRotate(scalar x,scalar y,scalar z,scalar angle){
 	modified();
 }
 
-void Entity::setScale(const Vector3 &scale){
+void Node::setScale(const Vector3 &scale){
 	mScale.set(scale);
 
 	setVisualTransformRotateScale(mRotate,mScale);
@@ -180,7 +180,7 @@ void Entity::setScale(const Vector3 &scale){
 	modified();
 }
 
-void Entity::setScale(scalar x,scalar y,scalar z){
+void Node::setScale(scalar x,scalar y,scalar z){
 	mScale.set(x,y,z);
 
 	setVisualTransformRotateScale(mRotate,mScale);
@@ -189,39 +189,39 @@ void Entity::setScale(scalar x,scalar y,scalar z){
 	modified();
 }
 
-void Entity::setScope(int scope){
+void Node::setScope(int scope){
 	mScope=scope;
 }
 
-void Entity::setBoundingRadius(scalar boundingRadius){
+void Node::setBoundingRadius(scalar boundingRadius){
 	mBoundingRadius=boundingRadius;
 }
 
-void Entity::setReceiveUpdates(bool receiveUpdates){
+void Node::setReceiveUpdates(bool receiveUpdates){
 	mReceiveUpdates=receiveUpdates;
 }
 
 /// @todo  Change the modified setup so you can tell if you were modified, or if any of your parents were modified
-void Entity::modified(){
+void Node::modified(){
 	if(mEngine!=NULL){
 		mModifiedLogicFrame=mEngine->getScene()->getLogicFrame();
 		mModifiedVisualFrame=mEngine->getScene()->getVisualFrame();
 	}
 }
 
-bool Entity::modifiedSinceLastLogicFrame() const{
+bool Node::modifiedSinceLastLogicFrame() const{
 	return mWorldModifiedLogicFrame+1>=mEngine->getScene()->getLogicFrame();
 }
 
-bool Entity::modifiedSinceLastVisualFrame() const{
+bool Node::modifiedSinceLastVisualFrame() const{
 	return mWorldModifiedVisualFrame+1>=mEngine->getScene()->getVisualFrame();
 }
 
-void Entity::setVisualTransformTranslate(const Vector3 &translate){
+void Node::setVisualTransformTranslate(const Vector3 &translate){
 	Math::setMatrix4x4FromTranslate(mVisualTransform,translate);
 }
 
-void Entity::setVisualTransformRotateScale(const Matrix3x3 &rotate,const Vector3 &scale){
+void Node::setVisualTransformRotateScale(const Matrix3x3 &rotate,const Vector3 &scale){
 	Math::setMatrix4x4FromRotateScale(mVisualTransform,rotate,scale);
 }
 

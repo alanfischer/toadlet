@@ -24,9 +24,9 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
-#include <toadlet/tadpole/entity/SpriteEntity.h>
-#include <toadlet/tadpole/entity/ParentEntity.h>
-#include <toadlet/tadpole/entity/CameraEntity.h>
+#include <toadlet/tadpole/node/SpriteNode.h>
+#include <toadlet/tadpole/node/ParentNode.h>
+#include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet::egg;
@@ -34,11 +34,11 @@ using namespace toadlet::peeper;
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
-TOADLET_ENTITY_IMPLEMENT(SpriteEntity,"toadlet::tadpole::entity::SpriteEntity");
+TOADLET_NODE_IMPLEMENT(SpriteNode,"toadlet::tadpole::node::SpriteNode");
 
-SpriteEntity::SpriteEntity():RenderableEntity(),
+SpriteNode::SpriteNode():RenderableNode(),
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
 	renderable(this),
 #endif
@@ -49,7 +49,7 @@ SpriteEntity::SpriteEntity():RenderableEntity(),
 	mScaled(false)
 {}
 
-Entity *SpriteEntity::create(Engine *engine){
+Node *SpriteNode::create(Engine *engine){
 	super::create(engine);
 
 	mTexture=NULL;
@@ -96,7 +96,7 @@ Entity *SpriteEntity::create(Engine *engine){
 	return this;
 }
 
-void SpriteEntity::destroy(){
+void SpriteNode::destroy(){
 	if(mVertexData!=NULL){
 		mVertexData->destroy();
 		mVertexData=NULL;
@@ -115,11 +115,11 @@ void SpriteEntity::destroy(){
 	super::destroy();
 }
 
-void SpriteEntity::load(scalar width,scalar height,bool scaled,const String &name){
+void SpriteNode::load(scalar width,scalar height,bool scaled,const String &name){
 	load(width,height,scaled,mEngine->getTextureManager()->findTexture(name));
 }
 
-void SpriteEntity::load(scalar width,scalar height,bool scaled,Texture::ptr texture){
+void SpriteNode::load(scalar width,scalar height,bool scaled,Texture::ptr texture){
 	mTexture=texture;
 
 	if(mTexture==NULL){
@@ -157,12 +157,12 @@ void SpriteEntity::load(scalar width,scalar height,bool scaled,Texture::ptr text
 	updateFrame();
 }
 
-void SpriteEntity::setFrame(int frame){
+void SpriteNode::setFrame(int frame){
 	mFrame=frame;
 	updateFrame();
 }
 
-int SpriteEntity::getNumFrames() const{
+int SpriteNode::getNumFrames() const{
 	int numFrames=1;
 //	if(mAnimatedTexture!=NULL){
 //		numFrames=mAnimatedTexture->getNumFrames();
@@ -170,7 +170,7 @@ int SpriteEntity::getNumFrames() const{
 	return numFrames;
 }
 
-void SpriteEntity::queueRenderables(Scene *scene){
+void SpriteNode::queueRenderables(Scene *scene){
 	Matrix4x4 &scale=cache_queueRenderables_scale.reset();
 	Vector4 &point=cache_queueRenderables_point.reset();
 	const Matrix4x4 &viewTransform=scene->getCamera()->getViewTransform();
@@ -222,11 +222,11 @@ void SpriteEntity::queueRenderables(Scene *scene){
 #endif
 }
 
-void SpriteEntity::render(Renderer *renderer) const{
+void SpriteNode::render(Renderer *renderer) const{
 	renderer->renderPrimitive(mVertexData,mIndexData);
 }
 
-void SpriteEntity::updateFrame(){
+void SpriteNode::updateFrame(){
 //	if(mAnimatedTexture!=NULL){
 //		mAnimatedTexture->getMatrix4x4ForFrame(mFrame,mTextureMatrix);
 //		TextureStage::ptr textureStage(new TextureStage(mAnimatedTexture->getTextureForFrame(mFrame)));

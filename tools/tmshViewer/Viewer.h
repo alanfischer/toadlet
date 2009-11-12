@@ -2,13 +2,13 @@
 #define VIEWER_H
 
 #include <toadlet/pad/Application.h>
-#include <toadlet/tadpole/entity/MeshEntity.h>
+#include <toadlet/tadpole/node/MeshNode.h>
 
 class Viewer:public toadlet::pad::Application{
 public:
 	Viewer();
 
-	void start(toadlet::tadpole::entity::MeshEntity::ptr meshEntity);
+	void start(toadlet::tadpole::node::MeshNode::ptr meshNode);
 
 	void update(int dt);
 	void render(toadlet::peeper::Renderer *renderer);
@@ -22,9 +22,9 @@ public:
 protected:
 	void updateCamera();
 
-	toadlet::tadpole::entity::ParentEntity::ptr mParent;
-	toadlet::tadpole::entity::CameraEntity::ptr mCamera;
-	toadlet::tadpole::entity::LightEntity::ptr mLight;
+	toadlet::tadpole::node::ParentNode::ptr mParent;
+	toadlet::tadpole::node::CameraNode::ptr mCamera;
+	toadlet::tadpole::node::LightNode::ptr mLight;
  	int mMouseX,mMouseY;
 	bool mDrag;
 	toadlet::scalar mDistance;

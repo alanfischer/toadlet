@@ -65,7 +65,7 @@ using namespace toadlet::egg;
 using namespace toadlet::egg::io;
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
-using namespace toadlet::tadpole::entity;
+using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::handler;
 using namespace toadlet::tadpole::mesh;
 
@@ -356,31 +356,31 @@ InputStream::ptr Engine::makeInputStream(const String &name){
 }
 
 // TODO: Use a pool for these entities
-Entity *Engine::allocEntity(const BaseType<Entity> &type){
-	Entity *entity=type.newInstance();
-	entity->internal_setManaged(true);
-	return entity;
+Node *Engine::allocNode(const BaseType<Node> &type){
+	Node *node=type.newInstance();
+	node->internal_setManaged(true);
+	return node;
 }
 
-Entity *Engine::createEntity(const BaseType<Entity> &type){
-	Entity *entity=allocEntity(type);
-	entity->create(this);
-	return entity;
+Node *Engine::createNode(const BaseType<Node> &type){
+	Node *node=allocNode(type);
+	node->create(this);
+	return node;
 }
 
-void Engine::destroyEntity(Entity *entity){
-	if(entity->destroyed()==false){
-		entity->destroy();
+void Engine::destroyNode(Node *node){
+	if(node->destroyed()==false){
+		node->destroy();
 	}
 }
 
-void Engine::freeEntity(Entity *entity){
-	if(entity->destroyed()==false){
-		Error::unknown("freeing undestroyed entity");
+void Engine::freeNode(Node *node){
+	if(node->destroyed()==false){
+		Error::unknown("freeing undestroyed node");
 		return;
 	}
-	if(entity->internal_getManaged()){
-		entity->internal_setManaged(false);
+	if(node->internal_getManaged()){
+		node->internal_setManaged(false);
 	}
 }
 

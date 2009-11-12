@@ -45,7 +45,7 @@
 #include <toadlet/tadpole/MaterialManager.h>
 #include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/ResourceManager.h>
-#include <toadlet/tadpole/entity/Scene.h>
+#include <toadlet/tadpole/node/Scene.h>
 #include <toadlet/tadpole/handler/AudioBufferHandler.h>
 #include <toadlet/tadpole/mesh/Mesh.h>
 
@@ -57,10 +57,10 @@ public:
 	Engine();
 	virtual ~Engine();
 
-	/// @todo: Remove the Scene in Engine completely.  I believe we only need it currently for some HopEntity stuff.
+	/// @todo: Remove the Scene in Engine completely.  I believe we only need it currently for some HopNode stuff.
 	///  This would let us have multiple Scenes in an application, pretty neat.
-	void setScene(const entity::Scene::ptr &scene);
-	const entity::Scene::ptr &getScene() const;
+	void setScene(const node::Scene::ptr &scene);
+	const node::Scene::ptr &getScene() const;
 
 	void setInputStreamFactory(egg::io::InputStreamFactory *inputStreamFactory);
 	egg::io::InputStreamFactory *getInputStreamFactory() const;
@@ -76,13 +76,13 @@ public:
 	const egg::String &getDirectory() const;
 	egg::io::InputStream::ptr makeInputStream(const egg::String &name);
 
-	// Entity methods
-	entity::Entity *allocEntity(const egg::BaseType<entity::Entity> &type);
-	entity::Entity *createEntity(const egg::BaseType<entity::Entity> &type);
-	void destroyEntity(entity::Entity *entity);
-	void freeEntity(entity::Entity *entity);
+	// Node methods
+	node::Node *allocNode(const egg::BaseType<node::Node> &type);
+	node::Node *createNode(const egg::BaseType<node::Node> &type);
+	void destroyNode(node::Node *node);
+	void freeNode(node::Node *node);
 
-	template<typename Type> Type *createEntityType(const egg::Type<Type,entity::Entity> &type){return (Type*)createEntity(type);}
+	template<typename Type> Type *createNodeType(const egg::Type<Type,node::Node> &type){return (Type*)createNode(type);}
 
 	// Context methods
 	void contextReset(peeper::Renderer *renderer);
@@ -105,7 +105,7 @@ public:
 protected:
 	egg::String mDirectory;
 	egg::io::InputStreamFactory *mInputStreamFactory;
-	entity::Scene::ptr mScene;
+	node::Scene::ptr mScene;
 	peeper::Renderer *mRenderer;
 	ribbit::AudioPlayer *mAudioPlayer;
 

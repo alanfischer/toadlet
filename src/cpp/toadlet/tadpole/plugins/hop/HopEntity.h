@@ -27,17 +27,17 @@
 #define TOADLET_TADPOLE_HOPENTITY_H
 
 #include <toadlet/egg/MathConversion.h>
-#include <toadlet/tadpole/entity/ParentEntity.h>
-#include <toadlet/tadpole/entity/MeshEntity.h>
+#include <toadlet/tadpole/node/ParentNode.h>
+#include <toadlet/tadpole/node/MeshNode.h>
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
 #include <toadlet/tadpole/plugins/hop/HopCollisionListener.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API HopEntity:public entity::ParentEntity,public hop::CollisionListener{
+class TOADLET_API HopEntity:public node::ParentNode,public hop::CollisionListener{
 public:
-	TOADLET_ENTITY(HopEntity,entity::ParentEntity);
+	TOADLET_NODE(HopEntity,node::ParentNode);
 
 	// TODO: Rename this to fit with new enum standards when reworking client/server
 	enum{
@@ -62,7 +62,7 @@ public:
 	const static int NETWORKID_NOT_NETWORKED=-1;
 
 	HopEntity();
-	virtual Entity *create(Engine *engine,bool networked=true);
+	virtual Node *create(Engine *engine,bool networked=true);
 	virtual void destroy();
 
 	/// Can be used to specify this is an instance of a custom class
@@ -141,7 +141,7 @@ public:
 	void setShadowMesh(mesh::Mesh::ptr shadow,scalar scale,scalar testLength,scalar offset);
 	inline mesh::Mesh::ptr setShadowMesh() const{return mShadowMesh;}
 
-	virtual void parentChanged(entity::ParentEntity *newParent);
+	virtual void parentChanged(node::ParentNode *newParent);
 
 	virtual void collision(const hop::Collision &c);
 
@@ -170,9 +170,9 @@ protected:
 	scalar mShadowOffset;
 	mesh::Mesh::ptr mShadowMesh;
 	Material::ptr mShadowMaterial;
-	entity::MeshEntity::ptr mShadowEntity;
+	node::MeshNode::ptr mShadowNode;
 
-	entity::ParentEntity::ptr mVolumeNode;
+	node::ParentNode::ptr mVolumeNode;
 
 	Vector3 cache_setVelocity_velocity;
 	Vector3 cache_interpolatePhysicalParameters_interpolate;

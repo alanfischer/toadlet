@@ -20,7 +20,7 @@
 #ifndef M3GCONVERTER_H
 #define M3GCONVERTER_H
 
-#include <toadlet/tadpole/Mesh.h>
+#include <toadlet/tadpole/mesh/Mesh.h>
 #include <toadlet/egg/io/OutputStream.h>
 
 #define USE_ACTC
@@ -28,8 +28,8 @@
 
 #ifdef USE_ACTC
 extern "C"{
-#	include <stdio.h>
-#	include "../shared/actc/tc.h"
+	#include <stdio.h>
+	#include "../shared/actc/tc.h"
 }
 #endif
 
@@ -44,10 +44,10 @@ public:
 	M3GConverter();
 	~M3GConverter();
 
-	bool convertMesh(toadlet::tadpole::Mesh *mesh,toadlet::egg::io::OutputStream *out,float scale,int forceBytes,bool invertYTexCoord,bool viewable,int animation);
+	bool convertMesh(toadlet::tadpole::mesh::Mesh *mesh,toadlet::egg::io::OutputStream *out,float scale,int forceBytes,bool invertYTexCoord,bool viewable,int animation);
 
 protected:
-	M3GObject3D *buildSceneGraph(toadlet::tadpole::Mesh *mesh,float scale,int forceBytes,bool invertYTexCoord,bool viewable,int animation);
+	M3GObject3D *buildSceneGraph(toadlet::tadpole::mesh::Mesh *mesh,float scale,int forceBytes,bool invertYTexCoord,bool viewable,int animation);
 
 #ifdef USE_ACTC
 	ACTCData *mTC;

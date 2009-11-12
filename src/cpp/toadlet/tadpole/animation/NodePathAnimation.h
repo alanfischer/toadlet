@@ -23,36 +23,46 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ENTITY_SKELETONPARENTENTITY_H
-#define TOADLET_TADPOLE_ENTITY_SKELETONPARENTENTITY_H
+#ifndef TOADLET_TADPOLE_ANIMATION_NODEPATHANIMATION_H
+#define TOADLET_TADPOLE_ANIMATION_NODEPATHANIMATION_H
 
-#include <toadlet/tadpole/entity/ParentEntity.h>
-#include <toadlet/tadpole/entity/MeshEntitySkeleton.h>
+#include <toadlet/tadpole/Track.h>
+#include <toadlet/tadpole/animation/Animation.h>
+#include <toadlet/tadpole/node/Node.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace animation{
 
-/// WARNING: This class is not currently logic-safe.  Avoid using the locations of these nodes in logic calculations.
-class TOADLET_API SkeletonParentEntity:public ParentEntity{
+class TOADLET_API NodePathAnimation:public Animation{
 public:
-	TOADLET_ENTITY(SkeletonParentEntity,ParentEntity);
+	TOADLET_SHARED_POINTERS(NodePathAnimation);
 
-	SkeletonParentEntity();
+	NodePathAnimation(node::Node::ptr target);
+	virtual ~NodePathAnimation(){}
 
-	virtual void setSkeleton(MeshEntitySkeleton::ptr skeleton);
+	void setTarget(node::Node::ptr target);
+	inline node::Node::ptr getTarget() const{return mTarget;}
 
-	virtual bool attach(Entity *entity,int bone);
-	virtual bool remove(Entity *entity);
+	void setTrack(Track::ptr track);
+	inline Track::ptr getTrack() const{return mTrack;}
 
-	virtual void visualUpdate(int dt);
+	void set(scalar value);
+
+	scalar getMin() const;
+	scalar getMax() const;
+
+	void attached(AnimationController *){}
+	void removed(AnimationController *){}
 
 protected:
-	MeshEntitySkeleton::ptr mSkeleton;
+	node::Node::ptr mTarget;
+	Track::ptr mTrack;
+	int mHint;
 
-	egg::Collection<int> mChildrenBones;
-
-	friend class Scene;
+	Vector3 cache_set_translate;
+	Quaternion cache_set_rotate;
+	Matrix3x3 cache_set_rotateMatrix;
 };
 
 }
@@ -60,3 +70,4 @@ protected:
 }
 
 #endif
+

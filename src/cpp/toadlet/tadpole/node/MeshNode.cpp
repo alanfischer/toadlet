@@ -24,8 +24,8 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
-#include <toadlet/tadpole/entity/MeshEntity.h>
-#include <toadlet/tadpole/entity/ParentEntity.h>
+#include <toadlet/tadpole/node/MeshNode.h>
+#include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/animation/SkeletonAnimation.h>
 #include <toadlet/tadpole/Engine.h>
 #include <stdlib.h>
@@ -40,76 +40,76 @@ using namespace toadlet::tadpole::mesh;
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
-TOADLET_ENTITY_IMPLEMENT(MeshEntity,"toadlet::tadpole::entity::MeshEntity");
+TOADLET_NODE_IMPLEMENT(MeshNode,"toadlet::tadpole::node::MeshNode");
 
-MeshEntity::SubMesh::SubMesh(MeshEntity *meshEntity,Mesh::SubMesh *meshSubMesh){
-	this->meshEntity=meshEntity;
+MeshNode::SubMesh::SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh){
+	this->meshNode=meshNode;
 	this->meshSubMesh=meshSubMesh;
 }
 
-void MeshEntity::SubMesh::render(Renderer *renderer) const{
+void MeshNode::SubMesh::render(Renderer *renderer) const{
 	renderer->renderPrimitive(vertexData,indexData);
 }
 
-MeshEntity::MeshAnimationController::MeshAnimationController(MeshEntity *entity):AnimationController(),
-	mMeshEntity(NULL),
+MeshNode::MeshAnimationController::MeshAnimationController(MeshNode *node):AnimationController(),
+	mMeshNode(NULL),
 	//mAnimation,
 	mStartingFrame(0)
 {
-	mMeshEntity=entity;
+	mMeshNode=node;
 	mAnimation=SkeletonAnimation::ptr(new SkeletonAnimation());
-	mAnimation->setTarget(mMeshEntity->getSkeleton());
+	mAnimation->setTarget(mMeshNode->getSkeleton());
 	attachAnimation(mAnimation);
 }
 
-void MeshEntity::MeshAnimationController::setSequenceIndex(int index){
+void MeshNode::MeshAnimationController::setSequenceIndex(int index){
 	mAnimation->setSequenceIndex(index);
 }
 
-int MeshEntity::MeshAnimationController::getSequenceIndex() const{
+int MeshNode::MeshAnimationController::getSequenceIndex() const{
 	return mAnimation->getSequenceIndex();
 }
 
-void MeshEntity::MeshAnimationController::start(){
+void MeshNode::MeshAnimationController::start(){
 	if(isRunning()){
 		stop();
 	}
 
-	mMeshEntity->setReceiveUpdates(true);
+	mMeshNode->setReceiveUpdates(true);
 
 	AnimationController::start();
-	if(mMeshEntity->getEngine()->getScene()!=NULL){
-		mStartingFrame=mMeshEntity->getEngine()->getScene()->getLogicFrame();
+	if(mMeshNode->getEngine()->getScene()!=NULL){
+		mStartingFrame=mMeshNode->getEngine()->getScene()->getLogicFrame();
 	}
 }
 
-void MeshEntity::MeshAnimationController::stop(){
+void MeshNode::MeshAnimationController::stop(){
 	if(isRunning()==false){
 		return;
 	}
 
-	mMeshEntity->setReceiveUpdates(false);
+	mMeshNode->setReceiveUpdates(false);
 
 	AnimationController::stop();
 }	
 
-void MeshEntity::MeshAnimationController::logicUpdate(int dt){
-	if(mMeshEntity->getEngine()->getScene()==NULL || mStartingFrame!=mMeshEntity->getEngine()->getScene()->getLogicFrame()){
+void MeshNode::MeshAnimationController::logicUpdate(int dt){
+	if(mMeshNode->getEngine()->getScene()==NULL || mStartingFrame!=mMeshNode->getEngine()->getScene()->getLogicFrame()){
 		AnimationController::logicUpdate(dt);
 	}
 }
 
-void MeshEntity::MeshAnimationController::visualUpdate(int dt){
+void MeshNode::MeshAnimationController::visualUpdate(int dt){
 	AnimationController::visualUpdate(dt);
 }
 
-void MeshEntity::MeshAnimationController::skeletonChanged(){
-	mAnimation->setTarget(mMeshEntity->getSkeleton());
+void MeshNode::MeshAnimationController::skeletonChanged(){
+	mAnimation->setTarget(mMeshNode->getSkeleton());
 }
 
-MeshEntity::MeshEntity():RenderableEntity()
+MeshNode::MeshNode():RenderableNode()
 	//mMesh,
 	//mSubMeshes,
 	//mSkeleton,
@@ -119,7 +119,7 @@ MeshEntity::MeshEntity():RenderableEntity()
 {
 }
 
-Entity *MeshEntity::create(Engine *engine){
+Node *MeshNode::create(Engine *engine){
 	super::create(engine);
 
 	mMesh=NULL;
@@ -132,7 +132,7 @@ Entity *MeshEntity::create(Engine *engine){
 	return this;
 }
 
-void MeshEntity::destroy(){
+void MeshNode::destroy(){
 	mSubMeshes.clear();
 
 	if(mAnimationController!=NULL){
@@ -152,11 +152,11 @@ void MeshEntity::destroy(){
 	super::destroy();
 }
 
-void MeshEntity::load(const String &name){
+void MeshNode::load(const String &name){
 	load(mEngine->getMeshManager()->findMesh(name));
 }
 
-void MeshEntity::load(Mesh::ptr mesh){
+void MeshNode::load(Mesh::ptr mesh){
 	mSubMeshes.clear();
 
 	if(mMesh!=NULL){
@@ -182,7 +182,7 @@ void MeshEntity::load(Mesh::ptr mesh){
 	}
 
 	if(mMesh->skeleton!=NULL){
-		mSkeleton=MeshEntitySkeleton::ptr(new MeshEntitySkeleton(this,mMesh->skeleton));
+		mSkeleton=MeshNodeSkeleton::ptr(new MeshNodeSkeleton(this,mMesh->skeleton));
 
 		createVertexBuffer();
 	}
@@ -203,7 +203,7 @@ void MeshEntity::load(Mesh::ptr mesh){
 	}
 }
 
-MeshEntity::SubMesh *MeshEntity::getSubMesh(const String &name){
+MeshNode::SubMesh *MeshNode::getSubMesh(const String &name){
 	if(mMesh==NULL){
 		return NULL;
 	}
@@ -218,7 +218,7 @@ MeshEntity::SubMesh *MeshEntity::getSubMesh(const String &name){
 	return NULL;
 }
 
-void MeshEntity::setSkeleton(MeshEntitySkeleton::ptr skeleton){
+void MeshNode::setSkeleton(MeshNodeSkeleton::ptr skeleton){
 	mSkeleton=skeleton;
 
 	if(mAnimationController!=NULL){
@@ -226,7 +226,7 @@ void MeshEntity::setSkeleton(MeshEntitySkeleton::ptr skeleton){
 	}
 }
 
-MeshEntity::MeshAnimationController::ptr MeshEntity::getAnimationController(){
+MeshNode::MeshAnimationController::ptr MeshNode::getAnimationController(){
 	if(mAnimationController==NULL){
 		mAnimationController=MeshAnimationController::ptr(new MeshAnimationController(this));
 	}
@@ -234,19 +234,19 @@ MeshEntity::MeshAnimationController::ptr MeshEntity::getAnimationController(){
 	return mAnimationController;
 }
 
-void MeshEntity::logicUpdate(int dt){
+void MeshNode::logicUpdate(int dt){
 	if(mAnimationController!=NULL){
 		mAnimationController->logicUpdate(dt);
 	}
 }
 
-void MeshEntity::visualUpdate(int dt){
+void MeshNode::visualUpdate(int dt){
 	if(mAnimationController!=NULL){
 		mAnimationController->visualUpdate(dt);
 	}
 }
 
-void MeshEntity::queueRenderables(Scene *scene){
+void MeshNode::queueRenderables(Scene *scene){
 	if(mMesh!=NULL && mMesh->worldScale!=Math::ONE){
 		mVisualWorldTransform.reset();
 		mVisualWorldTransform.setAt(0,0,mMesh->worldScale);
@@ -273,7 +273,7 @@ void MeshEntity::queueRenderables(Scene *scene){
 	}
 }
 
-void MeshEntity::createVertexBuffer(){
+void MeshNode::createVertexBuffer(){
 	if(mDynamicVertexData==NULL){
 		if(mSkeleton!=NULL){
 			VertexBuffer::ptr srcVertexBuffer=mMesh->staticVertexData->getVertexBuffer(0);
@@ -292,7 +292,7 @@ void MeshEntity::createVertexBuffer(){
 	}
 }
 
-void MeshEntity::updateVertexBuffer(){
+void MeshNode::updateVertexBuffer(){
 	if(mDynamicVertexData!=NULL){
 		VertexBuffer::ptr srcVertexBuffer=mMesh->staticVertexData->getVertexBuffer(0);
 		VertexBuffer::ptr dstVertexBuffer=mDynamicVertexData->getVertexBuffer(0);
@@ -317,7 +317,7 @@ void MeshEntity::updateVertexBuffer(){
 			if(format->hasVertexElementOfType(VertexElement::Type_NORMAL)){
 				int normalElement=format->getVertexElementIndexOfType(VertexElement::Type_NORMAL);
 				for(i=0;i<srcVertexBuffer->getSize();++i){
-					MeshEntitySkeleton::Bone *bone=mSkeleton->getBone(mMesh->vertexBoneAssignments[i][0].bone); // TODO: Implement all bones
+					MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(mMesh->vertexBoneAssignments[i][0].bone); // TODO: Implement all bones
 
 					svba.get3(i,positionElement,vector);
 
@@ -335,7 +335,7 @@ void MeshEntity::updateVertexBuffer(){
 			}
 			else{
 				for(i=0;i<srcVertexBuffer->getSize();++i){
-					MeshEntitySkeleton::Bone *bone=mSkeleton->getBone(mMesh->vertexBoneAssignments[i][0].bone); // TODO: Implement all bones
+					MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(mMesh->vertexBoneAssignments[i][0].bone); // TODO: Implement all bones
 
 					svba.get3(i,positionElement,vector);
 

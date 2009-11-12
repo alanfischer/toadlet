@@ -3,8 +3,8 @@
 #include <toadlet/egg/io/FileInputStream.h>
 #include <toadlet/egg/io/FileOutputStream.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/Mesh.h>
 #include <toadlet/tadpole/TextureManager.h>
+#include <toadlet/tadpole/mesh/Mesh.h>
 
 #include <iostream>
 #include <sstream>
@@ -15,7 +15,7 @@ using namespace toadlet::egg;
 using namespace toadlet::egg::io;
 using namespace toadlet::egg::math;
 using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::entity;
+using namespace toadlet::tadpole::mesh;
 
 class TextureInputStreamFactory:public InputStreamFactory{
 public:
@@ -171,7 +171,7 @@ int main(int argc,char **argv){
 		}
 
 		// Load the mesh data
-		Mesh::ptr mesh=engine->cacheMesh(mshFileName);
+		Mesh::ptr mesh=engine->getMeshManager()->findMesh(mshFileName);
 		if(mesh==NULL){
 			std::cerr << "Error loading \"" << (const char*)mshFileName << "\" failed!  File invalid or not found." << std::endl;
 			continue;
@@ -200,8 +200,8 @@ int main(int argc,char **argv){
 			int j;
 			for(j=0;j<mesh->skeleton->sequences.size();++j){
 				String traFileName;
-				if(forceAnimationNumbers==false && mesh->skeleton->sequences[j]->name.length()>0){
-					traFileName=mesh->skeleton->sequences[j]->name+String(".tra");
+				if(forceAnimationNumbers==false && mesh->skeleton->sequences[j]->getName().length()>0){
+					traFileName=mesh->skeleton->sequences[j]->getName()+String(".tra");
 				}
 				else{
 					std::stringstream ss;

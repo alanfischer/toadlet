@@ -27,7 +27,7 @@ public:
 	VertexLighter(toadlet::tadpole::Engine *engine);
 	virtual ~VertexLighter();
 
-	void lightMesh(toadlet::tadpole::Mesh *mesh);
+	void lightMesh(toadlet::tadpole::mesh::Mesh *mesh);
 
 	void setLightDirection(const toadlet::tadpole::Vector3 &direction);
 	void setLightDiffuseColor(const toadlet::peeper::Color &diffuseColor);

@@ -27,6 +27,7 @@ using namespace toadlet;
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole;
+using namespace toadlet::tadpole::mesh;
 
 #define EPSILON 0.0001f
 

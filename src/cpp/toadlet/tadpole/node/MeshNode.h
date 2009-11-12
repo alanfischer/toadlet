@@ -23,42 +23,42 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ENTITY_MESHENTITY_H
-#define TOADLET_TADPOLE_ENTITY_MESHENTITY_H
+#ifndef TOADLET_TADPOLE_NODE_MESHNODE_H
+#define TOADLET_TADPOLE_NODE_MESHNODE_H
 
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/tadpole/Renderable.h>
-#include <toadlet/tadpole/entity/RenderableEntity.h>
-#include <toadlet/tadpole/entity/MeshEntitySkeleton.h>
+#include <toadlet/tadpole/node/RenderableNode.h>
+#include <toadlet/tadpole/node/MeshNodeSkeleton.h>
 #include <toadlet/tadpole/animation/AnimationController.h>
 #include <toadlet/tadpole/animation/SkeletonAnimation.h>
 #include <toadlet/tadpole/mesh/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
 class Scene;
 
-class TOADLET_API MeshEntity:public RenderableEntity{
+class TOADLET_API MeshNode:public RenderableNode{
 public:
-	TOADLET_ENTITY(MeshEntity,RenderableEntity);
+	TOADLET_NODE(MeshNode,RenderableNode);
 
 	class TOADLET_API SubMesh:public Renderable{
 	public:
 		TOADLET_SHARED_POINTERS(SubMesh);
 
-		SubMesh(MeshEntity *meshEntity,mesh::Mesh::SubMesh *meshSubMesh);
+		SubMesh(MeshNode *meshNode,mesh::Mesh::SubMesh *meshSubMesh);
 
-		const Matrix4x4 &getRenderTransform() const{return meshEntity->getVisualWorldTransform();}
+		const Matrix4x4 &getRenderTransform() const{return meshNode->getVisualWorldTransform();}
 		const Material::ptr &getRenderMaterial() const{return material;}
 		void render(peeper::Renderer *renderer) const;
 
 		Material::ptr material;
 		peeper::IndexData::ptr indexData;
 		peeper::VertexData::ptr vertexData;
-		MeshEntity *meshEntity;
+		MeshNode *meshNode;
 		mesh::Mesh::SubMesh *meshSubMesh;
 	};
 
@@ -67,7 +67,7 @@ public:
 	public:
 		TOADLET_SHARED_POINTERS(MeshAnimationController);
 
-		MeshAnimationController(MeshEntity *entity);
+		MeshAnimationController(MeshNode *node);
 
 		void setSequenceIndex(int index);
 		int getSequenceIndex() const;
@@ -81,13 +81,13 @@ public:
 		void skeletonChanged();
 
 	protected:
-		MeshEntity *mMeshEntity;
+		MeshNode *mMeshNode;
 		animation::SkeletonAnimation::ptr mAnimation;
 		int mStartingFrame;
 	};
 
-	MeshEntity();
-	virtual Entity *create(Engine *engine);
+	MeshNode();
+	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
 	void load(const egg::String &name);
@@ -99,8 +99,8 @@ public:
 	SubMesh *getSubMesh(int i){return mSubMeshes[i];}
 	SubMesh *getSubMesh(const egg::String &name);
 
-	inline MeshEntitySkeleton::ptr getSkeleton() const{return mSkeleton;}
-	void setSkeleton(MeshEntitySkeleton::ptr skeleton);
+	inline MeshNodeSkeleton::ptr getSkeleton() const{return mSkeleton;}
+	void setSkeleton(MeshNodeSkeleton::ptr skeleton);
 
 	MeshAnimationController::ptr getAnimationController();
 
@@ -117,7 +117,7 @@ public:
 protected:
 	mesh::Mesh::ptr mMesh;
 	egg::Collection<SubMesh::ptr> mSubMeshes;
-	MeshEntitySkeleton::ptr mSkeleton;
+	MeshNodeSkeleton::ptr mSkeleton;
 	peeper::VertexData::ptr mDynamicVertexData;
 
 	MeshAnimationController::ptr mAnimationController;

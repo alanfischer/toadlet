@@ -9,6 +9,7 @@ using namespace toadlet::egg::math;
 using namespace toadlet::egg::math::Math;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole;
+using namespace toadlet::tadpole::mesh;
 
 MeshOptimizer::MeshOptimizer(){
 	mEpsilon=0.001f;
@@ -304,10 +305,10 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 	}
 
 	// Remove empty tracks
-	MeshSkeleton::ptr skeleton=mesh->skeleton;
+	Skeleton::ptr skeleton=mesh->skeleton;
 	if(skeleton!=NULL){
 		for(i=0;i<skeleton->sequences.size();++i){
-			MeshSkeletonSequence::ptr sequence=skeleton->sequences[i];
+			Sequence::ptr sequence=skeleton->sequences[i];
 			for(j=0;j<sequence->tracks.size();++j){
 				if(sequence->tracks[j]->keyFrames.size()==0){
 					sequence->tracks.removeAt(j);

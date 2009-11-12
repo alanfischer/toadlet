@@ -30,15 +30,15 @@
 using namespace toadlet::egg;
 using namespace toadlet::hop;
 using namespace toadlet::peeper;
-using namespace toadlet::tadpole::entity;
+using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::mesh;
 
 namespace toadlet{
 namespace tadpole{
 
-TOADLET_ENTITY_IMPLEMENT(HopEntity,"toadlet::tadpole::HopEntity");
+TOADLET_NODE_IMPLEMENT(HopEntity,"toadlet::tadpole::HopEntity");
 
-HopEntity::HopEntity():ParentEntity(),
+HopEntity::HopEntity():ParentNode(),
 	mNextThink(0),
 	mSolid(new Solid()),
 	//mScene,
@@ -54,10 +54,10 @@ HopEntity::HopEntity():ParentEntity(),
 	mShadowOffset(0)
 	//mShadowMesh,
 	//mShadowMaterial,
-	//mShadowEntity
+	//mShadowNode
 {}
 
-Entity *HopEntity::create(Engine *engine,bool networked){
+Node *HopEntity::create(Engine *engine,bool networked){
 	super::create(engine);
 
 	mNextThink=0;
@@ -76,7 +76,7 @@ Entity *HopEntity::create(Engine *engine,bool networked){
 	mShadowOffset=0;
 	mShadowMesh=NULL;
 	mShadowMaterial=NULL;
-	mShadowEntity=NULL;
+	mShadowNode=NULL;
 
 	mIdentityTransform=false;
 
@@ -266,25 +266,25 @@ void HopEntity::setShadowMesh(Mesh::ptr shadow,scalar scale,scalar testLength,sc
 	mShadowTestLength=testLength;
 	mShadowOffset=offset;
 	if(mShadowMesh!=NULL){
-		if(mShadowEntity==NULL){
-			mShadowEntity=mEngine->createEntityType(MeshEntity::type());
-			mScene->attach(mShadowEntity);
+		if(mShadowNode==NULL){
+			mShadowNode=mEngine->createNodeType(MeshNode::type());
+			mScene->attach(mShadowNode);
 		}
-		mShadowEntity->load(mShadowMesh);
-		mShadowEntity->setScale(scale,scale,scale);
+		mShadowNode->load(mShadowMesh);
+		mShadowNode->setScale(scale,scale,scale);
 		// We assume the shadow only has 1 subMesh
-		mShadowMaterial=mShadowEntity->getSubMesh(0)->material;
+		mShadowMaterial=mShadowNode->getSubMesh(0)->material;
 		mShadowMaterial->setBlend(Blend::Combination_ALPHA);
 	}
 	else{
-		if(mShadowEntity!=NULL){
-			mShadowEntity->destroy();
-			mShadowEntity=NULL;
+		if(mShadowNode!=NULL){
+			mShadowNode->destroy();
+			mShadowNode=NULL;
 		}
 	}
 }
 
-void HopEntity::parentChanged(ParentEntity *newParent){
+void HopEntity::parentChanged(ParentNode *newParent){
 	if(mScene!=NULL){
 		if(newParent==mScene){
 			mScene->getSimulator()->addSolid(getSolid());
@@ -299,7 +299,7 @@ void HopEntity::parentChanged(ParentEntity *newParent){
 
 void HopEntity::collision(const Collision &c){
 	if(mListener!=NULL){
-		Entity::ptr reference(this); // To make sure that the object is not deleted by the collision callback until we exit this function
+		HopEntity::ptr reference(this); // To make sure that the object is not deleted by the collision callback until we exit this function
 		mHopCollision.time=c.time;
 		mHopCollision.point.set(c.point);
 		mHopCollision.normal.set(c.normal);
@@ -365,14 +365,14 @@ void HopEntity::castShadow(){
 	if(collision.collider!=NULL && collision.collider->hasInfiniteMass()){
 		Math::mul(vector,collision.normal,mShadowOffset);
 		Math::add(collision.point,vector);
-		mShadowEntity->setTranslate(collision.point);
+		mShadowNode->setTranslate(collision.point);
 
 		Vector3 zAxis;
 		Math::mul(zAxis,rotate,Math::Z_UNIT_VECTOR3);
 		Matrix3x3 shadowRotate;
 		Math::setMatrix3x3FromVector3ToVector3(shadowRotate,collision.normal,zAxis,Math::ONE/2048);
 		Math::postMul(rotate,shadowRotate);
-		mShadowEntity->setRotate(rotate);
+		mShadowNode->setRotate(rotate);
 
 		LightEffect le(Color(0,0,0,Math::ONE-collision.time));
 		mShadowMaterial->setLightEffect(le);
@@ -386,7 +386,7 @@ void HopEntity::castShadow(){
 void HopEntity::showCollisionVolumes(bool show){
 	if(show){
 		if(mVolumeNode==NULL){
-			mVolumeNode=mEngine->createEntityType(ParentEntity::type());
+			mVolumeNode=mEngine->createNodeType(ParentNode::type());
 			mScene->attach(mVolumeNode);
 		}
 		else{
@@ -416,7 +416,7 @@ void HopEntity::showCollisionVolumes(bool show){
 
 //			mesh->subMeshes[0]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,mesh->subMeshes[0]->indexData->indexBuffer));
 
-			MeshEntity *meshNode=mEngine->createEntityType(MeshEntity::type());
+			MeshNode *meshNode=mEngine->createNodeType(MeshNode::type());
 			meshNode->load(mesh);
 			mVolumeNode->attach(meshNode);
 		}

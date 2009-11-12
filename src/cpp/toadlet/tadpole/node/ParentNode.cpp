@@ -24,22 +24,22 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
-#include <toadlet/tadpole/entity/ParentEntity.h>
+#include <toadlet/tadpole/node/ParentNode.h>
 
 using namespace toadlet::egg;
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
-TOADLET_ENTITY_IMPLEMENT(ParentEntity,"toadlet::tadpole::entity::ParentEntity");
+TOADLET_NODE_IMPLEMENT(ParentNode,"toadlet::tadpole::node::ParentNode");
 
-ParentEntity::ParentEntity():Entity(),
+ParentNode::ParentNode():Node(),
 	mShadowChildrenDirty(false)
 {
 }
 
-Entity *ParentEntity::create(Engine *engine){
+Node *ParentNode::create(Engine *engine){
 	super::create(engine);
 
 	mChildren.clear();
@@ -49,7 +49,7 @@ Entity *ParentEntity::create(Engine *engine){
 	return this;
 }
 
-void ParentEntity::destroy(){
+void ParentNode::destroy(){
 	while(mChildren.size()>0){
 		mChildren[0]->destroy();
 	}
@@ -59,46 +59,46 @@ void ParentEntity::destroy(){
 	super::destroy();
 }
 
-void ParentEntity::removeAllEntityDestroyedListeners(){
-	super::removeAllEntityDestroyedListeners();
+void ParentNode::removeAllNodeDestroyedListeners(){
+	super::removeAllNodeDestroyedListeners();
 
 	int i;
 	for(i=mChildren.size()-1;i>=0;--i){
-		mChildren[i]->removeAllEntityDestroyedListeners();
+		mChildren[i]->removeAllNodeDestroyedListeners();
 	}
 }
 
-bool ParentEntity::attach(Entity *entity){
-	if(entity->destroyed()){
+bool ParentNode::attach(Node *node){
+	if(node->destroyed()){
 		Error::unknown(Categories::TOADLET_TADPOLE,
-			"cannot attach a destroyed entity");
+			"cannot attach a destroyed node");
 		return false;
 	}
 
-	ParentEntity *parent=entity->getParent();
+	ParentNode *parent=node->getParent();
 	if(parent!=NULL){
-		parent->remove(entity);
+		parent->remove(node);
 	}
 
-	mChildren.add(entity);
+	mChildren.add(node);
 
-	entity->parentChanged(this);
+	node->parentChanged(this);
 
 	mShadowChildrenDirty=true;
 
 	return true;
 }
 
-bool ParentEntity::remove(Entity *entity){
-	Entity::ptr reference(entity); // To make sure that the object is not deleted until we can call parentChanged
+bool ParentNode::remove(Node *node){
+	Node::ptr reference(node); // To make sure that the object is not deleted until we can call parentChanged
 	int i;
 	for(i=mChildren.size()-1;i>=0;--i){
-		if(mChildren[i]==entity)break;
+		if(mChildren[i]==node)break;
 	}
 	if(i>=0){
 		mChildren.removeAt(i);
 
-		entity->parentChanged(NULL);
+		node->parentChanged(NULL);
 
 		mShadowChildrenDirty=true;
 
@@ -109,7 +109,7 @@ bool ParentEntity::remove(Entity *entity){
 	}
 }
 
-void ParentEntity::updateShadowChildren(){
+void ParentNode::updateShadowChildren(){
 	mShadowChildrenDirty=false;
 
 	mShadowChildren.resize(mChildren.size());

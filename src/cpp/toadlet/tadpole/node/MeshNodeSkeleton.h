@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ENTITY_MESHENTITYSKELETON_H
-#define TOADLET_TADPOLE_ENTITY_MESHENTITYSKELETON_H
+#ifndef TOADLET_TADPOLE_NODE_MESHNODESKELETON_H
+#define TOADLET_TADPOLE_NODE_MESHNODESKELETON_H
 
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/Renderable.h>
@@ -32,13 +32,13 @@
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
-class MeshEntity;
+class MeshNode;
 
-class TOADLET_API MeshEntitySkeleton:public Renderable{
+class TOADLET_API MeshNodeSkeleton:public Renderable{
 public:
-	TOADLET_SHARED_POINTERS(MeshEntitySkeleton);
+	TOADLET_SHARED_POINTERS(MeshNodeSkeleton);
 
 	// BoneSpaceUpdate flags
 	const static int BoneSpaceUpdate_NONE=				0;
@@ -99,7 +99,7 @@ public:
 		bool useMatrixTransforms;
 	};
 
-	MeshEntitySkeleton(MeshEntity *entity,mesh::Skeleton::ptr skeleton);
+	MeshNodeSkeleton(MeshNode *node,mesh::Skeleton::ptr skeleton);
 
 	void updateBones();
 	void updateBones(int sequenceIndex,scalar sequenceTime);
@@ -124,7 +124,7 @@ protected:
 	int updateBoneTransformation(Bone *bone);
 	void updateBone(Bone *bone);
 
-	MeshEntity *mEntity;
+	MeshNode *mNode;
 	mesh::Skeleton::ptr mSkeleton;
 	egg::Collection<Bone::ptr> mBones;
 	int mLastVisualUpdateFrame;

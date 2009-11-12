@@ -12,6 +12,7 @@ using namespace toadlet::egg::io;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole;
 using namespace toadlet::tadpole::handler;
+using namespace toadlet::tadpole::mesh;
 
 int main(int argc,char **argv){
 	String arg;
@@ -62,25 +63,25 @@ int main(int argc,char **argv){
 	Engine *engine=new Engine();
 
 	// Load the mesh data
-	Mesh::ptr mesh=engine->cacheMesh(mshFileName);
+	Mesh::ptr mesh=engine->getMeshManager()->findMesh(mshFileName);
 	if(mesh==NULL){
 		std::cout << "Error loading file: " << (const char*)mshFileName << std::endl;
 		return 0;
 	}
 
 	if(extract){
-		MeshSkeleton::ptr skeleton=mesh->skeleton;
+		Skeleton::ptr skeleton=mesh->skeleton;
 		if(skeleton==NULL){
 			std::cout << "Error, Mesh does not contain a skeleton" << std::endl;
 			return 0;
 		}
 
 		for(i=0;i<skeleton->sequences.size();++i){
-			MeshSkeletonSequence::ptr sequence=skeleton->sequences[i];
+			Sequence::ptr sequence=skeleton->sequences[i];
 
 			String name;
-			if(sequence->name.length()>0){
-				name=sequence->name+".xanm";
+			if(sequence->getName().length()>0){
+				name=sequence->getName()+".xanm";
 			}
 			else{
 				name=String("unnamed-") + i + ".xanm";
@@ -99,7 +100,7 @@ int main(int argc,char **argv){
 	}
 
 	if(insert){
-		MeshSkeleton::ptr skeleton=mesh->skeleton;
+		Skeleton::ptr skeleton=mesh->skeleton;
 		if(skeleton==NULL){
 			std::cout << "Error, Mesh does not contain a skeleton" << std::endl;
 			return 0;
@@ -115,7 +116,7 @@ int main(int argc,char **argv){
 				return 0;
 			}
 			XANMHandler::ptr handler(new XANMHandler());
-			MeshSkeletonSequence::ptr sequence=shared_static_cast<MeshSkeletonSequence>(handler->load(fin,NULL));
+			Sequence::ptr sequence=shared_static_cast<Sequence>(handler->load(fin,NULL));
 			skeleton->sequences.add(sequence);
 		}
 
@@ -132,15 +133,17 @@ int main(int argc,char **argv){
 		int i,j,k;
 
 		VertexBuffer::ptr vertexBuffer=mesh->staticVertexData->getVertexBuffer(0);
-		VertexBufferAccessor vba(vertexBuffer);
-		for(i=0;i<vba.getSize();++i){
-			Vector3 position;
-			vba.get3(i,0,position);
-			position*=scale;
-			vba.set3(i,0,position);
+		{
+			VertexBufferAccessor vba(vertexBuffer);
+			for(i=0;i<vba.getSize();++i){
+				Vector3 position;
+				vba.get3(i,0,position);
+				position*=scale;
+				vba.set3(i,0,position);
+			}
 		}
 
-		MeshSkeleton::ptr skeleton=mesh->skeleton;
+		Skeleton::ptr skeleton=mesh->skeleton;
 		if(skeleton!=NULL){
 			for(i=0;i<skeleton->bones.size();++i){
 				skeleton->bones[i]->translate*=scale;

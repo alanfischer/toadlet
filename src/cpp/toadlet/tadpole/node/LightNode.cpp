@@ -23,39 +23,37 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ENTITY_RENDERABLEENTITY_H
-#define TOADLET_TADPOLE_ENTITY_RENDERABLEENTITY_H
+#include <toadlet/tadpole/node/LightNode.h>
+#include <toadlet/tadpole/node/ParentNode.h>
+#include <toadlet/tadpole/Engine.h>
 
-#include <toadlet/tadpole/entity/Entity.h>
+using namespace toadlet::peeper;
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
-class Scene;
+TOADLET_NODE_IMPLEMENT(LightNode,"toadlet::tadpole::node::LightNode");
 
-class TOADLET_API RenderableEntity:public Entity{
-public:
-	TOADLET_ENTITY(RenderableEntity,Entity);
+LightNode::LightNode():Node()
+	//mLight
+{
+}
 
-	RenderableEntity();
-	Entity *create(Engine *engine);
+Node *LightNode::create(Engine *engine){
+	super::create(engine);
 
-	virtual bool isRenderable() const{return true;}
+	mLight=Light::ptr(new Light());
 
-	virtual void setVisible(bool visible);
-	inline bool getVisible() const{return mVisible;}
+	return this;
+}
 
-	virtual void queueRenderables(Scene *scene){}
+void LightNode::destroy(){
+	mLight=NULL;
 
-protected:
-	bool mVisible;
-
-	friend class Scene;
-};
+	super::destroy();
+}
 
 }
 }
 }
-
-#endif

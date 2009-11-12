@@ -26,8 +26,8 @@
 #include <toadlet/egg/math/Vector3.h>
 #include <toadlet/egg/math/Vector4.h>
 #include <toadlet/egg/io/OutputStream.h>
-#include <toadlet/tadpole/Mesh.h>
-#include <toadlet/tadpole/entity/MeshEntity.h>
+#include <toadlet/tadpole/mesh/Mesh.h>
+#include <toadlet/tadpole/node/MeshNode.h>
 
 class BACVertex{
 public:
@@ -114,8 +114,8 @@ public:
 	BACConverter(toadlet::tadpole::Engine *engine);
 	virtual ~BACConverter();
 
-	bool convertMesh(toadlet::tadpole::Mesh::ptr mesh,toadlet::egg::io::OutputStream *out,bool submeshes=true,bool quads=true,float adjust=0,int version=6);
-	bool convertAnimation(toadlet::tadpole::Mesh::ptr mesh,toadlet::tadpole::MeshSkeletonSequence *animation,toadlet::egg::io::OutputStream *out,int version=4);
+	bool convertMesh(toadlet::tadpole::mesh::Mesh::ptr mesh,toadlet::egg::io::OutputStream *out,bool submeshes=true,bool quads=true,float adjust=0,int version=6);
+	bool convertAnimation(toadlet::tadpole::mesh::Mesh::ptr mesh,toadlet::tadpole::mesh::Sequence *animation,toadlet::egg::io::OutputStream *out,int version=4);
 
 	void setPositionEpsilon(float epsilon){mPositionEpsilon=epsilon;}
 	float getPositionEpsilon() const{return mPositionEpsilon;}
@@ -150,15 +150,15 @@ protected:
 		TRA_MAGIC=0x12345678,
 	};
 
-	bool extractMeshData(toadlet::tadpole::Mesh::ptr mesh,bool submeshes=true);
-	void buildBones(toadlet::tadpole::Mesh *mesh,toadlet::tadpole::entity::MeshEntity *meshEntity,int bone);
+	bool extractMeshData(toadlet::tadpole::mesh::Mesh::ptr mesh,bool submeshes=true);
+	void buildBones(toadlet::tadpole::mesh::Mesh *mesh,toadlet::tadpole::node::MeshNode *meshNode,int bone);
 	void constructQuads();
 	void rewindTriangles();
 	void adjustVertexes(float amount);
 	void writeOutModelVersion6(toadlet::egg::io::OutputStream *tout);
 	void writeOutModelVersion5(toadlet::egg::io::OutputStream *tout);
 
-	void extractAnimationData(toadlet::tadpole::Mesh *mesh,toadlet::tadpole::MeshSkeletonSequence *animation);
+	void extractAnimationData(toadlet::tadpole::mesh::Mesh *mesh,toadlet::tadpole::mesh::Sequence *animation);
 	void writeOutAnimationVersion4(toadlet::egg::io::OutputStream *tout);
 	void writeOutAnimationVersion3(toadlet::egg::io::OutputStream *tout);
 	void clean();

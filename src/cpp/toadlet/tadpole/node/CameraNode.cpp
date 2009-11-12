@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/entity/CameraEntity.h>
-#include <toadlet/tadpole/entity/ParentEntity.h>
+#include <toadlet/tadpole/node/CameraNode.h>
+#include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet::egg;
@@ -32,11 +32,11 @@ using namespace toadlet::peeper;
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
-TOADLET_ENTITY_IMPLEMENT(CameraEntity,"toadlet::tadpole::entity::CameraEntity");
+TOADLET_NODE_IMPLEMENT(CameraNode,"toadlet::tadpole::node::CameraNode");
 
-CameraEntity::CameraEntity():Entity(),
+CameraNode::CameraNode():Node(),
 	mProjectionType(ProjectionType_FOVX),
 	mFov(0),mAspect(0),
 	mLeftDist(0),mRightDist(0),
@@ -60,7 +60,7 @@ CameraEntity::CameraEntity():Entity(),
 	mFPS(0)
 {}
 
-Entity *CameraEntity::create(Engine *engine){
+Node *CameraNode::create(Engine *engine){
 	super::create(engine);
 
 	setProjectionFovX(Math::HALF_PI,Math::fromInt(1),Math::fromInt(1),Math::fromInt(100));
@@ -81,7 +81,7 @@ Entity *CameraEntity::create(Engine *engine){
 	return this;
 }
 
-void CameraEntity::setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,scalar farDist){
+void CameraNode::setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,scalar farDist){
 	mProjectionType=ProjectionType_FOVX;
 	mFov=fovx;mAspect=aspect;
 	mNearDist=nearDist;mFarDist=farDist;
@@ -91,7 +91,7 @@ void CameraEntity::setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,s
 	mBoundingRadius=mFarDist/2;
 }
 
-void CameraEntity::setProjectionFovY(scalar fovy,scalar aspect,scalar nearDist,scalar farDist){
+void CameraNode::setProjectionFovY(scalar fovy,scalar aspect,scalar nearDist,scalar farDist){
 	mProjectionType=ProjectionType_FOVY;
 	mFov=fovy;mAspect=aspect;
 	mNearDist=nearDist;mFarDist=farDist;
@@ -101,7 +101,7 @@ void CameraEntity::setProjectionFovY(scalar fovy,scalar aspect,scalar nearDist,s
 	mBoundingRadius=mFarDist/2;
 }
 
-void CameraEntity::setProjectionOrtho(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist){
+void CameraNode::setProjectionOrtho(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist){
 	mProjectionType=ProjectionType_ORTHO;
 	mLeftDist=leftDist;mRightDist=rightDist;
 	mBottomDist=bottomDist;mTopDist=topDist;
@@ -112,7 +112,7 @@ void CameraEntity::setProjectionOrtho(scalar leftDist,scalar rightDist,scalar bo
 	mBoundingRadius=mFarDist/2;
 }
 
-void CameraEntity::setProjectionFrustum(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist){
+void CameraNode::setProjectionFrustum(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist){
 	mProjectionType=ProjectionType_FRUSTUM;
 	mLeftDist=leftDist;mRightDist=rightDist;
 	mBottomDist=bottomDist;mTopDist=topDist;
@@ -123,7 +123,7 @@ void CameraEntity::setProjectionFrustum(scalar leftDist,scalar rightDist,scalar 
 	mBoundingRadius=mFarDist/2;
 }
 
-void CameraEntity::setProjectionTransform(const Matrix4x4 &transform){
+void CameraNode::setProjectionTransform(const Matrix4x4 &transform){
 	mProjectionType=ProjectionType_MATRIX;
 
 	mProjectionTransform.set(transform);
@@ -131,7 +131,7 @@ void CameraEntity::setProjectionTransform(const Matrix4x4 &transform){
 	/// @todo  need to set mBoundingRadius
 }
 
-void CameraEntity::setProjectionRotation(scalar rotate){
+void CameraNode::setProjectionRotation(scalar rotate){
 	Matrix4x4 projection=cache_setProjectionRotation_projection.reset();
 
 	scalar x=mViewport.x+mViewport.width/2;
@@ -149,7 +149,7 @@ void CameraEntity::setProjectionRotation(scalar rotate){
 	Math::postMul(mProjectionTransform,projection);
 }
 
-void CameraEntity::setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up){
+void CameraNode::setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up){
 	Math::setMatrix4x4FromLookAt(mVisualTransform,eye,point,up,true);
 
 	Math::setVector3FromMatrix4x4(mTranslate,mVisualTransform);
@@ -159,7 +159,7 @@ void CameraEntity::setLookAt(const Vector3 &eye,const Vector3 &point,const Vecto
 	modified();
 }
 
-void CameraEntity::setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up){
+void CameraNode::setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up){
 	Math::setMatrix4x4FromLookDir(mVisualTransform,eye,dir,up,true);
 
 	Math::setVector3FromMatrix4x4(mTranslate,mVisualTransform);
@@ -169,29 +169,29 @@ void CameraEntity::setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector
 	modified();
 }
 
-void CameraEntity::setViewport(const Viewport &viewport){
+void CameraNode::setViewport(const Viewport &viewport){
 	mViewportSet=true;
 	mViewport.set(viewport);
 }
 
-void CameraEntity::setViewport(int x,int y,int width,int height){
+void CameraNode::setViewport(int x,int y,int width,int height){
 	mViewportSet=true;
 	mViewport.set(x,y,width,height);
 }
 
-void CameraEntity::setClearFlags(int clearFlags){
+void CameraNode::setClearFlags(int clearFlags){
 	mClearFlags=clearFlags;
 }
 
-void CameraEntity::setClearColor(Color clearColor){
+void CameraNode::setClearColor(Color clearColor){
 	mClearColor.set(clearColor);
 }
 
-void CameraEntity::setSkipFirstClear(bool skip){
+void CameraNode::setSkipFirstClear(bool skip){
 	mSkipFirstClear=skip;
 }
 
-void CameraEntity::updateViewTransform(){
+void CameraNode::updateViewTransform(){
 	scalar wt00=mVisualWorldTransform.at(0,0),wt01=mVisualWorldTransform.at(0,1),wt02=mVisualWorldTransform.at(0,2);
 	scalar wt10=mVisualWorldTransform.at(1,0),wt11=mVisualWorldTransform.at(1,1),wt12=mVisualWorldTransform.at(1,2);
 	scalar wt20=mVisualWorldTransform.at(2,0),wt21=mVisualWorldTransform.at(2,1),wt22=mVisualWorldTransform.at(2,2);
@@ -230,7 +230,7 @@ void CameraEntity::updateViewTransform(){
 	Math::normalize(mClipPlanes[5].set(vpt[3]+vpt[2], vpt[7]+vpt[6], vpt[11]+vpt[10], vpt[15]+vpt[14]));
 }
 
-bool CameraEntity::culled(const Sphere &sphere) const{
+bool CameraNode::culled(const Sphere &sphere) const{
 	scalar distance=0;
 	int i;
 	for(i=0;i<6;++i){
@@ -243,7 +243,7 @@ bool CameraEntity::culled(const Sphere &sphere) const{
 }
 
 // TODO: Test this culling algorithm, remove the use of the temporary to make something this important threadsafe
-bool CameraEntity::culled(const AABox &box){
+bool CameraNode::culled(const AABox &box){
 	Vector3 &vertex=cache_culled_vertex;
 	int i;
 	for(i=0;i<6;i++){
@@ -255,7 +255,7 @@ bool CameraEntity::culled(const AABox &box){
 	return false;
 }
 
-void CameraEntity::updateFramesPerSecond(){
+void CameraNode::updateFramesPerSecond(){
 	mFPSFrameCount++;
 	int fpsTime=mEngine->getScene()->getVisualTime();
 	if(mFPSLastTime==0 || fpsTime-mFPSLastTime>5000){

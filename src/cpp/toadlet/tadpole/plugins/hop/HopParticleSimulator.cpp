@@ -30,14 +30,14 @@
 #include <toadlet/tadpole/plugins/hop/HopEntity.h>
 
 using namespace toadlet::egg;
-using namespace toadlet::tadpole::entity;
+using namespace toadlet::tadpole::node;
 
 namespace toadlet{
 namespace tadpole{
 
-HopParticleSimulator::HopParticleSimulator(HopScene *scene,ParticleEntity *entity):
+HopParticleSimulator::HopParticleSimulator(HopScene *scene,ParticleNode *node):
 	mScene(NULL),
-	mParticleEntity(NULL),
+	mParticleNode(NULL),
 	mParticleLife(1000),
 	mSpawnExistingParticles(true),
 	//mSpawnAABox,
@@ -45,7 +45,7 @@ HopParticleSimulator::HopParticleSimulator(HopScene *scene,ParticleEntity *entit
 	mCoefficientOfGravity(Math::ONE)
 {
 	mScene=scene;
-	mParticleEntity=entity;
+	mParticleNode=node;
 
 	mRandom.setSeed(System::mtime());
 }
@@ -69,7 +69,7 @@ void HopParticleSimulator::setSpawnAABox(const AABox &box){
 void HopParticleSimulator::updateParticles(int dt,const Matrix4x4 &transform){
 	int i;
 
-	bool alive=!mParticleEntity->getDestroyOnFinish();
+	bool alive=!mParticleNode->getDestroyOnFinish();
 	bool allDead=!alive;
 
 	scalar fdt=Math::fromMilli(dt);
@@ -78,8 +78,8 @@ void HopParticleSimulator::updateParticles(int dt,const Matrix4x4 &transform){
 	Vector3 &velocity=cache_updateParticles_velocity.reset();
 	Vector3 &direction=cache_updateParticles_direction.reset();
 	scalar length=0;
-	for(i=mParticleEntity->getNumParticles()-1;i>=0;--i){
-		ParticleEntity::Particle &p=mParticleEntity->getParticle(i);
+	for(i=mParticleNode->getNumParticles()-1;i>=0;--i){
+		ParticleNode::Particle &p=mParticleNode->getParticle(i);
 		if(p.age<Math::ONE && !mSpawnExistingParticles){
 			allDead=false;
 			p.age+=pdt;
@@ -102,12 +102,12 @@ void HopParticleSimulator::updateParticles(int dt,const Matrix4x4 &transform){
 		}
 		else if(alive || mSpawnExistingParticles){
 			allDead=false;
-			if(mSpawnExistingParticles==false || mParticleEntity->hadAges()==false){
+			if(mSpawnExistingParticles==false || mParticleNode->hadAges()==false){
 				p.age=0;
 				p.visible=true;
 			}
 
-			if(mSpawnExistingParticles==false || mParticleEntity->hadPoints()==false){
+			if(mSpawnExistingParticles==false || mParticleNode->hadPoints()==false){
 				p.x=transform.at(0,3);p.y=transform.at(1,3);p.z=transform.at(2,3);
 			}
 			p.x+=mRandom.nextScalar(mSpawnAABox.mins.x,mSpawnAABox.maxs.x);
@@ -122,7 +122,7 @@ void HopParticleSimulator::updateParticles(int dt,const Matrix4x4 &transform){
 			Math::mul(velocity,transform);
 			p.vx=velocity.x;p.vy=velocity.y;p.vz=velocity.z;
 		}
-		if(mParticleEntity->getOrientation()){
+		if(mParticleNode->getOrientation()){
 			length=Math::sqrt(Math::square(p.vx)+Math::square(p.vy)+Math::square(p.vz));
 			if(length>0){
 				p.ox=Math::div(p.vx,length);
@@ -135,7 +135,7 @@ void HopParticleSimulator::updateParticles(int dt,const Matrix4x4 &transform){
 	mSpawnExistingParticles=false;
 
 	if(allDead){
-		mParticleEntity->destroyNextLogicFrame();
+		mParticleNode->destroyNextLogicFrame();
 	}
 }
 

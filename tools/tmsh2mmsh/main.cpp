@@ -1,7 +1,7 @@
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/io/FileOutputStream.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/Mesh.h>
+#include <toadlet/tadpole/mesh/Mesh.h>
 
 #include <iostream>
 
@@ -12,6 +12,7 @@ using namespace toadlet::egg;
 using namespace toadlet::egg::io;
 using namespace toadlet::egg::math;
 using namespace toadlet::tadpole;
+using namespace toadlet::tadpole::mesh;
 
 int main(int argc,char **argv){
 	String arg;
@@ -77,7 +78,7 @@ int main(int argc,char **argv){
 	Engine *engine=new Engine();
 
 	// Load the mesh data
-	Mesh::ptr mesh=engine->loadMesh(mshFileName);
+	Mesh::ptr mesh=engine->getMeshManager()->findMesh(mshFileName);
 	if(mesh==NULL){
 		std::cout << "Error loading file: " << (const char*)mshFileName << std::endl;
 		return 0;

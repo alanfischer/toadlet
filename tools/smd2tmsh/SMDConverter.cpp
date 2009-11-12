@@ -4,7 +4,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
-#include <toadlet/tadpole/entity/MeshEntitySkeleton.h>
+#include <toadlet/tadpole/node/MeshNodeSkeleton.h>
 #include <stdio.h>
 
 using namespace toadlet;
@@ -13,7 +13,8 @@ using namespace toadlet::egg::io;
 using namespace toadlet::egg::MathConversion;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::entity;
+using namespace toadlet::tadpole::mesh;
+using namespace toadlet::tadpole::node;
 
 class Vertex{
 public:
@@ -81,7 +82,7 @@ void SMDConverter::load(toadlet::egg::io::InputStream *in){
 			else if(s.startsWith("skeleton")){
 				block=Block_SKELETON;
 				if(reference==false && mSkeleton!=NULL){
-					mSequence=MeshSkeletonSequence::ptr(new MeshSkeletonSequence());
+					mSequence=Sequence::ptr(new Sequence());
 					mSkeleton->sequences.add(mSequence);
 
 					for(int i=0;i<mSkeleton->bones.size();++i){
@@ -119,13 +120,13 @@ void SMDConverter::load(toadlet::egg::io::InputStream *in){
 				}
 
 				if(mSkeleton==NULL){
-					mSkeleton=MeshSkeleton::ptr(new MeshSkeleton());
+					mSkeleton=Skeleton::ptr(new Skeleton());
 					mMesh->skeleton=mSkeleton;
 					reference=true;
 				}
 
 				if(reference && mSkeleton!=NULL){
-					MeshSkeleton::Bone::ptr bone(new MeshSkeleton::Bone());
+					Skeleton::Bone::ptr bone(new Skeleton::Bone());
 					bone->index=id;
 					bone->parentIndex=pid;
 					bone->name=name;
@@ -152,7 +153,7 @@ void SMDConverter::load(toadlet::egg::io::InputStream *in){
 
 				if(mSkeleton!=NULL){
 					if(reference){
-						MeshSkeleton::Bone::ptr bone=mSkeleton->bones.at(id);
+						Skeleton::Bone::ptr bone=mSkeleton->bones.at(id);
 						bone->translate.set(floatToScalar(px),floatToScalar(py),floatToScalar(pz));
 						setQuaternionFromXYZ(bone->rotate,floatToScalar(rx),floatToScalar(ry),floatToScalar(rz));
 					}
@@ -205,7 +206,7 @@ void SMDConverter::load(toadlet::egg::io::InputStream *in){
 		int i,j,k;
 
 		if(mRemoveSkeleton==false && mSkeleton!=NULL){
-			MeshEntitySkeleton::ptr skeleton(new MeshEntitySkeleton(NULL,mSkeleton));
+			MeshNodeSkeleton::ptr skeleton(new MeshNodeSkeleton(NULL,mSkeleton));
 			skeleton->updateBones();
 			for(i=0;i<skeleton->getNumBones();++i){
 				Vector3 wtbTranslation(skeleton->getBone(i)->worldTranslate);

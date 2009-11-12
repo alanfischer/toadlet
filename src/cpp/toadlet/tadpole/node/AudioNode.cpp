@@ -23,47 +23,53 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ENTITY_PARENTENTITY_H
-#define TOADLET_TADPOLE_ENTITY_PARENTENTITY_H
+#include <toadlet/tadpole/node/AudioNode.h>
+#include <toadlet/tadpole/node/ParentNode.h>
+#include <toadlet/tadpole/Engine.h>
 
-#include <toadlet/egg/Collection.h>
-#include <toadlet/tadpole/entity/Entity.h>
+using namespace toadlet::ribbit;
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
-class TOADLET_API ParentEntity:public Entity{
-public:
-	TOADLET_ENTITY(ParentEntity,Entity);
+TOADLET_NODE_IMPLEMENT(AudioNode,"toadlet::tadpole::node::AudioNode");
 
-	ParentEntity();
-	virtual Entity *create(Engine *engine);
-	virtual void destroy();
+AudioNode::AudioNode():Node(){}
 
-	virtual bool isParent() const{return true;}
+Node *AudioNode::create(Engine *engine){
+	super::create(engine);
+	return this;
+}
 
-	virtual void removeAllEntityDestroyedListeners();
+void AudioNode::destroy(){
+	mAudio->destroy();
 
-	virtual bool attach(Entity *entity);
-	virtual bool remove(Entity *entity);
+	super::destroy();
+}
 
-	inline int getNumChildren() const{return mChildren.size();}
-	inline Entity *getChild(int i) const{return mChildren[i];}
+bool AudioNode::loadAudioBuffer(const AudioBuffer::ptr &audioBuffer){
+	if(mAudio!=NULL){
+		mAudio->destroy();
+	}
 
-protected:
-	void updateShadowChildren();
+	mAudio=Audio::ptr(mEngine->getAudioPlayer()->createBufferedAudio());
+	mAudio->create(audioBuffer);
 
-	egg::Collection<Entity::ptr> mChildren;
+	return true;
+}
 
-	bool mShadowChildrenDirty;
-	egg::Collection<Entity::ptr> mShadowChildren;
+bool AudioNode::loadAudioStream(egg::io::InputStream::ptr in,const egg::String &extension){
+	if(mAudio!=NULL){
+		mAudio->destroy();
+	}
 
-	friend class Scene;
-};
+	mAudio=Audio::ptr(mEngine->getAudioPlayer()->createStreamingAudio());
+	mAudio->create(in,extension);
+
+	return true;
+}
 
 }
 }
 }
-
-#endif

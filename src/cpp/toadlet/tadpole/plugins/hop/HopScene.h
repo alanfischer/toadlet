@@ -28,22 +28,22 @@
 
 #include <toadlet/hop/Simulator.h>
 #include <toadlet/tadpole/plugins/hop/HopEntityFactory.h>
-#include <toadlet/tadpole/entity/Scene.h>
+#include <toadlet/tadpole/node/Scene.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class HopEntity;
+class HopNode;
 class HopCollision;
 class HopEntityMessage;
 
-class TOADLET_API HopScene:public entity::Scene{
+class TOADLET_API HopScene:public node::Scene{
 public:
-	TOADLET_ENTITY(HopScene,entity::Scene);
+	TOADLET_NODE(HopScene,node::Scene);
 
 	HopScene();
 	virtual ~HopScene();
-	virtual Entity *create(Engine *engine);
+	virtual Node *create(Engine *engine);
 
 	virtual void setFluidVelocity(const Vector3 &fluidVelocity);
 	virtual const Vector3 &getFluidVelocity() const;
@@ -70,7 +70,7 @@ public:
 
 	inline hop::Simulator *getSimulator(){return mSimulator;}
 
-	virtual entity::ParticleEntity::ParticleSimulator::ptr newParticleSimulator(entity::ParticleEntity *particleEntity);
+	virtual node::ParticleNode::ParticleSimulator::ptr newParticleSimulator(node::ParticleNode *particleNode);
 	virtual void registerHopEntity(HopEntity *entity);
 	virtual void unregisterHopEntity(HopEntity *entity);
 

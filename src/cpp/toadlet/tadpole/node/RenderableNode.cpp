@@ -23,38 +23,32 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ENTITY_ENTITYDESTROYEDLISTENER_H
-#define TOADLET_TADPOLE_ENTITY_ENTITYDESTROYEDLISTENER_H
-
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/node/RenderableNode.h>
+#include <toadlet/tadpole/node/ParentNode.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
-class Entity;
+TOADLET_NODE_IMPLEMENT(RenderableNode,"toadlet::tadpole::node::RenderableNode");
 
-class EntityDestroyedListener{
-public:
-	virtual ~EntityDestroyedListener(){}
+RenderableNode::RenderableNode():Node(),
+	mVisible(false)
+{}
 
-	virtual void entityDestroyed(Entity *entity)=0;
-};
+Node *RenderableNode::create(Engine *engine){
+	super::create(engine);
 
-template<class Type>
-class EntityDestroyedFunctor:public EntityDestroyedListener{
-public:
-	EntityDestroyedFunctor(Type *obj,void (Type::*func)(void)):mObject(obj),mFunction(func){}
+	mBoundingRadius=-Math::ONE;
+	mVisible=true;
 
-	virtual void entityDestroyed(Entity *entity){(mObject->*mFunction)();}
+	return this;
+}
 
-protected:
-	Type *mObject;
-	void (Type::*mFunction)(void);
-};
+void RenderableNode::setVisible(bool visible){
+	mVisible=visible;
+}
 
 }
 }
 }
-
-#endif

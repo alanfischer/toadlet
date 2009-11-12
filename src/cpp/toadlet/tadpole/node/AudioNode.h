@@ -23,23 +23,23 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ENTITY_AUDIOENTITY_H
-#define TOADLET_TADPOLE_ENTITY_AUDIOENTITY_H
+#ifndef TOADLET_TADPOLE_NODE_AUDIONODE_H
+#define TOADLET_TADPOLE_NODE_AUDIONODE_H
 
-#include <toadlet/tadpole/entity/Entity.h>
+#include <toadlet/tadpole/node/Node.h>
 #include <toadlet/ribbit/Audio.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace entity{
+namespace node{
 
-/// @todo: Add proper world position & direction updating of the Audio, same with LightEntity
-class TOADLET_API AudioEntity:public Entity{
+/// @todo: Add proper world position & direction updating of the Audio, same with LightNode
+class TOADLET_API AudioNode:public Node{
 public:
-	TOADLET_ENTITY(AudioEntity,Entity);
+	TOADLET_NODE(AudioNode,Node);
 
-	AudioEntity();
-	virtual Entity *create(Engine *engine);
+	AudioNode();
+	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
 	bool loadAudioBuffer(const ribbit::AudioBuffer::ptr &audioBuffer);
