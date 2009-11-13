@@ -91,19 +91,20 @@ public:
 	virtual void update(int dt);
 	virtual void render(peeper::Renderer *renderer);
 
-	virtual bool createContextAndRenderer();
-	virtual bool destroyRendererAndContext();
-	virtual bool createAudioPlayer();
-	virtual bool destroyAudioPlayer();
-	
+	void setRendererOptions(int *options,int length);
+
 	static int translateKey(int key);
 
 	inline void *getWindow() const{return mWindow;}
 	inline void *getView() const{return mView;}
 	
 protected:
-	virtual peeper::RenderTarget *makeRenderTarget();
-	virtual peeper::Renderer *makeRenderer();
+	peeper::RenderTarget *makeRenderTarget();
+	peeper::Renderer *makeRenderer();
+	bool createContextAndRenderer();
+	bool destroyRendererAndContext();
+	bool createAudioPlayer();
+	bool destroyAudioPlayer();
 
 	egg::String mTitle;
 	int mPositionX,mPositionY;
@@ -113,8 +114,9 @@ protected:
 	ApplicationListener *mApplicationListener;
 
 	tadpole::Engine *mEngine;
-	peeper::Renderer *mRenderer;
 	peeper::RenderTarget *mRenderTarget;
+	peeper::Renderer *mRenderer;
+	int *mRendererOptions;
 	ribbit::AudioPlayer *mAudioPlayer;
 
 	bool mRun;
