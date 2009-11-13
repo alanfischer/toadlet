@@ -57,7 +57,7 @@ HopEntity::HopEntity():ParentNode(),
 	//mShadowNode
 {}
 
-Node *HopEntity::create(Engine *engine,bool networked){
+Node *HopEntity::create(Engine *engine){
 	super::create(engine);
 
 	mNextThink=0;
@@ -79,10 +79,6 @@ Node *HopEntity::create(Engine *engine,bool networked){
 	mShadowNode=NULL;
 
 	mIdentityTransform=false;
-
-	if(networked==false){
-		mNetworkID=NETWORKID_NOT_NETWORKED;
-	}
 
 	mScene=shared_static_cast<HopScene>(mEngine->getScene());
 
@@ -415,7 +411,7 @@ void HopEntity::showCollisionVolumes(bool show){
 			}
 
 //			mesh->subMeshes[0]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,mesh->subMeshes[0]->indexData->indexBuffer));
-
+			Logger::log("buidling collision vols\n");
 			MeshNode *meshNode=mEngine->createNodeType(MeshNode::type());
 			meshNode->load(mesh);
 			mVolumeNode->attach(meshNode);
