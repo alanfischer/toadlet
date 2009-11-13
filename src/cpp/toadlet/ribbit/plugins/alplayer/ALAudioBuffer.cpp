@@ -26,6 +26,12 @@
 #include "ALAudioBuffer.h"
 #include "ALPlayer.h"
 
+#if defined(TOADLET_PLATFORM_OSX)
+	#include <toadlet/egg/Error.h>
+	#include "../decoders/coreaudiodecoder/CoreAudioDecoder.h"
+	#include "platform/osx/CoreAudio.h"
+#endif
+
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
 

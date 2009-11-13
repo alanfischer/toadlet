@@ -265,7 +265,7 @@ OSXApplication::OSXApplication():
 
 	mEngine(NULL),
 	mRenderer(NULL),
-	mRenderTarget(NULL),
+	mRendererOptions(NULL),
 	mAudioPlayer(NULL),
 
 	mRun(false),
@@ -277,6 +277,8 @@ OSXApplication::OSXApplication():
 {}
 
 OSXApplication::~OSXApplication(){
+	delete[] mRendererOptions;
+
 	if(mView!=nil){
 		[(ApplicationView*)mView release];
 	}
@@ -458,7 +460,7 @@ bool OSXApplication::createContextAndRenderer(){
 
 		mRenderer=makeRenderer();
 		if(mRenderer!=NULL){
-			if(mRenderer->startup(this,NULL)==false){
+			if(mRenderer->create(this,mRendererOptions)==false){
 				delete mRenderer;
 				mRenderer=NULL;
 				Error::unknown(Categories::TOADLET_PAD,
@@ -494,7 +496,7 @@ bool OSXApplication::destroyRendererAndContext(){
 	if(mRenderer!=NULL){
 		mEngine->setRenderer(NULL);
 
-		mRenderer->shutdown();
+		mRenderer->destroy();
 		delete mRenderer;
 		mRenderer=NULL;
 	}
@@ -514,7 +516,7 @@ bool OSXApplication::createAudioPlayer(){
 		int options[]={1,100,0};
 		bool result=false;
 		TOADLET_TRY
-			result=mAudioPlayer->startup(options);
+			result=mAudioPlayer->create(options);
 		TOADLET_CATCH(const Exception &){result=false;}
 		if(result==false){
 			delete mAudioPlayer;
@@ -530,7 +532,7 @@ bool OSXApplication::createAudioPlayer(){
 bool OSXApplication::destroyAudioPlayer(){
 	if(mAudioPlayer!=NULL){
 		mEngine->setAudioPlayer(NULL);
-		mAudioPlayer->shutdown();
+		mAudioPlayer->destroy();
 		delete mAudioPlayer;
 		mAudioPlayer=NULL;
 	}
@@ -601,6 +603,15 @@ void OSXApplication::render(Renderer *renderer){
 	if(mApplicationListener!=NULL){
 		mApplicationListener->render(renderer);
 	}
+}
+
+void OSXApplication::setRendererOptions(int *options,int length){
+        if(mRendererOptions!=NULL){
+                delete[] mRendererOptions;
+        }
+
+        mRendererOptions=new int[length];
+        memcpy(mRendererOptions,options,length*sizeof(int));
 }
 
 int OSXApplication::translateKey(int key){
