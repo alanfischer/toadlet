@@ -62,7 +62,7 @@ public:
 	const static int NETWORKID_NOT_NETWORKED=-1;
 
 	HopEntity();
-	virtual Node *create(Engine *engine,bool networked=true);
+	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
 	/// Can be used to specify this is an instance of a custom class
