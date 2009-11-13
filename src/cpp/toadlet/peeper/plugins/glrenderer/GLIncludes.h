@@ -71,7 +71,7 @@
 	#include <OpenGL/OpenGL.h>
 	#include <AGL/agl.h>
 #else
-	#if !defined(TOADLET_BUILD_DYNAMIC) || defined(TOADLET_BUILD_STATIC)
+	#if defined(TOADLET_PLATFORM_WIN32)
 		#define GLEW_STATIC
 	#endif
 	extern "C" {
