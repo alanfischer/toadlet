@@ -70,13 +70,12 @@ Resource::ptr ResourceManager::find(const egg::String &name,ResourceHandlerData:
 Resource::ptr ResourceManager::manage(const Resource::ptr &resource){
 	if(mResources.contains(resource)==false){
 		mResources.add(resource);
-
-		String name=resource->getName();
-		if(name!=(char*)NULL){
-			mNameResourceMap[name]=resource;
-		}
-
 		resource->setFullyReleasedListener(this);
+	}
+
+	String name=resource->getName();
+	if(name!=(char*)NULL){
+		mNameResourceMap[name]=resource;
 	}
 
 	return resource;
