@@ -109,7 +109,7 @@ void MeshNode::MeshAnimationController::skeletonChanged(){
 	mAnimation->setTarget(mMeshNode->getSkeleton());
 }
 
-MeshNode::MeshNode():RenderableNode()
+MeshNode::MeshNode():super()
 	//mMesh,
 	//mSubMeshes,
 	//mSkeleton,

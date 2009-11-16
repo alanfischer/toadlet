@@ -36,7 +36,7 @@ namespace node{
 
 TOADLET_NODE_IMPLEMENT(AnimationControllerNode,"toadlet::tadpole::node::AnimationControllerNode");
 
-AnimationControllerNode::AnimationControllerNode():Node(),
+AnimationControllerNode::AnimationControllerNode():super(),
 	//mAnimationController,
 	mStartingFrame(0),
 	mDestroyOnFinish(false)

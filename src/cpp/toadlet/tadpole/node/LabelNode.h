@@ -23,14 +23,14 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_NODE_SPRITENODE_H
-#define TOADLET_TADPOLE_NODE_SPRITENODE_H
+#ifndef TOADLET_TADPOLE_NODE_LABELNODE_H
+#define TOADLET_TADPOLE_NODE_LABELNODE_H
 
-//#include <toadlet/peeper/AnimatedTexture.h>
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/peeper/VertexData.h>
+#include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/node/RenderableNode.h>
@@ -39,21 +39,17 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class Scene;
-
-class TOADLET_API SpriteNode:public RenderableNode,public Renderable{
+class TOADLET_API LabelNode:public RenderableNode,public Renderable{
 public:
-	TOADLET_NODE(SpriteNode,RenderableNode);
+	TOADLET_NODE(LabelNode,RenderableNode);
 
-	SpriteNode();
+	LabelNode();
 	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
-	void load(scalar width,scalar height,bool scaled,const egg::String &name);
-	void load(scalar width,scalar height,bool scaled,peeper::Texture::ptr texture);
-
-	void setFrame(int frame);
-	int getNumFrames() const;
+	virtual void setFont(const Font::ptr &font);
+	virtual void setText(const egg::String &text);
+	virtual void setScaled(bool scaled);
 
 	virtual const Material::ptr &getRenderMaterial() const{return mMaterial;}
 	virtual const Matrix4x4 &getRenderTransform() const{return super::getVisualWorldTransform();}
@@ -64,17 +60,12 @@ public:
 	peeper::VertexBufferAccessor vba;
 
 protected:
-	TOADLET_GIB_DEFINE(SpriteNode);
+	TOADLET_GIB_DEFINE(LabelNode);
 
-	void updateFrame();
+	void rebuild();
 
-	peeper::Texture::ptr mTexture;
-//	peeper::AnimatedTexture::ptr mAnimatedTexture;
-	Matrix4x4 mTextureMatrix;
-
-	int mFrame;
-	scalar mWidth;
-	scalar mHeight;
+	Font::ptr mFont;
+	egg::String mText;
 	bool mScaled;
 
 	Material::ptr mMaterial;

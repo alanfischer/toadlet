@@ -411,7 +411,6 @@ void HopEntity::showCollisionVolumes(bool show){
 			}
 
 //			mesh->subMeshes[0]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,mesh->subMeshes[0]->indexData->indexBuffer));
-			Logger::log("buidling collision vols\n");
 			MeshNode *meshNode=mEngine->createNodeType(MeshNode::type());
 			meshNode->load(mesh);
 			mVolumeNode->attach(meshNode);

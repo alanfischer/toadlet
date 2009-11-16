@@ -36,7 +36,7 @@ namespace node{
 
 TOADLET_NODE_IMPLEMENT(CameraNode,"toadlet::tadpole::node::CameraNode");
 
-CameraNode::CameraNode():Node(),
+CameraNode::CameraNode():super(),
 	mProjectionType(ProjectionType_FOVX),
 	mFov(0),mAspect(0),
 	mLeftDist(0),mRightDist(0),

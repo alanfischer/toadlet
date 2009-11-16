@@ -51,17 +51,6 @@ class TOADLET_API ParticleNode:public RenderableNode,public Renderable{
 public:
 	TOADLET_NODE(ParticleNode,RenderableNode);
 
-#if defined(TOADLET_GCC_INHERITANCE_BUG)
-	class RenderableWorkaround:public Renderable{
-	public:
-		RenderableWorkaround(ParticleNode *node):renderableNode(node){}
-		ParticleNode *renderableNode;
-		const Material::ptr &getRenderMaterial() const{return renderableNode->getRenderMaterial();}
-		const Matrix4x4 &getRenderTransform() const{return renderableNode->getRenderTransform();}
-		void render(peeper::Renderer *renderer) const{renderableNode->render(renderer);}
-	};
-#endif
-
 	class Particle{
 	public:
 		scalar x,y,z; // local space
@@ -154,9 +143,7 @@ public:
 	peeper::IndexBufferAccessor iba;
 
 protected:
-#if defined(TOADLET_GCC_INHERITANCE_BUG)
-	RenderableWorkaround renderable;
-#endif
+	TOADLET_GIB_DEFINE(ParticleNode);
 
 	int randomColor();
 

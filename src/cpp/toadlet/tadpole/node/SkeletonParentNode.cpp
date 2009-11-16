@@ -34,7 +34,7 @@ namespace node{
 
 TOADLET_NODE_IMPLEMENT(SkeletonParentNode,"toadlet::tadpole::node::SkeletonParentNode");
 
-SkeletonParentNode::SkeletonParentNode():ParentNode(){}
+SkeletonParentNode::SkeletonParentNode():super(){}
 
 void SkeletonParentNode::setSkeleton(MeshNodeSkeleton::ptr skeleton){
 	mSkeleton=skeleton;

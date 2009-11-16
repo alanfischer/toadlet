@@ -89,7 +89,8 @@ public:
 	virtual void postLogicUpdateLoop(int dt);
 	virtual void visualUpdate(int dt);
 
-	virtual void render(peeper::Renderer *renderer,CameraNode *cameraNode);
+	inline void render(peeper::Renderer *renderer,CameraNode *cameraNode){render(renderer,cameraNode,this);}
+	virtual void render(peeper::Renderer *renderer,CameraNode *cameraNode,Node *node);
 
 	virtual void queueRenderable(Renderable *renderable);
 	inline CameraNode *getCamera() const{return mCamera;} // Only valid during rendering operations
@@ -150,10 +151,10 @@ protected:
 	UpdateListener *mUpdateListener;
 
 	peeper::Color mAmbientColor;
-	LightNode::ptr mLight;
 
 	Matrix4x4 mIdealParticleViewTransform;
 
+	LightNode *mLight;
 	CameraNode *mCamera;
 	Material *mPreviousMaterial;
 

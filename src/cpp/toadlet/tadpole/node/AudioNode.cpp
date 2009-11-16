@@ -35,7 +35,7 @@ namespace node{
 
 TOADLET_NODE_IMPLEMENT(AudioNode,"toadlet::tadpole::node::AudioNode");
 
-AudioNode::AudioNode():Node(){}
+AudioNode::AudioNode():super(){}
 
 Node *AudioNode::create(Engine *engine){
 	super::create(engine);

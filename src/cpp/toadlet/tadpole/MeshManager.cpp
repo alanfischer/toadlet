@@ -307,12 +307,12 @@ Mesh::ptr MeshManager::createGeoSphere(const Sphere &sphere,int depth,bool icosa
 			6, 10
 		};
 		int indicesLength=sizeof(indices)/sizeof(int);
-		scalar y = Math::fromMilli(4472);
-		scalar a = Math::fromMilli(8944);
-		scalar b = Math::fromMilli(2764);
-		scalar c = Math::fromMilli(7236);
-		scalar d = Math::fromMilli(8507);
-		scalar e = Math::fromMilli(5257);
+		scalar y = Math::fromMilli(447);
+		scalar a = Math::fromMilli(894);
+		scalar b = Math::fromMilli(276);
+		scalar c = Math::fromMilli(723);
+		scalar d = Math::fromMilli(850);
+		scalar e = Math::fromMilli(525);
 		geoSet(vertexIndex++,Vector3(0, Math::ONE, 0));
 		geoSet(vertexIndex++,Vector3(a, y, 0));
 		geoSet(vertexIndex++,Vector3(b, y, -d));

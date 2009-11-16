@@ -75,6 +75,7 @@ GLRenderer::GLRenderer():
 	mPBuffersAvailable(false),
 	mFBOsAvailable(false),
 
+	mDepthWrite(false),
 	mFaceCulling(FaceCulling_NONE),
 	mInTexGen(false),
 	mMirrorY(false),
@@ -502,7 +503,14 @@ void GLRenderer::clear(int clearFlags,const Color &clearColor){
 		bufferBits|=GL_STENCIL_BUFFER_BIT;
 	}
 
-	glClear(bufferBits);
+	if(mDepthWrite==false){
+		glDepthMask(GL_TRUE);
+		glClear(bufferBits);
+		glDepthMask(GL_FALSE);
+	}
+	else{
+		glClear(bufferBits);
+	}
 
 	TOADLET_CHECK_GLERROR("clear");
 }
@@ -761,6 +769,8 @@ void GLRenderer::setDepthTest(const DepthTest &depthTest){
 
 void GLRenderer::setDepthWrite(bool depthWrite){
 	glDepthMask(depthWrite?GL_TRUE:GL_FALSE);
+
+	mDepthWrite=depthWrite;
 
 	TOADLET_CHECK_GLERROR("setDepthWrite");
 }
