@@ -112,10 +112,10 @@ bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const Stri
 	if((alignment&Alignment_BIT_TOP)>0){
 	}
 	else if((alignment&Alignment_BIT_BOTTOM)>0){
-		y-=height;
+		y+=height;
 	}
 	else if((alignment&Alignment_BIT_VCENTER)>0){
-		y-=height/2;
+		y+=height/2;
 	}
 
 	vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
@@ -139,7 +139,7 @@ bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const Stri
 				x=-lineLength/2;
 			}
 
-			y+=mHeight;
+			y-=mHeight;
 		}
 
 		c=string.at(i);
@@ -147,16 +147,16 @@ bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const Stri
 		int i4=i*4;
 		Glyph *g=getGlyph(c);
 		if(g!=NULL){
-			vba.set3(i4+0,positionElement,	Math::fromInt(x+g->offsetx), Math::fromInt(y+g->offsety), 0);
+			vba.set3(i4+0,positionElement,	Math::fromInt(x+g->offsetx), Math::fromInt(y+g->offsety+g->height), 0);
 			vba.set2(i4+0,texCoordElement,	Math::div(Math::fromInt(g->x),scalarTexWidth), Math::div(Math::fromInt(g->y),scalarTexHeight));
 
-			vba.set3(i4+1,positionElement,	Math::fromInt(x+g->offsetx+g->width), Math::fromInt(y+g->offsety), 0);
+			vba.set3(i4+1,positionElement,	Math::fromInt(x+g->offsetx+g->width), Math::fromInt(y+g->offsety+g->height), 0);
 			vba.set2(i4+1,texCoordElement,	Math::div(Math::fromInt(g->x+g->width),scalarTexWidth), Math::div(Math::fromInt(g->y),scalarTexHeight));
 
-			vba.set3(i4+2,positionElement,	Math::fromInt(x+g->offsetx+g->width), Math::fromInt(y+g->offsety+g->height), 0);
+			vba.set3(i4+2,positionElement,	Math::fromInt(x+g->offsetx+g->width), Math::fromInt(y+g->offsety), 0);
 			vba.set2(i4+2,texCoordElement,	Math::div(Math::fromInt(g->x+g->width),scalarTexWidth), Math::div(Math::fromInt(g->y+g->height),scalarTexHeight));
 
-			vba.set3(i4+3,positionElement,	Math::fromInt(x+g->offsetx), Math::fromInt(y+g->offsety+g->height), 0);
+			vba.set3(i4+3,positionElement,	Math::fromInt(x+g->offsetx), Math::fromInt(y+g->offsety), 0);
 			vba.set2(i4+3,texCoordElement,	Math::div(Math::fromInt(g->x),scalarTexWidth), Math::div(Math::fromInt(g->y+g->height),scalarTexHeight));
 
 			x+=Math::toInt(g->advancex);

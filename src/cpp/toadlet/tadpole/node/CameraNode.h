@@ -26,7 +26,7 @@
 #ifndef TOADLET_TADPOLE_NODE_CAMERANODE_H
 #define TOADLET_TADPOLE_NODE_CAMERANODE_H
 
-#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/peeper/Color.h>
 #include <toadlet/peeper/Viewport.h>
 
@@ -34,9 +34,9 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class TOADLET_API CameraNode:public Node{
+class TOADLET_API CameraNode:public ParentNode{
 public:
-	TOADLET_NODE(CameraNode,Node);
+	TOADLET_NODE(CameraNode,ParentNode);
 
 	enum ProjectionType{
 		ProjectionType_FOVX=0,

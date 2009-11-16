@@ -40,10 +40,8 @@ namespace node{
 
 TOADLET_NODE_IMPLEMENT(ParticleNode,"toadlet::tadpole::node::ParticleNode");
 
-ParticleNode::ParticleNode():RenderableNode(),
-#if defined(TOADLET_GCC_INHERITANCE_BUG)
-	renderable(this),
-#endif
+ParticleNode::ParticleNode():super(),
+	TOADLET_GIB_IMPLEMENT()
 
 	mDestroyNextLogicFrame(false),
 	

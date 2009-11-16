@@ -35,15 +35,15 @@ namespace node{
 
 TOADLET_NODE_IMPLEMENT(LightNode,"toadlet::tadpole::node::LightNode");
 
-LightNode::LightNode():Node()
-	//mLight
-{
-}
+LightNode::LightNode():super(),
+	mLight(NULL)
+{}
 
 Node *LightNode::create(Engine *engine){
 	super::create(engine);
 
 	mLight=Light::ptr(new Light());
+	mBoundingRadius=-1;
 
 	return this;
 }

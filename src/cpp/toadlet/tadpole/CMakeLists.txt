@@ -28,10 +28,11 @@ set (TADPOLE_NODE_SRC
 	node/AnimationControllerNode.cpp
 	node/AudioNode.cpp
 	node/CameraNode.cpp
-	node/Node.cpp
+	node/LabelNode.cpp
 	node/LightNode.cpp
 	node/MeshNode.cpp
 	node/MeshNodeSkeleton.cpp
+	node/Node.cpp
 	node/ParentNode.cpp
 	node/ParticleNode.cpp
 	node/RenderableNode.cpp
@@ -109,11 +110,12 @@ set (TADPOLE_NODE_HEADERS
 	node/AnimationControllerNode.h
 	node/AudioNode.h
 	node/CameraNode.h
-	node/Node.h
-	node/NodeDestroyedListener.h
+	node/LabelNode.h
 	node/LightNode.h
 	node/MeshNode.h
 	node/MeshNodeSkeleton.h
+	node/Node.h
+	node/NodeDestroyedListener.h
 	node/ParentNode.h
 	node/ParticleNode.h
 	node/RenderableNode.h

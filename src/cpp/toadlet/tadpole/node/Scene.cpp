@@ -39,7 +39,7 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-Scene::Scene():ParentNode(),
+Scene::Scene():super(),
 	mExcessiveDT(5000),
 	mLogicDT(100), // 10 fps
 	mLogicTime(0),
@@ -187,10 +187,10 @@ void Scene::logicUpdate(int dt){
 	mLogicTime+=dt;
 	mLogicFrame++;
 
-	logicUpdate(this,dt);
 	if(mBackground->getNumChildren()>0){
 		logicUpdate(mBackground,dt);
 	}
+	logicUpdate(this,dt);
 }
 
 void Scene::logicUpdate(Node::ptr node,int dt){
@@ -225,11 +225,10 @@ void Scene::postLogicUpdateLoop(int dt){
 void Scene::visualUpdate(int dt){
 	mVisualFrame++;
 
-	mLight=NULL;
-	visualUpdate(this,dt);
 	if(mBackground->getNumChildren()>0){
 		visualUpdate(mBackground,dt);
 	}
+	visualUpdate(this,dt);
 }
 
 void Scene::visualUpdate(Node::ptr node,int dt){
@@ -276,10 +275,6 @@ void Scene::visualUpdate(Node::ptr node,int dt){
 			parent->mWorldModifiedVisualFrame=parent->mWorldModifiedVisualFrame>child->mWorldModifiedVisualFrame?parent->mWorldModifiedVisualFrame:child->mWorldModifiedVisualFrame;
 		}
 	}
-	else if(node->isLight()){
-		// TODO: Find the best light
-		mLight=shared_static_cast<LightNode>(node);
-	}
 	else{
 		Math::setVector3FromMatrix4x4(node->mVisualWorldBound.origin,node->mVisualWorldTransform);
 		if(node->mIdentityTransform==false){
@@ -292,7 +287,7 @@ void Scene::visualUpdate(Node::ptr node,int dt){
 	}
 }
 
-void Scene::render(Renderer *renderer,CameraNode *camera){
+void Scene::render(Renderer *renderer,CameraNode *camera,Node *node){
 	#if defined(TOADLET_DEBUG)
 		if(destroyed()){
 			Error::unknown(Categories::TOADLET_TADPOLE,
@@ -325,26 +320,28 @@ void Scene::render(Renderer *renderer,CameraNode *camera){
 	renderer->setProjectionMatrix(mCamera->mProjectionTransform);
 	renderer->setViewMatrix(mCamera->mViewTransform);
 	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
-
-	// TODO: Gather lights in queueRenderables
-	if(mLight!=NULL){
-		renderer->setLight(0,mLight->internal_getLight());
-		renderer->setLightEnabled(0,true);
-	}
-	else{
-		renderer->setLightEnabled(0,false);
-	}
-
 	renderer->setAmbientColor(mAmbientColor);
 
 	mCamera->mNumCulledEntities=0;
 
-	if(mBackground->getNumChildren()>0){
+	mLight=NULL;
+
+	// Only render background when rendering from the scene
+	if(node==this && mBackground->getNumChildren()>0){
 		mBackground->setTranslate(mCamera->getVisualWorldTranslate());
 		visualUpdate(mBackground,0);
 		queueRenderables(mBackground);
 	}
-	queueRenderables(this);
+	queueRenderables(node);
+
+	if(mLight!=NULL){
+		renderer->setLight(0,mLight->internal_getLight());
+		renderer->setLightEnabled(0,true);
+		mLight=NULL;
+	}
+	else{
+		renderer->setLightEnabled(0,false);
+	}
 
 	bool renderedLayer=false;
 	for(i=0;i<mRenderLayers.size();++i){
@@ -380,9 +377,6 @@ void Scene::render(Renderer *renderer,CameraNode *camera){
 		mPreviousMaterial=NULL;
 
 		postLayerRender(renderer,layerNum);
-
-		// This is necessary for some hardware accelerated devices to depth buffer clear properly
-		renderer->setDepthWrite(true);
 	}
 
 	mCamera=NULL;
@@ -415,6 +409,10 @@ void Scene::queueRenderables(Node *node){
 		for(i=0;i<numChildren;++i){
 			queueRenderables(parent->mChildren[i]);
 		}
+	}
+	else if(node->isLight()){
+		// TODO: Find the best light
+		mLight=(LightNode*)node;
 	}
 	else if(node->isRenderable()){
 		RenderableNode *renderable=(RenderableNode*)node;

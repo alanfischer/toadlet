@@ -66,8 +66,10 @@ public:
 
 	inline bool destroyed() const{return !mCreated;}
 	virtual bool isParent() const{return false;}
+	// I'd like to be able to remove these two members, probably involving some sort of queueRenderable Node function which
+	//  is overridden
 	virtual bool isRenderable() const{return false;}
-	virtual bool isLight() const{return false;} // This one at least should be moved out to visualUpdate() in the LightNode
+	virtual bool isLight() const{return false;}
 
 	virtual void setNodeDestroyedListener(NodeDestroyedListener *listener,bool owns);
 	inline NodeDestroyedListener *getNodeDestroyedListener() const{return mNodeDestroyedListener;}

@@ -34,7 +34,7 @@ namespace node{
 
 TOADLET_NODE_IMPLEMENT(ParentNode,"toadlet::tadpole::node::ParentNode");
 
-ParentNode::ParentNode():Node(),
+ParentNode::ParentNode():super(),
 	mShadowChildrenDirty(false)
 {
 }

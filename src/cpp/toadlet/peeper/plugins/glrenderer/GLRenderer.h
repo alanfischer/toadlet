@@ -148,7 +148,7 @@ protected:
 	bool mPBuffersAvailable;
 	bool mFBOsAvailable;
 
-	// Cached render state attributes
+	bool mDepthWrite;
 	FaceCulling mFaceCulling;
 	bool mInTexGen;
 	bool mMirrorY;

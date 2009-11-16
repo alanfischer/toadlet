@@ -48,6 +48,23 @@ public:
 
 	virtual void queueRenderables(Scene *scene){}
 
+	#if defined(TOADLET_GCC_INHERITANCE_BUG)
+		template<typename RenderableNodeType>
+		class RenderableWorkaround:public Renderable{
+		public:
+			RenderableWorkaround(RenderableNodeType *node):renderableNode(node){}
+			RenderableNodeType *renderableNode;
+			const Material::ptr &getRenderMaterial() const{return renderableNode->getRenderMaterial();}
+			const Matrix4x4 &getRenderTransform() const{return renderableNode->getRenderTransform();}
+			void render(peeper::Renderer *renderer) const{renderableNode->render(renderer);}
+		};
+		#define TOADLET_GIB_DEFINE(type) toadlet::tadpole::node::RenderableNode::RenderableWorkaround<type> renderable;
+		#define TOADLET_GIB_IMPLEMENT() renderable(this),
+	#else
+		#define TOADLET_GIB_DEFINE(type)
+		#define TOADLET_GIB_IMPLEMENT()
+	#endif
+
 protected:
 	bool mVisible;
 

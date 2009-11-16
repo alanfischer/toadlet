@@ -24,9 +24,8 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
-#include <toadlet/tadpole/node/SpriteNode.h>
+#include <toadlet/tadpole/node/LabelNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
-#include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet::egg;
@@ -36,65 +35,37 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-TOADLET_NODE_IMPLEMENT(SpriteNode,"toadlet::tadpole::node::SpriteNode");
+TOADLET_NODE_IMPLEMENT(LabelNode,"toadlet::tadpole::node::LabelNode");
 
-SpriteNode::SpriteNode():super(),
+LabelNode::LabelNode():super(),
 	TOADLET_GIB_IMPLEMENT()
 
-	mFrame(0),
-	mWidth(0),
-	mHeight(0),
-	mScaled(false)
+	mFont(NULL),
+	mText(NULL),
+	mScaled(false),
+
+	mMaterial(NULL),
+	mVertexData(NULL),
+	mIndexData(NULL)
 {}
 
-Node *SpriteNode::create(Engine *engine){
+Node *LabelNode::create(Engine *engine){
 	super::create(engine);
 
-	mTexture=NULL;
-//	mAnimatedTexture=NULL;
-	mTextureMatrix.reset();
-
-	mFrame=0;
-	mWidth=0;
-	mHeight=0;
-	mScaled=true;
-
+	mFont=NULL;
 	mMaterial=NULL;
 	mVertexData=NULL;
 	mIndexData=NULL;
-
-	VertexBuffer::ptr vertexBuffer=engine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,4);
-	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
-	{
-		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
-
-		vba.set3(0,0, -Math::HALF,Math::HALF,0);
-		vba.set2(0,1, 0,0);
-
-		vba.set3(1,0, Math::HALF,Math::HALF,0);
-		vba.set2(1,1, Math::ONE,0);
-
-		vba.set3(2,0, -Math::HALF,-Math::HALF,0);
-		vba.set2(2,1, 0,Math::ONE);
-
-		vba.set3(3,0, Math::HALF,-Math::HALF,0);
-		vba.set2(3,1, Math::ONE,Math::ONE);
-
-		vba.unlock();
-	}
-
-	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,4));
-
+	
 	mMaterial=engine->getMaterialManager()->createMaterial();
 	mMaterial->retain();
-
 	mMaterial->setFaceCulling(Renderer::FaceCulling_NONE);
 	mMaterial->setDepthWrite(false);
 
 	return this;
 }
 
-void SpriteNode::destroy(){
+void LabelNode::destroy(){
 	if(mVertexData!=NULL){
 		mVertexData->destroy();
 		mVertexData=NULL;
@@ -113,62 +84,21 @@ void SpriteNode::destroy(){
 	super::destroy();
 }
 
-void SpriteNode::load(scalar width,scalar height,bool scaled,const String &name){
-	load(width,height,scaled,mEngine->getTextureManager()->findTexture(name));
+void LabelNode::setFont(const Font::ptr &font){
+	mFont=font;
+	rebuild();
 }
 
-void SpriteNode::load(scalar width,scalar height,bool scaled,Texture::ptr texture){
-	mTexture=texture;
+void LabelNode::setText(const String &text){
+	mText=text;
+	rebuild();
+}
 
-	if(mTexture==NULL){
-		Error::invalidParameters(Categories::TOADLET_TADPOLE,
-			"Invalid Texture");
-		return;
-	}
-
-//	if(mTexture->getType()==Texture::Type_ANIMATED){
-//		mAnimatedTexture=shared_static_cast<AnimatedTexture>(texture);
-//	}
-//	else{
-//		mAnimatedTexture=NULL;
-		mTextureMatrix.set(Math::IDENTITY_MATRIX4X4);
-		TextureStage::ptr textureStage(new TextureStage(mTexture));
-		textureStage->setSAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
-		textureStage->setTAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
-		textureStage->setCalculation(TextureStage::Calculation_NORMAL,mTextureMatrix);
-		mMaterial->setTextureStage(0,textureStage);
-//	}
-
-	if(scaled){
-		scalar hw=width/2;
-		scalar hh=height/2;
-		mBoundingRadius=Math::sqrt(Math::square(hw) + Math::square(hh));
-	}
-	else{
-		mBoundingRadius=-Math::ONE;
-	}
-
-	mWidth=width;
-	mHeight=height;
+void LabelNode::setScaled(bool scaled){
 	mScaled=scaled;
-
-	updateFrame();
 }
 
-void SpriteNode::setFrame(int frame){
-	mFrame=frame;
-	updateFrame();
-}
-
-int SpriteNode::getNumFrames() const{
-	int numFrames=1;
-//	if(mAnimatedTexture!=NULL){
-//		numFrames=mAnimatedTexture->getNumFrames();
-//	}
-	return numFrames;
-}
-
-void SpriteNode::queueRenderables(Scene *scene){
+void LabelNode::queueRenderables(Scene *scene){
 	Matrix4x4 &scale=cache_queueRenderables_scale.reset();
 	Vector4 &point=cache_queueRenderables_point.reset();
 	const Matrix4x4 &viewTransform=scene->getCamera()->getViewTransform();
@@ -193,16 +123,16 @@ void SpriteNode::queueRenderables(Scene *scene){
 
 	scale.reset();
 	if(mScaled){
-		scale.setAt(0,0,mWidth);
-		scale.setAt(1,1,mHeight);
+		scale.setAt(0,0,Math::ONE);
+		scale.setAt(1,1,Math::ONE);
 		scale.setAt(2,2,Math::ONE);
 	}
 	else{
 		point.set(mVisualWorldTransform.at(0,3),mVisualWorldTransform.at(1,3),mVisualWorldTransform.at(2,3),Math::ONE);
 		Math::mul(point,viewTransform);
 		Math::mul(point,projectionTransform);
-		scale.setAt(0,0,Math::mul(point.w,mWidth));
-		scale.setAt(1,1,Math::mul(point.w,mHeight));
+		scale.setAt(0,0,point.w);
+		scale.setAt(1,1,point.w);
 		scale.setAt(2,2,Math::ONE);
 	}
 
@@ -220,19 +150,64 @@ void SpriteNode::queueRenderables(Scene *scene){
 #endif
 }
 
-void SpriteNode::render(Renderer *renderer) const{
+void LabelNode::render(Renderer *renderer) const{
 	renderer->renderPrimitive(mVertexData,mIndexData);
 }
 
-void SpriteNode::updateFrame(){
-//	if(mAnimatedTexture!=NULL){
-//		mAnimatedTexture->getMatrix4x4ForFrame(mFrame,mTextureMatrix);
-//		TextureStage::ptr textureStage(new TextureStage(mAnimatedTexture->getTextureForFrame(mFrame)));
-//		textureStage->setSAddressMode(Texture::AddressMode_CLAMP_TO_EDGE);
-//		textureStage->setTAddressMode(Texture::AddressMode_CLAMP_TO_EDGE);
-//		textureStage->setTextureMatrix(mTextureMatrix);
-//		mMaterial->setTextureStage(0,textureStage);
+void LabelNode::rebuild(){
+	String text=mText;
+//	if(mWordWrap){
+//		text=wordWrap(mFont,mWidth,text);
 //	}
+
+	int length=text.length();
+
+	if(mVertexData==NULL || mVertexData->getVertexBuffer(0)->getSize()/4<length){
+		int i,ix;
+
+		VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_DYNAMIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,length*4);
+		mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+
+		IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::UsageFlags_DYNAMIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,length*6);
+		mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,length*6));
+
+		{
+			uint16 *data=(uint16*)indexBuffer->lock(Buffer::AccessType_WRITE_ONLY);
+			for(i=0;i<length;i++){
+				ix=i*6;
+				data[ix+0]=i*4+0;
+				data[ix+1]=i*4+1;
+				data[ix+2]=i*4+3;
+				data[ix+3]=i*4+3;
+				data[ix+4]=i*4+1;
+				data[ix+5]=i*4+2;
+			}
+			indexBuffer->unlock();
+		}
+	}
+
+	int alignment=Font::Alignment_BIT_VCENTER|Font::Alignment_BIT_HCENTER;
+	mFont->updateVertexBufferForString(mVertexData->getVertexBuffer(0),text,Colors::WHITE,alignment);
+	mIndexData->setCount(length*6);
+
+	Texture::ptr texture=mFont->getTexture();
+	mMaterial->setTextureStage(0,TextureStage::ptr(new TextureStage(texture)));
+	if((texture->getFormat()&Texture::Format_BIT_A)>0){
+		mMaterial->setBlend(Blend::Combination_ALPHA);
+	}
+	else{
+		mMaterial->setBlend(Blend::Combination_COLOR);
+	}
+/*
+	if(scaled){
+		scalar hw=width/2;
+		scalar hh=height/2;
+		mBoundingRadius=Math::sqrt(Math::square(hw) + Math::square(hh));
+	}
+	else{
+		mBoundingRadius=-Math::ONE;
+	}
+*/
 }
 
 }
