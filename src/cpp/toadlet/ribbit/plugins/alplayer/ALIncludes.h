@@ -30,14 +30,14 @@
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/ribbit/Types.h>
 
-#if defined(TOADLET_PLATFORM_WIN32) || defined(TOADLET_PLATFORM_POSIX)
-	#define TOADLET_HAS_ALEM
-	#include "alem/alem.h"
-#elif defined(TOADLET_PLATFORM_OSX)
+#if defined(TOADLET_PLATFORM_OSX)
 	extern "C" {
 		#include <OpenAL/al.h>
 		#include <OpenAL/alc.h>
 	}
+#elif defined(TOADLET_PLATFORM_WIN32) || defined(TOADLET_PLATFORM_POSIX)
+	#define TOADLET_HAS_ALEM
+	#include "alem/alem.h"
 #else
 	#error "Unknown platform"
 #endif
