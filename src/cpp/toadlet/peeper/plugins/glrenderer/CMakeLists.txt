@@ -111,8 +111,9 @@ elseif (TOADLET_PLATFORM_WIN32)
 endif (TOADLET_PLATFORM_WINCE)
 
 
-# Dependencies - note that glew has already been found
+# Dependencies - note these have already been searched for
 include_directories (${GLEW_INCLUDE_DIR})
+
 
 # Dynamic libs
 if (TOADLET_PLATFORM_WINCE)
@@ -121,8 +122,10 @@ elseif (TOADLET_PLATFORM_IPHONEOS OR TOADLET_PLATFORM_IPHONESIMULATOR)
 	find_library (UIKIT_LIBS UIKit)
 	set (PEEPER_GLRENDERER_LIBS objc ${UIKIT_LIBS})
 elseif (TOADLET_PLATFORM_OSX)
+	find_package (OPENGL REQUIRED)
 	find_library (APPKIT_LIBS AppKit)
-	set (PEEPER_GLRENDERER_LIBS objc ${APPKIT_LIBS} ${GLEW_LIBRARY})
+	include_directories (${OPENGL_INCLUDE_DIR})
+	set (PEEPER_GLRENDERER_LIBS objc ${APPKIT_LIBS} ${GLEW_LIBRARY} ${OPENGL_LIBRARY})
 else (TOADLET_PLATFORM_WINCE)
 	set (PEEPER_GLRENDERER_LIBS ${GLEW_LIBRARY})
 endif (TOADLET_PLATFORM_WINCE)
@@ -134,8 +137,10 @@ elseif (TOADLET_PLATFORM_IPHONE)
 	find_library (UIKIT_LIBS UIKit)
 	set (PEEPER_GLRENDERER_LIBS_S objc ${UIKIT_LIBS})
 elseif (TOADLET_PLATFORM_OSX)
+	find_package (OPENGL REQUIRED)
 	find_library (APPKIT_LIBS AppKit)
-	set (PEEPER_GLRENDERER_LIBS_S objc ${APPKIT_LIBS} ${GLEW_LIBRARY})
+	include_directories (${OPENGL_INCLUDE_DIR})
+	set (PEEPER_GLRENDERER_LIBS_S objc ${APPKIT_LIBS} ${GLEW_LIBRARY} ${OPENGL_LIBRARY})
 else (TOADLET_PLATFORM_WINCE)
 	add_library (libglew_s STATIC IMPORTED)
 	if (TOADLET_PLATFORM_POSIX)
