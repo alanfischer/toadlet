@@ -34,9 +34,9 @@ TextureStage::TextureStage():
 
 	//blend,
 
-	sAddressMode(AddressMode_REPEAT),
-	tAddressMode(AddressMode_REPEAT),
-	rAddressMode(AddressMode_REPEAT),
+	uAddressMode(AddressMode_REPEAT),
+	vAddressMode(AddressMode_REPEAT),
+	wAddressMode(AddressMode_REPEAT),
 
 	minFilter(Filter_NEAREST),
 	mipFilter(Filter_NONE),
@@ -55,9 +55,9 @@ TextureStage::TextureStage(const Texture::ptr &texture1):
 
 	//blend,
 
-	sAddressMode(AddressMode_REPEAT),
-	tAddressMode(AddressMode_REPEAT),
-	rAddressMode(AddressMode_REPEAT),
+	uAddressMode(AddressMode_REPEAT),
+	vAddressMode(AddressMode_REPEAT),
+	wAddressMode(AddressMode_REPEAT),
 
 	minFilter(Filter_NEAREST),
 	mipFilter(Filter_NONE),
@@ -92,9 +92,9 @@ TextureStage::ptr TextureStage::clone() const{
 
 	textureStage->blend.set(blend);
 
-	textureStage->sAddressMode=sAddressMode;
-	textureStage->tAddressMode=tAddressMode;
-	textureStage->rAddressMode=rAddressMode;
+	textureStage->uAddressMode=uAddressMode;
+	textureStage->vAddressMode=vAddressMode;
+	textureStage->wAddressMode=wAddressMode;
 
 	textureStage->minFilter=minFilter;
 	textureStage->mipFilter=mipFilter;

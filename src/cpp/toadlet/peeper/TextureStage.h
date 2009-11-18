@@ -71,12 +71,12 @@ public:
 	void setBlend(const TextureBlend &blend1){blend.set(blend1);}
 	inline const TextureBlend &getBlend() const{return blend;}
 
-	void setSAddressMode(AddressMode addressMode){sAddressMode=addressMode;}
-	inline AddressMode getSAddressMode() const{return sAddressMode;}
-	void setTAddressMode(AddressMode addressMode){tAddressMode=addressMode;}
-	inline AddressMode getTAddressMode() const{return tAddressMode;}
-	void setRAddressMode(AddressMode addressMode){rAddressMode=addressMode;}
-	inline AddressMode getRAddressMode() const{return rAddressMode;}
+	void setUAddressMode(AddressMode addressMode){uAddressMode=addressMode;}
+	inline AddressMode getUAddressMode() const{return uAddressMode;}
+	void setVAddressMode(AddressMode addressMode){vAddressMode=addressMode;}
+	inline AddressMode getVAddressMode() const{return vAddressMode;}
+	void setWAddressMode(AddressMode addressMode){wAddressMode=addressMode;}
+	inline AddressMode getWAddressMode() const{return wAddressMode;}
 
 	void setMinFilter(Filter minf){minFilter=minf;}
 	inline Filter getMinFilter() const{return minFilter;}
@@ -97,9 +97,9 @@ public:
 
 	TextureBlend blend;
 
-	AddressMode sAddressMode;
-	AddressMode tAddressMode;
-	AddressMode rAddressMode;
+	AddressMode uAddressMode;
+	AddressMode vAddressMode;
+	AddressMode wAddressMode;
 
 	Filter minFilter;
 	Filter mipFilter;

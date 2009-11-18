@@ -1200,11 +1200,11 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 			#else
 				gl_version>=12;
 			#endif
-		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_S,GLTexture::getGLWrap(textureStage->sAddressMode,hasClampToEdge));
-		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_T,GLTexture::getGLWrap(textureStage->tAddressMode,hasClampToEdge));
+		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_S,GLTexture::getGLWrap(textureStage->uAddressMode,hasClampToEdge));
+		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_T,GLTexture::getGLWrap(textureStage->vAddressMode,hasClampToEdge));
 		#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_12)
 		if(gl_version>=12){
-			glTexParameteri(textureTarget,GL_TEXTURE_WRAP_R,GLTexture::getGLWrap(textureStage->rAddressMode,hasClampToEdge));
+			glTexParameteri(textureTarget,GL_TEXTURE_WRAP_R,GLTexture::getGLWrap(textureStage->wAddressMode,hasClampToEdge));
 		}
 		#endif
 

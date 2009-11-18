@@ -25,6 +25,7 @@
 
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/System.h>
 #include <toadlet/egg/io/InputStream.h>
 #include <toadlet/egg/io/OutputStream.h>
 #include <toadlet/egg/io/FileInputStream.h>
@@ -347,7 +348,13 @@ InputStream::ptr Engine::makeInputStream(const String &name){
 		in=mInputStreamFactory->makeInputStream(name);
 	}
 	else{
-		FileInputStream::ptr fin(new FileInputStream(mDirectory+name));
+		FileInputStream::ptr fin;
+		if(System::absolutePath(name)==false){
+			fin=FileInputStream::ptr(new FileInputStream(mDirectory+name));
+		}
+		else{
+			fin=FileInputStream::ptr(new FileInputStream(name));
+		}
 		if(fin->isOpen()){
 			in=fin;
 		}

@@ -90,8 +90,8 @@ public:
 	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
-	void load(const egg::String &name);
-	void load(mesh::Mesh::ptr mesh);
+	void start(const egg::String &name);
+	void start(mesh::Mesh::ptr mesh);
 
 	inline const mesh::Mesh::ptr &getMesh() const{return mMesh;}
 

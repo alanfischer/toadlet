@@ -26,10 +26,11 @@
 #ifndef TOADLET_TADPOLE_NODE_NODE_H
 #define TOADLET_TADPOLE_NODE_NODE_H
 
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/egg/Event.h>
 #include <toadlet/egg/IntrusivePointer.h>
 #include <toadlet/egg/WeakPointer.h>
 #include <toadlet/egg/Type.h>
+#include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/node/NodeDestroyedListener.h>
 
 #ifndef TOADLET_NODE
@@ -92,6 +93,8 @@ public:
 
 	inline bool isIdentityTransform() const{return mIdentityTransform;}
 
+	virtual void handleEvent(const egg::Event::ptr &event){}
+	
 	virtual void setScope(int scope);
 	inline int getScope() const{return mScope;}
 

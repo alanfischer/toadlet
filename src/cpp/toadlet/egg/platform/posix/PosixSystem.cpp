@@ -58,6 +58,11 @@ uint64 PosixSystem::mtime(){
 	return ((uint64)now.tv_sec)*1000+((uint64)(now.tv_usec))/1000;
 }
 
+bool PosixSystem::absolutePath(const String &path){
+	int length=path.length();
+	return	(length>0 && path.at(0)=='/');
+}
+
 String PosixSystem::getEnv(const String &name){
 	return getenv(name);
 }

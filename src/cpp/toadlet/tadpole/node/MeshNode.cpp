@@ -147,32 +147,42 @@ void MeshNode::destroy(){
 
 	if(mMesh!=NULL){
 		mMesh->release();
+		mMesh=NULL;
 	}
 
 	super::destroy();
 }
 
-void MeshNode::load(const String &name){
-	load(mEngine->getMeshManager()->findMesh(name));
+void MeshNode::start(const String &name){
+	start(mEngine->getMeshManager()->findMesh(name));
 }
 
-void MeshNode::load(Mesh::ptr mesh){
+void MeshNode::start(Mesh::ptr mesh){
 	mSubMeshes.clear();
+
+	if(mAnimationController!=NULL){
+		mAnimationController->stop();
+		mAnimationController=NULL;
+	}
+
+	if(mDynamicVertexData!=NULL){
+		mDynamicVertexData->destroy();
+		mDynamicVertexData=NULL;
+	}
 
 	if(mMesh!=NULL){
 		mMesh->release();
+		mMesh=NULL;
 	}
 
-	mMesh=mesh;
-
-	if(mMesh==NULL){
+	if(mesh==NULL){
 		Error::invalidParameters(Categories::TOADLET_TADPOLE,
 			"Invalid Mesh");
 		return;
 	}
-	else{
-		mMesh->retain();
-	}
+
+	mMesh=mesh;
+	mMesh->retain();
 
 	if(mMesh->boundingRadius!=Math::ONE){
 		mBoundingRadius=Math::mul(mMesh->worldScale,mMesh->boundingRadius);

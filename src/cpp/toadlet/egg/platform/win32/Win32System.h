@@ -39,6 +39,8 @@ public:
 	static uint64 utime();
 	static uint64 mtime();
 
+	static bool absolutePath(const String &path);
+
 #	if !defined(TOADLET_PLATFORM_WINCE)
 		static String getEnv(const String &name);
 #	endif

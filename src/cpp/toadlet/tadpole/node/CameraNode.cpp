@@ -48,6 +48,7 @@ CameraNode::CameraNode():super(),
 	mClearFlags(0),
 	//mClearColor,
 	mSkipFirstClear(false),
+	mMidNode(NULL),
 
 	//mVisualBoundingOrigin,
 	//mWorldTranslate,
@@ -69,6 +70,7 @@ Node *CameraNode::create(Engine *engine){
 	mClearFlags=Renderer::ClearFlag_COLOR|Renderer::ClearFlag_DEPTH;
 	mClearColor.reset();
 	mSkipFirstClear=false;
+	mMidNode=NULL;
 
 	updateViewTransform();
 
@@ -88,7 +90,7 @@ void CameraNode::setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,sca
 
 	Math::setMatrix4x4FromPerspectiveX(mProjectionTransform,fovx,aspect,nearDist,farDist);
 
-	mBoundingRadius=mFarDist/2;
+	update();
 }
 
 void CameraNode::setProjectionFovY(scalar fovy,scalar aspect,scalar nearDist,scalar farDist){
@@ -98,7 +100,7 @@ void CameraNode::setProjectionFovY(scalar fovy,scalar aspect,scalar nearDist,sca
 
 	Math::setMatrix4x4FromPerspectiveY(mProjectionTransform,fovy,aspect,nearDist,farDist);
 
-	mBoundingRadius=mFarDist/2;
+	update();
 }
 
 void CameraNode::setProjectionOrtho(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist){
@@ -109,7 +111,7 @@ void CameraNode::setProjectionOrtho(scalar leftDist,scalar rightDist,scalar bott
 
 	Math::setMatrix4x4FromOrtho(mProjectionTransform,leftDist,rightDist,bottomDist,topDist,nearDist,farDist);
 
-	mBoundingRadius=mFarDist/2;
+	update();
 }
 
 void CameraNode::setProjectionFrustum(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist){
@@ -120,7 +122,7 @@ void CameraNode::setProjectionFrustum(scalar leftDist,scalar rightDist,scalar bo
 
 	Math::setMatrix4x4FromFrustum(mProjectionTransform,leftDist,rightDist,bottomDist,topDist,nearDist,farDist);
 
-	mBoundingRadius=mFarDist/2;
+	update();
 }
 
 void CameraNode::setProjectionTransform(const Matrix4x4 &transform){
@@ -128,7 +130,9 @@ void CameraNode::setProjectionTransform(const Matrix4x4 &transform){
 
 	mProjectionTransform.set(transform);
 
-	/// @todo  need to set mBoundingRadius
+	// TODO: Set mNearDist and mFarDist
+
+	update();
 }
 
 void CameraNode::setProjectionRotation(scalar rotate){
@@ -189,6 +193,15 @@ void CameraNode::setClearColor(Color clearColor){
 
 void CameraNode::setSkipFirstClear(bool skip){
 	mSkipFirstClear=skip;
+}
+
+ParentNode::ptr CameraNode::getMidNode(){
+	if(mMidNode==NULL){
+		mMidNode=mEngine->createNodeType(ParentNode::type());
+		attach(mMidNode);
+		update();
+	}
+	return mMidNode;
 }
 
 void CameraNode::updateViewTransform(){
@@ -266,6 +279,13 @@ void CameraNode::updateFramesPerSecond(){
 		mFPSLastTime=fpsTime;
 		mFPSFrameCount=0;
 		mFPS=fps;
+	}
+}
+
+void CameraNode::update(){
+	mBoundingRadius=mFarDist/2;
+	if(mMidNode!=NULL){
+		mMidNode->setTranslate(0,0,-(mFarDist-mNearDist)/2);
 	}
 }
 
