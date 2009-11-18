@@ -51,6 +51,8 @@ public:
 	inline int getNumChildren() const{return mChildren.size();}
 	inline Node *getChild(int i) const{return mChildren[i];}
 
+	virtual void handleEvent(const egg::Event::ptr &event);
+
 protected:
 	void updateShadowChildren();
 

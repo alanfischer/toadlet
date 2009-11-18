@@ -109,6 +109,14 @@ bool ParentNode::remove(Node *node){
 	}
 }
 
+void ParentNode::handleEvent(const Event::ptr &event){
+	int numChildren=mShadowChildren.size();
+	int i;
+	for(i=0;i<numChildren;++i){
+		mShadowChildren[i]->handleEvent(event);
+	}
+}
+
 void ParentNode::updateShadowChildren(){
 	mShadowChildrenDirty=false;
 

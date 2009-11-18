@@ -52,6 +52,12 @@ uint64 Win32System::mtime(){
 	return GetTickCount();
 }
 
+bool Win32System::absolutePath(const String &path){
+	int length=path.length();
+	return	(length>3 && path.at(1)==':' && (path.at(2)=='\\' || path.at(2)=='/')) ||
+			(length>2 && ((path.at(0)=='/' && path.at(1)=='/') || (path.at(0)=='\\' && path.at(1)=='\\')));
+}
+
 #if !defined(TOADLET_PLATFORM_WINCE)
 	String Win32System::getEnv(const String &name){
 		TCHAR result[1024];

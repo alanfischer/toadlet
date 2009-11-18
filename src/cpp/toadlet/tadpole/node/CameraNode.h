@@ -67,6 +67,8 @@ public:
 	void setClearColor(peeper::Color clearColor);
 	void setSkipFirstClear(bool skip);
 
+	ParentNode::ptr getMidNode();
+
 	inline ProjectionType getProjectionType() const{return mProjectionType;}
 	inline scalar getFov() const{return mFov;}
 	inline scalar getAspect() const{return mAspect;}
@@ -101,6 +103,8 @@ public:
 	inline scalar getFramesPerSecond() const{return mFPS;}
 
 protected:
+	void update();
+
 	ProjectionType mProjectionType;
 	scalar mFov,mAspect;
 	scalar mLeftDist,mRightDist;
@@ -112,6 +116,7 @@ protected:
 	int mClearFlags;
 	peeper::Color mClearColor;
 	bool mSkipFirstClear;
+	ParentNode::ptr mMidNode;
 
 	Vector3 mVisualBoundingOrigin;
 	Vector3 mVisualWorldTranslate;

@@ -41,55 +41,21 @@ TOADLET_NODE_IMPLEMENT(SpriteNode,"toadlet::tadpole::node::SpriteNode");
 SpriteNode::SpriteNode():super(),
 	TOADLET_GIB_IMPLEMENT()
 
-	mFrame(0),
-	mWidth(0),
-	mHeight(0),
-	mScaled(false)
+	mCentered(false),
+	mScaled(false),
+	mMaterial(NULL),
+	mVertexData(NULL),
+	mIndexData(NULL)
 {}
 
 Node *SpriteNode::create(Engine *engine){
 	super::create(engine);
 
-	mTexture=NULL;
-//	mAnimatedTexture=NULL;
-	mTextureMatrix.reset();
-
-	mFrame=0;
-	mWidth=0;
-	mHeight=0;
-	mScaled=true;
-
+	mCentered=false;
+	mScaled=false;
 	mMaterial=NULL;
 	mVertexData=NULL;
 	mIndexData=NULL;
-
-	VertexBuffer::ptr vertexBuffer=engine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,4);
-	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
-	{
-		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
-
-		vba.set3(0,0, -Math::HALF,Math::HALF,0);
-		vba.set2(0,1, 0,0);
-
-		vba.set3(1,0, Math::HALF,Math::HALF,0);
-		vba.set2(1,1, Math::ONE,0);
-
-		vba.set3(2,0, -Math::HALF,-Math::HALF,0);
-		vba.set2(2,1, 0,Math::ONE);
-
-		vba.set3(3,0, Math::HALF,-Math::HALF,0);
-		vba.set2(3,1, Math::ONE,Math::ONE);
-
-		vba.unlock();
-	}
-
-	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,4));
-
-	mMaterial=engine->getMaterialManager()->createMaterial();
-	mMaterial->retain();
-
-	mMaterial->setFaceCulling(Renderer::FaceCulling_NONE);
-	mMaterial->setDepthWrite(false);
 
 	return this;
 }
@@ -113,59 +79,84 @@ void SpriteNode::destroy(){
 	super::destroy();
 }
 
-void SpriteNode::load(scalar width,scalar height,bool scaled,const String &name){
-	load(width,height,scaled,mEngine->getTextureManager()->findTexture(name));
+void SpriteNode::start(const String &material,bool scaled,bool centered,scalar width,scalar height){
+	start(mEngine->getMaterialManager()->findMaterial(material),scaled,centered,width,height);
 }
 
-void SpriteNode::load(scalar width,scalar height,bool scaled,Texture::ptr texture){
-	mTexture=texture;
-
-	if(mTexture==NULL){
-		Error::invalidParameters(Categories::TOADLET_TADPOLE,
-			"Invalid Texture");
-		return;
+void SpriteNode::start(const Material::ptr &material,bool scaled,bool centered,scalar width,scalar height){
+	if(mVertexData!=NULL){
+		mVertexData->destroy();
+		mVertexData=NULL;
+	}
+	
+	if(mIndexData!=NULL){
+		mIndexData->destroy();
+		mIndexData=NULL;
+	}
+	
+	if(mMaterial!=NULL){
+		mMaterial->release();
+		mMaterial=NULL;
 	}
 
-//	if(mTexture->getType()==Texture::Type_ANIMATED){
-//		mAnimatedTexture=shared_static_cast<AnimatedTexture>(texture);
-//	}
-//	else{
-//		mAnimatedTexture=NULL;
-		mTextureMatrix.set(Math::IDENTITY_MATRIX4X4);
-		TextureStage::ptr textureStage(new TextureStage(mTexture));
-		textureStage->setSAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
-		textureStage->setTAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
-		textureStage->setCalculation(TextureStage::Calculation_NORMAL,mTextureMatrix);
-		mMaterial->setTextureStage(0,textureStage);
-//	}
+	mMaterial=material;
+	mMaterial->retain();
 
-	if(scaled){
-		scalar hw=width/2;
-		scalar hh=height/2;
-		mBoundingRadius=Math::sqrt(Math::square(hw) + Math::square(hh));
+	// TODO: Move these so they are set externally, perhaps in a material manager loadspritematerial or something
+	//  Then we'd just have a debug check here to look for faceculling perhaps...?
+	mMaterial->setFaceCulling(Renderer::FaceCulling_NONE);
+	mMaterial->setDepthWrite(false);
+	int i;
+	for(i=0;i<mMaterial->getNumTextureStages();++i){
+		mMaterial->getTextureStage(i)->setUAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
+		mMaterial->getTextureStage(i)->setVAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
+		mMaterial->getTextureStage(i)->setWAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
+	}
+
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,4);
+	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+	if(centered){
+		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
+
+		vba.set3(0,0, -Math::HALF,Math::HALF,0);
+		vba.set2(0,1, 0,0);
+
+		vba.set3(1,0, Math::HALF,Math::HALF,0);
+		vba.set2(1,1, Math::ONE,0);
+
+		vba.set3(2,0, -Math::HALF,-Math::HALF,0);
+		vba.set2(2,1, 0,Math::ONE);
+
+		vba.set3(3,0, Math::HALF,-Math::HALF,0);
+		vba.set2(3,1, Math::ONE,Math::ONE);
+
+		vba.unlock();
 	}
 	else{
-		mBoundingRadius=-Math::ONE;
+		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
+
+		vba.set3(0,0, 0,Math::ONE,0);
+		vba.set2(0,1, 0,0);
+
+		vba.set3(1,0, Math::ONE,Math::ONE,0);
+		vba.set2(1,1, Math::ONE,0);
+
+		vba.set3(2,0, 0,0,0);
+		vba.set2(2,1, 0,Math::ONE);
+
+		vba.set3(3,0, Math::ONE,0,0);
+		vba.set2(3,1, Math::ONE,Math::ONE);
+
+		vba.unlock();
 	}
 
-	mWidth=width;
-	mHeight=height;
+	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,4));
+
+	mCentered=centered;
 	mScaled=scaled;
+	setScale(width,height,Math::ONE);
 
-	updateFrame();
-}
-
-void SpriteNode::setFrame(int frame){
-	mFrame=frame;
-	updateFrame();
-}
-
-int SpriteNode::getNumFrames() const{
-	int numFrames=1;
-//	if(mAnimatedTexture!=NULL){
-//		numFrames=mAnimatedTexture->getNumFrames();
-//	}
-	return numFrames;
+	mBoundingRadius=mScaled?Math::sqrt(Math::square(width/2) + Math::square(height/2)):-Math::ONE;
 }
 
 void SpriteNode::queueRenderables(Scene *scene){
@@ -191,25 +182,20 @@ void SpriteNode::queueRenderables(Scene *scene){
 	mVisualWorldTransform.setAt(1,2,viewTransform.at(2,1));
 	mVisualWorldTransform.setAt(2,2,viewTransform.at(2,2));
 
-	scale.reset();
+	// Get scale information from rotate
 	if(mScaled){
-		scale.setAt(0,0,mWidth);
-		scale.setAt(1,1,mHeight);
-		scale.setAt(2,2,Math::ONE);
+		scale.setAt(0,0,mScale.x);
+		scale.setAt(1,1,mScale.y);
+		scale.setAt(2,2,mScale.z);
 	}
 	else{
 		point.set(mVisualWorldTransform.at(0,3),mVisualWorldTransform.at(1,3),mVisualWorldTransform.at(2,3),Math::ONE);
 		Math::mul(point,viewTransform);
 		Math::mul(point,projectionTransform);
-		scale.setAt(0,0,Math::mul(point.w,mWidth));
-		scale.setAt(1,1,Math::mul(point.w,mHeight));
-		scale.setAt(2,2,Math::ONE);
+		scale.setAt(0,0,Math::mul(point.w,mScale.x));
+		scale.setAt(1,1,Math::mul(point.w,mScale.y));
+		scale.setAt(2,2,Math::mul(point.w,mScale.z));
 	}
-
-	/// @todo  Modify this so we can have sprites of arbitrary orientations, and also have the scale passed by the
-	///  transform matrix, and not having to just grab the entities scale
-	scale.setAt(0,0,Math::mul(scale.at(0,0),mScale.x));
-	scale.setAt(1,1,Math::mul(scale.at(1,1),mScale.y));
 
 	Math::postMul(mVisualWorldTransform,scale);
 
@@ -222,17 +208,6 @@ void SpriteNode::queueRenderables(Scene *scene){
 
 void SpriteNode::render(Renderer *renderer) const{
 	renderer->renderPrimitive(mVertexData,mIndexData);
-}
-
-void SpriteNode::updateFrame(){
-//	if(mAnimatedTexture!=NULL){
-//		mAnimatedTexture->getMatrix4x4ForFrame(mFrame,mTextureMatrix);
-//		TextureStage::ptr textureStage(new TextureStage(mAnimatedTexture->getTextureForFrame(mFrame)));
-//		textureStage->setSAddressMode(Texture::AddressMode_CLAMP_TO_EDGE);
-//		textureStage->setTAddressMode(Texture::AddressMode_CLAMP_TO_EDGE);
-//		textureStage->setTextureMatrix(mTextureMatrix);
-//		mMaterial->setTextureStage(0,textureStage);
-//	}
 }
 
 }

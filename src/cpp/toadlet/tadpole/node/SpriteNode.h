@@ -26,7 +26,6 @@
 #ifndef TOADLET_TADPOLE_NODE_SPRITENODE_H
 #define TOADLET_TADPOLE_NODE_SPRITENODE_H
 
-//#include <toadlet/peeper/AnimatedTexture.h>
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
@@ -49,11 +48,8 @@ public:
 	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
-	void load(scalar width,scalar height,bool scaled,const egg::String &name);
-	void load(scalar width,scalar height,bool scaled,peeper::Texture::ptr texture);
-
-	void setFrame(int frame);
-	int getNumFrames() const;
+	void start(const egg::String &name,bool scaled=true,bool centered=true,scalar width=Math::ONE,scalar height=Math::ONE);
+	void start(const Material::ptr &name,bool scaled=true,bool centered=true,scalar width=Math::ONE,scalar height=Math::ONE);
 
 	virtual const Material::ptr &getRenderMaterial() const{return mMaterial;}
 	virtual const Matrix4x4 &getRenderTransform() const{return super::getVisualWorldTransform();}
@@ -66,17 +62,8 @@ public:
 protected:
 	TOADLET_GIB_DEFINE(SpriteNode);
 
-	void updateFrame();
-
-	peeper::Texture::ptr mTexture;
-//	peeper::AnimatedTexture::ptr mAnimatedTexture;
-	Matrix4x4 mTextureMatrix;
-
-	int mFrame;
-	scalar mWidth;
-	scalar mHeight;
+	bool mCentered;
 	bool mScaled;
-
 	Material::ptr mMaterial;
 	peeper::VertexData::ptr mVertexData;
 	peeper::IndexData::ptr mIndexData;
