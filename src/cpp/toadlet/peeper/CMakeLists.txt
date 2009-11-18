@@ -105,6 +105,7 @@ elseif (TOADLET_PLATFORM_IPHONE)
 	set (TOADLET_HAS_OPENGL ON PARENT_SCOPE)
 	add_subdirectory (plugins/glrenderer)
 elseif (TOADLET_PLATFORM_POSIX)
+	# On posix we find opengl dynamically provided we have glew
 	find_package (GLEW)
 	if (GLEW_FOUND)
 		set (TOADLET_HAS_OPENGL ON PARENT_SCOPE)
