@@ -43,6 +43,7 @@ public:
 
 	virtual bool isParent() const{return true;}
 
+	virtual void destroyAllChildren();
 	virtual void removeAllNodeDestroyedListeners();
 
 	virtual bool attach(Node *node);

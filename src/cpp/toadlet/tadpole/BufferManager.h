@@ -35,9 +35,10 @@ namespace tadpole{
 
 class Engine;
 
-class TOADLET_API BufferManager{
+class TOADLET_API BufferManager:public peeper::BufferDestroyedListener{
 public:
 	BufferManager(Engine *engine);
+	virtual ~BufferManager();
 
 	virtual peeper::IndexBuffer::ptr createIndexBuffer(int usageFlags,peeper::Buffer::AccessType accessType,peeper::IndexBuffer::IndexFormat indexFormat,int size);
 	virtual peeper::VertexBuffer::ptr createVertexBuffer(int usageFlags,peeper::Buffer::AccessType accessType,peeper::VertexFormat::ptr vertexFormat,int size);
@@ -49,6 +50,8 @@ public:
 	virtual void contextUpdate(peeper::Renderer *renderer);
 	virtual void preContextReset(peeper::Renderer *renderer);
 	virtual void postContextReset(peeper::Renderer *renderer);
+
+	virtual void bufferDestroyed(peeper::Buffer *buffer);
 
 protected:
 	egg::Collection<peeper::BackableIndexBuffer::ptr> mIndexBuffers;

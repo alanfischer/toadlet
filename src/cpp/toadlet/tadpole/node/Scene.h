@@ -100,6 +100,9 @@ public:
 
 	virtual ParticleNode::ParticleSimulator::ptr newParticleSimulator(ParticleNode *particleNode){return NULL;}
 
+	void logicUpdate(Node::ptr node,int dt);
+	void visualUpdate(Node::ptr node,int dt);
+
 protected:
 	class RenderLayer{
 	public:
@@ -128,9 +131,6 @@ protected:
 	}
 
 	void resetModifiedFrames(Node *node);
-
-	void logicUpdate(Node::ptr node,int dt);
-	void visualUpdate(Node::ptr node,int dt);
 
 	void queueRenderables(Node *node);
 	bool culled(Node *node);

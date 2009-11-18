@@ -44,6 +44,8 @@ public:
 	virtual bool create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size);
 	virtual void destroy();
 
+	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
+
 	virtual bool createContext();
 	virtual void destroyContext(bool backData);
 	virtual bool contextNeedsReset();
@@ -62,6 +64,7 @@ protected:
 
 	D3D9Renderer *mRenderer;
 
+	BufferDestroyedListener *mListener;
 	int mUsageFlags;
 	AccessType mAccessType;
 	int mSize;

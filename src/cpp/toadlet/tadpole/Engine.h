@@ -39,6 +39,7 @@
 #include <toadlet/tadpole/AudioBufferData.h>
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/FontData.h>
+#include <toadlet/tadpole/FontManager.h>
 #include <toadlet/tadpole/VertexFormats.h>
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/TextureManager.h>
@@ -98,7 +99,7 @@ public:
 	inline ResourceManager *getShaderManager() const{return mShaderManager;}
 	inline ResourceManager *getProgramManager() const{return mProgramManager;}
 	inline MaterialManager *getMaterialManager() const{return  mMaterialManager;}
-	inline ResourceManager *getFontManager() const{return mFontManager;}
+	inline FontManager *getFontManager() const{return mFontManager;}
 	inline MeshManager *getMeshManager() const{return mMeshManager;}
 	inline ResourceManager *getAudioBufferManager() const{return mAudioBufferManager;}
 
@@ -117,7 +118,7 @@ protected:
 	ResourceManager *mShaderManager;
 	ResourceManager *mProgramManager;
 	MaterialManager *mMaterialManager;
-	ResourceManager *mFontManager;
+	FontManager *mFontManager;
 	MeshManager *mMeshManager;
 	ResourceManager *mAudioBufferManager;
 	handler::AudioBufferHandler::ptr mAudioBufferHandler;

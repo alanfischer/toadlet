@@ -26,6 +26,7 @@ set (PEEPER_HEADERS
 	BackableTexture.h
 	Blend.h
 	Buffer.h
+	BufferDestroyedListener.h
 	CapabilitySet.h
 	Color.h
 	Colors.h

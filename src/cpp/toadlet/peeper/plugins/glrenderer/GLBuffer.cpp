@@ -37,6 +37,7 @@ namespace peeper{
 GLBuffer::GLBuffer(GLRenderer *renderer):
 	mRenderer(NULL),
 
+	mListener(NULL),
 	mUsageFlags(0),
 	mAccessType(AccessType_NO_ACCESS),
 	mSize(0),
@@ -146,6 +147,15 @@ void GLBuffer::destroy(){
 	mElementTypes.clear();
 	mElementCounts.clear();
 	mElementOffsets.clear();
+
+	if(mListener!=NULL){
+		if(mTarget==GL_ELEMENT_ARRAY_BUFFER){
+			mListener->bufferDestroyed((IndexBuffer*)this);
+		}
+		else{
+			mListener->bufferDestroyed((VertexBuffer*)this);
+		}
+	}
 }
 
 bool GLBuffer::createContext(){

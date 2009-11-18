@@ -97,7 +97,7 @@ Engine::Engine():
 
 	mMaterialManager=new MaterialManager(this,mTextureManager);
 
-	mFontManager=new ResourceManager(this);
+	mFontManager=new FontManager(this);
 
 	mMeshManager=new MeshManager(this);
 

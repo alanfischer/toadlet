@@ -43,6 +43,8 @@ public:
 	virtual bool create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size);
 	virtual void destroy();
 
+	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
+
 	virtual bool createContext(){return mBack->createContext();}
 	virtual void destroyContext(bool backData){mBack->destroyContext(backData);}
 	virtual bool contextNeedsReset(){return mBack->contextNeedsReset();}
@@ -60,6 +62,7 @@ public:
 	virtual VertexBuffer::ptr getBack(){return mBack;}
 	
 protected:
+	BufferDestroyedListener *mListener;
 	int mUsageFlags;
 	AccessType mAccessType;
 	int mDataSize;

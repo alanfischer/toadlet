@@ -70,7 +70,7 @@ public:
 		Alignment_BIT_VCENTER=	1<<5,
 	};
 
-	Font(float pointWidth,float pointHeight,int height,int innerSpace,peeper::Texture::ptr texture,const wchar *charSet,Glyph **glyphs,int numChars);
+	Font(float pointSize,int innerSpace,peeper::Texture::ptr texture,const wchar *charSet,Glyph **glyphs,int numChars);
 	virtual ~Font();
 
 	void destroy();
@@ -83,9 +83,7 @@ public:
 	int getStringHeight(const egg::String &string) const{return getStringHeight(string,0,string.length());}
 	int getStringHeight(const egg::String &string,int start,int end) const;
 
-	inline float getPointWidth() const{return mPointWidth;}
-	inline float getPointHeight() const{return mPointHeight;}
-	inline int getHeight() const{return mHeight;}
+	inline float getPointSize() const{return mPointSize;}
 	inline int getInnerSpace() const{return mInnerSpace;}
 	inline peeper::Texture::ptr getTexture() const{return mTexture;}
 	inline Glyph *getGlyph(int i) const{if(i<0 || i>=mGlyphs.size()){return NULL;}else{return mGlyphs[i];}}
@@ -93,9 +91,7 @@ public:
 	peeper::VertexBufferAccessor vba;
 
 protected:
-	float mPointWidth;
-	float mPointHeight;
-	int mHeight; // TODO: Perhaps somehow mHeight should be depreciated, and we force all the font loaders to actually have a consistant mPointHeight
+	float mPointSize;
 	int mInnerSpace;
 	peeper::Texture::ptr mTexture;
 	egg::Collection<Glyph*> mGlyphs;

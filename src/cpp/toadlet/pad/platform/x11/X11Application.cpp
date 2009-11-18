@@ -688,12 +688,9 @@ void X11Application::configured(int x,int y,int width,int height){
 
 		if(mActive && mRenderer!=NULL){
 			if(mRenderer->getCapabilitySet().resetOnResize){
-				mEngine->setRenderer(NULL);
-
-				mRenderer->reset();
-
-				mEngine->setRenderer(mRenderer);
+				mEngine->contextReset(mRenderer);
 			}
+			update(0);
 			render(mRenderer);
 		}
 	}

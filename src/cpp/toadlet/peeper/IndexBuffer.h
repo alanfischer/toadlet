@@ -49,6 +49,8 @@ public:
 	virtual bool create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size)=0;
 	virtual void destroy()=0;
 
+	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener)=0;
+
 	virtual bool createContext()=0;
 	virtual void destroyContext(bool backData)=0;
 	virtual bool contextNeedsReset()=0;

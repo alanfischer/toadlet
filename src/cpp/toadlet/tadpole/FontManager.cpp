@@ -23,44 +23,44 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_BUFFER_H
-#define TOADLET_PEEPER_BUFFER_H
+#include <toadlet/tadpole/FontManager.h>
 
-#include <toadlet/egg/Resource.h>
-#include <toadlet/peeper/BufferDestroyedListener.h>
+using namespace toadlet::egg;
+using namespace toadlet::egg::io;
 
 namespace toadlet{
-namespace peeper{
+namespace tadpole{
 
-class TOADLET_API Buffer{
-public:
-	TOADLET_SHARED_POINTERS(Buffer);
+FontManager::FontManager(InputStreamFactory *inputStreamFactory):ResourceManager(inputStreamFactory){}
 
-	enum UsageFlags{
-		UsageFlags_NONE=		0,
-		UsageFlags_STATIC=		1<<0,	// Buffer data is never changed
-		UsageFlags_STREAM=		1<<1,	// Buffer data changes once per frame
-		UsageFlags_DYNAMIC=		1<<2,	// Buffer data changes frequently
-	};
+Resource::ptr FontManager::manage(const Resource::ptr &resource){
+	if(mResources.contains(resource)==false){
+		mResources.add(resource);
+		resource->setFullyReleasedListener(this);
+	}
 
-	enum AccessType{
-		AccessType_NO_ACCESS,			// Buffer data is inaccessable
-		AccessType_READ_ONLY,			// Buffer data is only readable
-		AccessType_WRITE_ONLY,			// Buffer data is only writeable
-		AccessType_READ_WRITE,
-	};
+	String name=resource->getName();
+	if(name!=(char*)NULL){
+		mNameResourceMap[name+String(":")+shared_static_cast<Font>(resource)->getPointSize()]=resource;
+	}
 
-	virtual ~Buffer(){}
+	return resource;
+}
 
-	virtual int getUsageFlags() const=0;
-	virtual AccessType getAccessType() const=0;
-	virtual int getDataSize() const=0;
+void FontManager::unmanage(Resource *resource){
+	mResources.remove(resource);
 
-	virtual uint8 *lock(AccessType accessType)=0;
-	virtual bool unlock()=0;
-};
+	String name=resource->getName();
+	if(name!=(char*)NULL){
+		NameResourceMap::iterator it=mNameResourceMap.find(name+String(":")+((Font*)resource)->getPointSize());
+		if(it!=mNameResourceMap.end()){
+			mNameResourceMap.erase(it);
+		}
+	}
+
+	resource->destroy();
+}
 
 }
 }
 
-#endif

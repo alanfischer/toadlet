@@ -35,17 +35,13 @@ using namespace toadlet::peeper;
 namespace toadlet{
 namespace tadpole{
 
-Font::Font(float pointWidth,float pointHeight,int height,int innerSpace,Texture::ptr texture,const wchar *charSet,Glyph **glyphs,int numChars):BaseResource(),
-	mPointWidth(0),
-	mPointHeight(0),
-	mHeight(0),
+Font::Font(float pointSize,int innerSpace,Texture::ptr texture,const wchar *charSet,Glyph **glyphs,int numChars):BaseResource(),
+	mPointSize(0),
 	mInnerSpace(0)
 	//mTexture,
 	//mGlyphs
 {
-	mPointWidth=pointWidth;
-	mPointHeight=pointHeight;
-	mHeight=height;
+	mPointSize=pointSize;
 	mInnerSpace=innerSpace;
 	mTexture=texture;
 
@@ -139,7 +135,7 @@ bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const Stri
 				x=-lineLength/2;
 			}
 
-			y-=mHeight;
+			y-=mPointSize;
 		}
 
 		c=string.at(i);
@@ -220,13 +216,13 @@ int Font::getStringWidth(const String &string,int start,int end) const{
 }
 
 int Font::getStringHeight(const String &string,int start,int end) const{
-	int height=mHeight;
+	int height=mPointSize;
 
 	int i;
 	for(i=start;i<end;++i){
 		wchar c=string.at(i);
 		if(c==(char)10){
-			height+=mHeight;
+			height+=mPointSize;
 		}
 	}
 

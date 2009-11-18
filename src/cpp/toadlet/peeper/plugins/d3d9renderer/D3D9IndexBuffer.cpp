@@ -36,6 +36,7 @@ namespace peeper{
 D3D9IndexBuffer::D3D9IndexBuffer(D3D9Renderer *renderer):
 	mRenderer(NULL),
 
+	mListener(NULL),
 	mUsageFlags(0),
 	mAccessType(AccessType_NO_ACCESS),
 	mSize(0),
@@ -80,6 +81,10 @@ void D3D9IndexBuffer::destroy(){
 	if(mBackingData!=NULL){
 		delete[] mBackingData;
 		mBackingData=NULL;
+	}
+
+	if(mListener!=NULL){
+		mListener->bufferDestroyed(this);
 	}
 }
 

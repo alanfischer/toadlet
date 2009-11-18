@@ -720,6 +720,7 @@ void Win32Application::internal_resize(int width,int height){
 		if(mRenderer->getCapabilitySet().resetOnResize){
 			mEngine->contextReset(mRenderer);
 		}
+		update(0);
 		render(mRenderer);
 	}
 }
