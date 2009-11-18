@@ -81,11 +81,25 @@ void LabelNode::destroy(){
 		mMaterial=NULL;
 	}
 
+	if(mFont!=NULL){
+		mFont->release();
+		mFont=NULL;
+	}
+
 	super::destroy();
 }
 
 void LabelNode::setFont(const Font::ptr &font){
+	if(mFont!=NULL){
+		mFont->release();
+	}
+
 	mFont=font;
+
+	if(mFont!=NULL){
+		mFont->retain();
+	}
+
 	rebuild();
 }
 

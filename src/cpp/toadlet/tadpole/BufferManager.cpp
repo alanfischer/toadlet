@@ -39,6 +39,16 @@ BufferManager::BufferManager(Engine *engine){
 	mEngine=engine;
 }
 
+BufferManager::~BufferManager(){
+	int i;
+	for(i=0;i<mIndexBuffers.size();++i){
+		mIndexBuffers[i]->setBufferDestroyedListener(NULL);
+	}
+	for(i=0;i<mVertexBuffers.size();++i){
+		mVertexBuffers[i]->setBufferDestroyedListener(NULL);
+	}
+}
+
 IndexBuffer::ptr BufferManager::createIndexBuffer(int usageFlags,Buffer::AccessType accessType,IndexBuffer::IndexFormat indexFormat,int size){
 	BackableIndexBuffer::ptr indexBuffer(new BackableIndexBuffer());
 	indexBuffer->create(usageFlags,accessType,indexFormat,size);
@@ -49,6 +59,8 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usageFlags,Buffer::AccessT
 	}
 	mIndexBuffers.add(indexBuffer);
 	mIndexBuffersToLoad.add(indexBuffer);
+
+	indexBuffer->setBufferDestroyedListener(this);
 
 	return indexBuffer;
 }
@@ -63,6 +75,8 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usageFlags,Buffer::Acces
 	}
 	mVertexBuffers.add(vertexBuffer);
 	mVertexBuffersToLoad.add(vertexBuffer);
+
+	vertexBuffer->setBufferDestroyedListener(this);
 
 	return vertexBuffer;
 }
@@ -219,6 +233,11 @@ void BufferManager::postContextReset(Renderer *renderer){
 			mVertexBuffers[i]->createContext();
 		}
 	}
+}
+
+void BufferManager::bufferDestroyed(Buffer *buffer){
+	mIndexBuffers.remove(buffer);
+	mVertexBuffers.remove(buffer);
 }
 
 }

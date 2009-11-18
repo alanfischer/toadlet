@@ -7,6 +7,7 @@ set (TADPOLE_SRC
 	BufferManager.cpp
 	Engine.cpp
 	Font.cpp
+	FontManager.cpp
 	Material.cpp
 	TPKGInputStreamFactory.cpp
 	Track.cpp
@@ -80,6 +81,7 @@ set (TADPOLE_HEADERS
 	Engine.h
 	Font.h
 	FontData.h
+	FontManager.h
 	KeyFrame.h
 	Material.h
 	Renderable.h

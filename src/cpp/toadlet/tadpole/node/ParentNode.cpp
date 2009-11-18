@@ -59,6 +59,14 @@ void ParentNode::destroy(){
 	super::destroy();
 }
 
+void ParentNode::destroyAllChildren(){
+	while(mChildren.size()>0){
+		mChildren[0]->destroy();
+	}
+
+	mShadowChildren.clear();
+}
+
 void ParentNode::removeAllNodeDestroyedListeners(){
 	super::removeAllNodeDestroyedListeners();
 

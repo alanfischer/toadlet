@@ -64,8 +64,8 @@ Resource *Win32FontHandler::load(const ResourceHandlerData *handlerData){
 	int i,j;
 
 	LOGFONT logFont={0};
-	logFont.lfWidth=fontData->width/2;
-	logFont.lfHeight=fontData->height;
+	logFont.lfWidth=Math::fromInt(fontData->pointSize/2);
+	logFont.lfHeight=Math::fromInt(fontData->pointSize);
 	logFont.lfWeight=FW_BOLD;
 	logFont.lfCharSet=DEFAULT_CHARSET;
 	logFont.lfPitchAndFamily=VARIABLE_PITCH | FF_SWISS;
@@ -112,7 +112,7 @@ Resource *Win32FontHandler::load(const ResourceHandlerData *handlerData){
 	int charCountWidth=Math::intCeil(Math::div(Math::fromInt(numChars),Math::fromInt(charCountHeight)));
 
 	int charmapWidth=0;
-	int charmapHeight=charCountWidth*fontData->height;
+	int charmapHeight=charCountWidth*Math::fromInt(fontData->pointSize);
 
 	for(i=0;i<charCountHeight;++i){
 		int w=0;
@@ -194,7 +194,7 @@ Resource *Win32FontHandler::load(const ResourceHandlerData *handlerData){
 
 		if(i%charCountWidth==charCountWidth-1){
 			x=0;
-			y+=fontData->height;
+			y+=fontData->pointSize;
 		}
 		else{
 			x+=sizes[i].right;
@@ -216,7 +216,7 @@ Resource *Win32FontHandler::load(const ResourceHandlerData *handlerData){
 		memcpy(imageData+imageStride*(textureHeight-i-1),buffer+bitmapStride*i,bitmapStride);
 	}
 
-	Font *font=new Font(fontData->width,fontData->height,fontData->height,0,shared_static_cast<Texture>(mTextureManager->createTexture(image)),charArray,&glyphs[0],glyphs.size());
+	Font *font=new Font(fontData->pointSize,0,shared_static_cast<Texture>(mTextureManager->createTexture(image)),charArray,&glyphs[0],glyphs.size());
 
 	SelectObject(cdc,oldBitmap);
 	DeleteObject(bitmap);

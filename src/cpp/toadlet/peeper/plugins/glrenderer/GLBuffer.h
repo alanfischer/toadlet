@@ -49,6 +49,8 @@ public:
 	virtual bool create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size);
 	virtual void destroy();
 
+	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
+
 	virtual bool createContext();
 	virtual void destroyContext(bool backData);
 	virtual bool contextNeedsReset(){return false;}
@@ -69,6 +71,7 @@ protected:
 
 	GLRenderer *mRenderer;
 
+	BufferDestroyedListener *mListener;
 	int mUsageFlags;
 	AccessType mAccessType;
 	int mSize;

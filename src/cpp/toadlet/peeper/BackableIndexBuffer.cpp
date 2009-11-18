@@ -30,6 +30,7 @@ namespace toadlet{
 namespace peeper{
 
 BackableIndexBuffer::BackableIndexBuffer():
+	mListener(NULL),
 	mUsageFlags(0),
 	mAccessType(AccessType_NO_ACCESS),
 	mDataSize(0),
@@ -67,6 +68,10 @@ void BackableIndexBuffer::destroy(){
 	if(mData!=NULL){
 		delete[] mData;
 		mData=NULL;
+	}
+
+	if(mListener!=NULL){
+		mListener->bufferDestroyed(this);
 	}
 }
 

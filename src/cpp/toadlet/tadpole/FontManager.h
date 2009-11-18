@@ -23,41 +23,27 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_BUFFER_H
-#define TOADLET_PEEPER_BUFFER_H
+#ifndef TOADLET_TADPOLE_FONTMANAGER_H
+#define TOADLET_TADPOLE_FONTMANAGER_H
 
-#include <toadlet/egg/Resource.h>
-#include <toadlet/peeper/BufferDestroyedListener.h>
+#include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/tadpole/Font.h>
+#include <toadlet/tadpole/FontData.h>
 
 namespace toadlet{
-namespace peeper{
+namespace tadpole{
 
-class TOADLET_API Buffer{
+class Engine;
+
+class TOADLET_API FontManager:public ResourceManager{
 public:
-	TOADLET_SHARED_POINTERS(Buffer);
+	FontManager(egg::io::InputStreamFactory *inputStreamFactory);
 
-	enum UsageFlags{
-		UsageFlags_NONE=		0,
-		UsageFlags_STATIC=		1<<0,	// Buffer data is never changed
-		UsageFlags_STREAM=		1<<1,	// Buffer data changes once per frame
-		UsageFlags_DYNAMIC=		1<<2,	// Buffer data changes frequently
-	};
+	Font::ptr getFont(const egg::String &name,float pointSize){return egg::shared_static_cast<Font>(ResourceManager::get(name+egg::String(":")+pointSize));}
+	Font::ptr findFont(const egg::String &name,float pointSize){return egg::shared_static_cast<Font>(ResourceManager::find(name,FontData::ptr(new FontData(pointSize))));}
 
-	enum AccessType{
-		AccessType_NO_ACCESS,			// Buffer data is inaccessable
-		AccessType_READ_ONLY,			// Buffer data is only readable
-		AccessType_WRITE_ONLY,			// Buffer data is only writeable
-		AccessType_READ_WRITE,
-	};
-
-	virtual ~Buffer(){}
-
-	virtual int getUsageFlags() const=0;
-	virtual AccessType getAccessType() const=0;
-	virtual int getDataSize() const=0;
-
-	virtual uint8 *lock(AccessType accessType)=0;
-	virtual bool unlock()=0;
+	egg::Resource::ptr manage(const egg::Resource::ptr &resource);
+	void unmanage(egg::Resource *resource);
 };
 
 }

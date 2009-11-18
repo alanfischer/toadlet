@@ -93,7 +93,7 @@ Resource::ptr FreeTypeHandler::load(InputStream::ptr in,const ResourceHandlerDat
 		return NULL;
 	}
 
-	FT_Set_Char_Size(face,floatToFixed26_6(fontData->width),floatToFixed26_6(fontData->height),0,0);
+	FT_Set_Char_Size(face,floatToFixed26_6(fontData->pointSize),floatToFixed26_6(fontData->pointSize),0,0);
 
 	int maxHeight=0;
 	Collection<FT_BitmapGlyph> bitmapGlyphs(numChars);
@@ -182,7 +182,7 @@ Resource::ptr FreeTypeHandler::load(InputStream::ptr in,const ResourceHandlerDat
 		}
 	}
 
-	Font::ptr font(new Font(fontData->width,fontData->height,maxHeight,0,mTextureManager->createTexture(image),charArray,&glyphs[0],glyphs.size()));
+	Font::ptr font(new Font(fontData->pointSize,0,mTextureManager->createTexture(image),charArray,&glyphs[0],glyphs.size()));
 
 	// Clean up FreeType data
 	for(i=0;i<bitmapGlyphs.size();++i){

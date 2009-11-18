@@ -152,12 +152,9 @@ rect{
 
 	if(mApplication->isActive() && mApplication->getRenderer()!=NULL){
 		if(mApplication->getRenderer()->getCapabilitySet().resetOnResize){
-			mApplication->getEngine()->setRenderer(NULL);
-
-			mApplication->getRenderer()->reset();
-
-			mApplication->getEngine()->setRenderer(mApplication->getRenderer());
+			mApplication->getEngine()->contextReset(mApplication->getRenderer());
 		}
+		mApplication->update(0);
 		mApplication->render(mApplication->getRenderer());
 	}
 }

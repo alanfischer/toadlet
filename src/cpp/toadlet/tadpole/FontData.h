@@ -37,13 +37,11 @@ class TOADLET_API FontData:public ResourceHandlerData{
 public:
 	TOADLET_SHARED_POINTERS(FontData);
 
-	FontData(float height,float width){
-		this->height=height;
-		this->width=width;
+	FontData(float pointSize1){
+		pointSize=pointSize1;
 	}
 
-	float height;
-	float width;
+	float pointSize;
 	egg::String characterSet;
 };
 
