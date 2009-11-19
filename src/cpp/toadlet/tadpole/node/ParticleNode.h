@@ -34,11 +34,9 @@
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/Renderer.h>
-//#include <toadlet/peeper/TextureSection.h>
 #include <toadlet/tadpole/Material.h>
-#include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/node/CameraNode.h>
-#include <toadlet/tadpole/node/RenderableNode.h>
+#include <toadlet/tadpole/node/Renderable.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -47,9 +45,9 @@ namespace node{
 class Scene;
 class CameraNode;
 
-class TOADLET_API ParticleNode:public RenderableNode,public Renderable{
+class TOADLET_API ParticleNode:public Node,public Renderable{
 public:
-	TOADLET_NODE(ParticleNode,RenderableNode);
+	TOADLET_NODE(ParticleNode,Node);
 
 	class Particle{
 	public:
@@ -81,6 +79,8 @@ public:
 	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
+	Renderable *isRenderable(){return this;}
+
 	virtual void setScale(scalar x,scalar y,scalar z){super::setScale(x,y,z);}
 	virtual void setScale(const Vector3 &scale){super::setScale(scale);}
 
@@ -107,9 +107,6 @@ public:
 	inline void setOrientation(bool vector){mOrientation=vector;}
 	inline bool getOrientation() const{return mOrientation;}
 
-//	inline void setTextureSection(peeper::TextureSection::ptr textureSection){mTextureSection=textureSection;}
-//	inline peeper::TextureSection::ptr getTextureSection() const{return mTextureSection;}
-
 	inline void setIndividualAttributes(bool individual){mIndividualAttributes=individual;}
 	inline bool getIndividualAttributes() const{return mIndividualAttributes;}
 
@@ -119,7 +116,9 @@ public:
 	inline bool hadPoints() const{return mHadPoints;}
 	inline bool hadAges() const{return mHadAges;}
 
-	virtual void setRenderMaterial(const Material::ptr &material);
+	virtual void setMaterial(const egg::String &name);
+	virtual void setMaterial(Material::ptr material);
+	virtual Material::ptr getMaterial(){return mMaterial;}
 
 	inline void setDestroyOnFinish(bool destroy){mDestroyOnFinish=destroy;}
 	inline bool getDestroyOnFinish() const{return mDestroyOnFinish;}
@@ -133,9 +132,9 @@ public:
 	
 	virtual void logicUpdate(int dt);
 	virtual void visualUpdate(int dt);
-	virtual void queueRenderables(Scene *scene);
+	virtual void queueRenderable(Scene *scene);
 
-	virtual const Material::ptr &getRenderMaterial() const{return mMaterial;}
+	virtual Material *getRenderMaterial() const{return mMaterial;}
 	virtual const Matrix4x4 &getRenderTransform() const;
 	virtual void render(peeper::Renderer *renderer) const;
 
@@ -175,7 +174,6 @@ protected:
 	scalar mStartScale;
 	scalar mEndScale;
 
-//	peeper::TextureSection::ptr mTextureSection;
 	Material::ptr mMaterial;
 	peeper::VertexBuffer::ptr mVertexBuffer;
 	peeper::VertexData::ptr mVertexData;

@@ -338,7 +338,11 @@ void ParticleNode::setWorldSpace(bool worldSpace){
 	}
 }
 
-void ParticleNode::setRenderMaterial(const Material::ptr &material){
+void ParticleNode::setMaterial(const egg::String &name){
+	setMaterial(mEngine->getMaterialManager()->findMaterial(name));
+}
+
+void ParticleNode::setMaterial(Material::ptr material){
 	if(mMaterial!=NULL){
 		mMaterial->release();
 	}
@@ -389,7 +393,7 @@ void ParticleNode::visualUpdate(int dt){
 	}
 }
 	
-void ParticleNode::queueRenderables(Scene *scene){
+void ParticleNode::queueRenderable(Scene *scene){
 	if(mUpdateParticles){
 		if(mHasIdealViewTransform){
 			updateVertexBuffer(mIdealViewTransform);

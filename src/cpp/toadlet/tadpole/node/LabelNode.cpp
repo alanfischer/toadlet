@@ -42,7 +42,9 @@ LabelNode::LabelNode():super(),
 
 	mFont(NULL),
 	mText(NULL),
-	mScaled(false),
+	mPerspective(false),
+	mAlignment(0),
+	mPixelSpace(false),
 
 	mMaterial(NULL),
 	mVertexData(NULL),
@@ -52,11 +54,10 @@ LabelNode::LabelNode():super(),
 Node *LabelNode::create(Engine *engine){
 	super::create(engine);
 
-	mFont=NULL;
-	mMaterial=NULL;
-	mVertexData=NULL;
-	mIndexData=NULL;
-	
+	setPerspective(true);
+	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
+	setPixelSpace(false);
+
 	mMaterial=engine->getMaterialManager()->createMaterial();
 	mMaterial->retain();
 	mMaterial->setFaceCulling(Renderer::FaceCulling_NONE);
@@ -100,21 +101,40 @@ void LabelNode::setFont(const Font::ptr &font){
 		mFont->retain();
 	}
 
-	rebuild();
+	updateLabel();
 }
 
 void LabelNode::setText(const String &text){
 	mText=text;
-	rebuild();
+
+	updateLabel();
 }
 
-void LabelNode::setScaled(bool scaled){
-	mScaled=scaled;
+void LabelNode::setPerspective(bool perspective){
+	mPerspective=perspective;
+
+	updateBound();
 }
 
-void LabelNode::queueRenderables(Scene *scene){
-	Matrix4x4 &scale=cache_queueRenderables_scale.reset();
-	Vector4 &point=cache_queueRenderables_point.reset();
+void LabelNode::setAlignment(int alignment){
+	mAlignment=alignment;
+
+	updateLabel();
+}
+
+void LabelNode::setPixelSpace(bool pixelSpace){
+	mPixelSpace=pixelSpace;
+
+	updateLabel();
+}
+
+void LabelNode::queueRenderable(Scene *scene){
+	if(mVertexData==NULL || mIndexData==NULL){
+		return;
+	}
+
+	Matrix4x4 &scale=cache_queueRenderable_scale.reset();
+	Vector4 &point=cache_queueRenderable_point.reset();
 	const Matrix4x4 &viewTransform=scene->getCamera()->getViewTransform();
 	const Matrix4x4 &projectionTransform=scene->getCamera()->getProjectionTransform();
 
@@ -136,24 +156,19 @@ void LabelNode::queueRenderables(Scene *scene){
 	mVisualWorldTransform.setAt(2,2,viewTransform.at(2,2));
 
 	scale.reset();
-	if(mScaled){
-		scale.setAt(0,0,Math::ONE);
-		scale.setAt(1,1,Math::ONE);
-		scale.setAt(2,2,Math::ONE);
+	if(mPerspective){
+		scale.setAt(0,0,mScale.x);
+		scale.setAt(1,1,mScale.y);
+		scale.setAt(2,2,mScale.z);
 	}
 	else{
 		point.set(mVisualWorldTransform.at(0,3),mVisualWorldTransform.at(1,3),mVisualWorldTransform.at(2,3),Math::ONE);
 		Math::mul(point,viewTransform);
 		Math::mul(point,projectionTransform);
-		scale.setAt(0,0,point.w);
-		scale.setAt(1,1,point.w);
-		scale.setAt(2,2,Math::ONE);
+		scale.setAt(0,0,Math::mul(point.w,mScale.x));
+		scale.setAt(1,1,Math::mul(point.w,mScale.y));
+		scale.setAt(2,2,Math::mul(point.w,mScale.z));
 	}
-
-	/// @todo  Modify this so we can have sprites of arbitrary orientations, and also have the scale passed by the
-	///  transform matrix, and not having to just grab the entities scale
-	scale.setAt(0,0,Math::mul(scale.at(0,0),mScale.x));
-	scale.setAt(1,1,Math::mul(scale.at(1,1),mScale.y));
 
 	Math::postMul(mVisualWorldTransform,scale);
 
@@ -168,7 +183,11 @@ void LabelNode::render(Renderer *renderer) const{
 	renderer->renderPrimitive(mVertexData,mIndexData);
 }
 
-void LabelNode::rebuild(){
+void LabelNode::updateLabel(){
+	if(mFont==NULL){
+		return;
+	}
+
 	String text=mText;
 //	if(mWordWrap){
 //		text=wordWrap(mFont,mWidth,text);
@@ -200,8 +219,7 @@ void LabelNode::rebuild(){
 		}
 	}
 
-	int alignment=Font::Alignment_BIT_VCENTER|Font::Alignment_BIT_HCENTER;
-	mFont->updateVertexBufferForString(mVertexData->getVertexBuffer(0),text,Colors::WHITE,alignment);
+	mFont->updateVertexBufferForString(mVertexData->getVertexBuffer(0),text,Colors::WHITE,mAlignment,mPixelSpace);
 	mIndexData->setCount(length*6);
 
 	Texture::ptr texture=mFont->getTexture();
@@ -212,16 +230,45 @@ void LabelNode::rebuild(){
 	else{
 		mMaterial->setBlend(Blend::Combination_COLOR);
 	}
-/*
-	if(scaled){
-		scalar hw=width/2;
-		scalar hh=height/2;
-		mBoundingRadius=Math::sqrt(Math::square(hw) + Math::square(hh));
+
+	updateBound();
+}
+
+void LabelNode::updateBound(){
+	if(mFont==NULL){
+		mBoundingRadius=0;
+	}
+	else if(mPerspective){
+		int iw=mFont->getStringWidth(mText);
+		int ih=mFont->getStringHeight(mText);
+
+		scalar width,height;
+		if(mPixelSpace){
+			width=Math::fromInt(iw);
+			height=Math::fromInt(ih);
+		}
+		else{
+			scalar pointSize=
+			#if defined(TOADLET_FIXED_POINT)
+				Math::fromFloat(mFont->getPointSize();
+			#else
+				mFont->getPointSize();
+			#endif
+
+			width=Math::div(Math::fromInt(iw),pointSize);
+			height=Math::div(Math::fromInt(ih),pointSize);
+		}
+
+		if(mAlignment==(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER)){
+			mBoundingRadius=Math::sqrt(Math::square(width/2) + Math::square(height/2));
+		}
+		else{
+			mBoundingRadius=Math::sqrt(Math::square(width) + Math::square(height));
+		}
 	}
 	else{
 		mBoundingRadius=-Math::ONE;
 	}
-*/
 }
 
 }

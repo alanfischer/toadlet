@@ -31,8 +31,8 @@
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/Material.h>
-#include <toadlet/tadpole/Renderable.h>
-#include <toadlet/tadpole/node/RenderableNode.h>
+#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/node/Renderable.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -40,21 +40,32 @@ namespace node{
 
 class Scene;
 
-class TOADLET_API SpriteNode:public RenderableNode,public Renderable{
+class TOADLET_API SpriteNode:public Node,public Renderable{
 public:
-	TOADLET_NODE(SpriteNode,RenderableNode);
+	TOADLET_NODE(SpriteNode,Node);
 
 	SpriteNode();
 	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
-	void start(const egg::String &name,bool scaled=true,bool centered=true,scalar width=Math::ONE,scalar height=Math::ONE);
-	void start(const Material::ptr &name,bool scaled=true,bool centered=true,scalar width=Math::ONE,scalar height=Math::ONE);
+	Renderable *isRenderable(){return this;}
 
-	virtual const Material::ptr &getRenderMaterial() const{return mMaterial;}
-	virtual const Matrix4x4 &getRenderTransform() const{return super::getVisualWorldTransform();}
+	void setMaterial(const egg::String &name);
+	void setMaterial(Material::ptr material);
+	Material::ptr getMaterial() const{return mMaterial;}
 
-	void queueRenderables(Scene *scene);
+	void setPerspective(bool perspective);
+	bool getPerspective() const{return mPerspective;}
+
+	void setAlignment(int alignment);
+	int getAlignment() const{return mAlignment;}
+
+	void setPixelSpace(bool pixelSpace);
+	bool getPixelSpace() const{return mPixelSpace;}
+
+	void queueRenderable(Scene *scene);
+	Material *getRenderMaterial() const{return mMaterial;}
+	const Matrix4x4 &getRenderTransform() const{return super::getVisualWorldTransform();}
 	void render(peeper::Renderer *renderer) const;
 
 	peeper::VertexBufferAccessor vba;
@@ -62,14 +73,20 @@ public:
 protected:
 	TOADLET_GIB_DEFINE(SpriteNode);
 
-	bool mCentered;
-	bool mScaled;
+	void updateSprite();
+	void updateBound();
+
+	bool mPerspective;
+	int mAlignment;
+	bool mPixelSpace;
+
 	Material::ptr mMaterial;
 	peeper::VertexData::ptr mVertexData;
 	peeper::IndexData::ptr mIndexData;
+	Matrix4x4 mAlignmentTransform;
 
-	Matrix4x4 cache_queueRenderables_scale;
-	Vector4 cache_queueRenderables_point;
+	Matrix4x4 cache_queueRenderable_scale;
+	Vector4 cache_queueRenderable_point;
 };
 
 }

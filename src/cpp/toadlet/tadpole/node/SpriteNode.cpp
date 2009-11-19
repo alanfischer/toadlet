@@ -41,21 +41,44 @@ TOADLET_NODE_IMPLEMENT(SpriteNode,"toadlet::tadpole::node::SpriteNode");
 SpriteNode::SpriteNode():super(),
 	TOADLET_GIB_IMPLEMENT()
 
-	mCentered(false),
-	mScaled(false),
+	mPerspective(false),
+	mAlignment(0),
+	mPixelSpace(false),
+
 	mMaterial(NULL),
 	mVertexData(NULL),
 	mIndexData(NULL)
+	//mAlignmentTransform
 {}
 
 Node *SpriteNode::create(Engine *engine){
 	super::create(engine);
 
-	mCentered=false;
-	mScaled=false;
-	mMaterial=NULL;
-	mVertexData=NULL;
-	mIndexData=NULL;
+	setPerspective(true);
+	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
+	setPixelSpace(false);
+
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,4);
+	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+	{
+		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
+
+		vba.set3(0,0, -Math::HALF,Math::HALF,0);
+		vba.set2(0,1, 0,0);
+
+		vba.set3(1,0, Math::HALF,Math::HALF,0);
+		vba.set2(1,1, Math::ONE,0);
+
+		vba.set3(2,0, -Math::HALF,-Math::HALF,0);
+		vba.set2(2,1, 0,Math::ONE);
+
+		vba.set3(3,0, Math::HALF,-Math::HALF,0);
+		vba.set2(3,1, Math::ONE,Math::ONE);
+
+		vba.unlock();
+	}
+
+	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,4));
 
 	return this;
 }
@@ -79,28 +102,20 @@ void SpriteNode::destroy(){
 	super::destroy();
 }
 
-void SpriteNode::start(const String &material,bool scaled,bool centered,scalar width,scalar height){
-	start(mEngine->getMaterialManager()->findMaterial(material),scaled,centered,width,height);
+void SpriteNode::setMaterial(const egg::String &name){
+	setMaterial(mEngine->getMaterialManager()->findMaterial(name));
 }
 
-void SpriteNode::start(const Material::ptr &material,bool scaled,bool centered,scalar width,scalar height){
-	if(mVertexData!=NULL){
-		mVertexData->destroy();
-		mVertexData=NULL;
-	}
-	
-	if(mIndexData!=NULL){
-		mIndexData->destroy();
-		mIndexData=NULL;
-	}
-	
+void SpriteNode::setMaterial(Material::ptr material){
 	if(mMaterial!=NULL){
 		mMaterial->release();
-		mMaterial=NULL;
 	}
 
 	mMaterial=material;
-	mMaterial->retain();
+
+	if(mMaterial!=NULL){
+		mMaterial->retain();
+	}
 
 	// TODO: Move these so they are set externally, perhaps in a material manager loadspritematerial or something
 	//  Then we'd just have a debug check here to look for faceculling perhaps...?
@@ -113,55 +128,30 @@ void SpriteNode::start(const Material::ptr &material,bool scaled,bool centered,s
 		mMaterial->getTextureStage(i)->setWAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
 	}
 
-	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,4);
-	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
-	if(centered){
-		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
-
-		vba.set3(0,0, -Math::HALF,Math::HALF,0);
-		vba.set2(0,1, 0,0);
-
-		vba.set3(1,0, Math::HALF,Math::HALF,0);
-		vba.set2(1,1, Math::ONE,0);
-
-		vba.set3(2,0, -Math::HALF,-Math::HALF,0);
-		vba.set2(2,1, 0,Math::ONE);
-
-		vba.set3(3,0, Math::HALF,-Math::HALF,0);
-		vba.set2(3,1, Math::ONE,Math::ONE);
-
-		vba.unlock();
-	}
-	else{
-		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
-
-		vba.set3(0,0, 0,Math::ONE,0);
-		vba.set2(0,1, 0,0);
-
-		vba.set3(1,0, Math::ONE,Math::ONE,0);
-		vba.set2(1,1, Math::ONE,0);
-
-		vba.set3(2,0, 0,0,0);
-		vba.set2(2,1, 0,Math::ONE);
-
-		vba.set3(3,0, Math::ONE,0,0);
-		vba.set2(3,1, Math::ONE,Math::ONE);
-
-		vba.unlock();
-	}
-
-	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,4));
-
-	mCentered=centered;
-	mScaled=scaled;
-	setScale(width,height,Math::ONE);
-
-	mBoundingRadius=mScaled?Math::sqrt(Math::square(width/2) + Math::square(height/2)):-Math::ONE;
+	updateSprite();
 }
 
-void SpriteNode::queueRenderables(Scene *scene){
-	Matrix4x4 &scale=cache_queueRenderables_scale.reset();
-	Vector4 &point=cache_queueRenderables_point.reset();
+void SpriteNode::setPerspective(bool perspective){
+	mPerspective=perspective;
+
+	updateBound();
+}
+
+void SpriteNode::setAlignment(int alignment){
+	mAlignment=alignment;
+
+	updateSprite();
+}
+
+void SpriteNode::setPixelSpace(bool pixelSpace){
+	mPixelSpace=pixelSpace;
+
+	updateSprite();
+}
+
+void SpriteNode::queueRenderable(Scene *scene){
+	Matrix4x4 &scale=cache_queueRenderable_scale.reset();
+	Vector4 &point=cache_queueRenderable_point.reset();
 	const Matrix4x4 &viewTransform=scene->getCamera()->getViewTransform();
 	const Matrix4x4 &projectionTransform=scene->getCamera()->getProjectionTransform();
 
@@ -182,8 +172,8 @@ void SpriteNode::queueRenderables(Scene *scene){
 	mVisualWorldTransform.setAt(1,2,viewTransform.at(2,1));
 	mVisualWorldTransform.setAt(2,2,viewTransform.at(2,2));
 
-	// Get scale information from rotate
-	if(mScaled){
+	scale.reset();
+	if(mPerspective){
 		scale.setAt(0,0,mScale.x);
 		scale.setAt(1,1,mScale.y);
 		scale.setAt(2,2,mScale.z);
@@ -197,6 +187,9 @@ void SpriteNode::queueRenderables(Scene *scene){
 		scale.setAt(2,2,Math::mul(point.w,mScale.z));
 	}
 
+	if(mAlignment!=(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER) || mPixelSpace){
+		Math::postMul(mVisualWorldTransform,mAlignmentTransform);
+	}
 	Math::postMul(mVisualWorldTransform,scale);
 
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
@@ -208,6 +201,54 @@ void SpriteNode::queueRenderables(Scene *scene){
 
 void SpriteNode::render(Renderer *renderer) const{
 	renderer->renderPrimitive(mVertexData,mIndexData);
+}
+
+void SpriteNode::updateSprite(){
+	scalar x=0,y=0;
+	if((mAlignment&Font::Alignment_BIT_LEFT)>0){
+		x=Math::HALF;
+	}
+	else if((mAlignment&Font::Alignment_BIT_RIGHT)>0){
+		x=-Math::HALF;
+	}
+	if((mAlignment&Font::Alignment_BIT_BOTTOM)>0){
+		y=Math::HALF;
+	}
+	else if((mAlignment&Font::Alignment_BIT_TOP)>0){
+		y=-Math::HALF;
+	}
+	Math::setMatrix4x4FromTranslate(mAlignmentTransform,x,y,0);
+
+	if(mPixelSpace && mMaterial!=NULL){
+		TextureStage::ptr textureStage=mMaterial->getTextureStage(0);
+		if(textureStage!=NULL){
+			Texture::ptr texture=textureStage->getTexture();
+			if(texture!=NULL){
+				scalar width=texture->getWidth();
+				scalar height=texture->getHeight();
+
+				Matrix4x4 pixelScale;
+				Math::setMatrix4x4FromScale(pixelScale,width,height,Math::ONE);
+				Math::postMul(mAlignmentTransform,pixelScale);
+			}
+		}
+	}
+
+	updateBound();
+}
+
+void SpriteNode::updateBound(){
+	if(mPerspective){
+		if(mAlignment==(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER)){
+			mBoundingRadius=Math::sqrt(Math::square(mScale.x/2) + Math::square(mScale.y/2));
+		}
+		else{
+			mBoundingRadius=Math::sqrt(Math::square(mScale.x) + Math::square(mScale.y));
+		}
+	}
+	else{
+		mBoundingRadius=-Math::ONE;
+	}
 }
 
 }

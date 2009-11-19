@@ -32,29 +32,41 @@
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/Material.h>
-#include <toadlet/tadpole/Renderable.h>
-#include <toadlet/tadpole/node/RenderableNode.h>
+#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/node/Renderable.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class TOADLET_API LabelNode:public RenderableNode,public Renderable{
+class TOADLET_API LabelNode:public Node,public Renderable{
 public:
-	TOADLET_NODE(LabelNode,RenderableNode);
+	TOADLET_NODE(LabelNode,Node);
 
 	LabelNode();
 	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
-	virtual void setFont(const Font::ptr &font);
-	virtual void setText(const egg::String &text);
-	virtual void setScaled(bool scaled);
+	Renderable *isRenderable(){return this;}
 
-	virtual const Material::ptr &getRenderMaterial() const{return mMaterial;}
-	virtual const Matrix4x4 &getRenderTransform() const{return super::getVisualWorldTransform();}
+	void setFont(const Font::ptr &font);
+	Font::ptr getFont() const{return mFont;}
 
-	void queueRenderables(Scene *scene);
+	void setText(const egg::String &text);
+	const egg::String &getText() const{return mText;}
+
+	void setPerspective(bool perspective);
+	bool getPerspective() const{return mPerspective;}
+
+	void setAlignment(int alignment);
+	int getAlignment() const{return mAlignment;}
+
+	void setPixelSpace(bool pixelSpace);
+	bool getPixelSpace() const{return mPixelSpace;}
+
+	void queueRenderable(Scene *scene);
+	Material *getRenderMaterial() const{return mMaterial;}
+	const Matrix4x4 &getRenderTransform() const{return super::getVisualWorldTransform();}
 	void render(peeper::Renderer *renderer) const;
 
 	peeper::VertexBufferAccessor vba;
@@ -62,18 +74,21 @@ public:
 protected:
 	TOADLET_GIB_DEFINE(LabelNode);
 
-	void rebuild();
+	void updateLabel();
+	void updateBound();
 
 	Font::ptr mFont;
 	egg::String mText;
-	bool mScaled;
+	bool mPerspective;
+	int mAlignment;
+	bool mPixelSpace;
 
 	Material::ptr mMaterial;
 	peeper::VertexData::ptr mVertexData;
 	peeper::IndexData::ptr mIndexData;
 
-	Matrix4x4 cache_queueRenderables_scale;
-	Vector4 cache_queueRenderables_point;
+	Matrix4x4 cache_queueRenderable_scale;
+	Vector4 cache_queueRenderable_point;
 };
 
 }

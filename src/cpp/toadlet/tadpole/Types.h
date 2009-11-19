@@ -40,6 +40,24 @@ namespace tadpole{
 	using namespace toadlet::egg::math;
 #endif
 
+
+#if defined(TOADLET_GCC_INHERITANCE_BUG)
+	template<typename RenderableType>
+	class RenderableWorkaround:public Renderable{
+	public:
+		RenderableWorkaround(RenderableType *type):renderable(type){}
+		RenderableType *renderable;
+		const Material::ptr &getRenderMaterial() const{return renderable->getRenderMaterial();}
+		const Matrix4x4 &getRenderTransform() const{return renderable->getRenderTransform();}
+		void render(peeper::Renderer *renderer) const{renderable->render(renderer);}
+	};
+	#define TOADLET_GIB_DEFINE(type) toadlet::tadpole::RenderableType<type> renderable;
+	#define TOADLET_GIB_IMPLEMENT() renderable(this),
+#else
+	#define TOADLET_GIB_DEFINE(type)
+	#define TOADLET_GIB_IMPLEMENT()
+#endif
+
 }
 }
 

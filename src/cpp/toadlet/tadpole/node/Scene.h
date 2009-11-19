@@ -29,11 +29,11 @@
 #include <toadlet/peeper/Color.h>
 #include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/peeper/TextureStage.h>
-#include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/UpdateListener.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/LightNode.h>
 #include <toadlet/tadpole/node/ParticleNode.h>
+#include <toadlet/tadpole/node/Renderable.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -92,7 +92,8 @@ public:
 	inline void render(peeper::Renderer *renderer,CameraNode *cameraNode){render(renderer,cameraNode,this);}
 	virtual void render(peeper::Renderer *renderer,CameraNode *cameraNode,Node *node);
 
-	virtual void queueRenderable(Renderable *renderable);
+	void queueRenderable(Renderable *renderable);
+	void queueLight(LightNode *light);
 	inline CameraNode *getCamera() const{return mCamera;} // Only valid during rendering operations
 
 	virtual void setUpdateListener(UpdateListener *updateListener);

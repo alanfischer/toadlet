@@ -36,7 +36,6 @@ set (TADPOLE_NODE_SRC
 	node/Node.cpp
 	node/ParentNode.cpp
 	node/ParticleNode.cpp
-	node/RenderableNode.cpp
 	node/Scene.cpp
 	node/SkeletonParentNode.cpp
 	node/SpriteNode.cpp
@@ -84,7 +83,6 @@ set (TADPOLE_HEADERS
 	FontManager.h
 	KeyFrame.h
 	Material.h
-	Renderable.h
 	ResourceHandler.h
 	ResourceHandlerData.h
 	ResourceManager.h
@@ -120,7 +118,7 @@ set (TADPOLE_NODE_HEADERS
 	node/NodeDestroyedListener.h
 	node/ParentNode.h
 	node/ParticleNode.h
-	node/RenderableNode.h
+	node/Renderable.h
 	node/Scene.h
 	node/SkeletonParentNode.h
 	node/SpriteNode.h

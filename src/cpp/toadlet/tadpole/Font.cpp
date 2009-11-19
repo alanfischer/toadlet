@@ -75,7 +75,7 @@ void Font::destroy(){
 	}
 }
 
-bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const String &string,const Color &color,int alignment){
+bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const String &string,const Color &color,int alignment,bool pixelSpace){
 	VertexFormat *format=vertexBuffer->getVertexFormat();
 
 	int positionElement=format->getVertexElementIndexOfType(VertexElement::Type_POSITION);
@@ -108,16 +108,25 @@ bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const Stri
 	if((alignment&Alignment_BIT_TOP)>0){
 	}
 	else if((alignment&Alignment_BIT_BOTTOM)>0){
-		y+=height;
+		y-=height;
 	}
 	else if((alignment&Alignment_BIT_VCENTER)>0){
-		y+=height/2;
+		y-=height/2;
 	}
 
 	vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
 
 	int lineLength=0;
-	char c=(char)10; // The first loop will add mHeight, but we work from the baseline of the letters, so that is correct
+	char c=(char)10;
+	// Depending on if we want the font facing up or down we need to add mHeight here or not
+//	y+=mPointSize;
+
+	scalar pointSize=
+		#if defined(TOADLET_FIXED_POINT)
+			Math::fromFloat(mPointSize);
+		#else
+			mPointSize;
+		#endif
 
 	int i,j;
 	for(i=0;i<length;++i){
@@ -135,7 +144,7 @@ bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const Stri
 				x=-lineLength/2;
 			}
 
-			y-=mPointSize;
+			y+=mPointSize;
 		}
 
 		c=string.at(i);
@@ -143,17 +152,23 @@ bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const Stri
 		int i4=i*4;
 		Glyph *g=getGlyph(c);
 		if(g!=NULL){
-			vba.set3(i4+0,positionElement,	Math::fromInt(x+g->offsetx), Math::fromInt(y+g->offsety+g->height), 0);
-			vba.set2(i4+0,texCoordElement,	Math::div(Math::fromInt(g->x),scalarTexWidth), Math::div(Math::fromInt(g->y),scalarTexHeight));
+			if(pixelSpace){
+				vba.set3(i4+0,positionElement,	Math::fromInt(x+g->offsetx),			Math::fromInt(y+g->offsety+g->height), 0);
+				vba.set3(i4+1,positionElement,	Math::fromInt(x+g->offsetx+g->width),	Math::fromInt(y+g->offsety+g->height), 0);
+				vba.set3(i4+2,positionElement,	Math::fromInt(x+g->offsetx+g->width),	Math::fromInt(y+g->offsety), 0);
+				vba.set3(i4+3,positionElement,	Math::fromInt(x+g->offsetx),			Math::fromInt(y+g->offsety), 0);
+			}
+			else{
+				vba.set3(i4+0,positionElement,	Math::div(Math::fromInt(x+g->offsetx),pointSize),			Math::div(Math::fromInt(y+g->offsety+g->height),pointSize), 0);
+				vba.set3(i4+1,positionElement,	Math::div(Math::fromInt(x+g->offsetx+g->width),pointSize),	Math::div(Math::fromInt(y+g->offsety+g->height),pointSize), 0);
+				vba.set3(i4+2,positionElement,	Math::div(Math::fromInt(x+g->offsetx+g->width),pointSize),	Math::div(Math::fromInt(y+g->offsety),pointSize), 0);
+				vba.set3(i4+3,positionElement,	Math::div(Math::fromInt(x+g->offsetx),pointSize),			Math::div(Math::fromInt(y+g->offsety),pointSize), 0);
+			}
 
-			vba.set3(i4+1,positionElement,	Math::fromInt(x+g->offsetx+g->width), Math::fromInt(y+g->offsety+g->height), 0);
-			vba.set2(i4+1,texCoordElement,	Math::div(Math::fromInt(g->x+g->width),scalarTexWidth), Math::div(Math::fromInt(g->y),scalarTexHeight));
-
-			vba.set3(i4+2,positionElement,	Math::fromInt(x+g->offsetx+g->width), Math::fromInt(y+g->offsety), 0);
-			vba.set2(i4+2,texCoordElement,	Math::div(Math::fromInt(g->x+g->width),scalarTexWidth), Math::div(Math::fromInt(g->y+g->height),scalarTexHeight));
-
-			vba.set3(i4+3,positionElement,	Math::fromInt(x+g->offsetx), Math::fromInt(y+g->offsety), 0);
-			vba.set2(i4+3,texCoordElement,	Math::div(Math::fromInt(g->x),scalarTexWidth), Math::div(Math::fromInt(g->y+g->height),scalarTexHeight));
+			vba.set2(i4+0,texCoordElement,	Math::div(Math::fromInt(g->x),scalarTexWidth),			Math::div(Math::fromInt(g->y+g->height),scalarTexHeight));
+			vba.set2(i4+1,texCoordElement,	Math::div(Math::fromInt(g->x+g->width),scalarTexWidth),	Math::div(Math::fromInt(g->y+g->height),scalarTexHeight));
+			vba.set2(i4+2,texCoordElement,	Math::div(Math::fromInt(g->x+g->width),scalarTexWidth),	Math::div(Math::fromInt(g->y),scalarTexHeight));
+			vba.set2(i4+3,texCoordElement,	Math::div(Math::fromInt(g->x),scalarTexWidth),			Math::div(Math::fromInt(g->y),scalarTexHeight));
 
 			x+=Math::toInt(g->advancex);
 			y+=Math::toInt(g->advancey);

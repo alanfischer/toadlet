@@ -41,7 +41,7 @@ public:
 	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
-	virtual bool isParent() const{return true;}
+	virtual ParentNode *isParent(){return this;}
 
 	virtual void destroyAllChildren();
 	virtual void removeAllNodeDestroyedListeners();

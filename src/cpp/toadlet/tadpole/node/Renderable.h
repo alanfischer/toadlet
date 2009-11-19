@@ -23,24 +23,29 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_RENDERABLE_H
-#define TOADLET_TADPOLE_RENDERABLE_H
+#ifndef TOADLET_TADPOLE_NODE_RENDERABLE_H
+#define TOADLET_TADPOLE_NODE_RENDERABLE_H
 
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/Material.h>
 
 namespace toadlet{
 namespace tadpole{
+namespace node{
+
+class Scene;
 
 class Renderable{
 public:
 	virtual ~Renderable(){}
 
+	virtual void queueRenderable(Scene *queue)=0;
+	virtual Material *getRenderMaterial() const=0;
 	virtual const tadpole::Matrix4x4 &getRenderTransform() const=0;
-	virtual const Material::ptr &getRenderMaterial() const=0;
 	virtual void render(peeper::Renderer *renderer) const=0;
 };
 
+}
 }
 }
 
