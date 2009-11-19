@@ -223,6 +223,8 @@ uint8 *GLBuffer::lock(AccessType accessType){
 				case AccessType_READ_WRITE:
 					lock=GL_READ_WRITE;
 				break;
+				default:
+				break;
 			}
 
 			glBindBuffer(mTarget,mHandle);

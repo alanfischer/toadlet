@@ -39,7 +39,7 @@ public:
 
 	virtual bool create(AudioBuffer::ptr buffer)=0;
 	virtual bool create(egg::io::InputStream::ptr in,const egg::String &mimeType)=0;
-	virtual bool destroy()=0;
+	virtual void destroy()=0;
 
 	virtual bool play()=0;
 	virtual bool stop()=0;

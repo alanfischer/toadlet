@@ -34,6 +34,7 @@ namespace egg{
 template<typename Class>
 class BaseType{
 public:
+	virtual ~BaseType(){}
 	virtual const char *getFullName() const=0;
 	virtual Class *newInstance() const=0;
 };

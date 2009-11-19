@@ -52,7 +52,7 @@ CoreAudio::CoreAudio(ALPlayer *audioPlayer):
 	mPacketDescs(NULL),
 	mFileDataSize(0)
 {
-	mAudioPlayer=player;
+	mAudioPlayer=audioPlayer;
 
 	setGain(Math::ONE);
 }
@@ -61,25 +61,38 @@ CoreAudio::~CoreAudio(){
 	destroy();
 }
 
-mCoreAudios.add(audio);
+bool CoreAudio::create(AudioBuffer::ptr buffer){
+	mAudioPlayer->registerCoreAudio(this);
+	
+	return false;
+}
+	
+bool CoreAudio::create(InputStream::ptr in,const String &mimeType){
+	AudioStream::ptr decoder=mAudioPlayer->startAudioStream(in,mimeType);
+	if(decoder==NULL){
+		return false;
+	}
 
-mCoreAudios.remove(audio);
+	mStream=shared_static_cast<CoreAudioDecoder>(decoder);
 
-if(mAudioQueue!=NULL){
-	AudioQueueDispose(mAudioQueue,true);
+	setupQueue();
+
+	setupBuffers();
+
+	mAudioPlayer->registerCoreAudio(this);
+	
+	return true;
 }
 
-bool CoreAudio::loadAudioStream(AudioStream::ptr stream){
-	if(mALPlayer!=NULL){
-		mStream=shared_static_cast<CoreAudioDecoder>(stream);
-
-		setupQueue();
-
-		setupBuffers();
-
-		return true;
+void CoreAudio::destroy(){
+	if(mAudioPlayer!=NULL){
+		mAudioPlayer->unregisterCoreAudio(this);
 	}
-	return false;
+
+	if(mAudioQueue!=NULL){
+		AudioQueueDispose(mAudioQueue,true);
+		mAudioQueue=NULL;
+	}
 }
 
 bool CoreAudio::play(){
@@ -128,38 +141,30 @@ bool CoreAudio::getFinished() const{
 }
 
 void CoreAudio::setGain(scalar gain){
-	if(mALPlayer!=NULL){
-		mALPlayer->lock();
+	if(mAudioPlayer!=NULL){
+		mAudioPlayer->lock();
 
-		internal_setGain(gain);
+		setImmediateGain(gain);
 		mTargetGain=gain;
 		mFadeTime=0;
 
-		mALPlayer->unlock();
+		mAudioPlayer->unlock();
 	}
 }
 
 void CoreAudio::fadeToGain(scalar gain,int time){
-	if(mALPlayer!=NULL){
-		mALPlayer->lock();
+	if(mAudioPlayer!=NULL){
+		mAudioPlayer->lock();
 
 		mTargetGain=gain;
 		mFadeTime=time;
 
-		mALPlayer->unlock();
+		mAudioPlayer->unlock();
 	}
 }
 
 scalar CoreAudio::getGain() const{
 	return mGain;
-}
-
-scalar CoreAudio::getTargetGain() const{
-	return mTargetGain;
-}
-
-int CoreAudio::getFadeTime(){
-	return mFadeTime;
 }
 
 void CoreAudio::setLooping(bool looping){

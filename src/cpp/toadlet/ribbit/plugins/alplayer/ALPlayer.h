@@ -94,6 +94,11 @@ public:
 
 	egg::math::Vector3 cacheVector3;
 
+	#if defined(TOADLET_PLATFORM_OSX)
+		void registerCoreAudio(CoreAudio *audio){mCoreAudios.add(audio);}
+		void unregisterCoreAudio(CoreAudio *audio){mCoreAudios.remove(audio);}
+	#endif
+	
 protected:
 	void run();
 

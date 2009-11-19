@@ -92,7 +92,7 @@ Resource::ptr OSXFontHandler::load(InputStream::ptr in,const ResourceHandlerData
 		return NULL;
 	}
 
-	float pointSize=fontData->height;
+	float pointSize=fontData->pointSize;
 	
 	int i,j;
 
@@ -228,10 +228,8 @@ Resource::ptr OSXFontHandler::load(InputStream::ptr in,const ResourceHandlerData
 
 	memcpy(imageData,data,imageStride*charmapHeight);
 
-	Texture::ptr texture=mTextureManager->createTexture(image);
-
 	// Build font
-	Font::ptr font(new Font(fontData->width,fontData->height,fontData->height/2,0,shared_static_cast<Texture>(mTextureManager->load(texture)),wcharArray,glyphs.begin(),glyphs.size()));
+	Font::ptr font(new Font(fontData->pointSize,0,mTextureManager->createTexture(image),wcharArray,glyphs.begin(),glyphs.size()));
 
 	CGContextRelease(context);
 	free(data);

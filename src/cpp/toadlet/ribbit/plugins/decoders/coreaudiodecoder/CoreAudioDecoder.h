@@ -36,7 +36,7 @@ namespace ribbit{
 
 class CoreAudioDecoder:public AudioStream{
 public:
-	TOADLET_SHARED_POINTERS(CoreAudioDecoder,egg::io::InputStream);
+	TOADLET_SHARED_POINTERS(CoreAudioDecoder);
 
 	CoreAudioDecoder();
 	virtual ~CoreAudioDecoder();
