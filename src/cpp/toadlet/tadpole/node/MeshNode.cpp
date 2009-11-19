@@ -153,11 +153,11 @@ void MeshNode::destroy(){
 	super::destroy();
 }
 
-void MeshNode::start(const String &name){
-	start(mEngine->getMeshManager()->findMesh(name));
+void MeshNode::setMesh(const String &name){
+	setMesh(mEngine->getMeshManager()->findMesh(name));
 }
 
-void MeshNode::start(Mesh::ptr mesh){
+void MeshNode::setMesh(Mesh::ptr mesh){
 	mSubMeshes.clear();
 
 	if(mAnimationController!=NULL){

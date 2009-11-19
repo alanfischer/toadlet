@@ -94,8 +94,8 @@ public:
 
 	Renderable *isRenderable(){return this;}
 
-	void start(const egg::String &name);
-	void start(mesh::Mesh::ptr mesh);
+	void setMesh(const egg::String &name);
+	void setMesh(mesh::Mesh::ptr mesh);
 
 	inline const mesh::Mesh::ptr &getMesh() const{return mMesh;}
 
