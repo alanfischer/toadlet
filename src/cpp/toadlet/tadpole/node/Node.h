@@ -54,6 +54,7 @@ class Engine;
 namespace node{
 
 class ParentNode;
+class Renderable;
 class Scene;
 
 class TOADLET_API Node{
@@ -66,11 +67,8 @@ public:
 	virtual void destroy();
 
 	inline bool destroyed() const{return !mCreated;}
-	virtual bool isParent() const{return false;}
-	// I'd like to be able to remove these two members, probably involving some sort of queueRenderable Node function which
-	//  is overridden
-	virtual bool isRenderable() const{return false;}
-	virtual bool isLight() const{return false;}
+	virtual ParentNode *isParent(){return NULL;}
+	virtual Renderable *isRenderable(){return NULL;}
 
 	virtual void setNodeDestroyedListener(NodeDestroyedListener *listener,bool owns);
 	inline NodeDestroyedListener *getNodeDestroyedListener() const{return mNodeDestroyedListener;}

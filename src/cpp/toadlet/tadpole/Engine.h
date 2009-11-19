@@ -83,6 +83,7 @@ public:
 	void destroyNode(node::Node *node);
 	void freeNode(node::Node *node);
 
+	template<typename Type> Type *allocNodeType(const egg::Type<Type,node::Node> &type){return (Type*)allocNode(type);}
 	template<typename Type> Type *createNodeType(const egg::Type<Type,node::Node> &type){return (Type*)createNode(type);}
 
 	// Context methods

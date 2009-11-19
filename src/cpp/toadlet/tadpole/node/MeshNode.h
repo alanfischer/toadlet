@@ -28,12 +28,12 @@
 
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
-#include <toadlet/tadpole/Renderable.h>
-#include <toadlet/tadpole/node/RenderableNode.h>
-#include <toadlet/tadpole/node/MeshNodeSkeleton.h>
 #include <toadlet/tadpole/animation/AnimationController.h>
 #include <toadlet/tadpole/animation/SkeletonAnimation.h>
 #include <toadlet/tadpole/mesh/Mesh.h>
+#include <toadlet/tadpole/node/MeshNodeSkeleton.h>
+#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/node/Renderable.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -41,9 +41,10 @@ namespace node{
 
 class Scene;
 
-class TOADLET_API MeshNode:public RenderableNode{
+// TODO: Make MeshNode a ParentNode, and integrate the SkeletonParentNode into this
+class TOADLET_API MeshNode:public Node,public Renderable{
 public:
-	TOADLET_NODE(MeshNode,RenderableNode);
+	TOADLET_NODE(MeshNode,Node);
 
 	class TOADLET_API SubMesh:public Renderable{
 	public:
@@ -51,8 +52,9 @@ public:
 
 		SubMesh(MeshNode *meshNode,mesh::Mesh::SubMesh *meshSubMesh);
 
+		void queueRenderable(Scene *queue){} // Queuing done by parent
+		Material *getRenderMaterial() const{return material;}
 		const Matrix4x4 &getRenderTransform() const{return meshNode->getVisualWorldTransform();}
-		const Material::ptr &getRenderMaterial() const{return material;}
 		void render(peeper::Renderer *renderer) const;
 
 		Material::ptr material;
@@ -90,6 +92,8 @@ public:
 	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
+	Renderable *isRenderable(){return this;}
+
 	void start(const egg::String &name);
 	void start(mesh::Mesh::ptr mesh);
 
@@ -113,6 +117,11 @@ public:
 
 	void createVertexBuffer();
 	void updateVertexBuffer();
+
+	void queueRenderable(Scene *queue);
+	Material *getRenderMaterial() const{return NULL;}
+	const Matrix4x4 &getRenderTransform() const{return mVisualWorldTransform;}
+	void render(peeper::Renderer *renderer) const{} // Rendering done by children
 
 protected:
 	mesh::Mesh::ptr mMesh;

@@ -27,8 +27,8 @@
 #define TOADLET_TADPOLE_NODE_MESHNODESKELETON_H
 
 #include <toadlet/tadpole/Types.h>
-#include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/mesh/Skeleton.h>
+#include <toadlet/tadpole/node/Renderable.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -116,8 +116,10 @@ public:
 
 	void setRenderable(bool renderable);
 	void updateVertexData();
+
+	void queueRenderable(Scene *queue){} // Queued by parent
+	Material *getRenderMaterial() const{return mMaterial;}
 	const Matrix4x4 &getRenderTransform() const;
-	const Material::ptr &getRenderMaterial() const{return mMaterial;}
 	void render(peeper::Renderer *renderer) const;
 
 protected:

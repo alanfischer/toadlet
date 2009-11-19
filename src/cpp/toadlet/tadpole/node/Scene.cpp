@@ -28,7 +28,7 @@
 #include <toadlet/egg/Profile.h>
 #include <toadlet/tadpole/node/Scene.h>
 #include <toadlet/tadpole/node/CameraNode.h>
-#include <toadlet/tadpole/node/RenderableNode.h>
+#include <toadlet/tadpole/node/Renderable.h>
 #include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet::egg;
@@ -124,8 +124,8 @@ void Scene::resetModifiedFrames(Node *node){
 	node->mWorldModifiedLogicFrame=-1;
 	node->mWorldModifiedVisualFrame=-1;
 
-	if(node->isParent()){
-		ParentNode *parent=(ParentNode*)node;
+	ParentNode *parent=node->isParent();
+	if(parent!=NULL){
 		int numChildren=parent->mChildren.size();
 		int i;
 		for(i=0;i<numChildren;++i){
@@ -200,8 +200,8 @@ void Scene::logicUpdate(Node::ptr node,int dt){
 
 	node->mWorldModifiedLogicFrame=node->mModifiedLogicFrame;
 
-	if(node->isParent()){
-		ParentNode *parent=(ParentNode*)node.get();
+	ParentNode *parent=node->isParent();
+	if(parent!=NULL){
 		if(parent->mShadowChildrenDirty){
 			parent->updateShadowChildren();
 		}
@@ -248,8 +248,8 @@ void Scene::visualUpdate(Node::ptr node,int dt){
 
 	node->mWorldModifiedVisualFrame=node->mModifiedVisualFrame;
 
-	if(node->isParent()){
-		ParentNode *parent=(ParentNode*)node.get();
+	ParentNode *parent=node->isParent();
+	if(parent!=NULL){
 		if(parent->mShadowChildrenDirty){
 			parent->updateShadowChildren();
 		}
@@ -388,6 +388,11 @@ void Scene::queueRenderable(Renderable *renderable){
 	getRenderLayer(layer)->renderables.add(renderable);
 }
 
+void Scene::queueLight(LightNode *light){
+	// TODO: FInd best light
+	mLight=light;
+}
+
 void Scene::setUpdateListener(UpdateListener *updateListener){
 	mUpdateListener=updateListener;
 }
@@ -402,22 +407,18 @@ void Scene::queueRenderables(Node *node){
 		return;
 	}
 
-	if(node->isParent()){
-		ParentNode *parent=(ParentNode*)node;
+	ParentNode *parent=node->isParent();
+	if(parent!=NULL){
 		int numChildren=parent->mChildren.size();
 		int i;
 		for(i=0;i<numChildren;++i){
 			queueRenderables(parent->mChildren[i]);
 		}
 	}
-	else if(node->isLight()){
-		// TODO: Find the best light
-		mLight=(LightNode*)node;
-	}
-	else if(node->isRenderable()){
-		RenderableNode *renderable=(RenderableNode*)node;
-		if(renderable->mVisible){
-			renderable->queueRenderables(this);
+	else{
+		Renderable *renderable=node->isRenderable();
+		if(renderable!=NULL){
+			renderable->queueRenderable(this);
 		}
 	}
 }

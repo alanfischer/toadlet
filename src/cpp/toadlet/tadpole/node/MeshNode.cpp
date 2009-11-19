@@ -256,7 +256,7 @@ void MeshNode::visualUpdate(int dt){
 	}
 }
 
-void MeshNode::queueRenderables(Scene *scene){
+void MeshNode::queueRenderable(Scene *scene){
 	if(mMesh!=NULL && mMesh->worldScale!=Math::ONE){
 		mVisualWorldTransform.reset();
 		mVisualWorldTransform.setAt(0,0,mMesh->worldScale);

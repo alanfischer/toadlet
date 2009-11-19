@@ -54,6 +54,10 @@ void LightNode::destroy(){
 	super::destroy();
 }
 
+void LightNode::queueRenderable(Scene *queue){
+	queue->queueLight(this);
+}
+
 }
 }
 }
