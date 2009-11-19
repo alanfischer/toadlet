@@ -107,7 +107,7 @@ bool ALAudio::create(InputStream::ptr in,const String &mimeType){
 	return true;
 }
 
-bool ALAudio::destroy(){
+void ALAudio::destroy(){
 	if(mHandle!=0){
 		if(alIsSource(mHandle)){
 			alSourceStop(mHandle);
@@ -116,7 +116,6 @@ bool ALAudio::destroy(){
 		mAudioPlayer->checkinSourceHandle(this,mHandle);
 		mHandle=0;
 	}
-	return true;
 }
 
 bool ALAudio::play(){

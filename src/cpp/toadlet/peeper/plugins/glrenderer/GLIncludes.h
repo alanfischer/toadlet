@@ -66,10 +66,6 @@
 	#define TOADLET_HAS_EGL_11
 	#define TOADLET_HAS_GLES
 	#define TOADLET_HAS_GL_11
-#elif defined(TOADLET_PLATFORM_OSX)
-	// TODO: Move OSX back to using GLEW
-	#include <OpenGL/OpenGL.h>
-	#include <AGL/agl.h>
 #else
 	#if defined(TOADLET_PLATFORM_WIN32)
 		#define GLEW_STATIC

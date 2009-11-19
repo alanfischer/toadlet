@@ -41,7 +41,9 @@ public:
 	CoreAudio(ALPlayer *audioPlayer);
 	virtual ~CoreAudio();
 
-	bool loadAudioStream(AudioStream::ptr stream);
+	bool create(AudioBuffer::ptr buffer);
+	bool create(egg::io::InputStream::ptr in,const egg::String &mimeType);
+	void destroy();
 
 	bool play();
 	bool stop();
@@ -70,6 +72,8 @@ public:
 	void setSourceHandle(int handle);
 	int getSourceHandle();
 
+	void update(int dt);
+	
 	void setImmediateGain(scalar gain);
 
 protected:
@@ -82,11 +86,12 @@ protected:
 
 	bool mLooping;
 	ALPlayer *mAudioPlayer;
-	CoreAudioDecoder::ptr mAudioStream;
+	CoreAudioDecoder::ptr mStream;
 	scalar mTargetGain;
 	scalar mGain;
 	int mFadeTime;
 
+	const static int numBuffers=3;
 	AudioQueueRef mAudioQueue;
 	AudioQueueBufferRef mBuffers[numBuffers];
 	egg::Collection<AudioQueueBufferRef> mBuffersToDispose;
@@ -94,6 +99,8 @@ protected:
 	int mCurrentPacket;
 	AudioStreamPacketDescription *mPacketDescs;
 	UInt64 mFileDataSize;
+	
+	friend class ALPlayer;
 };
 
 }
