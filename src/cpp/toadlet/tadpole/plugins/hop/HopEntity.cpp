@@ -266,7 +266,7 @@ void HopEntity::setShadowMesh(Mesh::ptr shadow,scalar scale,scalar testLength,sc
 			mShadowNode=mEngine->createNodeType(MeshNode::type());
 			mScene->attach(mShadowNode);
 		}
-		mShadowNode->start(mShadowMesh);
+		mShadowNode->setMesh(mShadowMesh);
 		mShadowNode->setScale(scale,scale,scale);
 		// We assume the shadow only has 1 subMesh
 		mShadowMaterial=mShadowNode->getSubMesh(0)->material;
@@ -410,9 +410,10 @@ void HopEntity::showCollisionVolumes(bool show){
 				}break;
 			}
 
-//			mesh->subMeshes[0]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,mesh->subMeshes[0]->indexData->indexBuffer));
+			// TODO: Use LINES for bounding volumes
+			//mesh->subMeshes[0]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,mesh->subMeshes[0]->indexData->indexBuffer));
 			MeshNode *meshNode=mEngine->createNodeType(MeshNode::type());
-			meshNode->start(mesh);
+			meshNode->setMesh(mesh);
 			mVolumeNode->attach(meshNode);
 		}
 	}
