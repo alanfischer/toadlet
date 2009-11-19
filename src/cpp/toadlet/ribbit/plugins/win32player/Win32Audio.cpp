@@ -60,9 +60,8 @@ bool Win32Audio::create(egg::io::InputStream::ptr in,const egg::String &mimeType
 	return false;
 }
 
-bool Win32Audio::destroy(){
+void Win32Audio::destroy(){
 	mPlayer->internal_audioDestroy(this);
-	return true;
 }
 
 bool Win32Audio::play(){
