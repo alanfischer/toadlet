@@ -45,6 +45,8 @@ LabelNode::LabelNode():super(),
 	mPerspective(false),
 	mAlignment(0),
 	mPixelSpace(false),
+	mWordWrap(false),
+	//mSize,
 
 	mMaterial(NULL),
 	mVertexData(NULL),
@@ -57,6 +59,8 @@ Node *LabelNode::create(Engine *engine){
 	setPerspective(true);
 	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
 	setPixelSpace(false);
+	setWordWrap(false);
+	mSize.reset();
 
 	mMaterial=engine->getMaterialManager()->createMaterial();
 	mMaterial->retain();
@@ -128,6 +132,28 @@ void LabelNode::setPixelSpace(bool pixelSpace){
 	updateLabel();
 }
 
+void LabelNode::setWordWrap(bool wordWrap){
+	mWordWrap=wordWrap;
+
+	updateLabel();
+}
+
+void LabelNode::setSize(scalar x,scalar y,scalar z){
+	mSize.set(x,y,z);
+
+	updateLabel();
+}
+
+void LabelNode::setSize(const Vector3 &size){
+	mSize.set(size);
+
+	updateLabel();
+}
+
+const Vector3 &LabelNode::getDesiredSize() const{
+	return Math::ZERO_VECTOR3;
+}
+
 void LabelNode::queueRenderable(Scene *scene){
 	if(mVertexData==NULL || mIndexData==NULL){
 		return;
@@ -188,10 +214,18 @@ void LabelNode::updateLabel(){
 		return;
 	}
 
-	String text=mText;
-//	if(mWordWrap){
-//		text=wordWrap(mFont,mWidth,text);
-//	}
+	String text;
+	if(mWordWrap){
+		if(mPixelSpace){
+			text=wordWrap(mFont,mSize.x,mText);
+		}
+		else{
+			text=wordWrap(mFont,Math::toInt(mSize.x*mFont->getPointSize()),mText);
+		}
+	}
+	else{
+		text=mText;
+	}
 
 	int length=text.length();
 
@@ -269,6 +303,39 @@ void LabelNode::updateBound(){
 	else{
 		mBoundingRadius=-Math::ONE;
 	}
+}
+
+String LabelNode::wordWrap(Font::ptr font,int width,const String &text){
+	// Word wrapping algorithm
+	String result=text;
+	int spaceWidth=font->getStringWidth(" ");
+	int spaceLeft=width;
+	int start=0;
+	int end=result.find(' ');
+	while(end!=String::npos){
+		String word=result.substr(start,end-start);
+		int wordWidth=font->getStringWidth(word);
+		if(wordWidth>spaceLeft){
+			result=result.substr(0,start)+(char)10+result.substr(start,result.length());
+			spaceLeft=width-wordWidth;
+		}
+		else{
+			spaceLeft=spaceLeft-(wordWidth + spaceWidth);
+		}
+
+		if(end>=result.length()){
+			break;
+		}
+		else{
+			start=end+1;
+			end=result.find(' ',start);
+			if(end==String::npos){
+				end=result.length();
+			}
+		}
+	}
+
+	return result;
 }
 
 }

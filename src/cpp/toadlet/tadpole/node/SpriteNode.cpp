@@ -44,11 +44,12 @@ SpriteNode::SpriteNode():super(),
 	mPerspective(false),
 	mAlignment(0),
 	mPixelSpace(false),
+	//mSize,
 
 	mMaterial(NULL),
 	mVertexData(NULL),
 	mIndexData(NULL)
-	//mAlignmentTransform
+	//mSpriteTransform
 {}
 
 Node *SpriteNode::create(Engine *engine){
@@ -57,6 +58,7 @@ Node *SpriteNode::create(Engine *engine){
 	setPerspective(true);
 	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
 	setPixelSpace(false);
+	mSize.reset();
 
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,4);
 	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
@@ -149,6 +151,18 @@ void SpriteNode::setPixelSpace(bool pixelSpace){
 	updateSprite();
 }
 
+void SpriteNode::setSize(scalar x,scalar y,scalar z){
+	mSize.set(x,y,z);
+
+	updateSprite();
+}
+
+void SpriteNode::setSize(const Vector3 &size){
+	mSize.set(size);
+
+	updateSprite();
+}
+
 void SpriteNode::queueRenderable(Scene *scene){
 	Matrix4x4 &scale=cache_queueRenderable_scale.reset();
 	Vector4 &point=cache_queueRenderable_point.reset();
@@ -187,9 +201,7 @@ void SpriteNode::queueRenderable(Scene *scene){
 		scale.setAt(2,2,Math::mul(point.w,mScale.z));
 	}
 
-	if(mAlignment!=(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER) || mPixelSpace){
-		Math::postMul(mVisualWorldTransform,mAlignmentTransform);
-	}
+	Math::postMul(mVisualWorldTransform,mSpriteTransform);
 	Math::postMul(mVisualWorldTransform,scale);
 
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
@@ -204,6 +216,8 @@ void SpriteNode::render(Renderer *renderer) const{
 }
 
 void SpriteNode::updateSprite(){
+	mSpriteTransform.reset();
+
 	scalar x=0,y=0;
 	if((mAlignment&Font::Alignment_BIT_LEFT)>0){
 		x=Math::HALF;
@@ -217,22 +231,26 @@ void SpriteNode::updateSprite(){
 	else if((mAlignment&Font::Alignment_BIT_TOP)>0){
 		y=-Math::HALF;
 	}
-	Math::setMatrix4x4FromTranslate(mAlignmentTransform,x,y,0);
+	Math::setMatrix4x4FromTranslate(mSpriteTransform,x,y,0);
 
-	if(mPixelSpace && mMaterial!=NULL){
+	scalar widthScale=Math::ONE;
+	scalar heightScale=Math::ONE;
+	scalar depthScale=Math::ONE;
+	if(mMaterial!=NULL && mPixelSpace){
 		TextureStage::ptr textureStage=mMaterial->getTextureStage(0);
 		if(textureStage!=NULL){
 			Texture::ptr texture=textureStage->getTexture();
 			if(texture!=NULL){
-				scalar width=texture->getWidth();
-				scalar height=texture->getHeight();
-
-				Matrix4x4 pixelScale;
-				Math::setMatrix4x4FromScale(pixelScale,width,height,Math::ONE);
-				Math::postMul(mAlignmentTransform,pixelScale);
+				widthScale=Math::fromInt(texture->getWidth());
+				heightScale=Math::fromInt(texture->getHeight());
+				depthScale=Math::fromInt(texture->getDepth());
 			}
 		}
 	}
+
+	Matrix4x4 scale;
+	Math::setMatrix4x4FromScale(scale,Math::mul(mSize.x,widthScale),Math::mul(mSize.y,heightScale),Math::mul(mSize.z,depthScale));
+	Math::postMul(mSpriteTransform,scale);
 
 	updateBound();
 }

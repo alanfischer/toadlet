@@ -34,12 +34,13 @@
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/node/Node.h>
 #include <toadlet/tadpole/node/Renderable.h>
+#include <toadlet/tadpole/node/Sizeable.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class TOADLET_API LabelNode:public Node,public Renderable{
+class TOADLET_API LabelNode:public Node,public Renderable,public Sizeable{
 public:
 	TOADLET_NODE(LabelNode,Node);
 
@@ -64,6 +65,14 @@ public:
 	void setPixelSpace(bool pixelSpace);
 	bool getPixelSpace() const{return mPixelSpace;}
 
+	void setWordWrap(bool wordWrap);
+	bool getWordWrap() const{return mWordWrap;}
+
+	void setSize(scalar x,scalar y,scalar z);
+	void setSize(const Vector3 &size);
+	const Vector3 &getSize() const{return mSize;}
+	const Vector3 &getDesiredSize() const;
+
 	void queueRenderable(Scene *scene);
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Matrix4x4 &getRenderTransform() const{return super::getVisualWorldTransform();}
@@ -77,11 +86,15 @@ protected:
 	void updateLabel();
 	void updateBound();
 
+	static egg::String wordWrap(Font::ptr font,int width,const egg::String &text);
+
 	Font::ptr mFont;
 	egg::String mText;
 	bool mPerspective;
 	int mAlignment;
 	bool mPixelSpace;
+	bool mWordWrap;
+	Vector3 mSize;
 
 	Material::ptr mMaterial;
 	peeper::VertexData::ptr mVertexData;
