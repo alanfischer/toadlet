@@ -136,7 +136,7 @@ void HopEntity::setTranslate(const Vector3 &translate){
 
 	mModifiedFields|=ENTITY_BIT_POSITION;
 
-	setVisualTransformTranslate(mTranslate);
+	setRenderTransformTranslate(mTranslate);
 }
 
 void HopEntity::setTranslate(scalar x,scalar y,scalar z){
@@ -338,15 +338,15 @@ void HopEntity::postLogicUpdate(int dt){
 void HopEntity::interpolatePhysicalParameters(scalar f){
 	Vector3 &interpolate=cache_interpolatePhysicalParameters_interpolate;
 	Math::lerp(interpolate,mLastPosition,mSolid->getPosition(),f);
-	setVisualTransformTranslate(interpolate);
+	setRenderTransformTranslate(interpolate);
 }
 
 void HopEntity::castShadow(){
 	Segment segment;
 	Vector3 vector;
 	Matrix3x3 rotate;
-	Math::setVector3FromMatrix4x4(segment.origin,mVisualTransform);
-	Math::setMatrix3x3FromMatrix4x4(rotate,mVisualTransform);
+	Math::setVector3FromMatrix4x4(segment.origin,mRenderTransform);
+	Math::setMatrix3x3FromMatrix4x4(rotate,mRenderTransform);
 	if(mSolid->hasLocalGravity()){
 		Math::normalize(vector,mSolid->getLocalGravity());
 	}
@@ -428,7 +428,7 @@ void HopEntity::showCollisionVolumes(bool show){
 void HopEntity::updateVolumes(bool interpolate){
 	if(interpolate){
 		Vector3 translate;
-		Math::setVector3FromMatrix4x4(translate,mVisualTransform);
+		Math::setVector3FromMatrix4x4(translate,mRenderTransform);
 		mVolumeNode->setTranslate(translate);
 	}
 	else{

@@ -55,9 +55,9 @@ Node::Node():
 	mReceiveUpdates(false),
 
 	mModifiedLogicFrame(0),
-	mModifiedVisualFrame(0),
+	mModifiedRenderFrame(0),
 	mWorldModifiedLogicFrame(0),
-	mWorldModifiedVisualFrame(0)
+	mWorldModifiedRenderFrame(0)
 {
 }
 
@@ -87,13 +87,13 @@ Node *Node::create(Engine *engine){
 	mReceiveUpdates=false;
 
 	mModifiedLogicFrame=-1;
-	mModifiedVisualFrame=-1;
+	mModifiedRenderFrame=-1;
 	mWorldModifiedLogicFrame=-1;
-	mWorldModifiedVisualFrame=-1;
+	mWorldModifiedRenderFrame=-1;
 
-	mVisualTransform.reset();
-	mVisualWorldBound.reset();
-	mVisualWorldTransform.reset();
+	mRenderTransform.reset();
+	mRenderWorldBound.reset();
+	mRenderWorldTransform.reset();
 
 	return this;
 }
@@ -138,7 +138,7 @@ void Node::removeAllNodeDestroyedListeners(){
 void Node::setTranslate(const Vector3 &translate){
 	mTranslate.set(translate);
 
-	setVisualTransformTranslate(mTranslate);
+	setRenderTransformTranslate(mTranslate);
 
 	mIdentityTransform=false;
 	modified();
@@ -147,7 +147,7 @@ void Node::setTranslate(const Vector3 &translate){
 void Node::setTranslate(scalar x,scalar y,scalar z){
 	mTranslate.set(x,y,z);
 
-	setVisualTransformTranslate(mTranslate);
+	setRenderTransformTranslate(mTranslate);
 
 	mIdentityTransform=false;
 	modified();
@@ -156,7 +156,7 @@ void Node::setTranslate(scalar x,scalar y,scalar z){
 void Node::setRotate(const Matrix3x3 &rotate){
 	mRotate.set(rotate);
 
-	setVisualTransformRotateScale(mRotate,mScale);
+	setRenderTransformRotateScale(mRotate,mScale);
 
 	mIdentityTransform=false;
 	modified();
@@ -165,7 +165,7 @@ void Node::setRotate(const Matrix3x3 &rotate){
 void Node::setRotate(scalar x,scalar y,scalar z,scalar angle){
 	Math::setMatrix3x3FromAxisAngle(mRotate,cache_setRotate_vector.set(x,y,z),angle);
 
-	setVisualTransformRotateScale(mRotate,mScale);
+	setRenderTransformRotateScale(mRotate,mScale);
 
 	mIdentityTransform=false;
 	modified();
@@ -174,7 +174,7 @@ void Node::setRotate(scalar x,scalar y,scalar z,scalar angle){
 void Node::setScale(const Vector3 &scale){
 	mScale.set(scale);
 
-	setVisualTransformRotateScale(mRotate,mScale);
+	setRenderTransformRotateScale(mRotate,mScale);
 
 	mIdentityTransform=false;
 	modified();
@@ -183,7 +183,7 @@ void Node::setScale(const Vector3 &scale){
 void Node::setScale(scalar x,scalar y,scalar z){
 	mScale.set(x,y,z);
 
-	setVisualTransformRotateScale(mRotate,mScale);
+	setRenderTransformRotateScale(mRotate,mScale);
 
 	mIdentityTransform=false;
 	modified();
@@ -205,7 +205,7 @@ void Node::setReceiveUpdates(bool receiveUpdates){
 void Node::modified(){
 	if(mEngine!=NULL){
 		mModifiedLogicFrame=mEngine->getScene()->getLogicFrame();
-		mModifiedVisualFrame=mEngine->getScene()->getVisualFrame();
+		mModifiedRenderFrame=mEngine->getScene()->getRenderFrame();
 	}
 }
 
@@ -213,16 +213,16 @@ bool Node::modifiedSinceLastLogicFrame() const{
 	return mWorldModifiedLogicFrame+1>=mEngine->getScene()->getLogicFrame();
 }
 
-bool Node::modifiedSinceLastVisualFrame() const{
-	return mWorldModifiedVisualFrame+1>=mEngine->getScene()->getVisualFrame();
+bool Node::modifiedSinceLastRenderFrame() const{
+	return mWorldModifiedRenderFrame+1>=mEngine->getScene()->getRenderFrame();
 }
 
-void Node::setVisualTransformTranslate(const Vector3 &translate){
-	Math::setMatrix4x4FromTranslate(mVisualTransform,translate);
+void Node::setRenderTransformTranslate(const Vector3 &translate){
+	Math::setMatrix4x4FromTranslate(mRenderTransform,translate);
 }
 
-void Node::setVisualTransformRotateScale(const Matrix3x3 &rotate,const Vector3 &scale){
-	Math::setMatrix4x4FromRotateScale(mVisualTransform,rotate,scale);
+void Node::setRenderTransformRotateScale(const Matrix3x3 &rotate,const Vector3 &scale){
+	Math::setMatrix4x4FromRotateScale(mRenderTransform,rotate,scale);
 }
 
 }

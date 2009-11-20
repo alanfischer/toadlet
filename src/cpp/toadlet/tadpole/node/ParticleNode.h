@@ -131,7 +131,7 @@ public:
 	inline void destroyNextLogicFrame(){mDestroyNextLogicFrame=true;}
 	
 	virtual void logicUpdate(int dt);
-	virtual void visualUpdate(int dt);
+	virtual void renderUpdate(int dt);
 	virtual void queueRenderable(Scene *scene);
 
 	virtual Material *getRenderMaterial() const{return mMaterial;}

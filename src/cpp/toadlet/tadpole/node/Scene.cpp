@@ -45,7 +45,7 @@ Scene::Scene():super(),
 	mLogicTime(0),
 	mLogicFrame(0),
 	mAccumulatedDT(0),
-	mVisualFrame(0),
+	mRenderFrame(0),
 
 	//mBackground,
 
@@ -113,16 +113,16 @@ void Scene::setLogicTimeAndFrame(int time,int frame){
 	mLogicTime=time;
 	mLogicFrame=frame;
 	mAccumulatedDT=0;
-	mVisualFrame=0;
+	mRenderFrame=0;
 
 	resetModifiedFrames(this);
 }
 
 void Scene::resetModifiedFrames(Node *node){
 	node->mModifiedLogicFrame=-1;
-	node->mModifiedVisualFrame=-1;
+	node->mModifiedRenderFrame=-1;
 	node->mWorldModifiedLogicFrame=-1;
-	node->mWorldModifiedVisualFrame=-1;
+	node->mWorldModifiedRenderFrame=-1;
 
 	ParentNode *parent=node->isParent();
 	if(parent!=NULL){
@@ -168,10 +168,10 @@ void Scene::update(int dt){
 	}
 
 	if(mUpdateListener!=NULL){
-		mUpdateListener->visualUpdate(dt);
+		mUpdateListener->renderUpdate(dt);
 	}
 	else{
-		visualUpdate(dt);
+		renderUpdate(dt);
 	}
 
 	AudioPlayer *audioPlayer=mEngine->getAudioPlayer();
@@ -222,31 +222,31 @@ void Scene::logicUpdate(Node::ptr node,int dt){
 void Scene::postLogicUpdateLoop(int dt){
 }
 
-void Scene::visualUpdate(int dt){
-	mVisualFrame++;
+void Scene::renderUpdate(int dt){
+	mRenderFrame++;
 
 	if(mBackground->getNumChildren()>0){
-		visualUpdate(mBackground,dt);
+		renderUpdate(mBackground,dt);
 	}
-	visualUpdate(this,dt);
+	renderUpdate(this,dt);
 }
 
-void Scene::visualUpdate(Node::ptr node,int dt){
+void Scene::renderUpdate(Node::ptr node,int dt){
 	if(node->mReceiveUpdates){
-		node->visualUpdate(dt);
+		node->renderUpdate(dt);
 	}
 
 	if(node->mParent==NULL){
-		node->mVisualWorldTransform.set(node->mVisualTransform);
+		node->mRenderWorldTransform.set(node->mRenderTransform);
 	}
 	else if(node->mIdentityTransform){
-		node->mVisualWorldTransform.set(node->mParent->mVisualWorldTransform);
+		node->mRenderWorldTransform.set(node->mParent->mRenderWorldTransform);
 	}
 	else{
-		Math::mul(node->mVisualWorldTransform,node->mParent->mVisualWorldTransform,node->mVisualTransform);
+		Math::mul(node->mRenderWorldTransform,node->mParent->mRenderWorldTransform,node->mRenderTransform);
 	}
 
-	node->mWorldModifiedVisualFrame=node->mModifiedVisualFrame;
+	node->mWorldModifiedRenderFrame=node->mModifiedRenderFrame;
 
 	ParentNode *parent=node->isParent();
 	if(parent!=NULL){
@@ -260,29 +260,29 @@ void Scene::visualUpdate(Node::ptr node,int dt){
 		for(i=0;i<numChildren;++i){
 			child=parent->mShadowChildren[i];
 
-			visualUpdate(child,dt);
+			renderUpdate(child,dt);
 
-			if(parent->mVisualWorldBound.radius>=0){
-				if(child->mVisualWorldBound.radius>=0){
-					scalar d=Math::length(parent->mVisualWorldBound.origin,child->mVisualWorldBound.origin) + child->mVisualWorldBound.radius;
-					parent->mVisualWorldBound.radius=Math::maxVal(parent->mVisualWorldBound.radius,d);
+			if(parent->mRenderWorldBound.radius>=0){
+				if(child->mRenderWorldBound.radius>=0){
+					scalar d=Math::length(parent->mRenderWorldBound.origin,child->mRenderWorldBound.origin) + child->mRenderWorldBound.radius;
+					parent->mRenderWorldBound.radius=Math::maxVal(parent->mRenderWorldBound.radius,d);
 				}
 				else{
-					parent->mVisualWorldBound.radius=-Math::ONE;
+					parent->mRenderWorldBound.radius=-Math::ONE;
 				}
 			}
 
-			parent->mWorldModifiedVisualFrame=parent->mWorldModifiedVisualFrame>child->mWorldModifiedVisualFrame?parent->mWorldModifiedVisualFrame:child->mWorldModifiedVisualFrame;
+			parent->mWorldModifiedRenderFrame=parent->mWorldModifiedRenderFrame>child->mWorldModifiedRenderFrame?parent->mWorldModifiedRenderFrame:child->mWorldModifiedRenderFrame;
 		}
 	}
 	else{
-		Math::setVector3FromMatrix4x4(node->mVisualWorldBound.origin,node->mVisualWorldTransform);
+		Math::setVector3FromMatrix4x4(node->mRenderWorldBound.origin,node->mRenderWorldTransform);
 		if(node->mIdentityTransform==false){
 			scalar scale=Math::maxVal(node->getScale().x,Math::maxVal(node->getScale().y,node->getScale().z));
-			node->mVisualWorldBound.radius=Math::mul(scale,node->mBoundingRadius);
+			node->mRenderWorldBound.radius=Math::mul(scale,node->mBoundingRadius);
 		}
 		else{
-			node->mVisualWorldBound.radius=node->mBoundingRadius;
+			node->mRenderWorldBound.radius=node->mBoundingRadius;
 		}
 	}
 }
@@ -328,8 +328,8 @@ void Scene::render(Renderer *renderer,CameraNode *camera,Node *node){
 
 	// Only render background when rendering from the scene
 	if(node==this && mBackground->getNumChildren()>0){
-		mBackground->setTranslate(mCamera->getVisualWorldTranslate());
-		visualUpdate(mBackground,0);
+		mBackground->setTranslate(mCamera->getRenderWorldTranslate());
+		renderUpdate(mBackground,0);
 		queueRenderables(mBackground);
 	}
 	queueRenderables(node);
@@ -424,11 +424,11 @@ void Scene::queueRenderables(Node *node){
 }
 
 bool Scene::culled(Node *node){
-	if(node->mVisualWorldBound.radius<0){
+	if(node->mRenderWorldBound.radius<0){
 		return false;
 	}
 
-	return mCamera->culled(node->mVisualWorldBound);
+	return mCamera->culled(node->mRenderWorldBound);
 }
 
 bool Scene::preLayerRender(Renderer *renderer,int layer){

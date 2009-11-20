@@ -240,7 +240,7 @@ void HopScene::logicUpdate(int dt){
 void HopScene::postLogicUpdateLoop(int dt){
 }
 
-void HopScene::visualUpdate(int dt){
+void HopScene::renderUpdate(int dt){
 	int i;
 	bool active,activePrevious;
 
@@ -267,7 +267,7 @@ void HopScene::visualUpdate(int dt){
 		}
 	}
 
-	super::visualUpdate(dt);
+	super::renderUpdate(dt);
 }
 
 void HopScene::defaultRegisterHopEntity(HopEntity *entity){

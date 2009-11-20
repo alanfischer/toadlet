@@ -34,7 +34,7 @@ public:
 	virtual ~UpdateListener(){}
 
 	virtual void logicUpdate(int dt)=0;
-	virtual void visualUpdate(int dt)=0;
+	virtual void renderUpdate(int dt)=0;
 };
 
 }

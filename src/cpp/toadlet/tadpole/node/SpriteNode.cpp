@@ -164,28 +164,29 @@ void SpriteNode::setSize(const Vector3 &size){
 }
 
 void SpriteNode::queueRenderable(Scene *scene){
+// The sprite & label alignment needs to be reworked
 	Matrix4x4 &scale=cache_queueRenderable_scale.reset();
 	Vector4 &point=cache_queueRenderable_point.reset();
 	const Matrix4x4 &viewTransform=scene->getCamera()->getViewTransform();
 	const Matrix4x4 &projectionTransform=scene->getCamera()->getProjectionTransform();
 
 	if(mIdentityTransform){
-		mVisualWorldTransform.set(mParent->getVisualWorldTransform());
+		mRenderWorldTransform.set(mParent->getRenderWorldTransform());
 	}
 	else{
-		Math::mul(mVisualWorldTransform,mParent->getVisualWorldTransform(),mVisualTransform);
+		Math::mul(mRenderWorldTransform,mParent->getRenderWorldTransform(),mRenderTransform);
 	}
-
-	mVisualWorldTransform.setAt(0,0,viewTransform.at(0,0));
-	mVisualWorldTransform.setAt(1,0,viewTransform.at(0,1));
-	mVisualWorldTransform.setAt(2,0,viewTransform.at(0,2));
-	mVisualWorldTransform.setAt(0,1,viewTransform.at(1,0));
-	mVisualWorldTransform.setAt(1,1,viewTransform.at(1,1));
-	mVisualWorldTransform.setAt(2,1,viewTransform.at(1,2));
-	mVisualWorldTransform.setAt(0,2,viewTransform.at(2,0));
-	mVisualWorldTransform.setAt(1,2,viewTransform.at(2,1));
-	mVisualWorldTransform.setAt(2,2,viewTransform.at(2,2));
-
+/*
+	mRenderWorldTransform.setAt(0,0,viewTransform.at(0,0));
+	mRenderWorldTransform.setAt(1,0,viewTransform.at(0,1));
+	mRenderWorldTransform.setAt(2,0,viewTransform.at(0,2));
+	mRenderWorldTransform.setAt(0,1,viewTransform.at(1,0));
+	mRenderWorldTransform.setAt(1,1,viewTransform.at(1,1));
+	mRenderWorldTransform.setAt(2,1,viewTransform.at(1,2));
+	mRenderWorldTransform.setAt(0,2,viewTransform.at(2,0));
+	mRenderWorldTransform.setAt(1,2,viewTransform.at(2,1));
+	mRenderWorldTransform.setAt(2,2,viewTransform.at(2,2));
+*/
 	scale.reset();
 	if(mPerspective){
 		scale.setAt(0,0,mScale.x);
@@ -193,7 +194,7 @@ void SpriteNode::queueRenderable(Scene *scene){
 		scale.setAt(2,2,mScale.z);
 	}
 	else{
-		point.set(mVisualWorldTransform.at(0,3),mVisualWorldTransform.at(1,3),mVisualWorldTransform.at(2,3),Math::ONE);
+		point.set(mRenderWorldTransform.at(0,3),mRenderWorldTransform.at(1,3),mRenderWorldTransform.at(2,3),Math::ONE);
 		Math::mul(point,viewTransform);
 		Math::mul(point,projectionTransform);
 		scale.setAt(0,0,Math::mul(point.w,mScale.x));
@@ -201,8 +202,8 @@ void SpriteNode::queueRenderable(Scene *scene){
 		scale.setAt(2,2,Math::mul(point.w,mScale.z));
 	}
 
-	Math::postMul(mVisualWorldTransform,mSpriteTransform);
-	Math::postMul(mVisualWorldTransform,scale);
+	Math::postMul(mRenderWorldTransform,mSpriteTransform);
+	Math::postMul(mRenderWorldTransform,scale);
 
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
 	scene->queueRenderable(&renderable);
@@ -236,7 +237,7 @@ void SpriteNode::updateSprite(){
 	scalar widthScale=Math::ONE;
 	scalar heightScale=Math::ONE;
 	scalar depthScale=Math::ONE;
-	if(mMaterial!=NULL && mPixelSpace){
+/*	if(mMaterial!=NULL && mPixelSpace){
 		TextureStage::ptr textureStage=mMaterial->getTextureStage(0);
 		if(textureStage!=NULL){
 			Texture::ptr texture=textureStage->getTexture();
@@ -247,7 +248,7 @@ void SpriteNode::updateSprite(){
 			}
 		}
 	}
-
+*/
 	Matrix4x4 scale;
 	Math::setMatrix4x4FromScale(scale,Math::mul(mSize.x,widthScale),Math::mul(mSize.y,heightScale),Math::mul(mSize.z,depthScale));
 	Math::postMul(mSpriteTransform,scale);

@@ -45,7 +45,7 @@ public:
 	virtual bool attach(Node *node,int bone);
 	virtual bool remove(Node *node);
 
-	virtual void visualUpdate(int dt);
+	virtual void renderUpdate(int dt);
 
 protected:
 	MeshNodeSkeleton::ptr mSkeleton;

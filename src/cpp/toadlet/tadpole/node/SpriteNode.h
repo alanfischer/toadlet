@@ -50,6 +50,7 @@ public:
 	virtual void destroy();
 
 	Renderable *isRenderable(){return this;}
+	Sizeable *isSizeable(){return this;}
 
 	void setMaterial(const egg::String &name);
 	void setMaterial(Material::ptr material);
@@ -67,11 +68,11 @@ public:
 	void setSize(scalar x,scalar y,scalar z);
 	void setSize(const Vector3 &size);
 	const Vector3 &getSize() const{return mSize;}
-	const Vector3 &getDesiredSize() const{return Math::ZERO_VECTOR3;}
+	const Vector3 &getDesiredSize(){return Math::ZERO_VECTOR3;}
 
 	void queueRenderable(Scene *scene);
 	Material *getRenderMaterial() const{return mMaterial;}
-	const Matrix4x4 &getRenderTransform() const{return super::getVisualWorldTransform();}
+	const Matrix4x4 &getRenderTransform() const{return super::getRenderWorldTransform();}
 	void render(peeper::Renderer *renderer) const;
 
 	peeper::VertexBufferAccessor vba;

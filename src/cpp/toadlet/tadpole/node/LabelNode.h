@@ -49,6 +49,7 @@ public:
 	virtual void destroy();
 
 	Renderable *isRenderable(){return this;}
+	Sizeable *isSizeable(){return this;}
 
 	void setFont(const Font::ptr &font);
 	Font::ptr getFont() const{return mFont;}
@@ -71,11 +72,11 @@ public:
 	void setSize(scalar x,scalar y,scalar z);
 	void setSize(const Vector3 &size);
 	const Vector3 &getSize() const{return mSize;}
-	const Vector3 &getDesiredSize() const;
+	const Vector3 &getDesiredSize();
 
 	void queueRenderable(Scene *scene);
 	Material *getRenderMaterial() const{return mMaterial;}
-	const Matrix4x4 &getRenderTransform() const{return super::getVisualWorldTransform();}
+	const Matrix4x4 &getRenderTransform() const{return super::getRenderWorldTransform();}
 	void render(peeper::Renderer *renderer) const;
 
 	peeper::VertexBufferAccessor vba;

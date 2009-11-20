@@ -101,8 +101,8 @@ void MeshNode::MeshAnimationController::logicUpdate(int dt){
 	}
 }
 
-void MeshNode::MeshAnimationController::visualUpdate(int dt){
-	AnimationController::visualUpdate(dt);
+void MeshNode::MeshAnimationController::renderUpdate(int dt){
+	AnimationController::renderUpdate(dt);
 }
 
 void MeshNode::MeshAnimationController::skeletonChanged(){
@@ -250,25 +250,25 @@ void MeshNode::logicUpdate(int dt){
 	}
 }
 
-void MeshNode::visualUpdate(int dt){
+void MeshNode::renderUpdate(int dt){
 	if(mAnimationController!=NULL){
-		mAnimationController->visualUpdate(dt);
+		mAnimationController->renderUpdate(dt);
 	}
 }
 
 void MeshNode::queueRenderable(Scene *scene){
 	if(mMesh!=NULL && mMesh->worldScale!=Math::ONE){
-		mVisualWorldTransform.reset();
-		mVisualWorldTransform.setAt(0,0,mMesh->worldScale);
-		mVisualWorldTransform.setAt(1,1,mMesh->worldScale);
-		mVisualWorldTransform.setAt(2,2,mMesh->worldScale);
-		Math::preMul(mVisualWorldTransform,mVisualTransform);
-		Math::preMul(mVisualWorldTransform,mParent->getVisualWorldTransform());
+		mRenderWorldTransform.reset();
+		mRenderWorldTransform.setAt(0,0,mMesh->worldScale);
+		mRenderWorldTransform.setAt(1,1,mMesh->worldScale);
+		mRenderWorldTransform.setAt(2,2,mMesh->worldScale);
+		Math::preMul(mRenderWorldTransform,mRenderTransform);
+		Math::preMul(mRenderWorldTransform,mParent->getRenderWorldTransform());
 	}
 
 	if(mSkeleton!=NULL){
-		int lastVisualUpdateFrame=mSkeleton->getLastVisualUpdateFrame();
-		if(lastVisualUpdateFrame==-1 || lastVisualUpdateFrame==scene->getVisualFrame()){
+		int lastRenderUpdateFrame=mSkeleton->getLastRenderUpdateFrame();
+		if(lastRenderUpdateFrame==-1 || lastRenderUpdateFrame==scene->getRenderFrame()){
 			updateVertexBuffer();
 		}
 	}

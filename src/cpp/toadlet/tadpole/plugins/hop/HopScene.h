@@ -77,7 +77,7 @@ public:
 	virtual void preLogicUpdateLoop(int dt);
 	virtual void logicUpdate(int dt);
 	virtual void postLogicUpdateLoop(int dt);
-	virtual void visualUpdate(int dt);
+	virtual void renderUpdate(int dt);
 
 	hop::Collision cache_traceSegment_collision;
 

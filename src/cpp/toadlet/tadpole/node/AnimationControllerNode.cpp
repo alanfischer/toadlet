@@ -96,8 +96,8 @@ void AnimationControllerNode::logicUpdate(int dt){
 	}
 }
 
-void AnimationControllerNode::visualUpdate(int dt){
-	mAnimationController->visualUpdate(dt);
+void AnimationControllerNode::renderUpdate(int dt){
+	mAnimationController->renderUpdate(dt);
 }
 
 void AnimationControllerNode::controllerFinished(AnimationController *controller){

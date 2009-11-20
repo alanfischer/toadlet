@@ -150,7 +150,7 @@ void LabelNode::setSize(const Vector3 &size){
 	updateLabel();
 }
 
-const Vector3 &LabelNode::getDesiredSize() const{
+const Vector3 &LabelNode::getDesiredSize(){
 	return Math::ZERO_VECTOR3;
 }
 
@@ -165,21 +165,23 @@ void LabelNode::queueRenderable(Scene *scene){
 	const Matrix4x4 &projectionTransform=scene->getCamera()->getProjectionTransform();
 
 	if(mIdentityTransform){
-		mVisualWorldTransform.set(mParent->getVisualWorldTransform());
+		mRenderWorldTransform.set(mParent->getRenderWorldTransform());
 	}
 	else{
-		Math::mul(mVisualWorldTransform,mParent->getVisualWorldTransform(),mVisualTransform);
+		Math::mul(mRenderWorldTransform,mParent->getRenderWorldTransform(),mRenderTransform);
 	}
 
-	mVisualWorldTransform.setAt(0,0,viewTransform.at(0,0));
-	mVisualWorldTransform.setAt(1,0,viewTransform.at(0,1));
-	mVisualWorldTransform.setAt(2,0,viewTransform.at(0,2));
-	mVisualWorldTransform.setAt(0,1,viewTransform.at(1,0));
-	mVisualWorldTransform.setAt(1,1,viewTransform.at(1,1));
-	mVisualWorldTransform.setAt(2,1,viewTransform.at(1,2));
-	mVisualWorldTransform.setAt(0,2,viewTransform.at(2,0));
-	mVisualWorldTransform.setAt(1,2,viewTransform.at(2,1));
-	mVisualWorldTransform.setAt(2,2,viewTransform.at(2,2));
+/*
+	mRenderWorldTransform.setAt(0,0,viewTransform.at(0,0));
+	mRenderWorldTransform.setAt(1,0,viewTransform.at(0,1));
+	mRenderWorldTransform.setAt(2,0,viewTransform.at(0,2));
+	mRenderWorldTransform.setAt(0,1,viewTransform.at(1,0));
+	mRenderWorldTransform.setAt(1,1,viewTransform.at(1,1));
+	mRenderWorldTransform.setAt(2,1,viewTransform.at(1,2));
+	mRenderWorldTransform.setAt(0,2,viewTransform.at(2,0));
+	mRenderWorldTransform.setAt(1,2,viewTransform.at(2,1));
+	mRenderWorldTransform.setAt(2,2,viewTransform.at(2,2));
+*/
 
 	scale.reset();
 	if(mPerspective){
@@ -188,7 +190,7 @@ void LabelNode::queueRenderable(Scene *scene){
 		scale.setAt(2,2,mScale.z);
 	}
 	else{
-		point.set(mVisualWorldTransform.at(0,3),mVisualWorldTransform.at(1,3),mVisualWorldTransform.at(2,3),Math::ONE);
+		point.set(mRenderWorldTransform.at(0,3),mRenderWorldTransform.at(1,3),mRenderWorldTransform.at(2,3),Math::ONE);
 		Math::mul(point,viewTransform);
 		Math::mul(point,projectionTransform);
 		scale.setAt(0,0,Math::mul(point.w,mScale.x));
@@ -196,7 +198,7 @@ void LabelNode::queueRenderable(Scene *scene){
 		scale.setAt(2,2,Math::mul(point.w,mScale.z));
 	}
 
-	Math::postMul(mVisualWorldTransform,scale);
+	Math::postMul(mRenderWorldTransform,scale);
 
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
 	scene->queueRenderable(&renderable);

@@ -52,7 +52,7 @@ int main(int argc,char **argv){
 	}
 
 	MeshNode::ptr meshNode=engine->createNodeType(MeshNode::type());
-	meshNode->load(mesh);
+	meshNode->setMesh(mesh);
 
 	if(mesh->skeleton!=NULL){
 		std::cout << "Has skeleton" << std::endl;
