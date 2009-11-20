@@ -120,6 +120,7 @@ set (TADPOLE_NODE_HEADERS
 	node/ParticleNode.h
 	node/Renderable.h
 	node/Scene.h
+	node/Sizeable.h
 	node/SkeletonParentNode.h
 	node/SpriteNode.h
 )
