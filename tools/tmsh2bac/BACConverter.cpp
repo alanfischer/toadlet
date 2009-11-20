@@ -384,7 +384,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 	}
 	else{
 		MeshNode::ptr meshNode=mEngine->createNodeType(MeshNode::type());
-		meshNode->load(mesh);
+		meshNode->setMesh(mesh);
 		buildBones(mesh,meshNode,0);
 		meshNode->destroy();
 	}

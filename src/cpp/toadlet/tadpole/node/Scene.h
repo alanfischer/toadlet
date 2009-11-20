@@ -43,7 +43,7 @@ class CameraNode;
 
 /// @todo  I think a good way to let us use EventKeyFrames with the Controller framework is to:
 ///   1: Have a way of ensuring that the EventKeyFrames are aligned on LogicDT times.
-///   2: Have the AnimationControllerNode not issue a visualUpdate until we have enough logicUpdates to keep up with it.
+///   2: Have the AnimationControllerNode not issue a renderUpdate until we have enough logicUpdates to keep up with it.
 ///  That way, entities without EventKeyFrames should update smoothly if something keeps the logic from flowing, but
 ///   we will still be able to have any logic dependent stuff happen at the correct times.
 ///
@@ -79,15 +79,15 @@ public:
 	virtual void setLogicTimeAndFrame(int time,int frame);
 	inline int getLogicTime() const{return mLogicTime;}
 	inline int getLogicFrame() const{return mLogicFrame;}
-	inline int getVisualTime() const{return mLogicTime+mAccumulatedDT;}
-	inline int getVisualFrame() const{return mVisualFrame;}
+	inline int getRenderTime() const{return mLogicTime+mAccumulatedDT;}
+	inline int getRenderFrame() const{return mRenderFrame;}
 
 	virtual void update(int dt);
 
 	virtual void preLogicUpdateLoop(int dt);
 	virtual void logicUpdate(int dt);
 	virtual void postLogicUpdateLoop(int dt);
-	virtual void visualUpdate(int dt);
+	virtual void renderUpdate(int dt);
 
 	inline void render(peeper::Renderer *renderer,CameraNode *cameraNode){render(renderer,cameraNode,this);}
 	virtual void render(peeper::Renderer *renderer,CameraNode *cameraNode,Node *node);
@@ -102,7 +102,7 @@ public:
 	virtual ParticleNode::ParticleSimulator::ptr newParticleSimulator(ParticleNode *particleNode){return NULL;}
 
 	void logicUpdate(Node::ptr node,int dt);
-	void visualUpdate(Node::ptr node,int dt);
+	void renderUpdate(Node::ptr node,int dt);
 
 protected:
 	class RenderLayer{
@@ -144,7 +144,7 @@ protected:
 	int mLogicTime;
 	int mLogicFrame;
 	int mAccumulatedDT;
-	int mVisualFrame;
+	int mRenderFrame;
 
 	ParentNode::ptr mBackground;
 

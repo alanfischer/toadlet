@@ -37,6 +37,7 @@ set (TADPOLE_NODE_SRC
 	node/ParentNode.cpp
 	node/ParticleNode.cpp
 	node/Scene.cpp
+	node/SizeableParentNode.cpp
 	node/SkeletonParentNode.cpp
 	node/SpriteNode.cpp
 )
@@ -121,6 +122,7 @@ set (TADPOLE_NODE_HEADERS
 	node/Renderable.h
 	node/Scene.h
 	node/Sizeable.h
+	node/SizeableParentNode.h
 	node/SkeletonParentNode.h
 	node/SpriteNode.h
 )

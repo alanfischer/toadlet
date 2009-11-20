@@ -70,7 +70,7 @@ public:
 	inline bool isRunning() const{return mRunning;}
 
 	virtual void logicUpdate(int dt);
-	virtual void visualUpdate(int dt);
+	virtual void renderUpdate(int dt);
 
 	virtual void set(scalar value);
 
@@ -83,7 +83,7 @@ protected:
 	egg::Collection<Animation::ptr> mAnimations;
 
 	int mLogicTime;
-	int mVisualTime;
+	int mRenderTime;
 	scalar mMinValue;
 	scalar mMaxValue;
 	int mMinTime;

@@ -112,24 +112,24 @@ public:
 	/// Only called if the Node registers itself with the Scene in registerUpdateNode.
 	/// Dont forget to call unregisterUpdateNode in its destroy.
 	virtual void logicUpdate(int dt){}
-	virtual void visualUpdate(int dt){}
+	virtual void renderUpdate(int dt){}
 
 	void modified();
 	bool modifiedSinceLastLogicFrame() const;
-	bool modifiedSinceLastVisualFrame() const;
+	bool modifiedSinceLastRenderFrame() const;
 
 	inline Engine *getEngine() const{return mEngine;}
 
 	inline egg::PointerCounter *getCounter() const{return mCounter;}
-	inline const Matrix4x4 &getVisualTransform() const{return mVisualTransform;}
-	inline const Matrix4x4 &getVisualWorldTransform() const{return mVisualWorldTransform;}
+	inline const Matrix4x4 &getRenderTransform() const{return mRenderTransform;}
+	inline const Matrix4x4 &getRenderWorldTransform() const{return mRenderWorldTransform;}
 
 	inline void internal_setManaged(bool managed){mManaged=managed;}
 	inline bool internal_getManaged() const{return mManaged;}
 
 protected:
-	void setVisualTransformTranslate(const Vector3 &translate);
-	void setVisualTransformRotateScale(const Matrix3x3 &rotate,const Vector3 &scale);
+	void setRenderTransformTranslate(const Vector3 &translate);
+	void setRenderTransformRotateScale(const Matrix3x3 &rotate,const Vector3 &scale);
 
 	// Allocation items
 	egg::PointerCounter *mCounter;
@@ -154,13 +154,13 @@ protected:
 	bool mReceiveUpdates;
 
 	int mModifiedLogicFrame;
-	int mModifiedVisualFrame;
+	int mModifiedRenderFrame;
 	int mWorldModifiedLogicFrame;
-	int mWorldModifiedVisualFrame;
+	int mWorldModifiedRenderFrame;
 
-	Matrix4x4 mVisualTransform;
-	Sphere mVisualWorldBound;
-	Matrix4x4 mVisualWorldTransform;
+	Matrix4x4 mRenderTransform;
+	Sphere mRenderWorldBound;
+	Matrix4x4 mRenderWorldTransform;
 
 	Vector3 cache_setRotate_vector;
 

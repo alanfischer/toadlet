@@ -34,7 +34,7 @@ namespace animation{
 
 AnimationController::AnimationController():
 	mLogicTime(0),
-	mVisualTime(0),
+	mRenderTime(0),
 	mMinValue(0),
 	mMaxValue(0),
 	mMinTime(0),
@@ -48,10 +48,10 @@ AnimationController::AnimationController():
 
 void AnimationController::setTime(int time,bool setagain){
 	mLogicTime=time;
-	mVisualTime=time;
+	mRenderTime=time;
 
 	if(setagain){
-		set(Math::fromMilli(mVisualTime));
+		set(Math::fromMilli(mRenderTime));
 	}
 }
 
@@ -75,14 +75,14 @@ void AnimationController::start(){
 	mRunning=true;
 
 	mLogicTime=0;
-	mVisualTime=0;
+	mRenderTime=0;
 }
 
 void AnimationController::stop(){
 	mRunning=false;
 
 	mLogicTime=0;
-	mVisualTime=0;
+	mRenderTime=0;
 
 	set(0);
 }
@@ -100,13 +100,13 @@ void AnimationController::logicUpdate(int dt){
 
 	if(mMaxTime!=0 && mLogicTime>=mMaxTime){
 		mLogicTime=mMaxTime;
-		mVisualTime=mMaxTime;
+		mRenderTime=mMaxTime;
 
-		set(Math::fromMilli(mVisualTime));
+		set(Math::fromMilli(mRenderTime));
 
 		if(mLoop){
 			mLogicTime=0;
-			mVisualTime=0;
+			mRenderTime=0;
 		}
 		else if(mFinishedListener!=NULL){
 			mRunning=false;
@@ -115,22 +115,22 @@ void AnimationController::logicUpdate(int dt){
 	}
 }
 
-void AnimationController::visualUpdate(int dt){
+void AnimationController::renderUpdate(int dt){
 	if(mRunning==false){
 		return;
 	}
 
-	if(mMaxTime>0 && mVisualTime>=mMaxTime){
+	if(mMaxTime>0 && mRenderTime>=mMaxTime){
 		return;
 	}
 
-	mVisualTime+=Math::mul(dt,mTimeScale);
+	mRenderTime+=Math::mul(dt,mTimeScale);
 
-	if(mMaxTime>0 && mVisualTime>=mMaxTime){
-		mVisualTime=mMaxTime;
+	if(mMaxTime>0 && mRenderTime>=mMaxTime){
+		mRenderTime=mMaxTime;
 	}
 
-	set(Math::fromMilli(mVisualTime));
+	set(Math::fromMilli(mRenderTime));
 }
 
 void AnimationController::set(scalar value){

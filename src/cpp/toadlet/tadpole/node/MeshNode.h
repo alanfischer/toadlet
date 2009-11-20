@@ -54,7 +54,7 @@ public:
 
 		void queueRenderable(Scene *queue){} // Queuing done by parent
 		Material *getRenderMaterial() const{return material;}
-		const Matrix4x4 &getRenderTransform() const{return meshNode->getVisualWorldTransform();}
+		const Matrix4x4 &getRenderTransform() const{return meshNode->getRenderWorldTransform();}
 		void render(peeper::Renderer *renderer) const;
 
 		Material::ptr material;
@@ -78,7 +78,7 @@ public:
 		virtual void stop();
 
 		virtual void logicUpdate(int dt);
-		virtual void visualUpdate(int dt);
+		virtual void renderUpdate(int dt);
 
 		void skeletonChanged();
 
@@ -109,7 +109,7 @@ public:
 	MeshAnimationController::ptr getAnimationController();
 
 	void logicUpdate(int dt);
-	void visualUpdate(int dt);
+	void renderUpdate(int dt);
 	void queueRenderables(Scene *scene);
 
 	peeper::VertexBufferAccessor svba;
@@ -120,7 +120,7 @@ public:
 
 	void queueRenderable(Scene *queue);
 	Material *getRenderMaterial() const{return NULL;}
-	const Matrix4x4 &getRenderTransform() const{return mVisualWorldTransform;}
+	const Matrix4x4 &getRenderTransform() const{return mRenderWorldTransform;}
 	void render(peeper::Renderer *renderer) const{} // Rendering done by children
 
 protected:

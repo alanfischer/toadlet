@@ -70,7 +70,7 @@ public:
 	inline bool isRunning() const{return mAnimationController->isRunning();}
 
 	void logicUpdate(int dt);
-	void visualUpdate(int dt);
+	void renderUpdate(int dt);
 
 	void controllerFinished(animation::AnimationController *controller);
 

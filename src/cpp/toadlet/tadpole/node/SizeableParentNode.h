@@ -23,44 +23,50 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_NODE_PARENTNODE_H
-#define TOADLET_TADPOLE_NODE_PARENTNODE_H
+#ifndef TOADLET_TADPOLE_NODE_SIZEABLEPARENTNODE_H
+#define TOADLET_TADPOLE_NODE_SIZEABLEPARENTNODE_H
 
-#include <toadlet/egg/Collection.h>
-#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/node/ParentNode.h>
+#include <toadlet/tadpole/node/Sizeable.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class TOADLET_API ParentNode:public Node{
+class TOADLET_API SizeableParentNode:public ParentNode,public Sizeable{
 public:
-	TOADLET_NODE(ParentNode,Node);
+	TOADLET_NODE(SizeableParentNode,ParentNode);
 
-	ParentNode();
+	enum Layout{
+		Layout_NONE=				0,
+		Layout_FILL=				1<<0,
+		Layout_SHRINK=				1<<1,
+		Layout_CHILDREN_VERTICAL=	1<<2,
+	};
+
+	SizeableParentNode();
 	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
-	virtual ParentNode *isParent(){return this;}
+	Sizeable *isSizeable(){return this;}
 
-	virtual void destroyAllChildren();
-	virtual void removeAllNodeDestroyedListeners();
+	void setLayout(int layout);
+	int getLayout() const{return mLayout;}
 
-	virtual bool attach(Node *node);
-	virtual bool remove(Node *node);
+	bool attach(Node *node);
+	bool remove(Node *node);
 
-	inline int getNumChildren() const{return mChildren.size();}
-	inline Node *getChild(int i) const{return mChildren[i];}
-
-	virtual void handleEvent(const egg::Event::ptr &event);
+	void setSize(scalar x,scalar y,scalar z);
+	void setSize(const Vector3 &size);
+	const Vector3 &getSize() const{return mSize;}
+	const Vector3 &getDesiredSize();
 
 protected:
-	virtual void updateShadowChildren();
+	void updateShadowChildren();
 
-	egg::Collection<Node::ptr> mChildren;
-
-	bool mShadowChildrenDirty;
-	egg::Collection<Node::ptr> mShadowChildren;
+	int mLayout;
+	Vector3 mSize;
+	egg::Collection<Node*> mSizeableChildren;
 
 	friend class Scene;
 };

@@ -50,7 +50,7 @@ CameraNode::CameraNode():super(),
 	mSkipFirstClear(false),
 	mMidNode(NULL),
 
-	//mVisualBoundingOrigin,
+	//mRenderBoundingOrigin,
 	//mWorldTranslate,
 	//mViewTransform,
 
@@ -154,20 +154,20 @@ void CameraNode::setProjectionRotation(scalar rotate){
 }
 
 void CameraNode::setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up){
-	Math::setMatrix4x4FromLookAt(mVisualTransform,eye,point,up,true);
+	Math::setMatrix4x4FromLookAt(mRenderTransform,eye,point,up,true);
 
-	Math::setVector3FromMatrix4x4(mTranslate,mVisualTransform);
-	Math::setMatrix3x3FromMatrix4x4(mRotate,mVisualTransform);
+	Math::setVector3FromMatrix4x4(mTranslate,mRenderTransform);
+	Math::setMatrix3x3FromMatrix4x4(mRotate,mRenderTransform);
 
 	mIdentityTransform=false;
 	modified();
 }
 
 void CameraNode::setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up){
-	Math::setMatrix4x4FromLookDir(mVisualTransform,eye,dir,up,true);
+	Math::setMatrix4x4FromLookDir(mRenderTransform,eye,dir,up,true);
 
-	Math::setVector3FromMatrix4x4(mTranslate,mVisualTransform);
-	Math::setMatrix3x3FromMatrix4x4(mRotate,mVisualTransform);
+	Math::setVector3FromMatrix4x4(mTranslate,mRenderTransform);
+	Math::setMatrix3x3FromMatrix4x4(mRotate,mRenderTransform);
 
 	mIdentityTransform=false;
 	modified();
@@ -205,12 +205,12 @@ ParentNode::ptr CameraNode::getMidNode(){
 }
 
 void CameraNode::updateViewTransform(){
-	scalar wt00=mVisualWorldTransform.at(0,0),wt01=mVisualWorldTransform.at(0,1),wt02=mVisualWorldTransform.at(0,2);
-	scalar wt10=mVisualWorldTransform.at(1,0),wt11=mVisualWorldTransform.at(1,1),wt12=mVisualWorldTransform.at(1,2);
-	scalar wt20=mVisualWorldTransform.at(2,0),wt21=mVisualWorldTransform.at(2,1),wt22=mVisualWorldTransform.at(2,2);
-	mVisualWorldTranslate.x=mVisualWorldTransform.at(0,3);mVisualWorldTranslate.y=mVisualWorldTransform.at(1,3);mVisualWorldTranslate.z=mVisualWorldTransform.at(2,3);
+	scalar wt00=mRenderWorldTransform.at(0,0),wt01=mRenderWorldTransform.at(0,1),wt02=mRenderWorldTransform.at(0,2);
+	scalar wt10=mRenderWorldTransform.at(1,0),wt11=mRenderWorldTransform.at(1,1),wt12=mRenderWorldTransform.at(1,2);
+	scalar wt20=mRenderWorldTransform.at(2,0),wt21=mRenderWorldTransform.at(2,1),wt22=mRenderWorldTransform.at(2,2);
+	mRenderWorldTranslate.x=mRenderWorldTransform.at(0,3);mRenderWorldTranslate.y=mRenderWorldTransform.at(1,3);mRenderWorldTranslate.z=mRenderWorldTransform.at(2,3);
 
-	mVisualBoundingOrigin.set(mVisualWorldTranslate.x-Math::mul(wt02,mBoundingRadius),mVisualWorldTranslate.y-Math::mul(wt12,mBoundingRadius),mVisualWorldTranslate.z-Math::mul(wt22,mBoundingRadius));
+	mRenderBoundingOrigin.set(mRenderWorldTranslate.x-Math::mul(wt02,mBoundingRadius),mRenderWorldTranslate.y-Math::mul(wt12,mBoundingRadius),mRenderWorldTranslate.z-Math::mul(wt22,mBoundingRadius));
 
 	mViewTransform.setAt(0,0,wt00);
 	mViewTransform.setAt(0,1,wt10);
@@ -222,9 +222,9 @@ void CameraNode::updateViewTransform(){
 	mViewTransform.setAt(2,1,wt12);
 	mViewTransform.setAt(2,2,wt22);
 
-	mViewTransform.setAt(0,3,-(Math::mul(wt00,mVisualWorldTranslate.x) + Math::mul(wt10,mVisualWorldTranslate.y) + Math::mul(wt20,mVisualWorldTranslate.z)));
-	mViewTransform.setAt(1,3,-(Math::mul(wt01,mVisualWorldTranslate.x) + Math::mul(wt11,mVisualWorldTranslate.y) + Math::mul(wt21,mVisualWorldTranslate.z)));
-	mViewTransform.setAt(2,3,-(Math::mul(wt02,mVisualWorldTranslate.x) + Math::mul(wt12,mVisualWorldTranslate.y) + Math::mul(wt22,mVisualWorldTranslate.z)));
+	mViewTransform.setAt(0,3,-(Math::mul(wt00,mRenderWorldTranslate.x) + Math::mul(wt10,mRenderWorldTranslate.y) + Math::mul(wt20,mRenderWorldTranslate.z)));
+	mViewTransform.setAt(1,3,-(Math::mul(wt01,mRenderWorldTranslate.x) + Math::mul(wt11,mRenderWorldTranslate.y) + Math::mul(wt21,mRenderWorldTranslate.z)));
+	mViewTransform.setAt(2,3,-(Math::mul(wt02,mRenderWorldTranslate.x) + Math::mul(wt12,mRenderWorldTranslate.y) + Math::mul(wt22,mRenderWorldTranslate.z)));
 
 	// Update frustum planes
 	Math::mul(mViewProjectionTransform,mProjectionTransform,mViewTransform);
@@ -270,7 +270,7 @@ bool CameraNode::culled(const AABox &box){
 
 void CameraNode::updateFramesPerSecond(){
 	mFPSFrameCount++;
-	int fpsTime=mEngine->getScene()->getVisualTime();
+	int fpsTime=mEngine->getScene()->getRenderTime();
 	if(mFPSLastTime==0 || fpsTime-mFPSLastTime>5000){
 		scalar fps=0;
 		if(mFPSLastTime>0){
