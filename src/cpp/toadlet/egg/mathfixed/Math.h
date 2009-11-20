@@ -47,11 +47,13 @@ namespace mathfixed{
 
 namespace Math{
 	const Vector2 ZERO_VECTOR2;
+	const Vector2 ONE_VECTOR2(ONE,ONE);
 	const Vector2 X_UNIT_VECTOR2(ONE,0);
 	const Vector2 NEG_X_UNIT_VECTOR2(-ONE,0);
 	const Vector2 Y_UNIT_VECTOR2(0,ONE);
 	const Vector2 NEG_Y_UNIT_VECTOR2(0,-ONE);
 	const Vector3 ZERO_VECTOR3;
+	const Vector3 ONE_VECTOR3(ONE,ONE,ONE);
 	const Vector3 X_UNIT_VECTOR3(ONE,0,0);
 	const Vector3 NEG_X_UNIT_VECTOR3(-ONE,0,0);
 	const Vector3 Y_UNIT_VECTOR3(0,ONE,0);
@@ -59,6 +61,7 @@ namespace Math{
 	const Vector3 Z_UNIT_VECTOR3(0,0,ONE);
 	const Vector3 NEG_Z_UNIT_VECTOR3(0,0,-ONE);
 	const Vector4 ZERO_VECTOR4;
+	const Vector4 ONE_VECTOR4(ONE,ONE,ONE,ONE);
 	const Vector4 X_UNIT_VECTOR4(ONE,0,0,0);
 	const Vector4 NEG_X_UNIT_VECTOR4(-ONE,0,0,0);
 	const Vector4 Y_UNIT_VECTOR4(0,ONE,0,0);

@@ -61,7 +61,7 @@ MeshNode::MeshAnimationController::MeshAnimationController(MeshNode *node):Anima
 	mMeshNode=node;
 	mAnimation=SkeletonAnimation::ptr(new SkeletonAnimation());
 	mAnimation->setTarget(mMeshNode->getSkeleton());
-	attachAnimation(mAnimation);
+	attach(mAnimation);
 }
 
 void MeshNode::MeshAnimationController::setSequenceIndex(int index){

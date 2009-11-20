@@ -23,30 +23,30 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_KEYFRAME_H
-#define TOADLET_TADPOLE_KEYFRAME_H
+#include <toadlet/tadpole/KeyFrame.h>
+#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/node/ParentNode.h>
 
-#include <toadlet/tadpole/Types.h>
+using namespace toadlet::tadpole::node;
 
 namespace toadlet{
 namespace tadpole{
 
-namespace node{
-	class Node;
+KeyFrame::KeyFrame(scalar time1,const Vector3 &translate1,const Quaternion &rotate1,const Vector3 &scale1):
+	time(time1),
+	translate(translate1),
+	rotate(rotate1),
+	scale(scale1){}
+
+KeyFrame::KeyFrame(scalar time1,Node *node):
+	time(time1),
+	scale(Math::ONE_VECTOR3)
+{
+	translate.set(node->getTranslate());
+	Math::setQuaternionFromMatrix3x3(rotate,node->getRotate());
+	scale.set(node->getScale());
 }
 
-class TOADLET_API KeyFrame{
-public:
-	KeyFrame(scalar time1=0,const Vector3 &translate1=Math::ZERO_VECTOR3,const Quaternion &rotate1=Math::IDENTITY_QUATERNION,const Vector3 &scale1=Math::ONE_VECTOR3);
-	KeyFrame(scalar time1,node::Node *node);
-
-	scalar time;
-	Vector3 translate;
-	Quaternion rotate;
-	Vector3 scale;
-};
-
 }
 }
 
-#endif

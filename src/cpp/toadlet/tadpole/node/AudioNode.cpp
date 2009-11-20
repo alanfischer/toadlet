@@ -48,7 +48,7 @@ void AudioNode::destroy(){
 	super::destroy();
 }
 
-bool AudioNode::loadAudioBuffer(const AudioBuffer::ptr &audioBuffer){
+bool AudioNode::setAudioBuffer(const AudioBuffer::ptr &audioBuffer){
 	if(mAudio!=NULL){
 		mAudio->destroy();
 	}
@@ -59,13 +59,13 @@ bool AudioNode::loadAudioBuffer(const AudioBuffer::ptr &audioBuffer){
 	return true;
 }
 
-bool AudioNode::loadAudioStream(egg::io::InputStream::ptr in,const egg::String &extension){
+bool AudioNode::setAudioStream(egg::io::InputStream::ptr in,const egg::String &mimeType){
 	if(mAudio!=NULL){
 		mAudio->destroy();
 	}
 
 	mAudio=Audio::ptr(mEngine->getAudioPlayer()->createStreamingAudio());
-	mAudio->create(in,extension);
+	mAudio->create(in,mimeType);
 
 	return true;
 }

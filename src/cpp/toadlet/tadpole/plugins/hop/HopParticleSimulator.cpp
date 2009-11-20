@@ -41,6 +41,7 @@ HopParticleSimulator::HopParticleSimulator(HopScene *scene,ParticleNode *node):
 	mParticleLife(1000),
 	mSpawnExistingParticles(true),
 	//mSpawnAABox,
+	mLife(-1),
 
 	mCoefficientOfGravity(Math::ONE)
 {
@@ -66,8 +67,20 @@ void HopParticleSimulator::setSpawnAABox(const AABox &box){
 	mSpawnAABox.set(box);
 }
 
+void HopParticleSimulator::setLife(int life){
+	mLife=life;
+}
+
 void HopParticleSimulator::updateParticles(int dt,const Matrix4x4 &transform){
 	int i;
+
+	if(mLife>=0){
+		mLife-=dt;
+		if(mLife<=0){
+			mParticleNode->setDestroyOnFinish(true);
+			mLife=-1;
+		}
+	}
 
 	bool alive=!mParticleNode->getDestroyOnFinish();
 	bool allDead=!alive;
@@ -87,7 +100,7 @@ void HopParticleSimulator::updateParticles(int dt,const Matrix4x4 &transform){
 				p.age=Math::ONE;
 			}
 
-			Math::mul(velocity,mScene->getGravity(),Math::mul(mCoefficientOfGravity,fdt));
+			Math::mul(velocity,mLocalGravity,Math::mul(mCoefficientOfGravity,fdt));
 			p.vx+=velocity.x;p.vy+=velocity.y;p.vz+=velocity.z;
 			direction.x=Math::mul(p.vx,fdt);direction.y=Math::mul(p.vy,fdt);direction.z=Math::mul(p.vz,fdt);
 			mSegment.setStartDir(p.x,p.y,p.z,direction.x,direction.y,direction.z);

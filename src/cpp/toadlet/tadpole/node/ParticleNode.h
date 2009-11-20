@@ -71,6 +71,8 @@ public:
 		virtual void setParticleInitialVelocity(const Vector3 &velocity,const Vector3 &variance)=0;
 		virtual void setSpawnAABox(const AABox &box)=0;
 		virtual void setCoefficientOfGravity(scalar cog)=0;
+		virtual void setLife(int life)=0;
+		virtual void setLocalGravity(const Vector3 &gravity)=0;
 
 		virtual void updateParticles(int dt,const Matrix4x4 &transform)=0;
 	};

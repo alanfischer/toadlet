@@ -39,6 +39,10 @@ ResourceManager::ResourceManager(InputStreamFactory *inputStreamFactory){
 }
 
 ResourceManager::~ResourceManager(){
+	int i;
+	for(i=0;i<mResources.size();++i){
+		mResources[i]->setFullyReleasedListener(NULL);
+	}
 }
 
 Resource::ptr ResourceManager::get(const String &name){

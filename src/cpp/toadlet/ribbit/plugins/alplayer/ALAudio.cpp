@@ -108,7 +108,7 @@ bool ALAudio::create(InputStream::ptr in,const String &mimeType){
 }
 
 void ALAudio::destroy(){
-	if(mHandle!=0){
+	if(mAudioPlayer!=NULL && mHandle!=0){
 		if(alIsSource(mHandle)){
 			alSourceStop(mHandle);
 			alSourcei(mHandle,AL_BUFFER,0);

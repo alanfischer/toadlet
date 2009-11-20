@@ -43,14 +43,20 @@ public:
 		Interpolation_COS,
 	};
 
+	enum Cycling{
+		Cycling_NONE,
+		Cycling_LOOP,
+		Cycling_REFLECT,
+	};
+
 	AnimationController();
 	virtual ~AnimationController(){}
 
 	virtual void setTime(int time,bool setagain=true);
 	inline int getTime() const{return mLogicTime;}
 
-	virtual void setLoop(bool loop);
-	inline bool getLoop() const{return mLoop;}
+	virtual void setCycling(Cycling cycling);
+	inline Cycling getCycling() const{return mCycling;}
 
 	virtual void setInterpolation(Interpolation interpolation);
 	inline Interpolation getInterpolation() const{return mInterpolation;}
@@ -76,8 +82,8 @@ public:
 
 	virtual void extentsChanged();
 
-	virtual void attachAnimation(Animation::ptr animation);
-	virtual void removeAnimation(Animation::ptr animation);
+	virtual void attach(Animation::ptr animation);
+	virtual void remove(Animation::ptr animation);
 
 protected:
 	egg::Collection<Animation::ptr> mAnimations;
@@ -88,7 +94,7 @@ protected:
 	scalar mMaxValue;
 	int mMinTime;
 	int mMaxTime;
-	bool mLoop;
+	Cycling mCycling;
 	Interpolation mInterpolation;
 	scalar mTimeScale;
 	bool mRunning;

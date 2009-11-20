@@ -8,6 +8,7 @@ set (TADPOLE_SRC
 	Engine.cpp
 	Font.cpp
 	FontManager.cpp
+	KeyFrame.cpp
 	Material.cpp
 	TPKGInputStreamFactory.cpp
 	Track.cpp
