@@ -85,11 +85,12 @@ protected:
 	bool mPerspective;
 	int mAlignment;
 	bool mPixelSpace;
+	Vector3 mSize;
 
 	Material::ptr mMaterial;
 	peeper::VertexData::ptr mVertexData;
 	peeper::IndexData::ptr mIndexData;
-	Matrix4x4 mAlignmentTransform;
+	Matrix4x4 mSpriteTransform;
 
 	Matrix4x4 cache_queueRenderable_scale;
 	Vector4 cache_queueRenderable_point;

@@ -39,7 +39,6 @@ public:
 	virtual void setSize(scalar x,scalar y,scalar z)=0;
 	virtual void setSize(const Vector3 &size)=0;
 	virtual const Vector3 &getSize() const=0;
-	virtual bool 
 	virtual const Vector3 &getDesiredSize() const=0;
 };
 
