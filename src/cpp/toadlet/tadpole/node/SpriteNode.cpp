@@ -164,7 +164,7 @@ void SpriteNode::setSize(const Vector3 &size){
 }
 
 void SpriteNode::queueRenderable(Scene *scene){
-// The sprite & label alignment needs to be reworked
+// TODO: The sprite & label alignment needs to be reworked
 	Matrix4x4 &scale=cache_queueRenderable_scale.reset();
 	Vector4 &point=cache_queueRenderable_point.reset();
 	const Matrix4x4 &viewTransform=scene->getCamera()->getViewTransform();
@@ -176,7 +176,7 @@ void SpriteNode::queueRenderable(Scene *scene){
 	else{
 		Math::mul(mRenderWorldTransform,mParent->getRenderWorldTransform(),mRenderTransform);
 	}
-/*
+
 	mRenderWorldTransform.setAt(0,0,viewTransform.at(0,0));
 	mRenderWorldTransform.setAt(1,0,viewTransform.at(0,1));
 	mRenderWorldTransform.setAt(2,0,viewTransform.at(0,2));
@@ -186,7 +186,7 @@ void SpriteNode::queueRenderable(Scene *scene){
 	mRenderWorldTransform.setAt(0,2,viewTransform.at(2,0));
 	mRenderWorldTransform.setAt(1,2,viewTransform.at(2,1));
 	mRenderWorldTransform.setAt(2,2,viewTransform.at(2,2));
-*/
+
 	scale.reset();
 	if(mPerspective){
 		scale.setAt(0,0,mScale.x);
@@ -258,11 +258,14 @@ void SpriteNode::updateSprite(){
 
 void SpriteNode::updateBound(){
 	if(mPerspective){
+		scalar x=Math::mul(mScale.x,mSize.x);
+		scalar y=Math::mul(mScale.y,mSize.y);
+
 		if(mAlignment==(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER)){
-			mBoundingRadius=Math::sqrt(Math::square(mScale.x/2) + Math::square(mScale.y/2));
+			mBoundingRadius=Math::sqrt(Math::square(x/2) + Math::square(y/2));
 		}
 		else{
-			mBoundingRadius=Math::sqrt(Math::square(mScale.x) + Math::square(mScale.y));
+			mBoundingRadius=Math::sqrt(Math::square(x) + Math::square(y));
 		}
 	}
 	else{

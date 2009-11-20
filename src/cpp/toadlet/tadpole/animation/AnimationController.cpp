@@ -39,7 +39,7 @@ AnimationController::AnimationController():
 	mMaxValue(0),
 	mMinTime(0),
 	mMaxTime(0),
-	mLoop(false),
+	mCycling(Cycling_NONE),
 	mInterpolation(Interpolation_LINEAR),
 	mTimeScale(Math::ONE),
 	mRunning(false),
@@ -55,8 +55,8 @@ void AnimationController::setTime(int time,bool setagain){
 	}
 }
 
-void AnimationController::setLoop(bool loop){
-	mLoop=loop;
+void AnimationController::setCycling(Cycling cycling){
+	mCycling=cycling;
 }
 
 void AnimationController::setInterpolation(Interpolation interpolation){
@@ -92,25 +92,52 @@ void AnimationController::logicUpdate(int dt){
 		return;
 	}
 
-	if(mMaxTime>0 && mLogicTime>=mMaxTime){
-		return;
+	if(mTimeScale>0){
+		if(mMaxTime>0 && mLogicTime>=mMaxTime){
+			return;
+		}
+
+		mLogicTime+=Math::mul(dt,mTimeScale);
+
+		if(mMaxTime!=0 && mLogicTime>=mMaxTime){
+			mLogicTime=mMaxTime;
+			mRenderTime=mMaxTime;
+
+			set(Math::fromMilli(mRenderTime));
+
+			if(mCycling==Cycling_LOOP){
+				mLogicTime=0;
+				mRenderTime=0;
+			}
+			else if(mCycling==Cycling_REFLECT){
+				mTimeScale*=-1;
+			}
+			else if(mFinishedListener!=NULL){
+				mRunning=false;
+				mFinishedListener->controllerFinished(this); // Must be last since it may delete this
+			}
+		}
 	}
+	else if(mTimeScale<0){
+		mLogicTime+=Math::mul(dt,mTimeScale);
 
-	mLogicTime+=Math::mul(dt,mTimeScale);
-
-	if(mMaxTime!=0 && mLogicTime>=mMaxTime){
-		mLogicTime=mMaxTime;
-		mRenderTime=mMaxTime;
-
-		set(Math::fromMilli(mRenderTime));
-
-		if(mLoop){
+		if(mLogicTime<0){
 			mLogicTime=0;
 			mRenderTime=0;
-		}
-		else if(mFinishedListener!=NULL){
-			mRunning=false;
-			mFinishedListener->controllerFinished(this); // Must be last since it may delete this
+
+			set(Math::fromMilli(0));
+
+			if(mCycling==Cycling_LOOP){
+				mLogicTime=mMaxTime;
+				mRenderTime=mMaxTime;
+			}
+			else if(mCycling==Cycling_REFLECT){
+				mTimeScale*=-1;
+			}
+			else if(mFinishedListener!=NULL){
+				mRunning=false;
+				mFinishedListener->controllerFinished(this); // Must be last since it may delete this
+			}
 		}
 	}
 }
@@ -120,14 +147,27 @@ void AnimationController::renderUpdate(int dt){
 		return;
 	}
 
-	if(mMaxTime>0 && mRenderTime>=mMaxTime){
-		return;
+	if(mTimeScale>0){
+		if(mMaxTime>0 && mRenderTime>=mMaxTime){
+			return;
+		}
+
+		mRenderTime+=Math::mul(dt,mTimeScale);
+
+		if(mMaxTime>0 && mRenderTime>=mMaxTime){
+			mRenderTime=mMaxTime;
+		}
 	}
+	else if(mTimeScale<0){
+		if(mRenderTime<0){
+			return;
+		}
 
-	mRenderTime+=Math::mul(dt,mTimeScale);
+		mRenderTime+=Math::mul(dt,mTimeScale);
 
-	if(mMaxTime>0 && mRenderTime>=mMaxTime){
-		mRenderTime=mMaxTime;
+		if(mRenderTime<0){
+			mRenderTime=0;
+		}
 	}
 
 	set(Math::fromMilli(mRenderTime));
@@ -168,7 +208,7 @@ void AnimationController::extentsChanged(){
 	mMaxTime=Math::toMilli(mMaxValue);
 }
 
-void AnimationController::attachAnimation(Animation::ptr animation){
+void AnimationController::attach(Animation::ptr animation){
 	mAnimations.add(animation);
 
 	animation->attached(this);
@@ -176,7 +216,7 @@ void AnimationController::attachAnimation(Animation::ptr animation){
 	extentsChanged();
 }
 
-void AnimationController::removeAnimation(Animation::ptr animation){
+void AnimationController::remove(Animation::ptr animation){
 	mAnimations.remove(animation);
 
 	animation->removed(this);

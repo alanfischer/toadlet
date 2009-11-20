@@ -42,8 +42,8 @@ public:
 	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
-	bool loadAudioBuffer(const ribbit::AudioBuffer::ptr &audioBuffer);
-	bool loadAudioStream(egg::io::InputStream::ptr in,const egg::String &extension);
+	bool setAudioBuffer(const ribbit::AudioBuffer::ptr &audioBuffer);
+	bool setAudioStream(egg::io::InputStream::ptr in,const egg::String &mimeType);
 
 	inline bool play(){return mAudio->play();}
 	inline bool stop(){return mAudio->stop();}

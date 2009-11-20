@@ -46,8 +46,8 @@ public:
 	inline void setTime(int time,bool setagain=true){mAnimationController->setTime(time,setagain);}
 	inline int getTime() const{return mAnimationController->getTime();}
 
-	inline void setLoop(bool loop){mAnimationController->setLoop(loop);}
-	inline bool getLoop() const{return mAnimationController->getLoop();}
+	inline void setCycling(animation::AnimationController::Cycling cycling){mAnimationController->setCycling(cycling);}
+	inline animation::AnimationController::Cycling getCycling() const{return mAnimationController->getCycling();}
 
 	inline void setInterpolation(animation::AnimationController::Interpolation interpolation){mAnimationController->setInterpolation(interpolation);}
 	inline animation::AnimationController::Interpolation getInterpolation() const{return mAnimationController->getInterpolation();}
@@ -59,8 +59,8 @@ public:
 	inline scalar getMinValue() const{return mAnimationController->getMinValue();}
 	inline scalar getMaxValue() const{return mAnimationController->getMaxValue();}
 
-	inline void attachAnimation(animation::Animation::ptr animation){mAnimationController->attachAnimation(animation);}
-	inline void removeAnimation(animation::Animation::ptr animation){mAnimationController->removeAnimation(animation);}
+	inline void attach(animation::Animation::ptr animation){mAnimationController->attach(animation);}
+	inline void remove(animation::Animation::ptr animation){mAnimationController->remove(animation);}
 
 	void setDestroyOnFinish(bool destroy);
 	inline bool getDestroyOnFinish() const{return mDestroyOnFinish;}

@@ -45,11 +45,13 @@ public final class Math{
 	public static final real SQRT_2=(real)1.41421356237309504880168;
 
 	public static final Vector2 ZERO_VECTOR2=new Vector2();
+	public static final Vector2 ONE_VECTOR2=new Vector2(ONE,ONE);
 	public static final Vector2 X_UNIT_VECTOR2=new Vector2(ONE,0);
 	public static final Vector2 NEG_X_UNIT_VECTOR2=new Vector2(-ONE,0);
 	public static final Vector2 Y_UNIT_VECTOR2=new Vector2(0,ONE);
 	public static final Vector2 NEG_Y_UNIT_VECTOR2=new Vector2(0,-ONE);
 	public static final Vector3 ZERO_VECTOR3=new Vector3();
+	public static final Vector3 ONE_VECTOR3=new Vector2(ONE,ONE,ONE);
 	public static final Vector3 X_UNIT_VECTOR3=new Vector3(ONE,0,0);
 	public static final Vector3 NEG_X_UNIT_VECTOR3=new Vector3(-ONE,0,0);
 	public static final Vector3 Y_UNIT_VECTOR3=new Vector3(0,ONE,0);
@@ -57,6 +59,7 @@ public final class Math{
 	public static final Vector3 Z_UNIT_VECTOR3=new Vector3(0,0,ONE);
 	public static final Vector3 NEG_Z_UNIT_VECTOR3=new Vector3(0,0,-ONE);
 	public static final Vector4 ZERO_VECTOR4=new Vector4();
+	public static final Vector4 ONE_VECTOR4=new Vector2(ONE,ONE,ONE,ONE);
 	public static final Vector4 X_UNIT_VECTOR4=new Vector4(ONE,0,0,0);
 	public static final Vector4 NEG_X_UNIT_VECTOR4=new Vector4(-ONE,0,0,0);
 	public static final Vector4 Y_UNIT_VECTOR4=new Vector4(0,ONE,0,0);

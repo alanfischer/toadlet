@@ -44,6 +44,8 @@ public:
 	void setParticleInitialVelocity(const Vector3 &velocity,const Vector3 &variance);
 	void setSpawnAABox(const AABox &box);
 	void setCoefficientOfGravity(scalar cog){mCoefficientOfGravity=cog;}
+	void setLife(int life);
+	void setLocalGravity(const Vector3 &gravity){mLocalGravity.set(gravity);}
 
 	void updateParticles(int dt,const Matrix4x4 &transform);
 
@@ -53,10 +55,12 @@ protected:
 	int mParticleLife;
 	bool mSpawnExistingParticles;
 	AABox mSpawnAABox;
+	int mLife;
 
 	scalar mCoefficientOfGravity;
 	Vector3 mParticleInitialVelocity;
 	Vector3 mParticleInitialVariance;
+	Vector3 mLocalGravity;
 	egg::Random mRandom;
 
 	Segment mSegment;
