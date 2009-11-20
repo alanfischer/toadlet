@@ -33,6 +33,7 @@
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/node/Node.h>
 #include <toadlet/tadpole/node/Renderable.h>
+#include <toadlet/tadpole/node/Sizeable.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -40,7 +41,7 @@ namespace node{
 
 class Scene;
 
-class TOADLET_API SpriteNode:public Node,public Renderable{
+class TOADLET_API SpriteNode:public Node,public Renderable,public Sizeable{
 public:
 	TOADLET_NODE(SpriteNode,Node);
 
@@ -62,6 +63,11 @@ public:
 
 	void setPixelSpace(bool pixelSpace);
 	bool getPixelSpace() const{return mPixelSpace;}
+
+	void setSize(scalar x,scalar y,scalar z);
+	void setSize(const Vector3 &size);
+	const Vector3 &getSize() const{return mSize;}
+	const Vector3 &getDesiredSize() const{return Math::ZERO_VECTOR3;}
 
 	void queueRenderable(Scene *scene);
 	Material *getRenderMaterial() const{return mMaterial;}
