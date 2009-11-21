@@ -286,7 +286,7 @@ void LabelNode::updateBound(){
 		else{
 			scalar pointSize=
 			#if defined(TOADLET_FIXED_POINT)
-				Math::fromFloat(mFont->getPointSize();
+				Math::fromFloat(mFont->getPointSize());
 			#else
 				mFont->getPointSize();
 			#endif
