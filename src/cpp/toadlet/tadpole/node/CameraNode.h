@@ -57,6 +57,9 @@ public:
 	void setProjectionRotation(scalar rotate);
 	inline const Matrix4x4 &getProjectionTransform() const{return mProjectionTransform;}
 
+	void setAlignmentCalculationsUseOrigin(bool origin);
+	bool getAlignmentCalculationsUseOrigin() const{return mAlignmentCalculationsUseOrigin;}
+
 	void setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up);
 	void setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up);
 
@@ -116,6 +119,7 @@ protected:
 	int mClearFlags;
 	peeper::Color mClearColor;
 	bool mSkipFirstClear;
+	bool mAlignmentCalculationsUseOrigin;
 	ParentNode::ptr mMidNode;
 
 	Vector3 mRenderBoundingOrigin;
