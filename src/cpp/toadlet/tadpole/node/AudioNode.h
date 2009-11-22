@@ -45,28 +45,28 @@ public:
 	bool setAudioBuffer(const ribbit::AudioBuffer::ptr &audioBuffer);
 	bool setAudioStream(egg::io::InputStream::ptr in,const egg::String &mimeType);
 
-	inline bool play(){return mAudio->play();}
-	inline bool stop(){return mAudio->stop();}
-	inline bool getPlaying() const{return mAudio->getPlaying();}
-	inline bool getFinished() const{return mAudio->getFinished();}
+	inline bool play(){return mAudio!=NULL?mAudio->play():false;}
+	inline bool stop(){return mAudio!=NULL?mAudio->stop():false;}
+	inline bool getPlaying() const{return mAudio!=NULL?mAudio->getPlaying():false;}
+	inline bool getFinished() const{return mAudio!=NULL?mAudio->getFinished():false;}
 
-	inline void setGain(scalar gain){mAudio->setGain(gain);}
-	inline void fadeToGain(scalar gain,int time){mAudio->fadeToGain(gain,time);}
-	inline scalar getGain() const{return mAudio->getGain();}
+	inline void setGain(scalar gain){mAudio!=NULL?mAudio->setGain(gain):0;}
+	inline void fadeToGain(scalar gain,int time){mAudio!=NULL?mAudio->fadeToGain(gain,time):0;}
+	inline scalar getGain() const{return mAudio!=NULL?mAudio->getGain():0;}
 
-	inline void setLooping(bool looping){mAudio->setLooping(looping);}
-	inline bool getLooping() const{return mAudio->getLooping();}
+	inline void setLooping(bool looping){mAudio!=NULL?mAudio->setLooping(looping):0;}
+	inline bool getLooping() const{return mAudio!=NULL?mAudio->getLooping():false;}
 
-	inline void setPitch(scalar pitch){mAudio->setPitch(pitch);}
-	inline scalar getPitch() const{return mAudio->getPitch();}
+	inline void setPitch(scalar pitch){mAudio!=NULL?mAudio->setPitch(pitch):0;}
+	inline scalar getPitch() const{return mAudio!=NULL?mAudio->getPitch():false;}
 
-	inline void setGlobal(bool global){mAudio->setGlobal(global);}
-	inline bool getGlobal() const{return mAudio->getGlobal();}
+	inline void setGlobal(bool global){mAudio!=NULL?mAudio->setGlobal(global):0;}
+	inline bool getGlobal() const{return mAudio!=NULL?mAudio->getGlobal():false;}
 
-	inline void setRolloffFactor(scalar f){mAudio->setRolloffFactor(f);}
-	inline scalar getRolloffFactor() const{return mAudio->getRolloffFactor();}
+	inline void setRolloffFactor(scalar f){mAudio!=NULL?mAudio->setRolloffFactor(f):0;}
+	inline scalar getRolloffFactor() const{return mAudio!=NULL?mAudio->getRolloffFactor():0;}
 
-	inline void setVelocity(const Vector3 &velocity){mAudio->setVelocity(velocity);}
+	inline void setVelocity(const Vector3 &velocity){mAudio!=NULL?mAudio->setVelocity(velocity):0;}
 
 protected:
 	ribbit::Audio::ptr mAudio;

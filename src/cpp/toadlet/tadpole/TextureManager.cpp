@@ -77,6 +77,15 @@ Image::ptr TextureManager::createImage(const Texture::ptr &texture){
 	return image;
 }
 
+SurfaceRenderTarget::ptr TextureManager::createSurfaceRenderTarget(){
+	// TODO: Make this use a BackableSufaceRenderTarget
+	if(mEngine->getRenderer()!=NULL){
+		SurfaceRenderTarget::ptr back(mEngine->getRenderer()->createSurfaceRenderTarget());
+		return back;
+	}
+	return NULL;
+}
+
 void TextureManager::contextActivate(peeper::Renderer *renderer){
 	int i;
 	for(i=0;i<mResources.size();++i){

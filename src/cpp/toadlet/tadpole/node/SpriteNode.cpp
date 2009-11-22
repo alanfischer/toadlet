@@ -56,6 +56,7 @@ Node *SpriteNode::create(Engine *engine){
 	super::create(engine);
 
 	setPerspective(true);
+	setAlignmentCalculation(true,true,true);
 	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
 	setPixelSpace(false);
 	mSize.reset();
@@ -164,46 +165,25 @@ void SpriteNode::setSize(const Vector3 &size){
 }
 
 void SpriteNode::queueRenderable(Scene *scene){
-// TODO: The sprite & label alignment needs to be reworked
-	Matrix4x4 &scale=cache_queueRenderable_scale.reset();
-	Vector4 &point=cache_queueRenderable_point.reset();
-	const Matrix4x4 &viewTransform=scene->getCamera()->getViewTransform();
-	const Matrix4x4 &projectionTransform=scene->getCamera()->getProjectionTransform();
-
-	if(mIdentityTransform){
-		mRenderWorldTransform.set(mParent->getRenderWorldTransform());
-	}
-	else{
-		Math::mul(mRenderWorldTransform,mParent->getRenderWorldTransform(),mRenderTransform);
-	}
-
-	mRenderWorldTransform.setAt(0,0,viewTransform.at(0,0));
-	mRenderWorldTransform.setAt(1,0,viewTransform.at(0,1));
-	mRenderWorldTransform.setAt(2,0,viewTransform.at(0,2));
-	mRenderWorldTransform.setAt(0,1,viewTransform.at(1,0));
-	mRenderWorldTransform.setAt(1,1,viewTransform.at(1,1));
-	mRenderWorldTransform.setAt(2,1,viewTransform.at(1,2));
-	mRenderWorldTransform.setAt(0,2,viewTransform.at(2,0));
-	mRenderWorldTransform.setAt(1,2,viewTransform.at(2,1));
-	mRenderWorldTransform.setAt(2,2,viewTransform.at(2,2));
-
-	scale.reset();
-	if(mPerspective){
-		scale.setAt(0,0,mScale.x);
-		scale.setAt(1,1,mScale.y);
-		scale.setAt(2,2,mScale.z);
-	}
-	else{
-		point.set(mRenderWorldTransform.at(0,3),mRenderWorldTransform.at(1,3),mRenderWorldTransform.at(2,3),Math::ONE);
-		Math::mul(point,viewTransform);
-		Math::mul(point,projectionTransform);
-		scale.setAt(0,0,Math::mul(point.w,mScale.x));
-		scale.setAt(1,1,Math::mul(point.w,mScale.y));
-		scale.setAt(2,2,Math::mul(point.w,mScale.z));
+	if(mVertexData==NULL || mIndexData==NULL){
+		return;
 	}
 
 	Math::postMul(mRenderWorldTransform,mSpriteTransform);
-	Math::postMul(mRenderWorldTransform,scale);
+
+	if(!mPerspective){
+		Matrix4x4 &scale=cache_queueRenderable_scale.reset();
+		Vector4 &point=cache_queueRenderable_point.reset();
+
+		point.set(mRenderWorldTransform.at(0,3),mRenderWorldTransform.at(1,3),mRenderWorldTransform.at(2,3),Math::ONE);
+		Math::mul(point,scene->getCamera()->getViewTransform());
+		Math::mul(point,scene->getCamera()->getProjectionTransform());
+		scale.setAt(0,0,point.w);
+		scale.setAt(1,1,point.w);
+		scale.setAt(2,2,point.w);
+
+		Math::postMul(mRenderWorldTransform,scale);
+	}
 
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
 	scene->queueRenderable(&renderable);

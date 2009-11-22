@@ -407,6 +407,41 @@ void Scene::queueRenderables(Node *node){
 		return;
 	}
 
+	// TODO: Fix these alignment calculations so it actually aligns per axis, and preserves parent scale
+	if(node->mAlignXAxis || node->mAlignYAxis || node->mAlignZAxis){
+		if(mCamera->mAlignmentCalculationsUseOrigin){
+			const Matrix4x4 &viewTransform=mCamera->getViewTransform();
+			Matrix4x4 &nodeWorldTransform=node->mRenderWorldTransform;
+			Vector3 nodeWorldTranslate; Math::setVector3FromMatrix4x4(nodeWorldTranslate,node->mRenderWorldTransform);
+			Vector3 cameraWorldTranslate; Math::setVector3FromMatrix4x4(cameraWorldTranslate,mCamera->mRenderWorldTransform);
+			Matrix4x4 lookAtCamera; Math::setMatrix4x4FromLookAt(lookAtCamera,nodeWorldTranslate,cameraWorldTranslate,Math::Z_UNIT_VECTOR3,false);
+			const Vector3 &nodeScale=node->mScale;
+			nodeWorldTransform.setAt(0,0,Math::mul(lookAtCamera.at(0,0),nodeScale.x));
+			nodeWorldTransform.setAt(1,0,lookAtCamera.at(0,1));
+			nodeWorldTransform.setAt(2,0,lookAtCamera.at(0,2));
+			nodeWorldTransform.setAt(0,1,lookAtCamera.at(1,0));
+			nodeWorldTransform.setAt(1,1,Math::mul(lookAtCamera.at(1,1),nodeScale.y));
+			nodeWorldTransform.setAt(2,1,lookAtCamera.at(1,2));
+			nodeWorldTransform.setAt(0,2,lookAtCamera.at(2,0));
+			nodeWorldTransform.setAt(1,2,lookAtCamera.at(2,1));
+			nodeWorldTransform.setAt(2,2,Math::mul(lookAtCamera.at(2,2),nodeScale.z));
+		}
+		else{
+			const Matrix4x4 &viewTransform=mCamera->getViewTransform();
+			Matrix4x4 &nodeWorldTransform=node->mRenderWorldTransform;
+			const Vector3 &nodeScale=node->mScale;
+			nodeWorldTransform.setAt(0,0,Math::mul(viewTransform.at(0,0),nodeScale.x));
+			nodeWorldTransform.setAt(1,0,viewTransform.at(0,1));
+			nodeWorldTransform.setAt(2,0,viewTransform.at(0,2));
+			nodeWorldTransform.setAt(0,1,viewTransform.at(1,0));
+			nodeWorldTransform.setAt(1,1,Math::mul(viewTransform.at(1,1),nodeScale.y));
+			nodeWorldTransform.setAt(2,1,viewTransform.at(1,2));
+			nodeWorldTransform.setAt(0,2,viewTransform.at(2,0));
+			nodeWorldTransform.setAt(1,2,viewTransform.at(2,1));
+			nodeWorldTransform.setAt(2,2,Math::mul(viewTransform.at(2,2),nodeScale.z));
+		}
+	}
+
 	ParentNode *parent=node->isParent();
 	if(parent!=NULL){
 		int numChildren=parent->mChildren.size();
