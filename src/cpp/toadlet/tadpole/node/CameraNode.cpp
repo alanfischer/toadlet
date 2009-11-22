@@ -48,6 +48,7 @@ CameraNode::CameraNode():super(),
 	mClearFlags(0),
 	//mClearColor,
 	mSkipFirstClear(false),
+	mAlignmentCalculationsUseOrigin(false),
 	mMidNode(NULL),
 
 	//mRenderBoundingOrigin,
@@ -151,6 +152,10 @@ void CameraNode::setProjectionRotation(scalar rotate){
 	projection.reset();
 	Math::setMatrix4x4FromTranslate(projection,-x,-y,0);
 	Math::postMul(mProjectionTransform,projection);
+}
+
+void CameraNode::setAlignmentCalculationsUseOrigin(bool origin){
+	mAlignmentCalculationsUseOrigin=origin;
 }
 
 void CameraNode::setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up){

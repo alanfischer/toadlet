@@ -29,6 +29,7 @@
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/BackableTexture.h>
+#include <toadlet/peeper/SurfaceRenderTarget.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -42,6 +43,7 @@ public:
 	peeper::Texture::ptr createTexture(const egg::image::Image::ptr &image);
 	peeper::Texture::ptr createTexture(int usageFlags,peeper::Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels);
 	egg::image::Image::ptr createImage(const peeper::Texture::ptr &texture);
+	peeper::SurfaceRenderTarget::ptr createSurfaceRenderTarget();
 
 	peeper::Texture::ptr findTexture(const egg::String &name){return egg::shared_static_cast<peeper::Texture>(ResourceManager::find(name));}
 
