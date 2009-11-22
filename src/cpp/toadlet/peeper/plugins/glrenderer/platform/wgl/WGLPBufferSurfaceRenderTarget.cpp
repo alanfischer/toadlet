@@ -180,7 +180,6 @@ bool WGLPBufferSurfaceRenderTarget::createBuffer(){
 
 	int wglformat=0;
 	unsigned int count=0;
-
 	wglChoosePixelFormatARB(hdc,iAttributes,fAttributes,1,&wglformat,&count);
 
 	if(count==0){

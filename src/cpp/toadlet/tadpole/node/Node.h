@@ -103,6 +103,8 @@ public:
 	virtual void setScope(int scope);
 	inline int getScope() const{return mScope;}
 
+	virtual void setAlignmentCalculation(bool xAxis,bool yAxis,bool zAxis);
+
 	virtual void setBoundingRadius(scalar boundingRadius);
 	inline scalar getBoundingRadius() const{return mBoundingRadius;}
 
@@ -150,6 +152,7 @@ protected:
 	Matrix3x3 mRotate;
 	Vector3 mScale;
 	int mScope;
+	bool mAlignXAxis,mAlignYAxis,mAlignZAxis;
 	scalar mBoundingRadius;
 	bool mReceiveUpdates;
 
