@@ -86,7 +86,9 @@ Resource::ptr ResourceManager::manage(const Resource::ptr &resource){
 }
 
 void ResourceManager::unmanage(Resource *resource){
-	mResources.remove(resource);
+	if(mResources.remove(resource)==false){
+		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_WARNING,"Error unmaning resource, check inheritance heiarchy");
+	}
 
 	String name=resource->getName();
 	if(name!=(char*)NULL){

@@ -93,7 +93,7 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr ver
 	mDataSize=mVertexSize*mSize;
 	
 	mTarget=GL_ARRAY_BUFFER;
-	createContext();
+	bool result=createContext();
 
 	#if defined(TOADLET_BIG_ENDIAN)
 		int i;
@@ -133,7 +133,7 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr ver
 		}
 	}
 
-	return true;
+	return result;
 }
 
 void GLBuffer::destroy(){
@@ -180,7 +180,7 @@ bool GLBuffer::createContext(){
 		}
 	#endif
 
-	TOADLET_CHECK_GLERROR("createContext");
+	TOADLET_CHECK_GLERROR("GLBuffer::createContext");
 
 	return true;
 }
@@ -202,7 +202,7 @@ void GLBuffer::destroyContext(bool backData){
 		mHandle=0;
 	}
 
-	TOADLET_CHECK_GLERROR("destroyContext");
+	TOADLET_CHECK_GLERROR("GLBuffer::destroyContext");
 }
 
 uint8 *GLBuffer::lock(AccessType accessType){
@@ -243,7 +243,7 @@ uint8 *GLBuffer::lock(AccessType accessType){
 		}
 	#endif
 
-	TOADLET_CHECK_GLERROR("lock");
+	TOADLET_CHECK_GLERROR("GLBuffer::lock");
 
 	return mData;
 }
@@ -273,7 +273,7 @@ bool GLBuffer::unlock(){
 		glBufferSubData(mTarget,0,mDataSize,mData);
 	}
 
-	TOADLET_CHECK_GLERROR("unlock");
+	TOADLET_CHECK_GLERROR("GLBuffer::unlock");
 
 	return true;
 }

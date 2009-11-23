@@ -37,7 +37,7 @@ namespace peeper{
 class D3D9Renderer;
 
 class TOADLET_API D3D9Texture:protected egg::BaseResource,public Texture{
-	TOADLET_BASERESOURCE_PASSTHROUGH();
+	TOADLET_BASERESOURCE_PASSTHROUGH(Texture);
 public:
 	D3D9Texture(D3D9Renderer *renderer);
 
@@ -47,6 +47,10 @@ public:
 
 	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels);
 	virtual void destroy();
+
+	virtual bool createContext();
+	virtual void destroyContext(bool backData);
+	virtual bool contextNeedsReset();
 
 	virtual int getUsageFlags() const{return mUsageFlags;}
 	virtual Dimension getDimension() const{return mDimension;}
@@ -75,6 +79,7 @@ protected:
 	int mWidth;
 	int mHeight;
 	int mDepth;
+	int mMipLevels;
 
 	D3DFORMAT mD3DFormat;
 	DWORD mD3DUsage;

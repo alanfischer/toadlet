@@ -89,6 +89,16 @@ bool GLTexture::create(int usageFlags,Dimension dimension,int format,int width,i
 	mMipLevels=mipLevels;
 
 	// Create texture
+	bool result=createContext();
+
+	return result;
+}
+
+void GLTexture::destroy(){
+	destroyContext(false);
+}
+
+bool GLTexture::createContext(){
 	mTarget=getGLTarget();
 	glGenTextures(1,&mHandle);
 	glBindTexture(mTarget,mHandle);
@@ -101,21 +111,21 @@ bool GLTexture::create(int usageFlags,Dimension dimension,int format,int width,i
 	glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
 
 	// Allocate space for texture
-	GLint glformat=getGLFormat(format);
+	GLint glformat=getGLFormat(mFormat);
 	GLint glinternalFormat=glformat;
-	GLint gltype=getGLType(format);
+	GLint gltype=getGLType(mFormat);
 	switch(mTarget){
 		#if !defined(TOADLET_HAS_GLES)
 			case GL_TEXTURE_1D:
-				glTexImage1D(mTarget,0,glinternalFormat,width,0,glformat,gltype,NULL);
+				glTexImage1D(mTarget,0,glinternalFormat,mWidth,0,glformat,gltype,NULL);
 			break;
 		#endif
 		case GL_TEXTURE_2D:
-			glTexImage2D(mTarget,0,glinternalFormat,width,height,0,glformat,gltype,NULL);
+			glTexImage2D(mTarget,0,glinternalFormat,mWidth,mHeight,0,glformat,gltype,NULL);
 		break;
 		#if !defined(TOADLET_HAS_GLES)
 			case GL_TEXTURE_3D:
-				glTexImage3D(mTarget,0,glinternalFormat,width,height,depth,0,glformat,gltype,NULL);
+				glTexImage3D(mTarget,0,glinternalFormat,mWidth,mHeight,mDepth,0,glformat,gltype,NULL);
 			break;
 			case GL_TEXTURE_CUBE_MAP:{
 				// TODO: Is the following required?
@@ -124,14 +134,14 @@ bool GLTexture::create(int usageFlags,Dimension dimension,int format,int width,i
 
 				int i;
 				for(i=0;i<6;++i){
-					glTexImage2D(GLCubeFaces[i],0,glinternalFormat,width,height,0,glformat,gltype,NULL);
+					glTexImage2D(GLCubeFaces[i],0,glinternalFormat,mWidth,mHeight,0,glformat,gltype,NULL);
 				}
 			}break;
 			case GL_TEXTURE_RECTANGLE_ARB:
 				// Set up rectangle scale matrix
-				Math::setMatrix4x4FromScale(mMatrix,width,height,Math::ONE);
+				Math::setMatrix4x4FromScale(mMatrix,mWidth,mHeight,Math::ONE);
 
-				glTexImage2D(mTarget,0,glinternalFormat,width,height,0,glformat,gltype,NULL);
+				glTexImage2D(mTarget,0,glinternalFormat,mWidth,mHeight,0,glformat,gltype,NULL);
 			break;
 		#endif
 	}
@@ -148,25 +158,40 @@ bool GLTexture::create(int usageFlags,Dimension dimension,int format,int width,i
 		mManuallyGenerateMipLevels=false;
 	}
 
-	TOADLET_CHECK_GLERROR("GLTexture::create");
+	// TODO: Add mBacking data
+
+	TOADLET_CHECK_GLERROR("GLTexture::createContext");
 
 	return true;
 }
 
-void GLTexture::destroy(){
+void GLTexture::destroyContext(bool backData){
+	if(backData){
+		// TODO: backup data
+	}
+
 	if(mHandle!=0){
 		glDeleteTextures(1,&mHandle);
 		mHandle=0;
-
-		TOADLET_CHECK_GLERROR("GLTexture::destroy");
+		mTarget=0;
 	}
+
+	TOADLET_CHECK_GLERROR("GLTexture::destroyContext");
 }
 
 Surface::ptr GLTexture::getMipSuface(int i) const{
+	if(mHandle==0){
+		return NULL;
+	}
+
 	return Surface::ptr(new GLTextureMipSurface(const_cast<GLTexture*>(this),i));
 }
 
 bool GLTexture::load(int format,int width,int height,int depth,uint8 *data){
+	if(mHandle==0){
+		return false;
+	}
+
 	if(width!=mWidth || height!=mHeight || depth!=mDepth){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"GLTexture: Texture data of incorrect dimensions");
@@ -210,12 +235,17 @@ bool GLTexture::load(int format,int width,int height,int depth,uint8 *data){
 }
 
 bool GLTexture::read(int format,int width,int height,int depth,uint8 *data){
+	if(mHandle==0){
+		return false;
+	}
+
 	#if !defined(TOADLET_HAS_GLES)
 		GLint glformat=getGLFormat(format);
 		GLint gltype=getGLType(format);
 
-		// TODO: This seems to crash on some ATI cards.  Either fix it, or disable it
-//		glGetTexImage(mTarget,0,glformat,gltype,data);
+		glBindTexture(mTarget,mHandle);
+
+		glGetTexImage(mTarget,0,glformat,gltype,data);
 
 		return true;
 	#else
@@ -223,9 +253,13 @@ bool GLTexture::read(int format,int width,int height,int depth,uint8 *data){
 			"GLTexture::read is not supported");
 		return false;
 	#endif
-}
+} 
 
 void GLTexture::generateMipLevels(){
+	if(mHandle==0){
+		return;
+	}
+
 	#if defined(TOADLET_HAS_GLEW) && defined(GL_EXT_framebuffer_object)
 	if(GLEW_EXT_framebuffer_object){
 		// Set some items to make ATI cards happier

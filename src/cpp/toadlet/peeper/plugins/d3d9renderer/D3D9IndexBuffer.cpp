@@ -102,9 +102,6 @@ bool D3D9IndexBuffer::createContext(){
 		mD3DUsage|=D3DUSAGE_WRITEONLY;
 	}
 
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_EXCESSIVE,
-		String("Allocating D3D9IndexBuffer of size:")+mDataSize);
-
 	HRESULT result=mRenderer->getDirect3DDevice9()->CreateIndexBuffer(mDataSize,mD3DUsage,mD3DFormat,mD3DPool,&mIndexBuffer TOADLET_SHAREDHANDLE);
 	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: CreateVertexBuffer");
 
@@ -146,6 +143,10 @@ bool D3D9IndexBuffer::contextNeedsReset(){
 }
 
 uint8 *D3D9IndexBuffer::lock(AccessType lockType){
+	if(mIndexBuffer==NULL){
+		return NULL;
+	}
+
 	mLockType=lockType;
 
 	DWORD d3dflags=0;
@@ -177,6 +178,10 @@ uint8 *D3D9IndexBuffer::lock(AccessType lockType){
 }
 
 bool D3D9IndexBuffer::unlock(){
+	if(mIndexBuffer==NULL){
+		return false;
+	}
+
 	// We do this even if its read only, since we have to do it in all situations for locking
 	if(mData!=NULL && mIndexFormat==IndexFormat_UINT_8){
 		// Unpack the indexes

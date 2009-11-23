@@ -58,10 +58,12 @@ protected:
 }
 }
 
-// Help to work around an annoying issue with c++ & multiple inheritance issues
-#define TOADLET_BASERESOURCE_PASSTHROUGH()\
+// Help to work around an annoying issue with c++ multiple inheritance issues
+//  Since I can't just call BaseResource::release(), since it will use a different base pointer
+//  This issue doesn't exist in other languages (Java)
+#define TOADLET_BASERESOURCE_PASSTHROUGH(BaseClass)\
 	void retain(){toadlet::egg::BaseResource::retain();} \
-	void release(){toadlet::egg::BaseResource::release();} \
+	void release(){if(--mReference==0){mListener!=NULL?mListener->resourceFullyReleased((BaseClass*)this):destroy();}} \
 	void setFullyReleasedListener(toadlet::egg::ResourceFullyReleasedListener *listener){toadlet::egg::BaseResource::setFullyReleasedListener(listener);} \
 	void setName(const toadlet::egg::String &name){toadlet::egg::BaseResource::setName(name);}\
 	const toadlet::egg::String &getName() const{return toadlet::egg::BaseResource::getName();}

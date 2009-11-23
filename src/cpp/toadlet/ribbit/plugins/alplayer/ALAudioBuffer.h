@@ -36,7 +36,7 @@ namespace ribbit{
 class ALPlayer;
 
 class TOADLET_API ALAudioBuffer:protected egg::BaseResource,public AudioBuffer{
-	TOADLET_BASERESOURCE_PASSTHROUGH();
+	TOADLET_BASERESOURCE_PASSTHROUGH(AudioBuffer);
 public:
 	ALAudioBuffer(ALPlayer *player);
 	virtual ~ALAudioBuffer();

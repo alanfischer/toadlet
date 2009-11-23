@@ -42,8 +42,7 @@ public:
 
 		renderTexture=mEngine->getTextureManager()->createTexture(Texture::UsageFlags_RENDERTARGET,Texture::Dimension_D2,Texture::Format_RGB_5_6_5,256,256,0,0);
 
-		surfaceRenderTarget=SurfaceRenderTarget::ptr(getRenderer()->createSurfaceRenderTarget());
-		surfaceRenderTarget->create();
+		surfaceRenderTarget=mEngine->getTextureManager()->createSurfaceRenderTarget();
 		surfaceRenderTarget->attach(renderTexture->getMipSuface(0),SurfaceRenderTarget::Attachment_COLOR_0);
 
 		quadTextureStage=TextureStage::ptr(new TextureStage(renderTexture));
