@@ -43,12 +43,12 @@ SpriteNode::SpriteNode():super(),
 
 	mPerspective(false),
 	mAlignment(0),
-	mPixelSpace(false),
+	mPixelSpace(false)
 	//mSize,
 
-	mMaterial(NULL),
-	mVertexData(NULL),
-	mIndexData(NULL)
+	//mMaterial,
+	//mVertexData,
+	//mIndexData,
 	//mSpriteTransform
 {}
 

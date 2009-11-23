@@ -35,8 +35,8 @@ namespace node{
 
 TOADLET_NODE_IMPLEMENT(LightNode,"toadlet::tadpole::node::LightNode");
 
-LightNode::LightNode():super(),
-	mLight(NULL)
+LightNode::LightNode():super()
+	//mLight(NULL)
 {}
 
 Node *LightNode::create(Engine *engine){
