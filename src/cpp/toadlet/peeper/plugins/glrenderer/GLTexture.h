@@ -38,7 +38,7 @@ namespace peeper{
 class GLRenderer;
 
 class TOADLET_API GLTexture:protected egg::BaseResource,public Texture{
-	TOADLET_BASERESOURCE_PASSTHROUGH();
+	TOADLET_BASERESOURCE_PASSTHROUGH(Texture);
 public:
 	GLTexture(GLRenderer *renderer);
 	virtual ~GLTexture();
@@ -47,6 +47,10 @@ public:
 
 	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels);
 	virtual void destroy();
+
+	virtual bool createContext();
+	virtual void destroyContext(bool backData);
+	virtual bool contextNeedsReset(){return false;}
 
 	virtual int getUsageFlags() const{return mUsageFlags;}
 	virtual Dimension getDimension() const{return mDimension;}

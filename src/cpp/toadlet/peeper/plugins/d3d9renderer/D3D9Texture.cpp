@@ -44,6 +44,7 @@ D3D9Texture::D3D9Texture(D3D9Renderer *renderer):BaseResource(),
 	mWidth(0),
 	mHeight(0),
 	mDepth(0),
+	mMipLevels(0),
 
 	mD3DFormat(D3DFMT_X8R8G8B8),
 	mD3DUsage(0),
@@ -78,7 +79,18 @@ bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width
 	mWidth=width;
 	mHeight=height;
 	mDepth=depth;
-	
+	mMipLevels=mipLevels;
+
+	bool result=createContext();
+
+	return result;
+}
+
+void D3D9Texture::destroy(){
+	destroyContext(false);
+}
+
+bool D3D9Texture::createContext(){
 	IDirect3DDevice9 *device=mRenderer->getDirect3DDevice9();
 	IDirect3D9 *d3d=NULL; device->GetDirect3D(&d3d);
 
@@ -91,7 +103,7 @@ bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 		mD3DUsage|=D3DUSAGE_LOCKABLE;
 	#endif
-	mManuallyGenerateMipLevels=(usageFlags&UsageFlags_AUTOGEN_MIPMAPS)>0;
+	mManuallyGenerateMipLevels=(mUsageFlags&UsageFlags_AUTOGEN_MIPMAPS)>0;
 	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
 		if(mManuallyGenerateMipLevels && isD3DFORMATValid(d3d,D3DFMT_X8R8G8B8,mD3DFormat,D3DUSAGE_AUTOGENMIPMAP)){
 			mD3DUsage|=D3DUSAGE_AUTOGENMIPMAP;
@@ -107,26 +119,28 @@ bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width
 		#endif
 
 	HRESULT result=E_FAIL;
-	switch(dimension){
+	switch(mDimension){
 		case Texture::Dimension_D1:
 		case Texture::Dimension_D2:{
 			IDirect3DTexture9 *texture=NULL;
-			result=device->CreateTexture(mWidth,mHeight,mipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
+			result=device->CreateTexture(mWidth,mHeight,mMipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
 			mTexture=texture;
 		}break;
 		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
 			case Texture::Dimension_D3:{
 				IDirect3DVolumeTexture9 *texture=NULL;
-				result=device->CreateVolumeTexture(mWidth,mHeight,mDepth,mipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
+				result=device->CreateVolumeTexture(mWidth,mHeight,mDepth,mMipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
 				mTexture=texture;
 			}break;
 			case Texture::Dimension_CUBEMAP:{
 				IDirect3DCubeTexture9 *texture=NULL;
-				result=device->CreateCubeTexture(mWidth,mipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
+				result=device->CreateCubeTexture(mWidth,mMipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
 				mTexture=texture;
 			}break;
 		#endif
 	}
+
+	// TODO: Add mBacking data
 
 	if(FAILED(result)){
 		TOADLET_CHECK_D3D9ERROR(result,"CreateTexture");
@@ -136,7 +150,11 @@ bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width
 	return true;
 }
 
-void D3D9Texture::destroy(){
+void D3D9Texture::destroyContext(bool backData){
+	if(backData){
+		// TODO: backup data
+	}
+
 	if(mTexture!=NULL){
 		HRESULT result=mTexture->Release();
 		mTexture=NULL;
@@ -148,7 +166,19 @@ void D3D9Texture::destroy(){
 	}
 }
 
+bool D3D9Texture::contextNeedsReset(){
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		return false;
+	#else
+		return mD3DPool==D3DPOOL_DEFAULT;
+	#endif
+}
+
 Surface::ptr D3D9Texture::getMipSuface(int i) const{
+	if(mTexture==NULL){
+		return NULL;
+	}
+
 	IDirect3DSurface9 *surface=NULL;
 
 	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
@@ -165,6 +195,10 @@ Surface::ptr D3D9Texture::getMipSuface(int i) const{
 }
 
 bool D3D9Texture::load(int format,int width,int height,int depth,uint8 *data){
+	if(mTexture==NULL){
+		return false;
+	}
+
 	if(width!=mWidth || height!=mHeight || depth!=mDepth){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"D3D9Texture: Texture data of incorrect dimensions");
@@ -265,6 +299,10 @@ bool D3D9Texture::load(int format,int width,int height,int depth,uint8 *data){
 }
 
 bool D3D9Texture::read(int format,int width,int height,int depth,uint8 *data){
+	if(mTexture==NULL){
+		return false;
+	}
+
 	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
 		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
 

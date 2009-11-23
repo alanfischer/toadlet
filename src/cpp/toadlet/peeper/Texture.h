@@ -52,6 +52,10 @@ public:
 	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels)=0;
 	virtual void destroy()=0;
 
+	virtual bool createContext()=0;
+	virtual void destroyContext(bool backData)=0;
+	virtual bool contextNeedsReset()=0;
+
 	virtual int getUsageFlags() const=0;
 	virtual Dimension getDimension() const=0;
 	virtual int getFormat() const=0;

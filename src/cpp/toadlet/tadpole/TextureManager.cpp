@@ -62,7 +62,7 @@ Texture::ptr TextureManager::createTexture(int usageFlags,Texture::Dimension dim
 	if(mEngine->getRenderer()!=NULL){
 		Texture::ptr back(mEngine->getRenderer()->createTexture());
 		back->create(usageFlags,dimension,format,width,height,depth,mipLevels);
-		texture->setBack(back);
+		texture->setBack(back,true);
 	}
 	mBackableTexturesToLoad.add(texture);
 
@@ -81,6 +81,7 @@ SurfaceRenderTarget::ptr TextureManager::createSurfaceRenderTarget(){
 	// TODO: Make this use a BackableSufaceRenderTarget
 	if(mEngine->getRenderer()!=NULL){
 		SurfaceRenderTarget::ptr back(mEngine->getRenderer()->createSurfaceRenderTarget());
+		back->create();
 		return back;
 	}
 	return NULL;
@@ -97,6 +98,7 @@ void TextureManager::contextActivate(peeper::Renderer *renderer){
 		}
 		else{
 			// TODO: move createContext to Texture so it can be called from here
+			// Likewise fix BufferManager so it is aware of both Backable & NonBackable items
 		}
 	}
 }
@@ -110,6 +112,7 @@ void TextureManager::contextDeactivate(peeper::Renderer *renderer){
 		}
 		else{
 			// TODO: move destroyContext to Texture so it can be called from here
+			// Likewise fix BufferManager so it is aware of both Backable & NonBackable items
 		}
 	}
 }
@@ -128,9 +131,23 @@ void TextureManager::contextUpdate(peeper::Renderer *renderer){
 }
 
 void TextureManager::preContextReset(peeper::Renderer *renderer){
+	int i;
+	for(i=0;i<mResources.size();++i){
+		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
+		if(texture->contextNeedsReset()){
+			texture->destroyContext(true);
+		}
+	}
 }
 
 void TextureManager::postContextReset(peeper::Renderer *renderer){
+	int i;
+	for(i=0;i<mResources.size();++i){
+		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
+		if(texture->contextNeedsReset()){
+			texture->createContext();
+		}
+	}
 }
 
 }
