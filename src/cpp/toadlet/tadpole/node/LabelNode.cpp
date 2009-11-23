@@ -40,17 +40,17 @@ TOADLET_NODE_IMPLEMENT(LabelNode,"toadlet::tadpole::node::LabelNode");
 LabelNode::LabelNode():super(),
 	TOADLET_GIB_IMPLEMENT()
 
-	mFont(NULL),
-	mText(NULL),
+	//mFont,
+	//mText,
 	mPerspective(false),
 	mAlignment(0),
 	mPixelSpace(false),
-	mWordWrap(false),
+	mWordWrap(false)
 	//mSize,
 
-	mMaterial(NULL),
-	mVertexData(NULL),
-	mIndexData(NULL)
+	//mMaterial,
+	//mVertexData,
+	//mIndexData
 {}
 
 Node *LabelNode::create(Engine *engine){

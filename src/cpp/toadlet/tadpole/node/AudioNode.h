@@ -45,28 +45,29 @@ public:
 	bool setAudioBuffer(const ribbit::AudioBuffer::ptr &audioBuffer);
 	bool setAudioStream(egg::io::InputStream::ptr in,const egg::String &mimeType);
 
-	inline bool play(){return mAudio!=NULL?mAudio->play():false;}
-	inline bool stop(){return mAudio!=NULL?mAudio->stop():false;}
-	inline bool getPlaying() const{return mAudio!=NULL?mAudio->getPlaying():false;}
-	inline bool getFinished() const{return mAudio!=NULL?mAudio->getFinished():false;}
+	inline bool play(){if(mAudio!=NULL){return mAudio->play();}else{return false;}}
+	inline bool stop(){if(mAudio!=NULL){return mAudio->stop();}else{return false;}}
+	inline bool getPlaying() const{if(mAudio!=NULL){return mAudio->getPlaying();}else{return false;}}
+	inline bool getFinished() const{if(mAudio!=NULL){return mAudio->getFinished();}else{return false;}}
 
-	inline void setGain(scalar gain){mAudio!=NULL?mAudio->setGain(gain):0;}
-	inline void fadeToGain(scalar gain,int time){mAudio!=NULL?mAudio->fadeToGain(gain,time):0;}
-	inline scalar getGain() const{return mAudio!=NULL?mAudio->getGain():0;}
+	inline void setGain(scalar gain){if(mAudio!=NULL){setGain(gain);}}
+	inline void fadeToGain(scalar gain,int time){if(mAudio!=NULL){mAudio->fadeToGain(gain,time);}}
+	inline scalar getGain() const{if(mAudio!=NULL){return mAudio->getGain();}else{return 0;}}
 
-	inline void setLooping(bool looping){mAudio!=NULL?mAudio->setLooping(looping):0;}
-	inline bool getLooping() const{return mAudio!=NULL?mAudio->getLooping():false;}
+	inline void setLooping(bool looping){if(mAudio!=NULL){mAudio->setLooping(looping);}}
+	inline bool getLooping() const{if(mAudio!=NULL){return mAudio->getLooping();}else{return false;}}
 
-	inline void setPitch(scalar pitch){mAudio!=NULL?mAudio->setPitch(pitch):0;}
-	inline scalar getPitch() const{return mAudio!=NULL?mAudio->getPitch():false;}
+	inline void setPitch(scalar pitch){if(mAudio!=NULL){mAudio->setPitch(pitch);}}
+	inline scalar getPitch() const{if(mAudio!=NULL){return mAudio->getPitch();}else{return 0;}}
 
-	inline void setGlobal(bool global){mAudio!=NULL?mAudio->setGlobal(global):0;}
-	inline bool getGlobal() const{return mAudio!=NULL?mAudio->getGlobal():false;}
+	inline void setGlobal(bool global){if(mAudio!=NULL){mAudio->setGlobal(global);}}
+	inline bool getGlobal() const{if(mAudio!=NULL){return mAudio->getGlobal();}else{return false;}}
 
-	inline void setRolloffFactor(scalar f){mAudio!=NULL?mAudio->setRolloffFactor(f):0;}
-	inline scalar getRolloffFactor() const{return mAudio!=NULL?mAudio->getRolloffFactor():0;}
+	inline void setRolloffFactor(scalar f){if(mAudio!=NULL){mAudio->setRolloffFactor(f);}}
+	inline scalar getRolloffFactor() const{if(mAudio!=NULL){return mAudio->getRolloffFactor();}else{return 0;}}
 
-	inline void setVelocity(const Vector3 &velocity){mAudio!=NULL?mAudio->setVelocity(velocity):0;}
+	// TODO: This needs to be integrated into the tadpole plugin
+	inline void setVelocity(const Vector3 &velocity){if(mAudio!=NULL){mAudio->setVelocity(velocity);}}
 
 protected:
 	ribbit::Audio::ptr mAudio;
