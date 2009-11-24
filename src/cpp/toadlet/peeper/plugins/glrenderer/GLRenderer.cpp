@@ -1167,6 +1167,8 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 					mode=GL_REPLACE;
 				break;
 				case TextureBlend::Operation_MODULATE:
+				case TextureBlend::Operation_MODULATE_2X:
+				case TextureBlend::Operation_MODULATE_4X:
 					mode=GL_MODULATE;
 				break;
 				case TextureBlend::Operation_ADD:
@@ -1179,6 +1181,20 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 				break;
 			}
 			
+			switch(blend.operation){
+				case TextureBlend::Operation_MODULATE:
+					glTexEnvf(GL_TEXTURE_ENV,GL_RGB_SCALE,1.0f);
+				break;
+				case TextureBlend::Operation_MODULATE_2X:
+					glTexEnvf(GL_TEXTURE_ENV,GL_RGB_SCALE,2.0f);
+				break;
+				case TextureBlend::Operation_MODULATE_4X:
+					glTexEnvf(GL_TEXTURE_ENV,GL_RGB_SCALE,4.0f);
+				break;
+				default:
+				break;
+			}
+
 			if(blend.source1==TextureBlend::Source_UNSPECIFIED || blend.source2==TextureBlend::Source_UNSPECIFIED){
 				glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,mode);
 			}
