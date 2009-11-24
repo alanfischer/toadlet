@@ -47,7 +47,8 @@ GLFBOSurfaceRenderTarget::GLFBOSurfaceRenderTarget(GLRenderer *renderer):GLRende
 	mRenderer(NULL),
 	mWidth(0),
 	mHeight(0),
-	mHandle(0)
+	mHandle(0),
+	mNeedsCompile(false)
 	//mSurfaces
 {
 	mRenderer=renderer;
@@ -60,12 +61,14 @@ GLFBOSurfaceRenderTarget::~GLFBOSurfaceRenderTarget(){
 bool GLFBOSurfaceRenderTarget::create(){
 	destroy();
 
+	mWidth=0;
+	mHeight=0;
+	mNeedsCompile=true;
+
 	glGenFramebuffers(1,&mHandle);
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 
 	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::create");
-
-	attach(this->createBufferSurface(Texture::Format_DEPTH_8,256,256),Attachment_DEPTH_STENCIL);
 
 	return true;
 }
@@ -88,6 +91,10 @@ bool GLFBOSurfaceRenderTarget::destroy(){
 }
 
 bool GLFBOSurfaceRenderTarget::makeCurrent(){
+	if(mNeedsCompile){
+		compile();
+	}
+
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 
 	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::current");
@@ -128,16 +135,9 @@ bool GLFBOSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER,getGLAttachment(attachment),GL_RENDERBUFFER,handle);
 	}
 	
-	GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
-Logger::log("LOL!");
-	if(status!=GL_FRAMEBUFFER_COMPLETE){
-Logger::log("ga busted!");
-		Logger::log(Categories::TOADLET_PEEPER,Logger::Level_WARNING,getFBOMessage(status));
-	}
-	glBindFramebuffer(GL_FRAMEBUFFER,0);
-
 	mSurfaces.add(surface);
 	mSurfaceAttachments.add(attachment);
+	mNeedsCompile=true;
 
 	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::attach");
 
@@ -170,18 +170,43 @@ bool GLFBOSurfaceRenderTarget::remove(Surface::ptr surface){
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER,getGLAttachment(attachment),GL_RENDERBUFFER,0);
 	}
 
+	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::remove");
+
+	mSurfaces.remove(i);
+	mSurfaceAttachments.remove(i);
+	mNeedsCompile=true;
+
+	return true;
+}
+
+bool GLFBOSurfaceRenderTarget::compile(){
+	Surface::ptr depth;
+	Surface::ptr color;
+
+	int i;
+	for(i=0;i<mSurfaceAttachments.size();++i){
+		if(mSurfaceAttachments[i]==Attachment_DEPTH_STENCIL){
+			depth=mSurfaces[i];
+		}
+		else{
+			color=mSurfaces[i];
+		}
+	}
+
+	if(color!=NULL && depth==NULL){
+		// No Depth-Stencil surface, so add one
+		attach(this->createBufferSurface(Texture::Format_DEPTH_8,mWidth,mHeight),Attachment_DEPTH_STENCIL);
+	}
+
 	GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if(status!=GL_FRAMEBUFFER_COMPLETE){
 		Logger::log(Categories::TOADLET_PEEPER,Logger::Level_WARNING,getFBOMessage(status));
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 
-	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::remove");
+	mNeedsCompile=false;
 
-	mSurfaces.remove(i);
-	mSurfaceAttachments.remove(i);
-
-	return true;
+	return status==GL_FRAMEBUFFER_COMPLETE;
 }
 
 Surface::ptr GLFBOSurfaceRenderTarget::createBufferSurface(int format,int width,int height){
