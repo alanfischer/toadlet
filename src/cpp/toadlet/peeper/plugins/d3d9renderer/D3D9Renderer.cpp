@@ -660,6 +660,12 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 				case TextureBlend::Operation_MODULATE:
 					mode=D3DTOP_MODULATE;
 				break;
+				case TextureBlend::Operation_MODULATE_2X:
+					mode=D3DTOP_MODULATE2X;
+				break;
+				case TextureBlend::Operation_MODULATE_4X:
+					mode=D3DTOP_MODULATE4X;
+				break;
 				case TextureBlend::Operation_ADD:
 					mode=D3DTOP_ADD;
 				break;
