@@ -121,7 +121,6 @@ bool BackableTexture::read(int format,int width,int height,int depth,uint8 *data
 void BackableTexture::setBack(Texture::ptr back,bool initial){
 	if(back!=mBack && mBack!=NULL){
 		mData=new uint8[mDataSize];
-Logger::log(String("DS:")+mDataSize);
 		mBack->read(mFormat,mWidth,mHeight,mDepth,mData);
 	}
 

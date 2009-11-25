@@ -46,7 +46,7 @@ public:
 
 	virtual bool create();
 	virtual bool destroy();
-	virtual bool compile(){return true;}
+	virtual bool compile();
 
 	virtual bool makeCurrent();
 	virtual bool swap();

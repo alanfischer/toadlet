@@ -62,7 +62,12 @@ bool EGLWindowRenderTarget::createContext(void *nativeSurface,const Visual &visu
 
 	#if defined(TOADLET_HAS_GLESEM)
 		if(!glesem_getInitialized()){
-			glesem_init(GLESEM_ACCELERATED_IF_AVAILABLE);
+			int glesemInitResult=glesem_init(GLESEM_ACCELERATED_NO);//IF_AVAILABLE);
+			if(glesemInitResult<1){
+				Error::unknown(Categories::TOADLET_PEEPER,
+					"glesem_init failed");
+				return false;
+			}
 		}
 	#endif
 

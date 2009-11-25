@@ -67,20 +67,19 @@ WGLPBufferSurfaceRenderTarget::~WGLPBufferSurfaceRenderTarget(){
 }
 
 bool WGLPBufferSurfaceRenderTarget::create(){
-	// Nothing yet, all done after an attach
+	mInitialized=false;
+
 	return true;
 }
 
 bool WGLPBufferSurfaceRenderTarget::destroy(){
-	destroyBuffer();
-
 	if(mBound){
 		mBound=false;
 		wglReleaseTexImageARB(mPBuffer,WGL_FRONT_LEFT_ARB);
 		TOADLET_CHECK_GLERROR("wglReleaseTexImageARB");
 	}
 
-	mInitialized=false;
+	destroyBuffer();
 
 	return true;
 }
@@ -113,11 +112,6 @@ bool WGLPBufferSurfaceRenderTarget::swap(){
 	return true;
 }
 
-bool WGLPBufferSurfaceRenderTarget::remove(Surface::ptr surface){
-	// Unimplemented currently
-	return false;
-}
-
 bool WGLPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
 	GLTextureMipSurface *gltextureSurface=((GLSurface*)surface->getRootSurface())->castToGLTextureMipSurface();
 	mTexture=gltextureSurface->getTexture();
@@ -128,13 +122,32 @@ bool WGLPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attac
 		return false;
 	}
 
-	createBuffer();
+	compile();
 
-	Matrix4x4 matrix;
-	Math::setMatrix4x4FromScale(matrix,Math::ONE,-Math::ONE,Math::ONE);
-	Math::setMatrix4x4FromTranslate(matrix,0,Math::ONE,0);
-	mTexture->setMatrix(matrix);
+	return true;
+}
 
+bool WGLPBufferSurfaceRenderTarget::remove(Surface::ptr surface){
+	mTexture=NULL;
+
+	compile();
+
+	return false;
+}
+
+bool WGLPBufferSurfaceRenderTarget::compile(){
+	if(mTexture!=NULL){
+		createBuffer();
+
+		Matrix4x4 matrix;
+		Math::setMatrix4x4FromScale(matrix,Math::ONE,-Math::ONE,Math::ONE);
+		Math::setMatrix4x4FromTranslate(matrix,0,Math::ONE,0);
+		mTexture->setMatrix(matrix);
+	}
+	else{
+		destroyBuffer();
+	}
+	
 	return true;
 }
 
@@ -244,6 +257,10 @@ bool WGLPBufferSurfaceRenderTarget::createBuffer(){
 }
 
 bool WGLPBufferSurfaceRenderTarget::destroyBuffer(){
+	if(mGLRC==wglGetCurrentContext()){
+		((WGLRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->makeCurrent();
+	}
+
 	if(mGLRC!=0){
 		wglDeleteContext(mGLRC);
 		mGLRC=0;

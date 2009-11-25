@@ -34,7 +34,7 @@ namespace net{
 
 class BluetoothServerQuery{
 public:
-	TOADLET_SHARED_POINTERS(BluetoothServerQuery,BluetoothServerQuery);
+	TOADLET_SHARED_POINTERS(BluetoothServerQuery);
 
 	virtual ~BluetoothServerQuery(){}
 

@@ -64,8 +64,10 @@ Resource::ptr ResourceManager::find(const egg::String &name,ResourceHandlerData:
 		}
 		
 		resource=findFromFile(name,handlerData);
-		resource->setName(name);
-		manage(resource);
+		if(resource!=NULL){
+			resource->setName(name);
+			manage(resource);
+		}
 	}
 
 	return resource;
