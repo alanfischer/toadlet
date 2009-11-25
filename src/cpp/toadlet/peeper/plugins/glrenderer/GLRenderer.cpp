@@ -439,8 +439,6 @@ void GLRenderer::setProjectionMatrix(const Matrix4x4 &matrix){
 }
 
 bool GLRenderer::setRenderTarget(RenderTarget *target){
-	TOADLET_CHECK_GLERROR("before setRenderTarget");
-
 	if(target==NULL){
 		Error::nullPointer(Categories::TOADLET_PEEPER,
 			"RenderTarget is NULL");

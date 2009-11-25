@@ -53,7 +53,8 @@ EGLPBufferSurfaceRenderTarget::EGLPBufferSurfaceRenderTarget(GLRenderer *rendere
 	mBound(false),
 	mInitialized(false)
 {
-	egl_version=((EGLRenderTarget*)renderer->getPrimaryRenderTarget()->getRootRenderTarget())->egl_version;
+	mRenderer=renderer;
+	egl_version=((EGLRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->egl_version;
 }
 
 EGLPBufferSurfaceRenderTarget::~EGLPBufferSurfaceRenderTarget(){
@@ -61,20 +62,19 @@ EGLPBufferSurfaceRenderTarget::~EGLPBufferSurfaceRenderTarget(){
 }
 
 bool EGLPBufferSurfaceRenderTarget::create(){
-	// Nothing yet, all done after an attach
+	mInitialized=false;
+
 	return true;
 }
 
 bool EGLPBufferSurfaceRenderTarget::destroy(){
-	destroyBuffer();
-
 	if(mBound){
 		mBound=false;
 		eglReleaseTexImage(mDisplay,mSurface,EGL_BACK_BUFFER);
 		TOADLET_CHECK_EGLERROR("eglReleaseTexImage");
 	}
 
-	mInitialized=false;
+	destroyBuffer();
 
 	return true;
 }
@@ -107,11 +107,6 @@ bool EGLPBufferSurfaceRenderTarget::swap(){
 	return true;
 }
 
-bool EGLPBufferSurfaceRenderTarget::remove(Surface::ptr surface){
-	// Unimplemented currently
-	return false;
-}
-
 bool EGLPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
 	GLTextureMipSurface *gltextureSurface=((GLSurface*)surface->getRootSurface())->castToGLTextureMipSurface();
 	mTexture=gltextureSurface->getTexture();
@@ -122,7 +117,26 @@ bool EGLPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attac
 		return false;
 	}
 
-	createBuffer();
+	compile();
+
+	return true;
+}
+
+bool EGLPBufferSurfaceRenderTarget::remove(Surface::ptr surface){
+	mTexture=NULL;
+
+	compile();
+
+	return false;
+}
+
+bool EGLPBufferSurfaceRenderTarget::compile(){
+	if(mTexture!=NULL){
+		createBuffer();
+	}
+	else{
+		destroyBuffer();
+	}
 
 	return true;
 }
@@ -204,15 +218,19 @@ bool EGLPBufferSurfaceRenderTarget::destroyBuffer(){
 	}
 
 	if(mDisplay!=EGL_NO_DISPLAY){
-		eglMakeCurrent(mDisplay,EGL_NO_SURFACE,EGL_NO_SURFACE,EGL_NO_CONTEXT);
+		if(mContext==eglGetCurrentContext()){
+			((EGLRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->makeCurrent();
+		}
 
 		if(mContext!=EGL_NO_CONTEXT){
 			eglDestroyContext(mDisplay,mContext);
+			TOADLET_CHECK_EGLERROR("eglDestroyContext");
 			mContext=EGL_NO_CONTEXT;
 		}
 
 		if(mSurface!=EGL_NO_SURFACE){
 			eglDestroySurface(mDisplay,mSurface);
+			TOADLET_CHECK_EGLERROR("eglDestroySurface");
 			mSurface=EGL_NO_SURFACE;
 		}
 	}

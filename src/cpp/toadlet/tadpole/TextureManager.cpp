@@ -81,7 +81,9 @@ SurfaceRenderTarget::ptr TextureManager::createSurfaceRenderTarget(){
 	// TODO: Make this use a BackableSufaceRenderTarget
 	if(mEngine->getRenderer()!=NULL){
 		SurfaceRenderTarget::ptr back(mEngine->getRenderer()->createSurfaceRenderTarget());
-		back->create();
+		if(back!=NULL){
+			back->create();
+		}
 		return back;
 	}
 	return NULL;

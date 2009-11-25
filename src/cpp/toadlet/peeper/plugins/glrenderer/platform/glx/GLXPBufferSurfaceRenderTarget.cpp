@@ -72,6 +72,7 @@ bool GLXPBufferSurfaceRenderTarget::create(){
 
 bool GLXPBufferSurfaceRenderTarget::destroy(){
 	destroyBuffer();
+
 	return true;
 }
 
@@ -91,11 +92,6 @@ bool GLXPBufferSurfaceRenderTarget::swap(){
 	glCopyTexSubImage2D(mTexture->getTarget(),0,0,0,0,0,mWidth,mHeight);
 }
 
-bool GLXPBufferSurfaceRenderTarget::remove(Surface::ptr surface){
-	// Unimplemented currently
-	return false;
-}
-
 bool GLXPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
 	GLTextureMipSurface *gltextureSurface=((GLSurface*)surface->getRootSurface())->castToGLTextureMipSurface();
 	mTexture=gltextureSurface->getTexture();
@@ -106,13 +102,32 @@ bool GLXPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attac
 		return false;
 	}
 
-	createBuffer();
+	compile();
 
-	Matrix4x4 matrix;
-	Math::setMatrix4x4FromScale(matrix,Math::ONE,-Math::ONE,Math::ONE);
-	Math::setMatrix4x4FromTranslate(matrix,0,Math::ONE,0);
-	mTexture->setMatrix(matrix);
+	return true;
+}
 
+bool GLXPBufferSurfaceRenderTarget::remove(Surface::ptr surface){
+	mTexture=NULL;
+
+	compile();
+
+	return false;
+}
+
+bool GLXPBufferSurfaceRenderTarget::compile(){
+	if(mTexture!=NULL){
+		createBuffer();
+
+		Matrix4x4 matrix;
+		Math::setMatrix4x4FromScale(matrix,Math::ONE,-Math::ONE,Math::ONE);
+		Math::setMatrix4x4FromTranslate(matrix,0,Math::ONE,0);
+		mTexture->setMatrix(matrix);
+	}
+	else{
+		destroyBuffer();
+	}
+	
 	return true;
 }
 
@@ -223,7 +238,8 @@ mContext=glXCreateNewContext(mDisplay,fbConfig,GLX_RGBA_BIT,renderTarget->getGLX
 	XFree(fbConfigs);
 //	XFree(visInfo);
 
-	glXMakeCurrent(mDisplay,mPBuffer,mContext);
+//removed this to keep it similar to egl
+//	glXMakeCurrent(mDisplay,mPBuffer,mContext);
 
 	mDrawable=mPBuffer;
 
@@ -241,17 +257,24 @@ mContext=glXCreateNewContext(mDisplay,fbConfig,GLX_RGBA_BIT,renderTarget->getGLX
 }
 
 bool GLXPBufferSurfaceRenderTarget::destroyBuffer(){
-	if(mContext!=0){
-		glXDestroyContext(mDisplay,mContext);
-		mContext=0;
-	}
-	if(mPBuffer!=0){
-		glXDestroyGLXPbufferSGIX(mDisplay,mPBuffer);
-		mPBuffer=0;
-	}
-	if(mDisplay!=None){
-		XCloseDisplay(mDisplay);
-		mDisplay=None;
+	if(mDisplay!=0){
+		if(mContext==glXGetCurrentContext()){
+			((GLXRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->makeCurrent();
+		}
+
+		if(mContext!=0){
+			glXDestroyContext(mDisplay,mContext);
+			mContext=0;
+		}
+		if(mPBuffer!=0){
+			glXDestroyGLXPbufferSGIX(mDisplay,mPBuffer);
+			mPBuffer=0;
+		}
+		
+		if(mDisplay!=None){
+			XCloseDisplay(mDisplay);
+			mDisplay=None;
+		}
 	}
 	return true;
 }
