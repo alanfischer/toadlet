@@ -28,7 +28,7 @@
 
 // CMake fills in this file with the proper values for our build
 
-// Setup the overall platform
+// Setup the platform
 #cmakedefine TOADLET_PLATFORM_WIN32
 #cmakedefine TOADLET_PLATFORM_WINCE
 #cmakedefine TOADLET_PLATFORM_POSIX

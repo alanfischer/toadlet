@@ -7,8 +7,6 @@ include_directories (${toadlet_SOURCE_DIR}/src/cpp ${toadlet_BINARY_DIR}/src/cpp
 set (DYNAMIC_LIB_PROPS COMPILE_DEFINITIONS TOADLET_BUILD_DYNAMIC COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX _d)
 set (STATIC_LIB_PROPS COMPILE_DEFINITIONS TOADLET_BUILD_STATIC COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG DEBUG_POSTFIX d)
 
-# Set engine wide compile flags - these need to be appended separately due to some crazy way cmake works
-
 
 # Set platform specific options
 if (TOADLET_PLATFORM_WIN32)
