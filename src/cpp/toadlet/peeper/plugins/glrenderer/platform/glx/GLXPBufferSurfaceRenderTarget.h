@@ -63,6 +63,8 @@ public:
 protected:
 	bool createBuffer();
 	bool destroyBuffer();
+	void bind();
+	void unbind();
 
 	GLRenderer *mRenderer;
 	GLTexture *mTexture;

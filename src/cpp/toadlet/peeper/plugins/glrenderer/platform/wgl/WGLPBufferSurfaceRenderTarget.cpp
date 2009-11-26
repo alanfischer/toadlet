@@ -38,8 +38,8 @@ bool GLPBufferSurfaceRenderTarget_available(GLRenderer *renderer){
 	return WGLPBufferSurfaceRenderTarget::available(renderer);
 }
 
-SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer){
-	return new WGLPBufferSurfaceRenderTarget(renderer);
+SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer,bool copy){
+	return new WGLPBufferSurfaceRenderTarget(renderer,copy);
 }
 
 bool WGLPBufferSurfaceRenderTarget::available(GLRenderer *renderer){
@@ -50,8 +50,9 @@ bool WGLPBufferSurfaceRenderTarget::available(GLRenderer *renderer){
 	#endif
 }
 
-WGLPBufferSurfaceRenderTarget::WGLPBufferSurfaceRenderTarget(GLRenderer *renderer):WGLRenderTarget(),
+WGLPBufferSurfaceRenderTarget::WGLPBufferSurfaceRenderTarget(GLRenderer *renderer,bool copy):WGLRenderTarget(),
 	mRenderer(NULL),
+	mCopy(false),
 	mTexture(NULL),
 	mPBuffer(NULL),
 	mWidth(0),
@@ -60,6 +61,7 @@ WGLPBufferSurfaceRenderTarget::WGLPBufferSurfaceRenderTarget(GLRenderer *rendere
 	mInitialized(false)
 {
 	mRenderer=renderer;
+	mCopy=copy;
 }
 
 WGLPBufferSurfaceRenderTarget::~WGLPBufferSurfaceRenderTarget(){
@@ -67,29 +69,22 @@ WGLPBufferSurfaceRenderTarget::~WGLPBufferSurfaceRenderTarget(){
 }
 
 bool WGLPBufferSurfaceRenderTarget::create(){
+	mWidth=0;
+	mHeight=0;
+	mBound=false;
 	mInitialized=false;
 
 	return true;
 }
 
 bool WGLPBufferSurfaceRenderTarget::destroy(){
-	if(mBound){
-		mBound=false;
-		wglReleaseTexImageARB(mPBuffer,WGL_FRONT_LEFT_ARB);
-		TOADLET_CHECK_GLERROR("wglReleaseTexImageARB");
-	}
-
 	destroyBuffer();
 
 	return true;
 }
 
 bool WGLPBufferSurfaceRenderTarget::makeCurrent(){
-	if(mBound){
-		mBound=false;
-		wglReleaseTexImageARB(mPBuffer,WGL_FRONT_LEFT_ARB);
-		TOADLET_CHECK_GLERROR("wglReleaseTexImageARB");
-	}
+	unbind();
 
 	WGLRenderTarget::makeCurrent();
 
@@ -102,12 +97,9 @@ bool WGLPBufferSurfaceRenderTarget::makeCurrent(){
 }
 
 bool WGLPBufferSurfaceRenderTarget::swap(){
-	if(mBound==false){
-		mBound=true;
-		glBindTexture(mTexture->getTarget(),mTexture->getHandle());
-		wglBindTexImageARB(mPBuffer,WGL_FRONT_LEFT_ARB);
-		TOADLET_CHECK_GLERROR("wglBindTexImageARB");
-	}
+	glFlush();
+
+	bind();
 
 	return true;
 }
@@ -158,7 +150,9 @@ bool WGLPBufferSurfaceRenderTarget::createBuffer(){
 	int height=mTexture->getHeight();
 
 	HDC hdc=wglGetCurrentDC();
+	TOADLET_CHECK_WGLERROR("wglGetCurrentDC");
 	HGLRC context=wglGetCurrentContext();
+	TOADLET_CHECK_WGLERROR("wglGetCurrentContext");
 
 	int bindType=WGL_BIND_TO_TEXTURE_RGB_ARB;
 	int pixelType=WGL_TYPE_RGBA_ARB;
@@ -179,7 +173,7 @@ bool WGLPBufferSurfaceRenderTarget::createBuffer(){
 		WGL_DOUBLE_BUFFER_ARB,GL_FALSE,
 		WGL_PIXEL_TYPE_ARB,pixelType,
 		WGL_ACCELERATION_ARB,WGL_FULL_ACCELERATION_ARB,
-		bindType,true,// bindType must be last, since it could be zero if we were not binding
+		bindType,mCopy,
 		0,
 	};
 
@@ -194,6 +188,7 @@ bool WGLPBufferSurfaceRenderTarget::createBuffer(){
 	int wglformat=0;
 	unsigned int count=0;
 	wglChoosePixelFormatARB(hdc,iAttributes,fAttributes,1,&wglformat,&count);
+	TOADLET_CHECK_WGLERROR("wglChoosePixelFormatARB");
 
 	if(count==0){
 		Error::unknown(Categories::TOADLET_PEEPER,
@@ -209,6 +204,7 @@ bool WGLPBufferSurfaceRenderTarget::createBuffer(){
 
 	int piValues[sizeof(piAttributes)/sizeof(const int)];
 	wglGetPixelFormatAttribivARB(hdc,wglformat,0,sizeof(piAttributes)/sizeof(const int),piAttributes,piValues);
+	TOADLET_CHECK_WGLERROR("wglGetPixelFormatAttribivARB");
 
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
 		String("Format RGBA=")+
@@ -253,10 +249,14 @@ bool WGLPBufferSurfaceRenderTarget::createBuffer(){
 		return false;
 	}
 
+	TOADLET_CHECK_WGLERROR("createBuffer");
+
 	return true;
 }
 
 bool WGLPBufferSurfaceRenderTarget::destroyBuffer(){
+	unbind();
+
 	if(mGLRC==wglGetCurrentContext()){
 		((WGLRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->makeCurrent();
 	}
@@ -273,7 +273,34 @@ bool WGLPBufferSurfaceRenderTarget::destroyBuffer(){
 		wglDestroyPbufferARB(mPBuffer);
 		mPBuffer=0;
 	}
+
 	return true;
+}
+
+void WGLPBufferSurfaceRenderTarget::bind(){
+	if(mBound==false){
+		mBound=true;
+		glBindTexture(mTexture->getTarget(),mTexture->getHandle());
+		TOADLET_CHECK_GLERROR("glBindTexture");
+		if(mCopy){
+			glCopyTexSubImage2D(mTexture->getTarget(),0,0,0,0,0,mWidth,mHeight);
+			TOADLET_CHECK_GLERROR("glBindTexture");
+		}
+		else{
+			wglBindTexImageARB(mPBuffer,WGL_FRONT_LEFT_ARB);
+			TOADLET_CHECK_WGLERROR("wglBindTexImageARB");
+		}
+	}
+}
+
+void WGLPBufferSurfaceRenderTarget::unbind(){
+	if(mBound==true){
+		mBound=false;
+		if(mCopy==false){
+			wglReleaseTexImageARB(mPBuffer,WGL_FRONT_LEFT_ARB);
+			TOADLET_CHECK_WGLERROR("wglReleaseTexImageARB");
+		}
+	}
 }
 
 }

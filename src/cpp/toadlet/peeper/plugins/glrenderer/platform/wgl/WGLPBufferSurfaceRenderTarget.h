@@ -39,7 +39,7 @@ class WGLPBufferSurfaceRenderTarget:public WGLRenderTarget,public SurfaceRenderT
 public:
 	static bool available(GLRenderer *renderer);
 
-	WGLPBufferSurfaceRenderTarget(GLRenderer *renderer);
+	WGLPBufferSurfaceRenderTarget(GLRenderer *renderer,bool copy);
 	virtual ~WGLPBufferSurfaceRenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
@@ -61,10 +61,13 @@ public:
 	inline HPBUFFERARB getHPBUFFER() const{return mPBuffer;}
 
 protected:
-	virtual bool createBuffer();
-	virtual bool destroyBuffer();
+	bool createBuffer();
+	bool destroyBuffer();
+	void bind();
+	void unbind();
 
 	GLRenderer *mRenderer;
+	bool mCopy;
 	GLTexture *mTexture;
 	HPBUFFERARB mPBuffer;
 	int mWidth;
