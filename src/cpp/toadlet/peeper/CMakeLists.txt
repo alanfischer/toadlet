@@ -104,6 +104,16 @@ elseif (TOADLET_PLATFORM_IPHONE)
 	# Both iPhoneOS and iPhoneSimulator always have opengles
 	set (TOADLET_HAS_OPENGL ON PARENT_SCOPE)
 	add_subdirectory (plugins/glrenderer)
+elseif (TOADLET_PLATFORM_OSX)
+	# OSX requires we find OpenGL and GLEW
+	find_package (OPENGL)
+	find_package (GLEW)
+	if (OPENGL_FOUND AND GLEW_FOUND)
+		set (TOADLET_HAS_OPENGL ON PARENT_SCOPE)
+		add_subdirectory (plugins/glrenderer)
+	else (OPENGL_FOUND AND GLEW_FOUND)
+		message ("OpenGL and/or GLEW was not found. The peeper_glrenderer will not be built")
+	endif (OPENGL_FOUND AND GLEW_FOUND)
 elseif (TOADLET_PLATFORM_POSIX)
 	# On posix we find opengl dynamically provided we have glew
 	find_package (GLEW)
