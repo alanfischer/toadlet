@@ -39,7 +39,7 @@ class EGLPBufferSurfaceRenderTarget:public EGLRenderTarget,public SurfaceRenderT
 public:
 	static bool available(GLRenderer *renderer);
 
-	EGLPBufferSurfaceRenderTarget(GLRenderer *renderer);
+	EGLPBufferSurfaceRenderTarget(GLRenderer *renderer,bool copy);
 	virtual ~EGLPBufferSurfaceRenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
@@ -62,8 +62,11 @@ public:
 protected:
 	bool createBuffer();
 	bool destroyBuffer();
+	void bind();
+	void unbind();
 
 	GLRenderer *mRenderer;
+	bool mCopy;
 	GLTexture *mTexture;
 	int mWidth;
 	int mHeight;

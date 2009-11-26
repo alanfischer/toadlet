@@ -73,12 +73,15 @@
 	extern "C" {
 		#include <GL/glew.h>
 		#if defined(TOADLET_PLATFORM_WIN32)
+			#define TOADLET_HAS_WGL
 			#include <GL/wglew.h>
 			#include <GL/gl.h>
 		#elif defined(TOADLET_PLATFORM_OSX)
+			#define TOADLET_HAS_NSGL
 			#include <OpenGL/OpenGL.h>
 			#include <AGL/agl.h>
 		#elif defined(TOADLET_PLATFORM_POSIX)
+			#define TOADLET_HAS_GLX
 			#include <GL/glxew.h>
 			#include <GL/gl.h>
 		#else
@@ -250,6 +253,16 @@
 #else
 	#define TOADLET_CHECK_EGLERROR(function)
 #endif
-	
+
+#if defined(TOADLET_HAS_WGL) && defined(TOADLET_DEBUG)
+	#define TOADLET_CHECK_WGLERROR(function) \
+		{ int error=GetLastError(); \
+		if(error!=0) \
+			toadlet::egg::Logger::log(toadlet::egg::Categories::TOADLET_PEEPER,toadlet::egg::Logger::Level_ALERT, \
+				toadlet::egg::String("WGL Error in ") + function + ": error=" + error); }
+#else
+	#define TOADLET_CHECK_WGLERROR(function)
+#endif
+
 #endif
 

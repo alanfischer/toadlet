@@ -23,6 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
+// TODO: This needs to be run through and tested thoroughly, plus remove the SGIX stuff in favor of EXT
+ 
 #include "GLXPBufferSurfaceRenderTarget.h"
 #include "../../GLRenderer.h"
 #include <toadlet/egg/Logger.h>
@@ -67,6 +69,11 @@ GLXPBufferSurfaceRenderTarget::~GLXPBufferSurfaceRenderTarget(){
 }
 
 bool GLXPBufferSurfaceRenderTarget::create(){
+	mWidth=0;
+	mHeight=0;
+	mBound=false;
+	mInitialized=false;
+
 	return true;
 }
 
@@ -77,6 +84,8 @@ bool GLXPBufferSurfaceRenderTarget::destroy(){
 }
 
 bool GLXPBufferSurfaceRenderTarget::makeCurrent(){
+	unbind();
+
 	GLXRenderTarget::makeCurrent();
 
 	if(mInitialized==false){
@@ -88,8 +97,11 @@ bool GLXPBufferSurfaceRenderTarget::makeCurrent(){
 }
 
 bool GLXPBufferSurfaceRenderTarget::swap(){
-	glBindTexture(mTexture->getTarget(),mTexture->getHandle());
-	glCopyTexSubImage2D(mTexture->getTarget(),0,0,0,0,0,mWidth,mHeight);
+	glFlush();
+
+	bind();
+	
+	return true;
 }
 
 bool GLXPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
@@ -173,12 +185,14 @@ bool GLXPBufferSurfaceRenderTarget::createBuffer(){
 		GLX_DEPTH_SIZE,depthBits,
 		GLX_DOUBLEBUFFER,0,
 		GLX_STENCIL_SIZE,0,
+		GLX_BIND_TO_TEXTURE_RGB_EXT,True,
 		None
 	};
 
 	int pbAttribs[]={
 		GLX_LARGEST_PBUFFER_SGIX,False,
 		GLX_PRESERVED_CONTENTS_SGIX,False,
+		GLX_TEXTURE_FORMAT_EXT,GLX_TEXTURE_FORMAT_RGB_EXT,
 		None
 	};
 
@@ -207,7 +221,7 @@ bool GLXPBufferSurfaceRenderTarget::createBuffer(){
 			"Error creating pbuffer");
 		return false;
 	}
-
+	
 	XSetErrorHandler(oldHandler);
 /*
 	XVisualInfo *visInfo=glXGetVisualFromFBConfigSGIX(mDisplay,fbConfig);
@@ -237,9 +251,6 @@ mContext=glXCreateNewContext(mDisplay,fbConfig,GLX_RGBA_BIT,renderTarget->getGLX
 
 	XFree(fbConfigs);
 //	XFree(visInfo);
-
-//removed this to keep it similar to egl
-//	glXMakeCurrent(mDisplay,mPBuffer,mContext);
 
 	mDrawable=mPBuffer;
 
@@ -277,6 +288,15 @@ bool GLXPBufferSurfaceRenderTarget::destroyBuffer(){
 		}
 	}
 	return true;
+}
+
+void GLXPBufferSurfaceRenderTarget::bind(){
+	glBindTexture(mTexture->getTarget(),mTexture->getHandle());
+	glCopyTexSubImage2D(mTexture->getTarget(),0,0,0,0,0,mWidth,mHeight);
+}
+
+void GLXPBufferSurfaceRenderTarget::unbind(){
+	// Nothing yet...
 }
 
 }
