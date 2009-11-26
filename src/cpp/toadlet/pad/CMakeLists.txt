@@ -86,7 +86,7 @@ elseif (TOADLET_PLATFORM_OSX)
 	set (PAD_LIBS_S objc ${APPKIT_LIBS} toadlet_peeper_glrenderer_s toadlet_ribbit_alplayer_s)
 elseif (TOADLET_PLATFORM_POSIX)
 	# HACK: we are using a custom patched version of FindX11 until the xf86vmode library is included in the mainline
-	find_package(X11XVM REQUIRED)
+	find_package(X11XVM)
 	if (X11_xf86vmode_FOUND)
 		include_directories (${X11_INCLUDE_DIR} ${X11_xf86vmode_INCLUDE_PATH})
 		set (PAD_LIBS toadlet_peeper_glrenderer toadlet_ribbit_alplayer ${X11_LIBRARIES} ${X11_Xxf86vm_LIB})
