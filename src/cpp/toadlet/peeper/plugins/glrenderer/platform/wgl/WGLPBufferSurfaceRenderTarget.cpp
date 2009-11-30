@@ -38,8 +38,8 @@ bool GLPBufferSurfaceRenderTarget_available(GLRenderer *renderer){
 	return WGLPBufferSurfaceRenderTarget::available(renderer);
 }
 
-SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer,bool copy){
-	return new WGLPBufferSurfaceRenderTarget(renderer,copy);
+SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer){
+	return new WGLPBufferSurfaceRenderTarget(renderer);
 }
 
 bool WGLPBufferSurfaceRenderTarget::available(GLRenderer *renderer){
@@ -50,7 +50,7 @@ bool WGLPBufferSurfaceRenderTarget::available(GLRenderer *renderer){
 	#endif
 }
 
-WGLPBufferSurfaceRenderTarget::WGLPBufferSurfaceRenderTarget(GLRenderer *renderer,bool copy):WGLRenderTarget(),
+WGLPBufferSurfaceRenderTarget::WGLPBufferSurfaceRenderTarget(GLRenderer *renderer):WGLRenderTarget(),
 	mRenderer(NULL),
 	mCopy(false),
 	mTexture(NULL),
@@ -61,7 +61,6 @@ WGLPBufferSurfaceRenderTarget::WGLPBufferSurfaceRenderTarget(GLRenderer *rendere
 	mInitialized(false)
 {
 	mRenderer=renderer;
-	mCopy=copy;
 }
 
 WGLPBufferSurfaceRenderTarget::~WGLPBufferSurfaceRenderTarget(){
@@ -69,6 +68,7 @@ WGLPBufferSurfaceRenderTarget::~WGLPBufferSurfaceRenderTarget(){
 }
 
 bool WGLPBufferSurfaceRenderTarget::create(){
+	mCopy=true;
 	mWidth=0;
 	mHeight=0;
 	mBound=false;
@@ -173,15 +173,17 @@ bool WGLPBufferSurfaceRenderTarget::createBuffer(){
 		WGL_DOUBLE_BUFFER_ARB,GL_FALSE,
 		WGL_PIXEL_TYPE_ARB,pixelType,
 		WGL_ACCELERATION_ARB,WGL_FULL_ACCELERATION_ARB,
-		bindType,mCopy,
+		mCopy?0:bindType,GL_TRUE,
 		0,
 	};
 
-	float fAttributes[]={0,0};
+	float fAttributes[]={
+		0
+	};
 
-	int pAttributes[]={ 
-		WGL_TEXTURE_FORMAT_ARB,texFormat,
-		WGL_TEXTURE_TARGET_ARB,WGL_TEXTURE_2D_ARB,
+	int pAttributes[]={
+		mCopy?0:WGL_TEXTURE_FORMAT_ARB,texFormat,
+		mCopy?0:WGL_TEXTURE_TARGET_ARB,WGL_TEXTURE_2D_ARB,
 		0 
 	};
 
@@ -258,7 +260,7 @@ bool WGLPBufferSurfaceRenderTarget::destroyBuffer(){
 	unbind();
 
 	if(mGLRC==wglGetCurrentContext()){
-		((WGLRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->makeCurrent();
+		((GLRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->makeCurrent();
 	}
 
 	if(mGLRC!=0){

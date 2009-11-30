@@ -53,7 +53,7 @@ public:
 	static int parseInt(const char *string);
 	static egg::String makeInt(int i);
 
-	static Material::ptr loadMaterial(mxml_node_t *node,int version,TextureManager *textureManager);
+	static Material::ptr loadMaterial(mxml_node_t *node,int version,MaterialManager *materialManager,TextureManager *textureManager);
 	static mxml_node_t *saveMaterial(Material::ptr material,int version);
 
 	static mesh::Mesh::ptr loadMesh(mxml_node_t *node,int version,BufferManager *bufferManager,MaterialManager *materialManager,TextureManager *textureManager);

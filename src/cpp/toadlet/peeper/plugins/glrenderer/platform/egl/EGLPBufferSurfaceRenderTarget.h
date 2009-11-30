@@ -39,7 +39,7 @@ class EGLPBufferSurfaceRenderTarget:public EGLRenderTarget,public SurfaceRenderT
 public:
 	static bool available(GLRenderer *renderer);
 
-	EGLPBufferSurfaceRenderTarget(GLRenderer *renderer,bool copy);
+	EGLPBufferSurfaceRenderTarget(GLRenderer *renderer);
 	virtual ~EGLPBufferSurfaceRenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}

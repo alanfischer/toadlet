@@ -341,6 +341,32 @@ void D3D9Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Index
 	}
 }
 
+bool D3D9Renderer::copyToSurface(Surface *surface){
+	D3D9Surface *d3dsurface=(D3D9Surface*)surface->getRootSurface();
+
+	IDirect3DSurface9 *currentSurface=NULL;
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		mD3DDevice->GetRenderTarget(&currentSurface);
+	#else
+		mD3DDevice->GetRenderTarget(0,&currentSurface);
+	#endif
+
+	D3DSURFACE_DESC desc;
+	HRESULT result=currentSurface->GetDesc(&desc);
+	TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: GetDesc");
+
+	RECT rect={0};
+	rect.right=desc.Width<d3dsurface->mWidth?desc.Width:d3dsurface->mWidth;
+	rect.bottom=desc.Height<d3dsurface->mHeight?desc.Height:d3dsurface->mHeight;
+
+	result=mD3DDevice->StretchRect(currentSurface,&rect,d3dsurface->mSurface,&rect,D3DTEXF_NONE);
+	TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: StretchRect");
+
+	currentSurface->Release();
+
+	return true;
+}
+
 void D3D9Renderer::setDefaultStates(){
 	setAlphaTest(AlphaTest_NONE,0.5);
 	setBlend(Blend::Combination_DISABLED);

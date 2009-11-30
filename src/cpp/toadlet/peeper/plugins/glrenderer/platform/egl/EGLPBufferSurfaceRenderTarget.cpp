@@ -37,15 +37,15 @@ bool GLPBufferSurfaceRenderTarget_available(GLRenderer *renderer){
 	return EGLPBufferSurfaceRenderTarget::available(renderer);
 }
 
-SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer,bool copy){
-	return new EGLPBufferSurfaceRenderTarget(renderer,copy);
+SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer){
+	return new EGLPBufferSurfaceRenderTarget(renderer);
 }
 
 bool EGLPBufferSurfaceRenderTarget::available(GLRenderer *renderer){
 	return ((EGLRenderTarget*)renderer->getPrimaryRenderTarget()->getRootRenderTarget())->egl_version>=11;
 }
 
-EGLPBufferSurfaceRenderTarget::EGLPBufferSurfaceRenderTarget(GLRenderer *renderer,bool copy):EGLRenderTarget(),
+EGLPBufferSurfaceRenderTarget::EGLPBufferSurfaceRenderTarget(GLRenderer *renderer):EGLRenderTarget(),
 	mRenderer(NULL),
 	mCopy(false),
 	mTexture(NULL),
@@ -55,7 +55,6 @@ EGLPBufferSurfaceRenderTarget::EGLPBufferSurfaceRenderTarget(GLRenderer *rendere
 	mInitialized(false)
 {
 	mRenderer=renderer;
-	mCopy=copy;
 	egl_version=((EGLRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->egl_version;
 }
 
@@ -64,6 +63,7 @@ EGLPBufferSurfaceRenderTarget::~EGLPBufferSurfaceRenderTarget(){
 }
 
 bool EGLPBufferSurfaceRenderTarget::create(){
+	mCopy=true;
 	mWidth=0;
 	mHeight=0;
 	mBound=false;
@@ -214,7 +214,7 @@ bool EGLPBufferSurfaceRenderTarget::destroyBuffer(){
 
 	if(mDisplay!=EGL_NO_DISPLAY){
 		if(mContext==eglGetCurrentContext()){
-			((EGLRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->makeCurrent();
+			((GLRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->makeCurrent();
 		}
 
 		if(mContext!=EGL_NO_CONTEXT){

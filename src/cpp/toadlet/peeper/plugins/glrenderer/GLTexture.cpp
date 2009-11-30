@@ -55,6 +55,8 @@ GLTexture::GLTexture(GLRenderer *renderer):BaseResource(),
 }
 
 GLTexture::~GLTexture(){
+	mSurfaces.clear();
+
 	if(mHandle!=0){
 		destroy();
 	}
@@ -179,12 +181,21 @@ void GLTexture::destroyContext(bool backData){
 	TOADLET_CHECK_GLERROR("GLTexture::destroyContext");
 }
 
-Surface::ptr GLTexture::getMipSuface(int i) const{
+Surface::ptr GLTexture::getMipSuface(int i){
 	if(mHandle==0){
 		return NULL;
 	}
 
-	return Surface::ptr(new GLTextureMipSurface(const_cast<GLTexture*>(this),i));
+	if(mSurfaces.size()<=i){
+		mSurfaces.resize(i+1);
+	}
+
+	if(mSurfaces[i]==NULL){
+		Surface::ptr surface(new GLTextureMipSurface(const_cast<GLTexture*>(this),i));
+		mSurfaces[i]=surface;
+	}
+
+	return mSurfaces[i];
 }
 
 bool GLTexture::load(int format,int width,int height,int depth,uint8 *data){
@@ -322,11 +333,20 @@ GLuint GLTexture::getGLFormat(int textureFormat){
 	else if((textureFormat&Texture::Format_BIT_RGBA)>0){
 		format=GL_RGBA;
 	}
-	#if !defined(TOADLET_HAS_GLES)
+	#if !defined(TOADLET_HAS_GLES) || defined(TOADLET_HAS_EAGL)
 		else if((textureFormat&Texture::Format_BIT_DEPTH)>0){
-			format=GL_DEPTH_COMPONENT;
-			// We just leave the internalFormat as GL_DEPTH_COMPONENT, otherwise it seems it needs to do
-			// a conversion if the formats dont match up, and that gets really slow in a copy to texture
+			if((textureFormat&Texture::Format_BIT_UINT_16)>0){
+				format=GL_DEPTH_COMPONENT16;
+			}
+			else if((textureFormat&Texture::Format_BIT_UINT_24)>0){
+				format=GL_DEPTH_COMPONENT24;
+			}
+			else if((textureFormat&Texture::Format_BIT_UINT_32)>0){
+				format=GL_DEPTH_COMPONENT32;
+			}
+			else{
+				format=GL_DEPTH_COMPONENT;
+			}
 		}
 	#endif
 
