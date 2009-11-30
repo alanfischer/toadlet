@@ -25,6 +25,7 @@
 
 #include "GLFBOSurfaceRenderTarget.h"
 #include "GLTexture.h"
+#include "GLRenderer.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 
@@ -66,7 +67,6 @@ bool GLFBOSurfaceRenderTarget::create(){
 	mNeedsCompile=true;
 
 	glGenFramebuffers(1,&mHandle);
-	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 
 	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::create");
 
@@ -74,6 +74,10 @@ bool GLFBOSurfaceRenderTarget::create(){
 }
 
 bool GLFBOSurfaceRenderTarget::destroy(){
+	if(mRenderer->getRenderTarget()->getRootRenderTarget()==(GLRenderTarget*)this){
+		glBindFramebuffer(GL_FRAMEBUFFER,0);
+	}
+
 	int i;
 	for(i=0;i<mOwnedSurfaces.size();++i){
 		mOwnedSurfaces[i]->destroy();
@@ -83,9 +87,9 @@ bool GLFBOSurfaceRenderTarget::destroy(){
 	if(mHandle!=0){
 		glDeleteFramebuffers(1,&mHandle);
 		mHandle=0;
-
-		TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::destroy");
 	}
+
+	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::destroy");
 
 	return true;
 }
@@ -97,7 +101,7 @@ bool GLFBOSurfaceRenderTarget::makeCurrent(){
 
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 
-	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::current");
+	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::makeCurrent");
 
 	return true;
 }
@@ -118,9 +122,12 @@ bool GLFBOSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment
 
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	if(textureSurface!=NULL){
-		GLuint handle=textureSurface->getTexture()->getHandle();
-		GLenum target=textureSurface->getTexture()->getTarget();
+		GLTexture *texture=textureSurface->getTexture();
+		GLuint handle=texture->getHandle();
+		GLenum target=texture->getTarget();
 		GLuint level=textureSurface->getLevel();
+		mWidth=texture->getWidth();
+		mHeight=texture->getHeight();
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER,getGLAttachment(attachment),target,handle,level);
 		// TODO: Figure out EXACTLY when we need these and when we dont, I think we just need them if its ONLY a SHADOWMAP
@@ -128,12 +135,18 @@ bool GLFBOSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment
 			//glDrawBuffer(GL_NONE);
 			//glReadBuffer(GL_NONE);
 		#endif
+
+		Matrix4x4 matrix;
+		Math::setMatrix4x4FromScale(matrix,Math::ONE,-Math::ONE,Math::ONE);
+		Math::setMatrix4x4FromTranslate(matrix,0,Math::ONE,0);
+		texture->setMatrix(matrix);
 	}
 	else if(renderbufferSurface!=NULL){
 		GLuint handle=renderbufferSurface->getHandle();
 
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER,getGLAttachment(attachment),GL_RENDERBUFFER,handle);
 	}
+	glBindFramebuffer(GL_FRAMEBUFFER,0);
 	
 	mSurfaces.add(surface);
 	mSurfaceAttachments.add(attachment);
@@ -164,21 +177,23 @@ bool GLFBOSurfaceRenderTarget::remove(Surface::ptr surface){
 
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	if(textureSurface!=NULL){
-		glFramebufferTexture2D(GL_FRAMEBUFFER,getGLAttachment(attachment),0,0,0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER,getGLAttachment(attachment),GL_TEXTURE_2D,0,0);
 	}
 	else if(renderbufferSurface!=NULL){
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER,getGLAttachment(attachment),GL_RENDERBUFFER,0);
 	}
+	glBindFramebuffer(GL_FRAMEBUFFER,0);
+
+	mSurfaces.removeAt(i);
+	mSurfaceAttachments.removeAt(i);
+	mNeedsCompile=true;
 
 	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::remove");
-
-	mSurfaces.remove(i);
-	mSurfaceAttachments.remove(i);
-	mNeedsCompile=true;
 
 	return true;
 }
 
+// TODO: Make it check to see if a pre-existing self-created depth surface is compatible, and if not, destroy & recreate it
 bool GLFBOSurfaceRenderTarget::compile(){
 	Surface::ptr depth;
 	Surface::ptr color;
@@ -195,14 +210,17 @@ bool GLFBOSurfaceRenderTarget::compile(){
 
 	if(color!=NULL && depth==NULL){
 		// No Depth-Stencil surface, so add one
-		attach(this->createBufferSurface(Texture::Format_DEPTH_8,mWidth,mHeight),Attachment_DEPTH_STENCIL);
+		attach(createBufferSurface(Texture::Format_DEPTH_16,mWidth,mHeight),Attachment_DEPTH_STENCIL);
 	}
 
+	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if(status!=GL_FRAMEBUFFER_COMPLETE){
 		Logger::log(Categories::TOADLET_PEEPER,Logger::Level_WARNING,getFBOMessage(status));
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
+
+	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::compile");
 
 	mNeedsCompile=false;
 

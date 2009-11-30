@@ -270,7 +270,7 @@ mContext=glXCreateNewContext(mDisplay,fbConfig,GLX_RGBA_BIT,renderTarget->getGLX
 bool GLXPBufferSurfaceRenderTarget::destroyBuffer(){
 	if(mDisplay!=0){
 		if(mContext==glXGetCurrentContext()){
-			((GLXRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->makeCurrent();
+			((GLRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->makeCurrent();
 		}
 
 		if(mContext!=0){
