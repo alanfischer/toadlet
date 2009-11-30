@@ -37,7 +37,7 @@ if (WIN32)
 		)
 
 		find_library (DXERR9_LIB NAMES dxerr dxerr9
-			"$ENV{DXSDK_DIR}/Lib/${D3D9_LIB_PATH}"
+			PATHS "$ENV{DXSDK_DIR}/Lib/${D3D9_LIB_PATH}"
 			NO_DEFAULT_PATH
 			DOC "Path to the dxerr9x.lib file"
 		)
