@@ -56,7 +56,7 @@ namespace peeper{
 
 #if defined(TOADLET_HAS_GLPBUFFERS)
 	extern bool GLPBufferSurfaceRenderTarget_available(GLRenderer *renderer);
-	extern SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer,bool copy);
+	extern SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer);
 #endif
 
 TOADLET_C_API Renderer* new_GLRenderer(){
@@ -308,7 +308,7 @@ SurfaceRenderTarget *GLRenderer::createSurfaceRenderTarget(){
 	#endif
 	#if defined(TOADLET_HAS_GLPBUFFERS)
 		if(mPBuffersAvailable){
-			return new_GLPBufferSurfaceRenderTarget(this,true);
+			return new_GLPBufferSurfaceRenderTarget(this);
 		}
 	#endif
 	return NULL;

@@ -38,8 +38,8 @@ bool GLPBufferSurfaceRenderTarget_available(GLRenderer *renderer){
 	return WGLPBufferSurfaceRenderTarget::available(renderer);
 }
 
-SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer,bool copy){
-	return new WGLPBufferSurfaceRenderTarget(renderer,copy);
+SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer){
+	return new WGLPBufferSurfaceRenderTarget(renderer);
 }
 
 bool WGLPBufferSurfaceRenderTarget::available(GLRenderer *renderer){
@@ -50,7 +50,7 @@ bool WGLPBufferSurfaceRenderTarget::available(GLRenderer *renderer){
 	#endif
 }
 
-WGLPBufferSurfaceRenderTarget::WGLPBufferSurfaceRenderTarget(GLRenderer *renderer,bool copy):WGLRenderTarget(),
+WGLPBufferSurfaceRenderTarget::WGLPBufferSurfaceRenderTarget(GLRenderer *renderer):WGLRenderTarget(),
 	mRenderer(NULL),
 	mCopy(false),
 	mTexture(NULL),
