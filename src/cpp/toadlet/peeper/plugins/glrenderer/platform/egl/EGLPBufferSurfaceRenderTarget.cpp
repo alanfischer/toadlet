@@ -37,8 +37,8 @@ bool GLPBufferSurfaceRenderTarget_available(GLRenderer *renderer){
 	return EGLPBufferSurfaceRenderTarget::available(renderer);
 }
 
-SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer,bool copy){
-	return new EGLPBufferSurfaceRenderTarget(renderer,copy);
+SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer){
+	return new EGLPBufferSurfaceRenderTarget(renderer);
 }
 
 bool EGLPBufferSurfaceRenderTarget::available(GLRenderer *renderer){
@@ -63,7 +63,7 @@ EGLPBufferSurfaceRenderTarget::~EGLPBufferSurfaceRenderTarget(){
 }
 
 bool EGLPBufferSurfaceRenderTarget::create(){
-	mCopy=false;
+	mCopy=true;
 	mWidth=0;
 	mHeight=0;
 	mBound=false;

@@ -143,7 +143,7 @@ Engine::Engine():
 
 	// Material handlers
 	#if defined(TOADLET_HAS_MXML)
-		mMaterialManager->setHandler(XMATHandler::ptr(new XMATHandler(mTextureManager)),"xmat");
+		mMaterialManager->setHandler(XMATHandler::ptr(new XMATHandler(mMaterialManager,mTextureManager)),"xmat");
 	#endif
 
 	// Mesh handlers

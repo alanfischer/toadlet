@@ -39,7 +39,7 @@ class WGLPBufferSurfaceRenderTarget:public WGLRenderTarget,public SurfaceRenderT
 public:
 	static bool available(GLRenderer *renderer);
 
-	WGLPBufferSurfaceRenderTarget(GLRenderer *renderer,bool copy);
+	WGLPBufferSurfaceRenderTarget(GLRenderer *renderer);
 	virtual ~WGLPBufferSurfaceRenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
