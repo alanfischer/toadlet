@@ -36,15 +36,15 @@ if (WIN32)
 			DOC "Path to the d3d9x.lib file"
 		)
 
-		find_library (DXERR9_LIB dxerr9
+		find_library (DXERR9_LIB NAMES dxerr dxerr9
 			"$ENV{DXSDK_DIR}/Lib/${D3D9_LIB_PATH}"
 			NO_DEFAULT_PATH
 			DOC "Path to the dxerr9x.lib file"
 		)
 
-		if (D3D9_LIB AND D3DX9_LIB)
+		if (D3D9_LIB AND D3DX9_LIB AND DXERR9_LIB)
 			set (D3D9_FOUND "YES")
-		endif (D3D9_LIB AND D3DX9_LIB)
+		endif (D3D9_LIB AND D3DX9_LIB AND DXERR9_LIB)
 	endif (D3D9_INCLUDE_PATH)
 
 	mark_as_advanced (D3D9_INCLUDE_PATH D3D9_LIB D3DX9_LIB DXERR9_LIB)
