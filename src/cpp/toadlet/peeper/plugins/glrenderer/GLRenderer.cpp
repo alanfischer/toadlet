@@ -56,7 +56,7 @@ namespace peeper{
 
 #if defined(TOADLET_HAS_GLPBUFFERS)
 	extern bool GLPBufferSurfaceRenderTarget_available(GLRenderer *renderer);
-	extern SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer,bool copy);
+	extern SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer);
 #endif
 
 TOADLET_C_API Renderer* new_GLRenderer(){
@@ -308,7 +308,7 @@ SurfaceRenderTarget *GLRenderer::createSurfaceRenderTarget(){
 	#endif
 	#if defined(TOADLET_HAS_GLPBUFFERS)
 		if(mPBuffersAvailable){
-			return new_GLPBufferSurfaceRenderTarget(this,true);
+			return new_GLPBufferSurfaceRenderTarget(this);
 		}
 	#endif
 	return NULL;
@@ -672,6 +672,31 @@ void GLRenderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexDa
 
 		TOADLET_CHECK_GLERROR("glDrawArrays");
 	}
+}
+
+bool GLRenderer::copyToSurface(Surface *surface){
+	GLSurface *glsurface=(GLSurface*)surface->getRootSurface();
+
+	GLTextureMipSurface *textureSurface=glsurface->castToGLTextureMipSurface();
+	GLFBORenderbufferSurface *renderbufferSurface=glsurface->castToGLFBORenderbufferSurface();
+
+	if(textureSurface!=NULL){
+		GLTexture *gltexture=textureSurface->getTexture();
+
+		glBindTexture(gltexture->mTarget,gltexture->mHandle);
+		glCopyTexSubImage2D(gltexture->mTarget,textureSurface->getLevel(),0,0,0,mRenderTarget->getHeight()-gltexture->mHeight,gltexture->mWidth,gltexture->mHeight);
+
+		Matrix4x4 matrix;
+		Math::setMatrix4x4FromScale(matrix,Math::ONE,-Math::ONE,Math::ONE);
+		Math::setMatrix4x4FromTranslate(matrix,0,Math::ONE,0);
+		gltexture->setMatrix(matrix);
+	}
+	else if(renderbufferSurface!=NULL){
+		Error::unknown(Categories::TOADLET_PEEPER,"copyToSurface is unimplemented for a renderbuffer");
+		return false;
+	}
+
+	return true;
 }
 
 void GLRenderer::setDefaultStates(){

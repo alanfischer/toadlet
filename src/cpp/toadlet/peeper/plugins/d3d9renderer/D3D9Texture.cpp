@@ -94,7 +94,7 @@ bool D3D9Texture::createContext(){
 	IDirect3DDevice9 *device=mRenderer->getDirect3DDevice9();
 	IDirect3D9 *d3d=NULL; device->GetDirect3D(&d3d);
 
-	mD3DFormat=getD3DFORMAT(mFormat);
+	mD3DFormat=D3DFMT_X8R8G8B8;//getD3DFORMAT(mFormat);
 	if(!isD3DFORMATValid(d3d,D3DFMT_X8R8G8B8,mD3DFormat,0)){
 		mD3DFormat=D3DFMT_X8R8G8B8;
 	}
@@ -174,7 +174,7 @@ bool D3D9Texture::contextNeedsReset(){
 	#endif
 }
 
-Surface::ptr D3D9Texture::getMipSuface(int i) const{
+Surface::ptr D3D9Texture::getMipSuface(int i){
 	if(mTexture==NULL){
 		return NULL;
 	}

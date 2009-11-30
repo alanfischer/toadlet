@@ -45,6 +45,7 @@ class RenderTarget;
 class SurfaceRenderTarget;
 class Shader;
 class StatisticsSet;
+class Surface;
 class Texture;
 class TextureStage;
 class VertexBuffer;
@@ -146,6 +147,7 @@ public:
 	virtual void beginScene()=0;
 	virtual void endScene()=0;
 	virtual void renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData)=0;
+	virtual bool copyToSurface(Surface *surface)=0;
 
 	// Render state operations
 	virtual void setDefaultStates()=0;

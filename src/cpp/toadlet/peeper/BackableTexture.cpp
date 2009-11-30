@@ -92,7 +92,7 @@ void BackableTexture::destroy(){
 }
 
 // TODO: This should return a BackableSurface, which will be able to change surface pointers
-Surface::ptr BackableTexture::getMipSuface(int i) const{
+Surface::ptr BackableTexture::getMipSuface(int i){
 	return mBack->getMipSuface(i);
 }
 

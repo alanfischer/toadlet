@@ -60,7 +60,7 @@ public:
 	virtual int getDepth() const{return mDepth;}
 	virtual int getNumMipLevels() const{return mMipLevels;}
 
-	virtual Surface::ptr getMipSuface(int i) const;
+	virtual Surface::ptr getMipSuface(int i);
 	virtual bool load(int format,int width,int height,int depth,uint8 *data);
 	virtual bool read(int format,int width,int height,int depth,uint8 *data);
 
@@ -95,6 +95,7 @@ protected:
 	GLenum mTarget;
 	Matrix4x4 mMatrix;
 	bool mManuallyGenerateMipLevels;
+	egg::Collection<Surface::ptr> mSurfaces;
 
 	friend class GLRenderer;
 };

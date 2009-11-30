@@ -74,6 +74,7 @@ public:
 	void beginScene();
 	void endScene();
 	void renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData);
+	bool copyToSurface(Surface *surface);
 
 	// Render state operations
 	void setDefaultStates();

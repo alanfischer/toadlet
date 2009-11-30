@@ -157,7 +157,7 @@ bool D3D9SurfaceRenderTarget::compile(){
 
 	if(color!=NULL && depth==NULL){
 		// No Depth-Stencil surface, so add one
-		attach(this->createBufferSurface(Texture::Format_DEPTH_8,mWidth,mHeight),Attachment_DEPTH_STENCIL);
+		attach(createBufferSurface(Texture::Format_DEPTH_8,mWidth,mHeight),Attachment_DEPTH_STENCIL);
 	}
 
 	mNeedsCompile=false;

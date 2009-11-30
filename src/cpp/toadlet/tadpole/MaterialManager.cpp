@@ -37,6 +37,9 @@ namespace tadpole{
 
 MaterialManager::MaterialManager(InputStreamFactory *inputStreamFactory,TextureManager *textureManager):ResourceManager(inputStreamFactory){
 	mTextureManager=textureManager;
+	mDefaultMinFilter=TextureStage::Filter_LINEAR;
+	mDefaultMagFilter=TextureStage::Filter_LINEAR;
+	mDefaultMipFilter=TextureStage::Filter_LINEAR;
 }
 
 Material::ptr MaterialManager::createMaterial(){
@@ -45,15 +48,28 @@ Material::ptr MaterialManager::createMaterial(){
 	return material;
 }
 
+TextureStage::ptr MaterialManager::createTextureStage(Texture::ptr texture){
+	TextureStage::ptr textureStage(new TextureStage(texture));
+	textureStage->setMinFilter(mDefaultMinFilter);
+	textureStage->setMagFilter(mDefaultMagFilter);
+	if(texture->getNumMipLevels()>1){
+		textureStage->setMipFilter(mDefaultMipFilter);
+	}
+	else{
+		textureStage->setMipFilter(TextureStage::Filter_NONE);
+	}
+	return textureStage;
+}
+
 Resource::ptr MaterialManager::unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData){
 	Texture::ptr texture=mTextureManager->findTexture(name);
 	if(texture!=NULL){
 		Material::ptr material(new Material());
-		
-		material->setTextureStage(0,TextureStage::ptr(new TextureStage(texture)));
-		
+
+		material->setTextureStage(0,createTextureStage(texture));
+
 		material->setLighting(true);
-		
+
 		return material;
 	}
 	else{

@@ -41,10 +41,22 @@ public:
 
 	Material::ptr findMaterial(const egg::String &name){return egg::shared_static_cast<Material>(ResourceManager::find(name));}
 
+	peeper::TextureStage::ptr createTextureStage(peeper::Texture::ptr texture);
+
 	virtual egg::Resource::ptr unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData);
+
+	void setDefaultMinFilter(peeper::TextureStage::Filter filter){mDefaultMinFilter=filter;}
+	inline peeper::TextureStage::Filter getDefaultMinFilter(){return mDefaultMinFilter;}
+	void setDefaultMagFilter(peeper::TextureStage::Filter filter){mDefaultMagFilter=filter;}
+	inline peeper::TextureStage::Filter getDefaultMagFilter(){return mDefaultMagFilter;}
+	void setDefaultMipFilter(peeper::TextureStage::Filter filter){mDefaultMipFilter=filter;}
+	inline peeper::TextureStage::Filter getDefaultMipFilter(){return mDefaultMipFilter;}
 
 protected:
 	TextureManager *mTextureManager;
+	peeper::TextureStage::Filter mDefaultMinFilter;
+	peeper::TextureStage::Filter mDefaultMagFilter;
+	peeper::TextureStage::Filter mDefaultMipFilter;
 };
 
 }
