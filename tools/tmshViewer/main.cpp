@@ -4,6 +4,7 @@
 
 using namespace toadlet::egg;
 using namespace toadlet::tadpole;
+using namespace toadlet::tadpole::animation;
 using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::mesh;
 
@@ -66,7 +67,7 @@ int main(int argc,char **argv){
 			int sequence=atoi(argv[2]);
 			if(sequence>=0 && sequence<numSequences){
 				meshNode->getAnimationController()->setSequenceIndex(sequence);
-				meshNode->getAnimationController()->setLoop(true);
+				meshNode->getAnimationController()->setCycling(AnimationController::Cycling_LOOP);
 				meshNode->getAnimationController()->setTimeScale(Math::ONE);
 				meshNode->getAnimationController()->start();
 			}
