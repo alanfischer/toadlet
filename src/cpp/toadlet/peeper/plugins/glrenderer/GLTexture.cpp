@@ -74,14 +74,6 @@ bool GLTexture::create(int usageFlags,Dimension dimension,int format,int width,i
 		return false;
 	}
 
-	if(mipLevels==0){
-		int w=width,h=height;
-		while(w>0 && h>0){
-			mipLevels++;
-			w/=2; h/=2;
-		}
-	}
-
 	mUsageFlags=usageFlags;
 	mDimension=dimension;
 	mFormat=format;
@@ -117,7 +109,8 @@ bool GLTexture::createContext(){
 	GLint glinternalFormat=glformat;
 	GLint gltype=getGLType(mFormat);
 	int level=0,width=mWidth,height=mHeight,depth=mDepth;
-	for(level=0;level<mMipLevels;++level,width/=2,height/=2){
+	int levelsToAlloc=mMipLevels==0?1:mMipLevels;
+	for(level=0;level<levelsToAlloc;++level,width/=2,height/=2){
 		switch(mTarget){
 			#if !defined(TOADLET_HAS_GLES)
 				case GL_TEXTURE_1D:

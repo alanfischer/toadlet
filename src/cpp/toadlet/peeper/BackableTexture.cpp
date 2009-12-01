@@ -55,14 +55,6 @@ BackableTexture::~BackableTexture(){
 bool BackableTexture::create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels){
 	destroy();
 
-	if(mipLevels==0){
-		int w=width,h=height;
-		while(w>0 && h>0){
-			mipLevels++;
-			w/=2; h/=2;
-		}
-	}
-
 	mUsageFlags=usageFlags;
 	mDimension=dimension;
 	mFormat=format;
