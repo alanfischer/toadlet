@@ -854,6 +854,11 @@ void D3D9Renderer::setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D
 	#else
 		capabilitySet.textureNonPowerOf2Restricted=(caps.TextureCaps & D3DPTEXTURECAPS_NONPOW2CONDITIONAL)!=0;
 	#endif
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		capabilitySet.textureAutogenMipMaps=false;
+	#else
+		capabilitySet.textureAutogenMipMaps=(caps.Caps2 & D3DCAPS2_CANAUTOGENMIPMAP)!=0;
+	#endif
 	capabilitySet.renderToTexture=renderToTexture;
 	capabilitySet.renderToDepthTexture=renderToDepthTexture;
 	capabilitySet.renderToTextureNonPowerOf2Restricted=capabilitySet.textureNonPowerOf2Restricted && capabilitySet.renderToTexture;

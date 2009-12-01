@@ -116,36 +116,39 @@ bool GLTexture::createContext(){
 	GLint glformat=getGLFormat(mFormat);
 	GLint glinternalFormat=glformat;
 	GLint gltype=getGLType(mFormat);
-	switch(mTarget){
-		#if !defined(TOADLET_HAS_GLES)
-			case GL_TEXTURE_1D:
-				glTexImage1D(mTarget,0,glinternalFormat,mWidth,0,glformat,gltype,NULL);
+	int level=0,width=mWidth,height=mHeight,depth=mDepth;
+	for(level=0;level<mMipLevels;++level,width/=2,height/=2){
+		switch(mTarget){
+			#if !defined(TOADLET_HAS_GLES)
+				case GL_TEXTURE_1D:
+					glTexImage1D(mTarget,level,glinternalFormat,width,0,glformat,gltype,NULL);
+				break;
+			#endif
+			case GL_TEXTURE_2D:
+				glTexImage2D(mTarget,level,glinternalFormat,width,height,0,glformat,gltype,NULL);
 			break;
-		#endif
-		case GL_TEXTURE_2D:
-			glTexImage2D(mTarget,0,glinternalFormat,mWidth,mHeight,0,glformat,gltype,NULL);
-		break;
-		#if !defined(TOADLET_HAS_GLES)
-			case GL_TEXTURE_3D:
-				glTexImage3D(mTarget,0,glinternalFormat,mWidth,mHeight,mDepth,0,glformat,gltype,NULL);
-			break;
-			case GL_TEXTURE_CUBE_MAP:{
-				// TODO: Is the following required?
-				glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-				glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+			#if !defined(TOADLET_HAS_GLES)
+				case GL_TEXTURE_3D:
+					glTexImage3D(mTarget,level,glinternalFormat,width,height,depth,0,glformat,gltype,NULL);
+				break;
+				case GL_TEXTURE_CUBE_MAP:{
+					// TODO: Is the following required?
+					glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+					glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 
-				int i;
-				for(i=0;i<6;++i){
-					glTexImage2D(GLCubeFaces[i],0,glinternalFormat,mWidth,mHeight,0,glformat,gltype,NULL);
-				}
-			}break;
-			case GL_TEXTURE_RECTANGLE_ARB:
-				// Set up rectangle scale matrix
-				Math::setMatrix4x4FromScale(mMatrix,mWidth,mHeight,Math::ONE);
+					int i;
+					for(i=0;i<6;++i){
+						glTexImage2D(GLCubeFaces[i],level,glinternalFormat,width,height,0,glformat,gltype,NULL);
+					}
+				}break;
+				case GL_TEXTURE_RECTANGLE_ARB:
+					// Set up rectangle scale matrix
+					Math::setMatrix4x4FromScale(mMatrix,mWidth,mHeight,Math::ONE);
 
-				glTexImage2D(mTarget,0,glinternalFormat,mWidth,mHeight,0,glformat,gltype,NULL);
-			break;
-		#endif
+					glTexImage2D(mTarget,level,glinternalFormat,width,height,0,glformat,gltype,NULL);
+				break;
+			#endif
+		}
 	}
 
 	mManuallyGenerateMipLevels=(mUsageFlags&UsageFlags_AUTOGEN_MIPMAPS)>0;
@@ -156,8 +159,8 @@ bool GLTexture::createContext(){
 			mRenderer->gl_version>=14
 		#endif
 	){
-//		glTexParameteri(mTarget,GL_GENERATE_MIPMAP,GL_TRUE);
-//		mManuallyGenerateMipLevels=false;
+		glTexParameteri(mTarget,GL_GENERATE_MIPMAP,GL_TRUE);
+		mManuallyGenerateMipLevels=false;
 	}
 
 	// TODO: Add mBacking data
@@ -203,7 +206,7 @@ bool GLTexture::load(int format,int width,int height,int depth,int mipLevel,uint
 		return false;
 	}
 
-	if(width!=mWidth || height!=mHeight || depth!=mDepth){
+	if(mipLevel==0 && (width!=mWidth || height!=mHeight || depth!=mDepth)){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"GLTexture: Texture data of incorrect dimensions");
 		return false;
@@ -239,21 +242,10 @@ bool GLTexture::load(int format,int width,int height,int depth,int mipLevel,uint
 	}
 
 	if(mManuallyGenerateMipLevels){
-		bool result=generateMipLevels();
-		if(result==false){
-			int i;
-			for(i=1;i<mMipLevels;++i){
-				int hwidth=width/2;
-				int hheight=height/2;
-
-uint8 *data=new uint8[hwidth*hheight
-				glTexSubImage2D(mTarget,i,0,0,hwidth,hheight,glformat,gltype,NULL);
-
-				width=hwidth;
-				height=hheight;
-			}
-		}
+		generateMipLevels();
 	}
+
+	TOADLET_CHECK_GLERROR("GLTexture::load");
 
 	return true;
 }
@@ -271,6 +263,8 @@ bool GLTexture::read(int format,int width,int height,int depth,int mipLevel,uint
 
 		glGetTexImage(mTarget,mipLevel,glformat,gltype,data);
 
+		TOADLET_CHECK_GLERROR("GLTexture::read");
+
 		return true;
 	#else
 		Error::unimplemented(Categories::TOADLET_PEEPER,
@@ -280,7 +274,6 @@ bool GLTexture::read(int format,int width,int height,int depth,int mipLevel,uint
 } 
 
 bool GLTexture::generateMipLevels(){
-return false;
 	if(mHandle==0){
 		return false;
 	}
@@ -294,6 +287,9 @@ return false;
 		glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 		glGenerateMipmap(mTarget);
 		glBindTexture(mTarget,0);
+
+		TOADLET_CHECK_GLERROR("GLTexture::generateMipLevels");
+
 		return true;
 	}
 	else

@@ -238,6 +238,14 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 		mCapabilitySet.textureDot3=(gl_version>=11);
 	#endif
 
+	#if defined(TOADLET_HAS_GLES)
+		mCapabilitySet.textureAutogenMipMaps|=(gl_version>=11);
+	#elif defined(TOADLET_HAS_GLEW) && defined(GL_EXT_framebuffer_object)
+		mCapabilitySet.textureAutogenMipMaps|=GLEW_EXT_framebuffer_object;
+	#else
+		mCapabilitySet.textureAutogenMipMaps|=(gl_version>=14);
+	#endif
+
 	#if defined(TOADLET_HAS_GLEW)
 		// Usefully, GL_TEXTURE_RECTANGLE_ARB == GL_TEXTURE_RECTANGLE_EXT == GL_TEXTURE_RECTANGLE_NV
 		mCapabilitySet.textureNonPowerOf2Restricted=(GLEW_ARB_texture_rectangle!=0) || (GLEW_EXT_texture_rectangle!=0) || (GLEW_NV_texture_rectangle!=0);

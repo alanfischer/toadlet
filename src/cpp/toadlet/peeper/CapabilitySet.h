@@ -52,6 +52,7 @@ public:
 		textureDot3(false),
 		textureNonPowerOf2Restricted(false),
 		textureNonPowerOf2(false),
+		textureAutogenMipMaps(false),
 		idealVertexFormatBit(VertexElement::Format_BIT_FLOAT_32)
 	{}
 
@@ -73,6 +74,7 @@ public:
 	bool textureDot3;
 	bool textureNonPowerOf2Restricted;
 	bool textureNonPowerOf2;
+	bool textureAutogenMipMaps;
 	int idealVertexFormatBit;
 };
 
