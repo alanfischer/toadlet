@@ -73,14 +73,6 @@ bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width
 		return false;
 	}
 
-	if(mipLevels==0){
-		int w=width,h=height;
-		while(w>0 && h>0){
-			mipLevels++;
-			w/=2; h/=2;
-		}
-	}
-
 	mUsageFlags=usageFlags;
 	mDimension=dimension;
 	mFormat=format;
@@ -102,7 +94,7 @@ bool D3D9Texture::createContext(){
 	IDirect3DDevice9 *device=mRenderer->getDirect3DDevice9();
 	IDirect3D9 *d3d=NULL; device->GetDirect3D(&d3d);
 
-	mD3DFormat=D3DFMT_X8R8G8B8;//getD3DFORMAT(mFormat);
+	mD3DFormat=getD3DFORMAT(mFormat);
 	if(!isD3DFORMATValid(d3d,D3DFMT_X8R8G8B8,mD3DFormat,0)){
 		mD3DFormat=D3DFMT_X8R8G8B8;
 	}

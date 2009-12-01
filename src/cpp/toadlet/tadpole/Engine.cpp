@@ -246,6 +246,8 @@ void Engine::setRenderer(Renderer *renderer){
 			String()+(char)9+"textureNonPowerOf2Restricted:"+capabilitySet.textureNonPowerOf2Restricted);
 		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
 			String()+(char)9+"textureNonPowerOf2:"+capabilitySet.textureNonPowerOf2);
+		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+			String()+(char)9+"textureAutogenMipMaps:"+capabilitySet.textureAutogenMipMaps);
 	}
 
 	if(renderer!=mRenderer && mRenderer!=NULL){

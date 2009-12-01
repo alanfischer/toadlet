@@ -40,34 +40,40 @@ TextureManager::TextureManager(Engine *engine):ResourceManager(engine){
 	mEngine=engine;
 }
 
-Texture::ptr TextureManager::createTexture(const Image::ptr &image,int usageFlags){
+Texture::ptr TextureManager::createTexture(const Image::ptr &image,int usageFlags,int mipLevels){
 	bool hasAutogen=mEngine->getRenderer()->getCapabilitySet().textureAutogenMipMaps;
 	bool wantsAutogen=(usageFlags&Texture::UsageFlags_AUTOGEN_MIPMAPS)>0;
 
 	if(hasAutogen==false && wantsAutogen==true){
 		usageFlags&=~Texture::UsageFlags_AUTOGEN_MIPMAPS;
+
+		if(mipLevels==0){
+			int hwidth=image->getWidth(),hheight=image->getHeight();
+			while(hwidth>0 && hheight>0){
+				mipLevels++;
+				hwidth/=2; hheight/=2;
+			}
+		}
 	}
 
 	BackableTexture::ptr texture(new BackableTexture());
-	texture->create(usageFlags,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0);
+	texture->create(usageFlags,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),mipLevels);
 	if(mEngine->getRenderer()!=NULL){
 		Texture::ptr back(mEngine->getRenderer()->createTexture());
-		back->create(usageFlags,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0);
+		back->create(usageFlags,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),mipLevels);
 		texture->setBack(back,true);
 	}
 	mBackableTexturesToLoad.add(texture);
 
 	texture->load(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0,image->getData());
-	if(hasAutogen==false && wantsAutogen){
+	if(hasAutogen==false && wantsAutogen==true){
 		int mipLevels=texture->getNumMipLevels();
 		int width=image->getWidth(),height=image->getHeight();
 		int hwidth=width,hheight=height;
 		int i;
 		for(i=1;i<mipLevels;++i){
-			hwidth/=2;
-			hheight/=2;
-			int xoff=width/(hwidth+1);
-			int yoff=height/(hheight+1);
+			hwidth/=2; hheight/=2;
+			int xoff=width/(hwidth+1),yoff=height/(hheight+1);
 
 			Image::ptr mipImage(new Image(image->getDimension(),image->getFormat(),hwidth,hheight,image->getDepth()));
 

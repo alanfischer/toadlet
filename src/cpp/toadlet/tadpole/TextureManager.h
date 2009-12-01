@@ -40,7 +40,7 @@ class TOADLET_API TextureManager:public ResourceManager{
 public:
 	TextureManager(Engine *engine);
 
-	peeper::Texture::ptr createTexture(const egg::image::Image::ptr &image,int usageFlags=peeper::Texture::UsageFlags_AUTOGEN_MIPMAPS);
+	peeper::Texture::ptr createTexture(const egg::image::Image::ptr &image,int usageFlags=peeper::Texture::UsageFlags_AUTOGEN_MIPMAPS,int mipLevels=0);
 	peeper::Texture::ptr createTexture(int usageFlags,peeper::Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels);
 	egg::image::Image::ptr createImage(const peeper::Texture::ptr &texture);
 	peeper::SurfaceRenderTarget::ptr createSurfaceRenderTarget();
