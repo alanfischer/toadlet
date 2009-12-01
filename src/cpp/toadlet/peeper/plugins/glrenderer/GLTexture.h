@@ -61,8 +61,8 @@ public:
 	virtual int getNumMipLevels() const{return mMipLevels;}
 
 	virtual Surface::ptr getMipSuface(int i);
-	virtual bool load(int format,int width,int height,int depth,uint8 *data);
-	virtual bool read(int format,int width,int height,int depth,uint8 *data);
+	virtual bool load(int format,int mipLevel,int width,int height,int depth,uint8 *data);
+	virtual bool read(int format,int mipLevel,int width,int height,int depth,uint8 *data);
 
 	inline GLuint getHandle() const{return mHandle;}
 	inline GLenum getTarget() const{return mTarget;}
@@ -78,7 +78,7 @@ public:
 	inline void setMatrix(const Matrix4x4 &matrix){mMatrix.set(matrix);}
 
 protected:
-	void generateMipLevels();
+	bool generateMipLevels();
 	GLuint getGLTarget();
 
 	GLRenderer *mRenderer;

@@ -156,8 +156,8 @@ bool GLTexture::createContext(){
 			mRenderer->gl_version>=14
 		#endif
 	){
-		glTexParameteri(mTarget,GL_GENERATE_MIPMAP,GL_TRUE);
-		mManuallyGenerateMipLevels=false;
+//		glTexParameteri(mTarget,GL_GENERATE_MIPMAP,GL_TRUE);
+//		mManuallyGenerateMipLevels=false;
 	}
 
 	// TODO: Add mBacking data
@@ -198,7 +198,7 @@ Surface::ptr GLTexture::getMipSuface(int i){
 	return mSurfaces[i];
 }
 
-bool GLTexture::load(int format,int width,int height,int depth,uint8 *data){
+bool GLTexture::load(int format,int width,int height,int depth,int mipLevel,uint8 *data){
 	if(mHandle==0){
 		return false;
 	}
@@ -216,36 +216,49 @@ bool GLTexture::load(int format,int width,int height,int depth,uint8 *data){
 	switch(mTarget){
 		#if !defined(TOADLET_HAS_GLES)
 			case GL_TEXTURE_1D:
-				glTexSubImage1D(mTarget,0,0,width,glformat,gltype,data);
+				glTexSubImage1D(mTarget,mipLevel,0,width,glformat,gltype,data);
 			break;
 		#endif
 		case GL_TEXTURE_2D:
-			glTexSubImage2D(mTarget,0,0,0,width,height,glformat,gltype,data);
+			glTexSubImage2D(mTarget,mipLevel,0,0,width,height,glformat,gltype,data);
 		break;
 		#if !defined(TOADLET_HAS_GLES)
 			case GL_TEXTURE_3D:
-				glTexSubImage3D(mTarget,0,0,0,0,width,height,depth,glformat,gltype,data);
+				glTexSubImage3D(mTarget,mipLevel,0,0,0,width,height,depth,glformat,gltype,data);
 			break;
 			case GL_TEXTURE_CUBE_MAP:
 				for(int i=0;i<6;++i){
-					glTexSubImage2D(GLCubeFaces[i],0,0,0,width,height,glformat,gltype,
+					glTexSubImage2D(GLCubeFaces[i],mipLevel,0,0,width,height,glformat,gltype,
 						data+(width*height*ImageFormatConversion::getPixelSize(format)*i));
 				}
 			break;
 			case GL_TEXTURE_RECTANGLE_ARB:
-				glTexSubImage2D(mTarget,0,0,0,width,height,glformat,gltype,data);
+				glTexSubImage2D(mTarget,mipLevel,0,0,width,height,glformat,gltype,data);
 			break;
 		#endif
 	}
 
 	if(mManuallyGenerateMipLevels){
-		generateMipLevels();
+		bool result=generateMipLevels();
+		if(result==false){
+			int i;
+			for(i=1;i<mMipLevels;++i){
+				int hwidth=width/2;
+				int hheight=height/2;
+
+uint8 *data=new uint8[hwidth*hheight
+				glTexSubImage2D(mTarget,i,0,0,hwidth,hheight,glformat,gltype,NULL);
+
+				width=hwidth;
+				height=hheight;
+			}
+		}
 	}
 
 	return true;
 }
 
-bool GLTexture::read(int format,int width,int height,int depth,uint8 *data){
+bool GLTexture::read(int format,int width,int height,int depth,int mipLevel,uint8 *data){
 	if(mHandle==0){
 		return false;
 	}
@@ -256,7 +269,7 @@ bool GLTexture::read(int format,int width,int height,int depth,uint8 *data){
 
 		glBindTexture(mTarget,mHandle);
 
-		glGetTexImage(mTarget,0,glformat,gltype,data);
+		glGetTexImage(mTarget,mipLevel,glformat,gltype,data);
 
 		return true;
 	#else
@@ -266,26 +279,30 @@ bool GLTexture::read(int format,int width,int height,int depth,uint8 *data){
 	#endif
 } 
 
-void GLTexture::generateMipLevels(){
+bool GLTexture::generateMipLevels(){
+return false;
 	if(mHandle==0){
-		return;
+		return false;
 	}
 
 	#if defined(TOADLET_HAS_GLEW) && defined(GL_EXT_framebuffer_object)
 	if(GLEW_EXT_framebuffer_object){
+		glBindTexture(mTarget,mHandle);
 		// Set some items to make ATI cards happier
 		glEnable(mTarget);
 		glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 		glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-
-		glBindTexture(mTarget,mHandle);
 		glGenerateMipmap(mTarget);
 		glBindTexture(mTarget,0);
+		return true;
 	}
 	else
 	#endif
+	{
 		Logger::log(Categories::TOADLET_PEEPER,Logger::Level_WARNING,
 			"GLTexture::generateMipMaps: Not implemented");
+		return false;
+	}
 }
 
 GLuint GLTexture::getGLTarget(){

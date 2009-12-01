@@ -39,17 +39,17 @@ TextureManager::TextureManager(Engine *engine):ResourceManager(engine){
 	mEngine=engine;
 }
 
-Texture::ptr TextureManager::createTexture(const Image::ptr &image){
+Texture::ptr TextureManager::createTexture(const Image::ptr &image,int usageFlags){
 	BackableTexture::ptr texture(new BackableTexture());
-	texture->create(Texture::UsageFlags_AUTOGEN_MIPMAPS,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0);
+	texture->create(usageFlags,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0);
 	if(mEngine->getRenderer()!=NULL){
 		Texture::ptr back(mEngine->getRenderer()->createTexture());
-		back->create(Texture::UsageFlags_AUTOGEN_MIPMAPS,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0);
+		back->create(usageFlags,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0);
 		texture->setBack(back,true);
 	}
 	mBackableTexturesToLoad.add(texture);
 
-	texture->load(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),image->getData());
+	texture->load(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0,image->getData());
 
 	manage(shared_static_cast<Texture>(texture));
 
@@ -73,7 +73,7 @@ Texture::ptr TextureManager::createTexture(int usageFlags,Texture::Dimension dim
 
 Image::ptr TextureManager::createImage(const Texture::ptr &texture){
 	Image::ptr image(new Image(texture->getDimension(),texture->getFormat(),texture->getWidth(),texture->getHeight(),texture->getDepth()));
-	texture->read(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),image->getData());
+	texture->read(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0,image->getData());
 	return image;
 }
 

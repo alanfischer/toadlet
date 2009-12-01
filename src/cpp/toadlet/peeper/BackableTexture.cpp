@@ -96,38 +96,48 @@ Surface::ptr BackableTexture::getMipSuface(int i){
 	return mBack->getMipSuface(i);
 }
 
-bool BackableTexture::load(int format,int width,int height,int depth,uint8 *data){
+bool BackableTexture::load(int format,int width,int height,int depth,int mipLevel,uint8 *data){
 	if(mBack!=NULL){
-		return mBack->load(format,width,height,depth,data);
+		return mBack->load(format,width,height,depth,mipLevel,data);
 	}
 	else{
 		// TODO: This should modify the data to fit into our buffer
-		memcpy(mData,data,mDataSize);
-		return true;
+		if(mipLevel==0){
+			memcpy(mData,data,mDataSize);
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 }
 
-bool BackableTexture::read(int format,int width,int height,int depth,uint8 *data){
+bool BackableTexture::read(int format,int width,int height,int depth,int mipLevel,uint8 *data){
 	if(mBack!=NULL){
-		return mBack->read(format,width,height,depth,data);
+		return mBack->read(format,width,height,depth,mipLevel,data);
 	}
 	else{
 		// TODO: This should modify the data to fit into our buffer
-		memcpy(data,mData,mDataSize);
-		return true;
+		if(mipLevel==0){
+			memcpy(data,mData,mDataSize);
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 }
 
 void BackableTexture::setBack(Texture::ptr back,bool initial){
 	if(back!=mBack && mBack!=NULL){
 		mData=new uint8[mDataSize];
-		mBack->read(mFormat,mWidth,mHeight,mDepth,mData);
+		mBack->read(mFormat,mWidth,mHeight,mDepth,0,mData);
 	}
 
 	mBack=back;
 	
 	if(initial==false && mBack!=NULL && mData!=NULL){
-		mBack->load(mFormat,mWidth,mHeight,mDepth,mData);
+		mBack->load(mFormat,mWidth,mHeight,mDepth,0,mData);
 		delete[] mData;
 		mData=NULL;
 	}

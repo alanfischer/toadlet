@@ -61,8 +61,8 @@ public:
 	virtual int getNumMipLevels() const{return mTexture==NULL?0:mTexture->GetLevelCount();}
 
 	virtual Surface::ptr getMipSuface(int i);
-	virtual bool load(int format,int width,int height,int depth,uint8 *data);
-	virtual bool read(int format,int width,int height,int depth,uint8 *data);
+	virtual bool load(int format,int width,int height,int depth,int mipLevel,uint8 *data);
+	virtual bool read(int format,int width,int height,int depth,int mipLevel,uint8 *data);
 
 protected:
 	static bool isD3DFORMATValid(IDirect3D9 *d3d,D3DFORMAT adapterFormat,D3DFORMAT textureFormat,DWORD usage);
