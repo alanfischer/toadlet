@@ -23,9 +23,10 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/peeper/BackableTexture.h>
+#include <toadlet/peeper/CapabilitySet.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/peeper/BackableTexture.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
@@ -40,6 +41,13 @@ TextureManager::TextureManager(Engine *engine):ResourceManager(engine){
 }
 
 Texture::ptr TextureManager::createTexture(const Image::ptr &image,int usageFlags){
+	bool hasAutogen=mEngine->getRenderer()->getCapabilitySet().textureAutogenMipMaps;
+	bool wantsAutogen=(usageFlags&Texture::UsageFlags_AUTOGEN_MIPMAPS)>0;
+
+	if(hasAutogen==false && wantsAutogen==true){
+		usageFlags&=~Texture::UsageFlags_AUTOGEN_MIPMAPS;
+	}
+
 	BackableTexture::ptr texture(new BackableTexture());
 	texture->create(usageFlags,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0);
 	if(mEngine->getRenderer()!=NULL){
@@ -50,6 +58,31 @@ Texture::ptr TextureManager::createTexture(const Image::ptr &image,int usageFlag
 	mBackableTexturesToLoad.add(texture);
 
 	texture->load(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0,image->getData());
+	if(hasAutogen==false && wantsAutogen){
+		int mipLevels=texture->getNumMipLevels();
+		int width=image->getWidth(),height=image->getHeight();
+		int hwidth=width,hheight=height;
+		int i;
+		for(i=1;i<mipLevels;++i){
+			hwidth/=2;
+			hheight/=2;
+			int xoff=width/(hwidth+1);
+			int yoff=height/(hheight+1);
+
+			Image::ptr mipImage(new Image(image->getDimension(),image->getFormat(),hwidth,hheight,image->getDepth()));
+
+			Pixel<uint8> pixel;
+			int x,y;
+			for(x=0;x<hwidth;++x){
+				for(y=0;y<hheight;++y){
+					image->getPixel(pixel,xoff+x*(1<<i),yoff+y*(1<<i));
+					mipImage->setPixel(pixel,x,y);
+				}
+			}
+
+			texture->load(mipImage->getFormat(),mipImage->getWidth(),mipImage->getHeight(),mipImage->getDepth(),i,mipImage->getData());
+		}
+	}
 
 	manage(shared_static_cast<Texture>(texture));
 

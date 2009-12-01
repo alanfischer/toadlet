@@ -73,6 +73,14 @@ bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width
 		return false;
 	}
 
+	if(mipLevels==0){
+		int w=width,h=height;
+		while(w>0 && h>0){
+			mipLevels++;
+			w/=2; h/=2;
+		}
+	}
+
 	mUsageFlags=usageFlags;
 	mDimension=dimension;
 	mFormat=format;
@@ -199,7 +207,7 @@ bool D3D9Texture::load(int format,int width,int height,int depth,int mipLevel,ui
 		return false;
 	}
 
-	if(width!=mWidth || height!=mHeight || depth!=mDepth){
+	if(mipLevel==0 && (width!=mWidth || height!=mHeight || depth!=mDepth)){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"D3D9Texture: Texture data of incorrect dimensions");
 		return false;
@@ -287,8 +295,6 @@ bool D3D9Texture::load(int format,int width,int height,int depth,int mipLevel,ui
 		return false;
 	}
 
-	// TODO: I dont think this will work if the driver doesnt support autogen mipmaps, so for this & GL, we should probably
-	//  replace it with a custom routine of ours
 	if(mManuallyGenerateMipLevels){
 		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
 			mTexture->GenerateMipSubLevels();
