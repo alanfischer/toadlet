@@ -194,7 +194,7 @@ Surface::ptr D3D9Texture::getMipSuface(int i){
 	}
 }
 
-bool D3D9Texture::load(int format,int width,int height,int depth,uint8 *data){
+bool D3D9Texture::load(int format,int width,int height,int depth,int mipLevel,uint8 *data){
 	if(mTexture==NULL){
 		return false;
 	}
@@ -210,7 +210,7 @@ bool D3D9Texture::load(int format,int width,int height,int depth,uint8 *data){
 		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
 
 		D3DLOCKED_RECT rect={0};
-		result=texture->LockRect(0,&rect,NULL,D3DLOCK_DISCARD);
+		result=texture->LockRect(mipLevel,&rect,NULL,D3DLOCK_DISCARD);
 		if(FAILED(result)){
 			TOADLET_CHECK_D3D9ERROR(result,"LockRect");
 			return false;
@@ -279,7 +279,7 @@ bool D3D9Texture::load(int format,int width,int height,int depth,uint8 *data){
 			}
 		}
 
-		texture->UnlockRect(0);
+		texture->UnlockRect(mipLevel);
 	}
 	else{
 		Error::unimplemented(Categories::TOADLET_PEEPER,
@@ -298,7 +298,7 @@ bool D3D9Texture::load(int format,int width,int height,int depth,uint8 *data){
 	return true;
 }
 
-bool D3D9Texture::read(int format,int width,int height,int depth,uint8 *data){
+bool D3D9Texture::read(int format,int width,int height,int depth,int mipLevel,uint8 *data){
 	if(mTexture==NULL){
 		return false;
 	}
@@ -307,11 +307,11 @@ bool D3D9Texture::read(int format,int width,int height,int depth,uint8 *data){
 		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
 
 		D3DLOCKED_RECT rect={0};
-		HRESULT result=texture->LockRect(0,&rect,NULL,D3DLOCK_READONLY);
+		HRESULT result=texture->LockRect(mipLevel,&rect,NULL,D3DLOCK_READONLY);
 		
 		// TODO: convert & copy back, inverse of above
 		
-		texture->UnlockRect(0);
+		texture->UnlockRect(mipLevel);
 
 		return true;
 	}

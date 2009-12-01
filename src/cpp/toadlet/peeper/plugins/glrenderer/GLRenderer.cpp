@@ -692,7 +692,8 @@ bool GLRenderer::copyToSurface(Surface *surface){
 		gltexture->setMatrix(matrix);
 	}
 	else if(renderbufferSurface!=NULL){
-		Error::unknown(Categories::TOADLET_PEEPER,"copyToSurface is unimplemented for a renderbuffer");
+		Error::unimplemented(Categories::TOADLET_PEEPER,
+			"GLRenderer::copyToSurface: unimplemented for GLFBORenderbufferSurface");
 		return false;
 	}
 
