@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="Performance"
+	Name="PeeperTest"
 	ProjectGUID="{3775C300-18EA-11DB-AC5D-0800200C9A66}"
 	RootNamespace="tut05_textures"
 	Keyword="Win32Proj"
@@ -78,11 +78,11 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/subsystem:$(CESubsystem) /MACHINE:ARM "
 				AdditionalDependencies="toadlet_egg_sd.lib toadlet_peeper_sd.lib toadlet_ribbit_sd.lib toadlet_tadpole_sd.lib toadlet_pad_sd.lib"
-				OutputFile="$(OutDir)/Performance.exe"
+				OutputFile="$(OutDir)/PeeperTest.exe"
 				LinkIncremental="2"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/Performance.pdb"
+				ProgramDatabaseFile="$(OutDir)/PeeperTest.pdb"
 				SubSystem="0"
 				TargetMachine="0"
 			/>
@@ -103,7 +103,7 @@
 			/>
 			<DeploymentTool
 				ForceDirty="-1"
-				RemoteDirectory="%CSIDL_PROGRAM_FILES%\Performance"
+				RemoteDirectory="%CSIDL_PROGRAM_FILES%\PeeperTest"
 				RegisterOutput="0"
 				AdditionalFiles=""
 			/>
@@ -142,7 +142,7 @@
 				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;_WINDOWS;_UNICODE;UNICODE;TOADLET_USE_STATIC"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
-				RuntimeLibrary="1"
+				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
 				TreatWChar_tAsBuiltInType="false"
 				UsePrecompiledHeader="0"
@@ -166,11 +166,11 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="toadlet_egg_sd.lib toadlet_peeper_sd.lib toadlet_ribbit_sd.lib toadlet_tadpole_sd.lib toadlet_pad_sd.lib"
 				ShowProgress="0"
-				OutputFile="$(OutDir)/Performance.exe"
+				OutputFile="$(OutDir)/PeeperTest.exe"
 				LinkIncremental="2"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/Performance.pdb"
+				ProgramDatabaseFile="$(OutDir)/PeeperTest.pdb"
 				SubSystem="1"
 			/>
 			<Tool
@@ -256,12 +256,12 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/ALIGN:4096 /subsystem:$(CESubsystem) /MACHINE:ARM "
 				AdditionalDependencies="toadlet_egg_s.lib toadlet_peeper_s.lib toadlet_ribbit_s.lib toadlet_tadpole_s.lib toadlet_pad_s.lib"
-				OutputFile="$(OutDir)/Performance.exe"
+				OutputFile="$(OutDir)/PeeperTest.exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="false"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="false"
-				ProgramDatabaseFile="$(OutDir)/Performance.pdb"
+				ProgramDatabaseFile="$(OutDir)/PeeperTest.pdb"
 				SubSystem="0"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -284,7 +284,7 @@
 			/>
 			<DeploymentTool
 				ForceDirty="-1"
-				RemoteDirectory="%CSIDL_PROGRAM_FILES%\Performance"
+				RemoteDirectory="%CSIDL_PROGRAM_FILES%\PeeperTest"
 				RegisterOutput="0"
 				AdditionalFiles=""
 			/>
@@ -345,13 +345,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="toadlet_egg_s.lib toadlet_peeper_s.lib toadlet_ribbit_s.lib toadlet_tadpole_s.lib toadlet_pad_s.lib"
-				OutputFile="$(OutDir)/Performance.exe"
+				OutputFile="$(OutDir)/PeeperTest.exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="secchk.lib"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="false"
-				ProgramDatabaseFile="$(OutDir)/Performance.pdb"
+				ProgramDatabaseFile="$(OutDir)/PeeperTest.pdb"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -437,12 +437,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/ALIGN:4096 /subsystem:$(CESubsystem) /MACHINE:ARM "
-				OutputFile="$(OutDir)/Performance.exe"
+				OutputFile="$(OutDir)/PeeperTest.exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="false"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="false"
-				ProgramDatabaseFile="$(OutDir)/Performance.pdb"
+				ProgramDatabaseFile="$(OutDir)/PeeperTest.pdb"
 				SubSystem="0"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -465,7 +465,7 @@
 			/>
 			<DeploymentTool
 				ForceDirty="-1"
-				RemoteDirectory="%CSIDL_PROGRAM_FILES%\Dev 3D Performance"
+				RemoteDirectory="%CSIDL_PROGRAM_FILES%\Dev 3D PeeperTest"
 				RegisterOutput="0"
 				AdditionalFiles=""
 			/>
@@ -527,12 +527,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.01 /machine:THUMB"
-				OutputFile="$(OutDir)/Performance.exe"
+				OutputFile="$(OutDir)/PeeperTest.exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="false"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="false"
-				ProgramDatabaseFile="$(OutDir)/Performance.pdb"
+				ProgramDatabaseFile="$(OutDir)/PeeperTest.pdb"
 				SubSystem="0"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -618,11 +618,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.01 /machine:THUMB"
-				OutputFile="$(OutDir)/Performance.exe"
+				OutputFile="$(OutDir)/PeeperTest.exe"
 				LinkIncremental="2"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/Performance.pdb"
+				ProgramDatabaseFile="$(OutDir)/PeeperTest.pdb"
 				SubSystem="0"
 			/>
 			<Tool
@@ -703,13 +703,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.01 /machine:THUMB"
-				OutputFile="$(OutDir)/Performance.exe"
+				OutputFile="$(OutDir)/PeeperTest.exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="secchk.lib"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="false"
-				ProgramDatabaseFile="$(OutDir)/Performance.pdb"
+				ProgramDatabaseFile="$(OutDir)/PeeperTest.pdb"
 				SubSystem="0"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -793,12 +793,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.01 /machine:THUMB"
-				OutputFile="$(OutDir)/Performance.exe"
+				OutputFile="$(OutDir)/PeeperTest.exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="false"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="false"
-				ProgramDatabaseFile="$(OutDir)/Performance.pdb"
+				ProgramDatabaseFile="$(OutDir)/PeeperTest.pdb"
 				SubSystem="0"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -837,16 +837,16 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\src\cpp\Performance.cpp"
+				RelativePath="..\..\PeeperTest.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\cpp\Performance.h"
+				RelativePath="..\..\PeeperTest.h"
 				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\Performance.rc"
+			RelativePath=".\PeeperTest.rc"
 			>
 		</File>
 	</Files>

@@ -1,9 +1,18 @@
 #ifndef PERFORMANCE_H
 #define PERFORMANCE_H
 
+#include <toadlet/tadpole/MeshManager.h>
+#include <toadlet/tadpole/node/MeshNode.h>
 #include <toadlet/pad/Application.h>
 
-class Performance:public toadlet::pad::Application{
+using namespace toadlet::egg;
+using namespace toadlet::peeper;
+using namespace toadlet::tadpole;
+using namespace toadlet::tadpole::node;
+using namespace toadlet::tadpole::mesh;
+using namespace toadlet::pad;
+
+class Performance:public Application{
 public:
 	Performance();
 	virtual ~Performance();
@@ -16,15 +25,14 @@ public:
 
 protected:
 	bool setupTest(int test,int intensity);
-	toadlet::tadpole::entity::Entity::ptr setupMinimumTest();
-	toadlet::tadpole::entity::Entity::ptr setupFillrateTest();
-	toadlet::tadpole::entity::Entity::ptr setupVertexrateTest();
-	toadlet::tadpole::entity::Entity::ptr setupDynamicTest();
+	Node::ptr setupMinimumTest();
+	Node::ptr setupFillrateTest();
+	Node::ptr setupVertexrateTest();
+	Node::ptr setupDynamicTest();
 
-	toadlet::tadpole::entity::Scene::ptr mScene;
-	toadlet::tadpole::entity::CameraEntity::ptr mCamera;
-	toadlet::tadpole::entity::ParentEntity::ptr mNode;
-	int mTest;
+	CameraNode::ptr cameraNode;
+	ParentNode::ptr parentNode;
+	int test;
 };
 
 #endif

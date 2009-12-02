@@ -62,6 +62,14 @@ MemoryInputStream::MemoryInputStream(char *data,int length,bool ownsData){
 	mOwnsData=ownsData;
 }
 
+MemoryInputStream::MemoryInputStream(unsigned char *data,int length,bool ownsData){
+	mOriginalData=(char*)data;
+	mData=(char*)data;
+	mOriginalLength=length;
+	mLeft=length;
+	mOwnsData=ownsData;
+}
+
 MemoryInputStream::~MemoryInputStream(){
 	if(mOwnsData && mOriginalData!=NULL){
 		delete[] mOriginalData;

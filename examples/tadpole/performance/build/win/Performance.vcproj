@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="renderToTexture"
+	Name="Performance"
 	ProjectGUID="{3775C300-18EA-11DB-AC5D-0800200C9A66}"
 	RootNamespace="tut05_textures"
 	Keyword="Win32Proj"
@@ -77,11 +77,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/subsystem:$(CESubsystem) /MACHINE:ARM "
-				OutputFile="$(OutDir)/renderToTexture.exe"
+				AdditionalDependencies="toadlet_egg_sd.lib toadlet_peeper_sd.lib toadlet_ribbit_sd.lib toadlet_tadpole_sd.lib toadlet_pad_sd.lib"
+				OutputFile="$(OutDir)/Performance.exe"
 				LinkIncremental="2"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/renderToTexture.pdb"
+				ProgramDatabaseFile="$(OutDir)/Performance.pdb"
 				SubSystem="0"
 				TargetMachine="0"
 			/>
@@ -102,24 +103,28 @@
 			/>
 			<DeploymentTool
 				ForceDirty="-1"
-				RemoteDirectory="%CSIDL_PROGRAM_FILES%\renderToTexture"
+				RemoteDirectory="%CSIDL_PROGRAM_FILES%\Performance"
 				RegisterOutput="0"
-				AdditionalFiles="libEGL.dll|$(TOADLET_DEPS_DIR)\wince\lib|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;libGLES_CM_NoE.dll|$(TOADLET_DEPS_DIR)\wince\lib|%CSIDL_PROGRAM_FILES%\renderToTexture\|0"
+				AdditionalFiles=""
 			/>
 			<DebuggerTool
 			/>
 		</Configuration>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
+			CharacterSet="1"
+			WholeProgramOptimization="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine="copy &quot;$(OutDir)\$(ProjectName).exe&quot; .&#x0D;&#x0A;"
+				Outputs="$(ProjectName).exe"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -133,19 +138,26 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				AdditionalIncludeDirectories="C:\home\siralanf\include"
+				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;_WINDOWS;_UNICODE;UNICODE;TOADLET_USE_STATIC"
 				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
+				ExceptionHandling="0"
+				RuntimeLibrary="0"
+				BufferSecurityCheck="false"
+				TreatWChar_tAsBuiltInType="false"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				AdditionalOptions="-n"
+				PreprocessorDefinitions="_DEBUG;_UNICODE;UNICODE;_WIN32_WCE;UNDER_CE"
+				Culture="1033"
+				AdditionalIncludeDirectories="$(IntDir)"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -153,8 +165,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="toadlet_egg_sd.lib toadlet_peeper_sd.lib toadlet_ribbit_sd.lib toadlet_tadpole_sd.lib toadlet_pad_sd.lib"
+				ShowProgress="0"
+				OutputFile="$(OutDir)/Performance.exe"
 				LinkIncremental="2"
+				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(OutDir)/Performance.pdb"
+				SubSystem="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -238,12 +255,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/ALIGN:4096 /subsystem:$(CESubsystem) /MACHINE:ARM "
-				OutputFile="$(OutDir)/renderToTexture.exe"
+				AdditionalDependencies="toadlet_egg_s.lib toadlet_peeper_s.lib toadlet_ribbit_s.lib toadlet_tadpole_s.lib toadlet_pad_s.lib"
+				OutputFile="$(OutDir)/Performance.exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="false"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="false"
-				ProgramDatabaseFile="$(OutDir)/renderToTexture.pdb"
+				ProgramDatabaseFile="$(OutDir)/Performance.pdb"
 				SubSystem="0"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -266,24 +284,28 @@
 			/>
 			<DeploymentTool
 				ForceDirty="-1"
-				RemoteDirectory="%CSIDL_PROGRAM_FILES%\renderToTexture"
+				RemoteDirectory="%CSIDL_PROGRAM_FILES%\Performance"
 				RegisterOutput="0"
-				AdditionalFiles="libEGL.dll|$(TOADLET_DEPS_DIR)\wince\lib|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;libGLES_CM_NoE.dll|$(TOADLET_DEPS_DIR)\wince\lib|%CSIDL_PROGRAM_FILES%\renderToTexture\|0"
+				AdditionalFiles=""
 			/>
 			<DebuggerTool
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
+			CharacterSet="1"
+			WholeProgramOptimization="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine="copy &quot;$(OutDir)\$(ProjectName).exe&quot; .&#x0D;&#x0A;"
+				Outputs="$(ProjectName).exe"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -296,12 +318,26 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="1"
+				InlineFunctionExpansion="2"
+				WholeProgramOptimization="true"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_UNICODE;UNICODE;TOADLET_USE_STATIC"
+				ExceptionHandling="0"
+				RuntimeLibrary="0"
+				TreatWChar_tAsBuiltInType="false"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				AdditionalOptions="-n"
+				PreprocessorDefinitions="NDEBUG;_UNICODE;UNICODE;_WIN32_WCE;UNDER_CE"
+				Culture="1033"
+				AdditionalIncludeDirectories="$(IntDir)"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -309,6 +345,16 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="toadlet_egg_s.lib toadlet_peeper_s.lib toadlet_ribbit_s.lib toadlet_tadpole_s.lib toadlet_pad_s.lib"
+				OutputFile="$(OutDir)/Performance.exe"
+				LinkIncremental="1"
+				IgnoreAllDefaultLibraries="false"
+				IgnoreDefaultLibraryNames="secchk.lib"
+				DelayLoadDLLs="$(NOINHERIT)"
+				GenerateDebugInformation="false"
+				ProgramDatabaseFile="$(OutDir)/Performance.pdb"
+				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -370,7 +416,6 @@
 				PreprocessorDefinitions="_WIN32_WCE=$(CEVER);UNDER_CE=$(CEVER);WINCE;$(PLATFORMDEFINES);NDEBUG;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;BUILD_DEMO;GLESEM_STATIC"
 				ExceptionHandling="0"
 				RuntimeLibrary="0"
-				BufferSecurityCheck="false"
 				TreatWChar_tAsBuiltInType="false"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -392,12 +437,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/ALIGN:4096 /subsystem:$(CESubsystem) /MACHINE:ARM "
-				OutputFile="$(OutDir)/renderToTexture.exe"
+				OutputFile="$(OutDir)/Performance.exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="false"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="false"
-				ProgramDatabaseFile="$(OutDir)/renderToTexture.pdb"
+				ProgramDatabaseFile="$(OutDir)/Performance.pdb"
 				SubSystem="0"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -420,22 +465,28 @@
 			/>
 			<DeploymentTool
 				ForceDirty="-1"
-				RemoteDirectory="%CSIDL_PROGRAM_FILES%\Dev 3D renderToTexture"
+				RemoteDirectory="%CSIDL_PROGRAM_FILES%\Dev 3D Performance"
 				RegisterOutput="0"
-				AdditionalFiles="index.dat|$(InputDir)\build\unsigned\data|%CSIDL_PROGRAM_FILES%\Dev 3D renderToTexture\|0;data.dat|$(InputDir)\build\unsigned\data|%CSIDL_PROGRAM_FILES%\Dev 3D renderToTexture\|0;knot_stream_BC_2003.dll|$(InputDir)\build\unsigned\release\dll|%CSIDL_PROGRAM_FILES%\Dev 3D renderToTexture\|0;knot_stream_BC_5.dll|$(InputDir)\build\unsigned\release\dll|%CSIDL_PROGRAM_FILES%\Dev 3D renderToTexture\|0;knot_stream_MS.dll|$(InputDir)\build\unsigned\release\dll|%CSIDL_PROGRAM_FILES%\Dev 3D renderToTexture\|0;flick_DS.dll|$(InputDir)\build\unsigned\release\dll|%CSIDL_PROGRAM_FILES%\Dev 3D renderToTexture\|0;libEGL.dll|$(TOADLET_DEPS_DIR)\wince\lib|%CSIDL_PROGRAM_FILES%\Dev 3D renderToTexture\|0;libGLES_CM_NoE.dll|$(TOADLET_DEPS_DIR)\wince\lib|%CSIDL_PROGRAM_FILES%\Dev 3D renderToTexture\|0"
+				AdditionalFiles=""
 			/>
 			<DebuggerTool
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release Demo|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
+			CharacterSet="1"
+			WholeProgramOptimization="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine="copy &quot;$(OutDir)\$(ProjectName).exe&quot; .&#x0D;&#x0A;"
+				Outputs="$(ProjectName).exe"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -445,21 +496,47 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
+				TargetEnvironment="1"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="1"
+				InlineFunctionExpansion="2"
+				WholeProgramOptimization="true"
+				PreprocessorDefinitions="_WIN32_WCE=$(CEVER);UNDER_CE=$(CEVER);WINCE;$(PLATFORMDEFINES);NDEBUG;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;BUILD_DEMO"
+				ExceptionHandling="0"
+				RuntimeLibrary="0"
+				TreatWChar_tAsBuiltInType="false"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				AdditionalOptions="-n"
+				PreprocessorDefinitions="NDEBUG;_UNICODE;UNICODE;_WIN32_WCE;UNDER_CE;BUILD_DEMO"
+				Culture="1033"
+				AdditionalIncludeDirectories="$(IntDir)"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions=" /subsystem:windowsce,5.01 /machine:THUMB"
+				OutputFile="$(OutDir)/Performance.exe"
+				LinkIncremental="1"
+				IgnoreAllDefaultLibraries="false"
+				DelayLoadDLLs="$(NOINHERIT)"
+				GenerateDebugInformation="false"
+				ProgramDatabaseFile="$(OutDir)/Performance.pdb"
+				SubSystem="0"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="0"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -517,7 +594,9 @@
 				Optimization="0"
 				PreprocessorDefinitions="_WIN32_WCE=$(CEVER);UNDER_CE=$(CEVER);WINCE;$(PLATFORMDEFINES);_DEBUG;DEBUG;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;"
 				MinimalRebuild="true"
+				ExceptionHandling="0"
 				RuntimeLibrary="1"
+				BufferSecurityCheck="false"
 				TreatWChar_tAsBuiltInType="false"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -539,11 +618,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.01 /machine:THUMB"
-				OutputFile="$(OutDir)/renderToTexture.exe"
+				OutputFile="$(OutDir)/Performance.exe"
 				LinkIncremental="2"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/renderToTexture.pdb"
+				ProgramDatabaseFile="$(OutDir)/Performance.pdb"
 				SubSystem="0"
 			/>
 			<Tool
@@ -565,7 +644,6 @@
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles="index.dat|$(InputDir)\renderToTexture-unsignedFiles|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;data.dat|$(InputDir)\renderToTexture-unsignedFiles|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;knot_stream_BC.dll|$(InputDir)|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;knot_stream_MS.dll|$(InputDir)|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;flick_DS.dll|$(InputDir)|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;toadletfixed_d.dll|$(InputDir)|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;libEGL.dll|$(InputDir)|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;libGLES_CM_NoE.dll|$(InputDir)|%CSIDL_PROGRAM_FILES%\renderToTexture\|0"
 			/>
 			<DebuggerTool
 			/>
@@ -625,13 +703,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.01 /machine:THUMB"
-				OutputFile="$(OutDir)/renderToTexture.exe"
+				OutputFile="$(OutDir)/Performance.exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="secchk.lib"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="false"
-				ProgramDatabaseFile="$(OutDir)/renderToTexture.pdb"
+				ProgramDatabaseFile="$(OutDir)/Performance.pdb"
 				SubSystem="0"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -655,7 +733,6 @@
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles="index.dat|$(InputDir)\renderToTexture-unsignedFiles|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;data.dat|$(InputDir)\renderToTexture-unsignedFiles|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;knot_stream_BC.dll|$(InputDir)|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;knot_stream_MS.dll|$(InputDir)|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;flick_DS.dll|$(InputDir)|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;toadletfixed.dll|$(InputDir)|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;libEGL.dll|$(InputDir)|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;libGLES_CM_NoE.dll|$(InputDir)|%CSIDL_PROGRAM_FILES%\renderToTexture\|0"
 			/>
 			<DebuggerTool
 			/>
@@ -716,12 +793,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.01 /machine:THUMB"
-				OutputFile="$(OutDir)/renderToTexture.exe"
+				OutputFile="$(OutDir)/Performance.exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="false"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="false"
-				ProgramDatabaseFile="$(OutDir)/renderToTexture.pdb"
+				ProgramDatabaseFile="$(OutDir)/Performance.pdb"
 				SubSystem="0"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -746,7 +823,6 @@
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles="index.dat|$(InputDir)\renderToTexture-unsignedFiles|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;data.dat|$(InputDir)\renderToTexture-unsignedFiles|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;knot_stream_BC.dll|$(InputDir)|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;knot_stream_MS.dll|$(InputDir)|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;flick_DS.dll|$(InputDir)|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;libEGL.dll|$(InputDir)|%CSIDL_PROGRAM_FILES%\renderToTexture\|0;libGLES_CM_NoE.dll|$(InputDir)|%CSIDL_PROGRAM_FILES%\renderToTexture\|0"
 			/>
 			<DebuggerTool
 			/>
@@ -761,10 +837,18 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\main.cpp"
+				RelativePath="..\..\src\cpp\Performance.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\cpp\Performance.h"
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\Performance.rc"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
