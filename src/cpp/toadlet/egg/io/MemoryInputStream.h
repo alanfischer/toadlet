@@ -39,7 +39,8 @@ public:
 	// Reads all data from in
 	MemoryInputStream(InputStream::ptr in);
 	// Use the provided data
-	MemoryInputStream(char *data,int length,bool ownsData);
+	MemoryInputStream(char *data,int length,bool ownsData=false);
+	MemoryInputStream(unsigned char *data,int length,bool ownsData=false);
 	virtual ~MemoryInputStream();
 
 	int read(char *buffer,int length);
