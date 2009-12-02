@@ -410,7 +410,6 @@ void Scene::queueRenderables(Node *node){
 	// TODO: Fix these alignment calculations so it actually aligns per axis, and preserves parent scale
 	if(node->mAlignXAxis || node->mAlignYAxis || node->mAlignZAxis){
 		if(mCamera->mAlignmentCalculationsUseOrigin){
-			const Matrix4x4 &viewTransform=mCamera->getViewTransform();
 			Matrix4x4 &nodeWorldTransform=node->mRenderWorldTransform;
 			Vector3 nodeWorldTranslate; Math::setVector3FromMatrix4x4(nodeWorldTranslate,node->mRenderWorldTransform);
 			Vector3 cameraWorldTranslate; Math::setVector3FromMatrix4x4(cameraWorldTranslate,mCamera->mRenderWorldTransform);

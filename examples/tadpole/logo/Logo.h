@@ -2,13 +2,13 @@
 #define LOGO_H
 
 #include <toadlet/pad/Application.h>
-#include <toadlet/tadpole/entity/CameraEntity.h>
-#include <toadlet/tadpole/entity/MeshEntity.h>
+#include <toadlet/tadpole/node/CameraNode.h>
+#include <toadlet/tadpole/node/MeshNode.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::entity;
+using namespace toadlet::tadpole::node;
 using namespace toadlet::pad;
 
 class Logo:public Application{
@@ -22,8 +22,8 @@ public:
 	void update(int dt);
 
 	String resourcePath;
-	CameraEntity::ptr cameraEntity;
-	MeshEntity::ptr meshEntity;
+	CameraNode::ptr cameraNode;
+	MeshNode::ptr meshNode;
 };
 
 #endif

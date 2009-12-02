@@ -43,18 +43,20 @@ namespace tadpole{
 
 HopScene::HopScene():Scene(),
 	//mHopEntities,
+	mShowCollisionVolumes(false),
+	mInterpolateCollisionVolumes(false),
 
-	mSimulator(new Simulator()),
-
+	mExcessiveDT(0),
+	mSimulator(NULL),
+	
 	//mFreeNetworkIDs,
 	//mNetworkIDMap,
-	mHopEntityFactory(NULL),
+	mHopEntityFactory(NULL)
 
-	//mSolidCollection,
-
-	mShowCollisionVolumes(false),
-	mInterpolateCollisionVolumes(false)
-{}
+	//mSolidCollection
+{
+	mSimulator=new Simulator();
+}
 
 HopScene::~HopScene(){
 	if(mSimulator!=NULL){
