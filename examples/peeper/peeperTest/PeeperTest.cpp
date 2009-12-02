@@ -1,18 +1,5 @@
 #include "PeeperTest.h"
 
-#if defined(TOADLET_PLATFORM_WINCE)
-int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,int nCmdShow){
-#else
-int main(int argc,char **argv){
-#endif
-	PeeperTest app;
-	app.setFullscreen(false);
-	app.create();
-	app.start(true);
-	app.destroy();
-	return 0;
-}
-
 PeeperTest::PeeperTest():Application(){
 }
 
@@ -101,3 +88,17 @@ void PeeperTest::resized(int width,int height){
 		Math::setMatrix4x4FromPerspectiveX(projectionMatrix,Math::degToRad(Math::fromInt(45)),Math::div(Math::fromInt(height),Math::fromInt(width)),Math::fromInt(1),Math::fromInt(100));
 	}
 }
+
+#if defined(TOADLET_PLATFORM_WINCE)
+int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,int nCmdShow){
+#else
+int main(int argc,char **argv){
+#endif
+	PeeperTest app;
+	app.setFullscreen(false);
+	app.create();
+	app.start(true);
+	app.destroy();
+	return 0;
+}
+

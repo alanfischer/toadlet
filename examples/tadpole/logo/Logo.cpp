@@ -52,3 +52,16 @@ void Logo::render(Renderer *renderer){
 void Logo::update(int dt){
 	getEngine()->getScene()->update(dt);
 }
+
+#if defined(TOADLET_PLATFORM_WINCE)
+int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,int nCmdShow){
+#else
+int main(int argc,char **argv){
+#endif
+	Logo app;
+	app.setFullscreen(false);
+	app.create();
+	app.start(true);
+	app.destroy();
+	return 0;
+}
