@@ -1,21 +1,12 @@
 #include "Performance.h"
 
-#if defined(TOADLET_PLATFORM_WINCE)
-int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,int nCmdShow){
-#else
-int main(int argc,char **argv){
-#endif
-	Performance app;
-	app.setFullscreen(false);
-	app.create();
-	app.start(true);
-	app.destroy();
-	return 0;
-}
-
 Performance::Performance():
 	test(0)
 {}
+
+
+Performance::~Performance(){
+}
 
 void Performance::create(){
 	Application::create();
@@ -27,9 +18,6 @@ void Performance::create(){
 	getEngine()->getScene()->attach(cameraNode);
 
 	setupTest(test++,10);
-}
-
-Performance::~Performance(){
 }
 
 void Performance::update(int dt){
@@ -135,4 +123,17 @@ Node::ptr Performance::setupDynamicTest(){
 	// TODO
 	Node::ptr node=getEngine()->createNodeType(Node::type());
 	return node;
+}
+
+#if defined(TOADLET_PLATFORM_WINCE)
+int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,int nCmdShow){
+#else
+int main(int argc,char **argv){
+#endif
+	Performance app;
+	app.setFullscreen(false);
+	app.create();
+	app.start(true);
+	app.destroy();
+	return 0;
 }
