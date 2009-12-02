@@ -10,11 +10,12 @@ set (TADPOLE_SRC
 	FontManager.cpp
 	KeyFrame.cpp
 	Material.cpp
-	TPKGInputStreamFactory.cpp
-	Track.cpp
-	ResourceManager.cpp
 	MaterialManager.cpp
 	MeshManager.cpp
+	Noise.cpp
+	ResourceManager.cpp
+	TPKGInputStreamFactory.cpp
+	Track.cpp
 	TextureManager.cpp
 	Version.cpp
 )
@@ -85,11 +86,12 @@ set (TADPOLE_HEADERS
 	FontManager.h
 	KeyFrame.h
 	Material.h
+	MaterialManager.h
+	MeshManager.h
+	Noise.h
 	ResourceHandler.h
 	ResourceHandlerData.h
 	ResourceManager.h
-	MaterialManager.h
-	MeshManager.h
 	TextureManager.h
 	TPKGInputStreamFactory.h
 	Track.h
