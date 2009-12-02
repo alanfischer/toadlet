@@ -241,7 +241,7 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 	#if defined(TOADLET_HAS_GLES)
 		mCapabilitySet.textureAutogenMipMaps|=(gl_version>=11);
 	#elif defined(TOADLET_HAS_GLEW) && defined(GL_EXT_framebuffer_object)
-		mCapabilitySet.textureAutogenMipMaps|=GLEW_EXT_framebuffer_object;
+		mCapabilitySet.textureAutogenMipMaps|=(GLEW_EXT_framebuffer_object!=0);
 	#else
 		mCapabilitySet.textureAutogenMipMaps|=(gl_version>=14);
 	#endif

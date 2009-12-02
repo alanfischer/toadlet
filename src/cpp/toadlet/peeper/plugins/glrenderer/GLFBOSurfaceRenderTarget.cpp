@@ -239,15 +239,15 @@ Surface::ptr GLFBOSurfaceRenderTarget::createBufferSurface(int format,int width,
 GLenum GLFBOSurfaceRenderTarget::getGLAttachment(Attachment attachment){
 	switch(attachment){
 		case Attachment_DEPTH_STENCIL:
-			return GL_DEPTH_ATTACHMENT_EXT;
+			return GL_DEPTH_ATTACHMENT;
 		case Attachment_COLOR_0:
-			return GL_COLOR_ATTACHMENT0_EXT;
+			return GL_COLOR_ATTACHMENT0;
 		case Attachment_COLOR_1:
-			return GL_COLOR_ATTACHMENT1_EXT;
+			return GL_COLOR_ATTACHMENT1;
 		case Attachment_COLOR_2:
-			return GL_COLOR_ATTACHMENT2_EXT;
+			return GL_COLOR_ATTACHMENT2;
 		case Attachment_COLOR_3:
-			return GL_COLOR_ATTACHMENT3_EXT;
+			return GL_COLOR_ATTACHMENT3;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"GLFBOSurfaceRenderTarget::getGLAttachment: Invalid attachment");

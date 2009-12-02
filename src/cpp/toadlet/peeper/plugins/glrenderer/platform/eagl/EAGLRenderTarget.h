@@ -39,6 +39,7 @@
 namespace toadlet{
 namespace peeper{
 
+// TODO: Switch this to extending an FBOSurfaceRenderTarget
 class TOADLET_API EAGLRenderContext:public GLRenderTarget{
 public:
 	EAGLRenderContext();

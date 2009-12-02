@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "EAGLRenderContextPeer.h"
+#include "EAGLRenderTarget.h"
 #include <toadlet/egg/Error.h>
 
 #import <QuartzCore/QuartzCore.h>
