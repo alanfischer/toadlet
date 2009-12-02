@@ -648,8 +648,7 @@ bool Win32Application::changeVideoMode(int width,int height,int colorBits){
 	#if defined(TOADLET_PLATFORM_WINCE)
 		result=(width==GetSystemMetrics(SM_CXSCREEN) && height==GetSystemMetrics(SM_CYSCREEN));
 	#else
-		DEVMODE dmScreenSettings;
-		memset(&dmScreenSettings,0,sizeof(dmScreenSettings));
+		DEVMODE dmScreenSettings={0};
 		dmScreenSettings.dmSize=sizeof(dmScreenSettings);
 		dmScreenSettings.dmPelsWidth=width;
 		dmScreenSettings.dmPelsHeight=height;
