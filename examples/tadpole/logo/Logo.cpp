@@ -1,6 +1,5 @@
 #include "Logo.h"
 #include "lt_xmsh.h"
-#include "lt_mmsh.h"
 
 // To keep this example as simple as possible, it does not require any other data files, instead getting its data from lt_xmsh
 Logo::Logo():Application(){
@@ -14,10 +13,8 @@ void Logo::create(){
 
 	getEngine()->setScene((Scene*)((new Scene())->create(getEngine())));
 
-	//MemoryInputStream::ptr in(new MemoryInputStream(lt_xmsh::data,lt_xmsh::length));
-	//Mesh::ptr mesh=shared_static_cast<Mesh>(getEngine()->getMeshManager()->getHandler("xmsh")->load(in,NULL));
-	MemoryInputStream::ptr in(new MemoryInputStream(lt_mmsh::data,lt_mmsh::length));
-	Mesh::ptr mesh=shared_static_cast<Mesh>(getEngine()->getMeshManager()->getHandler("mmsh")->load(in,NULL));
+	MemoryInputStream::ptr in(new MemoryInputStream(lt_xmsh::data,lt_xmsh::length));
+	Mesh::ptr mesh=shared_static_cast<Mesh>(getEngine()->getMeshManager()->getHandler("xmsh")->load(in,NULL));
 
 	meshNode=getEngine()->createNodeType(MeshNode::type());
 	meshNode->setMesh(mesh);
@@ -56,6 +53,7 @@ void Logo::update(int dt){
 	getEngine()->getScene()->update(dt);
 }
 
+#if !defined(TOADLET_PLATFORM_OSX)
 #if defined(TOADLET_PLATFORM_WINCE)
 int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,int nCmdShow){
 #else
@@ -68,3 +66,4 @@ int main(int argc,char **argv){
 	app.destroy();
 	return 0;
 }
+#endif

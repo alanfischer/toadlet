@@ -74,7 +74,7 @@ bool GLFBOSurfaceRenderTarget::create(){
 }
 
 bool GLFBOSurfaceRenderTarget::destroy(){
-	if(mRenderer->getRenderTarget()->getRootRenderTarget()==(GLRenderTarget*)this){
+	if(mRenderer==NULL || mRenderer->getRenderTarget()->getRootRenderTarget()==(GLRenderTarget*)this){
 		glBindFramebuffer(GL_FRAMEBUFFER,0);
 	}
 
