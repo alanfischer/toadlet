@@ -363,6 +363,11 @@ bool Win32Application::createWindow(){
 		return false;
 	}
 
+	// Use client rect for size, the one that matters
+	GetClientRect(win32->mWnd,&rect);
+	mHeight=rect.bottom-rect.top;
+	mWidth=rect.right-rect.left;
+
 	mApplicationMap[win32->mWnd]=this;
 
 	ShowWindow(win32->mWnd,SW_SHOW);

@@ -687,12 +687,13 @@ bool GLRenderer::copyToSurface(Surface *surface){
 
 	GLTextureMipSurface *textureSurface=glsurface->castToGLTextureMipSurface();
 	GLFBORenderbufferSurface *renderbufferSurface=glsurface->castToGLFBORenderbufferSurface();
+	RenderTarget *renderTarget=mRenderTarget->getRootRenderTarget();
 
 	if(textureSurface!=NULL){
 		GLTexture *gltexture=textureSurface->getTexture();
 
 		glBindTexture(gltexture->mTarget,gltexture->mHandle);
-		glCopyTexSubImage2D(gltexture->mTarget,textureSurface->getLevel(),0,0,0,mRenderTarget->getHeight()-gltexture->mHeight,gltexture->mWidth,gltexture->mHeight);
+		glCopyTexSubImage2D(gltexture->mTarget,textureSurface->getLevel(),0,0,0,renderTarget->getHeight()-gltexture->mHeight,gltexture->mWidth,gltexture->mHeight);
 
 		Matrix4x4 matrix;
 		Math::setMatrix4x4FromScale(matrix,Math::ONE,-Math::ONE,Math::ONE);
