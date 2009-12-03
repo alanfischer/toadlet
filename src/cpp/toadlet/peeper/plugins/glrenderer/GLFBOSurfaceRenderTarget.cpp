@@ -242,12 +242,14 @@ GLenum GLFBOSurfaceRenderTarget::getGLAttachment(Attachment attachment){
 			return GL_DEPTH_ATTACHMENT;
 		case Attachment_COLOR_0:
 			return GL_COLOR_ATTACHMENT0;
-		case Attachment_COLOR_1:
-			return GL_COLOR_ATTACHMENT1;
-		case Attachment_COLOR_2:
-			return GL_COLOR_ATTACHMENT2;
-		case Attachment_COLOR_3:
-			return GL_COLOR_ATTACHMENT3;
+		#if !defined(TOADLET_HAS_EAGL)
+			case Attachment_COLOR_1:
+				return GL_COLOR_ATTACHMENT1;
+			case Attachment_COLOR_2:
+				return GL_COLOR_ATTACHMENT2;
+			case Attachment_COLOR_3:
+				return GL_COLOR_ATTACHMENT3;
+		#endif
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"GLFBOSurfaceRenderTarget::getGLAttachment: Invalid attachment");

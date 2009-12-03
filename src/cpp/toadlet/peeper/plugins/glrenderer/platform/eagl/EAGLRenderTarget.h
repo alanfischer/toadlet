@@ -23,11 +23,12 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_EAGLRENDERCONTEXT_H
-#define TOADLET_PEEPER_EAGLRENDERCONTEXT_H
+#ifndef TOADLET_PEEPER_EAGLRENDERTARGET_H
+#define TOADLET_PEEPER_EAGLRENDERTARGET_H
 
 #include "../../GLIncludes.h"
 #include "../../GLRenderTarget.h"
+#include "../../GLFBOSurfaceRenderTarget.h"
 #include <toadlet/peeper/Visual.h>
 #include <toadlet/egg/Logger.h>
 
@@ -39,12 +40,11 @@
 namespace toadlet{
 namespace peeper{
 
-// TODO: Switch this to extending an FBOSurfaceRenderTarget
-class TOADLET_API EAGLRenderContext:public GLRenderTarget{
+class TOADLET_API EAGLRenderTarget:public GLFBOSurfaceRenderTarget{
 public:
-	EAGLRenderContext();
-	EAGLRenderContext(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat=nil);
-	virtual ~EAGLRenderContext();
+	EAGLRenderTarget();
+	EAGLRenderTarget(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat=nil);
+	virtual ~EAGLRenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
@@ -55,17 +55,14 @@ public:
 	virtual bool swap();
 	
 	virtual bool isPrimary() const{return true;}
-	virtual bool isValid() const{return mContext!=nil && mRenderBuffer!=0;}
+	virtual bool isValid() const{return mContext!=nil && GLFBOSurfaceRenderTarget::isValid();}
 	virtual int getWidth() const;
 	virtual int getHeight() const;
 
 protected:
 	CAEAGLLayer *mDrawable;
 	EAGLContext *mContext;
-
-	GLuint mRenderBuffer;
-	GLuint mFrameBuffer;
-	GLuint mDepthBuffer;
+	GLuint mRenderBufferHandle;
 };
 
 }
