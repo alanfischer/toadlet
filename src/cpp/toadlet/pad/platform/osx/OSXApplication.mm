@@ -34,7 +34,7 @@
 #if defined(TOADLET_HAS_OPENGL)
 	#include <toadlet/peeper/plugins/glrenderer/GLRenderer.h>
 	#if defined(TOADLET_HAS_UIKIT)
-		#include <toadlet/peeper/plugins/glrenderer/platform/eagl/EAGLRenderContext.h>
+		#include <toadlet/peeper/plugins/glrenderer/platform/eagl/EAGLRenderTarget.h>
 	#else
 		#include <toadlet/peeper/plugins/glrenderer/platform/nsgl/NSGLRenderTarget.h>
 	#endif
@@ -433,7 +433,7 @@ ApplicationListener *OSXApplication::getApplicationListener() const{
 RenderTarget *OSXApplication::makeRenderTarget(){
 	#if defined(TOADLET_HAS_OPENGL)
 		#if defined(TOADLET_HAS_UIKIT)
-			return new EAGLRenderTarget((CAEAGLLayer*)[(UIView*)mView layer],mVisual);
+			return (GLRenderTarget*)new EAGLRenderTarget((CAEAGLLayer*)[(UIView*)mView layer],mVisual);
 		#else
 			return new NSGLRenderTarget((NSView*)mView,mVisual);
 	#endif
