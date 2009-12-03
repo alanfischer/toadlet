@@ -14,27 +14,14 @@
 @synthesize window;
 
 - (void) startApplication:(id) mainWindow{
-	if(shovelstuff!=NULL){
+	if(logo!=NULL){
 		return;
 	}
+
+	logo=new Logo();
 	
-	NSString *string=[[NSBundle mainBundle] pathForResource:@"shovelstuff" ofType:@"tpkg"];
-	if(string!=nil){
-		String path=[string cStringUsingEncoding:NSASCIIStringEncoding];
-		path="-p"+path.substr(0,path.rfind('/'));
-		int argc=2;
-		char *argv[2]={
-			NULL,
-			(char*)path.c_str(),
-		};
-		shovelstuff=new Logo(argc,argv);
-	}
-	else{
-		shovelstuff=new Logo(0,NULL);
-	}
-	
-	((Application*)shovelstuff)->create(mainWindow);
-	shovelstuff->start(false);
+	((Application*)logo)->create(mainWindow);
+	logo->start(false);
 }
 
 - (void)applicationDidFinishLaunching:(UIApplication *)application {    
@@ -45,8 +32,8 @@
 
 
 - (void)dealloc {
-	shovelstuff->destroy();
-	delete shovelstuff;
+	logo->destroy();
+	delete logo;
     [window release];
     [super dealloc];
 }
