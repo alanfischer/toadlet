@@ -415,9 +415,9 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 
 				track->length=length;
 
-				int bone=in->readUInt8();
+				track->index=in->readUInt8();
 
-				sequence->tracks[bone]=track;
+				sequence->tracks[i]=track;
 
 				uint16 numKeyFrames=in->readBigUInt16();
 				track->keyFrames.resize(numKeyFrames);
