@@ -110,7 +110,7 @@ bool GLTexture::createContext(){
 	GLint gltype=getGLType(mFormat);
 	int level=0,width=mWidth,height=mHeight,depth=mDepth;
 	int levelsToAlloc=mMipLevels==0?1:mMipLevels;
-	for(level=0;level<levelsToAlloc;++level,width/=2,height/=2){
+	for(level=0;level<levelsToAlloc;++level,width/=2,height/=2,depth/=2){
 		switch(mTarget){
 			#if !defined(TOADLET_HAS_GLES)
 				case GL_TEXTURE_1D:
@@ -347,12 +347,14 @@ GLuint GLTexture::getGLFormat(int textureFormat){
 			else if((textureFormat&Texture::Format_BIT_UINT_24)>0){
 				format=GL_DEPTH_COMPONENT24;
 			}
-			else if((textureFormat&Texture::Format_BIT_UINT_32)>0){
-				format=GL_DEPTH_COMPONENT32;
-			}
-			else{
-				format=GL_DEPTH_COMPONENT;
-			}
+			#if !defined(TOADLET_HAS_EAGL)
+				else if((textureFormat&Texture::Format_BIT_UINT_32)>0){
+					format=GL_DEPTH_COMPONENT32;
+				}
+				else{
+					format=GL_DEPTH_COMPONENT;
+				}
+			#endif
 		}
 	#endif
 
