@@ -53,6 +53,7 @@ void Logo::update(int dt){
 	getEngine()->getScene()->update(dt);
 }
 
+#if !defined(TOADLET_PLATFORM_OSX)
 #if defined(TOADLET_PLATFORM_WINCE)
 int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,int nCmdShow){
 #else
@@ -65,3 +66,4 @@ int main(int argc,char **argv){
 	app.destroy();
 	return 0;
 }
+#endif
