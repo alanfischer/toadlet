@@ -662,6 +662,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\lt_mmsh.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\lt_mmsh.h"
+				>
+			</File>
+			<File
 				RelativePath="..\lt_xmsh.cpp"
 				>
 			</File>
