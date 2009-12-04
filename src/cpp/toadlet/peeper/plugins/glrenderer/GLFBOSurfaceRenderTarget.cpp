@@ -147,7 +147,7 @@ bool GLFBOSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER,getGLAttachment(attachment),GL_RENDERBUFFER,handle);
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
-	
+
 	mSurfaces.add(surface);
 	mSurfaceAttachments.add(attachment);
 	mNeedsCompile=true;

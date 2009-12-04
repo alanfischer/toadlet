@@ -27,6 +27,8 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/Texture.h>
 
+#include "../../GLTexture.h"
+
 #import <QuartzCore/QuartzCore.h>
 
 using namespace toadlet::egg;
@@ -81,19 +83,24 @@ bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,const Visual &visual,
 
 	GLFBOSurfaceRenderTarget::create();
 
+	// Manually create the Color Renderbuffer for now
+	//  We could add another Renderbuffer storage function for EAGL in
+	//  GLFBORenderbufferSurface and then we could just make an instance
+	//  of that and attach it.
 	glGenRenderbuffers(1,&mRenderBufferHandle);
 	glBindRenderbuffer(GL_RENDERBUFFER,mRenderBufferHandle);
 	if(![mContext renderbufferStorage:GL_RENDERBUFFER fromDrawable:drawable]){
 		destroyContext();
 		return false;
 	}
+	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_RENDERBUFFER,mRenderBufferHandle);
 
-	if(visual.depthBits){
+	if(visual.depthBits!=0){
 		attach(createBufferSurface(Texture::Format_DEPTH_16,width,height),Attachment_DEPTH_STENCIL);
 	}
-	
-	compile();
+
+	GLFBOSurfaceRenderTarget::makeCurrent();
 
 	return true;
 }

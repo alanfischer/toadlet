@@ -19,6 +19,7 @@
 		8C29FA3610078B6C008DADF1 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C29FA3210078B6C008DADF1 /* QuartzCore.framework */; };
 		8C32048C10C8775900E983CE /* Logo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C32048810C8775900E983CE /* Logo.cpp */; };
 		8C32048D10C8775900E983CE /* lt_xmsh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C32048A10C8775900E983CE /* lt_xmsh.cpp */; };
+		8C32054C10C8872800E983CE /* lt_mmsh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C32054A10C8872800E983CE /* lt_mmsh.cpp */; };
 		8CF6BE19105A74230001E399 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CF6BE18105A74230001E399 /* SystemConfiguration.framework */; };
 /* End PBXBuildFile section */
 
@@ -40,6 +41,8 @@
 		8C32048910C8775900E983CE /* Logo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Logo.h; path = ../Logo.h; sourceTree = SOURCE_ROOT; };
 		8C32048A10C8775900E983CE /* lt_xmsh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lt_xmsh.cpp; path = ../lt_xmsh.cpp; sourceTree = SOURCE_ROOT; };
 		8C32048B10C8775900E983CE /* lt_xmsh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lt_xmsh.h; path = ../lt_xmsh.h; sourceTree = SOURCE_ROOT; };
+		8C32054A10C8872800E983CE /* lt_mmsh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lt_mmsh.cpp; path = ../lt_mmsh.cpp; sourceTree = SOURCE_ROOT; };
+		8C32054B10C8872800E983CE /* lt_mmsh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lt_mmsh.h; path = ../lt_mmsh.h; sourceTree = SOURCE_ROOT; };
 		8CF6BE18105A74230001E399 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		8D1107310486CEB800E47090 /* Logo-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Logo-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -66,6 +69,8 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				8C32054A10C8872800E983CE /* lt_mmsh.cpp */,
+				8C32054B10C8872800E983CE /* lt_mmsh.h */,
 				8C32048810C8775900E983CE /* Logo.cpp */,
 				8C32048910C8775900E983CE /* Logo.h */,
 				8C32048A10C8775900E983CE /* lt_xmsh.cpp */,
@@ -186,6 +191,7 @@
 				1D3623260D0F684500981E51 /* LogoAppDelegate.mm in Sources */,
 				8C32048C10C8775900E983CE /* Logo.cpp in Sources */,
 				8C32048D10C8775900E983CE /* lt_xmsh.cpp in Sources */,
+				8C32054C10C8872800E983CE /* lt_mmsh.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
