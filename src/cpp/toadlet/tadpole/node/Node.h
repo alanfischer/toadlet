@@ -81,7 +81,7 @@ public:
 	inline NodeDestroyedListener *getNodeDestroyedListener() const{return mNodeDestroyedListener;}
 	virtual void removeAllNodeDestroyedListeners();
 
-	virtual void parentChanged(ParentNode *newParent){mParent=newParent;}
+	virtual void parentChanged(ParentNode *parent){mParent=parent;}
 	inline ParentNode *getParent() const{return mParent;}
 
 	virtual void setTranslate(const Vector3 &translate);

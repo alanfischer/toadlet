@@ -280,9 +280,9 @@ void HopEntity::setShadowMesh(Mesh::ptr shadow,scalar scale,scalar testLength,sc
 	}
 }
 
-void HopEntity::parentChanged(ParentNode *newParent){
+void HopEntity::parentChanged(ParentNode *parent){
 	if(mScene!=NULL){
-		if(newParent==mScene){
+		if(parent==mScene){
 			mScene->getSimulator()->addSolid(getSolid());
 		}
 		else{
@@ -290,7 +290,7 @@ void HopEntity::parentChanged(ParentNode *newParent){
 		}
 	}
 
-	super::parentChanged(newParent);
+	super::parentChanged(parent);
 }
 
 void HopEntity::collision(const Collision &c){

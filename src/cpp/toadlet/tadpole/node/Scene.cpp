@@ -374,11 +374,11 @@ void Scene::render(Renderer *renderer,CameraNode *camera,Node *node){
 			renderable->render(renderer);
 		}
 		layer->renderables.clear();
-		mPreviousMaterial=NULL;
 
 		postLayerRender(renderer,layerNum);
 	}
 
+	mPreviousMaterial=NULL;
 	mCamera=NULL;
 }
 
