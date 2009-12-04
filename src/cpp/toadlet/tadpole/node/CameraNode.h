@@ -55,7 +55,7 @@ public:
 	void setProjectionFrustum(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist);
 	void setProjectionTransform(const Matrix4x4 &transform);
 	void setProjectionRotation(scalar rotate);
-	inline const Matrix4x4 &getProjectionTransform() const{return mProjectionTransform;}
+	void setNearAndFarDist(scalar nearDist,scalar farDist);
 
 	void setAlignmentCalculationsUseOrigin(bool origin);
 	bool getAlignmentCalculationsUseOrigin() const{return mAlignmentCalculationsUseOrigin;}
@@ -73,6 +73,7 @@ public:
 	ParentNode::ptr getMidNode();
 
 	inline ProjectionType getProjectionType() const{return mProjectionType;}
+	inline const Matrix4x4 &getProjectionTransform() const{return mProjectionTransform;}
 	inline scalar getFov() const{return mFov;}
 	inline scalar getAspect() const{return mAspect;}
 	inline scalar getLeftDist() const{return mLeftDist;}

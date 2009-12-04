@@ -154,6 +154,29 @@ void CameraNode::setProjectionRotation(scalar rotate){
 	Math::postMul(mProjectionTransform,projection);
 }
 
+void CameraNode::setNearAndFarDist(scalar nearDist,scalar farDist){
+	mNearDist=nearDist;
+	mFarDist=farDist;
+
+	switch(mProjectionType){
+		case(ProjectionType_FOVX):
+			setProjectionFovX(mFov,mAspect,mNearDist,mFarDist);
+		break;
+		case(ProjectionType_FOVY):
+			setProjectionFovY(mFov,mAspect,mNearDist,mFarDist);
+		break;
+		case(ProjectionType_ORTHO):
+			setProjectionOrtho(mLeftDist,mRightDist,mBottomDist,mTopDist,mNearDist,mFarDist);
+		break;
+		case(ProjectionType_FRUSTUM):
+			setProjectionFrustum(mLeftDist,mRightDist,mBottomDist,mTopDist,mNearDist,mFarDist);
+		break;
+		default:
+			Error::unimplemented("projection type does not support adjusting near and far");
+		break;
+	}
+}
+
 void CameraNode::setAlignmentCalculationsUseOrigin(bool origin){
 	mAlignmentCalculationsUseOrigin=origin;
 }
