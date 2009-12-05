@@ -281,9 +281,63 @@ bool D3D9Texture::load(int format,int width,int height,int depth,int mipLevel,ui
 
 		texture->UnlockRect(mipLevel);
 	}
+	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+		else if(mDimension==Texture::Dimension_D3){
+			IDirect3DVolumeTexture9 *texture=(IDirect3DVolumeTexture9*)mTexture;
+
+			D3DLOCKED_BOX box={0};
+			result=texture->LockBox(mipLevel,&box,NULL,D3DLOCK_DISCARD);
+			if(FAILED(result)){
+				TOADLET_CHECK_D3D9ERROR(result,"LockBox");
+				return false;
+			}
+
+			int pixelSize=ImageFormatConversion::getPixelSize(format);
+			unsigned char *dst=(unsigned char*)box.pBits;
+			unsigned char *src=(unsigned char*)data;
+
+			int i,j,k;
+			if(mFormat==Texture::Format_A_8 && mD3DFormat==D3DFMT_A8L8){
+				for(k=0;k<depth;++k){
+					for(j=0;j<height;++j){
+						for(i=0;i<width;++i){
+							*(uint16*)(dst+box.SlicePitch*k+box.RowPitch*j+i*2)=A8toA8L8(*(uint8*)(src+depth*width*pixelSize*k+width*pixelSize*j+pixelSize*i));
+						}
+					}
+				}
+			}
+			else if(mFormat==Texture::Format_RGBA_8 && mD3DFormat==D3DFMT_A8R8G8B8){
+				for(k=0;k<depth;++k){
+					for(j=0;j<height;++j){
+						for(i=0;i<width;++i){
+							*(uint32*)(dst+box.SlicePitch*k+box.RowPitch*j+i*4)=RGBA8toA8R8G8B8(*(uint32*)(src+depth*width*pixelSize*k+width*pixelSize*j+pixelSize*i));
+						}
+					}
+				}
+			}
+			else if(mFormat==Texture::Format_RGB_8 && mD3DFormat==D3DFMT_X8R8G8B8){
+				for(k=0;k<depth;++k){
+					for(j=0;j<height;++j){
+						for(i=0;i<width;++i){
+							*(uint32*)(dst+box.SlicePitch*k+box.RowPitch*j+i*4)=RGB8toX8R8G8B8(src+depth*width*pixelSize*k+width*pixelSize*j+pixelSize*i);
+						}
+					}
+				}
+			}
+			else{
+				for(k=0;k<depth;++k){
+					for(j=0;j<height;++j){
+						memcpy(dst+box.SlicePitch*k+box.RowPitch*j,src+depth*width*pixelSize*k+width*pixelSize*j,width*pixelSize);
+					}
+				}
+			}
+
+			texture->UnlockBox(mipLevel);
+		}
+	#endif
 	else{
 		Error::unimplemented(Categories::TOADLET_PEEPER,
-			"D3D9Texture: Volume & Cube loading not yet implemented");
+			"D3D9Texture: unimplemented");
 		return false;
 	}
 
