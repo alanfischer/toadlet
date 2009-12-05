@@ -157,52 +157,6 @@ namespace peeper{
 	#endif
 #endif
 
-inline uint16 A8toA8L8(const uint8 a){
-	return (a<<8)|0xFF;
-}
-
-inline uint32 RGBA8toA8R8G8B8(uint32 rgba){
-	return ((rgba&0xFF)<<16) | (rgba&0xFF00FF00) | ((rgba&0xFF0000)>>16);
-}
-
-inline uint32 RGB8toX8R8G8B8(uint8 *rgb){
-	return (*(rgb+0)<<16) | (*(rgb+1)<<8) | (*(rgb+2)<<0);
-}
-
-inline uint16 A8toA8R8G8B8(const uint8 a){
-	return (a<<24)|0xFFFFFF;
-}
-
-inline uint16 A8toA4R4G4B4(const uint8 a){
-	return ((a&0xF0)<<8)|0xFFF;
-}
-
-inline uint16 L8toR5G6B5(const uint8 l){
-	return ((l&0xF8)<<11)|((l&0xFC)<<5)|(l&0xF8);
-}
-
-inline uint16 L8toR8G8B8(const uint8 l){
-	return (l<<16)|(l<<8)|l;
-}
-
-// This function needs to be endian aware, since it takes an LA_8 in as a uint16 instead of individual components
-inline uint16 LA8toA4R4G4B4(const uint16 la){
-#	if defined(TOADLET_LITTLE_ENDIAN)
-		return ((la&0xF0)<8)|((la&0xF000)>>4)|((la&0xF000)>>8)|((la&0xF000)>>12);
-#	else
-		return (la&0xF000)|((la&0xF0)<<4)|(la&0xF0)|((la&0xF0)>>4)
-#	endif
-}
-
-// This function needs to be endian aware, since it takes an LA_8 in as a uint16 instead of individual components
-inline uint16 LA8toA8R8G8B8(const uint8 la){
-#	if defined(TOADLET_LITTLE_ENDIAN)
-		return ((la&0xFF00)<<16)|((la&0xFF)<<16)|((la&0xFF)<<8)|(la&0xFF);
-#	else
-		return ((la&0xFF)<<24)|((la&0xFF00)<<8)|(la&0xFF00)|((la&0xFF00)>>8);
-#	endif
-}
-
 #if defined(TOADLET_HAS_DIRECT3DMOBILE)
 	#define TOADLET_D3D_DLL_NAME TEXT("D3DM.DLL")
 	#define TOADLET_D3D_CREATE_NAME TEXT("Direct3DMobileCreate")

@@ -67,6 +67,7 @@ public:
 protected:
 	static bool isD3DFORMATValid(IDirect3D9 *d3d,D3DFORMAT adapterFormat,D3DFORMAT textureFormat,DWORD usage);
 
+	static int getClosestTextureFormat(int textureFormat);
 	static D3DFORMAT getD3DFORMAT(int textureFormat);
 	static DWORD getD3DTADDRESS(TextureStage::AddressMode addressMode);
 	static DWORD getD3DTEXF(TextureStage::Filter filter);
@@ -81,6 +82,7 @@ protected:
 	int mDepth;
 	int mMipLevels;
 
+	int mInternalFormat;
 	D3DFORMAT mD3DFormat;
 	DWORD mD3DUsage;
 	D3DPOOL mD3DPool;

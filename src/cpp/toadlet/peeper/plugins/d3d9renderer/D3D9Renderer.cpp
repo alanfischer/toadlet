@@ -646,6 +646,9 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 		TextureStage::Calculation calculation=textureStage->calculation;
 		if(calculation!=TextureStage::Calculation_DISABLED){
 			if(calculation==TextureStage::Calculation_NORMAL){
+				// TODO: Get this working with 3D Texture coordinates.  Doesnt seem to currently
+				//  I have tried just switching to D3DTTFF_COUNT3, but nothing changed, I'm pretty sure it has
+				//  something to do with the setup of the cacheD3DMatrix below
 				result=mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT2);
 				TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
 

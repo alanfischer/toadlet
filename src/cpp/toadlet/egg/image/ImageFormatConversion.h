@@ -32,7 +32,7 @@ namespace toadlet{
 namespace egg{
 namespace image{
 
-class ImageFormatConversion:public ImageDefinitions{
+class TOADLET_API ImageFormatConversion:public ImageDefinitions{
 public:
 	static inline uint8 getRedBits(int format){
 		switch(format){
@@ -162,6 +162,8 @@ public:
 				return 0;
 		}
 	}
+
+	static bool convert(uint8 *src,int srcFormat,int srcRowPitch,int srcSlicePitch,uint8 *dst,int dstFormat,int dstRowPitch,int dstSlicePitch,int width,int height,int depth);
 };
 
 }
