@@ -17,6 +17,7 @@ set (EGG_SRC
 # Yes it's ugly, no I don't have a better idea right now
 set (EGG_IMAGE_SRC
 	image/Image.cpp
+	image/ImageFormatConversion.cpp
 	image/ImageUtilities.cpp
 )
 set (EGG_IMAGE_BMP_SRC
