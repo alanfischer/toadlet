@@ -123,11 +123,11 @@ bool GLFBOSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	if(textureSurface!=NULL){
 		GLTexture *texture=textureSurface->getTexture();
-		GLuint handle=texture->getHandle();
-		GLenum target=texture->getTarget();
+		GLuint handle=textureSurface->getHandle();
+		GLenum target=textureSurface->getTarget();
 		GLuint level=textureSurface->getLevel();
-		mWidth=texture->getWidth();
-		mHeight=texture->getHeight();
+		mWidth=textureSurface->getWidth();
+		mHeight=textureSurface->getHeight();
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER,getGLAttachment(attachment),target,handle,level);
 		// TODO: Figure out EXACTLY when we need these and when we dont, I think we just need them if its ONLY a SHADOWMAP

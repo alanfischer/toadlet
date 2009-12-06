@@ -72,7 +72,7 @@ bool BackableTexture::create(int usageFlags,Dimension dimension,int format,int w
 	else if(mDimension==Dimension_D3){
 		mDataSize=ImageFormatConversion::getPixelSize(format)*mWidth*mHeight*mDepth;
 	}
-	else if(mDimension==Dimension_CUBEMAP){
+	else if(mDimension==Dimension_CUBE){
 		mDataSize=ImageFormatConversion::getPixelSize(format)*mWidth*mHeight*6;
 	}
 
@@ -93,8 +93,8 @@ void BackableTexture::destroy(){
 }
 
 // TODO: This should return a BackableSurface, which will be able to change surface pointers
-Surface::ptr BackableTexture::getMipSuface(int i){
-	return mBack->getMipSuface(i);
+Surface::ptr BackableTexture::getMipSuface(int level,int cubeSide){
+	return mBack->getMipSuface(level,cubeSide);
 }
 
 bool BackableTexture::load(int format,int width,int height,int depth,int mipLevel,uint8 *data){
