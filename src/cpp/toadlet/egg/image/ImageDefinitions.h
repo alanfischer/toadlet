@@ -42,17 +42,17 @@ public:
 		Dimension_D1,
 		Dimension_D2,
 		Dimension_D3,
-		Dimension_CUBEMAP,
+		Dimension_CUBE,
 	};
 
-	enum CubemapSide{
-		CubemapSide_POSITIVE_X,
-		CubemapSide_NEGATIVE_X,
-		CubemapSide_POSITIVE_Y,
-		CubemapSide_NEGATIVE_Y,
-		CubemapSide_POSITIVE_Z,
-		CubemapSide_NEGATIVE_Z,
-		CubemapSide_MAX,
+	enum CubeSide{
+		CubeSide_POSITIVE_X=0,
+		CubeSide_NEGATIVE_X=1,
+		CubeSide_POSITIVE_Y=2,
+		CubeSide_NEGATIVE_Y=3,
+		CubeSide_POSITIVE_Z=4,
+		CubeSide_NEGATIVE_Z=5,
+		CubeSide_MAX=6,
 	};
 
 	enum Format{

@@ -60,7 +60,7 @@ public:
 	virtual int getDepth() const{return mDepth;}
 	virtual int getNumMipLevels() const{return mMipLevels;}
 
-	virtual Surface::ptr getMipSuface(int i);
+	virtual Surface::ptr getMipSuface(int level,int cubeSide);
 	virtual bool load(int format,int mipLevel,int width,int height,int depth,uint8 *data);
 	virtual bool read(int format,int mipLevel,int width,int height,int depth,uint8 *data);
 

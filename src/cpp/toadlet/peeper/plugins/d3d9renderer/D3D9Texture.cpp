@@ -136,7 +136,7 @@ bool D3D9Texture::createContext(){
 				result=device->CreateVolumeTexture(mWidth,mHeight,mDepth,mMipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
 				mTexture=texture;
 			}break;
-			case Texture::Dimension_CUBEMAP:{
+			case Texture::Dimension_CUBE:{
 				IDirect3DCubeTexture9 *texture=NULL;
 				result=device->CreateCubeTexture(mWidth,mMipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
 				mTexture=texture;
@@ -178,7 +178,7 @@ bool D3D9Texture::contextNeedsReset(){
 	#endif
 }
 
-Surface::ptr D3D9Texture::getMipSuface(int i){
+Surface::ptr D3D9Texture::getMipSuface(int level,int cubeSide){
 	if(mTexture==NULL){
 		return NULL;
 	}
@@ -187,7 +187,15 @@ Surface::ptr D3D9Texture::getMipSuface(int i){
 
 	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
 		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
-		texture->GetSurfaceLevel(i,&surface);
+		texture->GetSurfaceLevel(level,&surface);
+	}
+	else if(mDimension==Texture::Dimension_D3){
+		Error::unimplemented("D3D9Texture::getMipSurface not implement for volume textures");
+		return NULL;
+	}
+	else if(mDimension==Texture::Dimension_CUBE){
+		IDirect3DCubeTexture9 *texture=(IDirect3DCubeTexture9*)mTexture;
+		texture->GetCubeMapSurface((D3DCUBEMAP_FACES)cubeSide,level,&surface);
 	}
 
 	if(surface!=NULL){
@@ -220,9 +228,9 @@ bool D3D9Texture::load(int format,int width,int height,int depth,int mipLevel,ui
 			return false;
 		}
 
+		int pixelSize=ImageFormatConversion::getPixelSize(format);
 		unsigned char *dst=(unsigned char*)rect.pBits;
 		unsigned char *src=(unsigned char*)data;
-		int pixelSize=ImageFormatConversion::getPixelSize(format);
 
 		ImageFormatConversion::convert(src,format,width*pixelSize,width*height*pixelSize,dst,mInternalFormat,rect.Pitch,rect.Pitch*height,width,height,depth);
 
@@ -239,13 +247,34 @@ bool D3D9Texture::load(int format,int width,int height,int depth,int mipLevel,ui
 				return false;
 			}
 
+			int pixelSize=ImageFormatConversion::getPixelSize(format);
 			unsigned char *dst=(unsigned char*)box.pBits;
 			unsigned char *src=(unsigned char*)data;
-			int pixelSize=ImageFormatConversion::getPixelSize(format);
 
 			ImageFormatConversion::convert(src,format,width*pixelSize,width*height*pixelSize,dst,mInternalFormat,box.RowPitch,box.SlicePitch,width,height,depth);
 
 			texture->UnlockBox(mipLevel);
+		}
+		else if(mDimension==Texture::Dimension_CUBE){
+			IDirect3DCubeTexture9 *texture=(IDirect3DCubeTexture9*)mTexture;
+
+			int i;
+			for(i=0;i<6;++i){
+				D3DLOCKED_RECT rect={0};
+				result=texture->LockRect((D3DCUBEMAP_FACES)i,mipLevel,&rect,NULL,0);
+				if(FAILED(result)){
+					TOADLET_CHECK_D3D9ERROR(result,"LockBox");
+					return false;
+				}
+
+				int pixelSize=ImageFormatConversion::getPixelSize(format);
+				unsigned char *dst=(unsigned char*)rect.pBits;
+				unsigned char *src=(unsigned char*)(data+width*height*pixelSize*i);
+
+				ImageFormatConversion::convert(src,format,width*pixelSize,width*height*pixelSize,dst,mInternalFormat,rect.Pitch,rect.Pitch*height,width,height,1);
+
+				texture->UnlockRect((D3DCUBEMAP_FACES)i,mipLevel);
+			}
 		}
 	#endif
 	else{
@@ -284,9 +313,9 @@ bool D3D9Texture::read(int format,int width,int height,int depth,int mipLevel,ui
 			return false;
 		}
 
+		int pixelSize=ImageFormatConversion::getPixelSize(format);
 		unsigned char *dst=(unsigned char*)data;
 		unsigned char *src=(unsigned char*)rect.pBits;
-		int pixelSize=ImageFormatConversion::getPixelSize(format);
 
 		ImageFormatConversion::convert(src,mInternalFormat,rect.Pitch,rect.Pitch*height,dst,format,width*pixelSize,width*height*pixelSize,width,height,depth);
 
@@ -305,9 +334,9 @@ bool D3D9Texture::read(int format,int width,int height,int depth,int mipLevel,ui
 				return false;
 			}
 
+			int pixelSize=ImageFormatConversion::getPixelSize(format);
 			unsigned char *dst=(unsigned char*)data;
 			unsigned char *src=(unsigned char*)box.pBits;
-			int pixelSize=ImageFormatConversion::getPixelSize(format);
 
 			ImageFormatConversion::convert(src,mInternalFormat,box.RowPitch,box.SlicePitch,dst,format,width*pixelSize,width*height*pixelSize,width,height,depth);
 

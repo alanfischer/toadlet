@@ -177,21 +177,28 @@ void GLTexture::destroyContext(bool backData){
 	TOADLET_CHECK_GLERROR("GLTexture::destroyContext");
 }
 
-Surface::ptr GLTexture::getMipSuface(int i){
+Surface::ptr GLTexture::getMipSuface(int level,int cubeSide){
 	if(mHandle==0){
 		return NULL;
 	}
 
-	if(mSurfaces.size()<=i){
-		mSurfaces.resize(i+1);
+	int index=level;
+	#if !defined(TOADLET_HAS_GLES)
+		if(mTarget==GL_TEXTURE_CUBE_MAP){
+			index=level*6+cubeSide;
+		}
+	#endif
+
+	if(mSurfaces.size()<=index){
+		mSurfaces.resize(index+1);
 	}
 
-	if(mSurfaces[i]==NULL){
-		Surface::ptr surface(new GLTextureMipSurface(const_cast<GLTexture*>(this),i));
-		mSurfaces[i]=surface;
+	if(mSurfaces[index]==NULL){
+		Surface::ptr surface(new GLTextureMipSurface(const_cast<GLTexture*>(this),index,cubeSide));
+		mSurfaces[index]=surface;
 	}
 
-	return mSurfaces[i];
+	return mSurfaces[index];
 }
 
 bool GLTexture::load(int format,int width,int height,int depth,int mipLevel,uint8 *data){
@@ -254,7 +261,17 @@ bool GLTexture::read(int format,int width,int height,int depth,int mipLevel,uint
 
 		glBindTexture(mTarget,mHandle);
 
-		glGetTexImage(mTarget,mipLevel,glformat,gltype,data);
+		if(mTarget!=GL_TEXTURE_CUBE_MAP){
+			glGetTexImage(mTarget,mipLevel,glformat,gltype,data);
+		}
+		else{
+			int pixelSize=ImageFormatConversion::getPixelSize(format);
+
+			int i;
+			for(i=0;i<6;++i){
+				glGetTexImage(GLCubeFaces[i],mipLevel,glformat,gltype,data+width*height*pixelSize*i);
+			}
+		}
 
 		TOADLET_CHECK_GLERROR("GLTexture::read");
 
@@ -311,7 +328,7 @@ GLuint GLTexture::getGLTarget(){
 		#if !defined(TOADLET_HAS_GLES)
 			case Texture::Dimension_D3:
 				return GL_TEXTURE_3D;
-			case Texture::Dimension_CUBEMAP:
+			case Texture::Dimension_CUBE:
 				return GL_TEXTURE_CUBE_MAP;
 		#endif
 		default:
