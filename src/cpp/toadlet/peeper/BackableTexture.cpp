@@ -93,8 +93,8 @@ void BackableTexture::destroy(){
 }
 
 // TODO: This should return a BackableSurface, which will be able to change surface pointers
-Surface::ptr BackableTexture::getMipSuface(int level,int cubeSide){
-	return mBack->getMipSuface(level,cubeSide);
+Surface::ptr BackableTexture::getMipSurface(int level,int cubeSide){
+	return mBack->getMipSurface(level,cubeSide);
 }
 
 bool BackableTexture::load(int format,int width,int height,int depth,int mipLevel,uint8 *data){

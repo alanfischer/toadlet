@@ -53,7 +53,7 @@ public:
 
 	virtual bool createContext();
 	virtual void destroyContext(bool backData);
-	virtual bool contextNeedsReset();
+	virtual bool contextNeedsReset(){return false;}
 
 	virtual int getUsageFlags() const{return mUsageFlags;}
 	virtual AccessType getAccessType() const{return mAccessType;}
@@ -67,8 +67,6 @@ public:
 	virtual bool unlock();
 
 protected:
-	static DWORD getFVF(VertexFormat *vertexFormat,egg::Collection<VertexElement> *colorElements);
-
 	D3D10Renderer *mRenderer;
 
 	BufferDestroyedListener *mListener;

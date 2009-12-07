@@ -39,13 +39,15 @@ D3D10Buffer::D3D10Buffer(D3D10Renderer *renderer):
 	mUsageFlags(0),
 	mAccessType(AccessType_NO_ACCESS),
 	mSize(0),
+	mDataSize(0),
+
+	mIndexFormat(IndexBuffer::IndexFormat_UINT_8),
 	//mVertexFormat,
 	mVertexSize(0),
-	mDataSize(0),
 
 	mFVF(0),
 	mD3DUsage(0),
-	mD3DPool(D3DPOOL_MANAGED),
+//	mD3DPool(D3DPOOL_MANAGED),
 	mBuffer(NULL),
 	//mColorElements,
 	mLockType(AccessType_NO_ACCESS),
@@ -60,6 +62,10 @@ D3D10Buffer::~D3D10Buffer(){
 	destroy();
 }
 
+bool D3D10Buffer::create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size){
+return false;
+}
+
 bool D3D10Buffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size){
 	destroy();
 
@@ -69,7 +75,6 @@ bool D3D10Buffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr 
 	mVertexFormat=vertexFormat;
 	mVertexSize=mVertexFormat->vertexSize;
 	mDataSize=mVertexSize*mSize;
-	mFVF=getFVF(mVertexFormat,&mColorElements);
 
 	return createContext();
 }
@@ -83,32 +88,36 @@ void D3D10Buffer::destroy(){
 	}
 
 	if(mListener!=NULL){
-		mListener->bufferDestroyed(this);
+//		if(mTarget==GL_ELEMENT_ARRAY_BUFFER){
+//			mListener->bufferDestroyed((IndexBuffer*)this);
+//		}
+//		else{
+//			mListener->bufferDestroyed((VertexBuffer*)this);
+//		}
 	}
 }
 
-bool D3D9Buffer::createContext(){
-	mD3DUsage=0;
-	mD3DPool=D3DPOOL_MANAGED;
+bool D3D10Buffer::createContext(){
+/*	mD3DUsage=0;
+
 	if((mUsageFlags&UsageFlags_DYNAMIC)>0){
 		mD3DUsage|=D3DUSAGE_DYNAMIC;
-		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
-			mD3DPool=D3DPOOL_DEFAULT;
-		#endif
 	}
 
 	if(mAccessType==AccessType_WRITE_ONLY){
 		mD3DUsage|=D3DUSAGE_WRITEONLY;
 	}
 
-	HRESULT result=mRenderer->getDirect3DDevice9()->CreateVertexBuffer(mDataSize,mD3DUsage,mFVF,mD3DPool,&mVertexBuffer TOADLET_SHAREDHANDLE);
-	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: CreateVertexBuffer");
+	HRESULT result=mRenderer->getD3D10Device()->CreateBuffer();//CreateVertexBuffer(mDataSize,mD3DUsage,mFVF,mD3DPool,&mVertexBuffer TOADLET_SHAREDHANDLE);
+	TOADLET_CHECK_D3D9ERROR(result,"D3D10Buffer: CreateBuffer");
 
 	return SUCCEEDED(result);
+*/
+return false;
 }
 
-void D3D9Buffer::destroyContext(bool backData){
-	if(backData){
+void D3D10Buffer::destroyContext(bool backData){
+/*	if(backData){
 		mBackingData=new uint8[mDataSize];
 		mBacking=true;
 
@@ -121,18 +130,10 @@ void D3D9Buffer::destroyContext(bool backData){
 		mVertexBuffer->Release();
 		mVertexBuffer=NULL;
 	}
-}
+*/}
 
-bool D3D9Buffer::contextNeedsReset(){
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		return false;
-	#else
-		return mD3DPool==D3DPOOL_DEFAULT;
-	#endif
-}
-
-uint8 *D3D9Buffer::lock(AccessType lockType){
-	if(mVertexBuffer==NULL){
+uint8 *D3D10Buffer::lock(AccessType lockType){
+/*	if(mVertexBuffer==NULL){
 		return NULL;
 	}
 
@@ -166,10 +167,12 @@ uint8 *D3D9Buffer::lock(AccessType lockType){
 	}
 
 	return mData;
+*/
+return 0;
 }
 
-bool D3D9Buffer::unlock(){
-	if(mVertexBuffer==NULL){
+bool D3D10Buffer::unlock(){
+/*	if(mVertexBuffer==NULL){
 		return false;
 	}
 
@@ -191,116 +194,8 @@ bool D3D9Buffer::unlock(){
 	mData=NULL;
 
 	return SUCCEEDED(result);
-}
-
-DWORD D3D9Buffer::getFVF(VertexFormat *vertexFormat,Collection<VertexElement> *colorElements){
-	DWORD fvf=0;
-
-	int i;
-	int texCoordCount=0;
-	for(i=0;i<vertexFormat->vertexElements.size();++i){
-		const VertexElement &element=vertexFormat->vertexElements[i];
-		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-			if(element.type==VertexElement::Type_POSITION && element.format==(VertexElement::Format_BIT_FIXED_32|VertexElement::Format_BIT_COUNT_3)){
-				fvf|=D3DMFVF_XYZ_FIXED;
-			}
-			else if(element.type==VertexElement::Type_POSITION && element.format==(VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3)){
-				fvf|=D3DMFVF_XYZ_FLOAT;
-			}
-			else if(element.type==VertexElement::Type_NORMAL && element.format==(VertexElement::Format_BIT_FIXED_32|VertexElement::Format_BIT_COUNT_3)){
-				fvf|=D3DMFVF_NORMAL_FIXED;
-			}
-			else if(element.type==VertexElement::Type_NORMAL && element.format==(VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3)){
-				fvf|=D3DMFVF_NORMAL_FLOAT;
-			}
-		#else
-			if(element.type==VertexElement::Type_POSITION && element.format==(VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3)){
-				fvf|=D3DFVF_XYZ;
-			}
-			else if(element.type==VertexElement::Type_NORMAL && element.format==(VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3)){
-				fvf|=D3DFVF_NORMAL;
-			}
-		#endif
-		else if(element.type==VertexElement::Type_COLOR_DIFFUSE && element.format==VertexElement::Format_COLOR_RGBA){
-			fvf|=D3DFVF_DIFFUSE;
-			colorElements->add(element);
-		}
-		else if(element.type==VertexElement::Type_COLOR_SPECULAR && element.format==VertexElement::Format_COLOR_RGBA){
-			fvf|=D3DFVF_SPECULAR;
-			colorElements->add(element);
-		}
-		else if(element.type>=VertexElement::Type_TEX_COORD){
-			if((element.format&VertexElement::Format_BIT_COUNT_1)>0){
-				fvf|=D3DFVF_TEXCOORDSIZE1(texCoordCount);
-			}
-			else if((element.format&VertexElement::Format_BIT_COUNT_2)>0){
-				fvf|=D3DFVF_TEXCOORDSIZE2(texCoordCount);
-			}
-			else if((element.format&VertexElement::Format_BIT_COUNT_3)>0){
-				fvf|=D3DFVF_TEXCOORDSIZE3(texCoordCount);
-			}
-			else if((element.format&VertexElement::Format_BIT_COUNT_4)>0){
-				#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-					Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ERROR,
-						"D3D9VertexBuffer: Invalid tex coord count");
-				#else
-					fvf|=D3DFVF_TEXCOORDSIZE4(texCoordCount);
-				#endif
-			}
-
-			#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-				if((element.format&VertexElement::Format_BIT_FIXED_32)>0){
-					fvf|=D3DMFVF_TEXCOORDFIXED(texCoordCount);
-				}
-				else if((element.format&VertexElement::Format_BIT_FLOAT_32)>0){
-					fvf|=D3DMFVF_TEXCOORDFLOAT(texCoordCount);
-				}
-			#endif
-
-			texCoordCount++;
-		}
-		else{
-			Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ERROR,
-				String("D3DVertexBuffer: Invalid vertex element:")+element.type+","+element.format);
-		}
-	}
-
-	switch(texCoordCount){
-		case 0:
-			fvf|=D3DFVF_TEX0;
-		break;
-		case 1:
-			fvf|=D3DFVF_TEX1;
-		break;
-		case 2:
-			fvf|=D3DFVF_TEX2;
-		break;
-		case 3:
-			fvf|=D3DFVF_TEX3;
-		break;
-		case 4:
-			fvf|=D3DFVF_TEX4;
-		break;
-		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
-			case 5:
-				fvf|=D3DFVF_TEX5;
-			break;
-			case 6:
-				fvf|=D3DFVF_TEX6;
-			break;
-			case 7:
-				fvf|=D3DFVF_TEX7;
-			break;
-			case 8:
-				fvf|=D3DFVF_TEX8;
-			break;
-		#endif
-		default:
-			Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ERROR,
-				String("D3DVertexBuffer: Invalid tex coord number")+texCoordCount);
-	}
-
-	return fvf;
+*/
+return false;
 }
 
 }

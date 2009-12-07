@@ -178,7 +178,7 @@ bool D3D9Texture::contextNeedsReset(){
 	#endif
 }
 
-Surface::ptr D3D9Texture::getMipSuface(int level,int cubeSide){
+Surface::ptr D3D9Texture::getMipSurface(int level,int cubeSide){
 	if(mTexture==NULL){
 		return NULL;
 	}

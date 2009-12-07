@@ -177,7 +177,7 @@ void GLTexture::destroyContext(bool backData){
 	TOADLET_CHECK_GLERROR("GLTexture::destroyContext");
 }
 
-Surface::ptr GLTexture::getMipSuface(int level,int cubeSide){
+Surface::ptr GLTexture::getMipSurface(int level,int cubeSide){
 	if(mHandle==0){
 		return NULL;
 	}
