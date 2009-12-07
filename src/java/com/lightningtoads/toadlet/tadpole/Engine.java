@@ -41,8 +41,8 @@ import org.w3c.dom.Node;
 
 public class Engine implements InputStreamFactory{
 	public Engine(){
-		Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.DEBUG,
-			"Engine.Engine started");
+		Logger.debug(Categories.TOADLET_TADPOLE,
+			"creating Engine");
 
 		mTextureManager=new ContextResourceManager<Texture.Peer>(new TextureSemantics(),this);
 
@@ -65,7 +65,7 @@ public class Engine implements InputStreamFactory{
 //		mAudioBufferManager=new ResourceManager(this);
 
 
-		Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.DEBUG,
+		Logger.debug(Categories.TOADLET_TADPOLE,
 			"Engine: adding all handlers");
 
 		// Texture handlers
@@ -96,37 +96,37 @@ public class Engine implements InputStreamFactory{
 	public void setRenderer(Renderer renderer){
 		if(renderer!=null){
 			CapabilitySet capabilitySet=renderer.getCapabilitySet();
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_TADPOLE,
 				"Renderer Capabilities:");
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_TADPOLE,
 				(char)9+"maxLights:"+capabilitySet.maxLights);
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_TADPOLE,
 				(char)9+"tmaxTextureStages:"+capabilitySet.maxTextureStages);
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_TADPOLE,
 				(char)9+"maxTextureSize:"+capabilitySet.maxTextureSize);
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_TADPOLE,
 				(char)9+"hardwareVertexBuffers:"+capabilitySet.hardwareVertexBuffers);
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_TADPOLE,
 				(char)9+"hardwareIndexBuffers:"+capabilitySet.hardwareIndexBuffers);
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_TADPOLE,
 				(char)9+"vertexShaders:"+capabilitySet.vertexShaders);
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_TADPOLE,
 				(char)9+"maxVertexShaderLocalParameters:"+capabilitySet.maxVertexShaderLocalParameters);
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_TADPOLE,
 				(char)9+"fragmentShaders:"+capabilitySet.fragmentShaders);
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_TADPOLE,
 				(char)9+"maxFragmentShaderLocalParameters:"+capabilitySet.maxFragmentShaderLocalParameters);
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_TADPOLE,
 				(char)9+"renderToTexture:"+capabilitySet.renderToTexture);
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_TADPOLE,
 				(char)9+"renderToDepthTexture:"+capabilitySet.renderToDepthTexture);
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_TADPOLE,
 				(char)9+"renderToTextureNonPowerOf2Restricted:"+capabilitySet.renderToTextureNonPowerOf2Restricted);
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_TADPOLE,
 				(char)9+"textureDot3:"+capabilitySet.textureDot3);
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_TADPOLE,
 				(char)9+"textureNonPowerOf2Restricted:"+capabilitySet.textureNonPowerOf2Restricted);
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_TADPOLE,
 				(char)9+"textureNonPowerOf2:"+capabilitySet.textureNonPowerOf2);
 		}
 
@@ -269,7 +269,7 @@ public class Engine implements InputStreamFactory{
 	public void contextActivate(Renderer renderer){
 		assert(renderer!=null);
 
-		Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.DEBUG,
+		Logger.debug(Categories.TOADLET_TADPOLE,
 			"Engine::contextActivate");
 
 		Map<Resource,ResourceManager.ResourceCache> textureResourceMap=mTextureManager.getResourcePtrMap();
@@ -313,7 +313,7 @@ public class Engine implements InputStreamFactory{
 		mBufferManager.getContextResourcesToLoad().clear();
 
 		if((numTexturesLoaded>0 || numBuffersLoaded>0) && Logger.getInstance().getMasterCategoryReportingLevel(Categories.TOADLET_TADPOLE)>=Logger.Level.EXCESSIVE){
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.EXCESSIVE,
+			Logger.excess(Categories.TOADLET_TADPOLE,
 				("contextActivate: Loaded ")+numTexturesLoaded+" textures, loaded "+numBuffersLoaded+" buffers");
 		}
 	}
@@ -321,7 +321,7 @@ public class Engine implements InputStreamFactory{
 	public void contextDeactivate(Renderer renderer){
 		assert(renderer!=null);
 
-		Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.DEBUG,
+		Logger.debug(Categories.TOADLET_TADPOLE,.Level.DEBUG,
 			"Engine::contextDeactivate");
 
 		int i;
@@ -376,7 +376,7 @@ public class Engine implements InputStreamFactory{
 		}
 
 		if((numTexturePeersUnloaded>0 || numBufferPeersUnloaded>0) && Logger.getInstance().getMasterCategoryReportingLevel(Categories.TOADLET_TADPOLE)>=Logger.Level.EXCESSIVE){
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.EXCESSIVE,
+			Logger.excess(Categories.TOADLET_TADPOLE,
 				("contextDeactivate: Unloaded ")+numTexturePeersUnloaded+" texture peers, unloaded "+numBufferPeersUnloaded+" buffer peers");
 		}
 	}
@@ -410,7 +410,7 @@ public class Engine implements InputStreamFactory{
 		textureResourcesToLoad.clear();
 
 		if((numTexturePeersUnloaded>0 || numTexturesLoaded>0) && Logger.getInstance().getMasterCategoryReportingLevel(Categories.TOADLET_TADPOLE)>=Logger.Level.EXCESSIVE){
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.EXCESSIVE,
+			Logger.excess(Categories.TOADLET_TADPOLE,
 				("contextUpdate: Unloaded ")+numTexturePeersUnloaded+" texture peers, loaded "+numTexturesLoaded+" textures");
 		}
 
@@ -442,7 +442,7 @@ public class Engine implements InputStreamFactory{
 		bufferResourcesToLoad.clear();
 
 		if((numBufferPeersUnloaded>0 || numBuffersLoaded>0) && Logger.getInstance().getMasterCategoryReportingLevel(Categories.TOADLET_TADPOLE)>=Logger.Level.EXCESSIVE){
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.EXCESSIVE,
+			Logger.excess(Categories.TOADLET_TADPOLE,
 				("contextUpdate: Unloaded ")+numBufferPeersUnloaded+" buffer peers, loaded "+numBuffersLoaded+" buffers");
 		}
 	}

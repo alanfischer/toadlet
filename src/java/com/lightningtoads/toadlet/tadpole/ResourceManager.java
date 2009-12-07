@@ -133,7 +133,7 @@ public class ResourceManager{
 			return it.resource.get();
 		}
 		else{
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.DEBUG,
+			Logger.debug(Categories.TOADLET_TADPOLE,
 				"Resource "+name+" not found");
 			return null;
 		}
@@ -151,11 +151,11 @@ public class ResourceManager{
 	public void addHandler(ResourceHandler handler,String extension){
 		ResourceHandler it=mExtensionHandlerMap.get(extension);
 		if(it!=null){
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.DEBUG,
+			Logger.debug(Categories.TOADLET_TADPOLE,
 				"Removing handler for extension "+extension);
 		}
 
-		Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.DEBUG,
+		Logger.debug(Categories.TOADLET_TADPOLE,
 			"Adding handler for extension "+extension);
 		mExtensionHandlerMap.put(extension,handler);
 	}
@@ -163,11 +163,11 @@ public class ResourceManager{
 	public void removeHandler(String extension){
 		ResourceHandler it=mExtensionHandlerMap.remove(extension);
 		if(it!=null){
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.DEBUG,
+			Logger.debug(Categories.TOADLET_TADPOLE,
 				"Removing handler for extension "+extension);
 		}
 		else{
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.DEBUG,
+			Logger.debug(Categories.TOADLET_TADPOLE,
 				"Handler not found for extension "+extension);
 		}
 	}
@@ -202,7 +202,7 @@ public class ResourceManager{
 				description=description+"anonymously";
 			}
 
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.EXCESSIVE,
+			Logger.excess(Categories.TOADLET_TADPOLE,
 				description);
 		}
 
@@ -213,7 +213,7 @@ public class ResourceManager{
 
 		if(resCache!=null){
 			if(resource!=null && resCache.resource.get()!=resource){
-				Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.WARNING,
+				Logger.warning(Categories.TOADLET_TADPOLE,
 					"Replacing previous resource of same name, previous resource is becoming anonymous");
 
 				resCache.name=null;

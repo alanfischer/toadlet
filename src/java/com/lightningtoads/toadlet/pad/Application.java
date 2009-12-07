@@ -333,7 +333,7 @@ public class Application extends Activity implements RenderContext,Runnable{
 	}
 
 	public void surfaceCreated(SurfaceHolder holder){
-		Logger.log(Categories.TOADLET_PAD,Logger.Level.ALERT,
+		Logger.alert(Categories.TOADLET_PAD,
 			"surfaceCreated");
 
 		RenderTarget.Peer renderTargetPeer=new EGLRenderContextPeer(holder,new Visual());
@@ -364,7 +364,7 @@ public class Application extends Activity implements RenderContext,Runnable{
 	}
 
 	public void surfaceDestroyed(SurfaceHolder holder){
-		Logger.log(Categories.TOADLET_PAD,Logger.Level.ALERT,
+		Logger.alert(Categories.TOADLET_PAD,
 			"surfaceDestroyed");
 
 		if(mRenderer!=null){

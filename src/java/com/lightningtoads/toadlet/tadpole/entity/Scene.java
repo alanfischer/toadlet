@@ -109,7 +109,8 @@ public class Scene extends ParentEntity{
 		#endif
 
 		if(mExcessiveDT>0 && dt>mExcessiveDT){
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.ALERT,"skipping excessive dt:"+dt);
+			Logger.alert(Categories.TOADLET_TADPOLE,
+				"skipping excessive dt:"+dt);
 			return;
 		}
 

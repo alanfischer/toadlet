@@ -84,16 +84,16 @@ public class EGLRenderContextPeer extends EGLRenderTargetPeer{
 			}
 			egl_version=version[0]*10+version[1];
 		#endif
-		Logger.log(Categories.TOADLET_PEEPER,Logger.Level.ALERT,
+		Logger.alert(Categories.TOADLET_PEEPER,
 			"CALCULATED EGL VERSION:"+(egl_version/10)+"."+(egl_version%10));
 
 		// Crashes on Android 1.1
 		#if !defined(TOADLET_PLATFORM_ANDROID)
-			Logger.log(Categories.TOADLET_PEEPER,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_PEEPER,
 				"EGL_VENDOR:"+egl.eglQueryString(mDisplay,EGL_VENDOR));
-			Logger.log(Categories.TOADLET_PEEPER,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_PEEPER,
 				"EGL_VERSION:"+egl.eglQueryString(mDisplay,EGL_VERSION));
-			Logger.log(Categories.TOADLET_PEEPER,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_PEEPER,
 				"EGL_EXTENSIONS:"+egl.eglQueryString(mDisplay,EGL_EXTENSIONS));
 		#endif
 
@@ -109,7 +109,7 @@ public class EGLRenderContextPeer extends EGLRenderTargetPeer{
 		mConfig=chooseEGLConfig(mDisplay,redBits,greenBits,blueBits,alphaBits,depthBits,stencilBits,!pixmap,pixmap,false,visual.multisamples);
 		TOADLET_CHECK_EGLERROR("chooseEGLConfig");
 
-		Logger.log(Categories.TOADLET_PEEPER,Logger.Level.DEBUG,
+		Logger.debug(Categories.TOADLET_PEEPER,
 			"chooseEGLConfig config:"+mConfig);
 
 		if(!pixmap){

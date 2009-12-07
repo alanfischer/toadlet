@@ -27,6 +27,16 @@ package com.lightningtoads.toadlet.egg;
 
 #include <com/lightningtoads/toadlet/Types.h>
 
+#define TOADLET_MAKE_LOGGER_FUNCTION(name,level) \
+	public static void name(String description){name(null,description);} \
+	public static void name(String categoryName,const String &description){ \
+		Logger instance=getInstance(); \
+		if(level>Level.MAX) ; \
+		else if(level<=instance.getMasterReportingLevel() && level<=instance.getCategoryReportingLevel(categoryName)){ \
+			instance.addLogString(categoryName,level,description); \
+		} \
+	}
+
 import java.util.Vector;
 import java.util.HashMap;
 
@@ -37,7 +47,7 @@ public final class Logger{
 		public final static byte WARNING=2;
 		public final static byte ALERT=3;
 		public final static byte DEBUG=4;
-		public final static byte EXCESSIVE=5;
+		public final static byte EXCESS=5;
 		public final static byte MAX=6;
 	}
 
@@ -81,28 +91,11 @@ public final class Logger{
 		}
 	}
 
-	// Write message to Logger instance
-	public static void log(String categoryName,byte level,String message){
-		if(level>Level.MAX) ;
-		else if(level<=getInstance().getMasterReportingLevel() && level<=getInstance().getCategoryReportingLevel(categoryName)){
-			getInstance().addLogString(categoryName,level,message);
-		}
-	}
-
-	public static void log(byte level,String message){
-		if(level>Level.MAX) ;
-		else if(level<=getInstance().getMasterReportingLevel()){
-			getInstance().addLogString(level,message);
-		}
-	}
-
-	public static void log(String message){
-		byte level=Level.ALERT;
-		if(level>Level.MAX) ;
-		else if(level<=getInstance().getMasterReportingLevel()){
-			getInstance().addLogString(level,message);
-		}
-	}
+	TOADLET_MAKE_LOGGER_FUNCTION(error,Level.ERROR);
+	TOADLET_MAKE_LOGGER_FUNCTION(warning,Level.WARNING);
+	TOADLET_MAKE_LOGGER_FUNCTION(alert,Level.ALERT);
+	TOADLET_MAKE_LOGGER_FUNCTION(debug,Level.DEBUG);
+	TOADLET_MAKE_LOGGER_FUNCTION(excess,Level.EXCESS);
 
 	public synchronized void setMasterReportingLevel(byte level){
 		mReportingLevel=level;
@@ -202,25 +195,25 @@ public final class Logger{
 
 			switch(level){
 				case Level.DISABLED:
-					prefix="LOGGER:   ";
+					prefix="LOGGER:  ";
 				break;
 				case Level.ERROR:
-					prefix="ERROR:    ";
+					prefix="ERROR:   ";
 				break;
 				case Level.WARNING:
-					prefix="WARNING:  ";
+					prefix="WARNING: ";
 				break;
 				case Level.ALERT:
-					prefix="ALERT:    ";
+					prefix="ALERT:   ";
 				break;
 				case Level.DEBUG:
-					prefix="DEBUG:    ";
+					prefix="DEBUG:   ";
 				break;
-				case Level.EXCESSIVE:
-					prefix="EXCESSIVE:";
+				case Level.EXCESS:
+					prefix="EXCESS:  ";
 				break;
 				default:
-					prefix="UNKNOWN:  ";
+					prefix="UNKNOWN: ";
 				break;
 			}
 

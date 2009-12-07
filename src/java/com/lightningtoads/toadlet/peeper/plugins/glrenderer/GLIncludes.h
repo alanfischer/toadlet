@@ -38,13 +38,13 @@ import com.lightningtoads.toadlet.egg.Logger;
 	#define TOADLET_CHECK_EGLERROR(function) \
 		{ int error=egl.eglGetError(); \
 		if(error!=javax.microedition.khronos.egl.EGL10.EGL_SUCCESS) \
-			com.lightningtoads.toadlet.egg.Logger.log(com.lightningtoads.toadlet.egg.Categories.TOADLET_PEEPER,com.lightningtoads.toadlet.egg.Logger.Level.ALERT, \
+			com.lightningtoads.toadlet.egg.Logger.warning(com.lightningtoads.toadlet.egg.Categories.TOADLET_PEEPER, \
 				"EGL Error in " + function + ": error=" + error); }
 
 	#define TOADLET_CHECK_GLERROR(function) \
 		{ int error=gl.glGetError(); \
 		if(error!=javax.microedition.khronos.opengles.GL10.GL_NO_ERROR) \
-			com.lightningtoads.toadlet.egg.Logger.log(com.lightningtoads.toadlet.egg.Categories.TOADLET_PEEPER,com.lightningtoads.toadlet.egg.Logger.Level.ALERT, \
+			com.lightningtoads.toadlet.egg.Logger.warning(com.lightningtoads.toadlet.egg.Categories.TOADLET_PEEPER, \
 				"GL Error in " + function + ": error=" + error); }
 #else
 	#define TOADLET_CHECK_EGLERROR(function)
