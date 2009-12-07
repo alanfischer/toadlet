@@ -268,9 +268,13 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "~/include";
-				LIBRARY_SEARCH_PATHS = "~/lib";
+				LIBRARY_SEARCH_PATHS = (
+					/sw/lib,
+					"~/lib",
+				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
+					"-lGLEW",
 					"-lmxml",
 					"-ltoadlet_ribbit_alplayer_sd",
 					"-ltoadlet_peeper_glrenderer_sd",

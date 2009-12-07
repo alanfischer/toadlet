@@ -129,7 +129,7 @@ namespace Math{
 	}
 
 	inline real lerp(real t1,real t2,real time){
-		return t1*(1-time)+t2*time;
+		return (t1 + time*(t2-t1));
 	}
 
 	inline int nextPowerOf2(int i){

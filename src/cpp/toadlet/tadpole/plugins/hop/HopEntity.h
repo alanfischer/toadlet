@@ -141,7 +141,7 @@ public:
 	void setShadowMesh(mesh::Mesh::ptr shadow,scalar scale,scalar testLength,scalar offset);
 	inline mesh::Mesh::ptr setShadowMesh() const{return mShadowMesh;}
 
-	virtual void parentChanged(node::ParentNode *newParent);
+	virtual void parentChanged(node::ParentNode *parent);
 
 	virtual void collision(const hop::Collision &c);
 

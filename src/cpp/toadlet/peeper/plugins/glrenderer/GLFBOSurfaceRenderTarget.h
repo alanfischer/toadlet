@@ -35,6 +35,8 @@ namespace peeper{
 
 class GLRenderer;
 
+// TODO: Make the D3D9SurfaceRenderTarget & the GLFBOSurfaceRenderTarget more strict about Surface sizes,
+//  and smarter about destroying their temporary depth buffer when not needed
 class TOADLET_API GLFBOSurfaceRenderTarget:public GLRenderTarget,public SurfaceRenderTarget{
 public:
 	static bool available(GLRenderer *renderer);
@@ -52,6 +54,7 @@ public:
 
 	virtual bool attach(Surface::ptr surface,Attachment attachment);
 	virtual bool remove(Surface::ptr surface);
+	virtual bool compile();
 
 	virtual bool isPrimary() const{return false;}
 	virtual bool isValid() const{return mHandle!=0;}
@@ -68,6 +71,7 @@ protected:
 	int mWidth;
 	int mHeight;
 	GLuint mHandle;
+	bool mNeedsCompile;
 	egg::Collection<Surface::ptr> mSurfaces;
 	egg::Collection<Attachment> mSurfaceAttachments;
 	egg::Collection<GLFBORenderbufferSurface::ptr> mOwnedSurfaces;

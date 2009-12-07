@@ -102,9 +102,6 @@ bool D3D9VertexBuffer::createContext(){
 		mD3DUsage|=D3DUSAGE_WRITEONLY;
 	}
 
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_EXCESSIVE,
-		String("Allocating D3D9VertexBuffer of size:")+mDataSize);
-
 	HRESULT result=mRenderer->getDirect3DDevice9()->CreateVertexBuffer(mDataSize,mD3DUsage,mFVF,mD3DPool,&mVertexBuffer TOADLET_SHAREDHANDLE);
 	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: CreateVertexBuffer");
 
@@ -136,6 +133,10 @@ bool D3D9VertexBuffer::contextNeedsReset(){
 }
 
 uint8 *D3D9VertexBuffer::lock(AccessType lockType){
+	if(mVertexBuffer==NULL){
+		return NULL;
+	}
+
 	mLockType=lockType;
 
 	DWORD d3dflags=0;
@@ -169,6 +170,10 @@ uint8 *D3D9VertexBuffer::lock(AccessType lockType){
 }
 
 bool D3D9VertexBuffer::unlock(){
+	if(mVertexBuffer==NULL){
+		return false;
+	}
+
 	// We do this even if its read only, since we have to do it in all situations for locking
 	if(mData!=NULL){
 		int i,j;

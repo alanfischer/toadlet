@@ -46,6 +46,7 @@ public:
 
 	virtual bool create();
 	virtual bool destroy();
+	virtual bool compile();
 
 	virtual bool makeCurrent();
 	virtual bool swap();
@@ -62,6 +63,8 @@ public:
 protected:
 	bool createBuffer();
 	bool destroyBuffer();
+	void bind();
+	void unbind();
 
 	GLRenderer *mRenderer;
 	GLTexture *mTexture;

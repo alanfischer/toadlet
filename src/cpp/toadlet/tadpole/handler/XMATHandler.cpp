@@ -35,7 +35,8 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-XMATHandler::XMATHandler(TextureManager *textureManager){
+XMATHandler::XMATHandler(MaterialManager *materialManager,TextureManager *textureManager){
+	mMaterialManager=materialManager;
 	mTextureManager=textureManager;
 }
 
@@ -107,7 +108,7 @@ Material::ptr XMATHandler::loadMaterial(mxml_node_t *root,int version){
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
 		if(strcmp(mxmlGetElementName(block),"Material")==0){
-			material=XMLMeshUtilities::loadMaterial(block,version,mTextureManager);
+			material=XMLMeshUtilities::loadMaterial(block,version,mMaterialManager,mTextureManager);
 		}
 	}
 

@@ -3,6 +3,9 @@
 set (JAVA_SRC_DIR com/lightningtoads/toadlet)
 set (JAVA_GPP_DIR ${CMAKE_CURRENT_BINARY_DIR}/gpp)
 
+# Add the gpp executable for java file preprocessing
+add_subdirectory(gpp)
+
 # All toadlet libraries require the same includes
 # Note we include the JAVA_GPP_DIR files since those have been preprocessed
 include_directories (${JAVA_GPP_DIR}/com/lightningtoads ${ANDROID_JAR})

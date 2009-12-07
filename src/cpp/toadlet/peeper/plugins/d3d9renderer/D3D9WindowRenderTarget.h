@@ -57,6 +57,8 @@ public:
 	inline IDirect3DDevice9 *getDirect3DDevice9() const{return mD3DDevice;}
 	inline IDirect3D9 *getDirect3D9() const{return mD3D;}
 	inline const D3DPRESENT_PARAMETERS &getPresentParameters() const{return mPresentParameters;}
+	inline IDirect3DSurface9 *getColorSurface() const{return mColorSurface;}
+	inline IDirect3DSurface9 *getDepthSurface() const{return mDepthSurface;}
 
 protected:
 	void fillPresentParameters(D3DPRESENT_PARAMETERS &presentParameters);
@@ -66,7 +68,7 @@ protected:
 	IDirect3D9 *mD3D;
 	IDirect3DDevice9 *mD3DDevice;
 	IDirect3DSurface9 *mColorSurface;
-	IDirect3DSurface9 *mDepthSurface;	
+	IDirect3DSurface9 *mDepthSurface;
 	HWND mWindow;
 	int mWidth,mHeight;
 };

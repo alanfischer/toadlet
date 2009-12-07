@@ -363,6 +363,11 @@ bool Win32Application::createWindow(){
 		return false;
 	}
 
+	// Use client rect for size, the one that matters
+	GetClientRect(win32->mWnd,&rect);
+	mHeight=rect.bottom-rect.top;
+	mWidth=rect.right-rect.left;
+
 	mApplicationMap[win32->mWnd]=this;
 
 	ShowWindow(win32->mWnd,SW_SHOW);
@@ -648,8 +653,7 @@ bool Win32Application::changeVideoMode(int width,int height,int colorBits){
 	#if defined(TOADLET_PLATFORM_WINCE)
 		result=(width==GetSystemMetrics(SM_CXSCREEN) && height==GetSystemMetrics(SM_CYSCREEN));
 	#else
-		DEVMODE dmScreenSettings;
-		memset(&dmScreenSettings,0,sizeof(dmScreenSettings));
+		DEVMODE dmScreenSettings={0};
 		dmScreenSettings.dmSize=sizeof(dmScreenSettings);
 		dmScreenSettings.dmPelsWidth=width;
 		dmScreenSettings.dmPelsHeight=height;

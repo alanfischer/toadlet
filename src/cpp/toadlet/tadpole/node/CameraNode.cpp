@@ -48,6 +48,7 @@ CameraNode::CameraNode():super(),
 	mClearFlags(0),
 	//mClearColor,
 	mSkipFirstClear(false),
+	mAlignmentCalculationsUseOrigin(false),
 	mMidNode(NULL),
 
 	//mRenderBoundingOrigin,
@@ -151,6 +152,33 @@ void CameraNode::setProjectionRotation(scalar rotate){
 	projection.reset();
 	Math::setMatrix4x4FromTranslate(projection,-x,-y,0);
 	Math::postMul(mProjectionTransform,projection);
+}
+
+void CameraNode::setNearAndFarDist(scalar nearDist,scalar farDist){
+	mNearDist=nearDist;
+	mFarDist=farDist;
+
+	switch(mProjectionType){
+		case(ProjectionType_FOVX):
+			setProjectionFovX(mFov,mAspect,mNearDist,mFarDist);
+		break;
+		case(ProjectionType_FOVY):
+			setProjectionFovY(mFov,mAspect,mNearDist,mFarDist);
+		break;
+		case(ProjectionType_ORTHO):
+			setProjectionOrtho(mLeftDist,mRightDist,mBottomDist,mTopDist,mNearDist,mFarDist);
+		break;
+		case(ProjectionType_FRUSTUM):
+			setProjectionFrustum(mLeftDist,mRightDist,mBottomDist,mTopDist,mNearDist,mFarDist);
+		break;
+		default:
+			Error::unimplemented("projection type does not support adjusting near and far");
+		break;
+	}
+}
+
+void CameraNode::setAlignmentCalculationsUseOrigin(bool origin){
+	mAlignmentCalculationsUseOrigin=origin;
 }
 
 void CameraNode::setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up){

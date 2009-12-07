@@ -143,7 +143,7 @@ Engine::Engine():
 
 	// Material handlers
 	#if defined(TOADLET_HAS_MXML)
-		mMaterialManager->setHandler(XMATHandler::ptr(new XMATHandler(mTextureManager)),"xmat");
+		mMaterialManager->setHandler(XMATHandler::ptr(new XMATHandler(mMaterialManager,mTextureManager)),"xmat");
 	#endif
 
 	// Mesh handlers
@@ -246,6 +246,8 @@ void Engine::setRenderer(Renderer *renderer){
 			String()+(char)9+"textureNonPowerOf2Restricted:"+capabilitySet.textureNonPowerOf2Restricted);
 		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
 			String()+(char)9+"textureNonPowerOf2:"+capabilitySet.textureNonPowerOf2);
+		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+			String()+(char)9+"textureAutogenMipMaps:"+capabilitySet.textureAutogenMipMaps);
 	}
 
 	if(renderer!=mRenderer && mRenderer!=NULL){

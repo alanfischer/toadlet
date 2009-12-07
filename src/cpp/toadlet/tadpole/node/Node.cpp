@@ -51,6 +51,8 @@ Node::Node():
 	mIdentityTransform(false),
 	//mScale,
 	mScope(0),
+	mAlignXAxis(false),mAlignYAxis(false),mAlignZAxis(false),
+
 	mBoundingRadius(0),
 	mReceiveUpdates(false),
 
@@ -191,6 +193,10 @@ void Node::setScale(scalar x,scalar y,scalar z){
 
 void Node::setScope(int scope){
 	mScope=scope;
+}
+
+void Node::setAlignmentCalculation(bool xAxis,bool yAxis,bool zAxis){
+	mAlignXAxis=xAxis;mAlignYAxis=yAxis;mAlignZAxis=zAxis;
 }
 
 void Node::setBoundingRadius(scalar boundingRadius){

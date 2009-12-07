@@ -230,6 +230,7 @@ public:
 
 private:
 	void clearExtraData();
+	void update();
 
 	stringchar *mData;
 	int mLength;

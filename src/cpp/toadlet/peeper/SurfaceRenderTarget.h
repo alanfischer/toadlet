@@ -51,6 +51,7 @@ public:
 
 	virtual bool attach(Surface::ptr surface,Attachment attachment)=0;
 	virtual bool remove(Surface::ptr surface)=0;
+	virtual bool compile()=0;
 };
 
 }

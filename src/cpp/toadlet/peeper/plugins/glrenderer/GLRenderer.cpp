@@ -33,9 +33,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/IndexData.h>
-#include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/VertexData.h>
-#include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/peeper/Viewport.h>
 #include <toadlet/peeper/Program.h>
 #include <toadlet/peeper/Shader.h>
@@ -165,6 +163,8 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 		}
 
 		gl_version=GLEW_VERSION_2_1?21:(GLEW_VERSION_2_0?20:(GLEW_VERSION_1_5?15:(GLEW_VERSION_1_4?14:(GLEW_VERSION_1_3?13:(GLEW_VERSION_1_2?12:(GLEW_VERSION_1_1?11:00))))));
+	#else
+		gl_version=10;
 	#endif
 	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
 		String("CALCULATED GL VERSION:")+(gl_version/10)+"."+(gl_version%10));
@@ -236,6 +236,14 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 		mCapabilitySet.textureDot3=(GLEW_ARB_texture_env_dot3!=0);
 	#elif defined(TOADLET_HAS_GLES)
 		mCapabilitySet.textureDot3=(gl_version>=11);
+	#endif
+
+	#if defined(TOADLET_HAS_GLES)
+		mCapabilitySet.textureAutogenMipMaps|=(gl_version>=11);
+	#elif defined(TOADLET_HAS_GLEW) && defined(GL_EXT_framebuffer_object)
+		mCapabilitySet.textureAutogenMipMaps|=(GLEW_EXT_framebuffer_object!=0);
+	#else
+		mCapabilitySet.textureAutogenMipMaps|=(gl_version>=14);
 	#endif
 
 	#if defined(TOADLET_HAS_GLEW)
@@ -439,8 +447,6 @@ void GLRenderer::setProjectionMatrix(const Matrix4x4 &matrix){
 }
 
 bool GLRenderer::setRenderTarget(RenderTarget *target){
-	TOADLET_CHECK_GLERROR("before setRenderTarget");
-
 	if(target==NULL){
 		Error::nullPointer(Categories::TOADLET_PEEPER,
 			"RenderTarget is NULL");
@@ -674,6 +680,33 @@ void GLRenderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexDa
 
 		TOADLET_CHECK_GLERROR("glDrawArrays");
 	}
+}
+
+bool GLRenderer::copyToSurface(Surface *surface){
+	GLSurface *glsurface=(GLSurface*)surface->getRootSurface();
+
+	GLTextureMipSurface *textureSurface=glsurface->castToGLTextureMipSurface();
+	GLFBORenderbufferSurface *renderbufferSurface=glsurface->castToGLFBORenderbufferSurface();
+	RenderTarget *renderTarget=mRenderTarget->getRootRenderTarget();
+
+	if(textureSurface!=NULL){
+		GLTexture *gltexture=textureSurface->getTexture();
+
+		glBindTexture(gltexture->mTarget,gltexture->mHandle);
+		glCopyTexSubImage2D(gltexture->mTarget,textureSurface->getLevel(),0,0,0,renderTarget->getHeight()-gltexture->mHeight,gltexture->mWidth,gltexture->mHeight);
+
+		Matrix4x4 matrix;
+		Math::setMatrix4x4FromScale(matrix,Math::ONE,-Math::ONE,Math::ONE);
+		Math::setMatrix4x4FromTranslate(matrix,0,Math::ONE,0);
+		gltexture->setMatrix(matrix);
+	}
+	else if(renderbufferSurface!=NULL){
+		Error::unimplemented(Categories::TOADLET_PEEPER,
+			"GLRenderer::copyToSurface: unimplemented for GLFBORenderbufferSurface");
+		return false;
+	}
+
+	return true;
 }
 
 void GLRenderer::setDefaultStates(){
@@ -1167,6 +1200,8 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 					mode=GL_REPLACE;
 				break;
 				case TextureBlend::Operation_MODULATE:
+				case TextureBlend::Operation_MODULATE_2X:
+				case TextureBlend::Operation_MODULATE_4X:
 					mode=GL_MODULATE;
 				break;
 				case TextureBlend::Operation_ADD:
@@ -1179,6 +1214,20 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 				break;
 			}
 			
+			switch(blend.operation){
+				case TextureBlend::Operation_MODULATE:
+					glTexEnvf(GL_TEXTURE_ENV,GL_RGB_SCALE,1.0f);
+				break;
+				case TextureBlend::Operation_MODULATE_2X:
+					glTexEnvf(GL_TEXTURE_ENV,GL_RGB_SCALE,2.0f);
+				break;
+				case TextureBlend::Operation_MODULATE_4X:
+					glTexEnvf(GL_TEXTURE_ENV,GL_RGB_SCALE,4.0f);
+				break;
+				default:
+				break;
+			}
+
 			if(blend.source1==TextureBlend::Source_UNSPECIFIED || blend.source2==TextureBlend::Source_UNSPECIFIED){
 				glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,mode);
 			}

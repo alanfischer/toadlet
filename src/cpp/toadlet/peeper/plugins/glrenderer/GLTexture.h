@@ -38,7 +38,7 @@ namespace peeper{
 class GLRenderer;
 
 class TOADLET_API GLTexture:protected egg::BaseResource,public Texture{
-	TOADLET_BASERESOURCE_PASSTHROUGH();
+	TOADLET_BASERESOURCE_PASSTHROUGH(Texture);
 public:
 	GLTexture(GLRenderer *renderer);
 	virtual ~GLTexture();
@@ -48,6 +48,10 @@ public:
 	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels);
 	virtual void destroy();
 
+	virtual bool createContext();
+	virtual void destroyContext(bool backData);
+	virtual bool contextNeedsReset(){return false;}
+
 	virtual int getUsageFlags() const{return mUsageFlags;}
 	virtual Dimension getDimension() const{return mDimension;}
 	virtual int getFormat() const{return mFormat;}
@@ -56,9 +60,9 @@ public:
 	virtual int getDepth() const{return mDepth;}
 	virtual int getNumMipLevels() const{return mMipLevels;}
 
-	virtual Surface::ptr getMipSuface(int i) const;
-	virtual bool load(int format,int width,int height,int depth,uint8 *data);
-	virtual bool read(int format,int width,int height,int depth,uint8 *data);
+	virtual Surface::ptr getMipSurface(int level,int cubeSide);
+	virtual bool load(int format,int mipLevel,int width,int height,int depth,uint8 *data);
+	virtual bool read(int format,int mipLevel,int width,int height,int depth,uint8 *data);
 
 	inline GLuint getHandle() const{return mHandle;}
 	inline GLenum getTarget() const{return mTarget;}
@@ -74,7 +78,7 @@ public:
 	inline void setMatrix(const Matrix4x4 &matrix){mMatrix.set(matrix);}
 
 protected:
-	void generateMipLevels();
+	bool generateMipLevels();
 	GLuint getGLTarget();
 
 	GLRenderer *mRenderer;
@@ -91,6 +95,7 @@ protected:
 	GLenum mTarget;
 	Matrix4x4 mMatrix;
 	bool mManuallyGenerateMipLevels;
+	egg::Collection<Surface::ptr> mSurfaces;
 
 	friend class GLRenderer;
 };

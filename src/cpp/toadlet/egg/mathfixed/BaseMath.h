@@ -169,7 +169,7 @@ namespace Math{
 	}
 
 	inline fixed lerp(fixed t1,fixed t2,fixed time){
-		return TOADLET_MUL_XX(t1,ONE-time) + TOADLET_MUL_XX(t2,time);
+		return (t1 + TOADLET_MUL_XX(time,t2-t1));
 	}
 
 	inline int nextPowerOf2(int i){

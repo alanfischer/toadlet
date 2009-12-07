@@ -66,30 +66,12 @@ endif (WIN32)
 
 # Android specific options
 if (TOADLET_PLATFORM_ANDROID)
-	# Use the java override files
-	#SET(CMAKE_USER_MAKE_RULES_OVERRIDE "Override")
-	#FILE(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/classes")
-
-	#SET(CMAKE_Java_COMPILE_OBJECT
-	#	"<CMAKE_Java_COMPILER> <FLAGS> <SOURCE> -d \"<CMAKE_CURRENT_BINARY_DIR>/classes\""
-	#)
-
-	#this is a place holder if java needed flags for javac they would go here.
-	#SET(CMAKE_Java_CREATE_STATIC_LIBRARY
-		#"<CMAKE_Java_ARCHIVE> -cf <TARGET> -C \"<CMAKE_CURRENT_BINARY_DIR>/classes\" ."
-	#)
-
-
 	# We require the android.jar
 	if (NOT ANDROID_JAR)
 		message (FATAL_ERROR "Required variable ANDROID_JAR not set as path/to/android.jar, please set ANDROID_JAR and rerun!")
 	else (NOT ANDROID_JAR)
 		message ("Using android.jar located at: ${ANDROID_JAR}")
 	endif (NOT ANDROID_JAR)
-
-	# Optionally set these custom java flags if need be
-	#set (CMAKE_Java_FLAGS "")
-	#set (CMAKE_Java_DEFINES ""
 endif (TOADLET_PLATFORM_ANDROID)
 
 
@@ -136,14 +118,16 @@ if (UPDATE_WINCE)
 		"${CMAKE_BINARY_DIR}/src/cpp/toadlet/tadpole/plugins/hop/toadlet_tadpole_hop_s.vcproj"
 	)
 	foreach (VCPROJFILE ${PROJS})
-		file (STRINGS ${VCPROJFILE} VCPROJ NEWLINE_CONSUME)
-		set (VCPROJFILENEW "${VCPROJFILE}")
-		file (WRITE ${VCPROJFILENEW} "")
-		foreach (LINE ${VCPROJ})
-			string (REPLACE "Name=\"Win32\"" "Name=\"${WINCE_PLATFORM_SDK}\"" OUTLINE "${LINE}")
-			string (REPLACE "|Win32" "|${WINCE_PLATFORM_SDK}" OUTLINE "${OUTLINE}")
-			file (APPEND ${VCPROJFILENEW} "${OUTLINE}")
-		endforeach (LINE)
+		if (EXISTS "${VCPROJFILE}")
+			file (STRINGS ${VCPROJFILE} VCPROJ NEWLINE_CONSUME)
+			set (VCPROJFILENEW "${VCPROJFILE}")
+			file (WRITE ${VCPROJFILENEW} "")
+			foreach (LINE ${VCPROJ})
+				string (REPLACE "Name=\"Win32\"" "Name=\"${WINCE_PLATFORM_SDK}\"" OUTLINE "${LINE}")
+				string (REPLACE "|Win32" "|${WINCE_PLATFORM_SDK}" OUTLINE "${OUTLINE}")
+				file (APPEND ${VCPROJFILENEW} "${OUTLINE}")
+			endforeach (LINE)
+		endif (EXISTS "${VCPROJFILE}")
 	endforeach(VCPROJFILE)
 	message (SEND_ERROR "Done! \nThis isn't really an error; just letting you know the WinCE build files are updated. \nYes it's a hack, yes it will go away once CMake supports WinCE by default. But believe me it's more straightforward than patching the source.")
 endif (UPDATE_WINCE)
@@ -172,16 +156,18 @@ if (UPDATE_IPHONEOS)
 		"${CMAKE_BINARY_DIR}/src/cpp/toadlet/tadpole/plugins/hop/cmake_install.cmake"
 	)
 	foreach (INSTPROJFILE ${PROJS})
-		file (STRINGS ${INSTPROJFILE} INSTPROJ NEWLINE_CONSUME)
-		set (INSTPROJFILENEW "${INSTPROJFILE}")
-		file (WRITE ${INSTPROJFILENEW} "")
-		foreach (LINE ${INSTPROJ})
-			string (REPLACE "/Debug/" "/Debug-iphoneos/" OUTLINE "${LINE}")
-			string (REPLACE "/Release/" "/Release-iphoneos/" OUTLINE "${OUTLINE}")
-			string (REPLACE "/MinSizeRel/" "/MinSizeRel-iphoneos/" OUTLINE "${OUTLINE}")
-			string (REPLACE "/RelWithDebInfo/" "/RelWithDebInfo-iphoneos/" OUTLINE "${OUTLINE}")
-			file (APPEND ${INSTPROJFILENEW} "${OUTLINE}")
-		endforeach (LINE)
+		if (EXISTS "${INSTPROJFILE}")
+			file (STRINGS ${INSTPROJFILE} INSTPROJ NEWLINE_CONSUME)
+			set (INSTPROJFILENEW "${INSTPROJFILE}")
+			file (WRITE ${INSTPROJFILENEW} "")
+			foreach (LINE ${INSTPROJ})
+				string (REPLACE "/Debug/" "/Debug-iphoneos/" OUTLINE "${LINE}")
+				string (REPLACE "/Release/" "/Release-iphoneos/" OUTLINE "${OUTLINE}")
+				string (REPLACE "/MinSizeRel/" "/MinSizeRel-iphoneos/" OUTLINE "${OUTLINE}")
+				string (REPLACE "/RelWithDebInfo/" "/RelWithDebInfo-iphoneos/" OUTLINE "${OUTLINE}")
+				file (APPEND ${INSTPROJFILENEW} "${OUTLINE}")
+			endforeach (LINE)
+		endif (EXISTS "${INSTPROJFILE}")
 	endforeach(INSTPROJFILE)
 	message (SEND_ERROR "Done! \nThis isn't really an error; just letting you know the cmake_install.cmake files are updated. \nYes it's a hack, yes it will go away once CMake supports iphoneos by default. But believe me it's more straightforward than patching the source.")
 endif (UPDATE_IPHONEOS)

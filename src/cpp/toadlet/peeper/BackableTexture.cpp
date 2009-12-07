@@ -23,6 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/BackableTexture.h>
 #include <string.h>
 
@@ -61,8 +62,20 @@ bool BackableTexture::create(int usageFlags,Dimension dimension,int format,int w
 	mHeight=height;
 	mDepth=depth;
 	mMipLevels=mipLevels;
-	mDataSize=ImageFormatConversion::getPixelSize(format)*mWidth*mHeight*mDepth;
-	
+
+	if(mDimension==Dimension_D1){
+		mDataSize=ImageFormatConversion::getPixelSize(format)*mWidth;
+	}
+	else if(mDimension==Dimension_D2){
+		mDataSize=ImageFormatConversion::getPixelSize(format)*mWidth*mHeight;
+	}
+	else if(mDimension==Dimension_D3){
+		mDataSize=ImageFormatConversion::getPixelSize(format)*mWidth*mHeight*mDepth;
+	}
+	else if(mDimension==Dimension_CUBE){
+		mDataSize=ImageFormatConversion::getPixelSize(format)*mWidth*mHeight*6;
+	}
+
 	mData=new uint8[mDataSize];
 
 	return true;
@@ -80,42 +93,52 @@ void BackableTexture::destroy(){
 }
 
 // TODO: This should return a BackableSurface, which will be able to change surface pointers
-Surface::ptr BackableTexture::getMipSuface(int i) const{
-	return mBack->getMipSuface(i);
+Surface::ptr BackableTexture::getMipSurface(int level,int cubeSide){
+	return mBack->getMipSurface(level,cubeSide);
 }
 
-bool BackableTexture::load(int format,int width,int height,int depth,uint8 *data){
+bool BackableTexture::load(int format,int width,int height,int depth,int mipLevel,uint8 *data){
 	if(mBack!=NULL){
-		return mBack->load(format,width,height,depth,data);
+		return mBack->load(format,width,height,depth,mipLevel,data);
 	}
 	else{
 		// TODO: This should modify the data to fit into our buffer
-		memcpy(mData,data,mDataSize);
-		return true;
+		if(mipLevel==0){
+			memcpy(mData,data,mDataSize);
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 }
 
-bool BackableTexture::read(int format,int width,int height,int depth,uint8 *data){
+bool BackableTexture::read(int format,int width,int height,int depth,int mipLevel,uint8 *data){
 	if(mBack!=NULL){
-		return mBack->read(format,width,height,depth,data);
+		return mBack->read(format,width,height,depth,mipLevel,data);
 	}
 	else{
 		// TODO: This should modify the data to fit into our buffer
-		memcpy(data,mData,mDataSize);
-		return true;
+		if(mipLevel==0){
+			memcpy(data,mData,mDataSize);
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 }
 
 void BackableTexture::setBack(Texture::ptr back,bool initial){
 	if(back!=mBack && mBack!=NULL){
 		mData=new uint8[mDataSize];
-		mBack->read(mFormat,mWidth,mHeight,mDepth,mData);
+		mBack->read(mFormat,mWidth,mHeight,mDepth,0,mData);
 	}
 
 	mBack=back;
 	
 	if(initial==false && mBack!=NULL && mData!=NULL){
-		mBack->load(mFormat,mWidth,mHeight,mDepth,mData);
+		mBack->load(mFormat,mWidth,mHeight,mDepth,0,mData);
 		delete[] mData;
 		mData=NULL;
 	}

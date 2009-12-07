@@ -1,19 +1,22 @@
 #ifndef LOGO_H
 #define LOGO_H
 
+#include <toadlet/egg/io/MemoryInputStream.h>
+#include <toadlet/tadpole/node/CameraNode.h>
+#include <toadlet/tadpole/node/MeshNode.h>
 #include <toadlet/pad/Application.h>
-#include <toadlet/tadpole/entity/CameraEntity.h>
-#include <toadlet/tadpole/entity/MeshEntity.h>
 
 using namespace toadlet::egg;
+using namespace toadlet::egg::io;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::entity;
+using namespace toadlet::tadpole::node;
+using namespace toadlet::tadpole::mesh;
 using namespace toadlet::pad;
 
 class Logo:public Application{
 public:
-	Logo(const String &respath);
+	Logo();
 	virtual ~Logo();
 
 	void create();
@@ -21,9 +24,8 @@ public:
 	void render(Renderer *renderer);
 	void update(int dt);
 
-	String resourcePath;
-	CameraEntity::ptr cameraEntity;
-	MeshEntity::ptr meshEntity;
+	CameraNode::ptr cameraNode;
+	MeshNode::ptr meshNode;
 };
 
 #endif

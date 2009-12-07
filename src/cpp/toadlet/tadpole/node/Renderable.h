@@ -30,7 +30,15 @@
 #include <toadlet/tadpole/Material.h>
 
 namespace toadlet{
+namespace peeper{
+
+class Renderer;
+
+}
 namespace tadpole{
+	
+class Material;
+
 namespace node{
 
 class Scene;
