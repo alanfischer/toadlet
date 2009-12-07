@@ -164,7 +164,7 @@ void D3D9Texture::destroyContext(bool backData){
 		mTexture=NULL;
 
 		if(FAILED(result)){
-			TOADLET_CHECK_D3D9ERROR(result,"CreateTexture");
+			TOADLET_CHECK_D3D9ERROR(result,"Release");
 			return;
 		}
 	}

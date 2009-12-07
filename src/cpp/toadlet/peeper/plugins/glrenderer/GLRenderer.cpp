@@ -33,9 +33,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/IndexData.h>
-#include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/VertexData.h>
-#include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/peeper/Viewport.h>
 #include <toadlet/peeper/Program.h>
 #include <toadlet/peeper/Shader.h>
