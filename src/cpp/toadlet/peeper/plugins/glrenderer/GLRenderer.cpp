@@ -103,7 +103,7 @@ GLRenderer::~GLRenderer(){
 }
 
 bool GLRenderer::create(RenderTarget *target,int *options){
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_PEEPER,
 		"creating GLRenderer");
 
 	if(target==NULL){
@@ -121,17 +121,17 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 			switch(options[i++]){
 				case Option_USE_PBUFFERS:
 					usePBuffers=options[i++]>0;
-					Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+					Logger::alert(Categories::TOADLET_PEEPER,
 						String("Setting PBuffer usage to:")+usePBuffers);
 				break;
 				case Option_USE_FBOS:
 					useFBOs=options[i++]>0;
-					Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+					Logger::alert(Categories::TOADLET_PEEPER,
 						String("Setting FBO usage to:")+useFBOs);
 				break;
 				case Option_USE_HARDWARE_BUFFERS:
 					useHardwareBuffers=options[i++]>0;
-					Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+					Logger::alert(Categories::TOADLET_PEEPER,
 						String("Setting Hardware Buffer usage to:")+useHardwareBuffers);
 				break;
 			}
@@ -149,7 +149,7 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 		}
 
 		int glesemAcceleratedResult=glesem_getAccelerated();
-		Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_PEEPER,
 			String("glesem_getAccelerated result:")+glesemAcceleratedResult);
 
 		gl_version=glesem_gl_majorVersion*10+glesem_gl_minorVersion;
@@ -166,7 +166,7 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 	#else
 		gl_version=10;
 	#endif
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_PEEPER,
 		String("CALCULATED GL VERSION:")+(gl_version/10)+"."+(gl_version%10));
 
 	GLRenderTarget *gltarget=(GLRenderTarget*)target->getRootRenderTarget();
@@ -176,13 +176,13 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 	mRenderTarget=target;
 	mGLRenderTarget=gltarget;
 
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_PEEPER,
 		String("GL_VENDOR:") + glGetString(GL_VENDOR));
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_PEEPER,
 		String("GL_RENDERER:") + glGetString(GL_RENDERER));
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_PEEPER,
 		String("GL_VERSION:") + glGetString(GL_VERSION));
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_PEEPER,
 		String("GL_EXTENSIONS:") + glGetString(GL_EXTENSIONS));
 
 	#if defined(TOADLET_HAS_GLESEM)
@@ -285,7 +285,7 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 
 	TOADLET_CHECK_GLERROR("create");
 
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_PEEPER,
 		"created GLRenderer");
 
 	return true;

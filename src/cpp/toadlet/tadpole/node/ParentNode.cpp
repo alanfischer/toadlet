@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Logger.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 
 using namespace toadlet::egg;
@@ -88,6 +89,10 @@ bool ParentNode::attach(Node *node){
 
 	mChildren.add(node);
 
+	if(node->getName()!=(char*)NULL){
+		childRenamed(node,NULL,node->getName());
+	}
+
 	node->parentChanged(this);
 
 	mShadowChildrenDirty=true;
@@ -103,6 +108,10 @@ bool ParentNode::remove(Node *node){
 	}
 	if(i>=0){
 		mChildren.removeAt(i);
+
+		if(node->getName()!=(char*)NULL){
+			childRenamed(node,node->getName(),NULL);
+		}
 
 		node->parentChanged(NULL);
 
@@ -120,6 +129,25 @@ void ParentNode::handleEvent(const Event::ptr &event){
 	int i;
 	for(i=0;i<numChildren;++i){
 		mShadowChildren[i]->handleEvent(event);
+	}
+}
+
+void ParentNode::childRenamed(Node *node,const String &oldName,const String &newName){
+	Map<String,Node*>::iterator it;
+
+	if(oldName!=(char*)NULL){
+		it=mNamedChildren.find(oldName);
+		if(it!=mNamedChildren.end() && it->second==node){
+			mNamedChildren.erase(it);
+		}
+	}
+
+	if(newName!=(char*)NULL){
+		it=mNamedChildren.find(newName);
+		if(it!=mNamedChildren.end()){
+			Logger::warning("ParentNode: Multiple children of name: "+newName+"  Forgetting old child");
+		}
+		mNamedChildren[newName]=node;
 	}
 }
 

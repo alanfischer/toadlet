@@ -66,8 +66,8 @@ Resource::ptr ResourceManager::get(const String &name){
 Resource::ptr ResourceManager::find(const egg::String &name,ResourceHandlerData::ptr handlerData){
 	Resource::ptr resource=get(name);
 	if(resource==NULL){
-		if(Logger::getInstance()->getMasterCategoryReportingLevel(Categories::TOADLET_TADPOLE)>=Logger::Level_EXCESSIVE){
-			Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_EXCESSIVE,
+		if(Logger::getInstance()->getMasterCategoryReportingLevel(Categories::TOADLET_TADPOLE)>=Logger::Level_EXCESS){
+			Logger::excess(Categories::TOADLET_TADPOLE,
 				String("Finding ")+name);
 		}
 
@@ -99,7 +99,8 @@ Resource::ptr ResourceManager::manage(const Resource::ptr &resource){
 
 void ResourceManager::unmanage(Resource *resource){
 	if(mResources.remove(resource)==false){
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_WARNING,"Error unmaning resource, check inheritance heiarchy");
+		Logger::alert(Categories::TOADLET_TADPOLE,
+			"Error unmanaging resource, check inheritance heiarchy");
 	}
 
 	String name=resource->getName();
@@ -116,14 +117,14 @@ void ResourceManager::unmanage(Resource *resource){
 void ResourceManager::setHandler(ResourceHandler::ptr handler,const String &extension){
 	ExtensionHandlerMap::iterator it=mExtensionHandlerMap.find(extension);
 	if(it!=mExtensionHandlerMap.end()){
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_DEBUG,
+		Logger::debug(Categories::TOADLET_TADPOLE,
 			"Removing handler for extension "+extension);
 
 		it->second=NULL;
 	}
 
 	if(handler!=NULL){
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_DEBUG,
+		Logger::debug(Categories::TOADLET_TADPOLE,
 			"Adding handler for extension "+extension);
 		mExtensionHandlerMap[extension]=handler;
 	}

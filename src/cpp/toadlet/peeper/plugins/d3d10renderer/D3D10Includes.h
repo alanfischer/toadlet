@@ -108,7 +108,7 @@ inline D3DCOLOR toD3DCOLOR(const Color &c){
 #if defined(TOADLET_DEBUG)
 	#define TOADLET_CHECK_D3D10ERROR(result,function) \
 		if(FAILED(result)) \
-			toadlet::egg::Logger::log(toadlet::egg::Categories::TOADLET_PEEPER,toadlet::egg::Logger::Level_ALERT, \
+			toadlet::egg::Logger::warning(toadlet::egg::Categories::TOADLET_PEEPER, \
 			toadlet::egg::String("D3D10 Error in ") + function + ": error=" + (int)result); \
 
 #else

@@ -31,7 +31,7 @@ namespace egg{
 namespace io{
 
 FileOutputStream::FileOutputStream(const String &filename){
-	Logger::log(Categories::TOADLET_EGG,Logger::Level_EXCESSIVE,"Opening file: "+filename);
+	Logger::excess(Categories::TOADLET_EGG,"Opening file: "+filename);
 
 	mFile=fopen(filename,"wb");
 	mAutoClose=true;

@@ -74,7 +74,8 @@ HTCMotionDetector::HTCMotionDetector():FilteredMotionDetector(),
 		}
 	}
 
-	Logger::log(Categories::TOADLET_FLICK,Logger::Level_ALERT,String("HTCMotionDetector:")+(mSensor!=NULL));
+	Logger::alert(Categories::TOADLET_FLICK,
+		String("HTCMotionDetector:")+(mSensor!=NULL));
 }
 
 HTCMotionDetector::~HTCMotionDetector(){

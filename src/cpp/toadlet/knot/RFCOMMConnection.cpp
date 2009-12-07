@@ -76,7 +76,7 @@ RFCOMMConnection::~RFCOMMConnection(){
 }
 
 bool RFCOMMConnection::connect(BluetoothAddress *address){
-	Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+	Logger::debug(Categories::TOADLET_KNOT,
 		String("connect: protocol ")+CONNECTION_PACKET);
 
 	bool result=mClient->connect(address);
@@ -88,22 +88,22 @@ bool RFCOMMConnection::connect(BluetoothAddress *address){
 
 		amount=mClient->send(mOutPacket->getOriginalDataPointer(),size);
 		if(amount>0){
-			Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+			Logger::debug(Categories::TOADLET_KNOT,
 				"connect: sent connection packet");
 
 			amount=mClient->receive(mInPacket->getOriginalDataPointer(),size);
 			if(amount>0){
-				Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+				Logger::debug(Categories::TOADLET_KNOT,
 					"connect: received connection packet");
 
 				if(verifyConnectionPacket(mDataInPacket)){
-					Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+					Logger::debug(Categories::TOADLET_KNOT,
 						"connect: verified connection packet");
 
 					result=true;
 				}
 				else{
-					Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+					Logger::alert(Categories::TOADLET_KNOT,
 						"connect: error verifying connection packet");
 				}
 			}
@@ -121,7 +121,7 @@ bool RFCOMMConnection::connect(BluetoothAddress *address){
 }
 
 bool RFCOMMConnection::accept(const String &guid){
-	Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+	Logger::debug(Categories::TOADLET_KNOT,
 		String("accept: protocol ")+CONNECTION_PACKET);
 
 	bool result=mServer->accept(guid);
@@ -133,23 +133,23 @@ bool RFCOMMConnection::accept(const String &guid){
 
 		amount=mServer->receive(mInPacket->getOriginalDataPointer(),size);
 		if(amount>0){
-			Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+			Logger::debug(Categories::TOADLET_KNOT,
 				"accept: received connection packet");
 
 			if(verifyConnectionPacket(mDataInPacket)){
-				Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+				Logger::debug(Categories::TOADLET_KNOT,
 					"accept: verified connection packet");
 
 				amount=mServer->send(mOutPacket->getOriginalDataPointer(),size);
 				if(amount>0){
-					Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+					Logger::debug(Categories::TOADLET_KNOT,
 						"accept: sent connection packet");
 
 					result=true;
 				}
 			}
 			else{
-				Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+				Logger::alert(Categories::TOADLET_KNOT,
 					"connect: error verifying connection packet");
 			}
 		}

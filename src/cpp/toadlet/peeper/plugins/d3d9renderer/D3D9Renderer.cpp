@@ -82,7 +82,7 @@ D3D9Renderer::~D3D9Renderer(){
 }
 
 bool D3D9Renderer::create(RenderTarget *target,int *options){
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_PEEPER,
 		"creating D3D9Renderer");
 
 	if(target==NULL){
@@ -124,7 +124,7 @@ bool D3D9Renderer::create(RenderTarget *target,int *options){
 
 	setDefaultStates();
 
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_PEEPER,
 		"created D3D9Renderer");
 
 	return true;

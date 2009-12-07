@@ -47,7 +47,7 @@ namespace net{
 	Socket::WSAHandler::WSAHandler(){
 		int result=WSAStartup(MAKEWORD(1,1),&mWSADATA);
 		if(result!=0){
-			Logger::log(Categories::TOADLET_EGG,Logger::Level_ERROR,
+			Logger::error(Categories::TOADLET_EGG,
 				String("WSAHandler::WSAHandler(): error ")+result);
 		}
 	}
@@ -55,7 +55,7 @@ namespace net{
 	Socket::WSAHandler::~WSAHandler(){
 		int result=WSACleanup();
 		if(result!=0){
-			Logger::log(Categories::TOADLET_EGG,Logger::Level_ERROR,
+			Logger::error(Categories::TOADLET_EGG,
 				String("WSAHandler::~WSAHandler(): error ")+result);
 		}
 	}

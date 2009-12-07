@@ -208,7 +208,7 @@ bool WGLPBufferSurfaceRenderTarget::createBuffer(){
 	wglGetPixelFormatAttribivARB(hdc,wglformat,0,sizeof(piAttributes)/sizeof(const int),piAttributes,piValues);
 	TOADLET_CHECK_WGLERROR("wglGetPixelFormatAttribivARB");
 
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_PEEPER,
 		String("Format RGBA=")+
 		piValues[0] + "," + piValues[1] + "," + piValues[2] + "," + piValues[3] + " Depth=" +
 		piValues[4] + " Stencil=" + piValues[5] + " Width=" + width + " Height=" + height);

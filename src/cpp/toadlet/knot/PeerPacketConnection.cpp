@@ -114,7 +114,7 @@ bool PeerPacketConnection::connect(const String &address,int port){
 	uint32 remoteIP=Socket::stringToIP(address);
 	int remotePort=port;
 
-	Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+	Logger::debug(Categories::TOADLET_KNOT,
 		String("connect: protocol ")+CONNECTION_PACKET);
 
 	bool result=false;
@@ -126,30 +126,30 @@ bool PeerPacketConnection::connect(const String &address,int port){
 		while(tries<3){
 			amount=mSocket->sendTo(mOutPacket->getOriginalDataPointer(),size,remoteIP,remotePort);
 			if(amount>0){
-				Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+				Logger::debug(Categories::TOADLET_KNOT,
 					String("connect: sent connection packet to:")+Socket::ipToString(remoteIP)+":"+remotePort);
 
 				amount=mSocket->receiveFrom(mInPacket->getOriginalDataPointer(),size,remoteIP,remotePort);
 				if(amount>0){
-					Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+					Logger::debug(Categories::TOADLET_KNOT,
 						String("connect: received connection packet from:")+Socket::ipToString(remoteIP)+":"+remotePort);
 
 					if(verifyConnectionPacket(mDataInPacket)){
-						Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+						Logger::debug(Categories::TOADLET_KNOT,
 							"connect: verified connection packet");
 
 						result=true;
 						break;
 					}
 					else{
-						Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+						Logger::alert(Categories::TOADLET_KNOT,
 							"connect: error verifying connection packet");
 					}
 
 					mInPacket->reset();
 				}
 				else{
-					Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+					Logger::alert(Categories::TOADLET_KNOT,
 						"connect: error receiving connection packet");
 				}
 			}
@@ -176,7 +176,7 @@ bool PeerPacketConnection::accept(){
 	uint32 remoteIP=0;
 	int remotePort=0;
 
-	Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+	Logger::debug(Categories::TOADLET_KNOT,
 		String("accept: protocol ")+CONNECTION_PACKET);
 
 	bool result=false;
@@ -190,16 +190,16 @@ bool PeerPacketConnection::accept(){
 				amount=mSocket->receiveFrom(mInPacket->getOriginalDataPointer(),size,remoteIP,remotePort);
 			TOADLET_CATCH(const Exception &){}
 			if(amount>0){
-				Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+				Logger::debug(Categories::TOADLET_KNOT,
 					String("accept: received connection packet from:")+Socket::ipToString(remoteIP)+":"+remotePort);
 
 				if(verifyConnectionPacket(mDataInPacket)){
-					Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+					Logger::debug(Categories::TOADLET_KNOT,
 						"accept: verified connection packet");
 
 					amount=mSocket->sendTo(mOutPacket->getOriginalDataPointer(),size,remoteIP,remotePort);
 					if(amount>0){
-						Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+						Logger::debug(Categories::TOADLET_KNOT,
 							String("accept: sent connection packet to:")+Socket::ipToString(remoteIP)+":"+remotePort);
 
 						result=true;
@@ -207,14 +207,14 @@ bool PeerPacketConnection::accept(){
 					}
 				}
 				else{
-					Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+					Logger::alert(Categories::TOADLET_KNOT,
 						"accept: error verifying connection packet");
 				}
 
 				mInPacket->reset();
 			}
 			else{
-				Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+				Logger::alert(Categories::TOADLET_KNOT,
 					"accept: error receiving connection packet");
 			}
 
@@ -377,7 +377,7 @@ void PeerPacketConnection::output(){
 
 	mMutex->unlock();
 
-	Logger::log(Categories::TOADLET_KNOT,Logger::Level_ALERT,string);
+	Logger::alert(Categories::TOADLET_KNOT,string);
 }
 
 String PeerPacketConnection::toBinaryString(int n){
@@ -543,12 +543,12 @@ int PeerPacketConnection::sendPacketsToSocket(const toadlet::egg::Collection<Pee
 	for(i=0;i<numPackets;++i){frameNames=frameNames+packets[i]->getFrame()+",";}
 
 	if(mDebugDropNextPacket==false && (mDebugPacketDropAmount==0 || mDebugRandom.nextFloat(0,1)>mDebugPacketDropAmount)){
-		Logger::log(Categories::TOADLET_KNOT,Logger::Level_EXCESSIVE,String("sending frames : ")+frameNames+" size:"+mOutPacket->getSize());
+		Logger::excess(Categories::TOADLET_KNOT,String("sending frames : ")+frameNames+" size:"+mOutPacket->getSize());
 
 		amount=mSocket->send(mOutPacket->getOriginalDataPointer(),mOutPacket->getSize());
 	}
 	else{
-		Logger::log(Categories::TOADLET_KNOT,Logger::Level_EXCESSIVE,String("dropping frames: ")+frameNames);
+		Logger::excess(Categories::TOADLET_KNOT,String("dropping frames: ")+frameNames);
 
 		mDebugDropNextPacket=false;
 	}
@@ -596,7 +596,7 @@ int PeerPacketConnection::receivePacketsFromSocket(const toadlet::egg::Collectio
 		if(numPackets>0){
 			String frameNames;
 			for(i=0;i<numPackets;++i) frameNames=frameNames+packets[i]->getFrame()+",";
-			Logger::log(Categories::TOADLET_KNOT,Logger::Level_EXCESSIVE,String("receive frames : ")+frameNames);
+			Logger::excess(Categories::TOADLET_KNOT,String("receive frames : ")+frameNames);
 		}
 	#endif
 

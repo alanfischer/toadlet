@@ -261,7 +261,7 @@ DWORD D3D9VertexBuffer::getFVF(VertexFormat *vertexFormat,Collection<VertexEleme
 			texCoordCount++;
 		}
 		else{
-			Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ERROR,
+			Logger::error(Categories::TOADLET_PEEPER,
 				String("D3DVertexBuffer: Invalid vertex element:")+element.type+","+element.format);
 		}
 	}
@@ -297,7 +297,7 @@ DWORD D3D9VertexBuffer::getFVF(VertexFormat *vertexFormat,Collection<VertexEleme
 			break;
 		#endif
 		default:
-			Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ERROR,
+			Logger::error(Categories::TOADLET_PEEPER,
 				String("D3DVertexBuffer: Invalid tex coord number")+texCoordCount);
 	}
 

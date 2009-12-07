@@ -93,7 +93,7 @@ bool TPKGInputStreamFactory::init(InputStream::ptr inputStream){
 }
 
 InputStream::ptr TPKGInputStreamFactory::makeInputStream(const String &name){
-	Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_DEBUG,
+	Logger::debug(Categories::TOADLET_TADPOLE,
 		"Creating InputStream for "+name);
 
 	if(mInputStream==NULL){

@@ -103,6 +103,9 @@ public:
 	virtual void setScope(int scope);
 	inline int getScope() const{return mScope;}
 
+	virtual void setName(const egg::String &name);
+	inline const egg::String &getName() const{return mName;}
+
 	virtual void setAlignmentCalculation(bool xAxis,bool yAxis,bool zAxis);
 
 	virtual void setBoundingRadius(scalar boundingRadius);
@@ -152,6 +155,7 @@ protected:
 	Matrix3x3 mRotate;
 	Vector3 mScale;
 	int mScope;
+	egg::String mName;
 	bool mAlignXAxis,mAlignYAxis,mAlignZAxis;
 	scalar mBoundingRadius;
 	bool mReceiveUpdates;

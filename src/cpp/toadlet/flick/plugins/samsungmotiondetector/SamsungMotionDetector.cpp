@@ -58,7 +58,8 @@ SamsungMotionDetector::SamsungMotionDetector():
 {
 	mSensor=CreateFile(TILT_SENSOR,0,0,NULL,OPEN_EXISTING,0,NULL);
 
-	Logger::log(Categories::TOADLET_FLICK,Logger::Level_ALERT,String("SamsungMotionDetector:")+(mSensor!=INVALID_HANDLE_VALUE));
+	Logger::alert(Categories::TOADLET_FLICK,
+		String("SamsungMotionDetector:")+(mSensor!=INVALID_HANDLE_VALUE));
 }
 
 SamsungMotionDetector::~SamsungMotionDetector(){

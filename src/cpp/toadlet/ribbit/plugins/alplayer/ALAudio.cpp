@@ -301,7 +301,7 @@ void ALAudio::update(int dt){
 				TOADLET_CHECK_ALERROR("update::alBufferData");
 			}
 			if(total==0){
-				Logger::log(Categories::TOADLET_RIBBIT,Logger::Level_ERROR,
+				Logger::error(Categories::TOADLET_RIBBIT,
 					"bad audio stream");
 				return;
 			}

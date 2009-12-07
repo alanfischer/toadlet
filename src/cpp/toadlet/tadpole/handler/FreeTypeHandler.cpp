@@ -59,7 +59,7 @@ FreeTypeHandler::FreeTypeHandler(TextureManager *textureManager){
 
 FreeTypeHandler::~FreeTypeHandler(){
 	if(FT_Done_FreeType(mLibrary)){
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ERROR,
+		Logger::error(Categories::TOADLET_TADPOLE,
 			"FT_Done_FreeType failed");
 	}
 }

@@ -199,25 +199,25 @@ void Logger::addCompleteLogString(Category *category,Level level,const String &d
 
 		switch(level){
 			case Level_DISABLED:
-				prefix="LOGGER:   ";
+				prefix="LOGGER:  ";
 			break;
 			case Level_ERROR:
-				prefix="ERROR:    ";
+				prefix="ERROR:   ";
 			break;
 			case Level_WARNING:
-				prefix="WARNING:  ";
+				prefix="WARNING: ";
 			break;
 			case Level_ALERT:
-				prefix="ALERT:    ";
+				prefix="ALERT:   ";
 			break;
 			case Level_DEBUG:
-				prefix="DEBUG:    ";
+				prefix="DEBUG:   ";
 			break;
-			case Level_EXCESSIVE:
-				prefix="EXCESSIVE:";
+			case Level_EXCESS:
+				prefix="EXCESS:  ";
 			break;
 			default:
-				prefix="UNKNOWN:  ";
+				prefix="UNKNOWN: ";
 			break;
 		}
 

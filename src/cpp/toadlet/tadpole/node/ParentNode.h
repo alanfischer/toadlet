@@ -27,6 +27,7 @@
 #define TOADLET_TADPOLE_NODE_PARENTNODE_H
 
 #include <toadlet/egg/Collection.h>
+#include <toadlet/egg/Map.h>
 #include <toadlet/tadpole/node/Node.h>
 
 namespace toadlet{
@@ -54,10 +55,13 @@ public:
 
 	virtual void handleEvent(const egg::Event::ptr &event);
 
+	virtual void childRenamed(Node *node,const egg::String &oldName,const egg::String &newName);
+
 protected:
 	virtual void updateShadowChildren();
 
 	egg::Collection<Node::ptr> mChildren;
+	egg::Map<egg::String,Node*> mNamedChildren;
 
 	bool mShadowChildrenDirty;
 	egg::Collection<Node::ptr> mShadowChildren;
