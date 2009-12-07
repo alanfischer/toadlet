@@ -89,10 +89,6 @@ bool ParentNode::attach(Node *node){
 
 	mChildren.add(node);
 
-	if(node->getName()!=(char*)NULL){
-		childRenamed(node,NULL,node->getName());
-	}
-
 	node->parentChanged(this);
 
 	mShadowChildrenDirty=true;
@@ -108,10 +104,6 @@ bool ParentNode::remove(Node *node){
 	}
 	if(i>=0){
 		mChildren.removeAt(i);
-
-		if(node->getName()!=(char*)NULL){
-			childRenamed(node,node->getName(),NULL);
-		}
 
 		node->parentChanged(NULL);
 
@@ -132,23 +124,19 @@ void ParentNode::handleEvent(const Event::ptr &event){
 	}
 }
 
-void ParentNode::childRenamed(Node *node,const String &oldName,const String &newName){
-	Map<String,Node*>::iterator it;
-
-	if(oldName!=(char*)NULL){
-		it=mNamedChildren.find(oldName);
-		if(it!=mNamedChildren.end() && it->second==node){
-			mNamedChildren.erase(it);
+Node *ParentNode::findNodeByName(const String &name){
+	Node *node=super::findNodeByName(name);
+	if(node==NULL){
+		int numChildren=mShadowChildren.size();
+		int i;
+		for(i=0;i<numChildren;++i){
+			node=mShadowChildren[i]->findNodeByName(name);
+			if(node!=NULL){
+				return node;
+			}
 		}
 	}
-
-	if(newName!=(char*)NULL){
-		it=mNamedChildren.find(newName);
-		if(it!=mNamedChildren.end()){
-			Logger::warning("ParentNode: Multiple children of name: "+newName+"  Forgetting old child");
-		}
-		mNamedChildren[newName]=node;
-	}
+	return node;
 }
 
 void ParentNode::updateShadowChildren(){

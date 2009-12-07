@@ -197,11 +197,11 @@ void Node::setScope(int scope){
 }
 
 void Node::setName(const String &name){
-	if(mParent!=NULL){
-		mParent->childRenamed(this,mName,name);
-	}
-
 	mName=name;
+}
+
+Node *Node::findNodeByName(const String &name){
+	return (mName!=(char*)NULL && mName.equals(name))?this:NULL;
 }
 
 void Node::setAlignmentCalculation(bool xAxis,bool yAxis,bool zAxis){

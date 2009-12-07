@@ -55,13 +55,12 @@ public:
 
 	virtual void handleEvent(const egg::Event::ptr &event);
 
-	virtual void childRenamed(Node *node,const egg::String &oldName,const egg::String &newName);
+	virtual Node *findNodeByName(const egg::String &name);
 
 protected:
 	virtual void updateShadowChildren();
 
 	egg::Collection<Node::ptr> mChildren;
-	egg::Map<egg::String,Node*> mNamedChildren;
 
 	bool mShadowChildrenDirty;
 	egg::Collection<Node::ptr> mShadowChildren;
