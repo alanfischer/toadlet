@@ -105,6 +105,7 @@ public:
 
 	virtual void setName(const egg::String &name);
 	inline const egg::String &getName() const{return mName;}
+	virtual Node *findNodeByName(const egg::String &name);
 
 	virtual void setAlignmentCalculation(bool xAxis,bool yAxis,bool zAxis);
 
