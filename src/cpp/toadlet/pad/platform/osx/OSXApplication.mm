@@ -327,9 +327,13 @@ void OSXApplication::create(){
 }
 
 void OSXApplication::destroy(){
+	if(mEngine!=NULL){
+		mEngine->destroy()
+	}
+
 	deactivate();
 	destroyAudioPlayer();
-	
+
 	if(mEngine!=NULL){
 		delete mEngine;
 		mEngine=NULL;

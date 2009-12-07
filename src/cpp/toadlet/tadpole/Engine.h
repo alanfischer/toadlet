@@ -58,6 +58,8 @@ public:
 	Engine();
 	virtual ~Engine();
 
+	void destroy();
+
 	/// @todo: Remove the Scene in Engine completely.  I believe we only need it currently for some HopNode stuff.
 	///  This would let us have multiple Scenes in an application, pretty neat.
 	void setScene(const node::Scene::ptr &scene);

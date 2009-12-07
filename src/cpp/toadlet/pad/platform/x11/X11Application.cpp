@@ -117,6 +117,10 @@ void X11Application::destroy(){
 
 	mDestroyed=true;
 
+	if(mEngine!=NULL){
+		mEngine->destroy();
+	}
+
 	deactivate();
 	destroyWindow();
 	destroyAudioPlayer();

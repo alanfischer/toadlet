@@ -43,6 +43,8 @@ public:
 	ResourceManager(egg::io::InputStreamFactory *inputStreamFactory);
 	virtual ~ResourceManager();
 
+	virtual void destroy();
+
 	virtual void setInputStreamFactory(egg::io::InputStreamFactory *inputStreamFactory){mInputStreamFactory=inputStreamFactory;}
 
 	virtual egg::Resource::ptr get(const egg::String &name);

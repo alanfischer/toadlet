@@ -63,6 +63,7 @@ bool BackableIndexBuffer::create(int usageFlags,AccessType accessType,IndexForma
 void BackableIndexBuffer::destroy(){
 	if(mBack!=NULL){
 		mBack->destroy();
+		mBack=NULL;
 	}
 
 	if(mData!=NULL){

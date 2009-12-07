@@ -159,10 +159,7 @@ Engine::Engine():
 }
 
 Engine::~Engine(){
-	if(mScene!=NULL){
-		mScene->destroy();
-		mScene=NULL;
-	}
+	destroy();
 
 	if(mAudioBufferManager!=NULL){
 		delete mAudioBufferManager;
@@ -193,6 +190,20 @@ Engine::~Engine(){
 		delete mTextureManager;
 		mTextureManager=NULL;
 	}
+}
+
+void Engine::destroy(){
+	if(mScene!=NULL){
+		mScene->destroy();
+		mScene=NULL;
+	}
+
+	mAudioBufferManager->destroy();
+	mMeshManager->destroy();
+	mMaterialManager->destroy();
+	mFontManager->destroy();
+	mBufferManager->destroy();
+	mTextureManager->destroy();
 }
 
 void Engine::setScene(const Scene::ptr &scene){

@@ -63,6 +63,7 @@ bool BackableVertexBuffer::create(int usageFlags,AccessType accessType,VertexFor
 void BackableVertexBuffer::destroy(){
 	if(mBack!=NULL){
 		mBack->destroy();
+		mBack=NULL;
 	}
 
 	if(mData!=NULL){

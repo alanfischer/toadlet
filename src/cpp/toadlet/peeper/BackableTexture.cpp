@@ -84,6 +84,7 @@ bool BackableTexture::create(int usageFlags,Dimension dimension,int format,int w
 void BackableTexture::destroy(){
 	if(mBack!=NULL){
 		mBack->destroy();
+		mBack=NULL;
 	}
 
 	if(mData!=NULL){
