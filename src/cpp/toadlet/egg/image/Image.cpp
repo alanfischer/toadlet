@@ -80,9 +80,9 @@ bool Image::reallocate(Dimension dimension,int format,unsigned int width,unsigne
 		return false; 
 	}
 
-	if(dimension==Dimension_CUBEMAP && depth!=CubemapSide_MAX){
+	if(dimension==Dimension_CUBE && depth!=CubeSide_MAX){
 		Error::invalidParameters(Categories::TOADLET_EGG,
-			"Image::reallocate: Dimension_CUBEMAP not used with depth of MAX_CUBEMAP_SIDES");
+			"Image::reallocate: Dimension_CUBEMAP not used with depth of CubeSide_MAX");
 		return false; 
 	}
 

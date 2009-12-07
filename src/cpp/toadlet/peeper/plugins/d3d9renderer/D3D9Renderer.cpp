@@ -33,8 +33,6 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/LightEffect.h>
 #include <toadlet/peeper/Light.h>
-#include <toadlet/peeper/IndexBuffer.h>
-#include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/Viewport.h>
 
@@ -341,6 +339,32 @@ void D3D9Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Index
 	}
 }
 
+bool D3D9Renderer::copyToSurface(Surface *surface){
+	D3D9Surface *d3dsurface=(D3D9Surface*)surface->getRootSurface();
+
+	IDirect3DSurface9 *currentSurface=NULL;
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		mD3DDevice->GetRenderTarget(&currentSurface);
+	#else
+		mD3DDevice->GetRenderTarget(0,&currentSurface);
+	#endif
+
+	D3DSURFACE_DESC desc;
+	HRESULT result=currentSurface->GetDesc(&desc);
+	TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: GetDesc");
+
+	RECT rect={0};
+	rect.right=desc.Width<d3dsurface->mWidth?desc.Width:d3dsurface->mWidth;
+	rect.bottom=desc.Height<d3dsurface->mHeight?desc.Height:d3dsurface->mHeight;
+
+	result=mD3DDevice->StretchRect(currentSurface,&rect,d3dsurface->mSurface,&rect,D3DTEXF_NONE);
+	TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: StretchRect");
+
+	currentSurface->Release();
+
+	return true;
+}
+
 void D3D9Renderer::setDefaultStates(){
 	setAlphaTest(AlphaTest_NONE,0.5);
 	setBlend(Blend::Combination_DISABLED);
@@ -620,6 +644,9 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 		TextureStage::Calculation calculation=textureStage->calculation;
 		if(calculation!=TextureStage::Calculation_DISABLED){
 			if(calculation==TextureStage::Calculation_NORMAL){
+				// TODO: Get this working with 3D Texture coordinates.  Doesnt seem to currently
+				//  I have tried just switching to D3DTTFF_COUNT3, but nothing changed, I'm pretty sure it has
+				//  something to do with the setup of the cacheD3DMatrix below
 				result=mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT2);
 				TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
 
@@ -659,6 +686,12 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 				break;
 				case TextureBlend::Operation_MODULATE:
 					mode=D3DTOP_MODULATE;
+				break;
+				case TextureBlend::Operation_MODULATE_2X:
+					mode=D3DTOP_MODULATE2X;
+				break;
+				case TextureBlend::Operation_MODULATE_4X:
+					mode=D3DTOP_MODULATE4X;
 				break;
 				case TextureBlend::Operation_ADD:
 					mode=D3DTOP_ADD;
@@ -821,6 +854,11 @@ void D3D9Renderer::setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D
 		capabilitySet.textureNonPowerOf2Restricted=false;
 	#else
 		capabilitySet.textureNonPowerOf2Restricted=(caps.TextureCaps & D3DPTEXTURECAPS_NONPOW2CONDITIONAL)!=0;
+	#endif
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		capabilitySet.textureAutogenMipMaps=false;
+	#else
+		capabilitySet.textureAutogenMipMaps=(caps.Caps2 & D3DCAPS2_CANAUTOGENMIPMAP)!=0;
 	#endif
 	capabilitySet.renderToTexture=renderToTexture;
 	capabilitySet.renderToDepthTexture=renderToDepthTexture;

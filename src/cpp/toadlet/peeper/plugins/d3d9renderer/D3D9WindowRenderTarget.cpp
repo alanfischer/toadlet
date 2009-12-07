@@ -53,6 +53,7 @@ D3D9WindowRenderTarget::D3D9WindowRenderTarget(HWND wnd,const Visual &visual):D3
 	mD3DDevice(NULL),
 	mColorSurface(NULL),
 	mDepthSurface(NULL),
+	mWindow(0),
 	mWidth(0),
 	mHeight(0)
 {
@@ -105,17 +106,17 @@ void D3D9WindowRenderTarget::reset(){
 bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual){
 	HRESULT result;
 
-	mLibrary=LoadLibrary(TOADLET_D3D_DLL_NAME);
+	mLibrary=LoadLibrary(TOADLET_D3D9_DLL_NAME);
 	if(mLibrary==0){
 		Error::libraryNotFound(Categories::TOADLET_PEEPER,
-			String("D3D9RenderWindow: Error loading ")+TOADLET_D3D_DLL_NAME);
+			String("D3D9RenderWindow: Error loading ")+TOADLET_D3D9_DLL_NAME);
 		return false;
 	}
 
-	void *symbol=GetProcAddress(mLibrary,TOADLET_D3D_CREATE_NAME);
+	void *symbol=GetProcAddress(mLibrary,TOADLET_D3D9_CREATE_NAME);
 	if(symbol==NULL){
 		Error::symbolNotFound(Categories::TOADLET_PEEPER,
-			String("D3D9RenderWindow: Error finding ")+TOADLET_D3D_CREATE_NAME);
+			String("D3D9RenderWindow: Error finding ")+TOADLET_D3D9_CREATE_NAME);
 		return NULL;
 	}
 

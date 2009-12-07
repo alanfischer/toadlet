@@ -29,14 +29,16 @@
 namespace toadlet{
 namespace peeper{
 
-GLTextureMipSurface::GLTextureMipSurface(GLTexture *texture,GLuint level):GLSurface(),
+GLTextureMipSurface::GLTextureMipSurface(GLTexture *texture,GLuint level,GLuint cubeSide):GLSurface(),
 	mTexture(NULL),
 	mLevel(0),
+	mCubeSide(0),
 	mWidth(0),
 	mHeight(0)
 {
 	mTexture=texture;
 	mLevel=level;
+	mCubeSide=cubeSide;
 
 	int l=level;
 	int w=texture->getWidth(),h=texture->getHeight();
@@ -46,6 +48,19 @@ GLTextureMipSurface::GLTextureMipSurface(GLTexture *texture,GLuint level):GLSurf
 	}
 	mWidth=w;
 	mHeight=h;
+}
+
+GLuint GLTextureMipSurface::getHandle() const{
+	return mTexture->getHandle();
+}
+
+GLuint GLTextureMipSurface::getTarget() const{
+	#if !defined(TOADLET_HAS_GLES)
+		if(mTexture->getTarget()==GL_TEXTURE_CUBE_MAP){
+			return GLTexture::GLCubeFaces[mCubeSide];
+		}
+	#endif
+	return mTexture->getTarget();
 }
 
 }

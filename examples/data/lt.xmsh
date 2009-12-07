@@ -439,7 +439,7 @@ Type="Position,Normal,TexCoord,Bone">
 				<Scale>1.000000,1.000000,1.000000</Scale>
 			</KeyFrame>
 		</Track>
-		<Track Index="0">
+		<Track Index="1">
 			<KeyFrame Time="0.033325">
 				<Translate>0.052017,0.045197,0.791885</Translate>
 				<Rotate>0.000000,0.000000,0.000000,1.000000</Rotate>
@@ -481,7 +481,7 @@ Type="Position,Normal,TexCoord,Bone">
 				<Scale>1.000000,1.000000,1.000000</Scale>
 			</KeyFrame>
 		</Track>
-		<Track Index="0">
+		<Track Index="2">
 			<KeyFrame Time="0.033325">
 				<Translate>152.436737,0.004303,-15.258835</Translate>
 				<Rotate>0.707107,0.000000,0.000000,0.707107</Rotate>

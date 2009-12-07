@@ -23,8 +23,11 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "EAGLRenderContextPeer.h"
+#include "EAGLRenderTarget.h"
 #include <toadlet/egg/Error.h>
+#include <toadlet/peeper/Texture.h>
+
+#include "../../GLTexture.h"
 
 #import <QuartzCore/QuartzCore.h>
 
@@ -33,32 +36,26 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
-EAGLRenderContext::EAGLRenderContext():
+EAGLRenderTarget::EAGLRenderTarget():GLFBOSurfaceRenderTarget(NULL),
 	mDrawable(nil),
 	mContext(nil),
-
-	mRenderBuffer(0),
-	mFrameBuffer(0),
-	mDepthBuffer(0)
+	mRenderBufferHandle(0)
 {
 }
 
-EAGLRenderContext::EAGLRenderContext(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat):
+EAGLRenderTarget::EAGLRenderTarget(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat):GLFBOSurfaceRenderTarget(NULL),
 	mDrawable(nil),
 	mContext(nil),
-
-	mRenderBuffer(0),
-	mFrameBuffer(0),
-	mDepthBuffer(0)
+	mRenderBufferHandle(0)
 {
 	createContext(drawable,visual,colorFormat);
 }
 
-EAGLRenderContext::~EAGLRenderContext(){
+EAGLRenderTarget::~EAGLRenderTarget(){
 	destroyContext();
 }
 
-bool EAGLRenderContext::createContext(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat){
+bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat){
 	mDrawable=drawable;
 
 	mDrawable.drawableProperties=[NSDictionary dictionaryWithObjectsAndKeys:
@@ -83,29 +80,32 @@ bool EAGLRenderContext::createContext(CAEAGLLayer *drawable,const Visual &visual
 
 	int width=[drawable bounds].size.width;
 	int height=[drawable bounds].size.height;
-	int depthFormat=visual.depthBits!=0?GL_DEPTH_COMPONENT16:0;
-	
-	glGenRenderbuffers(1,&mRenderBuffer);
-	glBindRenderbuffer(GL_RENDERBUFFER,mRenderBuffer);
+
+	GLFBOSurfaceRenderTarget::create();
+
+	// Manually create the Color Renderbuffer for now
+	//  We could add another Renderbuffer storage function for EAGL in
+	//  GLFBORenderbufferSurface and then we could just make an instance
+	//  of that and attach it.
+	glGenRenderbuffers(1,&mRenderBufferHandle);
+	glBindRenderbuffer(GL_RENDERBUFFER,mRenderBufferHandle);
 	if(![mContext renderbufferStorage:GL_RENDERBUFFER fromDrawable:drawable]){
 		destroyContext();
 		return false;
 	}
+	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_RENDERBUFFER,mRenderBufferHandle);
 
-	glGenFramebuffers(1,&mFrameBuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER,mFrameBuffer);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_RENDERBUFFER,mRenderBuffer);
-	if(depthFormat!=0){
-		glGenRenderbuffers(1,&mDepthBuffer);
-		glBindRenderbuffer(GL_RENDERBUFFER,mDepthBuffer);
-		glRenderbufferStorage(GL_RENDERBUFFER,depthFormat,width,height);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_RENDERBUFFER,mDepthBuffer);
+	if(visual.depthBits!=0){
+		attach(createBufferSurface(Texture::Format_DEPTH_16,width,height),Attachment_DEPTH_STENCIL);
 	}
+
+	GLFBOSurfaceRenderTarget::makeCurrent();
 
 	return true;
 }
 
-bool EAGLRenderContext::destroyContext(){
+bool EAGLRenderTarget::destroyContext(){
 	if(mContext!=nil){
 		EAGLContext *oldContext=[EAGLContext currentContext];
 
@@ -113,19 +113,11 @@ bool EAGLRenderContext::destroyContext(){
 			[EAGLContext setCurrentContext:mContext];
 		}
 
-		if(mDepthBuffer!=0){
-			glDeleteRenderbuffers(1,&mDepthBuffer);
-			mDepthBuffer=0;
-		}
-
-		if(mRenderBuffer!=0){
-			glDeleteRenderbuffers(1,&mRenderBuffer);
-			mRenderBuffer=0;
-		}
-
-		if(mFrameBuffer!=0){
-			glDeleteFramebuffers(1,&mFrameBuffer);
-			mFrameBuffer=0;
+		GLFBOSurfaceRenderTarget::destroy();
+		
+		if(mRenderBufferHandle!=0){
+			glDeleteRenderbuffers(1,&mRenderBufferHandle);
+			mRenderBufferHandle=0;
 		}
 
 		if(oldContext!=mContext){
@@ -139,20 +131,20 @@ bool EAGLRenderContext::destroyContext(){
 	return true;
 }
 
-bool EAGLRenderContext::makeCurrent(){
+bool EAGLRenderTarget::makeCurrent(){
 	return [EAGLContext setCurrentContext:mContext];
 }
 
-bool EAGLRenderContextPeer::swap(){
-	glBindRenderbuffer(GL_RENDERBUFFER,mRenderBuffer);
+bool EAGLRenderTarget::swap(){
+	glBindRenderbuffer(GL_RENDERBUFFER,mRenderBufferHandle);
 	return [mContext presentRenderbuffer:GL_RENDERBUFFER];
 }
 
-int EAGLRenderContextPeer::getWidth() const{
+int EAGLRenderTarget::getWidth() const{
 	return [mDrawable bounds].size.width;
 }
 
-int EAGLRenderContextPeer::getHeight() const{
+int EAGLRenderTarget::getHeight() const{
 	return [mDrawable bounds].size.height;
 }
 

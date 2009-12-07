@@ -32,15 +32,15 @@ namespace toadlet{
 namespace egg{
 namespace image{
 
-class ImageFormatConversion:public ImageDefinitions{
+class TOADLET_API ImageFormatConversion:public ImageDefinitions{
 public:
 	static inline uint8 getRedBits(int format){
 		switch(format){
 			case Format_RGB_8:
 			case Format_RGBA_8:
 				return 8;
-			case Format_RGB_32:
-			case Format_RGBA_32:
+			case Format_RGB_F32:
+			case Format_RGBA_F32:
 				return 32;
 			case Format_RGB_5_6_5:
 			case Format_RGBA_5_5_5_1:
@@ -57,8 +57,8 @@ public:
 			case Format_RGB_8:
 			case Format_RGBA_8:
 				return 8;
-			case Format_RGB_32:
-			case Format_RGBA_32:
+			case Format_RGB_F32:
+			case Format_RGBA_F32:
 				return 32;
 			case Format_RGB_5_6_5:
 				return 6;
@@ -76,8 +76,8 @@ public:
 			case Format_RGB_8:
 			case Format_RGBA_8:
 				return 8;
-			case Format_RGB_32:
-			case Format_RGBA_32:
+			case Format_RGB_F32:
+			case Format_RGBA_F32:
 				return 32;
 			case Format_RGB_5_6_5:
 			case Format_RGBA_5_5_5_1:
@@ -95,9 +95,9 @@ public:
 			case Format_LA_8:
 			case Format_RGBA_8:
 				return 8;
-			case Format_A_32:
-			case Format_LA_32:
-			case Format_RGBA_32:
+			case Format_A_F32:
+			case Format_LA_F32:
+			case Format_RGBA_F32:
 				return 32;
 			case Format_RGBA_5_5_5_1:
 				return 1;
@@ -149,19 +149,21 @@ public:
 			case Format_RGBA_5_5_5_1:
 			case Format_RGBA_4_4_4_4:
 				return sizeof(uint16);
-			case Format_L_32:
-			case Format_A_32:
+			case Format_L_F32:
+			case Format_A_F32:
 				return sizeof(float);
-			case Format_LA_32:
+			case Format_LA_F32:
 				return sizeof(float)*2;
-			case Format_RGB_32:
+			case Format_RGB_F32:
 				return sizeof(float)*3;
-			case Format_RGBA_32:
+			case Format_RGBA_F32:
 				return sizeof(float)*4;
 			default:
 				return 0;
 		}
 	}
+
+	static bool convert(uint8 *src,int srcFormat,int srcRowPitch,int srcSlicePitch,uint8 *dst,int dstFormat,int dstRowPitch,int dstSlicePitch,int width,int height,int depth);
 };
 
 }

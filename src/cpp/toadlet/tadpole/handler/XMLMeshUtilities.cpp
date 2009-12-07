@@ -244,13 +244,15 @@ const char *MAP_NAMES[]={
 
 int MAX_MAP=8;
 
-Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,TextureManager *textureManager){
+Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,MaterialManager *materialManager,TextureManager *textureManager){
 	Material::ptr material(new Material());
 
 	const char *prop=mxmlElementGetAttr(node,"Name");
 	if(prop!=NULL){
 		material->setName(prop);
 	}
+
+	materialManager->manage(material);
 
 	mxml_node_t *lightEffectNode=mxmlFindChild(node,"LightEffect");
 	if(lightEffectNode!=NULL){
@@ -359,7 +361,7 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Textu
 			}
 
 			int type=MAX_MAP;
-			String file;
+			String textureName;
 			float amount;
 
 			const char *prop=mxmlElementGetAttr(mapNode,"Type");
@@ -378,8 +380,8 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Textu
 				if(fileNode!=NULL){
 					const char *data=mxmlGetOpaque(fileNode->child);
 					if(data!=NULL){
-						file=data;
-						file=file.trimLeft().trimRight();
+						textureName=data;
+						textureName=textureName.trimLeft().trimRight();
 					}
 				}
 
@@ -391,10 +393,25 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Textu
 					}
 				}
 
+				TextureStage::ptr textureStage(new TextureStage());
+				Texture::ptr texture;
 				if(textureManager!=NULL){
-					textureManager->cleanFilename(file);
-					material->setTextureStage(0,TextureStage::ptr(new TextureStage(textureManager->findTexture(file))));
+					textureManager->cleanFilename(textureName);
+					texture=textureManager->findTexture(textureName);
+					textureStage->setTexture(texture);
 				}
+				if(texture!=NULL){
+					textureStage->setTextureName(texture->getName());
+				}
+				else{
+					textureStage->setTextureName(textureName);
+				}
+
+				textureStage->setMinFilter(materialManager->getDefaultMinFilter());
+				textureStage->setMagFilter(materialManager->getDefaultMagFilter());
+				textureStage->setMipFilter(materialManager->getDefaultMipFilter());
+
+				material->setTextureStage(0,TextureStage::ptr(new TextureStage()));
 			}
 		}
 	}
@@ -427,6 +444,12 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Textu
 					}
 				}
 			}
+
+			textureStage->setMinFilter(materialManager->getDefaultMinFilter());
+			textureStage->setMagFilter(materialManager->getDefaultMagFilter());
+			textureStage->setMipFilter(materialManager->getDefaultMipFilter());
+
+			material->setTextureStage(0,textureStage);
 		}
 	}
 
@@ -794,7 +817,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 				}
 			}
 			else{
-				material=Material::ptr(loadMaterial(materialNode,version,textureManager));
+				material=Material::ptr(loadMaterial(materialNode,version,materialManager,textureManager));
 				material->setSaveLocally(true);
 			}
 

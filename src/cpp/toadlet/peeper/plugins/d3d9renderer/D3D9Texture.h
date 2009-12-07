@@ -37,7 +37,7 @@ namespace peeper{
 class D3D9Renderer;
 
 class TOADLET_API D3D9Texture:protected egg::BaseResource,public Texture{
-	TOADLET_BASERESOURCE_PASSTHROUGH();
+	TOADLET_BASERESOURCE_PASSTHROUGH(Texture);
 public:
 	D3D9Texture(D3D9Renderer *renderer);
 
@@ -48,6 +48,10 @@ public:
 	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels);
 	virtual void destroy();
 
+	virtual bool createContext();
+	virtual void destroyContext(bool backData);
+	virtual bool contextNeedsReset();
+
 	virtual int getUsageFlags() const{return mUsageFlags;}
 	virtual Dimension getDimension() const{return mDimension;}
 	virtual int getFormat() const{return mFormat;}
@@ -56,13 +60,14 @@ public:
 	virtual int getDepth() const{return mDepth;}
 	virtual int getNumMipLevels() const{return mTexture==NULL?0:mTexture->GetLevelCount();}
 
-	virtual Surface::ptr getMipSuface(int i) const;
-	virtual bool load(int format,int width,int height,int depth,uint8 *data);
-	virtual bool read(int format,int width,int height,int depth,uint8 *data);
+	virtual Surface::ptr getMipSurface(int level,int cubeSide);
+	virtual bool load(int format,int width,int height,int depth,int mipLevel,uint8 *data);
+	virtual bool read(int format,int width,int height,int depth,int mipLevel,uint8 *data);
 
 protected:
 	static bool isD3DFORMATValid(IDirect3D9 *d3d,D3DFORMAT adapterFormat,D3DFORMAT textureFormat,DWORD usage);
 
+	static int getClosestTextureFormat(int textureFormat);
 	static D3DFORMAT getD3DFORMAT(int textureFormat);
 	static DWORD getD3DTADDRESS(TextureStage::AddressMode addressMode);
 	static DWORD getD3DTEXF(TextureStage::Filter filter);
@@ -75,7 +80,9 @@ protected:
 	int mWidth;
 	int mHeight;
 	int mDepth;
+	int mMipLevels;
 
+	int mInternalFormat;
 	D3DFORMAT mD3DFormat;
 	DWORD mD3DUsage;
 	D3DPOOL mD3DPool;

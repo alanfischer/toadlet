@@ -34,7 +34,7 @@ namespace toadlet{
 namespace ribbit{
 
 class TOADLET_API Win32AudioBuffer:protected egg::BaseResource,public AudioBuffer{
-	TOADLET_BASERESOURCE_PASSTHROUGH();
+	TOADLET_BASERESOURCE_PASSTHROUGH(AudioBuffer);
 public:
 	Win32AudioBuffer(Win32Player *player);
 	virtual ~Win32AudioBuffer();

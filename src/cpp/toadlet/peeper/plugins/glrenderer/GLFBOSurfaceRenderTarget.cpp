@@ -25,6 +25,7 @@
 
 #include "GLFBOSurfaceRenderTarget.h"
 #include "GLTexture.h"
+#include "GLRenderer.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 
@@ -47,7 +48,8 @@ GLFBOSurfaceRenderTarget::GLFBOSurfaceRenderTarget(GLRenderer *renderer):GLRende
 	mRenderer(NULL),
 	mWidth(0),
 	mHeight(0),
-	mHandle(0)
+	mHandle(0),
+	mNeedsCompile(false)
 	//mSurfaces
 {
 	mRenderer=renderer;
@@ -60,17 +62,22 @@ GLFBOSurfaceRenderTarget::~GLFBOSurfaceRenderTarget(){
 bool GLFBOSurfaceRenderTarget::create(){
 	destroy();
 
+	mWidth=0;
+	mHeight=0;
+	mNeedsCompile=true;
+
 	glGenFramebuffers(1,&mHandle);
-	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 
 	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::create");
-
-	attach(this->createBufferSurface(Texture::Format_DEPTH_8,256,256),Attachment_DEPTH_STENCIL);
 
 	return true;
 }
 
 bool GLFBOSurfaceRenderTarget::destroy(){
+	if(mRenderer==NULL || mRenderer->getRenderTarget()->getRootRenderTarget()==(GLRenderTarget*)this){
+		glBindFramebuffer(GL_FRAMEBUFFER,0);
+	}
+
 	int i;
 	for(i=0;i<mOwnedSurfaces.size();++i){
 		mOwnedSurfaces[i]->destroy();
@@ -80,17 +87,21 @@ bool GLFBOSurfaceRenderTarget::destroy(){
 	if(mHandle!=0){
 		glDeleteFramebuffers(1,&mHandle);
 		mHandle=0;
-
-		TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::destroy");
 	}
+
+	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::destroy");
 
 	return true;
 }
 
 bool GLFBOSurfaceRenderTarget::makeCurrent(){
+	if(mNeedsCompile){
+		compile();
+	}
+
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 
-	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::current");
+	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::makeCurrent");
 
 	return true;
 }
@@ -111,9 +122,12 @@ bool GLFBOSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment
 
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	if(textureSurface!=NULL){
-		GLuint handle=textureSurface->getTexture()->getHandle();
-		GLenum target=textureSurface->getTexture()->getTarget();
+		GLTexture *texture=textureSurface->getTexture();
+		GLuint handle=textureSurface->getHandle();
+		GLenum target=textureSurface->getTarget();
 		GLuint level=textureSurface->getLevel();
+		mWidth=textureSurface->getWidth();
+		mHeight=textureSurface->getHeight();
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER,getGLAttachment(attachment),target,handle,level);
 		// TODO: Figure out EXACTLY when we need these and when we dont, I think we just need them if its ONLY a SHADOWMAP
@@ -121,23 +135,22 @@ bool GLFBOSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment
 			//glDrawBuffer(GL_NONE);
 			//glReadBuffer(GL_NONE);
 		#endif
+
+		Matrix4x4 matrix;
+		Math::setMatrix4x4FromScale(matrix,Math::ONE,-Math::ONE,Math::ONE);
+		Math::setMatrix4x4FromTranslate(matrix,0,Math::ONE,0);
+		texture->setMatrix(matrix);
 	}
 	else if(renderbufferSurface!=NULL){
 		GLuint handle=renderbufferSurface->getHandle();
 
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER,getGLAttachment(attachment),GL_RENDERBUFFER,handle);
 	}
-	
-	GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
-Logger::log("LOL!");
-	if(status!=GL_FRAMEBUFFER_COMPLETE){
-Logger::log("ga busted!");
-		Logger::log(Categories::TOADLET_PEEPER,Logger::Level_WARNING,getFBOMessage(status));
-	}
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 
 	mSurfaces.add(surface);
 	mSurfaceAttachments.add(attachment);
+	mNeedsCompile=true;
 
 	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::attach");
 
@@ -164,24 +177,54 @@ bool GLFBOSurfaceRenderTarget::remove(Surface::ptr surface){
 
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	if(textureSurface!=NULL){
-		glFramebufferTexture2D(GL_FRAMEBUFFER,getGLAttachment(attachment),0,0,0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER,getGLAttachment(attachment),GL_TEXTURE_2D,0,0);
 	}
 	else if(renderbufferSurface!=NULL){
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER,getGLAttachment(attachment),GL_RENDERBUFFER,0);
 	}
+	glBindFramebuffer(GL_FRAMEBUFFER,0);
 
+	mSurfaces.removeAt(i);
+	mSurfaceAttachments.removeAt(i);
+	mNeedsCompile=true;
+
+	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::remove");
+
+	return true;
+}
+
+// TODO: Make it check to see if a pre-existing self-created depth surface is compatible, and if not, destroy & recreate it
+bool GLFBOSurfaceRenderTarget::compile(){
+	Surface::ptr depth;
+	Surface::ptr color;
+
+	int i;
+	for(i=0;i<mSurfaceAttachments.size();++i){
+		if(mSurfaceAttachments[i]==Attachment_DEPTH_STENCIL){
+			depth=mSurfaces[i];
+		}
+		else{
+			color=mSurfaces[i];
+		}
+	}
+
+	if(color!=NULL && depth==NULL){
+		// No Depth-Stencil surface, so add one
+		attach(createBufferSurface(Texture::Format_DEPTH_16,mWidth,mHeight),Attachment_DEPTH_STENCIL);
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if(status!=GL_FRAMEBUFFER_COMPLETE){
 		Logger::log(Categories::TOADLET_PEEPER,Logger::Level_WARNING,getFBOMessage(status));
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 
-	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::remove");
+	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::compile");
 
-	mSurfaces.remove(i);
-	mSurfaceAttachments.remove(i);
+	mNeedsCompile=false;
 
-	return true;
+	return status==GL_FRAMEBUFFER_COMPLETE;
 }
 
 Surface::ptr GLFBOSurfaceRenderTarget::createBufferSurface(int format,int width,int height){
@@ -196,15 +239,17 @@ Surface::ptr GLFBOSurfaceRenderTarget::createBufferSurface(int format,int width,
 GLenum GLFBOSurfaceRenderTarget::getGLAttachment(Attachment attachment){
 	switch(attachment){
 		case Attachment_DEPTH_STENCIL:
-			return GL_DEPTH_ATTACHMENT_EXT;
+			return GL_DEPTH_ATTACHMENT;
 		case Attachment_COLOR_0:
-			return GL_COLOR_ATTACHMENT0_EXT;
-		case Attachment_COLOR_1:
-			return GL_COLOR_ATTACHMENT1_EXT;
-		case Attachment_COLOR_2:
-			return GL_COLOR_ATTACHMENT2_EXT;
-		case Attachment_COLOR_3:
-			return GL_COLOR_ATTACHMENT3_EXT;
+			return GL_COLOR_ATTACHMENT0;
+		#if !defined(TOADLET_HAS_EAGL)
+			case Attachment_COLOR_1:
+				return GL_COLOR_ATTACHMENT1;
+			case Attachment_COLOR_2:
+				return GL_COLOR_ATTACHMENT2;
+			case Attachment_COLOR_3:
+				return GL_COLOR_ATTACHMENT3;
+		#endif
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"GLFBOSurfaceRenderTarget::getGLAttachment: Invalid attachment");

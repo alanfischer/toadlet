@@ -10,11 +10,12 @@ set (TADPOLE_SRC
 	FontManager.cpp
 	KeyFrame.cpp
 	Material.cpp
-	TPKGInputStreamFactory.cpp
-	Track.cpp
-	ResourceManager.cpp
 	MaterialManager.cpp
 	MeshManager.cpp
+	Noise.cpp
+	ResourceManager.cpp
+	TPKGInputStreamFactory.cpp
+	Track.cpp
 	TextureManager.cpp
 	Version.cpp
 )
@@ -85,11 +86,12 @@ set (TADPOLE_HEADERS
 	FontManager.h
 	KeyFrame.h
 	Material.h
+	MaterialManager.h
+	MeshManager.h
+	Noise.h
 	ResourceHandler.h
 	ResourceHandlerData.h
 	ResourceManager.h
-	MaterialManager.h
-	MeshManager.h
 	TextureManager.h
 	TPKGInputStreamFactory.h
 	Track.h
@@ -185,56 +187,56 @@ set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_NODE_SRC} ${T
 set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_MESH_HEADERS})
 
 
-# Dependencies for toadlet_tadpole
-find_package (Freetype)
-find_package (MXML)
-
-
 # Setup dependecy specific files and libraries
-if (FREETYPE_FOUND)
-	set (TOADLET_HAS_FREETYPE ON PARENT_SCOPE)
-	include_directories (${FREETYPE_INCLUDE_DIRS})
-        source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_FREETYPE_SRC})
-        source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_FREETYPE_HEADERS})
-        set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_FREETYPE_SRC})
-        set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_FREETYPE_HEADERS})
+# Note the iphone build uses neither freetype or mxml
+if (NOT TOADLET_PLATFORM_IPHONE)
+	find_package (Freetype)
+	if (FREETYPE_FOUND)
+		set (TOADLET_HAS_FREETYPE ON PARENT_SCOPE)
+		include_directories (${FREETYPE_INCLUDE_DIRS})
+		source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_FREETYPE_SRC})
+		source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_FREETYPE_HEADERS})
+		set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_FREETYPE_SRC})
+		set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_FREETYPE_HEADERS})
 
-	# Libraries
-	set (TADPOLE_LIBS ${FREETYPE_LIBRARIES})
-	add_library (libfreetype_s STATIC IMPORTED)
-	if (TOADLET_PLATFORM_POSIX)
-		string (REPLACE ".so" ".a" FREETYPE_A ${FREETYPE_LIBRARY})
-		if (EXISTS ${FREETYPE_A})
-			set (FREETYPE_LIBRARY ${FREETYPE_A})
-		endif (EXISTS ${FREETYPE_A})
-	endif (TOADLET_PLATFORM_POSIX)
-	set_property (TARGET libfreetype_s PROPERTY IMPORTED_LOCATION ${FREETYPE_LIBRARY})
-	set (TADPOLE_DEFS_S TOADLET_LIBFREETYPE_NAME="${FREETYPE_LIBRARY}")
-	set (TADPOLE_LIBS_S libfreetype_s)
-endif (FREETYPE_FOUND)
-if (MXML_FOUND)
-        # Files
-        set (TOADLET_HAS_MXML ON PARENT_SCOPE)
-        include_directories (${MXML_INCLUDE_DIR})
-        source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_XML_SRC})
-        source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_XML_HEADERS})
-        set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_XML_SRC})
-        set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_XML_HEADERS})
+		# Libraries
+		set (TADPOLE_LIBS ${FREETYPE_LIBRARIES})
+		add_library (libfreetype_s STATIC IMPORTED)
+		if (TOADLET_PLATFORM_POSIX)
+			string (REPLACE ".so" ".a" FREETYPE_A ${FREETYPE_LIBRARY})
+			if (EXISTS ${FREETYPE_A})
+				set (FREETYPE_LIBRARY ${FREETYPE_A})
+			endif (EXISTS ${FREETYPE_A})
+		endif (TOADLET_PLATFORM_POSIX)
+		set_property (TARGET libfreetype_s PROPERTY IMPORTED_LOCATION ${FREETYPE_LIBRARY})
+		set (TADPOLE_DEFS_S TOADLET_LIBFREETYPE_NAME="${FREETYPE_LIBRARY}")
+		set (TADPOLE_LIBS_S libfreetype_s)
+	endif (FREETYPE_FOUND)
 
-        # Libraries
-        set (TADPOLE_LIBS ${TADPOLE_LIBS} ${MXML_LIBRARY})
-        add_library (libmxml_s STATIC IMPORTED)
-	if (TOADLET_PLATFORM_POSIX)
-		string (REPLACE ".so" ".a" MXML_A ${MXML_LIBRARY})
-		if (EXISTS ${MXML_A})
-			set (MXML_LIBRARY ${MXML_A})
-		endif (EXISTS ${MXML_A})
-	endif (TOADLET_PLATFORM_POSIX)
-        set_property (TARGET libmxml_s PROPERTY IMPORTED_LOCATION ${MXML_LIBRARY})
-        set (TADPOLE_DEFS_S ${TADPOLE_DEFS_S} TOADLET_LIBMXML_NAME="${MXML_LIBRARY}")
-        set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} libmxml_s)
-endif (MXML_FOUND)
+	find_package (MXML)
+	if (MXML_FOUND)
+		# Files
+		set (TOADLET_HAS_MXML ON PARENT_SCOPE)
+		include_directories (${MXML_INCLUDE_DIR})
+		source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_XML_SRC})
+		source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_XML_HEADERS})
+		set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_XML_SRC})
+		set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_XML_HEADERS})
 
+		# Libraries
+		set (TADPOLE_LIBS ${TADPOLE_LIBS} ${MXML_LIBRARY})
+		add_library (libmxml_s STATIC IMPORTED)
+		if (TOADLET_PLATFORM_POSIX)
+			string (REPLACE ".so" ".a" MXML_A ${MXML_LIBRARY})
+			if (EXISTS ${MXML_A})
+				set (MXML_LIBRARY ${MXML_A})
+			endif (EXISTS ${MXML_A})
+		endif (TOADLET_PLATFORM_POSIX)
+		set_property (TARGET libmxml_s PROPERTY IMPORTED_LOCATION ${MXML_LIBRARY})
+		set (TADPOLE_DEFS_S ${TADPOLE_DEFS_S} TOADLET_LIBMXML_NAME="${MXML_LIBRARY}")
+		set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} libmxml_s)
+	endif (MXML_FOUND)
+endif (NOT TOADLET_PLATFORM_IPHONE)
 
 # Platform specific files
 if (TOADLET_PLATFORM_OSX)

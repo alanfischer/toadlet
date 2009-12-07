@@ -53,7 +53,6 @@ String::String(){
 	mData=new stringchar[1];
 	mData[0]=0;
 	mLength=0;
-
 	mNarrowData=NULL;
 }
 
@@ -62,7 +61,6 @@ String::String(const char *text){
 		mLength=0;
 		mData=new stringchar[1];
 		mData[0]=0;
-
 		mNarrowData=NULL;
 
 		return;
@@ -72,8 +70,8 @@ String::String(const char *text){
 	mData=new stringchar[mLength+1];
 	stringchar *dest=mData;
 	while((*dest++=*text++)!=0);
-
 	mNarrowData=NULL;
+	update();
 }
 
 String::String(const unsigned char *text){
@@ -81,8 +79,8 @@ String::String(const unsigned char *text){
 		mLength=0;
 		mData=new stringchar[1];
 		mData[0]=0;
-
 		mNarrowData=NULL;
+		update();
 
 		return;
 	}
@@ -91,8 +89,8 @@ String::String(const unsigned char *text){
 	mData=new stringchar[mLength+1];
 	stringchar *dest=mData;
 	while((*dest++=*text++)!=0);
-
 	mNarrowData=NULL;
+	update();
 }
 
 void String::internal_String(const stringchar *text){
@@ -100,7 +98,6 @@ void String::internal_String(const stringchar *text){
 		mLength=0;
 		mData=new stringchar[1];
 		mData[0]=0;
-
 		mNarrowData=NULL;
 
 		return;
@@ -109,21 +106,19 @@ void String::internal_String(const stringchar *text){
 	mLength=wcslen((wchar_t*)text);
 	mData=new stringchar[mLength+1];
 	wcsncpy((wchar_t*)mData,(wchar_t*)text,mLength+1);
-
 	mNarrowData=NULL;
+	update();
 }
 
 String::String(int length){
 	mLength=length;
 	mData=new stringchar[mLength+1];
-
 	mNarrowData=NULL;
 }
 
 String::String(long int length){
 	mLength=length;
 	mData=new stringchar[mLength+1];
-
 	mNarrowData=NULL;
 }
 
@@ -131,8 +126,8 @@ String::String(const String &string){
 	mLength=string.mLength;
 	mData=new stringchar[mLength+1];
 	wcsncpy((wchar_t*)mData,(wchar_t*)string.mData,mLength+1);
-
 	mNarrowData=NULL;
+	update();
 }
 
 String::~String(){
@@ -412,6 +407,7 @@ const String &String::operator=(const String &string){
 	delete[] mData;
 	mData=new stringchar[mLength+1];
 	wcsncpy((wchar_t*)mData,(wchar_t*)string.mData,mLength+1);
+	update();
 	return *this;
 }
 
@@ -520,6 +516,7 @@ void String::operator+=(const String &string){
 	delete[] mData;
 	mData=data;
 	mLength=length;
+	update();
 }
 
 void String::operator+=(const char *text){
@@ -541,6 +538,7 @@ void String::operator+=(const char *text){
 	delete[] mData;
 	mData=data;
 	mLength=length;
+	update();
 }
 
 void String::internal_addassign(const stringchar *text){
@@ -561,6 +559,7 @@ void String::internal_addassign(const stringchar *text){
 	delete[] mData;
 	mData=data;
 	mLength=length;
+	update();
 }
 
 bool String::equals(const String &string) const{
@@ -622,6 +621,12 @@ void String::clearExtraData(){
 		delete[] mNarrowData;
 		mNarrowData=NULL;
 	}
+}
+
+void String::update(){
+	#if defined(TOADLET_DEBUG)
+		c_str();
+	#endif
 }
 
 String operator+(const char *text,const String &string){

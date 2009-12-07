@@ -295,7 +295,7 @@ public:
 		enableRendering=true;
 		enablePicking=true;
 		alphaFactor=255;
-		scope=4294967295; // -1 by default
+		scope=4294967295UL; // -1 by default
 		hasAlignment=false;
 		zTarget=0;
 		yTarget=0;

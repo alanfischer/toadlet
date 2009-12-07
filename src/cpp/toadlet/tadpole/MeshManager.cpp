@@ -122,10 +122,10 @@ Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded){
 		scalar quarter3=Math::ONE*3/4;
 
 		// Bottom
-		vba.set3(vi,0,-size,-size,-size); if(unfolded) vba.set2(vi,1, quarter, one);	else vba.set2(vi,1, one, one);	vi++;
-		vba.set3(vi,0, size,-size,-size); if(unfolded) vba.set2(vi,1, half, one);		else vba.set2(vi,1, 0, one);	vi++;
-		vba.set3(vi,0, size, size,-size); if(unfolded) vba.set2(vi,1, half, third2);	else vba.set2(vi,1, 0, 0);		vi++;
-		vba.set3(vi,0,-size, size,-size); if(unfolded) vba.set2(vi,1, quarter, third2);	else vba.set2(vi,1, one, 0);	vi++;
+		vba.set3(vi,0,-size,-size,-size); if(unfolded) vba.set2(vi,1, quarter, one);	else vba.set2(vi,1, 0, one);	vi++;
+		vba.set3(vi,0, size,-size,-size); if(unfolded) vba.set2(vi,1, half, one);		else vba.set2(vi,1, one, one);	vi++;
+		vba.set3(vi,0, size, size,-size); if(unfolded) vba.set2(vi,1, half, third2);	else vba.set2(vi,1, one, 0);	vi++;
+		vba.set3(vi,0,-size, size,-size); if(unfolded) vba.set2(vi,1, quarter, third2);	else vba.set2(vi,1, 0, 0);		vi++;
 
 		iba.set(ii++,1);		iba.set(ii++,0);		iba.set(ii++,2);
 		iba.set(ii++,3);		iba.set(ii++,2);		iba.set(ii++,0);

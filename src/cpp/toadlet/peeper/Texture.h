@@ -52,6 +52,10 @@ public:
 	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels)=0;
 	virtual void destroy()=0;
 
+	virtual bool createContext()=0;
+	virtual void destroyContext(bool backData)=0;
+	virtual bool contextNeedsReset()=0;
+
 	virtual int getUsageFlags() const=0;
 	virtual Dimension getDimension() const=0;
 	virtual int getFormat() const=0;
@@ -60,9 +64,9 @@ public:
 	virtual int getDepth() const=0;
 	virtual int getNumMipLevels() const=0;
 
-	virtual Surface::ptr getMipSuface(int i) const=0;
-	virtual bool load(int format,int width,int height,int depth,uint8 *data)=0;
-	virtual bool read(int format,int width,int height,int depth,uint8 *data)=0;
+	virtual Surface::ptr getMipSurface(int i,int cubeSide)=0;
+	virtual bool load(int format,int width,int height,int depth,int mipLevel,uint8 *data)=0;
+	virtual bool read(int format,int width,int height,int depth,int mipLevel,uint8 *data)=0;
 };
 
 }

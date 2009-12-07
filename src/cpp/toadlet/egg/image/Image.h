@@ -135,28 +135,28 @@ public:
 		int o=((z*mHeight*mWidth)+(y*mWidth)+x);
 
 		switch(mFormat){
-			case ImageFormatConversion::Format_RGBA_32:
+			case ImageFormatConversion::Format_RGBA_F32:
 				o*=4;
 				pixel.a=((float*)mData)[o+3];
 				pixel.b=((float*)mData)[o+2];
 				pixel.g=((float*)mData)[o+1];
 				pixel.r=((float*)mData)[o+0];
 			break;	
-			case ImageFormatConversion::Format_RGB_32:
+			case ImageFormatConversion::Format_RGB_F32:
 				o*=3;
 				pixel.b=((float*)mData)[o+2];
 				pixel.g=((float*)mData)[o+1];
 				pixel.r=((float*)mData)[o+0];
 			break;
-			case ImageFormatConversion::Format_LA_32:
+			case ImageFormatConversion::Format_LA_F32:
 				o*=2;
 				pixel.a=((float*)mData)[o+1];
 				pixel.r=((float*)mData)[o+0];
 			break;
-			case ImageFormatConversion::Format_L_32:
+			case ImageFormatConversion::Format_L_F32:
 				pixel.r=((float*)mData)[o+0];
 			break;
-			case ImageFormatConversion::Format_A_32:
+			case ImageFormatConversion::Format_A_F32:
 				pixel.a=((float*)mData)[o+0];
 			break;
 			default:
@@ -210,28 +210,28 @@ public:
 		int o=((z*mHeight*mWidth)+(y*mWidth)+x);
 
 		switch(mFormat){
-			case Format_RGBA_32:
+			case Format_RGBA_F32:
 				o*=4;
 				((float*)mData)[o+3]=pixel.a;
 				((float*)mData)[o+2]=pixel.b;
 				((float*)mData)[o+1]=pixel.g;
 				((float*)mData)[o+0]=pixel.r;
 			break;	
-			case Format_RGB_32:
+			case Format_RGB_F32:
 				o*=3;
 				((float*)mData)[o+2]=pixel.b;
 				((float*)mData)[o+1]=pixel.g;
 				((float*)mData)[o+0]=pixel.r;
 			break;
-			case Format_LA_32:
+			case Format_LA_F32:
 				o*=2;
 				((float*)mData)[o+1]=pixel.a;
 				((float*)mData)[o+0]=pixel.r;
 			break;
-			case Format_L_32:
+			case Format_L_F32:
 				((float*)mData)[o+0]=pixel.r;
 			break;
-			case Format_A_32:
+			case Format_A_F32:
 				((float*)mData)[o+0]=pixel.a;
 			break;
 			default:

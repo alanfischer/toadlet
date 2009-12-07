@@ -33,7 +33,7 @@ namespace toadlet{
 namespace peeper{
 
 class TOADLET_API BackableTexture:public egg::BaseResource,public Texture{
-	TOADLET_BASERESOURCE_PASSTHROUGH();
+	TOADLET_BASERESOURCE_PASSTHROUGH(Texture);
 public:
 	TOADLET_SHARED_POINTERS(BackableTexture);
 
@@ -45,6 +45,10 @@ public:
 	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels);
 	virtual void destroy();
 
+	virtual bool createContext(){return mBack->createContext();}
+	virtual void destroyContext(bool backData){mBack->destroyContext(backData);}
+	virtual bool contextNeedsReset(){return mBack->contextNeedsReset();}
+
 	virtual int getUsageFlags() const{return mUsageFlags;}
 	virtual Dimension getDimension() const{return mDimension;}
 	virtual int getFormat() const{return mFormat;}
@@ -53,9 +57,9 @@ public:
 	virtual int getDepth() const{return mDepth;}
 	virtual int getNumMipLevels() const{return mMipLevels;}
 
-	virtual Surface::ptr getMipSuface(int i) const;
-	virtual bool load(int format,int width,int height,int depth,uint8 *data);
-	virtual bool read(int format,int width,int height,int depth,uint8 *data);
+	virtual Surface::ptr getMipSurface(int level,int cubeSide);
+	virtual bool load(int format,int width,int height,int depth,int mipLevel,uint8 *data);
+	virtual bool read(int format,int width,int height,int depth,int mipLevel,uint8 *data);
 
 	virtual void setBack(Texture::ptr back,bool initial=false);
 	virtual Texture::ptr getBack(){return mBack;}

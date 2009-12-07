@@ -36,7 +36,8 @@ namespace peeper{
 D3D9SurfaceRenderTarget::D3D9SurfaceRenderTarget(D3D9Renderer *renderer):D3D9RenderTarget(),
 	mRenderer(NULL),
 	mWidth(0),
-	mHeight(0)
+	mHeight(0),
+	mNeedsCompile(false)
 	//mSurfaces,
 	//mSurfaceAttachments,
 	//mOwnedSurfaces
@@ -49,7 +50,11 @@ D3D9SurfaceRenderTarget::~D3D9SurfaceRenderTarget(){
 }
 
 bool D3D9SurfaceRenderTarget::create(){
-	attach(this->createBufferSurface(Texture::Format_DEPTH_8,256,256),Attachment_DEPTH_STENCIL);
+	destroy();
+
+	mWidth=0;
+	mHeight=0;
+	mNeedsCompile=true;
 
 	return true;
 }
@@ -65,6 +70,10 @@ bool D3D9SurfaceRenderTarget::destroy(){
 }
 
 bool D3D9SurfaceRenderTarget::makeCurrent(IDirect3DDevice9 *device){
+	if(mNeedsCompile){
+		compile();
+	}
+
 	bool result=false;
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 		if(mSurfaces.size()>=2 && mSurfaces[0]!=NULL && mSurfaces[1]!=NULL){
@@ -109,6 +118,7 @@ bool D3D9SurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment)
 
 	mWidth=surface->getWidth();
 	mHeight=surface->getHeight();
+	mNeedsCompile=true;
 
 	return true;
 }
@@ -126,6 +136,31 @@ bool D3D9SurfaceRenderTarget::remove(Surface::ptr surface){
 
 	mSurfaces.remove(i);
 	mSurfaceAttachments.remove(i);
+	mNeedsCompile=true;
+
+	return true;
+}
+
+bool D3D9SurfaceRenderTarget::compile(){
+	Surface::ptr depth;
+	Surface::ptr color;
+
+	int i;
+	for(i=0;i<mSurfaceAttachments.size();++i){
+		if(mSurfaceAttachments[i]==Attachment_DEPTH_STENCIL){
+			depth=mSurfaces[i];
+		}
+		else{
+			color=mSurfaces[i];
+		}
+	}
+
+	if(color!=NULL && depth==NULL){
+		// No Depth-Stencil surface, so add one
+		attach(createBufferSurface(Texture::Format_DEPTH_8,mWidth,mHeight),Attachment_DEPTH_STENCIL);
+	}
+
+	mNeedsCompile=false;
 
 	return true;
 }

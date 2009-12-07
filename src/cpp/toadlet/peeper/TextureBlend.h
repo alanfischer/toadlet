@@ -38,6 +38,8 @@ public:
 		Operation_REPLACE,
 		Operation_ADD,
 		Operation_MODULATE,
+		Operation_MODULATE_2X,
+		Operation_MODULATE_4X,
 		Operation_DOTPRODUCT,
 	};
 

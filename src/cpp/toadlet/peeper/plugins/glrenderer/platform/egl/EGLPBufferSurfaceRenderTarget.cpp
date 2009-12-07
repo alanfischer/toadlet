@@ -47,13 +47,15 @@ bool EGLPBufferSurfaceRenderTarget::available(GLRenderer *renderer){
 
 EGLPBufferSurfaceRenderTarget::EGLPBufferSurfaceRenderTarget(GLRenderer *renderer):EGLRenderTarget(),
 	mRenderer(NULL),
+	mCopy(false),
 	mTexture(NULL),
 	mWidth(0),
 	mHeight(0),
 	mBound(false),
 	mInitialized(false)
 {
-	egl_version=((EGLRenderTarget*)renderer->getPrimaryRenderTarget()->getRootRenderTarget())->egl_version;
+	mRenderer=renderer;
+	egl_version=((EGLRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->egl_version;
 }
 
 EGLPBufferSurfaceRenderTarget::~EGLPBufferSurfaceRenderTarget(){
@@ -61,30 +63,23 @@ EGLPBufferSurfaceRenderTarget::~EGLPBufferSurfaceRenderTarget(){
 }
 
 bool EGLPBufferSurfaceRenderTarget::create(){
-	// Nothing yet, all done after an attach
+	mCopy=true;
+	mWidth=0;
+	mHeight=0;
+	mBound=false;
+	mInitialized=false;
+
 	return true;
 }
 
 bool EGLPBufferSurfaceRenderTarget::destroy(){
 	destroyBuffer();
 
-	if(mBound){
-		mBound=false;
-		eglReleaseTexImage(mDisplay,mSurface,EGL_BACK_BUFFER);
-		TOADLET_CHECK_EGLERROR("eglReleaseTexImage");
-	}
-
-	mInitialized=false;
-
 	return true;
 }
 
 bool EGLPBufferSurfaceRenderTarget::makeCurrent(){
-	if(mBound){
-		mBound=false;
-		eglReleaseTexImage(mDisplay,mSurface,EGL_BACK_BUFFER);
-		TOADLET_CHECK_EGLERROR("eglReleaseTexImage");
-	}
+	unbind();
 
 	EGLRenderTarget::makeCurrent();
 
@@ -97,19 +92,11 @@ bool EGLPBufferSurfaceRenderTarget::makeCurrent(){
 }
 
 bool EGLPBufferSurfaceRenderTarget::swap(){
-	if(mBound==false){
-		mBound=true;
-		glBindTexture(mTexture->getTarget(),mTexture->getHandle());
-		eglBindTexImage(mDisplay,mSurface,EGL_BACK_BUFFER);
-		TOADLET_CHECK_EGLERROR("eglBindTexImage");
-	}
+	glFlush();
+
+	bind();
 
 	return true;
-}
-
-bool EGLPBufferSurfaceRenderTarget::remove(Surface::ptr surface){
-	// Unimplemented currently
-	return false;
 }
 
 bool EGLPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
@@ -122,7 +109,31 @@ bool EGLPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attac
 		return false;
 	}
 
-	createBuffer();
+	compile();
+
+	return true;
+}
+
+bool EGLPBufferSurfaceRenderTarget::remove(Surface::ptr surface){
+	mTexture=NULL;
+
+	compile();
+
+	return false;
+}
+
+bool EGLPBufferSurfaceRenderTarget::compile(){
+	if(mTexture!=NULL){
+		createBuffer();
+
+		Matrix4x4 matrix;
+		Math::setMatrix4x4FromScale(matrix,Math::ONE,-Math::ONE,Math::ONE);
+		Math::setMatrix4x4FromTranslate(matrix,0,Math::ONE,0);
+		mTexture->setMatrix(matrix);
+	}
+	else{
+		destroyBuffer();
+	}
 
 	return true;
 }
@@ -199,25 +210,53 @@ bool EGLPBufferSurfaceRenderTarget::createBuffer(){
 }
 
 bool EGLPBufferSurfaceRenderTarget::destroyBuffer(){
-	if(eglMakeCurrent==NULL){
-		return true;
-	}
+	unbind();
 
 	if(mDisplay!=EGL_NO_DISPLAY){
-		eglMakeCurrent(mDisplay,EGL_NO_SURFACE,EGL_NO_SURFACE,EGL_NO_CONTEXT);
+		if(mContext==eglGetCurrentContext()){
+			((GLRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->makeCurrent();
+		}
 
 		if(mContext!=EGL_NO_CONTEXT){
 			eglDestroyContext(mDisplay,mContext);
+			TOADLET_CHECK_EGLERROR("eglDestroyContext");
 			mContext=EGL_NO_CONTEXT;
 		}
 
 		if(mSurface!=EGL_NO_SURFACE){
 			eglDestroySurface(mDisplay,mSurface);
+			TOADLET_CHECK_EGLERROR("eglDestroySurface");
 			mSurface=EGL_NO_SURFACE;
 		}
 	}
 
 	return true;
+}
+
+void EGLPBufferSurfaceRenderTarget::bind(){
+	if(mBound==false){
+		mBound=true;
+		glBindTexture(mTexture->getTarget(),mTexture->getHandle());
+		TOADLET_CHECK_GLERROR("glBindTexture");
+		if(mCopy){
+			glCopyTexSubImage2D(mTexture->getTarget(),0,0,0,0,0,mWidth,mHeight);
+			TOADLET_CHECK_GLERROR("glBindTexture");
+		}
+		else{
+			eglBindTexImage(mDisplay,mSurface,EGL_BACK_BUFFER);
+			TOADLET_CHECK_EGLERROR("eglBindTexImage");
+		}
+	}
+}
+
+void EGLPBufferSurfaceRenderTarget::unbind(){
+	if(mBound==true){
+		mBound=false;
+		if(mCopy==false){
+			eglReleaseTexImage(mDisplay,mSurface,EGL_BACK_BUFFER);
+			TOADLET_CHECK_EGLERROR("eglReleaseTexImage");
+		}
+	}
 }
 
 }

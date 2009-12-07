@@ -23,9 +23,10 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/peeper/BackableTexture.h>
+#include <toadlet/peeper/CapabilitySet.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/peeper/BackableTexture.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
@@ -39,17 +40,55 @@ TextureManager::TextureManager(Engine *engine):ResourceManager(engine){
 	mEngine=engine;
 }
 
-Texture::ptr TextureManager::createTexture(const Image::ptr &image){
+Texture::ptr TextureManager::createTexture(const Image::ptr &image,int usageFlags,int mipLevels){
+	bool hasAutogen=mEngine->getRenderer()->getCapabilitySet().textureAutogenMipMaps;
+	bool wantsAutogen=(usageFlags&Texture::UsageFlags_AUTOGEN_MIPMAPS)>0;
+
+	if(hasAutogen==false && wantsAutogen==true){
+		usageFlags&=~Texture::UsageFlags_AUTOGEN_MIPMAPS;
+
+		if(mipLevels==0){
+			int hwidth=image->getWidth(),hheight=image->getHeight();
+			while(hwidth>0 && hheight>0){
+				mipLevels++;
+				hwidth/=2; hheight/=2;
+			}
+		}
+	}
+
 	BackableTexture::ptr texture(new BackableTexture());
-	texture->create(Texture::UsageFlags_AUTOGEN_MIPMAPS,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0);
+	texture->create(usageFlags,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),mipLevels);
 	if(mEngine->getRenderer()!=NULL){
 		Texture::ptr back(mEngine->getRenderer()->createTexture());
-		back->create(Texture::UsageFlags_AUTOGEN_MIPMAPS,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0);
+		back->create(usageFlags,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),mipLevels);
 		texture->setBack(back,true);
 	}
 	mBackableTexturesToLoad.add(texture);
 
-	texture->load(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),image->getData());
+	texture->load(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0,image->getData());
+	if(hasAutogen==false && wantsAutogen==true){
+		int mipLevels=texture->getNumMipLevels();
+		int width=image->getWidth(),height=image->getHeight();
+		int hwidth=width,hheight=height;
+		int i;
+		for(i=1;i<mipLevels;++i){
+			hwidth/=2; hheight/=2;
+			int xoff=width/(hwidth+1),yoff=height/(hheight+1);
+
+			Image::ptr mipImage(new Image(image->getDimension(),image->getFormat(),hwidth,hheight,image->getDepth()));
+
+			Pixel<uint8> pixel;
+			int x,y;
+			for(x=0;x<hwidth;++x){
+				for(y=0;y<hheight;++y){
+					image->getPixel(pixel,xoff+x*(1<<i),yoff+y*(1<<i));
+					mipImage->setPixel(pixel,x,y);
+				}
+			}
+
+			texture->load(mipImage->getFormat(),mipImage->getWidth(),mipImage->getHeight(),mipImage->getDepth(),i,mipImage->getData());
+		}
+	}
 
 	manage(shared_static_cast<Texture>(texture));
 
@@ -62,7 +101,7 @@ Texture::ptr TextureManager::createTexture(int usageFlags,Texture::Dimension dim
 	if(mEngine->getRenderer()!=NULL){
 		Texture::ptr back(mEngine->getRenderer()->createTexture());
 		back->create(usageFlags,dimension,format,width,height,depth,mipLevels);
-		texture->setBack(back);
+		texture->setBack(back,true);
 	}
 	mBackableTexturesToLoad.add(texture);
 
@@ -73,8 +112,20 @@ Texture::ptr TextureManager::createTexture(int usageFlags,Texture::Dimension dim
 
 Image::ptr TextureManager::createImage(const Texture::ptr &texture){
 	Image::ptr image(new Image(texture->getDimension(),texture->getFormat(),texture->getWidth(),texture->getHeight(),texture->getDepth()));
-	texture->read(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),image->getData());
+	texture->read(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0,image->getData());
 	return image;
+}
+
+SurfaceRenderTarget::ptr TextureManager::createSurfaceRenderTarget(){
+	// TODO: Make this use a BackableSufaceRenderTarget
+	if(mEngine->getRenderer()!=NULL){
+		SurfaceRenderTarget::ptr back(mEngine->getRenderer()->createSurfaceRenderTarget());
+		if(back!=NULL){
+			back->create();
+		}
+		return back;
+	}
+	return NULL;
 }
 
 void TextureManager::contextActivate(peeper::Renderer *renderer){
@@ -88,6 +139,7 @@ void TextureManager::contextActivate(peeper::Renderer *renderer){
 		}
 		else{
 			// TODO: move createContext to Texture so it can be called from here
+			// Likewise fix BufferManager so it is aware of both Backable & NonBackable items
 		}
 	}
 }
@@ -101,6 +153,7 @@ void TextureManager::contextDeactivate(peeper::Renderer *renderer){
 		}
 		else{
 			// TODO: move destroyContext to Texture so it can be called from here
+			// Likewise fix BufferManager so it is aware of both Backable & NonBackable items
 		}
 	}
 }
@@ -119,9 +172,23 @@ void TextureManager::contextUpdate(peeper::Renderer *renderer){
 }
 
 void TextureManager::preContextReset(peeper::Renderer *renderer){
+	int i;
+	for(i=0;i<mResources.size();++i){
+		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
+		if(texture->contextNeedsReset()){
+			texture->destroyContext(true);
+		}
+	}
 }
 
 void TextureManager::postContextReset(peeper::Renderer *renderer){
+	int i;
+	for(i=0;i<mResources.size();++i){
+		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
+		if(texture->contextNeedsReset()){
+			texture->createContext();
+		}
+	}
 }
 
 }

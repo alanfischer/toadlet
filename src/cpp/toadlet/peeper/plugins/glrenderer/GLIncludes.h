@@ -73,12 +73,15 @@
 	extern "C" {
 		#include <GL/glew.h>
 		#if defined(TOADLET_PLATFORM_WIN32)
+			#define TOADLET_HAS_WGL
 			#include <GL/wglew.h>
 			#include <GL/gl.h>
 		#elif defined(TOADLET_PLATFORM_OSX)
+			#define TOADLET_HAS_NSGL
 			#include <OpenGL/OpenGL.h>
 			#include <AGL/agl.h>
 		#elif defined(TOADLET_PLATFORM_POSIX)
+			#define TOADLET_HAS_GLX
 			#include <GL/glxew.h>
 			#include <GL/gl.h>
 		#else
@@ -151,12 +154,21 @@
 	#define GL_FRAMEBUFFER_INCOMPLETE_FORMATS GL_FRAMEBUFFER_INCOMPLETE_FORMATS_OES
 	#define GL_POINT_SPRITE GL_POINT_SPRITE_OES
 	#define GL_COORD_REPLACE GL_COORD_REPLACE_OES
-#else
+#elif !defined(TOADLET_HAS_GLES)
 	#ifndef GL_RENDERBUFFER
 		#define GL_RENDERBUFFER GL_RENDERBUFFER_EXT
 	#endif
 	#ifndef GL_COLOR_ATTACHMENT0
 		#define GL_COLOR_ATTACHMENT0 GL_COLOR_ATTACHMENT0_EXT
+	#endif
+	#ifndef GL_COLOR_ATTACHMENT1
+		#define GL_COLOR_ATTACHMENT1 GL_COLOR_ATTACHMENT1_EXT
+	#endif
+	#ifndef GL_COLOR_ATTACHMENT2
+		#define GL_COLOR_ATTACHMENT2 GL_COLOR_ATTACHMENT2_EXT
+	#endif
+	#ifndef GL_COLOR_ATTACHMENT3
+		#define GL_COLOR_ATTACHMENT3 GL_COLOR_ATTACHMENT3_EXT
 	#endif
 	#ifndef GL_DEPTH_ATTACHMENT
 		#define GL_DEPTH_ATTACHMENT GL_DEPTH_ATTACHMENT_EXT
@@ -250,6 +262,16 @@
 #else
 	#define TOADLET_CHECK_EGLERROR(function)
 #endif
-	
+
+#if defined(TOADLET_HAS_WGL) && defined(TOADLET_DEBUG)
+	#define TOADLET_CHECK_WGLERROR(function) \
+		{ int error=GetLastError(); \
+		if(error!=0) \
+			toadlet::egg::Logger::log(toadlet::egg::Categories::TOADLET_PEEPER,toadlet::egg::Logger::Level_ALERT, \
+				toadlet::egg::String("WGL Error in ") + function + ": error=" + error); }
+#else
+	#define TOADLET_CHECK_WGLERROR(function)
+#endif
+
 #endif
 
