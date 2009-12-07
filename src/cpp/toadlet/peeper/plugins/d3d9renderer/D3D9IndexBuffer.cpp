@@ -211,7 +211,7 @@ D3DFORMAT D3D9IndexBuffer::getD3DFORMAT(IndexFormat format){
 			d3dFormat=D3DFMT_INDEX32;
 		break;
 		default:
-			Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ERROR,
+			Logger::error(Categories::TOADLET_PEEPER,
 				"D3D9IndexBuffer::getD3DFORMAT: Invalid format");
 			return (D3DFORMAT)0;
 		break;

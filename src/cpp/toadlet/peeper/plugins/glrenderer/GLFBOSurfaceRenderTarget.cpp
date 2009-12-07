@@ -216,7 +216,7 @@ bool GLFBOSurfaceRenderTarget::compile(){
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if(status!=GL_FRAMEBUFFER_COMPLETE){
-		Logger::log(Categories::TOADLET_PEEPER,Logger::Level_WARNING,getFBOMessage(status));
+		Logger::warning(Categories::TOADLET_PEEPER,getFBOMessage(status));
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 

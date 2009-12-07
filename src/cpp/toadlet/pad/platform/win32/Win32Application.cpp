@@ -590,7 +590,7 @@ bool Win32Application::createContextAndRenderer(int plugin){
 		return false;
 	}
 
-	Logger::log(Categories::TOADLET_PAD,Logger::Level_DEBUG,
+	Logger::debug(Categories::TOADLET_PAD,
 		"Win32Application: creating context and renderer");
 
 	RenderTarget *renderTarget=makeRenderTarget(plugin);
@@ -633,7 +633,7 @@ bool Win32Application::createContextAndRenderer(int plugin){
 }
 
 bool Win32Application::destroyRendererAndContext(){
-	Logger::log(Categories::TOADLET_PAD,Logger::Level_DEBUG,
+	Logger::debug(Categories::TOADLET_PAD,
 		"Win32Application: destroying context and renderer");
 
 	if(mRenderer!=NULL){

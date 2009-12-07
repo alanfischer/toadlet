@@ -95,7 +95,7 @@ ALPlayer::~ALPlayer(){
 }
 
 bool ALPlayer::create(int *options){
-	Logger::log(Categories::TOADLET_RIBBIT,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_RIBBIT,
 		"creating ALPlayer");
 
 	if(options!=NULL){
@@ -104,7 +104,7 @@ bool ALPlayer::create(int *options){
 			switch(options[i++]){
 				case Option_FADE_IN_BUFFER_TIME:
 					mBufferFadeInTime=options[i++];
-					Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+					Logger::alert(Categories::TOADLET_PEEPER,
 						String("Setting BufferFadeInTime to:")+mBufferFadeInTime);
 					break;
 			}
@@ -122,7 +122,7 @@ bool ALPlayer::create(int *options){
 		}
 
 		int alemAcceleratedResult=alem_getAccelerated();
-		Logger::log(Categories::TOADLET_RIBBIT,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_RIBBIT,
 			String("alem_getAccelerated result:")+alemAcceleratedResult);
 	#endif
 
@@ -138,7 +138,7 @@ bool ALPlayer::create(int *options){
 
 	toadlet_alBufferDataStatic=(proc_alBufferDataStatic)alcGetProcAddress(mDevice,(ALCchar*)"alBufferDataStatic");
 	if(toadlet_alBufferDataStatic!=NULL){
-		Logger::log(Categories::TOADLET_RIBBIT,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_RIBBIT,
 			"using alBufferDataStatic extension");
 	}
 
@@ -193,21 +193,21 @@ bool ALPlayer::create(int *options){
 	}
 	TOADLET_CHECK_ALERROR("Initialize sources");
 
-	Logger::log(Categories::TOADLET_RIBBIT,Logger::Level_DEBUG,
+	Logger::debug(Categories::TOADLET_RIBBIT,
 		"starting thread");
 
 	mStopThread=false;
 	mThread=new Thread(this);
 	mThread->start();
 
-	Logger::log(Categories::TOADLET_RIBBIT,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_RIBBIT,
 		"created ALPlayer");
 
 	return true;
 }
 
 bool ALPlayer::destroy(){
-	Logger::log(Categories::TOADLET_RIBBIT,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_RIBBIT,
 		"shutingdown ALPlayer");
 
 	mStopThread=true;
@@ -244,7 +244,7 @@ bool ALPlayer::destroy(){
 		mDevice=NULL;
 	}
 
-	Logger::log(Categories::TOADLET_RIBBIT,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_RIBBIT,
 		"shutdown ALPlayer");
 
 	return true;

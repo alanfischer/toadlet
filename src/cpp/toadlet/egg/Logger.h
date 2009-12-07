@@ -32,6 +32,15 @@
 #if !defined(TOADLET_NO_THREADS)
 	#include <toadlet/egg/Mutex.h>
 #endif
+#define TOADLET_MAKE_LOGGER_FUNCTION(name,level) \
+	static void name(const String &description){name(NULL,description);} \
+	static void name(const String &categoryName,const String &description){ \
+		Logger *instance=getInstance(); \
+		if(level>Level_MAX) ; \
+		else if(level<=instance->getMasterReportingLevel() && level<=instance->getCategoryReportingLevel(categoryName)){ \
+			instance->addLogString(categoryName,level,description); \
+		} \
+	}
 
 namespace toadlet{
 namespace egg{
@@ -50,7 +59,7 @@ public:
 		Level_WARNING,
 		Level_ALERT,
 		Level_DEBUG,
-		Level_EXCESSIVE,
+		Level_EXCESS,
 
 		Level_MAX,
 	};
@@ -70,28 +79,11 @@ public:
 	static Logger *getInstance();
 	static void destroy();
 
-	// Write message to Logger instance
-	static void log(const String &categoryName,Level level,const String &message){
-		if(level>Level_MAX) ;
-		else if(level<=getInstance()->getMasterReportingLevel() && level<=getInstance()->getCategoryReportingLevel(categoryName)){
-			getInstance()->addLogString(categoryName,level,message);
-		}
-	}
-
-	static void log(Level level,const String &message){
-		if(level>Level_MAX) ;
-		else if(level<=getInstance()->getMasterReportingLevel()){
-			getInstance()->addLogString(level,message);
-		}
-	}
-
-	static void log(const String &message){
-		Level level=Level_ALERT;
-		if(level>Level_MAX) ;
-		else if(level<=getInstance()->getMasterReportingLevel()){
-			getInstance()->addLogString(level,message);
-		}
-	}
+	TOADLET_MAKE_LOGGER_FUNCTION(error,Level_ERROR);
+	TOADLET_MAKE_LOGGER_FUNCTION(warning,Level_WARNING);
+	TOADLET_MAKE_LOGGER_FUNCTION(alert,Level_ALERT);
+	TOADLET_MAKE_LOGGER_FUNCTION(debug,Level_DEBUG);
+	TOADLET_MAKE_LOGGER_FUNCTION(excess,Level_EXCESS);
 
 	void setMasterReportingLevel(Level level);
 	Level getMasterReportingLevel() const{return mReportingLevel;}

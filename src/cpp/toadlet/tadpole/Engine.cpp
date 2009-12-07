@@ -80,8 +80,8 @@ Engine::Engine():
 	mRenderer(NULL),
 	mAudioPlayer(NULL)
 {
-	Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_DEBUG,
-		"Engine::Engine started");
+	Logger::debug(Categories::TOADLET_TADPOLE,
+		"creating Engine");
 
 	mTextureManager=new TextureManager(this);
 
@@ -104,7 +104,7 @@ Engine::Engine():
 	mAudioBufferManager=new ResourceManager(this);
 
 
-	Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_DEBUG,
+	Logger::debug(Categories::TOADLET_TADPOLE,
 		"Engine: adding all handlers");
 
 	// Texture handlers
@@ -193,6 +193,9 @@ Engine::~Engine(){
 }
 
 void Engine::destroy(){
+	Logger::debug(Categories::TOADLET_TADPOLE,
+		"destroying Engine");
+
 	if(mScene!=NULL){
 		mScene->destroy();
 		mScene=NULL;
@@ -225,39 +228,39 @@ InputStreamFactory *Engine::getInputStreamFactory() const{
 void Engine::setRenderer(Renderer *renderer){
 	if(renderer!=NULL){
 		const toadlet::peeper::CapabilitySet &capabilitySet=renderer->getCapabilitySet();
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_TADPOLE,
 			"Renderer Capabilities:");
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_TADPOLE,
 			String()+(char)9+"maxLights:"+capabilitySet.maxLights);
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_TADPOLE,
 			String()+(char)9+"maxTextureStages:"+capabilitySet.maxTextureStages);
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_TADPOLE,
 			String()+(char)9+"maxTextureSize:"+capabilitySet.maxTextureSize);
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_TADPOLE,
 			String()+(char)9+"hardwareVertexBuffers:"+capabilitySet.hardwareVertexBuffers);
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_TADPOLE,
 			String()+(char)9+"hardwareIndexBuffers:"+capabilitySet.hardwareIndexBuffers);
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_TADPOLE,
 			String()+(char)9+"vertexShaders:"+capabilitySet.vertexShaders);
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_TADPOLE,
 			String()+(char)9+"maxVertexShaderLocalParameters:"+capabilitySet.maxVertexShaderLocalParameters);
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_TADPOLE,
 			String()+(char)9+"fragmentShaders:"+capabilitySet.fragmentShaders);
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_TADPOLE,
 			String()+(char)9+"maxFragmentShaderLocalParameters:"+capabilitySet.maxFragmentShaderLocalParameters);
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_TADPOLE,
 			String()+(char)9+"renderToTexture:"+capabilitySet.renderToTexture);
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_TADPOLE,
 			String()+(char)9+"renderToDepthTexture:"+capabilitySet.renderToDepthTexture);
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_TADPOLE,
 			String()+(char)9+"renderToTextureNonPowerOf2Restricted:"+capabilitySet.renderToTextureNonPowerOf2Restricted);
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_TADPOLE,
 			String()+(char)9+"textureDot3:"+capabilitySet.textureDot3);
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_TADPOLE,
 			String()+(char)9+"textureNonPowerOf2Restricted:"+capabilitySet.textureNonPowerOf2Restricted);
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_TADPOLE,
 			String()+(char)9+"textureNonPowerOf2:"+capabilitySet.textureNonPowerOf2);
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_TADPOLE,
 			String()+(char)9+"textureAutogenMipMaps:"+capabilitySet.textureAutogenMipMaps);
 	}
 

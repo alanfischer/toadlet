@@ -51,7 +51,7 @@ int Win32BluetoothServerQuery::startQuery(){
 
 	clearServers();
 
-	Logger::log(Categories::TOADLET_EGG,Logger::Level_DEBUG,
+	Logger::debug(Categories::TOADLET_EGG,
 		"Win32BluetoothServerQuery: Starting server query");
 
 	WSAQUERYSET wsaq={0};

@@ -76,7 +76,7 @@ D3D10Renderer::~D3D10Renderer(){
 }
 
 bool D3D10Renderer::create(RenderTarget *target,int *options){
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_PEEPER,
 		"creating D3D10Renderer");
 
 	if(target==NULL){
@@ -117,7 +117,7 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 
 	setDefaultStates();
 
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_PEEPER,
 		"created D3D10Renderer");
 
 	return true;

@@ -34,7 +34,7 @@ bool MicroMeshConverter::convertMesh(Mesh *mesh,OutputStream *outStream,float me
 	int i,j,k;
 
 	if(meshScale==0){
-		Logger::log("Using a scale of 0!");
+		Logger::alert("Using a scale of 0!");
 	}
 
 	DataOutputStream::ptr out(new DataOutputStream(outStream));
@@ -51,12 +51,12 @@ bool MicroMeshConverter::convertMesh(Mesh *mesh,OutputStream *outStream,float me
 	if(meshScale<MINIMUM_ACCEPTABLE_SCALE){
 		scaleModifier=meshScale/MINIMUM_ACCEPTABLE_SCALE;
 		meshScale=MINIMUM_ACCEPTABLE_SCALE;
-		Logger::log("Scale below minimum acceptable scale, prescaling mesh");
+		Logger::alert("Scale below minimum acceptable scale, prescaling mesh");
 	}
 	else if(meshScale>MAXIMUM_ACCEPTABLE_SCALE){
 		scaleModifier=meshScale/MAXIMUM_ACCEPTABLE_SCALE;
 		meshScale=MAXIMUM_ACCEPTABLE_SCALE;
-		Logger::log("Scale above maximum acceptable scale, prescaling mesh");
+		Logger::alert("Scale above maximum acceptable scale, prescaling mesh");
 	}
 
 	// Mesh Block
@@ -110,7 +110,7 @@ bool MicroMeshConverter::convertMesh(Mesh *mesh,OutputStream *outStream,float me
 			if(bytes==0){
 				bytes=VertexCompression::getSuggestedArrayBytes(3,vba.getSize(),
 					(float*)(vba.getData()+positionOffset),vertexFormat->getVertexSize());
-				Logger::log(String("Position bytes:") + bytes);
+				Logger::alert(String("Position bytes:") + bytes);
 			}
 
 			if(bytes==1){
@@ -219,7 +219,7 @@ bool MicroMeshConverter::convertMesh(Mesh *mesh,OutputStream *outStream,float me
 			if(bytes==0){
 				bytes=VertexCompression::getSuggestedArrayBytes(2,vba.getSize(),
 					(float*)(vba.getData()+texCoordOffset),vertexFormat->getVertexSize());
-				Logger::log(String("TexCoord bytes:") + bytes);
+				Logger::alert(String("TexCoord bytes:") + bytes);
 			}
 
 			if(invertYTexCoord){
@@ -346,7 +346,7 @@ bool MicroMeshConverter::convertMesh(Mesh *mesh,OutputStream *outStream,float me
 				}
 			}
 
-			Logger::log(String("Number of strips:") + strips.size());
+			Logger::alert(String("Number of strips:") + strips.size());
 
 			out->writeBigUInt16(strips.size());
 
@@ -356,7 +356,7 @@ bool MicroMeshConverter::convertMesh(Mesh *mesh,OutputStream *outStream,float me
 
 				out->writeBigUInt16(strips[j].size());
 			}
-			Logger::log(string);
+			Logger::alert(string);
 		}
 	}
 	if(mesh->skeleton!=NULL){
@@ -386,7 +386,7 @@ bool MicroMeshConverter::convertMesh(Mesh *mesh,OutputStream *outStream,float me
 		int translateBytes=forceBytes;
 		if(translateBytes==0){
 			translateBytes=VertexCompression::getSuggestedArrayBytes(3,translates.size(),(float*)&translates[0],sizeof(Vector3));
-			Logger::log(String("Skeleton Translate bytes:") + translateBytes);
+			Logger::alert(String("Skeleton Translate bytes:") + translateBytes);
 		}
 
 		if(translateBytes==1){
@@ -476,7 +476,7 @@ bool MicroMeshConverter::convertMesh(Mesh *mesh,OutputStream *outStream,float me
 			int translateBytes=forceBytes;
 			if(translateBytes==0){
 				translateBytes=VertexCompression::getSuggestedArrayBytes(3,translates.size(),(float*)&translates[0],sizeof(Vector3));
-				Logger::log(String("Animation Translate bytes:") + translateBytes);
+				Logger::alert(String("Animation Translate bytes:") + translateBytes);
 			}
 
 			if(translateBytes==1){

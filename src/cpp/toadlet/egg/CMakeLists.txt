@@ -18,7 +18,6 @@ set (EGG_SRC
 set (EGG_IMAGE_SRC
 	image/Image.cpp
 	image/ImageFormatConversion.cpp
-	image/ImageUtilities.cpp
 )
 set (EGG_IMAGE_BMP_SRC
 	image/BMPHandler.cpp
@@ -140,7 +139,6 @@ set (EGG_IMAGE_HEADERS
 	image/Image.h
 	image/ImageDefinitions.h
 	image/ImageFormatConversion.h
-	image/ImageUtilities.h
 )
 set (EGG_IMAGE_BMP_HEADERS
 	image/BMPHandler.h

@@ -144,7 +144,8 @@ void Scene::update(int dt){
 	#endif
 
 	if(mExcessiveDT>0 && dt>mExcessiveDT){
-		Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,String("skipping excessive dt:")+dt);
+		Logger::alert(Categories::TOADLET_TADPOLE,
+			String("skipping excessive dt:")+dt);
 		return;
 	}
 

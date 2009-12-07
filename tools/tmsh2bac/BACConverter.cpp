@@ -181,7 +181,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 		}
 	}
 
-	Logger::log(String("Initial numbers: ") + vertexList.size() + " vertices and " + texCoordList.size() + " texture coords");
+	Logger::alert(String("Initial numbers: ") + vertexList.size() + " vertices and " + texCoordList.size() + " texture coords");
 
 	// Form mVertices
 	vertexMap.resize(vertexList.size());
@@ -221,7 +221,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 		++i;
 	}
 
-	Logger::log(String("Reduced mVertices: ") + mVertices.size() + " vertices");
+	Logger::alert(String("Reduced mVertices: ") + mVertices.size() + " vertices");
 
 	// Form mMaterials
 	texCoordMap.resize(texCoordList.size());
@@ -262,7 +262,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 		mTexCoords[i]->texture[1]=1.0-mTexCoords[i]->texture[1];
 	}
 
-	Logger::log(String("Reduced mTexCoords: ") + mTexCoords.size() + " texture coords");
+	Logger::alert(String("Reduced mTexCoords: ") + mTexCoords.size() + " texture coords");
 
 	// Iterate through submeshes
 	int k,l,m;
@@ -342,7 +342,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 						height=texture->getHeight();
 					}
 					else{
-						Logger::log(String("Texture ")+name+" not found, a texture must be available so msh2bac can determine the texture size.  Will default to 256x256");
+						Logger::alert(String("Texture ")+name+" not found, a texture must be available so msh2bac can determine the texture size.  Will default to 256x256");
 					}
 					mTextures.add(Vector2(width,height));
 					m->textureIndex=mTextures.size()-1;
@@ -366,7 +366,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 		}
 	}
 
-	Logger::log(String("Number of mTriangles: ")+mTriangles.size()+" triangles");
+	Logger::alert(String("Number of mTriangles: ")+mTriangles.size()+" triangles");
 
 	if(mesh->skeleton==NULL){
 		BACBone *bone=new BACBone();
@@ -674,8 +674,8 @@ void BACConverter::constructQuads(){
 		}
 	}
 
-	Logger::log(String("Reduced number of mTriangles after quad formation: ")+mTriangles.size()+" triangles");
-	Logger::log(String("Number of mQuads: ")+mQuads.size()+" quads");
+	Logger::alert(String("Reduced number of mTriangles after quad formation: ")+mTriangles.size()+" triangles");
+	Logger::alert(String("Number of mQuads: ")+mQuads.size()+" quads");
 }
 
 void BACConverter::rewindTriangles(){

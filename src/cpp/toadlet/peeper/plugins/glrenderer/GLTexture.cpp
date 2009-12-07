@@ -305,7 +305,7 @@ bool GLTexture::generateMipLevels(){
 	else
 	#endif
 	{
-		Logger::log(Categories::TOADLET_PEEPER,Logger::Level_WARNING,
+		Logger::warning(Categories::TOADLET_PEEPER,
 			"GLTexture::generateMipMaps: Not implemented");
 		return false;
 	}

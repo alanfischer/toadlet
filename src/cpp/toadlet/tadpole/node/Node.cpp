@@ -51,6 +51,7 @@ Node::Node():
 	mIdentityTransform(false),
 	//mScale,
 	mScope(0),
+	//mName,
 	mAlignXAxis(false),mAlignYAxis(false),mAlignZAxis(false),
 
 	mBoundingRadius(0),
@@ -193,6 +194,14 @@ void Node::setScale(scalar x,scalar y,scalar z){
 
 void Node::setScope(int scope){
 	mScope=scope;
+}
+
+void Node::setName(const String &name){
+	if(mParent!=NULL){
+		mParent->childRenamed(this,mName,name);
+	}
+
+	mName=name;
 }
 
 void Node::setAlignmentCalculation(bool xAxis,bool yAxis,bool zAxis){

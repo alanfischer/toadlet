@@ -118,7 +118,7 @@ PeerEventSynchronizer::PeerStatus PeerEventSynchronizer::update(){
 	while((amount=mConnection->receive(mPacketIn->getOriginalDataPointer(),mPacketIn->getSize()))>0){
 		int remoteFrame=mDataPacketIn->readBigInt32();
 		if(remoteFrame==0 || remoteFrame<mFrame || remoteFrame>mFrame+MAX_FRAME_DIFFERENCE){
-			Logger::log(Categories::TOADLET_KNOT,Logger::Level_WARNING,
+			Logger::warning(Categories::TOADLET_KNOT,
 				String("invalid frame:")+remoteFrame+" current frame:"+mFrame);
 
 			return PeerStatus_FRAME_BAD;
@@ -126,14 +126,14 @@ PeerEventSynchronizer::PeerStatus PeerEventSynchronizer::update(){
 
 		int numFrames=mDataPacketIn->readUInt8();
 		if(numFrames<=0){
-			Logger::log(Categories::TOADLET_KNOT,Logger::Level_WARNING,
+			Logger::warning(Categories::TOADLET_KNOT,
 				String("invalid numFrames:")+numFrames);
 
 			return PeerStatus_FRAME_BAD;
 		}
 
-		if(Logger::getInstance()->getMasterCategoryReportingLevel(Categories::TOADLET_KNOT)>=Logger::Level_EXCESSIVE){
-			Logger::log(Categories::TOADLET_KNOT,Logger::Level_EXCESSIVE,
+		if(Logger::getInstance()->getMasterCategoryReportingLevel(Categories::TOADLET_KNOT)>=Logger::Level_EXCESS){
+			Logger::excess(Categories::TOADLET_KNOT,
 				String("Received events for frames:")+remoteFrame+"-"+(remoteFrame+numFrames-1)+" current frame:"+mFrame);
 		}
 
@@ -167,7 +167,7 @@ PeerEventSynchronizer::PeerStatus PeerEventSynchronizer::update(){
 					events->add(event);
 				}
 				else{
-					Logger::log(Categories::TOADLET_KNOT,Logger::Level_WARNING,
+					Logger::warning(Categories::TOADLET_KNOT,
 						String("Received unknown event type:")+type);
 				}
 			}
@@ -182,23 +182,23 @@ PeerEventSynchronizer::PeerStatus PeerEventSynchronizer::update(){
 	}
 
 	if(mSkipReceivingFrames>0 && mSkipAtFrame<=mFrame){
-		if(Logger::getInstance()->getMasterCategoryReportingLevel(Categories::TOADLET_KNOT)>=Logger::Level_EXCESSIVE){
-			Logger::log(Categories::TOADLET_KNOT,Logger::Level_EXCESSIVE,
+		if(Logger::getInstance()->getMasterCategoryReportingLevel(Categories::TOADLET_KNOT)>=Logger::Level_EXCESS){
+			Logger::excess(Categories::TOADLET_KNOT,
 				String("Skipping receiving frame:")+mFrame);
 		}
 
 		mSkipReceivingFrames--;
 	}
 	else if(mRemoteEventGroups.size()==0){
-		Logger::log(Categories::TOADLET_KNOT,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_KNOT,
 			String("Missing events for frame:")+mFrame);
 
 		return PeerStatus_FRAME_MISSING;
 	}
 
 	if(mSkipSendingFrames>0 && mSkipAtFrame<=mFrame){
-		if(Logger::getInstance()->getMasterCategoryReportingLevel(Categories::TOADLET_KNOT)>=Logger::Level_EXCESSIVE){
-			Logger::log(Categories::TOADLET_KNOT,Logger::Level_EXCESSIVE,
+		if(Logger::getInstance()->getMasterCategoryReportingLevel(Categories::TOADLET_KNOT)>=Logger::Level_EXCESS){
+			Logger::excess(Categories::TOADLET_KNOT,
 				String("Skipping sending frame:")+mFrame);
 		}
 
@@ -228,8 +228,8 @@ PeerEventSynchronizer::PeerStatus PeerEventSynchronizer::update(){
 		if(mFrameGroupCount>=mFrameGroupSize){
 			mFrameGroupCount=0;
 
-			if(Logger::getInstance()->getMasterCategoryReportingLevel(Categories::TOADLET_KNOT)>=Logger::Level_EXCESSIVE){
-				Logger::log(Categories::TOADLET_KNOT,Logger::Level_EXCESSIVE,
+			if(Logger::getInstance()->getMasterCategoryReportingLevel(Categories::TOADLET_KNOT)>=Logger::Level_EXCESS){
+				Logger::excess(Categories::TOADLET_KNOT,
 					String("Sending events for frames:")+(frame-mFrameGroupSize+1)+"-"+frame+" current frame:"+mFrame);
 			}
 
@@ -309,7 +309,7 @@ PeerEventSynchronizer::PeerStatus PeerEventSynchronizer::update(){
 bool PeerEventSynchronizer::adjustFrameBuffer(int frameBuffer,int frameGroupSize,bool force){
 	if(force==false && (mSkipReceivingFrames>0 || mSkipSendingFrames>0)){
 		// For now, dont let us adjust the frame buffer if we're already adjusting it
-		Logger::log(Categories::TOADLET_KNOT,Logger::Level_WARNING,
+		Logger::warning(Categories::TOADLET_KNOT,
 			"Cannot adjust FrameBuffer, currently adjusting");
 
 		return false;
@@ -321,10 +321,10 @@ bool PeerEventSynchronizer::adjustFrameBuffer(int frameBuffer,int frameGroupSize
 		return false;
 	}
 
-	Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_TADPOLE,
 		String("Adjusting FrameBuffer from:")+mFrameBuffer+" to:"+frameBuffer);
 
-	Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_TADPOLE,
 		String("Adjusting FrameGroupSize from:")+mFrameGroupSize+" to:"+frameGroupSize);
 
 	if(frameBuffer>mFrameBuffer){

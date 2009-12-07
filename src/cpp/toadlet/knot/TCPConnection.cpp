@@ -67,7 +67,7 @@ bool TCPConnection::connect(const String &address,int port){
 	uint32 remoteIP=Socket::stringToIP(address);
 	int remotePort=port;
 
-	Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+	Logger::debug(Categories::TOADLET_KNOT,
 		String("connect: protocol ")+CONNECTION_PACKET);
 
 	bool result=false;
@@ -80,22 +80,22 @@ bool TCPConnection::connect(const String &address,int port){
 
 			amount=mSocket->send(mOutPacket->getOriginalDataPointer(),size);
 			if(amount>0){
-				Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+				Logger::debug(Categories::TOADLET_KNOT,
 					"connect: sent connection packet");
 
 				amount=mSocket->receive(mInPacket->getOriginalDataPointer(),size);
 				if(amount>0){
-					Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+					Logger::debug(Categories::TOADLET_KNOT,
 						"connect: received connection packet");
 
 					if(verifyConnectionPacket(mDataInPacket)){
-						Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+						Logger::debug(Categories::TOADLET_KNOT,
 							"connect: verified connection packet");
 
 						result=true;
 					}
 					else{
-						Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+						Logger::alert(Categories::TOADLET_KNOT,
 							"connect: error verifying connection packet");
 					}
 				}
@@ -116,7 +116,7 @@ bool TCPConnection::connect(const String &address,int port){
 bool TCPConnection::accept(){
 	mSocket->listen(1);
 
-	Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+	Logger::debug(Categories::TOADLET_KNOT,
 		String("accept: protocol ")+CONNECTION_PACKET);
 
 	bool result=false;
@@ -130,23 +130,23 @@ bool TCPConnection::accept(){
 
 			amount=mSocket->receive(mInPacket->getOriginalDataPointer(),size);
 			if(amount>0){
-				Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+				Logger::debug(Categories::TOADLET_KNOT,
 					"accept: received connection packet");
 
 				if(verifyConnectionPacket(mDataInPacket)){
-					Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+					Logger::debug(Categories::TOADLET_KNOT,
 						"accept: verified connection packet");
 
 					amount=mSocket->send(mOutPacket->getOriginalDataPointer(),size);
 					if(amount>0){
-						Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+						Logger::debug(Categories::TOADLET_KNOT,
 							"accept: sent connection packet");
 
 						result=true;
 					}
 				}
 				else{
-					Logger::log(Categories::TOADLET_KNOT,Logger::Level_DEBUG,
+					Logger::alert(Categories::TOADLET_KNOT,
 						"connect: error verifying connection packet");
 				}
 			}

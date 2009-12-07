@@ -49,7 +49,7 @@ Resource::ptr AudioBufferHandler::load(InputStream::ptr in,const ResourceHandler
 		String mimeType;
 		AudioBufferData *audioBufferData=(AudioBufferData*)handlerData;
 		if(audioBufferData==NULL){
-			Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_WARNING,
+			Logger::warning(Categories::TOADLET_TADPOLE,
 				"no valid AudioBufferData, audio may not be decoded properly");
 		}
 		else{

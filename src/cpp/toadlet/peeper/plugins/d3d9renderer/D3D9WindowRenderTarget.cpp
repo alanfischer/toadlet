@@ -131,9 +131,9 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual){
 	UINT adaptor=D3DADAPTER_DEFAULT;
 	D3DADAPTER_IDENTIFIER9 identifier={0};
 	mD3D->GetAdapterIdentifier(adaptor,0,&identifier);
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_PEEPER,
 		String("D3D Driver:") + identifier.Driver);
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_PEEPER,
 		String("D3D Description:") + identifier.Description);
 
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)

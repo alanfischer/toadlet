@@ -50,7 +50,7 @@
 	#define TOADLET_CHECK_ALERROR(function) \
 		{ int error=alGetError(); \
 		if(error!=AL_NO_ERROR) \
-			toadlet::egg::Logger::log(toadlet::egg::Categories::TOADLET_RIBBIT,toadlet::egg::Logger::Level_ALERT, \
+			toadlet::egg::Logger::warning(toadlet::egg::Categories::TOADLET_RIBBIT, \
 				toadlet::egg::String("AL Error in ") + function + ": error=" + error + " string=" + alGetString(error)); }
 
 #else
