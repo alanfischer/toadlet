@@ -244,7 +244,7 @@ mContext=glXCreateNewContext(mDisplay,fbConfig,GLX_RGBA_BIT,renderTarget->getGLX
 			return false;
 		}
 		else{
-			Logger::log(Categories::TOADLET_PEEPER,Logger::Level_WARNING,
+			Logger::warning(Categories::TOADLET_PEEPER,
 				"Using indirect GLXContext");
 		}
 	}

@@ -294,7 +294,7 @@ bool X11Application::createWindow(){
 		if(x11->mOriginalEnv.antialiasing==NULL){
 			if(mVisual.multisamples>1){
 				setenv("__GL_FSAA_MODE","4",1);
-				Logger::log(Categories::TOADLET_PAD,Logger::Level_ALERT,
+				Logger::alert(Categories::TOADLET_PAD,
 					"Antialiasing attempted with __GL_FSAA_MODE = 4");
 			}
 			else{
@@ -382,7 +382,7 @@ bool X11Application::createWindow(){
 			}
 
 			if(mode!=-1){
-				Logger::log(Categories::TOADLET_PAD,Logger::Level_ALERT,
+				Logger::alert(Categories::TOADLET_PAD,
 					String("Attemping to use Mode ") + (int)mode + " : " + (int)displayModes[mode]->hdisplay +
 					" x " + (int)displayModes[mode]->vdisplay + " @ " +
 					(1000 * displayModes[mode]->dotclock / (displayModes[mode]->htotal * displayModes[mode]->vtotal)));
@@ -392,7 +392,7 @@ bool X11Application::createWindow(){
 					XF86VidModeSwitchToMode(x11->mDisplay,x11->mScrnum,displayModes[mode]);
 					XF86VidModeSetViewPort(x11->mDisplay,x11->mScrnum,0,0);
 				}
-				Logger::log(Categories::TOADLET_PAD,Logger::Level_ALERT,
+				Logger::alert(Categories::TOADLET_PAD,
 					"Success");
 			}
 			else{

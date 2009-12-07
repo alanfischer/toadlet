@@ -94,14 +94,14 @@ bool EGLWindowRenderTarget::createContext(void *nativeSurface,const Visual &visu
 		}
 		egl_version=version[0]*10+version[1];
 	#endif
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_PEEPER,
 		String("CALCULATED EGL VERSION:")+(egl_version/10)+"."+(egl_version%10));
 
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_PEEPER,
 		String("EGL_VENDOR:")+eglQueryString(mDisplay,EGL_VENDOR));
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_PEEPER,
 		String("EGL_VERSION:")+eglQueryString(mDisplay,EGL_VERSION));
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+	Logger::alert(Categories::TOADLET_PEEPER,
 		String("EGL_EXTENSIONS:")+eglQueryString(mDisplay,EGL_EXTENSIONS));
 
 	int format=visual.pixelFormat;
@@ -113,12 +113,13 @@ bool EGLWindowRenderTarget::createContext(void *nativeSurface,const Visual &visu
 	int stencilBits=visual.stencilBits;
 	int multisamples=visual.multisamples;
 
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,String("Choosing config for color:")+redBits+","+greenBits+","+blueBits+","+alphaBits+" depth:"+depthBits+" stencil:"+stencilBits);
+	Logger::alert(Categories::TOADLET_PEEPER,
+		String("Choosing config for color:")+redBits+","+greenBits+","+blueBits+","+alphaBits+" depth:"+depthBits+" stencil:"+stencilBits);
 
 	mConfig=chooseEGLConfig(mDisplay,redBits,greenBits,blueBits,alphaBits,depthBits,stencilBits,!pixmap,pixmap,false,visual.multisamples);
 	TOADLET_CHECK_EGLERROR("chooseEGLConfig");
 
-	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_DEBUG,
+	Logger::debug(Categories::TOADLET_PEEPER,
 		String("chooseEGLConfig config:")+(int)mConfig);
 
 	if(!pixmap){
