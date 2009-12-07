@@ -55,7 +55,7 @@ public class TCPConnection implements Connection,Runnable{
 		}catch(Exception ex){}
 		int remotePort=port;
 
-		Logger.log(Categories.TOADLET_KNOT,Logger.Level.DEBUG,
+		Logger.debug(Categories.TOADLET_KNOT,
 			("connect: protocol ")+new String(CONNECTION_PACKET));
 
 		boolean result=false;
@@ -69,22 +69,22 @@ public class TCPConnection implements Connection,Runnable{
 				byte[] outPacketBytes=mOutPacket.toByteArray();
 				mSocket.getOutputStream().write(outPacketBytes,0,outPacketBytes.length); amount=outPacketBytes.length;
 				if(amount>0){
-					Logger.log(Categories.TOADLET_KNOT,Logger.Level.DEBUG,
+					Logger.debug(Categories.TOADLET_KNOT,
 						"connect: sent connection packet");
 
 					amount=mSocket.getInputStream().read(mInPacketBytes,0,mInPacketBytes.length);
 					if(amount>0){
-						Logger.log(Categories.TOADLET_KNOT,Logger.Level.DEBUG,
+						Logger.debug(Categories.TOADLET_KNOT,
 							"connect: received connection packet");
 
 						if(verifyConnectionPacket(mDataInPacket)){
-							Logger.log(Categories.TOADLET_KNOT,Logger.Level.DEBUG,
+							Logger.debug(Categories.TOADLET_KNOT,
 								"connect: verified connection packet");
 
 							result=true;
 						}
 						else{
-							Logger.log(Categories.TOADLET_KNOT,Logger.Level.DEBUG,
+							Logger.alert(Categories.TOADLET_KNOT,
 								"connect: error verifying connection packet");
 						}
 					}
@@ -104,7 +104,7 @@ public class TCPConnection implements Connection,Runnable{
 	}
 
 	public boolean accept(){
-		Logger.log(Categories.TOADLET_KNOT,Logger.Level.DEBUG,
+		Logger.debug(Categories.TOADLET_KNOT,
 			("accept: protocol ")+new String(CONNECTION_PACKET));
 
 		boolean result=false;
@@ -118,24 +118,24 @@ public class TCPConnection implements Connection,Runnable{
 
 				amount=mSocket.getInputStream().read(mInPacketBytes,0,mInPacketBytes.length);
 				if(amount>0){
-					Logger.log(Categories.TOADLET_KNOT,Logger.Level.DEBUG,
+					Logger.debug(Categories.TOADLET_KNOT,
 						"accept: received connection packet");
 
 					if(verifyConnectionPacket(mDataInPacket)){
-						Logger.log(Categories.TOADLET_KNOT,Logger.Level.DEBUG,
+						Logger.debug(Categories.TOADLET_KNOT,
 							"accept: verified connection packet");
 
 						byte[] outPacketBytes=mOutPacket.toByteArray();
 						mSocket.getOutputStream().write(outPacketBytes,0,outPacketBytes.length);amount=outPacketBytes.length;
 						if(amount>0){
-							Logger.log(Categories.TOADLET_KNOT,Logger.Level.DEBUG,
+							Logger.debug(Categories.TOADLET_KNOT,
 								"accept: sent connection packet");
 
 							result=true;
 						}
 					}
 					else{
-						Logger.log(Categories.TOADLET_KNOT,Logger.Level.DEBUG,
+						Logger.alert(Categories.TOADLET_KNOT,
 							"connect: error verifying connection packet");
 					}
 				}

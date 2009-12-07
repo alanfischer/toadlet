@@ -128,7 +128,7 @@ public class GLTexturePeer implements Texture.Peer{
 	public RenderTarget.Peer castToRenderTargetPeer(){return null;}
 
 	public void generateMipMaps(){
-		Logger.log(Categories.TOADLET_PEEPER,Logger.Level.WARNING,
+		Logger.warning(Categories.TOADLET_PEEPER,
 			"GLTexturePeer::generateMipMaps: Not implemented");
 	}
 

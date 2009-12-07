@@ -76,7 +76,7 @@ public class Window extends ParentWidget{
 
 	public void render(Renderer renderer){
 		if(mWidth==0 || mHeight==0){
-			Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.WARNING,
+			Logger.warning(Categories.TOADLET_TADPOLE,
 				"rendering a zero sized window");
 		}
 

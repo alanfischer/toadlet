@@ -32,6 +32,7 @@
 #if !defined(TOADLET_NO_THREADS)
 	#include <toadlet/egg/Mutex.h>
 #endif
+
 #define TOADLET_MAKE_LOGGER_FUNCTION(name,level) \
 	static void name(const String &description){name(NULL,description);} \
 	static void name(const String &categoryName,const String &description){ \

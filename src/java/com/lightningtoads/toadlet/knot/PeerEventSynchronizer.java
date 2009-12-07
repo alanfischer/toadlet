@@ -112,7 +112,7 @@ public class PeerEventSynchronizer{
 			while((amount=mConnection.receive(mPacketInBytes,0,mPacketInBytes.length))>0){
 				int remoteFrame=mDataPacketIn.readInt();
 				if(remoteFrame==0 || remoteFrame<mFrame || remoteFrame>mFrame+MAX_FRAME_DIFFERENCE){
-					Logger.log(Categories.TOADLET_KNOT,Logger.Level.WARNING,
+					Logger.warning(Categories.TOADLET_KNOT,
 						("invalid frame:")+remoteFrame+" current frame:"+mFrame);
 
 					return PeerStatus.FRAME_BAD;
@@ -120,14 +120,14 @@ public class PeerEventSynchronizer{
 
 				int numFrames=mDataPacketIn.readByte();
 				if(numFrames<=0){
-					Logger.log(Categories.TOADLET_KNOT,Logger.Level.WARNING,
+					Logger.warning(Categories.TOADLET_KNOT,
 						("invalid numFrames:")+numFrames);
 
 					return PeerStatus.FRAME_BAD;
 				}
 
 				if(Logger.getInstance().getMasterCategoryReportingLevel(Categories.TOADLET_KNOT)>=Logger.Level.EXCESSIVE){
-					Logger.log(Categories.TOADLET_KNOT,Logger.Level.EXCESSIVE,
+					Logger.excess(Categories.TOADLET_KNOT,
 						("Received events for frames:")+remoteFrame+"-"+(remoteFrame+numFrames-1)+" current frame:"+mFrame);
 				}
 
@@ -161,7 +161,7 @@ public class PeerEventSynchronizer{
 							events.add(event);
 						}
 						else{
-							Logger.log(Categories.TOADLET_KNOT,Logger.Level.WARNING,
+							Logger.warning(Categories.TOADLET_KNOT,
 								("Received unknown event type:")+type);
 						}
 					}
@@ -180,14 +180,14 @@ public class PeerEventSynchronizer{
 
 		if(mSkipReceivingFrames>0 && mSkipAtFrame<=mFrame){
 			if(Logger.getInstance().getMasterCategoryReportingLevel(Categories.TOADLET_KNOT)>=Logger.Level.EXCESSIVE){
-				Logger.log(Categories.TOADLET_KNOT,Logger.Level.EXCESSIVE,
+				Logger.excess(Categories.TOADLET_KNOT,
 					("Skipping receiving frame:")+mFrame);
 			}
 
 			mSkipReceivingFrames--;
 		}
 		else if(mRemoteEventGroups.size()==0){
-			Logger.log(Categories.TOADLET_KNOT,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_KNOT,
 				("Missing events for frame:")+mFrame);
 
 			return PeerStatus.FRAME_MISSING;
@@ -195,7 +195,7 @@ public class PeerEventSynchronizer{
 
 		if(mSkipSendingFrames>0 && mSkipAtFrame<=mFrame){
 			if(Logger.getInstance().getMasterCategoryReportingLevel(Categories.TOADLET_KNOT)>=Logger.Level.EXCESSIVE){
-				Logger.log(Categories.TOADLET_KNOT,Logger.Level.EXCESSIVE,
+				Logger.excess(Categories.TOADLET_KNOT,
 					("Skipping sending frame:")+mFrame);
 			}
 
@@ -227,7 +227,7 @@ public class PeerEventSynchronizer{
 					mFrameGroupCount=0;
 
 					if(Logger.getInstance().getMasterCategoryReportingLevel(Categories.TOADLET_KNOT)>=Logger.Level.EXCESSIVE){
-						Logger.log(Categories.TOADLET_KNOT,Logger.Level.EXCESSIVE,
+						Logger.excess(Categories.TOADLET_KNOT,
 							("Sending events for frames:")+(frame-mFrameGroupSize+1)+"-"+frame+" current frame:"+mFrame);
 					}
 
@@ -346,7 +346,7 @@ public class PeerEventSynchronizer{
 	boolean adjustFrameBuffer(int frameBuffer,int frameGroupSize,boolean force){
 		if(force==false && (mSkipReceivingFrames>0 || mSkipSendingFrames>0)){
 			// For now, dont let us adjust the frame buffer if we're already adjusting it
-			Logger.log(Categories.TOADLET_KNOT,Logger.Level.WARNING,
+			Logger.warning(Categories.TOADLET_KNOT,
 				"Cannot adjust FrameBuffer, currently adjusting");
 
 			return false;
@@ -358,10 +358,10 @@ public class PeerEventSynchronizer{
 			return false;
 		}
 
-		Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.ALERT,
+		Logger.alert(Categories.TOADLET_TADPOLE,
 			("Adjusting FrameBuffer from:")+mFrameBuffer+" to:"+frameBuffer);
 
-		Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.ALERT,
+		Logger.alert(Categories.TOADLET_TADPOLE,
 			("Adjusting FrameGroupSize from:")+mFrameGroupSize+" to:"+frameGroupSize);
 
 		if(frameBuffer>mFrameBuffer){

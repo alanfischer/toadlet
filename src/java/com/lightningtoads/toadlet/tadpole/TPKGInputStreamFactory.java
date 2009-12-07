@@ -88,7 +88,7 @@ public class TPKGInputStreamFactory implements InputStreamFactory{
 	}
 
 	public InputStream makeInputStream(String name){
-		Logger.log(Categories.TOADLET_TADPOLE,Logger.Level.DEBUG,
+		Logger.debug(Categories.TOADLET_TADPOLE,
 			"Creating InputStream for "+name);
 
 		if(mInputStream==null){

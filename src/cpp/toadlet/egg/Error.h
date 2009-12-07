@@ -28,6 +28,7 @@
 
 #include <toadlet/egg/Categories.h>
 #include <toadlet/egg/String.h>
+
 #if defined(TOADLET_EXCEPTIONS)
 	#include <toadlet/egg/Exception.h>
 

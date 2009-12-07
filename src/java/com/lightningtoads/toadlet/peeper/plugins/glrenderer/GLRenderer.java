@@ -55,7 +55,7 @@ public class GLRenderer implements Renderer{
 
 	// Startup/Shutdown
 	public boolean startup(RenderContext renderContext,int[] options){
-		Logger.log(Categories.TOADLET_PEEPER,Logger.Level.ALERT,
+		Logger.alert(Categories.TOADLET_PEEPER,
 			"GLRenderer: Startup started");
 
 		boolean usePBuffers=true;
@@ -67,17 +67,17 @@ public class GLRenderer implements Renderer{
 				switch(options[i++]){
 					case Option.USE_PBUFFERS:
 						usePBuffers=options[i++]>0;
-						Logger.log(Categories.TOADLET_PEEPER,Logger.Level.ALERT,
+						Logger.alert(Categories.TOADLET_PEEPER,
 							"Setting PBuffer usage to:"+usePBuffers);
 					break;
 					case Option.USE_FBOS:
 						useFBOs=options[i++]>0;
-						Logger.log(Categories.TOADLET_PEEPER,Logger.Level.ALERT,
+						Logger.alert(Categories.TOADLET_PEEPER,
 							"Setting FBO usage to:"+useFBOs);
 					break;
 					case Option.USE_HARDWARE_BUFFERS:
 						useHardwareBuffers=options[i++]>0;
-						Logger.log(Categories.TOADLET_PEEPER,Logger.Level.ALERT,
+						Logger.alert(Categories.TOADLET_PEEPER,
 							"Setting Hardware Buffer usage to:"+useHardwareBuffers);
 					break;
 				}
@@ -94,7 +94,7 @@ public class GLRenderer implements Renderer{
 			catch(Exception ex){}
 		#endif
 
-		Logger.log(Categories.TOADLET_PEEPER,Logger.Level.ALERT,
+		Logger.alert(Categories.TOADLET_PEEPER,
 			"CALCULATED GL VERSION:"+(gl_version/10)+"."+(gl_version%10));
 
 		mShutdown=false;
@@ -104,13 +104,13 @@ public class GLRenderer implements Renderer{
 
 		// Crashes on Android 1.1
 		#if !defined(TOADLET_PLATFORM_ANDROID)
-			Logger.log(Categories.TOADLET_PEEPER,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_PEEPER,
 				"GL_VENDOR:" + gl.glGetString(GL_VENDOR));
-			Logger.log(Categories.TOADLET_PEEPER,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_PEEPER,
 				"GL_RENDERER:" + gl.glGetString(GL_RENDERER));
-			Logger.log(Categories.TOADLET_PEEPER,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_PEEPER,
 				"GL_VERSION:" + gl.glGetString(GL_VERSION));
-			Logger.log(Categories.TOADLET_PEEPER,Logger.Level.ALERT,
+			Logger.alert(Categories.TOADLET_PEEPER,
 				"GL_EXTENSIONS:" + gl.glGetString(GL_EXTENSIONS));
 		#endif
 
@@ -198,14 +198,14 @@ public class GLRenderer implements Renderer{
 
 		TOADLET_CHECK_GLERROR("startup");
 
-		Logger.log(Categories.TOADLET_PEEPER,Logger.Level.ALERT,
+		Logger.alert(Categories.TOADLET_PEEPER,
 			"GLRenderer: Startup finished");
 
 		return true;
 	}
 
 	public boolean shutdown(){
-		Logger.log(Categories.TOADLET_PEEPER,Logger.Level.ALERT,
+		Logger.alert(Categories.TOADLET_PEEPER,
 			"GLRenderer: Shutdown finished");
 
 		mShutdown=true;
