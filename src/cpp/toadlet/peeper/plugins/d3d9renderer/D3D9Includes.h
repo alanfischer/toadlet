@@ -158,11 +158,11 @@ namespace peeper{
 #endif
 
 #if defined(TOADLET_HAS_DIRECT3DMOBILE)
-	#define TOADLET_D3D_DLL_NAME TEXT("D3DM.DLL")
-	#define TOADLET_D3D_CREATE_NAME TEXT("Direct3DMobileCreate")
+	#define TOADLET_D3D9_DLL_NAME TEXT("D3DM.DLL")
+	#define TOADLET_D3D9_CREATE_NAME TEXT("Direct3DMobileCreate")
 #else
-	#define TOADLET_D3D_DLL_NAME TEXT("D3D9.DLL")
-	#define TOADLET_D3D_CREATE_NAME TEXT("Direct3DCreate9")
+	#define TOADLET_D3D9_DLL_NAME TEXT("D3D9.DLL")
+	#define TOADLET_D3D9_CREATE_NAME TEXT("Direct3DCreate9")
 #endif
 
 #if defined(TOADLET_HAS_DIRECT3DMOBILE)

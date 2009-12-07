@@ -23,12 +23,11 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "D3D9Renderer.h"
-#include "D3D9Texture.h"
-#include "D3D9RenderTarget.h"
-#include "D3D9SurfaceRenderTarget.h"
-#include "D3D9VertexBuffer.h"
-#include "D3D9IndexBuffer.h"
+#include "D3D10Renderer.h"
+#include "D3D10Texture.h"
+#include "D3D10RenderTarget.h"
+#include "D3D10SurfaceRenderTarget.h"
+#include "D3D10Buffer.h"
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/LightEffect.h>
@@ -52,32 +51,27 @@ using namespace toadlet::egg::MathConversion;
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API Renderer* new_D3D9Renderer(){
-	return new D3D9Renderer();
+TOADLET_C_API Renderer* new_D3D10Renderer(){
+	return new D3D10Renderer();
 }
 
 #if defined(TOADLET_BUILD_DYNAMIC)
 	TOADLET_C_API Renderer* new_Renderer(){
-		return new D3D9Renderer();
+		return new D3D10Renderer();
 	}
 #endif
 
-D3D9Renderer::D3D9Renderer():
-	mD3D(NULL),
+D3D10Renderer::D3D10Renderer():
 	mD3DDevice(NULL),
-	//mD3DCaps,
 	mPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL),
-
-	mFaceCulling(FaceCulling_NONE),
-	mMirrorY(false)
 
 	//mStatisticsSet,
 	//mCapabilitySet
 {
 }
 
-D3D9Renderer::~D3D9Renderer(){
+D3D10Renderer::~D3D10Renderer(){
 	destroy();
 }
 
