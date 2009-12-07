@@ -59,11 +59,11 @@ bool GLXWindowRenderTarget::createContext(GLXDrawable drawable,Display *display,
 	glXMakeCurrent(mDisplay,mDrawable,mContext);
 	
 	if(glXIsDirect(mDisplay,mContext)){
-		Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_PEEPER,
 			"Using Direct Rendering");
 	}
 	else{
-		Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_PEEPER,
 			"No Direct Rendering possible");
 	}
 
