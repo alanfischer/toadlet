@@ -39,10 +39,18 @@ ResourceManager::ResourceManager(InputStreamFactory *inputStreamFactory){
 }
 
 ResourceManager::~ResourceManager(){
+	destroy();
+}
+
+void ResourceManager::destroy(){
 	int i;
 	for(i=0;i<mResources.size();++i){
+		Resource::ptr resource=mResources[i];
 		mResources[i]->setFullyReleasedListener(NULL);
+		mResources[i]->destroy();
 	}
+	mResources.clear();
+	mNameResourceMap.clear();
 }
 
 Resource::ptr ResourceManager::get(const String &name){
@@ -62,8 +70,10 @@ Resource::ptr ResourceManager::find(const egg::String &name,ResourceHandlerData:
 			Logger::log(Categories::TOADLET_TADPOLE,Logger::Level_EXCESSIVE,
 				String("Finding ")+name);
 		}
-		
-		resource=findFromFile(name,handlerData);
+
+		TOADLET_TRY
+			resource=findFromFile(name,handlerData);
+		TOADLET_CATCH(const Exception &){resource=NULL;}
 		if(resource!=NULL){
 			resource->setName(name);
 			manage(resource);

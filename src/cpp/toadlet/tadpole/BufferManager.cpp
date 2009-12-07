@@ -49,6 +49,23 @@ BufferManager::~BufferManager(){
 	}
 }
 
+void BufferManager::destroy(){
+	int i;
+	for(i=0;i<mIndexBuffers.size();++i){
+		BackableIndexBuffer::ptr indexBuffer=mIndexBuffers[i];
+		indexBuffer->setBufferDestroyedListener(NULL);
+		indexBuffer->destroy();
+	}
+	mIndexBuffers.clear();
+
+	for(i=0;i<mVertexBuffers.size();++i){
+		BackableVertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
+		vertexBuffer->setBufferDestroyedListener(NULL);
+		vertexBuffer->destroy();
+	}
+	mVertexBuffers.clear();
+}
+
 IndexBuffer::ptr BufferManager::createIndexBuffer(int usageFlags,Buffer::AccessType accessType,IndexBuffer::IndexFormat indexFormat,int size){
 	BackableIndexBuffer::ptr indexBuffer(new BackableIndexBuffer());
 	indexBuffer->create(usageFlags,accessType,indexFormat,size);

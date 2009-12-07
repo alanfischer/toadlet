@@ -118,17 +118,17 @@ void SpriteNode::setMaterial(Material::ptr material){
 
 	if(mMaterial!=NULL){
 		mMaterial->retain();
-	}
 
-	// TODO: Move these so they are set externally, perhaps in a material manager loadspritematerial or something
-	//  Then we'd just have a debug check here to look for faceculling perhaps...?
-	mMaterial->setFaceCulling(Renderer::FaceCulling_NONE);
-	mMaterial->setDepthWrite(false);
-	int i;
-	for(i=0;i<mMaterial->getNumTextureStages();++i){
-		mMaterial->getTextureStage(i)->setUAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
-		mMaterial->getTextureStage(i)->setVAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
-		mMaterial->getTextureStage(i)->setWAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
+		// TODO: Move these so they are set externally, perhaps in a material manager loadspritematerial or something
+		//  Then we'd just have a debug check here to look for faceculling perhaps...?
+		mMaterial->setFaceCulling(Renderer::FaceCulling_NONE);
+		mMaterial->setDepthWrite(false);
+		int i;
+		for(i=0;i<mMaterial->getNumTextureStages();++i){
+			mMaterial->getTextureStage(i)->setUAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
+			mMaterial->getTextureStage(i)->setVAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
+			mMaterial->getTextureStage(i)->setWAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
+		}
 	}
 
 	updateSprite();

@@ -40,6 +40,8 @@ public:
 	BufferManager(Engine *engine);
 	virtual ~BufferManager();
 
+	virtual void destroy();
+
 	virtual peeper::IndexBuffer::ptr createIndexBuffer(int usageFlags,peeper::Buffer::AccessType accessType,peeper::IndexBuffer::IndexFormat indexFormat,int size);
 	virtual peeper::VertexBuffer::ptr createVertexBuffer(int usageFlags,peeper::Buffer::AccessType accessType,peeper::VertexFormat::ptr vertexFormat,int size);
 	virtual peeper::IndexBuffer::ptr cloneIndexBuffer(peeper::IndexBuffer::ptr oldIndexBuffer,int usageFlags,peeper::Buffer::AccessType accessType,peeper::IndexBuffer::IndexFormat indexFormat,int size);
