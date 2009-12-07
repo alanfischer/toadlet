@@ -51,6 +51,7 @@ D3D10Texture::D3D10Texture(D3D10Renderer *renderer):BaseResource(),
 //	mD3DUsage(0),
 //	mD3DPool(D3DPOOL_MANAGED),
 	mTexture(NULL),
+	mShaderResourceView(NULL),
 	mManuallyGenerateMipLevels(false)
 {
 	mRenderer=renderer;
@@ -90,6 +91,9 @@ bool D3D10Texture::createContext(){
 
 	mDXGIFormat=getDXGI_FORMAT(mFormat);
 
+	D3D10_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	srvDesc.Format=mDXGIFormat;
+
 	HRESULT result=E_FAIL;
 	switch(mDimension){
 		case Texture::Dimension_D1:{
@@ -99,6 +103,9 @@ bool D3D10Texture::createContext(){
 			desc.Usage=mD3DUsage;
 			desc.Format=mDXGIFormat;
 			desc.ArraySize=1;
+			srvDesc.ViewDimension=D3D10_SRV_DIMENSION_TEXTURE1D;
+			srvDesc.Texture1D.MipLevels=mMipLevels;
+			srvDesc.Texture1D.MostDetailedMip=0;
 
 			ID3D10Texture1D *texture=NULL;
 			result=device->CreateTexture1D(&desc,NULL,&texture);
@@ -112,7 +119,18 @@ bool D3D10Texture::createContext(){
 			desc.MipLevels=mMipLevels;
 			desc.Usage=mD3DUsage;
 			desc.Format=mDXGIFormat;
-			desc.ArraySize=mDimension==Texture::Dimension_CUBE?6:1;
+			if(mDimension==Texture::Dimension_CUBE){
+				desc.ArraySize=6;
+				srvDesc.ViewDimension=D3D10_SRV_DIMENSION_TEXTURECUBE;
+				srvDesc.TextureCube.MipLevels=mMipLevels;
+				srvDesc.TextureCube.MostDetailedMip=0;
+			}
+			else{
+				desc.ArraySize=1;
+				srvDesc.ViewDimension=D3D10_SRV_DIMENSION_TEXTURE2D;
+				srvDesc.Texture2D.MipLevels=mMipLevels;
+				srvDesc.Texture2D.MostDetailedMip=0;
+			}
 
 			ID3D10Texture2D *texture=NULL;
 			result=device->CreateTexture2D(&desc,NULL,&texture);
@@ -126,12 +144,17 @@ bool D3D10Texture::createContext(){
 			desc.MipLevels=mMipLevels;
 			desc.Usage=mD3DUsage;
 			desc.Format=mDXGIFormat;
+			srvDesc.ViewDimension=D3D10_SRV_DIMENSION_TEXTURE3D;
+			srvDesc.Texture3D.MipLevels=mMipLevels;
+			srvDesc.Texture3D.MostDetailedMip=0;
 
 			ID3D10Texture3D *texture=NULL;
 			result=device->CreateTexture3D(&desc,NULL,&texture);
 			mTexture=texture;
 		}break;
 	}
+
+	device->CreateShaderResourceView(mTexture,&srvDesc,&mShaderResourceView);
 
 	// TODO: Add mBacking data
 
@@ -159,7 +182,7 @@ void D3D10Texture::destroyContext(bool backData){
 	}
 }
 
-Surface::ptr D3D10Texture::getMipSuface(int level,int cubeSide){
+Surface::ptr D3D10Texture::getMipSurface(int level,int cubeSide){
 return NULL;
 /*	if(mTexture==NULL){
 		return NULL;
@@ -266,9 +289,8 @@ bool D3D10Texture::load(int format,int width,int height,int depth,int mipLevel,u
 		return false;
 	}
 
-// TODO:
 	if(mManuallyGenerateMipLevels){
-//		mTexture->GenerateMipSubLevels();
+		mRenderer->getD3D10Device()->GenerateMips(mShaderResourceView);
 	}
 
 	return true;
@@ -333,6 +355,7 @@ bool D3D10Texture::read(int format,int width,int height,int depth,int mipLevel,u
 		return false;
 	}
 */
+return false;
 }
 
 int D3D10Texture::getClosestTextureFormat(int textureFormat){
