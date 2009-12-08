@@ -54,15 +54,21 @@ public:
 		set(color);
 	}
 
-	LightEffect(bool trackColor):
+	LightEffect(const Color &ambient1,const Color &diffuse1,const Color &specular1,scalar shininess):
+		emissive(Colors::BLACK),
+		trackColor(false)
+	{
+		set(ambient1,diffuse1,specular1,shininess);
+	}
+
+	LightEffect(bool trackColor1):
 		ambient(Colors::WHITE),
 		diffuse(Colors::WHITE),
 		specular(Colors::WHITE),
 		shininess(Math::ONE),
-		emissive(Colors::BLACK)
-	{
-		this->trackColor=trackColor;
-	}
+		emissive(Colors::BLACK),
+		trackColor(trackColor1)
+	{}
 
 	LightEffect &set(const LightEffect &lightEffect){
 		ambient.set(lightEffect.ambient);
@@ -78,6 +84,14 @@ public:
 		ambient.set(color);
 		diffuse.set(color);
 		specular.set(color);
+		return *this;
+	}
+
+	LightEffect &set(const Color &ambient1,const Color &diffuse1,const Color &specular1,scalar shininess1){
+		ambient.set(ambient1);
+		diffuse.set(diffuse1);
+		specular.set(specular1);
+		shininess=shininess1;
 		return *this;
 	}
 

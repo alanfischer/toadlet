@@ -52,7 +52,7 @@ TextureStage::ptr MaterialManager::createTextureStage(Texture::ptr texture){
 	TextureStage::ptr textureStage(new TextureStage(texture));
 	textureStage->setMinFilter(mDefaultMinFilter);
 	textureStage->setMagFilter(mDefaultMagFilter);
-	if(texture->getNumMipLevels()>1){
+	if(texture!=NULL && texture->getNumMipLevels()>1){
 		textureStage->setMipFilter(mDefaultMipFilter);
 	}
 	else{

@@ -193,9 +193,6 @@ Engine::~Engine(){
 }
 
 void Engine::destroy(){
-	Logger::debug(Categories::TOADLET_TADPOLE,
-		"destroying Engine");
-
 	if(mScene!=NULL){
 		mScene->destroy();
 		mScene=NULL;
