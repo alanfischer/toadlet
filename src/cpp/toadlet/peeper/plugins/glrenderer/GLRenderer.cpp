@@ -1715,7 +1715,7 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastTypeBits){
 		tb=typeBits>>VertexElement::Type_TEX_COORD;
 		ltb=lastTypeBits>>VertexElement::Type_TEX_COORD;
 		int stci; // Shifted Tex Coord Indexes
-		for(i=0;i<mMaxTexCoordIndex;++i){
+		for(i=0;((tb|ltb)>>i)>0;++i){
 			stci=(1<<i);
 			if((tb&stci)!=(ltb&stci)){
 				glClientActiveTexture(GL_TEXTURE0+i);
