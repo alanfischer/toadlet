@@ -46,6 +46,7 @@ public:
 	mesh::Mesh::ptr createSkyBox(scalar size,bool unfolded);
 	mesh::Mesh::ptr createSphere(const Sphere &sphere,int numSegments=16,int numRings=16);
 	mesh::Mesh::ptr createGeoSphere(const Sphere &sphere,int depth,bool icosahedron);
+	mesh::Mesh::ptr createTorus(scalar majorRadius,scalar minorRadius,int numMajor,int numMinor);
 
 protected:
 	class IndexTri{
