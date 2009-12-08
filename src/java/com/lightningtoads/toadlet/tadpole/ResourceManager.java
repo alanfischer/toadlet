@@ -189,7 +189,7 @@ public class ResourceManager{
 	}
 
 	public Resource load(boolean cache,String name,String file,Resource resource,ResourceHandlerData handlerData){
-		if(Logger.getInstance().getMasterCategoryReportingLevel(Categories.TOADLET_TADPOLE)>=Logger.Level.EXCESSIVE){
+		if(Logger.getInstance().getMasterCategoryReportingLevel(Categories.TOADLET_TADPOLE)>=Logger.Level.EXCESS){
 			String description=cache?"Caching":"Loading";
 			description=description+" resource ";
 			if(file!=null){

@@ -312,7 +312,7 @@ public class Engine implements InputStreamFactory{
 
 		mBufferManager.getContextResourcesToLoad().clear();
 
-		if((numTexturesLoaded>0 || numBuffersLoaded>0) && Logger.getInstance().getMasterCategoryReportingLevel(Categories.TOADLET_TADPOLE)>=Logger.Level.EXCESSIVE){
+		if((numTexturesLoaded>0 || numBuffersLoaded>0) && Logger.getInstance().getMasterCategoryReportingLevel(Categories.TOADLET_TADPOLE)>=Logger.Level.EXCESS){
 			Logger.excess(Categories.TOADLET_TADPOLE,
 				("contextActivate: Loaded ")+numTexturesLoaded+" textures, loaded "+numBuffersLoaded+" buffers");
 		}
@@ -321,7 +321,7 @@ public class Engine implements InputStreamFactory{
 	public void contextDeactivate(Renderer renderer){
 		assert(renderer!=null);
 
-		Logger.debug(Categories.TOADLET_TADPOLE,.Level.DEBUG,
+		Logger.debug(Categories.TOADLET_TADPOLE,
 			"Engine::contextDeactivate");
 
 		int i;
@@ -375,7 +375,7 @@ public class Engine implements InputStreamFactory{
 			}
 		}
 
-		if((numTexturePeersUnloaded>0 || numBufferPeersUnloaded>0) && Logger.getInstance().getMasterCategoryReportingLevel(Categories.TOADLET_TADPOLE)>=Logger.Level.EXCESSIVE){
+		if((numTexturePeersUnloaded>0 || numBufferPeersUnloaded>0) && Logger.getInstance().getMasterCategoryReportingLevel(Categories.TOADLET_TADPOLE)>=Logger.Level.EXCESS){
 			Logger.excess(Categories.TOADLET_TADPOLE,
 				("contextDeactivate: Unloaded ")+numTexturePeersUnloaded+" texture peers, unloaded "+numBufferPeersUnloaded+" buffer peers");
 		}
@@ -409,7 +409,7 @@ public class Engine implements InputStreamFactory{
 		}
 		textureResourcesToLoad.clear();
 
-		if((numTexturePeersUnloaded>0 || numTexturesLoaded>0) && Logger.getInstance().getMasterCategoryReportingLevel(Categories.TOADLET_TADPOLE)>=Logger.Level.EXCESSIVE){
+		if((numTexturePeersUnloaded>0 || numTexturesLoaded>0) && Logger.getInstance().getMasterCategoryReportingLevel(Categories.TOADLET_TADPOLE)>=Logger.Level.EXCESS){
 			Logger.excess(Categories.TOADLET_TADPOLE,
 				("contextUpdate: Unloaded ")+numTexturePeersUnloaded+" texture peers, loaded "+numTexturesLoaded+" textures");
 		}
@@ -441,7 +441,7 @@ public class Engine implements InputStreamFactory{
 		}
 		bufferResourcesToLoad.clear();
 
-		if((numBufferPeersUnloaded>0 || numBuffersLoaded>0) && Logger.getInstance().getMasterCategoryReportingLevel(Categories.TOADLET_TADPOLE)>=Logger.Level.EXCESSIVE){
+		if((numBufferPeersUnloaded>0 || numBuffersLoaded>0) && Logger.getInstance().getMasterCategoryReportingLevel(Categories.TOADLET_TADPOLE)>=Logger.Level.EXCESS){
 			Logger.excess(Categories.TOADLET_TADPOLE,
 				("contextUpdate: Unloaded ")+numBufferPeersUnloaded+" buffer peers, loaded "+numBuffersLoaded+" buffers");
 		}
