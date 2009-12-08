@@ -189,13 +189,15 @@ Surface::ptr D3D9Texture::getMipSurface(int level,int cubeSide){
 		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
 		texture->GetSurfaceLevel(level,&surface);
 	}
-	else if(mDimension==Texture::Dimension_D3){
-		Error::unimplemented("D3D9Texture::getMipSurface not implement for volume textures");
+	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+		else if(mDimension==Texture::Dimension_CUBE){
+			IDirect3DCubeTexture9 *texture=(IDirect3DCubeTexture9*)mTexture;
+			texture->GetCubeMapSurface((D3DCUBEMAP_FACES)cubeSide,level,&surface);
+		}
+	#endif
+	else{
+		Error::unimplemented("D3D9Texture::getMipSurface unimplemented for this texture");
 		return NULL;
-	}
-	else if(mDimension==Texture::Dimension_CUBE){
-		IDirect3DCubeTexture9 *texture=(IDirect3DCubeTexture9*)mTexture;
-		texture->GetCubeMapSurface((D3DCUBEMAP_FACES)cubeSide,level,&surface);
 	}
 
 	if(surface!=NULL){
