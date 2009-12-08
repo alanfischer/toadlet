@@ -107,9 +107,7 @@ Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded){
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,24);
 	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_8,36);
 	{
-		VertexBufferAccessor vba;
 		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
-		IndexBufferAccessor iba;
 		iba.lock(indexBuffer,Buffer::AccessType_WRITE_ONLY);
 
 		int vi=0,ii=0;
@@ -426,6 +424,62 @@ Mesh::ptr MeshManager::createGeoSphere(const Sphere &sphere,int depth,bool icosa
 
 	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
+	subMesh->material=mEngine->getMaterialManager()->createMaterial();
+	subMesh->material->retain();
+	subMesh->material->setFaceCulling(Renderer::FaceCulling_BACK);
+	subMesh->material->setLighting(true);
+
+	Mesh::ptr mesh(new Mesh());
+	mesh->subMeshes.resize(1);
+	mesh->subMeshes[0]=subMesh;
+	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+
+	return mesh;
+}
+
+Mesh::ptr MeshManager::createTorus(scalar majorRadius,scalar minorRadius,int numMajor,int numMinor){
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,numMajor*(numMinor+1)*2);
+	{
+		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
+
+		Vector3 normal;
+		scalar majorStep=Math::TWO_PI/numMajor;
+		scalar minorStep=Math::TWO_PI/numMinor;
+		int i,j;
+		for(i=0;i<numMajor;i++){
+			scalar a0=i*majorStep;
+			scalar a1=a0+majorStep;
+			scalar x0=Math::cos(a0);
+			scalar y0=Math::sin(a0);
+			scalar x1=Math::cos(a1);
+			scalar y1=Math::sin(a1);
+
+			for(j=0;j<=numMinor;++j){
+				int index=(i*(numMinor+1)+j)*2;
+				scalar b=j*minorStep;
+				scalar c=Math::cos(b);
+				scalar r=Math::mul(minorRadius,c)+majorRadius;
+				scalar z=Math::mul(minorRadius,Math::sin(b));
+
+				vba.set3(index,0,Math::mul(x0,r),Math::mul(y0,r),z);
+				normal.set(Math::mul(x0,c),Math::mul(y0,c),Math::div(z,minorRadius));
+				Math::normalize(normal);
+				vba.set3(index,1,normal);
+				vba.set2(index,2,Math::div(Math::fromInt(i),Math::fromInt(numMajor)),Math::div(Math::fromInt(j),Math::fromInt(numMinor)));
+
+				vba.set3(index+1,0,Math::mul(x1,r),Math::mul(y1,r),z);
+				normal.set(Math::mul(x1,c),Math::mul(y1,c),Math::div(z,minorRadius));
+				Math::normalize(normal);
+				vba.set3(index+1,1,normal);
+				vba.set2(index+1,2,Math::div(Math::fromInt(i+1),Math::fromInt(numMajor)),Math::div(Math::fromInt(j),Math::fromInt(numMinor)));
+			}
+		}
+
+		vba.unlock();
+	}
+
+	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
+	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,vertexBuffer->getSize()));
 	subMesh->material=mEngine->getMaterialManager()->createMaterial();
 	subMesh->material->retain();
 	subMesh->material->setFaceCulling(Renderer::FaceCulling_BACK);
