@@ -48,7 +48,7 @@
         classname="com.android.ant.SetupTask"
         classpathref="android.antlibs"/>
 
-		<copy file="C:\users\siralanf\lib\toadlet.jar" todir="libs/"/>
+		<copy file="/home/wizzrobe/lib/toadlet.jar" todir="libs/"/>
 		
     <!-- Execute the Android Setup task that will setup some properties specific to the target,
          and import the rules files.
