@@ -18,6 +18,9 @@ configure_file (${JAVA_SRC_DIR}/Types.h ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/Types.h 
 set (CMAKE_Java_COMPILE_OBJECT
 	"<CMAKE_Java_COMPILER> -Xlint:unchecked <FLAGS> <SOURCE>"
 )
+#set (CMAKE_Java_CREATE_STATIC_LIBRARY
+#        "<CMAKE_Java_ARCHIVE> -cf <TARGET>"
+#)
 
 # Special setup for using gpp
 option (WINDOWS_VISTA "Java builds on Windows Vista require this flag to be ON" OFF)
@@ -111,10 +114,12 @@ foreach (SRCFILE ${EGG_SRC})
 endforeach (SRCFILE)
 
 #  Jar library
-add_library (toadlet_egg STATIC ${EGG_SRC_GPP})
+add_library (toadlet_egg ${EGG_SRC_GPP})
 set_target_properties (toadlet_egg PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_egg.dir/gpp\"")
 set_target_properties (toadlet_egg PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+set_target_properties (toadlet_egg PROPERTIES STATIC_LIBRARY_FLAGS "-C \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_egg.dir/gpp\" .")
 set_target_properties (toadlet_egg PROPERTIES LINK_FLAGS "-C \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_egg.dir/gpp\" .")
+set_property (TARGET toadlet_egg PROPERTY STATIC_LIBRARY_FLAGS "-C \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_egg.dir/gpp\" .")
 install (TARGETS toadlet_egg DESTINATION lib)
 
 
