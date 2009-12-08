@@ -1199,6 +1199,12 @@ void initthings(int argc, char **argv)
       add_comment(S,"sss",my_strdup("\""),my_strdup("\""),'\\','\n');
       add_comment(S,"sss",my_strdup("'"),my_strdup("'"),'\\','\n');
       break;
+    case 'J':
+      NoStdInc = 1;
+      NoCurIncFirst = 1;
+      execallowed=1;
+      add_comment(S,"ccc",my_strdup("/*"),my_strdup("*/"),0,0);
+      break;
     case 'P':
       ishelp|=ismode|hasmeta|usrmode; ismode=1;
       S->User=KUser; S->Meta=KMeta;

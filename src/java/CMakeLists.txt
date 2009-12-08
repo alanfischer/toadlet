@@ -23,12 +23,7 @@ set (CMAKE_Java_CREATE_STATIC_LIBRARY
 )
 
 # Special setup for using gpp
-option (WINDOWS_VISTA "Java builds on Windows Vista require this flag to be ON" OFF)
-if (WINDOWS_VISTA)
-	set (GPP_COMMAND gpp -x --nocurinc --nostdinc +c `"/*`" `"*/`")
-else (WINDOWS_VISTA)
-	set (GPP_COMMAND gpp -x --nocurinc --nostdinc +c \"/*\" \"*/\")
-endif (WINDOWS_VISTA)
+set (GPP_COMMAND gpp -J)
 
 
 # Building toadlet_egg
