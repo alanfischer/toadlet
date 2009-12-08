@@ -18,9 +18,9 @@ configure_file (${JAVA_SRC_DIR}/Types.h ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/Types.h 
 set (CMAKE_Java_COMPILE_OBJECT
 	"<CMAKE_Java_COMPILER> -Xlint:unchecked <FLAGS> <SOURCE>"
 )
-#set (CMAKE_Java_CREATE_STATIC_LIBRARY
-#        "<CMAKE_Java_ARCHIVE> -cf <TARGET>"
-#)
+set (CMAKE_Java_CREATE_STATIC_LIBRARY
+        "<CMAKE_Java_ARCHIVE> -cf <TARGET> -C <OBJECT_DIR>/gpp ."
+)
 
 # Special setup for using gpp
 option (WINDOWS_VISTA "Java builds on Windows Vista require this flag to be ON" OFF)
@@ -117,9 +117,6 @@ endforeach (SRCFILE)
 add_library (toadlet_egg ${EGG_SRC_GPP})
 set_target_properties (toadlet_egg PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_egg.dir/gpp\"")
 set_target_properties (toadlet_egg PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-set_target_properties (toadlet_egg PROPERTIES STATIC_LIBRARY_FLAGS "-C \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_egg.dir/gpp\" .")
-set_target_properties (toadlet_egg PROPERTIES LINK_FLAGS "-C \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_egg.dir/gpp\" .")
-set_property (TARGET toadlet_egg PROPERTY STATIC_LIBRARY_FLAGS "-C \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_egg.dir/gpp\" .")
 install (TARGETS toadlet_egg DESTINATION lib)
 
 
@@ -158,7 +155,6 @@ endforeach (SRCFILE)
 add_library (toadlet_hop STATIC ${HOP_SRC_GPP})
 set_target_properties (toadlet_hop PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_hop.dir/gpp\"")
 set_target_properties (toadlet_hop PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-set_target_properties (toadlet_hop PROPERTIES LINK_FLAGS "-C \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_hop.dir/gpp\" .")
 add_dependencies (toadlet_hop toadlet_egg)
 install (TARGETS toadlet_hop DESTINATION lib)
 
@@ -193,7 +189,6 @@ endforeach (SRCFILE)
 add_library (toadlet_knot STATIC ${KNOT_SRC_GPP})
 set_target_properties (toadlet_knot PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_knot.dir/gpp\"")
 set_target_properties (toadlet_knot PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-set_target_properties (toadlet_knot PROPERTIES LINK_FLAGS "-C \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_knot.dir/gpp\" .")
 add_dependencies (toadlet_knot toadlet_egg)
 install (TARGETS toadlet_knot DESTINATION lib)
 
@@ -283,7 +278,6 @@ endforeach (SRCFILE)
 add_library (toadlet_peeper STATIC ${PEEPER_SRC_GPP} ${PEEPER_GLRENDERER_SRC_GPP})
 set_target_properties (toadlet_peeper PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_peeper.dir/gpp\"")
 set_target_properties (toadlet_peeper PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-set_target_properties (toadlet_peeper PROPERTIES LINK_FLAGS "-C \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_peeper.dir/gpp\" .")
 add_dependencies (toadlet_peeper toadlet_egg)
 install (TARGETS toadlet_peeper DESTINATION lib)
 
@@ -384,7 +378,6 @@ endforeach (SRCFILE)
 add_library (toadlet_tadpole STATIC ${TADPOLE_SRC_GPP})
 set_target_properties (toadlet_tadpole PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_tadpole.dir/gpp\"")
 set_target_properties (toadlet_tadpole PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-set_target_properties (toadlet_tadpole PROPERTIES LINK_FLAGS "-C \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_tadpole.dir/gpp\" .")
 add_dependencies (toadlet_tadpole toadlet_egg toadlet_peeper)
 install (TARGETS toadlet_tadpole DESTINATION lib)
 
@@ -418,7 +411,6 @@ endforeach (SRCFILE)
 add_library (toadlet_tadpole_hop STATIC ${TADPOLE_HOP_SRC_GPP})
 set_target_properties (toadlet_tadpole_hop PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_tadpole_hop.dir/gpp\"")
 set_target_properties (toadlet_tadpole_hop PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-set_target_properties (toadlet_tadpole_hop PROPERTIES LINK_FLAGS "-C \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_tadpole_hop.dir/gpp\" .")
 add_dependencies (toadlet_tadpole_hop toadlet_egg toadlet_hop toadlet_tadpole)
 install (TARGETS toadlet_tadpole_hop DESTINATION lib)
 
@@ -452,7 +444,6 @@ endforeach (SRCFILE)
 add_library (toadlet_pad STATIC ${PAD_SRC_GPP})
 set_target_properties (toadlet_pad PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_pad.dir/gpp\"")
 set_target_properties (toadlet_pad PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-set_target_properties (toadlet_pad PROPERTIES LINK_FLAGS "-C \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_pad.dir/gpp\" .")
 add_dependencies (toadlet_pad toadlet_egg toadlet_peeper toadlet_tadpole)
 install (TARGETS toadlet_pad DESTINATION lib)
 
