@@ -8,30 +8,18 @@ add_subdirectory(gpp)
 
 # All toadlet libraries require the same includes
 # Note we include the JAVA_GPP_DIR files since those have been preprocessed
-include_directories (${JAVA_GPP_DIR}/com/lightningtoads ${ANDROID_JAR})
+include_directories (${JAVA_GPP_DIR} ${JAVA_GPP_DIR}/com/lightningtoads ${ANDROID_JAR})
 
 # Configure and copy the Config and Types file
 configure_file (${JAVA_SRC_DIR}/Config.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/Config.h)
 configure_file (${JAVA_SRC_DIR}/Types.h ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/Types.h COPYONLY)
 
-# Configure and copy the Version files
-configure_file (${JAVA_SRC_DIR}/egg/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/egg/Version.h)
-configure_file (${JAVA_SRC_DIR}/hop/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/hop/Version.h)
-configure_file (${JAVA_SRC_DIR}/knot/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/knot/Version.h)
-configure_file (${JAVA_SRC_DIR}/peeper/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/peeper/Version.h)
-configure_file (${JAVA_SRC_DIR}/tadpole/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/tadpole/Version.h)
-configure_file (${JAVA_SRC_DIR}/pad/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/pad/Version.h)
-
 # Special setup for java cmake compiling - MAKE THESE AN OVERRIDE FILE?
-set (CMAKE_Java_FLAGS "-sourcepath \"${JAVA_GPP_DIR}\"")
-file (MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/classes")
-include_directories (${CMAKE_CURRENT_BINARY_DIR}/classes)
 set (CMAKE_Java_COMPILE_OBJECT
-	"<CMAKE_Java_COMPILER> -Xlint:unchecked <FLAGS> <SOURCE> -d \"<CMAKE_CURRENT_BINARY_DIR>/classes\""
+	"<CMAKE_Java_COMPILER> -Xlint:unchecked <FLAGS> <SOURCE>"
 )
-# this is a place holder if java needed flags for javac they would go here.
 set (CMAKE_Java_CREATE_STATIC_LIBRARY
-	"<CMAKE_Java_ARCHIVE> -cf <TARGET> -C \"<CMAKE_CURRENT_BINARY_DIR>/classes\" ."
+        "<CMAKE_Java_ARCHIVE> -cf <TARGET> -C <OBJECT_DIR>/gpp ."
 )
 
 # Special setup for using gpp
@@ -44,6 +32,9 @@ endif (WINDOWS_VISTA)
 
 
 # Building toadlet_egg
+
+# Configure
+configure_file (${JAVA_SRC_DIR}/egg/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/egg/Version.h)
 
 # Source files
 set (EGG_SRC
@@ -124,13 +115,15 @@ endforeach (SRCFILE)
 
 #  Jar library
 add_library (toadlet_egg ${EGG_SRC_GPP})
+set_target_properties (toadlet_egg PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_egg.dir/gpp\"")
 set_target_properties (toadlet_egg PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
 install (TARGETS toadlet_egg DESTINATION lib)
 
 
 # Building toadlet_hop
 
-# Configure and copy the types file
+# Configure
+configure_file (${JAVA_SRC_DIR}/hop/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/hop/Version.h)
 configure_file (${JAVA_SRC_DIR}/hop/Types.h ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/hop/Types.h COPYONLY)
 
 # Source files
@@ -159,13 +152,17 @@ foreach (SRCFILE ${HOP_SRC})
 endforeach (SRCFILE)
 
 #  Jar library
-add_library (toadlet_hop ${HOP_SRC_GPP})
+add_library (toadlet_hop STATIC ${HOP_SRC_GPP})
+set_target_properties (toadlet_hop PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_hop.dir/gpp\"")
 set_target_properties (toadlet_hop PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
 add_dependencies (toadlet_hop toadlet_egg)
 install (TARGETS toadlet_hop DESTINATION lib)
 
 
 # Building toadlet_knot
+
+# Configure
+configure_file (${JAVA_SRC_DIR}/knot/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/knot/Version.h)
 
 # Source files
 set (KNOT_SRC
@@ -189,7 +186,8 @@ foreach (SRCFILE ${KNOT_SRC})
 endforeach (SRCFILE)
 
 #  Jar library
-add_library (toadlet_knot ${KNOT_SRC_GPP})
+add_library (toadlet_knot STATIC ${KNOT_SRC_GPP})
+set_target_properties (toadlet_knot PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_knot.dir/gpp\"")
 set_target_properties (toadlet_knot PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
 add_dependencies (toadlet_knot toadlet_egg)
 install (TARGETS toadlet_knot DESTINATION lib)
@@ -197,7 +195,8 @@ install (TARGETS toadlet_knot DESTINATION lib)
 
 # Building toadlet_peeper
 
-# Configure and copy the types file
+# Configure
+configure_file (${JAVA_SRC_DIR}/peeper/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/peeper/Version.h)
 configure_file (${JAVA_SRC_DIR}/peeper/Types.h ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/peeper/Types.h COPYONLY)
 
 # Source files
@@ -276,7 +275,8 @@ foreach (SRCFILE ${PEEPER_GLRENDERER_SRC})
 endforeach (SRCFILE)
 
 #  Jar library for peeper and it's plugins
-add_library (toadlet_peeper ${PEEPER_SRC_GPP} ${PEEPER_GLRENDERER_SRC_GPP})
+add_library (toadlet_peeper STATIC ${PEEPER_SRC_GPP} ${PEEPER_GLRENDERER_SRC_GPP})
+set_target_properties (toadlet_peeper PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_peeper.dir/gpp\"")
 set_target_properties (toadlet_peeper PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
 add_dependencies (toadlet_peeper toadlet_egg)
 install (TARGETS toadlet_peeper DESTINATION lib)
@@ -285,6 +285,7 @@ install (TARGETS toadlet_peeper DESTINATION lib)
 # Building toadlet_tadpole
 
 # Configure and copy the types file
+configure_file (${JAVA_SRC_DIR}/tadpole/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/tadpole/Version.h)
 configure_file (${JAVA_SRC_DIR}/tadpole/Types.h ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/tadpole/Types.h COPYONLY)
 
 # Source files
@@ -374,7 +375,8 @@ foreach (SRCFILE ${TADPOLE_SRC})
 endforeach (SRCFILE)
 
 #  Jar library
-add_library (toadlet_tadpole ${TADPOLE_SRC_GPP})
+add_library (toadlet_tadpole STATIC ${TADPOLE_SRC_GPP})
+set_target_properties (toadlet_tadpole PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_tadpole.dir/gpp\"")
 set_target_properties (toadlet_tadpole PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
 add_dependencies (toadlet_tadpole toadlet_egg toadlet_peeper)
 install (TARGETS toadlet_tadpole DESTINATION lib)
@@ -406,13 +408,17 @@ foreach (SRCFILE ${TADPOLE_HOP_SRC})
 endforeach (SRCFILE)
 
 #  Jar library
-add_library (toadlet_tadpole_hop ${TADPOLE_HOP_SRC_GPP})
+add_library (toadlet_tadpole_hop STATIC ${TADPOLE_HOP_SRC_GPP})
+set_target_properties (toadlet_tadpole_hop PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_tadpole_hop.dir/gpp\"")
 set_target_properties (toadlet_tadpole_hop PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
 add_dependencies (toadlet_tadpole_hop toadlet_egg toadlet_hop toadlet_tadpole)
 install (TARGETS toadlet_tadpole_hop DESTINATION lib)
 
 
 # Building toadlet_pad
+
+# Configure
+configure_file (${JAVA_SRC_DIR}/pad/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/pad/Version.h)
 
 # Source files
 set (PAD_SRC
@@ -435,7 +441,8 @@ foreach (SRCFILE ${PAD_SRC})
 endforeach (SRCFILE)
 
 #  Jar library
-add_library (toadlet_pad ${PAD_SRC_GPP})
+add_library (toadlet_pad STATIC ${PAD_SRC_GPP})
+set_target_properties (toadlet_pad PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_pad.dir/gpp\"")
 set_target_properties (toadlet_pad PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
 add_dependencies (toadlet_pad toadlet_egg toadlet_peeper toadlet_tadpole)
 install (TARGETS toadlet_pad DESTINATION lib)

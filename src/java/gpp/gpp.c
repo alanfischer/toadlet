@@ -25,7 +25,9 @@
 
 /* To compile under MS VC++, one must define WIN_NT */
 
-#ifdef WIN32              /* WIN NT settings */
+#include "config.h"
+
+#ifdef WIN_NT              /* WIN NT settings */
 #define popen   _popen
 #define pclose  _pclose
 #define my_strdup  _strdup
@@ -35,7 +37,10 @@
 #else                      /* UNIX settings */
 #define SLASH '/'
 #define DEFAULT_CRLF 0
+#define my_strdup  strdup
+#define my_strcasecmp strcasecmp
 #endif
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -249,9 +254,6 @@ inline char *my_strdup(const char *s) {
   char *newstr=malloc(len);
   return newstr ? (char *)memcpy(newstr, s, len) : NULL;
 }
-#else
-#  undef my_strdup
-#  define my_strdup strdup
 #endif
 #if ! HAVE_STRCASECMP
 int my_strcasecmp(const char *s, const char *s2) {
@@ -265,9 +267,6 @@ int my_strcasecmp(const char *s, const char *s2) {
   } while (*s++ && *s2++);
   return 0;
 }
-#else
-#  undef my_strcasecmp
-#  define my_strcasecmp strcasecmp
 #endif
 
 void bug(const char *s)
@@ -1595,7 +1594,8 @@ int DoArithmEval(char *buf,int pos1,int pos2,int *result)
   if (SpliceInfix(buf,pos1,pos2,"=~",&spl1,&spl2)) {
 #if ! HAVE_FNMATCH_H
     bug("globbing support has not been compiled in");
-#endif
+	return 0;
+#else
     if (!DoArithmEval(buf,pos1,spl1,&result1)||
         !DoArithmEval(buf,spl2,pos2,&result2)) {
       char *str1,*str2;
@@ -1603,15 +1603,16 @@ int DoArithmEval(char *buf,int pos1,int pos2,int *result)
       /* revert to string comparison */
       while ((pos1<spl1)&&iswhite(buf[spl1-1])) spl1--;
       while ((pos2>spl2)&&iswhite(buf[spl2])) spl2++;
-      str1=strdup(buf+pos1);
+      str1=my_strdup(buf+pos1);
       str1[spl1-pos1]='\0';
-      str2=strdup(buf+spl2);
+      str2=my_strdup(buf+spl2);
       str2[pos2-spl2]='\0';
       *result=(fnmatch(str2,str1,0)==0);
       free(str1);
       free(str2);
     }
     else *result=(result1==result2);
+#endif
     return 1;
   }
 
@@ -2001,7 +2002,7 @@ static void DoInclude(char *file_name)
   struct INPUTCONTEXT *N;
   char *incfile_name = NULL;
   FILE *f = NULL;
-  int i, j;
+  int j;
   int len = strlen(file_name);
 
   /* if absolute path name is specified */
