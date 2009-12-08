@@ -29,7 +29,7 @@ package com.lightningtoads.toadlet.egg;
 
 #define TOADLET_MAKE_LOGGER_FUNCTION(name,level) \
 	public static void name(String description){name(null,description);} \
-	public static void name(String categoryName,const String &description){ \
+	public static void name(String categoryName,String description){ \
 		Logger instance=getInstance(); \
 		if(level>Level.MAX) ; \
 		else if(level<=instance.getMasterReportingLevel() && level<=instance.getCategoryReportingLevel(categoryName)){ \
