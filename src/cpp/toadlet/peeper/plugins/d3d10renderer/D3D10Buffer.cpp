@@ -45,15 +45,10 @@ D3D10Buffer::D3D10Buffer(D3D10Renderer *renderer):
 	//mVertexFormat,
 	mVertexSize(0),
 
-	mFVF(0),
-	mD3DUsage(0),
-//	mD3DPool(D3DPOOL_MANAGED),
 	mBuffer(NULL),
 	//mColorElements,
 	mLockType(AccessType_NO_ACCESS),
-	mData(NULL),
-	mBacking(false),
-	mBackingData(NULL)
+	mData(NULL)
 {
 	mRenderer=renderer;
 }
@@ -63,7 +58,15 @@ D3D10Buffer::~D3D10Buffer(){
 }
 
 bool D3D10Buffer::create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size){
-return false;
+	destroy();
+
+	mUsageFlags=usageFlags;
+	mAccessType=accessType;
+	mSize=size;
+	mIndexFormat=indexFormat;
+	mDataSize=mIndexFormat*mSize;
+
+	return createContext();
 }
 
 bool D3D10Buffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size){
@@ -82,37 +85,32 @@ bool D3D10Buffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr 
 void D3D10Buffer::destroy(){
 	destroyContext(false);
 
-	if(mBackingData!=NULL){
-		delete[] mBackingData;
-		mBackingData=NULL;
-	}
-
 	if(mListener!=NULL){
-//		if(mTarget==GL_ELEMENT_ARRAY_BUFFER){
-//			mListener->bufferDestroyed((IndexBuffer*)this);
-//		}
-//		else{
-//			mListener->bufferDestroyed((VertexBuffer*)this);
-//		}
+		if(mVertexFormat==NULL){
+			mListener->bufferDestroyed((IndexBuffer*)this);
+		}
+		else{
+			mListener->bufferDestroyed((VertexBuffer*)this);
+		}
 	}
 }
 
 bool D3D10Buffer::createContext(){
-/*	mD3DUsage=0;
+	D3D10_BUFFER_DESC desc;
 
+	desc.ByteWidth=mDataSize;
 	if((mUsageFlags&UsageFlags_DYNAMIC)>0){
-		mD3DUsage|=D3DUSAGE_DYNAMIC;
+		desc.Usage=D3D10_USAGE_DYNAMIC;
 	}
-
-	if(mAccessType==AccessType_WRITE_ONLY){
-		mD3DUsage|=D3DUSAGE_WRITEONLY;
+	else{
+		desc.Usage=D3D10_USAGE_DEFAULT;
 	}
+//	desc.BindFlags=
 
-	HRESULT result=mRenderer->getD3D10Device()->CreateBuffer();//CreateVertexBuffer(mDataSize,mD3DUsage,mFVF,mD3DPool,&mVertexBuffer TOADLET_SHAREDHANDLE);
-	TOADLET_CHECK_D3D9ERROR(result,"D3D10Buffer: CreateBuffer");
+//	HRESULT result=mRenderer->getD3D10Device()->CreateBuffer();//CreateVertexBuffer(mDataSize,mD3DUsage,mFVF,mD3DPool,&mVertexBuffer TOADLET_SHAREDHANDLE);
+//	TOADLET_CHECK_D3D10ERROR(result,"D3D10Buffer: CreateBuffer");
 
-	return SUCCEEDED(result);
-*/
+//	return SUCCEEDED(result);
 return false;
 }
 

@@ -89,6 +89,7 @@ GLRenderer::GLRenderer():
 
 	//mStatisticsSet,
 	//mCapabilitySet,
+	mMultiTexture(false),
 
 	mPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL)
@@ -197,6 +198,7 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 		maxTextureStages=1;
 	}
 	mCapabilitySet.maxTextureStages=maxTextureStages;
+	mMultiTexture=maxTextureStages>1;
 
 	mLastTextures.resize(mCapabilitySet.maxTextureStages,NULL);
 	mLastTexTargets.resize(mCapabilitySet.maxTextureStages,0);
@@ -1021,9 +1023,15 @@ void GLRenderer::setPointParameters(bool sprite,scalar size,bool attenuated,scal
 			glDisable(GL_POINT_SPRITE);
 			value=0;
 		}
-		int stage;
-		for(stage=0;stage<mCapabilitySet.maxTextureStages;++stage){
-			glActiveTexture(GL_TEXTURE0+stage);
+
+		if(mMultiTexture){
+			int stage;
+			for(stage=0;stage<mCapabilitySet.maxTextureStages;++stage){
+				glActiveTexture(GL_TEXTURE0+stage);
+				glTexEnvi(GL_POINT_SPRITE,GL_COORD_REPLACE,value);
+			}
+		}
+		else{
 			glTexEnvi(GL_POINT_SPRITE,GL_COORD_REPLACE,value);
 		}
 	}
@@ -1054,7 +1062,12 @@ void GLRenderer::setPointParameters(bool sprite,scalar size,bool attenuated,scal
 void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 	mStatisticsSet.textureChangeCount++;
 
-	glActiveTexture(GL_TEXTURE0+stage);
+	if(stage>0){
+		if(mMultiTexture==false){
+			return;
+		}
+		glActiveTexture(GL_TEXTURE0+stage);
+	}
 
 	if(textureStage!=NULL){
 		Texture *texture=textureStage->texture;
@@ -1677,7 +1690,9 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastTypeBits){
 					for(k=0;k<mMaxTexCoordIndex;++k){
 						if(mTexCoordIndexes[k]==texCoordIndex){
 							typeBits|=(1<<(k+VertexElement::Type_TEX_COORD));
-							glClientActiveTexture(GL_TEXTURE0+k);
+							if(mMultiTexture){
+								glClientActiveTexture(GL_TEXTURE0+k);
+							}
 							glTexCoordPointer(
 								glvertexBuffer->mElementCounts[j],
 								glvertexBuffer->mElementTypes[j],
@@ -1718,7 +1733,9 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastTypeBits){
 		for(i=0;((tb|ltb)>>i)>0;++i){
 			stci=(1<<i);
 			if((tb&stci)!=(ltb&stci)){
-				glClientActiveTexture(GL_TEXTURE0+i);
+				if(mMultiTexture){
+					glClientActiveTexture(GL_TEXTURE0+i);
+				}
 				if((tb&stci)>(ltb&stci)){
 					glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 				}

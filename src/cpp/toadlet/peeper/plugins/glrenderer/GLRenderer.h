@@ -171,6 +171,7 @@ protected:
 
 	StatisticsSet mStatisticsSet;
 	CapabilitySet mCapabilitySet;
+	bool mMultiTexture;
 
 	RenderTarget *mPrimaryRenderTarget;
 	GLRenderTarget *mGLPrimaryRenderTarget;

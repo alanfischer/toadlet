@@ -69,7 +69,7 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,IndexFormat indexForm
 	mSize=size;
 	mIndexFormat=indexFormat;
 	mDataSize=mIndexFormat*mSize;
-	
+
 	mTarget=GL_ELEMENT_ARRAY_BUFFER;
 	bool result=createContext();
 
@@ -116,6 +116,7 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr ver
 		mBacking=true;
 	}
 
+	// TODO: This will be converted to a a GLVertexFormat type
 	int numVertexElements=mVertexFormat->vertexElements.size();
 	mElementTypes.resize(numVertexElements);
 	mElementCounts.resize(numVertexElements);

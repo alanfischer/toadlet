@@ -78,15 +78,12 @@ protected:
 	IndexFormat mIndexFormat;
 	VertexFormat::ptr mVertexFormat;
 	short mVertexSize;
-
-	DWORD mFVF;
-	DWORD mD3DUsage;
-	ID3D10Buffer *mBuffer;
 	egg::Collection<VertexElement> mColorElements;
+
+	ID3D10Buffer *mBuffer;
 	AccessType mLockType;
-	uint8 *mData;
 	bool mBacking;
-	uint8 *mBackingData;
+	uint8 *mData;
 
 	friend D3D10Renderer;
 };
