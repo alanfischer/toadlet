@@ -83,7 +83,6 @@ protected:
 	int mInternalFormat;
 	DXGI_FORMAT mDXGIFormat;
 	D3D10_USAGE mD3DUsage;
-//	D3DPOOL mD3DPool;
 	ID3D10Resource *mTexture;
 	ID3D10ShaderResourceView *mShaderResourceView;
 	bool mManuallyGenerateMipLevels;

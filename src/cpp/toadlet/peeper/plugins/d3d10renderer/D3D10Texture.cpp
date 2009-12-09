@@ -88,6 +88,7 @@ bool D3D10Texture::createContext(){
 
 	// TODO: Get Usage flags working
 	mD3DUsage=D3D10_USAGE_DEFAULT;
+	int miscFlags=((mUsageFlags&UsageFlags_AUTOGEN_MIPMAPS)>0)?D3D10_RESOURCE_MISC_GENERATE_MIPS:0;
 
 	mDXGIFormat=getDXGI_FORMAT(mFormat);
 
@@ -101,6 +102,7 @@ bool D3D10Texture::createContext(){
 			desc.Width=mWidth;
 			desc.MipLevels=mMipLevels;
 			desc.Usage=mD3DUsage;
+			desc.MiscFlags=miscFlags;
 			desc.Format=mDXGIFormat;
 			desc.ArraySize=1;
 			srvDesc.ViewDimension=D3D10_SRV_DIMENSION_TEXTURE1D;
@@ -118,6 +120,7 @@ bool D3D10Texture::createContext(){
 			desc.Height=mHeight;
 			desc.MipLevels=mMipLevels;
 			desc.Usage=mD3DUsage;
+			desc.MiscFlags=miscFlags;
 			desc.Format=mDXGIFormat;
 			if(mDimension==Texture::Dimension_CUBE){
 				desc.ArraySize=6;
@@ -143,6 +146,7 @@ bool D3D10Texture::createContext(){
 			desc.Depth=mDepth;
 			desc.MipLevels=mMipLevels;
 			desc.Usage=mD3DUsage;
+			desc.MiscFlags=miscFlags;
 			desc.Format=mDXGIFormat;
 			srvDesc.ViewDimension=D3D10_SRV_DIMENSION_TEXTURE3D;
 			srvDesc.Texture3D.MipLevels=mMipLevels;
