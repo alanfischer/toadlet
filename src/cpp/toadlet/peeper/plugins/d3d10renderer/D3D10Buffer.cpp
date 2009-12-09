@@ -45,6 +45,7 @@ D3D10Buffer::D3D10Buffer(D3D10Renderer *renderer):
 	//mVertexFormat,
 	mVertexSize(0),
 
+	mBindFlags(0),
 	mBuffer(NULL),
 	//mColorElements,
 	mLockType(AccessType_NO_ACCESS),
@@ -66,6 +67,7 @@ bool D3D10Buffer::create(int usageFlags,AccessType accessType,IndexFormat indexF
 	mIndexFormat=indexFormat;
 	mDataSize=mIndexFormat*mSize;
 
+	mBindFlags|=D3D10_BIND_INDEX_BUFFER;
 	return createContext();
 }
 
@@ -79,6 +81,7 @@ bool D3D10Buffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr 
 	mVertexSize=mVertexFormat->vertexSize;
 	mDataSize=mVertexSize*mSize;
 
+	mBindFlags|=D3D10_BIND_VERTEX_BUFFER;
 	return createContext();
 }
 
@@ -86,7 +89,7 @@ void D3D10Buffer::destroy(){
 	destroyContext(false);
 
 	if(mListener!=NULL){
-		if(mVertexFormat==NULL){
+		if((mBindFlags&D3D10_BIND_INDEX_BUFFER)>0){
 			mListener->bufferDestroyed((IndexBuffer*)this);
 		}
 		else{
@@ -105,7 +108,7 @@ bool D3D10Buffer::createContext(){
 	else{
 		desc.Usage=D3D10_USAGE_DEFAULT;
 	}
-//	desc.BindFlags=
+	desc.BindFlags=mBindFlags;
 
 //	HRESULT result=mRenderer->getD3D10Device()->CreateBuffer();//CreateVertexBuffer(mDataSize,mD3DUsage,mFVF,mD3DPool,&mVertexBuffer TOADLET_SHAREDHANDLE);
 //	TOADLET_CHECK_D3D10ERROR(result,"D3D10Buffer: CreateBuffer");

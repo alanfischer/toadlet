@@ -80,6 +80,7 @@ protected:
 	short mVertexSize;
 	egg::Collection<VertexElement> mColorElements;
 
+	int mBindFlags;
 	ID3D10Buffer *mBuffer;
 	AccessType mLockType;
 	bool mBacking;
