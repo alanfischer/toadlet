@@ -138,8 +138,7 @@ void TextureManager::contextActivate(peeper::Renderer *renderer){
 			shared_static_cast<BackableTexture>(texture)->setBack(back);
 		}
 		else{
-			// TODO: move createContext to Texture so it can be called from here
-			// Likewise fix BufferManager so it is aware of both Backable & NonBackable items
+			texture->createContext();
 		}
 	}
 }
@@ -152,8 +151,7 @@ void TextureManager::contextDeactivate(peeper::Renderer *renderer){
 			shared_static_cast<BackableTexture>(texture)->setBack(NULL);
 		}
 		else{
-			// TODO: move destroyContext to Texture so it can be called from here
-			// Likewise fix BufferManager so it is aware of both Backable & NonBackable items
+			texture->destroyContext(true);
 		}
 	}
 }
