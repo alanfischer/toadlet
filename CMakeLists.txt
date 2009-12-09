@@ -126,7 +126,7 @@ endif (UPDATE_WINCE)
 
 # HACK: Directly alter the cmake install scripts for iPhoneOS
 # This should no longer be necessary once CMake supports iPhoneOS properly
-if (UPDATE_IPHONEOS)
+if (UPDATE_IPHONE)
 	message ("Manually updating the cmake install scripts to use BUILD_TYPE-iphoneos")
 	set (PROJS 
 		"${CMAKE_BINARY_DIR}/cmake_install.cmake"
@@ -161,6 +161,6 @@ if (UPDATE_IPHONEOS)
 		endif (EXISTS "${INSTPROJFILE}")
 	endforeach(INSTPROJFILE)
 	message (SEND_ERROR "Done! \nThis isn't really an error; just letting you know the cmake_install.cmake files are updated. \nYes it's a hack, yes it will go away once CMake supports iphoneos by default. But believe me it's more straightforward than patching the source.")
-endif (UPDATE_IPHONEOS)
+endif (UPDATE_IPHONE)
 
 
