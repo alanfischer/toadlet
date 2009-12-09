@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_WIN32AUDIOBUFFERPEER_H
-#define TOADLET_RIBBIT_WIN32AUDIOBUFFERPEER_H
+#ifndef TOADLET_RIBBIT_WIN32AUDIOBUFFER_H
+#define TOADLET_RIBBIT_WIN32AUDIOBUFFER_H
 
 #include "Win32Player.h"
 #include <toadlet/egg/BaseResource.h>
