@@ -6,11 +6,11 @@ Contents
 2. Setup
 3. Build commands
    3.1 General
-   3.2 Win32
+   3.2 Windows
    3.3 WinCE
    3.4 Posix
    3.5 OSX
-   3.6 iPhoneOS and iPhoneSimulator
+   3.6 iPhoneOS
    3.7 Android
 
 
@@ -34,6 +34,7 @@ toadlet_egg:
 toadlet-peeper:
 * OpenGL
 * Direct3D 9 (Windows only)
+* DirectX 10 (Windows only)
 
 toadlet-ribbit:
 * OpenAL
@@ -49,10 +50,16 @@ toadlet-pad:
 
 
 2. Setup
+    Toadlet uses CMake to greatly
+simplify the task of building it for
+the large number of supported platforms.
+If you are unfamiliar with CMake, better
+read up on it first: http://www.cmake.org
+
     We recommend using out of source
 builds with Toadlet. Simply create a
 subdirectory within the toadlet project
-(eg build.win32 when building for win32)
+(eg build.win when building for Windows)
 and enter that directory. You should
 create separate build subdirectories
 for each platform specific build of
@@ -64,7 +71,7 @@ TOADLET_FIXED_POINT, that you might want
 to use in your build directory naming, eg:
 build.wince.fixed
 
-    On win32 platforms, cmake needs
+    On Windows platforms, cmake needs
 to be aware of your Visual Studio
 installation to create project files.
 Typically, it is best to open up a 
@@ -83,7 +90,7 @@ the base of the toadlet project):
 
    cmake ..
 
-This will build and install toadlet into
+    This will build and install toadlet into
 the default install locations. We STRONGLY
 recommend specifiying your header and library
 installation path via the following:
@@ -93,10 +100,10 @@ installation path via the following:
 This way you can place different platform builds of
 toadlet into different locations. 
 
-   Sometimes the toadlet dependices will be 
+    Sometimes the toadlet dependices will be 
 installed into non-standard paths which cmake 
 does not autmatically find. (This is typical on
-win32 platforms).  You can instruct cmake to 
+Windows platforms).  You can instruct cmake to 
 seach additional directories for the dependencies
 with the following:
 
@@ -105,7 +112,7 @@ with the following:
 You can specify multiple paths my separating them with a 
 colon : between each one on windows systems and a ; on posix systems.
 
-   Finally, on certain systems (like posix) cmake requires 
+    Finally, on certain systems (like posix) cmake requires 
 you to determine the type of build (debug/release/etc) when
 calling cmake. You can set this up by calling:
 
@@ -115,20 +122,20 @@ Where BuildType can be either Debug or Release.
 
 
 3.2 Windows
-   On windows systems, toadlet usually needs to be told where to
+    On windows systems, toadlet usually needs to be told where to
 find the dependencies. Otherwise the setup is straightforward:
 
    cmake -DCMAKE_INSTALL_PREFIX=%HOME%\toadlet\win32 -DCMAKE_PREFIX_PATH="C:\Program Files" ..
 
-   RTTI May be enabled or disabled with -DTOADLET_RTTI=ON or OFF
+Note: RTTI May be enabled or disabled with -DTOADLET_RTTI=ON or OFF
    
  
 3.3 WinCE
-   Toadlet also builds for WinCE using cmake toolchain files. 
+    Toadlet also builds for WinCE using cmake toolchain files. 
 In addition, you have to do a 2 step process since cmake cannot 
 yet change the platform build type in Visual Studio 8 and up. 
 
-So you call a cmake build normally with the toolchain file and 
+    First you call a cmake build normally with the toolchain file and 
 the special UPDATE_WINCE variable off. Then you call cmake again 
 with UPDATE_WINCE on. Ignore the complaints it makes, you're 
 ready to go. Otherwise the WinCE build is similar to the win32 build:
@@ -139,45 +146,53 @@ ready to go. Otherwise the WinCE build is similar to the win32 build:
 
 
 3.4 Posix
-   On posix systems don't forget to set the build type, if you 
+    On posix systems don't forget to set the build type, if you 
 are using makefiles. A typical command might look like:
 
    cmake -DCMAKE_INSTALL_PREFIX=$HOME/toadlet/posix -DCMAKE_BUILD_TYPE=Release ..
 
 
 3.5 OSX
-   Toadlet if OSX is easy to build using Xcode Projects. You only
+    Toadlet if OSX is easy to build using Xcode Projects. You only
 need to make sure you tell cmake to use the Xcode generator with
 the -G switch as follows:
 
    cmake -GXcode -DCMAKE_INSTALL_PREFIX=$HOME/toadlet/osx  ..
 
 
-3.6 iPhoneOS and iPhoneSimulator
-   Toadlet is avaialble for the iPhoneOS and iPhoneSimulator 
-platforms using Toolchain files. Note that dependency checking 
-on these platforms will find the system osx libraries if the 
-iPhone SDK ones are not found. Make sure you setup your 
-CMAKE_PREFIX_PATH to avoid this. 
+3.6 iPhoneOS
+    Toadlet is avaialble for the iPhoneOS platform using 
+Toolchain files. Note that dependency checking will find
+the system osx libraries if the iPhone SDK ones are not 
+found. Make sure you setup your CMAKE_PREFIX_PATH to avoid this. 
 
-   cmake -GXcode -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/iPhoneOS.cmake -DCMAKE_INSTALL_PREFIX=$HOME/iPhoneOS -DCMAKE_PREFIX_PATH=$HOME/toadlet/iphone/deps -DTOADLET_FIXED_POINT=ON ..
+    Much like with WinCE, cmake's generated Xcode build will be for
+the wrong platform. You need to manually update. First call cmake 
+with the toolchain file and the special UPDATE_IPHONE variable off. 
+Then you call cmake again with UPDATE_IPHONE on.
 
-   cmake -DUPDATE_IPHONEOS=ON ..
+   cmake -GXcode -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/iPhoneOS.cmake -DCMAKE_INSTALL_PREFIX=$HOME/iPhoneOS -DCMAKE_PREFIX_PATH=$HOME/toadlet/iphone/deps -DTOADLET_FIXED_POINT=ON -DUPDATE_IPHONE=OFF ..
+
+   cmake -DUPDATE_IPHONE=ON ..
 
 NOTE: Be sure you set your xcodeproject to use the same iPhoneOS SDK that cmake found!
 
 
 3.7 Android
-   When building for android, you need to specify the 
+    When building for android, you need to specify the 
 android.jar for the android sdk you wish to build against, 
 using ANDROID_JAR. 
 
    cmake -DCMAKE_INSTALL_PREFIX=$HOME/toadlet/android -DTOADLET_PLATFORM_ANDROID=ON -DANDROID_JAR=$HOME/android/android.jar -DTOADLET_FIXED_POINT=ON ..
 	
-   On Windows systems, the Visual Studio generators for
-cmake java do not work well at all. Instead use the nmake
-generators an run command line builds. It is so much
-nicer to use.
+    On Windows systems, the Visual Studio generators for
+cmake java tend to be annoying to use, since Visual 
+Studio wants to edit the already preprocessed java files 
+instead of the original source files. 
+
+    Instead, use the nmake generators an run command line 
+builds, and a separate editor for the .java sources. It is
+so much nicer to use.
 
    cmake -G"NMake Makefiles" -DCMAKE_INSTALL_PREFIX=$HOME/toadlet/android -DTOADLET_PLATFORM_ANDROID=ON -DANDROID_JAR=$HOME/android/android.jar -DTOADLET_FIXED_POINT=ON ..
 
