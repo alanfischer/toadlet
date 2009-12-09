@@ -207,7 +207,7 @@ and type: "doxygen Doxyfile"
 doxygen/html/index.html
 
 Note: You'll need the Doxygen tool installed, and
-we recommend the Graphviz packaged for the dot graph
+we recommend the Graphviz package for the dot graph
 generator.
 
 http://www.stack.nl/~dimitri/doxygen/
