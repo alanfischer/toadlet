@@ -1,3 +1,6 @@
+# With java, you have the option of building separate jars for each library
+option (TOADLET_ANDROID_SPLIT_JARS "Build separate jars for each library instead of a single one." OFF)
+
 # Java is really fussy about pathing, so we do all setup here instead of
 # in subdirectories. For simplicity, define our paths here
 set (JAVA_SRC_DIR com/lightningtoads/toadlet)
@@ -102,10 +105,12 @@ foreach (SRCFILE ${EGG_SRC})
 endforeach (SRCFILE)
 
 #  Jar library
-add_library (toadlet_egg ${EGG_SRC_GPP})
-set_target_properties (toadlet_egg PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_egg.dir/gpp\"")
-set_target_properties (toadlet_egg PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-install (TARGETS toadlet_egg DESTINATION lib)
+if (TOADLET_ANDROID_SPLIT_JARS)
+	add_library (toadlet_egg ${EGG_SRC_GPP})
+	set_target_properties (toadlet_egg PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_egg.dir/gpp\"")
+	set_target_properties (toadlet_egg PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+	install (TARGETS toadlet_egg DESTINATION lib)
+endif (TOADLET_ANDROID_SPLIT_JARS)
 
 
 # Building toadlet_hop
@@ -140,11 +145,13 @@ foreach (SRCFILE ${HOP_SRC})
 endforeach (SRCFILE)
 
 #  Jar library
-add_library (toadlet_hop STATIC ${HOP_SRC_GPP})
-set_target_properties (toadlet_hop PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_hop.dir/gpp\"")
-set_target_properties (toadlet_hop PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-add_dependencies (toadlet_hop toadlet_egg)
-install (TARGETS toadlet_hop DESTINATION lib)
+if (TOADLET_ANDROID_SPLIT_JARS)
+	add_library (toadlet_hop STATIC ${HOP_SRC_GPP})
+	set_target_properties (toadlet_hop PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_hop.dir/gpp\"")
+	set_target_properties (toadlet_hop PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+	add_dependencies (toadlet_hop toadlet_egg)
+	install (TARGETS toadlet_hop DESTINATION lib)
+endif (TOADLET_ANDROID_SPLIT_JARS)
 
 
 # Building toadlet_knot
@@ -174,11 +181,13 @@ foreach (SRCFILE ${KNOT_SRC})
 endforeach (SRCFILE)
 
 #  Jar library
-add_library (toadlet_knot STATIC ${KNOT_SRC_GPP})
-set_target_properties (toadlet_knot PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_knot.dir/gpp\"")
-set_target_properties (toadlet_knot PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-add_dependencies (toadlet_knot toadlet_egg)
-install (TARGETS toadlet_knot DESTINATION lib)
+if (TOADLET_ANDROID_SPLIT_JARS)
+	add_library (toadlet_knot STATIC ${KNOT_SRC_GPP})
+	set_target_properties (toadlet_knot PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_knot.dir/gpp\"")
+	set_target_properties (toadlet_knot PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+	add_dependencies (toadlet_knot toadlet_egg)
+	install (TARGETS toadlet_knot DESTINATION lib)
+endif (TOADLET_ANDROID_SPLIT_JARS)
 
 
 # Building toadlet_peeper
@@ -263,11 +272,13 @@ foreach (SRCFILE ${PEEPER_GLRENDERER_SRC})
 endforeach (SRCFILE)
 
 #  Jar library for peeper and it's plugins
-add_library (toadlet_peeper STATIC ${PEEPER_SRC_GPP} ${PEEPER_GLRENDERER_SRC_GPP})
-set_target_properties (toadlet_peeper PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_peeper.dir/gpp\"")
-set_target_properties (toadlet_peeper PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-add_dependencies (toadlet_peeper toadlet_egg)
-install (TARGETS toadlet_peeper DESTINATION lib)
+if (TOADLET_ANDROID_SPLIT_JARS)
+	add_library (toadlet_peeper STATIC ${PEEPER_SRC_GPP} ${PEEPER_GLRENDERER_SRC_GPP})
+	set_target_properties (toadlet_peeper PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_peeper.dir/gpp\"")
+	set_target_properties (toadlet_peeper PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+	add_dependencies (toadlet_peeper toadlet_egg)
+	install (TARGETS toadlet_peeper DESTINATION lib)
+endif (TOADLET_ANDROID_SPLIT_JARS)
 
 
 # Building toadlet_tadpole
@@ -363,11 +374,13 @@ foreach (SRCFILE ${TADPOLE_SRC})
 endforeach (SRCFILE)
 
 #  Jar library
-add_library (toadlet_tadpole STATIC ${TADPOLE_SRC_GPP})
-set_target_properties (toadlet_tadpole PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_tadpole.dir/gpp\"")
-set_target_properties (toadlet_tadpole PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-add_dependencies (toadlet_tadpole toadlet_egg toadlet_peeper)
-install (TARGETS toadlet_tadpole DESTINATION lib)
+if (TOADLET_ANDROID_SPLIT_JARS)
+	add_library (toadlet_tadpole STATIC ${TADPOLE_SRC_GPP})
+	set_target_properties (toadlet_tadpole PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_tadpole.dir/gpp\"")
+	set_target_properties (toadlet_tadpole PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+	add_dependencies (toadlet_tadpole toadlet_egg toadlet_peeper)
+	install (TARGETS toadlet_tadpole DESTINATION lib)
+endif (TOADLET_ANDROID_SPLIT_JARS)
 
 
 # Building toadlet_tadpole_hop
@@ -396,11 +409,13 @@ foreach (SRCFILE ${TADPOLE_HOP_SRC})
 endforeach (SRCFILE)
 
 #  Jar library
-add_library (toadlet_tadpole_hop STATIC ${TADPOLE_HOP_SRC_GPP})
-set_target_properties (toadlet_tadpole_hop PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_tadpole_hop.dir/gpp\"")
-set_target_properties (toadlet_tadpole_hop PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-add_dependencies (toadlet_tadpole_hop toadlet_egg toadlet_hop toadlet_tadpole)
-install (TARGETS toadlet_tadpole_hop DESTINATION lib)
+if (TOADLET_ANDROID_SPLIT_JARS)
+	add_library (toadlet_tadpole_hop STATIC ${TADPOLE_HOP_SRC_GPP})
+	set_target_properties (toadlet_tadpole_hop PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_tadpole_hop.dir/gpp\"")
+	set_target_properties (toadlet_tadpole_hop PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+	add_dependencies (toadlet_tadpole_hop toadlet_egg toadlet_hop toadlet_tadpole)
+	install (TARGETS toadlet_tadpole_hop DESTINATION lib)
+endif (TOADLET_ANDROID_SPLIT_JARS)
 
 
 # Building toadlet_pad
@@ -429,15 +444,20 @@ foreach (SRCFILE ${PAD_SRC})
 endforeach (SRCFILE)
 
 #  Jar library
-add_library (toadlet_pad STATIC ${PAD_SRC_GPP})
-set_target_properties (toadlet_pad PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_pad.dir/gpp\"")
-set_target_properties (toadlet_pad PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-add_dependencies (toadlet_pad toadlet_egg toadlet_peeper toadlet_tadpole)
-install (TARGETS toadlet_pad DESTINATION lib)
+if (TOADLET_ANDROID_SPLIT_JARS)
+	add_library (toadlet_pad STATIC ${PAD_SRC_GPP})
+	set_target_properties (toadlet_pad PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_pad.dir/gpp\"")
+	set_target_properties (toadlet_pad PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+	add_dependencies (toadlet_pad toadlet_egg toadlet_peeper toadlet_tadpole)
+	install (TARGETS toadlet_pad DESTINATION lib)
+endif (TOADLET_ANDROID_SPLIT_JARS)
 
 
 # Generate the all encompassing toadlet jar
-#add_library (toadlet ${EGG_SRC_GPP} ${HOP_SRC_GPP} ${KNOT_SRC_GPP} ${PEEPER_SRC_GPP} ${PEEPER_GLRENDERER_SRC_GPP} ${TADPOLE_SRC_GPP} ${TADPOLE_HOP_SRC_GPP} ${PAD_SRC_GPP})
-#set_target_properties (toadlet PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-#install (TARGETS toadlet DESTINATION lib)
+if (NOT TOADLET_ANDROID_SPLIT_JARS)
+	add_library (toadlet ${EGG_SRC_GPP} ${HOP_SRC_GPP} ${KNOT_SRC_GPP} ${PEEPER_SRC_GPP} ${PEEPER_GLRENDERER_SRC_GPP} ${TADPOLE_SRC_GPP} ${TADPOLE_HOP_SRC_GPP} ${PAD_SRC_GPP})
+	set_target_properties (toadlet PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet.dir/gpp\"")
+	set_target_properties (toadlet PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+	install (TARGETS toadlet DESTINATION lib)
+endif (NOT TOADLET_ANDROID_SPLIT_JARS)
 
