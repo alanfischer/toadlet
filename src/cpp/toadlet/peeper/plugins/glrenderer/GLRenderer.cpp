@@ -1062,11 +1062,11 @@ void GLRenderer::setPointParameters(bool sprite,scalar size,bool attenuated,scal
 void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 	mStatisticsSet.textureChangeCount++;
 
-	if(stage>0){
-		if(mMultiTexture==false){
-			return;
-		}
+	if(mMultiTexture){
 		glActiveTexture(GL_TEXTURE0+stage);
+	}
+	else if(stage>0){
+		return;
 	}
 
 	if(textureStage!=NULL){

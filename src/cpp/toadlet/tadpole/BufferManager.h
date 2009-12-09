@@ -56,10 +56,10 @@ public:
 	virtual void bufferDestroyed(peeper::Buffer *buffer);
 
 protected:
-	egg::Collection<peeper::BackableIndexBuffer::ptr> mIndexBuffers;
-	egg::Collection<peeper::BackableVertexBuffer::ptr> mVertexBuffers;
-	egg::Collection<peeper::BackableIndexBuffer::ptr> mIndexBuffersToLoad;
-	egg::Collection<peeper::BackableVertexBuffer::ptr> mVertexBuffersToLoad;
+	egg::Collection<peeper::IndexBuffer::ptr> mIndexBuffers;
+	egg::Collection<peeper::VertexBuffer::ptr> mVertexBuffers;
+	egg::Collection<peeper::IndexBuffer::ptr> mIndexBuffersToLoad;
+	egg::Collection<peeper::VertexBuffer::ptr> mVertexBuffersToLoad;
 
 	Engine *mEngine;
 };

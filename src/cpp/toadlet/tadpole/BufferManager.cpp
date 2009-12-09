@@ -52,14 +52,14 @@ BufferManager::~BufferManager(){
 void BufferManager::destroy(){
 	int i;
 	for(i=0;i<mIndexBuffers.size();++i){
-		BackableIndexBuffer::ptr indexBuffer=mIndexBuffers[i];
+		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
 		indexBuffer->setBufferDestroyedListener(NULL);
 		indexBuffer->destroy();
 	}
 	mIndexBuffers.clear();
 
 	for(i=0;i<mVertexBuffers.size();++i){
-		BackableVertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
+		VertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
 		vertexBuffer->setBufferDestroyedListener(NULL);
 		vertexBuffer->destroy();
 	}
@@ -176,49 +176,75 @@ VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBu
 void BufferManager::contextActivate(Renderer *renderer){
 	int i;
 	for(i=0;i<mIndexBuffers.size();++i){
-		BackableIndexBuffer::ptr indexBuffer=mIndexBuffers[i];
-		IndexBuffer::ptr back(renderer->createIndexBuffer());
-		back->create(indexBuffer->getUsageFlags(),indexBuffer->getAccessType(),indexBuffer->getIndexFormat(),indexBuffer->getSize());
-		indexBuffer->setBack(back);
+		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
+		if(indexBuffer->getRootIndexBuffer()!=indexBuffer){
+			IndexBuffer::ptr back(renderer->createIndexBuffer());
+			back->create(indexBuffer->getUsageFlags(),indexBuffer->getAccessType(),indexBuffer->getIndexFormat(),indexBuffer->getSize());
+			shared_static_cast<BackableIndexBuffer>(indexBuffer)->setBack(back);
+		}
+		else{
+			indexBuffer->createContext();
+		}
 	}
 	for(i=0;i<mVertexBuffers.size();++i){
-		BackableVertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
-		VertexBuffer::ptr back(renderer->createVertexBuffer());
-		back->create(vertexBuffer->getUsageFlags(),vertexBuffer->getAccessType(),vertexBuffer->getVertexFormat(),vertexBuffer->getSize());
-		vertexBuffer->setBack(back);
+		VertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
+		if(vertexBuffer->getRootVertexBuffer()!=vertexBuffer){
+			VertexBuffer::ptr back(renderer->createVertexBuffer());
+			back->create(vertexBuffer->getUsageFlags(),vertexBuffer->getAccessType(),vertexBuffer->getVertexFormat(),vertexBuffer->getSize());
+			shared_static_cast<BackableVertexBuffer>(vertexBuffer)->setBack(back);
+		}
+		else{
+			vertexBuffer->createContext();
+		}
 	}
 }
 
 void BufferManager::contextDeactivate(Renderer *renderer){
 	int i;
 	for(i=0;i<mIndexBuffers.size();++i){
-		BackableIndexBuffer::ptr indexBuffer=mIndexBuffers[i];
-		indexBuffer->setBack(NULL);
+		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
+		if(indexBuffer->getRootIndexBuffer()!=indexBuffer){
+			shared_static_cast<BackableIndexBuffer>(indexBuffer)->setBack(NULL);
+		}
+		else{
+			indexBuffer->destroyContext(true);
+		}
 	}
 	for(i=0;i<mVertexBuffers.size();++i){
-		BackableVertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
-		vertexBuffer->setBack(NULL);
+		VertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
+		if(vertexBuffer->getRootVertexBuffer()!=vertexBuffer){
+			shared_static_cast<BackableVertexBuffer>(vertexBuffer)->setBack(NULL);
+		}
+		else{
+			vertexBuffer->destroyContext(true);
+		}
 	}
 }
 
 void BufferManager::contextUpdate(Renderer *renderer){
 	int i;
 	for(i=0;i<mIndexBuffersToLoad.size();++i){
-		BackableIndexBuffer::ptr indexBuffer=mIndexBuffersToLoad[i];
-		if(indexBuffer->getBack()==NULL){
-			IndexBuffer::ptr back(renderer->createIndexBuffer());
-			back->create(indexBuffer->getUsageFlags(),indexBuffer->getAccessType(),indexBuffer->getIndexFormat(),indexBuffer->getSize());
-			indexBuffer->setBack(back);
+		IndexBuffer::ptr indexBuffer=mIndexBuffersToLoad[i];
+		if(indexBuffer->getRootIndexBuffer()!=indexBuffer){
+			BackableIndexBuffer::ptr backableIndexBuffer=shared_static_cast<BackableIndexBuffer>(indexBuffer);
+			if(backableIndexBuffer->getBack()==NULL){
+				IndexBuffer::ptr back(renderer->createIndexBuffer());
+				back->create(indexBuffer->getUsageFlags(),indexBuffer->getAccessType(),indexBuffer->getIndexFormat(),indexBuffer->getSize());
+				backableIndexBuffer->setBack(back);
+			}
 		}
 	}
 	mIndexBuffersToLoad.clear();
 
 	for(i=0;i<mVertexBuffersToLoad.size();++i){
-		BackableVertexBuffer::ptr vertexBuffer=mVertexBuffersToLoad[i];
-		if(vertexBuffer->getBack()==NULL){
-			VertexBuffer::ptr back(renderer->createVertexBuffer());
-			back->create(vertexBuffer->getUsageFlags(),vertexBuffer->getAccessType(),vertexBuffer->getVertexFormat(),vertexBuffer->getSize());
-			vertexBuffer->setBack(back);
+		VertexBuffer::ptr vertexBuffer=mVertexBuffersToLoad[i];
+		if(vertexBuffer->getRootVertexBuffer()!=vertexBuffer){
+			BackableVertexBuffer::ptr backableVertexBuffer=shared_static_cast<BackableVertexBuffer>(vertexBuffer);
+			if(backableVertexBuffer->getBack()==NULL){
+				VertexBuffer::ptr back(renderer->createVertexBuffer());
+				back->create(vertexBuffer->getUsageFlags(),vertexBuffer->getAccessType(),vertexBuffer->getVertexFormat(),vertexBuffer->getSize());
+				backableVertexBuffer->setBack(back);
+			}
 		}
 	}
 	mVertexBuffersToLoad.clear();
@@ -227,13 +253,15 @@ void BufferManager::contextUpdate(Renderer *renderer){
 void BufferManager::preContextReset(Renderer *renderer){
 	int i;
 	for(i=0;i<mIndexBuffers.size();++i){
-		if(mIndexBuffers[i]->contextNeedsReset()){
-			mIndexBuffers[i]->destroyContext(true);
+		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
+		if(indexBuffer->contextNeedsReset()){
+			indexBuffer->destroyContext(true);
 		}
 	}
 	for(i=0;i<mVertexBuffers.size();++i){
-		if(mVertexBuffers[i]->contextNeedsReset()){
-			mVertexBuffers[i]->destroyContext(true);
+		VertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
+		if(vertexBuffer->contextNeedsReset()){
+			vertexBuffer->destroyContext(true);
 		}
 	}
 }
@@ -241,13 +269,15 @@ void BufferManager::preContextReset(Renderer *renderer){
 void BufferManager::postContextReset(Renderer *renderer){
 	int i;
 	for(i=0;i<mIndexBuffers.size();++i){
-		if(mIndexBuffers[i]->contextNeedsReset()){
-			mIndexBuffers[i]->createContext();
+		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
+		if(indexBuffer->contextNeedsReset()){
+			indexBuffer->createContext();
 		}
 	}
 	for(i=0;i<mVertexBuffers.size();++i){
-		if(mVertexBuffers[i]->contextNeedsReset()){
-			mVertexBuffers[i]->createContext();
+		VertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
+		if(vertexBuffer->contextNeedsReset()){
+			vertexBuffer->createContext();
 		}
 	}
 }
