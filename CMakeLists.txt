@@ -40,31 +40,19 @@ if (WIN32)
 	# This is setup in the toolchain file until cmake has built-in support for wince
 	#option (TOADLET_PLATFORM_WINCE "Build for Windows CE devices" OFF)
 	option (TOADLET_PLATFORM_ANDROID "Build for Android devices" OFF)
-	if (TOADLET_PLATFORM_WINCE OR TOADLET_PLATFORM_ANDROID)
-		option (TOADLET_FIXED_POINT "Use a fixed point build of toadlet" ON)
-	else (TOADLET_PLATFORM_WINCE OR TOADLET_PLATFORM_ANDROID)
-		option (TOADLET_FIXED_POINT "Use a fixed point build of toadlet" OFF)
-	endif (TOADLET_PLATFORM_WINCE OR TOADLET_PLATFORM_ANDROID)
+	option (TOADLET_FIXED_POINT "Use a fixed point build of toadlet" OFF)
 elseif (UNIX)
 	set (TOADLET_PLATFORM_POSIX ON)
 	option (TOADLET_PLATFORM_ANDROID "Build for Android devices" OFF)
+	option (TOADLET_FIXED_POINT "Use a fixed point build of toadlet" OFF)
 	if (APPLE) 
 		set (TOADLET_PLATFORM_OSX ON)
 		option (TOADLET_PLATFORM_IPHONE "Build for the iPhone" OFF)
-		if (TOADLET_PLATFORM_IPHONE OR TOADLET_PLATFORM_ANDROID)
-			option (TOADLET_FIXED_POINT "Use a fixed point build of toadlet" ON)
-		endif (TOADLET_PLATFORM_IPHONE OR TOADLET_PLATFORM_ANDROID)
-	else (APPLE)
-		if (TOADLET_PLATFORM_ANDROID)
-			option (TOADLET_FIXED_POINT "Use a fixed point build of toadlet" ON)
-		else (TOADLET_PLATFORM_ANDROID)
-			option (TOADLET_FIXED_POINT "Use a fixed point build of toadlet" OFF)
-		endif (TOADLET_PLATFORM_ANDROID)
 	endif (APPLE)
 endif (WIN32)
 
 
-# Android specific options
+# Android specifics
 if (TOADLET_PLATFORM_ANDROID)
 	# We require the android.jar
 	if (NOT ANDROID_JAR)
@@ -72,6 +60,9 @@ if (TOADLET_PLATFORM_ANDROID)
 	else (NOT ANDROID_JAR)
 		message ("Using android.jar located at: ${ANDROID_JAR}")
 	endif (NOT ANDROID_JAR)
+
+	# Add the gpp executable for java file preprocessing
+	add_subdirectory (gpp)
 endif (TOADLET_PLATFORM_ANDROID)
 
 

@@ -3,11 +3,8 @@
 set (JAVA_SRC_DIR com/lightningtoads/toadlet)
 set (JAVA_GPP_DIR ${CMAKE_CURRENT_BINARY_DIR}/gpp)
 
-# Add the gpp executable for java file preprocessing
-add_subdirectory(gpp)
-
 # We include the JAVA_GPP_DIR files since those have been preprocessed
-include_directories (${JAVA_GPP_DIR} ${JAVA_GPP_DIR}/com/lightningtoads ${ANDROID_JAR})
+include_directories (${JAVA_GPP_DIR} ${ANDROID_JAR})
 
 # Configure and copy the Config and Types file
 configure_file (${JAVA_SRC_DIR}/Config.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/Config.h)
