@@ -12,6 +12,7 @@ Contents
    3.5 OSX
    3.6 iPhoneOS
    3.7 Android
+4. Doxygen
 
 
 1. Dependencies
@@ -196,3 +197,18 @@ so much nicer to use.
 
    cmake -G"NMake Makefiles" -DCMAKE_INSTALL_PREFIX=$HOME/toadlet/android -DTOADLET_PLATFORM_ANDROID=ON -DANDROID_JAR=$HOME/android/android.jar -DTOADLET_FIXED_POINT=ON ..
 
+
+4. Doxygen
+    Toadlet source files can be documented in HTML using 
+Doxygen. To build the docs go into the doxygen/ subfolder
+and type: "doxygen Doxyfile"
+
+    To view the results point your webbrowser at:
+doxygen/html/index.html
+
+Note: You'll need the Doxygen tool installed, and
+we recommend the Graphviz packaged for the dot graph
+generator.
+
+http://www.stack.nl/~dimitri/doxygen/
+http://www.graphviz.org
