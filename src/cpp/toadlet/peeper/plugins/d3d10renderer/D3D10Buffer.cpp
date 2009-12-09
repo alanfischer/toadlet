@@ -49,6 +49,8 @@ D3D10Buffer::D3D10Buffer(D3D10Renderer *renderer):
 	mBuffer(NULL),
 	//mColorElements,
 	mLockType(AccessType_NO_ACCESS),
+	mMapping(false),
+	mBacking(false),
 	mData(NULL)
 {
 	mRenderer=renderer;
@@ -68,7 +70,17 @@ bool D3D10Buffer::create(int usageFlags,AccessType accessType,IndexFormat indexF
 	mDataSize=mIndexFormat*mSize;
 
 	mBindFlags|=D3D10_BIND_INDEX_BUFFER;
-	return createContext();
+
+	mMapping=(mUsageFlags&Buffer::UsageFlags_STATIC)==0;//mRenderer->useMapping(this);
+	if(mMapping){
+		createContext();
+	}
+	else{
+		mData=new uint8[mDataSize];
+		mBacking=true;
+	}
+
+	return true;
 }
 
 bool D3D10Buffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size){
@@ -82,7 +94,17 @@ bool D3D10Buffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr 
 	mDataSize=mVertexSize*mSize;
 
 	mBindFlags|=D3D10_BIND_VERTEX_BUFFER;
-	return createContext();
+
+	mMapping=(mUsageFlags&Buffer::UsageFlags_STATIC)==0;//mRenderer->useMapping(this);
+	if(mMapping){
+		createContext();
+	}
+	else{
+		mData=new uint8[mDataSize];
+		mBacking=true;
+	}
+
+	return true;
 }
 
 void D3D10Buffer::destroy(){
@@ -99,10 +121,13 @@ void D3D10Buffer::destroy(){
 }
 
 bool D3D10Buffer::createContext(){
-	D3D10_BUFFER_DESC desc;
+	D3D10_BUFFER_DESC desc={0};
 
 	desc.ByteWidth=mDataSize;
-	if((mUsageFlags&UsageFlags_DYNAMIC)>0){
+	if((mUsageFlags&UsageFlags_STATIC)>0){
+		desc.Usage=D3D10_USAGE_IMMUTABLE;
+	}
+	else if((mUsageFlags&UsageFlags_DYNAMIC)>0){
 		desc.Usage=D3D10_USAGE_DYNAMIC;
 	}
 	else{
@@ -110,50 +135,65 @@ bool D3D10Buffer::createContext(){
 	}
 	desc.BindFlags=mBindFlags;
 
-//	HRESULT result=mRenderer->getD3D10Device()->CreateBuffer();//CreateVertexBuffer(mDataSize,mD3DUsage,mFVF,mD3DPool,&mVertexBuffer TOADLET_SHAREDHANDLE);
-//	TOADLET_CHECK_D3D10ERROR(result,"D3D10Buffer: CreateBuffer");
+	if((mUsageFlags&AccessType_READ_ONLY)>0){
+		desc.CPUAccessFlags|=D3D10_CPU_ACCESS_READ;
+	}
+	else if((mUsageFlags&AccessType_WRITE_ONLY)>0){
+		desc.CPUAccessFlags|=D3D10_CPU_ACCESS_WRITE;
+	}
+	else if((mUsageFlags&AccessType_READ_WRITE)>0){
+		desc.CPUAccessFlags|=D3D10_CPU_ACCESS_READ|D3D10_CPU_ACCESS_WRITE;
+	}
 
-//	return SUCCEEDED(result);
-return false;
+	D3D10_SUBRESOURCE_DATA data={0};
+	data.pSysMem=mData;
+
+	HRESULT result=mRenderer->getD3D10Device()->CreateBuffer(&desc,&data,&mBuffer);
+	TOADLET_CHECK_D3D10ERROR(result,"D3D10Buffer: CreateBuffer");
+
+	return SUCCEEDED(result);
 }
 
 void D3D10Buffer::destroyContext(bool backData){
-/*	if(backData){
-		mBackingData=new uint8[mDataSize];
+	if(mMapping && backData){
+		mData=new uint8[mDataSize];
 		mBacking=true;
 
 		uint8 *data=lock(AccessType_READ_ONLY);
-		memcpy(mBackingData,data,mDataSize);
+		memcpy(mData,data,mDataSize);
 		unlock();
 	}
 
-	if(mVertexBuffer!=NULL){
-		mVertexBuffer->Release();
-		mVertexBuffer=NULL;
+	if(mBuffer!=NULL){
+		mBuffer->Release();
+		mBuffer=NULL;
 	}
-*/}
+}
 
 uint8 *D3D10Buffer::lock(AccessType lockType){
-/*	if(mVertexBuffer==NULL){
-		return NULL;
-	}
+	mRenderer->mStatisticsSet.bufferLockCount++;
 
 	mLockType=lockType;
 
-	DWORD d3dflags=0;
-	switch(mLockType){
-		case AccessType_WRITE_ONLY:
-			if((mUsageFlags&UsageFlags_DYNAMIC)>0){
-				d3dflags|=D3DLOCK_DISCARD;
-			}
-		break;
-		case AccessType_READ_WRITE:
-			d3dflags|=D3DLOCK_READONLY;
-		break;
-	}
+	if(mMapping){
+		D3D10_MAP mapType=(D3D10_MAP)0;
+		switch(mLockType){
+			case AccessType_READ_ONLY:
+				mapType=D3D10_MAP_READ;
+			break;
+			case AccessType_WRITE_ONLY:
+				mapType=D3D10_MAP_WRITE;
+			break;
+			case AccessType_READ_WRITE:
+				mapType=D3D10_MAP_READ_WRITE;
+			break;
+		}
 
-	HRESULT result=mVertexBuffer->Lock(0,0,(void**)&mData,d3dflags);
-	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: Lock");
+		UINT mapFlags=0;
+
+		HRESULT result=mBuffer->Map(mapType,mapFlags,(void**)&mData);
+		TOADLET_CHECK_D3D10ERROR(result,"D3D10Buffer: Lock");
+	}
 
 	// We do this even if its write only, since the unlocking will write it back, it would get messed up if we didn't swap in all situations
 	if(mData!=NULL){
@@ -168,15 +208,9 @@ uint8 *D3D10Buffer::lock(AccessType lockType){
 	}
 
 	return mData;
-*/
-return 0;
 }
 
 bool D3D10Buffer::unlock(){
-/*	if(mVertexBuffer==NULL){
-		return false;
-	}
-
 	// We do this even if its read only, since we have to do it in all situations for locking
 	if(mData!=NULL){
 		int i,j;
@@ -189,14 +223,20 @@ bool D3D10Buffer::unlock(){
 		}
 	}
 
-	HRESULT result=mVertexBuffer->Unlock();
-	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: Unlock");
+	if(mMapping){
+		mBuffer->Unmap();
+		mData=NULL;
+	}
+	else{
+		if(mBuffer==NULL){
+			createContext();
+		}
+		else{
+			mRenderer->getD3D10Device()->UpdateSubresource(mBuffer,0,NULL,mData,0,0);
+		}
+	}
 
-	mData=NULL;
-
-	return SUCCEEDED(result);
-*/
-return false;
+	return true;
 }
 
 }

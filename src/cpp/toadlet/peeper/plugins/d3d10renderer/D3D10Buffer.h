@@ -83,6 +83,7 @@ protected:
 	int mBindFlags;
 	ID3D10Buffer *mBuffer;
 	AccessType mLockType;
+	bool mMapping;
 	bool mBacking;
 	uint8 *mData;
 

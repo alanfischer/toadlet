@@ -64,6 +64,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,
 int main(int argc,char **argv){
 #endif
 	Logo app;
+	app.changeRendererPlugin(Logo::RendererPlugin_DIRECT3D10);
 	app.setFullscreen(false);
 	app.create();
 	app.start(true);

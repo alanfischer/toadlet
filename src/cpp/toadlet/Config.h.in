@@ -49,6 +49,7 @@
 #cmakedefine TOADLET_HAS_MXML
 #cmakedefine TOADLET_HAS_DIRECT3D9
 #cmakedefine TOADLET_HAS_DIRECT3DMOBILE
+#cmakedefine TOADLET_HAS_DIRECT3D10
 #cmakedefine TOADLET_HAS_OPENGL
 #cmakedefine TOADLET_HAS_OPENAL
 

@@ -38,7 +38,8 @@ public:
 	enum RendererPlugin{
 		RendererPlugin_NONE,
 		RendererPlugin_OPENGL,
-		RendererPlugin_DIRECT3D,
+		RendererPlugin_DIRECT3D9,
+		RendererPlugin_DIRECT3D10,
 	};
 
 	Win32Application();

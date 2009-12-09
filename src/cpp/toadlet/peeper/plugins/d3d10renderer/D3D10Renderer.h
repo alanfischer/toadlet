@@ -122,6 +122,8 @@ protected:
 
 	StatisticsSet mStatisticsSet;
 	CapabilitySet mCapabilitySet;
+
+	friend class D3D10Buffer;
 };
 
 }
