@@ -38,7 +38,7 @@ bool ImageFormatConversion::convert(uint8 *src,int srcFormat,int srcRowPitch,int
 		for(k=0;k<depth;++k){
 			for(j=0;j<height;++j){
 				for(i=0;i<width;++i){
-					uint8 *s=(src+k*srcSlicePitch+j*srcRowPitch+i);
+					uint8 *s=(uint8*)(src+k*srcSlicePitch+j*srcRowPitch+i);
 					uint16 *d=(uint16*)(dst+k*dstSlicePitch+j*dstRowPitch+i*2);
 					*d=((*s)<<8)|0xFF;
 				}
@@ -50,7 +50,7 @@ bool ImageFormatConversion::convert(uint8 *src,int srcFormat,int srcRowPitch,int
 			for(j=0;j<height;++j){
 				for(i=0;i<width;++i){
 					uint16 *s=(uint16*)(src+k*srcSlicePitch+j*srcRowPitch+i*2);
-					uint8 *d=(dst+k*dstSlicePitch+j*dstRowPitch+i);
+					uint8 *d=(uint8*)(dst+k*dstSlicePitch+j*dstRowPitch+i);
 					*d=((*s)>>8);
 				}
 			}
@@ -60,7 +60,7 @@ bool ImageFormatConversion::convert(uint8 *src,int srcFormat,int srcRowPitch,int
 		for(k=0;k<depth;++k){
 			for(j=0;j<height;++j){
 				for(i=0;i<width;++i){
-					uint8 *s=(src+k*srcSlicePitch+j*srcRowPitch+i);
+					uint8 *s=(uint8*)(src+k*srcSlicePitch+j*srcRowPitch+i);
 					uint32 *d=(uint32*)(dst+k*dstSlicePitch+j*dstRowPitch+i*4);
 					*d=(*s)|((*s)<<8)|((*s)<<16)|(0xFF<<24);
 				}
@@ -72,8 +72,30 @@ bool ImageFormatConversion::convert(uint8 *src,int srcFormat,int srcRowPitch,int
 			for(j=0;j<height;++j){
 				for(i=0;i<width;++i){
 					uint32 *s=(uint32*)(src+k*srcSlicePitch+j*srcRowPitch+i*4);
-					uint8 *d=(dst+k*dstSlicePitch+j*dstRowPitch+i);
+					uint8 *d=(uint8*)(dst+k*dstSlicePitch+j*dstRowPitch+i);
 					*d=(*s)&0xFF;
+				}
+			}
+		}
+	}
+	else if(srcFormat==Format_LA_8 && dstFormat==Format_RGBA_8){
+		for(k=0;k<depth;++k){
+			for(j=0;j<height;++j){
+				for(i=0;i<width;++i){
+					uint16 *s=(uint16*)(src+k*srcSlicePitch+j*srcRowPitch+i*2);
+					uint32 *d=(uint32*)(dst+k*dstSlicePitch+j*dstRowPitch+i*4);
+					*d=((*s)&0xFF)|(((*s)&0xFF)<<8)|(((*s)&0xFF)<<16)|(((*s)&0xFF00)<<16);
+				}
+			}
+		}
+	}
+	else if(srcFormat==Format_RGBA_8 && dstFormat==Format_LA_8){
+		for(k=0;k<depth;++k){
+			for(j=0;j<height;++j){
+				for(i=0;i<width;++i){
+					uint32 *s=(uint32*)(src+k*srcSlicePitch+j*srcRowPitch+i*4);
+					uint16 *d=(uint16*)(dst+k*dstSlicePitch+j*dstRowPitch+i*2);
+					*d=((*s)&0xFF)|(((*s)&0xFF000000)>>16);
 				}
 			}
 		}
@@ -82,7 +104,7 @@ bool ImageFormatConversion::convert(uint8 *src,int srcFormat,int srcRowPitch,int
 		for(k=0;k<depth;++k){
 			for(j=0;j<height;++j){
 				for(i=0;i<width;++i){
-					uint8 *s=(src+k*srcSlicePitch+j*srcRowPitch+i*3);
+					uint8 *s=(uint8*)(src+k*srcSlicePitch+j*srcRowPitch+i*3);
 					uint32 *d=(uint32*)(dst+k*dstSlicePitch+j*dstRowPitch+i*4);
 					*d=(0xFF<<24) | (*(s+0)<<16) | (*(s+1)<<8) | (*(s+2)<<0);
 				}
@@ -94,7 +116,7 @@ bool ImageFormatConversion::convert(uint8 *src,int srcFormat,int srcRowPitch,int
 			for(j=0;j<height;++j){
 				for(i=0;i<width;++i){
 					uint32 *s=(uint32*)(src+k*srcSlicePitch+j*srcRowPitch+i*4);
-					uint8 *d=(dst+k*dstSlicePitch+j*dstRowPitch+i*3);
+					uint8 *d=(uint8*)(dst+k*dstSlicePitch+j*dstRowPitch+i*3);
 					*(d+0)=(*s)>>16;
 					*(d+1)=(*s)>>8;
 					*(d+2)=(*s)>>0;

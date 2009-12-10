@@ -253,7 +253,7 @@ void CoreAudio::queueCallback(void *userData,AudioQueueRef audioQueue,AudioQueue
 	UInt32 numPackets=audio->mNumPacketsToRead;
 	result=AudioFileReadPackets(audio->mStream->getAudioFileID(),false,&numBytes,audio->mPacketDescs,audio->mCurrentPacket,&numPackets,audioQueueBuffer->mAudioData);
 	if(result!=0){
-		Logger::log(Categories::TOADLET_RIBBIT,Logger::Level_ERROR,
+		Logger::error(Categories::TOADLET_RIBBIT,
 			"Error reading file data");
 	}
 	audioQueueBuffer->mAudioDataByteSize=numBytes;
@@ -268,7 +268,7 @@ void CoreAudio::queueCallback(void *userData,AudioQueueRef audioQueue,AudioQueue
 				audioQueueBuffer->mAudioDataByteSize=numBytes;
 
 				if(result!=0){
-					Logger::log(Categories::TOADLET_RIBBIT,Logger::Level_ERROR,
+					Logger::error(Categories::TOADLET_RIBBIT,
 						"Error reading file data");
 				}
 			}
@@ -283,7 +283,7 @@ void CoreAudio::queueCallback(void *userData,AudioQueueRef audioQueue,AudioQueue
 
 	result=AudioQueueEnqueueBuffer(audioQueue,audioQueueBuffer,audio->mPacketDescs?numPackets:0,audio->mPacketDescs);
 	if(result!=0){
-		Logger::log(Categories::TOADLET_RIBBIT,Logger::Level_ERROR,
+		Logger::error(Categories::TOADLET_RIBBIT,
 			String("Error enqueuing new buffer:")+(int)result);
 	}
 
