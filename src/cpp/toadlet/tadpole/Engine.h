@@ -92,7 +92,6 @@ public:
 	void contextReset(peeper::Renderer *renderer);
 	void contextActivate(peeper::Renderer *renderer);
 	void contextDeactivate(peeper::Renderer *renderer);
-	void contextUpdate(peeper::Renderer *renderer);
 
 	int getIdealVertexFormatBit() const{return mIdealVertexFormatBit;}
 	const VertexFormats &getVertexFormats() const{return mVertexFormats;}

@@ -49,7 +49,6 @@ public:
 
 	virtual void contextActivate(peeper::Renderer *renderer);
 	virtual void contextDeactivate(peeper::Renderer *renderer);
-	virtual void contextUpdate(peeper::Renderer *renderer);
 	virtual void preContextReset(peeper::Renderer *renderer);
 	virtual void postContextReset(peeper::Renderer *renderer);
 
@@ -58,8 +57,6 @@ public:
 protected:
 	egg::Collection<peeper::IndexBuffer::ptr> mIndexBuffers;
 	egg::Collection<peeper::VertexBuffer::ptr> mVertexBuffers;
-	egg::Collection<peeper::IndexBuffer::ptr> mIndexBuffersToLoad;
-	egg::Collection<peeper::VertexBuffer::ptr> mVertexBuffersToLoad;
 
 	Engine *mEngine;
 };

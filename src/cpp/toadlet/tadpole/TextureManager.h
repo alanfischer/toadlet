@@ -49,13 +49,10 @@ public:
 
 	virtual void contextActivate(peeper::Renderer *renderer);
 	virtual void contextDeactivate(peeper::Renderer *renderer);
-	virtual void contextUpdate(peeper::Renderer *renderer);
 	virtual void preContextReset(peeper::Renderer *renderer);
 	virtual void postContextReset(peeper::Renderer *renderer);
 
 protected:
-	egg::Collection<peeper::BackableTexture::ptr> mBackableTexturesToLoad;
-
 	Engine *mEngine;
 };
 
