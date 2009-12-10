@@ -63,7 +63,6 @@ Texture::ptr TextureManager::createTexture(const Image::ptr &image,int usageFlag
 		back->create(usageFlags,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),mipLevels);
 		texture->setBack(back,true);
 	}
-	mBackableTexturesToLoad.add(texture);
 
 	texture->load(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0,image->getData());
 	if(hasAutogen==false && wantsAutogen==true){
@@ -103,7 +102,6 @@ Texture::ptr TextureManager::createTexture(int usageFlags,Texture::Dimension dim
 		back->create(usageFlags,dimension,format,width,height,depth,mipLevels);
 		texture->setBack(back,true);
 	}
-	mBackableTexturesToLoad.add(texture);
 
 	manage(shared_static_cast<Texture>(texture));
 
@@ -154,19 +152,6 @@ void TextureManager::contextDeactivate(peeper::Renderer *renderer){
 			texture->destroyContext(true);
 		}
 	}
-}
-
-void TextureManager::contextUpdate(peeper::Renderer *renderer){
-	int i;
-	for(i=0;i<mBackableTexturesToLoad.size();++i){
-		BackableTexture::ptr texture=mBackableTexturesToLoad[i];
-		if(texture->getBack()==NULL){
-			Texture::ptr back(renderer->createTexture());
-			back->create(texture->getUsageFlags(),texture->getDimension(),texture->getFormat(),texture->getWidth(),texture->getHeight(),texture->getDepth(),0);
-			texture->setBack(back);
-		}
-	}
-	mBackableTexturesToLoad.clear();
 }
 
 void TextureManager::preContextReset(peeper::Renderer *renderer){

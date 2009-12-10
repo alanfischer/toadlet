@@ -425,10 +425,5 @@ void Engine::contextDeactivate(Renderer *renderer){
 	mTextureManager->contextDeactivate(renderer);
 }
 
-void Engine::contextUpdate(Renderer *renderer){
-	mBufferManager->contextUpdate(renderer);
-	mTextureManager->contextUpdate(renderer);
-}
-
 }
 }

@@ -100,13 +100,6 @@ bool D3D9Texture::createContext(){
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 		mD3DUsage|=D3DUSAGE_LOCKABLE;
 	#endif
-	mManuallyGenerateMipLevels=(mUsageFlags&UsageFlags_AUTOGEN_MIPMAPS)>0;
-	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
-		if(mManuallyGenerateMipLevels && isD3DFORMATValid(d3d,D3DFMT_X8R8G8B8,mD3DFormat,D3DUSAGE_AUTOGENMIPMAP)){
-			mD3DUsage|=D3DUSAGE_AUTOGENMIPMAP;
-			mManuallyGenerateMipLevels=false;
-		}
-	#endif
 
 	mD3DPool=
 		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
@@ -117,10 +110,18 @@ bool D3D9Texture::createContext(){
 
 	mInternalFormat=getClosestTextureFormat(mFormat);
 	mD3DFormat=getD3DFORMAT(mInternalFormat);
-	if(!isD3DFORMATValid(d3d,D3DFMT_X8R8G8B8,mD3DFormat,mD3DUsage)){
+	if(!mRenderer->isD3DFORMATValid(mD3DFormat,mD3DUsage)){
 		mInternalFormat=Format_RGBA_8;
 		mD3DFormat=D3DFMT_X8R8G8B8;
 	}
+
+	mManuallyGenerateMipLevels=(mUsageFlags&UsageFlags_AUTOGEN_MIPMAPS)>0;
+	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+		if(mManuallyGenerateMipLevels && mRenderer->isD3DFORMATValid(mD3DFormat,D3DUSAGE_AUTOGENMIPMAP)){
+			mD3DUsage|=D3DUSAGE_AUTOGENMIPMAP;
+			mManuallyGenerateMipLevels=false;
+		}
+	#endif
 
 	HRESULT result=E_FAIL;
 	switch(mDimension){
@@ -209,7 +210,7 @@ Surface::ptr D3D9Texture::getMipSurface(int level,int cubeSide){
 }
 
 bool D3D9Texture::load(int format,int width,int height,int depth,int mipLevel,uint8 *data){
-	if(mTexture==NULL || mD3DPool==D3DPOOL_DEFAULT){
+	if(mTexture==NULL){
 		return false;
 	}
 
@@ -223,20 +224,42 @@ bool D3D9Texture::load(int format,int width,int height,int depth,int mipLevel,ui
 	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
 		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
 
+		if(mD3DPool==D3DPOOL_DEFAULT){
+			IDirect3DSurface9 *offscreenSurface=NULL;
+			result=mRenderer->getDirect3DDevice9()->CreateOffscreenPlainSurface(mWidth,mHeight,mD3DFormat,D3DPOOL_SYSTEMMEM,&offscreenSurface,NULL);
+			TOADLET_CHECK_D3D9ERROR(result,"CreateOffscreenPlainSurface");
+			if(SUCCEEDED(result)){
+				IDirect3DSurface9 *textureSurface=NULL;
+				result=texture->GetSurfaceLevel(mipLevel,&textureSurface);
+				TOADLET_CHECK_D3D9ERROR(result,"GetSurfaceLevel");
+				if(SUCCEEDED(result)){
+					D3DLOCKED_RECT rect={0};
+					HRESULT result=offscreenSurface->LockRect(&rect,NULL,D3DLOCK_READONLY);
+					TOADLET_CHECK_D3D9ERROR(result,"LockRect");
+					if(SUCCEEDED(result)){
+						int pixelSize=ImageFormatConversion::getPixelSize(format);
+						ImageFormatConversion::convert(data,format,width*pixelSize,width*height*pixelSize,(uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,width,height,depth);
+						offscreenSurface->UnlockRect();
+					}
+
+					result=mRenderer->getDirect3DDevice9()->UpdateSurface(offscreenSurface,NULL,textureSurface,NULL);
+					TOADLET_CHECK_D3D9ERROR(result,"UpdateSurface");
+
+					textureSurface->Release();
+				}
+				offscreenSurface->Release();
+			}
+		}
+		else{
 		D3DLOCKED_RECT rect={0};
 		result=texture->LockRect(mipLevel,&rect,NULL,0);
-		if(FAILED(result)){
-			TOADLET_CHECK_D3D9ERROR(result,"LockRect");
-			return false;
+		TOADLET_CHECK_D3D9ERROR(result,"LockRect");
+		if(SUCCEEDED(result)){
+			int pixelSize=ImageFormatConversion::getPixelSize(format);
+			ImageFormatConversion::convert(data,format,width*pixelSize,width*height*pixelSize,(uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,width,height,depth);
+			texture->UnlockRect(mipLevel);
 		}
-
-		int pixelSize=ImageFormatConversion::getPixelSize(format);
-		unsigned char *dst=(unsigned char*)rect.pBits;
-		unsigned char *src=(unsigned char*)data;
-
-		ImageFormatConversion::convert(src,format,width*pixelSize,width*height*pixelSize,dst,mInternalFormat,rect.Pitch,rect.Pitch*height,width,height,depth);
-
-		texture->UnlockRect(mipLevel);
+		}
 	}
 	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
 		else if(mDimension==Texture::Dimension_D3){
@@ -244,18 +267,12 @@ bool D3D9Texture::load(int format,int width,int height,int depth,int mipLevel,ui
 
 			D3DLOCKED_BOX box={0};
 			result=texture->LockBox(mipLevel,&box,NULL,0);
-			if(FAILED(result)){
-				TOADLET_CHECK_D3D9ERROR(result,"LockBox");
-				return false;
+			TOADLET_CHECK_D3D9ERROR(result,"LockBox");
+			if(SUCCEEDED(result)){
+				int pixelSize=ImageFormatConversion::getPixelSize(format);
+				ImageFormatConversion::convert(data,format,width*pixelSize,width*height*pixelSize,(uint8*)box.pBits,mInternalFormat,box.RowPitch,box.SlicePitch,width,height,depth);
+				texture->UnlockBox(mipLevel);
 			}
-
-			int pixelSize=ImageFormatConversion::getPixelSize(format);
-			unsigned char *dst=(unsigned char*)box.pBits;
-			unsigned char *src=(unsigned char*)data;
-
-			ImageFormatConversion::convert(src,format,width*pixelSize,width*height*pixelSize,dst,mInternalFormat,box.RowPitch,box.SlicePitch,width,height,depth);
-
-			texture->UnlockBox(mipLevel);
 		}
 		else if(mDimension==Texture::Dimension_CUBE){
 			IDirect3DCubeTexture9 *texture=(IDirect3DCubeTexture9*)mTexture;
@@ -264,18 +281,12 @@ bool D3D9Texture::load(int format,int width,int height,int depth,int mipLevel,ui
 			for(i=0;i<6;++i){
 				D3DLOCKED_RECT rect={0};
 				result=texture->LockRect((D3DCUBEMAP_FACES)i,mipLevel,&rect,NULL,0);
-				if(FAILED(result)){
-					TOADLET_CHECK_D3D9ERROR(result,"LockBox");
-					return false;
+				TOADLET_CHECK_D3D9ERROR(result,"LockRect");
+				if(SUCCEEDED(result)){
+					int pixelSize=ImageFormatConversion::getPixelSize(format);
+					ImageFormatConversion::convert((data+width*height*pixelSize*i),format,width*pixelSize,width*height*pixelSize,(uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,width,height,1);
+					texture->UnlockRect((D3DCUBEMAP_FACES)i,mipLevel);
 				}
-
-				int pixelSize=ImageFormatConversion::getPixelSize(format);
-				unsigned char *dst=(unsigned char*)rect.pBits;
-				unsigned char *src=(unsigned char*)(data+width*height*pixelSize*i);
-
-				ImageFormatConversion::convert(src,format,width*pixelSize,width*height*pixelSize,dst,mInternalFormat,rect.Pitch,rect.Pitch*height,width,height,1);
-
-				texture->UnlockRect((D3DCUBEMAP_FACES)i,mipLevel);
 			}
 		}
 	#endif
@@ -295,7 +306,7 @@ bool D3D9Texture::load(int format,int width,int height,int depth,int mipLevel,ui
 }
 
 bool D3D9Texture::read(int format,int width,int height,int depth,int mipLevel,uint8 *data){
-	if(mTexture==NULL || mD3DPool==D3DPOOL_DEFAULT){
+	if(mTexture==NULL){
 		return false;
 	}
 
@@ -305,46 +316,64 @@ bool D3D9Texture::read(int format,int width,int height,int depth,int mipLevel,ui
 		return false;
 	}
 
+	HRESULT result=S_OK;
+
 	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
 		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
 
-		D3DLOCKED_RECT rect={0};
-		HRESULT result=texture->LockRect(mipLevel,&rect,NULL,D3DLOCK_READONLY);
-		if(FAILED(result)){
-			TOADLET_CHECK_D3D9ERROR(result,"LockRect");
-			return false;
+		if(mD3DPool==D3DPOOL_DEFAULT){
+			IDirect3DSurface9 *offscreenSurface=NULL;
+			result=mRenderer->getDirect3DDevice9()->CreateOffscreenPlainSurface(mWidth,mHeight,mD3DFormat,D3DPOOL_SYSTEMMEM,&offscreenSurface,NULL);
+			TOADLET_CHECK_D3D9ERROR(result,"CreateOffscreenPlainSurface");
+			if(SUCCEEDED(result)){
+				IDirect3DSurface9 *textureSurface=NULL;
+				result=texture->GetSurfaceLevel(mipLevel,&textureSurface);
+				TOADLET_CHECK_D3D9ERROR(result,"GetSurfaceLevel");
+				if(SUCCEEDED(result)){
+					result=mRenderer->getDirect3DDevice9()->GetRenderTargetData(textureSurface,offscreenSurface);
+					TOADLET_CHECK_D3D9ERROR(result,"GetRenderTargetData");
+					if(SUCCEEDED(result)){
+						D3DLOCKED_RECT rect={0};
+						HRESULT result=offscreenSurface->LockRect(&rect,NULL,D3DLOCK_READONLY);
+						TOADLET_CHECK_D3D9ERROR(result,"LockRect");
+						if(SUCCEEDED(result)){
+							int pixelSize=ImageFormatConversion::getPixelSize(format);
+							ImageFormatConversion::convert((uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,data,format,width*pixelSize,width*height*pixelSize,width,height,depth);
+							offscreenSurface->UnlockRect();
+						}
+					}
+					textureSurface->Release();
+				}
+				offscreenSurface->Release();
+			}
 		}
-
-		int pixelSize=ImageFormatConversion::getPixelSize(format);
-		unsigned char *dst=(unsigned char*)data;
-		unsigned char *src=(unsigned char*)rect.pBits;
-
-		ImageFormatConversion::convert(src,mInternalFormat,rect.Pitch,rect.Pitch*height,dst,format,width*pixelSize,width*height*pixelSize,width,height,depth);
-
-		texture->UnlockRect(mipLevel);
-
-		return true;
+		else{
+			D3DLOCKED_RECT rect={0};
+			result=texture->LockRect(mipLevel,&rect,NULL,D3DLOCK_READONLY);
+			TOADLET_CHECK_D3D9ERROR(result,"LockRect");
+			if(SUCCEEDED(result)){
+				int pixelSize=ImageFormatConversion::getPixelSize(format);
+				ImageFormatConversion::convert((uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,data,format,width*pixelSize,width*height*pixelSize,width,height,depth);
+				texture->UnlockRect(mipLevel);
+			}
+		}
 	}
 	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
 		else if(mDimension==Texture::Dimension_D3){
-			IDirect3DVolumeTexture9 *texture=(IDirect3DVolumeTexture9*)mTexture;
-
-			D3DLOCKED_BOX box={0};
-			HRESULT result=texture->LockBox(mipLevel,&box,NULL,D3DLOCK_READONLY);
-			if(FAILED(result)){
-				TOADLET_CHECK_D3D9ERROR(result,"LockBox");
+			if(mD3DPool==D3DPOOL_DEFAULT){
 				return false;
 			}
 
-			int pixelSize=ImageFormatConversion::getPixelSize(format);
-			unsigned char *dst=(unsigned char*)data;
-			unsigned char *src=(unsigned char*)box.pBits;
+			IDirect3DVolumeTexture9 *texture=(IDirect3DVolumeTexture9*)mTexture;
 
-			ImageFormatConversion::convert(src,mInternalFormat,box.RowPitch,box.SlicePitch,dst,format,width*pixelSize,width*height*pixelSize,width,height,depth);
-
-			texture->UnlockBox(mipLevel);
-
-			return true;
+			D3DLOCKED_BOX box={0};
+			result=texture->LockBox(mipLevel,&box,NULL,D3DLOCK_READONLY);
+			TOADLET_CHECK_D3D9ERROR(result,"LockBox");
+			if(SUCCEEDED(result)){
+				int pixelSize=ImageFormatConversion::getPixelSize(format);
+				ImageFormatConversion::convert((uint8*)box.pBits,mInternalFormat,box.RowPitch,box.SlicePitch,data,format,width*pixelSize,width*height*pixelSize,width,height,depth);
+				texture->UnlockBox(mipLevel);
+			}
 		}
 	#endif
 	else{
@@ -352,14 +381,8 @@ bool D3D9Texture::read(int format,int width,int height,int depth,int mipLevel,ui
 			"D3D9Texture: unimplemented");
 		return false;
 	}
-}
 
-bool D3D9Texture::isD3DFORMATValid(IDirect3D9 *d3d,D3DFORMAT adapterFormat,D3DFORMAT textureFormat,DWORD usage){
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		return SUCCEEDED(d3d->CheckDeviceFormat(D3DMADAPTER_DEFAULT,D3DMDEVTYPE_DEFAULT,adapterFormat,usage,D3DMRTYPE_TEXTURE,textureFormat));
-	#else
-		return SUCCEEDED(d3d->CheckDeviceFormat(D3DADAPTER_DEFAULT,D3DDEVTYPE_HAL,adapterFormat,usage,D3DRTYPE_TEXTURE,textureFormat));
-	#endif
+	return SUCCEEDED(result);
 }
 
 int D3D9Texture::getClosestTextureFormat(int textureFormat){
@@ -382,36 +405,32 @@ int D3D9Texture::getClosestTextureFormat(int textureFormat){
 }
 
 D3DFORMAT D3D9Texture::getD3DFORMAT(int textureFormat){
-	D3DFORMAT format=D3DFMT_UNKNOWN;
-
-	if(textureFormat==Format_L_8){
-		format=D3DFMT_L8;
+	switch(textureFormat){
+		case Format_L_8:
+			return D3DFMT_L8;
+		case Format_LA_8:
+			return D3DFMT_A8L8;
+		case Format_RGB_8:
+			return D3DFMT_R8G8B8;
+		case Format_RGBA_8:
+			return D3DFMT_A8R8G8B8;
+		case Format_RGB_5_6_5:
+			return D3DFMT_R5G6B5;
+		case Format_RGBA_5_5_5_1:
+			return D3DFMT_A1R5G5B5;
+		case Format_RGBA_4_4_4_4:
+			return D3DFMT_A4R4G4B4;
+		case Format_DEPTH_16:
+			return D3DFMT_D16;
+		case Format_DEPTH_24:
+			return D3DFMT_D24X8;
+		case Format_DEPTH_32:
+			return D3DFMT_D32;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"D3D9Texture::getD3DFORMAT: Invalid type");
+			return D3DFMT_UNKNOWN;
 	}
-	else if(textureFormat==Format_LA_8){
-		format=D3DFMT_A8L8;
-	}
-	else if(textureFormat==Format_RGB_8){
-		format=D3DFMT_R8G8B8;
-	}
-	else if(textureFormat==Format_RGBA_8){
-		format=D3DFMT_A8R8G8B8;
-	}
-	else if(textureFormat==Format_RGB_5_6_5){
-		format=D3DFMT_R5G6B5;
-	}
-	else if(textureFormat==Format_RGBA_5_5_5_1){
-		format=D3DFMT_A1R5G5B5;
-	}
-	else if(textureFormat==Format_RGBA_4_4_4_4){
-		format=D3DFMT_A4R4G4B4;
-	}
-
-	if(format==D3DFMT_UNKNOWN){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"D3D9Texture::getD3DFORMAT: Invalid type");
-	}
-
-	return format;
 }
 
 DWORD D3D9Texture::getD3DTADDRESS(TextureStage::AddressMode addressMode){

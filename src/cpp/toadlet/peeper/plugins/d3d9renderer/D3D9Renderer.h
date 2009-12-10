@@ -112,6 +112,7 @@ public:
 
 	inline IDirect3DDevice9 *getDirect3DDevice9(){return mD3DDevice;}
 	inline const D3DCAPS9 &getD3DCAPS9() const{return mD3DCaps;}
+	bool isD3DFORMATValid(D3DFORMAT textureFormat,DWORD usage);
 
 	Matrix4x4 cacheMatrix4x4;
 	D3DMATRIX cacheD3DMatrix;
@@ -124,6 +125,9 @@ protected:
 
 	IDirect3D9 *mD3D;
 	IDirect3DDevice9 *mD3DDevice;
+	UINT mD3DAdapter;
+	D3DDEVTYPE mD3DDevType;
+	D3DFORMAT mD3DAdapterFormat;
 	D3DCAPS9 mD3DCaps;
 	RenderTarget *mPrimaryRenderTarget;
 	D3D9RenderTarget *mD3DPrimaryRenderTarget;

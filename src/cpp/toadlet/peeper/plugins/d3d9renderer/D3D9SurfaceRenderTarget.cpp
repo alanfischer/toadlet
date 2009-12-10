@@ -25,6 +25,7 @@
 
 #include "D3D9Renderer.h"
 #include "D3D9SurfaceRenderTarget.h"
+#include "D3D9Texture.h"
 #include <toadlet/egg/Error.h>
 
 using namespace toadlet::egg;
@@ -157,7 +158,7 @@ bool D3D9SurfaceRenderTarget::compile(){
 
 	if(color!=NULL && depth==NULL){
 		// No Depth-Stencil surface, so add one
-		attach(createBufferSurface(Texture::Format_DEPTH_8,mWidth,mHeight),Attachment_DEPTH_STENCIL);
+		attach(createBufferSurface(Texture::Format_DEPTH_16,mWidth,mHeight),Attachment_DEPTH_STENCIL);
 	}
 
 	mNeedsCompile=false;
@@ -165,36 +166,34 @@ bool D3D9SurfaceRenderTarget::compile(){
 	return true;
 }
 
-// TODO: Make this do more than just clone depth.  Create color, and create varying depths
 Surface::ptr D3D9SurfaceRenderTarget::createBufferSurface(int format,int width,int height){
-#if 1
-	IDirect3DDevice9 *device=mRenderer->getDirect3DDevice9();
-	IDirect3DSurface9 *deviceDepthSurface=NULL;
-	HRESULT result=device->GetDepthStencilSurface(&deviceDepthSurface);
-	if(FAILED(result)){
-		TOADLET_CHECK_D3D9ERROR(result,"GetDepthStencilSurface");
-		return NULL;
-	}
-
-	D3DSURFACE_DESC desc;
-	result=deviceDepthSurface->GetDesc(&desc);
-	deviceDepthSurface->Release();
-	if(FAILED(result)){
-		TOADLET_CHECK_D3D9ERROR(result,"GetDesc");
-		return NULL;
-	}
-
 	IDirect3DSurface9 *d3dsurface=NULL;
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		result=device->CreateDepthStencilSurface(width,height,desc.Format,desc.MultiSampleType,&d3dsurface TOADLET_SHAREDHANDLE);
-	#else
-		result=device->CreateDepthStencilSurface(width,height,desc.Format,desc.MultiSampleType,NULL,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
-	#endif
-	if(FAILED(result)){
-		TOADLET_CHECK_D3D9ERROR(result,"CreateDepthStencilSurface");
-		return NULL;
+
+	D3DFORMAT d3dformat=D3D9Texture::getD3DFORMAT(format);
+
+	HRESULT result;
+	if((format&Texture::Format_BIT_DEPTH)>0){
+		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+			result=mRenderer->getDirect3DDevice9()->CreateDepthStencilSurface(width,height,d3dformat,D3DMULTISAMPLE_NONE,&d3dsurface TOADLET_SHAREDHANDLE);
+		#else
+			result=mRenderer->getDirect3DDevice9()->CreateDepthStencilSurface(width,height,d3dformat,D3DMULTISAMPLE_NONE,NULL,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
+		#endif
+		if(FAILED(result)){
+			TOADLET_CHECK_D3D9ERROR(result,"CreateDepthStencilSurface");
+			return NULL;
+		}
 	}
-#endif
+	else{
+		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+			result=mRenderer->getDirect3DDevice9()->CreateRenderTarget(width,height,d3dformat,D3DMULTISAMPLE_NONE,&d3dsurface TOADLET_SHAREDHANDLE);
+		#else
+			result=mRenderer->getDirect3DDevice9()->CreateRenderTarget(width,height,d3dformat,D3DMULTISAMPLE_NONE,NULL,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
+		#endif
+		if(FAILED(result)){
+			TOADLET_CHECK_D3D9ERROR(result,"CreateRenderTarget");
+			return NULL;
+		}
+	}
 
 	D3D9Surface::ptr surface(new D3D9Surface(d3dsurface));
 	mOwnedSurfaces.add(surface);

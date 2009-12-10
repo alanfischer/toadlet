@@ -64,14 +64,12 @@ public:
 	virtual bool load(int format,int width,int height,int depth,int mipLevel,uint8 *data);
 	virtual bool read(int format,int width,int height,int depth,int mipLevel,uint8 *data);
 
-protected:
-	static bool isD3DFORMATValid(IDirect3D9 *d3d,D3DFORMAT adapterFormat,D3DFORMAT textureFormat,DWORD usage);
-
 	static int getClosestTextureFormat(int textureFormat);
 	static D3DFORMAT getD3DFORMAT(int textureFormat);
 	static DWORD getD3DTADDRESS(TextureStage::AddressMode addressMode);
 	static DWORD getD3DTEXF(TextureStage::Filter filter);
 
+protected:
 	D3D9Renderer *mRenderer;
 
 	int mUsageFlags;

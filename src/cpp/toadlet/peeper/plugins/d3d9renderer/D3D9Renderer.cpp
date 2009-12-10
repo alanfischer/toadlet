@@ -65,6 +65,9 @@ TOADLET_C_API Renderer* new_D3D9Renderer(){
 D3D9Renderer::D3D9Renderer():
 	mD3D(NULL),
 	mD3DDevice(NULL),
+	mD3DDevType((D3DDEVTYPE)0),
+	mD3DAdapter(0),
+	mD3DAdapterFormat(D3DFMT_UNKNOWN),
 	//mD3DCaps,
 	mPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL),
@@ -100,6 +103,15 @@ bool D3D9Renderer::create(RenderTarget *target,int *options){
 		return false;
 	}
 
+	// TODO: Get these from the D3D9RenderTarget
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		mD3DDevType=D3DDEVTYPE_DEFAULT;
+	#else
+		mD3DDevType=D3DDEVTYPE_HAL;
+	#endif
+	mD3DAdapter=D3DADAPTER_DEFAULT;
+	mD3DAdapterFormat=D3DFMT_X8R8G8B8;
+
 	mPrimaryRenderTarget=target;
 	mD3DPrimaryRenderTarget=d3dtarget;
 	mRenderTarget=target;
@@ -109,17 +121,8 @@ bool D3D9Renderer::create(RenderTarget *target,int *options){
 	HRESULT result=mD3DDevice->GetDeviceCaps(&mD3DCaps);
 	TOADLET_CHECK_D3D9ERROR(result,"Error getting caps");
 
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		HRESULT renderToTextureResult=mD3D->CheckDeviceFormat( D3DMADAPTER_DEFAULT, D3DMDEVTYPE_DEFAULT, D3DMFMT_X8R8G8B8,
-			D3DMUSAGE_RENDERTARGET, D3DMRTYPE_TEXTURE, D3DMFMT_X8R8G8B8);
-		HRESULT renderToDepthTextureResult=E_FAIL;
-	#else
-		HRESULT renderToTextureResult=mD3D->CheckDeviceFormat( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8,
-			D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE, D3DFMT_X8R8G8B8);
-		HRESULT renderToDepthTextureResult=mD3D->CheckDeviceFormat(	D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8,
-			D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, D3DFMT_D24S8);
-	#endif
-
+	HRESULT renderToTextureResult=isD3DFORMATValid(D3DFMT_X8R8G8B8,D3DUSAGE_RENDERTARGET);
+	HRESULT renderToDepthTextureResult=isD3DFORMATValid(D3DFMT_D24S8,D3DUSAGE_DEPTHSTENCIL);
 	setCapabilitySetFromCaps(mCapabilitySet,mD3DCaps,SUCCEEDED(renderToTextureResult),SUCCEEDED(renderToDepthTextureResult));
 
 	setDefaultStates();
@@ -961,6 +964,10 @@ void D3D9Renderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &r
 				0,          -Math::HALF, 0,         yoff,
 				0,          0,           Math::ONE, 0,
 				0,          0,           0,         Math::ONE);
+}
+
+bool D3D9Renderer::isD3DFORMATValid(D3DFORMAT textureFormat,DWORD usage){
+	return SUCCEEDED(mD3D->CheckDeviceFormat(mD3DAdapter,mD3DDevType,mD3DAdapterFormat,usage,D3DRTYPE_TEXTURE,textureFormat));
 }
 
 }
