@@ -26,6 +26,7 @@
 package com.lightningtoads.toadlet.egg.math;
 
 #include <com/lightningtoads/toadlet/Types.h>
+#include <com/lightningtoads/toadlet/egg/math/Inline.h>
 
 public final class Math{
 	public static final real ONE=(real)1.0;
@@ -122,22 +123,17 @@ public final class Math{
 		return (real)java.lang.Math.sqrt(r);
 	}
 
-	public static real maxVal(real n1,real n2){
-		return ((n1>n2)?n1:n2);
+	public static real minVal(real x,real y){
+		return TOADLET_MIN_RR(x,y);
 	}
 
-	public static real minVal(real n1,real n2){
-		return ((n1<n2)?n1:n2);
+	public static real maxVal(real x,real y){
+		return TOADLET_MAX_RR(x,y);
 	}
 
 	public static real clamp(real low,real high,real value){
-		if(value<low){
-			return low;
-		}
-		if(value>high){
-			return high;
-		}
-		return value;
+		low=TOADLET_MAX_RR(low,value);
+		return TOADLET_MIN_RR(high,low);
 	}
 
 

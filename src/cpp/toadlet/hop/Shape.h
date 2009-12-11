@@ -70,8 +70,6 @@ public:
 	void getBound(AABox &box) const;
 
 protected:
-	void internal_clamp();
-
 	Type mType;
 	AABox mAABox;
 	Sphere mSphere;

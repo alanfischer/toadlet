@@ -100,7 +100,7 @@ public:
 
 	void capVector3(Vector3 &vector,scalar value) const;
 	void convertToEpsilonOffset(Vector3 &offset) const;
-	void clampPosition(Vector3 &position) const;
+	void snapToGrid(Vector3 &position) const;
 	bool toSmall(const Vector3 &dist) const;
 
 protected:

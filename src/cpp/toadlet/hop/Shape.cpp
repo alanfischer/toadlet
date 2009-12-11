@@ -102,7 +102,6 @@ void Shape::setAABox(const AABox &box){
 	mAABox.set(box);
 
 	if(mSolid!=NULL){
-		internal_clamp();
 		mSolid->updateLocalBound();
 	}
 }
@@ -234,19 +233,6 @@ void Shape::getBound(AABox &box) const{
 			}
 		}
 		break;
-	}
-}
-
-void Shape::internal_clamp(){
-	if(mSolid!=NULL && mSolid->mSimulator!=NULL){
-		switch(mType){
-			case Type_AABOX:
-				mSolid->mSimulator->clampPosition(mAABox.mins);
-				mSolid->mSimulator->clampPosition(mAABox.maxs);
-			break;
-			default:
-			break;
-		}
 	}
 }
 

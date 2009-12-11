@@ -27,6 +27,7 @@
 #define TOADLET_EGG_MATH_BASEMATH_H
 
 #include <toadlet/Types.h>
+#include <toadlet/egg/math/Inline.h>
 
 #if defined(TOADLET_PLATFORM_OSX)
 	#include <sys/../math.h> // Force it to use the right math.h, because xcode is buggy
@@ -38,7 +39,7 @@ namespace toadlet{
 namespace egg{
 namespace math{
 
-typedef float real;
+typedef TOADLET_REAL real;
 
 namespace Math{
 	const real ONE=(real)1.0;
@@ -110,22 +111,17 @@ namespace Math{
 
 	inline real sqrt(real r){return ::sqrt(r);}
 
-	template<class T> inline T maxVal(const T &t1,const T &t2){
-		return ((t1>t2)?t1:t2);
+	inline real minVal(real x,real y){
+		return TOADLET_MIN_RR(x,y);
 	}
 
-	template<class T> inline T minVal(const T &t1,const T &t2){
-		return ((t1<t2)?t1:t2);
+	inline real maxVal(real x,real y){
+		return TOADLET_MAX_RR(x,y);
 	}
 
-	template<class T1,class T2,class T3> inline T3 clamp(const T1 low,const T2 high,const T3 value){
-		if(value<low){
-			return low;
-		}
-		if(value>high){
-			return high;
-		}
-		return value;
+	inline real clamp(real low,real high,real value){
+		low=TOADLET_MAX_RR(low,value);
+		return TOADLET_MIN_RR(high,low);
 	}
 
 	inline real lerp(real t1,real t2,real time){

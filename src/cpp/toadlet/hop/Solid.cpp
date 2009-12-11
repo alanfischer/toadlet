@@ -264,10 +264,6 @@ void Solid::updateLocalBound(){
 
 void Solid::internal_setSimulator(Simulator *s){
 	mSimulator=s;
-	int i;
-	for(i=0;i<mShapes.size();++i){
-		mShapes[i]->internal_clamp();
-	}
 }
 
 }
