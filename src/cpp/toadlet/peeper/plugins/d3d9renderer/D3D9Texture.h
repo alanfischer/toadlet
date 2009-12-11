@@ -86,6 +86,7 @@ protected:
 	D3DPOOL mD3DPool;
 	IDirect3DBaseTexture9 *mTexture;
 	bool mManuallyGenerateMipLevels;
+	IDirect3DSurface9 *mBackupSurface;
 
 	friend D3D9Renderer;
 };

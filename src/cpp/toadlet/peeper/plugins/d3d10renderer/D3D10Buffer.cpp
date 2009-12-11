@@ -71,7 +71,8 @@ bool D3D10Buffer::create(int usageFlags,AccessType accessType,IndexFormat indexF
 
 	mBindFlags|=D3D10_BIND_INDEX_BUFFER;
 
-	mMapping=(mUsageFlags&Buffer::UsageFlags_STATIC)==0;//mRenderer->useMapping(this);
+	// Having issues with being able to Map a DYANMIC buffer, not sure why, so dont map for now
+	mMapping=false;//(mUsageFlags&Buffer::UsageFlags_STATIC)==0;//mRenderer->useMapping(this);
 	if(mMapping){
 		createContext();
 	}
@@ -95,7 +96,7 @@ bool D3D10Buffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr 
 
 	mBindFlags|=D3D10_BIND_VERTEX_BUFFER;
 
-	mMapping=(mUsageFlags&Buffer::UsageFlags_STATIC)==0;//mRenderer->useMapping(this);
+	mMapping=false;//(mUsageFlags&Buffer::UsageFlags_STATIC)==0;//mRenderer->useMapping(this);
 	if(mMapping){
 		createContext();
 	}
@@ -110,6 +111,11 @@ bool D3D10Buffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr 
 void D3D10Buffer::destroy(){
 	destroyContext(false);
 
+	if(mData!=NULL){
+		delete[] mData;
+		mData=NULL;
+	}
+	
 	if(mListener!=NULL){
 		if((mBindFlags&D3D10_BIND_INDEX_BUFFER)>0){
 			mListener->bufferDestroyed((IndexBuffer*)this);
@@ -135,20 +141,27 @@ bool D3D10Buffer::createContext(){
 	}
 	desc.BindFlags=mBindFlags;
 
-	if((mUsageFlags&AccessType_READ_ONLY)>0){
-		desc.CPUAccessFlags|=D3D10_CPU_ACCESS_READ;
-	}
-	else if((mUsageFlags&AccessType_WRITE_ONLY)>0){
-		desc.CPUAccessFlags|=D3D10_CPU_ACCESS_WRITE;
-	}
-	else if((mUsageFlags&AccessType_READ_WRITE)>0){
-		desc.CPUAccessFlags|=D3D10_CPU_ACCESS_READ|D3D10_CPU_ACCESS_WRITE;
+	if((mUsageFlags&UsageFlags_STATIC)==0){
+		if(mAccessType==AccessType_READ_ONLY){
+			desc.CPUAccessFlags|=D3D10_CPU_ACCESS_READ;
+		}
+		else if(mAccessType==AccessType_WRITE_ONLY){
+			desc.CPUAccessFlags|=D3D10_CPU_ACCESS_WRITE;
+		}
+		else if(mAccessType==AccessType_READ_WRITE){
+			desc.CPUAccessFlags|=D3D10_CPU_ACCESS_READ|D3D10_CPU_ACCESS_WRITE;
+		}
 	}
 
-	D3D10_SUBRESOURCE_DATA data={0};
-	data.pSysMem=mData;
-
-	HRESULT result=mRenderer->getD3D10Device()->CreateBuffer(&desc,&data,&mBuffer);
+	HRESULT result;
+	if(mMapping){
+		result=mRenderer->getD3D10Device()->CreateBuffer(&desc,NULL,&mBuffer);
+	}
+	else{
+		D3D10_SUBRESOURCE_DATA data={0};
+		data.pSysMem=mData;
+		result=mRenderer->getD3D10Device()->CreateBuffer(&desc,&data,&mBuffer);
+	}
 	TOADLET_CHECK_D3D10ERROR(result,"D3D10Buffer: CreateBuffer");
 
 	return SUCCEEDED(result);
@@ -194,6 +207,11 @@ uint8 *D3D10Buffer::lock(AccessType lockType){
 		HRESULT result=mBuffer->Map(mapType,mapFlags,(void**)&mData);
 		TOADLET_CHECK_D3D10ERROR(result,"D3D10Buffer: Lock");
 	}
+	else{
+		if(mData==NULL){
+			mData=new uint8[mDataSize];
+		}
+	}
 
 	// We do this even if its write only, since the unlocking will write it back, it would get messed up if we didn't swap in all situations
 	if(mData!=NULL){
@@ -233,6 +251,11 @@ bool D3D10Buffer::unlock(){
 		}
 		else{
 			mRenderer->getD3D10Device()->UpdateSubresource(mBuffer,0,NULL,mData,0,0);
+		}
+
+		if((mUsageFlags&UsageFlags_STATIC)>0){
+			delete[] mData;
+			mData=NULL;
 		}
 	}
 

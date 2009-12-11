@@ -50,7 +50,11 @@ public:
 
 	virtual int getHeight() const{return mHeight;}
 
-	virtual bool makeCurrent(ID3D10Device *device);
+	virtual void makeCurrent(ID3D10Device *device);
+
+	virtual void clear(int clearFlags,const Color &clearColor);
+
+	virtual void swap();
 
 	virtual void reset();
 
@@ -63,6 +67,7 @@ protected:
 
 //	D3DPRESENT_PARAMETERS mPresentParameters;
 	HINSTANCE mLibrary;
+	IDXGISwapChain *mSwapChain;
 	ID3D10Device *mD3DDevice;
 	ID3D10RenderTargetView *mRenderTargetView;
 	ID3D10DepthStencilView *mDepthStencilView;

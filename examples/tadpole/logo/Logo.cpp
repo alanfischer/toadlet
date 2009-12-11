@@ -46,7 +46,6 @@ void Logo::resized(int width,int height){
 }
 
 void Logo::render(Renderer *renderer){
-	getEngine()->contextUpdate(renderer);
 	renderer->beginScene();
 		getEngine()->getScene()->render(renderer,cameraNode);
 	renderer->endScene();
