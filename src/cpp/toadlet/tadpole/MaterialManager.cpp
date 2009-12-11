@@ -48,7 +48,7 @@ Material::ptr MaterialManager::createMaterial(){
 	return material;
 }
 
-TextureStage::ptr MaterialManager::createTextureStage(Texture::ptr texture){
+TextureStage::ptr MaterialManager::createTextureStage(Texture::ptr texture,bool clamped){
 	TextureStage::ptr textureStage(new TextureStage(texture));
 	textureStage->setMinFilter(mDefaultMinFilter);
 	textureStage->setMagFilter(mDefaultMagFilter);
@@ -58,6 +58,12 @@ TextureStage::ptr MaterialManager::createTextureStage(Texture::ptr texture){
 	else{
 		textureStage->setMipFilter(TextureStage::Filter_NONE);
 	}
+	if(clamped){
+		textureStage->setUAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
+		textureStage->setVAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
+		textureStage->setWAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
+	}
+
 	return textureStage;
 }
 

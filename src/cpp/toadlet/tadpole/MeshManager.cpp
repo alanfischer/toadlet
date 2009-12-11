@@ -103,7 +103,7 @@ Mesh::ptr MeshManager::createBox(const AABox &box){
 	return mesh;
 }
 
-Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded){
+Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded,Texture::ptr bottom,Texture::ptr top,Texture::ptr left,Texture::ptr right,Texture::ptr back,Texture::ptr front){
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,24);
 	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_8,36);
 	{
@@ -125,8 +125,8 @@ Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded){
 		vba.set3(vi,0, size, size,-size); if(unfolded) vba.set2(vi,1, half, third2);	else vba.set2(vi,1, one, 0);	vi++;
 		vba.set3(vi,0,-size, size,-size); if(unfolded) vba.set2(vi,1, quarter, third2);	else vba.set2(vi,1, 0, 0);		vi++;
 
-		iba.set(ii++,1);		iba.set(ii++,0);		iba.set(ii++,2);
-		iba.set(ii++,3);		iba.set(ii++,2);		iba.set(ii++,0);
+		iba.set(ii++,0);		iba.set(ii++,1);		iba.set(ii++,2);
+		iba.set(ii++,2);		iba.set(ii++,3);		iba.set(ii++,0);
 
 		// Top
 		vba.set3(vi,0,-size,-size, size); if(unfolded) vba.set2(vi,1, quarter, 0);		else vba.set2(vi,1, one, one);	vi++;
@@ -134,8 +134,8 @@ Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded){
 		vba.set3(vi,0, size, size, size); if(unfolded) vba.set2(vi,1, half, third);		else vba.set2(vi,1, 0, 0);		vi++;
 		vba.set3(vi,0,-size, size, size); if(unfolded) vba.set2(vi,1, quarter, third);	else vba.set2(vi,1, one, 0);	vi++;
 
-		iba.set(ii++,4);		iba.set(ii++,5);		iba.set(ii++,6);
-		iba.set(ii++,6);		iba.set(ii++,7);		iba.set(ii++,4);
+		iba.set(ii++,5);		iba.set(ii++,4);		iba.set(ii++,6);
+		iba.set(ii++,7);		iba.set(ii++,6);		iba.set(ii++,4);
 
 		// Left
 		vba.set3(vi,0,-size,-size,-size); if(unfolded) vba.set2(vi,1, 0, third2);		else vba.set2(vi,1, 0, one);	vi++;
@@ -143,8 +143,8 @@ Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded){
 		vba.set3(vi,0,-size, size, size); if(unfolded) vba.set2(vi,1, quarter, third);	else vba.set2(vi,1, one, 0);	vi++;
 		vba.set3(vi,0,-size,-size, size); if(unfolded) vba.set2(vi,1, 0, third);		else vba.set2(vi,1, 0, 0);		vi++;
 
-		iba.set(ii++,10);		iba.set(ii++,9);		iba.set(ii++,8);
-		iba.set(ii++,10);		iba.set(ii++,8);		iba.set(ii++,11);
+		iba.set(ii++,9);		iba.set(ii++,10);		iba.set(ii++,8);
+		iba.set(ii++,8);		iba.set(ii++,10);		iba.set(ii++,11);
 
 		// Right
 		vba.set3(vi,0, size,-size,-size); if(unfolded) vba.set2(vi,1, quarter3, third2);else vba.set2(vi,1, one, one);	vi++;
@@ -152,8 +152,8 @@ Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded){
 		vba.set3(vi,0, size, size, size); if(unfolded) vba.set2(vi,1, half, third);		else vba.set2(vi,1, 0, 0);		vi++;
 		vba.set3(vi,0, size,-size, size); if(unfolded) vba.set2(vi,1, quarter3, third);	else vba.set2(vi,1, one, 0);	vi++;
 
-		iba.set(ii++,13);		iba.set(ii++,14);		iba.set(ii++,12);
-		iba.set(ii++,12);		iba.set(ii++,14);		iba.set(ii++,15);
+		iba.set(ii++,14);		iba.set(ii++,13);		iba.set(ii++,12);
+		iba.set(ii++,14);		iba.set(ii++,12);		iba.set(ii++,15);
 
 		// Back
 		vba.set3(vi,0,-size,-size,-size); if(unfolded) vba.set2(vi,1, one, third2);		else vba.set2(vi,1, one, one);	vi++;
@@ -161,8 +161,8 @@ Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded){
 		vba.set3(vi,0, size,-size, size); if(unfolded) vba.set2(vi,1, quarter3, third);	else vba.set2(vi,1, 0, 0);		vi++;
 		vba.set3(vi,0,-size,-size, size); if(unfolded) vba.set2(vi,1, one, third);		else vba.set2(vi,1, one, 0);	vi++;
 
-		iba.set(ii++,17);		iba.set(ii++,18);		iba.set(ii++,16);
-		iba.set(ii++,16);		iba.set(ii++,18);		iba.set(ii++,19);
+		iba.set(ii++,18);		iba.set(ii++,17);		iba.set(ii++,16);
+		iba.set(ii++,18);		iba.set(ii++,16);		iba.set(ii++,19);
 
 		// Front
 		vba.set3(vi,0,-size, size,-size); if(unfolded) vba.set2(vi,1, quarter, third2);	else vba.set2(vi,1, 0, one);	vi++;
@@ -170,8 +170,8 @@ Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded){
 		vba.set3(vi,0, size, size, size); if(unfolded) vba.set2(vi,1, half, third);		else vba.set2(vi,1, one, 0);	vi++;
 		vba.set3(vi,0,-size, size, size); if(unfolded) vba.set2(vi,1, quarter, third);	else vba.set2(vi,1, 0, 0);		vi++;
 
-		iba.set(ii++,22);		iba.set(ii++,21);		iba.set(ii++,20);
-		iba.set(ii++,22);		iba.set(ii++,20);		iba.set(ii++,23);
+		iba.set(ii++,21);		iba.set(ii++,22);		iba.set(ii++,20);
+		iba.set(ii++,20);		iba.set(ii++,22);		iba.set(ii++,23);
 
 		iba.unlock();
 		vba.unlock();
@@ -203,11 +203,19 @@ Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded){
 	for(i=0;i<mesh->subMeshes.size();++i){
 		Material::ptr material=mEngine->getMaterialManager()->createMaterial();
 		material->retain();
-		material->setFaceCulling(Renderer::FaceCulling_NONE);
 		material->setDepthWrite(false);
 		mesh->subMeshes[i]->material=material;
 	}
-	
+
+	mesh->subMeshes[0]->material->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(bottom,true));
+	if(unfolded==false){
+		mesh->subMeshes[1]->material->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(top,true));
+		mesh->subMeshes[2]->material->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(left,true));
+		mesh->subMeshes[3]->material->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(right,true));
+		mesh->subMeshes[4]->material->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(back,true));
+		mesh->subMeshes[5]->material->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(front,true));
+	}
+
 	return mesh;
 }
 
