@@ -174,22 +174,17 @@ public final class Math{
 		return s;
 	}
 
-	public static fixed maxVal(fixed n1,fixed n2){
-		return ((n1>n2)?n1:n2);
+	public static fixed minVal(fixed x,fixed y){
+		return TOADLET_MIN_XX(x,y);
 	}
 
-	public static fixed minVal(fixed n1,fixed n2){
-		return ((n1<n2)?n1:n2);
+	public static fixed maxVal(fixed x,fixed y){
+		return TOADLET_MAX_XX(x,y);
 	}
 
 	public static fixed clamp(fixed low,fixed high,fixed value){
-		if(value<low){
-			return low;
-		}
-		if(value>high){
-			return high;
-		}
-		return value;
+		low=TOADLET_MAX_XX(low,value);
+		return TOADLET_MIN_XX(high,low);
 	}
 
 	public static fixed lerp(fixed t1,fixed t2,fixed time){

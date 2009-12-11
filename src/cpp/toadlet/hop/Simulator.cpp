@@ -37,8 +37,8 @@ using namespace toadlet::egg;
 // We need to help it figure out which div we want
 #define div Math::div
 
-//#define TOADLET_USE_CLAMP
-// Clamping should no longer be necessary, since solids are not hollow
+#define TOADLET_USE_SNAP
+// Snap to grid should no longer be necessary, since solids are not hollow
 
 namespace toadlet{
 namespace hop{
@@ -424,9 +424,9 @@ void Simulator::update(int dt){
 
 		// Collect all possible solids in the whole movement area
 		if(solid->mCollideWithBits!=0){
-			#if defined(TOADLET_USE_CLAMP)
-				clampPosition(oldPosition);
-				clampPosition(newPosition);
+			#if defined(TOADLET_USE_SNAP)
+				snapToGrid(oldPosition);
+				snapToGrid(newPosition);
 			#endif
 
 			sub(temp,newPosition,oldPosition);
@@ -442,7 +442,7 @@ void Simulator::update(int dt){
 				scalar m=temp.x;
 				if(temp.y>m){m=temp.y;}
 				if(temp.z>m){m=temp.z;}
-				m+=mEpsilon; // Move it out by epsilon, since we haven't clamped yet
+				m+=mEpsilon; // Move it out by epsilon, since we haven't snapped yet
 
 				AABox &box=cache_update_box.set(solid->mLocalBound);
 
@@ -465,9 +465,9 @@ void Simulator::update(int dt){
 				first=false;
 			}
 			else{
-				#if defined(TOADLET_USE_CLAMP)
-					clampPosition(oldPosition);
-					clampPosition(newPosition);
+				#if defined(TOADLET_USE_SNAP)
+					snapToGrid(oldPosition);
+					snapToGrid(newPosition);
 				#endif
 
 				sub(temp,newPosition,oldPosition);
@@ -584,8 +584,8 @@ void Simulator::update(int dt){
 				}
 
 				// Calculate offset vector, and then resulting position
-				#if defined(TOADLET_USE_CLAMP)
-					clampPosition(c.point);
+				#if defined(TOADLET_USE_SNAP)
+					snapToGrid(c.point);
 				#endif
 
 				// Offset our point slightly from the wall
@@ -761,9 +761,9 @@ void Simulator::traceSegment(Collision &result,const Segment &segment,int collid
 
 	Solid *solid2;
 
-	#if defined(TOADLET_USE_CLAMP)
-		clampPosition(const_cast<Vector3&>(segment.origin));
-		clampPosition(const_cast<Vector3&>(segment.direction));
+	#if defined(TOADLET_USE_SNAP)
+		snapToGrid(const_cast<Vector3&>(segment.origin));
+		snapToGrid(const_cast<Vector3&>(segment.direction));
 	#endif
 
 	Vector3 endPoint=cache_traceSegment_endPoint;
@@ -813,13 +813,21 @@ void Simulator::traceSegment(Collision &result,const Segment &segment,int collid
 }
 
 void Simulator::capVector3(Vector3 &vector,scalar value) const{
-	// TODO: Optimize this, perhaps using some bitwise &?
-	if(vector.x>value){vector.x=value;}
-	if(vector.x<-value){vector.x=-value;}
-	if(vector.y>value){vector.y=value;}
-	if(vector.y<-value){vector.y=-value;}
-	if(vector.z>value){vector.z=value;}
-	if(vector.z<-value){vector.z=-value;}
+	#if defined(TOADLET_FIXED_POINT)
+		vector.x=TOADLET_MAX_XX(-value,vector.x);
+		vector.x=TOADLET_MIN_XX(value,vector.x);
+		vector.y=TOADLET_MAX_XX(-value,vector.y);
+		vector.y=TOADLET_MIN_XX(value,vector.y);
+		vector.z=TOADLET_MAX_XX(-value,vector.z);
+		vector.z=TOADLET_MIN_XX(value,vector.z);
+	#else
+		vector.x=TOADLET_MAX_RR(-value,vector.x);
+		vector.x=TOADLET_MIN_RR(value,vector.x);
+		vector.y=TOADLET_MAX_RR(-value,vector.y);
+		vector.y=TOADLET_MIN_RR(value,vector.y);
+		vector.z=TOADLET_MAX_RR(-value,vector.z);
+		vector.z=TOADLET_MIN_RR(value,vector.z);
+	#endif
 }
 
 void Simulator::convertToEpsilonOffset(Vector3 &offset) const{
@@ -836,16 +844,16 @@ void Simulator::convertToEpsilonOffset(Vector3 &offset) const{
 	else offset.z=0;
 }
 
-void Simulator::clampPosition(Vector3 &pos) const{
-	#if defined(TOADLET_USE_CLAMP)
+void Simulator::snapToGrid(Vector3 &pos) const{
+	#if defined(TOADLET_USE_SNAP)
 		#if defined(TOADLET_FIXED_POINT)
 			pos.x=(((pos.x + mHalfEpsilon)>>mEpsilonBits) << mEpsilonBits);
 			pos.y=(((pos.y + mHalfEpsilon)>>mEpsilonBits) << mEpsilonBits);
 			pos.z=(((pos.z + mHalfEpsilon)>>mEpsilonBits) << mEpsilonBits);
 		#else
-			pos.x=round(pos.x*mOneOverEpsilon)*mEpsilon;
-			pos.y=round(pos.y*mOneOverEpsilon)*mEpsilon;
-			pos.z=round(pos.z*mOneOverEpsilon)*mEpsilon;
+			pos.x=(int)(pos.x*mOneOverEpsilon)*mEpsilon;
+			pos.y=(int)(pos.y*mOneOverEpsilon)*mEpsilon;
+			pos.z=(int)(pos.z*mOneOverEpsilon)*mEpsilon;
 		#endif
 	#endif
 }

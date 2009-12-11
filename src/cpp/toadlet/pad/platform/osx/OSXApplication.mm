@@ -328,7 +328,7 @@ void OSXApplication::create(){
 
 void OSXApplication::destroy(){
 	if(mEngine!=NULL){
-		mEngine->destroy()
+		mEngine->destroy();
 	}
 
 	deactivate();

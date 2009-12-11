@@ -406,6 +406,8 @@ void Engine::freeNode(Node *node){
 
 // Context methods
 void Engine::contextReset(peeper::Renderer *renderer){
+	Logger::debug("Engine::contextReset");
+
 	mBufferManager->preContextReset(renderer);
 	mTextureManager->preContextReset(renderer);
 
@@ -416,11 +418,15 @@ void Engine::contextReset(peeper::Renderer *renderer){
 }
 
 void Engine::contextActivate(Renderer *renderer){
+	Logger::debug("Engine::contextActivate");
+
 	mBufferManager->contextActivate(renderer);
 	mTextureManager->contextActivate(renderer);
 }
 
 void Engine::contextDeactivate(Renderer *renderer){
+	Logger::debug("Engine::contextDeactivate");
+
 	mBufferManager->contextDeactivate(renderer);
 	mTextureManager->contextDeactivate(renderer);
 }

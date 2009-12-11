@@ -44,7 +44,7 @@ namespace toadlet{
 namespace egg{
 namespace mathfixed{
 
-typedef int fixed;
+typedef TOADLET_FIXED fixed;
 
 namespace Math{
 	const int BITS=16;
@@ -150,22 +150,17 @@ namespace Math{
 		return s;
 	}
 
-	template<class T> inline T maxVal(const T &t1,const T &t2){
-		return ((t1>t2)?t1:t2);
+	inline fixed minVal(fixed x,fixed y){
+		return TOADLET_MIN_XX(x,y);
 	}
 
-	template<class T> inline T minVal(const T &t1,const T &t2){
-		return ((t1<t2)?t1:t2);
+	inline fixed maxVal(fixed x,fixed y){
+		return TOADLET_MAX_XX(x,y);
 	}
 
-	template<class T1,class T2,class T3> inline T3 clamp(const T1 low,const T2 high,const T3 value){
-		if(value<low){
-			return low;
-		}
-		if(value>high){
-			return high;
-		}
-		return value;
+	inline fixed clamp(fixed low,fixed high,fixed value){
+		low=TOADLET_MAX_XX(low,value);
+		return TOADLET_MIN_XX(high,low);
 	}
 
 	inline fixed lerp(fixed t1,fixed t2,fixed time){
