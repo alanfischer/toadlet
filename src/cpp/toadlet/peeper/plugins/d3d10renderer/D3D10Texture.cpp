@@ -47,9 +47,8 @@ D3D10Texture::D3D10Texture(D3D10Renderer *renderer):BaseResource(),
 	mMipLevels(0),
 
 	mInternalFormat(0),
-//	mD3DFormat(D3DFMT_X8R8G8B8),
-//	mD3DUsage(0),
-//	mD3DPool(D3DPOOL_MANAGED),
+	mDXGIFormat(DXGI_FORMAT_UNKNOWN),
+	mD3DUsage((D3D10_USAGE)0),
 	mTexture(NULL),
 	mShaderResourceView(NULL),
 	mManuallyGenerateMipLevels(false)
@@ -89,8 +88,10 @@ bool D3D10Texture::createContext(){
 	// TODO: Get Usage flags working
 	mD3DUsage=D3D10_USAGE_DEFAULT;
 	int miscFlags=((mUsageFlags&UsageFlags_AUTOGEN_MIPMAPS)>0)?D3D10_RESOURCE_MISC_GENERATE_MIPS:0;
+	int bindFlags=D3D10_BIND_SHADER_RESOURCE;
 
-	mDXGIFormat=getDXGI_FORMAT(mFormat);
+	mInternalFormat=getClosestTextureFormat(mFormat);
+	mDXGIFormat=getDXGI_FORMAT(mInternalFormat);
 
 	D3D10_SHADER_RESOURCE_VIEW_DESC srvDesc;
 	srvDesc.Format=mDXGIFormat;
@@ -98,10 +99,12 @@ bool D3D10Texture::createContext(){
 	HRESULT result=E_FAIL;
 	switch(mDimension){
 		case Texture::Dimension_D1:{
-			D3D10_TEXTURE1D_DESC desc;
+			D3D10_TEXTURE1D_DESC desc={0};
 			desc.Width=mWidth;
 			desc.MipLevels=mMipLevels;
 			desc.Usage=mD3DUsage;
+			desc.CPUAccessFlags=0;
+			desc.BindFlags=bindFlags;
 			desc.MiscFlags=miscFlags;
 			desc.Format=mDXGIFormat;
 			desc.ArraySize=1;
@@ -111,17 +114,23 @@ bool D3D10Texture::createContext(){
 
 			ID3D10Texture1D *texture=NULL;
 			result=device->CreateTexture1D(&desc,NULL,&texture);
+			TOADLET_CHECK_D3D10ERROR(result,"CreateTexture1D");
 			mTexture=texture;
 		}break;
 		case Texture::Dimension_D2:
 		case Texture::Dimension_CUBE:{
-			D3D10_TEXTURE2D_DESC desc;
+			D3D10_TEXTURE2D_DESC desc={0};
 			desc.Width=mWidth;
 			desc.Height=mHeight;
 			desc.MipLevels=mMipLevels;
-			desc.Usage=mD3DUsage;
-			desc.MiscFlags=miscFlags;
+			desc.SampleDesc.Count=1;
+			desc.SampleDesc.Quality=0;
+			desc.Usage=D3D10_USAGE_DEFAULT;//mD3DUsage;
+			desc.CPUAccessFlags=0;
+			desc.BindFlags=D3D10_BIND_SHADER_RESOURCE;//bindFlags;
+			desc.MiscFlags=0;//miscFlags;
 			desc.Format=mDXGIFormat;
+
 			if(mDimension==Texture::Dimension_CUBE){
 				desc.ArraySize=6;
 				srvDesc.ViewDimension=D3D10_SRV_DIMENSION_TEXTURECUBE;
@@ -137,15 +146,17 @@ bool D3D10Texture::createContext(){
 
 			ID3D10Texture2D *texture=NULL;
 			result=device->CreateTexture2D(&desc,NULL,&texture);
+			TOADLET_CHECK_D3D10ERROR(result,"CreateTexture2D");
 			mTexture=texture;
 		}break;
 		case Texture::Dimension_D3:{
-			D3D10_TEXTURE3D_DESC desc;
+			D3D10_TEXTURE3D_DESC desc={0};
 			desc.Width=mWidth;
 			desc.Height=mHeight;
 			desc.Depth=mDepth;
 			desc.MipLevels=mMipLevels;
 			desc.Usage=mD3DUsage;
+			desc.BindFlags=bindFlags;
 			desc.MiscFlags=miscFlags;
 			desc.Format=mDXGIFormat;
 			srvDesc.ViewDimension=D3D10_SRV_DIMENSION_TEXTURE3D;
@@ -154,20 +165,16 @@ bool D3D10Texture::createContext(){
 
 			ID3D10Texture3D *texture=NULL;
 			result=device->CreateTexture3D(&desc,NULL,&texture);
+			TOADLET_CHECK_D3D10ERROR(result,"CreateTexture3D");
 			mTexture=texture;
 		}break;
 	}
 
-	device->CreateShaderResourceView(mTexture,&srvDesc,&mShaderResourceView);
+//	device->CreateShaderResourceView(mTexture,&srvDesc,&mShaderResourceView);
 
 	// TODO: Add mBacking data
 
-	if(FAILED(result)){
-		TOADLET_CHECK_D3D10ERROR(result,"CreateTexture");
-		return false;
-	}
-
-	return true;
+	return SUCCEEDED(result);
 }
 
 void D3D10Texture::destroyContext(bool backData){
@@ -254,19 +261,19 @@ bool D3D10Texture::load(int format,int width,int height,int depth,int mipLevel,u
 
 		D3D10_MAPPED_TEXTURE2D mappedTex;
 		ID3D10Texture2D *texture=(ID3D10Texture2D*)mTexture;
-		result=texture->Map(subresource,mapType,0,&mappedTex);
-		if(FAILED(result)){
-			TOADLET_CHECK_D3D10ERROR(result,"Map");
-			return false;
-		}
+//		result=texture->Map(subresource,mapType,0,&mappedTex);
+//		if(FAILED(result)){
+//			TOADLET_CHECK_D3D10ERROR(result,"Map");
+//			return false;
+//		}
 
-		int pixelSize=ImageFormatConversion::getPixelSize(format);
-		unsigned char *dst=(unsigned char*)mappedTex.pData;
-		unsigned char *src=(unsigned char*)data;
+//		int pixelSize=ImageFormatConversion::getPixelSize(format);
+//		unsigned char *dst=(unsigned char*)mappedTex.pData;
+//		unsigned char *src=(unsigned char*)data;
 
-		ImageFormatConversion::convert(src,format,width*pixelSize,width*height*pixelSize,dst,mInternalFormat,mappedTex.RowPitch,mappedTex.RowPitch*height,width,height,depth);
+//		ImageFormatConversion::convert(src,format,width*pixelSize,width*height*pixelSize,dst,mInternalFormat,mappedTex.RowPitch,mappedTex.RowPitch*height,width,height,depth);
 
-		texture->Unmap(subresource);
+//		texture->Unmap(subresource);
 	}
 	else if(mDimension==Texture::Dimension_D3){
 		int subresource=D3D10CalcSubresource(mipLevel,1,1);
@@ -363,21 +370,15 @@ return false;
 }
 
 int D3D10Texture::getClosestTextureFormat(int textureFormat){
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		if(textureFormat==Format_L_8){
-			textureFormat=Format_RGB_5_6_5;
-		}
-		else if(textureFormat==Format_A_8){
-			textureFormat=Format_RGBA_8;
-		}
-		else if(textureFormat==Format_LA_8){
-			textureFormat=Format_RGBA_8;
-		}
-	#else
-		if(textureFormat==Format_A_8){
-			textureFormat=Format_LA_8;
-		}
-	#endif
+	if(textureFormat==Format_A_8){
+		textureFormat=Format_LA_8;
+	}
+	else if(textureFormat==Format_RGB_8){
+		textureFormat=Format_RGBA_8;
+	}
+
+textureFormat=Format_RGBA_8;
+
 	return textureFormat;
 }
 

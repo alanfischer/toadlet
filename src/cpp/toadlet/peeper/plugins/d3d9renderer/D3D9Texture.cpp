@@ -52,7 +52,8 @@ D3D9Texture::D3D9Texture(D3D9Renderer *renderer):BaseResource(),
 	mD3DUsage(0),
 	mD3DPool(D3DPOOL_MANAGED),
 	mTexture(NULL),
-	mManuallyGenerateMipLevels(false)
+	mManuallyGenerateMipLevels(false),
+	mBackupSurface(NULL)
 {
 	mRenderer=renderer;
 }
@@ -89,6 +90,11 @@ bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width
 }
 
 void D3D9Texture::destroy(){
+	if(mBackupSurface!=NULL){
+		mBackupSurface->Release();
+		mBackupSurface=NULL;
+	}
+
 	destroyContext(false);
 }
 
@@ -145,7 +151,20 @@ bool D3D9Texture::createContext(){
 		#endif
 	}
 
-	// TODO: Add mBacking data
+	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
+		if(mBackupSurface!=NULL){
+			IDirect3DSurface9 *surface=NULL;
+			result=((IDirect3DTexture9*)mTexture)->GetSurfaceLevel(0,&surface);
+			TOADLET_CHECK_D3D9ERROR(result,"CreateOffscreenPlainSurface");
+			if(SUCCEEDED(result)){
+				result=mRenderer->getDirect3DDevice9()->UpdateSurface(mBackupSurface,NULL,surface,NULL);
+				TOADLET_CHECK_D3D9ERROR(result,"UpdateSurface");
+				surface->Release();
+			}
+			mBackupSurface->Release();
+			mBackupSurface=NULL;
+		}
+	}
 
 	if(FAILED(result)){
 		TOADLET_CHECK_D3D9ERROR(result,"CreateTexture");
@@ -156,18 +175,29 @@ bool D3D9Texture::createContext(){
 }
 
 void D3D9Texture::destroyContext(bool backData){
-	if(backData){
-		// TODO: backup data
+	HRESULT result=S_OK;
+
+	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
+		if(backData){
+			result=mRenderer->getDirect3DDevice9()->CreateOffscreenPlainSurface(mWidth,mHeight,mD3DFormat,D3DPOOL_SYSTEMMEM,&mBackupSurface,NULL);
+			TOADLET_CHECK_D3D9ERROR(result,"CreateOffscreenPlainSurface");
+			if(SUCCEEDED(result)){
+				IDirect3DSurface9 *surface=NULL;
+				result=((IDirect3DTexture9*)mTexture)->GetSurfaceLevel(0,&surface);
+				TOADLET_CHECK_D3D9ERROR(result,"CreateOffscreenPlainSurface");
+				if(SUCCEEDED(result)){
+					result=mRenderer->getDirect3DDevice9()->GetRenderTargetData(surface,mBackupSurface);
+					TOADLET_CHECK_D3D9ERROR(result,"GetRenderTargetData");
+					surface->Release();
+				}
+			}
+		}
 	}
 
 	if(mTexture!=NULL){
 		HRESULT result=mTexture->Release();
+		TOADLET_CHECK_D3D9ERROR(result,"Release");
 		mTexture=NULL;
-
-		if(FAILED(result)){
-			TOADLET_CHECK_D3D9ERROR(result,"Release");
-			return;
-		}
 	}
 }
 
@@ -251,14 +281,14 @@ bool D3D9Texture::load(int format,int width,int height,int depth,int mipLevel,ui
 			}
 		}
 		else{
-		D3DLOCKED_RECT rect={0};
-		result=texture->LockRect(mipLevel,&rect,NULL,0);
-		TOADLET_CHECK_D3D9ERROR(result,"LockRect");
-		if(SUCCEEDED(result)){
-			int pixelSize=ImageFormatConversion::getPixelSize(format);
-			ImageFormatConversion::convert(data,format,width*pixelSize,width*height*pixelSize,(uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,width,height,depth);
-			texture->UnlockRect(mipLevel);
-		}
+			D3DLOCKED_RECT rect={0};
+			result=texture->LockRect(mipLevel,&rect,NULL,0);
+			TOADLET_CHECK_D3D9ERROR(result,"LockRect");
+			if(SUCCEEDED(result)){
+				int pixelSize=ImageFormatConversion::getPixelSize(format);
+				ImageFormatConversion::convert(data,format,width*pixelSize,width*height*pixelSize,(uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,width,height,depth);
+				texture->UnlockRect(mipLevel);
+			}
 		}
 	}
 	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)

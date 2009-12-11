@@ -120,6 +120,10 @@ protected:
 	D3D10RenderTarget *mD3DRenderTarget;
 	bool mShutdown;
 
+	Matrix4x4 mModelMatrix;
+	Matrix4x4 mViewMatrix;
+	Matrix4x4 mProjectionMatrix;
+
 	StatisticsSet mStatisticsSet;
 	CapabilitySet mCapabilitySet;
 

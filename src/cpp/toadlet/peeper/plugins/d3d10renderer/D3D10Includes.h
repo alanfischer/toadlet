@@ -29,6 +29,7 @@
 #include <toadlet/peeper/Types.h>
 #include <toadlet/peeper/Color.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Error.h>
 #include <windows.h>
 #include <commctrl.h>
 #include <d3d10.h>
@@ -103,12 +104,13 @@ inline D3DCOLOR toD3DCOLOR(const Color &c){
 #endif
 */
 #define TOADLET_D3D10_DLL_NAME TEXT("D3D10.DLL")
-#define TOADLET_D3D10_CREATE_NAME TEXT("D3D10CreateDevice")
+#define TOADLET_D3D10_CREATE_DEVICE_NAME TEXT("D3D10CreateDevice")
+#define TOADLET_D3D10_CREATE_DEVICE_AND_SWAP_CHAIN_NAME TEXT("D3D10CreateDeviceAndSwapChain")
 
 #if defined(TOADLET_DEBUG)
 	#define TOADLET_CHECK_D3D10ERROR(result,function) \
 		if(FAILED(result)) \
-			toadlet::egg::Logger::warning(toadlet::egg::Categories::TOADLET_PEEPER, \
+			toadlet::egg::Error::unknown(toadlet::egg::Categories::TOADLET_PEEPER, \
 			toadlet::egg::String("D3D10 Error in ") + function + ": error=" + (int)result); \
 
 #else

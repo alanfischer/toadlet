@@ -38,16 +38,6 @@
 using namespace toadlet::egg;
 using namespace toadlet::egg::MathConversion;
 
-#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-	#if defined(TOADLET_FIXED_POINT)
-		#define	TOADLET_D3DMFMT ,D3DMFMT_D3DMVALUE_FIXED
-	#else
-		#define	TOADLET_D3DMFMT ,D3DMFMT_D3DMVALUE_FLOAT
-	#endif
-#else
-	#define	TOADLET_D3DMFMT
-#endif
-
 namespace toadlet{
 namespace peeper{
 
@@ -198,41 +188,34 @@ void D3D10Renderer::setViewport(const Viewport &viewport){
 }
 
 void D3D10Renderer::clear(int clearFlags,const Color &clearColor){
-//	D3DCOLOR color=toD3DCOLOR(clearColor);
-//	if(mRenderTargetView!=NULL){
-//		mD3DDevice->ClearRenderTargetView(mRenderTargetView,clearColor.getData());
-//	}
-//	if(mDepthStencilView!=NULL){
-//		mD3DDevice->ClearRenderTargetView(mDepthStencilView,math::Math::ZERO_VECTOR4.getData());
-//	}
+	mD3DRenderTarget->clear(clearFlags,clearColor);
 }
 
 void D3D10Renderer::swap(){
-//	HRESULT result=mD3DDevice->Present(NULL,NULL,NULL,NULL);
-//	TOADLET_CHECK_D3D9ERROR(result,"swap");
+	mD3DRenderTarget->swap();
 }
 
 void D3D10Renderer::setModelMatrix(const Matrix4x4 &matrix){
-//	toD3DMATRIX(cacheD3DMatrix,matrix);
+	mModelMatrix.set(matrix);
 }
 
 void D3D10Renderer::setViewMatrix(const Matrix4x4 &matrix){
-//	toD3DMATRIX(cacheD3DMatrix,matrix);
+	mViewMatrix.set(matrix);
 }
 
 void D3D10Renderer::setProjectionMatrix(const Matrix4x4 &matrix){
-/*	if(mMirrorY){
+/*
+	if(mMirrorY){
 		cacheMatrix4x4.set(matrix);
 		cacheMatrix4x4.setAt(1,0,-cacheMatrix4x4.at(1,0));
 		cacheMatrix4x4.setAt(1,1,-cacheMatrix4x4.at(1,1));
 		cacheMatrix4x4.setAt(1,2,-cacheMatrix4x4.at(1,2));
 		cacheMatrix4x4.setAt(1,3,-cacheMatrix4x4.at(1,3));
-		toD3DMATRIX(cacheD3DMatrix,cacheMatrix4x4);
+		mProjectionMatrix.set(cacheMatrix4x4);
 	}
 	else{
-		toD3DMATRIX(cacheD3DMatrix,matrix);
-	}
-*/
+*/		mProjectionMatrix.set(matrix);
+//	}
 }
 
 void D3D10Renderer::beginScene(){
@@ -258,6 +241,22 @@ void D3D10Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Inde
 			"D3D10Renderer does not support multiple streams yet");
 		return;
 	}
+/*
+	// Set vertex buffer
+	D3DVertexBuffer *vertexBuffer=(D3DVertexBuffer*)vertexData->getVertexBuffer(0)->getRootVertexBuffer();
+	int offset=0;
+	mD3DDevice->IASetVertexBuffers(0,1,&vertexBuffer->getVertexBuffer(),vertexBuffer->getStride(),&offset);
+
+	pWorldMatrixEffectVariable->SetMatrix(w);
+	pViewMatrixEffectVariable->SetMatrix(viewMatrix);
+	pProjectionMatrixEffectVariable->SetMatrix(projectionMatrix);
+
+	mD3DDevice->IASetIndexBuffer(indexBuffer,indexBuffer->getFormat(),0);
+
+	mD3DDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLES);
+
+	mD3DDevice->Draw(numVertices,0);
+
 /*
 	HRESULT result;
 	D3DPRIMITIVETYPE d3dpt;
