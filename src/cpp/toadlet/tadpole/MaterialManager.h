@@ -41,7 +41,7 @@ public:
 
 	Material::ptr findMaterial(const egg::String &name){return egg::shared_static_cast<Material>(ResourceManager::find(name));}
 
-	peeper::TextureStage::ptr createTextureStage(peeper::Texture::ptr texture);
+	peeper::TextureStage::ptr createTextureStage(peeper::Texture::ptr texture,bool clamped=false);
 
 	virtual egg::Resource::ptr unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData);
 

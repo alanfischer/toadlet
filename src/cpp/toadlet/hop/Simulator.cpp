@@ -847,13 +847,13 @@ void Simulator::convertToEpsilonOffset(Vector3 &offset) const{
 void Simulator::snapToGrid(Vector3 &pos) const{
 	#if defined(TOADLET_USE_SNAP)
 		#if defined(TOADLET_FIXED_POINT)
-			pos.x=(((pos.x + mHalfEpsilon)>>mEpsilonBits) << mEpsilonBits);
-			pos.y=(((pos.y + mHalfEpsilon)>>mEpsilonBits) << mEpsilonBits);
-			pos.z=(((pos.z + mHalfEpsilon)>>mEpsilonBits) << mEpsilonBits);
+			pos.x=(((pos.x+(mHalfEpsilon*-(pos.x<0)))>>mEpsilonBits)<<mEpsilonBits);
+			pos.y=(((pos.y+(mHalfEpsilon*-(pos.y<0)))>>mEpsilonBits)<<mEpsilonBits);
+			pos.z=(((pos.z+(mHalfEpsilon*-(pos.z<0)))>>mEpsilonBits)<<mEpsilonBits);
 		#else
-			pos.x=(int)(pos.x*mOneOverEpsilon)*mEpsilon;
-			pos.y=(int)(pos.y*mOneOverEpsilon)*mEpsilon;
-			pos.z=(int)(pos.z*mOneOverEpsilon)*mEpsilon;
+			pos.x=(int)((pos.x+(mHalfEpsilon*-(pos.x<0)))*mOneOverEpsilon)*mEpsilon;
+			pos.y=(int)((pos.y+(mHalfEpsilon*-(pos.y<0)))*mOneOverEpsilon)*mEpsilon;
+			pos.z=(int)((pos.z+(mHalfEpsilon*-(pos.z<0)))*mOneOverEpsilon)*mEpsilon;
 		#endif
 	#endif
 }
