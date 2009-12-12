@@ -44,7 +44,7 @@ namespace toadlet{
 namespace hop{
 
 Simulator::Simulator():
-	mIntegrator(Integrator_EULER),
+	mIntegrator(Integrator_HEUN),
 
 	//mFluidVelocity,
 	//mGravity,
