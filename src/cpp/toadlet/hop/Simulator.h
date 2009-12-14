@@ -51,32 +51,35 @@ public:
 
 	#if defined(TOADLET_FIXED_POINT)
 		void setEpsilonBits(int epsilonBits);
-		int getEpsilonBits() const;
+		int getEpsilonBits() const{return mEpsilonBits;}
 	#else
 		void setEpsilon(scalar epsilon);
-		scalar getEpsilon() const;
+		scalar getEpsilon() const{return mEpsilon;}
 	#endif
 
 	void setIntegrator(Integrator integrator);
-	Integrator getIntegrator() const;
+	Integrator getIntegrator() const{return mIntegrator;}
+
+	void setSnapToGrid(bool snap);
+	bool getSnapToGrid() const{return mSnapToGrid;}
 
 	void setMaxVelocityComponent(scalar maxVelocityComponent);
-	scalar getMaxVelocityComponent() const;
+	scalar getMaxVelocityComponent() const{return mMaxVelocityComponent;}
 
 	void setMaxForceComponent(scalar maxForceComponent);
-	scalar getMaxForceComponent() const;
+	scalar getMaxForceComponent() const{return mMaxForceComponent;}
 
 	void setFluidVelocity(const Vector3 &fluidVelocity);
-	const Vector3 &getFluidVelocity() const;
+	const Vector3 &getFluidVelocity() const{return mFluidVelocity;}
 
 	void setGravity(const Vector3 &gravity);
-	const Vector3 &getGravity() const;
+	const Vector3 &getGravity() const{return mGravity;}
 
 	void setManager(Manager *manager);
-	Manager *getManager() const;
+	Manager *getManager() const{return mManager;}
 
 	void setMicroCollisionThreshold(scalar threshold);
-	scalar getMicroCollisionThreshold() const;
+	scalar getMicroCollisionThreshold() const{return mMicroCollisionThreshold;}
 
 	void setDeactivateSpeed(scalar speed);
 	void setDeactivateCount(int count);
@@ -134,6 +137,7 @@ protected:
 	scalar mHalfEpsilon;
 	scalar mQuarterEpsilon;
 
+	bool mSnapToGrid;
 	scalar mMaxVelocityComponent;
 	scalar mMaxForceComponent;
 	egg::Collection<Collision> mCollisions;
