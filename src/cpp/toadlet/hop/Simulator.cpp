@@ -37,9 +37,6 @@ using namespace toadlet::egg;
 // We need to help it figure out which div we want
 #define div Math::div
 
-#define TOADLET_USE_SNAP
-// Snap to grid should no longer be necessary, since solids are not hollow
-
 namespace toadlet{
 namespace hop{
 
@@ -58,6 +55,7 @@ Simulator::Simulator():
 	mHalfEpsilon(0),
 	mQuarterEpsilon(0),
 
+	mSnapToGrid(false),
 	mMaxVelocityComponent(0),
 	mMaxForceComponent(0),
 	//mCollisions,
@@ -99,10 +97,6 @@ Simulator::~Simulator(){
 		mHalfEpsilon=mEpsilon>>1;
 		mQuarterEpsilon=mEpsilon>>2;
 	}
-	
-	int Simulator::getEpsilonBits() const{
-		return mEpsilonBits;
-	}
 #else
 	void Simulator::setEpsilon(scalar epsilon){
 		mEpsilon=epsilon;
@@ -110,42 +104,26 @@ Simulator::~Simulator(){
 		mHalfEpsilon=mEpsilon*0.5;
 		mQuarterEpsilon=mEpsilon*0.25;
 	}
-
-	scalar Simulator::getEpsilon() const{
-		return mEpsilon;
-	}
 #endif
 
 void Simulator::setIntegrator(Integrator integrator){
 	mIntegrator=integrator;
 }
 
-Simulator::Integrator Simulator::getIntegrator() const{
-	return mIntegrator;
+void Simulator::setSnapToGrid(bool snap){
+	mSnapToGrid=snap;
 }
 
 void Simulator::setMaxVelocityComponent(scalar maxVelocityComponent){
 	mMaxVelocityComponent=maxVelocityComponent;
 }
 
-scalar Simulator::getMaxVelocityComponent() const{
-	return mMaxVelocityComponent;
-}
-
 void Simulator::setMaxForceComponent(scalar maxForceComponent){
 	mMaxForceComponent=maxForceComponent;
 }
 
-scalar Simulator::getMaxForceComponent() const{
-	return mMaxForceComponent;
-}
-
 void Simulator::setFluidVelocity(const Vector3 &fluidVelocity){
 	mFluidVelocity=fluidVelocity;
-}
-
-const Vector3 &Simulator::getFluidVelocity() const{
-	return mFluidVelocity;
 }
 
 void Simulator::setGravity(const Vector3 &gravity){
@@ -156,24 +134,12 @@ void Simulator::setGravity(const Vector3 &gravity){
 	}
 }
 
-const Vector3 &Simulator::getGravity() const{
-	return mGravity;
-}
-
 void Simulator::setManager(Manager *manager){
 	mManager=manager;
 }
 
-Manager *Simulator::getManager() const{
-	return mManager;
-}
-
 void Simulator::setMicroCollisionThreshold(scalar threshold){
 	mMicroCollisionThreshold=threshold;
-}
-
-scalar Simulator::getMicroCollisionThreshold() const{
-	return mMicroCollisionThreshold;
 }
 
 void Simulator::setDeactivateSpeed(scalar speed){
@@ -424,10 +390,8 @@ void Simulator::update(int dt){
 
 		// Collect all possible solids in the whole movement area
 		if(solid->mCollideWithBits!=0){
-			#if defined(TOADLET_USE_SNAP)
-				snapToGrid(oldPosition);
-				snapToGrid(newPosition);
-			#endif
+			snapToGrid(oldPosition);
+			snapToGrid(newPosition);
 
 			sub(temp,newPosition,oldPosition);
 			if(toSmall(temp)){
@@ -465,10 +429,8 @@ void Simulator::update(int dt){
 				first=false;
 			}
 			else{
-				#if defined(TOADLET_USE_SNAP)
-					snapToGrid(oldPosition);
-					snapToGrid(newPosition);
-				#endif
+				snapToGrid(oldPosition);
+				snapToGrid(newPosition);
 
 				sub(temp,newPosition,oldPosition);
 				if(toSmall(temp)){
@@ -584,9 +546,7 @@ void Simulator::update(int dt){
 				}
 
 				// Calculate offset vector, and then resulting position
-				#if defined(TOADLET_USE_SNAP)
-					snapToGrid(c.point);
-				#endif
+				snapToGrid(c.point);
 
 				// Offset our point slightly from the wall
 				temp.set(c.normal);
@@ -761,10 +721,8 @@ void Simulator::traceSegment(Collision &result,const Segment &segment,int collid
 
 	Solid *solid2;
 
-	#if defined(TOADLET_USE_SNAP)
-		snapToGrid(const_cast<Vector3&>(segment.origin));
-		snapToGrid(const_cast<Vector3&>(segment.direction));
-	#endif
+	snapToGrid(const_cast<Vector3&>(segment.origin));
+	snapToGrid(const_cast<Vector3&>(segment.direction));
 
 	Vector3 endPoint=cache_traceSegment_endPoint;
 	segment.getEndPoint(endPoint);
@@ -845,7 +803,7 @@ void Simulator::convertToEpsilonOffset(Vector3 &offset) const{
 }
 
 void Simulator::snapToGrid(Vector3 &pos) const{
-	#if defined(TOADLET_USE_SNAP)
+	if(mSnapToGrid){
 		#if defined(TOADLET_FIXED_POINT)
 			pos.x=(((pos.x+(mHalfEpsilon*-(pos.x<0)))>>mEpsilonBits)<<mEpsilonBits);
 			pos.y=(((pos.y+(mHalfEpsilon*-(pos.y<0)))>>mEpsilonBits)<<mEpsilonBits);
@@ -855,7 +813,7 @@ void Simulator::snapToGrid(Vector3 &pos) const{
 			pos.y=(int)((pos.y+(mHalfEpsilon*-(pos.y<0)))*mOneOverEpsilon)*mEpsilon;
 			pos.z=(int)((pos.z+(mHalfEpsilon*-(pos.z<0)))*mOneOverEpsilon)*mEpsilon;
 		#endif
-	#endif
+	}
 }
 
 bool Simulator::toSmall(const Vector3 &value) const{
