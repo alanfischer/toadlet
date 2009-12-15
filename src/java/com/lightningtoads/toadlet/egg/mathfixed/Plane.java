@@ -34,22 +34,22 @@ public final class Plane{
 	
 	public Plane(Plane p){
 		normal=new Vector3(p.normal);
-		d=p.d;
+		distance=p.distance;
 	}
 
-	public Plane(Vector3 normal1,fixed d1){
+	public Plane(Vector3 normal1,fixed distance1){
 		normal=new Vector3(normal1);
-		d=d1;
+		distance=distance1;
 	}
 
-	public Plane(fixed x1,fixed y1,fixed z1,fixed d1){
+	public Plane(fixed x1,fixed y1,fixed z1,fixed distance1){
 		normal=new Vector3(x1,y1,z1);
-		d=d1;
+		distance=distance1;
 	}
 
 	public Plane(Vector3 point,Vector3 normal1){
 		normal=new Vector3(normal1);
-		d=Math.dot(normal,point);
+		distance=Math.dot(normal,point);
 	}
 
 	public Plane(Vector3 point1,Vector3 point2,Vector3 point3){	
@@ -61,7 +61,7 @@ public final class Plane{
 
 		Math.cross(normal,v2,v1);
 
-		d=Math.dot(normal,point1);
+		distance=Math.dot(normal,point1);
 
 		Math.normalize(this);
 	}
@@ -71,27 +71,27 @@ public final class Plane{
 		normal.y=p.normal.y;
 		normal.z=p.normal.z;
 
-		d=p.d;
+		distance=p.distance;
 
 		return this;
 	}
 	
-	public Plane set(Vector3 normal1,fixed d1){
+	public Plane set(Vector3 normal1,fixed distance1){
 		normal.x=normal1.x;
 		normal.y=normal1.y;
 		normal.z=normal1.z;
 
-		d=d1;
+		distance=distance1;
 
 		return this;
 	}
 
-	public Plane set(fixed x1,fixed y1,fixed z1,fixed d1){
+	public Plane set(fixed x1,fixed y1,fixed z1,fixed distance1){
 		normal.x=x1;
 		normal.y=y1;
 		normal.z=z1;
 
-		d=d1;
+		distance=distance1;
 
 		return this;
 	}
@@ -101,7 +101,7 @@ public final class Plane{
 		normal.y=0;
 		normal.z=0;
 
-		d=0;
+		distance=0;
 
 		return this;
 	}
@@ -122,13 +122,13 @@ public final class Plane{
 			return false;
 		}
 		Plane p=(Plane)object;
-		return normal.equals(p.normal) && d==p.d;
+		return normal.equals(p.normal) && distance==p.distance;
 	}
 
 	public int hashCode(){
-		return normal.x + normal.y + normal.z + d;
+		return normal.x + normal.y + normal.z + distance;
 	}
 
 	public Vector3 normal;
-	public fixed d;
+	public fixed distance;
 }

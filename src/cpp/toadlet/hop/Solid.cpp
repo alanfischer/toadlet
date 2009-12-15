@@ -70,6 +70,7 @@ Solid::Solid():
 	mInside(false),
 
 	mDoUpdateCallback(false),
+	mManager(NULL),
 
 	mSimulator(NULL)
 {

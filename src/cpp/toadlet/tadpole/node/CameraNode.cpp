@@ -276,7 +276,7 @@ bool CameraNode::culled(const Sphere &sphere) const{
 	scalar distance=0;
 	int i;
 	for(i=0;i<6;++i){
-		distance=Math::dot(mClipPlanes[i].normal,sphere.origin)+mClipPlanes[i].d;
+		distance=Math::dot(mClipPlanes[i].normal,sphere.origin)+mClipPlanes[i].distance;
 		if(distance<-sphere.radius){
 			return true;
 		}
@@ -290,7 +290,7 @@ bool CameraNode::culled(const AABox &box){
 	int i;
 	for(i=0;i<6;i++){
 		box.findPVertex(vertex,mClipPlanes[i].normal);
-		if(Math::dot(mClipPlanes[i].normal,vertex)+mClipPlanes[i].d<0){
+		if(Math::dot(mClipPlanes[i].normal,vertex)+mClipPlanes[i].distance<0){
 			return true;
 		}
 	}

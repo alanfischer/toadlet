@@ -42,6 +42,7 @@ public:
 	virtual void postUpdate(int dt,scalar fdt)=0;
 	virtual void preUpdate(Solid *solid,int dt,scalar fdt)=0;
 	virtual void intraUpdate(Solid *solid,int dt,scalar fdt)=0;
+	virtual bool collisionResponse(Solid *solid,Vector3 &position,Vector3 &remainder,Collision &collision)=0;
 	virtual void postUpdate(Solid *solid,int dt,scalar fdt)=0;
 };
 

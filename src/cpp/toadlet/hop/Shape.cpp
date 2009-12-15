@@ -202,7 +202,7 @@ void Shape::getBound(AABox &box) const{
 							for(l=0;l<mConvexSolid.planes.size();++l){
 								if(l!=i && l!=j && l!=k){
 									const Plane &plane=mConvexSolid.planes[l];
-									if((Math::dot(plane.normal,r)-plane.d) > epsilon){
+									if((Math::dot(plane.normal,r)-plane.distance) > epsilon){
 										legal=false;
 										break;
 									}

@@ -1207,9 +1207,9 @@ namespace Math{
 
 	// Plane operations
 	inline void project(const Plane &plane,Vector3 &result,const Vector3 &point){
-		result.x=point.x - plane.normal.x*plane.d;
-		result.y=point.y - plane.normal.y*plane.d;
-		result.z=point.z - plane.normal.z*plane.d;
+		result.x=point.x - plane.normal.x*plane.distance;
+		result.y=point.y - plane.normal.y*plane.distance;
+		result.z=point.z - plane.normal.z*plane.distance;
 
 		real f=plane.normal.x*result.x + plane.normal.y*result.y + plane.normal.z*result.z;
 
@@ -1219,9 +1219,9 @@ namespace Math{
 	}
 
 	inline void project(const Plane &plane,Vector3 &point){
-		real tx=point.x - plane.normal.x*plane.d;
-		real ty=point.y - plane.normal.y*plane.d;
-		real tz=point.z - plane.normal.z*plane.d;
+		real tx=point.x - plane.normal.x*plane.distance;
+		real ty=point.y - plane.normal.y*plane.distance;
+		real tz=point.z - plane.normal.z*plane.distance;
 
 		real f=plane.normal.x*tx + plane.normal.y*ty + plane.normal.z*tz;
 
@@ -1235,7 +1235,7 @@ namespace Math{
 		plane.normal.x*=l;
 		plane.normal.y*=l;
 		plane.normal.z*=l;
-		plane.d*=l;
+		plane.distance*=l;
 	}
 
 	inline void normalize(Plane &r,const Plane &plane){
@@ -1243,11 +1243,11 @@ namespace Math{
 		r.normal.x=plane.normal.x*l;
 		r.normal.y=plane.normal.y*l;
 		r.normal.z=plane.normal.z*l;
-		r.d=plane.d*l;
+		r.distance=plane.distance*l;
 	}
 
 	inline real length(const Plane &p,const Vector3 &v){
-		return p.normal.x*v.x + p.normal.y*v.y + p.normal.z*v.z - p.d;
+		return p.normal.x*v.x + p.normal.y*v.y + p.normal.z*v.z - p.distance;
 	}
 
 	TOADLET_API bool getIntersectionOfThreePlanes(Vector3 &result,const Plane &p1,const Plane &p2,const Plane &p3,real epsilon);

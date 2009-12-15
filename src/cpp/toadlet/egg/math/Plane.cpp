@@ -33,7 +33,7 @@ Plane::Plane(const Vector3 &point,const Vector3 &normal1){
 	normal.x=normal1.x;
 	normal.y=normal1.y;
 	normal.z=normal1.z;
-	d=Math::dot(normal,point);
+	distance=Math::dot(normal,point);
 }
 
 Plane::Plane(const Vector3 &point1,const Vector3 &point2,const Vector3 &point3){
@@ -44,7 +44,7 @@ Plane::Plane(const Vector3 &point1,const Vector3 &point2,const Vector3 &point3){
 
 	Math::cross(normal,v2,v1);
 
-	d=Math::dot(normal,point1);
+	distance=Math::dot(normal,point1);
 
 	Math::normalize(*this);
 }
@@ -53,7 +53,7 @@ Plane &Plane::set(const Vector3 &point,const Vector3 &normal1){
 	normal.x=normal1.x;
 	normal.y=normal1.y;
 	normal.z=normal1.z;
-	d=Math::dot(normal,point);
+	distance=Math::dot(normal,point);
 
 	return *this;
 }
@@ -66,7 +66,7 @@ Plane &Plane::set(const Vector3 &point1,const Vector3 &point2,const Vector3 &poi
 
 	Math::cross(normal,v2,v1);
 
-	d=Math::dot(normal,point1);
+	distance=Math::dot(normal,point1);
 
 	Math::normalize(*this);
 

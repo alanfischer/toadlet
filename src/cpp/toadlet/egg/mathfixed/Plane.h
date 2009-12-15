@@ -34,11 +34,11 @@ namespace mathfixed{
 
 class TOADLET_API Plane{
 public:
-	inline Plane():d(0){}
+	inline Plane():distance(0){}
 
-	inline Plane(const Vector3 &normal1,fixed d1):normal(normal1),d(d1){}
+	inline Plane(const Vector3 &normal1,fixed distance1):normal(normal1),distance(distance1){}
 
-	inline Plane(fixed x1,fixed y1,fixed z1,fixed d1):normal(x1,y1,z1),d(d1){}
+	inline Plane(fixed x1,fixed y1,fixed z1,fixed distance1):normal(x1,y1,z1),distance(distance1){}
 
 	Plane(const Vector3 &point,const Vector3 &normal1);
 
@@ -49,27 +49,27 @@ public:
 		normal.y=p.normal.y;
 		normal.z=p.normal.z;
 
-		d=p.d;
+		distance=p.distance;
 
 		return *this;
 	}
 
-	inline Plane &set(const Vector3 &normal1,fixed d1){
+	inline Plane &set(const Vector3 &normal1,fixed distance1){
 		normal.x=normal1.x;
 		normal.y=normal1.y;
 		normal.z=normal1.z;
 
-		d=d1;
+		distance=distance1;
 
 		return *this;
 	}
 
-	inline Plane &set(fixed x1,fixed y1,fixed z1,fixed d1){
+	inline Plane &set(fixed x1,fixed y1,fixed z1,fixed distance1){
 		normal.x=x1;
 		normal.y=y1;
 		normal.z=z1;
 
-		d=d1;
+		distance=distance1;
 
 		return *this;
 	}
@@ -79,29 +79,29 @@ public:
 		normal.y=0;
 		normal.z=0;
 
-		d=0;
+		distance=0;
 
 		return *this;
 	}
 
 	inline bool isPointOutside(const Vector3 &point,fixed epsilon=0) const{
-		return Math::mul(normal.x,point.x)+Math::mul(normal.y,point.y)+Math::mul(normal.z,point.z)-d>epsilon;
+		return Math::mul(normal.x,point.x)+Math::mul(normal.y,point.y)+Math::mul(normal.z,point.z)-distance>epsilon;
 	}
 
 	inline bool equals(const Plane &plane) const{
-		return (plane.normal.equals(normal) && plane.d==d);
+		return (plane.normal.equals(normal) && plane.distance==distance);
 	}
 
 	inline bool operator==(const Plane &plane) const{
-		return (plane.normal==normal && plane.d==d);
+		return (plane.normal==normal && plane.distance==distance);
 	}
 
 	inline bool operator!=(const Plane &plane) const{
-		return (plane.normal!=normal || plane.d!=d);
+		return (plane.normal!=normal || plane.distance!=distance);
 	}
 
 	Vector3 normal;
-	fixed d;
+	fixed distance;
 };
 
 }
