@@ -75,6 +75,8 @@ public:
 	void setGravity(const Vector3 &gravity);
 	const Vector3 &getGravity() const{return mGravity;}
 
+	// TODO: If this manager doesnt start actually doing some managing before we opensource, it needs to be renamed
+	//  to something that just does callbacks
 	void setManager(Manager *manager);
 	Manager *getManager() const{return mManager;}
 
@@ -100,15 +102,16 @@ public:
 	int findSolidsInSphere(const Sphere &sphere,Solid *solids[],int maxSolids) const;
 
 	void traceSegment(Collision &result,const Segment &segment,int collideWithBits,Solid *ignore);
+	void traceSolid(Collision &result,Solid *solid,const Segment &segment);
 
 	void capVector3(Vector3 &vector,scalar value) const;
-	void convertToEpsilonOffset(Vector3 &offset) const;
+	void calculateEpsilonOffset(Vector3 &result,const Vector3 &vector) const;
 	void snapToGrid(Vector3 &position) const;
 	bool toSmall(const Vector3 &dist) const;
 
 protected:
-	/// Depends upon mSpacialCollection being update, so not public
-	void traceSolid(Collision &result,Solid *solid,const Segment &segment);
+	void traceSegmentWithCurrentSpacials(Collision &result,const Segment &segment,int collideWithBits,Solid *ignore);
+	void traceSolidWithCurrentSpacials(Collision &result,Solid *solid,const Segment &segment);
 
 	void testSolid(Collision &result,Solid *solid1,Solid *solid2,const Segment &segment);
 	void testSegment(Collision &result,Solid *solid,const Segment &segment);

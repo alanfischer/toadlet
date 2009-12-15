@@ -36,6 +36,7 @@ namespace hop{
 
 class Constraint;
 class Simulator;
+class Manager;
 
 class TOADLET_API Solid{
 public:
@@ -116,6 +117,7 @@ public:
 	bool getInside() const{return mInside;}
 
 	void setDoUpdateCallback(bool callback){mDoUpdateCallback=callback;}
+	void setManager(Manager *manager){mManager=manager;}
 
 	inline Simulator *getSimulator() const{return mSimulator;}
 
@@ -164,6 +166,7 @@ protected:
 	bool mInside;
 
 	bool mDoUpdateCallback;
+	Manager *mManager;
 
 	Simulator *mSimulator;
 

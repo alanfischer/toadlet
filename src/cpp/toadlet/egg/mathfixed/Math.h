@@ -1223,9 +1223,9 @@ namespace Math{
 
 	// Plane operations
 	inline void project(const Plane &plane,Vector3 &result,const Vector3 &point){
-		result.x=point.x - TOADLET_MUL_XX(plane.normal.x,plane.d);
-		result.y=point.y - TOADLET_MUL_XX(plane.normal.y,plane.d);
-		result.z=point.z - TOADLET_MUL_XX(plane.normal.z,plane.d);
+		result.x=point.x - TOADLET_MUL_XX(plane.normal.x,plane.distance);
+		result.y=point.y - TOADLET_MUL_XX(plane.normal.y,plane.distance);
+		result.z=point.z - TOADLET_MUL_XX(plane.normal.z,plane.distance);
 
 		fixed f=TOADLET_MUL_XX(plane.normal.x,result.x) + TOADLET_MUL_XX(plane.normal.y,result.y) + TOADLET_MUL_XX(plane.normal.z,result.z);
 
@@ -1235,9 +1235,9 @@ namespace Math{
 	}
 
 	inline void project(const Plane &plane,Vector3 &point){
-		fixed tx=point.x - TOADLET_MUL_XX(plane.normal.x,plane.d);
-		fixed ty=point.y - TOADLET_MUL_XX(plane.normal.y,plane.d);
-		fixed tz=point.z - TOADLET_MUL_XX(plane.normal.z,plane.d);
+		fixed tx=point.x - TOADLET_MUL_XX(plane.normal.x,plane.distance);
+		fixed ty=point.y - TOADLET_MUL_XX(plane.normal.y,plane.distance);
+		fixed tz=point.z - TOADLET_MUL_XX(plane.normal.z,plane.distance);
 
 		fixed f=TOADLET_MUL_XX(plane.normal.x,tx) + TOADLET_MUL_XX(plane.normal.y,ty) + TOADLET_MUL_XX(plane.normal.z,tz);
 
@@ -1251,7 +1251,7 @@ namespace Math{
 		plane.normal.x=TOADLET_MUL_XX(plane.normal.x,l);
 		plane.normal.y=TOADLET_MUL_XX(plane.normal.y,l);
 		plane.normal.z=TOADLET_MUL_XX(plane.normal.z,l);
-		plane.d=mul(plane.d,l);
+		plane.distance=mul(plane.distance,l);
 	}
 
 	inline void normalize(Plane &r,const Plane &plane){
@@ -1259,11 +1259,11 @@ namespace Math{
 		r.normal.x=TOADLET_MUL_XX(plane.normal.x,l);
 		r.normal.y=TOADLET_MUL_XX(plane.normal.y,l);
 		r.normal.z=TOADLET_MUL_XX(plane.normal.z,l);
-		r.d=mul(plane.d,l);
+		r.distance=mul(plane.distance,l);
 	}
 
 	inline fixed length(const Plane &p,const Vector3 &v){
-		return TOADLET_MUL_XX(p.normal.x,v.x) + TOADLET_MUL_XX(p.normal.y,v.y) + TOADLET_MUL_XX(p.normal.z,v.z) - p.d;
+		return TOADLET_MUL_XX(p.normal.x,v.x) + TOADLET_MUL_XX(p.normal.y,v.y) + TOADLET_MUL_XX(p.normal.z,v.z) - p.distance;
 	}
 
 	TOADLET_API bool getIntersectionOfThreePlanes(Vector3 &result,const Plane &p1,const Plane &p2,const Plane &p3,fixed epsilon);

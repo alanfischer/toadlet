@@ -256,8 +256,8 @@ void Simulator::update(int dt){
 			continue;
 		}
 
-		if(solid->mDoUpdateCallback && mManager!=NULL){
-			mManager->preUpdate(solid,dt,fdt);
+		if(solid->mDoUpdateCallback){
+			(solid->mManager!=NULL?solid->mManager:mManager)->preUpdate(solid,dt,fdt);
 		}
 
 		if(solid->mLocalGravityOverride==false){
@@ -384,15 +384,15 @@ void Simulator::update(int dt){
 		bool first=true;
 		bool skip=false;
 
-		if(solid->mDoUpdateCallback && mManager!=NULL){
-			mManager->intraUpdate(solid,dt,fdt);
+		if(solid->mDoUpdateCallback){
+			(solid->mManager!=NULL?solid->mManager:mManager)->intraUpdate(solid,dt,fdt);
 		}
+
+		snapToGrid(oldPosition);
+		snapToGrid(newPosition);
 
 		// Collect all possible solids in the whole movement area
 		if(solid->mCollideWithBits!=0){
-			snapToGrid(oldPosition);
-			snapToGrid(newPosition);
-
 			sub(temp,newPosition,oldPosition);
 			if(toSmall(temp)){
 				newPosition.set(oldPosition);
@@ -440,7 +440,7 @@ void Simulator::update(int dt){
 			}
 
 			path.setStartEnd(oldPosition,newPosition);
-			traceSolid(c,solid,path);
+			traceSolidWithCurrentSpacials(c,solid,path);
 
 			if(c.time>=0){
 				// TODO: Improve this Inside logic
@@ -450,6 +450,16 @@ void Simulator::update(int dt){
 				else{
 					solid->mInside=false;
 				}
+
+				// Calculate offset vector, and then resulting position
+				snapToGrid(c.point);
+
+				// Calculate oldPosition to be an epsilon back from where we can get to
+				calculateEpsilonOffset(oldPosition,c.normal);
+				add(oldPosition,c.point);
+
+				// leftOver is the energy we still have moving in this direction that we couldnt use
+				sub(leftOver,newPosition,oldPosition);
 
 				// If its a valid collision, and someone is listening, then store it
 				if(c.collider!=solid->mTouching &&
@@ -467,94 +477,91 @@ void Simulator::update(int dt){
 				}
 				hitSolid=c.collider;
 
-				// Conservation of momentum
-				if(solid->mCoefficientOfRestitutionOverride){
-					cor=solid->mCoefficientOfRestitution;
-				}
-				else{
-					cor=(solid->mCoefficientOfRestitution+hitSolid->mCoefficientOfRestitution)/2;
+				// TODO: We need to add a flag to regather possible solids if this callback is performed
+				bool responded=true;
+				if(solid->mDoUpdateCallback){
+					responded=(solid->mManager!=NULL?solid->mManager:mManager)->collisionResponse(solid,oldPosition,leftOver,c);
 				}
 
-				sub(temp,hitSolid->mVelocity,solid->mVelocity);
-
-				// Attempt to detect a microcollision
-				if(dot(temp,c.normal)<mMicroCollisionThreshold){
-					cor=0;
-				}
-
-				scalar numerator=mul(ONE+cor,dot(temp,c.normal));
-
-				// Temp stores the velocity change on hitSolid
-				temp.reset();
-
-				if(solid->mMass!=0 && hitSolid->mMass!=0){
-					oneOverMass=solid->mInvMass;
-					oneOverHitMass=hitSolid->mInvMass;
-
-					// Check to make sure its not two infinite mass solids interacting
-					if(oneOverMass+oneOverHitMass!=0){
-						impulse=div(numerator,oneOverMass+oneOverHitMass);
+				if(responded==false){
+					// Conservation of momentum
+					if(solid->mCoefficientOfRestitutionOverride){
+						cor=solid->mCoefficientOfRestitution;
 					}
 					else{
-						impulse=0;
+						cor=(solid->mCoefficientOfRestitution+hitSolid->mCoefficientOfRestitution)/2;
 					}
 
-					if(solid->mMass!=Solid::INFINITE_MASS){
-						/*
-							solid->mVelocity+=(c.normal*impulse)*oneOverMass;
-						*/
+					sub(temp,hitSolid->mVelocity,solid->mVelocity);
 
-						mul(t,c.normal,impulse);
-						mul(t,oneOverMass);
-						add(solid->mVelocity,t);
+					// Attempt to detect a microcollision
+					if(dot(temp,c.normal)<mMicroCollisionThreshold){
+						cor=0;
 					}
-					if(hitSolid->mMass!=Solid::INFINITE_MASS){
-						if(solid->mMass==Solid::INFINITE_MASS){
-							// Infinite mass trains assume a CoefficientOfRestitution of 1 
-							// for the hitSolid calculation to avoid having gravity jam objects against them 
-							/*
-								temp=c.normal*2.0f*dot(hitSolid->mVelocity-solid->mVelocity,c.normal);
-							*/
 
-							sub(temp,hitSolid->mVelocity,solid->mVelocity);
-							mul(temp,c.normal,dot(temp,c.normal)/2);
+					scalar numerator=mul(ONE+cor,dot(temp,c.normal));
+
+					// Temp stores the velocity change on hitSolid
+					temp.reset();
+
+					if(solid->mMass!=0 && hitSolid->mMass!=0){
+						oneOverMass=solid->mInvMass;
+						oneOverHitMass=hitSolid->mInvMass;
+
+						// Check to make sure its not two infinite mass solids interacting
+						if(oneOverMass+oneOverHitMass!=0){
+							impulse=div(numerator,oneOverMass+oneOverHitMass);
 						}
 						else{
+							impulse=0;
+						}
+
+						if(solid->mMass!=Solid::INFINITE_MASS){
 							/*
-								temp=(c.normal*impulse)*oneOverHitMass;
+								solid->mVelocity+=(c.normal*impulse)*oneOverMass;
 							*/
 
-							mul(temp,c.normal,impulse);
-							mul(temp,oneOverHitMass);
+							mul(t,c.normal,impulse);
+							mul(t,oneOverMass);
+							add(solid->mVelocity,t);
+						}
+						if(hitSolid->mMass!=Solid::INFINITE_MASS){
+							if(solid->mMass==Solid::INFINITE_MASS){
+								// Infinite mass trains assume a CoefficientOfRestitution of 1 
+								// for the hitSolid calculation to avoid having gravity jam objects against them 
+								/*
+									temp=c.normal*2.0f*dot(hitSolid->mVelocity-solid->mVelocity,c.normal);
+								*/
+
+								sub(temp,hitSolid->mVelocity,solid->mVelocity);
+								mul(temp,c.normal,dot(temp,c.normal)/2);
+							}
+							else{
+								/*
+									temp=(c.normal*impulse)*oneOverHitMass;
+								*/
+
+								mul(temp,c.normal,impulse);
+								mul(temp,oneOverHitMass);
+							}
 						}
 					}
-				}
-				else if(hitSolid->mMass==0){
-					mul(temp,c.normal,numerator);
-				}
-				else if(solid->mMass==0){
-					mul(t,c.normal,numerator);
-					add(solid->mVelocity,t);
-				}
+					else if(hitSolid->mMass==0){
+						mul(temp,c.normal,numerator);
+					}
+					else if(solid->mMass==0){
+						mul(t,c.normal,numerator);
+						add(solid->mVelocity,t);
+					}
 
-				// Only affect hitSolid if hitSolid would have collided with solid.
-				if(	(hitSolid->mCollideWithBits&solid->mCollisionBits)!=0 &&
-					(Math::abs(temp.x)>=mDeactivateSpeed || Math::abs(temp.y)>=mDeactivateSpeed || Math::abs(temp.z)>=mDeactivateSpeed))
-				{
-					hitSolid->activate();
-					sub(hitSolid->mVelocity,temp);
+					// Only affect hitSolid if hitSolid would have collided with solid.
+					if(	(hitSolid->mCollideWithBits&solid->mCollisionBits)!=0 &&
+						(Math::abs(temp.x)>=mDeactivateSpeed || Math::abs(temp.y)>=mDeactivateSpeed || Math::abs(temp.z)>=mDeactivateSpeed))
+					{
+						hitSolid->activate();
+						sub(hitSolid->mVelocity,temp);
+					}
 				}
-
-				// Calculate offset vector, and then resulting position
-				snapToGrid(c.point);
-
-				// Offset our point slightly from the wall
-				temp.set(c.normal);
-				convertToEpsilonOffset(temp);
-				add(temp,c.point);
-
-				// Calculate left over amount
-				sub(leftOver,newPosition,temp);
 
 				// Touching code
 				solid->mTouched2=solid->mTouched1;
@@ -570,29 +577,27 @@ void Simulator::update(int dt){
 				}
 
 				if(toSmall(leftOver)){
-					newPosition.set(temp);
+					newPosition.set(oldPosition);
 					break;
 				}
 				else if(loop>4){
 					// We keep hitting something, so just break out
-					newPosition.set(temp);
+					newPosition.set(oldPosition);
 					break;
 				}
 				else{
 					// Calculate new destinations from coefficient of restitution applied to velocity
 					if(normalizeCarefully(velocity,solid->mVelocity,mEpsilon)==false){
-						newPosition.set(temp);
+						newPosition.set(oldPosition);
 						break;
 					}
 					else{
 						/*
-							oldPosition=temp;
 							velocity*=length(leftOver);
 							velocity-=c.normal*dot(velocity,c.normal);
 							newPosition=oldPosition+velocity;
 						*/
 
-						oldPosition.set(temp);
 						mul(velocity,length(leftOver));
 						mul(temp,c.normal,dot(velocity,c.normal));
 						sub(velocity,temp);
@@ -645,7 +650,7 @@ void Simulator::update(int dt){
 		solid->setPositionNoActivate(newPosition);
 
 		if(solid->mDoUpdateCallback && mManager!=NULL){
-			mManager->postUpdate(solid,dt,fdt);
+			(solid->mManager!=NULL?solid->mManager:mManager)->postUpdate(solid,dt,fdt);
 		}
 	}
 
@@ -717,18 +722,100 @@ int Simulator::findSolidsInSphere(const Sphere &sphere,Solid *solids[],int maxSo
 }
 
 void Simulator::traceSegment(Collision &result,const Segment &segment,int collideWithBits,Solid *ignore){
-	result.time=-ONE;
-
-	Solid *solid2;
-
-	snapToGrid(const_cast<Vector3&>(segment.origin));
-	snapToGrid(const_cast<Vector3&>(segment.direction));
-
 	Vector3 endPoint=cache_traceSegment_endPoint;
 	segment.getEndPoint(endPoint);
 	AABox total=cache_traceSegment_total.set(segment.origin,segment.origin);
 	total.mergeWith(endPoint);
 	mNumSpacialCollection=findSolidsInAABox(total,mSpacialCollection.begin(),mSpacialCollection.size());
+
+	traceSegmentWithCurrentSpacials(result,segment,collideWithBits,ignore);
+}
+
+void Simulator::traceSolid(Collision &result,Solid *solid,const Segment &segment){
+	#if defined(TOADLET_FIXED_POINT)
+		scalar x=TOADLET_MAX_XX(-segment.direction.x,segment.direction.x);
+		scalar y=TOADLET_MAX_XX(-segment.direction.y,segment.direction.y);
+		scalar z=TOADLET_MAX_XX(-segment.direction.z,segment.direction.z);
+		scalar m=TOADLET_MAX_XX(x,y);
+		scalar m=TOADLET_MAX_XX(m,z);
+	#else
+		scalar x=TOADLET_MAX_RR(-segment.direction.x,segment.direction.x);
+		scalar y=TOADLET_MAX_RR(-segment.direction.y,segment.direction.y);
+		scalar z=TOADLET_MAX_RR(-segment.direction.z,segment.direction.z);
+		scalar m=TOADLET_MAX_RR(x,y);
+		m=TOADLET_MAX_RR(m,z);
+	#endif
+	m+=mEpsilon; // Move it out by epsilon, since we haven't snapped yet
+
+	AABox &box=cache_update_box.set(solid->mLocalBound);
+
+	add(box,segment.origin);
+	box.mins.x-=m;
+	box.mins.y-=m;
+	box.mins.z-=m;
+	box.maxs.x+=m;
+	box.maxs.y+=m;
+	box.maxs.z+=m;
+
+	mNumSpacialCollection=findSolidsInAABox(box,mSpacialCollection.begin(),mSpacialCollection.size());
+
+	traceSolidWithCurrentSpacials(result,solid,segment);
+}
+
+void Simulator::capVector3(Vector3 &vector,scalar value) const{
+	#if defined(TOADLET_FIXED_POINT)
+		vector.x=TOADLET_MAX_XX(-value,vector.x);
+		vector.x=TOADLET_MIN_XX(value,vector.x);
+		vector.y=TOADLET_MAX_XX(-value,vector.y);
+		vector.y=TOADLET_MIN_XX(value,vector.y);
+		vector.z=TOADLET_MAX_XX(-value,vector.z);
+		vector.z=TOADLET_MIN_XX(value,vector.z);
+	#else
+		vector.x=TOADLET_MAX_RR(-value,vector.x);
+		vector.x=TOADLET_MIN_RR(value,vector.x);
+		vector.y=TOADLET_MAX_RR(-value,vector.y);
+		vector.y=TOADLET_MIN_RR(value,vector.y);
+		vector.z=TOADLET_MAX_RR(-value,vector.z);
+		vector.z=TOADLET_MIN_RR(value,vector.z);
+	#endif
+}
+
+void Simulator::calculateEpsilonOffset(Vector3 &result,const Vector3 &vector) const{
+	if(vector.x>=mQuarterEpsilon)result.x=mEpsilon;
+	else if(vector.x<=-mQuarterEpsilon)result.x=-mEpsilon;
+	else result.x=0;
+
+	if(vector.y>=mQuarterEpsilon)result.y=mEpsilon;
+	else if(vector.y<=-mQuarterEpsilon)result.y=-mEpsilon;
+	else result.y=0;
+
+	if(vector.z>=mQuarterEpsilon)result.z=mEpsilon;
+	else if(vector.z<=-mQuarterEpsilon)result.z=-mEpsilon;
+	else result.z=0;
+}
+
+void Simulator::snapToGrid(Vector3 &pos) const{
+	if(mSnapToGrid){
+		#if defined(TOADLET_FIXED_POINT)
+			pos.x=(((pos.x+(mHalfEpsilon*-(pos.x<0)))>>mEpsilonBits)<<mEpsilonBits);
+			pos.y=(((pos.y+(mHalfEpsilon*-(pos.y<0)))>>mEpsilonBits)<<mEpsilonBits);
+			pos.z=(((pos.z+(mHalfEpsilon*-(pos.z<0)))>>mEpsilonBits)<<mEpsilonBits);
+		#else
+			pos.x=(int)((pos.x+(mHalfEpsilon*-(pos.x<0)))*mOneOverEpsilon)*mEpsilon;
+			pos.y=(int)((pos.y+(mHalfEpsilon*-(pos.y<0)))*mOneOverEpsilon)*mEpsilon;
+			pos.z=(int)((pos.z+(mHalfEpsilon*-(pos.z<0)))*mOneOverEpsilon)*mEpsilon;
+		#endif
+	}
+}
+
+bool Simulator::toSmall(const Vector3 &value) const{
+	return (value.x<mEpsilon && value.x>-mEpsilon && value.y<mEpsilon && value.y>-mEpsilon && value.z<mEpsilon && value.z>-mEpsilon);
+}
+
+void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment &segment,int collideWithBits,Solid *ignore){
+	result.time=-ONE;
+
+	Solid *solid2;
 
 	Collision &collision=cache_traceSegment_collision.reset();
 	int i;
@@ -770,58 +857,7 @@ void Simulator::traceSegment(Collision &result,const Segment &segment,int collid
 	}
 }
 
-void Simulator::capVector3(Vector3 &vector,scalar value) const{
-	#if defined(TOADLET_FIXED_POINT)
-		vector.x=TOADLET_MAX_XX(-value,vector.x);
-		vector.x=TOADLET_MIN_XX(value,vector.x);
-		vector.y=TOADLET_MAX_XX(-value,vector.y);
-		vector.y=TOADLET_MIN_XX(value,vector.y);
-		vector.z=TOADLET_MAX_XX(-value,vector.z);
-		vector.z=TOADLET_MIN_XX(value,vector.z);
-	#else
-		vector.x=TOADLET_MAX_RR(-value,vector.x);
-		vector.x=TOADLET_MIN_RR(value,vector.x);
-		vector.y=TOADLET_MAX_RR(-value,vector.y);
-		vector.y=TOADLET_MIN_RR(value,vector.y);
-		vector.z=TOADLET_MAX_RR(-value,vector.z);
-		vector.z=TOADLET_MIN_RR(value,vector.z);
-	#endif
-}
-
-void Simulator::convertToEpsilonOffset(Vector3 &offset) const{
-	if(offset.x>=mQuarterEpsilon)offset.x=mEpsilon;
-	else if(offset.x<=-mQuarterEpsilon)offset.x=-mEpsilon;
-	else offset.x=0;
-
-	if(offset.y>=mQuarterEpsilon)offset.y=mEpsilon;
-	else if(offset.y<=-mQuarterEpsilon)offset.y=-mEpsilon;
-	else offset.y=0;
-
-	if(offset.z>=mQuarterEpsilon)offset.z=mEpsilon;
-	else if(offset.z<=-mQuarterEpsilon)offset.z=-mEpsilon;
-	else offset.z=0;
-}
-
-void Simulator::snapToGrid(Vector3 &pos) const{
-	if(mSnapToGrid){
-		#if defined(TOADLET_FIXED_POINT)
-			pos.x=(((pos.x+(mHalfEpsilon*-(pos.x<0)))>>mEpsilonBits)<<mEpsilonBits);
-			pos.y=(((pos.y+(mHalfEpsilon*-(pos.y<0)))>>mEpsilonBits)<<mEpsilonBits);
-			pos.z=(((pos.z+(mHalfEpsilon*-(pos.z<0)))>>mEpsilonBits)<<mEpsilonBits);
-		#else
-			pos.x=(int)((pos.x+(mHalfEpsilon*-(pos.x<0)))*mOneOverEpsilon)*mEpsilon;
-			pos.y=(int)((pos.y+(mHalfEpsilon*-(pos.y<0)))*mOneOverEpsilon)*mEpsilon;
-			pos.z=(int)((pos.z+(mHalfEpsilon*-(pos.z<0)))*mOneOverEpsilon)*mEpsilon;
-		#endif
-	}
-}
-
-bool Simulator::toSmall(const Vector3 &value) const{
-	return (value.x<mEpsilon && value.x>-mEpsilon && value.y<mEpsilon && value.y>-mEpsilon && value.z<mEpsilon && value.z>-mEpsilon);
-}
-
-/// Depends upon mSpacialCollection being updated, so not public
-void Simulator::traceSolid(Collision &result,Solid *solid,const Segment &segment){
+void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,const Segment &segment){
 	result.time=-ONE;
 
 	if(solid->mCollideWithBits==0){
@@ -975,7 +1011,7 @@ void Simulator::testSolid(Collision &result,Solid *solid1,Solid *solid2,const Se
 				ConvexSolid convexsolid;
 				convexsolid.set(shape2->mConvexSolid);
 				for(int i=0;i<convexsolid.planes.size();++i){
-					convexsolid.planes[i].d+=shape1->mSphere.radius;
+					convexsolid.planes[i].distance+=shape1->mSphere.radius;
 				}
 
 				// Move the problem to the convex solid's origin
@@ -1036,7 +1072,7 @@ void Simulator::testSolid(Collision &result,Solid *solid1,Solid *solid2,const Se
 				ConvexSolid convexsolid;
 				convexsolid.set(shape1->mConvexSolid);
 				for(int i=0;i<convexsolid.planes.size();++i){
-					convexsolid.planes[i].d+=shape1->mSphere.radius;
+					convexsolid.planes[i].distance+=shape1->mSphere.radius;
 				}
 				
 				// Reverse the segment
@@ -1247,7 +1283,7 @@ void Simulator::traceConvexSolid(Collision &c,const Segment &segment,const Conve
 	// Check the segment against each plane in the solid
 	for(i=0;i<convexSolid.planes.size();++i){
 		// line below stolen from findIntersection(), but we want to avoid unnecessary math so we dont use the whole function
-		t=div(convexSolid.planes[i].d-dot(convexSolid.planes[i].normal,segment.getOrigin()),dot(convexSolid.planes[i].normal,segment.getDirection()));
+		t=div(convexSolid.planes[i].distance-dot(convexSolid.planes[i].normal,segment.getOrigin()),dot(convexSolid.planes[i].normal,segment.getDirection()));
 
 		// If we intersect the plane, compute the intersection point (u)
 		if(t>=0 && t<=ONE){
@@ -1261,7 +1297,7 @@ void Simulator::traceConvexSolid(Collision &c,const Segment &segment,const Conve
 			b=true;
 			for(j=0;j<convexSolid.planes.size();++j){
 				if(i==j) continue;
-				mul(v,convexSolid.planes[j].normal,convexSolid.planes[j].d);
+				mul(v,convexSolid.planes[j].normal,convexSolid.planes[j].distance);
 				sub(v,u,v);
 
 				if(dot(v,convexSolid.planes[j].normal)>0){

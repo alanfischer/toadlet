@@ -501,9 +501,9 @@ bool Math::getIntersectionOfThreePlanes(Vector3 &result,const Plane &p1,const Pl
 		Vector3 p3xp1,p1xp2;
 		cross(p3xp1,p3.normal,p1.normal);
 		cross(p1xp2,p1.normal,p2.normal);
-		mul(p1xp2,p3.d);
-		mul(p2xp3,p1.d);
-		mul(p3xp1,p2.d);
+		mul(p1xp2,p3.distance);
+		mul(p2xp3,p1.distance);
+		mul(p3xp1,p2.distance);
 		add(result,p1xp2,p2xp3);
 		add(result,p3xp1);
 		div(result,den);
@@ -514,8 +514,8 @@ bool Math::getIntersectionOfThreePlanes(Vector3 &result,const Plane &p1,const Pl
 void Math::getLineOfIntersection(Segment &result,const Plane &plane1,const Plane &plane2){
 	real determinant=lengthSquared(plane1.normal)*lengthSquared(plane2.normal) - (dot(plane1.normal,plane2.normal)*dot(plane1.normal,plane2.normal));
 
-	real c1=(plane1.d*lengthSquared(plane2.normal) - plane2.d*dot(plane1.normal,plane2.normal))/determinant;
-	real c2=(plane2.d*lengthSquared(plane1.normal) - plane1.d*dot(plane1.normal,plane2.normal))/determinant;
+	real c1=(plane1.distance*lengthSquared(plane2.normal) - plane2.distance*dot(plane1.normal,plane2.normal))/determinant;
+	real c2=(plane2.distance*lengthSquared(plane1.normal) - plane1.distance*dot(plane1.normal,plane2.normal))/determinant;
 
 	cross(result.direction,plane1.normal,plane2.normal);
 	Vector3 n1,n2;
@@ -624,7 +624,7 @@ void Math::findFitCapsule(Capsule &r,const AABox &box){
 }
 
 bool Math::testInside(const Vector3 &point,const Plane &plane){
-	return dot(point,plane.normal)<plane.d;
+	return dot(point,plane.normal)<plane.distance;
 }
 
 bool Math::testInside(const Vector3 &point,const Sphere &sphere){
@@ -679,7 +679,7 @@ bool Math::testIntersection(const Sphere &sphere,const AABox &box){
 real Math::findIntersection(const Segment &segment,const Plane &plane,Vector3 &point,Vector3 &normal){
 	real d=dot(plane.normal,segment.direction);
 	if(d!=0){
-		real t=(plane.d-dot(plane.normal,segment.origin))/d;
+		real t=(plane.distance-dot(plane.normal,segment.origin))/d;
 		mul(point,segment.direction,t);
 		add(point,segment.origin);
 		normal.set(plane.normal);

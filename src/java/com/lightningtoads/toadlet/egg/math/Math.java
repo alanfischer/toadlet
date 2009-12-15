@@ -1704,9 +1704,9 @@ public final class Math{
 
 	// Plane operations
 	public static void project(Plane plane,Vector3 result,Vector3 point){
-		result.x=point.x - plane.normal.x*plane.d;
-		result.y=point.y - plane.normal.y*plane.d;
-		result.z=point.z - plane.normal.z*plane.d;
+		result.x=point.x - plane.normal.x*plane.distance;
+		result.y=point.y - plane.normal.y*plane.distance;
+		result.z=point.z - plane.normal.z*plane.distance;
 
 		real f=plane.normal.x*result.x + plane.normal.y*result.y + plane.normal.z*result.z;
 
@@ -1716,9 +1716,9 @@ public final class Math{
 	}
 
 	public static void project(Plane plane,Vector3 point){
-		real tx=point.x - plane.normal.x*plane.d;
-		real ty=point.y - plane.normal.y*plane.d;
-		real tz=point.z - plane.normal.z*plane.d;
+		real tx=point.x - plane.normal.x*plane.distance;
+		real ty=point.y - plane.normal.y*plane.distance;
+		real tz=point.z - plane.normal.z*plane.distance;
 
 		real f=plane.normal.x*tx + plane.normal.y*ty + plane.normal.z*tz;
 
@@ -1732,7 +1732,7 @@ public final class Math{
 		plane.normal.x*=l;
 		plane.normal.y*=l;
 		plane.normal.z*=l;
-		plane.d*=l;
+		plane.distance*=l;
 	}
 
 	public static void normalize(Plane r,Plane plane){
@@ -1740,11 +1740,11 @@ public final class Math{
 		r.normal.x=plane.normal.x*l;
 		r.normal.y=plane.normal.y*l;
 		r.normal.z=plane.normal.z*l;
-		r.d=plane.d*l;
+		r.distance=plane.distance*l;
 	}
 
 	public static real length(Plane p,Vector3 v){
-		return p.normal.x*v.x + p.normal.y*v.y + p.normal.z*v.z - p.d;
+		return p.normal.x*v.x + p.normal.y*v.y + p.normal.z*v.z - p.distance;
 	}
 
 	public static boolean getIntersectionOfThreePlanes(Vector3 result,Plane p1,Plane p2,Plane p3,real epsilon){
@@ -1758,9 +1758,9 @@ public final class Math{
 			Vector3 p3xp1=new Vector3(),p1xp2=new Vector3();
 			cross(p3xp1,p3.normal,p1.normal);
 			cross(p1xp2,p1.normal,p2.normal);
-			mul(p1xp2,p3.d);
-			mul(p2xp3,p1.d);
-			mul(p3xp1,p2.d);
+			mul(p1xp2,p3.distance);
+			mul(p2xp3,p1.distance);
+			mul(p3xp1,p2.distance);
 			add(result,p1xp2,p2xp3);
 			add(result,p3xp1);
 			div(result,den);
@@ -1771,8 +1771,8 @@ public final class Math{
 	public static void getLineOfIntersection(Segment result,Plane plane1,Plane plane2){
 		real determinant=lengthSquared(plane1.normal)*lengthSquared(plane2.normal) - (dot(plane1.normal,plane2.normal)*dot(plane1.normal,plane2.normal));
 
-		real c1=(plane1.d*lengthSquared(plane2.normal) - plane2.d*dot(plane1.normal,plane2.normal))/determinant;
-		real c2=(plane2.d*lengthSquared(plane1.normal) - plane1.d*dot(plane1.normal,plane2.normal))/determinant;
+		real c1=(plane1.distance*lengthSquared(plane2.normal) - plane2.distance*dot(plane1.normal,plane2.normal))/determinant;
+		real c2=(plane2.distance*lengthSquared(plane1.normal) - plane1.distance*dot(plane1.normal,plane2.normal))/determinant;
 
 		cross(result.direction,plane1.normal,plane2.normal);
 		Vector3 n1=new Vector3(),n2=new Vector3();
@@ -1973,7 +1973,7 @@ public final class Math{
 
 	// Interesection operations
 	public static boolean testInside(Vector3 point,Plane plane){
-		return dot(point,plane.normal)<plane.d;
+		return dot(point,plane.normal)<plane.distance;
 	}
 
 	public static boolean testInside(Vector3 point,Sphere sphere){
@@ -2027,7 +2027,7 @@ public final class Math{
 	public static real findIntersection(Segment segment,Plane plane,Vector3 point,Vector3 normal){
 		real d=dot(plane.normal,segment.direction);
 		if(d!=0){
-			real t=(plane.d-dot(plane.normal,segment.origin))/d;
+			real t=(plane.distance-dot(plane.normal,segment.origin))/d;
 			mul(point,segment.direction,t);
 			add(point,segment.origin);
 			normal.set(plane.normal);
