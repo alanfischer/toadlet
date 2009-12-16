@@ -30,7 +30,8 @@ namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-
+class TOADLET_API Face{
+};
 
 }
 }

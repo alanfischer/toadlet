@@ -26,17 +26,20 @@
 #ifndef TOADLET_TADPOLE_BSP_BSPSCENENODE_H
 #define TOADLET_TADPOLE_BSP_BSPSCENENODE_H
 
+#include <toadlet/tadpole/node/ParentNode.h>
+#include <toadlet/tadpole/bsp/BSPMap.h>
+
 namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class TOADLET_API BSPSceneNode:public ParentNode{
+class TOADLET_API BSPSceneNode:public node::ParentNode{
 public:
 	TOADLET_NODE(BSPSceneNode,ParentNode);
 
 	BSPSceneNode();
 	virtual ~BSPSceneNode();
-	virtual tadpole::Node *create(Engine *engine);
+	virtual node::Node *create(Engine *engine);
 	virtual void destroy();
 
 	void setBSPMap(BSPMap::ptr map);
@@ -44,6 +47,8 @@ public:
 
 protected:
 	BSPMap::ptr mBSPMap;
+};
+
 }
 }
 }

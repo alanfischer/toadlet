@@ -26,11 +26,21 @@
 #ifndef TOADLET_TADPOLE_BSP_BSP30HANDLER_H
 #define TOADLET_TADPOLE_BSP_BSP30HANDLER_H
 
+#include <toadlet/tadpole/ResourceHandler.h>
+
 namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
+class BSP30Handler:public ResourceHandler{
+public:
+	TOADLET_SHARED_POINTERS(BSP30Handler);
 
+	BSP30Handler();
+	virtual ~BSP30Handler();
+
+	virtual egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
+};
 
 }
 }
