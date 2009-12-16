@@ -23,14 +23,15 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BSP_FACE_H
-#define TOADLET_TADPOLE_BSP_FACE_H
+#ifndef TOADLET_TADPOLE_BSP_BRUSH_H
+#define TOADLET_TADPOLE_BSP_BRUSH_H
 
 namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-
+class TOADLET_API Brush{
+};
 
 }
 }

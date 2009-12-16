@@ -26,6 +26,7 @@
 #ifndef TOADLET_TADPOLE_BSP_BSPMAP_H
 #define TOADLET_TADPOLE_BSP_BSPMAP_H
 
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/tadpole/bsp/Brush.h>
 #include <toadlet/tadpole/bsp/Face.h>
 #include <toadlet/tadpole/bsp/Leaf.h>
@@ -35,13 +36,15 @@ namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class BSPMap{
+class TOADLET_API BSPMap:public egg::BaseResource{
 	egg::Collection<Node> nodes;
 	egg::Collection<Leaf> leaves;
 	egg::Collection<Brush> brushes;
-	egg::Collection<Faces> faces;
+	egg::Collection<Face> faces;
 	egg::Collection<Plane> planes;
 	egg::Collection<Vector3> vertices;
+
+	TOADLET_BASERESOURCE_PASSTHROUGH(BaseResource);
 };
 
 }
