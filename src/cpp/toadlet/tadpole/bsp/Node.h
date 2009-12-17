@@ -31,6 +31,10 @@ namespace tadpole{
 namespace bsp{
 
 class TOADLET_API Node{
+public:
+	int plane;
+	int children[2];
+	AABox bound;
 };
 
 }
