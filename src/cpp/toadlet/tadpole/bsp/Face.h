@@ -31,6 +31,13 @@ namespace tadpole{
 namespace bsp{
 
 class TOADLET_API Face{
+public:
+	int plane;
+	bool side;
+
+	int edgeStart;
+	int edgeCount;
+	int texinfo;
 };
 
 }

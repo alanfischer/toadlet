@@ -28,6 +28,9 @@
 
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/bsp/BSPMap.h>
+#include <toadlet/peeper/IndexData.h>
+#include <toadlet/peeper/VertexData.h>
+#include <toadlet/peeper/Texture.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -46,7 +49,27 @@ public:
 	BSPMap::ptr getBSPMap() const{return mBSPMap;}
 
 protected:
+	// TODO: We need to get away from this markfaces stuff, make it more universal
+	class RendererData{
+	public:
+		toadlet::egg::Collection<uint8> markedFaces;
+		toadlet::egg::Collection<toadlet::egg::Collection<int> > textureVisibleFaces;
+	};
+
+	// TODO: Switch this to using an index into the lightmap array, and a matrix offset/scale
+	class RenderFace{
+	public:
+		peeper::IndexData::ptr indexData;
+		peeper::Texture::ptr lightmap;
+	};
+
+	peeper::VertexBufferAccessor vba;
+
 	BSPMap::ptr mBSPMap;
+	RendererData mRendererData;
+	peeper::VertexData::ptr mVertexData;
+	egg::Collection<RenderFace> mRenderFaces;
+
 };
 
 }

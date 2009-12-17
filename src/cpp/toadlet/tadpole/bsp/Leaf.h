@@ -31,6 +31,13 @@ namespace tadpole{
 namespace bsp{
 
 class TOADLET_API Leaf{
+public:
+	int contents;
+	int visibility;
+	AABox bound;
+	// TODO: Rename/change these marksurface things
+	int marksurfaceStart;
+	int marksurfaceCount;
 };
 
 }

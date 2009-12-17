@@ -37,12 +37,23 @@ namespace tadpole{
 namespace bsp{
 
 class TOADLET_API BSPMap:public egg::BaseResource{
+public:
+	TOADLET_SHARED_POINTERS(BSPMap);
+
+	void destroy(){}
+
+	egg::Collection<Vector3> vertexes;
 	egg::Collection<Node> nodes;
 	egg::Collection<Leaf> leaves;
 	egg::Collection<Brush> brushes;
 	egg::Collection<Face> faces;
 	egg::Collection<Plane> planes;
 	egg::Collection<Vector3> vertices;
+
+	// TODO: Remove these in favor of something easier
+	egg::Collection<int> surfedges;
+	struct edge{unsigned short v[2];};
+	egg::Collection<edge> edges;
 
 	TOADLET_BASERESOURCE_PASSTHROUGH(BaseResource);
 };
