@@ -31,6 +31,7 @@
 #include <toadlet/tadpole/bsp/Face.h>
 #include <toadlet/tadpole/bsp/Leaf.h>
 #include <toadlet/tadpole/bsp/Node.h>
+#include <toadlet/tadpole/bsp/Tree.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -42,18 +43,28 @@ public:
 
 	void destroy(){}
 
-	egg::Collection<Vector3> vertexes;
+	egg::Collection<Tree> trees;
 	egg::Collection<Node> nodes;
 	egg::Collection<Leaf> leaves;
 	egg::Collection<Brush> brushes;
 	egg::Collection<Face> faces;
+	egg::Collection<Vector3> vertexes;
 	egg::Collection<Plane> planes;
-	egg::Collection<Vector3> vertices;
 
 	// TODO: Remove these in favor of something easier
+	//  Or at least rename them to something more descriptive
 	egg::Collection<int> surfedges;
 	struct edge{unsigned short v[2];};
 	egg::Collection<edge> edges;
+	egg::Collection<unsigned char> visibility;
+	egg::Collection<unsigned short> marksurfaces;
+	struct texinfo{
+		float vecs[2][4]; // [s/t][xyz offset]
+		int miptex;
+		int flags;
+	};
+	#define TEX_SPECIAL  1     // sky or slime, no lightmap or 256 subdivision
+	egg::Collection<texinfo> texinfos;
 
 	TOADLET_BASERESOURCE_PASSTHROUGH(BaseResource);
 };

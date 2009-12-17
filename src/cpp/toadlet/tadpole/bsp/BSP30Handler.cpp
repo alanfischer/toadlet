@@ -64,10 +64,10 @@ Resource::ptr BSP30Handler::load(InputStream::ptr in,const ResourceHandlerData *
 	btexinfo *texinfos;	int ntexinfos;
 	bclipnode *clipnodes;int nclipnodes;
 	bface *faces;		int nfaces;
-	bmarksurface marksurfaces;int nmarksurfaces;
+	bmarksurface *marksurfaces;int nmarksurfaces;
 	bsurfedge *surfedges;int nsurfedges;
 	bedge *edges;		int nedges;
-	bvisleaf *visleafs;	int nvisleafs;
+	void *visibility;	int nvisibility;
 	void *textures;		int ntextures;
 	void *lighting;		int nlighting;
 	void *entities;		int nentities;
@@ -83,7 +83,7 @@ Resource::ptr BSP30Handler::load(InputStream::ptr in,const ResourceHandlerData *
 	readLump(in,LUMP_MARKSURFACES,(void**)&marksurfaces,sizeof(bmarksurface),&nmarksurfaces);
 	readLump(in,LUMP_SURFEDGES,(void**)&surfedges,sizeof(bsurfedge),&nsurfedges);
 	readLump(in,LUMP_EDGES,(void**)&edges,sizeof(bedge),&nedges);
-	readLump(in,LUMP_VISIBILITY,(void**)&visleafs,sizeof(bvisleaf),&nvisleafs);
+	readLump(in,LUMP_VISIBILITY,(void**)&visibility,1,&nvisibility);
 	readLump(in,LUMP_TEXTURES,(void**)&textures,1,&ntextures);
 	readLump(in,LUMP_LIGHTING,(void**)&lighting,1,&nlighting);
 	readLump(in,LUMP_ENTITIES,(void**)&entities,1,&nentities);
@@ -200,7 +200,7 @@ Resource::ptr BSP30Handler::load(InputStream::ptr in,const ResourceHandlerData *
 		bleaf &bl=leafs[i];
 
 		l.contents=bl.contents;
-		l.visibility=bl.visofs;
+		l.visibilityStart=bl.visofs;
 		l.bound.mins[0]=bl.mins[0];
 		l.bound.mins[1]=bl.mins[1];
 		l.bound.mins[2]=bl.mins[2];
@@ -223,11 +223,39 @@ Resource::ptr BSP30Handler::load(InputStream::ptr in,const ResourceHandlerData *
 		f.texinfo=bf.texinfo;
 	}
 
+	map->trees.resize(nmodels);
+	for(i=0;i<nmodels;++i){
+		Tree &t=map->trees[i];
+		bmodel &bm=models[i];
+
+		t.bound.mins[0]=bm.mins[0];
+		t.bound.mins[1]=bm.mins[1];
+		t.bound.mins[2]=bm.mins[2];
+		t.bound.mins[0]=bm.mins[0];
+		t.bound.mins[1]=bm.mins[1];
+		t.bound.mins[2]=bm.mins[2];
+		t.nodeStart=bm.headnode[0];
+		t.origin[0]=bm.origin[0];
+		t.origin[1]=bm.origin[1];
+		t.origin[2]=bm.origin[2];
+		t.visleafs=bm.visleafs;
+	}
+
+	// Hacky ones
 	map->surfedges.resize(nsurfedges);
 	memcpy(&map->surfedges[0],surfedges,nsurfedges*sizeof(int));
 
 	map->edges.resize(nedges);
 	memcpy(&map->edges[0],edges,nedges*sizeof(bedge));
+
+	map->visibility.resize(nvisibility);
+	memcpy(&map->visibility[0],visibility,nvisibility);
+
+	map->marksurfaces.resize(nmarksurfaces);
+	memcpy(&map->marksurfaces[0],marksurfaces,nmarksurfaces*sizeof(bmarksurface));
+
+	map->texinfos.resize(ntexinfos);
+	memcpy(&map->texinfos[0],texinfos,ntexinfos*sizeof(btexinfo));
 
 	return map;
 }
