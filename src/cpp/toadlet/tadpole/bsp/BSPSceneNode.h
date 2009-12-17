@@ -26,7 +26,7 @@
 #ifndef TOADLET_TADPOLE_BSP_BSPSCENENODE_H
 #define TOADLET_TADPOLE_BSP_BSPSCENENODE_H
 
-#include <toadlet/tadpole/node/ParentNode.h>
+#include <toadlet/tadpole/node/Scene.h>
 #include <toadlet/tadpole/bsp/BSPMap.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
@@ -36,9 +36,9 @@ namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class TOADLET_API BSPSceneNode:public node::ParentNode{
+class TOADLET_API BSPSceneNode:public node::Scene{
 public:
-	TOADLET_NODE(BSPSceneNode,ParentNode);
+	TOADLET_NODE(BSPSceneNode,Scene);
 
 	BSPSceneNode();
 	virtual ~BSPSceneNode();
@@ -63,6 +63,15 @@ protected:
 		peeper::Texture::ptr lightmap;
 	};
 
+	// TODO: We need a better hook to start rendering the level, since in theory this wont have access to preLayerRender,
+	//  cause it wont be a main scene node
+	bool preLayerRender(peeper::Renderer *renderer,int layer);
+	void processVisibleFaces(node::CameraNode *camera);
+	void renderVisibleFaces(peeper::Renderer *renderer);
+	int findLeaf(const Vector3 &point) const;
+	void addLeafToVisible(const Leaf &leaf,RendererData &data,node::CameraNode *camera) const;
+	void decompressVIS();
+
 	peeper::VertexBufferAccessor vba;
 
 	BSPMap::ptr mBSPMap;
@@ -70,6 +79,9 @@ protected:
 	peeper::VertexData::ptr mVertexData;
 	egg::Collection<RenderFace> mRenderFaces;
 
+	// TODO: And clean up these hacky members.
+	egg::Collection<peeper::Texture::ptr> textures; // Shouldnt be storing textures here, instead we need to go by material
+	egg::Collection<egg::Collection<int> > leafVisibility;
 };
 
 }

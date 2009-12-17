@@ -41,7 +41,9 @@ using namespace toadlet::tadpole::node;
 namespace toadlet{
 namespace tadpole{
 
-HopScene::HopScene():Scene(),
+TOADLET_NODE_IMPLEMENT(HopScene,"toadlet::tadpole::HopScene");
+
+HopScene::HopScene():toadlet::tadpole::bsp::BSPSceneNode(),
 	//mHopEntities,
 	mShowCollisionVolumes(false),
 	mInterpolateCollisionVolumes(false),

@@ -29,12 +29,15 @@
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
+using namespace toadlet::tadpole::node;
 
 namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-BSPSceneNode::BSPSceneNode():ParentNode(){}
+TOADLET_NODE_IMPLEMENT(BSPSceneNode,"toadlet::tadpole::bsp::BSPSceneNode");
+
+BSPSceneNode::BSPSceneNode():Scene(){}
 
 BSPSceneNode::~BSPSceneNode(){}
 
@@ -55,17 +58,22 @@ void BSPSceneNode::setBSPMap(BSPMap::ptr map){
 
 	mBSPMap=map;
 
+	int vertexCount=0;
+	for(i=0;i<mBSPMap->faces.size();i++){
+		vertexCount+=mBSPMap->faces[i].edgeCount;
+	}
+
 	VertexFormat::ptr vertexFormat(new VertexFormat(4));
 	vertexFormat->addVertexElement(VertexElement(VertexElement::Type_POSITION,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3));
 	vertexFormat->addVertexElement(VertexElement(VertexElement::Type_NORMAL,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3));
 	vertexFormat->addVertexElement(VertexElement(VertexElement::Type_TEX_COORD,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_2));
 	vertexFormat->addVertexElement(VertexElement(VertexElement::Type_TEX_COORD_2,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_2));
-	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,mBSPMap->vertexes.size());
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,vertexCount);
 	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 
 	mRenderFaces.resize(mBSPMap->faces.size());
 
-	int vertexCount=0;
+	vertexCount=0;
 	vba.lock(vertexBuffer);
 	for(i=0;i<mBSPMap->faces.size();i++){
 		const Face &face=mBSPMap->faces[i];
@@ -165,46 +173,97 @@ void BSPSceneNode::setBSPMap(BSPMap::ptr map){
 	vba.unlock();
 
 	mRendererData.markedFaces.resize((mBSPMap->faces.size()+7)/8);
+
+	decompressVIS();
+
+	getRenderLayer(0)->forceRender=true;
+}
+
+bool BSPSceneNode::preLayerRender(Renderer *renderer,int layer){
+	if(layer!=0){
+		return false;
+	}
+
+	processVisibleFaces(mCamera);
+	renderVisibleFaces(renderer);
+
+	return true;
 }
 
 int BSPSceneNode::findLeaf(const Vector3 &point) const{
-int BSPSceneNode::findLeaf(const Vector3 &coords) const{
-	int i=models[0].headnode[0];
+	int nodeIndex=mBSPMap->trees[0].nodeStart;
 
-	while(i>=0){
-		const dnode_t *n=&nodes[i];
-		const dplane_t *p=&planes[n->planenum];
-
-		float d;
-
-		// f(x,y,z) = Ax+Ay+Az-D
-		d=p->normal[0]*coords[0]
-			+p->normal[1]*coords[1]
-			+p->normal[2]*coords[2]
-			-p->dist;
-
-		if(d>=0){  // in front or on the plane
-			i=n->children[0];
+	while(nodeIndex>=0){
+		const bsp::Node &node=mBSPMap->nodes[nodeIndex];
+		const Plane &plane=mBSPMap->planes[node.plane];
+		if(Math::length(plane,point)>=0){ // in front or on the plane
+			nodeIndex=node.children[0];
 		}
 		else{  // behind the plane
-			i=n->children[1];
+			nodeIndex=node.children[1];
 		}
 	}
 
-	return -(i+1);
+	return -(nodeIndex+1);
 }
 
+void BSPSceneNode::decompressVIS(){
+	int count;
+	int i,c,index;
+	unsigned char bit;
+
+	if(mBSPMap->visibility.size()==0){
+		return; // No vis data to decompress
+	}
+
+	leafVisibility.resize(mBSPMap->leaves.size());
+
+	for(i=0;i<mBSPMap->leaves.size();i++){
+		int v=mBSPMap->leaves[i].visibilityStart;
+
+		count=0;
+
+		// first count the number of visible leafs...
+		for(c=1;c<mBSPMap->trees[0].visleafs;v++){
+			if(mBSPMap->visibility[v]==0){
+				v++;
+				c+=(mBSPMap->visibility[v]<<3);
+			}
+			else{
+				for (bit = 1; bit; bit<<=1,c++){
+					if(mBSPMap->visibility[v]&bit){
+						count++;
+					}
+				}
+			}
+		}
+
+		// allocate space to store the uncompressed VIS bit set...
+		leafVisibility[i].resize(count);
+	}
+
+	// now go through the VIS bit set again and store the VIS leafs...
+	for(i=0;i<mBSPMap->leaves.size();i++){
+		int v=mBSPMap->leaves[i].visibilityStart;
+
+		index=0;
+
+		for(c=1;c<mBSPMap->trees[0].visleafs;v++){
+			if(mBSPMap->visibility[v]==0){
+				v++;
+				c+=(mBSPMap->visibility[v]<<3);
+			}
+			else{
+				for(bit=1;bit;bit<<=1,c++){
+					if(mBSPMap->visibility[v]&bit){
+						leafVisibility[i][index]=c;
+						index++;
+					}
+				}
+			}
+		}
+	}
 }
-
-
-
-
-
-
-
-
-
-
 
 void BSPSceneNode::processVisibleFaces(CameraNode *camera){
 	int i;
@@ -218,16 +277,15 @@ void BSPSceneNode::processVisibleFaces(CameraNode *camera){
 	int idx=findLeaf(camera->getRenderWorldTranslate());
 
 	// If no visibility information just test all leaves
-	if(idx==0 || visData.size()==0){ // TODO: Replace with an mHasVisData
-		for(i=0;i<leafs.size();i++){
-			addLeafToVisible(leafs[i],data,camera);
+	if(idx==0){ // TODO: Replace with an mHasVisData, and do this too if no visdata
+		for(i=0;i<mBSPMap->leaves.size();i++){
+			addLeafToVisible(mBSPMap->leaves[i],data,camera);
 		}
 	}
 	else{
-		const vis_leaf_t &vis_leaf=leafVisibility[idx];
 		// go thru leaf visibility list
-		for(i=0;i<vis_leaf.num_leafs;i++){
-			addLeafToVisible(leafs[vis_leaf.leafs[i]],data,camera);
+		for(i=0;i<leafVisibility[idx].size();i++){
+			addLeafToVisible(mBSPMap->leaves[leafVisibility[idx][i]],data,camera);
 		}
 	}
 }
@@ -258,7 +316,7 @@ void BSPSceneNode::renderVisibleFaces(Renderer *renderer){
 		Collection<int> &visibleFaces=data.textureVisibleFaces[i];
 
 		if(visibleFaces.size()>0){
-			textureStage->setTexture(textures[i]);
+if(textures.size()>i) textureStage->setTexture(textures[i]);
 			renderer->setTextureStage(0,textureStage);
 
 			for(j=0;j<visibleFaces.size();++j){
@@ -275,22 +333,19 @@ void BSPSceneNode::renderVisibleFaces(Renderer *renderer){
 	}
 }
 
-
-void BSPSceneNode::addLeafToVisible(const dleaf_t &leaf,RendererData &data,CameraNode *camera) const{
+void BSPSceneNode::addLeafToVisible(const Leaf &leaf,RendererData &data,CameraNode *camera) const{
 	if(camera->culled(leaf.bound)==false){
-		const unsigned short* p=&markSurfaces[leaf.firstmarksurface];
+		const unsigned short* p=&mBSPMap->marksurfaces[leaf.marksurfaceStart];
 
-		int x;		for(x=0;x<leaf.nummarksurfaces;x++){
+		for(int x=0;x<leaf.marksurfaceCount;x++){
 			// don't render those already rendered
 			int face_idx=*p++;
 
 			if(!(data.markedFaces[face_idx>>3] & (1<<(face_idx & 7)))){
 				// back face culling
-				const dface_t &f=faces[face_idx];
+				const Face &f=mBSPMap->faces[face_idx];
 
-				// The planes should be converted to our type
-				float d=Math::dot(camera->getRenderWorldTranslate(),*(Vector3*)planes[f.planenum].normal) - planes[f.planenum].dist;
-
+				float d=Math::length(mBSPMap->planes[f.plane],camera->getRenderWorldTranslate());
 				if(f.side){
 					if(d>0) continue;
 				}
@@ -301,9 +356,12 @@ void BSPSceneNode::addLeafToVisible(const dleaf_t &leaf,RendererData &data,Camer
 				// mark face as visible
 				data.markedFaces[face_idx>>3] |= (1<<(face_idx & 7));
 
-				const texinfo_t &texinfo=texInfos[f.texinfo];
+				const BSPMap::texinfo &texinfo=mBSPMap->texinfos[f.texinfo];
 
 				if((texinfo.flags&TEX_SPECIAL)==0){
+if(data.textureVisibleFaces.size()<=texinfo.miptex){
+	data.textureVisibleFaces.resize(texinfo.miptex+1);
+}
 					data.textureVisibleFaces[texinfo.miptex].push_back(face_idx);
 				}
 /*
@@ -322,8 +380,6 @@ void BSPSceneNode::addLeafToVisible(const dleaf_t &leaf,RendererData &data,Camer
 	}
 }
  
-
-
 }
 }
 }

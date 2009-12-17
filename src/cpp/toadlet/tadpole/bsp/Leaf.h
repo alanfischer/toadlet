@@ -33,7 +33,7 @@ namespace bsp{
 class TOADLET_API Leaf{
 public:
 	int contents;
-	int visibility;
+	int visibilityStart;
 	AABox bound;
 	// TODO: Rename/change these marksurface things
 	int marksurfaceStart;

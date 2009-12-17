@@ -175,11 +175,6 @@ protected:
 		unsigned short v[2];
 	};
 
-	struct bvisleaf{
-		int num_leafs;
-		int *leafs;
-	};
-
 	void readLump(egg::io::InputStream *in,int lump,void **data,int size,int *count);
 
 	Engine *mEngine;
