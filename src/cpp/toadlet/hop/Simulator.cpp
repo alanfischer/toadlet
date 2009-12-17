@@ -267,7 +267,7 @@ void Simulator::update(int dt){
 		oldPosition.set(solid->mPosition);
 
 		// The cheapest, fastest, and worst integrator, it's 1st order
-		//  It may have trouble settling, so it is not recommended
+		// It may have trouble settling, so it is not recommended
 		if(mIntegrator==Integrator_EULER){
 			/*
 				integrationStep(solid,oldPosition,solid->mVelocity,ZERO_VECTOR3,ZERO_VECTOR3,fdt,dx1,dv1);
