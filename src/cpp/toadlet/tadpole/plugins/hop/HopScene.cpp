@@ -63,10 +63,10 @@ HopScene::HopScene():toadlet::tadpole::bsp::BSPSceneNode(),
 
 mSimulator->setSnapToGrid(true);
 mSimulator->setManager(this);
-Logger::alert(String("EPS:")+mEpsilon);
 mSimulator->setEpsilon(mEpsilon/4);
-//mSimulator->setGravity(Vector3(0,0,-750.0f));
+mSimulator->setGravity(Vector3(0,0,-750.0f));
 mSimulator->setMicroCollisionThreshold(200);
+setLogicDT(25);
 showCollisionVolumes(true,true);
 
 mWorld=new Solid();

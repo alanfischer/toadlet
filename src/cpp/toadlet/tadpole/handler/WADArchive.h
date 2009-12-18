@@ -40,14 +40,16 @@ public:
 	TOADLET_SHARED_POINTERS(WADArchive);
 
 	WADArchive(TextureManager *textureManager);
-	~WADArchive();
+	virtual ~WADArchive();
 
 	void destroy();
 
-	virtual bool open(egg::io::InputStream::ptr stream);
+	bool isResourceArchive() const{return true;}
 
-	virtual egg::io::InputStream::ptr openStream(const egg::String &name){return NULL;}
-	virtual egg::Resource::ptr openResource(const egg::String &name);
+	bool open(egg::io::InputStream::ptr stream);
+
+	egg::io::InputStream::ptr openStream(const egg::String &name){return NULL;}
+	egg::Resource::ptr openResource(const egg::String &name);
 
 	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 	

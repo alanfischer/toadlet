@@ -38,6 +38,7 @@ public:
 	int edgeStart;
 	int edgeCount;
 	int texinfo;
+	int lightinfo;
 };
 
 }

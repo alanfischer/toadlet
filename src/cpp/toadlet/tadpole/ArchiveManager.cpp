@@ -61,9 +61,11 @@ InputStream::ptr ArchiveManager::openStream(const String &name){
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Archive::ptr archive=shared_static_cast<Archive>(mResources[i]);
-		in=archive->openStream(name);
-		if(in!=NULL){
-			break;
+		if(archive->isResourceArchive()==false){
+			in=archive->openStream(name);
+			if(in!=NULL){
+				break;
+			}
 		}
 	}
 

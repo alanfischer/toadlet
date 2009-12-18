@@ -97,7 +97,6 @@ void traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *
 	else if(solid->getShape(0)->getType()==hop::Shape::Type_SPHERE){
 		result.time=super::traceSphere(result.normal,segment,solid->getShape(0)->getSphere());
 	}
-toadlet::egg::Logger::alert(toadlet::egg::String("TIME:")+result.time);
 	if(result.time<0) result.point=segment.origin+segment.direction;
 	else result.point=segment.origin+segment.direction*result.time;
 	result.collider=mWorld;

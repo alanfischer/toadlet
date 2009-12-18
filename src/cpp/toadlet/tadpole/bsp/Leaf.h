@@ -37,7 +37,6 @@ public:
 	AABox bound;
 	int brushStart;
 	int brushCount;
-egg::Collection<Brush> brushes;
 	// TODO: Rename/change these marksurface things
 	int marksurfaceStart;
 	int marksurfaceCount;

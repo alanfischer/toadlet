@@ -37,6 +37,8 @@ class Archive:public Resource{
 public:
 	TOADLET_SHARED_POINTERS(Archive);
 
+	virtual bool isResourceArchive() const=0;
+
 	virtual bool open(InputStream::ptr stream)=0;
 
 	virtual InputStream::ptr openStream(const String &name)=0;
