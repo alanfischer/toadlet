@@ -43,7 +43,7 @@ TOADLET_NODE_IMPLEMENT(BSPSceneNode,"toadlet::tadpole::bsp::BSPSceneNode");
 BSPSceneNode::BSPSceneNode():node::Scene(),
 	mEpsilon(0)
 {
-	mEpsilon=0.03125f * 2.0f;
+	mEpsilon=0.03125f;
 }
 
 BSPSceneNode::~BSPSceneNode(){}

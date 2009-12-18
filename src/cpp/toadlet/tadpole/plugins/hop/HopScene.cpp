@@ -63,7 +63,7 @@ HopScene::HopScene():toadlet::tadpole::bsp::BSPSceneNode(),
 
 mSimulator->setSnapToGrid(true);
 mSimulator->setManager(this);
-mSimulator->setEpsilon(mEpsilon/4);
+mSimulator->setEpsilon(mEpsilon/2);
 mSimulator->setGravity(Vector3(0,0,-750.0f));
 mSimulator->setMicroCollisionThreshold(200);
 setLogicDT(25);
