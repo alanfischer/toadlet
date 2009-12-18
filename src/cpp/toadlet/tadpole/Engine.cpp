@@ -75,13 +75,14 @@ namespace tadpole{
 
 Engine::Engine():
 	//mDirectory,
-	mInputStreamFactory(NULL),
 	//mScene,
 	mRenderer(NULL),
 	mAudioPlayer(NULL)
 {
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"creating Engine");
+
+	mArchiveManager=new ArchiveManager(this);
 
 	mTextureManager=new TextureManager(this);
 
@@ -107,7 +108,13 @@ Engine::Engine():
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"Engine: adding all handlers");
 
+	// Archive handlers
+	mArchiveManager->setHandler(TPKGHandler::ptr(new TPKGHandler()),"tpkg");
+
 	// Texture handlers
+	WADHandler::ptr wadHandler(new WADHandler(mTextureManager));
+	mTextureManager->setHandler(wadHandler,"wad");
+
 	mTextureManager->setHandler(BMPHandler::ptr(new BMPHandler(mTextureManager)),"bmp");
 
 	mTextureManager->setHandler(RGBHandler::ptr(new RGBHandler(mTextureManager)),"rgb");
@@ -190,6 +197,11 @@ Engine::~Engine(){
 		delete mTextureManager;
 		mTextureManager=NULL;
 	}
+
+	if(mArchiveManager!=NULL){
+		delete mArchiveManager;
+		mArchiveManager=NULL;
+	}
 }
 
 void Engine::destroy(){
@@ -204,6 +216,7 @@ void Engine::destroy(){
 	mFontManager->destroy();
 	mBufferManager->destroy();
 	mTextureManager->destroy();
+	mArchiveManager->destroy();
 }
 
 void Engine::setScene(const Scene::ptr &scene){
@@ -212,14 +225,6 @@ void Engine::setScene(const Scene::ptr &scene){
 
 const Scene::ptr &Engine::getScene() const{
 	return mScene;
-}
-
-void Engine::setInputStreamFactory(InputStreamFactory *inputStreamFactory){
-	mInputStreamFactory=inputStreamFactory;
-}
-
-InputStreamFactory *Engine::getInputStreamFactory() const{
-	return mInputStreamFactory;
 }
 
 void Engine::setRenderer(Renderer *renderer){
@@ -356,11 +361,10 @@ const String &Engine::getDirectory() const{
 }
 
 InputStream::ptr Engine::makeInputStream(const String &name){
-	InputStream::ptr in;
-	if(mInputStreamFactory!=NULL){
-		in=mInputStreamFactory->makeInputStream(name);
-	}
-	else{
+	InputStream::ptr in=mArchiveManager->makeInputStream(name);
+
+	// TODO: Replace this code with a FileSystemArchive
+	if(in!=NULL){
 		FileInputStream::ptr fin;
 		if(System::absolutePath(name)==false){
 			fin=FileInputStream::ptr(new FileInputStream(mDirectory+name));

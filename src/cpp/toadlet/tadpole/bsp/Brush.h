@@ -31,6 +31,10 @@ namespace tadpole{
 namespace bsp{
 
 class TOADLET_API Brush{
+public:
+	int planeStart;
+	int planeCount;
+	int contents;
 };
 
 }

@@ -23,24 +23,19 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BSP_LEAF_H
-#define TOADLET_TADPOLE_BSP_LEAF_H
+#ifndef TOADLET_TADPOLE_BSP_TREE_H
+#define TOADLET_TADPOLE_BSP_TREE_H
 
 namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class TOADLET_API Leaf{
+class TOADLET_API Tree{
 public:
-	int contents;
-	int visibilityStart;
 	AABox bound;
-	int brushStart;
-	int brushCount;
-egg::Collection<Brush> brushes;
-	// TODO: Rename/change these marksurface things
-	int marksurfaceStart;
-	int marksurfaceCount;
+	Vector3 origin;
+	int nodeStart;
+	int visleafs;
 };
 
 }

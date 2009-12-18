@@ -36,6 +36,7 @@
 #include <toadlet/peeper/Program.h>
 #include <toadlet/ribbit/AudioPlayer.h>
 #include <toadlet/ribbit/AudioBuffer.h>
+#include <toadlet/tadpole/ArchiveManager.h>
 #include <toadlet/tadpole/AudioBufferData.h>
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/FontData.h>
@@ -96,6 +97,7 @@ public:
 	int getIdealVertexFormatBit() const{return mIdealVertexFormatBit;}
 	const VertexFormats &getVertexFormats() const{return mVertexFormats;}
 
+	inline ArchiveManager *getArchiveManager() const{return mArchiveManager;}
 	inline TextureManager *getTextureManager() const{return mTextureManager;}
 	inline BufferManager *getBufferManager() const{return mBufferManager;}
 	inline ResourceManager *getShaderManager() const{return mShaderManager;}
@@ -115,6 +117,7 @@ protected:
 	int mIdealVertexFormatBit;
 	VertexFormats mVertexFormats;
 
+	ArchiveManager *mArchiveManager;
 	TextureManager *mTextureManager;
 	BufferManager *mBufferManager;
 	ResourceManager *mShaderManager;

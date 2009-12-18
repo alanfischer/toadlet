@@ -48,6 +48,8 @@ set (EGG_IO_SRC
 	io/PushbackInputStream.cpp
 	io/StringInputStream.cpp
 	io/StringOutputStream.cpp
+	io/TPKGArchive.cpp
+	io/WADArchive.cpp
 )
 
 set (EGG_MATH_SRC
@@ -160,6 +162,7 @@ set (EGG_IMAGE_SPR_HEADERS
 )
 
 set (EGG_IO_HEADERS
+	io/Archive.h
 	io/DataInputStream.h
 	io/DataOutputStream.h
 	io/FileInputStream.h
@@ -172,6 +175,8 @@ set (EGG_IO_HEADERS
 	io/PushbackInputStream.h
 	io/StringInputStream.h
 	io/StringOutputStream.h
+	io/TPKGArchive.h
+	io/WADArchive.h
 )
 
 set (EGG_MATH_HEADERS
