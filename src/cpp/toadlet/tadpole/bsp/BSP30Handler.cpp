@@ -226,6 +226,7 @@ Resource::ptr BSP30Handler::load(InputStream::ptr in,const ResourceHandlerData *
 		f.edgeStart=bf.firstedge;
 		f.edgeCount=bf.numedges;
 		f.texinfo=bf.texinfo;
+		f.lightinfo=bf.lightofs;
 	}
 
 	map->trees.resize(nmodels);
@@ -267,6 +268,12 @@ Resource::ptr BSP30Handler::load(InputStream::ptr in,const ResourceHandlerData *
 	map->texinfos.resize(ntexinfos);
 	memcpy(&map->texinfos[0],texinfos,ntexinfos*sizeof(btexinfo));
 
+	map->textures.resize(ntextures);
+	memcpy(&map->textures[0],textures,ntextures);
+
+	map->lighting.resize(nlighting);
+	memcpy(&map->lighting[0],lighting,nlighting);
+
 	Logger::debug(Categories::TOADLET_TADPOLE,"Reading map finished ");
 
 	return map;
@@ -299,11 +306,27 @@ void BSP30Handler::buildBrushes(BSPMap *map,int node,Collection<Plane> &planes,C
 		brush.planeStart=map->planes.size();
 		brush.planeCount=brushPlanes.size();
 
-//		map->leaves[leafIndex].brushCount=1;
-//		map->leaves[leafIndex].brushStart=map->brushes.size();
-map->leaves[leafIndex].brushes.add(brush);
-		map->planes.addAll(brushPlanes);
-		map->brushes.add(brush);
+		if(leafIndex==0){
+			Leaf leaf;
+			leaf.visibilityStart=-1;
+			leaf.brushCount=1;
+			leaf.brushStart=map->brushes.size();
+			leaf.contents=brush.contents;
+
+			map->planes.addAll(brushPlanes);
+			map->brushes.add(brush);
+
+			leafIndex=map->leaves.size();
+			map->leaves.add(leaf);
+
+			map->nodes[node].children[1]=-leafIndex-1;
+		}
+		else{
+			map->leaves[leafIndex].brushCount=1;
+			map->leaves[leafIndex].brushStart=map->brushes.size();
+			map->planes.addAll(brushPlanes);
+			map->brushes.add(brush);
+		}
 	}
 	else{
 		buildBrushes(map,map->nodes[node].children[1],planes,brushPlanes);
@@ -321,11 +344,27 @@ map->leaves[leafIndex].brushes.add(brush);
 		brush.planeStart=map->planes.size();
 		brush.planeCount=brushPlanes.size();
 
-//		map->leaves[leafIndex].brushCount=1;
-//		map->leaves[leafIndex].brushStart=map->brushes.size();
-map->leaves[leafIndex].brushes.add(brush);
-		map->planes.addAll(brushPlanes);
-		map->brushes.add(brush);
+		if(leafIndex==0){
+			Leaf leaf;
+			leaf.visibilityStart=-1;
+			leaf.brushCount=1;
+			leaf.brushStart=map->brushes.size();
+			leaf.contents=brush.contents;
+
+			map->planes.addAll(brushPlanes);
+			map->brushes.add(brush);
+
+			leafIndex=map->leaves.size();
+			map->leaves.add(leaf);
+
+			map->nodes[node].children[0]=-leafIndex-1;
+		}
+		else{
+			map->leaves[leafIndex].brushCount=1;
+			map->leaves[leafIndex].brushStart=map->brushes.size();
+			map->planes.addAll(brushPlanes);
+			map->brushes.add(brush);
+		}
 	}
 	else{
 		buildBrushes(map,map->nodes[node].children[0],planes,brushPlanes);

@@ -29,6 +29,7 @@
 #include <toadlet/tadpole/node/MeshNode.h>
 
 using namespace toadlet::egg;
+using namespace toadlet::egg::image;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole::mesh;
 using namespace toadlet::tadpole::node;
@@ -107,24 +108,25 @@ void BSPSceneNode::setBSPMap(BSPMap::ptr map){
 				vba.set3(vertexCount+j,1,plane.normal.x,plane.normal.y,plane.normal.z);
 			}
 		}
-/*
-		const texinfo_t &texinfo=texInfos[face.texinfo];
+
+		// START: Needs cleanup, conversion to our datastructures in BSPMap
+		const BSPMap::texinfo &texinfo=mBSPMap->texinfos[face.texinfo];
 		int width=0,height=0;
-		dmiptexlump_t *mipTexLump=(dmiptexlump_t*)&texData[0];
-		int miptexofs=mipTexLump->dataofs[texinfo.miptex];
+		BSPMap::miptexlump *lump=(BSPMap::miptexlump*)&mBSPMap->textures[0];
+		int miptexofs=lump->dataofs[texinfo.miptex];
 		if(miptexofs!=-1){
-			miptex_t *mipTex=(miptex_t*)(&texData[miptexofs]);
-			width=mipTex->width;
-			height=mipTex->height;
+			BSPMap::miptex *tex=(BSPMap::miptex*)(&mBSPMap->textures[miptexofs]);
+			width=tex->width;
+			height=tex->height;
 		}
 		Vector2 mins,maxs;
-		calculateSurfaceExtents(&face,mins,maxs);
+		calculateSurfaceExtents(face,mins,maxs);
 
 		Image::ptr lightmap;
 		unsigned int lmwidth=0,lmheight=0;
 
 		if((texinfo.flags&TEX_SPECIAL)==0){
-			lightmap=computeLightmap(&face,mins,maxs);
+			lightmap=computeLightmap(face,mins,maxs);
 			lmwidth=lightmap->getWidth();
 			lmheight=lightmap->getHeight();
 
@@ -142,7 +144,7 @@ void BSPSceneNode::setBSPMap(BSPMap::ptr map){
 //				lightmap=newLightmap;
 //			}
 
-			mRenderFaces[i].lightmap=engine->getTextureManager()->createTexture(lightmap);
+			mRenderFaces[i].lightmap=mEngine->getTextureManager()->createTexture(lightmap);
 			mRenderFaces[i].lightmap->retain();
 		}
 
@@ -150,7 +152,7 @@ void BSPSceneNode::setBSPMap(BSPMap::ptr map){
 			float is=1.0f/(float)width;
 			float it=1.0f/(float)height;
 
-			for(j=0;j<face.numedges;j++){
+			for(j=0;j<face.edgeCount;j++){
 				Vector3 p;
 				vba.get3(vertexCount+j,0,p);
 				float s=Math::dot(p,*(Vector3*)texinfo.vecs[0]) + texinfo.vecs[0][3];
@@ -173,7 +175,8 @@ void BSPSceneNode::setBSPMap(BSPMap::ptr map){
 				}
 			}
 		}
-*/
+		// END: Needs cleanup
+
 		vertexCount+=face.edgeCount;
 	}
 	vba.unlock();
@@ -182,6 +185,71 @@ void BSPSceneNode::setBSPMap(BSPMap::ptr map){
 
 	decompressVIS();
 
+	// START: Needs cleanup
+	BSPMap::miptexlump *lump=(BSPMap::miptexlump*)&mBSPMap->textures[0];
+	#ifdef TOADLET_BIG_ENDIAN
+		littleInt32(lump->nummiptex);
+	#endif
+
+	for(i=0;i<lump->nummiptex;i++){
+		#ifdef TOADLET_BIG_ENDIAN
+			littleInt32(lump->dataofs[i]);
+		#endif
+		if(lump->dataofs[i]==-1){
+			// Unused mip lump.
+			textures.add(NULL);
+			continue;
+		}
+
+		BSPMap::miptex *tex=(BSPMap::miptex*)(&mBSPMap->textures[lump->dataofs[i]]);
+		#ifdef TOADLET_BIG_ENDIAN
+			littleUInt32(tex->width);
+			littleUInt32(tex->height);
+		#endif
+
+		if(tex->width<1 || tex->height<1){
+			// Invalid texture
+			// Do we want a dummy texture here?
+			textures.add(NULL);
+			continue;
+		}
+
+		int size=tex->width*tex->height;
+
+		if(tex->offsets[0] != 0){
+			int datasize = size + (size/4) + (size/16) + (size/64);
+
+			unsigned char *indices=(unsigned char *)tex + tex->offsets[0];
+			unsigned char *palette = indices + datasize + 2;
+
+			// TODO: Load the texture here from the BSP, using 'palette'
+			// Look at wad loader for howto
+			Logger::alert("embedded tex:"+String(tex->name));
+			textures.add(NULL);
+			continue;
+		}
+		else{
+			Texture::ptr texture=mEngine->getTextureManager()->findTexture(tex->name);
+			if(texture!=NULL){
+				texture->retain();
+			}
+			textures.add(texture);
+			continue;
+		}
+
+		// Does this mip contain alpha transparency?
+		if(tex->name[0]=='{'){
+			// TODO: Convert any (0,0,1) to (0,0,0,0);
+			// This will involve re-allocating the texture as RGBA
+		}
+
+		// TODO: Look for textures beginning with "+0" and have these be AnimatedTextures.
+	}
+
+	getRenderLayer(0)->forceRender=true;
+	// END: Needs cleanup
+
+	// START: Needs to be removed, or a map/member setting, so skyboxes could be added outside of this class
 	Texture::ptr bottom=mEngine->getTextureManager()->findTexture("nightsky/nightsky_down.png");
 	Texture::ptr top=mEngine->getTextureManager()->findTexture("nightsky/nightsky_up.png");
 	Texture::ptr left=mEngine->getTextureManager()->findTexture("nightsky/nightsky_west.png");
@@ -198,8 +266,7 @@ void BSPSceneNode::setBSPMap(BSPMap::ptr map){
 	node::MeshNode::ptr node=mEngine->createNodeType(node::MeshNode::type());
 	node->setMesh(mesh);
 	getBackground()->attach(node);
-
-	getRenderLayer(0)->forceRender=true;
+	// END: Needs to be removed
 }
 
 bool BSPSceneNode::preLayerRender(Renderer *renderer,int layer){
@@ -261,23 +328,12 @@ void BSPSceneNode::traceNode(scalar &result,Vector3 &normal,int nodeIndex,const 
 
 	if(nodeIndex<0){
 		const Leaf &leaf=mBSPMap->leaves[-nodeIndex-1];
-int z=0;
-for(i=0;i<leaf.brushes.size();++i){
-const Brush &brush=leaf.brushes[i];
-if(brush.contents!=-1){ // TODO: -2=CONTENTS_SOLID, This is in BSP30Handler, and shouldnt be tested this way
-traceBrush(result,normal,brush,start,end,sphere,box);
-z++;
-}
-}
-Logger::alert(String("We are tracing brushes:")+z);
-
-//		for(i=0;i<leaf.brushCount;++i){
-//			const Brush &brush=mBSPMap->brushes[leaf.brushStart+i];
-//Logger::alert(String("contents:")+brush.contents);
-//			if(brush.contents==-2){ // TODO: -2=CONTENTS_SOLID, This is in BSP30Handler, and shouldnt be tested this way
-//				traceBrush(result,normal,brush,start,end,sphere,box);
-//			}
-//		}
+		for(i=0;i<leaf.brushCount;++i){
+			const Brush &brush=mBSPMap->brushes[leaf.brushStart+i];
+			if(brush.contents==-2){ // TODO: -2=CONTENTS_SOLID, This is in BSP30Handler, and shouldnt be tested this way
+				traceBrush(result,normal,brush,start,end,sphere,box);
+			}
+		}
 		return;
 	}
 
@@ -291,9 +347,9 @@ Logger::alert(String("We are tracing brushes:")+z);
 		offset=sphere->radius;
 	}
 	else if(box!=NULL){
-		offset=	Math::abs(Math::mul(Math::maxVal(box->mins.x,box->maxs.x),plane.normal.x)) +
-				Math::abs(Math::mul(Math::maxVal(box->mins.y,box->maxs.y),plane.normal.y)) +
-				Math::abs(Math::mul(Math::maxVal(box->mins.z,box->maxs.z),plane.normal.z));
+		offset=	Math::abs(Math::mul(Math::maxVal(-box->mins.x,box->maxs.x),plane.normal.x)) +
+				Math::abs(Math::mul(Math::maxVal(-box->mins.y,box->maxs.y),plane.normal.y)) +
+				Math::abs(Math::mul(Math::maxVal(-box->mins.z,box->maxs.z),plane.normal.z));
 	}
 
 	if(startDistance>=offset && endDistance>=offset){
@@ -375,10 +431,10 @@ void BSPSceneNode::traceBrush(scalar &result,Vector3 &normal,const Brush &brush,
 			Vector3 offset;
 			for(j=0;j<3;++j){
 				if(plane.normal[j]<0){
-					offset[j]=box->mins[j];
+					offset[j]=box->maxs[j];
 				}
 				else{
-					offset[j]=box->maxs[j];
+					offset[j]=box->mins[j];
 				}
 			}
 
@@ -455,44 +511,46 @@ void BSPSceneNode::decompressVIS(){
 
 	for(i=0;i<mBSPMap->leaves.size();i++){
 		int v=mBSPMap->leaves[i].visibilityStart;
+		if(v>=0){
+			count=0;
 
-		count=0;
-
-		// first count the number of visible leafs...
-		for(c=1;c<mBSPMap->trees[0].visleafs;v++){
-			if(mBSPMap->visibility[v]==0){
-				v++;
-				c+=(mBSPMap->visibility[v]<<3);
-			}
-			else{
-				for (bit = 1; bit; bit<<=1,c++){
-					if(mBSPMap->visibility[v]&bit){
-						count++;
+			// first count the number of visible leafs...
+			for(c=1;c<mBSPMap->trees[0].visleafs;v++){
+				if(mBSPMap->visibility[v]==0){
+					v++;
+					c+=(mBSPMap->visibility[v]<<3);
+				}
+				else{
+					for (bit = 1; bit; bit<<=1,c++){
+						if(mBSPMap->visibility[v]&bit){
+							count++;
+						}
 					}
 				}
 			}
-		}
 
-		// allocate space to store the uncompressed VIS bit set...
-		leafVisibility[i].resize(count);
+			// allocate space to store the uncompressed VIS bit set...
+			leafVisibility[i].resize(count);
+		}
 	}
 
 	// now go through the VIS bit set again and store the VIS leafs...
 	for(i=0;i<mBSPMap->leaves.size();i++){
 		int v=mBSPMap->leaves[i].visibilityStart;
+		if(v>=0){
+			index=0;
 
-		index=0;
-
-		for(c=1;c<mBSPMap->trees[0].visleafs;v++){
-			if(mBSPMap->visibility[v]==0){
-				v++;
-				c+=(mBSPMap->visibility[v]<<3);
-			}
-			else{
-				for(bit=1;bit;bit<<=1,c++){
-					if(mBSPMap->visibility[v]&bit){
-						leafVisibility[i][index]=c;
-						index++;
+			for(c=1;c<mBSPMap->trees[0].visleafs;v++){
+				if(mBSPMap->visibility[v]==0){
+					v++;
+					c+=(mBSPMap->visibility[v]<<3);
+				}
+				else{
+					for(bit=1;bit;bit<<=1,c++){
+						if(mBSPMap->visibility[v]&bit){
+							leafVisibility[i][index]=c;
+							index++;
+						}
 					}
 				}
 			}
@@ -614,7 +672,81 @@ if(data.textureVisibleFaces.size()<=texinfo.miptex){
 		}
 	}
 }
- 
+
+void BSPSceneNode::calculateSurfaceExtents(const Face &face,Vector2 &mins,Vector2 &maxs){
+	float val;
+	int i,j,e;
+
+	Vector3 v;
+	mins[0]=mins[1]=999999;
+	maxs[0]=maxs[1]=-999999;
+
+	const BSPMap::texinfo &tex=mBSPMap->texinfos[face.texinfo];
+
+	for(i=0;i<face.edgeCount;i++){
+		e=mBSPMap->surfedges[face.edgeStart + i];
+		if(e>=0){
+			v=mBSPMap->vertexes[mBSPMap->edges[e].v[0]];
+		}
+		else{
+			v=mBSPMap->vertexes[mBSPMap->edges[-e].v[1]];
+		}
+
+		for(j=0;j<2;j++){
+			val=v.x * tex.vecs[j][0] +
+				v.y * tex.vecs[j][1] +
+				v.z * tex.vecs[j][2] +
+				tex.vecs[j][3];
+			if(val<mins[j]){
+				mins[j]=val;
+			}
+			if(val>maxs[j]){
+				maxs[j]=val;
+			}
+		}
+	}
+}
+
+#define TEXTURE_SIZE 16
+
+Image::ptr BSPSceneNode::computeLightmap(const Face &face,const Vector2 &mins,const Vector2 &maxs){
+	if(mBSPMap->lighting.size()==0){return NULL;}
+
+	int c;
+	int width, height;
+
+	// compute lightmap size
+	int size[2];
+	for(c=0;c<2;c++){
+		float tmin=(float)floor(mins[c]/TEXTURE_SIZE);
+		float tmax=(float)ceil(maxs[c]/TEXTURE_SIZE);
+		size[c]=(int)(tmax-tmin);
+	}
+
+	width=size[0]+1;
+	height=size[1]+1;
+	int lsz=width*height*3;  // RGB buffer size
+
+	// generate lightmaps texture
+	Image::ptr image(new Image());
+
+//	for(c=0;c<1;c++){
+		//if(face->styles[c]==-1)break;
+		//face->styles[c]=dface->styles[c];
+
+	image->reallocate(Image::Dimension_D2,Image::Format_RGB_8,width,height);
+
+	memcpy(image->getData(),&mBSPMap->lighting[face.lightinfo],lsz);
+
+	// Line below is valid for when there are multiple lightmaps on this face, then c would be that index.
+	// Need to check into how there can be multiple lightmaps
+	//memcpy(image->data,&mLightData[face->lightofs+(lsz*c)],lsz);
+//	}
+
+//    face->lightmap = face->lightmaps[0];
+	return image;
+}
+
 }
 }
 }

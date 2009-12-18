@@ -78,6 +78,8 @@ protected:
 	int findLeaf(const Vector3 &point) const;
 	void addLeafToVisible(const Leaf &leaf,RendererData &data,node::CameraNode *camera) const;
 	void decompressVIS();
+	void calculateSurfaceExtents(const Face &face,Vector2 &mins,Vector2 &maxs);
+	egg::image::Image::ptr computeLightmap(const Face &face,const Vector2 &mins,const Vector2 &maxs);
 
 	peeper::VertexBufferAccessor vba;
 

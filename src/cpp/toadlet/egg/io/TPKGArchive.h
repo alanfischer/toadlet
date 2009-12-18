@@ -42,9 +42,11 @@ public:
 	TOADLET_SHARED_POINTERS(TPKGArchive);
 
 	TPKGArchive();
-	~TPKGArchive();
+	virtual ~TPKGArchive();
 
-	virtual void destroy();
+	void destroy();
+
+	bool isResourceArchive() const{return false;}
 
 	bool open(MemoryInputStream::ptr memoryInputStream);
 	bool open(InputStream::ptr inputStream);

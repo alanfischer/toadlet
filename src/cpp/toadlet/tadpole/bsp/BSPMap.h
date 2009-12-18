@@ -65,6 +65,18 @@ public:
 	};
 	#define TEX_SPECIAL  1     // sky or slime, no lightmap or 256 subdivision
 	egg::Collection<texinfo> texinfos;
+	struct miptexlump{
+		int nummiptex;
+		int dataofs[4]; // [nummiptex]
+	};
+	egg::Collection<unsigned char> textures;
+	#define MIPLEVELS 4
+	struct miptex{
+		char name[16];
+		unsigned width, height;
+		unsigned offsets[MIPLEVELS];  // four mip maps stored
+	};
+	egg::Collection<unsigned char> lighting;
 
 	TOADLET_BASERESOURCE_PASSTHROUGH(BaseResource);
 };
