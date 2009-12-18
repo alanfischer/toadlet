@@ -86,9 +86,11 @@ public:
 hop::Solid *mWorld;
 void traceSegment(hop::Collision &result,const Segment &segment){
 	result.time=super::traceSegment(result.normal,segment);
+	if(result.time==1.0){result.time=-1;}
 	if(result.time<0) result.point=segment.origin+segment.direction;
-	else result.point=segment.origin+segment.direction*result.time;
-	result.collider=mWorld;
+	else{result.point=segment.origin+segment.direction*result.time;
+		result.collider=mWorld;
+	}
 }
 void traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid){
 	if(solid->getShape(0)->getType()==hop::Shape::Type_AABOX){
@@ -97,9 +99,11 @@ void traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *
 	else if(solid->getShape(0)->getType()==hop::Shape::Type_SPHERE){
 		result.time=super::traceSphere(result.normal,segment,solid->getShape(0)->getSphere());
 	}
+	if(result.time==1.0){result.time=-1;}
 	if(result.time<0) result.point=segment.origin+segment.direction;
-	else result.point=segment.origin+segment.direction*result.time;
-	result.collider=mWorld;
+	else{result.point=segment.origin+segment.direction*result.time;
+		result.collider=mWorld;
+	}
 }
 void preUpdate(int,scalar){}
 void preUpdate(hop::Solid*,int,scalar){}
