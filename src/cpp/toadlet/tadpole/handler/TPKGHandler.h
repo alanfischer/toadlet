@@ -23,13 +23,37 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/io/WADArchive.h>
+#ifndef TOADLET_TADPOLE_HANDLER_TPKGHANDLER_H
+#define TOADLET_TADPOLE_HANDLER_TPKGHANDLER_H
+
+#include <toadlet/egg/io/TPKGArchive.h>
+#include <toadlet/tadpole/ResourceHandler.h>
 
 namespace toadlet{
-namespace egg{
-namespace io{
+namespace tadpole{
+namespace handler{
+
+class TOADLET_API TPKGHandler:public ResourceHandler{
+public:
+	TOADLET_SHARED_POINTERS(TPKGHandler);
+
+	TPKGHandler(){}
+
+	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData){
+		egg::io::TPKGArchive::ptr archive(new egg::io::TPKGArchive());
+		bool result=archive->open(in);
+		if(result){
+			return egg::shared_static_cast<egg::io::Archive>(archive);
+		}
+		else{
+			return NULL;
+		}
+	}
+};
 
 }
 }
 }
+
+#endif
 

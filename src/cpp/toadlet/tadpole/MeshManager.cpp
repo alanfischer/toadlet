@@ -34,7 +34,7 @@ using namespace toadlet::tadpole::mesh;
 namespace toadlet{
 namespace tadpole{
 
-MeshManager::MeshManager(Engine *engine):ResourceManager(engine){
+MeshManager::MeshManager(Engine *engine):ResourceManager(engine->getArchiveManager()){
 	mEngine=engine;
 }
 

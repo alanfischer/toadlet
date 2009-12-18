@@ -33,9 +33,11 @@
 namespace toadlet{
 namespace tadpole{
 
+class Engine;
+
 class TOADLET_API MaterialManager:public ResourceManager{
 public:
-	MaterialManager(egg::io::InputStreamFactory *inputStreamFactory,TextureManager *textureManager);
+	MaterialManager(Engine *engine);
 
 	Material::ptr createMaterial();
 

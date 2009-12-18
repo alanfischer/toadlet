@@ -26,22 +26,35 @@
 #ifndef TOADLET_TADPOLE_ARCHIVEMANAGER_H
 #define TOADLET_TADPOLE_ARCHIVEMANAGER_H
 
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/egg/io/Archive.h>
 #include <toadlet/tadpole/ResourceManager.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API ArchiveManager:public ResourceManager,public egg::io::InputStreamFactory{
+class TOADLET_API ArchiveManager:public ResourceManager,public egg::io::Archive,public egg::BaseResource{
 public:
-	ArchiveManager(InputStreamFactory *inputStreamFactory);
+	ArchiveManager();
+	virtual ~ArchiveManager();
+
+	void destroy();
+
+	bool open(egg::io::InputStream::ptr stream){return true;}
 
 	egg::io::Archive::ptr findArchive(const egg::String &name){return egg::shared_static_cast<egg::io::Archive>(ResourceManager::find(name));}
 
+	void setDirectory(const egg::String &directory);
+	const egg::String &getDirectory() const{return mDirectory;}
+
 	// Searches through all archives for the file
-	egg::io::InputStream::ptr makeInputStream(const egg::String &name);
+	egg::io::InputStream::ptr openStream(const egg::String &name);
+	egg::Resource::ptr openResource(const egg::String &name){return NULL;}
+
+	TOADLET_BASERESOURCE_PASSTHROUGH(egg::io::Archive);
 
 protected:
+	egg::String mDirectory;
 };
 
 }

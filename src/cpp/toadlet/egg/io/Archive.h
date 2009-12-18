@@ -27,18 +27,20 @@
 #define TOADLET_EGG_IO_ARCHIVE_H
 
 #include <toadlet/egg/Resource.h>
-#include <toadlet/egg/io/InputStreamFactory.h>
+#include <toadlet/egg/io/InputStream.h>
 
 namespace toadlet{
 namespace egg{
 namespace io{
 
-// TODO: This needs to be flushed out more, right now its just a fancy name for a Resource'd InputStreamFactory
-class Archive:public Resource,public InputStreamFactory{
+class Archive:public Resource{
 public:
 	TOADLET_SHARED_POINTERS(Archive);
 
-	virtual bool open(InputStream::ptr inputStream)=0;
+	virtual bool open(InputStream::ptr stream)=0;
+
+	virtual InputStream::ptr openStream(const String &name)=0;
+	virtual Resource::ptr openResource(const String &name)=0;
 };
 
 }

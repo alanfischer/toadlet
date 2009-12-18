@@ -39,6 +39,8 @@ namespace io{
 
 class TOADLET_API TPKGArchive:public Archive,public BaseResource{
 public:
+	TOADLET_SHARED_POINTERS(TPKGArchive);
+
 	TPKGArchive();
 	~TPKGArchive();
 
@@ -47,7 +49,8 @@ public:
 	bool open(MemoryInputStream::ptr memoryInputStream);
 	bool open(InputStream::ptr inputStream);
 
-	InputStream::ptr makeInputStream(const String &name);
+	InputStream::ptr openStream(const String &name);
+	Resource::ptr openResource(const String &name){return NULL;}
 
 	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 

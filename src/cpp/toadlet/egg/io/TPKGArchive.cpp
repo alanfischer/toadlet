@@ -101,7 +101,7 @@ bool TPKGArchive::open(InputStream::ptr inputStream){
 	return true;
 }
 
-InputStream::ptr TPKGArchive::makeInputStream(const String &name){
+InputStream::ptr TPKGArchive::openStream(const String &name){
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"Creating InputStream for "+name);
 

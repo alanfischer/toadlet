@@ -36,7 +36,7 @@ using namespace toadlet::peeper;
 namespace toadlet{
 namespace tadpole{
 
-TextureManager::TextureManager(Engine *engine):ResourceManager(engine){
+TextureManager::TextureManager(Engine *engine):ResourceManager(engine->getArchiveManager()){
 	mEngine=engine;
 }
 
