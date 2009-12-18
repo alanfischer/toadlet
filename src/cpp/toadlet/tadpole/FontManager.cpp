@@ -31,7 +31,7 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace tadpole{
 
-FontManager::FontManager(InputStreamFactory *inputStreamFactory):ResourceManager(inputStreamFactory){}
+FontManager::FontManager(Archive *archive):ResourceManager(archive){}
 
 Resource::ptr FontManager::manage(const Resource::ptr &resource){
 	if(mResources.contains(resource)==false){

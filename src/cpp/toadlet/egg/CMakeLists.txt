@@ -49,7 +49,6 @@ set (EGG_IO_SRC
 	io/StringInputStream.cpp
 	io/StringOutputStream.cpp
 	io/TPKGArchive.cpp
-	io/WADArchive.cpp
 )
 
 set (EGG_MATH_SRC
@@ -168,7 +167,6 @@ set (EGG_IO_HEADERS
 	io/FileInputStream.h
 	io/FileOutputStream.h
 	io/InputStream.h
-	io/InputStreamFactory.h
 	io/MemoryInputStream.h
 	io/MemoryOutputStream.h
 	io/OutputStream.h
@@ -176,7 +174,6 @@ set (EGG_IO_HEADERS
 	io/StringInputStream.h
 	io/StringOutputStream.h
 	io/TPKGArchive.h
-	io/WADArchive.h
 )
 
 set (EGG_MATH_HEADERS

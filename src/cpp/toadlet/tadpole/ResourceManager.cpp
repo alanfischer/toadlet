@@ -34,8 +34,8 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace tadpole{
 
-ResourceManager::ResourceManager(InputStreamFactory *inputStreamFactory){
-	mInputStreamFactory=inputStreamFactory;
+ResourceManager::ResourceManager(Archive *archive){
+	mArchive=archive;
 }
 
 ResourceManager::~ResourceManager(){
@@ -51,6 +51,14 @@ void ResourceManager::destroy(){
 	}
 	mResources.clear();
 	mNameResourceMap.clear();
+}
+
+void ResourceManager::addResourceArchive(egg::io::Archive::ptr archive){
+	mResourceArchives.add(archive);
+}
+
+void ResourceManager::removeResourceArchive(egg::io::Archive::ptr archive){
+	mResourceArchives.remove(archive);
 }
 
 Resource::ptr ResourceManager::get(const String &name){
@@ -211,7 +219,7 @@ Resource::ptr ResourceManager::findFromFile(const String &name,const ResourceHan
 	if(extension!=(char*)NULL){
 		ExtensionHandlerMap::iterator it=mExtensionHandlerMap.find(extension);
 		if(it!=mExtensionHandlerMap.end()){
-			InputStream::ptr in=mInputStreamFactory->makeInputStream(filename);
+			InputStream::ptr in=mArchive->openStream(filename);
 			if(in!=NULL){
 				return Resource::ptr(it->second->load(in,handlerData));
 			}
@@ -222,7 +230,7 @@ Resource::ptr ResourceManager::findFromFile(const String &name,const ResourceHan
 			}
 		}
 		else if(mDefaultHandler!=NULL){
-			InputStream::ptr in=mInputStreamFactory->makeInputStream(filename);
+			InputStream::ptr in=mArchive->openStream(filename);
 			if(in!=NULL){
 				return Resource::ptr(mDefaultHandler->load(in,handlerData));
 			}
@@ -233,10 +241,25 @@ Resource::ptr ResourceManager::findFromFile(const String &name,const ResourceHan
 			}
 		}
 		else{
+			int i;
+			for(i=0;i<mResourceArchives.size();++i){
+				Resource::ptr resource=mResourceArchives[i]->openResource(filename);
+				if(resource!=NULL){
+					return resource;
+				}
+			}
 			return Resource::ptr(unableToFindHandler(name,handlerData));
 		}
 	}
 	else{
+		int i;
+		for(i=0;i<mResourceArchives.size();++i){
+			Resource::ptr resource=mResourceArchives[i]->openResource(filename);
+			if(resource!=NULL){
+				return resource;
+			}
+		}
+
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"Extension not found on file");
 		return NULL;

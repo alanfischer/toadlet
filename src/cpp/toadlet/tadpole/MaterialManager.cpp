@@ -26,6 +26,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/Texture.h>
+#include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/MaterialManager.h>
 
 using namespace toadlet::egg;
@@ -35,8 +36,8 @@ using namespace toadlet::peeper;
 namespace toadlet{
 namespace tadpole{
 
-MaterialManager::MaterialManager(InputStreamFactory *inputStreamFactory,TextureManager *textureManager):ResourceManager(inputStreamFactory){
-	mTextureManager=textureManager;
+MaterialManager::MaterialManager(Engine *engine):ResourceManager(engine->getArchiveManager()){
+	mTextureManager=engine->getTextureManager();
 	mDefaultMinFilter=TextureStage::Filter_LINEAR;
 	mDefaultMagFilter=TextureStage::Filter_LINEAR;
 	mDefaultMipFilter=TextureStage::Filter_LINEAR;

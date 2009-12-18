@@ -25,21 +25,19 @@
 
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/egg/System.h>
-#include <toadlet/egg/io/InputStream.h>
-#include <toadlet/egg/io/OutputStream.h>
-#include <toadlet/egg/io/FileInputStream.h>
 #include <toadlet/peeper/CapabilitySet.h>
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/MaterialManager.h>
 #include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/TextureManager.h>
+#include <toadlet/tadpole/handler/AudioBufferHandler.h>
 #include <toadlet/tadpole/handler/BMPHandler.h>
+#include <toadlet/tadpole/handler/MMSHHandler.h>
 #include <toadlet/tadpole/handler/RGBHandler.h>
 #include <toadlet/tadpole/handler/SPRHandler.h>
-#include <toadlet/tadpole/handler/MMSHHandler.h>
-#include <toadlet/tadpole/handler/AudioBufferHandler.h>
+#include <toadlet/tadpole/handler/TPKGHandler.h>
+#include <toadlet/tadpole/handler/WADHandler.h>
 
 #if defined(TOADLET_HAS_GIF)
 	#include <toadlet/tadpole/handler/GIFHandler.h>
@@ -82,7 +80,7 @@ Engine::Engine():
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"creating Engine");
 
-	mArchiveManager=new ArchiveManager(this);
+	mArchiveManager=new ArchiveManager();
 
 	mTextureManager=new TextureManager(this);
 
@@ -96,13 +94,13 @@ Engine::Engine():
 
 	mBufferManager=new BufferManager(this);
 
-	mMaterialManager=new MaterialManager(this,mTextureManager);
+	mMaterialManager=new MaterialManager(this);
 
-	mFontManager=new FontManager(this);
+	mFontManager=new FontManager(this->getArchiveManager());
 
 	mMeshManager=new MeshManager(this);
 
-	mAudioBufferManager=new ResourceManager(this);
+	mAudioBufferManager=new ResourceManager(this->getArchiveManager());
 
 
 	Logger::debug(Categories::TOADLET_TADPOLE,
@@ -111,10 +109,9 @@ Engine::Engine():
 	// Archive handlers
 	mArchiveManager->setHandler(TPKGHandler::ptr(new TPKGHandler()),"tpkg");
 
-	// Texture handlers
-	WADHandler::ptr wadHandler(new WADHandler(mTextureManager));
-	mTextureManager->setHandler(wadHandler,"wad");
+	mArchiveManager->setHandler(WADHandler::ptr(new WADHandler(mTextureManager)),"wad");
 
+	// Texture handlers
 	mTextureManager->setHandler(BMPHandler::ptr(new BMPHandler(mTextureManager)),"bmp");
 
 	mTextureManager->setHandler(RGBHandler::ptr(new RGBHandler(mTextureManager)),"rgb");
@@ -345,38 +342,6 @@ void Engine::setAudioPlayer(AudioPlayer *audioPlayer){
 
 AudioPlayer *Engine::getAudioPlayer() const{
 	return mAudioPlayer;
-}
-
-void Engine::setDirectory(const String &directory){
-	if(directory.length()>0){
-		mDirectory=directory+"/";
-	}
-	else{
-		mDirectory=directory;
-	}
-}
-
-const String &Engine::getDirectory() const{
-	return mDirectory;
-}
-
-InputStream::ptr Engine::makeInputStream(const String &name){
-	InputStream::ptr in=mArchiveManager->makeInputStream(name);
-
-	// TODO: Replace this code with a FileSystemArchive
-	if(in!=NULL){
-		FileInputStream::ptr fin;
-		if(System::absolutePath(name)==false){
-			fin=FileInputStream::ptr(new FileInputStream(mDirectory+name));
-		}
-		else{
-			fin=FileInputStream::ptr(new FileInputStream(name));
-		}
-		if(fin->isOpen()){
-			in=fin;
-		}
-	}
-	return in;
 }
 
 // TODO: Use a pool for these entities

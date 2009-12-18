@@ -27,7 +27,6 @@
 #define TOADLET_TADPOLE_ENGINE_H
 
 #include <toadlet/tadpole/Types.h>
-#include <toadlet/egg/io/InputStreamFactory.h>
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/peeper/IndexBuffer.h>
@@ -54,7 +53,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API Engine:public egg::io::InputStreamFactory{
+class TOADLET_API Engine{
 public:
 	Engine();
 	virtual ~Engine();
@@ -66,9 +65,6 @@ public:
 	void setScene(const node::Scene::ptr &scene);
 	const node::Scene::ptr &getScene() const;
 
-	void setInputStreamFactory(egg::io::InputStreamFactory *inputStreamFactory);
-	egg::io::InputStreamFactory *getInputStreamFactory() const;
-
 	void setRenderer(peeper::Renderer *renderer);
 	peeper::Renderer *getRenderer() const;
 	void updateVertexFormats();
@@ -76,9 +72,9 @@ public:
 	void setAudioPlayer(ribbit::AudioPlayer *audioPlayer);
 	ribbit::AudioPlayer *getAudioPlayer() const;
 
-	void setDirectory(const egg::String &directory);
-	const egg::String &getDirectory() const;
-	egg::io::InputStream::ptr makeInputStream(const egg::String &name);
+	void setDirectory(const egg::String &directory){mArchiveManager->setDirectory(directory);}
+	const egg::String &getDirectory() const{return mArchiveManager->getDirectory();}
+	egg::io::InputStream::ptr openStream(const egg::String &name){return mArchiveManager->openStream(name);}
 
 	// Node methods
 	node::Node *allocNode(const egg::BaseType<node::Node> &type);
@@ -109,7 +105,6 @@ public:
 
 protected:
 	egg::String mDirectory;
-	egg::io::InputStreamFactory *mInputStreamFactory;
 	node::Scene::ptr mScene;
 	peeper::Renderer *mRenderer;
 	ribbit::AudioPlayer *mAudioPlayer;

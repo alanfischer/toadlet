@@ -23,6 +23,10 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/System.h>
+#include <toadlet/egg/io/InputStream.h>
+#include <toadlet/egg/io/OutputStream.h>
+#include <toadlet/egg/io/FileInputStream.h>
 #include <toadlet/tadpole/ArchiveManager.h>
 
 using namespace toadlet::egg;
@@ -31,17 +35,48 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace tadpole{
 
-ArchiveManager::ArchiveManager(InputStreamFactory *inputStreamFactory):ResourceManager(inputStreamFactory){}
+ArchiveManager::ArchiveManager():ResourceManager(NULL){
+	setArchive(this);
+}
 
-InputStream::ptr ArchiveManager::makeInputStream(const String &name){
+ArchiveManager::~ArchiveManager(){
+	destroy();
+}
+
+void ArchiveManager::destroy(){
+}
+
+void ArchiveManager::setDirectory(const String &directory){
+	if(directory.length()>0){
+		mDirectory=directory+"/";
+	}
+	else{
+		mDirectory=directory;
+	}
+}
+
+InputStream::ptr ArchiveManager::openStream(const String &name){
 	InputStream::ptr in;
 
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Archive::ptr archive=shared_static_cast<Archive>(mResources[i]);
-		in=archive->makeInputStream(name);
+		in=archive->openStream(name);
 		if(in!=NULL){
 			break;
+		}
+	}
+
+	if(in==NULL){
+		FileInputStream::ptr fin;
+		if(System::absolutePath(name)==false){
+			fin=FileInputStream::ptr(new FileInputStream(mDirectory+name));
+		}
+		else{
+			fin=FileInputStream::ptr(new FileInputStream(name));
+		}
+		if(fin->isOpen()){
+			in=fin;
 		}
 	}
 

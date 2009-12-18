@@ -26,8 +26,8 @@
 #ifndef TOADLET_TADPOLE_HANDLER_WADHANDLER_H
 #define TOADLET_TADPOLE_HANDLER_WADHANDLER_H
 
-#include <toadlet/egg/io/WADArchive.h>
 #include <toadlet/tadpole/ResourceHandler.h>
+#include <toadlet/tadpole/handler/WADArchive.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -37,18 +37,23 @@ class TOADLET_API WADHandler:public ResourceHandler{
 public:
 	TOADLET_SHARED_POINTERS(WADHandler);
 
-	WADHandler(){}
+	WADHandler(TextureManager *textureManager){
+		mTextureManager=textureManager;
+	}
 
 	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData){
-		egg::io::WADArchive::ptr archive(new WADArchive());
+		WADArchive::ptr archive(new WADArchive(mTextureManager));
 		bool result=archive->open(in);
 		if(result){
-			return archive;
+			return egg::shared_static_cast<egg::io::Archive>(archive);
 		}
 		else{
 			return NULL;
 		}
 	}
+
+protected:
+	TextureManager *mTextureManager;
 };
 
 }

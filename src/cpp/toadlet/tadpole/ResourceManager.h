@@ -30,9 +30,8 @@
 #include <toadlet/egg/Map.h>
 #include <toadlet/egg/Resource.h>
 #include <toadlet/egg/ResourceFullyReleasedListener.h>
+#include <toadlet/egg/io/Archive.h>
 #include <toadlet/egg/io/InputStream.h>
-#include <toadlet/egg/io/OutputStream.h>
-#include <toadlet/egg/io/InputStreamFactory.h>
 #include <toadlet/tadpole/ResourceHandler.h>
 
 namespace toadlet{
@@ -40,12 +39,16 @@ namespace tadpole{
 
 class TOADLET_API ResourceManager:public egg::ResourceFullyReleasedListener{
 public:
-	ResourceManager(egg::io::InputStreamFactory *inputStreamFactory);
+	ResourceManager(egg::io::Archive *archive);
 	virtual ~ResourceManager();
 
 	virtual void destroy();
 
-	virtual void setInputStreamFactory(egg::io::InputStreamFactory *inputStreamFactory){mInputStreamFactory=inputStreamFactory;}
+	virtual void setArchive(egg::io::Archive *archive){mArchive=archive;}
+	virtual egg::io::Archive *getArchive() const{return mArchive;}
+
+	virtual void addResourceArchive(egg::io::Archive::ptr archive);
+	virtual void removeResourceArchive(egg::io::Archive::ptr archive);
 
 	virtual egg::Resource::ptr get(const egg::String &name);
 	virtual egg::Resource::ptr find(const egg::String &name,ResourceHandlerData::ptr handlerData=(int)NULL);
@@ -76,7 +79,8 @@ protected:
 	virtual void resourceLoaded(const egg::Resource::ptr &resource){}
 	virtual void resourceUnloaded(const egg::Resource::ptr &resource){}
 
-	egg::io::InputStreamFactory *mInputStreamFactory;
+	egg::io::Archive *mArchive;
+	egg::Collection<egg::io::Archive::ptr> mResourceArchives;
 
 	egg::Collection<egg::Resource::ptr> mResources;
 	NameResourceMap mNameResourceMap;

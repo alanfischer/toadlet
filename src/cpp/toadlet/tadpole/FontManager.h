@@ -37,7 +37,7 @@ class Engine;
 
 class TOADLET_API FontManager:public ResourceManager{
 public:
-	FontManager(egg::io::InputStreamFactory *inputStreamFactory);
+	FontManager(egg::io::Archive *archive);
 
 	Font::ptr getFont(const egg::String &name,float pointSize){return egg::shared_static_cast<Font>(ResourceManager::get(name+egg::String(":")+pointSize));}
 	Font::ptr findFont(const egg::String &name,float pointSize){return egg::shared_static_cast<Font>(ResourceManager::find(name,FontData::ptr(new FontData(pointSize))));}

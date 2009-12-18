@@ -53,6 +53,7 @@ set (TADPOLE_NODE_SRC
 set (TADPOLE_HANDLER_SRC
 	handler/AudioBufferHandler.cpp
 	handler/MMSHHandler.cpp
+	handler/WADArchive.cpp
 )
 
 set (TADPOLE_HANDLER_XML_SRC
@@ -156,6 +157,9 @@ set (TADPOLE_HANDLER_HEADERS
 	handler/PNGHandler.h
 	handler/RGBHandler.h
 	handler/SPRHandler.h
+	handler/TPKGHandler.h
+	handler/WADArchive.h
+	handler/WADHandler.h
 )
 
 set (TADPOLE_HANDLER_XML_HEADERS
