@@ -23,24 +23,32 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BSP_LEAF_H
-#define TOADLET_TADPOLE_BSP_LEAF_H
+#ifndef TOADLET_TADPOLE_HANDLER_WADHANDLER_H
+#define TOADLET_TADPOLE_HANDLER_WADHANDLER_H
+
+#include <toadlet/egg/io/WADArchive.h>
+#include <toadlet/tadpole/ResourceHandler.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace bsp{
+namespace handler{
 
-class TOADLET_API Leaf{
+class TOADLET_API WADHandler:public ResourceHandler{
 public:
-	int contents;
-	int visibilityStart;
-	AABox bound;
-	int brushStart;
-	int brushCount;
-egg::Collection<Brush> brushes;
-	// TODO: Rename/change these marksurface things
-	int marksurfaceStart;
-	int marksurfaceCount;
+	TOADLET_SHARED_POINTERS(WADHandler);
+
+	WADHandler(){}
+
+	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData){
+		egg::io::WADArchive::ptr archive(new WADArchive());
+		bool result=archive->open(in);
+		if(result){
+			return archive;
+		}
+		else{
+			return NULL;
+		}
+	}
 };
 
 }
@@ -48,3 +56,4 @@ egg::Collection<Brush> brushes;
 }
 
 #endif
+

@@ -28,6 +28,7 @@
 
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/ResourceHandler.h>
+#include <toadlet/tadpole/bsp/BSPMap.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -176,8 +177,11 @@ protected:
 	};
 
 	void readLump(egg::io::InputStream *in,int lump,void **data,int size,int *count);
+	void buildBrushes(BSPMap *map,int node,egg::Collection<Plane> &planes,egg::Collection<Plane> &brushPlanes);
+	void findBrushPlanes(egg::Collection<Plane> &brushPlanes,const egg::Collection<Plane> &planes);
 
 	Engine *mEngine;
+	float mEpsilon;
 
 	bheader header;
 };

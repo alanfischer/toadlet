@@ -58,6 +58,22 @@ HopScene::HopScene():toadlet::tadpole::bsp::BSPSceneNode(),
 	//mSolidCollection
 {
 	mSimulator=new Simulator();
+
+
+
+mSimulator->setSnapToGrid(true);
+mSimulator->setManager(this);
+Logger::alert(String("EPS:")+mEpsilon);
+mSimulator->setEpsilon(mEpsilon/4);
+//mSimulator->setGravity(Vector3(0,0,-750.0f));
+mSimulator->setMicroCollisionThreshold(200);
+showCollisionVolumes(true,true);
+
+mWorld=new Solid();
+mWorld->setLocalGravity(Math::ZERO_VECTOR3);
+mWorld->setInfiniteMass();
+/*mSimulator->addSolid(mWorld);
+*/
 }
 
 HopScene::~HopScene(){

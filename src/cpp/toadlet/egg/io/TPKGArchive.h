@@ -23,24 +23,45 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BSP_LEAF_H
-#define TOADLET_TADPOLE_BSP_LEAF_H
+#ifndef TOADLET_EGG_IO_TPKGARCHIVE_H
+#define TOADLET_EGG_IO_TPKGARCHIVE_H
+
+#include <toadlet/egg/BaseResource.h>
+#include <toadlet/egg/Map.h>
+#include <toadlet/egg/io/Archive.h>
+#include <toadlet/egg/io/InputStreamFactory.h>
+#include <toadlet/egg/io/DataInputStream.h>
+#include <toadlet/egg/io/MemoryInputStream.h>
 
 namespace toadlet{
-namespace tadpole{
-namespace bsp{
+namespace egg{
+namespace io{
 
-class TOADLET_API Leaf{
+class TOADLET_API TPKGArchive:public Archive,public BaseResource{
 public:
-	int contents;
-	int visibilityStart;
-	AABox bound;
-	int brushStart;
-	int brushCount;
-egg::Collection<Brush> brushes;
-	// TODO: Rename/change these marksurface things
-	int marksurfaceStart;
-	int marksurfaceCount;
+	TPKGArchive();
+	~TPKGArchive();
+
+	virtual void destroy();
+
+	bool open(MemoryInputStream::ptr memoryInputStream);
+	bool open(InputStream::ptr inputStream);
+
+	InputStream::ptr makeInputStream(const String &name);
+
+	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
+
+protected:
+	class Index{
+	public:
+		uint32 position;
+		uint32 length;
+	};
+
+	Map<String,Index> mIndex;
+	int mDataOffset;
+	DataInputStream::ptr mInputStream;
+	MemoryInputStream::ptr mMemoryInputStream;
 };
 
 }

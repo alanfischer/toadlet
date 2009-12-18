@@ -23,28 +23,30 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BSP_LEAF_H
-#define TOADLET_TADPOLE_BSP_LEAF_H
+#include <toadlet/tadpole/ArchiveManager.h>
+
+using namespace toadlet::egg;
+using namespace toadlet::egg::io;
 
 namespace toadlet{
 namespace tadpole{
-namespace bsp{
 
-class TOADLET_API Leaf{
-public:
-	int contents;
-	int visibilityStart;
-	AABox bound;
-	int brushStart;
-	int brushCount;
-egg::Collection<Brush> brushes;
-	// TODO: Rename/change these marksurface things
-	int marksurfaceStart;
-	int marksurfaceCount;
-};
+ArchiveManager::ArchiveManager(InputStreamFactory *inputStreamFactory):ResourceManager(inputStreamFactory){}
+
+InputStream::ptr ArchiveManager::makeInputStream(const String &name){
+	InputStream::ptr in;
+
+	int i;
+	for(i=0;i<mResources.size();++i){
+		Archive::ptr archive=shared_static_cast<Archive>(mResources[i]);
+		in=archive->makeInputStream(name);
+		if(in!=NULL){
+			break;
+		}
+	}
+
+	return in;
+}
 
 }
 }
-}
-
-#endif

@@ -38,7 +38,7 @@ class HopNode;
 class HopCollision;
 class HopEntityMessage;
 
-class TOADLET_API HopScene:public bsp::BSPSceneNode{
+class TOADLET_API HopScene:public bsp::BSPSceneNode, public hop::Manager{
 public:
 	TOADLET_NODE(HopScene,bsp::BSPSceneNode);
 
@@ -81,6 +81,33 @@ public:
 	virtual void renderUpdate(int dt);
 
 	hop::Collision cache_traceSegment_collision;
+
+	// HACK:
+hop::Solid *mWorld;
+void traceSegment(hop::Collision &result,const Segment &segment){
+	result.time=super::traceSegment(result.normal,segment);
+	if(result.time<0) result.point=segment.origin+segment.direction;
+	else result.point=segment.origin+segment.direction*result.time;
+	result.collider=mWorld;
+}
+void traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid){
+	if(solid->getShape(0)->getType()==hop::Shape::Type_AABOX){
+		result.time=super::traceAABox(result.normal,segment,solid->getShape(0)->getAABox());
+	}
+	else if(solid->getShape(0)->getType()==hop::Shape::Type_SPHERE){
+		result.time=super::traceSphere(result.normal,segment,solid->getShape(0)->getSphere());
+	}
+toadlet::egg::Logger::alert(toadlet::egg::String("TIME:")+result.time);
+	if(result.time<0) result.point=segment.origin+segment.direction;
+	else result.point=segment.origin+segment.direction*result.time;
+	result.collider=mWorld;
+}
+void preUpdate(int,scalar){}
+void preUpdate(hop::Solid*,int,scalar){}
+void intraUpdate(hop::Solid*,int,scalar){}
+bool collisionResponse(hop::Solid*,Vector3&,Vector3&,hop::Collision&){return false;}
+void postUpdate(hop::Solid*,int,scalar){}
+void postUpdate(int,scalar){}
 
 protected:
 	virtual void defaultRegisterHopEntity(HopEntity *entity);

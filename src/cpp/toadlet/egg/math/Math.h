@@ -1206,6 +1206,20 @@ namespace Math{
 	inline bool unprojectSegment(Segment &result,const Matrix4x4 &projViewMatrix,int x,int y,unsigned int viewportX,unsigned int viewportY,unsigned int viewportWidth,unsigned int viewportHeight){Matrix4x4 scratchMatrix;return unprojectSegment(result,projViewMatrix,x,y,viewportX,viewportY,viewportWidth,viewportHeight,scratchMatrix);}
 
 	// Plane operations
+	inline void neg(Plane &r,const Plane &p){
+		r.normal.x=-p.normal.x;
+		r.normal.y=-p.normal.y;
+		r.normal.z=-p.normal.z;
+		r.distance=-p.distance;
+	}
+
+	inline void neg(Plane &p){
+		p.normal.x=-p.normal.x;
+		p.normal.y=-p.normal.y;
+		p.normal.z=-p.normal.z;
+		p.distance=-p.distance;
+	}
+
 	inline void project(const Plane &plane,Vector3 &result,const Vector3 &point){
 		result.x=point.x - plane.normal.x*plane.distance;
 		result.y=point.y - plane.normal.y*plane.distance;

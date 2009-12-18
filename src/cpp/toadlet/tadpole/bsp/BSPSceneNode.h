@@ -48,6 +48,10 @@ public:
 	void setBSPMap(BSPMap::ptr map);
 	BSPMap::ptr getBSPMap() const{return mBSPMap;}
 
+	scalar traceSegment(Vector3 &normal,const Segment &segment);
+	scalar traceSphere(Vector3 &normal,const Segment &segment,const Sphere &sphere);
+	scalar traceAABox(Vector3 &normal,const Segment &segment,const AABox &box);
+
 protected:
 	// TODO: We need to get away from this markfaces stuff, make it more universal
 	class RendererData{
@@ -63,6 +67,9 @@ protected:
 		peeper::Texture::ptr lightmap;
 	};
 
+	void traceNode(scalar &result,Vector3 &normal,int nodeIndex,const Vector3 &start,const Vector3 &end,scalar startFraction,scalar endFraction,const Sphere *sphere,const AABox *box);
+	void traceBrush(scalar &result,Vector3 &normal,const Brush &brush,const Vector3 &start,const Vector3 &end,const Sphere *sphere,const AABox *box);
+
 	// TODO: We need a better hook to start rendering the level, since in theory this wont have access to preLayerRender,
 	//  cause it wont be a main scene node
 	bool preLayerRender(peeper::Renderer *renderer,int layer);
@@ -75,6 +82,7 @@ protected:
 	peeper::VertexBufferAccessor vba;
 
 	BSPMap::ptr mBSPMap;
+	scalar mEpsilon;
 	RendererData mRendererData;
 	peeper::VertexData::ptr mVertexData;
 	egg::Collection<RenderFace> mRenderFaces;

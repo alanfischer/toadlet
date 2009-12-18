@@ -1703,6 +1703,20 @@ public final class Math{
 	}
 
 	// Plane operations
+	public static void neg(Plane r,Plane p){
+		r.normal.x=-p.normal.x;
+		r.normal.y=-p.normal.y;
+		r.normal.z=-p.normal.z;
+		r.distance=-p.distance;
+	}
+
+	public static void neg(Plane p){
+		p.normal.x=-p.normal.x;
+		p.normal.y=-p.normal.y;
+		p.normal.z=-p.normal.z;
+		p.distance=-p.distance;
+	}
+
 	public static void project(Plane plane,Vector3 result,Vector3 point){
 		result.x=point.x - plane.normal.x*plane.distance;
 		result.y=point.y - plane.normal.y*plane.distance;

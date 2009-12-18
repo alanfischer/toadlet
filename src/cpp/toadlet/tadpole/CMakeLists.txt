@@ -4,6 +4,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.in ${CMAKE_CURRENT_BINARY_
 
 # Source files for toadlet_tadpole
 set (TADPOLE_SRC
+	ArchiveManager.cpp
 	BufferManager.cpp
 	Engine.cpp
 	Font.cpp
@@ -83,6 +84,7 @@ set (TADPOLE_MESH_SRC
 
 # Headers
 set (TADPOLE_HEADERS
+	ArchiveManager.h
 	AudioBufferData.h
 	BufferManager.h
 	Engine.h

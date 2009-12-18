@@ -23,24 +23,22 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BSP_LEAF_H
-#define TOADLET_TADPOLE_BSP_LEAF_H
+#ifndef TOADLET_EGG_IO_ARCHIVE_H
+#define TOADLET_EGG_IO_ARCHIVE_H
+
+#include <toadlet/egg/Resource.h>
+#include <toadlet/egg/io/InputStreamFactory.h>
 
 namespace toadlet{
-namespace tadpole{
-namespace bsp{
+namespace egg{
+namespace io{
 
-class TOADLET_API Leaf{
+// TODO: This needs to be flushed out more, right now its just a fancy name for a Resource'd InputStreamFactory
+class Archive:public Resource,public InputStreamFactory{
 public:
-	int contents;
-	int visibilityStart;
-	AABox bound;
-	int brushStart;
-	int brushCount;
-egg::Collection<Brush> brushes;
-	// TODO: Rename/change these marksurface things
-	int marksurfaceStart;
-	int marksurfaceCount;
+	TOADLET_SHARED_POINTERS(Archive);
+
+	virtual bool open(InputStream::ptr inputStream)=0;
 };
 
 }
@@ -48,3 +46,4 @@ egg::Collection<Brush> brushes;
 }
 
 #endif
+

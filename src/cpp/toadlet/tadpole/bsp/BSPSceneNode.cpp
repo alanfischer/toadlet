@@ -26,9 +26,11 @@
 #include <toadlet/peeper/VertexFormat.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/bsp/BSPSceneNode.h>
+#include <toadlet/tadpole/node/MeshNode.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
+using namespace toadlet::tadpole::mesh;
 using namespace toadlet::tadpole::node;
 
 namespace toadlet{
@@ -37,7 +39,11 @@ namespace bsp{
 
 TOADLET_NODE_IMPLEMENT(BSPSceneNode,"toadlet::tadpole::bsp::BSPSceneNode");
 
-BSPSceneNode::BSPSceneNode():Scene(){}
+BSPSceneNode::BSPSceneNode():node::Scene(),
+	mEpsilon(0)
+{
+	mEpsilon=0.03125f * 2.0f;
+}
 
 BSPSceneNode::~BSPSceneNode(){}
 
@@ -176,6 +182,23 @@ void BSPSceneNode::setBSPMap(BSPMap::ptr map){
 
 	decompressVIS();
 
+	Texture::ptr bottom=mEngine->getTextureManager()->findTexture("nightsky/nightsky_down.png");
+	Texture::ptr top=mEngine->getTextureManager()->findTexture("nightsky/nightsky_up.png");
+	Texture::ptr left=mEngine->getTextureManager()->findTexture("nightsky/nightsky_west.png");
+	Texture::ptr right=mEngine->getTextureManager()->findTexture("nightsky/nightsky_east.png");
+	Texture::ptr back=mEngine->getTextureManager()->findTexture("nightsky/nightsky_south.png");
+	Texture::ptr front=mEngine->getTextureManager()->findTexture("nightsky/nightsky_north.png");
+
+	Mesh::ptr mesh=mEngine->getMeshManager()->createSkyBox(1024,false,bottom,top,left,right,back,front);
+	for(i=0;i<mesh->subMeshes.size();++i){
+		mesh->subMeshes[i]->material->setLayer(-1);
+	}
+	setLayerClearing(0,false);
+
+	node::MeshNode::ptr node=mEngine->createNodeType(node::MeshNode::type());
+	node->setMesh(mesh);
+	getBackground()->attach(node);
+
 	getRenderLayer(0)->forceRender=true;
 }
 
@@ -205,6 +228,218 @@ int BSPSceneNode::findLeaf(const Vector3 &point) const{
 	}
 
 	return -(nodeIndex+1);
+}
+
+scalar BSPSceneNode::traceSegment(Vector3 &normal,const Segment &segment){
+	scalar result=Math::ONE;
+	Vector3 end;
+	segment.getEndPoint(end);
+	traceNode(result,normal,0,segment.origin,end,0,Math::ONE,NULL,NULL);
+	return result;
+}
+
+scalar BSPSceneNode::traceSphere(Vector3 &normal,const Segment &segment,const Sphere &sphere){
+	scalar result=Math::ONE;
+	Vector3 end;
+	segment.getEndPoint(end);
+	traceNode(result,normal,0,segment.origin,end,0,Math::ONE,&sphere,NULL);
+	return result;
+}
+
+scalar BSPSceneNode::traceAABox(Vector3 &normal,const Segment &segment,const AABox &box){
+	scalar result=Math::ONE;
+	Vector3 end;
+	segment.getEndPoint(end);	
+	traceNode(result,normal,0,segment.origin,end,0,Math::ONE,NULL,&box);
+	return result;
+}
+
+// TODO: Rework this so we dont need to pass, start,end AND startFraction,endFraction.  We could probably get away with only fractions?
+// TODO: Change the BSP naming stuff to use nodei & such to indicate an index into an array perhaps?
+void BSPSceneNode::traceNode(scalar &result,Vector3 &normal,int nodeIndex,const Vector3 &start,const Vector3 &end,scalar startFraction,scalar endFraction,const Sphere *sphere,const AABox *box){
+	int i;
+
+	if(nodeIndex<0){
+		const Leaf &leaf=mBSPMap->leaves[-nodeIndex-1];
+int z=0;
+for(i=0;i<leaf.brushes.size();++i){
+const Brush &brush=leaf.brushes[i];
+if(brush.contents!=-1){ // TODO: -2=CONTENTS_SOLID, This is in BSP30Handler, and shouldnt be tested this way
+traceBrush(result,normal,brush,start,end,sphere,box);
+z++;
+}
+}
+Logger::alert(String("We are tracing brushes:")+z);
+
+//		for(i=0;i<leaf.brushCount;++i){
+//			const Brush &brush=mBSPMap->brushes[leaf.brushStart+i];
+//Logger::alert(String("contents:")+brush.contents);
+//			if(brush.contents==-2){ // TODO: -2=CONTENTS_SOLID, This is in BSP30Handler, and shouldnt be tested this way
+//				traceBrush(result,normal,brush,start,end,sphere,box);
+//			}
+//		}
+		return;
+	}
+
+	const bsp::Node &node=mBSPMap->nodes[nodeIndex];
+	const Plane &plane=mBSPMap->planes[node.plane];
+
+	scalar startDistance=Math::length(plane,start);
+	scalar endDistance=Math::length(plane,end);
+	scalar offset=0;
+	if(sphere!=NULL){
+		offset=sphere->radius;
+	}
+	else if(box!=NULL){
+		offset=	Math::abs(Math::mul(Math::maxVal(box->mins.x,box->maxs.x),plane.normal.x)) +
+				Math::abs(Math::mul(Math::maxVal(box->mins.y,box->maxs.y),plane.normal.y)) +
+				Math::abs(Math::mul(Math::maxVal(box->mins.z,box->maxs.z),plane.normal.z));
+	}
+
+	if(startDistance>=offset && endDistance>=offset){
+		// Segment is all in front
+		traceNode(result,normal,node.children[0],start,end,startFraction,endFraction,sphere,box);
+	}
+	else if(startDistance<-offset && endDistance<-offset){
+		// Segment is all behind
+		traceNode(result,normal,node.children[1],start,end,startFraction,endFraction,sphere,box);
+	}
+	else{
+		// Split segment
+		int side;
+		scalar fraction1, fraction2, middleFraction;
+		Vector3 middle;
+
+		// split the segment into two
+		if (startDistance < endDistance)
+		{
+			side = 1; // back
+			scalar inverseDistance = Math::div(Math::ONE,startDistance - endDistance);
+			fraction1 = (startDistance - offset + mEpsilon) * inverseDistance;
+			fraction2 = (startDistance + offset + mEpsilon) * inverseDistance;
+		}
+		else if (endDistance < startDistance)
+		{
+			side = 0; // front
+			scalar inverseDistance = Math::div(Math::ONE,startDistance - endDistance);
+			fraction1 = (startDistance + offset + mEpsilon) * inverseDistance;
+			fraction2 = (startDistance - offset - mEpsilon) * inverseDistance;
+		}
+		else
+		{
+			side = 0; // front
+			fraction1 = Math::ONE;
+			fraction2 = 0;
+		}
+
+		// make sure the numbers are valid
+		fraction1=Math::clamp(0,Math::ONE,fraction1);
+		fraction2=Math::clamp(0,Math::ONE,fraction2);
+
+		// calculate the middle point for the first side
+		middleFraction = startFraction + Math::mul(endFraction - startFraction, fraction1);
+		Math::lerp(middle,start,end,fraction1);
+
+		// check the first side
+		traceNode(result,normal,node.children[side],start,end,startFraction,middleFraction,sphere,box);
+
+		// calculate the middle point for the second side
+		middleFraction = startFraction + Math::mul(endFraction - startFraction, fraction2);
+		Math::lerp(middle,start,end,fraction2);
+
+		// check the second side
+		traceNode(result,normal,node.children[!side],start,end,startFraction,middleFraction,sphere,box);
+	}
+}
+
+void BSPSceneNode::traceBrush(scalar &result,Vector3 &normal,const Brush &brush,const Vector3 &start,const Vector3 &end,const Sphere *sphere,const AABox *box){
+	scalar startFraction=-Math::ONE,endFraction=Math::ONE;
+	Vector3 startNormal;
+	bool startsOut=false;
+	bool endsOut=false;
+	int i,j;
+
+	for(i=0;i<brush.planeCount;i++){
+		const Plane &plane=mBSPMap->planes[brush.planeStart+i];
+
+		scalar startDistance, endDistance;
+		if(sphere==NULL && box==NULL){
+			startDistance=Math::length(plane,start) + mEpsilon;
+			endDistance=Math::length(plane,end) - mEpsilon;
+		}
+		else if(sphere!=NULL){
+			startDistance=Math::length(plane,start) - sphere->radius + mEpsilon;
+			endDistance=Math::length(plane,end)- sphere->radius - mEpsilon;
+		}
+		else if(box!=NULL){
+			Vector3 offset;
+			for(j=0;j<3;++j){
+				if(plane.normal[j]<0){
+					offset[j]=box->mins[j];
+				}
+				else{
+					offset[j]=box->maxs[j];
+				}
+			}
+
+			Vector3 temp;
+			Math::add(temp,start,offset);
+			startDistance=Math::length(plane,temp) + mEpsilon;
+			Math::add(temp,end,offset);
+			endDistance=Math::length(plane,temp) - mEpsilon;
+		}
+
+		if(startDistance>0){
+			startsOut=true;
+		}
+		if(endDistance>0){
+			endsOut=true;
+		}
+
+		// make sure the trace isn't completely on one side of the brush
+		if(startDistance>0 && endDistance>0){
+			// both are in front of the plane, its outside of this brush
+			return;
+		}
+		if(startDistance<=0 && endDistance<=0){
+			// both are behind this plane, it will get clipped by another one
+			continue;
+		}
+
+		if(startDistance>endDistance){
+			// line is entering into the brush
+			scalar fraction=Math::div(startDistance-mEpsilon, startDistance-endDistance);
+			if(fraction>startFraction){
+				startFraction=fraction;
+				startNormal=plane.normal;
+			}
+		}
+		else{
+			// line is leaving the brush
+			scalar fraction=Math::div(startDistance+mEpsilon, startDistance-endDistance);
+			if(fraction<endFraction){
+				endFraction=fraction;
+			}
+		}
+	}
+
+	if(startsOut==false){
+//		outputStartsOut=false;
+//		if(endsOut==false){
+//			outputAllSolid=true;
+//		}
+		return;
+	}
+
+	if(startFraction<endFraction){
+		if(startFraction>-Math::ONE && startFraction<result){
+			if(startFraction<0){
+				startFraction=0;
+			}
+			result=startFraction;
+			normal=startNormal;
+		}
+	}
 }
 
 void BSPSceneNode::decompressVIS(){
