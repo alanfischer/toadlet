@@ -52,7 +52,7 @@ public:
 
 		SubMesh(MeshNode *meshNode,mesh::Mesh::SubMesh *meshSubMesh);
 
-		void queueRenderable(Scene *queue){} // Queuing done by parent
+		void queueRenderable(SceneNode *queue,CameraNode *camera){} // Queuing done by parent
 		Material *getRenderMaterial() const{return material;}
 		const Matrix4x4 &getRenderTransform() const{return meshNode->getRenderWorldTransform();}
 		void render(peeper::Renderer *renderer) const;
@@ -118,7 +118,7 @@ public:
 	void createVertexBuffer();
 	void updateVertexBuffer();
 
-	void queueRenderable(Scene *queue);
+	void queueRenderable(SceneNode *queue,CameraNode *camera);
 	Material *getRenderMaterial() const{return NULL;}
 	const Matrix4x4 &getRenderTransform() const{return mRenderWorldTransform;}
 	void render(peeper::Renderer *renderer) const{} // Rendering done by children

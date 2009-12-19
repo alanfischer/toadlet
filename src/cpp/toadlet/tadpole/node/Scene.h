@@ -26,20 +26,32 @@
 #ifndef TOADLET_TADPOLE_NODE_SCENE_H
 #define TOADLET_TADPOLE_NODE_SCENE_H
 
+#include <toadlet/peeper/Color.h>
+#include <toadlet/peeper/RenderTarget.h>
+#include <toadlet/peeper/TextureStage.h>
+#include <toadlet/tadpole/UpdateListener.h>
+#include <toadlet/tadpole/node/ParentNode.h>
+#include <toadlet/tadpole/node/Renderable.h>
+#include <toadlet/tadpole/node/Scene.h>
+
 namespace toadlet{
 namespace tadpole{
 namespace node{
 
 class Scene{
 public:
+	TOADLET_INTRUSIVE_POINTERS(Scene);
+
 	virtual ~Scene(){}
 
 	virtual void destroy()=0;
 
 	// Get information about the decorator chain, NOT the scene graph
+	virtual void setChildScene(Scene *scene)=0;
 	virtual Scene *getRootScene()=0;
-	
-	virtual const ParentNode::ptr &getBackground() const=0;
+
+	virtual ParentNode *getBackground()=0;
+	virtual ParentNode *getRootNode()=0;
 
 	virtual void setAmbientColor(peeper::Color ambientColor)=0;
 	virtual const peeper::Color &getAmbientColor() const=0;
@@ -51,19 +63,22 @@ public:
 	virtual void setLogicTimeAndFrame(int time,int frame)=0;
 	virtual int getLogicTime() const=0;
 	virtual int getLogicFrame() const=0;
+	virtual scalar getLogicFraction() const=0;
 	virtual int getRenderTime() const=0;
 	virtual int getRenderFrame() const=0;
 
 	virtual void update(int dt)=0;
 	virtual void render(peeper::Renderer *renderer,CameraNode *cameraNode,Node *node)=0;
 
-	virtual void preLogicUpdateLoop(int dt);
-	virtual void logicUpdate(int dt);
-	virtual void postLogicUpdateLoop(int dt);
-	virtual void renderUpdate(int dt);
+	virtual void preLogicUpdateLoop(int dt)=0;
+	virtual void logicUpdate(int dt)=0;
+	virtual void postLogicUpdateLoop(int dt)=0;
+	virtual void renderUpdate(int dt)=0;
 
 	virtual void setUpdateListener(UpdateListener *updateListener)=0;
 	virtual UpdateListener *getUpdateListener() const=0;
+
+	virtual egg::PointerCounter *getCounter() const=0;
 };
 
 }

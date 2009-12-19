@@ -264,7 +264,7 @@ void HopEntity::setShadowMesh(Mesh::ptr shadow,scalar scale,scalar testLength,sc
 	if(mShadowMesh!=NULL){
 		if(mShadowNode==NULL){
 			mShadowNode=mEngine->createNodeType(MeshNode::type());
-			mScene->attach(mShadowNode);
+			mScene->getRootNode()->attach(mShadowNode);
 		}
 		mShadowNode->setMesh(mShadowMesh);
 		mShadowNode->setScale(scale,scale,scale);
@@ -282,7 +282,7 @@ void HopEntity::setShadowMesh(Mesh::ptr shadow,scalar scale,scalar testLength,sc
 
 void HopEntity::parentChanged(ParentNode *parent){
 	if(mScene!=NULL){
-		if(parent==mScene){
+		if(parent==mScene->getRootNode()){
 			mScene->getSimulator()->addSolid(getSolid());
 		}
 		else{
@@ -383,7 +383,7 @@ void HopEntity::showCollisionVolumes(bool show){
 	if(show){
 		if(mVolumeNode==NULL){
 			mVolumeNode=mEngine->createNodeType(ParentNode::type());
-			mScene->attach(mVolumeNode);
+			mScene->getRootNode()->attach(mVolumeNode);
 		}
 		else{
 			while(mVolumeNode->getNumChildren()>0){

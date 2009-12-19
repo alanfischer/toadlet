@@ -134,7 +134,7 @@ public:
 	
 	virtual void logicUpdate(int dt);
 	virtual void renderUpdate(int dt);
-	virtual void queueRenderable(Scene *scene);
+	virtual void queueRenderable(SceneNode *scene,CameraNode *camera);
 
 	virtual Material *getRenderMaterial() const{return mMaterial;}
 	virtual const Matrix4x4 &getRenderTransform() const;

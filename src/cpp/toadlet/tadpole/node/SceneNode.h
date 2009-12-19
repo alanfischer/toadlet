@@ -34,6 +34,7 @@
 #include <toadlet/tadpole/node/LightNode.h>
 #include <toadlet/tadpole/node/ParticleNode.h>
 #include <toadlet/tadpole/node/Renderable.h>
+#include <toadlet/tadpole/node/Scene.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -61,9 +62,13 @@ public:
 	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
-	virtual const ParentNode::ptr &getBackground() const{return mBackground;}
+	virtual void setChildScene(Scene *scene){mChildScene=scene;}
+	virtual Scene *getRootScene(){return this;}
 
-	virtual void setAmbientColor(peeper::Color ambientColor){mAmbientColor.set(ambientColor);l}
+	virtual ParentNode *getBackground(){return mBackground;}
+	virtual ParentNode *getRootNode(){return this;}
+
+	virtual void setAmbientColor(peeper::Color ambientColor){mAmbientColor.set(ambientColor);}
 	virtual const peeper::Color &getAmbientColor() const{return mAmbientColor;}
 
 	virtual void setExcessiveDT(int dt){mExcessiveDT=dt;}
@@ -73,6 +78,7 @@ public:
 	virtual void setLogicTimeAndFrame(int time,int frame);
 	virtual int getLogicTime() const{return mLogicTime;}
 	virtual int getLogicFrame() const{return mLogicFrame;}
+	virtual scalar getLogicFraction() const{return Math::div(Math::fromInt(mAccumulatedDT),Math::fromInt(mLogicDT));}
 	virtual int getRenderTime() const{return mLogicTime+mAccumulatedDT;}
 	virtual int getRenderFrame() const{return mRenderFrame;}
 
@@ -90,6 +96,8 @@ public:
 	void queueRenderable(Renderable *renderable);
 	void queueLight(LightNode *light);
 	CameraNode *getCamera() const{return mCamera;} // Only valid during rendering operations
+
+	virtual egg::PointerCounter *getCounter() const{return super::getCounter();}
 
 protected:
 	class RenderLayer{
@@ -128,6 +136,8 @@ protected:
 
 	virtual bool preLayerRender(peeper::Renderer *renderer,int layer);
 	virtual bool postLayerRender(peeper::Renderer *renderer,int layer);
+
+	Scene *mChildScene;
 
 	int mExcessiveDT;
 	int mLogicDT;

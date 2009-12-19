@@ -70,7 +70,7 @@ public:
 	const Vector3 &getSize() const{return mSize;}
 	const Vector3 &getDesiredSize(){return Math::ZERO_VECTOR3;}
 
-	void queueRenderable(Scene *scene);
+	void queueRenderable(SceneNode *scene,CameraNode *camera);
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Matrix4x4 &getRenderTransform() const{return super::getRenderWorldTransform();}
 	void render(peeper::Renderer *renderer) const;

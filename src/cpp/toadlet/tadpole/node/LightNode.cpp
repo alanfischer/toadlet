@@ -25,6 +25,7 @@
 
 #include <toadlet/tadpole/node/LightNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
+#include <toadlet/tadpole/node/SceneNode.h>
 #include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet::peeper;
@@ -54,7 +55,7 @@ void LightNode::destroy(){
 	super::destroy();
 }
 
-void LightNode::queueRenderable(Scene *queue){
+void LightNode::queueRenderable(SceneNode *queue,CameraNode *node){
 	queue->queueLight(this);
 }
 

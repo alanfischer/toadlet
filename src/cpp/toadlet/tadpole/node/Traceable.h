@@ -23,35 +23,22 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_NODE_RENDERABLE_H
-#define TOADLET_TADPOLE_NODE_RENDERABLE_H
+#ifndef TOADLET_TADPOLE_NODE_TRACEABLE_H
+#define TOADLET_TADPOLE_NODE_TRACEABLE_H
 
 #include <toadlet/tadpole/Types.h>
-#include <toadlet/tadpole/Material.h>
 
 namespace toadlet{
-namespace peeper{
-
-class Renderer;
-
-}
 namespace tadpole{
-	
-class Material;
-
 namespace node{
 
-class SceneNode;
-class CameraNode;
-
-class Renderable{
+class Traceable{
 public:
-	virtual ~Renderable(){}
+	virtual ~Traceable(){}
 
-	virtual void queueRenderable(SceneNode *queue,CameraNode *camera)=0;
-	virtual Material *getRenderMaterial() const=0;
-	virtual const tadpole::Matrix4x4 &getRenderTransform() const=0;
-	virtual void render(peeper::Renderer *renderer) const=0;
+	virtual scalar traceSegment(Vector3 &normal,const Segment &segment)=0;
+	virtual scalar traceSphere(Vector3 &normal,const Segment &segment,const Sphere &sphere)=0;
+	virtual scalar traceAABox(Vector3 &normal,const Segment &segment,const AABox &box)=0;
 };
 
 }

@@ -28,7 +28,7 @@
 
 #include <toadlet/hop/Simulator.h>
 #include <toadlet/tadpole/plugins/hop/HopEntityFactory.h>
-#include <toadlet/tadpole/node/Scene.h> HACK
+#include <toadlet/tadpole/node/Scene.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -37,18 +37,50 @@ class HopNode;
 class HopCollision;
 class HopEntityMessage;
 
+// I'm not 100% sure that the decorator pattern was the correct hammer for this nail, but thats to be seen.
 class TOADLET_API HopScene:public node::Scene,public hop::Manager{
 public:
-	HopScene();
+	TOADLET_INTRUSIVE_POINTERS(HopScene);
+
+	HopScene(node::Scene::ptr scene);
 	virtual ~HopScene();
 
-	virtual void setScene(node::Scene *scene);
+	virtual void destroy(){mScene->destroy();}
 
-	virtual void setFluidVelocity(const Vector3 &fluidVelocity);
-	virtual const Vector3 &getFluidVelocity() const;
+	virtual void setChildScene(node::Scene *scene){mChildScene=scene;}
+	virtual node::Scene *getRootScene(){return mScene;}
 
-	virtual void setGravity(const Vector3 &gravity);
-	virtual const Vector3 &getGravity() const;
+	virtual node::ParentNode *getBackground(){return mScene->getBackground();}
+	virtual node::ParentNode *getRootNode(){return mScene->getRootNode();}
+
+	virtual void setAmbientColor(peeper::Color ambientColor){mScene->setAmbientColor(ambientColor);}
+	virtual const peeper::Color &getAmbientColor() const{return mScene->getAmbientColor();}
+
+	virtual void setExcessiveDT(int dt){mScene->setExcessiveDT(dt);}
+	virtual int getExcessiveDT() const{return mScene->getExcessiveDT();}
+	virtual void setLogicDT(int dt){mScene->setLogicDT(dt);}
+	virtual int getLogicDT() const{return mScene->getLogicDT();}
+	virtual void setLogicTimeAndFrame(int time,int frame){mScene->setLogicTimeAndFrame(time,frame);}
+	virtual int getLogicTime() const{return mScene->getLogicTime();}
+	virtual int getLogicFrame() const{return mScene->getLogicFrame();}
+	virtual scalar getLogicFraction() const{return mScene->getLogicFraction();}
+	virtual int getRenderTime() const{return mScene->getRenderTime();}
+	virtual int getRenderFrame() const{return mScene->getRenderFrame();}
+
+	virtual void update(int dt){mScene->update(dt);}
+	virtual void render(peeper::Renderer *renderer,node::CameraNode *cameraNode,node::Node *node){mScene->render(renderer,cameraNode,node);}
+
+	virtual void setUpdateListener(UpdateListener *updateListener){mScene->setUpdateListener(updateListener);}
+	virtual UpdateListener *getUpdateListener() const{return mScene->getUpdateListener();}
+
+	virtual void setFluidVelocity(const Vector3 &fluidVelocity){mSimulator->setFluidVelocity(fluidVelocity);}
+	virtual const Vector3 &getFluidVelocity() const{return mSimulator->getFluidVelocity();}
+
+	virtual void setGravity(const Vector3 &gravity){mSimulator->setGravity(gravity);}
+	virtual const Vector3 &getGravity() const{return mSimulator->getGravity();}
+
+	virtual void setEpsilon(scalar epsilon){mSimulator->setEpsilon(epsilon);}
+	virtual scalar getEpsilon() const{return mSimulator->getEpsilon();}
 
 	virtual void findHopEntitiesInAABox(const AABox &box,egg::Collection<egg::IntrusivePointer<HopEntity> > &entities);
 	virtual void findHopEntitiesInSphere(const Sphere &sphere,egg::Collection<egg::IntrusivePointer<HopEntity> > &entities);
@@ -69,7 +101,7 @@ public:
 
 	inline hop::Simulator *getSimulator(){return mSimulator;}
 
-	virtual node::ParticleNode::ParticleSimulator::ptr newParticleSimulator(node::ParticleNode *particleNode);
+//	virtual node::ParticleNode::ParticleSimulator::ptr newParticleSimulator(node::ParticleNode *particleNode);
 	virtual void registerHopEntity(HopEntity *entity);
 	virtual void unregisterHopEntity(HopEntity *entity);
 
@@ -78,37 +110,18 @@ public:
 	virtual void postLogicUpdateLoop(int dt);
 	virtual void renderUpdate(int dt);
 
-	hop::Collision cache_traceSegment_collision;
+	void traceSegment(hop::Collision &result,const Segment &segment);
+	void traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid);
+	void preUpdate(int,scalar){}
+	void preUpdate(hop::Solid*,int,scalar){}
+	void intraUpdate(hop::Solid*,int,scalar){}
+	bool collisionResponse(hop::Solid*,Vector3&,Vector3&,hop::Collision&){return false;}
+	void postUpdate(hop::Solid*,int,scalar){}
+	void postUpdate(int,scalar){}
 
-	// HACK:
-hop::Solid *mWorld;
-void traceSegment(hop::Collision &result,const Segment &segment){
-	result.time=super::traceSegment(result.normal,segment);
-	if(result.time==1.0){result.time=-1;}
-	if(result.time<0) result.point=segment.origin+segment.direction;
-	else{result.point=segment.origin+segment.direction*result.time;
-		result.collider=mWorld;
-	}
-}
-void traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid){
-	if(solid->getShape(0)->getType()==hop::Shape::Type_AABOX){
-		result.time=super::traceAABox(result.normal,segment,solid->getShape(0)->getAABox());
-	}
-	else if(solid->getShape(0)->getType()==hop::Shape::Type_SPHERE){
-		result.time=super::traceSphere(result.normal,segment,solid->getShape(0)->getSphere());
-	}
-	if(result.time==1.0){result.time=-1;}
-	if(result.time<0) result.point=segment.origin+segment.direction;
-	else{result.point=segment.origin+segment.direction*result.time;
-		result.collider=mWorld;
-	}
-}
-void preUpdate(int,scalar){}
-void preUpdate(hop::Solid*,int,scalar){}
-void intraUpdate(hop::Solid*,int,scalar){}
-bool collisionResponse(hop::Solid*,Vector3&,Vector3&,hop::Collision&){return false;}
-void postUpdate(hop::Solid*,int,scalar){}
-void postUpdate(int,scalar){}
+	virtual egg::PointerCounter *getCounter() const{return mCounter;}
+
+	hop::Collision cache_traceSegment_collision;
 
 protected:
 	virtual void defaultRegisterHopEntity(HopEntity *entity);
@@ -116,12 +129,18 @@ protected:
 
 	void castShadow(peeper::Renderer *renderer,HopEntity *entity);
 
+	egg::PointerCounter *mCounter;
+	node::Scene *mChildScene;
+	node::Scene::ptr mScene;
+	node::Traceable *mTraceable;
+
 	egg::Collection<HopEntity*> mHopEntities;
 	bool mShowCollisionVolumes;
 	bool mInterpolateCollisionVolumes;
 
 	int mExcessiveDT;
 	hop::Simulator *mSimulator;
+	hop::Solid::ptr mWorld;
 
 	egg::Collection<int> mFreeNetworkIDs;
 	egg::Collection<egg::IntrusivePointer<HopEntity> > mNetworkIDMap;

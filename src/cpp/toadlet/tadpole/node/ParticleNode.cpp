@@ -29,6 +29,7 @@
 #include <toadlet/tadpole/node/ParticleNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/CameraNode.h>
+#include <toadlet/tadpole/node/SceneNode.h>
 #include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet::egg;
@@ -356,7 +357,7 @@ void ParticleNode::setMaterial(Material::ptr material){
 
 void ParticleNode::startSimulating(ParticleSimulator::ptr particleSimulator){
 	if(particleSimulator==NULL){
-		particleSimulator=mEngine->getScene()->newParticleSimulator(this);
+//		particleSimulator=mEngine->getScene()->newParticleSimulator(this);
 	}
 	mParticleSimulator=particleSimulator;
 
@@ -393,13 +394,13 @@ void ParticleNode::renderUpdate(int dt){
 	}
 }
 	
-void ParticleNode::queueRenderable(Scene *scene){
+void ParticleNode::queueRenderable(SceneNode *scene,CameraNode *camera){
 	if(mUpdateParticles){
 		if(mHasIdealViewTransform){
 			updateVertexBuffer(mIdealViewTransform);
 		}
 		else{
-			updateVertexBuffer(scene->getIdealParticleViewTransform());
+//			updateVertexBuffer(scene->getIdealParticleViewTransform());
 		}
 		mUpdateParticles=false;
 	}
