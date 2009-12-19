@@ -28,6 +28,7 @@
 #include <toadlet/egg/Profile.h>
 #include <toadlet/peeper/CapabilitySet.h> 
 #include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/node/Traceable.h>
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
 #include <toadlet/tadpole/plugins/hop/HopEntity.h>
 #include <toadlet/tadpole/plugins/hop/HopCollision.h>
@@ -41,9 +42,12 @@ using namespace toadlet::tadpole::node;
 namespace toadlet{
 namespace tadpole{
 
-TOADLET_NODE_IMPLEMENT(HopScene,"toadlet::tadpole::HopScene");
+HopScene::HopScene(Scene::ptr scene):
+	mCounter(new PointerCounter(0)),
+	//mScene,
+	//mChildScene,
+	mTraceable(NULL),
 
-HopScene::HopScene():toadlet::tadpole::bsp::BSPSceneNode(),
 	//mHopEntities,
 	mShowCollisionVolumes(false),
 	mInterpolateCollisionVolumes(false),
@@ -58,22 +62,17 @@ HopScene::HopScene():toadlet::tadpole::bsp::BSPSceneNode(),
 	//mSolidCollection
 {
 	mSimulator=new Simulator();
+	mSimulator->setManager(this);
+	mScene=scene;
+	mScene->setChildScene(this);
+	mTraceable=mScene->getRootNode()->isTraceable();
 
+	resetNetworkIDs();
 
-
-mSimulator->setSnapToGrid(true);
-mSimulator->setManager(this);
-mSimulator->setEpsilon(mEpsilon/2);
-mSimulator->setGravity(Vector3(0,0,-750.0f));
-mSimulator->setMicroCollisionThreshold(200);
-setLogicDT(25);
-showCollisionVolumes(true,true);
-
-mWorld=new Solid();
-mWorld->setLocalGravity(Math::ZERO_VECTOR3);
-mWorld->setInfiniteMass();
-/*mSimulator->addSolid(mWorld);
-*/
+	mWorld=Solid::ptr(new Solid());
+	mWorld->setLocalGravity(Math::ZERO_VECTOR3);
+	mWorld->setInfiniteMass();
+	mSimulator->addSolid(mWorld);
 }
 
 HopScene::~HopScene(){
@@ -81,30 +80,6 @@ HopScene::~HopScene(){
 		delete mSimulator;
 		mSimulator=NULL;
 	}
-}
-
-Node *HopScene::create(Engine *engine){
-	super::create(engine);
-
-	resetNetworkIDs();
-
-	return this;
-}
-
-void HopScene::setFluidVelocity(const Vector3 &fluidVelocity){
-	mSimulator->setFluidVelocity(fluidVelocity);
-}
-
-const Vector3 &HopScene::getFluidVelocity() const{
-	return mSimulator->getFluidVelocity();
-}
-
-void HopScene::setGravity(const Vector3 &gravity){
-	mSimulator->setGravity(gravity);
-}
-
-const Vector3 &HopScene::getGravity() const{
-	return mSimulator->getGravity();
 }
 
 void HopScene::findHopEntitiesInAABox(const AABox &box,Collection<HopEntity::ptr> &entities){
@@ -203,9 +178,9 @@ void HopScene::showCollisionVolumes(bool show,bool interpolate){
 	}
 }
 
-ParticleNode::ParticleSimulator::ptr HopScene::newParticleSimulator(ParticleNode *particleNode){
-	return ParticleNode::ParticleSimulator::ptr(new HopParticleSimulator(this,particleNode));
-}
+//ParticleNode::ParticleSimulator::ptr HopScene::newParticleSimulator(ParticleNode *particleNode){
+//	return ParticleNode::ParticleSimulator::ptr(new HopParticleSimulator(this,particleNode));
+//}
 
 void HopScene::registerHopEntity(HopEntity *entity){
 	if(mHopEntities.contains(entity)==false){
@@ -239,10 +214,12 @@ void HopScene::preLogicUpdateLoop(int dt){
 		HopEntity *entity=mHopEntities[i];
 		entity->preLogicUpdateLoop(dt);
 	}
+
+	mScene->preLogicUpdateLoop(dt);
 }
 
 void HopScene::logicUpdate(int dt){
-	super::logicUpdate(dt);
+	mScene->logicUpdate(dt);
 
 	TOADLET_PROFILE_BEGINSECTION(Simulator::update);
 
@@ -258,13 +235,14 @@ void HopScene::logicUpdate(int dt){
 }
 
 void HopScene::postLogicUpdateLoop(int dt){
+	mScene->postLogicUpdateLoop(dt);
 }
 
 void HopScene::renderUpdate(int dt){
 	int i;
 	bool active,activePrevious;
 
-	scalar f=Math::div(Math::fromInt(mAccumulatedDT),Math::fromInt(mLogicDT));
+	scalar f=mScene->getLogicFraction();
 
 	for(i=mHopEntities.size()-1;i>=0;--i){
 		HopEntity *entity=mHopEntities[i];
@@ -287,7 +265,38 @@ void HopScene::renderUpdate(int dt){
 		}
 	}
 
-	super::renderUpdate(dt);
+	mScene->renderUpdate(dt);
+}
+
+void HopScene::traceSegment(Collision &result,const Segment &segment){
+	if(mTraceable!=NULL){
+		result.time=mTraceable->traceSegment(result.normal,segment);
+		if(result.time<0){
+			Math::add(result.point,segment.origin,segment.direction);
+		}
+		else{
+			Math::madd(result.point,segment.direction,result.time,segment.origin);
+			result.collider=mWorld;
+		}
+	}
+}
+
+void HopScene::traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid){
+	if(mTraceable!=NULL){
+		if(solid->getShape(0)->getType()==hop::Shape::Type_AABOX){
+			result.time=mTraceable->traceAABox(result.normal,segment,solid->getShape(0)->getAABox());
+		}
+		else if(solid->getShape(0)->getType()==hop::Shape::Type_SPHERE){
+			result.time=mTraceable->traceSphere(result.normal,segment,solid->getShape(0)->getSphere());
+		}
+		if(result.time<0){
+			Math::add(result.point,segment.origin,segment.direction);
+		}
+		else{
+			Math::madd(result.point,segment.direction,result.time,segment.origin);
+			result.collider=mWorld;
+		}
+	}
 }
 
 void HopScene::defaultRegisterHopEntity(HopEntity *entity){

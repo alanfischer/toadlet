@@ -70,7 +70,7 @@ public:
 
 	inline peeper::Light *internal_getLight(){return mLight;}
 
-	void queueRenderable(Scene *queue);
+	void queueRenderable(SceneNode *queue,CameraNode *camera);
 	Material *getRenderMaterial() const{return NULL;}
 	const tadpole::Matrix4x4 &getRenderTransform() const{return Math::IDENTITY_MATRIX4X4;}
 	void render(peeper::Renderer *renderer) const{return;}

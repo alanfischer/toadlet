@@ -24,8 +24,10 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
+#include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/node/LabelNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
+#include <toadlet/tadpole/node/SceneNode.h>
 #include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet::egg;
@@ -155,7 +157,7 @@ const Vector3 &LabelNode::getDesiredSize(){
 	return Math::ZERO_VECTOR3;
 }
 
-void LabelNode::queueRenderable(Scene *scene){
+void LabelNode::queueRenderable(SceneNode *scene,CameraNode *camera){
 	if(mVertexData==NULL || mIndexData==NULL){
 		return;
 	}
@@ -165,8 +167,8 @@ void LabelNode::queueRenderable(Scene *scene){
 		Vector4 &point=cache_queueRenderable_point.reset();
 
 		point.set(mRenderWorldTransform.at(0,3),mRenderWorldTransform.at(1,3),mRenderWorldTransform.at(2,3),Math::ONE);
-		Math::mul(point,scene->getCamera()->getViewTransform());
-		Math::mul(point,scene->getCamera()->getProjectionTransform());
+		Math::mul(point,camera->getViewTransform());
+		Math::mul(point,camera->getProjectionTransform());
 		scale.setAt(0,0,point.w);
 		scale.setAt(1,1,point.w);
 		scale.setAt(2,2,point.w);

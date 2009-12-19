@@ -26,6 +26,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/node/MeshNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
+#include <toadlet/tadpole/node/SceneNode.h>
 #include <toadlet/tadpole/animation/SkeletonAnimation.h>
 #include <toadlet/tadpole/Engine.h>
 #include <stdlib.h>
@@ -256,7 +257,7 @@ void MeshNode::renderUpdate(int dt){
 	}
 }
 
-void MeshNode::queueRenderable(Scene *scene){
+void MeshNode::queueRenderable(SceneNode *scene,CameraNode *camera){
 	if(mMesh!=NULL && mMesh->worldScale!=Math::ONE){
 		mRenderWorldTransform.reset();
 		mRenderWorldTransform.setAt(0,0,mMesh->worldScale);

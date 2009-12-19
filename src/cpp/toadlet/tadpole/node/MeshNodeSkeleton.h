@@ -117,7 +117,7 @@ public:
 	void setRenderable(bool renderable);
 	void updateVertexData();
 
-	void queueRenderable(Scene *queue){} // Queued by parent
+	void queueRenderable(SceneNode *queue,CameraNode *camera){} // Queued by parent
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Matrix4x4 &getRenderTransform() const;
 	void render(peeper::Renderer *renderer) const;

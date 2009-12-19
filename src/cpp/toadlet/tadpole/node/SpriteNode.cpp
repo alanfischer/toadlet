@@ -24,9 +24,10 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
-#include <toadlet/tadpole/node/SpriteNode.h>
-#include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/CameraNode.h>
+#include <toadlet/tadpole/node/ParentNode.h>
+#include <toadlet/tadpole/node/SceneNode.h>
+#include <toadlet/tadpole/node/SpriteNode.h>
 #include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet::egg;
@@ -164,7 +165,7 @@ void SpriteNode::setSize(const Vector3 &size){
 	updateSprite();
 }
 
-void SpriteNode::queueRenderable(Scene *scene){
+void SpriteNode::queueRenderable(SceneNode *scene,CameraNode *camera){
 	if(mVertexData==NULL || mIndexData==NULL){
 		return;
 	}
@@ -176,8 +177,8 @@ void SpriteNode::queueRenderable(Scene *scene){
 		Vector4 &point=cache_queueRenderable_point.reset();
 
 		point.set(mRenderWorldTransform.at(0,3),mRenderWorldTransform.at(1,3),mRenderWorldTransform.at(2,3),Math::ONE);
-		Math::mul(point,scene->getCamera()->getViewTransform());
-		Math::mul(point,scene->getCamera()->getProjectionTransform());
+		Math::mul(point,camera->getViewTransform());
+		Math::mul(point,camera->getProjectionTransform());
 		scale.setAt(0,0,point.w);
 		scale.setAt(1,1,point.w);
 		scale.setAt(2,2,point.w);

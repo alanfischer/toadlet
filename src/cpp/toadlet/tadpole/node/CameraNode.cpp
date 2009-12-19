@@ -178,10 +178,6 @@ void CameraNode::setNearAndFarDist(scalar nearDist,scalar farDist){
 	}
 }
 
-void CameraNode::setAlignmentCalculationsUseOrigin(bool origin){
-	mAlignmentCalculationsUseOrigin=origin;
-}
-
 void CameraNode::setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up){
 	Math::setMatrix4x4FromLookAt(mRenderTransform,eye,point,up,true);
 
@@ -210,18 +206,6 @@ void CameraNode::setViewport(const Viewport &viewport){
 void CameraNode::setViewport(int x,int y,int width,int height){
 	mViewportSet=true;
 	mViewport.set(x,y,width,height);
-}
-
-void CameraNode::setClearFlags(int clearFlags){
-	mClearFlags=clearFlags;
-}
-
-void CameraNode::setClearColor(Color clearColor){
-	mClearColor.set(clearColor);
-}
-
-void CameraNode::setSkipFirstClear(bool skip){
-	mSkipFirstClear=skip;
 }
 
 ParentNode::ptr CameraNode::getMidNode(){

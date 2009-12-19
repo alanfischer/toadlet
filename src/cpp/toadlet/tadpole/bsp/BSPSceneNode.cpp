@@ -40,7 +40,7 @@ namespace bsp{
 
 TOADLET_NODE_IMPLEMENT(BSPSceneNode,"toadlet::tadpole::bsp::BSPSceneNode");
 
-BSPSceneNode::BSPSceneNode():node::Scene(),
+BSPSceneNode::BSPSceneNode():super(),
 	mEpsilon(0)
 {
 	mEpsilon=0.03125f;
@@ -301,6 +301,9 @@ scalar BSPSceneNode::traceSegment(Vector3 &normal,const Segment &segment){
 	Vector3 end;
 	segment.getEndPoint(end);
 	traceNode(result,normal,0,segment.origin,end,0,Math::ONE,NULL,NULL);
+	if(result==Math::ONE){
+		result=-Math::ONE;
+	}
 	return result;
 }
 
@@ -309,6 +312,9 @@ scalar BSPSceneNode::traceSphere(Vector3 &normal,const Segment &segment,const Sp
 	Vector3 end;
 	segment.getEndPoint(end);
 	traceNode(result,normal,0,segment.origin,end,0,Math::ONE,&sphere,NULL);
+	if(result==Math::ONE){
+		result=-Math::ONE;
+	}
 	return result;
 }
 
@@ -317,6 +323,9 @@ scalar BSPSceneNode::traceAABox(Vector3 &normal,const Segment &segment,const AAB
 	Vector3 end;
 	segment.getEndPoint(end);	
 	traceNode(result,normal,0,segment.origin,end,0,Math::ONE,NULL,&box);
+	if(result==Math::ONE){
+		result=-Math::ONE;
+	}
 	return result;
 }
 
@@ -583,6 +592,7 @@ void BSPSceneNode::processVisibleFaces(CameraNode *camera){
 }
 
 void BSPSceneNode::renderVisibleFaces(Renderer *renderer){
+getRenderLayer(0)->clearLayer=false;
 	int i,j;
 	RendererData &data=(RendererData&)mRendererData;
 	TextureStage::ptr textureStage(new TextureStage());

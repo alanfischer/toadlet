@@ -26,7 +26,8 @@
 #ifndef TOADLET_TADPOLE_BSP_BSPSCENENODE_H
 #define TOADLET_TADPOLE_BSP_BSPSCENENODE_H
 
-#include <toadlet/tadpole/node/Scene.h>
+#include <toadlet/tadpole/node/SceneNode.h>
+#include <toadlet/tadpole/node/Traceable.h>
 #include <toadlet/tadpole/bsp/BSPMap.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
@@ -36,14 +37,21 @@ namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class TOADLET_API BSPSceneNode:public node::Scene{
+class TOADLET_API BSPSceneNode:public node::SceneNode,public node::Traceable{
 public:
-	TOADLET_NODE(BSPSceneNode,Scene);
+	TOADLET_NODE(BSPSceneNode,SceneNode);
 
 	BSPSceneNode();
 	virtual ~BSPSceneNode();
 	virtual node::Node *create(Engine *engine);
 	virtual void destroy();
+
+	virtual Traceable *isTraceable(){return this;}
+
+	Scene *getRootScene(){return this;}
+
+	void setEpsilon(scalar epsilon){mEpsilon=epsilon;}
+	scalar getEpsilon() const{return mEpsilon;}
 
 	void setBSPMap(BSPMap::ptr map);
 	BSPMap::ptr getBSPMap() const{return mBSPMap;}

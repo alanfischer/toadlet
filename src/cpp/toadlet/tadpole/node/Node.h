@@ -55,6 +55,7 @@ namespace node{
 
 class ParentNode;
 class Renderable;
+class Traceable;
 class Scene;
 class Sizeable;
 
@@ -70,6 +71,7 @@ public:
 	inline bool destroyed() const{return !mCreated;}
 	virtual ParentNode *isParent(){return NULL;}
 	virtual Renderable *isRenderable(){return NULL;}
+	virtual Traceable *isTraceable(){return NULL;}
 	// TODO: I am still not 100% sure on using the Sizeable interface.
 	//  Not only does it seem to conflict with the idea of Scalable nodes,
 	//  it also seems like it would be better handled using OrientedBoundingBoxes.
@@ -172,7 +174,7 @@ protected:
 
 	Vector3 cache_setRotate_vector;
 
-	friend class Scene;
+	friend class SceneNode;
 };
 
 }

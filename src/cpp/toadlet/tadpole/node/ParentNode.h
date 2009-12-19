@@ -65,7 +65,7 @@ protected:
 	bool mShadowChildrenDirty;
 	egg::Collection<Node::ptr> mShadowChildren;
 
-	friend class Scene;
+	friend class SceneNode;
 };
 
 }

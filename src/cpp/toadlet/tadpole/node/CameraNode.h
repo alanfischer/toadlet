@@ -57,7 +57,7 @@ public:
 	void setProjectionRotation(scalar rotate);
 	void setNearAndFarDist(scalar nearDist,scalar farDist);
 
-	void setAlignmentCalculationsUseOrigin(bool origin);
+	void setAlignmentCalculationsUseOrigin(bool origin){mAlignmentCalculationsUseOrigin=origin;}
 	bool getAlignmentCalculationsUseOrigin() const{return mAlignmentCalculationsUseOrigin;}
 
 	void setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up);
@@ -66,9 +66,9 @@ public:
 	void setViewport(const peeper::Viewport &viewport);
 	void setViewport(int x,int y,int width,int height);
 
-	void setClearFlags(int clearFlags);
-	void setClearColor(peeper::Color clearColor);
-	void setSkipFirstClear(bool skip);
+	void setClearFlags(int clearFlags){mClearFlags=clearFlags;}
+	void setClearColor(peeper::Color clearColor){mClearColor.set(clearColor);}
+	void setSkipFirstClear(bool skip){mSkipFirstClear=skip;}
 
 	ParentNode::ptr getMidNode();
 
@@ -138,7 +138,7 @@ protected:
 	Matrix4x4 cache_setProjectionRotation_projection;
 	Vector3 cache_culled_vertex;
 
-	friend class Scene;
+	friend class SceneNode;
 };
 
 }

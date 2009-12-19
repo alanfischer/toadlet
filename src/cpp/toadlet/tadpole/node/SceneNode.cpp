@@ -26,9 +26,9 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Profile.h>
-#include <toadlet/tadpole/node/Scene.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/node/Renderable.h>
+#include <toadlet/tadpole/node/SceneNode.h>
 #include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet::egg;
@@ -40,6 +40,8 @@ namespace tadpole{
 namespace node{
 
 SceneNode::SceneNode():super(),
+	mChildScene(NULL),
+
 	mExcessiveDT(0),
 	mLogicDT(0),
 	mLogicTime(0),
@@ -144,7 +146,7 @@ void SceneNode::update(int dt){
 	mAccumulatedDT+=dt;
 
 	if(mAccumulatedDT>=mLogicDT){
-		mLeafScene->preLogicUpdateLoop(dt);
+		mChildScene->preLogicUpdateLoop(dt);
 
 		while(mAccumulatedDT>=mLogicDT){
 			mAccumulatedDT-=mLogicDT;
@@ -153,18 +155,18 @@ void SceneNode::update(int dt){
 				mUpdateListener->logicUpdate(mLogicDT);
 			}
 			else{
-				mLeafScene->logicUpdate(mLogicDT);
+				mChildScene->logicUpdate(mLogicDT);
 			}
 		}
 
-		mLeafScene->postLogicUpdateLoop(dt);
+		mChildScene->postLogicUpdateLoop(dt);
 	}
 
 	if(mUpdateListener!=NULL){
 		mUpdateListener->renderUpdate(dt);
 	}
 	else{
-		mLeafScene->renderUpdate(dt);
+		mChildScene->renderUpdate(dt);
 	}
 
 	AudioPlayer *audioPlayer=mEngine->getAudioPlayer();
@@ -287,6 +289,10 @@ void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
 				"render called on a destroyed Scene");
 		}
 	#endif
+
+	if(node==NULL){
+		node=this;
+	}
 
 	int i,j;
 
@@ -445,7 +451,7 @@ void SceneNode::queueRenderables(Node *node){
 	else{
 		Renderable *renderable=node->isRenderable();
 		if(renderable!=NULL){
-			renderable->queueRenderable(this);
+			renderable->queueRenderable(this,mCamera);
 		}
 	}
 }
