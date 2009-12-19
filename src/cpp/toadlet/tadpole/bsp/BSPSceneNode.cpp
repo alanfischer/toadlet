@@ -261,7 +261,6 @@ void BSPSceneNode::setBSPMap(BSPMap::ptr map){
 	for(i=0;i<mesh->subMeshes.size();++i){
 		mesh->subMeshes[i]->material->setLayer(-1);
 	}
-	setLayerClearing(0,false);
 
 	node::MeshNode::ptr node=mEngine->createNodeType(node::MeshNode::type());
 	node->setMesh(mesh);

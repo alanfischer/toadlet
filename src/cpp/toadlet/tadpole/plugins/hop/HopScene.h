@@ -28,8 +28,7 @@
 
 #include <toadlet/hop/Simulator.h>
 #include <toadlet/tadpole/plugins/hop/HopEntityFactory.h>
-//#include <toadlet/tadpole/node/Scene.h> HACK
-#include <toadlet/tadpole/bsp/BSPSceneNode.h>
+#include <toadlet/tadpole/node/Scene.h> HACK
 
 namespace toadlet{
 namespace tadpole{
@@ -38,13 +37,12 @@ class HopNode;
 class HopCollision;
 class HopEntityMessage;
 
-class TOADLET_API HopScene:public bsp::BSPSceneNode, public hop::Manager{
+class TOADLET_API HopScene:public node::Scene,public hop::Manager{
 public:
-	TOADLET_NODE(HopScene,bsp::BSPSceneNode);
-
 	HopScene();
 	virtual ~HopScene();
-	virtual Node *create(Engine *engine);
+
+	virtual void setScene(node::Scene *scene);
 
 	virtual void setFluidVelocity(const Vector3 &fluidVelocity);
 	virtual const Vector3 &getFluidVelocity() const;
