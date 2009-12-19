@@ -39,9 +39,9 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-Scene::Scene():super(),
-	mExcessiveDT(5000),
-	mLogicDT(100), // 10 fps
+SceneNode::SceneNode():super(),
+	mExcessiveDT(0),
+	mLogicDT(0),
 	mLogicTime(0),
 	mLogicFrame(0),
 	mAccumulatedDT(0),
@@ -51,13 +51,33 @@ Scene::Scene():super(),
 
 	mUpdateListener(NULL),
 
-	mAmbientColor(Math::HALF,Math::HALF,Math::HALF,Math::ONE),
+	//mAmbientColor
 
 	mCamera(NULL),
 	mPreviousMaterial(NULL)
 {}
 
-Scene::~Scene(){
+SceneNode::~SceneNode(){
+}
+
+Node *SceneNode::create(Engine *engine){
+	super::create(engine);
+
+	setExcessiveDT(5000);
+	setLogicDT(100);
+	setAmbientColor(Colors::GREY);
+
+	mBackground=mEngine->createNodeType(ParentNode::type());
+
+	return this;
+}
+
+void SceneNode::destroy(){
+	if(mBackground!=NULL){
+		mBackground->destroy();
+		mBackground=NULL;
+	}
+
 	int i;
 	for(i=0;i<mRenderLayers.size();++i){
 		if(mRenderLayers[i]!=NULL){
@@ -65,39 +85,11 @@ Scene::~Scene(){
 		}
 	}
 	mRenderLayers.clear();
-}
-
-Node *Scene::create(Engine *engine){
-	super::create(engine);
-
-	if(mManaged){
-		Error::unknown("Scene must be unmanaged until I clean it up");
-		return this;
-	}
-
-	mBackground=mEngine->createNodeType(ParentNode::type());
-
-	return this;
-}
-
-void Scene::destroy(){
-	if(mBackground!=NULL){
-		mBackground->destroy();
-		mBackground=NULL;
-	}
 
 	super::destroy();
 }
 
-void Scene::setAmbientColor(Color ambientColor){
-	mAmbientColor=ambientColor;
-}
-
-void Scene::setLayerClearing(int layer,bool clear){
-	getRenderLayer(layer)->clearLayer=clear;
-}
-
-void Scene::setLogicDT(int dt){
+void SceneNode::setLogicDT(int dt){
 	#if defined(TOADLET_DEBUG)
 		if(dt<=0){
 			Error::unknown(Categories::TOADLET_TADPOLE,
@@ -109,7 +101,7 @@ void Scene::setLogicDT(int dt){
 	mLogicDT=dt;
 }
 
-void Scene::setLogicTimeAndFrame(int time,int frame){
+void SceneNode::setLogicTimeAndFrame(int time,int frame){
 	mLogicTime=time;
 	mLogicFrame=frame;
 	mAccumulatedDT=0;
@@ -118,7 +110,7 @@ void Scene::setLogicTimeAndFrame(int time,int frame){
 	resetModifiedFrames(this);
 }
 
-void Scene::resetModifiedFrames(Node *node){
+void SceneNode::resetModifiedFrames(Node *node){
 	node->mModifiedLogicFrame=-1;
 	node->mModifiedRenderFrame=-1;
 	node->mWorldModifiedLogicFrame=-1;
@@ -134,7 +126,7 @@ void Scene::resetModifiedFrames(Node *node){
 	}
 }
 
-void Scene::update(int dt){
+void SceneNode::update(int dt){
 	#if defined(TOADLET_DEBUG)
 		if(destroyed()){
 			Error::unknown(Categories::TOADLET_TADPOLE,
@@ -152,7 +144,7 @@ void Scene::update(int dt){
 	mAccumulatedDT+=dt;
 
 	if(mAccumulatedDT>=mLogicDT){
-		preLogicUpdateLoop(dt);
+		mLeafScene->preLogicUpdateLoop(dt);
 
 		while(mAccumulatedDT>=mLogicDT){
 			mAccumulatedDT-=mLogicDT;
@@ -161,18 +153,18 @@ void Scene::update(int dt){
 				mUpdateListener->logicUpdate(mLogicDT);
 			}
 			else{
-				logicUpdate(mLogicDT);
+				mLeafScene->logicUpdate(mLogicDT);
 			}
 		}
 
-		postLogicUpdateLoop(dt);
+		mLeafScene->postLogicUpdateLoop(dt);
 	}
 
 	if(mUpdateListener!=NULL){
 		mUpdateListener->renderUpdate(dt);
 	}
 	else{
-		renderUpdate(dt);
+		mLeafScene->renderUpdate(dt);
 	}
 
 	AudioPlayer *audioPlayer=mEngine->getAudioPlayer();
@@ -181,10 +173,10 @@ void Scene::update(int dt){
 	}
 }
 
-void Scene::preLogicUpdateLoop(int dt){
+void SceneNode::preLogicUpdateLoop(int dt){
 }
 
-void Scene::logicUpdate(int dt){
+void SceneNode::logicUpdate(int dt){
 	mLogicTime+=dt;
 	mLogicFrame++;
 
@@ -194,7 +186,7 @@ void Scene::logicUpdate(int dt){
 	logicUpdate(this,dt);
 }
 
-void Scene::logicUpdate(Node::ptr node,int dt){
+void SceneNode::logicUpdate(Node::ptr node,int dt){
 	if(node->mReceiveUpdates){
 		node->logicUpdate(dt);
 	}
@@ -220,10 +212,10 @@ void Scene::logicUpdate(Node::ptr node,int dt){
 	}
 }
 
-void Scene::postLogicUpdateLoop(int dt){
+void SceneNode::postLogicUpdateLoop(int dt){
 }
 
-void Scene::renderUpdate(int dt){
+void SceneNode::renderUpdate(int dt){
 	mRenderFrame++;
 
 	if(mBackground->getNumChildren()>0){
@@ -232,7 +224,7 @@ void Scene::renderUpdate(int dt){
 	renderUpdate(this,dt);
 }
 
-void Scene::renderUpdate(Node::ptr node,int dt){
+void SceneNode::renderUpdate(Node::ptr node,int dt){
 	if(node->mReceiveUpdates){
 		node->renderUpdate(dt);
 	}
@@ -288,7 +280,7 @@ void Scene::renderUpdate(Node::ptr node,int dt){
 	}
 }
 
-void Scene::render(Renderer *renderer,CameraNode *camera,Node *node){
+void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
 	#if defined(TOADLET_DEBUG)
 		if(destroyed()){
 			Error::unknown(Categories::TOADLET_TADPOLE,
@@ -383,22 +375,22 @@ void Scene::render(Renderer *renderer,CameraNode *camera,Node *node){
 	mCamera=NULL;
 }
 
-void Scene::queueRenderable(Renderable *renderable){
+void SceneNode::queueRenderable(Renderable *renderable){
 	Material *material=renderable->getRenderMaterial();
 	int layer=(material==NULL)?0:material->getLayer();
 	getRenderLayer(layer)->renderables.add(renderable);
 }
 
-void Scene::queueLight(LightNode *light){
+void SceneNode::queueLight(LightNode *light){
 	// TODO: FInd best light
 	mLight=light;
 }
 
-void Scene::setUpdateListener(UpdateListener *updateListener){
+void SceneNode::setUpdateListener(UpdateListener *updateListener){
 	mUpdateListener=updateListener;
 }
 
-void Scene::queueRenderables(Node *node){
+void SceneNode::queueRenderables(Node *node){
 	if((node->mScope&mCamera->mScope)==0){
 		return;
 	}
@@ -458,7 +450,7 @@ void Scene::queueRenderables(Node *node){
 	}
 }
 
-bool Scene::culled(Node *node){
+bool SceneNode::culled(Node *node){
 	if(node->mRenderWorldBound.radius<0){
 		return false;
 	}
@@ -466,11 +458,11 @@ bool Scene::culled(Node *node){
 	return mCamera->culled(node->mRenderWorldBound);
 }
 
-bool Scene::preLayerRender(Renderer *renderer,int layer){
+bool SceneNode::preLayerRender(Renderer *renderer,int layer){
 	return false;
 }
 
-bool Scene::postLayerRender(Renderer *renderer,int layer){
+bool SceneNode::postLayerRender(Renderer *renderer,int layer){
 	return false;
 }
 
