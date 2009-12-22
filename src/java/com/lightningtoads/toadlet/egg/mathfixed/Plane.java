@@ -111,7 +111,7 @@ public final class Plane{
 	}
 
 	public boolean isPointOutside(Vector3 point,fixed epsilon){
-		return Math.mul(normal.x,point.x)+Math.mul(normal.y,point.y)+Math.mul(normal.z,point.z)-d>epsilon;
+		return Math.mul(normal.x,point.x)+Math.mul(normal.y,point.y)+Math.mul(normal.z,point.z)-distance>epsilon;
 	}
 
 	public boolean equals(Object object){
