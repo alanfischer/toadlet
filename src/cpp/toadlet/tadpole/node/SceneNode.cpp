@@ -39,6 +39,8 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
+TOADLET_NODE_IMPLEMENT(SceneNode,"toadlet::tadpole::node::SceneNode");
+
 SceneNode::SceneNode():super(),
 	mChildScene(NULL),
 
