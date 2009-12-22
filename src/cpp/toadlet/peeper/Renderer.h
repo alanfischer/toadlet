@@ -41,6 +41,7 @@ class IndexBuffer;
 class Light;
 class LightEffect;
 class Program;
+class Query;
 class RenderTarget;
 class SurfaceRenderTarget;
 class Shader;
@@ -131,6 +132,7 @@ public:
 	virtual IndexBuffer *createIndexBuffer()=0;
 	virtual Program *createProgram()=0;
 	virtual Shader *createShader()=0;
+	virtual Query *createQuery()=0;
 
 	// Matrix operations
 	virtual void setModelMatrix(const Matrix4x4 &matrix)=0;
