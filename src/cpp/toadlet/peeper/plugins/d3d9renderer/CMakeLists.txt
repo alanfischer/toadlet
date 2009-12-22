@@ -1,6 +1,7 @@
 # Source files for toadlet_peeper_d3d9renderer
 set (PEEPER_D3D9RENDERER_SRC
 	D3D9IndexBuffer.cpp
+	D3D9Query.cpp
 	D3D9Renderer.cpp
 	D3D9Texture.cpp
 	D3D9Surface.cpp
@@ -14,6 +15,7 @@ set (PEEPER_D3D9RENDERER_SRC
 set (PEEPER_D3D9RENDERER_HEADERS
 	D3D9Includes.h
 	D3D9IndexBuffer.h
+	D3D9Query.h
 	D3D9RenderTarget.h
 	D3D9Renderer.h
 	D3D9Surface.h

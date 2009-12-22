@@ -23,10 +23,11 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "GLRenderer.h"
-#include "GLTexture.h"
 #include "GLBuffer.h"
+#include "GLQuery.h"
+#include "GLRenderer.h"
 #include "GLRenderTarget.h"
+#include "GLTexture.h"
 #if defined(TOADLET_HAS_GLFBOS)
 	#include "GLFBOSurfaceRenderTarget.h"
 #endif
@@ -338,6 +339,10 @@ Program *GLRenderer::createProgram(){
 
 Shader *GLRenderer::createShader(){
 	return NULL;
+}
+
+Query *GLRenderer::createQuery(){
+	return new GLQuery(this);
 }
 
 // Matrix operations

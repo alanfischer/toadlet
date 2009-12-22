@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include "D3D9Renderer.h"
+#include "D3D9Query.h"
 #include "D3D9Texture.h"
 #include "D3D9RenderTarget.h"
 #include "D3D9SurfaceRenderTarget.h"
@@ -182,6 +183,10 @@ Program *D3D9Renderer::createProgram(){
 
 Shader *D3D9Renderer::createShader(){
 	return NULL;
+}
+
+Query *D3D9Renderer::createQuery(){
+	return new D3D9Query(this);
 }
 
 bool D3D9Renderer::setRenderTarget(RenderTarget *target){

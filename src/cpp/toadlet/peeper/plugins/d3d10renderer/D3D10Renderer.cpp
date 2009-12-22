@@ -153,6 +153,10 @@ Shader *D3D10Renderer::createShader(){
 	return NULL;
 }
 
+Query *D3D10Renderer::createQuery(){
+	return NULL;
+}
+
 bool D3D10Renderer::setRenderTarget(RenderTarget *target){
 	if(target==NULL){
 		Error::nullPointer(Categories::TOADLET_PEEPER,
