@@ -27,6 +27,7 @@
 #include <toadlet/tadpole/bsp/BSP30Handler.h>
 #include <toadlet/tadpole/bsp/BSPMap.h>
 #include <stdlib.h>
+#include <string.h> // memset
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;

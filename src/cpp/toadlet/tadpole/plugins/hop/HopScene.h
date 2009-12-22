@@ -79,8 +79,13 @@ public:
 	virtual void setGravity(const Vector3 &gravity){mSimulator->setGravity(gravity);}
 	virtual const Vector3 &getGravity() const{return mSimulator->getGravity();}
 
-	virtual void setEpsilon(scalar epsilon){mSimulator->setEpsilon(epsilon);}
-	virtual scalar getEpsilon() const{return mSimulator->getEpsilon();}
+	#if defined(TOADLET_FIXED_POINT)
+		virtual void setEpsilonBits(int epsilonBits){mSimulator->setEpsilonBits(epsilonBits);}
+		virtual int getEpsilonBits() const{return mSimulator->getEpsilonBits();}
+	#else
+		virtual void setEpsilon(scalar epsilon){mSimulator->setEpsilon(epsilon);}
+		virtual scalar getEpsilon() const{return mSimulator->getEpsilon();}
+	#endif
 
 	virtual void findHopEntitiesInAABox(const AABox &box,egg::Collection<egg::IntrusivePointer<HopEntity> > &entities);
 	virtual void findHopEntitiesInSphere(const Sphere &sphere,egg::Collection<egg::IntrusivePointer<HopEntity> > &entities);

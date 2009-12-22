@@ -737,7 +737,7 @@ void Simulator::traceSolid(Collision &result,Solid *solid,const Segment &segment
 		scalar y=TOADLET_MAX_XX(-segment.direction.y,segment.direction.y);
 		scalar z=TOADLET_MAX_XX(-segment.direction.z,segment.direction.z);
 		scalar m=TOADLET_MAX_XX(x,y);
-		scalar m=TOADLET_MAX_XX(m,z);
+		m=TOADLET_MAX_XX(m,z);
 	#else
 		scalar x=TOADLET_MAX_RR(-segment.direction.x,segment.direction.x);
 		scalar y=TOADLET_MAX_RR(-segment.direction.y,segment.direction.y);

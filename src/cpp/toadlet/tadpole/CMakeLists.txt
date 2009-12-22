@@ -15,7 +15,6 @@ set (TADPOLE_SRC
 	MeshManager.cpp
 	Noise.cpp
 	ResourceManager.cpp
-	TPKGInputStreamFactory.cpp
 	Track.cpp
 	TextureManager.cpp
 	Version.cpp
@@ -101,7 +100,6 @@ set (TADPOLE_HEADERS
 	ResourceHandlerData.h
 	ResourceManager.h
 	TextureManager.h
-	TPKGInputStreamFactory.h
 	Track.h
 	Types.h
 	UpdateListener.h

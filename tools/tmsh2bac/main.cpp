@@ -17,9 +17,15 @@ using namespace toadlet::egg::math;
 using namespace toadlet::tadpole;
 using namespace toadlet::tadpole::mesh;
 
-class TextureInputStreamFactory:public InputStreamFactory{
+class TextureArchive:public Archive,public BaseResource{
 public:
-	TextureInputStreamFactory(){}
+	TOADLET_SHARED_POINTERS(TextureArchive);
+
+	TextureArchive(){}
+	void destroy(){}
+
+	bool open(InputStream::ptr stream){return true;}
+	bool isResourceArchive() const{return false;}
 
 	void setDirectory(const String &directory){
 		if(directory.length()>0){
@@ -39,7 +45,7 @@ public:
 		}
 	}
 
-	InputStream::ptr makeInputStream(const String &name){
+	InputStream::ptr openStream(const String &name){
 		FileInputStream::ptr fis(new FileInputStream(mDirectory+name));
 		if(fis->isOpen()==false){
 			if(mSecondaryDirectory.length()>0){
@@ -55,6 +61,11 @@ public:
 		return fis;
 	}
 
+	Resource::ptr openResource(const String &name){return NULL;}
+
+	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
+
+protected:
 	String mDirectory;
 	String mSecondaryDirectory;
 };
@@ -145,10 +156,10 @@ int main(int argc,char **argv){
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_EGG,Logger::Level_WARNING);
 	Logger::getInstance()->setCategoryReportingLevel(Categories::TOADLET_TADPOLE,Logger::Level_WARNING);
 	Engine *engine=new Engine();
-	TextureInputStreamFactory *textureInputStreamFactory=new TextureInputStreamFactory();
+	TextureArchive::ptr textureArchive(new TextureArchive());
 
-	textureInputStreamFactory->setDirectory(texDir);
-	engine->getTextureManager()->setInputStreamFactory(textureInputStreamFactory);
+	textureArchive->setDirectory(texDir);
+	engine->getTextureManager()->setArchive(textureArchive);
 
 	std::cout << "Compiling a version " << version << " file" << std::endl;
 
@@ -164,10 +175,10 @@ int main(int argc,char **argv){
 
 		int last=Math::maxVal(mshFileName.rfind('/'),mshFileName.rfind('\\'));
 		if(last>0){
-			textureInputStreamFactory->setSecondaryDirectory(mshFileName.substr(0,last));
+			textureArchive->setSecondaryDirectory(mshFileName.substr(0,last));
 		}
 		else{
-			textureInputStreamFactory->setSecondaryDirectory("");
+			textureArchive->setSecondaryDirectory("");
 		}
 
 		// Load the mesh data
@@ -220,7 +231,6 @@ int main(int argc,char **argv){
 	}
 
 	delete engine;
-	delete textureInputStreamFactory;
 
 	std::cout << "complete" << std::endl;
 
