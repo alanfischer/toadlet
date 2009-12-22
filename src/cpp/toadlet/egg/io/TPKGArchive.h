@@ -29,7 +29,6 @@
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/egg/Map.h>
 #include <toadlet/egg/io/Archive.h>
-#include <toadlet/egg/io/InputStreamFactory.h>
 #include <toadlet/egg/io/DataInputStream.h>
 #include <toadlet/egg/io/MemoryInputStream.h>
 

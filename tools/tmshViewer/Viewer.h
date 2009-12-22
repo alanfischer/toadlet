@@ -2,7 +2,10 @@
 #define VIEWER_H
 
 #include <toadlet/pad/Application.h>
+#include <toadlet/tadpole/node/CameraNode.h>
+#include <toadlet/tadpole/node/LightNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
+#include <toadlet/tadpole/node/SceneNode.h>
 
 class Viewer:public toadlet::pad::Application{
 public:

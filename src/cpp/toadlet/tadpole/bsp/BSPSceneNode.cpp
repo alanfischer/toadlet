@@ -27,6 +27,7 @@
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/bsp/BSPSceneNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
+#include <string.h> // memset
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::image;
