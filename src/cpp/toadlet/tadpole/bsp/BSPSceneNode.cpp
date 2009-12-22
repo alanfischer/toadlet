@@ -593,7 +593,6 @@ void BSPSceneNode::processVisibleFaces(CameraNode *camera){
 }
 
 void BSPSceneNode::renderVisibleFaces(Renderer *renderer){
-getRenderLayer(0)->clearLayer=false;
 	int i,j;
 	RendererData &data=(RendererData&)mRendererData;
 	TextureStage::ptr textureStage(new TextureStage());
