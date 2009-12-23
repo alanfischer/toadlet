@@ -23,40 +23,32 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_QUERY_H
-#define TOADLET_PEEPER_QUERY_H
+#ifndef TOADLET_TADPOLE_QUERY_SPACIALQUERY_H
+#define TOADLET_TADPOLE_QUERY_SPACIALQUERY_H
 
-#include <toadlet/peeper/Types.h>
-#include <toadlet/peeper/QueryDestroyedListener.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
-namespace peeper{
+namespace tadpole{
+namespace node{
 
-class TOADLET_API Query{
+class Scene;
+
+}
+namespace query{
+
+class QueryManager;
+
+class SpacialQuery{
 public:
-	TOADLET_SHARED_POINTERS(Query);
+	TOADLET_SHARED_POINTERS(SpacialQuery);
 
-	enum QueryType{
-		QueryType_UNKNOWN,
-		QueryType_OCCLUSION,
-		QueryType_FINISHED,
-	};
-	
-	virtual ~Query(){}
-
-	virtual Query *getRootQuery()=0;
-
-	virtual bool create(QueryType type)=0;
 	virtual void destroy()=0;
 
-	virtual void setQueryDestroyedListener(QueryDestroyedListener *listener)=0;
-
-	virtual void beginQuery()=0;
-	virtual void endQuery()=0;
-	
-	virtual uint64 getResult()=0;
+	virtual bool performQuery(node::Scene *scene)=0;
 };
 
+}
 }
 }
 

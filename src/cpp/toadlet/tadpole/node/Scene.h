@@ -78,6 +78,10 @@ public:
 	virtual void setUpdateListener(UpdateListener *updateListener)=0;
 	virtual UpdateListener *getUpdateListener() const=0;
 
+	QueryManager *jaja->createOcclusionQuery
+	
+	virtual void submitQuery
+	
 	virtual egg::PointerCounter *getCounter() const=0;
 };
 
