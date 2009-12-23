@@ -23,40 +23,33 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_QUERY_H
-#define TOADLET_PEEPER_QUERY_H
-
-#include <toadlet/peeper/Types.h>
-#include <toadlet/peeper/QueryDestroyedListener.h>
+#include <toadlet/tadpole/query/AABoxQuery.h>
+#include <toadlet/tadpole/node/Scene.h>
 
 namespace toadlet{
-namespace peeper{
+namespace tadpole{
+namespace query{
 
-class TOADLET_API Query{
-public:
-	TOADLET_SHARED_POINTERS(Query);
+AABoxQuery::AABoxQuery(QueryManager *manager){
+	mQueryManager=manager;
+}
 
-	enum QueryType{
-		QueryType_UNKNOWN,
-		QueryType_OCCLUSION,
-		QueryType_FINISHED,
-	};
-	
-	virtual ~Query(){}
+AABoxQuery::~AABoxQuery(){
+	destroy();
+}
 
-	virtual Query *getRootQuery()=0;
+void AABoxQuery::destroy(){
+	if(mQueryManager!=NULL){
+		mQueryManager->destroy();
+		mQueryManager=NULL;
+	}
+}
 
-	virtual bool create(QueryType type)=0;
-	virtual void destroy()=0;
+bool AABoxQuery::performQuery(Scene *scene){
+	scene->performQuery(this);
+}
 
-	virtual void setQueryDestroyedListener(QueryDestroyedListener *listener)=0;
-
-	virtual void beginQuery()=0;
-	virtual void endQuery()=0;
-	
-	virtual uint64 getResult()=0;
-};
-
+}
 }
 }
 

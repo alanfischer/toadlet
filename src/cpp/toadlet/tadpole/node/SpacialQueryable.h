@@ -32,16 +32,19 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
- TODO: We just need to figure out the right "structure" for these.  Either just a series of methods, with a BlahResult& passed in, or
-	we could do a base interface for each operation, like Ogre does, and then expand on them for each of the queries.
-	
- WHATEVER WE DO, should be similar to how we do OcclusionQuerys!  So, we need to figure out a good way of doing those, and then tie it into this!
- 
-
-class SpacialQueryable{
+// This is a broader interface, to expose some functionality for querying states of the scene.
+//  Maybe this should be just rolled into Scene?
+class SceneQueryable{
 public:
-	virtual ~SpacialQueryable(){}
+	virtual ~SceneQueryable(){}
 
+	
+	getRayTrace() -> actually reimplemented by HopScene to do a physical trace
+	getNodesInAABox()
+	getNodesInSphere()
+	getNodesTouchingNode(Node)
+
+	
 	tracing	(segment, sphere, box)
 	nodes in area	(sphere, box)
 	nodes touching node?  Something here for telling what we are "in".  basically 2 direcitons this can work:  
