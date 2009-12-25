@@ -1,10 +1,9 @@
 # msTMSHImporter tool
 
-# Windows Platforms Only!
-if (TOADLET_PLATFORM_WIN32)
-	# Find Milkshape 3D and it's SDK
-        find_package (Milkshape3D REQUIRED)
+# Find Milkshape 3D and it's SDK
+find_package (Milkshape3D)
 
+if (MS3D_FOUND)
 	# Includes
 	set (MSTMSHIMPORTER_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR} ${TOADLET_INCLUDE_DIR} ${MS3D_SDK_DIR})
 	include_directories (${MSTMSHIMPORTER_INCLUDES})
@@ -33,5 +32,5 @@ if (TOADLET_PLATFORM_WIN32)
 	set_target_properties (msTMSHImporter PROPERTIES COMPILE_FLAGS "/MT")
 	target_link_libraries (msTMSHImporter ${MSTMSHIMPORTER_LIBS})
 	install (TARGETS msTMSHImporter DESTINATION ${MS3D_DIR})
-endif (TOADLET_PLATFORM_WIN32)
+endif (MS3D_FOUND)
 
