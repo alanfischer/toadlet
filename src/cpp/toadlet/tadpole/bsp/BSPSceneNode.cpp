@@ -576,7 +576,7 @@ void BSPSceneNode::processVisibleFaces(CameraNode *camera){
 	data.textureVisibleFaces.resize(textures.size());
 
 	// find leaf we're in
-	int idx=findLeaf(camera->getRenderWorldTranslate());
+	int idx=findLeaf(camera->getWorldRenderTranslate());
 
 	// If no visibility information just test all leaves
 	if(idx==0){ // TODO: Replace with an mHasVisData, and do this too if no visdata
@@ -647,7 +647,7 @@ void BSPSceneNode::addLeafToVisible(const Leaf &leaf,RendererData &data,CameraNo
 				// back face culling
 				const Face &f=mBSPMap->faces[face_idx];
 
-				float d=Math::length(mBSPMap->planes[f.plane],camera->getRenderWorldTranslate());
+				float d=Math::length(mBSPMap->planes[f.plane],camera->getWorldRenderTranslate());
 				if(f.side){
 					if(d>0) continue;
 				}

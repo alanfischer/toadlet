@@ -4,6 +4,7 @@
 #include <toadlet/egg/io/MemoryInputStream.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
+#include <toadlet/tadpole/node/SceneNode.h>
 #include <toadlet/pad/Application.h>
 
 using namespace toadlet::egg;

@@ -40,6 +40,7 @@ set (PEEPER_HEADERS
 	QueryDestroyedListener.h
 	RenderTarget.h
 	Renderer.h
+	RenderQuery.h
 	Shader.h
 	StatisticsSet.h
 	Surface.h

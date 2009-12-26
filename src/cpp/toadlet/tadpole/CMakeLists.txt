@@ -14,6 +14,7 @@ set (TADPOLE_SRC
 	MaterialManager.cpp
 	MeshManager.cpp
 	Noise.cpp
+	QueryManager.cpp
 	ResourceManager.cpp
 	Track.cpp
 	TextureManager.cpp
@@ -30,23 +31,6 @@ set (TADPOLE_ANIMATION_SRC
 set (TADPOLE_BSP_SRC
 	bsp/BSPSceneNode.cpp
 	bsp/BSP30Handler.cpp
-)
-
-set (TADPOLE_NODE_SRC
-	node/AnimationControllerNode.cpp
-	node/AudioNode.cpp
-	node/CameraNode.cpp
-	node/LabelNode.cpp
-	node/LightNode.cpp
-	node/MeshNode.cpp
-	node/MeshNodeSkeleton.cpp
-	node/Node.cpp
-	node/ParentNode.cpp
-	node/ParticleNode.cpp
-	node/SceneNode.cpp
-	node/SizeableParentNode.cpp
-	node/SkeletonParentNode.cpp
-	node/SpriteNode.cpp
 )
 
 set (TADPOLE_HANDLER_SRC
@@ -81,6 +65,27 @@ set (TADPOLE_MESH_SRC
 	mesh/Skeleton.cpp
 )
 
+set (TADPOLE_NODE_SRC
+	node/AnimationControllerNode.cpp
+	node/AudioNode.cpp
+	node/CameraNode.cpp
+	node/LabelNode.cpp
+	node/LightNode.cpp
+	node/MeshNode.cpp
+	node/MeshNodeSkeleton.cpp
+	node/Node.cpp
+	node/ParentNode.cpp
+	node/ParticleNode.cpp
+	node/SceneNode.cpp
+	node/SizeableParentNode.cpp
+	node/SkeletonParentNode.cpp
+	node/SpriteNode.cpp
+)
+
+set (TADPOLE_QUERY_SRC
+	query/AABoxQuery.cpp
+)
+
 
 # Headers
 set (TADPOLE_HEADERS
@@ -96,6 +101,7 @@ set (TADPOLE_HEADERS
 	MaterialManager.h
 	MeshManager.h
 	Noise.h
+	QueryManager.h
 	ResourceHandler.h
 	ResourceHandlerData.h
 	ResourceManager.h
@@ -124,27 +130,6 @@ set (TADPOLE_BSP_HEADERS
 	bsp/Face.h
 	bsp/Leaf.h
 	bsp/Node.h
-)
-
-set (TADPOLE_NODE_HEADERS
-	node/AnimationControllerNode.h
-	node/AudioNode.h
-	node/CameraNode.h
-	node/LabelNode.h
-	node/LightNode.h
-	node/MeshNode.h
-	node/MeshNodeSkeleton.h
-	node/Node.h
-	node/NodeDestroyedListener.h
-	node/ParentNode.h
-	node/ParticleNode.h
-	node/Renderable.h
-	node/Scene.h
-	node/SceneNode.h
-	node/Sizeable.h
-	node/SizeableParentNode.h
-	node/SkeletonParentNode.h
-	node/SpriteNode.h
 )
 
 set (TADPOLE_HANDLER_HEADERS
@@ -187,6 +172,32 @@ set (TADPOLE_MESH_HEADERS
 	mesh/Skeleton.h
 )
 
+set (TADPOLE_NODE_HEADERS
+	node/AnimationControllerNode.h
+	node/AudioNode.h
+	node/CameraNode.h
+	node/LabelNode.h
+	node/LightNode.h
+	node/MeshNode.h
+	node/MeshNodeSkeleton.h
+	node/Node.h
+	node/NodeDestroyedListener.h
+	node/ParentNode.h
+	node/ParticleNode.h
+	node/Renderable.h
+	node/Scene.h
+	node/SceneNode.h
+	node/Sizeable.h
+	node/SizeableParentNode.h
+	node/SkeletonParentNode.h
+	node/SpriteNode.h
+)
+
+set (TADPOLE_QUERY_HEADERS
+	query/SpacialQuery.h
+	query/AABoxQuery.h
+)
+
 
 # Bundle source
 source_group ("Source Files\\\\animation" FILES ${TADPOLE_ANIMATION_SRC})
@@ -194,6 +205,7 @@ source_group ("Source Files\\\\bsp" FILES ${TADPOLE_BSP_SRC})
 source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_SRC})
 source_group ("Source Files\\\\mesh" FILES ${TADPOLE_MESH_SRC})
 source_group ("Source Files\\\\node" FILES ${TADPOLE_NODE_SRC})
+source_group ("Source Files\\\\query" FILES ${TADPOLE_QUERY_SRC})
 
 
 # Bundle headers
@@ -202,11 +214,12 @@ source_group ("Header Files\\\\bsp" FILES ${TADPOLE_BSP_HEADERS})
 source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_HEADERS})
 source_group ("Header Files\\\\mesh" FILES ${TADPOLE_MESH_HEADERS})
 source_group ("Header Files\\\\node" FILES ${TADPOLE_NODE_HEADERS})
+source_group ("Header Files\\\\query" FILES ${TADPOLE_QUERY_HEADERS})
 
 
 # Source and headers
-set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_BSP_SRC} ${TADPOLE_NODE_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MESH_SRC})
-set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_BSP_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_MESH_HEADERS})
+set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_BSP_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MESH_SRC} ${TADPOLE_NODE_SRC} ${TADPOLE_QUERY_SRC})
+set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_BSP_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_MESH_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_QUERY_HEADERS})
 
 
 # Setup dependecy specific files and libraries

@@ -33,6 +33,7 @@
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/Renderable.h>
 #include <toadlet/tadpole/node/Scene.h>
+#include <toadlet/tadpole/query/AABoxQuery.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -78,10 +79,8 @@ public:
 	virtual void setUpdateListener(UpdateListener *updateListener)=0;
 	virtual UpdateListener *getUpdateListener() const=0;
 
-	QueryManager *jaja->createOcclusionQuery
-	
-	virtual void submitQuery
-	
+	virtual bool performQuery(query::AABoxQuery *query)=0;
+
 	virtual egg::PointerCounter *getCounter() const=0;
 };
 

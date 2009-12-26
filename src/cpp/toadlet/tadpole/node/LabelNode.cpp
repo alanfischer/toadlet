@@ -166,14 +166,14 @@ void LabelNode::queueRenderable(SceneNode *scene,CameraNode *camera){
 		Matrix4x4 &scale=cache_queueRenderable_scale.reset();
 		Vector4 &point=cache_queueRenderable_point.reset();
 
-		point.set(mRenderWorldTransform.at(0,3),mRenderWorldTransform.at(1,3),mRenderWorldTransform.at(2,3),Math::ONE);
+		point.set(mWorldRenderTransform.at(0,3),mWorldRenderTransform.at(1,3),mWorldRenderTransform.at(2,3),Math::ONE);
 		Math::mul(point,camera->getViewTransform());
 		Math::mul(point,camera->getProjectionTransform());
 		scale.setAt(0,0,point.w);
 		scale.setAt(1,1,point.w);
 		scale.setAt(2,2,point.w);
 
-		Math::postMul(mRenderWorldTransform,scale);
+		Math::postMul(mWorldRenderTransform,scale);
 	}
 
 #if defined(TOADLET_GCC_INHERITANCE_BUG)

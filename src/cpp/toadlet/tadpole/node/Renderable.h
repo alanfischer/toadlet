@@ -27,7 +27,6 @@
 #define TOADLET_TADPOLE_NODE_RENDERABLE_H
 
 #include <toadlet/tadpole/Types.h>
-#include <toadlet/tadpole/Material.h>
 
 namespace toadlet{
 namespace peeper{

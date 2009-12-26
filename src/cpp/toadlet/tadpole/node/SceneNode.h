@@ -93,6 +93,8 @@ public:
 	virtual void setUpdateListener(UpdateListener *updateListener);
 	virtual UpdateListener *getUpdateListener() const{return mUpdateListener;}
 
+	virtual bool performQuery(query::AABoxQuery *query);
+
 	void queueRenderable(Renderable *renderable);
 	void queueLight(LightNode *light);
 	CameraNode *getCamera() const{return mCamera;} // Only valid during rendering operations
@@ -128,8 +130,6 @@ protected:
 
 	virtual void logicUpdate(Node::ptr node,int dt);
 	virtual void renderUpdate(Node::ptr node,int dt);
-
-	virtual void resetModifiedFrames(Node *node);
 
 	virtual void queueRenderables(Node *node);
 	virtual bool culled(Node *node);

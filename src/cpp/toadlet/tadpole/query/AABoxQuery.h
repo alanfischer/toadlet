@@ -32,22 +32,34 @@ namespace toadlet{
 namespace tadpole{
 namespace query{
 
-class AABoxQuery:public SpacialQuery{
+class TOADLET_API AABoxQuery:public SpacialQuery{
 public:
 	TOADLET_SHARED_POINTERS(AABoxQuery);
 
-	AABoxQuery(QueryManager *manager);
+	AABoxQuery();
 	virtual ~AABoxQuery();
 
+	virtual peeper::Query *getRootQuery(){return this;}
+
+	virtual void create(node::Scene *scene);
 	virtual void destroy();
+
+	virtual void setQueryDestroyedListener(peeper::QueryDestroyedListener *listener){mListener=listener;}
 
 	virtual void setAABox(const AABox &box){mBox.set(box);}
 
-	virtual bool performQuery(node::Scene *scene);
+	virtual void beginQuery(){}
+	virtual void endQuery(){}
+	virtual bool performQuery();
+
+	virtual const egg::Collection<node::Node*> &getResult(){return mResults;}
 
 public:
-	QueryManager *mQueryManager;
+	node::Scene *mScene;
+
+	peeper::QueryDestroyedListener *mListener;
 	AABox mBox;
+	egg::Collection<node::Node*> mResults;
 };
 
 }

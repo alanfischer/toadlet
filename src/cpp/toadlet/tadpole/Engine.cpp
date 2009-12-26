@@ -346,6 +346,8 @@ AudioPlayer *Engine::getAudioPlayer() const{
 
 // TODO: Use a pool for these entities
 Node *Engine::allocNode(const BaseType<Node> &type){
+	Logger::excess(Categories::TOADLET_TADPOLE,String("Allocating: ")+type.getFullName());
+
 	Node *node=type.newInstance();
 	node->internal_setManaged(true);
 	return node;

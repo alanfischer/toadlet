@@ -54,7 +54,7 @@ public:
 
 		void queueRenderable(SceneNode *queue,CameraNode *camera){} // Queuing done by parent
 		Material *getRenderMaterial() const{return material;}
-		const Matrix4x4 &getRenderTransform() const{return meshNode->getRenderWorldTransform();}
+		const Matrix4x4 &getRenderTransform() const{return meshNode->getWorldRenderTransform();}
 		void render(peeper::Renderer *renderer) const;
 
 		Material::ptr material;
@@ -120,7 +120,7 @@ public:
 
 	void queueRenderable(SceneNode *queue,CameraNode *camera);
 	Material *getRenderMaterial() const{return NULL;}
-	const Matrix4x4 &getRenderTransform() const{return mRenderWorldTransform;}
+	const Matrix4x4 &getRenderTransform() const{return mWorldRenderTransform;}
 	void render(peeper::Renderer *renderer) const{} // Rendering done by children
 
 protected:

@@ -58,7 +58,7 @@ public:
 	IndexBuffer *createIndexBuffer();
 	Program *createProgram();
 	Shader *createShader();
-	Query *createQuery();
+	RenderQuery *createQuery();
 
 	// Matrix operations
 	void setModelMatrix(const Matrix4x4 &matrix);

@@ -384,8 +384,8 @@ void ParticleNode::logicUpdate(int dt){
 void ParticleNode::renderUpdate(int dt){
 	if(mParticleSimulator!=NULL){
 		if(mWorldSpace){
-			Math::mul(mRenderWorldTransform,mParent->getRenderWorldTransform(),mRenderTransform);
-			mParticleSimulator->updateParticles(dt,mRenderWorldTransform);
+			Math::mul(mWorldRenderTransform,mParent->getWorldRenderTransform(),mRenderTransform);
+			mParticleSimulator->updateParticles(dt,mWorldRenderTransform);
 		}
 		else{
 			mParticleSimulator->updateParticles(dt,mRenderTransform);
@@ -417,7 +417,7 @@ const Matrix4x4 &ParticleNode::getRenderTransform() const{
 		return Math::IDENTITY_MATRIX4X4;
 	}
 	else{
-		return super::getRenderWorldTransform();
+		return super::getWorldRenderTransform();
 	}
 }
 
@@ -572,7 +572,7 @@ void ParticleNode::updateVertexBuffer(const Matrix4x4 &viewTransform){
 				if(mOrientation){
 					up.set(p.ox,p.oy,p.oz);
 					if(mWorldSpace==false){
-						Math::mul(up,mRenderWorldTransform);
+						Math::mul(up,mWorldRenderTransform);
 					}
 					Math::mul(up,scale);
 					Math::mul(right,viewRight,scale);

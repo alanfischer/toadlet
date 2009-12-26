@@ -34,15 +34,23 @@
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
+using namespace toadlet::tadpole::query;
 
 namespace toadlet{
 namespace tadpole{
 namespace node{
 
+// Immediate TODO:
+//	- Fix Bounding Volumes, so we have Logic & Render volumes properly updated with child volumes
+//	- Test that SceneNode returns proper AABoxQuery results
+//	- Modify SpacialQuery so it can specify Logic or Render volumes.  Logic volume will use Physics volumes.  Maybe I need to make that more clear somehow.
+//	- Modify HopScene so it prunes the results to the Spacial volumes if the bit is set.
+//	- Test that SceneNode returns proper AABoxQuery results for logic volumes
+
 TOADLET_NODE_IMPLEMENT(SceneNode,"toadlet::tadpole::node::SceneNode");
 
 SceneNode::SceneNode():super(),
-	mChildScene(NULL),
+	mChildScene (NULL),
 
 	mExcessiveDT(0),
 	mLogicDT(0),
@@ -67,6 +75,7 @@ SceneNode::~SceneNode(){
 Node *SceneNode::create(Engine *engine){
 	super::create(engine);
 
+	setChildScene(this);
 	setExcessiveDT(5000);
 	setLogicDT(100);
 	setAmbientColor(Colors::GREY);
@@ -110,24 +119,6 @@ void SceneNode::setLogicTimeAndFrame(int time,int frame){
 	mLogicFrame=frame;
 	mAccumulatedDT=0;
 	mRenderFrame=0;
-
-	resetModifiedFrames(this);
-}
-
-void SceneNode::resetModifiedFrames(Node *node){
-	node->mModifiedLogicFrame=-1;
-	node->mModifiedRenderFrame=-1;
-	node->mWorldModifiedLogicFrame=-1;
-	node->mWorldModifiedRenderFrame=-1;
-
-	ParentNode *parent=node->isParent();
-	if(parent!=NULL){
-		int numChildren=parent->mChildren.size();
-		int i;
-		for(i=0;i<numChildren;++i){
-			resetModifiedFrames(parent->mChildren[i]);
-		}
-	}
 }
 
 void SceneNode::update(int dt){
@@ -195,8 +186,7 @@ void SceneNode::logicUpdate(Node::ptr node,int dt){
 		node->logicUpdate(dt);
 	}
 
-	node->mWorldModifiedLogicFrame=node->mModifiedLogicFrame;
-
+	bool awake=node->mReceiveUpdates;
 	ParentNode *parent=node->isParent();
 	if(parent!=NULL){
 		if(parent->mShadowChildrenDirty){
@@ -208,10 +198,24 @@ void SceneNode::logicUpdate(Node::ptr node,int dt){
 		int i;
 		for(i=0;i<numChildren;++i){
 			child=parent->mShadowChildren[i];
-
-			logicUpdate(child,dt);
-
-			parent->mWorldModifiedLogicFrame=parent->mWorldModifiedLogicFrame>child->mWorldModifiedLogicFrame?parent->mWorldModifiedLogicFrame:child->mWorldModifiedLogicFrame;
+			if(child->mAwakeCount>0){
+				logicUpdate(child,dt);
+				awake=true;
+			}
+			else if(parent->mAwakeCount>1){
+				child->awake();
+				logicUpdate(child,dt);
+				awake=true;
+			}
+		}
+		if(parent->mAwakeCount>1){
+			parent->mAwakeCount--;
+		}
+	}
+	if(awake==false && node->mAwakeCount>0){
+		node->mAwakeCount--;
+		if(node->mAwakeCount==0){
+			node->asleep();
 		}
 	}
 }
@@ -234,16 +238,14 @@ void SceneNode::renderUpdate(Node::ptr node,int dt){
 	}
 
 	if(node->mParent==NULL){
-		node->mRenderWorldTransform.set(node->mRenderTransform);
+		node->mWorldRenderTransform.set(node->mRenderTransform);
 	}
 	else if(node->mIdentityTransform){
-		node->mRenderWorldTransform.set(node->mParent->mRenderWorldTransform);
+		node->mWorldRenderTransform.set(node->mParent->mWorldRenderTransform);
 	}
 	else{
-		Math::mul(node->mRenderWorldTransform,node->mParent->mRenderWorldTransform,node->mRenderTransform);
+		Math::mul(node->mWorldRenderTransform,node->mParent->mWorldRenderTransform,node->mRenderTransform);
 	}
-
-	node->mWorldModifiedRenderFrame=node->mModifiedRenderFrame;
 
 	ParentNode *parent=node->isParent();
 	if(parent!=NULL){
@@ -256,8 +258,9 @@ void SceneNode::renderUpdate(Node::ptr node,int dt){
 		int i;
 		for(i=0;i<numChildren;++i){
 			child=parent->mShadowChildren[i];
-
-			renderUpdate(child,dt);
+			if(child->mAwakeCount>0){
+				renderUpdate(child,dt);
+			}
 
 			if(parent->mRenderWorldBound.radius>=0){
 				if(child->mRenderWorldBound.radius>=0){
@@ -268,12 +271,10 @@ void SceneNode::renderUpdate(Node::ptr node,int dt){
 					parent->mRenderWorldBound.radius=-Math::ONE;
 				}
 			}
-
-			parent->mWorldModifiedRenderFrame=parent->mWorldModifiedRenderFrame>child->mWorldModifiedRenderFrame?parent->mWorldModifiedRenderFrame:child->mWorldModifiedRenderFrame;
 		}
 	}
 	else{
-		Math::setVector3FromMatrix4x4(node->mRenderWorldBound.origin,node->mRenderWorldTransform);
+		Math::setVector3FromMatrix4x4(node->mRenderWorldBound.origin,node->mWorldRenderTransform);
 		if(node->mIdentityTransform==false){
 			scalar scale=Math::maxVal(node->getScale().x,Math::maxVal(node->getScale().y,node->getScale().z));
 			node->mRenderWorldBound.radius=Math::mul(scale,node->mBoundingRadius);
@@ -329,7 +330,7 @@ void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
 
 	// Only render background when rendering from the scene
 	if(node==this && mBackground->getNumChildren()>0){
-		mBackground->setTranslate(mCamera->getRenderWorldTranslate());
+		mBackground->setTranslate(mCamera->getWorldRenderTranslate());
 		renderUpdate(mBackground,0);
 		queueRenderables(mBackground);
 	}
@@ -390,12 +391,24 @@ void SceneNode::queueRenderable(Renderable *renderable){
 }
 
 void SceneNode::queueLight(LightNode *light){
-	// TODO: FInd best light
+	// TODO: Find best light
 	mLight=light;
 }
 
 void SceneNode::setUpdateListener(UpdateListener *updateListener){
 	mUpdateListener=updateListener;
+}
+
+bool SceneNode::performQuery(AABoxQuery *query){
+	// TODO: Child Nodes should have proper bounding shapes (either a generic Volume which can be Sphere, etc, or just an actual Sphere)
+	int i;
+	for(i=0;i<mChildren.size();++i){
+		Node *child=mChildren[i];
+		if(Math::testIntersection(Sphere(child->mTranslate,child->mBoundingRadius),query->mBox)){
+			query->mResults.add(child);
+		}
+	}
+	return true;
 }
 
 void SceneNode::queueRenderables(Node *node){
@@ -411,9 +424,9 @@ void SceneNode::queueRenderables(Node *node){
 	// TODO: Fix these alignment calculations so it actually aligns per axis, and preserves parent scale
 	if(node->mAlignXAxis || node->mAlignYAxis || node->mAlignZAxis){
 		if(mCamera->mAlignmentCalculationsUseOrigin){
-			Matrix4x4 &nodeWorldTransform=node->mRenderWorldTransform;
-			Vector3 nodeWorldTranslate; Math::setVector3FromMatrix4x4(nodeWorldTranslate,node->mRenderWorldTransform);
-			Vector3 cameraWorldTranslate; Math::setVector3FromMatrix4x4(cameraWorldTranslate,mCamera->mRenderWorldTransform);
+			Matrix4x4 &nodeWorldTransform=node->mWorldRenderTransform;
+			Vector3 nodeWorldTranslate; Math::setVector3FromMatrix4x4(nodeWorldTranslate,node->mWorldRenderTransform);
+			Vector3 cameraWorldTranslate; Math::setVector3FromMatrix4x4(cameraWorldTranslate,mCamera->mWorldRenderTransform);
 			Matrix4x4 lookAtCamera; Math::setMatrix4x4FromLookAt(lookAtCamera,nodeWorldTranslate,cameraWorldTranslate,Math::Z_UNIT_VECTOR3,false);
 			const Vector3 &nodeScale=node->mScale;
 			nodeWorldTransform.setAt(0,0,Math::mul(lookAtCamera.at(0,0),nodeScale.x));
@@ -428,7 +441,7 @@ void SceneNode::queueRenderables(Node *node){
 		}
 		else{
 			const Matrix4x4 &viewTransform=mCamera->getViewTransform();
-			Matrix4x4 &nodeWorldTransform=node->mRenderWorldTransform;
+			Matrix4x4 &nodeWorldTransform=node->mWorldRenderTransform;
 			const Vector3 &nodeScale=node->mScale;
 			nodeWorldTransform.setAt(0,0,Math::mul(viewTransform.at(0,0),nodeScale.x));
 			nodeWorldTransform.setAt(1,0,viewTransform.at(0,1));

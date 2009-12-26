@@ -153,7 +153,7 @@ Shader *D3D10Renderer::createShader(){
 	return NULL;
 }
 
-Query *D3D10Renderer::createQuery(){
+RenderQuery *D3D10Renderer::createQuery(){
 	return NULL;
 }
 

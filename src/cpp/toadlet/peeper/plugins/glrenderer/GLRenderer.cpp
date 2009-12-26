@@ -341,7 +341,7 @@ Shader *GLRenderer::createShader(){
 	return NULL;
 }
 
-Query *GLRenderer::createQuery(){
+RenderQuery *GLRenderer::createQuery(){
 	return new GLQuery(this);
 }
 
