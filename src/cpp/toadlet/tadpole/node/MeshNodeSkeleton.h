@@ -29,6 +29,7 @@
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/mesh/Skeleton.h>
 #include <toadlet/tadpole/node/Renderable.h>
+#include <toadlet/tadpole/Material.h>
 
 namespace toadlet{
 namespace tadpole{
