@@ -198,12 +198,12 @@ void SceneNode::logicUpdate(Node::ptr node,int dt){
 		int i;
 		for(i=0;i<numChildren;++i){
 			child=parent->mShadowChildren[i];
-			if(child->mAwakeCount>0){
+			if(parent->mAwakeCount>1){
+				child->modified();
 				logicUpdate(child,dt);
 				awake=true;
 			}
-			else if(parent->mAwakeCount>1){
-				child->awake();
+			else if(child->mAwakeCount>0){
 				logicUpdate(child,dt);
 				awake=true;
 			}

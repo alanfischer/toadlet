@@ -211,6 +211,9 @@ void Node::modified(){
 	if(mAwakeCount==0){
 		awake();
 	}
+	else if(mAwakeCount==1){
+		mAwakeCount=2;
+	}
 }
 
 void Node::awake(){
