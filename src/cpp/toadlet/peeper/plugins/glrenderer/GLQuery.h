@@ -27,14 +27,14 @@
 #define TOADLET_PEEPER_GLQUERY_H
 
 #include "GLIncludes.h"
-#include <toadlet/peeper/Query.h>
+#include <toadlet/peeper/RenderQuery.h>
 
 namespace toadlet{
 namespace peeper{
 
 class GLRenderer;
 
-class GLQuery:public Query{
+class GLQuery:public RenderQuery{
 public:
 	GLQuery(GLRenderer *renderer);
 	virtual ~GLQuery();
@@ -48,6 +48,7 @@ public:
 
 	virtual void beginQuery();
 	virtual void endQuery();
+	virtual bool performQuery(){return false;}
 
 	virtual uint64 getResult();
 

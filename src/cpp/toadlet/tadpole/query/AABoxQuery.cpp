@@ -26,31 +26,38 @@
 #include <toadlet/tadpole/query/AABoxQuery.h>
 #include <toadlet/tadpole/node/Scene.h>
 
+using namespace toadlet::tadpole::node;
+
 namespace toadlet{
 namespace tadpole{
 namespace query{
 
-AABoxQuery::AABoxQuery(QueryManager *manager){
-	mQueryManager=manager;
+AABoxQuery::AABoxQuery():
+	mScene(NULL),
+
+	mListener(NULL)
+	//mBox
+{
 }
 
 AABoxQuery::~AABoxQuery(){
 	destroy();
 }
 
+void AABoxQuery::create(Scene *scene){
+	mScene=scene;
+}
+
 void AABoxQuery::destroy(){
-	if(mQueryManager!=NULL){
-		mQueryManager->destroy();
-		mQueryManager=NULL;
+	if(mListener!=NULL){
+		mListener->queryDestroyed(this);
 	}
 }
 
-bool AABoxQuery::performQuery(Scene *scene){
-	scene->performQuery(this);
+bool AABoxQuery::performQuery(){
+	return mScene->performQuery(this);
 }
 
 }
 }
 }
-
-#endif

@@ -96,7 +96,7 @@ public:
 
 	void updateViewTransform();
 	inline const Matrix4x4 &getViewTransform() const{return mViewTransform;}  /// Only valid during rendering
-	inline const Vector3 &getRenderWorldTranslate() const{return mRenderWorldTranslate;}  /// Only valid during rendering
+	inline const Vector3 &getWorldRenderTranslate() const{return mWorldRenderTranslate;}  /// Only valid during rendering
 
 	// TODO: These should probably be moved into the Math library, and passing in a list of planes
 	bool culled(const Sphere &sphere) const;
@@ -124,7 +124,7 @@ protected:
 	ParentNode::ptr mMidNode;
 
 	Vector3 mRenderBoundingOrigin;
-	Vector3 mRenderWorldTranslate;
+	Vector3 mWorldRenderTranslate;
 	Matrix4x4 mViewTransform;
 	Matrix4x4 mViewProjectionTransform;
 	Plane mClipPlanes[6];

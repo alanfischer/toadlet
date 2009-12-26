@@ -53,14 +53,9 @@ Node::Node():
 	mScope(0),
 	//mName,
 	mAlignXAxis(false),mAlignYAxis(false),mAlignZAxis(false),
-
 	mBoundingRadius(0),
 	mReceiveUpdates(false),
-
-	mModifiedLogicFrame(0),
-	mModifiedRenderFrame(0),
-	mWorldModifiedLogicFrame(0),
-	mWorldModifiedRenderFrame(0)
+	mAwakeCount(0)
 {
 }
 
@@ -88,15 +83,11 @@ Node *Node::create(Engine *engine){
 	mScope=-1;
 	mBoundingRadius=0;
 	mReceiveUpdates=false;
-
-	mModifiedLogicFrame=-1;
-	mModifiedRenderFrame=-1;
-	mWorldModifiedLogicFrame=-1;
-	mWorldModifiedRenderFrame=-1;
+	mAwakeCount=2;
 
 	mRenderTransform.reset();
 	mRenderWorldBound.reset();
-	mRenderWorldTransform.reset();
+	mWorldRenderTransform.reset();
 
 	return this;
 }
@@ -216,20 +207,21 @@ void Node::setReceiveUpdates(bool receiveUpdates){
 	mReceiveUpdates=receiveUpdates;
 }
 
-/// @todo  Change the modified setup so you can tell if you were modified, or if any of your parents were modified
 void Node::modified(){
-	if(mEngine!=NULL){
-		mModifiedLogicFrame=mEngine->getScene()->getLogicFrame();
-		mModifiedRenderFrame=mEngine->getScene()->getRenderFrame();
+	if(mAwakeCount==0){
+		awake();
 	}
 }
 
-bool Node::modifiedSinceLastLogicFrame() const{
-	return mWorldModifiedLogicFrame+1>=mEngine->getScene()->getLogicFrame();
+void Node::awake(){
+	mAwakeCount=2;
+	if(mParent!=NULL){
+		mParent->awake();
+	}
 }
 
-bool Node::modifiedSinceLastRenderFrame() const{
-	return mWorldModifiedRenderFrame+1>=mEngine->getScene()->getRenderFrame();
+void Node::asleep(){
+	mAwakeCount=0;
 }
 
 void Node::setRenderTransformTranslate(const Vector3 &translate){

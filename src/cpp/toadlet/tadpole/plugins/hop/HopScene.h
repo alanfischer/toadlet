@@ -115,6 +115,8 @@ public:
 	virtual void postLogicUpdateLoop(int dt);
 	virtual void renderUpdate(int dt);
 
+	virtual bool performQuery(query::AABoxQuery *query){return mScene->performQuery(query);}
+
 	void traceSegment(hop::Collision &result,const Segment &segment);
 	void traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid);
 	void preUpdate(int,scalar){}

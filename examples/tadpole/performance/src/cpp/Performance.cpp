@@ -11,11 +11,11 @@ Performance::~Performance(){
 void Performance::create(){
 	Application::create();
 
-	getEngine()->setScene((Scene*)(new Scene())->create(getEngine()));
+	getEngine()->setScene(mEngine->createNodeType(SceneNode::type()));
 
 	cameraNode=getEngine()->createNodeType(CameraNode::type());
 	cameraNode->setLookAt(Vector3(0,-Math::fromInt(5),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
-	getEngine()->getScene()->attach(cameraNode);
+	getEngine()->getScene()->getRootNode()->attach(cameraNode);
 
 	setupTest(test++,10);
 }
@@ -27,11 +27,9 @@ void Performance::update(int dt){
 }
 
 void Performance::render(Renderer *renderer){
-	getEngine()->contextUpdate(renderer);
-
 	renderer->beginScene();
 
-	getEngine()->getScene()->render(renderer,cameraNode);
+	getEngine()->getScene()->render(renderer,cameraNode,NULL);
 
 	renderer->endScene();
 
@@ -62,7 +60,7 @@ bool Performance::setupTest(int test,int intensity){
 		parentNode->destroy();
 	}
 	parentNode=getEngine()->createNodeType(ParentNode::type());
-	getEngine()->getScene()->attach(parentNode);
+	getEngine()->getScene()->getRootNode()->attach(parentNode);
 
 	bool result=true;
 	for(int i=0;i<intensity+1;++i){

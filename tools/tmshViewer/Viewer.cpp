@@ -99,11 +99,8 @@ void Viewer::update(int dt){
 
 void Viewer::render(Renderer *renderer){
 	renderer->beginScene();
-
-	mEngine->getScene()->render(renderer,mCamera,NULL);
-
+		mEngine->getScene()->render(renderer,mCamera,NULL);
 	renderer->endScene();
-
 	renderer->swap();
 }
 
@@ -156,13 +153,14 @@ void Viewer::mouseReleased(int x,int y,int button){
 }
 
 void Viewer::resized(int width,int height){
-	if(width!=0 && height!=0){
+	if(mCamera!=NULL && width!=0 && height!=0){
 		if(width>=height){
 			mCamera->setProjectionFovY(Math::degToRad(Math::fromInt(45)),Math::div(Math::fromInt(width),Math::fromInt(height)),Math::ONE,mDistance*2);
 		}
 		else{
 			mCamera->setProjectionFovX(Math::degToRad(Math::fromInt(45)),Math::div(Math::fromInt(height),Math::fromInt(width)),Math::ONE,mDistance*2);
 		}
+		mCamera->setViewport(Viewport(0,0,width,height));
 	}
 }
 

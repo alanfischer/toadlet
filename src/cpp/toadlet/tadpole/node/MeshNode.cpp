@@ -259,12 +259,12 @@ void MeshNode::renderUpdate(int dt){
 
 void MeshNode::queueRenderable(SceneNode *scene,CameraNode *camera){
 	if(mMesh!=NULL && mMesh->worldScale!=Math::ONE){
-		mRenderWorldTransform.reset();
-		mRenderWorldTransform.setAt(0,0,mMesh->worldScale);
-		mRenderWorldTransform.setAt(1,1,mMesh->worldScale);
-		mRenderWorldTransform.setAt(2,2,mMesh->worldScale);
-		Math::preMul(mRenderWorldTransform,mRenderTransform);
-		Math::preMul(mRenderWorldTransform,mParent->getRenderWorldTransform());
+		mWorldRenderTransform.reset();
+		mWorldRenderTransform.setAt(0,0,mMesh->worldScale);
+		mWorldRenderTransform.setAt(1,1,mMesh->worldScale);
+		mWorldRenderTransform.setAt(2,2,mMesh->worldScale);
+		Math::preMul(mWorldRenderTransform,mRenderTransform);
+		Math::preMul(mWorldRenderTransform,mParent->getWorldRenderTransform());
 	}
 
 	if(mSkeleton!=NULL){

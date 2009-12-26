@@ -36,25 +36,20 @@ class TOADLET_API Query{
 public:
 	TOADLET_SHARED_POINTERS(Query);
 
-	enum QueryType{
-		QueryType_UNKNOWN,
-		QueryType_OCCLUSION,
-		QueryType_FINISHED,
-	};
-	
 	virtual ~Query(){}
 
 	virtual Query *getRootQuery()=0;
 
-	virtual bool create(QueryType type)=0;
 	virtual void destroy()=0;
 
 	virtual void setQueryDestroyedListener(QueryDestroyedListener *listener)=0;
 
+	// For queries that have a definite begin & end
 	virtual void beginQuery()=0;
 	virtual void endQuery()=0;
-	
-	virtual uint64 getResult()=0;
+
+	// For instantanious queries
+	virtual bool performQuery()=0;
 };
 
 }

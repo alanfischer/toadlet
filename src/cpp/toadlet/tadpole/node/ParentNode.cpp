@@ -93,6 +93,8 @@ bool ParentNode::attach(Node *node){
 
 	mShadowChildrenDirty=true;
 
+//	modified();
+
 	return true;
 }
 
@@ -108,6 +110,8 @@ bool ParentNode::remove(Node *node){
 		node->parentChanged(NULL);
 
 		mShadowChildrenDirty=true;
+
+		modified();
 
 		return true;
 	}

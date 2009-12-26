@@ -185,7 +185,7 @@ Shader *D3D9Renderer::createShader(){
 	return NULL;
 }
 
-Query *D3D9Renderer::createQuery(){
+RenderQuery *D3D9Renderer::createQuery(){
 	return new D3D9Query(this);
 }
 

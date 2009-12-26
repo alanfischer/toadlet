@@ -26,12 +26,10 @@
 #ifndef TOADLET_TADPOLE_QUERYMANAGER_H
 #define TOADLET_TADPOLE_QUERYMANAGER_H
 
-#include <toadlet/peeper/Renderer.h>
+#include <toadlet/peeper/RenderQuery.h>
 #include <toadlet/tadpole/Types.h>
-#include <toadlet/tadpole/query/SegmentQuery.h>
-#include <toadlet/tadpole/query/SphereQuery.h>
+#include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/query/AABoxQuery.h>
-#include <toadlet/tadpole/query/NodeQuery.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -43,19 +41,17 @@ public:
 
 	void destroy();
 
-	peeper::Query::ptr createOcclusionQuery();
-	peeper::Query::ptr createFinishedQuery();
-	query::SegmentQuery::ptr createSegmentQuery();
-	query::SphereQuery::ptr createSphereQuery();
+	peeper::RenderQuery::ptr createOcclusionQuery();
+	peeper::RenderQuery::ptr createFinishedQuery();
+	query::SpacialQuery::ptr createSegmentQuery();
+	query::SpacialQuery::ptr createSphereQuery();
 	query::AABoxQuery::ptr createAABoxQuery();
-	query::NodeQuery::ptr createNodeQuery();
+	query::SpacialQuery::ptr createNodeQuery();
 
 	virtual void queryDestroyed(peeper::Query *query);
-	virtual void queryDestroyed(query::SpacialQuery *query);
 
 protected:
-	egg::Collection<peeper::Query::ptr> mVisualQueries;
-	egg::Collection<query::SpacialQuery::ptr> mSpacialQueries;
+	egg::Collection<peeper::Query::ptr> mQueries;
 
 	Engine *mEngine;
 };

@@ -38,6 +38,7 @@
 		typedef SuperClass super; \
 		typedef toadlet::egg::Type<Class,toadlet::tadpole::node::Node> ThisType; \
 		static const ThisType &type(); \
+		virtual const toadlet::egg::BaseType<toadlet::tadpole::node::Node> &getType(){return Class::type();} \
 		TOADLET_INTRUSIVE_POINTERS(Class)
 #endif
 
@@ -123,14 +124,14 @@ public:
 	virtual void renderUpdate(int dt){}
 
 	void modified();
-	bool modifiedSinceLastLogicFrame() const;
-	bool modifiedSinceLastRenderFrame() const;
+	void awake();
+	void asleep();
 
 	inline Engine *getEngine() const{return mEngine;}
 
 	inline egg::PointerCounter *getCounter() const{return mCounter;}
 	inline const Matrix4x4 &getRenderTransform() const{return mRenderTransform;}
-	inline const Matrix4x4 &getRenderWorldTransform() const{return mRenderWorldTransform;}
+	inline const Matrix4x4 &getWorldRenderTransform() const{return mWorldRenderTransform;}
 
 	inline void internal_setManaged(bool managed){mManaged=managed;}
 	inline bool internal_getManaged() const{return mManaged;}
@@ -162,15 +163,12 @@ protected:
 	bool mAlignXAxis,mAlignYAxis,mAlignZAxis;
 	scalar mBoundingRadius;
 	bool mReceiveUpdates;
+	int mAwakeCount; // 2=Initially Awoken, 1=Awake, 0=Asleep
 
-	int mModifiedLogicFrame;
-	int mModifiedRenderFrame;
-	int mWorldModifiedLogicFrame;
-	int mWorldModifiedRenderFrame;
-
-	Matrix4x4 mRenderTransform;
+	Sphere mLogicWorldBound;
 	Sphere mRenderWorldBound;
-	Matrix4x4 mRenderWorldTransform;
+	Matrix4x4 mRenderTransform;
+	Matrix4x4 mWorldRenderTransform;
 
 	Vector3 cache_setRotate_vector;
 

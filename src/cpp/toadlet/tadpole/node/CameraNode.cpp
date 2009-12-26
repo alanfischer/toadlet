@@ -218,12 +218,12 @@ ParentNode::ptr CameraNode::getMidNode(){
 }
 
 void CameraNode::updateViewTransform(){
-	scalar wt00=mRenderWorldTransform.at(0,0),wt01=mRenderWorldTransform.at(0,1),wt02=mRenderWorldTransform.at(0,2);
-	scalar wt10=mRenderWorldTransform.at(1,0),wt11=mRenderWorldTransform.at(1,1),wt12=mRenderWorldTransform.at(1,2);
-	scalar wt20=mRenderWorldTransform.at(2,0),wt21=mRenderWorldTransform.at(2,1),wt22=mRenderWorldTransform.at(2,2);
-	mRenderWorldTranslate.x=mRenderWorldTransform.at(0,3);mRenderWorldTranslate.y=mRenderWorldTransform.at(1,3);mRenderWorldTranslate.z=mRenderWorldTransform.at(2,3);
+	scalar wt00=mWorldRenderTransform.at(0,0),wt01=mWorldRenderTransform.at(0,1),wt02=mWorldRenderTransform.at(0,2);
+	scalar wt10=mWorldRenderTransform.at(1,0),wt11=mWorldRenderTransform.at(1,1),wt12=mWorldRenderTransform.at(1,2);
+	scalar wt20=mWorldRenderTransform.at(2,0),wt21=mWorldRenderTransform.at(2,1),wt22=mWorldRenderTransform.at(2,2);
+	mWorldRenderTranslate.x=mWorldRenderTransform.at(0,3);mWorldRenderTranslate.y=mWorldRenderTransform.at(1,3);mWorldRenderTranslate.z=mWorldRenderTransform.at(2,3);
 
-	mRenderBoundingOrigin.set(mRenderWorldTranslate.x-Math::mul(wt02,mBoundingRadius),mRenderWorldTranslate.y-Math::mul(wt12,mBoundingRadius),mRenderWorldTranslate.z-Math::mul(wt22,mBoundingRadius));
+	mRenderBoundingOrigin.set(mWorldRenderTranslate.x-Math::mul(wt02,mBoundingRadius),mWorldRenderTranslate.y-Math::mul(wt12,mBoundingRadius),mWorldRenderTranslate.z-Math::mul(wt22,mBoundingRadius));
 
 	mViewTransform.setAt(0,0,wt00);
 	mViewTransform.setAt(0,1,wt10);
@@ -235,9 +235,9 @@ void CameraNode::updateViewTransform(){
 	mViewTransform.setAt(2,1,wt12);
 	mViewTransform.setAt(2,2,wt22);
 
-	mViewTransform.setAt(0,3,-(Math::mul(wt00,mRenderWorldTranslate.x) + Math::mul(wt10,mRenderWorldTranslate.y) + Math::mul(wt20,mRenderWorldTranslate.z)));
-	mViewTransform.setAt(1,3,-(Math::mul(wt01,mRenderWorldTranslate.x) + Math::mul(wt11,mRenderWorldTranslate.y) + Math::mul(wt21,mRenderWorldTranslate.z)));
-	mViewTransform.setAt(2,3,-(Math::mul(wt02,mRenderWorldTranslate.x) + Math::mul(wt12,mRenderWorldTranslate.y) + Math::mul(wt22,mRenderWorldTranslate.z)));
+	mViewTransform.setAt(0,3,-(Math::mul(wt00,mWorldRenderTranslate.x) + Math::mul(wt10,mWorldRenderTranslate.y) + Math::mul(wt20,mWorldRenderTranslate.z)));
+	mViewTransform.setAt(1,3,-(Math::mul(wt01,mWorldRenderTranslate.x) + Math::mul(wt11,mWorldRenderTranslate.y) + Math::mul(wt21,mWorldRenderTranslate.z)));
+	mViewTransform.setAt(2,3,-(Math::mul(wt02,mWorldRenderTranslate.x) + Math::mul(wt12,mWorldRenderTranslate.y) + Math::mul(wt22,mWorldRenderTranslate.z)));
 
 	// Update frustum planes
 	Math::mul(mViewProjectionTransform,mProjectionTransform,mViewTransform);

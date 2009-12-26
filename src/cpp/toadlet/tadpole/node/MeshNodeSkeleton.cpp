@@ -318,7 +318,7 @@ void MeshNodeSkeleton::updateVertexData(){
 }
 
 const Matrix4x4 &MeshNodeSkeleton::getRenderTransform() const{
-	return mNode!=NULL?mNode->getRenderWorldTransform():Math::IDENTITY_MATRIX4X4;
+	return mNode!=NULL?mNode->getWorldRenderTransform():Math::IDENTITY_MATRIX4X4;
 }
 
 void MeshNodeSkeleton::render(Renderer *renderer) const{

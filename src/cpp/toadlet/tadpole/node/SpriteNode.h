@@ -72,7 +72,7 @@ public:
 
 	void queueRenderable(SceneNode *scene,CameraNode *camera);
 	Material *getRenderMaterial() const{return mMaterial;}
-	const Matrix4x4 &getRenderTransform() const{return super::getRenderWorldTransform();}
+	const Matrix4x4 &getRenderTransform() const{return super::getWorldRenderTransform();}
 	void render(peeper::Renderer *renderer) const;
 
 	peeper::VertexBufferAccessor vba;

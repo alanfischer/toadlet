@@ -30,8 +30,9 @@ int main(int argc,char **argv){
 	}
 
 	Viewer *viewer=new Viewer();
-	viewer->create();
+	viewer->setSize(640,480);
 	viewer->setFullscreen(false);
+	viewer->create();
 
 	Engine *engine=viewer->getEngine();
 

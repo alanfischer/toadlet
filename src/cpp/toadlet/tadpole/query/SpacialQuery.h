@@ -26,6 +26,7 @@
 #ifndef TOADLET_TADPOLE_QUERY_SPACIALQUERY_H
 #define TOADLET_TADPOLE_QUERY_SPACIALQUERY_H
 
+#include <toadlet/peeper/Query.h>
 #include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
@@ -33,19 +34,25 @@ namespace tadpole{
 namespace node{
 
 class Scene;
+class Node;
 
 }
 namespace query{
 
-class QueryManager;
-
-class SpacialQuery{
+class SpacialQuery:public peeper::Query{
 public:
 	TOADLET_SHARED_POINTERS(SpacialQuery);
 
+	virtual ~SpacialQuery(){}
+
+	virtual void create(node::Scene *scene)=0;
 	virtual void destroy()=0;
 
-	virtual bool performQuery(node::Scene *scene)=0;
+	virtual void beginQuery()=0;
+	virtual void endQuery()=0;
+	virtual bool performQuery()=0;
+
+	virtual const egg::Collection<node::Node*> &getResult()=0;
 };
 
 }
