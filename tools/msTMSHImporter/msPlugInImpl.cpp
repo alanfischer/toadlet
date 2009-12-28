@@ -56,7 +56,7 @@ CMsPlugInApp::CMsPlugInApp()
 CMsPlugInApp theApp;
 
 
-
+extern "C" __declspec(dllexport)
 cMsPlugIn*
 CreatePlugIn ()
 {

@@ -31,7 +31,7 @@ BOOL APIENTRY DllMain( HANDLE hModule,
 }
 
 
-
+extern "C" __declspec(dllexport)
 cMsPlugIn*
 CreatePlugIn ()
 {

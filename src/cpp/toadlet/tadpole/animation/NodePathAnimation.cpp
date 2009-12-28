@@ -36,6 +36,8 @@ namespace animation{
 NodePathAnimation::NodePathAnimation(Node::ptr target):
 	//mTarget,
 	//mTrack,
+	mUseLookAt(false),
+	//mLookAt,
 	mHint(0)
 {
 	mTarget=target;
@@ -49,6 +51,11 @@ void NodePathAnimation::setTrack(Track::ptr track){
 	mTrack=track;
 }
 
+void NodePathAnimation::setLookAt(const Vector3 &lookAt){
+	mLookAt.set(lookAt);
+	mUseLookAt=true;
+}
+
 void NodePathAnimation::set(scalar value){
 	const KeyFrame *f1=NULL,*f2=NULL;
 	scalar t=mTrack->getKeyFramesAtTime(value,f1,f2,mHint);
@@ -56,13 +63,24 @@ void NodePathAnimation::set(scalar value){
 	Vector3 &translate=cache_set_translate.reset();
 	Math::lerp(translate,f1->translate,f2->translate,t);
 
-	Quaternion &rotate=cache_set_rotate.reset();
-	Math::slerp(rotate,f1->rotate,f2->rotate,t);
-	Matrix3x3 &rotateMatrix=cache_set_rotateMatrix.reset();
-	Math::setMatrix3x3FromQuaternion(rotateMatrix,rotate);
+	if(mUseLookAt){
+		Matrix4x4 lookAt;
+		Math::setMatrix4x4FromLookAt(lookAt,translate,mLookAt,Math::Z_UNIT_VECTOR3,true);
+		Matrix3x3 &rotateMatrix=cache_set_rotateMatrix.reset();
+		Math::setMatrix3x3FromMatrix4x4(rotateMatrix,lookAt);
 
-	mTarget->setTranslate(translate);
-	mTarget->setRotate(rotateMatrix);
+		mTarget->setTranslate(translate);
+		mTarget->setRotate(rotateMatrix);
+	}
+	else{
+		Quaternion &rotate=cache_set_rotate.reset();
+		Math::slerp(rotate,f1->rotate,f2->rotate,t);
+		Matrix3x3 &rotateMatrix=cache_set_rotateMatrix.reset();
+		Math::setMatrix3x3FromQuaternion(rotateMatrix,rotate);
+
+		mTarget->setTranslate(translate);
+		mTarget->setRotate(rotateMatrix);
+	}
 }
 
 scalar NodePathAnimation::getMin() const{
