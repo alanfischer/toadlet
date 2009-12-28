@@ -47,6 +47,9 @@ public:
 	void setTrack(Track::ptr track);
 	inline Track::ptr getTrack() const{return mTrack;}
 
+	void setLookAt(const Vector3 &lookAt);
+	inline const Vector3 &getLookAt() const{return mLookAt;}
+
 	void set(scalar value);
 
 	scalar getMin() const;
@@ -58,6 +61,8 @@ public:
 protected:
 	node::Node::ptr mTarget;
 	Track::ptr mTrack;
+	bool mUseLookAt;
+	Vector3 mLookAt;
 	int mHint;
 
 	Vector3 cache_set_translate;
