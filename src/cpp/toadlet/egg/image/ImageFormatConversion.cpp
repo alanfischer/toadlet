@@ -82,6 +82,30 @@ bool ImageFormatConversion::convert(uint8 *src,int srcFormat,int srcRowPitch,int
 			}
 		}
 	}
+	else if(srcFormat==Format_L_8 && dstFormat==Format_RGB_8){
+		for(k=0;k<depth;++k){
+			for(j=0;j<height;++j){
+				for(i=0;i<width;++i){
+					uint8 *s=(uint8*)(src+k*srcSlicePitch+j*srcRowPitch+i);
+					uint8 *d=(uint8*)(dst+k*dstSlicePitch+j*dstRowPitch+i*3);
+					*d=*s;
+					*(d+1)=*s;
+					*(d+2)=*s;
+				}
+			}
+		}
+	}
+	else if(srcFormat==Format_RGB_8 && dstFormat==Format_L_8){
+		for(k=0;k<depth;++k){
+			for(j=0;j<height;++j){
+				for(i=0;i<width;++i){
+					uint8 *s=(uint8*)(src+k*srcSlicePitch+j*srcRowPitch+i*3);
+					uint8 *d=(uint8*)(dst+k*dstSlicePitch+j*dstRowPitch+i);
+					*d=*s;
+				}
+			}
+		}
+	}
 	else if(srcFormat==Format_LA_8 && dstFormat==Format_RGBA_8){
 		for(k=0;k<depth;++k){
 			for(j=0;j<height;++j){

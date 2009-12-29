@@ -3,6 +3,8 @@
 
 #include <toadlet/tadpole/plugins/hop/HopEntity.h>
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
+#include <toadlet/tadpole/node/CameraNode.h>
+#include <toadlet/tadpole/node/SceneNode.h>
 #include <toadlet/pad/Application.h>
 
 class ConvexTest:public toadlet::pad::Application{
@@ -20,8 +22,8 @@ protected:
 	void setupTest();
 
 	toadlet::tadpole::HopScene::ptr mScene;
-	toadlet::tadpole::entity::CameraEntity::ptr mCamera;
-	toadlet::tadpole::entity::ParentEntity::ptr mNode;
+	toadlet::tadpole::node::CameraNode::ptr mCamera;
+	toadlet::tadpole::node::ParentNode::ptr mNode;
 };
 
 #endif

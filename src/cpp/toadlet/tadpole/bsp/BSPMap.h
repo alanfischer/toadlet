@@ -50,6 +50,7 @@ public:
 	egg::Collection<Face> faces;
 	egg::Collection<Vector3> vertexes;
 	egg::Collection<Plane> planes;
+	egg::Collection<egg::Map<egg::String,egg::String> > entities;
 
 	// TODO: Remove these in favor of something easier
 	//  Or at least rename them to something more descriptive

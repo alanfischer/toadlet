@@ -2,7 +2,6 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/System.h>
-#include <toadlet/tadpole/entity/MeshEntity.h>
 
 
 using namespace toadlet;
@@ -10,7 +9,7 @@ using namespace toadlet::egg;
 using namespace toadlet::hop;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::entity;
+using namespace toadlet::tadpole::node;
 using namespace toadlet::pad;
 
 #if defined(TOADLET_PLATFORM_WINCE)
@@ -32,12 +31,12 @@ ConvexTest::ConvexTest(){
 void ConvexTest::create(){
 	Application::create();
 
-	mScene=(HopScene*)(new HopScene())->create(mEngine);
+	mScene=new HopScene(mEngine->createNodeType(SceneNode::type()));
 	mEngine->setScene(mScene);
 
-	mCamera=(CameraEntity*)(new CameraEntity())->create(mEngine);
+	mCamera=mEngine->createNodeType(CameraNode::type());
 	mCamera->setLookAt(Vector3(-Math::fromInt(25),0,0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
-	mScene->attach(mCamera);
+	mScene->getRootNode()->attach(mCamera);
 
 	setupTest();
 }
@@ -46,20 +45,15 @@ ConvexTest::~ConvexTest(){
 }
 
 void ConvexTest::update(int dt){
-	mNode->setRotate(0,0,Math::ONE,Math::fromMilli(mScene->getVisualTime())*4);
+	mNode->setRotate(0,0,Math::ONE,Math::fromMilli(mScene->getRenderTime())*4);
 
 	mScene->update(dt);
 }
 
 void ConvexTest::render(Renderer *renderer){
-	mEngine->contextUpdate(renderer);
-
 	renderer->beginScene();
-
-	mScene->render(renderer,mCamera);
-
+		mScene->render(renderer,mCamera,NULL);
 	renderer->endScene();
-
 	renderer->swap();
 }
 
@@ -82,16 +76,16 @@ void ConvexTest::setupTest(){
 	if(mNode!=NULL){
 		mNode->destroy();
 	}
-	mNode=(ParentEntity*)(new ParentEntity())->create(mEngine);
-	mScene->attach(mNode);
+	mNode=mEngine->createNodeType(ParentNode::type());
+	mScene->getRootNode()->attach(mNode);
 	mScene->showCollisionVolumes(true,true);
 
 	Shape::ptr sphere(new Shape(Sphere(Math::HALF)));
-	HopEntity::ptr sphereEntity=(HopEntity*)(new HopEntity())->create(mEngine);
+	HopEntity::ptr sphereEntity=mEngine->createNodeType(HopEntity::type());
 	sphereEntity->addShape(sphere);
 	sphereEntity->setCoefficientOfRestitution(0.9);
 	sphereEntity->setTranslate(Vector3(0.0,0.0,2.0));
-	mScene->attach(sphereEntity);
+	mScene->getRootNode()->attach(sphereEntity);
 
 	ConvexSolid cs;
 	cs.planes.add(Plane(Vector3(1.0,0.0,0.0),0.5));
@@ -101,12 +95,12 @@ void ConvexTest::setupTest(){
 	cs.planes.add(Plane(Vector3(1.0,1.0,1.0),0.5));
 	cs.planes.add(Plane(Vector3(0.0,0.0,-1.0),0.5));
 	Shape::ptr cshape(new Shape(cs));
-	HopEntity::ptr convexEntity=(HopEntity*)(new HopEntity())->create(mEngine);
+	HopEntity::ptr convexEntity=mEngine->createNodeType(HopEntity::type());
 	convexEntity->addShape(cshape);
 	convexEntity->setLocalGravity(Math::ZERO_VECTOR3);
 	convexEntity->setCoefficientOfRestitution(0.9);
 	convexEntity->setInfiniteMass();
-	mScene->attach(convexEntity);
+	mScene->getRootNode()->attach(convexEntity);
 
 	mScene->setGravity(Vector3(0.0,0.0,-Math::ONE));
 }

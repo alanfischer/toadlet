@@ -160,7 +160,7 @@ PeerEventSynchronizer::PeerStatus PeerEventSynchronizer::update(){
 			for(i=0;i<numEvents;++i){
 				int type=mDataPacketIn->readUInt8();
 				if(mEventFactory!=NULL){
-					event=mEventFactory->makeEventFromType(type);
+					event=mEventFactory->createEventType(type);
 				}
 				if(event!=NULL){
 					event->read(mDataPacketIn);

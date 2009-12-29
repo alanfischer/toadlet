@@ -169,6 +169,7 @@ void HopScene::setHopEntityFactory(HopEntityFactory *factory){
 }
 
 void HopScene::showCollisionVolumes(bool show,bool interpolate){
+Logger::alert(String("SETTING SHOW"));
 	mShowCollisionVolumes=show;
 	mInterpolateCollisionVolumes=interpolate;
 
