@@ -312,7 +312,9 @@ scalar BSPSceneNode::traceSphere(Vector3 &normal,const Segment &segment,const Sp
 	scalar result=Math::ONE;
 	Vector3 end;
 	segment.getEndPoint(end);
-	traceNode(result,normal,0,segment.origin,end,0,Math::ONE,&sphere,NULL);
+	if(mBSPMap!=NULL){
+		traceNode(result,normal,0,segment.origin,end,0,Math::ONE,&sphere,NULL);
+	}
 	if(result==Math::ONE){
 		result=-Math::ONE;
 	}
@@ -323,7 +325,9 @@ scalar BSPSceneNode::traceAABox(Vector3 &normal,const Segment &segment,const AAB
 	scalar result=Math::ONE;
 	Vector3 end;
 	segment.getEndPoint(end);	
-	traceNode(result,normal,0,segment.origin,end,0,Math::ONE,NULL,&box);
+	if(mBSPMap!=NULL){
+		traceNode(result,normal,0,segment.origin,end,0,Math::ONE,NULL,&box);
+	}
 	if(result==Math::ONE){
 		result=-Math::ONE;
 	}

@@ -99,6 +99,8 @@ public:
 	virtual void update(int dt);
 	virtual void render(peeper::Renderer *renderer);
 
+	void setMouseLocked(bool locked);
+
 	void changeRendererPlugin(int index);
 	void setRendererOptions(int *options,int length);
 
@@ -130,6 +132,7 @@ protected:
 	bool mFullscreen;
 	peeper::Visual mVisual;
 	ApplicationListener *mApplicationListener;
+	bool mMouseLocked;
 
 	tadpole::Engine *mEngine;
 	peeper::RenderTarget *mRenderTarget;

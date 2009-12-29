@@ -35,7 +35,7 @@ class EventFactory{
 public:
 	virtual ~EventFactory(){}
 
-	virtual Event::ptr makeEventFromType(int type)=0;
+	virtual Event::ptr createEventType(int type)=0;
 };
 
 }

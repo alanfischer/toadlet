@@ -116,6 +116,7 @@ Win32Application::Win32Application():
 		mVisual(ImageDefinitions::Format_RGB_8,16),
 	#endif
 	mApplicationListener(NULL),
+	mMouseLocked(false),
 
 	mEngine(NULL),
 	mRenderer(NULL),
@@ -500,6 +501,12 @@ void Win32Application::mousePressed(int x,int y,int button){
 }
 
 void Win32Application::mouseMoved(int x,int y){
+	if(mMouseLocked && (getWidth()/2!=x || getHeight()/2!=y)){
+		POINT pt={getWidth()/2,getHeight()/2};
+		ClientToScreen((HWND)getHWND(),&pt);
+		SetCursorPos(pt.x,pt.y);
+	}
+
 	if(mApplicationListener!=NULL){
 		mApplicationListener->mouseMoved(x,y);
 	}
@@ -527,6 +534,12 @@ void Win32Application::render(Renderer *renderer){
 	if(mApplicationListener!=NULL){
 		mApplicationListener->render(renderer);
 	}
+}
+
+void Win32Application::setMouseLocked(bool locked){
+	mMouseLocked=locked;
+
+	ShowCursor(!mMouseLocked);
 }
 
 void Win32Application::changeRendererPlugin(int rendererPlugin){

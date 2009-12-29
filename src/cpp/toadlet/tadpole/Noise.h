@@ -36,13 +36,21 @@ public:
 	Noise(int octaves,float freq,float amp,int seed,int sampleSize=1024);
 	~Noise();
 
+	float noise1(float x);
+	float noise2(float x,float y);
+	float noise3(float x,float y,float z);
+
 	float perlin1(float x);
 	float perlin2(float x,float y);
 	float perlin3(float x,float y,float z);
 
-	float noise1(float x);
-	float noise2(float x,float y);
-	float noise3(float x,float y,float z);
+	float tileableNoise1(float x,float w);
+	float tileableNoise2(float x,float y,float w,float h);
+	float tileableNoise3(float x,float y,float z,float w,float h,float d);
+
+	float tileablePerlin1(float x,float w);
+	float tileablePerlin2(float x,float y,float w,float h);
+	float tileablePerlin3(float x,float y,float z,float w,float h,float d);
 
 protected:
 	void init();

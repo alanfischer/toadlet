@@ -76,7 +76,7 @@ Resource::ptr BSP30Handler::load(InputStream::ptr in,const ResourceHandlerData *
 	void *visibility;	int nvisibility;
 	void *textures;		int ntextures;
 	void *lighting;		int nlighting;
-	void *entities;		int nentities;
+	char *entities;		int nentities;
 
 	readLump(in,LUMP_MODELS,(void**)&models,sizeof(bmodel),&nmodels);
 	readLump(in,LUMP_VERTEXES,(void**)&vertexes,sizeof(bvertex),&nvertexes);
@@ -252,6 +252,32 @@ Resource::ptr BSP30Handler::load(InputStream::ptr in,const ResourceHandlerData *
 
 	Collection<Plane> workingPlanes,workingBrushPlanes;
 	buildBrushes(map,map->trees[0].nodeStart,workingPlanes,workingBrushPlanes);
+
+	// Parse Entity data
+	char *data=entities;
+	Map<String,String> keyValues;
+	while(*data!=NULL){
+		if(*data=='{'){
+			keyValues.clear();
+		}
+		else if(*data=='}'){
+			map->entities.add(keyValues);
+		}
+		else if(*data=='\"'){
+			char *key=++data;
+			while(*data!='\"') data++;
+			*data=NULL;
+
+			while(*data!='\"') data++;
+
+			char *value=++data;
+			while(*data!='\"') data++;
+			*data=NULL;
+
+			keyValues[key]=value;
+		}
+		data++;
+	}
 
 	// Hacky ones
 	map->surfedges.resize(nsurfedges);

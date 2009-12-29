@@ -60,6 +60,7 @@ float Noise::noise1(float x){
 	float rx0, rx1, sx, u, v;
 
 	x*=mFrequency;
+	x+=mSampleSize;
 	bx0=((int)x) & (mSampleSize-1);
 	bx1=(bx0+1) & (mSampleSize-1);
 	rx0=x-(int)x;
@@ -79,12 +80,14 @@ float Noise::noise2(float x,float y){
 	int i,j;
 
 	x*=mFrequency;
+	x+=mSampleSize;
 	bx0=((int)x) & (mSampleSize-1);
 	bx1=(bx0+1) & (mSampleSize-1);
 	rx0=x-(int)x;
 	rx1=rx0-1.0f;
 
 	y*=mFrequency;
+	y+=mSampleSize;
 	by0=((int)y) & (mSampleSize-1);
 	by1=(by0+1) & (mSampleSize-1);
 	ry0=y-(int)y;
@@ -118,18 +121,21 @@ float Noise::noise3(float x,float y,float z){
 	int i,j;
 
 	x*=mFrequency;
+	x+=mSampleSize;
 	bx0=((int)x) & (mSampleSize-1);
 	bx1=(bx0+1) & (mSampleSize-1);
 	rx0=x-(int)x;
 	rx1=rx0-1.0f;
 
 	y*=mFrequency;
+	y+=mSampleSize;
 	by0=((int)y) & (mSampleSize-1);
 	by1=(by0+1) & (mSampleSize-1);
 	ry0=y-(int)y;
 	ry1=ry0-1.0f;
 
 	z*=mFrequency;
+	z+=mSampleSize;
 	bz0=((int)z) & (mSampleSize-1);
 	bz1=(bz0+1) & (mSampleSize-1);
 	rz0=z-(int)z;
@@ -215,6 +221,77 @@ float Noise::perlin3(float x,float y,float z){
 	return result;
 }
 
+float Noise::tileableNoise1(float x,float w){
+	float n1=noise1(x);
+	float n2=noise1(x-w);
+	float f=(n1*(w-x) +
+			n2*x) / w;
+	return f;
+}
+
+float Noise::tileableNoise2(float x,float y,float w,float h){
+	return (noise2(x,y)*(w-x)*(h-y) +
+			noise2(x-w,y)*x*(h-y) +
+			noise2(x,y-h)*(w-x)*y +
+			noise2(x-w,y-h)*x*y) / (w*h);
+}
+
+float Noise::tileableNoise3(float x,float y,float z,float w,float h,float d){
+	return (noise3(x,y,z)*(w-x)*(h-y)*(d-z) +
+			noise3(x-w,y,z)*x*(h-y)*(d-z) +
+			noise3(x,y-h,z)*(w-x)*y*(d-z) +
+			noise3(x-w,y-h,z)*x*y*(d-z) +
+			noise3(x,y,z-d)*(w-x)*(h-y)*z +
+			noise3(x-w,y,z-d)*x*(h-y)*z +
+			noise3(x,y-h,z-d)*(w-x)*y*z +
+			noise3(x-w,y-h,z-d)*x*y*z) / (w*h*d);
+}
+
+float Noise::tileablePerlin1(float x,float w){
+	float result=0.0f;
+	float scale=1.0f;
+
+	int i;
+	for(i=0;i<mOctaves;++i){
+		result+=tileableNoise1(x,w)*scale;
+		x*=2;w*=2;
+		scale*=0.5f;
+	}
+
+	return result;
+}
+
+float Noise::tileablePerlin2(float x,float y,float w,float h){
+	float result=0.0f;
+	float scale=1.0f;
+
+	int i;
+	for(i=0;i<mOctaves;++i){
+		result+=tileableNoise2(x,y,w,h)*scale;
+		x*=2;w*=2;
+		y*=2;h*=2;
+		scale*=0.5f;
+	}
+
+	return result;
+}
+
+float Noise::tileablePerlin3(float x,float y,float z,float w,float h,float d){
+	float result=0.0f;
+	float scale=1.0f;
+
+	int i;
+	for(i=0;i<mOctaves;++i){
+		result+=tileableNoise3(x,y,z,w,h,d)*scale;
+		x*=2;w*=2;
+		y*=2;h*=2;
+		z*=2;d*=2;
+		scale*=0.5f;
+	}
+
+	return result;
+}
+
 void Noise::init(){
 	float len,x,y,z;
 	int i,j,k;
@@ -240,7 +317,7 @@ void Noise::init(){
 		g3[i*3+2]=z;
 	}
 
-	while(--i){
+	while(--i>0){
 		k=p[i];
 		p[i]=p[j=mRandom.nextInt(0,mSampleSize)];
 		p[j]=k;

@@ -165,7 +165,7 @@ void HopEntity::addForce(const Vector3 &force){
 void HopEntity::clearForce(){
 	mSolid->clearForce();
 
-	mModifiedFields|=ENTITY_BIT_VELOCITY;
+	mModifiedFields|=ENTITY_BIT_FORCE;
 }
 
 void HopEntity::setLocalGravity(const Vector3 &gravity){
@@ -211,6 +211,7 @@ void HopEntity::setCoefficientOfEffectiveDrag(scalar coeff){
 }
 
 void HopEntity::addShape(hop::Shape::ptr shape){
+Logger::alert(String("ADDING SHAPE"));
 	mSolid->addShape(shape);
 
 	if(mVolumeNode!=NULL){
@@ -380,15 +381,14 @@ void HopEntity::castShadow(){
 }
 
 void HopEntity::showCollisionVolumes(bool show){
+Logger::alert(String("IN SHOW:")+show);
 	if(show){
 		if(mVolumeNode==NULL){
 			mVolumeNode=mEngine->createNodeType(ParentNode::type());
 			mScene->getRootNode()->attach(mVolumeNode);
 		}
 		else{
-			while(mVolumeNode->getNumChildren()>0){
-				mVolumeNode->remove(mVolumeNode->getChild(0));
-			}
+			mVolumeNode->destroyAllChildren();
 		}
 
 		int i;
@@ -411,10 +411,14 @@ void HopEntity::showCollisionVolumes(bool show){
 			}
 
 			// TODO: Use LINES for bounding volumes
-			//mesh->subMeshes[0]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,mesh->subMeshes[0]->indexData->indexBuffer));
+			IndexBuffer::ptr indexBuffer=mesh->subMeshes[0]->indexData->indexBuffer;
+			mesh->subMeshes[0]->indexData->setIndexBuffer(NULL);
+			mesh->subMeshes[0]->indexData->destroy();
+			mesh->subMeshes[0]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,indexBuffer));
 			MeshNode *meshNode=mEngine->createNodeType(MeshNode::type());
 			meshNode->setMesh(mesh);
 			mVolumeNode->attach(meshNode);
+			Logger::alert("ADDING THE NODES");
 		}
 	}
 	else{
