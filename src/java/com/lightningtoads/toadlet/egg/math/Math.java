@@ -210,6 +210,16 @@ public final class Math{
 		r.x*=f;
 		r.y*=f;
 	}
+
+	public static void mul(Vector2 r,Vector2 v1,Vector2 v2){
+		r.x=v1.x*v2.x;
+		r.y=v1.y*v2.y;
+	}
+
+	public static void mul(Vector2 r,Vector2 v){
+		r.x*=v.x;
+		r.y*=v.y;
+	}
 	
 	public static void div(Vector2 r,Vector2 v,real f){
 		real i=1.0f/f;
@@ -221,6 +231,16 @@ public final class Math{
 		real i=1.0f/f;
 		r.x*=i;
 		r.y*=i;
+	}
+
+	public static void div(Vector2 r,Vector2 v1,Vector2 v2){
+		r.x=v1.x/v2.x;
+		r.y=v1.y/v2.y;
+	}
+
+	public static void div(Vector2 r,Vector2 v){
+		r.x/=v.x;
+		r.y/=v.y;
 	}
 
 	public static void madd(Vector2 r,Vector2 b,real c,Vector2 a){
@@ -353,7 +373,19 @@ public final class Math{
 		r.y*=f;
 		r.z*=f;
 	}
-	
+
+	public static void mul(Vector3 r,Vector3 v1,Vector3 v2){
+		r.x=v1.x*v2.x;
+		r.y=v1.y*v2.y;
+		r.z=v1.z*v2.z;
+	}
+
+	public static void mul(Vector3 r,Vector3 v){
+		r.x*=v.x;
+		r.y*=v.y;
+		r.z*=v.z;
+	}
+
 	public static void div(Vector3 r,Vector3 v,real f){
 		real i=1.0f/f;
 		r.x=v.x*i;
@@ -366,6 +398,18 @@ public final class Math{
 		r.x*=i;
 		r.y*=i;
 		r.z*=i;
+	}
+
+	public static void div(Vector3 r,Vector3 v1,Vector3 v2){
+		r.x=v1.x/v2.x;
+		r.y=v1.y/v2.y;
+		r.y=v1.z/v2.z;
+	}
+
+	public static void div(Vector3 r,Vector3 v){
+		r.x/=v.x;
+		r.y/=v.y;
+		r.z/=v.z;
 	}
 
 	public static void madd(Vector3 r,Vector3 b,real c,Vector3 a){
@@ -527,6 +571,20 @@ public final class Math{
 		r.z*=f;
 		r.w*=f;
 	}
+
+	public static void mul(Vector4 r,Vector4 v1,Vector4 v2){
+		r.x=v1.x*v2.x;
+		r.y=v1.y*v2.y;
+		r.z=v1.z*v2.z;
+		r.w=v1.z*v2.w;
+	}
+
+	public static void mul(Vector4 r,Vector4 v){
+		r.x*=v.x;
+		r.y*=v.y;
+		r.z*=v.z;
+		r.w*=v.w;
+	}
 	
 	public static void div(Vector4 r,Vector4 v,real f){
 		real i=1.0f/f;
@@ -542,6 +600,20 @@ public final class Math{
 		r.y*=i;
 		r.z*=i;
 		r.w*=i;
+	}
+
+	public static void div(Vector4 r,Vector4 v1,Vector4 v2){
+		r.x=v1.x/v2.x;
+		r.y=v1.y/v2.y;
+		r.z=v1.z/v2.z;
+		r.w=v1.w/v2.w;
+	}
+
+	public static void div(Vector4 r,Vector4 v){
+		r.x/=v.x;
+		r.y/=v.y;
+		r.z/=v.z;
+		r.w/=v.w;
 	}
 
 	public static void madd(Vector4 r,Vector4 b,real c,Vector4 a){

@@ -90,14 +90,17 @@ public:
 	virtual void setTranslate(const Vector3 &translate);
 	virtual void setTranslate(scalar x,scalar y,scalar z);
 	inline const Vector3 &getTranslate() const{return mTranslate;}
+	inline const Vector3 &getWorldTranslate() const{return mWorldTranslate;}
 
 	virtual void setRotate(const Matrix3x3 &rotate);
 	virtual void setRotate(scalar x,scalar y,scalar z,scalar angle);
 	inline const Matrix3x3 &getRotate() const{return mRotate;}
+	inline const Matrix3x3 &getWorldRotate() const{return mWorldRotate;}
 
 	virtual void setScale(const Vector3 &scale);
 	virtual void setScale(scalar x,scalar y,scalar z);
 	inline const Vector3 &getScale() const{return mScale;}
+	inline const Vector3 &getWorldScale() const{return mWorldScale;}
 
 	inline bool isIdentityTransform() const{return mIdentityTransform;}
 
@@ -158,6 +161,9 @@ protected:
 	Vector3 mTranslate;
 	Matrix3x3 mRotate;
 	Vector3 mScale;
+	Vector3 mWorldTranslate;
+	Matrix3x3 mWorldRotate;
+	Vector3 mWorldScale;
 	int mScope;
 	egg::String mName;
 	bool mAlignXAxis,mAlignYAxis,mAlignZAxis;

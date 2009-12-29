@@ -385,6 +385,16 @@ public final class Math{
 		r.x=TOADLET_MUL_XX(r.x,f);
 		r.y=TOADLET_MUL_XX(r.y,f);
 	}
+
+	public static void mul(Vector2 r,Vector2 v1,Vector2 v2){
+		r.x=TOADLET_MUL_XX(v1.x,v2.x);
+		r.y=TOADLET_MUL_XX(v1.y,v2.y);
+	}
+
+	public static void mul(Vector2 r,Vector2 v){
+		r.x=TOADLET_MUL_XX(r.x,v.x);
+		r.y=TOADLET_MUL_XX(r.y,v.y);
+	}
 	
 	public static void div(Vector2 r,Vector2 v,fixed f){
 		fixed i=TOADLET_DIV_XX(ONE,f);
@@ -396,6 +406,16 @@ public final class Math{
 		fixed i=TOADLET_DIV_XX(ONE,f);
 		r.x=TOADLET_MUL_XX(r.x,i);
 		r.y=TOADLET_MUL_XX(r.y,i);
+	}
+
+	public static void div(Vector2 r,Vector2 v1,Vector2 v2){
+		r.x=TOADLET_DIV_XX(v1.x,v2.x);
+		r.y=TOADLET_DIV_XX(v1.y,v2.y);
+	}
+
+	public static void div(Vector2 r,Vector2 v){
+		r.x=TOADLET_DIV_XX(r.x,v.x);
+		r.y=TOADLET_DIV_XX(r.y,v.y);
 	}
 
 	public static void madd(Vector2 r,Vector2 b,fixed c,Vector2 a){
@@ -532,7 +552,19 @@ public final class Math{
 		r.y=TOADLET_MUL_XX(r.y,f);
 		r.z=TOADLET_MUL_XX(r.z,f);
 	}
-	
+
+	public static void mul(Vector3 r,Vector3 v1,Vector3 v2){
+		r.x=TOADLET_MUL_XX(v1.x,v2.x);
+		r.y=TOADLET_MUL_XX(v1.y,v2.y);
+		r.z=TOADLET_MUL_XX(v1.z,v2.z);
+	}
+
+	public static void mul(Vector3 r,Vector3 v){
+		r.x=TOADLET_MUL_XX(r.x,v.x);
+		r.y=TOADLET_MUL_XX(r.y,v.y);
+		r.z=TOADLET_MUL_XX(r.z,v.z);
+	}
+
 	public static void div(Vector3 r,Vector3 v,fixed f){
 		fixed i=TOADLET_DIV_XX(ONE,f);
 		r.x=TOADLET_MUL_XX(v.x,i);
@@ -546,7 +578,19 @@ public final class Math{
 		r.y=TOADLET_MUL_XX(r.y,i);
 		r.z=TOADLET_MUL_XX(r.z,i);
 	}
-	
+
+	public static void div(Vector3 r,Vector3 v1,Vector3 v2){
+		r.x=TOADLET_DIV_XX(v1.x,v2.x);
+		r.y=TOADLET_DIV_XX(v1.y,v2.y);
+		r.z=TOADLET_DIV_XX(v1.z,v2.z);
+	}
+
+	public static void div(Vector3 r,Vector3 v){
+		r.x=TOADLET_DIV_XX(r.x,v.x);
+		r.y=TOADLET_DIV_XX(r.y,v.y);
+		r.z=TOADLET_DIV_XX(r.z,v.z);
+	}
+
 	public static void madd(Vector3 r,Vector3 b,fixed c,Vector3 a){
 		r.x=TOADLET_MADD_XXX(b.x,c,a.x);
 		r.y=TOADLET_MADD_XXX(b.y,c,a.y);
@@ -710,7 +754,21 @@ public final class Math{
 		r.z=TOADLET_MUL_XX(r.z,f);
 		r.w=TOADLET_MUL_XX(r.w,f);
 	}
-	
+
+	public static void mul(Vector4 r,Vector4 v1,Vector4 v2){
+		r.x=TOADLET_MUL_XX(v1.x,v2.x);
+		r.y=TOADLET_MUL_XX(v1.y,v2.y);
+		r.z=TOADLET_MUL_XX(v1.z,v2.z);
+		r.w=TOADLET_MUL_XX(v1.w,v2.w);
+	}
+
+	public static void mul(Vector4 r,Vector4 v){
+		r.x=TOADLET_MUL_XX(r.x,v.x);
+		r.y=TOADLET_MUL_XX(r.y,v.y);
+		r.z=TOADLET_MUL_XX(r.z,v.z);
+		r.w=TOADLET_MUL_XX(r.w,v.w);
+	}
+
 	public static void div(Vector4 r,Vector4 v,fixed f){
 		fixed i=TOADLET_DIV_XX(ONE,f);
 		r.x=TOADLET_MUL_XX(v.x,i);
@@ -725,6 +783,20 @@ public final class Math{
 		r.y=TOADLET_MUL_XX(r.y,i);
 		r.z=TOADLET_MUL_XX(r.z,i);
 		r.w=TOADLET_MUL_XX(r.w,i);
+	}
+
+	public static void div(Vector4 r,Vector4 v1,Vector4 v2){
+		r.x=TOADLET_DIV_XX(v1.x,v2.x);
+		r.y=TOADLET_DIV_XX(v1.y,v2.y);
+		r.z=TOADLET_DIV_XX(v1.z,v2.z);
+		r.w=TOADLET_DIV_XX(v1.w,v2.w);
+	}
+
+	public static void div(Vector4 r,Vector4 v){
+		r.x=TOADLET_DIV_XX(r.x,v.x);
+		r.y=TOADLET_DIV_XX(r.y,v.y);
+		r.z=TOADLET_DIV_XX(r.z,v.z);
+		r.w=TOADLET_DIV_XX(r.w,v.w);
 	}
 
 	public static void madd(Vector4 r,Vector4 b,fixed c,Vector4 a){
