@@ -186,6 +186,22 @@ void SceneNode::logicUpdate(Node::ptr node,int dt){
 		node->logicUpdate(dt);
 	}
 
+	if(node->mParent==NULL){
+		node->mWorldTranslate.set(node->mTranslate);
+		node->mWorldRotate.set(node->mRotate);
+		node->mWorldScale.set(node->mScale);
+	}
+	else if(node->mIdentityTransform){
+		node->mWorldTranslate.set(node->mParent->mTranslate);
+		node->mWorldRotate.set(node->mParent->mRotate);
+		node->mWorldScale.set(node->mParent->mScale);
+	}
+	else{
+		Math::add(node->mWorldTranslate,node->mTranslate,node->mParent->mTranslate);
+		Math::mul(node->mWorldRotate,node->mRotate,node->mParent->mRotate);
+		Math::mul(node->mWorldScale,node->mScale,node->mParent->mScale);
+	}
+
 	bool awake=node->mReceiveUpdates;
 	ParentNode *parent=node->isParent();
 	if(parent!=NULL){
@@ -200,10 +216,8 @@ void SceneNode::logicUpdate(Node::ptr node,int dt){
 			child=parent->mShadowChildren[i];
 			if(parent->mAwakeCount>1){
 				child->modified();
-				logicUpdate(child,dt);
-				awake=true;
 			}
-			else if(child->mAwakeCount>0){
+			if(child->mAwakeCount>0){
 				logicUpdate(child,dt);
 				awake=true;
 			}

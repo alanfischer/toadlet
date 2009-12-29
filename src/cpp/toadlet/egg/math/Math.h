@@ -116,7 +116,17 @@ namespace Math{
 		r.x*=f;
 		r.y*=f;
 	}
-	
+
+	inline void mul(Vector2 &r,const Vector2 &v1,const Vector2 &v2){
+		r.x=v1.x*v2.x;
+		r.y=v1.y*v2.y;
+	}
+
+	inline void mul(Vector2 &r,const Vector2 &v){
+		r.x*=v.x;
+		r.y*=v.y;
+	}
+
 	inline void div(Vector2 &r,const Vector2 &v,real f){
 		real i=1.0/f;
 		r.x=v.x*i;
@@ -127,6 +137,16 @@ namespace Math{
 		real i=1.0/f;
 		r.x*=i;
 		r.y*=i;
+	}
+
+	inline void div(Vector2 &r,const Vector2 &v1,const Vector2 &v2){
+		r.x=v1.x/v2.x;
+		r.y=v1.y/v2.y;
+	}
+
+	inline void div(Vector2 &r,const Vector2 &v){
+		r.x/=v.x;
+		r.y/=v.y;
 	}
 
 	inline void madd(Vector2 &r,const Vector2 &b,real c,const Vector2 &a){
@@ -259,7 +279,19 @@ namespace Math{
 		r.y*=f;
 		r.z*=f;
 	}
-	
+
+	inline void mul(Vector3 &r,const Vector3 &v1,const Vector3 &v2){
+		r.x=v1.x*v2.x;
+		r.y=v1.y*v2.y;
+		r.z=v1.z*v2.z;
+	}
+
+	inline void mul(Vector3 &r,const Vector3 &v){
+		r.x*=v.x;
+		r.y*=v.y;
+		r.z*=v.z;
+	}
+
 	inline void div(Vector3 &r,const Vector3 &v,real f){
 		real i=1.0/f;
 		r.x=v.x*i;
@@ -272,6 +304,18 @@ namespace Math{
 		r.x*=i;
 		r.y*=i;
 		r.z*=i;
+	}
+
+	inline void div(Vector3 &r,const Vector3 &v1,const Vector3 &v2){
+		r.x=v1.x/v2.x;
+		r.y=v1.y/v2.y;
+		r.y=v1.z/v2.z;
+	}
+
+	inline void div(Vector3 &r,const Vector3 &v){
+		r.x/=v.x;
+		r.y/=v.y;
+		r.z/=v.z;
 	}
 
 	inline void madd(Vector3 &r,const Vector3 &b,real c,const Vector3 &a){
@@ -433,7 +477,21 @@ namespace Math{
 		r.z*=f;
 		r.w*=f;
 	}
-	
+
+	inline void mul(Vector4 &r,const Vector4 &v1,const Vector4 &v2){
+		r.x=v1.x*v2.x;
+		r.y=v1.y*v2.y;
+		r.z=v1.z*v2.z;
+		r.w=v1.z*v2.w;
+	}
+
+	inline void mul(Vector4 &r,const Vector4 &v){
+		r.x*=v.x;
+		r.y*=v.y;
+		r.z*=v.z;
+		r.w*=v.w;
+	}
+
 	inline void div(Vector4 &r,const Vector4 &v,real f){
 		real i=1.0/f;
 		r.x=v.x*i;
@@ -448,6 +506,20 @@ namespace Math{
 		r.y*=i;
 		r.z*=i;
 		r.w*=i;
+	}
+
+	inline void div(Vector4 &r,const Vector4 &v1,const Vector4 &v2){
+		r.x=v1.x/v2.x;
+		r.y=v1.y/v2.y;
+		r.z=v1.z/v2.z;
+		r.w=v1.w/v2.w;
+	}
+
+	inline void div(Vector4 &r,const Vector4 &v){
+		r.x/=v.x;
+		r.y/=v.y;
+		r.z/=v.z;
+		r.w/=v.w;
 	}
 
 	inline void madd(Vector4 &r,const Vector4 &b,real c,const Vector4 &a){

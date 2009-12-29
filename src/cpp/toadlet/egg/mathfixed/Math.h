@@ -116,17 +116,37 @@ namespace Math{
 		r.x=TOADLET_MUL_XX(r.x,f);
 		r.y=TOADLET_MUL_XX(r.y,f);
 	}
-	
+
+	inline void mul(Vector2 &r,const Vector2 &v1,const Vector2 &v2){
+		r.x=TOADLET_MUL_XX(v1.x,v2.x);
+		r.y=TOADLET_MUL_XX(v1.y,v2.y);
+	}
+
+	inline void mul(Vector2 &r,const Vector2 &v){
+		r.x=TOADLET_MUL_XX(r.x,v.x);
+		r.y=TOADLET_MUL_XX(r.y,v.y);
+	}
+
 	inline void div(Vector2 &r,const Vector2 &v,fixed f){
 		fixed i=TOADLET_DIV_XX(ONE,f);
 		r.x=TOADLET_MUL_XX(v.x,i);
 		r.y=TOADLET_MUL_XX(v.y,i);
 	}
-	
+
 	inline void div(Vector2 &r,fixed f){
 		fixed i=TOADLET_DIV_XX(ONE,f);
 		r.x=TOADLET_MUL_XX(r.x,i);
 		r.y=TOADLET_MUL_XX(r.y,i);
+	}
+
+	inline void div(Vector2 &r,const Vector2 &v1,const Vector2 &v2){
+		r.x=TOADLET_DIV_XX(v1.x,v2.x);
+		r.y=TOADLET_DIV_XX(v1.y,v2.y);
+	}
+
+	inline void div(Vector2 &r,const Vector2 &v){
+		r.x=TOADLET_DIV_XX(r.x,v.x);
+		r.y=TOADLET_DIV_XX(r.y,v.y);
 	}
 
 	inline void madd(Vector2 &r,const Vector2 &b,fixed c,const Vector2 &a){
@@ -263,7 +283,19 @@ namespace Math{
 		r.y=TOADLET_MUL_XX(r.y,f);
 		r.z=TOADLET_MUL_XX(r.z,f);
 	}
-	
+
+	inline void mul(Vector3 &r,const Vector3 &v1,const Vector3 &v2){
+		r.x=TOADLET_MUL_XX(v1.x,v2.x);
+		r.y=TOADLET_MUL_XX(v1.y,v2.y);
+		r.z=TOADLET_MUL_XX(v1.z,v2.z);
+	}
+
+	inline void mul(Vector3 &r,const Vector3 &v){
+		r.x=TOADLET_MUL_XX(r.x,v.x);
+		r.y=TOADLET_MUL_XX(r.y,v.y);
+		r.z=TOADLET_MUL_XX(r.z,v.z);
+	}
+
 	inline void div(Vector3 &r,const Vector3 &v,fixed f){
 		fixed i=TOADLET_DIV_XX(ONE,f);
 		r.x=TOADLET_MUL_XX(v.x,i);
@@ -276,6 +308,18 @@ namespace Math{
 		r.x=TOADLET_MUL_XX(r.x,i);
 		r.y=TOADLET_MUL_XX(r.y,i);
 		r.z=TOADLET_MUL_XX(r.z,i);
+	}
+
+	inline void div(Vector3 &r,const Vector3 &v1,const Vector3 &v2){
+		r.x=TOADLET_DIV_XX(v1.x,v2.x);
+		r.y=TOADLET_DIV_XX(v1.y,v2.y);
+		r.z=TOADLET_DIV_XX(v1.z,v2.z);
+	}
+
+	inline void div(Vector3 &r,const Vector3 &v){
+		r.x=TOADLET_DIV_XX(r.x,v.x);
+		r.y=TOADLET_DIV_XX(r.y,v.y);
+		r.z=TOADLET_DIV_XX(r.z,v.z);
 	}
 
 	inline void madd(Vector3 &r,const Vector3 &b,fixed c,const Vector3 &a){
@@ -441,7 +485,21 @@ namespace Math{
 		r.z=TOADLET_MUL_XX(r.z,f);
 		r.w=TOADLET_MUL_XX(r.w,f);
 	}
-	
+
+	inline void mul(Vector4 &r,const Vector4 &v1,const Vector4 &v2){
+		r.x=TOADLET_MUL_XX(v1.x,v2.x);
+		r.y=TOADLET_MUL_XX(v1.y,v2.y);
+		r.z=TOADLET_MUL_XX(v1.z,v2.z);
+		r.w=TOADLET_MUL_XX(v1.w,v2.w);
+	}
+
+	inline void mul(Vector4 &r,const Vector4 &v){
+		r.x=TOADLET_MUL_XX(r.x,v.x);
+		r.y=TOADLET_MUL_XX(r.y,v.y);
+		r.z=TOADLET_MUL_XX(r.z,v.z);
+		r.w=TOADLET_MUL_XX(r.w,v.w);
+	}
+
 	inline void div(Vector4 &r,const Vector4 &v,fixed f){
 		fixed i=TOADLET_DIV_XX(ONE,f);
 		r.x=TOADLET_MUL_XX(v.x,i);
@@ -456,6 +514,20 @@ namespace Math{
 		r.y=TOADLET_MUL_XX(r.y,i);
 		r.z=TOADLET_MUL_XX(r.z,i);
 		r.w=TOADLET_MUL_XX(r.w,i);
+	}
+
+	inline void div(Vector4 &r,const Vector4 &v1,const Vector4 &v2){
+		r.x=TOADLET_DIV_XX(v1.x,v2.x);
+		r.y=TOADLET_DIV_XX(v1.y,v2.y);
+		r.z=TOADLET_DIV_XX(v1.z,v2.z);
+		r.w=TOADLET_DIV_XX(v1.w,v2.w);
+	}
+
+	inline void div(Vector4 &r,const Vector4 &v){
+		r.x=TOADLET_DIV_XX(r.x,v.x);
+		r.y=TOADLET_DIV_XX(r.y,v.y);
+		r.z=TOADLET_DIV_XX(r.z,v.z);
+		r.w=TOADLET_DIV_XX(r.w,v.w);
 	}
 
 	inline void madd(Vector4 &r,const Vector4 &b,fixed c,const Vector4 &a){
