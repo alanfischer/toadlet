@@ -93,38 +93,38 @@ public:
 	inline real *getData(){return &x;}
 	inline const real *getData() const{return &x;}
 
-	inline bool equals(const Vector4 &vec) const{
-		return (vec.x==x && vec.y==y && vec.z==z && vec.w==w);
+	inline bool equals(const Vector4 &v) const{
+		return (v.x==x && v.y==y && v.z==z && v.w==w);
 	}
 
-	inline bool operator==(const Vector4 &vec) const{
-		return (vec.x==x && vec.y==y && vec.z==z && vec.w==w);
+	inline bool operator==(const Vector4 &v) const{
+		return (v.x==x && v.y==y && v.z==z && v.w==w);
 	}
 
-	inline bool operator!=(const Vector4 &vec) const{
-		return (vec.x!=x || vec.y!=y || vec.z!=z || vec.w!=w);
+	inline bool operator!=(const Vector4 &v) const{
+		return (v.x!=x || v.y!=y || v.z!=z || v.w!=w);
 	}
 
-	inline Vector4 operator+(const Vector4 &vec) const{
-		return Vector4(x+vec.x,y+vec.y,z+vec.z,w+vec.w);
+	inline Vector4 operator+(const Vector4 &v) const{
+		return Vector4(x+v.x,y+v.y,z+v.z,w+v.w);
 	}
 
-	inline void operator+=(const Vector4 &vec){
-		x+=vec.x;
-		y+=vec.y;
-		z+=vec.z;
-		w+=vec.w;
+	inline void operator+=(const Vector4 &v){
+		x+=v.x;
+		y+=v.y;
+		z+=v.z;
+		w+=v.w;
 	}
 
-	inline Vector4 operator-(const Vector4 &vec) const{
-		return Vector4(x-vec.x,y-vec.y,z-vec.z,w-vec.w);
+	inline Vector4 operator-(const Vector4 &v) const{
+		return Vector4(x-v.x,y-v.y,z-v.z,w-v.w);
 	}
 
-	inline void operator-=(const Vector4 &vec){
-		x-=vec.x;
-		y-=vec.y;
-		z-=vec.z;
-		w-=vec.w;
+	inline void operator-=(const Vector4 &v){
+		x-=v.x;
+		y-=v.y;
+		z-=v.z;
+		w-=v.w;
 	}
 
 	inline Vector4 operator*(real f) const{
@@ -138,15 +138,15 @@ public:
 		w*=f;
 	}
 
-	inline Vector4 operator*(const Vector4 &vec) const{
-		return Vector4(x*vec.x,y*vec.y,z*vec.z,w*vec.w);
+	inline Vector4 operator*(const Vector4 &v) const{
+		return Vector4(x*v.x,y*v.y,z*v.z,w*v.w);
 	}
 
-	inline void operator*=(const Vector4 &vec){
-		x*=vec.x;
-		y*=vec.y;
-		z*=vec.z;
-		w*=vec.w;
+	inline void operator*=(const Vector4 &v){
+		x*=v.x;
+		y*=v.y;
+		z*=v.z;
+		w*=v.w;
 	}
 
 	inline Vector4 operator/(real f) const{
@@ -162,11 +162,11 @@ public:
 		w*=f;
 	}
 
-	inline void operator/=(const Vector4 &vec){
-		x/=vec.x;
-		y/=vec.y;
-		z/=vec.z;
-		w/=vec.w;
+	inline void operator/=(const Vector4 &v){
+		x/=v.x;
+		y/=v.y;
+		z/=v.z;
+		w/=v.w;
 	}
 
 	inline Vector4 operator-() const{
@@ -182,13 +182,13 @@ public:
 	}
 };
 
-inline Vector4 operator*(real f,const Vector4 &vec){
-	return Vector4(vec.x*f,vec.y*f,vec.z*f,vec.w*f);
+inline Vector4 operator*(real f,const Vector4 &v){
+	return Vector4(v.x*f,v.y*f,v.z*f,v.w*f);
 }
 
-inline Vector4 operator/(real f,const Vector4 &vec){
+inline Vector4 operator/(real f,const Vector4 &v){
 	f=1.0/f;
-	return Vector4(vec.x*f,vec.y*f,vec.z*f,vec.w*f);
+	return Vector4(v.x*f,v.y*f,v.z*f,v.w*f);
 }
 
 }

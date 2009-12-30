@@ -64,34 +64,34 @@ public:
 	inline real *getData(){return &x;}
 	inline const real *getData() const{return &x;}
 
-	inline bool equals(const Vector2 &vec) const{
-		return (vec.x==x && vec.y==y);
+	inline bool equals(const Vector2 &v) const{
+		return (v.x==x && v.y==y);
 	}
 
-	inline bool operator==(const Vector2 &vec) const{
-		return (vec.x==x && vec.y==y);
+	inline bool operator==(const Vector2 &v) const{
+		return (v.x==x && v.y==y);
 	}
 
-	inline bool operator!=(const Vector2 &vec) const{
-		return (vec.x!=x || vec.y!=y);
+	inline bool operator!=(const Vector2 &v) const{
+		return (v.x!=x || v.y!=y);
 	}
 
-	inline Vector2 operator+(const Vector2 &vec) const{
-		return Vector2(x+vec.x,y+vec.y);
+	inline Vector2 operator+(const Vector2 &v) const{
+		return Vector2(x+v.x,y+v.y);
 	}
 
-	inline void operator+=(const Vector2 &vec){
-		x+=vec.x;
-		y+=vec.y;
+	inline void operator+=(const Vector2 &v){
+		x+=v.x;
+		y+=v.y;
 	}
 
-	inline Vector2 operator-(const Vector2 &vec) const{
-		return Vector2(x-vec.x,y-vec.y);
+	inline Vector2 operator-(const Vector2 &v) const{
+		return Vector2(x-v.x,y-v.y);
 	}
 
-	inline void operator-=(const Vector2 &vec){
-		x-=vec.x;
-		y-=vec.y;
+	inline void operator-=(const Vector2 &v){
+		x-=v.x;
+		y-=v.y;
 	}
 
 	inline Vector2 operator*(real f) const{
@@ -103,13 +103,13 @@ public:
 		y*=f;
 	}
 
-	inline Vector2 operator*(const Vector2 &vec) const{
-		return Vector2(x*vec.x,y*vec.y);
+	inline Vector2 operator*(const Vector2 &v) const{
+		return Vector2(x*v.x,y*v.y);
 	}
 
-	inline void operator*=(const Vector2 &vec){
-		x*=vec.x;
-		y*=vec.y;
+	inline void operator*=(const Vector2 &v){
+		x*=v.x;
+		y*=v.y;
 	}
 
 	inline Vector2 operator/(real f) const{
@@ -123,13 +123,13 @@ public:
 		y*=f;
 	}
 
-	inline Vector2 operator/(const Vector2 &vec) const{
-		return Vector2(x/vec.x,y/vec.y);
+	inline Vector2 operator/(const Vector2 &v) const{
+		return Vector2(x/v.x,y/v.y);
 	}
 
-	inline void operator/=(const Vector2 &vec){
-		x/=vec.x;
-		y/=vec.y;
+	inline void operator/=(const Vector2 &v){
+		x/=v.x;
+		y/=v.y;
 	}
 
 	inline Vector2 operator-() const{
@@ -145,13 +145,13 @@ public:
 	}
 };
 
-inline Vector2 operator*(real f,const Vector2 &vec){
-	return Vector2(vec.x*f,vec.y*f);
+inline Vector2 operator*(real f,const Vector2 &v){
+	return Vector2(v.x*f,v.y*f);
 }
 
-inline Vector2 operator/(real f,const Vector2 &vec){
+inline Vector2 operator/(real f,const Vector2 &v){
 	f=1.0/f;
-	return Vector2(vec.x*f,vec.y*f);
+	return Vector2(v.x*f,v.y*f);
 }
 
 }

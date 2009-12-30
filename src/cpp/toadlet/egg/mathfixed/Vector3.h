@@ -78,36 +78,36 @@ public:
 	inline fixed *getData(){return &x;}
 	inline const fixed *getData() const{return &x;}
 
-	inline bool equals(const Vector3 &vec) const{
-		return (vec.x==x && vec.y==y && vec.z==z);
+	inline bool equals(const Vector3 &v) const{
+		return (v.x==x && v.y==y && v.z==z);
 	}
 
-	inline bool operator==(const Vector3 &vec) const{
-		return (vec.x==x && vec.y==y && vec.z==z);
+	inline bool operator==(const Vector3 &v) const{
+		return (v.x==x && v.y==y && v.z==z);
 	}
 
-	inline bool operator!=(const Vector3 &vec) const{
-		return (vec.x!=x || vec.y!=y || vec.z!=z);
+	inline bool operator!=(const Vector3 &v) const{
+		return (v.x!=x || v.y!=y || v.z!=z);
 	}
 
-	inline Vector3 operator+(const Vector3 &vec) const{
-		return Vector3(x+vec.x,y+vec.y,z+vec.z);
+	inline Vector3 operator+(const Vector3 &v) const{
+		return Vector3(x+v.x,y+v.y,z+v.z);
 	}
 
-	inline void operator+=(const Vector3 &vec){
-		x+=vec.x;
-		y+=vec.y;
-		z+=vec.z;
+	inline void operator+=(const Vector3 &v){
+		x+=v.x;
+		y+=v.y;
+		z+=v.z;
 	}
 
-	inline Vector3 operator-(const Vector3 &vec) const{
-		return Vector3(x-vec.x,y-vec.y,z-vec.z);
+	inline Vector3 operator-(const Vector3 &v) const{
+		return Vector3(x-v.x,y-v.y,z-v.z);
 	}
 
-	inline void operator-=(const Vector3 &vec){
-		x-=vec.x;
-		y-=vec.y;
-		z-=vec.z;
+	inline void operator-=(const Vector3 &v){
+		x-=v.x;
+		y-=v.y;
+		z-=v.z;
 	}
 
 	inline Vector3 operator*(fixed f) const{
@@ -120,14 +120,14 @@ public:
 		z=Math::mul(z,f);
 	}
 
-	inline Vector3 operator*(const Vector3 &vec) const{
-		return Vector3(Math::mul(x,vec.x),Math::mul(y,vec.y),Math::mul(z,vec.z));
+	inline Vector3 operator*(const Vector3 &v) const{
+		return Vector3(Math::mul(x,v.x),Math::mul(y,v.y),Math::mul(z,v.z));
 	}
 
-	inline void operator*=(const Vector3 &vec){
-		x=Math::mul(x,vec.x);
-		y=Math::mul(y,vec.y);
-		z=Math::mul(z,vec.z);
+	inline void operator*=(const Vector3 &v){
+		x=Math::mul(x,v.x);
+		y=Math::mul(y,v.y);
+		z=Math::mul(z,v.z);
 	}
 
 	inline Vector3 operator/(fixed f) const{
@@ -142,14 +142,14 @@ public:
 		z=Math::mul(z,f);
 	}
 
-	inline Vector3 operator/(const Vector3 &vec) const{
-		return Vector3(Math::mul(x,vec.x),Math::mul(y,vec.y),Math::mul(z,vec.z));
+	inline Vector3 operator/(const Vector3 &v) const{
+		return Vector3(Math::mul(x,v.x),Math::mul(y,v.y),Math::mul(z,v.z));
 	}
 
-	inline void operator/=(const Vector3 &vec){
-		x=Math::mul(x,vec.x);
-		y=Math::mul(y,vec.y);
-		z=Math::mul(z,vec.z);
+	inline void operator/=(const Vector3 &v){
+		x=Math::mul(x,v.x);
+		y=Math::mul(y,v.y);
+		z=Math::mul(z,v.z);
 	}
 
 	inline Vector3 operator-() const{
@@ -165,13 +165,13 @@ public:
 	}
 };
 
-inline Vector3 operator*(fixed f,const Vector3 &vec){
-	return Vector3(Math::mul(vec.x,f),Math::mul(vec.y,f),Math::mul(vec.z,f));
+inline Vector3 operator*(fixed f,const Vector3 &v){
+	return Vector3(Math::mul(v.x,f),Math::mul(v.y,f),Math::mul(v.z,f));
 }
 
-inline Vector3 operator/(fixed f,const Vector3 &vec){
+inline Vector3 operator/(fixed f,const Vector3 &v){
 	f=Math::div(Math::ONE,f);
-	return Vector3(Math::mul(vec.x,f),Math::mul(vec.y,f),Math::mul(vec.z,f));
+	return Vector3(Math::mul(v.x,f),Math::mul(v.y,f),Math::mul(v.z,f));
 }
 
 }
