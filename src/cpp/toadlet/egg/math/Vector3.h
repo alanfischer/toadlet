@@ -78,36 +78,36 @@ public:
 	inline real *getData(){return &x;}
 	inline const real *getData() const{return &x;}
 
-	inline bool equals(const Vector3 &vec) const{
-		return (vec.x==x && vec.y==y && vec.z==z);
+	inline bool equals(const Vector3 &v) const{
+		return (v.x==x && v.y==y && v.z==z);
 	}
 
-	inline bool operator==(const Vector3 &vec) const{
-		return (vec.x==x && vec.y==y && vec.z==z);
+	inline bool operator==(const Vector3 &v) const{
+		return (v.x==x && v.y==y && v.z==z);
 	}
 
-	inline bool operator!=(const Vector3 &vec) const{
-		return (vec.x!=x || vec.y!=y || vec.z!=z);
+	inline bool operator!=(const Vector3 &v) const{
+		return (v.x!=x || v.y!=y || v.z!=z);
 	}
 
-	inline Vector3 operator+(const Vector3 &vec) const{
-		return Vector3(x+vec.x,y+vec.y,z+vec.z);
+	inline Vector3 operator+(const Vector3 &v) const{
+		return Vector3(x+v.x,y+v.y,z+v.z);
 	}
 
-	inline void operator+=(const Vector3 &vec){
-		x+=vec.x;
-		y+=vec.y;
-		z+=vec.z;
+	inline void operator+=(const Vector3 &v){
+		x+=v.x;
+		y+=v.y;
+		z+=v.z;
 	}
 
-	inline Vector3 operator-(const Vector3 &vec) const{
-		return Vector3(x-vec.x,y-vec.y,z-vec.z);
+	inline Vector3 operator-(const Vector3 &v) const{
+		return Vector3(x-v.x,y-v.y,z-v.z);
 	}
 
-	inline void operator-=(const Vector3 &vec){
-		x-=vec.x;
-		y-=vec.y;
-		z-=vec.z;
+	inline void operator-=(const Vector3 &v){
+		x-=v.x;
+		y-=v.y;
+		z-=v.z;
 	}
 
 	inline Vector3 operator*(real f) const{
@@ -120,14 +120,14 @@ public:
 		z*=f;
 	}
 
-	inline Vector3 operator*(const Vector3 &vec) const{
-		return Vector3(x*vec.x,y*vec.y,z*vec.z);
+	inline Vector3 operator*(const Vector3 &v) const{
+		return Vector3(x*v.x,y*v.y,z*v.z);
 	}
 
-	inline void operator*=(const Vector3 &vec){
-		x*=vec.x;
-		y*=vec.y;
-		z*=vec.z;
+	inline void operator*=(const Vector3 &v){
+		x*=v.x;
+		y*=v.y;
+		z*=v.z;
 	}
 
 	inline Vector3 operator/(real f) const{
@@ -142,14 +142,14 @@ public:
 		z*=f;
 	}
 
-	inline Vector3 operator/(const Vector3 &vec) const{
-		return Vector3(x/vec.x,y/vec.y,z/vec.z);
+	inline Vector3 operator/(const Vector3 &v) const{
+		return Vector3(x/v.x,y/v.y,z/v.z);
 	}
 
-	inline void operator/=(const Vector3 &vec){
-		x/=vec.x;
-		y/=vec.y;
-		z/=vec.z;
+	inline void operator/=(const Vector3 &v){
+		x/=v.x;
+		y/=v.y;
+		z/=v.z;
 	}
 
 	inline Vector3 operator-() const{
@@ -165,13 +165,13 @@ public:
 	}
 };
 
-inline Vector3 operator*(real f,const Vector3 &vec){
-	return Vector3(vec.x*f,vec.y*f,vec.z*f);
+inline Vector3 operator*(real f,const Vector3 &v){
+	return Vector3(v.x*f,v.y*f,v.z*f);
 }
 
-inline Vector3 operator/(real f,const Vector3 &vec){
+inline Vector3 operator/(real f,const Vector3 &v){
 	f=1.0/f;
-	return Vector3(vec.x*f,vec.y*f,vec.z*f);
+	return Vector3(v.x*f,v.y*f,v.z*f);
 }
 
 }

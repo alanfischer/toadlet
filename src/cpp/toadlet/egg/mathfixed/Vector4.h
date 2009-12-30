@@ -93,34 +93,34 @@ public:
 	inline fixed *getData(){return &x;}
 	inline const fixed *getData() const{return &x;}
 
-	inline bool operator==(const Vector4 &vec) const{
-		return (vec.x==x && vec.y==y && vec.z==z && vec.w==w);
+	inline bool operator==(const Vector4 &v) const{
+		return (v.x==x && v.y==y && v.z==z && v.w==w);
 	}
 
-	inline bool operator!=(const Vector4 &vec) const{
-		return (vec.x!=x || vec.y!=y || vec.z!=z || vec.w!=w);
+	inline bool operator!=(const Vector4 &v) const{
+		return (v.x!=x || v.y!=y || v.z!=z || v.w!=w);
 	}
 
-	inline Vector4 operator+(const Vector4 &vec) const{
-		return Vector4(x+vec.x,y+vec.y,z+vec.z,w+vec.w);
+	inline Vector4 operator+(const Vector4 &v) const{
+		return Vector4(x+v.x,y+v.y,z+v.z,w+v.w);
 	}
 
-	inline void operator+=(const Vector4 &vec){
-		x+=vec.x;
-		y+=vec.y;
-		z+=vec.z;
-		w+=vec.w;
+	inline void operator+=(const Vector4 &v){
+		x+=v.x;
+		y+=v.y;
+		z+=v.z;
+		w+=v.w;
 	}
 
-	inline Vector4 operator-(const Vector4 &vec) const{
-		return Vector4(x-vec.x,y-vec.y,z-vec.z,w-vec.w);
+	inline Vector4 operator-(const Vector4 &v) const{
+		return Vector4(x-v.x,y-v.y,z-v.z,w-v.w);
 	}
 
-	inline void operator-=(const Vector4 &vec){
-		x-=vec.x;
-		y-=vec.y;
-		z-=vec.z;
-		w-=vec.w;
+	inline void operator-=(const Vector4 &v){
+		x-=v.x;
+		y-=v.y;
+		z-=v.z;
+		w-=v.w;
 	}
 
 	inline Vector4 operator*(fixed f) const{
@@ -134,15 +134,15 @@ public:
 		w=Math::mul(w,f);
 	}
 
-	inline Vector4 operator*(const Vector4 &vec) const{
-		return Vector4(x*vec.x,y*vec.y,z*vec.z,w*vec.w);
+	inline Vector4 operator*(const Vector4 &v) const{
+		return Vector4(x*v.x,y*v.y,z*v.z,w*v.w);
 	}
 
-	inline void operator*=(const Vector4 &vec){
-		x=Math::mul(x,vec.x);
-		y=Math::mul(y,vec.y);
-		z=Math::mul(z,vec.z);
-		w=Math::mul(w,vec.w);
+	inline void operator*=(const Vector4 &v){
+		x=Math::mul(x,v.x);
+		y=Math::mul(y,v.y);
+		z=Math::mul(z,v.z);
+		w=Math::mul(w,v.w);
 	}
 
 	inline Vector4 operator/(fixed f) const{
@@ -158,11 +158,11 @@ public:
 		w=Math::mul(w,f);
 	}
 
-	inline void operator/=(const Vector4 &vec){
-		x=Math::div(x,vec.x);
-		y=Math::div(y,vec.y);
-		z=Math::div(z,vec.z);
-		w=Math::div(w,vec.w);
+	inline void operator/=(const Vector4 &v){
+		x=Math::div(x,v.x);
+		y=Math::div(y,v.y);
+		z=Math::div(z,v.z);
+		w=Math::div(w,v.w);
 	}
 
 	inline Vector4 operator-() const{
@@ -178,13 +178,13 @@ public:
 	}
 };
 
-inline Vector4 operator*(fixed f,const Vector4 &vec){
-	return Vector4(Math::mul(vec.x,f),Math::mul(vec.y,f),Math::mul(vec.z,f),Math::mul(vec.w,f));
+inline Vector4 operator*(fixed f,const Vector4 &v){
+	return Vector4(Math::mul(v.x,f),Math::mul(v.y,f),Math::mul(v.z,f),Math::mul(v.w,f));
 }
 
-inline Vector4 operator/(fixed f,const Vector4 &vec){
+inline Vector4 operator/(fixed f,const Vector4 &v){
 	f=Math::div(Math::ONE,f);
-	return Vector4(Math::mul(vec.x,f),Math::mul(vec.y,f),Math::mul(vec.z,f),Math::mul(vec.w,f));
+	return Vector4(Math::mul(v.x,f),Math::mul(v.y,f),Math::mul(v.z,f),Math::mul(v.w,f));
 }
 
 }

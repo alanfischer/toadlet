@@ -127,6 +127,78 @@ public:
 		return (c.r!=r || c.g!=g || c.b!=b || c.a!=a);
 	}
 
+	inline Color operator+(const Color &c) const{
+		return Color(r+c.r,g+c.g,b+c.b,a+c.a);
+	}
+
+	inline void operator+=(const Color &c){
+		r+=c.r;
+		g+=c.g;
+		b+=c.b;
+		a+=c.a;
+	}
+
+	inline Color operator-(const Color &c) const{
+		return Color(r-c.r,g-c.g,b-c.b,a-c.a);
+	}
+
+	inline void operator-=(const Color &c){
+		r-=c.r;
+		g-=c.g;
+		b-=c.b;
+		a-=c.a;
+	}
+
+	inline Color operator*(scalar f) const{
+		return Color(Math::mul(r,f),Math::mul(g,f),Math::mul(b,f),Math::mul(a,f));
+	}
+
+	inline void operator*=(scalar f){
+		r=Math::mul(r,f);
+		g=Math::mul(g,f);
+		b=Math::mul(b,f);
+		a=Math::mul(a,f);
+	}
+
+	inline Color operator*(const Color &c) const{
+		return Color(Math::mul(r,c.r),Math::mul(g,c.g),Math::mul(b,c.b),Math::mul(a,c.a));
+	}
+
+	inline void operator*=(const Color &c){
+		r=Math::mul(r,c.r);
+		g=Math::mul(g,c.g);
+		b=Math::mul(b,c.b);
+		a=Math::mul(a,c.a);
+	}
+
+	inline Color operator/(scalar f) const{
+		f=Math::div(Math::ONE,f);
+		return Color(Math::mul(r,f),Math::mul(g,f),Math::mul(b,f),Math::mul(a,f));
+	}
+
+	inline void operator/=(scalar f){
+		f=Math::mul(Math::ONE,f);
+		r=Math::mul(r,f);
+		g=Math::mul(g,f);
+		b=Math::mul(b,f);
+		a=Math::mul(a,f);
+	}
+
+	inline Color operator/(const Color &c) const{
+		return Color(Math::mul(r,c.r),Math::mul(g,c.g),Math::mul(b,c.b),Math::mul(a,c.a));
+	}
+
+	inline void operator/=(const Color &c){
+		r=Math::mul(r,c.r);
+		g=Math::mul(g,c.g);
+		b=Math::mul(b,c.b);
+		a=Math::mul(a,c.a);
+	}
+
+	inline Color operator-() const{
+		return Color(-r,-g,-b,-a);
+	}
+
 	inline scalar &operator[](int i){
 		return *(&r+i);
 	}
@@ -135,20 +207,148 @@ public:
 		return *(&r+i);
 	}
 
-	static inline void lerp(Color &result,const Color &start,const Color &end,scalar time){
-		result.r=Math::lerp(start.r,end.r,time);
-		result.g=Math::lerp(start.g,end.g,time);
-		result.b=Math::lerp(start.b,end.b,time);
-		result.a=Math::lerp(start.a,end.a,time);
+	static inline void neg(Color &r,Color &c){
+		r.r=-c.r;
+		r.g=-c.g;
+		r.b=-c.b;
+		r.a=-c.a;
+	}
+
+	static inline void neg(Color &c){
+		c.r=-c.r;
+		c.g=-c.g;
+		c.b=-c.b;
+		c.a=-c.a;
+	}
+
+	static inline void add(Color &r,const Color &c1,const Color &c2){
+		r.r=c1.r+c2.r;
+		r.g=c1.g+c2.g;
+		r.b=c1.b+c2.b;
+		r.a=c1.a+c2.a;
+	}
+
+	static inline void add(Color &r,const Color &c){
+		r.r+=c.r;
+		r.g+=c.g;
+		r.b+=c.b;
+		r.a+=c.a;
+	}
+	
+	static inline void sub(Color &r,const Color &c1,const Color &c2){
+		r.r=c1.r-c2.r;
+		r.g=c1.g-c2.g;
+		r.b=c1.b-c2.b;
+		r.a=c1.a-c2.a;
+	}
+	
+	static inline void sub(Color &r,const Color &c){
+		r.r-=c.r;
+		r.g-=c.g;
+		r.b-=c.b;
+		r.a-=c.a;
+	}
+
+	static inline void mul(Color &r,const Color &c,scalar f){
+		r.r=Math::mul(c.r,f);
+		r.g=Math::mul(c.g,f);
+		r.b=Math::mul(c.b,f);
+		r.a=Math::mul(c.a,f);
+	}
+	
+	static inline void mul(Color &r,scalar f){
+		r.r=Math::mul(r.r,f);
+		r.g=Math::mul(r.g,f);
+		r.b=Math::mul(r.b,f);
+		r.a=Math::mul(r.a,f);
+	}
+
+	static inline void mul(Color &r,const Color &c1,const Color &c2){
+		r.r=Math::mul(c1.r,c2.r);
+		r.g=Math::mul(c1.g,c2.g);
+		r.b=Math::mul(c1.b,c2.b);
+		r.a=Math::mul(c1.a,c2.a);
+	}
+
+	static inline void mul(Color &r,const Color &c){
+		r.r=Math::mul(r.r,c.r);
+		r.g=Math::mul(r.g,c.g);
+		r.b=Math::mul(r.b,c.b);
+		r.a=Math::mul(r.a,c.a);
+	}
+
+	static inline void div(Color &r,const Color &c,scalar f){
+		scalar i=Math::div(Math::ONE,f);
+		r.r=Math::mul(c.r,i);
+		r.g=Math::mul(c.g,i);
+		r.b=Math::mul(c.b,i);
+		r.a=Math::mul(c.a,i);
+	}
+	
+	static inline void div(Color &r,scalar f){
+		scalar i=Math::div(Math::ONE,f);
+		r.r=Math::mul(r.r,i);
+		r.g=Math::mul(r.g,i);
+		r.b=Math::mul(r.b,i);
+		r.a=Math::mul(r.a,i);
+	}
+
+	static inline void div(Color &r,const Color &c1,const Color &c2){
+		r.r=Math::div(c1.r,c2.r);
+		r.g=Math::div(c1.g,c2.g);
+		r.b=Math::div(c1.b,c2.b);
+		r.a=Math::div(c1.a,c2.a);
+	}
+
+	static inline void div(Color &r,const Color &c){
+		r.r=Math::div(r.r,c.r);
+		r.g=Math::div(r.g,c.g);
+		r.b=Math::div(r.b,c.b);
+		r.a=Math::div(r.a,c.a);
+	}
+
+	static inline void madd(Color &r,const Color &b,scalar c,const Color &a){
+		r.r=Math::madd(b.r,c,a.r);
+		r.g=Math::madd(b.g,c,a.g);
+		r.b=Math::madd(b.b,c,a.b);
+		r.a=Math::madd(b.a,c,a.a);
+	}
+
+	static inline void madd(Color &r,scalar c,const Color &a){
+		r.r=Math::madd(r.r,c,a.r);
+		r.g=Math::madd(r.g,c,a.g);
+		r.b=Math::madd(r.b,c,a.b);
+		r.a=Math::madd(r.a,c,a.a);
+	}
+
+	static inline void msub(Color &r,const Color &b,scalar c,const Color &a){
+		r.r=Math::msub(b.r,c,a.r);
+		r.g=Math::msub(b.g,c,a.g);
+		r.b=Math::msub(b.b,c,a.b);
+		r.a=Math::msub(b.a,c,a.a);
+	}
+
+	static inline void msub(Color &r,scalar c,const Color &a){
+		r.r=Math::msub(r.r,c,a.r);
+		r.g=Math::msub(r.g,c,a.g);
+		r.b=Math::msub(r.b,c,a.b);
+		r.a=Math::msub(r.a,c,a.a);
+	}
+
+	static inline void lerp(Color &r,const Color &c1,const Color &c2,scalar t){
+		r.r=Math::lerp(c1.r,c2.r,t);
+		r.g=Math::lerp(c1.g,c2.g,t);
+		r.b=Math::lerp(c1.b,c2.b,t);
+		r.a=Math::lerp(c1.a,c2.a,t);
 	}
 
 	// Useable for both rgba and abgr
-	static inline uint32 lerp(uint32 start,uint32 end,scalar time){
+	static inline uint32 lerp(uint32 c1,uint32 c2,scalar t){
 		return
-			(((int)Math::lerp((start&0xFF000000)>>24,(end&0xFF000000)>>24,time))<<24) |
-			(((int)Math::lerp((start&0x00FF0000)>>16,(end&0x00FF0000)>>16,time))<<16) |
-			(((int)Math::lerp((start&0x0000FF00)>>8 ,(end&0x0000FF00)>>8 ,time))<<8 ) |
-			(((int)Math::lerp((start&0x000000FF)    ,(end&0x000000FF)    ,time))    ) ;
+			(((int)Math::lerp((c1&0xFF000000)>>24,(c2&0xFF000000)>>24,t))<<24) |
+			(((int)Math::lerp((c1&0x00FF0000)>>16,(c2&0x00FF0000)>>16,t))<<16) |
+			(((int)Math::lerp((c1&0x0000FF00)>>8 ,(c2&0x0000FF00)>>8 ,t))<<8 ) |
+			(((int)Math::lerp((c1&0x000000FF)    ,(c2&0x000000FF)    ,t))    ) ;
 	}
 
 	// Changes from rgba to abgr and vice versa

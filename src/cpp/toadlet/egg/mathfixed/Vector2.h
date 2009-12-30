@@ -64,34 +64,34 @@ public:
 	inline fixed *getData(){return &x;}
 	inline const fixed *getData() const{return &x;}
 
-	inline bool equals(const Vector2 &vec) const{
-		return (vec.x==x && vec.y==y);
+	inline bool equals(const Vector2 &v) const{
+		return (v.x==x && v.y==y);
 	}
 
-	inline bool operator==(const Vector2 &vec) const{
-		return (vec.x==x && vec.y==y);
+	inline bool operator==(const Vector2 &v) const{
+		return (v.x==x && v.y==y);
 	}
 
-	inline bool operator!=(const Vector2 &vec) const{
-		return (vec.x!=x || vec.y!=y);
+	inline bool operator!=(const Vector2 &v) const{
+		return (v.x!=x || v.y!=y);
 	}
 
-	inline Vector2 operator+(const Vector2 &vec) const{
-		return Vector2(x+vec.x,y+vec.y);
+	inline Vector2 operator+(const Vector2 &v) const{
+		return Vector2(x+v.x,y+v.y);
 	}
 
-	inline void operator+=(const Vector2 &vec){
-		x+=vec.x;
-		y+=vec.y;
+	inline void operator+=(const Vector2 &v){
+		x+=v.x;
+		y+=v.y;
 	}
 
-	inline Vector2 operator-(const Vector2 &vec) const{
-		return Vector2(x-vec.x,y-vec.y);
+	inline Vector2 operator-(const Vector2 &v) const{
+		return Vector2(x-v.x,y-v.y);
 	}
 
-	inline void operator-=(const Vector2 &vec){
-		x-=vec.x;
-		y-=vec.y;
+	inline void operator-=(const Vector2 &v){
+		x-=v.x;
+		y-=v.y;
 	}
 
 	inline Vector2 operator*(fixed f) const{
@@ -103,13 +103,13 @@ public:
 		y=Math::mul(y,f);
 	}
 
-	inline Vector2 operator*(const Vector2 &vec) const{
-		return Vector2(Math::mul(x,vec.x),Math::mul(y,vec.y));
+	inline Vector2 operator*(const Vector2 &v) const{
+		return Vector2(Math::mul(x,v.x),Math::mul(y,v.y));
 	}
 
-	inline void operator*=(const Vector2 &vec){
-		x=Math::mul(x,vec.x);
-		y=Math::mul(y,vec.y);
+	inline void operator*=(const Vector2 &v){
+		x=Math::mul(x,v.x);
+		y=Math::mul(y,v.y);
 	}
 
 	inline Vector2 operator/(fixed f) const{
@@ -123,13 +123,13 @@ public:
 		y=Math::mul(y,f);
 	}
 
-	inline Vector2 operator/(const Vector2 &vec) const{
-		return Vector2(Math::div(x,vec.x),Math::div(y,vec.y));
+	inline Vector2 operator/(const Vector2 &v) const{
+		return Vector2(Math::div(x,v.x),Math::div(y,v.y));
 	}
 
-	inline void operator/=(const Vector2 &vec){
-		x=Math::div(x,vec.x);
-		y=Math::div(y,vec.y);
+	inline void operator/=(const Vector2 &v){
+		x=Math::div(x,v.x);
+		y=Math::div(y,v.y);
 	}
 
 	inline Vector2 operator-() const{
@@ -145,13 +145,13 @@ public:
 	}
 };
 
-inline Vector2 operator*(fixed f,const Vector2 &vec){
-	return Vector2(Math::mul(vec.x,f),Math::mul(vec.y,f));
+inline Vector2 operator*(fixed f,const Vector2 &v){
+	return Vector2(Math::mul(v.x,f),Math::mul(v.y,f));
 }
 
-inline Vector2 operator/(fixed f,const Vector2 &vec){
+inline Vector2 operator/(fixed f,const Vector2 &v){
 	f=Math::div(Math::ONE,f);
-	return Vector2(Math::mul(vec.x,f),Math::mul(vec.y,f));
+	return Vector2(Math::mul(v.x,f),Math::mul(v.y,f));
 }
 
 }
