@@ -478,7 +478,7 @@ void Simulator::update(int dt){
 				hitSolid=c.collider;
 
 				// TODO: We need to add a flag to regather possible solids if this callback is performed
-				bool responded=true;
+				bool responded=false;
 				if(solid->mDoUpdateCallback){
 					responded=(solid->mManager!=NULL?solid->mManager:mManager)->collisionResponse(solid,oldPosition,leftOver,c);
 				}
