@@ -270,7 +270,7 @@ void BSPSceneNode::setBSPMap(BSPMap::ptr map){
 }
 
 bool BSPSceneNode::preLayerRender(Renderer *renderer,int layer){
-	if(layer!=0){
+	if(layer!=0 || mBSPMap==NULL){
 		return false;
 	}
 

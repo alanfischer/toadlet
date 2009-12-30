@@ -131,6 +131,7 @@ public:
 	virtual void setNextThink(int nextThink){mNextThink=nextThink;}
 	inline int getNextThink() const{return mNextThink;}
 
+	virtual void changeNetworkID(int id){mScene->setHopEntityNetworkID(this,id);}
 	inline int getNetworkID() const{return mNetworkID;}
 	inline bool isNetworked() const{return mNetworkID!=NETWORKID_NOT_NETWORKED;}
 

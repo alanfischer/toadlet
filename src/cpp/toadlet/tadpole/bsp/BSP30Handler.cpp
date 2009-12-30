@@ -440,7 +440,7 @@ void BSP30Handler::findBrushPlanes(Collection<Plane> &brushPlanes,const Collecti
 		}
 	}
 
-
+/*
 if(points.size()>0){
 	AABox box(points[0],points[0]);
 	for(j=1;j<points.size();++j){
@@ -466,7 +466,7 @@ Logger::alert(String("box:")+box.mins.x+","+box.mins.y+","+box.mins.z+" : "+box.
 else{
 	Logger::alert("no points");
 }
-
+*/
 }
 
 }

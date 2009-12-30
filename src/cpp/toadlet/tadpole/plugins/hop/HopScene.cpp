@@ -146,16 +146,20 @@ HopEntity *HopScene::getHopEntityFromNetworkID(int id) const{
 
 void HopScene::setHopEntityNetworkID(HopEntity *entity,int id){
 	if(entity->getNetworkID()>=0 && entity->getNetworkID()<mNetworkIDMap.size()){
-		mFreeNetworkIDs.add(entity->getNetworkID());
-		mNetworkIDMap[entity->getNetworkID()]=NULL;
+		mFreeNetworkIDs.add(entity->mNetworkID);
+		mNetworkIDMap[entity->mNetworkID]=NULL;
+
+		Logger::alert(Categories::TOADLET_TADPOLE,String("Freeing NetworkID:")+entity->mNetworkID);
 	}
 	if(id>=0){
 		if(id>=mNetworkIDMap.size()){
 			mNetworkIDMap.resize(id+1);
 		}
 		mNetworkIDMap[id]=entity;
-		entity->mNetworkID=id;
 	}
+
+	entity->mNetworkID=id;
+	Logger::alert(Categories::TOADLET_TADPOLE,String("Assigning NetworkID:")+entity->mNetworkID);
 }
 
 void HopScene::resetNetworkIDs(){
@@ -169,7 +173,6 @@ void HopScene::setHopEntityFactory(HopEntityFactory *factory){
 }
 
 void HopScene::showCollisionVolumes(bool show,bool interpolate){
-Logger::alert(String("SETTING SHOW"));
 	mShowCollisionVolumes=show;
 	mInterpolateCollisionVolumes=interpolate;
 

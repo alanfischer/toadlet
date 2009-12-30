@@ -381,7 +381,6 @@ void HopEntity::castShadow(){
 }
 
 void HopEntity::showCollisionVolumes(bool show){
-Logger::alert(String("IN SHOW:")+show);
 	if(show){
 		if(mVolumeNode==NULL){
 			mVolumeNode=mEngine->createNodeType(ParentNode::type());
@@ -415,10 +414,10 @@ Logger::alert(String("IN SHOW:")+show);
 			mesh->subMeshes[0]->indexData->setIndexBuffer(NULL);
 			mesh->subMeshes[0]->indexData->destroy();
 			mesh->subMeshes[0]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,indexBuffer));
+			mesh->subMeshes[0]->material->setLighting(false);
 			MeshNode *meshNode=mEngine->createNodeType(MeshNode::type());
 			meshNode->setMesh(mesh);
 			mVolumeNode->attach(meshNode);
-			Logger::alert("ADDING THE NODES");
 		}
 	}
 	else{
