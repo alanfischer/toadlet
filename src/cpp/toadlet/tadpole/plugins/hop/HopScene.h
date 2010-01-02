@@ -29,6 +29,7 @@
 #include <toadlet/hop/Simulator.h>
 #include <toadlet/tadpole/plugins/hop/HopEntityFactory.h>
 #include <toadlet/tadpole/node/Scene.h>
+#include <toadlet/tadpole/node/PhysicallyTraceable.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -51,7 +52,7 @@ public:
 	virtual node::Scene *getRootScene(){return mScene;}
 
 	virtual node::ParentNode *getBackground(){return mScene->getBackground();}
-	virtual node::ParentNode *getRootNode(){return mScene->getRootNode();}
+	virtual node::SceneNode *getRootNode(){return mScene->getRootNode();}
 
 	virtual void setAmbientColor(peeper::Color ambientColor){mScene->setAmbientColor(ambientColor);}
 	virtual const peeper::Color &getAmbientColor() const{return mScene->getAmbientColor();}
@@ -111,9 +112,13 @@ public:
 	virtual void unregisterHopEntity(HopEntity *entity);
 
 	virtual void preLogicUpdateLoop(int dt);
+	virtual void preLogicUpdate(int dt);
 	virtual void logicUpdate(int dt);
+	virtual void postLogicUpdate(int dt);
 	virtual void postLogicUpdateLoop(int dt);
+	virtual void preRenderUpdate(int dt);
 	virtual void renderUpdate(int dt);
+	virtual void postRenderUpdate(int dt);
 
 	virtual bool performQuery(query::AABoxQuery *query){return mScene->performQuery(query);}
 
@@ -139,7 +144,7 @@ protected:
 	egg::PointerCounter *mCounter;
 	node::Scene *mChildScene;
 	node::Scene::ptr mScene;
-	node::Traceable *mTraceable;
+	node::PhysicallyTraceable *mTraceable;
 
 	egg::Collection<HopEntity*> mHopEntities;
 	bool mShowCollisionVolumes;
