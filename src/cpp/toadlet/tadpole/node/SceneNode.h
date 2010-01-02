@@ -41,6 +41,7 @@ namespace tadpole{
 namespace node{
 
 class CameraNode;
+class PhysicallyTraceable;
 
 /// @todo  I think a good way to let us use EventKeyFrames with the Controller framework is to:
 ///   1: Have a way of ensuring that the EventKeyFrames are aligned on LogicDT times.
@@ -62,11 +63,13 @@ public:
 	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
+	virtual PhysicallyTraceable *isPhysicallyTraceable(){return NULL;}
+
 	virtual void setChildScene(Scene *scene){mChildScene=scene;}
 	virtual Scene *getRootScene(){return this;}
 
 	virtual ParentNode *getBackground(){return mBackground;}
-	virtual ParentNode *getRootNode(){return this;}
+	virtual SceneNode *getRootNode(){return this;}
 
 	virtual void setAmbientColor(peeper::Color ambientColor){mAmbientColor.set(ambientColor);}
 	virtual const peeper::Color &getAmbientColor() const{return mAmbientColor;}
@@ -86,9 +89,13 @@ public:
 	virtual void render(peeper::Renderer *renderer,CameraNode *cameraNode,Node *node);
 
 	virtual void preLogicUpdateLoop(int dt);
+	virtual void preLogicUpdate(int dt);
 	virtual void logicUpdate(int dt);
+	virtual void postLogicUpdate(int dt);
 	virtual void postLogicUpdateLoop(int dt);
+	virtual void preRenderUpdate(int dt);
 	virtual void renderUpdate(int dt);
+	virtual void postRenderUpdate(int dt);
 
 	virtual void setUpdateListener(UpdateListener *updateListener);
 	virtual UpdateListener *getUpdateListener() const{return mUpdateListener;}

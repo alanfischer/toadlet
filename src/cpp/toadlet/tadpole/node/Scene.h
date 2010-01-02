@@ -39,6 +39,8 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
+class SceneNode;
+
 class Scene{
 public:
 	TOADLET_INTRUSIVE_POINTERS(Scene);
@@ -52,7 +54,7 @@ public:
 	virtual Scene *getRootScene()=0;
 
 	virtual ParentNode *getBackground()=0;
-	virtual ParentNode *getRootNode()=0;
+	virtual SceneNode *getRootNode()=0;
 
 	virtual void setAmbientColor(peeper::Color ambientColor)=0;
 	virtual const peeper::Color &getAmbientColor() const=0;
@@ -72,9 +74,13 @@ public:
 	virtual void render(peeper::Renderer *renderer,CameraNode *cameraNode,Node *node)=0;
 
 	virtual void preLogicUpdateLoop(int dt)=0;
+	virtual void preLogicUpdate(int dt)=0;
 	virtual void logicUpdate(int dt)=0;
+	virtual void postLogicUpdate(int dt)=0;
 	virtual void postLogicUpdateLoop(int dt)=0;
+	virtual void preRenderUpdate(int dt)=0;
 	virtual void renderUpdate(int dt)=0;
+	virtual void postRenderUpdate(int dt)=0;
 
 	virtual void setUpdateListener(UpdateListener *updateListener)=0;
 	virtual UpdateListener *getUpdateListener() const=0;

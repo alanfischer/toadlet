@@ -28,7 +28,8 @@
 #include <toadlet/egg/Profile.h>
 #include <toadlet/peeper/CapabilitySet.h> 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/node/Traceable.h>
+#include <toadlet/tadpole/node/SceneNode.h>
+#include <toadlet/tadpole/node/PhysicallyTraceable.h>
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
 #include <toadlet/tadpole/plugins/hop/HopEntity.h>
 #include <toadlet/tadpole/plugins/hop/HopCollision.h>
@@ -65,7 +66,7 @@ HopScene::HopScene(Scene::ptr scene):
 	mSimulator->setManager(this);
 	mScene=scene;
 	mScene->setChildScene(this);
-	mTraceable=mScene->getRootNode()->isTraceable();
+	mTraceable=mScene->getRootNode()->isPhysicallyTraceable();
 
 	resetNetworkIDs();
 
@@ -222,8 +223,16 @@ void HopScene::preLogicUpdateLoop(int dt){
 	mScene->preLogicUpdateLoop(dt);
 }
 
+void HopScene::preLogicUpdate(int dt){
+	mScene->preLogicUpdate(dt);
+}
+
 void HopScene::logicUpdate(int dt){
 	mScene->logicUpdate(dt);
+}
+
+void HopScene::postLogicUpdate(int dt){
+	mScene->postLogicUpdate(dt);
 
 	TOADLET_PROFILE_BEGINSECTION(Simulator::update);
 
@@ -242,7 +251,7 @@ void HopScene::postLogicUpdateLoop(int dt){
 	mScene->postLogicUpdateLoop(dt);
 }
 
-void HopScene::renderUpdate(int dt){
+void HopScene::preRenderUpdate(int dt){
 	int i;
 	bool active,activePrevious;
 
@@ -269,7 +278,15 @@ void HopScene::renderUpdate(int dt){
 		}
 	}
 
+	mScene->preRenderUpdate(dt);
+}
+
+void HopScene::renderUpdate(int dt){
 	mScene->renderUpdate(dt);
+}
+
+void HopScene::postRenderUpdate(int dt){
+	mScene->postRenderUpdate(dt);
 }
 
 void HopScene::traceSegment(Collision &result,const Segment &segment){

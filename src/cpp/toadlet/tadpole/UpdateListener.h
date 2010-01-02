@@ -33,8 +33,12 @@ class UpdateListener{
 public:
 	virtual ~UpdateListener(){}
 
+	virtual void preLogicUpdate(int dt)=0;
 	virtual void logicUpdate(int dt)=0;
+	virtual void postLogicUpdate(int dt)=0;
+	virtual void preRenderUpdate(int dt)=0;
 	virtual void renderUpdate(int dt)=0;
+	virtual void postRenderUpdate(int dt)=0;
 };
 
 }

@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/plugins/hop/HopEntity.h>
+#include <toadlet/tadpole/node/SceneNode.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/egg/Error.h>
 

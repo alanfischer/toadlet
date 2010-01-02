@@ -145,10 +145,14 @@ void SceneNode::update(int dt){
 			mAccumulatedDT-=mLogicDT;
 
 			if(mUpdateListener!=NULL){
+				mUpdateListener->preLogicUpdate(mLogicDT);
 				mUpdateListener->logicUpdate(mLogicDT);
+				mUpdateListener->postLogicUpdate(mLogicDT);
 			}
 			else{
+				mChildScene->preLogicUpdate(mLogicDT);
 				mChildScene->logicUpdate(mLogicDT);
+				mChildScene->postLogicUpdate(mLogicDT);
 			}
 		}
 
@@ -156,10 +160,14 @@ void SceneNode::update(int dt){
 	}
 
 	if(mUpdateListener!=NULL){
+		mUpdateListener->preRenderUpdate(dt);
 		mUpdateListener->renderUpdate(dt);
+		mUpdateListener->postRenderUpdate(dt);
 	}
 	else{
+		mChildScene->preRenderUpdate(dt);
 		mChildScene->renderUpdate(dt);
+		mChildScene->postRenderUpdate(dt);
 	}
 
 	AudioPlayer *audioPlayer=mEngine->getAudioPlayer();
@@ -171,6 +179,9 @@ void SceneNode::update(int dt){
 void SceneNode::preLogicUpdateLoop(int dt){
 }
 
+void SceneNode::preLogicUpdate(int dt){
+}
+
 void SceneNode::logicUpdate(int dt){
 	mLogicTime+=dt;
 	mLogicFrame++;
@@ -179,6 +190,9 @@ void SceneNode::logicUpdate(int dt){
 		logicUpdate(mBackground,dt);
 	}
 	logicUpdate(this,dt);
+}
+
+void SceneNode::postLogicUpdate(int dt){
 }
 
 void SceneNode::logicUpdate(Node::ptr node,int dt){
@@ -237,6 +251,9 @@ void SceneNode::logicUpdate(Node::ptr node,int dt){
 void SceneNode::postLogicUpdateLoop(int dt){
 }
 
+void SceneNode::preRenderUpdate(int dt){
+}
+
 void SceneNode::renderUpdate(int dt){
 	mRenderFrame++;
 
@@ -244,6 +261,9 @@ void SceneNode::renderUpdate(int dt){
 		renderUpdate(mBackground,dt);
 	}
 	renderUpdate(this,dt);
+}
+
+void SceneNode::postRenderUpdate(int dt){
 }
 
 void SceneNode::renderUpdate(Node::ptr node,int dt){
