@@ -36,7 +36,7 @@ namespace animation{
 
 class MaterialColorAnimation:public Animation{
 public:
-	TOADLET_SHARED_POINTERS(MaterialColorAnimation,Animation);
+	TOADLET_SHARED_POINTERS(MaterialColorAnimation);
 
 	MaterialColorAnimation(Material::ptr target){
 		mTarget=target;

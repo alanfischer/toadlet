@@ -256,7 +256,7 @@ Resource::ptr BSP30Handler::load(InputStream::ptr in,const ResourceHandlerData *
 	// Parse Entity data
 	char *data=entities;
 	Map<String,String> keyValues;
-	while(*data!=NULL){
+	while(*data!=0){
 		if(*data=='{'){
 			keyValues.clear();
 		}
@@ -266,13 +266,13 @@ Resource::ptr BSP30Handler::load(InputStream::ptr in,const ResourceHandlerData *
 		else if(*data=='\"'){
 			char *key=++data;
 			while(*data!='\"') data++;
-			*data=NULL;
+			*data=0;
 
 			while(*data!='\"') data++;
 
 			char *value=++data;
 			while(*data!='\"') data++;
-			*data=NULL;
+			*data=0;
 
 			keyValues[key]=value;
 		}
