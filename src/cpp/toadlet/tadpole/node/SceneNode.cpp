@@ -201,19 +201,21 @@ void SceneNode::logicUpdate(Node::ptr node,int dt){
 	}
 
 	if(node->mParent==NULL){
-		node->mWorldTranslate.set(node->mTranslate);
-		node->mWorldRotate.set(node->mRotate);
 		node->mWorldScale.set(node->mScale);
+		node->mWorldRotate.set(node->mRotate);
+		node->mWorldTranslate.set(node->mTranslate);
 	}
 	else if(node->mIdentityTransform){
-		node->mWorldTranslate.set(node->mParent->mTranslate);
-		node->mWorldRotate.set(node->mParent->mRotate);
 		node->mWorldScale.set(node->mParent->mScale);
+		node->mWorldRotate.set(node->mParent->mRotate);
+		node->mWorldTranslate.set(node->mParent->mTranslate);
 	}
 	else{
-		Math::add(node->mWorldTranslate,node->mTranslate,node->mParent->mTranslate);
-		Math::mul(node->mWorldRotate,node->mRotate,node->mParent->mRotate);
-		Math::mul(node->mWorldScale,node->mScale,node->mParent->mScale);
+		Math::mul(node->mWorldScale,node->mParent->mWorldScale,node->mScale);
+		Math::mul(node->mWorldRotate,node->mParent->mWorldRotate,node->mRotate);
+		Math::mul(node->mWorldTranslate,node->mParent->mWorldRotate,node->mTranslate);
+		Math::mul(node->mWorldTranslate,node->mParent->mWorldScale);
+		Math::add(node->mWorldTranslate,node->mParent->mWorldTranslate);
 	}
 
 	bool awake=node->mReceiveUpdates;
