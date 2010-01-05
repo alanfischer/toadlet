@@ -101,7 +101,11 @@ public:
 	inline const Vector3 &getScale() const{return mScale;}
 	inline const Vector3 &getWorldScale() const{return mWorldScale;}
 
+	virtual void setTransform(const Matrix4x4 &transform);
+
 	inline bool isIdentityTransform() const{return mIdentityTransform;}
+
+	virtual void findTransformTo(Matrix4x4 &result,Node *node);
 
 	virtual void handleEvent(const egg::Event::ptr &event){}
 	
