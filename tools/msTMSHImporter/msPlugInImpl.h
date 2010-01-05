@@ -1,19 +1,6 @@
 #ifndef __MS_PLUGIN_IMPL_H__
 #define __MS_PLUGIN_IMPL_H__
 
-
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
-
-#ifndef __AFXWIN_H__
-	#error include 'stdafx.h' before including this file for PCH
-#endif
-
-
-
-#include "resource.h"
 #include "msPlugIn.h"
 #include "msLib.h"
 #include <toadlet/tadpole/mesh/Mesh.h>
@@ -21,31 +8,6 @@
 using namespace toadlet::egg;
 using namespace toadlet::tadpole;
 using namespace toadlet::tadpole::mesh;
-
-/////////////////////////////////////////////////////////////////////////////
-// CMsPlugInApp
-//
-//
-
-class CMsPlugInApp : public CWinApp
-{
-public:
-	CMsPlugInApp();
-
-	//{{AFX_VIRTUAL(CMsPlugInApp)
-	//}}AFX_VIRTUAL
-
-	//{{AFX_MSG(CMsPlugInApp)
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-};
-
-
-
-/////////////////////////////////////////////////////////////////////////////
-// cPlugIn
-//
-//
 
 struct msModel;
 class cPlugIn : public cMsPlugIn
@@ -71,12 +33,5 @@ public:
     const char *    GetTitle ();
     int             Execute (msModel* pModel);
 };
-
-
-
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ fügt unmittelbar vor der vorhergehenden Zeile zusätzliche Deklarationen ein.
 
 #endif // __MS_PLUGIN_IMPL_H__

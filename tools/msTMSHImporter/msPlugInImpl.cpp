@@ -1,59 +1,43 @@
 #include "stdafx.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "msPlugInImpl.h"
-#include "msLib.h"
-#include "DlgOptions.h"
-#include "DlgMessage.h"
 
 #include <toadlet/egg/io/FileInputStream.h>
 #include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/handler/XMSHHandler.h>
 #include <toadlet/tadpole/handler/XANMHandler.h>
-
-#include <iostream>
-#include <sstream>
-#include <algorithm>
 
 #pragma warning(disable:4996)
 
 using namespace toadlet;
-using namespace toadlet::egg;
 using namespace toadlet::egg::io;
-using namespace toadlet::egg::math;
-using namespace toadlet::egg::math::Math;
 using namespace toadlet::peeper;
-using namespace toadlet::tadpole;
 using namespace toadlet::tadpole::handler;
+using namespace toadlet::tadpole::mesh;
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
+enum {
+    eMeshes         = 1,
+    eMaterials      = 2,
+    eBones          = 4,
+    eKeyFrames      = 8,
+	eAll			= 0xFFFF
+};
 
-
-
-/////////////////////////////////////////////////////////////////////////////
-// CMsPlugInApp
-
-BEGIN_MESSAGE_MAP(CMsPlugInApp, CWinApp)
-	//{{AFX_MSG_MAP(CMsPlugInApp)
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-
-/////////////////////////////////////////////////////////////////////////////
-//
-
-CMsPlugInApp::CMsPlugInApp()
+BOOL APIENTRY DllMain( HANDLE hModule, 
+                       DWORD  ul_reason_for_call, 
+                       LPVOID lpReserved
+					 )
 {
+    switch (ul_reason_for_call)
+	{
+		case DLL_PROCESS_ATTACH:
+		case DLL_THREAD_ATTACH:
+		case DLL_THREAD_DETACH:
+		case DLL_PROCESS_DETACH:
+			break;
+    }
+    return TRUE;
 }
-
-/////////////////////////////////////////////////////////////////////////////
-//
-
-CMsPlugInApp theApp;
 
 
 extern "C" __declspec(dllexport)
@@ -107,20 +91,20 @@ cPlugIn::convertVector3ToMSVec3(const Vector3 &tvec,msVec3 msvec,bool rotate){
 
 void
 cPlugIn::convertQuaternionToMSVec3(const Quaternion &quat,msVec3 msvec,bool rotate){
-	if(length(quat,Quaternion(0.5f,-0.5f,-0.5f,-0.5f))<0.0001f){
-		msvec[0]=-HALF_PI;
-		msvec[1]=HALF_PI;
+	if(Math::length(quat,Quaternion(0.5f,-0.5f,-0.5f,-0.5f))<0.0001f){
+		msvec[0]=-Math::HALF_PI;
+		msvec[1]=Math::HALF_PI;
 		msvec[2]=0;
 		return;
 	}
-	else if(length(quat,Quaternion(-0.5f,-0.5f,0.5f,-0.5f))<0.0001f){
-		msvec[0]=HALF_PI;
-		msvec[1]=HALF_PI;
+	else if(Math::length(quat,Quaternion(-0.5f,-0.5f,0.5f,-0.5f))<0.0001f){
+		msvec[0]=Math::HALF_PI;
+		msvec[1]=Math::HALF_PI;
 		msvec[2]=0;
 		return;
 	}
-	else if(length(quat,Quaternion(0.0f,0.0f,-0.707107f,-0.707107f))<0.0001f){
-		msvec[0]=-HALF_PI;
+	else if(Math::length(quat,Quaternion(0.0f,0.0f,-0.707107f,-0.707107f))<0.0001f){
+		msvec[0]=-Math::HALF_PI;
 		msvec[1]=0;
 		msvec[2]=0;
 		return;
@@ -173,41 +157,48 @@ cPlugIn::Execute (msModel *pModel)
         return -1;
 
     //
-    // switch the module state for MFC Dlls
-    //
-    AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
-    //
     // ask for deletion
     //
     if (msModel_GetBoneCount (pModel) > 0)
     {
-        int RC = ::AfxMessageBox (IDS_WARNING_MODEL_DELETE, MB_YESNOCANCEL);
-        if (RC != IDYES)
+        int result=::MessageBox (NULL, "The model is not empty!  Continuing will delete the model!", "Toadlet Mesh/Animation Import", MB_OKCANCEL | MB_ICONWARNING);
+		if(result!=IDOK)
             return 0;
     }
 
     //
-    // options dialog
+    // choose filename
     //
-    cDlgOptions dlgOptions (NULL);
-    if (dlgOptions.DoModal () != IDOK)
+    OPENFILENAME ofn;
+    memset (&ofn, 0, sizeof (OPENFILENAME));
+    
+	char szFile[MS_MAX_PATH]={0};
+    char szFileTitle[MS_MAX_PATH];
+    char szDefExt[32] = "xmsh\0xanm";
+    char szFilter[128] = "Toadlet XML Mesh Files (*.xmsh)\0*.xmsh\0Toadlet XML Animation Files (*.xanm)\0*.xanm\0All Files (*.*)\0*.*\0\0";
+    szFile[0] = '\0';
+    szFileTitle[0] = '\0';
+
+    ofn.lStructSize = sizeof (OPENFILENAME);
+    ofn.lpstrDefExt = szDefExt;
+    ofn.lpstrFilter = szFilter;
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = MS_MAX_PATH;
+    ofn.lpstrFileTitle = szFileTitle;
+    ofn.nMaxFileTitle = MS_MAX_PATH;
+    ofn.Flags = OFN_HIDEREADONLY | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
+    ofn.lpstrTitle = "Import Toadlet Mesh";
+
+    if (!::GetOpenFileName (&ofn))
         return 0;
-
-    CString sPath = dlgOptions.GetPathName ();
-    if (sPath.IsEmpty ())
-        return 0;
-
-    int nOptionFlags = dlgOptions.GetOptionFlags ();
-
-	String name=(LPCTSTR)sPath;
 
 	int result=-1;
+	String name=szFile;
 	if(name.find(".xmsh")!=String::npos){
-		result=importMesh(pModel,name,nOptionFlags);
+		result=importMesh(pModel,name,eAll);
 	}
 	else if(name.find(".xanm")!=String::npos){
-		result=importAnimation(pModel,name,nOptionFlags);
+		result=importAnimation(pModel,name,eAll);
 	}
 	else{
         ::MessageBox (NULL, "Importing model from unknown format!\nPlease choose .xmsh, or .xanm", "Toadlet Mesh/Animation Import", MB_OK | MB_ICONWARNING);
@@ -222,34 +213,20 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 
 	FileInputStream::ptr fin(new FileInputStream(name));
 	if(fin->isOpen()==false){
-		::AfxMessageBox("Error opening file");
+		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error opening file",MB_OK);
 		return -1;
 	}
 
 	XMSHHandler::ptr handler(new XMSHHandler(NULL,NULL,NULL));
 	Mesh::ptr mesh=shared_static_cast<Mesh>(handler->load(fin,NULL));
 	if(mesh==NULL){
-		::AfxMessageBox("Error loading file");
+		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error loading file",MB_OK);
 		return -1;
 	}
-
-    cDlgMessage dlgMessage (NULL);
-    dlgMessage.Create (IDD_MESSAGE, NULL);
-    dlgMessage.SetTitle ("Importing...");
 
 	if(msModel_GetBoneCount(pModel)>0){
 		flags&=~eBones;
 	}
-
-	/*
-	if((flags & eBones) && !(mesh->vertexBoneAssignments.size()>0)){
-		::AfxMessageBox("Bones not available");
-
-		delete engine;
-
-		return -1;
-	}
-	*/
 
     for(i=0;i<mesh->subMeshes.size();++i){
 		Mesh::SubMesh::ptr subMesh=mesh->subMeshes[i];
@@ -261,9 +238,7 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 
 			String meshName=subMesh->name;
 			if(meshName.length()==0){
-				std::stringstream ss;
-				ss << "Mesh:" << i;
-				meshName=ss.str().c_str();
+				meshName=String("Mesh:")+i;
 			}
 			msMesh_SetName(msmesh,meshName);
 
@@ -272,8 +247,11 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 			IndexBufferAccessor iba(subMesh->indexData->getIndexBuffer());
 			for(j=0;j<iba.getSize();++j){
 				int v=iba.get(j);
-				Collection<int>::iterator x=std::find(vertexesToAdd.begin(),vertexesToAdd.end(),v);
-				if(x==vertexesToAdd.end()){
+				int x=0;
+				for(x=0;x<vertexesToAdd.size();++x){
+					if(v==vertexesToAdd[x]) break;
+				}
+				if(x==vertexesToAdd.size()){
 					vertexesToAdd.add(v);
 					oldToNewMap[v]=vertexesToAdd.size()-1;
 				}
@@ -393,18 +371,14 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 
 			String boneName=bone->name;
 			if(boneName.length()==0){
-				std::stringstream ss;
-				ss << "Bone:" << i;
-				boneName=ss.str().c_str();
+				boneName=String("Bone:")+i;
 			}
 			msBone_SetName(msbone,boneName);
 
 			if(bone->parentIndex!=-1){
 				String parentName=skeleton->bones[bone->parentIndex]->name;
 				if(parentName.length()==0){
-					std::stringstream ss;
-					ss << "Bone:" << bone->parentIndex;
-					parentName=ss.str().c_str();
+					parentName=String("Bone:")+bone->parentIndex;
 				}
 				msBone_SetParentName(msbone,parentName);
 			}
@@ -492,25 +466,21 @@ cPlugIn::importAnimation(msModel *pModel,const String &name,int flags){
 
 	FileInputStream::ptr fin(new FileInputStream(name));
 	if(fin->isOpen()==false){
-		::AfxMessageBox("Error opening file");
+		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error opening file",MB_OK);
 		return -1;
 	}
 
 	XANMHandler::ptr handler(new XANMHandler());
 	Sequence::ptr sequence=shared_static_cast<Sequence>(handler->load(fin,NULL));
 	if(sequence==NULL){
-		::AfxMessageBox("Error loading file");
+		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error loading file",MB_OK);
 		return -1;
 	}
 
 	if(sequence->tracks.size()>msModel_GetBoneCount(pModel)){
-		::AfxMessageBox("Invalid number of tracks vs bone count");
+		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Invalid number of tracks vs bone count",MB_OK);
 		return -1;
 	}
-
-    cDlgMessage dlgMessage (NULL);
-    dlgMessage.Create (IDD_MESSAGE, NULL);
-    dlgMessage.SetTitle ("Importing...");
 
 	float fps=30.0f;
 

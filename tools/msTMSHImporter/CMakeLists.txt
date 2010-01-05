@@ -3,6 +3,7 @@
 # Find Milkshape 3D and it's SDK
 find_package (Milkshape3D)
 
+# Windows Platforms Only!
 if (MS3D_FOUND)
 	# Includes
 	set (MSTMSHIMPORTER_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR} ${TOADLET_INCLUDE_DIR} ${MS3D_SDK_DIR})
@@ -13,16 +14,12 @@ if (MS3D_FOUND)
 
 	# Source files
 	set (MSTMSHIMPORTER_SRC
-		DlgMessage.cpp
-		DlgOptions.cpp
 		StdAfx.cpp
 		msPlugInImpl.cpp
 	)
 
 	# Headers
 	set (MSTMSHIMPORTER_H
-		DlgMessage.h
-		DlgOptions.h
 		StdAfx.h
 		msPlugInImpl.h
 	)

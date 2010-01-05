@@ -281,6 +281,11 @@ void SceneNode::renderUpdate(Node::ptr node,int dt){
 	}
 	else{
 		Math::mul(node->mWorldRenderTransform,node->mParent->mWorldRenderTransform,node->mRenderTransform);
+		if(node->getName()=="mesh"){
+			Logger::alert(String("node->scale:")+node->mScale[0]+","+node->mScale[1]+","+node->mScale[2]);
+			Logger::alert(String("node->transform:")+node->mRenderTransform[0][0]+","+node->mRenderTransform[0][1]+","+node->mRenderTransform[0][2]);
+			Logger::alert(String("node->wtransform:")+node->mWorldRenderTransform[0][0]+","+node->mWorldRenderTransform[0][1]+","+node->mWorldRenderTransform[0][2]);
+		}
 	}
 
 	ParentNode *parent=node->isParent();

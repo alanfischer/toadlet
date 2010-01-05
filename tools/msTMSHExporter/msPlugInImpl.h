@@ -48,6 +48,4 @@ public:
     int             Execute (msModel* pModel);
 };
 
-
-
 #endif // __MS_PLUGIN_IMPL_H__
