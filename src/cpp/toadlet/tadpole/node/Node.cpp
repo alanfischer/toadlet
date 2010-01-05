@@ -183,6 +183,24 @@ void Node::setScale(scalar x,scalar y,scalar z){
 	modified();
 }
 
+void Node::setTransform(const Matrix4x4 &transform){
+	Math::setVector3FromMatrix4x4(mTranslate,transform);
+	Math::setMatrix3x3FromMatrix4x4(mRotate,transform);
+	mScale.set(Math::ONE_VECTOR3); // TODO: Extract scale from transform
+
+	mRenderTransform.set(transform);
+
+	mIdentityTransform=false;
+	modified();
+}
+
+// Currently just uses the worldRenderTransform, should be changed to walk up the scene till it finds a common parent,
+//  and then calculate the transform walking that path.
+void Node::findTransformTo(Matrix4x4 &result,Node *node){
+	Math::invert(result,node->mWorldRenderTransform);
+	Math::postMul(result,mWorldRenderTransform);
+}
+
 void Node::setScope(int scope){
 	mScope=scope;
 }
