@@ -82,6 +82,7 @@ public:
 
 	virtual void setTranslate(const Vector3 &translate);
 	virtual void setTranslate(scalar x,scalar y,scalar z);
+	virtual void setTransform(const Matrix4x4 &transform);
 	virtual void setPosition(const Vector3 &position){setTranslate(position);}
 	virtual const Vector3 &getPosition(){return getTranslate();}
 

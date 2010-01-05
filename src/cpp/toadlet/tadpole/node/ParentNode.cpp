@@ -93,7 +93,7 @@ bool ParentNode::attach(Node *node){
 
 	mShadowChildrenDirty=true;
 
-//	modified();
+	modified();
 
 	return true;
 }
@@ -121,20 +121,20 @@ bool ParentNode::remove(Node *node){
 }
 
 void ParentNode::handleEvent(const Event::ptr &event){
-	int numChildren=mShadowChildren.size();
+	int numChildren=mChildren.size();
 	int i;
 	for(i=0;i<numChildren;++i){
-		mShadowChildren[i]->handleEvent(event);
+		mChildren[i]->handleEvent(event);
 	}
 }
 
 Node *ParentNode::findNodeByName(const String &name){
 	Node *node=super::findNodeByName(name);
 	if(node==NULL){
-		int numChildren=mShadowChildren.size();
+		int numChildren=mChildren.size();
 		int i;
 		for(i=0;i<numChildren;++i){
-			node=mShadowChildren[i]->findNodeByName(name);
+			node=mChildren[i]->findNodeByName(name);
 			if(node!=NULL){
 				return node;
 			}

@@ -252,7 +252,9 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 		material->setName(prop);
 	}
 
-	materialManager->manage(material);
+	if(materialManager!=NULL){
+		materialManager->manage(material);
+	}
 
 	mxml_node_t *lightEffectNode=mxmlFindChild(node,"LightEffect");
 	if(lightEffectNode!=NULL){
@@ -407,9 +409,11 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 					textureStage->setTextureName(textureName);
 				}
 
-				textureStage->setMinFilter(materialManager->getDefaultMinFilter());
-				textureStage->setMagFilter(materialManager->getDefaultMagFilter());
-				textureStage->setMipFilter(materialManager->getDefaultMipFilter());
+				if(materialManager!=NULL){
+					textureStage->setMinFilter(materialManager->getDefaultMinFilter());
+					textureStage->setMagFilter(materialManager->getDefaultMagFilter());
+					textureStage->setMipFilter(materialManager->getDefaultMipFilter());
+				}
 
 				material->setTextureStage(0,TextureStage::ptr(new TextureStage()));
 			}
@@ -445,9 +449,11 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 				}
 			}
 
-			textureStage->setMinFilter(materialManager->getDefaultMinFilter());
-			textureStage->setMagFilter(materialManager->getDefaultMagFilter());
-			textureStage->setMipFilter(materialManager->getDefaultMipFilter());
+			if(materialManager!=NULL){
+				textureStage->setMinFilter(materialManager->getDefaultMinFilter());
+				textureStage->setMagFilter(materialManager->getDefaultMagFilter());
+				textureStage->setMipFilter(materialManager->getDefaultMipFilter());
+			}
 
 			material->setTextureStage(0,textureStage);
 		}
@@ -644,11 +650,17 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 
 		// HACK: Due to a bug in reading back vertexes from a hardware buffer in OGLES, we only load the static VertexBuffer of a Mesh if its not animated.
 		VertexBuffer::ptr vertexBuffer;
-		if(mesh->vertexBoneAssignments.size()>0){
-			vertexBuffer=bufferManager->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_READ_WRITE,vertexFormat,count);
+		if(bufferManager!=NULL){
+			if(mesh->vertexBoneAssignments.size()>0){
+				vertexBuffer=bufferManager->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_READ_WRITE,vertexFormat,count);
+			}
+			else{
+				vertexBuffer=bufferManager->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,count);
+			}
 		}
 		else{
-			vertexBuffer=bufferManager->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,count);
+			vertexBuffer=VertexBuffer::ptr(new BackableVertexBuffer());
+			vertexBuffer->create(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,count);
 		}
 
 		int pi=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_POSITION);
@@ -768,7 +780,15 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 				count=parseInt(prop);
 			}
 
-			IndexBuffer::ptr indexBuffer=bufferManager->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,count);
+			IndexBuffer::ptr indexBuffer;
+			if(bufferManager!=NULL){
+				indexBuffer=bufferManager->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,count);
+			}
+			else{
+				indexBuffer=IndexBuffer::ptr(new BackableIndexBuffer());
+				indexBuffer->create(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,count);
+			}
+
 			subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,count));
 
 			IndexBufferAccessor iba;

@@ -129,21 +129,29 @@ void HopEntity::setInfiniteMass(){
 }
 
 void HopEntity::setTranslate(const Vector3 &translate){
-	mTranslate.set(translate);
+	super::setTranslate(translate);
 
-	mSolid->setPosition(translate);
+	mSolid->setPosition(mTranslate);
 
-	mLastPosition.set(translate);
+	mLastPosition.set(mTranslate);
 
 	mModifiedFields|=ENTITY_BIT_POSITION;
-
-	setRenderTransformTranslate(mTranslate);
 }
 
 void HopEntity::setTranslate(scalar x,scalar y,scalar z){
 	mTranslate.set(x,y,z);
 
 	setTranslate(mTranslate);
+}
+
+void HopEntity::setTransform(const Matrix4x4 &transform){
+	super::setTransform(transform);
+
+	mSolid->setPosition(mTranslate);
+
+	mLastPosition.set(mTranslate);
+
+	mModifiedFields|=ENTITY_BIT_POSITION;
 }
 
 void HopEntity::setVelocity(const Vector3 &velocity){
