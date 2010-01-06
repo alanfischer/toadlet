@@ -151,10 +151,6 @@ int glesem_setSoftwareLibraryPath(char *path){
 	return 1;
 }
 
-void glesem_setVincent(int vincent){
-	glesem_vincent=vincent;
-}
-
 int glesem_init(int accelerated){
 	int i;
 

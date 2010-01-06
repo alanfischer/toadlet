@@ -242,6 +242,9 @@
 #if defined(TOADLET_HAS_GLEW) || defined(TOADLET_HAS_EAGL)
 	#define TOADLET_HAS_GLFBOS
 #endif
+#if defined(TOADLET_HAS_GLEW)
+	#define TOADLET_HAS_GLQUERY
+#endif
 
 #if defined(TOADLET_DEBUG)
 	#define TOADLET_CHECK_GLERROR(function) \

@@ -24,12 +24,14 @@
  ********** Copyright header - do not remove **********/
 
 #include "GLBuffer.h"
-#include "GLQuery.h"
 #include "GLRenderer.h"
 #include "GLRenderTarget.h"
 #include "GLTexture.h"
 #if defined(TOADLET_HAS_GLFBOS)
 	#include "GLFBOSurfaceRenderTarget.h"
+#endif
+#if defined(TOADLET_HAS_GLQUERY)
+	#include "GLQuery.h"
 #endif
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
@@ -342,7 +344,11 @@ Shader *GLRenderer::createShader(){
 }
 
 RenderQuery *GLRenderer::createQuery(){
-	return new GLQuery(this);
+	#if defined(TOADLET_HAS_GLQUERY)
+		return new GLQuery(this);
+	#else
+		return NULL;
+	#endif
 }
 
 // Matrix operations

@@ -56,7 +56,6 @@ extern "C" {
 #define GLESEM_ACCELERATED_NO 0
 
 GLESEMAPI int glesem_setSoftwareLibraryPath(char *path);
-GLESEMAPI void glesem_setVincent(int vincent); // Without a good way to detect the vincent library, we have a way of telling if we're using it
 
 GLESEMAPI int glesem_init(int accelerated);
 GLESEMAPI int glesem_initWithLibraryNames(char *eglLibrary,char *glLibrary);
@@ -72,8 +71,6 @@ GLESEMAPI int glesem_egl_version_1_2;
 GLESEMAPI int glesem_gl_majorVersion;
 GLESEMAPI int glesem_gl_minorVersion;
 GLESEMAPI int glesem_gl_version_1_1;
-
-GLESEMAPI int glesem_vincent;
 
 #define GLESEM_DEFINEPROCEDURE(ret,name,sig) \
 	typedef ret (GLESEMAPIENTRY *glesem_proc_##name) sig; \
@@ -98,8 +95,7 @@ typedef EGLint NativeDisplayType;
 typedef void* NativeWindowType;
 typedef void* NativePixmapType;
 
-#define EGL_DEFAULT_DISPLAY ((NativeDisplayType)(glesem_vincent?GetDC(0):0))
-
+#define EGL_DEFAULT_DISPLAY ((NativeDisplayType)0)
 #define EGL_NO_CONTEXT ((EGLContext)0)
 #define EGL_NO_DISPLAY ((EGLDisplay)0)
 #define EGL_NO_SURFACE ((EGLSurface)0)

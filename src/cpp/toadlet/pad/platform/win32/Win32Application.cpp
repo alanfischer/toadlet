@@ -64,7 +64,7 @@ using namespace toadlet::tadpole;
 	#pragma comment(lib,"toadlet_peeper_glrenderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_GLRenderer();
 	#if defined(TOADLET_PLATFORM_WINCE)
-		extern "C" RenderTarget *new_EGLWindowRenderTarget(void *nativeSurface,const Visual &visual);
+		extern "C" RenderTarget *new_EGLWindowRenderTarget(void *nativeDisplay,void *nativeSurface,const Visual &visual);
 	#else
 		extern "C" RenderTarget *new_WGLWindowRenderTarget(HWND wnd,const Visual &visual);
 	#endif
@@ -570,7 +570,7 @@ RenderTarget *Win32Application::makeRenderTarget(int rendererPlugin){
 	if(rendererPlugin==RendererPlugin_OPENGL){
 		#if defined(TOADLET_HAS_OPENGL)
 			#if defined(TOADLET_PLATFORM_WINCE)
-				target=new_EGLWindowRenderTarget(win32->mWnd,mVisual);
+				target=new_EGLWindowRenderTarget(GetDC(win32->mWnd),win32->mWnd,mVisual);
 			#else
 				target=new_WGLWindowRenderTarget(win32->mWnd,mVisual);
 			#endif

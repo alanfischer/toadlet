@@ -28,10 +28,6 @@
 
 #include <toadlet/Types.h>
 #include <toadlet/egg/WeakPointer.h>
-#ifndef WIN32_LEAN_AND_MEAN
-#	define WIN32_LEAN_AND_MEAN 1
-#endif
-#include <windows.h>
 
 namespace toadlet{
 namespace egg{
@@ -50,7 +46,7 @@ public:
 	bool unlock();
 
 protected:
-	HANDLE mMutex;
+	void *mMutex;
 
 	friend class Win32WaitCondition;
 };

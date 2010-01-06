@@ -28,10 +28,6 @@
 
 #include <toadlet/egg/Runnable.h>
 #include <toadlet/egg/WeakPointer.h>
-#ifndef WIN32_LEAN_AND_MEAN
-#	define WIN32_LEAN_AND_MEAN 1
-#endif
-#include <windows.h>
 
 namespace toadlet{
 namespace egg{
@@ -52,10 +48,10 @@ public:
 
 protected:
 	void startRun();
-	static unsigned long WINAPI startThread(void *thread);
+	static unsigned long startThread(void *thread);
 
 	Runnable *mRunner;
-	HANDLE mThread;
+	void *mThread;
 };
 
 }

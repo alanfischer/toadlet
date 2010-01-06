@@ -33,8 +33,8 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *nativeSurface,const Visual &visual){
-	return new EGLWindowRenderTarget(nativeSurface,visual);
+TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *nativeDisplay,void *nativeSurface,const Visual &visual){
+	return new EGLWindowRenderTarget(nativeDisplay,nativeSurface,visual);
 }
 
 EGLWindowRenderTarget::EGLWindowRenderTarget():EGLRenderTarget(),
@@ -42,18 +42,18 @@ EGLWindowRenderTarget::EGLWindowRenderTarget():EGLRenderTarget(),
 	mPixmap(false)
 {}
 
-EGLWindowRenderTarget::EGLWindowRenderTarget(void *nativeSurface,const Visual &visual,bool pixmap):EGLRenderTarget(),
+EGLWindowRenderTarget::EGLWindowRenderTarget(void *nativeDisplay,void *nativeSurface,const Visual &visual,bool pixmap):EGLRenderTarget(),
 	mConfig(0),
 	mPixmap(false)
 {
-	createContext(nativeSurface,visual,pixmap);
+	createContext(nativeDisplay,nativeSurface,visual,pixmap);
 }
 
 EGLWindowRenderTarget::~EGLWindowRenderTarget(){
 	destroyContext();
 }
 
-bool EGLWindowRenderTarget::createContext(void *nativeSurface,const Visual &visual,bool pixmap){
+bool EGLWindowRenderTarget::createContext(void *nativeDisplay,void *nativeSurface,const Visual &visual,bool pixmap){
 	if(mContext!=EGL_NO_CONTEXT){
 		return true;
 	}
@@ -71,7 +71,7 @@ bool EGLWindowRenderTarget::createContext(void *nativeSurface,const Visual &visu
 		}
 	#endif
 
-	mDisplay=eglGetDisplay(EGL_DEFAULT_DISPLAY);
+	mDisplay=eglGetDisplay((NativeDisplayType)nativeDisplay);
 	if(mDisplay==EGL_NO_DISPLAY){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"error getting display");

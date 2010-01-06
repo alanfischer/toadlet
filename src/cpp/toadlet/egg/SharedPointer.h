@@ -26,6 +26,7 @@
 #ifndef TOADLET_EGG_SHAREDPOINTER_H
 #define TOADLET_EGG_SHAREDPOINTER_H
 
+#include <toadlet/egg/Assert.h>
 #include <toadlet/egg/PointerCounter.h>
 
 namespace toadlet{

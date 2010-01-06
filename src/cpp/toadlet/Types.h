@@ -160,12 +160,8 @@
 	#define NULL 0
 #endif
 
-#if defined(TOADLET_DEBUG)
-	#include <assert.h>
-	#define TOADLET_ASSERT(x) assert(x)
-#else
-	#define TOADLET_ASSERT(x)
-#endif
+#define TOADLET_QUOTE_(x) #x
+#define TOADLET_QUOTE(x) TOADLET_QUOTE_(x)
 
 #if defined(TOADLET_EXCEPTIONS)
 	#define TOADLET_TRY try{

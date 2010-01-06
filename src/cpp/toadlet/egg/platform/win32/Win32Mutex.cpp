@@ -24,6 +24,10 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/platform/win32/Win32Mutex.h>
+#ifndef WIN32_LEAN_AND_MEAN
+	#define WIN32_LEAN_AND_MEAN 1
+#endif
+#include <windows.h>
 
 namespace toadlet{
 namespace egg{

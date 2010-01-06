@@ -35,12 +35,12 @@ namespace peeper{
 class TOADLET_API EGLWindowRenderTarget:public EGLRenderTarget{
 public:
 	EGLWindowRenderTarget();
-	EGLWindowRenderTarget(void *nativeSurface,const Visual &visual,bool pixmap=false);
+	EGLWindowRenderTarget(void *nativeDisplay,void *nativeSurface,const Visual &visual,bool pixmap=false);
 	virtual ~EGLWindowRenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
-	virtual bool createContext(void *nativeSurface,const Visual &visual,bool pixmap=false);
+	virtual bool createContext(void *nativeDisplay,void *nativeSurface,const Visual &visual,bool pixmap=false);
 	virtual bool destroyContext();
 	
 	virtual bool swap();
