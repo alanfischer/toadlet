@@ -52,7 +52,7 @@ public:
 
 	virtual egg::Resource::ptr get(const egg::String &name);
 	virtual egg::Resource::ptr find(const egg::String &name,ResourceHandlerData::ptr handlerData=(int)NULL);
-	virtual egg::Resource::ptr manage(const egg::Resource::ptr &resource);
+	virtual egg::Resource::ptr manage(const egg::Resource::ptr &resource,const egg::String &name=(char*)NULL);
 
 	virtual void unmanage(egg::Resource *resource);
 
