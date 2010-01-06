@@ -27,10 +27,6 @@
 #define TOADLET_EGG_WIN32WAITCONDITION_H
 
 #include <toadlet/egg/Mutex.h>
-#ifndef WIN32_LEAN_AND_MEAN
-#	define WIN32_LEAN_AND_MEAN 1
-#endif
-#include <windows.h>
 
 namespace toadlet{
 namespace egg{
@@ -48,7 +44,7 @@ public:
 	void notify();
 
 protected:
-	HANDLE mEvent;
+	void *mEvent;
 };
 
 }

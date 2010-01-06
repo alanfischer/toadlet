@@ -4,6 +4,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.in ${CMAKE_CURRENT_BINARY_
 
 # Source files for toadlet_egg
 set (EGG_SRC
+	Assert.cpp
 	Error.cpp
 	Exception.cpp
 	Logger.cpp
@@ -102,6 +103,7 @@ set (EGG_PLATFORM_WIN32_SRC
 
 # Headers
 set (EGG_HEADERS
+	Assert.h
 	BaseResource.h
 	Collection.h
 	Categories.h

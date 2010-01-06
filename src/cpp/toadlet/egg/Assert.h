@@ -23,30 +23,25 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_WIN32SYSTEM_H
-#define TOADLET_EGG_WIN32SYSTEM_H
+#ifndef TOADLET_EGG_ASSERT_H
+#define TOADLET_EGG_ASSERT_H
 
-#include <toadlet/egg/String.h>
+#include <toadlet/Types.h>
+
+// We want to avoid including assert.h, at least on win32, since it brings in windows.h
 
 namespace toadlet{
 namespace egg{
 
-class TOADLET_API Win32System{
-public:
-	static void usleep(uint64 microseconds);
-	static void msleep(uint64 milliseconds);
-
-	static uint64 utime();
-	static uint64 mtime();
-
-	static bool absolutePath(const String &path);
-
-	#if !defined(TOADLET_PLATFORM_WINCE)
-		static String getEnv(const String &name);
-	#endif
-};
+TOADLET_C_API void assert(char *message);
 
 }
 }
+
+#if defined(TOADLET_DEBUG)
+	#define TOADLET_ASSERT(x) if(!(x)){toadlet::egg::assert( __FILE__ ":" TOADLET_QUOTE(__LINE__) " assertion " #x " failed");}
+#else
+	#define TOADLET_ASSERT(x) ((void)0)
+#endif
 
 #endif

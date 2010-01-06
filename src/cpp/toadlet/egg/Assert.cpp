@@ -23,30 +23,17 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_WIN32SYSTEM_H
-#define TOADLET_EGG_WIN32SYSTEM_H
-
-#include <toadlet/egg/String.h>
+#include <toadlet/egg/Assert.h>
+#include <toadlet/egg/Error.h>
 
 namespace toadlet{
 namespace egg{
 
-class TOADLET_API Win32System{
-public:
-	static void usleep(uint64 microseconds);
-	static void msleep(uint64 milliseconds);
-
-	static uint64 utime();
-	static uint64 mtime();
-
-	static bool absolutePath(const String &path);
-
-	#if !defined(TOADLET_PLATFORM_WINCE)
-		static String getEnv(const String &name);
-	#endif
-};
+void assert(char *message){
+	if(message!=NULL){
+		Error::assert(message);
+	}
+}
 
 }
 }
-
-#endif
