@@ -55,6 +55,8 @@ namespace Math{
 	const fixed THREE_QUARTERS=ONE*3/4;
 	const fixed HALF=ONE/2;
 	const fixed QUARTER=ONE/4;
+	const fixed TWO_THIRDS=TWO/3;
+	const fixed THIRD=ONE/3;
 	const fixed ONE_EIGHTY=ONE*180;
 	const fixed PI=205887;
 	const fixed TWO_PI=PI*2;
