@@ -181,7 +181,7 @@ void CameraNode::setNearAndFarDist(scalar nearDist,scalar farDist){
 void CameraNode::setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up){
 	Math::setMatrix4x4FromLookAt(mRenderTransform,eye,point,up,true);
 
-	Math::setVector3FromMatrix4x4(mTranslate,mRenderTransform);
+	Math::setTranslateFromMatrix4x4(mTranslate,mRenderTransform);
 	Math::setMatrix3x3FromMatrix4x4(mRotate,mRenderTransform);
 
 	mIdentityTransform=false;
@@ -191,7 +191,7 @@ void CameraNode::setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3
 void CameraNode::setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up){
 	Math::setMatrix4x4FromLookDir(mRenderTransform,eye,dir,up,true);
 
-	Math::setVector3FromMatrix4x4(mTranslate,mRenderTransform);
+	Math::setTranslateFromMatrix4x4(mTranslate,mRenderTransform);
 	Math::setMatrix3x3FromMatrix4x4(mRotate,mRenderTransform);
 
 	mIdentityTransform=false;

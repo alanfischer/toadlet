@@ -355,7 +355,7 @@ void HopEntity::castShadow(){
 	Segment segment;
 	Vector3 vector;
 	Matrix3x3 rotate;
-	Math::setVector3FromMatrix4x4(segment.origin,mRenderTransform);
+	Math::setTranslateFromMatrix4x4(segment.origin,mRenderTransform);
 	Math::setMatrix3x3FromMatrix4x4(rotate,mRenderTransform);
 	if(mSolid->hasLocalGravity()){
 		Math::normalize(vector,mSolid->getLocalGravity());
@@ -440,7 +440,7 @@ void HopEntity::showCollisionVolumes(bool show){
 void HopEntity::updateVolumes(bool interpolate){
 	if(interpolate){
 		Vector3 translate;
-		Math::setVector3FromMatrix4x4(translate,mRenderTransform);
+		Math::setTranslateFromMatrix4x4(translate,mRenderTransform);
 		mVolumeNode->setTranslate(translate);
 	}
 	else{

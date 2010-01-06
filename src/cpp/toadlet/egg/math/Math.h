@@ -415,12 +415,6 @@ namespace Math{
 		r.z=v1.x*v2.y-v1.y*v2.x;
 	}
 
-	inline void setVector3FromMatrix4x4(Vector3 &r,const Matrix4x4 &m){
-		r.x=m.data[0+3*4];
-		r.y=m.data[1+3*4];
-		r.z=m.data[2+3*4];
-	}
-
 	// Vector4 operations
 	inline void neg(Vector4 &r,Vector4 &v){
 		r.x=-v.x;
@@ -1032,6 +1026,12 @@ namespace Math{
 		r.data[0+2*3]=m.data[0+2*4]; r.data[1+2*3]=m.data[1+2*4]; r.data[2+2*3]=m.data[2+2*4];
 	}
 
+	inline void setMatrix3x3FromMatrix4x4Transpose(Matrix3x3 &r,const Matrix4x4 &m){
+		r.data[0+0*3]=m.data[0+0*4]; r.data[1+0*3]=m.data[0+1*4]; r.data[2+0*3]=m.data[0+2*4];
+		r.data[0+1*3]=m.data[1+0*4]; r.data[1+1*3]=m.data[1+1*4]; r.data[2+1*3]=m.data[1+2*4];
+		r.data[0+2*3]=m.data[2+0*4]; r.data[1+2*3]=m.data[2+1*4]; r.data[2+2*3]=m.data[2+2*4];
+	}
+
 	// Matrix4x4 advanced operations
 	inline void setAxesFromMatrix4x4(const Matrix4x4 &m,Vector3 &xAxis,Vector3 &yAxis,Vector3 &zAxis){ setAxesFromMatrix(m,xAxis,yAxis,zAxis); }
 
@@ -1057,6 +1057,12 @@ namespace Math{
 		r.data[0+2*4]=m.data[0+2*3]; r.data[1+2*4]=m.data[1+2*3]; r.data[2+2*4]=m.data[2+2*3];
 	}
 
+	inline void setMatrix4x4FromMatrix3x3Transpose(Matrix4x4 &r,const Matrix3x3 &m){
+		r.data[0+0*4]=m.data[0+0*3]; r.data[1+0*4]=m.data[0+1*3]; r.data[2+0*4]=m.data[0+2*3];
+		r.data[0+1*4]=m.data[1+0*3]; r.data[1+1*4]=m.data[1+1*3]; r.data[2+1*4]=m.data[1+2*3];
+		r.data[0+2*4]=m.data[2+0*3]; r.data[1+2*4]=m.data[2+1*3]; r.data[2+2*4]=m.data[2+2*3];
+	}
+
 	inline void setMatrix4x4FromTranslate(Matrix4x4 &r,float x,float y,float z){
 		r.data[0+3*4]=x;
 		r.data[1+3*4]=y;
@@ -1069,6 +1075,12 @@ namespace Math{
 		r.data[2+3*4]=translate.z;
 	}
 
+	inline void setTranslateFromMatrix4x4(Vector3 &r,const Matrix4x4 &m){
+		r.x=m.data[0+3*4];
+		r.y=m.data[1+3*4];
+		r.z=m.data[2+3*4];
+	}
+
 	inline void setMatrix4x4FromScale(Matrix4x4 &r,float x,float y,float z){
 		r.data[0+0*4]=x;
 		r.data[1+1*4]=y;
@@ -1079,6 +1091,45 @@ namespace Math{
 		r.data[0+0*4]=scale.x;
 		r.data[1+1*4]=scale.y;
 		r.data[2+2*4]=scale.z;
+	}
+
+	inline void setScaleFromMatrix4x4(Vector3 &r,const Matrix4x4 &m){
+		r.x=sqrt(m.data[0+0*4]*m.data[0+0*4] + m.data[1+0*4]*m.data[1+0*4] + m.data[2+0*4]*m.data[2+0*4]);
+		r.y=sqrt(m.data[0+1*4]*m.data[0+1*4] + m.data[1+1*4]*m.data[1+1*4] + m.data[2+1*4]*m.data[2+1*4]);
+		r.z=sqrt(m.data[0+2*4]*m.data[0+2*4] + m.data[1+2*4]*m.data[1+2*4] + m.data[2+2*4]*m.data[2+2*4]);
+	}
+
+	inline void setRotateFromMatrix4x4(Matrix3x3 &r,const Matrix4x4 &m){
+		real x=sqrt(m.data[0+0*4]*m.data[0+0*4] + m.data[1+0*4]*m.data[1+0*4] + m.data[2+0*4]*m.data[2+0*4]);
+		real y=sqrt(m.data[0+1*4]*m.data[0+1*4] + m.data[1+1*4]*m.data[1+1*4] + m.data[2+1*4]*m.data[2+1*4]);
+		real z=sqrt(m.data[0+2*4]*m.data[0+2*4] + m.data[1+2*4]*m.data[1+2*4] + m.data[2+2*4]*m.data[2+2*4]);
+		x=1.0/x;
+		y=1.0/y;
+		z=1.0/z;
+		r.data[0+0*3]=m.data[0+0*4]*x;
+		r.data[1+0*3]=m.data[1+0*4]*x;
+		r.data[2+0*3]=m.data[2+0*4]*x;
+		r.data[0+1*3]=m.data[0+1*4]*y;
+		r.data[1+1*3]=m.data[1+1*4]*y;
+		r.data[2+1*3]=m.data[2+1*4]*y;
+		r.data[0+2*3]=m.data[0+2*4]*z;
+		r.data[1+2*3]=m.data[1+2*4]*z;
+		r.data[2+2*3]=m.data[2+2*4]*z;
+	}
+
+	inline void setRotateFromMatrix4x4(Matrix3x3 &r,const Matrix4x4 &m,const Vector3 &scale){
+		real x=1.0/scale.x;
+		real y=1.0/scale.y;
+		real z=1.0/scale.z;
+		r.data[0+0*3]=m.data[0+0*4]*x;
+		r.data[1+0*3]=m.data[1+0*4]*x;
+		r.data[2+0*3]=m.data[2+0*4]*x;
+		r.data[0+1*3]=m.data[0+1*4]*y;
+		r.data[1+1*3]=m.data[1+1*4]*y;
+		r.data[2+1*3]=m.data[2+1*4]*y;
+		r.data[0+2*3]=m.data[0+2*4]*z;
+		r.data[1+2*3]=m.data[1+2*4]*z;
+		r.data[2+2*3]=m.data[2+2*4]*z;
 	}
 
 	inline void setMatrix4x4FromRotateScale(Matrix4x4 &r,const Matrix3x3 &rotate,const Vector3 &scale){

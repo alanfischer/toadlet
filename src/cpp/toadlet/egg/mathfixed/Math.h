@@ -423,12 +423,6 @@ namespace Math{
 		r.z=TOADLET_MUL_XX(v1.x,v2.y) - TOADLET_MUL_XX(v1.y,v2.x);
 	}
 
-	inline void setVector3FromMatrix4x4(Vector3 &r,const Matrix4x4 &m){
-		r.x=m.data[0+3*4];
-		r.y=m.data[1+3*4];
-		r.z=m.data[2+3*4];
-	}
-
 	// Vector4 operations
 	inline void neg(Vector4 &r,Vector4 &v){
 		r.x=-v.x;
@@ -1044,6 +1038,12 @@ namespace Math{
 		r.data[0+2*3]=m.data[0+2*4]; r.data[1+2*3]=m.data[1+2*4]; r.data[2+2*3]=m.data[2+2*4];
 	}
 
+	inline void setMatrix3x3FromMatrix4x4Transpose(Matrix3x3 &r,const Matrix4x4 &m){
+		r.data[0+0*3]=m.data[0+0*4]; r.data[1+0*3]=m.data[0+1*4]; r.data[2+0*3]=m.data[0+2*4];
+		r.data[0+1*3]=m.data[1+0*4]; r.data[1+1*3]=m.data[1+1*4]; r.data[2+1*3]=m.data[1+2*4];
+		r.data[0+2*3]=m.data[2+0*4]; r.data[1+2*3]=m.data[2+1*4]; r.data[2+2*3]=m.data[2+2*4];
+	}
+
 	// Matrix4x4 advanced operations
 	inline void setAxesFromMatrix4x4(const Matrix4x4 &m,Vector3 &xAxis,Vector3 &yAxis,Vector3 &zAxis){ setAxesFromMatrix(m,xAxis,yAxis,zAxis); }
 
@@ -1069,6 +1069,12 @@ namespace Math{
 		r.data[0+2*4]=m.data[0+2*3]; r.data[1+2*4]=m.data[1+2*3]; r.data[2+2*4]=m.data[2+2*3];
 	}
 
+	inline void setMatrix4x4FromMatrix3x3Transpose(Matrix4x4 &r,const Matrix3x3 &m){
+		r.data[0+0*4]=m.data[0+0*3]; r.data[1+0*4]=m.data[0+1*3]; r.data[2+0*4]=m.data[0+2*3];
+		r.data[0+1*4]=m.data[1+0*3]; r.data[1+1*4]=m.data[1+1*3]; r.data[2+1*4]=m.data[1+2*3];
+		r.data[0+2*4]=m.data[2+0*3]; r.data[1+2*4]=m.data[2+1*3]; r.data[2+2*4]=m.data[2+2*3];
+	}
+
 	inline void setMatrix4x4FromTranslate(Matrix4x4 &r,fixed x,fixed y,fixed z){
 		r.data[0+3*4]=x;
 		r.data[1+3*4]=y;
@@ -1081,6 +1087,12 @@ namespace Math{
 		r.data[2+3*4]=translate.z;
 	}
 
+	inline void setTranslateFromMatrix4x4(Vector3 &r,const Matrix4x4 &m){
+		r.x=m.data[0+3*4];
+		r.y=m.data[1+3*4];
+		r.z=m.data[2+3*4];
+	}
+
 	inline void setMatrix4x4FromScale(Matrix4x4 &r,fixed x,fixed y,fixed z){
 		r.data[0+0*4]=x;
 		r.data[1+1*4]=y;
@@ -1091,6 +1103,45 @@ namespace Math{
 		r.data[0+0*4]=scale.x;
 		r.data[1+1*4]=scale.y;
 		r.data[2+2*4]=scale.z;
+	}
+
+	inline void setScaleFromMatrix4x4(Vector3 &r,const Matrix4x4 &m){
+		r.x=sqrt(TOADLET_MUL_XX(m.data[0+0*4],m.data[0+0*4]) + TOADLET_MUL_XX(m.data[1+0*4],m.data[1+0*4]) + TOADLET_MUL_XX(m.data[2+0*4],m.data[2+0*4]));
+		r.y=sqrt(TOADLET_MUL_XX(m.data[0+1*4],m.data[0+1*4]) + TOADLET_MUL_XX(m.data[1+1*4],m.data[1+1*4]) + TOADLET_MUL_XX(m.data[2+1*4],m.data[2+1*4]));
+		r.z=sqrt(TOADLET_MUL_XX(m.data[0+2*4],m.data[0+2*4]) + TOADLET_MUL_XX(m.data[1+2*4],m.data[1+2*4]) + TOADLET_MUL_XX(m.data[2+2*4],m.data[2+2*4]));
+	}
+
+	inline void setRotateFromMatrix4x4(Matrix3x3 &r,const Matrix4x4 &m){
+		fixed x=sqrt(TOADLET_MUL_XX(m.data[0+0*4],m.data[0+0*4]) + TOADLET_MUL_XX(m.data[1+0*4],m.data[1+0*4]) + TOADLET_MUL_XX(m.data[2+0*4],m.data[2+0*4]));
+		fixed y=sqrt(TOADLET_MUL_XX(m.data[0+1*4],m.data[0+1*4]) + TOADLET_MUL_XX(m.data[1+1*4],m.data[1+1*4]) + TOADLET_MUL_XX(m.data[2+1*4],m.data[2+1*4]));
+		fixed z=sqrt(TOADLET_MUL_XX(m.data[0+2*4],m.data[0+2*4]) + TOADLET_MUL_XX(m.data[1+2*4],m.data[1+2*4]) + TOADLET_MUL_XX(m.data[2+2*4],m.data[2+2*4]));
+		x=TOADLET_DIV_XX(ONE,x);
+		y=TOADLET_DIV_XX(ONE,y);
+		z=TOADLET_DIV_XX(ONE,z);
+		r.data[0+0*3]=TOADLET_MUL_XX(m.data[0+0*4],x);
+		r.data[1+0*3]=TOADLET_MUL_XX(m.data[1+0*4],x);
+		r.data[2+0*3]=TOADLET_MUL_XX(m.data[2+0*4],x);
+		r.data[0+1*3]=TOADLET_MUL_XX(m.data[0+1*4],y);
+		r.data[1+1*3]=TOADLET_MUL_XX(m.data[1+1*4],y);
+		r.data[2+1*3]=TOADLET_MUL_XX(m.data[2+1*4],y);
+		r.data[0+2*3]=TOADLET_MUL_XX(m.data[0+2*4],z);
+		r.data[1+2*3]=TOADLET_MUL_XX(m.data[1+2*4],z);
+		r.data[2+2*3]=TOADLET_MUL_XX(m.data[2+2*4],z);
+	}
+
+	inline void setRotateFromMatrix4x4(Matrix3x3 &r,const Matrix4x4 &m,const Vector3 &scale){
+		fixed x=TOADLET_DIV_XX(ONE,scale.x);
+		fixed y=TOADLET_DIV_XX(ONE,scale.y);
+		fixed z=TOADLET_DIV_XX(ONE,scale.z);
+		r.data[0+0*3]=TOADLET_MUL_XX(m.data[0+0*4],x);
+		r.data[1+0*3]=TOADLET_MUL_XX(m.data[1+0*4],x);
+		r.data[2+0*3]=TOADLET_MUL_XX(m.data[2+0*4],x);
+		r.data[0+1*3]=TOADLET_MUL_XX(m.data[0+1*4],y);
+		r.data[1+1*3]=TOADLET_MUL_XX(m.data[1+1*4],y);
+		r.data[2+1*3]=TOADLET_MUL_XX(m.data[2+1*4],y);
+		r.data[0+2*3]=TOADLET_MUL_XX(m.data[0+2*4],z);
+		r.data[1+2*3]=TOADLET_MUL_XX(m.data[1+2*4],z);
+		r.data[2+2*3]=TOADLET_MUL_XX(m.data[2+2*4],z);
 	}
 
 	inline void setMatrix4x4FromRotateScale(Matrix4x4 &r,const Matrix3x3 &rotate,const Vector3 &scale){

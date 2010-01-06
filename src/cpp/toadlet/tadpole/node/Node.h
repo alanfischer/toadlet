@@ -116,7 +116,8 @@ public:
 	inline const egg::String &getName() const{return mName;}
 	virtual Node *findNodeByName(const egg::String &name);
 
-	virtual void setAlignmentCalculation(bool xAxis,bool yAxis,bool zAxis);
+	virtual void setCameraAligned(bool aligned);
+	inline bool getCameraAligned() const{return mCameraAligned;}
 
 	virtual void setBoundingRadius(scalar boundingRadius);
 	inline scalar getBoundingRadius() const{return mBoundingRadius;}
@@ -169,7 +170,7 @@ protected:
 	Vector3 mWorldScale;
 	int mScope;
 	egg::String mName;
-	bool mAlignXAxis,mAlignYAxis,mAlignZAxis;
+	bool mCameraAligned;
 	scalar mBoundingRadius;
 	bool mReceiveUpdates;
 	int mAwakeCount; // 2=Initially Awoken, 1=Awake, 0=Asleep
