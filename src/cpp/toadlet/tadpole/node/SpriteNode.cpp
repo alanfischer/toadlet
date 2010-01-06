@@ -57,7 +57,7 @@ Node *SpriteNode::create(Engine *engine){
 	super::create(engine);
 
 	setPerspective(true);
-	setAlignmentCalculation(true,true,true);
+	setCameraAligned(true);
 	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
 	setPixelSpace(false);
 	mSize.reset();
@@ -170,7 +170,7 @@ void SpriteNode::queueRenderable(SceneNode *scene,CameraNode *camera){
 		return;
 	}
 
-	Math::postMul(mWorldRenderTransform,mSpriteTransform);
+	Math::mul(mWorldSpriteTransform,mWorldRenderTransform,mSpriteTransform);
 
 	if(!mPerspective){
 		Matrix4x4 &scale=cache_queueRenderable_scale.reset();
@@ -183,7 +183,7 @@ void SpriteNode::queueRenderable(SceneNode *scene,CameraNode *camera){
 		scale.setAt(1,1,point.w);
 		scale.setAt(2,2,point.w);
 
-		Math::postMul(mWorldRenderTransform,scale);
+		Math::postMul(mWorldSpriteTransform,scale);
 	}
 
 #if defined(TOADLET_GCC_INHERITANCE_BUG)

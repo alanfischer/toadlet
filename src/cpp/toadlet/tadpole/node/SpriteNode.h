@@ -72,7 +72,7 @@ public:
 
 	void queueRenderable(SceneNode *scene,CameraNode *camera);
 	Material *getRenderMaterial() const{return mMaterial;}
-	const Matrix4x4 &getRenderTransform() const{return super::getWorldRenderTransform();}
+	const Matrix4x4 &getRenderTransform() const{return mWorldSpriteTransform;}
 	void render(peeper::Renderer *renderer) const;
 
 	peeper::VertexBufferAccessor vba;
@@ -92,6 +92,7 @@ protected:
 	peeper::VertexData::ptr mVertexData;
 	peeper::IndexData::ptr mIndexData;
 	Matrix4x4 mSpriteTransform;
+	Matrix4x4 mWorldSpriteTransform;
 
 	Matrix4x4 cache_queueRenderable_scale;
 	Vector4 cache_queueRenderable_point;

@@ -59,7 +59,7 @@ Node *LabelNode::create(Engine *engine){
 	super::create(engine);
 
 	setPerspective(true);
-	setAlignmentCalculation(true,true,true);
+	setCameraAligned(true);
 	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
 	setPixelSpace(false);
 	setWordWrap(false);

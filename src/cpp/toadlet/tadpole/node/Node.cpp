@@ -52,7 +52,7 @@ Node::Node():
 	//mScale,
 	mScope(0),
 	//mName,
-	mAlignXAxis(false),mAlignYAxis(false),mAlignZAxis(false),
+	mCameraAligned(false),
 	mBoundingRadius(0),
 	mReceiveUpdates(false),
 	mAwakeCount(0)
@@ -184,9 +184,9 @@ void Node::setScale(scalar x,scalar y,scalar z){
 }
 
 void Node::setTransform(const Matrix4x4 &transform){
-	Math::setVector3FromMatrix4x4(mTranslate,transform);
-	Math::setMatrix3x3FromMatrix4x4(mRotate,transform);
-	mScale.set(Math::ONE_VECTOR3); // TODO: Extract scale from transform
+	Math::setScaleFromMatrix4x4(mScale,transform);
+	Math::setRotateFromMatrix4x4(mRotate,transform,mScale);
+	Math::setTranslateFromMatrix4x4(mTranslate,transform);
 
 	mRenderTransform.set(transform);
 
@@ -213,8 +213,8 @@ Node *Node::findNodeByName(const String &name){
 	return (mName!=(char*)NULL && mName.equals(name))?this:NULL;
 }
 
-void Node::setAlignmentCalculation(bool xAxis,bool yAxis,bool zAxis){
-	mAlignXAxis=xAxis;mAlignYAxis=yAxis;mAlignZAxis=zAxis;
+void Node::setCameraAligned(bool cameraAligned){
+	mCameraAligned=cameraAligned;
 }
 
 void Node::setBoundingRadius(scalar boundingRadius){

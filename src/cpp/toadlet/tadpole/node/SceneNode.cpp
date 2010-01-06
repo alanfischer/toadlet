@@ -281,11 +281,6 @@ void SceneNode::renderUpdate(Node::ptr node,int dt){
 	}
 	else{
 		Math::mul(node->mWorldRenderTransform,node->mParent->mWorldRenderTransform,node->mRenderTransform);
-		if(node->getName()=="mesh"){
-			Logger::alert(String("node->scale:")+node->mScale[0]+","+node->mScale[1]+","+node->mScale[2]);
-			Logger::alert(String("node->transform:")+node->mRenderTransform[0][0]+","+node->mRenderTransform[0][1]+","+node->mRenderTransform[0][2]);
-			Logger::alert(String("node->wtransform:")+node->mWorldRenderTransform[0][0]+","+node->mWorldRenderTransform[0][1]+","+node->mWorldRenderTransform[0][2]);
-		}
 	}
 
 	ParentNode *parent=node->isParent();
@@ -315,7 +310,7 @@ void SceneNode::renderUpdate(Node::ptr node,int dt){
 		}
 	}
 	else{
-		Math::setVector3FromMatrix4x4(node->mRenderWorldBound.origin,node->mWorldRenderTransform);
+		Math::setTranslateFromMatrix4x4(node->mRenderWorldBound.origin,node->mWorldRenderTransform);
 		if(node->mIdentityTransform==false){
 			scalar scale=Math::maxVal(node->getScale().x,Math::maxVal(node->getScale().y,node->getScale().z));
 			node->mRenderWorldBound.radius=Math::mul(scale,node->mBoundingRadius);
@@ -462,62 +457,23 @@ void SceneNode::queueRenderables(Node *node){
 		return;
 	}
 
-	// TODO: Fix these alignment calculations so it actually aligns per axis, and preserves parent scale
-	if(node->mAlignXAxis || node->mAlignYAxis || node->mAlignZAxis){
-		if(mCamera->mAlignmentCalculationsUseOrigin){
-			Matrix4x4 &nodeWorldTransform=node->mWorldRenderTransform;
-			Vector3 nodeWorldTranslate; Math::setVector3FromMatrix4x4(nodeWorldTranslate,node->mWorldRenderTransform);
-			Vector3 cameraWorldTranslate; Math::setVector3FromMatrix4x4(cameraWorldTranslate,mCamera->mWorldRenderTransform);
-			Matrix4x4 lookAtCamera; Math::setMatrix4x4FromLookAt(lookAtCamera,nodeWorldTranslate,cameraWorldTranslate,Math::Z_UNIT_VECTOR3,false);
+	if(node->mCameraAligned){
+		if(true){//mCamera->mAlignmentCalculationsUseOrigin){
+			Vector3 nodeWorldTranslate; Math::setTranslateFromMatrix4x4(nodeWorldTranslate,node->mWorldRenderTransform);
+			Vector3 cameraWorldTranslate; Math::setTranslateFromMatrix4x4(cameraWorldTranslate,mCamera->mWorldRenderTransform);
+			Matrix4x4 lookAtCamera; Math::setMatrix4x4FromLookAt(lookAtCamera,cameraWorldTranslate,nodeWorldTranslate,Math::Z_UNIT_VECTOR3,false);
+			Matrix3x3 rotate; Math::setMatrix3x3FromMatrix4x4Transpose(rotate,lookAtCamera);
 
-			const Vector3 &nodeScale=node->mScale;
-//			nodeWorldTransform.setAt(0,0,Math::mul(lookAtCamera.at(0,0),nodeScale.x));
-//			nodeWorldTransform.setAt(1,0,lookAtCamera.at(0,1));
-//			nodeWorldTransform.setAt(2,0,lookAtCamera.at(0,2));
-//			nodeWorldTransform.setAt(0,1,lookAtCamera.at(1,0));
-//			nodeWorldTransform.setAt(1,1,Math::mul(lookAtCamera.at(1,1),nodeScale.y));
-//			nodeWorldTransform.setAt(2,1,lookAtCamera.at(1,2));
-//			nodeWorldTransform.setAt(0,2,lookAtCamera.at(2,0));
-//			nodeWorldTransform.setAt(1,2,lookAtCamera.at(2,1));
-//			nodeWorldTransform.setAt(2,2,Math::mul(lookAtCamera.at(2,2),nodeScale.z));
-
-Matrix4x4 wtf;Math::setMatrix4x4FromScale(wtf,node->mScale);
-nodeWorldTransform.setAt(0,0,lookAtCamera.at(0,0));
-nodeWorldTransform.setAt(1,0,lookAtCamera.at(0,1));
-nodeWorldTransform.setAt(2,0,lookAtCamera.at(0,2));
-nodeWorldTransform.setAt(0,1,lookAtCamera.at(1,0));
-nodeWorldTransform.setAt(1,1,lookAtCamera.at(1,1));
-nodeWorldTransform.setAt(2,1,lookAtCamera.at(1,2));
-nodeWorldTransform.setAt(0,2,lookAtCamera.at(2,0));
-nodeWorldTransform.setAt(1,2,lookAtCamera.at(2,1));
-nodeWorldTransform.setAt(2,2,lookAtCamera.at(2,2));
-Math::postMul(nodeWorldTransform,wtf);
+			// TODO: Switch this to RenderWorldScale when its available
+			Vector3 worldScale; Math::setScaleFromMatrix4x4(worldScale,node->mWorldRenderTransform);
+			Math::setMatrix4x4FromRotateScale(node->mWorldRenderTransform,rotate,worldScale);
 		}
 		else{
-			const Matrix4x4 &viewTransform=mCamera->getViewTransform();
-			Matrix4x4 &nodeWorldTransform=node->mWorldRenderTransform;
-			const Vector3 &nodeScale=node->mScale;
-//			nodeWorldTransform.setAt(0,0,Math::mul(viewTransform.at(0,0),nodeScale.x));
-//			nodeWorldTransform.setAt(1,0,viewTransform.at(0,1));
-//			nodeWorldTransform.setAt(2,0,viewTransform.at(0,2));
-//			nodeWorldTransform.setAt(0,1,viewTransform.at(1,0));
-//			nodeWorldTransform.setAt(1,1,Math::mul(viewTransform.at(1,1),nodeScale.y));
-//			nodeWorldTransform.setAt(2,1,viewTransform.at(1,2));
-//			nodeWorldTransform.setAt(0,2,viewTransform.at(2,0));
-//			nodeWorldTransform.setAt(1,2,viewTransform.at(2,1));
-//			nodeWorldTransform.setAt(2,2,Math::mul(viewTransform.at(2,2),nodeScale.z));
+			Matrix3x3 rotate; Math::setMatrix3x3FromMatrix4x4Transpose(rotate,mCamera->getViewTransform());
 
-Matrix4x4 wtf;Math::setMatrix4x4FromScale(wtf,node->mScale);
-nodeWorldTransform.setAt(0,0,viewTransform.at(0,0));
-nodeWorldTransform.setAt(1,0,viewTransform.at(0,1));
-nodeWorldTransform.setAt(2,0,viewTransform.at(0,2));
-nodeWorldTransform.setAt(0,1,viewTransform.at(1,0));
-nodeWorldTransform.setAt(1,1,viewTransform.at(1,1));
-nodeWorldTransform.setAt(2,1,viewTransform.at(1,2));
-nodeWorldTransform.setAt(0,2,viewTransform.at(2,0));
-nodeWorldTransform.setAt(1,2,viewTransform.at(2,1));
-nodeWorldTransform.setAt(2,2,viewTransform.at(2,2));
-Math::postMul(nodeWorldTransform,wtf);
+			// TODO: Switch this to RenderWorldScale when its available
+			Vector3 worldScale; Math::setScaleFromMatrix4x4(worldScale,node->mWorldRenderTransform);
+			Math::setMatrix4x4FromRotateScale(node->mWorldRenderTransform,rotate,worldScale);
 		}
 	}
 
