@@ -49,6 +49,8 @@ namespace Math{
 	const real THREE_QUARTERS=(real)0.75;
 	const real HALF=(real)0.5;
 	const real QUARTER=(real)0.25;
+	const real TWO_THIRDS=(real)2.0/3.0;
+	const real THIRD=(real)1.0/3.0;
 	const real ONE_EIGHTY=(real)180.0;
 	const real PI=(real)3.14159265358979323846264;
 	const real TWO_PI=(real)(PI*2.0);

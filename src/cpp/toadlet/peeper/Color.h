@@ -39,15 +39,51 @@ public:
 
 	inline Color(scalar r1,scalar g1,scalar b1,scalar a1):r(r1),g(g1),b(b1),a(a1){}
 
+	static inline Color rgba(scalar r1,scalar g1,scalar b1,scalar a1){
+		Color color;
+		color.setRGBA(r1,g1,b1,a1);
+		return color;
+	}
+
+	static inline Color rgba(const Vector4 &rgba){
+		Color color;
+		color.setRGBA(rgba);
+		return color;
+	}
+
 	static inline Color rgba(uint32 rgba){
 		Color color;
 		color.setRGBA(rgba);
 		return color;
 	}
 
+	static inline Color abgr(scalar a1,scalar b1,scalar g1,scalar r1){
+		Color color;
+		color.setABGR(a1,b1,g1,r1);
+		return color;
+	}
+
+	static inline Color abgr(const Vector4 &abgr){
+		Color color;
+		color.setABGR(abgr);
+		return color;
+	}
+
 	static inline Color abgr(uint32 abgr){
 		Color color;
 		color.setABGR(abgr);
+		return color;
+	}
+
+	static inline Color hsva(scalar h,scalar s,scalar v,scalar a){
+		Color color;
+		color.setHSVA(h,s,v,a);
+		return color;
+	}
+
+	static inline Color hsva(const Vector4 &hsva){
+		Color color;
+		color.setHSVA(hsva);
 		return color;
 	}
 
@@ -69,6 +105,19 @@ public:
 		return *this;
 	}
 
+	inline Color &setRGBA(scalar r1,scalar g1,scalar b1,scalar a1){
+		r=r1;
+		g=g1;
+		b=b1;
+		a=a1;
+
+		return *this;
+	}
+
+	inline Color &setRGBA(const Vector4 &rgba){
+		return setRGBA(rgba.x,rgba.y,rgba.z,rgba.w);
+	}
+
 	inline Color &setRGBA(uint32 rgba){
 		r=Math::fromInt((rgba&0xFF000000)>>24)/255;
 		g=Math::fromInt((rgba&0x00FF0000)>>16)/255;
@@ -76,6 +125,19 @@ public:
 		a=Math::fromInt((rgba&0x000000FF)>>0 )/255;
 
 		return *this;
+	}
+
+	inline Color &setABGR(scalar a1,scalar b1,scalar g1,scalar r1){
+		a=a1;
+		b=b1;
+		g=g1;
+		r=r1;
+
+		return *this;
+	}
+
+	inline Color &setABGR(const Vector4 &abgr){
+		return setABGR(abgr.x,abgr.y,abgr.z,abgr.w);
 	}
 
 	inline Color &setABGR(uint32 abgr){
@@ -87,13 +149,46 @@ public:
 		return *this;
 	}
 
-	inline Color &reset(){
-		r=0;
-		g=0;
-		b=0;
-		a=0;
+	inline Color &setHSVA(scalar h,scalar s,scalar v,scalar a1){
+		scalar hi=Math::floor(h*6);
+		scalar f=(h*6)-hi;
+		scalar p=Math::mul(v,Math::ONE-s);
+		scalar q=Math::mul(v,Math::ONE-Math::mul(f,s));
+		scalar t=Math::mul(v,Math::ONE-Math::mul(Math::ONE-f,s));
+		switch(Math::toInt(hi)){
+			case(0):
+				r=v;g=t;b=p;
+			break;
+			case(1):
+				r=q;g=v;b=p;
+			break;
+			case(2):
+				r=p;g=v;b=t;
+			break;
+			case(3):
+				r=p;g=q;b=v;
+			break;
+			case(4):
+				r=t;g=p;b=v;
+			break;
+			case(5):
+				r=v;g=p;b=q;
+			break;
+		}
+		a=a1;
 
 		return *this;
+	}
+
+	inline Color &setHSVA(const Vector4 &hsva){
+		return setHSVA(hsva.x,hsva.y,hsva.z,hsva.w);
+	}
+
+	inline void getRGBA(Vector4 &rgba) const{
+		rgba.x=r;
+		rgba.y=g;
+		rgba.z=b;
+		rgba.w=a;
 	}
 
 	inline uint32 getRGBA() const{
@@ -104,12 +199,56 @@ public:
 			((uint32)Math::toInt(a*255))<<0;
 	}
 
+	inline void getABGR(Vector4 &abgr) const{
+		abgr.x=a;
+		abgr.y=b;
+		abgr.z=g;
+		abgr.w=r;
+	}
+
 	inline uint32 getABGR() const{
 		return 
 			((uint32)Math::toInt(r*255))<<0  |
 			((uint32)Math::toInt(g*255))<<8  |
 			((uint32)Math::toInt(b*255))<<16 |
 			((uint32)Math::toInt(a*255))<<24;
+	}
+
+	inline void getHSVA(Vector4 &hsva) const{
+		scalar mx=Math::maxVal(Math::maxVal(r,g),b);
+		scalar mn=Math::minVal(Math::minVal(r,g),b);
+
+		if(mx==mn){
+			hsva.x=0;
+		}
+		else if(mx==r){
+			hsva.x=Math::div(g-b,mx-mn)/6;
+		}
+		else if(mx==g){
+			hsva.x=Math::div(b-r,mx-mn)/6 + Math::THIRD;
+		}
+		else{
+			hsva.x=Math::div(r-g,mx-mn)/6 + Math::TWO_THIRDS;
+		}
+
+		if(mx==0){
+			hsva.y=0;
+		}
+		else{
+			hsva.y=Math::ONE-Math::div(mn,mx);
+		}
+
+		hsva.z=mx;
+		hsva.w=a;
+	}
+
+	inline Color &reset(){
+		r=0;
+		g=0;
+		b=0;
+		a=0;
+
+		return *this;
 	}
 
 	inline scalar *getData(){return &r;}
