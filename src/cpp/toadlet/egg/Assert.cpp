@@ -29,9 +29,9 @@
 namespace toadlet{
 namespace egg{
 
-void assert(char *message){
+void tassert(const char *message){
 	if(message!=NULL){
-		Error::assert(message);
+		Error::tassert(message);
 	}
 }
 

@@ -24,12 +24,14 @@
  ********** Copyright header - do not remove **********/
 
 #include "D3D9Renderer.h"
-#include "D3D9Query.h"
 #include "D3D9Texture.h"
 #include "D3D9RenderTarget.h"
 #include "D3D9SurfaceRenderTarget.h"
 #include "D3D9VertexBuffer.h"
 #include "D3D9IndexBuffer.h"
+#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#include "D3D9Query.h"
+#endif
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/LightEffect.h>
@@ -106,7 +108,7 @@ bool D3D9Renderer::create(RenderTarget *target,int *options){
 
 	// TODO: Get these from the D3D9RenderTarget
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		mD3DDevType=D3DDEVTYPE_DEFAULT;
+		mD3DDevType=D3DMDEVTYPE_DEFAULT;
 	#else
 		mD3DDevType=D3DDEVTYPE_HAL;
 	#endif
@@ -123,7 +125,12 @@ bool D3D9Renderer::create(RenderTarget *target,int *options){
 	TOADLET_CHECK_D3D9ERROR(result,"Error getting caps");
 
 	HRESULT renderToTextureResult=isD3DFORMATValid(D3DFMT_X8R8G8B8,D3DUSAGE_RENDERTARGET);
-	HRESULT renderToDepthTextureResult=isD3DFORMATValid(D3DFMT_D24S8,D3DUSAGE_DEPTHSTENCIL);
+	HRESULT renderToDepthTextureResult=
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		E_FAIL;
+	#else
+		isD3DFORMATValid(D3DFMT_D24S8,D3DUSAGE_DEPTHSTENCIL);
+	#endif
 	setCapabilitySetFromCaps(mCapabilitySet,mD3DCaps,SUCCEEDED(renderToTextureResult),SUCCEEDED(renderToDepthTextureResult));
 
 	setDefaultStates();
@@ -186,7 +193,12 @@ Shader *D3D9Renderer::createShader(){
 }
 
 RenderQuery *D3D9Renderer::createQuery(){
-	return new D3D9Query(this);
+	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+		return new D3D9Query(this);
+	#else
+		Error::unimplemented("D3D9Renderer::createQuery is unavailable");
+		return NULL;
+	#endif
 }
 
 bool D3D9Renderer::setRenderTarget(RenderTarget *target){
@@ -878,7 +890,7 @@ void D3D9Renderer::setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D
 	#endif
 
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
+		Logger::alert(Categories::TOADLET_PEEPER,
 			String("D3DM has lockable textures:")+((caps.SurfaceCaps & D3DMSURFCAPS_LOCKTEXTURE)>0));
 	#endif
 }

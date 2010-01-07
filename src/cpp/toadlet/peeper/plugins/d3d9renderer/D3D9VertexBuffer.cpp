@@ -242,7 +242,7 @@ DWORD D3D9VertexBuffer::getFVF(VertexFormat *vertexFormat,Collection<VertexEleme
 			}
 			else if((element.format&VertexElement::Format_BIT_COUNT_4)>0){
 				#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-					Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ERROR,
+					Logger::error(Categories::TOADLET_PEEPER,
 						"D3D9VertexBuffer: Invalid tex coord count");
 				#else
 					fvf|=D3DFVF_TEXCOORDSIZE4(texCoordCount);

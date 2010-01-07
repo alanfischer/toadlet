@@ -46,7 +46,36 @@ EGLWindowRenderTarget::EGLWindowRenderTarget(void *nativeDisplay,void *nativeSur
 	mConfig(0),
 	mPixmap(false)
 {
-	createContext(nativeDisplay,nativeSurface,visual,pixmap);
+	#if defined(TOADLET_HAS_GLESEM)
+		int initialized=glesem_getInitialized();
+		if(!initialized){
+			Logger::alert("initializing glesem");
+
+			int glesemInitResult=glesem_init(GLESEM_ACCELERATED_IF_AVAILABLE);
+			if(glesemInitResult<1){
+				Error::unknown(Categories::TOADLET_PEEPER,
+					"initial glesem_init failed");
+				return;
+			}
+		}
+	#endif
+
+	bool result=createContext(nativeDisplay,nativeSurface,visual,pixmap);
+
+	#if defined(TOADLET_HAS_GLESEM)
+		if(result==false && !initialized){
+			Logger::alert("trying software glesem");
+
+			int glesemInitResult=glesem_init(GLESEM_ACCELERATED_NO);
+			if(glesemInitResult<1){
+				Error::unknown(Categories::TOADLET_PEEPER,
+					"software glesem_init failed");
+				return;
+			}
+		}
+
+		result=createContext(nativeDisplay,nativeSurface,visual,pixmap);
+	#endif
 }
 
 EGLWindowRenderTarget::~EGLWindowRenderTarget(){
@@ -58,22 +87,20 @@ bool EGLWindowRenderTarget::createContext(void *nativeDisplay,void *nativeSurfac
 		return true;
 	}
 
+	// Seems like software egl doesn't want a nativeDisplay
+	#if defined(TOADLET_HAS_GLESEM)
+		if(glesem_getAccelerated()==false){
+			nativeDisplay=0;
+		}
+	#endif
+
 	Logger::debug(String("creating EGL context for ")+(pixmap?"pixmap":"window"));
 
 	mPixmap=pixmap;
 
-	#if defined(TOADLET_HAS_GLESEM)
-		if(!glesem_getInitialized()){
-			int glesemInitResult=glesem_init(GLESEM_ACCELERATED_IF_AVAILABLE);
-			if(glesemInitResult<1){
-				Error::unknown(Categories::TOADLET_PEEPER,
-					"glesem_init failed");
-				return false;
-			}
-		}
-	#endif
-
-	mDisplay=eglGetDisplay((NativeDisplayType)nativeDisplay);
+	try{
+		mDisplay=eglGetDisplay((NativeDisplayType)nativeDisplay);
+	}catch(...){mDisplay=EGL_NO_DISPLAY;}
 	if(mDisplay==EGL_NO_DISPLAY){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"error getting display");
@@ -124,24 +151,26 @@ bool EGLWindowRenderTarget::createContext(void *nativeDisplay,void *nativeSurfac
 	Logger::debug(Categories::TOADLET_PEEPER,
 		String("chooseEGLConfig config:")+(int)mConfig);
 
-	if(!pixmap){
-		mSurface=eglCreateWindowSurface(mDisplay,mConfig,nativeSurface,NULL);
-		TOADLET_CHECK_EGLERROR("eglCreateWindowSurface");
-	}
-	else{
-		mSurface=eglCreatePixmapSurface(mDisplay,mConfig,nativeSurface,NULL);
-		TOADLET_CHECK_EGLERROR("eglCreatePixmapSurface");
-	}
-
+	try{
+		if(!pixmap){
+			mSurface=eglCreateWindowSurface(mDisplay,mConfig,nativeSurface,NULL);
+			TOADLET_CHECK_EGLERROR("eglCreateWindowSurface");
+		}
+		else{
+			mSurface=eglCreatePixmapSurface(mDisplay,mConfig,nativeSurface,NULL);
+			TOADLET_CHECK_EGLERROR("eglCreatePixmapSurface");
+		}
+	}catch(...){mSurface=EGL_NO_SURFACE;}
 	if(mSurface==EGL_NO_SURFACE){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"error creating surface");
 		return false;
 	}
 
-	mContext=eglCreateContext(mDisplay,mConfig,EGL_NO_CONTEXT,NULL);
-	TOADLET_CHECK_EGLERROR("eglCreateContext");
-
+	try{
+		mContext=eglCreateContext(mDisplay,mConfig,EGL_NO_CONTEXT,NULL);
+		TOADLET_CHECK_EGLERROR("eglCreateContext");
+	}catch(...){mContext=EGL_NO_CONTEXT;}
 	if(mContext==EGL_NO_CONTEXT){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"error creating context");
@@ -155,8 +184,10 @@ bool EGLWindowRenderTarget::createContext(void *nativeDisplay,void *nativeSurfac
 	}
 	#endif
 
-	eglMakeCurrent(mDisplay,mSurface,mSurface,mContext);
-	TOADLET_CHECK_EGLERROR("eglMakeCurrent");
+	try{
+		eglMakeCurrent(mDisplay,mSurface,mSurface,mContext);
+		TOADLET_CHECK_EGLERROR("eglMakeCurrent");
+	}catch(...){}
 
 	#if defined(TOADLET_HAS_GLESEM)
 		if(glesem_glInitialize()==false){
