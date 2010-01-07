@@ -141,6 +141,8 @@ bool EGLPBufferSurfaceRenderTarget::compile(){
 bool EGLPBufferSurfaceRenderTarget::createBuffer(){
 	destroyBuffer();
 
+	Logger::debug("creating EGL context for pbuffer");
+
 	int width=mTexture->getWidth();
 	int height=mTexture->getHeight();
 
@@ -205,6 +207,8 @@ bool EGLPBufferSurfaceRenderTarget::createBuffer(){
 			"width or height not as expected");
 		return false;
 	}
+
+	Logger::debug("EGL context created");
 
 	return true;
 }

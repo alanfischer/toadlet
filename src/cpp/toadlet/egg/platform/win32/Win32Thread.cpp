@@ -32,6 +32,11 @@
 namespace toadlet{
 namespace egg{
 
+unsigned long WINAPI startThread(void *thread){
+	((Win32Thread*)thread)->internal_startRun();
+	return 0;
+}
+
 Win32Thread::Win32Thread():
 	mRunner(NULL),
 	mThread(0)
@@ -62,18 +67,13 @@ void Win32Thread::run(){
 	}
 }
 
-void Win32Thread::startRun(){
+void Win32Thread::internal_startRun(){
 	run();
 
 	if(mThread!=0){
 		CloseHandle(mThread);
 		mThread=0;
 	}
-}
-
-unsigned long Win32Thread::startThread(void *thread){
-	((Win32Thread*)thread)->startRun();
-	return 0;
 }
 
 }

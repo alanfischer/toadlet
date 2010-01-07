@@ -26,9 +26,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <stdlib.h>
-#if defined(TOADLET_PLATFORM_POSIX)
-	#include <string.h>
-#endif
+#include <string.h> // memset
 
 namespace toadlet{
 namespace egg{

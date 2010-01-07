@@ -31,9 +31,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/EndianConversion.h>
 #include <stdlib.h>
-#if defined(TOADLET_PLATFORM_POSIX)
-	#include <string.h>
-#endif
+#include <string.h> // memcpy
 
 #if defined(TOADLET_PLATFORM_OSX)
 	#include "../decoders/coreaudiodecoder/CoreAudioDecoder.h"

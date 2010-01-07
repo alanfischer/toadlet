@@ -46,10 +46,9 @@ public:
 
 	inline bool isAlive() const{return mThread!=0;}
 
-protected:
-	void startRun();
-	static unsigned long startThread(void *thread);
+	void internal_startRun();
 
+protected:
 	Runnable *mRunner;
 	void *mThread;
 };

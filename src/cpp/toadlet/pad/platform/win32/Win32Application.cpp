@@ -29,7 +29,7 @@
 #include <toadlet/peeper/CapabilitySet.h>
 #include <toadlet/pad/platform/win32/Win32Application.h>
 #include <toadlet/pad/ApplicationListener.h>
-
+#include <windows.h>
 #if defined(TOADLET_PLATFORM_WINCE)
 	#include <aygshell.h>
 	#pragma comment(lib,"aygshell.lib")

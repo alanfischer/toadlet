@@ -58,6 +58,8 @@ bool EGLWindowRenderTarget::createContext(void *nativeDisplay,void *nativeSurfac
 		return true;
 	}
 
+	Logger::debug(String("creating EGL context for ")+(pixmap?"pixmap":"window"));
+
 	mPixmap=pixmap;
 
 	#if defined(TOADLET_HAS_GLESEM)
@@ -163,6 +165,8 @@ bool EGLWindowRenderTarget::createContext(void *nativeDisplay,void *nativeSurfac
 			return false;
 		}
 	#endif
+
+	Logger::debug("EGL context created");
 
 	return true;
 }
