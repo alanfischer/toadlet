@@ -33,13 +33,13 @@
 namespace toadlet{
 namespace egg{
 
-TOADLET_C_API void assert(char *message);
+TOADLET_C_API void tassert(const char *message);
 
 }
 }
 
 #if defined(TOADLET_DEBUG)
-	#define TOADLET_ASSERT(x) if(!(x)){toadlet::egg::assert( __FILE__ ":" TOADLET_QUOTE(__LINE__) " assertion " #x " failed");}
+	#define TOADLET_ASSERT(x) if(!(x)){toadlet::egg::tassert( __FILE__ ":" TOADLET_QUOTE(__LINE__) " assertion " #x " failed");}
 #else
 	#define TOADLET_ASSERT(x) ((void)0)
 #endif

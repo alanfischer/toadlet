@@ -185,7 +185,7 @@ Surface::ptr D3D9SurfaceRenderTarget::createBufferSurface(int format,int width,i
 	}
 	else{
 		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-			result=mRenderer->getDirect3DDevice9()->CreateRenderTarget(width,height,d3dformat,D3DMULTISAMPLE_NONE,&d3dsurface TOADLET_SHAREDHANDLE);
+			result=mRenderer->getDirect3DDevice9()->CreateRenderTarget(width,height,d3dformat,D3DMULTISAMPLE_NONE,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
 		#else
 			result=mRenderer->getDirect3DDevice9()->CreateRenderTarget(width,height,d3dformat,D3DMULTISAMPLE_NONE,NULL,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
 		#endif
