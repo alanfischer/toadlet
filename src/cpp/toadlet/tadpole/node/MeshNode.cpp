@@ -30,9 +30,7 @@
 #include <toadlet/tadpole/animation/SkeletonAnimation.h>
 #include <toadlet/tadpole/Engine.h>
 #include <stdlib.h>
-#if defined(TOADLET_PLATFORM_POSIX)
-	#include <string.h>
-#endif
+#include <string.h> // memcpy
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;

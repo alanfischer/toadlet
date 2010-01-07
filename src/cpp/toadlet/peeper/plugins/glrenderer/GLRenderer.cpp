@@ -324,6 +324,8 @@ SurfaceRenderTarget *GLRenderer::createSurfaceRenderTarget(){
 			return new_GLPBufferSurfaceRenderTarget(this);
 		}
 	#endif
+
+	Error::unimplemented("GLRenderer::createSurfaceRenderTarget is unavailable");
 	return NULL;
 }
 
@@ -336,10 +338,12 @@ IndexBuffer *GLRenderer::createIndexBuffer(){
 }
 
 Program *GLRenderer::createProgram(){
+	Error::unimplemented("GLRenderer::createProgram is unavailable");
 	return NULL;
 }
 
 Shader *GLRenderer::createShader(){
+	Error::unimplemented("GLRenderer::createShader is unavailable");
 	return NULL;
 }
 
@@ -347,6 +351,7 @@ RenderQuery *GLRenderer::createQuery(){
 	#if defined(TOADLET_HAS_GLQUERY)
 		return new GLQuery(this);
 	#else
+		Error::unimplemented("GLRenderer::createQuery is unavailable");
 		return NULL;
 	#endif
 }
