@@ -711,7 +711,10 @@ bool GLRenderer::copyToSurface(Surface *surface){
 		GLTexture *gltexture=textureSurface->getTexture();
 
 		glBindTexture(gltexture->mTarget,gltexture->mHandle);
+		TOADLET_CHECK_GLERROR("glBindTexture");
+
 		glCopyTexSubImage2D(gltexture->mTarget,textureSurface->getLevel(),0,0,0,renderTarget->getHeight()-gltexture->mHeight,gltexture->mWidth,gltexture->mHeight);
+		TOADLET_CHECK_GLERROR("glCopyTexSubImage2D");
 
 		Matrix4x4 matrix;
 		Math::setMatrix4x4FromScale(matrix,Math::ONE,-Math::ONE,Math::ONE);
@@ -1762,11 +1765,11 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastTypeBits){
 		}
 	}
 
-	if((typeBits&(1<<VertexElement::Type_COLOR_DIFFUSE))>0){
+	if((typeBits&(1<<VertexElement::Type_COLOR_DIFFUSE))==0){
 		glColor4f(1.0f,1.0f,1.0f,1.0f);
 	}
 	#if defined(TOADLET_HAS_GLEW)
-		if((typeBits&(1<<VertexElement::Type_COLOR_SPECULAR))>0 && GLEW_EXT_secondary_color){
+		if((typeBits&(1<<VertexElement::Type_COLOR_SPECULAR))==0 && GLEW_EXT_secondary_color){
 			glSecondaryColor3fEXT(1.0f,1.0f,1.0f);
 		}
 	#endif

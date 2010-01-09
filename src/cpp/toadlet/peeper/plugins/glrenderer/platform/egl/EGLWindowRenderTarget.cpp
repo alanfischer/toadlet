@@ -142,9 +142,6 @@ bool EGLWindowRenderTarget::createContext(void *nativeDisplay,void *nativeSurfac
 	int stencilBits=visual.stencilBits;
 	int multisamples=visual.multisamples;
 
-	Logger::alert(Categories::TOADLET_PEEPER,
-		String("Choosing config for color:")+redBits+","+greenBits+","+blueBits+","+alphaBits+" depth:"+depthBits+" stencil:"+stencilBits);
-
 	mConfig=chooseEGLConfig(mDisplay,redBits,greenBits,blueBits,alphaBits,depthBits,stencilBits,!pixmap,pixmap,false,visual.multisamples);
 	TOADLET_CHECK_EGLERROR("chooseEGLConfig");
 

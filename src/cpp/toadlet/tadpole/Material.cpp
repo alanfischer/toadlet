@@ -104,9 +104,7 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		renderer->setDepthWrite(mDepthWrite);
 		renderer->setFaceCulling(mFaceCulling);
 		renderer->setLighting(mLighting);
-		if(mLighting){
-			renderer->setLightEffect(mLightEffect);
-		}
+		renderer->setLightEffect(mLightEffect); // We set this even if lighting isnt enabled, since it includes color tracking
 
 		int numTextureStages=mTextureStages.size();
 		int i;
@@ -121,9 +119,9 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		if(previousMaterial->mLighting!=mLighting){
 			renderer->setLighting(mLighting);
 		}
-		if(mLighting){
-			renderer->setLightEffect(mLightEffect);
-		}
+
+		renderer->setLightEffect(mLightEffect);
+
 		if(previousMaterial->mAlphaTest!=mAlphaTest || previousMaterial->mAlphaTestCutoff!=mAlphaTestCutoff){
 			renderer->setAlphaTest(mAlphaTest,mAlphaTestCutoff);
 		}
