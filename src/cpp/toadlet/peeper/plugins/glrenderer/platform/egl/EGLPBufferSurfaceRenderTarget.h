@@ -67,6 +67,7 @@ protected:
 
 	GLRenderer *mRenderer;
 	bool mCopy;
+	bool mSeparateContext;
 	GLTexture *mTexture;
 	int mWidth;
 	int mHeight;

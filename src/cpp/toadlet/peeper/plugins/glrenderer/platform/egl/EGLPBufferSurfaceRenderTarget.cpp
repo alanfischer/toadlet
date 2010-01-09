@@ -26,6 +26,7 @@
 #include "EGLPBufferSurfaceRenderTarget.h"
 #include "../../GLRenderer.h"
 #include <toadlet/egg/Error.h>
+#include <windows.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::image;
@@ -42,12 +43,13 @@ SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer){
 }
 
 bool EGLPBufferSurfaceRenderTarget::available(GLRenderer *renderer){
-	return ((EGLRenderTarget*)renderer->getPrimaryRenderTarget()->getRootRenderTarget())->egl_version>=11;
+	return true;
 }
 
 EGLPBufferSurfaceRenderTarget::EGLPBufferSurfaceRenderTarget(GLRenderer *renderer):EGLRenderTarget(),
 	mRenderer(NULL),
 	mCopy(false),
+	mSeparateContext(false),
 	mTexture(NULL),
 	mWidth(0),
 	mHeight(0),
@@ -64,6 +66,7 @@ EGLPBufferSurfaceRenderTarget::~EGLPBufferSurfaceRenderTarget(){
 
 bool EGLPBufferSurfaceRenderTarget::create(){
 	mCopy=true;
+	mSeparateContext=false;
 	mWidth=0;
 	mHeight=0;
 	mBound=false;
@@ -146,12 +149,7 @@ bool EGLPBufferSurfaceRenderTarget::createBuffer(){
 	int width=mTexture->getWidth();
 	int height=mTexture->getHeight();
 
-	mDisplay=eglGetDisplay(EGL_DEFAULT_DISPLAY);
-	if(mDisplay==EGL_NO_DISPLAY){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"Error getting display from eglGetDisplay");
-		return false;
-	}
+	mDisplay=((EGLRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->getEGLDisplay();
 
 	int format=mTexture->getFormat();
 	int redBits=ImageFormatConversion::getRedBits(format);
@@ -163,13 +161,15 @@ bool EGLPBufferSurfaceRenderTarget::createBuffer(){
 	EGLConfig config=chooseEGLConfig(mDisplay,redBits,greenBits,blueBits,alphaBits,depthBits,0,false,false,true,false);
 	TOADLET_CHECK_EGLERROR("chooseEGLConfig");
 
-	int attribList[]={
-		EGL_WIDTH,width,
-		EGL_HEIGHT,height,
-		EGL_TEXTURE_TARGET,EGL_TEXTURE_2D,
-		EGL_TEXTURE_FORMAT,EGL_TEXTURE_RGB,
-		EGL_NONE
-	};
+	int attribList[5]={0};
+	int i=0;
+	attribList[i++]=EGL_WIDTH; attribList[i++]=width;
+	attribList[i++]=EGL_HEIGHT; attribList[i++]=height;
+	if(mCopy==false){
+		attribList[i++]=EGL_TEXTURE_TARGET; attribList[i++]=EGL_TEXTURE_2D;
+		attribList[i++]=EGL_TEXTURE_FORMAT; attribList[i++]=EGL_TEXTURE_RGB;
+	}
+	attribList[i++]=EGL_NONE;
 
 	mSurface=eglCreatePbufferSurface(mDisplay,config,attribList);
 	TOADLET_CHECK_EGLERROR("eglCreatePbufferSurface");
@@ -182,17 +182,21 @@ bool EGLPBufferSurfaceRenderTarget::createBuffer(){
 		return false;
 	}
 
-	EGLContext context=eglGetCurrentContext();
+	EGLContext context=((EGLRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->getEGLContext();
+	if(mSeparateContext){
+		mContext=eglCreateContext(mDisplay,config,context,NULL);
+		TOADLET_CHECK_EGLERROR("eglCreateContext");
 
-	mContext=eglCreateContext(mDisplay,config,context,NULL);
-	TOADLET_CHECK_EGLERROR("eglCreateContext");
+		if(mContext==EGL_NO_CONTEXT){
+			destroyBuffer();
 
-	if(mContext==EGL_NO_CONTEXT){
-		destroyBuffer();
-
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"Error in eglCreateContext");
-		return false;
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"Error in eglCreateContext");
+			return false;
+		}
+	}
+	else{
+		mContext=context;
 	}
 
 	if(eglBindAPI!=NULL){
@@ -221,7 +225,7 @@ bool EGLPBufferSurfaceRenderTarget::destroyBuffer(){
 			((GLRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->makeCurrent();
 		}
 
-		if(mContext!=EGL_NO_CONTEXT){
+		if(mSeparateContext && mContext!=EGL_NO_CONTEXT){
 			eglDestroyContext(mDisplay,mContext);
 			TOADLET_CHECK_EGLERROR("eglDestroyContext");
 			mContext=EGL_NO_CONTEXT;

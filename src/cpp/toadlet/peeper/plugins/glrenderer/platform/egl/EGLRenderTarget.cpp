@@ -25,7 +25,9 @@
 
 #include "EGLWindowRenderTarget.h"
 #include <toadlet/egg/Error.h>
-#include <malloc.h>
+#include <toadlet/egg/Logger.h>
+
+using namespace toadlet::egg;
 
 namespace toadlet{
 namespace peeper{
@@ -45,6 +47,9 @@ bool EGLRenderTarget::makeCurrent(){
 EGLConfig EGLRenderTarget::chooseEGLConfig(EGLDisplay display,int redBits,int greenBits,int blueBits,int alphaBits,int depthBits,int stencilBits,bool window,bool pixmap,bool pbuffer,int fsaaCount){
     EGLint configOptions[32];
 	int i=0;
+
+	Logger::debug(Categories::TOADLET_PEEPER,
+		String("Choosing config for color:")+redBits+","+greenBits+","+blueBits+","+alphaBits+" depth:"+depthBits+" stencil:"+stencilBits);
 
 	// Select default configuration 
 	configOptions[i++]=EGL_LEVEL;
@@ -125,7 +130,9 @@ EGLConfig EGLRenderTarget::chooseEGLConfig(EGLDisplay display,int redBits,int gr
 	// Terminate the list with EGL_NONE
 	configOptions[i++]=EGL_NONE;
 
-	return chooseEGLConfigFromConfigOptions(display,configOptions);
+	EGLConfig config=chooseEGLConfigFromConfigOptions(display,configOptions);
+
+	return config;
 }
 
 EGLConfig EGLRenderTarget::chooseEGLConfigFromConfigOptions(EGLDisplay display,const EGLint *configOptions){
@@ -145,13 +152,14 @@ EGLConfig EGLRenderTarget::chooseEGLConfigFromConfigOptions(EGLDisplay display,c
 			return NULL;
 		}
 
-		allConfigs=(EGLConfig*)malloc(sizeof(EGLConfig)*numConfigs);
+		allConfigs=new EGLConfig[numConfigs];
 
 		i=numConfigs;
 
 		eglChooseConfig(display,configOptions,allConfigs,i,&numConfigs);
 		if(eglGetError()!=EGL_SUCCESS || numConfigs<=0){
-			free(allConfigs);
+			Logger::debug(String("no configs from eglChooseConfig:")+numConfigs);
+			delete[] allConfigs;
 			return NULL;
 		}
 
@@ -161,7 +169,7 @@ EGLConfig EGLRenderTarget::chooseEGLConfigFromConfigOptions(EGLDisplay display,c
 			result=pickEGLConfig(display,result,allConfigs[i]);
 		}
 
-		free(allConfigs);
+		delete[] allConfigs;
 	}
 
 	return result;
