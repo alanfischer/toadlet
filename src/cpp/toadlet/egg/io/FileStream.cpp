@@ -33,7 +33,7 @@ namespace io{
 FileStream::FileStream(const String &filename,int openFlags){
 	Logger::excess(Categories::TOADLET_EGG,"Opening file: "+filename);
 
-	char *mode=NULL;
+	const char *mode=NULL;
 	if((openFlags&OpenFlags_READ)>0 && (openFlags&OpenFlags_BINARY)>0) mode="rb";
 	else if((openFlags&OpenFlags_READ)>0) mode="r";
 	else if((openFlags&OpenFlags_WRITE)>0 && (openFlags&OpenFlags_BINARY)>0) mode="wb";

@@ -11,7 +11,6 @@ set (TMSH2M3G_LIBS ${TOADLET_EGG_LIB} ${TOADLET_PEEPER_LIB} ${TOADLET_RIBBIT_LIB
 set (TMSH2M3G_SRC
 	M3GConverter.cpp
 	main.cpp
-	../shared/LineInputStream.cpp
 	../shared/Adler32.cpp
 	../shared/actc/tc.c
 	../shared/VertexCompression.cpp
@@ -25,7 +24,6 @@ set (TMSH2M3G_H
 	M3GConverter.h
 	../shared/MeshPreprocess.h
 	../shared/actc/tc.h
-	../shared/LineInputStream.h
 	../shared/NvTriStrip/VertexCache.h
 	../shared/NvTriStrip/NvTriStripObjects.h
 	../shared/NvTriStrip/NvTriStrip.h
