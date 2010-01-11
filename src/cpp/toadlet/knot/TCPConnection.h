@@ -47,6 +47,7 @@ public:
 	virtual ~TCPConnection();
 
 	bool connect(const egg::String &address,int port);
+	bool connect(int ip,int port);
 	bool accept();
 	void skipStart();
 

@@ -26,6 +26,9 @@
 #ifndef TOADLET_KNOT_CONNECTION_H
 #define TOADLET_KNOT_CONNECTION_H
 
+#include <toadlet/egg/SharedPointer.h>
+#include <toadlet/egg/WeakPointer.h>
+
 namespace toadlet{
 namespace knot{
 

@@ -64,7 +64,11 @@ TCPConnection::~TCPConnection(){
 }
 
 bool TCPConnection::connect(const String &address,int port){
-	uint32 remoteIP=Socket::stringToIP(address);
+	return connect(Socket::stringToIP(address),port);
+}
+
+bool TCPConnection::connect(int ip,int port){
+	uint32 remoteIP=ip;
 	int remotePort=port;
 
 	Logger::debug(Categories::TOADLET_KNOT,
