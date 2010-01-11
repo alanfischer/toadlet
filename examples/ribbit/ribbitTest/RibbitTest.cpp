@@ -11,10 +11,10 @@ RibbitTest::~RibbitTest(){
 void RibbitTest::create(){
 	Application::create();
 
-	MemoryInputStream::ptr in(new MemoryInputStream(boing_wav::data,boing_wav::length));
+	MemoryStream::ptr stream(new MemoryStream(boing_wav::data,boing_wav::length,false));
 
 	audioBuffer=AudioBuffer::ptr(getAudioPlayer()->createAudioBuffer());
-	audioBuffer->create(in,"audio/x-wav");
+	audioBuffer->create(stream,"audio/x-wav");
 
 	audio=Audio::ptr(getAudioPlayer()->createBufferedAudio());
 	audio->create(audioBuffer);

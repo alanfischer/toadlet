@@ -51,8 +51,8 @@ public:
 	virtual void fadeToGain(scalar gain,int time){}
 	virtual scalar getGain() const{return 0;}
 
-	virtual void setLooping(bool looping){}
-	virtual bool getLooping() const{return 0;}
+	virtual void setLooping(bool looping);
+	virtual bool getLooping() const;
 
 	virtual void setPitch(scalar pitch){mPitch=pitch;}
 	virtual scalar getPitch() const{return mPitch;}

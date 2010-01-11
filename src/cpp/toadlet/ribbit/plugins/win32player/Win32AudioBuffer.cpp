@@ -88,21 +88,51 @@ bool Win32AudioBuffer::create(Stream::ptr stream,const String &mimeType){
 		mAudioPlayer->setWaveOut(waveOut);
 	}
 
-	hr=waveOutPrepareHeader(mAudioPlayer->getWaveOut(),&mWaveHDR,sizeof(mWaveHDR));
-	if(hr!=MMSYSERR_NOERROR){
-		Error::unknown(Categories::TOADLET_RIBBIT,
-			"error in waveOutPrepareHeader");
-		return NULL;
-	}
-
-	return true;
+	return prepareHeader();
 }
 
 void Win32AudioBuffer::destroy(){
+	unprepareHeader();
+
 	if(mWaveHDR.lpData!=NULL){
 		delete[] mWaveHDR.lpData;
 		mWaveHDR.lpData=NULL;
 	}
+}
+
+void Win32AudioBuffer::setLoopCount(int loopCount){
+	if(loopCount!=mWaveHDR.dwLoops){
+		unprepareHeader();
+
+		if(loopCount>0){
+			mWaveHDR.dwFlags=WHDR_BEGINLOOP|WHDR_ENDLOOP;
+			mWaveHDR.dwLoops=loopCount;
+		}
+		else{
+			mWaveHDR.dwFlags=0;
+			mWaveHDR.dwLoops=0;
+		}
+
+		prepareHeader();
+	}
+}
+
+int Win32AudioBuffer::getLoopCount() const{
+	return mWaveHDR.dwLoops;
+}
+
+bool Win32AudioBuffer::prepareHeader(){
+	HRESULT hr=waveOutPrepareHeader(mAudioPlayer->getWaveOut(),&mWaveHDR,sizeof(mWaveHDR));
+	if(hr!=MMSYSERR_NOERROR){
+		Error::unknown(Categories::TOADLET_RIBBIT,
+			"error in waveOutPrepareHeader");
+		return false;
+	}
+	return true;
+}
+
+void Win32AudioBuffer::unprepareHeader(){
+	waveOutUnprepareHeader(mAudioPlayer->getWaveOut(),&mWaveHDR,sizeof(mWaveHDR));
 }
 
 }

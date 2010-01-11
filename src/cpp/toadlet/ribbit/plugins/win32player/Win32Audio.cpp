@@ -26,6 +26,7 @@
 #include "Win32Audio.h"
 #include "Win32AudioBuffer.h"
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Extents.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/MathConversion.h>
 
@@ -94,6 +95,16 @@ bool Win32Audio::stop(){
 	waveOutReset(mPlayer->getWaveOut());
 
 	return true;
+}
+
+void Win32Audio::setLooping(bool looping){
+	Win32AudioBuffer *audioBuffer=((Win32AudioBuffer*)mAudioBuffer->getRootAudioBuffer());
+	audioBuffer->setLoopCount(looping?Extents::MAX_INT:0);
+}
+
+bool Win32Audio::getLooping() const{
+	Win32AudioBuffer *audioBuffer=((Win32AudioBuffer*)mAudioBuffer->getRootAudioBuffer());
+	return audioBuffer->getLoopCount()>0;;
 }
 
 }
