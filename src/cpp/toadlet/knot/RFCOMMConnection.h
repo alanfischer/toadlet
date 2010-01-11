@@ -30,10 +30,8 @@
 #include <toadlet/egg/Mutex.h>
 #include <toadlet/egg/Thread.h>
 #include <toadlet/egg/Runnable.h>
-#include <toadlet/egg/io/DataOutputStream.h>
-#include <toadlet/egg/io/MemoryOutputStream.h>
-#include <toadlet/egg/io/DataInputStream.h>
-#include <toadlet/egg/io/MemoryInputStream.h>
+#include <toadlet/egg/io/DataStream.h>
+#include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/egg/net/BluetoothClient.h>
 #include <toadlet/egg/net/BluetoothServer.h>
 #include <toadlet/knot/Connection.h>
@@ -73,17 +71,17 @@ protected:
 	const static int CONNECTION_PACKET_LENGTH;
 	const static int CONNECTION_VERSION;
 
-	int buildConnectionPacket(egg::io::DataOutputStream *out);
-	bool verifyConnectionPacket(egg::io::DataInputStream *in);
+	int buildConnectionPacket(egg::io::DataStream *stream);
+	bool verifyConnectionPacket(egg::io::DataStream *stream);
 
 	bool updatePacketReceive();
 
 	egg::net::BluetoothClient::ptr mClient;
 	egg::net::BluetoothServer::ptr mServer;
-	egg::io::MemoryOutputStream::ptr mOutPacket;
-	egg::io::DataOutputStream::ptr mDataOutPacket;
-	egg::io::MemoryInputStream::ptr mInPacket;
-	egg::io::DataInputStream::ptr mDataInPacket;
+	egg::io::MemoryStream::ptr mOutPacket;
+	egg::io::DataStream::ptr mDataOutPacket;
+	egg::io::MemoryStream::ptr mInPacket;
+	egg::io::DataStream::ptr mDataInPacket;
 
 	egg::Mutex::ptr mMutex;
 	egg::Thread::ptr mThread;

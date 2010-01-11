@@ -40,11 +40,11 @@ public:
 
 	GIFHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 
-	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData){
+	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData){
 		egg::Collection<egg::image::Image*> images;
 		egg::Collection<int> delayMilliseconds;
 
-		mHandler.loadAnimatedImage(in,images,delayMilliseconds);
+		mHandler.loadAnimatedImage(stream,images,delayMilliseconds);
 
 		if(images.size()==0){
 			return NULL;
@@ -70,8 +70,8 @@ return NULL;
 		}
 	}
 
-	bool save(peeper::Texture::ptr resource,egg::io::OutputStream::ptr out){
-		return mHandler.saveImage(mTextureManager->createImage(resource),out);
+	bool save(peeper::Texture::ptr resource,egg::io::Stream::ptr stream){
+		return mHandler.saveImage(mTextureManager->createImage(resource),stream);
 	}
 
 protected:

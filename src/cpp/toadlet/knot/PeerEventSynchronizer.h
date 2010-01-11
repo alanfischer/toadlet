@@ -28,10 +28,8 @@
 
 #include <toadlet/egg/Collection.h>
 #include <toadlet/egg/EventFactory.h>
-#include <toadlet/egg/io/DataInputStream.h>
-#include <toadlet/egg/io/MemoryInputStream.h>
-#include <toadlet/egg/io/DataOutputStream.h>
-#include <toadlet/egg/io/MemoryOutputStream.h>
+#include <toadlet/egg/io/DataStream.h>
+#include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/knot/Connection.h>
 
 namespace toadlet{
@@ -109,10 +107,10 @@ protected:
 	Connection::ptr mConnection;
 	egg::EventFactory *mEventFactory;
 
-	egg::io::MemoryInputStream::ptr mPacketIn;
-	egg::io::DataInputStream::ptr mDataPacketIn;
-	egg::io::MemoryOutputStream::ptr mPacketOut;
-	egg::io::DataOutputStream::ptr mDataPacketOut;
+	egg::io::MemoryStream::ptr mPacketIn;
+	egg::io::DataStream::ptr mDataPacketIn;
+	egg::io::MemoryStream::ptr mPacketOut;
+	egg::io::DataStream::ptr mDataPacketOut;
 
 	int mFrame;
 	int mFrameBuffer;

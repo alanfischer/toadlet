@@ -30,6 +30,7 @@
 #include <toadlet/egg/MathConversion.h>
 
 using namespace toadlet::egg;
+using namespace toadlet::egg::io;
 
 namespace toadlet{
 namespace ribbit{
@@ -54,7 +55,7 @@ bool Win32Audio::create(AudioBuffer::ptr audioBuffer){
 	return true;
 }
 
-bool Win32Audio::create(egg::io::InputStream::ptr in,const egg::String &mimeType){
+bool Win32Audio::create(Stream::ptr stream,const String &mimeType){
 	destroy();
 
 	return false;

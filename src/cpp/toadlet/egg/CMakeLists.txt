@@ -40,15 +40,9 @@ set (EGG_IMAGE_SPR_SRC
 )
 
 set (EGG_IO_SRC
-	io/DataInputStream.cpp
-	io/DataOutputStream.cpp
-	io/FileInputStream.cpp
-	io/FileOutputStream.cpp
-	io/MemoryInputStream.cpp
-	io/MemoryOutputStream.cpp
-	io/PushbackInputStream.cpp
-	io/StringInputStream.cpp
-	io/StringOutputStream.cpp
+	io/DataStream.cpp
+	io/FileStream.cpp
+	io/MemoryStream.cpp
 	io/TPKGArchive.cpp
 )
 
@@ -164,17 +158,10 @@ set (EGG_IMAGE_SPR_HEADERS
 
 set (EGG_IO_HEADERS
 	io/Archive.h
-	io/DataInputStream.h
-	io/DataOutputStream.h
-	io/FileInputStream.h
-	io/FileOutputStream.h
-	io/InputStream.h
-	io/MemoryInputStream.h
-	io/MemoryOutputStream.h
-	io/OutputStream.h
-	io/PushbackInputStream.h
-	io/StringInputStream.h
-	io/StringOutputStream.h
+	io/DataStream.h
+	io/FileStream.h
+	io/MemoryStream.h
+	io/Stream.h
 	io/TPKGArchive.h
 )
 

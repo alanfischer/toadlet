@@ -41,8 +41,8 @@ public:
 
 	JPEGHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 
-	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData){
-		egg::image::Image::ptr image(mHandler.loadImage(in));
+	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData){
+		egg::image::Image::ptr image(mHandler.loadImage(stream));
 		if(image!=NULL){
 			return mTextureManager->createTexture(image);
 		}
@@ -51,8 +51,8 @@ public:
 		}
 	}
 
-	bool save(peeper::Texture::ptr resource,egg::io::OutputStream::ptr out){
-		return mHandler.saveImage(mTextureManager->createImage(resource),out);
+	bool save(peeper::Texture::ptr resource,egg::io::Stream::ptr stream){
+		return mHandler.saveImage(mTextureManager->createImage(resource),stream);
 	}
 
 protected:

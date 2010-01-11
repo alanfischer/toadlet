@@ -27,8 +27,6 @@ extern "C"{
 	#include <gif_lib.h>
 }
 #include <toadlet/egg/image/GIFHandler.h>
-#include <toadlet/egg/io/DataInputStream.h>
-#include <toadlet/egg/io/DataOutputStream.h>
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/Error.h>
 #include <string.h> // memcpy
@@ -44,13 +42,13 @@ namespace egg{
 namespace image{
 
 int readGifData(GifFileType *file,GifByteType *data,int amount){
-	InputStream *in=(InputStream*)file->UserData;
-	return in->read((char*)data,amount);
+	Stream *stream=(Stream*)file->UserData;
+	return stream->read((char*)data,amount);
 }
 
 int writeGifData(GifFileType *file,GifByteType *data,int amount){
-	OutputStream *out=(OutputStream*)file->UserData;
-	return out->write((char*)data,amount);
+	Stream *stream=(Stream*)file->UserData;
+	return stream->write((char*)data,amount);
 }
 
 const int InterlacedOffset[] = { 0, 4, 2, 1 };	// The way Interlaced image should
@@ -299,8 +297,8 @@ int GIFHandler::getNextImage(GifFileType *gifFile,Image *&image,int &delayMillis
 	return GIF_OK;
 }
 
-GifFileType *GIFHandler::openFile(InputStream *in){
-	GifFileType *file=DGifOpen((void*)in,&readGifData);
+GifFileType *GIFHandler::openFile(Stream *stream){
+	GifFileType *file=DGifOpen((void*)stream,&readGifData);
 	return file;
 }
 
@@ -309,14 +307,14 @@ int GIFHandler::closeFile(GifFileType *file){
 	return result;
 }
 
-Image *GIFHandler::loadImage(InputStream *in){
-	if(in==NULL){
+Image *GIFHandler::loadImage(Stream *stream){
+	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_EGG,
-			"InputStream is NULL");
+			"Stream is NULL");
 		return NULL;
 	}
 
-	GifFileType *file=openFile(in);
+	GifFileType *file=openFile(stream);
 
 	if(file==NULL){
 		Error::loadingImage(Categories::TOADLET_EGG,
@@ -351,20 +349,20 @@ Image *GIFHandler::loadImage(InputStream *in){
 	return image;
 }
 
-bool GIFHandler::saveImage(Image *image,OutputStream *out){
+bool GIFHandler::saveImage(Image *image,Stream *stream){
 	Error::unimplemented(Categories::TOADLET_EGG,
 		"GIFHandler::saveImage: Not implemented");
 	return false;
 }
 
-bool GIFHandler::loadAnimatedImage(InputStream *in,Collection<Image*> &images,Collection<int> &delaysMilliseconds){
-	if(in==NULL){
+bool GIFHandler::loadAnimatedImage(Stream *stream,Collection<Image*> &images,Collection<int> &delaysMilliseconds){
+	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_EGG,
-			"InputStream is NULL");
+			"Stream is NULL");
 		return false;
 	}
 
-	GifFileType *file=openFile(in);
+	GifFileType *file=openFile(stream);
 
 	if(file==NULL){
 		Error::loadingImage(Categories::TOADLET_EGG,

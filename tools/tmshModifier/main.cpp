@@ -1,6 +1,5 @@
 #include <toadlet/egg/String.h>
-#include <toadlet/egg/io/FileInputStream.h>
-#include <toadlet/egg/io/FileOutputStream.h>
+#include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/handler/XANMHandler.h>
 #include <toadlet/tadpole/handler/XMSHHandler.h>
@@ -89,13 +88,13 @@ int main(int argc,char **argv){
 
 			std::cout << "Extracting " << (const char*)name << std::endl;
 
-			FileOutputStream::ptr fout(new FileOutputStream(name));
-			if(fout->isOpen()==false){
+			FileStream::ptr stream(new FileStream(name,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
+			if(stream->isOpen()==false){
 				std::cout << "Error opening " << (const char*)name << std::endl;
 				return 0;
 			}
 			XANMHandler::ptr handler(new XANMHandler());
-			handler->save(sequence,fout);
+			handler->save(sequence,stream);
 		}
 	}
 
@@ -110,23 +109,23 @@ int main(int argc,char **argv){
 
 		for(i=3;i<argc;++i){
 			std::cout << "Inserting " << argv[i] << std::endl;
-			FileInputStream::ptr fin(new FileInputStream(argv[i]));
-			if(fin->isOpen()==false){
+			FileStream::ptr stream(new FileStream(argv[i],FileStream::OpenFlags_READ|FileStream::OpenFlags_BINARY));
+			if(stream->isOpen()==false){
 				std::cout << "Error opening " << argv[i] << std::endl;
 				return 0;
 			}
 			XANMHandler::ptr handler(new XANMHandler());
-			Sequence::ptr sequence=shared_static_cast<Sequence>(handler->load(fin,NULL));
+			Sequence::ptr sequence=shared_static_cast<Sequence>(handler->load(stream,NULL));
 			skeleton->sequences.add(sequence);
 		}
 
-		FileOutputStream::ptr fout(new FileOutputStream(mshFileName));
-		if(fout->isOpen()==false){
+		FileStream::ptr stream(new FileStream(mshFileName,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
+		if(stream->isOpen()==false){
 			std::cout << "Error opening " << (const char*)mshFileName << std::endl;
 			return 0;
 		}
 		XMSHHandler::ptr handler(new XMSHHandler(NULL,NULL,NULL));
-		handler->save(mesh,fout);
+		handler->save(mesh,stream);
 	}
 
 	if(scale!=1.0f){
@@ -158,13 +157,13 @@ int main(int argc,char **argv){
 			}
 		}
 
-		FileOutputStream::ptr fout(new FileOutputStream(mshFileName));
-		if(fout->isOpen()==false){
+		FileStream::ptr stream(new FileStream(mshFileName,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
+		if(stream->isOpen()==false){
 			std::cout << "Error opening " << (const char*)mshFileName << std::endl;
 			return 0;
 		}
 		XMSHHandler::ptr handler(new XMSHHandler(NULL,NULL,NULL));
-		handler->save(mesh,fout);
+		handler->save(mesh,stream);
 	}
 
 	std::cout << "complete" << std::endl;

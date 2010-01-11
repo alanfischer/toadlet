@@ -43,7 +43,7 @@ public:
 
 	AudioBuffer *getRootAudioBuffer(){return this;}
 
-	bool create(egg::io::InputStream::ptr inputStream,const egg::String &mimeType);
+	bool create(egg::io::Stream::ptr stream,const egg::String &mimeType);
 	void destroy();
 
 	inline ALuint getHandle() const{return mHandle;}

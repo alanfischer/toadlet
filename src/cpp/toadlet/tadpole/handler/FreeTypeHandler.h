@@ -31,12 +31,12 @@
 #include <toadlet/tadpole/TextureManager.h>
 
 extern "C" {
-#	define USE_FREETYPE2_STATIC
-#	include <ft2build.h>
-#	include <freetype/freetype.h>
-#	include <freetype/ftglyph.h>
-#	include <freetype/ftoutln.h>
-#	include <freetype/fttrigon.h>
+	#define USE_FREETYPE2_STATIC
+	#include <ft2build.h>
+	#include <freetype/freetype.h>
+	#include <freetype/ftglyph.h>
+	#include <freetype/ftoutln.h>
+	#include <freetype/fttrigon.h>
 }
 
 namespace toadlet{
@@ -50,7 +50,7 @@ public:
 	FreeTypeHandler(TextureManager *textureManager);
 	virtual ~FreeTypeHandler();
 
-	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
+	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
 
 protected:
 	TextureManager *mTextureManager;

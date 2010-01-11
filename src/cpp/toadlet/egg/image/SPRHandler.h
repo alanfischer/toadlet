@@ -27,8 +27,7 @@
 #define TOADLET_EGG_IMAGE_SPRHANDLER_H
 
 #include <toadlet/egg/image/Image.h>
-#include <toadlet/egg/io/DataInputStream.h>
-#include <toadlet/egg/io/DataOutputStream.h>
+#include <toadlet/egg/io/DataStream.h>
 #include <toadlet/egg/Collection.h>
 
 namespace toadlet{
@@ -40,17 +39,17 @@ public:
 	SPRHandler();
 	virtual ~SPRHandler();
 
-	virtual Image *loadImage(io::InputStream *in);
-	virtual bool saveImage(Image *image,io::OutputStream *out);
+	virtual Image *loadImage(io::Stream *in);
+	virtual bool saveImage(Image *image,io::Stream *out);
 
-	virtual bool loadAnimatedImage(io::InputStream *in,Collection<Image*> &images);
+	virtual bool loadAnimatedImage(io::Stream *in,Collection<Image*> &images);
 
 protected:
-	virtual bool openFile(io::InputStream *in);
+	virtual bool openFile(io::Stream *in);
 	virtual void closeFile();
 	virtual Image *getNextImage();
 
-	io::DataInputStream *mDataIn;
+	io::DataStream::ptr mDataStream;
 	void *mSprite;
 	unsigned char *mPalette;
 	int mNextFrame;

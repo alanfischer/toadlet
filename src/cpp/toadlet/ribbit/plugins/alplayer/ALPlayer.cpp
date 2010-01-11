@@ -345,10 +345,10 @@ void ALPlayer::decodeStream(AudioStream *decoder,char *&finalBuffer,int &finalLe
 	#endif
 }
 
-AudioStream::ptr ALPlayer::startAudioStream(io::InputStream::ptr in,const String &mimeType){
-	if(in==NULL){
+AudioStream::ptr ALPlayer::startAudioStream(io::Stream::ptr stream,const String &mimeType){
+	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_RIBBIT,
-			"ALPlayer: Null InputStream");
+			"ALPlayer: Null Stream");
 		return NULL;
 	}
 
@@ -370,7 +370,7 @@ AudioStream::ptr ALPlayer::startAudioStream(io::InputStream::ptr in,const String
 		return NULL;
 	}
 
-	if(decoder->startStream(in)==false){
+	if(decoder->startStream(stream)==false){
 		Error::unknown(Categories::TOADLET_RIBBIT,
 			"ALPlayer: Error starting decoder stream");
 		return NULL;

@@ -14,7 +14,7 @@ void Logo::create(){
 
 	getEngine()->setScene(mEngine->createNodeType(SceneNode::type()));
 
-	MemoryInputStream::ptr in(new MemoryInputStream(lt_mmsh::data,lt_mmsh::length));
+	MemoryStream::ptr in(new MemoryStream(lt_mmsh::data,lt_mmsh::length,false));
 	Mesh::ptr mesh=shared_static_cast<Mesh>(getEngine()->getMeshManager()->getHandler("mmsh")->load(in,NULL));
 	//MemoryInputStream::ptr in(new MemoryInputStream(lt_xmsh::data,lt_xmsh::length));
 	//Mesh::ptr mesh=shared_static_cast<Mesh>(getEngine()->getMeshManager()->getHandler("xmsh")->load(in,NULL));

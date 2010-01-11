@@ -48,18 +48,18 @@ MMSHHandler::MMSHHandler(Engine *engine){
 }
 
 // TODO: Calculate a boundingRadius for the Mesh
-Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandlerData *handlerData){
-	DataInputStream::ptr in(new DataInputStream(inputStream));
+Resource::ptr MMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+	DataStream::ptr dataStream(new DataStream(stream));
 
 	char signature[4];
-	in->read(signature,4);
+	dataStream->read(signature,4);
 	if(signature[0]!='T' || signature[1]!='M' || signature[2]!='M' || signature[3]!='H'){
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"Not of TMMSH format");
 		return NULL;
 	}
 
-	uint8 version=in->readUInt8();
+	uint8 version=dataStream->readUInt8();
 	if(version!=3){
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"Not TMMH version 3");
@@ -73,13 +73,13 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 	int8 i8x=0,i8y=0,i8z=0,i8w=0;
 	int16 i16x=0,i16y=0,i16z=0;
 
-	while(in->available()>0){
-		uint8 block=in->readUInt8();
+	while(dataStream->position()<dataStream->length()){
+		uint8 block=dataStream->readUInt8();
 		if(block==MESH_BLOCK){
-			mesh->worldScale=MathConversion::fixedToScalar(in->readBigInt32());
+			mesh->worldScale=MathConversion::fixedToScalar(dataStream->readBigInt32());
 
-			uint16 numVertexes=in->readBigUInt16();
-			uint16 vertexType=in->readBigUInt16();
+			uint16 numVertexes=dataStream->readBigUInt16();
+			uint16 vertexType=dataStream->readBigUInt16();
 			int formatBit=mEngine->getIdealVertexFormatBit();
 
 			VertexFormat::ptr vertexFormat(new VertexFormat());
@@ -120,18 +120,18 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 			vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
 
 			if((vertexType&VT_POSITION)>0){
-				uint8 bytes=in->readUInt8();
+				uint8 bytes=dataStream->readUInt8();
 
 				mathfixed::fixed bias[3];
-				bias[0]=in->readBigInt32();
-				bias[1]=in->readBigInt32();
-				bias[2]=in->readBigInt32();
+				bias[0]=dataStream->readBigInt32();
+				bias[1]=dataStream->readBigInt32();
+				bias[2]=dataStream->readBigInt32();
 
-				mathfixed::fixed scale=in->readBigInt32();
+				mathfixed::fixed scale=dataStream->readBigInt32();
 
 				if(bytes==1){
 					for(i=0;i<numVertexes;++i){
-						i8x=in->readInt8();i8y=in->readInt8();i8z=in->readInt8();
+						i8x=dataStream->readInt8();i8y=dataStream->readInt8();i8z=dataStream->readInt8();
 						vba.set3(i,positionElement,
 							MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i8x),scale)+bias[0]),
 							MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i8y),scale)+bias[1]),
@@ -140,7 +140,7 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 				}
 				else if(bytes==2){
 					for(i=0;i<numVertexes;++i){
-						i16x=in->readBigInt16();i16y=in->readBigInt16();i16z=in->readBigInt16();
+						i16x=dataStream->readBigInt16();i16y=dataStream->readBigInt16();i16z=dataStream->readBigInt16();
 						vba.set3(i,positionElement,
 							MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i16x),scale)+bias[0]),
 							MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i16y),scale)+bias[1]),
@@ -159,7 +159,7 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 				Vector3 normal;
 
 				for(i=0;i<numVertexes;i++){
-					i8x=in->readInt8();i8y=in->readInt8();i8z=in->readInt8();
+					i8x=dataStream->readInt8();i8y=dataStream->readInt8();i8z=dataStream->readInt8();
 					normal.set(
 						MathConversion::fixedToScalar(((int)i8x)<<9),
 						MathConversion::fixedToScalar(((int)i8y)<<9),
@@ -173,9 +173,9 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 
 			if((vertexType&VT_COLOR)>0){
 				for(i=0;i<numVertexes;i++){
-					uint8 r=in->readUInt8();
-					uint8 g=in->readUInt8();
-					uint8 b=in->readUInt8();
+					uint8 r=dataStream->readUInt8();
+					uint8 g=dataStream->readUInt8();
+					uint8 b=dataStream->readUInt8();
 
 					vba.setABGR(i,colorElement,0xFF000000 | (((int)b)<<16) | (((int)g)<<8) | (((int)r)<<0));
 				}
@@ -184,23 +184,23 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 			if((vertexType&VT_BONE)>0){
 				uint8 ui8;
 				for(i=0;i<numVertexes;i++){
-					ui8=in->readUInt8();
+					ui8=dataStream->readUInt8();
 					mesh->vertexBoneAssignments[i].add(Mesh::VertexBoneAssignment(ui8,Math::ONE));
 				}
 			}
 
 			if((vertexType&VT_TEXCOORD1)>0){
-				uint8 bytes=in->readUInt8();
+				uint8 bytes=dataStream->readUInt8();
 
 				mathfixed::fixed bias[2];
-				bias[0]=in->readBigInt32();
-				bias[1]=in->readBigInt32();
+				bias[0]=dataStream->readBigInt32();
+				bias[1]=dataStream->readBigInt32();
 
-				mathfixed::fixed scale=in->readBigInt32();
+				mathfixed::fixed scale=dataStream->readBigInt32();
 
 				if(bytes==1){
 					for(i=0;i<numVertexes;++i){
-						i8x=in->readInt8();i8y=in->readInt8();
+						i8x=dataStream->readInt8();i8y=dataStream->readInt8();
 						vba.set2(i,texCoordElement,
 							MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i8x),scale)+bias[0]),
 							MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i8y),scale)+bias[1]));
@@ -208,7 +208,7 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 				}
 				else if(bytes==2){
 					for(i=0;i<numVertexes;++i){
-						i16x=in->readBigInt16();i16y=in->readBigInt16();
+						i16x=dataStream->readBigInt16();i16y=dataStream->readBigInt16();
 						vba.set2(i,texCoordElement,
 							MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i16x),scale)+bias[0]),
 							MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i16y),scale)+bias[1]));
@@ -226,7 +226,7 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 			
 			mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 
-			uint8 numSubMeshes=in->readUInt8();
+			uint8 numSubMeshes=dataStream->readUInt8();
 			mesh->subMeshes.resize(numSubMeshes);
 
 			for(i=0;i<numSubMeshes;++i){
@@ -241,52 +241,52 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 
 					material->setSaveLocally(true);
 
-					uint8 faceCulling=in->readUInt8();
+					uint8 faceCulling=dataStream->readUInt8();
 					if(faceCulling>Renderer::FaceCulling_BACK){
 						faceCulling=Renderer::FaceCulling_BACK;
 					}
 					material->setFaceCulling((Renderer::FaceCulling)faceCulling);
 
-					uint8 hasTexture=in->readUInt8();
+					uint8 hasTexture=dataStream->readUInt8();
 					if(hasTexture>0){
 						material->setTextureStage(0,TextureStage::ptr(new TextureStage()));
 					}
 
-					uint8 lighting=in->readUInt8();
+					uint8 lighting=dataStream->readUInt8();
 					material->setLighting(lighting>0);
 					if(lighting>0){
 						LightEffect lightEffect;
 						uint32 color=0;
 
 						// MMSH stored color in ARGB, now an outdated format
-						color=in->readBigUInt32();
+						color=dataStream->readBigUInt32();
 						lightEffect.ambient=Color::rgba(((color&0xFF000000)>>24)|((color&0x00FFFFFF)<<8));
-						color=in->readBigUInt32();
+						color=dataStream->readBigUInt32();
 						lightEffect.diffuse=Color::rgba(((color&0xFF000000)>>24)|((color&0x00FFFFFF)<<8));
-						color=in->readBigUInt32();
+						color=dataStream->readBigUInt32();
 						lightEffect.specular=Color::rgba(((color&0xFF000000)>>24)|((color&0x00FFFFFF)<<8));
-						lightEffect.shininess=MathConversion::fixedToScalar(in->readBigInt32());
-						color=in->readBigUInt32();
+						lightEffect.shininess=MathConversion::fixedToScalar(dataStream->readBigInt32());
+						color=dataStream->readBigUInt32();
 						lightEffect.emissive=Color::rgba(((color&0xFF000000)>>24)|((color&0x00FFFFFF)<<8));
 
 						material->setLightEffect(lightEffect);
 					}
 				}
 
-				uint16 numIndexes=in->readBigUInt16();
+				uint16 numIndexes=dataStream->readBigUInt16();
 				uint16 *indexes=new uint16[numIndexes];
 
 				for(j=0;j<numIndexes;++j){
-					indexes[j]=in->readBigUInt16();
+					indexes[j]=dataStream->readBigUInt16();
 				}
 				
-				uint16 numStrips=in->readBigUInt16();
+				uint16 numStrips=dataStream->readBigUInt16();
 
 				uint16 *stripLengths=new uint16[numStrips];
 
 				int newNumIndexes=0;
 				for(j=0;j<numStrips;++j){
-					stripLengths[j]=in->readBigUInt16();
+					stripLengths[j]=dataStream->readBigUInt16();
 					newNumIndexes+=(stripLengths[j]-2)*3;
 				}
 
@@ -322,17 +322,17 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 		else if(block==SKELETON_BLOCK){
 			Skeleton::ptr skeleton(new Skeleton());
 
-			int numBones=in->readUInt8();
+			int numBones=dataStream->readUInt8();
 			skeleton->bones.resize(numBones);
 
-			uint8 translateBytes=in->readUInt8();
+			uint8 translateBytes=dataStream->readUInt8();
 
 			mathfixed::fixed translateBias[3];
-			translateBias[0]=in->readBigInt32();
-			translateBias[1]=in->readBigInt32();
-			translateBias[2]=in->readBigInt32();
+			translateBias[0]=dataStream->readBigInt32();
+			translateBias[1]=dataStream->readBigInt32();
+			translateBias[2]=dataStream->readBigInt32();
 
-			mathfixed::fixed translateScale=in->readBigInt32();
+			mathfixed::fixed translateScale=dataStream->readBigInt32();
 
 			for(i=0;i<numBones;++i){
 				Skeleton::Bone::ptr bone(new Skeleton::Bone());
@@ -340,21 +340,21 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 				bone->index=i;
 
 				if(translateBytes==1){
-					i8x=in->readInt8();i8y=in->readInt8();i8z=in->readInt8();
+					i8x=dataStream->readInt8();i8y=dataStream->readInt8();i8z=dataStream->readInt8();
 					bone->translate.set(
 						MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i8x),translateScale)+translateBias[0]),
 						MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i8y),translateScale)+translateBias[1]),
 						MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i8z),translateScale)+translateBias[2]));
 				}
 				else{
-					i16x=in->readBigInt16();i16y=in->readBigInt16();i16z=in->readBigInt16();
+					i16x=dataStream->readBigInt16();i16y=dataStream->readBigInt16();i16z=dataStream->readBigInt16();
 					bone->translate.set(
 						MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i16x),translateScale)+translateBias[0]),
 						MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i16y),translateScale)+translateBias[1]),
 						MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i16z),translateScale)+translateBias[2]));
 				}
 
-				i8x=in->readInt8();i8y=in->readInt8();i8z=in->readInt8();i8w=in->readInt8();
+				i8x=dataStream->readInt8();i8y=dataStream->readInt8();i8z=dataStream->readInt8();i8w=dataStream->readInt8();
 				bone->rotate.set(
 					MathConversion::fixedToScalar(((int)i8x)<<9),
 					MathConversion::fixedToScalar(((int)i8y)<<9),
@@ -363,21 +363,21 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 				tadpole::Math::normalizeCarefully(bone->rotate,0);
 
 				if(translateBytes==1){
-					i8x=in->readInt8();i8y=in->readInt8();i8z=in->readInt8();
+					i8x=dataStream->readInt8();i8y=dataStream->readInt8();i8z=dataStream->readInt8();
 					bone->worldToBoneTranslate.set(
 						MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i8x),translateScale)+translateBias[0]),
 						MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i8y),translateScale)+translateBias[1]),
 						MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i8z),translateScale)+translateBias[2]));
 				}
 				else{
-					i16x=in->readBigInt16();i16y=in->readBigInt16();i16z=in->readBigInt16();
+					i16x=dataStream->readBigInt16();i16y=dataStream->readBigInt16();i16z=dataStream->readBigInt16();
 					bone->worldToBoneTranslate.set(
 						MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i16x),translateScale)+translateBias[0]),
 						MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i16y),translateScale)+translateBias[1]),
 						MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i16z),translateScale)+translateBias[2]));
 				}
 
-				i8x=in->readInt8();i8y=in->readInt8();i8z=in->readInt8();i8w=in->readInt8();
+				i8x=dataStream->readInt8();i8y=dataStream->readInt8();i8z=dataStream->readInt8();i8w=dataStream->readInt8();
 				bone->worldToBoneRotate.set(
 					MathConversion::fixedToScalar(((int)i8x)<<9),
 					MathConversion::fixedToScalar(((int)i8y)<<9),
@@ -385,7 +385,7 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 					MathConversion::fixedToScalar(((int)i8w)<<9));
 				tadpole::Math::normalizeCarefully(bone->worldToBoneRotate,0);
 
-				bone->parentIndex=in->readInt8();
+				bone->parentIndex=dataStream->readInt8();
 			}
 
 			skeleton->compile();
@@ -395,18 +395,18 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 		else if(block==ANIMATION_BLOCK){
 			Sequence::ptr sequence(new Sequence());
 
-			scalar length=MathConversion::fixedToScalar(in->readBigInt32());
+			scalar length=MathConversion::fixedToScalar(dataStream->readBigInt32());
 
-			uint8 translateBytes=in->readUInt8();
+			uint8 translateBytes=dataStream->readUInt8();
 
 			mathfixed::fixed translateBias[3];
-			translateBias[0]=in->readBigInt32();
-			translateBias[1]=in->readBigInt32();
-			translateBias[2]=in->readBigInt32();
+			translateBias[0]=dataStream->readBigInt32();
+			translateBias[1]=dataStream->readBigInt32();
+			translateBias[2]=dataStream->readBigInt32();
 
-			mathfixed::fixed translateScale=in->readBigInt32();
+			mathfixed::fixed translateScale=dataStream->readBigInt32();
 
-			uint8 numTracks=in->readUInt8();
+			uint8 numTracks=dataStream->readUInt8();
 
 			sequence->tracks.resize(mesh->skeleton->bones.size());
 
@@ -415,34 +415,34 @@ Resource::ptr MMSHHandler::load(InputStream::ptr inputStream,const ResourceHandl
 
 				track->length=length;
 
-				track->index=in->readUInt8();
+				track->index=dataStream->readUInt8();
 
 				sequence->tracks[i]=track;
 
-				uint16 numKeyFrames=in->readBigUInt16();
+				uint16 numKeyFrames=dataStream->readBigUInt16();
 				track->keyFrames.resize(numKeyFrames);
 
 				for(j=0;j<numKeyFrames;++j){
 					KeyFrame &keyFrame=track->keyFrames[j];
 
-					keyFrame.time=MathConversion::fixedToScalar(in->readBigInt32());
+					keyFrame.time=MathConversion::fixedToScalar(dataStream->readBigInt32());
 
 					if(translateBytes==1){
-						i8x=in->readInt8();i8y=in->readInt8();i8z=in->readInt8();
+						i8x=dataStream->readInt8();i8y=dataStream->readInt8();i8z=dataStream->readInt8();
 						keyFrame.translate.set(
 							MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i8x),translateScale)+translateBias[0]),
 							MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i8y),translateScale)+translateBias[1]),
 							MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i8z),translateScale)+translateBias[2]));
 					}
 					else{
-						i16x=in->readBigInt16();i16y=in->readBigInt16();i16z=in->readBigInt16();
+						i16x=dataStream->readBigInt16();i16y=dataStream->readBigInt16();i16z=dataStream->readBigInt16();
 						keyFrame.translate.set(
 							MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i16x),translateScale)+translateBias[0]),
 							MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i16y),translateScale)+translateBias[1]),
 							MathConversion::fixedToScalar(Math::mul(Math::intToFixed(i16z),translateScale)+translateBias[2]));
 					}
 
-					i8x=in->readInt8();i8y=in->readInt8();i8z=in->readInt8();i8w=in->readInt8();
+					i8x=dataStream->readInt8();i8y=dataStream->readInt8();i8z=dataStream->readInt8();i8w=dataStream->readInt8();
 					keyFrame.rotate.set(
 						MathConversion::fixedToScalar(((int)i8x)<<9),
 						MathConversion::fixedToScalar(((int)i8y)<<9),

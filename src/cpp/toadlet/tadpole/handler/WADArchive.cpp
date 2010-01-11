@@ -26,7 +26,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/EndianConversion.h>
-#include <toadlet/egg/io/DataInputStream.h>
+#include <toadlet/egg/io/DataStream.h>
 #include <toadlet/tadpole/handler/WADArchive.h>
 #include <string.h>
 
@@ -47,19 +47,19 @@ WADArchive::~WADArchive(){
 }
 
 void WADArchive::destroy(){
-	if(mInputStream!=NULL){
-		mInputStream->close();
-		mInputStream=NULL;
+	if(mStream!=NULL){
+		mStream->close();
+		mStream=NULL;
 	}
 }
 
-bool WADArchive::open(InputStream::ptr stream){
+bool WADArchive::open(Stream::ptr stream){
 	destroy();
 
-	mInputStream=DataInputStream::ptr(new DataInputStream(stream));
-	mInputStream->read(header.identification,sizeof(header.identification));
-	header.numlumps=mInputStream->readLittleInt32();
-	header.infotableofs=mInputStream->readLittleInt32();
+	mStream=DataStream::ptr(new DataStream(stream));
+	mStream->read(header.identification,sizeof(header.identification));
+	header.numlumps=mStream->readLittleInt32();
+	header.infotableofs=mStream->readLittleInt32();
 
 	if (strncmp(header.identification,"WAD2",4) &&
 		strncmp(header.identification,"WAD3",4)){
@@ -68,9 +68,9 @@ bool WADArchive::open(InputStream::ptr stream){
 	}
 
 	lumpinfos.resize(header.numlumps);
-	mInputStream->seek(header.infotableofs);
+	mStream->seek(header.infotableofs);
 
-	mInputStream->read((char*)&lumpinfos[0],sizeof(wlumpinfo)*header.numlumps);
+	mStream->read((char*)&lumpinfos[0],sizeof(wlumpinfo)*header.numlumps);
 
 	int i;
 	for(i=0;i<header.numlumps;i++){
@@ -88,8 +88,8 @@ Resource::ptr WADArchive::openResource(const String &name){
 	for(i=0;i<header.numlumps;i++){
 		String lumpname=lumpinfos[i].name;
 		if(lowername.equals(lumpname.toLower())){
-			mInputStream->seek(lumpinfos[i].filepos);
-			mInputStream->read((char*)mInBuffer,lumpinfos[i].size);
+			mStream->seek(lumpinfos[i].filepos);
+			mStream->read((char*)mInBuffer,lumpinfos[i].size);
 
 			wmiptex *tex=(wmiptex*)mInBuffer;
 

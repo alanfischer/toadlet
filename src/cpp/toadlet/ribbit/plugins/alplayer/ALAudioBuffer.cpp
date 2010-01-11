@@ -50,10 +50,10 @@ ALAudioBuffer::~ALAudioBuffer(){
 	destroy();
 }
 
-bool ALAudioBuffer::create(InputStream::ptr inputStream,const String &mimeType){
+bool ALAudioBuffer::create(Stream::ptr stream,const String &mimeType){
 	destroy();
 
-	AudioStream::ptr decoder=mAudioPlayer->startAudioStream(inputStream,mimeType);
+	AudioStream::ptr decoder=mAudioPlayer->startAudioStream(stream,mimeType);
 	if(decoder==NULL){
 		return false;
 	}

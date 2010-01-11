@@ -1,7 +1,6 @@
 #include <toadlet/egg/Collection.h>
 #include <toadlet/egg/String.h>
-#include <toadlet/egg/io/FileInputStream.h>
-#include <toadlet/egg/io/FileOutputStream.h>
+#include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/mesh/Mesh.h>
@@ -24,7 +23,7 @@ public:
 	TextureArchive(){}
 	void destroy(){}
 
-	bool open(InputStream::ptr stream){return true;}
+	bool open(Stream::ptr stream){return true;}
 	bool isResourceArchive() const{return false;}
 
 	void setDirectory(const String &directory){
@@ -45,20 +44,20 @@ public:
 		}
 	}
 
-	InputStream::ptr openStream(const String &name){
-		FileInputStream::ptr fis(new FileInputStream(mDirectory+name));
-		if(fis->isOpen()==false){
+	Stream::ptr openStream(const String &name){
+		FileStream::ptr stream(new FileStream(mDirectory+name,FileStream::OpenFlags_READ|FileStream::OpenFlags_BINARY));
+		if(stream->isOpen()==false){
 			if(mSecondaryDirectory.length()>0){
-				fis=FileInputStream::ptr(new FileInputStream(mSecondaryDirectory+name));
-				if(fis->isOpen()==false){
-					fis=NULL;
+				stream=FileStream::ptr(new FileStream(mSecondaryDirectory+name,FileStream::OpenFlags_READ|FileStream::OpenFlags_BINARY));
+				if(stream->isOpen()==false){
+					stream=NULL;
 				}
 			}
 			else{
-				fis=NULL;
+				stream=NULL;
 			}
 		}
-		return fis;
+		return stream;
 	}
 
 	Resource::ptr openResource(const String &name){return NULL;}
@@ -191,7 +190,7 @@ int main(int argc,char **argv){
 		// Prepare the output file
 		int loc=mshFileName.rfind('.');
 		String bacFileName=mshFileName.substr(0,loc)+String(".bac");
-		FileOutputStream fout(bacFileName);
+		FileStream::ptr stream(new FileStream(bacFileName,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
 
 		std::cout << "Writing mesh " << (const char*)bacFileName << std::endl;
 
@@ -201,7 +200,7 @@ int main(int argc,char **argv){
 		bac.setNormalEpsilon(normalEpsilon);
 		bac.setTexCoordEpsilon(texCoordEpsilon);
 		bac.setRotationEpsilon(rotationEpsilon);
-		if(bac.convertMesh(mesh,&fout,useSubmeshes,useQuads,adjust,(version==3)?6:5)==false){
+		if(bac.convertMesh(mesh,stream,useSubmeshes,useQuads,adjust,(version==3)?6:5)==false){
 			std::cout << "Error converting mesh" << std::endl;
 			return -1;
 		}
@@ -220,9 +219,9 @@ int main(int argc,char **argv){
 					traFileName=ss.str().c_str();
 				}
 				std::cout << "Writing animation " << (const char*)traFileName << std::endl;
-				FileOutputStream aout(traFileName);
+				FileStream::ptr stream(new FileStream(traFileName,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
 
-				if(bac.convertAnimation(mesh,mesh->skeleton->sequences[j],&aout,(version==3)?4:3)==false){
+				if(bac.convertAnimation(mesh,mesh->skeleton->sequences[j],stream,(version==3)?4:3)==false){
 					std::cout << "Error converting animation" << std::endl;
 					return -1;
 				}

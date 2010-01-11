@@ -1,5 +1,5 @@
 #include <toadlet/egg/String.h>
-#include <toadlet/egg/io/FileOutputStream.h>
+#include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/handler/XMSHHandler.h>
 
@@ -60,13 +60,13 @@ int main(int argc,char **argv){
 	MeshOptimizer optimizer;
 	bool result=optimizer.optimizeMesh(mesh,engine);
 
-	FileOutputStream::ptr fout(new FileOutputStream(mshFileName));
-	if(fout->isOpen()==false){
+	FileStream::ptr stream(new FileStream(mshFileName,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
+	if(stream->isOpen()==false){
 		std::cout << "Error opening " << (const char*)mshFileName << std::endl;
 		return 0;
 	}
 	XMSHHandler::ptr handler(new XMSHHandler(NULL,NULL,NULL));
-	handler->save(mesh,fout);
+	handler->save(mesh,stream);
 
 	if(result){
 		std::cout << "complete" << std::endl;

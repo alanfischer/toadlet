@@ -31,10 +31,8 @@
 #include <toadlet/egg/Thread.h>
 #include <toadlet/egg/Runnable.h>
 #include <toadlet/egg/Random.h>
-#include <toadlet/egg/io/DataOutputStream.h>
-#include <toadlet/egg/io/MemoryOutputStream.h>
-#include <toadlet/egg/io/DataInputStream.h>
-#include <toadlet/egg/io/MemoryInputStream.h>
+#include <toadlet/egg/io/DataStream.h>
+#include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/egg/net/Socket.h>
 #include <toadlet/knot/Connection.h>
 #include <toadlet/knot/PeerPacket.h>
@@ -87,8 +85,8 @@ protected:
 	const static int CONNECTION_PACKET_LENGTH;
 	const static int CONNECTION_VERSION;
 
-	int buildConnectionPacket(egg::io::DataOutputStream *out);
-	bool verifyConnectionPacket(egg::io::DataInputStream *in);
+	int buildConnectionPacket(egg::io::DataStream *stream);
+	bool verifyConnectionPacket(egg::io::DataStream *stream);
 
 	egg::String toBinaryString(int n);
 	inline int frameToIndex(int frame){return frame-mMasterFrame-1 + mHalfWindowSize;}
@@ -101,10 +99,10 @@ protected:
 	int receivePacketsFromSocket(const egg::Collection<PeerPacket::ptr> &packets,int numPackets);
 
 	egg::net::Socket::ptr mSocket;
-	egg::io::MemoryOutputStream::ptr mOutPacket;
-	egg::io::DataOutputStream::ptr mDataOutPacket;
-	egg::io::MemoryInputStream::ptr mInPacket;
-	egg::io::DataInputStream::ptr mDataInPacket;
+	egg::io::MemoryStream::ptr mOutPacket;
+	egg::io::DataStream::ptr mDataOutPacket;
+	egg::io::MemoryStream::ptr mInPacket;
+	egg::io::DataStream::ptr mDataInPacket;
 
 	egg::Mutex::ptr mMutex;
 	egg::Thread::ptr mThread;

@@ -21,8 +21,8 @@
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
-#include <toadlet/egg/io/MemoryOutputStream.h>
-#include <toadlet/egg/io/DataOutputStream.h>
+#include <toadlet/egg/io/MemoryStream.h>
+#include <toadlet/egg/io/DataStream.h>
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/tadpole/Material.h>
@@ -43,57 +43,57 @@ using namespace toadlet::tadpole::mesh;
 
 class M3GProxy{
 public:
-	static void writeBool(DataOutputStream *out,bool b){
+	static void writeBool(DataStream *out,bool b){
 		out->writeBool(b);
 	}
 
-	static void writeInt8(DataOutputStream *out,int8 i){
+	static void writeInt8(DataStream *out,int8 i){
 		out->writeInt8(i);
 	}
 
-	static void writeUInt8(DataOutputStream *out,uint8 i){
+	static void writeUInt8(DataStream *out,uint8 i){
 		out->writeUInt8(i);
 	}
 
-	static void writeInt16(DataOutputStream *out,int16 i){
+	static void writeInt16(DataStream *out,int16 i){
 		out->writeLittleInt16(i);
 	}
 
-	static void writeUInt16(DataOutputStream *out,uint16 i){
+	static void writeUInt16(DataStream *out,uint16 i){
 		out->writeLittleUInt16(i);
 	}
 
-	static void writeInt32(DataOutputStream *out,int32 i){
+	static void writeInt32(DataStream *out,int32 i){
 		out->writeLittleInt32(i);
 	}
 
-	static void writeUInt32(DataOutputStream *out,uint32 i){
+	static void writeUInt32(DataStream *out,uint32 i){
 		out->writeLittleUInt32(i);
 	}
 
-	static void writeFloat(DataOutputStream *out,float f){
+	static void writeFloat(DataStream *out,float f){
 		out->writeLittleFloat(f);
 	}
 
-	static void writeVector3(DataOutputStream *out,const Vector3 &v){
+	static void writeVector3(DataStream *out,const Vector3 &v){
 		int i;
 		for(i=0;i<3;++i){
 			out->writeLittleFloat(v[i]);
 		}
 	}
 
-	static void writeMatrix4x4(DataOutputStream *out,const Matrix4x4 &m){
+	static void writeMatrix4x4(DataStream *out,const Matrix4x4 &m){
 		int i;
 		for(i=0;i<16;++i){
 			out->writeLittleFloat(m.data[i]);
 		}
 	}
 
-	static void writeString(DataOutputStream *out,const String &s){
+	static void writeString(DataStream *out,const String &s){
 		out->writeNullTerminatedString(s);
 	}
 
-	static void writeObjectIndex(DataOutputStream *out,M3GProxy *object){
+	static void writeObjectIndex(DataStream *out,M3GProxy *object){
 		if(object==NULL){
 			writeUInt32(out,0);
 		}
@@ -102,13 +102,13 @@ public:
 		}
 	}
 
-	static void writeColorRGB(DataOutputStream *out,int color){
+	static void writeColorRGB(DataStream *out,int color){
 		writeUInt8(out,(color&0x00FF0000)>>16);
 		writeUInt8(out,(color&0x0000FF00)>>8);
 		writeUInt8(out,(color&0x000000FF)>>0);
 	}
 
-	static void writeColorRGBA(DataOutputStream *out,int color){
+	static void writeColorRGBA(DataStream *out,int color){
 		writeUInt8(out,(color&0x00FF0000)>>16);
 		writeUInt8(out,(color&0x0000FF00)>>8);
 		writeUInt8(out,(color&0x000000FF)>>0);
@@ -120,7 +120,7 @@ public:
 		objectType=0;
 	}
 
-	virtual void getData(DataOutputStream *out)=0;
+	virtual void getData(DataStream *out)=0;
 	virtual int getDataLength()=0;
 
 	String name;
@@ -141,7 +141,7 @@ public:
 		authoringField="(C) Lightning Toads Productions, LLC";
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		writeUInt8(out,versionNumber[0]);
 		writeUInt8(out,versionNumber[1]);
 		writeBool(out,hasExternalReferences);
@@ -167,7 +167,7 @@ public:
 		objectType=0xFF;
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		writeString(out,uri);
 	}
 
@@ -194,7 +194,7 @@ public:
 		userID=0;
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		writeUInt32(out,userID);
 		writeUInt32(out,animationTracks.size());
 		int i;
@@ -248,7 +248,7 @@ public:
 		transform=IDENTITY_MATRIX4X4;
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		M3GObject3D::getData(out);
 		writeBool(out,hasComponentTransform);
 		if(hasComponentTransform){
@@ -303,7 +303,7 @@ public:
 		yReference=NULL;
 	};
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		M3GTransformable::getData(out);
 		writeBool(out,enableRendering);
 		writeBool(out,enablePicking);
@@ -349,7 +349,7 @@ public:
 		objectType=9;
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		M3GNode::getData(out);
 		writeUInt32(out,children.size());
 		int i;
@@ -392,7 +392,7 @@ public:
 		farDist=0.0f;
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		M3GNode::getData(out);
 		writeUInt8(out,projectionType);
 		if(projectionType==GENERIC){
@@ -447,7 +447,7 @@ public:
 		colorClearEnabled=true;
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		M3GObject3D::getData(out);
 		writeColorRGBA(out,backgroundColor);
 		writeObjectIndex(out,backgroundImage);
@@ -485,7 +485,7 @@ public:
 		background=NULL;
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		M3GGroup::getData(out);
 		writeObjectIndex(out,activeCamera);
 		writeObjectIndex(out,background);
@@ -528,7 +528,7 @@ public:
 		spotExponent=0.0f;
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		M3GNode::getData(out);
 		writeFloat(out,attenuationConstant);
 		writeFloat(out,attenuationLinear);
@@ -570,7 +570,7 @@ public:
 		scale=1.0f;
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		M3GObject3D::getData(out);
 		writeUInt8(out,componentSize);
 		writeUInt8(out,componentCount);
@@ -629,7 +629,7 @@ public:
 		colors=NULL;
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		M3GObject3D::getData(out);
 		writeColorRGBA(out,defaultColor);
 		writeObjectIndex(out,positions);
@@ -682,7 +682,7 @@ class M3GIndexBuffer:public M3GObject3D{
 public:
 	M3GIndexBuffer():M3GObject3D(){}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		M3GObject3D::getData(out);
 	}
 
@@ -707,7 +707,7 @@ public:
 		encoding=EXPLICIT_UINT16;
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		M3GIndexBuffer::getData(out);
 		writeUInt8(out,encoding);
 		int i;
@@ -801,7 +801,7 @@ public:
 		depthOffsetUnits=0;
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		M3GObject3D::getData(out);
 		writeBool(out,depthTestEnabled);
 		writeBool(out,depthWriteEnabled);
@@ -848,7 +848,7 @@ public:
 		perspectiveCorrectionEnabled=true;
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		M3GObject3D::getData(out);
 		writeUInt8(out,culling);
 		writeUInt8(out,shading);
@@ -882,7 +882,7 @@ public:
 		vertexColorTrackingEnabled=false;
 	}
 
-	void getData(DataOutputStream *out){
+	void getData(DataStream *out){
 		M3GObject3D::getData(out);
 		writeColorRGB(out,ambientColor);
 		writeColorRGBA(out,diffuseColor);
@@ -915,7 +915,7 @@ public:
 		material=NULL;
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		M3GObject3D::getData(out);
 		writeUInt8(out,layer);
 		writeObjectIndex(out,compositingMode);
@@ -981,7 +981,7 @@ public:
 		vertexBuffer=NULL;
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		M3GNode::getData(out);
 		writeObjectIndex(out,vertexBuffer);
 		writeUInt32(out,submeshes.size());
@@ -1040,7 +1040,7 @@ public:
 		skeleton=NULL;
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		M3GMesh::getData(out);
 		writeObjectIndex(out,skeleton);
 		writeUInt32(out,bones.size());
@@ -1170,7 +1170,7 @@ public:
 		}
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		prepareData();
 
 		M3GObject3D::getData(out);
@@ -1265,7 +1265,7 @@ public:
 		referenceWorldTime=0;
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		M3GObject3D::getData(out);
 		writeFloat(out,speed);
 		writeFloat(out,weight);
@@ -1320,7 +1320,7 @@ public:
 		propertyID=TRANSLATION;
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		M3GObject3D::getData(out);
 		writeObjectIndex(out,keyframeSequence);
 		writeObjectIndex(out,animationController);
@@ -1356,7 +1356,7 @@ public:
 		mObject=object;
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		M3GProxy::writeUInt8(out,mObject->objectType);
 		M3GProxy::writeUInt32(out,mObject->getDataLength());
 		mObject->getData(out);
@@ -1385,10 +1385,10 @@ public:
 		totalSectionLength=1 + 4 + 4 + uncompressedLength + 4;
 	}
 
-    virtual void getData(DataOutputStream *out){
-		MemoryOutputStream mout;
+    virtual void getData(DataStream *out){
+		MemoryStream mout;
 
-		DataOutputStream dout(&mout);
+		DataStream dout(&mout);
 		M3GProxy::writeUInt8(&dout,compressionScheme);
 		M3GProxy::writeUInt32(&dout,totalSectionLength);
 		M3GProxy::writeUInt32(&dout,uncompressedLength);
@@ -1399,9 +1399,9 @@ public:
 		}
 
 		Adler32 adler;
-		adler.update((char*)mout.getOriginalDataPointer(),mout.getSize());
+		adler.update((char*)mout.getOriginalDataPointer(),mout.length());
 
-		out->write((char*)mout.getOriginalDataPointer(),mout.getSize());
+		out->write((char*)mout.getOriginalDataPointer(),mout.length());
 		M3GProxy::writeUInt32(out,adler.getValue());
 	}
 
@@ -1423,7 +1423,7 @@ public:
 	M3GFileIdentifier(){
 	}
 
-	virtual void getData(DataOutputStream *out){
+	virtual void getData(DataStream *out){
 		out->write((char*)M3GFileIdentifierData,12);
 	}
 
@@ -1446,7 +1446,7 @@ M3GConverter::~M3GConverter(){
 #endif
 }
 
-bool M3GConverter::convertMesh(Mesh *mesh,OutputStream *outStream,float scale,int forceBytes,bool invertYTexCoord,bool viewable,int animation){
+bool M3GConverter::convertMesh(Mesh *mesh,Stream *outStream,float scale,int forceBytes,bool invertYTexCoord,bool viewable,int animation){
 	int i,j;
 
 	if(scale==0){
@@ -1456,7 +1456,7 @@ bool M3GConverter::convertMesh(Mesh *mesh,OutputStream *outStream,float scale,in
 
 	bool result=false;
 
-	DataOutputStream::ptr out(new DataOutputStream(outStream));
+	DataStream::ptr out(new DataStream(outStream));
 
 	Collection<M3GProxy*> objects;
 	M3GHeaderObject headerObject;

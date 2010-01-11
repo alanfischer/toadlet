@@ -105,10 +105,10 @@ void Win32Player::playedSound(int time){
 	mNextSoundTime=System::mtime()+time;
 }
 
-AudioStream::ptr Win32Player::startAudioStream(io::InputStream::ptr in,const String &mimeType){
-	if(in==NULL){
+AudioStream::ptr Win32Player::startAudioStream(Stream::ptr stream,const String &mimeType){
+	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_RIBBIT,
-			"Win32Player: Null InputStream");
+			"Win32Player: Null Stream");
 		return NULL;
 	}
 
@@ -128,7 +128,7 @@ AudioStream::ptr Win32Player::startAudioStream(io::InputStream::ptr in,const Str
 		return NULL;
 	}
 
-	if(decoder->startStream(in)==false){
+	if(decoder->startStream(stream)==false){
 		Error::unknown(Categories::TOADLET_RIBBIT,
 			"Win32Player: Error starting decoder stream");
 		return NULL;

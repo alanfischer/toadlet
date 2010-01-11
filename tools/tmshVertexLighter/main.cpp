@@ -1,6 +1,6 @@
 #include <toadlet/egg/Collection.h>
 #include <toadlet/egg/String.h>
-#include <toadlet/egg/io/FileOutputStream.h>
+#include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/handler/XMSHHandler.h>
 
@@ -164,7 +164,7 @@ int main(int argc,char **argv){
 			}
 		}
 
-		FileOutputStream::ptr fout(new FileOutputStream(mshFileName));
+		FileStream::ptr fout(new FileStream(mshFileName,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
 
 		String extension;
 		int index=mshFileName.rfind('.');

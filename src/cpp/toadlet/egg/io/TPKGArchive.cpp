@@ -44,55 +44,55 @@ TPKGArchive::~TPKGArchive(){
 }
 
 void TPKGArchive::destroy(){
-	if(mInputStream!=NULL){
-		mInputStream->close();
-		mInputStream=NULL;
+	if(mStream!=NULL){
+		mStream->close();
+		mStream=NULL;
 	}
 
-	mMemoryInputStream=NULL;
+	mMemoryStream=NULL;
 }
 
-bool TPKGArchive::open(MemoryInputStream::ptr memoryInputStream){
-	mMemoryInputStream=memoryInputStream;
-	return open((InputStream::ptr)memoryInputStream);
+bool TPKGArchive::open(MemoryStream::ptr memoryStream){
+	mMemoryStream=memoryStream;
+	return open((Stream::ptr)memoryStream);
 }
 
-bool TPKGArchive::open(InputStream::ptr inputStream){
-	mInputStream=DataInputStream::ptr(new DataInputStream(inputStream));
+bool TPKGArchive::open(Stream::ptr stream){
+	mStream=DataStream::ptr(new DataStream(stream));
 
 	mDataOffset=0;
 
 	char signature[4];
-	mDataOffset+=mInputStream->read(signature,4);
+	mDataOffset+=mStream->read(signature,4);
 	if(signature[0]!='T' || signature[1]!='P' || signature[2]!='K' || signature[3]!='G'){
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"Not of TPKG format");
-		mInputStream=NULL;
+		mStream=NULL;
 		return false;
 	}
 
 	uint32 version=0;
-	mDataOffset+=mInputStream->readBigUInt32(version);
+	mDataOffset+=mStream->readBigUInt32(version);
 	if(version!=1){
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"Not TPKG version 1");
-		mInputStream=NULL;
+		mStream=NULL;
 		return false;
 	}
 
 	int32 numFiles=0;
-	mDataOffset+=mInputStream->readBigInt32(numFiles);
+	mDataOffset+=mStream->readBigInt32(numFiles);
 	int i;
 	for(i=0;i<numFiles;++i){
 		uint32 nameLength=0;
-		mDataOffset+=mInputStream->readBigUInt32(nameLength);
+		mDataOffset+=mStream->readBigUInt32(nameLength);
 		char *name=new char[nameLength+1];
-		mDataOffset+=mInputStream->read(name,nameLength);
+		mDataOffset+=mStream->read(name,nameLength);
 		name[nameLength]=0;
 		
 		Index index;
-		mDataOffset+=mInputStream->readBigUInt32(index.position);
-		mDataOffset+=mInputStream->readBigUInt32(index.length);
+		mDataOffset+=mStream->readBigUInt32(index.position);
+		mDataOffset+=mStream->readBigUInt32(index.length);
 
 		mIndex[name]=index;
 		delete[] name;
@@ -101,11 +101,11 @@ bool TPKGArchive::open(InputStream::ptr inputStream){
 	return true;
 }
 
-InputStream::ptr TPKGArchive::openStream(const String &name){
+Stream::ptr TPKGArchive::openStream(const String &name){
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"Creating InputStream for "+name);
 
-	if(mInputStream==NULL){
+	if(mStream==NULL){
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"TPKG not opened");
 		return NULL;
@@ -119,17 +119,17 @@ InputStream::ptr TPKGArchive::openStream(const String &name){
 		return NULL;
 	}
 
-	mInputStream->seek(mDataOffset+it->second.position);
+	mStream->seek(mDataOffset+it->second.position);
 	int length=it->second.length;
 
-	if(mMemoryInputStream!=NULL){
-		char *data=mMemoryInputStream->getCurrentDataPointer();
-		return MemoryInputStream::ptr(new MemoryInputStream(data,length,false));
+	if(mMemoryStream!=NULL){
+		char *data=mMemoryStream->getCurrentDataPointer();
+		return MemoryStream::ptr(new MemoryStream(data,length,false));
 	}
 	else{
 		char *data=new char[length];
-		mInputStream->read(data,length);
-		return MemoryInputStream::ptr(new MemoryInputStream(data,length,true));
+		mStream->read(data,length);
+		return MemoryStream::ptr(new MemoryStream(data,length,true));
 	}
 }
 

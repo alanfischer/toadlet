@@ -41,9 +41,9 @@ public:
 		mTextureManager=textureManager;
 	}
 
-	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData){
+	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData){
 		WADArchive::ptr archive(new WADArchive(mTextureManager));
-		bool result=archive->open(in);
+		bool result=archive->open(stream);
 		if(result){
 			return egg::shared_static_cast<egg::io::Archive>(archive);
 		}

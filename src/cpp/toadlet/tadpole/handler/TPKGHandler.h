@@ -39,9 +39,9 @@ public:
 
 	TPKGHandler(){}
 
-	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData){
+	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData){
 		egg::io::TPKGArchive::ptr archive(new egg::io::TPKGArchive());
-		bool result=archive->open(in);
+		bool result=archive->open(stream);
 		if(result){
 			return egg::shared_static_cast<egg::io::Archive>(archive);
 		}

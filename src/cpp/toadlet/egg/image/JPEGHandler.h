@@ -27,9 +27,7 @@
 #define TOADLET_EGG_IMAGE_JPEGHANDLER_H
 
 #include <toadlet/egg/image/Image.h>
-#include <toadlet/egg/io/InputStream.h>
-#include <toadlet/egg/io/OutputStream.h>
-#include <toadlet/egg/io/PushbackInputStream.h>
+#include <toadlet/egg/io/Stream.h>
 
 namespace toadlet{
 namespace egg{
@@ -39,15 +37,8 @@ class TOADLET_API JPEGHandler{
 public:
 	JPEGHandler();
 	virtual ~JPEGHandler();
-	virtual Image *loadImage(io::InputStream *in);
-	virtual bool saveImage(Image *image,io::OutputStream *out);
-
-	// A somewhat temporary method to handle the image loading through use of a pushback stream, so we wont sacrafice
-	// extra data beyond the jpeg file
-	virtual Image *loadImage(io::PushbackInputStream *in);
-
-protected:
-	virtual Image *loadImage(io::InputStream *in,io::PushbackInputStream *pin);
+	virtual Image *loadImage(io::Stream *stream);
+	virtual bool saveImage(Image *image,io::Stream *stream);
 };
 
 }

@@ -36,20 +36,28 @@ public:
 	WaveDecoder();
 	virtual ~WaveDecoder();
 
-	bool startStream(egg::io::InputStream::ptr istream);
+	void close(){}
+
+	bool isReadable(){return true;}
 	int read(char *buffer,int length);
+
+	bool isWriteable(){return false;}
+	int write(const char *buffer,int length){return 0;}
+
+	bool startStream(egg::io::Stream::ptr stream);
 	bool stopStream();
 	bool reset();
-	bool seek(int offs);
-	int available();
-	void close();
-	int getChannels();
-	int getSamplesPerSecond();
-	int getBitsPerSample();
-	egg::io::InputStream::ptr getParentStream();
+	int length(){return 0;}
+	int position(){return 0;}
+	bool seek(int offs){return false;}
+
+	int getChannels(){return mChannels;}
+	int getSamplesPerSecond(){return mSamplesPerSecond;}
+	int getBitsPerSample(){return mBitsPerSample;}
+	egg::io::Stream::ptr getParentStream(){return mStream;}
 
 private:
-	void skip(egg::io::InputStream::ptr in,int amount);
+	void skip(egg::io::Stream::ptr stream,int amount);
 	void ADPCMDecoder(const char *in,short *out,int len);
 
 	int mChannels;
@@ -58,7 +66,7 @@ private:
 	char *mData;
 	int mSize;
 	int mPosition;
-	egg::io::InputStream::ptr mIn;
+	egg::io::Stream::ptr mStream;
 };
 
 }

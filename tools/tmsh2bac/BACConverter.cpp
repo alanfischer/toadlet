@@ -19,7 +19,7 @@
 
 #include "BACConverter.h"
 #include <toadlet/egg/Logger.h>
-#include <toadlet/egg/io/DataOutputStream.h>
+#include <toadlet/egg/io/DataStream.h>
 #include <toadlet/egg/math/Math.h>
 #include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/VertexBuffer.h>
@@ -93,7 +93,7 @@ BACConverter::~BACConverter(){
 	clean();
 }
 
-bool BACConverter::convertMesh(Mesh::ptr mesh,OutputStream *out,bool submeshes,bool quads,float adjust,int version){
+bool BACConverter::convertMesh(Mesh::ptr mesh,Stream *out,bool submeshes,bool quads,float adjust,int version){
 	bool result=true;
 
 	result=extractMeshData(mesh,submeshes);
@@ -769,7 +769,7 @@ void BACConverter::adjustVertexes(float amount){
 	}
 }
 
-void BACConverter::writeOutModelVersion6(OutputStream *tout){
+void BACConverter::writeOutModelVersion6(Stream *tout){
 	int i,j;
 
 	std::stringstream out;
@@ -942,8 +942,8 @@ void BACConverter::writeOutModelVersion6(OutputStream *tout){
 	tout->write(string.c_str(),string.length());
 }
 
-void BACConverter::writeOutModelVersion5(OutputStream *tout){
-	DataOutputStream *out=new DataOutputStream(tout);
+void BACConverter::writeOutModelVersion5(Stream *tout){
+	DataStream *out=new DataStream(tout);
 
 	uint32 version=5;
 	out->writeLittleUInt32(version);
@@ -1152,7 +1152,7 @@ void BACConverter::writeOutModelVersion5(OutputStream *tout){
 	delete out;
 }
 
-bool BACConverter::convertAnimation(Mesh::ptr mesh,Sequence *animation,OutputStream *out,int version){
+bool BACConverter::convertAnimation(Mesh::ptr mesh,Sequence *animation,Stream *out,int version){
 	extractAnimationData(mesh,animation);
 
 	if(version==4){
@@ -1311,7 +1311,7 @@ void BACConverter::extractAnimationData(Mesh *mesh,Sequence *animation){
 	}
 }
 
-void BACConverter::writeOutAnimationVersion4(OutputStream *tout){
+void BACConverter::writeOutAnimationVersion4(Stream *tout){
 	int i,j;
 
 	std::stringstream out;
@@ -1393,8 +1393,8 @@ void BACConverter::writeOutAnimationVersion4(OutputStream *tout){
 	tout->write(string.c_str(),string.length());
 }
 
-void BACConverter::writeOutAnimationVersion3(OutputStream *tout){
-	DataOutputStream *out=new DataOutputStream(tout);
+void BACConverter::writeOutAnimationVersion3(Stream *tout){
+	DataStream *out=new DataStream(tout);
 
 	out->writeLittleUInt32(TRA_MAGIC+3);
 

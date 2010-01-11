@@ -25,7 +25,7 @@
 #include <toadlet/egg/math/Vector2.h>
 #include <toadlet/egg/math/Vector3.h>
 #include <toadlet/egg/math/Vector4.h>
-#include <toadlet/egg/io/OutputStream.h>
+#include <toadlet/egg/io/Stream.h>
 #include <toadlet/tadpole/mesh/Mesh.h>
 #include <toadlet/tadpole/node/MeshNode.h>
 
@@ -114,8 +114,8 @@ public:
 	BACConverter(toadlet::tadpole::Engine *engine);
 	virtual ~BACConverter();
 
-	bool convertMesh(toadlet::tadpole::mesh::Mesh::ptr mesh,toadlet::egg::io::OutputStream *out,bool submeshes=true,bool quads=true,float adjust=0,int version=6);
-	bool convertAnimation(toadlet::tadpole::mesh::Mesh::ptr mesh,toadlet::tadpole::mesh::Sequence *animation,toadlet::egg::io::OutputStream *out,int version=4);
+	bool convertMesh(toadlet::tadpole::mesh::Mesh::ptr mesh,toadlet::egg::io::Stream *stream,bool submeshes=true,bool quads=true,float adjust=0,int version=6);
+	bool convertAnimation(toadlet::tadpole::mesh::Mesh::ptr mesh,toadlet::tadpole::mesh::Sequence *animation,toadlet::egg::io::Stream *stream,int version=4);
 
 	void setPositionEpsilon(float epsilon){mPositionEpsilon=epsilon;}
 	float getPositionEpsilon() const{return mPositionEpsilon;}
@@ -155,12 +155,12 @@ protected:
 	void constructQuads();
 	void rewindTriangles();
 	void adjustVertexes(float amount);
-	void writeOutModelVersion6(toadlet::egg::io::OutputStream *tout);
-	void writeOutModelVersion5(toadlet::egg::io::OutputStream *tout);
+	void writeOutModelVersion6(toadlet::egg::io::Stream *stream);
+	void writeOutModelVersion5(toadlet::egg::io::Stream *stream);
 
 	void extractAnimationData(toadlet::tadpole::mesh::Mesh *mesh,toadlet::tadpole::mesh::Sequence *animation);
-	void writeOutAnimationVersion4(toadlet::egg::io::OutputStream *tout);
-	void writeOutAnimationVersion3(toadlet::egg::io::OutputStream *tout);
+	void writeOutAnimationVersion4(toadlet::egg::io::Stream *stream);
+	void writeOutAnimationVersion3(toadlet::egg::io::Stream *stream);
 	void clean();
 	
 	float mPositionEpsilon;

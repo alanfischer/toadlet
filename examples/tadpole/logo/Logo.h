@@ -1,7 +1,7 @@
 #ifndef LOGO_H
 #define LOGO_H
 
-#include <toadlet/egg/io/MemoryInputStream.h>
+#include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
 #include <toadlet/tadpole/node/SceneNode.h>

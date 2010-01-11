@@ -39,7 +39,7 @@ public:
 	virtual ~Win32Audio();
 
 	virtual bool create(AudioBuffer::ptr audioBuffer);
-	virtual bool create(egg::io::InputStream::ptr in,const egg::String &mimeType);
+	virtual bool create(egg::io::Stream::ptr stream,const egg::String &mimeType);
 	virtual void destroy();
 
 	virtual bool play();

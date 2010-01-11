@@ -31,7 +31,7 @@
 #include <toadlet/egg/Resource.h>
 #include <toadlet/egg/ResourceFullyReleasedListener.h>
 #include <toadlet/egg/io/Archive.h>
-#include <toadlet/egg/io/InputStream.h>
+#include <toadlet/egg/io/Stream.h>
 #include <toadlet/tadpole/ResourceHandler.h>
 
 namespace toadlet{

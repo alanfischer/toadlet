@@ -59,7 +59,7 @@ OggVorbisDecoder::~OggVorbisDecoder(){
 }
 
 size_t OggVorbisDecoder::read_func(void *ptr,size_t size,size_t nmemb, void *datasource){
-	return ((egg::io::InputStream*)datasource)->read((char*)ptr,size*nmemb);
+	return ((egg::io::Stream*)datasource)->read((char*)ptr,size*nmemb);
 }
 
 int OggVorbisDecoder::seek_func(void *datasource, ogg_int64_t offset, int whence){
@@ -74,12 +74,16 @@ long OggVorbisDecoder::tell_func(void *datasource){
 	return 0;
 }
 
-bool OggVorbisDecoder::startStream(egg::io::InputStream::ptr istream){
-	mIn=istream;
+void OggVorbisDecoder::close(){
+	stopStream();
+}
 
-	if(mIn==NULL){
+bool OggVorbisDecoder::startStream(egg::io::Stream::ptr stream){
+	mStream=stream;
+
+	if(mStream==NULL){
 		Error::nullPointer(Categories::TOADLET_RIBBIT,
-			"InputStream is NULL");
+			"Stream is NULL");
 		return false;
 	}
 
@@ -97,7 +101,7 @@ bool OggVorbisDecoder::startStream(egg::io::InputStream::ptr istream){
 	callbacks.tell_func=tell_func;
 
 	int result;
-	result=ov_open_callbacks(mIn,&mVorbisFile,NULL,0,callbacks);
+	result=ov_open_callbacks(mStream,&mVorbisFile,NULL,0,callbacks);
 
 	if(result!=0){
 		Error::unknown(Categories::TOADLET_RIBBIT,
@@ -164,22 +168,10 @@ bool OggVorbisDecoder::stopStream(){
 
 bool OggVorbisDecoder::reset(){
 	stopStream();
-	bool b=mIn->reset();
-	startStream(mIn);
+	bool b=mStream->reset();
+	startStream(mStream);
 
 	return b;
-}
-
-bool OggVorbisDecoder::seek(int offs){
-	return false;
-}
-
-int OggVorbisDecoder::available(){
-	return 0;
-}
-
-void OggVorbisDecoder::close(){
-	stopStream();
 }
 
 int OggVorbisDecoder::getChannels(){
@@ -196,14 +188,6 @@ int OggVorbisDecoder::getSamplesPerSecond(){
 	}
 
 	return 0;
-}
-
-int OggVorbisDecoder::getBitsPerSample(){
-	return 16;
-}
-
-InputStream::ptr OggVorbisDecoder::getParentStream(){
-	return mIn;
 }
 
 }

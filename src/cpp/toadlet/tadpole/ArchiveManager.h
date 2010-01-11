@@ -34,6 +34,7 @@ namespace toadlet{
 namespace tadpole{
 
 class TOADLET_API ArchiveManager:public ResourceManager,public egg::io::Archive,public egg::BaseResource{
+	TOADLET_BASERESOURCE_PASSTHROUGH(egg::io::Archive);
 public:
 	ArchiveManager();
 	virtual ~ArchiveManager();
@@ -42,7 +43,7 @@ public:
 
 	bool isResourceArchive() const{return false;}
 
-	bool open(egg::io::InputStream::ptr stream){return true;}
+	bool open(egg::io::Stream::ptr stream){return true;}
 
 	egg::io::Archive::ptr findArchive(const egg::String &name){return egg::shared_static_cast<egg::io::Archive>(ResourceManager::find(name));}
 
@@ -50,10 +51,8 @@ public:
 	const egg::String &getDirectory() const{return mDirectory;}
 
 	// Searches through all archives for the file
-	egg::io::InputStream::ptr openStream(const egg::String &name);
+	egg::io::Stream::ptr openStream(const egg::String &name);
 	egg::Resource::ptr openResource(const egg::String &name){return NULL;}
-
-	TOADLET_BASERESOURCE_PASSTHROUGH(egg::io::Archive);
 
 protected:
 	egg::String mDirectory;

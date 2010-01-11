@@ -27,6 +27,8 @@
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/Engine.h>
 
+using namespace toadlet::egg;
+using namespace toadlet::egg::io;
 using namespace toadlet::ribbit;
 
 namespace toadlet{
@@ -66,14 +68,14 @@ bool AudioNode::setAudioBuffer(const AudioBuffer::ptr &audioBuffer){
 	}
 }
 
-bool AudioNode::setAudioStream(egg::io::InputStream::ptr in,const egg::String &mimeType){
+bool AudioNode::setAudioStream(Stream::ptr stream,const String &mimeType){
 	if(mAudio!=NULL){
 		mAudio->destroy();
 	}
 
 	mAudio=Audio::ptr(mEngine->getAudioPlayer()->createStreamingAudio());
 	if(mAudio!=NULL){
-		mAudio->create(in,mimeType);
+		mAudio->create(stream,mimeType);
 		return true;
 	}
 	else{

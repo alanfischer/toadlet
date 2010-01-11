@@ -23,39 +23,49 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_IO_MEMORYOUTPUTSTREAM_H
-#define TOADLET_EGG_IO_MEMORYOUTPUTSTREAM_H
+#ifndef TOADLET_EGG_IO_MEMORYSTREAM_H
+#define TOADLET_EGG_IO_MEMORYSTREAM_H
 
-#include <toadlet/egg/io/OutputStream.h>
+#include <toadlet/egg/io/Stream.h>
 #include <toadlet/egg/Collection.h>
 
 namespace toadlet{
 namespace egg{
 namespace io{
 
-class TOADLET_API MemoryOutputStream:public OutputStream{
+// This does not properly support both reading & writing of the same stream
+// TODO: Unit test me
+class TOADLET_API MemoryStream:public Stream{
 public:
-	TOADLET_SHARED_POINTERS(MemoryOutputStream);
+	TOADLET_SHARED_POINTERS(MemoryStream);
 
-	MemoryOutputStream(char *data,int length,bool ownsData);
-	MemoryOutputStream();
-	virtual ~MemoryOutputStream();
+	MemoryStream(char *data,int length,bool ownsData);
+	MemoryStream(unsigned char *data,int length,bool ownsData);
+	MemoryStream(Stream::ptr stream); // Read all data from stream
+	MemoryStream();
+	virtual ~MemoryStream();
 
-	int write(const char *buffer,int length);
-	void reset();
-	void close();
+	virtual void close(){}
 
-	int getSize();
+	virtual bool isReadable(){return true;}
+	virtual int read(char *buffer,int length);
+
+	virtual bool isWriteable(){return true;}
+	virtual int write(const char *buffer,int length);
+
+	virtual bool reset();
+	virtual int length(){return mLength;}
+	virtual int position(){return mPosition;}
+	virtual bool seek(int offs);
+
 	char *getCurrentDataPointer();
 	char *getOriginalDataPointer();
 
 protected:
-	char *mOriginalData;
 	char *mData;
-	int mOriginalLength;
-	int mLeft;
-	int mSize;
 	Collection<char> *mInternalData;
+	int mLength;
+	int mPosition;
 
 	bool mOwnsData;
 };

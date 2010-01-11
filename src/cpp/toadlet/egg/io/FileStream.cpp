@@ -23,82 +23,66 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/io/FileInputStream.h>
+#include <toadlet/egg/io/FileStream.h>
 #include <toadlet/egg/Logger.h>
 
 namespace toadlet{
 namespace egg{
 namespace io{
 
-FileInputStream::FileInputStream(const String &filename){
+FileStream::FileStream(const String &filename,int openFlags){
 	Logger::excess(Categories::TOADLET_EGG,"Opening file: "+filename);
 
-	mFile=fopen(filename,"rb");
+	char *mode=NULL;
+	if((openFlags&OpenFlags_READ)>0 && (openFlags&OpenFlags_BINARY)>0) mode="rb";
+	else if((openFlags&OpenFlags_READ)>0) mode="r";
+	else if((openFlags&OpenFlags_WRITE)>0 && (openFlags&OpenFlags_BINARY)>0) mode="wb";
+	else if((openFlags&OpenFlags_WRITE)>0) mode="w";
+
+	mFile=fopen(filename,mode);
 	mAutoClose=true;
-
-	if(mFile!=NULL){
-		fseek(mFile,0,SEEK_END);
-		mLength=ftell(mFile);
-		fseek(mFile,0,SEEK_SET);
-	}
-	else{
-		mLength=0;
-	}
 }
 
-FileInputStream::~FileInputStream(){
-	if(mFile && mAutoClose){
-		fclose(mFile);
-		mFile=NULL;
-	}
+FileStream::~FileStream(){
+	close();
 }
 
-bool FileInputStream::isOpen() const{
+bool FileStream::isOpen() const{
 	return mFile!=NULL;
 }
 
-int FileInputStream::read(char *buffer,int length){
-	return fread(buffer,1,length,mFile);
-}
-
-bool FileInputStream::reset(){
-	if(mFile){
-		fseek(mFile,0,SEEK_SET);
-	}
-
-	return true;
-}
-
-bool FileInputStream::seek(int offs){
-	if(mFile){
-		fseek(mFile,offs,SEEK_SET);
-	}
-
-	return true;
-}
-
-int FileInputStream::available(){
-	if(mFile){
-		return mLength-ftell(mFile);
-	}
-	else{
-		return 0;
-	}
-}
-
-void FileInputStream::close(){
+void FileStream::close(){
 	if(mFile && mAutoClose){
 		fclose(mFile);
 		mFile=NULL;
-	}
+	} 
 }
 
-void FileInputStream::setFILE(FILE *file){
-	mFile=file;
+int FileStream::read(char *buffer,int length){
+	return fread(buffer,length,1,mFile);
 }
 
-FILE *FileInputStream::getFILE(){
-	return mFile;
+int FileStream::write(const char *buffer,int length){
+	return fwrite(buffer,length,1,mFile);
+}
+
+bool FileStream::reset(){
+	return seek(0);
+}
+
+int FileStream::length(){
+	int current=ftell(mFile);
+	int length=fseek(mFile,0,SEEK_END);
+	fseek(mFile,0,current);
+	return length;
+}
+
+int FileStream::position(){
+	return ftell(mFile);
+}
+
+bool FileStream::seek(int offs){
+	return fseek(mFile,offs,SEEK_SET)!=0;
 }
 
 }	

@@ -27,7 +27,7 @@
 #define TOADLET_EGG_IO_ARCHIVE_H
 
 #include <toadlet/egg/Resource.h>
-#include <toadlet/egg/io/InputStream.h>
+#include <toadlet/egg/io/Stream.h>
 
 namespace toadlet{
 namespace egg{
@@ -39,9 +39,9 @@ public:
 
 	virtual bool isResourceArchive() const=0;
 
-	virtual bool open(InputStream::ptr stream)=0;
+	virtual bool open(Stream::ptr stream)=0;
 
-	virtual InputStream::ptr openStream(const String &name)=0;
+	virtual Stream::ptr openStream(const String &name)=0;
 	virtual Resource::ptr openResource(const String &name)=0;
 };
 

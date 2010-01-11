@@ -40,17 +40,26 @@ public:
 	OggVorbisDecoder();
 	virtual ~OggVorbisDecoder();
 
-	bool startStream(egg::io::InputStream::ptr istream);
-	int read(char *buffer,int length);
-	bool stopStream();
-	bool reset();
-	bool seek(int offs);
 	void close();
-	int available();
+
+	bool isReadable(){return true;}
+	int read(char *buffer,int length);
+
+	bool isWriteable(){return false;}
+	int write(const char *buffer,int length){return 0;}
+
+	bool startStream(egg::io::Stream::ptr stream);
+	bool stopStream();
+
+	bool reset();
+	int length(){return 0;}
+	int position(){return 0;}
+	bool seek(int offs){return false;}
+
 	int getChannels();
 	int getSamplesPerSecond();
-	int getBitsPerSample();
-	egg::io::InputStream::ptr getParentStream();
+	int getBitsPerSample(){return 16;}
+	egg::io::Stream::ptr getParentStream(){return mStream;}
 
 private:
 	static size_t read_func(void *ptr,size_t size,size_t nmemb, void *datasource);
@@ -62,7 +71,7 @@ private:
 	vorbis_info *mVorbisInfo;
 	char mDataBuffer[OGGPACKETSIZE];
 	int mDataLength;
-	egg::io::InputStream::ptr mIn;
+	egg::io::Stream::ptr mStream;
 };
 
 }

@@ -41,7 +41,7 @@ public:
 	virtual ~ALAudio();
 
 	bool create(AudioBuffer::ptr buffer);
-	bool create(egg::io::InputStream::ptr in,const egg::String &mimeType);
+	bool create(egg::io::Stream::ptr stream,const egg::String &mimeType);
 	void destroy();
 
 	bool play();
