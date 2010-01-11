@@ -57,6 +57,7 @@ public:
 	inline float getPingWeighting() const{return mPingWeighting;}
 
 	bool connect(const egg::String &address,int port);
+	bool connect(int ip,int port);
 	bool accept();
 	bool disconnect();
 
