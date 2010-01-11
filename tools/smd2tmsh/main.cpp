@@ -1,7 +1,6 @@
 #include <toadlet/egg/Collection.h>
 #include <toadlet/egg/String.h>
-#include <toadlet/egg/io/FileInputStream.h>
-#include <toadlet/egg/io/FileOutputStream.h>
+#include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/mesh/Mesh.h>
 #include <toadlet/tadpole/handler/XMSHHandler.h>
@@ -83,14 +82,14 @@ int main(int argc,char **argv){
 
 		std::cout << "Loading " << (const char*)fileName << std::endl;
 
-		FileInputStream::ptr in(new FileInputStream(fileName));
-		if(in->isOpen()){
-			smd.load(in);
+		FileStream::ptr stream(new FileStream(fileName,FileStream::OpenFlags_READ|FileStream::OpenFlags_BINARY));
+		if(stream->isOpen()){
+			smd.load(stream);
 		}
 		else{
 			std::cout << "Error opening " << (const char*)fileName << std::endl;
 		}
-		in->close();
+		stream->close();
 	}
 
 	if(smd.getMesh()!=NULL){
@@ -100,12 +99,12 @@ int main(int argc,char **argv){
 
 		std::cout << "Saving " << (const char*)outputName << std::endl;
 
-		FileOutputStream::ptr out(new FileOutputStream(outputName));
-		if(out->isOpen()){
+		FileStream::ptr stream(new FileStream(outputName,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
+		if(stream->isOpen()){
 			XMSHHandler handler(NULL,NULL,NULL);
-			handler.save(smd.getMesh(),out);
+			handler.save(smd.getMesh(),stream);
 
-			out->close();
+			stream->close();
 
 			std::cout << "complete" << std::endl;
 		}

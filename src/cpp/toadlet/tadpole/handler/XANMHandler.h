@@ -26,7 +26,6 @@
 #ifndef TOADLET_TADPOLE_HANDLER_XANMHANDLER_H
 #define TOADLET_TADPOLE_HANDLER_XANMHANDLER_H
 
-#include <toadlet/egg/io/OutputStream.h>
 #include <toadlet/tadpole/ResourceHandler.h>
 #include <toadlet/tadpole/mesh/Sequence.h>
 
@@ -42,8 +41,8 @@ public:
 
 	XANMHandler();
 
-	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
-	bool save(mesh::Sequence::ptr resource,egg::io::OutputStream::ptr out);
+	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
+	bool save(mesh::Sequence::ptr resource,egg::io::Stream::ptr stream);
 
 protected:
 	mesh::Sequence::ptr loadSequenceVersion1(mxml_node_t *root);

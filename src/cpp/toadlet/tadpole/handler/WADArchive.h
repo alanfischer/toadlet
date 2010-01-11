@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_HANDLER_WADARCHIVE_H
 
 #include <toadlet/egg/io/Archive.h>
-#include <toadlet/egg/io/DataInputStream.h>
+#include <toadlet/egg/io/DataStream.h>
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/tadpole/TextureManager.h>
 
@@ -36,6 +36,7 @@ namespace tadpole{
 namespace handler{
 
 class TOADLET_API WADArchive:public egg::io::Archive,public egg::BaseResource{
+	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 public:
 	TOADLET_SHARED_POINTERS(WADArchive);
 
@@ -46,12 +47,10 @@ public:
 
 	bool isResourceArchive() const{return true;}
 
-	bool open(egg::io::InputStream::ptr stream);
+	bool open(egg::io::Stream::ptr stream);
 
-	egg::io::InputStream::ptr openStream(const egg::String &name){return NULL;}
+	egg::io::Stream::ptr openStream(const egg::String &name){return NULL;}
 	egg::Resource::ptr openResource(const egg::String &name);
-
-	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 	
 protected:
 	struct wheader{
@@ -80,7 +79,7 @@ protected:
 	unsigned char mInBuffer[640*480*85/64]; // Maxlump
 
 	toadlet::tadpole::TextureManager *mTextureManager;
-	toadlet::egg::io::DataInputStream::ptr mInputStream;
+	toadlet::egg::io::DataStream::ptr mStream;
 
 	wheader header;
 	egg::Collection<wlumpinfo> lumpinfos;

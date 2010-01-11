@@ -40,14 +40,14 @@ XMATHandler::XMATHandler(MaterialManager *materialManager,TextureManager *textur
 	mTextureManager=textureManager;
 }
 
-Resource::ptr XMATHandler::load(InputStream::ptr in,const ResourceHandlerData *handlerData){
+Resource::ptr XMATHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
 	Material::ptr material=NULL;
 
 	// TODO: Replace the following when mxml implements custom load/save callbacks
 	char buffer[1025];
 	int amount=0;
 	String string;
-	while((amount=in->read(buffer,1024))>0){
+	while((amount=stream->read(buffer,1024))>0){
 		buffer[amount]=0;
 		string+=buffer;
 	}
@@ -77,7 +77,7 @@ Resource::ptr XMATHandler::load(InputStream::ptr in,const ResourceHandlerData *h
 	return material;
 }
 
-bool XMATHandler::save(Material::ptr material,OutputStream::ptr out){
+bool XMATHandler::save(Material::ptr material,Stream::ptr stream){
 	mxml_node_t *root=mxmlNewElement(MXML_NO_PARENT,"XMAT");
 
 	int version=XMLMeshUtilities::version;
@@ -94,7 +94,7 @@ bool XMATHandler::save(Material::ptr material,OutputStream::ptr out){
 	}
 
 	char *string=mxmlSaveAllocString(root,XMLMeshUtilities::mxmlSaveCallback);
-	out->write(string,strlen(string));
+	stream->write(string,strlen(string));
 	free(string);
 
 	mxmlRelease(root);

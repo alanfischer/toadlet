@@ -23,28 +23,53 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_IO_INPUTSTREAM_H
-#define TOADLET_EGG_IO_INPUTSTREAM_H
+#ifndef TOADLET_EGG_IO_FILESTREAM_H
+#define TOADLET_EGG_IO_FILESTREAM_H
 
-#include <toadlet/Types.h>
-#include <toadlet/egg/WeakPointer.h>
+#include <toadlet/egg/io/Stream.h>
+#include <toadlet/egg/String.h>
+
+#include <stdio.h>
 
 namespace toadlet{
 namespace egg{
 namespace io{
 
-class InputStream{
+class TOADLET_API FileStream:public Stream{
 public:
-	TOADLET_SHARED_POINTERS(InputStream);
+	TOADLET_SHARED_POINTERS(FileStream);
 
-	virtual ~InputStream(){}
+	enum OpenFlags{
+		OpenFlags_READ=		1<<0,
+		OpenFlags_WRITE=	1<<1,
+		OpenFlags_CREATE=	1<<2,
+		OpenFlags_BINARY=	1<<3,
+	};
+	
+	FileStream(const String &filename,int openFlags);
+	virtual ~FileStream();
 
-	virtual int read(char *buffer,int length)=0;
-	virtual int readByte(){uint8 byte=0;read((char*)&byte,1);return byte;}
-	virtual bool reset()=0;
-	virtual bool seek(int offs)=0;
-	virtual int available()=0;
-	virtual void close()=0;
+	virtual bool isOpen() const;
+	virtual void close();
+
+	virtual bool isReadable(){return true;}
+	virtual int read(char *buffer,int length);
+
+	virtual bool isWriteable(){return true;}
+	virtual int write(const char *buffer,int length);
+
+	virtual bool reset();
+	virtual int length();
+	virtual int position();
+	virtual bool seek(int offs);
+
+	void setFILE(FILE *file){mFile=file;}
+	FILE *getFILE(){return mFile;}
+
+protected:
+	int mLength;
+	FILE *mFile;
+	bool mAutoClose;
 };
 
 }

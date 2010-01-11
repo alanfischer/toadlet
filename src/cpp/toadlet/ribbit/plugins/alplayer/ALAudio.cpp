@@ -81,10 +81,10 @@ bool ALAudio::create(AudioBuffer::ptr audioBuffer){
 	return true;
 }
 
-bool ALAudio::create(InputStream::ptr in,const String &mimeType){
+bool ALAudio::create(Stream::ptr stream,const String &mimeType){
 	destroy();
 
-	AudioStream::ptr decoder=mAudioPlayer->startAudioStream(in,mimeType);
+	AudioStream::ptr decoder=mAudioPlayer->startAudioStream(stream,mimeType);
 
 	if(decoder==NULL){
 		return false;

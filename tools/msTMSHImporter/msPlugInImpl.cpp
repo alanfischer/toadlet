@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "msPlugInImpl.h"
 
-#include <toadlet/egg/io/FileInputStream.h>
+#include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/handler/XMSHHandler.h>
@@ -211,14 +211,14 @@ int
 cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
     int i,j;
 
-	FileInputStream::ptr fin(new FileInputStream(name));
-	if(fin->isOpen()==false){
+	FileStream::ptr stream(new FileStream(name,FileStream::OpenFlags_READ|FileStream::OpenFlags_BINARY));
+	if(stream->isOpen()==false){
 		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error opening file",MB_OK);
 		return -1;
 	}
 
 	XMSHHandler::ptr handler(new XMSHHandler(NULL,NULL,NULL));
-	Mesh::ptr mesh=shared_static_cast<Mesh>(handler->load(fin,NULL));
+	Mesh::ptr mesh=shared_static_cast<Mesh>(handler->load(stream,NULL));
 	if(mesh==NULL){
 		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error loading file",MB_OK);
 		return -1;
@@ -464,14 +464,14 @@ int
 cPlugIn::importAnimation(msModel *pModel,const String &name,int flags){
 	Skeleton::ptr skeleton=buildSkeleton(pModel);
 
-	FileInputStream::ptr fin(new FileInputStream(name));
-	if(fin->isOpen()==false){
+	FileStream::ptr stream(new FileStream(name,FileStream::OpenFlags_READ|FileStream::OpenFlags_BINARY));
+	if(stream->isOpen()==false){
 		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error opening file",MB_OK);
 		return -1;
 	}
 
 	XANMHandler::ptr handler(new XANMHandler());
-	Sequence::ptr sequence=shared_static_cast<Sequence>(handler->load(fin,NULL));
+	Sequence::ptr sequence=shared_static_cast<Sequence>(handler->load(stream,NULL));
 	if(sequence==NULL){
 		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error loading file",MB_OK);
 		return -1;

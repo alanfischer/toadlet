@@ -47,10 +47,10 @@ RFCOMMConnection::RFCOMMConnection(BluetoothClient::ptr client):
 	mClient=client;
 
 	int maxSize=1024;
-	mOutPacket=MemoryOutputStream::ptr(new MemoryOutputStream(new char[maxSize],maxSize,true));
-	mDataOutPacket=DataOutputStream::ptr(new DataOutputStream(OutputStream::ptr(mOutPacket)));
-	mInPacket=MemoryInputStream::ptr(new MemoryInputStream(new char[maxSize],maxSize,true));
-	mDataInPacket=DataInputStream::ptr(new DataInputStream(InputStream::ptr(mInPacket)));
+	mOutPacket=MemoryStream::ptr(new MemoryStream(new char[maxSize],maxSize,true));
+	mDataOutPacket=DataStream::ptr(new DataStream(Stream::ptr(mOutPacket)));
+	mInPacket=MemoryStream::ptr(new MemoryStream(new char[maxSize],maxSize,true));
+	mDataInPacket=DataStream::ptr(new DataStream(Stream::ptr(mInPacket)));
 
 	mMutex=Mutex::ptr(new Mutex());
 	mThread=Thread::ptr(new Thread(this));
@@ -62,10 +62,10 @@ RFCOMMConnection::RFCOMMConnection(BluetoothServer::ptr server):
 	mServer=server;
 
 	int maxSize=1024;
-	mOutPacket=MemoryOutputStream::ptr(new MemoryOutputStream(new char[maxSize],maxSize,true));
-	mDataOutPacket=DataOutputStream::ptr(new DataOutputStream(OutputStream::ptr(mOutPacket)));
-	mInPacket=MemoryInputStream::ptr(new MemoryInputStream(new char[maxSize],maxSize,true));
-	mDataInPacket=DataInputStream::ptr(new DataInputStream(InputStream::ptr(mInPacket)));
+	mOutPacket=MemoryStream::ptr(new MemoryStream(new char[maxSize],maxSize,true));
+	mDataOutPacket=DataStream::ptr(new DataStream(Stream::ptr(mOutPacket)));
+	mInPacket=MemoryStream::ptr(new MemoryStream(new char[maxSize],maxSize,true));
+	mDataInPacket=DataStream::ptr(new DataStream(Stream::ptr(mInPacket)));
 
 	mMutex=Mutex::ptr(new Mutex());
 	mThread=Thread::ptr(new Thread(this));
@@ -191,10 +191,10 @@ int RFCOMMConnection::send(const char *data,int length){
 	mDataOutPacket->write(data,length);
 
 	if(mClient!=NULL){
-		length=mClient->send(mOutPacket->getOriginalDataPointer(),mOutPacket->getSize());
+		length=mClient->send(mOutPacket->getOriginalDataPointer(),mOutPacket->length());
 	}
 	else{
-		length=mServer->send(mOutPacket->getOriginalDataPointer(),mOutPacket->getSize());
+		length=mServer->send(mOutPacket->getOriginalDataPointer(),mOutPacket->length());
 	}
 	mOutPacket->reset();
 
@@ -250,29 +250,29 @@ bool RFCOMMConnection::updatePacketReceive(){
 	return amount>0;
 }
 
-int RFCOMMConnection::buildConnectionPacket(DataOutputStream *out){
+int RFCOMMConnection::buildConnectionPacket(DataStream *stream){
 	int size=0;
 
-	size+=out->writeBigInt32(CONNECTION_FRAME);
-	size+=out->write(CONNECTION_PACKET,CONNECTION_PACKET_LENGTH);
-	size+=out->writeBigInt32(CONNECTION_VERSION);
+	size+=stream->writeBigInt32(CONNECTION_FRAME);
+	size+=stream->write(CONNECTION_PACKET,CONNECTION_PACKET_LENGTH);
+	size+=stream->writeBigInt32(CONNECTION_VERSION);
 
 	return size; 
 }
 
-bool RFCOMMConnection::verifyConnectionPacket(DataInputStream *in){
-	int header=in->readBigInt32();
+bool RFCOMMConnection::verifyConnectionPacket(DataStream *stream){
+	int header=stream->readBigInt32();
 	if(header!=CONNECTION_FRAME){
 		return false;
 	}
 
 	char packet[CONNECTION_PACKET_LENGTH];
-	in->read(packet,CONNECTION_PACKET_LENGTH);
+	stream->read(packet,CONNECTION_PACKET_LENGTH);
 	if(memcmp(packet,CONNECTION_PACKET,CONNECTION_PACKET_LENGTH)!=0){
 		return false;
 	}
 
-	int version=in->readBigInt32();
+	int version=stream->readBigInt32();
 	if(version!=CONNECTION_VERSION){
 		return false;
 	}

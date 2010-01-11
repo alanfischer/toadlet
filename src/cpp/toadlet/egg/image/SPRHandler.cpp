@@ -24,8 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/image/SPRHandler.h>
-#include <toadlet/egg/io/DataInputStream.h>
-#include <toadlet/egg/io/DataOutputStream.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 
@@ -92,7 +90,7 @@ typedef struct{
 #define IDSPRITEHEADER	(('P'<<24)+('S'<<16)+('D'<<8)+'I')
 
 SPRHandler::SPRHandler():
-	mDataIn(NULL),
+	//mDataStream,
 	mSprite(NULL),
 	mPalette(NULL),
 	mNextFrame(0)
@@ -102,36 +100,36 @@ SPRHandler::~SPRHandler(){
 	closeFile();
 }
 
-bool SPRHandler::openFile(InputStream *in){
-	DataInputStream *dataIn=new DataInputStream(in);
+bool SPRHandler::openFile(Stream *stream){
+	DataStream::ptr dataStream(new DataStream(stream));
 
 	dsprite_t *sprite=new dsprite_t;
 
-	sprite->ident=dataIn->readLittleInt32();
-	sprite->version=dataIn->readLittleInt32();
+	sprite->ident=dataStream->readLittleInt32();
+	sprite->version=dataStream->readLittleInt32();
 	if(sprite->ident!=IDSPRITEHEADER || sprite->version!=SPRITE_VERSION){
 		delete sprite;
-		delete dataIn;
+		delete dataStream;
 		Error::unknown(Categories::TOADLET_EGG,"invalid sprite file or version");
 		return false;
 	}
 
-	sprite->type=dataIn->readLittleInt32();
-	sprite->texFormat=dataIn->readLittleInt32();
-	sprite->boundingradius=dataIn->readLittleFloat();
-	sprite->width=dataIn->readLittleInt32();
-	sprite->height=dataIn->readLittleInt32();
-	sprite->numframes=dataIn->readLittleInt32();
-	sprite->beamlength=dataIn->readLittleFloat();
-	sprite->synctype=(synctype_t)dataIn->readLittleInt32();
+	sprite->type=dataStream->readLittleInt32();
+	sprite->texFormat=dataStream->readLittleInt32();
+	sprite->boundingradius=dataStream->readLittleFloat();
+	sprite->width=dataStream->readLittleInt32();
+	sprite->height=dataStream->readLittleInt32();
+	sprite->numframes=dataStream->readLittleInt32();
+	sprite->beamlength=dataStream->readLittleFloat();
+	sprite->synctype=(synctype_t)dataStream->readLittleInt32();
 
 	short paletteSize=0;
-	paletteSize=dataIn->readLittleInt16();
+	paletteSize=dataStream->readLittleInt16();
 
 	unsigned char *palette=new unsigned char[paletteSize*3];
-	dataIn->read((char*)palette,paletteSize*3);
+	dataStream->read((char*)palette,paletteSize*3);
 
-	mDataIn=dataIn;
+	mDataStream=dataStream;
 	mSprite=sprite;
 	mPalette=palette;
 	mNextFrame=0;
@@ -140,9 +138,9 @@ bool SPRHandler::openFile(InputStream *in){
 }
 
 void SPRHandler::closeFile(){
-	if(mDataIn!=NULL){
-		delete mDataIn;
-		mDataIn=NULL;
+	if(mDataStream!=NULL){
+		mDataStream->close();
+		mDataStream=NULL;
 	}
 
 	if(mSprite!=NULL){
@@ -165,16 +163,16 @@ Image *SPRHandler::getNextImage(){
 	Image *image=NULL;
 
 	if(mNextFrame<((dsprite_t*)mSprite)->numframes){
-		frameType.type=(spriteframetype_t)mDataIn->readLittleInt32();
+		frameType.type=(spriteframetype_t)mDataStream->readLittleInt32();
 		if(frameType.type==SPR_SINGLE){
-			frame.origin[0]=mDataIn->readLittleInt32();
-			frame.origin[1]=mDataIn->readLittleInt32();
-			frame.width=mDataIn->readLittleInt32();
-			frame.height=mDataIn->readLittleInt32();
+			frame.origin[0]=mDataStream->readLittleInt32();
+			frame.origin[1]=mDataStream->readLittleInt32();
+			frame.width=mDataStream->readLittleInt32();
+			frame.height=mDataStream->readLittleInt32();
 
 			int readSize=(frame.width*frame.height);
 			unsigned char *data=new unsigned char[readSize];
-			mDataIn->read((char*)data,readSize);
+			mDataStream->read((char*)data,readSize);
 
 			image=new Image(Image::Dimension_D2,Image::Format_RGBA_8,frame.width,frame.height,1);
 			unsigned char *imageData=(unsigned char*)image->getData();
@@ -209,14 +207,14 @@ Image *SPRHandler::getNextImage(){
 	return image;
 }
 
-Image *SPRHandler::loadImage(InputStream *in){
-	if(in==NULL){
+Image *SPRHandler::loadImage(Stream *stream){
+	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_EGG,
-			"InputStream is NULL");
+			"Stream is NULL");
 		return NULL;
 	}
 
-	if(openFile(in)==false){
+	if(openFile(stream)==false){
 		Error::loadingImage(Categories::TOADLET_EGG,
 			"SPRHandler::loadImage: Invalid file");
 		return NULL;
@@ -229,20 +227,20 @@ Image *SPRHandler::loadImage(InputStream *in){
 	return image;
 }
 
-bool SPRHandler::saveImage(Image *image,OutputStream *out){
+bool SPRHandler::saveImage(Image *image,Stream *stream){
 	Error::unimplemented(Categories::TOADLET_EGG,
 		"SPRHandler::saveImage: Not implemented");
 	return false;
 }
 
-bool SPRHandler::loadAnimatedImage(InputStream *in,Collection<Image*> &images){
-	if(in==NULL){
+bool SPRHandler::loadAnimatedImage(Stream *stream,Collection<Image*> &images){
+	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_EGG,
-			"InputStream is NULL");
+			"Stream is NULL");
 		return false;
 	}
 
-	if(openFile(in)==false){
+	if(openFile(stream)==false){
 		Error::loadingImage(Categories::TOADLET_EGG,
 			"SPRHandler::loadImage: Invalid file");
 		return false;

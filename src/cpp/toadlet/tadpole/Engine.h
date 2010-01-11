@@ -74,7 +74,7 @@ public:
 
 	void setDirectory(const egg::String &directory){mArchiveManager->setDirectory(directory);}
 	const egg::String &getDirectory() const{return mArchiveManager->getDirectory();}
-	egg::io::InputStream::ptr openStream(const egg::String &name){return mArchiveManager->openStream(name);}
+	egg::io::Stream::ptr openStream(const egg::String &name){return mArchiveManager->openStream(name);}
 
 	// Node methods
 	node::Node *allocNode(const egg::BaseType<node::Node> &type);

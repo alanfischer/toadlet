@@ -48,8 +48,8 @@ Win32AudioBuffer::~Win32AudioBuffer(){
 	destroy();
 }
 
-bool Win32AudioBuffer::create(InputStream::ptr inputStream,const String &mimeType){
-	AudioStream::ptr decoder=mAudioPlayer->startAudioStream(inputStream,mimeType);
+bool Win32AudioBuffer::create(Stream::ptr stream,const String &mimeType){
+	AudioStream::ptr decoder=mAudioPlayer->startAudioStream(stream,mimeType);
 	if(decoder==NULL){
 		return false;
 	}

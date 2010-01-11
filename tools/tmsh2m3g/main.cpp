@@ -1,5 +1,5 @@
 #include <toadlet/egg/String.h>
-#include <toadlet/egg/io/FileOutputStream.h>
+#include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/MeshManager.h>
 
@@ -105,11 +105,11 @@ int main(int argc,char **argv){
 	// Prepare the output file
 	int loc=mshFileName.rfind('.');
 	String m3gFileName=mshFileName.substr(0,loc)+String(".m3g");
-	FileOutputStream fout(m3gFileName);
+	FileStream::ptr stream(new FileStream(m3gFileName,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
 
 	// Write to .mmsh format
 	M3GConverter converter;
-	bool result=converter.convertMesh(mesh,&fout,scale,forceBytes,true,viewable,animation);
+	bool result=converter.convertMesh(mesh,stream,scale,forceBytes,true,viewable,animation);
 
 	if(result){
 		std::cout << "complete" << std::endl;

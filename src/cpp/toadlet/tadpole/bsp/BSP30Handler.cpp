@@ -47,11 +47,10 @@ BSP30Handler::BSP30Handler(Engine *engine):ResourceHandler(),
 
 BSP30Handler::~BSP30Handler(){}
 
-Resource::ptr BSP30Handler::load(InputStream::ptr in,const ResourceHandlerData *handlerData){
-	DataInputStream::ptr din(new DataInputStream(in));
-
-	header.version=din->readLittleInt32();
-	din->reset();
+Resource::ptr BSP30Handler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+	DataStream::ptr dataStream(new DataStream(stream));
+	header.version=dataStream->readLittleInt32();
+	dataStream->reset();
 
 	if(header.version!=BSPVERSION){
 		Error::unknown(String("incorrect bsp version:")+header.version);
@@ -60,7 +59,7 @@ Resource::ptr BSP30Handler::load(InputStream::ptr in,const ResourceHandlerData *
 
 	Logger::debug(Categories::TOADLET_TADPOLE,"Reading map");
 
-	in->read((char*)&header,sizeof(header));
+	stream->read((char*)&header,sizeof(header));
 
 	bmodel *models;		int nmodels;
 	bvertex *vertexes;	int nvertexes;
@@ -78,21 +77,21 @@ Resource::ptr BSP30Handler::load(InputStream::ptr in,const ResourceHandlerData *
 	void *lighting;		int nlighting;
 	char *entities;		int nentities;
 
-	readLump(in,LUMP_MODELS,(void**)&models,sizeof(bmodel),&nmodels);
-	readLump(in,LUMP_VERTEXES,(void**)&vertexes,sizeof(bvertex),&nvertexes);
-	readLump(in,LUMP_PLANES,(void**)&planes,sizeof(bplane),&nplanes);
-	readLump(in,LUMP_LEAFS,(void**)&leafs,sizeof(bleaf),&nleafs);
-	readLump(in,LUMP_NODES,(void**)&nodes,sizeof(bnode),&nnodes);
-	readLump(in,LUMP_TEXINFO,(void**)&texinfos,sizeof(btexinfo),&ntexinfos);
-	readLump(in,LUMP_CLIPNODES,(void**)&clipnodes,sizeof(bclipnode),&nclipnodes);
-	readLump(in,LUMP_FACES,(void**)&faces,sizeof(bface),&nfaces);
-	readLump(in,LUMP_MARKSURFACES,(void**)&marksurfaces,sizeof(bmarksurface),&nmarksurfaces);
-	readLump(in,LUMP_SURFEDGES,(void**)&surfedges,sizeof(bsurfedge),&nsurfedges);
-	readLump(in,LUMP_EDGES,(void**)&edges,sizeof(bedge),&nedges);
-	readLump(in,LUMP_VISIBILITY,(void**)&visibility,1,&nvisibility);
-	readLump(in,LUMP_TEXTURES,(void**)&textures,1,&ntextures);
-	readLump(in,LUMP_LIGHTING,(void**)&lighting,1,&nlighting);
-	readLump(in,LUMP_ENTITIES,(void**)&entities,1,&nentities);
+	readLump(stream,LUMP_MODELS,(void**)&models,sizeof(bmodel),&nmodels);
+	readLump(stream,LUMP_VERTEXES,(void**)&vertexes,sizeof(bvertex),&nvertexes);
+	readLump(stream,LUMP_PLANES,(void**)&planes,sizeof(bplane),&nplanes);
+	readLump(stream,LUMP_LEAFS,(void**)&leafs,sizeof(bleaf),&nleafs);
+	readLump(stream,LUMP_NODES,(void**)&nodes,sizeof(bnode),&nnodes);
+	readLump(stream,LUMP_TEXINFO,(void**)&texinfos,sizeof(btexinfo),&ntexinfos);
+	readLump(stream,LUMP_CLIPNODES,(void**)&clipnodes,sizeof(bclipnode),&nclipnodes);
+	readLump(stream,LUMP_FACES,(void**)&faces,sizeof(bface),&nfaces);
+	readLump(stream,LUMP_MARKSURFACES,(void**)&marksurfaces,sizeof(bmarksurface),&nmarksurfaces);
+	readLump(stream,LUMP_SURFEDGES,(void**)&surfedges,sizeof(bsurfedge),&nsurfedges);
+	readLump(stream,LUMP_EDGES,(void**)&edges,sizeof(bedge),&nedges);
+	readLump(stream,LUMP_VISIBILITY,(void**)&visibility,1,&nvisibility);
+	readLump(stream,LUMP_TEXTURES,(void**)&textures,1,&ntextures);
+	readLump(stream,LUMP_LIGHTING,(void**)&lighting,1,&nlighting);
+	readLump(stream,LUMP_ENTITIES,(void**)&entities,1,&nentities);
 
 	#ifdef TOADLET_BIG_ENDIAN
 		int i,j;
@@ -306,13 +305,13 @@ Resource::ptr BSP30Handler::load(InputStream::ptr in,const ResourceHandlerData *
 	return map;
 }
 
-void BSP30Handler::readLump(InputStream *in,int lump,void **data,int size,int *count){
+void BSP30Handler::readLump(Stream *stream,int lump,void **data,int size,int *count){
 	int length=header.lumps[lump].filelen;
 	int ofs=header.lumps[lump].fileofs;
 
-	in->seek(ofs);
+	stream->seek(ofs);
 	*data=malloc(length);
-	in->read((char*)*data,length);
+	stream->read((char*)*data,length);
 
 	if(count!=NULL){
 		*count=length/size;

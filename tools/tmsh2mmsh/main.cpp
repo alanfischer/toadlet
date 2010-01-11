@@ -1,5 +1,5 @@
 #include <toadlet/egg/String.h>
-#include <toadlet/egg/io/FileOutputStream.h>
+#include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/mesh/Mesh.h>
 
@@ -95,11 +95,11 @@ int main(int argc,char **argv){
 	// Prepare the output file
 	int loc=mshFileName.rfind('.');
 	String mmshFileName=mshFileName.substr(0,loc)+String(".mmsh");
-	FileOutputStream fout(mmshFileName);
+	FileStream::ptr stream(new FileStream(mmshFileName,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
 
 	// Write to .mmsh format
 	MicroMeshConverter converter;
-	bool result=converter.convertMesh(mesh,&fout,scale,forceBytes,true);
+	bool result=converter.convertMesh(mesh,stream,scale,forceBytes,true);
 
 	if(result){
 		std::cout << "complete" << std::endl;

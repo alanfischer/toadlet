@@ -38,6 +38,8 @@ extern "C"{
 	#pragma comment(lib,TOADLET_ZLIB_NAME)
 #endif
 
+using namespace toadlet::egg::io;
+
 namespace toadlet{
 namespace egg{
 namespace image{
@@ -51,21 +53,21 @@ PNGHandler::~PNGHandler(){
 void toadlet_png_read_data(png_structp png_ptr,png_bytep data,png_size_t length){
 	png_size_t check; 
 
-	io::InputStream *in=(io::InputStream*)png_ptr->io_ptr;
-	check=(png_size_t)in->read((char*)data,length);
+	Stream *stream=(Stream*)png_ptr->io_ptr;
+	check=(png_size_t)stream->read((char*)data,length);
 
 	if(check!=length){
 		png_error(png_ptr,"Data read length mismatch");
 	}
 }
 
-Image *PNGHandler::loadImage(io::InputStream *in){
+Image *PNGHandler::loadImage(io::Stream *stream){
 	png_byte header[8];
 	int y;
 
-	if(in==NULL){
+	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_EGG,
-			"InputStream is NULL");
+			"Stream is NULL");
 		return NULL;
 	}
 
@@ -78,7 +80,7 @@ Image *PNGHandler::loadImage(io::InputStream *in){
 	int number_of_passes;
 	png_bytep *row_pointers;
 	
-	in->read((char*)header,8);
+	stream->read((char*)header,8);
 	if(png_sig_cmp(header,0,8)){
 		Error::loadingImage(Categories::TOADLET_EGG,
 			"PNGHandler::loadImage: Not a PNG file");
@@ -109,7 +111,7 @@ Image *PNGHandler::loadImage(io::InputStream *in){
 		return NULL;
 	}
 
-	png_set_read_fn(png_ptr,in,toadlet_png_read_data);
+	png_set_read_fn(png_ptr,stream,toadlet_png_read_data);
 	png_set_sig_bytes(png_ptr,8);
 	png_read_info(png_ptr,info_ptr);
 
@@ -236,7 +238,7 @@ Image *PNGHandler::loadImage(io::InputStream *in){
 	return image;
 }
 
-bool PNGHandler::saveImage(Image *image,io::OutputStream *out){
+bool PNGHandler::saveImage(Image *image,Stream *stream){
 	Error::unimplemented(Categories::TOADLET_EGG,
 		"PNGHandler::saveImage: Not implemented");
 	return false;

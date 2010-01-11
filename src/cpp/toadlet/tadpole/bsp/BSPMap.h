@@ -38,6 +38,7 @@ namespace tadpole{
 namespace bsp{
 
 class TOADLET_API BSPMap:public egg::BaseResource{
+	TOADLET_BASERESOURCE_PASSTHROUGH(BaseResource);
 public:
 	TOADLET_SHARED_POINTERS(BSPMap);
 
@@ -78,8 +79,6 @@ public:
 		unsigned offsets[MIPLEVELS];  // four mip maps stored
 	};
 	egg::Collection<unsigned char> lighting;
-
-	TOADLET_BASERESOURCE_PASSTHROUGH(BaseResource);
 };
 
 }

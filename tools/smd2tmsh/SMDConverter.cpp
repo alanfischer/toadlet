@@ -52,7 +52,7 @@ SMDConverter::SMDConverter(Engine *engine):
 	mEngine=engine;
 }
 
-void SMDConverter::load(toadlet::egg::io::InputStream *in){
+void SMDConverter::load(toadlet::egg::io::Stream *in){
 	int block=Block_NONE;
 	int version=0;
 	bool reference=false;
@@ -302,11 +302,11 @@ void SMDConverter::load(toadlet::egg::io::InputStream *in){
 	}
 }
 
-String SMDConverter::readLine(InputStream *in){
+String SMDConverter::readLine(Stream *stream){
 	String string;
 	char c=0;
-	while(in->available()>0){
-		c=in->readByte();
+	while(stream->length()>stream->position()){
+		stream->read(&c,1);
 		if(c==(char)10){
 			break;
 		}

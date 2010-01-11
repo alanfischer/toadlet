@@ -42,14 +42,15 @@ extern "C"{
 	#pragma comment(lib,TOADLET_LIBJPEG_NAME)
 #endif
 
+using namespace toadlet::egg::io;
+
 namespace toadlet{
 namespace egg{
 namespace image{
 
 typedef struct{
 	struct jpeg_source_mgr pub;
-	io::InputStream *in;
-	io::PushbackInputStream *pin;
+	Stream *stream;
 	JOCTET * buffer;
 	bool start_of_file;
 	int bufsize;
@@ -78,7 +79,7 @@ boolean toadlet_fill_input_buffer(j_decompress_ptr cinfo){
 	toadlet_src_mgr *src=(toadlet_src_mgr*)cinfo->src;
 	size_t nbytes;
 
-	nbytes=src->in->read((char*)src->buffer,src->bufsize);
+	nbytes=src->stream->read((char*)src->buffer,src->bufsize);
 
 	if(nbytes<=0){
 		if(src->start_of_file){
@@ -121,12 +122,12 @@ void toadlet_term_source(j_decompress_ptr cinfo){
 	toadlet_src_mgr *src;
 	src=(toadlet_src_mgr*)cinfo->src;
 
-	if(src->pin!=NULL){
-		src->pin->unread((char*)src->pub.next_input_byte,src->pub.bytes_in_buffer);
-	}
+//	if(src->pin!=NULL){
+//		src->pin->unread((char*)src->pub.next_input_byte,src->pub.bytes_in_buffer);
+//	}
 }
 
-void toadlet_InputStream_src(j_decompress_ptr cinfo,io::InputStream *in,io::PushbackInputStream *pin){
+void toadlet_InputStream_src(j_decompress_ptr cinfo,io::Stream *stream){
 	toadlet_src_mgr *src;
 
 	/* The source object and input buffer are made permanent so that a series
@@ -140,12 +141,7 @@ void toadlet_InputStream_src(j_decompress_ptr cinfo,io::InputStream *in,io::Push
 		cinfo->src=(struct jpeg_source_mgr*)new toadlet_src_mgr();
 		src=(toadlet_src_mgr*)cinfo->src;
 
-		if(pin==NULL){
-			src->bufsize=TOADLET_JPEG_BUFFER_SIZE*sizeof(JOCTET);
-		}
-		else{
-			src->bufsize=pin->getSize();
-		}
+		src->bufsize=TOADLET_JPEG_BUFFER_SIZE*sizeof(JOCTET);
 
 		src->buffer=(JOCTET*)(*cinfo->mem->alloc_small)((j_common_ptr)cinfo,JPOOL_PERMANENT,src->bufsize);
 	}
@@ -156,8 +152,7 @@ void toadlet_InputStream_src(j_decompress_ptr cinfo,io::InputStream *in,io::Push
 	src->pub.skip_input_data=toadlet_skip_input_data;
 	src->pub.resync_to_restart=jpeg_resync_to_restart; /* use default method */
 	src->pub.term_source=toadlet_term_source;
-	src->in=in;
-	src->pin=pin;
+	src->stream=stream;
 	src->pub.bytes_in_buffer=0; /* forces fill_input_buffer on first read */
 	src->pub.next_input_byte=NULL; /* until buffer loaded */
 }
@@ -187,7 +182,7 @@ JPEGHandler::JPEGHandler(){
 JPEGHandler::~JPEGHandler(){
 }
 
-Image *JPEGHandler::loadImage(io::InputStream *in,io::PushbackInputStream *pin){
+Image *JPEGHandler::loadImage(io::Stream *stream){
 	struct jpeg_decompress_struct cinfo;
 	struct toadlet_error_mgr jerr;
 	JSAMPARRAY buffer;
@@ -210,7 +205,7 @@ Image *JPEGHandler::loadImage(io::InputStream *in,io::PushbackInputStream *pin){
 
 	jpeg_create_decompress(&cinfo);
 
-	toadlet_InputStream_src(&cinfo,in,pin);
+	toadlet_InputStream_src(&cinfo,stream);
 
 	jpeg_read_header(&cinfo,true);
 
@@ -268,15 +263,7 @@ Image *JPEGHandler::loadImage(io::InputStream *in,io::PushbackInputStream *pin){
 	return image;
 }
 
-Image *JPEGHandler::loadImage(io::InputStream *in){
-	return loadImage(in,NULL);
-}
-
-Image *JPEGHandler::loadImage(io::PushbackInputStream *pin){
-	return loadImage(pin,pin);
-}
-
-bool JPEGHandler::saveImage(Image *image,io::OutputStream *out){
+bool JPEGHandler::saveImage(Image *image,io::Stream *stream){
 	Error::loadingImage(Categories::TOADLET_EGG,
 		"JPEGHandler::saveImage: Not implemented");
 	return false;

@@ -222,9 +222,9 @@ Resource::ptr ResourceManager::findFromFile(const String &name,const ResourceHan
 	if(extension!=(char*)NULL){
 		ExtensionHandlerMap::iterator it=mExtensionHandlerMap.find(extension);
 		if(it!=mExtensionHandlerMap.end()){
-			InputStream::ptr in=mArchive->openStream(filename);
-			if(in!=NULL){
-				return Resource::ptr(it->second->load(in,handlerData));
+			Stream::ptr stream=mArchive->openStream(filename);
+			if(stream!=NULL){
+				return Resource::ptr(it->second->load(stream,handlerData));
 			}
 			else{
 				Error::unknown(Categories::TOADLET_TADPOLE,
@@ -233,9 +233,9 @@ Resource::ptr ResourceManager::findFromFile(const String &name,const ResourceHan
 			}
 		}
 		else if(mDefaultHandler!=NULL){
-			InputStream::ptr in=mArchive->openStream(filename);
-			if(in!=NULL){
-				return Resource::ptr(mDefaultHandler->load(in,handlerData));
+			Stream::ptr stream=mArchive->openStream(filename);
+			if(stream!=NULL){
+				return Resource::ptr(mDefaultHandler->load(stream,handlerData));
 			}
 			else{
 				Error::unknown(Categories::TOADLET_TADPOLE,

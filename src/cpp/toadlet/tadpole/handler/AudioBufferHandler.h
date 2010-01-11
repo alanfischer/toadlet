@@ -42,7 +42,7 @@ public:
 
 	void setAudioPlayer(ribbit::AudioPlayer *player);
 
-	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
+	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
 
 protected:
 	ribbit::AudioPlayer *mAudioPlayer;

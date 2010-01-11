@@ -2,7 +2,7 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Extents.h>
-#include <toadlet/egg/io/DataOutputStream.h>
+#include <toadlet/egg/io/DataStream.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/tadpole/Material.h>
@@ -30,14 +30,14 @@ MicroMeshConverter::~MicroMeshConverter(){
 	actcDelete(mTC);
 }
 
-bool MicroMeshConverter::convertMesh(Mesh *mesh,OutputStream *outStream,float meshScale,int forceBytes,bool invertYTexCoord){
+bool MicroMeshConverter::convertMesh(Mesh *mesh,Stream *outStream,float meshScale,int forceBytes,bool invertYTexCoord){
 	int i,j,k;
 
 	if(meshScale==0){
 		Logger::alert("Using a scale of 0!");
 	}
 
-	DataOutputStream::ptr out(new DataOutputStream(outStream));
+	DataStream::ptr out(new DataStream(outStream));
 
 	// Header
 	out->write("TMMH",4);

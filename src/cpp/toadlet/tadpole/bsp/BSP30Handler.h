@@ -41,7 +41,7 @@ public:
 	BSP30Handler(Engine *engine);
 	virtual ~BSP30Handler();
 
-	virtual egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
+	virtual egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
 
 protected:
 	static const int BSPVERSION=30;
@@ -176,7 +176,7 @@ protected:
 		unsigned short v[2];
 	};
 
-	void readLump(egg::io::InputStream *in,int lump,void **data,int size,int *count);
+	void readLump(egg::io::Stream *stream,int lump,void **data,int size,int *count);
 	void buildBrushes(BSPMap *map,int node,egg::Collection<Plane> &planes,egg::Collection<Plane> &brushPlanes);
 	void findBrushPlanes(egg::Collection<Plane> &brushPlanes,const egg::Collection<Plane> &planes);
 

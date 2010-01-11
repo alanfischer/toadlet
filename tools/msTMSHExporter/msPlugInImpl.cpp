@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "msPlugInImpl.h"
 
-#include <toadlet/egg/io/FileOutputStream.h>
+#include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/handler/XMSHHandler.h>
@@ -377,10 +377,10 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 		mesh->skeleton=buildSkeleton(pModel,emptyBones);
 	}
 
-	FileOutputStream::ptr fout(new FileOutputStream(name));
+	FileStream::ptr stream(new FileStream(name,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
 	XMSHHandler::ptr handler(new XMSHHandler(NULL,NULL,NULL));
 
-	handler->save(mesh,fout);
+	handler->save(mesh,stream);
 
 	delete engine;
 
@@ -684,10 +684,10 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 
 	sequence->length=maxTime/fps;
 
-	FileOutputStream::ptr fout(new FileOutputStream(name));
+	FileStream::ptr stream(new FileStream(name,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
 	XANMHandler::ptr handler(new XANMHandler());
 
-	handler->save(sequence,fout);
+	handler->save(sequence,stream);
 
 	delete engine;
 

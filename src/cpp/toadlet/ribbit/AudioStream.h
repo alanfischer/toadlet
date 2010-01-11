@@ -27,24 +27,24 @@
 #define TOADLET_RIBBIT_AUDIOSTREAM_H
 
 #include <toadlet/ribbit/Types.h>
-#include <toadlet/egg/io/InputStream.h>
+#include <toadlet/egg/io/Stream.h>
 
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API AudioStream:public egg::io::InputStream{
+class TOADLET_API AudioStream:public egg::io::Stream{
 public:
 	TOADLET_SHARED_POINTERS(AudioStream);
 
 	virtual ~AudioStream(){}
 
-	virtual bool startStream(egg::io::InputStream::ptr in)=0;
+	virtual bool startStream(egg::io::Stream::ptr stream)=0;
 	virtual bool stopStream()=0;
 	virtual int getBitsPerSample()=0;
 	virtual int getChannels()=0;
 	virtual int getSamplesPerSecond()=0;
 
-	virtual egg::io::InputStream::ptr getParentStream()=0;
+	virtual egg::io::Stream::ptr getParentStream()=0;
 };
 
 }

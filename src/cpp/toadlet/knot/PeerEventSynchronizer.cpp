@@ -54,10 +54,10 @@ PeerEventSynchronizer::PeerEventSynchronizer(Connection::ptr connection,EventFac
 	//mLocalEventGroups,
 	//mRemoteEventGroups
 {
-	mPacketIn=MemoryInputStream::ptr(new MemoryInputStream(new char[1024],1024,true));
-	mDataPacketIn=DataInputStream::ptr(new DataInputStream(InputStream::ptr(mPacketIn)));
-	mPacketOut=MemoryOutputStream::ptr(new MemoryOutputStream());
-	mDataPacketOut=DataOutputStream::ptr(new DataOutputStream(OutputStream::ptr(mPacketOut)));
+	mPacketIn=MemoryStream::ptr(new MemoryStream(new char[1024],1024,true));
+	mDataPacketIn=DataStream::ptr(new DataStream(Stream::ptr(mPacketIn)));
+	mPacketOut=MemoryStream::ptr(new MemoryStream());
+	mDataPacketOut=DataStream::ptr(new DataStream(Stream::ptr(mPacketOut)));
 
 	mIncomingEvents=EventGroup::ptr(new EventGroup());
 	mOutgoingEvents=EventGroup::ptr(new EventGroup());
@@ -115,7 +115,7 @@ PeerEventSynchronizer::PeerStatus PeerEventSynchronizer::update(){
 	Event::ptr event;
 	int frameAdvance=0;
 
-	while((amount=mConnection->receive(mPacketIn->getOriginalDataPointer(),mPacketIn->getSize()))>0){
+	while((amount=mConnection->receive(mPacketIn->getOriginalDataPointer(),mPacketIn->length()))>0){
 		int remoteFrame=mDataPacketIn->readBigInt32();
 		if(remoteFrame==0 || remoteFrame<mFrame || remoteFrame>mFrame+MAX_FRAME_DIFFERENCE){
 			Logger::warning(Categories::TOADLET_KNOT,
@@ -254,7 +254,7 @@ PeerEventSynchronizer::PeerStatus PeerEventSynchronizer::update(){
 					event->write(mDataPacketOut);
 				}
 			}
-			amount=mConnection->send(mPacketOut->getOriginalDataPointer(),mPacketOut->getSize());
+			amount=mConnection->send(mPacketOut->getOriginalDataPointer(),mPacketOut->length());
 
 			mPacketOut->reset();
 		}

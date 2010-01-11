@@ -29,14 +29,15 @@
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/egg/Map.h>
 #include <toadlet/egg/io/Archive.h>
-#include <toadlet/egg/io/DataInputStream.h>
-#include <toadlet/egg/io/MemoryInputStream.h>
+#include <toadlet/egg/io/DataStream.h>
+#include <toadlet/egg/io/MemoryStream.h>
 
 namespace toadlet{
 namespace egg{
 namespace io{
 
 class TOADLET_API TPKGArchive:public Archive,public BaseResource{
+	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 public:
 	TOADLET_SHARED_POINTERS(TPKGArchive);
 
@@ -47,13 +48,11 @@ public:
 
 	bool isResourceArchive() const{return false;}
 
-	bool open(MemoryInputStream::ptr memoryInputStream);
-	bool open(InputStream::ptr inputStream);
+	bool open(MemoryStream::ptr memoryStream);
+	bool open(Stream::ptr stream);
 
-	InputStream::ptr openStream(const String &name);
+	Stream::ptr openStream(const String &name);
 	Resource::ptr openResource(const String &name){return NULL;}
-
-	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 
 protected:
 	class Index{
@@ -64,8 +63,8 @@ protected:
 
 	Map<String,Index> mIndex;
 	int mDataOffset;
-	DataInputStream::ptr mInputStream;
-	MemoryInputStream::ptr mMemoryInputStream;
+	DataStream::ptr mStream;
+	MemoryStream::ptr mMemoryStream;
 };
 
 }

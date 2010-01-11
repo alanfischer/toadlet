@@ -26,8 +26,7 @@
 #ifndef TOADLET_EGG_EVENT_H
 #define TOADLET_EGG_EVENT_H
 
-#include <toadlet/egg/io/DataInputStream.h>
-#include <toadlet/egg/io/DataOutputStream.h>
+#include <toadlet/egg/io/DataStream.h>
 
 namespace toadlet{
 namespace egg{
@@ -42,8 +41,8 @@ public:
 
 	inline int getType() const{return mType;}
 
-	virtual int read(io::DataInputStream *in){return 0;}
-	virtual int write(io::DataOutputStream *out){return 0;}
+	virtual int read(io::DataStream *stream){return 0;}
+	virtual int write(io::DataStream *stream){return 0;}
 
 protected:
 	int mType;

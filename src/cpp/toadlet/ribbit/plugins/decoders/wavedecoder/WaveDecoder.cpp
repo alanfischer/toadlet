@@ -82,17 +82,17 @@ WaveDecoder::~WaveDecoder(){
 	mSize=0;
 }
 
-bool WaveDecoder::startStream(InputStream::ptr in){
+bool WaveDecoder::startStream(Stream::ptr stream){
 	RIFFHEADER header;
 	CHUNKHEADER chunk;
 	WAVEFORMAT fmt;
 
-	mIn=in;
+	mStream=stream;
 	mChannels=1;
 	mBitsPerSample=16;
 	mSamplesPerSecond=22050;
 
-	if(in->read((char*)&header,sizeof(header))!=sizeof(header)){
+	if(stream->read((char*)&header,sizeof(header))!=sizeof(header)){
 		return false;
 	}
 
@@ -109,7 +109,7 @@ bool WaveDecoder::startStream(InputStream::ptr in){
 	header.dwSize += (header.dwSize & 1) - sizeof(header.fccType);
 
 	while(header.dwSize>0){
-		if(in->read((char*)&chunk,sizeof(chunk))!=sizeof(chunk)){
+		if(stream->read((char*)&chunk,sizeof(chunk))!=sizeof(chunk)){
 			break;
 		}
 
@@ -120,7 +120,7 @@ bool WaveDecoder::startStream(InputStream::ptr in){
 		chunk.dwSize+=chunk.dwSize & 1;
 
 		if(memcmp(&chunk.fccTag,"fmt ",4)==0){
-			if(in->read((char*)&fmt,sizeof(fmt))!=sizeof(fmt)){
+			if(stream->read((char*)&fmt,sizeof(fmt))!=sizeof(fmt)){
 				break;
 			}
 
@@ -135,30 +135,30 @@ bool WaveDecoder::startStream(InputStream::ptr in){
 			mBitsPerSample=fmt.wBitsPerSample;
 			mSamplesPerSecond=fmt.nSamplesPerSec;
 
-			skip(in,chunk.dwSize-sizeof(fmt));
+			skip(stream,chunk.dwSize-sizeof(fmt));
 		}
 		else if(memcmp(&chunk.fccTag,"data",4)==0){
 			if(fmt.wFormatTag==WAVE_Format_PCM){
 				mSize=chunk.dwSize;
 				mData=new char[chunk.dwSize];
-				if(in->read(mData,chunk.dwSize)!=chunk.dwSize){
+				if(stream->read(mData,chunk.dwSize)!=chunk.dwSize){
 					break;
 				}
 			}
 			else if(fmt.wFormatTag==WAVE_Format_IMA_ADPCM){
 				mSize=4*chunk.dwSize;
 				mData=new char[4*chunk.dwSize];
-				if(in->read(mData+3*chunk.dwSize,chunk.dwSize)!=chunk.dwSize){
+				if(stream->read(mData+3*chunk.dwSize,chunk.dwSize)!=chunk.dwSize){
 					break;
 				}
 				ADPCMDecoder(mData+3*chunk.dwSize,(short*)mData,chunk.dwSize);
 			}
 			else{
-				skip(in,chunk.dwSize);
+				skip(stream,chunk.dwSize);
 			}
 		}
 		else{
-			skip(in,chunk.dwSize);
+			skip(stream,chunk.dwSize);
 		}
 
 		header.dwSize-=chunk.dwSize+sizeof(chunk);
@@ -185,40 +185,12 @@ bool WaveDecoder::stopStream(){
 
 bool WaveDecoder::reset(){
 	mPosition=0;
-
 	return true;
 }
 
-bool WaveDecoder::seek(int offs){
-	return false;
-}
-
-int WaveDecoder::available(){
-	return 0;
-}
-
-void WaveDecoder::close(){
-}
-
-int WaveDecoder::getChannels(){
-	return mChannels;
-}
-
-int WaveDecoder::getSamplesPerSecond(){
-	return mSamplesPerSecond;
-}
-
-int WaveDecoder::getBitsPerSample(){
-	return mBitsPerSample;
-}
-
-InputStream::ptr WaveDecoder::getParentStream(){
-	return mIn;
-}
-
-void WaveDecoder::skip(InputStream::ptr in,int amount){
+void WaveDecoder::skip(Stream::ptr stream,int amount){
 	char *skipBuffer=new char[amount];
-	in->read(skipBuffer,amount);
+	stream->read(skipBuffer,amount);
 	delete[] skipBuffer;
 }
 

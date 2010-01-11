@@ -24,9 +24,8 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/System.h>
-#include <toadlet/egg/io/InputStream.h>
-#include <toadlet/egg/io/OutputStream.h>
-#include <toadlet/egg/io/FileInputStream.h>
+#include <toadlet/egg/io/Stream.h>
+#include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/ArchiveManager.h>
 
 using namespace toadlet::egg;
@@ -55,34 +54,34 @@ void ArchiveManager::setDirectory(const String &directory){
 	}
 }
 
-InputStream::ptr ArchiveManager::openStream(const String &name){
-	InputStream::ptr in;
+Stream::ptr ArchiveManager::openStream(const String &name){
+	Stream::ptr stream;
 
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Archive::ptr archive=shared_static_cast<Archive>(mResources[i]);
 		if(archive->isResourceArchive()==false){
-			in=archive->openStream(name);
-			if(in!=NULL){
+			stream=archive->openStream(name);
+			if(stream!=NULL){
 				break;
 			}
 		}
 	}
 
-	if(in==NULL){
-		FileInputStream::ptr fin;
+	if(stream==NULL){
+		FileStream::ptr fileStream;
 		if(System::absolutePath(name)==false){
-			fin=FileInputStream::ptr(new FileInputStream(mDirectory+name));
+			fileStream=FileStream::ptr(new FileStream(mDirectory+name,FileStream::OpenFlags_READ|FileStream::OpenFlags_BINARY));
 		}
 		else{
-			fin=FileInputStream::ptr(new FileInputStream(name));
+			fileStream=FileStream::ptr(new FileStream(name,FileStream::OpenFlags_READ|FileStream::OpenFlags_BINARY));
 		}
-		if(fin->isOpen()){
-			in=fin;
+		if(fileStream->isOpen()){
+			stream=fileStream;
 		}
 	}
 
-	return in;
+	return stream;
 }
 
 }

@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_RESOURCEHANDLER_H
 
 #include <toadlet/egg/Resource.h>
-#include <toadlet/egg/io/InputStream.h>
+#include <toadlet/egg/io/Stream.h>
 #include <toadlet/tadpole/ResourceHandlerData.h>
 
 namespace toadlet{
@@ -39,7 +39,7 @@ public:
 
 	virtual ~ResourceHandler(){}
 
-	virtual egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData)=0;
+	virtual egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData)=0;
 };
 
 }

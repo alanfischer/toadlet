@@ -27,7 +27,7 @@
 #define TOADLET_RIBBIT_AUDIOBUFFER_H
 
 #include <toadlet/ribbit/Types.h>
-#include <toadlet/egg/io/InputStream.h>
+#include <toadlet/egg/io/Stream.h>
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/Resource.h>
 
@@ -42,7 +42,7 @@ public:
 
 	virtual AudioBuffer *getRootAudioBuffer()=0;
 
-	virtual bool create(egg::io::InputStream::ptr inputStream,const egg::String &mimeType)=0;
+	virtual bool create(egg::io::Stream::ptr stream,const egg::String &mimeType)=0;
 	virtual void destroy()=0;
 };
 

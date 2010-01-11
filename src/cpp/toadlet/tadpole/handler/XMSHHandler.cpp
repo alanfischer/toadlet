@@ -42,14 +42,14 @@ XMSHHandler::XMSHHandler(BufferManager *bufferManager,MaterialManager *materialM
 	mTextureManager=textureManager;
 }
 
-Resource::ptr XMSHHandler::load(InputStream::ptr in,const ResourceHandlerData *handlerData){
+Resource::ptr XMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
 	Mesh::ptr mesh;
 
 	// TODO: Replace the following when mxml implements custom load/save callbacks
 	char buffer[1025];
 	int amount=0;
 	String string;
-	while((amount=in->read(buffer,1024))>0){
+	while((amount=stream->read(buffer,1024))>0){
 		buffer[amount]=0;
 		string+=buffer;
 	}
@@ -82,7 +82,7 @@ Resource::ptr XMSHHandler::load(InputStream::ptr in,const ResourceHandlerData *h
 	return mesh;
 }
 
-bool XMSHHandler::save(Mesh::ptr mesh,OutputStream::ptr out){
+bool XMSHHandler::save(Mesh::ptr mesh,Stream::ptr stream){
 	mxml_node_t *root=mxmlNewElement(MXML_NO_PARENT,"XMSH");
 
 	int version=XMLMeshUtilities::version;
@@ -102,7 +102,7 @@ bool XMSHHandler::save(Mesh::ptr mesh,OutputStream::ptr out){
 	}
 
 	char *string=mxmlSaveAllocString(root,XMLMeshUtilities::mxmlSaveCallback);
-	out->write(string,strlen(string));
+	stream->write(string,strlen(string));
 	free(string);
 
 	mxmlRelease(root);

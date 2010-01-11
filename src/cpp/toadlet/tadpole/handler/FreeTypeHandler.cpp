@@ -25,12 +25,12 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
-#include <toadlet/egg/io/MemoryInputStream.h>
+#include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/tadpole/FontData.h>
 #include <toadlet/tadpole/handler/FreeTypeHandler.h>
 
 #if defined(TOADLET_PLATFORM_WIN32) && defined(TOADLET_LIBFREETYPE_NAME)
-#	pragma comment(lib,TOADLET_LIBFREETYPE_NAME)
+	#pragma comment(lib,TOADLET_LIBFREETYPE_NAME)
 #endif
 
 using namespace toadlet::peeper;
@@ -64,7 +64,7 @@ FreeTypeHandler::~FreeTypeHandler(){
 	}
 }
 
-Resource::ptr FreeTypeHandler::load(InputStream::ptr in,const ResourceHandlerData *handlerData){
+Resource::ptr FreeTypeHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
 	FontData *fontData=(FontData*)handlerData;
 	if(fontData==NULL){
 		Error::nullPointer(Categories::TOADLET_TADPOLE,
@@ -83,11 +83,11 @@ Resource::ptr FreeTypeHandler::load(InputStream::ptr in,const ResourceHandlerDat
 		numChars=defaultCharacterSet.length();
 	}
 
-	MemoryInputStream::ptr memoryInputStream(new MemoryInputStream(in));
+	MemoryStream::ptr memoryStream(new MemoryStream(stream));
 	int i=0,j=0;
 
 	FT_Face face=NULL;
-	if(FT_New_Memory_Face(mLibrary,(const FT_Byte*)memoryInputStream->getOriginalDataPointer(),memoryInputStream->available(),0,&face)){
+	if(FT_New_Memory_Face(mLibrary,(const FT_Byte*)memoryStream->getOriginalDataPointer(),memoryStream->length(),0,&face)){
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"FT_New_Memory_Face failed");
 		return NULL;

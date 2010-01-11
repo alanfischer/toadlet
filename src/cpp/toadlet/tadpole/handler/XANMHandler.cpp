@@ -38,14 +38,14 @@ namespace handler{
 XANMHandler::XANMHandler(){
 }
 
-Resource::ptr XANMHandler::load(InputStream::ptr in,const ResourceHandlerData *handlerData){
+Resource::ptr XANMHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
 	Sequence::ptr sequence=NULL;
 
 	// TODO: Replace the following when mxml implements custom load/save callbacks
 	char buffer[1025];
 	int amount=0;
 	String string;
-	while((amount=in->read(buffer,1024))>0){
+	while((amount=stream->read(buffer,1024))>0){
 		buffer[amount]=0;
 		string+=buffer;
 	}
@@ -78,7 +78,7 @@ Resource::ptr XANMHandler::load(InputStream::ptr in,const ResourceHandlerData *h
 	return sequence;
 }
 
-bool XANMHandler::save(Sequence::ptr sequence,OutputStream::ptr out){
+bool XANMHandler::save(Sequence::ptr sequence,Stream::ptr stream){
 	mxml_node_t *root=mxmlNewElement(MXML_NO_PARENT,"XANM");
 
 	int version=XMLMeshUtilities::version;
@@ -98,7 +98,7 @@ bool XANMHandler::save(Sequence::ptr sequence,OutputStream::ptr out){
 	}
 
 	char *string=mxmlSaveAllocString(root,XMLMeshUtilities::mxmlSaveCallback);
-	out->write(string,strlen(string));
+	stream->write(string,strlen(string));
 	free(string);
 
 	mxmlRelease(root);

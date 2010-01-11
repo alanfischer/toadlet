@@ -1,5 +1,5 @@
 #include <toadlet/egg/math/Math.h>
-#include <toadlet/egg/io/OutputStream.h>
+#include <toadlet/egg/io/Stream.h>
 #include <toadlet/tadpole/mesh/Mesh.h>
 
 extern "C"{
@@ -26,7 +26,7 @@ public:
 	MicroMeshConverter();
 	~MicroMeshConverter();
 
-	bool convertMesh(toadlet::tadpole::mesh::Mesh *mesh,toadlet::egg::io::OutputStream *outStream,float meshScale,int forceBytes,bool invertYTexCoord);
+	bool convertMesh(toadlet::tadpole::mesh::Mesh *mesh,toadlet::egg::io::Stream *outStream,float meshScale,int forceBytes,bool invertYTexCoord);
 
 protected:
 	ACTCData *mTC;

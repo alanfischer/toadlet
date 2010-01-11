@@ -26,7 +26,7 @@
 #ifndef TOADLET_TADPOLE_HANDLER_MMSHHANDLER_H
 #define TOADLET_TADPOLE_HANDLER_MMSHHANDLER_H
 
-#include <toadlet/egg/io/DataInputStream.h>
+#include <toadlet/egg/io/DataStream.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/ResourceHandler.h>
@@ -44,7 +44,7 @@ public:
 
 	MMSHHandler(Engine *engine);
 
-	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
+	egg::Resource::ptr load(egg::io::Stream::ptr in,const ResourceHandlerData *handlerData);
 
 protected:
 	// Blocks for the mmsh format

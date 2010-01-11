@@ -27,8 +27,7 @@
 #define TOADLET_EGG_IMAGE_RGBHANDLER_H
 
 #include <toadlet/egg/image/Image.h>
-#include <toadlet/egg/io/InputStream.h>
-#include <toadlet/egg/io/OutputStream.h>
+#include <toadlet/egg/io/Stream.h>
 
 namespace toadlet{
 namespace egg{
@@ -39,8 +38,8 @@ public:
 	RGBHandler();
 	virtual ~RGBHandler();
 
-	virtual Image *loadImage(io::InputStream *in);
-	virtual bool saveImage(Image *image,io::OutputStream *out);
+	virtual Image *loadImage(io::Stream *stream);
+	virtual bool saveImage(Image *image,io::Stream *stream);
 };
 
 }

@@ -27,8 +27,7 @@
 #define TOADLET_EGG_IMAGE_GIFHANDLER_H
 
 #include <toadlet/egg/image/Image.h>
-#include <toadlet/egg/io/InputStream.h>
-#include <toadlet/egg/io/OutputStream.h>
+#include <toadlet/egg/io/Stream.h>
 #include <toadlet/egg/Collection.h>
 
 struct GifFileType;
@@ -42,13 +41,13 @@ public:
 	GIFHandler();
 	virtual ~GIFHandler();
 
-	virtual Image *loadImage(io::InputStream *in);
-	virtual bool saveImage(Image *image,io::OutputStream *out);
+	virtual Image *loadImage(io::Stream *stream);
+	virtual bool saveImage(Image *image,io::Stream *stream);
 
-	virtual bool loadAnimatedImage(io::InputStream *in,Collection<Image*> &images,Collection<int> &delayMilliseconds);
+	virtual bool loadAnimatedImage(io::Stream *stream,Collection<Image*> &images,Collection<int> &delayMilliseconds);
 
 protected:
-	GifFileType *openFile(io::InputStream *in);
+	GifFileType *openFile(io::Stream *stream);
 	int closeFile(GifFileType *file);
 	void resetReader();
 	int getNextImage(GifFileType *gifFile,Image *&image,int &delayMilliseconds);

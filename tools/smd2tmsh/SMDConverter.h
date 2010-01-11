@@ -1,7 +1,7 @@
 #ifndef SMDCONVERTER_H
 #define SMDCONVERTER_H
 
-#include <toadlet/egg/io/InputStream.h>
+#include <toadlet/egg/io/Stream.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/mesh/Mesh.h>
 
@@ -19,7 +19,7 @@ public:
 
 	SMDConverter(toadlet::tadpole::Engine *engine);
 
-	void load(toadlet::egg::io::InputStream *in);
+	void load(toadlet::egg::io::Stream *in);
 
 	toadlet::tadpole::mesh::Mesh::ptr getMesh(){return mMesh;}
 
@@ -39,7 +39,7 @@ public:
 	bool getInvertFaces() const{return mInvertFaces;}
 
 protected:
-	toadlet::egg::String readLine(toadlet::egg::io::InputStream *in);
+	toadlet::egg::String readLine(toadlet::egg::io::Stream *in);
 	void setQuaternionFromXYZ(toadlet::tadpole::Quaternion &r,scalar x,scalar y,scalar z);
 	bool vertsEqual(const Vertex &v1,const Vertex &v2);
 

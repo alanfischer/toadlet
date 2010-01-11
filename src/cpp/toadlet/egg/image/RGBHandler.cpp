@@ -24,8 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/image/RGBHandler.h>
-#include <toadlet/egg/io/MemoryInputStream.h>
-#include <toadlet/egg/io/MemoryOutputStream.h>
+#include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/Error.h>
 #include <string.h> // memcpy
@@ -43,20 +42,20 @@ typedef struct{
 	unsigned int wasteBytes;
 	char name[80];
 	unsigned long colorMap;
-	io::MemoryInputStream *in;
+	io::MemoryStream *stream;
 	unsigned char *tmp, *tmpR, *tmpG, *tmpB;
 	unsigned int *rowStart;
 	int *rowSize;
 } ImageRecord;
 
-ImageRecord *toadlet_rgb_openImage(io::MemoryInputStream *in){
+ImageRecord *toadlet_rgb_openImage(io::MemoryStream *stream){
 	ImageRecord *imageRecord;
 	int x;
 
 	imageRecord=new ImageRecord();
-	imageRecord->in=in;
+	imageRecord->stream=stream;
 
-	in->read((char*)imageRecord,12);
+	stream->read((char*)imageRecord,12);
 
 	bigUInt16InPlace(imageRecord->imagic);
 	bigUInt16InPlace(imageRecord->type);
@@ -75,9 +74,9 @@ ImageRecord *toadlet_rgb_openImage(io::MemoryInputStream *in){
 		imageRecord->rowStart=new unsigned int[x];
 		imageRecord->rowSize=new int[x];
 
-		in->seek(512);
-		in->read((char*)imageRecord->rowStart,x*sizeof(unsigned int));
-		in->read((char*)imageRecord->rowSize,x*sizeof(unsigned int));
+		stream->seek(512);
+		stream->read((char*)imageRecord->rowStart,x*sizeof(unsigned int));
+		stream->read((char*)imageRecord->rowSize,x*sizeof(unsigned int));
 
 		int i;
 		unsigned int *stp=imageRecord->rowStart;
@@ -110,8 +109,8 @@ void toadlet_rgb_getImageRow(ImageRecord *imageRecord,unsigned char *buf,int y,i
 	int count;
 
 	if((imageRecord->type & 0xFF00) == 0x0100){
-		imageRecord->in->seek((int)imageRecord->rowStart[y+z*imageRecord->ysize]);
-		imageRecord->in->read((char*)imageRecord->tmp,(int)imageRecord->rowSize[y+z*imageRecord->ysize]);
+		imageRecord->stream->seek((int)imageRecord->rowStart[y+z*imageRecord->ysize]);
+		imageRecord->stream->read((char*)imageRecord->tmp,(int)imageRecord->rowSize[y+z*imageRecord->ysize]);
 
 		iPtr=imageRecord->tmp;
 		oPtr=buf;
@@ -136,8 +135,8 @@ void toadlet_rgb_getImageRow(ImageRecord *imageRecord,unsigned char *buf,int y,i
 		}
 	}
 	else{
-		imageRecord->in->seek(512+(y*imageRecord->xsize)+(z*imageRecord->xsize*imageRecord->ysize));
-		imageRecord->in->read((char*)buf,imageRecord->xsize);
+		imageRecord->stream->seek(512+(y*imageRecord->xsize)+(z*imageRecord->xsize*imageRecord->ysize));
+		imageRecord->stream->read((char*)buf,imageRecord->xsize);
 	}
 }
 
@@ -147,19 +146,19 @@ RGBHandler::RGBHandler(){
 RGBHandler::~RGBHandler(){
 }
 
-Image *RGBHandler::loadImage(io::InputStream *in){
+Image *RGBHandler::loadImage(io::Stream *stream){
 	char buffer[1024];
 	char *totalBuffer=NULL;
 	int totalSize=0;
 	int i;
 
-	if(in==NULL){
+	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_EGG,
 			"InputStream is NULL");
 		return NULL;
 	}
 
-	for(i=in->read(buffer,1024);i>0;i=in->read(buffer,1024)){
+	for(i=stream->read(buffer,1024);i>0;i=stream->read(buffer,1024)){
 		char *newBuffer=new char[totalSize+i];
 		if(totalBuffer!=NULL){
 			memcpy(newBuffer,totalBuffer,totalSize);
@@ -170,15 +169,13 @@ Image *RGBHandler::loadImage(io::InputStream *in){
 		totalSize+=i;
 	}
 
-	io::MemoryInputStream *memin=new io::MemoryInputStream(totalBuffer,totalSize,false);
+	io::MemoryStream::ptr memoryStream(new io::MemoryStream(totalBuffer,totalSize,false));
 	unsigned char *rbuf, *gbuf, *bbuf, *abuf;
 	ImageRecord *imageRecord;
 	int y;
 
-	imageRecord=toadlet_rgb_openImage(memin);
+	imageRecord=toadlet_rgb_openImage(memoryStream);
 	if(imageRecord==NULL){
-		delete memin;
-
 		Error::loadingImage(Categories::TOADLET_EGG,
 			"RGBHandler: Error opening file");
 		return NULL;
@@ -259,7 +256,6 @@ Image *RGBHandler::loadImage(io::InputStream *in){
 
 	toadlet_rgb_closeImage(imageRecord);
 
-	delete memin;
 	delete[] totalBuffer;
 	
 	delete[] rbuf;
@@ -270,7 +266,7 @@ Image *RGBHandler::loadImage(io::InputStream *in){
 	return image;
 }
 
-bool RGBHandler::saveImage(Image *image,io::OutputStream *out){
+bool RGBHandler::saveImage(Image *image,io::Stream *stream){
 	Error::unimplemented(Categories::TOADLET_EGG,
 		"RGBHandler::saveImage: Not implemented");
 	return false;

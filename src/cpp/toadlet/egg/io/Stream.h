@@ -23,33 +23,34 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_IO_FILEOUTPUTSTREAM_H
-#define TOADLET_EGG_IO_FILEOUTPUTSTREAM_H
+#ifndef TOADLET_EGG_IO_STREAM_H
+#define TOADLET_EGG_IO_STREAM_H
 
-#include <toadlet/egg/io/OutputStream.h>
-#include <toadlet/egg/String.h>
-
-#include <stdio.h>
+#include <toadlet/Types.h>
+#include <toadlet/egg/WeakPointer.h>
 
 namespace toadlet{
 namespace egg{
 namespace io{
 
-class TOADLET_API FileOutputStream:public OutputStream{
+class Stream{
 public:
-	TOADLET_SHARED_POINTERS(FileOutputStream);
+	TOADLET_SHARED_POINTERS(Stream);
 
-	FileOutputStream(const String &filename);
-	virtual ~FileOutputStream();
+	virtual ~Stream(){}
 
-	bool isOpen() const;
-	int write(const char *buffer,int length);
-	void close();
-	FILE *getFILE();
+	virtual void close()=0;
 
-protected:
-	bool mAutoClose;
-	FILE *mFile;
+	virtual bool isReadable()=0;
+	virtual int read(char *buffer,int length)=0;
+
+	virtual bool isWriteable()=0;
+	virtual int write(const char *buffer,int length)=0;
+
+	virtual bool reset()=0;
+	virtual int length()=0;
+	virtual int position()=0;
+	virtual bool seek(int offs)=0;
 };
 
 }

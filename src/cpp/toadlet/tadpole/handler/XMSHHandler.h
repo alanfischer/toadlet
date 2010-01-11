@@ -26,7 +26,6 @@
 #ifndef TOADLET_TADPOLE_HANDLER_XMSHHANDLER_H
 #define TOADLET_TADPOLE_HANDLER_XMSHHANDLER_H
 
-#include <toadlet/egg/io/OutputStream.h>
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/MaterialManager.h>
 #include <toadlet/tadpole/TextureManager.h>
@@ -44,9 +43,9 @@ public:
 
 	XMSHHandler(BufferManager *bufferManager,MaterialManager *materialManager,TextureManager *textureManager);
 
-	egg::Resource::ptr load(egg::io::InputStream::ptr in,const ResourceHandlerData *handlerData);
+	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
 
-	bool save(mesh::Mesh::ptr resource,egg::io::OutputStream::ptr out);
+	bool save(mesh::Mesh::ptr resource,egg::io::Stream::ptr stream);
 
 protected:
 	mesh::Mesh::ptr loadMeshVersion1(mxml_node_t *root);
