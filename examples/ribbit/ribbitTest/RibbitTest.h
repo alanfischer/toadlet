@@ -1,7 +1,7 @@
 #ifndef RIBBITTEST_H
 #define RIBBITTEST_H
 
-#include <toadlet/egg/io/MemoryInputStream.h>
+#include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/pad/Application.h>
 
 using namespace toadlet::egg::io;

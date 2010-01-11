@@ -44,11 +44,17 @@ public:
 	bool create(egg::io::Stream::ptr stream,const egg::String &mimeType);
 	void destroy();
 
+	void setLoopCount(int loopCount);
+	int getLoopCount() const;
+
 	inline WAVEFORMATEX *getLPWAVEFORMATEX(){return &mWaveFormat;}
 	inline WAVEHDR *getLPWAVEHDR(){return &mWaveHDR;}
 	inline int getTime() const{return mTime;}
 
 protected:
+	bool prepareHeader();
+	void unprepareHeader();
+
 	Win32Player *mAudioPlayer;
 	WAVEFORMATEX mWaveFormat;
 	WAVEHDR mWaveHDR;
