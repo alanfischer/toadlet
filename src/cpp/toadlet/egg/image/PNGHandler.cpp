@@ -54,7 +54,7 @@ void toadlet_png_read_data(png_structp png_ptr,png_bytep data,png_size_t length)
 	png_size_t check; 
 
 	Stream *stream=(Stream*)png_ptr->io_ptr;
-	check=(png_size_t)stream->read((char*)data,length);
+	check=(png_size_t)stream->read((byte*)data,length);
 
 	if(check!=length){
 		png_error(png_ptr,"Data read length mismatch");
@@ -80,7 +80,7 @@ Image *PNGHandler::loadImage(io::Stream *stream){
 	int number_of_passes;
 	png_bytep *row_pointers;
 	
-	stream->read((char*)header,8);
+	stream->read(header,8);
 	if(png_sig_cmp(header,0,8)){
 		Error::loadingImage(Categories::TOADLET_EGG,
 			"PNGHandler::loadImage: Not a PNG file");
@@ -135,7 +135,7 @@ Image *PNGHandler::loadImage(io::Stream *stream){
 	if(info_ptr->color_type==PNG_COLOR_TYPE_GRAY){
 		image=new Image(Image::Dimension_D2,Image::Format_L_8,width,height);
 
-		uint8 *data=image->getData();
+		byte *data=image->getData();
 
 		for(y=0;y<height;++y){
 			memcpy(data+width*y,row_pointers[y],width);
@@ -164,7 +164,7 @@ Image *PNGHandler::loadImage(io::Stream *stream){
 			int x;
 			if(info_ptr->num_trans==1){
 				for(y=0;y<height;++y){
-					uint8 *row=row_pointers[y];
+					byte *row=row_pointers[y];
 					for(x=0;x<width;++x){
 						int index=PNGHANDLER_GET_INDEX;
 						data[y*width+x]=ImageFormatConversion::makeRGBA5551(palette[index].red,palette[index].green,palette[index].blue,(info_ptr->trans_values.index==index)?0:255);
@@ -173,7 +173,7 @@ Image *PNGHandler::loadImage(io::Stream *stream){
 			}
 			else{
 				for(y=0;y<height;++y){
-					uint8 *row=row_pointers[y];
+					byte *row=row_pointers[y];
 					for(x=0;x<width;++x){
 						int index=PNGHANDLER_GET_INDEX;
 						data[y*width+x]=ImageFormatConversion::makeRGBA4444(palette[index].red,palette[index].green,palette[index].blue,trans[index]);
@@ -188,7 +188,7 @@ Image *PNGHandler::loadImage(io::Stream *stream){
 
 			int x;
 			for(y=0;y<height;++y){
-				uint8 *row=row_pointers[y];
+				byte *row=row_pointers[y];
 				for(x=0;x<width;++x){
 					int index=PNGHANDLER_GET_INDEX;
 					data[y*width+x]=ImageFormatConversion::makeRGB565(palette[index].red,palette[index].green,palette[index].blue);
@@ -199,7 +199,7 @@ Image *PNGHandler::loadImage(io::Stream *stream){
 	else if(info_ptr->color_type==PNG_COLOR_TYPE_GRAY_ALPHA){
 		image=new Image(Image::Dimension_D2,Image::Format_LA_8,width,height);
 
-		uint8 *data=image->getData();
+		byte *data=image->getData();
 
 		for(y=0;y<height;++y){
 			memcpy(data+width*2*y,row_pointers[y],width*2);
@@ -208,7 +208,7 @@ Image *PNGHandler::loadImage(io::Stream *stream){
 	else if(info_ptr->color_type==PNG_COLOR_TYPE_RGB){
 		image=new Image(Image::Dimension_D2,Image::Format_RGB_8,width,height);
 
-		uint8 *data=image->getData();
+		byte *data=image->getData();
 
 		for(y=0;y<height;++y){
 			memcpy(data+width*3*y,row_pointers[y],width*3);
@@ -217,7 +217,7 @@ Image *PNGHandler::loadImage(io::Stream *stream){
 	else if(info_ptr->color_type==PNG_COLOR_TYPE_RGB_ALPHA){
 		image=new Image(Image::Dimension_D2,Image::Format_RGBA_8,width,height);
 
-		uint8 *data=image->getData();
+		byte *data=image->getData();
 
 		for(y=0;y<height;++y){
 			memcpy(data+width*4*y,row_pointers[y],width*4);

@@ -57,7 +57,7 @@ bool WADArchive::open(Stream::ptr stream){
 	destroy();
 
 	mStream=DataStream::ptr(new DataStream(stream));
-	mStream->read(header.identification,sizeof(header.identification));
+	mStream->read((byte*)header.identification,sizeof(header.identification));
 	header.numlumps=mStream->readLittleInt32();
 	header.infotableofs=mStream->readLittleInt32();
 
@@ -70,7 +70,7 @@ bool WADArchive::open(Stream::ptr stream){
 	lumpinfos.resize(header.numlumps);
 	mStream->seek(header.infotableofs);
 
-	mStream->read((char*)&lumpinfos[0],sizeof(wlumpinfo)*header.numlumps);
+	mStream->read((byte*)&lumpinfos[0],sizeof(wlumpinfo)*header.numlumps);
 
 	int i;
 	for(i=0;i<header.numlumps;i++){
@@ -89,7 +89,7 @@ Resource::ptr WADArchive::openResource(const String &name){
 		String lumpname=lumpinfos[i].name;
 		if(lowername.equals(lumpname.toLower())){
 			mStream->seek(lumpinfos[i].filepos);
-			mStream->read((char*)mInBuffer,lumpinfos[i].size);
+			mStream->read((byte*)mInBuffer,lumpinfos[i].size);
 
 			wmiptex *tex=(wmiptex*)mInBuffer;
 

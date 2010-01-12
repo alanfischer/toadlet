@@ -53,8 +53,8 @@ public:
 
 	bool disconnect();
 
-	int send(const char *data,int length);
-	int receive(char *data,int length);
+	int send(const byte *data,int length);
+	int receive(byte *data,int length);
 
 	int getPing() const{return -1;}
 
@@ -75,7 +75,7 @@ protected:
 			debugDeliverTime=0;
 		}
 
-		char data[1024];
+		byte data[1024];
 		int length;
 		uint64 debugDeliverTime;
 	};

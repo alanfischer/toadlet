@@ -58,11 +58,11 @@ void FileStream::close(){
 	} 
 }
 
-int FileStream::read(char *buffer,int length){
+int FileStream::read(byte *buffer,int length){
 	return fread(buffer,length,1,mFile);
 }
 
-int FileStream::write(const char *buffer,int length){
+int FileStream::write(const byte *buffer,int length){
 	return fwrite(buffer,length,1,mFile);
 }
 

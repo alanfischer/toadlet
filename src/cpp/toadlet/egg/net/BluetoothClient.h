@@ -43,9 +43,9 @@ public:
 
 	virtual void close()=0;
 
-	virtual int receive(char *buffer,int length)=0;
+	virtual int receive(byte *buffer,int length)=0;
 
-	virtual int send(const char *buffer,int length)=0;
+	virtual int send(const byte *buffer,int length)=0;
 };
 
 }

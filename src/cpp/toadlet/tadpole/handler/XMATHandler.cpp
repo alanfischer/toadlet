@@ -47,7 +47,7 @@ Resource::ptr XMATHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 	char buffer[1025];
 	int amount=0;
 	String string;
-	while((amount=stream->read(buffer,1024))>0){
+	while((amount=stream->read((byte*)buffer,1024))>0){
 		buffer[amount]=0;
 		string+=buffer;
 	}
@@ -94,7 +94,7 @@ bool XMATHandler::save(Material::ptr material,Stream::ptr stream){
 	}
 
 	char *string=mxmlSaveAllocString(root,XMLMeshUtilities::mxmlSaveCallback);
-	stream->write(string,strlen(string));
+	stream->write((byte*)string,strlen(string));
 	free(string);
 
 	mxmlRelease(root);

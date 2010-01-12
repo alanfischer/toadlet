@@ -334,20 +334,20 @@ Socket *Socket::accept(){
 	}
 }
 
-int Socket::receive(char *buffer,int length){
+int Socket::receive(byte *buffer,int length){
 	int flags=0;
-	int result=::recv(mHandle,buffer,length,flags);
+	int result=::recv(mHandle,(char*)buffer,length,flags);
 	if(result==TOADLET_SOCKET_ERROR){
 		error("recv");
 	}
 	return result;
 }
 
-int Socket::receiveFrom(char *buffer,int length,uint32 &ipAddress,int &port){
+int Socket::receiveFrom(byte *buffer,int length,uint32 &ipAddress,int &port){
 	int flags=0;
 	struct sockaddr_in from={0};
 	TOADLET_SOCKLEN fromLength=sizeof(sockaddr_in);
-	int result=::recvfrom(mHandle,buffer,length,flags,(struct sockaddr*)&from,&fromLength);
+	int result=::recvfrom(mHandle,(char*)buffer,length,flags,(struct sockaddr*)&from,&fromLength);
 	if(result==TOADLET_SOCKET_ERROR){
 		error("recvfrom");
 	}
@@ -356,22 +356,22 @@ int Socket::receiveFrom(char *buffer,int length,uint32 &ipAddress,int &port){
 	return result;
 }
 
-int Socket::send(const char *buffer,int length){
+int Socket::send(const byte *buffer,int length){
 	int flags=0;
-	int result=::send(mHandle,buffer,length,flags);
+	int result=::send(mHandle,(char*)buffer,length,flags);
 	if(result==TOADLET_SOCKET_ERROR){
 		error("send");
 	}
 	return result;
 }
 
-int Socket::sendTo(const char *buffer,int length,uint32 ipAddress,int port){
+int Socket::sendTo(const byte *buffer,int length,uint32 ipAddress,int port){
 	int flags=0;
 	struct sockaddr_in address={0};
 	address.sin_family=AF_INET;
 	address.sin_addr.s_addr=ipAddress;
 	address.sin_port=htons(port);
-	int result=::sendto(mHandle,buffer,length,flags,(struct sockaddr*)&address,sizeof(address));
+	int result=::sendto(mHandle,(char*)buffer,length,flags,(struct sockaddr*)&address,sizeof(address));
 	if(result==TOADLET_SOCKET_ERROR){
 		error("sendto");
 	}

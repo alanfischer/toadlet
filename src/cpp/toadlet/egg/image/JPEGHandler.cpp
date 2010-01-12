@@ -79,7 +79,7 @@ boolean toadlet_fill_input_buffer(j_decompress_ptr cinfo){
 	toadlet_src_mgr *src=(toadlet_src_mgr*)cinfo->src;
 	size_t nbytes;
 
-	nbytes=src->stream->read((char*)src->buffer,src->bufsize);
+	nbytes=src->stream->read(src->buffer,src->bufsize);
 
 	if(nbytes<=0){
 		if(src->start_of_file){

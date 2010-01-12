@@ -51,7 +51,7 @@ MMSHHandler::MMSHHandler(Engine *engine){
 Resource::ptr MMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
 	DataStream::ptr dataStream(new DataStream(stream));
 
-	char signature[4];
+	byte signature[4];
 	dataStream->read(signature,4);
 	if(signature[0]!='T' || signature[1]!='M' || signature[2]!='M' || signature[3]!='H'){
 		Error::unknown(Categories::TOADLET_TADPOLE,

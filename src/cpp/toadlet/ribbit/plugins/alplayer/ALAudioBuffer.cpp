@@ -66,7 +66,7 @@ bool ALAudioBuffer::create(Stream::ptr stream,const String &mimeType){
 		}
 	#endif
 
-	char *buffer=0;
+	byte *buffer=0;
 	int length=0;
 	int channels=decoder->getChannels();
 	int sps=decoder->getSamplesPerSecond();
@@ -85,7 +85,7 @@ bool ALAudioBuffer::create(Stream::ptr stream,const String &mimeType){
 		int i,j;
 		for(i=0;i<stf;++i){
 			for(j=0;j<sampsize;++j){
-				buffer[i*sampsize+j]=(char)(((int)buffer[i*sampsize+j])*i/stf);
+				buffer[i*sampsize+j]=(byte)(((int)buffer[i*sampsize+j])*i/stf);
 			}
 		}
 	}

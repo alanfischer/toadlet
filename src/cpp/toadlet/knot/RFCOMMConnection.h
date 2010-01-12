@@ -51,8 +51,8 @@ public:
 	bool accept(const egg::String &guid);
 	bool disconnect();
 
-	int send(const char *data,int length);
-	int receive(char *data,int length);
+	int send(const byte *data,int length);
+	int receive(byte *data,int length);
 
 	int getPing() const{return -1;}
 
@@ -62,7 +62,7 @@ protected:
 	class Packet{
 	public:
 		TOADLET_SHARED_POINTERS(Packet);
-		char data[1024];
+		byte data[1024];
 		int length;
 	};
 

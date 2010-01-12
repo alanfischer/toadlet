@@ -137,13 +137,13 @@ AudioStream::ptr Win32Player::startAudioStream(Stream::ptr stream,const String &
 	return decoder;
 }
 
-void Win32Player::decodeStream(AudioStream *decoder,char *&finalBuffer,int &finalLength){
-	Collection<char*> buffers;
+void Win32Player::decodeStream(AudioStream *decoder,byte *&finalBuffer,int &finalLength){
+	Collection<byte*> buffers;
 	int amount=0,total=0;
 	int i=0;
 
 	while(true){
-		char *buffer=new char[DECODE_BUFFER_SIZE];
+		byte *buffer=new byte[DECODE_BUFFER_SIZE];
 		amount=decoder->read(buffer,DECODE_BUFFER_SIZE);
 		if(amount==0){
 			delete[] buffer;
@@ -155,7 +155,7 @@ void Win32Player::decodeStream(AudioStream *decoder,char *&finalBuffer,int &fina
 		}
 	}
 
-	finalBuffer=new char[total];
+	finalBuffer=new byte[total];
 	finalLength=total;
 
 	for(i=0;i<buffers.size();++i){

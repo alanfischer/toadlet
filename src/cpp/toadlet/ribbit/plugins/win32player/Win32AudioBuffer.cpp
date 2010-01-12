@@ -54,7 +54,7 @@ bool Win32AudioBuffer::create(Stream::ptr stream,const String &mimeType){
 		return false;
 	}
 
-	char *buffer=0;
+	byte *buffer=0;
 	int length=0;
 	int channels=decoder->getChannels();
 	int sps=decoder->getSamplesPerSecond();
@@ -70,7 +70,7 @@ bool Win32AudioBuffer::create(Stream::ptr stream,const String &mimeType){
 	mWaveFormat.nBlockAlign=channels*bps/8;
 	mWaveFormat.nAvgBytesPerSec=sps*mWaveFormat.nBlockAlign;
 	// WaveHDR
-	mWaveHDR.lpData=buffer;
+	mWaveHDR.lpData=(LPSTR)buffer;
 	mWaveHDR.dwBufferLength=length;
 	// Time
 	mTime=length*1000*8/(channels*bps*sps);

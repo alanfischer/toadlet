@@ -92,7 +92,7 @@ bool WaveDecoder::startStream(Stream::ptr stream){
 	mBitsPerSample=16;
 	mSamplesPerSecond=22050;
 
-	if(stream->read((char*)&header,sizeof(header))!=sizeof(header)){
+	if(stream->read((byte*)&header,sizeof(header))!=sizeof(header)){
 		return false;
 	}
 
@@ -109,7 +109,7 @@ bool WaveDecoder::startStream(Stream::ptr stream){
 	header.dwSize += (header.dwSize & 1) - sizeof(header.fccType);
 
 	while(header.dwSize>0){
-		if(stream->read((char*)&chunk,sizeof(chunk))!=sizeof(chunk)){
+		if(stream->read((byte*)&chunk,sizeof(chunk))!=sizeof(chunk)){
 			break;
 		}
 
@@ -120,7 +120,7 @@ bool WaveDecoder::startStream(Stream::ptr stream){
 		chunk.dwSize+=chunk.dwSize & 1;
 
 		if(memcmp(&chunk.fccTag,"fmt ",4)==0){
-			if(stream->read((char*)&fmt,sizeof(fmt))!=sizeof(fmt)){
+			if(stream->read((byte*)&fmt,sizeof(fmt))!=sizeof(fmt)){
 				break;
 			}
 
@@ -140,18 +140,18 @@ bool WaveDecoder::startStream(Stream::ptr stream){
 		else if(memcmp(&chunk.fccTag,"data",4)==0){
 			if(fmt.wFormatTag==WAVE_Format_PCM){
 				mSize=chunk.dwSize;
-				mData=new char[chunk.dwSize];
+				mData=new byte[chunk.dwSize];
 				if(stream->read(mData,chunk.dwSize)!=chunk.dwSize){
 					break;
 				}
 			}
 			else if(fmt.wFormatTag==WAVE_Format_IMA_ADPCM){
 				mSize=4*chunk.dwSize;
-				mData=new char[4*chunk.dwSize];
+				mData=new byte[4*chunk.dwSize];
 				if(stream->read(mData+3*chunk.dwSize,chunk.dwSize)!=chunk.dwSize){
 					break;
 				}
-				ADPCMDecoder(mData+3*chunk.dwSize,(short*)mData,chunk.dwSize);
+				ADPCMDecoder((char*)mData+3*chunk.dwSize,(short*)mData,chunk.dwSize);
 			}
 			else{
 				skip(stream,chunk.dwSize);
@@ -167,7 +167,7 @@ bool WaveDecoder::startStream(Stream::ptr stream){
 	return true;
 }
 
-int WaveDecoder::read(char *buffer,int length){
+int WaveDecoder::read(byte *buffer,int length){
 	if(mSize-mPosition<length){
 		length=mSize-mPosition;
 	}
@@ -189,7 +189,7 @@ bool WaveDecoder::reset(){
 }
 
 void WaveDecoder::skip(Stream::ptr stream,int amount){
-	char *skipBuffer=new char[amount];
+	byte *skipBuffer=new byte[amount];
 	stream->read(skipBuffer,amount);
 	delete[] skipBuffer;
 }

@@ -362,11 +362,11 @@ void ALAudio::update(int dt){
 	}
 }
 
-int ALAudio::readAudioData(unsigned char *buffer,int bsize){
-	int amount=mAudioStream->read((char*)buffer,bsize);
+int ALAudio::readAudioData(byte *buffer,int bsize){
+	int amount=mAudioStream->read(buffer,bsize);
 	if(amount==0 && mLooping){
 		mAudioStream->reset();
-		amount=mAudioStream->read((char*)buffer,bsize);
+		amount=mAudioStream->read(buffer,bsize);
 	}
 
 	#if !defined(TOADLET_NATIVE_FORMAT)

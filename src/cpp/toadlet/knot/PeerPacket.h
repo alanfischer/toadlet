@@ -61,16 +61,16 @@ public:
 		setFrameBits(packet->getFrameBits(),packet->getFrameBitsReferenceFrame());
 	}
 	
-	inline char *getData() const{return mData;}
+	inline byte *getData() const{return mData;}
 	inline int getDataLength() const{return mDataLength;}
 
-	int setData(const char *data,int length){
+	int setData(const byte *data,int length){
 		if(mDataMaxSize<length){
 			if(mData!=NULL){
 				delete[] mData;
 				mData=NULL;
 			}
-			mData=new char[length];
+			mData=new byte[length];
 			mDataMaxSize=length;
 		}
 		memcpy(mData,data,length);
@@ -96,7 +96,7 @@ public:
 	}
 
 protected:
-	char *mData;
+	byte *mData;
 	int mDataLength;
 	int mDataMaxSize;
 

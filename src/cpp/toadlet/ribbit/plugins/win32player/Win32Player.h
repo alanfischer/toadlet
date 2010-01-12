@@ -73,7 +73,7 @@ public:
 	const CapabilitySet &getCapabilitySet(){return mCapabilitySet;}
 
 	AudioStream::ptr startAudioStream(egg::io::Stream::ptr stream,const egg::String &mimeType);
-	void decodeStream(AudioStream *decoder,char *&finalBuffer,int &finalLength);
+	void decodeStream(AudioStream *decoder,byte *&finalBuffer,int &finalLength);
 
 	void setWaveOut(HWAVEOUT waveOut){mWaveOut=waveOut;}
 	HWAVEOUT getWaveOut() const{return mWaveOut;}
