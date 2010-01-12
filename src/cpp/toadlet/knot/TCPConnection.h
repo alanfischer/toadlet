@@ -56,8 +56,6 @@ public:
 	int send(const byte *data,int length);
 	int receive(byte *data,int length);
 
-	int getPing() const{return -1;}
-
 	void run();
 
 	/// Debug methods

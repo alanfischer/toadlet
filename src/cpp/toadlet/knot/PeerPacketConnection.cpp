@@ -36,6 +36,51 @@ using namespace toadlet::egg::net;
 namespace toadlet{
 namespace knot{
 
+PeerPacketConnection::PeerPacket::PeerPacket():
+	mData(NULL),
+	mDataLength(0),
+	mDataMaxSize(0),
+
+	mFrame(0),
+	mFrameBits(0),
+	mFrameBitsReferenceFrame(0),
+
+	mTimeHandled(0)
+{}
+
+PeerPacketConnection::PeerPacket::~PeerPacket(){
+	if(mData!=NULL){
+		delete[] mData;
+		mData=NULL;
+	}
+}
+
+void PeerPacketConnection::PeerPacket::set(PeerPacket *packet){
+	setData(packet->getData(),packet->getDataLength());
+	setFrame(packet->getFrame());
+	setFrameBits(packet->getFrameBits(),packet->getFrameBitsReferenceFrame());
+}
+
+int PeerPacketConnection::PeerPacket::setData(const byte *data,int length){
+	if(mDataMaxSize<length){
+		if(mData!=NULL){
+			delete[] mData;
+			mData=NULL;
+		}
+		mData=new byte[length];
+		mDataMaxSize=length;
+	}
+	memcpy(mData,data,length);
+	mDataLength=length;
+	return length;
+}
+
+void PeerPacketConnection::PeerPacket::setFrameBits(int bits,int referenceFrame){
+	mFrameBits=bits;
+	mFrameBitsReferenceFrame=referenceFrame;
+}
+
+
 const int PeerPacketConnection::CONNECTION_FRAME=-1;
 const char *PeerPacketConnection::CONNECTION_PACKET="toadlet::knot::ppp";
 const int PeerPacketConnection::CONNECTION_PACKET_LENGTH=18;
