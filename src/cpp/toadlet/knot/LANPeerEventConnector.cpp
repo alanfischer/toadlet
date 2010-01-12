@@ -516,7 +516,7 @@ void LANPeerEventConnector::connected(Connection::ptr connection){
 		}
 		else if(remoteConnectionEvent->randomSeed==localConnectionEvent->randomSeed){
 			Logger::alert(Categories::TOADLET_KNOT,
-				String("Identical seed error")+remoteConnectionEvent->randomSeed+":"+localConnectionEvent->randomSeed+" _ "+(int)remoteConnectionEvent.get()+":"+(int)localConnectionEvent.get());
+				String("Identical seed error")+remoteConnectionEvent->randomSeed+":"+localConnectionEvent->randomSeed);
 			pushThreadEvent(Event::ptr(new Event(-Error_IDENTICAL_SEED)));
 		}
 		else{
