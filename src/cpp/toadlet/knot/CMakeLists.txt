@@ -7,7 +7,6 @@ set (KNOT_SRC
 	LANPeerEventConnector.cpp
 	PeerEventSynchronizer.cpp
 	PeerPacketConnection.cpp
-	RFCOMMConnection.cpp
 	TCPConnection.cpp
 	Version.cpp
 )
@@ -18,9 +17,7 @@ set (KNOT_HEADERS
 	Connection.h
 	LANPeerEventConnector.h
 	PeerEventSynchronizer.h
-	PeerPacket.h
 	PeerPacketConnection.h
-	RFCOMMConnection.h
 	TCPConnection.h
 	Version.h
 )

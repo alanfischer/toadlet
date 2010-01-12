@@ -81,6 +81,42 @@ public:
 	void debugDropNextPacket();
 
 protected:
+	class PeerPacket{
+	public:
+		TOADLET_SHARED_POINTERS(PeerPacket);
+
+		PeerPacket();
+		~PeerPacket();
+
+		void set(PeerPacket *packet);
+		
+		inline byte *getData() const{return mData;}
+		inline int getDataLength() const{return mDataLength;}
+
+		int setData(const byte *data,int length);
+
+		inline int getFrame() const{return mFrame;}
+		void setFrame(int frame){mFrame=frame;}
+
+		inline int getFrameBits() const{return mFrameBits;}
+		inline int getFrameBitsReferenceFrame() const{return mFrameBitsReferenceFrame;}
+		void setFrameBits(int bits,int referenceFrame);
+
+		inline uint64 getTimeHandled() const{return mTimeHandled;}
+		void setTimeHandled(uint64 time){mTimeHandled=time;}
+
+	protected:
+		byte *mData;
+		int mDataLength;
+		int mDataMaxSize;
+
+		int mFrame;
+		int mFrameBits;
+		int mFrameBitsReferenceFrame;
+
+		uint64 mTimeHandled;
+	};
+
 	const static int CONNECTION_FRAME;
 	const static char *CONNECTION_PACKET;
 	const static int CONNECTION_PACKET_LENGTH;

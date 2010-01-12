@@ -45,8 +45,6 @@ public:
 	virtual int send(const byte *data,int length)=0;
 	/// Receive a packet of data, currently non-blocking
 	virtual int receive(byte *data,int length)=0;
-
-	virtual int getPing() const=0;
 };
 
 }
