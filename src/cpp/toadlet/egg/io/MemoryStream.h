@@ -39,8 +39,7 @@ class TOADLET_API MemoryStream:public Stream{
 public:
 	TOADLET_SHARED_POINTERS(MemoryStream);
 
-	MemoryStream(char *data,int length,bool ownsData);
-	MemoryStream(unsigned char *data,int length,bool ownsData);
+	MemoryStream(byte *data,int dataLength,int initialLength,bool ownsData);
 	MemoryStream(Stream::ptr stream); // Read all data from stream
 	MemoryStream();
 	virtual ~MemoryStream();
@@ -48,23 +47,25 @@ public:
 	virtual void close(){}
 
 	virtual bool isReadable(){return true;}
-	virtual int read(char *buffer,int length);
+	virtual int read(byte *buffer,int length);
 
 	virtual bool isWriteable(){return true;}
-	virtual int write(const char *buffer,int length);
+	virtual int write(const byte *buffer,int length);
 
 	virtual bool reset();
 	virtual int length(){return mLength;}
 	virtual int position(){return mPosition;}
 	virtual bool seek(int offs);
 
-	char *getCurrentDataPointer();
-	char *getOriginalDataPointer();
+	byte *getCurrentDataPointer();
+	byte *getOriginalDataPointer();
 
 protected:
-	char *mData;
-	Collection<char> *mInternalData;
+	byte *mData;
+	int mDataLength;
+	Collection<byte> *mInternalData;
 	int mLength;
+	int mInitialLength;
 	int mPosition;
 
 	bool mOwnsData;

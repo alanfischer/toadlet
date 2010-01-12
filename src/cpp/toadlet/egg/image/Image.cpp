@@ -93,7 +93,7 @@ bool Image::reallocate(Dimension dimension,int format,unsigned int width,unsigne
 	mDepth=depth;
 
 	int size=getPixelSize()*mWidth*mHeight*mDepth;
-	mData=new uint8[size];
+	mData=new byte[size];
 	if(clear){
 		memset(mData,0,size);
 	}

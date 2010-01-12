@@ -61,8 +61,8 @@ public:
 	bool accept();
 	bool disconnect();
 
-	int send(const char *data,int length);
-	int receive(char *data,int length);
+	int send(const byte *data,int length);
+	int receive(byte *data,int length);
 
 	/// This is not an accurate ping value.  Since the soonest an acknowledgement of a received packet can be sent is
 	///  dependent on the logic dt of the application, the sum of the ping value of both peers will always be greater

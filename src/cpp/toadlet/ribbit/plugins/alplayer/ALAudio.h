@@ -72,7 +72,7 @@ public:
 
 protected:
 	void update(int dt);
-	int readAudioData(unsigned char *buffer,int bsize);
+	int readAudioData(byte *buffer,int bsize);
 	void setImmediateGain(scalar gain);
 
 	ALPlayer *mAudioPlayer;

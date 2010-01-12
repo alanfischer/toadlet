@@ -125,18 +125,20 @@ LANPeerEventConnector::LANPeerEventConnector():
 	//mUUID,
 	mVersion(0),
 	//mLocalPayload,
-	//mPayload,
 	mEventFactory(NULL),
 	//mLANListenerSocket,
 	//mFindLANGameThread,
 
-	mServerPort(0)
+	mServerPort(0),
 	//mIPServerSocket,
 	//mIPServerThread,
 
 	//mIPClientSocket,
 	//mIPClientThread,
 
+	mOrder(0),
+	mSeed(0)
+	//mPayload,
 	//mConnection,
 	//mConnectionMutex,
 	//mSynchronizer,
@@ -149,8 +151,10 @@ LANPeerEventConnector::~LANPeerEventConnector(){
 	close();
 }
 
-bool LANPeerEventConnector::create(int port,const String &uuid,int version,EventFactory *factory){
-	mBroadcastPort=port;
+bool LANPeerEventConnector::create(bool udp,int broadcastPort,int serverPort,const String &uuid,int version,EventFactory *factory){
+	mUDP=udp;
+	mBroadcastPort=broadcastPort;
+	mServerPort=serverPort;
 	mUUID=uuid;
 	mVersion=version;
 	mEventFactory=factory;
@@ -213,7 +217,9 @@ int LANPeerEventConnector::update(){
 			switch(event->getType()){
 				case(Event_CONNECTION):{
 					ConnectionEvent *connectionEvent=(ConnectionEvent*)event.get();
-//					startGame(startGameEvent->randomSeed,startGameEvent->team,startGameEvent->level,false,0);
+					mOrder=connectionEvent->order;
+					mSeed=connectionEvent->randomSeed;
+					mPayload=connectionEvent->payload;
 					result=1;
 				} break;
 				default:{ // Assume its an error, and return the code
@@ -398,7 +404,8 @@ void LANPeerEventConnector::findLANGameThread(){
 	broadcastSocket->bind(0);
 	broadcastSocket->setBroadcast(true);
 
-	amount=broadcastSocket->sendTo(mUUID.c_str(),mUUID.length(),mBroadcastIP,mBroadcastPort);
+	String message=mUUID+":"+mServerPort;
+	amount+=broadcastSocket->sendTo((byte*)message.c_str(),message.length(),mBroadcastIP,mBroadcastPort);
 
 	broadcastSocket->close();
 
@@ -412,7 +419,7 @@ void LANPeerEventConnector::findLANGameThread(){
 	uint32 ip=0;
 	int port=0;
 	TOADLET_TRY
-		amount=mLANListenerSocket->receiveFrom(receivedData,sizeof(receivedData),ip,port);
+		amount=mLANListenerSocket->receiveFrom((byte*)receivedData,sizeof(receivedData),ip,port);
 	TOADLET_CATCH(const Exception &){}
 
 	TOADLET_TRY
@@ -423,10 +430,20 @@ void LANPeerEventConnector::findLANGameThread(){
 		mLANListenerSocket=NULL;
 	mConnectionMutex.unlock();
 
-	if(amount>0 && mUUID.equals(receivedData)){
-		Logger::alert(Categories::TOADLET_KNOT,
-			String("Received broadcast from ")+Socket::ipToString(ip)+":"+port);
-		startIPClient(ip,port);
+	Logger::alert(Categories::TOADLET_KNOT,
+		String("Received broadcast from ")+Socket::ipToString(ip)+":"+port);
+
+	if(amount>0){
+		message=receivedData;
+		String uuid="";
+		int index=message.find(':');
+		if(index>=0){
+			uuid=message.substr(0,index);
+			port=message.substr(index+1,message.length()).toInt32();
+		}
+		if(mUUID.equals(uuid)){
+			startIPClient(ip,port);
+		}
 	}
 }
 
@@ -478,7 +495,6 @@ void LANPeerEventConnector::connected(Connection::ptr connection){
 		// Now that we have sent the proper connection messages
 		synchronizer->reset(4,1);
 
-		mPayload=connectionEvent->payload;
 		mConnection=connection;
 		mSynchronizer=synchronizer;
 
@@ -490,7 +506,7 @@ void LANPeerEventConnector::connected(Connection::ptr connection){
 	else{
 		if(remoteConnectionEvent==NULL){
 			Logger::alert(Categories::TOADLET_KNOT,
-				String("Error receiving StartGameEvent"));
+				String("Error receiving ConnectionEvent"));
 			pushThreadEvent(Event::ptr(new Event(-Error_RECEIVING_CONNECTION)));
 		}
 		else if(remoteConnectionEvent->version!=localConnectionEvent->version){

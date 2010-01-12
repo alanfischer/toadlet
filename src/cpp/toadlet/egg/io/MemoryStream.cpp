@@ -32,58 +32,56 @@ namespace io{
 
 MemoryStream::MemoryStream(Stream::ptr stream):
 	mData(NULL),
+	mDataLength(0),
 	mInternalData(NULL),
 	mLength(0),
+	mInitialLength(0),
 	mPosition(0),
 	mOwnsData(false)
 {
-	char data[1024];
+	byte data[1024];
 	int i;
 	for(i=stream->read(data,sizeof(data));i>0;i=stream->read(data,sizeof(data))){
-		char *newData=new char[mLength+i];
+		byte *newData=new byte[mLength+i];
 		if(mData!=NULL){
 			memcpy(newData,mData,mLength);
 		}
 		memcpy(newData+mLength,data,i);
 		delete[] mData;
 		mData=newData;
-		mLength+=i;
+		mDataLength+=i;
 	}
 	mOwnsData=true;
+	mLength=mDataLength;
+	mInitialLength=mDataLength;
 }
 
-MemoryStream::MemoryStream(char *data,int length,bool ownsData):
+MemoryStream::MemoryStream(byte *data,int dataLength,int initialLength,bool ownsData):
 	mData(NULL),
+	mDataLength(0),
 	mInternalData(NULL),
 	mLength(0),
+	mInitialLength(0),
 	mPosition(0),
 	mOwnsData(false)
 {
 	mData=data;
-	mLength=length;
-	mOwnsData=ownsData;
-}
-
-MemoryStream::MemoryStream(unsigned char *data,int length,bool ownsData):
-	mData(NULL),
-	mInternalData(NULL),
-	mLength(0),
-	mPosition(0),
-	mOwnsData(false)
-{
-	mData=(char*)data;
-	mLength=length;
+	mDataLength=dataLength;
+	mLength=initialLength;
+	mInitialLength=initialLength;
 	mOwnsData=ownsData;
 }
 
 MemoryStream::MemoryStream():
 	mData(NULL),
+	mDataLength(0),
 	mInternalData(NULL),
 	mLength(0),
+	mInitialLength(0),
 	mPosition(0),
 	mOwnsData(false)
 {
-	mInternalData=new Collection<char>();
+	mInternalData=new Collection<byte>();
 }
 
 MemoryStream::~MemoryStream(){
@@ -98,20 +96,18 @@ MemoryStream::~MemoryStream(){
 	}
 }
 
-int MemoryStream::read(char *buffer,int length){
-	char *data=(mData!=NULL)?mData:mInternalData->begin();
+int MemoryStream::read(byte *buffer,int length){
+	byte *data=(mData!=NULL)?mData:mInternalData->begin();
 	int amt=(length<(mLength-mPosition)?length:(mLength-mPosition));
 	memcpy(buffer,data+mPosition,amt);
 	mPosition+=amt;
 	return amt;
 }
 
-int MemoryStream::write(const char *buffer,int length){
+int MemoryStream::write(const byte *buffer,int length){
 	if(mData!=NULL){
-		int amt=((mLength-mPosition)<length?(mLength-mPosition):length);
-		memcpy(mData+mPosition,buffer,amt);
-		mPosition+=amt;
-		return amt;
+		length=((mDataLength-mPosition)<length?(mDataLength-mPosition):length);
+		memcpy(mData+mPosition,buffer,length);
 	}
 	else{
 		if(length>=mInternalData->capacity()){
@@ -124,15 +120,16 @@ int MemoryStream::write(const char *buffer,int length){
 
 		mInternalData->resize(newsize);
 
-		char *data=&mInternalData->at(oldsize);
+		byte *data=&mInternalData->at(oldsize);
 		memcpy(data,buffer,length);
-		mPosition+=length;
-		return length;
 	}
+	mPosition+=length;
+	mLength=mPosition>mLength?mPosition:mLength;
+	return length;
 }
 
 bool MemoryStream::reset(){
-	mLength=0;
+	mLength=mInitialLength;
 	mPosition=0;
 	if(mInternalData!=NULL){
 		mInternalData->clear();
@@ -141,7 +138,7 @@ bool MemoryStream::reset(){
 }
 
 bool MemoryStream::seek(int offs){
-	if(mInternalData==NULL){
+	if(mData!=NULL){
 		mPosition=mLength<offs?mLength:offs;
 	}
 	else{
@@ -150,13 +147,13 @@ bool MemoryStream::seek(int offs){
 	return true;
 }
 
-char *MemoryStream::getCurrentDataPointer(){
-	char *data=(mData!=NULL)?mData:mInternalData->begin();
+byte *MemoryStream::getCurrentDataPointer(){
+	byte *data=(mData!=NULL)?mData:mInternalData->begin();
 	return data+mPosition;
 }
 
-char *MemoryStream::getOriginalDataPointer(){
-	char *data=(mData!=NULL)?mData:mInternalData->begin();
+byte *MemoryStream::getOriginalDataPointer(){
+	byte *data=(mData!=NULL)?mData:mInternalData->begin();
 	return data;
 }
 

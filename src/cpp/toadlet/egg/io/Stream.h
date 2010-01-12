@@ -42,10 +42,10 @@ public:
 	virtual void close()=0;
 
 	virtual bool isReadable()=0;
-	virtual int read(char *buffer,int length)=0;
+	virtual int read(byte *buffer,int length)=0;
 
 	virtual bool isWriteable()=0;
-	virtual int write(const char *buffer,int length)=0;
+	virtual int write(const byte *buffer,int length)=0;
 
 	virtual bool reset()=0;
 	virtual int length()=0;

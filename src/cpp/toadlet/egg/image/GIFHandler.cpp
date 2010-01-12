@@ -43,12 +43,12 @@ namespace image{
 
 int readGifData(GifFileType *file,GifByteType *data,int amount){
 	Stream *stream=(Stream*)file->UserData;
-	return stream->read((char*)data,amount);
+	return stream->read(data,amount);
 }
 
 int writeGifData(GifFileType *file,GifByteType *data,int amount){
 	Stream *stream=(Stream*)file->UserData;
-	return stream->write((char*)data,amount);
+	return stream->write(data,amount);
 }
 
 const int InterlacedOffset[] = { 0, 4, 2, 1 };	// The way Interlaced image should

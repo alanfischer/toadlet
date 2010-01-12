@@ -54,7 +54,7 @@ PeerEventSynchronizer::PeerEventSynchronizer(Connection::ptr connection,EventFac
 	//mLocalEventGroups,
 	//mRemoteEventGroups
 {
-	mPacketIn=MemoryStream::ptr(new MemoryStream(new char[1024],1024,true));
+	mPacketIn=MemoryStream::ptr(new MemoryStream(new byte[1024],1024,1024,true));
 	mDataPacketIn=DataStream::ptr(new DataStream(Stream::ptr(mPacketIn)));
 	mPacketOut=MemoryStream::ptr(new MemoryStream());
 	mDataPacketOut=DataStream::ptr(new DataStream(Stream::ptr(mPacketOut)));

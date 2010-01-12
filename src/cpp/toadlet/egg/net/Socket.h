@@ -99,11 +99,11 @@ public:
 	virtual bool setTimeout(int millis);
 	virtual int getTimeout() const;
 
-	virtual int receive(char *buffer,int length);
-	virtual int receiveFrom(char *buffer,int length,uint32 &ipAddress,int &port);
+	virtual int receive(byte *buffer,int length);
+	virtual int receiveFrom(byte *buffer,int length,uint32 &ipAddress,int &port);
 
-	virtual int send(const char *buffer,int length);
-	virtual int sendTo(const char *buffer,int length,uint32 ipAddress,int port);
+	virtual int send(const byte *buffer,int length);
+	virtual int sendTo(const byte *buffer,int length,uint32 ipAddress,int port);
 
 public:
 	static String ipToString(uint32 ip);

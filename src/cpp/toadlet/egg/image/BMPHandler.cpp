@@ -129,22 +129,22 @@ Image *BMPHandler::loadImage(Stream *stream){
 	Image *image=new Image(Image::Dimension_D2,format,width,height);
 
 	if(bmih.biBitCount==1 || bmih.biBitCount==2 || bmih.biBitCount==4 || bmih.biBitCount==8){
-		unsigned char *palette=new unsigned char[(1<<bmih.biBitCount)*4];
-		amount+=stream->read((char*)palette,(1<<bmih.biBitCount)*4);
+		byte *palette=new byte[(1<<bmih.biBitCount)*4];
+		amount+=stream->read(palette,(1<<bmih.biBitCount)*4);
 
 		int byteWidth=(width*bmih.biBitCount)/8 + ((((width*bmih.biBitCount)%8)>0)?1:0);
 		int rowSize=byteWidth + (4-byteWidth%4)%4;
 
 		if(amount<(int)bmfh.bfOffBits){
-			char *temp=new char[bmfh.bfOffBits-amount];
+			byte *temp=new byte[bmfh.bfOffBits-amount];
 			stream->read(temp,bmfh.bfOffBits-amount);
 			delete[] temp;
 		}
 
-		unsigned char *rawData=new unsigned char[rowSize*height];
-		stream->read((char*)rawData,rowSize*height);
+		byte *rawData=new byte[rowSize*height];
+		stream->read(rawData,rowSize*height);
 
-		unsigned char *imageData=image->getData();
+		byte *imageData=image->getData();
 
 		for(j=0;j<height;++j){
 			for(i=0;i<width;++i){
@@ -164,17 +164,17 @@ Image *BMPHandler::loadImage(Stream *stream){
 	}
 	else if(bmih.biBitCount==24){
 		if(amount<(int)bmfh.bfOffBits){
-			char *temp=new char[bmfh.bfOffBits-amount];
+			byte *temp=new byte[bmfh.bfOffBits-amount];
 			stream->read(temp,bmfh.bfOffBits-amount);
 			delete[] temp;
 		}
 
 		int rowSize=(width*3) + (4-(width*3)%4)%4;
 
-		unsigned char *rawData=new unsigned char[rowSize*height];
-		stream->read((char*)rawData,rowSize*height);
+		byte *rawData=new byte[rowSize*height];
+		stream->read((byte*)rawData,rowSize*height);
 
-		unsigned char *imageData=image->getData();
+		byte *imageData=image->getData();
 
 		for(j=0;j<height;++j){
 			for(i=0;i<width;++i){
@@ -191,18 +191,18 @@ Image *BMPHandler::loadImage(Stream *stream){
 	}
 	else if(bmih.biBitCount==32){
 		if(amount<(int)bmfh.bfOffBits){
-			char *temp=new char[bmfh.bfOffBits-amount];
+			byte *temp=new byte[bmfh.bfOffBits-amount];
 			stream->read(temp,bmfh.bfOffBits-amount);
 			delete[] temp;
 		}
 
-		unsigned char *imageData=image->getData();
-		stream->read((char*)imageData,width*height*4);
+		byte *imageData=image->getData();
+		stream->read((byte*)imageData,width*height*4);
 
 		for(j=0;j<height;++j){
 			for(i=0;i<width;++i){
 				int imageDataOffset=i*4 + j*width*4;
-				unsigned char temp=imageData[imageDataOffset+2];
+				byte temp=imageData[imageDataOffset+2];
 
 				imageData[imageDataOffset+2]=imageData[imageDataOffset+0];
 				imageData[imageDataOffset+0]=temp;
@@ -308,15 +308,15 @@ bool BMPHandler::saveImage(Image *image,Stream *stream){
 			}
 		}
 
-		stream->write((char*)rawData,rowSize*height);
+		stream->write(rawData,rowSize*height);
 
 		delete[] rawData;
 	}
 	else if(image->getFormat()==Image::Format_RGBA_8){
-		unsigned char *rawData=new unsigned char[width*height*4];
+		byte *rawData=new byte[width*height*4];
 		memset(rawData,0,width*height*4);
 
-		unsigned char *imageData=image->getData();
+		byte *imageData=image->getData();
 
 		for(j=0;j<height;++j){
 			for(i=0;i<width;++i){
@@ -330,7 +330,7 @@ bool BMPHandler::saveImage(Image *image,Stream *stream){
 			}
 		}
 
-		stream->write((char*)imageData,width*height*4);
+		stream->write(imageData,width*height*4);
 
 		delete[] rawData;
 	}

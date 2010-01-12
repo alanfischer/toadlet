@@ -59,7 +59,7 @@ Resource::ptr BSP30Handler::load(Stream::ptr stream,const ResourceHandlerData *h
 
 	Logger::debug(Categories::TOADLET_TADPOLE,"Reading map");
 
-	stream->read((char*)&header,sizeof(header));
+	stream->read((byte*)&header,sizeof(header));
 
 	bmodel *models;		int nmodels;
 	bvertex *vertexes;	int nvertexes;
@@ -311,7 +311,7 @@ void BSP30Handler::readLump(Stream *stream,int lump,void **data,int size,int *co
 
 	stream->seek(ofs);
 	*data=malloc(length);
-	stream->read((char*)*data,length);
+	stream->read((byte*)*data,length);
 
 	if(count!=NULL){
 		*count=length/size;

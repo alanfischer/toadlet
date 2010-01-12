@@ -43,6 +43,8 @@ namespace knot{
 // TODO: This class can be separated out to base PeerEventConnector, which will contain the Events & connected(), and then specialize it for BluetoothPeerConnector, LANPeerConnector, etc
 class TOADLET_API LANPeerEventConnector:public egg::EventFactory{
 public:
+	TOADLET_SHARED_POINTERS(LANPeerEventConnector);
+
 	static const int Event_CONNECTION=1;
 
 	static const int Error_SERVER_CONNECT=-2;
@@ -56,7 +58,7 @@ public:
 	virtual ~LANPeerEventConnector();
 
 	// TODO: Replace int uuid with an actual UUID class
-	bool create(int port,const egg::String &uuid,int version,EventFactory *factory);
+	bool create(bool udp,int broadcastPort,int serverPort,const egg::String &uuid,int version,EventFactory *factory);
 	void close();
 
 	// Start searching for a game
@@ -67,6 +69,8 @@ public:
 	//  Or returns a negative number upon error, and can check with the Errors above
 	int update();
 
+	int getOrder() const{return mOrder;}
+	int getSeed() const{return mSeed;}
 	egg::Event::ptr getPayload() const{return mPayload;}
 	Connection::ptr getConnection() const{return mConnection;}
 	PeerEventSynchronizer::ptr getSynchronizer() const{return mSynchronizer;}
@@ -96,7 +100,6 @@ protected:
 	egg::String mUUID;
 	int mVersion;
 	egg::Event::ptr mLocalPayload;
-	egg::Event::ptr mPayload;
 	egg::EventFactory *mEventFactory;
 	egg::net::Socket::ptr mLANListenerSocket;
 	egg::Thread::ptr mFindLANGameThread;
@@ -108,6 +111,9 @@ protected:
 	egg::net::Socket::ptr mIPClientSocket;
 	egg::Thread::ptr mIPClientThread;
 
+	int mOrder;
+	int mSeed;
+	egg::Event::ptr mPayload;
 	Connection::ptr mConnection;
 	egg::Mutex mConnectionMutex;
 	PeerEventSynchronizer::ptr mSynchronizer;

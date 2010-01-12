@@ -62,7 +62,7 @@ bool TPKGArchive::open(Stream::ptr stream){
 
 	mDataOffset=0;
 
-	char signature[4];
+	byte signature[4];
 	mDataOffset+=mStream->read(signature,4);
 	if(signature[0]!='T' || signature[1]!='P' || signature[2]!='K' || signature[3]!='G'){
 		Error::unknown(Categories::TOADLET_TADPOLE,
@@ -86,7 +86,7 @@ bool TPKGArchive::open(Stream::ptr stream){
 	for(i=0;i<numFiles;++i){
 		uint32 nameLength=0;
 		mDataOffset+=mStream->readBigUInt32(nameLength);
-		char *name=new char[nameLength+1];
+		byte *name=new byte[nameLength+1];
 		mDataOffset+=mStream->read(name,nameLength);
 		name[nameLength]=0;
 		
@@ -123,13 +123,13 @@ Stream::ptr TPKGArchive::openStream(const String &name){
 	int length=it->second.length;
 
 	if(mMemoryStream!=NULL){
-		char *data=mMemoryStream->getCurrentDataPointer();
-		return MemoryStream::ptr(new MemoryStream(data,length,false));
+		byte *data=mMemoryStream->getCurrentDataPointer();
+		return MemoryStream::ptr(new MemoryStream(data,length,length,false));
 	}
 	else{
-		char *data=new char[length];
+		byte *data=new byte[length];
 		mStream->read(data,length);
-		return MemoryStream::ptr(new MemoryStream(data,length,true));
+		return MemoryStream::ptr(new MemoryStream(data,length,length,true));
 	}
 }
 

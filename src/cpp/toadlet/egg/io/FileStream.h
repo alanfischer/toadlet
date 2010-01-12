@@ -53,10 +53,10 @@ public:
 	virtual void close();
 
 	virtual bool isReadable(){return true;}
-	virtual int read(char *buffer,int length);
+	virtual int read(byte *buffer,int length);
 
 	virtual bool isWriteable(){return true;}
-	virtual int write(const char *buffer,int length);
+	virtual int write(const byte *buffer,int length);
 
 	virtual bool reset();
 	virtual int length();

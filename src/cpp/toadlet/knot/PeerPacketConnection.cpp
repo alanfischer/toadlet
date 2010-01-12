@@ -66,9 +66,9 @@ PeerPacketConnection::PeerPacketConnection(Socket::ptr socket):
 	mSocket=socket;
 
 	int maxSize=1024;
-	mOutPacket=MemoryStream::ptr(new MemoryStream(new char[maxSize],maxSize,true));
+	mOutPacket=MemoryStream::ptr(new MemoryStream(new byte[maxSize],maxSize,0,true));
 	mDataOutPacket=DataStream::ptr(new DataStream(Stream::ptr(mOutPacket)));
-	mInPacket=MemoryStream::ptr(new MemoryStream(new char[maxSize],maxSize,true));
+	mInPacket=MemoryStream::ptr(new MemoryStream(new byte[maxSize],maxSize,maxSize,true));
 	mDataInPacket=DataStream::ptr(new DataStream(Stream::ptr(mInPacket)));
 
 	mWindowSize=32;
@@ -255,7 +255,7 @@ bool PeerPacketConnection::disconnect(){
 	return true;
 }
 
-int PeerPacketConnection::send(const char *data,int length){
+int PeerPacketConnection::send(const byte *data,int length){
 	mMutex->lock();
 
 	mLocalFrame++;
@@ -289,7 +289,7 @@ int PeerPacketConnection::send(const char *data,int length){
 	return length;
 }
 
-int PeerPacketConnection::receive(char *data,int length){
+int PeerPacketConnection::receive(byte *data,int length){
 	mMutex->lock();
 
 	int index=mHalfWindowSize;
@@ -399,7 +399,7 @@ int PeerPacketConnection::buildConnectionPacket(DataStream *stream){
 	int size=0;
 
 	size+=stream->writeBigInt32(CONNECTION_FRAME);
-	size+=stream->write(CONNECTION_PACKET,CONNECTION_PACKET_LENGTH);
+	size+=stream->write((byte*)CONNECTION_PACKET,CONNECTION_PACKET_LENGTH);
 	size+=stream->writeBigInt32(CONNECTION_VERSION);
 
 	return size; 
@@ -412,7 +412,7 @@ bool PeerPacketConnection::verifyConnectionPacket(DataStream *stream){
 	}
 
 	char packet[CONNECTION_PACKET_LENGTH];
-	stream->read(packet,CONNECTION_PACKET_LENGTH);
+	stream->read((byte*)packet,CONNECTION_PACKET_LENGTH);
 	if(memcmp(packet,CONNECTION_PACKET,CONNECTION_PACKET_LENGTH)!=0){
 		return false;
 	}

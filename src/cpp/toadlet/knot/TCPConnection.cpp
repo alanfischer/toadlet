@@ -50,9 +50,9 @@ TCPConnection::TCPConnection(Socket::ptr socket):
 	mSocket=socket;
 
 	int maxSize=1024;
-	mOutPacket=MemoryStream::ptr(new MemoryStream(new char[maxSize],maxSize,true));
+	mOutPacket=MemoryStream::ptr(new MemoryStream(new uint8[maxSize],maxSize,0,true));
 	mDataOutPacket=DataStream::ptr(new DataStream(Stream::ptr(mOutPacket)));
-	mInPacket=MemoryStream::ptr(new MemoryStream(new char[maxSize],maxSize,true));
+	mInPacket=MemoryStream::ptr(new MemoryStream(new uint8[maxSize],maxSize,maxSize,true));
 	mDataInPacket=DataStream::ptr(new DataStream(Stream::ptr(mInPacket)));
 
 	mMutex=Mutex::ptr(new Mutex());
@@ -186,7 +186,7 @@ bool TCPConnection::disconnect(){
 	return true;
 }
 
-int TCPConnection::send(const char *data,int length){
+int TCPConnection::send(const byte *data,int length){
 	mMutex->lock();
 		mDataOutPacket->writeBigInt16(length);
 		mDataOutPacket->write(data,length);
@@ -201,7 +201,7 @@ int TCPConnection::send(const char *data,int length){
 	return length;
 }
 
-int TCPConnection::receive(char *data,int length){
+int TCPConnection::receive(byte *data,int length){
 	int amount=0;
 	mMutex->lock();
 		if(mPackets.size()>0){
@@ -235,7 +235,7 @@ int TCPConnection::buildConnectionPacket(DataStream *stream){
 	int size=0;
 
 	size+=stream->writeBigInt32(CONNECTION_FRAME);
-	size+=stream->write(CONNECTION_PACKET,CONNECTION_PACKET_LENGTH);
+	size+=stream->write((byte*)CONNECTION_PACKET,CONNECTION_PACKET_LENGTH);
 	size+=stream->writeBigInt32(CONNECTION_VERSION);
 
 	return size; 
@@ -248,7 +248,7 @@ bool TCPConnection::verifyConnectionPacket(DataStream *stream){
 	}
 
 	char packet[CONNECTION_PACKET_LENGTH];
-	stream->read(packet,CONNECTION_PACKET_LENGTH);
+	stream->read((byte*)packet,CONNECTION_PACKET_LENGTH);
 	if(memcmp(packet,CONNECTION_PACKET,CONNECTION_PACKET_LENGTH)!=0){
 		return false;
 	}

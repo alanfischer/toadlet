@@ -42,9 +42,9 @@ public:
 	virtual bool disconnect()=0;
 
 	/// Send a packet of data
-	virtual int send(const char *data,int length)=0;
+	virtual int send(const byte *data,int length)=0;
 	/// Receive a packet of data, currently non-blocking
-	virtual int receive(char *data,int length)=0;
+	virtual int receive(byte *data,int length)=0;
 
 	virtual int getPing() const=0;
 };

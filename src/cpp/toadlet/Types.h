@@ -184,6 +184,7 @@ namespace toadlet{
 
 typedef signed char int8;
 typedef unsigned char uint8;
+typedef uint8 byte;
 
 typedef signed short int16;
 typedef unsigned short uint16;
@@ -210,6 +211,7 @@ typedef unsigned int uint32;
 #endif
 
 #if defined(TOADLET_DEBUG)
+	static char byteSizeTest  [sizeof(byte)==   1 ?1:-1];
 	static char int8SizeTest  [sizeof(int8)==   1 ?1:-1];
 	static char uint8SizeTest [sizeof(uint8)==  1 ?1:-1];
 	static char int16SizeTest [sizeof(int16)==  2 ?1:-1];

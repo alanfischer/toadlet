@@ -76,8 +76,8 @@ public:
 
 	inline Dimension getDimension() const{return mDimension;}
 	inline int getFormat() const{return mFormat;}
-	inline uint8 *getData(){return mData;}
-	inline const uint8 *getData() const{return mData;}
+	inline byte *getData(){return mData;}
+	inline const byte *getData() const{return mData;}
 	
 	unsigned int getPixelSize() const;
 
@@ -243,7 +243,7 @@ protected:
 	Dimension mDimension;
 	int mFormat;
 	unsigned int mWidth,mHeight,mDepth;
-	uint8 *mData;
+	byte *mData;
 };
 
 }

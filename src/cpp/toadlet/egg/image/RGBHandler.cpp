@@ -55,7 +55,7 @@ ImageRecord *toadlet_rgb_openImage(io::MemoryStream *stream){
 	imageRecord=new ImageRecord();
 	imageRecord->stream=stream;
 
-	stream->read((char*)imageRecord,12);
+	stream->read((byte*)imageRecord,12);
 
 	bigUInt16InPlace(imageRecord->imagic);
 	bigUInt16InPlace(imageRecord->type);
@@ -75,8 +75,8 @@ ImageRecord *toadlet_rgb_openImage(io::MemoryStream *stream){
 		imageRecord->rowSize=new int[x];
 
 		stream->seek(512);
-		stream->read((char*)imageRecord->rowStart,x*sizeof(unsigned int));
-		stream->read((char*)imageRecord->rowSize,x*sizeof(unsigned int));
+		stream->read((byte*)imageRecord->rowStart,x*sizeof(unsigned int));
+		stream->read((byte*)imageRecord->rowSize,x*sizeof(unsigned int));
 
 		int i;
 		unsigned int *stp=imageRecord->rowStart;
@@ -110,7 +110,7 @@ void toadlet_rgb_getImageRow(ImageRecord *imageRecord,unsigned char *buf,int y,i
 
 	if((imageRecord->type & 0xFF00) == 0x0100){
 		imageRecord->stream->seek((int)imageRecord->rowStart[y+z*imageRecord->ysize]);
-		imageRecord->stream->read((char*)imageRecord->tmp,(int)imageRecord->rowSize[y+z*imageRecord->ysize]);
+		imageRecord->stream->read((byte*)imageRecord->tmp,(int)imageRecord->rowSize[y+z*imageRecord->ysize]);
 
 		iPtr=imageRecord->tmp;
 		oPtr=buf;
@@ -136,7 +136,7 @@ void toadlet_rgb_getImageRow(ImageRecord *imageRecord,unsigned char *buf,int y,i
 	}
 	else{
 		imageRecord->stream->seek(512+(y*imageRecord->xsize)+(z*imageRecord->xsize*imageRecord->ysize));
-		imageRecord->stream->read((char*)buf,imageRecord->xsize);
+		imageRecord->stream->read((byte*)buf,imageRecord->xsize);
 	}
 }
 
@@ -147,8 +147,8 @@ RGBHandler::~RGBHandler(){
 }
 
 Image *RGBHandler::loadImage(io::Stream *stream){
-	char buffer[1024];
-	char *totalBuffer=NULL;
+	byte buffer[1024];
+	byte *totalBuffer=NULL;
 	int totalSize=0;
 	int i;
 
@@ -159,7 +159,7 @@ Image *RGBHandler::loadImage(io::Stream *stream){
 	}
 
 	for(i=stream->read(buffer,1024);i>0;i=stream->read(buffer,1024)){
-		char *newBuffer=new char[totalSize+i];
+		byte *newBuffer=new byte[totalSize+i];
 		if(totalBuffer!=NULL){
 			memcpy(newBuffer,totalBuffer,totalSize);
 		}
@@ -169,7 +169,7 @@ Image *RGBHandler::loadImage(io::Stream *stream){
 		totalSize+=i;
 	}
 
-	io::MemoryStream::ptr memoryStream(new io::MemoryStream(totalBuffer,totalSize,false));
+	io::MemoryStream::ptr memoryStream(new io::MemoryStream(totalBuffer,totalSize,totalSize,false));
 	unsigned char *rbuf, *gbuf, *bbuf, *abuf;
 	ImageRecord *imageRecord;
 	int y;
@@ -181,10 +181,10 @@ Image *RGBHandler::loadImage(io::Stream *stream){
 		return NULL;
 	}
 
-	rbuf=new unsigned char[imageRecord->xsize];
-	gbuf=new unsigned char[imageRecord->xsize];
-	bbuf=new unsigned char[imageRecord->xsize];
-	abuf=new unsigned char[imageRecord->xsize];
+	rbuf=new byte[imageRecord->xsize];
+	gbuf=new byte[imageRecord->xsize];
+	bbuf=new byte[imageRecord->xsize];
+	abuf=new byte[imageRecord->xsize];
 
 	Image *image=new Image();
 	int format=Image::Format_UNKNOWN;
@@ -203,7 +203,7 @@ Image *RGBHandler::loadImage(io::Stream *stream){
 		break;
 	}
 	image->reallocate(Image::Dimension_D2,format,imageRecord->xsize,imageRecord->ysize,false);
-	unsigned char *lptr=image->getData();
+	byte *lptr=image->getData();
 
 	int width=image->getWidth();
 
