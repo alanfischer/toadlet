@@ -1401,7 +1401,7 @@ public:
 		Adler32 adler;
 		adler.update((char*)mout.getOriginalDataPointer(),mout.length());
 
-		out->write((char*)mout.getOriginalDataPointer(),mout.length());
+		out->write(mout.getOriginalDataPointer(),mout.length());
 		M3GProxy::writeUInt32(out,adler.getValue());
 	}
 
@@ -1417,14 +1417,14 @@ protected:
 	Collection<M3GSectionObject> mSectionObjects;
 };
 
-const unsigned char M3GFileIdentifierData[12]={0xAB, 0x4A, 0x53, 0x52, 0x31, 0x38, 0x34, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A};
+const byte M3GFileIdentifierData[12]={0xAB, 0x4A, 0x53, 0x52, 0x31, 0x38, 0x34, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A};
 class M3GFileIdentifier{
 public:
 	M3GFileIdentifier(){
 	}
 
 	virtual void getData(DataStream *out){
-		out->write((char*)M3GFileIdentifierData,12);
+		out->write(M3GFileIdentifierData,12);
 	}
 
 	virtual int getLength(){
