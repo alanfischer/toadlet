@@ -46,18 +46,18 @@ namespace handler{
 static String defaultCharacterSet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()_+|{}:\"'<>?`-=\\/[];,. \t");
 
 size_t FontStreamGetBytes(void *info,void *buffer,size_t count){
-	return ((InputStream*)info)->read((char*)buffer,count);
+	return ((Stream*)info)->read((byte*)buffer,count);
 }
 
 off_t FontStreamSkipForward(void *info,off_t count){
-	char *buffer=new char[count];
-	int amount=((InputStream*)info)->read(buffer,count);
+	byte *buffer=new byte[count];
+	int amount=((Stream*)info)->read(buffer,count);
 	delete[] buffer;
 	return amount;
 }
 
 void FontStreamRewind(void *info){
-	((InputStream*)info)->reset();
+	((Stream*)info)->reset();
 }
 	
 typedef void (*CGFontGetGlyphsForUnicharsPtr)(CGFontRef, const UniChar[], const CGGlyph[], size_t);
@@ -78,7 +78,7 @@ OSXFontHandler::OSXFontHandler(TextureManager *textureManager){
 	mTextureManager=textureManager;
 }
 
-Resource::ptr OSXFontHandler::load(InputStream::ptr in,const ResourceHandlerData *handlerData){
+Resource::ptr OSXFontHandler::load(Stream::ptr in,const ResourceHandlerData *handlerData){
 	if(!CGFontGetGlyphsForUnichars){
 		Error::nullPointer(Categories::TOADLET_TADPOLE,
 			"error finding CGFontGetGlyphsForUnichars");

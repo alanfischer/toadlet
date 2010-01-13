@@ -29,6 +29,7 @@
 #include <toadlet/knot/LANPeerEventConnector.h>
 #include <toadlet/knot/PeerPacketConnection.h>
 #include <toadlet/knot/TCPConnection.h>
+#include <string.h> // memset
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;

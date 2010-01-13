@@ -35,7 +35,6 @@
 #include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/egg/net/Socket.h>
 #include <toadlet/knot/Connection.h>
-#include <toadlet/knot/PeerPacket.h>
 
 namespace toadlet{
 namespace knot{

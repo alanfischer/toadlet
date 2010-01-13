@@ -48,12 +48,23 @@ CoreAudioDecoder::~CoreAudioDecoder(){
 	close();
 }
 
-bool CoreAudioDecoder::startStream(InputStream::ptr in){
+void CoreAudioDecoder::close(){
+	if(mAudioFile!=0){
+		AudioFileClose(mAudioFile);
+		mAudioFile=0;
+	}
+
+	if(mIn!=NULL){
+		mIn->close();
+	}
+}
+
+bool CoreAudioDecoder::startStream(Stream::ptr in){
 	UInt32 propertySize=0;
 	OSStatus result=0;
 
 	mIn=in;
-	mSourceSize=in->available();
+	mSourceSize=in->length();
 	mSourcePosition=0;
 
 	result=AudioFileOpenWithCallbacks(this,audioFileRead,0,audioFileGetSize,0,kAudioFileWAVEType,&mAudioFile);
@@ -74,63 +85,23 @@ bool CoreAudioDecoder::startStream(InputStream::ptr in){
 	return true;
 }
 
-int CoreAudioDecoder::read(char *buffer,int length){
-	AudioFileReadBytes(mAudioFile,false,mPosition,(UInt32*)&length,buffer);
-
-	mPosition+=length;
-
-	return length;
-}
-
 bool CoreAudioDecoder::stopStream(){
 	return true;
 }
 
+int CoreAudioDecoder::read(byte *buffer,int length){
+	AudioFileReadBytes(mAudioFile,false,mPosition,(UInt32*)&length,buffer);
+	mPosition+=length;
+	return length;
+}
+
 bool CoreAudioDecoder::reset(){
 	mPosition=0;
-
 	return true;
-}
-
-bool CoreAudioDecoder::seek(int offs){
-	return false;
-}
-
-int CoreAudioDecoder::available(){
-	return 0;
-}
-
-void CoreAudioDecoder::close(){
-	if(mAudioFile!=0){
-		AudioFileClose(mAudioFile);
-		mAudioFile=0;
-	}
-}
-
-int CoreAudioDecoder::getChannels(){
-	return mStreamDescription.mChannelsPerFrame;
-}
-
-int CoreAudioDecoder::getSamplesPerSecond(){
-	return mStreamDescription.mSampleRate;
-}
-
-int CoreAudioDecoder::getBitsPerSample(){
-	return mStreamDescription.mBitsPerChannel;
-}
-
-InputStream::ptr CoreAudioDecoder::getParentStream(){
-	return mIn;
 }
 
 bool CoreAudioDecoder::isVariableBitRate() const{
 	return mStreamDescription.mBytesPerPacket==0 || mStreamDescription.mFramesPerPacket==0;
-}
-
-void CoreAudioDecoder::skip(InputStream::ptr in,int amount){
-	char *skipBuffer=new char[amount];
-	in->read(skipBuffer,amount);
-	delete[] skipBuffer;
 }
 
 OSStatus CoreAudioDecoder::audioFileRead(void *inRefCon,SInt64 inPosition,ByteCount requestCount,void *buffer,ByteCount *actualCount){
@@ -142,7 +113,7 @@ OSStatus CoreAudioDecoder::audioFileRead(void *inRefCon,SInt64 inPosition,ByteCo
 		decoder->mSourcePosition=inPosition;
 	}
 
-	*actualCount=decoder->mIn->read((char*)buffer,requestCount);
+	*actualCount=decoder->mIn->read((byte*)buffer,requestCount);
 
 	decoder->mSourcePosition+=*actualCount;
 
