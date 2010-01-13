@@ -67,7 +67,6 @@ public:
 	FILE *getFILE(){return mFile;}
 
 protected:
-	int mLength;
 	FILE *mFile;
 	bool mAutoClose;
 };

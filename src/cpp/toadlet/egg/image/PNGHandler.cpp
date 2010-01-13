@@ -54,14 +54,14 @@ void toadlet_png_read_data(png_structp png_ptr,png_bytep data,png_size_t length)
 	png_size_t check; 
 
 	Stream *stream=(Stream*)png_ptr->io_ptr;
-	check=(png_size_t)stream->read((byte*)data,length);
+	check=(png_size_t)stream->read(data,length);
 
 	if(check!=length){
 		png_error(png_ptr,"Data read length mismatch");
 	}
 }
 
-Image *PNGHandler::loadImage(io::Stream *stream){
+Image *PNGHandler::loadImage(Stream *stream){
 	png_byte header[8];
 	int y;
 
