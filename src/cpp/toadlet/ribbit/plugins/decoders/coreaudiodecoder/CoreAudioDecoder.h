@@ -41,32 +41,38 @@ public:
 	CoreAudioDecoder();
 	virtual ~CoreAudioDecoder();
 
-	bool startStream(egg::io::InputStream::ptr istream);
-	int read(char *buffer,int length);
+	void close();
+
+	bool isReadable(){return true;}
+	int read(byte *buffer,int length);
+
+	bool isWriteable(){return false;}
+	int write(const byte *buffer,int length){return 0;}
+
+	bool startStream(egg::io::Stream::ptr stream);
 	bool stopStream();
 	bool reset();
-	bool seek(int offs);
-	int available();
-	void close();
-	int getChannels();
-	int getSamplesPerSecond();
-	int getBitsPerSample();
-	egg::io::InputStream::ptr getParentStream();
+	int length(){return 0;}
+	int position(){return 0;}
+	bool seek(int offs){return false;}
+
+	int getChannels(){return mStreamDescription.mChannelsPerFrame;}
+	int getSamplesPerSecond(){return mStreamDescription.mSampleRate;}
+	int getBitsPerSample(){return mStreamDescription.mBitsPerChannel;}
+	egg::io::Stream::ptr getParentStream(){return mIn;}
 
 	inline AudioFileID getAudioFileID() const{return mAudioFile;}
 	inline const AudioStreamBasicDescription &getStreamDescription() const{return mStreamDescription;}
 	bool isVariableBitRate() const;
 
 private:
-	void skip(egg::io::InputStream::ptr in,int amount);
-
 	static OSStatus audioFileRead(void *inRefCon,SInt64 inPosition,ByteCount requestCount,void *buffer,ByteCount *actualCount);
 	static SInt64 audioFileGetSize(void *inRefCon);
 
 	int mPosition;
 	int mSourceSize;
 	int mSourcePosition;
-	egg::io::InputStream::ptr mIn;
+	egg::io::Stream::ptr mIn;
 	AudioFileID mAudioFile;
 	AudioStreamBasicDescription mStreamDescription;
 };

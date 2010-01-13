@@ -43,25 +43,25 @@ namespace tadpole{
 namespace handler{
 
 size_t TextureStreamGetBytes(void *info,void *buffer,size_t count){
-	return ((InputStream*)info)->read((char*)buffer,count);
+	return ((Stream*)info)->read((byte*)buffer,count);
 }
 
 off_t TextureStreamSkipForward(void *info,off_t count){
-	char *buffer=new char[count];
-	int amount=((InputStream*)info)->read(buffer,count);
+	byte *buffer=new byte[count];
+	int amount=((Stream*)info)->read(buffer,count);
 	delete[] buffer;
 	return amount;
 }
 
 void TextureStreamRewind(void *info){
-	((InputStream*)info)->reset();
+	((Stream*)info)->reset();
 }
 	
 OSXTextureHandler::OSXTextureHandler(TextureManager *textureManager){
 	mTextureManager=textureManager;
 }
 
-Resource::ptr OSXTextureHandler::load(InputStream::ptr in,const ResourceHandlerData *handlerData){
+Resource::ptr OSXTextureHandler::load(Stream::ptr in,const ResourceHandlerData *handlerData){
 	CGDataProviderSequentialCallbacks callbacks={0};
 	callbacks.version=0;
 	callbacks.getBytes=TextureStreamGetBytes;

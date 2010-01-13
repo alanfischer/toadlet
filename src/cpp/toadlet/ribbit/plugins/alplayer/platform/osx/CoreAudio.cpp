@@ -67,7 +67,7 @@ bool CoreAudio::create(AudioBuffer::ptr buffer){
 	return false;
 }
 	
-bool CoreAudio::create(InputStream::ptr in,const String &mimeType){
+bool CoreAudio::create(Stream::ptr in,const String &mimeType){
 	AudioStream::ptr decoder=mAudioPlayer->startAudioStream(in,mimeType);
 	if(decoder==NULL){
 		return false;
