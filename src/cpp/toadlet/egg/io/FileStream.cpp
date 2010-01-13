@@ -30,7 +30,10 @@ namespace toadlet{
 namespace egg{
 namespace io{
 
-FileStream::FileStream(const String &filename,int openFlags){
+FileStream::FileStream(const String &filename,int openFlags):
+	mFile(NULL),
+	mAutoClose(false)
+{
 	Logger::excess(Categories::TOADLET_EGG,"Opening file: "+filename);
 
 	const char *mode=NULL;
@@ -59,11 +62,11 @@ void FileStream::close(){
 }
 
 int FileStream::read(byte *buffer,int length){
-	return fread(buffer,length,1,mFile);
+	return fread(buffer,1,length,mFile);
 }
 
 int FileStream::write(const byte *buffer,int length){
-	return fwrite(buffer,length,1,mFile);
+	return fwrite(buffer,1,length,mFile);
 }
 
 bool FileStream::reset(){
@@ -73,7 +76,7 @@ bool FileStream::reset(){
 int FileStream::length(){
 	int current=ftell(mFile);
 	int length=fseek(mFile,0,SEEK_END);
-	fseek(mFile,0,current);
+	fseek(mFile,current,SEEK_SET);
 	return length;
 }
 
