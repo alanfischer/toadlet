@@ -31,6 +31,12 @@
 #include <toadlet/knot/TCPConnection.h>
 #include <string.h> // memset
 
+#if defined(TOADLET_PLATFORM_IPHONE)
+	#import <SystemConfiguration/SCNetworkReachability.h>
+	#define ReachableViaWiFiNetwork	2
+	#define ReachableDirectWWAN	(1<<18)
+#endif
+
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
 using namespace toadlet::egg::net;
@@ -537,33 +543,26 @@ bool LANPeerEventConnector::ensureConnectionAbility(){
 		// However if a GPRS connection is already open from some other application, and a WIFI connection is not
 		//  available, it appears as if we can not tell the difference, from what I have read, so it will just silently fail, oh well.
 		#if 1
-			if(InternetCheckConnection(TEXT("http://www.google.com"),FLAG_ICC_FORCE_CONNECTION,0)==false){
-				pushThreadEvent(ShovelEvent::ptr(new ShovelEvent(EVENT_ERROR_CONNECTION_MANAGER)));
-			}
+			result=InternetCheckConnection(TEXT("http://www.google.com"),FLAG_ICC_FORCE_CONNECTION,0);
 		#else
 			mConnectionManagerMutex.lock();
 			if(mConnectionManager==NULL){
 				mConnectionManager=SharedPointer<ConnectionManager>(new ConnectionManager());
 				result=mConnectionManager->connect(false,60000);
-				if(result==false){
-					pushThreadEvent(ShovelEvent::ptr(new ShovelEvent(EVENT_ERROR_CONNECTION_MANAGER)));
-				}
 			}
 			mConnectionManagerMutex.unlock();
 		#endif
 	#elif defined(TOADLET_PLATFORM_IPHONE)
-		SCNetworkReachabilityFlags flags;
+		SCNetworkReachabilityFlags flags=0;
 		SCNetworkReachabilityRef reachabilityRef;
-		BOOL gotFlags;
+		BOOL gotFlags=false;
 
 		reachabilityRef=SCNetworkReachabilityCreateWithName(CFAllocatorGetDefault(),[@"www.google.com" UTF8String]);
 
 		gotFlags=SCNetworkReachabilityGetFlags(reachabilityRef,&flags);
 		CFRelease(reachabilityRef);
     
-		if(!gotFlags || (flags & ReachableDirectWWAN) || !(flags & ReachableViaWiFiNetwork)){
-			pushThreadEvent(ShovelEvent::ptr(new ShovelEvent(EVENT_ERROR_CONNECTION_MANAGER)));
-		}
+		result=!(!gotFlags || (flags & ReachableDirectWWAN) || !(flags & ReachableViaWiFiNetwork));
 	#endif
 	return result;
 }
