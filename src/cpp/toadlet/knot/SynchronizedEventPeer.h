@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_KNOT_PEEREVENTSYNCHRONIZER_H
-#define TOADLET_KNOT_PEEREVENTSYNCHRONIZER_H
+#ifndef TOADLET_KNOT_SYNCHRONIZEDEVENTPEER_H
+#define TOADLET_KNOT_SYNCHRONIZEDEVENTPEER_H
 
 #include <toadlet/egg/Collection.h>
 #include <toadlet/egg/EventFactory.h>
@@ -35,9 +35,9 @@
 namespace toadlet{
 namespace knot{
 
-class TOADLET_API PeerEventSynchronizer{
+class TOADLET_API SynchronizedEventPeer{
 public:
-	TOADLET_SHARED_POINTERS(PeerEventSynchronizer);
+	TOADLET_SHARED_POINTERS(SynchronizedEventPeer);
 
 	enum PeerStatus{
 		PeerStatus_FRAME_OK,
@@ -49,7 +49,7 @@ public:
 	const static int CONTROL_EVENT_FRAMEBUFFER=1;
 	const static int MAX_FRAME_DIFFERENCE=1000;
 
-	PeerEventSynchronizer(Connection::ptr connection=NULL,egg::EventFactory *factory=NULL);
+	SynchronizedEventPeer(Connection::ptr connection=NULL,egg::EventFactory *factory=NULL);
 
 	void reset(int frameBuffer,int frameGroupSize);
 	void setConnection(Connection::ptr connection);
@@ -59,8 +59,8 @@ public:
 	inline int getFrameBuffer() const{return mFrameBuffer;}
 	inline int getFrameGroupSize() const{return mFrameGroupSize;}
 
-	void pushEvent(egg::Event::ptr event);
-	egg::Event::ptr popEvent();
+	void sendEvent(egg::Event::ptr event);
+	egg::Event::ptr receiveEvent();
 
 	PeerStatus update();
 
