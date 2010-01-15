@@ -1,8 +1,14 @@
+#include <toadlet/egg/System.h>
+#include <toadlet/knot/LANPeerEventConnector.h>
+#include "../quicktest.h"
+
+using namespace toadlet::egg;
+using namespace toadlet::knot;
+
 // The EventListener interface seems to imply that it listens to things internally to an Event, whereas its really a "EventServer/EventClient listener"
 //  But unless EventServer & EventClient both implement an EventPump or something like that, in which case it would be an EventPumpListener, we're kind of SOL
-
-int main(int argc,char **argv){
-	DebugListener::ptr debugListener(new DebugListener());
+QT_TEST(ClientServerTest){
+/*	DebugListener::ptr debugListener(new DebugListener());
 
 	EventServer::ptr server;
 	EventClient::ptr client;
@@ -42,4 +48,5 @@ int main(int argc,char **argv){
 	int ping=client->pingAndWait(); // TODO: Figure out how pinging will work, if there are unprocessed Events hanging around like the Howdy above?
 									//  We could include a PingID, or a more general EventID, and then the client itself would be able to look at
 									//  incoming events and tell 'Hey this is a Pong Event, and it has the ID I'm waiting for
+*/
 }

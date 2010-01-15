@@ -1,70 +1,67 @@
 #include <toadlet/egg/System.h>
+#include <toadlet/egg/Logger.h>
 #include <toadlet/knot/LANPeerEventConnector.h>
 #include "../quicktest.h"
 
-QT_TEST(LANPeerEventConnectorTest){
-	LANPeerEventConnector connector(new LANPeerEventConnector());
+using namespace toadlet::egg;
+using namespace toadlet::knot;
 
-	QT_CHECK(connector->create(true,12345,port,"LANPeerEventConnectorTest",1,NULL));
+QT_TEST(LANPeerEventConnectorTestTCP){
+	LANPeerEventConnector::ptr connector1(new LANPeerEventConnector());
+	LANPeerEventConnector::ptr connector2(new LANPeerEventConnector());
 
-	QT_CHECK(connector->search(NULL));
-	
+	QT_CHECK(connector1->create(true,6968,6969,"LANPeerEventConnectorTest",1,NULL));
+	QT_CHECK(connector2->create(true,6968,6970,"LANPeerEventConnectorTest",1,NULL));
+
+	Random random(System::mtime());
+	QT_CHECK(connector1->search(random.nextInt(),NULL));
+	System::msleep(100);
+
+	QT_CHECK(connector2->search(random.nextInt(),NULL));
+	System::msleep(100);
+
+	int result1=0,result2=0;
 	int i;
-	for(i=0;i<10;++i){
-		if(connector->update()>=0) break;
+	for(i=0;i<10 && (result1<=0 || result2<=0);++i){
+		if(result1<=0) result1=connector1->update();
+		if(result2<=0) result2=connector2->update();
 		System::msleep(100);
 	}
-	QT_CHECK(i!=10);
-	QT_CHECK(connector->getOrder()==0 || i!=10);
 
-	Logger::alert(String("result:")+result+" order:"+connector->getOrder()+" seed:"+connector->getSeed());
+	QT_CHECK(result1==1 && result2==1);
+	QT_CHECK_NOT_EQUAL(connector1->getOrder(),connector2->getOrder());
+	QT_CHECK_EQUAL(connector1->getSeed(),connector2->getSeed());
 
-}
-using namespace toadlet::egg;
-
-FindTest::FindTest():Application(){
-	connector=LANPeerEventConnector::ptr(new LANPeerEventConnector());
+	connector1->close();
+	connector2->close();
 }
 
-FindTest::~FindTest(){
-}
+QT_TEST(LANPeerEventConnectorTestUDP){
+	LANPeerEventConnector::ptr connector1(new LANPeerEventConnector());
+	LANPeerEventConnector::ptr connector2(new LANPeerEventConnector());
 
-void FindTest::create(int port){
-	Application::create();
+	QT_CHECK(connector1->create(false,6968,6969,"LANPeerEventConnectorTest",1,NULL));
+	QT_CHECK(connector2->create(false,6968,6970,"LANPeerEventConnectorTest",1,NULL));
 
-	connector->create(true,12345,port,"FindTest",1,NULL);
-
-	if(connector->search(NULL)==false){
-		Logger::alert("Problem");
-		return;
-	}
-}
-
-void FindTest::destroy(){
-	connector->close();
-
-	Application::destroy();
-}
-
-void FindTest::update(int dt){
-	int result=connector->update();
-
-	Logger::alert(String("result:")+result+" order:"+connector->getOrder()+" seed:"+connector->getSeed());
-
+	Random random(System::mtime());
+	QT_CHECK(connector1->search(random.nextInt(),NULL));
 	System::msleep(100);
-}
 
-#if defined(TOADLET_PLATFORM_WINCE)
-int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,int nCmdShow){
-#else
-int main(int argc,char **argv){
-#endif
-	if(argc<2){return 0;}
+	QT_CHECK(connector2->search(random.nextInt(),NULL));
+	System::msleep(100);
 
-	FindTest app;
-	app.setFullscreen(false);
-	app.create(String(argv[1]).toInt32());
-	app.start(true);
-	app.destroy();
-	return 0;
+	int result1=0,result2=0;
+	int i;
+	for(i=0;i<10 && (result1<=0 || result2<=0);++i){
+		if(result1<=0) result1=connector1->update();
+		if(result2<=0) result2=connector2->update();
+		System::msleep(100);
+	}
+
+	QT_CHECK(result1==1 && result2==1);
+	QT_CHECK_NOT_EQUAL(connector1->getOrder(),connector2->getOrder());
+	QT_CHECK_EQUAL(connector1->getSeed(),connector2->getSeed());
+
+	connector1->close();
+	connector2->close();
 }

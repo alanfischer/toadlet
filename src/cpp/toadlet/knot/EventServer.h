@@ -1,5 +1,4 @@
 class EventServer{
-
 	clientConnected(Connection connection);
 	clientDisconnected(Connection connection);
 	
