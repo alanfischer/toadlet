@@ -613,7 +613,9 @@ int PeerPacketConnection::receivePacketsFromSocket(const toadlet::egg::Collectio
 	int amount=0;
 	int time=System::mtime();
 
-	amount=mSocket->receive(mInPacket->getOriginalDataPointer(),mInPacket->length());
+	TOADLET_TRY
+		amount=mSocket->receive(mInPacket->getOriginalDataPointer(),mInPacket->length());
+	TOADLET_CATCH(const Exception &){}
 	if(amount>0){
 		int frame=mDataInPacket->readBigInt32();
 		if(frame>0){ // Is a data packet

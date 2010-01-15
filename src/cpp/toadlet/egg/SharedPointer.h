@@ -41,7 +41,7 @@ public:
 	template<typename Type> static int releasePointer(PointerCounter *counter,Type *type){
 		int count=counter->decSharedCount();
 		if(count<1){
-			delete type;
+ 			delete type;
 		}
 		return count;
 	}

@@ -33,7 +33,7 @@
 #include <toadlet/egg/Thread.h>
 #include <toadlet/egg/net/Socket.h>
 #include <toadlet/knot/Connection.h>
-#include <toadlet/knot/PeerEventSynchronizer.h>
+#include <toadlet/knot/SynchronizedEventPeer.h>
 
 namespace toadlet{
 namespace knot{
@@ -65,7 +65,7 @@ public:
 	void close();
 
 	// Start searching for a game
-	bool search(egg::Event::ptr localPayload);
+	bool search(int seed,egg::Event::ptr localPayload);
 	// Cancel the search
 	void cancel();
 	// Returns a 1 upon connection, and the get* commands will return valid objects
@@ -76,7 +76,7 @@ public:
 	int getSeed() const{return mSeed;}
 	egg::Event::ptr getPayload() const{return mPayload;}
 	Connection::ptr getConnection() const{return mConnection;}
-	PeerEventSynchronizer::ptr getSynchronizer() const{return mSynchronizer;}
+	SynchronizedEventPeer::ptr getEventPeer() const{return mEventPeer;}
 
 	egg::Event::ptr createEventType(int type);
 
@@ -102,6 +102,7 @@ protected:
 	int mBroadcastPort;
 	egg::String mUUID;
 	int mVersion;
+	int mLocalSeed;
 	egg::Event::ptr mLocalPayload;
 	egg::EventFactory *mEventFactory;
 	egg::net::Socket::ptr mLANListenerSocket;
@@ -119,7 +120,7 @@ protected:
 	egg::Event::ptr mPayload;
 	Connection::ptr mConnection;
 	egg::Mutex mConnectionMutex;
-	PeerEventSynchronizer::ptr mSynchronizer;
+	SynchronizedEventPeer::ptr mEventPeer;
 	egg::Mutex mEventsMutex;
 	egg::Collection<egg::Event::ptr> mEvents;
 

@@ -5,7 +5,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.in ${CMAKE_CURRENT_BINARY_
 # Source files for toadlet_knot
 set (KNOT_SRC
 	LANPeerEventConnector.cpp
-	PeerEventSynchronizer.cpp
+	SynchronizedEventPeer.cpp
 	PeerPacketConnection.cpp
 	TCPConnection.cpp
 	Version.cpp
@@ -16,7 +16,7 @@ set (KNOT_SRC
 set (KNOT_HEADERS
 	Connection.h
 	LANPeerEventConnector.h
-	PeerEventSynchronizer.h
+	SynchronizedEventPeer.h
 	PeerPacketConnection.h
 	TCPConnection.h
 	Version.h
