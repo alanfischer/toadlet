@@ -1,6 +1,25 @@
-#include "FindTest.h"
 #include <toadlet/egg/System.h>
+#include <toadlet/knot/LANPeerEventConnector.h>
+#include "../quicktest.h"
 
+QT_TEST(LANPeerEventConnectorTest){
+	LANPeerEventConnector connector(new LANPeerEventConnector());
+
+	QT_CHECK(connector->create(true,12345,port,"LANPeerEventConnectorTest",1,NULL));
+
+	QT_CHECK(connector->search(NULL));
+	
+	int i;
+	for(i=0;i<10;++i){
+		if(connector->update()>=0) break;
+		System::msleep(100);
+	}
+	QT_CHECK(i!=10);
+	QT_CHECK(connector->getOrder()==0 || i!=10);
+
+	Logger::alert(String("result:")+result+" order:"+connector->getOrder()+" seed:"+connector->getSeed());
+
+}
 using namespace toadlet::egg;
 
 FindTest::FindTest():Application(){
