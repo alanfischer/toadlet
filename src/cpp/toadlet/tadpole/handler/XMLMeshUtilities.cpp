@@ -415,7 +415,7 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 					textureStage->setMipFilter(materialManager->getDefaultMipFilter());
 				}
 
-				material->setTextureStage(0,TextureStage::ptr(new TextureStage()));
+				material->setTextureStage(0,textureStage);
 			}
 		}
 	}

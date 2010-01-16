@@ -155,8 +155,9 @@ protected:
 	bool mInTexGen;
 	bool mMirrorY;
 	egg::Collection<Texture*> mLastTextures;
-	unsigned short mMaxTexCoordIndex;
+	short mMaxTexCoordIndex;
 	egg::Collection<short> mTexCoordIndexes;
+	short mLastMaxTexCoordIndex;
 	egg::Collection<GLenum> mLastTexTargets;
 	VertexData::wptr mLastVertexData;
 	int mLastTypeBits;
