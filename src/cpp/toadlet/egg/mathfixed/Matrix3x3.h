@@ -67,6 +67,10 @@ public:
 		data[2]=z1;data[5]=z2;data[8]=z3;
 	}
 
+	inline Matrix3x3(fixed d[]){
+		*this=*(Matrix3x3*)d;
+	}
+
 	inline Matrix3x3 &set(const Matrix3x3 &matrix){
 		*this=matrix;
 
@@ -77,6 +81,12 @@ public:
 		data[0]=x1;data[3]=x2;data[6]=x3;
 		data[1]=y1;data[4]=y2;data[7]=y3;
 		data[2]=z1;data[5]=z2;data[8]=z3;
+
+		return *this;
+	}
+
+	inline Matrix3x3 &set(fixed d[]){
+		*this=*(Matrix3x3*)d;
 
 		return *this;
 	}

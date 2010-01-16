@@ -69,6 +69,20 @@ public:
 		data[3]=w1;data[7]=w2;data[11]=w3;data[15]=w4;
 	}
 
+	inline Matrix4x4(float d[]){
+		data[0]=d[0];data[4]=d[4];data[8]=d[8];data[12]=d[12];
+		data[1]=d[1];data[5]=d[5];data[9]=d[9];data[13]=d[13];
+		data[2]=d[2];data[6]=d[6];data[10]=d[10];data[14]=d[14];
+		data[3]=d[3];data[7]=d[7];data[11]=d[11];data[15]=d[15];
+	}
+
+	inline Matrix4x4(double d[]){
+		data[0]=d[0];data[4]=d[4];data[8]=d[8];data[12]=d[12];
+		data[1]=d[1];data[5]=d[5];data[9]=d[9];data[13]=d[13];
+		data[2]=d[2];data[6]=d[6];data[10]=d[10];data[14]=d[14];
+		data[3]=d[3];data[7]=d[7];data[11]=d[11];data[15]=d[15];
+	}
+
 	inline Matrix4x4 &set(const Matrix4x4 &matrix){
 		*this=matrix;
 
@@ -80,6 +94,24 @@ public:
 		data[1]=y1;data[5]=y2;data[9]=y3;data[13]=y4;
 		data[2]=z1;data[6]=z2;data[10]=z3;data[14]=z4;
 		data[3]=w1;data[7]=w2;data[11]=w3;data[15]=w4;
+
+		return *this;
+	}
+
+	inline Matrix4x4 &set(float d[]){
+		data[0]=d[0];data[4]=d[4];data[8]=d[8];data[12]=d[12];
+		data[1]=d[1];data[5]=d[5];data[9]=d[9];data[13]=d[13];
+		data[2]=d[2];data[6]=d[6];data[10]=d[10];data[14]=d[14];
+		data[3]=d[3];data[7]=d[7];data[11]=d[11];data[15]=d[15];
+
+		return *this;
+	}
+
+	inline Matrix4x4 &set(double d[]){
+		data[0]=d[0];data[4]=d[4];data[8]=d[8];data[12]=d[12];
+		data[1]=d[1];data[5]=d[5];data[9]=d[9];data[13]=d[13];
+		data[2]=d[2];data[6]=d[6];data[10]=d[10];data[14]=d[14];
+		data[3]=d[3];data[7]=d[7];data[11]=d[11];data[15]=d[15];
 
 		return *this;
 	}

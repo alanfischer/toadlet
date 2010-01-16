@@ -82,6 +82,7 @@ GLRenderer::GLRenderer():
 	mMirrorY(false),
 	mMaxTexCoordIndex(0),
 	//mTexCoordIndexes,
+	mLastMaxTexCoordIndex(0),
 	//mLastTexTargets,
 	//mLastVertexData,
 	mLastTypeBits(0),
@@ -642,7 +643,7 @@ void GLRenderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexDa
 	}
 
 	bool rebind=false;
-	if(mLastVertexData.get()!=vertexData.get()){
+	if(mLastVertexData.get()!=vertexData.get() || mMaxTexCoordIndex!=mLastMaxTexCoordIndex){
 		rebind=true;
 	}
 	else{
@@ -656,6 +657,7 @@ void GLRenderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexDa
 		}
 	}
 	if(rebind){
+		mLastMaxTexCoordIndex=mMaxTexCoordIndex;
 		mLastTypeBits=setVertexData(vertexData,mLastTypeBits);
 		mLastVertexData=vertexData;
 	}

@@ -26,6 +26,7 @@
 #include <toadlet/egg/image/BMPHandler.h>
 #include <toadlet/egg/io/DataStream.h>
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Logger.h>
 #include <string.h> // memset
 
 #if !defined(BI_RGB)
@@ -79,23 +80,22 @@ Image *BMPHandler::loadImage(Stream *stream){
 
 	DataStream::ptr dataStream(new DataStream(stream));
 
-	int amount=0;
-	amount+=dataStream->readLittleUInt16(bmfh.bfType);
-	amount+=dataStream->readLittleUInt32(bmfh.bfSize);
-	amount+=dataStream->readLittleUInt16(bmfh.bfReserved1);
-	amount+=dataStream->readLittleUInt16(bmfh.bfReserved2);
-	amount+=dataStream->readLittleUInt32(bmfh.bfOffBits);
-	amount+=dataStream->readLittleUInt32(bmih.biSize);
-	amount+=dataStream->readLittleInt32(bmih.biWidth);
-	amount+=dataStream->readLittleInt32(bmih.biHeight);
-	amount+=dataStream->readLittleUInt16(bmih.biPlanes);
-	amount+=dataStream->readLittleUInt16(bmih.biBitCount);
-	amount+=dataStream->readLittleUInt32(bmih.biCompression);
-	amount+=dataStream->readLittleUInt32(bmih.biSizeImage);
-	amount+=dataStream->readLittleInt32(bmih.biXPelsPerMeter);
-	amount+=dataStream->readLittleInt32(bmih.biYPelsPerMeter);
-	amount+=dataStream->readLittleUInt32(bmih.biClrUsed);
-	amount+=dataStream->readLittleUInt32(bmih.biClrImportant);
+	bmfh.bfType=dataStream->readLittleUInt16();
+	bmfh.bfSize=dataStream->readLittleUInt32();
+	bmfh.bfReserved1=dataStream->readLittleUInt16();
+	bmfh.bfReserved2=dataStream->readLittleUInt16();
+	bmfh.bfOffBits=dataStream->readLittleUInt32();
+	bmih.biSize=dataStream->readLittleUInt32();
+	bmih.biWidth=dataStream->readLittleInt32();
+	bmih.biHeight=dataStream->readLittleInt32();
+	bmih.biPlanes=dataStream->readLittleUInt16();
+	bmih.biBitCount=dataStream->readLittleUInt16();
+	bmih.biCompression=dataStream->readLittleUInt32();
+	bmih.biSizeImage=dataStream->readLittleUInt32();
+	bmih.biXPelsPerMeter=dataStream->readLittleInt32();
+	bmih.biYPelsPerMeter=dataStream->readLittleInt32();
+	bmih.biClrUsed=dataStream->readLittleUInt32();
+	bmih.biClrImportant=dataStream->readLittleUInt32();
 
 	int width=bmih.biWidth;
 	int height=bmih.biHeight;
@@ -127,24 +127,19 @@ Image *BMPHandler::loadImage(Stream *stream){
 	}
 
 	Image *image=new Image(Image::Dimension_D2,format,width,height);
+	byte *imageData=image->getData();
 
 	if(bmih.biBitCount==1 || bmih.biBitCount==2 || bmih.biBitCount==4 || bmih.biBitCount==8){
 		byte *palette=new byte[(1<<bmih.biBitCount)*4];
-		amount+=stream->read(palette,(1<<bmih.biBitCount)*4);
+		stream->read(palette,(1<<bmih.biBitCount)*4);
 
 		int byteWidth=(width*bmih.biBitCount)/8 + ((((width*bmih.biBitCount)%8)>0)?1:0);
 		int rowSize=byteWidth + (4-byteWidth%4)%4;
 
-		if(amount<(int)bmfh.bfOffBits){
-			byte *temp=new byte[bmfh.bfOffBits-amount];
-			stream->read(temp,bmfh.bfOffBits-amount);
-			delete[] temp;
-		}
+		stream->seek(bmfh.bfOffBits);
 
 		byte *rawData=new byte[rowSize*height];
 		stream->read(rawData,rowSize*height);
-
-		byte *imageData=image->getData();
 
 		for(j=0;j<height;++j){
 			for(i=0;i<width;++i){
@@ -163,18 +158,12 @@ Image *BMPHandler::loadImage(Stream *stream){
 		delete[] palette;
 	}
 	else if(bmih.biBitCount==24){
-		if(amount<(int)bmfh.bfOffBits){
-			byte *temp=new byte[bmfh.bfOffBits-amount];
-			stream->read(temp,bmfh.bfOffBits-amount);
-			delete[] temp;
-		}
+		stream->seek(bmfh.bfOffBits);
 
 		int rowSize=(width*3) + (4-(width*3)%4)%4;
 
 		byte *rawData=new byte[rowSize*height];
 		stream->read((byte*)rawData,rowSize*height);
-
-		byte *imageData=image->getData();
 
 		for(j=0;j<height;++j){
 			for(i=0;i<width;++i){
@@ -190,13 +179,8 @@ Image *BMPHandler::loadImage(Stream *stream){
 		delete[] rawData;
 	}
 	else if(bmih.biBitCount==32){
-		if(amount<(int)bmfh.bfOffBits){
-			byte *temp=new byte[bmfh.bfOffBits-amount];
-			stream->read(temp,bmfh.bfOffBits-amount);
-			delete[] temp;
-		}
+		stream->seek(bmfh.bfOffBits);
 
-		byte *imageData=image->getData();
 		stream->read((byte*)imageData,width*height*4);
 
 		for(j=0;j<height;++j){

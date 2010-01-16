@@ -69,6 +69,10 @@ public:
 		data[3]=w1;data[7]=w2;data[11]=w3;data[15]=w4;
 	}
 
+	inline Matrix4x4(fixed d[]){
+		*this=*(Matrix4x4*)d;
+	}
+
 	inline Matrix4x4 &set(const Matrix4x4 &matrix){
 		*this=matrix;
 
@@ -80,6 +84,12 @@ public:
 		data[1]=y1;data[5]=y2;data[9]=y3;data[13]=y4;
 		data[2]=z1;data[6]=z2;data[10]=z3;data[14]=z4;
 		data[3]=w1;data[7]=w2;data[11]=w3;data[15]=w4;
+
+		return *this;
+	}
+
+	inline Matrix4x4 &set(fixed d[]){
+		*this=*(Matrix4x4*)d;
 
 		return *this;
 	}

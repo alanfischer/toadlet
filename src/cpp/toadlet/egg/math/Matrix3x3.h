@@ -67,6 +67,18 @@ public:
 		data[2]=z1;data[5]=z2;data[8]=z3;
 	}
 
+	inline Matrix3x3(float d[]){
+		data[0]=d[0];data[3]=d[3];data[6]=d[6];
+		data[1]=d[1];data[4]=d[4];data[7]=d[7];
+		data[2]=d[2];data[5]=d[5];data[8]=d[8];
+	}
+
+	inline Matrix3x3(double d[]){
+		data[0]=d[0];data[3]=d[3];data[6]=d[6];
+		data[1]=d[1];data[4]=d[4];data[7]=d[7];
+		data[2]=d[2];data[5]=d[5];data[8]=d[8];
+	}
+
 	inline Matrix3x3 &set(const Matrix3x3 &matrix){
 		*this=matrix;
 
@@ -77,6 +89,22 @@ public:
 		data[0]=x1;data[3]=x2;data[6]=x3;
 		data[1]=y1;data[4]=y2;data[7]=y3;
 		data[2]=z1;data[5]=z2;data[8]=z3;
+
+		return *this;
+	}
+
+	inline Matrix3x3 &set(float d[]){
+		data[0]=d[0];data[3]=d[3];data[6]=d[6];
+		data[1]=d[1];data[4]=d[4];data[7]=d[7];
+		data[2]=d[2];data[5]=d[5];data[8]=d[8];
+
+		return *this;
+	}
+
+	inline Matrix3x3 &set(double d[]){
+		data[0]=d[0];data[3]=d[3];data[6]=d[6];
+		data[1]=d[1];data[4]=d[4];data[7]=d[7];
+		data[2]=d[2];data[5]=d[5];data[8]=d[8];
 
 		return *this;
 	}
