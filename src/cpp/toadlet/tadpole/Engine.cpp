@@ -51,7 +51,11 @@
 #if defined(TOADLET_PLATFORM_OSX)
 	#include <toadlet/tadpole/handler/platform/osx/OSXFontHandler.h>
 	#include <toadlet/tadpole/handler/platform/osx/OSXTextureHandler.h>
-#elif defined(TOADLET_HAS_FREETYPE)
+#elif defined(TOADLET_PLATFORM_WIN32)
+	#include <toadlet/tadpole/handler/platform/win32/Win32FontHandler.h>
+	#include <toadlet/tadpole/handler/platform/win32/Win32TextureHandler.h>
+#endif
+#if defined(TOADLET_HAS_FREETYPE)
 	#include <toadlet/tadpole/handler/FreeTypeHandler.h>
 #endif
 #if defined(TOADLET_HAS_MXML)
@@ -130,8 +134,22 @@ Engine::Engine():
 
 	#if defined(TOADLET_HAS_PNG)
 		mTextureManager->setHandler(PNGHandler::ptr(new PNGHandler(mTextureManager)),"png");
-	#elif defined(TOADLET_PLATFORM_OSX)
-		mTextureManager->setHandler(OSXTextureHandler::ptr(new OSXTextureHandler(mTextureManager)),"png");
+	#endif
+
+	#if defined(TOADLET_PLATFORM_OSX)
+		OSXTextureHandler::ptr textureHandler(new OSXTextureHandler(mTextureManager));
+		mTextureManager->setHandler(textureHandler,"bmp");
+		mTextureManager->setHandler(textureHandler,"gif");
+		mTextureManager->setHandler(textureHandler,"jpg");
+		mTextureManager->setHandler(textureHandler,"jpeg");
+		mTextureManager->setHandler(textureHandler,"png");
+	#elif defined(TOADLET_PLATFORM_WIN32)
+		Win32TextureHandler::ptr textureHandler(new Win32TextureHandler(mTextureManager));
+		mTextureManager->setHandler(textureHandler,"bmp");
+		mTextureManager->setHandler(textureHandler,"gif");
+		mTextureManager->setHandler(textureHandler,"jpg");
+		mTextureManager->setHandler(textureHandler,"jpeg");
+		mTextureManager->setHandler(textureHandler,"png");
 	#endif
 
 	// Font handlers
@@ -139,7 +157,8 @@ Engine::Engine():
 		OSXFontHandler::ptr osxFontHandler(new OSXFontHandler(mTextureManager));
 		mFontManager->setHandler(osxFontHandler,"ttf");
 		mFontManager->setHandler(osxFontHandler,"dfont");
-	#elif defined(TOADLET_HAS_FREETYPE)
+	#endif
+	#if defined(TOADLET_HAS_FREETYPE)
 		FreeTypeHandler::ptr freeTypeHandler(new FreeTypeHandler(mTextureManager));
 		mFontManager->setHandler(freeTypeHandler,"ttf");
 		mFontManager->setHandler(freeTypeHandler,"dfont");

@@ -57,6 +57,7 @@ set (TADPOLE_HANDLER_PLATFORM_OSX_SRC
 
 set (TADPOLE_HANDLER_PLATFORM_WIN32_SRC
 	handler/platform/win32/Win32FontHandler.cpp
+	handler/platform/win32/Win32TextureHandler.cpp
 )
 
 set (TADPOLE_MESH_SRC
@@ -164,6 +165,7 @@ set (TADPOLE_HANDLER_PLATFORM_OSX_HEADERS
 
 set (TADPOLE_HANDLER_PLATFORM_WIN32_HEADERS
 	handler/platform/win32/Win32FontHandler.h
+	handler/platform/win32/Win32TextureHandler.h
 ) 
 
 set (TADPOLE_MESH_HEADERS
