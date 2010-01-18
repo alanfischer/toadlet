@@ -28,6 +28,7 @@
 
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/tadpole/TextureManager.h>
+#include <windows.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -38,12 +39,14 @@ namespace handler{
 class TOADLET_API Win32TextureHandler:public ResourceHandler{
 public:
 	Win32TextureHandler(TextureManager *textureManager);
-	virtual ~Win32TextureHandler(){}
+	virtual ~Win32TextureHandler();
 
 	egg::Resource::ptr load(egg::io::Stream::ptr in,const ResourceHandlerData *handlerData);
 
 protected:
 	TextureManager *mTextureManager;
+
+	ULONG_PTR mToken;
 };
 
 }

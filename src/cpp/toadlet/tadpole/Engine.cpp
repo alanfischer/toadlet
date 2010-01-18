@@ -32,32 +32,34 @@
 #include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/handler/AudioBufferHandler.h>
-#include <toadlet/tadpole/handler/BMPHandler.h>
 #include <toadlet/tadpole/handler/MMSHHandler.h>
-#include <toadlet/tadpole/handler/RGBHandler.h>
 #include <toadlet/tadpole/handler/SPRHandler.h>
 #include <toadlet/tadpole/handler/TPKGHandler.h>
 #include <toadlet/tadpole/handler/WADHandler.h>
 
-#if defined(TOADLET_HAS_GIF)
-	#include <toadlet/tadpole/handler/GIFHandler.h>
+#if defined(TOADLET_PLATFORM_WIN32)
+	#include <toadlet/tadpole/handler/platform/win32/Win32TextureHandler.h>
+#elif defined(TOADLET_PLATFORM_OSX)
+	#include <toadlet/tadpole/handler/platform/osx/OSXTextureHandler.h>
+#else
+	#include <toadlet/tadpole/handler/BMPHandler.h>
+	#if defined(TOADLET_HAS_GIF)
+		#include <toadlet/tadpole/handler/GIFHandler.h>
+	#endif
+	#if defined(TOADLET_HAS_JPEG)
+		#include <toadlet/tadpole/handler/JPEGHandler.h>
+	#endif
+	#if defined(TOADLET_HAS_PNG)
+		#include <toadlet/tadpole/handler/PNGHandler.h>
+	#endif
 #endif
-#if defined(TOADLET_HAS_JPEG)
-	#include <toadlet/tadpole/handler/JPEGHandler.h>
-#endif
-#if defined(TOADLET_HAS_PNG)
-	#include <toadlet/tadpole/handler/PNGHandler.h>
-#endif
+
 #if defined(TOADLET_PLATFORM_OSX)
 	#include <toadlet/tadpole/handler/platform/osx/OSXFontHandler.h>
-	#include <toadlet/tadpole/handler/platform/osx/OSXTextureHandler.h>
-#elif defined(TOADLET_PLATFORM_WIN32)
-	#include <toadlet/tadpole/handler/platform/win32/Win32FontHandler.h>
-	#include <toadlet/tadpole/handler/platform/win32/Win32TextureHandler.h>
-#endif
-#if defined(TOADLET_HAS_FREETYPE)
+#elif defined(TOADLET_HAS_FREETYPE)
 	#include <toadlet/tadpole/handler/FreeTypeHandler.h>
 #endif
+
 #if defined(TOADLET_HAS_MXML)
 	#include <toadlet/tadpole/handler/XANMHandler.h>
 	#include <toadlet/tadpole/handler/XMATHandler.h>
@@ -116,40 +118,35 @@ Engine::Engine():
 	mArchiveManager->setHandler(WADHandler::ptr(new WADHandler(mTextureManager)),"wad");
 
 	// Texture handlers
-	mTextureManager->setHandler(BMPHandler::ptr(new BMPHandler(mTextureManager)),"bmp");
-
-	mTextureManager->setHandler(RGBHandler::ptr(new RGBHandler(mTextureManager)),"rgb");
-
 	mTextureManager->setHandler(SPRHandler::ptr(new SPRHandler(mTextureManager)),"spr");
 
-	#if defined(TOADLET_HAS_GIF)
-		mTextureManager->setHandler(GIFHandler::ptr(new GIFHandler(mTextureManager)),"gif");
-	#endif
-
-	#if defined(TOADLET_HAS_JPEG)
-		JPEGHandler::ptr jpegHandler(new JPEGHandler(mTextureManager));
-		mTextureManager->setHandler(jpegHandler,"jpeg");
-		mTextureManager->setHandler(jpegHandler,"jpg");
-	#endif
-
-	#if defined(TOADLET_HAS_PNG)
-		mTextureManager->setHandler(PNGHandler::ptr(new PNGHandler(mTextureManager)),"png");
-	#endif
-
-	#if defined(TOADLET_PLATFORM_OSX)
-		OSXTextureHandler::ptr textureHandler(new OSXTextureHandler(mTextureManager));
-		mTextureManager->setHandler(textureHandler,"bmp");
-		mTextureManager->setHandler(textureHandler,"gif");
-		mTextureManager->setHandler(textureHandler,"jpg");
-		mTextureManager->setHandler(textureHandler,"jpeg");
-		mTextureManager->setHandler(textureHandler,"png");
-	#elif defined(TOADLET_PLATFORM_WIN32)
+	#if defined(TOADLET_PLATFORM_WIN32)
 		Win32TextureHandler::ptr textureHandler(new Win32TextureHandler(mTextureManager));
 		mTextureManager->setHandler(textureHandler,"bmp");
 		mTextureManager->setHandler(textureHandler,"gif");
 		mTextureManager->setHandler(textureHandler,"jpg");
 		mTextureManager->setHandler(textureHandler,"jpeg");
 		mTextureManager->setHandler(textureHandler,"png");
+	#elif defined(TOADLET_PLATFORM_OSX)
+		OSXTextureHandler::ptr textureHandler(new OSXTextureHandler(mTextureManager));
+		mTextureManager->setHandler(textureHandler,"bmp");
+		mTextureManager->setHandler(textureHandler,"gif");
+		mTextureManager->setHandler(textureHandler,"jpg");
+		mTextureManager->setHandler(textureHandler,"jpeg");
+		mTextureManager->setHandler(textureHandler,"png");
+	#else
+		mTextureManager->setHandler(BMPHandler::ptr(new BMPHandler(mTextureManager)),"bmp");
+		#if defined(TOADLET_HAS_GIF)
+			mTextureManager->setHandler(GIFHandler::ptr(new GIFHandler(mTextureManager)),"gif");
+		#endif
+		#if defined(TOADLET_HAS_JPEG)
+			JPEGHandler::ptr jpegHandler(new JPEGHandler(mTextureManager));
+			mTextureManager->setHandler(jpegHandler,"jpeg");
+			mTextureManager->setHandler(jpegHandler,"jpg");
+		#endif
+		#if defined(TOADLET_HAS_PNG)
+			mTextureManager->setHandler(PNGHandler::ptr(new PNGHandler(mTextureManager)),"png");
+		#endif
 	#endif
 
 	// Font handlers
@@ -157,8 +154,7 @@ Engine::Engine():
 		OSXFontHandler::ptr osxFontHandler(new OSXFontHandler(mTextureManager));
 		mFontManager->setHandler(osxFontHandler,"ttf");
 		mFontManager->setHandler(osxFontHandler,"dfont");
-	#endif
-	#if defined(TOADLET_HAS_FREETYPE)
+	#elif defined(TOADLET_HAS_FREETYPE)
 		FreeTypeHandler::ptr freeTypeHandler(new FreeTypeHandler(mTextureManager));
 		mFontManager->setHandler(freeTypeHandler,"ttf");
 		mFontManager->setHandler(freeTypeHandler,"dfont");

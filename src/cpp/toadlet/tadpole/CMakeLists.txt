@@ -140,7 +140,6 @@ set (TADPOLE_HANDLER_HEADERS
 	handler/JPEGHandler.h
 	handler/MMSHHandler.h
 	handler/PNGHandler.h
-	handler/RGBHandler.h
 	handler/SPRHandler.h
 	handler/TPKGHandler.h
 	handler/WADArchive.h

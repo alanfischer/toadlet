@@ -559,12 +559,8 @@ bool LANPeerEventConnector::ensureConnectionAbility(){
 		#endif
 	#elif defined(TOADLET_PLATFORM_IPHONE)
 		SCNetworkReachabilityFlags flags=0;
-		SCNetworkReachabilityRef reachabilityRef;
-		BOOL gotFlags=false;
-
-		reachabilityRef=SCNetworkReachabilityCreateWithName(CFAllocatorGetDefault(),[@"www.google.com" UTF8String]);
-
-		gotFlags=SCNetworkReachabilityGetFlags(reachabilityRef,&flags);
+		SCNetworkReachabilityRef reachabilityRef=SCNetworkReachabilityCreateWithName(CFAllocatorGetDefault(),"www.google.com"]);
+		bool gotFlags=SCNetworkReachabilityGetFlags(reachabilityRef,&flags);
 		CFRelease(reachabilityRef);
     
 		result=!(!gotFlags || (flags & ReachableDirectWWAN) || !(flags & ReachableViaWiFiNetwork));

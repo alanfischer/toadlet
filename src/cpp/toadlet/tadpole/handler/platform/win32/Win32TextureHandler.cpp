@@ -25,12 +25,15 @@
 
 #include <toadlet/egg/Collection.h>
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Logger.h>
 #include <toadlet/tadpole/handler/platform/win32/Win32TextureHandler.h>
 
 #if defined(TOADLET_PLATFORM_WINCE)
 	#include <Imaging.h>
 #else
 	#include <OleCtl.h>
+	#include <gdiplus.h>
+	#pragma comment(lib,"gdiplus.lib")
 #endif
 
 using namespace toadlet::egg;
@@ -104,6 +107,12 @@ protected:
 
 Win32TextureHandler::Win32TextureHandler(TextureManager *textureManager){
 	mTextureManager=textureManager;
+	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+	Gdiplus::GdiplusStartup(&mToken,&gdiplusStartupInput,NULL);
+}
+
+Win32TextureHandler::~Win32TextureHandler(){
+	Gdiplus::GdiplusShutdown(mToken);
 }
 
 Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData *handlerData){
@@ -119,11 +128,62 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData
 
 		CreateBitmapFromImage(
 	#else
-		IPicture *picture=NULL;
-		hr=OleLoadPicture(stream,0,FALSE,IID_IPicture,(void**)&picture);
-		if(FAILED(hr)){
+		Gdiplus::Bitmap *bitmap=Gdiplus::Bitmap::FromStream(stream);
+		if(bitmap==NULL){
 			return NULL;
 		}
+		if(bitmap->GetLastStatus()!=Gdiplus::Ok){
+			delete bitmap;
+			return NULL;
+		}
+
+		bitmap->LockBits(&rect,
+		Logger::alert(String("W:")+bitmap->GetWidth()+" H:"+bitmap->GetHeight());
+/*
+ 
+
+    // create the destination Bitmap object
+
+    Bitmap bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+
+ 
+
+    unsafe
+
+    {
+
+        // get a pointer to the raw bits
+
+        RGBQUAD* pBits = (RGBQUAD*)(void*)dibsection.dsBm.bmBits;
+
+ 
+
+        // copy each pixel manually
+
+        for (int x = 0; x < dibsection.dsBmih.biWidth; x++)
+
+            for (int y = 0; y < dibsection.dsBmih.biHeight; y++)
+
+            {
+
+                int offset = y * dibsection.dsBmih.biWidth + x;
+
+                if (pBits[offset].rgbReserved != 0)
+
+                {
+
+                    bitmap.SetPixel(x, y, Color.FromArgb(pBits[offset].rgbReserved, pBits[offset].rgbRed, pBits[offset].rgbGreen, pBits[offset].rgbBlue));
+
+                }
+
+            }
+
+    }
+
+ 
+
+    return bitmap;
+*/
 	#endif
 
 	return NULL;

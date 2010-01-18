@@ -85,7 +85,7 @@ int FileStream::position(){
 }
 
 bool FileStream::seek(int offs){
-	return fseek(mFile,offs,SEEK_SET)!=0;
+	return fseek(mFile,offs,SEEK_SET)==0;
 }
 
 }	
