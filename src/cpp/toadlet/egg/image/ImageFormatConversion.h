@@ -142,12 +142,17 @@ public:
 			case Format_LA_8:
 				return sizeof(uint8)*2;
 			case Format_RGB_8:
+			case Format_BGR_8:
 				return sizeof(uint8)*3;
 			case Format_RGBA_8:
+			case Format_BGRA_8:
 				return sizeof(uint8)*4;
 			case Format_RGB_5_6_5:
+			case Format_BGR_5_6_5:
 			case Format_RGBA_5_5_5_1:
+			case Format_BGRA_5_5_5_1:
 			case Format_RGBA_4_4_4_4:
+			case Format_BGRA_4_4_4_4:
 				return sizeof(uint16);
 			case Format_L_F32:
 			case Format_A_F32:
@@ -155,8 +160,10 @@ public:
 			case Format_LA_F32:
 				return sizeof(float)*2;
 			case Format_RGB_F32:
+			case Format_BGR_F32:
 				return sizeof(float)*3;
 			case Format_RGBA_F32:
+			case Format_BGRA_F32:
 				return sizeof(float)*4;
 			default:
 				return 0;
