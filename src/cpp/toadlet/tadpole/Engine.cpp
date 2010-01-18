@@ -118,22 +118,10 @@ Engine::Engine():
 	mArchiveManager->setHandler(WADHandler::ptr(new WADHandler(mTextureManager)),"wad");
 
 	// Texture handlers
-	mTextureManager->setHandler(SPRHandler::ptr(new SPRHandler(mTextureManager)),"spr");
-
 	#if defined(TOADLET_PLATFORM_WIN32)
-		Win32TextureHandler::ptr textureHandler(new Win32TextureHandler(mTextureManager));
-		mTextureManager->setHandler(textureHandler,"bmp");
-		mTextureManager->setHandler(textureHandler,"gif");
-		mTextureManager->setHandler(textureHandler,"jpg");
-		mTextureManager->setHandler(textureHandler,"jpeg");
-		mTextureManager->setHandler(textureHandler,"png");
+		mTextureManager->setDefaultHandler(Win32TextureHandler::ptr(new Win32TextureHandler(mTextureManager)));
 	#elif defined(TOADLET_PLATFORM_OSX)
-		OSXTextureHandler::ptr textureHandler(new OSXTextureHandler(mTextureManager));
-		mTextureManager->setHandler(textureHandler,"bmp");
-		mTextureManager->setHandler(textureHandler,"gif");
-		mTextureManager->setHandler(textureHandler,"jpg");
-		mTextureManager->setHandler(textureHandler,"jpeg");
-		mTextureManager->setHandler(textureHandler,"png");
+		mTextureManager->setDefaultHandler(OSXTextureHandler::ptr(new OSXTextureHandler(mTextureManager)));
 	#else
 		mTextureManager->setHandler(BMPHandler::ptr(new BMPHandler(mTextureManager)),"bmp");
 		#if defined(TOADLET_HAS_GIF)
@@ -148,6 +136,8 @@ Engine::Engine():
 			mTextureManager->setHandler(PNGHandler::ptr(new PNGHandler(mTextureManager)),"png");
 		#endif
 	#endif
+
+	mTextureManager->setHandler(SPRHandler::ptr(new SPRHandler(mTextureManager)),"spr");
 
 	// Font handlers
 	#if defined(TOADLET_PLATFORM_OSX)
