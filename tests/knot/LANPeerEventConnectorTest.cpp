@@ -10,8 +10,8 @@ QT_TEST(LANPeerEventConnectorTestTCP){
 	LANPeerEventConnector::ptr connector1(new LANPeerEventConnector());
 	LANPeerEventConnector::ptr connector2(new LANPeerEventConnector());
 
-	QT_CHECK(connector1->create(true,6968,6969,"LANPeerEventConnectorTest",1,NULL));
-	QT_CHECK(connector2->create(true,6968,6970,"LANPeerEventConnectorTest",1,NULL));
+	QT_CHECK(connector1->create(false,6968,6969,"LANPeerEventConnectorTest",1,NULL));
+	QT_CHECK(connector2->create(false,6968,6970,"LANPeerEventConnectorTest",1,NULL));
 
 	Random random(System::mtime());
 	QT_CHECK(connector1->search(random.nextInt(),NULL));
@@ -40,8 +40,8 @@ QT_TEST(LANPeerEventConnectorTestUDP){
 	LANPeerEventConnector::ptr connector1(new LANPeerEventConnector());
 	LANPeerEventConnector::ptr connector2(new LANPeerEventConnector());
 
-	QT_CHECK(connector1->create(false,6968,6969,"LANPeerEventConnectorTest",1,NULL));
-	QT_CHECK(connector2->create(false,6968,6970,"LANPeerEventConnectorTest",1,NULL));
+	QT_CHECK(connector1->create(true,6971,6972,"LANPeerEventConnectorTest",1,NULL));
+	QT_CHECK(connector2->create(true,6971,6973,"LANPeerEventConnectorTest",1,NULL));
 
 	Random random(System::mtime());
 	QT_CHECK(connector1->search(random.nextInt(),NULL));

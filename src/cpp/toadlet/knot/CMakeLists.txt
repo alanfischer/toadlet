@@ -4,21 +4,33 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.in ${CMAKE_CURRENT_BINARY_
 
 # Source files for toadlet_knot
 set (KNOT_SRC
+	DebugListener.cpp
 	LANPeerEventConnector.cpp
+	SimpleEventClient.cpp
+	SimpleEventServer.cpp
 	SynchronizedEventPeer.cpp
 	PeerPacketConnection.cpp
 	TCPConnection.cpp
+	TCPConnector.cpp
 	Version.cpp
 )
 
 
 # Headers
 set (KNOT_HEADERS
+	EventClient.h
+	EventServer.h
 	Connection.h
+	Connector.h
+	ConnectorListener.h
+	DebugListener.h
 	LANPeerEventConnector.h
+	SimpleEventClient.h
+	SimpleEventServer.h
 	SynchronizedEventPeer.h
 	PeerPacketConnection.h
 	TCPConnection.h
+	TCPConnector.h
 	Version.h
 )
 

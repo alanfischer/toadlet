@@ -39,16 +39,20 @@
 namespace toadlet{
 namespace knot{
 
+class TCPConnector;
+
 class TOADLET_API TCPConnection:public Connection,egg::Runnable{
 public:
 	TOADLET_SHARED_POINTERS(TCPConnection);
 
-	TCPConnection(egg::net::Socket::ptr socket);
+	TCPConnection(TCPConnector *connector=NULL); // An optional Connector to be notified about disconnection
+	TCPConnection(egg::net::Socket::ptr socket); // Supply a socket to use, this lets the socket be controlled externally
 	virtual ~TCPConnection();
 
-	bool connect(const egg::String &address,int port);
-	bool connect(int ip,int port);
-	bool accept();
+	bool connect(int remoteHost,int remotePort);
+	bool connect(egg::net::Socket::ptr socket);
+	bool accept(int localPort);
+	bool accept(egg::net::Socket::ptr socket);
 	void skipStart();
 
 	bool disconnect();
@@ -97,6 +101,7 @@ protected:
 	egg::Mutex::ptr mMutex;
 	egg::Thread::ptr mThread;
 	bool mRun;
+	TCPConnector *mConnector;
 
 	egg::Collection<Packet::ptr> mPackets;
 	egg::Collection<Packet::ptr> mFreePackets;

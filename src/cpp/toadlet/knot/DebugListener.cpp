@@ -23,28 +23,25 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_KNOT_EVENTSERVER_H
-#define TOADLET_KNOT_EVENTSERVER_H
+#include <toadlet/egg/Logger.h>
+#include <toadlet/knot/DebugListener.h>
 
-#include <toadlet/egg/String.h>
-#include <toadlet/knot/ConnectorListener.h>
+using namespace toadlet::egg;
 
 namespace toadlet{
 namespace knot{
 
-class TOADLET_API EventServer:public ConnectorListener{
-public:
-	TOADLET_SHARED_POINTERS(EventServer);
+DebugListener::DebugListener(){}
 
-	virtual void connected(Connection::ptr connection)=0;
-	virtual void disconnected(Connection::ptr connection)=0;
-	
-	virtual bool sendEvent(Event event,int clientID)=0;
-	virtual bool broadcastEvent(Event event)=0;
-	virtual bool receiveEvent(Event::ptr &event,int &clientID)=0;
-};
+DebugListener::~DebugListener(){}
+
+void DebugListener::connected(Connection::ptr connection){
+	Logger::alert(String("Connection connected:")+(int)connection.get());
+}
+
+void DebugListener::disconnected(Connection::ptr connection){
+	Logger::alert(String("Connection disconnected:")+(int)connection.get());
+}
 
 }
 }
-
-#endif

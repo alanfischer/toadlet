@@ -383,30 +383,24 @@ textureFormat=Format_RGBA_8;
 }
 
 DXGI_FORMAT D3D10Texture::getDXGI_FORMAT(int textureFormat){
-	DXGI_FORMAT format=DXGI_FORMAT_UNKNOWN;
-
-	if(textureFormat==Format_L_8){
-		format=DXGI_FORMAT_R8_UNORM;
+	switch(textureFormat){
+		case Format_L_8:
+			return DXGI_FORMAT_R8_UNORM;
+		case Format_LA_8:
+			return DXGI_FORMAT_R8G8_UNORM;
+		case Format_RGBA_8:
+			return DXGI_FORMAT_R8G8B8A8_UNORM;
+		case Format_BGRA_8:
+			return DXGI_FORMAT_B8G8R8A8_UNORM;
+		case Format_BGR_5_6_5:
+			return DXGI_FORMAT_B5G6R5_UNORM;
+		case Format_BGRA_5_5_5_1:
+			return DXGI_FORMAT_B5G5R5A1_UNORM;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"D3D10Texture::getDXGI_FORMAT: Invalid type");
+			return DXGI_FORMAT_UNKNOWN;
 	}
-	else if(textureFormat==Format_LA_8){
-		format=DXGI_FORMAT_R8G8_UNORM;
-	}
-	else if(textureFormat==Format_RGBA_8){
-		format=DXGI_FORMAT_R8G8B8A8_UNORM;
-	}
-	else if(textureFormat==Format_RGB_5_6_5){
-		format=DXGI_FORMAT_B5G6R5_UNORM;
-	}
-	else if(textureFormat==Format_RGBA_5_5_5_1){
-		format=DXGI_FORMAT_B5G5R5A1_UNORM;
-	}
-
-	if(format==DXGI_FORMAT_UNKNOWN){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"D3D10Texture::getDXGI_FORMAT: Invalid type");
-	}
-
-	return format;
 }
 
 }

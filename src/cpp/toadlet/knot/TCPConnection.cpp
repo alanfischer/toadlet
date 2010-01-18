@@ -27,6 +27,7 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/knot/TCPConnection.h>
+#include <toadlet/knot/TCPConnector.h>
 #include <string.h>
 
 using namespace toadlet::egg;
@@ -41,19 +42,63 @@ const char *TCPConnection::CONNECTION_PACKET="toadlet::knot::tcp";
 const int TCPConnection::CONNECTION_PACKET_LENGTH=18;
 const int TCPConnection::CONNECTION_VERSION=1;
 
-TCPConnection::TCPConnection(Socket::ptr socket):
-	mRun(true),
+TCPConnection::TCPConnection(TCPConnector *connector):
+	//mSocket,
+	//mOutPacket,
+	//mDataOutPacket,
+	//mInPacket,
+	//mDataInPacket,
 
+	//mMutex,
+	//mThread,
+	mRun(true),
+	mConnector(NULL),
+
+	//mPackets,
+	//mFreePackets,
+
+	//mDebugRandom,
 	mDebugPacketDelayMinTime(0),
 	mDebugPacketDelayMaxTime(0)
 {
-	mSocket=socket;
-
 	int maxSize=1024;
 	mOutPacket=MemoryStream::ptr(new MemoryStream(new uint8[maxSize],maxSize,0,true));
 	mDataOutPacket=DataStream::ptr(new DataStream(Stream::ptr(mOutPacket)));
 	mInPacket=MemoryStream::ptr(new MemoryStream(new uint8[maxSize],maxSize,maxSize,true));
 	mDataInPacket=DataStream::ptr(new DataStream(Stream::ptr(mInPacket)));
+
+	mConnector=connector;
+	
+	mMutex=Mutex::ptr(new Mutex());
+	mThread=Thread::ptr(new Thread(this));
+}
+
+TCPConnection::TCPConnection(egg::net::Socket::ptr socket):
+	//mSocket,
+	//mOutPacket,
+	//mDataOutPacket,
+	//mInPacket,
+	//mDataInPacket,
+
+	//mMutex,
+	//mThread,
+	mRun(true),
+	mConnector(NULL),
+
+	//mPackets,
+	//mFreePackets,
+
+	//mDebugRandom,
+	mDebugPacketDelayMinTime(0),
+	mDebugPacketDelayMaxTime(0)
+{
+	int maxSize=1024;
+	mOutPacket=MemoryStream::ptr(new MemoryStream(new uint8[maxSize],maxSize,0,true));
+	mDataOutPacket=DataStream::ptr(new DataStream(Stream::ptr(mOutPacket)));
+	mInPacket=MemoryStream::ptr(new MemoryStream(new uint8[maxSize],maxSize,maxSize,true));
+	mDataInPacket=DataStream::ptr(new DataStream(Stream::ptr(mInPacket)));
+
+	mSocket=socket;
 
 	mMutex=Mutex::ptr(new Mutex());
 	mThread=Thread::ptr(new Thread(this));
@@ -63,13 +108,28 @@ TCPConnection::~TCPConnection(){
 	disconnect();
 }
 
-bool TCPConnection::connect(const String &address,int port){
-	return connect(Socket::stringToIP(address),port);
+bool TCPConnection::connect(int remoteHost,int remotePort){
+	Socket::ptr socket;
+	if(mSocket==NULL){
+		socket=Socket::ptr(Socket::makeTCPSocket());
+	}
+	else{
+		socket=mSocket;
+	}
+
+	bool result=false;
+	TOADLET_TRY
+		result=socket->connect(remoteHost,remotePort);
+	TOADLET_CATCH(const Exception &){result=false;}
+	if(result){
+		connect(socket);
+	}
+
+	return result;
 }
 
-bool TCPConnection::connect(int ip,int port){
-	uint32 remoteIP=ip;
-	int remotePort=port;
+bool TCPConnection::connect(Socket::ptr socket){
+	mSocket=socket;
 
 	Logger::debug(Categories::TOADLET_KNOT,
 		String("connect: protocol ")+CONNECTION_PACKET);
@@ -77,77 +137,23 @@ bool TCPConnection::connect(int ip,int port){
 	bool result=false;
 	int amount=0;
 	TOADLET_TRY
-		result=mSocket->connect(remoteIP,remotePort);
-		if(result){
-			result=false;
-			int size=buildConnectionPacket(mDataOutPacket);
+		int size=buildConnectionPacket(mDataOutPacket);
 
-			amount=mSocket->send(mOutPacket->getOriginalDataPointer(),size);
-			if(amount>0){
-				Logger::debug(Categories::TOADLET_KNOT,
-					"connect: sent connection packet");
-
-				amount=mSocket->receive(mInPacket->getOriginalDataPointer(),size);
-				if(amount>0){
-					Logger::debug(Categories::TOADLET_KNOT,
-						"connect: received connection packet");
-
-					if(verifyConnectionPacket(mDataInPacket)){
-						Logger::debug(Categories::TOADLET_KNOT,
-							"connect: verified connection packet");
-
-						result=true;
-					}
-					else{
-						Logger::alert(Categories::TOADLET_KNOT,
-							"connect: error verifying connection packet");
-					}
-				}
-			}
-		}
-	TOADLET_CATCH(const Exception &){result=false;}
-
-	mInPacket->reset();
-	mOutPacket->reset();
-
-	if(result){
-		skipStart();
-	}
-
-	return result;
-}
-
-bool TCPConnection::accept(){
-	mSocket->listen(1);
-
-	Logger::debug(Categories::TOADLET_KNOT,
-		String("accept: protocol ")+CONNECTION_PACKET);
-
-	bool result=false;
-	TOADLET_TRY
-		Socket::ptr socket=Socket::ptr(mSocket->accept());
-		if(socket!=NULL){
-			mSocket=socket;
-			int amount=0;
-
-			int size=buildConnectionPacket(mDataOutPacket);
+		amount=mSocket->send(mOutPacket->getOriginalDataPointer(),size);
+		if(amount>0){
+			Logger::debug(Categories::TOADLET_KNOT,
+				"connect: sent connection packet");
 
 			amount=mSocket->receive(mInPacket->getOriginalDataPointer(),size);
 			if(amount>0){
 				Logger::debug(Categories::TOADLET_KNOT,
-					"accept: received connection packet");
+					"connect: received connection packet");
 
 				if(verifyConnectionPacket(mDataInPacket)){
 					Logger::debug(Categories::TOADLET_KNOT,
-						"accept: verified connection packet");
+						"connect: verified connection packet");
 
-					amount=mSocket->send(mOutPacket->getOriginalDataPointer(),size);
-					if(amount>0){
-						Logger::debug(Categories::TOADLET_KNOT,
-							"accept: sent connection packet");
-
-						result=true;
-					}
+					result=true;
 				}
 				else{
 					Logger::alert(Categories::TOADLET_KNOT,
@@ -161,20 +167,89 @@ bool TCPConnection::accept(){
 	mOutPacket->reset();
 
 	if(result){
-		skipStart();
+		mThread->start();
 	}
 
 	return result;
 }
 
-void TCPConnection::skipStart(){
-	mThread->start();
+bool TCPConnection::accept(int localPort){
+	Socket::ptr socket;
+	if(mSocket==NULL){
+		socket=Socket::ptr(Socket::makeTCPSocket());
+	}
+	else{
+		socket=mSocket;
+	}
+
+	Socket::ptr clientSocket;
+	TOADLET_TRY
+		// If we were passed in a server Socket to use, then we assume it has already been bound.
+		// This allows users to have more control over external sockets
+		if(socket!=mSocket){
+			socket->bind(localPort);
+		}
+		socket->listen(1);
+		clientSocket=Socket::ptr(socket->accept());
+	TOADLET_CATCH(const Exception &){clientSocket=NULL;}
+	bool result=false;
+	if(clientSocket!=NULL){
+		result=accept(clientSocket);
+	}
+
+	return result;
+}
+
+bool TCPConnection::accept(Socket::ptr socket){
+	mSocket=socket;
+
+	Logger::debug(Categories::TOADLET_KNOT,
+		String("accept: protocol ")+CONNECTION_PACKET);
+
+	bool result=false;
+	TOADLET_TRY
+		int amount=0;
+		int size=buildConnectionPacket(mDataOutPacket);
+
+		amount=mSocket->receive(mInPacket->getOriginalDataPointer(),size);
+		if(amount>0){
+			Logger::debug(Categories::TOADLET_KNOT,
+				"accept: received connection packet");
+
+			if(verifyConnectionPacket(mDataInPacket)){
+				Logger::debug(Categories::TOADLET_KNOT,
+					"accept: verified connection packet");
+
+				amount=mSocket->send(mOutPacket->getOriginalDataPointer(),size);
+				if(amount>0){
+					Logger::debug(Categories::TOADLET_KNOT,
+						"accept: sent connection packet");
+
+					result=true;
+				}
+			}
+			else{
+				Logger::alert(Categories::TOADLET_KNOT,
+					"connect: error verifying connection packet");
+			}
+		}
+	TOADLET_CATCH(const Exception &){result=false;}
+
+	mInPacket->reset();
+	mOutPacket->reset();
+
+	if(result){
+		mThread->start();
+	}
+
+	return result;
 }
 
 bool TCPConnection::disconnect(){
 	TOADLET_TRY
 		if(mSocket!=NULL){
 			mSocket->close();
+			mSocket=NULL;
 		}
 	TOADLET_CATCH(const Exception &){}
 
@@ -291,6 +366,9 @@ bool TCPConnection::updatePacketReceive(){
 			else{
 				mFreePackets.add(packet);
 			}
+		}
+		else if(mConnector!=NULL){
+			mConnector->receiveError(this);
 		}
 	TOADLET_CATCH(const Exception &){amount=0;}
 

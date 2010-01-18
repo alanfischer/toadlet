@@ -324,7 +324,7 @@ void LANPeerEventConnector::ipServerThread(int port){
 	}
 	else{
 		TCPConnection::ptr con(new TCPConnection(mIPServerSocket));
-		result=con->accept();
+		result=con->accept(port);
 		connection=con;
 	}
 
