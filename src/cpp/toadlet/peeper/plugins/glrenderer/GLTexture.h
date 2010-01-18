@@ -67,6 +67,7 @@ public:
 	inline GLuint getHandle() const{return mHandle;}
 	inline GLenum getTarget() const{return mTarget;}
 
+	static int getClosestTextureFormat(int textureFormat);
 	static GLuint getGLFormat(int textureFormat);
 	static GLuint getGLType(int textureFormat);
 	static GLuint getGLWrap(TextureStage::AddressMode addressMode,bool hasClampToEdge=true);
@@ -79,7 +80,6 @@ public:
 
 protected:
 	bool generateMipLevels();
-	int getClosestTextureFormat(int textureFormat);
 	GLuint getGLTarget();
 
 	GLRenderer *mRenderer;

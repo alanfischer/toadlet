@@ -425,27 +425,29 @@ bool D3D9Texture::read(int format,int width,int height,int depth,int mipLevel,ui
 	return SUCCEEDED(result);
 }
 
-int D3D9Texture::getClosestTextureFormat(int textureFormat){
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		if(textureFormat==Format_L_8){
-			textureFormat=Format_RGB_5_6_5;
-		}
-		else if(textureFormat==Format_A_8){
-			textureFormat=Format_RGBA_8;
-		}
-		else if(textureFormat==Format_LA_8){
-			textureFormat=Format_RGBA_8;
-		}
-	#else
-		if(textureFormat==Format_A_8){
-			textureFormat=Format_LA_8;
-		}
-	#endif
-	return textureFormat;
+int D3D9Texture::getClosestTextureFormat(int format){
+	switch(format){
+		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+			case(Format_L_8):
+				return Format_RGB_5_6_5;
+			case(Format_A_8):
+			case(Format_LA_8):
+				return Format_RGBA_8;
+		#else
+			case(Format_A_8):
+				return Format_LA_8;
+		#endif
+		case(Format_BGR_8):
+			return Format_RGB_8;
+		case(Format_BGRA_8):
+			return Format_RGBA_8;
+		default:
+			return format;
+	}
 }
 
-D3DFORMAT D3D9Texture::getD3DFORMAT(int textureFormat){
-	switch(textureFormat){
+D3DFORMAT D3D9Texture::getD3DFORMAT(int format){
+	switch(format){
 		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
 			case Format_L_8:
 				return D3DFMT_L8;
