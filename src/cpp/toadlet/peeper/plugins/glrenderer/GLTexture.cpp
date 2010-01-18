@@ -356,6 +356,17 @@ GLuint GLTexture::getGLFormat(int textureFormat){
 	else if((textureFormat&Texture::Format_BIT_RGBA)>0){
 		format=GL_RGBA;
 	}
+	#if defined(TOADLET_HAS_GLEW) && defined(GL_EXT_bgra)
+		else if(GLEW_EXT_bgra && (textureFormat&Texture::Format_BIT_BGR)>0){
+			format=GL_BGR_EXT;
+		}
+	#endif
+	#if defined(TOADLET_HAS_GLEW) && defined(GL_EXT_bgra)
+		else if(GLEW_EXT_bgra && (textureFormat&Texture::Format_BIT_BGRA)>0){
+			format=GL_BGRA_EXT;
+		}
+	#endif
+
 	#if !defined(TOADLET_HAS_GLES) || defined(TOADLET_HAS_EAGL)
 		else if((textureFormat&Texture::Format_BIT_DEPTH)>0){
 			if((textureFormat&Texture::Format_BIT_UINT_16)>0){

@@ -32,9 +32,6 @@ set (EGG_IMAGE_JPG_SRC
 set (EGG_IMAGE_PNG_SRC
 	image/PNGHandler.cpp
 )
-set (EGG_IMAGE_RGB_SRC
-	image/RGBHandler.cpp	
-)
 set (EGG_IMAGE_SPR_SRC
 	image/SPRHandler.cpp
 )
@@ -149,9 +146,6 @@ set (EGG_IMAGE_JPG_HEADERS
 set (EGG_IMAGE_PNG_HEADERS
 	image/PNGHandler.h
 )
-set (EGG_IMAGE_RGB_HEADERS
-	image/RGBHandler.h	
-)
 set (EGG_IMAGE_SPR_HEADERS
 	image/SPRHandler.h	
 )
@@ -239,7 +233,7 @@ set (EGG_PLATFORM_WIN32_HEADERS
 
 
 # Bundle source
-source_group ("Source Files\\\\image" FILES ${EGG_IMAGE_SRC} ${EGG_IMAGE_BMP_SRC} ${EGG_IMAGE_RGB_SRC} ${EGG_IMAGE_SPR_SRC})
+source_group ("Source Files\\\\image" FILES ${EGG_IMAGE_SRC} ${EGG_IMAGE_BMP_SRC} ${EGG_IMAGE_SPR_SRC})
 source_group ("Source Files\\\\io" FILES ${EGG_IO_SRC})
 source_group ("Source Files\\\\math" FILES ${EGG_MATH_SRC})
 source_group ("Source Files\\\\mathfixed" FILES ${EGG_MATHFIXED_SRC})
@@ -247,7 +241,7 @@ source_group ("Source Files\\\\net" FILES ${EGG_NET_SRC})
 
 
 # Bundle headers
-source_group ("Header Files\\\\image" FILES ${EGG_IMAGE_HEADERS} ${EGG_IMAGE_BMP_HEADERS} ${EGG_IMAGE_RGB_HEADERS} ${EGG_IMAGE_SPR_HEADERS})
+source_group ("Header Files\\\\image" FILES ${EGG_IMAGE_HEADERS} ${EGG_IMAGE_BMP_HEADERS} ${EGG_IMAGE_SPR_HEADERS})
 source_group ("Header Files\\\\io" FILES ${EGG_IO_HEADERS})
 source_group ("Header Files\\\\math" FILES ${EGG_MATH_HEADERS})
 source_group ("Header Files\\\\mathfixed" FILES ${EGG_MATHFIXED_HEADERS})
@@ -255,8 +249,8 @@ source_group ("Header Files\\\\net" FILES ${EGG_NET_HEADERS})
 
 
 # Sources and headers
-set (EGG_SRC ${EGG_SRC} ${EGG_IMAGE_SRC} ${EGG_IO_SRC} ${EGG_MATH_SRC} ${EGG_MATHFIXED_SRC} ${EGG_NET_SRC} ${EGG_IMAGE_BMP_SRC} ${EGG_IMAGE_RGB_SRC} ${EGG_IMAGE_SPR_SRC})
-set (EGG_HEADERS ${EGG_HEADERS} ${EGG_IMAGE_HEADERS} ${EGG_IO_HEADERS} ${EGG_MATH_HEADERS} ${EGG_MATHFIXED_HEADERS} ${EGG_NET_HEADERS} ${EGG_IMAGE_BMP_HEADERS} ${EGG_IMAGE_RGB_HEADERS} ${EGG_IMAGE_SPR_HEADERS})
+set (EGG_SRC ${EGG_SRC} ${EGG_IMAGE_SRC} ${EGG_IO_SRC} ${EGG_MATH_SRC} ${EGG_MATHFIXED_SRC} ${EGG_NET_SRC} ${EGG_IMAGE_BMP_SRC} ${EGG_IMAGE_SPR_SRC})
+set (EGG_HEADERS ${EGG_HEADERS} ${EGG_IMAGE_HEADERS} ${EGG_IO_HEADERS} ${EGG_MATH_HEADERS} ${EGG_MATHFIXED_HEADERS} ${EGG_NET_HEADERS} ${EGG_IMAGE_BMP_HEADERS} ${EGG_IMAGE_SPR_HEADERS})
 
 
 # Platform specific files
