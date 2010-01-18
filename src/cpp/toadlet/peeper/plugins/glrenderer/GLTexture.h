@@ -79,6 +79,7 @@ public:
 
 protected:
 	bool generateMipLevels();
+	int getClosestTextureFormat(int textureFormat);
 	GLuint getGLTarget();
 
 	GLRenderer *mRenderer;

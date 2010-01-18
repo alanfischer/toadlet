@@ -62,8 +62,8 @@ public:
 		Format_BIT_A=				1<<1,
 		Format_BIT_LA=				1<<2,
 		Format_BIT_RGB=				1<<3,
-		Format_BIT_RGBA=			1<<4,
-		Format_BIT_BGR=				1<<5,
+		Format_BIT_BGR=				1<<4,
+		Format_BIT_RGBA=			1<<5,
 		Format_BIT_BGRA=			1<<6,
 		Format_BIT_DEPTH=			1<<10,
 
@@ -99,8 +99,11 @@ public:
 		Format_BGRA_F32=			Format_BIT_BGRA|Format_BIT_FLOAT_32,
 		Format_DEPTH_F32=			Format_BIT_DEPTH|Format_BIT_FLOAT_32,
 		Format_RGB_5_6_5=			Format_BIT_RGB|Format_BIT_UINT_5_6_5,
+		Format_BGR_5_6_5=			Format_BIT_BGR|Format_BIT_UINT_5_6_5,
 		Format_RGBA_5_5_5_1=		Format_BIT_RGBA|Format_BIT_UINT_5_5_5_1,
+		Format_BGRA_5_5_5_1=		Format_BIT_BGRA|Format_BIT_UINT_5_5_5_1,
 		Format_RGBA_4_4_4_4=		Format_BIT_RGBA|Format_BIT_UINT_4_4_4_4,
+		Format_BGRA_4_4_4_4=		Format_BIT_BGRA|Format_BIT_UINT_4_4_4_4,
 	};
 };
 

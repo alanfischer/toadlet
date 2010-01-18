@@ -34,6 +34,7 @@
 	#include <OleCtl.h>
 	#include <gdiplus.h>
 	#pragma comment(lib,"gdiplus.lib")
+	using namespace Gdiplus;
 #endif
 
 using namespace toadlet::egg;
@@ -91,13 +92,20 @@ public:
 		return result?S_OK:E_FAIL;
 	}
 
+	HRESULT STDMETHODCALLTYPE Stat(STATSTG *pstatstg,DWORD grfStatFlag){
+		memset(pstatstg,0,sizeof(STATSTG));
+		pstatstg->type=STGTY_STREAM;
+		pstatstg->cbSize.QuadPart=mBase->length();
+		pstatstg->clsid=CLSID_NULL;
+		return S_OK;
+	}
+
 	HRESULT STDMETHODCALLTYPE SetSize(ULARGE_INTEGER libNewSize){return E_NOTIMPL;}
 	HRESULT STDMETHODCALLTYPE CopyTo(IStream *pstm,ULARGE_INTEGER cb,ULARGE_INTEGER *pcbRead,ULARGE_INTEGER *pcbWritten){return E_NOTIMPL;}
 	HRESULT STDMETHODCALLTYPE Commit(DWORD grfCommitFlags){return E_NOTIMPL;}
 	HRESULT STDMETHODCALLTYPE Revert(){return E_NOTIMPL;}
 	HRESULT STDMETHODCALLTYPE LockRegion(ULARGE_INTEGER libOffset,ULARGE_INTEGER cb,DWORD dwLockType){return E_NOTIMPL;}
 	HRESULT STDMETHODCALLTYPE UnlockRegion(ULARGE_INTEGER libOffset,ULARGE_INTEGER cb,DWORD dwLockType){return E_NOTIMPL;}
-	HRESULT STDMETHODCALLTYPE Stat(STATSTG *pstatstg,DWORD grfStatFlag){return E_NOTIMPL;}
 	HRESULT STDMETHODCALLTYPE Clone(IStream **ppstm){return E_NOTIMPL;}
 
 protected:
@@ -107,12 +115,12 @@ protected:
 
 Win32TextureHandler::Win32TextureHandler(TextureManager *textureManager){
 	mTextureManager=textureManager;
-	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-	Gdiplus::GdiplusStartup(&mToken,&gdiplusStartupInput,NULL);
+	GdiplusStartupInput gdiplusStartupInput;
+	GdiplusStartup(&mToken,&gdiplusStartupInput,NULL);
 }
 
 Win32TextureHandler::~Win32TextureHandler(){
-	Gdiplus::GdiplusShutdown(mToken);
+	GdiplusShutdown(mToken);
 }
 
 Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData *handlerData){
@@ -128,62 +136,59 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData
 
 		CreateBitmapFromImage(
 	#else
-		Gdiplus::Bitmap *bitmap=Gdiplus::Bitmap::FromStream(stream);
+		Bitmap *bitmap=Bitmap::FromStream(stream);
 		if(bitmap==NULL){
 			return NULL;
 		}
-		if(bitmap->GetLastStatus()!=Gdiplus::Ok){
+
+		int status=bitmap->GetLastStatus();
+		if(status!=Ok){
 			delete bitmap;
+			Logger::alert(String("Status:")+status);
 			return NULL;
 		}
 
-		bitmap->LockBits(&rect,
-		Logger::alert(String("W:")+bitmap->GetWidth()+" H:"+bitmap->GetHeight());
-/*
- 
+		Rect rect(0,0,bitmap->GetWidth(),bitmap->GetHeight());
+		PixelFormat gdiformat=bitmap->GetPixelFormat();
+		int format=0;
+		switch(format){
+			case(PixelFormat16bppARGB1555):
+				format=Texture::Format_BGRA_5_5_5_1;
+			break;
+			case(PixelFormat16bppRGB565):
+				format=Texture::Format_BGR_5_6_5;
+			break;
+			case(PixelFormat24bppRGB):
+				format=Texture::Format_BGR_8;
+			break;
+			case(PixelFormat32bppARGB):
+				format=Texture::Format_BGRA_8;
+			break;
+			default:
+				if((format&PixelFormatAlpha)>0){
+					gdiformat=PixelFormat32bppARGB;
+					format=Texture::Format_BGRA_8;
+				}
+				else{
+					gdiformat=PixelFormat24bppRGB;
+					format=Texture::Format_BGR_8;
+				}
+			break;
+		}
 
-    // create the destination Bitmap object
+		image::Image::ptr image(new image::Image(image::Image::Dimension_D2,format,bitmap->GetWidth(),bitmap->GetHeight()));
 
-    Bitmap bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+		BitmapData data;
+		bitmap->LockBits(&rect,ImageLockModeRead,gdiformat,&data);
 
- 
+		int i;
+		for(i=0;i<image->getHeight();++i){
+			memcpy(image->getData()+image->getWidth()*image->getPixelSize()*i,((uint8*)data.Scan0)+data.Stride*(bitmap->GetHeight()-i-1),image->getWidth()*image->getPixelSize());
+		}
 
-    unsafe
+		bitmap->UnlockBits(&data);
 
-    {
-
-        // get a pointer to the raw bits
-
-        RGBQUAD* pBits = (RGBQUAD*)(void*)dibsection.dsBm.bmBits;
-
- 
-
-        // copy each pixel manually
-
-        for (int x = 0; x < dibsection.dsBmih.biWidth; x++)
-
-            for (int y = 0; y < dibsection.dsBmih.biHeight; y++)
-
-            {
-
-                int offset = y * dibsection.dsBmih.biWidth + x;
-
-                if (pBits[offset].rgbReserved != 0)
-
-                {
-
-                    bitmap.SetPixel(x, y, Color.FromArgb(pBits[offset].rgbReserved, pBits[offset].rgbRed, pBits[offset].rgbGreen, pBits[offset].rgbBlue));
-
-                }
-
-            }
-
-    }
-
- 
-
-    return bitmap;
-*/
+		return mTextureManager->createTexture(image);
 	#endif
 
 	return NULL;

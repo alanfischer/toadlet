@@ -76,7 +76,7 @@ bool GLTexture::create(int usageFlags,Dimension dimension,int format,int width,i
 
 	mUsageFlags=usageFlags;
 	mDimension=dimension;
-	mFormat=format;
+	mFormat=getClosestTextureFormat(format);
 	mWidth=width;
 	mHeight=height;
 	mDepth=depth;
@@ -214,31 +214,44 @@ bool GLTexture::load(int format,int width,int height,int depth,int mipLevel,uint
 
 	glBindTexture(mTarget,mHandle);
 
+	uint8 *finalData=data;
+	if(format!=getClosestTextureFormat(format)){
+		int closestFormat=getClosestTextureFormat(format);
+		finalData=new uint8[width*ImageFormatConversion::getPixelSize(closestFormat)*height*depth];
+		int rowPitch=width*ImageFormatConversion::getPixelSize(format),slicePitch=width*height*ImageFormatConversion::getPixelSize(format);
+		ImageFormatConversion::convert(data,format,rowPitch,slicePitch,finalData,closestFormat,rowPitch,slicePitch,width,height,depth);
+		format=closestFormat;
+	}
+
 	GLint glformat=getGLFormat(format);
 	GLint gltype=getGLType(format);
 	switch(mTarget){
 		#if !defined(TOADLET_HAS_GLES)
 			case GL_TEXTURE_1D:
-				glTexSubImage1D(mTarget,mipLevel,0,width,glformat,gltype,data);
+				glTexSubImage1D(mTarget,mipLevel,0,width,glformat,gltype,finalData);
 			break;
 		#endif
 		case GL_TEXTURE_2D:
-			glTexSubImage2D(mTarget,mipLevel,0,0,width,height,glformat,gltype,data);
+			glTexSubImage2D(mTarget,mipLevel,0,0,width,height,glformat,gltype,finalData);
 		break;
 		#if !defined(TOADLET_HAS_GLES)
 			case GL_TEXTURE_3D:
-				glTexSubImage3D(mTarget,mipLevel,0,0,0,width,height,depth,glformat,gltype,data);
+				glTexSubImage3D(mTarget,mipLevel,0,0,0,width,height,depth,glformat,gltype,finalData);
 			break;
 			case GL_TEXTURE_CUBE_MAP:
 				for(int i=0;i<6;++i){
 					glTexSubImage2D(GLCubeFaces[i],mipLevel,0,0,width,height,glformat,gltype,
-						data+(width*height*ImageFormatConversion::getPixelSize(format)*i));
+						finalData+(width*height*ImageFormatConversion::getPixelSize(format)*i));
 				}
 			break;
 			case GL_TEXTURE_RECTANGLE_ARB:
-				glTexSubImage2D(mTarget,mipLevel,0,0,width,height,glformat,gltype,data);
+				glTexSubImage2D(mTarget,mipLevel,0,0,width,height,glformat,gltype,finalData);
 			break;
 		#endif
+	}
+
+	if(mFormat!=format){
+		delete[] finalData;
 	}
 
 	if(mManuallyGenerateMipLevels){
@@ -272,6 +285,8 @@ bool GLTexture::read(int format,int width,int height,int depth,int mipLevel,uint
 				glGetTexImage(GLCubeFaces[i],mipLevel,glformat,gltype,data+width*height*pixelSize*i);
 			}
 		}
+
+		// TODO: Convert back like in load
 
 		TOADLET_CHECK_GLERROR("GLTexture::read");
 
@@ -338,9 +353,19 @@ GLuint GLTexture::getGLTarget(){
 	}
 }
 
+int GLTexture::getClosestTextureFormat(int textureFormat){
+	if(textureFormat==Format_BGR_8){
+		textureFormat=Format_RGB_8;
+	}
+	if(textureFormat==Format_BGRA_8){
+		textureFormat=Format_RGBA_8;
+	}
+	return textureFormat;
+}
+
 GLuint GLTexture::getGLFormat(int textureFormat){
 	GLuint format=0;
-	
+
 	if((textureFormat&Texture::Format_BIT_L)>0){
 		format=GL_LUMINANCE;
 	}
@@ -356,16 +381,6 @@ GLuint GLTexture::getGLFormat(int textureFormat){
 	else if((textureFormat&Texture::Format_BIT_RGBA)>0){
 		format=GL_RGBA;
 	}
-	#if defined(TOADLET_HAS_GLEW) && defined(GL_EXT_bgra)
-		else if(GLEW_EXT_bgra && (textureFormat&Texture::Format_BIT_BGR)>0){
-			format=GL_BGR_EXT;
-		}
-	#endif
-	#if defined(TOADLET_HAS_GLEW) && defined(GL_EXT_bgra)
-		else if(GLEW_EXT_bgra && (textureFormat&Texture::Format_BIT_BGRA)>0){
-			format=GL_BGRA_EXT;
-		}
-	#endif
 
 	#if !defined(TOADLET_HAS_GLES) || defined(TOADLET_HAS_EAGL)
 		else if((textureFormat&Texture::Format_BIT_DEPTH)>0){

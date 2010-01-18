@@ -75,7 +75,8 @@ bool FileStream::reset(){
 
 int FileStream::length(){
 	int current=ftell(mFile);
-	int length=fseek(mFile,0,SEEK_END);
+	fseek(mFile,0,SEEK_END);
+	int length=ftell(mFile);
 	fseek(mFile,current,SEEK_SET);
 	return length;
 }
