@@ -215,16 +215,15 @@ bool GLTexture::load(int format,int width,int height,int depth,int mipLevel,uint
 	glBindTexture(mTarget,mHandle);
 
 	uint8 *finalData=data;
-	if(format!=getClosestTextureFormat(format)){
-		int closestFormat=getClosestTextureFormat(format);
+	int closestFormat=getClosestTextureFormat(format);
+	if(format!=closestFormat){
 		finalData=new uint8[width*ImageFormatConversion::getPixelSize(closestFormat)*height*depth];
 		int rowPitch=width*ImageFormatConversion::getPixelSize(format),slicePitch=width*height*ImageFormatConversion::getPixelSize(format);
 		ImageFormatConversion::convert(data,format,rowPitch,slicePitch,finalData,closestFormat,rowPitch,slicePitch,width,height,depth);
-		format=closestFormat;
 	}
 
-	GLint glformat=getGLFormat(format);
-	GLint gltype=getGLType(format);
+	GLint glformat=getGLFormat(closestFormat);
+	GLint gltype=getGLType(closestFormat);
 	switch(mTarget){
 		#if !defined(TOADLET_HAS_GLES)
 			case GL_TEXTURE_1D:
@@ -250,7 +249,7 @@ bool GLTexture::load(int format,int width,int height,int depth,int mipLevel,uint
 		#endif
 	}
 
-	if(mFormat!=format){
+	if(format!=closestFormat){
 		delete[] finalData;
 	}
 
@@ -269,24 +268,34 @@ bool GLTexture::read(int format,int width,int height,int depth,int mipLevel,uint
 	}
 
 	#if !defined(TOADLET_HAS_GLES)
-		GLint glformat=getGLFormat(format);
-		GLint gltype=getGLType(format);
+		uint8 *finalData=data;
+		int closestFormat=getClosestTextureFormat(format);
+		if(format!=closestFormat){
+			finalData=new uint8[width*ImageFormatConversion::getPixelSize(closestFormat)*height*depth];
+		}
+
+		GLint glformat=getGLFormat(closestFormat);
+		GLint gltype=getGLType(closestFormat);
 
 		glBindTexture(mTarget,mHandle);
 
 		if(mTarget!=GL_TEXTURE_CUBE_MAP){
-			glGetTexImage(mTarget,mipLevel,glformat,gltype,data);
+			glGetTexImage(mTarget,mipLevel,glformat,gltype,finalData);
 		}
 		else{
-			int pixelSize=ImageFormatConversion::getPixelSize(format);
+			int pixelSize=ImageFormatConversion::getPixelSize(closestFormat);
 
 			int i;
 			for(i=0;i<6;++i){
-				glGetTexImage(GLCubeFaces[i],mipLevel,glformat,gltype,data+width*height*pixelSize*i);
+				glGetTexImage(GLCubeFaces[i],mipLevel,glformat,gltype,finalData+width*height*closestFormat*i);
 			}
 		}
 
-		// TODO: Convert back like in load
+		if(format!=closestFormat){
+			int rowPitch=width*ImageFormatConversion::getPixelSize(format),slicePitch=width*height*ImageFormatConversion::getPixelSize(format);
+			ImageFormatConversion::convert(finalData,closestFormat,rowPitch,slicePitch,data,format,rowPitch,slicePitch,width,height,depth);
+			delete[] finalData;
+		}
 
 		TOADLET_CHECK_GLERROR("GLTexture::read");
 
