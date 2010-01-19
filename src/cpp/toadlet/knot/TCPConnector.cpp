@@ -167,6 +167,15 @@ void TCPConnector::receiveError(TCPConnection *connection){
 	mConnectionsMutex.unlock();
 }
 
+void TCPConnector::dataReady(TCPConnection *connection){
+	mListenersMutex.lock();
+		int i;
+		for(i=0;i<mListeners.size();++i){
+			mListeners[i]->dataReady(connection);
+		}
+	mListenersMutex.unlock();
+}
+
 void TCPConnector::notifyListenersConnected(TCPConnection::ptr connection){
 	mListenersMutex.lock();
 		int i;

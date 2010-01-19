@@ -32,6 +32,8 @@
 namespace toadlet{
 namespace knot{
 
+class ConnectorListener;
+
 /// A connection delivers packets of data.
 class Connection{
 public:

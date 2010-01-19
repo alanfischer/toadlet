@@ -39,7 +39,7 @@ public:
 
 	virtual bool isOpen() const=0;
 	virtual void close()=0;
-	
+
 	virtual void addConnectorListener(ConnectorListener *listener)=0;
 	virtual void removeConnectorListener(ConnectorListener *listener)=0;
 };
