@@ -53,6 +53,7 @@ public:
 	void run();
 
 	void receiveError(TCPConnection *connection);
+	void dataReady(TCPConnection *connection);
 	
 protected:
 	void notifyListenersConnected(TCPConnection::ptr connection);

@@ -362,6 +362,9 @@ bool TCPConnection::updatePacketReceive(){
 					}
 					mPackets.add(packet);
 				mMutex->unlock();
+				if(mConnector!=NULL){
+					mConnector->dataReady(this);
+				}
 			}
 			else{
 				mFreePackets.add(packet);

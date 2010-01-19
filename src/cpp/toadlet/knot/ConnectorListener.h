@@ -26,15 +26,16 @@
 #ifndef TOADLET_KNOT_CONNECTORLISTENER_H
 #define TOADLET_KNOT_CONNECTORLISTENER_H
 
-#include <toadlet/knot/Connection.h>
+#include <toadlet/knot/Connector.h>
 
 namespace toadlet{
 namespace knot{
 
 class TOADLET_API ConnectorListener{
 public:
-	virtual void connected(Connection::ptr connection)=0;
-	virtual void disconnected(Connection::ptr connection)=0;
+	virtual void connected(Connection *connection)=0;
+	virtual void disconnected(Connection *connection)=0;
+	virtual void dataReady(Connection *connection)=0;
 };
 
 }

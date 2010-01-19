@@ -26,7 +26,10 @@
 #ifndef TOADLET_KNOT_SIMPLEEVENTCLIENT_H
 #define TOADLET_KNOT_SIMPLEEVENTCLIENT_H
 
-#include <toadlet/knot/SimpleEventClient.h>
+#include <toadlet/egg/Event.h>
+#include <toadlet/egg/io/DataStream.h>
+#include <toadlet/egg/io/MemoryStream.h>
+#include <toadlet/knot/EventClient.h>
 
 namespace toadlet{
 namespace knot{
@@ -40,15 +43,23 @@ public:
 
 	void connected(Connection::ptr connection);
 	void disconnected(Connection::ptr connection);
-	
-	bool sendEvent(Event::ptr event);
-	bool sendEventToClient(Event::ptr event,int clientID);
-	bool receiveEvent(Event::ptr &event,int &clientID);
+	void dataReady(Connection::ptr connection);
+
+	bool sendEvent(egg::Event::ptr event);
+	bool sendEventToClient(egg::Event::ptr event,int clientID);
+	bool receiveEvent(egg::Event::ptr &event,int &clientID);
 	
 	int getClientID(){return mClientID;}
 
 protected:
 	int mClientID;
+
+	egg::io::MemoryStream::ptr mPacketIn;
+	egg::io::DataStream::ptr mDataPacketIn;
+	egg::io::MemoryStream::ptr mPacketOut;
+	egg::io::DataStream::ptr mDataPacketOut;
+
+	Connection::ptr mConnection;
 };
 
 }

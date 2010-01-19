@@ -26,7 +26,7 @@
 #ifndef TOADLET_KNOT_EVENTCLIENT_H
 #define TOADLET_KNOT_EVENTCLIENT_H
 
-#include <toadlet/egg/String.h>
+#include <toadlet/egg/Event.h>
 #include <toadlet/knot/ConnectorListener.h>
 
 namespace toadlet{
@@ -38,10 +38,11 @@ public:
 
 	virtual void connected(Connection::ptr connection)=0;
 	virtual void disconnected(Connection::ptr connection)=0;
-	
-	virtual bool sendEvent(Event::ptr event)=0;
-	virtual bool sendEventToClient(Event::ptr event,int clientID)=0;
-	virtual bool receiveEvent(Event::ptr &event,int &clientID)=0;
+	virtual void dataReady(Connection::ptr connection)=0;
+
+	virtual bool sendEvent(egg::Event::ptr event)=0;
+	virtual bool sendEventToClient(egg::Event::ptr event,int clientID)=0;
+	virtual bool receiveEvent(egg::Event::ptr &event,int &clientID)=0;
 	
 	virtual int getClientID()=0;
 };
