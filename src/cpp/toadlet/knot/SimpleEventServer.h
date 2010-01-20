@@ -38,10 +38,11 @@ class TOADLET_API SimpleEventServer:public EventServer{
 public:
 	TOADLET_SHARED_POINTERS(SimpleEventServer);
 
-	SimpleEventServer(egg::EventFactory *eventFactory);
+	SimpleEventServer(egg::EventFactory *eventFactory,Connector::ptr connector=NULL);
 	virtual ~SimpleEventServer();
 
 	void setConnector(Connector::ptr connector);
+	Connector::ptr getConnector(){return mConnector;}
 
 	void connected(Connection::ptr connection);
 	void disconnected(Connection::ptr connection);

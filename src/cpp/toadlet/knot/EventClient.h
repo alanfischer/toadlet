@@ -37,6 +37,7 @@ public:
 	TOADLET_SHARED_POINTERS(EventClient);
 
 	virtual void setConnector(Connector::ptr connector)=0;
+	virtual Connector::ptr getConnector()=0;
 
 	virtual void connected(Connection::ptr connection)=0;
 	virtual void disconnected(Connection::ptr connection)=0;

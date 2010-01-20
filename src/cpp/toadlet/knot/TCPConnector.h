@@ -47,8 +47,8 @@ public:
 	bool isOpen() const;
 	void close();
 
-	void addConnectorListener(ConnectorListener *listener);
-	void removeConnectorListener(ConnectorListener *listener);
+	void addConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent);
+	void removeConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent);
 	
 	void run();
 

@@ -275,6 +275,12 @@ bool LANPeerEventConnector::startIPServer(int port){
 		mIPServerSocket=Socket::ptr(Socket::makeTCPSocket());
 	}
 
+	// The reason we do the binding before starting the thread & Connection is due to the following:
+	//  If we bind before starting the thread, we know that we can call close on the socket at any time in this thread and verify
+	//  that we closed it after it was bound, and that the socket will properly not send/recv data.
+	//  If instead we bind the socket in the thread, then we can have a race condition where we could attempt to close the socket,
+	//  but the thread would not of even bound the socket yet, so then the thread binds the socket and starts running it.
+	//  I suppose this could be prevented by modifying a socket so when it is closed, it can not be used for anything again. (and make them threadsafe)
 	if(mIPServerSocket->bind(port)==false){
 		Error::unknown("error binding server socket");
 		return false;
