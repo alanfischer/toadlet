@@ -56,33 +56,33 @@ QT_TEST(ClientServerTest){
 	EventServer::ptr server;
 	EventClient::ptr client;
 	// Create Server
-	if(true){
+	if(false){
 		server=EventServer::ptr(new SimpleEventServer(eventFactory));
 //		server->addEventListener(debug);
 
 		// Listen for connections
 		TCPConnector::ptr serverConnector(new TCPConnector());
 		server->setConnector(serverConnector);
-		serverConnector->addConnectorListener(debug);
+		serverConnector->addConnectorListener(debug,true);
 		serverConnector->accept(6969);
 	}
 	else{ // TODO: Compact syntax?
-//		server=new SimpleEventServer(new TCPConnector(6969));
+		server=EventServer::ptr(new SimpleEventServer(eventFactory,Connector::ptr(new TCPConnector(6969))));
 	}
 	
-	// Create Client
-	if(true){
+	// Create Client 1
+	if(false){
 		client=EventClient::ptr(new SimpleEventClient(eventFactory));
 //		client->addEventListener(debug);
 
 		// Connect
 		TCPConnector::ptr clientConnector(new TCPConnector());
 		client->setConnector(clientConnector);
-		clientConnector->addConnectorListener(debug);
+		clientConnector->addConnectorListener(debug,true);
 		clientConnector->connect(Socket::stringToIP("127.0.0.1"),6969);
 	}
 	else{ // TODO: Compact syntax?
-//		client=new SimpleEventClient(new TCPConnector(localhost:6969));
+		client=EventClient::ptr(new SimpleEventClient(eventFactory,Connector::ptr(new TCPConnector(Socket::stringToIP("127.0.0.1"),6969))));
 	}
 
 	Event::ptr sendEvent,receiveEvent;

@@ -117,16 +117,41 @@ void TCPConnector::close(){
 	while(mServerThread!=NULL && mServerThread->isAlive()){
 		System::msleep(10);
 	}
+
+	mConnectionsMutex.lock();
+		int i;
+		for(i=0;i<mConnections.size();++i){
+			mConnections[i]->disconnect();
+		}
+	mConnectionsMutex.unlock();
 }
 
-void TCPConnector::addConnectorListener(ConnectorListener *listener){
+void TCPConnector::addConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent){
 	mListenersMutex.lock();
 		mListeners.add(listener);
+
+		if(notifyAboutCurrent){
+			mConnectionsMutex.lock();
+				int i;
+				for(i=0;i<mConnections.size();++i){
+					listener->connected(mConnections[i]);
+				}
+			mConnectionsMutex.unlock();
+		}
 	mListenersMutex.unlock();
 }
 
-void TCPConnector::removeConnectorListener(ConnectorListener *listener){
+void TCPConnector::removeConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent){
 	mListenersMutex.lock();
+		if(notifyAboutCurrent){
+			mConnectionsMutex.lock();
+				int i;
+				for(i=0;i<mConnections.size();++i){
+					listener->disconnected(mConnections[i]);
+				}
+			mConnectionsMutex.unlock();
+		}
+
 		mListeners.remove(listener);
 	mListenersMutex.unlock();
 }

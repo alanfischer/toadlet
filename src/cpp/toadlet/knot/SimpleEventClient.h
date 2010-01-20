@@ -39,10 +39,11 @@ class TOADLET_API SimpleEventClient:public EventClient{
 public:
 	TOADLET_SHARED_POINTERS(SimpleEventClient);
 
-	SimpleEventClient(egg::EventFactory *eventFactory);
+	SimpleEventClient(egg::EventFactory *eventFactory,Connector::ptr connector=NULL);
 	virtual ~SimpleEventClient();
 
 	void setConnector(Connector::ptr connector);
+	Connector::ptr getConnector(){return mConnector;}
 
 	void connected(Connection::ptr connection);
 	void disconnected(Connection::ptr connection);

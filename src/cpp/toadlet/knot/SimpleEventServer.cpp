@@ -33,7 +33,7 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace knot{
 
-SimpleEventServer::SimpleEventServer(EventFactory *eventFactory):
+SimpleEventServer::SimpleEventServer(EventFactory *eventFactory,Connector::ptr connector):
 	mEventFactory(NULL)
 	//mPacketIn,
 	//mDataPacketIn,
@@ -51,6 +51,9 @@ SimpleEventServer::SimpleEventServer(EventFactory *eventFactory):
 	mDataPacketOut=DataStream::ptr(new DataStream(Stream::ptr(mPacketOut)));
 
 	mEventFactory=eventFactory;
+	if(connector!=NULL){
+		setConnector(connector);
+	}
 }
 
 SimpleEventServer::~SimpleEventServer(){
@@ -58,13 +61,13 @@ SimpleEventServer::~SimpleEventServer(){
 
 void SimpleEventServer::setConnector(Connector::ptr connector){
 	if(mConnector!=NULL){
-		mConnector->removeConnectorListener(this);
+		mConnector->removeConnectorListener(this,true);
 	}
 
 	mConnector=connector;
 
 	if(mConnector!=NULL){
-		mConnector->addConnectorListener(this);
+		mConnector->addConnectorListener(this,true);
 	}
 }
 
