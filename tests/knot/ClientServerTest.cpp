@@ -1,3 +1,4 @@
+#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/knot/TCPConnector.h>
 #include <toadlet/knot/DebugListener.h>
@@ -6,6 +7,7 @@
 #include "../quicktest.h"
 
 using namespace toadlet::egg;
+using namespace toadlet::egg::io;
 using namespace toadlet::egg::net;
 using namespace toadlet::knot;
 
@@ -23,6 +25,9 @@ public:
 
 	void setText(const String &text){mText=text;}
 	const String getText() const{return mText;}
+
+	int read(DataStream *stream){return stream->readBigInt16String(mText);}
+	int write(DataStream *stream){return stream->writeBigInt16String(mText);}
 
 protected:
 	String mText;
@@ -80,10 +85,27 @@ QT_TEST(ClientServerTest){
 //		client=new SimpleEventClient(new TCPConnector(localhost:6969));
 	}
 
+	Event::ptr sendEvent,receiveEvent;
+	int fromClient=-1;
+	int endTime=0;
+
 	// Send some events
-	client->sendEvent(Event::ptr(new MessageEvent("Hello!")));
-	server->broadcastEvent(Event::ptr(new MessageEvent("Howdy!")));
-	while(true);
+	client->sendEvent(sendEvent=Event::ptr(new MessageEvent("Hello!")));
+	for(receiveEvent=NULL,endTime=System::mtime()+5000;System::mtime()<endTime && receiveEvent==NULL;server->receiveEvent(receiveEvent,fromClient));
+	if(receiveEvent!=NULL){
+		Logger::alert("Received:"+shared_static_cast<MessageEvent>(receiveEvent)->getText());
+	}
+
+	QT_CHECK(receiveEvent!=NULL && shared_static_cast<MessageEvent>(sendEvent)->getText().equals(shared_static_cast<MessageEvent>(receiveEvent)->getText()));
+
+	server->broadcastEvent(sendEvent=Event::ptr(new MessageEvent("Howdy!")));
+	for(receiveEvent=NULL,endTime=System::mtime()+5000;System::mtime()<endTime && receiveEvent==NULL;client->receiveEvent(receiveEvent,fromClient));
+	if(receiveEvent!=NULL){
+		Logger::alert("Received:"+shared_static_cast<MessageEvent>(receiveEvent)->getText());
+	}
+
+	QT_CHECK(receiveEvent!=NULL && shared_static_cast<MessageEvent>(sendEvent)->getText().equals(shared_static_cast<MessageEvent>(receiveEvent)->getText()));
+
 //	int ping=client->pingAndWait(); // TODO: Figure out how pinging will work, if there are unprocessed Events hanging around like the Howdy above?
 									//  We could include a PingID, or a more general EventID, and then the client itself would be able to look at
 									//  incoming events and tell 'Hey this is a Pong Event, and it has the ID I'm waiting for
