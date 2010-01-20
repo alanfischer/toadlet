@@ -32,14 +32,41 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace knot{
 
-SimpleEventClient::SimpleEventClient(){
+SimpleEventClient::SimpleEventClient(EventFactory *eventFactory):
+	mClientID(0),
+
+	mEventFactory(NULL)
+	//mPacketIn,
+	//mDataPacketIn,
+	//mPacketOut,
+	//mDataPacketOut,
+
+	//mConnection,
+	//mEvents,
+	//mEventsMutex,
+	//mEventClientIDs
+{
 	mPacketIn=MemoryStream::ptr(new MemoryStream(new byte[1024],1024,1024,true));
 	mDataPacketIn=DataStream::ptr(new DataStream(Stream::ptr(mPacketIn)));
 	mPacketOut=MemoryStream::ptr(new MemoryStream());
 	mDataPacketOut=DataStream::ptr(new DataStream(Stream::ptr(mPacketOut)));
+
+	mEventFactory=eventFactory;
 }
 
 SimpleEventClient::~SimpleEventClient(){
+}
+
+void SimpleEventClient::setConnector(Connector::ptr connector){
+	if(mConnector!=NULL){
+		mConnector->removeConnectorListener(this);
+	}
+
+	mConnector=connector;
+
+	if(mConnector!=NULL){
+		mConnector->addConnectorListener(this);
+	}
 }
 
 void SimpleEventClient::connected(Connection::ptr connection){
@@ -47,19 +74,21 @@ void SimpleEventClient::connected(Connection::ptr connection){
 }
 
 void SimpleEventClient::disconnected(Connection::ptr connection){
-	mConnection=NULL;
+	if(mConnection==connection){
+		mConnection=NULL;
+	}
 }
 
-void SimpleEventClient::dataReady(Connection::ptr connection){
-	int amount=mConnection->receive(mPacketIn->getOriginalDataPointer(),mPacketIn->length());
+void SimpleEventClient::dataReady(Connection *connection){
+	int amount=connection->receive(mPacketIn->getOriginalDataPointer(),mPacketIn->length());
 //	int eventFrame=mDataPacketIn->readBigInt32();
 
-	int clientID=mDataPacketIn->readBigInt32();
+	int fromClientID=mDataPacketIn->readBigInt32();
 	int type=mDataPacketIn->readUInt8();
 	Event::ptr event;
-//	if(mEventFactory!=NULL){
-//		event=mEventFactory->createEventType(type);
-//	}
+	if(mEventFactory!=NULL){
+		event=mEventFactory->createEventType(type);
+	}
 	if(event==NULL){
 		Logger::warning(Categories::TOADLET_KNOT,
 			String("Received unknown event type:")+type);
@@ -70,16 +99,14 @@ void SimpleEventClient::dataReady(Connection::ptr connection){
 
 	mPacketIn->reset();
 
-//	eventReceived(event);
-//	mEvents.add(event);
-//	mEventFrames.add(eventFrame);
+	eventReceived(event,fromClientID);
 }
 
 bool SimpleEventClient::sendEvent(Event::ptr event){
-	return sendEventToClient(event,-1);
+	return sendEventToClient(-1,event);
 }
 
-bool SimpleEventClient::sendEventToClient(Event::ptr event,int clientID){
+bool SimpleEventClient::sendEventToClient(int clientID,Event::ptr event){
 //	mDataPacketOut->writeBigInt32(eventFrame);
 	mDataPacketOut->writeBigInt32(clientID);
 	mDataPacketOut->writeUInt8(event->getType());
@@ -95,17 +122,33 @@ bool SimpleEventClient::sendEventToClient(Event::ptr event,int clientID){
 	return amount>0;
 }
 
-//bool SimpleEventClient::receiveEvent(Event::ptr &event,int &clientID){	
-//}
+bool SimpleEventClient::receiveEvent(Event::ptr &event,int &fromClientID){	
+	mEventsMutex.lock();
+		int size=mEvents.size();
+		if(size>0){
+			event=mEvents.at(size-1);
+			mEvents.removeAt(size-1);
+			fromClientID=mEventClientIDs.at(size-1);
+			mEventClientIDs.removeAt(size-1);
+		}
+	mEventsMutex.unlock();
 
-//void SimpleEventClient::eventReceived(Event::pr event,int clientID){
+	return size>0;
+}
+
+void SimpleEventClient::eventReceived(Event::ptr event,int fromClientID){
 //	if(event->getType()==EventType_PING){
 //		if(mEventFactory!=NULL){
 //			event=mEventFactory->createEventType(type);
 //		}
 //		sendEventToClient(clientID,pongEvent);
 //	}
-//}
+
+	mEventsMutex.lock();
+		mEvents.add(event);
+		mEventClientIDs.add(fromClientID);
+	mEventsMutex.unlock();
+}
 
 //void SimpleEventClient::run(){
 //}

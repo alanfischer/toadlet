@@ -41,6 +41,7 @@ public:
 
 	void connected(Connection::ptr connection);
 	void disconnected(Connection::ptr connection);
+	void dataReady(Connection *connection){}
 };
 
 }

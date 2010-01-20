@@ -26,7 +26,7 @@
 #ifndef TOADLET_KNOT_EVENTSERVER_H
 #define TOADLET_KNOT_EVENTSERVER_H
 
-#include <toadlet/egg/String.h>
+#include <toadlet/egg/Event.h>
 #include <toadlet/knot/ConnectorListener.h>
 
 namespace toadlet{
@@ -36,12 +36,14 @@ class TOADLET_API EventServer:public ConnectorListener{
 public:
 	TOADLET_SHARED_POINTERS(EventServer);
 
+	virtual void setConnector(Connector::ptr connector)=0;
+
 	virtual void connected(Connection::ptr connection)=0;
 	virtual void disconnected(Connection::ptr connection)=0;
 	
-	virtual bool sendEvent(Event event,int clientID)=0;
-	virtual bool broadcastEvent(Event event)=0;
-	virtual bool receiveEvent(Event::ptr &event,int &clientID)=0;
+	virtual bool broadcastEvent(egg::Event::ptr event)=0;
+	virtual bool sendEvent(int clientID,egg::Event::ptr event,int fromClientID)=0;
+	virtual bool receiveEvent(egg::Event::ptr &event,int &fromClientID)=0;
 };
 
 }

@@ -77,6 +77,7 @@ bool TCPConnector::accept(int localPort){
 	mServerSocket->bind(localPort);
 	bool result=mServerSocket->listen(32);
 	if(result){
+		mRun=true;
 		mServerThread=Thread::ptr(new Thread(this));
 		mServerThread->start();
 	}

@@ -559,7 +559,7 @@ bool LANPeerEventConnector::ensureConnectionAbility(){
 		#endif
 	#elif defined(TOADLET_PLATFORM_IPHONE)
 		SCNetworkReachabilityFlags flags=0;
-		SCNetworkReachabilityRef reachabilityRef=SCNetworkReachabilityCreateWithName(CFAllocatorGetDefault(),"www.google.com"]);
+		SCNetworkReachabilityRef reachabilityRef=SCNetworkReachabilityCreateWithName(CFAllocatorGetDefault(),"www.google.com");
 		bool gotFlags=SCNetworkReachabilityGetFlags(reachabilityRef,&flags);
 		CFRelease(reachabilityRef);
     
