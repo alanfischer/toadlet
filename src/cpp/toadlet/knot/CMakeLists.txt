@@ -19,6 +19,7 @@ set (KNOT_SRC
 # Headers
 set (KNOT_HEADERS
 	EventClient.h
+	EventListener.h
 	EventServer.h
 	Connection.h
 	Connector.h

@@ -27,6 +27,7 @@
 #define TOADLET_KNOT_SIMPLEEVENTCLIENT_H
 
 #include <toadlet/egg/Event.h>
+#include <toadlet/egg/EventFactory.h>
 #include <toadlet/egg/io/DataStream.h>
 #include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/knot/EventClient.h>
@@ -38,28 +39,37 @@ class TOADLET_API SimpleEventClient:public EventClient{
 public:
 	TOADLET_SHARED_POINTERS(SimpleEventClient);
 
-	SimpleEventClient();
+	SimpleEventClient(egg::EventFactory *eventFactory);
 	virtual ~SimpleEventClient();
+
+	void setConnector(Connector::ptr connector);
 
 	void connected(Connection::ptr connection);
 	void disconnected(Connection::ptr connection);
-	void dataReady(Connection::ptr connection);
+	void dataReady(Connection *connection);
 
 	bool sendEvent(egg::Event::ptr event);
-	bool sendEventToClient(egg::Event::ptr event,int clientID);
-	bool receiveEvent(egg::Event::ptr &event,int &clientID);
-	
+	bool sendEventToClient(int clientID,egg::Event::ptr event);
+	bool receiveEvent(egg::Event::ptr &event,int &fromClientID);
+
 	int getClientID(){return mClientID;}
 
 protected:
+	void eventReceived(egg::Event::ptr event,int fromClientID);
+
 	int mClientID;
 
+	egg::EventFactory *mEventFactory;
 	egg::io::MemoryStream::ptr mPacketIn;
 	egg::io::DataStream::ptr mDataPacketIn;
 	egg::io::MemoryStream::ptr mPacketOut;
 	egg::io::DataStream::ptr mDataPacketOut;
 
+	Connector::ptr mConnector;
 	Connection::ptr mConnection;
+	egg::Collection<egg::Event::ptr> mEvents;
+	egg::Mutex mEventsMutex;
+	egg::Collection<int> mEventClientIDs;
 };
 
 }

@@ -23,19 +23,33 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_KNOT_CONNECTORLISTENER_H
-#define TOADLET_KNOT_CONNECTORLISTENER_H
+#ifndef TOADLET_EGG_PINGEVENT_H
+#define TOADLET_EGG_PINGEVENT_H
 
-#include <toadlet/knot/Connector.h>
+#include <toadlet/egg/Event.h>
 
 namespace toadlet{
-namespace knot{
+namespace egg{
 
-class TOADLET_API ConnectorListener{
+class PingEvent{
 public:
-	virtual void connected(Connection::ptr connection)=0;
-	virtual void disconnected(Connection::ptr connection)=0;
-	virtual void dataReady(Connection *connection)=0;
+	TOADLET_SHARED_POINTERS(PingEvent);
+
+	PingEvent():mType(EventType_PING),mSendTime(0){}
+
+	int read(io::DataStream *stream){
+		return stream->readInt64(mSendTime);
+	}
+	
+	int write(io::DataStream *stream){
+		return stream->writeInt64(mSendTime);
+	}
+
+	void setSendTime(int64 sendTime){mSendTime=sendTime;}
+	int64 getSendTime() const{return mSendTime;}
+	
+protected:
+	int64 mSendTime;
 };
 
 }

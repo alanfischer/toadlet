@@ -36,13 +36,15 @@ class TOADLET_API EventClient:public ConnectorListener{
 public:
 	TOADLET_SHARED_POINTERS(EventClient);
 
+	virtual void setConnector(Connector::ptr connector)=0;
+
 	virtual void connected(Connection::ptr connection)=0;
 	virtual void disconnected(Connection::ptr connection)=0;
-	virtual void dataReady(Connection::ptr connection)=0;
+	virtual void dataReady(Connection *connection)=0;
 
 	virtual bool sendEvent(egg::Event::ptr event)=0;
-	virtual bool sendEventToClient(egg::Event::ptr event,int clientID)=0;
-	virtual bool receiveEvent(egg::Event::ptr &event,int &clientID)=0;
+	virtual bool sendEventToClient(int clientID,egg::Event::ptr event)=0;
+	virtual bool receiveEvent(egg::Event::ptr &event,int &fromClientID)=0;
 	
 	virtual int getClientID()=0;
 };
