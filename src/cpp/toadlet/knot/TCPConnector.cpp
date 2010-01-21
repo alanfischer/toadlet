@@ -142,6 +142,7 @@ void TCPConnector::addConnectorListener(ConnectorListener *listener,bool notifyA
 }
 
 void TCPConnector::removeConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent){
+Logger::alert("REMOVING CON LIST");
 	mListenersMutex.lock();
 		if(notifyAboutCurrent){
 			mConnectionsMutex.lock();

@@ -37,6 +37,8 @@ class TOADLET_API Connector{
 public:
 	TOADLET_SHARED_POINTERS(Connector);
 
+	virtual ~Connector(){}
+
 	virtual bool isOpen() const=0;
 	virtual void close()=0;
 

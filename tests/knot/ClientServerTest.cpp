@@ -53,45 +53,37 @@ QT_TEST(ClientServerTest){
 	DebugListener::ptr debug(new DebugListener());
 	SimpleEventFactory::ptr eventFactory(new SimpleEventFactory());
 
-	EventServer::ptr server;
-	EventClient::ptr client;
 	// Create Server
-	if(false){
+	/* Full syntax
 		server=EventServer::ptr(new SimpleEventServer(eventFactory));
-//		server->addEventListener(debug);
 
-		// Listen for connections
 		TCPConnector::ptr serverConnector(new TCPConnector());
 		server->setConnector(serverConnector);
 		serverConnector->addConnectorListener(debug,true);
 		serverConnector->accept(6969);
-	}
-	else{ // TODO: Compact syntax?
-		server=EventServer::ptr(new SimpleEventServer(eventFactory,Connector::ptr(new TCPConnector(6969))));
-	}
+	*/
+	// Compact Syntax
+	EventServer::ptr server=EventServer::ptr(new SimpleEventServer(eventFactory,Connector::ptr(new TCPConnector(6969))));
 	
-	// Create Client 1
-	if(false){
-		client=EventClient::ptr(new SimpleEventClient(eventFactory));
-//		client->addEventListener(debug);
-
-		// Connect
-		TCPConnector::ptr clientConnector(new TCPConnector());
-		client->setConnector(clientConnector);
-		clientConnector->addConnectorListener(debug,true);
-		clientConnector->connect(Socket::stringToIP("127.0.0.1"),6969);
-	}
-	else{ // TODO: Compact syntax?
-		client=EventClient::ptr(new SimpleEventClient(eventFactory,Connector::ptr(new TCPConnector(Socket::stringToIP("127.0.0.1"),6969))));
-	}
+	// Create Clients
+	EventClient::ptr client1=EventClient::ptr(new SimpleEventClient(eventFactory,Connector::ptr(new TCPConnector(Socket::stringToIP("127.0.0.1"),6969))));
+	EventClient::ptr client2=EventClient::ptr(new SimpleEventClient(eventFactory,Connector::ptr(new TCPConnector(Socket::stringToIP("127.0.0.1"),6969))));
 
 	Event::ptr sendEvent,receiveEvent;
 	int fromClient=-1;
 	int endTime=0;
 
 	// Send some events
-	client->sendEvent(sendEvent=Event::ptr(new MessageEvent("Hello!")));
+	client1->sendEvent(sendEvent=Event::ptr(new MessageEvent("Hello!")));
 	for(receiveEvent=NULL,endTime=System::mtime()+5000;System::mtime()<endTime && receiveEvent==NULL;server->receiveEvent(receiveEvent,fromClient));
+	if(receiveEvent!=NULL){
+		Logger::alert("Received:"+shared_static_cast<MessageEvent>(receiveEvent)->getText());
+	}
+
+	QT_CHECK(receiveEvent!=NULL && fromClient==0 && shared_static_cast<MessageEvent>(sendEvent)->getText().equals(shared_static_cast<MessageEvent>(receiveEvent)->getText()));
+
+	server->broadcastEvent(sendEvent=Event::ptr(new MessageEvent("Howdy!")));
+	for(receiveEvent=NULL,endTime=System::mtime()+5000;System::mtime()<endTime && receiveEvent==NULL;client1->receiveEvent(receiveEvent,fromClient));
 	if(receiveEvent!=NULL){
 		Logger::alert("Received:"+shared_static_cast<MessageEvent>(receiveEvent)->getText());
 	}
@@ -99,7 +91,7 @@ QT_TEST(ClientServerTest){
 	QT_CHECK(receiveEvent!=NULL && shared_static_cast<MessageEvent>(sendEvent)->getText().equals(shared_static_cast<MessageEvent>(receiveEvent)->getText()));
 
 	server->broadcastEvent(sendEvent=Event::ptr(new MessageEvent("Howdy!")));
-	for(receiveEvent=NULL,endTime=System::mtime()+5000;System::mtime()<endTime && receiveEvent==NULL;client->receiveEvent(receiveEvent,fromClient));
+	for(receiveEvent=NULL,endTime=System::mtime()+5000;System::mtime()<endTime && receiveEvent==NULL;client2->receiveEvent(receiveEvent,fromClient));
 	if(receiveEvent!=NULL){
 		Logger::alert("Received:"+shared_static_cast<MessageEvent>(receiveEvent)->getText());
 	}

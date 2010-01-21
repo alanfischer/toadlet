@@ -36,6 +36,8 @@ class TOADLET_API EventServer:public ConnectorListener{
 public:
 	TOADLET_SHARED_POINTERS(EventServer);
 
+	virtual ~EventServer(){}
+
 	virtual void setConnector(Connector::ptr connector)=0;
 	virtual Connector::ptr getConnector()=0;
 
