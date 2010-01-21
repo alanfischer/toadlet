@@ -59,12 +59,10 @@ SimpleEventClient::SimpleEventClient(EventFactory *eventFactory,Connector::ptr c
 }
 
 SimpleEventClient::~SimpleEventClient(){
-Logger::alert("DIE CLIENT");
 	setConnector(NULL);
 }
 
 void SimpleEventClient::setConnector(Connector::ptr connector){
-Logger::alert(String("SET CON:")+(int)connector.get());
 	if(mConnector!=NULL){
 		mConnector->removeConnectorListener(this,true);
 	}

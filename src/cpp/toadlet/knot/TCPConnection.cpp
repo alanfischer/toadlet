@@ -249,7 +249,6 @@ bool TCPConnection::disconnect(){
 	TOADLET_TRY
 		if(mSocket!=NULL){
 			mSocket->close();
-			mSocket=NULL;
 		}
 	TOADLET_CATCH(const Exception &){}
 
@@ -257,6 +256,7 @@ bool TCPConnection::disconnect(){
 	while(mThread->isAlive()){
 		System::msleep(10);
 	}
+	mSocket=NULL;
 
 	return true;
 }

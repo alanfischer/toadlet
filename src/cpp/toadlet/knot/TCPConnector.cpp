@@ -109,7 +109,6 @@ void TCPConnector::close(){
 	TOADLET_TRY
 		if(mServerSocket!=NULL){
 			mServerSocket->close();
-			mServerSocket=NULL;
 		}
 	TOADLET_CATCH(const Exception &){}
 
@@ -117,6 +116,7 @@ void TCPConnector::close(){
 	while(mServerThread!=NULL && mServerThread->isAlive()){
 		System::msleep(10);
 	}
+	mServerSocket=NULL;
 
 	mConnectionsMutex.lock();
 		int i;
@@ -129,30 +129,29 @@ void TCPConnector::close(){
 void TCPConnector::addConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent){
 	mListenersMutex.lock();
 		mListeners.add(listener);
-
-		if(notifyAboutCurrent){
-			mConnectionsMutex.lock();
-				int i;
-				for(i=0;i<mConnections.size();++i){
-					listener->connected(mConnections[i]);
-				}
-			mConnectionsMutex.unlock();
-		}
 	mListenersMutex.unlock();
+
+	if(notifyAboutCurrent){
+		mConnectionsMutex.lock();
+			int i;
+			for(i=0;i<mConnections.size();++i){
+				listener->connected(mConnections[i]);
+			}
+		mConnectionsMutex.unlock();
+	}
 }
 
 void TCPConnector::removeConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent){
-Logger::alert("REMOVING CON LIST");
-	mListenersMutex.lock();
-		if(notifyAboutCurrent){
-			mConnectionsMutex.lock();
-				int i;
-				for(i=0;i<mConnections.size();++i){
-					listener->disconnected(mConnections[i]);
-				}
-			mConnectionsMutex.unlock();
-		}
+	if(notifyAboutCurrent){
+		mConnectionsMutex.lock();
+			int i;
+			for(i=0;i<mConnections.size();++i){
+				listener->disconnected(mConnections[i]);
+			}
+		mConnectionsMutex.unlock();
+	}
 
+	mListenersMutex.lock();
 		mListeners.remove(listener);
 	mListenersMutex.unlock();
 }
@@ -180,18 +179,23 @@ void TCPConnector::run(){
 }
 
 void TCPConnector::receiveError(TCPConnection *connection){
+	TCPConnection::ptr conn;
+
 	mConnectionsMutex.lock();
 		// Find the Connection::ptr from the connection
 		int i;
 		for(i=0;i<mConnections.size();++i){
 			if(mConnections[i]==connection) break;
 		}
-
 		if(i<mConnections.size()){
-			notifyListenersDisconnected(mConnections[i]);
+			conn=mConnections[i];
 			mConnections.removeAt(i);
 		}
 	mConnectionsMutex.unlock();
+
+	if(conn!=NULL){
+		notifyListenersDisconnected(conn);
+	}
 }
 
 void TCPConnector::dataReady(TCPConnection *connection){

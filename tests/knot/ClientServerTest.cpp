@@ -63,7 +63,7 @@ QT_TEST(ClientServerTest){
 		serverConnector->accept(6969);
 	*/
 	// Compact Syntax
-	EventServer::ptr server=EventServer::ptr(new SimpleEventServer(eventFactory,Connector::ptr(new TCPConnector(6969))));
+	EventServer::ptr server=EventServer::ptr(new SimpleEventServer(eventFactory,Connector::ptr(new TCPConnector(6969))))  ;
 	
 	// Create Clients
 	EventClient::ptr client1=EventClient::ptr(new SimpleEventClient(eventFactory,Connector::ptr(new TCPConnector(Socket::stringToIP("127.0.0.1"),6969))));
@@ -83,6 +83,7 @@ QT_TEST(ClientServerTest){
 	QT_CHECK(receiveEvent!=NULL && fromClient==0 && shared_static_cast<MessageEvent>(sendEvent)->getText().equals(shared_static_cast<MessageEvent>(receiveEvent)->getText()));
 
 	server->broadcastEvent(sendEvent=Event::ptr(new MessageEvent("Howdy!")));
+
 	for(receiveEvent=NULL,endTime=System::mtime()+5000;System::mtime()<endTime && receiveEvent==NULL;client1->receiveEvent(receiveEvent,fromClient));
 	if(receiveEvent!=NULL){
 		Logger::alert("Received:"+shared_static_cast<MessageEvent>(receiveEvent)->getText());
@@ -90,7 +91,14 @@ QT_TEST(ClientServerTest){
 
 	QT_CHECK(receiveEvent!=NULL && shared_static_cast<MessageEvent>(sendEvent)->getText().equals(shared_static_cast<MessageEvent>(receiveEvent)->getText()));
 
-	server->broadcastEvent(sendEvent=Event::ptr(new MessageEvent("Howdy!")));
+	for(receiveEvent=NULL,endTime=System::mtime()+5000;System::mtime()<endTime && receiveEvent==NULL;client2->receiveEvent(receiveEvent,fromClient));
+	if(receiveEvent!=NULL){
+		Logger::alert("Received:"+shared_static_cast<MessageEvent>(receiveEvent)->getText());
+	}
+
+	QT_CHECK(receiveEvent!=NULL && shared_static_cast<MessageEvent>(sendEvent)->getText().equals(shared_static_cast<MessageEvent>(receiveEvent)->getText()));
+
+	client1->sendEventToClient(1,sendEvent=Event::ptr(new MessageEvent("Sup!")));
 	for(receiveEvent=NULL,endTime=System::mtime()+5000;System::mtime()<endTime && receiveEvent==NULL;client2->receiveEvent(receiveEvent,fromClient));
 	if(receiveEvent!=NULL){
 		Logger::alert("Received:"+shared_static_cast<MessageEvent>(receiveEvent)->getText());
