@@ -57,7 +57,6 @@ SimpleEventServer::SimpleEventServer(EventFactory *eventFactory,Connector::ptr c
 }
 
 SimpleEventServer::~SimpleEventServer(){
-Logger::alert("DIE SERVER");
 	setConnector(NULL);
 }
 

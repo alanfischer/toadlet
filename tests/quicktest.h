@@ -62,6 +62,8 @@ namespace quicktest
 			mTestName = testName;
 		}
 
+		const std::string &getTestName() const{return mTestName;}
+
 		virtual void run(TestResult& result) = 0;
 
 	protected:
@@ -126,6 +128,8 @@ namespace quicktest
 			std::vector<Test*>::iterator iter;
 			for (iter = mTests.begin(); iter != mTests.end(); ++iter)
 			{
+				*getOutputStream() << (*iter)->getTestName() << std::endl;
+
 				(*iter)->run(mResult);
 
 				bool testFailed = false;
