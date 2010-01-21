@@ -169,6 +169,9 @@ void TCPConnector::run(){
 				mConnectionsMutex.lock();
 					mConnections.add(connection);
 					notifyListenersConnected(connection);
+
+					// Clear out dead connections
+					mDeadConnections.clear();
 				mConnectionsMutex.unlock();
 			}
 			else{
@@ -179,7 +182,7 @@ void TCPConnector::run(){
 }
 
 void TCPConnector::receiveError(TCPConnection *connection){
-	TCPConnection::ptr conn;
+	TCPConnection::ptr deadConnection;
 
 	mConnectionsMutex.lock();
 		// Find the Connection::ptr from the connection
@@ -188,13 +191,17 @@ void TCPConnector::receiveError(TCPConnection *connection){
 			if(mConnections[i]==connection) break;
 		}
 		if(i<mConnections.size()){
-			conn=mConnections[i];
+			deadConnection=mConnections[i];
 			mConnections.removeAt(i);
+
+			// Store dead connections, and they get cleaned out at a later time
+			//  Otherwise we have a deadlock when the thread in the Connection tries to let the Connection::ptr die
+			mDeadConnections.add(deadConnection);
 		}
 	mConnectionsMutex.unlock();
 
-	if(conn!=NULL){
-		notifyListenersDisconnected(conn);
+	if(deadConnection!=NULL){
+		notifyListenersDisconnected(deadConnection);
 	}
 }
 
