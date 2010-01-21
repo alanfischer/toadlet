@@ -63,6 +63,7 @@ protected:
 	egg::Thread::ptr mServerThread;
 	bool mRun;
 	egg::Collection<TCPConnection::ptr> mConnections;
+	egg::Collection<TCPConnection::ptr> mDeadConnections;
 	egg::Mutex mConnectionsMutex;
 	egg::Collection<ConnectorListener*> mListeners;
 	egg::Mutex mListenersMutex;
