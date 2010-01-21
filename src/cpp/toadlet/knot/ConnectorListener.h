@@ -33,6 +33,8 @@ namespace knot{
 
 class TOADLET_API ConnectorListener{
 public:
+	virtual ~ConnectorListener(){}
+
 	virtual void connected(Connection::ptr connection)=0;
 	virtual void disconnected(Connection::ptr connection)=0;
 	virtual void dataReady(Connection *connection)=0;
