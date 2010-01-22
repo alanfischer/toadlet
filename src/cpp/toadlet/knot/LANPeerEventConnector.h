@@ -32,7 +32,7 @@
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/Thread.h>
 #include <toadlet/egg/net/Socket.h>
-#include <toadlet/knot/Connection.h>
+#include <toadlet/knot/Connector.h>
 #include <toadlet/knot/SynchronizedEventPeer.h>
 
 namespace toadlet{
@@ -42,9 +42,9 @@ namespace knot{
 
 // TODO: This class can be separated out to base PeerEventConnector, which will contain the Events & connected(), and then specialize it for BluetoothPeerConnector, LANPeerConnector, etc
 
-// TODO: The LANPeerConnector could really just be a LANConnector, and would do broadcasting, and generate connections.  Then we would have a PeerNegotiator, which would take connections, and do the whole "send events and see who is server" thing, and return a PeerEventSynchronizer.
+// TODO: The LANPeerConnector could really just be a LANConnector, and would do broadcasting, and generate client/server connections.  Then we would have a PeerNegotiator, which would take connections, and do the whole "send events and see who is server" thing, and return a PeerEventSynchronizer.
 //  That would let us re-use the LANConnector in the server stuff to automatically find a server on the LAN
-class TOADLET_API LANPeerEventConnector:public egg::EventFactory{
+class TOADLET_API LANPeerEventConnector:public Connector,public egg::EventFactory{
 public:
 	TOADLET_SHARED_POINTERS(LANPeerEventConnector);
 
@@ -62,7 +62,12 @@ public:
 
 	// TODO: Replace int uuid with an actual UUID class
 	bool create(bool udp,int broadcastPort,int serverPort,const egg::String &uuid,int version,EventFactory *factory);
+
+	bool isOpen() const;
 	void close();
+
+	void addConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent);
+	void removeConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent);
 
 	// Start searching for a game
 	bool search(int seed,egg::Event::ptr localPayload);
@@ -74,9 +79,9 @@ public:
 
 	int getOrder() const{return mOrder;}
 	int getSeed() const{return mSeed;}
-	egg::Event::ptr getPayload() const{return mPayload;}
-	Connection::ptr getConnection() const{return mConnection;}
-	SynchronizedEventPeer::ptr getEventPeer() const{return mEventPeer;}
+	egg::Event::ptr getPayload(){return mPayload;}
+	Connection::ptr getConnection(){return mConnection;}
+	SynchronizedEventPeer::ptr getEventPeer(){return mEventPeer;}
 
 	egg::Event::ptr createEventType(int type);
 
@@ -120,6 +125,8 @@ protected:
 	egg::Event::ptr mPayload;
 	Connection::ptr mConnection;
 	egg::Mutex mConnectionMutex;
+	egg::Collection<ConnectorListener*> mListeners;
+	egg::Mutex mListenersMutex;
 	SynchronizedEventPeer::ptr mEventPeer;
 	egg::Mutex mEventsMutex;
 	egg::Collection<egg::Event::ptr> mEvents;

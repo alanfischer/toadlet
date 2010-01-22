@@ -362,8 +362,12 @@ bool TCPConnection::updatePacketReceive(){
 					}
 					mPackets.add(packet);
 				mMutex->unlock();
-				if(mConnector!=NULL){
-					mConnector->dataReady(this);
+
+				// TODO: Fix the dataReady notification if there is a packetDelay
+				if(mDebugPacketDelayMaxTime==0){
+					if(mConnector!=NULL){
+						mConnector->dataReady(this);
+					}
 				}
 			}
 			else{

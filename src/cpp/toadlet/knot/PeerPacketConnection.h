@@ -39,6 +39,11 @@
 namespace toadlet{
 namespace knot{
 
+/*!
+ * A specialized Connection that operates over UDP, and enforces reliable delivery of packets.
+ * It's usage requires that both sides of the connection send the same amount of packets, since
+ * the packet header is used to determine which packets need to be resent.
+ */
 class TOADLET_API PeerPacketConnection:public Connection,egg::Runnable{
 public:
 	TOADLET_SHARED_POINTERS(PeerPacketConnection);
@@ -46,30 +51,37 @@ public:
 	PeerPacketConnection(egg::net::Socket::ptr socket);
 	virtual ~PeerPacketConnection();
 
+	/// This is the amount of time(ms) that the Connection will wait before it assumes a packet is lost
 	void setPacketResendTime(int time);
 	inline int getPacketResendTime() const{return mPacketResendTime;}
 
+	/// This is the number of previous packets to send each frame, useful if you are predicting several frames ahead, and have a high packet drop
 	void setNumExtraPackets(int extraPackets);
 	inline int getNumExtraPackets() const{return mNumExtraPackets;}
 
+	/// This weights the calculated ping value, to make it more stable
 	void setPingWeighting(float weighting);
 	inline float getPingWeighting() const{return mPingWeighting;}
 
-	bool connect(const egg::String &address,int port);
-	bool connect(int ip,int port);
+	/// Connect to an address:port
+	bool connect(int address,int port);
+	/// Wait for a connection
 	bool accept();
 	bool disconnect();
 
 	int send(const byte *data,int length);
 	int receive(byte *data,int length);
 
-	/// This is not an accurate ping value.  Since the soonest an acknowledgement of a received packet can be sent is
-	///  dependent on the logic dt of the application, the sum of the ping value of both peers will always be greater
-	///  the logic dt.
-	/// So if your logic dt is 100 ms, you can be playing locally, and the ping on one client will be reported as
-	///  anywhere from 0 - 100 ms, on average about 50.
+	/*!
+	 * This is not an accurate ping value.  Since the soonest an acknowledgement of a received packet can be sent is
+	 * dependent on the logic dt of the application, the sum of the ping value of both peers will always be greater
+	 * the logic dt.
+	 * So if your logic dt is 100 ms, you can be playing locally, and the ping on one client will be reported as
+	 * anywhere from 0 - 100 ms, on average about 50.
+	*/
 	int getPing() const{return mPing;}
 
+	/// Log current status
 	void output();
 
 	void run();

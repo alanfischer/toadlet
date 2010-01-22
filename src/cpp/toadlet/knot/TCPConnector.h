@@ -37,7 +37,9 @@ public:
 	TOADLET_SHARED_POINTERS(TCPConnector);
 
 	TCPConnector();
-	TCPConnector(int localPort); // Server mode
+	/// Start accepting on the port
+	TCPConnector(int localPort);
+	/// Start connecting to the remote host
 	TCPConnector(int remoteHost,int remotePort); // Client mode
 	virtual ~TCPConnector();
 
@@ -49,12 +51,16 @@ public:
 
 	void addConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent);
 	void removeConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent);
-	
+
+	TCPConnection::ptr getConnection(int i);
+
 	void run();
 
 	void receiveError(TCPConnection *connection);
 	void dataReady(TCPConnection *connection);
-	
+
+//	Connection::ptr getConnection() const{return mConnection;}
+
 protected:
 	void notifyListenersConnected(TCPConnection::ptr connection);
 	void notifyListenersDisconnected(TCPConnection::ptr connection);

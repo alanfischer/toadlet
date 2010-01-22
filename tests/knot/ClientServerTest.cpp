@@ -63,8 +63,8 @@ QT_TEST(ClientServerTest){
 		serverConnector->accept(6969);
 	*/
 	// Compact Syntax
-	EventServer::ptr server=EventServer::ptr(new SimpleEventServer(eventFactory,Connector::ptr(new TCPConnector(6969))))  ;
-	
+	EventServer::ptr server=EventServer::ptr(new SimpleEventServer(eventFactory,Connector::ptr(new TCPConnector(6969))));
+
 	// Create Clients
 	EventClient::ptr client1=EventClient::ptr(new SimpleEventClient(eventFactory,Connector::ptr(new TCPConnector(Socket::stringToIP("127.0.0.1"),6969))));
 	EventClient::ptr client2=EventClient::ptr(new SimpleEventClient(eventFactory,Connector::ptr(new TCPConnector(Socket::stringToIP("127.0.0.1"),6969))));
@@ -98,6 +98,7 @@ QT_TEST(ClientServerTest){
 
 	QT_CHECK(receiveEvent!=NULL && shared_static_cast<MessageEvent>(sendEvent)->getText().equals(shared_static_cast<MessageEvent>(receiveEvent)->getText()));
 
+((TCPConnector*)client2->getConnector().get())->getConnection(0)->debugSetPacketDelayTime(1,1);
 	client1->sendEventToClient(1,sendEvent=Event::ptr(new MessageEvent("Sup!")));
 	for(receiveEvent=NULL,endTime=System::mtime()+5000;System::mtime()<endTime && receiveEvent==NULL;client2->receiveEvent(receiveEvent,fromClient));
 	if(receiveEvent!=NULL){
