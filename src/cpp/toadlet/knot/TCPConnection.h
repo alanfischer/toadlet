@@ -64,6 +64,7 @@ public:
 
 	/// Debug methods
 	void debugSetPacketDelayTime(int minTime,int maxTime);
+	void debugRun();
 
 protected:
 	class Packet{
@@ -109,6 +110,8 @@ protected:
 	egg::Random mDebugRandom;
 	int mDebugPacketDelayMinTime;
 	int mDebugPacketDelayMaxTime;
+	egg::Thread::ptr mDebugThread;
+	bool mDebugRun;
 };
 
 }

@@ -98,7 +98,6 @@ QT_TEST(ClientServerTest){
 
 	QT_CHECK(receiveEvent!=NULL && shared_static_cast<MessageEvent>(sendEvent)->getText().equals(shared_static_cast<MessageEvent>(receiveEvent)->getText()));
 
-((TCPConnector*)client2->getConnector().get())->getConnection(0)->debugSetPacketDelayTime(1,1);
 	client1->sendEventToClient(1,sendEvent=Event::ptr(new MessageEvent("Sup!")));
 	for(receiveEvent=NULL,endTime=System::mtime()+5000;System::mtime()<endTime && receiveEvent==NULL;client2->receiveEvent(receiveEvent,fromClient));
 	if(receiveEvent!=NULL){

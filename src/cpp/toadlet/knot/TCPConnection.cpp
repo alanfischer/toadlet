@@ -37,6 +37,13 @@ using namespace toadlet::egg::net;
 namespace toadlet{
 namespace knot{
 
+class DebugThread:public Thread{
+public:
+	DebugThread(TCPConnection *connection){mConnection=connection;}
+	void run(){mConnection->debugRun();}
+	TCPConnection *mConnection;
+};
+
 const int TCPConnection::CONNECTION_FRAME=-1;
 const char *TCPConnection::CONNECTION_PACKET="toadlet::knot::tcp";
 const int TCPConnection::CONNECTION_PACKET_LENGTH=18;
@@ -51,7 +58,7 @@ TCPConnection::TCPConnection(TCPConnector *connector):
 
 	//mMutex,
 	//mThread,
-	mRun(true),
+	mRun(false),
 	mConnector(NULL),
 
 	//mPackets,
@@ -59,7 +66,9 @@ TCPConnection::TCPConnection(TCPConnector *connector):
 
 	//mDebugRandom,
 	mDebugPacketDelayMinTime(0),
-	mDebugPacketDelayMaxTime(0)
+	mDebugPacketDelayMaxTime(0),
+	//mDebugThread
+	mDebugRun(false)
 {
 	int maxSize=1024;
 	mOutPacket=MemoryStream::ptr(new MemoryStream(new uint8[maxSize],maxSize,0,true));
@@ -82,7 +91,7 @@ TCPConnection::TCPConnection(egg::net::Socket::ptr socket):
 
 	//mMutex,
 	//mThread,
-	mRun(true),
+	mRun(false),
 	mConnector(NULL),
 
 	//mPackets,
@@ -90,7 +99,9 @@ TCPConnection::TCPConnection(egg::net::Socket::ptr socket):
 
 	//mDebugRandom,
 	mDebugPacketDelayMinTime(0),
-	mDebugPacketDelayMaxTime(0)
+	mDebugPacketDelayMaxTime(0),
+	//mDebugThread
+	mDebugRun(false)
 {
 	int maxSize=1024;
 	mOutPacket=MemoryStream::ptr(new MemoryStream(new uint8[maxSize],maxSize,0,true));
@@ -167,6 +178,7 @@ bool TCPConnection::connect(Socket::ptr socket){
 	mOutPacket->reset();
 
 	if(result){
+		mRun=true;
 		mThread->start();
 	}
 
@@ -239,6 +251,7 @@ bool TCPConnection::accept(Socket::ptr socket){
 	mOutPacket->reset();
 
 	if(result){
+		mRun=true;
 		mThread->start();
 	}
 
@@ -253,9 +266,15 @@ bool TCPConnection::disconnect(){
 	TOADLET_CATCH(const Exception &){}
 
 	mRun=false;
-	while(mThread->isAlive()){
+	while(mThread!=NULL && mThread->isAlive()){
 		System::msleep(10);
 	}
+
+	mDebugRun=false;
+	while(mDebugThread!=NULL && mDebugThread->isAlive()){
+		System::msleep(10);
+	}
+
 	mSocket=NULL;
 
 	return true;
@@ -302,8 +321,48 @@ void TCPConnection::run(){
 }
 
 void TCPConnection::debugSetPacketDelayTime(int minTime,int maxTime){
-	mDebugPacketDelayMinTime=minTime;
-	mDebugPacketDelayMaxTime=maxTime;
+	mMutex->lock();
+		mDebugPacketDelayMinTime=minTime;
+		mDebugPacketDelayMaxTime=maxTime;
+
+		if(mDebugPacketDelayMinTime>0 && mDebugThread==NULL){
+			mDebugThread=Thread::ptr(new DebugThread(this));
+			mDebugRun=true;
+			mDebugThread->start();
+		}
+		else if(mDebugPacketDelayMaxTime==0 && mDebugThread!=NULL){
+			mDebugRun=false;
+			while(mDebugThread->isAlive()){
+				System::msleep(10);
+			}
+			mDebugThread=NULL;
+
+			int i;
+			for(i=0;i<mPackets.size();++i){
+				Packet::ptr packet=mPackets[i];
+				if(packet->debugDeliverTime!=0){
+					packet->debugDeliverTime=0;
+					mConnector->dataReady(this);
+				}
+			}
+		}
+	mMutex->unlock();
+}
+
+void TCPConnection::debugRun(){
+	while(mDebugRun){
+		mMutex->lock();
+			int i;
+			for(i=0;i<mPackets.size();++i){
+				Packet::ptr packet=mPackets[i];
+				if(packet->debugDeliverTime<=System::mtime()){
+					packet->debugDeliverTime=0;
+					mConnector->dataReady(this);
+				}
+			}
+		mMutex->unlock();
+		System::msleep(10);
+	}
 }
 
 int TCPConnection::buildConnectionPacket(DataStream *stream){
@@ -363,7 +422,6 @@ bool TCPConnection::updatePacketReceive(){
 					mPackets.add(packet);
 				mMutex->unlock();
 
-				// TODO: Fix the dataReady notification if there is a packetDelay
 				if(mDebugPacketDelayMaxTime==0){
 					if(mConnector!=NULL){
 						mConnector->dataReady(this);
