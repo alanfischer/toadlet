@@ -29,6 +29,7 @@
 #include <toadlet/knot/LANPeerEventConnector.h>
 #include <toadlet/knot/PeerPacketConnection.h>
 #include <toadlet/knot/TCPConnection.h>
+#include <toadlet/knot/ConnectorListener.h>
 #include <string.h> // memset
 
 #if defined(TOADLET_PLATFORM_IPHONE)
@@ -169,6 +170,10 @@ bool LANPeerEventConnector::create(bool udp,int broadcastPort,int serverPort,con
 	return true;
 }
 
+bool LANPeerEventConnector::isOpen() const{
+	return mConnection!=NULL;
+}
+
 void LANPeerEventConnector::close(){
 	if(mConnection!=NULL){
 		mConnection->disconnect();
@@ -191,6 +196,34 @@ void LANPeerEventConnector::close(){
 			System::msleep(10);
 		}
 	}
+}
+
+void LANPeerEventConnector::addConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent){
+	mListenersMutex.lock();
+		mListeners.add(listener);
+	mListenersMutex.unlock();
+
+	if(notifyAboutCurrent){
+		mConnectionMutex.lock();
+			if(mConnection!=NULL){
+				listener->connected(mConnection);
+			}
+		mConnectionMutex.unlock();
+	}
+}
+
+void LANPeerEventConnector::removeConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent){
+	if(notifyAboutCurrent){
+		mConnectionMutex.lock();
+			if(mConnection!=NULL){
+				listener->disconnected(mConnection);
+			}
+		mConnectionMutex.unlock();
+	}
+
+	mListenersMutex.lock();
+		mListeners.remove(listener);
+	mListenersMutex.unlock();
 }
 
 bool LANPeerEventConnector::search(int localSeed,Event::ptr localPayload){
@@ -512,6 +545,13 @@ void LANPeerEventConnector::connected(Connection::ptr connection){
 
 		// Now that we have sent the proper connection messages
 		eventPeer->reset(4,1);
+
+		// TODO: Add a disconnected & dataReady notification to the listeners
+		mListenersMutex.lock();
+			for(i=0;i<mListeners.size();++i){
+				mListeners[i]->connected(connection);
+			}
+		mListenersMutex.unlock();
 
 		mConnection=connection;
 		mEventPeer=eventPeer;

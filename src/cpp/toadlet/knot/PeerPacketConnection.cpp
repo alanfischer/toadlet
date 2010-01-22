@@ -155,12 +155,8 @@ void PeerPacketConnection::setPingWeighting(float weighting){
 	mPingWeighting=weighting;
 }
 
-bool PeerPacketConnection::connect(const String &address,int port){
-	return connect(Socket::stringToIP(address),port);
-}
-
-bool PeerPacketConnection::connect(int ip,int port){
-	uint32 remoteIP=ip;
+bool PeerPacketConnection::connect(int address,int port){
+	uint32 remoteAddress=address;
 	int remotePort=port;
 
 	Logger::debug(Categories::TOADLET_KNOT,
@@ -173,15 +169,15 @@ bool PeerPacketConnection::connect(int ip,int port){
 
 		int tries=0;
 		while(tries<3){
-			amount=mSocket->sendTo(mOutPacket->getOriginalDataPointer(),size,remoteIP,remotePort);
+			amount=mSocket->sendTo(mOutPacket->getOriginalDataPointer(),size,remoteAddress,remotePort);
 			if(amount>0){
 				Logger::debug(Categories::TOADLET_KNOT,
-					String("connect: sent connection packet to:")+Socket::ipToString(remoteIP)+":"+remotePort);
+					String("connect: sent connection packet to:")+Socket::ipToString(remoteAddress)+":"+remotePort);
 
-				amount=mSocket->receiveFrom(mInPacket->getOriginalDataPointer(),size,remoteIP,remotePort);
+				amount=mSocket->receiveFrom(mInPacket->getOriginalDataPointer(),size,remoteAddress,remotePort);
 				if(amount>0){
 					Logger::debug(Categories::TOADLET_KNOT,
-						String("connect: received connection packet from:")+Socket::ipToString(remoteIP)+":"+remotePort);
+						String("connect: received connection packet from:")+Socket::ipToString(remoteAddress)+":"+remotePort);
 
 					if(verifyConnectionPacket(mDataInPacket)){
 						Logger::debug(Categories::TOADLET_KNOT,
@@ -213,7 +209,7 @@ bool PeerPacketConnection::connect(int ip,int port){
 	mDebugRandom.setSeed(System::mtime());
 
 	if(result){
-		mSocket->connect(remoteIP,remotePort);
+		mSocket->connect(remoteAddress,remotePort);
 
 		mThread->start();
 	}
@@ -222,7 +218,7 @@ bool PeerPacketConnection::connect(int ip,int port){
 }
 
 bool PeerPacketConnection::accept(){
-	uint32 remoteIP=0;
+	uint32 remoteAddress=0;
 	int remotePort=0;
 
 	Logger::debug(Categories::TOADLET_KNOT,
@@ -236,20 +232,20 @@ bool PeerPacketConnection::accept(){
 		int tries=0;
 		while(tries<3){
 			TOADLET_TRY
-				amount=mSocket->receiveFrom(mInPacket->getOriginalDataPointer(),size,remoteIP,remotePort);
+				amount=mSocket->receiveFrom(mInPacket->getOriginalDataPointer(),size,remoteAddress,remotePort);
 			TOADLET_CATCH(const Exception &){}
 			if(amount>0){
 				Logger::debug(Categories::TOADLET_KNOT,
-					String("accept: received connection packet from:")+Socket::ipToString(remoteIP)+":"+remotePort);
+					String("accept: received connection packet from:")+Socket::ipToString(remoteAddress)+":"+remotePort);
 
 				if(verifyConnectionPacket(mDataInPacket)){
 					Logger::debug(Categories::TOADLET_KNOT,
 						"accept: verified connection packet");
 
-					amount=mSocket->sendTo(mOutPacket->getOriginalDataPointer(),size,remoteIP,remotePort);
+					amount=mSocket->sendTo(mOutPacket->getOriginalDataPointer(),size,remoteAddress,remotePort);
 					if(amount>0){
 						Logger::debug(Categories::TOADLET_KNOT,
-							String("accept: sent connection packet to:")+Socket::ipToString(remoteIP)+":"+remotePort);
+							String("accept: sent connection packet to:")+Socket::ipToString(remoteAddress)+":"+remotePort);
 
 						result=true;
 						break;
@@ -277,7 +273,7 @@ bool PeerPacketConnection::accept(){
 	mDebugRandom.setSeed(System::mtime());
 
 	if(result){
-		mSocket->connect(remoteIP,remotePort);
+		mSocket->connect(remoteAddress,remotePort);
 
 		mThread->start();
 	}

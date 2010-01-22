@@ -156,6 +156,14 @@ void TCPConnector::removeConnectorListener(ConnectorListener *listener,bool noti
 	mListenersMutex.unlock();
 }
 
+TCPConnection::ptr TCPConnector::getConnection(int i){
+	TCPConnection::ptr connection;
+	mConnectionsMutex.lock();
+		connection=mConnections[i];
+	mConnectionsMutex.unlock();
+	return connection;
+}
+
 void TCPConnector::run(){
 	while(mRun){
 		Socket::ptr clientSocket;

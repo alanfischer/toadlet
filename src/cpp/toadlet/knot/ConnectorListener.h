@@ -37,6 +37,8 @@ public:
 
 	virtual void connected(Connection::ptr connection)=0;
 	virtual void disconnected(Connection::ptr connection)=0;
+
+	// Perhaps this notification should be moved to a Connection listener
 	virtual void dataReady(Connection *connection)=0;
 };
 
