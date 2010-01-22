@@ -90,6 +90,7 @@ public:
 	void debugSetPacketDelayTime(int time);
 	void debugSetPacketDropAmount(float amount);
 	void debugDropNextPacket();
+	void debugRun();
 
 protected:
 	class PeerPacket{
@@ -115,6 +116,8 @@ protected:
 
 		inline uint64 getTimeHandled() const{return mTimeHandled;}
 		void setTimeHandled(uint64 time){mTimeHandled=time;}
+
+		int debugDeliverTime;
 
 	protected:
 		byte *mData;
@@ -177,6 +180,8 @@ protected:
 	int mDebugPacketDelayTime;
 	float mDebugPacketDropAmount;
 	bool mDebugDropNextPacket;
+	egg::Thread::ptr mDebugThread;
+	bool mDebugRun;
 };
 
 }

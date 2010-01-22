@@ -36,6 +36,17 @@ using namespace toadlet::egg::net;
 namespace toadlet{
 namespace knot{
 
+// TODO: We need to add the dataReady notification, but it's in the wrong interface currently, 
+//  and its a bit trickier in this class, since we should only notify that a packet arrived if there are no missing packets
+//  between that future packet and our current packet.
+
+class DebugThread:public Thread{
+public:
+	DebugThread(PeerPacketConnection *connection){mConnection=connection;}
+	void run(){mConnection->debugRun();}
+	PeerPacketConnection *mConnection;
+};
+
 PeerPacketConnection::PeerPacket::PeerPacket():
 	mData(NULL),
 	mDataLength(0),
@@ -45,7 +56,9 @@ PeerPacketConnection::PeerPacket::PeerPacket():
 	mFrameBits(0),
 	mFrameBitsReferenceFrame(0),
 
-	mTimeHandled(0)
+	mTimeHandled(0),
+
+	debugDeliverTime(0)
 {}
 
 PeerPacketConnection::PeerPacket::~PeerPacket(){
@@ -87,7 +100,9 @@ const int PeerPacketConnection::CONNECTION_PACKET_LENGTH=18;
 const int PeerPacketConnection::CONNECTION_VERSION=1;
 
 PeerPacketConnection::PeerPacketConnection(Socket::ptr socket):
-	mRun(true),
+	//mMutex,
+	//mThread,
+	mRun(false),
 
 	mPacketResendTime(1000),
 	mPing(-1),
@@ -104,7 +119,9 @@ PeerPacketConnection::PeerPacketConnection(Socket::ptr socket):
 
 	mDebugPacketDelayTime(0),
 	mDebugPacketDropAmount(0),
-	mDebugDropNextPacket(false)
+	mDebugDropNextPacket(false),
+	//mDebugThread
+	mDebugRun(false)
 {
 	int i;
 
@@ -211,6 +228,7 @@ bool PeerPacketConnection::connect(int address,int port){
 	if(result){
 		mSocket->connect(remoteAddress,remotePort);
 
+		mRun=true;
 		mThread->start();
 	}
 
@@ -275,6 +293,7 @@ bool PeerPacketConnection::accept(){
 	if(result){
 		mSocket->connect(remoteAddress,remotePort);
 
+		mRun=true;
 		mThread->start();
 	}
 
@@ -289,9 +308,16 @@ bool PeerPacketConnection::disconnect(){
 	TOADLET_CATCH(const Exception &){}
 
 	mRun=false;
-	while(mThread->isAlive()){
+	while(mThread!=NULL && mThread->isAlive()){
 		System::msleep(10);
 	}
+
+	mDebugRun=false;
+	while(mDebugThread!=NULL && mDebugThread->isAlive()){
+		System::msleep(10);
+	}
+
+	mSocket=NULL;
 
 	return true;
 }
@@ -334,7 +360,7 @@ int PeerPacketConnection::receive(byte *data,int length){
 	mMutex->lock();
 
 	int index=mHalfWindowSize;
-	if((mNewFrameBits&(0x1<<index))!=0 && (uint32)(mRemotePackets[index]->getTimeHandled()+mDebugPacketDelayTime)<=System::mtime()){ // If the NewPacketBit for the current packet is on
+	if((mNewFrameBits&(0x1<<index))!=0 && mRemotePackets[index]->debugDeliverTime<=System::mtime()){ // If the NewPacketBit for the current packet is on
 		mNewFrameBits&=(~(0x1<<index)); // Turn it off
 
 		mMasterFrame++;
@@ -519,6 +545,13 @@ bool PeerPacketConnection::updatePacketReceive(){
 							break;
 						}
 					}
+
+					if(mDebugPacketDelayTime>0){
+						packet->debugDeliverTime=System::mtime() + mDebugPacketDelayTime;
+					}
+					else{
+						packet->debugDeliverTime=0;
+					}
 				}
 			}
 		}
@@ -658,26 +691,58 @@ void PeerPacketConnection::run(){
 
 void PeerPacketConnection::debugSetPacketDelayTime(int time){
 	mMutex->lock();
+		mDebugPacketDelayTime=time;
 
-	mDebugPacketDelayTime=time;
+		if(mDebugPacketDelayTime>0 && mDebugThread==NULL){
+			mDebugThread=Thread::ptr(new DebugThread(this));
+			mDebugRun=true;
+			mDebugThread->start();
+		}
+		else if(mDebugPacketDelayTime==0 && mDebugThread!=NULL){
+			mDebugRun=false;
+			while(mDebugThread->isAlive()){
+				System::msleep(10);
+			}
+			mDebugThread=NULL;
 
+			int i;
+			for(i=0;i<mRemotePackets.size();++i){
+				PeerPacket::ptr packet=mRemotePackets[i];
+				if(packet->debugDeliverTime!=0){
+					packet->debugDeliverTime=0;
+					//mConnector->dataReady(this);
+				}
+			}
+		}
 	mMutex->unlock();
 }
 
 void PeerPacketConnection::debugSetPacketDropAmount(float amount){
 	mMutex->lock();
-
-	mDebugPacketDropAmount=amount;
-
+		mDebugPacketDropAmount=amount;
 	mMutex->unlock();
 }
 
 void PeerPacketConnection::debugDropNextPacket(){
 	mMutex->lock();
-
-	mDebugDropNextPacket=true;
-
+		mDebugDropNextPacket=true;
 	mMutex->unlock();
+}
+
+void PeerPacketConnection::debugRun(){
+	while(mDebugRun){
+//		mMutex->lock();
+//			int i;
+//			for(i=0;i<mRemotePackets.size();++i){
+//				PeerPacket::ptr packet=mPackets[i];
+//				if(packet->debugDeliverTime<=System::mtime()){
+//					packet->debugDeliverTime=0;
+//					mConnector->dataReady(this);
+//				}
+//			}
+//		mMutex->unlock();
+		System::msleep(10);
+	}
 }
 
 }
