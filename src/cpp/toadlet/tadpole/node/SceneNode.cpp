@@ -104,9 +104,9 @@ void SceneNode::destroy(){
 
 void SceneNode::setLogicDT(int dt){
 	#if defined(TOADLET_DEBUG)
-		if(dt<=0){
+		if(dt<0){
 			Error::unknown(Categories::TOADLET_TADPOLE,
-				"setLogicDT must be > 0");
+				"setLogicDT must be >= 0");
 			return;
 		}
 	#endif
@@ -141,18 +141,32 @@ void SceneNode::update(int dt){
 	if(mAccumulatedDT>=mLogicDT){
 		mChildScene->preLogicUpdateLoop(dt);
 
-		while(mAccumulatedDT>=mLogicDT){
-			mAccumulatedDT-=mLogicDT;
+		if(mLogicDT>0){
+			while(mAccumulatedDT>=mLogicDT){
+				mAccumulatedDT-=mLogicDT;
 
+				if(mUpdateListener!=NULL){
+					mUpdateListener->preLogicUpdate(mLogicDT);
+					mUpdateListener->logicUpdate(mLogicDT);
+					mUpdateListener->postLogicUpdate(mLogicDT);
+				}
+				else{
+					mChildScene->preLogicUpdate(mLogicDT);
+					mChildScene->logicUpdate(mLogicDT);
+					mChildScene->postLogicUpdate(mLogicDT);
+				}
+			}
+		}
+		else{
 			if(mUpdateListener!=NULL){
-				mUpdateListener->preLogicUpdate(mLogicDT);
-				mUpdateListener->logicUpdate(mLogicDT);
-				mUpdateListener->postLogicUpdate(mLogicDT);
+				mUpdateListener->preLogicUpdate(dt);
+				mUpdateListener->logicUpdate(dt);
+				mUpdateListener->postLogicUpdate(dt);
 			}
 			else{
-				mChildScene->preLogicUpdate(mLogicDT);
-				mChildScene->logicUpdate(mLogicDT);
-				mChildScene->postLogicUpdate(mLogicDT);
+				mChildScene->preLogicUpdate(dt);
+				mChildScene->logicUpdate(dt);
+				mChildScene->postLogicUpdate(dt);
 			}
 		}
 
