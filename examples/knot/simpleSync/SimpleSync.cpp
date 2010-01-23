@@ -1,6 +1,26 @@
 #include "SimpleSync.h"
 #include <stdlib.h>
 
+class MessageEvent:public Event{
+public:
+	enum{
+		EventType_MESSAGE=101
+	};
+
+	MessageEvent():Event(EventType_MESSAGE){}
+
+	MessageEvent(const String &text):Event(EventType_MESSAGE){mText=text;}
+
+	void setText(const String &text){mText=text;}
+	const String getText() const{return mText;}
+
+	int read(DataStream *stream){return stream->readBigInt16String(mText);}
+	int write(DataStream *stream){return stream->writeBigInt16String(mText);}
+
+protected:
+	String mText;
+};
+
 SimpleSync::SimpleSync():Application(){
 }
 
@@ -21,7 +41,7 @@ void SimpleSync::create(){
 	HopScene::ptr scene(new HopScene(mEngine->createNodeType(SceneNode::type())));
 	getEngine()->setScene(scene);
 	scene->showCollisionVolumes(true,false);
-	scene->setLogicDT(20);
+	scene->setLogicDT(0);
 	scene->setGravity(Vector3(0,0,-10));
 	scene->getSimulator()->setMicroCollisionThreshold(5);
 
@@ -45,7 +65,7 @@ void SimpleSync::create(){
 	floor->setLocalGravity(Math::ZERO_VECTOR3);
 	getEngine()->getScene()->getRootNode()->attach(floor);
 
-	block=getEngine()->createNodeType(HopEntity::type());
+	HopEntity::ptr block=getEngine()->createNodeType(HopEntity::type());
 	block->addShape(Shape::ptr(new Shape(AABox(-1,-1,-1,1,1,1))));
 	{
 		Mesh::ptr mesh=getEngine()->getMeshManager()->createBox(block->getShape(0)->getAABox());
@@ -94,10 +114,29 @@ void SimpleSync::render(Renderer *renderer){
 
 void SimpleSync::update(int dt){
 	getEngine()->getScene()->update(dt);
+
+	if(eventServer!=NULL){
+		eventServer->broadcastEvent(Event::ptr(new MessageEvent("ChatMessage")));
+	}
+	if(eventClient!=NULL){
+		Event::ptr event=NULL;
+		int clientID=0;
+
+		eventClient->receiveEvent(event,clientID);
+
+		if(event!=NULL){
+			Logger::alert("Received:"+((MessageEvent*)event.get())->getText());
+		}
+	}
 }
 
 Event::ptr SimpleSync::createEventType(int type){
-	return Event::ptr(new Event());
+	if(type==MessageEvent::EventType_MESSAGE){
+		return Event::ptr(new MessageEvent());
+	}
+	else{
+		return Event::ptr(new Event());
+	}
 }
 
 void SimpleSync::run(){

@@ -81,7 +81,7 @@ public:
 	virtual void setLogicTimeAndFrame(int time,int frame);
 	virtual int getLogicTime() const{return mLogicTime;}
 	virtual int getLogicFrame() const{return mLogicFrame;}
-	virtual scalar getLogicFraction() const{return Math::div(Math::fromInt(mAccumulatedDT),Math::fromInt(mLogicDT));}
+	virtual scalar getLogicFraction() const{return mLogicDT==0?0:Math::div(Math::fromInt(mAccumulatedDT),Math::fromInt(mLogicDT));}
 	virtual int getRenderTime() const{return mLogicTime+mAccumulatedDT;}
 	virtual int getRenderFrame() const{return mRenderFrame;}
 

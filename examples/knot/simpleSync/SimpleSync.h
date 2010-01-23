@@ -48,7 +48,6 @@ public:
 
 	CameraNode::ptr cameraNode;
 	MeshNode::ptr meshNode;
-HopEntity::ptr block;
 };
 
 #endif
