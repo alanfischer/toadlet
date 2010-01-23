@@ -21,8 +21,9 @@ void SimpleSync::create(){
 	HopScene::ptr scene(new HopScene(mEngine->createNodeType(SceneNode::type())));
 	getEngine()->setScene(scene);
 	scene->showCollisionVolumes(true,false);
-	scene->setLogicDT(25);
+	scene->setLogicDT(20);
 	scene->setGravity(Vector3(0,0,-10));
+	scene->getSimulator()->setMicroCollisionThreshold(5);
 
 	getEngine()->getScene()->getRootNode()->attach(getEngine()->createNodeType(LightNode::type()));
 
@@ -44,7 +45,7 @@ void SimpleSync::create(){
 	floor->setLocalGravity(Math::ZERO_VECTOR3);
 	getEngine()->getScene()->getRootNode()->attach(floor);
 
-	HopEntity::ptr block=getEngine()->createNodeType(HopEntity::type());
+	block=getEngine()->createNodeType(HopEntity::type());
 	block->addShape(Shape::ptr(new Shape(AABox(-1,-1,-1,1,1,1))));
 	{
 		Mesh::ptr mesh=getEngine()->getMeshManager()->createBox(block->getShape(0)->getAABox());
