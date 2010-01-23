@@ -61,6 +61,9 @@ HopEntity::HopEntity():ParentNode(),
 Node *HopEntity::create(Engine *engine){
 	super::create(engine);
 
+	// No need to worry about this
+	mIdentityTransform=false;
+
 	mNextThink=0;
 	mSolid->reset();
 	mSolid->setUserData(this);
@@ -220,7 +223,6 @@ void HopEntity::setCoefficientOfEffectiveDrag(scalar coeff){
 }
 
 void HopEntity::addShape(hop::Shape::ptr shape){
-Logger::alert(String("ADDING SHAPE"));
 	mSolid->addShape(shape);
 
 	if(mVolumeNode!=NULL){
@@ -334,6 +336,7 @@ void HopEntity::preLogicUpdateLoop(int dt){
 void HopEntity::postLogicUpdate(int dt){
 	if(mSolid->getActive()){
 		mTranslate.set(mSolid->getPosition());
+		modified();
 	}
 
 	if(mNextThink>0){
