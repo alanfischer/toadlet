@@ -64,10 +64,12 @@ public:
 	inline float getPingWeighting() const{return mPingWeighting;}
 
 	/// Connect to an address:port
-	bool connect(int address,int port);
+	bool connect(uint32 remoteHost,int remotePort);
 	/// Wait for a connection
-	bool accept();
-	bool disconnect();
+	bool accept(int localPort);
+
+	bool opened(){return mRun;}
+	void close();
 
 	int send(const byte *data,int length);
 	int receive(byte *data,int length);

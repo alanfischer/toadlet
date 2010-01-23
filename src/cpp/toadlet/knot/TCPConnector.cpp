@@ -73,7 +73,7 @@ TCPConnector::~TCPConnector(){
 bool TCPConnector::accept(int localPort){
 	close();
 
-	mServerSocket=Socket::ptr(Socket::makeTCPSocket());
+	mServerSocket=Socket::ptr(Socket::createTCPSocket());
 	mServerSocket->bind(localPort);
 	bool result=mServerSocket->listen(32);
 	if(result){
@@ -90,19 +90,16 @@ bool TCPConnector::connect(int remoteHost,int remotePort){
 	TCPConnection::ptr connection(new TCPConnection(this));
 	bool result=connection->connect(remoteHost,remotePort);
 	if(result){
+		mRun=true;
 		mConnectionsMutex.lock();
 			mConnections.add(connection);
 			notifyListenersConnected(connection);
 		mConnectionsMutex.unlock();
 	}
 	else{
-		connection->disconnect();
+		connection->close();
 	}
 	return result;
-}
-
-bool TCPConnector::isOpen() const{
-	return mRun;
 }
 
 void TCPConnector::close(){
@@ -112,18 +109,37 @@ void TCPConnector::close(){
 		}
 	TOADLET_CATCH(const Exception &){}
 
-	mRun=false;
-	while(mServerThread!=NULL && mServerThread->isAlive()){
-		System::msleep(10);
-	}
-	mServerSocket=NULL;
-
+	bool run=false;
 	mConnectionsMutex.lock();
-		int i;
-		for(i=0;i<mConnections.size();++i){
-			mConnections[i]->disconnect();
-		}
+		run=mRun;
+		mRun=false;
 	mConnectionsMutex.unlock();
+	if(run){
+		while(mServerThread!=NULL && mServerThread->isAlive()){
+			System::msleep(10);
+		}
+		mServerSocket=NULL;
+
+		int i;
+		Collection<Connection::ptr> connections;
+		mConnectionsMutex.lock();
+			for(i=0;i<mConnections.size();++i){
+				connections.add(mConnections[i]);
+			}
+		mConnectionsMutex.unlock();
+
+		for(i=0;i<connections.size();++i){
+			connections[i]->close();
+		}
+
+		mConnectionsMutex.lock();
+			mConnections.clear();
+
+			for(i=0;i<mConnections.size();++i){
+				connections.add(mConnections[i]);
+			}
+		mConnectionsMutex.unlock();
+	}
 }
 
 void TCPConnector::addConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent){
@@ -183,7 +199,7 @@ void TCPConnector::run(){
 				mConnectionsMutex.unlock();
 			}
 			else{
-				connection->disconnect();
+				connection->close();
 			}
 		}
 	}

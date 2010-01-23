@@ -68,8 +68,8 @@ public:
 	Socket(int handle,struct sockaddr_in *address);
 	virtual ~Socket();
 
-	static Socket *makeTCPSocket();
-	static Socket *makeUDPSocket();
+	static Socket *createTCPSocket();
+	static Socket *createUDPSocket();
 
 	virtual bool bind(int port=0);
 	virtual bool isBound() const;

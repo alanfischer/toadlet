@@ -76,7 +76,7 @@ void ParentNode::removeAllNodeDestroyedListeners(){
 }
 
 bool ParentNode::attach(Node *node){
-	if(node->destroyed()){
+	if(!node->created()){
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"cannot attach a destroyed node");
 		return false;

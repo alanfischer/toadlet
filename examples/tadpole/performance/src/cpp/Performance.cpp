@@ -129,7 +129,6 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,
 int main(int argc,char **argv){
 #endif
 	Performance app;
-	app.setFullscreen(false);
 	app.create();
 	app.start(true);
 	app.destroy();

@@ -34,6 +34,8 @@ namespace knot{
 
 class ConnectorListener;
 
+/// Thought: On Java this can just be the ByteChannel
+
 /// A connection delivers packets of data.
 class Connection{
 public:
@@ -41,7 +43,8 @@ public:
 
 	virtual ~Connection(){}
 
-	virtual bool disconnect()=0;
+	virtual bool opened()=0;
+	virtual void close()=0;
 
 	/// Send a packet of data
 	virtual int send(const byte *data,int length)=0;

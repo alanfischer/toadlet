@@ -157,7 +157,7 @@ PeerPacketConnection::PeerPacketConnection(Socket::ptr socket):
 }
 
 PeerPacketConnection::~PeerPacketConnection(){
-	disconnect();
+	close();
 }
 
 void PeerPacketConnection::setPacketResendTime(int time){
@@ -172,10 +172,7 @@ void PeerPacketConnection::setPingWeighting(float weighting){
 	mPingWeighting=weighting;
 }
 
-bool PeerPacketConnection::connect(int address,int port){
-	uint32 remoteAddress=address;
-	int remotePort=port;
-
+bool PeerPacketConnection::connect(uint32 remoteHost,int remotePort){
 	Logger::debug(Categories::TOADLET_KNOT,
 		String("connect: protocol ")+CONNECTION_PACKET);
 
@@ -186,15 +183,15 @@ bool PeerPacketConnection::connect(int address,int port){
 
 		int tries=0;
 		while(tries<3){
-			amount=mSocket->sendTo(mOutPacket->getOriginalDataPointer(),size,remoteAddress,remotePort);
+			amount=mSocket->sendTo(mOutPacket->getOriginalDataPointer(),size,remoteHost,remotePort);
 			if(amount>0){
 				Logger::debug(Categories::TOADLET_KNOT,
-					String("connect: sent connection packet to:")+Socket::ipToString(remoteAddress)+":"+remotePort);
+					String("connect: sent connection packet to:")+Socket::ipToString(remoteHost)+":"+remotePort);
 
-				amount=mSocket->receiveFrom(mInPacket->getOriginalDataPointer(),size,remoteAddress,remotePort);
+				amount=mSocket->receiveFrom(mInPacket->getOriginalDataPointer(),size,remoteHost,remotePort);
 				if(amount>0){
 					Logger::debug(Categories::TOADLET_KNOT,
-						String("connect: received connection packet from:")+Socket::ipToString(remoteAddress)+":"+remotePort);
+						String("connect: received connection packet from:")+Socket::ipToString(remoteHost)+":"+remotePort);
 
 					if(verifyConnectionPacket(mDataInPacket)){
 						Logger::debug(Categories::TOADLET_KNOT,
@@ -226,7 +223,7 @@ bool PeerPacketConnection::connect(int address,int port){
 	mDebugRandom.setSeed(System::mtime());
 
 	if(result){
-		mSocket->connect(remoteAddress,remotePort);
+		mSocket->connect(remoteHost,remotePort);
 
 		mRun=true;
 		mThread->start();
@@ -235,8 +232,9 @@ bool PeerPacketConnection::connect(int address,int port){
 	return result;
 }
 
-bool PeerPacketConnection::accept(){
-	uint32 remoteAddress=0;
+// localPort is currently unused, since its expected that the socket is already bound
+bool PeerPacketConnection::accept(int localPort){
+	uint32 remoteHost=0;
 	int remotePort=0;
 
 	Logger::debug(Categories::TOADLET_KNOT,
@@ -250,20 +248,20 @@ bool PeerPacketConnection::accept(){
 		int tries=0;
 		while(tries<3){
 			TOADLET_TRY
-				amount=mSocket->receiveFrom(mInPacket->getOriginalDataPointer(),size,remoteAddress,remotePort);
+				amount=mSocket->receiveFrom(mInPacket->getOriginalDataPointer(),size,remoteHost,remotePort);
 			TOADLET_CATCH(const Exception &){}
 			if(amount>0){
 				Logger::debug(Categories::TOADLET_KNOT,
-					String("accept: received connection packet from:")+Socket::ipToString(remoteAddress)+":"+remotePort);
+					String("accept: received connection packet from:")+Socket::ipToString(remoteHost)+":"+remotePort);
 
 				if(verifyConnectionPacket(mDataInPacket)){
 					Logger::debug(Categories::TOADLET_KNOT,
 						"accept: verified connection packet");
 
-					amount=mSocket->sendTo(mOutPacket->getOriginalDataPointer(),size,remoteAddress,remotePort);
+					amount=mSocket->sendTo(mOutPacket->getOriginalDataPointer(),size,remoteHost,remotePort);
 					if(amount>0){
 						Logger::debug(Categories::TOADLET_KNOT,
-							String("accept: sent connection packet to:")+Socket::ipToString(remoteAddress)+":"+remotePort);
+							String("accept: sent connection packet to:")+Socket::ipToString(remoteHost)+":"+remotePort);
 
 						result=true;
 						break;
@@ -291,7 +289,7 @@ bool PeerPacketConnection::accept(){
 	mDebugRandom.setSeed(System::mtime());
 
 	if(result){
-		mSocket->connect(remoteAddress,remotePort);
+		mSocket->connect(remoteHost,remotePort);
 
 		mRun=true;
 		mThread->start();
@@ -300,7 +298,7 @@ bool PeerPacketConnection::accept(){
 	return result;
 }
 
-bool PeerPacketConnection::disconnect(){
+void PeerPacketConnection::close(){
 	TOADLET_TRY
 		if(mSocket!=NULL){
 			mSocket->close();
@@ -318,8 +316,6 @@ bool PeerPacketConnection::disconnect(){
 	}
 
 	mSocket=NULL;
-
-	return true;
 }
 
 int PeerPacketConnection::send(const byte *data,int length){
@@ -644,33 +640,33 @@ int PeerPacketConnection::receivePacketsFromSocket(const toadlet::egg::Collectio
 
 	TOADLET_TRY
 		amount=mSocket->receive(mInPacket->getOriginalDataPointer(),mInPacket->length());
-	TOADLET_CATCH(const Exception &){}
-	if(amount>0){
-		int frame=mDataInPacket->readBigInt32();
-		if(frame>0){ // Is a data packet
-			int frameBits=mDataInPacket->readBigInt32();
-			int frameBitsReferenceFrame=mDataInPacket->readBigInt32();
-			numPackets=mDataInPacket->readInt8();
-			numPackets=maxNumPackets<numPackets?maxNumPackets:numPackets;
+		if(amount>0){
+			int frame=mDataInPacket->readBigInt32();
+			if(frame>0){ // Is a data packet
+				int frameBits=mDataInPacket->readBigInt32();
+				int frameBitsReferenceFrame=mDataInPacket->readBigInt32();
+				numPackets=mDataInPacket->readInt8();
+				numPackets=maxNumPackets<numPackets?maxNumPackets:numPackets;
 
-			for(i=0;i<numPackets;++i){
-				int length=mDataInPacket->readBigInt16();
+				for(i=0;i<numPackets;++i){
+					int length=mDataInPacket->readBigInt16();
 
-				PeerPacket *packet=packets[i];
-				packet->setData(mInPacket->getCurrentDataPointer(),length);
-				mInPacket->seek(mInPacket->position()+length);
-				packet->setFrame(frame-i);
-				packet->setFrameBits(frameBits,frameBitsReferenceFrame);
-				packet->setTimeHandled(time);
+					PeerPacket *packet=packets[i];
+					packet->setData(mInPacket->getCurrentDataPointer(),length);
+					mInPacket->seek(mInPacket->position()+length);
+					packet->setFrame(frame-i);
+					packet->setFrameBits(frameBits,frameBitsReferenceFrame);
+					packet->setTimeHandled(time);
+				}
+
+				result=true;
 			}
-
-			result=true;
+			mInPacket->reset();
 		}
-		mInPacket->reset();
-	}
-	else if(amount<0){
-		// Connection was closed
-	}
+	TOADLET_CATCH(const Exception &){}
+//	if(amount==0 && mConnector!=NULL){
+//		mConnector->receiveError(this);
+//	}
 
 	#if defined(TOADLET_DEBUG)
 		if(numPackets>0){

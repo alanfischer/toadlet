@@ -109,7 +109,7 @@ Win32Application::Win32Application():
 	mPositionY(0),
 	mWidth(-1),
 	mHeight(-1),
-	mFullscreen(true),
+	mFullscreen(false),
 	#if defined(TOADLET_PLATFORM_WINCE)
 		mVisual(ImageDefinitions::Format_RGB_5_6_5,16),
 	#else
@@ -146,6 +146,8 @@ Win32Application::Win32Application():
 }
 
 Win32Application::~Win32Application(){
+	destroy();
+
 	delete[] mRendererOptions;
 
 	delete win32;
@@ -180,13 +182,15 @@ void Win32Application::destroy(){
 	}
 }
 
-bool Win32Application::start(bool runEventLoop){
-	resized(mWidth,mHeight);
-
+void Win32Application::start(){
 	mRun=true;
+	resized(mWidth,mHeight);
+	runEventLoop();
+}
 
+void Win32Application::runEventLoop(){
 	uint64 lastTime=System::mtime();
-	while(runEventLoop && mRun){
+	while(mRun){
 		stepEventLoop();
 
 		if(mActive){
@@ -204,8 +208,6 @@ bool Win32Application::start(bool runEventLoop){
 
 		System::msleep(10);
 	}
-
-	return true;
 }
 
 void Win32Application::stepEventLoop(){
@@ -225,14 +227,6 @@ void Win32Application::stepEventLoop(){
 		mRendererPlugin=mChangeRendererPlugin;
 		createContextAndRenderer(mRendererPlugin);
 	}
-}
-
-void Win32Application::stop(){
-	mRun=false;
-}
-
-void Win32Application::setAutoActivate(bool autoActivate){
-	mAutoActivate=autoActivate;
 }
 
 void Win32Application::activate(){

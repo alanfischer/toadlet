@@ -121,11 +121,11 @@ Socket::Socket(int handle,struct sockaddr_in *address):
 	#endif
 }
 
-Socket *Socket::makeTCPSocket(){
+Socket *Socket::createTCPSocket(){
 	return new Socket(PF_INET,SOCK_STREAM,IPPROTO_TCP);
 }
 
-Socket *Socket::makeUDPSocket(){
+Socket *Socket::createUDPSocket(){
 	return new Socket(PF_INET,SOCK_DGRAM,IPPROTO_UDP);
 }
 
@@ -418,10 +418,10 @@ bool Socket::getHostAdaptorsByIP(Collection<uint32> &adaptors,uint32 ip){
 
 void Socket::error(const String &function){
 	#if defined(TOADLET_PLATFORM_WIN32)
-		Error::unknown(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_EGG,true,
 			String("Socket::")+function+"(): error "+(int)WSAGetLastError());
 	#else
-		Error::unknown(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_EGG,true,
 			String("Socket::")+function+"(): error "+(int)errno);
 	#endif
 }

@@ -365,13 +365,13 @@ Node *Engine::createNode(const BaseType<Node> &type){
 }
 
 void Engine::destroyNode(Node *node){
-	if(node->destroyed()==false){
+	if(node->created()){
 		node->destroy();
 	}
 }
 
 void Engine::freeNode(Node *node){
-	if(node->destroyed()==false){
+	if(node->created()){
 		Error::unknown("freeing undestroyed node");
 		return;
 	}

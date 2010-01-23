@@ -34,7 +34,6 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,
 int main(int argc,char **argv){
 #endif
 	RibbitTest app;
-	app.setFullscreen(false);
 	app.create();
 	app.start(true);
 	app.destroy();

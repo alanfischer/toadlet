@@ -27,6 +27,7 @@
 #define TOADLET_PAD_X11APPLICATION_H
 
 #include <toadlet/pad/BaseApplication.h>
+#include <toadlet/egg/Thread.h>
 
 namespace toadlet{
 namespace pad{
@@ -41,12 +42,13 @@ public:
 	virtual void create();
 	virtual void destroy();
 
-	virtual bool start(bool runEventLoop);
+	virtual void start();
+	virtual void runEventLoop();
 	virtual void stepEventLoop();
-	virtual void stop();
+	virtual void stop(){mRun=false;}
 	virtual bool isRunning() const{return mRun;}
 
-	virtual void setAutoActivate(bool autoActivate);
+	virtual void setAutoActivate(bool autoActivate){mAutoActivate=autoActivate;}
 	virtual bool getAutoActivate() const{return mAutoActivate;}
 	virtual void activate();
 	virtual void deactivate();

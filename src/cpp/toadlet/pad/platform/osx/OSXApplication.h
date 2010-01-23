@@ -40,12 +40,13 @@ public:
 	virtual void create();
 	virtual void destroy();
 	
-	virtual bool start(bool runEventLoop);
+	virtual void start();
+	virtual void runEventLoop(){}
 	virtual void stepEventLoop(){}
 	virtual void stop();
 	virtual bool isRunning() const{return mRun;}
 
-	virtual void setAutoActivate(bool autoActivate);
+	virtual void setAutoActivate(bool autoActivate){mAutoActivate=autoActivate;}
 	virtual bool getAutoActivate() const{return mAutoActivate;}
 	virtual void activate();
 	virtual void deactivate();
