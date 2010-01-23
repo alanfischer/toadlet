@@ -61,8 +61,6 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,
 int main(int argc,char **argv){
 #endif
 	Logo app;
-	app.changeRendererPlugin(Logo::RendererPlugin_OPENGL);
-	app.setFullscreen(false);
 	app.create();
 	app.start(true);
 	app.destroy();

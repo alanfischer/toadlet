@@ -33,16 +33,18 @@
 	#include <toadlet/egg/Exception.h>
 
 	#define TOADLET_MAKE_ERROR_FUNCTION(name,type) \
-		static void name(const String &description){name(NULL,description);} \
-		static void name(const String &categoryName,const String &description){ \
-			errorLog(categoryName,description); \
+		static void name(const String &description){name(NULL,true,description);} \
+		static void name(const String &categoryName,const String &description){name(categoryName,true,description);} \
+		static void name(const String &categoryName,bool report,const String &description){ \
+			if(report){errorLog(categoryName,description);} \
 			throw toadlet::egg::Exception(type,description); \
 		}
 #else
 	#define TOADLET_MAKE_ERROR_FUNCTION(name,type) \
-		static void name(const String &description){name(NULL,description);} \
-		static void name(const String &categoryName,const String &description){ \
-			errorLog(categoryName,description); \
+		static void name(const String &description){name(NULL,true,description);} \
+		static void name(const String &categoryName,const String &description){name(categoryName,true,description);} \
+		static void name(const String &categoryName,bool report,const String &description){ \
+			if(report){errorLog(categoryName,description);} \
 			Error::getInstance()->setError(type,description); \
 		}
 #endif

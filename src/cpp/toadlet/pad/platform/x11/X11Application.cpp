@@ -97,6 +97,8 @@ X11Application::X11Application():
 }
 
 X11Application::~X11Application(){
+	destroy();
+
 	delete[] mRendererOptions;
 
 	delete x11;
@@ -131,13 +133,15 @@ void X11Application::destroy(){
 	}
 }
 
-bool X11Application::start(bool runEventLoop){
+void X11Application::start(){
 	resized(mWidth,mHeight);
-
 	mRun=true;
+	runEventLoop();
+}
 
+void X11Application::runEventLoop(){
 	uint64 lastTime=System::mtime();
-	while(runEventLoop && mRun){
+	while(mRun){
 		stepEventLoop();
 
 		uint64 currentTime=System::mtime();
@@ -149,8 +153,6 @@ bool X11Application::start(bool runEventLoop){
 
 		System::msleep(10);
 	}
-
-	return true;
 }
 
 void X11Application::stepEventLoop(){
@@ -229,14 +231,6 @@ void X11Application::stepEventLoop(){
 				break;
 		}
 	}
-}
-
-void X11Application::stop(){
-	mRun=false;
-}
-
-void X11Application::setAutoActivate(bool autoActivate){
-	mAutoActivate=autoActivate;
 }
 
 void X11Application::activate(){

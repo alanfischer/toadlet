@@ -38,7 +38,7 @@ class HopEntityFactory{
 public:
 	virtual ~HopEntityFactory(){}
 
-	virtual HopEntity *makeHopEntity(Engine *engine,uint64 type)=0;
+	virtual HopEntity *createHopEntity(Engine *engine,uint64 type)=0;
 };
 
 }

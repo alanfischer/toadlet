@@ -49,13 +49,13 @@ public:
 	TCPConnection(egg::net::Socket::ptr socket); // Supply a socket to use, this lets the socket be controlled externally
 	virtual ~TCPConnection();
 
-	bool connect(int remoteHost,int remotePort);
+	bool connect(uint32 remoteHost,int remotePort);
 	bool connect(egg::net::Socket::ptr socket);
 	bool accept(int localPort);
 	bool accept(egg::net::Socket::ptr socket);
-	void skipStart();
 
-	bool disconnect();
+	bool opened(){return mRun;}
+	void close();
 
 	int send(const byte *data,int length);
 	int receive(byte *data,int length);

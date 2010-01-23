@@ -74,7 +74,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="toadlet_egg_sd.lib toadlet_peeper_sd.lib toadlet_ribbit_sd.lib toadlet_tadpole_sd.lib toadlet_pad_sd.lib"
+				AdditionalDependencies="toadlet_egg_sd.lib toadlet_hop_sd.lib toadlet_knot_sd.lib toadlet_peeper_sd.lib toadlet_ribbit_sd.lib toadlet_tadpole_sd.lib toadlet_tadpole_hop_sd.lib toadlet_pad_sd.lib"
 				ShowProgress="0"
 				OutputFile="$(OutDir)/SimpleSync.exe"
 				LinkIncremental="2"
@@ -249,7 +249,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="toadlet_egg_s.lib toadlet_peeper_s.lib toadlet_ribbit_s.lib toadlet_tadpole_s.lib toadlet_pad_s.lib"
+				AdditionalDependencies="toadlet_egg_s.lib toadlet_hop_s.lib toadlet_knot_s.lib toadlet_peeper_s.lib toadlet_ribbit_s.lib toadlet_tadpole_s.lib toadlet_tadpole_hop_s.lib toadlet_pad_s.lib"
 				OutputFile="$(OutDir)/SimpleSync.exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="false"

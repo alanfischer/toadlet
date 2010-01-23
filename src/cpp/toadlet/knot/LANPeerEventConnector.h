@@ -63,7 +63,7 @@ public:
 	// TODO: Replace int uuid with an actual UUID class
 	bool create(bool udp,int broadcastPort,int serverPort,const egg::String &uuid,int version,EventFactory *factory);
 
-	bool isOpen() const;
+	bool opened(){return mConnection!=NULL;}
 	void close();
 
 	void addConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent);

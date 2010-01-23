@@ -274,6 +274,8 @@ OSXApplication::OSXApplication():
 {}
 
 OSXApplication::~OSXApplication(){
+	destroy();
+
 	delete[] mRendererOptions;
 
 	if(mView!=nil){
@@ -340,12 +342,9 @@ void OSXApplication::destroy(){
 	}
 }
 	
-bool OSXApplication::start(bool runEventLoop){
+void OSXApplication::start(){
 	mRun=true;
-
 	resized([(ApplicationView*)mView bounds].size.width,[(ApplicationView*)mView bounds].size.height);
-
-	return true;
 }
 
 void OSXApplication::stop(){
@@ -354,10 +353,6 @@ void OSXApplication::stop(){
 	#if !defined(TOADLET_HAS_UIKIT)
 		[[NSApplication sharedApplication] terminate:nil];
 	#endif
-}
-
-void OSXApplication::setAutoActivate(bool autoActivate){
-	mAutoActivate=autoActivate;
 }
 
 void OSXApplication::activate(){

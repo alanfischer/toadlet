@@ -46,7 +46,7 @@ public:
 	bool accept(int localPort);
 	bool connect(int remoteHost,int remotePort);
 
-	bool isOpen() const;
+	bool opened(){return mRun;}
 	void close();
 
 	void addConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent);

@@ -116,13 +116,13 @@ TCPConnection::TCPConnection(egg::net::Socket::ptr socket):
 }
 
 TCPConnection::~TCPConnection(){
-	disconnect();
+	close();
 }
 
-bool TCPConnection::connect(int remoteHost,int remotePort){
+bool TCPConnection::connect(uint32 remoteHost,int remotePort){
 	Socket::ptr socket;
 	if(mSocket==NULL){
-		socket=Socket::ptr(Socket::makeTCPSocket());
+		socket=Socket::ptr(Socket::createTCPSocket());
 	}
 	else{
 		socket=mSocket;
@@ -188,7 +188,7 @@ bool TCPConnection::connect(Socket::ptr socket){
 bool TCPConnection::accept(int localPort){
 	Socket::ptr socket;
 	if(mSocket==NULL){
-		socket=Socket::ptr(Socket::makeTCPSocket());
+		socket=Socket::ptr(Socket::createTCPSocket());
 	}
 	else{
 		socket=mSocket;
@@ -242,7 +242,7 @@ bool TCPConnection::accept(Socket::ptr socket){
 			}
 			else{
 				Logger::alert(Categories::TOADLET_KNOT,
-					"connect: error verifying connection packet");
+					"accept: error verifying connection packet");
 			}
 		}
 	TOADLET_CATCH(const Exception &){result=false;}
@@ -258,7 +258,7 @@ bool TCPConnection::accept(Socket::ptr socket){
 	return result;
 }
 
-bool TCPConnection::disconnect(){
+void TCPConnection::close(){
 	TOADLET_TRY
 		if(mSocket!=NULL){
 			mSocket->close();
@@ -276,8 +276,6 @@ bool TCPConnection::disconnect(){
 	}
 
 	mSocket=NULL;
-
-	return true;
 }
 
 int TCPConnection::send(const byte *data,int length){
@@ -432,10 +430,10 @@ bool TCPConnection::updatePacketReceive(){
 				mFreePackets.add(packet);
 			}
 		}
-		else if(mConnector!=NULL){
-			mConnector->receiveError(this);
-		}
 	TOADLET_CATCH(const Exception &){amount=0;}
+	if(amount==0 && mConnector!=NULL){
+		mConnector->receiveError(this);
+	}
 
 	return amount>0;
 }

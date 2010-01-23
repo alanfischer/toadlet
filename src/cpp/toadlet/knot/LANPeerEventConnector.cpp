@@ -170,13 +170,9 @@ bool LANPeerEventConnector::create(bool udp,int broadcastPort,int serverPort,con
 	return true;
 }
 
-bool LANPeerEventConnector::isOpen() const{
-	return mConnection!=NULL;
-}
-
 void LANPeerEventConnector::close(){
 	if(mConnection!=NULL){
-		mConnection->disconnect();
+		mConnection->close();
 		mConnection=NULL;
 	}
 
@@ -302,10 +298,10 @@ bool LANPeerEventConnector::startIPServer(int port){
 		String("Starting IPServer:")+port);
 
 	if(mUDP){
-		mIPServerSocket=Socket::ptr(Socket::makeUDPSocket());
+		mIPServerSocket=Socket::ptr(Socket::createUDPSocket());
 	}
 	else{
-		mIPServerSocket=Socket::ptr(Socket::makeTCPSocket());
+		mIPServerSocket=Socket::ptr(Socket::createTCPSocket());
 	}
 
 	// The reason we do the binding before starting the thread & Connection is due to the following:
@@ -358,7 +354,7 @@ void LANPeerEventConnector::ipServerThread(int port){
 	// accept() is not a member of Connection, so we have to know the child class to call it
 	if(mUDP){
 		PeerPacketConnection::ptr con(new PeerPacketConnection(mIPServerSocket));
-		result=con->accept();
+		result=con->accept(port);
 		connection=con;
 	}
 	else{
@@ -382,10 +378,10 @@ bool LANPeerEventConnector::startIPClient(int ip,int port){
 		String("Starting IPClient:")+ip+":"+port);
 
 	if(mUDP){
-		mIPClientSocket=Socket::ptr(Socket::makeUDPSocket());
+		mIPClientSocket=Socket::ptr(Socket::createUDPSocket());
 	}
 	else{
-		mIPClientSocket=Socket::ptr(Socket::makeTCPSocket());
+		mIPClientSocket=Socket::ptr(Socket::createTCPSocket());
 	}
 
 	if(mIPClientSocket->bind(0)==false){
@@ -449,7 +445,7 @@ void LANPeerEventConnector::ipClientThread(int ip,int port){
 //  to itself.  This could be aleviated by not allowing sockets to bind to the same port, and then having the
 //  second instance change its server port.
 void LANPeerEventConnector::findLANGameThread(){
-	Socket::ptr broadcastSocket(Socket::makeUDPSocket());
+	Socket::ptr broadcastSocket(Socket::createUDPSocket());
 	int amount=0;
 
 	broadcastSocket->bind(0);
@@ -461,7 +457,7 @@ void LANPeerEventConnector::findLANGameThread(){
 	broadcastSocket->close();
 
 	mConnectionMutex.lock();
-		mLANListenerSocket=Socket::ptr(Socket::makeUDPSocket());
+		mLANListenerSocket=Socket::ptr(Socket::createUDPSocket());
 	mConnectionMutex.unlock();
 	mLANListenerSocket->bind(mBroadcastPort);
 
@@ -500,7 +496,7 @@ void LANPeerEventConnector::findLANGameThread(){
 
 void LANPeerEventConnector::connected(Connection::ptr connection){
 	if(mConnectionMutex.tryLock()==false || mConnection!=NULL){
-		connection->disconnect();
+		connection->close();
 		return;
 	}
 

@@ -123,7 +123,7 @@ void SceneNode::setLogicTimeAndFrame(int time,int frame){
 
 void SceneNode::update(int dt){
 	#if defined(TOADLET_DEBUG)
-		if(destroyed()){
+		if(!created()){
 			Error::unknown(Categories::TOADLET_TADPOLE,
 				"update called on a destroyed Scene");
 			return;
@@ -323,9 +323,9 @@ void SceneNode::renderUpdate(Node::ptr node,int dt){
 
 void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
 	#if defined(TOADLET_DEBUG)
-		if(destroyed()){
+		if(!created()){
 			Error::unknown(Categories::TOADLET_TADPOLE,
-				"render called on a destroyed Scene");
+				"render called on a desroyed Scene");
 		}
 	#endif
 

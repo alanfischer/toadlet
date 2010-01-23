@@ -26,6 +26,7 @@
 #ifndef TOADLET_PAD_BASEAPPLICATION_H
 #define TOADLET_PAD_BASEAPPLICATION_H
 
+#include <toadlet/egg/Runnable.h>
 #include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/Visual.h>
@@ -39,6 +40,8 @@ class ApplicationListener;
 
 class BaseApplication:public peeper::RenderTarget{
 public:
+	TOADLET_SHARED_POINTERS(BaseApplication);
+
 	enum Key{
 		Key_ENTER=10,
 		Key_TAB=8,
@@ -74,7 +77,8 @@ public:
 	virtual void create()=0;
 	virtual void destroy()=0;
 
-	virtual bool start(bool runEventLoop)=0;
+	virtual void start()=0;
+	virtual void runEventLoop()=0;
 	virtual void stepEventLoop()=0;
 	virtual void stop()=0;
 	virtual bool isRunning() const=0;

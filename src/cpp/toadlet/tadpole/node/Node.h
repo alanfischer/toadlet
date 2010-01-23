@@ -66,9 +66,8 @@ public:
 	Node();
 	virtual ~Node();
 	virtual Node *create(Engine *engine);
+	inline bool created() const{return mCreated;}
 	virtual void destroy();
-
-	inline bool destroyed() const{return !mCreated;}
 
 	virtual ParentNode *isParent(){return NULL;}
 	virtual Renderable *isRenderable(){return NULL;}
