@@ -42,6 +42,9 @@ public:
 
 	virtual void start();
 
+	virtual bool join();
+	virtual bool join(uint64 milliseconds);
+
 	virtual void run();
 
 	inline bool isAlive() const{return mThread!=0;}

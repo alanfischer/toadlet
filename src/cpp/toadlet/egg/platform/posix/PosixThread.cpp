@@ -61,17 +61,38 @@ void PosixThread::start(){
 		mAlive=true;
 		pthread_attr_t attrib;
 		pthread_attr_init(&attrib);
-#		if defined(TOADLET_PLATFORM_IRIX)
+		#if defined(TOADLET_PLATFORM_IRIX)
 			pthread_attr_setscope(&attrib,PTHREAD_SCOPE_BOUND_NP);
-#		else
+		#else
 			pthread_attr_setscope(&attrib,PTHREAD_SCOPE_SYSTEM);
-#		endif
+		#endif
 		int result=pthread_create(&mThread,&attrib,startThread,(void*)this);
 		pthread_attr_destroy(&attrib);
 		if(result<0){
 			Error::unknown(Categories::TOADLET_EGG,
 				"error in pthread_create");
 		}
+	}
+}
+
+bool PosixThread::join(){
+	if(pthread_join(mThread,NULL)==0){
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+bool PosixThread::join(uint64 milliseconds){
+	timespec ts={0};
+	ts.seconds=milliseconds/1000;
+	ts.nanoseconds((milliseconds%1000)*1000000);
+	if(pthread_timedjoin(mThread,NULL,&ts)==0){
+		return true;
+	}
+	else{
+		return false;
 	}
 }
 

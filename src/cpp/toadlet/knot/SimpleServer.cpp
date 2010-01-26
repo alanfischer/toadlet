@@ -25,7 +25,7 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
-#include <toadlet/knot/SimpleEventServer.h>
+#include <toadlet/knot/SimpleServer.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
@@ -33,7 +33,7 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace knot{
 
-SimpleEventServer::SimpleEventServer(EventFactory *eventFactory,Connector::ptr connector):
+SimpleServer::SimpleServer(EventFactory *eventFactory,Connector::ptr connector):
 	mEventFactory(NULL)
 	//mPacketIn,
 	//mDataPacketIn,
@@ -56,11 +56,11 @@ SimpleEventServer::SimpleEventServer(EventFactory *eventFactory,Connector::ptr c
 	}
 }
 
-SimpleEventServer::~SimpleEventServer(){
+SimpleServer::~SimpleServer(){
 	setConnector(NULL);
 }
 
-void SimpleEventServer::setConnector(Connector::ptr connector){
+void SimpleServer::setConnector(Connector::ptr connector){
 	if(mConnector!=NULL){
 		mConnector->removeConnectorListener(this,true);
 	}
@@ -72,19 +72,19 @@ void SimpleEventServer::setConnector(Connector::ptr connector){
 	}
 }
 
-void SimpleEventServer::connected(Connection::ptr connection){
+void SimpleServer::connected(Connection::ptr connection){
 	mConnectionsMutex.lock();
 		mConnections.add(connection);
 	mConnectionsMutex.unlock();
 }
 
-void SimpleEventServer::disconnected(Connection::ptr connection){
+void SimpleServer::disconnected(Connection::ptr connection){
 	mConnectionsMutex.lock();
 		mConnections.remove(connection);
 	mConnectionsMutex.unlock();
 }
 
-void SimpleEventServer::dataReady(Connection *connection){
+void SimpleServer::dataReady(Connection *connection){
 	// TODO: Work in separate objects with their own dataReady, so we don't have to search for the proper client ID
 	int fromClientID=-1;
 	mConnectionsMutex.lock();
@@ -119,7 +119,7 @@ void SimpleEventServer::dataReady(Connection *connection){
 	eventReceived(clientID,event,fromClientID);
 }
 
-bool SimpleEventServer::broadcastEvent(Event::ptr event){
+bool SimpleServer::broadcastEvent(Event::ptr event){
 	int fromClientID=-1;
 
 //	mDataPacketOut->writeBigInt32(eventFrame);
@@ -139,7 +139,7 @@ bool SimpleEventServer::broadcastEvent(Event::ptr event){
 	return true;
 }
 
-bool SimpleEventServer::sendEvent(int clientID,Event::ptr event,int fromClientID){
+bool SimpleServer::sendEvent(int clientID,Event::ptr event,int fromClientID){
 //	mDataPacketOut->writeBigInt32(eventFrame);
 	mDataPacketOut->writeBigInt32(fromClientID);
 	mDataPacketOut->writeUInt8(event->getType());
@@ -162,7 +162,7 @@ bool SimpleEventServer::sendEvent(int clientID,Event::ptr event,int fromClientID
 	return amount>0;
 }
 
-bool SimpleEventServer::receiveEvent(egg::Event::ptr &event,int &fromClientID){
+bool SimpleServer::receiveEvent(egg::Event::ptr &event,int &fromClientID){
 	mEventsMutex.lock();
 		int size=mEvents.size();
 		if(size>0){
@@ -176,7 +176,7 @@ bool SimpleEventServer::receiveEvent(egg::Event::ptr &event,int &fromClientID){
 	return size>0;
 }
 
-void SimpleEventServer::eventReceived(int clientID,egg::Event::ptr event,int fromClientID){
+void SimpleServer::eventReceived(int clientID,egg::Event::ptr event,int fromClientID){
 	if(clientID!=-1){
 		sendEvent(clientID,event,fromClientID);
 	}

@@ -41,6 +41,11 @@ namespace knot{
 
 class TCPConnector;
 
+/**
+ The TCPConnection is a Connection abstraction over TCP Sockets.
+ It can either be created via a TCPConnector, or a One to One connection can be achieved via the connect & accept methods.
+ It currently is synchronous.
+*/
 class TOADLET_API TCPConnection:public Connection,egg::Runnable{
 public:
 	TOADLET_SHARED_POINTERS(TCPConnection);
@@ -54,17 +59,15 @@ public:
 	bool accept(int localPort);
 	bool accept(egg::net::Socket::ptr socket);
 
-	bool opened(){return mRun;}
+	bool opened(){return !mSocket->isClosed();}
 	void close();
 
 	int send(const byte *data,int length);
 	int receive(byte *data,int length);
 
-	void run();
-
 	/// Debug methods
 	void debugSetPacketDelayTime(int minTime,int maxTime);
-	void debugRun();
+	void run();
 
 protected:
 	class Packet{
@@ -91,21 +94,21 @@ protected:
 	int buildConnectionPacket(egg::io::DataStream *stream);
 	bool verifyConnectionPacket(egg::io::DataStream *stream);
 
-	bool updatePacketReceive();
-
 	egg::net::Socket::ptr mSocket;
 	egg::io::MemoryStream::ptr mOutPacket;
 	egg::io::DataStream::ptr mDataOutPacket;
 	egg::io::MemoryStream::ptr mInPacket;
 	egg::io::DataStream::ptr mDataInPacket;
+	static const int mDummyDataLength=1024;
+	byte mDummyData[mDummyDataLength];
 
 	egg::Mutex::ptr mMutex;
-	egg::Thread::ptr mThread;
-	bool mRun;
 	TCPConnector *mConnector;
 
 	egg::Collection<Packet::ptr> mPackets;
 	egg::Collection<Packet::ptr> mFreePackets;
+	bool mReceiving;
+	bool mReceiveError;
 
 	egg::Random mDebugRandom;
 	int mDebugPacketDelayMinTime;

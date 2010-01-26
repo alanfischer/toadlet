@@ -1,3 +1,5 @@
+#if 0
+
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/knot/LANPeerEventConnector.h>
@@ -65,3 +67,5 @@ QT_TEST(LANPeerEventConnectorTestUDP){
 	connector1->close();
 	connector2->close();
 }
+
+#endif

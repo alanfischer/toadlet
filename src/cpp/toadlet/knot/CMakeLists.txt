@@ -6,9 +6,9 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.in ${CMAKE_CURRENT_BINARY_
 set (KNOT_SRC
 	DebugListener.cpp
 	LANPeerEventConnector.cpp
-	SimpleEventClient.cpp
-	SimpleEventServer.cpp
-	SynchronizedEventPeer.cpp
+	SimpleClient.cpp
+	SimpleServer.cpp
+	SynchronizedPeerEventConnection.cpp
 	PeerPacketConnection.cpp
 	TCPConnection.cpp
 	TCPConnector.cpp
@@ -18,17 +18,15 @@ set (KNOT_SRC
 
 # Headers
 set (KNOT_HEADERS
-	EventClient.h
-	EventListener.h
-	EventServer.h
 	Connection.h
 	Connector.h
 	ConnectorListener.h
 	DebugListener.h
+	EventConnection.h
 	LANPeerEventConnector.h
-	SimpleEventClient.h
-	SimpleEventServer.h
-	SynchronizedEventPeer.h
+	SimpleClient.h
+	SimpleServer.h
+	SynchronizedPeerEventConnection.h
 	PeerPacketConnection.h
 	TCPConnection.h
 	TCPConnector.h

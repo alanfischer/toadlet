@@ -24,7 +24,8 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Logger.h>
-#include <toadlet/knot/SimpleEventClient.h>
+#include <toadlet/egg/System.h>
+#include <toadlet/knot/SimpleClient.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
@@ -32,10 +33,10 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace knot{
 
-SimpleEventClient::SimpleEventClient(EventFactory *eventFactory,Connector::ptr connector):
+SimpleClient::SimpleClient(EventFactory *eventFactory,Connector::ptr connector):
 	mClientID(0),
 
-	mEventFactory(NULL)
+	mEventFactory(NULL),
 	//mPacketIn,
 	//mDataPacketIn,
 	//mPacketOut,
@@ -44,7 +45,10 @@ SimpleEventClient::SimpleEventClient(EventFactory *eventFactory,Connector::ptr c
 	//mConnection,
 	//mEvents,
 	//mEventsMutex,
-	//mEventClientIDs
+	//mEventClientIDs,
+
+	//mThread,
+	mRun(false)
 {
 	mPacketIn=MemoryStream::ptr(new MemoryStream(new byte[1024],1024,1024,true));
 	mDataPacketIn=DataStream::ptr(new DataStream(Stream::ptr(mPacketIn)));
@@ -58,11 +62,25 @@ SimpleEventClient::SimpleEventClient(EventFactory *eventFactory,Connector::ptr c
 	}
 }
 
-SimpleEventClient::~SimpleEventClient(){
-	setConnector(NULL);
+SimpleClient::~SimpleClient(){
+	close();
 }
 
-void SimpleEventClient::setConnector(Connector::ptr connector){
+void SimpleClient::close(){
+	if(mConnector!=NULL){
+		mConnector->close();
+	}
+
+	setConnector(NULL);
+
+	mRun=false;
+	if(mThread!=NULL){
+		mThread->join();
+		mThread=NULL;
+	}
+}
+
+void SimpleClient::setConnector(Connector::ptr connector){
 	if(mConnector!=NULL){
 		mConnector->removeConnectorListener(this,true);
 	}
@@ -74,60 +92,38 @@ void SimpleEventClient::setConnector(Connector::ptr connector){
 	}
 }
 
-void SimpleEventClient::connected(Connection::ptr connection){
+void SimpleClient::connected(Connection::ptr connection){
 	mConnection=connection;
+
+	mThread=Thread::ptr(new Thread(this));
+	mRun=true;
+	mThread->start();
 }
 
-void SimpleEventClient::disconnected(Connection::ptr connection){
+void SimpleClient::disconnected(Connection::ptr connection){
+	mRun=false;
+	if(mThread!=NULL){
+		mThread->join();
+		mThread=NULL;
+	}
+
 	if(mConnection==connection){
 		mConnection=NULL;
 	}
 }
 
-void SimpleEventClient::dataReady(Connection *connection){
-	int amount=connection->receive(mPacketIn->getOriginalDataPointer(),mPacketIn->length());
-//	int eventFrame=mDataPacketIn->readBigInt32();
+bool SimpleClient::send(Event::ptr event){
+	return sendEvent(-1,event)>0;
+}
 
-	int fromClientID=mDataPacketIn->readBigInt32();
-	int type=mDataPacketIn->readUInt8();
+bool SimpleClient::sendToClient(int toClientID,Event::ptr event){
+	return sendEvent(toClientID,event)>0;
+}
+
+Event::ptr SimpleClient::receive(){	
 	Event::ptr event;
-	if(mEventFactory!=NULL){
-		event=mEventFactory->createEventType(type);
-	}
-	if(event==NULL){
-		Logger::warning(Categories::TOADLET_KNOT,
-			String("Received unknown event type:")+type);
-	}
-	else{
-		event->read(mDataPacketIn);
-	}
+	int fromClientID=0;
 
-	mPacketIn->reset();
-
-	eventReceived(event,fromClientID);
-}
-
-bool SimpleEventClient::sendEvent(Event::ptr event){
-	return sendEventToClient(-1,event);
-}
-
-bool SimpleEventClient::sendEventToClient(int clientID,Event::ptr event){
-//	mDataPacketOut->writeBigInt32(eventFrame);
-	mDataPacketOut->writeBigInt32(clientID);
-	mDataPacketOut->writeUInt8(event->getType());
-	event->write(mDataPacketOut);
-
-	int amount=mConnection->send(mPacketOut->getOriginalDataPointer(),mPacketOut->length());
-
-	mPacketOut->reset();
-
-//	mLocalEvents.add(event);
-//	mLocalEventFrames.add(eventFrame);
-
-	return amount>0;
-}
-
-bool SimpleEventClient::receiveEvent(Event::ptr &event,int &fromClientID){	
 	mEventsMutex.lock();
 		int size=mEvents.size();
 		if(size>0){
@@ -138,10 +134,27 @@ bool SimpleEventClient::receiveEvent(Event::ptr &event,int &fromClientID){
 		}
 	mEventsMutex.unlock();
 
-	return size>0;
+	return event;
 }
 
-void SimpleEventClient::eventReceived(Event::ptr event,int fromClientID){
+void SimpleClient::run(){
+	while(mRun){
+		Event::ptr event;
+		int fromClientID;
+		int amount=receiveEvent(&fromClientID,&event);
+		if(amount>0){
+			eventReceived(fromClientID,event);
+		}
+		else if(amount<0){
+			if(mConnector!=NULL){
+				mConnector->close();
+			}
+		}
+		System::msleep(0);
+	}
+}
+
+void SimpleClient::eventReceived(int fromClientID,Event::ptr event){
 //	if(event->getType()==EventType_PING){
 //		if(mEventFactory!=NULL){
 //			event=mEventFactory->createEventType(type);
@@ -155,8 +168,37 @@ void SimpleEventClient::eventReceived(Event::ptr event,int fromClientID){
 	mEventsMutex.unlock();
 }
 
-//void SimpleEventClient::run(){
-//}
+int SimpleClient::sendEvent(int toClientID,Event::ptr event){
+//	mDataPacketOut->writeBigInt32(eventFrame);
+	mDataPacketOut->writeBigInt32(toClientID);
+	mDataPacketOut->writeUInt8(event->getType());
+	event->write(mDataPacketOut);
+
+	int amount=mConnection->send(mPacketOut->getOriginalDataPointer(),mPacketOut->length());
+
+	mPacketOut->reset();
+
+	return amount;
+}
+
+int SimpleClient::receiveEvent(int *fromClientID,Event::ptr *event){
+	int amount=mConnection->receive(mPacketIn->getOriginalDataPointer(),mPacketIn->length());
+	if(amount>0){
+//		int eventFrame=mDataPacketIn->readBigInt32();
+		*fromClientID=mDataPacketIn->readBigInt32();
+		int type=mDataPacketIn->readUInt8();
+		if(mEventFactory!=NULL){
+			*event=mEventFactory->createEventType(type);
+		}
+		if(*event!=NULL){
+			(*event)->read(mDataPacketIn);
+		}
+
+		mPacketIn->reset();
+	}
+
+	return amount;
+}
 
 }
 }

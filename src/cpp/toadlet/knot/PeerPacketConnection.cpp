@@ -36,10 +36,6 @@ using namespace toadlet::egg::net;
 namespace toadlet{
 namespace knot{
 
-// TODO: We need to add the dataReady notification, but it's in the wrong interface currently, 
-//  and its a bit trickier in this class, since we should only notify that a packet arrived if there are no missing packets
-//  between that future packet and our current packet.
-
 class DebugThread:public Thread{
 public:
 	DebugThread(PeerPacketConnection *connection){mConnection=connection;}
@@ -306,13 +302,15 @@ void PeerPacketConnection::close(){
 	TOADLET_CATCH(const Exception &){}
 
 	mRun=false;
-	while(mThread!=NULL && mThread->isAlive()){
-		System::msleep(10);
+	if(mThread!=NULL){
+		mThread->join();
+		mThread=NULL;
 	}
 
 	mDebugRun=false;
-	while(mDebugThread!=NULL && mDebugThread->isAlive()){
-		System::msleep(10);
+	if(mDebugThread!=NULL){
+		mDebugThread->join();
+		mDebugThread=NULL;
 	}
 
 	mSocket=NULL;
@@ -664,9 +662,7 @@ int PeerPacketConnection::receivePacketsFromSocket(const toadlet::egg::Collectio
 			mInPacket->reset();
 		}
 	TOADLET_CATCH(const Exception &){}
-//	if(amount==0 && mConnector!=NULL){
-//		mConnector->receiveError(this);
-//	}
+	// We ignore receive errors in this connection, since they can possibly be ignored and the packet will get resent
 
 	#if defined(TOADLET_DEBUG)
 		if(numPackets>0){
@@ -696,9 +692,7 @@ void PeerPacketConnection::debugSetPacketDelayTime(int time){
 		}
 		else if(mDebugPacketDelayTime==0 && mDebugThread!=NULL){
 			mDebugRun=false;
-			while(mDebugThread->isAlive()){
-				System::msleep(10);
-			}
+			mDebugThread->join();
 			mDebugThread=NULL;
 
 			int i;
@@ -706,7 +700,6 @@ void PeerPacketConnection::debugSetPacketDelayTime(int time){
 				PeerPacket::ptr packet=mRemotePackets[i];
 				if(packet->debugDeliverTime!=0){
 					packet->debugDeliverTime=0;
-					//mConnector->dataReady(this);
 				}
 			}
 		}
