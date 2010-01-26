@@ -12,9 +12,10 @@ if (WIN32)
 		# Add default search paths for each supported winmo SDK
 		find_path (GDIPLUS_INCLUDE_PATH GdiplusPixelFormats.h PATHS
 			"C:/Program Files/Windows Mobile 6 SDK/PocketPC/Include/Armv4i"
+			NO_DEFAULT_PATH
 		)
 	else (WINCE)
-		find_path (GDIPLUS_INCLUDE_PATH GdiplusPixelFormats.h 
+		find_path (GDIPLUS_INCLUDE_PATH GdiplusPixelFormats.h PATHS
 			"C:/Program Files/Microsoft Visual Studio 8/VC/include"
 		)
 	endif (WINCE)
