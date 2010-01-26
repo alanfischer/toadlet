@@ -23,37 +23,51 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_KNOT_SIMPLEEVENTSERVER_H
-#define TOADLET_KNOT_SIMPLEEVENTSERVER_H
+#ifndef TOADLET_KNOT_SIMPLECLIENT_H
+#define TOADLET_KNOT_SIMPLECLIENT_H
 
+#include <toadlet/egg/Event.h>
 #include <toadlet/egg/EventFactory.h>
+#include <toadlet/egg/Thread.h>
 #include <toadlet/egg/io/DataStream.h>
 #include <toadlet/egg/io/MemoryStream.h>
-#include <toadlet/knot/EventServer.h>
+#include <toadlet/knot/ClientEventConnection.h>
 
 namespace toadlet{
 namespace knot{
 
-class TOADLET_API SimpleEventServer:public EventServer{
+class TOADLET_API SimpleClient:public EventConnection,public ConnectorListener,public egg::Runnable{
 public:
-	TOADLET_SHARED_POINTERS(SimpleEventServer);
+	TOADLET_SHARED_POINTERS(SimpleClient);
 
-	SimpleEventServer(egg::EventFactory *eventFactory,Connector::ptr connector=NULL);
-	virtual ~SimpleEventServer();
+	SimpleClient(egg::EventFactory *eventFactory,Connector::ptr connector=NULL);
+	virtual ~SimpleClient();
+
+	bool opened(){return mRun;}
+	void close();
 
 	void setConnector(Connector::ptr connector);
 	Connector::ptr getConnector(){return mConnector;}
+	Connection::ptr getConnection(){return mConnection;}
 
 	void connected(Connection::ptr connection);
 	void disconnected(Connection::ptr connection);
-	void dataReady(Connection *connection);
-	
-	bool broadcastEvent(egg::Event::ptr event);
-	bool sendEvent(int clientID,egg::Event::ptr event,int fromClientID);
-	bool receiveEvent(egg::Event::ptr &event,int &fromClientID);
+
+	bool send(egg::Event::ptr event);
+	bool sendToClient(int toClientID,egg::Event::ptr event);
+	egg::Event::ptr receive();
+
+	int getClientID(){return mClientID;}
+
+	int update(){return 0;}
+
+	void run();
 
 protected:
-	void eventReceived(int clientID,egg::Event::ptr event,int fromClientID);
+	void eventReceived(int fromClientID,egg::Event::ptr event);
+
+	int sendEvent(int toClientID,egg::Event::ptr event);
+	int receiveEvent(int *fromClientID,egg::Event::ptr *event);
 
 	int mClientID;
 
@@ -64,11 +78,13 @@ protected:
 	egg::io::DataStream::ptr mDataPacketOut;
 
 	Connector::ptr mConnector;
-	egg::Collection<Connection::ptr> mConnections;
-	egg::Mutex mConnectionsMutex;
+	Connection::ptr mConnection;
 	egg::Collection<egg::Event::ptr> mEvents;
 	egg::Mutex mEventsMutex;
 	egg::Collection<int> mEventClientIDs;
+
+	egg::Thread::ptr mThread;
+	bool mRun;
 };
 
 }

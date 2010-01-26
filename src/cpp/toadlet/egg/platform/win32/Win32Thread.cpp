@@ -61,6 +61,19 @@ void Win32Thread::start(){
 	}
 }
 
+bool Win32Thread::join(){
+	return join(INFINITE);
+}
+
+bool Win32Thread::join(uint64 milliseconds){
+	if(mThread!=0 && WaitForSingleObject(mThread,milliseconds)==WAIT_OBJECT_0){
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
 void Win32Thread::run(){
 	if(mRunner!=NULL){
 		mRunner->run();

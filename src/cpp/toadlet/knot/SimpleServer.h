@@ -23,24 +23,23 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_KNOT_SIMPLEEVENTCLIENT_H
-#define TOADLET_KNOT_SIMPLEEVENTCLIENT_H
+#ifndef TOADLET_KNOT_SIMPLESERVER_H
+#define TOADLET_KNOT_SIMPLESERVER_H
 
-#include <toadlet/egg/Event.h>
 #include <toadlet/egg/EventFactory.h>
 #include <toadlet/egg/io/DataStream.h>
 #include <toadlet/egg/io/MemoryStream.h>
-#include <toadlet/knot/EventClient.h>
+#include <toadlet/knot/ConnectorListener.h>
 
 namespace toadlet{
 namespace knot{
 
-class TOADLET_API SimpleEventClient:public EventClient{
+class TOADLET_API SimpleServer:public ConnectorListener{
 public:
-	TOADLET_SHARED_POINTERS(SimpleEventClient);
+	TOADLET_SHARED_POINTERS(SimpleServer);
 
-	SimpleEventClient(egg::EventFactory *eventFactory,Connector::ptr connector=NULL);
-	virtual ~SimpleEventClient();
+	SimpleServer(egg::EventFactory *eventFactory,Connector::ptr connector=NULL);
+	virtual ~SimpleServer();
 
 	void setConnector(Connector::ptr connector);
 	Connector::ptr getConnector(){return mConnector;}
@@ -48,15 +47,13 @@ public:
 	void connected(Connection::ptr connection);
 	void disconnected(Connection::ptr connection);
 	void dataReady(Connection *connection);
-
-	bool sendEvent(egg::Event::ptr event);
-	bool sendEventToClient(int clientID,egg::Event::ptr event);
+	
+	bool broadcastEvent(egg::Event::ptr event);
+	bool sendEvent(int clientID,egg::Event::ptr event,int fromClientID);
 	bool receiveEvent(egg::Event::ptr &event,int &fromClientID);
 
-	int getClientID(){return mClientID;}
-
 protected:
-	void eventReceived(egg::Event::ptr event,int fromClientID);
+	void eventReceived(int clientID,egg::Event::ptr event,int fromClientID);
 
 	int mClientID;
 
@@ -67,7 +64,8 @@ protected:
 	egg::io::DataStream::ptr mDataPacketOut;
 
 	Connector::ptr mConnector;
-	Connection::ptr mConnection;
+	egg::Collection<Connection::ptr> mConnections;
+	egg::Mutex mConnectionsMutex;
 	egg::Collection<egg::Event::ptr> mEvents;
 	egg::Mutex mEventsMutex;
 	egg::Collection<int> mEventClientIDs;

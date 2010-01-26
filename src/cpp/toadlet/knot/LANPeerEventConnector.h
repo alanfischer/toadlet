@@ -33,7 +33,7 @@
 #include <toadlet/egg/Thread.h>
 #include <toadlet/egg/net/Socket.h>
 #include <toadlet/knot/Connector.h>
-#include <toadlet/knot/SynchronizedEventPeer.h>
+#include <toadlet/knot/SynchronizedPeerEventConnection.h>
 
 namespace toadlet{
 namespace knot{
@@ -81,7 +81,7 @@ public:
 	int getSeed() const{return mSeed;}
 	egg::Event::ptr getPayload(){return mPayload;}
 	Connection::ptr getConnection(){return mConnection;}
-	SynchronizedEventPeer::ptr getEventPeer(){return mEventPeer;}
+	SynchronizedPeerEventConnection::ptr getEventConnection(){return mEventConnection;}
 
 	egg::Event::ptr createEventType(int type);
 
@@ -127,7 +127,7 @@ protected:
 	egg::Mutex mConnectionMutex;
 	egg::Collection<ConnectorListener*> mListeners;
 	egg::Mutex mListenersMutex;
-	SynchronizedEventPeer::ptr mEventPeer;
+	SynchronizedPeerEventConnection::ptr mEventConnection;
 	egg::Mutex mEventsMutex;
 	egg::Collection<egg::Event::ptr> mEvents;
 

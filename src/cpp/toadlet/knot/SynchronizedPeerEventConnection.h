@@ -31,25 +31,26 @@
 #include <toadlet/egg/io/DataStream.h>
 #include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/knot/Connection.h>
+#include <toadlet/knot/EventConnection.h>
 
 namespace toadlet{
 namespace knot{
 
-class TOADLET_API SynchronizedEventPeer{
+class TOADLET_API SynchronizedPeerEventConnection{
 public:
-	TOADLET_SHARED_POINTERS(SynchronizedEventPeer);
+	TOADLET_SHARED_POINTERS(SynchronizedPeerEventConnection);
 
-	enum PeerStatus{
-		PeerStatus_FRAME_OK,
-		PeerStatus_FRAME_MISSING,
-		PeerStatus_FRAME_BAD,
+	enum{
+		PeerStatus_FRAME_OK=0,
+		PeerStatus_FRAME_MISSING=-1,
+		PeerStatus_FRAME_BAD=-2,
 	};
 
 	const static int CONTROL_EVENT_FLAG=0x4000; // Switch to 0x4000 from 0x8000 since setting the sign bit for a short ended up confusing the bit operations in java
 	const static int CONTROL_EVENT_FRAMEBUFFER=1;
 	const static int MAX_FRAME_DIFFERENCE=1000;
 
-	SynchronizedEventPeer(Connection::ptr connection=NULL,egg::EventFactory *factory=NULL);
+	SynchronizedPeerEventConnection(Connection::ptr connection=NULL,egg::EventFactory *factory=NULL);
 
 	void reset(int frameBuffer,int frameGroupSize);
 	void setConnection(Connection::ptr connection);
@@ -59,10 +60,10 @@ public:
 	inline int getFrameBuffer() const{return mFrameBuffer;}
 	inline int getFrameGroupSize() const{return mFrameGroupSize;}
 
-	void sendEvent(egg::Event::ptr event);
-	egg::Event::ptr receiveEvent();
+	void send(egg::Event::ptr event);
+	egg::Event::ptr receive();
 
-	PeerStatus update();
+	int update();
 
 protected:
 	class EventGroup:public egg::Collection<egg::Event::ptr>{

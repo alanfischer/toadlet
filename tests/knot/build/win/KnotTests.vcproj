@@ -187,6 +187,10 @@
 				RelativePath="..\..\main.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\TCPConnectionTest.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

@@ -81,11 +81,11 @@ ALPlayer::ALPlayer():
 	mDefaultRolloffFactor(0),
 	mBufferFadeInTime(0),
 
-	mStopThread(false),
-	mThread(NULL)
+	mStopThread(false)
+	//mThread,
 	//mMutex,
 
-	//mCapabilitySet,
+	//mCapabilitySet
 {}
 
 ALPlayer::~ALPlayer(){
@@ -195,7 +195,7 @@ bool ALPlayer::create(int *options){
 		"starting thread");
 
 	mStopThread=false;
-	mThread=new Thread(this);
+	mThread=Thread::ptr(new Thread(this));
 	mThread->start();
 
 	Logger::alert(Categories::TOADLET_RIBBIT,
@@ -210,10 +210,7 @@ bool ALPlayer::destroy(){
 
 	mStopThread=true;
 	if(mThread!=NULL){
-		while(mThread->isAlive()){
-			System::msleep(10);
-		}
-		delete mThread;
+		mThread->join();
 		mThread=NULL;
 	}
 

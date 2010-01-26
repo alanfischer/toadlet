@@ -56,12 +56,9 @@ public:
 
 	void run();
 
-	void receiveError(TCPConnection *connection);
-	void dataReady(TCPConnection *connection);
-
-//	Connection::ptr getConnection() const{return mConnection;}
-
 protected:
+	void connectionClosed(TCPConnection *connection);
+
 	void notifyListenersConnected(TCPConnection::ptr connection);
 	void notifyListenersDisconnected(TCPConnection::ptr connection);
 
@@ -73,6 +70,8 @@ protected:
 	egg::Mutex mConnectionsMutex;
 	egg::Collection<ConnectorListener*> mListeners;
 	egg::Mutex mListenersMutex;
+
+	friend TCPConnection;
 };
 
 }

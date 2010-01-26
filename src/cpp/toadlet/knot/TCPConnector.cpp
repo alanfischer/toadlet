@@ -115,17 +115,17 @@ void TCPConnector::close(){
 		mRun=false;
 	mConnectionsMutex.unlock();
 	if(run){
-		while(mServerThread!=NULL && mServerThread->isAlive()){
-			System::msleep(10);
+		if(mServerThread!=NULL){
+			mServerThread->join();
+			mServerThread=NULL;
 		}
+
 		mServerSocket=NULL;
 
 		int i;
-		Collection<Connection::ptr> connections;
+		Collection<TCPConnection::ptr> connections;
 		mConnectionsMutex.lock();
-			for(i=0;i<mConnections.size();++i){
-				connections.add(mConnections[i]);
-			}
+			connections.addAll(mConnections);
 		mConnectionsMutex.unlock();
 
 		for(i=0;i<connections.size();++i){
@@ -134,10 +134,6 @@ void TCPConnector::close(){
 
 		mConnectionsMutex.lock();
 			mConnections.clear();
-
-			for(i=0;i<mConnections.size();++i){
-				connections.add(mConnections[i]);
-			}
 		mConnectionsMutex.unlock();
 	}
 }
@@ -205,7 +201,7 @@ void TCPConnector::run(){
 	}
 }
 
-void TCPConnector::receiveError(TCPConnection *connection){
+void TCPConnector::connectionClosed(TCPConnection *connection){
 	TCPConnection::ptr deadConnection;
 
 	mConnectionsMutex.lock();
@@ -229,31 +225,30 @@ void TCPConnector::receiveError(TCPConnection *connection){
 	}
 }
 
-void TCPConnector::dataReady(TCPConnection *connection){
-	mListenersMutex.lock();
-		int i;
-		for(i=0;i<mListeners.size();++i){
-			mListeners[i]->dataReady(connection);
-		}
-	mListenersMutex.unlock();
-}
-
 void TCPConnector::notifyListenersConnected(TCPConnection::ptr connection){
+	int i;
+	Collection<ConnectorListener*> listeners;
+
 	mListenersMutex.lock();
-		int i;
-		for(i=0;i<mListeners.size();++i){
-			mListeners[i]->connected(connection);
-		}
+		listeners.addAll(mListeners);
 	mListenersMutex.unlock();
+
+	for(i=0;i<listeners.size();++i){
+		listeners[i]->connected(connection);
+	}
 }
 
 void TCPConnector::notifyListenersDisconnected(TCPConnection::ptr connection){
+	int i;
+	Collection<ConnectorListener*> listeners;
+
 	mListenersMutex.lock();
-		int i;
-		for(i=0;i<mListeners.size();++i){
-			mListeners[i]->disconnected(connection);
-		}
+		listeners.addAll(mListeners);
 	mListenersMutex.unlock();
+
+	for(i=0;i<listeners.size();++i){
+		listeners[i]->disconnected(connection);
+	}
 }
 
 }

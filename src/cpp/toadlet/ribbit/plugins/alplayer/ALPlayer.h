@@ -111,7 +111,7 @@ protected:
 	int mBufferFadeInTime;
 
 	bool mStopThread;
-	egg::Thread *mThread;
+	egg::Thread::ptr mThread;
 	egg::Mutex mMutex;
 
 	CapabilitySet mCapabilitySet;

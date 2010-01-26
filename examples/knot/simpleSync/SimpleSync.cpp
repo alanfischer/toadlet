@@ -130,6 +130,22 @@ void SimpleSync::update(int dt){
 	}
 }
 
+void SimpleSync::keyPressed(int key){
+	if(
+}
+
+void SimpleSync::keyReleased(int key){
+}
+
+void SimpleSync::mousePressed(int x,int y,int button){
+}
+
+void SimpleSync::mouseMoved(int x,int y){
+}
+
+void SimpleSync::mouseReleased(int x,int y,int button){
+}
+
 Event::ptr SimpleSync::createEventType(int type){
 	if(type==MessageEvent::EventType_MESSAGE){
 		return Event::ptr(new MessageEvent());

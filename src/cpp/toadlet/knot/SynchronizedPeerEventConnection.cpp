@@ -25,7 +25,7 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
-#include <toadlet/knot/SynchronizedEventPeer.h>
+#include <toadlet/knot/SynchronizedPeerEventConnection.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
@@ -33,7 +33,7 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace knot{
 
-SynchronizedEventPeer::SynchronizedEventPeer(Connection::ptr connection,EventFactory *factory):
+SynchronizedPeerEventConnection::SynchronizedPeerEventConnection(Connection::ptr connection,EventFactory *factory):
 	//mConnection,
 	mEventFactory(NULL),
 
@@ -68,7 +68,7 @@ SynchronizedEventPeer::SynchronizedEventPeer(Connection::ptr connection,EventFac
 	adjustFrameBuffer(1,1,true);
 }
 
-void SynchronizedEventPeer::reset(int frameBuffer,int frameGroupSize){
+void SynchronizedPeerEventConnection::reset(int frameBuffer,int frameGroupSize){
 	mFrame=0;
 	mFrameBuffer=0;
 	mSkipAtFrame=0;
@@ -84,23 +84,23 @@ void SynchronizedEventPeer::reset(int frameBuffer,int frameGroupSize){
 	adjustFrameBuffer(frameBuffer,frameGroupSize,true);
 }
 
-void SynchronizedEventPeer::setConnection(Connection::ptr connection){
+void SynchronizedPeerEventConnection::setConnection(Connection::ptr connection){
 	mConnection=connection;
 }
 
-void SynchronizedEventPeer::setEventFactory(EventFactory *factory){
+void SynchronizedPeerEventConnection::setEventFactory(EventFactory *factory){
 	mEventFactory=factory;
 }
 
-void SynchronizedEventPeer::requestFrameBuffer(int frameBuffer,int frameGroupSize){
+void SynchronizedPeerEventConnection::requestFrameBuffer(int frameBuffer,int frameGroupSize){
 	mOutgoingEvents->setFrameBuffer(frameBuffer,frameGroupSize);
 }
 
-void SynchronizedEventPeer::sendEvent(Event::ptr event){
+void SynchronizedPeerEventConnection::send(Event::ptr event){
 	mOutgoingEvents->add(event);
 }
 
-Event::ptr SynchronizedEventPeer::receiveEvent(){
+Event::ptr SynchronizedPeerEventConnection::receive(){
 	Event::ptr event;
 	if(mIncomingEvents->size()>0){
 		event=mIncomingEvents->get(0);
@@ -109,7 +109,7 @@ Event::ptr SynchronizedEventPeer::receiveEvent(){
 	return event;
 }
 
-SynchronizedEventPeer::PeerStatus SynchronizedEventPeer::update(){
+int SynchronizedPeerEventConnection::update(){
 	int i,j;
 	int amount=0;
 	Event::ptr event;
@@ -306,7 +306,7 @@ SynchronizedEventPeer::PeerStatus SynchronizedEventPeer::update(){
 	}
 }
 
-bool SynchronizedEventPeer::adjustFrameBuffer(int frameBuffer,int frameGroupSize,bool force){
+bool SynchronizedPeerEventConnection::adjustFrameBuffer(int frameBuffer,int frameGroupSize,bool force){
 	if(force==false && (mSkipReceivingFrames>0 || mSkipSendingFrames>0)){
 		// For now, dont let us adjust the frame buffer if we're already adjusting it
 		Logger::warning(Categories::TOADLET_KNOT,

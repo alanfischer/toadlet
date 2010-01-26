@@ -36,7 +36,7 @@ class ConnectorListener;
 
 /// Thought: On Java this can just be the ByteChannel
 
-/// A connection delivers packets of data.
+/// A Connection sends and receives packets of data.
 class Connection{
 public:
 	TOADLET_SHARED_POINTERS(Connection);
@@ -48,7 +48,7 @@ public:
 
 	/// Send a packet of data
 	virtual int send(const byte *data,int length)=0;
-	/// Receive a packet of data, currently non-blocking
+	/// Receive a packet of data
 	virtual int receive(byte *data,int length)=0;
 };
 

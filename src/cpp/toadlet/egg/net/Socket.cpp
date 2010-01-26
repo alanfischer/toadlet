@@ -418,10 +418,10 @@ bool Socket::getHostAdaptorsByIP(Collection<uint32> &adaptors,uint32 ip){
 
 void Socket::error(const String &function){
 	#if defined(TOADLET_PLATFORM_WIN32)
-		Error::unknown(Categories::TOADLET_EGG,true,
+		Error::unknown(Categories::TOADLET_EGG,false,
 			String("Socket::")+function+"(): error "+(int)WSAGetLastError());
 	#else
-		Error::unknown(Categories::TOADLET_EGG,true,
+		Error::unknown(Categories::TOADLET_EGG,false,
 			String("Socket::")+function+"(): error "+(int)errno);
 	#endif
 }

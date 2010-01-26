@@ -149,7 +149,7 @@ LANPeerEventConnector::LANPeerEventConnector():
 	//mPayload,
 	//mConnection,
 	//mConnectionMutex,
-	//mEventPeer,
+	//mEventConnection,
 	//mEventsMutex,
 	//mEvents
 {
@@ -176,7 +176,7 @@ void LANPeerEventConnector::close(){
 		mConnection=NULL;
 	}
 
-	mEventPeer=NULL;
+	mEventConnection=NULL;
 
 	stopIPClient();
 	stopIPServer();
@@ -188,9 +188,8 @@ void LANPeerEventConnector::close(){
 	mConnectionMutex.unlock();
 
 	if(mFindLANGameThread!=NULL){
-		while(mFindLANGameThread->isAlive()){
-			System::msleep(10);
-		}
+		mFindLANGameThread->join();
+		mFindLANGameThread=NULL;
 	}
 }
 
@@ -330,9 +329,7 @@ void LANPeerEventConnector::stopIPServer(){
 	}
 
 	if(mIPServerThread!=NULL){
-		while(mIPServerThread->isAlive()){
-			System::msleep(100);
-		}
+		mIPServerThread->join();
 		mIPServerThread=NULL;
 		Logger::debug(Categories::TOADLET_KNOT,
 			"IPServer stopped");
@@ -404,9 +401,7 @@ void LANPeerEventConnector::stopIPClient(){
 	}
 
 	if(mIPClientThread!=NULL){
-		while(mIPClientThread->isAlive()){
-			System::msleep(100);
-		}
+		mIPClientThread->join();
 		mIPClientThread=NULL;
 		Logger::debug(Categories::TOADLET_KNOT,
 			"IPClient stopped");
@@ -500,28 +495,28 @@ void LANPeerEventConnector::connected(Connection::ptr connection){
 		return;
 	}
 
-	SynchronizedEventPeer::ptr eventPeer(new SynchronizedEventPeer(connection,this));
+	SynchronizedPeerEventConnection::ptr eventConnection(new SynchronizedPeerEventConnection(connection,this));
 
 	ConnectionEvent::ptr localConnectionEvent(new ConnectionEvent(mVersion,mLocalSeed,mLocalPayload,this));
 	ConnectionEvent::ptr remoteConnectionEvent;
 
 	// Send local event
-	eventPeer->sendEvent(localConnectionEvent);
-	eventPeer->update(); // Send the event
+	eventConnection->send(localConnectionEvent);
+	eventConnection->update(); // Send the event
 
 	// Receive remote event
 	int i;
 	for(i=50;i>=0;--i){ // 5 seconds total to wait for the event
-		if(eventPeer->update()==SynchronizedEventPeer::PeerStatus_FRAME_OK){
-			remoteConnectionEvent=shared_static_cast<ConnectionEvent>(eventPeer->receiveEvent());
+		if(eventConnection->update()==SynchronizedPeerEventConnection::PeerStatus_FRAME_OK){
+			remoteConnectionEvent=shared_static_cast<ConnectionEvent>(eventConnection->receive());
 			// Check to see if it just gave us the local event first
 			if(remoteConnectionEvent==localConnectionEvent){
 				// Do it again, this time remote should be coming
-				remoteConnectionEvent=shared_static_cast<ConnectionEvent>(eventPeer->receiveEvent());
+				remoteConnectionEvent=shared_static_cast<ConnectionEvent>(eventConnection->receive());
 			}
 			else{
 				// Just need to receive any event, but we know its local
-				localConnectionEvent=shared_static_cast<ConnectionEvent>(eventPeer->receiveEvent());
+				localConnectionEvent=shared_static_cast<ConnectionEvent>(eventConnection->receive());
 			}
 			break;
 		}
@@ -540,7 +535,7 @@ void LANPeerEventConnector::connected(Connection::ptr connection){
 		}
 
 		// Now that we have sent the proper connection messages
-		eventPeer->reset(4,1);
+		eventConnection->reset(4,1);
 
 		// TODO: Add a disconnected & dataReady notification to the listeners
 		mListenersMutex.lock();
@@ -550,7 +545,7 @@ void LANPeerEventConnector::connected(Connection::ptr connection){
 		mListenersMutex.unlock();
 
 		mConnection=connection;
-		mEventPeer=eventPeer;
+		mEventConnection=eventConnection;
 
 		Logger::alert(Categories::TOADLET_KNOT,
 			String("Receiving ConnectionEvent:")+(int)connectionEvent->randomSeed);
