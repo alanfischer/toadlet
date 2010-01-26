@@ -33,8 +33,6 @@
 namespace toadlet{
 namespace knot{
 
-class ConnectorListener;
-
 /// An EventConnection sends & receives events
 class EventConnection{
 public:
