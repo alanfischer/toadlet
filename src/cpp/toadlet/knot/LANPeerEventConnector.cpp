@@ -36,6 +36,9 @@
 	#import <SystemConfiguration/SCNetworkReachability.h>
 	#define ReachableViaWiFiNetwork	2
 	#define ReachableDirectWWAN	(1<<18)
+#else if defined(TOADLET_PLATFORM_WINCE)
+	#include <wininet.h>
+	#pragma comment(lib,"wininet.lib")
 #endif
 
 using namespace toadlet::egg;
@@ -585,7 +588,7 @@ bool LANPeerEventConnector::ensureConnectionAbility(){
 		// However if a GPRS connection is already open from some other application, and a WIFI connection is not
 		//  available, it appears as if we can not tell the difference, from what I have read, so it will just silently fail, oh well.
 		#if 1
-			result=InternetCheckConnection(TEXT("http://www.google.com"),FLAG_ICC_FORCE_CONNECTION,0);
+			result=InternetCheckConnection(TEXT("http://www.google.com"),FLAG_ICC_FORCE_CONNECTION,0)>0;
 		#else
 			mConnectionManagerMutex.lock();
 			if(mConnectionManager==NULL){

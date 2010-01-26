@@ -7,6 +7,7 @@ set (KNOT_SRC
 	DebugListener.cpp
 	LANPeerEventConnector.cpp
 	SimpleClient.cpp
+	SimpleEventConnection.cpp
 	SimpleServer.cpp
 	SynchronizedPeerEventConnection.cpp
 	PeerPacketConnection.cpp
@@ -25,6 +26,7 @@ set (KNOT_HEADERS
 	EventConnection.h
 	LANPeerEventConnector.h
 	SimpleClient.h
+	SimpleEventConnection.h
 	SimpleServer.h
 	SynchronizedPeerEventConnection.h
 	PeerPacketConnection.h

@@ -66,11 +66,11 @@ void Win32BluetoothClient::close(){
 	Socket::close();
 }
 
-int Win32BluetoothClient::receive(char *buffer,int length){
+int Win32BluetoothClient::receive(byte *buffer,int length){
 	return Socket::receive(buffer,length);
 }
 
-int Win32BluetoothClient::send(const char *buffer,int length){
+int Win32BluetoothClient::send(const byte *buffer,int length){
 	return Socket::send(buffer,length);
 }
 

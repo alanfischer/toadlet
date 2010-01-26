@@ -35,21 +35,12 @@ namespace knot{
 
 SimpleServer::SimpleServer(EventFactory *eventFactory,Connector::ptr connector):
 	mEventFactory(NULL)
-	//mPacketIn,
-	//mDataPacketIn,
-	//mPacketOut,
-	//mDataPacketOut,
 
 	//mConnection,
 	//mEvents,
 	//mEventsMutex,
 	//mEventClientIDs
 {
-	mPacketIn=MemoryStream::ptr(new MemoryStream(new byte[1024],1024,1024,true));
-	mDataPacketIn=DataStream::ptr(new DataStream(Stream::ptr(mPacketIn)));
-	mPacketOut=MemoryStream::ptr(new MemoryStream());
-	mDataPacketOut=DataStream::ptr(new DataStream(Stream::ptr(mPacketOut)));
-
 	mEventFactory=eventFactory;
 	if(connector!=NULL){
 		setConnector(connector);
@@ -83,42 +74,7 @@ void SimpleServer::disconnected(Connection::ptr connection){
 		mConnections.remove(connection);
 	mConnectionsMutex.unlock();
 }
-
-void SimpleServer::dataReady(Connection *connection){
-	// TODO: Work in separate objects with their own dataReady, so we don't have to search for the proper client ID
-	int fromClientID=-1;
-	mConnectionsMutex.lock();
-		int i;
-		for(i=0;i<mConnections.size();++i){
-			if(mConnections[i]==connection){
-				fromClientID=i;
-				break;
-			}
-		}
-	mConnectionsMutex.unlock();
-
-	int amount=connection->receive(mPacketIn->getOriginalDataPointer(),mPacketIn->length());
-//	int eventFrame=mDataPacketIn->readBigInt32();
-
-	int clientID=mDataPacketIn->readBigInt32();
-	int type=mDataPacketIn->readUInt8();
-	Event::ptr event;
-	if(mEventFactory!=NULL){
-		event=mEventFactory->createEventType(type);
-	}
-	if(event==NULL){
-		Logger::warning(Categories::TOADLET_KNOT,
-			String("Received unknown event type:")+type);
-	}
-	else{
-		event->read(mDataPacketIn);
-	}
-
-	mPacketIn->reset();
-
-	eventReceived(clientID,event,fromClientID);
-}
-
+/*
 bool SimpleServer::broadcastEvent(Event::ptr event){
 	int fromClientID=-1;
 
@@ -187,6 +143,6 @@ void SimpleServer::eventReceived(int clientID,egg::Event::ptr event,int fromClie
 		mEventsMutex.unlock();
 	}
 }
-
+*/
 }
 }
