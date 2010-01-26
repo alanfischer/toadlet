@@ -8,18 +8,16 @@ set (GDIPLUS_FOUND "NO")
 
 # Win32 Only
 if (WIN32)
-	if (TOADLET_PLATFORM_WINCE)
+	if (WINCE)
 		# Add default search paths for each supported winmo SDK
-		find_path (GDIPLUS_INCLUDE_PATH GdiplusPixelFormats.h
+		find_path (GDIPLUS_INCLUDE_PATH GdiplusPixelFormats.h PATHS
 			"C:/Program Files/Windows Mobile 6 SDK/PocketPC/Include/Armv4i"
-			DOC "Path to the GdiplusPixelFormats.h file"
 		)
-	else (TOADLET_PLATFORM_WINCE)
-		find_path (GDIPLUS_INCLUDE_PATH GdiplusPixelFormats.h
+	else (WINCE)
+		find_path (GDIPLUS_INCLUDE_PATH GdiplusPixelFormats.h 
 			"C:/Program Files/Microsoft Visual Studio 8/VC/include"
-			DOC "Path to the GdiplusPixelFormats.h file"
 		)
-	endif (TOADLET_PLATFORM_WINCE)
+	endif (WINCE)
 
 	if (GDIPLUS_INCLUDE_PATH)
 		set (GDIPLUS_FOUND "YES")
