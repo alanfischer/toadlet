@@ -1,4 +1,4 @@
-#if 0
+#if 1
 
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Logger.h>

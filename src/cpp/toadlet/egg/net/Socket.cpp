@@ -27,6 +27,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <time.h>
+
 #if !defined(TOADLET_PLATFORM_WIN32)
 	#include <errno.h>
 #endif
@@ -259,6 +260,30 @@ int Socket::getTimeout() const{
 	return value.tv_sec*1000 + value.tv_usec/1000;
 }
 
+bool Socket::pollRead(int millis){
+	fd_set fd={0};
+	fd.fd_count=1;
+	fd.fd_array[0]=mHandle;
+
+	timeval tv={0};
+	tv.tv_sec=millis/1000;
+	tv.tv_usec=(millis%1000)*1000;
+
+	return select(1,&fd,NULL,NULL,&tv)!=0;
+}
+
+bool Socket::pollWrite(int millis){
+	fd_set fd={0};
+	fd.fd_count=1;
+	fd.fd_array[0]=mHandle;
+
+	timeval tv={0};
+	tv.tv_sec=millis/1000;
+	tv.tv_usec=(millis%1000)*1000;
+
+	return select(1,NULL,&fd,NULL,&tv)!=0;
+}
+
 bool Socket::bind(int port){
 	struct sockaddr_in address={0};
 	address.sin_family=AF_INET;
@@ -418,10 +443,10 @@ bool Socket::getHostAdaptorsByIP(Collection<uint32> &adaptors,uint32 ip){
 
 void Socket::error(const String &function){
 	#if defined(TOADLET_PLATFORM_WIN32)
-		Error::unknown(Categories::TOADLET_EGG,false,
+		Error::unknown(Categories::TOADLET_EGG,
 			String("Socket::")+function+"(): error "+(int)WSAGetLastError());
 	#else
-		Error::unknown(Categories::TOADLET_EGG,false,
+		Error::unknown(Categories::TOADLET_EGG,
 			String("Socket::")+function+"(): error "+(int)errno);
 	#endif
 }

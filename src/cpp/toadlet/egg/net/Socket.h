@@ -99,6 +99,9 @@ public:
 	virtual bool setTimeout(int millis);
 	virtual int getTimeout() const;
 
+	virtual bool pollRead(int millis);
+	virtual bool pollWrite(int millis);
+
 	virtual int receive(byte *buffer,int length);
 	virtual int receiveFrom(byte *buffer,int length,uint32 &ipAddress,int &port);
 
