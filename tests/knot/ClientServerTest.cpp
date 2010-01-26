@@ -4,8 +4,8 @@
 #include <toadlet/egg/System.h>
 #include <toadlet/knot/TCPConnector.h>
 #include <toadlet/knot/DebugListener.h>
-#include <toadlet/knot/SimpleClientEventConnection.h>
-//#include <toadlet/knot/SimpleServerEventConnection.h>
+#include <toadlet/knot/SimpleClient.h>
+#include <toadlet/knot/SimpleServer.h>
 #include "../quicktest.h"
 
 using namespace toadlet::egg;
@@ -52,8 +52,8 @@ public:
 QT_TEST(ClientClientTest){
 	SimpleEventFactory::ptr eventFactory(new SimpleEventFactory());
 
-	SimpleClientEventConnection::ptr client1(new SimpleClientEventConnection(eventFactory,Connector::ptr(new TCPConnector(5252))));
-	SimpleClientEventConnection::ptr client2(new SimpleClientEventConnection(eventFactory,Connector::ptr(new TCPConnector(Socket::stringToIP("127.0.0.1"),5252))));
+	SimpleClient::ptr client1(new SimpleClient(eventFactory,Connector::ptr(new TCPConnector(5252))));
+	SimpleClient::ptr client2(new SimpleClient(eventFactory,Connector::ptr(new TCPConnector(Socket::stringToIP("127.0.0.1"),5252))));
 
 	System::msleep(1000);
 	if(client1->getConnection()==NULL || client2->getConnection()==NULL){

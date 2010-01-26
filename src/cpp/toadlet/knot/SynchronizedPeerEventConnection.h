@@ -36,7 +36,7 @@
 namespace toadlet{
 namespace knot{
 
-class TOADLET_API SynchronizedPeerEventConnection{
+class TOADLET_API SynchronizedPeerEventConnection:public EventConnection{
 public:
 	TOADLET_SHARED_POINTERS(SynchronizedPeerEventConnection);
 
@@ -51,16 +51,18 @@ public:
 	const static int MAX_FRAME_DIFFERENCE=1000;
 
 	SynchronizedPeerEventConnection(Connection::ptr connection=NULL,egg::EventFactory *factory=NULL);
+	virtual ~SynchronizedPeerEventConnection();
+
+	bool opened();
+	void close();
 
 	void reset(int frameBuffer,int frameGroupSize);
-	void setConnection(Connection::ptr connection);
-	void setEventFactory(egg::EventFactory *factory);
 
 	void requestFrameBuffer(int frameBuffer,int frameGroupSize);
 	inline int getFrameBuffer() const{return mFrameBuffer;}
 	inline int getFrameGroupSize() const{return mFrameGroupSize;}
 
-	void send(egg::Event::ptr event);
+	bool send(egg::Event::ptr event);
 	egg::Event::ptr receive();
 
 	int update();

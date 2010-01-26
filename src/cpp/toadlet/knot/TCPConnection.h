@@ -50,8 +50,8 @@ class TOADLET_API TCPConnection:public Connection,egg::Runnable{
 public:
 	TOADLET_SHARED_POINTERS(TCPConnection);
 
-	TCPConnection(TCPConnector *connector=NULL); // An optional Connector to be notified about disconnection
-	TCPConnection(egg::net::Socket::ptr socket); // Supply a socket to use, this lets the socket be controlled externally
+	TCPConnection(TCPConnector *connector=NULL,bool blocking=true); // An optional Connector to be notified about disconnection
+	TCPConnection(egg::net::Socket::ptr socket,bool blocking=true); // Supply a socket to use, this lets the socket be controlled externally
 	virtual ~TCPConnection();
 
 	bool connect(uint32 remoteHost,int remotePort);
@@ -62,8 +62,12 @@ public:
 	bool opened(){return !mSocket->isClosed();}
 	void close();
 
+	bool blocking(){return mBlocking;}
+
 	int send(const byte *data,int length);
 	int receive(byte *data,int length);
+
+	egg::net::Socket::ptr getSocket(){return mSocket;}
 
 	/// Debug methods
 	void debugSetPacketDelayTime(int minTime,int maxTime);
@@ -94,6 +98,7 @@ protected:
 	int buildConnectionPacket(egg::io::DataStream *stream);
 	bool verifyConnectionPacket(egg::io::DataStream *stream);
 
+	bool mBlocking;
 	egg::net::Socket::ptr mSocket;
 	egg::io::MemoryStream::ptr mOutPacket;
 	egg::io::DataStream::ptr mDataOutPacket;

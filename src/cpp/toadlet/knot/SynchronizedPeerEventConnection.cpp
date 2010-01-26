@@ -62,10 +62,18 @@ SynchronizedPeerEventConnection::SynchronizedPeerEventConnection(Connection::ptr
 	mIncomingEvents=EventGroup::ptr(new EventGroup());
 	mOutgoingEvents=EventGroup::ptr(new EventGroup());
 
-	mConnection=connection;
+	adjustFrameBuffer(1,1,true);
+
 	mEventFactory=factory;
 
-	adjustFrameBuffer(1,1,true);
+	if(connection->blocking()){
+		Error::unknown(Categories::TOADLET_KNOT,
+			"SynchronizedPeerEventConnection requires a non blocking Connection");
+	}
+	else{
+		mConnection=connection;
+		mEventFactory=factory;
+	}
 }
 
 void SynchronizedPeerEventConnection::reset(int frameBuffer,int frameGroupSize){
@@ -84,20 +92,28 @@ void SynchronizedPeerEventConnection::reset(int frameBuffer,int frameGroupSize){
 	adjustFrameBuffer(frameBuffer,frameGroupSize,true);
 }
 
-void SynchronizedPeerEventConnection::setConnection(Connection::ptr connection){
-	mConnection=connection;
+SynchronizedPeerEventConnection::~SynchronizedPeerEventConnection(){
+	close();
 }
 
-void SynchronizedPeerEventConnection::setEventFactory(EventFactory *factory){
-	mEventFactory=factory;
+bool SynchronizedPeerEventConnection::opened(){
+	return mConnection!=NULL;
+}
+
+void SynchronizedPeerEventConnection::close(){
+	if(mConnection!=NULL){
+		mConnection->close();
+		mConnection=NULL;
+	}
 }
 
 void SynchronizedPeerEventConnection::requestFrameBuffer(int frameBuffer,int frameGroupSize){
 	mOutgoingEvents->setFrameBuffer(frameBuffer,frameGroupSize);
 }
 
-void SynchronizedPeerEventConnection::send(Event::ptr event){
+bool SynchronizedPeerEventConnection::send(Event::ptr event){
 	mOutgoingEvents->add(event);
+	return true;
 }
 
 Event::ptr SynchronizedPeerEventConnection::receive(){

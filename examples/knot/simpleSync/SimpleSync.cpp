@@ -41,7 +41,12 @@ void SimpleSync::create(){
 	HopScene::ptr scene(new HopScene(mEngine->createNodeType(SceneNode::type())));
 	getEngine()->setScene(scene);
 	scene->showCollisionVolumes(true,false);
-	scene->setLogicDT(0);
+	if(eventClient!=NULL){
+		scene->setLogicDT(100);
+	}
+	else{
+		scene->setLogicDT(0);
+	}
 	scene->setGravity(Vector3(0,0,-10));
 	scene->getSimulator()->setMicroCollisionThreshold(5);
 

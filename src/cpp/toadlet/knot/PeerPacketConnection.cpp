@@ -351,9 +351,11 @@ int PeerPacketConnection::send(const byte *data,int length){
 }
 
 int PeerPacketConnection::receive(byte *data,int length){
+	int index=mHalfWindowSize;
+
+//	if(mBlocking){
 	mMutex->lock();
 
-	int index=mHalfWindowSize;
 	if((mNewFrameBits&(0x1<<index))!=0 && mRemotePackets[index]->debugDeliverTime<=System::mtime()){ // If the NewPacketBit for the current packet is on
 		mNewFrameBits&=(~(0x1<<index)); // Turn it off
 

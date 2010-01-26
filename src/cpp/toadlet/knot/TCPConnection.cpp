@@ -42,7 +42,8 @@ const char *TCPConnection::CONNECTION_PACKET="toadlet::knot::tcp";
 const int TCPConnection::CONNECTION_PACKET_LENGTH=18;
 const int TCPConnection::CONNECTION_VERSION=1;
 
-TCPConnection::TCPConnection(TCPConnector *connector):
+TCPConnection::TCPConnection(TCPConnector *connector,bool blocking):
+	mBlocking(false),
 	//mSocket,
 	//mOutPacket,
 	//mDataOutPacket,
@@ -69,12 +70,14 @@ TCPConnection::TCPConnection(TCPConnector *connector):
 	mInPacket=MemoryStream::ptr(new MemoryStream(new uint8[maxSize],maxSize,maxSize,true));
 	mDataInPacket=DataStream::ptr(new DataStream(Stream::ptr(mInPacket)));
 
+	mBlocking=blocking;
 	mConnector=connector;
 	
 	mMutex=Mutex::ptr(new Mutex());
 }
 
-TCPConnection::TCPConnection(egg::net::Socket::ptr socket):
+TCPConnection::TCPConnection(egg::net::Socket::ptr socket,bool blocking):
+	mBlocking(false),
 	//mSocket,
 	//mOutPacket,
 	//mDataOutPacket,
@@ -101,6 +104,7 @@ TCPConnection::TCPConnection(egg::net::Socket::ptr socket):
 	mInPacket=MemoryStream::ptr(new MemoryStream(new uint8[maxSize],maxSize,maxSize,true));
 	mDataInPacket=DataStream::ptr(new DataStream(Stream::ptr(mInPacket)));
 
+	mBlocking=blocking;
 	mSocket=socket;
 
 	mMutex=Mutex::ptr(new Mutex());
@@ -354,25 +358,33 @@ int TCPConnection::receive(byte *data,int length){
 					break;
 				}
 			mMutex->unlock();
-			System::msleep(10);
+
+			if(mBlocking){
+				System::msleep(10);
+			}
+			else{
+				break;
+			}
 		}
 	}
 
 	if(needReceive){
 		TOADLET_TRY
-			amount=mSocket->receive(mInPacket->getOriginalDataPointer(),2);
-			if(amount>0){
-				int packetLength=mDataInPacket->readBigInt16();
-				mInPacket->reset();
+			if(mBlocking || mSocket->pollRead(0)==true){
+				amount=mSocket->receive(mInPacket->getOriginalDataPointer(),2);
+				if(amount>0){
+					int packetLength=mDataInPacket->readBigInt16();
+					mInPacket->reset();
 
-				amount=mSocket->receive(data,packetLength<length?packetLength:length);
-				if(amount>=0){
-					int remaining=amount-packetLength;
-					while(remaining>0){
-						remaining-=mSocket->receive(mDummyData,remaining<mDummyDataLength?remaining:mDummyDataLength);
+					amount=mSocket->receive(data,packetLength<length?packetLength:length);
+					if(amount>=0){
+						int remaining=amount-packetLength;
+						while(remaining>0){
+							remaining-=mSocket->receive(mDummyData,remaining<mDummyDataLength?remaining:mDummyDataLength);
+						}
 					}
+					amount=packetLength;
 				}
-				amount=packetLength;
 			}
 		TOADLET_CATCH(const Exception &){amount=-1;}
 	}

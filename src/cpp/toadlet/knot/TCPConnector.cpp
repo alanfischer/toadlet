@@ -87,7 +87,7 @@ bool TCPConnector::accept(int localPort){
 bool TCPConnector::connect(int remoteHost,int remotePort){
 	close();
 
-	TCPConnection::ptr connection(new TCPConnection(this));
+	TCPConnection::ptr connection(new TCPConnection(this,true));
 	bool result=connection->connect(remoteHost,remotePort);
 	if(result){
 		mRun=true;
@@ -183,7 +183,7 @@ void TCPConnector::run(){
 			clientSocket=Socket::ptr(mServerSocket->accept());
 		TOADLET_CATCH(const Exception &){clientSocket=NULL;}
 		if(clientSocket!=NULL){
-			TCPConnection::ptr connection(new TCPConnection(this));
+			TCPConnection::ptr connection(new TCPConnection(this,true));
 			bool result=connection->accept(clientSocket);
 			if(result){
 				mConnectionsMutex.lock();

@@ -46,6 +46,9 @@ public:
 	virtual bool opened()=0;
 	virtual void close()=0;
 
+	/// If the connection is blocking or not
+	virtual bool blocking()=0;
+
 	/// Send a packet of data
 	virtual int send(const byte *data,int length)=0;
 	/// Receive a packet of data
