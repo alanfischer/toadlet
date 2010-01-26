@@ -44,9 +44,9 @@ public:
 
 	virtual void close();
 
-	virtual int receive(char *buffer,int length);
+	virtual int receive(byte *buffer,int length);
 
-	virtual int send(const char *buffer,int length);
+	virtual int send(const byte *buffer,int length);
 
 protected:
 };

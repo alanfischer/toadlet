@@ -103,7 +103,7 @@ void Win32BluetoothServer::close(){
 	Socket::close();
 }
 
-int Win32BluetoothServer::receive(char *buffer,int length){
+int Win32BluetoothServer::receive(byte *buffer,int length){
 	if(mClient!=NULL){
 		return mClient->receive(buffer,length);
 	}
@@ -112,7 +112,7 @@ int Win32BluetoothServer::receive(char *buffer,int length){
 	}
 }
 
-int Win32BluetoothServer::send(const char *buffer,int length){
+int Win32BluetoothServer::send(const byte *buffer,int length){
 	if(mClient!=NULL){
 		return mClient->send(buffer,length);
 	}

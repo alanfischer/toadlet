@@ -27,8 +27,6 @@
 #define TOADLET_KNOT_SIMPLESERVER_H
 
 #include <toadlet/egg/EventFactory.h>
-#include <toadlet/egg/io/DataStream.h>
-#include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/knot/ConnectorListener.h>
 
 namespace toadlet{
@@ -46,8 +44,7 @@ public:
 
 	void connected(Connection::ptr connection);
 	void disconnected(Connection::ptr connection);
-	void dataReady(Connection *connection);
-	
+
 	bool broadcastEvent(egg::Event::ptr event);
 	bool sendEvent(int clientID,egg::Event::ptr event,int fromClientID);
 	bool receiveEvent(egg::Event::ptr &event,int &fromClientID);
@@ -58,10 +55,6 @@ protected:
 	int mClientID;
 
 	egg::EventFactory *mEventFactory;
-	egg::io::MemoryStream::ptr mPacketIn;
-	egg::io::DataStream::ptr mDataPacketIn;
-	egg::io::MemoryStream::ptr mPacketOut;
-	egg::io::DataStream::ptr mDataPacketOut;
 
 	Connector::ptr mConnector;
 	egg::Collection<Connection::ptr> mConnections;
