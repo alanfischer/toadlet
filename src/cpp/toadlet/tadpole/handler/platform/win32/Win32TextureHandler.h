@@ -40,13 +40,19 @@ class TOADLET_API Win32TextureHandler:public ResourceHandler{
 public:
 	Win32TextureHandler(TextureManager *textureManager);
 	virtual ~Win32TextureHandler();
+	bool valid();
 
 	egg::Resource::ptr load(egg::io::Stream::ptr in,const ResourceHandlerData *handlerData);
 
 protected:
-	TextureManager *mTextureManager;
+	int getFormat(INT *gdiformat);
 
-	ULONG_PTR mToken;
+	TextureManager *mTextureManager;
+	#if !defined(TOADLET_PLATFORM_WINCE)
+		ULONG_PTR mToken;
+	#else
+		IUnknown *mImagingFactory;
+	#endif
 };
 
 }

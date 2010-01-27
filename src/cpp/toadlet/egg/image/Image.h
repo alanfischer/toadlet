@@ -92,11 +92,18 @@ public:
 				pixel.g=mData[o+1];
 				pixel.r=mData[o+0];
 			break;
-			case Format_RGB_8:
-				o*=3;
-				pixel.b=mData[o+2];
+			case Format_BGRA_8:
+				o*=4;
+				pixel.a=mData[o+3];
+				pixel.r=mData[o+2];
 				pixel.g=mData[o+1];
-				pixel.r=mData[o+0];
+				pixel.b=mData[o+0];
+			break;
+			case Format_BGR_8:
+				o*=3;
+				pixel.r=mData[o+2];
+				pixel.g=mData[o+1];
+				pixel.b=mData[o+0];
 			break;
 			case Format_LA_8:
 				o*=2;
@@ -175,11 +182,24 @@ public:
 				mData[o+1]=pixel.g;
 				mData[o+0]=pixel.r;
 			break;
+			case Format_BGRA_8:
+				o*=4;
+				mData[o+3]=pixel.a;
+				mData[o+2]=pixel.r;
+				mData[o+1]=pixel.g;
+				mData[o+0]=pixel.b;
+			break;
 			case Format_RGB_8:
 				o*=3;
 				mData[o+2]=pixel.b;
 				mData[o+1]=pixel.g;
 				mData[o+0]=pixel.r;
+			break;
+			case Format_BGR_8:
+				o*=3;
+				mData[o+2]=pixel.r;
+				mData[o+1]=pixel.g;
+				mData[o+0]=pixel.b;
 			break;
 			case Format_LA_8:
 				o*=2;

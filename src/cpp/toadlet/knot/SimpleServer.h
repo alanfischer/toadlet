@@ -51,6 +51,7 @@ public:
 
 	virtual bool broadcast(egg::Event::ptr event);
 	virtual bool sendToClient(int toClientID,egg::Event::ptr event);
+	virtual egg::Event::ptr receive();
 
 protected:
 	class ServerClient:public SimpleEventConnection{
@@ -65,7 +66,7 @@ protected:
 		SimpleServer *mServer;
 	};
 
-	virtual void eventReceived(ServerClient *client,egg::Event::ptr event);
+	virtual bool eventReceived(ServerClient *client,egg::Event::ptr event);
 
 	egg::EventFactory *mEventFactory;
 	Connector::ptr mConnector;

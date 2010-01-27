@@ -38,6 +38,7 @@ MeshManager::MeshManager(Engine *engine):ResourceManager(engine->getArchiveManag
 	mEngine=engine;
 }
 
+// TODO: Add proper tex coords to this box
 Mesh::ptr MeshManager::createBox(const AABox &box){
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,8);
 	{

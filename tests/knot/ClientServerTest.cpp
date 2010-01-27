@@ -104,23 +104,18 @@ QT_TEST(ClientServerTest){
 	if(receiveEvent!=NULL){
 		Logger::alert("Received:"+shared_static_cast<MessageEvent>(receiveEvent)->getText());
 	}
-
 	QT_CHECK(receiveEvent!=NULL && ((MessageEvent*)sendEvent->getRootEvent())->getText().equals(((MessageEvent*)receiveEvent->getRootEvent())->getText()));
 
 	server->broadcast(sendEvent=Event::ptr(new MessageEvent("Howdy!")));
-
 	for(receiveEvent=NULL,endTime=System::mtime()+5000;System::mtime()<endTime && receiveEvent==NULL;receiveEvent=client1->receive());
 	if(receiveEvent!=NULL){
 		Logger::alert("Received:"+((MessageEvent*)receiveEvent->getRootEvent())->getText());
 	}
-
 	QT_CHECK(receiveEvent!=NULL && ((MessageEvent*)sendEvent->getRootEvent())->getText().equals(((MessageEvent*)receiveEvent->getRootEvent())->getText()));
-
 	for(receiveEvent=NULL,endTime=System::mtime()+5000;System::mtime()<endTime && receiveEvent==NULL;receiveEvent=client2->receive());
 	if(receiveEvent!=NULL){
 		Logger::alert("Received:"+((MessageEvent*)receiveEvent->getRootEvent())->getText());
 	}
-
 	QT_CHECK(receiveEvent!=NULL && ((MessageEvent*)sendEvent->getRootEvent())->getText().equals(((MessageEvent*)receiveEvent->getRootEvent())->getText()));
 
 	client1->sendToClient(1,sendEvent=Event::ptr(new MessageEvent("Sup!")));
@@ -128,7 +123,6 @@ QT_TEST(ClientServerTest){
 	if(receiveEvent!=NULL){
 		Logger::alert("Received:"+((MessageEvent*)receiveEvent->getRootEvent())->getText());
 	}
-
 	QT_CHECK(receiveEvent!=NULL && ((MessageEvent*)sendEvent->getRootEvent())->getText().equals(((MessageEvent*)receiveEvent->getRootEvent())->getText()));
 
 //	int ping=client->pingAndWait(); // TODO: Figure out how pinging will work, if there are unprocessed Events hanging around like the Howdy above?
