@@ -28,6 +28,7 @@
 
 #include <toadlet/egg/EventFactory.h>
 #include <toadlet/knot/ConnectorListener.h>
+#include <toadlet/knot/SimpleEventConnection.h>
 
 namespace toadlet{
 namespace knot{
@@ -39,29 +40,38 @@ public:
 	SimpleServer(egg::EventFactory *eventFactory,Connector::ptr connector=NULL);
 	virtual ~SimpleServer();
 
-	void setConnector(Connector::ptr connector);
-	Connector::ptr getConnector(){return mConnector;}
+	virtual void setEventFactory(egg::EventFactory *eventFactory);
+	virtual egg::EventFactory *getEventFactory(){return mEventFactory;}
 
-	void connected(Connection::ptr connection);
-	void disconnected(Connection::ptr connection);
+	virtual void setConnector(Connector::ptr connector);
+	virtual Connector::ptr getConnector(){return mConnector;}
 
-	bool broadcastEvent(egg::Event::ptr event);
-	bool sendEvent(int clientID,egg::Event::ptr event,int fromClientID);
-	bool receiveEvent(egg::Event::ptr &event,int &fromClientID);
+	virtual void connected(Connection::ptr connection);
+	virtual void disconnected(Connection::ptr connection);
+
+	virtual bool broadcast(egg::Event::ptr event);
+	virtual bool sendToClient(int toClientID,egg::Event::ptr event);
 
 protected:
-	void eventReceived(int clientID,egg::Event::ptr event,int fromClientID);
+	class ServerClient:public SimpleEventConnection{
+	public:
+		TOADLET_SHARED_POINTERS(ServerClient);
 
-	int mClientID;
+		ServerClient(SimpleServer *server,egg::EventFactory *factory,Connection::ptr connection);
+
+	protected:
+		void eventReceived(egg::Event::ptr event);
+
+		SimpleServer *mServer;
+	};
+
+	virtual void eventReceived(ServerClient *client,egg::Event::ptr event);
 
 	egg::EventFactory *mEventFactory;
-
 	Connector::ptr mConnector;
-	egg::Collection<Connection::ptr> mConnections;
-	egg::Mutex mConnectionsMutex;
-	egg::Collection<egg::Event::ptr> mEvents;
-	egg::Mutex mEventsMutex;
-	egg::Collection<int> mEventClientIDs;
+	egg::Collection<ServerClient::ptr> mClients;
+	egg::Map<Connection::ptr,ServerClient::ptr> mConnectionClients;
+	egg::Mutex mClientsMutex;
 };
 
 }

@@ -115,12 +115,18 @@ protected:
 
 Win32TextureHandler::Win32TextureHandler(TextureManager *textureManager){
 	mTextureManager=textureManager;
-	GdiplusStartupInput gdiplusStartupInput;
-	GdiplusStartup(&mToken,&gdiplusStartupInput,NULL);
+	#if !defined(TOADLET_PLATFORM_WINCE)
+		GdiplusStartupInput gdiplusStartupInput;
+		GdiplusStartup(&mToken,&gdiplusStartupInput,NULL);
+	#else
+		IImagingFact
+	#endif
 }
 
 Win32TextureHandler::~Win32TextureHandler(){
-	GdiplusShutdown(mToken);
+	#if !defined(TOADLET_PLATFORM_WINCE)
+		GdiplusShutdown(mToken);
+	#endif
 }
 
 Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData *handlerData){

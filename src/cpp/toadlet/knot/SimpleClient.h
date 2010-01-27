@@ -38,19 +38,19 @@ public:
 	SimpleClient(egg::EventFactory *eventFactory,Connector::ptr connector=NULL);
 	virtual ~SimpleClient();
 
-	void close();
+	virtual void close();
 
-	void setConnector(Connector::ptr connector);
-	Connector::ptr getConnector(){return mConnector;}
+	virtual void setConnector(Connector::ptr connector);
+	virtual Connector::ptr getConnector(){return mConnector;}
 
-	bool sendToClient(int toClientID,egg::Event::ptr event);
+	virtual bool sendToClient(int toClientID,egg::Event::ptr event);
 
-	int getClientID(){return mClientID;}
+	virtual int getClientID(){return mClientID;}
 
-	int update(){return 0;}
+	virtual int update(){return 0;}
 
 protected:
-	void receiveError();
+	virtual void receiveError();
 
 	int mClientID;
 	Connector::ptr mConnector;

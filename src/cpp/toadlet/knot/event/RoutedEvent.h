@@ -23,40 +23,40 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_EVENT_H
-#define TOADLET_EGG_EVENT_H
+#ifndef TOADLET_KNOT_ROUTEDEVENT_H
+#define TOADLET_KNOT_ROUTEDEVENT_H
 
-#include <toadlet/egg/io/DataStream.h>
+#include <toadlet/egg/Event.h>
 
 namespace toadlet{
-namespace egg{
+namespace knot{
 
-class Event{
+// TODO: Replace IDs with an Address structure
+class RoutedEvent{
 public:
-	TOADLET_SHARED_POINTERS(Event);
+	TOADLET_SHARED_POINTERS(RoutedEvent);
 
-	enum{
-		// General events
-		Type_UNKNOWN=0,
+	RoutedEvent(egg::Event::ptr event,int sourceID,int destinationID):mType(Type_ROUTED),mEvent(event),mSourceID(sourceID),mDestinationID(destinationID){}
 
-		// Knot events
-		Type_ROUTED=100,
-		Type_PING,
-	};
+	Event *getRootEvent(){return mEvent;}
+
+	// RoutedEvents do not send themselves over the connection, instead they are left to the Connections to deal with
+	int read(io::DataStream *stream){return mEvent->read(stream);}
+	int write(io::DataStream *stream){return mEvent->write(stream);}
+
+	void setEvent(egg::Event::ptr event){mEvent=event;}
+	egg::Event::ptr getEvent(){return mEvent;}
 	
-	Event():mType(Type_UNKNOWN){}
-	Event(int type):mType(type){}
-	virtual ~Event(){}
+	void setSourceID(int sourceID){mSourceID=sourceID;}
+	int getSourceID(){return mSourceID;}
 
-	virtual Event *getRootEvent(){return this;}
-
-	inline int getType() const{return mType;}
-
-	virtual int read(io::DataStream *stream){return 0;}
-	virtual int write(io::DataStream *stream){return 0;}
-
+	void setDestinationID(int destinationID){mDestinationID=destinationID;}
+	int getDestinationID(){return mDestinationID;}
+	
 protected:
-	int mType;
+	Event::ptr mEvent;
+	int mSourceID;
+	int mDestinationID;
 };
 
 }

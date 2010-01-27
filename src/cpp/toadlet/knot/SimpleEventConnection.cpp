@@ -26,6 +26,7 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/knot/SimpleEventConnection.h>
+#include <toadlet/knot/event/RoutedEvent.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
@@ -111,20 +112,18 @@ void SimpleEventConnection::disconnected(Connection::ptr connection){
 }
 
 bool SimpleEventConnection::send(Event::ptr event){
-	return sendEvent(-1,event)>0;
+	return sendEvent(event)>0;
 }
 
 Event::ptr SimpleEventConnection::receive(){	
 	Event::ptr event;
-	int fromClientID=0;
+	int clientID=0;
 
 	mEventsMutex.lock();
 		int size=mEvents.size();
 		if(size>0){
 			event=mEvents.at(size-1);
 			mEvents.removeAt(size-1);
-			fromClientID=mEventClientIDs.at(size-1);
-			mEventClientIDs.removeAt(size-1);
 		}
 	mEventsMutex.unlock();
 
@@ -134,10 +133,9 @@ Event::ptr SimpleEventConnection::receive(){
 void SimpleEventConnection::run(){
 	while(mRun){
 		Event::ptr event;
-		int fromClientID;
-		int amount=receiveEvent(&fromClientID,&event);
+		int amount=receiveEvent(&event);
 		if(amount>0){
-			eventReceived(fromClientID,event);
+			eventReceived(event);
 		}
 		else if(amount<0){
 			receiveError();
@@ -146,21 +144,29 @@ void SimpleEventConnection::run(){
 	}
 }
 
-void SimpleEventConnection::eventReceived(int fromClientID,Event::ptr event){
+void SimpleEventConnection::eventReceived(Event::ptr event){
 	mEventsMutex.lock();
 		mEvents.add(event);
-		mEventClientIDs.add(fromClientID);
 	mEventsMutex.unlock();
 }
 
 void SimpleEventConnection::receiveError(){
 }
 
-int SimpleEventConnection::sendEvent(int toClientID,Event::ptr event){
-//	mDataPacketOut->writeBigInt32(eventFrame);
-	mDataPacketOut->writeBigInt32(toClientID);
-	mDataPacketOut->writeUInt8(event->getType());
-	event->write(mDataPacketOut);
+int SimpleEventConnection::sendEvent(Event::ptr event){
+	Event::ptr rootEvent=event->getRootEvent();
+	int eventType=rootEvent->getType();
+	if(event->getType()==Event::Type_ROUTED){
+		eventType|=CONTROL_EVENT_FLAG;
+	}
+	mDataPacketOut->writeBigInt16(eventType);
+	if(event->getType()==Event::Type_ROUTED){
+		RouteEvent *routeEvent=(RouteEvent*)event;
+		mDataPacketOut->writeBigUInt8(CONTROL_EVENT_ROUTE);
+		mDataPacketOut->writeBigInt32(routeEvent->getSourceID());
+		mDataPacketOut->writeBigInt32(routeEvent->getDestinationID());
+	}
+	rootEvent->write(mDataPacketOut);
 
 	int amount=mConnection->send(mPacketOut->getOriginalDataPointer(),mPacketOut->length());
 
@@ -169,19 +175,31 @@ int SimpleEventConnection::sendEvent(int toClientID,Event::ptr event){
 	return amount;
 }
 
-int SimpleEventConnection::receiveEvent(int *fromClientID,Event::ptr *event){
+int SimpleEventConnection::receiveEvent(Event::ptr *event){
 	int amount=mConnection->receive(mPacketIn->getOriginalDataPointer(),mPacketIn->length());
 	if(amount>0){
-//		int eventFrame=mDataPacketIn->readBigInt32();
-		*fromClientID=mDataPacketIn->readBigInt32();
-		int type=mDataPacketIn->readUInt8();
+		RouteEvent::ptr routeEvent=NULL;
+		int eventType=mDataPacketIn->readBigInt16();
+		if((eventType&CONTROL_EVENT_FLAG)==CONTROL_EVENT_FLAG){
+			eventType=eventType&~CONTROL_EVENT_FLAG;
+			int type=mDataPacketIn->readUInt8();
+			if(type==CONTROL_EVENT_ROUTE){
+				int sourceID=mDataPacketIn->readBigInt32();
+				int destinationID=mDataPacketIn->readBigInt32();
+				routeEvent=RouteEvent::ptr(new RouteEvent(NULL,sourceID,destinationID));
+			}
+		}
 		mEventsMutex.lock();
 			if(mEventFactory!=NULL){
-				*event=mEventFactory->createEventType(type);
+				*event=mEventFactory->createEventType(eventType);
 			}
 		mEventsMutex.unlock();
 		if(*event!=NULL){
 			(*event)->read(mDataPacketIn);
+		}
+		if(routeEvent!=NULL){
+			routeEvent->setEvent(*event);
+			(*event)=routeEvent;
 		}
 
 		mPacketIn->reset();
