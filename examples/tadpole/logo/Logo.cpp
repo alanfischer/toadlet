@@ -14,7 +14,7 @@ void Logo::create(){
 
 	getEngine()->setScene(mEngine->createNodeType(SceneNode::type()));
 
-	MemoryStream::ptr in(new MemoryStream(lt_mmsh::data,lt_mmsh::length,false));
+	MemoryStream::ptr in(new MemoryStream(lt_mmsh::data,lt_mmsh::length,lt_mmsh::length,false));
 	Mesh::ptr mesh=shared_static_cast<Mesh>(getEngine()->getMeshManager()->getHandler("mmsh")->load(in,NULL));
 	//MemoryInputStream::ptr in(new MemoryInputStream(lt_xmsh::data,lt_xmsh::length));
 	//Mesh::ptr mesh=shared_static_cast<Mesh>(getEngine()->getMeshManager()->getHandler("xmsh")->load(in,NULL));
@@ -56,13 +56,16 @@ void Logo::update(int dt){
 
 #if !defined(TOADLET_PLATFORM_OSX)
 #if defined(TOADLET_PLATFORM_WINCE)
+#include <windows.h>
 int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,int nCmdShow){
+	Logo app;
+	app.setFullscreen(true);
 #else
 int main(int argc,char **argv){
-#endif
 	Logo app;
+#endif
 	app.create();
-	app.start(true);
+	app.start();
 	app.destroy();
 	return 0;
 }

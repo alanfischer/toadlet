@@ -39,7 +39,9 @@ SimpleServer::ServerClient::ServerClient(SimpleServer *server,EventFactory *fact
 }
 
 void SimpleServer::ServerClient::eventReceived(Event::ptr event){
-	mServer->eventReceived(this,event);
+	if(mServer->eventReceived(this,event)==false){
+		SimpleEventConnection::eventReceived(event);
+	}
 }
 
 SimpleServer::SimpleServer(EventFactory *eventFactory,Connector::ptr connector):
@@ -110,7 +112,7 @@ bool SimpleServer::broadcast(Event::ptr event){
 	return result;
 }
 
-bool SimpleServer::sendToClient(int clientID,egg::Event::ptr event){
+bool SimpleServer::sendToClient(int clientID,Event::ptr event){
 	bool result=false;
 	mClientsMutex.lock();
 		result=mClients[clientID]->send(event);
@@ -118,10 +120,24 @@ bool SimpleServer::sendToClient(int clientID,egg::Event::ptr event){
 	return result;
 }
 
-void SimpleServer::eventReceived(ServerClient *client,egg::Event::ptr event){
+Event::ptr SimpleServer::receive(){
+	Event::ptr event;
+	mClientsMutex.lock();
+		for(int i=0;i<mClients.size() && event==NULL;++i){
+			event=mClients[i]->receive();
+		}
+	mClientsMutex.unlock();
+	return event;	
+}
+
+bool SimpleServer::eventReceived(ServerClient *client,Event::ptr event){
 	if(event->getType()==Event::Type_ROUTED){
 		RoutedEvent *routedEvent=(RoutedEvent*)event.get();
 		sendToClient(routedEvent->getDestinationID(),event);
+		return true;
+	}
+	else{
+		return false;
 	}
 }
 

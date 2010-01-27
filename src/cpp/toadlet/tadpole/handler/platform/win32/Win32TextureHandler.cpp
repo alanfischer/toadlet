@@ -30,6 +30,8 @@
 
 #if defined(TOADLET_PLATFORM_WINCE)
 	#include <Imaging.h>
+	#include <initguid.h>
+	#include <imgguids.h>
 #else
 	#include <OleCtl.h>
 	#include <gdiplus.h>
@@ -113,19 +115,46 @@ protected:
 	Stream::ptr mBase;
 };
 
-Win32TextureHandler::Win32TextureHandler(TextureManager *textureManager){
+Win32TextureHandler::Win32TextureHandler(TextureManager *textureManager):
+	mTextureManager(NULL),
+	#if !defined(TOADLET_PLATFORM_WINCE)
+		mToken(0)
+	#else
+		mImagingFactory(NULL)
+	#endif
+{
 	mTextureManager=textureManager;
 	#if !defined(TOADLET_PLATFORM_WINCE)
 		GdiplusStartupInput gdiplusStartupInput;
 		GdiplusStartup(&mToken,&gdiplusStartupInput,NULL);
 	#else
-		IImagingFact
+		HRESULT hr=CoInitializeEx(NULL,COINIT_MULTITHREADED);
+		if(hr==S_OK){
+			IImagingFactory *imagingFactory=NULL;
+			hr=CoCreateInstance(CLSID_ImagingFactory,NULL,CLSCTX_INPROC_SERVER,IID_IImagingFactory,(void**)&imagingFactory);
+			if(SUCCEEDED(hr) && imagingFactory!=NULL){
+				mImagingFactory=imagingFactory;
+			}
+		}
 	#endif
 }
 
 Win32TextureHandler::~Win32TextureHandler(){
 	#if !defined(TOADLET_PLATFORM_WINCE)
 		GdiplusShutdown(mToken);
+	#else
+		if(mImagingFactory!=NULL){
+			mImagingFactory->Release();
+		}
+		CoUninitialize();
+	#endif
+}
+
+bool Win32TextureHandler::valid(){
+	#if !defined(TOADLET_PLATFORM_WINCE)
+		return true;
+	#else
+		return mImagingFactory!=NULL;
 	#endif
 }
 
@@ -134,13 +163,38 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData
 	HRESULT hr=0;
 
 	#if defined(TOADLET_PLATFORM_WINCE)
-		IImage *image=NULL;
-		hr=CreateImageFromStream(stream,&image);
-		if(FAILED(hr)){
+		IImage *iimage=NULL;
+		hr=((IImagingFactory*)mImagingFactory)->CreateImageFromStream(stream,&iimage);
+		if(FAILED(hr) || iimage==NULL){
 			return NULL;
 		}
 
-		CreateBitmapFromImage(
+		IBitmapImage *bitmap=NULL;
+		hr=((IImagingFactory*)mImagingFactory)->CreateBitmapFromImage(iimage,0,0,0,InterpolationHintDefault,&bitmap);
+		if(FAILED(hr) || bitmap==NULL){
+			return NULL;
+		}
+
+		PixelFormat gdiformat=PixelFormatUndefined;
+		hr=bitmap->GetPixelFormatID(&gdiformat);
+		int format=getFormat(&gdiformat);
+		SIZE size={0};
+		hr=bitmap->GetSize(&size);
+		image::Image::ptr image(new image::Image(image::Image::Dimension_D2,format,size.cx,size.cy));
+
+		RECT rect={0};
+		rect.right=size.cx;
+		rect.bottom=size.cy;
+		BitmapData data;
+		bitmap->LockBits(&rect,ImageLockModeRead,gdiformat,&data);
+
+		int i;
+		for(i=0;i<image->getHeight();++i){
+			memcpy(image->getData()+image->getWidth()*image->getPixelSize()*i,((uint8*)data.Scan0)+data.Stride*(size.cy-i-1),image->getWidth()*image->getPixelSize());
+		}
+
+		bitmap->UnlockBits(&data);
+		return mTextureManager->createTexture(image);
 	#else
 		Bitmap *bitmap=Bitmap::FromStream(stream);
 		if(bitmap==NULL){
@@ -154,36 +208,11 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData
 			return NULL;
 		}
 
-		Rect rect(0,0,bitmap->GetWidth(),bitmap->GetHeight());
 		PixelFormat gdiformat=bitmap->GetPixelFormat();
-		int format=0;
-		switch(format){
-			case(PixelFormat16bppARGB1555):
-				format=Texture::Format_BGRA_5_5_5_1;
-			break;
-			case(PixelFormat16bppRGB565):
-				format=Texture::Format_BGR_5_6_5;
-			break;
-			case(PixelFormat24bppRGB):
-				format=Texture::Format_BGR_8;
-			break;
-			case(PixelFormat32bppARGB):
-				format=Texture::Format_BGRA_8;
-			break;
-			default:
-				if((format&PixelFormatAlpha)>0){
-					gdiformat=PixelFormat32bppARGB;
-					format=Texture::Format_BGRA_8;
-				}
-				else{
-					gdiformat=PixelFormat24bppRGB;
-					format=Texture::Format_BGR_8;
-				}
-			break;
-		}
-
+		int format=getFormat(&gdiformat);
 		image::Image::ptr image(new image::Image(image::Image::Dimension_D2,format,bitmap->GetWidth(),bitmap->GetHeight()));
 
+		Rect rect(0,0,bitmap->GetWidth(),bitmap->GetHeight());
 		BitmapData data;
 		bitmap->LockBits(&rect,ImageLockModeRead,gdiformat,&data);
 
@@ -198,6 +227,33 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData
 	#endif
 
 	return NULL;
+}
+
+int Win32TextureHandler::getFormat(PixelFormat *gdiformat){
+	switch(*gdiformat){
+		case(PixelFormat16bppARGB1555):
+			return Texture::Format_BGRA_5_5_5_1;
+		break;
+		case(PixelFormat16bppRGB565):
+			return Texture::Format_BGR_5_6_5;
+		break;
+		case(PixelFormat24bppRGB):
+			return Texture::Format_BGR_8;
+		break;
+		case(PixelFormat32bppARGB):
+			return Texture::Format_BGRA_8;
+		break;
+		default:
+			if(((*gdiformat)&PixelFormatAlpha)>0){
+				*gdiformat=PixelFormat32bppARGB;
+				return Texture::Format_BGRA_8;
+			}
+			else{
+				*gdiformat=PixelFormat24bppRGB;
+				return Texture::Format_BGR_8;
+			}
+		break;
+	}
 }
 
 }

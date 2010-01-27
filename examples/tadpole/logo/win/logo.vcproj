@@ -164,6 +164,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/subsystem:$(CESubsystem) /MACHINE:ARM "
+				AdditionalDependencies="toadlet_egg_sd.lib toadlet_peeper_sd.lib toadlet_ribbit_sd.lib toadlet_tadpole_sd.lib toadlet_pad_sd.lib"
 				OutputFile="$(OutDir)/logo.exe"
 				LinkIncremental="2"
 				DelayLoadDLLs="$(NOINHERIT)"
@@ -321,6 +322,7 @@
 				PreprocessorDefinitions="_WIN32_WCE=$(CEVER);UNDER_CE=$(CEVER);WINCE;$(PLATFORMDEFINES);NDEBUG;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;GLESEM_STATIC"
 				ExceptionHandling="0"
 				RuntimeLibrary="0"
+				BufferSecurityCheck="false"
 				TreatWChar_tAsBuiltInType="false"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -342,6 +344,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/ALIGN:4096 /subsystem:$(CESubsystem) /MACHINE:ARM "
+				AdditionalDependencies="toadlet_egg_s.lib toadlet_peeper_s.lib toadlet_ribbit_s.lib toadlet_tadpole_s.lib toadlet_pad_s.lib"
 				OutputFile="$(OutDir)/logo.exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="false"
@@ -678,6 +681,14 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\logo.rc"
+			>
+		</File>
+		<File
+			RelativePath=".\resource.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
