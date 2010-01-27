@@ -34,6 +34,12 @@ namespace toadlet{
 namespace knot{
 
 /// An EventConnection sends & receives events
+/// @todo: There currently isnt any clean way to include routing information in this class, so that ends up being done
+///  by the sub-classes.  Perhaps I could come up with a standard "address" structure that could be added to these methods.
+///  Or switch it to include the routing information in the Events, if they are off a certain type, say a Routed Event.
+///  Would it be desireable to use the Decorator pattern here?  A RoutedEvent could take an Event, add the routing information, and pass it on.
+///  Then the Client/Server specific EventConnections could look for Events that ARE RoutedEvents, and then extract the necessary information and pass it on.
+///  Non routed events just get sent to the end point of the connection, and then are to be dealt with.
 class EventConnection{
 public:
 	TOADLET_SHARED_POINTERS(EventConnection);

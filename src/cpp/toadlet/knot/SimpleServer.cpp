@@ -33,15 +33,29 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace knot{
 
+SimpleServer::ServerClient::ServerClient(SimpleServer *server,EventFactory *factory,Connection::ptr connection):SimpleEventConnection(factory,connection){
+	mServer=server;
+}
+
+bool SimpleServer::ServerClient::sendFrom(Event::ptr event,int clientID){
+	return sendEvent(clientID,event)>0;
+}
+
+void SimpleServer::ServerClient::eventReceived(int clientID,Event::ptr event){
+	mServer->eventReceived(this,clientID,event);
+}
+
 SimpleServer::SimpleServer(EventFactory *eventFactory,Connector::ptr connector):
 	mEventFactory(NULL)
-
-	//mConnection,
-	//mEvents,
-	//mEventsMutex,
-	//mEventClientIDs
+	//mConnector,
+	//mClients,
+	//mConnectionClients,
+	//mClientsMutex
 {
-	mEventFactory=eventFactory;
+	if(eventFactory!=NULL){
+		setEventFactory(eventFactory);
+	}
+
 	if(connector!=NULL){
 		setConnector(connector);
 	}
@@ -49,6 +63,16 @@ SimpleServer::SimpleServer(EventFactory *eventFactory,Connector::ptr connector):
 
 SimpleServer::~SimpleServer(){
 	setConnector(NULL);
+}
+
+void SimpleServer::setEventFactory(EventFactory *eventFactory){
+	mEventFactory=eventFactory;
+
+	mClientsMutex.lock();
+		for(int i=0;i<mClients.size();++i){
+			mClients[i]->setEventFactory(eventFactory);
+		}
+	mClientsMutex.unlock();
 }
 
 void SimpleServer::setConnector(Connector::ptr connector){
@@ -64,85 +88,51 @@ void SimpleServer::setConnector(Connector::ptr connector){
 }
 
 void SimpleServer::connected(Connection::ptr connection){
-	mConnectionsMutex.lock();
-		mConnections.add(connection);
-	mConnectionsMutex.unlock();
+	mClientsMutex.lock();
+		ServerClient::ptr client(new ServerClient(this,mEventFactory,connection));
+		mClients.add(client);
+		mConnectionClients[connection]=client;
+	mClientsMutex.unlock();
 }
 
 void SimpleServer::disconnected(Connection::ptr connection){
-	mConnectionsMutex.lock();
-		mConnections.remove(connection);
-	mConnectionsMutex.unlock();
+	mClientsMutex.lock();
+		ServerClient::ptr client=mConnectionClients[connection];
+		mConnectionClients.erase(connection);
+		mClients.remove(client);
+	mClientsMutex.unlock();
 }
-/*
-bool SimpleServer::broadcastEvent(Event::ptr event){
-	int fromClientID=-1;
 
-//	mDataPacketOut->writeBigInt32(eventFrame);
-	mDataPacketOut->writeBigInt32(fromClientID);
-	mDataPacketOut->writeUInt8(event->getType());
-	event->write(mDataPacketOut);
-
-	mConnectionsMutex.lock();
-		int i;
-		for(i=0;i<mConnections.size();++i){
-			mConnections[i]->send(mPacketOut->getOriginalDataPointer(),mPacketOut->length());
+bool SimpleServer::broadcast(Event::ptr event){
+	bool result=false;
+	mClientsMutex.lock();
+		for(int i=0;i<mClients.size();++i){
+			result|=mClients[i]->send(event);
 		}
-	mConnectionsMutex.unlock();
-
-	mPacketOut->reset();
-
-	return true;
+	mClientsMutex.unlock();
+	return result;
 }
 
-bool SimpleServer::sendEvent(int clientID,Event::ptr event,int fromClientID){
-//	mDataPacketOut->writeBigInt32(eventFrame);
-	mDataPacketOut->writeBigInt32(fromClientID);
-	mDataPacketOut->writeUInt8(event->getType());
-	event->write(mDataPacketOut);
-
-	int amount=0;
-	mConnectionsMutex.lock();
-		if(clientID<0 || clientID>=mConnections.size()){
-			mConnectionsMutex.unlock();
-			mPacketOut->reset();
-			Error::invalidParameters("invalid clientID");
-			return false;
-		}
-
-		amount=mConnections[clientID]->send(mPacketOut->getOriginalDataPointer(),mPacketOut->length());
-	mConnectionsMutex.unlock();
-
-	mPacketOut->reset();
-
-	return amount>0;
+bool SimpleServer::sendToClient(int clientID,egg::Event::ptr event){
+	bool result=false;
+	mClientsMutex.lock();
+		result=mClients[clientID]->send(event);
+	mClientsMutex.unlock();
+	return result;
 }
 
-bool SimpleServer::receiveEvent(egg::Event::ptr &event,int &fromClientID){
-	mEventsMutex.lock();
-		int size=mEvents.size();
-		if(size>0){
-			event=mEvents.at(size-1);
-			mEvents.removeAt(size-1);
-			fromClientID=mEventClientIDs.at(size-1);
-			mEventClientIDs.removeAt(size-1);
-		}
-	mEventsMutex.unlock();
-
-	return size>0;
-}
-
-void SimpleServer::eventReceived(int clientID,egg::Event::ptr event,int fromClientID){
-	if(clientID!=-1){
-		sendEvent(clientID,event,fromClientID);
-	}
-	else{
-		mEventsMutex.lock();
-			mEvents.add(event);
-			mEventClientIDs.add(fromClientID);
-		mEventsMutex.unlock();
+void SimpleServer::eventReceived(ServerClient *client,egg::Event::ptr event){
+	if(event->getType()
+	if(toClientID!=-1){
+		int i=0;
+		mClientsMutex.lock();
+			for(i=0;i<mClients.size();++i){
+				if(mClients[i]==client) break;
+			}
+		mClientsMutex.unlock();
+		sendTo(toClientID,event,i);
 	}
 }
-*/
+
 }
 }

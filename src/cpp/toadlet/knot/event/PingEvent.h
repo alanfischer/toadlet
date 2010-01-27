@@ -23,19 +23,19 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_PINGEVENT_H
-#define TOADLET_EGG_PINGEVENT_H
+#ifndef TOADLET_KNOT_PINGEVENT_H
+#define TOADLET_KNOT_PINGEVENT_H
 
 #include <toadlet/egg/Event.h>
 
 namespace toadlet{
-namespace egg{
+namespace knot{
 
 class PingEvent{
 public:
 	TOADLET_SHARED_POINTERS(PingEvent);
 
-	PingEvent():mType(EventType_PING),mSendTime(0){}
+	PingEvent():mType(Type_PING),mSendTime(0){}
 
 	int read(io::DataStream *stream){
 		return stream->readInt64(mSendTime);

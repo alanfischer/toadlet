@@ -68,7 +68,7 @@ void SimpleClient::setConnector(Connector::ptr connector){
 }
 
 bool SimpleClient::sendToClient(int toClientID,Event::ptr event){
-	return sendEvent(toClientID,event)>0;
+	return send(Event::ptr(new RouteEvent(event,mClientID,toClientID)));
 }
 
 void SimpleClient::receiveError(){

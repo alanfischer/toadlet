@@ -59,14 +59,16 @@ public:
 	virtual bool send(egg::Event::ptr event);
 	virtual egg::Event::ptr receive();
 
+	virtual int update(){return 0;}
+
 	virtual void run();
 
 protected:
-	virtual void eventReceived(int fromClientID,egg::Event::ptr event);
+	virtual void eventReceived(egg::Event::ptr event);
 	virtual void receiveError();
 
-	virtual int sendEvent(int toClientID,egg::Event::ptr event);
-	virtual int receiveEvent(int *fromClientID,egg::Event::ptr *event);
+	virtual int sendEvent(egg::Event::ptr event);
+	virtual int receiveEvent(egg::Event::ptr *event);
 
 	egg::EventFactory *mEventFactory;
 	egg::io::MemoryStream::ptr mPacketIn;
@@ -77,7 +79,6 @@ protected:
 	Connection::ptr mConnection;
 	egg::Collection<egg::Event::ptr> mEvents;
 	egg::Mutex mEventsMutex;
-	egg::Collection<int> mEventClientIDs;
 
 	egg::Thread::ptr mThread;
 	bool mRun;
