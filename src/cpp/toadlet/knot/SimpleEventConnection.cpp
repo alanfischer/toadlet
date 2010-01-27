@@ -154,15 +154,15 @@ void SimpleEventConnection::receiveError(){
 }
 
 int SimpleEventConnection::sendEvent(Event::ptr event){
-	Event::ptr rootEvent=event->getRootEvent();
+	Event *rootEvent=event->getRootEvent();
 	int eventType=rootEvent->getType();
 	if(event->getType()==Event::Type_ROUTED){
 		eventType|=CONTROL_EVENT_FLAG;
 	}
 	mDataPacketOut->writeBigInt16(eventType);
 	if(event->getType()==Event::Type_ROUTED){
-		RouteEvent *routeEvent=(RouteEvent*)event;
-		mDataPacketOut->writeBigUInt8(CONTROL_EVENT_ROUTE);
+		RoutedEvent *routeEvent=(RoutedEvent*)event.get();
+		mDataPacketOut->writeUInt8(CONTROL_EVENT_ROUTE);
 		mDataPacketOut->writeBigInt32(routeEvent->getSourceID());
 		mDataPacketOut->writeBigInt32(routeEvent->getDestinationID());
 	}
@@ -178,7 +178,7 @@ int SimpleEventConnection::sendEvent(Event::ptr event){
 int SimpleEventConnection::receiveEvent(Event::ptr *event){
 	int amount=mConnection->receive(mPacketIn->getOriginalDataPointer(),mPacketIn->length());
 	if(amount>0){
-		RouteEvent::ptr routeEvent=NULL;
+		RoutedEvent::ptr routedEvent=NULL;
 		int eventType=mDataPacketIn->readBigInt16();
 		if((eventType&CONTROL_EVENT_FLAG)==CONTROL_EVENT_FLAG){
 			eventType=eventType&~CONTROL_EVENT_FLAG;
@@ -186,7 +186,7 @@ int SimpleEventConnection::receiveEvent(Event::ptr *event){
 			if(type==CONTROL_EVENT_ROUTE){
 				int sourceID=mDataPacketIn->readBigInt32();
 				int destinationID=mDataPacketIn->readBigInt32();
-				routeEvent=RouteEvent::ptr(new RouteEvent(NULL,sourceID,destinationID));
+				routedEvent=RoutedEvent::ptr(new RoutedEvent(NULL,sourceID,destinationID));
 			}
 		}
 		mEventsMutex.lock();
@@ -197,9 +197,9 @@ int SimpleEventConnection::receiveEvent(Event::ptr *event){
 		if(*event!=NULL){
 			(*event)->read(mDataPacketIn);
 		}
-		if(routeEvent!=NULL){
-			routeEvent->setEvent(*event);
-			(*event)=routeEvent;
+		if(routedEvent!=NULL){
+			routedEvent->setEvent(*event);
+			(*event)=routedEvent;
 		}
 
 		mPacketIn->reset();

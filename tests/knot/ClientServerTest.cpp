@@ -68,18 +68,18 @@ QT_TEST(ClientClientTest){
 	client1->send(sendEvent=Event::ptr(new MessageEvent("Hello!")));
 	for(receiveEvent=NULL,endTime=System::mtime()+5000;System::mtime()<endTime && receiveEvent==NULL;receiveEvent=client2->receive());
 	if(receiveEvent!=NULL){
-		Logger::alert("Received:"+shared_static_cast<MessageEvent>(receiveEvent)->getText());
+		Logger::alert("Received:"+((MessageEvent*)receiveEvent->getRootEvent())->getText());
 	}
 
-	QT_CHECK(receiveEvent!=NULL && shared_static_cast<MessageEvent>(sendEvent)->getText().equals(shared_static_cast<MessageEvent>(receiveEvent)->getText()));
+	QT_CHECK(receiveEvent!=NULL && ((MessageEvent*)sendEvent->getRootEvent())->getText().equals(((MessageEvent*)receiveEvent->getRootEvent())->getText()));
 
 	client2->send(sendEvent=Event::ptr(new MessageEvent("Greets to the greety!")));
 	for(receiveEvent=NULL,endTime=System::mtime()+5000;System::mtime()<endTime && receiveEvent==NULL;receiveEvent=client1->receive());
 	if(receiveEvent!=NULL){
-		Logger::alert("Received:"+shared_static_cast<MessageEvent>(receiveEvent)->getText());
+		Logger::alert("Received:"+((MessageEvent*)receiveEvent->getRootEvent())->getText());
 	}
 
-	QT_CHECK(receiveEvent!=NULL && shared_static_cast<MessageEvent>(sendEvent)->getText().equals(shared_static_cast<MessageEvent>(receiveEvent)->getText()));
+	QT_CHECK(receiveEvent!=NULL && ((MessageEvent*)sendEvent->getRootEvent())->getText().equals(((MessageEvent*)receiveEvent->getRootEvent())->getText()));
 }
 
 // The EventListener interface seems to imply that it listens to things internally to an Event, whereas its really a "EventServer/EventClient listener"
@@ -96,41 +96,40 @@ QT_TEST(ClientServerTest){
 	SimpleClient::ptr client2=SimpleClient::ptr(new SimpleClient(eventFactory,Connector::ptr(new TCPConnector(Socket::stringToIP("127.0.0.1"),6969))));
 
 	Event::ptr sendEvent,receiveEvent;
-	int fromClient=-1;
 	int endTime=0;
 
 	// Send some events
-//	client1->send(sendEvent=Event::ptr(new MessageEvent("Hello!")));
-//	for(receiveEvent=NULL,endTime=System::mtime()+5000;System::mtime()<endTime && receiveEvent==NULL;server->receive(receiveEvent,fromClient));
-//	if(receiveEvent!=NULL){
-//		Logger::alert("Received:"+shared_static_cast<MessageEvent>(receiveEvent)->getText());
-//	}
+	client1->send(sendEvent=Event::ptr(new MessageEvent("Hello!")));
+	for(receiveEvent=NULL,endTime=System::mtime()+5000;System::mtime()<endTime && receiveEvent==NULL;receiveEvent=server->receive());
+	if(receiveEvent!=NULL){
+		Logger::alert("Received:"+shared_static_cast<MessageEvent>(receiveEvent)->getText());
+	}
 
-	QT_CHECK(receiveEvent!=NULL && fromClient==0 && shared_static_cast<MessageEvent>(sendEvent)->getText().equals(shared_static_cast<MessageEvent>(receiveEvent)->getText()));
+	QT_CHECK(receiveEvent!=NULL && ((MessageEvent*)sendEvent->getRootEvent())->getText().equals(((MessageEvent*)receiveEvent->getRootEvent())->getText()));
 
 	server->broadcast(sendEvent=Event::ptr(new MessageEvent("Howdy!")));
 
 	for(receiveEvent=NULL,endTime=System::mtime()+5000;System::mtime()<endTime && receiveEvent==NULL;receiveEvent=client1->receive());
 	if(receiveEvent!=NULL){
-		Logger::alert("Received:"+shared_static_cast<MessageEvent>(receiveEvent)->getText());
+		Logger::alert("Received:"+((MessageEvent*)receiveEvent->getRootEvent())->getText());
 	}
 
-	QT_CHECK(receiveEvent!=NULL && shared_static_cast<MessageEvent>(sendEvent)->getText().equals(shared_static_cast<MessageEvent>(receiveEvent)->getText()));
+	QT_CHECK(receiveEvent!=NULL && ((MessageEvent*)sendEvent->getRootEvent())->getText().equals(((MessageEvent*)receiveEvent->getRootEvent())->getText()));
 
 	for(receiveEvent=NULL,endTime=System::mtime()+5000;System::mtime()<endTime && receiveEvent==NULL;receiveEvent=client2->receive());
 	if(receiveEvent!=NULL){
-		Logger::alert("Received:"+shared_static_cast<MessageEvent>(receiveEvent)->getText());
+		Logger::alert("Received:"+((MessageEvent*)receiveEvent->getRootEvent())->getText());
 	}
 
-	QT_CHECK(receiveEvent!=NULL && shared_static_cast<MessageEvent>(sendEvent)->getText().equals(shared_static_cast<MessageEvent>(receiveEvent)->getText()));
+	QT_CHECK(receiveEvent!=NULL && ((MessageEvent*)sendEvent->getRootEvent())->getText().equals(((MessageEvent*)receiveEvent->getRootEvent())->getText()));
 
 	client1->sendToClient(1,sendEvent=Event::ptr(new MessageEvent("Sup!")));
 	for(receiveEvent=NULL,endTime=System::mtime()+5000;System::mtime()<endTime && receiveEvent==NULL;receiveEvent=client2->receive());
 	if(receiveEvent!=NULL){
-		Logger::alert("Received:"+shared_static_cast<MessageEvent>(receiveEvent)->getText());
+		Logger::alert("Received:"+((MessageEvent*)receiveEvent->getRootEvent())->getText());
 	}
 
-	QT_CHECK(receiveEvent!=NULL && shared_static_cast<MessageEvent>(sendEvent)->getText().equals(shared_static_cast<MessageEvent>(receiveEvent)->getText()));
+	QT_CHECK(receiveEvent!=NULL && ((MessageEvent*)sendEvent->getRootEvent())->getText().equals(((MessageEvent*)receiveEvent->getRootEvent())->getText()));
 
 //	int ping=client->pingAndWait(); // TODO: Figure out how pinging will work, if there are unprocessed Events hanging around like the Howdy above?
 									//  We could include a PingID, or a more general EventID, and then the client itself would be able to look at

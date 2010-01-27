@@ -26,6 +26,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/knot/SimpleServer.h>
+#include <toadlet/knot/event/RoutedEvent.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
@@ -37,12 +38,8 @@ SimpleServer::ServerClient::ServerClient(SimpleServer *server,EventFactory *fact
 	mServer=server;
 }
 
-bool SimpleServer::ServerClient::sendFrom(Event::ptr event,int clientID){
-	return sendEvent(clientID,event)>0;
-}
-
-void SimpleServer::ServerClient::eventReceived(int clientID,Event::ptr event){
-	mServer->eventReceived(this,clientID,event);
+void SimpleServer::ServerClient::eventReceived(Event::ptr event){
+	mServer->eventReceived(this,event);
 }
 
 SimpleServer::SimpleServer(EventFactory *eventFactory,Connector::ptr connector):
@@ -122,15 +119,9 @@ bool SimpleServer::sendToClient(int clientID,egg::Event::ptr event){
 }
 
 void SimpleServer::eventReceived(ServerClient *client,egg::Event::ptr event){
-	if(event->getType()
-	if(toClientID!=-1){
-		int i=0;
-		mClientsMutex.lock();
-			for(i=0;i<mClients.size();++i){
-				if(mClients[i]==client) break;
-			}
-		mClientsMutex.unlock();
-		sendTo(toClientID,event,i);
+	if(event->getType()==Event::Type_ROUTED){
+		RoutedEvent *routedEvent=(RoutedEvent*)event.get();
+		sendToClient(routedEvent->getDestinationID(),event);
 	}
 }
 
