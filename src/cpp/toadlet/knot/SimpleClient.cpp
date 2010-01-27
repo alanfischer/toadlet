@@ -26,6 +26,7 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/knot/SimpleClient.h>
+#include <toadlet/knot/event/RoutedEvent.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
@@ -68,7 +69,7 @@ void SimpleClient::setConnector(Connector::ptr connector){
 }
 
 bool SimpleClient::sendToClient(int toClientID,Event::ptr event){
-	return send(Event::ptr(new RouteEvent(event,mClientID,toClientID)));
+	return send(Event::ptr(new RoutedEvent(event,mClientID,toClientID)));
 }
 
 void SimpleClient::receiveError(){
