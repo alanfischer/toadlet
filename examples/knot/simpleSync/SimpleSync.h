@@ -4,8 +4,8 @@
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/knot/TCPConnector.h>
-#include <toadlet/knot/SimpleEventServer.h>
-#include <toadlet/knot/SimpleEventClient.h>
+#include <toadlet/knot/SimpleServer.h>
+#include <toadlet/knot/SimpleClient.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
 #include <toadlet/tadpole/node/SceneNode.h>
@@ -48,8 +48,8 @@ public:
 
 	void run();
 
-	EventServer::ptr eventServer;
-	EventClient::ptr eventClient;
+	SimpleServer::ptr server;
+	SimpleClient::ptr client;
 
 	CameraNode::ptr cameraNode;
 	MeshNode::ptr meshNode;

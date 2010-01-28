@@ -26,6 +26,7 @@
 #ifndef TOADLET_KNOT_SIMPLESERVER_H
 #define TOADLET_KNOT_SIMPLESERVER_H
 
+#include <toadlet/egg/Map.h>
 #include <toadlet/egg/EventFactory.h>
 #include <toadlet/knot/ConnectorListener.h>
 #include <toadlet/knot/SimpleEventConnection.h>

@@ -122,7 +122,7 @@ public:
 	int time1,time2,time3,time4,time5,time6;
 };
 
-QT_TEST(ATCPConnectionTest){
+QT_TEST(TCPConnectionTest){
 	Server::ptr server(new Server(52525));
 	server->start();
 

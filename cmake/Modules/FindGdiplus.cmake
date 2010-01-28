@@ -36,7 +36,7 @@ else (GDIPLUS_FOUND)
 		message (FATAL_ERROR "Could NOT find GdiplusPixelFormats.h")
 	endif (GDIPLUS_FIND_QUITELY)
 	if (NOT GDIPLUS_FIND_QUITELY)
-		message (STATUS "Could NOT find Imaging.h")
+		message (STATUS "Could NOT find GdiplusPixelFormats.h")
 	endif (NOT GDIPLUS_FIND_QUITELY)
 endif (GDIPLUS_FOUND)
 
