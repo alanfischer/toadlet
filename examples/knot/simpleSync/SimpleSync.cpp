@@ -28,11 +28,11 @@ SimpleSync::~SimpleSync(){
 }
 
 void SimpleSync::accept(int localPort){
-	eventServer=EventServer::ptr(new SimpleEventServer(this,TCPConnector::ptr(new TCPConnector(localPort))));
+	server=SimpleServer::ptr(new SimpleServer(this,TCPConnector::ptr(new TCPConnector(localPort))));
 }
 
 void SimpleSync::connect(int remoteHost,int remotePort){
-	eventClient=EventClient::ptr(new SimpleEventClient(this,TCPConnector::ptr(new TCPConnector(remoteHost,remotePort))));
+	client=SimpleClient::ptr(new SimpleClient(this,TCPConnector::ptr(new TCPConnector(remoteHost,remotePort))));
 }
 
 void SimpleSync::create(){
@@ -41,7 +41,7 @@ void SimpleSync::create(){
 	HopScene::ptr scene(new HopScene(mEngine->createNodeType(SceneNode::type())));
 	getEngine()->setScene(scene);
 	scene->showCollisionVolumes(true,false);
-	if(eventClient!=NULL){
+	if(client!=NULL){
 		scene->setLogicDT(100);
 	}
 	else{
@@ -120,14 +120,13 @@ void SimpleSync::render(Renderer *renderer){
 void SimpleSync::update(int dt){
 	getEngine()->getScene()->update(dt);
 
-	if(eventServer!=NULL){
-		eventServer->broadcastEvent(Event::ptr(new MessageEvent("ChatMessage")));
+	if(server!=NULL){
+		server->broadcast(Event::ptr(new MessageEvent("ChatMessage")));
 	}
-	if(eventClient!=NULL){
+	if(client!=NULL){
 		Event::ptr event=NULL;
-		int clientID=0;
 
-		eventClient->receiveEvent(event,clientID);
+		event=client->receive();
 
 		if(event!=NULL){
 			Logger::alert("Received:"+((MessageEvent*)event.get())->getText());
@@ -136,7 +135,6 @@ void SimpleSync::update(int dt){
 }
 
 void SimpleSync::keyPressed(int key){
-	if(
 }
 
 void SimpleSync::keyReleased(int key){
