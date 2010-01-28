@@ -26,7 +26,6 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/io/TPKGArchive.h>
-#include <stdio.h>
 
 namespace toadlet{
 namespace egg{
@@ -35,8 +34,8 @@ namespace io{
 TPKGArchive::TPKGArchive():
 	//mIndex,
 	mDataOffset(0)
-	//mInputStream,
-	//mMemoryInputStream
+	//mStream,
+	//mMemoryStream
 {}
 
 TPKGArchive::~TPKGArchive(){

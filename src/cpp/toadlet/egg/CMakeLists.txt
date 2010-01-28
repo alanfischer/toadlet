@@ -42,6 +42,9 @@ set (EGG_IO_SRC
 	io/MemoryStream.cpp
 	io/TPKGArchive.cpp
 )
+set (EGG_IO_ZZIP_SRC
+	io/ZIPArchive.cpp
+)
 
 set (EGG_MATH_SRC
 	math/AABox.cpp
@@ -157,6 +160,9 @@ set (EGG_IO_HEADERS
 	io/MemoryStream.h
 	io/Stream.h
 	io/TPKGArchive.h
+)
+set (EGG_IO_ZZIP_HEADERS
+	io/ZIPArchive.h
 )
 
 set (EGG_MATH_HEADERS
@@ -284,6 +290,7 @@ endif (TOADLET_PLATFORM_WIN32)
 
 
 # Dependencies for toadlet_egg
+find_package (ZZIP)
 if (NOT TOADLET_PLATFORM_OSX)
 	find_package (GIF)
 	find_package (JPEG)
@@ -292,7 +299,7 @@ if (NOT TOADLET_PLATFORM_OSX)
 endif (NOT TOADLET_PLATFORM_OSX)
 
 
-# Setup dependecy specific  files and libraries
+# Setup dependecy specific files and libraries
 if (GIF_FOUND)
 	# Files
 	set (TOADLET_HAS_GIF ON PARENT_SCOPE)
@@ -380,6 +387,29 @@ if (PNG_FOUND)
 	set (EGG_DEFS_S ${EGG_DEFS_S} TOADLET_LIBPNG_NAME="${PNG_LIBRARY}")
 	set (EGG_LIBS_S ${EGG_LIBS_S} libpng_s)
 endif (PNG_FOUND)
+
+if (ZZIP_FOUND)
+	# Files
+	set (TOADLET_HAS_ZZIP ON PARENT_SCOPE)
+	include_directories (${ZZIP_INCLUDE_DIR})
+	source_group ("Source Files\\\\io" FILES ${EGG_IO_ZZIP_SRC})
+	source_group ("Header Files\\\\io" FILES ${EGG_IO_ZZIP_HEADERS})
+	set (EGG_SRC ${EGG_SRC} ${EGG_IO_ZZIP_SRC})
+	set (EGG_HEADERS ${EGG_HEADERS} ${EGG_IO_ZZIP_HEADERS})
+	
+	# Libraries
+	set (EGG_LIBS ${EGG_LIBS} ${ZZIP_LIBRARY})
+	add_library (zziplib_s STATIC IMPORTED)
+	if (TOADLET_PLATFORM_POSIX)
+		string (REPLACE ".so" ".a" ZZIP_A ${ZZIP_LIBRARY})
+		if (EXISTS ${ZZIP_A})
+			set (ZZIP_LIBRARY ${ZZIP_A})
+		endif (EXISTS ${ZZIP_A})
+	endif (TOADLET_PLATFORM_POSIX)
+	set_property (TARGET zziplib_s PROPERTY IMPORTED_LOCATION ${ZZIP_LIBRARY})
+	set (EGG_DEFS_S ${EGG_DEFS_S} TOADLET_LIBZZIP_NAME="${ZZIP_LIBRARY}")
+	set (EGG_LIBS_S ${EGG_LIBS_S} zziplib_s)
+endif (ZZIP_FOUND)
 
 
 #  Dynamic library
