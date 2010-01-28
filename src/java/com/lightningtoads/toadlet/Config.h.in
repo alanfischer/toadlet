@@ -30,6 +30,7 @@
 
 // Setup specific build options
 #cmakedefine TOADLET_PLATFORM_ANDROID
+#cmakedefine TOADLET_PLATFORM_BLACKBERRY
 #cmakedefine TOADLET_FIXED_POINT
 
 #endif

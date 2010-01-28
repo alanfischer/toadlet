@@ -40,6 +40,7 @@ if (WIN32)
 	# This is setup in the toolchain file until cmake has built-in support for wince
 	#option (TOADLET_PLATFORM_WINCE "Build for Windows CE devices" OFF)
 	option (TOADLET_PLATFORM_ANDROID "Build for Android devices" OFF)
+	option (TOADLET_PLATFORM_BLACKBERRY "Build for Blackberry devices" OFF)
 	option (TOADLET_FIXED_POINT "Use a fixed point build of toadlet" OFF)
 elseif (UNIX)
 	set (TOADLET_PLATFORM_POSIX ON)
@@ -52,7 +53,7 @@ elseif (UNIX)
 endif (WIN32)
 
 
-# Android specifics
+# Android and Blackberry specifics
 if (TOADLET_PLATFORM_ANDROID)
 	# We require the android.jar
 	if (NOT ANDROID_JAR)
@@ -60,6 +61,16 @@ if (TOADLET_PLATFORM_ANDROID)
 	else (NOT ANDROID_JAR)
 		message ("Using android.jar located at: ${ANDROID_JAR}")
 	endif (NOT ANDROID_JAR)
+
+	# Add the gpp executable for java file preprocessing
+	add_subdirectory (gpp)
+elseif (TOADLET_PLATFORM_BLACKBERRY)
+	# We require the blackberry JDE install dir
+	if (NOT BLACKBERRY_JDE_DIR)
+		message (FATAL_ERROR "Required variable BLACKBERRY_JDE_DIR not set as path/to/blackberryJDE, please set BLACKBERRY_JDE_DIR and rerun!")
+	else (NOT BLACKBERRY_JDE_DIR)
+		message ("Using BLACKBERRY_JDE_DIR at: ${BLACKBERRY_JDE_DIR}")
+	endif (NOT BLACKBERRY_JDE_DIR)
 
 	# Add the gpp executable for java file preprocessing
 	add_subdirectory (gpp)
