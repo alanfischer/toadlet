@@ -52,6 +52,7 @@ public:
 
 protected:
 	void *mIO;
+	void *mDir;
 	Stream::ptr mStream;
 
 	static egg::Collection<Stream::ptr> mGlobalStreams;

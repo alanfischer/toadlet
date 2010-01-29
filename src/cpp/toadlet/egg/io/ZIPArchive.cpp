@@ -138,7 +138,9 @@ void ZIPArchive::destroy(){
 		mStream=NULL;
 	}
 
-	zzip_closedir(dir);
+	if(mDir!=NULL){
+		zzip_closedir((ZZIP_DIR*)mDir);
+	}
 }
 
 bool ZIPArchive::open(Stream::ptr stream){
@@ -146,7 +148,7 @@ bool ZIPArchive::open(Stream::ptr stream){
 
 	int id=toadlet_zzip_openStream(stream);
 	String idString=String("")+id;
-	ZZIP_DIR *dir=zzip_dir_open_ext_io(idString.c_str(),NULL,NULL,(zzip_plugin_io_handlers*)mIO);
+	mDir=(void*)zzip_dir_open_ext_io(idString.c_str(),NULL,NULL,(zzip_plugin_io_handlers*)mIO);
 
 	return true;
 }
