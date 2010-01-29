@@ -36,7 +36,7 @@
 	#import <SystemConfiguration/SCNetworkReachability.h>
 	#define ReachableViaWiFiNetwork	2
 	#define ReachableDirectWWAN	(1<<18)
-#else if defined(TOADLET_PLATFORM_WINCE)
+#elif defined(TOADLET_PLATFORM_WINCE)
 	#include <wininet.h>
 	#pragma comment(lib,"wininet.lib")
 #endif

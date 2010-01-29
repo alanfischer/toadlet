@@ -1,5 +1,7 @@
 #include "SimpleSync.h"
 #include <stdlib.h>
+#include <toadlet/egg/io/FileStream.h>
+#include <toadlet/egg/io/ZIPArchive.h>
 
 class MessageEvent:public Event{
 public:
@@ -37,6 +39,11 @@ void SimpleSync::connect(int remoteHost,int remotePort){
 
 void SimpleSync::create(){
 	Application::create();
+
+	FileStream::ptr file(new FileStream("file.zip",FileStream::OpenFlags_READ|FileStream::OpenFlags_BINARY));
+
+	ZIPArchive zip;
+	zip.open(file);
 
 	HopScene::ptr scene(new HopScene(mEngine->createNodeType(SceneNode::type())));
 	getEngine()->setScene(scene);

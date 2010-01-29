@@ -261,9 +261,9 @@ int Socket::getTimeout() const{
 }
 
 bool Socket::pollRead(int millis){
-	fd_set fd={0};
-	fd.fd_count=1;
-	fd.fd_array[0]=mHandle;
+	fd_set fd;
+	FD_ZERO(&fd);
+	FD_SET(mHandle,&fd);
 
 	timeval tv={0};
 	tv.tv_sec=millis/1000;
@@ -273,9 +273,9 @@ bool Socket::pollRead(int millis){
 }
 
 bool Socket::pollWrite(int millis){
-	fd_set fd={0};
-	fd.fd_count=1;
-	fd.fd_array[0]=mHandle;
+	fd_set fd;
+	FD_ZERO(&fd);
+	FD_SET(mHandle,&fd);
 
 	timeval tv={0};
 	tv.tv_sec=millis/1000;

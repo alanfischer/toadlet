@@ -71,7 +71,7 @@ protected:
 	egg::Collection<ConnectorListener*> mListeners;
 	egg::Mutex mListenersMutex;
 
-	friend TCPConnection;
+	friend class TCPConnection;
 };
 
 }

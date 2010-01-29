@@ -26,52 +26,109 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/io/ZIPArchive.h>
+#include <zzip/zzip.h>
+#include <zzip/plugin.h>
+
+#if defined(TOADLET_PLATFORM_WIN32) && defined(TOADLET_ZZIPLIB_NAME)
+	#pragma comment(lib,TOADLET_ZZIPLIB_NAME)
+#endif
+
+#if defined(TOADLET_PLATFORM_WIN32) && defined(TOADLET_ZLIB_NAME)
+	#pragma comment(lib,TOADLET_ZLIB_NAME)
+#endif
 
 namespace toadlet{
 namespace egg{
 namespace io{
 
+Collection<Stream::ptr> ZIPArchive::mGlobalStreams;
+Mutex ZIPArchive::mGlobalMutex;
+
+int toadlet_zzip_openStream(Stream::ptr stream){
+	int id=-1;
+	ZIPArchive::mutex.lock();
+		ZIPArchive::streams.add(stream);
+		id=ZIPArchive::streams.size()-1;
+	ZIPArchive::mutex.unlock();
+	return id;
+}
+
+void toadlet_zzip_closeStream(int id){
+	ZIPArchive::mutex.lock();
+		ZIPArchive::streams.removeAt(id);
+	ZIPArchive::mutex.unlock();
+}
+
+Stream::ptr toadlet_zzip_findStream(int id){
+	Stream::ptr stream;
+	ZIPArchive::mutex.lock();
+		stream=ZIPArchive::streams[id];
+	ZIPArchive::mutex.unlock();
+	return stream;
+}
+
+// Stream id is the name in text.  Wish I could find a better way of doing this...
 int toadlet_zzip_open(zzip_char_t* name,int flags,...){
-	Logger::alert("Open called!");
-	return 0;
+	return atoi(name);
 }
 
 int toadlet_zzip_close(int fd){
-	Logger::alert("close called!");
+	toadlet_zzip_closeStream(fd);
 	return 0;
 }
 
 zzip_ssize_t toadlet_zzip_read(int fd,void *buf,zzip_size_t len){
-	Logger::alert("read called!");
-	return 0;
+	Stream::ptr stream=toadlet_zzip_findStream(fd);
+
+	return stream->read((byte*)buf,len);
 }
 
 zzip_off_t toadlet_zzip_seeks(int fd,zzip_off_t offset,int whence){
-	Logger::alert("seeks called!");
-	return 0;
+	Stream::ptr stream=toadlet_zzip_findStream(fd);
+
+	bool result=false;
+	if(whence==SEEK_SET){
+		result=stream->seek(offset);
+	}
+	else if(whence==SEEK_CUR){
+		int position=stream->position();
+		result=stream->seek(position+offset);
+	}
+	else if(whence==SEEK_END){
+		int length=stream->length();
+		result=stream->seek(length+offset);
+	}
+	return offset;
 }
 
 zzip_off_t toadlet_zzip_filesize(int fd){
-	Logger::alert("filesize called!");
-	return 0;
+	Stream::ptr stream=toadlet_zzip_findStream(fd);
+
+	return stream->position();
 }
 
 zzip_ssize_t toadlet_zzip_write(int fd,_zzip_const void* buf,zzip_size_t len){
-	Logger::alert("write called!");
-	return 0;
+	Stream::ptr stream=toadlet_zzip_findStream(fd);
+
+	return stream->write((byte*)buf,len);
 }
 
 ZIPArchive::ZIPArchive(){
-	zzip_init_io(&mIO,0);
-	mIO.fd.open=toadlet_zzip_open;
-	mIO.fd.close=toadlet_zzip_close;
-	mIO.fd.read=toadlet_zzip_read;
-	mIO.fd.seeks=toadlet_zzip_seeks;
-	mIO.fd.filesize=toadlet_zzip_filesize;
-	mIO.fd.write=toadlet_zzip_write;
+	mIO=new zzip_plugin_io_handlers();
+
+	zzip_plugin_io_handlers *io=(zzip_plugin_io_handlers*)mIO;
+	zzip_init_io(io,0);
+	io->fd.open=toadlet_zzip_open;
+	io->fd.close=toadlet_zzip_close;
+	io->fd.read=toadlet_zzip_read;
+	io->fd.seeks=toadlet_zzip_seeks;
+	io->fd.filesize=toadlet_zzip_filesize;
+	io->fd.write=toadlet_zzip_write;
 }
 
 ZIPArchive::~ZIPArchive(){
+	delete (zzip_plugin_io_handlers*)mIO;
+
 	destroy();
 }
 
@@ -81,85 +138,21 @@ void ZIPArchive::destroy(){
 		mStream=NULL;
 	}
 
-	zzip_close(NULL,0,0,NULL,&mIO);
+	zzip_closedir(dir);
 }
 
 bool ZIPArchive::open(Stream::ptr stream){
 	mStream=stream;
 
-	zzip_open_ext_io(NULL,0,0,NULL,&mIO);
-
-	mDataOffset=0;
-
-	byte signature[4];
-	mDataOffset+=mStream->read(signature,4);
-	if(signature[0]!='T' || signature[1]!='P' || signature[2]!='K' || signature[3]!='G'){
-		Error::unknown(Categories::TOADLET_TADPOLE,
-			"Not of ZIP format");
-		mStream=NULL;
-		return false;
-	}
-
-	uint32 version=0;
-	mDataOffset+=mStream->readBigUInt32(version);
-	if(version!=1){
-		Error::unknown(Categories::TOADLET_TADPOLE,
-			"Not ZIP version 1");
-		mStream=NULL;
-		return false;
-	}
-
-	int32 numFiles=0;
-	mDataOffset+=mStream->readBigInt32(numFiles);
-	int i;
-	for(i=0;i<numFiles;++i){
-		uint32 nameLength=0;
-		mDataOffset+=mStream->readBigUInt32(nameLength);
-		byte *name=new byte[nameLength+1];
-		mDataOffset+=mStream->read(name,nameLength);
-		name[nameLength]=0;
-		
-		Index index;
-		mDataOffset+=mStream->readBigUInt32(index.position);
-		mDataOffset+=mStream->readBigUInt32(index.length);
-
-		mIndex[name]=index;
-		delete[] name;
-	}
+	int id=toadlet_zzip_openStream(stream);
+	String idString=String("")+id;
+	ZZIP_DIR *dir=zzip_dir_open_ext_io(idString.c_str(),NULL,NULL,(zzip_plugin_io_handlers*)mIO);
 
 	return true;
 }
 
 Stream::ptr ZIPArchive::openStream(const String &name){
-	Logger::debug(Categories::TOADLET_TADPOLE,
-		"Creating InputStream for "+name);
-
-	if(mStream==NULL){
-		Error::unknown(Categories::TOADLET_TADPOLE,
-			"ZIP not opened");
-		return NULL;
-	}
-
-	Map<String,Index>::iterator it;
-	it=mIndex.find(name);
-	if(it==mIndex.end()){
-		Error::unknown(Categories::TOADLET_TADPOLE,
-			"File not found in data file");
-		return NULL;
-	}
-
-	mStream->seek(mDataOffset+it->second.position);
-	int length=it->second.length;
-
-	if(mMemoryStream!=NULL){
-		byte *data=mMemoryStream->getCurrentDataPointer();
-		return MemoryStream::ptr(new MemoryStream(data,length,length,false));
-	}
-	else{
-		byte *data=new byte[length];
-		mStream->read(data,length);
-		return MemoryStream::ptr(new MemoryStream(data,length,length,true));
-	}
+	return NULL;
 }
 
 }
