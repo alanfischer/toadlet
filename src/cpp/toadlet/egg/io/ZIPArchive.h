@@ -27,12 +27,7 @@
 #define TOADLET_EGG_IO_ZIPARCHIVE_H
 
 #include <toadlet/egg/BaseResource.h>
-#include <toadlet/egg/Map.h>
 #include <toadlet/egg/io/Archive.h>
-#include <toadlet/egg/io/DataStream.h>
-#include <toadlet/egg/io/MemoryStream.h>
-#include <zzip/zzip.h>
-#include <zzip/plugin.h>
 
 namespace toadlet{
 namespace egg{
@@ -50,15 +45,17 @@ public:
 
 	bool isResourceArchive() const{return false;}
 
-	bool open(MemoryStream::ptr memoryStream);
 	bool open(Stream::ptr stream);
 
 	Stream::ptr openStream(const String &name);
 	Resource::ptr openResource(const String &name){return NULL;}
 
 protected:
-	zzip_plugin_io_handlers mIO;
-	DataStream::ptr mStream;
+	void *mIO;
+	Stream::ptr mStream;
+
+	static egg::Collection<Stream::ptr> mGlobalStreams;
+	static egg::Mutex mGlobalMutex;
 };
 
 }

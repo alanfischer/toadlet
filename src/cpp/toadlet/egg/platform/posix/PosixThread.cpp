@@ -84,18 +84,6 @@ bool PosixThread::join(){
 	}
 }
 
-bool PosixThread::join(uint64 milliseconds){
-	timespec ts={0};
-	ts.seconds=milliseconds/1000;
-	ts.nanoseconds((milliseconds%1000)*1000000);
-	if(pthread_timedjoin(mThread,NULL,&ts)==0){
-		return true;
-	}
-	else{
-		return false;
-	}
-}
-
 void PosixThread::run(){
 	if(mRunner!=NULL){
 		mRunner->run();

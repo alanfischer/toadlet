@@ -90,7 +90,7 @@ void Viewer::start(MeshNode::ptr meshNode){
 
 	updateCamera();
 
-	Application::start(true);
+	Application::start();
 }
 
 void Viewer::update(int dt){
