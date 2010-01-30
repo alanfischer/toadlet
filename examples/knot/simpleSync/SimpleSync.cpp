@@ -40,11 +40,6 @@ void SimpleSync::connect(int remoteHost,int remotePort){
 void SimpleSync::create(){
 	Application::create();
 
-	FileStream::ptr file(new FileStream("file.zip",FileStream::OpenFlags_READ|FileStream::OpenFlags_BINARY));
-
-	ZIPArchive zip;
-	zip.open(file);
-
 	HopScene::ptr scene(new HopScene(mEngine->createNodeType(SceneNode::type())));
 	getEngine()->setScene(scene);
 	scene->showCollisionVolumes(true,false);
