@@ -28,6 +28,7 @@
 #include <toadlet/egg/io/ZIPArchive.h>
 #include <zzip/zzip.h>
 #include <zzip/plugin.h>
+#include <stdio.h>
 
 #if defined(TOADLET_PLATFORM_WIN32) && defined(TOADLET_ZZIPLIB_NAME)
 	#pragma comment(lib,TOADLET_ZZIPLIB_NAME)
@@ -35,41 +36,42 @@
 
 #if defined(TOADLET_PLATFORM_WIN32) && defined(TOADLET_ZLIB_NAME)
 	#pragma comment(lib,TOADLET_ZLIB_NAME)
-#endif
+ #endif
 
 namespace toadlet{
 namespace egg{
 namespace io{
 
-Collection<Stream::ptr> ZIPArchive::mGlobalStreams;
-Mutex ZIPArchive::mGlobalMutex;
+Collection<Stream::ptr> ZIPArchive::streams;
+Mutex ZIPArchive::mutex;
 
 int toadlet_zzip_openStream(Stream::ptr stream){
 	int id=-1;
 	ZIPArchive::mutex.lock();
 		ZIPArchive::streams.add(stream);
-		id=ZIPArchive::streams.size()-1;
+		id=ZIPArchive::streams.size();
 	ZIPArchive::mutex.unlock();
 	return id;
 }
 
 void toadlet_zzip_closeStream(int id){
 	ZIPArchive::mutex.lock();
-		ZIPArchive::streams.removeAt(id);
+		ZIPArchive::streams[id-1]->close();
+		ZIPArchive::streams.removeAt(id-1);
 	ZIPArchive::mutex.unlock();
 }
 
 Stream::ptr toadlet_zzip_findStream(int id){
 	Stream::ptr stream;
 	ZIPArchive::mutex.lock();
-		stream=ZIPArchive::streams[id];
+		stream=ZIPArchive::streams[id-1];
 	ZIPArchive::mutex.unlock();
 	return stream;
 }
 
 // Stream id is the name in text.  Wish I could find a better way of doing this...
 int toadlet_zzip_open(zzip_char_t* name,int flags,...){
-	return atoi(name);
+	return String(name).toInt32();
 }
 
 int toadlet_zzip_close(int fd){
@@ -104,7 +106,7 @@ zzip_off_t toadlet_zzip_seeks(int fd,zzip_off_t offset,int whence){
 zzip_off_t toadlet_zzip_filesize(int fd){
 	Stream::ptr stream=toadlet_zzip_findStream(fd);
 
-	return stream->position();
+	return stream->length();
 }
 
 zzip_ssize_t toadlet_zzip_write(int fd,_zzip_const void* buf,zzip_size_t len){
@@ -112,6 +114,58 @@ zzip_ssize_t toadlet_zzip_write(int fd,_zzip_const void* buf,zzip_size_t len){
 
 	return stream->write((byte*)buf,len);
 }
+
+class ZIPStream:public Stream{
+public:
+	TOADLET_SHARED_POINTERS(ZIPStream);
+
+	ZIPStream(ZZIP_DIR *dir,const String &name){
+		mFile=zzip_file_open(dir,name,O_WRONLY);
+	}
+
+	virtual ~ZIPStream(){
+		close();
+	}
+
+	bool isOpen(){return mFile!=NULL;}
+	void close(){
+		if(mFile!=NULL){
+			zzip_file_close(mFile);
+			mFile=NULL;
+		}
+	}
+
+	bool isReadable(){return true;}
+	int read(byte *buffer,int length){
+		return zzip_file_read(mFile,buffer,length);
+	}
+
+	bool isWriteable(){return false;}
+	int write(const byte *buffer,int length){return 0;}
+
+	bool reset(){
+		return zzip_rewind(mFile)!=0;
+	}
+
+	virtual int length(){
+		int current=zzip_tell(mFile);
+		zzip_seek(mFile,0,SEEK_END);
+		int length=zzip_tell(mFile);
+		zzip_seek(mFile,current,SEEK_SET);
+		return length;
+	}
+
+	virtual int position(){
+		return zzip_tell(mFile);
+	}
+
+	virtual bool seek(int offs){
+		return zzip_seek(mFile,offs,SEEK_SET)!=0;
+	}
+
+protected:
+	ZZIP_FILE *mFile;
+};
 
 ZIPArchive::ZIPArchive(){
 	mIO=new zzip_plugin_io_handlers();
@@ -127,23 +181,26 @@ ZIPArchive::ZIPArchive(){
 }
 
 ZIPArchive::~ZIPArchive(){
-	delete (zzip_plugin_io_handlers*)mIO;
-
 	destroy();
+
+	delete (zzip_plugin_io_handlers*)mIO;
 }
 
 void ZIPArchive::destroy(){
+	if(mDir!=NULL){
+		zzip_dir_close((ZZIP_DIR*)mDir);
+		mDir=NULL;
+	}
+
 	if(mStream!=NULL){
 		mStream->close();
 		mStream=NULL;
 	}
-
-	if(mDir!=NULL){
-		zzip_closedir((ZZIP_DIR*)mDir);
-	}
 }
 
 bool ZIPArchive::open(Stream::ptr stream){
+	destroy();
+
 	mStream=stream;
 
 	int id=toadlet_zzip_openStream(stream);
@@ -154,7 +211,18 @@ bool ZIPArchive::open(Stream::ptr stream){
 }
 
 Stream::ptr ZIPArchive::openStream(const String &name){
-	return NULL;
+	if(mDir==NULL){
+		Error::unknown("ZIPArchive is not open");
+		return NULL;
+	}
+
+	ZIPStream::ptr stream(new ZIPStream((ZZIP_DIR*)mDir,name));
+	if(stream->isOpen()){
+		return stream;
+	}
+	else{
+		return NULL;
+	}
 }
 
 }

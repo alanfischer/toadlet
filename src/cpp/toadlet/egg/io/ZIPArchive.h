@@ -50,13 +50,13 @@ public:
 	Stream::ptr openStream(const String &name);
 	Resource::ptr openResource(const String &name){return NULL;}
 
+	static egg::Collection<Stream::ptr> streams;
+	static egg::Mutex mutex;
+
 protected:
 	void *mIO;
 	void *mDir;
 	Stream::ptr mStream;
-
-	static egg::Collection<Stream::ptr> mGlobalStreams;
-	static egg::Mutex mGlobalMutex;
 };
 
 }
