@@ -47,6 +47,7 @@
 #cmakedefine TOADLET_HAS_PNG
 #cmakedefine TOADLET_HAS_FREETYPE
 #cmakedefine TOADLET_HAS_MXML
+#cmakedefine TOADLET_HAS_ZZIP
 #cmakedefine TOADLET_HAS_DIRECT3D9
 #cmakedefine TOADLET_HAS_DIRECT3DMOBILE
 #cmakedefine TOADLET_HAS_DIRECT3D10

@@ -128,6 +128,15 @@ Resource::ptr WADArchive::openResource(const String &name){
 	return NULL;
 }
 
+Collection<String>::ptr WADArchive::getEntries(){
+	Collection<String>::ptr entries(new Collection<String>());
+	int i;
+	for(i=0;i<header.numlumps;i++){
+		entries->add(lumpinfos[i].name);
+	}
+	return entries;
+}
+
 }
 }
 }

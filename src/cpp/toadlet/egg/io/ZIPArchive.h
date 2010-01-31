@@ -50,8 +50,7 @@ public:
 	Stream::ptr openStream(const String &name);
 	Resource::ptr openResource(const String &name){return NULL;}
 
-	static egg::Collection<Stream::ptr> streams;
-	static egg::Mutex mutex;
+	Collection<String>::ptr getEntries();
 
 protected:
 	void *mIO;

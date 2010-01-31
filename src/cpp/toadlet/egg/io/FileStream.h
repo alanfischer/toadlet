@@ -28,7 +28,6 @@
 
 #include <toadlet/egg/io/Stream.h>
 #include <toadlet/egg/String.h>
-
 #include <stdio.h>
 
 namespace toadlet{
@@ -40,6 +39,7 @@ public:
 	TOADLET_SHARED_POINTERS(FileStream);
 
 	enum OpenFlags{
+		OpenFlags_UNKNOWN=	0,
 		OpenFlags_READ=		1<<0,
 		OpenFlags_WRITE=	1<<1,
 		OpenFlags_CREATE=	1<<2,
@@ -52,10 +52,10 @@ public:
 	virtual bool isOpen() const;
 	virtual void close();
 
-	virtual bool isReadable(){return true;}
+	virtual bool isReadable(){return (mOpenFlags&OpenFlags_READ)>0;}
 	virtual int read(byte *buffer,int length);
 
-	virtual bool isWriteable(){return true;}
+	virtual bool isWriteable(){return (mOpenFlags&OpenFlags_WRITE)>0;}
 	virtual int write(const byte *buffer,int length);
 
 	virtual bool reset();
@@ -67,6 +67,7 @@ public:
 	FILE *getFILE(){return mFile;}
 
 protected:
+	int mOpenFlags;
 	FILE *mFile;
 	bool mAutoClose;
 };

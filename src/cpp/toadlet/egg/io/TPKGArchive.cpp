@@ -132,6 +132,14 @@ Stream::ptr TPKGArchive::openStream(const String &name){
 	}
 }
 
+Collection<String>::ptr TPKGArchive::getEntries(){
+	Collection<String>::ptr entries(new Collection<String>());
+	for(Map<String,Index>::iterator it=mIndex.begin();it!=mIndex.end();++it){
+		entries->add(it->first);
+	}
+	return entries;
+}
+
 }
 }
 }

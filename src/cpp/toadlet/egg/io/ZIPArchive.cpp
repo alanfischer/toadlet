@@ -26,6 +26,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/io/ZIPArchive.h>
+#include <toadlet/egg/io/ZIPStream.h>
 #include <zzip/zzip.h>
 #include <zzip/plugin.h>
 #include <stdio.h>
@@ -36,36 +37,36 @@
 
 #if defined(TOADLET_PLATFORM_WIN32) && defined(TOADLET_ZLIB_NAME)
 	#pragma comment(lib,TOADLET_ZLIB_NAME)
- #endif
+#endif
 
 namespace toadlet{
 namespace egg{
 namespace io{
 
-Collection<Stream::ptr> ZIPArchive::streams;
-Mutex ZIPArchive::mutex;
+Collection<Stream::ptr> ZIPArchive_streams;
+Mutex ZIPArchive_mutex;
 
 int toadlet_zzip_openStream(Stream::ptr stream){
 	int id=-1;
-	ZIPArchive::mutex.lock();
-		ZIPArchive::streams.add(stream);
-		id=ZIPArchive::streams.size();
-	ZIPArchive::mutex.unlock();
+	ZIPArchive_mutex.lock();
+		ZIPArchive_streams.add(stream);
+		id=ZIPArchive_streams.size();
+	ZIPArchive_mutex.unlock();
 	return id;
 }
 
 void toadlet_zzip_closeStream(int id){
-	ZIPArchive::mutex.lock();
-		ZIPArchive::streams[id-1]->close();
-		ZIPArchive::streams.removeAt(id-1);
-	ZIPArchive::mutex.unlock();
+	ZIPArchive_mutex.lock();
+		ZIPArchive_streams[id-1]->close();
+		ZIPArchive_streams.removeAt(id-1);
+	ZIPArchive_mutex.unlock();
 }
 
 Stream::ptr toadlet_zzip_findStream(int id){
 	Stream::ptr stream;
-	ZIPArchive::mutex.lock();
-		stream=ZIPArchive::streams[id-1];
-	ZIPArchive::mutex.unlock();
+	ZIPArchive_mutex.lock();
+		stream=ZIPArchive_streams[id-1];
+	ZIPArchive_mutex.unlock();
 	return stream;
 }
 
@@ -115,59 +116,11 @@ zzip_ssize_t toadlet_zzip_write(int fd,_zzip_const void* buf,zzip_size_t len){
 	return stream->write((byte*)buf,len);
 }
 
-class ZIPStream:public Stream{
-public:
-	TOADLET_SHARED_POINTERS(ZIPStream);
-
-	ZIPStream(ZZIP_DIR *dir,const String &name){
-		mFile=zzip_file_open(dir,name,O_WRONLY);
-	}
-
-	virtual ~ZIPStream(){
-		close();
-	}
-
-	bool isOpen(){return mFile!=NULL;}
-	void close(){
-		if(mFile!=NULL){
-			zzip_file_close(mFile);
-			mFile=NULL;
-		}
-	}
-
-	bool isReadable(){return true;}
-	int read(byte *buffer,int length){
-		return zzip_file_read(mFile,buffer,length);
-	}
-
-	bool isWriteable(){return false;}
-	int write(const byte *buffer,int length){return 0;}
-
-	bool reset(){
-		return zzip_rewind(mFile)!=0;
-	}
-
-	virtual int length(){
-		int current=zzip_tell(mFile);
-		zzip_seek(mFile,0,SEEK_END);
-		int length=zzip_tell(mFile);
-		zzip_seek(mFile,current,SEEK_SET);
-		return length;
-	}
-
-	virtual int position(){
-		return zzip_tell(mFile);
-	}
-
-	virtual bool seek(int offs){
-		return zzip_seek(mFile,offs,SEEK_SET)!=0;
-	}
-
-protected:
-	ZZIP_FILE *mFile;
-};
-
-ZIPArchive::ZIPArchive(){
+ZIPArchive::ZIPArchive():
+	mIO(NULL),
+	mDir(NULL)
+	//mStream
+{
 	mIO=new zzip_plugin_io_handlers();
 
 	zzip_plugin_io_handlers *io=(zzip_plugin_io_handlers*)mIO;
@@ -207,7 +160,7 @@ bool ZIPArchive::open(Stream::ptr stream){
 	String idString=String("")+id;
 	mDir=(void*)zzip_dir_open_ext_io(idString.c_str(),NULL,NULL,(zzip_plugin_io_handlers*)mIO);
 
-	return true;
+	return mDir!=NULL;
 }
 
 Stream::ptr ZIPArchive::openStream(const String &name){
@@ -223,6 +176,16 @@ Stream::ptr ZIPArchive::openStream(const String &name){
 	else{
 		return NULL;
 	}
+}
+
+Collection<String>::ptr ZIPArchive::getEntries(){
+	Collection<String>::ptr entries(new Collection<String>());
+	ZZIP_DIRENT *dir=NULL;
+	while((dir=zzip_readdir((ZZIP_DIR*)mDir))!=NULL){
+		entries->add(dir->d_name);
+	}
+	zzip_rewinddir((ZZIP_DIR*)mDir);
+	return entries;
 }
 
 }
