@@ -51,7 +51,9 @@ public:
 
 	egg::io::Stream::ptr openStream(const egg::String &name){return NULL;}
 	egg::Resource::ptr openResource(const egg::String &name);
-	
+
+	egg::Collection<egg::String>::ptr getEntries();
+
 protected:
 	struct wheader{
 		char identification[4]; // should be WAD2 or 2DAW

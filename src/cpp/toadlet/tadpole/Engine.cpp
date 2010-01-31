@@ -60,6 +60,10 @@
 	#include <toadlet/tadpole/handler/FreeTypeHandler.h>
 #endif
 
+#if defined(TOADLET_HAS_ZZIP)
+	#include <toadlet/tadpole/handler/ZIPHandler.h>
+#endif
+
 #if defined(TOADLET_HAS_MXML)
 	#include <toadlet/tadpole/handler/XANMHandler.h>
 	#include <toadlet/tadpole/handler/XMATHandler.h>
@@ -114,8 +118,11 @@ Engine::Engine():
 
 	// Archive handlers
 	mArchiveManager->setHandler(TPKGHandler::ptr(new TPKGHandler()),"tpkg");
-
 	mArchiveManager->setHandler(WADHandler::ptr(new WADHandler(mTextureManager)),"wad");
+	#if defined(TOADLET_HAS_ZZIP)
+		ZIPHandler::ptr zipHandler(new ZIPHandler());
+		mArchiveManager->setHandler(zipHandler,"zip");
+	#endif
 
 	// Texture handlers
 	#if defined(TOADLET_PLATFORM_WIN32)
@@ -136,7 +143,6 @@ Engine::Engine():
 			mTextureManager->setHandler(PNGHandler::ptr(new PNGHandler(mTextureManager)),"png");
 		#endif
 	#endif
-
 	mTextureManager->setHandler(SPRHandler::ptr(new SPRHandler(mTextureManager)),"spr");
 
 	// Font handlers

@@ -23,29 +23,32 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_IO_ARCHIVE_H
-#define TOADLET_EGG_IO_ARCHIVE_H
+#ifndef TOADLET_TADPOLE_HANDLER_ZIPHANDLER_H
+#define TOADLET_TADPOLE_HANDLER_ZIPHANDLER_H
 
-#include <toadlet/egg/Resource.h>
-#include <toadlet/egg/Collection.h>
-#include <toadlet/egg/io/Stream.h>
+#include <toadlet/egg/io/ZIPArchive.h>
+#include <toadlet/tadpole/ResourceHandler.h>
 
 namespace toadlet{
-namespace egg{
-namespace io{
+namespace tadpole{
+namespace handler{
 
-class Archive:public Resource{
+class TOADLET_API ZIPHandler:public ResourceHandler{
 public:
-	TOADLET_SHARED_POINTERS(Archive);
+	TOADLET_SHARED_POINTERS(ZIPHandler);
 
-	virtual bool isResourceArchive() const=0;
+	ZIPHandler(){}
 
-	virtual bool open(Stream::ptr stream)=0;
-
-	virtual Stream::ptr openStream(const String &name)=0;
-	virtual Resource::ptr openResource(const String &name)=0;
-
-	virtual Collection<String>::ptr getEntries()=0;
+	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData){
+		egg::io::ZIPArchive::ptr archive(new egg::io::ZIPArchive());
+		bool result=archive->open(stream);
+		if(result){
+			return egg::shared_static_cast<egg::io::Archive>(archive);
+		}
+		else{
+			return NULL;
+		}
+	}
 };
 
 }

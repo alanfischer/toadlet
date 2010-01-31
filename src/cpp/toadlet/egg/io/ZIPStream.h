@@ -23,29 +23,53 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_IO_ARCHIVE_H
-#define TOADLET_EGG_IO_ARCHIVE_H
+#ifndef TOADLET_EGG_IO_ZIPSTREAM_H
+#define TOADLET_EGG_IO_ZIPSTREAM_H
 
-#include <toadlet/egg/Resource.h>
-#include <toadlet/egg/Collection.h>
 #include <toadlet/egg/io/Stream.h>
 
 namespace toadlet{
 namespace egg{
 namespace io{
 
-class Archive:public Resource{
+// TODO: Ideally the zlib usage would be replaced with zziplib, but zziplib does not support writing
+class TOADLET_API ZIPStream:public Stream{
 public:
-	TOADLET_SHARED_POINTERS(Archive);
+	TOADLET_SHARED_POINTERS(ZIPStream);
 
-	virtual bool isResourceArchive() const=0;
+	enum OpenFlags{
+		OpenFlags_UNKNOWN=	0,
+		OpenFlags_READ=		1<<0,
+		OpenFlags_WRITE=	1<<1,
+	};
 
-	virtual bool open(Stream::ptr stream)=0;
+	// Constructor to open a stream that compresses or decompresses data to a parent stream
+	ZIPStream(Stream::ptr stream,int openFlags=0);
 
-	virtual Stream::ptr openStream(const String &name)=0;
-	virtual Resource::ptr openResource(const String &name)=0;
+	// Constructor to open a ZZIP_FILE in a ZZIP_DIR
+	ZIPStream(void *dir,const String &name);
 
-	virtual Collection<String>::ptr getEntries()=0;
+	virtual ~ZIPStream();
+
+	bool isOpen();
+	void close();
+
+	bool isReadable(){return mStream!=NULL?mStream->isReadable():true;}
+	int read(byte *buffer,int length);
+
+	bool isWriteable(){return mStream!=NULL?mStream->isWriteable():false;}
+	int write(const byte *buffer,int length);
+
+	bool reset();
+	int length();
+	int position();
+	bool seek(int offs);
+
+protected:
+	int mOpenFlags;
+	Stream::ptr mStream;
+	void *mZStream;
+	void *mFile;
 };
 
 }
@@ -53,4 +77,3 @@ public:
 }
 
 #endif
-

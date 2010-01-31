@@ -54,6 +54,8 @@ public:
 	egg::io::Stream::ptr openStream(const egg::String &name);
 	egg::Resource::ptr openResource(const egg::String &name){return NULL;}
 
+	egg::Collection<egg::String>::ptr getEntries(){return NULL;}
+
 protected:
 	egg::String mDirectory;
 };

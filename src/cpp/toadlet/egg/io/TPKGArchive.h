@@ -54,6 +54,8 @@ public:
 	Stream::ptr openStream(const String &name);
 	Resource::ptr openResource(const String &name){return NULL;}
 
+	Collection<String>::ptr getEntries();
+
 protected:
 	class Index{
 	public:

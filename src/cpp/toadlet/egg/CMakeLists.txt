@@ -44,6 +44,7 @@ set (EGG_IO_SRC
 )
 set (EGG_IO_ZZIP_SRC
 	io/ZIPArchive.cpp
+	io/ZIPStream.cpp
 )
 
 set (EGG_MATH_SRC
@@ -163,6 +164,7 @@ set (EGG_IO_HEADERS
 )
 set (EGG_IO_ZZIP_HEADERS
 	io/ZIPArchive.h
+	io/ZIPStream.h
 )
 
 set (EGG_MATH_HEADERS

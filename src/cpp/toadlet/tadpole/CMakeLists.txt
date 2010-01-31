@@ -144,6 +144,7 @@ set (TADPOLE_HANDLER_HEADERS
 	handler/TPKGHandler.h
 	handler/WADArchive.h
 	handler/WADHandler.h
+	handler/ZIPHandler.h
 )
 
 set (TADPOLE_HANDLER_XML_HEADERS

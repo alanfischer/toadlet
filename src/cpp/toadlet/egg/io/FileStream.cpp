@@ -31,6 +31,7 @@ namespace egg{
 namespace io{
 
 FileStream::FileStream(const String &filename,int openFlags):
+	mOpenFlags(0),
 	mFile(NULL),
 	mAutoClose(false)
 {
@@ -42,6 +43,7 @@ FileStream::FileStream(const String &filename,int openFlags):
 	else if((openFlags&OpenFlags_WRITE)>0 && (openFlags&OpenFlags_BINARY)>0) mode="wb";
 	else if((openFlags&OpenFlags_WRITE)>0) mode="w";
 
+	mOpenFlags=openFlags;
 	mFile=fopen(filename,mode);
 	mAutoClose=true;
 }
