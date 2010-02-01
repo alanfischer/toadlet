@@ -1,5 +1,7 @@
 #include "SimpleSync.h"
 #include <stdlib.h>
+#include <string.h>
+#include <toadlet/egg/Error.h>
 #include <toadlet/egg/io/FileStream.h>
 #include <toadlet/egg/io/ZIPArchive.h>
 
