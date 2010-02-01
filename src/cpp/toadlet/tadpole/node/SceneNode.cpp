@@ -257,10 +257,10 @@ void SceneNode::logicUpdate(Node::ptr node,int dt){
 		}
 	}
 	if(awake==false && node->mAwakeCount>0){
-		node->mAwakeCount--;
-		if(node->mAwakeCount==0){
-			node->asleep();
-		}
+//		node->mAwakeCount--;
+//		if(node->mAwakeCount==0){
+//			node->asleep();
+//		}
 	}
 }
 

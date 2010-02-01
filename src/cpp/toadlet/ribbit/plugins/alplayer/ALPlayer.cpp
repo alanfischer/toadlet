@@ -70,8 +70,6 @@ TOADLET_C_API AudioPlayer* new_ALPlayer(){
 	}
 #endif
 
-proc_alBufferDataStatic toadlet_alBufferDataStatic=NULL;
-
 ALPlayer::ALPlayer():
 	mDevice(NULL),
 	mContext(NULL),
@@ -81,11 +79,13 @@ ALPlayer::ALPlayer():
 	mDefaultRolloffFactor(0),
 	mBufferFadeInTime(0),
 
-	mStopThread(false)
+	mStopThread(false),
 	//mThread,
 	//mMutex,
 
-	//mCapabilitySet
+	//mCapabilitySet,
+
+	alBufferDataStatic(NULL)
 {}
 
 ALPlayer::~ALPlayer(){
@@ -134,8 +134,8 @@ bool ALPlayer::create(int *options){
 		return false;
 	}
 
-	toadlet_alBufferDataStatic=(proc_alBufferDataStatic)alcGetProcAddress(mDevice,(ALCchar*)"alBufferDataStatic");
-	if(toadlet_alBufferDataStatic!=NULL){
+	alBufferDataStatic=(proc_alBufferDataStatic)alcGetProcAddress(mDevice,(ALCchar*)"alBufferDataStatic");
+	if(alBufferDataStatic!=NULL){
 		Logger::alert(Categories::TOADLET_RIBBIT,
 			"using alBufferDataStatic extension");
 	}
