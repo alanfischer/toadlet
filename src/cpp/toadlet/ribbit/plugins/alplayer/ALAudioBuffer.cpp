@@ -91,9 +91,9 @@ bool ALAudioBuffer::create(Stream::ptr stream,const String &mimeType){
 	}
 
 	alGenBuffers(1,&mHandle);
-	if(toadlet_alBufferDataStatic!=NULL){
+	if(mAudioPlayer->alBufferDataStatic!=NULL){
 		mStaticData=buffer;
-		toadlet_alBufferDataStatic(mHandle,format,mStaticData,length,sps);
+		mAudioPlayer->alBufferDataStatic(mHandle,format,mStaticData,length,sps);
 	}
 	else{
 		alBufferData(mHandle,format,buffer,length,sps);

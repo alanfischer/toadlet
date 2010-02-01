@@ -24,7 +24,9 @@ using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::mesh;
 using namespace toadlet::pad;
 
-class SimpleSync:public Application,public EventFactory,public Runnable{
+class SimpleSync:public Application,public EventFactory,public Runnable,public UpdateListener,
+public ConnectorListener
+{
 public:
 	TOADLET_SHARED_POINTERS(SimpleSync);
 
@@ -38,6 +40,12 @@ public:
 	void resized(int width,int height);
 	void render(Renderer *renderer);
 	void update(int dt);
+	void preLogicUpdate(int dt);
+	void logicUpdate(int dt);
+	void postLogicUpdate(int dt);
+	void preRenderUpdate(int dt){scene->preRenderUpdate(dt);}
+	void renderUpdate(int dt){scene->renderUpdate(dt);}
+	void postRenderUpdate(int dt){scene->postRenderUpdate(dt);}
 	void keyPressed(int key);
 	void keyReleased(int key);
 	void mousePressed(int x,int y,int button);
@@ -48,11 +56,21 @@ public:
 
 	void run();
 
+void connected(Connection::ptr connection);
+void disconnected(Connection::ptr connection);
+
 	SimpleServer::ptr server;
 	SimpleClient::ptr client;
 
+	HopScene::ptr scene;
+	int nextUpdateTime;
+	int debugUpdateMin,debugUpdateMax;
+	Mutex mutex;
+
+	Random random;
 	CameraNode::ptr cameraNode;
 	MeshNode::ptr meshNode;
+	HopEntity::ptr block;
 };
 
 #endif

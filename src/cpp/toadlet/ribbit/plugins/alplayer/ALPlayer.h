@@ -47,7 +47,6 @@ class ALAudio;
 #endif
 
 typedef void (*proc_alBufferDataStatic)(ALuint buffer,ALenum format,ALvoid *data,ALsizei size,ALsizei freq);
-extern proc_alBufferDataStatic toadlet_alBufferDataStatic;
 
 class TOADLET_API ALPlayer:public AudioPlayer,public egg::Runnable{
 public:
@@ -119,6 +118,10 @@ protected:
 	#if defined(TOADLET_PLATFORM_OSX)
 		egg::Collection<CoreAudio*> mCoreAudios;
 	#endif
+
+	proc_alBufferDataStatic alBufferDataStatic;
+
+	friend class ALAudioBuffer;
 };
 
 }
