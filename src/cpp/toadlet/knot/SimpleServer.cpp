@@ -130,6 +130,16 @@ Event::ptr SimpleServer::receive(){
 	return event;	
 }
 
+EventConnection::ptr SimpleServer::getClient(int i){
+	EventConnection::ptr connection;
+	mClientsMutex.lock();
+		if(i>=0 && i<mClients.size()){
+			connection=mClients[i];
+		}
+	mClientsMutex.unlock();
+	return connection;
+}
+
 bool SimpleServer::eventReceived(ServerClient *client,Event::ptr event){
 	if(event->getType()==Event::Type_ROUTED){
 		RoutedEvent *routedEvent=(RoutedEvent*)event.get();

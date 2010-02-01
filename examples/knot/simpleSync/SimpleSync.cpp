@@ -3,12 +3,57 @@
 #include <toadlet/egg/io/FileStream.h>
 #include <toadlet/egg/io/ZIPArchive.h>
 
+class SyncEvent:public Event{
+public:
+	TOADLET_SHARED_POINTERS(SyncEvent);
+
+	enum{
+		EventType_SYNC=101
+	};
+
+	SyncEvent():Event(EventType_SYNC),
+		localTime(0),
+		remoteTime(0)
+	{}
+	SyncEvent(int localTime):Event(EventType_SYNC),
+		localTime(0),
+		remoteTime(0)
+	{
+		this->localTime=localTime;
+	}
+
+	int getLocalTime(){return localTime;}
+	void setLocalTime(int localTime){this->localTime=localTime;}
+	int getRemoteTime(){return remoteTime;}
+	void setRemoteTime(int remoteTime){this->remoteTime=remoteTime;}
+
+	int read(DataStream *stream){
+		int amount=0;
+		amount+=stream->readBigInt32(localTime);
+		amount+=stream->readBigInt32(remoteTime);
+		return amount;
+	}
+
+	int write(DataStream *stream){
+		int amount=0;
+		amount+=stream->writeBigInt32(localTime);
+		amount+=stream->writeBigInt32(remoteTime);
+		return amount;
+	}
+
+	String toString(){return String("localTime:")+localTime+",remoteTime:"+remoteTime;}
+
+protected:
+	int localTime;
+	int remoteTime;
+};
+
 class UpdateEvent:public Event{
 public:
 	TOADLET_SHARED_POINTERS(UpdateEvent);
 
 	enum{
-		EventType_UPDATE=101
+		EventType_UPDATE=102
 	};
 
 	UpdateEvent():Event(EventType_UPDATE){}
@@ -63,7 +108,13 @@ SimpleSync::~SimpleSync(){
 }
 
 void SimpleSync::accept(int localPort){
-	server=SimpleServer::ptr(new SimpleServer(this,TCPConnector::ptr(new TCPConnector(localPort))));
+	TCPConnector::ptr connector(new TCPConnector());
+	if(connector->accept(localPort)==false){
+		Error::unknown("error accepting server connections");
+		return;
+	}
+
+	server=SimpleServer::ptr(new SimpleServer(this,connector));
 	//debugUpdateMin=100;
 	//debugUpdateMax=100;
 }
@@ -74,7 +125,13 @@ void SimpleSync::disconnected(Connection::ptr connection){
 }
 
 void SimpleSync::connect(int remoteHost,int remotePort){
-	client=SimpleClient::ptr(new SimpleClient(this,TCPConnector::ptr(new TCPConnector(remoteHost,remotePort))));
+	TCPConnector::ptr connector(new TCPConnector());
+	if(connector->connect(remoteHost,remotePort)==false){
+		Error::unknown("error connecting to server");
+		return;
+	}
+
+	client=SimpleClient::ptr(new SimpleClient(this,connector));
 	//shared_static_cast<TCPConnection>(client->getConnection())->debugSetPacketDelayTime(100,500);
 }
 
@@ -87,10 +144,10 @@ void SimpleSync::create(){
 	getEngine()->setScene(scene);
 	scene->setUpdateListener(this);
 	scene->setGravity(Vector3(0,0,-10));
-	scene->showCollisionVolumes(true,false);
+	//scene->showCollisionVolumes(true,false);
 	scene->getSimulator()->setMicroCollisionThreshold(5);
-	scene->setLogicDT(50);
-	//scene->setLogicDT(0);
+	//scene->setLogicDT(50);
+	scene->setLogicDT(0);
 
 	scene->getRootNode()->attach(getEngine()->createNodeType(LightNode::type()));
 
@@ -141,10 +198,11 @@ void SimpleSync::create(){
 
 	mutex.unlock();
 
-	// Cheap way to initially synchronize
+	// Send initial sync message
 	if(client!=NULL){
-		client->send(Event::ptr(new Event()));
-		scene->setLogicTimeAndFrame(200,0);
+		SyncEvent::ptr syncEvent(new SyncEvent(scene->getLogicTime()));
+		Logger::alert(String("sending inital SyncEvent:")+syncEvent->toString());
+		client->send(syncEvent);
 	}
 }
 
@@ -191,16 +249,29 @@ void SimpleSync::postLogicUpdate(int dt){
 	if(client!=NULL){
 		Event::ptr event=NULL;
 		while((event=client->receive())!=NULL){
-			if(event->getType()==UpdateEvent::EventType_UPDATE){
-				UpdateEvent::ptr update=shared_static_cast<UpdateEvent>(event);
+			if(event->getType()==SyncEvent::EventType_SYNC){
+				SyncEvent::ptr syncEvent=shared_static_cast<SyncEvent>(event);
+
+				// We now know the times for the client & server, and the ping, so we can calculate our 'lead ahead time'
+				int oldClientTime=syncEvent->getRemoteTime();
+				int newClientTime=scene->getLogicTime();
+				int serverTime=syncEvent->getLocalTime();
+				int ping=(newClientTime-oldClientTime);
+				Logger::alert(String("received SyncEvent:")+syncEvent->toString());
+				Logger::alert(String("ping:")+ping);
+
+				scene->setLogicTimeAndFrame(serverTime+ping/2,0);
+			}
+			else if(event->getType()==UpdateEvent::EventType_UPDATE){
+				UpdateEvent::ptr updateEvent=shared_static_cast<UpdateEvent>(event);
 
 				// Update block
-				block->getSolid()->setPosition(update->getPosition());
-				block->getSolid()->setVelocity(update->getVelocity());
+				block->getSolid()->setPosition(updateEvent->getPosition());
+				block->getSolid()->setVelocity(updateEvent->getVelocity());
 
 				// Now simulate block till we're back to where we need to be
-	Logger::alert(String("TIME:")+(scene->getLogicTime()-update->getTime()));
-				int time=update->getTime();
+//Logger::debug(String("TIME:")+(scene->getLogicTime()-updateEvent->getTime()));
+				int time=updateEvent->getTime();
 				int updateDT=0;
 				int minDT=scene->getLogicDT()!=0?scene->getLogicDT():10;
 				do{
@@ -213,8 +284,24 @@ void SimpleSync::postLogicUpdate(int dt){
 	}
 
 	if(server!=NULL){
-		if(server->receive()!=NULL){
-			scene->setLogicTimeAndFrame(0,0);
+		EventConnection::ptr eventConnection=NULL;
+		int i=0;
+		for(eventConnection=server->getClient(0);eventConnection!=NULL;eventConnection=server->getClient(i++)){
+			Event::ptr event;
+			while((event=eventConnection->receive())!=NULL){
+				if(event->getType()==SyncEvent::EventType_SYNC){
+					SyncEvent::ptr syncEvent=shared_static_cast<SyncEvent>(event);
+					Logger::alert(String("received SyncEvent:")+syncEvent->toString());
+
+					// Flip syncEvent to be from the server's view
+					int clientTime=syncEvent->getLocalTime();
+					syncEvent->setLocalTime(scene->getLogicTime());
+					syncEvent->setRemoteTime(clientTime);
+
+					Logger::alert(String("sending SyncEvent:")+syncEvent->toString());
+					eventConnection->send(syncEvent);
+				}
+			}
 		}
 
 		if(nextUpdateTime<=scene->getLogicTime()){
@@ -257,7 +344,10 @@ void SimpleSync::mouseReleased(int x,int y,int button){
 }
 
 Event::ptr SimpleSync::createEventType(int type){
-	if(type==UpdateEvent::EventType_UPDATE){
+	if(type==SyncEvent::EventType_SYNC){
+		return Event::ptr(new SyncEvent());
+	}
+	else if(type==UpdateEvent::EventType_UPDATE){
 		return Event::ptr(new UpdateEvent());
 	}
 	else{

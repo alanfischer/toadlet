@@ -53,6 +53,7 @@ public:
 	virtual bool broadcast(egg::Event::ptr event);
 	virtual bool sendToClient(int toClientID,egg::Event::ptr event);
 	virtual egg::Event::ptr receive();
+	virtual EventConnection::ptr getClient(int i);
 
 protected:
 	class ServerClient:public SimpleEventConnection{
