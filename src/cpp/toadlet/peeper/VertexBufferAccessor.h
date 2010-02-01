@@ -31,9 +31,6 @@
 #include <toadlet/egg/mathfixed/Math.h>
 #include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/peeper/Color.h>
-#if defined(TOADLET_DEBUG)
-	#include <toadlet/egg/Error.h>
-#endif
 
 #if defined(TOADLET_FIXED_POINT)
 	#define TOADLET_TOFIXED(x) x
@@ -320,12 +317,7 @@ public:
 
 protected:
 	inline int offset(int vertex,int element){
-		#if defined(TOADLET_DEBUG)
-			if(vertex<0 || element<0 || (vertex*mVertexSize32 + mElementOffsets32[element])*sizeof(int32)>=(uint32)mVertexBuffer->getDataSize()){
-				egg::Error::unknown(egg::Categories::TOADLET_PEEPER,"vertex out of bounds");
-				return 0;
-			}
-		#endif
+		TOADLET_ASSERT(vertex>0 && element>0 && (vertex*mVertexSize32 + mElementOffsets32[element])*sizeof(int32)<(uint32)mVertexBuffer->getDataSize()); // "vertex out of bounds"
 		return vertex*mVertexSize32 + mElementOffsets32[element];
 	}
 
