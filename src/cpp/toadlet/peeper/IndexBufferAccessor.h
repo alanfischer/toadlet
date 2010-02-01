@@ -27,9 +27,6 @@
 #define TOADLET_PEEPER_INDEXBUFFERACCESSOR_H
 
 #include <toadlet/peeper/IndexBuffer.h>
-#if defined(TOADLET_DEBUG)
-	#include <toadlet/egg/Error.h>
-#endif
 
 namespace toadlet{
 namespace peeper{
@@ -49,10 +46,8 @@ public:
 	inline uint8 *getData(){return mData;}
 
 	inline void set(int i,uint32 x){
-		#if defined(TOADLET_DEBUG)
-			if(i<0 || i>=getSize()){egg::Error::unknown(egg::Categories::TOADLET_PEEPER,"index out of bounds");return;}
-			if(x>=(uint32)(1<<(8*mIndexFormat))){egg::Error::unknown(egg::Categories::TOADLET_PEEPER,"out of datatype range");return;}
-		#endif
+		TOADLET_ASSERT(i>=0 && i<=getSize()); // "index out of bounds"
+		TOADLET_ASSERT(x<(uint32)(1<<(8*mIndexFormat))); // "out of datatype range"
 		if(mIndexFormat==IndexBuffer::IndexFormat_UINT_8){
 			((uint8*)mData)[i]=x;
 		}
@@ -65,9 +60,7 @@ public:
 	}
 
 	inline uint32 get(int i){
-		#if defined(TOADLET_DEBUG)
-			if(i<0 || i>=getSize()){egg::Error::unknown(egg::Categories::TOADLET_PEEPER,"index out of bounds");return 0;}
-		#endif
+		TOADLET_ASSERT(i>=0 && i<=getSize()); // "index out of bounds"
 		if(mIndexFormat==IndexBuffer::IndexFormat_UINT_8){
 			return ((uint8*)mData)[i];
 		}

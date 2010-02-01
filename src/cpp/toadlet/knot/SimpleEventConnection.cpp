@@ -168,7 +168,10 @@ int SimpleEventConnection::sendEvent(Event::ptr event){
 	}
 	rootEvent->write(mDataPacketOut);
 
-	int amount=mConnection->send(mPacketOut->getOriginalDataPointer(),mPacketOut->length());
+	int amount=-1;
+	if(mConnection!=NULL){
+		amount=mConnection->send(mPacketOut->getOriginalDataPointer(),mPacketOut->length());
+	}
 
 	mPacketOut->reset();
 
@@ -176,7 +179,10 @@ int SimpleEventConnection::sendEvent(Event::ptr event){
 }
 
 int SimpleEventConnection::receiveEvent(Event::ptr *event){
-	int amount=mConnection->receive(mPacketIn->getOriginalDataPointer(),mPacketIn->length());
+	int amount=-1;
+	if(mConnection!=NULL){
+		amount=mConnection->receive(mPacketIn->getOriginalDataPointer(),mPacketIn->length());
+	}
 	if(amount>0){
 		RoutedEvent::ptr routedEvent=NULL;
 		int eventType=mDataPacketIn->readBigInt16();
