@@ -35,7 +35,7 @@ class TOADLET_API SimpleClient:public SimpleEventConnection{
 public:
 	TOADLET_SHARED_POINTERS(SimpleClient);
 
-	SimpleClient(egg::EventFactory *eventFactory,Connector::ptr connector=NULL);
+	SimpleClient(egg::EventFactory *eventFactory,Connector::ptr connector);
 	virtual ~SimpleClient();
 
 	virtual void close();

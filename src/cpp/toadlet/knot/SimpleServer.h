@@ -38,7 +38,7 @@ class TOADLET_API SimpleServer:public ConnectorListener{
 public:
 	TOADLET_SHARED_POINTERS(SimpleServer);
 
-	SimpleServer(egg::EventFactory *eventFactory,Connector::ptr connector=NULL);
+	SimpleServer(egg::EventFactory *eventFactory,Connector::ptr connector=Connector::ptr());
 	virtual ~SimpleServer();
 
 	virtual void setEventFactory(egg::EventFactory *eventFactory);
