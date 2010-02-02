@@ -41,6 +41,7 @@ public:
 	SimpleServer(egg::EventFactory *eventFactory,Connector::ptr connector=Connector::ptr());
 	virtual ~SimpleServer();
 
+	virtual void close();
 	virtual void setEventFactory(egg::EventFactory *eventFactory);
 	virtual egg::EventFactory *getEventFactory(){return mEventFactory;}
 

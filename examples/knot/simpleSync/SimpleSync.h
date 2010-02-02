@@ -37,6 +37,7 @@ public:
 	void connect(int remoteHost,int remortPort);
 
 	void create();
+	void destroy();
 	void resized(int width,int height);
 	void render(Renderer *renderer);
 	void update(int dt);

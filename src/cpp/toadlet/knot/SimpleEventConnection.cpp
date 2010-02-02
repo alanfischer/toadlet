@@ -68,6 +68,11 @@ SimpleEventConnection::~SimpleEventConnection(){
 }
 
 void SimpleEventConnection::close(){
+	if(mConnection!=NULL){
+		mConnection->close();
+		mConnection=NULL;
+	}
+
 	mRun=false;
 	if(mThread!=NULL){
 		mThread->join();

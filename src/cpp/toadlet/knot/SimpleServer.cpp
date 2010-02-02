@@ -64,6 +64,17 @@ SimpleServer::~SimpleServer(){
 	setConnector(NULL);
 }
 
+void SimpleServer::close(){
+	egg::Collection<ServerClient::ptr> serverClients;
+	mClientsMutex.lock();
+		serverClients.addAll(mClients);
+	mClientsMutex.unlock();
+	int i;
+	for(i=0;i<serverClients.size();++i){
+		serverClients[i]->close();
+	}
+}
+
 void SimpleServer::setEventFactory(EventFactory *eventFactory){
 	mEventFactory=eventFactory;
 

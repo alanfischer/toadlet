@@ -297,6 +297,7 @@ int TCPConnection::receive(byte *data,int length){
 
 	mMutex->lock();
 		if(mSocket==NULL){
+			mMutex->unlock();
 			return -1;
 		}
 
@@ -390,6 +391,10 @@ int TCPConnection::receive(byte *data,int length){
 	}
 
 	mReceiving=false;
+
+	if(amount<0){
+		close();
+	}
 
 	return amount;
 }

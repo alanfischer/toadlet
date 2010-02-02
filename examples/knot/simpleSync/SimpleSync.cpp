@@ -122,6 +122,7 @@ void SimpleSync::accept(int localPort){
 
 void SimpleSync::connected(Connection::ptr connection){
 }
+
 void SimpleSync::disconnected(Connection::ptr connection){
 }
 
@@ -205,6 +206,18 @@ void SimpleSync::create(){
 		Logger::alert(String("sending inital SyncEvent:")+syncEvent->toString());
 		client->send(syncEvent);
 	}
+}
+
+void SimpleSync::destroy(){
+	if(client!=NULL){
+		client->close();
+	}
+
+	if(server!=NULL){
+		server->close();
+	}
+
+	Application::destroy();
 }
 
 void SimpleSync::resized(int width,int height){
