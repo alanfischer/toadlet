@@ -65,6 +65,10 @@ SimpleServer::~SimpleServer(){
 }
 
 void SimpleServer::close(){
+	if(mConnector!=NULL){
+		mConnector->close();
+	}
+
 	egg::Collection<ServerClient::ptr> serverClients;
 	mClientsMutex.lock();
 		serverClients.addAll(mClients);
@@ -87,13 +91,13 @@ void SimpleServer::setEventFactory(EventFactory *eventFactory){
 
 void SimpleServer::setConnector(Connector::ptr connector){
 	if(mConnector!=NULL){
-		mConnector->removeConnectorListener(this,true);
+		mConnector->removeConnectionListener(this,true);
 	}
 
 	mConnector=connector;
 
 	if(mConnector!=NULL){
-		mConnector->addConnectorListener(this,true);
+		mConnector->addConnectionListener(this,true);
 	}
 }
 
@@ -108,8 +112,10 @@ void SimpleServer::connected(Connection::ptr connection){
 void SimpleServer::disconnected(Connection::ptr connection){
 	mClientsMutex.lock();
 		ServerClient::ptr client=mConnectionClients[connection];
+		client->disconnected(connection);
 		mConnectionClients.erase(connection);
 		mClients.remove(client);
+		mDeadClients.add(client);
 	mClientsMutex.unlock();
 }
 
@@ -149,6 +155,17 @@ EventConnection::ptr SimpleServer::getClient(int i){
 		}
 	mClientsMutex.unlock();
 	return connection;
+}
+
+int SimpleServer::update(){
+	mClientsMutex.lock();
+		int i;
+		for(i=0;i<mDeadClients.size();++i){
+			mDeadClients[i]->close();
+		}
+		mDeadClients.clear();
+	mClientsMutex.unlock();
+	return 0;
 }
 
 bool SimpleServer::eventReceived(ServerClient *client,Event::ptr event){

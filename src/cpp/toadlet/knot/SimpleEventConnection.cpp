@@ -70,14 +70,15 @@ SimpleEventConnection::~SimpleEventConnection(){
 void SimpleEventConnection::close(){
 	if(mConnection!=NULL){
 		mConnection->close();
-		mConnection=NULL;
 	}
 
 	mRun=false;
 	if(mThread!=NULL){
-		mThread->join();
+		Thread::ptr thread=mThread;
 		mThread=NULL;
+		thread->join();
 	}
+	mConnection=NULL;
 }
 
 void SimpleEventConnection::setEventFactory(EventFactory *eventFactory){
@@ -99,6 +100,10 @@ void SimpleEventConnection::setConnection(Connection::ptr connection){
 void SimpleEventConnection::connected(Connection::ptr connection){
 	mConnection=connection;
 
+	// Since we don't join() in disconnected, we join here just in case its still running somehow
+	if(mThread!=NULL){
+		mThread->join();
+	}
 	mThread=Thread::ptr(new Thread(this));
 	mRun=true;
 	mThread->start();
@@ -106,10 +111,7 @@ void SimpleEventConnection::connected(Connection::ptr connection){
 
 void SimpleEventConnection::disconnected(Connection::ptr connection){
 	mRun=false;
-	if(mThread!=NULL){
-		mThread->join();
-		mThread=NULL;
-	}
+	// We don't want to mThread.join() here, since mThread could be the one that is notifying us that we are disconnected
 
 	if(mConnection==connection){
 		mConnection=NULL;
@@ -142,9 +144,6 @@ void SimpleEventConnection::run(){
 		if(amount>0){
 			eventReceived(event);
 		}
-		else if(amount<0){
-			receiveError();
-		}
 		System::msleep(0);
 	}
 }
@@ -153,9 +152,6 @@ void SimpleEventConnection::eventReceived(Event::ptr event){
 	mEventsMutex.lock();
 		mEvents.add(event);
 	mEventsMutex.unlock();
-}
-
-void SimpleEventConnection::receiveError(){
 }
 
 int SimpleEventConnection::sendEvent(Event::ptr event){

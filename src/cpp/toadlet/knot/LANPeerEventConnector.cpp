@@ -29,7 +29,7 @@
 #include <toadlet/knot/LANPeerEventConnector.h>
 #include <toadlet/knot/PeerPacketConnection.h>
 #include <toadlet/knot/TCPConnection.h>
-#include <toadlet/knot/ConnectorListener.h>
+#include <toadlet/knot/ConnectionListener.h>
 #include <string.h> // memset
 
 #if defined(TOADLET_PLATFORM_IPHONE)
@@ -191,12 +191,13 @@ void LANPeerEventConnector::close(){
 	mConnectionMutex.unlock();
 
 	if(mFindLANGameThread!=NULL){
-		mFindLANGameThread->join();
+		Thread::ptr thread=mFindLANGameThread;
 		mFindLANGameThread=NULL;
+		thread->join();
 	}
 }
 
-void LANPeerEventConnector::addConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent){
+void LANPeerEventConnector::addConnectionListener(ConnectionListener *listener,bool notifyAboutCurrent){
 	mListenersMutex.lock();
 		mListeners.add(listener);
 	mListenersMutex.unlock();
@@ -210,7 +211,7 @@ void LANPeerEventConnector::addConnectorListener(ConnectorListener *listener,boo
 	}
 }
 
-void LANPeerEventConnector::removeConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent){
+void LANPeerEventConnector::removeConnectionListener(ConnectionListener *listener,bool notifyAboutCurrent){
 	if(notifyAboutCurrent){
 		mConnectionMutex.lock();
 			if(mConnection!=NULL){
@@ -332,8 +333,9 @@ void LANPeerEventConnector::stopIPServer(){
 	}
 
 	if(mIPServerThread!=NULL){
-		mIPServerThread->join();
+		Thread::ptr thread=mIPServerThread;
 		mIPServerThread=NULL;
+		thread->join();
 		Logger::debug(Categories::TOADLET_KNOT,
 			"IPServer stopped");
 	}
@@ -404,8 +406,9 @@ void LANPeerEventConnector::stopIPClient(){
 	}
 
 	if(mIPClientThread!=NULL){
-		mIPClientThread->join();
+		Thread::ptr thread=mIPClientThread;
 		mIPClientThread=NULL;
+		thread->join();
 		Logger::debug(Categories::TOADLET_KNOT,
 			"IPClient stopped");
 	}

@@ -28,13 +28,14 @@
 
 #include <toadlet/egg/Map.h>
 #include <toadlet/egg/EventFactory.h>
-#include <toadlet/knot/ConnectorListener.h>
+#include <toadlet/knot/Connector.h>
+#include <toadlet/knot/ConnectionListener.h>
 #include <toadlet/knot/SimpleEventConnection.h>
 
 namespace toadlet{
 namespace knot{
 
-class TOADLET_API SimpleServer:public ConnectorListener{
+class TOADLET_API SimpleServer:public ConnectionListener{
 public:
 	TOADLET_SHARED_POINTERS(SimpleServer);
 
@@ -56,6 +57,8 @@ public:
 	virtual egg::Event::ptr receive();
 	virtual EventConnection::ptr getClient(int i);
 
+	virtual int update();
+
 protected:
 	class ServerClient:public SimpleEventConnection{
 	public:
@@ -74,6 +77,7 @@ protected:
 	egg::EventFactory *mEventFactory;
 	Connector::ptr mConnector;
 	egg::Collection<ServerClient::ptr> mClients;
+	egg::Collection<ServerClient::ptr> mDeadClients;
 	egg::Map<Connection::ptr,ServerClient::ptr> mConnectionClients;
 	egg::Mutex mClientsMutex;
 };

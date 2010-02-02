@@ -23,17 +23,17 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_KNOT_CONNECTORLISTENER_H
-#define TOADLET_KNOT_CONNECTORLISTENER_H
+#ifndef TOADLET_KNOT_CONNECTIONLISTENER_H
+#define TOADLET_KNOT_CONNECTIONLISTENER_H
 
-#include <toadlet/knot/Connector.h>
+#include <toadlet/knot/Connection.h>
 
 namespace toadlet{
 namespace knot{
 
-class TOADLET_API ConnectorListener{
+class TOADLET_API ConnectionListener{
 public:
-	virtual ~ConnectorListener(){}
+	virtual ~ConnectionListener(){}
 
 	virtual void connected(Connection::ptr connection)=0;
 	virtual void disconnected(Connection::ptr connection)=0;

@@ -115,16 +115,12 @@ void SimpleSync::accept(int localPort){
 		return;
 	}
 
+	connector->addConnectionListener(this,false);
 	server=SimpleServer::ptr(new SimpleServer(this,connector));
 	//debugUpdateMin=100;
 	//debugUpdateMax=100;
 }
 
-void SimpleSync::connected(Connection::ptr connection){
-}
-
-void SimpleSync::disconnected(Connection::ptr connection){
-}
 
 void SimpleSync::connect(int remoteHost,int remotePort){
 	TCPConnector::ptr connector(new TCPConnector());
@@ -133,6 +129,7 @@ void SimpleSync::connect(int remoteHost,int remotePort){
 		return;
 	}
 
+	connector->addConnectionListener(this,false);
 	client=SimpleClient::ptr(new SimpleClient(this,connector));
 	//shared_static_cast<TCPConnection>(client->getConnection())->debugSetPacketDelayTime(100,500);
 }
@@ -247,6 +244,13 @@ void SimpleSync::update(int dt){
 	mutex.lock();
 
 	scene->update(dt);
+
+	if(client!=NULL){
+		client->update();
+	}
+	if(server!=NULL){
+		server->update();
+	}
 
 	mutex.unlock();
 }
@@ -367,6 +371,13 @@ Event::ptr SimpleSync::createEventType(int type){
 	else{
 		return Event::ptr(new Event());
 	}
+}
+
+void SimpleSync::connected(Connection::ptr connection){
+}
+
+void SimpleSync::disconnected(Connection::ptr connection){
+	stop();
 }
 
 void SimpleSync::run(){

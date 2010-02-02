@@ -31,7 +31,7 @@
 namespace toadlet{
 namespace knot{
 
-class ConnectorListener;
+class ConnectionListener;
 
 class TOADLET_API Connector{
 public:
@@ -42,8 +42,8 @@ public:
 	virtual bool opened()=0;
 	virtual void close()=0;
 
-	virtual void addConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent)=0;
-	virtual void removeConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent)=0;
+	virtual void addConnectionListener(ConnectionListener *listener,bool notifyAboutCurrent)=0;
+	virtual void removeConnectionListener(ConnectionListener *listener,bool notifyAboutCurrent)=0;
 };
 
 }

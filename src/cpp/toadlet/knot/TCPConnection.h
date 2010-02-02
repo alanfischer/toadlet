@@ -35,6 +35,7 @@
 #include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/egg/net/Socket.h>
 #include <toadlet/knot/Connection.h>
+#include <toadlet/knot/ConnectionListener.h>
 
 namespace toadlet{
 namespace knot{
@@ -50,8 +51,7 @@ class TOADLET_API TCPConnection:public Connection,egg::Runnable{
 public:
 	TOADLET_SHARED_POINTERS(TCPConnection);
 
-	TCPConnection(TCPConnector *connector=NULL,bool blocking=true); // An optional Connector to be notified about disconnection
-	TCPConnection(egg::net::Socket::ptr socket,bool blocking=true); // Supply a socket to use, this lets the socket be controlled externally
+	TCPConnection(egg::net::Socket::ptr socket=egg::net::Socket::ptr(),bool blocking=true); // Supply a socket to use, this lets the socket be controlled externally
 	virtual ~TCPConnection();
 
 	bool connect(uint32 remoteHost,int remotePort);
@@ -68,6 +68,10 @@ public:
 	int receive(byte *data,int length);
 
 	egg::net::Socket::ptr getSocket(){return mSocket;}
+
+	// Due to the use of unintrusive smart pointers, we don't actually expose a setConnectionListener(ConnectionListener*) method
+	//  Instead that is left to the Connectors, since they can figure out which smart pointer cooresponds to a raw pointer
+	void setConnectionListener(TCPConnector *listener);
 
 	/// Debug methods
 	void debugSetPacketDelayTime(int minTime,int maxTime);
@@ -98,18 +102,16 @@ protected:
 	int buildConnectionPacket(egg::io::DataStream *stream);
 	bool verifyConnectionPacket(egg::io::DataStream *stream);
 
+	bool mClient;
 	bool mBlocking;
 	egg::net::Socket::ptr mSocket;
 	egg::io::MemoryStream::ptr mOutPacket;
 	egg::io::DataStream::ptr mDataOutPacket;
 	egg::io::MemoryStream::ptr mInPacket;
 	egg::io::DataStream::ptr mDataInPacket;
-	static const int mDummyDataLength=1024;
-	byte mDummyData[mDummyDataLength];
+	TCPConnector *mConnectionListener;
 
 	egg::Mutex::ptr mMutex;
-	TCPConnector *mConnector;
-
 	egg::Collection<Packet::ptr> mPackets;
 	egg::Collection<Packet::ptr> mFreePackets;
 	bool mReceiving;
@@ -120,6 +122,9 @@ protected:
 	int mDebugPacketDelayMaxTime;
 	egg::Thread::ptr mDebugThread;
 	bool mDebugRun;
+
+	static const int mDummyDataLength=1024;
+	byte mDummyData[mDummyDataLength];
 };
 
 }

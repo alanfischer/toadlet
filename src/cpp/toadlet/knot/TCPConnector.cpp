@@ -27,7 +27,7 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/knot/TCPConnector.h>
-#include <toadlet/knot/ConnectorListener.h>
+#include <toadlet/knot/ConnectionListener.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
@@ -87,12 +87,13 @@ bool TCPConnector::accept(int localPort){
 bool TCPConnector::connect(int remoteHost,int remotePort){
 	close();
 
-	TCPConnection::ptr connection(new TCPConnection(this,true));
+	TCPConnection::ptr connection(new TCPConnection());
 	bool result=connection->connect(remoteHost,remotePort);
 	if(result){
 		mRun=true;
 		mConnectionsMutex.lock();
 			mConnections.add(connection);
+			connection->setConnectionListener(this);
 			notifyListenersConnected(connection);
 		mConnectionsMutex.unlock();
 	}
@@ -103,21 +104,23 @@ bool TCPConnector::connect(int remoteHost,int remotePort){
 }
 
 void TCPConnector::close(){
+	bool run=false;
+	mConnectionsMutex.lock();
+		run=mRun;
+		mRun=false;
+	mConnectionsMutex.unlock();
+
 	TOADLET_TRY
 		if(mServerSocket!=NULL){
 			mServerSocket->close();
 		}
 	TOADLET_CATCH(const Exception &){}
 
-	bool run=false;
-	mConnectionsMutex.lock();
-		run=mRun;
-		mRun=false;
-	mConnectionsMutex.unlock();
 	if(run){
 		if(mServerThread!=NULL){
-			mServerThread->join();
+			Thread::ptr thread=mServerThread;
 			mServerThread=NULL;
+			thread->join();
 		}
 
 		mServerSocket=NULL;
@@ -129,6 +132,7 @@ void TCPConnector::close(){
 		mConnectionsMutex.unlock();
 
 		for(i=0;i<connections.size();++i){
+			connections[i]->setConnectionListener(NULL);
 			connections[i]->close();
 		}
 
@@ -138,7 +142,7 @@ void TCPConnector::close(){
 	}
 }
 
-void TCPConnector::addConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent){
+void TCPConnector::addConnectionListener(ConnectionListener *listener,bool notifyAboutCurrent){
 	mListenersMutex.lock();
 		mListeners.add(listener);
 	mListenersMutex.unlock();
@@ -153,7 +157,7 @@ void TCPConnector::addConnectorListener(ConnectorListener *listener,bool notifyA
 	}
 }
 
-void TCPConnector::removeConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent){
+void TCPConnector::removeConnectionListener(ConnectionListener *listener,bool notifyAboutCurrent){
 	if(notifyAboutCurrent){
 		mConnectionsMutex.lock();
 			int i;
@@ -183,27 +187,27 @@ void TCPConnector::run(){
 			clientSocket=Socket::ptr(mServerSocket->accept());
 		TOADLET_CATCH(const Exception &){clientSocket=NULL;}
 		if(clientSocket!=NULL){
-			TCPConnection::ptr connection(new TCPConnection(this,true));
+			TCPConnection::ptr connection(new TCPConnection());
 			bool result=connection->accept(clientSocket);
 			if(result){
 				mConnectionsMutex.lock();
 					mConnections.add(connection);
+					connection->setConnectionListener(this);
 					notifyListenersConnected(connection);
-
-					// Clear out dead connections
-					mDeadConnections.clear();
 				mConnectionsMutex.unlock();
 			}
 			else{
 				connection->close();
 			}
 		}
+
+		System::msleep(10);
 	}
 }
 
-void TCPConnector::connectionClosed(TCPConnection *connection){
-	TCPConnection::ptr deadConnection;
-
+// This function won't be called, since the connection listener isn't assigned till after its already open
+//  But we'll implement it anyway
+void TCPConnector::connected(Connection *connection){
 	mConnectionsMutex.lock();
 		// Find the Connection::ptr from the connection
 		int i;
@@ -211,23 +215,28 @@ void TCPConnector::connectionClosed(TCPConnection *connection){
 			if(mConnections[i]==connection) break;
 		}
 		if(i<mConnections.size()){
-			deadConnection=mConnections[i];
-			mConnections.removeAt(i);
-
-			// Store dead connections, and they get cleaned out at a later time
-			//  Otherwise we have a deadlock when the thread in the Connection tries to let the Connection::ptr die
-			mDeadConnections.add(deadConnection);
+			notifyListenersConnected(mConnections[i]);
 		}
-	mConnectionsMutex.unlock();
+	mConnectionsMutex.lock();
+}
 
-	if(deadConnection!=NULL){
-		notifyListenersDisconnected(deadConnection);
-	}
+void TCPConnector::disconnected(Connection *connection){
+	mConnectionsMutex.lock();
+		// Find the Connection::ptr from the connection
+		int i;
+		for(i=0;i<mConnections.size();++i){
+			if(mConnections[i]==connection) break;
+		}
+		if(i<mConnections.size()){
+			notifyListenersDisconnected(mConnections[i]);
+			mConnections.removeAt(i);
+		}
+	mConnectionsMutex.lock();
 }
 
 void TCPConnector::notifyListenersConnected(TCPConnection::ptr connection){
 	int i;
-	Collection<ConnectorListener*> listeners;
+	Collection<ConnectionListener*> listeners;
 
 	mListenersMutex.lock();
 		listeners.addAll(mListeners);
@@ -240,7 +249,7 @@ void TCPConnector::notifyListenersConnected(TCPConnection::ptr connection){
 
 void TCPConnector::notifyListenersDisconnected(TCPConnection::ptr connection){
 	int i;
-	Collection<ConnectorListener*> listeners;
+	Collection<ConnectionListener*> listeners;
 
 	mListenersMutex.lock();
 		listeners.addAll(mListeners);
