@@ -76,13 +76,13 @@ void SimpleServer::setEventFactory(EventFactory *eventFactory){
 
 void SimpleServer::setConnector(Connector::ptr connector){
 	if(mConnector!=NULL){
-		mConnector->removeConnectorListener(this,true);
+		mConnector->removeConnectionListener(this,true);
 	}
 
 	mConnector=connector;
 
 	if(mConnector!=NULL){
-		mConnector->addConnectorListener(this,true);
+		mConnector->addConnectionListener(this,true);
 	}
 }
 

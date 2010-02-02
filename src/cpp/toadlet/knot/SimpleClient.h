@@ -26,6 +26,7 @@
 #ifndef TOADLET_KNOT_SIMPLECLIENT_H
 #define TOADLET_KNOT_SIMPLECLIENT_H
 
+#include <toadlet/knot/Connector.h>
 #include <toadlet/knot/SimpleEventConnection.h>
 
 namespace toadlet{
@@ -50,8 +51,6 @@ public:
 	virtual int update(){return 0;}
 
 protected:
-	virtual void receiveError();
-
 	int mClientID;
 	Connector::ptr mConnector;
 };

@@ -317,7 +317,7 @@ public:
 
 protected:
 	inline int offset(int vertex,int element){
-		TOADLET_ASSERT(vertex>0 && element>0 && (vertex*mVertexSize32 + mElementOffsets32[element])*sizeof(int32)<(uint32)mVertexBuffer->getDataSize()); // "vertex out of bounds"
+		TOADLET_ASSERT(vertex>=0 && element>=0 && (vertex*mVertexSize32 + mElementOffsets32[element])*sizeof(int32)<(uint32)mVertexBuffer->getDataSize()); // "vertex out of bounds"
 		return vertex*mVertexSize32 + mElementOffsets32[element];
 	}
 
