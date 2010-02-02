@@ -42,54 +42,19 @@ const char *TCPConnection::CONNECTION_PACKET="toadlet::knot::tcp";
 const int TCPConnection::CONNECTION_PACKET_LENGTH=18;
 const int TCPConnection::CONNECTION_VERSION=1;
 
-TCPConnection::TCPConnection(TCPConnector *connector,bool blocking):
-	mBlocking(false),
-	//mSocket,
-	//mOutPacket,
-	//mDataOutPacket,
-	//mInPacket,
-	//mDataInPacket,
-
-	//mMutex,
-	mConnector(NULL),
-
-	//mPackets,
-	//mFreePackets,
-	mReceiving(false),
-	mReceiveError(false),
-
-	//mDebugRandom,
-	mDebugPacketDelayMinTime(0),
-	mDebugPacketDelayMaxTime(0),
-	//mDebugThread
-	mDebugRun(false)
-{
-	int maxSize=1024;
-	mOutPacket=MemoryStream::ptr(new MemoryStream(new uint8[maxSize],maxSize,0,true));
-	mDataOutPacket=DataStream::ptr(new DataStream(Stream::ptr(mOutPacket)));
-	mInPacket=MemoryStream::ptr(new MemoryStream(new uint8[maxSize],maxSize,maxSize,true));
-	mDataInPacket=DataStream::ptr(new DataStream(Stream::ptr(mInPacket)));
-
-	mBlocking=blocking;
-	mConnector=connector;
-	
-	mMutex=Mutex::ptr(new Mutex());
-}
-
 TCPConnection::TCPConnection(egg::net::Socket::ptr socket,bool blocking):
+	mClient(false),
 	mBlocking(false),
 	//mSocket,
 	//mOutPacket,
 	//mDataOutPacket,
 	//mInPacket,
 	//mDataInPacket,
+	mConnectionListener(NULL),
 
 	//mMutex,
-	mConnector(NULL),
-
 	//mPackets,
 	//mFreePackets,
-	mReceiving(false),
 	mReceiveError(false),
 
 	//mDebugRandom,
@@ -104,8 +69,8 @@ TCPConnection::TCPConnection(egg::net::Socket::ptr socket,bool blocking):
 	mInPacket=MemoryStream::ptr(new MemoryStream(new uint8[maxSize],maxSize,maxSize,true));
 	mDataInPacket=DataStream::ptr(new DataStream(Stream::ptr(mInPacket)));
 
-	mBlocking=blocking;
 	mSocket=socket;
+	mBlocking=blocking;
 
 	mMutex=Mutex::ptr(new Mutex());
 }
@@ -171,6 +136,12 @@ bool TCPConnection::connect(Socket::ptr socket){
 
 	mInPacket->reset();
 	mOutPacket->reset();
+
+	mClient=true;
+
+	if(result && mConnectionListener!=NULL){
+		mConnectionListener->connected(this);
+	}
 
 	return result;
 }
@@ -240,6 +211,12 @@ bool TCPConnection::accept(Socket::ptr socket){
 	mInPacket->reset();
 	mOutPacket->reset();
 
+	mClient=false;
+
+	if(result && mConnectionListener!=NULL){
+		mConnectionListener->connected(this);
+	}
+
 	return result;
 }
 
@@ -250,26 +227,17 @@ void TCPConnection::close(){
 		}
 	TOADLET_CATCH(const Exception &){}
 
-	if(mConnector!=NULL){
-		mConnector->connectionClosed(this);
-	}
-
 	mDebugRun=false;
 	if(mDebugThread!=NULL){
-		mDebugThread->join();
+		Thread::ptr thread=mDebugThread;
 		mDebugThread=NULL;
+		thread->join();
 	}
 
-	while(true){
-		mMutex->lock();
-			if(mReceiving==false){
-				mSocket=NULL;
-
-				mMutex->unlock();
-				break;
-			}
-		mMutex->unlock();
-		System::msleep(10);
+	if(mConnectionListener!=NULL){
+		TCPConnector *listener=mConnectionListener;
+		mConnectionListener=NULL;
+		listener->disconnected(this);
 	}
 }
 
@@ -280,7 +248,9 @@ int TCPConnection::send(const byte *data,int length){
 	mDataOutPacket->write(data,length);
 
 	TOADLET_TRY
-		if((amount=mSocket->send(mOutPacket->getOriginalDataPointer(),mOutPacket->length()))<0)
+		if(mSocket!=NULL){
+			amount=mSocket->send(mOutPacket->getOriginalDataPointer(),mOutPacket->length());
+		}
 	TOADLET_CATCH(const Exception &){amount=-1;}
 
 	// We need to account for the bigInt we write first
@@ -296,13 +266,6 @@ int TCPConnection::receive(byte *data,int length){
 	int numPackets=0;
 
 	mMutex->lock();
-		if(mSocket==NULL){
-			mMutex->unlock();
-			return -1;
-		}
-
-		mReceiving=true;
-
 		// Start or notify the debug thread to stop if necessary
 		if(mDebugPacketDelayMinTime>0 && mDebugThread==NULL){
 			mDebugThread=Thread::ptr(new Thread(this));
@@ -348,6 +311,7 @@ int TCPConnection::receive(byte *data,int length){
 					}
 				}
 				else if(mReceiveError){
+					mReceiveError=false;
 					amount=-1;
 
 					mMutex->unlock();
@@ -371,7 +335,7 @@ int TCPConnection::receive(byte *data,int length){
 
 	if(needReceive){
 		TOADLET_TRY
-			if(mBlocking || mSocket->pollRead(0)==true){
+			if(mSocket!=NULL && (mBlocking || mSocket->pollRead(0)==true)){
 				amount=mSocket->receive(mInPacket->getOriginalDataPointer(),2);
 				if(amount>0){
 					int packetLength=mDataInPacket->readBigInt16();
@@ -390,13 +354,15 @@ int TCPConnection::receive(byte *data,int length){
 		TOADLET_CATCH(const Exception &){amount=-1;}
 	}
 
-	mReceiving=false;
-
-	if(amount<0){
+	if(amount<=0 && opened() && mSocket!=NULL && (mBlocking || mSocket->pollRead(0)==true)){
 		close();
 	}
 
 	return amount;
+}
+
+void TCPConnection::setConnectionListener(TCPConnector *listener){
+	mConnectionListener=listener;
 }
 
 void TCPConnection::debugSetPacketDelayTime(int minTime,int maxTime){

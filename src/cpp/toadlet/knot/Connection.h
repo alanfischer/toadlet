@@ -32,8 +32,6 @@
 namespace toadlet{
 namespace knot{
 
-class ConnectorListener;
-
 /// Thought: On Java this can just be the ByteChannel
 
 /// A Connection sends and receives packets of data.

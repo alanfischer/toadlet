@@ -32,12 +32,12 @@
 #include <toadlet/egg/io/DataStream.h>
 #include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/knot/EventConnection.h>
-#include <toadlet/knot/ConnectorListener.h>
+#include <toadlet/knot/ConnectionListener.h>
 
 namespace toadlet{
 namespace knot{
 
-class TOADLET_API SimpleEventConnection:public EventConnection,public ConnectorListener,public egg::Runnable{
+class TOADLET_API SimpleEventConnection:public EventConnection,public ConnectionListener,public egg::Runnable{
 public:
 	TOADLET_SHARED_POINTERS(SimpleEventConnection);
 
@@ -68,7 +68,6 @@ public:
 
 protected:
 	virtual void eventReceived(egg::Event::ptr event);
-	virtual void receiveError();
 
 	virtual int sendEvent(egg::Event::ptr event);
 	virtual int receiveEvent(egg::Event::ptr *event);

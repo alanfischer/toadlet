@@ -20,8 +20,8 @@ set (KNOT_SRC
 # Headers
 set (KNOT_HEADERS
 	Connection.h
+	ConnectionListener.h
 	Connector.h
-	ConnectorListener.h
 	DebugListener.h
 	EventConnection.h
 	LANPeerEventConnector.h

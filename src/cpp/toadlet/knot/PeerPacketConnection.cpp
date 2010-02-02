@@ -303,14 +303,16 @@ void PeerPacketConnection::close(){
 
 	mRun=false;
 	if(mThread!=NULL){
-		mThread->join();
+		Thread::ptr thread=mThread;
 		mThread=NULL;
+		thread->join();
 	}
 
 	mDebugRun=false;
 	if(mDebugThread!=NULL){
-		mDebugThread->join();
+		Thread::ptr thread=mDebugThread;
 		mDebugThread=NULL;
+		thread->join();
 	}
 
 	mSocket=NULL;
@@ -694,8 +696,9 @@ void PeerPacketConnection::debugSetPacketDelayTime(int time){
 		}
 		else if(mDebugPacketDelayTime==0 && mDebugThread!=NULL){
 			mDebugRun=false;
-			mDebugThread->join();
+			Thread::ptr thread=mDebugThread;
 			mDebugThread=NULL;
+			thread->join();
 
 			int i;
 			for(i=0;i<mRemotePackets.size();++i){

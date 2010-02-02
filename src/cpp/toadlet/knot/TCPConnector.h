@@ -27,12 +27,13 @@
 #define TOADLET_KNOT_TCPCONNECTOR_H
 
 #include <toadlet/knot/Connector.h>
+#include <toadlet/knot/ConnectionListener.h>
 #include <toadlet/knot/TCPConnection.h>
 
 namespace toadlet{
 namespace knot{
 
-class TOADLET_API TCPConnector:public Connector,egg::Runnable{
+class TOADLET_API TCPConnector:public Connector,public egg::Runnable{
 public:
 	TOADLET_SHARED_POINTERS(TCPConnector);
 
@@ -49,16 +50,17 @@ public:
 	bool opened(){return mRun;}
 	void close();
 
-	void addConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent);
-	void removeConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent);
+	void addConnectionListener(ConnectionListener *listener,bool notifyAboutCurrent);
+	void removeConnectionListener(ConnectionListener *listener,bool notifyAboutCurrent);
 
 	TCPConnection::ptr getConnection(int i);
 
 	void run();
 
-protected:
-	void connectionClosed(TCPConnection *connection);
+	void connected(Connection *connection);
+	void disconnected(Connection *connection);
 
+protected:
 	void notifyListenersConnected(TCPConnection::ptr connection);
 	void notifyListenersDisconnected(TCPConnection::ptr connection);
 
@@ -66,9 +68,9 @@ protected:
 	egg::Thread::ptr mServerThread;
 	bool mRun;
 	egg::Collection<TCPConnection::ptr> mConnections;
-	egg::Collection<TCPConnection::ptr> mDeadConnections;
+	//egg::Collection<TCPConnection::ptr> mDeadConnections;
 	egg::Mutex mConnectionsMutex;
-	egg::Collection<ConnectorListener*> mListeners;
+	egg::Collection<ConnectionListener*> mListeners;
 	egg::Mutex mListenersMutex;
 
 	friend class TCPConnection;

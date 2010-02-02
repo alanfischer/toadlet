@@ -51,6 +51,7 @@ void SimpleClient::close(){
 	if(mConnector!=NULL){
 		mConnector->close();
 	}
+
 	setConnector(NULL);
 
 	SimpleEventConnection::close();
@@ -58,24 +59,18 @@ void SimpleClient::close(){
 
 void SimpleClient::setConnector(Connector::ptr connector){
 	if(mConnector!=NULL){
-		mConnector->removeConnectorListener(this,true);
+		mConnector->removeConnectionListener(this,true);
 	}
 
 	mConnector=connector;
 
 	if(mConnector!=NULL){
-		mConnector->addConnectorListener(this,true);
+		mConnector->addConnectionListener(this,true);
 	}
 }
 
 bool SimpleClient::sendToClient(int toClientID,Event::ptr event){
 	return send(Event::ptr(new RoutedEvent(event,mClientID,toClientID)));
-}
-
-void SimpleClient::receiveError(){
-	if(mConnector!=NULL){
-		mConnector->close();
-	}
 }
 
 }

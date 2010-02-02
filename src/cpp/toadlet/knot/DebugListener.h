@@ -27,12 +27,12 @@
 #define TOADLET_KNOT_DEBUGLISTENER_H
 
 #include <toadlet/egg/String.h>
-#include <toadlet/knot/ConnectorListener.h>
+#include <toadlet/knot/ConnectionListener.h>
 
 namespace toadlet{
 namespace knot{
 
-class TOADLET_API DebugListener:public ConnectorListener{
+class TOADLET_API DebugListener:public ConnectionListener{
 public:
 	TOADLET_SHARED_POINTERS(DebugListener);
 

@@ -24,9 +24,7 @@ using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::mesh;
 using namespace toadlet::pad;
 
-class SimpleSync:public Application,public EventFactory,public Runnable,public UpdateListener,
-public ConnectorListener
-{
+class SimpleSync:public Application,public EventFactory,public ConnectionListener,public Runnable,public UpdateListener{
 public:
 	TOADLET_SHARED_POINTERS(SimpleSync);
 
@@ -55,10 +53,10 @@ public:
 
 	Event::ptr createEventType(int type);
 
-	void run();
+	void connected(Connection::ptr connection);
+	void disconnected(Connection::ptr connection);
 
-void connected(Connection::ptr connection);
-void disconnected(Connection::ptr connection);
+	void run();
 
 	SimpleServer::ptr server;
 	SimpleClient::ptr client;
