@@ -28,13 +28,14 @@
 
 #include <toadlet/egg/Map.h>
 #include <toadlet/egg/EventFactory.h>
-#include <toadlet/knot/ConnectorListener.h>
+#include <toadlet/knot/Connector.h>
+#include <toadlet/knot/ConnectionListener.h>
 #include <toadlet/knot/SimpleEventConnection.h>
 
 namespace toadlet{
 namespace knot{
 
-class TOADLET_API SimpleServer:public ConnectorListener{
+class TOADLET_API SimpleServer:public ConnectionListener{
 public:
 	TOADLET_SHARED_POINTERS(SimpleServer);
 

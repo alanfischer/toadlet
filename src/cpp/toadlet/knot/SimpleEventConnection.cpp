@@ -137,9 +137,6 @@ void SimpleEventConnection::run(){
 		if(amount>0){
 			eventReceived(event);
 		}
-		else if(amount<0){
-			receiveError();
-		}
 		System::msleep(0);
 	}
 }
@@ -148,9 +145,6 @@ void SimpleEventConnection::eventReceived(Event::ptr event){
 	mEventsMutex.lock();
 		mEvents.add(event);
 	mEventsMutex.unlock();
-}
-
-void SimpleEventConnection::receiveError(){
 }
 
 int SimpleEventConnection::sendEvent(Event::ptr event){

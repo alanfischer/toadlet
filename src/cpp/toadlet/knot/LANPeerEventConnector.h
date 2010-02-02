@@ -66,8 +66,8 @@ public:
 	bool opened(){return mConnection!=NULL;}
 	void close();
 
-	void addConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent);
-	void removeConnectorListener(ConnectorListener *listener,bool notifyAboutCurrent);
+	void addConnectionListener(ConnectionListener *listener,bool notifyAboutCurrent);
+	void removeConnectionListener(ConnectionListener *listener,bool notifyAboutCurrent);
 
 	// Start searching for a game
 	bool search(int seed,egg::Event::ptr localPayload);
@@ -125,7 +125,7 @@ protected:
 	egg::Event::ptr mPayload;
 	Connection::ptr mConnection;
 	egg::Mutex mConnectionMutex;
-	egg::Collection<ConnectorListener*> mListeners;
+	egg::Collection<ConnectionListener*> mListeners;
 	egg::Mutex mListenersMutex;
 	SynchronizedPeerEventConnection::ptr mEventConnection;
 	egg::Mutex mEventsMutex;

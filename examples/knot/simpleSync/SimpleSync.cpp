@@ -120,11 +120,6 @@ void SimpleSync::accept(int localPort){
 	//debugUpdateMax=100;
 }
 
-void SimpleSync::connected(Connection::ptr connection){
-}
-void SimpleSync::disconnected(Connection::ptr connection){
-}
-
 void SimpleSync::connect(int remoteHost,int remotePort){
 	TCPConnector::ptr connector(new TCPConnector());
 	if(connector->connect(remoteHost,remotePort)==false){
