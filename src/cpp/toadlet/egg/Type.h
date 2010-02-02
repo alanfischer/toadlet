@@ -35,7 +35,7 @@ template<typename Class>
 class BaseType{
 public:
 	virtual ~BaseType(){}
-	virtual const char *getFullName() const=0;
+	virtual const String &getFullName() const=0;
 	virtual Class *newInstance() const=0;
 };
 
@@ -44,7 +44,7 @@ class TOADLET_API Type:public BaseType<BaseClass>{
 public:
 	Type(const char *fullName):mFullName(fullName){}
 
-	const char *getFullName() const{return mFullName;}
+	const String &getFullName() const{return mFullName;}
 	BaseClass *newInstance() const{return new Class();}
 
 protected:
