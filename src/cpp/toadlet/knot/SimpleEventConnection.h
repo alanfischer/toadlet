@@ -44,7 +44,7 @@ public:
 	const static int CONTROL_EVENT_FLAG=0x4000; // Switch to 0x4000 from 0x8000 since setting the sign bit for a short ended up confusing the bit operations in java
 	const static int CONTROL_EVENT_ROUTE=1;
 
-	SimpleEventConnection(egg::EventFactory *eventFactory=NULL,Connection::ptr connection=NULL);
+	SimpleEventConnection(egg::EventFactory *eventFactory=NULL,Connection::ptr connection=Connection::ptr());
 	virtual ~SimpleEventConnection();
 
 	virtual bool opened(){return mRun;}

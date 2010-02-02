@@ -27,6 +27,7 @@
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/peeper/BackableIndexBuffer.h>
 #include <toadlet/peeper/BackableVertexBuffer.h>
+#include <toadlet/egg/Error.h>
 #include <string.h> //memcpy
 
 using namespace toadlet::egg;

@@ -36,11 +36,11 @@ DebugListener::DebugListener(){}
 DebugListener::~DebugListener(){}
 
 void DebugListener::connected(Connection::ptr connection){
-	Logger::alert(String("Connection connected:")+(int)connection.get());
+	Logger::alert(String("Connection connected"));
 }
 
 void DebugListener::disconnected(Connection::ptr connection){
-	Logger::alert(String("Connection disconnected:")+(int)connection.get());
+	Logger::alert(String("Connection disconnected"));
 }
 
 }
