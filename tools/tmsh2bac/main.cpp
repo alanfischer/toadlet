@@ -62,6 +62,8 @@ public:
 
 	Resource::ptr openResource(const String &name){return NULL;}
 
+	Collection<String>::ptr getEntries(){return Collection<String>::ptr();}
+
 	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 
 protected:
