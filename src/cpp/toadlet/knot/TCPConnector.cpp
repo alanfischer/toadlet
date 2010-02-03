@@ -201,7 +201,7 @@ void TCPConnector::run(){
 			}
 		}
 
-		System::msleep(10);
+		System::msleep(0);
 	}
 }
 
