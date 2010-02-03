@@ -117,10 +117,9 @@ void SimpleSync::accept(int localPort){
 
 	connector->addConnectionListener(this,false);
 	server=SimpleServer::ptr(new SimpleServer(this,connector));
-	//debugUpdateMin=100;
-	//debugUpdateMax=100;
+//	debugUpdateMin=500;
+//	debugUpdateMax=500;
 }
-
 
 void SimpleSync::connect(int remoteHost,int remotePort){
 	TCPConnector::ptr connector(new TCPConnector());
@@ -131,7 +130,7 @@ void SimpleSync::connect(int remoteHost,int remotePort){
 
 	connector->addConnectionListener(this,false);
 	client=SimpleClient::ptr(new SimpleClient(this,connector));
-	//shared_static_cast<TCPConnection>(client->getConnection())->debugSetPacketDelayTime(100,500);
+	shared_static_cast<TCPConnection>(client->getConnection())->debugSetPacketDelayTime(100,100);
 }
 
 void SimpleSync::create(){
@@ -145,7 +144,7 @@ void SimpleSync::create(){
 	scene->setGravity(Vector3(0,0,-10));
 	//scene->showCollisionVolumes(true,false);
 	scene->getSimulator()->setMicroCollisionThreshold(5);
-	//scene->setLogicDT(50);
+	//scene->setLogicDT(100);
 	scene->setLogicDT(0);
 
 	scene->getRootNode()->attach(getEngine()->createNodeType(LightNode::type()));
@@ -288,15 +287,14 @@ void SimpleSync::postLogicUpdate(int dt){
 				block->getSolid()->setVelocity(updateEvent->getVelocity());
 
 				// Now simulate block till we're back to where we need to be
-//Logger::debug(String("TIME:")+(scene->getLogicTime()-updateEvent->getTime()));
-				int time=updateEvent->getTime();
+				int clientTime=scene->getLogicTime();
+				int serverTime=updateEvent->getTime();
 				int updateDT=0;
 				int minDT=scene->getLogicDT()!=0?scene->getLogicDT():10;
-				do{
-					updateDT=(int)Math::minVal(minDT,scene->getLogicTime()-time);
+				for(updateDT=(int)Math::minVal(minDT,clientTime-serverTime);serverTime<clientTime;updateDT=(int)Math::minVal(minDT,clientTime-serverTime)){
 					scene->getSimulator()->update(updateDT);
-					time+=updateDT;
-				}while(updateDT>0);
+					serverTime+=updateDT;
+				}
 			}
 		}
 	}
@@ -325,7 +323,7 @@ void SimpleSync::postLogicUpdate(int dt){
 		if(nextUpdateTime<=scene->getLogicTime()){
 			Event::ptr update(new UpdateEvent(scene->getLogicTime(),block->getPosition(),block->getVelocity()));
 			server->broadcast(update);
-			nextUpdateTime=scene->getLogicDT()+random.nextInt(debugUpdateMin,debugUpdateMax);
+			nextUpdateTime=scene->getLogicTime()+random.nextInt(debugUpdateMin,debugUpdateMax);
 		}
 	}
 
