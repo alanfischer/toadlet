@@ -220,7 +220,7 @@ void Simulator::removeConstraint(Constraint *constraint){
 	mConstraints.remove(constraint);
 }
 
-void Simulator::update(int dt){
+void Simulator::update(int dt,Solid *solid){
 	Vector3 &oldPosition=cache_update_oldPosition;
 	Vector3 &newPosition=cache_update_newPosition;
 	Vector3 &velocity=cache_update_velocity;
@@ -234,7 +234,7 @@ void Simulator::update(int dt){
 	Segment &path=cache_update_path;
 	scalar cor=0,impulse=0,oneOverMass=0,oneOverHitMass=0;
 	int loop=0;
-	Solid *solid=NULL,*hitSolid=NULL;
+	Solid *hitSolid=NULL;
 	Collision &c=cache_update_c.reset();
 	int numCollisions=0;
 	int i,j;
@@ -249,8 +249,11 @@ void Simulator::update(int dt){
 		mManager->preUpdate(dt,fdt);
 	}
 
-	for(i=0;i<mSolids.size();i++){
-		solid=mSolids[i];
+	int numSolids=(solid!=NULL)?1:mSolids.size();
+	for(i=0;i<numSolids;i++){
+		if(numSolids>1 || solid==NULL){
+			solid=mSolids[i];
+		}
 
 		if(solid->mActive==false){
 			continue;

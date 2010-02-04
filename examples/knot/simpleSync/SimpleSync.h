@@ -70,6 +70,8 @@ public:
 	CameraNode::ptr cameraNode;
 	MeshNode::ptr meshNode;
 	HopEntity::ptr block;
+	HopEntity::ptr player[2];
+	int movement;
 };
 
 #endif

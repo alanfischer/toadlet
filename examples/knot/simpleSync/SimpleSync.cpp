@@ -101,7 +101,8 @@ protected:
 SimpleSync::SimpleSync():Application(),
 	nextUpdateTime(0),
 	debugUpdateMin(0),
-	debugUpdateMax(0)
+	debugUpdateMax(0),
+	movement(0)
 {
 }
 
@@ -144,8 +145,12 @@ void SimpleSync::create(){
 	scene->setGravity(Vector3(0,0,-10));
 	//scene->showCollisionVolumes(true,false);
 	scene->getSimulator()->setMicroCollisionThreshold(5);
-	//scene->setLogicDT(100);
-	scene->setLogicDT(0);
+	if(client!=NULL){
+		scene->setLogicDT(0);
+	}
+	else{
+		scene->setLogicDT(0);
+	}
 
 	scene->getRootNode()->attach(getEngine()->createNodeType(LightNode::type()));
 
@@ -181,17 +186,17 @@ void SimpleSync::create(){
 
 	int i;
 	for(i=0;i<2;++i){
-		HopEntity::ptr player=getEngine()->createNodeType(HopEntity::type());
-		player->addShape(Shape::ptr(new Shape(AABox(-1,-1,0,1,1,4))));
+		player[i]=getEngine()->createNodeType(HopEntity::type());
+		player[i]->addShape(Shape::ptr(new Shape(AABox(-1,-1,0,1,1,4))));
 		{
-			Mesh::ptr mesh=getEngine()->getMeshManager()->createBox(player->getShape(0)->getAABox());
+			Mesh::ptr mesh=getEngine()->getMeshManager()->createBox(player[i]->getShape(0)->getAABox());
 			mesh->subMeshes[0]->material->setLightEffect(i==0?Colors::GREEN:Colors::BLUE);
 			MeshNode::ptr meshNode=getEngine()->createNodeType(MeshNode::type());
 			meshNode->setMesh(mesh);
-			player->attach(meshNode);
+			player[i]->attach(meshNode);
 		}
-		player->setTranslate(0,i==0?-20:20,0);
-		scene->getRootNode()->attach(player);
+		player[i]->setTranslate(0,i==0?-20:20,0);
+		scene->getRootNode()->attach(player[i]);
 	}
 
 	mutex.unlock();
@@ -292,7 +297,7 @@ void SimpleSync::postLogicUpdate(int dt){
 				int updateDT=0;
 				int minDT=scene->getLogicDT()!=0?scene->getLogicDT():10;
 				for(updateDT=(int)Math::minVal(minDT,clientTime-serverTime);serverTime<clientTime;updateDT=(int)Math::minVal(minDT,clientTime-serverTime)){
-					scene->getSimulator()->update(updateDT);
+					scene->getSimulator()->update(updateDT,block->getSolid());
 					serverTime+=updateDT;
 				}
 			}
@@ -327,6 +332,19 @@ void SimpleSync::postLogicUpdate(int dt){
 		}
 	}
 
+	if(movement&(1<<0)){
+		player[0]->setVelocity(Vector3(0,10,0));
+	}
+	if(movement&(1<<1)){
+		player[0]->setVelocity(Vector3(0,-10,0));
+	}
+	if(movement&(1<<2)){
+		player[0]->setVelocity(Vector3(-10,0,0));
+	}
+	if(movement&(1<<3)){
+		player[0]->setVelocity(Vector3(10,0,0));
+	}
+
 	scene->postLogicUpdate(dt);
 }
 
@@ -345,9 +363,33 @@ void SimpleSync::keyPressed(int key){
 	else if(key=='f'){
 		block->addForce(Vector3(random.nextScalar(-20,20),random.nextScalar(-20,20),random.nextScalar(-20,20))*10);
 	}
+	else if(key=='w'){
+		movement|=(1<<0);
+	}
+	else if(key=='s'){
+		movement|=(1<<1);
+	}
+	else if(key=='a'){
+		movement|=(1<<2);
+	}
+	else if(key=='d'){
+		movement|=(1<<3);
+	}
 }
 
 void SimpleSync::keyReleased(int key){
+	if(key=='w'){
+		movement&=~(1<<0);
+	}
+	else if(key=='s'){
+		movement&=~(1<<1);
+	}
+	else if(key=='a'){
+		movement&=~(1<<2);
+	}
+	else if(key=='d'){
+		movement&=~(1<<3);
+	}
 }
 
 void SimpleSync::mousePressed(int x,int y,int button){
