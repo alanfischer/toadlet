@@ -13,16 +13,20 @@ public:
 	};
 
 	SyncEvent():Event(EventType_SYNC),
+		playerID(-1),
 		localTime(0),
 		remoteTime(0)
 	{}
 	SyncEvent(int localTime):Event(EventType_SYNC),
+		playerID(-1),
 		localTime(0),
 		remoteTime(0)
 	{
 		this->localTime=localTime;
 	}
 
+	void setPlayerID(int id){playerID=id;}
+	int getPlayerID(){return playerID;}
 	int getLocalTime(){return localTime;}
 	void setLocalTime(int localTime){this->localTime=localTime;}
 	int getRemoteTime(){return remoteTime;}
@@ -30,6 +34,7 @@ public:
 
 	int read(DataStream *stream){
 		int amount=0;
+		amount+=stream->readBigInt32(playerID);
 		amount+=stream->readBigInt32(localTime);
 		amount+=stream->readBigInt32(remoteTime);
 		return amount;
@@ -37,6 +42,7 @@ public:
 
 	int write(DataStream *stream){
 		int amount=0;
+		amount+=stream->writeBigInt32(playerID);
 		amount+=stream->writeBigInt32(localTime);
 		amount+=stream->writeBigInt32(remoteTime);
 		return amount;
@@ -45,6 +51,7 @@ public:
 	String toString(){return String("localTime:")+localTime+",remoteTime:"+remoteTime;}
 
 protected:
+	int playerID;
 	int localTime;
 	int remoteTime;
 };
@@ -94,49 +101,63 @@ public:
 	};
 
 	UpdateEvent():Event(EventType_UPDATE){}
-	UpdateEvent(int time,int id,const Vector3 &position,const Vector3 &velocity):Event(EventType_UPDATE){
+	UpdateEvent(int time):Event(EventType_UPDATE){
 		this->time=time;
-		this->id=id;
-		this->position=position;
-		this->velocity=velocity;
+	}
+
+	void addUpdate(int id,const Vector3 &position,const Vector3 &velocity){
+		ids.add(id);
+		positions.add(position);
+		velocities.add(velocity);
 	}
 
 	int getTime(){return time;}
-	int getID(){return id;}
-	const Vector3 &getPosition(){return position;}
-	const Vector3 &getVelocity(){return velocity;}
+	int getNumUpdates(){return ids.size();}
+	int getID(int i){return ids[i];}
+	const Vector3 &getPosition(int i){return positions[i];}
+	const Vector3 &getVelocity(int i){return velocities[i];}
 
 	int read(DataStream *stream){
 		int amount=0;
 		amount+=stream->readBigInt32(time);
-		amount+=stream->readBigInt32(id);
-		amount+=stream->readBigFloat(position.x);
-		amount+=stream->readBigFloat(position.y);
-		amount+=stream->readBigFloat(position.z);
-		amount+=stream->readBigFloat(velocity.x);
-		amount+=stream->readBigFloat(velocity.y);
-		amount+=stream->readBigFloat(velocity.z);
+		int numUpdates=0;
+		amount+=stream->readBigInt32(numUpdates);
+		ids.resize(numUpdates);
+		positions.resize(numUpdates);
+		velocities.resize(numUpdates);
+		for(int i=0;i<numUpdates;++i){
+			amount+=stream->readBigInt32(ids[i]);
+			amount+=stream->readBigFloat(positions[i].x);
+			amount+=stream->readBigFloat(positions[i].y);
+			amount+=stream->readBigFloat(positions[i].z);
+			amount+=stream->readBigFloat(velocities[i].x);
+			amount+=stream->readBigFloat(velocities[i].y);
+			amount+=stream->readBigFloat(velocities[i].z);
+		}
 		return amount;
 	}
 
 	int write(DataStream *stream){
 		int amount=0;
 		amount+=stream->writeBigInt32(time);
-		amount+=stream->writeBigInt32(id);
-		amount+=stream->writeBigFloat(position.x);
-		amount+=stream->writeBigFloat(position.y);
-		amount+=stream->writeBigFloat(position.z);
-		amount+=stream->writeBigFloat(velocity.x);
-		amount+=stream->writeBigFloat(velocity.y);
-		amount+=stream->writeBigFloat(velocity.z);
+		amount+=stream->writeBigInt32(ids.size());
+		for(int i=0;i<ids.size();++i){
+			amount+=stream->writeBigInt32(ids[i]);
+			amount+=stream->writeBigFloat(positions[i].x);
+			amount+=stream->writeBigFloat(positions[i].y);
+			amount+=stream->writeBigFloat(positions[i].z);
+			amount+=stream->writeBigFloat(velocities[i].x);
+			amount+=stream->writeBigFloat(velocities[i].y);
+			amount+=stream->writeBigFloat(velocities[i].z);
+		}
 		return amount;
 	}
 
 protected:
 	int time;
-	int id;
-	Vector3 position;
-	Vector3 velocity;
+	Collection<int> ids;
+	Collection<Vector3> positions;
+	Collection<Vector3> velocities;
 };
 
 SimpleSync::SimpleSync():Application(),
@@ -147,10 +168,12 @@ SimpleSync::SimpleSync():Application(),
 	debugUpdateMax(0),
 	packetDelay(0),
 	packetDelayVariance(0),
-	movement(0)
+	localID(0),
+	predictedTimeStart(0)
 {
 	playerMovement[0]=0;
 	playerMovement[1]=0;
+	predictedMovement.resize(100,0);
 }
 
 SimpleSync::~SimpleSync(){
@@ -310,17 +333,17 @@ void SimpleSync::preLogicUpdate(int dt){
 	scene->preLogicUpdate(dt);
 
 	if(client!=NULL){
-		Event::ptr update(new ClientUpdateEvent(0,movement));
+		Event::ptr update(new ClientUpdateEvent(localID,predictedMovement[0]));
 		client->send(update);
 	}
 
 	if(server!=NULL){
 		if(nextUpdateTime<=scene->getLogicTime()){
-			Event::ptr update(new UpdateEvent(scene->getLogicTime(),0,block->getPosition(),block->getVelocity()));
-			server->broadcast(update);
-
-			update=Event::ptr(new UpdateEvent(scene->getLogicTime(),1,player[0]->getPosition(),player[0]->getVelocity()));
-			server->broadcast(update);
+			UpdateEvent::ptr updateEvent(new UpdateEvent(scene->getLogicTime()));
+			updateEvent->addUpdate(-1,block->getPosition(),block->getVelocity());
+			updateEvent->addUpdate(0,player[0]->getPosition(),player[0]->getVelocity());
+			updateEvent->addUpdate(1,player[1]->getPosition(),player[1]->getVelocity());
+			server->broadcast(updateEvent);
 
 			nextUpdateTime=scene->getLogicTime()+random.nextInt(debugUpdateMin,debugUpdateMax);
 		}
@@ -329,6 +352,21 @@ void SimpleSync::preLogicUpdate(int dt){
 
 void SimpleSync::logicUpdate(int dt){
 	scene->logicUpdate(dt);
+}
+
+void updatePlayerMovement(int movement,Solid::ptr player){
+	if(movement&(1<<0)){
+		player->setVelocity(Vector3(0,10,0));
+	}
+	if(movement&(1<<1)){
+		player->setVelocity(Vector3(0,-10,0));
+	}
+	if(movement&(1<<2)){
+		player->setVelocity(Vector3(-10,0,0));
+	}
+	if(movement&(1<<3)){
+		player->setVelocity(Vector3(10,0,0));
+	}
 }
 
 void SimpleSync::postLogicUpdate(int dt){
@@ -349,36 +387,50 @@ void SimpleSync::postLogicUpdate(int dt){
 				clientServerTimeDifference=serverTime-newClientTime;
 				clientLeadTime=ping/2;
 Logger::alert(String("TD:")+(clientServerTimeDifference));
+
+				localID=syncEvent->getPlayerID();
+Logger::alert(String("localID:")+(localID));
 			}
 			else if(event->getType()==UpdateEvent::EventType_UPDATE){
 				UpdateEvent::ptr updateEvent=shared_static_cast<UpdateEvent>(event);
 
-				Solid::ptr solid=updateEvent->getID()>0?player[0]->getSolid():block->getSolid();
-				if(solid!=NULL){
-					// Update object
-Vector3 previous=solid->getPosition();
-					solid->setPosition(updateEvent->getPosition());
-					solid->setVelocity(updateEvent->getVelocity());
-
-					// Now simulate block till we're back to where we need to be
-					int clientTime=scene->getLogicTime()+clientServerTimeDifference+clientLeadTime;
-					int serverTime=updateEvent->getTime();
-					int updateDT=0;
-					int minDT=scene->getLogicDT()!=0?scene->getLogicDT():10;
-					for(updateDT=(int)Math::minVal(minDT,clientTime-serverTime);serverTime<clientTime;updateDT=(int)Math::minVal(minDT,clientTime-serverTime)){
-						scene->getSimulator()->update(updateDT,solid);
-						serverTime+=updateDT;
+				int u=0;
+				for(u=0;u<updateEvent->getNumUpdates();++u){
+					Solid::ptr solid=updateEvent->getID(u)>=0?player[updateEvent->getID(u)]->getSolid():block->getSolid();
+					if(solid!=NULL){
+						// Update object
+						solid->setPosition(updateEvent->getPosition(u));
+						solid->setVelocity(updateEvent->getVelocity(u));
 					}
-//Logger::alert(String("Error:")+updateEvent->getID()+":"+Math::length(previous,solid->getPosition()));
+				}
+
+				// Now simulate till we're back to where we need to be
+				int clientTime=scene->getLogicTime()+clientServerTimeDifference+20;//clientLeadTime;
+				int serverTime=updateEvent->getTime();
+				int updateDT=0;
+				int minDT=scene->getLogicDT()!=0?scene->getLogicDT():10;
+int timesToUpdate=(clientTime-serverTime)/minDT;
+int i=0;
+				for(updateDT=(int)Math::minVal(minDT,clientTime-serverTime);serverTime<clientTime;updateDT=(int)Math::minVal(minDT,clientTime-serverTime)){
+updatePlayerMovement(predictedMovement[timesToUpdate-i],player[localID]->getSolid());
+//Logger::alert(String("i:")+(timesToUpdate-i));
+i++;
+					for(u=0;u<updateEvent->getNumUpdates();++u){
+						Solid::ptr solid=updateEvent->getID(u)>=0?player[updateEvent->getID(u)]->getSolid():block->getSolid();
+						scene->getSimulator()->update(updateDT,solid);
+					}
+					serverTime+=updateDT;
 				}
 			}
 		}
+
+		memcpy(&predictedMovement[1],&predictedMovement[0],sizeof(int)*99);
 	}
 
 	if(server!=NULL){
 		EventConnection::ptr eventConnection=NULL;
 		int i=0;
-		for(eventConnection=server->getClient(0);eventConnection!=NULL;eventConnection=server->getClient(i++)){
+		for(eventConnection=server->getClient(0);eventConnection!=NULL;eventConnection=server->getClient(++i)){
 			Event::ptr event;
 			while((event=eventConnection->receive())!=NULL){
 				if(event->getType()==SyncEvent::EventType_SYNC){
@@ -389,6 +441,8 @@ Vector3 previous=solid->getPosition();
 					int clientTime=syncEvent->getLocalTime();
 					syncEvent->setLocalTime(scene->getLogicTime());
 					syncEvent->setRemoteTime(clientTime);
+					syncEvent->setPlayerID(i);
+					Logger::alert(String("ASSIGNING ID:")+i);
 
 					Logger::alert(String("sending SyncEvent:")+syncEvent->toString());
 					eventConnection->send(syncEvent);
@@ -399,21 +453,9 @@ Vector3 previous=solid->getPosition();
 				}
 			}
 		}
-	}
 
-	int i;
-	for(i=0;i<2;++i){
-		if(playerMovement[i]&(1<<0)){
-			player[i]->setVelocity(Vector3(0,10,0));
-		}
-		if(playerMovement[i]&(1<<1)){
-			player[i]->setVelocity(Vector3(0,-10,0));
-		}
-		if(playerMovement[i]&(1<<2)){
-			player[i]->setVelocity(Vector3(-10,0,0));
-		}
-		if(playerMovement[i]&(1<<3)){
-			player[i]->setVelocity(Vector3(10,0,0));
+		for(i=0;i<2;++i){
+			updatePlayerMovement(playerMovement[i],player[i]->getSolid());
 		}
 	}
 
@@ -454,31 +496,31 @@ Logger::alert(String("packetDelay:")+packetDelay+" packetDelayVariance:"+packetD
 		block->addForce(Vector3(random.nextScalar(-20,20),random.nextScalar(-20,20),random.nextScalar(-20,20))*10);
 	}
 	else if(key=='w'){
-		movement|=(1<<0);
+		predictedMovement[0]|=(1<<0);
 	}
 	else if(key=='s'){
-		movement|=(1<<1);
+		predictedMovement[0]|=(1<<1);
 	}
 	else if(key=='a'){
-		movement|=(1<<2);
+		predictedMovement[0]|=(1<<2);
 	}
 	else if(key=='d'){
-		movement|=(1<<3);
+		predictedMovement[0]|=(1<<3);
 	}
 }
 
 void SimpleSync::keyReleased(int key){
 	if(key=='w'){
-		movement&=~(1<<0);
+		predictedMovement[0]&=~(1<<0);
 	}
 	else if(key=='s'){
-		movement&=~(1<<1);
+		predictedMovement[0]&=~(1<<1);
 	}
 	else if(key=='a'){
-		movement&=~(1<<2);
+		predictedMovement[0]&=~(1<<2);
 	}
 	else if(key=='d'){
-		movement&=~(1<<3);
+		predictedMovement[0]&=~(1<<3);
 	}
 }
 

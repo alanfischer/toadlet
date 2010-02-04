@@ -79,7 +79,6 @@ void SimpleEventConnection::close(){
 		mThread=NULL;
 		thread->join();
 	}
-	mConnection=NULL;
 }
 
 void SimpleEventConnection::setEventFactory(EventFactory *eventFactory){

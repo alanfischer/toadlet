@@ -77,8 +77,9 @@ public:
 	HopEntity::ptr player[2];
 	int playerMovement[2];
 
+	int localID;
 	Collection<int> predictedMovement;
-	int predictionTime;
+	int predictedTimeStart;
 };
 
 #endif
