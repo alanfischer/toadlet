@@ -295,20 +295,21 @@ bool PeerPacketConnection::accept(int localPort){
 }
 
 void PeerPacketConnection::close(){
+	mRun=false;
+	mDebugRun=false;
+
 	TOADLET_TRY
 		if(mSocket!=NULL){
 			mSocket->close();
 		}
 	TOADLET_CATCH(const Exception &){}
 
-	mRun=false;
 	if(mThread!=NULL){
 		Thread::ptr thread=mThread;
 		mThread=NULL;
 		thread->join();
 	}
 
-	mDebugRun=false;
 	if(mDebugThread!=NULL){
 		Thread::ptr thread=mDebugThread;
 		mDebugThread=NULL;

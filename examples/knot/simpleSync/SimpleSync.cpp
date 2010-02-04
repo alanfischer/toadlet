@@ -149,6 +149,8 @@ SimpleSync::SimpleSync():Application(),
 	packetDelayVariance(0),
 	movement(0)
 {
+	playerMovement[0]=0;
+	playerMovement[1]=0;
 }
 
 SimpleSync::~SimpleSync(){
@@ -308,7 +310,7 @@ void SimpleSync::preLogicUpdate(int dt){
 	scene->preLogicUpdate(dt);
 
 	if(client!=NULL){
-		Event::ptr update(new ClientUpdateEvent(dt,movement));
+		Event::ptr update(new ClientUpdateEvent(0,movement));
 		client->send(update);
 	}
 
@@ -420,16 +422,16 @@ Vector3 previous=solid->getPosition();
 
 void SimpleSync::keyPressed(int key){
 	if(key=='o'){
-		packetDelay-=10;
+		packetDelay-=50;
 	}
 	else if(key=='p'){
-		packetDelay+=10;
+		packetDelay+=50;
 	}
 	else if(key=='O'){
-		packetDelayVariance-=10;
+		packetDelayVariance-=50;
 	}
 	else if(key=='P'){
-		packetDelayVariance+=10;
+		packetDelayVariance+=50;
 	}
 
 	if(client!=NULL){

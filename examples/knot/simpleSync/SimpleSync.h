@@ -76,7 +76,9 @@ public:
 	HopEntity::ptr block;
 	HopEntity::ptr player[2];
 	int playerMovement[2];
-	int movement;
+
+	Collection<int> predictedMovement;
+	int predictionTime;
 };
 
 #endif
