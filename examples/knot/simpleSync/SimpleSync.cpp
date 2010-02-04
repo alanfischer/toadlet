@@ -49,6 +49,42 @@ protected:
 	int remoteTime;
 };
 
+class ClientUpdateEvent:public Event{
+public:
+	TOADLET_SHARED_POINTERS(ClientUpdateEvent);
+
+	enum{
+		EventType_CLIENTUPDATE=103
+	};
+
+	ClientUpdateEvent():Event(EventType_CLIENTUPDATE){}
+	ClientUpdateEvent(int id,int movement):Event(EventType_CLIENTUPDATE){
+		this->id=id;
+		this->movement=movement;
+	}
+
+	int getID(){return id;}
+	int getMovement(){return movement;}
+
+	int read(DataStream *stream){
+		int amount=0;
+		amount+=stream->readBigInt32(id);
+		amount+=stream->readBigInt32(movement);
+		return amount;
+	}
+
+	int write(DataStream *stream){
+		int amount=0;
+		amount+=stream->writeBigInt32(id);
+		amount+=stream->writeBigInt32(movement);
+		return amount;
+	}
+
+protected:
+	int id;
+	int movement;
+};
+
 class UpdateEvent:public Event{
 public:
 	TOADLET_SHARED_POINTERS(UpdateEvent);
@@ -58,19 +94,22 @@ public:
 	};
 
 	UpdateEvent():Event(EventType_UPDATE){}
-	UpdateEvent(int time,const Vector3 &position,const Vector3 &velocity):Event(EventType_UPDATE){
+	UpdateEvent(int time,int id,const Vector3 &position,const Vector3 &velocity):Event(EventType_UPDATE){
 		this->time=time;
+		this->id=id;
 		this->position=position;
 		this->velocity=velocity;
 	}
 
 	int getTime(){return time;}
+	int getID(){return id;}
 	const Vector3 &getPosition(){return position;}
 	const Vector3 &getVelocity(){return velocity;}
 
 	int read(DataStream *stream){
 		int amount=0;
 		amount+=stream->readBigInt32(time);
+		amount+=stream->readBigInt32(id);
 		amount+=stream->readBigFloat(position.x);
 		amount+=stream->readBigFloat(position.y);
 		amount+=stream->readBigFloat(position.z);
@@ -83,6 +122,7 @@ public:
 	int write(DataStream *stream){
 		int amount=0;
 		amount+=stream->writeBigInt32(time);
+		amount+=stream->writeBigInt32(id);
 		amount+=stream->writeBigFloat(position.x);
 		amount+=stream->writeBigFloat(position.y);
 		amount+=stream->writeBigFloat(position.z);
@@ -94,12 +134,15 @@ public:
 
 protected:
 	int time;
+	int id;
 	Vector3 position;
 	Vector3 velocity;
 };
 
 SimpleSync::SimpleSync():Application(),
 	nextUpdateTime(0),
+	clientServerTimeDifference(0),
+	clientLeadTime(0),
 	debugUpdateMin(0),
 	debugUpdateMax(0),
 	packetDelay(0),
@@ -148,10 +191,10 @@ void SimpleSync::create(){
 	//scene->showCollisionVolumes(true,false);
 	scene->getSimulator()->setMicroCollisionThreshold(5);
 	if(client!=NULL){
-		scene->setLogicDT(0);
+		scene->setLogicDT(10);
 	}
 	else{
-		scene->setLogicDT(0);
+		scene->setLogicDT(10);
 	}
 
 	scene->getRootNode()->attach(getEngine()->createNodeType(LightNode::type()));
@@ -263,6 +306,23 @@ void SimpleSync::update(int dt){
 
 void SimpleSync::preLogicUpdate(int dt){
 	scene->preLogicUpdate(dt);
+
+	if(client!=NULL){
+		Event::ptr update(new ClientUpdateEvent(dt,movement));
+		client->send(update);
+	}
+
+	if(server!=NULL){
+		if(nextUpdateTime<=scene->getLogicTime()){
+			Event::ptr update(new UpdateEvent(scene->getLogicTime(),0,block->getPosition(),block->getVelocity()));
+			server->broadcast(update);
+
+			update=Event::ptr(new UpdateEvent(scene->getLogicTime(),1,player[0]->getPosition(),player[0]->getVelocity()));
+			server->broadcast(update);
+
+			nextUpdateTime=scene->getLogicTime()+random.nextInt(debugUpdateMin,debugUpdateMax);
+		}
+	}
 }
 
 void SimpleSync::logicUpdate(int dt){
@@ -284,23 +344,30 @@ void SimpleSync::postLogicUpdate(int dt){
 				Logger::alert(String("received SyncEvent:")+syncEvent->toString());
 				Logger::alert(String("ping:")+ping);
 
-				scene->setLogicTimeAndFrame(serverTime+20,0);
+				clientServerTimeDifference=serverTime-newClientTime;
+				clientLeadTime=ping/2;
+Logger::alert(String("TD:")+(clientServerTimeDifference));
 			}
 			else if(event->getType()==UpdateEvent::EventType_UPDATE){
 				UpdateEvent::ptr updateEvent=shared_static_cast<UpdateEvent>(event);
 
-				// Update block
-				block->getSolid()->setPosition(updateEvent->getPosition());
-				block->getSolid()->setVelocity(updateEvent->getVelocity());
+				Solid::ptr solid=updateEvent->getID()>0?player[0]->getSolid():block->getSolid();
+				if(solid!=NULL){
+					// Update object
+Vector3 previous=solid->getPosition();
+					solid->setPosition(updateEvent->getPosition());
+					solid->setVelocity(updateEvent->getVelocity());
 
-				// Now simulate block till we're back to where we need to be
-				int clientTime=scene->getLogicTime();
-				int serverTime=updateEvent->getTime();
-				int updateDT=0;
-				int minDT=scene->getLogicDT()!=0?scene->getLogicDT():10;
-				for(updateDT=(int)Math::minVal(minDT,clientTime-serverTime);serverTime<clientTime;updateDT=(int)Math::minVal(minDT,clientTime-serverTime)){
-					scene->getSimulator()->update(updateDT,block->getSolid());
-					serverTime+=updateDT;
+					// Now simulate block till we're back to where we need to be
+					int clientTime=scene->getLogicTime()+clientServerTimeDifference+clientLeadTime;
+					int serverTime=updateEvent->getTime();
+					int updateDT=0;
+					int minDT=scene->getLogicDT()!=0?scene->getLogicDT():10;
+					for(updateDT=(int)Math::minVal(minDT,clientTime-serverTime);serverTime<clientTime;updateDT=(int)Math::minVal(minDT,clientTime-serverTime)){
+						scene->getSimulator()->update(updateDT,solid);
+						serverTime+=updateDT;
+					}
+//Logger::alert(String("Error:")+updateEvent->getID()+":"+Math::length(previous,solid->getPosition()));
 				}
 			}
 		}
@@ -324,34 +391,34 @@ void SimpleSync::postLogicUpdate(int dt){
 					Logger::alert(String("sending SyncEvent:")+syncEvent->toString());
 					eventConnection->send(syncEvent);
 				}
+				else if(event->getType()==ClientUpdateEvent::EventType_CLIENTUPDATE){
+					ClientUpdateEvent::ptr updateEvent=shared_static_cast<ClientUpdateEvent>(event);
+					playerMovement[updateEvent->getID()]=updateEvent->getMovement();
+				}
 			}
 		}
+	}
 
-		if(nextUpdateTime<=scene->getLogicTime()){
-			Event::ptr update(new UpdateEvent(scene->getLogicTime(),block->getPosition(),block->getVelocity()));
-			server->broadcast(update);
-			nextUpdateTime=scene->getLogicTime()+random.nextInt(debugUpdateMin,debugUpdateMax);
+	int i;
+	for(i=0;i<2;++i){
+		if(playerMovement[i]&(1<<0)){
+			player[i]->setVelocity(Vector3(0,10,0));
 		}
-	}
-
-	if(movement&(1<<0)){
-		player[0]->setVelocity(Vector3(0,10,0));
-	}
-	if(movement&(1<<1)){
-		player[0]->setVelocity(Vector3(0,-10,0));
-	}
-	if(movement&(1<<2)){
-		player[0]->setVelocity(Vector3(-10,0,0));
-	}
-	if(movement&(1<<3)){
-		player[0]->setVelocity(Vector3(10,0,0));
+		if(playerMovement[i]&(1<<1)){
+			player[i]->setVelocity(Vector3(0,-10,0));
+		}
+		if(playerMovement[i]&(1<<2)){
+			player[i]->setVelocity(Vector3(-10,0,0));
+		}
+		if(playerMovement[i]&(1<<3)){
+			player[i]->setVelocity(Vector3(10,0,0));
+		}
 	}
 
 	scene->postLogicUpdate(dt);
 }
 
 void SimpleSync::keyPressed(int key){
-	Logger::alert(String("KP:")+key+":"+(int)'[');
 	if(key=='o'){
 		packetDelay-=10;
 	}
@@ -428,6 +495,9 @@ Event::ptr SimpleSync::createEventType(int type){
 	}
 	else if(type==UpdateEvent::EventType_UPDATE){
 		return Event::ptr(new UpdateEvent());
+	}
+	else if(type==ClientUpdateEvent::EventType_CLIENTUPDATE){
+		return Event::ptr(new ClientUpdateEvent());
 	}
 	else{
 		return Event::ptr(new Event());

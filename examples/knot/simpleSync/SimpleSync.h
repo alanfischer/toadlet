@@ -63,6 +63,8 @@ public:
 
 	HopScene::ptr scene;
 	int nextUpdateTime;
+	int clientServerTimeDifference;
+	int clientLeadTime;
 	int debugUpdateMin,debugUpdateMax;
 	int packetDelay;
 	int packetDelayVariance;
@@ -73,6 +75,7 @@ public:
 	MeshNode::ptr meshNode;
 	HopEntity::ptr block;
 	HopEntity::ptr player[2];
+	int playerMovement[2];
 	int movement;
 };
 
