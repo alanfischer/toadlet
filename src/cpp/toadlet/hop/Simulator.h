@@ -96,7 +96,7 @@ public:
 	int getNumConstraints() const{return mConstraints.size();}
 	Constraint::ptr getConstraint(int i) const{return mConstraints[i];}
 
-	void update(int dt); // milliseconds
+	void update(int dt,Solid *solid=NULL); // milliseconds
 
 	int findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids) const;
 	int findSolidsInSphere(const Sphere &sphere,Solid *solids[],int maxSolids) const;
