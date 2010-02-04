@@ -64,6 +64,8 @@ public:
 	HopScene::ptr scene;
 	int nextUpdateTime;
 	int debugUpdateMin,debugUpdateMax;
+	int packetDelay;
+	int packetDelayVariance;
 	Mutex mutex;
 
 	Random random;

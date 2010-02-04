@@ -102,6 +102,8 @@ SimpleSync::SimpleSync():Application(),
 	nextUpdateTime(0),
 	debugUpdateMin(0),
 	debugUpdateMax(0),
+	packetDelay(0),
+	packetDelayVariance(0),
 	movement(0)
 {
 }
@@ -131,7 +133,7 @@ void SimpleSync::connect(int remoteHost,int remotePort){
 
 	connector->addConnectionListener(this,false);
 	client=SimpleClient::ptr(new SimpleClient(this,connector));
-	shared_static_cast<TCPConnection>(client->getConnection())->debugSetPacketDelayTime(100,100);
+//	shared_static_cast<TCPConnection>(client->getConnection())->debugSetPacketDelayTime(100,130);
 }
 
 void SimpleSync::create(){
@@ -282,7 +284,7 @@ void SimpleSync::postLogicUpdate(int dt){
 				Logger::alert(String("received SyncEvent:")+syncEvent->toString());
 				Logger::alert(String("ping:")+ping);
 
-				scene->setLogicTimeAndFrame(serverTime+ping/2,0);
+				scene->setLogicTimeAndFrame(serverTime+20,0);
 			}
 			else if(event->getType()==UpdateEvent::EventType_UPDATE){
 				UpdateEvent::ptr updateEvent=shared_static_cast<UpdateEvent>(event);
@@ -349,6 +351,25 @@ void SimpleSync::postLogicUpdate(int dt){
 }
 
 void SimpleSync::keyPressed(int key){
+	Logger::alert(String("KP:")+key+":"+(int)'[');
+	if(key=='o'){
+		packetDelay-=10;
+	}
+	else if(key=='p'){
+		packetDelay+=10;
+	}
+	else if(key=='O'){
+		packetDelayVariance-=10;
+	}
+	else if(key=='P'){
+		packetDelayVariance+=10;
+	}
+
+	if(client!=NULL){
+Logger::alert(String("packetDelay:")+packetDelay+" packetDelayVariance:"+packetDelayVariance);
+		shared_static_cast<TCPConnection>(client->getConnection())->debugSetPacketDelayTime(packetDelay-packetDelayVariance/2,packetDelay+packetDelayVariance/2);
+	}
+
 	if(key=='r'){
 		block->setPosition(Vector3(0,0,10));
 		block->setVelocity(Vector3(0,0,0));
