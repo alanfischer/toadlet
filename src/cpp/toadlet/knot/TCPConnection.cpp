@@ -221,13 +221,14 @@ bool TCPConnection::accept(Socket::ptr socket){
 }
 
 void TCPConnection::close(){
+	mDebugRun=false;
+
 	TOADLET_TRY
 		if(mSocket!=NULL){
 			mSocket->close();
 		}
 	TOADLET_CATCH(const Exception &){}
 
-	mDebugRun=false;
 	if(mDebugThread!=NULL){
 		Thread::ptr thread=mDebugThread;
 		mDebugThread=NULL;

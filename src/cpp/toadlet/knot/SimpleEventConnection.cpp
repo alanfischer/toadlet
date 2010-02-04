@@ -68,11 +68,12 @@ SimpleEventConnection::~SimpleEventConnection(){
 }
 
 void SimpleEventConnection::close(){
+	mRun=false;
+
 	if(mConnection!=NULL){
 		mConnection->close();
 	}
 
-	mRun=false;
 	if(mThread!=NULL){
 		Thread::ptr thread=mThread;
 		mThread=NULL;
