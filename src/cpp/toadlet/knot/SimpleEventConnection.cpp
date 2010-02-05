@@ -98,12 +98,13 @@ void SimpleEventConnection::setConnection(Connection::ptr connection){
 }
 
 void SimpleEventConnection::connected(Connection::ptr connection){
-	mConnection=connection;
-
 	// Since we don't join() in disconnected, we join here just in case its still running somehow
 	if(mThread!=NULL){
 		mThread->join();
 	}
+
+	mConnection=connection;
+
 	mThread=Thread::ptr(new Thread(this));
 	mRun=true;
 	mThread->start();
@@ -112,10 +113,6 @@ void SimpleEventConnection::connected(Connection::ptr connection){
 void SimpleEventConnection::disconnected(Connection::ptr connection){
 	mRun=false;
 	// We don't want to mThread.join() here, since mThread could be the one that is notifying us that we are disconnected
-
-	if(mConnection==connection){
-		mConnection=NULL;
-	}
 }
 
 bool SimpleEventConnection::send(Event::ptr event){

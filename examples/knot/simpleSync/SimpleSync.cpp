@@ -405,7 +405,7 @@ Logger::alert(String("localID:")+(localID));
 				}
 
 				// Now simulate till we're back to where we need to be
-				int clientTime=scene->getLogicTime()+clientServerTimeDifference+20;//clientLeadTime;
+				int clientTime=scene->getLogicTime()+clientServerTimeDifference+50;//clientLeadTime;
 				int serverTime=updateEvent->getTime();
 				int updateDT=0;
 				int minDT=scene->getLogicDT()!=0?scene->getLogicDT():10;
@@ -549,10 +549,19 @@ Event::ptr SimpleSync::createEventType(int type){
 }
 
 void SimpleSync::connected(Connection::ptr connection){
+	if(server!=NULL){
+		Logger::alert("Client connected");
+	}
 }
 
 void SimpleSync::disconnected(Connection::ptr connection){
-	stop();
+	if(server!=NULL){
+		Logger::alert("Client disconnected");
+	}
+
+	if(client!=NULL){
+		stop();
+	}
 }
 
 void SimpleSync::run(){

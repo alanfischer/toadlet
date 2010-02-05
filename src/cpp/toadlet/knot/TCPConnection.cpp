@@ -355,7 +355,7 @@ int TCPConnection::receive(byte *data,int length){
 		TOADLET_CATCH(const Exception &){amount=-1;}
 	}
 
-	if(amount<=0 && opened() && mSocket!=NULL && (mBlocking || mSocket->pollRead(0)==true)){
+	if(amount<0 && opened()){
 		close();
 	}
 
