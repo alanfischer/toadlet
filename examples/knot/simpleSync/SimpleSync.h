@@ -76,10 +76,13 @@ public:
 	HopEntity::ptr block;
 	HopEntity::ptr player[2];
 	int playerMovement[2];
+	int lastReceivedPlayerMovement[2];
 
 	int localID;
 	Collection<int> predictedMovement;
+	Collection<int> predictedMovementTime;
 	int predictedTimeStart;
+	int predictedLastAcknowledgedTime;
 };
 
 #endif
