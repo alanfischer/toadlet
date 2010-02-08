@@ -4,171 +4,184 @@
 #include <toadlet/egg/io/FileStream.h>
 #include <toadlet/egg/io/ZIPArchive.h>
 
-class SyncEvent:public Event{
+class PingEvent:public Event{
 public:
-	TOADLET_SHARED_POINTERS(SyncEvent);
+	TOADLET_SHARED_POINTERS(PingEvent);
 
 	enum{
-		EventType_SYNC=101
+		EventType_PING=101
 	};
 
-	SyncEvent():Event(EventType_SYNC),
-		playerID(-1),
-		localTime(0),
-		remoteTime(0)
+	PingEvent():Event(EventType_PING),
+		mLocalTime(0),
+		mRemoteTime(0)
 	{}
-	SyncEvent(int localTime):Event(EventType_SYNC),
-		playerID(-1),
-		localTime(0),
-		remoteTime(0)
+	PingEvent(int localTime,int remoteTime=0):Event(EventType_PING),
+		mLocalTime(0),
+		mRemoteTime(0)
 	{
-		this->localTime=localTime;
+		mLocalTime=localTime;
+		mRemoteTime=remoteTime;
 	}
 
-	void setPlayerID(int id){playerID=id;}
-	int getPlayerID(){return playerID;}
-	int getLocalTime(){return localTime;}
-	void setLocalTime(int localTime){this->localTime=localTime;}
-	int getRemoteTime(){return remoteTime;}
-	void setRemoteTime(int remoteTime){this->remoteTime=remoteTime;}
+	int getLocalTime(){return mLocalTime;}
+	int getRemoteTime(){return mRemoteTime;}
 
 	int read(DataStream *stream){
 		int amount=0;
-		amount+=stream->readBigInt32(playerID);
-		amount+=stream->readBigInt32(localTime);
-		amount+=stream->readBigInt32(remoteTime);
+		amount+=stream->readBigInt32(mLocalTime);
+		amount+=stream->readBigInt32(mRemoteTime);
 		return amount;
 	}
 
 	int write(DataStream *stream){
 		int amount=0;
-		amount+=stream->writeBigInt32(playerID);
-		amount+=stream->writeBigInt32(localTime);
-		amount+=stream->writeBigInt32(remoteTime);
+		amount+=stream->writeBigInt32(mLocalTime);
+		amount+=stream->writeBigInt32(mRemoteTime);
 		return amount;
 	}
 
-	String toString(){return String("localTime:")+localTime+",remoteTime:"+remoteTime;}
-
 protected:
-	int playerID;
-	int localTime;
-	int remoteTime;
+	int mLocalTime;
+	int mRemoteTime;
 };
 
+// This event is sent from the client each frame with the client dt and commands
 class ClientUpdateEvent:public Event{
 public:
 	TOADLET_SHARED_POINTERS(ClientUpdateEvent);
 
-	enum{
-		EventType_CLIENTUPDATE=103
-	};
-
-	ClientUpdateEvent():Event(EventType_CLIENTUPDATE){}
-	ClientUpdateEvent(int id,int movement,int time):Event(EventType_CLIENTUPDATE){
-		this->id=id;
-		this->movement=movement;
-		this->time=time;
+	ClientUpdateEvent(int type):Event(type),mCounter(0),mDT(0){}
+	ClientUpdateEvent(int type,int counter,int dt):Event(type){
+		mCounter=counter;
+		mDT=dt;
 	}
 
-	int getID(){return id;}
-	int getMovement(){return movement;}
-	int getTime(){return time;}
+	int getCounter(){return mCounter;}
+	int getDT(){return mDT;}
 
-	int read(DataStream *stream){
-		int amount=0;
-		amount+=stream->readBigInt32(id);
-		amount+=stream->readBigInt32(movement);
-		amount+=stream->readBigInt32(time);
-		return amount;
-	}
-
-	int write(DataStream *stream){
-		int amount=0;
-		amount+=stream->writeBigInt32(id);
-		amount+=stream->writeBigInt32(movement);
-		amount+=stream->writeBigInt32(time);
-		return amount;
-	}
+	int read(DataStream *stream){return stream->readBigInt16(mCounter)+stream->readBigInt32(mDT);}
+	int write(DataStream *stream){return stream->writeBigInt16(mCounter)+stream->writeBigInt32(mDT);}
 
 protected:
-	int id;
-	int movement;
-	int time;
+	short mCounter;
+	int mDT;
 };
 
-class UpdateEvent:public Event{
+// This event is sent from the server occasionally to update information about objects or possibly confirm the receipt of a ClientUpdateEvent
+class ServerUpdateEvent:public Event{
 public:
-	TOADLET_SHARED_POINTERS(UpdateEvent);
+	TOADLET_SHARED_POINTERS(ServerUpdateEvent);
+
+	ServerUpdateEvent(int type):Event(type),mLastCounter(0),mTime(0){}
+	ServerUpdateEvent(int type,int lastCounter,int time):Event(type){
+		mLastCounter=lastCounter;
+		mTime=time;
+	}
+
+	int getLastClientUpdateCounter(){return mLastCounter;}
+	int getTime(){return mTime;}
+
+	int read(DataStream *stream){return stream->readBigInt16(mLastCounter)+stream->readBigInt32(mTime);}
+	int write(DataStream *stream){return stream->writeBigInt16(mLastCounter)+stream->writeBigInt32(mTime);}
+
+protected:
+	short mLastCounter;
+	int mTime;
+};
+
+
+class ClientEvent:public ClientUpdateEvent{
+public:
+	TOADLET_SHARED_POINTERS(ClientEvent);
 
 	enum{
-		EventType_UPDATE=102
+		EventType_CLIENT=201
 	};
 
-	UpdateEvent():Event(EventType_UPDATE){}
-	UpdateEvent(int time):Event(EventType_UPDATE){
-		this->time=time;
+	ClientEvent():ClientUpdateEvent(EventType_CLIENT){}
+	ClientEvent(int dt,int counter,int flags):ClientUpdateEvent(counter,flags,EventType_CLIENT){
+		mFlags=flags;
 	}
 
-	void addUpdate(int id,const Vector3 &position,const Vector3 &velocity,int lastMovement=0){
-		ids.add(id);
-		positions.add(position);
-		velocities.add(velocity);
-		lastMovements.add(lastMovement);
-	}
-
-	int getTime(){return time;}
-	int getNumUpdates(){return ids.size();}
-	int getID(int i){return ids[i];}
-	const Vector3 &getPosition(int i){return positions[i];}
-	const Vector3 &getVelocity(int i){return velocities[i];}
-	int getLastMovement(int i){return lastMovements[i];}
+	int getFlags(){return mFlags;}
 
 	int read(DataStream *stream){
-		int amount=0;
-		amount+=stream->readBigInt32(time);
+		int amount=ClientUpdateEvent::read(stream);
+		amount+=stream->readBigInt32(mFlags);
+		return amount;
+	}
+
+	int write(DataStream *stream){
+		int amount=ClientUpdateEvent::write(stream);
+		amount+=stream->writeBigInt32(mFlags);
+		return amount;
+	}
+
+protected:
+	int mFlags;
+};
+
+class ServerEvent:public ServerUpdateEvent{
+public:
+	TOADLET_SHARED_POINTERS(ServerEvent);
+
+	enum{
+		EventType_SERVER=202
+	};
+
+	ServerEvent():ServerUpdateEvent(EventType_SERVER){}
+	ServerEvent(int time,int lastCounter):ServerUpdateEvent(EventType_SERVER,time,lastCounter){}
+
+	void addUpdate(int id,const Vector3 &position,const Vector3 &velocity){
+		mIDs.add(id);
+		mPositions.add(position);
+		mVelocitys.add(velocity);
+	}
+
+	int getNumUpdates(){return mIDs.size();}
+	int getID(int i){return mIDs[i];}
+	const Vector3 &getPosition(int i){return mPositions[i];}
+	const Vector3 &getVelocity(int i){return mVelocitys[i];}
+
+	int read(DataStream *stream){
+		int amount=ServerUpdateEvent::read(stream);
 		int numUpdates=0;
 		amount+=stream->readBigInt32(numUpdates);
-		ids.resize(numUpdates);
-		positions.resize(numUpdates);
-		velocities.resize(numUpdates);
-		lastMovements.resize(numUpdates);
+		mIDs.resize(numUpdates);
+		mPositions.resize(numUpdates);
+		mVelocitys.resize(numUpdates);
 		for(int i=0;i<numUpdates;++i){
-			amount+=stream->readBigInt32(ids[i]);
-			amount+=stream->readBigFloat(positions[i].x);
-			amount+=stream->readBigFloat(positions[i].y);
-			amount+=stream->readBigFloat(positions[i].z);
-			amount+=stream->readBigFloat(velocities[i].x);
-			amount+=stream->readBigFloat(velocities[i].y);
-			amount+=stream->readBigFloat(velocities[i].z);
-			amount+=stream->readBigInt32(lastMovements[i]);
+			amount+=stream->readBigInt32(mIDs[i]);
+			amount+=stream->readBigFloat(mPositions[i].x);
+			amount+=stream->readBigFloat(mPositions[i].y);
+			amount+=stream->readBigFloat(mPositions[i].z);
+			amount+=stream->readBigFloat(mVelocitys[i].x);
+			amount+=stream->readBigFloat(mVelocitys[i].y);
+			amount+=stream->readBigFloat(mVelocitys[i].z);
 		}
 		return amount;
 	}
 
 	int write(DataStream *stream){
-		int amount=0;
-		amount+=stream->writeBigInt32(time);
-		amount+=stream->writeBigInt32(ids.size());
-		for(int i=0;i<ids.size();++i){
-			amount+=stream->writeBigInt32(ids[i]);
-			amount+=stream->writeBigFloat(positions[i].x);
-			amount+=stream->writeBigFloat(positions[i].y);
-			amount+=stream->writeBigFloat(positions[i].z);
-			amount+=stream->writeBigFloat(velocities[i].x);
-			amount+=stream->writeBigFloat(velocities[i].y);
-			amount+=stream->writeBigFloat(velocities[i].z);
-			amount+=stream->writeBigInt32(lastMovements[i]);
+		int amount=ServerUpdateEvent::write(stream);
+		amount+=stream->writeBigInt32(mIDs.size());
+		for(int i=0;i<mIDs.size();++i){
+			amount+=stream->writeBigInt32(mIDs[i]);
+			amount+=stream->writeBigFloat(mPositions[i].x);
+			amount+=stream->writeBigFloat(mPositions[i].y);
+			amount+=stream->writeBigFloat(mPositions[i].z);
+			amount+=stream->writeBigFloat(mVelocitys[i].x);
+			amount+=stream->writeBigFloat(mVelocitys[i].y);
+			amount+=stream->writeBigFloat(mVelocitys[i].z);
 		}
 		return amount;
 	}
 
 protected:
-	int time;
-	Collection<int> ids;
-	Collection<Vector3> positions;
-	Collection<Vector3> velocities;
-	Collection<int> lastMovements;
+	Collection<int> mIDs;
+	Collection<Vector3> mPositions;
+	Collection<Vector3> mVelocitys;
 };
 
 SimpleSync::SimpleSync():Application(),
@@ -179,14 +192,11 @@ SimpleSync::SimpleSync():Application(),
 	debugUpdateMax(0),
 	packetDelay(0),
 	packetDelayVariance(0),
-	localID(0),
-	predictedTimeStart(0),
-	predictedLastAcknowledgedTime(0)
 {
 	playerMovement[0]=0;
 	playerMovement[1]=0;
-	predictedMovement.resize(100,0);
-	predictedMovementTime.resize(100,0);
+	predictedMovement.resize(1000,0);
+	predictedMovementTime.resize(1000,-1);
 }
 
 SimpleSync::~SimpleSync(){
@@ -284,11 +294,10 @@ void SimpleSync::create(){
 
 	mutex.unlock();
 
-	// Send initial sync message
+	// Send initial ping message
 	if(client!=NULL){
-		SyncEvent::ptr syncEvent(new SyncEvent(scene->getLogicTime()));
-		Logger::alert(String("sending inital SyncEvent:")+syncEvent->toString());
-		client->send(syncEvent);
+		PingEvent::ptr pingEvent(new PingEvent(scene->getLogicTime()));
+		client->send(pingEvent);
 	}
 }
 
@@ -347,19 +356,21 @@ void SimpleSync::preLogicUpdate(int dt){
 
 	if(client!=NULL){
 		predictedMovementTime[0]=scene->getLogicTime();
-		Event::ptr update(new ClientUpdateEvent(localID,predictedMovement[0],scene->getLogicTime()));
+		Event::ptr update(new ClientEvent(dt,scene->getLogicFrame(),predictedMovement[0]));
 		client->send(update);
 	}
 
-	if(server!=NULL){
-		if(nextUpdateTime<=scene->getLogicTime()){
-			UpdateEvent::ptr updateEvent(new UpdateEvent(scene->getLogicTime()));
-			updateEvent->addUpdate(-1,block->getPosition(),block->getVelocity());
-			updateEvent->addUpdate(0,player[0]->getPosition(),player[0]->getVelocity(),lastReceivedPlayerMovement[0]);
-			updateEvent->addUpdate(1,player[1]->getPosition(),player[1]->getVelocity(),lastReceivedPlayerMovement[1]);
-			server->broadcast(updateEvent);
+	if(server!=NULL && nextUpdateTime<=scene->getLogicTime()){
+		nextUpdateTime=scene->getLogicTime()+random.nextInt(debugUpdateMin,debugUpdateMax);
 
-			nextUpdateTime=scene->getLogicTime()+random.nextInt(debugUpdateMin,debugUpdateMax);
+		EventConnection::ptr eventConnection=NULL;
+		int i=0;
+		for(eventConnection=server->getClient(0);eventConnection!=NULL;eventConnection=server->getClient(++i)){
+			ServerEvent::ptr serverEvent(new ServerEvent(scene->getLogicTime(),lastReceivedPlayerMovement[i]));
+			serverEvent->addUpdate(-1,block->getPosition(),block->getVelocity());
+			serverEvent->addUpdate(0,player[0]->getPosition(),player[0]->getVelocity());
+			serverEvent->addUpdate(1,player[1]->getPosition(),player[1]->getVelocity());
+			eventConnection->send(serverEvent);
 		}
 	}
 }
@@ -388,39 +399,33 @@ void SimpleSync::postLogicUpdate(int dt){
 	if(client!=NULL){
 		Event::ptr event=NULL;
 		while((event=client->receive())!=NULL){
-			if(event->getType()==SyncEvent::EventType_SYNC){
-				SyncEvent::ptr syncEvent=shared_static_cast<SyncEvent>(event);
+			if(event->getType()==PingEvent::EventType_PING){
+				PingEvent::ptr pingEvent=shared_static_cast<PingEvent>(event);
 
 				// We now know the times for the client & server, and the ping, so we can calculate our 'lead ahead time'
-				int oldClientTime=syncEvent->getRemoteTime();
+				int oldClientTime=pingEvent->getRemoteTime();
 				int newClientTime=scene->getLogicTime();
-				int serverTime=syncEvent->getLocalTime();
+				int serverTime=pingEvent->getLocalTime();
 				int ping=(newClientTime-oldClientTime);
-				Logger::alert(String("received SyncEvent:")+syncEvent->toString());
 				Logger::alert(String("ping:")+ping);
 
 				clientServerTimeDifference=serverTime-newClientTime;
 				clientLeadTime=ping/2;
 Logger::alert(String("TD:")+(clientServerTimeDifference));
-
-				localID=syncEvent->getPlayerID();
-Logger::alert(String("localID:")+(localID));
 			}
-			else if(event->getType()==UpdateEvent::EventType_UPDATE){
-				UpdateEvent::ptr updateEvent=shared_static_cast<UpdateEvent>(event);
+			else if(event->getType()==ServerEvent::EventType_SERVER){
+				ServerEvent::ptr serverEvent=shared_static_cast<ServerEvent>(event);
+
+				predictedLastAcknowledgedCounter=serverEvent->getLastClientUpdateCounter();
 
 				int u=0;
-				for(u=0;u<updateEvent->getNumUpdates();++u){
-					Solid::ptr solid=updateEvent->getID(u)>=0?player[updateEvent->getID(u)]->getSolid():block->getSolid();
+				for(u=0;u<serverEvent->getNumUpdates();++u){
+					int id=serverEvent->getID(u);
+					Solid::ptr solid=id>=0?player[id]->getSolid():block->getSolid();
 					if(solid!=NULL){
 						// Update object
-						solid->setPosition(updateEvent->getPosition(u));
-						solid->setVelocity(updateEvent->getVelocity(u));
-					}
-
-					if(updateEvent->getID(u)==localID){
-						predictedLastAcknowledgedTime=updateEvent->getLastMovement(u);
-if(predictedLastAcknowledgedTime<0)predictedLastAcknowledgedTime=0;
+						solid->setPosition(serverEvent->getPosition(u));
+						solid->setVelocity(serverEvent->getVelocity(u));
 					}
 				}
 
@@ -436,16 +441,16 @@ int timesToUpdate=(clientTime-serverTime)/minDT;
 int i=0;
 //Logger::alert(String("last ack:")+predictedLastAcknowledgedTime+" curr:"+scene->getLogicTime()+" TTU:"+timesToUpdate);
 				for(updateDT=(int)Math::minVal(minDT,clientTime-serverTime);serverTime<clientTime;updateDT=(int)Math::minVal(minDT,clientTime-serverTime)){
-for(int z=0;z<100;++z){
+for(int z=0;z<1000;++z){
 	if(predictedMovementTime[z]==serverTime){
-		updatePlayerMovement(predictedMovement[z],player[localID]->getSolid());
+		updatePlayerMovement(predictedMovement[z],player[client->getClientID()]->getSolid());
 	}
 }
 //Logger::alert(String("PT:")+predictedMovementTime[timesToUpdate-i]);
 //Logger::alert(String("i:")+(timesToUpdate-i));
 i++;
-					for(u=0;u<updateEvent->getNumUpdates();++u){
-						Solid::ptr solid=updateEvent->getID(u)>=0?player[updateEvent->getID(u)]->getSolid():block->getSolid();
+					for(u=0;u<serverEvent->getNumUpdates();++u){
+						Solid::ptr solid=serverEvent->getID(u)>=0?player[updateEvent->getID(u)]->getSolid():block->getSolid();
 						scene->getSimulator()->update(updateDT,solid);
 					}
 					serverTime+=updateDT;
@@ -453,8 +458,8 @@ i++;
 			}
 		}
 
-		memcpy(&predictedMovement[1],&predictedMovement[0],sizeof(int)*99);
-		memcpy(&predictedMovementTime[1],&predictedMovementTime[0],sizeof(int)*99);
+		memcpy(&predictedMovement[1],&predictedMovement[0],sizeof(int)*999);
+		memcpy(&predictedMovementTime[1],&predictedMovementTime[0],sizeof(int)*999);
 	}
 
 	if(server!=NULL){
