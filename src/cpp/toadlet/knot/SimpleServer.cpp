@@ -148,13 +148,21 @@ Event::ptr SimpleServer::receive(){
 }
 
 EventConnection::ptr SimpleServer::getClient(int i){
-	EventConnection::ptr connection;
+	ServerClient::ptr client;
 	mClientsMutex.lock();
 		if(i>=0 && i<mClients.size()){
-			connection=mClients[i];
+			client=mClients[i];
 		}
 	mClientsMutex.unlock();
-	return connection;
+	return client;
+}
+
+EventConnection::ptr SimpleServer::getClient(Connection::ptr connection){
+	ServerClient::ptr client;
+	mClientsMutex.lock();
+		client=mConnectionClients.find(connection)->second;
+	mClientsMutex.unlock();
+	return client;
 }
 
 int SimpleServer::update(){

@@ -56,6 +56,7 @@ public:
 	virtual bool sendToClient(int toClientID,egg::Event::ptr event);
 	virtual egg::Event::ptr receive();
 	virtual EventConnection::ptr getClient(int i);
+	virtual EventConnection::ptr getClient(Connection::ptr connection);
 
 	virtual int update();
 
