@@ -4,48 +4,6 @@
 #include <toadlet/egg/io/FileStream.h>
 #include <toadlet/egg/io/ZIPArchive.h>
 
-class PingEvent:public Event{
-public:
-	TOADLET_SHARED_POINTERS(PingEvent);
-
-	enum{
-		EventType_PING=101
-	};
-
-	PingEvent():Event(EventType_PING),
-		mLocalTime(0),
-		mRemoteTime(0)
-	{}
-	PingEvent(int localTime,int remoteTime=0):Event(EventType_PING),
-		mLocalTime(0),
-		mRemoteTime(0)
-	{
-		mLocalTime=localTime;
-		mRemoteTime=remoteTime;
-	}
-
-	int getLocalTime(){return mLocalTime;}
-	int getRemoteTime(){return mRemoteTime;}
-
-	int read(DataStream *stream){
-		int amount=0;
-		amount+=stream->readBigInt32(mLocalTime);
-		amount+=stream->readBigInt32(mRemoteTime);
-		return amount;
-	}
-
-	int write(DataStream *stream){
-		int amount=0;
-		amount+=stream->writeBigInt32(mLocalTime);
-		amount+=stream->writeBigInt32(mRemoteTime);
-		return amount;
-	}
-
-protected:
-	int mLocalTime;
-	int mRemoteTime;
-};
-
 // This event is sent from the client each frame with the client dt and commands
 class ClientUpdateEvent:public Event{
 public:
@@ -60,8 +18,8 @@ public:
 	int getCounter(){return mCounter;}
 	int getDT(){return mDT;}
 
-	int read(DataStream *stream){return stream->readBigInt16(mCounter)+stream->readBigInt32(mDT);}
-	int write(DataStream *stream){return stream->writeBigInt16(mCounter)+stream->writeBigInt32(mDT);}
+	virtual int read(DataStream *stream){return stream->readBigInt16(mCounter)+stream->readBigInt32(mDT);}
+	virtual int write(DataStream *stream){return stream->writeBigInt16(mCounter)+stream->writeBigInt32(mDT);}
 
 protected:
 	short mCounter;
@@ -82,8 +40,8 @@ public:
 	int getLastClientUpdateCounter(){return mLastCounter;}
 	int getTime(){return mTime;}
 
-	int read(DataStream *stream){return stream->readBigInt16(mLastCounter)+stream->readBigInt32(mTime);}
-	int write(DataStream *stream){return stream->writeBigInt16(mLastCounter)+stream->writeBigInt32(mTime);}
+	virtual int read(DataStream *stream){return stream->readBigInt16(mLastCounter)+stream->readBigInt32(mTime);}
+	virtual int write(DataStream *stream){return stream->writeBigInt16(mLastCounter)+stream->writeBigInt32(mTime);}
 
 protected:
 	short mLastCounter;
@@ -96,23 +54,23 @@ public:
 	TOADLET_SHARED_POINTERS(ClientEvent);
 
 	enum{
-		EventType_CLIENT=201
+		EventType_CLIENT=202
 	};
 
 	ClientEvent():ClientUpdateEvent(EventType_CLIENT){}
-	ClientEvent(int dt,int counter,int flags):ClientUpdateEvent(counter,flags,EventType_CLIENT){
+	ClientEvent(int counter,int dt,int flags):ClientUpdateEvent(EventType_CLIENT,counter,dt){
 		mFlags=flags;
 	}
 
 	int getFlags(){return mFlags;}
 
-	int read(DataStream *stream){
+	virtual int read(DataStream *stream){
 		int amount=ClientUpdateEvent::read(stream);
 		amount+=stream->readBigInt32(mFlags);
 		return amount;
 	}
 
-	int write(DataStream *stream){
+	virtual int write(DataStream *stream){
 		int amount=ClientUpdateEvent::write(stream);
 		amount+=stream->writeBigInt32(mFlags);
 		return amount;
@@ -127,11 +85,11 @@ public:
 	TOADLET_SHARED_POINTERS(ServerEvent);
 
 	enum{
-		EventType_SERVER=202
+		EventType_SERVER=203
 	};
 
 	ServerEvent():ServerUpdateEvent(EventType_SERVER){}
-	ServerEvent(int time,int lastCounter):ServerUpdateEvent(EventType_SERVER,time,lastCounter){}
+	ServerEvent(int lastCounter,int time):ServerUpdateEvent(EventType_SERVER,lastCounter,time){}
 
 	void addUpdate(int id,const Vector3 &position,const Vector3 &velocity){
 		mIDs.add(id);
@@ -144,7 +102,7 @@ public:
 	const Vector3 &getPosition(int i){return mPositions[i];}
 	const Vector3 &getVelocity(int i){return mVelocitys[i];}
 
-	int read(DataStream *stream){
+	virtual int read(DataStream *stream){
 		int amount=ServerUpdateEvent::read(stream);
 		int numUpdates=0;
 		amount+=stream->readBigInt32(numUpdates);
@@ -163,7 +121,7 @@ public:
 		return amount;
 	}
 
-	int write(DataStream *stream){
+	virtual int write(DataStream *stream){
 		int amount=ServerUpdateEvent::write(stream);
 		amount+=stream->writeBigInt32(mIDs.size());
 		for(int i=0;i<mIDs.size();++i){
@@ -192,11 +150,10 @@ SimpleSync::SimpleSync():Application(),
 	debugUpdateMax(0),
 	packetDelay(0),
 	packetDelayVariance(0),
+	movement(0)
 {
-	playerMovement[0]=0;
-	playerMovement[1]=0;
-	predictedMovement.resize(1000,0);
-	predictedMovementTime.resize(1000,-1);
+	lastClientUpdateCounter[0]=0;
+	lastClientUpdateCounter[1]=0;
 }
 
 SimpleSync::~SimpleSync(){
@@ -239,10 +196,10 @@ void SimpleSync::create(){
 	//scene->showCollisionVolumes(true,false);
 	scene->getSimulator()->setMicroCollisionThreshold(5);
 	if(client!=NULL){
-		scene->setLogicDT(10);
+		scene->setLogicDT(20);
 	}
 	else{
-		scene->setLogicDT(10);
+		scene->setLogicDT(20);
 	}
 
 	scene->getRootNode()->attach(getEngine()->createNodeType(LightNode::type()));
@@ -292,13 +249,18 @@ void SimpleSync::create(){
 		scene->getRootNode()->attach(player[i]);
 	}
 
-	mutex.unlock();
+playerCollision=1<<0;
+if(client!=NULL){
+player[0]->setMass(0);
+player[0]->setCollisionBits(playerCollision);
+player[0]->getSolid()->setAlwaysActive(true);
+}
+else{
+	player[0]->setCollisionBits(playerCollision);
+	player[1]->setCollisionBits(playerCollision);
+}
 
-	// Send initial ping message
-	if(client!=NULL){
-		PingEvent::ptr pingEvent(new PingEvent(scene->getLogicTime()));
-		client->send(pingEvent);
-	}
+	mutex.unlock();
 }
 
 void SimpleSync::destroy(){
@@ -355,9 +317,10 @@ void SimpleSync::preLogicUpdate(int dt){
 	scene->preLogicUpdate(dt);
 
 	if(client!=NULL){
-		predictedMovementTime[0]=scene->getLogicTime();
-		Event::ptr update(new ClientEvent(dt,scene->getLogicFrame(),predictedMovement[0]));
-		client->send(update);
+		int currentFrame=scene->getLogicFrame()+1;
+		ClientEvent::ptr clientEvent(new ClientEvent(currentFrame,dt,movement));
+		sentClientEvents.add(clientEvent);
+		client->send(clientEvent);
 	}
 
 	if(server!=NULL && nextUpdateTime<=scene->getLogicTime()){
@@ -366,7 +329,7 @@ void SimpleSync::preLogicUpdate(int dt){
 		EventConnection::ptr eventConnection=NULL;
 		int i=0;
 		for(eventConnection=server->getClient(0);eventConnection!=NULL;eventConnection=server->getClient(++i)){
-			ServerEvent::ptr serverEvent(new ServerEvent(scene->getLogicTime(),lastReceivedPlayerMovement[i]));
+			ServerEvent::ptr serverEvent(new ServerEvent(lastClientUpdateCounter[i],scene->getLogicTime()));
 			serverEvent->addUpdate(-1,block->getPosition(),block->getVelocity());
 			serverEvent->addUpdate(0,player[0]->getPosition(),player[0]->getVelocity());
 			serverEvent->addUpdate(1,player[1]->getPosition(),player[1]->getVelocity());
@@ -395,28 +358,13 @@ void updatePlayerMovement(int movement,Solid::ptr player){
 }
 
 void SimpleSync::postLogicUpdate(int dt){
-//Logger::alert("postLogicUpdate");
+	int i;
+
 	if(client!=NULL){
 		Event::ptr event=NULL;
 		while((event=client->receive())!=NULL){
-			if(event->getType()==PingEvent::EventType_PING){
-				PingEvent::ptr pingEvent=shared_static_cast<PingEvent>(event);
-
-				// We now know the times for the client & server, and the ping, so we can calculate our 'lead ahead time'
-				int oldClientTime=pingEvent->getRemoteTime();
-				int newClientTime=scene->getLogicTime();
-				int serverTime=pingEvent->getLocalTime();
-				int ping=(newClientTime-oldClientTime);
-				Logger::alert(String("ping:")+ping);
-
-				clientServerTimeDifference=serverTime-newClientTime;
-				clientLeadTime=ping/2;
-Logger::alert(String("TD:")+(clientServerTimeDifference));
-			}
-			else if(event->getType()==ServerEvent::EventType_SERVER){
+			if(event->getType()==ServerEvent::EventType_SERVER){
 				ServerEvent::ptr serverEvent=shared_static_cast<ServerEvent>(event);
-
-				predictedLastAcknowledgedCounter=serverEvent->getLastClientUpdateCounter();
 
 				int u=0;
 				for(u=0;u<serverEvent->getNumUpdates();++u){
@@ -429,37 +377,40 @@ Logger::alert(String("TD:")+(clientServerTimeDifference));
 					}
 				}
 
-				// Now simulate till we're back to where we need to be
-//				int clientTime=scene->getLogicTime()+clientServerTimeDifference+0;//clientLeadTime*2;
-//				int serverTime=updateEvent->getTime();
-int clientTime=scene->getLogicTime();
-int serverTime=predictedLastAcknowledgedTime;
+				int clientTime=scene->getLogicTime();
+				int serverTime=serverEvent->getTime();
+
+				// If the client is behind the server, then we always jump up to be in sync
+				if(clientTime<serverTime){
+					clientServerTimeDifference=serverTime-clientTime;
+				}
+				else{
+					int idealDifference=serverTime-clientTime;
+					scalar differenceWeighting=Math::fromMilli(100);
+					clientServerTimeDifference=Math::toMilli(Math::mul(Math::fromMilli(clientServerTimeDifference-idealDifference),differenceWeighting));
+				}
+				clientTime+=clientServerTimeDifference;
 
 				int updateDT=0;
 				int minDT=scene->getLogicDT()!=0?scene->getLogicDT():10;
-int timesToUpdate=(clientTime-serverTime)/minDT;
-int i=0;
-//Logger::alert(String("last ack:")+predictedLastAcknowledgedTime+" curr:"+scene->getLogicTime()+" TTU:"+timesToUpdate);
 				for(updateDT=(int)Math::minVal(minDT,clientTime-serverTime);serverTime<clientTime;updateDT=(int)Math::minVal(minDT,clientTime-serverTime)){
-for(int z=0;z<1000;++z){
-	if(predictedMovementTime[z]==serverTime){
-		updatePlayerMovement(predictedMovement[z],player[client->getClientID()]->getSolid());
-	}
-}
-//Logger::alert(String("PT:")+predictedMovementTime[timesToUpdate-i]);
-//Logger::alert(String("i:")+(timesToUpdate-i));
-i++;
-					for(u=0;u<serverEvent->getNumUpdates();++u){
-						Solid::ptr solid=serverEvent->getID(u)>=0?player[updateEvent->getID(u)]->getSolid():block->getSolid();
-						scene->getSimulator()->update(updateDT,solid);
-					}
+					scene->getSimulator()->update(updateDT,~player[client->getClientID()]->getCollisionBits(),NULL);
 					serverTime+=updateDT;
+				}
+
+				// Remove any old events
+				int lastReceivedUpdateCounter=serverEvent->getLastClientUpdateCounter();
+				while(sentClientEvents.size()>0 && sentClientEvents[0]->getCounter()<=lastReceivedUpdateCounter){
+					sentClientEvents.removeAt(0);
+				}
+
+				// Apply the events and update the player
+				for(i=0;i<sentClientEvents.size();++i){
+					updatePlayerMovement(sentClientEvents[i]->getFlags(),player[client->getClientID()]->getSolid());
+					scene->getSimulator()->update(sentClientEvents[i]->getDT(),0,player[client->getClientID()]->getSolid());
 				}
 			}
 		}
-
-		memcpy(&predictedMovement[1],&predictedMovement[0],sizeof(int)*999);
-		memcpy(&predictedMovementTime[1],&predictedMovementTime[0],sizeof(int)*999);
 	}
 
 	if(server!=NULL){
@@ -468,37 +419,19 @@ i++;
 		for(eventConnection=server->getClient(0);eventConnection!=NULL;eventConnection=server->getClient(++i)){
 			Event::ptr event;
 			while((event=eventConnection->receive())!=NULL){
-				if(event->getType()==SyncEvent::EventType_SYNC){
-					SyncEvent::ptr syncEvent=shared_static_cast<SyncEvent>(event);
-					Logger::alert(String("received SyncEvent:")+syncEvent->toString());
-
-					// Flip syncEvent to be from the server's view
-					int clientTime=syncEvent->getLocalTime();
-					syncEvent->setLocalTime(scene->getLogicTime());
-					syncEvent->setRemoteTime(clientTime);
-					syncEvent->setPlayerID(i);
-					Logger::alert(String("ASSIGNING ID:")+i);
-
-					Logger::alert(String("sending SyncEvent:")+syncEvent->toString());
-					eventConnection->send(syncEvent);
-				}
-				else if(event->getType()==ClientUpdateEvent::EventType_CLIENTUPDATE){
-					ClientUpdateEvent::ptr updateEvent=shared_static_cast<ClientUpdateEvent>(event);
-					playerMovement[updateEvent->getID()]=updateEvent->getMovement();
-					lastReceivedPlayerMovement[updateEvent->getID()]=updateEvent->getTime();
-updatePlayerMovement(playerMovement[updateEvent->getID()],player[i]->getSolid());
-scene->getSimulator()->update(dt,player[updateEvent->getID()]->getSolid());
+				if(event->getType()==ClientEvent::EventType_CLIENT){
+					ClientEvent::ptr clientEvent=shared_static_cast<ClientEvent>(event);
+					lastClientUpdateCounter[i]=clientEvent->getCounter();
+					updatePlayerMovement(clientEvent->getFlags(),player[i]->getSolid());
+					scene->getSimulator()->update(clientEvent->getDT(),0,player[i]->getSolid());
 				}
 			}
 		}
-
-//		for(i=0;i<2;++i){
-//			updatePlayerMovement(playerMovement[i],player[i]->getSolid());
-//		}
 	}
 
-if(server!=NULL){
-scene->getSimulator()->update(dt,block->getSolid());
+// TODO: We need to clean up this so it actually interpolates the player positions again to make it smooth on both client & server
+if(true || server!=NULL){
+scene->getSimulator()->update(dt,~playerCollision,NULL);
 
 int i;
 for(i=scene->getNumHopEntities()-1;i>=0;--i){
@@ -537,46 +470,50 @@ void SimpleSync::keyPressed(int key){
 		}
 	}
 
-	if(key=='r'){
-		block->setPosition(Vector3(0,0,10));
-		block->setVelocity(Vector3(0,0,0));
-		block->clearForce();
+	if(client==NULL){
+		if(key=='r'){
+			block->setPosition(Vector3(0,0,10));
+			block->setVelocity(Vector3(0,0,0));
+			block->clearForce();
+		}
+		else if(key=='p'){
+			block->setPosition(Vector3(random.nextScalar(-20,20),random.nextScalar(-20,20),random.nextScalar(0,20)));
+		}
+		else if(key=='v'){
+			block->setVelocity(Vector3(random.nextScalar(-20,20),random.nextScalar(-20,20),random.nextScalar(-20,20)));
+		}
+		else if(key=='f'){
+			block->addForce(Vector3(random.nextScalar(-20,20),random.nextScalar(-20,20),random.nextScalar(-20,20))*10);
+		}
 	}
-	else if(key=='p'){
-		block->setPosition(Vector3(random.nextScalar(-20,20),random.nextScalar(-20,20),random.nextScalar(0,20)));
-	}
-	else if(key=='v'){
-		block->setVelocity(Vector3(random.nextScalar(-20,20),random.nextScalar(-20,20),random.nextScalar(-20,20)));
-	}
-	else if(key=='f'){
-		block->addForce(Vector3(random.nextScalar(-20,20),random.nextScalar(-20,20),random.nextScalar(-20,20))*10);
-	}
-	else if(key=='w'){
-		predictedMovement[0]|=(1<<0);
-	}
-	else if(key=='s'){
-		predictedMovement[0]|=(1<<1);
-	}
-	else if(key=='a'){
-		predictedMovement[0]|=(1<<2);
-	}
-	else if(key=='d'){
-		predictedMovement[0]|=(1<<3);
+	else{
+		if(key=='w'){
+			movement|=(1<<0);
+		}
+		else if(key=='s'){
+			movement|=(1<<1);
+		}
+		else if(key=='a'){
+			movement|=(1<<2);
+		}
+		else if(key=='d'){
+			movement|=(1<<3);
+		}
 	}
 }
 
 void SimpleSync::keyReleased(int key){
 	if(key=='w'){
-		predictedMovement[0]&=~(1<<0);
+		movement&=~(1<<0);
 	}
 	else if(key=='s'){
-		predictedMovement[0]&=~(1<<1);
+		movement&=~(1<<1);
 	}
 	else if(key=='a'){
-		predictedMovement[0]&=~(1<<2);
+		movement&=~(1<<2);
 	}
 	else if(key=='d'){
-		predictedMovement[0]&=~(1<<3);
+		movement&=~(1<<3);
 	}
 }
 
@@ -590,14 +527,11 @@ void SimpleSync::mouseReleased(int x,int y,int button){
 }
 
 Event::ptr SimpleSync::createEventType(int type){
-	if(type==SyncEvent::EventType_SYNC){
-		return Event::ptr(new SyncEvent());
+	if(type==ClientEvent::EventType_CLIENT){
+		return Event::ptr(new ClientEvent());
 	}
-	else if(type==UpdateEvent::EventType_UPDATE){
-		return Event::ptr(new UpdateEvent());
-	}
-	else if(type==ClientUpdateEvent::EventType_CLIENTUPDATE){
-		return Event::ptr(new ClientUpdateEvent());
+	else if(type==ServerEvent::EventType_SERVER){
+		return Event::ptr(new ServerEvent());
 	}
 	else{
 		return Event::ptr(new Event());
