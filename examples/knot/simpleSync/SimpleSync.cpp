@@ -49,6 +49,38 @@ protected:
 };
 
 
+
+class ConnectionEvent:public Event{
+public:
+	TOADLET_SHARED_POINTERS(ConnectionEvent);
+
+	enum{
+		EventType_CONNECTION=204
+	};
+
+	ConnectionEvent():Event(EventType_CONNECTION){}
+	ConnectionEvent(int id):Event(EventType_CONNECTION){
+		mID=id;
+	}
+
+	int getID(){return mID;}
+
+	virtual int read(DataStream *stream){
+		int amount=0;
+		amount+=stream->readBigInt32(mID);
+		return amount;
+	}
+
+	virtual int write(DataStream *stream){
+		int amount=0;
+		amount+=stream->writeBigInt32(mID);
+		return amount;
+	}
+
+protected:
+	int mID;
+};
+
 class ClientEvent:public ClientUpdateEvent{
 public:
 	TOADLET_SHARED_POINTERS(ClientEvent);
@@ -166,10 +198,10 @@ void SimpleSync::accept(int localPort){
 		return;
 	}
 
-	connector->addConnectionListener(this,false);
 	server=SimpleServer::ptr(new SimpleServer(this,connector));
-//	debugUpdateMin=500;
-//	debugUpdateMax=500;
+	connector->addConnectionListener(this,false);
+//	debugUpdateMin=200;
+//	debugUpdateMax=200;
 }
 
 void SimpleSync::connect(int remoteHost,int remotePort){
@@ -196,10 +228,10 @@ void SimpleSync::create(){
 	//scene->showCollisionVolumes(true,false);
 	scene->getSimulator()->setMicroCollisionThreshold(5);
 	if(client!=NULL){
-		scene->setLogicDT(20);
+		scene->setLogicDT(0);
 	}
 	else{
-		scene->setLogicDT(20);
+		scene->setLogicDT(0);
 	}
 
 	scene->getRootNode()->attach(getEngine()->createNodeType(LightNode::type()));
@@ -249,16 +281,11 @@ void SimpleSync::create(){
 		scene->getRootNode()->attach(player[i]);
 	}
 
-playerCollision=1<<0;
-if(client!=NULL){
-player[0]->setMass(0);
-player[0]->setCollisionBits(playerCollision);
-player[0]->getSolid()->setAlwaysActive(true);
-}
-else{
-	player[0]->setCollisionBits(playerCollision);
-	player[1]->setCollisionBits(playerCollision);
-}
+	playerCollision=1<<0;
+	if(server!=NULL){
+		player[0]->setCollisionBits(playerCollision);
+		player[1]->setCollisionBits(playerCollision);
+	}
 
 	mutex.unlock();
 }
@@ -361,9 +388,18 @@ void SimpleSync::postLogicUpdate(int dt){
 	int i;
 
 	if(client!=NULL){
+		int eventStart=sentClientEvents.size()-1;
+
 		Event::ptr event=NULL;
 		while((event=client->receive())!=NULL){
-			if(event->getType()==ServerEvent::EventType_SERVER){
+			if(event->getType()==ConnectionEvent::EventType_CONNECTION){
+				ConnectionEvent::ptr connectionEvent=shared_static_cast<ConnectionEvent>(event);
+				client->setClientID(connectionEvent->getID());
+				player[client->getClientID()]->setMass(0);
+				player[client->getClientID()]->setCollisionBits(playerCollision);
+				player[client->getClientID()]->getSolid()->setAlwaysActive(true);
+			}
+			else if(event->getType()==ServerEvent::EventType_SERVER){
 				ServerEvent::ptr serverEvent=shared_static_cast<ServerEvent>(event);
 
 				int u=0;
@@ -391,6 +427,8 @@ void SimpleSync::postLogicUpdate(int dt){
 				}
 				clientTime+=clientServerTimeDifference;
 
+				// TODO: Looks like we need to have the server do some dead reckogning on other clients when no updates have been sent.
+				//  These updates will just be temporary/visual only, and sent to other clients to keep the movement smooth on them & on the sever
 				int updateDT=0;
 				int minDT=scene->getLogicDT()!=0?scene->getLogicDT():10;
 				for(updateDT=(int)Math::minVal(minDT,clientTime-serverTime);serverTime<clientTime;updateDT=(int)Math::minVal(minDT,clientTime-serverTime)){
@@ -404,11 +442,14 @@ void SimpleSync::postLogicUpdate(int dt){
 					sentClientEvents.removeAt(0);
 				}
 
-				// Apply the events and update the player
-				for(i=0;i<sentClientEvents.size();++i){
-					updatePlayerMovement(sentClientEvents[i]->getFlags(),player[client->getClientID()]->getSolid());
-					scene->getSimulator()->update(sentClientEvents[i]->getDT(),0,player[client->getClientID()]->getSolid());
-				}
+				eventStart=0;
+			}
+		}
+
+		if(client->getClientID()>=0){
+			for(i=eventStart;i<sentClientEvents.size();++i){
+				updatePlayerMovement(sentClientEvents[i]->getFlags(),player[client->getClientID()]->getSolid());
+				scene->getSimulator()->update(sentClientEvents[i]->getDT(),0,player[client->getClientID()]->getSolid());
 			}
 		}
 	}
@@ -429,19 +470,12 @@ void SimpleSync::postLogicUpdate(int dt){
 		}
 	}
 
-// TODO: We need to clean up this so it actually interpolates the player positions again to make it smooth on both client & server
-if(true || server!=NULL){
-scene->getSimulator()->update(dt,~playerCollision,NULL);
+	scene->getSimulator()->update(dt,~playerCollision,NULL);
 
-int i;
-for(i=scene->getNumHopEntities()-1;i>=0;--i){
-	HopEntity *entity=scene->getHopEntity(i);
-	entity->postLogicUpdate(dt);
-}
-}
-else{
-	scene->postLogicUpdate(dt);
-}
+	for(i=scene->getNumHopEntities()-1;i>=0;--i){
+		HopEntity *entity=scene->getHopEntity(i);
+		entity->postLogicUpdate(dt);
+	}
 }
 
 void SimpleSync::keyPressed(int key){
@@ -527,7 +561,10 @@ void SimpleSync::mouseReleased(int x,int y,int button){
 }
 
 Event::ptr SimpleSync::createEventType(int type){
-	if(type==ClientEvent::EventType_CLIENT){
+	if(type==ConnectionEvent::EventType_CONNECTION){
+		return Event::ptr(new ConnectionEvent());
+	}
+	else if(type==ClientEvent::EventType_CLIENT){
 		return Event::ptr(new ClientEvent());
 	}
 	else if(type==ServerEvent::EventType_SERVER){
@@ -541,6 +578,12 @@ Event::ptr SimpleSync::createEventType(int type){
 void SimpleSync::connected(Connection::ptr connection){
 	if(server!=NULL){
 		Logger::alert("Client connected");
+
+		EventConnection::ptr client=server->getClient(connection);
+		int i=0;
+		for(EventConnection::ptr eventConnection=server->getClient(0);client!=eventConnection;eventConnection=server->getClient(++i));
+
+		client->send(Event::ptr(new ConnectionEvent(i)));
 	}
 }
 
