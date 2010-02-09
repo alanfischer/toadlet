@@ -220,7 +220,7 @@ void Simulator::removeConstraint(Constraint *constraint){
 	mConstraints.remove(constraint);
 }
 
-void Simulator::update(int dt,Solid *solid){
+void Simulator::update(int dt,int updateWithBits,Solid *solid){
 	Vector3 &oldPosition=cache_update_oldPosition;
 	Vector3 &newPosition=cache_update_newPosition;
 	Vector3 &velocity=cache_update_velocity;
@@ -255,7 +255,7 @@ void Simulator::update(int dt,Solid *solid){
 			solid=mSolids[i];
 		}
 
-		if(solid->mActive==false){
+		if(solid->mActive==false || (updateWithBits!=0 && (solid->mCollisionBits&updateWithBits)==0)){
 			continue;
 		}
 
@@ -622,32 +622,34 @@ void Simulator::update(int dt,Solid *solid){
 			solid->mTouched2=NULL;
 		}
 
-		if(Math::abs(newPosition.x-solid->mPosition.x)<mDeactivateSpeed && Math::abs(newPosition.y-solid->mPosition.y)<mDeactivateSpeed && Math::abs(newPosition.z-solid->mPosition.z)<mDeactivateSpeed){
-			solid->mDeactivateCount++;
-			if(solid->mDeactivateCount>mDeactivateCount){
-				for(j=solid->mConstraints.size()-1;j>=0;--j){
-					Constraint *constraint=solid->mConstraints[j];
-					Solid *startSolid=constraint->mStartSolid;
-					Solid *endSolid=constraint->mEndSolid;
-					if(startSolid!=solid){
-						if(startSolid->mActive==true && startSolid->mDeactivateCount<=mDeactivateCount){
-							break;
+		if(solid->mDeactivateCount>=0){
+			if(Math::abs(newPosition.x-solid->mPosition.x)<mDeactivateSpeed && Math::abs(newPosition.y-solid->mPosition.y)<mDeactivateSpeed && Math::abs(newPosition.z-solid->mPosition.z)<mDeactivateSpeed){
+				solid->mDeactivateCount++;
+				if(solid->mDeactivateCount>mDeactivateCount){
+					for(j=solid->mConstraints.size()-1;j>=0;--j){
+						Constraint *constraint=solid->mConstraints[j];
+						Solid *startSolid=constraint->mStartSolid;
+						Solid *endSolid=constraint->mEndSolid;
+						if(startSolid!=solid){
+							if(startSolid->mActive==true && startSolid->mDeactivateCount<=mDeactivateCount){
+								break;
+							}
+						}
+						else if(endSolid!=NULL){
+							if(endSolid->mActive==true && endSolid->mDeactivateCount<=mDeactivateCount){
+								break;
+							}
 						}
 					}
-					else if(endSolid!=NULL){
-						if(endSolid->mActive==true && endSolid->mDeactivateCount<=mDeactivateCount){
-							break;
-						}
+					if(j<0){
+						solid->mActive=false;
+						solid->mDeactivateCount=0;
 					}
-				}
-				if(j<0){
-					solid->mActive=false;
-					solid->mDeactivateCount=0;
 				}
 			}
-		}
-		else{
-			solid->mDeactivateCount=0;
+			else{
+				solid->mDeactivateCount=0;
+			}
 		}
 
 		solid->setPositionNoActivate(newPosition);
@@ -725,6 +727,10 @@ int Simulator::findSolidsInSphere(const Sphere &sphere,Solid *solids[],int maxSo
 }
 
 void Simulator::traceSegment(Collision &result,const Segment &segment,int collideWithBits,Solid *ignore){
+	if(collideWithBits==0){
+		collideWithBits=-1;
+	}
+
 	Vector3 endPoint=cache_traceSegment_endPoint;
 	segment.getEndPoint(endPoint);
 	AABox total=cache_traceSegment_total.set(segment.origin,segment.origin);

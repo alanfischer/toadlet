@@ -96,12 +96,12 @@ public:
 	int getNumConstraints() const{return mConstraints.size();}
 	Constraint::ptr getConstraint(int i) const{return mConstraints[i];}
 
-	void update(int dt,Solid *solid=NULL); // milliseconds
+	void update(int dt,int updateWithBits=0,Solid *solid=NULL); // milliseconds
 
 	int findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids) const;
 	int findSolidsInSphere(const Sphere &sphere,Solid *solids[],int maxSolids) const;
 
-	void traceSegment(Collision &result,const Segment &segment,int collideWithBits,Solid *ignore);
+	void traceSegment(Collision &result,const Segment &segment,int collideWithBits=0,Solid *ignore=NULL);
 	void traceSolid(Collision &result,Solid *solid,const Segment &segment);
 
 	void capVector3(Vector3 &vector,scalar value) const;

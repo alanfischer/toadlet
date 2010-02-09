@@ -84,8 +84,8 @@ Solid::~Solid(){
 void Solid::reset(){
 	destroy();
 
-	mCollisionBits=1;
-	mCollideWithBits=1;
+	mCollisionBits=-1;
+	mCollideWithBits=-1;
 	mMass=Math::ONE;
 	mInvMass=Math::ONE;
 	mPosition.reset();
@@ -155,8 +155,7 @@ void Solid::setInfiniteMass(){
 bool Solid::hasInfiniteMass() const{return mMass==INFINITE_MASS;}
 
 void Solid::setPosition(const Vector3 &position){
-	mActive=true;
-	mDeactivateCount=0;
+	activate();
 	mPosition.set(position);
 	Math::add(mWorldBound,mLocalBound,mPosition);
 
@@ -168,49 +167,42 @@ void Solid::setPosition(const Vector3 &position){
 }
 
 void Solid::setVelocity(const Vector3 &velocity){
-	mActive=true;
-	mDeactivateCount=0;
+	activate();
 	mVelocity.set(velocity);
 }
 
 void Solid::addForce(const Vector3 &force){
-	mActive=true;
-	mDeactivateCount=0;
+	activate();
 	Math::add(mForce,force);
 }
 
 void Solid::setLocalGravity(const Vector3 &gravity){
-	mActive=true;
-	mDeactivateCount=0;
+	activate();
 	mLocalGravity.set(gravity);
 	mLocalGravityOverride=true;
 }
 
 void Solid::setWorldGravity(){
-	mActive=true;
-	mDeactivateCount=0;
+	activate();
 	mLocalGravityOverride=false;
 }
 
 void Solid::addShape(Shape::ptr shape){
-	mActive=true;
-	mDeactivateCount=0;
+	activate();
 	mShapes.add(shape);
 	shape->mSolid=this;
 	updateLocalBound();
 }
 
 void Solid::removeShape(Shape *shape){
-	mActive=true;
-	mDeactivateCount=0;
+	activate();
 	mShapes.remove(shape);
 	shape->mSolid=NULL;
 	updateLocalBound();
 }
 
 void Solid::removeAllShapes(){
-	mActive=true;
-	mDeactivateCount=0;
+	activate();
 	mShapes.clear();
 	updateLocalBound();
 }
@@ -224,7 +216,9 @@ void Solid::setUserData(void *data){
 }
 
 void Solid::activate(){
-	mDeactivateCount=0;
+	if(mDeactivateCount>0){
+		mDeactivateCount=0;
+	}
 	if(mActive==false){
 		mActive=true;
 		int i;
@@ -238,6 +232,11 @@ void Solid::activate(){
 			}
 		}
 	}
+}
+
+void Solid::setAlwaysActive(bool always){
+	activate();
+	mDeactivateCount=(always?-1:0);
 }
 
 void Solid::setPositionNoActivate(const Vector3 &position){

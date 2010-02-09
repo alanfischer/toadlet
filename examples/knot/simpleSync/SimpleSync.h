@@ -35,6 +35,8 @@ using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::mesh;
 using namespace toadlet::pad;
 
+class ClientEvent;
+
 class SimpleSync:public Application,public EventFactory,public ConnectionListener,public Runnable,public UpdateListener{
 public:
 	TOADLET_SHARED_POINTERS(SimpleSync);
@@ -86,11 +88,11 @@ public:
 	MeshNode::ptr meshNode;
 	HopEntity::ptr block;
 	HopEntity::ptr player[2];
-	int playerMovement[2];
-	int lastReceivedPlayerMovement[2];
 
-	Collection<int> predictedMovement;
-	Collection<int> predictedMovementTime;
+	int playerCollision;
+	int lastClientUpdateCounter[2];
+	int movement;
+	Collection<SharedPointer<ClientEvent> > sentClientEvents;
 };
 
 #endif
