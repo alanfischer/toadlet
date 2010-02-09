@@ -91,7 +91,10 @@ public:
 
 	int playerCollision;
 	int lastClientUpdateCounter[2];
-	int movement;
+	int flags;
+	Quaternion look;
+	int lastX,lastY;
+	bool looking;
 	Collection<SharedPointer<ClientEvent> > sentClientEvents;
 };
 

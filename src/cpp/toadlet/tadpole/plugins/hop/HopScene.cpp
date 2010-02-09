@@ -229,16 +229,16 @@ void HopScene::preLogicUpdate(int dt){
 
 void HopScene::logicUpdate(int dt){
 	mScene->logicUpdate(dt);
-}
-
-void HopScene::postLogicUpdate(int dt){
-	mScene->postLogicUpdate(dt);
 
 	TOADLET_PROFILE_BEGINSECTION(Simulator::update);
 
 	mSimulator->update(dt);
 
 	TOADLET_PROFILE_ENDSECTION(Simulator::update);
+}
+
+void HopScene::postLogicUpdate(int dt){
+	mScene->postLogicUpdate(dt);
 
 	int i;
 	for(i=mHopEntities.size()-1;i>=0;--i){
@@ -262,13 +262,18 @@ void HopScene::preRenderUpdate(int dt){
 		active=entity->mSolid->getActive();
 		activePrevious=entity->mActivePrevious;
 		if(active || activePrevious){
+			// TODO: Add an option to either use strict interpolation, or fuzzy interpolation
 			// If we are deactivating, then make sure we are at our rest point
-			if(active==false && activePrevious){
-				entity->interpolatePhysicalParameters(Math::ONE);
-			}
-			else{
-				entity->interpolatePhysicalParameters(f);
-			}
+//			if(active==false && activePrevious){
+//				entity->interpolatePhysicalParameters(Math::ONE);
+//			}
+//			else{
+//				entity->interpolatePhysicalParameters(f);
+//			}
+			Vector3 last;Math::setTranslateFromMatrix4x4(last,entity->getRenderTransform());
+			Vector3 translate;Math::lerp(translate,last,entity->getTranslate(),0.3);
+			entity->setRenderTransformTranslate(translate);
+
 			if(entity->mShadowMesh!=NULL){
 				entity->castShadow();
 			}
