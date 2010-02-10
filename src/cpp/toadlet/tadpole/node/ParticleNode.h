@@ -201,6 +201,7 @@ protected:
 	Vector3 cache_updateVertexBuffer_forward;
 	Matrix4x4 cache_updateWorldTransform_temp1;
 	Matrix4x4 cache_updateWorldTransform_temp2;
+	Matrix3x3 cache_updateWorldTransform_temp3;
 };
 
 }

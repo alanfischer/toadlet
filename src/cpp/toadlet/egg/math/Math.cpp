@@ -272,13 +272,14 @@ real Math::setAxisAngleFromQuaternion(Vector3 &axis,const Quaternion &q,real eps
 
 // Algorithm from Ken Shoemake's article in 1987 SIGGRAPH course notes
 // article "Quaternion Calculus and Fast Animation".
-void Math::setQuaternionFromMatrix3x3(Quaternion &r,const Matrix3x3 &m){
+template<class Matrix>
+void setQuaternionFromMatrix(Quaternion &r,const Matrix &m){
 	real trace=m.at(0,0)+m.at(1,1)+m.at(2,2);
 	real root;
 
 	if(trace>0.0){
 		// |w| > 1/2, may as well choose w > 1/2
-		root=sqrt(trace+1.0); // 2w
+		root=Math::sqrt(trace+1.0); // 2w
 		r.w=0.5*root;
 		root=0.5/root; // 1/(4w)
 		r.x=(m.at(2,1)-m.at(1,2))*root;
@@ -298,7 +299,7 @@ void Math::setQuaternionFromMatrix3x3(Quaternion &r,const Matrix3x3 &m){
 		int j=next[i];
 		int k=next[j];
 
-		root=sqrt(m.at(i,i)-m.at(j,j)-m.at(k,k)+1.0);
+		root=Math::sqrt(m.at(i,i)-m.at(j,j)-m.at(k,k)+1.0);
 		r[i]=0.5*root;
 		root=0.5/root;
 		r.w=(m.at(k,j)-m.at(j,k))*root;
@@ -306,6 +307,10 @@ void Math::setQuaternionFromMatrix3x3(Quaternion &r,const Matrix3x3 &m){
 		r[k]=(m.at(k,i)+m.at(i,k))*root;
 	}
 }
+
+void Math::setQuaternionFromMatrix3x3(Quaternion &r,const Matrix3x3 &m){ setQuaternionFromMatrix(r,m); }
+
+void Math::setQuaternionFromMatrix4x4(Quaternion &r,const Matrix4x4 &m){ setQuaternionFromMatrix(r,m); }
 
 void Math::lerp(Quaternion &r,const Quaternion &q1,const Quaternion &q2,real t){
 	real cosom=dot(q1,q2);

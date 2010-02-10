@@ -43,7 +43,7 @@ KeyFrame::KeyFrame(scalar time1,Node *node):
 	scale(Math::ONE_VECTOR3)
 {
 	translate.set(node->getTranslate());
-	Math::setQuaternionFromMatrix3x3(rotate,node->getRotate());
+	rotate.set(node->getRotate());
 	scale.set(node->getScale());
 }
 
