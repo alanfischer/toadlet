@@ -235,6 +235,7 @@ SimpleSync::SimpleSync():Application(),
 {
 	lastClientUpdateCounter[0]=0;
 	lastClientUpdateCounter[1]=0;
+changeRendererPlugin(RendererPlugin_DIRECT3D9);
 }
 
 SimpleSync::~SimpleSync(){
@@ -277,10 +278,10 @@ void SimpleSync::create(){
 	//scene->showCollisionVolumes(true,false);
 	scene->getSimulator()->setMicroCollisionThreshold(5);
 	if(client!=NULL){
-		scene->setLogicDT(10);
+		scene->setLogicDT(0);
 	}
 	else{
-		scene->setLogicDT(10);
+		scene->setLogicDT(0);
 	}
 
 	scene->getRootNode()->attach(getEngine()->createNodeType(LightNode::type()));
@@ -326,7 +327,6 @@ void SimpleSync::create(){
 			meshNode->setMesh(mesh);
 			player[i]->attach(meshNode);
 		}
-		player[i]->setCoefficientOfDynamicFriction(0.75);
 		player[i]->setTranslate(0,i==0?-20:20,0);
 		scene->getRootNode()->attach(player[i]);
 	}
@@ -410,38 +410,44 @@ void SimpleSync::preLogicUpdate(int dt){
 		int i=0;
 		for(eventConnection=server->getClient(0);eventConnection!=NULL;eventConnection=server->getClient(++i)){
 			ServerEvent::ptr serverEvent(new ServerEvent(lastClientUpdateCounter[i],scene->getLogicTime()));
-			serverEvent->addUpdate(-1,block->getTranslate(),block->getRotate(),block->getVelocity());
-			serverEvent->addUpdate(0,player[0]->getTranslate(),player[0]->getRotate(),player[0]->getVelocity());
-			serverEvent->addUpdate(1,player[1]->getTranslate(),player[1]->getRotate(),player[1]->getVelocity());
+			serverEvent->addUpdate(-1,block->getSolid()->getPosition(),block->getRotate(),block->getVelocity());
+			serverEvent->addUpdate(0,player[0]->getSolid()->getPosition(),player[0]->getRotate(),player[0]->getVelocity());
+			serverEvent->addUpdate(1,player[1]->getSolid()->getPosition(),player[1]->getRotate(),player[1]->getVelocity());
 			eventConnection->send(serverEvent);
 		}
 	}
 }
 
 void updatePlayer(const ClientEvent::ptr &event,HopEntity::ptr player){
-	if(event->getFlags()&(1<<0)){
-		Vector3 result;
-		Math::mul(result,player->getRotate(),Vector3(0,10,0));
-		player->setVelocity(result);
-	}
-	if(event->getFlags()&(1<<1)){
-		Vector3 result;
-		Math::mul(result,player->getRotate(),Vector3(0,-10,0));
-		player->setVelocity(result);
-	}
-	if(event->getFlags()&(1<<2)){
-		Vector3 result;
-		Math::mul(result,player->getRotate(),Vector3(-10,0,0));
-		player->setVelocity(result);
-	}
-	if(event->getFlags()&(1<<3)){
-		Vector3 result;
-		Math::mul(result,player->getRotate(),Vector3(10,0,0));
-		player->setVelocity(result);
-	}
-
 	Matrix3x3 rotate; Math::setMatrix3x3FromQuaternion(rotate,event->getLook());
 	player->setRotate(rotate);
+
+	scalar fall=player->getVelocity().z;
+	if(event->getFlags()&(1<<0)){
+		Vector3 velocity(0,10,fall);
+		Math::mul(velocity,player->getRotate());
+		player->setVelocity(velocity);
+	}
+	if(event->getFlags()&(1<<1)){
+		Vector3 velocity(0,-10,fall);
+		Math::mul(velocity,player->getRotate());
+		player->setVelocity(velocity);
+	}
+	if(event->getFlags()&(1<<2)){
+		Vector3 velocity(-10,0,fall);
+		Math::mul(velocity,player->getRotate());
+		player->setVelocity(velocity);
+	}
+	if(event->getFlags()&(1<<3)){
+		Vector3 velocity(10,0,fall);
+		Math::mul(velocity,player->getRotate());
+		player->setVelocity(velocity);
+	}
+	if(event->getFlags()&(1<<4) && player->getTouching()!=NULL && player->getSolid()->getTouchingNormal().z>=Math::HALF){
+		Vector3 velocity=player->getVelocity();
+		velocity.z=10;
+		player->setVelocity(velocity);
+	}
 }
 
 void SimpleSync::logicUpdate(int dt){
@@ -461,7 +467,6 @@ Matrix3x3 forcelook;bool force=false;
 Matrix3x3 m;Math::setMatrix3x3FromQuaternion(m,connectionEvent->getLook());
 player[client->getClientID()]->setRotate(m);
 forcelook=m;force=true;
-				player[client->getClientID()]->setMass(0);
 				player[client->getClientID()]->setCollisionBits(playerCollision);
 				player[client->getClientID()]->getSolid()->setAlwaysActive(true);
 
@@ -478,9 +483,14 @@ forcelook=m;force=true;
 					if(entity!=NULL){
 						// Update object
 						// TODO: We have to set the Solid's Position here, instead of the Entity's.  Figure out why that is.
-						entity->getSolid()->setPosition(serverEvent->getPosition(u));
-						Matrix3x3 mrotate;Math::setMatrix3x3FromQuaternion(mrotate,serverEvent->getRotation(u));
-						entity->setRotate(mrotate);
+						if(entity==player[client->getClientID()]){
+							entity->getSolid()->setPositionDirect(serverEvent->getPosition(u)); // We want to retain our touching info
+						}
+						else{
+							entity->getSolid()->setPosition(serverEvent->getPosition(u));
+							Matrix3x3 mrotate;Math::setMatrix3x3FromQuaternion(mrotate,serverEvent->getRotation(u));
+							entity->setRotate(mrotate);
+						}
 						entity->setVelocity(serverEvent->getVelocity(u));
 					}
 				}
@@ -499,8 +509,7 @@ forcelook=m;force=true;
 				}
 				clientTime+=clientServerTimeDifference;
 
-				// TODO: Looks like we need to have the server do some dead reckogning on other clients when no updates have been sent.
-				//  These updates will just be temporary/visual only, and sent to other clients to keep the movement smooth on them & on the sever
+				// TODO: We seem to still be simulating "farther ahead" than we should.  Look at this more and get us to simulate just as much as needed
 				int updateDT=0;
 				int minDT=scene->getLogicDT()!=0?scene->getLogicDT():10;
 				for(updateDT=(int)Math::minVal(minDT,clientTime-serverTime);serverTime<clientTime;updateDT=(int)Math::minVal(minDT,clientTime-serverTime)){
@@ -510,7 +519,7 @@ forcelook=m;force=true;
 
 				// Remove any old events
 				int lastReceivedUpdateCounter=serverEvent->getLastClientUpdateCounter();
-				while(sentClientEvents.size()>0 && sentClientEvents[0]->getCounter()<=lastReceivedUpdateCounter){
+				while(sentClientEvents.size()>1 && sentClientEvents[0]->getCounter()<=lastReceivedUpdateCounter){
 					sentClientEvents.removeAt(0);
 				}
 
@@ -518,6 +527,8 @@ forcelook=m;force=true;
 			}
 		}
 
+		// TODO: Ideally we would somehow "ghost" the player so he wouldnt impart any forces on anything he touches
+		//  We can't simply set his Mass to 0, because that affects friction calculations
 		if(client->getClientID()>=0){
 			for(i=eventStart;i<sentClientEvents.size();++i){
 				updatePlayer(sentClientEvents[i],player[client->getClientID()]);
@@ -607,6 +618,9 @@ void SimpleSync::keyPressed(int key){
 		else if(key=='d'){
 			flags|=(1<<3);
 		}
+		else if(key==' '){
+			flags|=(1<<4);
+		}
 	}
 }
 
@@ -622,6 +636,9 @@ void SimpleSync::keyReleased(int key){
 	}
 	else if(key=='d'){
 		flags&=~(1<<3);
+	}
+	else if(key==' '){
+		flags&=~(1<<4);
 	}
 }
 

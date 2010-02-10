@@ -122,11 +122,11 @@ public:
 
 	inline Simulator *getSimulator() const{return mSimulator;}
 
-	void setPositionNoActivate(const Vector3 &position);
+	void setPositionDirect(const Vector3 &position);
 
 	void updateLocalBound();
 
-protected:
+//protected:
 	void internal_setSimulator(Simulator *s);
 	void internal_addConstraint(Constraint *constraint){mConstraints.add(constraint);}
 	void internal_removeConstraint(Constraint *constraint){mConstraints.remove(constraint);}
