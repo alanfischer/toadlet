@@ -4,6 +4,10 @@
 #include <toadlet/egg/io/FileStream.h>
 #include <toadlet/egg/io/ZIPArchive.h>
 
+// TODO: Look at the START/END comments and move those parts to a PredictedSimpleServer/PredictedSimpleClient
+//  Which will basically handle queuing of ClientEvents, and letting you get them back out
+
+// START: Move to PredictedSimpleServer/PredictedSimpleClient classes
 // This event is sent from the client each frame with the client dt and commands
 class ClientUpdateEvent:public Event{
 public:
@@ -47,7 +51,7 @@ protected:
 	short mLastCounter;
 	int mTime;
 };
-
+// END
 
 
 class ConnectionEvent:public Event{
@@ -224,8 +228,7 @@ SimpleSync::SimpleSync():Application(),
 	debugUpdateMax(0),
 	packetDelay(0),
 	packetDelayVariance(0),
-	flags(0),
-	looking(false)
+	flags(0)
 {
 	lastClientUpdateCounter[0]=0;
 	lastClientUpdateCounter[1]=0;
@@ -394,13 +397,16 @@ void SimpleSync::update(int dt){
 void SimpleSync::preLogicUpdate(int dt){
 	scene->preLogicUpdate(dt);
 
+	// START: Move to PredictedServer/Client classes, you'll have to call a send/add/setClientEvent each frame
 	if(client!=NULL){
 		int currentFrame=scene->getLogicFrame()+1;
 		ClientEvent::ptr clientEvent(new ClientEvent(currentFrame,dt,flags,player[client->getClientID()]->getRotate()));
 		sentClientEvents.add(clientEvent);
 		client->send(clientEvent);
 	}
+	// END
 
+	// START: Move to PredictedServer/Client classes, for the most part this will be the same, except you'll call a getLastClientUpdate() to get that counter
 	if(server!=NULL && nextUpdateTime<=scene->getLogicTime()){
 		nextUpdateTime=scene->getLogicTime()+random.nextInt(debugUpdateMin,debugUpdateMax);
 
@@ -414,6 +420,7 @@ void SimpleSync::preLogicUpdate(int dt){
 			eventConnection->send(serverEvent);
 		}
 	}
+	// END
 }
 
 void updatePlayer(const ClientEvent::ptr &event,HopEntity::ptr entity){
@@ -436,7 +443,6 @@ void updatePlayer(const ClientEvent::ptr &event,HopEntity::ptr entity){
 
 	Math::normalizeCarefully(velocity,0);
 	Math::mul(velocity,Math::fromInt(200));
-//	Math::mul(velocity,mPitch);
 	Math::mul(velocity,entity->getRotate());
 	scalar z=entity->getVelocity().z;
 	Vector3 result;
@@ -469,7 +475,7 @@ forcelook=connectionEvent->getLook();force=true;
 				player[client->getClientID()]->getSolid()->setAlwaysActive(true);
 
 				player[client->getClientID()]->attach(cameraNode);
-				cameraNode->setLookDir(Vector3(0,0,4),Math::Y_UNIT_VECTOR3,Math::Z_UNIT_VECTOR3);
+				cameraNode->setLookDir(Vector3(0,0,30),Math::Y_UNIT_VECTOR3,Math::Z_UNIT_VECTOR3);
 			}
 			else if(event->getType()==ServerEvent::EventType_SERVER){
 				ServerEvent::ptr serverEvent=shared_static_cast<ServerEvent>(event);
@@ -514,16 +520,19 @@ forcelook=connectionEvent->getLook();force=true;
 					serverTime+=updateDT;
 				}
 
+				// START: Move to PredictedServer/Client classes
 				// Remove any old events
 				int lastReceivedUpdateCounter=serverEvent->getLastClientUpdateCounter();
 				while(sentClientEvents.size()>1 && sentClientEvents[0]->getCounter()<=lastReceivedUpdateCounter){
 					sentClientEvents.removeAt(0);
 				}
+				// END
 
 				eventStart=0;
 			}
 		}
 
+		// START: Move to PredictedServer/Client classes.  There will just be a method to enumerate all pending ClientEvents
 		// TODO: Ideally we would somehow "ghost" the player so he wouldnt impart any forces on anything he touches
 		//  We can't simply set his Mass to 0, because that affects friction calculations
 		if(client->getClientID()>=0){
@@ -532,10 +541,12 @@ forcelook=connectionEvent->getLook();force=true;
 				scene->getSimulator()->update(sentClientEvents[i]->getDT(),0,player[client->getClientID()]->getSolid());
 			}
 		}
+		// END
 
 if(force){player[i]->setRotate(forcelook);}
 	}
 
+	// START: Move to PredictedServer/Client classes, basically this will all be the same, except you'll call a setLastClientUpdate()
 	if(server!=NULL){
 		EventConnection::ptr eventConnection=NULL;
 		int i=0;
@@ -552,6 +563,7 @@ if(force){player[i]->setRotate(forcelook);}
 			}
 		}
 	}
+	// END
 
 	scene->getSimulator()->update(dt,~playerCollision,NULL);
 }
@@ -640,32 +652,35 @@ void SimpleSync::keyReleased(int key){
 }
 
 void SimpleSync::mousePressed(int x,int y,int button){
-	if(button==2){
-		looking=true;
-		lastX=x;
-		lastY=y;
+	if(client!=NULL && button==2){
+		setMouseLocked(true);
 	}
 }
 
 void SimpleSync::mouseMoved(int x,int y){
-	if(looking){
-		if(client!=NULL){
-			look.y+=Math::fromMilli(lastY-y)*4;
-			look.z+=Math::fromMilli(lastX-x)*4;
-			Quaternion q1,q2;
-			Math::setQuaternionFromAxisAngle(q1,Math::X_UNIT_VECTOR3,look.y);
-			Math::setQuaternionFromAxisAngle(q2,Math::Z_UNIT_VECTOR3,look.z);
-			Math::preMul(q1,q2);
-			player[client->getClientID()]->setRotate(q1);
-			lastX=x;
-			lastY=y;
-		}
+	int hwidth=getWidth()/2;
+	int hheight=getHeight()/2;
+	if(client!=NULL && getMouseLocked() && (hwidth!=x || hheight!=y)){
+		int dx=x-hwidth;
+		int dy=y-hheight;
+
+		look.y-=((float)dx)/500.0f*Math::PI;
+		if(look.y<0) look.y+=Math::TWO_PI;
+		if(look.y>=Math::TWO_PI) look.y-=Math::TWO_PI;
+
+		look.z-=((float)dy)/500.0f*Math::PI;
+		if(look.z<-Math::HALF_PI) look.z=-Math::HALF_PI;
+		if(look.z>Math::HALF_PI) look.z=Math::HALF_PI;
+
+		Quaternion result;
+		Math::setQuaternionFromEulerAngleXYZ(result,look);
+		player[client->getClientID()]->setRotate(result);
 	}
 }
 
 void SimpleSync::mouseReleased(int x,int y,int button){
-	if(button==2){
-		looking=false;
+	if(client!=NULL && button==2){
+		setMouseLocked(false);
 	}
 }
 

@@ -93,8 +93,6 @@ public:
 	int lastClientUpdateCounter[2];
 	int flags;
 	EulerAngle look;
-	int lastX,lastY;
-	bool looking;
 	Collection<SharedPointer<ClientEvent> > sentClientEvents;
 };
 

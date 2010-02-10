@@ -102,6 +102,7 @@ public:
 	virtual void render(peeper::Renderer *renderer);
 
 	void setMouseLocked(bool locked);
+	bool getMouseLocked() const{return mMouseLocked;}
 
 	void changeRendererPlugin(int index);
 	void setRendererOptions(int *options,int length);
@@ -111,6 +112,7 @@ public:
 	void *getHWND() const;
 
 	void internal_resize(int width,int height);
+	void internal_mouseMoved(int x,int y);
 
 	typedef egg::Map<void*,Win32Application*> ApplicationMap;
 	static int mWindowCount;
@@ -135,6 +137,7 @@ protected:
 	peeper::Visual mVisual;
 	ApplicationListener *mApplicationListener;
 	bool mMouseLocked;
+	bool mSkipNextMove;
 
 	tadpole::Engine *mEngine;
 	peeper::RenderTarget *mRenderTarget;

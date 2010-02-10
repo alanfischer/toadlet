@@ -1611,6 +1611,20 @@ public final class Math{
 		r.w=cos(halfAngle);
 	}
 
+	public static void setQuaternionFromEulerAngleXYZ(Quaternion r,EulerAngle euler){
+		real cx=cos(euler.x);
+		real sx=sin(euler.x);
+		real cy=cos(euler.y);
+		real sy=sin(euler.y);
+		real cz=cos(euler.z);
+		real sz=sin(euler.z);
+		r.w=sqrt(1.0f + cx*cy + cx*cz - sx*sy*sz + cy*cz)*0.5f;
+		real w4=1.0f/(r.w*4.0f);
+		r.x=(cy*sz + cx*sz + sx*sy*cz)*w4;
+		r.y=(sx*cy + sx*cz + cx*sy*sz)*w4;
+		r.z=(-sx*sz + cx*sy*cz + sy)*w4;
+	}
+
 	public static void lerp(Quaternion r,Quaternion q1,Quaternion q2,real t){
 		real cosom=dot(q1,q2);
 
