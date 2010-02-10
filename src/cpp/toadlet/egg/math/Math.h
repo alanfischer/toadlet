@@ -1340,6 +1340,20 @@ namespace Math{
 		r.w=cos(halfAngle);
 	}
 
+	inline void setQuaternionFromEulerAngleXYZ(Quaternion &r,const EulerAngle &euler){
+		real cx=cos(euler.x);
+		real sx=sin(euler.x);
+		real cy=cos(euler.y);
+		real sy=sin(euler.y);
+		real cz=cos(euler.z);
+		real sz=sin(euler.z);
+		r.w=sqrt(1.0 + cx*cy + cx*cz - sx*sy*sz + cy*cz)*0.5;
+		real w4=1.0/(r.w*4.0);
+		r.x=(cy*sz + cx*sz + sx*sy*cz)*w4;
+		r.y=(sx*cy + sx*cz + cx*sy*sz)*w4;
+		r.z=(-sx*sz + cx*sy*cz + sy)*w4;
+	}
+
 	TOADLET_API void lerp(Quaternion &r,const Quaternion &q1,const Quaternion &q2,real t);
 
 	TOADLET_API void slerp(Quaternion &r,const Quaternion &q1,const Quaternion &q2,real t);

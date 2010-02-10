@@ -117,6 +117,7 @@ Win32Application::Win32Application():
 	#endif
 	mApplicationListener(NULL),
 	mMouseLocked(false),
+	mSkipNextMove(false),
 
 	mEngine(NULL),
 	mRenderer(NULL),
@@ -495,12 +496,6 @@ void Win32Application::mousePressed(int x,int y,int button){
 }
 
 void Win32Application::mouseMoved(int x,int y){
-	if(mMouseLocked && (getWidth()/2!=x || getHeight()/2!=y)){
-		POINT pt={getWidth()/2,getHeight()/2};
-		ClientToScreen((HWND)getHWND(),&pt);
-		SetCursorPos(pt.x,pt.y);
-	}
-
 	if(mApplicationListener!=NULL){
 		mApplicationListener->mouseMoved(x,y);
 	}
@@ -532,6 +527,7 @@ void Win32Application::render(Renderer *renderer){
 
 void Win32Application::setMouseLocked(bool locked){
 	mMouseLocked=locked;
+	mSkipNextMove=true;
 
 	ShowCursor(!mMouseLocked);
 }
@@ -755,6 +751,21 @@ void Win32Application::internal_resize(int width,int height){
 	}
 }
 
+void Win32Application::internal_mouseMoved(int x,int y){
+	if(mMouseLocked && (getWidth()/2!=x || getHeight()/2!=y)){
+		POINT pt={getWidth()/2,getHeight()/2};
+		ClientToScreen((HWND)getHWND(),&pt);
+		SetCursorPos(pt.x,pt.y);
+
+		if(mSkipNextMove){
+			mSkipNextMove=false;
+			return;
+		}
+	}
+
+	mouseMoved(x,y);
+}
+
 LRESULT CALLBACK wndProc(HWND wnd,UINT msg,WPARAM wParam,LPARAM lParam){
 	Win32Application *application;
 	Win32Application::ApplicationMap::iterator it=Win32Application::mApplicationMap.find(wnd);
@@ -866,7 +877,7 @@ LRESULT CALLBACK wndProc(HWND wnd,UINT msg,WPARAM wParam,LPARAM lParam){
 			}
 			return 0;
 		case WM_MOUSEMOVE:
-			application->mouseMoved(LOWORD(lParam),HIWORD(lParam));
+			application->internal_mouseMoved(LOWORD(lParam),HIWORD(lParam));
 			return 0;
 		case WM_LBUTTONDOWN:
 			application->mousePressed(LOWORD(lParam),HIWORD(lParam),0);

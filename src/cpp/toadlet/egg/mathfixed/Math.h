@@ -1357,6 +1357,20 @@ namespace Math{
 		r.w=cos(halfAngle);
 	}
 
+	inline void setQuaternionFromEulerAngleXYZ(Quaternion &r,const EulerAngle &euler){
+		fixed cx=cos(euler.x);
+		fixed sx=sin(euler.x);
+		fixed cy=cos(euler.y);
+		fixed sy=sin(euler.y);
+		fixed cz=cos(euler.z);
+		fixed sz=sin(euler.z);
+		r.w=sqrt(ONE + TOADLET_MUL_XX(cx,cy) + TOADLET_MUL_XX(cx,cz) - TOADLET_MUL_XX(TOADLET_MUL_XX(sx,sy),sz) + TOADLET_MUL_XX(cy,cz))>>1;
+		fixed w4=TOADLET_DIV_XX(ONE,r.w<<2);
+		r.x=TOADLET_MUL_XX(TOADLET_MUL_XX(cy,sz) + TOADLET_MUL_XX(cx,sz) + TOADLET_MUL_XX(TOADLET_MUL_XX(sx,sy),cz),w4);
+		r.y=TOADLET_MUL_XX(TOADLET_MUL_XX(sx,cy) + TOADLET_MUL_XX(sx,cz) + TOADLET_MUL_XX(TOADLET_MUL_XX(cx,sy),sz),w4);
+		r.z=TOADLET_MUL_XX(TOADLET_MUL_XX(-sx,sz) + TOADLET_MUL_XX(TOADLET_MUL_XX(cx,sy),cz) + sy,w4);
+	}
+
 	TOADLET_API void lerp(Quaternion &r,const Quaternion &q1,const Quaternion &q2,fixed t);
 
 	TOADLET_API void slerp(Quaternion &r,const Quaternion &q1,const Quaternion &q2,fixed t);
