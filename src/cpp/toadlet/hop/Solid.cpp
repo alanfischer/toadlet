@@ -239,7 +239,7 @@ void Solid::setAlwaysActive(bool always){
 	mDeactivateCount=(always?-1:0);
 }
 
-void Solid::setPositionNoActivate(const Vector3 &position){
+void Solid::setPositionDirect(const Vector3 &position){
 	mPosition.set(position);
 	Math::add(mWorldBound,mLocalBound,mPosition);
 }

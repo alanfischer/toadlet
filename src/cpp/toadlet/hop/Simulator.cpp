@@ -652,7 +652,7 @@ void Simulator::update(int dt,int updateWithBits,Solid *solid){
 			}
 		}
 
-		solid->setPositionNoActivate(newPosition);
+		solid->setPositionDirect(newPosition);
 
 		if(solid->mDoUpdateCallback && mManager!=NULL){
 			(solid->mManager!=NULL?solid->mManager:mManager)->postUpdate(solid,dt,fdt);
