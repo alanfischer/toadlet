@@ -1440,6 +1440,28 @@ public final class Math{
 		q2.w=w;
 	}
 
+	public static void mul(Vector3 r,Quaternion q){
+		real x=+q.y*r.z-q.z*r.y+q.w*r.x;
+		real y=-q.x*r.z+q.z*r.x+q.w*r.y;
+		real z=+q.x*r.y-q.y*r.x+q.w*r.z;
+		real w=-q.x*r.x-q.y*r.y-q.z*r.z;
+
+		r.x=+x*+q.w+y*-q.z-z*-q.y+w*-q.x;
+		r.y=-x*-q.z+y*+q.w+z*-q.x+w*-q.y;
+		r.z=+x*-q.y-y*-q.x+z*+q.w+w*-q.z;
+	}
+
+	public static void mul(Vector3 r,Quaternion q,Vector3 v){
+		real x=+q.y*v.z-q.z*v.y+q.w*v.x;
+		real y=-q.x*v.z+q.z*v.x+q.w*v.y;
+		real z=+q.x*v.y-q.y*v.x+q.w*v.z;
+		real w=-q.x*v.x-q.y*v.y-q.z*v.z;
+
+		r.x=+x*+q.w+y*-q.z-z*-q.y+w*-q.x;
+		r.y=-x*-q.z+y*+q.w+z*-q.x+w*-q.y;
+		r.z=+x*-q.y-y*-q.x+z*+q.w+w*-q.z;
+	}
+
 	public static real length(Quaternion q){
 		return sqrt(q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w);
 	}
@@ -1539,46 +1561,46 @@ public final class Math{
 		r.w=q.w*i;
 	}
 
-	private static int[] quaternionFromMatrix3x3_next={1,2,0};
-	public static void setQuaternionFromMatrix3x3(Quaternion r,Matrix3x3 mat){
-		// Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
-		// article "Quaternion Calculus and Fast Animation".
+	// Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
+	// article "Quaternion Calculus and Fast Animation".
+	private static int[] quaternionFromMatrix_next={1,2,0};
+	#define setQuaternionFromMatrix(r,mat) \
+		real trace=mat.at(0,0)+mat.at(1,1)+mat.at(2,2); \
+		real root; \
+		\
+		if(trace>0){ \
+			root=sqrt(trace+ONE); \
+			r.w=0.5f*root; \
+			root=0.5f/root; \
+			r.x=(mat.at(2,1)-mat.at(1,2))*root; \
+			r.y=(mat.at(0,2)-mat.at(2,0))*root; \
+			r.z=(mat.at(1,0)-mat.at(0,1))*root; \
+		} \
+		else{ \
+			int i=0; \
+			if(mat.at(1,1)>mat.at(0,0)){ \
+				i=1; \
+			} \
+			if(mat.at(2,2)>mat.at(i,i)){ \
+				i=2; \
+			} \
+			int j=quaternionFromMatrix3x3_next[i]; \
+			int k=quaternionFromMatrix3x3_next[j]; \
+			\
+			root=sqrt(mat.at(i,i)-mat.at(j,j)-mat.at(k,k)+1.0f); \
+			trace=0.5f*root; \
+			trace=(i==0?(r.x=trace):(i==1?(r.y=trace):(r.z=trace))); \
+			root=0.5f/root; \
+			r.w=(mat.at(k,j)-mat.at(j,k))*root; \
+			trace=(mat.at(j,i)+mat.at(i,j))*root; \
+			trace=(j==0?(r.x=trace):(j==1?(r.y=trace):(r.z=trace))); \
+			trace=(mat.at(k,i)+mat.at(i,k))*root; \
+			trace=(k==0?(r.x=trace):(k==1?(r.y=trace):(r.z=trace))); \
+		} \
 
-		real trace=mat.at(0,0)+mat.at(1,1)+mat.at(2,2);
-		real root;
+	public static void setQuaternionFromMatrix3x3(Quaternion r,Matrix3x3 mat){ setQuaternionFromMatrix(r,mat); }
 
-		if(trace>0){
-			// |w| > 1/2, may as well choose w > 1/2
-			root=sqrt(trace+ONE); // 2w
-			r.w=0.5f*root;
-			root=0.5f/root; // 1/(4w)
-			r.x=(mat.at(2,1)-mat.at(1,2))*root;
-			r.y=(mat.at(0,2)-mat.at(2,0))*root;
-			r.z=(mat.at(1,0)-mat.at(0,1))*root;
-		}
-		else{
-			// |w| <= 1/2
-			int i=0;
-			if(mat.at(1,1)>mat.at(0,0)){
-				i=1;
-			}
-			if(mat.at(2,2)>mat.at(i,i)){
-				i=2;
-			}
-			int j=quaternionFromMatrix3x3_next[i];
-			int k=quaternionFromMatrix3x3_next[j];
-
-			root=sqrt(mat.at(i,i)-mat.at(j,j)-mat.at(k,k)+1.0f);
-			trace=0.5f*root; // trace used as temp in the below code, and as a dummy assignment
-			trace=(i==0?(r.x=trace):(i==1?(r.y=trace):(r.z=trace)));
-			root=0.5f/root;
-			r.w=(mat.at(k,j)-mat.at(j,k))*root;
-			trace=(mat.at(j,i)+mat.at(i,j))*root;
-			trace=(j==0?(r.x=trace):(j==1?(r.y=trace):(r.z=trace)));
-			trace=(mat.at(k,i)+mat.at(i,k))*root;
-			trace=(k==0?(r.x=trace):(k==1?(r.y=trace):(r.z=trace)));
-		}
-	}
+	public static void setQuaternionFromMatrix4x4(Quaternion r,Matrix4x4 mat){ setQuaternionFromMatrix(r,mat); }
 
 	public static void setQuaternionFromAxisAngle(Quaternion r,Vector3 axis,real angle){
 		real halfAngle=angle*0.5f;

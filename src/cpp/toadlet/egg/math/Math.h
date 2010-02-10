@@ -1210,6 +1210,28 @@ namespace Math{
 		q2.w=w;
 	}
 
+	inline void mul(Vector3 &r,const Quaternion &q){
+		real x=+q.y*r.z-q.z*r.y+q.w*r.x;
+		real y=-q.x*r.z+q.z*r.x+q.w*r.y;
+		real z=+q.x*r.y-q.y*r.x+q.w*r.z;
+		real w=-q.x*r.x-q.y*r.y-q.z*r.z;
+
+		r.x=+x*+q.w+y*-q.z-z*-q.y+w*-q.x;
+		r.y=-x*-q.z+y*+q.w+z*-q.x+w*-q.y;
+		r.z=+x*-q.y-y*-q.x+z*+q.w+w*-q.z;
+	}
+
+	inline void mul(Vector3 &r,const Quaternion &q,const Vector3 &v){
+		real x=+q.y*v.z-q.z*v.y+q.w*v.x;
+		real y=-q.x*v.z+q.z*v.x+q.w*v.y;
+		real z=+q.x*v.y-q.y*v.x+q.w*v.z;
+		real w=-q.x*v.x-q.y*v.y-q.z*v.z;
+
+		r.x=+x*+q.w+y*-q.z-z*-q.y+w*-q.x;
+		r.y=-x*-q.z+y*+q.w+z*-q.x+w*-q.y;
+		r.z=+x*-q.y-y*-q.x+z*+q.w+w*-q.z;
+	}
+
 	inline real lengthSquared(const Quaternion &q){
 		return q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w;
 	}
@@ -1306,6 +1328,8 @@ namespace Math{
 	}
 
 	TOADLET_API void setQuaternionFromMatrix3x3(Quaternion &r,const Matrix3x3 &m);
+
+	TOADLET_API void setQuaternionFromMatrix4x4(Quaternion &r,const Matrix4x4 &m);
 
 	inline void setQuaternionFromAxisAngle(Quaternion &r,const Vector3 &axis,real angle){
 		real halfAngle=angle*0.5;

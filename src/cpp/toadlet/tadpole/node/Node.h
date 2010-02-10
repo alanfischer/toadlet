@@ -91,9 +91,10 @@ public:
 	inline const Vector3 &getWorldTranslate() const{return mWorldTranslate;}
 
 	virtual void setRotate(const Matrix3x3 &rotate);
+	virtual void setRotate(const Quaternion &rotate);
 	virtual void setRotate(scalar x,scalar y,scalar z,scalar angle);
-	inline const Matrix3x3 &getRotate() const{return mRotate;}
-	inline const Matrix3x3 &getWorldRotate() const{return mWorldRotate;}
+	inline const Quaternion &getRotate() const{return mRotate;}
+	inline const Quaternion &getWorldRotate() const{return mWorldRotate;}
 
 	virtual void setScale(const Vector3 &scale);
 	virtual void setScale(scalar x,scalar y,scalar z);
@@ -144,7 +145,7 @@ public:
 
 protected:
 	void setRenderTransformTranslate(const Vector3 &translate);
-	void setRenderTransformRotateScale(const Matrix3x3 &rotate,const Vector3 &scale);
+	void setRenderTransformRotateScale(const Quaternion &rotate,const Vector3 &scale);
 
 	// Allocation items
 	egg::PointerCounter *mCounter;
@@ -162,10 +163,10 @@ protected:
 
 	bool mIdentityTransform;
 	Vector3 mTranslate;
-	Matrix3x3 mRotate;
+	Quaternion mRotate;
 	Vector3 mScale;
 	Vector3 mWorldTranslate;
-	Matrix3x3 mWorldRotate;
+	Quaternion mWorldRotate;
 	Vector3 mWorldScale;
 	int mScope;
 	egg::String mName;
@@ -180,6 +181,7 @@ protected:
 	Matrix4x4 mWorldRenderTransform;
 
 	Vector3 cache_setRotate_vector;
+	Matrix3x3 cache_setTransform_matrix;
 
 	friend class SceneNode;
 };

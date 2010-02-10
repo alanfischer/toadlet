@@ -69,17 +69,15 @@ void NodePathAnimation::set(scalar value){
 		Matrix3x3 &rotateMatrix=cache_set_rotateMatrix.reset();
 		Math::setMatrix3x3FromMatrix4x4(rotateMatrix,lookAt);
 
-		mTarget->setTranslate(translate);
 		mTarget->setRotate(rotateMatrix);
+		mTarget->setTranslate(translate);
 	}
 	else{
 		Quaternion &rotate=cache_set_rotate.reset();
 		Math::slerp(rotate,f1->rotate,f2->rotate,t);
-		Matrix3x3 &rotateMatrix=cache_set_rotateMatrix.reset();
-		Math::setMatrix3x3FromQuaternion(rotateMatrix,rotate);
 
+		mTarget->setRotate(rotate);
 		mTarget->setTranslate(translate);
-		mTarget->setRotate(rotateMatrix);
 	}
 }
 

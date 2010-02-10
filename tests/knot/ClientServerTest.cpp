@@ -8,6 +8,8 @@
 #include <toadlet/knot/SimpleServer.h>
 #include "../quicktest.h"
 
+#include <toadlet/egg/math/Math.h>
+
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
 using namespace toadlet::egg::net;
@@ -48,6 +50,8 @@ public:
 		}
 	}
 };
+
+using namespace toadlet::egg::math;
 
 QT_TEST(ClientClientTest){
 	SimpleEventFactory::ptr eventFactory(new SimpleEventFactory());

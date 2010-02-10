@@ -1222,6 +1222,29 @@ namespace Math{
 		q2.w=w;
 	}
 
+	inline void mul(Vector3 &r,const Quaternion &q){
+		fixed x=TOADLET_MUL_XX(+q.y,r.z)-TOADLET_MUL_XX(q.z,r.y)+TOADLET_MUL_XX(q.w,r.x);
+		fixed y=TOADLET_MUL_XX(-q.x,r.z)+TOADLET_MUL_XX(q.z,r.x)+TOADLET_MUL_XX(q.w,r.y);
+		fixed z=TOADLET_MUL_XX(+q.x,r.y)-TOADLET_MUL_XX(q.y,r.x)+TOADLET_MUL_XX(q.w,r.z);
+		fixed w=TOADLET_MUL_XX(-q.x,r.x)-TOADLET_MUL_XX(q.y,r.y)-TOADLET_MUL_XX(q.z,r.z);
+
+		r.x=TOADLET_MUL_XX(+x,+q.w)+TOADLET_MUL_XX(y,-q.z)-TOADLET_MUL_XX(z,-q.y)+TOADLET_MUL_XX(w,-q.x);
+		r.y=TOADLET_MUL_XX(-x,-q.z)+TOADLET_MUL_XX(y,+q.w)+TOADLET_MUL_XX(z,-q.x)+TOADLET_MUL_XX(w,-q.y);
+		r.z=TOADLET_MUL_XX(+x,-q.y)-TOADLET_MUL_XX(y,-q.x)+TOADLET_MUL_XX(z,+q.w)+TOADLET_MUL_XX(w,-q.z);
+	}
+
+	inline void mul(Vector3 &r,const Quaternion &q,const Vector3 &v){
+		fixed x=TOADLET_MUL_XX(+q.y,v.z)-TOADLET_MUL_XX(q.z,v.y)+TOADLET_MUL_XX(q.w,v.x);
+		fixed y=TOADLET_MUL_XX(-q.x,v.z)+TOADLET_MUL_XX(q.z,v.x)+TOADLET_MUL_XX(q.w,v.y);
+		fixed z=TOADLET_MUL_XX(+q.x,v.y)-TOADLET_MUL_XX(q.y,v.x)+TOADLET_MUL_XX(q.w,v.z);
+		fixed w=TOADLET_MUL_XX(-q.x,v.x)-TOADLET_MUL_XX(q.y,v.y)-TOADLET_MUL_XX(q.z,v.z);
+
+		r.x=TOADLET_MUL_XX(+x,+q.w)+TOADLET_MUL_XX(y,-q.z)-TOADLET_MUL_XX(z,-q.y)+TOADLET_MUL_XX(w,-q.x);
+		r.y=TOADLET_MUL_XX(-x,-q.z)+TOADLET_MUL_XX(y,+q.w)+TOADLET_MUL_XX(z,-q.x)+TOADLET_MUL_XX(w,-q.y);
+		r.z=TOADLET_MUL_XX(+x,-q.y)-TOADLET_MUL_XX(y,-q.x)+TOADLET_MUL_XX(z,+q.w)+TOADLET_MUL_XX(w,-q.z);
+	}
+
+
 	inline fixed lengthSquared(const Quaternion &q){
 		fixed r=TOADLET_MUL_XX(q.x,q.x) + TOADLET_MUL_XX(q.y,q.y) + TOADLET_MUL_XX(q.z,q.z) + TOADLET_MUL_XX(q.w,q.w);
 		TOADLET_CHECK_OVERFLOW(r,"overflow in lengthSquared");
@@ -1322,6 +1345,8 @@ namespace Math{
 	}
 
 	TOADLET_API void setQuaternionFromMatrix3x3(Quaternion &r,const Matrix3x3 &m);
+
+	TOADLET_API void setQuaternionFromMatrix4x4(Quaternion &r,const Matrix4x4 &m);
 
 	inline void setQuaternionFromAxisAngle(Quaternion &r,const Vector3 &axis,fixed angle){
 		fixed halfAngle=angle>>1;

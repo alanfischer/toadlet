@@ -269,21 +269,21 @@ fixed Math::setAxisAngleFromQuaternion(Vector3 &axis,const Quaternion &q,fixed e
 	return angle;
 }
 
-void Math::setQuaternionFromMatrix3x3(Quaternion &r,const Matrix3x3 &m){
-	// Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
-	// article "Quaternion Calculus and Fast Animation".
-
+// Algorithm from Ken Shoemake's article in 1987 SIGGRAPH course notes
+// article "Quaternion Calculus and Fast Animation".
+template<class Matrix>
+void setQuaternionFromMatrix(Quaternion &r,const Matrix &m){
 	fixed trace=m.at(0,0)+m.at(1,1)+m.at(2,2);
 	fixed root;
 
 	if(trace>0){
 		// |w| > 1/2, may as well choose w > 1/2
-		root=sqrt(trace+ONE); // 2w
+		root=Math::sqrt(trace+Math::ONE); // 2w
 		r.w=root>>1;
-		root=div(HALF,root); // 1/(4w)
-		r.x=mul(m.at(2,1)-m.at(1,2),root);
-		r.y=mul(m.at(0,2)-m.at(2,0),root);
-		r.z=mul(m.at(1,0)-m.at(0,1),root);
+		root=Math::div(Math::HALF,root); // 1/(4w)
+		r.x=Math::mul(m.at(2,1)-m.at(1,2),root);
+		r.y=Math::mul(m.at(0,2)-m.at(2,0),root);
+		r.z=Math::mul(m.at(1,0)-m.at(0,1),root);
 	}
 	else{
 		// |w| <= 1/2
@@ -298,14 +298,18 @@ void Math::setQuaternionFromMatrix3x3(Quaternion &r,const Matrix3x3 &m){
 		int j=next[i];
 		int k=next[j];
 
-		root=sqrt(m.at(i,i)-m.at(j,j)-m.at(k,k)+ONE);
+		root=Math::sqrt(m.at(i,i)-m.at(j,j)-m.at(k,k)+Math::ONE);
 		r[i]=root>>1;
-		root=div(HALF,root);
-		r.w=mul(m.at(k,j)-m.at(j,k),root);
-		r[j]=mul(m.at(j,i)+m.at(i,j),root);
-		r[k]=mul(m.at(k,i)+m.at(i,k),root);
+		root=Math::div(Math::HALF,root);
+		r.w=Math::mul(m.at(k,j)-m.at(j,k),root);
+		r[j]=Math::mul(m.at(j,i)+m.at(i,j),root);
+		r[k]=Math::mul(m.at(k,i)+m.at(i,k),root);
 	}
 }
+
+void Math::setQuaternionFromMatrix3x3(Quaternion &r,const Matrix3x3 &m){ setQuaternionFromMatrix(r,m); }
+
+void Math::setQuaternionFromMatrix4x4(Quaternion &r,const Matrix4x4 &m){ setQuaternionFromMatrix(r,m); }
 
 void Math::lerp(Quaternion &r,const Quaternion &q1,const Quaternion &q2,fixed t){
 	fixed cosom=dot(q1,q2);

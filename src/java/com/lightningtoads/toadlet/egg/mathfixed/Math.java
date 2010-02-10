@@ -1626,6 +1626,28 @@ public final class Math{
 		q2.w=w;
 	}
 
+	public static void mul(Vector3 r,Quaternion q){
+		fixed x=TOADLET_MUL_XX(+q.y,r.z)-TOADLET_MUL_XX(q.z,r.y)+TOADLET_MUL_XX(q.w,r.x);
+		fixed y=TOADLET_MUL_XX(-q.x,r.z)+TOADLET_MUL_XX(q.z,r.x)+TOADLET_MUL_XX(q.w,r.y);
+		fixed z=TOADLET_MUL_XX(+q.x,r.y)-TOADLET_MUL_XX(q.y,r.x)+TOADLET_MUL_XX(q.w,r.z);
+		fixed w=TOADLET_MUL_XX(-q.x,r.x)-TOADLET_MUL_XX(q.y,r.y)-TOADLET_MUL_XX(q.z,r.z);
+
+		r.x=TOADLET_MUL_XX(+x,+q.w)+TOADLET_MUL_XX(y,-q.z)-TOADLET_MUL_XX(z,-q.y)+TOADLET_MUL_XX(w,-q.x);
+		r.y=TOADLET_MUL_XX(-x,-q.z)+TOADLET_MUL_XX(y,+q.w)+TOADLET_MUL_XX(z,-q.x)+TOADLET_MUL_XX(w,-q.y);
+		r.z=TOADLET_MUL_XX(+x,-q.y)-TOADLET_MUL_XX(y,-q.x)+TOADLET_MUL_XX(z,+q.w)+TOADLET_MUL_XX(w,-q.z);
+	}
+
+	public static void mul(Vector3 r,Quaternion q,Vector3 v){
+		fixed x=TOADLET_MUL_XX(+q.y,v.z)-TOADLET_MUL_XX(q.z,v.y)+TOADLET_MUL_XX(q.w,v.x);
+		fixed y=TOADLET_MUL_XX(-q.x,v.z)+TOADLET_MUL_XX(q.z,v.x)+TOADLET_MUL_XX(q.w,v.y);
+		fixed z=TOADLET_MUL_XX(+q.x,v.y)-TOADLET_MUL_XX(q.y,v.x)+TOADLET_MUL_XX(q.w,v.z);
+		fixed w=TOADLET_MUL_XX(-q.x,v.x)-TOADLET_MUL_XX(q.y,v.y)-TOADLET_MUL_XX(q.z,v.z);
+
+		r.x=TOADLET_MUL_XX(+x,+q.w)+TOADLET_MUL_XX(y,-q.z)-TOADLET_MUL_XX(z,-q.y)+TOADLET_MUL_XX(w,-q.x);
+		r.y=TOADLET_MUL_XX(-x,-q.z)+TOADLET_MUL_XX(y,+q.w)+TOADLET_MUL_XX(z,-q.x)+TOADLET_MUL_XX(w,-q.y);
+		r.z=TOADLET_MUL_XX(+x,-q.y)-TOADLET_MUL_XX(y,-q.x)+TOADLET_MUL_XX(z,+q.w)+TOADLET_MUL_XX(w,-q.z);
+	}
+
 	public static fixed lengthSquared(Quaternion q){
 		fixed r=TOADLET_MUL_XX(q.x,q.x) + TOADLET_MUL_XX(q.y,q.y) + TOADLET_MUL_XX(q.z,q.z) + TOADLET_MUL_XX(q.w,q.w);
 		TOADLET_CHECK_OVERFLOW(r,"overflow in lengthSquared");
@@ -1725,46 +1747,46 @@ public final class Math{
 		r.w=TOADLET_MUL_XX(q.w,i);
 	}
 
+	// Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
+	// article "Quaternion Calculus and Fast Animation".
 	private static int[] quaternionFromMatrix3x3_next={1,2,0};
-	public static void setQuaternionFromMatrix3x3(Quaternion r,Matrix3x3 mat){
-		// Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
-		// article "Quaternion Calculus and Fast Animation".
+	#define setQuaternionFromMatrix(r,mat) \
+		fixed trace=mat.at(0,0)+mat.at(1,1)+mat.at(2,2); \
+		fixed root; \
+		\
+		if(trace>0){ \
+			root=sqrt(trace+ONE); \
+			r.w=root>>1; \
+			root=div(HALF,root); \
+			r.x=mul(mat.at(2,1)-mat.at(1,2),root); \
+			r.y=mul(mat.at(0,2)-mat.at(2,0),root); \
+			r.z=mul(mat.at(1,0)-mat.at(0,1),root); \
+		} \
+		else{ \
+			int i=0; \
+			if(mat.at(1,1)>mat.at(0,0)){ \
+				i=1; \
+			} \
+			if(mat.at(2,2)>mat.at(i,i)){ \
+				i=2; \
+			} \
+			int j=quaternionFromMatrix3x3_next[i]; \
+			int k=quaternionFromMatrix3x3_next[j]; \
+			\
+			root=sqrt(mat.at(i,i)-mat.at(j,j)-mat.at(k,k)+ONE); \
+			trace=root>>1; \
+			trace=(i==0?(r.x=trace):(i==1?(r.y=trace):(r.z=trace))); \
+			root=div(HALF,root); \
+			r.w=mul(mat.at(k,j)-mat.at(j,k),root); \
+			trace=mul(mat.at(j,i)+mat.at(i,j),root); \
+			trace=(j==0?(r.x=trace):(j==1?(r.y=trace):(r.z=trace))); \
+			trace=mul(mat.at(k,i)+mat.at(i,k),root); \
+			trace=(k==0?(r.x=trace):(k==1?(r.y=trace):(r.z=trace))); \
+		} \
 
-		fixed trace=mat.at(0,0)+mat.at(1,1)+mat.at(2,2);
-		fixed root;
+	public static void setQuaternionFromMatrix3x3(Quaternion r,Matrix3x3 mat){ setQuaternionFromMatrix(r,mat); }
 
-		if(trace>0){
-			// |w| > 1/2, may as well choose w > 1/2
-			root=sqrt(trace+ONE); // 2w
-			r.w=root>>1;
-			root=div(HALF,root); // 1/(4w)
-			r.x=mul(mat.at(2,1)-mat.at(1,2),root);
-			r.y=mul(mat.at(0,2)-mat.at(2,0),root);
-			r.z=mul(mat.at(1,0)-mat.at(0,1),root);
-		}
-		else{
-			// |w| <= 1/2
-			int i=0;
-			if(mat.at(1,1)>mat.at(0,0)){
-				i=1;
-			}
-			if(mat.at(2,2)>mat.at(i,i)){
-				i=2;
-			}
-			int j=quaternionFromMatrix3x3_next[i];
-			int k=quaternionFromMatrix3x3_next[j];
-
-			root=sqrt(mat.at(i,i)-mat.at(j,j)-mat.at(k,k)+ONE);
-			trace=root>>1; // trace used as temp in the below code, and as a dummy assignment
-			trace=(i==0?(r.x=trace):(i==1?(r.y=trace):(r.z=trace)));
-			root=div(HALF,root);
-			r.w=mul(mat.at(k,j)-mat.at(j,k),root);
-			trace=mul(mat.at(j,i)+mat.at(i,j),root);
-			trace=(j==0?(r.x=trace):(j==1?(r.y=trace):(r.z=trace)));
-			trace=mul(mat.at(k,i)+mat.at(i,k),root);
-			trace=(k==0?(r.x=trace):(k==1?(r.y=trace):(r.z=trace)));
-		}
-	}
+	public static void setQuaternionFromMatrix4x4(Quaternion r,Matrix4x4 mat){ setQuaternionFromMatrix(r,mat); }
 
 	public static void setQuaternionFromAxisAngle(Quaternion r,Vector3 axis,fixed angle){
 		fixed halfAngle=angle>>1;

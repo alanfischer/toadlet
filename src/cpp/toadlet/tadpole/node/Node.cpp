@@ -148,6 +148,15 @@ void Node::setTranslate(scalar x,scalar y,scalar z){
 }
 
 void Node::setRotate(const Matrix3x3 &rotate){
+	Math::setQuaternionFromMatrix3x3(mRotate,rotate);
+
+	setRenderTransformRotateScale(mRotate,mScale);
+
+	mIdentityTransform=false;
+	modified();
+}
+
+void Node::setRotate(const Quaternion &rotate){
 	mRotate.set(rotate);
 
 	setRenderTransformRotateScale(mRotate,mScale);
@@ -157,7 +166,7 @@ void Node::setRotate(const Matrix3x3 &rotate){
 }
 
 void Node::setRotate(scalar x,scalar y,scalar z,scalar angle){
-	Math::setMatrix3x3FromAxisAngle(mRotate,cache_setRotate_vector.set(x,y,z),angle);
+	Math::setQuaternionFromAxisAngle(mRotate,cache_setRotate_vector.set(x,y,z),angle);
 
 	setRenderTransformRotateScale(mRotate,mScale);
 
@@ -185,7 +194,8 @@ void Node::setScale(scalar x,scalar y,scalar z){
 
 void Node::setTransform(const Matrix4x4 &transform){
 	Math::setScaleFromMatrix4x4(mScale,transform);
-	Math::setRotateFromMatrix4x4(mRotate,transform,mScale);
+	Math::setRotateFromMatrix4x4(cache_setTransform_matrix,transform,mScale);
+	Math::setQuaternionFromMatrix3x3(mRotate,cache_setTransform_matrix);
 	Math::setTranslateFromMatrix4x4(mTranslate,transform);
 
 	mRenderTransform.set(transform);
@@ -249,8 +259,9 @@ void Node::setRenderTransformTranslate(const Vector3 &translate){
 	Math::setMatrix4x4FromTranslate(mRenderTransform,translate);
 }
 
-void Node::setRenderTransformRotateScale(const Matrix3x3 &rotate,const Vector3 &scale){
-	Math::setMatrix4x4FromRotateScale(mRenderTransform,rotate,scale);
+void Node::setRenderTransformRotateScale(const Quaternion &rotate,const Vector3 &scale){
+	Math::setMatrix3x3FromQuaternion(cache_setTransform_matrix,rotate);
+	Math::setMatrix4x4FromRotateScale(mRenderTransform,cache_setTransform_matrix,scale);
 }
 
 }

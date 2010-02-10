@@ -149,12 +149,6 @@ public:
 	ServerEvent():ServerUpdateEvent(EventType_SERVER){}
 	ServerEvent(int lastCounter,int time):ServerUpdateEvent(EventType_SERVER,lastCounter,time){}
 
-	void addUpdate(int id,const Vector3 &position,const Matrix3x3 &rotation,const Vector3 &velocity){
-		Quaternion qrotation;
-		Math::setQuaternionFromMatrix3x3(qrotation,rotation);
-		addUpdate(id,position,qrotation,velocity);
-	}
-
 	void addUpdate(int id,const Vector3 &position,const Quaternion &rotation,const Vector3 &velocity){
 		mIDs.add(id);
 		mPositions.add(position);
@@ -238,6 +232,14 @@ SimpleSync::SimpleSync():Application(),
 changeRendererPlugin(RendererPlugin_DIRECT3D9);
 }
 
+enum{
+	Move_FORE=1<<0,
+	Move_BACK=1<<1,
+	Move_RIGHT=1<<2,
+	Move_LEFT=1<<3,
+	Move_JUMP=1<<4,
+};
+
 SimpleSync::~SimpleSync(){
 }
 
@@ -274,25 +276,20 @@ void SimpleSync::create(){
 	scene=HopScene::ptr(new HopScene(mEngine->createNodeType(SceneNode::type())));
 	getEngine()->setScene(scene);
 	scene->setUpdateListener(this);
-	scene->setGravity(Vector3(0,0,-10));
+	scene->setGravity(Vector3(0,0,-500));
 	//scene->showCollisionVolumes(true,false);
 	scene->getSimulator()->setMicroCollisionThreshold(5);
-	if(client!=NULL){
-		scene->setLogicDT(0);
-	}
-	else{
-		scene->setLogicDT(0);
-	}
+	scene->setLogicDT(10);
 
 	scene->getRootNode()->attach(getEngine()->createNodeType(LightNode::type()));
 
 	cameraNode=getEngine()->createNodeType(CameraNode::type());
-	cameraNode->setLookAt(Vector3(0,-Math::fromInt(50),Math::fromInt(25)),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
+	cameraNode->setLookAt(Vector3(0,-Math::fromInt(500),Math::fromInt(250)),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
 	cameraNode->setClearColor(Colors::BLUE);
 	scene->getRootNode()->attach(cameraNode);
 
 	HopEntity::ptr floor=getEngine()->createNodeType(HopEntity::type());
-	floor->addShape(Shape::ptr(new Shape(AABox(-100,-100,-1,100,100,0))));
+	floor->addShape(Shape::ptr(new Shape(AABox(-1000,-1000,-1,1000,1000,0))));
 	{
 		Mesh::ptr mesh=getEngine()->getMeshManager()->createBox(floor->getShape(0)->getAABox());
 		mesh->subMeshes[0]->material->setLightEffect(Colors::GREY);
@@ -305,7 +302,7 @@ void SimpleSync::create(){
 	scene->getRootNode()->attach(floor);
 
 	block=getEngine()->createNodeType(HopEntity::type());
-	block->addShape(Shape::ptr(new Shape(AABox(-1,-1,-1,1,1,1))));
+	block->addShape(Shape::ptr(new Shape(AABox(-8,-8,-8,8,8,8))));
 	{
 		Mesh::ptr mesh=getEngine()->getMeshManager()->createBox(block->getShape(0)->getAABox());
 		mesh->subMeshes[0]->material->setLightEffect(Colors::RED);
@@ -313,13 +310,15 @@ void SimpleSync::create(){
 		meshNode->setMesh(mesh);
 		block->attach(meshNode);
 	}
-	block->setTranslate(0,0,10);
+	block->setTranslate(0,0,32);
 	scene->getRootNode()->attach(block);
 
 	int i;
 	for(i=0;i<2;++i){
 		player[i]=getEngine()->createNodeType(HopEntity::type());
-		player[i]->addShape(Shape::ptr(new Shape(AABox(-1,-1,0,1,1,4))));
+		player[i]->setCoefficientOfRestitution(0);
+		player[i]->setCoefficientOfRestitutionOverride(true);
+		player[i]->addShape(Shape::ptr(new Shape(AABox(-16,-16,-32,16,16,32))));
 		{
 			Mesh::ptr mesh=getEngine()->getMeshManager()->createBox(player[i]->getShape(0)->getAABox());
 			mesh->subMeshes[0]->material->setLightEffect(i==0?Colors::GREEN:Colors::CYAN);
@@ -327,7 +326,7 @@ void SimpleSync::create(){
 			meshNode->setMesh(mesh);
 			player[i]->attach(meshNode);
 		}
-		player[i]->setTranslate(0,i==0?-20:20,0);
+		player[i]->setTranslate(0,i==0?-20:20,32);
 		scene->getRootNode()->attach(player[i]);
 	}
 
@@ -357,10 +356,10 @@ void SimpleSync::destroy(){
 void SimpleSync::resized(int width,int height){
 	if(cameraNode!=NULL && width>0 && height>0){
 		if(width>=height){
-			cameraNode->setProjectionFovY(Math::degToRad(Math::fromInt(75)),Math::div(Math::fromInt(width),Math::fromInt(height)),Math::fromMilli(10),Math::fromInt(100));
+			cameraNode->setProjectionFovY(Math::degToRad(Math::fromInt(75)),Math::div(Math::fromInt(width),Math::fromInt(height)),Math::fromMilli(100),Math::fromInt(1000));
 		}
 		else{
-			cameraNode->setProjectionFovX(Math::degToRad(Math::fromInt(75)),Math::div(Math::fromInt(height),Math::fromInt(width)),Math::fromMilli(10),Math::fromInt(100));
+			cameraNode->setProjectionFovX(Math::degToRad(Math::fromInt(75)),Math::div(Math::fromInt(height),Math::fromInt(width)),Math::fromMilli(100),Math::fromInt(1000));
 		}
 		cameraNode->setViewport(Viewport(0,0,width,height));
 	}
@@ -397,8 +396,7 @@ void SimpleSync::preLogicUpdate(int dt){
 
 	if(client!=NULL){
 		int currentFrame=scene->getLogicFrame()+1;
-		Quaternion look; Math::setQuaternionFromMatrix3x3(look,player[client->getClientID()]->getRotate());
-		ClientEvent::ptr clientEvent(new ClientEvent(currentFrame,dt,flags,look));
+		ClientEvent::ptr clientEvent(new ClientEvent(currentFrame,dt,flags,player[client->getClientID()]->getRotate()));
 		sentClientEvents.add(clientEvent);
 		client->send(clientEvent);
 	}
@@ -418,36 +416,37 @@ void SimpleSync::preLogicUpdate(int dt){
 	}
 }
 
-void updatePlayer(const ClientEvent::ptr &event,HopEntity::ptr player){
-	Matrix3x3 rotate; Math::setMatrix3x3FromQuaternion(rotate,event->getLook());
-	player->setRotate(rotate);
+void updatePlayer(const ClientEvent::ptr &event,HopEntity::ptr entity){
+	entity->setRotate(event->getLook());
 
-	scalar fall=player->getVelocity().z;
-	if(event->getFlags()&(1<<0)){
-		Vector3 velocity(0,10,fall);
-		Math::mul(velocity,player->getRotate());
-		player->setVelocity(velocity);
+	int flags=event->getFlags();
+	Vector3 velocity;
+	if((flags&Move_FORE)>0){
+		Math::add(velocity,Math::Y_UNIT_VECTOR3);
 	}
-	if(event->getFlags()&(1<<1)){
-		Vector3 velocity(0,-10,fall);
-		Math::mul(velocity,player->getRotate());
-		player->setVelocity(velocity);
+	if((flags&Move_BACK)>0){
+		Math::add(velocity,Math::NEG_Y_UNIT_VECTOR3);
 	}
-	if(event->getFlags()&(1<<2)){
-		Vector3 velocity(-10,0,fall);
-		Math::mul(velocity,player->getRotate());
-		player->setVelocity(velocity);
+	if((flags&Move_LEFT)>0){
+		Math::add(velocity,Math::NEG_X_UNIT_VECTOR3);
 	}
-	if(event->getFlags()&(1<<3)){
-		Vector3 velocity(10,0,fall);
-		Math::mul(velocity,player->getRotate());
-		player->setVelocity(velocity);
+	if((flags&Move_RIGHT)>0){
+		Math::add(velocity,Math::X_UNIT_VECTOR3);
 	}
-	if(event->getFlags()&(1<<4) && player->getTouching()!=NULL && player->getSolid()->getTouchingNormal().z>=Math::HALF){
-		Vector3 velocity=player->getVelocity();
-		velocity.z=10;
-		player->setVelocity(velocity);
+
+	Math::normalizeCarefully(velocity,0);
+	Math::mul(velocity,Math::fromInt(200));
+//	Math::mul(velocity,mPitch);
+	Math::mul(velocity,entity->getRotate());
+	scalar z=entity->getVelocity().z;
+	Vector3 result;
+	Math::lerp(result,entity->getVelocity(),velocity,0.5f);
+	result.z=z;
+
+	if((flags&Move_JUMP)>0 && entity->getSolid()->getTouching()!=NULL && entity->getSolid()->getTouchingNormal().z>Math::HALF){
+		result.z=250;
 	}
+	entity->setVelocity(result);
 }
 
 void SimpleSync::logicUpdate(int dt){
@@ -455,7 +454,7 @@ void SimpleSync::logicUpdate(int dt){
 
 	// Skip HopScene's logicUpdate
 	scene->getRootNode()->logicUpdate(dt);
-Matrix3x3 forcelook;bool force=false;
+Quaternion forcelook;bool force=false;
 	if(client!=NULL){
 		int eventStart=sentClientEvents.size()-1;
 
@@ -464,9 +463,8 @@ Matrix3x3 forcelook;bool force=false;
 			if(event->getType()==ConnectionEvent::EventType_CONNECTION){
 				ConnectionEvent::ptr connectionEvent=shared_static_cast<ConnectionEvent>(event);
 				client->setClientID(connectionEvent->getID());
-Matrix3x3 m;Math::setMatrix3x3FromQuaternion(m,connectionEvent->getLook());
-player[client->getClientID()]->setRotate(m);
-forcelook=m;force=true;
+				player[client->getClientID()]->setRotate(connectionEvent->getLook());
+forcelook=connectionEvent->getLook();force=true;
 				player[client->getClientID()]->setCollisionBits(playerCollision);
 				player[client->getClientID()]->getSolid()->setAlwaysActive(true);
 
@@ -488,8 +486,7 @@ forcelook=m;force=true;
 						}
 						else{
 							entity->getSolid()->setPosition(serverEvent->getPosition(u));
-							Matrix3x3 mrotate;Math::setMatrix3x3FromQuaternion(mrotate,serverEvent->getRotation(u));
-							entity->setRotate(mrotate);
+							entity->setRotate(serverEvent->getRotation(u));
 						}
 						entity->setVelocity(serverEvent->getVelocity(u));
 					}
@@ -607,38 +604,38 @@ void SimpleSync::keyPressed(int key){
 	}
 	else{
 		if(key=='w'){
-			flags|=(1<<0);
+			flags|=Move_FORE;
 		}
 		else if(key=='s'){
-			flags|=(1<<1);
+			flags|=Move_BACK;
 		}
 		else if(key=='a'){
-			flags|=(1<<2);
+			flags|=Move_LEFT;
 		}
 		else if(key=='d'){
-			flags|=(1<<3);
+			flags|=Move_RIGHT;
 		}
 		else if(key==' '){
-			flags|=(1<<4);
+			flags|=Move_JUMP;
 		}
 	}
 }
 
 void SimpleSync::keyReleased(int key){
 	if(key=='w'){
-		flags&=~(1<<0);
+		flags&=~Move_FORE;
 	}
 	else if(key=='s'){
-		flags&=~(1<<1);
+		flags&=~Move_BACK;
 	}
 	else if(key=='a'){
-		flags&=~(1<<2);
+		flags&=~Move_LEFT;
 	}
 	else if(key=='d'){
-		flags&=~(1<<3);
+		flags&=~Move_RIGHT;
 	}
 	else if(key==' '){
-		flags&=~(1<<4);
+		flags&=~Move_JUMP;
 	}
 }
 
@@ -653,10 +650,13 @@ void SimpleSync::mousePressed(int x,int y,int button){
 void SimpleSync::mouseMoved(int x,int y){
 	if(looking){
 		if(client!=NULL){
-			Matrix3x3 rotate; Math::setMatrix3x3FromZ(rotate,Math::fromMilli(lastX-x)*3);
-			Math::postMul(rotate,player[client->getClientID()]->getRotate());
-			Quaternion q;Math::setQuaternionFromMatrix3x3(q,rotate);Math::normalize(q);Math::setMatrix3x3FromQuaternion(rotate,q);
-			player[client->getClientID()]->setRotate(rotate);
+			look.y+=Math::fromMilli(lastY-y)*4;
+			look.z+=Math::fromMilli(lastX-x)*4;
+			Quaternion q1,q2;
+			Math::setQuaternionFromAxisAngle(q1,Math::X_UNIT_VECTOR3,look.y);
+			Math::setQuaternionFromAxisAngle(q2,Math::Z_UNIT_VECTOR3,look.z);
+			Math::preMul(q1,q2);
+			player[client->getClientID()]->setRotate(q1);
 			lastX=x;
 			lastY=y;
 		}
@@ -692,10 +692,7 @@ void SimpleSync::connected(Connection::ptr connection){
 		int i=0;
 		for(EventConnection::ptr eventConnection=server->getClient(0);client!=eventConnection;eventConnection=server->getClient(++i));
 
-// TODO: Big hack, cause the player isnt created yet on the server when the local client connects, but thats ok cause his look is identity
-Quaternion q;
-if(player[i]!=NULL)Math::setQuaternionFromMatrix3x3(q,player[i]->getRotate());
-		client->send(Event::ptr(new ConnectionEvent(i,q)));
+		client->send(Event::ptr(new ConnectionEvent(i,player[i]!=NULL?player[i]->getRotate():Math::IDENTITY_QUATERNION)));
 	}
 }
 

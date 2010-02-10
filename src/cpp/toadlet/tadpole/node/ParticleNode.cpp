@@ -427,7 +427,9 @@ void ParticleNode::render(Renderer *renderer) const{
 
 void ParticleNode::updateWorldTransform(Node *node){
 	if(node->getParent()==NULL){
-		Math::setMatrix4x4FromTranslateRotateScale(mWorldTransform,node->getTranslate(),node->getRotate(),node->getScale());
+		Matrix3x3 &temp=cache_updateWorldTransform_temp3;
+		Math::setMatrix3x3FromQuaternion(temp,node->getRotate());
+		Math::setMatrix4x4FromTranslateRotateScale(mWorldTransform,node->getTranslate(),temp,node->getScale());
 	}
 	else{
 		updateWorldTransform(node->getParent());
@@ -435,8 +437,10 @@ void ParticleNode::updateWorldTransform(Node *node){
 		if(node->isIdentityTransform()==false){
 			Matrix4x4 &temp1=cache_updateWorldTransform_temp1;
 			Matrix4x4 &temp2=cache_updateWorldTransform_temp2;
+			Matrix3x3 &temp3=cache_updateWorldTransform_temp3;
 
-			Math::setMatrix4x4FromTranslateRotateScale(temp1,node->getTranslate(),node->getRotate(),node->getScale());
+			Math::setMatrix3x3FromQuaternion(temp3,node->getRotate());
+			Math::setMatrix4x4FromTranslateRotateScale(temp1,node->getTranslate(),temp3,node->getScale());
 			Math::mul(temp2,mWorldTransform,temp1);
 			mWorldTransform.set(temp2);
 		}

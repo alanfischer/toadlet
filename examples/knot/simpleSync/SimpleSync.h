@@ -92,7 +92,7 @@ public:
 	int playerCollision;
 	int lastClientUpdateCounter[2];
 	int flags;
-	Quaternion look;
+	EulerAngle look;
 	int lastX,lastY;
 	bool looking;
 	Collection<SharedPointer<ClientEvent> > sentClientEvents;
