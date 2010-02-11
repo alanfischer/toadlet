@@ -23,29 +23,36 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_CATEGORIES_H
-#define TOADLET_EGG_CATEGORIES_H
+package org.toadlet.tadpole;
 
-#include <toadlet/egg/String.h>
+#include <org/toadlet/tadpole/Types.h>
 
-namespace toadlet{
-namespace egg{
+import org.toadlet.egg.Resource;
+import java.util.Vector;
 
-namespace Categories{
-	const static String TOADLET=			"org.toadlet";
-	const static String TOADLET_EGG_LOGGER=	TOADLET+".egg.Logger";
-	const static String TOADLET_EGG_NET=	TOADLET+".egg.net";
-	const static String TOADLET_EGG=		TOADLET+".egg";
-	const static String TOADLET_FLICK=		TOADLET+".flick";
-	const static String TOADLET_HOP=		TOADLET+".hop";
-	const static String TOADLET_KNOT=		TOADLET+".knot";
-	const static String TOADLET_PEEPER=		TOADLET+".peeper";
-	const static String TOADLET_RIBBIT=		TOADLET+".ribbit";
-	const static String TOADLET_TADPOLE=	TOADLET+".tadpole";
-	const static String TOADLET_PAD=		TOADLET+".pad";
+public class MeshSkeleton implements Resource{
+	public class Bone{
+		public Bone(){}
+
+		public int index=-1;
+		public int parentIndex=-1;
+
+		public Vector3 translate=new Vector3();
+		public Quaternion rotate=new Quaternion();
+		public Vector3 scale=new Vector3(Math.ONE,Math.ONE,Math.ONE); // TODO: Implement bone scaling
+
+		public Vector3 worldToBoneTranslate=new Vector3();
+		public Quaternion worldToBoneRotate=new Quaternion();
+
+		public String name;
+	}
+
+	public MeshSkeleton(){}
+
+	public void compile(){}
+
+	public String name;
+
+	public Bone[] bones;
+	public Vector<MeshSkeletonSequence> sequences;
 }
-
-}
-}
-
-#endif

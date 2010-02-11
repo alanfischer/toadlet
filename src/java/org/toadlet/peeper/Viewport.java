@@ -23,29 +23,46 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_CATEGORIES_H
-#define TOADLET_EGG_CATEGORIES_H
+package org.toadlet.peeper;
 
-#include <toadlet/egg/String.h>
+#include <org/toadlet/peeper/Types.h>
 
-namespace toadlet{
-namespace egg{
+public final class Viewport{
+	public Viewport(){}
 
-namespace Categories{
-	const static String TOADLET=			"org.toadlet";
-	const static String TOADLET_EGG_LOGGER=	TOADLET+".egg.Logger";
-	const static String TOADLET_EGG_NET=	TOADLET+".egg.net";
-	const static String TOADLET_EGG=		TOADLET+".egg";
-	const static String TOADLET_FLICK=		TOADLET+".flick";
-	const static String TOADLET_HOP=		TOADLET+".hop";
-	const static String TOADLET_KNOT=		TOADLET+".knot";
-	const static String TOADLET_PEEPER=		TOADLET+".peeper";
-	const static String TOADLET_RIBBIT=		TOADLET+".ribbit";
-	const static String TOADLET_TADPOLE=	TOADLET+".tadpole";
-	const static String TOADLET_PAD=		TOADLET+".pad";
+	public Viewport(int x1,int y1,int width1,int height1){
+		x=x1;
+		y=y1;
+		width=width1;
+		height=height1;
+	}
+
+	public Viewport set(Viewport v){
+		x=v.x;
+		y=v.y;
+		width=v.width;
+		height=v.height;
+		return this;
+	}
+
+	public Viewport set(int x1,int y1,int width1,int height1){
+		x=x1;
+		y=y1;
+		width=width1;
+		height=height1;
+		return this;
+	}
+
+	public Viewport reset(){
+		x=0;
+		y=0;
+		width=0;
+		height=0;
+		return this;
+	}
+
+	public int x;
+	public int y;
+	public int width;
+	public int height;
 }
-
-}
-}
-
-#endif

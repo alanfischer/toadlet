@@ -23,29 +23,63 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_CATEGORIES_H
-#define TOADLET_EGG_CATEGORIES_H
+package org.toadlet.egg.math;
 
-#include <toadlet/egg/String.h>
+#include <org/toadlet/Types.h>
 
-namespace toadlet{
-namespace egg{
+public final class EulerAngle{
+	public real x,y,z;
 
-namespace Categories{
-	const static String TOADLET=			"org.toadlet";
-	const static String TOADLET_EGG_LOGGER=	TOADLET+".egg.Logger";
-	const static String TOADLET_EGG_NET=	TOADLET+".egg.net";
-	const static String TOADLET_EGG=		TOADLET+".egg";
-	const static String TOADLET_FLICK=		TOADLET+".flick";
-	const static String TOADLET_HOP=		TOADLET+".hop";
-	const static String TOADLET_KNOT=		TOADLET+".knot";
-	const static String TOADLET_PEEPER=		TOADLET+".peeper";
-	const static String TOADLET_RIBBIT=		TOADLET+".ribbit";
-	const static String TOADLET_TADPOLE=	TOADLET+".tadpole";
-	const static String TOADLET_PAD=		TOADLET+".pad";
+	public EulerAngle(){}
+
+	public EulerAngle(EulerAngle angle){
+		x=angle.x;
+		y=angle.y;
+		z=angle.z;
+	}
+
+	public EulerAngle(real x1,real y1,real z1){
+		x=x1;
+		y=y1;
+		z=z1;
+	}
+
+	public EulerAngle set(EulerAngle angle){
+		x=angle.x;
+		y=angle.y;
+		z=angle.z;
+
+		return this;
+	}
+
+	public EulerAngle set(real x1,real y1,real z1){
+		x=x1;
+		y=y1;
+		z=z1;
+
+		return this;
+	}
+
+	public EulerAngle reset(){
+		x=0;
+		y=0;
+		z=0;
+
+		return this;
+	}
+
+	public boolean equals(Object object){
+		if(this==object){
+			return true;
+		}
+		if((object==null) || (object.getClass()!=getClass())){
+			return false;
+		}
+		EulerAngle angle=(EulerAngle)object;
+		return x==angle.x && y==angle.y && z==angle.z;
+	}
+
+	public int hashCode(){
+		return (int)(x + y + z);
+	}
 }
-
-}
-}
-
-#endif

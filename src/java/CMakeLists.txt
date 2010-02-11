@@ -3,7 +3,7 @@ option (TOADLET_JAVA_SPLIT_JARS "Build separate jars for each library instead of
 
 # Java is really fussy about pathing, so we do all setup here instead of
 # in subdirectories. For simplicity, define our paths here
-set (JAVA_SRC_DIR com/lightningtoads/toadlet)
+set (JAVA_SRC_DIR org/toadlet)
 set (JAVA_GPP_DIR ${CMAKE_CURRENT_BINARY_DIR}/gpp)
 
 # We include the JAVA_GPP_DIR files since those have been preprocessed
@@ -88,11 +88,11 @@ set (EGG_MATHFIXED_SRC
 )
 
 # Bundle source files
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/com/lightningtoads/toadlet/egg)
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/com/lightningtoads/toadlet/egg/image)
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/com/lightningtoads/toadlet/egg/io)
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/com/lightningtoads/toadlet/egg/math)
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/com/lightningtoads/toadlet/egg/mathfixed)
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/org/toadlet/egg)
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/org/toadlet/egg/image)
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/org/toadlet/egg/io)
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/org/toadlet/egg/math)
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/org/toadlet/egg/mathfixed)
 source_group ("Source Files\\\\image" FILES ${EGG_IMAGE_SRC})
 source_group ("Source Files\\\\io" FILES ${EGG_IMAGE_SRC})
 source_group ("Source Files\\\\math" FILES ${EGG_MATH_SRC})
@@ -137,7 +137,7 @@ set (HOP_SRC
 )
 
 # Bundle source files
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/com/lightningtoads/toadlet/hop)
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/org/toadlet/hop)
 
 # Copy over source files and run gpp
 foreach (SRCFILE ${HOP_SRC})
@@ -173,7 +173,7 @@ set (KNOT_SRC
 )
 
 # Bundle source files
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/com/lightningtoads/toadlet/knot)
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/org/toadlet/knot)
 
 # Copy over source files and run gpp
 foreach (SRCFILE ${KNOT_SRC})
@@ -235,7 +235,7 @@ set (PEEPER_SRC
 )
 
 # Bundle source files
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/com/lightningtoads/toadlet/peeper)
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/org/toadlet/peeper)
 
 # Copy over source files and run gpp
 foreach (SRCFILE ${PEEPER_SRC})
@@ -263,7 +263,7 @@ set (PEEPER_GLRENDERER_SRC
 )
 
 # Bundle source files
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/com/lightningtoads/toadlet/peeper/plugins/glrenderer)
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/org/toadlet/peeper/plugins/glrenderer)
 source_group ("Source Files\\\\plugins\\\\glrenderer" FILES ${PEEPER_GLRENDERER_SRC})
 
 # Copy over source files and run gpp
@@ -357,11 +357,11 @@ set (TADPOLE_WIDGET_SRC
 )
 
 # Bundle source files
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/com/lightningtoads/toadlet/tadpole)
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/com/lightningtoads/toadlet/tadpole/animation)
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/com/lightningtoads/toadlet/tadpole/entity)
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/com/lightningtoads/toadlet/tadpole/handler)
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/com/lightningtoads/toadlet/tadpole/widget)
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/org/toadlet/tadpole)
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/org/toadlet/tadpole/animation)
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/org/toadlet/tadpole/entity)
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/org/toadlet/tadpole/handler)
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/org/toadlet/tadpole/widget)
 source_group ("Source Files\\\\animation" FILES ${TADPOLE_ANIMATION_SRC})
 source_group ("Source Files\\\\entity" FILES ${TADPOLE_ENTITY_SRC})
 source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_SRC})
@@ -401,7 +401,7 @@ set (TADPOLE_HOP_SRC
 )
 
 # Bundle source files
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/com/lightningtoads/toadlet/tadpole/plugins/hop)
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/org/toadlet/tadpole/plugins/hop)
 
 # Copy over source files and run gpp
 foreach (SRCFILE ${TADPOLE_HOP_SRC})
@@ -436,7 +436,7 @@ set (PAD_SRC
 )
 
 # Bundle source files
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/com/lightningtoads/toadlet/pad)
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GPP_DIR}/org/toadlet/pad)
 
 # Copy over source files and run gpp
 foreach (SRCFILE ${PAD_SRC})

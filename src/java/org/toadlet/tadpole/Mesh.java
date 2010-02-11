@@ -23,29 +23,52 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_CATEGORIES_H
-#define TOADLET_EGG_CATEGORIES_H
+package org.toadlet.tadpole;
 
-#include <toadlet/egg/String.h>
+#include <org/toadlet/tadpole/Types.h>
 
-namespace toadlet{
-namespace egg{
+import org.toadlet.egg.Resource;
+import org.toadlet.peeper.IndexData;
+import org.toadlet.peeper.VertexData;
+import java.util.Vector;
 
-namespace Categories{
-	const static String TOADLET=			"org.toadlet";
-	const static String TOADLET_EGG_LOGGER=	TOADLET+".egg.Logger";
-	const static String TOADLET_EGG_NET=	TOADLET+".egg.net";
-	const static String TOADLET_EGG=		TOADLET+".egg";
-	const static String TOADLET_FLICK=		TOADLET+".flick";
-	const static String TOADLET_HOP=		TOADLET+".hop";
-	const static String TOADLET_KNOT=		TOADLET+".knot";
-	const static String TOADLET_PEEPER=		TOADLET+".peeper";
-	const static String TOADLET_RIBBIT=		TOADLET+".ribbit";
-	const static String TOADLET_TADPOLE=	TOADLET+".tadpole";
-	const static String TOADLET_PAD=		TOADLET+".pad";
+public class Mesh implements Resource{
+	public static class SubMesh{
+		public SubMesh(){}
+
+		public IndexData indexData;
+
+		public Material material;
+		public String materialName;
+
+		public String name;
+	};
+
+	public static class VertexBoneAssignment{
+		public VertexBoneAssignment(short b,scalar w){
+			bone=b;
+			weight=w;
+		}
+
+		public VertexBoneAssignment(){}
+
+		public short bone=0;
+		public scalar weight=Math.ONE;
+	};
+
+	public Mesh(){
+	}
+
+	public void compile(){}
+
+	public String name;
+
+	public scalar boundingRadius=-Math.ONE; // Before world scale
+	public scalar worldScale=Math.ONE;
+
+	public SubMesh[] subMeshes;
+	public VertexData staticVertexData;
+
+	public MeshSkeleton skeleton;
+	public VertexBoneAssignment[][] vertexBoneAssignments;
 }
-
-}
-}
-
-#endif
