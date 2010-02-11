@@ -23,29 +23,34 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_CATEGORIES_H
-#define TOADLET_EGG_CATEGORIES_H
+package org.toadlet.peeper;
 
-#include <toadlet/egg/String.h>
+#include <org/toadlet/tadpole/Types.h>
 
-namespace toadlet{
-namespace egg{
+import java.util.Vector;
 
-namespace Categories{
-	const static String TOADLET=			"org.toadlet";
-	const static String TOADLET_EGG_LOGGER=	TOADLET+".egg.Logger";
-	const static String TOADLET_EGG_NET=	TOADLET+".egg.net";
-	const static String TOADLET_EGG=		TOADLET+".egg";
-	const static String TOADLET_FLICK=		TOADLET+".flick";
-	const static String TOADLET_HOP=		TOADLET+".hop";
-	const static String TOADLET_KNOT=		TOADLET+".knot";
-	const static String TOADLET_PEEPER=		TOADLET+".peeper";
-	const static String TOADLET_RIBBIT=		TOADLET+".ribbit";
-	const static String TOADLET_TADPOLE=	TOADLET+".tadpole";
-	const static String TOADLET_PAD=		TOADLET+".pad";
+public class TextureSequence extends AnimatedTexture{
+	public TextureSequence(){}
+
+	public void setNumFrames(int numFrames){mFrames.setSize(numFrames);}
+	public int getNumFrames(){return mFrames.size();}
+
+	public void setFrame(int frame,Texture texture){
+		mFrames.set(frame,texture);
+
+		// Takes the attributes from the 0th frame
+		if(frame==0){
+			mDimension=texture.getDimension();
+			mFormat=texture.getFormat();
+			mWidth=texture.getWidth();
+			mHeight=texture.getHeight();
+			mDepth=texture.getDepth();
+		}
+	}
+
+	public Texture getTextureForFrame(int frame){return mFrames.get(frame);}
+	public boolean getMatrix4x4ForFrame(int frame,Matrix4x4 matrix){return true;}
+
+	protected Vector<Texture> mFrames=new Vector<Texture>();
+	protected int mCurrentFrame;
 }
-
-}
-}
-
-#endif

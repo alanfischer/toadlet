@@ -23,29 +23,20 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_CATEGORIES_H
-#define TOADLET_EGG_CATEGORIES_H
+package org.toadlet.pad;
 
-#include <toadlet/egg/String.h>
+import org.toadlet.peeper.Renderer;
 
-namespace toadlet{
-namespace egg{
-
-namespace Categories{
-	const static String TOADLET=			"org.toadlet";
-	const static String TOADLET_EGG_LOGGER=	TOADLET+".egg.Logger";
-	const static String TOADLET_EGG_NET=	TOADLET+".egg.net";
-	const static String TOADLET_EGG=		TOADLET+".egg";
-	const static String TOADLET_FLICK=		TOADLET+".flick";
-	const static String TOADLET_HOP=		TOADLET+".hop";
-	const static String TOADLET_KNOT=		TOADLET+".knot";
-	const static String TOADLET_PEEPER=		TOADLET+".peeper";
-	const static String TOADLET_RIBBIT=		TOADLET+".ribbit";
-	const static String TOADLET_TADPOLE=	TOADLET+".tadpole";
-	const static String TOADLET_PAD=		TOADLET+".pad";
+public interface ApplicationListener{
+	public void resized(int width,int height);
+	public void focusGained();
+	public void focusLost();
+	public void keyPressed(int key);
+	public void keyReleased(int key);
+	public void mousePressed(int x,int y,int button);
+	public void mouseMoved(int x,int y);
+	public void mouseReleased(int x,int y,int button);
+	public void mouseScrolled(int x,int y,int scroll);
+	public void update(int dt);
+	public void render(Renderer renderer);
 }
-
-}
-}
-
-#endif

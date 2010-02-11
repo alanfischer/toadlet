@@ -53,7 +53,7 @@ PNGHandler::~PNGHandler(){
 void toadlet_png_read_data(png_structp png_ptr,png_bytep data,png_size_t length){
 	png_size_t check; 
 
-	Stream *stream=(Stream*)png_ptr->io_ptr;
+	Stream *stream=(Stream*)png_get_io_ptr(png_ptr);
 	check=(png_size_t)stream->read(data,length);
 
 	if(check!=length){
@@ -115,24 +115,24 @@ Image *PNGHandler::loadImage(Stream *stream){
 	png_set_sig_bytes(png_ptr,8);
 	png_read_info(png_ptr,info_ptr);
 
-	width=info_ptr->width;
-	height=info_ptr->height;
-	color_type=info_ptr->color_type;
-	bit_depth=info_ptr->bit_depth;
+	width=png_get_image_width(png_ptr,info_ptr);
+	height=png_get_image_height(png_ptr,info_ptr);
+	color_type=png_get_color_type(png_ptr,info_ptr);
+	bit_depth=png_get_bit_depth(png_ptr,info_ptr);
 
 	number_of_passes=png_set_interlace_handling(png_ptr);
 	png_read_update_info(png_ptr,info_ptr);
 
 	row_pointers=(png_bytep*) malloc(sizeof(png_bytep)*height);
 	for(y=0;y<height;++y){
-		row_pointers[y]=(png_byte*) malloc(info_ptr->rowbytes);
+		row_pointers[y]=(png_byte*) malloc(png_get_rowbytes(png_ptr,info_ptr));
 	}
 	
 	png_read_image(png_ptr,row_pointers);
 
 	Image *image=NULL;
 
-	if(info_ptr->color_type==PNG_COLOR_TYPE_GRAY){
+	if(color_type==PNG_COLOR_TYPE_GRAY){
 		image=new Image(Image::Dimension_D2,Image::Format_L_8,width,height);
 
 		byte *data=image->getData();
@@ -141,17 +141,16 @@ Image *PNGHandler::loadImage(Stream *stream){
 			memcpy(data+width*y,row_pointers[y],width);
 		}
 	}
-	else if(info_ptr->color_type==PNG_COLOR_TYPE_PALETTE){
+	else if(color_type==PNG_COLOR_TYPE_PALETTE){
 		#define PNGHANDLER_GET_INDEX \
-			(row[x/a]>>((8-bitDepth)-bitDepth*(x%a)))&b
+			(row[x/a]>>((8-bit_depth)-bit_depth*(x%a)))&b
 
 		png_colorp palette=info_ptr->palette;
 		png_bytep trans=info_ptr->trans;
-		int bitDepth=info_ptr->bit_depth;
-		int a=(8/bitDepth);
-		int b=(255>>(8-bitDepth));
+		int a=(8/bit_depth);
+		int b=(255>>(8-bit_depth));
 
-		if((info_ptr->valid & PNG_INFO_tRNS)>0){
+		if(png_get_valid(png_ptr,info_ptr,PNG_INFO_tRNS)){
 			if(info_ptr->num_trans==1){
 				image=new Image(Image::Dimension_D2,Image::Format_RGBA_5_5_5_1,width,height);
 			}
@@ -196,7 +195,7 @@ Image *PNGHandler::loadImage(Stream *stream){
 			}
 		}
 	}
-	else if(info_ptr->color_type==PNG_COLOR_TYPE_GRAY_ALPHA){
+	else if(color_type==PNG_COLOR_TYPE_GRAY_ALPHA){
 		image=new Image(Image::Dimension_D2,Image::Format_LA_8,width,height);
 
 		byte *data=image->getData();
@@ -205,7 +204,7 @@ Image *PNGHandler::loadImage(Stream *stream){
 			memcpy(data+width*2*y,row_pointers[y],width*2);
 		}
 	}
-	else if(info_ptr->color_type==PNG_COLOR_TYPE_RGB){
+	else if(color_type==PNG_COLOR_TYPE_RGB){
 		image=new Image(Image::Dimension_D2,Image::Format_RGB_8,width,height);
 
 		byte *data=image->getData();
@@ -214,7 +213,7 @@ Image *PNGHandler::loadImage(Stream *stream){
 			memcpy(data+width*3*y,row_pointers[y],width*3);
 		}
 	}
-	else if(info_ptr->color_type==PNG_COLOR_TYPE_RGB_ALPHA){
+	else if(color_type==PNG_COLOR_TYPE_RGB_ALPHA){
 		image=new Image(Image::Dimension_D2,Image::Format_RGBA_8,width,height);
 
 		byte *data=image->getData();
@@ -225,7 +224,7 @@ Image *PNGHandler::loadImage(Stream *stream){
 	}
 	else{
 		Error::loadingImage(Categories::TOADLET_EGG,
-			String("PNGHandler::loadImage: Unknown PNG type:")+info_ptr->color_type);
+			String("PNGHandler::loadImage: Unknown PNG type:")+color_type);
 	}
 
 	for(y=0;y<height;++y){

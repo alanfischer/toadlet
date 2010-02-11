@@ -23,29 +23,23 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_CATEGORIES_H
-#define TOADLET_EGG_CATEGORIES_H
+package org.toadlet.peeper;
 
-#include <toadlet/egg/String.h>
+#include <org/toadlet/peeper/Types.h>
 
-namespace toadlet{
-namespace egg{
+import org.toadlet.egg.image.ImageDefinitions;
 
-namespace Categories{
-	const static String TOADLET=			"org.toadlet";
-	const static String TOADLET_EGG_LOGGER=	TOADLET+".egg.Logger";
-	const static String TOADLET_EGG_NET=	TOADLET+".egg.net";
-	const static String TOADLET_EGG=		TOADLET+".egg";
-	const static String TOADLET_FLICK=		TOADLET+".flick";
-	const static String TOADLET_HOP=		TOADLET+".hop";
-	const static String TOADLET_KNOT=		TOADLET+".knot";
-	const static String TOADLET_PEEPER=		TOADLET+".peeper";
-	const static String TOADLET_RIBBIT=		TOADLET+".ribbit";
-	const static String TOADLET_TADPOLE=	TOADLET+".tadpole";
-	const static String TOADLET_PAD=		TOADLET+".pad";
+public final class Visual{
+	public Visual(){}
+
+	public Visual(int pixelFormat,int depthBits){
+		this.pixelFormat=pixelFormat;
+		this.depthBits=depthBits;
+	}
+
+	public int pixelFormat=ImageDefinitions.Format.RGB_5_6_5;
+	public int depthBits=16;
+	public int stencilBits=0;
+	public int multisamples=0;
+	public boolean vsync=true;
 }
-
-}
-}
-
-#endif

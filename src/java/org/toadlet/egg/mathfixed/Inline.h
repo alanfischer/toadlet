@@ -23,29 +23,20 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_CATEGORIES_H
-#define TOADLET_EGG_CATEGORIES_H
+#ifndef TOADLET_EGG_MATHFIXED_INLINE_H
+#define TOADLET_EGG_MATHFIXED_INLINE_H
 
-#include <toadlet/egg/String.h>
+#include <org/toadlet/Types.h>
 
-namespace toadlet{
-namespace egg{
+#define TOADLET_FIXED	int
+#define TOADLET_LONG	long
 
-namespace Categories{
-	const static String TOADLET=			"org.toadlet";
-	const static String TOADLET_EGG_LOGGER=	TOADLET+".egg.Logger";
-	const static String TOADLET_EGG_NET=	TOADLET+".egg.net";
-	const static String TOADLET_EGG=		TOADLET+".egg";
-	const static String TOADLET_FLICK=		TOADLET+".flick";
-	const static String TOADLET_HOP=		TOADLET+".hop";
-	const static String TOADLET_KNOT=		TOADLET+".knot";
-	const static String TOADLET_PEEPER=		TOADLET+".peeper";
-	const static String TOADLET_RIBBIT=		TOADLET+".ribbit";
-	const static String TOADLET_TADPOLE=	TOADLET+".tadpole";
-	const static String TOADLET_PAD=		TOADLET+".pad";
-}
-
-}
-}
+// Used to force inlining in performance critical functions
+#define TOADLET_MUL_XX(x,y)		((TOADLET_FIXED)(((TOADLET_LONG)(x) * (TOADLET_LONG)(y)) >> 16))
+#define TOADLET_DIV_XX(x,y)		(TOADLET_FIXED)(((((TOADLET_LONG)(x)) << 32) / (y)) >> 16)
+#define TOADLET_MADD_XXX(x,y,z)	(((TOADLET_FIXED)(((TOADLET_LONG)(x) * (TOADLET_LONG)(y)) >> 16)) + z)
+#define TOADLET_MSUB_XXX(x,y,z)	(((TOADLET_FIXED)(((TOADLET_LONG)(x) * (TOADLET_LONG)(y)) >> 16)) + z)
+#define TOADLET_MIN_XX(x,y)		((x<y)?x:y)
+#define TOADLET_MAX_XX(x,y)		((x>y)?x:y)
 
 #endif

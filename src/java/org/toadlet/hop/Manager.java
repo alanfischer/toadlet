@@ -23,29 +23,16 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_CATEGORIES_H
-#define TOADLET_EGG_CATEGORIES_H
+package org.toadlet.hop;
 
-#include <toadlet/egg/String.h>
+#include <org/toadlet/hop/Types.h>
 
-namespace toadlet{
-namespace egg{
-
-namespace Categories{
-	const static String TOADLET=			"org.toadlet";
-	const static String TOADLET_EGG_LOGGER=	TOADLET+".egg.Logger";
-	const static String TOADLET_EGG_NET=	TOADLET+".egg.net";
-	const static String TOADLET_EGG=		TOADLET+".egg";
-	const static String TOADLET_FLICK=		TOADLET+".flick";
-	const static String TOADLET_HOP=		TOADLET+".hop";
-	const static String TOADLET_KNOT=		TOADLET+".knot";
-	const static String TOADLET_PEEPER=		TOADLET+".peeper";
-	const static String TOADLET_RIBBIT=		TOADLET+".ribbit";
-	const static String TOADLET_TADPOLE=	TOADLET+".tadpole";
-	const static String TOADLET_PAD=		TOADLET+".pad";
+public interface Manager{
+	public void traceSegment(Collision result,Segment segment);
+	public void traceSolid(Collision result,Segment segment,Solid solid);
+	public void preUpdate(int dt,scalar fdt);
+	public void postUpdate(int dt,scalar fdt);
+	public void preUpdate(Solid solid,int dt,scalar fdt);
+	public void intraUpdate(Solid solid,int dt,scalar fdt);
+	public void postUpdate(Solid solid,int dt,scalar fdt);
 }
-
-}
-}
-
-#endif
