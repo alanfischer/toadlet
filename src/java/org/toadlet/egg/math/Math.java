@@ -1624,7 +1624,7 @@ public final class Math{
 		r.w=cos(halfAngle);
 	}
 
-	public static bool setQuaternionFromEulerAngleXYZ(Quaternion r,EulerAngle euler,real epsilon){
+	public static boolean setQuaternionFromEulerAngleXYZ(Quaternion r,EulerAngle euler,real epsilon){
 		real cx=cos(euler.x);
 		real sx=sin(euler.x);
 		real cy=cos(euler.y);
@@ -1635,7 +1635,7 @@ public final class Math{
 		real cxsy=(cx*sy);
 
 		real w=sqrt(1.0 + cx*cy + cx*cz - sxsy*sz + cy*cz)*0.5;
-		if(r.w>epsilon){
+		if(w>epsilon){
 			real w4=1.0/(w*4.0);
 			r.w=w;
 			r.x=(cy*sz + cx*sz + sxsy*cz)*w4;

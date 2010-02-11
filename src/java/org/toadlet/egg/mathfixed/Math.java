@@ -1810,7 +1810,7 @@ public final class Math{
 		r.w=cos(halfAngle);
 	}
 	
-	public static bool setQuaternionFromEulerAngleXYZ(Quaternion r,EulerAngle euler,fixed epsilon){
+	public static boolean setQuaternionFromEulerAngleXYZ(Quaternion r,EulerAngle euler,fixed epsilon){
 		fixed cx=cos(euler.x);
 		fixed sx=sin(euler.x);
 		fixed cy=cos(euler.y);
