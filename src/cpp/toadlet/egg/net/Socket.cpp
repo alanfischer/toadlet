@@ -45,6 +45,7 @@ namespace egg{
 namespace net{
 
 #if defined(TOADLET_PLATFORM_WIN32)
+	// We'll keep these errors in TOADLET_EGG, since they are more significant than the socket errors
 	Socket::WSAHandler::WSAHandler(){
 		int result=WSAStartup(MAKEWORD(1,1),&mWSADATA);
 		if(result!=0){
@@ -443,10 +444,10 @@ bool Socket::getHostAdaptorsByIP(Collection<uint32> &adaptors,uint32 ip){
 
 void Socket::error(const String &function){
 	#if defined(TOADLET_PLATFORM_WIN32)
-		Error::unknown(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_EGG_NET,
 			String("Socket::")+function+"(): error "+(int)WSAGetLastError());
 	#else
-		Error::unknown(Categories::TOADLET_EGG,
+		Error::unknown(Categories::TOADLET_EGG_NET,
 			String("Socket::")+function+"(): error "+(int)errno);
 	#endif
 }

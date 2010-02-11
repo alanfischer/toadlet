@@ -1114,8 +1114,8 @@ public final class Simulator{
 
 	protected void traceAABox(Collision c,Segment segment,AABox box){
 		if(testInside(segment.origin,box)){
+			scalar x;
 			#if defined(TOADLET_FIXED_POINT)
-				scalar x;
 				x=segment.origin.x-box.mins.x;scalar dix=(x^(x>>31))-(x>>31);
 				x=segment.origin.y-box.mins.y;scalar diy=(x^(x>>31))-(x>>31);
 				x=segment.origin.z-box.mins.z;scalar diz=(x^(x>>31))-(x>>31);
@@ -1123,7 +1123,6 @@ public final class Simulator{
 				x=segment.origin.y-box.maxs.y;scalar day=(x^(x>>31))-(x>>31);
 				x=segment.origin.z-box.maxs.z;scalar daz=(x^(x>>31))-(x>>31);
 			#else
-				x=segment.origin.x-box.mins.x;scalar dix=x<0?-x:x;
 				x=segment.origin.x-box.mins.x;scalar dix=x<0?-x:x;
 				x=segment.origin.y-box.mins.y;scalar diy=x<0?-x:x;
 				x=segment.origin.z-box.mins.z;scalar diz=x<0?-x:x;

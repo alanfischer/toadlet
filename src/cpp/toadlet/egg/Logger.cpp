@@ -71,6 +71,8 @@ Logger::Logger(){
 	mStoreLogString=true;
 
 	addCategory(Categories::TOADLET_EGG_LOGGER);
+	addCategory(Categories::TOADLET_EGG_NET);
+	setCategoryReportingLevel(Categories::TOADLET_EGG_NET,Logger::Level_DISABLED); // Don't log socket errors
 	addCategory(Categories::TOADLET_EGG);
 	addCategory(Categories::TOADLET_FLICK);
 	addCategory(Categories::TOADLET_HOP);
