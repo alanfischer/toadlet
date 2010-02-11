@@ -23,29 +23,20 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_CATEGORIES_H
-#define TOADLET_EGG_CATEGORIES_H
+package org.toadlet.knot;
 
-#include <toadlet/egg/String.h>
+#include <org/toadlet/Types.h>
 
-namespace toadlet{
-namespace egg{
+import java.io.*;
 
-namespace Categories{
-	const static String TOADLET=			"org.toadlet";
-	const static String TOADLET_EGG_LOGGER=	TOADLET+".egg.Logger";
-	const static String TOADLET_EGG_NET=	TOADLET+".egg.net";
-	const static String TOADLET_EGG=		TOADLET+".egg";
-	const static String TOADLET_FLICK=		TOADLET+".flick";
-	const static String TOADLET_HOP=		TOADLET+".hop";
-	const static String TOADLET_KNOT=		TOADLET+".knot";
-	const static String TOADLET_PEEPER=		TOADLET+".peeper";
-	const static String TOADLET_RIBBIT=		TOADLET+".ribbit";
-	const static String TOADLET_TADPOLE=	TOADLET+".tadpole";
-	const static String TOADLET_PAD=		TOADLET+".pad";
+/// A connection delivers packets of data.
+public interface Connection{
+	public boolean disconnect();
+
+	/// Send a packet of data
+	public int send(byte[] data,int offset,int length);
+	/// Receive a packet of data, currently non-blocking
+	public int receive(byte[] data,int offset,int length);
+
+	public int getPing();
 }
-
-}
-}
-
-#endif

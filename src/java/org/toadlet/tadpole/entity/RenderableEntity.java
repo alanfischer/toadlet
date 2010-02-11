@@ -23,29 +23,30 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_CATEGORIES_H
-#define TOADLET_EGG_CATEGORIES_H
+package org.toadlet.tadpole.entity;
 
-#include <toadlet/egg/String.h>
+#include <org/toadlet/tadpole/Types.h>
 
-namespace toadlet{
-namespace egg{
+import org.toadlet.tadpole.*;
 
-namespace Categories{
-	const static String TOADLET=			"org.toadlet";
-	const static String TOADLET_EGG_LOGGER=	TOADLET+".egg.Logger";
-	const static String TOADLET_EGG_NET=	TOADLET+".egg.net";
-	const static String TOADLET_EGG=		TOADLET+".egg";
-	const static String TOADLET_FLICK=		TOADLET+".flick";
-	const static String TOADLET_HOP=		TOADLET+".hop";
-	const static String TOADLET_KNOT=		TOADLET+".knot";
-	const static String TOADLET_PEEPER=		TOADLET+".peeper";
-	const static String TOADLET_RIBBIT=		TOADLET+".ribbit";
-	const static String TOADLET_TADPOLE=	TOADLET+".tadpole";
-	const static String TOADLET_PAD=		TOADLET+".pad";
+public abstract class RenderableEntity extends Entity{
+	public RenderableEntity(){super();}
+
+	public Entity create(Engine engine){
+		super.create(engine);
+
+		mBoundingRadius=-Math.ONE;
+		mVisible=true;
+
+		return this;
+	}
+
+	public boolean isRenderable(){return true;}
+	
+	public void setVisible(boolean visible){mVisible=visible;}
+	public boolean getVisible(){return mVisible;}
+
+	public abstract void queueRenderables(Scene scene);
+	
+	boolean mVisible=false;
 }
-
-}
-}
-
-#endif

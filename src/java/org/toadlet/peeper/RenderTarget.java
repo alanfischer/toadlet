@@ -23,29 +23,29 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_CATEGORIES_H
-#define TOADLET_EGG_CATEGORIES_H
+package org.toadlet.peeper;
 
-#include <toadlet/egg/String.h>
+#include <org/toadlet/peeper/Types.h>
 
-namespace toadlet{
-namespace egg{
+public interface RenderTarget{
+	public interface Peer{
+		public Texture.Peer castToTexturePeer();
 
-namespace Categories{
-	const static String TOADLET=			"org.toadlet";
-	const static String TOADLET_EGG_LOGGER=	TOADLET+".egg.Logger";
-	const static String TOADLET_EGG_NET=	TOADLET+".egg.net";
-	const static String TOADLET_EGG=		TOADLET+".egg";
-	const static String TOADLET_FLICK=		TOADLET+".flick";
-	const static String TOADLET_HOP=		TOADLET+".hop";
-	const static String TOADLET_KNOT=		TOADLET+".knot";
-	const static String TOADLET_PEEPER=		TOADLET+".peeper";
-	const static String TOADLET_RIBBIT=		TOADLET+".ribbit";
-	const static String TOADLET_TADPOLE=	TOADLET+".tadpole";
-	const static String TOADLET_PAD=		TOADLET+".pad";
+		public void destroy();
+
+		public boolean isValid();
+		
+		public int getWidth();
+		public int getHeight();
+	}
+
+	// TODO:add a destroy ()to RenderTarget so we can destroy() the Peer
+
+	public Texture castToTexture();
+
+	public int getWidth();
+	public int getHeight();
+
+	public void internal_setRenderTargetPeer(RenderTarget.Peer renderTargetPeer);
+	public RenderTarget.Peer internal_getRenderTargetPeer();
 }
-
-}
-}
-
-#endif

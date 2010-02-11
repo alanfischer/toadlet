@@ -23,29 +23,28 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_CATEGORIES_H
-#define TOADLET_EGG_CATEGORIES_H
+package org.toadlet.peeper;
 
-#include <toadlet/egg/String.h>
+#include <org/toadlet/peeper/Types.h>
 
-namespace toadlet{
-namespace egg{
-
-namespace Categories{
-	const static String TOADLET=			"org.toadlet";
-	const static String TOADLET_EGG_LOGGER=	TOADLET+".egg.Logger";
-	const static String TOADLET_EGG_NET=	TOADLET+".egg.net";
-	const static String TOADLET_EGG=		TOADLET+".egg";
-	const static String TOADLET_FLICK=		TOADLET+".flick";
-	const static String TOADLET_HOP=		TOADLET+".hop";
-	const static String TOADLET_KNOT=		TOADLET+".knot";
-	const static String TOADLET_PEEPER=		TOADLET+".peeper";
-	const static String TOADLET_RIBBIT=		TOADLET+".ribbit";
-	const static String TOADLET_TADPOLE=	TOADLET+".tadpole";
-	const static String TOADLET_PAD=		TOADLET+".pad";
+public class CapabilitySet{
+	public boolean resetOnResize=false;
+	public boolean hardwareTextures=false;
+	public boolean hardwareVertexBuffers=false;
+	public boolean hardwareIndexBuffers=false;
+	public int maxLights=0;
+	public int maxTextureStages=0;
+	public int maxTextureSize=0;
+	public boolean pointSprites=false;
+	public boolean vertexShaders=false;
+	public int maxVertexShaderLocalParameters=0;
+	public boolean fragmentShaders=false;
+	public int maxFragmentShaderLocalParameters=0;
+	public boolean renderToTexture=false;
+	public boolean renderToDepthTexture=false;
+	public boolean renderToTextureNonPowerOf2Restricted=false;
+	public boolean textureDot3=false;
+	public boolean textureNonPowerOf2Restricted=false;
+	public boolean textureNonPowerOf2=false;
+	public int idealFormatBit=VertexElement.Format.BIT_FLOAT_32;
 }
-
-}
-}
-
-#endif

@@ -23,29 +23,19 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_CATEGORIES_H
-#define TOADLET_EGG_CATEGORIES_H
+#ifndef TOADLET_HOP_TYPES_H
+#define TOADLET_HOP_TYPES_H
 
-#include <toadlet/egg/String.h>
+#include <org/toadlet/Types.h>
 
-namespace toadlet{
-namespace egg{
-
-namespace Categories{
-	const static String TOADLET=			"org.toadlet";
-	const static String TOADLET_EGG_LOGGER=	TOADLET+".egg.Logger";
-	const static String TOADLET_EGG_NET=	TOADLET+".egg.net";
-	const static String TOADLET_EGG=		TOADLET+".egg";
-	const static String TOADLET_FLICK=		TOADLET+".flick";
-	const static String TOADLET_HOP=		TOADLET+".hop";
-	const static String TOADLET_KNOT=		TOADLET+".knot";
-	const static String TOADLET_PEEPER=		TOADLET+".peeper";
-	const static String TOADLET_RIBBIT=		TOADLET+".ribbit";
-	const static String TOADLET_TADPOLE=	TOADLET+".tadpole";
-	const static String TOADLET_PAD=		TOADLET+".pad";
-}
-
-}
-}
+#if defined(TOADLET_FIXED_POINT)
+	import org.toadlet.egg.mathfixed.*;
+	import org.toadlet.egg.mathfixed.Math;
+#else
+	import org.toadlet.egg.math.*;
+	import org.toadlet.egg.math.Math;
+#endif
 
 #endif
+
+

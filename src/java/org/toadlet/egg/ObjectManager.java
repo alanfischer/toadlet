@@ -23,29 +23,47 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_CATEGORIES_H
-#define TOADLET_EGG_CATEGORIES_H
+package org.toadlet.egg;
 
-#include <toadlet/egg/String.h>
+import java.util.HashMap;
+import java.util.Vector;
 
-namespace toadlet{
-namespace egg{
+public class ObjectManager{
+	public ObjectManager(){}
 
-namespace Categories{
-	const static String TOADLET=			"org.toadlet";
-	const static String TOADLET_EGG_LOGGER=	TOADLET+".egg.Logger";
-	const static String TOADLET_EGG_NET=	TOADLET+".egg.net";
-	const static String TOADLET_EGG=		TOADLET+".egg";
-	const static String TOADLET_FLICK=		TOADLET+".flick";
-	const static String TOADLET_HOP=		TOADLET+".hop";
-	const static String TOADLET_KNOT=		TOADLET+".knot";
-	const static String TOADLET_PEEPER=		TOADLET+".peeper";
-	const static String TOADLET_RIBBIT=		TOADLET+".ribbit";
-	const static String TOADLET_TADPOLE=	TOADLET+".tadpole";
-	const static String TOADLET_PAD=		TOADLET+".pad";
+	public Object alloc(Class type){
+		Vector<Object> available=mAllocated.get(type);
+		if(available!=null && available.size()>0){
+			Object object=available.get(0);
+			available.remove(0);
+			return object;
+		}
+		else if(mFactory!=null){
+			return mFactory.createObjectOfType(type);
+		}
+		else{
+			Object object=null;
+			try{
+				object=type.newInstance();
+			}
+			catch(Exception ex){}
+			return object;
+		}
+	}
+
+	public void free(Object object){
+		Vector<Object> available=mAllocated.get(object.getClass());
+		if(available==null){
+			available=new Vector<Object>();
+			mAllocated.put(object.getClass(),available);
+		}
+		available.add(object);
+	}
+
+	public void setFactory(ObjectFactory factory){
+		mFactory=factory;
+	}
+
+	protected HashMap<Class,Vector<Object>> mAllocated=new HashMap<Class,Vector<Object>>();
+	protected ObjectFactory mFactory;
 }
-
-}
-}
-
-#endif
