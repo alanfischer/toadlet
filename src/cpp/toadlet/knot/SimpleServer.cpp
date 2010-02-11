@@ -38,10 +38,8 @@ SimpleServer::ServerClient::ServerClient(SimpleServer *server,EventFactory *fact
 	mServer=server;
 }
 
-void SimpleServer::ServerClient::eventReceived(Event::ptr event){
-	if(mServer->eventReceived(this,event)==false){
-		SimpleEventConnection::eventReceived(event);
-	}
+bool SimpleServer::ServerClient::eventReceived(Event::ptr event){
+	return mServer->eventReceived(this,event);
 }
 
 SimpleServer::SimpleServer(EventFactory *eventFactory,Connector::ptr connector):

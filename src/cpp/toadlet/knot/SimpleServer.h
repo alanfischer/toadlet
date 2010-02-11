@@ -68,7 +68,7 @@ protected:
 		ServerClient(SimpleServer *server,egg::EventFactory *factory,Connection::ptr connection);
 
 	protected:
-		void eventReceived(egg::Event::ptr event);
+		bool eventReceived(egg::Event::ptr event);
 
 		SimpleServer *mServer;
 	};

@@ -67,7 +67,7 @@ public:
 	virtual void run();
 
 protected:
-	virtual void eventReceived(egg::Event::ptr event);
+	virtual bool eventReceived(egg::Event::ptr event);
 
 	virtual int sendEvent(egg::Event::ptr event);
 	virtual int receiveEvent(egg::Event::ptr *event);
