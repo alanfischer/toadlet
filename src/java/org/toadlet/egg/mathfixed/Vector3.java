@@ -23,29 +23,63 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_CATEGORIES_H
-#define TOADLET_EGG_CATEGORIES_H
+package org.toadlet.egg.mathfixed;
 
-#include <toadlet/egg/String.h>
+#include <org/toadlet/Types.h>
 
-namespace toadlet{
-namespace egg{
+public final class Vector3{
+	public fixed x,y,z;
 
-namespace Categories{
-	const static String TOADLET=			"org.toadlet";
-	const static String TOADLET_EGG_LOGGER=	TOADLET+".egg.Logger";
-	const static String TOADLET_EGG_NET=	TOADLET+".egg.net";
-	const static String TOADLET_EGG=		TOADLET+".egg";
-	const static String TOADLET_FLICK=		TOADLET+".flick";
-	const static String TOADLET_HOP=		TOADLET+".hop";
-	const static String TOADLET_KNOT=		TOADLET+".knot";
-	const static String TOADLET_PEEPER=		TOADLET+".peeper";
-	const static String TOADLET_RIBBIT=		TOADLET+".ribbit";
-	const static String TOADLET_TADPOLE=	TOADLET+".tadpole";
-	const static String TOADLET_PAD=		TOADLET+".pad";
+	public Vector3(){}
+	
+	public Vector3(Vector3 v){
+		x=v.x;
+		y=v.y;
+		z=v.z;
+	}
+	
+	public Vector3(fixed x1,fixed y1,fixed z1){
+		x=x1;
+		y=y1;
+		z=z1;
+	}
+	
+	public Vector3 set(Vector3 v){
+		x=v.x;
+		y=v.y;
+		z=v.z;
+
+		return this;
+	}
+
+	public Vector3 set(fixed x1,fixed y1,fixed z1){
+		x=x1;
+		y=y1;
+		z=z1;
+
+		return this;
+	}
+
+	public Vector3 reset(){
+		x=0;
+		y=0;
+		z=0;
+
+		return this;
+	}
+
+	public boolean equals(Object object){
+		if(this==object){
+			return true;
+		}
+		if((object==null) || (object.getClass()!=getClass())){
+			return false;
+		}
+		Vector3 v=(Vector3)object;
+		return x==v.x && y==v.y && z==v.z;
+	}
+
+	public int hashCode(){
+		return x + y + z;
+	}
 }
-
-}
-}
-
-#endif

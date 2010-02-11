@@ -23,29 +23,39 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_CATEGORIES_H
-#define TOADLET_EGG_CATEGORIES_H
+package org.toadlet.hop;
 
-#include <toadlet/egg/String.h>
+#include <org/toadlet/hop/Types.h>
 
-namespace toadlet{
-namespace egg{
+public final class Collision{
+	public Collision(){}
 
-namespace Categories{
-	const static String TOADLET=			"org.toadlet";
-	const static String TOADLET_EGG_LOGGER=	TOADLET+".egg.Logger";
-	const static String TOADLET_EGG_NET=	TOADLET+".egg.net";
-	const static String TOADLET_EGG=		TOADLET+".egg";
-	const static String TOADLET_FLICK=		TOADLET+".flick";
-	const static String TOADLET_HOP=		TOADLET+".hop";
-	const static String TOADLET_KNOT=		TOADLET+".knot";
-	const static String TOADLET_PEEPER=		TOADLET+".peeper";
-	const static String TOADLET_RIBBIT=		TOADLET+".ribbit";
-	const static String TOADLET_TADPOLE=	TOADLET+".tadpole";
-	const static String TOADLET_PAD=		TOADLET+".pad";
+	public Collision set(Collision c){
+		time=c.time;
+		point.set(c.point);
+		normal.set(c.normal);
+		velocity.set(c.velocity);
+		collider=c.collider;
+		collidee=c.collidee;
+
+		return this;
+	}
+
+	public Collision reset(){
+		time=-Math.ONE;
+		point.reset();
+		normal.reset();
+		velocity.reset();
+		collider=null;
+		collidee=null;
+
+		return this;
+	}
+
+	public scalar time=-Math.ONE;
+	public Vector3 point=new Vector3(); // This is the point at which the tracing solid would stop
+	public Vector3 normal=new Vector3();
+	public Vector3 velocity=new Vector3(); // The velocity difference between the two solids
+	public Solid collider=null;
+	public Solid collidee=null;
 }
-
-}
-}
-
-#endif

@@ -23,29 +23,17 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_CATEGORIES_H
-#define TOADLET_EGG_CATEGORIES_H
+package org.toadlet.egg;
 
-#include <toadlet/egg/String.h>
-
-namespace toadlet{
-namespace egg{
-
-namespace Categories{
-	const static String TOADLET=			"org.toadlet";
-	const static String TOADLET_EGG_LOGGER=	TOADLET+".egg.Logger";
-	const static String TOADLET_EGG_NET=	TOADLET+".egg.net";
-	const static String TOADLET_EGG=		TOADLET+".egg";
-	const static String TOADLET_FLICK=		TOADLET+".flick";
-	const static String TOADLET_HOP=		TOADLET+".hop";
-	const static String TOADLET_KNOT=		TOADLET+".knot";
-	const static String TOADLET_PEEPER=		TOADLET+".peeper";
-	const static String TOADLET_RIBBIT=		TOADLET+".ribbit";
-	const static String TOADLET_TADPOLE=	TOADLET+".tadpole";
-	const static String TOADLET_PAD=		TOADLET+".pad";
+public final class Categories{
+	public final static String TOADLET =			"org.toadlet";
+	public final static String TOADLET_EGG_LOGGER=	TOADLET+".Logger";
+	public final static String TOADLET_EGG=			TOADLET+".egg";
+	public final static String TOADLET_FLICK=		TOADLET+".flick";
+	public final static String TOADLET_HOP=			TOADLET+".hop";
+	public final static String TOADLET_KNOT=		TOADLET+".knot";
+	public final static String TOADLET_PEEPER=		TOADLET+".peeper";
+	public final static String TOADLET_RIBBIT=		TOADLET+".ribbit";
+	public final static String TOADLET_TADPOLE=		TOADLET+".tadpole";
+	public final static String TOADLET_PAD=			TOADLET+".pad";
 }
-
-}
-}
-
-#endif
