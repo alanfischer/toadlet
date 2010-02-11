@@ -1005,12 +1005,25 @@ namespace Math{
 
 	template<class Matrix>
 	void setMatrixFromEulerAngleXYZ(Matrix &r,const EulerAngle &euler){
-		Matrix xmat,ymat,zmat;
-		setMatrixFromX(xmat,euler.x);
-		setMatrixFromY(ymat,euler.y);
-		setMatrixFromZ(zmat,euler.z);
-		postMul(ymat,zmat);
-		mul(r,xmat,ymat);
+		fixed cx=cos(euler.x);
+		fixed sx=sin(euler.x);
+		fixed cy=cos(euler.y);
+		fixed sy=sin(euler.y);
+		fixed cz=cos(euler.z);
+		fixed sz=sin(euler.z);
+		fixed cxsy=TOADLET_MUL_XX(cx,sy);
+		fixed cycz=TOADLET_MUL_XX(cy,cz);
+		fixed sxsy=TOADLET_MUL_XX(sx,sy);
+		
+		r.setAt(0,0,TOADLET_MUL_XX(cx,cy));
+		r.setAt(0,1,TOADLET_MUL_XX(sx,sz) - TOADLET_MUL_XX(cxsy,cz));
+		r.setAt(0,2,TOADLET_MUL_XX(cxsy,sz) + TOADLET_MUL_XX(sx,cz));
+		r.setAt(1,0,sy);
+		r.setAt(1,1,cycz);
+		r.setAt(1,2,-cycz);
+		r.setAt(2,0,-TOADLET_MUL_XX(sx,cy));
+		r.setAt(2,1,TOADLET_MUL_XX(sxsy,cz) + TOADLET_MUL_XX(cx,sz));
+		r.setAt(2,2,-TOADLET_MUL_XX(sxsy,sz) + TOADLET_MUL_XX(cx,cz));
 	}
 
 	// Matrix3x3 advanced operations
@@ -1364,11 +1377,14 @@ namespace Math{
 		fixed sy=sin(euler.y);
 		fixed cz=cos(euler.z);
 		fixed sz=sin(euler.z);
-		r.w=sqrt(ONE + TOADLET_MUL_XX(cx,cy) + TOADLET_MUL_XX(cx,cz) - TOADLET_MUL_XX(TOADLET_MUL_XX(sx,sy),sz) + TOADLET_MUL_XX(cy,cz))>>1;
+		fixed sxsy=TOADLET_MUL_XX(sx,sy);
+		fixed cxsy=TOADLET_MUL_XX(cx,sy);
+
+		r.w=sqrt(ONE + TOADLET_MUL_XX(cx,cy) + TOADLET_MUL_XX(cx,cz) - TOADLET_MUL_XX(sxsy,sz) + TOADLET_MUL_XX(cy,cz))>>1;
 		fixed w4=TOADLET_DIV_XX(ONE,r.w<<2);
-		r.x=TOADLET_MUL_XX(TOADLET_MUL_XX(cy,sz) + TOADLET_MUL_XX(cx,sz) + TOADLET_MUL_XX(TOADLET_MUL_XX(sx,sy),cz),w4);
-		r.y=TOADLET_MUL_XX(TOADLET_MUL_XX(sx,cy) + TOADLET_MUL_XX(sx,cz) + TOADLET_MUL_XX(TOADLET_MUL_XX(cx,sy),sz),w4);
-		r.z=TOADLET_MUL_XX(TOADLET_MUL_XX(-sx,sz) + TOADLET_MUL_XX(TOADLET_MUL_XX(cx,sy),cz) + sy,w4);
+		r.x=TOADLET_MUL_XX(TOADLET_MUL_XX(cy,sz) + TOADLET_MUL_XX(cx,sz) + TOADLET_MUL_XX(sxsy,cz),w4);
+		r.y=TOADLET_MUL_XX(TOADLET_MUL_XX(sx,cy) + TOADLET_MUL_XX(sx,cz) + TOADLET_MUL_XX(cxsy,sz),w4);
+		r.z=TOADLET_MUL_XX(TOADLET_MUL_XX(-sx,sz) + TOADLET_MUL_XX(cxsy,cz) + sy,w4);
 	}
 
 	TOADLET_API void lerp(Quaternion &r,const Quaternion &q1,const Quaternion &q2,fixed t);
