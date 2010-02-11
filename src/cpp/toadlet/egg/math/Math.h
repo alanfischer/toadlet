@@ -1364,7 +1364,7 @@ namespace Math{
 		real cxsy=(cx*sy);
 
 		real w=sqrt(1.0 + cx*cy + cx*cz - sxsy*sz + cy*cz)*0.5;
-		if(r.w>epsilon){
+		if(w>epsilon){
 			real w4=1.0/(w*4.0);
 			r.w=w;
 			r.x=(cy*sz + cx*sz + sxsy*cz)*w4;
