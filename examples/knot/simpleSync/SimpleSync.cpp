@@ -282,7 +282,12 @@ void SimpleSync::create(){
 	scene->setGravity(Vector3(0,0,-500));
 	//scene->showCollisionVolumes(true,false);
 	scene->getSimulator()->setMicroCollisionThreshold(5);
-	scene->setLogicDT(10);
+	if(client!=NULL){
+		scene->setLogicDT(100);
+	}
+	else{
+		scene->setLogicDT(10);
+	}
 
 	scene->getRootNode()->attach(getEngine()->createNodeType(LightNode::type()));
 
@@ -449,7 +454,11 @@ void updatePlayer(const ClientEvent::ptr &event,HopEntity::ptr entity){
 	Math::lerp(result,entity->getVelocity(),velocity,0.5f);
 	result.z=z;
 
-	if((flags&Move_JUMP)>0 && entity->getSolid()->getTouching()!=NULL && entity->getSolid()->getTouchingNormal().z>Math::HALF){
+	// TODO: Fix the hop touching when manually running the simulation so we can use the "touching" information here if desired
+	Collision c;
+	Segment path; path.setStartEnd(entity->getSolid()->getPosition(),entity->getSolid()->getPosition()+Vector3(0,0,-1));
+	entity->getScene()->getSimulator()->traceSolid(c,entity->getSolid(),path);
+	if((flags&Move_JUMP)>0 && c.time>=0){
 		result.z=250;
 	}
 	entity->setVelocity(result);
@@ -615,7 +624,12 @@ void SimpleSync::keyPressed(int key){
 		}
 	}
 	else{
-		if(key=='w'){
+		if(key=='r'){
+			block->setPosition(Vector3(0,0,10));
+			block->setVelocity(Vector3(0,0,0));
+			block->clearForce();
+		}
+		else if(key=='w'){
 			flags|=Move_FORE;
 		}
 		else if(key=='s'){

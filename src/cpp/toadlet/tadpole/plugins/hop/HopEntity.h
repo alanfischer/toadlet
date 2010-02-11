@@ -123,7 +123,6 @@ public:
 
 	inline HopScene::ptr getScene() const{return mScene;}
 	inline hop::Solid::ptr getSolid() const{return mSolid;}
-	virtual HopEntity::ptr getTouching() const;
 
 	virtual void setCollisionListener(HopCollisionListener *listener);
 
