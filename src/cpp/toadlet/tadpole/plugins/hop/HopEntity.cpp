@@ -246,15 +246,6 @@ void HopEntity::removeAllShapes(){
 	}
 }
 
-HopEntity::ptr HopEntity::getTouching() const{
-	HopEntity::ptr ent;
-	Solid *solid=mSolid->getTouching();
-	if(solid!=NULL){
-		ent=HopEntity::ptr(static_cast<HopEntity*>(solid->getUserData()));
-	}
-	return ent;
-}
-
 void HopEntity::setCollisionListener(HopCollisionListener *listener){
 	if(listener!=NULL){
 		mSolid->setCollisionListener(this);

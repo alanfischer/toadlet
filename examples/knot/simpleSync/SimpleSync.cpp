@@ -283,10 +283,10 @@ void SimpleSync::create(){
 	//scene->showCollisionVolumes(true,false);
 	scene->getSimulator()->setMicroCollisionThreshold(5);
 	if(client!=NULL){
-		scene->setLogicDT(100);
+		scene->setLogicDT(20);
 	}
 	else{
-		scene->setLogicDT(10);
+		scene->setLogicDT(20);
 	}
 
 	scene->getRootNode()->attach(getEngine()->createNodeType(LightNode::type()));
@@ -687,7 +687,7 @@ void SimpleSync::mouseMoved(int x,int y){
 		if(look.z>Math::HALF_PI) look.z=Math::HALF_PI;
 
 		Quaternion result;
-		Math::setQuaternionFromEulerAngleXYZ(result,look);
+		Math::setQuaternionFromEulerAngleXYZ(result,look,0);
 		player[client->getClientID()]->setRotate(result);
 	}
 }

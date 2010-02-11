@@ -1810,7 +1810,7 @@ public final class Math{
 		r.w=cos(halfAngle);
 	}
 	
-	public static void setQuaternionFromEulerAngleXYZ(Quaternion r,EulerAngle euler){
+	public static bool setQuaternionFromEulerAngleXYZ(Quaternion r,EulerAngle euler,fixed epsilon){
 		fixed cx=cos(euler.x);
 		fixed sx=sin(euler.x);
 		fixed cy=cos(euler.y);
@@ -1820,11 +1820,16 @@ public final class Math{
 		fixed sxsy=TOADLET_MUL_XX(sx,sy);
 		fixed cxsy=TOADLET_MUL_XX(cx,sy);
 
-		r.w=sqrt(ONE + TOADLET_MUL_XX(cx,cy) + TOADLET_MUL_XX(cx,cz) - TOADLET_MUL_XX(sxsy,sz) + TOADLET_MUL_XX(cy,cz))>>1;
-		fixed w4=TOADLET_DIV_XX(ONE,r.w<<2);
-		r.x=TOADLET_MUL_XX(TOADLET_MUL_XX(cy,sz) + TOADLET_MUL_XX(cx,sz) + TOADLET_MUL_XX(sxsy,cz),w4);
-		r.y=TOADLET_MUL_XX(TOADLET_MUL_XX(sx,cy) + TOADLET_MUL_XX(sx,cz) + TOADLET_MUL_XX(cxsy,sz),w4);
-		r.z=TOADLET_MUL_XX(TOADLET_MUL_XX(-sx,sz) + TOADLET_MUL_XX(cxsy,cz) + sy,w4);
+		fixed w=sqrt(ONE + TOADLET_MUL_XX(cx,cy) + TOADLET_MUL_XX(cx,cz) - TOADLET_MUL_XX(sxsy,sz) + TOADLET_MUL_XX(cy,cz))>>1;
+		if(w>epsilon){
+			fixed w4=TOADLET_DIV_XX(ONE,w<<2);
+			r.w=w;
+			r.x=TOADLET_MUL_XX(TOADLET_MUL_XX(cy,sz) + TOADLET_MUL_XX(cx,sz) + TOADLET_MUL_XX(sxsy,cz),w4);
+			r.y=TOADLET_MUL_XX(TOADLET_MUL_XX(sx,cy) + TOADLET_MUL_XX(sx,cz) + TOADLET_MUL_XX(cxsy,sz),w4);
+			r.z=TOADLET_MUL_XX(TOADLET_MUL_XX(-sx,sz) + TOADLET_MUL_XX(cxsy,cz) + sy,w4);
+			return true;
+		}
+		return false;
 	}
 
 	public static void lerp(Quaternion r,Quaternion q1,Quaternion q2,fixed t){

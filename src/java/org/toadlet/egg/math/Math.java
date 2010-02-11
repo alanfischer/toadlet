@@ -1624,7 +1624,7 @@ public final class Math{
 		r.w=cos(halfAngle);
 	}
 
-	public static void setQuaternionFromEulerAngleXYZ(Quaternion r,EulerAngle euler){
+	public static bool setQuaternionFromEulerAngleXYZ(Quaternion r,EulerAngle euler,real epsilon){
 		real cx=cos(euler.x);
 		real sx=sin(euler.x);
 		real cy=cos(euler.y);
@@ -1634,11 +1634,16 @@ public final class Math{
 		real sxsy=(sx*sy);
 		real cxsy=(cx*sy);
 
-		r.w=sqrt(1.0f + cx*cy + cx*cz - sxsy*sz + cy*cz)*0.5f;
-		real w4=1.0f/(r.w*4.0f);
-		r.x=(cy*sz + cx*sz + sxsy*cz)*w4;
-		r.y=(sx*cy + sx*cz + cxsy*sz)*w4;
-		r.z=(-sx*sz + cxsy*cz + sy)*w4;
+		real w=sqrt(1.0 + cx*cy + cx*cz - sxsy*sz + cy*cz)*0.5;
+		if(r.w>epsilon){
+			real w4=1.0/(w*4.0);
+			r.w=w;
+			r.x=(cy*sz + cx*sz + sxsy*cz)*w4;
+			r.y=(sx*cy + sx*cz + cxsy*sz)*w4;
+			r.z=(-sx*sz + cxsy*cz + sy)*w4;
+			return true;
+		}
+		return false;
 	}
 
 	public static void lerp(Quaternion r,Quaternion q1,Quaternion q2,real t){
