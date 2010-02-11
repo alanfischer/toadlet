@@ -993,12 +993,25 @@ namespace Math{
 
 	template<class Matrix>
 	void setMatrixFromEulerAngleXYZ(Matrix &r,const EulerAngle &euler){
-		Matrix xmat,ymat,zmat;
-		setMatrixFromX(xmat,euler.x);
-		setMatrixFromY(ymat,euler.y);
-		setMatrixFromZ(zmat,euler.z);
-		postMul(ymat,zmat);
-		mul(r,xmat,ymat);
+		real cx=cos(euler.x);
+		real sx=sin(euler.x);
+		real cy=cos(euler.y);
+		real sy=sin(euler.y);
+		real cz=cos(euler.z);
+		real sz=sin(euler.z);
+		real cxsy=(cx*sy);
+		real cycz=(cy*cz);
+		real sxsy=(sx*sy);
+		
+		r.setAt(0,0,(cx*cy));
+		r.setAt(0,1,(sx*sz) - (cxsy*cz));
+		r.setAt(0,2,(cxsy*sz) + (sx*cz));
+		r.setAt(1,0,sy);
+		r.setAt(1,1,cycz);
+		r.setAt(1,2,-cycz);
+		r.setAt(2,0,-(sx*cy));
+		r.setAt(2,1,(sxsy*cz) + (cx*sz));
+		r.setAt(2,2,-(sxsy*sz) + (cx*cz));
 	}
 
 	// Matrix3x3 advanced operations
@@ -1347,11 +1360,14 @@ namespace Math{
 		real sy=sin(euler.y);
 		real cz=cos(euler.z);
 		real sz=sin(euler.z);
-		r.w=sqrt(1.0 + cx*cy + cx*cz - sx*sy*sz + cy*cz)*0.5;
+		real sxsy=(sx*sy);
+		real cxsy=(cx*sy);
+
+		r.w=sqrt(1.0 + cx*cy + cx*cz - sxsy*sz + cy*cz)*0.5;
 		real w4=1.0/(r.w*4.0);
-		r.x=(cy*sz + cx*sz + sx*sy*cz)*w4;
-		r.y=(sx*cy + sx*cz + cx*sy*sz)*w4;
-		r.z=(-sx*sz + cx*sy*cz + sy)*w4;
+		r.x=(cy*sz + cx*sz + sxsy*cz)*w4;
+		r.y=(sx*cy + sx*cz + cxsy*sz)*w4;
+		r.z=(-sx*sz + cxsy*cz + sy)*w4;
 	}
 
 	TOADLET_API void lerp(Quaternion &r,const Quaternion &q1,const Quaternion &q2,real t);

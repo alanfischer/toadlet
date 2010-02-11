@@ -1169,12 +1169,25 @@ public final class Math{
 		}
 
 	#define setMatrixFromEulerAngleXYZ(Type,r,euler) \
-		Type xmat=new Type(),ymat=new Type(),zmat=new Type(); \
-		setMatrixFromX(xmat,euler.x); \
-		setMatrixFromY(ymat,euler.y); \
-		setMatrixFromZ(zmat,euler.z); \
-		postMul(ymat,zmat); \
-		mul(r,xmat,ymat);
+		real cx=cos(euler.x); \
+		real sx=sin(euler.x); \
+		real cy=cos(euler.y); \
+		real sy=sin(euler.y); \
+		real cz=cos(euler.z); \
+		real sz=sin(euler.z); \
+		real cxsy=(cx*sy); \
+		real cycz=(cy*cz); \
+		real sxsy=(sx*sy); \
+		\
+		r.setAt(0,0,(cx*cy)); \
+		r.setAt(0,1,(sx*sz) - (cxsy*cz)); \
+		r.setAt(0,2,(cxsy*sz) + (sx*cz)); \
+		r.setAt(1,0,sy); \
+		r.setAt(1,1,cycz); \
+		r.setAt(1,2,-cycz); \
+		r.setAt(2,0,-(sx*cy)); \
+		r.setAt(2,1,(sxsy*cz) + (cx*sz)); \
+		r.setAt(2,2,-(sxsy*sz) + (cx*cz)); \
 
 	// Matrix3x3 advanced operations
 	public static void setAxesFromMatrix3x3(Matrix3x3 m,Vector3 xAxis,Vector3 yAxis,Vector3 zAxis){ setAxesFromMatrix(m,xAxis,yAxis,zAxis); }
@@ -1584,8 +1597,8 @@ public final class Math{
 			if(mat.at(2,2)>mat.at(i,i)){ \
 				i=2; \
 			} \
-			int j=quaternionFromMatrix3x3_next[i]; \
-			int k=quaternionFromMatrix3x3_next[j]; \
+			int j=quaternionFromMatrix_next[i]; \
+			int k=quaternionFromMatrix_next[j]; \
 			\
 			root=sqrt(mat.at(i,i)-mat.at(j,j)-mat.at(k,k)+1.0f); \
 			trace=0.5f*root; \
@@ -1618,11 +1631,14 @@ public final class Math{
 		real sy=sin(euler.y);
 		real cz=cos(euler.z);
 		real sz=sin(euler.z);
-		r.w=sqrt(1.0f + cx*cy + cx*cz - sx*sy*sz + cy*cz)*0.5f;
+		real sxsy=(sx*sy);
+		real cxsy=(cx*sy);
+
+		r.w=sqrt(1.0f + cx*cy + cx*cz - sxsy*sz + cy*cz)*0.5f;
 		real w4=1.0f/(r.w*4.0f);
-		r.x=(cy*sz + cx*sz + sx*sy*cz)*w4;
-		r.y=(sx*cy + sx*cz + cx*sy*sz)*w4;
-		r.z=(-sx*sz + cx*sy*cz + sy)*w4;
+		r.x=(cy*sz + cx*sz + sxsy*cz)*w4;
+		r.y=(sx*cy + sx*cz + cxsy*sz)*w4;
+		r.z=(-sx*sz + cxsy*cz + sy)*w4;
 	}
 
 	public static void lerp(Quaternion r,Quaternion q1,Quaternion q2,real t){

@@ -112,11 +112,10 @@ void Viewer::mouseMoved(int x,int y){
 		scalar dx=Math::fromInt(diffx)/100;
 		scalar dy=Math::fromInt(diffy)/100;
 
-		EulerAngle ex(-dy,0.0,-dx);
-		Matrix3x3 mx;
-		Matrix3x3 r;
-		Math::setMatrix3x3FromEulerAngleXYZ(mx,ex);
-		Math::mul(r,mx,mParent->getRotate());
+		EulerAngle ex(0,-dx,-dy);
+		Quaternion r;
+		Math::setQuaternionFromEulerAngleXYZ(r,ex);
+		Math::postMul(r,mParent->getRotate());
 		mParent->setRotate(r);
 	}
 	if(mZoom){
