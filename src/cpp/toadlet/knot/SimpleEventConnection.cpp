@@ -139,16 +139,19 @@ void SimpleEventConnection::run(){
 		Event::ptr event;
 		int amount=receiveEvent(&event);
 		if(amount>0){
-			eventReceived(event);
+			if(eventReceived(event)==false){
+				mEventsMutex.lock();
+					mEvents.add(event);
+					event=Event::ptr();
+				mEventsMutex.unlock();
+			}
 		}
 		System::msleep(0);
 	}
 }
 
-void SimpleEventConnection::eventReceived(Event::ptr event){
-	mEventsMutex.lock();
-		mEvents.add(event);
-	mEventsMutex.unlock();
+bool SimpleEventConnection::eventReceived(Event::ptr event){
+	return false;
 }
 
 int SimpleEventConnection::sendEvent(Event::ptr event){
