@@ -33,7 +33,7 @@
 	#include <toadlet/egg/Exception.h>
 
 	#define TOADLET_MAKE_ERROR_FUNCTION(name,type) \
-		static void name(const String &description){name(NULL,true,description);} \
+		static void name(const String &description){name((char*)NULL,true,description);} \
 		static void name(const String &categoryName,const String &description){name(categoryName,true,description);} \
 		static void name(const String &categoryName,bool report,const String &description){ \
 			if(report){errorLog(categoryName,description);} \
@@ -41,7 +41,7 @@
 		}
 #else
 	#define TOADLET_MAKE_ERROR_FUNCTION(name,type) \
-		static void name(const String &description){name(NULL,true,description);} \
+		static void name(const String &description){name((char*)NULL,true,description);} \
 		static void name(const String &categoryName,const String &description){name(categoryName,true,description);} \
 		static void name(const String &categoryName,bool report,const String &description){ \
 			if(report){errorLog(categoryName,description);} \

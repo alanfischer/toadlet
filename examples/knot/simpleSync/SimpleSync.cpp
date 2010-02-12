@@ -692,7 +692,14 @@ int main(int argc,char **argv){
 			else{
 				char *p=strchr(c,':');
 				if(p==NULL){
-					remoteHost=Socket::stringToIP(c);
+					Collection<uint32> hosts;
+					Socket::getHostAdaptorsByName(hosts,c);
+					if(hosts.size()>0){
+						remoteHost=hosts[0];
+					}
+					else{
+						remoteHost=Socket::stringToIP(c);
+					}
 					remotePort=defaultPort;
 				}
 				else{
@@ -703,7 +710,14 @@ int main(int argc,char **argv){
 						remoteHost=Socket::stringToIP("127.0.0.1");
 					}
 					else{
-						remoteHost=Socket::stringToIP(c);
+						Collection<uint32> hosts;
+						Socket::getHostAdaptorsByName(hosts,c);
+						if(hosts.size()>0){
+							remoteHost=hosts[0];
+						}
+						else{
+							remoteHost=Socket::stringToIP(c);
+						}
 					}
 					remotePort=String(p).toInt32();
 				}
