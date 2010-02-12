@@ -1625,24 +1625,24 @@ public final class Math{
 	}
 
 	public static void setQuaternionFromEulerAngleXYZ(Quaternion r,EulerAngle euler){
-		real s1=euler.x/2;
-		real c1=cos(s1);
-		s1=sin(s1);
-		real s2=euler.y/2;
-		real c2=cos(s2);
-		s2=sin(s2);
-		real s3=euler.z/2;
-		real c3=cos(s3);
-		s3=sin(s3);
-		real c1c2=c1*c2;
-		real s1s2=s1*s2;
-		real c1s2=c1*s2;
-		real s1c2=s1*c2;
+		real sx=euler.x/2;
+		real cx=cos(sx);
+		sx=sin(sx);
+		real sy=euler.y/2;
+		real cy=cos(sy);
+		sy=sin(sy);
+		real sz=euler.z/2;
+		real cz=cos(sz);
+		sz=sin(sz);
+		real cxcy=cx*cy;
+		real sxsy=sx*sy;
+		real cxsy=cx*sy;
+		real sxcy=sx*cy;
 
-		r.w=(c1c2*c3) - (s1s2*s3);
-  		r.x=(c1c2*s3) + (s1s2*c3);
-		r.y=(s1c2*c3) + (c1s2*s3);
-		r.z=(c1s2*c3) - (s1c2*s3);
+		r.w=(cxcy*cz) - (sxsy*sz);
+  		r.x=(cxcy*sz) + (sxsy*cz);
+		r.y=(sxcy*cz) + (cxsy*sz);
+		r.z=(cxsy*cz) - (sxcy*sz);
 	}
 
 	public static void lerp(Quaternion r,Quaternion q1,Quaternion q2,real t){

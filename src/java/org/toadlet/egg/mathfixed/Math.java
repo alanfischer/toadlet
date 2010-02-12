@@ -1811,24 +1811,24 @@ public final class Math{
 	}
 	
 	public static void setQuaternionFromEulerAngleXYZ(Quaternion r,EulerAngle euler){
-		fixed s1=euler.x>>1;
-		fixed c1=cos(s1);
-		s1=sin(s1);
-		fixed s2=euler.y>>1;
-		fixed c2=cos(s2);
-		s2=sin(s2);
-		fixed s3=euler.z>>1;
-		fixed c3=cos(s3);
-		s3=sin(s3);
-		fixed c1c2=TOADLET_MUL_XX(c1,c2);
-		fixed s1s2=TOADLET_MUL_XX(s1,s2);
-		fixed c1s2=TOADLET_MUL_XX(c1,s2);
-		fixed s1c2=TOADLET_MUL_XX(s1,c2);
+		fixed sx=euler.x>>1;
+		fixed cx=cos(sx);
+		sx=sin(sx);
+		fixed sy=euler.y>>1;
+		fixed cy=cos(sy);
+		sy=sin(sy);
+		fixed sz=euler.z>>1;
+		fixed cz=cos(sz);
+		sz=sin(sz);
+		fixed cxcy=TOADLET_MUL_XX(cx,cy);
+		fixed sxsy=TOADLET_MUL_XX(sx,sy);
+		fixed cxsy=TOADLET_MUL_XX(cx,sy);
+		fixed sxcy=TOADLET_MUL_XX(sx,cy);
 
-		r.w=TOADLET_MUL_XX(c1c2,c3) - TOADLET_MUL_XX(s1s2,s3);
-  		r.x=TOADLET_MUL_XX(c1c2,s3) + TOADLET_MUL_XX(s1s2,c3);
-		r.y=TOADLET_MUL_XX(s1c2,c3) + TOADLET_MUL_XX(c1s2,s3);
-		r.z=TOADLET_MUL_XX(c1s2,c3) - TOADLET_MUL_XX(s1c2,s3);
+		r.w=TOADLET_MUL_XX(cxcy,cz) - TOADLET_MUL_XX(sxsy,sz);
+  		r.x=TOADLET_MUL_XX(cxcy,sz) + TOADLET_MUL_XX(sxsy,cz);
+		r.y=TOADLET_MUL_XX(sxcy,cz) + TOADLET_MUL_XX(cxsy,sz);
+		r.z=TOADLET_MUL_XX(cxsy,cz) - TOADLET_MUL_XX(sxcy,sz);
 	}
 
 	public static void lerp(Quaternion r,Quaternion q1,Quaternion q2,fixed t){

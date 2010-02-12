@@ -429,14 +429,7 @@ void SimpleSync::intraUpdate(int dt){
 		server->update();
 	}
 
-
-
-
-
-
 	if(client!=NULL){
-//		int eventStart=sentClientEvents.size()>0?sentClientEvents.size()-1:0;
-
 		Event::ptr event=NULL;
 		while((event=client->receive())!=NULL){
 			if(event->getType()==ConnectionEvent::EventType_CONNECTION){
@@ -457,17 +450,15 @@ void SimpleSync::intraUpdate(int dt){
 					int id=serverEvent->getID(u);
 					HopEntity::ptr entity=id>=0?player[id]:block;
 					if(entity!=NULL){
-						// Update object
-						// TODO: We have to set the Solid's Position here, instead of the Entity's.  Figure out why that is.
+						// Update object's physical properties
 						if(entity==player[client->getClientID()]){
-//wank=serverEvent->getPosition(u);
 							entity->getSolid()->setPositionDirect(serverEvent->getPosition(u)); // We want to retain our touching info
 						}
 						else{
 							entity->getSolid()->setPosition(serverEvent->getPosition(u));
 							entity->setRotate(serverEvent->getRotation(u));
 						}
-						entity->setVelocity(serverEvent->getVelocity(u));
+						entity->getSolid()->setVelocity(serverEvent->getVelocity(u));
 					}
 				}
 
@@ -518,10 +509,9 @@ void SimpleSync::intraUpdate(int dt){
 			}
 		}
 		// END
+		
+		player[client->getClientID()]->setRotate(viewRotation);
 	}
-
-
-
 
 	// START: Move to PredictedServer/Client classes, basically this will all be the same, except you'll call a setLastClientUpdate()
 	if(server!=NULL){
@@ -541,10 +531,6 @@ void SimpleSync::intraUpdate(int dt){
 		}
 	}
 	// END
-
-	if(client!=NULL){
-		player[client->getClientID()]->setRotate(viewRotation);
-	}
 
 }
 
@@ -584,8 +570,6 @@ void SimpleSync::logicUpdate(int dt){
 
 	// Skip HopScene's logicUpdate
 	scene->getRootNode()->logicUpdate(dt);
-
-
 
 	// Update everything but the players
 	scene->getSimulator()->update(dt,~playerCollision,NULL);
