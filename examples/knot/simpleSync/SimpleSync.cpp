@@ -671,6 +671,26 @@ void SimpleSync::mousePressed(int x,int y,int button){
 	}
 }
 
+	inline bool setQuaternionFromEulerAngleXYZ(Quaternion &r,const EulerAngle &euler,real epsilon){
+    float c1 = Math::cos(euler.x/2);
+    float s1 = Math::sin(euler.x/2);
+    float c2 = Math::cos(euler.y/2);
+    float s2 = Math::sin(euler.y/2);
+    float c3 = Math::cos(euler.z/2);
+    float s3 = Math::sin(euler.z/2);
+    float c1c2 = c1*c2;
+    float s1s2 = s1*s2;
+    float c1s2 = c1*s2;
+    float s1c2 = s1*c2;
+    r.w =c1c2*c3 - s1s2*s3;
+  	r.x =c1c2*s3 + s1s2*c3;
+	r.y =s1c2*c3 + c1s2*s3;
+	r.z =c1s2*c3 - s1c2*s3;
+//	Math::normalize(r);
+	return true;
+	}
+
+
 void SimpleSync::mouseMoved(int x,int y){
 	int hwidth=getWidth()/2;
 	int hheight=getHeight()/2;
@@ -687,7 +707,9 @@ void SimpleSync::mouseMoved(int x,int y){
 		if(look.z>Math::HALF_PI) look.z=Math::HALF_PI;
 
 		Quaternion result;
-		Math::setQuaternionFromEulerAngleXYZ(result,look,0);
+		Logger::alert(String("EUL:")+look.y+","+look.z);
+setQuaternionFromEulerAngleXYZ(result,look,0);
+//		Math::setQuaternionFromEulerAngleXYZ(result,look,0);
 		player[client->getClientID()]->setRotate(result);
 	}
 }
