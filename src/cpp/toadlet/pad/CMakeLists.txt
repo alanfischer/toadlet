@@ -61,7 +61,6 @@ endif (TOADLET_PLATFORM_WIN32)
 
 
 # Dependcies for toadlet_pad
-include_directories (${OPENGL_INCLUDES} ${GLEW_INCLUDE_DIR})
 if (TOADLET_PLATFORM_WINCE)
 	if (TOADLET_HAS_DIRECT3D9)
 		set (PAD_LIBS toadlet_peeper_d3d9renderer)
