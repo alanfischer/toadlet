@@ -1,0 +1,41 @@
+# Contributor: Andrew Fischer <andrew_at_lightningtoads.com>
+
+pkgname=toadlet-hg
+pkgver=371
+pkgrel=1
+pkgdesc="The toadlet engine is a versatile software toolkit for building powerful and efficient applications across a range of operating systems and mobile devices."
+arch=('i686' 'x86_64')
+license=("LGPL")
+conflicts=('toadlet')
+provides=('toadlet')
+makedepends=('cmake>=2.6.0' 'mercurial')
+optdepends=('giflib: GIF image support'
+'libjpeg: JPEG image support'
+'libpng: PNG image support'
+'glew: OpenGL support'
+'freetype2: font rendering'
+'openal: audio support'
+'libvorbis: ogg vorbis support'
+'mxml: xml file IO')
+url="http://code.google.com/p/toadlet"
+source=()
+md5sums=()
+
+_hgroot="ssh://ltdev.no-ip.org//data/Hg"
+_hgrepo="toadlet"
+
+build() {
+  _kernelver=$(eval 'uname -r')
+
+  rm -rf "$srcdir/$_hgrepo/build-$_kernelver"
+  mkdir -p "$srcdir/$_hgrepo/build-$_kernelver"
+  cd "$srcdir/$_hgrepo/build-$_kernelver"
+
+  cmake \
+    -DCMAKE_INSTALL_PREFIX:PATH=/usr \
+    -DCMAKE_BUILD_TYPE:STRING=Release \
+    .. || return 1
+
+  make || return 1
+  make DESTDIR=$pkgdir install || return 1
+}
