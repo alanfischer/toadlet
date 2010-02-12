@@ -23,13 +23,14 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_KNOT_ROUTEDEVENT_H
-#define TOADLET_KNOT_ROUTEDEVENT_H
+#ifndef TOADLET_KNOT_EVENT_ROUTEDEVENT_H
+#define TOADLET_KNOT_EVENT_ROUTEDEVENT_H
 
 #include <toadlet/egg/Event.h>
 
 namespace toadlet{
 namespace knot{
+namespace event{
 
 // TODO: Replace IDs with an Address structure
 class RoutedEvent:public egg::Event{
@@ -59,6 +60,7 @@ protected:
 	int mDestinationID;
 };
 
+}
 }
 }
 

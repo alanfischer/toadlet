@@ -23,22 +23,45 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_EVENTFACTORY_H
-#define TOADLET_EGG_EVENTFACTORY_H
+#ifndef TOADLET_KNOT_EVENT_BASECONNECTIONEVENT_H
+#define TOADLET_KNOT_EVENT_BASECONNECTIONEVENT_H
 
 #include <toadlet/egg/Event.h>
 
 namespace toadlet{
-namespace egg{
+namespace knot{
+namespace event{
 
-// TODO: Perhaps we could replace this Factory interface with some clever use of the Type system, like we did with Entities
-class EventFactory{
+class BaseConnectionEvent:public egg::Event{
 public:
-	virtual ~EventFactory(){}
+	TOADLET_SHARED_POINTERS(BaseConnectionEvent);
 
-	virtual Event::ptr createEventType(int type)=0;
+	BaseConnectionEvent(int type):Event(type),
+		mID(0)
+	{}
+	BaseConnectionEvent(int type,int id):Event(type){
+		mID=id;
+	}
+
+	int getID(){return mID;}
+
+	virtual int read(egg::io::DataStream *stream){
+		int amount=0;
+		amount+=stream->readBigInt32(mID);
+		return amount;
+	}
+
+	virtual int write(egg::io::DataStream *stream){
+		int amount=0;
+		amount+=stream->writeBigInt32(mID);
+		return amount;
+	}
+
+protected:
+	int mID;
 };
 
+}
 }
 }
 

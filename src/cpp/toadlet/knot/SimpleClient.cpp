@@ -30,6 +30,7 @@
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
+using namespace toadlet::knot::event;
 
 namespace toadlet{
 namespace knot{
@@ -71,6 +72,10 @@ void SimpleClient::setConnector(Connector::ptr connector){
 
 bool SimpleClient::sendToClient(int toClientID,Event::ptr event){
 	return send(Event::ptr(new RoutedEvent(event,mClientID,toClientID)));
+}
+
+void SimpleClient::handleConnectionEvent(BaseConnectionEvent::ptr event){
+	mClientID=event->getID();
 }
 
 }

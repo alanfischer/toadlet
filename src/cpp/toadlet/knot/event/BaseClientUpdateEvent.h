@@ -23,22 +23,53 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_EVENTFACTORY_H
-#define TOADLET_EGG_EVENTFACTORY_H
+#ifndef TOADLET_KNOT_EVENT_BASECLIENTUPDATEEVENT_H
+#define TOADLET_KNOT_EVENT_BASECLIENTUPDATEEVENT_H
 
 #include <toadlet/egg/Event.h>
 
 namespace toadlet{
-namespace egg{
+namespace knot{
+namespace event{
 
-// TODO: Perhaps we could replace this Factory interface with some clever use of the Type system, like we did with Entities
-class EventFactory{
+// This event is sent from the client each frame with the client dt and commands
+//  The Counter could be replaced with a reliable packet sequence number, but that is not implemented yet
+class BaseClientUpdateEvent:public egg::Event{
 public:
-	virtual ~EventFactory(){}
+	TOADLET_SHARED_POINTERS(BaseClientUpdateEvent);
 
-	virtual Event::ptr createEventType(int type)=0;
+	BaseClientUpdateEvent(int type):Event(type),
+		mCounter(0),
+		mDT(0)
+	{}
+	BaseClientUpdateEvent(int type,int counter,int dt):Event(type){
+		mCounter=counter;
+		mDT=dt;
+	}
+
+	int getCounter(){return mCounter;}
+	int getDT(){return mDT;}
+
+	virtual int read(egg::io::DataStream *stream){
+		int amount=0;
+		amount+=stream->readBigInt16(mCounter);
+		amount+=stream->readBigInt32(mDT);
+		return amount;
+	}
+
+	virtual int write(egg::io::DataStream *stream){
+		int amount=0;
+		amount+=stream->writeBigInt16(mCounter);
+		amount+=stream->writeBigInt32(mDT);
+		return amount;
+	}
+
+protected:
+	short mCounter;
+	int mDT;
 };
 
+}
 }
 }
 

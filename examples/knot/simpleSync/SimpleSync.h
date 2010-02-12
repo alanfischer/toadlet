@@ -4,24 +4,13 @@
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/knot/TCPConnector.h>
+#include <toadlet/knot/SimplePredictedClient.h>
 #include <toadlet/knot/SimpleServer.h>
-#include <toadlet/knot/SimpleClient.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
 #include <toadlet/tadpole/node/SceneNode.h>
 #include <toadlet/tadpole/plugins/hop/HopEntity.h>
 #include <toadlet/pad/Application.h>
-/*
-An Event class for the Client message structure, which will control player movement.
-
-Which means we can have a class of events for the ClientUpdateEvent sort of thing,
-	which are time marked or maybe DT marked and can be retrieved from the client & servers?
-
-Then we also have a generic class of just UpdateEvents which are different, and time marked, and are unique, as in only one will be dealt with each frame.  If we get repeats, then the old ones are thrown out.
-
-We also need to add in the Sync/Ping something event to let us figure out the time differenceing for the lag/buffer code.
-*/
-
 
 using namespace toadlet;
 using namespace toadlet::egg;
@@ -29,13 +18,12 @@ using namespace toadlet::egg::io;
 using namespace toadlet::egg::net;
 using namespace toadlet::hop;
 using namespace toadlet::knot;
+using namespace toadlet::knot::event;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole;
 using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::mesh;
 using namespace toadlet::pad;
-
-class SimplePredictedClient;
 
 class SimpleSync:public Application,public EventFactory,public ConnectionListener,public Runnable,public UpdateListener{
 public:
@@ -72,8 +60,8 @@ public:
 
 	void run();
 
+	SimplePredictedClient::ptr client;
 	SimpleServer::ptr server;
-	egg::SharedPointer<SimplePredictedClient> client;
 
 	HopScene::ptr scene;
 	int nextUpdateTime;
