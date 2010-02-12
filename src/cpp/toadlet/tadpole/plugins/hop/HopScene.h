@@ -116,6 +116,7 @@ public:
 	virtual void logicUpdate(int dt);
 	virtual void postLogicUpdate(int dt);
 	virtual void postLogicUpdateLoop(int dt);
+	virtual void intraUpdate(int dt);
 	virtual void preRenderUpdate(int dt);
 	virtual void renderUpdate(int dt);
 	virtual void postRenderUpdate(int dt);

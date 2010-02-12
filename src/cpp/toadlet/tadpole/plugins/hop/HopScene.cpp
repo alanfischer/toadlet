@@ -251,6 +251,10 @@ void HopScene::postLogicUpdateLoop(int dt){
 	mScene->postLogicUpdateLoop(dt);
 }
 
+void HopScene::intraUpdate(int dt){
+	mScene->intraUpdate(dt);
+}
+
 void HopScene::preRenderUpdate(int dt){
 	int i;
 	bool active,activePrevious;
@@ -264,17 +268,19 @@ void HopScene::preRenderUpdate(int dt){
 		if(active || activePrevious){
 			// TODO: Add an option to either use strict interpolation, or fuzzy interpolation
 			// If we are deactivating, then make sure we are at our rest point
-#if 1
+#if 0
 			if(active==false && activePrevious){
 				entity->interpolatePhysicalParameters(Math::ONE);
 			}
 			else{
 				entity->interpolatePhysicalParameters(f);
 			}
-#else
+#elif 1
 			Vector3 last;Math::setTranslateFromMatrix4x4(last,entity->getRenderTransform());
 			Vector3 translate;Math::lerp(translate,last,entity->getTranslate(),0.3);
 			entity->setRenderTransformTranslate(translate);
+#else
+			entity->setRenderTransformTranslate(entity->getTranslate());
 #endif
 
 			if(entity->mShadowMesh!=NULL){
