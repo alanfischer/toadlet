@@ -35,7 +35,7 @@ using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::mesh;
 using namespace toadlet::pad;
 
-class ClientEvent;
+class SimplePredictedClient;
 
 class SimpleSync:public Application,public EventFactory,public ConnectionListener,public Runnable,public UpdateListener{
 public:
@@ -73,7 +73,7 @@ public:
 	void run();
 
 	SimpleServer::ptr server;
-	SimpleClient::ptr client;
+	egg::SharedPointer<SimplePredictedClient> client;
 
 	HopScene::ptr scene;
 	int nextUpdateTime;
@@ -94,7 +94,6 @@ public:
 	int flags;
 	EulerAngle angles;
 	Quaternion viewRotation;
-	Collection<SharedPointer<ClientEvent> > sentClientEvents;
 };
 
 #endif

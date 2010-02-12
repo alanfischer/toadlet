@@ -9,13 +9,40 @@
 //  Which will basically handle queuing of ClientEvents, and letting you get them back out
 
 // START: Move to PredictedSimpleServer/PredictedSimpleClient classes
-// This event is sent from the client each frame with the client dt and commands
-class ClientUpdateEvent:public Event{
+class BaseConnectionEvent:public Event{
 public:
-	TOADLET_SHARED_POINTERS(ClientUpdateEvent);
+	TOADLET_SHARED_POINTERS(BaseConnectionEvent);
 
-	ClientUpdateEvent(int type):Event(type),mCounter(0),mDT(0){}
-	ClientUpdateEvent(int type,int counter,int dt):Event(type){
+	BaseConnectionEvent(int type):Event(type){}
+	BaseConnectionEvent(int type,int id):Event(type){
+		mID=id;
+	}
+
+	int getID(){return mID;}
+
+	virtual int read(DataStream *stream){
+		int amount=0;
+		amount+=stream->readBigInt32(mID);
+		return amount;
+	}
+
+	virtual int write(DataStream *stream){
+		int amount=0;
+		amount+=stream->writeBigInt32(mID);
+		return amount;
+	}
+
+protected:
+	int mID;
+};
+
+// This event is sent from the client each frame with the client dt and commands
+class BaseClientUpdateEvent:public Event{
+public:
+	TOADLET_SHARED_POINTERS(BaseClientUpdateEvent);
+
+	BaseClientUpdateEvent(int type):Event(type),mCounter(0),mDT(0){}
+	BaseClientUpdateEvent(int type,int counter,int dt):Event(type){
 		mCounter=counter;
 		mDT=dt;
 	}
@@ -32,12 +59,12 @@ protected:
 };
 
 // This event is sent from the server occasionally to update information about objects or possibly confirm the receipt of a ClientUpdateEvent
-class ServerUpdateEvent:public Event{
+class BaseServerUpdateEvent:public Event{
 public:
-	TOADLET_SHARED_POINTERS(ServerUpdateEvent);
+	TOADLET_SHARED_POINTERS(BaseServerUpdateEvent);
 
-	ServerUpdateEvent(int type):Event(type),mLastCounter(0),mTime(0){}
-	ServerUpdateEvent(int type,int lastCounter,int time):Event(type){
+	BaseServerUpdateEvent(int type):Event(type),mLastCounter(0),mTime(0){}
+	BaseServerUpdateEvent(int type,int lastCounter,int time):Event(type){
 		mLastCounter=lastCounter;
 		mTime=time;
 	}
@@ -52,10 +79,55 @@ protected:
 	short mLastCounter;
 	int mTime;
 };
+
+class SimplePredictedClient:public SimpleClient{
+public:
+	TOADLET_SHARED_POINTERS(SimplePredictedClient);
+
+	SimplePredictedClient(EventFactory *factory,Connector::ptr connector):SimpleClient(factory,connector),
+		mLastReceivedClientUpdateCount(0),
+		mLastAppliedClientUpdateCount(0)
+	{}
+
+	virtual void handleConnectionEvent(BaseConnectionEvent::ptr event){
+		setClientID(event->getID());
+	}
+
+	virtual void handleServerUpdateEvent(BaseServerUpdateEvent::ptr event){
+		mLastReceivedClientUpdateCount=event->getLastClientUpdateCounter();
+		while(mSentClientEvents.size()>1 && mSentClientEvents[0]->getCounter()<=mLastReceivedClientUpdateCount){
+			mSentClientEvents.removeAt(0);
+		}
+		mLastAppliedClientUpdateCount=mLastReceivedClientUpdateCount;
+	}
+
+	virtual void sendClientUpdateEvent(BaseClientUpdateEvent::ptr event){
+		mSentClientEvents.add(event);
+		send(event);
+	}
+
+	virtual Collection<BaseClientUpdateEvent::ptr> enumerateClientUpdateEvents(){
+		Collection<BaseClientUpdateEvent::ptr> events;
+		int i;
+		for(i=0;i<mSentClientEvents.size();++i){
+			if(mLastAppliedClientUpdateCount<mSentClientEvents[i]->getCounter()){
+				mLastAppliedClientUpdateCount=mSentClientEvents[i]->getCounter();
+				events.add(mSentClientEvents[i]);
+			}
+		}
+		return events;
+	}
+	
+protected:
+	Collection<BaseClientUpdateEvent::ptr> mSentClientEvents;
+	int mLastReceivedClientUpdateCount;
+	int mLastAppliedClientUpdateCount;
+};
+
 // END
 
 
-class ConnectionEvent:public Event{
+class ConnectionEvent:public BaseConnectionEvent{
 public:
 	TOADLET_SHARED_POINTERS(ConnectionEvent);
 
@@ -63,19 +135,15 @@ public:
 		EventType_CONNECTION=204
 	};
 
-	ConnectionEvent():Event(EventType_CONNECTION){}
-	ConnectionEvent(int id,const Quaternion &look):Event(EventType_CONNECTION){
-		mID=id;
+	ConnectionEvent():BaseConnectionEvent(EventType_CONNECTION){}
+	ConnectionEvent(int id,const Quaternion &look):BaseConnectionEvent(EventType_CONNECTION,id){
 		mLook=look;
 	}
 
-	int getID(){return mID;}
 	const Quaternion &getLook(){return mLook;}
 
 	virtual int read(DataStream *stream){
-		int amount=0;
-		amount+=stream->readBigInt32(mID);
-
+		int amount=BaseConnectionEvent::read(stream);
 		amount+=stream->readBigFloat(mLook.x);
 		amount+=stream->readBigFloat(mLook.y);
 		amount+=stream->readBigFloat(mLook.z);
@@ -84,9 +152,7 @@ public:
 	}
 
 	virtual int write(DataStream *stream){
-		int amount=0;
-		amount+=stream->writeBigInt32(mID);
-
+		int amount=BaseConnectionEvent::write(stream);
 		amount+=stream->writeBigFloat(mLook.x);
 		amount+=stream->writeBigFloat(mLook.y);
 		amount+=stream->writeBigFloat(mLook.z);
@@ -95,20 +161,19 @@ public:
 	}
 
 protected:
-	int mID;
 	Quaternion mLook;
 };
 
-class ClientEvent:public ClientUpdateEvent{
+class ClientUpdateEvent:public BaseClientUpdateEvent{
 public:
-	TOADLET_SHARED_POINTERS(ClientEvent);
+	TOADLET_SHARED_POINTERS(ClientUpdateEvent);
 
 	enum{
-		EventType_CLIENT=202
+		EventType_CLIENTUPDATE=202
 	};
 
-	ClientEvent():ClientUpdateEvent(EventType_CLIENT){}
-	ClientEvent(int counter,int dt,int flags,const Quaternion &look):ClientUpdateEvent(EventType_CLIENT,counter,dt){
+	ClientUpdateEvent():BaseClientUpdateEvent(EventType_CLIENTUPDATE){}
+	ClientUpdateEvent(int counter,int dt,int flags,const Quaternion &look):BaseClientUpdateEvent(EventType_CLIENTUPDATE,counter,dt){
 		mFlags=flags;
 		mLook=look;
 	}
@@ -117,7 +182,7 @@ public:
 	const Quaternion &getLook(){return mLook;}
 
 	virtual int read(DataStream *stream){
-		int amount=ClientUpdateEvent::read(stream);
+		int amount=BaseClientUpdateEvent::read(stream);
 		amount+=stream->readBigInt32(mFlags);
 
 		amount+=stream->readBigFloat(mLook.x);
@@ -128,7 +193,7 @@ public:
 	}
 
 	virtual int write(DataStream *stream){
-		int amount=ClientUpdateEvent::write(stream);
+		int amount=BaseClientUpdateEvent::write(stream);
 		amount+=stream->writeBigInt32(mFlags);
 
 		amount+=stream->writeBigFloat(mLook.x);
@@ -143,16 +208,16 @@ protected:
 	Quaternion mLook;
 };
 
-class ServerEvent:public ServerUpdateEvent{
+class ServerUpdateEvent:public BaseServerUpdateEvent{
 public:
-	TOADLET_SHARED_POINTERS(ServerEvent);
+	TOADLET_SHARED_POINTERS(ServerUpdateEvent);
 
 	enum{
-		EventType_SERVER=203
+		EventType_SERVERUPDATE=203
 	};
 
-	ServerEvent():ServerUpdateEvent(EventType_SERVER){}
-	ServerEvent(int lastCounter,int time):ServerUpdateEvent(EventType_SERVER,lastCounter,time){}
+	ServerUpdateEvent():BaseServerUpdateEvent(EventType_SERVERUPDATE){}
+	ServerUpdateEvent(int lastCounter,int time):BaseServerUpdateEvent(EventType_SERVERUPDATE,lastCounter,time){}
 
 	void addUpdate(int id,const Vector3 &position,const Quaternion &rotation,const Vector3 &velocity){
 		mIDs.add(id);
@@ -168,7 +233,7 @@ public:
 	const Vector3 &getVelocity(int i){return mVelocitys[i];}
 
 	virtual int read(DataStream *stream){
-		int amount=ServerUpdateEvent::read(stream);
+		int amount=BaseServerUpdateEvent::read(stream);
 		int numUpdates=0;
 		amount+=stream->readBigInt32(numUpdates);
 		mIDs.resize(numUpdates);
@@ -194,7 +259,7 @@ public:
 	}
 
 	virtual int write(DataStream *stream){
-		int amount=ServerUpdateEvent::write(stream);
+		int amount=BaseServerUpdateEvent::write(stream);
 		amount+=stream->writeBigInt32(mIDs.size());
 		for(int i=0;i<mIDs.size();++i){
 			amount+=stream->writeBigInt32(mIDs[i]);
@@ -268,7 +333,7 @@ void SimpleSync::connect(int remoteHost,int remotePort){
 	}
 
 	connector->addConnectionListener(this,false);
-	client=SimpleClient::ptr(new SimpleClient(this,connector));
+	client=SimplePredictedClient::ptr(new SimplePredictedClient(this,connector));
 //	shared_static_cast<TCPConnection>(client->getConnection())->debugSetPacketDelayTime(100,130);
 }
 
@@ -377,7 +442,7 @@ void SimpleSync::render(Renderer *renderer){
 	renderer->swap();
 }
 
-void updatePlayer(const ClientEvent::ptr &event,HopEntity::ptr entity){
+void updatePlayer(const ClientUpdateEvent::ptr &event,HopEntity::ptr entity){
 	entity->setRotate(event->getLook());
 
 	int flags=event->getFlags();
@@ -417,24 +482,15 @@ void SimpleSync::update(int dt){
 	scene->update(dt);
 }
 
-int lastAppliedUpdateCounter=0;
-
 void SimpleSync::intraUpdate(int dt){
-	int i;
-
-	if(client!=NULL){
-		client->update();
-	}
-	if(server!=NULL){
-		server->update();
-	}
-
 	if(client!=NULL){
 		Event::ptr event=NULL;
 		while((event=client->receive())!=NULL){
 			if(event->getType()==ConnectionEvent::EventType_CONNECTION){
 				ConnectionEvent::ptr connectionEvent=shared_static_cast<ConnectionEvent>(event);
-				client->setClientID(connectionEvent->getID());
+
+				client->handleConnectionEvent(connectionEvent);
+
 				player[client->getClientID()]->setRotate(connectionEvent->getLook());
 				player[client->getClientID()]->setCollisionBits(playerCollision);
 				player[client->getClientID()]->getSolid()->setAlwaysActive(true);
@@ -442,8 +498,10 @@ void SimpleSync::intraUpdate(int dt){
 				player[client->getClientID()]->attach(cameraNode);
 				cameraNode->setLookDir(Vector3(0,0,30),Math::Y_UNIT_VECTOR3,Math::Z_UNIT_VECTOR3);
 			}
-			else if(event->getType()==ServerEvent::EventType_SERVER){
-				ServerEvent::ptr serverEvent=shared_static_cast<ServerEvent>(event);
+			else if(event->getType()==ServerUpdateEvent::EventType_SERVERUPDATE){
+				ServerUpdateEvent::ptr serverEvent=shared_static_cast<ServerUpdateEvent>(event);
+
+				client->handleServerUpdateEvent(serverEvent);
 
 				int u=0;
 				for(u=0;u<serverEvent->getNumUpdates();++u){
@@ -483,45 +541,35 @@ void SimpleSync::intraUpdate(int dt){
 					scene->getSimulator()->update(updateDT,~player[client->getClientID()]->getCollisionBits(),NULL);
 					serverTime+=updateDT;
 				}
-
-				// START: Move to PredictedServer/Client classes
-				// Remove any old events, and make all pending events new ClientEvents
-				int lastReceivedUpdateCounter=serverEvent->getLastClientUpdateCounter();
-				while(sentClientEvents.size()>1 && sentClientEvents[0]->getCounter()<=lastReceivedUpdateCounter){
-					sentClientEvents.removeAt(0);
-				}
-				lastAppliedUpdateCounter=lastReceivedUpdateCounter;
-				// END
 			}
 		}
 
-		// START: Move to PredictedServer/Client classes.  There will just be a method to enumerate all pending ClientEvents
+		client->update();
+
 		// TODO: Ideally we would somehow "ghost" the player so he wouldnt impart any forces on anything he touches
 		//  We can't simply set his Mass to 0, because that affects friction calculations
-		if(client->getClientID()>=0){
-			// Now we apply all new ClientEvents.
-			for(int i=0;i<sentClientEvents.size();++i){
-				if(lastAppliedUpdateCounter<sentClientEvents[i]->getCounter()){
-					lastAppliedUpdateCounter=sentClientEvents[i]->getCounter();
-					updatePlayer(sentClientEvents[i],player[client->getClientID()]);
-					scene->getSimulator()->update(sentClientEvents[i]->getDT(),0,player[client->getClientID()]->getSolid());
-				}
-			}
+		// Now we apply all new ClientEvents.
+		Collection<BaseClientUpdateEvent::ptr> clientEvents=client->enumerateClientUpdateEvents();
+		for(int i=0;i<clientEvents.size();++i){
+			ClientUpdateEvent::ptr clientEvent=shared_static_cast<ClientUpdateEvent>(clientEvents[i]);
+			updatePlayer(clientEvent,player[client->getClientID()]);
+			scene->getSimulator()->update(clientEvent->getDT(),0,player[client->getClientID()]->getSolid());
 		}
-		// END
 		
 		player[client->getClientID()]->setRotate(viewRotation);
 	}
 
 	// START: Move to PredictedServer/Client classes, basically this will all be the same, except you'll call a setLastClientUpdate()
 	if(server!=NULL){
+		server->update();
+
 		EventConnection::ptr eventConnection=NULL;
 		int i=0;
 		for(eventConnection=server->getClient(0);eventConnection!=NULL;eventConnection=server->getClient(++i)){
 			Event::ptr event;
 			while((event=eventConnection->receive())!=NULL){
-				if(event->getType()==ClientEvent::EventType_CLIENT){
-					ClientEvent::ptr clientEvent=shared_static_cast<ClientEvent>(event);
+				if(event->getType()==ClientUpdateEvent::EventType_CLIENTUPDATE){
+					ClientUpdateEvent::ptr clientEvent=shared_static_cast<ClientUpdateEvent>(event);
 
 					lastClientUpdateCounter[i]=clientEvent->getCounter();
 					updatePlayer(clientEvent,player[i]);
@@ -531,21 +579,15 @@ void SimpleSync::intraUpdate(int dt){
 		}
 	}
 	// END
-
 }
 
 void SimpleSync::preLogicUpdate(int dt){
 	scene->preLogicUpdate(dt);
 
-
-	// START: Move to PredictedServer/Client classes, you'll have to call a send/add/setClientEvent each frame
 	if(client!=NULL){
 		int currentFrame=scene->getLogicFrame()+1;
-		ClientEvent::ptr clientEvent(new ClientEvent(currentFrame,dt,flags,viewRotation));
-		sentClientEvents.add(clientEvent);
-		client->send(clientEvent);
+		client->sendClientUpdateEvent(ClientUpdateEvent::ptr(new ClientUpdateEvent(currentFrame,dt,flags,viewRotation)));
 	}
-	// END
 
 	// START: Move to PredictedServer/Client classes, for the most part this will be the same, except you'll call a getLastClientUpdate() to get that counter
 	if(server!=NULL && nextUpdateTime<=scene->getLogicTime()){
@@ -554,7 +596,7 @@ void SimpleSync::preLogicUpdate(int dt){
 		EventConnection::ptr eventConnection=NULL;
 		int i=0;
 		for(eventConnection=server->getClient(0);eventConnection!=NULL;eventConnection=server->getClient(++i)){
-			ServerEvent::ptr serverEvent(new ServerEvent(lastClientUpdateCounter[i],scene->getLogicTime()));
+			ServerUpdateEvent::ptr serverEvent(new ServerUpdateEvent(lastClientUpdateCounter[i],scene->getLogicTime()));
 			serverEvent->addUpdate(-1,block->getSolid()->getPosition(),block->getRotate(),block->getVelocity());
 			serverEvent->addUpdate(0,player[0]->getSolid()->getPosition(),player[0]->getRotate(),player[0]->getVelocity());
 			serverEvent->addUpdate(1,player[1]->getSolid()->getPosition(),player[1]->getRotate(),player[1]->getVelocity());
@@ -566,8 +608,6 @@ void SimpleSync::preLogicUpdate(int dt){
 
 
 void SimpleSync::logicUpdate(int dt){
-	int i;
-
 	// Skip HopScene's logicUpdate
 	scene->getRootNode()->logicUpdate(dt);
 
@@ -698,11 +738,11 @@ Event::ptr SimpleSync::createEventType(int type){
 	if(type==ConnectionEvent::EventType_CONNECTION){
 		return Event::ptr(new ConnectionEvent());
 	}
-	else if(type==ClientEvent::EventType_CLIENT){
-		return Event::ptr(new ClientEvent());
+	else if(type==ClientUpdateEvent::EventType_CLIENTUPDATE){
+		return Event::ptr(new ClientUpdateEvent());
 	}
-	else if(type==ServerEvent::EventType_SERVER){
-		return Event::ptr(new ServerEvent());
+	else if(type==ServerUpdateEvent::EventType_SERVERUPDATE){
+		return Event::ptr(new ServerUpdateEvent());
 	}
 	else{
 		return Event::ptr(new Event());
@@ -826,7 +866,7 @@ int main(int argc,char **argv){
 		while((serverThread!=NULL && serverThread->isAlive()) || clientThread!=NULL && clientThread->isAlive()){
 			System::msleep(100);
 		}
-	TOADLET_CATCH(const Exception &ex){}
+	TOADLET_CATCH(const Exception &){}
 
 	return 0;
 
