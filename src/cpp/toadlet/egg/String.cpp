@@ -34,16 +34,26 @@
 	#include <wctype.h>
 #endif
 
-#if defined(TOADLET_PLATFORM_WIN32)
+// TODO: Have CMake set TOADLET_HAS_SWPRINTF
+#if defined(TOADLET_HAS_SWPRINTF) && defined(TOADLET_PLATFORM_WIN32)
 	#define TOADLET_SPRINTF(str,fmt,x) \
 		str.mLength=_snwprintf((wchar_t*)(str).mData,(str).mLength,L##fmt,x)
 	#define TOADLET_SSCANF(str,fmt,x) \
 		swscanf((wchar_t*)(str).mData,L##fmt,x)
-#elif defined(TOADLET_PLATFORM_POSIX)
+#elif defined(TOADLET_HAS_SWPRINTF) && defined(TOADLET_PLATFORM_POSIX)
 	#define TOADLET_SPRINTF(str,fmt,x) \
 		str.mLength=swprintf((wchar_t*)(str).mData,(str).mLength,L##fmt,x)
 	#define TOADLET_SSCANF(str,fmt,x) \
 		swscanf((wchar_t*)(str).mData,L##fmt,x)
+#else
+	#define TOADLET_SPRINTF(str,fmt,x) \
+		char temp[128]; \
+		str.mLength=sprintf(temp,fmt,x); \
+		mbstowcs((wchar_t*)(str).mData,temp,128);
+	#define TOADLET_SSCANF(str,fmt,x) \
+		char temp[128]; \
+		wcstombs(temp,(wchar_t*)(str).mData,128); \
+		sscanf(temp,fmt,x)
 #endif
 
 namespace toadlet{

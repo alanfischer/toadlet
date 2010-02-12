@@ -34,7 +34,7 @@
 #endif
 
 #define TOADLET_MAKE_LOGGER_FUNCTION(name,level) \
-	static void name(const String &description){name(NULL,description);} \
+	static void name(const String &description){name((char*)NULL,description);} \
 	static void name(const String &categoryName,const String &description){ \
 		Logger *instance=getInstance(); \
 		if(level>Level_MAX) ; \
