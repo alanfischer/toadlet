@@ -1353,26 +1353,25 @@ namespace Math{
 		r.w=cos(halfAngle);
 	}
 
-	inline bool setQuaternionFromEulerAngleXYZ(Quaternion &r,const EulerAngle &euler,real epsilon){
-		real cx=cos(euler.x);
-		real sx=sin(euler.x);
-		real cy=cos(euler.y);
-		real sy=sin(euler.y);
-		real cz=cos(euler.z);
-		real sz=sin(euler.z);
-		real sxsy=(sx*sy);
-		real cxsy=(cx*sy);
+	inline void setQuaternionFromEulerAngleXYZ(Quaternion &r,const EulerAngle &euler){
+		real s1=euler.x/2;
+		real c1=cos(s1);
+		s1=sin(s1);
+		real s2=euler.y/2;
+		real c2=cos(s2);
+		s2=sin(s2);
+		real s3=euler.z/2;
+		real c3=cos(s3);
+		s3=sin(s3);
+		real c1c2=c1*c2;
+		real s1s2=s1*s2;
+		real c1s2=c1*s2;
+		real s1c2=s1*c2;
 
-		real w=sqrt(1.0 + cx*cy + cx*cz - sxsy*sz + cy*cz)*0.5;
-		if(w>epsilon){
-			real w4=1.0/(w*4.0);
-			r.w=w;
-			r.x=(cy*sz + cx*sz + sxsy*cz)*w4;
-			r.y=(sx*cy + sx*cz + cxsy*sz)*w4;
-			r.z=(-sx*sz + cxsy*cz + sy)*w4;
-			return true;
-		}
-		return false;
+		r.w=(c1c2*c3) - (s1s2*s3);
+  		r.x=(c1c2*s3) + (s1s2*c3);
+		r.y=(s1c2*c3) + (c1s2*s3);
+		r.z=(c1s2*c3) - (s1c2*s3);
 	}
 
 	TOADLET_API void lerp(Quaternion &r,const Quaternion &q1,const Quaternion &q2,real t);
