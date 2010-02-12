@@ -32,7 +32,7 @@ namespace toadlet{
 namespace egg{
 
 namespace Categories{
-	const static String TOADLET=			"org.toadlet";
+	const static String TOADLET=			"toadlet";
 	const static String TOADLET_EGG_LOGGER=	TOADLET+".egg.Logger";
 	const static String TOADLET_EGG_NET=	TOADLET+".egg.net";
 	const static String TOADLET_EGG=		TOADLET+".egg";

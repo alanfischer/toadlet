@@ -26,7 +26,7 @@
 package org.toadlet.egg;
 
 public final class Categories{
-	public final static String TOADLET =			"org.toadlet";
+	public final static String TOADLET =			"toadlet";
 	public final static String TOADLET_EGG_LOGGER=	TOADLET+".Logger";
 	public final static String TOADLET_EGG=			TOADLET+".egg";
 	public final static String TOADLET_FLICK=		TOADLET+".flick";
