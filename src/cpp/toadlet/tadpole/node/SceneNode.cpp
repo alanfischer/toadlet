@@ -174,6 +174,13 @@ void SceneNode::update(int dt){
 	}
 
 	if(mUpdateListener!=NULL){
+		mUpdateListener->intraUpdate(dt);
+	}
+	else{
+		mChildScene->intraUpdate(dt);
+	}
+
+	if(mUpdateListener!=NULL){
 		mUpdateListener->preRenderUpdate(dt);
 		mUpdateListener->renderUpdate(dt);
 		mUpdateListener->postRenderUpdate(dt);
@@ -265,6 +272,9 @@ void SceneNode::logicUpdate(Node::ptr node,int dt){
 }
 
 void SceneNode::postLogicUpdateLoop(int dt){
+}
+
+void SceneNode::intraUpdate(int dt){
 }
 
 void SceneNode::preRenderUpdate(int dt){

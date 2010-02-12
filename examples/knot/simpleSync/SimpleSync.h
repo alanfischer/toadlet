@@ -55,6 +55,7 @@ public:
 	void preLogicUpdate(int dt);
 	void logicUpdate(int dt);
 	void postLogicUpdate(int dt);
+	void intraUpdate(int dt);
 	void preRenderUpdate(int dt){scene->preRenderUpdate(dt);}
 	void renderUpdate(int dt){scene->renderUpdate(dt);}
 	void postRenderUpdate(int dt){scene->postRenderUpdate(dt);}
@@ -81,7 +82,6 @@ public:
 	int debugUpdateMin,debugUpdateMax;
 	int packetDelay;
 	int packetDelayVariance;
-	Mutex mutex;
 
 	Random random;
 	CameraNode::ptr cameraNode;
@@ -92,7 +92,8 @@ public:
 	int playerCollision;
 	int lastClientUpdateCounter[2];
 	int flags;
-	EulerAngle look;
+	EulerAngle angles;
+	Quaternion viewRotation;
 	Collection<SharedPointer<ClientEvent> > sentClientEvents;
 };
 
