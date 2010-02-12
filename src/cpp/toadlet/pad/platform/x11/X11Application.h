@@ -94,11 +94,16 @@ public:
 	virtual void update(int dt);
 	virtual void render(peeper::Renderer *renderer);
 
+	void setMouseLocked(bool locked);
+	bool getMouseLocked() const{return mMouseLocked;}
+
 	void setRendererOptions(int *options,int length);
 
 	void *getDisplay() const;
 	void *getWindow() const;
 	void *getVisualInfo() const;
+
+	void internal_mouseMoved(int x,int y);
 
 protected:
 	bool createWindow();
@@ -122,6 +127,8 @@ protected:
 	bool mFullscreen;
 	peeper::Visual mVisual;
 	ApplicationListener *mApplicationListener;
+	bool mMouseLocked;
+	bool mSkipNextMove;
 
 	tadpole::Engine *mEngine;
 	peeper::RenderTarget *mRenderTarget;

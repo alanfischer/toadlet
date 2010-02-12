@@ -141,6 +141,7 @@ Image *PNGHandler::loadImage(Stream *stream){
 			memcpy(data+width*y,row_pointers[y],width);
 		}
 	}
+	#if 0 // This code is removed until I have time to update it to all the non-depreciated & new trans stuff
 	else if(color_type==PNG_COLOR_TYPE_PALETTE){
 		#define PNGHANDLER_GET_INDEX \
 			(row[x/a]>>((8-bit_depth)-bit_depth*(x%a)))&b
@@ -195,6 +196,7 @@ Image *PNGHandler::loadImage(Stream *stream){
 			}
 		}
 	}
+	#endif
 	else if(color_type==PNG_COLOR_TYPE_GRAY_ALPHA){
 		image=new Image(Image::Dimension_D2,Image::Format_LA_8,width,height);
 

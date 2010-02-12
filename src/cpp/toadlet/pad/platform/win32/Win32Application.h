@@ -101,8 +101,8 @@ public:
 	virtual void update(int dt);
 	virtual void render(peeper::Renderer *renderer);
 
-	void setMouseLocked(bool locked);
-	bool getMouseLocked() const{return mMouseLocked;}
+	virtual void setMouseLocked(bool locked);
+	virtual bool getMouseLocked() const{return mMouseLocked;}
 
 	void changeRendererPlugin(int index);
 	void setRendererOptions(int *options,int length);

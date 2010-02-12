@@ -80,6 +80,8 @@ X11Application::X11Application():
 	mFullscreen(false),
 	//mVisual(),
 	mApplicationListener(NULL),
+	mMouseLocked(false),
+	mSkipNextMove(false),
 
 	mEngine(NULL),
 	mRenderer(NULL),
@@ -159,7 +161,7 @@ void X11Application::stepEventLoop(){
 	XEvent event;
 	KeySym key;
 
-	while(XPending(x11->mDisplay)){
+	while(x11->mDisplay!=NULL && XPending(x11->mDisplay)){
 		XNextEvent(x11->mDisplay,&event);
 		switch(event.type){
 			case ClientMessage:
@@ -191,7 +193,7 @@ void X11Application::stepEventLoop(){
 				keyPressed(translateKey(key));
 				break;
 			case MotionNotify:
-				mouseMoved(event.xmotion.x,event.xmotion.y);
+				internal_mouseMoved(event.xmotion.x,event.xmotion.y);
 				break;
 			case ButtonPress:
 				switch(event.xbutton.button){
@@ -674,6 +676,19 @@ bool X11Application::destroyAudioPlayer(){
 	return true;
 }
 
+void X11Application::internal_mouseMoved(int x,int y){
+	if(mMouseLocked && (getWidth()/2!=x || getHeight()/2!=y)){
+		XWarpPointer(x11->mDisplay,None,x11->mWindow,0,0,0,0,getWidth()/2,getHeight()/2);
+
+		if(mSkipNextMove){
+			mSkipNextMove=false;
+			return;
+		}
+	}
+
+	mouseMoved(x,y);
+}
+
 void X11Application::configured(int x,int y,int width,int height){
 	mPositionX=x;
 	mPositionY=y;
@@ -758,6 +773,11 @@ void X11Application::render(Renderer *renderer){
 	if(mApplicationListener!=NULL){
 		mApplicationListener->render(renderer);
 	}
+}
+
+void X11Application::setMouseLocked(bool locked){
+	mMouseLocked=locked;
+	mSkipNextMove=true;
 }
 
 void X11Application::setRendererOptions(int *options,int length){
