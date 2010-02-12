@@ -50,7 +50,7 @@ public:
 		return *this;
 	}
 
-	inline Sphere &set(Vector3 origin1,int radius1){
+	inline Sphere &set(Vector3 origin1,real radius1){
 		origin.x=origin1.x;
 		origin.y=origin1.y;
 		origin.z=origin1.z;

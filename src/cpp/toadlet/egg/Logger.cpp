@@ -176,7 +176,7 @@ void Logger::addLogString(const String &categoryName,Level level,const String &d
 }
 
 void Logger::addLogString(Level level,const String &string){
-	addLogString(NULL,level,string);
+	addLogString((char*)NULL,level,string);
 }
 
 String Logger::getLogString(){
