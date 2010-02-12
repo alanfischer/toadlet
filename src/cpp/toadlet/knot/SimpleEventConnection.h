@@ -28,6 +28,7 @@
 
 #include <toadlet/egg/Event.h>
 #include <toadlet/egg/EventFactory.h>
+#include <toadlet/egg/Mutex.h>
 #include <toadlet/egg/Thread.h>
 #include <toadlet/egg/io/DataStream.h>
 #include <toadlet/egg/io/MemoryStream.h>

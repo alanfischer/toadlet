@@ -23,20 +23,34 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_EVENTFACTORY_H
-#define TOADLET_EGG_EVENTFACTORY_H
+#ifndef TOADLET_KNOT_SIMPLEPREDICTEDCLIENT_H
+#define TOADLET_KNOT_SIMPLEPREDICTEDCLIENT_H
 
-#include <toadlet/egg/Event.h>
+#include <toadlet/egg/Collection.h>
+#include <toadlet/knot/SimpleClient.h>
+#include <toadlet/knot/event/BaseClientUpdateEvent.h>
+#include <toadlet/knot/event/BaseServerUpdateEvent.h>
 
 namespace toadlet{
-namespace egg{
+namespace knot{
 
-// TODO: Perhaps we could replace this Factory interface with some clever use of the Type system, like we did with Entities
-class EventFactory{
+class TOADLET_API SimplePredictedClient:public SimpleClient{
 public:
-	virtual ~EventFactory(){}
+	TOADLET_SHARED_POINTERS(SimplePredictedClient);
 
-	virtual Event::ptr createEventType(int type)=0;
+	SimplePredictedClient(egg::EventFactory *factory,Connector::ptr connector);
+	virtual ~SimplePredictedClient();
+
+	virtual void handleServerUpdateEvent(event::BaseServerUpdateEvent::ptr event);
+
+	virtual void sendClientUpdateEvent(event::BaseClientUpdateEvent::ptr event);
+
+	virtual egg::Collection<event::BaseClientUpdateEvent::ptr> enumerateClientUpdateEvents();
+	
+protected:
+	egg::Collection<event::BaseClientUpdateEvent::ptr> mSentClientEvents;
+	int mLastReceivedClientUpdateCount;
+	int mLastAppliedClientUpdateCount;
 };
 
 }

@@ -30,6 +30,7 @@
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
+using namespace toadlet::knot::event;
 
 namespace toadlet{
 namespace knot{

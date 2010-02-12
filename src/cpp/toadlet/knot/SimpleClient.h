@@ -28,6 +28,7 @@
 
 #include <toadlet/knot/Connector.h>
 #include <toadlet/knot/SimpleEventConnection.h>
+#include <toadlet/knot/event/BaseConnectionEvent.h>
 
 namespace toadlet{
 namespace knot{
@@ -46,9 +47,9 @@ public:
 
 	virtual bool sendToClient(int toClientID,egg::Event::ptr event);
 
-	// TODO: setClientID should dissapear and it be figured out automatically from a handshake setup
-	virtual void setClientID(int id){mClientID=id;}
 	virtual int getClientID(){return mClientID;}
+
+	virtual void handleConnectionEvent(event::BaseConnectionEvent::ptr event);
 
 protected:
 	int mClientID;
