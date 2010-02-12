@@ -3,6 +3,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/io/FileStream.h>
 #include <toadlet/egg/io/ZIPArchive.h>
+#include <toadlet/egg/Extents.h>
 
 // TODO: Look at the START/END comments and move those parts to a PredictedSimpleServer/PredictedSimpleClient
 //  Which will basically handle queuing of ClientEvents, and letting you get them back out
@@ -255,8 +256,8 @@ void SimpleSync::accept(int localPort){
 
 	server=SimpleServer::ptr(new SimpleServer(this,connector));
 	connector->addConnectionListener(this,false);
-//	debugUpdateMin=200;
-//	debugUpdateMax=200;
+	debugUpdateMin=50;
+	debugUpdateMax=100;
 }
 
 void SimpleSync::connect(int remoteHost,int remotePort){
@@ -384,50 +385,6 @@ void SimpleSync::render(Renderer *renderer){
 	mutex.unlock();
 }
 
-void SimpleSync::update(int dt){
-	mutex.lock();
-
-	scene->update(dt);
-
-	if(client!=NULL){
-		client->update();
-	}
-	if(server!=NULL){
-		server->update();
-	}
-
-	mutex.unlock();
-}
-
-void SimpleSync::preLogicUpdate(int dt){
-	scene->preLogicUpdate(dt);
-
-	// START: Move to PredictedServer/Client classes, you'll have to call a send/add/setClientEvent each frame
-	if(client!=NULL){
-		int currentFrame=scene->getLogicFrame()+1;
-		ClientEvent::ptr clientEvent(new ClientEvent(currentFrame,dt,flags,player[client->getClientID()]->getRotate()));
-		sentClientEvents.add(clientEvent);
-		client->send(clientEvent);
-	}
-	// END
-
-	// START: Move to PredictedServer/Client classes, for the most part this will be the same, except you'll call a getLastClientUpdate() to get that counter
-	if(server!=NULL && nextUpdateTime<=scene->getLogicTime()){
-		nextUpdateTime=scene->getLogicTime()+random.nextInt(debugUpdateMin,debugUpdateMax);
-
-		EventConnection::ptr eventConnection=NULL;
-		int i=0;
-		for(eventConnection=server->getClient(0);eventConnection!=NULL;eventConnection=server->getClient(++i)){
-			ServerEvent::ptr serverEvent(new ServerEvent(lastClientUpdateCounter[i],scene->getLogicTime()));
-			serverEvent->addUpdate(-1,block->getSolid()->getPosition(),block->getRotate(),block->getVelocity());
-			serverEvent->addUpdate(0,player[0]->getSolid()->getPosition(),player[0]->getRotate(),player[0]->getVelocity());
-			serverEvent->addUpdate(1,player[1]->getSolid()->getPosition(),player[1]->getRotate(),player[1]->getVelocity());
-			eventConnection->send(serverEvent);
-		}
-	}
-	// END
-}
-
 void updatePlayer(const ClientEvent::ptr &event,HopEntity::ptr entity){
 	entity->setRotate(event->getLook());
 
@@ -462,6 +419,77 @@ void updatePlayer(const ClientEvent::ptr &event,HopEntity::ptr entity){
 		result.z=250;
 	}
 	entity->setVelocity(result);
+}
+
+void SimpleSync::update(int dt){
+	mutex.lock();
+
+	scene->update(dt);
+
+	if(client!=NULL){
+		client->update();
+	}
+	if(server!=NULL){
+		server->update();
+	}
+
+
+	// START: Move to PredictedServer/Client classes, basically this will all be the same, except you'll call a setLastClientUpdate()
+	if(server!=NULL){
+		EventConnection::ptr eventConnection=NULL;
+		int i=0;
+		for(eventConnection=server->getClient(0);eventConnection!=NULL;eventConnection=server->getClient(++i)){
+			Event::ptr event;
+			while((event=eventConnection->receive())!=NULL){
+				if(event->getType()==ClientEvent::EventType_CLIENT){
+					ClientEvent::ptr clientEvent=shared_static_cast<ClientEvent>(event);
+
+					lastClientUpdateCounter[i]=clientEvent->getCounter();
+Solid *s=player[i]->getSolid();
+Vector3 v1=s->getVelocity();
+					updatePlayer(clientEvent,player[i]);
+Vector3 v2=s->getVelocity();
+					scene->getSimulator()->update(clientEvent->getDT(),0,player[i]->getSolid());
+if(Extents::isNAN(v1.x) || Extents::isNAN(v2.x) || Extents::isNAN(s->getVelocity().x)){
+	Logger::alert(String("NAN!:")+ v1.x+","+v2.x+","+s->getVelocity().x+"+"+player[i]->getRotate().x+"+"+player[i]->getRotate().w);
+}
+				}
+			}
+		}
+	}
+	// END
+
+
+	mutex.unlock();
+}
+
+void SimpleSync::preLogicUpdate(int dt){
+	scene->preLogicUpdate(dt);
+
+	// START: Move to PredictedServer/Client classes, you'll have to call a send/add/setClientEvent each frame
+	if(client!=NULL){
+		int currentFrame=scene->getLogicFrame()+1;
+		ClientEvent::ptr clientEvent(new ClientEvent(currentFrame,dt,flags,player[client->getClientID()]->getRotate()));
+		sentClientEvents.add(clientEvent);
+		client->send(clientEvent);
+	}
+	// END
+
+	// START: Move to PredictedServer/Client classes, for the most part this will be the same, except you'll call a getLastClientUpdate() to get that counter
+	if(server!=NULL && nextUpdateTime<=scene->getLogicTime()){
+		nextUpdateTime=scene->getLogicTime()+random.nextInt(debugUpdateMin,debugUpdateMax);
+
+		EventConnection::ptr eventConnection=NULL;
+		int i=0;
+		for(eventConnection=server->getClient(0);eventConnection!=NULL;eventConnection=server->getClient(++i)){
+			ServerEvent::ptr serverEvent(new ServerEvent(lastClientUpdateCounter[i],scene->getLogicTime()));
+			serverEvent->addUpdate(-1,block->getSolid()->getPosition(),block->getRotate(),block->getVelocity());
+			serverEvent->addUpdate(0,player[0]->getSolid()->getPosition(),player[0]->getRotate(),player[0]->getVelocity());
+			serverEvent->addUpdate(1,player[1]->getSolid()->getPosition(),player[1]->getRotate(),player[1]->getVelocity());
+			eventConnection->send(serverEvent);
+		}
+	}
+	// END
 }
 
 void SimpleSync::logicUpdate(int dt){
@@ -554,25 +582,6 @@ forcelook=connectionEvent->getLook();force=true;
 
 if(force){player[i]->setRotate(forcelook);}
 	}
-
-	// START: Move to PredictedServer/Client classes, basically this will all be the same, except you'll call a setLastClientUpdate()
-	if(server!=NULL){
-		EventConnection::ptr eventConnection=NULL;
-		int i=0;
-		for(eventConnection=server->getClient(0);eventConnection!=NULL;eventConnection=server->getClient(++i)){
-			Event::ptr event;
-			while((event=eventConnection->receive())!=NULL){
-				if(event->getType()==ClientEvent::EventType_CLIENT){
-					ClientEvent::ptr clientEvent=shared_static_cast<ClientEvent>(event);
-
-					lastClientUpdateCounter[i]=clientEvent->getCounter();
-					updatePlayer(clientEvent,player[i]);
-					scene->getSimulator()->update(clientEvent->getDT(),0,player[i]->getSolid());
-				}
-			}
-		}
-	}
-	// END
 
 	scene->getSimulator()->update(dt,~playerCollision,NULL);
 }
