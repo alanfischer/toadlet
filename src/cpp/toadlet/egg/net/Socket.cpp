@@ -27,11 +27,20 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <time.h>
+#include <string.h> // memset
 
 #if !defined(TOADLET_PLATFORM_WIN32)
 	#include <errno.h>
 #endif
 
+#if !defined(MSG_NOSIGNAL)
+#	if defined(SO_NOSIGPIPE)
+#		define MSG_NOSIGNAL SO_NOSIGPIPE
+#	else
+#		define MSG_NOSIGNAL 0	
+#	endif
+#endif
+ 
 #if defined(TOADLET_PLATFORM_WIN32)
 	#if defined(TOADLET_PLATFORM_WINCE)
 		#pragma comment(lib,"ws2.lib")
@@ -93,11 +102,7 @@ Socket::Socket(int domain,int type,int protocol):
 	setsockopt(mHandle,SOL_SOCKET,SO_REUSEADDR,(char*)&value,sizeof(int));
 	#if defined(TOADLET_PLATFORM_POSIX)
 		// Also disable sigpipe exceptions
-		#if defined(TOADLET_PLATFORM_OSX)
-			setsockopt(mHandle,SOL_SOCKET,SO_NOSIGPIPE,(char*)&value,sizeof(int));
-		#else
-			setsockopt(mHandle,SOL_SOCKET,MSG_NOSIGNAL,(char*)&value,sizeof(int));
-		#endif
+		setsockopt(mHandle,SOL_SOCKET,MSG_NOSIGNAL,(char*)&value,sizeof(int));
 	#endif
 }
 
