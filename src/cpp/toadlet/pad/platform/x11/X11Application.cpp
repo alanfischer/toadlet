@@ -25,6 +25,7 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/System.h>
+#include <toadlet/peeper/CapabilitySet.h>
 #if defined(TOADLET_HAS_OPENGL)
 	#include <toadlet/peeper/plugins/glrenderer/GLRenderer.h>
 	#include <toadlet/peeper/plugins/glrenderer/platform/glx/GLXWindowRenderTarget.h>
@@ -252,6 +253,11 @@ void X11Application::deactivate(){
 }
 
 bool X11Application::createWindow(){
+#if !defined(TOADLET_HAS_OPENGL)
+	Error::unimplemented(Categories::TOADLET_PAD,
+		"createWindow unimplemented without OpenGL");
+	return false;
+#else
 	x11->mDisplay=XOpenDisplay(getenv("DISPLAY"));
 	if(x11->mDisplay==None){
 		Error::unknown(Categories::TOADLET_PAD,
@@ -453,6 +459,7 @@ bool X11Application::createWindow(){
 	XSetWMProtocols(x11->mDisplay,x11->mWindow,&x11->mDeleteWindow,1);
 
 	return true;
+#endif
 }
 
 void X11Application::destroyWindow(){
