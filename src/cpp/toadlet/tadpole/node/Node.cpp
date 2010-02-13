@@ -102,7 +102,7 @@ void Node::destroy(){
 	mCreated=false;
 
 	if(mParent!=NULL){
-		mParent->remove(this);
+		((ParentNode*)mParent.get())->remove(this);
 		mParent=NULL;
 	}
 
@@ -127,6 +127,14 @@ void Node::setNodeDestroyedListener(NodeDestroyedListener *listener,bool owns){
 
 void Node::removeAllNodeDestroyedListeners(){
 	setNodeDestroyedListener(NULL,false);
+}
+
+void Node::parentChanged(ParentNode *parent){
+	mParent=(Node*)parent;
+}
+
+ParentNode *Node::getParent() const{
+	return (ParentNode*)mParent.get();
 }
 
 void Node::setTranslate(const Vector3 &translate){

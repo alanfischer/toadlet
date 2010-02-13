@@ -82,8 +82,8 @@ public:
 	inline NodeDestroyedListener *getNodeDestroyedListener() const{return mNodeDestroyedListener;}
 	virtual void removeAllNodeDestroyedListeners();
 
-	virtual void parentChanged(ParentNode *parent){mParent=parent;}
-	inline ParentNode *getParent() const{return mParent;}
+	virtual void parentChanged(ParentNode *parent);
+	ParentNode *getParent() const;
 
 	virtual void setTranslate(const Vector3 &translate);
 	virtual void setTranslate(scalar x,scalar y,scalar z);
@@ -159,7 +159,7 @@ protected:
 	NodeDestroyedListener *mNodeDestroyedListener;
 	bool mOwnsNodeDestroyedListener;
 
-	egg::IntrusivePointer<ParentNode> mParent;
+	Node::ptr mParent;
 
 	bool mIdentityTransform;
 	Vector3 mTranslate;
