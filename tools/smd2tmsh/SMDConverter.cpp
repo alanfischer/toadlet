@@ -67,7 +67,8 @@ void SMDConverter::load(toadlet::egg::io::Stream *in){
 	}
 
 	String s;
-	while((s=readLine(in)).length()>0){
+	while(in->position()<in->length()){
+		s=readLine(in);
 		if(block==Block_NONE){
 			if(s.startsWith("version")){
 				sscanf(s.c_str(),"version %d",&version);
@@ -307,10 +308,14 @@ String SMDConverter::readLine(Stream *stream){
 	char c=0;
 	while(stream->length()>stream->position()){
 		stream->read((byte*)&c,1);
-		if(c==(char)10){
-			break;
+		if(c==10 || c==13){
+			if(string.length()>0){
+				break;
+			}
 		}
-		string=string+(char)c;
+		else{
+			string=string+c;
+		}
 	}
 	return string;
 }

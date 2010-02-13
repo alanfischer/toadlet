@@ -51,13 +51,13 @@ public:
 	};
 
 	ClientUpdateEvent():BaseClientUpdateEvent(EventType_CLIENTUPDATE){}
-	ClientUpdateEvent(int counter,int dt,int flags,const Quaternion &look):BaseClientUpdateEvent(EventType_CLIENTUPDATE,counter,dt){
+	ClientUpdateEvent(int counter,int dt,int flags,const EulerAngle &look):BaseClientUpdateEvent(EventType_CLIENTUPDATE,counter,dt){
 		mFlags=flags;
 		mLook=look;
 	}
 
 	int getFlags(){return mFlags;}
-	const Quaternion &getLook(){return mLook;}
+	const EulerAngle &getLook(){return mLook;}
 
 	virtual int read(DataStream *stream){
 		int amount=BaseClientUpdateEvent::read(stream);
@@ -66,7 +66,6 @@ public:
 		amount+=stream->readBigFloat(mLook.x);
 		amount+=stream->readBigFloat(mLook.y);
 		amount+=stream->readBigFloat(mLook.z);
-		amount+=stream->readBigFloat(mLook.w);
 		return amount;
 	}
 
@@ -77,13 +76,12 @@ public:
 		amount+=stream->writeBigFloat(mLook.x);
 		amount+=stream->writeBigFloat(mLook.y);
 		amount+=stream->writeBigFloat(mLook.z);
-		amount+=stream->writeBigFloat(mLook.w);
 		return amount;
 	}
 
 protected:
 	int mFlags;
-	Quaternion mLook;
+	EulerAngle mLook;
 };
 
 class ServerUpdateEvent:public BaseServerUpdateEvent{
@@ -236,6 +234,7 @@ void SimpleSync::create(){
 	cameraNode=getEngine()->createNodeType(CameraNode::type());
 	cameraNode->setLookAt(Vector3(0,-Math::fromInt(500),Math::fromInt(250)),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
 	cameraNode->setClearColor(Colors::BLUE);
+	cameraNode->setName("camera");
 	scene->getRootNode()->attach(cameraNode);
 
 	HopEntity::ptr floor=getEngine()->createNodeType(HopEntity::type());
@@ -268,15 +267,16 @@ void SimpleSync::create(){
 		player[i]=getEngine()->createNodeType(HopEntity::type());
 		player[i]->setCoefficientOfRestitution(0);
 		player[i]->setCoefficientOfRestitutionOverride(true);
-		player[i]->addShape(Shape::ptr(new Shape(AABox(-16,-16,-32,16,16,32))));
+		player[i]->addShape(Shape::ptr(new Shape(AABox(-16,-16,0,16,16,64))));
 		{
-			Mesh::ptr mesh=getEngine()->getMeshManager()->createBox(player[i]->getShape(0)->getAABox());
-			mesh->subMeshes[0]->material->setLightEffect(i==0?Colors::GREEN:Colors::CYAN);
+//			Mesh::ptr mesh=getEngine()->getMeshManager()->createBox(player[i]->getShape(0)->getAABox());
+//			mesh->subMeshes[0]->material->setLightEffect(i==0?Colors::GREEN:Colors::CYAN);
+			Mesh::ptr mesh=getEngine()->getMeshManager()->findMesh("pyro_ref.xmsh");
 			MeshNode::ptr meshNode=getEngine()->createNodeType(MeshNode::type());
 			meshNode->setMesh(mesh);
 			player[i]->attach(meshNode);
 		}
-		player[i]->setTranslate(0,i==0?-20:20,32);
+		player[i]->setTranslate(0,i==0?-20:20,0);
 		scene->getRootNode()->attach(player[i]);
 	}
 
@@ -320,10 +320,19 @@ void SimpleSync::render(Renderer *renderer){
 	renderer->swap();
 }
 
-void updatePlayer(const ClientUpdateEvent::ptr &event,HopEntity::ptr entity){
-	entity->setRotate(event->getLook());
+void SimpleSync::updatePlayer(Event::ptr event,HopEntity::ptr entity){
+	ClientUpdateEvent::ptr clientEvent=shared_static_cast<ClientUpdateEvent>(event);
+	Quaternion playerRotate,cameraRotate;
+	EulerAngle angle;
+	Math::setQuaternionFromEulerAngleXYZ(playerRotate,angle.set(0,clientEvent->getLook().y,0));
+	Math::setQuaternionFromEulerAngleXYZ(cameraRotate,angle.set(0,0,clientEvent->getLook().z+Math::HALF_PI));
+	entity->setRotate(playerRotate);
+	CameraNode *camera=(CameraNode*)entity->findNodeByName("camera");
+	if(camera!=NULL){
+		camera->setRotate(cameraRotate);
+	}
 
-	int flags=event->getFlags();
+	int flags=clientEvent->getFlags();
 	Vector3 velocity;
 	if((flags&Move_FORE)>0){
 		Math::add(velocity,Math::Y_UNIT_VECTOR3);
@@ -369,12 +378,12 @@ void SimpleSync::intraUpdate(int dt){
 
 				client->handleConnectionEvent(connectionEvent);
 
-				player[client->getClientID()]->setRotate(connectionEvent->getLook());
+//				player[client->getClientID()]->setRotate(connectionEvent->getLook());
 				player[client->getClientID()]->setCollisionBits(playerCollision);
 				player[client->getClientID()]->getSolid()->setAlwaysActive(true);
 
 				player[client->getClientID()]->attach(cameraNode);
-				cameraNode->setLookDir(Vector3(0,0,30),Math::Y_UNIT_VECTOR3,Math::Z_UNIT_VECTOR3);
+				cameraNode->setLookDir(Vector3(0,0,64),Math::Y_UNIT_VECTOR3,Math::Z_UNIT_VECTOR3);
 			}
 			else if(event->getType()==ServerUpdateEvent::EventType_SERVERUPDATE){
 				ServerUpdateEvent::ptr serverEvent=shared_static_cast<ServerUpdateEvent>(event);
@@ -433,8 +442,10 @@ void SimpleSync::intraUpdate(int dt){
 			updatePlayer(clientEvent,player[client->getClientID()]);
 			scene->getSimulator()->update(clientEvent->getDT(),0,player[client->getClientID()]->getSolid());
 		}
-		
-		player[client->getClientID()]->setRotate(viewRotation);
+
+		Quaternion rotate;
+		Math::setQuaternionFromAxisAngle(rotate,Math::Z_UNIT_VECTOR3,angles.y);
+		player[client->getClientID()]->setRotate(rotate);
 	}
 
 	// START: Move to PredictedServer/Client classes, basically this will all be the same, except you'll call a setLastClientUpdate()
@@ -464,7 +475,7 @@ void SimpleSync::preLogicUpdate(int dt){
 
 	if(client!=NULL){
 		int currentFrame=scene->getLogicFrame()+1;
-		client->sendClientUpdateEvent(ClientUpdateEvent::ptr(new ClientUpdateEvent(currentFrame,dt,flags,viewRotation)));
+		client->sendClientUpdateEvent(ClientUpdateEvent::ptr(new ClientUpdateEvent(currentFrame,dt,flags,angles)));
 	}
 
 	// START: Move to PredictedServer/Client classes, for the most part this will be the same, except you'll call a getLastClientUpdate() to get that counter
@@ -601,8 +612,6 @@ void SimpleSync::mouseMoved(int x,int y){
 		angles.z-=((float)dy)/500.0f*Math::PI;
 		if(angles.z<-Math::HALF_PI) angles.z=-Math::HALF_PI;
 		if(angles.z>Math::HALF_PI) angles.z=Math::HALF_PI;
-
-		Math::setQuaternionFromEulerAngleXYZ(viewRotation,angles);
 	}
 }
 
