@@ -97,7 +97,7 @@ void AnimationController::logicUpdate(int dt){
 			return;
 		}
 
-		mLogicTime+=Math::mul(dt,mTimeScale);
+		mLogicTime+=Math::toMilli(Math::mul(Math::fromMilli(dt),mTimeScale));
 
 		if(mMaxTime!=0 && mLogicTime>=mMaxTime){
 			mLogicTime=mMaxTime;
@@ -119,7 +119,7 @@ void AnimationController::logicUpdate(int dt){
 		}
 	}
 	else if(mTimeScale<0){
-		mLogicTime+=Math::mul(dt,mTimeScale);
+		mLogicTime+=Math::toMilli(Math::mul(Math::fromMilli(dt),mTimeScale));
 
 		if(mLogicTime<0){
 			mLogicTime=0;
@@ -152,7 +152,7 @@ void AnimationController::renderUpdate(int dt){
 			return;
 		}
 
-		mRenderTime+=Math::mul(dt,mTimeScale);
+		mRenderTime+=Math::toMilli(Math::mul(Math::fromMilli(dt),mTimeScale));
 
 		if(mMaxTime>0 && mRenderTime>=mMaxTime){
 			mRenderTime=mMaxTime;
@@ -163,7 +163,7 @@ void AnimationController::renderUpdate(int dt){
 			return;
 		}
 
-		mRenderTime+=Math::mul(dt,mTimeScale);
+		mRenderTime+=Math::toMilli(Math::mul(Math::fromMilli(dt),mTimeScale));
 
 		if(mRenderTime<0){
 			mRenderTime=0;
