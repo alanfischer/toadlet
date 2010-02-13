@@ -53,6 +53,8 @@ public:
 	void mouseMoved(int x,int y);
 	void mouseReleased(int x,int y,int button);
 
+	void updatePlayer(Event::ptr event,HopEntity::ptr entity);
+
 	Event::ptr createEventType(int type);
 
 	void connected(Connection::ptr connection);
