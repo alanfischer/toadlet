@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="KnotTests"
+	Name="EggTests"
 	ProjectGUID="{3D948737-9A1E-4F1B-B725-A2711BE50BCE}"
-	RootNamespace="KnotTests"
+	RootNamespace="EggTests"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="toadlet_egg_sd.lib toadlet_knot_sd.lib"
+				AdditionalDependencies="toadlet_egg_sd.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -176,19 +176,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\ClientServerTest.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\LANPeerEventConnectorTest.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\main.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\TCPConnectionTest.cpp"
+				RelativePath="..\..\MathTest.cpp"
 				>
 			</File>
 		</Filter>

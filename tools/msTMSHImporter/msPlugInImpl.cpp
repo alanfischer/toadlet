@@ -136,16 +136,28 @@ cPlugIn::convertMSVec3ToVector3(const msVec3 &msvec,Vector3 &tvec,bool rotate){
 	}
 }
 
+void setMatrix3x3FromEulerAngleXYZ(Matrix3x3 &r,const EulerAngle &euler){
+	Matrix3x3 xmat,ymat,zmat;
+	Math::setMatrix3x3FromX(xmat,euler.x);
+	Math::setMatrix3x3FromY(ymat,euler.y);
+	Math::setMatrix3x3FromZ(zmat,euler.z);
+	Math::postMul(ymat,zmat);
+	Math::mul(r,xmat,ymat);
+}
+
 void
 cPlugIn::convertMSVec3ToQuaternion(const msVec3 &msvec,Quaternion &quat,bool rotate){
-	EulerAngle angle(-msvec[0],-msvec[1],-msvec[2]);
+	EulerAngle angle(msvec[0],msvec[1],msvec[2]);
 	Matrix3x3 matrix;
-	Math::setMatrix3x3FromEulerAngleXYZ(matrix,angle);
+	setMatrix3x3FromEulerAngleXYZ(matrix,angle);
 	if(rotate){
 		// This multiply uses toadletToMilkshape, seems odd but it works
 		matrix=matrix*toadletToMilkshape;
 	}
 	Math::setQuaternionFromMatrix3x3(quat,matrix);
+Math::setQuaternionFromEulerAngleXYZ(quat,angle);
+//Quaternion q;Math::setQuaternionFromMatrix3x3(q,milkshapeToToadlet);
+//quat=q*quat;
 	quat.w*=-1.0f;
 	Math::normalize(quat);
 }

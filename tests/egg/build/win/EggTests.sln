@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KnotTests", "KnotTests.vcproj", "{3D948737-9A1E-4F1B-B725-A2711BE50BCE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EggTests", "EggTests.vcproj", "{3D948737-9A1E-4F1B-B725-A2711BE50BCE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
