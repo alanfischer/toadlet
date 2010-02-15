@@ -8,7 +8,32 @@
 using namespace toadlet::egg;
 using namespace toadlet::egg::math;
 
+	void setMatrix3x3FromEulerAngleXYZ(Matrix3x3 &r,const EulerAngle &euler){
+		Matrix3x3 xmat,ymat,zmat;
+		Math::setMatrixFromX(xmat,euler.x);
+		Math::setMatrixFromY(ymat,euler.y);
+		Math::setMatrixFromZ(zmat,euler.z);
+		Math::postMul(ymat,zmat);
+		Math::mul(r,xmat,ymat);
+	}
+
 QT_TEST(MathTest){
+	EulerAngle angle;
+	Matrix3x3 r;
+	setMatrix3x3FromEulerAngleXYZ(r,angle.set(Math::QUARTER_PI,-Math::QUARTER_PI,0));
+	Logger::alert(String("r0:")+r.at(0,0)+","+r.at(0,1)+","+r.at(0,2));
+	Logger::alert(String("r1:")+r.at(1,0)+","+r.at(1,1)+","+r.at(1,2));
+	Logger::alert(String("r2:")+r.at(2,0)+","+r.at(2,1)+","+r.at(2,2));
+	Math::setMatrix3x3FromEulerAngleXYZ(r,angle.set(Math::QUARTER_PI,0,-Math::QUARTER_PI));
+	Logger::alert(String("r0:")+r.at(0,0)+","+r.at(0,1)+","+r.at(0,2));
+	Logger::alert(String("r1:")+r.at(1,0)+","+r.at(1,1)+","+r.at(1,2));
+	Logger::alert(String("r2:")+r.at(2,0)+","+r.at(2,1)+","+r.at(2,2));
+
+//now:    was y now x
+//		  was z now y
+//		  was x now z
+
+
 	EulerAngle euler1,euler2;
 	Quaternion quaternion1,quaternion2;
 	Matrix3x3 matrix1,matrix2;
