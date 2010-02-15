@@ -30,28 +30,49 @@ namespace toadlet{
 namespace egg{
 namespace mathfixed{
 
-bool Math::setEulerAngleXYZFromMatrix3x3(EulerAngle &r,const Matrix3x3 &m){
-	r.y=asin(m.at(0,2));
-	if(r.y<HALF_PI){
-		if(r.y>-HALF_PI){
-			r.x=atan2(-m.at(1,2),m.at(2,2));
-			r.z=atan2(-m.at(0,1),m.at(0,0));
-			return true;
-		}
-		else{
-			// WARNING: Not a unique solution.
-			fixed my=atan2(m.at(1,0),m.at(1,1));
-			r.z=0; // any angle works
-			r.x=r.z-my;
-			return false;
-		}
+bool Math::setEulerAngleXYZFromMatrix3x3(EulerAngle &r,const Matrix3x3 &m,fixed epsilon){
+	if(m.at(1,0)>ONE-epsilon){ // North Pole singularity
+		r.x=atan2(m.at(0,2),m.at(2,2));
+		r.y=HALF_PI;
+		r.z=0;
+		return false;
+	}
+	else if(m.at(1,0)<-(ONE-epsilon)){ // South Pole singularity
+		r.x=atan2(m.at(0,2),m.at(2,2));
+		r.y=-HALF_PI;
+		r.z=0;
+		return false;
 	}
 	else{
-		// WARNING: Not a unique solution.
-		fixed py=atan2(m.at(1,0),m.at(1,1));
-		r.z=0; // any angle works
-		r.x=py-r.z;
+		r.x=atan2(-m.at(2,0),m.at(0,0));
+		r.y=asin(m.at(1,0));
+		r.z=atan2(-m.at(1,2),m.at(1,1));
+		return true;
+	}
+}
+
+bool Math::setEulerAngleXYZFromQuaternion(EulerAngle &r,const Quaternion &q,fixed epsilon){
+	fixed test=TOADLET_MUL_XX(q.x,q.y) + TOADLET_MUL_XX(q.z,q.w);
+	if(test>HALF-epsilon){ // North Pole singularity
+		r.x=atan2(q.x,q.w)<<1;
+		r.y=HALF_PI;
+		r.z=0;
 		return false;
+	}
+	else if(test<-(HALF-epsilon)){ // South Pole singularity
+		r.x=-atan2(q.x,q.w)<<1;
+		r.y=-HALF_PI;
+		r.z=0;
+		return false;
+	}
+	else{
+		fixed sqx=TOADLET_MUL_XX(q.x,q.x);
+		fixed sqy=TOADLET_MUL_XX(q.y,q.y);
+		fixed sqz=TOADLET_MUL_XX(q.z,q.z);
+		r.x=atan2((TOADLET_MUL_XX(q.y,q.w)<<1)-(TOADLET_MUL_XX(q.x,q.z)<<1), ONE - (sqy<<1) - (sqz<<1));
+		r.y=asin(test<<1);
+		r.z=atan2((TOADLET_MUL_XX(q.x,q.w)<<1)-(TOADLET_MUL_XX(q.y,q.z)<<1), ONE - (sqx<<1) - (sqz<<1));
+		return true;
 	}
 }
 

@@ -131,7 +131,8 @@ protected:
 
 	MeshAnimationController::ptr mAnimationController;
 
-	Vector3 cache_updateVertexBuffer_vector;
+	Vector3 cache_updateVertexBuffer_positionVector;
+	Vector3 cache_updateVertexBuffer_normalVector;
 };
 
 }

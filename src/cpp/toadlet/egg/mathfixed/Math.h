@@ -629,7 +629,9 @@ namespace Math{
 	}
 
 	// EulerAngle operations
-	TOADLET_API bool setEulerAngleXYZFromMatrix3x3(EulerAngle &r,const Matrix3x3 &m);
+	TOADLET_API bool setEulerAngleXYZFromMatrix3x3(EulerAngle &r,const Matrix3x3 &m,fixed epsilon);
+
+	TOADLET_API bool setEulerAngleXYZFromQuaternion(EulerAngle &r,const Quaternion &q,fixed epsilon);
 
 	// Matrix3x3 basic operations
 	inline void mul(Matrix3x3 &r,const Matrix3x3 &m1,const Matrix3x3 &m2){
@@ -1012,15 +1014,14 @@ namespace Math{
 		fixed cz=cos(euler.z);
 		fixed sz=sin(euler.z);
 		fixed cxsy=TOADLET_MUL_XX(cx,sy);
-		fixed cycz=TOADLET_MUL_XX(cy,cz);
 		fixed sxsy=TOADLET_MUL_XX(sx,sy);
 		
 		r.setAt(0,0,TOADLET_MUL_XX(cx,cy));
 		r.setAt(0,1,TOADLET_MUL_XX(sx,sz) - TOADLET_MUL_XX(cxsy,cz));
 		r.setAt(0,2,TOADLET_MUL_XX(cxsy,sz) + TOADLET_MUL_XX(sx,cz));
 		r.setAt(1,0,sy);
-		r.setAt(1,1,cycz);
-		r.setAt(1,2,-cycz);
+		r.setAt(1,1,TOADLET_MUL_XX(cy,cz));
+		r.setAt(1,2,-TOADLET_MUL_XX(cy,sz));
 		r.setAt(2,0,-TOADLET_MUL_XX(sx,cy));
 		r.setAt(2,1,TOADLET_MUL_XX(sxsy,cz) + TOADLET_MUL_XX(cx,sz));
 		r.setAt(2,2,-TOADLET_MUL_XX(sxsy,sz) + TOADLET_MUL_XX(cx,cz));

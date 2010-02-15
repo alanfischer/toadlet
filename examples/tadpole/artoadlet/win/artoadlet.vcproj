@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\siralanf\Desktop\New Folder\artoolkit\include&quot;;C:\Users\siralanf\toadletDeps\win32\include"
+				AdditionalIncludeDirectories="&quot;C:\Program Files\ARToolKit\include&quot;;C:\Users\siralanf\toadletDeps\win32\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -194,11 +194,11 @@
 			>
 		</Filter>
 		<File
-			RelativePath="..\..\..\..\..\artoolkit\build.win32\lib\debug\AR.lib"
+			RelativePath="..\..\..\..\..\..\..\Program Files\ARToolKit\lib\AR.lib"
 			>
 		</File>
 		<File
-			RelativePath="..\..\..\..\..\artoolkit\build.win32\lib\debug\ARvideo.lib"
+			RelativePath="..\..\..\..\..\..\..\Program Files\ARToolKit\lib\ARvideo.lib"
 			>
 		</File>
 	</Files>

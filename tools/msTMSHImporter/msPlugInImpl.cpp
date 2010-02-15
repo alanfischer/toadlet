@@ -111,16 +111,19 @@ cPlugIn::convertQuaternionToMSVec3(const Quaternion &quat,msVec3 msvec,bool rota
 	}
 
 	Quaternion temp(quat);
-	temp.w*=-1.0f;
+	temp.w*=1.0f;
 	Math::normalize(temp);
-	Matrix3x3 matrix;
-	Math::setMatrix3x3FromQuaternion(matrix,temp);
-	if(rotate){
-		// This multiply uses milkshapeToToadlet, seems odd but it works
-		matrix=matrix*milkshapeToToadlet;
-	}
+//	Matrix3x3 matrix;
+//	Math::setMatrix3x3FromQuaternion(matrix,temp);
+//	if(rotate){
+//		// This multiply uses milkshapeToToadlet, seems odd but it works
+//		matrix=matrix*milkshapeToToadlet;
+//	}
 	EulerAngle angle;
-	Math::setEulerAngleXYZFromMatrix3x3(angle,matrix);
+//	Math::setEulerAngleXYZFromMatrix3x3(angle,matrix);
+//if(rotate){Quaternion q; Math::setQuaternionFromMatrix3x3(q,milkshapeToToadlet);temp=temp*q;}
+Math::setEulerAngleXYZFromQuaternion(angle,temp,0.001);
+
 	msvec[0]=-angle.x;
 	msvec[1]=-angle.y;
 	msvec[2]=-angle.z;
@@ -136,29 +139,19 @@ cPlugIn::convertMSVec3ToVector3(const msVec3 &msvec,Vector3 &tvec,bool rotate){
 	}
 }
 
-void setMatrix3x3FromEulerAngleXYZ(Matrix3x3 &r,const EulerAngle &euler){
-	Matrix3x3 xmat,ymat,zmat;
-	Math::setMatrix3x3FromX(xmat,euler.x);
-	Math::setMatrix3x3FromY(ymat,euler.y);
-	Math::setMatrix3x3FromZ(zmat,euler.z);
-	Math::postMul(ymat,zmat);
-	Math::mul(r,xmat,ymat);
-}
-
 void
 cPlugIn::convertMSVec3ToQuaternion(const msVec3 &msvec,Quaternion &quat,bool rotate){
-	EulerAngle angle(msvec[0],msvec[1],msvec[2]);
-	Matrix3x3 matrix;
-	setMatrix3x3FromEulerAngleXYZ(matrix,angle);
-	if(rotate){
-		// This multiply uses toadletToMilkshape, seems odd but it works
-		matrix=matrix*toadletToMilkshape;
-	}
-	Math::setQuaternionFromMatrix3x3(quat,matrix);
+	EulerAngle angle(-msvec[0],-msvec[1],-msvec[2]);
+//	Matrix3x3 matrix;
+//	setMatrix3x3FromEulerAngleXYZ(matrix,angle);
+///	if(rotate){
+//		// This multiply uses toadletToMilkshape, seems odd but it works
+//		matrix=matrix*toadletToMilkshape;
+//	}
+//	Math::setQuaternionFromMatrix3x3(quat,matrix);
 Math::setQuaternionFromEulerAngleXYZ(quat,angle);
-//Quaternion q;Math::setQuaternionFromMatrix3x3(q,milkshapeToToadlet);
-//quat=q*quat;
-	quat.w*=-1.0f;
+//if(rotate){Quaternion q; Math::setQuaternionFromMatrix3x3(q,toadletToMilkshape);quat=quat*q;}
+	quat.w*=1.0f;
 	Math::normalize(quat);
 }
 

@@ -904,28 +904,49 @@ public final class Math{
 	}
 
 	// EulerAngle operations
-	public static boolean setEulerAngleXYZFromMatrix3x3(EulerAngle r,Matrix3x3 m){
-		r.y=asin(m.at(0,2));
-		if(r.y<HALF_PI){
-			if(r.y>-HALF_PI){
-				r.x=atan2(-m.at(1,2),m.at(2,2));
-				r.z=atan2(-m.at(0,1),m.at(0,0));
-				return true;
-			}
-			else{
-				// WARNING: Not a unique solution.
-				fixed my=atan2(m.at(1,0),m.at(1,1));
-				r.z=0; // any angle works
-				r.x=r.z-my;
-				return false;
-			}
+	public static boolean setEulerAngleXYZFromMatrix3x3(EulerAngle r,Matrix3x3 m,fixed epsilon){
+		if(m.at(1,0)>ONE-epsilon){ // North Pole singularity
+			r.x=atan2(m.at(0,2),m.at(2,2));
+			r.y=HALF_PI;
+			r.z=0;
+			return false;
+		}
+		else if(m.at(1,0)<-(ONE-epsilon)){ // South Pole singularity
+			r.x=atan2(m.at(0,2),m.at(2,2));
+			r.y=-HALF_PI;
+			r.z=0;
+			return false;
 		}
 		else{
-			// WARNING: Not a unique solution.
-			fixed py=atan2(m.at(1,0),m.at(1,1));
-			r.z=0; // any angle works
-			r.x=py-r.z;
+			r.x=atan2(-m.at(2,0),m.at(0,0));
+			r.y=asin(m.at(1,0));
+			r.z=atan2(-m.at(1,2),m.at(1,1));
+			return true;
+		}
+	}
+
+	public static boolean setEulerAngleXYZFromQuaternion(EulerAngle r,Quaternion q,fixed epsilon){
+		fixed test=TOADLET_MUL_XX(q.x,q.y) + TOADLET_MUL_XX(q.z,q.w);
+		if(test>HALF-epsilon){ // North Pole singularity
+			r.x=atan2(q.x,q.w)<<1;
+			r.y=HALF_PI;
+			r.z=0;
 			return false;
+		}
+		else if(test<-(HALF-epsilon)){ // South Pole singularity
+			r.x=-atan2(q.x,q.w)<<1;
+			r.y=-HALF_PI;
+			r.z=0;
+			return false;
+		}
+		else{
+			fixed sqx=TOADLET_MUL_XX(q.x,q.x);
+			fixed sqy=TOADLET_MUL_XX(q.y,q.y);
+			fixed sqz=TOADLET_MUL_XX(q.z,q.z);
+			r.x=atan2((TOADLET_MUL_XX(q.y,q.w)<<1)-(TOADLET_MUL_XX(q.x,q.z)<<1), ONE - (sqy<<1) - (sqz<<1));
+			r.y=asin(test<<1);
+			r.z=atan2((TOADLET_MUL_XX(q.x,q.w)<<1)-(TOADLET_MUL_XX(q.y,q.z)<<1), ONE - (sqx<<1) - (sqz<<1));
+			return true;
 		}
 	}
 
@@ -1362,15 +1383,14 @@ public final class Math{
 		fixed cz=cos(euler.z); \
 		fixed sz=sin(euler.z); \
 		fixed cxsy=TOADLET_MUL_XX(cx,sy); \
-		fixed cycz=TOADLET_MUL_XX(cy,cz); \
 		fixed sxsy=TOADLET_MUL_XX(sx,sy); \
 		\
 		r.setAt(0,0,TOADLET_MUL_XX(cx,cy)); \
 		r.setAt(0,1,TOADLET_MUL_XX(sx,sz) - TOADLET_MUL_XX(cxsy,cz)); \
 		r.setAt(0,2,TOADLET_MUL_XX(cxsy,sz) + TOADLET_MUL_XX(sx,cz)); \
 		r.setAt(1,0,sy); \
-		r.setAt(1,1,cycz); \
-		r.setAt(1,2,-cycz); \
+		r.setAt(1,1,TOADLET_MUL_XX(cy,cz)); \
+		r.setAt(1,2,-TOADLET_MUL_XX(cy,sz)); \
 		r.setAt(2,0,-TOADLET_MUL_XX(sx,cy)); \
 		r.setAt(2,1,TOADLET_MUL_XX(sxsy,cz) + TOADLET_MUL_XX(cx,sz)); \
 		r.setAt(2,2,-TOADLET_MUL_XX(sxsy,sz) + TOADLET_MUL_XX(cx,cz));
