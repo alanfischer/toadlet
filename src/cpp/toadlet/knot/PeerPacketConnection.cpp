@@ -539,7 +539,7 @@ bool PeerPacketConnection::updatePacketReceive(){
 								mPing=newPing;
 							}
 							else{
-								mPing=(float)mPing*(1.0-mPingWeighting)+(float)newPing*mPingWeighting;
+								mPing=(int)((float)mPing*(1.0-mPingWeighting)+(float)newPing*mPingWeighting);
 							}
 							break;
 						}

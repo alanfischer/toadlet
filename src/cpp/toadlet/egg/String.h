@@ -53,11 +53,10 @@ public:
 	String(const char *text);
 	String(const unsigned char *text);
 	void internal_String(const stringchar *text);
-	String(int length);
-	String(NullType *null);
 	inline String(const wchar *text){internal_String((const stringchar*)text);}
 
 	String(const String &string);
+	explicit String(int length);
 
 	~String();
 
