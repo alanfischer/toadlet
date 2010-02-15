@@ -130,9 +130,8 @@ public:
 	virtual void logicUpdate(int dt){}
 	virtual void renderUpdate(int dt){}
 
-	void modified();
-	void awake();
-	void asleep();
+	virtual void activate();
+	inline bool getActive() const{return mActive;}
 
 	inline Engine *getEngine() const{return mEngine;}
 
@@ -173,7 +172,9 @@ protected:
 	bool mCameraAligned;
 	scalar mBoundingRadius;
 	bool mReceiveUpdates;
-	int mAwakeCount; // 2=Initially Awoken, 1=Awake, 0=Asleep
+
+	bool mActive;
+	int mDeactivateCount;	
 
 	Sphere mLogicWorldBound;
 	Sphere mRenderWorldBound;

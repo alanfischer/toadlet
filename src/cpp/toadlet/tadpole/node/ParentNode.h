@@ -57,10 +57,13 @@ public:
 
 	virtual Node *findNodeByName(const egg::String &name);
 
+	virtual void activate();
+
 protected:
 	virtual void updateShadowChildren();
 
 	egg::Collection<Node::ptr> mChildren;
+	bool mActivateChildren;
 
 	bool mShadowChildrenDirty;
 	egg::Collection<Node::ptr> mShadowChildren;

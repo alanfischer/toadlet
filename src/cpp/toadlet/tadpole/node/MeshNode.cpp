@@ -41,7 +41,7 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-TOADLET_NODE_IMPLEMENT(MeshNode,"toadlet::tadpole::node::MeshNode");
+TOADLET_NODE_IMPLEMENT(MeshNode,Categories::TOADLET_TADPOLE_NODE+".MeshNode");
 
 MeshNode::SubMesh::SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh){
 	this->meshNode=meshNode;

@@ -221,7 +221,7 @@ void SimpleSync::create(){
 	scene->setUpdateListener(this);
 	scene->setGravity(Vector3(0,0,-500));
 	//scene->showCollisionVolumes(true,false);
-	scene->getSimulator()->setMicroCollisionThreshold(5);
+	scene->getSimulator()->setMicroCollisionThreshold(250);
 	if(client!=NULL){
 		scene->setLogicDT(0);
 	}
@@ -380,7 +380,7 @@ void SimpleSync::intraUpdate(int dt){
 
 //				player[client->getClientID()]->setRotate(connectionEvent->getLook());
 				player[client->getClientID()]->setCollisionBits(playerCollision);
-				player[client->getClientID()]->getSolid()->setAlwaysActive(true);
+				player[client->getClientID()]->getSolid()->setStayActive(true);
 
 				player[client->getClientID()]->attach(cameraNode);
 				cameraNode->setLookDir(Vector3(0,0,64),Math::Y_UNIT_VECTOR3,Math::Z_UNIT_VECTOR3);

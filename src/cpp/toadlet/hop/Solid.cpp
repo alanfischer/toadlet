@@ -155,9 +155,9 @@ void Solid::setInfiniteMass(){
 bool Solid::hasInfiniteMass() const{return mMass==INFINITE_MASS;}
 
 void Solid::setPosition(const Vector3 &position){
-	activate();
 	mPosition.set(position);
 	Math::add(mWorldBound,mLocalBound,mPosition);
+	activate();
 
 	// Reset touching information
 	mTouched1=NULL;
@@ -167,44 +167,44 @@ void Solid::setPosition(const Vector3 &position){
 }
 
 void Solid::setVelocity(const Vector3 &velocity){
-	activate();
 	mVelocity.set(velocity);
+	activate();
 }
 
 void Solid::addForce(const Vector3 &force){
-	activate();
 	Math::add(mForce,force);
+	activate();
 }
 
 void Solid::setLocalGravity(const Vector3 &gravity){
-	activate();
 	mLocalGravity.set(gravity);
 	mLocalGravityOverride=true;
+	activate();
 }
 
 void Solid::setWorldGravity(){
-	activate();
 	mLocalGravityOverride=false;
+	activate();
 }
 
 void Solid::addShape(Shape::ptr shape){
-	activate();
 	mShapes.add(shape);
 	shape->mSolid=this;
 	updateLocalBound();
+	activate();
 }
 
 void Solid::removeShape(Shape *shape){
-	activate();
 	mShapes.remove(shape);
 	shape->mSolid=NULL;
 	updateLocalBound();
+	activate();
 }
 
 void Solid::removeAllShapes(){
-	activate();
 	mShapes.clear();
 	updateLocalBound();
+	activate();
 }
 
 void Solid::setCollisionListener(CollisionListener *listener){
@@ -234,9 +234,9 @@ void Solid::activate(){
 	}
 }
 
-void Solid::setAlwaysActive(bool always){
+void Solid::setStayActive(bool active){
+	mDeactivateCount=(active?-1:0);
 	activate();
-	mDeactivateCount=(always?-1:0);
 }
 
 void Solid::setPositionDirect(const Vector3 &position){

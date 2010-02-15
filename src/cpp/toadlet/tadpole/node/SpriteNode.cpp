@@ -37,7 +37,7 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-TOADLET_NODE_IMPLEMENT(SpriteNode,"toadlet::tadpole::node::SpriteNode");
+TOADLET_NODE_IMPLEMENT(SpriteNode,Categories::TOADLET_TADPOLE_NODE+".SpriteNode");
 
 SpriteNode::SpriteNode():super(),
 	TOADLET_GIB_IMPLEMENT()

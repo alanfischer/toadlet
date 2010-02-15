@@ -114,7 +114,7 @@ public:
 	void *getUserData() const{return mUserData;}
 
 	void activate();
-	void setAlwaysActive(bool always);
+	void setStayActive(bool active);
 	bool getActive() const{return (mActive && mSimulator!=NULL);}
 
 	bool getInside() const{return mInside;}

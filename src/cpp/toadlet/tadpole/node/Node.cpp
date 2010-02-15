@@ -34,7 +34,7 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-TOADLET_NODE_IMPLEMENT(Node,"toadlet::tadpole::node::Node");
+TOADLET_NODE_IMPLEMENT(Node,Categories::TOADLET_TADPOLE_NODE+".Node");
 
 Node::Node():
 	mCounter(new PointerCounter(0)),
@@ -55,7 +55,9 @@ Node::Node():
 	mCameraAligned(false),
 	mBoundingRadius(0),
 	mReceiveUpdates(false),
-	mAwakeCount(0)
+	
+	mActive(false),
+	mDeactivateCount(0)
 {
 }
 
@@ -83,7 +85,9 @@ Node *Node::create(Engine *engine){
 	mScope=-1;
 	mBoundingRadius=0;
 	mReceiveUpdates=false;
-	mAwakeCount=2;
+
+	mActive=true;
+	mDeactivateCount=0;
 
 	mRenderTransform.reset();
 	mRenderWorldBound.reset();
@@ -143,7 +147,7 @@ void Node::setTranslate(const Vector3 &translate){
 	setRenderTransformTranslate(mTranslate);
 
 	mIdentityTransform=false;
-	modified();
+	activate();
 }
 
 void Node::setTranslate(scalar x,scalar y,scalar z){
@@ -152,7 +156,7 @@ void Node::setTranslate(scalar x,scalar y,scalar z){
 	setRenderTransformTranslate(mTranslate);
 
 	mIdentityTransform=false;
-	modified();
+	activate();
 }
 
 void Node::setRotate(const Matrix3x3 &rotate){
@@ -161,7 +165,7 @@ void Node::setRotate(const Matrix3x3 &rotate){
 	setRenderTransformRotateScale(mRotate,mScale);
 
 	mIdentityTransform=false;
-	modified();
+	activate();
 }
 
 void Node::setRotate(const Quaternion &rotate){
@@ -170,7 +174,7 @@ void Node::setRotate(const Quaternion &rotate){
 	setRenderTransformRotateScale(mRotate,mScale);
 
 	mIdentityTransform=false;
-	modified();
+	activate();
 }
 
 void Node::setRotate(scalar x,scalar y,scalar z,scalar angle){
@@ -179,7 +183,7 @@ void Node::setRotate(scalar x,scalar y,scalar z,scalar angle){
 	setRenderTransformRotateScale(mRotate,mScale);
 
 	mIdentityTransform=false;
-	modified();
+	activate();
 }
 
 void Node::setScale(const Vector3 &scale){
@@ -188,7 +192,7 @@ void Node::setScale(const Vector3 &scale){
 	setRenderTransformRotateScale(mRotate,mScale);
 
 	mIdentityTransform=false;
-	modified();
+	activate();
 }
 
 void Node::setScale(scalar x,scalar y,scalar z){
@@ -197,7 +201,7 @@ void Node::setScale(scalar x,scalar y,scalar z){
 	setRenderTransformRotateScale(mRotate,mScale);
 
 	mIdentityTransform=false;
-	modified();
+	activate();
 }
 
 void Node::setTransform(const Matrix4x4 &transform){
@@ -209,7 +213,7 @@ void Node::setTransform(const Matrix4x4 &transform){
 	mRenderTransform.set(transform);
 
 	mIdentityTransform=false;
-	modified();
+	activate();
 }
 
 // Currently just uses the worldRenderTransform, should be changed to walk up the scene till it finds a common parent,
@@ -241,26 +245,20 @@ void Node::setBoundingRadius(scalar boundingRadius){
 
 void Node::setReceiveUpdates(bool receiveUpdates){
 	mReceiveUpdates=receiveUpdates;
+	mDeactivateCount=(receiveUpdates?-1:0);
+	activate();
 }
 
-void Node::modified(){
-	if(mAwakeCount==0){
-		awake();
+void Node::activate(){
+	if(mDeactivateCount>0){
+		mDeactivateCount=0;
 	}
-	else if(mAwakeCount==1){
-		mAwakeCount=2;
+	if(mActive==false){
+		mActive=true;
+		if(mParent!=NULL){
+			mParent->activate();
+		}
 	}
-}
-
-void Node::awake(){
-	mAwakeCount=2;
-	if(mParent!=NULL){
-		mParent->awake();
-	}
-}
-
-void Node::asleep(){
-	mAwakeCount=0;
 }
 
 void Node::setRenderTransformTranslate(const Vector3 &translate){

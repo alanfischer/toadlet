@@ -35,7 +35,7 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-TOADLET_NODE_IMPLEMENT(CameraNode,"toadlet::tadpole::node::CameraNode");
+TOADLET_NODE_IMPLEMENT(CameraNode,Categories::TOADLET_TADPOLE_NODE+".CameraNode");
 
 CameraNode::CameraNode():super(),
 	mProjectionType(ProjectionType_FOVX),
@@ -185,7 +185,7 @@ void CameraNode::setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3
 	Math::setQuaternionFromMatrix4x4(mRotate,mRenderTransform);
 
 	mIdentityTransform=false;
-	modified();
+	activate();
 }
 
 void CameraNode::setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up){
@@ -195,7 +195,7 @@ void CameraNode::setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 
 	Math::setQuaternionFromMatrix4x4(mRotate,mRenderTransform);
 
 	mIdentityTransform=false;
-	modified();
+	activate();
 }
 
 void CameraNode::setViewport(const Viewport &viewport){

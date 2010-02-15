@@ -33,9 +33,11 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-TOADLET_NODE_IMPLEMENT(ParentNode,"toadlet::tadpole::node::ParentNode");
+TOADLET_NODE_IMPLEMENT(ParentNode,Categories::TOADLET_TADPOLE_NODE+".ParentNode");
 
 ParentNode::ParentNode():super(),
+	mActivateChildren(false),
+
 	mShadowChildrenDirty(false)
 {
 }
@@ -44,6 +46,8 @@ Node *ParentNode::create(Engine *engine){
 	super::create(engine);
 
 	mChildren.clear();
+	mActivateChildren=true;
+
 	mShadowChildren.clear();
 	mShadowChildrenDirty=false;
 
@@ -93,7 +97,7 @@ bool ParentNode::attach(Node *node){
 
 	mShadowChildrenDirty=true;
 
-	modified();
+	activate();
 
 	return true;
 }
@@ -111,7 +115,7 @@ bool ParentNode::remove(Node *node){
 
 		mShadowChildrenDirty=true;
 
-		modified();
+		activate();
 
 		return true;
 	}
@@ -141,6 +145,11 @@ Node *ParentNode::findNodeByName(const String &name){
 		}
 	}
 	return node;
+}
+
+void ParentNode::activate(){
+	mActivateChildren=true;//!mActive;
+	super::activate();
 }
 
 void ParentNode::updateShadowChildren(){
