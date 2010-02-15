@@ -43,7 +43,7 @@ public:
 	Win32DynamicLibrary();
 	~Win32DynamicLibrary();
 
-	bool load(const String &name,const String &directory=NULL,const String &prefix="",const String &extension=".dll");
+	bool load(const String &name,const String &directory=NULL,const String &prefix=NULL,const String &extension=".dll");
 
 	void *getSymbol(const String &name);
 

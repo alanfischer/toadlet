@@ -45,6 +45,7 @@ namespace egg{
 #endif
 
 class TOADLET_API String{
+	class NullType{};
 public:
 	static const int npos=-1;
 
@@ -53,7 +54,7 @@ public:
 	String(const unsigned char *text);
 	void internal_String(const stringchar *text);
 	String(int length);
-	String(long int length); // 64-bit NULL support
+	String(NullType *null);
 	inline String(const wchar *text){internal_String((const stringchar*)text);}
 
 	String(const String &string);
