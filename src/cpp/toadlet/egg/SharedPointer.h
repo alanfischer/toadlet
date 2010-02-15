@@ -174,8 +174,8 @@ public:
 		return *this;
 	}
 
-	inline SharedPointer<Type,PointerSemantics> &operator=(int null){
-		TOADLET_ASSERT(null==0);
+	inline SharedPointer<Type,PointerSemantics> &operator=(NullType *null){
+		TOADLET_ASSERT(NULL==null);
 		cleanup();
 
 		mPointer=NULL;

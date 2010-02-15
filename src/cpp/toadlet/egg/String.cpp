@@ -121,26 +121,18 @@ void String::internal_String(const stringchar *text){
 	update();
 }
 
-String::String(int length){
-	mLength=length;
-	mData=new stringchar[mLength+1];
-	mNarrowData=NULL;
-}
-
-String::String(NullType *null){
-	TOADLET_ASSERT(NULL==null);
-	mData=new stringchar[1];
-	mData[0]=0;
-	mLength=0;
-	mNarrowData=NULL;
-}
-
 String::String(const String &string){
 	mLength=string.mLength;
 	mData=new stringchar[mLength+1];
 	wcsncpy((wchar_t*)mData,(wchar_t*)string.mData,mLength+1);
 	mNarrowData=NULL;
 	update();
+}
+
+String::String(int length){
+	mLength=length;
+	mData=new stringchar[mLength+1];
+	mNarrowData=NULL;
 }
 
 String::~String(){

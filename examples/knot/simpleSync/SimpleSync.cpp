@@ -712,7 +712,7 @@ int main(int argc,char **argv){
 					remotePort=defaultPort;
 				}
 				else{
-					*p=NULL;
+					*p=0;
 					p++;
 
 					if(strlen(c)==0){

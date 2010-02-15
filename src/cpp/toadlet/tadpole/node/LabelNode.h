@@ -87,7 +87,7 @@ protected:
 	void updateLabel();
 	void updateBound();
 
-	static egg::String wordWrap(Font::ptr font,int width,const egg::String &text);
+	static egg::String wordWrap(Font::ptr font,float width,const egg::String &text);
 
 	Font::ptr mFont;
 	egg::String mText;

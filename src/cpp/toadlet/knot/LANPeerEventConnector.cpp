@@ -483,7 +483,7 @@ void LANPeerEventConnector::findLANGameThread(){
 
 	if(amount>0){
 		message=receivedData;
-		String uuid=NULL;
+		String uuid=(char*)NULL;
 		int index=message.find(':');
 		if(index>=0){
 			uuid=message.substr(0,index);

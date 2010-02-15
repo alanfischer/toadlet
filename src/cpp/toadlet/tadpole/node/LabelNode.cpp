@@ -283,11 +283,11 @@ void LabelNode::updateBound(){
 	}
 }
 
-String LabelNode::wordWrap(Font::ptr font,int width,const String &text){
+String LabelNode::wordWrap(Font::ptr font,float width,const String &text){
 	// Word wrapping algorithm
 	String result=text;
 	int spaceWidth=font->getStringWidth(" ");
-	int spaceLeft=width;
+	int spaceLeft=(int)width;
 	int start=0;
 	int end=result.find(' ');
 	while(end!=String::npos){
@@ -295,7 +295,7 @@ String LabelNode::wordWrap(Font::ptr font,int width,const String &text){
 		int wordWidth=font->getStringWidth(word);
 		if(wordWidth>spaceLeft){
 			result=result.substr(0,start)+(char)10+result.substr(start,result.length());
-			spaceLeft=width-wordWidth;
+			spaceLeft=(int)width-wordWidth;
 		}
 		else{
 			spaceLeft=spaceLeft-(wordWidth + spaceWidth);

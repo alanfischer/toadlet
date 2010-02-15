@@ -144,7 +144,7 @@ bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const Stri
 				x=-lineLength/2;
 			}
 
-			y+=mPointSize;
+			y+=(int)mPointSize;
 		}
 
 		c=string.at(i);
@@ -231,13 +231,13 @@ int Font::getStringWidth(const String &string,int start,int end) const{
 }
 
 int Font::getStringHeight(const String &string,int start,int end) const{
-	int height=mPointSize;
+	int height=(int)mPointSize;
 
 	int i;
 	for(i=start;i<end;++i){
 		wchar c=string.at(i);
 		if(c==(char)10){
-			height+=mPointSize;
+			height+=(int)mPointSize;
 		}
 	}
 
