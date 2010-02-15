@@ -157,7 +157,7 @@ bool ZIPArchive::open(Stream::ptr stream){
 	mStream=stream;
 
 	int id=toadlet_zzip_openStream(stream);
-	String idString=String("")+id;
+	String idString=String()+id;
 	mDir=(void*)zzip_dir_open_ext_io(idString.c_str(),NULL,NULL,(zzip_plugin_io_handlers*)mIO);
 
 	return mDir!=NULL;

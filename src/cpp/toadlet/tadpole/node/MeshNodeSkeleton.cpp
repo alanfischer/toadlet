@@ -102,7 +102,7 @@ String MeshNodeSkeleton::getBoneName(int index) const{
 		return mSkeleton->bones[index]->name;
 	}
 	else{
-		return "";
+		return NULL;
 	}
 }
 

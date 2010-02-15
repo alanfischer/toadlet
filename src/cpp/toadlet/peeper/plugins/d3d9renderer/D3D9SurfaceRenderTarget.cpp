@@ -135,8 +135,8 @@ bool D3D9SurfaceRenderTarget::remove(Surface::ptr surface){
 		return false;
 	}
 
-	mSurfaces.remove(i);
-	mSurfaceAttachments.remove(i);
+	mSurfaces.removeAt(i);
+	mSurfaceAttachments.removeAt(i);
 	mNeedsCompile=true;
 
 	return true;

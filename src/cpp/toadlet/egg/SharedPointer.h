@@ -60,6 +60,7 @@ class WeakPointer;
 	template<typename Type,typename PointerSemantics=DefaultSharedSemantics>
 #endif
 class SharedPointer{
+	class NullType{};
 public:
 	explicit inline SharedPointer(Type *pointer){
 		mPointer=pointer;
@@ -105,8 +106,8 @@ public:
 		}
 	}
 
-	inline SharedPointer(int null){
-		TOADLET_ASSERT(null==0);
+	inline SharedPointer(NullType *null){
+		TOADLET_ASSERT(NULL==null);
 		mPointer=NULL;
 		mCount=NULL;
 	}

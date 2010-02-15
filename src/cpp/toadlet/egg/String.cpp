@@ -23,6 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Assert.h>
 #include <toadlet/egg/String.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -126,9 +127,11 @@ String::String(int length){
 	mNarrowData=NULL;
 }
 
-String::String(long int length){
-	mLength=length;
-	mData=new stringchar[mLength+1];
+String::String(NullType *null){
+	TOADLET_ASSERT(NULL==null);
+	mData=new stringchar[1];
+	mData[0]=0;
+	mLength=0;
 	mNarrowData=NULL;
 }
 
