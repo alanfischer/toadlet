@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "msPlugInImpl.h"
+#include "../shared/msConversion.h"
 
 #include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/Engine.h>
@@ -43,8 +44,6 @@ CreatePlugIn ()
 cPlugIn::cPlugIn ()
 {
     strcpy (szTitle, "Toadlet Mesh/Animation...");
-	Math::setMatrix3x3FromX(milkshapeToToadlet,Math::degToRad(90));
-	Math::setMatrix3x3FromX(toadletToMilkshape,Math::degToRad(-90));
 }
 
 
@@ -80,31 +79,6 @@ public:
 		return v.position==position && v.normal==normal && v.texCoord==texCoord && v.bone==bone;
 	}
 };
-
-void
-cPlugIn::convertMSVec3ToVector3(const msVec3 &msvec,Vector3 &tvec,bool rotate){
-	tvec.x=msvec[0];
-	tvec.y=msvec[1];
-	tvec.z=msvec[2];
-	if(rotate){
-		Math::mul(tvec,milkshapeToToadlet);
-	}
-}
-
-void
-cPlugIn::convertMSVec3ToQuaternion(const msVec3 &msvec,Quaternion &quat,bool rotate){
-	EulerAngle angle(-msvec[0],-msvec[1],-msvec[2]);
-//	Matrix3x3 matrix;
-//	Math::setMatrix3x3FromEulerAngleXYZ(matrix,angle);
-//	if(rotate){
-//		// This multiply uses toadletToMilkshape, seems odd but it works
-//		matrix=matrix*toadletToMilkshape;
-//	}
-//	Math::setQuaternionFromMatrix3x3(quat,matrix);
-	Math::setQuaternionFromEulerAngleXYZ(quat,angle);
-	quat.w*=-1.0f;
-	Math::normalize(quat);
-}
 
 int
 cPlugIn::Execute (msModel *pModel)

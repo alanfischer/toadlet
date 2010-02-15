@@ -309,6 +309,7 @@ namespace Math{
 		return result;
 	}
 
+	// The predicision on this can be somewhat poor, so if speed isnt an issue, its suggested to convert to float and use math::Math::atan2
 	inline fixed atan2(fixed y,fixed x){
 		fixed absy=(y^(y>>31))-(y>>31)+1; // Add an epsilon to avoid div zero
 		fixed angle;

@@ -34,7 +34,6 @@ using namespace toadlet;
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
 using namespace toadlet::egg::math;
-using namespace toadlet::egg::math::Math;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole;
 using namespace toadlet::tadpole::mesh;
@@ -46,10 +45,10 @@ Vector3 BACTriangle::normal(){
 	Vector3 v0=vertex[1]->position-vertex[0]->position;
 	Vector3 v1=vertex[2]->position-vertex[0]->position;
 	Vector3 n;
-	cross(n,v0,v1);
+	Math::cross(n,v0,v1);
 
-	if(lengthSquared(n)!=0){
-		normalize(n);
+	if(Math::lengthSquared(n)!=0){
+		Math::normalize(n);
 	}
 
 	return n;
@@ -68,12 +67,12 @@ float BACQuad::computeSP(){
 		if(i==3) in=0;
 
 		vn=vertex[in]->position-vertex[i]->position;
-		normalize(vn);
+		Math::normalize(vn);
 
 		vp=vertex[ip]->position-vertex[i]->position;
-		normalize(vp);
+		Math::normalize(vp);
 
-		sp+=fabs(dot(vn,vp));
+		sp+=Math::abs(Math::dot(vn,vp));
 	}
 
 	return sp;
@@ -180,6 +179,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 			texCoordList.add(t);
 		}
 	}
+	vba.unlock();
 
 	Logger::alert(String("Initial numbers: ") + vertexList.size() + " vertices and " + texCoordList.size() + " texture coords");
 
@@ -205,7 +205,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 			if(	fabs(v1->position[0]-v2->position[0])<mPositionEpsilon &&
 				fabs(v1->position[1]-v2->position[1])<mPositionEpsilon &&
 				fabs(v1->position[2]-v2->position[2])<mPositionEpsilon &&
-				dot(v1->normal,v2->normal)>=1.0f-mNormalEpsilon &&
+				Math::dot(v1->normal,v2->normal)>=1.0f-mNormalEpsilon &&
 				v1->bone==v2->bone){
 				// Store the mapping of vertexData id to mVertices id
 				vertexMap[v2->id]=i;
@@ -310,6 +310,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 			
 			mTriangles.add(tri);
 		}
+		iba.unlock();
 
 		// Extract materials
 		for(j=0;j<1/*sub->getNumMaterials()*/;++j){
@@ -511,7 +512,7 @@ void BACConverter::constructQuads(){
 			}
 			
 			// If we share an edge, and if the normals of the 2 triangles are within epsilon, store it
-			if(count==2 && dot(tri1->normal(),tri2->normal())>=1.0f-mNormalEpsilon){
+			if(count==2 && Math::dot(tri1->normal(),tri2->normal())>=1.0f-mNormalEpsilon){
 				BACSharedEdge e;
 				e.tri=tri2;
 				e.edge[0]=idMatch[0];
@@ -721,17 +722,17 @@ void BACConverter::adjustVertexes(float amount){
 		Vector3 dir;
 
 		dir=tri1->vertex[0]->position-center;
-		normalize(dir);
+		Math::normalize(dir);
 		dir*=amount;
 		tri1->vertex[0]->position+=dir;
 
 		dir=tri1->vertex[1]->position-center;
-		normalize(dir);
+		Math::normalize(dir);
 		dir*=amount;
 		tri1->vertex[1]->position+=dir;
 
 		dir=tri1->vertex[2]->position-center;
-		normalize(dir);
+		Math::normalize(dir);
 		dir*=amount;
 		tri1->vertex[2]->position+=dir;
 	}
@@ -748,22 +749,22 @@ void BACConverter::adjustVertexes(float amount){
 		Vector3 dir;
 
 		dir=quad1->vertex[0]->position-center;
-		normalize(dir);
+		Math::normalize(dir);
 		dir*=amount;
 		quad1->vertex[0]->position+=dir;
 
 		dir=quad1->vertex[1]->position-center;
-		normalize(dir);
+		Math::normalize(dir);
 		dir*=amount;
 		quad1->vertex[1]->position+=dir;
 
 		dir=quad1->vertex[2]->position-center;
-		normalize(dir);
+		Math::normalize(dir);
 		dir*=amount;
 		quad1->vertex[2]->position+=dir;
 
 		dir=quad1->vertex[3]->position-center;
-		normalize(dir);
+		Math::normalize(dir);
 		dir*=amount;
 		quad1->vertex[3]->position+=dir;
 	}
@@ -1170,7 +1171,7 @@ bool BACConverter::convertAnimation(Mesh::ptr mesh,Sequence *animation,Stream *o
 void BACConverter::extractAnimationData(Mesh *mesh,Sequence *animation){
 	int i,j;
 
-	mTotalFrame=(animation->length*EXPORT_FPS)/1000+1; // Must add 1 so we are above the max keyFrame.time*EXPORT_FPS
+	mTotalFrame=(animation->length*EXPORT_FPS)+1; // Must add 1 so we are above the max keyFrame.time*EXPORT_FPS
 
 	for(i=0;i<animation->tracks.size();++i){
 		Track *track=animation->tracks[i];
@@ -1214,17 +1215,16 @@ void BACConverter::extractAnimationData(Mesh *mesh,Sequence *animation){
 				Matrix3x3 keyframeRotate; Math::setMatrix3x3FromQuaternion(keyframeRotate,keyFrame.rotate);
 				Matrix3x3 matrix=invBoneRotate*keyframeRotate;
 				zAxis=matrix*zAxis;
-				normalize(zAxis);
+				Math::normalize(zAxis);
 
-#error setEulerAngleXYZFromMatrix3x3 was modified, so we may need to change which portion is "roll", though Z should be bank
-#error  Perhaps it will just work?
-				EulerAngle euler; Math::setEulerAngleXYZFromMatrix3x3(euler,matrix);
-				float roll=euler.z;
+				// If we're using toadlet's standard EulerAngles, then roll is matrix->euler.y, used to be matrix->euler.z
+				//  But to avoid breakage if we rework the EulerAngle format, we just manually calculate the roll from the matrix
+				float roll=Math::atan2(-matrix.at(0,1),matrix.at(0,0));
 
 				bacbone->rotatex.add(Pair<int,float>(frame,zAxis.x*100.0f));
 				bacbone->rotatey.add(Pair<int,float>(frame,zAxis.y*100.0f));
 				bacbone->rotatez.add(Pair<int,float>(frame,zAxis.z*100.0f));
-				bacbone->roll.add(Pair<int,float>(frame,radToDeg(roll)));
+				bacbone->roll.add(Pair<int,float>(frame,Math::radToDeg(roll)));
 			}
 
 			// Clean out redundant information
