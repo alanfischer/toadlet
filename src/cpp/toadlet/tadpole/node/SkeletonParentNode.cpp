@@ -32,7 +32,7 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-TOADLET_NODE_IMPLEMENT(SkeletonParentNode,"toadlet::tadpole::node::SkeletonParentNode");
+TOADLET_NODE_IMPLEMENT(SkeletonParentNode,Categories::TOADLET_TADPOLE_NODE+".SkeletonParentNode");
 
 SkeletonParentNode::SkeletonParentNode():super(){}
 

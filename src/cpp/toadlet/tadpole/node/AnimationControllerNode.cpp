@@ -34,7 +34,7 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-TOADLET_NODE_IMPLEMENT(AnimationControllerNode,"toadlet::tadpole::node::AnimationControllerNode");
+TOADLET_NODE_IMPLEMENT(AnimationControllerNode,Categories::TOADLET_TADPOLE_NODE+".AnimationControllerNode");
 
 AnimationControllerNode::AnimationControllerNode():super(),
 	//mAnimationController,

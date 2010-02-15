@@ -28,13 +28,14 @@
 #include <toadlet/tadpole/node/SceneNode.h>
 #include <toadlet/tadpole/Engine.h>
 
+using namespace toadlet::egg;
 using namespace toadlet::peeper;
 
 namespace toadlet{
 namespace tadpole{
 namespace node{
 
-TOADLET_NODE_IMPLEMENT(LightNode,"toadlet::tadpole::node::LightNode");
+TOADLET_NODE_IMPLEMENT(LightNode,Categories::TOADLET_TADPOLE_NODE+".LightNode");
 
 LightNode::LightNode():super()
 	//mLight(NULL)

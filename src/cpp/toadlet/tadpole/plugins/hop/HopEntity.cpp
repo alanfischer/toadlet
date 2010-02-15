@@ -37,7 +37,7 @@ using namespace toadlet::tadpole::mesh;
 namespace toadlet{
 namespace tadpole{
 
-TOADLET_NODE_IMPLEMENT(HopEntity,"toadlet::tadpole::HopEntity");
+TOADLET_NODE_IMPLEMENT(HopEntity,Categories::TOADLET_TADPOLE+".HopEntity");
 
 HopEntity::HopEntity():ParentNode(),
 	mNextThink(0),
@@ -327,7 +327,7 @@ void HopEntity::preLogicUpdateLoop(int dt){
 void HopEntity::postLogicUpdate(int dt){
 	if(mSolid->getActive()){
 		mTranslate.set(mSolid->getPosition());
-		modified();
+		activate();
 	}
 
 	if(mNextThink>0){

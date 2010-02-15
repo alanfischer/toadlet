@@ -37,7 +37,7 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-TOADLET_NODE_IMPLEMENT(LabelNode,"toadlet::tadpole::node::LabelNode");
+TOADLET_NODE_IMPLEMENT(LabelNode,Categories::TOADLET_TADPOLE_NODE+".LabelNode");
 
 LabelNode::LabelNode():super(),
 	TOADLET_GIB_IMPLEMENT()

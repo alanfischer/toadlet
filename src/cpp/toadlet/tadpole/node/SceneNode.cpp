@@ -47,7 +47,7 @@ namespace node{
 //	- Modify HopScene so it prunes the results to the Spacial volumes if the bit is set.
 //	- Test that SceneNode returns proper AABoxQuery results for logic volumes
 
-TOADLET_NODE_IMPLEMENT(SceneNode,"toadlet::tadpole::node::SceneNode");
+TOADLET_NODE_IMPLEMENT(SceneNode,Categories::TOADLET_TADPOLE_NODE+".SceneNode");
 
 SceneNode::SceneNode():super(),
 	mChildScene (NULL),
@@ -239,35 +239,41 @@ void SceneNode::logicUpdate(Node::ptr node,int dt){
 		Math::add(node->mWorldTranslate,node->mParent->mWorldTranslate);
 	}
 
-	bool awake=node->mReceiveUpdates;
 	ParentNode *parent=node->isParent();
+	bool childrenActive=false;
 	if(parent!=NULL){
 		if(parent->mShadowChildrenDirty){
 			parent->updateShadowChildren();
 		}
 
-		Node *child;
 		int numChildren=parent->mShadowChildren.size();
+		Node *child=NULL;
 		int i;
 		for(i=0;i<numChildren;++i){
 			child=parent->mShadowChildren[i];
-			if(parent->mAwakeCount>1){
-				child->modified();
+			if(parent->mActivateChildren){
+				child->activate();
 			}
-			if(child->mAwakeCount>0){
+			if(child->getActive()){
 				logicUpdate(child,dt);
-				awake=true;
+				childrenActive=true;
 			}
 		}
-		if(parent->mAwakeCount>1){
-//			parent->mAwakeCount--;
-		}
+
+		parent->mActivateChildren=false;
 	}
-	if(awake==false && node->mAwakeCount>0){
-//		node->mAwakeCount--;
-//		if(node->mAwakeCount==0){
-//			node->asleep();
-//		}
+	
+	if(node->mDeactivateCount>=0){
+		if(childrenActive==false){
+			node->mDeactivateCount++;
+			if(node->mDeactivateCount>4){
+				node->mActive=false;
+				node->mDeactivateCount=0;
+			}
+		}
+		else{
+			node->mDeactivateCount=0;
+		}
 	}
 }
 
@@ -318,7 +324,7 @@ void SceneNode::renderUpdate(Node::ptr node,int dt){
 		int i;
 		for(i=0;i<numChildren;++i){
 			child=parent->mShadowChildren[i];
-			if(child->mAwakeCount>0){
+			if(child->getActive()){
 				renderUpdate(child,dt);
 			}
 

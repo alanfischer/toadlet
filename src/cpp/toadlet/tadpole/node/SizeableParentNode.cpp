@@ -33,7 +33,7 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-TOADLET_NODE_IMPLEMENT(SizeableParentNode,"toadlet::tadpole::node::SizeableParentNode");
+TOADLET_NODE_IMPLEMENT(SizeableParentNode,Categories::TOADLET_TADPOLE_NODE+".SizeableParentNode");
 
 SizeableParentNode::SizeableParentNode():super(),
 	mLayout(Layout_NONE)

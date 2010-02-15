@@ -35,7 +35,7 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-TOADLET_NODE_IMPLEMENT(AudioNode,"toadlet::tadpole::node::AudioNode");
+TOADLET_NODE_IMPLEMENT(AudioNode,Categories::TOADLET_TADPOLE_NODE+".AudioNode");
 
 AudioNode::AudioNode():super(){}
 

@@ -39,7 +39,7 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-TOADLET_NODE_IMPLEMENT(ParticleNode,"toadlet::tadpole::node::ParticleNode");
+TOADLET_NODE_IMPLEMENT(ParticleNode,Categories::TOADLET_TADPOLE_NODE+".ParticleNode");
 
 ParticleNode::ParticleNode():super(),
 	TOADLET_GIB_IMPLEMENT()
