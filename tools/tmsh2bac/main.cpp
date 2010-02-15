@@ -189,6 +189,8 @@ int main(int argc,char **argv){
 			continue;
 		}
 
+		mesh->retain();
+
 		// Prepare the output file
 		int loc=mshFileName.rfind('.');
 		String bacFileName=mshFileName.substr(0,loc)+String(".bac");
@@ -229,6 +231,8 @@ int main(int argc,char **argv){
 				}
 			}
 		}
+
+		mesh->release();
 	}
 
 	delete engine;

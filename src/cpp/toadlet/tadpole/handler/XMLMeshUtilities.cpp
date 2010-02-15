@@ -1149,7 +1149,12 @@ Sequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int version){
 		Track::ptr track(new Track());
 		sequence->tracks.add(track);
 
-		prop=mxmlElementGetAttr(trackNode,"Index");
+		if(version<=2){
+			prop=mxmlElementGetAttr(trackNode,"Bone");
+		}
+		else{
+			prop=mxmlElementGetAttr(trackNode,"Index");
+		}
 		if(prop!=NULL){
 			track->index=parseInt(prop);
 		}
@@ -1213,7 +1218,12 @@ mxml_node_t *XMLMeshUtilities::saveSequence(Sequence::ptr sequence,int version){
 
 		mxml_node_t *trackNode=mxmlNewElement(sequenceNode,"Track");
 
-		mxmlElementSetAttr(trackNode,"Index",makeInt(track->index));
+		if(version<=2){
+			mxmlElementSetAttr(trackNode,"Index",makeInt(track->index));
+		}
+		else{
+			mxmlElementSetAttr(trackNode,"Bone",makeInt(track->index));
+		}
 
 		int k;
 		for(k=0;k<track->keyFrames.size();++k){

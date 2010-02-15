@@ -41,7 +41,7 @@ TextureManager::TextureManager(Engine *engine):ResourceManager(engine->getArchiv
 }
 
 Texture::ptr TextureManager::createTexture(const Image::ptr &image,int usageFlags,int mipLevels){
-	bool hasAutogen=mEngine->getRenderer()->getCapabilitySet().textureAutogenMipMaps;
+	bool hasAutogen=mEngine->getRenderer()==NULL?false:mEngine->getRenderer()->getCapabilitySet().textureAutogenMipMaps;
 	bool wantsAutogen=(usageFlags&Texture::UsageFlags_AUTOGEN_MIPMAPS)>0;
 
 	if(hasAutogen==false && wantsAutogen==true){

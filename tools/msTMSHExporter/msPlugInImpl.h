@@ -13,8 +13,6 @@ struct msModel;
 class cPlugIn : public cMsPlugIn
 {
     char szTitle[64];
-	Matrix3x3 milkshapeToToadlet;
-	Matrix3x3 toadletToMilkshape;
 
 	class Frame{
 	public:
@@ -31,8 +29,6 @@ class cPlugIn : public cMsPlugIn
 		float time;
 	};
 
-	void convertMSVec3ToVector3(const msVec3 &msvec,Vector3 &tvec,bool rotate);
-	void convertMSVec3ToQuaternion(const msVec3 &msvec,Quaternion &quat,bool rotate);
 	Skeleton::ptr buildSkeleton(msModel *pModel,const Collection<int> &emptyBones);
 	int exportMesh(msModel *pModel,const String &sname);
 	int exportAnimation(msModel *pModel,const String &sname);
