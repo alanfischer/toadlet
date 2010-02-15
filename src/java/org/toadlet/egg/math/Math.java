@@ -717,28 +717,49 @@ public final class Math{
 	}
 
 	// EulerAngle operations
-	public static boolean setEulerAngleXYZFromMatrix3x3(EulerAngle r,Matrix3x3 m){
-		r.y=asin(m.at(0,2));
-		if(r.y<HALF_PI){
-			if(r.y>-HALF_PI){
-				r.x=atan2(-m.at(1,2),m.at(2,2));
-				r.z=atan2(-m.at(0,1),m.at(0,0));
-				return true;
-			}
-			else{
-				// WARNING: Not a unique solution.
-				real my=atan2(m.at(1,0),m.at(1,1));
-				r.z=0.0f; // any angle works
-				r.x=r.z-my;
-				return false;
-			}
+	public static boolean setEulerAngleXYZFromMatrix3x3(EulerAngle r,Matrix3x3 m,real epsilon){
+		if(m.at(1,0)>1-epsilon){ // North Pole singularity
+			r.x=atan2(m.at(0,2),m.at(2,2));
+			r.y=HALF_PI;
+			r.z=0;
+			return false;
+		}
+		else if(m.at(1,0)<-(1-epsilon)){ // South Pole singularity
+			r.x=atan2(m.at(0,2),m.at(2,2));
+			r.y=-HALF_PI;
+			r.z=0;
+			return false;
 		}
 		else{
-			// WARNING: Not a unique solution.
-			real py=atan2(m.at(1,0),m.at(1,1));
-			r.z=0.0f; // any angle works
-			r.x=py-r.z;
+			r.x=atan2(-m.at(2,0),m.at(0,0));
+			r.y=asin(m.at(1,0));
+			r.z=atan2(-m.at(1,2),m.at(1,1));
+			return true;
+		}
+	}
+
+	public static boolean setEulerAngleXYZFromQuaternion(EulerAngle r,Quaternion q,real epsilon){
+		real test=q.x*q.y + q.z*q.w;
+		if(test>0.5-epsilon){ // North Pole singularity
+			r.x=2*atan2(q.x,q.w);
+			r.y=HALF_PI;
+			r.z=0;
 			return false;
+		}
+		else if(test<-(0.5-epsilon)){ // South Pole singularity
+			r.x=-2*atan2(q.x,q.w);
+			r.y=-HALF_PI;
+			r.z=0;
+			return false;
+		}
+		else{
+			real sqx=q.x*q.x;
+			real sqy=q.y*q.y;
+			real sqz=q.z*q.z;
+			r.x=atan2(2*q.y*q.w-2*q.x*q.z, 1 - 2*sqy - 2*sqz);
+			r.y=asin(2*test);
+			r.z=atan2(2*q.x*q.w-2*q.y*q.z, 1 - 2*sqx - 2*sqz);
+			return true;
 		}
 	}
 
@@ -1176,15 +1197,14 @@ public final class Math{
 		real cz=cos(euler.z); \
 		real sz=sin(euler.z); \
 		real cxsy=(cx*sy); \
-		real cycz=(cy*cz); \
 		real sxsy=(sx*sy); \
 		\
 		r.setAt(0,0,(cx*cy)); \
 		r.setAt(0,1,(sx*sz) - (cxsy*cz)); \
 		r.setAt(0,2,(cxsy*sz) + (sx*cz)); \
 		r.setAt(1,0,sy); \
-		r.setAt(1,1,cycz); \
-		r.setAt(1,2,-cycz); \
+		r.setAt(1,1,(cy*cz)); \
+		r.setAt(1,2,-(cy*sz)); \
 		r.setAt(2,0,-(sx*cy)); \
 		r.setAt(2,1,(sxsy*cz) + (cx*sz)); \
 		r.setAt(2,2,-(sxsy*sz) + (cx*cz)); \

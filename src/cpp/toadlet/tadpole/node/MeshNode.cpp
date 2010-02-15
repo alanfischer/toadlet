@@ -320,38 +320,43 @@ void MeshNode::updateVertexBuffer(){
 			// TODO: Research this more, and see if this is a known problem
 			memcpy(dvba.getData(),svba.getData(),srcVertexBuffer->getDataSize());
 
-			Vector3 &vector=cache_updateVertexBuffer_vector.reset();
+			Vector3 &positionVector=cache_updateVertexBuffer_positionVector.reset();
+			Vector3 &normalVector=cache_updateVertexBuffer_normalVector.reset();
 
 			int i;
 			if(format->hasVertexElementOfType(VertexElement::Type_NORMAL)){
 				int normalElement=format->getVertexElementIndexOfType(VertexElement::Type_NORMAL);
 				for(i=0;i<srcVertexBuffer->getSize();++i){
-					MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(mMesh->vertexBoneAssignments[i][0].bone); // TODO: Implement all bones
+					svba.get3(i,positionElement,positionVector);
+					svba.get3(i,normalElement,normalVector);
 
-					svba.get3(i,positionElement,vector);
+					const Mesh::VertexBoneAssignmentList &vba=mMesh->vertexBoneAssignments[i];
+					if(vba.size()>0){
+						MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(mMesh->vertexBoneAssignments[i][0].bone); // TODO: Implement all bones
 
-					Math::mul(vector,bone->boneSpaceRotate);
-					Math::add(vector,bone->boneSpaceTranslate);
+						Math::mul(positionVector,bone->boneSpaceRotate);
+						Math::add(positionVector,bone->boneSpaceTranslate);
 
-					dvba.set3(i,positionElement,vector);
-
-					svba.get3(i,normalElement,vector);
-
-					Math::mul(vector,bone->boneSpaceRotate);
-
-					dvba.set3(i,normalElement,vector);
+						Math::mul(normalVector,bone->boneSpaceRotate);
+					}
+				
+					dvba.set3(i,positionElement,positionVector);
+					dvba.set3(i,normalElement,normalVector);
 				}
 			}
 			else{
 				for(i=0;i<srcVertexBuffer->getSize();++i){
-					MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(mMesh->vertexBoneAssignments[i][0].bone); // TODO: Implement all bones
+					svba.get3(i,positionElement,positionVector);
 
-					svba.get3(i,positionElement,vector);
+					const Mesh::VertexBoneAssignmentList &vba=mMesh->vertexBoneAssignments[i];
+					if(vba.size()>0){
+						MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(mMesh->vertexBoneAssignments[i][0].bone); // TODO: Implement all bones
 
-					Math::mul(vector,bone->boneSpaceRotate);
-					Math::add(vector,bone->boneSpaceTranslate);
+						Math::mul(positionVector,bone->boneSpaceRotate);
+						Math::add(positionVector,bone->boneSpaceTranslate);
+					}
 
-					dvba.set3(i,positionElement,vector);
+					dvba.set3(i,positionElement,positionVector);
 				}
 			}
 

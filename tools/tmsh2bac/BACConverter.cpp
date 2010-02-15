@@ -1216,6 +1216,8 @@ void BACConverter::extractAnimationData(Mesh *mesh,Sequence *animation){
 				zAxis=matrix*zAxis;
 				normalize(zAxis);
 
+#error setEulerAngleXYZFromMatrix3x3 was modified, so we may need to change which portion is "roll", though Z should be bank
+#error  Perhaps it will just work?
 				EulerAngle euler; Math::setEulerAngleXYZFromMatrix3x3(euler,matrix);
 				float roll=euler.z;
 

@@ -9,9 +9,6 @@
 #include <AR/param.h>			// arParamDisp()
 #include <AR/ar.h>
 
-#pragma comment(lib,"AR.lib")
-#pragma comment(lib,"ARvideo.lib")
-
 using namespace toadlet::egg;
 using namespace toadlet::pad;
 using namespace toadlet::peeper;
@@ -104,10 +101,12 @@ public:
 		mLight->setDirection(Math::NEG_Z_UNIT_VECTOR3);
 		mEngine->getScene()->getRootNode()->attach(mLight);
 
+Logger::alert("Setting up camera");
 		if (!setupARCamera("../data/camera_para.dat", "", &mARTCparam)) {
 			Error::unknown("error setting up camera");
 			return;
 		}
+Logger::alert("Setting up done");
 	
 		mPatternIDs.resize(2);
 		if((mPatternIDs[0]=arLoadPatt("../data/patt.sample1"))<0){

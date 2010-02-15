@@ -269,9 +269,9 @@ void SimpleSync::create(){
 		player[i]->setCoefficientOfRestitutionOverride(true);
 		player[i]->addShape(Shape::ptr(new Shape(AABox(-16,-16,0,16,16,64))));
 		{
-//			Mesh::ptr mesh=getEngine()->getMeshManager()->createBox(player[i]->getShape(0)->getAABox());
-//			mesh->subMeshes[0]->material->setLightEffect(i==0?Colors::GREEN:Colors::CYAN);
-			Mesh::ptr mesh=getEngine()->getMeshManager()->findMesh("pyro_ref.xmsh");
+			Mesh::ptr mesh=getEngine()->getMeshManager()->createBox(player[i]->getShape(0)->getAABox());
+			mesh->subMeshes[0]->material->setLightEffect(i==0?Colors::GREEN:Colors::CYAN);
+//			Mesh::ptr mesh=getEngine()->getMeshManager()->findMesh("pyro_ref.xmsh");
 			MeshNode::ptr meshNode=getEngine()->createNodeType(MeshNode::type());
 			meshNode->setMesh(mesh);
 			player[i]->attach(meshNode);
