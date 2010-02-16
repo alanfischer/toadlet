@@ -268,7 +268,7 @@ void HopScene::preRenderUpdate(int dt){
 		if(active || activePrevious){
 			// TODO: Add an option to either use strict interpolation, or fuzzy interpolation
 			// If we are deactivating, then make sure we are at our rest point
-#if 0
+#if 1
 			if(active==false && activePrevious){
 				entity->interpolatePhysicalParameters(Math::ONE);
 			}

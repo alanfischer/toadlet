@@ -53,6 +53,7 @@ public:
 	void mouseMoved(int x,int y);
 	void mouseReleased(int x,int y,int button);
 
+	void updatePlayerView(const EulerAngle &angle,HopEntity::ptr entity);
 	void updatePlayer(Event::ptr event,HopEntity::ptr entity);
 
 	Event::ptr createEventType(int type);
@@ -64,6 +65,9 @@ public:
 
 	SimplePredictedClient::ptr client;
 	SimpleServer::ptr server;
+	Mutex mutex;
+	Collection<int> playersConnected;
+	Collection<int> playersDisconnected;
 
 	HopScene::ptr scene;
 	int nextUpdateTime;
@@ -79,7 +83,7 @@ public:
 	HopEntity::ptr block;
 	HopEntity::ptr player[2];
 
-	int playerCollision;
+	int playerScope;
 	int lastClientUpdateCounter[2];
 	int flags;
 	EulerAngle angles;

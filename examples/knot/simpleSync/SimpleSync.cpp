@@ -162,6 +162,15 @@ protected:
 	Collection<Vector3> mVelocitys;
 };
 
+class Player:public HopEntity{
+public:
+	Player():HopEntity(){}
+	
+	Node *create(Engine *engine){HopEntity::create(engine);setReceiveUpdates(true);return this;}
+	
+	void logicUpdate(int dt){}
+};
+
 SimpleSync::SimpleSync():Application(),
 	nextUpdateTime(0),
 	clientServerTimeDifference(0),
@@ -223,10 +232,10 @@ void SimpleSync::create(){
 	//scene->showCollisionVolumes(true,false);
 	scene->getSimulator()->setMicroCollisionThreshold(250);
 	if(client!=NULL){
-		scene->setLogicDT(0);
+		scene->setLogicDT(20);
 	}
 	else{
-		scene->setLogicDT(0);
+		scene->setLogicDT(20);
 	}
 
 	scene->getRootNode()->attach(getEngine()->createNodeType(LightNode::type()));
@@ -264,7 +273,7 @@ void SimpleSync::create(){
 
 	int i;
 	for(i=0;i<2;++i){
-		player[i]=getEngine()->createNodeType(HopEntity::type());
+		player[i]=(HopEntity*)(new Player())->create(getEngine());//getEngine()->createNodeType(HopEntity::type());
 		player[i]->setCoefficientOfRestitution(0);
 		player[i]->setCoefficientOfRestitutionOverride(true);
 		player[i]->addShape(Shape::ptr(new Shape(AABox(-16,-16,0,16,16,64))));
@@ -280,11 +289,9 @@ void SimpleSync::create(){
 		scene->getRootNode()->attach(player[i]);
 	}
 
-	playerCollision=1<<0;
+	playerScope=1<<0;
 	if(server!=NULL){
-		player[0]->setCollisionBits(playerCollision);
 		player[0]->setRotate(0,0,Math::ONE,0);
-		player[1]->setCollisionBits(playerCollision);
 		player[1]->setRotate(0,0,Math::ONE,Math::PI);
 	}
 }
@@ -320,17 +327,21 @@ void SimpleSync::render(Renderer *renderer){
 	renderer->swap();
 }
 
-void SimpleSync::updatePlayer(Event::ptr event,HopEntity::ptr entity){
-	ClientUpdateEvent::ptr clientEvent=shared_static_cast<ClientUpdateEvent>(event);
+void SimpleSync::updatePlayerView(const EulerAngle &look,HopEntity::ptr entity){
 	Quaternion playerRotate,cameraRotate;
 	EulerAngle angle;
-	Math::setQuaternionFromEulerAngleXYZ(playerRotate,angle.set(0,clientEvent->getLook().y,0));
-	Math::setQuaternionFromEulerAngleXYZ(cameraRotate,angle.set(0,0,clientEvent->getLook().z+Math::HALF_PI));
+	Math::setQuaternionFromEulerAngleXYZ(playerRotate,angle.set(0,look.y,0));
+	Math::setQuaternionFromEulerAngleXYZ(cameraRotate,angle.set(0,0,look.z+Math::HALF_PI));
 	entity->setRotate(playerRotate);
 	CameraNode *camera=(CameraNode*)entity->findNodeByName("camera");
 	if(camera!=NULL){
 		camera->setRotate(cameraRotate);
 	}
+}
+
+void SimpleSync::updatePlayer(Event::ptr event,HopEntity::ptr entity){
+	ClientUpdateEvent::ptr clientEvent=shared_static_cast<ClientUpdateEvent>(event);
+	updatePlayerView(clientEvent->getLook(),entity);
 
 	int flags=clientEvent->getFlags();
 	Vector3 velocity;
@@ -366,10 +377,15 @@ void SimpleSync::updatePlayer(Event::ptr event,HopEntity::ptr entity){
 }
 
 void SimpleSync::update(int dt){
+	mutex.lock();
+	mutex.unlock();
+
 	scene->update(dt);
 }
 
 void SimpleSync::intraUpdate(int dt){
+	int i;
+
 	if(client!=NULL){
 		Event::ptr event=NULL;
 		while((event=client->receive())!=NULL){
@@ -379,7 +395,7 @@ void SimpleSync::intraUpdate(int dt){
 				client->handleConnectionEvent(connectionEvent);
 
 //				player[client->getClientID()]->setRotate(connectionEvent->getLook());
-				player[client->getClientID()]->setCollisionBits(playerCollision);
+				player[client->getClientID()]->setCollisionBits(playerScope);
 				player[client->getClientID()]->getSolid()->setStayActive(true);
 
 				player[client->getClientID()]->attach(cameraNode);
@@ -437,24 +453,42 @@ void SimpleSync::intraUpdate(int dt){
 		//  We can't simply set his Mass to 0, because that affects friction calculations
 		// Now we apply all new ClientEvents.
 		Collection<BaseClientUpdateEvent::ptr> clientEvents=client->enumerateClientUpdateEvents();
-		for(int i=0;i<clientEvents.size();++i){
+		for(i=0;i<clientEvents.size();++i){
 			ClientUpdateEvent::ptr clientEvent=shared_static_cast<ClientUpdateEvent>(clientEvents[i]);
 			updatePlayer(clientEvent,player[client->getClientID()]);
 			scene->getSimulator()->update(clientEvent->getDT(),0,player[client->getClientID()]->getSolid());
 		}
 
-		Quaternion rotate;
-		Math::setQuaternionFromAxisAngle(rotate,Math::Z_UNIT_VECTOR3,angles.y);
-		player[client->getClientID()]->setRotate(rotate);
+		// Update the player's view again, in the case that the client events are slower than our frame rate, we want the view to be smooth
+		updatePlayerView(angles,player[client->getClientID()]);
 	}
 
 	// START: Move to PredictedServer/Client classes, basically this will all be the same, except you'll call a setLastClientUpdate()
 	if(server!=NULL){
+		mutex.lock();
+			for(i=0;i<playersConnected.size();++i){
+				int id=playersConnected[i];
+				EventConnection::ptr client=server->getClient(id);
+				if(client!=NULL){
+					player[id]->setScope(playerScope);
+					player[id]->setCollisionBits(playerScope);
+					client->send(Event::ptr(new ConnectionEvent(id,player[id]!=NULL?player[id]->getRotate():Math::IDENTITY_QUATERNION)));
+				}
+			}
+			playersConnected.clear();
+		
+			for(i=0;i<playersDisconnected.size();++i){
+				int id=playersConnected[i];
+				player[id]->setScope(-1);
+				player[id]->setCollisionBits(-1);
+			}
+			playersDisconnected.clear();
+		mutex.unlock();
+
 		server->update();
 
 		EventConnection::ptr eventConnection=NULL;
-		int i=0;
-		for(eventConnection=server->getClient(0);eventConnection!=NULL;eventConnection=server->getClient(++i)){
+		for(i=0,eventConnection=server->getClient(0);eventConnection!=NULL;eventConnection=server->getClient(++i)){
 			Event::ptr event;
 			while((event=eventConnection->receive())!=NULL){
 				if(event->getType()==ClientUpdateEvent::EventType_CLIENTUPDATE){
@@ -462,6 +496,7 @@ void SimpleSync::intraUpdate(int dt){
 
 					lastClientUpdateCounter[i]=clientEvent->getCounter();
 					updatePlayer(clientEvent,player[i]);
+					scene->getRootNode()->logicUpdate(player[i],dt,playerScope);
 					scene->getSimulator()->update(clientEvent->getDT(),0,player[i]->getSolid());
 				}
 			}
@@ -498,10 +533,10 @@ void SimpleSync::preLogicUpdate(int dt){
 
 void SimpleSync::logicUpdate(int dt){
 	// Skip HopScene's logicUpdate
-	scene->getRootNode()->logicUpdate(dt);
+	scene->getRootNode()->logicUpdate(dt,~playerScope);
 
 	// Update everything but the players
-	scene->getSimulator()->update(dt,~playerCollision,NULL);
+	scene->getSimulator()->update(dt,~playerScope,NULL);
 }
 
 void SimpleSync::postLogicUpdate(int dt){
@@ -526,7 +561,7 @@ void SimpleSync::keyPressed(int key){
 	if(client!=NULL){
 		shared_static_cast<TCPConnection>(client->getConnection())->debugSetPacketDelayTime(packetDelay-packetDelayVariance/2,packetDelay+packetDelayVariance/2);
 	}
-	else{
+	else if(server!=NULL){
 		EventConnection::ptr eventConnection=NULL;
 		int i=0;
 		for(eventConnection=server->getClient(0);eventConnection!=NULL;eventConnection=server->getClient(++i)){
@@ -644,13 +679,23 @@ void SimpleSync::connected(Connection::ptr connection){
 		int i=0;
 		for(EventConnection::ptr eventConnection=server->getClient(0);client!=eventConnection;eventConnection=server->getClient(++i));
 
-		client->send(Event::ptr(new ConnectionEvent(i,player[i]!=NULL?player[i]->getRotate():Math::IDENTITY_QUATERNION)));
+		mutex.lock();
+		playersConnected.add(i);
+		mutex.unlock();
 	}
 }
 
 void SimpleSync::disconnected(Connection::ptr connection){
 	if(server!=NULL){
 		Logger::alert("Client disconnected");
+
+		EventConnection::ptr client=server->getClient(connection);
+		int i=0;
+		for(EventConnection::ptr eventConnection=server->getClient(0);client!=eventConnection;eventConnection=server->getClient(++i));
+
+		mutex.lock();
+		playersDisconnected.add(i);
+		mutex.unlock();
 	}
 
 	if(client!=NULL){
@@ -740,11 +785,14 @@ int main(int argc,char **argv){
 
 		if(localPort!=0){
 			server=SimpleSync::ptr(new SimpleSync());
-			server->accept(localPort);
 			server->setPosition(0,0);
 			server->setSize(640,480);
 			serverThread=Thread::ptr(new Thread(server));
 			serverThread->start();
+			
+			// Hack: Lets try to wait for the system to be initialized before we start accepting, should be event/mutexed
+			System::msleep(2000);
+			server->accept(localPort);
 		}
 		if(remotePort!=0){
 			client=SimpleSync::ptr(new SimpleSync());

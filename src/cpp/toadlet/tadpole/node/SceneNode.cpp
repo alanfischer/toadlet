@@ -204,19 +204,27 @@ void SceneNode::preLogicUpdate(int dt){
 }
 
 void SceneNode::logicUpdate(int dt){
+	logicUpdate(dt,-1);
+}
+
+void SceneNode::logicUpdate(int dt,int scope){
 	mLogicTime+=dt;
 	mLogicFrame++;
 
 	if(mBackground->getNumChildren()>0){
-		logicUpdate(mBackground,dt);
+		logicUpdate(mBackground,dt,scope);
 	}
-	logicUpdate(this,dt);
+	logicUpdate(this,dt,scope);
 }
 
 void SceneNode::postLogicUpdate(int dt){
 }
 
-void SceneNode::logicUpdate(Node::ptr node,int dt){
+void SceneNode::logicUpdate(Node::ptr node,int dt,int scope){
+	if((node->mScope&scope)==0){
+		return;
+	}
+
 	if(node->mReceiveUpdates){
 		node->logicUpdate(dt);
 	}
@@ -255,7 +263,7 @@ void SceneNode::logicUpdate(Node::ptr node,int dt){
 				child->activate();
 			}
 			if(child->getActive()){
-				logicUpdate(child,dt);
+				logicUpdate(child,dt,scope);
 				childrenActive=true;
 			}
 		}
@@ -287,18 +295,26 @@ void SceneNode::preRenderUpdate(int dt){
 }
 
 void SceneNode::renderUpdate(int dt){
+	renderUpdate(dt,-1);
+}
+
+void SceneNode::renderUpdate(int dt,int scope){
 	mRenderFrame++;
 
 	if(mBackground->getNumChildren()>0){
-		renderUpdate(mBackground,dt);
+		renderUpdate(mBackground,dt,scope);
 	}
-	renderUpdate(this,dt);
+	renderUpdate(this,dt,scope);
 }
 
 void SceneNode::postRenderUpdate(int dt){
 }
 
-void SceneNode::renderUpdate(Node::ptr node,int dt){
+void SceneNode::renderUpdate(Node::ptr node,int dt,int scope){
+	if((node->mScope&scope)==0){
+		return;
+	}
+
 	if(node->mReceiveUpdates){
 		node->renderUpdate(dt);
 	}
@@ -325,7 +341,7 @@ void SceneNode::renderUpdate(Node::ptr node,int dt){
 		for(i=0;i<numChildren;++i){
 			child=parent->mShadowChildren[i];
 			if(child->getActive()){
-				renderUpdate(child,dt);
+				renderUpdate(child,dt,scope);
 			}
 
 			if(parent->mRenderWorldBound.radius>=0){
@@ -397,7 +413,7 @@ void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
 	// Only render background when rendering from the scene
 	if(node==this && mBackground->getNumChildren()>0){
 		mBackground->setTranslate(mCamera->getWorldRenderTranslate());
-		renderUpdate(mBackground,0);
+		renderUpdate(mBackground,0,mCamera->getScope());
 		queueRenderables(mBackground);
 	}
 	queueRenderables(node);
