@@ -91,11 +91,15 @@ public:
 	virtual void preLogicUpdateLoop(int dt);
 	virtual void preLogicUpdate(int dt);
 	virtual void logicUpdate(int dt);
+	virtual void logicUpdate(int dt,int scope);
+	virtual void logicUpdate(Node::ptr node,int dt,int scope);
 	virtual void postLogicUpdate(int dt);
 	virtual void postLogicUpdateLoop(int dt);
 	virtual void intraUpdate(int dt);
 	virtual void preRenderUpdate(int dt);
 	virtual void renderUpdate(int dt);
+	virtual void renderUpdate(int dt,int scope);
+	virtual void renderUpdate(Node::ptr node,int dt,int scope);
 	virtual void postRenderUpdate(int dt);
 
 	virtual void setUpdateListener(UpdateListener *updateListener);
@@ -135,9 +139,6 @@ protected:
 		}
 		return renderLayer;
 	}
-
-	virtual void logicUpdate(Node::ptr node,int dt);
-	virtual void renderUpdate(Node::ptr node,int dt);
 
 	virtual void queueRenderables(Node *node);
 	virtual bool culled(Node *node);
