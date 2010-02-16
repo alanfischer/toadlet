@@ -21,6 +21,7 @@ using namespace toadlet::knot;
 using namespace toadlet::knot::event;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole;
+using namespace toadlet::tadpole::animation;
 using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::mesh;
 using namespace toadlet::pad;
