@@ -17,9 +17,9 @@ public:
 		Block_TRIANGLES,
 	};
 
-	SMDConverter(toadlet::tadpole::Engine *engine);
+	SMDConverter();
 
-	void load(toadlet::egg::io::Stream *in);
+	void load(toadlet::tadpole::Engine *engine,toadlet::egg::io::Stream *in,const toadlet::egg::String &fileName);
 
 	toadlet::tadpole::mesh::Mesh::ptr getMesh(){return mMesh;}
 
@@ -31,6 +31,9 @@ public:
 
 	void setTexCoordEpsilon(scalar epsilon){mTexCoordEpsilon=epsilon;}
 	scalar getTexCoordEpsilon() const{return mTexCoordEpsilon;}
+
+	void setFPS(scalar fps){mFPS=fps;}
+	scalar getFPS() const{return mFPS;}
 
 	void setRemoveSkeleton(bool removeSkeleton){mRemoveSkeleton=removeSkeleton;}
 	bool getRemoveSkeleton() const{return mRemoveSkeleton;}
@@ -52,6 +55,7 @@ protected:
 	scalar mPositionEpsilon;
 	scalar mNormalEpsilon;
 	scalar mTexCoordEpsilon;
+	scalar mFPS;
 	bool mRemoveSkeleton;
 	bool mInvertFaces;
 };

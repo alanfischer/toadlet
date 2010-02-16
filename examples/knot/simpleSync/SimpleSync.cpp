@@ -14,18 +14,17 @@ public:
 	};
 
 	ConnectionEvent():BaseConnectionEvent(EventType_CONNECTION){}
-	ConnectionEvent(int id,const Quaternion &look):BaseConnectionEvent(EventType_CONNECTION,id){
+	ConnectionEvent(int id,const EulerAngle &look):BaseConnectionEvent(EventType_CONNECTION,id){
 		mLook=look;
 	}
 
-	const Quaternion &getLook(){return mLook;}
+	const EulerAngle &getLook(){return mLook;}
 
 	virtual int read(DataStream *stream){
 		int amount=BaseConnectionEvent::read(stream);
 		amount+=stream->readBigFloat(mLook.x);
 		amount+=stream->readBigFloat(mLook.y);
 		amount+=stream->readBigFloat(mLook.z);
-		amount+=stream->readBigFloat(mLook.w);
 		return amount;
 	}
 
@@ -34,12 +33,11 @@ public:
 		amount+=stream->writeBigFloat(mLook.x);
 		amount+=stream->writeBigFloat(mLook.y);
 		amount+=stream->writeBigFloat(mLook.z);
-		amount+=stream->writeBigFloat(mLook.w);
 		return amount;
 	}
 
 protected:
-	Quaternion mLook;
+	EulerAngle mLook;
 };
 
 class ClientUpdateEvent:public BaseClientUpdateEvent{
@@ -280,12 +278,11 @@ void SimpleSync::create(){
 		{
 			Mesh::ptr mesh=getEngine()->getMeshManager()->createBox(player[i]->getShape(0)->getAABox());
 			mesh->subMeshes[0]->material->setLightEffect(i==0?Colors::GREEN:Colors::CYAN);
-//			Mesh::ptr mesh=getEngine()->getMeshManager()->findMesh("pyro_ref.xmsh");
 			MeshNode::ptr meshNode=getEngine()->createNodeType(MeshNode::type());
 			meshNode->setMesh(mesh);
 			player[i]->attach(meshNode);
 		}
-		player[i]->setTranslate(0,i==0?-20:20,0);
+		player[i]->setTranslate(0,i==0?-20:20,32);
 		scene->getRootNode()->attach(player[i]);
 	}
 
@@ -394,10 +391,11 @@ void SimpleSync::intraUpdate(int dt){
 
 				client->handleConnectionEvent(connectionEvent);
 
-//				player[client->getClientID()]->setRotate(connectionEvent->getLook());
 				player[client->getClientID()]->setCollisionBits(playerScope);
 				player[client->getClientID()]->getSolid()->setStayActive(true);
 
+				// TODO: The initial setting of the Look angles doesn't work yet
+				angles=connectionEvent->getLook();
 				player[client->getClientID()]->attach(cameraNode);
 				cameraNode->setLookDir(Vector3(0,0,64),Math::Y_UNIT_VECTOR3,Math::Z_UNIT_VECTOR3);
 			}
@@ -472,7 +470,9 @@ void SimpleSync::intraUpdate(int dt){
 				if(client!=NULL){
 					player[id]->setScope(playerScope);
 					player[id]->setCollisionBits(playerScope);
-					client->send(Event::ptr(new ConnectionEvent(id,player[id]!=NULL?player[id]->getRotate():Math::IDENTITY_QUATERNION)));
+					EulerAngle eulerAngles;
+					Math::setEulerAngleXYZFromQuaternion(eulerAngles,player[id]!=NULL?player[id]->getRotate():Math::IDENTITY_QUATERNION,0.001);
+					client->send(Event::ptr(new ConnectionEvent(id,eulerAngles)));
 				}
 			}
 			playersConnected.clear();

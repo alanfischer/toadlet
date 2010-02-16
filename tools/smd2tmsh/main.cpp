@@ -16,11 +16,8 @@ int main(int argc,char **argv){
 	String arg;
 	Collection<String> files;
 	int i;
-	float positionEpsilon=0;
-	float normalEpsilon=0;
-	float texCoordEpsilon=0;
-	bool removeSkeleton=false;
-	bool invertFaces=false;
+
+	SMDConverter smd;
 
 	if(argc<2){
 		std::cerr << "Usage: " << argv[0] << " \"refFile\" \"smdFile1\" \"smdfile2\" etc..." << std::endl;
@@ -31,19 +28,22 @@ int main(int argc,char **argv){
         if(arg.substr(0,1)=="-"){
 			int j=1;
 			if(arg.substr(j,1)=="p"){
-				positionEpsilon=arg.substr(j+1,arg.length()).toFloat();
+				smd.setPositionEpsilon(arg.substr(j+1,arg.length()).toFloat());
 			}
 			if(arg.substr(j,1)=="n"){
-				normalEpsilon=arg.substr(j+1,arg.length()).toFloat();
+				smd.setNormalEpsilon(arg.substr(j+1,arg.length()).toFloat());
 			}
 			if(arg.substr(j,1)=="t"){
-				texCoordEpsilon=arg.substr(j+1,arg.length()).toFloat();
+				smd.setTexCoordEpsilon(arg.substr(j+1,arg.length()).toFloat());
+			}
+			if(arg.substr(j,1)=="f"){
+				smd.setFPS(arg.substr(j+1,arg.length()).toFloat());
 			}
 			if(arg.substr(j,1)=="k"){
-				removeSkeleton=true;
+				smd.setRemoveSkeleton(true);
 			}
 			if(arg.substr(j,1)=="i"){
-				invertFaces=true;
+				smd.setInvertFaces(true);
 			}
             if(arg.substr(j,1)=="h"){
                 std::cout << "Options for " << argv[0] << ": "<< std::endl;
@@ -51,6 +51,7 @@ int main(int argc,char **argv){
 				std::cout << "-pamt \tepsilon - set position epsilon" << std::endl;
 				std::cout << "-namt \tepsilon - set normal epsilon" << std::endl;
 				std::cout << "-tamt \tepsilon - set texCoord epsilon" << std::endl;
+				std::cout << "-famt \tfps - set animation framerate" << std::endl;
 				std::cout << "-i \tinvert - invert faces" << std::endl;
                 return 1;
             }
@@ -69,13 +70,6 @@ int main(int argc,char **argv){
 
 	Engine *engine=new Engine();
 
-	SMDConverter smd(engine);
-	smd.setPositionEpsilon(positionEpsilon);
-	smd.setNormalEpsilon(normalEpsilon);
-	smd.setTexCoordEpsilon(texCoordEpsilon);
-	smd.setRemoveSkeleton(removeSkeleton);
-	smd.setInvertFaces(invertFaces);
-
 	// Load each file
 	for(i=0;i<files.size();++i){
 		String fileName=files[i];
@@ -84,7 +78,7 @@ int main(int argc,char **argv){
 
 		FileStream::ptr stream(new FileStream(fileName,FileStream::OpenFlags_READ|FileStream::OpenFlags_BINARY));
 		if(stream->isOpen()){
-			smd.load(stream);
+			smd.load(engine,stream,fileName);
 		}
 		else{
 			std::cout << "Error opening " << (const char*)fileName << std::endl;

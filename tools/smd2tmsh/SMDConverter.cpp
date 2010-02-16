@@ -41,18 +41,29 @@ public:
 	Vertex verts[3];
 };
 
-SMDConverter::SMDConverter(Engine *engine):
+SMDConverter::SMDConverter():
 	mEngine(NULL),
 	mPositionEpsilon(Math::fromMilli(10)),
 	mNormalEpsilon(Math::fromMilli(10)),
 	mTexCoordEpsilon(Math::fromMilli(10)),
+	mFPS(30),
 	mRemoveSkeleton(false),
 	mInvertFaces(false)
 {
-	mEngine=engine;
 }
 
-void SMDConverter::load(toadlet::egg::io::Stream *in){
+void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
+	mEngine=engine;
+
+	String resourceName;
+	int ext=fileName.rfind('.');
+	if(ext>=0){
+		resourceName=fileName.substr(0,ext);
+	}
+	else{
+		resourceName=fileName;
+	}
+
 	int block=Block_NONE;
 	int version=0;
 	bool reference=false;
@@ -64,6 +75,7 @@ void SMDConverter::load(toadlet::egg::io::Stream *in){
 
 	if(mMesh==NULL){
 		mMesh=Mesh::ptr(new Mesh());
+		mMesh->setName(resourceName);
 	}
 
 	String s;
@@ -84,6 +96,7 @@ void SMDConverter::load(toadlet::egg::io::Stream *in){
 				block=Block_SKELETON;
 				if(reference==false && mSkeleton!=NULL){
 					mSequence=Sequence::ptr(new Sequence());
+					mSequence->setName(resourceName);
 					mSkeleton->sequences.add(mSequence);
 
 					for(int i=0;i<mSkeleton->bones.size();++i){
@@ -162,7 +175,7 @@ void SMDConverter::load(toadlet::egg::io::Stream *in){
 						Track::ptr track=mSequence->tracks.at(id);
 
 						KeyFrame keyFrame;
-						keyFrame.time=Math::fromInt(time);
+						keyFrame.time=Math::fromInt(time)/mFPS;
 						keyFrame.translate.set(floatToScalar(px),floatToScalar(py),floatToScalar(pz));
 						setQuaternionFromXYZ(keyFrame.rotate,floatToScalar(rx),floatToScalar(ry),floatToScalar(rz));
 
