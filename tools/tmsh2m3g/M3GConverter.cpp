@@ -1450,8 +1450,7 @@ bool M3GConverter::convertMesh(Mesh *mesh,Stream *outStream,float scale,int forc
 	int i,j;
 
 	if(scale==0){
-		Logger::alert(Logger::Level_WARNING,
-			"Using a scale of 0!");
+		Logger::alert("Using a scale of 0!");
 	}
 
 	bool result=false;

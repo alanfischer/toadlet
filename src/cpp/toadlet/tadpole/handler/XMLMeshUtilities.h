@@ -33,7 +33,7 @@
 #include <toadlet/tadpole/mesh/Mesh.h>
 #include <mxml.h>
 
-#define mxmlGetElementName(x) ((x->type==MXML_ELEMENT)?x->value.element.name:NULL)
+#define mxmlGetElementName(x) ((x->type==MXML_ELEMENT)?x->value.element.name:"")
 #define mxmlFindChild(x,s) mxmlFindElement(x->child,x,s,NULL,NULL,MXML_NO_DESCEND)
 #define mxmlGetOpaque(x) ((x!=NULL)?x->value.opaque:NULL)
 #define mxmlAddChild(x,c) mxmlAdd(x,MXML_ADD_AFTER,MXML_ADD_TO_PARENT,c)
