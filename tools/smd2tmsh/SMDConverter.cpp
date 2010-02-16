@@ -215,10 +215,7 @@ void SMDConverter::load(toadlet::egg::io::Stream *in){
 
 				Quaternion wtbRotation(skeleton->getBone(i)->worldRotate);
 				Math::conjugate(wtbRotation);
-				Matrix3x3 wtbRotationMatrix;
-				Math::setMatrix3x3FromQuaternion(wtbRotationMatrix,wtbRotation);
-
-				Math::mul(wtbTranslation,wtbRotationMatrix);
+				Math::mul(wtbTranslation,wtbRotation);
 
 				mSkeleton->bones[i]->worldToBoneTranslate.set(wtbTranslation);
 				mSkeleton->bones[i]->worldToBoneRotate.set(wtbRotation);
