@@ -30,6 +30,7 @@
 #include <toadlet/egg/EventFactory.h>
 #include <toadlet/knot/Connector.h>
 #include <toadlet/knot/ConnectionListener.h>
+#include <toadlet/knot/EventConnectionListener.h>
 #include <toadlet/knot/SimpleEventConnection.h>
 
 namespace toadlet{
@@ -49,16 +50,20 @@ public:
 	virtual void setConnector(Connector::ptr connector);
 	virtual Connector::ptr getConnector(){return mConnector;}
 
-	virtual void connected(Connection::ptr connection);
-	virtual void disconnected(Connection::ptr connection);
+	virtual void addEventConnectionListener(EventConnectionListener *listener,bool notifyAboutCurrent);
+	virtual void removeEventConnectionListener(EventConnectionListener *listener,bool notifyAboutCurrent);
 
 	virtual bool broadcast(egg::Event::ptr event);
 	virtual bool sendToClient(int toClientID,egg::Event::ptr event);
 	virtual egg::Event::ptr receive();
 	virtual EventConnection::ptr getClient(int i);
 	virtual EventConnection::ptr getClient(Connection::ptr connection);
+	virtual EventConnection::ptr getClient(EventConnection *connection); // Only needed to get the smart pointer
 
 	virtual int update();
+
+	virtual void connected(Connection::ptr connection);
+	virtual void disconnected(Connection::ptr connection);
 
 protected:
 	class ServerClient:public SimpleEventConnection{
@@ -74,6 +79,9 @@ protected:
 	};
 
 	virtual bool eventReceived(ServerClient *client,egg::Event::ptr event);
+	
+	virtual void notifyListenersConnected(EventConnection *connection);
+	virtual void notifyListenersDisconnected(EventConnection *connection);
 
 	egg::EventFactory *mEventFactory;
 	Connector::ptr mConnector;
@@ -81,6 +89,8 @@ protected:
 	egg::Collection<ServerClient::ptr> mDeadClients;
 	egg::Map<Connection::ptr,ServerClient::ptr> mConnectionClients;
 	egg::Mutex mClientsMutex;
+	egg::Collection<EventConnectionListener*> mListeners;
+	egg::Mutex mListenersMutex;
 };
 
 }
