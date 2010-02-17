@@ -258,7 +258,7 @@ void BSPSceneNode::setBSPMap(BSPMap::ptr map){
 	Texture::ptr back=mEngine->getTextureManager()->findTexture("nightsky/nightsky_south.png");
 	Texture::ptr front=mEngine->getTextureManager()->findTexture("nightsky/nightsky_north.png");
 
-	Mesh::ptr mesh=mEngine->getMeshManager()->createSkyBox(1024,false,bottom,top,left,right,back,front);
+	Mesh::ptr mesh=mEngine->getMeshManager()->createSkyBox(1024,false,false,bottom,top,left,right,back,front);
 	for(i=0;i<mesh->subMeshes.size();++i){
 		mesh->subMeshes[i]->material->setLayer(-1);
 	}

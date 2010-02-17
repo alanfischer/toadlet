@@ -27,6 +27,7 @@
 #define TOADLET_EGG_TYPE_H
 
 #include <toadlet/egg/String.h>
+#include <toadlet/egg/Map.h>
 
 namespace toadlet{
 namespace egg{
@@ -49,6 +50,34 @@ public:
 
 protected:
 	String mFullName;
+};
+
+template<typename Class>
+class TypeFactory{
+public:
+	TypeFactory(){}
+	
+	void registerType(const BaseType<Class> &type){
+		mTypes[type.getFullName()]=&type;
+	}
+	
+	void unregisterType(const BaseType<Class> &type){
+		mTypes.erase(&type);
+	}
+	
+	Class *newInstance(const String &fullName){
+		Map<String,const BaseType<Class>*>::iterator i=mTypes.find(fullName);
+		if(i==mTypes.end()){
+			Error::unknown("unknown type: "+fullName);
+			return NULL;
+		}
+		else{
+			return i->second->newInstance();
+		}
+	}
+
+protected:
+	Map<String,const BaseType<Class>*> mTypes;
 };
 
 }

@@ -77,8 +77,11 @@ public:
 	egg::io::Stream::ptr openStream(const egg::String &name){return mArchiveManager->openStream(name);}
 
 	// Node methods
+	void registerNodeType(const egg::BaseType<node::Node> &type);
 	node::Node *allocNode(const egg::BaseType<node::Node> &type);
+	node::Node *allocNode(const egg::String &fullName);
 	node::Node *createNode(const egg::BaseType<node::Node> &type);
+	node::Node *createNode(const egg::String &fullName);
 	void destroyNode(node::Node *node);
 	void freeNode(node::Node *node);
 
@@ -122,6 +125,8 @@ protected:
 	MeshManager *mMeshManager;
 	ResourceManager *mAudioBufferManager;
 	handler::AudioBufferHandler::ptr mAudioBufferHandler;
+	
+	egg::TypeFactory<node::Node> mNodeFactory;
 };
 
 }
