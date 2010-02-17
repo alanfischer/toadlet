@@ -73,7 +73,6 @@ public:
 	HopScene::ptr scene;
 	int nextUpdateTime;
 	int clientServerTimeDifference;
-	int clientLeadTime;
 	int debugUpdateMin,debugUpdateMax;
 	int packetDelay;
 	int packetDelayVariance;
