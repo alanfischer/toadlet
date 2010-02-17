@@ -25,6 +25,7 @@ set (KNOT_HEADERS
 	Connector.h
 	DebugListener.h
 	EventConnection.h
+	EventConnectionListener.h
 	LANPeerEventConnector.h
 	SimpleClient.h
 	SimpleEventConnection.h
