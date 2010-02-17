@@ -172,7 +172,6 @@ public:
 SimpleSync::SimpleSync():Application(),
 	nextUpdateTime(0),
 	clientServerTimeDifference(0),
-	clientLeadTime(0),
 	debugUpdateMin(0),
 	debugUpdateMax(0),
 	packetDelay(0),
@@ -478,7 +477,7 @@ void SimpleSync::intraUpdate(int dt){
 			playersConnected.clear();
 		
 			for(i=0;i<playersDisconnected.size();++i){
-				int id=playersConnected[i];
+				int id=playersDisconnected[i];
 				player[id]->setScope(-1);
 				player[id]->setCollisionBits(-1);
 			}
@@ -496,7 +495,7 @@ void SimpleSync::intraUpdate(int dt){
 
 					lastClientUpdateCounter[i]=clientEvent->getCounter();
 					updatePlayer(clientEvent,player[i]);
-					scene->getRootNode()->logicUpdate(player[i],dt,playerScope);
+					scene->getRootNode()->logicUpdate(player[i],clientEvent->getDT(),playerScope);
 					scene->getSimulator()->update(clientEvent->getDT(),0,player[i]->getSolid());
 				}
 			}
@@ -787,13 +786,14 @@ int main(int argc,char **argv){
 			server=SimpleSync::ptr(new SimpleSync());
 			server->setPosition(0,0);
 			server->setSize(640,480);
+			server->accept(localPort);
 			serverThread=Thread::ptr(new Thread(server));
 			serverThread->start();
-			
-			// Hack: Lets try to wait for the system to be initialized before we start accepting, should be event/mutexed
-			System::msleep(2000);
-			server->accept(localPort);
 		}
+
+		// HACK: Lets try to wait for the system to be initialized before we start accepting
+		System::msleep(2000);
+
 		if(remotePort!=0){
 			client=SimpleSync::ptr(new SimpleSync());
 			client->connect(remoteHost,remotePort);
