@@ -33,6 +33,7 @@
 #include <toadlet/egg/io/DataStream.h>
 #include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/knot/EventConnection.h>
+#include <toadlet/knot/EventConnectionListener.h>
 #include <toadlet/knot/ConnectionListener.h>
 
 namespace toadlet{
@@ -57,18 +58,24 @@ public:
 	virtual void setConnection(Connection::ptr connection);
 	virtual Connection::ptr getConnection(){return mConnection;}
 
-	virtual void connected(Connection::ptr connection);
-	virtual void disconnected(Connection::ptr connection);
+	virtual void addEventConnectionListener(EventConnectionListener *listener,bool notifyAboutCurrent);
+	virtual void removeEventConnectionListener(EventConnectionListener *listener,bool notifyAboutCurrent);
 
 	virtual bool send(egg::Event::ptr event);
 	virtual egg::Event::ptr receive();
 
 	virtual int update(){return 0;}
 
+	virtual void connected(Connection::ptr connection);
+	virtual void disconnected(Connection::ptr connection);
+
 	virtual void run();
 
 protected:
 	virtual bool eventReceived(egg::Event::ptr event);
+
+	virtual void notifyListenersConnected(EventConnection *connection);
+	virtual void notifyListenersDisconnected(EventConnection *connection);
 
 	virtual int sendEvent(egg::Event::ptr event);
 	virtual int receiveEvent(egg::Event::ptr *event);
@@ -82,6 +89,8 @@ protected:
 	Connection::ptr mConnection;
 	egg::Collection<egg::Event::ptr> mEvents;
 	egg::Mutex mEventsMutex;
+	egg::Collection<EventConnectionListener*> mListeners;
+	egg::Mutex mListenersMutex;
 
 	egg::Thread::ptr mThread;
 	bool mRun;

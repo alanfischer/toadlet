@@ -98,6 +98,26 @@ void SimpleEventConnection::setConnection(Connection::ptr connection){
 	}
 }
 
+void SimpleEventConnection::addEventConnectionListener(EventConnectionListener *listener,bool notifyAboutCurrent){
+	mListenersMutex.lock();
+		mListeners.add(listener);
+	mListenersMutex.unlock();
+
+	if(notifyAboutCurrent){
+		listener->connected(this);
+	}
+}
+
+void SimpleEventConnection::removeEventConnectionListener(EventConnectionListener *listener,bool notifyAboutCurrent){
+	if(notifyAboutCurrent){
+		listener->disconnected(this);
+	}
+
+	mListenersMutex.lock();
+		mListeners.remove(listener);
+	mListenersMutex.unlock();
+}
+
 void SimpleEventConnection::connected(Connection::ptr connection){
 	// Since we don't join() in disconnected, we join here just in case its still running somehow
 	if(mThread!=NULL){
@@ -105,6 +125,8 @@ void SimpleEventConnection::connected(Connection::ptr connection){
 	}
 
 	mConnection=connection;
+
+	notifyListenersConnected(this);
 
 	mThread=Thread::ptr(new Thread(this));
 	mRun=true;
@@ -114,6 +136,8 @@ void SimpleEventConnection::connected(Connection::ptr connection){
 void SimpleEventConnection::disconnected(Connection::ptr connection){
 	mRun=false;
 	// We don't want to mThread.join() here, since mThread could be the one that is notifying us that we are disconnected
+
+	notifyListenersDisconnected(this);
 }
 
 bool SimpleEventConnection::send(Event::ptr event){
@@ -153,6 +177,32 @@ void SimpleEventConnection::run(){
 
 bool SimpleEventConnection::eventReceived(Event::ptr event){
 	return false;
+}
+
+void SimpleEventConnection::notifyListenersConnected(EventConnection *connection){
+	int i;
+	Collection<EventConnectionListener*> listeners;
+
+	mListenersMutex.lock();
+		listeners.addAll(mListeners);
+	mListenersMutex.unlock();
+
+	for(i=0;i<listeners.size();++i){
+		listeners[i]->connected(connection);
+	}
+}
+
+void SimpleEventConnection::notifyListenersDisconnected(EventConnection *connection){
+	int i;
+	Collection<EventConnectionListener*> listeners;
+
+	mListenersMutex.lock();
+		listeners.addAll(mListeners);
+	mListenersMutex.unlock();
+
+	for(i=0;i<listeners.size();++i){
+		listeners[i]->disconnected(connection);
+	}
 }
 
 int SimpleEventConnection::sendEvent(Event::ptr event){
