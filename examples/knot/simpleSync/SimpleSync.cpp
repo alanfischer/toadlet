@@ -719,12 +719,14 @@ int main(int argc,char **argv){
 	uint32 defaultPort=20202;
 	uint32 localPort=0;
 	uint32 remoteHost=0,remotePort=0;
+	bool dualClients=false;
 
 	TOADLET_TRY
 		if(argc<2){
 			localPort=defaultPort;
 			remoteHost=Socket::stringToIP("127.0.0.1");
 			remotePort=defaultPort;
+			dualClients=true;
 		}
 		else if(strncmp(argv[1],"-s",2)==0){
 			char *s=argv[1]+2;
@@ -781,10 +783,12 @@ int main(int argc,char **argv){
 		Thread::ptr serverThread;
 		SimpleSync::ptr client;
 		Thread::ptr clientThread;
+		SimpleSync::ptr client2;
+		Thread::ptr client2Thread;
 
 		if(localPort!=0){
 			server=SimpleSync::ptr(new SimpleSync());
-			server->setPosition(0,0);
+			server->setPosition(320,0);
 			server->setSize(640,480);
 			server->accept(localPort);
 			serverThread=Thread::ptr(new Thread(server));
@@ -805,14 +809,27 @@ int main(int argc,char **argv){
 				client->setPosition(0,0);
 			}
 			else{
-				client->setPosition(640,0);
+				client->setPosition(0,480);
 			}
 			client->setSize(640,480);
 			clientThread=Thread::ptr(new Thread(client));
 			clientThread->start();
 		}
 
-		while((serverThread!=NULL && serverThread->isAlive()) || clientThread!=NULL && clientThread->isAlive()){
+		if(dualClients){
+			client2=SimpleSync::ptr(new SimpleSync());
+			client2->connect(remoteHost,remotePort);
+			if(client2->client->getConnection()==NULL){
+				Logger::alert("Error connecting");
+				return -1;
+			}
+			client2->setPosition(640,480);
+			client2->setSize(640,480);
+			client2Thread=Thread::ptr(new Thread(client2));
+			client2Thread->start();
+		}
+
+		while((serverThread!=NULL && serverThread->isAlive()) || clientThread!=NULL && clientThread->isAlive() || client2Thread!=NULL && client2Thread->isAlive()){
 			System::msleep(100);
 		}
 	TOADLET_CATCH(const Exception &){}

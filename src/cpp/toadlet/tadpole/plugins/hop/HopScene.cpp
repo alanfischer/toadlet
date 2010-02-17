@@ -74,6 +74,8 @@ HopScene::HopScene(Scene::ptr scene):
 	mWorld->setLocalGravity(Math::ZERO_VECTOR3);
 	mWorld->setInfiniteMass();
 	mSimulator->addSolid(mWorld);
+	
+	mScene->getRootNode()->getEngine()->registerNodeType(HopEntity::type());
 }
 
 HopScene::~HopScene(){
@@ -268,7 +270,7 @@ void HopScene::preRenderUpdate(int dt){
 		if(active || activePrevious){
 			// TODO: Add an option to either use strict interpolation, or fuzzy interpolation
 			// If we are deactivating, then make sure we are at our rest point
-#if 1
+#if 0
 			if(active==false && activePrevious){
 				entity->interpolatePhysicalParameters(Math::ONE);
 			}

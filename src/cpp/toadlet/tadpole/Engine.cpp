@@ -31,6 +31,16 @@
 #include <toadlet/tadpole/MaterialManager.h>
 #include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/TextureManager.h>
+
+#include <toadlet/tadpole/node/AnimationControllerNode.h>
+#include <toadlet/tadpole/node/AudioNode.h>
+#include <toadlet/tadpole/node/LabelNode.h>
+#include <toadlet/tadpole/node/LightNode.h>
+#include <toadlet/tadpole/node/MeshNode.h>
+#include <toadlet/tadpole/node/ParticleNode.h>
+#include <toadlet/tadpole/node/SkeletonParentNode.h>
+#include <toadlet/tadpole/node/SpriteNode.h>
+
 #include <toadlet/tadpole/handler/AudioBufferHandler.h>
 #include <toadlet/tadpole/handler/MMSHHandler.h>
 #include <toadlet/tadpole/handler/SPRHandler.h>
@@ -90,10 +100,6 @@ Engine::Engine():
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"creating Engine");
 
-	mArchiveManager=new ArchiveManager();
-
-	mTextureManager=new TextureManager(this);
-
 	// Make a guess at what the ideal format is.
 	#if defined(TOADLET_FIXED_POINT) && (defined(TOADLET_PLATFORM_WINCE) || defined(TOADLET_PLATFORM_IPHONE) || defined(TOADLET_PLATFORM_ANDROID))
 		mIdealVertexFormatBit=VertexElement::Format_BIT_FIXED_32;
@@ -102,16 +108,25 @@ Engine::Engine():
 	#endif
 	updateVertexFormats();
 
+	mArchiveManager=new ArchiveManager();
+	mTextureManager=new TextureManager(this);
 	mBufferManager=new BufferManager(this);
-
 	mMaterialManager=new MaterialManager(this);
-
 	mFontManager=new FontManager(this->getArchiveManager());
-
 	mMeshManager=new MeshManager(this);
-
 	mAudioBufferManager=new ResourceManager(this->getArchiveManager());
 
+	registerNodeType(AnimationControllerNode::type());
+	registerNodeType(AudioNode::type());
+	registerNodeType(CameraNode::type());
+	registerNodeType(LabelNode::type());
+	registerNodeType(LightNode::type());
+	registerNodeType(MeshNode::type());
+	registerNodeType(Node::type());
+	registerNodeType(ParentNode::type());
+	registerNodeType(ParticleNode::type());
+	registerNodeType(SkeletonParentNode::type());
+	registerNodeType(SpriteNode::type());
 
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"Engine: adding all handlers");
@@ -355,18 +370,50 @@ AudioPlayer *Engine::getAudioPlayer() const{
 	return mAudioPlayer;
 }
 
+void Engine::registerNodeType(const BaseType<Node> &type){
+	mNodeFactory.registerType(type);
+}
+
 // TODO: Use a pool for these entities
 Node *Engine::allocNode(const BaseType<Node> &type){
 	Logger::excess(Categories::TOADLET_TADPOLE,String("Allocating: ")+type.getFullName());
 
-	Node *node=type.newInstance();
-	node->internal_setManaged(true);
+	Node *node=NULL;
+	TOADLET_TRY
+		node=type.newInstance();
+	TOADLET_CATCH(const Exception &){node=NULL;}
+	if(node!=NULL){
+		node->internal_setManaged(true);
+	}
+	return node;
+}
+
+Node *Engine::allocNode(const String &fullName){
+	Logger::excess(Categories::TOADLET_TADPOLE,String("Allocating: ")+fullName);
+
+	Node *node=NULL;
+	TOADLET_TRY
+		node=mNodeFactory.newInstance(fullName);
+	TOADLET_CATCH(const Exception &){node=NULL;}
+	if(node!=NULL){
+		node->internal_setManaged(true);
+	}
 	return node;
 }
 
 Node *Engine::createNode(const BaseType<Node> &type){
 	Node *node=allocNode(type);
-	node->create(this);
+	if(node!=NULL){
+		node->create(this);
+	}
+	return node;
+}
+
+Node *Engine::createNode(const String &fullName){
+	Node *node=allocNode(fullName);
+	if(node!=NULL){
+		node->create(this);
+	}
 	return node;
 }
 
