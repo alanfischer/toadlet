@@ -68,7 +68,7 @@ Logger::Logger(){
 	mLoggedMessage=false;
 	mReportingLevel=Level_MAX;
 	mOutputLogString=true;
-	mStoreLogString=true;
+	mStoreLogString=false;
 
 	addCategory(Categories::TOADLET_EGG_LOGGER);
 	addCategory(Categories::TOADLET_EGG_NET);
