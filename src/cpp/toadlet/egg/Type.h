@@ -27,6 +27,7 @@
 #define TOADLET_EGG_TYPE_H
 
 #include <toadlet/egg/String.h>
+#include <toadlet/egg/Error.h>
 #include <toadlet/egg/Map.h>
 
 namespace toadlet{
@@ -66,7 +67,7 @@ public:
 	}
 	
 	Class *newInstance(const String &fullName){
-		Map<String,const BaseType<Class>*>::iterator i=mTypes.find(fullName);
+		typename Map<String,const BaseType<Class>*>::iterator i=mTypes.find(fullName);
 		if(i==mTypes.end()){
 			Error::unknown("unknown type: "+fullName);
 			return NULL;
