@@ -33,14 +33,6 @@
 	#include <errno.h>
 #endif
 
-#if !defined(MSG_NOSIGNAL)
-#	if defined(SO_NOSIGPIPE)
-#		define MSG_NOSIGNAL SO_NOSIGPIPE
-#	else
-#		define MSG_NOSIGNAL 0	
-#	endif
-#endif
- 
 #if defined(TOADLET_PLATFORM_WIN32)
 	#if defined(TOADLET_PLATFORM_WINCE)
 		#pragma comment(lib,"ws2.lib")
@@ -100,9 +92,8 @@ Socket::Socket(int domain,int type,int protocol):
 	//  it will give an address in use error unless I set this.
 	int value=1;
 	setsockopt(mHandle,SOL_SOCKET,SO_REUSEADDR,(char*)&value,sizeof(int));
-	#if defined(TOADLET_PLATFORM_POSIX)
-		// Also disable sigpipe exceptions
-		setsockopt(mHandle,SOL_SOCKET,MSG_NOSIGNAL,(char*)&value,sizeof(int));
+	#if defined(SO_NOSIGPIPE)
+		setsockopt(mHandle,SOL_SOCKET,SO_NOSIGPIPE,(char*)&value,sizeof(int));
 	#endif
 }
 
@@ -117,14 +108,9 @@ Socket::Socket(int handle,struct sockaddr_in *address):
 	//  and a client socket trying to connect to port Y on a separate machine,
 	//  it will give an address in use error unless I set this.
 	int value=1;
-	#if defined(TOADLET_PLATFORM_POSIX)
-		setsockopt(mHandle,SOL_SOCKET,SO_REUSEADDR,(char*)&value,sizeof(int));
-		// Also disable sigpipe exceptions
-		#if defined(TOADLET_PLATFORM_OSX)
-			setsockopt(mHandle,SOL_SOCKET,SO_NOSIGPIPE,(char*)&value,sizeof(int));
-		#else
-			setsockopt(mHandle,SOL_SOCKET,MSG_NOSIGNAL,(char*)&value,sizeof(int));
-		#endif
+	setsockopt(mHandle,SOL_SOCKET,SO_REUSEADDR,(char*)&value,sizeof(int));
+	#if defined(SO_NOSIGPIPE)
+		setsockopt(mHandle,SOL_SOCKET,SO_NOSIGPIPE,(char*)&value,sizeof(int));
 	#endif
 }
 
@@ -388,7 +374,11 @@ int Socket::receiveFrom(byte *buffer,int length,uint32 &ipAddress,int &port){
 }
 
 int Socket::send(const byte *buffer,int length){
-	int flags=0;
+	#if defined(MSG_NOSIGNAL)
+		int flags=MSG_NOSIGNAL;
+	#else
+		int flags=0;
+	#endif
 	int result=::send(mHandle,(char*)buffer,length,flags);
 	if(result==TOADLET_SOCKET_ERROR){
 		error("send");
@@ -397,7 +387,11 @@ int Socket::send(const byte *buffer,int length){
 }
 
 int Socket::sendTo(const byte *buffer,int length,uint32 ipAddress,int port){
-	int flags=0;
+	#if defined(MSG_NOSIGNAL)
+		int flags=MSG_NOSIGNAL;
+	#else
+		int flags=0;
+	#endif
 	struct sockaddr_in address={0};
 	address.sin_family=AF_INET;
 	address.sin_addr.s_addr=ipAddress;
