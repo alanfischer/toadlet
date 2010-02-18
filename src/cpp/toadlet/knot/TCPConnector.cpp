@@ -217,7 +217,7 @@ void TCPConnector::connected(Connection *connection){
 		if(i<mConnections.size()){
 			notifyListenersConnected(mConnections[i]);
 		}
-	mConnectionsMutex.lock();
+	mConnectionsMutex.unlock();
 }
 
 void TCPConnector::disconnected(Connection *connection){
@@ -231,7 +231,7 @@ void TCPConnector::disconnected(Connection *connection){
 			notifyListenersDisconnected(mConnections[i]);
 			mConnections.removeAt(i);
 		}
-	mConnectionsMutex.lock();
+	mConnectionsMutex.unlock();
 }
 
 void TCPConnector::notifyListenersConnected(TCPConnection::ptr connection){
