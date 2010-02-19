@@ -33,6 +33,8 @@ namespace toadlet{
 namespace knot{
 
 /// Thought: On Java this can just be the ByteChannel
+///  Or we could have a Connection be like a Channel which only has opened() and close(),
+//   And add a DataConnection which handles in Bytes, and an EventConnection which handles events
 
 /// A Connection sends and receives packets of data.
 class Connection{
