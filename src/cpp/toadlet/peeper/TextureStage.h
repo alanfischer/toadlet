@@ -91,9 +91,13 @@ public:
 	void setCalculation(Calculation calculation1,const Matrix4x4 &matrix1);
 	inline Calculation getCalculation() const{return calculation;}
 	inline const Matrix4x4 &getMatrix() const{return matrix;}
+	int getNumFrames();
+	void setFrame(int frame);
+	inline int getFrame(){return textureFrame;}
 
 	Texture::ptr texture;
 	egg::String textureName;
+	int textureFrame;
 
 	TextureBlend blend;
 

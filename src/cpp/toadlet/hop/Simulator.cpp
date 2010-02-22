@@ -220,7 +220,7 @@ void Simulator::removeConstraint(Constraint *constraint){
 	mConstraints.remove(constraint);
 }
 
-void Simulator::update(int dt,int updateWithBits,Solid *solid){
+void Simulator::update(int dt,int scope,Solid *solid){
 	Vector3 &oldPosition=cache_update_oldPosition;
 	Vector3 &newPosition=cache_update_newPosition;
 	Vector3 &velocity=cache_update_velocity;
@@ -255,7 +255,7 @@ void Simulator::update(int dt,int updateWithBits,Solid *solid){
 			solid=mSolids[i];
 		}
 
-		if(solid->mActive==false || (updateWithBits!=0 && (solid->mCollisionBits&updateWithBits)==0)){
+		if(solid->mActive==false || (scope!=0 && (solid->mScope&scope)==0)){
 			continue;
 		}
 

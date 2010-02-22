@@ -207,7 +207,7 @@ void Win32Application::runEventLoop(){
 			lastTime=currentTime;
 		}
 
-		System::msleep(10);
+		System::msleep(0);
 	}
 }
 

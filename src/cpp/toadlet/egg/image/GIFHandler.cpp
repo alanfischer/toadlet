@@ -29,6 +29,7 @@ extern "C"{
 #include <toadlet/egg/image/GIFHandler.h>
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Logger.h>
 #include <string.h> // memcpy
 
 #if defined(TOADLET_PLATFORM_WIN32) && defined(TOADLET_LIBGIF_NAME)
@@ -98,10 +99,29 @@ void copyGIFLine(	unsigned char *dest,
 	}
 }
 
+void setImagePortion(Image *dest,int x,int y,int width,int height,int red,int green,int blue){
+	byte *data=dest->getData();
+	int i,j;
+	for(j=y;j<y+height;++j){
+		for(i=x;i<x+width;++i){
+			if(dest->getFormat()==Image::Format_RGB_8){
+				data[(j*width+i)*3+0]=red;
+				data[(j*width+i)*3+1]=green;
+				data[(j*width+i)*3+2]=blue;
+			}
+			else{
+				data[(j*width+i)*4+0]=red;
+				data[(j*width+i)*4+1]=green;
+				data[(j*width+i)*4+2]=blue;
+				data[(j*width+i)*4+3]=0;
+			}
+		}
+	}
+}
+
 GIFHandler::GIFHandler(){
-	mWorking=0;
-	mBase=0;
-	mDelayMilliseconds=0;
+	mWorking=NULL;
+	mBase=NULL;
 }
 
 GIFHandler::~GIFHandler(){
@@ -109,24 +129,23 @@ GIFHandler::~GIFHandler(){
 }
 
 void GIFHandler::resetReader(){
-	if(mWorking){
+	if(mWorking!=NULL){
 		delete mWorking;
-		mWorking=0;
+		mWorking=NULL;
 	}
-	if(mBase){
+	if(mBase!=NULL){
 		delete mBase;
-		mBase=0;
+		mBase=NULL;
 	}
-	mDelayMilliseconds=0;
 }
 
-int GIFHandler::getNextImage(GifFileType *gifFile,Image *&image,int &delayMilliseconds){
+int GIFHandler::getNextImage(GifFileType *gifFile,Image *&image,int &frameDelay){
 	GifRecordType RecordType;
-	GifByteType *pLine=0;
-	GifByteType *pExtension=0;
-	int dispose = 0;
-	int pass = 0;
-	int transparent = GIF_NOT_TRANSPARENT;
+	GifByteType *pLine=NULL;
+	GifByteType *pExtension=NULL;
+	int dispose=GIF_DISPOSE_RESTORE;
+	int pass=0;
+	int transparent=GIF_NOT_TRANSPARENT;
 
 	do{
 		int i, ExtCode;
@@ -148,8 +167,8 @@ int GIFHandler::getNextImage(GifFileType *gifFile,Image *&image,int &delayMillis
 					pColorTable = gifFile->Image.ColorMap->Colors;
 				}
 
-				const int Width = gifFile->Image.Width;
-				const int Height = gifFile->Image.Height;
+				const int width=gifFile->Image.Width;
+				const int height=gifFile->Image.Height;
 
 				int format=Image::Format_UNKNOWN;
 				int pixelSize=0;
@@ -163,75 +182,70 @@ int GIFHandler::getNextImage(GifFileType *gifFile,Image *&image,int &delayMillis
 				}
 
 				if(mWorking==NULL){
-					mWorking=new Image(Image::Dimension_D2,format,Width,Height);
-					memset(mWorking->getData(),0,pixelSize*Width*Height);
+					mWorking=new Image(Image::Dimension_D2,format,width,height);
+					memset(mWorking->getData(),0,pixelSize*width*height);
+
+					GifColorType *color=gifFile->SColorMap->Colors + gifFile->SBackGroundColor;
+					setImagePortion(mWorking,gifFile->Image.Left,gifFile->Image.Top,gifFile->Image.Width,gifFile->Image.Height,color->Red,color->Green,color->Blue);
 				}
 
-				pLine=new GifByteType[Width];
+				if(mBase==NULL){
+					mBase=new Image(Image::Dimension_D2,format,width,height);
+					memset(mWorking->getData(),0,pixelSize*width*height);
+
+					GifColorType *color=gifFile->SColorMap->Colors + gifFile->SBackGroundColor;
+					setImagePortion(mWorking,gifFile->Image.Left,gifFile->Image.Top,gifFile->Image.Width,gifFile->Image.Height,color->Red,color->Green,color->Blue);
+				}
+
+				pLine=new GifByteType[width*pixelSize];
 
 				unsigned int workingWidth=mWorking->getWidth();
 				unsigned int workingHeight=mWorking->getHeight();
 
 				if(gifFile->Image.Interlace){
 					// Need to perform 4 passes on the images:
-					for (pass = 0; pass < 4; ++pass){
-						for (i = InterlacedOffset[pass]; i < Height; i += InterlacedJumps[pass]){
-							if (DGifGetLine(gifFile, pLine, Width) == GIF_ERROR){
+					for(pass=0;pass<4;++pass){
+						for(i=InterlacedOffset[pass];i<height;i+=InterlacedJumps[pass]){
+							if(DGifGetLine(gifFile,pLine,width)==GIF_ERROR){
 								delete[] pLine;
 								return GIF_ERROR;
 							}
-							copyGIFLine(mWorking->getData(),workingWidth,workingHeight,x,y,Width,Height,Width,i,pLine,transparent,pColorTable,pixelSize,format);
-						}
+							copyGIFLine(mWorking->getData(),workingWidth,workingHeight,x,y,width,height,width,i,pLine,transparent,pColorTable,pixelSize,format);
+ 						}
 					}
 				}
 				else{
 					// Non-interlaced image
-					for (i = 0; i < Height; ++i){
-						if (DGifGetLine(gifFile, pLine, Width) == GIF_ERROR){
+					for(i=0;i<height;++i){
+						if(DGifGetLine(gifFile,pLine,width)==GIF_ERROR){
 							delete[] pLine;
 							return GIF_ERROR;
 						}
-						copyGIFLine(mWorking->getData(),workingWidth,workingHeight,x,y,Width,Height,Width,i,pLine,transparent,pColorTable,pixelSize,format);
+						copyGIFLine(mWorking->getData(),workingWidth,workingHeight,x,y,width,height,width,i,pLine,transparent,pColorTable,pixelSize,format);
 					}
 				}
 				delete[] pLine;
 
-				if(mBase==NULL){
-					mBase=mWorking->clone();
-				}
-
 				image=flipImage(mWorking);
-				delayMilliseconds=mDelayMilliseconds;
 
-				// Prepare second image with next starting
-				if(dispose == GIF_DISPOSE_BACKGND){
-					/* Untested
+				if(dispose == GIF_DISPOSE_LEAVE){
+					memcpy(mBase->getData(),mWorking->getData(),mWorking->getPixelSize()*mWorking->getWidth()*mWorking->getHeight());
+				}
+ 				else if(dispose == GIF_DISPOSE_BACKGND){
 					GifColorType *color=gifFile->SColorMap->Colors + gifFile->SBackGroundColor;
-					const int x = gifFile->Image.Left;
-					const int y = gifFile->Image.Top;
-					const int Width = gifFile->Image.Width;
-					const int Height = gifFile->Image.Height;
-
-					int i,j;
-					for(i=y;i<y+Width;++i){
-						for(j=x;j<x+Height;++j){
-							if(mWorking->type==Image::TYPE_RGB){
-								mWorking->data[(i*mWorking->width+j)*3+0]=color->Red;
-								mWorking->data[(i*mWorking->width+j)*3+1]=color->Green;
-								mWorking->data[(i*mWorking->width+j)*3+2]=color->Blue;
-							}
-							else{
-								mWorking->data[(i*mWorking->width+j)*4+0]=color->Red;
-								mWorking->data[(i*mWorking->width+j)*4+1]=color->Green;
-								mWorking->data[(i*mWorking->width+j)*4+2]=color->Blue;
-								mWorking->data[(i*mWorking->width+j)*4+3]=0;
-							}
-						}
-					}
-					*/
+					setImagePortion(mWorking,gifFile->Image.Left,gifFile->Image.Top,gifFile->Image.Width,gifFile->Image.Height,color->Red,color->Green,color->Blue);
 				}
 				else if(dispose == GIF_DISPOSE_RESTORE){
-					memcpy(mBase->getData(),mWorking->getData(),mWorking->getPixelSize()*mWorking->getWidth()*mWorking->getHeight());
+					const int x = gifFile->Image.Left;
+					const int y = gifFile->Image.Top;
+					const int width = gifFile->Image.Width;
+					const int height = gifFile->Image.Height;
+					const int stride = width*pixelSize;
+
+					int j;
+					for(j=y;j<y+height;++j){
+						memcpy(mWorking->getData()+y*stride+x,mBase->getData()+y*stride+x,stride);
+					}
 				}
 				else{
 					// Dont do anything
@@ -249,15 +263,19 @@ int GIFHandler::getNextImage(GifFileType *gifFile,Image *&image,int &delayMillis
 				case COMMENT_EXT_FUNC_CODE:
 					break;
 				case GRAPHICS_EXT_FUNC_CODE:{
-					int flag = pExtension[1];
-					int16 d=*(int16*)&pExtension[2];
-					littleInt16InPlace(d);
+					int flag = pExtension[0];
 
-					// Not really correct probably, but sometimes zero's crop up when they shouldnt...
-					if(d!=0){
-						mDelayMilliseconds=d*10;
+					frameDelay=(pExtension[2] << 8) | pExtension[1];
+					if(frameDelay<10){
+						frameDelay=10;
 					}
-
+			
+					if((flag&GIF_TRANSPARENT)>0){
+						transparent=pExtension[3];
+					}
+					else{
+						transparent=GIF_NOT_TRANSPARENT;
+					}
 					transparent = (flag & GIF_TRANSPARENT) ? pExtension[4] : GIF_NOT_TRANSPARENT;
 					dispose = (flag >> GIF_DISPOSE_SHIFT) & GIF_DISPOSE_MASK;
 
@@ -325,10 +343,10 @@ Image *GIFHandler::loadImage(Stream *stream){
 	resetReader();
 
 	Image *image=0;
-	int delayMilliseconds=0;
+	int frameDelay=0;
 	int result=0;
 
-	result=getNextImage(file,image,delayMilliseconds);
+	result=getNextImage(file,image,frameDelay);
 	if(result==GIF_ERROR){
 		delete image;
 
@@ -355,7 +373,7 @@ bool GIFHandler::saveImage(Image *image,Stream *stream){
 	return false;
 }
 
-bool GIFHandler::loadAnimatedImage(Stream *stream,Collection<Image*> &images,Collection<int> &delaysMilliseconds){
+bool GIFHandler::loadAnimatedImage(Stream *stream,Collection<Image*> &images,Collection<int> &frameDelays){
 	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_EGG,
 			"Stream is NULL");
@@ -373,16 +391,16 @@ bool GIFHandler::loadAnimatedImage(Stream *stream,Collection<Image*> &images,Col
 	resetReader();
 
 	Image *image;
-	int delayMilliseconds;
+	int frameDelay;
 	int result;
 
 	do{
 		image=0;
-		delayMilliseconds=0;
-		result=getNextImage(file,image,delayMilliseconds);
+		frameDelay=0;
+		result=getNextImage(file,image,frameDelay);
 		if(image!=0 && result!=GIF_ERROR){
 			images.add(image);
-			delaysMilliseconds.add(delayMilliseconds);
+			frameDelays.add(frameDelay);
 		}
 	}while(result!=GIF_ERROR && image!=0);
 

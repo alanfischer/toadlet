@@ -141,6 +141,8 @@ protected:
 
 	StatisticsSet mStatisticsSet;
 	CapabilitySet mCapabilitySet;
+
+	Matrix4x4 cache_setTextureStage_transform;
 };
 
 }

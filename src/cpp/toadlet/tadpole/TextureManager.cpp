@@ -130,7 +130,7 @@ void TextureManager::contextActivate(peeper::Renderer *renderer){
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
-		if(texture->getRootTexture()!=texture){
+		if(texture->getRootTexture(0)!=texture){
 			Texture::ptr back(renderer->createTexture());
 			back->create(texture->getUsageFlags(),texture->getDimension(),texture->getFormat(),texture->getWidth(),texture->getHeight(),texture->getDepth(),0);
 			shared_static_cast<BackableTexture>(texture)->setBack(back);
@@ -145,7 +145,7 @@ void TextureManager::contextDeactivate(peeper::Renderer *renderer){
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
-		if(texture->getRootTexture()!=texture){
+		if(texture->getRootTexture(0)!=texture){
 			shared_static_cast<BackableTexture>(texture)->setBack(NULL);
 		}
 		else{

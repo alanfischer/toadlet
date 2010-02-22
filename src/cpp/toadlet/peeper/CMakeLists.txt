@@ -10,6 +10,8 @@ set (PEEPER_SRC
 	IndexBufferAccessor.cpp
 	IndexData.cpp
 	Light.cpp
+	SectionTexture.cpp
+	SequenceTexture.cpp
 	TextureStage.cpp
 	VertexBufferAccessor.cpp
 	VertexData.cpp
@@ -41,6 +43,8 @@ set (PEEPER_HEADERS
 	RenderTarget.h
 	Renderer.h
 	RenderQuery.h
+	SectionTexture.h
+	SequenceTexture.h
 	Shader.h
 	StatisticsSet.h
 	Surface.h

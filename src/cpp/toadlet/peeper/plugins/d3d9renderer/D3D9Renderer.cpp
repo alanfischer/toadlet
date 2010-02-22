@@ -648,7 +648,7 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 	if(textureStage!=NULL){
 		Texture *texture=textureStage->texture;
 		if(texture!=NULL){
-			D3D9Texture *d3dtexture=(D3D9Texture*)texture->getRootTexture();
+			D3D9Texture *d3dtexture=(D3D9Texture*)texture->getRootTexture(textureStage->textureFrame);
 			result=mD3DDevice->SetTexture(stage,d3dtexture->mTexture);
 			TOADLET_CHECK_D3D9ERROR(result,"SetTexture");
 		}
@@ -662,6 +662,12 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 
 		// TODO: Only if we're not using shaders
 		TextureStage::Calculation calculation=textureStage->calculation;
+		Matrix4x4 &transform=cache_setTextureStage_transform;
+		bool identityTransform=texture->getRootTransform(textureStage->textureFrame,transform);
+		if(identityTransform==false){
+			calculation=TextureStage::Calculation_NORMAL;
+		}
+
 		if(calculation!=TextureStage::Calculation_DISABLED){
 			if(calculation==TextureStage::Calculation_NORMAL){
 				// TODO: Get this working with 3D Texture coordinates.  Doesnt seem to currently
@@ -670,7 +676,13 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 				result=mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT2);
 				TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
 
-				toD3DMATRIX(cacheD3DMatrix,textureStage->matrix);
+				if(identityTransform==false){
+					Math::postMul(transform,textureStage->matrix);
+					toD3DMATRIX(cacheD3DMatrix,transform);
+				}
+				else{
+					toD3DMATRIX(cacheD3DMatrix,textureStage->matrix);
+				}
 				#if defined(TOADLET_HAS_DIRECT3DMOBILE) && defined(TOADLET_FIXED_POINT)
 					scalar t;
 				#else

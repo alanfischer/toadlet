@@ -152,7 +152,7 @@ void HopScene::setHopEntityNetworkID(HopEntity *entity,int id){
 		mFreeNetworkIDs.add(entity->mNetworkID);
 		mNetworkIDMap[entity->mNetworkID]=NULL;
 
-		Logger::alert(Categories::TOADLET_TADPOLE,String("Freeing NetworkID:")+entity->mNetworkID);
+//		Logger::alert(Categories::TOADLET_TADPOLE,String("Freeing NetworkID:")+entity->mNetworkID);
 	}
 	if(id>=0){
 		if(id>=mNetworkIDMap.size()){
@@ -162,7 +162,7 @@ void HopScene::setHopEntityNetworkID(HopEntity *entity,int id){
 	}
 
 	entity->mNetworkID=id;
-	Logger::alert(Categories::TOADLET_TADPOLE,String("Assigning NetworkID:")+entity->mNetworkID);
+//	Logger::alert(Categories::TOADLET_TADPOLE,String("Assigning NetworkID:")+entity->mNetworkID);
 }
 
 void HopScene::resetNetworkIDs(){

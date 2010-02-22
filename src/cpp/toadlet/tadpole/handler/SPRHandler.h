@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_HANDLER_SPRHANDLER_H
 
 #include <toadlet/egg/image/SPRHandler.h>
-//#include <toadlet/peeper/TextureSequence.h>
+#include <toadlet/peeper/SequenceTexture.h>
 #include <toadlet/tadpole/ResourceHandler.h>
 #include <toadlet/tadpole/TextureManager.h>
 
@@ -53,21 +53,12 @@ public:
 			return mTextureManager->createTexture(egg::image::Image::ptr(images[0]));
 		}
 		else{
-/*			peeper::TextureSequence *textureSequence=new peeper::TextureSequence();
-			textureSequence->setNumFrames(images.size());
-
+			peeper::SequenceTexture::ptr sequence(new peeper::SequenceTexture(peeper::Texture::Dimension_D2,images.size()));
 			int i;
 			for(i=0;i<images.size();++i){
-				egg::image::Image::ptr image=egg::image::Image::ptr(images[i]);
-				peeper::Texture::ptr frame(new peeper::Texture(image));
-				// TODO: Work delay into TextureSequences
-				peeper::Texture::ptr texture=egg::shared_static_cast<peeper::Texture>(mTextureManager->load(frame));
-				textureSequence->setFrame(i,texture);
+				sequence->setTexture(i,mTextureManager->createTexture(egg::image::Image::ptr(images[i])));
 			}
-
-			return textureSequence;
-*/
-return NULL;
+			return egg::shared_static_cast<peeper::Texture>(sequence);
 		}
 	}
 
