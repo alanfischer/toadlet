@@ -26,6 +26,7 @@
 #include <toadlet/egg/Collection.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/peeper/SequenceTexture.h>
 #include <toadlet/tadpole/handler/platform/win32/Win32TextureHandler.h>
 
 #if defined(TOADLET_PLATFORM_WINCE)
@@ -198,32 +199,68 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData
 	#else
 		Bitmap *bitmap=Bitmap::FromStream(stream);
 		if(bitmap==NULL){
+			Error::unknown("error creating bitmap");
 			return NULL;
 		}
 
 		int status=bitmap->GetLastStatus();
 		if(status!=Ok){
 			delete bitmap;
-			Logger::alert(String("Status:")+status);
+			Error::unknown("error after creating bitmap");
 			return NULL;
 		}
 
-		PixelFormat gdiformat=bitmap->GetPixelFormat();
-		int format=getFormat(&gdiformat);
-		image::Image::ptr image(new image::Image(image::Image::Dimension_D2,format,bitmap->GetWidth(),bitmap->GetHeight()));
+		int dimensionCount=bitmap->GetFrameDimensionsCount();
+		GUID *dimensionIDs=new GUID[dimensionCount];
+		bitmap->GetFrameDimensionsList(dimensionIDs,dimensionCount);
+		int frameCount=bitmap->GetFrameCount(&dimensionIDs[0]);
 
-		Rect rect(0,0,bitmap->GetWidth(),bitmap->GetHeight());
-		BitmapData data;
-		bitmap->LockBits(&rect,ImageLockModeRead,gdiformat,&data);
+		// We could use the below code to get the times
+		// Assume that the image has a property item of type PropertyItemEquipMake.
+		// Get the size of that property item.
+		//int propertySize=bitmap->GetPropertyItemSize(PropertyTagFrameDelay);
+		//PropertyItem propertyItem=(PropertyItem*)malloc(nSize);
+		//GetPropertyItem(PropertyTagFrameDelay,properySize,propertyItem);
+		//delete dimensionIDs;
 
+		Collection<image::Image::ptr> images;
 		int i;
-		for(i=0;i<image->getHeight();++i){
-			memcpy(image->getData()+image->getWidth()*image->getPixelSize()*i,((uint8*)data.Scan0)+data.Stride*(bitmap->GetHeight()-i-1),image->getWidth()*image->getPixelSize());
+		for(i=0;i<frameCount;++i){
+			bitmap->SelectActiveFrame(&dimensionIDs[0],i);
+			PixelFormat gdiformat=bitmap->GetPixelFormat();
+			int format=getFormat(&gdiformat);
+
+			image::Image::ptr image(new image::Image(image::Image::Dimension_D2,format,bitmap->GetWidth(),bitmap->GetHeight()));
+			Rect rect(0,0,bitmap->GetWidth(),bitmap->GetHeight());
+			BitmapData data;
+			bitmap->LockBits(&rect,ImageLockModeRead,gdiformat,&data);
+
+			int j;
+			for(j=0;j<image->getHeight();++j){
+				memcpy(image->getData()+image->getWidth()*image->getPixelSize()*j,((uint8*)data.Scan0)+data.Stride*(bitmap->GetHeight()-j-1),image->getWidth()*image->getPixelSize());
+			}
+
+			bitmap->UnlockBits(&data);
+
+			images.add(image);
 		}
 
-		bitmap->UnlockBits(&data);
+		delete dimensionIDs;
 
-		return mTextureManager->createTexture(image);
+		if(images.size()==0){
+			return NULL;
+		}
+		else if(images.size()==1){
+			return mTextureManager->createTexture(image::Image::ptr(images[0]));
+		}
+ 		else{
+			SequenceTexture::ptr sequence(new SequenceTexture(Texture::Dimension_D2,images.size()));
+			int i;
+			for(i=0;i<images.size();++i){
+				sequence->setTexture(i,mTextureManager->createTexture(image::Image::ptr(images[i])));
+			}
+			return shared_static_cast<Texture>(sequence);
+		}
 	#endif
 
 	return NULL;

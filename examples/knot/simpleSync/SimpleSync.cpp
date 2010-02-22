@@ -390,7 +390,7 @@ void SimpleSync::intraUpdate(int dt){
 
 				client->handleConnectionEvent(connectionEvent);
 
-				player[client->getClientID()]->setCollisionBits(playerScope);
+				player[client->getClientID()]->getSolid()->setScope(playerScope);
 				player[client->getClientID()]->getSolid()->setStayActive(true);
 
 				// TODO: The initial setting of the Look angles doesn't work yet
@@ -438,7 +438,7 @@ void SimpleSync::intraUpdate(int dt){
 				int updateDT=0;
 				int minDT=scene->getLogicDT()!=0?scene->getLogicDT():10;
 				for(updateDT=(int)Math::minVal(minDT,clientTime-serverTime);serverTime<clientTime;updateDT=(int)Math::minVal(minDT,clientTime-serverTime)){
-					scene->getSimulator()->update(updateDT,~player[client->getClientID()]->getCollisionBits(),NULL);
+					scene->getSimulator()->update(updateDT,~player[client->getClientID()]->getSolid()->getScope(),NULL);
 					serverTime+=updateDT;
 				}
 			}
@@ -468,7 +468,7 @@ void SimpleSync::intraUpdate(int dt){
 				EventConnection::ptr client=server->getClient(id);
 				if(client!=NULL){
 					player[id]->setScope(playerScope);
-					player[id]->setCollisionBits(playerScope);
+					player[id]->getSolid()->setScope(playerScope);
 					EulerAngle eulerAngles;
 					Math::setEulerAngleXYZFromQuaternion(eulerAngles,player[id]!=NULL?player[id]->getRotate():Math::IDENTITY_QUATERNION,0.001);
 					client->send(Event::ptr(new ConnectionEvent(id,eulerAngles)));
@@ -479,7 +479,7 @@ void SimpleSync::intraUpdate(int dt){
 			for(i=0;i<playersDisconnected.size();++i){
 				int id=playersDisconnected[i];
 				player[id]->setScope(-1);
-				player[id]->setCollisionBits(-1);
+				player[id]->getSolid()->setScope(-1);
 			}
 			playersDisconnected.clear();
 		mutex.unlock();

@@ -37,27 +37,11 @@ public:
 
 	virtual ~AnimatedTexture(){}
 
-	virtual 
-	virtual Texture *getRootTexture(){return mTextures.size()>0?mTextures[0]:NULL;}
+	virtual int getNumFrames() const=0;
+	virtual void setFrame(int frame,const Texture::ptr &texture)=0;
 
-	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels);
-	virtual void destroy();
-
-	virtual bool createContext();
-	virtual void destroyContext(bool backData);
-	virtual bool contextNeedsReset();
-
-	virtual int getUsageFlags() const{return mUsageFlags;}
-	virtual Dimension getDimension() const{return mDimension;}
-	virtual int getFormat() const{return mFormat;}
-	virtual int getWidth() const{return mWidth;}
-	virtual int getHeight() const{return mHeight;}
-	virtual int getDepth() const{return mDepth;}
-	virtual int getNumMipLevels() const{return mMipLevels;}
-
-	virtual Surface::ptr getMipSurface(int i,int cubeSide);
-	virtual bool load(int format,int width,int height,int depth,int mipLevel,uint8 *data);
-	virtual bool read(int format,int width,int height,int depth,int mipLevel,uint8 *data);
+	virtual const peeper::Texture::ptr &getTextureForFrame(int frame) const=0;
+	virtual bool getMatrix4x4ForFrame(int frame,Matrix4x4 &matrix) const=0; // Returns false if the identity Matrix4x4
 };
 
 }

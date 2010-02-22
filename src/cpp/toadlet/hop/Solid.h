@@ -50,6 +50,9 @@ public:
 
 	void reset();
 
+	void setScope(int scope){mScope=scope;}
+	int getScope() const{return mScope;}
+
 	void setCollisionBits(int bits){mCollisionBits=bits;}
 	int getCollisionBits() const{return mCollisionBits;}
 
@@ -128,11 +131,12 @@ public:
 
 	void updateLocalBound();
 
-//protected:
+protected:
 	void internal_setSimulator(Simulator *s);
 	void internal_addConstraint(Constraint *constraint){mConstraints.add(constraint);}
 	void internal_removeConstraint(Constraint *constraint){mConstraints.remove(constraint);}
 
+	int mScope;
 	int mCollisionBits;
 	int mCollideWithBits;
 	scalar mMass;

@@ -40,7 +40,8 @@ public:
 	BackableTexture();
 	virtual ~BackableTexture();
 
-	virtual Texture *getRootTexture(){return mBack;}
+	virtual Texture *getRootTexture(int frame){return mBack;}
+	virtual bool getRootTransform(int frame,Matrix4x4 &transform){return true;}
 
 	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels);
 	virtual void destroy();

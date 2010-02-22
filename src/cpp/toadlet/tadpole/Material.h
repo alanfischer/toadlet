@@ -99,6 +99,7 @@ protected:
 	peeper::Renderer::Fill mFill;
 	int mLayer;
 	egg::Collection<peeper::TextureStage::ptr> mTextureStages;
+	egg::Collection<peeper::Texture::ptr> mAnimatedTextures;
 	bool mSaveLocally;
 };
 

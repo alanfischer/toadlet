@@ -1094,7 +1094,7 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 		Texture *texture=textureStage->texture;
 		GLuint textureTarget=0;
 		if(texture!=NULL){
-			GLTexture *gltexture=(GLTexture*)texture->getRootTexture();
+			GLTexture *gltexture=(GLTexture*)texture->getRootTexture(textureStage->textureFrame);
 
 			textureTarget=gltexture->mTarget;
 
@@ -1104,7 +1104,13 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 			}
 
 			TextureStage::Calculation calculation=textureStage->calculation;
-			if(calculation!=TextureStage::Calculation_DISABLED || (gltexture->mUsageFlags&(Texture::UsageFlags_NPOT_RESTRICTED|Texture::UsageFlags_RENDERTARGET))>0){
+			Matrix4x4 &transform=cache_setTextureStage_transform;
+			bool identityTransform=texture->getRootTransform(textureStage->textureFrame,transform);
+			if((gltexture->mUsageFlags&(Texture::UsageFlags_NPOT_RESTRICTED|Texture::UsageFlags_RENDERTARGET))>0 || identityTransform==false){
+				calculation=TextureStage::Calculation_NORMAL;
+			}
+
+			if(calculation!=TextureStage::Calculation_DISABLED){
 				if(mMatrixMode!=GL_TEXTURE){
 					mMatrixMode=GL_TEXTURE;
 					glMatrixMode(mMatrixMode);
@@ -1125,6 +1131,18 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 				}
 				else{
 					glLoadIdentity();
+				}
+
+				if(identityTransform==false){
+					#if defined(TOADLET_FIXED_POINT)
+						#if defined(TOADLET_HAS_GLES)
+							glMultMatrixx(transform.data);
+						#else
+							glMultMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,transform).data);
+						#endif
+					#else
+						glMultMatrixf(transform.data);
+					#endif
 				}
 
 				#if defined(TOADLET_FIXED_POINT)

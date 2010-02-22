@@ -44,19 +44,18 @@ public:
 	virtual Image *loadImage(io::Stream *stream);
 	virtual bool saveImage(Image *image,io::Stream *stream);
 
-	virtual bool loadAnimatedImage(io::Stream *stream,Collection<Image*> &images,Collection<int> &delayMilliseconds);
+	virtual bool loadAnimatedImage(io::Stream *stream,Collection<Image*> &images,Collection<int> &frameDelays);
 
 protected:
 	GifFileType *openFile(io::Stream *stream);
 	int closeFile(GifFileType *file);
 	void resetReader();
-	int getNextImage(GifFileType *gifFile,Image *&image,int &delayMilliseconds);
+	int getNextImage(GifFileType *gifFile,Image *&image,int &frameDelay);
 
 	Image *flipImage(Image *image);
 
 	Image *mWorking;
 	Image *mBase;
-	int mDelayMilliseconds;
 };
 
 }

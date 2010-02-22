@@ -180,17 +180,11 @@ protected:
 	RenderTarget *mRenderTarget;
 	GLRenderTarget *mGLRenderTarget;
 
-	class ScratchBuffer{
-	public:
-		uint8 *data;
-		int size;
-		bool free;
-	};
-	egg::Collection<ScratchBuffer> mScratchBuffers;
-
 	#if defined(TOADLET_DEBUG)
 		int mBeginEndCounter;
 	#endif
+
+	Matrix4x4 cache_setTextureStage_transform;
 
 	friend class GLBuffer;
 };
