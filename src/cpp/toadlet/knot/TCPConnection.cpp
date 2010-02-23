@@ -63,7 +63,7 @@ TCPConnection::TCPConnection(egg::net::Socket::ptr socket,bool blocking):
 	//mDebugThread
 	mDebugRun(false)
 {
-	int maxSize=1024;
+	int maxSize=4096;
 	mOutPacket=MemoryStream::ptr(new MemoryStream(new uint8[maxSize],maxSize,0,true));
 	mDataOutPacket=DataStream::ptr(new DataStream(Stream::ptr(mOutPacket)));
 	mInPacket=MemoryStream::ptr(new MemoryStream(new uint8[maxSize],maxSize,maxSize,true));
@@ -246,16 +246,20 @@ int TCPConnection::send(const byte *data,int length){
 	int amount=0;
 
 	mDataOutPacket->writeBigInt16(length);
-	mDataOutPacket->write(data,length);
+	amount=mDataOutPacket->write(data,length);
+	if(amount>=length){
+		TOADLET_TRY
+			if(mSocket!=NULL){
+				amount=mSocket->send(mOutPacket->getOriginalDataPointer(),mOutPacket->length());
+			}
+		TOADLET_CATCH(const Exception &){amount=-1;}
 
-	TOADLET_TRY
-		if(mSocket!=NULL){
-			amount=mSocket->send(mOutPacket->getOriginalDataPointer(),mOutPacket->length());
-		}
-	TOADLET_CATCH(const Exception &){amount=-1;}
-
-	// We need to account for the bigInt we write first
-	if(amount>0){ amount-=2; }
+		// We need to account for the bigInt we write first
+		if(amount>0){ amount-=2; }
+	}
+	else{
+		amount=-2;
+	}
 
 	mOutPacket->reset();
 

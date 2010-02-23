@@ -50,10 +50,11 @@ SimpleEventConnection::SimpleEventConnection(EventFactory *eventFactory,Connecti
 	//mThread,
 	mRun(false)
 {
-	mPacketIn=MemoryStream::ptr(new MemoryStream(new byte[1024],1024,1024,true));
-	mDataPacketIn=DataStream::ptr(new DataStream(Stream::ptr(mPacketIn)));
-	mPacketOut=MemoryStream::ptr(new MemoryStream());
+	int maxSize=4096;
+	mPacketOut=MemoryStream::ptr(new MemoryStream(new byte[maxSize],maxSize,0,true));
 	mDataPacketOut=DataStream::ptr(new DataStream(Stream::ptr(mPacketOut)));
+	mPacketIn=MemoryStream::ptr(new MemoryStream(new byte[maxSize],maxSize,maxSize,true));
+	mDataPacketIn=DataStream::ptr(new DataStream(Stream::ptr(mPacketIn)));
 
 	if(eventFactory!=NULL){
 		setEventFactory(eventFactory);
@@ -223,6 +224,9 @@ int SimpleEventConnection::sendEvent(Event::ptr event){
 	int amount=-1;
 	if(mConnection!=NULL){
 		amount=mConnection->send(mPacketOut->getOriginalDataPointer(),mPacketOut->length());
+		if(amount<mPacketOut->length()){
+			amount=-1;
+		}
 	}
 
 	mPacketOut->reset();

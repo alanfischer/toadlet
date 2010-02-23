@@ -167,7 +167,9 @@ void SpriteNode::setMaterial(Material::ptr material){
 	}
 
 	// We clone the Material, so we can animate it freely
-	mMaterial=material->clone();
+	if(material!=NULL){
+		mMaterial=material->clone();
+	}
 
 	if(mMaterial!=NULL){
 		mMaterial->retain();
