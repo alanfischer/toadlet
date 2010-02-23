@@ -23,36 +23,36 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_IMAGE_SPRHANDLER_H
-#define TOADLET_EGG_IMAGE_SPRHANDLER_H
+#ifndef TOADLET_TADPOLE_ANIMATION_TEXTURESTAGEANIMATION_H
+#define TOADLET_TADPOLE_ANIMATION_TEXTURESTAGEANIMATION_H
 
-#include <toadlet/egg/image/Image.h>
-#include <toadlet/egg/io/DataStream.h>
-#include <toadlet/egg/Collection.h>
+#include <toadlet/peeper/TextureStage.h>
+#include <toadlet/tadpole/animation/Animation.h>
 
 namespace toadlet{
-namespace egg{
-namespace image{
+namespace tadpole{
+namespace animation{
 
-class TOADLET_API SPRHandler{
+class TextureStageAnimation:public Animation{
 public:
-	SPRHandler();
-	virtual ~SPRHandler();
+	TOADLET_SHARED_POINTERS(TextureStageAnimation);
 
-	virtual Image *loadImage(io::Stream *in);
-	virtual bool saveImage(Image *image,io::Stream *out);
+	TextureStageAnimation(){}
+	virtual ~TextureStageAnimation(){}
 
-	virtual bool loadAnimatedImage(io::Stream *in,Collection<Image*> &images,Collection<int> &frameDelays);
+	void setTarget(peeper::TextureStage::ptr target){mTarget=target;}
+	inline peeper::TextureStage::ptr getTarget() const{return mTarget;}
+
+	void set(scalar value){mTarget->setTime(value);}
+
+	scalar getMin() const{return 0;}
+	scalar getMax() const{return mTarget->getLength();}
+
+	void attached(AnimationController *){}
+	void removed(AnimationController *){}
 
 protected:
-	virtual bool openFile(io::Stream *in);
-	virtual void closeFile();
-	virtual Image *getNextImage();
-
-	io::DataStream::ptr mDataStream;
-	void *mSprite;
-	unsigned char *mPalette;
-	int mNextFrame;
+	peeper::TextureStage::ptr mTarget;
 };
 
 }

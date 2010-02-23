@@ -32,13 +32,6 @@
 #include <toadlet/peeper/Types.h>
 #include <toadlet/peeper/Surface.h>
 
-// AnimatedTextures :  pro - Lets GIFHandler still pop out a Texture, but it can be an AnimatedTexture
-//
-// Is there any way to 'chain' AnimatedTextures together if they are used by a Material, and the Material is animated?
-//  I could modify the getRootTexture to be getRootTexture(frame), a getTransform(frame), and a getNumFrames().
-// GLTexture would always return 1, and ignore the other parameters, that would let me chain SequenceTextures and SectionTextures like I desired
-//  It would remove the whole AnimatedTexture class.
-
 namespace toadlet{
 namespace peeper{
 
@@ -55,8 +48,8 @@ public:
 
 	virtual ~Texture(){}
 
-	virtual Texture *getRootTexture(int frame)=0;
-	virtual bool getRootTransform(int frame,Matrix4x4 &transform)=0;
+	virtual Texture *getRootTexture(scalar time)=0;
+	virtual bool getRootTransform(scalar time,Matrix4x4 &transform)=0;
 
 	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels)=0;
 	virtual void destroy()=0;
@@ -72,6 +65,7 @@ public:
 	virtual int getHeight() const=0;
 	virtual int getDepth() const=0;
 	virtual int getNumMipLevels() const=0;
+	virtual scalar getLength() const=0;
 
 	// TODO: Perhaps the whole frame portion of getRootTexture could be combined with this mipsurface thing somehow
 	//  Where Textures would just have SubTextures, which would be the surfaces perhaps?

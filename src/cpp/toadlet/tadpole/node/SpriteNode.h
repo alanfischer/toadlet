@@ -31,6 +31,8 @@
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/Material.h>
+#include <toadlet/tadpole/animation/AnimationController.h>
+#include <toadlet/tadpole/animation/TextureStageAnimation.h>
 #include <toadlet/tadpole/node/Node.h>
 #include <toadlet/tadpole/node/Renderable.h>
 #include <toadlet/tadpole/node/Sizeable.h>
@@ -45,6 +47,27 @@ class TOADLET_API SpriteNode:public Node,public Renderable,public Sizeable{
 public:
 	TOADLET_NODE(SpriteNode,Node);
 
+	/// Specialization of the AnimationController that allows for easy access to playing sprites.
+	class TOADLET_API SpriteAnimationController:public animation::AnimationController{
+	public:
+		TOADLET_SHARED_POINTERS(SpriteAnimationController);
+
+		SpriteAnimationController(SpriteNode *node);
+
+		virtual void start();
+		virtual void stop();
+
+		virtual void logicUpdate(int dt);
+		virtual void renderUpdate(int dt);
+
+		void materialChanged();
+
+	protected:
+		SpriteNode *mSpriteNode;
+		animation::TextureStageAnimation::ptr mAnimation;
+		int mStartingFrame;
+	};
+	
 	SpriteNode();
 	virtual Node *create(Engine *engine);
 	virtual void destroy();
@@ -70,6 +93,10 @@ public:
 	const Vector3 &getSize() const{return mSize;}
 	const Vector3 &getDesiredSize(){return Math::ZERO_VECTOR3;}
 
+	SpriteAnimationController::ptr getAnimationController();
+
+	void logicUpdate(int dt);
+	void renderUpdate(int dt);
 	void queueRenderable(SceneNode *scene,CameraNode *camera);
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Matrix4x4 &getRenderTransform() const{return mWorldSpriteTransform;}
@@ -87,6 +114,7 @@ protected:
 	int mAlignment;
 	bool mPixelSpace;
 	Vector3 mSize;
+	SpriteAnimationController::ptr mAnimationController;
 
 	Material::ptr mMaterial;
 	peeper::VertexData::ptr mVertexData;

@@ -23,6 +23,12 @@
  *
  ********** Copyright header - do not remove **********/
 
+// TODO: The GIFHandler needs to be cleaned up in several ways:
+//  - Delays seem to be too long
+//  - Transparent backgrounds dont work properly
+//  - Some of the disposes seem to be broken, so it doesn't clear out the previous image correctly
+//  - Not all extensions are properly handled
+
 extern "C"{
 	#include <gif_lib.h>
 }

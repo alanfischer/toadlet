@@ -42,9 +42,9 @@ public:
 
 	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData){
 		egg::Collection<egg::image::Image*> images;
-		egg::Collection<int> delayMilliseconds;
+		egg::Collection<int> delays;
 
-		mHandler.loadAnimatedImage(stream,images,delayMilliseconds);
+		mHandler.loadAnimatedImage(stream,images,delays);
 
 		if(images.size()==0){
 			return NULL;
@@ -56,7 +56,7 @@ public:
 			peeper::SequenceTexture::ptr sequence(new peeper::SequenceTexture(peeper::Texture::Dimension_D2,images.size()));
 			int i;
 			for(i=0;i<images.size();++i){
-				sequence->setTexture(i,mTextureManager->createTexture(egg::image::Image::ptr(images[i])));
+				sequence->setTexture(i,mTextureManager->createTexture(egg::image::Image::ptr(images[i])),Math::fromMilli(delays[i]));
 			}
 			return egg::shared_static_cast<peeper::Texture>(sequence);
 		}

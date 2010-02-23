@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/SequenceTexture.h>
 
 using namespace toadlet::egg;
@@ -34,57 +35,46 @@ namespace peeper{
 SequenceTexture::SequenceTexture(Dimension dimension,int frames){
 	mDimension=dimension;
 	mTextures.resize(frames);
+	mDelays.resize(frames,0);
 }
 
 SequenceTexture::~SequenceTexture(){
 }
 
-Texture *SequenceTexture::getRootTexture(int frame){
+Texture *SequenceTexture::getRootTexture(scalar time){
 	int i;
 	for(i=0;i<mTextures.size();++i){
-		if(mTextures[i]!=NULL){
-			int frames=0;
-			switch(mDimension){
-				case(Dimension_D1):
-					frames=mTextures[i]->getHeight();
-				break;
-				case(Dimension_D2):
-					frames=mTextures[i]->getDepth();
-				break;
-			}
-			if(frame>frames){
-				frame-=frames;
-			}
-			else{
-				return mTextures[i]->getRootTexture(frame);
-			}
-		}
+		scalar length=mTextures[i]!=NULL?mTextures[i]->getLength():0;
+		length=length>0?length:mDelays[i];
+		if(time>=length) time-=length;
+		else return mTextures[i]->getRootTexture(time);
 	}
-	return NULL;
+
+	// Otherwise just return the last one if available
+	if(mTextures.size()>0){
+		return mTextures[mTextures.size()-1]->getRootTexture(time);
+	}
+	else{
+		return NULL;
+	}
 }
 
-bool SequenceTexture::getRootTransform(int frame,Matrix4x4 &transform){
+bool SequenceTexture::getRootTransform(scalar time,Matrix4x4 &transform){
 	int i;
 	for(i=0;i<mTextures.size();++i){
-		if(mTextures[i]!=NULL){
-			int frames=0;
-			switch(mDimension){
-				case(Dimension_D1):
-					frames=mTextures[i]->getHeight();
-				break;
-				case(Dimension_D2):
-					frames=mTextures[i]->getDepth();
-				break;
-			}
-			if(frame>frames){
-				frame-=frames;
-			}
-			else{
-				return mTextures[i]->getRootTransform(frame,transform);
-			}
-		}
+		scalar length=mTextures[i]!=NULL?mTextures[i]->getLength():0;
+		length=length>0?length:mDelays[i];
+		if(time>=length) time-=length;
+		else return mTextures[i]->getRootTransform(time,transform);
 	}
-	return true;
+
+	// Otherwise just return the last one if available
+	if(mTextures.size()>0){
+		return mTextures[mTextures.size()-1]->getRootTransform(time,transform);
+	}
+	else{
+		return NULL;
+	}
 }
 
 bool SequenceTexture::create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels){
@@ -139,39 +129,21 @@ int SequenceTexture::getWidth() const{
 }
 
 int SequenceTexture::getHeight() const{
-	if(mDimension==Dimension_D1){
-		return getTotalNumTextures();
-	}
-	else{
-		return (mTextures.size()>0 && mTextures[0]!=NULL)?mTextures[0]->getHeight():0;
-	}
+	return (mTextures.size()>0 && mTextures[0]!=NULL)?mTextures[0]->getHeight():0;
 }
 
 int SequenceTexture::getDepth() const{
-	if(mDimension==Dimension_D2){
-		return getTotalNumTextures();
-	}
-	else{
-		return (mTextures.size()>0 && mTextures[0]!=NULL)?mTextures[0]->getDepth():0;
-	}
+	return (mTextures.size()>0 && mTextures[0]!=NULL)?mTextures[0]->getDepth():0;
 }
 
-int SequenceTexture::getTotalNumTextures() const{
-	int frames=0;
+scalar SequenceTexture::getLength() const{
+	scalar length=0;
 	int i;
 	for(i=0;i<mTextures.size();++i){
-		if(mTextures[i]!=NULL){
-			switch(mDimension){
-				case(Dimension_D1):
-					frames+=mTextures[i]->getHeight();
-				break;
-				case(Dimension_D2):
-					frames+=mTextures[i]->getDepth();
-				break;
-			}
-		}
+		scalar sublength=mTextures[i]!=NULL?mTextures[i]->getLength():0;
+		length+=sublength>0?sublength:mDelays[i];
 	}
-	return frames;
+	return length;
 }
 
 int SequenceTexture::getNumTextures() const{
@@ -182,8 +154,9 @@ Texture::ptr SequenceTexture::getTexture(int frame){
 	return mTextures[frame];
 }
 
-void SequenceTexture::setTexture(int frame,peeper::Texture::ptr texture){
+void SequenceTexture::setTexture(int frame,peeper::Texture::ptr texture,scalar delay){
 	mTextures[frame]=texture;
+	mDelays[frame]=delay;
 }
 
 }
