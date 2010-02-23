@@ -41,8 +41,9 @@ TextureManager::TextureManager(Engine *engine):ResourceManager(engine->getArchiv
 }
 
 Texture::ptr TextureManager::createTexture(const Image::ptr &image,int usageFlags,int mipLevels){
+	// Only handle any autogen simulation if we actually have a renderer
 	bool hasAutogen=mEngine->getRenderer()==NULL?false:mEngine->getRenderer()->getCapabilitySet().textureAutogenMipMaps;
-	bool wantsAutogen=(usageFlags&Texture::UsageFlags_AUTOGEN_MIPMAPS)>0;
+	bool wantsAutogen=mEngine->getRenderer()==NULL?false:(usageFlags&Texture::UsageFlags_AUTOGEN_MIPMAPS)>0;
 
 	if(hasAutogen==false && wantsAutogen==true){
 		usageFlags&=~Texture::UsageFlags_AUTOGEN_MIPMAPS;
