@@ -648,7 +648,7 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 	if(textureStage!=NULL){
 		Texture *texture=textureStage->texture;
 		if(texture!=NULL){
-			D3D9Texture *d3dtexture=(D3D9Texture*)texture->getRootTexture(textureStage->textureFrame);
+			D3D9Texture *d3dtexture=(D3D9Texture*)texture->getRootTexture(textureStage->textureTime);
 			result=mD3DDevice->SetTexture(stage,d3dtexture->mTexture);
 			TOADLET_CHECK_D3D9ERROR(result,"SetTexture");
 		}
@@ -663,7 +663,7 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 		// TODO: Only if we're not using shaders
 		TextureStage::Calculation calculation=textureStage->calculation;
 		Matrix4x4 &transform=cache_setTextureStage_transform;
-		bool identityTransform=texture->getRootTransform(textureStage->textureFrame,transform);
+		bool identityTransform=texture->getRootTransform(textureStage->textureTime,transform);
 		if(identityTransform==false){
 			calculation=TextureStage::Calculation_NORMAL;
 		}

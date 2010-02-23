@@ -31,7 +31,7 @@ namespace peeper{
 TextureStage::TextureStage():
 	//texture,
 	//textureName
-	textureFrame(0),
+	textureTime(0),
 
 	//blend,
 
@@ -53,7 +53,7 @@ TextureStage::TextureStage():
 TextureStage::TextureStage(const Texture::ptr &texture1):
 	//texture,
 	//textureName
-	textureFrame(0),
+	textureTime(0),
 
 	//blend,
 
@@ -121,9 +121,7 @@ void TextureStage::setTexture(const Texture::ptr &texture1){
 		texture->retain();
 	}
 
-	if(getNumFrames()>1){
-		setFrame(0);
-	}
+	textureTime=0;
 }
 
 void TextureStage::setCalculation(Calculation calculation1,const Matrix4x4 &matrix1){
@@ -131,23 +129,12 @@ void TextureStage::setCalculation(Calculation calculation1,const Matrix4x4 &matr
 	matrix.set(matrix1);
 }
 
-int TextureStage::getNumFrames(){
-	if(texture!=NULL){
-		switch(texture->getDimension()){
-			case(Texture::Dimension_D1):
-				return texture->getHeight();
-			case(Texture::Dimension_D2):
-				return texture->getDepth();
-			default:
-				// TODO: Possibly add a 4th parameter to textures, time/frame/something so we can handle D3
-			break;
-		}
-	}
-	return 0;
+scalar TextureStage::getLength(){
+	return texture!=NULL?texture->getLength():0;
 }
 
-void TextureStage::setFrame(int frame){
-	textureFrame=frame;
+void TextureStage::setTime(scalar time){
+	textureTime=time;
 }
 
 }

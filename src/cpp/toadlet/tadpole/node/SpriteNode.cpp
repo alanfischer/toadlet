@@ -32,12 +32,63 @@
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
+using namespace toadlet::tadpole::animation;
 
 namespace toadlet{
 namespace tadpole{
 namespace node{
 
 TOADLET_NODE_IMPLEMENT(SpriteNode,Categories::TOADLET_TADPOLE_NODE+".SpriteNode");
+
+SpriteNode::SpriteAnimationController::SpriteAnimationController(SpriteNode *node):AnimationController(),
+	mSpriteNode(NULL),
+	//mAnimation,
+	mStartingFrame(0)
+{
+	mSpriteNode=node;
+	mAnimation=TextureStageAnimation::ptr(new TextureStageAnimation());
+	if(mSpriteNode->getMaterial()!=NULL && mSpriteNode->getMaterial()->getNumTextureStages()>0){
+		mAnimation->setTarget(mSpriteNode->getMaterial()->getTextureStage(0));
+	}
+	attach(mAnimation);
+}
+
+void SpriteNode::SpriteAnimationController::start(){
+	if(isRunning()){
+		stop();
+	}
+
+	mSpriteNode->setReceiveUpdates(true);
+
+	AnimationController::start();
+	if(mSpriteNode->getEngine()->getScene()!=NULL){
+		mStartingFrame=mSpriteNode->getEngine()->getScene()->getLogicFrame();
+	}
+}
+
+void SpriteNode::SpriteAnimationController::stop(){
+	if(isRunning()==false){
+		return;
+	}
+
+	mSpriteNode->setReceiveUpdates(false);
+
+	AnimationController::stop();
+}	
+
+void SpriteNode::SpriteAnimationController::logicUpdate(int dt){
+	if(mSpriteNode->getEngine()->getScene()==NULL || mStartingFrame!=mSpriteNode->getEngine()->getScene()->getLogicFrame()){
+		AnimationController::logicUpdate(dt);
+	}
+}
+
+void SpriteNode::SpriteAnimationController::renderUpdate(int dt){
+	AnimationController::renderUpdate(dt);
+}
+
+void SpriteNode::SpriteAnimationController::materialChanged(){
+	mAnimation->setTarget(mSpriteNode->getMaterial()->getTextureStage(0));
+}
 
 SpriteNode::SpriteNode():super(),
 	TOADLET_GIB_IMPLEMENT()
@@ -60,23 +111,23 @@ Node *SpriteNode::create(Engine *engine){
 	setCameraAligned(true);
 	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
 	setPixelSpace(false);
-	mSize.reset();
+	mSize.set(Math::ONE,Math::ONE,Math::ONE);
 
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,4);
 	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 	{
 		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
 
-		vba.set3(0,0, -Math::HALF,Math::HALF,0);
+		vba.set3(0,0, -Math::HALF,-Math::HALF,0);
 		vba.set2(0,1, 0,0);
 
-		vba.set3(1,0, Math::HALF,Math::HALF,0);
-		vba.set2(1,1, Math::ONE,0);
+		vba.set3(1,0, -Math::HALF,Math::HALF,0);
+		vba.set2(1,1, 0,Math::ONE);
 
-		vba.set3(2,0, -Math::HALF,-Math::HALF,0);
-		vba.set2(2,1, 0,Math::ONE);
+		vba.set3(2,0, Math::HALF,-Math::HALF,0);
+		vba.set2(2,1, Math::ONE,0);
 
-		vba.set3(3,0, Math::HALF,-Math::HALF,0);
+		vba.set3(3,0, Math::HALF,Math::HALF,0);
 		vba.set2(3,1, Math::ONE,Math::ONE);
 
 		vba.unlock();
@@ -115,13 +166,12 @@ void SpriteNode::setMaterial(Material::ptr material){
 		mMaterial->release();
 	}
 
-	mMaterial=material;
+	// We clone the Material, so we can animate it freely
+	mMaterial=material->clone();
 
 	if(mMaterial!=NULL){
 		mMaterial->retain();
 
-		// TODO: Move these so they are set externally, perhaps in a material manager loadspritematerial or something
-		//  Then we'd just have a debug check here to look for faceculling perhaps...?
 		mMaterial->setFaceCulling(Renderer::FaceCulling_NONE);
 		mMaterial->setDepthWrite(false);
 		int i;
@@ -130,6 +180,10 @@ void SpriteNode::setMaterial(Material::ptr material){
 			mMaterial->getTextureStage(i)->setVAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
 			mMaterial->getTextureStage(i)->setWAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
 		}
+	}
+
+	if(mAnimationController!=NULL){
+		mAnimationController->materialChanged();
 	}
 
 	updateSprite();
@@ -163,6 +217,26 @@ void SpriteNode::setSize(const Vector3 &size){
 	mSize.set(size);
 
 	updateSprite();
+}
+
+SpriteNode::SpriteAnimationController::ptr SpriteNode::getAnimationController(){
+	if(mAnimationController==NULL){
+		mAnimationController=SpriteAnimationController::ptr(new SpriteAnimationController(this));
+	}
+
+	return mAnimationController;
+}
+
+void SpriteNode::logicUpdate(int dt){
+	if(mAnimationController!=NULL){
+		mAnimationController->logicUpdate(dt);
+	}
+}
+
+void SpriteNode::renderUpdate(int dt){
+	if(mAnimationController!=NULL){
+		mAnimationController->renderUpdate(dt);
+	}
 }
 
 void SpriteNode::queueRenderable(SceneNode *scene,CameraNode *camera){
@@ -215,9 +289,9 @@ void SpriteNode::updateSprite(){
 	}
 	Math::setMatrix4x4FromTranslate(mSpriteTransform,x,y,0);
 
-	scalar widthScale=Math::ONE;
-	scalar heightScale=Math::ONE;
-	scalar depthScale=Math::ONE;
+	scalar scaleX=Math::ONE;
+	scalar scaleY=Math::ONE;
+	scalar scaleZ=Math::ONE;
 /*	if(mMaterial!=NULL && mPixelSpace){
 		TextureStage::ptr textureStage=mMaterial->getTextureStage(0);
 		if(textureStage!=NULL){
@@ -230,8 +304,12 @@ void SpriteNode::updateSprite(){
 		}
 	}
 */
+	scaleX=Math::mul(scaleX,Math::mul(mSize.x,mScale.x));
+	scaleY=Math::mul(scaleY,Math::mul(mSize.y,mScale.y));
+	scaleZ=Math::mul(scaleZ,Math::mul(mSize.z,mScale.z));
+
 	Matrix4x4 scale;
-	Math::setMatrix4x4FromScale(scale,Math::mul(mSize.x,widthScale),Math::mul(mSize.y,heightScale),Math::mul(mSize.z,depthScale));
+	Math::setMatrix4x4FromScale(scale,scaleX,scaleY,scaleZ);
 	Math::postMul(mSpriteTransform,scale);
 
 	updateBound();

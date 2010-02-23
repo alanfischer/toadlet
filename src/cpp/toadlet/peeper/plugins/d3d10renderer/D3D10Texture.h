@@ -43,8 +43,8 @@ public:
 
 	virtual ~D3D10Texture();
 
-	virtual Texture *getRootTexture(int frame){return this;}
-	virtual bool getRootTransform(int frame,Matrix4x4 &transform){return true;}
+	virtual Texture *getRootTexture(scalar time){return this;}
+	virtual bool getRootTransform(scalar time,Matrix4x4 &transform){return true;}
 
 	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels);
 	virtual void destroy();
@@ -60,6 +60,7 @@ public:
 	virtual int getHeight() const{return mHeight;}
 	virtual int getDepth() const{return mDepth;}
 	virtual int getNumMipLevels() const{return mMipLevels;}
+	virtual scalar getLength() const{return 0;}
 
 	virtual Surface::ptr getMipSurface(int level,int cubeSide);
 	virtual bool load(int format,int width,int height,int depth,int mipLevel,uint8 *data);

@@ -1093,9 +1093,8 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 	if(textureStage!=NULL){
 		Texture *texture=textureStage->texture;
 		GLuint textureTarget=0;
-		if(texture!=NULL){
-			GLTexture *gltexture=(GLTexture*)texture->getRootTexture(textureStage->textureFrame);
-
+		GLTexture *gltexture=texture!=NULL?(GLTexture*)texture->getRootTexture(textureStage->textureTime):NULL;
+		if(gltexture!=NULL){
 			textureTarget=gltexture->mTarget;
 
 			if(mLastTextures[stage]!=texture){
@@ -1105,7 +1104,7 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 
 			TextureStage::Calculation calculation=textureStage->calculation;
 			Matrix4x4 &transform=cache_setTextureStage_transform;
-			bool identityTransform=texture->getRootTransform(textureStage->textureFrame,transform);
+			bool identityTransform=texture->getRootTransform(textureStage->textureTime,transform);
 			if((gltexture->mUsageFlags&(Texture::UsageFlags_NPOT_RESTRICTED|Texture::UsageFlags_RENDERTARGET))>0 || identityTransform==false){
 				calculation=TextureStage::Calculation_NORMAL;
 			}

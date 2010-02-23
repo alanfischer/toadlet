@@ -41,8 +41,8 @@ public:
 	SequenceTexture(Dimension dimension,int frames);
 	virtual ~SequenceTexture();
 
-	Texture *getRootTexture(int frame);
-	bool getRootTransform(int frame,Matrix4x4 &transform);
+	Texture *getRootTexture(scalar time);
+	bool getRootTransform(scalar time,Matrix4x4 &transform);
 
 	bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels);// Throw not implemented
 	void destroy();
@@ -58,20 +58,21 @@ public:
 	int getHeight() const;
 	int getDepth() const;
 	int getNumMipLevels() const{return 0;}
+	scalar getLength() const;
 
 	Surface::ptr getMipSurface(int i,int cubeSide){return NULL;}
 	// These two methods could be implemented, but we would need to basically find which frame we are talking about, and then call load/read on that
 	bool load(int format,int width,int height,int depth,int mipLevel,uint8 *data){return false;}
 	bool read(int format,int width,int height,int depth,int mipLevel,uint8 *data){return false;}
 
-	int getTotalNumTextures() const;
 	int getNumTextures() const;
 	Texture::ptr getTexture(int frame);
-	void setTexture(int frame,peeper::Texture::ptr texture);
+	void setTexture(int frame,peeper::Texture::ptr texture,scalar delay);
 
 protected:
 	Dimension mDimension;
 	egg::Collection<peeper::Texture::ptr> mTextures;
+	egg::Collection<scalar> mDelays;
 };
 
 }

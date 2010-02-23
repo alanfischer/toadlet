@@ -215,15 +215,15 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData
 		bitmap->GetFrameDimensionsList(dimensionIDs,dimensionCount);
 		int frameCount=bitmap->GetFrameCount(&dimensionIDs[0]);
 
-		// We could use the below code to get the times
-		// Assume that the image has a property item of type PropertyItemEquipMake.
-		// Get the size of that property item.
-		//int propertySize=bitmap->GetPropertyItemSize(PropertyTagFrameDelay);
-		//PropertyItem propertyItem=(PropertyItem*)malloc(nSize);
-		//GetPropertyItem(PropertyTagFrameDelay,properySize,propertyItem);
-		//delete dimensionIDs;
+		int propertySize=bitmap->GetPropertyItemSize(PropertyTagFrameDelay);
+		PropertyItem *propertyItem=NULL;
+		if(propertySize>0){
+			propertyItem=(PropertyItem*)malloc(propertySize);
+			bitmap->GetPropertyItem(PropertyTagFrameDelay,propertySize,propertyItem);
+		}
 
 		Collection<image::Image::ptr> images;
+		Collection<int> delayMilliseconds;
 		int i;
 		for(i=0;i<frameCount;++i){
 			bitmap->SelectActiveFrame(&dimensionIDs[0],i);
@@ -243,9 +243,19 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData
 			bitmap->UnlockBits(&data);
 
 			images.add(image);
+
+			int delay=0;
+			if(propertyItem!=NULL){
+				delay=((UINT*)propertyItem[0].value)[i]*10;
+			}
+			if(delay<100){
+				delay=100;
+			}
+			delayMilliseconds.add(delay);
 		}
 
 		delete dimensionIDs;
+		free(propertyItem);
 
 		if(images.size()==0){
 			return NULL;
@@ -257,7 +267,7 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData
 			SequenceTexture::ptr sequence(new SequenceTexture(Texture::Dimension_D2,images.size()));
 			int i;
 			for(i=0;i<images.size();++i){
-				sequence->setTexture(i,mTextureManager->createTexture(image::Image::ptr(images[i])));
+				sequence->setTexture(i,mTextureManager->createTexture(image::Image::ptr(images[i])),Math::fromMilli(delayMilliseconds[i]));
 			}
 			return shared_static_cast<Texture>(sequence);
 		}

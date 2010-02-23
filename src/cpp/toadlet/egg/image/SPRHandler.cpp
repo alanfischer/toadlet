@@ -233,7 +233,7 @@ bool SPRHandler::saveImage(Image *image,Stream *stream){
 	return false;
 }
 
-bool SPRHandler::loadAnimatedImage(Stream *stream,Collection<Image*> &images){
+bool SPRHandler::loadAnimatedImage(Stream *stream,Collection<Image*> &images,Collection<int> &frameDelays){
 	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_EGG,
 			"Stream is NULL");
@@ -249,6 +249,7 @@ bool SPRHandler::loadAnimatedImage(Stream *stream,Collection<Image*> &images){
 	Image *image=NULL;
 	while((image=getNextImage())!=NULL){
 		images.add(image);
+		frameDelays.add(100); // Just default to 100ms
 	}
 
 	closeFile();
