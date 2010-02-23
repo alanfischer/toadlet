@@ -179,19 +179,20 @@ Image *SPRHandler::getNextImage(){
 			int x,y;
 			for(y=0;y<frame.height;++y){
 				for(x=0;x<frame.width;++x){
-					int a=(y*frame.width+x);
+					int src=((frame.height-y-1)*frame.width+x);
+					int dst=(y*frame.width+x);
 
-					if(data[a]==255){
-						imageData[a*4+0]=0;
-						imageData[a*4+1]=0;
-						imageData[a*4+2]=0;
-						imageData[a*4+3]=0;
+					if(data[src]==255){
+						imageData[dst*4+0]=0;
+						imageData[dst*4+1]=0;
+						imageData[dst*4+2]=0;
+						imageData[dst*4+3]=0;
 					}
 					else{
-						imageData[a*4+0]=mPalette[data[a]*3+0];
-						imageData[a*4+1]=mPalette[data[a]*3+1];
-						imageData[a*4+2]=mPalette[data[a]*3+2];
-						imageData[a*4+3]=255;
+						imageData[dst*4+0]=mPalette[data[src]*3+0];
+						imageData[dst*4+1]=mPalette[data[src]*3+1];
+						imageData[dst*4+2]=mPalette[data[src]*3+2];
+						imageData[dst*4+3]=255;
 					}
 				}
 			}

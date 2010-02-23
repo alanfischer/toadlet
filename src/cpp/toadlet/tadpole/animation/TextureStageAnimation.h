@@ -43,10 +43,10 @@ public:
 	void setTarget(peeper::TextureStage::ptr target){mTarget=target;}
 	inline peeper::TextureStage::ptr getTarget() const{return mTarget;}
 
-	void set(scalar value){mTarget->setTime(value);}
+	void set(scalar value){if(mTarget!=NULL) mTarget->setTime(value);}
 
 	scalar getMin() const{return 0;}
-	scalar getMax() const{return mTarget->getLength();}
+	scalar getMax() const{return mTarget!=NULL?mTarget->getLength():0;}
 
 	void attached(AnimationController *){}
 	void removed(AnimationController *){}
