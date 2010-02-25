@@ -618,7 +618,7 @@ void BSPSceneNode::renderVisibleFaces(Renderer *renderer){
 
 	TextureStage::ptr lightmapStage(new TextureStage());
 	lightmapStage->setTexCoordIndex(1);
-	lightmapStage->setBlend(TextureBlend(TextureBlend::Operation_MODULATE_2X,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
+	lightmapStage->setBlend(TextureBlend(TextureBlend::Operation_MODULATE_4X,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
 	lightmapStage->setMinFilter(TextureStage::Filter_LINEAR);
 	lightmapStage->setMipFilter(TextureStage::Filter_LINEAR);
 	lightmapStage->setMagFilter(TextureStage::Filter_LINEAR);

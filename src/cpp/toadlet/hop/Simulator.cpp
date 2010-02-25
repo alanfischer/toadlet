@@ -466,10 +466,11 @@ void Simulator::update(int dt,int scope,Solid *solid){
 				snapToGrid(c.point);
 
 				// Calculate oldPosition to be an epsilon back from where we can get to
-				calculateEpsilonOffset(oldPosition,c.normal);
+				sub(leftOver,c.point,oldPosition);
+				calculateEpsilonOffset(oldPosition,leftOver,c.normal);
 				add(oldPosition,c.point);
 
-				// leftOver is the energy we still have moving in this direction that we couldnt use
+				// Update leftOver, the energy we still have moving in this direction that we couldnt use
 				sub(leftOver,newPosition,oldPosition);
 
 				// If its a valid collision, and someone is listening, then store it
@@ -797,18 +798,33 @@ void Simulator::capVector3(Vector3 &vector,scalar value) const{
 	#endif
 }
 
-void Simulator::calculateEpsilonOffset(Vector3 &result,const Vector3 &vector) const{
-	if(vector.x>=mQuarterEpsilon)result.x=mEpsilon;
-	else if(vector.x<=-mQuarterEpsilon)result.x=-mEpsilon;
-	else result.x=0;
+void Simulator::calculateEpsilonOffset(Vector3 &result,const Vector3 &direction,const Vector3 &normal) const{
+	if(mSnapToGrid){
+		if(normal.x>=mQuarterEpsilon)result.x=mEpsilon;
+		else if(normal.x<=-mQuarterEpsilon)result.x=-mEpsilon;
+		else result.x=0;
 
-	if(vector.y>=mQuarterEpsilon)result.y=mEpsilon;
-	else if(vector.y<=-mQuarterEpsilon)result.y=-mEpsilon;
-	else result.y=0;
+		if(normal.y>=mQuarterEpsilon)result.y=mEpsilon;
+		else if(normal.y<=-mQuarterEpsilon)result.y=-mEpsilon;
+		else result.y=0;
 
-	if(vector.z>=mQuarterEpsilon)result.z=mEpsilon;
-	else if(vector.z<=-mQuarterEpsilon)result.z=-mEpsilon;
-	else result.z=0;
+		if(normal.z>=mQuarterEpsilon)result.z=mEpsilon;
+		else if(normal.z<=-mQuarterEpsilon)result.z=-mEpsilon;
+		else result.z=0;
+	}
+	else{
+		scalar length=Math::length(direction);
+		if(length>mEpsilon){
+			result.x=mul(div(-direction.x,length),mEpsilon);
+			result.y=mul(div(-direction.y,length),mEpsilon);
+			result.z=mul(div(-direction.z,length),mEpsilon);
+		}
+		else{
+			result.x=0;
+			result.y=0;
+			result.z=0;
+		}
+	}
 }
 
 void Simulator::snapToGrid(Vector3 &pos) const{
