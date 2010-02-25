@@ -56,6 +56,7 @@ Simulator::Simulator():
 	mQuarterEpsilon(0),
 
 	mSnapToGrid(false),
+	mMaxPositionComponent(0),
 	mMaxVelocityComponent(0),
 	mMaxForceComponent(0),
 	//mCollisions,
@@ -74,12 +75,14 @@ Simulator::Simulator():
 	setGravity(Vector3(0,0,-fromMilli(9810)));
 	#if defined(TOADLET_FIXED_POINT)
 		setEpsilonBits(4);
+		setMaxPositionComponent(intToFixed(65536/2));
 		setMaxVelocityComponent(intToFixed(104)); // A vector above 104,104,104 can have its length overflow
 		setMaxForceComponent(intToFixed(104));
 		setDeactivateSpeed(1<<8); // Some default
 		setDeactivateCount(4); // 4 frames
 	#else
 		setEpsilon(.0001);
+		setMaxPositionComponent(100000);
 		setMaxVelocityComponent(1000);
 		setMaxForceComponent(1000);
 		setDeactivateSpeed(mEpsilon*2); // Twice epsilon
@@ -112,6 +115,10 @@ void Simulator::setIntegrator(Integrator integrator){
 
 void Simulator::setSnapToGrid(bool snap){
 	mSnapToGrid=snap;
+}
+
+void Simulator::setMaxPositionComponent(scalar maxPositionComponent){
+	mMaxPositionComponent=maxPositionComponent;
 }
 
 void Simulator::setMaxVelocityComponent(scalar maxVelocityComponent){
@@ -393,6 +400,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 
 		snapToGrid(oldPosition);
 		snapToGrid(newPosition);
+		capVector3(newPosition,mMaxPositionComponent);
 
 		// Collect all possible solids in the whole movement area
 		if(solid->mCollideWithBits!=0){

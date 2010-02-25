@@ -249,8 +249,8 @@ Resource::ptr BSP30Handler::load(Stream::ptr stream,const ResourceHandlerData *h
 
 	Logger::debug(Categories::TOADLET_TADPOLE,"Building brushes");
 
-	Collection<Plane> workingPlanes,workingBrushPlanes;
-	buildBrushes(map,map->trees[0].nodeStart,workingPlanes,workingBrushPlanes);
+//	Collection<Plane> workingPlanes,workingBrushPlanes;
+//	buildBrushes(map,map->trees[0].nodeStart,workingPlanes,workingBrushPlanes);
 
 	// Parse Entity data
 	char *data=entities;
@@ -299,6 +299,10 @@ Resource::ptr BSP30Handler::load(Stream::ptr stream,const ResourceHandlerData *h
 
 	map->lighting.resize(nlighting);
 	memcpy(&map->lighting[0],lighting,nlighting);
+
+	// Add clipnodes as a hack till we sort out our collision
+	map->clipnodes.resize(nclipnodes);
+	memcpy(&map->clipnodes[0],clipnodes,nclipnodes*sizeof(bclipnode));
 
 	Logger::debug(Categories::TOADLET_TADPOLE,"Reading map finished ");
 

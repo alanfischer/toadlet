@@ -79,6 +79,11 @@ public:
 		unsigned offsets[MIPLEVELS];  // four mip maps stored
 	};
 	egg::Collection<unsigned char> lighting;
+	struct clipnode{
+		int planenum;
+		short children[2]; // <0 = contents
+	};
+	egg::Collection<clipnode> clipnodes;
 };
 
 }

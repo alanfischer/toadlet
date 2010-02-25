@@ -53,7 +53,8 @@ SceneNode::SceneNode():super(),
 	mChildScene (NULL),
 
 	mExcessiveDT(0),
-	mLogicDT(0),
+	mMinLogicDT(0),
+	mMaxLogicDT(0),
 	mLogicTime(0),
 	mLogicFrame(0),
 	mAccumulatedDT(0),
@@ -77,7 +78,7 @@ Node *SceneNode::create(Engine *engine){
 
 	setChildScene(this);
 	setExcessiveDT(5000);
-	setLogicDT(100);
+	setRangeLogicDT(0,0);
 	setAmbientColor(Colors::GREY);
 
 	mBackground=mEngine->createNodeType(ParentNode::type());
@@ -102,16 +103,17 @@ void SceneNode::destroy(){
 	super::destroy();
 }
 
-void SceneNode::setLogicDT(int dt){
+void SceneNode::setRangeLogicDT(int minDT,int maxDT){
 	#if defined(TOADLET_DEBUG)
-		if(dt<0){
+		if(minDT<0 || maxDT<0){
 			Error::unknown(Categories::TOADLET_TADPOLE,
-				"setLogicDT must be >= 0");
+				"setRangeLogicDT must have min & max >= 0");
 			return;
 		}
 	#endif
 
-	mLogicDT=dt;
+	mMinLogicDT=minDT;
+	mMaxLogicDT=maxDT;
 }
 
 void SceneNode::setLogicTimeAndFrame(int time,int frame){
@@ -138,22 +140,29 @@ void SceneNode::update(int dt){
 
 	mAccumulatedDT+=dt;
 
-	if(mAccumulatedDT>=mLogicDT){
+	if(mAccumulatedDT>=mMinLogicDT){
 		mChildScene->preLogicUpdateLoop(dt);
 
-		if(mLogicDT>0){
-			while(mAccumulatedDT>=mLogicDT){
-				mAccumulatedDT-=mLogicDT;
-
-				if(mUpdateListener!=NULL){
-					mUpdateListener->preLogicUpdate(mLogicDT);
-					mUpdateListener->logicUpdate(mLogicDT);
-					mUpdateListener->postLogicUpdate(mLogicDT);
+		if(mMaxLogicDT>0){
+			while(mAccumulatedDT>0 && mAccumulatedDT>=mMinLogicDT){
+				int logicDT=mAccumulatedDT;
+				if(mAccumulatedDT>mMaxLogicDT){
+					mAccumulatedDT-=mMaxLogicDT;
+					logicDT=mMaxLogicDT;
 				}
 				else{
-					mChildScene->preLogicUpdate(mLogicDT);
-					mChildScene->logicUpdate(mLogicDT);
-					mChildScene->postLogicUpdate(mLogicDT);
+					mAccumulatedDT=0;
+				}
+
+				if(mUpdateListener!=NULL){
+					mUpdateListener->preLogicUpdate(logicDT);
+					mUpdateListener->logicUpdate(logicDT);
+					mUpdateListener->postLogicUpdate(logicDT);
+				}
+				else{
+					mChildScene->preLogicUpdate(logicDT);
+					mChildScene->logicUpdate(logicDT);
+					mChildScene->postLogicUpdate(logicDT);
 				}
 			}
 		}

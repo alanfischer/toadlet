@@ -59,8 +59,9 @@ public:
 
 	virtual void setExcessiveDT(int dt){mScene->setExcessiveDT(dt);}
 	virtual int getExcessiveDT() const{return mScene->getExcessiveDT();}
-	virtual void setLogicDT(int dt){mScene->setLogicDT(dt);}
-	virtual int getLogicDT() const{return mScene->getLogicDT();}
+	virtual void setRangeLogicDT(int minDT,int maxDT){mScene->setRangeLogicDT(minDT,maxDT);}
+	virtual int getMinLogicDT() const{return mScene->getMinLogicDT();}
+	virtual int getMaxLogicDT() const{return mScene->getMaxLogicDT();}
 	virtual void setLogicTimeAndFrame(int time,int frame){mScene->setLogicTimeAndFrame(time,frame);}
 	virtual int getLogicTime() const{return mScene->getLogicTime();}
 	virtual int getLogicFrame() const{return mScene->getLogicFrame();}
