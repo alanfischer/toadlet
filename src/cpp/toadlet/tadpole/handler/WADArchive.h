@@ -83,8 +83,9 @@ protected:
 	toadlet::tadpole::TextureManager *mTextureManager;
 	toadlet::egg::io::DataStream::ptr mStream;
 
-	wheader header;
-	egg::Collection<wlumpinfo> lumpinfos;
+	wheader mHeader;
+	egg::Collection<wlumpinfo> mLumpinfos;
+	egg::Map<egg::String,int> mNameMap;
 };
 
 }

@@ -35,6 +35,8 @@ using namespace toadlet::peeper;
 using namespace toadlet::tadpole::mesh;
 using namespace toadlet::tadpole::node;
 
+float trace(toadlet::tadpole::bsp::BSPMap *map,int startnode,Vector3 start,Vector3 end,Vector3 &normal);
+
 namespace toadlet{
 namespace tadpole{
 namespace bsp{
@@ -301,10 +303,13 @@ scalar BSPSceneNode::traceSegment(Vector3 &normal,const Segment &segment){
 	scalar result=Math::ONE;
 	Vector3 end;
 	segment.getEndPoint(end);
-	traceNode(result,normal,0,segment.origin,end,0,Math::ONE,NULL,NULL);
-	if(result==Math::ONE){
-		result=-Math::ONE;
+	if(mBSPMap!=NULL){
+		//traceNode(result,normal,0,segment.origin,end,0,Math::ONE,NULL,NULL);
+result=trace(mBSPMap,mBSPMap->trees[0].nodeStart,segment.origin,end,normal);
 	}
+//	if(result==Math::ONE){
+//		result=-Math::ONE;
+//	}
 	return result;
 }
 
@@ -313,11 +318,12 @@ scalar BSPSceneNode::traceSphere(Vector3 &normal,const Segment &segment,const Sp
 	Vector3 end;
 	segment.getEndPoint(end);
 	if(mBSPMap!=NULL){
-		traceNode(result,normal,0,segment.origin,end,0,Math::ONE,&sphere,NULL);
+//		traceNode(result,normal,0,segment.origin,end,0,Math::ONE,&sphere,NULL);
+result=trace(mBSPMap,mBSPMap->trees[0].nodeStart,segment.origin,end,normal);
 	}
-	if(result==Math::ONE){
-		result=-Math::ONE;
-	}
+//	if(result==Math::ONE){
+//		result=-Math::ONE;
+//	}
 	return result;
 }
 
@@ -326,7 +332,8 @@ scalar BSPSceneNode::traceAABox(Vector3 &normal,const Segment &segment,const AAB
 	Vector3 end;
 	segment.getEndPoint(end);	
 	if(mBSPMap!=NULL){
-		traceNode(result,normal,0,segment.origin,end,0,Math::ONE,NULL,&box);
+//		traceNode(result,normal,0,segment.origin,end,0,Math::ONE,NULL,&box);
+result=trace(mBSPMap,mBSPMap->trees[0].nodeStart,segment.origin,end,normal);
 	}
 	if(result==Math::ONE){
 		result=-Math::ONE;
@@ -611,7 +618,7 @@ void BSPSceneNode::renderVisibleFaces(Renderer *renderer){
 
 	TextureStage::ptr lightmapStage(new TextureStage());
 	lightmapStage->setTexCoordIndex(1);
-	lightmapStage->setBlend(TextureBlend(TextureBlend::Operation_MODULATE,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
+	lightmapStage->setBlend(TextureBlend(TextureBlend::Operation_MODULATE_2X,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
 	lightmapStage->setMinFilter(TextureStage::Filter_LINEAR);
 	lightmapStage->setMipFilter(TextureStage::Filter_LINEAR);
 	lightmapStage->setMagFilter(TextureStage::Filter_LINEAR);
@@ -628,8 +635,8 @@ if(textures.size()>i) textureStage->setTexture(textures[i]);
 			for(j=0;j<visibleFaces.size();++j){
 				int vf=visibleFaces[j];
 
-//				lightmapStage->setTexture(mRenderFaces[vf].lightmap);
-//				renderer->setTextureStage(1,lightmapStage);
+				lightmapStage->setTexture(mRenderFaces[vf].lightmap);
+				renderer->setTextureStage(1,lightmapStage);
 
 				renderer->renderPrimitive(mVertexData,mRenderFaces[vf].indexData);
 			}
@@ -764,3 +771,238 @@ Image::ptr BSPSceneNode::computeLightmap(const Face &face,const Vector2 &mins,co
 }
 }
 
+
+
+// Code structure from
+// http://svn.jansson.be/foreign/quake/q1/trunk/QW/client/pmovetst.c
+
+using namespace toadlet::egg;
+using namespace toadlet::tadpole;
+using namespace toadlet::tadpole::bsp;
+
+struct pmtrace_t{
+	pmtrace_t(){memset(this,0,sizeof(pmtrace_t));
+		fraction = 1;
+		allsolid = true;}
+
+	bool allsolid;
+	bool inopen;
+	bool inwater;
+	bool startsolid;
+	Plane plane;
+	float fraction;
+	Vector3 endpos;
+};
+
+typedef BSPMap::clipnode dclipnode_t;
+typedef BSPMap hull_t;
+typedef Vector3 vec3_t;
+typedef Plane mplane_t;
+enum{
+	CONTENTS_EMPTY=	-1,
+	CONTENTS_SOLID=	-2,
+	CONTENTS_WATER=	-3,
+	CONTENTS_SLIME=	-4,
+	CONTENTS_LAVAL=	-5,
+	CONTENTS_SKY=	-6,
+	CONTENTS_ORIGIN=-7,
+	CONTENTS_CLIP=	-8,
+};
+
+#define qfalse false
+#define qtrue true
+#define DotProduct Math::dot
+#define VectorCopy(v1,v2) v2.set(v1)
+#define	DIST_EPSILON	(0.03125)
+#define vec3_origin Math::ZERO_VECTOR3
+#define VectorSubtract(v1,v2,r) Math::sub(r,v1,v2);
+
+int HullPointContents (hull_t *hull, int num, vec3_t p)
+{
+	float		d;
+	dclipnode_t	*node;
+	mplane_t	*plane;
+
+	while (num >= 0)
+	{
+//		if (num < hull->firstclipnode || num > hull->lastclipnode)
+//			Sys_Error ("HullPointContents: bad node number");
+	
+		node = &hull->clipnodes[num];
+		plane = &hull->planes[node->planenum];
+		
+//		if (plane->type < 3)
+//			d = p[plane->type] - plane->dist;
+//		else
+			d = DotProduct (plane->normal, p) - plane->distance;
+		if (d < 0)
+			num = node->children[1];
+		else
+			num = node->children[0];
+	}
+	
+	return num;
+}
+
+bool RecursiveHullCheck (hull_t *hull, int num, float p1f, float p2f, Vector3 p1, Vector3 p2, pmtrace_t *trace)
+{
+	dclipnode_t	*node;
+	Plane		*plane;
+	float		t1, t2;
+	float		frac;
+	int			i;
+	Vector3		mid;
+	int			side;
+	float		midf;
+
+// check for empty
+	if (num < 0)
+	{
+		if (num != CONTENTS_SOLID)
+		{
+			trace->allsolid = qfalse;
+			if (num == CONTENTS_EMPTY)
+				trace->inopen = qtrue;
+			else
+				trace->inwater = qtrue;
+		}
+		else
+			trace->startsolid = qtrue;
+		return qtrue;		// empty
+	}
+
+//	if (num < hull->firstclipnode || num > hull->lastclipnode)
+//		Sys_Error ("RecursiveHullCheck: bad node number");
+
+//
+// find the point distances
+//
+	node = &hull->clipnodes[num];
+	plane = &hull->planes[node->planenum];
+
+//	if (plane->type < 3)
+//	{
+//		t1 = p1[plane->type] - plane->dist;
+//		t2 = p2[plane->type] - plane->dist;
+//	}
+//	else
+	{
+		t1 = DotProduct (plane->normal, p1) - plane->distance;
+		t2 = DotProduct (plane->normal, p2) - plane->distance;
+	}
+	
+#if 1
+	if (t1 >= 0 && t2 >= 0)
+		return RecursiveHullCheck (hull, node->children[0], p1f, p2f, p1, p2, trace);
+	if (t1 < 0 && t2 < 0)
+		return RecursiveHullCheck (hull, node->children[1], p1f, p2f, p1, p2, trace);
+#else
+	if ( (t1 >= DIST_EPSILON && t2 >= DIST_EPSILON) || (t2 > t1 && t1 >= 0) )
+		return RecursiveHullCheck (hull, node->children[0], p1f, p2f, p1, p2, trace);
+	if ( (t1 <= -DIST_EPSILON && t2 <= -DIST_EPSILON) || (t2 < t1 && t1 <= 0) )
+		return RecursiveHullCheck (hull, node->children[1], p1f, p2f, p1, p2, trace);
+#endif
+
+// put the crosspoint DIST_EPSILON pixels on the near side
+	if (t1 < 0)
+		frac = (t1 + DIST_EPSILON)/(t1-t2);
+	else
+		frac = (t1 - DIST_EPSILON)/(t1-t2);
+	if (frac < 0)
+		frac = 0;
+	if (frac > 1)
+		frac = 1;
+		
+	midf = p1f + (p2f - p1f)*frac;
+	for (i=0 ; i<3 ; i++)
+		mid[i] = p1[i] + frac*(p2[i] - p1[i]);
+
+	side = (t1 < 0);
+
+// move up to the node
+	if (!RecursiveHullCheck (hull, node->children[side], p1f, midf, p1, mid, trace) )
+		return qfalse;
+
+#ifdef PARANOID
+	if (HullPointContents (pm_hullmodel, mid, node->children[side])
+	== CONTENTS_SOLID)
+	{
+		Con_Printf ("mid PointInHullSolid\n");
+		return qfalse;
+	}
+#endif
+	
+	if (HullPointContents (hull, node->children[side^1], mid)
+	!= CONTENTS_SOLID)
+// go past the node
+		return RecursiveHullCheck (hull, node->children[side^1], midf, p2f, mid, p2, trace);
+	
+	if (trace->allsolid)
+		return qfalse;		// never got out of the solid area
+		
+//==================
+// the other side of the node is solid, this is the impact point
+//==================
+	if (!side)
+	{
+		VectorCopy (plane->normal, trace->plane.normal);
+		trace->plane.distance = plane->distance;
+	}
+	else
+	{
+		VectorSubtract (vec3_origin, plane->normal, trace->plane.normal);
+		trace->plane.distance = -plane->distance;
+	}
+
+	while (HullPointContents (hull, 0/*hull->firstclipnode*/, mid)
+	== CONTENTS_SOLID)
+	{ // shouldn't really happen, but does occasionally
+		frac -= 0.1;
+		if (frac < 0)
+		{
+			trace->fraction = midf;
+			VectorCopy (mid, trace->endpos);
+//			Con_DPrintf ("backup past 0\n");
+			return qfalse;
+		}
+		midf = p1f + (p2f - p1f)*frac;
+		for (i=0 ; i<3 ; i++)
+			mid[i] = p1[i] + frac*(p2[i] - p1[i]);
+	}
+
+	trace->fraction = midf;
+	VectorCopy (mid, trace->endpos);
+
+	return qfalse;
+}
+
+float trace(BSPMap *map,int startnode,Vector3 start,Vector3 end,Vector3 &normal){
+	pmtrace_t t;
+	bool result=RecursiveHullCheck(map,startnode,0,1,start,end,&t);
+	normal=t.plane.normal;
+
+		if (t.allsolid)
+			t.startsolid = qtrue;
+		if (t.startsolid)
+			t.fraction = 0;
+
+//		if(t.allsolid){
+//			t.fraction=0;
+//		}
+//		else if(t.fraction==0)t.fraction=-1.0;
+//		else if(t.startsolid){
+		
+//		}
+//Logger::alert(String("AS:")+t.allsolid+" SS:"+t.startsolid+" F:"+t.fraction);
+if(t.allsolid==false && t.startsolid==true){t.fraction=1.0;}
+//		else
+//			if(t.fraction==0)t.fraction=-1.0;
+
+//	if(t.allsolid==true){
+		return t.fraction;
+//		return 0;
+//	}
+//	else {
+//		return t.fraction;
+//	}
+}

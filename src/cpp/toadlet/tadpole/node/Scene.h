@@ -61,8 +61,9 @@ public:
 
 	virtual void setExcessiveDT(int dt)=0;
 	virtual int getExcessiveDT() const=0;
-	virtual void setLogicDT(int dt)=0;
-	virtual int getLogicDT() const=0;
+	virtual void setRangeLogicDT(int minDT,int maxDT)=0;
+	virtual int getMinLogicDT() const=0;
+	virtual int getMaxLogicDT() const=0;
 	virtual void setLogicTimeAndFrame(int time,int frame)=0;
 	virtual int getLogicTime() const=0;
 	virtual int getLogicFrame() const=0;

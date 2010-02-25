@@ -76,12 +76,13 @@ public:
 
 	virtual void setExcessiveDT(int dt){mExcessiveDT=dt;}
 	virtual int getExcessiveDT() const{return mExcessiveDT;}
-	virtual void setLogicDT(int dt);
-	virtual int getLogicDT() const{return mLogicDT;}
+	virtual void setRangeLogicDT(int minDT,int maxDT);
+	virtual int getMinLogicDT() const{return mMinLogicDT;}
+	virtual int getMaxLogicDT() const{return mMaxLogicDT;}
 	virtual void setLogicTimeAndFrame(int time,int frame);
 	virtual int getLogicTime() const{return mLogicTime;}
 	virtual int getLogicFrame() const{return mLogicFrame;}
-	virtual scalar getLogicFraction() const{return mLogicDT==0?0:Math::div(Math::fromInt(mAccumulatedDT),Math::fromInt(mLogicDT));}
+	virtual scalar getLogicFraction() const{return (mMinLogicDT==0 || mMinLogicDT!=mMaxLogicDT)?0:Math::div(Math::fromInt(mAccumulatedDT),Math::fromInt(mMinLogicDT));}
 	virtual int getRenderTime() const{return mLogicTime+mAccumulatedDT;}
 	virtual int getRenderFrame() const{return mRenderFrame;}
 
@@ -149,7 +150,8 @@ protected:
 	Scene *mChildScene;
 
 	int mExcessiveDT;
-	int mLogicDT;
+	int mMinLogicDT;
+	int mMaxLogicDT;
 	int mLogicTime;
 	int mLogicFrame;
 	int mAccumulatedDT;

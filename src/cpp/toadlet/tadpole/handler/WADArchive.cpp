@@ -57,82 +57,79 @@ bool WADArchive::open(Stream::ptr stream){
 	destroy();
 
 	mStream=DataStream::ptr(new DataStream(stream));
-	mStream->read((byte*)header.identification,sizeof(header.identification));
-	header.numlumps=mStream->readLittleInt32();
-	header.infotableofs=mStream->readLittleInt32();
+	mStream->read((byte*)mHeader.identification,sizeof(mHeader.identification));
+	mHeader.numlumps=mStream->readLittleInt32();
+	mHeader.infotableofs=mStream->readLittleInt32();
 
-	if (strncmp(header.identification,"WAD2",4) &&
-		strncmp(header.identification,"WAD3",4)){
+	if (strncmp(mHeader.identification,"WAD2",4) &&
+		strncmp(mHeader.identification,"WAD3",4)){
 		Error::unknown("invalid wad file");
 		return false;
 	}
 
-	lumpinfos.resize(header.numlumps);
-	mStream->seek(header.infotableofs);
+	mLumpinfos.resize(mHeader.numlumps);
+	mStream->seek(mHeader.infotableofs);
 
-	mStream->read((byte*)&lumpinfos[0],sizeof(wlumpinfo)*header.numlumps);
-
+	mStream->read((byte*)&mLumpinfos[0],sizeof(wlumpinfo)*mHeader.numlumps);
 	int i;
-	for(i=0;i<header.numlumps;i++){
-		littleInt32(lumpinfos[i].filepos);
-		littleInt32(lumpinfos[i].size);
+	for(i=0;i<mHeader.numlumps;i++){
+		littleInt32(mLumpinfos[i].filepos);
+		littleInt32(mLumpinfos[i].size);
+		mNameMap[String(mLumpinfos[i].name).toLower()]=i;
 	}
 
 	return true;
 }
 
 Resource::ptr WADArchive::openResource(const String &name){
-	String lowername=name.toLower();
+	Map<String,int>::iterator texindex=mNameMap.find(name.toLower());
+	if(texindex==mNameMap.end()){
+		return NULL;
+	}
+	
+	wlumpinfo *info=&mLumpinfos[texindex->second];
+	mStream->seek(info->filepos);
+	mStream->read((byte*)mInBuffer,info->size);
 
-	int i;
-	for(i=0;i<header.numlumps;i++){
-		String lumpname=lumpinfos[i].name;
-		if(lowername.equals(lumpname.toLower())){
-			mStream->seek(lumpinfos[i].filepos);
-			mStream->read((byte*)mInBuffer,lumpinfos[i].size);
+	wmiptex *tex=(wmiptex*)mInBuffer;
 
-			wmiptex *tex=(wmiptex*)mInBuffer;
+	int width=tex->width;
+	littleInt32(width);
 
-			int width=tex->width;
-			littleInt32(width);
+	int height=tex->height;
+	littleInt32(height);
 
-			int height=tex->height;
-			littleInt32(height);
+	Image::ptr image(new Image(Image::Dimension_D2,Image::Format_RGB_8,width,height));
 
-			Image::ptr image(new Image(Image::Dimension_D2,Image::Format_RGB_8,width,height));
+	int off=tex->offsets[0];
+	littleInt32(off);
+	uint8 *src=mInBuffer+off;
 
-			int off=tex->offsets[0];
-			littleInt32(off);
-			uint8 *src=mInBuffer+off;
+	off=tex->offsets[3];
+	littleInt32(off);
+	uint8 *pal=mInBuffer+off+width*height/64+2;
 
-			off=tex->offsets[3];
-			littleInt32(off);
-			uint8 *pal=mInBuffer+off+width*height/64+2;
+	uint8 *data=image->getData();
 
-			uint8 *data=image->getData();
+	int j=0,k=0,j3=0,k3=0;
+	for(j=0;j<height*width;j++){
+		k=*(src+j);
 
-			int j=0,k=0;
-			for(j=0;j<height*width;j++){
-				k=*(src+j);
-				k=k*3;
-
-				*(data+j*3+0)=*(k+pal+0);
-				*(data+j*3+1)=*(k+pal+1);
-				*(data+j*3+2)=*(k+pal+2);
-			}
-
-			return mTextureManager->createTexture(image);
-		}
+		j3=j*3;
+		k3=k*3;
+		*(data+j3+0)=*(pal+k3+0);
+		*(data+j3+1)=*(pal+k3+1);
+		*(data+j3+2)=*(pal+k3+2);
 	}
 
-	return NULL;
+	return mTextureManager->createTexture(image);
 }
 
 Collection<String>::ptr WADArchive::getEntries(){
 	Collection<String>::ptr entries(new Collection<String>());
 	int i;
-	for(i=0;i<header.numlumps;i++){
-		entries->add(lumpinfos[i].name);
+	for(i=0;i<mHeader.numlumps;i++){
+		entries->add(mLumpinfos[i].name);
 	}
 	return entries;
 }

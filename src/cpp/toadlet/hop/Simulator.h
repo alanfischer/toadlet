@@ -63,6 +63,9 @@ public:
 	void setSnapToGrid(bool snap);
 	bool getSnapToGrid() const{return mSnapToGrid;}
 
+	void setMaxPositionComponent(scalar maxPositionComponent);
+	scalar getMaxPositionComponent() const{return mMaxPositionComponent;}
+
 	void setMaxVelocityComponent(scalar maxVelocityComponent);
 	scalar getMaxVelocityComponent() const{return mMaxVelocityComponent;}
 
@@ -141,6 +144,7 @@ protected:
 	scalar mQuarterEpsilon;
 
 	bool mSnapToGrid;
+	scalar mMaxPositionComponent;
 	scalar mMaxVelocityComponent;
 	scalar mMaxForceComponent;
 	egg::Collection<Collision> mCollisions;

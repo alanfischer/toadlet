@@ -99,6 +99,12 @@ public:
 				pixel.g=mData[o+1];
 				pixel.b=mData[o+0];
 			break;
+			case Format_RGB_8:
+				o*=3;
+				pixel.r=mData[o+0];
+				pixel.g=mData[o+1];
+				pixel.b=mData[o+2];
+			break;
 			case Format_BGR_8:
 				o*=3;
 				pixel.r=mData[o+2];
