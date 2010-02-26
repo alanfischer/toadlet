@@ -96,6 +96,14 @@ Resource::ptr ResourceManager::manage(const Resource::ptr &resource,const String
 		mResources.add(resource);
 		resource->setFullyReleasedListener(this);
 	}
+	else {
+		if(resource->getName()!=(char*)NULL){
+			NameResourceMap::iterator it=mNameResourceMap.find(resource->getName());
+			if(it!=mNameResourceMap.end()){
+				mNameResourceMap.erase(it);
+			}
+		}
+	}
 
 	if(name!=(char*)NULL){
 		resource->setName(name);
@@ -114,9 +122,8 @@ void ResourceManager::unmanage(Resource *resource){
 			"Error unmanaging resource, check inheritance heiarchy");
 	}
 
-	String name=resource->getName();
-	if(name!=(char*)NULL){
-		NameResourceMap::iterator it=mNameResourceMap.find(name);
+	if(resource->getName()!=(char*)NULL){
+		NameResourceMap::iterator it=mNameResourceMap.find(resource->getName());
 		if(it!=mNameResourceMap.end()){
 			mNameResourceMap.erase(it);
 		}

@@ -77,6 +77,7 @@ Texture::ptr TextureManager::createTexture(const Image::ptr &image,int usageFlag
 
 			Image::ptr mipImage(new Image(image->getDimension(),image->getFormat(),hwidth,hheight,image->getDepth()));
 
+			// TODO: Add depth
 			Pixel<uint8> pixel;
 			int x,y;
 			for(x=0;x<hwidth;++x){

@@ -103,6 +103,10 @@ bool GLTexture::createContext(){
 	glTexParameteri(mTarget,GL_TEXTURE_WRAP_T,GL_REPEAT);
 	glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 	glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	if(mRenderer->gl_version>=12){
+		glTexParameteri(mTarget,GL_TEXTURE_BASE_LEVEL,0);
+		glTexParameteri(mTarget,GL_TEXTURE_MAX_LEVEL,mMipLevels==0?100:mMipLevels-1);
+	}
 
 	// Allocate space for texture
 	GLint glformat=getGLFormat(mFormat);
