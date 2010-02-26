@@ -33,6 +33,7 @@
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
 using namespace toadlet::egg::image;
+using namespace toadlet::peeper;
 
 namespace toadlet{
 namespace tadpole{
@@ -73,8 +74,8 @@ bool WADArchive::open(Stream::ptr stream){
 	mStream->read((byte*)&mLumpinfos[0],sizeof(wlumpinfo)*mHeader.numlumps);
 	int i;
 	for(i=0;i<mHeader.numlumps;i++){
-		littleInt32(mLumpinfos[i].filepos);
-		littleInt32(mLumpinfos[i].size);
+		mLumpinfos[i].filepos=littleInt32(mLumpinfos[i].filepos);
+		mLumpinfos[i].size=littleInt32(mLumpinfos[i].size);
 		mNameMap[String(mLumpinfos[i].name).toLower()]=i;
 	}
 
@@ -93,36 +94,42 @@ Resource::ptr WADArchive::openResource(const String &name){
 
 	wmiptex *tex=(wmiptex*)mInBuffer;
 
-	int width=tex->width;
-	littleInt32(width);
+	int width=littleInt32(tex->width);
+	int height=littleInt32(tex->height);
+	int size=width*height;
 
-	int height=tex->height;
-	littleInt32(height);
+	int datasize=size + (size/4) + (size/16) + (size/64);
+	byte *pal=(byte*)tex + littleInt32(tex->offsets[0]) + datasize + 2;
 
-	Image::ptr image(new Image(Image::Dimension_D2,Image::Format_RGB_8,width,height));
+	Texture::ptr texture=mTextureManager->createTexture(0,Texture::Dimension_D2,Texture::Format_RGB_8,width,height,0,4);
+	if(texture!=NULL){
+		Image::ptr image(new Image(Image::Dimension_D2,Image::Format_RGB_8,width,height));
 
-	int off=tex->offsets[0];
-	littleInt32(off);
-	uint8 *src=mInBuffer+off;
+		int hwidth=width,hheight=height;
+		int mipLevel;
+		for(mipLevel=0;mipLevel<4;++mipLevel){
+			byte *src=(byte*)tex + littleInt32(tex->offsets[mipLevel]);
+			byte *data=image->getData();
 
-	off=tex->offsets[3];
-	littleInt32(off);
-	uint8 *pal=mInBuffer+off+width*height/64+2;
+			int j=0,k=0,j3=0,k3=0;
+			for(j=0;j<hwidth*hheight;j++){
+				k=*(src+j);
 
-	uint8 *data=image->getData();
+				j3=j*3;
+				k3=k*3;
+				*(data+j3+0)=*(pal+k3+0);
+				*(data+j3+1)=*(pal+k3+1);
+				*(data+j3+2)=*(pal+k3+2);
+			}
 
-	int j=0,k=0,j3=0,k3=0;
-	for(j=0;j<height*width;j++){
-		k=*(src+j);
-
-		j3=j*3;
-		k3=k*3;
-		*(data+j3+0)=*(pal+k3+0);
-		*(data+j3+1)=*(pal+k3+1);
-		*(data+j3+2)=*(pal+k3+2);
+			texture->load(Image::Format_RGB_8,hwidth,hheight,0,mipLevel,image->getData());
+			
+			if(hwidth>=2) hwidth/=2;
+			if(hheight>=2) hheight/=2;
+		}
 	}
 
-	return mTextureManager->createTexture(image);
+	return texture;
 }
 
 Collection<String>::ptr WADArchive::getEntries(){
