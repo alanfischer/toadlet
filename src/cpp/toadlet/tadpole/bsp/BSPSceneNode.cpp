@@ -209,44 +209,57 @@ void BSPSceneNode::setBSPMap(BSPMap::ptr map){
 			littleUInt32(tex->width);
 			littleUInt32(tex->height);
 		#endif
-
-		if(tex->width<1 || tex->height<1){
-			// Invalid texture
-			// Do we want a dummy texture here?
-			textures.add(NULL);
-			continue;
-		}
-
 		int size=tex->width*tex->height;
 
-		if(tex->offsets[0] != 0){
-			int datasize = size + (size/4) + (size/16) + (size/64);
+		Texture::ptr texture=NULL;
 
-			unsigned char *indices=(unsigned char *)tex + tex->offsets[0];
-			unsigned char *palette = indices + datasize + 2;
+		// TODO: Check tex->name[0]=='{', and convert any (0,0,1) to (0,0,0,0)
+		// TODO: Look for textures beginning with "+0" and have these be SequenceTextures.
 
-			// TODO: Load the texture here from the BSP, using 'palette'
-			// Look at wad loader for howto
-			Logger::alert("embedded tex:"+String(tex->name));
-			textures.add(NULL);
-			continue;
+		if(size<=0){
+			// Invalid texture
+		}
+		else if(tex->offsets[0]!=0){
+			int datasize=size + (size/4) + (size/16) + (size/64);
+			byte *pal=(byte*)tex + tex->offsets[0] + datasize + 2;
+
+			texture=mEngine->getTextureManager()->createTexture(0,Texture::Dimension_D2,Texture::Format_RGB_8,tex->width,tex->height,0,4);
+			if(texture!=NULL){
+				Image::ptr image(new Image(Image::Dimension_D2,Image::Format_RGB_8,tex->width,tex->height));
+				int hwidth=tex->width,hheight=tex->height;
+				int mipLevel;
+				for(mipLevel=0;mipLevel<4;++mipLevel){
+					byte *src=(byte*)tex + tex->offsets[mipLevel];
+					byte *data=image->getData();
+
+					int j=0,k=0,j3=0,k3=0;
+					for(j=0;j<hwidth*hheight;j++){
+						k=*(src+j);
+
+						j3=j*3;
+						k3=k*3;
+						*(data+j3+0)=*(pal+k3+0);
+						*(data+j3+1)=*(pal+k3+1);
+						*(data+j3+2)=*(pal+k3+2);
+					}
+
+					texture->load(Image::Format_RGB_8,hwidth,hheight,0,mipLevel,image->getData());
+					
+					if(hwidth>=2) hwidth/=2;
+					if(hheight>=2) hheight/=2;
+				}
+			}
 		}
 		else{
-			Texture::ptr texture=mEngine->getTextureManager()->findTexture(tex->name);
-			if(texture!=NULL){
-				texture->retain();
-			}
-			textures.add(texture);
-			continue;
+			texture=mEngine->getTextureManager()->findTexture(tex->name);
 		}
 
-		// Does this mip contain alpha transparency?
-		if(tex->name[0]=='{'){
-			// TODO: Convert any (0,0,1) to (0,0,0,0);
-			// This will involve re-allocating the texture as RGBA
+		if(texture!=NULL){
+			mEngine->getTextureManager()->manage(texture,tex->name);
+			texture->retain();
 		}
 
-		// TODO: Look for textures beginning with "+0" and have these be AnimatedTextures.
+		textures.add(texture);
 	}
 
 	getRenderLayer(0)->forceRender=true;
@@ -618,7 +631,7 @@ void BSPSceneNode::renderVisibleFaces(Renderer *renderer){
 
 	TextureStage::ptr lightmapStage(new TextureStage());
 	lightmapStage->setTexCoordIndex(1);
-	lightmapStage->setBlend(TextureBlend(TextureBlend::Operation_MODULATE_4X,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
+	lightmapStage->setBlend(TextureBlend(TextureBlend::Operation_MODULATE_2X,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
 	lightmapStage->setMinFilter(TextureStage::Filter_LINEAR);
 	lightmapStage->setMipFilter(TextureStage::Filter_LINEAR);
 	lightmapStage->setMagFilter(TextureStage::Filter_LINEAR);
@@ -644,6 +657,9 @@ if(textures.size()>i) textureStage->setTexture(textures[i]);
 
 		visibleFaces.clear();
 	}
+	
+	renderer->setTextureStage(0,NULL);
+	renderer->setTextureStage(1,NULL);
 }
 
 void BSPSceneNode::addLeafToVisible(const Leaf &leaf,RendererData &data,CameraNode *camera) const{
