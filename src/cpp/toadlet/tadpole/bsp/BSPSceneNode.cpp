@@ -23,6 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/EndianConversion.h>
 #include <toadlet/peeper/VertexFormat.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/bsp/BSPSceneNode.h>
@@ -205,11 +206,9 @@ void BSPSceneNode::setBSPMap(BSPMap::ptr map){
 		}
 
 		BSPMap::miptex *tex=(BSPMap::miptex*)(&mBSPMap->textures[lump->dataofs[i]]);
-		#ifdef TOADLET_BIG_ENDIAN
-			littleUInt32(tex->width);
-			littleUInt32(tex->height);
-		#endif
-		int size=tex->width*tex->height;
+		int width=littleInt32(tex->width);
+		int height=littleInt32(tex->height);
+		int size=width*height;
 
 		Texture::ptr texture=NULL;
 
@@ -221,15 +220,15 @@ void BSPSceneNode::setBSPMap(BSPMap::ptr map){
 		}
 		else if(tex->offsets[0]!=0){
 			int datasize=size + (size/4) + (size/16) + (size/64);
-			byte *pal=(byte*)tex + tex->offsets[0] + datasize + 2;
+			byte *pal=(byte*)tex + littleInt32(tex->offsets[0]) + datasize + 2;
 
-			texture=mEngine->getTextureManager()->createTexture(0,Texture::Dimension_D2,Texture::Format_RGB_8,tex->width,tex->height,0,4);
+			texture=mEngine->getTextureManager()->createTexture(0,Texture::Dimension_D2,Texture::Format_RGB_8,width,height,0,4);
 			if(texture!=NULL){
-				Image::ptr image(new Image(Image::Dimension_D2,Image::Format_RGB_8,tex->width,tex->height));
-				int hwidth=tex->width,hheight=tex->height;
+				Image::ptr image(new Image(Image::Dimension_D2,Image::Format_RGB_8,width,height));
+				int hwidth=width,hheight=height;
 				int mipLevel;
 				for(mipLevel=0;mipLevel<4;++mipLevel){
-					byte *src=(byte*)tex + tex->offsets[mipLevel];
+					byte *src=(byte*)tex + littleInt32(tex->offsets[mipLevel]);
 					byte *data=image->getData();
 
 					int j=0,k=0,j3=0,k3=0;
