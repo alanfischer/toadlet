@@ -75,9 +75,6 @@ protected:
 		peeper::Texture::ptr lightmap;
 	};
 
-	void traceNode(scalar &result,Vector3 &normal,int nodeIndex,const Vector3 &start,const Vector3 &end,scalar startFraction,scalar endFraction,const Sphere *sphere,const AABox *box);
-	void traceBrush(scalar &result,Vector3 &normal,const Brush &brush,const Vector3 &start,const Vector3 &end,const Sphere *sphere,const AABox *box);
-
 	// TODO: We need a better hook to start rendering the level, since in theory this wont have access to preLayerRender,
 	//  cause it wont be a main scene node
 	bool preLayerRender(peeper::Renderer *renderer,int layer);

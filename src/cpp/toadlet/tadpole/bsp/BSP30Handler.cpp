@@ -37,11 +37,9 @@ namespace tadpole{
 namespace bsp{
 
 BSP30Handler::BSP30Handler(Engine *engine):ResourceHandler(),
-	mEngine(NULL),
-	mEpsilon(0)
+	mEngine(NULL)
 {
 	mEngine=engine;
-	mEpsilon=0.001f;
 	memset(&header,0,sizeof(header));
 }
 
@@ -247,11 +245,6 @@ Resource::ptr BSP30Handler::load(Stream::ptr stream,const ResourceHandlerData *h
 		t.visleafs=bm.visleafs;
 	}
 
-	Logger::debug(Categories::TOADLET_TADPOLE,"Building brushes");
-
-//	Collection<Plane> workingPlanes,workingBrushPlanes;
-//	buildBrushes(map,map->trees[0].nodeStart,workingPlanes,workingBrushPlanes);
-
 	// Parse Entity data
 	char *data=entities;
 	Map<String,String> keyValues;
@@ -320,156 +313,6 @@ void BSP30Handler::readLump(Stream *stream,int lump,void **data,int size,int *co
 	if(count!=NULL){
 		*count=length/size;
 	}
-}
-
-void BSP30Handler::buildBrushes(BSPMap *map,int node,Collection<Plane> &planes,Collection<Plane> &brushPlanes){
-	Plane plane=map->planes[map->nodes[node].plane];
-	planes.add(plane);
-
-	// Do back brush first, since the plane is facing the right direction
-	if(map->nodes[node].children[1]<0){
-		int leafIndex=-map->nodes[node].children[1]-1;
-
-		findBrushPlanes(brushPlanes,planes);
-		Brush brush;
-		brush.contents=map->leaves[leafIndex].contents;
-		brush.planeStart=map->planes.size();
-		brush.planeCount=brushPlanes.size();
-
-		if(leafIndex==0){
-			Leaf leaf;
-			leaf.visibilityStart=-1;
-			leaf.brushCount=1;
-			leaf.brushStart=map->brushes.size();
-			leaf.contents=brush.contents;
-
-			map->planes.addAll(brushPlanes);
-			map->brushes.add(brush);
-
-			leafIndex=map->leaves.size();
-			map->leaves.add(leaf);
-
-			map->nodes[node].children[1]=-leafIndex-1;
-		}
-		else{
-			map->leaves[leafIndex].brushCount=1;
-			map->leaves[leafIndex].brushStart=map->brushes.size();
-			map->planes.addAll(brushPlanes);
-			map->brushes.add(brush);
-		}
-	}
-	else{
-		buildBrushes(map,map->nodes[node].children[1],planes,brushPlanes);
-	}
-
-	Math::neg(planes[planes.size()-1]);
-
-	// Now do front brush
-	if(map->nodes[node].children[0]<0){
-		int leafIndex=-map->nodes[node].children[0]-1;
-
-		findBrushPlanes(brushPlanes,planes);
-		Brush brush;
-		brush.contents=map->leaves[leafIndex].contents;
-		brush.planeStart=map->planes.size();
-		brush.planeCount=brushPlanes.size();
-
-		if(leafIndex==0){
-			Leaf leaf;
-			leaf.visibilityStart=-1;
-			leaf.brushCount=1;
-			leaf.brushStart=map->brushes.size();
-			leaf.contents=brush.contents;
-
-			map->planes.addAll(brushPlanes);
-			map->brushes.add(brush);
-
-			leafIndex=map->leaves.size();
-			map->leaves.add(leaf);
-
-			map->nodes[node].children[0]=-leafIndex-1;
-		}
-		else{
-			map->leaves[leafIndex].brushCount=1;
-			map->leaves[leafIndex].brushStart=map->brushes.size();
-			map->planes.addAll(brushPlanes);
-			map->brushes.add(brush);
-		}
-	}
-	else{
-		buildBrushes(map,map->nodes[node].children[0],planes,brushPlanes);
-	}
-
-	planes.removeAt(planes.size()-1);
-}
-
-void BSP30Handler::findBrushPlanes(Collection<Plane> &brushPlanes,const Collection<Plane> &planes){
-	int i,j,k,l;
-	float epsilon=mEpsilon;
-	toadlet::egg::Collection<Vector3> points;
-	Vector3 r;
-	int numPlanes=planes.size();
-	brushPlanes.clear();
-
-	for(i=0;i<numPlanes-2;++i){
-		for(j=i+1;j<numPlanes-1;++j){
-			for(k=j+1;k<numPlanes;++k){
-				if(Math::getIntersectionOfThreePlanes(r,planes[i],planes[j],planes[k],epsilon)){
-					bool valid=true;
-					for(l=0;l<numPlanes;++l){
-						if(l!=i && l!=j && l!=k){
-							const Plane &plane=planes[l];
-							if((Math::dot(plane.normal,r)-plane.distance)>epsilon){
-								valid=false;
-								break;
-							}
-						}
-					}
-
-					if(valid){
-						points.add(r);
-					}
-				}	
-			}
-		}
-	}
-
-	for(i=0;i<planes.size();++i){
-		for(j=0;j<points.size();++j){
-			if(Math::length(planes[i],points[j])<epsilon)break;
-		}
-		if(j!=points.size()){
-			brushPlanes.add(planes[i]);
-		}
-	}
-
-/*
-if(points.size()>0){
-	AABox box(points[0],points[0]);
-	for(j=1;j<points.size();++j){
-		if(points[j].x<box.mins.x) box.mins.x=points[j].x;
-		if(points[j].y<box.mins.y) box.mins.y=points[j].y;
-		if(points[j].z<box.mins.z) box.mins.z=points[j].z;
-
-		if(points[j].x>box.maxs.x) box.maxs.x=points[j].x;
-		if(points[j].y>box.maxs.y) box.maxs.y=points[j].y;
-		if(points[j].z>box.maxs.z) box.maxs.z=points[j].z;
-	}
-
-Logger::alert(String("box:")+box.mins.x+","+box.mins.y+","+box.mins.z+" : "+box.maxs.x+","+box.maxs.y+","+box.maxs.z);
-
-	// Add beveling planes, super crude for now
-//	planes.add(Plane(Math::X_UNIT_VECTOR3,box.mins.x));
-//	planes.add(Plane(Math::Y_UNIT_VECTOR3,box.mins.y));
-//	planes.add(Plane(Math::Z_UNIT_VECTOR3,box.mins.z));
-//	planes.add(Plane(Math::NEG_X_UNIT_VECTOR3,-box.maxs.x));
-//	planes.add(Plane(Math::NEG_Y_UNIT_VECTOR3,-box.maxs.y));
-//	planes.add(Plane(Math::NEG_Z_UNIT_VECTOR3,-box.maxs.z));
-}
-else{
-	Logger::alert("no points");
-}
-*/
 }
 
 }

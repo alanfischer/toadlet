@@ -28,13 +28,16 @@
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/bsp/BSPSceneNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
+#include <toadlet/tadpole/handler/WADArchive.h>
 #include <string.h> // memset
+#include <toadlet/tadpole/PixelPacker.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::image;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole::mesh;
 using namespace toadlet::tadpole::node;
+using namespace toadlet::tadpole::handler;
 
 float trace(toadlet::tadpole::bsp::BSPMap *map,int startnode,Vector3 start,Vector3 end,Vector3 &normal);
 
@@ -119,7 +122,7 @@ void BSPSceneNode::setBSPMap(BSPMap::ptr map){
 		BSPMap::miptexlump *lump=(BSPMap::miptexlump*)&mBSPMap->textures[0];
 		int miptexofs=lump->dataofs[texinfo.miptex];
 		if(miptexofs!=-1){
-			BSPMap::miptex *tex=(BSPMap::miptex*)(&mBSPMap->textures[miptexofs]);
+			WADArchive::wmiptex *tex=(WADArchive::wmiptex*)(&mBSPMap->textures[miptexofs]);
 			width=tex->width;
 			height=tex->height;
 		}
@@ -128,26 +131,10 @@ void BSPSceneNode::setBSPMap(BSPMap::ptr map){
 
 		Image::ptr lightmap;
 		unsigned int lmwidth=0,lmheight=0;
-
 		if((texinfo.flags&TEX_SPECIAL)==0){
 			lightmap=computeLightmap(face,mins,maxs);
 			lmwidth=lightmap->getWidth();
 			lmheight=lightmap->getHeight();
-
-			unsigned int newlmwidth=lmwidth,newlmheight=lmheight;
-			if(Math::isPowerOf2(newlmwidth)==false){
-				newlmwidth=Math::nextPowerOf2(newlmwidth);
-			}
-			if(Math::isPowerOf2(newlmheight)==false){
-				newlmheight=Math::nextPowerOf2(newlmheight);
-			}
-
-//			if(lmwidth!=newlmwidth || lmheight!=newlmheight){
-//				Image::ptr newLightmap(new Image(lightmap->getDimension(),lightmap->getFormat(),newlmwidth,newlmheight));
-//				ImageUtilities::scaleImage(lightmap,newLightmap,false);
-//				lightmap=newLightmap;
-//			}
-
 			mRenderFaces[i].lightmap=mEngine->getTextureManager()->createTexture(lightmap);
 			mRenderFaces[i].lightmap->retain();
 		}
@@ -199,65 +186,20 @@ void BSPSceneNode::setBSPMap(BSPMap::ptr map){
 		#ifdef TOADLET_BIG_ENDIAN
 			littleInt32(lump->dataofs[i]);
 		#endif
-		if(lump->dataofs[i]==-1){
-			// Unused mip lump.
-			textures.add(NULL);
-			continue;
-		}
+		
+		Texture::ptr texture;
+		if(lump->dataofs[i]!=-1){
+			WADArchive::wmiptex *miptex=(WADArchive::wmiptex*)(&mBSPMap->textures[lump->dataofs[i]]);
+			// TODO: Look for textures beginning with "+0" and have these be SequenceTextures.
 
-		BSPMap::miptex *tex=(BSPMap::miptex*)(&mBSPMap->textures[lump->dataofs[i]]);
-		int width=littleInt32(tex->width);
-		int height=littleInt32(tex->height);
-		int size=width*height;
-
-		Texture::ptr texture=NULL;
-
-		// TODO: Check tex->name[0]=='{', and convert any (0,0,1) to (0,0,0,0)
-		// TODO: Look for textures beginning with "+0" and have these be SequenceTextures.
-
-		if(size<=0){
-			// Invalid texture
-		}
-		else if(tex->offsets[0]!=0){
-			int datasize=size + (size/4) + (size/16) + (size/64);
-			byte *pal=(byte*)tex + littleInt32(tex->offsets[0]) + datasize + 2;
-
-			texture=mEngine->getTextureManager()->createTexture(0,Texture::Dimension_D2,Texture::Format_RGB_8,width,height,0,4);
+			texture=WADArchive::createTexture(mEngine->getTextureManager(),miptex);
+			if(texture==NULL){
+				texture=mEngine->getTextureManager()->findTexture(miptex->name);
+			}
 			if(texture!=NULL){
-				Image::ptr image(new Image(Image::Dimension_D2,Image::Format_RGB_8,width,height));
-				int hwidth=width,hheight=height;
-				int mipLevel;
-				for(mipLevel=0;mipLevel<4;++mipLevel){
-					byte *src=(byte*)tex + littleInt32(tex->offsets[mipLevel]);
-					byte *data=image->getData();
-
-					int j=0,k=0,j3=0,k3=0;
-					for(j=0;j<hwidth*hheight;j++){
-						k=*(src+j);
-
-						j3=j*3;
-						k3=k*3;
-						*(data+j3+0)=*(pal+k3+0);
-						*(data+j3+1)=*(pal+k3+1);
-						*(data+j3+2)=*(pal+k3+2);
-					}
-
-					texture->load(Image::Format_RGB_8,hwidth,hheight,0,mipLevel,image->getData());
-					
-					if(hwidth>=2) hwidth/=2;
-					if(hheight>=2) hheight/=2;
-				}
+				texture->retain();
 			}
 		}
-		else{
-			texture=mEngine->getTextureManager()->findTexture(tex->name);
-		}
-
-		if(texture!=NULL){
-			mEngine->getTextureManager()->manage(texture,tex->name);
-			texture->retain();
-		}
-
 		textures.add(texture);
 	}
 
@@ -316,35 +258,6 @@ scalar BSPSceneNode::traceSegment(Vector3 &normal,const Segment &segment){
 	Vector3 end;
 	segment.getEndPoint(end);
 	if(mBSPMap!=NULL){
-		//traceNode(result,normal,0,segment.origin,end,0,Math::ONE,NULL,NULL);
-result=trace(mBSPMap,mBSPMap->trees[0].nodeStart,segment.origin,end,normal);
-	}
-//	if(result==Math::ONE){
-//		result=-Math::ONE;
-//	}
-	return result;
-}
-
-scalar BSPSceneNode::traceSphere(Vector3 &normal,const Segment &segment,const Sphere &sphere){
-	scalar result=Math::ONE;
-	Vector3 end;
-	segment.getEndPoint(end);
-	if(mBSPMap!=NULL){
-//		traceNode(result,normal,0,segment.origin,end,0,Math::ONE,&sphere,NULL);
-result=trace(mBSPMap,mBSPMap->trees[0].nodeStart,segment.origin,end,normal);
-	}
-//	if(result==Math::ONE){
-//		result=-Math::ONE;
-//	}
-	return result;
-}
-
-scalar BSPSceneNode::traceAABox(Vector3 &normal,const Segment &segment,const AABox &box){
-	scalar result=Math::ONE;
-	Vector3 end;
-	segment.getEndPoint(end);	
-	if(mBSPMap!=NULL){
-//		traceNode(result,normal,0,segment.origin,end,0,Math::ONE,NULL,&box);
 result=trace(mBSPMap,mBSPMap->trees[0].nodeStart,segment.origin,end,normal);
 	}
 	if(result==Math::ONE){
@@ -353,181 +266,30 @@ result=trace(mBSPMap,mBSPMap->trees[0].nodeStart,segment.origin,end,normal);
 	return result;
 }
 
-// TODO: Rework this so we dont need to pass, start,end AND startFraction,endFraction.  We could probably get away with only fractions?
-// TODO: Change the BSP naming stuff to use nodei & such to indicate an index into an array perhaps?
-void BSPSceneNode::traceNode(scalar &result,Vector3 &normal,int nodeIndex,const Vector3 &start,const Vector3 &end,scalar startFraction,scalar endFraction,const Sphere *sphere,const AABox *box){
-	int i;
-
-	if(nodeIndex<0){
-		const Leaf &leaf=mBSPMap->leaves[-nodeIndex-1];
-		for(i=0;i<leaf.brushCount;++i){
-			const Brush &brush=mBSPMap->brushes[leaf.brushStart+i];
-			if(brush.contents==-2){ // TODO: -2=CONTENTS_SOLID, This is in BSP30Handler, and shouldnt be tested this way
-				traceBrush(result,normal,brush,start,end,sphere,box);
-			}
-		}
-		return;
+scalar BSPSceneNode::traceSphere(Vector3 &normal,const Segment &segment,const Sphere &sphere){
+	scalar result=Math::ONE;
+	Vector3 end;
+	segment.getEndPoint(end);
+	if(mBSPMap!=NULL){
+result=trace(mBSPMap,mBSPMap->trees[0].nodeStart,segment.origin,end,normal);
 	}
-
-	const bsp::Node &node=mBSPMap->nodes[nodeIndex];
-	const Plane &plane=mBSPMap->planes[node.plane];
-
-	scalar startDistance=Math::length(plane,start);
-	scalar endDistance=Math::length(plane,end);
-	scalar offset=0;
-	if(sphere!=NULL){
-		offset=sphere->radius;
+	if(result==Math::ONE){
+		result=-Math::ONE;
 	}
-	else if(box!=NULL){
-		offset=	Math::abs(Math::mul(Math::maxVal(-box->mins.x,box->maxs.x),plane.normal.x)) +
-				Math::abs(Math::mul(Math::maxVal(-box->mins.y,box->maxs.y),plane.normal.y)) +
-				Math::abs(Math::mul(Math::maxVal(-box->mins.z,box->maxs.z),plane.normal.z));
-	}
-
-	if(startDistance>=offset && endDistance>=offset){
-		// Segment is all in front
-		traceNode(result,normal,node.children[0],start,end,startFraction,endFraction,sphere,box);
-	}
-	else if(startDistance<-offset && endDistance<-offset){
-		// Segment is all behind
-		traceNode(result,normal,node.children[1],start,end,startFraction,endFraction,sphere,box);
-	}
-	else{
-		// Split segment
-		int side;
-		scalar fraction1, fraction2, middleFraction;
-		Vector3 middle;
-
-		// split the segment into two
-		if (startDistance < endDistance)
-		{
-			side = 1; // back
-			scalar inverseDistance = Math::div(Math::ONE,startDistance - endDistance);
-			fraction1 = (startDistance - offset + mEpsilon) * inverseDistance;
-			fraction2 = (startDistance + offset + mEpsilon) * inverseDistance;
-		}
-		else if (endDistance < startDistance)
-		{
-			side = 0; // front
-			scalar inverseDistance = Math::div(Math::ONE,startDistance - endDistance);
-			fraction1 = (startDistance + offset + mEpsilon) * inverseDistance;
-			fraction2 = (startDistance - offset - mEpsilon) * inverseDistance;
-		}
-		else
-		{
-			side = 0; // front
-			fraction1 = Math::ONE;
-			fraction2 = 0;
-		}
-
-		// make sure the numbers are valid
-		fraction1=Math::clamp(0,Math::ONE,fraction1);
-		fraction2=Math::clamp(0,Math::ONE,fraction2);
-
-		// calculate the middle point for the first side
-		middleFraction = startFraction + Math::mul(endFraction - startFraction, fraction1);
-		Math::lerp(middle,start,end,fraction1);
-
-		// check the first side
-		traceNode(result,normal,node.children[side],start,end,startFraction,middleFraction,sphere,box);
-
-		// calculate the middle point for the second side
-		middleFraction = startFraction + Math::mul(endFraction - startFraction, fraction2);
-		Math::lerp(middle,start,end,fraction2);
-
-		// check the second side
-		traceNode(result,normal,node.children[!side],start,end,startFraction,middleFraction,sphere,box);
-	}
+	return result;
 }
 
-void BSPSceneNode::traceBrush(scalar &result,Vector3 &normal,const Brush &brush,const Vector3 &start,const Vector3 &end,const Sphere *sphere,const AABox *box){
-	scalar startFraction=-Math::ONE,endFraction=Math::ONE;
-	Vector3 startNormal;
-	bool startsOut=false;
-	bool endsOut=false;
-	int i,j;
-
-	for(i=0;i<brush.planeCount;i++){
-		const Plane &plane=mBSPMap->planes[brush.planeStart+i];
-
-		scalar startDistance, endDistance;
-		if(sphere==NULL && box==NULL){
-			startDistance=Math::length(plane,start) + mEpsilon;
-			endDistance=Math::length(plane,end) - mEpsilon;
-		}
-		else if(sphere!=NULL){
-			startDistance=Math::length(plane,start) - sphere->radius + mEpsilon;
-			endDistance=Math::length(plane,end)- sphere->radius - mEpsilon;
-		}
-		else if(box!=NULL){
-			Vector3 offset;
-			for(j=0;j<3;++j){
-				if(plane.normal[j]<0){
-					offset[j]=box->maxs[j];
-				}
-				else{
-					offset[j]=box->mins[j];
-				}
-			}
-
-			Vector3 temp;
-			Math::add(temp,start,offset);
-			startDistance=Math::length(plane,temp) + mEpsilon;
-			Math::add(temp,end,offset);
-			endDistance=Math::length(plane,temp) - mEpsilon;
-		}
-
-		if(startDistance>0){
-			startsOut=true;
-		}
-		if(endDistance>0){
-			endsOut=true;
-		}
-
-		// make sure the trace isn't completely on one side of the brush
-		if(startDistance>0 && endDistance>0){
-			// both are in front of the plane, its outside of this brush
-			return;
-		}
-		if(startDistance<=0 && endDistance<=0){
-			// both are behind this plane, it will get clipped by another one
-			continue;
-		}
-
-		if(startDistance>endDistance){
-			// line is entering into the brush
-			scalar fraction=Math::div(startDistance-mEpsilon, startDistance-endDistance);
-			if(fraction>startFraction){
-				startFraction=fraction;
-				startNormal=plane.normal;
-			}
-		}
-		else{
-			// line is leaving the brush
-			scalar fraction=Math::div(startDistance+mEpsilon, startDistance-endDistance);
-			if(fraction<endFraction){
-				endFraction=fraction;
-			}
-		}
+scalar BSPSceneNode::traceAABox(Vector3 &normal,const Segment &segment,const AABox &box){
+	scalar result=Math::ONE;
+	Vector3 end;
+	segment.getEndPoint(end);	
+	if(mBSPMap!=NULL){
+result=trace(mBSPMap,mBSPMap->trees[0].nodeStart,segment.origin,end,normal);
 	}
-
-	if(startsOut==false){
-//		outputStartsOut=false;
-//		if(endsOut==false){
-//			outputAllSolid=true;
-//		}
-		return;
+	if(result==Math::ONE){
+		result=-Math::ONE;
 	}
-
-	if(startFraction<endFraction){
-		if(startFraction>-Math::ONE && startFraction<result){
-			if(startFraction<0){
-				startFraction=0;
-			}
-			result=startFraction;
-			normal=startNormal;
-		}
-	}
+	return result;
 }
 
 void BSPSceneNode::decompressVIS(){
@@ -627,10 +389,11 @@ void BSPSceneNode::renderVisibleFaces(Renderer *renderer){
 	renderer->setFaceCulling(Renderer::FaceCulling_FRONT);
 	renderer->setDepthWrite(true);
 	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
+//renderer->setAlphaTest(Renderer::AlphaTest_GEQUAL,Math::HALF);
 
 	TextureStage::ptr lightmapStage(new TextureStage());
 	lightmapStage->setTexCoordIndex(1);
-	lightmapStage->setBlend(TextureBlend(TextureBlend::Operation_MODULATE_2X,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
+	lightmapStage->setBlend(TextureBlend(TextureBlend::Operation_MODULATE,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
 	lightmapStage->setMinFilter(TextureStage::Filter_LINEAR);
 	lightmapStage->setMipFilter(TextureStage::Filter_LINEAR);
 	lightmapStage->setMagFilter(TextureStage::Filter_LINEAR);

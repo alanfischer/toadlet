@@ -54,7 +54,6 @@ public:
 
 	egg::Collection<egg::String>::ptr getEntries();
 
-protected:
 	struct wheader{
 		char identification[4]; // should be WAD2 or 2DAW
 		int numlumps;
@@ -78,6 +77,9 @@ protected:
 		unsigned int offsets[MIPLEVELS]; // four mip maps stored
 	};
 
+	static peeper::Texture::ptr createTexture(toadlet::tadpole::TextureManager *textureManager,wmiptex *miptex);
+
+protected:
 	unsigned char mInBuffer[640*480*85/64]; // Maxlump
 
 	toadlet::tadpole::TextureManager *mTextureManager;

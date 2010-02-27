@@ -177,12 +177,8 @@ protected:
 	};
 
 	void readLump(egg::io::Stream *stream,int lump,void **data,int size,int *count);
-	void buildBrushes(BSPMap *map,int node,egg::Collection<Plane> &planes,egg::Collection<Plane> &brushPlanes);
-	void findBrushPlanes(egg::Collection<Plane> &brushPlanes,const egg::Collection<Plane> &planes);
 
 	Engine *mEngine;
-	float mEpsilon;
-
 	bheader header;
 };
 

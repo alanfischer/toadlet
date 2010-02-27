@@ -103,9 +103,27 @@ bool GLTexture::createContext(){
 	glTexParameteri(mTarget,GL_TEXTURE_WRAP_T,GL_REPEAT);
 	glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 	glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-	if(mRenderer->gl_version>=12){
-		glTexParameteri(mTarget,GL_TEXTURE_BASE_LEVEL,0);
-		glTexParameteri(mTarget,GL_TEXTURE_MAX_LEVEL,mMipLevels==0?100:mMipLevels-1);
+
+	// If we don't support partial miplevel specification, then calculate the amount of levels we'll need
+	int mipLevels=0;
+	if(mMipLevels>0){
+		if(mRenderer->gl_version>=12){
+			glTexParameteri(mTarget,GL_TEXTURE_BASE_LEVEL,0);
+			glTexParameteri(mTarget,GL_TEXTURE_MAX_LEVEL,mMipLevels-1);
+			mipLevels=mMipLevels;
+		}
+		else{
+			int width=mWidth,height=mHeight,depth=mDepth;
+			for(mipLevels=1;width>=2 || height>=2 || depth>=2;++mipLevels,width/=2,height/=2,depth/=2);
+
+			if(mipLevels!=mMipLevels){
+				Logger::debug(Categories::TOADLET_PEEPER,
+					"partial mipmap specification not supported!");
+			}
+		}
+	}
+	else{
+		mipLevels=1;
 	}
 
 	// Allocate space for texture
@@ -113,8 +131,7 @@ bool GLTexture::createContext(){
 	GLint glinternalFormat=glformat;
 	GLint gltype=getGLType(mFormat);
 	int level=0,width=mWidth,height=mHeight,depth=mDepth;
-	int levelsToAlloc=mMipLevels==0?1:mMipLevels;
-	for(level=0;level<levelsToAlloc;++level,width/=2,height/=2,depth/=2){
+	for(level=0;level<mipLevels;++level,width/=2,height/=2,depth/=2){
 		switch(mTarget){
 			#if !defined(TOADLET_HAS_GLES)
 				case GL_TEXTURE_1D:
