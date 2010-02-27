@@ -110,7 +110,7 @@ Texture::ptr TextureManager::createTexture(int usageFlags,Texture::Dimension dim
 	return texture;
 }
 
-Image::ptr TextureManager::createImage(const Texture::ptr &texture){
+Image::ptr TextureManager::createImage(Texture *texture){
 	Image::ptr image(new Image(texture->getDimension(),texture->getFormat(),texture->getWidth(),texture->getHeight(),texture->getDepth()));
 	texture->read(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0,image->getData());
 	return image;

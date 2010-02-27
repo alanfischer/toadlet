@@ -47,7 +47,6 @@ public:
 	egg::Collection<Tree> trees;
 	egg::Collection<Node> nodes;
 	egg::Collection<Leaf> leaves;
-	egg::Collection<Brush> brushes;
 	egg::Collection<Face> faces;
 	egg::Collection<Vector3> vertexes;
 	egg::Collection<Plane> planes;
@@ -72,12 +71,6 @@ public:
 		int dataofs[4]; // [nummiptex]
 	};
 	egg::Collection<unsigned char> textures;
-	#define MIPLEVELS 4
-	struct miptex{
-		char name[16];
-		unsigned width, height;
-		unsigned offsets[MIPLEVELS];  // four mip maps stored
-	};
 	egg::Collection<unsigned char> lighting;
 	struct clipnode{
 		int planenum;

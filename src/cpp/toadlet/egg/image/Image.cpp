@@ -74,9 +74,13 @@ bool Image::reallocate(Dimension dimension,int format,unsigned int width,unsigne
 		mData=NULL;
 	}
 
-	if(dimension==Dimension_UNKNOWN || format==Format_UNKNOWN || width<1 || height<1 || depth<1){
+	if(width<=0) width=1;
+	if(height<=0) height=1;
+	if(depth<=0) depth=1;
+
+	if(dimension==Dimension_UNKNOWN || format==Format_UNKNOWN){
 		Error::invalidParameters(Categories::TOADLET_EGG,
-			"Image::reallocate: Categories parameters");
+			"Image::reallocate: invalid parameters");
 		return false; 
 	}
 

@@ -27,6 +27,8 @@
 #define TOADLET_TADPOLE_PIXELPACKER_H
 
 #include <toadlet/tadpole/Types.h>
+#include <toadlet/egg/image/ImageFormatConversion.h>
+#include <memory.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -37,66 +39,86 @@ class TOADLET_API PixelPacker{
 public:
 	class Node{
 	public:
-		Node(int x1=0,int y1=0,int width1=0,int height1=0):x(x1),y(y1),width(width1),height(height1),id(0){
+		Node(int x1=0,int y1=0,int width1=0,int height1=0):x(x1),y(y1),width(width1),height(height1),assigned(false){
 			children[0]=NULL;
 			children[1]=NULL;
 		}
 
 		Node *children[2];
-		int x,int y,int width,int height;
-		int id;
+		int x,y,width,height;
+		bool assigned;
 	};
 
-	PixelPacker();
-	virtual ~PixelPacker();
+	PixelPacker(byte *data,int format,int width,int height){
+		mData=data;
+		mFormat=format;
+		mWidth=width;
+		mHeight=height;
+		
+		mRootNode=new Node(0,0,mWidth,mHeight);
+	}
+	
+	virtual ~PixelPacker(){}
 
-	int insert(Image::ptr image){
-		Node *node=insert(mRootNode,image);
+	bool insert(int width,int height,byte *data,Matrix4x4 &result){
+		Node *node=insert(mRootNode,width,height);
 		if(node!=NULL){
-			copyImagePortion(image->getFormat(),image->getData(),0,0,image->getWidth(),image->getHeight(),mData,node->x,node->y,node->width,node->height);
-			return node->id;
+			node->assigned=true;
+
+			int pixelSize=egg::image::ImageFormatConversion::getPixelSize(mFormat);
+			int y=0;
+			for(y=0;y<height;++y){
+				byte *src=data + (y*width*pixelSize);
+				byte *dst=mData + ((node->y+y)*mWidth+node->x)*pixelSize;
+				memcpy(dst,src,width*pixelSize);
+			}
+
+			Math::setMatrix4x4FromTranslate(result,Math::div(Math::fromInt(node->x),Math::fromInt(mWidth)),Math::div(Math::fromInt(node->y),Math::fromInt(mHeight)),0);
+			Math::setMatrix4x4FromScale(result,Math::div(Math::fromInt(width),Math::fromInt(mWidth)),Math::div(Math::fromInt(height),Math::fromInt(mHeight)),Math::ONE);
+			return true;
 		}
 		else{
-			return -1;
+			return false;
 		}
 	}
 	
-	Node *insert(Node *node,Image::ptr image){
+	Node *insert(Node *node,int width,int height){
 		// Push image to children
 		if(node->children[0]!=NULL && node->children[1]!=NULL){
-			Node *node=insert(children[0],image);
-			
-			if(node!=NULL) return node;
-			return insert(children[1],image);
+			Node *child=insert(node->children[0],width,height);
+			if(child!=NULL) return child;
+			return insert(node->children[1],width,height);
 		}
 		// Create new children
 		else{
-			if(id==0) return NULL;
+			if(node->assigned) return NULL;
 
-			int imageWidth=image->getWidth();
-			int imageHeight=image->getHeight();
-			
-			if(width<imageWidth || height<imageHeight) return;
-			if(width==imageWidth && height==imageHeight) return this;
+			if(node->width<width || node->height<height) return NULL;
+			if(node->width==width && node->height==height) return node;
 
-			int dw=width-imageWidth;
-			int dh=height-imageHeight;
+			int dw=node->width-width;
+			int dh=node->height-height;
 			
 			if(dw>dh){
-				children[0]=new Node(x,y,imageWidth,height);
-				children[1]=new Node(x+imageWidth,y,width-imageWidth,height);
+				node->children[0]=new Node(node->x,node->y,width,node->height);
+				node->children[1]=new Node(node->x+width,node->y,node->width-width,node->height);
 			}
 			else{
-				children[0]=new Node(x,y,width,imageHeight);
-				children[1]=new Node(x,y+imageHeight,width,height-imageHeight);
+				node->children[0]=new Node(node->x,node->y,node->width,height);
+				node->children[1]=new Node(node->x,node->y+height,node->width,node->height-height);
 			}
 			
-			return insert(children[0],image);
+			return insert(node->children[0],width,height);
 		}
 	}
 	
 protected:
 	Node *mRootNode;
+
+	byte *mData;
+	int mFormat;
+	int mWidth;
+	int mHeight;
 };
 
 }

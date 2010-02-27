@@ -92,44 +92,7 @@ Resource::ptr WADArchive::openResource(const String &name){
 	mStream->seek(info->filepos);
 	mStream->read((byte*)mInBuffer,info->size);
 
-	wmiptex *tex=(wmiptex*)mInBuffer;
-
-	int width=littleInt32(tex->width);
-	int height=littleInt32(tex->height);
-	int size=width*height;
-
-	int datasize=size + (size/4) + (size/16) + (size/64);
-	byte *pal=(byte*)tex + littleInt32(tex->offsets[0]) + datasize + 2;
-
-	Texture::ptr texture=mTextureManager->createTexture(0,Texture::Dimension_D2,Texture::Format_RGB_8,width,height,0,4);
-	if(texture!=NULL){
-		Image::ptr image(new Image(Image::Dimension_D2,Image::Format_RGB_8,width,height));
-
-		int hwidth=width,hheight=height;
-		int mipLevel;
-		for(mipLevel=0;mipLevel<4;++mipLevel){
-			byte *src=(byte*)tex + littleInt32(tex->offsets[mipLevel]);
-			byte *data=image->getData();
-
-			int j=0,k=0,j3=0,k3=0;
-			for(j=0;j<hwidth*hheight;j++){
-				k=*(src+j);
-
-				j3=j*3;
-				k3=k*3;
-				*(data+j3+0)=*(pal+k3+0);
-				*(data+j3+1)=*(pal+k3+1);
-				*(data+j3+2)=*(pal+k3+2);
-			}
-
-			texture->load(Image::Format_RGB_8,hwidth,hheight,0,mipLevel,image->getData());
-			
-			if(hwidth>=2) hwidth/=2;
-			if(hheight>=2) hheight/=2;
-		}
-	}
-
-	return texture;
+	return createTexture(mTextureManager,(wmiptex*)mInBuffer);
 }
 
 Collection<String>::ptr WADArchive::getEntries(){
@@ -139,6 +102,70 @@ Collection<String>::ptr WADArchive::getEntries(){
 		entries->add(mLumpinfos[i].name);
 	}
 	return entries;
+}
+
+peeper::Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager *textureManager,wmiptex *miptex){
+	int width=littleInt32(miptex->width);
+	int height=littleInt32(miptex->height);
+	int size=width*height;
+
+	if(size<=0 || littleInt32(miptex->offsets[0])==0){
+		return NULL;
+	}
+
+	int datasize=size + (size/4) + (size/16) + (size/64);
+	byte *pal=(byte*)miptex + littleInt32(miptex->offsets[0]) + datasize + 2;
+
+	int format=Texture::Format_RGB_8;
+	if(miptex->name[0]=='{'){
+		format=Texture::Format_RGBA_8;
+	}
+	
+	Texture::ptr texture=textureManager->createTexture(0,Texture::Dimension_D2,format,width,height,0,4);
+	if(texture!=NULL){
+		textureManager->manage(texture,miptex->name);
+
+		Image::ptr image(new Image(Image::Dimension_D2,format,width,height));
+
+		int hwidth=width,hheight=height;
+		int mipLevel;
+		for(mipLevel=0;mipLevel<4;++mipLevel){
+			byte *src=(byte*)miptex + littleInt32(miptex->offsets[mipLevel]);
+			byte *data=image->getData();
+
+			int j=0,k=0,j3=0,k3=0;
+			if(format==Texture::Format_RGB_8){
+				for(j=0;j<hwidth*hheight;j++){
+					k=*(src+j);
+
+					j3=j*3;
+					k3=k*3;
+					*(data+j3+0)=*(pal+k3+0);
+					*(data+j3+1)=*(pal+k3+1);
+					*(data+j3+2)=*(pal+k3+2);
+				}
+			}
+			else{
+				for(j=0;j<hwidth*hheight;j++){
+					k=*(src+j);
+
+					j3=j*4;
+					k3=k*3;
+					*(data+j3+0)=*(pal+k3+0);
+					*(data+j3+1)=*(pal+k3+1);
+					*(data+j3+2)=*(pal+k3+2);
+					*(data+j3+3)=(k==255)?0:255;
+				}
+			}
+
+			texture->load(format,hwidth,hheight,0,mipLevel,image->getData());
+			
+			if(hwidth>=2) hwidth/=2;
+			if(hheight>=2) hheight/=2;
+		}
+	}
+
+	return texture;
 }
 
 }

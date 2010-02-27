@@ -171,6 +171,7 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 	#else
 		gl_version=10;
 	#endif
+
 	Logger::alert(Categories::TOADLET_PEEPER,
 		String("CALCULATED GL VERSION:")+(gl_version/10)+"."+(gl_version%10));
 
