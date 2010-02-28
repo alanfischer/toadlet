@@ -388,13 +388,13 @@ DXGI_FORMAT D3D10Texture::getDXGI_FORMAT(int textureFormat){
 			return DXGI_FORMAT_R8_UNORM;
 		case Format_LA_8:
 			return DXGI_FORMAT_R8G8_UNORM;
-		case Format_RGBA_8:
-			return DXGI_FORMAT_R8G8B8A8_UNORM;
 		case Format_BGRA_8:
+			return DXGI_FORMAT_R8G8B8A8_UNORM;
+		case Format_RGBA_8:
 			return DXGI_FORMAT_B8G8R8A8_UNORM;
-		case Format_BGR_5_6_5:
+		case Format_RGB_5_6_5:
 			return DXGI_FORMAT_B5G6R5_UNORM;
-		case Format_BGRA_5_5_5_1:
+		case Format_RGBA_5_5_5_1:
 			return DXGI_FORMAT_B5G5R5A1_UNORM;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
