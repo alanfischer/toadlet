@@ -117,7 +117,7 @@ bool D3D9Texture::createContext(){
 	mInternalFormat=getClosestTextureFormat(mFormat);
 	mD3DFormat=getD3DFORMAT(mInternalFormat);
 	if(!mRenderer->isD3DFORMATValid(mD3DFormat,mD3DUsage)){
-		mInternalFormat=Format_RGBA_8;
+		mInternalFormat=Format_BGRA_8;
 		mD3DFormat=D3DFMT_X8R8G8B8;
 	}
 
@@ -428,19 +428,19 @@ bool D3D9Texture::read(int format,int width,int height,int depth,int mipLevel,ui
 int D3D9Texture::getClosestTextureFormat(int format){
 	switch(format){
 		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-			case(Format_L_8):
-				return Format_RGB_5_6_5;
-			case(Format_A_8):
-			case(Format_LA_8):
-				return Format_RGBA_8;
+			case Format_L_8:
+				return Format_BGR_5_6_5;
+			case Format_A_8:
+			case Format_LA_8:
+				return Format_BGRA_8;
 		#else
-			case(Format_A_8):
+			case Format_A_8:
 				return Format_LA_8;
 		#endif
-		case(Format_BGR_8):
-			return Format_RGB_8;
-		case(Format_BGRA_8):
-			return Format_RGBA_8;
+		case Format_RGB_8:
+			return Format_BGR_8;
+		case Format_RGBA_8:
+			return Format_BGRA_8;
 		default:
 			return format;
 	}
@@ -454,15 +454,15 @@ D3DFORMAT D3D9Texture::getD3DFORMAT(int format){
 			case Format_LA_8:
 				return D3DFMT_A8L8;
 		#endif
-		case Format_RGB_8:
+		case Format_BGR_8:
 			return D3DFMT_R8G8B8;
-		case Format_RGBA_8:
+		case Format_BGRA_8:
 			return D3DFMT_A8R8G8B8;
-		case Format_RGB_5_6_5:
+		case Format_BGR_5_6_5:
 			return D3DFMT_R5G6B5;
-		case Format_RGBA_5_5_5_1:
+		case Format_BGRA_5_5_5_1:
 			return D3DFMT_A1R5G5B5;
-		case Format_RGBA_4_4_4_4:
+		case Format_BGRA_4_4_4_4:
 			return D3DFMT_A4R4G4B4;
 		case Format_DEPTH_16:
 			return D3DFMT_D16;
