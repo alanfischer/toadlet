@@ -30,11 +30,11 @@
 #include <toadlet/tadpole/node/Renderable.h>
 #include <toadlet/tadpole/node/SceneNode.h>
 #include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/SpacialQuery.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
-using namespace toadlet::tadpole::query;
 
 namespace toadlet{
 namespace tadpole{
@@ -490,13 +490,15 @@ void SceneNode::setUpdateListener(UpdateListener *updateListener){
 	mUpdateListener=updateListener;
 }
 
-bool SceneNode::performQuery(AABoxQuery *query){
+bool SceneNode::performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact){
+	SpacialQueryResultsListener *listener=query->getSpacialQueryResultsListener();
+
 	// TODO: Child Nodes should have proper bounding shapes (either a generic Volume which can be Sphere, etc, or just an actual Sphere)
 	int i;
 	for(i=0;i<mChildren.size();++i){
 		Node *child=mChildren[i];
-		if(Math::testIntersection(Sphere(child->mTranslate,child->mBoundingRadius),query->mBox)){
-			query->mResults.add(child);
+		if(Math::testIntersection(Sphere(child->mTranslate,child->mBoundingRadius),box)){
+			listener->resultFound(child);
 		}
 	}
 	return true;

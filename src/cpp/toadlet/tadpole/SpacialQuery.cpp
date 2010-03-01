@@ -23,40 +23,31 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_QUERY_SPACIALQUERY_H
-#define TOADLET_TADPOLE_QUERY_SPACIALQUERY_H
+#include <toadlet/tadpole/SpacialQuery.h>
+#include <toadlet/tadpole/node/Scene.h>
 
-#include <toadlet/peeper/Query.h>
-#include <toadlet/tadpole/Types.h>
+using namespace toadlet::tadpole::node;
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
 
-class Scene;
-class Node;
+SpacialQuery::SpacialQuery():
+	mDestroyedListener(NULL),
+	mResultsListener(NULL)
+{}
 
+SpacialQuery::~SpacialQuery(){
+	destroy();
 }
-namespace query{
 
-class SpacialQuery:public peeper::Query{
-public:
-	TOADLET_SHARED_POINTERS(SpacialQuery);
+void SpacialQuery::create(){
+}
 
-	virtual ~SpacialQuery(){}
-
-	virtual void create(node::Scene *scene)=0;
-	virtual void destroy()=0;
-
-	virtual void beginQuery()=0;
-	virtual void endQuery()=0;
-	virtual bool performQuery()=0;
-
-	virtual const egg::Collection<node::Node*> &getResult()=0;
-};
+void SpacialQuery::destroy(){
+	if(mDestroyedListener!=NULL){
+		mDestroyedListener->queryDestroyed(this);
+	}	
+}
 
 }
 }
-}
-
-#endif

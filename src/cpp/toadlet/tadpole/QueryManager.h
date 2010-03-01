@@ -28,11 +28,12 @@
 
 #include <toadlet/peeper/RenderQuery.h>
 #include <toadlet/tadpole/Types.h>
-#include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/query/AABoxQuery.h>
+#include <toadlet/tadpole/SpacialQuery.h>
 
 namespace toadlet{
 namespace tadpole{
+
+class Engine;
 
 class TOADLET_API QueryManager:public peeper::QueryDestroyedListener{
 public:
@@ -43,10 +44,7 @@ public:
 
 	peeper::RenderQuery::ptr createOcclusionQuery();
 	peeper::RenderQuery::ptr createFinishedQuery();
-	query::SpacialQuery::ptr createSegmentQuery();
-	query::SpacialQuery::ptr createSphereQuery();
-	query::AABoxQuery::ptr createAABoxQuery();
-	query::SpacialQuery::ptr createNodeQuery();
+	SpacialQuery::ptr createSpacialQuery();
 
 	virtual void queryDestroyed(peeper::Query *query);
 

@@ -23,41 +23,25 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/query/AABoxQuery.h>
-#include <toadlet/tadpole/node/Scene.h>
-
-using namespace toadlet::tadpole::node;
+#ifndef TOADLET_TADPOLE_SPACIALQUERYRESULTSLISTENER_H
+#define TOADLET_TADPOLE_SPACIALQUERYRESULTSLISTENER_H
 
 namespace toadlet{
 namespace tadpole{
-namespace query{
-
-AABoxQuery::AABoxQuery():
-	mScene(NULL),
-
-	mListener(NULL)
-	//mBox
-{
+namespace node{
+	class Node;
 }
 
-AABoxQuery::~AABoxQuery(){
-	destroy();
-}
+class SpacialQuery;
 
-void AABoxQuery::create(Scene *scene){
-	mScene=scene;
-}
+class SpacialQueryResultsListener{
+public:
+	virtual ~SpacialQueryResultsListener(){}
 
-void AABoxQuery::destroy(){
-	if(mListener!=NULL){
-		mListener->queryDestroyed(this);
-	}
-}
-
-bool AABoxQuery::performQuery(){
-	return mScene->performQuery(this);
-}
+	virtual void resultFound(node::Node *result)=0;
+};
 
 }
 }
-}
+
+#endif

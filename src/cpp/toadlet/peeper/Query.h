@@ -47,9 +47,6 @@ public:
 	// For queries that have a definite begin & end
 	virtual void beginQuery()=0;
 	virtual void endQuery()=0;
-
-	// For instantanious queries
-	virtual bool performQuery()=0;
 };
 
 }

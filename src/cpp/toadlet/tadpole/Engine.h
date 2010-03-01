@@ -45,6 +45,7 @@
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/MaterialManager.h>
 #include <toadlet/tadpole/MeshManager.h>
+#include <toadlet/tadpole/QueryManager.h>
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/node/Scene.h>
 #include <toadlet/tadpole/handler/AudioBufferHandler.h>
@@ -104,6 +105,7 @@ public:
 	inline MaterialManager *getMaterialManager() const{return  mMaterialManager;}
 	inline FontManager *getFontManager() const{return mFontManager;}
 	inline MeshManager *getMeshManager() const{return mMeshManager;}
+	inline QueryManager *getQueryManager() const{return mQueryManager;}
 	inline ResourceManager *getAudioBufferManager() const{return mAudioBufferManager;}
 
 protected:
@@ -123,6 +125,7 @@ protected:
 	MaterialManager *mMaterialManager;
 	FontManager *mFontManager;
 	MeshManager *mMeshManager;
+	QueryManager *mQueryManager;
 	ResourceManager *mAudioBufferManager;
 	handler::AudioBufferHandler::ptr mAudioBufferHandler;
 	
