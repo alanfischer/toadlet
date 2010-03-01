@@ -106,7 +106,8 @@ public:
 	virtual void setUpdateListener(UpdateListener *updateListener);
 	virtual UpdateListener *getUpdateListener() const{return mUpdateListener;}
 
-	virtual bool performQuery(query::AABoxQuery *query);
+	virtual bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact);
+	virtual int getContents(const Vector3 &point){return 0;}
 
 	void queueRenderable(Renderable *renderable);
 	void queueLight(LightNode *light);

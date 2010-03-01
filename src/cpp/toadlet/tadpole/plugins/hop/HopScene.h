@@ -122,7 +122,8 @@ public:
 	virtual void renderUpdate(int dt);
 	virtual void postRenderUpdate(int dt);
 
-	virtual bool performQuery(query::AABoxQuery *query){return mScene->performQuery(query);}
+	virtual bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact){return mScene->performAABoxQuery(query,box,exact);}
+	virtual int getContents(const Vector3 &point){return mScene->getContents(point);}
 
 	void traceSegment(hop::Collision &result,const Segment &segment);
 	void traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid);

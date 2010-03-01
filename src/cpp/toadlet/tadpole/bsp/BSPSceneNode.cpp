@@ -40,6 +40,7 @@ using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::handler;
 
 float trace(toadlet::tadpole::bsp::BSPMap *map,int startnode,Vector3 start,Vector3 end,Vector3 &normal);
+int contents(toadlet::tadpole::bsp::BSPMap *map,const Vector3 &point);
 
 namespace toadlet{
 namespace tadpole{
@@ -223,6 +224,34 @@ void BSPSceneNode::setBSPMap(BSPMap::ptr map){
 	node->setMesh(mesh);
 	getBackground()->attach(node);
 	// END: Needs to be removed
+}
+
+void BSPSceneNode::setContentNode(int content,Node::ptr node){
+	mContent[-content]=node;
+}
+
+bool BSPSceneNode::performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact){
+	SpacialQueryResultsListener *listener=query->getSpacialQueryResultsListener();
+
+	// First check contents
+	int c=contents(mBSPMap,(box.maxs-box.mins)/2);
+	if(mContent[-c]) listener->resultFound(mContent[-c]);
+
+	// TODO: Find current scene nodes by finding the portion of the scene we're in and what nodes are in there
+	int i;
+	for(i=0;i<mChildren.size();++i){
+		Node *child=mChildren[i];
+		if(Math::testIntersection(Sphere(child->getTranslate(),child->getBoundingRadius()),box)){
+			listener->resultFound(child);
+		}
+	}
+	return true;
+}
+
+int BSPSceneNode::getContents(const Vector3 &point){
+	int c=contents(mBSPMap,point);
+	Logger::alert(String("IN:")+c);
+	return c;
 }
 
 bool BSPSceneNode::preLayerRender(Renderer *renderer,int layer){
@@ -764,23 +793,12 @@ float trace(BSPMap *map,int startnode,Vector3 start,Vector3 end,Vector3 &normal)
 		if (t.startsolid)
 			t.fraction = 0;
 
-//		if(t.allsolid){
-//			t.fraction=0;
-//		}
-//		else if(t.fraction==0)t.fraction=-1.0;
-//		else if(t.startsolid){
-		
-//		}
-//Logger::alert(String("AS:")+t.allsolid+" SS:"+t.startsolid+" F:"+t.fraction);
-if(t.allsolid==false && t.startsolid==true){t.fraction=1.0;}
-//		else
-//			if(t.fraction==0)t.fraction=-1.0;
+		if(t.allsolid==false && t.startsolid==true){t.fraction=1.0;}
 
-//	if(t.allsolid==true){
 		return t.fraction;
-//		return 0;
-//	}
-//	else {
-//		return t.fraction;
-//	}
+}
+
+int contents(BSPMap *map,const Vector3 &point){
+	if(map!=NULL) return HullPointContents(map,0,point);
+	return 0;
 }

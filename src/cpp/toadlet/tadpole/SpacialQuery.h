@@ -23,46 +23,42 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_QUERY_AABOXQUERY_H
-#define TOADLET_TADPOLE_QUERY_AABOXQUERY_H
+#ifndef TOADLET_TADPOLE_SPACIALQUERY_H
+#define TOADLET_TADPOLE_SPACIALQUERY_H
 
-#include <toadlet/tadpole/query/SpacialQuery.h>
+#include <toadlet/peeper/Query.h>
+#include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/SpacialQueryResultsListener.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace query{
 
-class TOADLET_API AABoxQuery:public SpacialQuery{
+// TODO: The SpacialQuery structure really needs to be refactored
+class SpacialQuery:public peeper::Query{
 public:
-	TOADLET_SHARED_POINTERS(AABoxQuery);
+	TOADLET_SHARED_POINTERS(SpacialQuery);
 
-	AABoxQuery();
-	virtual ~AABoxQuery();
+	SpacialQuery();
+	virtual ~SpacialQuery();
 
-	virtual peeper::Query *getRootQuery(){return this;}
+	virtual SpacialQuery *getRootQuery(){return this;}
 
-	virtual void create(node::Scene *scene);
+	virtual void create();
 	virtual void destroy();
 
-	virtual void setQueryDestroyedListener(peeper::QueryDestroyedListener *listener){mListener=listener;}
-
-	virtual void setAABox(const AABox &box){mBox.set(box);}
+	virtual void setQueryDestroyedListener(peeper::QueryDestroyedListener *listener){mDestroyedListener=listener;}
+	virtual peeper::QueryDestroyedListener *getQueryDestroyedListener() const{return mDestroyedListener;}
+	virtual void setResultsListener(SpacialQueryResultsListener *listener){mResultsListener=listener;}
+	virtual SpacialQueryResultsListener *getSpacialQueryResultsListener() const{return mResultsListener;}
 
 	virtual void beginQuery(){}
 	virtual void endQuery(){}
-	virtual bool performQuery();
 
-	virtual const egg::Collection<node::Node*> &getResult(){return mResults;}
-
-public:
-	node::Scene *mScene;
-
-	peeper::QueryDestroyedListener *mListener;
-	AABox mBox;
-	egg::Collection<node::Node*> mResults;
+protected:
+	peeper::QueryDestroyedListener *mDestroyedListener;
+	SpacialQueryResultsListener *mResultsListener;
 };
 
-}
 }
 }
 
