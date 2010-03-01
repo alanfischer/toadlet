@@ -41,7 +41,8 @@ public:
 		//normal,
 		//velocity,
 		collider(NULL),
-		collidee(NULL){}
+		collidee(NULL),
+		scope(0){}
 
 	inline Collision &set(const Collision &c){
 		time=c.time;
@@ -50,6 +51,7 @@ public:
 		velocity.set(c.velocity);
 		collider=c.collider;
 		collidee=c.collidee;
+		scope=c.scope;
 
 		return *this;
 	}
@@ -61,6 +63,7 @@ public:
 		velocity.reset();
 		collider=NULL;
 		collidee=NULL;
+		scope=0;
 
 		return *this;
 	}
@@ -71,6 +74,7 @@ public:
 	Vector3 velocity; // The velocity difference between the two solids
 	Solid *collider; // The solid that blocked the trace
 	Solid *collidee; // The solid being traced
+	int scope; // The OR'd scope of the collision point
 };
 
 }

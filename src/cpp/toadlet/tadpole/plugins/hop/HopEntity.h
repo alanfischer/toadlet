@@ -49,7 +49,7 @@ public:
 		ENTITY_BIT_POSITION=1<<3,
 		ENTITY_BIT_VELOCITY=1<<4,
 		ENTITY_BIT_FORCE=1<<5,
-		ENTITY_BIT_GRAVITY=1<<6,
+		ENTITY_BIT_CO_GRAVITY=1<<6,
 		ENTITY_BIT_CO_RESTITUTION=1<<7,
 		ENTITY_BIT_CO_RESTITUTIONOVERRIDE=1<<8,
 		ENTITY_BIT_CO_STATICFRICTION=1<<9,
@@ -94,11 +94,8 @@ public:
 	virtual const Vector3 &getForce() const{return mSolid->getForce();}
 	virtual void clearForce();
 
-	virtual void setLocalGravity(const Vector3 &gravity);
-	virtual const Vector3 &getLocalGravity() const{return mSolid->getLocalGravity();}
-
-	virtual void setWorldGravity();
-	virtual bool hasLocalGravity() const{return mSolid->hasLocalGravity();}
+	virtual void setCoefficientOfGravity(scalar coeff);
+	virtual scalar getCoefficientOfGravity() const{return mSolid->getCoefficientOfGravity();}
 
 	virtual void setCoefficientOfRestitution(scalar coeff);
 	virtual scalar getCoefficientOfRestitution() const{return mSolid->getCoefficientOfRestitution();}
