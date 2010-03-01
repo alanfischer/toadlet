@@ -180,16 +180,10 @@ void HopEntity::clearForce(){
 	mModifiedFields|=ENTITY_BIT_FORCE;
 }
 
-void HopEntity::setLocalGravity(const Vector3 &gravity){
-	mSolid->setLocalGravity(gravity);
+void HopEntity::setCoefficientOfGravity(scalar coeff){
+	mSolid->setCoefficientOfGravity(coeff);
 
-	mModifiedFields|=ENTITY_BIT_GRAVITY;
-}
-
-void HopEntity::setWorldGravity(){
-	mSolid->setWorldGravity();
-
-	mModifiedFields|=ENTITY_BIT_GRAVITY;
+	mModifiedFields|=ENTITY_BIT_CO_GRAVITY;
 }
 
 void HopEntity::setCoefficientOfRestitution(scalar coeff){
@@ -296,7 +290,7 @@ void HopEntity::parentChanged(ParentNode *parent){
 	super::parentChanged(parent);
 }
 
-void HopEntity::collision(const Collision &c){
+void HopEntity::collision(const hop::Collision &c){
 	if(mListener!=NULL){
 		HopEntity::ptr reference(this); // To make sure that the object is not deleted by the collision callback until we exit this function
 		mHopCollision.time=c.time;
@@ -351,15 +345,10 @@ void HopEntity::castShadow(){
 	Matrix3x3 rotate;
 	Math::setTranslateFromMatrix4x4(segment.origin,mRenderTransform);
 	Math::setMatrix3x3FromMatrix4x4(rotate,mRenderTransform);
-	if(mSolid->hasLocalGravity()){
-		Math::normalize(vector,mSolid->getLocalGravity());
-	}
-	else{
-		Math::normalize(vector,mScene->getSimulator()->getGravity());
-	}
+	Math::normalize(vector,mScene->getSimulator()->getGravity());
 	Math::mul(segment.direction,vector,mShadowTestLength);
 
-	Collision collision;
+	hop::Collision collision;
 	mScene->getSimulator()->traceSegment(collision,segment,-1,mSolid);
 	// Shadow if the object beneath us is of infinite mass (eg static)
 	if(collision.collider!=NULL && collision.collider->hasInfiniteMass()){

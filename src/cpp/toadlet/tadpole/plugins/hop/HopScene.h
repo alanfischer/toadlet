@@ -35,7 +35,6 @@ namespace toadlet{
 namespace tadpole{
 
 class HopNode;
-class HopCollision;
 class HopEntityMessage;
 
 // I'm not 100% sure that the decorator pattern was the correct hammer for this nail, but thats to be seen.
@@ -93,7 +92,7 @@ public:
 	virtual void findHopEntitiesInSphere(const Sphere &sphere,egg::Collection<egg::IntrusivePointer<HopEntity> > &entities);
 	virtual void findHopEntitiesInSolids(egg::Collection<egg::IntrusivePointer<HopEntity> > &entities,hop::Solid *solids[],int numSolids);
 
-	virtual void traceSegment(HopCollision &result,const Segment &segment,int collideWithBits,HopEntity *ignore);
+	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits,HopEntity *ignore);
 
 	inline int getNumHopEntities() const{return mHopEntities.size();}
 	inline HopEntity *getHopEntity(int i) const{return mHopEntities[i];}
@@ -139,6 +138,9 @@ public:
 	hop::Collision cache_traceSegment_collision;
 
 protected:
+	void set(tadpole::Collision &r,hop::Collision &c);
+	void set(hop::Collision &r,tadpole::Collision &c);
+
 	virtual void defaultRegisterHopEntity(HopEntity *entity);
 	virtual void defaultUnregisterHopEntity(HopEntity *entity);
 

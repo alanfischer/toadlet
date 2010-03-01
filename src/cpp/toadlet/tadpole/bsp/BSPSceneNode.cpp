@@ -226,16 +226,8 @@ void BSPSceneNode::setBSPMap(BSPMap::ptr map){
 	// END: Needs to be removed
 }
 
-void BSPSceneNode::setContentNode(int content,Node::ptr node){
-	mContent[-content]=node;
-}
-
 bool BSPSceneNode::performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact){
 	SpacialQueryResultsListener *listener=query->getSpacialQueryResultsListener();
-
-	// First check contents
-	int c=contents(mBSPMap,(box.maxs-box.mins)/2);
-	if(mContent[-c]) listener->resultFound(mContent[-c]);
 
 	// TODO: Find current scene nodes by finding the portion of the scene we're in and what nodes are in there
 	int i;
@@ -246,12 +238,6 @@ bool BSPSceneNode::performAABoxQuery(SpacialQuery *query,const AABox &box,bool e
 		}
 	}
 	return true;
-}
-
-int BSPSceneNode::getContents(const Vector3 &point){
-	int c=contents(mBSPMap,point);
-	Logger::alert(String("IN:")+c);
-	return c;
 }
 
 bool BSPSceneNode::preLayerRender(Renderer *renderer,int layer){
@@ -282,43 +268,67 @@ int BSPSceneNode::findLeaf(const Vector3 &point) const{
 	return -(nodeIndex+1);
 }
 
-scalar BSPSceneNode::traceSegment(Vector3 &normal,const Segment &segment){
-	scalar result=Math::ONE;
+void BSPSceneNode::traceSegment(Collision &result,const Segment &segment){
+	result.time=Math::ONE;
 	Vector3 end;
 	segment.getEndPoint(end);
 	if(mBSPMap!=NULL){
-result=trace(mBSPMap,mBSPMap->trees[0].nodeStart,segment.origin,end,normal);
+result.time=trace(mBSPMap,mBSPMap->trees[0].nodeStart,segment.origin,end,result.normal);
+int contents=mBSPMap->leaves[findLeaf(segment.origin)].contents;
+if(contents<=-1){ result.scope|=(-(contents+1))<<1; } // Would be nice to merge this into the trace
 	}
-	if(result==Math::ONE){
-		result=-Math::ONE;
+	if(result.time==Math::ONE){
+		result.time=-Math::ONE;
 	}
-	return result;
+
+	if(result.time<0){
+		Math::add(result.point,segment.origin,segment.direction);
+	}
+	else{
+		Math::madd(result.point,segment.direction,result.time,segment.origin);
+	}
 }
 
-scalar BSPSceneNode::traceSphere(Vector3 &normal,const Segment &segment,const Sphere &sphere){
-	scalar result=Math::ONE;
+void BSPSceneNode::traceSphere(Collision &result,const Segment &segment,const Sphere &sphere){
+	result.time=Math::ONE;
 	Vector3 end;
 	segment.getEndPoint(end);
 	if(mBSPMap!=NULL){
-result=trace(mBSPMap,mBSPMap->trees[0].nodeStart,segment.origin,end,normal);
+result.time=trace(mBSPMap,mBSPMap->trees[0].nodeStart,segment.origin,end,result.normal);
+int contents=mBSPMap->leaves[findLeaf(segment.origin)].contents;
+if(contents<=-1){ result.scope|=(-(contents+1))<<1; } // Would be nice to merge this into the trace
 	}
-	if(result==Math::ONE){
-		result=-Math::ONE;
+	if(result.time==Math::ONE){
+		result.time=-Math::ONE;
 	}
-	return result;
+
+	if(result.time<0){
+		Math::add(result.point,segment.origin,segment.direction);
+	}
+	else{
+		Math::madd(result.point,segment.direction,result.time,segment.origin);
+	}
 }
 
-scalar BSPSceneNode::traceAABox(Vector3 &normal,const Segment &segment,const AABox &box){
-	scalar result=Math::ONE;
+void BSPSceneNode::traceAABox(Collision &result,const Segment &segment,const AABox &box){
+	result.time=Math::ONE;
 	Vector3 end;
 	segment.getEndPoint(end);	
 	if(mBSPMap!=NULL){
-result=trace(mBSPMap,mBSPMap->trees[0].nodeStart,segment.origin,end,normal);
+result.time=trace(mBSPMap,mBSPMap->trees[0].nodeStart,segment.origin,end,result.normal);
+int contents=mBSPMap->leaves[findLeaf(segment.origin)].contents;
+if(contents<=-1){ result.scope|=(-(contents+1))<<1; } // Would be nice to merge this into the trace
 	}
-	if(result==Math::ONE){
-		result=-Math::ONE;
+	if(result.time==Math::ONE){
+		result.time=-Math::ONE;
 	}
-	return result;
+
+	if(result.time<0){
+		Math::add(result.point,segment.origin,segment.direction);
+	}
+	else{
+		Math::madd(result.point,segment.direction,result.time,segment.origin);
+	}
 }
 
 void BSPSceneNode::decompressVIS(){
@@ -788,14 +798,14 @@ float trace(BSPMap *map,int startnode,Vector3 start,Vector3 end,Vector3 &normal)
 	bool result=RecursiveHullCheck(map,startnode,0,1,start,end,&t);
 	normal=t.plane.normal;
 
-		if (t.allsolid)
-			t.startsolid = qtrue;
-		if (t.startsolid)
-			t.fraction = 0;
+	if (t.allsolid)
+		t.startsolid = qtrue;
+	if (t.startsolid)
+		t.fraction = 0;
 
-		if(t.allsolid==false && t.startsolid==true){t.fraction=1.0;}
+	if(t.allsolid==false && t.startsolid==true){t.fraction=1.0;}
 
-		return t.fraction;
+	return t.fraction;
 }
 
 int contents(BSPMap *map,const Vector3 &point){

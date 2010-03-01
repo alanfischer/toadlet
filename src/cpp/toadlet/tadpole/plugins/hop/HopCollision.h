@@ -37,6 +37,9 @@ class HopCollision{
 public:
 	HopCollision():
 		time(-Math::ONE),
+		//point,
+		//normal,
+		//velocity,
 		collider(NULL),
 		collidee(NULL)
 	{}
@@ -52,7 +55,7 @@ public:
 
 	inline void reset(){
 		time=-Math::ONE;
-		point.set(Math::ZERO_VECTOR3)	;
+		point.set(Math::ZERO_VECTOR3);
 		normal.set(Math::ZERO_VECTOR3);
 		velocity.set(Math::ZERO_VECTOR3);
 		collider=NULL;

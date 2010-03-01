@@ -42,8 +42,7 @@ Solid::Solid():
 	//mPosition,
 	//mVelocity,
 	//mForce,
-	//mLocalGravity,
-	mLocalGravityOverride(false),
+	mCoefficientOfGravity(0),
 	mCoefficientOfRestitution(0),
 	mCoefficientOfRestitutionOverride(false),
 	mCoefficientOfStaticFriction(0),
@@ -93,8 +92,7 @@ void Solid::reset(){
 	mPosition.reset();
 	mVelocity.reset();
 	mForce.reset();
-	mLocalGravity.reset();
-	mLocalGravityOverride=false;
+	mCoefficientOfGravity=0;
 	mCoefficientOfRestitution=Math::HALF;
 	mCoefficientOfRestitutionOverride=false;
 	mCoefficientOfStaticFriction=Math::HALF;
@@ -175,17 +173,6 @@ void Solid::setVelocity(const Vector3 &velocity){
 
 void Solid::addForce(const Vector3 &force){
 	Math::add(mForce,force);
-	activate();
-}
-
-void Solid::setLocalGravity(const Vector3 &gravity){
-	mLocalGravity.set(gravity);
-	mLocalGravityOverride=true;
-	activate();
-}
-
-void Solid::setWorldGravity(){
-	mLocalGravityOverride=false;
 	activate();
 }
 
