@@ -42,6 +42,9 @@ TOADLET_NODE_IMPLEMENT(HopEntity,Categories::TOADLET_TADPOLE+".HopEntity");
 HopEntity::HopEntity():ParentNode(),
 	mNextThink(0),
 	mSolid(new Solid()),
+	//mTraceableShape,
+	mTraceable(NULL),
+
 	//mScene,
 	mListener(NULL),
 	//mHopCollision,
@@ -216,6 +219,20 @@ void HopEntity::setCoefficientOfEffectiveDrag(scalar coeff){
 	mModifiedFields|=ENTITY_BIT_CO_EFFECTIVEDRAG;
 }
 
+void HopEntity::setTraceableShape(Traceable *traceable){
+	if(mTraceable!=NULL){
+		removeShape(mTraceableShape);
+		mTraceableShape=NULL;
+	}
+
+	mTraceable=traceable;
+
+	if(mTraceable!=NULL){
+		mTraceableShape=Shape::ptr(new Shape(this));
+		addShape(mTraceableShape);
+	}
+}
+
 void HopEntity::addShape(hop::Shape::ptr shape){
 	mSolid->addShape(shape);
 
@@ -288,6 +305,30 @@ void HopEntity::parentChanged(ParentNode *parent){
 	}
 
 	super::parentChanged(parent);
+}
+
+void HopEntity::getBound(AABox &result){
+	if(mTraceable!=NULL){
+		const Sphere &bound=mTraceable->getLocalBound();
+		result.set(bound.radius);
+		Math::add(result,bound.origin);
+	}
+}
+
+void HopEntity::traceSegment(hop::Collision &result,const Segment &segment){
+	if(mTraceable!=NULL){
+		tadpole::Collision collision;
+		mTraceable->traceSegment(collision,segment);
+		HopScene::set(result,collision,this);
+	}
+}
+
+void HopEntity::traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid){
+	if(mTraceable!=NULL){
+		tadpole::Collision collision;
+		mTraceable->traceSegment(collision,segment);
+		HopScene::set(result,collision,this);
+	}
 }
 
 void HopEntity::collision(const hop::Collision &c){

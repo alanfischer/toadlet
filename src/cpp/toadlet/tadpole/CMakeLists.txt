@@ -30,7 +30,7 @@ set (TADPOLE_ANIMATION_SRC
 )
 
 set (TADPOLE_BSP_SRC
-	bsp/BSPSceneNode.cpp
+	bsp/BSP30SceneNode.cpp
 	bsp/BSP30Handler.cpp
 )
 
@@ -128,12 +128,9 @@ set (TADPOLE_ANIMATION_HEADERS
 
 set (TADPOLE_BSP_HEADERS
 	bsp/BSP30Handler.h
-	bsp/BSPMap.h
-	bsp/BSPSceneNode.h
-	bsp/Brush.h
-	bsp/Face.h
-	bsp/Leaf.h
-	bsp/Node.h
+	bsp/BSP30Map.h
+	bsp/BSP30SceneNode.h
+	bsp/BSP30Types.h
 )
 
 set (TADPOLE_HANDLER_HEADERS
@@ -196,6 +193,7 @@ set (TADPOLE_NODE_HEADERS
 	node/SizeableParentNode.h
 	node/SkeletonParentNode.h
 	node/SpriteNode.h
+	node/Traceable.h
 )
 
 

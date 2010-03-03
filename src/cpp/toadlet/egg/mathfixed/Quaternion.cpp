@@ -23,28 +23,31 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_NODE_PHYSICALLYTRACEABLE_H
-#define TOADLET_TADPOLE_NODE_PHYSICALLYTRACEABLE_H
-
-#include <toadlet/tadpole/Types.h>
-#include <toadlet/tadpole/Collision.h>
+#include <toadlet/egg/mathfixed/Quaternion.h>
+#include <toadlet/egg/mathfixed/Math.h>
 
 namespace toadlet{
-namespace tadpole{
-namespace node{
+namespace egg{
+namespace mathfixed{
 
-class PhysicallyTraceable{
-public:
-	virtual ~PhysicallyTraceable(){}
+Quaternion Quaternion::operator*(const Quaternion &q2) const{
+	Quaternion r;
+	Math::mul(r,*this,q2);
+	return r;
+}
 
-	// TODO: I'd like to generalize this to just be one method with some Geometry overload
-	virtual void traceSegment(Collision &result,const Segment &segment)=0;
-	virtual void traceSphere(Collision &result,const Segment &segment,const Sphere &sphere)=0;
-	virtual void traceAABox(Collision &result,const Segment &segment,const AABox &box)=0;
-};
+Quaternion &Quaternion::operator*=(const Quaternion &q2){
+	Math::postMul(*this,q2);
+	return *this;
+}
+
+Vector3 Quaternion::operator*(const Vector3 &v) const{
+	Vector3 r;
+	Math::mul(r,*this,v);
+	return r;
+}
 
 }
 }
 }
 
-#endif

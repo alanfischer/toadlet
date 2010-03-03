@@ -63,8 +63,6 @@ public:
 	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
-	virtual PhysicallyTraceable *isPhysicallyTraceable(){return NULL;}
-
 	virtual void setChildScene(Scene *scene){mChildScene=scene;}
 	virtual Scene *getRootScene(){return this;}
 
@@ -107,7 +105,6 @@ public:
 	virtual UpdateListener *getUpdateListener() const{return mUpdateListener;}
 
 	virtual bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact);
-	virtual int getContents(const Vector3 &point){return 0;}
 
 	void queueRenderable(Renderable *renderable);
 	void queueLight(LightNode *light);

@@ -37,11 +37,13 @@ class Vector3{
 public:
 	real x,y,z;
 
-	Vector3():x(0),y(0),z(0){}
+	inline Vector3():x(0),y(0),z(0){}
 
-	Vector3(real x1,real y1,real z1):x(x1),y(y1),z(z1){}
+	inline Vector3(real x1,real y1,real z1):x(x1),y(y1),z(z1){}
 
-	Vector3(const Vector2 &v,real z1):x(v.x),y(v.y),z(z1){}
+	inline Vector3(real v[]):x(v[0]),y(v[1]),z(v[2]){}
+
+	inline Vector3(const Vector2 &v,real z1):x(v.x),y(v.y),z(z1){}
 
 	inline Vector3 &set(const Vector3 &v){
 		x=v.x;

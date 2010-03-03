@@ -37,13 +37,15 @@ class Vector4{
 public:
 	real x,y,z,w;
 
-	Vector4():x(0),y(0),z(0),w(0){}
+	inline Vector4():x(0),y(0),z(0),w(0){}
 
-	Vector4(real x1,real y1,real z1,real w1):x(x1),y(y1),z(z1),w(w1){}
+	inline Vector4(real x1,real y1,real z1,real w1):x(x1),y(y1),z(z1),w(w1){}
 
-	Vector4(const Vector2 &v,real z1,real w1):x(v.x),y(v.y),z(z1),w(w1){}
+	inline Vector4(real v[]):x(v[0]),y(v[1]),z(v[2]),w(v[3]){}
 
-	Vector4(const Vector3 &v,real w1):x(v.x),y(v.y),z(v.z),w(w1){}
+	inline Vector4(const Vector2 &v,real z1,real w1):x(v.x),y(v.y),z(z1),w(w1){}
+
+	inline Vector4(const Vector3 &v,real w1):x(v.x),y(v.y),z(v.z),w(w1){}
 
 	inline Vector4 &set(const Vector4 &v){
 		x=v.x;

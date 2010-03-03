@@ -29,13 +29,14 @@
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
+#include <toadlet/tadpole/node/Traceable.h>
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
 #include <toadlet/tadpole/plugins/hop/HopCollisionListener.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API HopEntity:public node::ParentNode,public hop::CollisionListener{
+class TOADLET_API HopEntity:public node::ParentNode,public hop::TraceCallback,public hop::CollisionListener{
 public:
 	TOADLET_NODE(HopEntity,node::ParentNode);
 
@@ -112,6 +113,7 @@ public:
 	virtual void setCoefficientOfEffectiveDrag(scalar coeff);
 	virtual scalar getCoefficientOfEffectiveDrag() const{return mSolid->getCoefficientOfEffectiveDrag();}
 
+	virtual void setTraceableShape(node::Traceable *traceable);
 	virtual void addShape(hop::Shape::ptr shape);
 	virtual void removeShape(hop::Shape *shape);
 	virtual void removeAllShapes();
@@ -139,11 +141,17 @@ public:
 	void setShadowMesh(mesh::Mesh::ptr shadow,scalar scale,scalar testLength,scalar offset);
 	inline mesh::Mesh::ptr setShadowMesh() const{return mShadowMesh;}
 
+	// Node callbacks
 	virtual void parentChanged(node::ParentNode *parent);
 
+	// TraceCallback callbacks
+	virtual void getBound(AABox &result);
+	virtual void traceSegment(hop::Collision &result,const Segment &segment);
+	virtual void traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid);
+
+	// CollisionListener callbacks
 	virtual void collision(const hop::Collision &c);
 
-//protected:
 	virtual void preLogicUpdateLoop(int dt);
 	virtual void postLogicUpdate(int dt);
 	virtual void interpolatePhysicalParameters(scalar f);
@@ -155,6 +163,9 @@ protected:
 
 	int mNextThink;
 	hop::Solid::ptr mSolid;
+	hop::Shape::ptr mTraceableShape;
+	node::Traceable *mTraceable;
+	
 	HopScene::ptr mScene;
 	HopCollisionListener *mListener;
 	HopCollision mHopCollision;
