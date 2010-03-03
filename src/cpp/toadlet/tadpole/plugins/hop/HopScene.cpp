@@ -28,11 +28,11 @@
 #include <toadlet/egg/Profile.h>
 #include <toadlet/peeper/CapabilitySet.h> 
 #include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/node/SceneNode.h>
 #include <toadlet/tadpole/node/PhysicallyTraceable.h>
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
 #include <toadlet/tadpole/plugins/hop/HopEntity.h>
-#include <toadlet/tadpole/plugins/hop/HopCollision.h>
 #include <toadlet/tadpole/plugins/hop/HopParticleSimulator.h>
 
 using namespace toadlet::egg;
@@ -71,10 +71,10 @@ HopScene::HopScene(Scene::ptr scene):
 	resetNetworkIDs();
 
 	mWorld=Solid::ptr(new Solid());
-	mWorld->setLocalGravity(Math::ZERO_VECTOR3);
+	mWorld->setCoefficientOfGravity(0);
 	mWorld->setInfiniteMass();
 	mSimulator->addSolid(mWorld);
-	
+
 	mScene->getRootNode()->getEngine()->registerNodeType(HopEntity::type());
 }
 
@@ -113,7 +113,7 @@ void HopScene::findHopEntitiesInSolids(Collection<HopEntity::ptr> &entities,Soli
 	}
 }
 
-void HopScene::traceSegment(HopCollision &result,const Segment &segment,int collideWithBits,HopEntity *ignore){
+void HopScene::traceSegment(Collision &result,const Segment &segment,int collideWithBits,HopEntity *ignore){
 	result.reset();
 
 	Solid *ignoreSolid=NULL;
@@ -121,21 +121,9 @@ void HopScene::traceSegment(HopCollision &result,const Segment &segment,int coll
 		ignoreSolid=ignore->getSolid();
 	}
 
-	Collision &collision=cache_traceSegment_collision.reset();
+	hop::Collision &collision=cache_traceSegment_collision.reset();
 	mSimulator->traceSegment(collision,segment,collideWithBits,ignoreSolid);
-
-	if(collision.time!=-Math::ONE){
-		result.time=collision.time;
-		result.point=collision.point;
-		result.normal=collision.normal;
-
-		if(collision.collider!=NULL){
-			HopEntity *entity=static_cast<HopEntity*>(collision.collider->getUserData());
-			if(entity!=NULL){
-				result.collider=HopEntity::ptr(entity);
-			}
-		}
-	}
+	set(result,collision);
 }
 
 HopEntity *HopScene::getHopEntityFromNetworkID(int id) const{
@@ -305,35 +293,43 @@ void HopScene::postRenderUpdate(int dt){
 	mScene->postRenderUpdate(dt);
 }
 
-void HopScene::traceSegment(Collision &result,const Segment &segment){
+void HopScene::traceSegment(hop::Collision &result,const Segment &segment){
 	if(mTraceable!=NULL){
-		result.time=mTraceable->traceSegment(result.normal,segment);
-		if(result.time<0){
-			Math::add(result.point,segment.origin,segment.direction);
-		}
-		else{
-			Math::madd(result.point,segment.direction,result.time,segment.origin);
-			result.collider=mWorld;
-		}
+		tadpole::Collision collision;
+		mTraceable->traceSegment(collision,segment);
+		set(result,collision);
 	}
 }
 
 void HopScene::traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid){
 	if(mTraceable!=NULL){
+		tadpole::Collision collision;
 		if(solid->getShape(0)->getType()==hop::Shape::Type_AABOX){
-			result.time=mTraceable->traceAABox(result.normal,segment,solid->getShape(0)->getAABox());
+			mTraceable->traceAABox(collision,segment,solid->getShape(0)->getAABox());
 		}
 		else if(solid->getShape(0)->getType()==hop::Shape::Type_SPHERE){
-			result.time=mTraceable->traceSphere(result.normal,segment,solid->getShape(0)->getSphere());
+			mTraceable->traceSphere(collision,segment,solid->getShape(0)->getSphere());
 		}
-		if(result.time<0){
-			Math::add(result.point,segment.origin,segment.direction);
-		}
-		else{
-			Math::madd(result.point,segment.direction,result.time,segment.origin);
-			result.collider=mWorld;
-		}
+		set(result,collision);
 	}
+}
+
+void HopScene::set(tadpole::Collision &r,hop::Collision &c){
+	r.time=c.time;
+	r.point.set(c.point);
+	r.normal.set(c.normal);
+	if(c.collider!=NULL){r.collider=(HopEntity*)c.collider->getUserData();};
+	r.scope=c.scope;
+}
+
+void HopScene::set(hop::Collision &r,tadpole::Collision &c){
+	r.time=c.time;
+	r.point.set(c.point);
+	r.normal.set(c.normal);
+	// TODO: Add some method to see if the c.collider is HopEntity
+	//if(c.collider!=NULL && c.collider->isHopEntity) r.collider=(HopEntity*)c.collider;
+	if(c.time>=0){r.collider=mWorld;}
+	r.scope=c.scope;
 }
 
 void HopScene::defaultRegisterHopEntity(HopEntity *entity){

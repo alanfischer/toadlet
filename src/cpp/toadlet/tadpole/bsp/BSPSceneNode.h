@@ -56,14 +56,11 @@ public:
 	void setBSPMap(BSPMap::ptr map);
 	BSPMap::ptr getBSPMap() const{return mBSPMap;}
 
-	void setContentNode(int content,Node::ptr node);
-
 	bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact);
-	int getContents(const Vector3 &point);
 
-	scalar traceSegment(Vector3 &normal,const Segment &segment);
-	scalar traceSphere(Vector3 &normal,const Segment &segment,const Sphere &sphere);
-	scalar traceAABox(Vector3 &normal,const Segment &segment,const AABox &box);
+	void traceSegment(Collision &result,const Segment &segment);
+	void traceSphere(Collision &result,const Segment &segment,const Sphere &sphere);
+	void traceAABox(Collision &result,const Segment &segment,const AABox &box);
 
 protected:
 	// TODO: We need to get away from this markfaces stuff, make it more universal
@@ -102,7 +99,6 @@ protected:
 	// TODO: And clean up these hacky members.
 	egg::Collection<peeper::Texture::ptr> textures; // Shouldnt be storing textures here, instead we need to go by material
 	egg::Collection<egg::Collection<int> > leafVisibility;
-	Node::ptr mContent[12];
 };
 
 }

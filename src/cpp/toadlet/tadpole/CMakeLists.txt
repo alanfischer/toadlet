@@ -94,6 +94,7 @@ set (TADPOLE_HEADERS
 	ArchiveManager.h
 	AudioBufferData.h
 	BufferManager.h
+	Collision.h
 	Engine.h
 	Font.h
 	FontData.h
