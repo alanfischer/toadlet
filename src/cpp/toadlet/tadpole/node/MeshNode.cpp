@@ -176,7 +176,7 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 
 	if(mesh==NULL){
 		Error::invalidParameters(Categories::TOADLET_TADPOLE,
-			"Invalid Mesh");
+			"invalid Mesh");
 		return;
 	}
 

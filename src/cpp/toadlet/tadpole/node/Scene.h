@@ -88,7 +88,6 @@ public:
 	virtual UpdateListener *getUpdateListener() const=0;
 
 	virtual bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact)=0;
-	virtual int getContents(const Vector3 &point)=0;
 
 	virtual egg::PointerCounter *getCounter() const=0;
 };

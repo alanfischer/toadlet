@@ -30,7 +30,6 @@
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/node/SceneNode.h>
-#include <toadlet/tadpole/node/PhysicallyTraceable.h>
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
 #include <toadlet/tadpole/plugins/hop/HopEntity.h>
 #include <toadlet/tadpole/plugins/hop/HopParticleSimulator.h>
@@ -47,7 +46,6 @@ HopScene::HopScene(Scene::ptr scene):
 	mCounter(new PointerCounter(0)),
 	//mScene,
 	//mChildScene,
-	mTraceable(NULL),
 
 	//mHopEntities,
 	mShowCollisionVolumes(false),
@@ -58,16 +56,15 @@ HopScene::HopScene(Scene::ptr scene):
 	
 	//mFreeNetworkIDs,
 	//mNetworkIDMap,
-	mHopEntityFactory(NULL)
+	mHopEntityFactory(NULL),
+mServer(false)
 
 	//mSolidCollection
 {
 	mSimulator=new Simulator();
-	mSimulator->setManager(this);
 	mScene=scene;
 	mScene->setChildScene(this);
-	mTraceable=mScene->getRootNode()->isPhysicallyTraceable();
-
+	
 	resetNetworkIDs();
 
 	mWorld=Solid::ptr(new Solid());
@@ -293,27 +290,6 @@ void HopScene::postRenderUpdate(int dt){
 	mScene->postRenderUpdate(dt);
 }
 
-void HopScene::traceSegment(hop::Collision &result,const Segment &segment){
-	if(mTraceable!=NULL){
-		tadpole::Collision collision;
-		mTraceable->traceSegment(collision,segment);
-		set(result,collision);
-	}
-}
-
-void HopScene::traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid){
-	if(mTraceable!=NULL){
-		tadpole::Collision collision;
-		if(solid->getShape(0)->getType()==hop::Shape::Type_AABOX){
-			mTraceable->traceAABox(collision,segment,solid->getShape(0)->getAABox());
-		}
-		else if(solid->getShape(0)->getType()==hop::Shape::Type_SPHERE){
-			mTraceable->traceSphere(collision,segment,solid->getShape(0)->getSphere());
-		}
-		set(result,collision);
-	}
-}
-
 void HopScene::set(tadpole::Collision &r,hop::Collision &c){
 	r.time=c.time;
 	r.point.set(c.point);
@@ -322,13 +298,12 @@ void HopScene::set(tadpole::Collision &r,hop::Collision &c){
 	r.scope=c.scope;
 }
 
-void HopScene::set(hop::Collision &r,tadpole::Collision &c){
+void HopScene::set(hop::Collision &r,tadpole::Collision &c,HopEntity *collider){
 	r.time=c.time;
 	r.point.set(c.point);
 	r.normal.set(c.normal);
-	// TODO: Add some method to see if the c.collider is HopEntity
-	//if(c.collider!=NULL && c.collider->isHopEntity) r.collider=(HopEntity*)c.collider;
-	if(c.time>=0){r.collider=mWorld;}
+	// Since the c.collider passed in could be any Node, not necessarily a HopEntity, we force a passing in of a Collider
+	if(collider!=NULL){r.collider=collider->getSolid();}
 	r.scope=c.scope;
 }
 

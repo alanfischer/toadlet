@@ -23,26 +23,31 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BSP_FACE_H
-#define TOADLET_TADPOLE_BSP_FACE_H
+#include <toadlet/egg/math/Quaternion.h>
+#include <toadlet/egg/math/Math.h>
 
 namespace toadlet{
-namespace tadpole{
-namespace bsp{
+namespace egg{
+namespace math{
 
-class TOADLET_API Face{
-public:
-	int plane;
-	bool side;
+Quaternion Quaternion::operator*(const Quaternion &q2) const{
+	Quaternion r;
+	Math::mul(r,*this,q2);
+	return r;
+}
 
-	int edgeStart;
-	int edgeCount;
-	int texinfo;
-	int lightinfo;
-};
+Quaternion &Quaternion::operator*=(const Quaternion &q2){
+	Math::postMul(*this,q2);
+	return *this;
+}
+
+Vector3 Quaternion::operator*(const Vector3 &v) const{
+	Vector3 r;
+	Math::mul(r,*this,v);
+	return r;
+}
 
 }
 }
 }
 
-#endif
