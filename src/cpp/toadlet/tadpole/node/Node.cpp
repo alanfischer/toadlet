@@ -53,7 +53,6 @@ Node::Node():
 	mScope(0),
 	//mName,
 	mCameraAligned(false),
-	mBoundingRadius(0),
 	mReceiveUpdates(false),
 	
 	mActive(false),
@@ -83,14 +82,15 @@ Node *Node::create(Engine *engine){
 	mRotate.reset();
 	mScale.set(Math::ONE,Math::ONE,Math::ONE);
 	mScope=-1;
-	mBoundingRadius=0;
 	mReceiveUpdates=false;
 
 	mActive=true;
 	mDeactivateCount=0;
 
-	mRenderTransform.reset();
+	mLocalBound.reset();
+	mLogicWorldBound.reset();
 	mRenderWorldBound.reset();
+	mRenderTransform.reset();
 	mWorldRenderTransform.reset();
 
 	return this;
@@ -239,8 +239,8 @@ void Node::setCameraAligned(bool cameraAligned){
 	mCameraAligned=cameraAligned;
 }
 
-void Node::setBoundingRadius(scalar boundingRadius){
-	mBoundingRadius=boundingRadius;
+void Node::setLocalBound(const Sphere &bound){
+	mLocalBound.set(bound);
 }
 
 void Node::setReceiveUpdates(bool receiveUpdates){

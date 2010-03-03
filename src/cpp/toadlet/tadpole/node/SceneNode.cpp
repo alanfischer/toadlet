@@ -365,13 +365,13 @@ void SceneNode::renderUpdate(Node::ptr node,int dt,int scope){
 		}
 	}
 	else{
-		Math::setTranslateFromMatrix4x4(node->mRenderWorldBound.origin,node->mWorldRenderTransform);
+		Math::mul(node->mRenderWorldBound.origin,node->mWorldRenderTransform,node->mLocalBound.origin);
 		if(node->mIdentityTransform==false){
 			scalar scale=Math::maxVal(node->getScale().x,Math::maxVal(node->getScale().y,node->getScale().z));
-			node->mRenderWorldBound.radius=Math::mul(scale,node->mBoundingRadius);
+			node->mRenderWorldBound.radius=Math::mul(scale,node->mLocalBound.radius);
 		}
 		else{
-			node->mRenderWorldBound.radius=node->mBoundingRadius;
+			node->mRenderWorldBound.radius=node->mLocalBound.radius;
 		}
 	}
 }
@@ -497,7 +497,7 @@ bool SceneNode::performAABoxQuery(SpacialQuery *query,const AABox &box,bool exac
 	int i;
 	for(i=0;i<mChildren.size();++i){
 		Node *child=mChildren[i];
-		if(Math::testIntersection(Sphere(child->mTranslate,child->mBoundingRadius),box)){
+		if(Math::testIntersection(child->mLogicWorldBound,box)){
 			listener->resultFound(child);
 		}
 	}
