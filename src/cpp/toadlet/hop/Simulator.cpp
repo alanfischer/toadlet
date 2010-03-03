@@ -270,10 +270,6 @@ void Simulator::update(int dt,int scope,Solid *solid){
 			(solid->mManager!=NULL?solid->mManager:mManager)->preUpdate(solid,dt,fdt);
 		}
 
-		if(solid->mLocalGravityOverride==false){
-			solid->mLocalGravity.set(mGravity);
-		}
-
 		oldPosition.set(solid->mPosition);
 
 		// The cheapest, fastest, and worst integrator, it's 1st order
@@ -847,6 +843,7 @@ bool Simulator::toSmall(const Vector3 &value) const{
 
 void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment &segment,int collideWithBits,Solid *ignore){
 	result.time=-ONE;
+	result.scope=0;
 
 	Solid *solid2;
 
@@ -858,6 +855,7 @@ void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment 
 			collision.time=-ONE;
 			testSegment(collision,solid2,segment);
 			if(collision.time>=0){
+				int scope=result.scope;
 				if(result.time<0 || collision.time<result.time){
 					result.set(collision);
 				}
@@ -868,6 +866,7 @@ void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment 
 						result.set(collision);
 					}
 				}
+				result.scope|=scope;
 			}
 		}
 	}
@@ -875,6 +874,7 @@ void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment 
 	if(mManager!=NULL){
 		collision.time=-ONE;
 		mManager->traceSegment(collision,segment);
+		int scope=result.scope;
 		if(collision.time>=0){
 			if(result.time<0 || collision.time<result.time){
 				result.set(collision);
@@ -887,6 +887,7 @@ void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment 
 				}
 			}
 		}
+		result.scope=(scope|collision.scope);
 	}
 }
 
@@ -907,6 +908,7 @@ void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,con
 			collision.time=-ONE;
 			testSolid(collision,solid,solid2,segment);
 			if(collision.time>=0){
+				int scope=result.scope;
 				if(result.time<0 || collision.time<result.time){
 					result.set(collision);
 				}
@@ -917,6 +919,7 @@ void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,con
 						result.set(collision);
 					}
 				}
+				result.scope|=scope;
 			}
 		}
 	}
@@ -924,6 +927,7 @@ void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,con
 	if(mManager!=NULL){
 		collision.time=-ONE;
 		mManager->traceSolid(collision,segment,solid);
+		int scope=result.scope;
 		if(collision.time>=0){
 			if(result.time<0 || collision.time<result.time){
 				result.set(collision);
@@ -936,6 +940,7 @@ void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,con
 				}
 			}
 		}
+		result.scope=(scope|collision.scope);
 	}
 }
 
@@ -1121,11 +1126,12 @@ void Simulator::testSolid(Collision &result,Solid *solid1,Solid *solid2,const Se
 			else if(shape1->mType==Shape::Type_CONVEXSOLID && shape2->mType==Shape::Type_CAPSULE){
 				//TODO: Figure this one out, somehow...
 			}
-			else if(shape1->mType==Shape::Type_CONVEXSOLID && shape2->mType==Shape::Type_CAPSULE){
+			else if(shape1->mType==Shape::Type_CONVEXSOLID && shape2->mType==Shape::Type_CONVEXSOLID){
 				//TODO: Umm... This is not trivial. Not at all.
 			}
 
 			if(collision.time>=0){
+				int scope=result.scope;
 				if(result.time<0 || collision.time<result.time){
 					result.set(collision);
 				}
@@ -1136,6 +1142,7 @@ void Simulator::testSolid(Collision &result,Solid *solid1,Solid *solid2,const Se
 						result.set(collision);
 					}
 				}
+				result.scope=(scope|=solid2->mScope);
 			}
 		}
 	}
@@ -1185,6 +1192,7 @@ void Simulator::testSegment(Collision &result,Solid *solid,const Segment &segmen
 		}
 
 		if(collision.time>=0){
+			int scope=result.scope;
 			if(result.time<0 || collision.time<result.time){
 				result.set(collision);
 			}
@@ -1195,6 +1203,7 @@ void Simulator::testSegment(Collision &result,Solid *solid,const Segment &segmen
 					result.set(collision);
 				}
 			}
+			result.scope=(scope|=solid->mScope);
 		}
 	}
 }
@@ -1377,7 +1386,7 @@ void Simulator::frictionLink(Vector3 &result,Solid *solid,const Vector3 &solidVe
 		Vector3 &fs=cache_frictionLink_fs;
 		Vector3 &normVr=cache_frictionLink_normVr;
 
-		fn=mul(dot(solid->mLocalGravity,hitSolidNormal),solid->mMass)+dot(appliedForce,hitSolidNormal);
+		fn=mul(mul(dot(mGravity,hitSolidNormal),solid->mCoefficientOfGravity),solid->mMass)+dot(appliedForce,hitSolidNormal);
 
 		// When calculating relative velocity, ignore any components perpendicular to the plane of contact
 		// normVr acts as a temp here
@@ -1459,7 +1468,7 @@ void Simulator::updateAcceleration(Vector3 &result,Solid *solid,const Vector3 &x
 	Vector3 &fluidForce=cache_updateAcceleration_fluidForce;
 
 	/*
-		result=solid->mLocalGravity;
+		result=mGravity*solid->mCoefficientOfGravity;
 		if(solid->mMass!=0){
 			constraintLink(constraintForce,solid,x,v,fdt);
 			for(#NUM_TOUCHED_SOLIDS){
@@ -1470,7 +1479,7 @@ void Simulator::updateAcceleration(Vector3 &result,Solid *solid,const Vector3 &x
 		}
 	*/
 
-	result.set(solid->mLocalGravity);
+	mul(result,mGravity,solid->mCoefficientOfGravity);
 	if(solid->mMass!=0){
 		constraintLink(constraintForce,solid,x,v);
 		add(constraintForce,solid->mForce);
