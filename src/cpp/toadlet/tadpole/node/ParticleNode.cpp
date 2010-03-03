@@ -179,7 +179,7 @@ bool ParticleNode::start(int particlesPerBeam,int numParticles,bool hasColor,con
 
 	int i;
 	if(points!=NULL){
-		mBoundingRadius=0;
+		mLocalBound.radius=0;
 		if(ages!=NULL){
 			for(i=0;i<numParticles;++i){
 				Particle &p=mParticles[i];
@@ -197,7 +197,7 @@ bool ParticleNode::start(int particlesPerBeam,int numParticles,bool hasColor,con
 				p.visible=visible;
 
 				scalar ls=Math::lengthSquared(point);
-				if(mBoundingRadius<ls) mBoundingRadius=ls;
+				if(mLocalBound.radius<ls) mLocalBound.radius=ls;
 			}
 		}
 		else{
@@ -217,10 +217,10 @@ bool ParticleNode::start(int particlesPerBeam,int numParticles,bool hasColor,con
 				p.visible=visible;
 
 				scalar ls=Math::lengthSquared(point);
-				if(mBoundingRadius<ls) mBoundingRadius=ls;
+				if(mLocalBound.radius<ls) mLocalBound.radius=ls;
 			}
 		}
-		mBoundingRadius=Math::sqrt(mBoundingRadius);
+		mLocalBound.radius=Math::sqrt(mLocalBound.radius);
 	}
 	else if(ages!=NULL){
 		for(i=0;i<numParticles;++i){
@@ -362,7 +362,7 @@ void ParticleNode::startSimulating(ParticleSimulator::ptr particleSimulator){
 	mParticleSimulator=particleSimulator;
 
 	// Disable the bounding radius, cause they may very well bounce out of it
-	mBoundingRadius=-Math::ONE;
+	mLocalBound.radius=-Math::ONE;
 
 	setReceiveUpdates(true);
 }

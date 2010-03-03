@@ -123,7 +123,6 @@ protected:
 	bool mAlignmentCalculationsUseOrigin;
 	ParentNode::ptr mMidNode;
 
-	Vector3 mRenderBoundingOrigin;
 	Vector3 mWorldRenderTranslate;
 	Matrix4x4 mViewTransform;
 	Matrix4x4 mViewProjectionTransform;

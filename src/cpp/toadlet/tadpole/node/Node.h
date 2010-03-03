@@ -119,11 +119,13 @@ public:
 	virtual void setCameraAligned(bool aligned);
 	inline bool getCameraAligned() const{return mCameraAligned;}
 
-	virtual void setBoundingRadius(scalar boundingRadius);
-	inline scalar getBoundingRadius() const{return mBoundingRadius;}
-
 	virtual void setReceiveUpdates(bool receiveUpdates);
 	inline bool getReceiveUpdates() const{return mReceiveUpdates;}
+
+	virtual void setLocalBound(const Sphere &bound);
+	inline const Sphere &getLocalBound() const{return mLocalBound;}
+	inline const Sphere &getLogicWorldBound() const{return mLogicWorldBound;}
+	inline const Sphere &getRenderWorldBound() const{return mRenderWorldBound;}
 
 	/// Only called if the Node registers itself with the Scene in registerUpdateNode.
 	/// Dont forget to call unregisterUpdateNode in its destroy.
@@ -170,12 +172,12 @@ protected:
 	int mScope;
 	egg::String mName;
 	bool mCameraAligned;
-	scalar mBoundingRadius;
 	bool mReceiveUpdates;
 
 	bool mActive;
 	int mDeactivateCount;	
 
+	Sphere mLocalBound;
 	Sphere mLogicWorldBound;
 	Sphere mRenderWorldBound;
 	Matrix4x4 mRenderTransform;

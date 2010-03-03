@@ -241,7 +241,7 @@ bool BSPSceneNode::performAABoxQuery(SpacialQuery *query,const AABox &box,bool e
 	int i;
 	for(i=0;i<mChildren.size();++i){
 		Node *child=mChildren[i];
-		if(Math::testIntersection(Sphere(child->getTranslate(),child->getBoundingRadius()),box)){
+		if(Math::testIntersection(child->getLogicWorldBound(),box)){
 			listener->resultFound(child);
 		}
 	}

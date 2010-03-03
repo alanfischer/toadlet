@@ -248,7 +248,7 @@ void LabelNode::updateLabel(){
 
 void LabelNode::updateBound(){
 	if(mFont==NULL){
-		mBoundingRadius=0;
+		mLocalBound.radius=0;
 	}
 	else if(mPerspective){
 		int iw=mFont->getStringWidth(mText);
@@ -272,14 +272,14 @@ void LabelNode::updateBound(){
 		}
 
 		if(mAlignment==(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER)){
-			mBoundingRadius=Math::sqrt(Math::square(width/2) + Math::square(height/2));
+			mLocalBound.radius=Math::sqrt(Math::square(width/2) + Math::square(height/2));
 		}
 		else{
-			mBoundingRadius=Math::sqrt(Math::square(width) + Math::square(height));
+			mLocalBound.radius=Math::sqrt(Math::square(width) + Math::square(height));
 		}
 	}
 	else{
-		mBoundingRadius=-Math::ONE;
+		mLocalBound.radius=-Math::ONE;
 	}
 }
 
