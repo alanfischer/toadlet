@@ -50,9 +50,10 @@ TOADLET_NODE_IMPLEMENT(BSP30ModelNode,Categories::TOADLET_TADPOLE_BSP+".BSP30Mod
 
 BSP30ModelNode::BSP30ModelNode():Node(),
 	//mMap,
-	mModelIndex(-1)
-{
-}
+	mModelIndex(-1),
+	mVisible(true),
+	mInternalScope(0)
+{}
 
 BSP30ModelNode::~BSP30ModelNode(){
 }
@@ -86,7 +87,9 @@ void BSP30ModelNode::setModel(BSP30Map::ptr map,int index){
 }
 
 void BSP30ModelNode::queueRenderable(SceneNode *queue,CameraNode *camera){
-	queue->queueRenderable(this);
+	if(mVisible){
+		queue->queueRenderable(this);
+	}
 }
 
 Material *BSP30ModelNode::getRenderMaterial() const{
@@ -112,7 +115,7 @@ void BSP30ModelNode::render(peeper::Renderer *renderer) const{
 		data.textureVisibleFaces[texinfo->miptex].push_back(model->firstface+i);
 	}
 
-	renderer->setAlphaTest(Renderer::AlphaTest_GEQUAL,Math::HALF);
+	renderer->setAlphaTest(Renderer::AlphaTest_GEQUAL,0.9);
 
 	scene->renderVisibleFaces(renderer);
 }
@@ -136,6 +139,8 @@ int contents=0;
 BSP30SceneNode *scene=(BSP30SceneNode*)mEngine->getScene()->getRootScene();
 int leaf=scene->findLeaf(0,segment.origin);
 if(leaf>=0 && leaf<mMap->nleafs){contents=mMap->leafs[leaf].contents;}
+
+if(result.time==0 && mInternalScope!=0){result.scope|=mInternalScope; result.time=Math::ONE; }
 
 if(contents<=-1){ result.scope|=(-(contents+1))<<1; } // Would be nice to merge this into the trace
 	}
