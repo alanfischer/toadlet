@@ -52,6 +52,12 @@ public:
 
 	virtual node::Renderable *isRenderable(){return this;}
 
+	void setVisible(bool visible){mVisible=visible;}
+	bool getVisible() const{return mVisible;}
+
+	void setInternalScope(int scope){mInternalScope=scope;}
+	int getInternalScope() const{return mInternalScope;}
+
 	void queueRenderable(node::SceneNode *queue,node::CameraNode *camera);
 	Material *getRenderMaterial() const;
 	const Matrix4x4 &getRenderTransform() const;
@@ -63,6 +69,8 @@ public:
 protected:
 	BSP30Map::ptr mMap;
 	int mModelIndex;
+	bool mVisible;
+	int mInternalScope;
 };
 
 class TOADLET_API BSP30SceneNode:public node::SceneNode{
