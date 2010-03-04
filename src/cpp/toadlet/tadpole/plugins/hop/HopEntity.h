@@ -66,8 +66,7 @@ public:
 	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
-	/// Can be used to specify this is an instance of a custom class
-	virtual bool isCustom() const{return false;}
+	virtual Node *isEntity(){return this;}
 
 	virtual void setCollisionBits(int bits);
 	virtual int getCollisionBits() const{return mSolid->getCollisionBits();}

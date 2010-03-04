@@ -42,7 +42,7 @@ class HopEntityMessage;
 //	- Scene Management	(bsp)
 //	- Physics			(hop)
 //	- Networking		(knot)
-class TOADLET_API HopScene:public node::Scene{
+class TOADLET_API HopScene:public node::Scene,public hop::Manager{
 public:
 	TOADLET_INTRUSIVE_POINTERS(HopScene);
 
@@ -92,10 +92,6 @@ public:
 		virtual scalar getEpsilon() const{return mSimulator->getEpsilon();}
 	#endif
 
-	virtual void findHopEntitiesInAABox(const AABox &box,egg::Collection<egg::IntrusivePointer<HopEntity> > &entities);
-	virtual void findHopEntitiesInSphere(const Sphere &sphere,egg::Collection<egg::IntrusivePointer<HopEntity> > &entities);
-	virtual void findHopEntitiesInSolids(egg::Collection<egg::IntrusivePointer<HopEntity> > &entities,hop::Solid *solids[],int numSolids);
-
 	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits,HopEntity *ignore);
 
 	inline int getNumHopEntities() const{return mHopEntities.size();}
@@ -125,6 +121,16 @@ public:
 	virtual void postRenderUpdate(int dt);
 
 	virtual bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact){return mScene->performAABoxQuery(query,box,exact);}
+
+	virtual int findSolidsInAABox(const AABox &box,hop::Solid *solids[],int maxSolids);
+	virtual void traceSegment(hop::Collision &result,const Segment &segment){}
+	virtual void traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid){}
+	virtual void preUpdate(int dt,scalar fdt){}
+	virtual void postUpdate(int dt,scalar fdt){}
+	virtual void preUpdate(hop::Solid *solid,int dt,scalar fdt){}
+	virtual void intraUpdate(hop::Solid *solid,int dt,scalar fdt){}
+	virtual bool collisionResponse(hop::Solid *solid,Vector3 &position,Vector3 &remainder,hop::Collision &collision){return false;}
+	virtual void postUpdate(hop::Solid *solid,int dt,scalar fdt){}
 
 	virtual bool isServer(){return mServer;}
 void setServer(bool server){mServer=server;}

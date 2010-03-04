@@ -88,7 +88,7 @@ Node *Node::create(Engine *engine){
 	mDeactivateCount=0;
 
 	mLocalBound.reset();
-	mLogicWorldBound.reset();
+	mWorldBound.reset();
 	mRenderWorldBound.reset();
 	mRenderTransform.reset();
 	mWorldRenderTransform.reset();

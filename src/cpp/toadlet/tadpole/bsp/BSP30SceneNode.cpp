@@ -39,6 +39,7 @@ using namespace toadlet::tadpole::mesh;
 using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::handler;
 
+// #define USE_PARTITIONING
 float trace(toadlet::tadpole::bsp::BSP30Map *map,int startnode,Vector3 start,Vector3 end,Vector3 &normal);
 int contents(toadlet::tadpole::bsp::BSP30Map *map,const Vector3 &point);
 
@@ -107,6 +108,10 @@ void BSP30ModelNode::render(peeper::Renderer *renderer) const{
 
 	BSP30SceneNode *scene=(BSP30SceneNode*)mEngine->getScene()->getRootScene();
 	BSP30SceneNode::RendererData &data=(BSP30SceneNode::RendererData&)scene->mRendererData;
+
+	// clear stuff
+	memset(&data.markedFaces[0],0,data.markedFaces.size()*sizeof(unsigned char));
+	data.textureVisibleFaces.resize(scene->textures.size());
 
 	bmodel *model=&mMap->models[mModelIndex];
 	for(int i=0;i<model->numfaces;++i){
@@ -308,6 +313,8 @@ void BSP30SceneNode::setMap(BSP30Map::ptr map){
 	getRenderLayer(0)->forceRender=true;
 	// END: Needs cleanup
 
+	mNodeLists.resize(mMap->nleafs);
+	
 	// START: Needs to be removed, or a map/member setting, so skyboxes could be added outside of this class
 	Texture::ptr bottom=mEngine->getTextureManager()->findTexture("nightsky/nightsky_down.png");
 	Texture::ptr top=mEngine->getTextureManager()->findTexture("nightsky/nightsky_up.png");
@@ -328,17 +335,127 @@ void BSP30SceneNode::setMap(BSP30Map::ptr map){
 }
 
 bool BSP30SceneNode::performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact){
+	if(mMap==NULL){
+		return false;
+	}
+
 	SpacialQueryResultsListener *listener=query->getSpacialQueryResultsListener();
 
-	// TODO: Find current scene nodes by finding the portion of the scene we're in and what nodes are in there
-	int i;
-	for(i=0;i<mChildren.size();++i){
-		Node *child=mChildren[i];
-		if(Math::testIntersection(child->getLogicWorldBound(),box)){
-			listener->resultFound(child);
+#if 1 || !defined(USE_PARTITIONING)
+for(int i=0;i<mChildren.size();++i){listener->resultFound(mChildren[i]);}
+#else
+	Collection<int> leafs;
+	getIntersectingLeafs(leafs,0,box);
+egg::Collection<Node*> HACK; // TODO: Use a counter system instead!
+		// go thru leaf visibility list
+	for(int i=0;i<leafs.size();i++){
+		const Collection<Node::ptr> &nodeList=mNodeLists[leafs[i]];
+		for(int j=0;j<nodeList.size();++j){
+if(HACK.contains(nodeList[j]))continue;
+else{
+HACK.add(nodeList[j]);
+listener->resultFound(nodeList[j]);
+}
 		}
 	}
+#endif
 	return true;
+}
+
+void BSP30SceneNode::logicUpdate(Node::ptr node,int dt,int scope){
+	super::logicUpdate(node,dt,scope);
+
+	if(mMap==NULL){
+		return;
+	}
+
+#if defined(USE_PARTITIONING)
+	// Check to see if we need to update the node's leaf assignments
+	if(node->getParent()==this && node->getActive()){
+		int i;
+		Collection<int> newLeafs;
+		getIntersectingLeafs(newLeafs,0,node->getWorldBound());
+
+		const Collection<int> &currentLeafs=mNodeToNodeListMap[node];
+		if(newLeafs.size()==currentLeafs.size()){
+			for(i=0;i<newLeafs.size();++i){
+				if(newLeafs[i]!=currentLeafs[i]) break;
+			}
+			if(i==newLeafs.size()) return; // No changes necessary
+		}
+
+		for(i=0;i<currentLeafs.size();++i){
+			mNodeLists[currentLeafs[i]].remove(node);
+		}
+		for(i=0;i<newLeafs.size();++i){
+			mNodeLists[newLeafs[i]].add(node);
+		}
+		mNodeToNodeListMap[node]=newLeafs;
+	}
+#endif
+}
+
+void BSP30SceneNode::getIntersectingLeafs(Collection<int> &leafs,int nodeIndex,const Sphere &bound){
+	if(nodeIndex<0){
+		leafs.add(-(nodeIndex+1));
+		return;
+	}
+
+	bnode *node=&mMap->nodes[nodeIndex];
+	// TODO: Optimize and make a function that takes shorts
+	AABox nodeBound(node->mins[0],node->mins[1],node->mins[2],node->maxs[0],node->maxs[1],node->maxs[2]);
+	if(Math::testIntersection(bound,nodeBound)){
+		getIntersectingLeafs(leafs,node->children[0],bound);
+		getIntersectingLeafs(leafs,node->children[1],bound);
+	}
+}
+
+void BSP30SceneNode::getIntersectingLeafs(Collection<int> &leafs,int nodeIndex,const AABox &bound){
+	if(nodeIndex<0){
+		leafs.add(-(nodeIndex+1));
+		return;
+	}
+
+	bnode *node=&mMap->nodes[nodeIndex];
+	// TODO: Optimize and make a function that takes shorts
+	AABox nodeBound(node->mins[0],node->mins[1],node->mins[2],node->maxs[0],node->maxs[1],node->maxs[2]);
+	if(Math::testIntersection(bound,nodeBound)){
+		getIntersectingLeafs(leafs,node->children[0],bound);
+		getIntersectingLeafs(leafs,node->children[1],bound);
+	}
+}
+
+void BSP30SceneNode::queueRenderables(){
+	if(mMap==NULL){
+		super::queueRenderables();
+		return;
+	}
+
+#if !defined(USE_PARTITIONING)
+	for(int i=0;i<mChildren.size();++i){super::queueRenderables(mChildren[i]);}
+#else
+	int leaf=findLeaf(0,mCamera->getWorldTranslate());
+	// If no visibility information just test all leaves
+	if(leaf==0 || mMap->nvisibility==0){
+		for(int i=0;i<mChildren.size();++i){
+			super::queueRenderables(mChildren[i]);
+		}
+	}
+	else{
+egg::Collection<Node*> HACK; // TODO: Use a counter system instead!
+		// go thru leaf visibility list
+		for(int i=0;i<leafVisibility[leaf].size();i++){
+			const Collection<Node::ptr> &nodeList=mNodeLists[leafVisibility[leaf][i]];
+			for(int j=0;j<nodeList.size();++j){
+if(HACK.contains(nodeList[j]))continue;
+else{
+HACK.add(nodeList[j]);
+				super::queueRenderables(nodeList[j]);
+}
+			} 
+		}
+	}
+#endif
 }
 
 bool BSP30SceneNode::preLayerRender(Renderer *renderer,int layer){
@@ -441,18 +558,18 @@ void BSP30SceneNode::processVisibleFaces(CameraNode *camera){
 	data.textureVisibleFaces.resize(textures.size());
 
 	// find leaf we're in
-	int idx=findLeaf(0,camera->getWorldRenderTranslate());
+	int leaf=findLeaf(0,camera->getWorldRenderTranslate());
 
 	// If no visibility information just test all leaves
-	if(idx==0){ // TODO: Replace with an mHasVisData, and do this too if no visdata
+	if(leaf==0 || mMap->nvisibility==0){
 		for(i=0;i<mMap->nleafs;i++){
 			addLeafToVisible(&mMap->leafs[i],data,camera);
 		}
 	}
 	else{
 		// go thru leaf visibility list
-		for(i=0;i<leafVisibility[idx].size();i++){
-			addLeafToVisible(&mMap->leafs[leafVisibility[idx][i]],data,camera);
+		for(i=0;i<leafVisibility[leaf].size();i++){
+			addLeafToVisible(&mMap->leafs[leafVisibility[leaf][i]],data,camera);
 		}
 	}
 }

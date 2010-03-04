@@ -62,6 +62,7 @@ mServer(false)
 	//mSolidCollection
 {
 	mSimulator=new Simulator();
+	mSimulator->setManager(this);
 	mScene=scene;
 	mScene->setChildScene(this);
 	
@@ -79,34 +80,6 @@ HopScene::~HopScene(){
 	if(mSimulator!=NULL){
 		delete mSimulator;
 		mSimulator=NULL;
-	}
-}
-
-void HopScene::findHopEntitiesInAABox(const AABox &box,Collection<HopEntity::ptr> &entities){
-	if(mSolidCollection.size()<mSimulator->getNumSolids()){
-		mSolidCollection.resize(mSimulator->getNumSolids());
-	}
-	int numSolids=mSimulator->findSolidsInAABox(box,mSolidCollection.begin(),mSolidCollection.size());
-	findHopEntitiesInSolids(entities,mSolidCollection.begin(),numSolids);
-}
-
-void HopScene::findHopEntitiesInSphere(const Sphere &sphere,Collection<HopEntity::ptr> &entities){
-	if(mSolidCollection.size()<mSimulator->getNumSolids()){
-		mSolidCollection.resize(mSimulator->getNumSolids());
-	}
-	int numSolids=mSimulator->findSolidsInSphere(sphere,mSolidCollection.begin(),mSolidCollection.size());
-	findHopEntitiesInSolids(entities,mSolidCollection.begin(),numSolids);
-}
-
-void HopScene::findHopEntitiesInSolids(Collection<HopEntity::ptr> &entities,Solid *solids[],int numSolids){
-	entities.clear();
-	int i;
-	for(i=numSolids-1;i>=0;--i){
-		Solid *solid=solids[i];
-		HopEntity *entity=static_cast<HopEntity*>(solid->getUserData());
-		if(entity!=NULL){
-			entities.add(entity);
-		}
 	}
 }
 
@@ -288,6 +261,35 @@ void HopScene::renderUpdate(int dt){
 
 void HopScene::postRenderUpdate(int dt){
 	mScene->postRenderUpdate(dt);
+}
+
+class QueryListener:public SpacialQueryResultsListener{
+public:
+	QueryListener(Solid *solids[],int maxSolids){
+		mSolids=solids;
+		mMaxSolids=maxSolids;
+		mCounter=0;
+	}
+
+	void resultFound(Node *result){
+		Node *entity=result->isEntity();
+		if(entity!=NULL && mCounter<mMaxSolids){
+			mSolids[mCounter++]=((HopEntity*)entity)->getSolid();
+		}
+	}
+
+	Solid **mSolids;
+	int mMaxSolids;
+	int mCounter;
+};
+
+int HopScene::findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids){
+	// TODO: The query interface is messy here, it shouldnt be this much work!
+	QueryListener listener(solids,maxSolids);
+	SpacialQuery query;
+	query.setResultsListener(&listener);
+	performAABoxQuery(&query,box,false);
+	return listener.mCounter;
 }
 
 void HopScene::set(tadpole::Collision &r,hop::Collision &c){

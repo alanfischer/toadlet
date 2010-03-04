@@ -293,9 +293,8 @@ void CameraNode::updateFramesPerSecond(){
 }
 
 void CameraNode::update(){
-	mLocalBound.radius=mFarDist/2;
 	if(mMidNode!=NULL){
-		mMidNode->setTranslate(0,0,-(mFarDist-mNearDist)/2);
+		mMidNode->setTranslate(0,0,(mFarDist-mNearDist)/2);
 	}
 }
 
