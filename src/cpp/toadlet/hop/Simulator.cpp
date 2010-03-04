@@ -698,37 +698,27 @@ void Simulator::update(int dt,int scope,Solid *solid){
 }
 
 int Simulator::findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids) const{
-	Solid *s=NULL;
+	int amount=-1;
+	if(mManager!=NULL){
+		amount=mManager->findSolidsInAABox(box,solids,maxSolids);
+	}
 
-	int i,j=0;
-	for(i=0;i<mSolids.size();++i){
-		s=mSolids[i];
-		if(testIntersection(box,s->mWorldBound)){
-			if(j<maxSolids){
-				solids[j]=s;
+	if(amount==-1){
+		amount=0;
+		Solid *s=NULL;
+		int i=0;
+		for(i=0;i<mSolids.size();++i){
+			s=mSolids[i];
+			if(testIntersection(box,s->mWorldBound)){
+				if(amount<maxSolids){
+					solids[amount]=s;
+				}
+				amount++;
 			}
-			j++;
 		}
 	}
 
-	return j;
-}
-
-int Simulator::findSolidsInSphere(const Sphere &sphere,Solid *solids[],int maxSolids) const{
-	Solid *s=NULL;
-
-	int i,j=0;
-	for(i=0;i<mSolids.size();++i){
-		s=mSolids[i];
-		if(testIntersection(sphere,s->mWorldBound)){
-			if(j<maxSolids){
-				solids[j]=s;
-			}
-			j++;
-		}
-	}
-
-	return j;
+	return amount;
 }
 
 void Simulator::traceSegment(Collision &result,const Segment &segment,int collideWithBits,Solid *ignore){
@@ -867,6 +857,9 @@ void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment 
 					}
 				}
 			}
+if(collision.scope==-1){
+	Logger::alert(String("BAD SCOPE:")+solid2->getScope()+":"+solid2->getShape(0)->getType());
+}
 			result.scope=scope|collision.scope;
 		}
 	}
@@ -952,6 +945,7 @@ void Simulator::testSegment(Collision &result,Solid *solid,const Segment &segmen
 	int numShapes=shapes.size();
 
 	Shape *shape;
+	bool modifyScope=false;
 
 	int i;
 	for(i=0;i<numShapes;++i){
@@ -985,6 +979,7 @@ void Simulator::testSegment(Collision &result,Solid *solid,const Segment &segmen
 			break;
 			case Shape::Type_CALLBACK:
 				shape->mCallback->traceSegment(collision,segment);
+				modifyScope=true;
 			break;
 		}
 
@@ -1004,8 +999,12 @@ void Simulator::testSegment(Collision &result,Solid *solid,const Segment &segmen
 					result.set(collision);
 				}
 			}
+			modifyScope=true;
 		}
-		result.scope=scope|collision.scope;
+
+		if(modifyScope){
+			result.scope=scope|collision.scope;
+		}
 	}
 }
 
@@ -1019,6 +1018,7 @@ void Simulator::testSolid(Collision &result,Solid *solid1,Solid *solid2,const Se
 	int numShapes2=shapes2.size();
 	Shape *shape1;
 	Shape *shape2;
+	bool modifyScope=false;
 
 	int i,j;
 	for(i=0;i<numShapes1;++i){
@@ -1028,6 +1028,7 @@ void Simulator::testSolid(Collision &result,Solid *solid1,Solid *solid2,const Se
 			shape2=shapes2[j];
 
 			// No need to reset collision or it's time here since the trace functions are gaurenteed to do that
+			modifyScope=false;
 
 			// AABox collisions
 			if(shape1->mType==Shape::Type_AABOX && shape2->mType==Shape::Type_AABOX){
@@ -1198,6 +1199,7 @@ void Simulator::testSolid(Collision &result,Solid *solid1,Solid *solid2,const Se
 			}
 			else if(shape2->mType==Shape::Type_CALLBACK){
 				shape2->mCallback->traceSolid(collision,segment,solid1);
+				modifyScope=true;
 			}
 
 			if(shape1->mType!=Shape::Type_CALLBACK && shape2->mType!=Shape::Type_CALLBACK){
@@ -1216,8 +1218,12 @@ void Simulator::testSolid(Collision &result,Solid *solid1,Solid *solid2,const Se
 						result.set(collision);
 					}
 				}
+				modifyScope=true;
 			}
-			result.scope=scope|collision.scope;
+
+			if(modifyScope){
+				result.scope=scope|collision.scope;
+			}
 		}
 	}
 }

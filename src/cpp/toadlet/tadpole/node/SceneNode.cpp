@@ -263,6 +263,8 @@ void SceneNode::logicUpdate(Node::ptr node,int dt,int scope){
 			parent->updateShadowChildren();
 		}
 
+		mul(node->mWorldBound,node->mWorldTranslate,node->mLocalBound);
+
 		int numChildren=parent->mShadowChildren.size();
 		Node *child=NULL;
 		int i;
@@ -275,9 +277,14 @@ void SceneNode::logicUpdate(Node::ptr node,int dt,int scope){
 				logicUpdate(child,dt,scope);
 				childrenActive=true;
 			}
+
+			merge(parent->mWorldBound,child->mWorldBound);
 		}
 
 		parent->mActivateChildren=false;
+	}
+	else{
+		mul(node->mWorldBound,node->mWorldTranslate,node->mLocalBound);
 	}
 	
 	if(node->mDeactivateCount>=0){
@@ -344,6 +351,8 @@ void SceneNode::renderUpdate(Node::ptr node,int dt,int scope){
 			parent->updateShadowChildren();
 		}
 
+		mul(node->mRenderWorldBound,node->mWorldRenderTransform,node->mLocalBound);
+
 		Node *child;
 		int numChildren=parent->mShadowChildren.size();
 		int i;
@@ -353,26 +362,11 @@ void SceneNode::renderUpdate(Node::ptr node,int dt,int scope){
 				renderUpdate(child,dt,scope);
 			}
 
-			if(parent->mRenderWorldBound.radius>=0){
-				if(child->mRenderWorldBound.radius>=0){
-					scalar d=Math::length(parent->mRenderWorldBound.origin,child->mRenderWorldBound.origin) + child->mRenderWorldBound.radius;
-					parent->mRenderWorldBound.radius=Math::maxVal(parent->mRenderWorldBound.radius,d);
-				}
-				else{
-					parent->mRenderWorldBound.radius=-Math::ONE;
-				}
-			}
+			merge(parent->mRenderWorldBound,child->mRenderWorldBound);
 		}
 	}
 	else{
-		Math::mul(node->mRenderWorldBound.origin,node->mWorldRenderTransform,node->mLocalBound.origin);
-		if(node->mIdentityTransform==false){
-			scalar scale=Math::maxVal(node->getScale().x,Math::maxVal(node->getScale().y,node->getScale().z));
-			node->mRenderWorldBound.radius=Math::mul(scale,node->mLocalBound.radius);
-		}
-		else{
-			node->mRenderWorldBound.radius=node->mLocalBound.radius;
-		}
+		mul(node->mRenderWorldBound,node->mWorldRenderTransform,node->mLocalBound);
 	}
 }
 
@@ -425,7 +419,7 @@ void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
 		renderUpdate(mBackground,0,mCamera->getScope());
 		queueRenderables(mBackground);
 	}
-	queueRenderables(node);
+	queueRenderables();
 
 	if(mLight!=NULL){
 		renderer->setLight(0,mLight->internal_getLight());
@@ -497,11 +491,15 @@ bool SceneNode::performAABoxQuery(SpacialQuery *query,const AABox &box,bool exac
 	int i;
 	for(i=0;i<mChildren.size();++i){
 		Node *child=mChildren[i];
-		if(Math::testIntersection(child->mLogicWorldBound,box)){
+		if(Math::testIntersection(child->mWorldBound,box)){
 			listener->resultFound(child);
 		}
 	}
 	return true;
+}
+
+void SceneNode::queueRenderables(){
+	queueRenderables(this);
 }
 
 void SceneNode::queueRenderables(Node *node){

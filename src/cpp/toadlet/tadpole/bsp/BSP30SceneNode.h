@@ -49,6 +49,7 @@ public:
 	virtual void destroy();
 
 	void setModel(BSP30Map::ptr map,int index);
+	int getModel() const{return mModelIndex;}
 
 	virtual node::Renderable *isRenderable(){return this;}
 
@@ -89,6 +90,10 @@ public:
 
 	bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact);
 
+	void logicUpdate(Node::ptr node,int dt,int scope);
+	void getIntersectingLeafs(egg::Collection<int> &leafs,int ni,const Sphere &bound);
+	void getIntersectingLeafs(egg::Collection<int> &leafs,int ni,const AABox &bound);
+
 //protected:
 	// TODO: We need to get away from this markfaces stuff, make it more universal
 	class RendererData{
@@ -106,6 +111,7 @@ public:
 
 	// TODO: We need a better hook to start rendering the level, since in theory this wont have access to preLayerRender,
 	//  cause it wont be a main scene node
+	void queueRenderables();
 	bool preLayerRender(peeper::Renderer *renderer,int layer);
 	void processVisibleFaces(node::CameraNode *camera);
 	void renderVisibleFaces(peeper::Renderer *renderer);
@@ -121,6 +127,9 @@ public:
 	RendererData mRendererData;
 	peeper::VertexData::ptr mVertexData;
 	egg::Collection<RenderFace> mRenderFaces;
+
+	egg::Collection<egg::Collection<Node::ptr> > mNodeLists;
+	egg::Map<Node::ptr,egg::Collection<int> > mNodeToNodeListMap;
 
 	// TODO: And clean up these hacky members.
 	egg::Collection<peeper::Texture::ptr> textures; // Shouldnt be storing textures here, instead we need to go by material

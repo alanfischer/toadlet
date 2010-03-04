@@ -123,7 +123,7 @@ protected:
 	bool mAlignmentCalculationsUseOrigin;
 	ParentNode::ptr mMidNode;
 
-	Vector3 mWorldRenderTranslate;
+	Vector3 mWorldRenderTranslate; // Can I just use WorldTranslate for this instead, or is that too logic bound?
 	Matrix4x4 mViewTransform;
 	Matrix4x4 mViewProjectionTransform;
 	Plane mClipPlanes[6];

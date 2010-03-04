@@ -139,6 +139,7 @@ protected:
 		return renderLayer;
 	}
 
+	virtual void queueRenderables();
 	virtual void queueRenderables(Node *node);
 	virtual bool culled(Node *node);
 

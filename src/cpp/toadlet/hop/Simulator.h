@@ -102,7 +102,6 @@ public:
 	void update(int dt,int scope=0,Solid *solid=NULL); // milliseconds
 
 	int findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids) const;
-	int findSolidsInSphere(const Sphere &sphere,Solid *solids[],int maxSolids) const;
 
 	void traceSegment(Collision &result,const Segment &segment,int collideWithBits=0,Solid *ignore=NULL);
 	void traceSolid(Collision &result,Solid *solid,const Segment &segment);
