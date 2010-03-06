@@ -27,6 +27,7 @@
 #define TOADLET_EGG_MATH_QUATERNION_H
 
 #include <toadlet/egg/math/BaseMath.h>
+#include <toadlet/egg/math/Vector3.h>
 
 namespace toadlet{
 namespace egg{
@@ -39,6 +40,8 @@ public:
 	inline Quaternion():x(0),y(0),z(0),w(1){}
 
 	inline Quaternion(real x1,real y1,real z1,real w1):x(x1),y(y1),z(z1),w(w1){}
+
+	inline Quaternion(real v[]):x(v[0]),y(v[1]),z(v[2]),w(v[3]){}
 
 	inline Quaternion &set(const Quaternion &q){
 		x=q.x;
@@ -79,59 +82,9 @@ public:
 		return (q.x!=x || q.y!=y || q.z!=z || q.w!=w);
 	}
 
-	inline Quaternion operator*(const Quaternion &q) const{
-		return Quaternion(
-			+x*q.w+y*q.z-z*q.y+w*q.x,
-			-x*q.z+y*q.w+z*q.x+w*q.y,
-			+x*q.y-y*q.x+z*q.w+w*q.z,
-			-x*q.x-y*q.y-z*q.z+w*q.w);
-	}
-
-	inline Quaternion operator+(const Quaternion &q) const{
-		return Quaternion(x+q.x,y+q.y,z+q.z,w+q.w);
-	}
-
-	inline void operator+=(const Quaternion &q){
-		x+=q.x;
-		y+=q.y;
-		z+=q.z;
-		w+=q.w;
-	}
-
-	inline Quaternion operator-(const Quaternion &q) const{
-		return Quaternion(x-q.x,y-q.y,z-q.z,w-q.w);
-	}
-
-	inline void operator-=(const Quaternion &q){
-		x-=q.x;
-		y-=q.y;
-		z-=q.z;
-		w-=q.w;
-	}
-
-	inline Quaternion operator*(real f) const{
-		return Quaternion(x*f,y*f,z*f,w*f);
-	}
-
-	inline void operator*=(real f){
-		x*=f;
-		y*=f;
-		z*=f;
-		w*=f;
-	}
-
-	inline Quaternion operator/(real f) const{
-		f=1.0/f;
-		return Quaternion(x*f,y*f,z*f,w*f);
-	}
-
-	inline void operator/=(real f){
-		f=1.0/f;
-		x*=f;
-		y*=f;
-		z*=f;
-		w*=f;
-	}
+	Quaternion operator*(const Quaternion &q2) const;
+	Quaternion &operator*=(const Quaternion &q2);
+	Vector3 operator*(const Vector3 &v) const;
 
 	inline real &operator[](int i){
 		return *(&x+i);

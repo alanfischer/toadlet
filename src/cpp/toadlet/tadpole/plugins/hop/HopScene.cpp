@@ -28,11 +28,10 @@
 #include <toadlet/egg/Profile.h>
 #include <toadlet/peeper/CapabilitySet.h> 
 #include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/node/SceneNode.h>
-#include <toadlet/tadpole/node/PhysicallyTraceable.h>
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
 #include <toadlet/tadpole/plugins/hop/HopEntity.h>
-#include <toadlet/tadpole/plugins/hop/HopCollision.h>
 #include <toadlet/tadpole/plugins/hop/HopParticleSimulator.h>
 
 using namespace toadlet::egg;
@@ -47,7 +46,6 @@ HopScene::HopScene(Scene::ptr scene):
 	mCounter(new PointerCounter(0)),
 	//mScene,
 	//mChildScene,
-	mTraceable(NULL),
 
 	//mHopEntities,
 	mShowCollisionVolumes(false),
@@ -58,7 +56,8 @@ HopScene::HopScene(Scene::ptr scene):
 	
 	//mFreeNetworkIDs,
 	//mNetworkIDMap,
-	mHopEntityFactory(NULL)
+	mHopEntityFactory(NULL),
+mServer(false)
 
 	//mSolidCollection
 {
@@ -66,15 +65,14 @@ HopScene::HopScene(Scene::ptr scene):
 	mSimulator->setManager(this);
 	mScene=scene;
 	mScene->setChildScene(this);
-	mTraceable=mScene->getRootNode()->isPhysicallyTraceable();
-
+	
 	resetNetworkIDs();
 
 	mWorld=Solid::ptr(new Solid());
-	mWorld->setLocalGravity(Math::ZERO_VECTOR3);
+	mWorld->setCoefficientOfGravity(0);
 	mWorld->setInfiniteMass();
 	mSimulator->addSolid(mWorld);
-	
+
 	mScene->getRootNode()->getEngine()->registerNodeType(HopEntity::type());
 }
 
@@ -85,35 +83,7 @@ HopScene::~HopScene(){
 	}
 }
 
-void HopScene::findHopEntitiesInAABox(const AABox &box,Collection<HopEntity::ptr> &entities){
-	if(mSolidCollection.size()<mSimulator->getNumSolids()){
-		mSolidCollection.resize(mSimulator->getNumSolids());
-	}
-	int numSolids=mSimulator->findSolidsInAABox(box,mSolidCollection.begin(),mSolidCollection.size());
-	findHopEntitiesInSolids(entities,mSolidCollection.begin(),numSolids);
-}
-
-void HopScene::findHopEntitiesInSphere(const Sphere &sphere,Collection<HopEntity::ptr> &entities){
-	if(mSolidCollection.size()<mSimulator->getNumSolids()){
-		mSolidCollection.resize(mSimulator->getNumSolids());
-	}
-	int numSolids=mSimulator->findSolidsInSphere(sphere,mSolidCollection.begin(),mSolidCollection.size());
-	findHopEntitiesInSolids(entities,mSolidCollection.begin(),numSolids);
-}
-
-void HopScene::findHopEntitiesInSolids(Collection<HopEntity::ptr> &entities,Solid *solids[],int numSolids){
-	entities.clear();
-	int i;
-	for(i=numSolids-1;i>=0;--i){
-		Solid *solid=solids[i];
-		HopEntity *entity=static_cast<HopEntity*>(solid->getUserData());
-		if(entity!=NULL){
-			entities.add(entity);
-		}
-	}
-}
-
-void HopScene::traceSegment(HopCollision &result,const Segment &segment,int collideWithBits,HopEntity *ignore){
+void HopScene::traceSegment(Collision &result,const Segment &segment,int collideWithBits,HopEntity *ignore){
 	result.reset();
 
 	Solid *ignoreSolid=NULL;
@@ -121,21 +91,9 @@ void HopScene::traceSegment(HopCollision &result,const Segment &segment,int coll
 		ignoreSolid=ignore->getSolid();
 	}
 
-	Collision &collision=cache_traceSegment_collision.reset();
+	hop::Collision &collision=cache_traceSegment_collision.reset();
 	mSimulator->traceSegment(collision,segment,collideWithBits,ignoreSolid);
-
-	if(collision.time!=-Math::ONE){
-		result.time=collision.time;
-		result.point=collision.point;
-		result.normal=collision.normal;
-
-		if(collision.collider!=NULL){
-			HopEntity *entity=static_cast<HopEntity*>(collision.collider->getUserData());
-			if(entity!=NULL){
-				result.collider=HopEntity::ptr(entity);
-			}
-		}
-	}
+	set(result,collision);
 }
 
 HopEntity *HopScene::getHopEntityFromNetworkID(int id) const{
@@ -305,35 +263,50 @@ void HopScene::postRenderUpdate(int dt){
 	mScene->postRenderUpdate(dt);
 }
 
-void HopScene::traceSegment(Collision &result,const Segment &segment){
-	if(mTraceable!=NULL){
-		result.time=mTraceable->traceSegment(result.normal,segment);
-		if(result.time<0){
-			Math::add(result.point,segment.origin,segment.direction);
-		}
-		else{
-			Math::madd(result.point,segment.direction,result.time,segment.origin);
-			result.collider=mWorld;
+class QueryListener:public SpacialQueryResultsListener{
+public:
+	QueryListener(Solid *solids[],int maxSolids){
+		mSolids=solids;
+		mMaxSolids=maxSolids;
+		mCounter=0;
+	}
+
+	void resultFound(Node *result){
+		Node *entity=result->isEntity();
+		if(entity!=NULL && mCounter<mMaxSolids){
+			mSolids[mCounter++]=((HopEntity*)entity)->getSolid();
 		}
 	}
+
+	Solid **mSolids;
+	int mMaxSolids;
+	int mCounter;
+};
+
+int HopScene::findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids){
+	// TODO: The query interface is messy here, it shouldnt be this much work!
+	QueryListener listener(solids,maxSolids);
+	SpacialQuery query;
+	query.setResultsListener(&listener);
+	performAABoxQuery(&query,box,false);
+	return listener.mCounter;
 }
 
-void HopScene::traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid){
-	if(mTraceable!=NULL){
-		if(solid->getShape(0)->getType()==hop::Shape::Type_AABOX){
-			result.time=mTraceable->traceAABox(result.normal,segment,solid->getShape(0)->getAABox());
-		}
-		else if(solid->getShape(0)->getType()==hop::Shape::Type_SPHERE){
-			result.time=mTraceable->traceSphere(result.normal,segment,solid->getShape(0)->getSphere());
-		}
-		if(result.time<0){
-			Math::add(result.point,segment.origin,segment.direction);
-		}
-		else{
-			Math::madd(result.point,segment.direction,result.time,segment.origin);
-			result.collider=mWorld;
-		}
-	}
+void HopScene::set(tadpole::Collision &r,hop::Collision &c){
+	r.time=c.time;
+	r.point.set(c.point);
+	r.normal.set(c.normal);
+	if(c.collider!=NULL){r.collider=(HopEntity*)c.collider->getUserData();};
+	r.scope=c.scope;
+}
+
+void HopScene::set(hop::Collision &r,tadpole::Collision &c,HopEntity *collider){
+	r.time=c.time;
+	r.point.set(c.point);
+	r.normal.set(c.normal);
+	// Since the c.collider passed in could be any Node, not necessarily a HopEntity, we force a passing in of a Collider
+	if(collider!=NULL){r.collider=collider->getSolid();}
+	r.scope=c.scope;
 }
 
 void HopScene::defaultRegisterHopEntity(HopEntity *entity){

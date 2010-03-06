@@ -52,7 +52,6 @@ CameraNode::CameraNode():super(),
 	mAlignmentCalculationsUseOrigin(false),
 	mMidNode(NULL),
 
-	//mRenderBoundingOrigin,
 	//mWorldTranslate,
 	//mViewTransform,
 
@@ -223,8 +222,6 @@ void CameraNode::updateViewTransform(){
 	scalar wt20=mWorldRenderTransform.at(2,0),wt21=mWorldRenderTransform.at(2,1),wt22=mWorldRenderTransform.at(2,2);
 	mWorldRenderTranslate.x=mWorldRenderTransform.at(0,3);mWorldRenderTranslate.y=mWorldRenderTransform.at(1,3);mWorldRenderTranslate.z=mWorldRenderTransform.at(2,3);
 
-	mRenderBoundingOrigin.set(mWorldRenderTranslate.x-Math::mul(wt02,mBoundingRadius),mWorldRenderTranslate.y-Math::mul(wt12,mBoundingRadius),mWorldRenderTranslate.z-Math::mul(wt22,mBoundingRadius));
-
 	mViewTransform.setAt(0,0,wt00);
 	mViewTransform.setAt(0,1,wt10);
 	mViewTransform.setAt(0,2,wt20);
@@ -296,9 +293,8 @@ void CameraNode::updateFramesPerSecond(){
 }
 
 void CameraNode::update(){
-	mBoundingRadius=mFarDist/2;
 	if(mMidNode!=NULL){
-		mMidNode->setTranslate(0,0,-(mFarDist-mNearDist)/2);
+		mMidNode->setTranslate(0,0,(mFarDist-mNearDist)/2);
 	}
 }
 

@@ -53,7 +53,6 @@ Node::Node():
 	mScope(0),
 	//mName,
 	mCameraAligned(false),
-	mBoundingRadius(0),
 	mReceiveUpdates(false),
 	
 	mActive(false),
@@ -83,14 +82,15 @@ Node *Node::create(Engine *engine){
 	mRotate.reset();
 	mScale.set(Math::ONE,Math::ONE,Math::ONE);
 	mScope=-1;
-	mBoundingRadius=0;
 	mReceiveUpdates=false;
 
 	mActive=true;
 	mDeactivateCount=0;
 
-	mRenderTransform.reset();
+	mLocalBound.reset();
+	mWorldBound.reset();
 	mRenderWorldBound.reset();
+	mRenderTransform.reset();
 	mWorldRenderTransform.reset();
 
 	return this;
@@ -204,6 +204,15 @@ void Node::setScale(scalar x,scalar y,scalar z){
 	activate();
 }
 
+void Node::setScale(scalar s){
+	mScale.set(s,s,s);
+
+	setRenderTransformRotateScale(mRotate,mScale);
+
+	mIdentityTransform=false;
+	activate();
+}
+
 void Node::setTransform(const Matrix4x4 &transform){
 	Math::setScaleFromMatrix4x4(mScale,transform);
 	Math::setRotateFromMatrix4x4(cache_setTransform_matrix,transform,mScale);
@@ -239,8 +248,8 @@ void Node::setCameraAligned(bool cameraAligned){
 	mCameraAligned=cameraAligned;
 }
 
-void Node::setBoundingRadius(scalar boundingRadius){
-	mBoundingRadius=boundingRadius;
+void Node::setLocalBound(const Sphere &bound){
+	mLocalBound.set(bound);
 }
 
 void Node::setReceiveUpdates(bool receiveUpdates){

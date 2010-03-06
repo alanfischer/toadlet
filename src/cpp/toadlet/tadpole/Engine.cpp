@@ -41,6 +41,8 @@
 #include <toadlet/tadpole/node/SkeletonParentNode.h>
 #include <toadlet/tadpole/node/SpriteNode.h>
 
+#include <toadlet/tadpole/bsp/BSP30SceneNode.h>
+
 #include <toadlet/tadpole/handler/AudioBufferHandler.h>
 #include <toadlet/tadpole/handler/MMSHHandler.h>
 #include <toadlet/tadpole/handler/SPRHandler.h>
@@ -87,6 +89,7 @@ using namespace toadlet::ribbit;
 using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::handler;
 using namespace toadlet::tadpole::mesh;
+using namespace toadlet::tadpole::bsp;
 
 namespace toadlet{
 namespace tadpole{
@@ -127,6 +130,10 @@ Engine::Engine():
 	registerNodeType(ParticleNode::type());
 	registerNodeType(SkeletonParentNode::type());
 	registerNodeType(SpriteNode::type());
+
+	// Plugin types, should be removed from here somehow
+	registerNodeType(BSP30SceneNode::type());
+	registerNodeType(BSP30ModelNode::type());
 
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"Engine: adding all handlers");

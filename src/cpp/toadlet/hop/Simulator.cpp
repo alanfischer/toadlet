@@ -270,10 +270,6 @@ void Simulator::update(int dt,int scope,Solid *solid){
 			(solid->mManager!=NULL?solid->mManager:mManager)->preUpdate(solid,dt,fdt);
 		}
 
-		if(solid->mLocalGravityOverride==false){
-			solid->mLocalGravity.set(mGravity);
-		}
-
 		oldPosition.set(solid->mPosition);
 
 		// The cheapest, fastest, and worst integrator, it's 1st order
@@ -702,37 +698,27 @@ void Simulator::update(int dt,int scope,Solid *solid){
 }
 
 int Simulator::findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids) const{
-	Solid *s=NULL;
+	int amount=-1;
+	if(mManager!=NULL){
+		amount=mManager->findSolidsInAABox(box,solids,maxSolids);
+	}
 
-	int i,j=0;
-	for(i=0;i<mSolids.size();++i){
-		s=mSolids[i];
-		if(testIntersection(box,s->mWorldBound)){
-			if(j<maxSolids){
-				solids[j]=s;
+	if(amount==-1){
+		amount=0;
+		Solid *s=NULL;
+		int i=0;
+		for(i=0;i<mSolids.size();++i){
+			s=mSolids[i];
+			if(testIntersection(box,s->mWorldBound)){
+				if(amount<maxSolids){
+					solids[amount]=s;
+				}
+				amount++;
 			}
-			j++;
 		}
 	}
 
-	return j;
-}
-
-int Simulator::findSolidsInSphere(const Sphere &sphere,Solid *solids[],int maxSolids) const{
-	Solid *s=NULL;
-
-	int i,j=0;
-	for(i=0;i<mSolids.size();++i){
-		s=mSolids[i];
-		if(testIntersection(sphere,s->mWorldBound)){
-			if(j<maxSolids){
-				solids[j]=s;
-			}
-			j++;
-		}
-	}
-
-	return j;
+	return amount;
 }
 
 void Simulator::traceSegment(Collision &result,const Segment &segment,int collideWithBits,Solid *ignore){
@@ -847,6 +833,7 @@ bool Simulator::toSmall(const Vector3 &value) const{
 
 void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment &segment,int collideWithBits,Solid *ignore){
 	result.time=-ONE;
+	result.scope=0;
 
 	Solid *solid2;
 
@@ -857,6 +844,7 @@ void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment 
 		if(solid2!=ignore && (collideWithBits&solid2->mCollisionBits)!=0){
 			collision.time=-ONE;
 			testSegment(collision,solid2,segment);
+			int scope=result.scope;
 			if(collision.time>=0){
 				if(result.time<0 || collision.time<result.time){
 					result.set(collision);
@@ -869,12 +857,14 @@ void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment 
 					}
 				}
 			}
+			result.scope=scope|collision.scope;
 		}
 	}
 
 	if(mManager!=NULL){
 		collision.time=-ONE;
 		mManager->traceSegment(collision,segment);
+		int scope=result.scope;
 		if(collision.time>=0){
 			if(result.time<0 || collision.time<result.time){
 				result.set(collision);
@@ -887,6 +877,7 @@ void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment 
 				}
 			}
 		}
+		result.scope=(scope|collision.scope);
 	}
 }
 
@@ -906,6 +897,7 @@ void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,con
 		if(solid!=solid2 && (solid->mCollideWithBits&solid2->mCollisionBits)!=0){
 			collision.time=-ONE;
 			testSolid(collision,solid,solid2,segment);
+			int scope=result.scope;
 			if(collision.time>=0){
 				if(result.time<0 || collision.time<result.time){
 					result.set(collision);
@@ -918,12 +910,14 @@ void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,con
 					}
 				}
 			}
+			result.scope=scope|collision.scope;
 		}
 	}
 
 	if(mManager!=NULL){
 		collision.time=-ONE;
 		mManager->traceSolid(collision,segment,solid);
+		int scope=result.scope;
 		if(collision.time>=0){
 			if(result.time<0 || collision.time<result.time){
 				result.set(collision);
@@ -935,6 +929,81 @@ void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,con
 					result.set(collision);
 				}
 			}
+		}
+		result.scope=(scope|collision.scope);
+	}
+}
+
+void Simulator::testSegment(Collision &result,Solid *solid,const Segment &segment){
+	Collision &collision=cache_testSegment_collision.reset();
+	collision.collider=solid;
+
+	const Collection<Shape::ptr> &shapes=solid->mShapes;
+	int numShapes=shapes.size();
+
+	Shape *shape;
+	bool modifyScope=false;
+
+	int i;
+	for(i=0;i<numShapes;++i){
+		// No need to reset collision or it's time here since the trace functions are gaurenteed to do that
+
+		shape=shapes[i];
+		switch(shape->mType){
+			case Shape::Type_AABOX:
+				{
+					AABox &box=cache_testSegment_box.set(shape->mAABox);
+					add(box,solid->mPosition);
+					traceAABox(collision,segment,box);
+				}
+			break;
+			case Shape::Type_SPHERE:
+				{
+					Sphere &sphere=cache_testSegment_sphere.set(shape->mSphere);
+					add(sphere,solid->mPosition);
+					traceSphere(collision,segment,sphere);
+				}
+			break;
+			case Shape::Type_CAPSULE:
+				{
+					Capsule &capsule=cache_testSegment_capsule.set(shape->mCapsule);
+					add(capsule,solid->mPosition);
+					traceCapsule(collision,segment,capsule);
+				}
+			break;
+			case Shape::Type_CONVEXSOLID:
+				Error::unimplemented("traceSegment not implemented for Type_CONVEXSOLID"); 
+			break;
+			case Shape::Type_CALLBACK:
+				shape->mCallback->traceSegment(collision,segment);
+				modifyScope=true;
+			break;
+		}
+
+		if(shape->mType!=Shape::Type_CALLBACK && collision.time==0){
+			collision.scope=solid->mScope;
+		}
+
+		int scope=result.scope;
+		if(collision.time>=0){
+			if(result.time<0 || collision.time<result.time){
+				result.set(collision);
+			}
+			else if(result.time==collision.time){
+				add(result.normal,collision.normal);
+				bool b=normalizeCarefully(result.normal,mEpsilon);
+				if(b==false){
+					result.set(collision);
+				}
+			}
+			modifyScope=(collision.time==0);
+		}
+
+		if(modifyScope){
+			result.scope=scope|collision.scope;
+		}
+		else{
+			result.scope=scope;
 		}
 	}
 }
@@ -949,6 +1018,7 @@ void Simulator::testSolid(Collision &result,Solid *solid1,Solid *solid2,const Se
 	int numShapes2=shapes2.size();
 	Shape *shape1;
 	Shape *shape2;
+	bool modifyScope=false;
 
 	int i,j;
 	for(i=0;i<numShapes1;++i){
@@ -958,6 +1028,7 @@ void Simulator::testSolid(Collision &result,Solid *solid1,Solid *solid2,const Se
 			shape2=shapes2[j];
 
 			// No need to reset collision or it's time here since the trace functions are gaurenteed to do that
+			modifyScope=false;
 
 			// AABox collisions
 			if(shape1->mType==Shape::Type_AABOX && shape2->mType==Shape::Type_AABOX){
@@ -1092,12 +1163,11 @@ void Simulator::testSolid(Collision &result,Solid *solid1,Solid *solid2,const Se
 				traceCapsule(collision,segment,capsule);
 			}
 			else if(shape1->mType==Shape::Type_CAPSULE && shape2->mType==Shape::Type_CONVEXSOLID){
-				//TODO: Figure this one out, somehow...
-				//traceConvexSolid(collision,segment,convexsolid);
+				Error::unimplemented("from Type_CAPSULE to Type_CONVEXSOLID unimplemented");
 			}
 			// Convex solid collisions
 			else if(shape1->mType==Shape::Type_CONVEXSOLID && shape2->mType==Shape::Type_AABOX){
-				//TODO: Easy, figure it out
+				Error::unimplemented("from Type_CONVEXSOLID to Type_AABOX unimplemented");
 			}
 			else if(shape1->mType==Shape::Type_CONVEXSOLID && shape2->mType==Shape::Type_SPHERE){
 				// Construct the mirrored super convex solid by "bumping" all of the planes "outward"
@@ -1119,12 +1189,24 @@ void Simulator::testSolid(Collision &result,Solid *solid1,Solid *solid2,const Se
 				traceConvexSolid(collision,tmpseg,convexsolid);
 			}
 			else if(shape1->mType==Shape::Type_CONVEXSOLID && shape2->mType==Shape::Type_CAPSULE){
-				//TODO: Figure this one out, somehow...
+				Error::unimplemented("from Type_CONVEXSOLID to Type_CAPSULE unimplemented");
 			}
-			else if(shape1->mType==Shape::Type_CONVEXSOLID && shape2->mType==Shape::Type_CAPSULE){
-				//TODO: Umm... This is not trivial. Not at all.
+			else if(shape1->mType==Shape::Type_CONVEXSOLID && shape2->mType==Shape::Type_CONVEXSOLID){
+				Error::unimplemented("from Type_CONVEXSOLID to Type_CONVEXSOLID unimplemented");
+			}
+			else if(shape1->mType==Shape::Type_CALLBACK){
+//				Error::unimplemented("from Type_CALLBACK unimplemented");
+			}
+			else if(shape2->mType==Shape::Type_CALLBACK){
+				shape2->mCallback->traceSolid(collision,segment,solid1);
+				modifyScope=true;
 			}
 
+			if(shape1->mType!=Shape::Type_CALLBACK && shape2->mType!=Shape::Type_CALLBACK && collision.time==0){
+				collision.scope=solid2->mScope;
+			}
+
+			int scope=result.scope;
 			if(collision.time>=0){
 				if(result.time<0 || collision.time<result.time){
 					result.set(collision);
@@ -1136,64 +1218,14 @@ void Simulator::testSolid(Collision &result,Solid *solid1,Solid *solid2,const Se
 						result.set(collision);
 					}
 				}
+				modifyScope=(collision.time==0);
 			}
-		}
-	}
-}
 
-void Simulator::testSegment(Collision &result,Solid *solid,const Segment &segment){
-	Collision &collision=cache_testSegment_collision.reset();
-	collision.collider=solid;
-
-	const Collection<Shape::ptr> &shapes=solid->mShapes;
-	int numShapes=shapes.size();
-
-	Shape *shape;
-
-	int i;
-	for(i=0;i<numShapes;++i){
-		// No need to reset collision or it's time here since the trace functions are gaurenteed to do that
-
-		shape=shapes[i];
-		switch(shape->mType){
-			case Shape::Type_AABOX:
-				{
-					AABox &box=cache_testSegment_box.set(shape->mAABox);
-					add(box,solid->mPosition);
-					traceAABox(collision,segment,box);
-				}
-			break;
-			case Shape::Type_SPHERE:
-				{
-					Sphere &sphere=cache_testSegment_sphere.set(shape->mSphere);
-					add(sphere,solid->mPosition);
-					traceSphere(collision,segment,sphere);
-				}
-			break;
-			case Shape::Type_CAPSULE:
-				{
-					Capsule &capsule=cache_testSegment_capsule.set(shape->mCapsule);
-					add(capsule,solid->mPosition);
-					traceCapsule(collision,segment,capsule);
-				}
-			break;
-			case Shape::Type_CONVEXSOLID:
-				{
-					Error::unimplemented("traceSegment not implemented for Type_CONVEXSOLID"); 
-				}
-			break;
-		}
-
-		if(collision.time>=0){
-			if(result.time<0 || collision.time<result.time){
-				result.set(collision);
+			if(modifyScope){
+				result.scope=scope|collision.scope;
 			}
-			else if(result.time==collision.time){
-				add(result.normal,collision.normal);
-				bool b=normalizeCarefully(result.normal,mEpsilon);
-				if(b==false){
-					result.set(collision);
-				}
+			else{
+				result.scope=scope;
 			}
 		}
 	}
@@ -1377,7 +1409,7 @@ void Simulator::frictionLink(Vector3 &result,Solid *solid,const Vector3 &solidVe
 		Vector3 &fs=cache_frictionLink_fs;
 		Vector3 &normVr=cache_frictionLink_normVr;
 
-		fn=mul(dot(solid->mLocalGravity,hitSolidNormal),solid->mMass)+dot(appliedForce,hitSolidNormal);
+		fn=mul(mul(dot(mGravity,hitSolidNormal),solid->mCoefficientOfGravity),solid->mMass)+dot(appliedForce,hitSolidNormal);
 
 		// When calculating relative velocity, ignore any components perpendicular to the plane of contact
 		// normVr acts as a temp here
@@ -1459,7 +1491,7 @@ void Simulator::updateAcceleration(Vector3 &result,Solid *solid,const Vector3 &x
 	Vector3 &fluidForce=cache_updateAcceleration_fluidForce;
 
 	/*
-		result=solid->mLocalGravity;
+		result=mGravity*solid->mCoefficientOfGravity;
 		if(solid->mMass!=0){
 			constraintLink(constraintForce,solid,x,v,fdt);
 			for(#NUM_TOUCHED_SOLIDS){
@@ -1470,7 +1502,7 @@ void Simulator::updateAcceleration(Vector3 &result,Solid *solid,const Vector3 &x
 		}
 	*/
 
-	result.set(solid->mLocalGravity);
+	mul(result,mGravity,solid->mCoefficientOfGravity);
 	if(solid->mMass!=0){
 		constraintLink(constraintForce,solid,x,v);
 		add(constraintForce,solid->mForce);

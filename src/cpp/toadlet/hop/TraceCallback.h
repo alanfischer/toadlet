@@ -23,25 +23,25 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BSP_FACE_H
-#define TOADLET_TADPOLE_BSP_FACE_H
+#ifndef TOADLET_HOP_TRACECALLBACK_H
+#define TOADLET_HOP_TRACECALLBACK_H
+
+#include <toadlet/hop/Collision.h>
 
 namespace toadlet{
-namespace tadpole{
-namespace bsp{
+namespace hop{
 
-class TOADLET_API Face{
+class Solid;
+
+class TraceCallback{
 public:
-	int plane;
-	bool side;
+	virtual ~TraceCallback(){}
 
-	int edgeStart;
-	int edgeCount;
-	int texinfo;
-	int lightinfo;
+	virtual void getBound(AABox &result)=0;
+	virtual void traceSegment(Collision &result,const Segment &segment)=0;
+	virtual void traceSolid(Collision &result,const Segment &segment,const Solid *solid)=0;
 };
 
-}
 }
 }
 

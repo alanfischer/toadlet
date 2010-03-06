@@ -29,16 +29,19 @@
 #include <toadlet/hop/Simulator.h>
 #include <toadlet/tadpole/plugins/hop/HopEntityFactory.h>
 #include <toadlet/tadpole/node/Scene.h>
-#include <toadlet/tadpole/node/PhysicallyTraceable.h>
+#include <toadlet/tadpole/Collision.h>
 
 namespace toadlet{
 namespace tadpole{
 
 class HopNode;
-class HopCollision;
 class HopEntityMessage;
 
 // I'm not 100% sure that the decorator pattern was the correct hammer for this nail, but thats to be seen.
+// Because we really have several subsystems we want to tie together in the Scene
+//	- Scene Management	(bsp)
+//	- Physics			(hop)
+//	- Networking		(knot)
 class TOADLET_API HopScene:public node::Scene,public hop::Manager{
 public:
 	TOADLET_INTRUSIVE_POINTERS(HopScene);
@@ -89,11 +92,7 @@ public:
 		virtual scalar getEpsilon() const{return mSimulator->getEpsilon();}
 	#endif
 
-	virtual void findHopEntitiesInAABox(const AABox &box,egg::Collection<egg::IntrusivePointer<HopEntity> > &entities);
-	virtual void findHopEntitiesInSphere(const Sphere &sphere,egg::Collection<egg::IntrusivePointer<HopEntity> > &entities);
-	virtual void findHopEntitiesInSolids(egg::Collection<egg::IntrusivePointer<HopEntity> > &entities,hop::Solid *solids[],int numSolids);
-
-	virtual void traceSegment(HopCollision &result,const Segment &segment,int collideWithBits,HopEntity *ignore);
+	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits,HopEntity *ignore);
 
 	inline int getNumHopEntities() const{return mHopEntities.size();}
 	inline HopEntity *getHopEntity(int i) const{return mHopEntities[i];}
@@ -108,7 +107,6 @@ public:
 
 	inline hop::Simulator *getSimulator(){return mSimulator;}
 
-//	virtual node::ParticleNode::ParticleSimulator::ptr newParticleSimulator(node::ParticleNode *particleNode);
 	virtual void registerHopEntity(HopEntity *entity);
 	virtual void unregisterHopEntity(HopEntity *entity);
 
@@ -122,22 +120,30 @@ public:
 	virtual void renderUpdate(int dt);
 	virtual void postRenderUpdate(int dt);
 
-	virtual bool performQuery(query::AABoxQuery *query){return mScene->performQuery(query);}
+	virtual bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact){return mScene->performAABoxQuery(query,box,exact);}
 
-	void traceSegment(hop::Collision &result,const Segment &segment);
-	void traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid);
-	void preUpdate(int,scalar){}
-	void preUpdate(hop::Solid*,int,scalar){}
-	void intraUpdate(hop::Solid*,int,scalar){}
-	bool collisionResponse(hop::Solid*,Vector3&,Vector3&,hop::Collision&){return false;}
-	void postUpdate(hop::Solid*,int,scalar){}
-	void postUpdate(int,scalar){}
+	virtual int findSolidsInAABox(const AABox &box,hop::Solid *solids[],int maxSolids);
+	virtual void traceSegment(hop::Collision &result,const Segment &segment){}
+	virtual void traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid){}
+	virtual void preUpdate(int dt,scalar fdt){}
+	virtual void postUpdate(int dt,scalar fdt){}
+	virtual void preUpdate(hop::Solid *solid,int dt,scalar fdt){}
+	virtual void intraUpdate(hop::Solid *solid,int dt,scalar fdt){}
+	virtual bool collisionResponse(hop::Solid *solid,Vector3 &position,Vector3 &remainder,hop::Collision &collision){return false;}
+	virtual void postUpdate(hop::Solid *solid,int dt,scalar fdt){}
+
+	virtual bool isServer(){return mServer;}
+void setServer(bool server){mServer=server;}
 
 	virtual egg::PointerCounter *getCounter() const{return mCounter;}
+
+	static void set(tadpole::Collision &r,hop::Collision &c);
+	static void set(hop::Collision &r,tadpole::Collision &c,HopEntity *collider);
 
 	hop::Collision cache_traceSegment_collision;
 
 protected:
+
 	virtual void defaultRegisterHopEntity(HopEntity *entity);
 	virtual void defaultUnregisterHopEntity(HopEntity *entity);
 
@@ -146,7 +152,6 @@ protected:
 	egg::PointerCounter *mCounter;
 	node::Scene *mChildScene;
 	node::Scene::ptr mScene;
-	node::PhysicallyTraceable *mTraceable;
 
 	egg::Collection<HopEntity*> mHopEntities;
 	bool mShowCollisionVolumes;
@@ -159,6 +164,7 @@ protected:
 	egg::Collection<int> mFreeNetworkIDs;
 	egg::Collection<egg::IntrusivePointer<HopEntity> > mNetworkIDMap;
 	HopEntityFactory *mHopEntityFactory;
+bool mServer;
 
 	egg::Collection<hop::Solid*> mSolidCollection;
 

@@ -24,9 +24,9 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/QueryManager.h>
+#include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet::peeper;
-using namespace toadlet::tadpole::query;
 
 namespace toadlet{
 namespace tadpole{
@@ -60,23 +60,11 @@ RenderQuery::ptr QueryManager::createFinishedQuery(){
 	return query;
 }
 
-SpacialQuery::ptr QueryManager::createSegmentQuery(){
-	return NULL;
-}
-
-SpacialQuery::ptr QueryManager::createSphereQuery(){
-	return NULL;
-}
-
-AABoxQuery::ptr QueryManager::createAABoxQuery(){
-	AABoxQuery::ptr query=AABoxQuery::ptr(new AABoxQuery());
+SpacialQuery::ptr QueryManager::createSpacialQuery(){
+	SpacialQuery::ptr query=SpacialQuery::ptr(new SpacialQuery());
 	query->setQueryDestroyedListener(this);
-	query->create(mEngine->getScene());
+	query->create();
 	return query;
-}
-
-SpacialQuery::ptr QueryManager::createNodeQuery(){
-	return NULL;
 }
 
 void QueryManager::queryDestroyed(peeper::Query *query){

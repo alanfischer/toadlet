@@ -159,7 +159,9 @@ bool ALPlayer::create(int *options){
 	mCapabilitySet.streaming=true;
 	mCapabilitySet.positional=true;
 	mCapabilitySet.mimeTypes.add("audio/x-wav");
-	mCapabilitySet.mimeTypes.add("application/ogg");
+	#if defined(TOADLET_HAS_OGGVORBIS)
+		mCapabilitySet.mimeTypes.add("application/ogg");
+	#endif
 
 	alListenerf(AL_GAIN,1.0);
 	TOADLET_CHECK_ALERROR("alListenerf");
@@ -353,10 +355,12 @@ AudioStream::ptr ALPlayer::startAudioStream(io::Stream::ptr stream,const String 
 	#if defined(TOADLET_PLATFORM_OSX)
 		decoder=AudioStream::ptr(new_CoreAudioDecoder());
 	#else
-		if(mimeType=="application/ogg"){
-			decoder=AudioStream::ptr(new_OggVorbisDecoder());
-		}
-		else if(mimeType=="audio/x-wav"){
+		#if defined(TOADLET_HAS_OGGVORBIS)
+			if(mimeType=="application/ogg"){
+				decoder=AudioStream::ptr(new_OggVorbisDecoder());
+			}
+		#endif
+		if(mimeType=="audio/x-wav"){
 			decoder=AudioStream::ptr(new_WaveDecoder());
 		}
 	#endif

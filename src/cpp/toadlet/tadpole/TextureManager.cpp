@@ -36,7 +36,10 @@ using namespace toadlet::peeper;
 namespace toadlet{
 namespace tadpole{
 
-TextureManager::TextureManager(Engine *engine):ResourceManager(engine->getArchiveManager()){
+TextureManager::TextureManager(Engine *engine):ResourceManager(engine->getArchiveManager()),
+	mEngine(NULL),
+	mBackable(true)
+{
 	mEngine=engine;
 }
 
@@ -57,12 +60,24 @@ Texture::ptr TextureManager::createTexture(const Image::ptr &image,int usageFlag
 		}
 	}
 
-	BackableTexture::ptr texture(new BackableTexture());
-	texture->create(usageFlags,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),mipLevels);
-	if(mEngine->getRenderer()!=NULL){
-		Texture::ptr back(mEngine->getRenderer()->createTexture());
-		back->create(usageFlags,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),mipLevels);
-		texture->setBack(back,true);
+	Texture::ptr texture;
+	if(mBackable){
+		BackableTexture::ptr backableTexture(new BackableTexture());
+		backableTexture->create(usageFlags,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),mipLevels);
+		if(mEngine->getRenderer()!=NULL){
+			Texture::ptr back(mEngine->getRenderer()->createTexture());
+			back->create(usageFlags,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),mipLevels);
+			backableTexture->setBack(back,true);
+		}
+		texture=backableTexture;
+	}
+	else if(mEngine->getRenderer()!=NULL){
+		texture=Texture::ptr(mEngine->getRenderer()->createTexture());
+		texture->create(usageFlags,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),mipLevels);
+	}
+	else{
+		Error::nullPointer("can not create a non-backable Texture without a renderer");
+		return NULL;
 	}
 
 	texture->load(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0,image->getData());
@@ -97,12 +112,24 @@ Texture::ptr TextureManager::createTexture(const Image::ptr &image,int usageFlag
 }
 
 Texture::ptr TextureManager::createTexture(int usageFlags,Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels){
-	BackableTexture::ptr texture(new BackableTexture());
-	texture->create(usageFlags,dimension,format,width,height,depth,mipLevels);
-	if(mEngine->getRenderer()!=NULL){
-		Texture::ptr back(mEngine->getRenderer()->createTexture());
-		back->create(usageFlags,dimension,format,width,height,depth,mipLevels);
-		texture->setBack(back,true);
+	Texture::ptr texture;
+	if(mBackable){
+		BackableTexture::ptr backableTexture(new BackableTexture());
+		backableTexture->create(usageFlags,dimension,format,width,height,depth,mipLevels);
+		if(mEngine->getRenderer()!=NULL){
+			Texture::ptr back(mEngine->getRenderer()->createTexture());
+			back->create(usageFlags,dimension,format,width,height,depth,mipLevels);
+			backableTexture->setBack(back,true);
+		}
+		texture=backableTexture;
+	}
+	else if(mEngine->getRenderer()!=NULL){
+		texture=Texture::ptr(mEngine->getRenderer()->createTexture());
+		texture->create(usageFlags,dimension,format,width,height,depth,mipLevels);
+	}
+	else{
+		Error::nullPointer("can not create a non-backable Texture without a renderer");
+		return NULL;
 	}
 
 	manage(shared_static_cast<Texture>(texture));

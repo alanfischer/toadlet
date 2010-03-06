@@ -23,41 +23,31 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/query/AABoxQuery.h>
-#include <toadlet/tadpole/node/Scene.h>
-
-using namespace toadlet::tadpole::node;
+#include <toadlet/egg/mathfixed/Quaternion.h>
+#include <toadlet/egg/mathfixed/Math.h>
 
 namespace toadlet{
-namespace tadpole{
-namespace query{
+namespace egg{
+namespace mathfixed{
 
-AABoxQuery::AABoxQuery():
-	mScene(NULL),
-
-	mListener(NULL)
-	//mBox
-{
+Quaternion Quaternion::operator*(const Quaternion &q2) const{
+	Quaternion r;
+	Math::mul(r,*this,q2);
+	return r;
 }
 
-AABoxQuery::~AABoxQuery(){
-	destroy();
+Quaternion &Quaternion::operator*=(const Quaternion &q2){
+	Math::postMul(*this,q2);
+	return *this;
 }
 
-void AABoxQuery::create(Scene *scene){
-	mScene=scene;
-}
-
-void AABoxQuery::destroy(){
-	if(mListener!=NULL){
-		mListener->queryDestroyed(this);
-	}
-}
-
-bool AABoxQuery::performQuery(){
-	return mScene->performQuery(this);
+Vector3 Quaternion::operator*(const Vector3 &v) const{
+	Vector3 r;
+	Math::mul(r,*this,v);
+	return r;
 }
 
 }
 }
 }
+

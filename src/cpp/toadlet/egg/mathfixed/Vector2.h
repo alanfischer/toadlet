@@ -36,9 +36,11 @@ class Vector2{
 public:
 	fixed x,y;
 
-	Vector2():x(0),y(0){}
+	inline Vector2():x(0),y(0){}
 
-	Vector2(fixed x1,fixed y1):x(x1),y(y1){}
+	inline Vector2(fixed x1,fixed y1):x(x1),y(y1){}
+
+	inline Vector2(fixed v[]):x(v[0]),y(v[1]){}
 
 	inline Vector2 &set(const Vector2 &v){
 		x=v.x;

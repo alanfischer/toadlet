@@ -45,7 +45,7 @@ Node *LightNode::create(Engine *engine){
 	super::create(engine);
 
 	mLight=Light::ptr(new Light());
-	mBoundingRadius=-1;
+	mLocalBound.radius=-Math::ONE;
 
 	return this;
 }

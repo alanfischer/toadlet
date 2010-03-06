@@ -23,27 +23,31 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BSP_LEAF_H
-#define TOADLET_TADPOLE_BSP_LEAF_H
+#include <toadlet/tadpole/SpacialQuery.h>
+#include <toadlet/tadpole/node/Scene.h>
+
+using namespace toadlet::tadpole::node;
 
 namespace toadlet{
 namespace tadpole{
-namespace bsp{
 
-class TOADLET_API Leaf{
-public:
-	int contents;
-	int visibilityStart;
-	AABox bound;
-	int brushStart;
-	int brushCount;
-	// TODO: Rename/change these marksurface things
-	int marksurfaceStart;
-	int marksurfaceCount;
-};
+SpacialQuery::SpacialQuery():
+	mDestroyedListener(NULL),
+	mResultsListener(NULL)
+{}
+
+SpacialQuery::~SpacialQuery(){
+	destroy();
+}
+
+void SpacialQuery::create(){
+}
+
+void SpacialQuery::destroy(){
+	if(mDestroyedListener!=NULL){
+		mDestroyedListener->queryDestroyed(this);
+	}	
+}
 
 }
 }
-}
-
-#endif

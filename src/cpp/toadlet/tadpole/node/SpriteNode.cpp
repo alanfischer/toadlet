@@ -323,14 +323,14 @@ void SpriteNode::updateBound(){
 		scalar y=Math::mul(mScale.y,mSize.y);
 
 		if(mAlignment==(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER)){
-			mBoundingRadius=Math::sqrt(Math::square(x/2) + Math::square(y/2));
+			mLocalBound.radius=Math::sqrt(Math::square(x/2) + Math::square(y/2));
 		}
 		else{
-			mBoundingRadius=Math::sqrt(Math::square(x) + Math::square(y));
+			mLocalBound.radius=Math::sqrt(Math::square(x) + Math::square(y));
 		}
 	}
 	else{
-		mBoundingRadius=-Math::ONE;
+		mLocalBound.radius=-Math::ONE;
 	}
 }
 
