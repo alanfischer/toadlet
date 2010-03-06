@@ -17,6 +17,7 @@ if (WIN32)
 	else (WINCE)
 		find_path (GDIPLUS_INCLUDE_PATH GdiplusPixelFormats.h PATHS
 			"C:/Program Files/Microsoft Visual Studio 8/VC/include"
+			"C:/Program Files (x86)/Microsoft SDKs/Windows/v7.0A/Include"
 		)
 	endif (WINCE)
 
