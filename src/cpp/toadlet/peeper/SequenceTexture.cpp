@@ -86,7 +86,7 @@ void SequenceTexture::destroy(){
 	int i;
 	for(i=0;i<mTextures.size();++i){
 		if(mTextures[i]!=NULL){
-			mTextures[i]->destroy();
+			mTextures[i]->release();
 		}
 	}
 	mTextures.clear();
@@ -155,8 +155,16 @@ Texture::ptr SequenceTexture::getTexture(int frame){
 }
 
 void SequenceTexture::setTexture(int frame,peeper::Texture::ptr texture,scalar delay){
+	if(mTextures[frame]!=NULL){
+		mTextures[frame]->release();
+	}
+
 	mTextures[frame]=texture;
 	mDelays[frame]=delay;
+
+	if(mTextures[frame]!=NULL){
+		mTextures[frame]->retain();
+	}
 }
 
 }

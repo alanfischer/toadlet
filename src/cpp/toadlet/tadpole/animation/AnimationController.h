@@ -50,7 +50,7 @@ public:
 	};
 
 	AnimationController();
-	virtual ~AnimationController(){}
+	virtual ~AnimationController();
 
 	virtual void setTime(int time,bool setagain=true);
 	inline int getTime() const{return mLogicTime;}
@@ -64,7 +64,7 @@ public:
 	virtual void setTimeScale(scalar scale);
 	inline scalar getTimeScale() const{return mTimeScale;}
 
-	virtual void setAnimationControllerFinishedListener(AnimationControllerFinishedListener *listener);
+	virtual void setAnimationControllerFinishedListener(AnimationControllerFinishedListener *listener,bool owns);
 	inline AnimationControllerFinishedListener *getAnimationControllerFinishedListener() const{return mFinishedListener;}
 
 	virtual void setMinMaxValue(scalar minValue,scalar maxValue){mMinValue=minValue;mMaxValue=maxValue;}
@@ -99,6 +99,7 @@ protected:
 	scalar mTimeScale;
 	bool mRunning;
 	AnimationControllerFinishedListener *mFinishedListener;
+	bool mOwnsFinishedListener;
 };
 
 }

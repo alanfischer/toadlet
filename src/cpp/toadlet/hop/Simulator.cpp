@@ -857,9 +857,6 @@ void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment 
 					}
 				}
 			}
-if(collision.scope==-1){
-	Logger::alert(String("BAD SCOPE:")+solid2->getScope()+":"+solid2->getShape(0)->getType());
-}
 			result.scope=scope|collision.scope;
 		}
 	}
@@ -983,7 +980,7 @@ void Simulator::testSegment(Collision &result,Solid *solid,const Segment &segmen
 			break;
 		}
 
-		if(shape->mType!=Shape::Type_CALLBACK){
+		if(shape->mType!=Shape::Type_CALLBACK && collision.time==0){
 			collision.scope=solid->mScope;
 		}
 
@@ -999,11 +996,14 @@ void Simulator::testSegment(Collision &result,Solid *solid,const Segment &segmen
 					result.set(collision);
 				}
 			}
-			modifyScope=true;
+			modifyScope=(collision.time==0);
 		}
 
 		if(modifyScope){
 			result.scope=scope|collision.scope;
+		}
+		else{
+			result.scope=scope;
 		}
 	}
 }
@@ -1202,7 +1202,7 @@ void Simulator::testSolid(Collision &result,Solid *solid1,Solid *solid2,const Se
 				modifyScope=true;
 			}
 
-			if(shape1->mType!=Shape::Type_CALLBACK && shape2->mType!=Shape::Type_CALLBACK){
+			if(shape1->mType!=Shape::Type_CALLBACK && shape2->mType!=Shape::Type_CALLBACK && collision.time==0){
 				collision.scope=solid2->mScope;
 			}
 
@@ -1218,11 +1218,14 @@ void Simulator::testSolid(Collision &result,Solid *solid1,Solid *solid2,const Se
 						result.set(collision);
 					}
 				}
-				modifyScope=true;
+				modifyScope=(collision.time==0);
 			}
 
 			if(modifyScope){
 				result.scope=scope|collision.scope;
+			}
+			else{
+				result.scope=scope;
 			}
 		}
 	}

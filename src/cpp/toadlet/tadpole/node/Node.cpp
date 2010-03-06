@@ -204,6 +204,15 @@ void Node::setScale(scalar x,scalar y,scalar z){
 	activate();
 }
 
+void Node::setScale(scalar s){
+	mScale.set(s,s,s);
+
+	setRenderTransformRotateScale(mRotate,mScale);
+
+	mIdentityTransform=false;
+	activate();
+}
+
 void Node::setTransform(const Matrix4x4 &transform){
 	Math::setScaleFromMatrix4x4(mScale,transform);
 	Math::setRotateFromMatrix4x4(cache_setTransform_matrix,transform,mScale);

@@ -120,11 +120,13 @@ Win32Application::Win32Application():
 	mSkipNextMove(false),
 
 	mEngine(NULL),
+	mRenderTarget(NULL),
 	mRenderer(NULL),
 	mRendererPlugin(RendererPlugin_NONE),
 	mChangeRendererPlugin(RendererPlugin_NONE),
 	mRendererOptions(NULL),
 	mAudioPlayer(NULL),
+	mChangeAudioPlayerPlugin(false),
 
 	mRun(false),
 	#if defined(TOADLET_PLATFORM_WINCE)
@@ -141,7 +143,8 @@ Win32Application::Win32Application():
 	win32->mWnd=0;
 	win32->mIcon=0;
 
-	changeRendererPlugin(RendererPlugin_OPENGL); // OpenGL By default
+	changeRendererPlugin(RendererPlugin_OPENGL); // OpenGL by default
+	changeAudioPlayerPlugin(true); // Use Audio by default
 
 	win32->mInstance=GetModuleHandle(NULL);
 }
@@ -157,7 +160,9 @@ Win32Application::~Win32Application(){
 void Win32Application::create(){
 	mEngine=new Engine();
 
-	createAudioPlayer();
+	if(mChangeAudioPlayerPlugin){
+		createAudioPlayer();
+	}
 	createWindow();
 	activate();
 }
@@ -543,6 +548,10 @@ void Win32Application::setRendererOptions(int *options,int length){
 
 	mRendererOptions=new int[length];
 	memcpy(mRendererOptions,options,length*sizeof(int));
+}
+
+void Win32Application::changeAudioPlayerPlugin(bool audio){
+	mChangeAudioPlayerPlugin=audio;
 }
 
 void Win32Application::setIcon(void *icon){

@@ -75,9 +75,10 @@ void Viewer::start(MeshNode::ptr meshNode){
 	mParent->attach(meshNode);
 
 	mCamera=mEngine->createNodeType(CameraNode::type());
+	mCamera->setClearColor(Colors::ORANGE);
 	mEngine->getScene()->getRootNode()->attach(mCamera);
 
-	mDistance=meshNode->getBoundingRadius()*2;
+	mDistance=meshNode->getLocalBound().radius*2;
 
 	mEngine->getScene()->setAmbientColor(Color(Math::QUARTER,Math::QUARTER,Math::QUARTER,Math::ONE));
 

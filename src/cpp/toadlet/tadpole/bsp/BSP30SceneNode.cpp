@@ -23,6 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
+#define CLIP
+
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/peeper/VertexFormat.h>
 #include <toadlet/tadpole/Engine.h>
@@ -65,6 +67,15 @@ Node *BSP30ModelNode::create(Engine *engine){
 
 void BSP30ModelNode::destroy(){
 	super::destroy();
+}
+
+void BSP30ModelNode::setModel(BSP30Map::ptr map,const String &name){
+	// BSP Names are in the form of *X where X is an integer corresponding to the model index
+	int index=-1;
+	if(name.length()>0 && name[0]=='*'){
+		index=name.substr(1,name.length()).toInt32();
+	}
+	setModel(map,index);
 }
 
 void BSP30ModelNode::setModel(BSP30Map::ptr map,int index){
@@ -138,7 +149,11 @@ void BSP30ModelNode::traceSegment(Collision &result,const Segment &segment){
 	segment.getEndPoint(end);
 	if(mMap!=NULL){
 	// TODO: Using headnode[1]!! is that right??
+#if !defined(CLIP)
+result.time=trace(mMap,mMap->models[mModelIndex].headnode[0],segment.origin,end,result.normal);
+#else
 result.time=trace(mMap,mMap->models[mModelIndex].headnode[1],segment.origin,end,result.normal);
+#endif
 
 int contents=0;
 BSP30SceneNode *scene=(BSP30SceneNode*)mEngine->getScene()->getRootScene();
@@ -768,7 +783,11 @@ struct pmtrace_t{
 	Vector3 endpos;
 };
 
+#if !defined(CLIP)
+typedef bnode dclipnode_t;
+#else
 typedef bclipnode dclipnode_t;
+#endif
 typedef BSP30Map hull_t;
 typedef Vector3 vec3_t;
 typedef bplane mplane_t;
@@ -792,7 +811,11 @@ int HullPointContents (hull_t *hull, int num, vec3_t p)
 //		if (num < hull->firstclipnode || num > hull->lastclipnode)
 //			Sys_Error ("HullPointContents: bad node number");
 	
+#if !defined(CLIP)
+		node = &hull->nodes[num];
+#else
 		node = &hull->clipnodes[num];
+#endif
 		plane = &hull->planes[node->planenum];
 		
 //		if (plane->type < 3)
@@ -804,7 +827,9 @@ int HullPointContents (hull_t *hull, int num, vec3_t p)
 		else
 			num = node->children[0];
 	}
-	
+#if !defined(CLIP)
+num=hull->leafs[-(num+1)].contents;
+#endif
 	return num;
 }
 
@@ -841,7 +866,11 @@ bool RecursiveHullCheck (hull_t *hull, int num, float p1f, float p2f, Vector3 p1
 //
 // find the point distances
 //
-	node = &hull->clipnodes[num];
+#if !defined(CLIP)
+		node = &hull->nodes[num];
+#else
+		node = &hull->clipnodes[num];
+#endif
 	plane = &hull->planes[node->planenum];
 
 //	if (plane->type < 3)

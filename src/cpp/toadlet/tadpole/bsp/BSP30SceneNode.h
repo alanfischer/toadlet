@@ -48,6 +48,7 @@ public:
 	virtual node::Node *create(Engine *engine);
 	virtual void destroy();
 
+	void setModel(BSP30Map::ptr map,const egg::String &name);
 	void setModel(BSP30Map::ptr map,int index);
 	int getModel() const{return mModelIndex;}
 

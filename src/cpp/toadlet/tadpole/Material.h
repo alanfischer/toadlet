@@ -48,7 +48,7 @@ public:
 	virtual ~Material();
 
 	void destroy();
-	Material::ptr clone() const;
+	Material::ptr clone();
 
 	void setLighting(bool lighting){mLighting=lighting;}
 	inline bool getLighting() const{return mLighting;}
@@ -72,9 +72,6 @@ public:
 	void setDepthTest(peeper::Renderer::DepthTest depthTest){mDepthTest=depthTest;}
 	inline peeper::Renderer::DepthTest getDepthTest() const{return mDepthTest;}
 
-	void setFill(peeper::Renderer::Fill fill);
-	inline peeper::Renderer::Fill getFill() const{return mFill;}
-
 	void setLayer(int layer){mLayer=layer;}
 	inline int getLayer() const{return mLayer;}
 
@@ -96,7 +93,6 @@ protected:
 	peeper::Blend mBlend;
 	bool mDepthWrite;
 	peeper::Renderer::DepthTest mDepthTest;
-	peeper::Renderer::Fill mFill;
 	int mLayer;
 	egg::Collection<peeper::TextureStage::ptr> mTextureStages;
 	egg::Collection<peeper::Texture::ptr> mAnimatedTextures;
