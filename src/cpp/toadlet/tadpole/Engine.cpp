@@ -147,7 +147,7 @@ Engine::Engine():
 	#endif
 
 	// Texture handlers
-	#if defined(TOADLET_PLATFORM_WIN32)
+	#if defined(TOADLET_HAS_GDIPLUS)
 		mTextureManager->setDefaultHandler(Win32TextureHandler::ptr(new Win32TextureHandler(mTextureManager)));
 	#elif defined(TOADLET_PLATFORM_OSX)
 		mTextureManager->setDefaultHandler(OSXTextureHandler::ptr(new OSXTextureHandler(mTextureManager)));
