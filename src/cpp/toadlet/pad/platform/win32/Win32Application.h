@@ -107,6 +107,9 @@ public:
 	void changeRendererPlugin(int index);
 	void setRendererOptions(int *options,int length);
 
+	// Isn't as flexible as the RendererPlugin yet, you can just set true/false before creating the Application
+	void changeAudioPlayerPlugin(bool audio);
+
 	void setIcon(void *icon);
 	void *getHINSTANCE() const;
 	void *getHWND() const;
@@ -146,6 +149,7 @@ protected:
 	int mChangeRendererPlugin;
 	int *mRendererOptions;
 	ribbit::AudioPlayer *mAudioPlayer;
+	int mChangeAudioPlayerPlugin;
 
 	bool mRun;
 	bool mAutoActivate;

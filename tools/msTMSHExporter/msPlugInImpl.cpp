@@ -638,7 +638,10 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 		// Check for slerped quaternions that are > 180 degrees and fix them
 		for(j=1;j<frames.size();++j){
 			if(Math::dot(frames[j-1].rotate,frames[j].rotate)<0){
-				frames[j].rotate*=-1;
+				frames[j].rotate.x*=-1;
+				frames[j].rotate.y*=-1;
+				frames[j].rotate.z*=-1;
+				frames[j].rotate.w*=-1;
 			}
 		}
 

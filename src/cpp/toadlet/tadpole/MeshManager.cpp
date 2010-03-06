@@ -207,6 +207,7 @@ Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded,bool invert,Textur
 		Material::ptr material=mEngine->getMaterialManager()->createMaterial();
 		material->retain();
 		material->setDepthWrite(false);
+		material->setLighting(false);
 		mesh->subMeshes[i]->material=material;
 	}
 

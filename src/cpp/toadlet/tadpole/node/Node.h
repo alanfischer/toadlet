@@ -99,6 +99,7 @@ public:
 
 	virtual void setScale(const Vector3 &scale);
 	virtual void setScale(scalar x,scalar y,scalar z);
+	virtual void setScale(scalar s);
 	inline const Vector3 &getScale() const{return mScale;}
 	inline const Vector3 &getWorldScale() const{return mWorldScale;}
 

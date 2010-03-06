@@ -54,6 +54,7 @@ public:
 
 protected:
 	Engine *mEngine;
+	bool mBackable;
 };
 
 }

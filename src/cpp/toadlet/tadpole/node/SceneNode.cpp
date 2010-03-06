@@ -455,8 +455,8 @@ void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
 			Material *material=renderable->getRenderMaterial();
 			if(material!=NULL && mPreviousMaterial!=material){
 				material->setupRenderer(renderer,mPreviousMaterial);
-				mPreviousMaterial=material;
 			}
+			mPreviousMaterial=material;
 			renderer->setModelMatrix(renderable->getRenderTransform());
 			renderable->render(renderer);
 		}
