@@ -154,7 +154,7 @@ peeper::Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager 
 					*(data+j3+0)=*(pal+k3+0);
 					*(data+j3+1)=*(pal+k3+1);
 					*(data+j3+2)=*(pal+k3+2);
-					*(data+j3+3)=(k==255)?0:255;
+					*(data+j3+3)=(*(data+j3+0)==0 && *(data+j3+1)==0 && *(data+j3+2)==255)?0:255;
 				}
 			}
 

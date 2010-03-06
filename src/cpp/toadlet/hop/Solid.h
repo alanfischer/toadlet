@@ -75,11 +75,8 @@ public:
 	const Vector3 &getForce() const{return mForce;}
 	void clearForce(){mForce.reset();}
 
-	void setLocalGravity(const Vector3 &gravity);
-	const Vector3 &getLocalGravity() const{return mLocalGravity;}
-
-	void setWorldGravity();
-	bool hasLocalGravity() const{return mLocalGravityOverride;}
+	void setCoefficientOfGravity(scalar coeff){mCoefficientOfGravity=coeff;}
+	scalar getCoefficientOfGravity() const{return mCoefficientOfGravity;}
 
 	void setCoefficientOfRestitution(scalar coeff){mCoefficientOfRestitution=coeff;}
 	scalar getCoefficientOfRestitution() const{return mCoefficientOfRestitution;}
@@ -144,8 +141,7 @@ protected:
 	Vector3 mPosition;
 	Vector3 mVelocity;
 	Vector3 mForce;
-	Vector3 mLocalGravity;
-	bool mLocalGravityOverride;
+	scalar mCoefficientOfGravity;
 	scalar mCoefficientOfRestitution;
 	bool mCoefficientOfRestitutionOverride;
 	scalar mCoefficientOfStaticFriction;

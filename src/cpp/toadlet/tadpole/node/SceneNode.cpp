@@ -30,11 +30,11 @@
 #include <toadlet/tadpole/node/Renderable.h>
 #include <toadlet/tadpole/node/SceneNode.h>
 #include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/SpacialQuery.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
-using namespace toadlet::tadpole::query;
 
 namespace toadlet{
 namespace tadpole{
@@ -263,6 +263,8 @@ void SceneNode::logicUpdate(Node::ptr node,int dt,int scope){
 			parent->updateShadowChildren();
 		}
 
+		mul(node->mWorldBound,node->mWorldTranslate,node->mLocalBound);
+
 		int numChildren=parent->mShadowChildren.size();
 		Node *child=NULL;
 		int i;
@@ -275,9 +277,14 @@ void SceneNode::logicUpdate(Node::ptr node,int dt,int scope){
 				logicUpdate(child,dt,scope);
 				childrenActive=true;
 			}
+
+			merge(parent->mWorldBound,child->mWorldBound);
 		}
 
 		parent->mActivateChildren=false;
+	}
+	else{
+		mul(node->mWorldBound,node->mWorldTranslate,node->mLocalBound);
 	}
 	
 	if(node->mDeactivateCount>=0){
@@ -344,6 +351,8 @@ void SceneNode::renderUpdate(Node::ptr node,int dt,int scope){
 			parent->updateShadowChildren();
 		}
 
+		mul(node->mRenderWorldBound,node->mWorldRenderTransform,node->mLocalBound);
+
 		Node *child;
 		int numChildren=parent->mShadowChildren.size();
 		int i;
@@ -353,26 +362,11 @@ void SceneNode::renderUpdate(Node::ptr node,int dt,int scope){
 				renderUpdate(child,dt,scope);
 			}
 
-			if(parent->mRenderWorldBound.radius>=0){
-				if(child->mRenderWorldBound.radius>=0){
-					scalar d=Math::length(parent->mRenderWorldBound.origin,child->mRenderWorldBound.origin) + child->mRenderWorldBound.radius;
-					parent->mRenderWorldBound.radius=Math::maxVal(parent->mRenderWorldBound.radius,d);
-				}
-				else{
-					parent->mRenderWorldBound.radius=-Math::ONE;
-				}
-			}
+			merge(parent->mRenderWorldBound,child->mRenderWorldBound);
 		}
 	}
 	else{
-		Math::setTranslateFromMatrix4x4(node->mRenderWorldBound.origin,node->mWorldRenderTransform);
-		if(node->mIdentityTransform==false){
-			scalar scale=Math::maxVal(node->getScale().x,Math::maxVal(node->getScale().y,node->getScale().z));
-			node->mRenderWorldBound.radius=Math::mul(scale,node->mBoundingRadius);
-		}
-		else{
-			node->mRenderWorldBound.radius=node->mBoundingRadius;
-		}
+		mul(node->mRenderWorldBound,node->mWorldRenderTransform,node->mLocalBound);
 	}
 }
 
@@ -425,7 +419,7 @@ void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
 		renderUpdate(mBackground,0,mCamera->getScope());
 		queueRenderables(mBackground);
 	}
-	queueRenderables(node);
+	queueRenderables();
 
 	if(mLight!=NULL){
 		renderer->setLight(0,mLight->internal_getLight());
@@ -461,8 +455,8 @@ void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
 			Material *material=renderable->getRenderMaterial();
 			if(material!=NULL && mPreviousMaterial!=material){
 				material->setupRenderer(renderer,mPreviousMaterial);
-				mPreviousMaterial=material;
 			}
+			mPreviousMaterial=material;
 			renderer->setModelMatrix(renderable->getRenderTransform());
 			renderable->render(renderer);
 		}
@@ -490,16 +484,22 @@ void SceneNode::setUpdateListener(UpdateListener *updateListener){
 	mUpdateListener=updateListener;
 }
 
-bool SceneNode::performQuery(AABoxQuery *query){
+bool SceneNode::performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact){
+	SpacialQueryResultsListener *listener=query->getSpacialQueryResultsListener();
+
 	// TODO: Child Nodes should have proper bounding shapes (either a generic Volume which can be Sphere, etc, or just an actual Sphere)
 	int i;
 	for(i=0;i<mChildren.size();++i){
 		Node *child=mChildren[i];
-		if(Math::testIntersection(Sphere(child->mTranslate,child->mBoundingRadius),query->mBox)){
-			query->mResults.add(child);
+		if(Math::testIntersection(child->mWorldBound,box)){
+			listener->resultFound(child);
 		}
 	}
 	return true;
+}
+
+void SceneNode::queueRenderables(){
+	queueRenderables(this);
 }
 
 void SceneNode::queueRenderables(Node *node){

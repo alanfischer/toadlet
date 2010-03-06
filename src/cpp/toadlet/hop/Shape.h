@@ -27,6 +27,7 @@
 #define TOADLET_HOP_SHAPE_H
 
 #include <toadlet/hop/Types.h>
+#include <toadlet/hop/TraceCallback.h>
 
 namespace toadlet{
 namespace hop{
@@ -43,6 +44,7 @@ public:
 		Type_SPHERE,
 		Type_CAPSULE,
 		Type_CONVEXSOLID,
+		Type_CALLBACK,
 	};
 
 	Shape();
@@ -50,6 +52,7 @@ public:
 	Shape(const Sphere &sphere);
 	Shape(const Capsule &capsule);
 	Shape(const ConvexSolid &convexSolid);
+	Shape(TraceCallback *callback);
 
 	void reset();
 
@@ -65,6 +68,9 @@ public:
 	void setConvexSolid(const ConvexSolid &convexSolid);
 	inline const ConvexSolid &getConvexSolid() const{return mConvexSolid;}
 
+	void setCallback(TraceCallback *callback);
+	inline TraceCallback *getCallback() const{return mCallback;}
+
 	inline Type getType() const{return mType;}
 
 	void getBound(AABox &box) const;
@@ -75,6 +81,7 @@ protected:
 	Sphere mSphere;
 	Capsule mCapsule;
 	ConvexSolid mConvexSolid;
+	TraceCallback *mCallback;
 	Solid *mSolid;
 
 	Vector3 cache_getBound_r;

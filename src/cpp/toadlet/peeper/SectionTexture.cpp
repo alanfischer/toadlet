@@ -39,6 +39,10 @@ SectionTexture::SectionTexture(int widthFrames,int frameOffset,int numFrames,Tex
 	mFrameOffset=frameOffset;
 	mNumFrames=numFrames;
 	mTexture=texture;
+
+	if(mTexture!=NULL){
+		mTexture->retain();
+	}
 }
 
 SectionTexture::SectionTexture(int widthFrames,int heightFrames,int frameOffset,int numFrames,Texture::ptr texture){
@@ -49,9 +53,12 @@ SectionTexture::SectionTexture(int widthFrames,int heightFrames,int frameOffset,
 	mFrameOffset=frameOffset;
 	mNumFrames=numFrames;
 	mTexture=texture;
+
+	if(mTexture!=NULL){
+		mTexture->retain();
+	}
 }
 
-// TODO: We don't really support framed 3d textures yet, since the framing is the dimension above the texture dimension
 SectionTexture::SectionTexture(int widthFrames,int heightFrames,int depthFrames,int frameOffset,int numFrames,Texture::ptr texture){
 	mDimension=Dimension_D3;
 	mWidthFrames=widthFrames;
@@ -60,6 +67,10 @@ SectionTexture::SectionTexture(int widthFrames,int heightFrames,int depthFrames,
 	mFrameOffset=frameOffset;
 	mNumFrames=numFrames;
 	mTexture=texture;
+
+	if(mTexture!=NULL){
+		mTexture->retain();
+	}
 }
 
 SectionTexture::~SectionTexture(){
@@ -104,7 +115,7 @@ bool SectionTexture::create(int usageFlags,Dimension dimension,int format,int wi
 
 void SectionTexture::destroy(){
 	if(mTexture!=NULL){
-		mTexture->destroy();
+		mTexture->release();
 		mTexture=NULL;
 	}
 }

@@ -36,6 +36,7 @@ Shape::Shape():
 	//mSphere,
 	//mCapsule,
 	//mConvexSolid,
+	mCallback(NULL),
 	mSolid(NULL)
 {
 }
@@ -46,6 +47,7 @@ Shape::Shape(const AABox &box):
 	//mSphere,
 	//mCapsule,
 	//mConvexSolid,
+	mCallback(NULL),
 	mSolid(NULL)
 {
 	mAABox.set(box);
@@ -57,6 +59,7 @@ Shape::Shape(const Sphere &sphere):
 	//mSphere,
 	//mCapsule,
 	//mConvexSolid,
+	mCallback(NULL),
 	mSolid(NULL)
 {
 	mSphere.set(sphere);
@@ -68,6 +71,7 @@ Shape::Shape(const Capsule &capsule):
 	//mSphere,
 	//mCapsule,
 	//mConvexSolid,
+	mCallback(NULL),
 	mSolid(NULL)
 {
 	mCapsule.set(capsule);
@@ -79,9 +83,22 @@ Shape::Shape(const ConvexSolid &convexSolid):
 	//mSphere,
 	//mCapsule,
 	//mConvexSolid,
+	mCallback(NULL),
 	mSolid(NULL)
 {
 	mConvexSolid.set(convexSolid);
+}
+
+Shape::Shape(TraceCallback *callback):
+	mType(Type_CALLBACK),
+	//mAABox,
+	//mSphere,
+	//mCapsule,
+	//mConvexSolid,
+	mCallback(NULL),
+	mSolid(NULL)
+{
+	mCallback=callback;
 }
 
 void Shape::reset(){
@@ -127,6 +144,15 @@ void Shape::setCapsule(const Capsule &capsule){
 void Shape::setConvexSolid(const ConvexSolid &convexSolid){
 	mType=Type_CONVEXSOLID;
 	mConvexSolid.set(convexSolid);
+
+	if(mSolid!=NULL){
+		mSolid->updateLocalBound();
+	}
+}
+
+void Shape::setCallback(TraceCallback *callback){
+	mType=Type_CALLBACK;
+	mCallback=callback;
 
 	if(mSolid!=NULL){
 		mSolid->updateLocalBound();
@@ -232,6 +258,9 @@ void Shape::getBound(AABox &box) const{
 				}
 			}
 		}
+		break;
+		case(Type_CALLBACK):
+			mCallback->getBound(box);
 		break;
 	}
 }

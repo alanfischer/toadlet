@@ -23,21 +23,24 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BSP_NODE_H
-#define TOADLET_TADPOLE_BSP_NODE_H
+#ifndef TOADLET_TADPOLE_SPACIALQUERYRESULTSLISTENER_H
+#define TOADLET_TADPOLE_SPACIALQUERYRESULTSLISTENER_H
 
 namespace toadlet{
 namespace tadpole{
-namespace bsp{
+namespace node{
+	class Node;
+}
 
-class TOADLET_API Node{
+class SpacialQuery;
+
+class SpacialQueryResultsListener{
 public:
-	int plane;
-	int children[2];
-	AABox bound;
+	virtual ~SpacialQueryResultsListener(){}
+
+	virtual void resultFound(node::Node *result)=0;
 };
 
-}
 }
 }
 

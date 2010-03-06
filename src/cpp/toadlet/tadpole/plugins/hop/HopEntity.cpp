@@ -42,6 +42,9 @@ TOADLET_NODE_IMPLEMENT(HopEntity,Categories::TOADLET_TADPOLE+".HopEntity");
 HopEntity::HopEntity():ParentNode(),
 	mNextThink(0),
 	mSolid(new Solid()),
+	//mTraceableShape,
+	mTraceable(NULL),
+
 	//mScene,
 	mListener(NULL),
 	//mHopCollision,
@@ -180,16 +183,10 @@ void HopEntity::clearForce(){
 	mModifiedFields|=ENTITY_BIT_FORCE;
 }
 
-void HopEntity::setLocalGravity(const Vector3 &gravity){
-	mSolid->setLocalGravity(gravity);
+void HopEntity::setCoefficientOfGravity(scalar coeff){
+	mSolid->setCoefficientOfGravity(coeff);
 
-	mModifiedFields|=ENTITY_BIT_GRAVITY;
-}
-
-void HopEntity::setWorldGravity(){
-	mSolid->setWorldGravity();
-
-	mModifiedFields|=ENTITY_BIT_GRAVITY;
+	mModifiedFields|=ENTITY_BIT_CO_GRAVITY;
 }
 
 void HopEntity::setCoefficientOfRestitution(scalar coeff){
@@ -220,6 +217,20 @@ void HopEntity::setCoefficientOfEffectiveDrag(scalar coeff){
 	mSolid->setCoefficientOfEffectiveDrag(coeff);
 
 	mModifiedFields|=ENTITY_BIT_CO_EFFECTIVEDRAG;
+}
+
+void HopEntity::setTraceableShape(Traceable *traceable){
+	if(mTraceable!=NULL){
+		removeShape(mTraceableShape);
+		mTraceableShape=NULL;
+	}
+
+	mTraceable=traceable;
+
+	if(mTraceable!=NULL){
+		mTraceableShape=Shape::ptr(new Shape(this));
+		addShape(mTraceableShape);
+	}
 }
 
 void HopEntity::addShape(hop::Shape::ptr shape){
@@ -296,7 +307,31 @@ void HopEntity::parentChanged(ParentNode *parent){
 	super::parentChanged(parent);
 }
 
-void HopEntity::collision(const Collision &c){
+void HopEntity::getBound(AABox &result){
+	if(mTraceable!=NULL){
+		const Sphere &bound=mTraceable->getLocalBound();
+		result.set(bound.radius);
+		Math::add(result,bound.origin);
+	}
+}
+
+void HopEntity::traceSegment(hop::Collision &result,const Segment &segment){
+	if(mTraceable!=NULL){
+		tadpole::Collision collision;
+		mTraceable->traceSegment(collision,segment);
+		HopScene::set(result,collision,this);
+	}
+}
+
+void HopEntity::traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid){
+	if(mTraceable!=NULL){
+		tadpole::Collision collision;
+		mTraceable->traceSegment(collision,segment);
+		HopScene::set(result,collision,this);
+	}
+}
+
+void HopEntity::collision(const hop::Collision &c){
 	if(mListener!=NULL){
 		HopEntity::ptr reference(this); // To make sure that the object is not deleted by the collision callback until we exit this function
 		mHopCollision.time=c.time;
@@ -351,15 +386,10 @@ void HopEntity::castShadow(){
 	Matrix3x3 rotate;
 	Math::setTranslateFromMatrix4x4(segment.origin,mRenderTransform);
 	Math::setMatrix3x3FromMatrix4x4(rotate,mRenderTransform);
-	if(mSolid->hasLocalGravity()){
-		Math::normalize(vector,mSolid->getLocalGravity());
-	}
-	else{
-		Math::normalize(vector,mScene->getSimulator()->getGravity());
-	}
+	Math::normalize(vector,mScene->getSimulator()->getGravity());
 	Math::mul(segment.direction,vector,mShadowTestLength);
 
-	Collision collision;
+	hop::Collision collision;
 	mScene->getSimulator()->traceSegment(collision,segment,-1,mSolid);
 	// Shadow if the object beneath us is of infinite mass (eg static)
 	if(collision.collider!=NULL && collision.collider->hasInfiniteMass()){

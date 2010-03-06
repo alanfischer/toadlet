@@ -36,10 +36,12 @@ class Vector2{
 public:
 	real x,y;
 
-	Vector2():x(0),y(0){}
+	inline Vector2():x(0),y(0){}
 
-	Vector2(real x1,real y1):x(x1),y(y1){}
-	
+	inline Vector2(real x1,real y1):x(x1),y(y1){}
+
+	inline Vector2(real v[]):x(v[0]),y(v[1]){}
+
 	inline Vector2 &set(const Vector2 &v){
 		x=v.x;
 		y=v.y;

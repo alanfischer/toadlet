@@ -43,8 +43,15 @@ AnimationController::AnimationController():
 	mInterpolation(Interpolation_LINEAR),
 	mTimeScale(Math::ONE),
 	mRunning(false),
-	mFinishedListener(NULL)
+	mFinishedListener(NULL),
+	mOwnsFinishedListener(false)
 {}
+
+AnimationController::~AnimationController(){
+	if(mOwnsFinishedListener && mFinishedListener!=NULL){
+		delete mFinishedListener;
+	}
+}
 
 void AnimationController::setTime(int time,bool setagain){
 	mLogicTime=time;
@@ -67,8 +74,12 @@ void AnimationController::setTimeScale(scalar scale){
 	mTimeScale=scale;
 }
 
-void AnimationController::setAnimationControllerFinishedListener(AnimationControllerFinishedListener *listener){
+void AnimationController::setAnimationControllerFinishedListener(AnimationControllerFinishedListener *listener,bool owns){
+	if(mOwnsFinishedListener && mFinishedListener!=NULL){
+		delete mFinishedListener;
+	}
 	mFinishedListener=listener;
+	mOwnsFinishedListener=owns;
 }
 
 void AnimationController::start(){

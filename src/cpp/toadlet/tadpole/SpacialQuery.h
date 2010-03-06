@@ -23,27 +23,42 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_NODE_PHYSICALLYTRACEABLE_H
-#define TOADLET_TADPOLE_NODE_PHYSICALLYTRACEABLE_H
+#ifndef TOADLET_TADPOLE_SPACIALQUERY_H
+#define TOADLET_TADPOLE_SPACIALQUERY_H
 
+#include <toadlet/peeper/Query.h>
 #include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/SpacialQueryResultsListener.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
 
-// This is pretty much a thin interface for SceneNodes which allow us to expose some physical tracing to things like hop,
-// In theory this could be replaced by hop::Manager, but that would impose a dependence of hop upon tadpole, and also be hop specific instead of usable by other physics engines
-class PhysicallyTraceable{
+// TODO: The SpacialQuery structure really needs to be refactored
+class TOADLET_API SpacialQuery:public peeper::Query{
 public:
-	virtual ~PhysicallyTraceable(){}
+	TOADLET_SHARED_POINTERS(SpacialQuery);
 
-	virtual scalar traceSegment(Vector3 &normal,const Segment &segment)=0;
-	virtual scalar traceSphere(Vector3 &normal,const Segment &segment,const Sphere &sphere)=0;
-	virtual scalar traceAABox(Vector3 &normal,const Segment &segment,const AABox &box)=0;
+	SpacialQuery();
+	virtual ~SpacialQuery();
+
+	virtual SpacialQuery *getRootQuery(){return this;}
+
+	virtual void create();
+	virtual void destroy();
+
+	virtual void setQueryDestroyedListener(peeper::QueryDestroyedListener *listener){mDestroyedListener=listener;}
+	virtual peeper::QueryDestroyedListener *getQueryDestroyedListener() const{return mDestroyedListener;}
+	virtual void setResultsListener(SpacialQueryResultsListener *listener){mResultsListener=listener;}
+	virtual SpacialQueryResultsListener *getSpacialQueryResultsListener() const{return mResultsListener;}
+
+	virtual void beginQuery(){}
+	virtual void endQuery(){}
+
+protected:
+	peeper::QueryDestroyedListener *mDestroyedListener;
+	SpacialQueryResultsListener *mResultsListener;
 };
 
-}
 }
 }
 

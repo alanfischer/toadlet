@@ -71,6 +71,7 @@ public:
 
 	virtual ParentNode *isParent(){return NULL;}
 	virtual Renderable *isRenderable(){return NULL;}
+	virtual Node *isEntity(){return NULL;}
 	// TODO: I am still not 100% sure on using the Sizeable interface.
 	//  Not only does it seem to conflict with the idea of Scalable nodes,
 	//  it also seems like it would be better handled using OrientedBoundingBoxes.
@@ -98,6 +99,7 @@ public:
 
 	virtual void setScale(const Vector3 &scale);
 	virtual void setScale(scalar x,scalar y,scalar z);
+	virtual void setScale(scalar s);
 	inline const Vector3 &getScale() const{return mScale;}
 	inline const Vector3 &getWorldScale() const{return mWorldScale;}
 
@@ -119,11 +121,13 @@ public:
 	virtual void setCameraAligned(bool aligned);
 	inline bool getCameraAligned() const{return mCameraAligned;}
 
-	virtual void setBoundingRadius(scalar boundingRadius);
-	inline scalar getBoundingRadius() const{return mBoundingRadius;}
-
 	virtual void setReceiveUpdates(bool receiveUpdates);
 	inline bool getReceiveUpdates() const{return mReceiveUpdates;}
+
+	virtual void setLocalBound(const Sphere &bound);
+	inline const Sphere &getLocalBound() const{return mLocalBound;}
+	inline const Sphere &getWorldBound() const{return mWorldBound;}
+	inline const Sphere &getRenderWorldBound() const{return mRenderWorldBound;}
 
 	/// Only called if the Node registers itself with the Scene in registerUpdateNode.
 	/// Dont forget to call unregisterUpdateNode in its destroy.
@@ -141,6 +145,34 @@ public:
 
 	inline void internal_setManaged(bool managed){mManaged=managed;}
 	inline bool internal_getManaged() const{return mManaged;}
+
+	// TODO: Make a SphereBound class, and have it contain these methods
+	// Not in Math currently, because its not technically correct, a Matrix*Sphere=Eplisoid
+	static void mul(Sphere &r,const Matrix4x4 &m,const Sphere &s){
+		Math::mulPoint3Fast(r.origin,m,s.origin);
+		r.radius=s.radius;
+	}
+
+	static void mul(Sphere &r,const Vector3 &v,const Sphere &s){
+		Math::add(r.origin,v,s.origin);
+		r.radius=s.radius;
+	}
+
+	// Merge two spheres, passing along -1 radius, and ignoring 0 radius
+	static void merge(Sphere &r,const Sphere &s){
+		if(r.radius>0 && s.radius>0){
+			Vector3 origin=(r.origin+s.origin)/2;
+			scalar radius=Math::maxVal(Math::length(r.origin-origin)+r.radius,Math::length(s.origin-origin)+s.radius);
+			r.origin=origin;
+			r.radius=radius;
+		}
+		else if(r.radius==0 && s.radius>0){
+			r.set(s);
+		}
+		else if(s.radius<0){
+			r.radius=-Math::ONE;
+		}
+	}
 
 protected:
 	void setRenderTransformTranslate(const Vector3 &translate);
@@ -170,13 +202,13 @@ protected:
 	int mScope;
 	egg::String mName;
 	bool mCameraAligned;
-	scalar mBoundingRadius;
 	bool mReceiveUpdates;
 
 	bool mActive;
 	int mDeactivateCount;	
 
-	Sphere mLogicWorldBound;
+	Sphere mLocalBound;
+	Sphere mWorldBound;
 	Sphere mRenderWorldBound;
 	Matrix4x4 mRenderTransform;
 	Matrix4x4 mWorldRenderTransform;

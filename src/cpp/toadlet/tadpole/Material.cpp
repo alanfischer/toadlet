@@ -57,8 +57,12 @@ void Material::destroy(){
 	mTextureStages.clear();
 }
 
-Material::ptr Material::clone() const{
+Material::ptr Material::clone(){
 	Material::ptr material(new Material());
+
+	// Here we retain & release ourselves to handle the case
+	//  Of an unused material being cloned, so the unused original will get cleaned up
+	retain();
 
 	material->mLightEffect.set(mLightEffect);
 	material->mLighting=mLighting;
@@ -73,6 +77,8 @@ Material::ptr Material::clone() const{
 	for(i=0;i<mTextureStages.size();++i){
 		material->setTextureStage(i,mTextureStages[i]->clone());
 	}
+
+	release();
 
 	return material;
 }

@@ -49,14 +49,14 @@ Node *AnimationControllerNode::create(Engine *engine){
 	mDestroyOnFinish=false;
 
 	mAnimationController=AnimationController::ptr(new AnimationController());
-	mAnimationController->setAnimationControllerFinishedListener(this);
+	mAnimationController->setAnimationControllerFinishedListener(this,false);
 
 	return this;
 }
 
 void AnimationControllerNode::destroy(){
 	if(mAnimationController!=NULL){
-		mAnimationController->setAnimationControllerFinishedListener(NULL);
+		mAnimationController->setAnimationControllerFinishedListener(NULL,false);
 		mAnimationController=NULL;
 	}
 

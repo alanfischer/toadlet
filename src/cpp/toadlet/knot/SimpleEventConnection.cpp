@@ -50,7 +50,7 @@ SimpleEventConnection::SimpleEventConnection(EventFactory *eventFactory,Connecti
 	//mThread,
 	mRun(false)
 {
-	int maxSize=4096;
+	int maxSize=4096*16;
 	mPacketOut=MemoryStream::ptr(new MemoryStream(new byte[maxSize],maxSize,0,true));
 	mDataPacketOut=DataStream::ptr(new DataStream(Stream::ptr(mPacketOut)));
 	mPacketIn=MemoryStream::ptr(new MemoryStream(new byte[maxSize],maxSize,maxSize,true));

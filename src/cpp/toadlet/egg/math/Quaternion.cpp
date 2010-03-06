@@ -23,47 +23,31 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_QUERY_AABOXQUERY_H
-#define TOADLET_TADPOLE_QUERY_AABOXQUERY_H
-
-#include <toadlet/tadpole/query/SpacialQuery.h>
+#include <toadlet/egg/math/Quaternion.h>
+#include <toadlet/egg/math/Math.h>
 
 namespace toadlet{
-namespace tadpole{
-namespace query{
+namespace egg{
+namespace math{
 
-class TOADLET_API AABoxQuery:public SpacialQuery{
-public:
-	TOADLET_SHARED_POINTERS(AABoxQuery);
+Quaternion Quaternion::operator*(const Quaternion &q2) const{
+	Quaternion r;
+	Math::mul(r,*this,q2);
+	return r;
+}
 
-	AABoxQuery();
-	virtual ~AABoxQuery();
+Quaternion &Quaternion::operator*=(const Quaternion &q2){
+	Math::postMul(*this,q2);
+	return *this;
+}
 
-	virtual peeper::Query *getRootQuery(){return this;}
-
-	virtual void create(node::Scene *scene);
-	virtual void destroy();
-
-	virtual void setQueryDestroyedListener(peeper::QueryDestroyedListener *listener){mListener=listener;}
-
-	virtual void setAABox(const AABox &box){mBox.set(box);}
-
-	virtual void beginQuery(){}
-	virtual void endQuery(){}
-	virtual bool performQuery();
-
-	virtual const egg::Collection<node::Node*> &getResult(){return mResults;}
-
-public:
-	node::Scene *mScene;
-
-	peeper::QueryDestroyedListener *mListener;
-	AABox mBox;
-	egg::Collection<node::Node*> mResults;
-};
+Vector3 Quaternion::operator*(const Vector3 &v) const{
+	Vector3 r;
+	Math::mul(r,*this,v);
+	return r;
+}
 
 }
 }
 }
 
-#endif

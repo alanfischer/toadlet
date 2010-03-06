@@ -23,36 +23,26 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_QUERY_SPACIALQUERY_H
-#define TOADLET_TADPOLE_QUERY_SPACIALQUERY_H
+#ifndef TOADLET_TADPOLE_NODE_TRACEABLE_H
+#define TOADLET_TADPOLE_NODE_TRACEABLE_H
 
-#include <toadlet/peeper/Query.h>
 #include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/Collision.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class Scene;
-class Node;
-
-}
-namespace query{
-
-class SpacialQuery:public peeper::Query{
+class Traceable{
 public:
-	TOADLET_SHARED_POINTERS(SpacialQuery);
+	virtual ~Traceable(){}
 
-	virtual ~SpacialQuery(){}
-
-	virtual void create(node::Scene *scene)=0;
-	virtual void destroy()=0;
-
-	virtual void beginQuery()=0;
-	virtual void endQuery()=0;
-	virtual bool performQuery()=0;
-
-	virtual const egg::Collection<node::Node*> &getResult()=0;
+	virtual const Sphere &getLocalBound() const=0;
+	// TODO: Could I replace these multiple functions with just 1 function with a Geometry object
+	//  Could also take an Expandable interface, which would take a Normal and return a scalar, which indicates how far to expand along that normal
+	virtual void traceSegment(Collision &result,const Segment &segment)=0;
+//	virtual void traceSphere(Collision &result,const Segment &segment,const Sphere &sphere)=0;
+//	virtual void traceAABox(Collision &result,const Segment &segment,const AABox &box)=0;
 };
 
 }

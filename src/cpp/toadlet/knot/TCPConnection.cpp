@@ -63,7 +63,7 @@ TCPConnection::TCPConnection(egg::net::Socket::ptr socket,bool blocking):
 	//mDebugThread
 	mDebugRun(false)
 {
-	int maxSize=4096;
+	int maxSize=4096*16;
 	mOutPacket=MemoryStream::ptr(new MemoryStream(new uint8[maxSize],maxSize,0,true));
 	mDataOutPacket=DataStream::ptr(new DataStream(Stream::ptr(mOutPacket)));
 	mInPacket=MemoryStream::ptr(new MemoryStream(new uint8[maxSize],maxSize,maxSize,true));
@@ -423,7 +423,7 @@ void TCPConnection::run(){
 				}
 			}
 		TOADLET_CATCH(const Exception &){amount=-1;}
-
+waes
 		if(amount<=0){
 			mReceiveError=true;
 		}

@@ -29,13 +29,14 @@
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
+#include <toadlet/tadpole/node/Traceable.h>
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
 #include <toadlet/tadpole/plugins/hop/HopCollisionListener.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API HopEntity:public node::ParentNode,public hop::CollisionListener{
+class TOADLET_API HopEntity:public node::ParentNode,public hop::TraceCallback,public hop::CollisionListener{
 public:
 	TOADLET_NODE(HopEntity,node::ParentNode);
 
@@ -49,7 +50,7 @@ public:
 		ENTITY_BIT_POSITION=1<<3,
 		ENTITY_BIT_VELOCITY=1<<4,
 		ENTITY_BIT_FORCE=1<<5,
-		ENTITY_BIT_GRAVITY=1<<6,
+		ENTITY_BIT_CO_GRAVITY=1<<6,
 		ENTITY_BIT_CO_RESTITUTION=1<<7,
 		ENTITY_BIT_CO_RESTITUTIONOVERRIDE=1<<8,
 		ENTITY_BIT_CO_STATICFRICTION=1<<9,
@@ -65,8 +66,7 @@ public:
 	virtual Node *create(Engine *engine);
 	virtual void destroy();
 
-	/// Can be used to specify this is an instance of a custom class
-	virtual bool isCustom() const{return false;}
+	virtual Node *isEntity(){return this;}
 
 	virtual void setCollisionBits(int bits);
 	virtual int getCollisionBits() const{return mSolid->getCollisionBits();}
@@ -94,11 +94,8 @@ public:
 	virtual const Vector3 &getForce() const{return mSolid->getForce();}
 	virtual void clearForce();
 
-	virtual void setLocalGravity(const Vector3 &gravity);
-	virtual const Vector3 &getLocalGravity() const{return mSolid->getLocalGravity();}
-
-	virtual void setWorldGravity();
-	virtual bool hasLocalGravity() const{return mSolid->hasLocalGravity();}
+	virtual void setCoefficientOfGravity(scalar coeff);
+	virtual scalar getCoefficientOfGravity() const{return mSolid->getCoefficientOfGravity();}
 
 	virtual void setCoefficientOfRestitution(scalar coeff);
 	virtual scalar getCoefficientOfRestitution() const{return mSolid->getCoefficientOfRestitution();}
@@ -115,6 +112,7 @@ public:
 	virtual void setCoefficientOfEffectiveDrag(scalar coeff);
 	virtual scalar getCoefficientOfEffectiveDrag() const{return mSolid->getCoefficientOfEffectiveDrag();}
 
+	virtual void setTraceableShape(node::Traceable *traceable);
 	virtual void addShape(hop::Shape::ptr shape);
 	virtual void removeShape(hop::Shape *shape);
 	virtual void removeAllShapes();
@@ -142,11 +140,17 @@ public:
 	void setShadowMesh(mesh::Mesh::ptr shadow,scalar scale,scalar testLength,scalar offset);
 	inline mesh::Mesh::ptr setShadowMesh() const{return mShadowMesh;}
 
+	// Node callbacks
 	virtual void parentChanged(node::ParentNode *parent);
 
+	// TraceCallback callbacks
+	virtual void getBound(AABox &result);
+	virtual void traceSegment(hop::Collision &result,const Segment &segment);
+	virtual void traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid);
+
+	// CollisionListener callbacks
 	virtual void collision(const hop::Collision &c);
 
-//protected:
 	virtual void preLogicUpdateLoop(int dt);
 	virtual void postLogicUpdate(int dt);
 	virtual void interpolatePhysicalParameters(scalar f);
@@ -158,6 +162,9 @@ protected:
 
 	int mNextThink;
 	hop::Solid::ptr mSolid;
+	hop::Shape::ptr mTraceableShape;
+	node::Traceable *mTraceable;
+	
 	HopScene::ptr mScene;
 	HopCollisionListener *mListener;
 	HopCollision mHopCollision;
