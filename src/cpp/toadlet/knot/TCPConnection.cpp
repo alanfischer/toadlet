@@ -423,7 +423,7 @@ void TCPConnection::run(){
 				}
 			}
 		TOADLET_CATCH(const Exception &){amount=-1;}
-waes
+
 		if(amount<=0){
 			mReceiveError=true;
 		}
