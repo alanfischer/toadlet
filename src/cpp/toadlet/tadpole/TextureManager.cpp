@@ -44,18 +44,47 @@ TextureManager::TextureManager(Engine *engine):ResourceManager(engine->getArchiv
 }
 
 Texture::ptr TextureManager::createTexture(const Image::ptr &image,int usageFlags,int mipLevels){
-	// Only handle any autogen simulation if we actually have a renderer
+	Image::Dimension dimension=image->getDimension();
+	int format=image->getFormat();
+	int width=image->getWidth(),height=image->getHeight(),depth=image->getDepth();
+	byte *data=image->getData();
+	bool hasNonPowerOf2=mEngine->getRenderer()==NULL?false:mEngine->getRenderer()->getCapabilitySet().textureNonPowerOf2;
 	bool hasAutogen=mEngine->getRenderer()==NULL?false:mEngine->getRenderer()->getCapabilitySet().textureAutogenMipMaps;
+	// Only handle any autogen simulation if we actually have a renderer
 	bool wantsAutogen=mEngine->getRenderer()==NULL?false:(usageFlags&Texture::UsageFlags_AUTOGEN_MIPMAPS)>0;
+
+	Image::ptr scaledImage;
+	if(hasNonPowerOf2==false && (Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false) || Math::isPowerOf2(depth)==false){
+		int dwidth=Math::nextPowerOf2(width)>>1;
+		int dheight=Math::nextPowerOf2(height)>>1;
+		int ddepth=Math::nextPowerOf2(depth)>>1;
+
+		scaledImage=Image::ptr(new Image(dimension,format,dwidth,dheight,ddepth));
+
+		// TODO: Add depth
+		Pixel<uint8> pixel;
+		int x,y;
+		for(y=0;y<dheight;y++){
+			for(x=0;x<dwidth;x++){
+				image->getPixel(pixel,x*width/dwidth,y*height/dheight);
+				scaledImage->setPixel(pixel,x,y);
+			}
+		}
+
+		width=dwidth;
+		height=dheight;
+		depth=ddepth;
+		data=scaledImage->getData();
+	}
 
 	if(hasAutogen==false && wantsAutogen==true){
 		usageFlags&=~Texture::UsageFlags_AUTOGEN_MIPMAPS;
 
 		if(mipLevels==0){
-			int hwidth=image->getWidth(),hheight=image->getHeight();
-			while(hwidth>0 && hheight>0){
+			int hwidth=width,hheight=height,hdepth=depth;
+			while(hwidth>0 || hheight>0 || hdepth>0){
 				mipLevels++;
-				hwidth/=2; hheight/=2;
+				hwidth/=2; hheight/=2; hdepth/=2;
 			}
 		}
 	}
@@ -63,46 +92,46 @@ Texture::ptr TextureManager::createTexture(const Image::ptr &image,int usageFlag
 	Texture::ptr texture;
 	if(mBackable){
 		BackableTexture::ptr backableTexture(new BackableTexture());
-		backableTexture->create(usageFlags,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),mipLevels);
+		backableTexture->create(usageFlags,dimension,format,width,height,depth,mipLevels);
 		if(mEngine->getRenderer()!=NULL){
 			Texture::ptr back(mEngine->getRenderer()->createTexture());
-			back->create(usageFlags,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),mipLevels);
+			back->create(usageFlags,dimension,format,width,height,depth,mipLevels);
 			backableTexture->setBack(back,true);
 		}
 		texture=backableTexture;
 	}
 	else if(mEngine->getRenderer()!=NULL){
 		texture=Texture::ptr(mEngine->getRenderer()->createTexture());
-		texture->create(usageFlags,image->getDimension(),image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),mipLevels);
+		texture->create(usageFlags,dimension,format,width,height,depth,mipLevels);
 	}
 	else{
 		Error::nullPointer("can not create a non-backable Texture without a renderer");
 		return NULL;
 	}
 
-	texture->load(image->getFormat(),image->getWidth(),image->getHeight(),image->getDepth(),0,image->getData());
+	texture->load(format,width,height,depth,0,data);
+
 	if(hasAutogen==false && wantsAutogen==true){
 		int mipLevels=texture->getNumMipLevels();
-		int width=image->getWidth(),height=image->getHeight();
-		int hwidth=width,hheight=height;
+		int hwidth=width,hheight=height,hdepth=depth;
 		int i;
 		for(i=1;i<mipLevels;++i){
 			hwidth/=2; hheight/=2;
 			int xoff=width/(hwidth+1),yoff=height/(hheight+1);
 
-			Image::ptr mipImage(new Image(image->getDimension(),image->getFormat(),hwidth,hheight,image->getDepth()));
+			Image::ptr mipImage(new Image(dimension,format,hwidth,hheight,hdepth));
 
 			// TODO: Add depth
 			Pixel<uint8> pixel;
 			int x,y;
-			for(x=0;x<hwidth;++x){
-				for(y=0;y<hheight;++y){
+			for(y=0;y<hheight;++y){
+				for(x=0;x<hwidth;++x){
 					image->getPixel(pixel,xoff+x*(1<<i),yoff+y*(1<<i));
 					mipImage->setPixel(pixel,x,y);
 				}
 			}
 
-			texture->load(mipImage->getFormat(),mipImage->getWidth(),mipImage->getHeight(),mipImage->getDepth(),i,mipImage->getData());
+			texture->load(format,mipImage->getWidth(),mipImage->getHeight(),mipImage->getDepth(),i,mipImage->getData());
 		}
 	}
 
@@ -202,6 +231,8 @@ void TextureManager::postContextReset(peeper::Renderer *renderer){
 		}
 	}
 }
+
+Renderer *TextureManager::getRenderer(){return mEngine->getRenderer();}
 
 }
 }
