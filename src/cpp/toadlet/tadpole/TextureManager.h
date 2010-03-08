@@ -52,6 +52,8 @@ public:
 	virtual void preContextReset(peeper::Renderer *renderer);
 	virtual void postContextReset(peeper::Renderer *renderer);
 
+	peeper::Renderer *getRenderer();
+
 protected:
 	Engine *mEngine;
 	bool mBackable;

@@ -148,6 +148,13 @@ void ResourceManager::setHandler(ResourceHandler::ptr handler,const String &exte
 	}
 }
 
+void ResourceManager::setDefaultHandler(ResourceHandler::ptr handler){
+	Logger::debug(Categories::TOADLET_TADPOLE,
+		"Adding default handler");
+
+	mDefaultHandler=handler;
+}
+
 ResourceHandler::ptr ResourceManager::getHandler(const String &extension){
 	ExtensionHandlerMap::iterator it=mExtensionHandlerMap.find(extension);
 	if(it!=mExtensionHandlerMap.end()){
