@@ -91,7 +91,7 @@ public:
 	void *lighting;				int nlighting;
 	char *entitydata;			int nentitydata;
 
-	egg::Collection<egg::Map<egg::String,egg::String>> entities;
+	egg::Collection<egg::Map<egg::String,egg::String> > entities;
 };
 
 }
