@@ -107,17 +107,15 @@ public:
 	Solid *getTouching() const{return mTouching;}
 	const Vector3 &getTouchingNormal() const{return mTouchingNormal;}
 
-	void setCollisionListener(CollisionListener *listener);
+	void setCollisionListener(CollisionListener *listener){mCollisionListener=listener;}
 	CollisionListener *getCollisionListener() const{return mCollisionListener;}
 
-	void setUserData(void *data);
+	void setUserData(void *data){mUserData=data;}
 	void *getUserData() const{return mUserData;}
 
 	void activate();
 	void setStayActive(bool active);
-	bool getActive() const{return (mActive && mSimulator!=NULL);}
-
-	bool getInside() const{return mInside;}
+	bool active() const{return (mActive && mSimulator!=NULL);}
 
 	void setDoUpdateCallback(bool callback){mDoUpdateCallback=callback;}
 	void setManager(Manager *manager){mManager=manager;}
@@ -166,7 +164,6 @@ protected:
 	Vector3 mTouched2Normal;
 	Solid *mTouching;
 	Vector3 mTouchingNormal;
-	bool mInside;
 
 	bool mDoUpdateCallback;
 	Manager *mManager;

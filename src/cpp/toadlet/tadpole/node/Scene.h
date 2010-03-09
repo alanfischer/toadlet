@@ -89,7 +89,7 @@ public:
 
 	virtual bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact)=0;
 
-	virtual egg::PointerCounter *getCounter() const=0;
+	virtual egg::PointerCounter *pointerCounter() const=0;
 };
 
 }

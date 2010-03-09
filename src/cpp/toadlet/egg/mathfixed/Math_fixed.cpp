@@ -710,7 +710,7 @@ fixed Math::findIntersection(const Segment &segment,const Plane &plane,Vector3 &
 		return t;
 	}
 	else{
-		return -ONE;
+		return ONE;
 	}
 }
 
@@ -725,17 +725,17 @@ fixed Math::findIntersection(const Segment &segment,const Sphere &sphere,Vector3
 	sub(diff,segOrigin,sphOrigin);
 	fixed a=lengthSquared(segDirection);
 	if(a<=0){
-		return -ONE;
+		return ONE;
 	}
 	fixed b=dot(diff,segDirection);
 	fixed c=lengthSquared(diff)-square(sphRadius);
-	fixed time1=-ONE;
-	fixed time2=-ONE;
+	fixed time1=ONE;
+	fixed time2=ONE;
 
 	// If no real roots, then no intersection
 	fixed discr=square(b) - mul(a,c);
 	if(discr<0){
-		time1=-ONE;
+		time1=ONE;
 	}
 	else if(discr>0){
 		fixed root=sqrt(discr);
@@ -744,7 +744,7 @@ fixed Math::findIntersection(const Segment &segment,const Sphere &sphere,Vector3
 		time2=mul((-b)+root,invA);
 
 		if(time1>ONE || time2<0){
-			time1=-ONE;
+			time1=ONE;
 		}
 		else if(time1>=0){
 			mul(point,segDirection,time1);
@@ -762,11 +762,11 @@ fixed Math::findIntersection(const Segment &segment,const Sphere &sphere,Vector3
 			add(point,segOrigin);
 		}
 		else{
-			time1=-ONE;
+			time1=ONE;
 		}
 	}
 
-	if(time1!=-ONE){
+	if(time1!=ONE){
 		sub(normal,point,sphOrigin);
 		normalizeCarefully(normal,0);
 	}
@@ -787,7 +787,7 @@ fixed Math::findIntersection(const Segment &segment,const AABox &box,Vector3 &po
 	fixed candNormX=-ONE;
 	fixed candNormY=-ONE;
 	fixed candNormZ=-ONE;
-	fixed time=-ONE;
+	fixed time=ONE;
 
 	// The below tests were originally < or >, but are now <= or >=
 	// Without this change finds that start on the edge of a box count as inside which conflicts with how testInside works
@@ -840,7 +840,7 @@ fixed Math::findIntersection(const Segment &segment,const AABox &box,Vector3 &po
 
 	// Inside
 	if(inside){
-		return -TWO;
+		return 0;
 	}
 
 	// Calculate t distances to candidate planes
@@ -849,21 +849,21 @@ fixed Math::findIntersection(const Segment &segment,const AABox &box,Vector3 &po
 		maxTX=TOADLET_DIV_XX(candPlaneX-segOrigin.x,segDirection.x);
 	}
 	else{
-		maxTX=-ONE;
+		maxTX=ONE;
 	}
 	// Y
 	if(quadY!=2 /*Middle*/ && segDirection.y!=0){
 		maxTY=TOADLET_DIV_XX(candPlaneY-segOrigin.y,segDirection.y);
 	}
 	else{
-		maxTY=-ONE;
+		maxTY=ONE;
 	}
 	// Z
 	if(quadZ!=2 /*Middle*/ && segDirection.z!=0){
 		maxTZ=TOADLET_DIV_XX(candPlaneZ-segOrigin.z,segDirection.z);
 	}
 	else{
-		maxTZ=-ONE;
+		maxTZ=ONE;
 	}
 
 	// Find largets of maxT's
@@ -888,13 +888,13 @@ fixed Math::findIntersection(const Segment &segment,const AABox &box,Vector3 &po
 
 	// Check final candidate actually inside box and calculate final point
 	if(time<0 || time>ONE){
-		return -ONE;
+		return ONE;
 	}
 	// X
 	if(whichPlane!=0){
 		point.x=segOrigin.x+TOADLET_MUL_XX(time,segDirection.x);
 		if(point.x<boxMins.x || point.x>boxMaxs.x){
-			return -ONE;
+			return ONE;
 		}
 	}
 	else{
@@ -904,7 +904,7 @@ fixed Math::findIntersection(const Segment &segment,const AABox &box,Vector3 &po
 	if(whichPlane!=1){
 		point.y=segOrigin.y+TOADLET_MUL_XX(time,segDirection.y);
 		if(point.y<boxMins.y || point.y>boxMaxs.y){
-			return -ONE;
+			return ONE;
 		}
 	}
 	else{
@@ -914,7 +914,7 @@ fixed Math::findIntersection(const Segment &segment,const AABox &box,Vector3 &po
 	if(whichPlane!=2){
 		point.z=segOrigin.z+TOADLET_MUL_XX(time,segDirection.z);
 		if(point.z<boxMins.z || point.z>boxMaxs.z){
-			return -ONE;
+			return ONE;
 		}
 	}
 	else{
