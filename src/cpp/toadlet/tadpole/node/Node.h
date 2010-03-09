@@ -86,6 +86,9 @@ public:
 	virtual void parentChanged(ParentNode *parent);
 	ParentNode *getParent() const;
 
+	void setParentData(void *data){mParentData=data;}
+	void *getParentData() const{return mParentData;}
+
 	virtual void setTranslate(const Vector3 &translate);
 	virtual void setTranslate(scalar x,scalar y,scalar z);
 	inline const Vector3 &getTranslate() const{return mTranslate;}
@@ -135,11 +138,11 @@ public:
 	virtual void renderUpdate(int dt){}
 
 	virtual void activate();
-	inline bool getActive() const{return mActive;}
+	inline bool active() const{return mActive;}
 
 	inline Engine *getEngine() const{return mEngine;}
 
-	inline egg::PointerCounter *getCounter() const{return mCounter;}
+	inline egg::PointerCounter *pointerCounter() const{return mPointerCounter;}
 	inline const Matrix4x4 &getRenderTransform() const{return mRenderTransform;}
 	inline const Matrix4x4 &getWorldRenderTransform() const{return mWorldRenderTransform;}
 
@@ -177,9 +180,10 @@ public:
 protected:
 	void setRenderTransformTranslate(const Vector3 &translate);
 	void setRenderTransformRotateScale(const Quaternion &rotate,const Vector3 &scale);
+	void transformUpdated();
 
 	// Allocation items
-	egg::PointerCounter *mCounter;
+	egg::PointerCounter *mPointerCounter;
 	bool mManaged;
 
 	// Engine items
@@ -191,6 +195,7 @@ protected:
 	bool mOwnsNodeDestroyedListener;
 
 	Node::ptr mParent;
+	void *mParentData;
 
 	bool mIdentityTransform;
 	Vector3 mTranslate;

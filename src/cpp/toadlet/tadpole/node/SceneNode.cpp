@@ -273,7 +273,7 @@ void SceneNode::logicUpdate(Node::ptr node,int dt,int scope){
 			if(parent->mActivateChildren){
 				child->activate();
 			}
-			if(child->getActive()){
+			if(child->active()){
 				logicUpdate(child,dt,scope);
 				childrenActive=true;
 			}
@@ -358,7 +358,7 @@ void SceneNode::renderUpdate(Node::ptr node,int dt,int scope){
 		int i;
 		for(i=0;i<numChildren;++i){
 			child=parent->mShadowChildren[i];
-			if(child->getActive()){
+			if(child->active()){
 				renderUpdate(child,dt,scope);
 			}
 

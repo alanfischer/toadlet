@@ -448,16 +448,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 
 			path.setStartEnd(oldPosition,newPosition);
 			traceSolidWithCurrentSpacials(c,solid,path);
-
-			if(c.time>=0){
-				// TODO: Improve this Inside logic
-				if(c.time==0 && c.collider!=NULL && c.collider->mMass==Solid::INFINITE_MASS){
-					solid->mInside=true;
-				}
-				else{
-					solid->mInside=false;
-				}
-
+			if(c.time<ONE){
 				// Calculate offset vector, and then resulting position
 				snapToGrid(c.point);
 
@@ -621,7 +612,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 		}
 
 		// Touching code
-		if(c.time<0 && loop==0){
+		if(c.time==ONE && loop==0){
 			solid->mTouching=NULL;
 			solid->mTouched1=NULL;
 			solid->mTouched2=NULL;
@@ -832,7 +823,7 @@ bool Simulator::toSmall(const Vector3 &value) const{
 }
 
 void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment &segment,int collideWithBits,Solid *ignore){
-	result.time=-ONE;
+	result.time=ONE;
 	result.scope=0;
 
 	Solid *solid2;
@@ -842,11 +833,11 @@ void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment 
 	for(i=0;i<mNumSpacialCollection;++i){
 		solid2=mSpacialCollection[i];
 		if(solid2!=ignore && (collideWithBits&solid2->mCollisionBits)!=0){
-			collision.time=-ONE;
+			collision.time=ONE;
 			testSegment(collision,solid2,segment);
 			int scope=result.scope;
-			if(collision.time>=0){
-				if(result.time<0 || collision.time<result.time){
+			if(collision.time<ONE){
+				if(collision.time<result.time){
 					result.set(collision);
 				}
 				else if(result.time==collision.time){
@@ -862,11 +853,11 @@ void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment 
 	}
 
 	if(mManager!=NULL){
-		collision.time=-ONE;
+		collision.time=ONE;
 		mManager->traceSegment(collision,segment);
 		int scope=result.scope;
-		if(collision.time>=0){
-			if(result.time<0 || collision.time<result.time){
+		if(collision.time<ONE){
+			if(collision.time<result.time){
 				result.set(collision);
 			}
 			else if(result.time==collision.time){
@@ -882,7 +873,7 @@ void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment 
 }
 
 void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,const Segment &segment){
-	result.time=-ONE;
+	result.time=ONE;
 
 	if(solid->mCollideWithBits==0){
 		return;
@@ -895,11 +886,11 @@ void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,con
 	for(i=0;i<mNumSpacialCollection;++i){
 		solid2=mSpacialCollection[i];
 		if(solid!=solid2 && (solid->mCollideWithBits&solid2->mCollisionBits)!=0){
-			collision.time=-ONE;
+			collision.time=ONE;
 			testSolid(collision,solid,solid2,segment);
 			int scope=result.scope;
-			if(collision.time>=0){
-				if(result.time<0 || collision.time<result.time){
+			if(collision.time<ONE){
+				if(collision.time<result.time){
 					result.set(collision);
 				}
 				else if(result.time==collision.time){
@@ -915,11 +906,11 @@ void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,con
 	}
 
 	if(mManager!=NULL){
-		collision.time=-ONE;
+		collision.time=ONE;
 		mManager->traceSolid(collision,segment,solid);
 		int scope=result.scope;
-		if(collision.time>=0){
-			if(result.time<0 || collision.time<result.time){
+		if(collision.time<ONE){
+			if(collision.time<result.time){
 				result.set(collision);
 			}
 			else if(result.time==collision.time){
@@ -985,8 +976,8 @@ void Simulator::testSegment(Collision &result,Solid *solid,const Segment &segmen
 		}
 
 		int scope=result.scope;
-		if(collision.time>=0){
-			if(result.time<0 || collision.time<result.time){
+		if(collision.time<ONE){
+			if(collision.time<result.time){
 				result.set(collision);
 			}
 			else if(result.time==collision.time){
@@ -1207,8 +1198,8 @@ void Simulator::testSolid(Collision &result,Solid *solid1,Solid *solid2,const Se
 			}
 
 			int scope=result.scope;
-			if(collision.time>=0){
-				if(result.time<0 || collision.time<result.time){
+			if(collision.time<ONE){
+				if(collision.time<result.time){
 					result.set(collision);
 				}
 				else if(result.time==collision.time){
@@ -1314,7 +1305,7 @@ void Simulator::traceSphere(Collision &c,const Segment &segment,const Sphere &sp
 				normalizeCarefully(c.normal,n,mEpsilon);
 			}
 			else{
-				c.time=-ONE;
+				c.time=ONE;
 			}
 		}
 	}
@@ -1343,7 +1334,7 @@ void Simulator::traceConvexSolid(Collision &c,const Segment &segment,const Conve
 	scalar t;
 	bool b;
 
-	c.time=-ONE;
+	c.time=ONE;
 
 	// Check the segment against each plane in the solid
 	for(i=0;i<convexSolid.planes.size();++i){
@@ -1373,7 +1364,7 @@ void Simulator::traceConvexSolid(Collision &c,const Segment &segment,const Conve
 			}
 			if(b){
 				// This point (u) IS a valid collison for face i
-				if(c.time==-ONE){
+				if(c.time==ONE){
 					// This is the first valid collsion point
 					c.time=t;
 					c.point.set(u);

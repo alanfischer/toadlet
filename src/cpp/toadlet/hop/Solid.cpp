@@ -67,7 +67,6 @@ Solid::Solid():
 	//mTouched2Normal,
 	//mTouching,
 	//mTouchingNormal,
-	mInside(false),
 
 	mDoUpdateCallback(false),
 	mManager(NULL),
@@ -114,7 +113,6 @@ void Solid::reset(){
 	mTouched2Normal.reset();
 	mTouching=NULL;
 	mTouchingNormal.reset();
-	mInside=false;
 	
 	mDoUpdateCallback=false;
 	
@@ -163,7 +161,6 @@ void Solid::setPosition(const Vector3 &position){
 	mTouched1=NULL;
 	mTouched2=NULL;
 	mTouching=NULL;
-	mInside=false;
 }
 
 void Solid::setVelocity(const Vector3 &velocity){
@@ -194,14 +191,6 @@ void Solid::removeAllShapes(){
 	mShapes.clear();
 	updateLocalBound();
 	activate();
-}
-
-void Solid::setCollisionListener(CollisionListener *listener){
-	mCollisionListener=listener;
-}
-
-void Solid::setUserData(void *data){
-	mUserData=data;
 }
 
 void Solid::activate(){
