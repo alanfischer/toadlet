@@ -148,7 +148,7 @@ Node *ParentNode::findNodeByName(const String &name){
 }
 
 void ParentNode::activate(){
-	mActivateChildren=true;//!mActive;
+	mActivateChildren=true;
 	super::activate();
 }
 

@@ -236,6 +236,14 @@ void HopEntity::setTraceableShape(Traceable *traceable){
 void HopEntity::addShape(hop::Shape::ptr shape){
 	mSolid->addShape(shape);
 
+	const AABox &bound=mSolid->getLocalBound();
+	Vector3 origin;
+	Math::add(origin,bound.maxs,bound.mins);
+	Math::div(origin,Math::TWO);
+	scalar radius=Math::maxVal(Math::maxVal(
+		Math::maxVal(-bound.mins.x-origin.x,bound.maxs.x-origin.x),Math::maxVal(-bound.mins.y-origin.y,bound.maxs.y-origin.y)),Math::maxVal(-bound.mins.z-origin.z,bound.maxs.z-origin.z));
+	setLocalBound(Sphere(origin,radius));
+
 	if(mVolumeNode!=NULL){
 		showCollisionVolumes(true);
 	}
@@ -356,11 +364,11 @@ void HopEntity::collision(const hop::Collision &c){
 
 void HopEntity::preLogicUpdateLoop(int dt){
 	mLastPosition.set(mSolid->getPosition());
-	mActivePrevious=mSolid->getActive();
+	mActivePrevious=mSolid->active();
 }
 
 void HopEntity::postLogicUpdate(int dt){
-	if(mSolid->getActive()){
+	if(mSolid->active()){
 		mTranslate.set(mSolid->getPosition());
 		activate();
 	}

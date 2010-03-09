@@ -25,11 +25,14 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/bsp/BSP30Handler.h>
+#include <toadlet/tadpole/handler/WADArchive.h>
 #include <stdlib.h>
 #include <string.h> // memset
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
+using namespace toadlet::peeper;
+using namespace toadlet::tadpole::handler;
 
 namespace toadlet{
 namespace tadpole{
@@ -74,17 +77,103 @@ Resource::ptr BSP30Handler::load(Stream::ptr stream,const ResourceHandlerData *h
 	readLump(stream,LUMP_VISIBILITY,	(void**)&map->visibility,1,						&map->nvisibility);
 	readLump(stream,LUMP_TEXTURES,		(void**)&map->textures,1,						&map->ntextures);
 	readLump(stream,LUMP_LIGHTING,		(void**)&map->lighting,1,						&map->nlighting);
-	readLump(stream,LUMP_ENTITIES,		(void**)&map->entitydata,1,						&map->nentitydata);
+	readLump(stream,LUMP_ENTITIES,		(void**)&map->entities,1,						&map->nentities);
 
-	// Parse Entity data
-	char *data=map->entitydata;
+	parseVisibility(map);
+	parseEntities(map);
+	parseWADs(map);
+	parseTextures(map);
+
+	return map;
+}
+
+void BSP30Handler::readLump(Stream *stream,int lump,void **data,int size,int *count){
+	int length=header.lumps[lump].filelen;
+	int ofs=header.lumps[lump].fileofs;
+
+	stream->seek(ofs);
+	*data=malloc(length);
+	stream->read((byte*)*data,length);
+
+	if(count!=NULL){
+		*count=length/size;
+	}
+}
+
+void BSP30Handler::parseVisibility(BSP30Map *map){
+	int count;
+	int i,c,index;
+	unsigned char bit;
+
+	if(map->nvisibility==0){
+		return; // No vis data to decompress
+	}
+
+	map->parsedVisibility.resize(map->nleafs);
+
+	// First allocate space for each leaf
+	for(i=0;i<map->nleafs;i++){
+		int v=map->leafs[i].visofs;
+		if(v>=0){
+			count=0;
+
+			// We enumerate through all possible leafs
+			for(c=1;c<map->models[0].visleafs;v++){
+				// If the whole byte is zero, that means the nextvis*8 leafs are invisible, so skip them
+				if(((byte*)map->visibility)[v]==0){
+					v++;
+					c+=(((byte*)map->visibility)[v]<<3);
+				}
+				// Otherwise, we need to check each bit to see if that leaf is visible
+				else{
+					for(bit=1;bit;bit<<=1,c++){
+						if(((byte*)map->visibility)[v]&bit){
+							count++;
+						}
+					}
+				}
+			}
+
+			map->parsedVisibility[i].resize(count);
+		}
+	}
+
+	// Now actually store the leaf vis info
+	for(i=0;i<map->nleafs;i++){
+		int v=map->leafs[i].visofs;
+		if(v>=0){
+			index=0;
+
+			// We enumerate through all possible leafs
+			for(c=1;c<map->models[0].visleafs;v++){
+				// If the whole byte is zero, that means the nextvis*8 leafs are invisible, so skip them
+				if(((byte*)map->visibility)[v]==0){
+					v++;
+					c+=(((byte*)map->visibility)[v]<<3);
+				}
+				// Otherwise, we need to check each bit to see if that leaf is visible
+				else{
+					for(bit=1;bit;bit<<=1,c++){
+						if(((byte*)map->visibility)[v]&bit){
+							map->parsedVisibility[i][index]=c;
+							index++;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+void BSP30Handler::parseEntities(BSP30Map *map){
+	char *data=map->entities;
 	Map<String,String> keyValues;
 	while(*data!=0){
 		if(*data=='{'){
 			keyValues.clear();
 		}
 		else if(*data=='}'){
-			map->entities.add(keyValues);
+			map->parsedEntities.add(keyValues);
 		}
 		else if(*data=='\"'){
 			char *key=++data;
@@ -101,20 +190,40 @@ Resource::ptr BSP30Handler::load(Stream::ptr stream,const ResourceHandlerData *h
 		}
 		data++;
 	}
-
-	return map;
 }
 
-void BSP30Handler::readLump(Stream *stream,int lump,void **data,int size,int *count){
-	int length=header.lumps[lump].filelen;
-	int ofs=header.lumps[lump].fileofs;
+void BSP30Handler::parseWADs(BSP30Map *map){
+	if(map->parsedEntities.size()>0 && map->parsedEntities[0]["classname"].equals("worldspawn")){
+		String wad=map->parsedEntities[0]["wad"];
+		int start=0,end=0;
+		while((end=wad.find(".wad",end+1))!=-1){
+			start=Math::maxVal(wad.rfind('\\',end)+1,wad.rfind(';',end)+1);
+			String file=wad.substr(start,(end-start)+4);
+			Archive::ptr archive=mEngine->getArchiveManager()->findArchive(file);
+			if(archive!=NULL){
+				mEngine->getTextureManager()->addResourceArchive(archive);
+			}
+		}
+	}
+}
 
-	stream->seek(ofs);
-	*data=malloc(length);
-	stream->read((byte*)*data,length);
-
-	if(count!=NULL){
-		*count=length/size;
+void BSP30Handler::parseTextures(BSP30Map *map){
+	bmiptexlump *lump=(bmiptexlump*)map->textures;
+	map->parsedTextures.resize(lump->nummiptex);
+	int i;
+	for(i=0;i<lump->nummiptex;i++){
+		Texture::ptr texture;
+		if(lump->dataofs[i]!=-1){
+			WADArchive::wmiptex *miptex=(WADArchive::wmiptex*)(&((byte*)map->textures)[lump->dataofs[i]]);
+			texture=WADArchive::createTexture(mEngine->getTextureManager(),miptex);
+			if(texture==NULL){
+				texture=mEngine->getTextureManager()->findTexture(miptex->name);
+			}
+			if(texture!=NULL){
+				texture->retain();
+			}
+		}
+		map->parsedTextures[i]=texture;
 	}
 }
 

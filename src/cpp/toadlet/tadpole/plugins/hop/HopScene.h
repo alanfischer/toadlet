@@ -135,7 +135,7 @@ public:
 	virtual bool isServer(){return mServer;}
 void setServer(bool server){mServer=server;}
 
-	virtual egg::PointerCounter *getCounter() const{return mCounter;}
+	virtual egg::PointerCounter *pointerCounter() const{return mCounter;}
 
 	static void set(tadpole::Collision &r,hop::Collision &c);
 	static void set(hop::Collision &r,tadpole::Collision &c,HopEntity *collider);

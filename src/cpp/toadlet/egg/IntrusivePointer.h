@@ -34,11 +34,11 @@ namespace egg{
 class DefaultIntrusiveSemantics{
 public:
 	template<typename Type> static int addReference(Type *type){
-		return type->getCounter()->incSharedCount();
+		return type->pointerCounter()->incSharedCount();
 	}
 
 	template<typename Type> static int releaseReference(Type *type){
-		PointerCounter *counter=type->getCounter();
+		PointerCounter *counter=type->pointerCounter();
 		int count=counter->decSharedCount();
 		if(count<1){
 			delete type;
@@ -48,7 +48,7 @@ public:
 
 	// Only necessary if you wish to use a WeakPointer with an IntrusivePointer
 	template<typename Type> static PointerCounter *getCount(Type *type){
-		return type->getCounter();
+		return type->pointerCounter();
 	}
 };
 

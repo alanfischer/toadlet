@@ -223,7 +223,7 @@ void HopScene::preRenderUpdate(int dt){
 
 	for(i=mHopEntities.size()-1;i>=0;--i){
 		HopEntity *entity=mHopEntities[i];
-		active=entity->mSolid->getActive();
+		active=entity->mSolid->active();
 		activePrevious=entity->mActivePrevious;
 		if(active || activePrevious){
 			// TODO: Add an option to either use strict interpolation, or fuzzy interpolation

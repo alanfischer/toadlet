@@ -54,15 +54,15 @@ public:
 	TOADLET_INTRUSIVE_POINTERS(StreamIStream);
 	
 	StreamIStream(Stream::ptr base):
-		mCounter(new PointerCounter(0)),
+		mPointerCounter(new PointerCounter(0)),
 		mBase(base)
 	{}
 
-	PointerCounter *getCounter(){return mCounter;}
+	PointerCounter *pointerCounter(){return mPointerCounter;}
 
 	HRESULT STDMETHODCALLTYPE QueryInterface(const IID &riid,void **ppvObject){return E_NOINTERFACE;}
-	ULONG STDMETHODCALLTYPE AddRef(){return mCounter->incSharedCount();}
-	ULONG STDMETHODCALLTYPE Release(){return mCounter->decSharedCount();}
+	ULONG STDMETHODCALLTYPE AddRef(){return mPointerCounter->incSharedCount();}
+	ULONG STDMETHODCALLTYPE Release(){return mPointerCounter->decSharedCount();}
 
 	HRESULT STDMETHODCALLTYPE Read(void *pv,ULONG cb,ULONG *pcbRead){
 		int amount=mBase->read((byte*)pv,cb);
@@ -112,7 +112,7 @@ public:
 	HRESULT STDMETHODCALLTYPE Clone(IStream **ppstm){return E_NOTIMPL;}
 
 protected:
-	PointerCounter *mCounter;
+	PointerCounter *mPointerCounter;
 	Stream::ptr mBase;
 };
 

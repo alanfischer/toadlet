@@ -91,9 +91,12 @@ public:
 
 	bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact);
 
-	void logicUpdate(Node::ptr node,int dt,int scope);
-	void getIntersectingLeafs(egg::Collection<int> &leafs,int ni,const Sphere &bound);
-	void getIntersectingLeafs(egg::Collection<int> &leafs,int ni,const AABox &bound);
+	bool attach(Node *node);
+	bool remove(Node *node);
+	void insertNodeLeafIndexes(const egg::Collection<int> &indexes,Node *node);
+	void removeNodeLeafIndexes(const egg::Collection<int> &indexes,Node *node);
+
+	void childTransformUpdated(Node *child);
 
 //protected:
 	// TODO: We need to get away from this markfaces stuff, make it more universal
@@ -116,9 +119,7 @@ public:
 	bool preLayerRender(peeper::Renderer *renderer,int layer);
 	void processVisibleFaces(node::CameraNode *camera);
 	void renderVisibleFaces(peeper::Renderer *renderer);
-	int findLeaf(int model,const Vector3 &point) const;
 	void addLeafToVisible(bleaf *leaf,RendererData &data,node::CameraNode *camera) const;
-	void decompressVIS();
 	void calculateSurfaceExtents(bface *face,Vector2 &mins,Vector2 &maxs);
 	egg::image::Image::ptr computeLightmap(bface *face,const Vector2 &mins,const Vector2 &maxs);
 
@@ -129,14 +130,21 @@ public:
 	peeper::VertexData::ptr mVertexData;
 	egg::Collection<RenderFace> mRenderFaces;
 
-	egg::Collection<egg::Collection<Node::ptr> > mNodeLists;
-	egg::Map<Node::ptr,egg::Collection<int> > mNodeToNodeListMap;
+	int mCounter;
+	egg::Collection<int> mLeafIndexes;
 
-	// TODO: And clean up these hacky members.
-	egg::Collection<peeper::Texture::ptr> textures; // Shouldnt be storing textures here, instead we need to go by material
-	egg::Collection<egg::Collection<int> > leafVisibility;
-	
-	egg::Collection<egg::Map<egg::String,egg::String> > mEntityData;
+	class childdata{
+	public:
+		childdata():counter(0){}
+		egg::Collection<int> leafs;
+		int counter;
+	};
+
+	class bleafdata{
+	public:
+		egg::Collection<Node*> occupants;
+	};
+	egg::Collection<bleafdata> mLeafData;
 };
 
 }

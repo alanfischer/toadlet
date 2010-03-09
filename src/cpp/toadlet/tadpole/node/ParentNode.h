@@ -59,6 +59,8 @@ public:
 
 	virtual void activate();
 
+	virtual void childTransformUpdated(Node *child){}
+
 protected:
 	virtual void updateShadowChildren();
 
