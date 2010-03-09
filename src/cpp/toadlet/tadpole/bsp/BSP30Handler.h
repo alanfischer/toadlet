@@ -45,6 +45,10 @@ public:
 
 protected:
 	void readLump(egg::io::Stream *stream,int lump,void **data,int size,int *count);
+	void parseVisibility(BSP30Map *map);
+	void parseEntities(BSP30Map *map);
+	void parseWADs(BSP30Map *map);
+	void parseTextures(BSP30Map *map);
 
 	Engine *mEngine;
 	bheader header;

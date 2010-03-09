@@ -37,7 +37,7 @@ namespace node{
 TOADLET_NODE_IMPLEMENT(Node,Categories::TOADLET_TADPOLE_NODE+".Node");
 
 Node::Node():
-	mCounter(new PointerCounter(0)),
+	mPointerCounter(new PointerCounter(0)),
 	mManaged(false),
 
 	mCreated(false),
@@ -47,6 +47,7 @@ Node::Node():
 	mOwnsNodeDestroyedListener(false),
 
 	//mParent,
+	mParentData(NULL),
 
 	mIdentityTransform(false),
 	//mScale,
@@ -143,74 +144,50 @@ ParentNode *Node::getParent() const{
 
 void Node::setTranslate(const Vector3 &translate){
 	mTranslate.set(translate);
-
 	setRenderTransformTranslate(mTranslate);
-
-	mIdentityTransform=false;
-	activate();
+	transformUpdated();
 }
 
 void Node::setTranslate(scalar x,scalar y,scalar z){
 	mTranslate.set(x,y,z);
-
 	setRenderTransformTranslate(mTranslate);
-
-	mIdentityTransform=false;
-	activate();
+	transformUpdated();
 }
 
 void Node::setRotate(const Matrix3x3 &rotate){
 	Math::setQuaternionFromMatrix3x3(mRotate,rotate);
-
 	setRenderTransformRotateScale(mRotate,mScale);
-
-	mIdentityTransform=false;
-	activate();
+	transformUpdated();
 }
 
 void Node::setRotate(const Quaternion &rotate){
 	mRotate.set(rotate);
-
 	setRenderTransformRotateScale(mRotate,mScale);
-
-	mIdentityTransform=false;
-	activate();
+	transformUpdated();
 }
 
 void Node::setRotate(scalar x,scalar y,scalar z,scalar angle){
 	Math::setQuaternionFromAxisAngle(mRotate,cache_setRotate_vector.set(x,y,z),angle);
-
 	setRenderTransformRotateScale(mRotate,mScale);
-
-	mIdentityTransform=false;
-	activate();
+	transformUpdated();
 }
 
 void Node::setScale(const Vector3 &scale){
 	mScale.set(scale);
-
 	setRenderTransformRotateScale(mRotate,mScale);
-
-	mIdentityTransform=false;
-	activate();
+	transformUpdated();
 }
 
 void Node::setScale(scalar x,scalar y,scalar z){
 	mScale.set(x,y,z);
-
 	setRenderTransformRotateScale(mRotate,mScale);
-
-	mIdentityTransform=false;
-	activate();
+	transformUpdated();
 }
 
 void Node::setScale(scalar s){
 	mScale.set(s,s,s);
-
 	setRenderTransformRotateScale(mRotate,mScale);
-
-	mIdentityTransform=false;
-	activate();
+	transformUpdated();
 }
 
 void Node::setTransform(const Matrix4x4 &transform){
@@ -218,11 +195,8 @@ void Node::setTransform(const Matrix4x4 &transform){
 	Math::setRotateFromMatrix4x4(cache_setTransform_matrix,transform,mScale);
 	Math::setQuaternionFromMatrix3x3(mRotate,cache_setTransform_matrix);
 	Math::setTranslateFromMatrix4x4(mTranslate,transform);
-
 	mRenderTransform.set(transform);
-
-	mIdentityTransform=false;
-	activate();
+	transformUpdated();
 }
 
 // Currently just uses the worldRenderTransform, should be changed to walk up the scene till it finds a common parent,
@@ -250,6 +224,7 @@ void Node::setCameraAligned(bool cameraAligned){
 
 void Node::setLocalBound(const Sphere &bound){
 	mLocalBound.set(bound);
+	transformUpdated();
 }
 
 void Node::setReceiveUpdates(bool receiveUpdates){
@@ -277,6 +252,14 @@ void Node::setRenderTransformTranslate(const Vector3 &translate){
 void Node::setRenderTransformRotateScale(const Quaternion &rotate,const Vector3 &scale){
 	Math::setMatrix3x3FromQuaternion(cache_setTransform_matrix,rotate);
 	Math::setMatrix4x4FromRotateScale(mRenderTransform,cache_setTransform_matrix,scale);
+}
+
+void Node::transformUpdated(){
+	mIdentityTransform=false;
+	activate();
+	if(mParent!=NULL){
+		shared_static_cast<ParentNode>(mParent)->childTransformUpdated(this);
+	}
 }
 
 }

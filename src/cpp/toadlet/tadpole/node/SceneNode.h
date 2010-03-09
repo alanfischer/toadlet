@@ -110,7 +110,7 @@ public:
 	void queueLight(LightNode *light);
 	CameraNode *getCamera() const{return mCamera;} // Only valid during rendering operations
 
-	virtual egg::PointerCounter *getCounter() const{return super::getCounter();}
+	virtual egg::PointerCounter *pointerCounter() const{return super::pointerCounter();}
 
 protected:
 	class RenderLayer{

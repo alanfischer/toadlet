@@ -663,9 +663,8 @@ bool Math::testInside(const Vector3 &point,const AABox &box){
 }
 
 bool Math::testIntersection(const AABox &box1,const AABox &box2){
-	// Look for a separating axis on each box for each axis
 	return	!(box1.mins.x>box2.maxs.x || box1.mins.y>box2.maxs.y || box1.mins.z>box2.maxs.z ||
-			box2.mins.x>box1.maxs.x || box2.mins.y>box1.maxs.y || box2.mins.z>box1.maxs.z);
+			  box2.mins.x>box1.maxs.x || box2.mins.y>box1.maxs.y || box2.mins.z>box1.maxs.z);
 }
 
 bool Math::testIntersection(const Sphere &sphere,const AABox &box){
@@ -712,7 +711,7 @@ real Math::findIntersection(const Segment &segment,const Plane &plane,Vector3 &p
 		return t;
 	}
 	else{
-		return -1.0;
+		return 1.0;
 	}
 }
 
@@ -727,17 +726,17 @@ real Math::findIntersection(const Segment &segment,const Sphere &sphere,Vector3 
 	sub(diff,segOrigin,sphOrigin);
 	real a=lengthSquared(segDirection);
 	if(a<=0.0){
-		return -1.0;
+		return 1.0;
 	}
 	real b=dot(diff,segDirection);
 	real c=lengthSquared(diff)-square(sphRadius);
-	real time1=-1.0;
-	real time2=-1.0;
+	real time1=1.0;
+	real time2=1.0;
 
 	// If no real roots, then no intersection
 	real discr=b*b - a*c;
 	if(discr<0.0){
-		time1=-1.0;
+		time1=1.0;
 	}
 	else if(discr>0.0){
 		real root=sqrt(discr);
@@ -746,7 +745,7 @@ real Math::findIntersection(const Segment &segment,const Sphere &sphere,Vector3 
 		time2=((-b)+root)*invA;
 
 		if(time1>1.0 || time2<0.0){
-			time1=-1.0;
+			time1=1.0;
 		}
 		else if(time1>=0.0){
 			mul(point,segDirection,time1);
@@ -759,16 +758,16 @@ real Math::findIntersection(const Segment &segment,const Sphere &sphere,Vector3 
 	}
 	else{
 		time1=-b/a;
-		if(0.0<=time1 && time1<=1){
+		if(0.0<=time1 && time1<=1.0){
 			mul(point,segDirection,time1);
 			add(point,segOrigin);
 		}
 		else{
-			time1=-1.0;
+			time1=1.0;
 		}
 	}
 
-	if(time1!=-1.0){
+	if(time1!=1.0){
 		sub(normal,point,sphOrigin);
 		normalizeCarefully(normal,0);
 	}
@@ -789,7 +788,7 @@ real Math::findIntersection(const Segment &segment,const AABox &box,Vector3 &poi
 	real candNormX=-1.0;
 	real candNormY=-1.0;
 	real candNormZ=-1.0;
-	real time=-1.0;
+	real time=1.0;
 
 	// The below tests were originally < or >, but are now <= or >=
 	// Without this change finds that start on the edge of a box count as inside which conflicts with how testInside works
@@ -842,7 +841,7 @@ real Math::findIntersection(const Segment &segment,const AABox &box,Vector3 &poi
 
 	// Inside
 	if(inside){
-		return -2.0;
+		return 0.0;
 	}
 
 	// Calculate t distances to candidate planes
@@ -851,21 +850,21 @@ real Math::findIntersection(const Segment &segment,const AABox &box,Vector3 &poi
 		maxTX=(candPlaneX-segOrigin.x)/segDirection.x;
 	}
 	else{
-		maxTX=-1.0;
+		maxTX=1.0;
 	}
 	// Y
 	if(quadY!=2 /*Middle*/ && segDirection.y!=0){
 		maxTY=(candPlaneY-segOrigin.y)/segDirection.y;
 	}
 	else{
-		maxTY=-1.0;
+		maxTY=1.0;
 	}
 	// Z
 	if(quadZ!=2 /*Middle*/ && segDirection.z!=0){
 		maxTZ=(candPlaneZ-segOrigin.z)/segDirection.z;
 	}
 	else{
-		maxTZ=-1.0;
+		maxTZ=1.0;
 	}
 
 	// Find largets of maxT's
@@ -890,13 +889,13 @@ real Math::findIntersection(const Segment &segment,const AABox &box,Vector3 &poi
 
 	// Check final candidate actually inside box and calculate final point
 	if(time<0.0 || time>1.0){
-		return -1.0;
+		return 1.0;
 	}
 	// X
 	if(whichPlane!=0){
 		point.x=segOrigin.x+time*segDirection.x;
 		if(point.x<boxMins.x || point.x>boxMaxs.x){
-			return -1.0;
+			return 1.0;
 		}
 	}
 	else{
@@ -906,7 +905,7 @@ real Math::findIntersection(const Segment &segment,const AABox &box,Vector3 &poi
 	if(whichPlane!=1){
 		point.y=segOrigin.y+time*segDirection.y;
 		if(point.y<boxMins.y || point.y>boxMaxs.y){
-			return -1.0;
+			return 1.0;
 		}
 	}
 	else{
@@ -916,7 +915,7 @@ real Math::findIntersection(const Segment &segment,const AABox &box,Vector3 &poi
 	if(whichPlane!=2){
 		point.z=segOrigin.z+time*segDirection.z;
 		if(point.z<boxMins.z || point.z>boxMaxs.z){
-			return -1.0;
+			return 1.0;
 		}
 	}
 	else{

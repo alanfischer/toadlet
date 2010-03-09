@@ -36,7 +36,7 @@ class Solid;
 class Collision{
 public:
 	Collision():
-		time(-Math::ONE),
+		time(Math::ONE),
 		//point,
 		//normal,
 		//velocity,
@@ -57,7 +57,7 @@ public:
 	}
 
 	inline Collision &reset(){
-		time=-1.0;
+		time=Math::ONE;
 		point.reset();
 		normal.reset();
 		velocity.reset();
