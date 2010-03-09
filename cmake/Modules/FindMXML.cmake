@@ -14,7 +14,7 @@ if (WIN32)
 			"C:/Program Files/Windows Mobile 6 SDK/PocketPC/Include/Armv4i"
 			"C:/Program Files/Microsoft Visual Studio 8/SmartDevices/SDK/PocketPC2003/Include"
 		)
-		find_library (MXML_LIBRARY NAMES mxml PATHS
+		find_library (MXML_LIBRARY NAMES mxml mxml1 PATHS
 			"C:/Program Files/Windows Mobile 6 SDK/PocketPC/Lib/Armv4i"
 			"C:/Program Files/Microsoft Visual Studio 8/SmartDevices/SDK/PocketPC2003/Lib/armv4"
 		)
@@ -22,7 +22,7 @@ if (WIN32)
 		find_path (MXML_INCLUDE_DIR mxml.h
 			"C:/Program Files/Microsoft Visual Studio 8/VC/include"
 		)
-		find_library (MXML_LIBRARY NAMES mxml PATHS
+		find_library (MXML_LIBRARY NAMES mxml mxml1 PATHS
 			"C:/Program Files/Microsoft Visual Studio 8/VC/lib"
 		)
 	endif (WINCE)
