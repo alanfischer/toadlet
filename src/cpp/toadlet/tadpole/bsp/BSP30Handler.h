@@ -44,14 +44,13 @@ public:
 	virtual egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
 
 protected:
-	void readLump(egg::io::Stream *stream,int lump,void **data,int size,int *count);
+	void readLump(egg::io::Stream *stream,blump *lump,void **data,int size,int *count);
 	void parseVisibility(BSP30Map *map);
 	void parseEntities(BSP30Map *map);
 	void parseWADs(BSP30Map *map);
 	void parseTextures(BSP30Map *map);
 
 	Engine *mEngine;
-	bheader header;
 };
 
 }

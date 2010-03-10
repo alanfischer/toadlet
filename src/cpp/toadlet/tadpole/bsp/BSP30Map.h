@@ -28,6 +28,7 @@
 
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/tadpole/bsp/BSP30Types.h>
+#include <toadlet/tadpole/Collision.h>
 #include <stdlib.h>
 
 namespace toadlet{
@@ -55,7 +56,9 @@ public:
 		textures(NULL),		ntextures(0),
 		lighting(NULL),		nlighting(0),
 		entities(NULL),	nentities(0)
-	{};
+	{
+		header.version=0;
+	};
 	
 	void destroy(){
 		if(models!=NULL){		free(models);		nmodels=0;}
@@ -100,6 +103,110 @@ public:
 		}
 
 		return -1-index;
+	}
+
+	static bool hullTrace(Collision &result,bplane *planes,bleaf *leafs,void *hull,int hullStride,int index,scalar p1t,scalar p2t,const Vector3 &p1,const Vector3 &p2,scalar epsilon){
+		bclipnode *node=NULL;
+		bplane *plane=NULL;
+		scalar t1=0,t2=0;
+		scalar time=0;
+		Vector3 mid;
+		scalar midt=0;
+		int side=0;
+
+		if(index<0){
+			int contents=(leafs!=NULL)?(leafs[-1-index].contents):(index);
+			result.scope=(-1-contents)<<1;
+			if(contents==CONTENTS_SOLID) result.time=0;
+			return true;
+		}
+
+		node=(bclipnode*)(((byte*)hull)+hullStride*index);
+		plane=planes+node->planenum;
+
+		if(plane->type<3){
+			t1=p1[plane->type]-plane->dist;
+			t2=p2[plane->type]-plane->dist;
+		}
+		else{
+			t1=Math::dot(plane->normal,p1)-plane->dist;
+			t2=Math::dot(plane->normal,p2)-plane->dist;
+		}
+
+#if 1
+		if(t1>=0 && t2>=0){
+			return hullTrace(result,planes,leafs,hull,hullStride,node->children[0],p1t,p2t,p1,p2,epsilon);
+		}
+		if(t1<0 && t2<0){
+			return hullTrace(result,planes,leafs,hull,hullStride,node->children[1],p1t,p2t,p1,p2,epsilon);
+		}
+#else
+		if(t1>=epsilon && t2>=epsilon){
+			return hullTrace(result,planes,leafs,hull,hullStride,node->children[0],p1t,p2t,p1,p2,epsilon);
+		}
+		if(t1<epsilon && t2<epsilon){
+			return hullTrace(result,planes,leafs,hull,hullStride,node->children[1],p1t,p2t,p1,p2,epsilon);
+		}
+#endif
+
+		if(t1<0){
+			time=Math::div(t1+epsilon,t1-t2);
+		}
+		else{
+			time=Math::div(t1-epsilon,t1-t2);
+		}
+		time=Math::clamp(0,Math::ONE,time);
+
+		midt=p1t+Math::mul(p2t-p1t,time);
+		mid.x=p1.x+Math::mul(p2.x-p1.x,time);
+		mid.y=p1.y+Math::mul(p2.y-p1.y,time);
+		mid.z=p1.z+Math::mul(p2.z-p1.z,time);
+
+		side=(t1<0);
+
+		if(!hullTrace(result,planes,leafs,hull,hullStride,node->children[side],p1t,midt,p1,mid,epsilon)){
+			return false;
+		}
+
+		int leaf=findPointLeaf(planes,hull,hullStride,node->children[side^1],mid);
+		if(((leafs!=NULL)?(leafs[leaf].contents):(-1-leaf))!=CONTENTS_SOLID){
+			return hullTrace(result,planes,leafs,hull,hullStride,node->children[side^1],midt,p2t,mid,p2,epsilon);
+		}
+
+		if(result.time==0){
+			return false;
+		}
+
+		// Other side is solid, we have impact point
+		if(!side){
+			result.normal.set(plane->normal);
+		}
+		else{
+			Math::neg(result.normal,plane->normal);
+		}
+
+		// Sometimes we have to walk backwards
+		while(true){
+			int leaf=findPointLeaf(planes,hull,hullStride,0,mid);
+			if(((leafs!=NULL)?(leafs[leaf].contents):(-1-leaf))!=CONTENTS_SOLID) break;
+
+			time-=epsilon*4;
+			if(time<0){
+				result.time=midt;
+				result.point.set(mid);
+				return false;
+			}
+
+			midt=p1t+Math::mul(p2t-p1t,time);
+			mid.x=p1.x+Math::mul(p2.x-p1.x,time);
+			mid.y=p1.y+Math::mul(p2.y-p1.y,time);
+			mid.z=p1.z+Math::mul(p2.z-p1.z,time);
+		}
+
+		result.time=midt;
+		result.point.set(mid);
+
+		return false;
 	}
 
 	template<typename Bound>
@@ -158,6 +265,7 @@ public:
 		return d<=Math::mul(sphere.radius,sphere.radius);
 	}
 
+	bheader header;
 	bmodel *models;				int nmodels;
 	bvertex *vertexes;			int nvertexes;
 	bplane *planes;				int nplanes;
@@ -175,7 +283,7 @@ public:
 	char *entities;				int nentities;
 
 	egg::Collection<egg::Collection<int> > parsedVisibility;
-	egg::Collection<egg::Map<egg::String,egg::String>> parsedEntities;
+	egg::Collection<egg::Map<egg::String,egg::String> > parsedEntities;
 	egg::Collection<peeper::Texture::ptr> parsedTextures;
 };
 

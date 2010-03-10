@@ -7,7 +7,8 @@ namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-static const int BSPVERSION=30;
+static const int Q1BSPVERSION=29;
+static const int HLBSPVERSION=30;
 static const int MAX_MAP_HULLS=4;
 
 enum{

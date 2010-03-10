@@ -447,7 +447,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 			}
 
 			path.setStartEnd(oldPosition,newPosition);
-			traceSolidWithCurrentSpacials(c,solid,path);
+			traceSolidWithCurrentSpacials(c,solid,path,solid->mCollideWithBits);
 			if(c.time<ONE){
 				// Calculate offset vector, and then resulting position
 				snapToGrid(c.point);
@@ -713,10 +713,6 @@ int Simulator::findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids)
 }
 
 void Simulator::traceSegment(Collision &result,const Segment &segment,int collideWithBits,Solid *ignore){
-	if(collideWithBits==0){
-		collideWithBits=-1;
-	}
-
 	Vector3 endPoint=cache_traceSegment_endPoint;
 	segment.getEndPoint(endPoint);
 	AABox total=cache_traceSegment_total.set(segment.origin,segment.origin);
@@ -726,7 +722,7 @@ void Simulator::traceSegment(Collision &result,const Segment &segment,int collid
 	traceSegmentWithCurrentSpacials(result,segment,collideWithBits,ignore);
 }
 
-void Simulator::traceSolid(Collision &result,Solid *solid,const Segment &segment){
+void Simulator::traceSolid(Collision &result,Solid *solid,const Segment &segment,int collideWithBits){
 	#if defined(TOADLET_FIXED_POINT)
 		scalar x=TOADLET_MAX_XX(-segment.direction.x,segment.direction.x);
 		scalar y=TOADLET_MAX_XX(-segment.direction.y,segment.direction.y);
@@ -754,178 +750,10 @@ void Simulator::traceSolid(Collision &result,Solid *solid,const Segment &segment
 
 	mNumSpacialCollection=findSolidsInAABox(box,mSpacialCollection.begin(),mSpacialCollection.size());
 
-	traceSolidWithCurrentSpacials(result,solid,segment);
+	traceSolidWithCurrentSpacials(result,solid,segment,collideWithBits);
 }
 
-void Simulator::capVector3(Vector3 &vector,scalar value) const{
-	#if defined(TOADLET_FIXED_POINT)
-		vector.x=TOADLET_MAX_XX(-value,vector.x);
-		vector.x=TOADLET_MIN_XX(value,vector.x);
-		vector.y=TOADLET_MAX_XX(-value,vector.y);
-		vector.y=TOADLET_MIN_XX(value,vector.y);
-		vector.z=TOADLET_MAX_XX(-value,vector.z);
-		vector.z=TOADLET_MIN_XX(value,vector.z);
-	#else
-		vector.x=TOADLET_MAX_RR(-value,vector.x);
-		vector.x=TOADLET_MIN_RR(value,vector.x);
-		vector.y=TOADLET_MAX_RR(-value,vector.y);
-		vector.y=TOADLET_MIN_RR(value,vector.y);
-		vector.z=TOADLET_MAX_RR(-value,vector.z);
-		vector.z=TOADLET_MIN_RR(value,vector.z);
-	#endif
-}
-
-void Simulator::calculateEpsilonOffset(Vector3 &result,const Vector3 &direction,const Vector3 &normal) const{
-	if(mSnapToGrid){
-		if(normal.x>=mQuarterEpsilon)result.x=mEpsilon;
-		else if(normal.x<=-mQuarterEpsilon)result.x=-mEpsilon;
-		else result.x=0;
-
-		if(normal.y>=mQuarterEpsilon)result.y=mEpsilon;
-		else if(normal.y<=-mQuarterEpsilon)result.y=-mEpsilon;
-		else result.y=0;
-
-		if(normal.z>=mQuarterEpsilon)result.z=mEpsilon;
-		else if(normal.z<=-mQuarterEpsilon)result.z=-mEpsilon;
-		else result.z=0;
-	}
-	else{
-		scalar length=Math::length(direction);
-		if(length>mEpsilon){
-			result.x=mul(div(-direction.x,length),mEpsilon);
-			result.y=mul(div(-direction.y,length),mEpsilon);
-			result.z=mul(div(-direction.z,length),mEpsilon);
-		}
-		else{
-			result.x=0;
-			result.y=0;
-			result.z=0;
-		}
-	}
-}
-
-void Simulator::snapToGrid(Vector3 &pos) const{
-	if(mSnapToGrid){
-		#if defined(TOADLET_FIXED_POINT)
-			pos.x=(((pos.x+(mHalfEpsilon*-(pos.x<0)))>>mEpsilonBits)<<mEpsilonBits);
-			pos.y=(((pos.y+(mHalfEpsilon*-(pos.y<0)))>>mEpsilonBits)<<mEpsilonBits);
-			pos.z=(((pos.z+(mHalfEpsilon*-(pos.z<0)))>>mEpsilonBits)<<mEpsilonBits);
-		#else
-			pos.x=(int)((pos.x+(mHalfEpsilon*-(pos.x<0)))*mOneOverEpsilon)*mEpsilon;
-			pos.y=(int)((pos.y+(mHalfEpsilon*-(pos.y<0)))*mOneOverEpsilon)*mEpsilon;
-			pos.z=(int)((pos.z+(mHalfEpsilon*-(pos.z<0)))*mOneOverEpsilon)*mEpsilon;
-		#endif
-	}
-}
-
-bool Simulator::toSmall(const Vector3 &value) const{
-	return (value.x<mEpsilon && value.x>-mEpsilon && value.y<mEpsilon && value.y>-mEpsilon && value.z<mEpsilon && value.z>-mEpsilon);
-}
-
-void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment &segment,int collideWithBits,Solid *ignore){
-	result.time=ONE;
-	result.scope=0;
-
-	Solid *solid2;
-
-	Collision &collision=cache_traceSegment_collision.reset();
-	int i;
-	for(i=0;i<mNumSpacialCollection;++i){
-		solid2=mSpacialCollection[i];
-		if(solid2!=ignore && (collideWithBits&solid2->mCollisionBits)!=0){
-			collision.time=ONE;
-			testSegment(collision,solid2,segment);
-			int scope=result.scope;
-			if(collision.time<ONE){
-				if(collision.time<result.time){
-					result.set(collision);
-				}
-				else if(result.time==collision.time){
-					add(result.normal,collision.normal);
-					bool b=normalizeCarefully(result.normal,mEpsilon);
-					if(b==false){
-						result.set(collision);
-					}
-				}
-			}
-			result.scope=scope|collision.scope;
-		}
-	}
-
-	if(mManager!=NULL){
-		collision.time=ONE;
-		mManager->traceSegment(collision,segment);
-		int scope=result.scope;
-		if(collision.time<ONE){
-			if(collision.time<result.time){
-				result.set(collision);
-			}
-			else if(result.time==collision.time){
-				add(result.normal,collision.normal);
-				bool b=normalizeCarefully(result.normal,mEpsilon);
-				if(b==false){
-					result.set(collision);
-				}
-			}
-		}
-		result.scope=(scope|collision.scope);
-	}
-}
-
-void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,const Segment &segment){
-	result.time=ONE;
-
-	if(solid->mCollideWithBits==0){
-		return;
-	}
-
-	Solid *solid2;
-
-	Collision &collision=cache_traceSolid_collision.reset();
-	int i;
-	for(i=0;i<mNumSpacialCollection;++i){
-		solid2=mSpacialCollection[i];
-		if(solid!=solid2 && (solid->mCollideWithBits&solid2->mCollisionBits)!=0){
-			collision.time=ONE;
-			testSolid(collision,solid,solid2,segment);
-			int scope=result.scope;
-			if(collision.time<ONE){
-				if(collision.time<result.time){
-					result.set(collision);
-				}
-				else if(result.time==collision.time){
-					add(result.normal,collision.normal);
-					bool b=normalizeCarefully(result.normal,mEpsilon);
-					if(b==false){
-						result.set(collision);
-					}
-				}
-			}
-			result.scope=scope|collision.scope;
-		}
-	}
-
-	if(mManager!=NULL){
-		collision.time=ONE;
-		mManager->traceSolid(collision,segment,solid);
-		int scope=result.scope;
-		if(collision.time<ONE){
-			if(collision.time<result.time){
-				result.set(collision);
-			}
-			else if(result.time==collision.time){
-				add(result.normal,collision.normal);
-				bool b=normalizeCarefully(result.normal,mEpsilon);
-				if(b==false){
-					result.set(collision);
-				}
-			}
-		}
-		result.scope=(scope|collision.scope);
-	}
-}
-
-void Simulator::testSegment(Collision &result,Solid *solid,const Segment &segment){
+void Simulator::testSegment(Collision &result,const Segment &segment,Solid *solid){
 	Collision &collision=cache_testSegment_collision.reset();
 	collision.collider=solid;
 
@@ -999,7 +827,7 @@ void Simulator::testSegment(Collision &result,Solid *solid,const Segment &segmen
 	}
 }
 
-void Simulator::testSolid(Collision &result,Solid *solid1,Solid *solid2,const Segment &segment){
+void Simulator::testSolid(Collision &result,Solid *solid1,const Segment &segment,Solid *solid2){
 	Collision &collision=cache_testSolid_collision.reset();
 	collision.collider=solid2;
 
@@ -1219,6 +1047,174 @@ void Simulator::testSolid(Collision &result,Solid *solid1,Solid *solid2,const Se
 				result.scope=scope;
 			}
 		}
+	}
+}
+
+void Simulator::capVector3(Vector3 &vector,scalar value) const{
+	#if defined(TOADLET_FIXED_POINT)
+		vector.x=TOADLET_MAX_XX(-value,vector.x);
+		vector.x=TOADLET_MIN_XX(value,vector.x);
+		vector.y=TOADLET_MAX_XX(-value,vector.y);
+		vector.y=TOADLET_MIN_XX(value,vector.y);
+		vector.z=TOADLET_MAX_XX(-value,vector.z);
+		vector.z=TOADLET_MIN_XX(value,vector.z);
+	#else
+		vector.x=TOADLET_MAX_RR(-value,vector.x);
+		vector.x=TOADLET_MIN_RR(value,vector.x);
+		vector.y=TOADLET_MAX_RR(-value,vector.y);
+		vector.y=TOADLET_MIN_RR(value,vector.y);
+		vector.z=TOADLET_MAX_RR(-value,vector.z);
+		vector.z=TOADLET_MIN_RR(value,vector.z);
+	#endif
+}
+
+void Simulator::calculateEpsilonOffset(Vector3 &result,const Vector3 &direction,const Vector3 &normal) const{
+	if(mSnapToGrid){
+		if(normal.x>=mQuarterEpsilon)result.x=mEpsilon;
+		else if(normal.x<=-mQuarterEpsilon)result.x=-mEpsilon;
+		else result.x=0;
+
+		if(normal.y>=mQuarterEpsilon)result.y=mEpsilon;
+		else if(normal.y<=-mQuarterEpsilon)result.y=-mEpsilon;
+		else result.y=0;
+
+		if(normal.z>=mQuarterEpsilon)result.z=mEpsilon;
+		else if(normal.z<=-mQuarterEpsilon)result.z=-mEpsilon;
+		else result.z=0;
+	}
+	else{
+		scalar length=Math::length(direction);
+		if(length>mEpsilon){
+			result.x=mul(div(-direction.x,length),mEpsilon);
+			result.y=mul(div(-direction.y,length),mEpsilon);
+			result.z=mul(div(-direction.z,length),mEpsilon);
+		}
+		else{
+			result.x=0;
+			result.y=0;
+			result.z=0;
+		}
+	}
+}
+
+void Simulator::snapToGrid(Vector3 &pos) const{
+	if(mSnapToGrid){
+		#if defined(TOADLET_FIXED_POINT)
+			pos.x=(((pos.x+(mHalfEpsilon*-(pos.x<0)))>>mEpsilonBits)<<mEpsilonBits);
+			pos.y=(((pos.y+(mHalfEpsilon*-(pos.y<0)))>>mEpsilonBits)<<mEpsilonBits);
+			pos.z=(((pos.z+(mHalfEpsilon*-(pos.z<0)))>>mEpsilonBits)<<mEpsilonBits);
+		#else
+			pos.x=(int)((pos.x+(mHalfEpsilon*-(pos.x<0)))*mOneOverEpsilon)*mEpsilon;
+			pos.y=(int)((pos.y+(mHalfEpsilon*-(pos.y<0)))*mOneOverEpsilon)*mEpsilon;
+			pos.z=(int)((pos.z+(mHalfEpsilon*-(pos.z<0)))*mOneOverEpsilon)*mEpsilon;
+		#endif
+	}
+}
+
+bool Simulator::toSmall(const Vector3 &value) const{
+	return (value.x<mEpsilon && value.x>-mEpsilon && value.y<mEpsilon && value.y>-mEpsilon && value.z<mEpsilon && value.z>-mEpsilon);
+}
+
+void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment &segment,int collideWithBits,Solid *ignore){
+	result.time=ONE;
+	result.scope=0;
+
+	Solid *solid2;
+
+	Collision &collision=cache_traceSegment_collision.reset();
+	int i;
+	for(i=0;i<mNumSpacialCollection;++i){
+		solid2=mSpacialCollection[i];
+		if(solid2!=ignore && (collideWithBits&solid2->mCollisionBits)!=0){
+			collision.time=ONE;
+			testSegment(collision,segment,solid2);
+			int scope=result.scope;
+			if(collision.time<ONE){
+				if(collision.time<result.time){
+					result.set(collision);
+				}
+				else if(result.time==collision.time){
+					add(result.normal,collision.normal);
+					bool b=normalizeCarefully(result.normal,mEpsilon);
+					if(b==false){
+						result.set(collision);
+					}
+				}
+			}
+			result.scope=scope|collision.scope;
+		}
+	}
+
+	if(mManager!=NULL){
+		collision.time=ONE;
+		mManager->traceSegment(collision,segment);
+		int scope=result.scope;
+		if(collision.time<ONE){
+			if(collision.time<result.time){
+				result.set(collision);
+			}
+			else if(result.time==collision.time){
+				add(result.normal,collision.normal);
+				bool b=normalizeCarefully(result.normal,mEpsilon);
+				if(b==false){
+					result.set(collision);
+				}
+			}
+		}
+		result.scope=(scope|collision.scope);
+	}
+}
+
+void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,const Segment &segment,int collideWithBits){
+	result.time=ONE;
+
+	if(collideWithBits==0){
+		return;
+	}
+
+	Solid *solid2;
+
+	Collision &collision=cache_traceSolid_collision.reset();
+	int i;
+	for(i=0;i<mNumSpacialCollection;++i){
+		solid2=mSpacialCollection[i];
+		if(solid!=solid2 && (collideWithBits&solid2->mCollisionBits)!=0){
+			collision.time=ONE;
+			testSolid(collision,solid,segment,solid2);
+			int scope=result.scope;
+			if(collision.time<ONE){
+				if(collision.time<result.time){
+					result.set(collision);
+				}
+				else if(result.time==collision.time){
+					add(result.normal,collision.normal);
+					bool b=normalizeCarefully(result.normal,mEpsilon);
+					if(b==false){
+						result.set(collision);
+					}
+				}
+			}
+			result.scope=scope|collision.scope;
+		}
+	}
+
+	if(mManager!=NULL){
+		collision.time=ONE;
+		mManager->traceSolid(collision,segment,solid);
+		int scope=result.scope;
+		if(collision.time<ONE){
+			if(collision.time<result.time){
+				result.set(collision);
+			}
+			else if(result.time==collision.time){
+				add(result.normal,collision.normal);
+				bool b=normalizeCarefully(result.normal,mEpsilon);
+				if(b==false){
+					result.set(collision);
+				}
+			}
+		}
+		result.scope=(scope|collision.scope);
 	}
 }
 
