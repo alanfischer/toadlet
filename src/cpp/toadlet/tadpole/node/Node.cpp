@@ -50,7 +50,12 @@ Node::Node():
 	mParentData(NULL),
 
 	mIdentityTransform(false),
+	//mTranslate,
+	//mRotate,
 	//mScale,
+	//mWorldTranslate,
+	//mWorldRotate,
+	//mWorldScale,
 	mScope(0),
 	//mName,
 	mCameraAligned(false),
@@ -77,12 +82,18 @@ Node *Node::create(Engine *engine){
 	mOwnsNodeDestroyedListener=false;
 
 	mParent=NULL;
+	mParentData=NULL;
 
 	mIdentityTransform=true;
 	mTranslate.reset();
 	mRotate.reset();
 	mScale.set(Math::ONE,Math::ONE,Math::ONE);
+	mWorldTranslate.reset();
+	mWorldRotate.reset();
+	mWorldScale.set(Math::ONE,Math::ONE,Math::ONE);
 	mScope=-1;
+	mName="";
+	mCameraAligned=false;
 	mReceiveUpdates=false;
 
 	mActive=true;

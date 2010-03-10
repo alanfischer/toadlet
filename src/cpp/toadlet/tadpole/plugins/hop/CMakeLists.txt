@@ -8,8 +8,6 @@ set (TADPOLE_HOP_SRC
 
 # Headers
 set (TADPOLE_HOP_HEADERS
-	HopCollision.h
-	HopCollisionListener.h
 	HopEntity.h
 	HopEntityFactory.h
 	HopParticleSimulator.h

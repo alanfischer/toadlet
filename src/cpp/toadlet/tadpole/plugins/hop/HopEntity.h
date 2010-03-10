@@ -31,7 +31,6 @@
 #include <toadlet/tadpole/node/MeshNode.h>
 #include <toadlet/tadpole/node/Traceable.h>
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
-#include <toadlet/tadpole/plugins/hop/HopCollisionListener.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -122,9 +121,8 @@ public:
 	inline HopScene::ptr getScene() const{return mScene;}
 	inline hop::Solid::ptr getSolid() const{return mSolid;}
 
-	virtual void setCollisionListener(HopCollisionListener *listener);
-
 	virtual void think();
+	virtual void touch(const Collision &c);
 
 	virtual void setNextThink(int nextThink){mNextThink=nextThink;}
 	inline int getNextThink() const{return mNextThink;}
@@ -166,8 +164,6 @@ protected:
 	node::Traceable *mTraceable;
 	
 	HopScene::ptr mScene;
-	HopCollisionListener *mListener;
-	HopCollision mHopCollision;
 	Vector3 mLastPosition;
 	bool mActivePrevious;
 

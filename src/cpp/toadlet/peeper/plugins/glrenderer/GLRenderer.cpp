@@ -1098,9 +1098,9 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 		if(gltexture!=NULL){
 			textureTarget=gltexture->mTarget;
 
-			if(mLastTextures[stage]!=texture){
+			if(mLastTextures[stage]!=gltexture){
 				glBindTexture(textureTarget,gltexture->mHandle);
-				mLastTextures[stage]=texture;
+				mLastTextures[stage]=gltexture;
 			}
 
 			TextureStage::Calculation calculation=textureStage->calculation;
@@ -1228,9 +1228,9 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 		}
 		else{
 			textureTarget=GL_TEXTURE_2D;
-			if(mLastTextures[stage]!=texture){
+			if(mLastTextures[stage]!=gltexture){
 				glBindTexture(textureTarget,0);
-				mLastTextures[stage]=texture;
+				mLastTextures[stage]=gltexture;
 			}
 		}
 
