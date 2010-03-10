@@ -38,11 +38,7 @@ public:
 	virtual ~Traceable(){}
 
 	virtual const Sphere &getLocalBound() const=0;
-	// TODO: Could I replace these multiple functions with just 1 function with a Geometry object
-	//  Could also take an Expandable interface, which would take a Normal and return a scalar, which indicates how far to expand along that normal
-	virtual void traceSegment(Collision &result,const Segment &segment)=0;
-//	virtual void traceSphere(Collision &result,const Segment &segment,const Sphere &sphere)=0;
-//	virtual void traceAABox(Collision &result,const Segment &segment,const AABox &box)=0;
+	virtual void traceSegment(Collision &result,const Segment &segment,const Vector3 &size)=0;
 };
 
 }

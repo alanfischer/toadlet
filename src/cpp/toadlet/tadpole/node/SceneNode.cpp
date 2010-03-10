@@ -256,14 +256,14 @@ void SceneNode::logicUpdate(Node::ptr node,int dt,int scope){
 		Math::add(node->mWorldTranslate,node->mParent->mWorldTranslate);
 	}
 
+	mul(node->mWorldBound,node->mWorldTranslate,node->mWorldScale,node->mLocalBound);
+
 	ParentNode *parent=node->isParent();
 	bool childrenActive=false;
 	if(parent!=NULL){
 		if(parent->mShadowChildrenDirty){
 			parent->updateShadowChildren();
 		}
-
-		mul(node->mWorldBound,node->mWorldTranslate,node->mLocalBound);
 
 		int numChildren=parent->mShadowChildren.size();
 		Node *child=NULL;
@@ -282,9 +282,6 @@ void SceneNode::logicUpdate(Node::ptr node,int dt,int scope){
 		}
 
 		parent->mActivateChildren=false;
-	}
-	else{
-		mul(node->mWorldBound,node->mWorldTranslate,node->mLocalBound);
 	}
 	
 	if(node->mDeactivateCount>=0){
@@ -345,13 +342,13 @@ void SceneNode::renderUpdate(Node::ptr node,int dt,int scope){
 		Math::mul(node->mWorldRenderTransform,node->mParent->mWorldRenderTransform,node->mRenderTransform);
 	}
 
+	mul(node->mRenderWorldBound,node->mWorldRenderTransform,node->mLocalBound);
+
 	ParentNode *parent=node->isParent();
 	if(parent!=NULL){
 		if(parent->mShadowChildrenDirty){
 			parent->updateShadowChildren();
 		}
-
-		mul(node->mRenderWorldBound,node->mWorldRenderTransform,node->mLocalBound);
 
 		Node *child;
 		int numChildren=parent->mShadowChildren.size();
@@ -364,9 +361,6 @@ void SceneNode::renderUpdate(Node::ptr node,int dt,int scope){
 
 			merge(parent->mRenderWorldBound,child->mRenderWorldBound);
 		}
-	}
-	else{
-		mul(node->mRenderWorldBound,node->mWorldRenderTransform,node->mLocalBound);
 	}
 }
 

@@ -66,7 +66,7 @@ public:
 	void render(peeper::Renderer *renderer) const;
 
 	const Sphere &getLocalBound() const{return super::getLocalBound();}
-	void traceSegment(Collision &result,const Segment &segment);
+	void traceSegment(Collision &result,const Segment &segment,const Vector3 &size);
 
 protected:
 	BSP30Map::ptr mMap;
@@ -110,7 +110,8 @@ public:
 	class RenderFace{
 	public:
 		peeper::IndexData::ptr indexData;
-		peeper::Texture::ptr lightmap;
+		//peeper::Texture::ptr lightmap;
+Matrix4x4 lightmapTransform;
 	};
 
 	// TODO: We need a better hook to start rendering the level, since in theory this wont have access to preLayerRender,

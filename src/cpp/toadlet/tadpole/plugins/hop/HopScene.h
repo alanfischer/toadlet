@@ -93,6 +93,8 @@ public:
 	#endif
 
 	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits,HopEntity *ignore);
+	virtual void traceEntity(Collision &result,HopEntity *entity,const Segment &segment,int collideWithBits);
+	virtual void testEntity(Collision &result,HopEntity *entity1,const Segment &segment,HopEntity *entity2);
 
 	inline int getNumHopEntities() const{return mHopEntities.size();}
 	inline HopEntity *getHopEntity(int i) const{return mHopEntities[i];}
@@ -137,8 +139,8 @@ void setServer(bool server){mServer=server;}
 
 	virtual egg::PointerCounter *pointerCounter() const{return mCounter;}
 
-	static void set(tadpole::Collision &r,hop::Collision &c);
-	static void set(hop::Collision &r,tadpole::Collision &c,HopEntity *collider);
+	static void set(tadpole::Collision &r,const hop::Collision &c);
+	static void set(hop::Collision &r,const tadpole::Collision &c,HopEntity *collider);
 
 	hop::Collision cache_traceSegment_collision;
 

@@ -77,7 +77,7 @@ namespace Math{
 	const AABox ZERO_AABOX;
 
 	// Vector2 operations
-	inline void neg(Vector2 &r,Vector2 &v){
+	inline void neg(Vector2 &r,const Vector2 &v){
 		r.x=-v.x;
 		r.y=-v.y;
 	}
@@ -232,7 +232,7 @@ namespace Math{
 	}
 
 	// Vector3 operations
-	inline void neg(Vector3 &r,Vector3 &v){
+	inline void neg(Vector3 &r,const Vector3 &v){
 		r.x=-v.x;
 		r.y=-v.y;
 		r.z=-v.z;
@@ -416,7 +416,7 @@ namespace Math{
 	}
 
 	// Vector4 operations
-	inline void neg(Vector4 &r,Vector4 &v){
+	inline void neg(Vector4 &r,const Vector4 &v){
 		r.x=-v.x;
 		r.y=-v.y;
 		r.z=-v.z;
