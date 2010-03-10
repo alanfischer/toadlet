@@ -103,8 +103,10 @@ public:
 
 	int findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids) const;
 
-	void traceSegment(Collision &result,const Segment &segment,int collideWithBits=0,Solid *ignore=NULL);
-	void traceSolid(Collision &result,Solid *solid,const Segment &segment);
+	void traceSegment(Collision &result,const Segment &segment,int collideWithBits=-1,Solid *ignore=NULL);
+	void traceSolid(Collision &result,Solid *solid,const Segment &segment,int collideWithBits=-1);
+	void testSegment(Collision &result,const Segment &segment,Solid *solid);
+	void testSolid(Collision &result,Solid *solid1,const Segment &segment,Solid *solid2);
 
 	void capVector3(Vector3 &vector,scalar value) const;
 	void calculateEpsilonOffset(Vector3 &result,const Vector3 &direction,const Vector3 &normal) const;
@@ -113,10 +115,7 @@ public:
 
 protected:
 	void traceSegmentWithCurrentSpacials(Collision &result,const Segment &segment,int collideWithBits,Solid *ignore);
-	void traceSolidWithCurrentSpacials(Collision &result,Solid *solid,const Segment &segment);
-
-	void testSegment(Collision &result,Solid *solid,const Segment &segment);
-	void testSolid(Collision &result,Solid *solid1,Solid *solid2,const Segment &segment);
+	void traceSolidWithCurrentSpacials(Collision &result,Solid *solid,const Segment &segment,int collideWithBits);
 
 	void traceAABox(Collision &c,const Segment &segment,const AABox &box);
 	void traceSphere(Collision &c,const Segment &segment,const Sphere &sphere);

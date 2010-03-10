@@ -96,6 +96,30 @@ void HopScene::traceSegment(Collision &result,const Segment &segment,int collide
 	set(result,collision);
 }
 
+void HopScene::traceEntity(Collision &result,HopEntity *entity,const Segment &segment,int collideWithBits){
+	result.reset();
+
+	Solid *solid=NULL;
+	if(entity!=NULL){
+		solid=entity->getSolid();
+	}
+
+	hop::Collision &collision=cache_traceSegment_collision.reset();
+	mSimulator->traceSolid(collision,solid,segment,collideWithBits);
+	set(result,collision);
+}
+
+void HopScene::testEntity(Collision &result,HopEntity *entity1,const Segment &segment,HopEntity *entity2){
+	result.reset();
+
+	Solid *solid1=entity1->getSolid();
+	Solid *solid2=entity2->getSolid();
+
+	hop::Collision &collision=cache_traceSegment_collision.reset();
+	mSimulator->testSolid(collision,solid1,segment,solid2);
+	set(result,collision);
+}
+
 HopEntity *HopScene::getHopEntityFromNetworkID(int id) const{
 	if(id>=0 && id<mNetworkIDMap.size()){
 		return mNetworkIDMap[id];
@@ -284,7 +308,6 @@ public:
 };
 
 int HopScene::findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids){
-	// TODO: The query interface is messy here, it shouldnt be this much work!
 	QueryListener listener(solids,maxSolids);
 	SpacialQuery query;
 	query.setResultsListener(&listener);
@@ -292,7 +315,7 @@ int HopScene::findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids){
 	return listener.mCounter;
 }
 
-void HopScene::set(tadpole::Collision &r,hop::Collision &c){
+void HopScene::set(tadpole::Collision &r,const hop::Collision &c){
 	r.time=c.time;
 	r.point.set(c.point);
 	r.normal.set(c.normal);
@@ -300,7 +323,7 @@ void HopScene::set(tadpole::Collision &r,hop::Collision &c){
 	r.scope=c.scope;
 }
 
-void HopScene::set(hop::Collision &r,tadpole::Collision &c,HopEntity *collider){
+void HopScene::set(hop::Collision &r,const tadpole::Collision &c,HopEntity *collider){
 	r.time=c.time;
 	r.point.set(c.point);
 	r.normal.set(c.normal);

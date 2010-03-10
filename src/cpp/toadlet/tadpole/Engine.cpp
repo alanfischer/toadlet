@@ -41,8 +41,6 @@
 #include <toadlet/tadpole/node/SkeletonParentNode.h>
 #include <toadlet/tadpole/node/SpriteNode.h>
 
-#include <toadlet/tadpole/bsp/BSP30SceneNode.h>
-
 #include <toadlet/tadpole/handler/AudioBufferHandler.h>
 #include <toadlet/tadpole/handler/MMSHHandler.h>
 #include <toadlet/tadpole/handler/SPRHandler.h>
@@ -82,6 +80,10 @@
 	#include <toadlet/tadpole/handler/XMSHHandler.h>
 #endif
 
+#if !defined(TOADLET_FIXED_POINT)
+	#include <toadlet/tadpole/bsp/BSP30SceneNode.h>
+#endif
+
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
 using namespace toadlet::peeper;
@@ -89,7 +91,6 @@ using namespace toadlet::ribbit;
 using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::handler;
 using namespace toadlet::tadpole::mesh;
-using namespace toadlet::tadpole::bsp;
 
 namespace toadlet{
 namespace tadpole{
@@ -132,8 +133,10 @@ Engine::Engine():
 	registerNodeType(SpriteNode::type());
 
 	// Plugin types, should be removed from here somehow
-	registerNodeType(BSP30SceneNode::type());
-	registerNodeType(BSP30ModelNode::type());
+	#if !defined(TOADLET_FIXED_POINT)
+		registerNodeType(bsp::BSP30SceneNode::type());
+		registerNodeType(bsp::BSP30ModelNode::type());
+	#endif
 
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"Engine: adding all handlers");

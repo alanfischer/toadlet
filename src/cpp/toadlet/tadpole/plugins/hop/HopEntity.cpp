@@ -46,8 +46,6 @@ HopEntity::HopEntity():ParentNode(),
 	mTraceable(NULL),
 
 	//mScene,
-	mListener(NULL),
-	//mHopCollision,
 	//mLastPosition,
 	mActivePrevious(false),
 
@@ -71,8 +69,6 @@ Node *HopEntity::create(Engine *engine){
 	mSolid->reset();
 	mSolid->setUserData(this);
 	mScene=NULL;
-	mListener=NULL;
-	mHopCollision.reset();
 	mLastPosition.reset();
 	mActivePrevious=true;
 
@@ -236,13 +232,9 @@ void HopEntity::setTraceableShape(Traceable *traceable){
 void HopEntity::addShape(hop::Shape::ptr shape){
 	mSolid->addShape(shape);
 
-	const AABox &bound=mSolid->getLocalBound();
-	Vector3 origin;
-	Math::add(origin,bound.maxs,bound.mins);
-	Math::div(origin,Math::TWO);
-	scalar radius=Math::maxVal(Math::maxVal(
-		Math::maxVal(-bound.mins.x-origin.x,bound.maxs.x-origin.x),Math::maxVal(-bound.mins.y-origin.y,bound.maxs.y-origin.y)),Math::maxVal(-bound.mins.z-origin.z,bound.maxs.z-origin.z));
-	setLocalBound(Sphere(origin,radius));
+	Sphere bound;
+	set(bound,mSolid->getLocalBound());
+	setLocalBound(bound);
 
 	if(mVolumeNode!=NULL){
 		showCollisionVolumes(true);
@@ -265,18 +257,10 @@ void HopEntity::removeAllShapes(){
 	}
 }
 
-void HopEntity::setCollisionListener(HopCollisionListener *listener){
-	if(listener!=NULL){
-		mSolid->setCollisionListener(this);
-	}
-	else{
-		mSolid->setCollisionListener(NULL);
-	}
-
-	mListener=listener;
+void HopEntity::think(){
 }
 
-void HopEntity::think(){
+void HopEntity::touch(const tadpole::Collision &c){
 }
 
 void HopEntity::setShadowMesh(Mesh::ptr shadow,scalar scale,scalar testLength,scalar offset){
@@ -326,7 +310,7 @@ void HopEntity::getBound(AABox &result){
 void HopEntity::traceSegment(hop::Collision &result,const Segment &segment){
 	if(mTraceable!=NULL){
 		tadpole::Collision collision;
-		mTraceable->traceSegment(collision,segment);
+		mTraceable->traceSegment(collision,segment,Math::ZERO_VECTOR3);
 		HopScene::set(result,collision,this);
 	}
 }
@@ -334,32 +318,18 @@ void HopEntity::traceSegment(hop::Collision &result,const Segment &segment){
 void HopEntity::traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid){
 	if(mTraceable!=NULL){
 		tadpole::Collision collision;
-		mTraceable->traceSegment(collision,segment);
+		const AABox &bound=solid->getLocalBound();
+		Vector3 size;
+		Math::sub(size,bound.maxs,bound.mins);
+		mTraceable->traceSegment(collision,segment,size);
 		HopScene::set(result,collision,this);
 	}
 }
 
 void HopEntity::collision(const hop::Collision &c){
-	if(mListener!=NULL){
-		HopEntity::ptr reference(this); // To make sure that the object is not deleted by the collision callback until we exit this function
-		mHopCollision.time=c.time;
-		mHopCollision.point.set(c.point);
-		mHopCollision.normal.set(c.normal);
-		mHopCollision.velocity.set(c.velocity);
-		if(c.collider!=NULL){
-			mHopCollision.collider=static_cast<HopEntity*>(c.collider->getUserData());
-		}
-		else{
-			mHopCollision.collider=NULL;
-		}
-		if(c.collidee!=NULL){
-			mHopCollision.collidee=static_cast<HopEntity*>(c.collidee->getUserData());
-		}
-		else{
-			mHopCollision.collidee=NULL;
-		}
-		mListener->collision(mHopCollision);
-	}
+	tadpole::Collision collision;
+	mScene->set(collision,c);
+	touch(collision);
 }
 
 void HopEntity::preLogicUpdateLoop(int dt){

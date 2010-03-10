@@ -40,6 +40,7 @@ namespace toadlet{
 namespace peeper{
 
 class GLBuffer;
+class GLTexture;
 
 class TOADLET_API GLRenderer:public Renderer{
 public:
@@ -154,7 +155,7 @@ protected:
 	FaceCulling mFaceCulling;
 	bool mInTexGen;
 	bool mMirrorY;
-	egg::Collection<Texture*> mLastTextures;
+	egg::Collection<GLTexture*> mLastTextures;
 	short mMaxTexCoordIndex;
 	egg::Collection<short> mTexCoordIndexes;
 	short mLastMaxTexCoordIndex;

@@ -152,13 +152,15 @@ public:
 	// TODO: Make a SphereBound class, and have it contain these methods
 	// Not in Math currently, because its not technically correct, a Matrix*Sphere=Eplisoid
 	static void mul(Sphere &r,const Matrix4x4 &m,const Sphere &s){
+		Math::mul(r.origin.set(s.radius,s.radius,s.radius),m);
+		r.radius=Math::maxVal(Math::maxVal(r.origin.x,r.origin.y),r.origin.z);
 		Math::mulPoint3Fast(r.origin,m,s.origin);
-		r.radius=s.radius;
 	}
 
-	static void mul(Sphere &r,const Vector3 &v,const Sphere &s){
-		Math::add(r.origin,v,s.origin);
-		r.radius=s.radius;
+	static void mul(Sphere &r,const Vector3 &translate,const Vector3 &scale,const Sphere &s){
+		Math::mul(r.origin,scale,s.radius);
+		r.radius=Math::maxVal(Math::maxVal(r.origin.x,r.origin.y),r.origin.z);
+		Math::add(r.origin,translate,s.origin);
 	}
 
 	// Merge two spheres, passing along -1 radius, and ignoring 0 radius
@@ -175,6 +177,20 @@ public:
 		else if(s.radius<0){
 			r.radius=-Math::ONE;
 		}
+	}
+
+	static void set(Sphere &sphere,const AABox &box){
+		Math::add(sphere.origin,box.mins,box.maxs);
+		Math::div(sphere.origin,Math::TWO);
+		scalar x=Math::maxVal(sphere.origin.x-box.mins.x,box.maxs.x-sphere.origin.x);
+		scalar y=Math::maxVal(sphere.origin.y-box.mins.y,box.maxs.y-sphere.origin.y);
+		scalar z=Math::maxVal(sphere.origin.z-box.mins.z,box.maxs.z-sphere.origin.z);
+		sphere.radius=Math::sqrt(Math::square(x)+Math::square(y)+Math::square(z));
+	}
+
+	static void set(AABox &box,const Sphere &sphere){
+		box.set(sphere.radius);
+		Math::add(box,sphere.origin);
 	}
 
 protected:

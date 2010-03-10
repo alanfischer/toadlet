@@ -199,7 +199,6 @@ set (TADPOLE_NODE_HEADERS
 
 # Bundle source
 source_group ("Source Files\\\\animation" FILES ${TADPOLE_ANIMATION_SRC})
-source_group ("Source Files\\\\bsp" FILES ${TADPOLE_BSP_SRC})
 source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_SRC})
 source_group ("Source Files\\\\mesh" FILES ${TADPOLE_MESH_SRC})
 source_group ("Source Files\\\\node" FILES ${TADPOLE_NODE_SRC})
@@ -207,16 +206,22 @@ source_group ("Source Files\\\\node" FILES ${TADPOLE_NODE_SRC})
 
 # Bundle headers
 source_group ("Header Files\\\\animation" FILES ${TADPOLE_ANIMATION_HEADERS})
-source_group ("Header Files\\\\bsp" FILES ${TADPOLE_BSP_HEADERS})
 source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_HEADERS})
 source_group ("Header Files\\\\mesh" FILES ${TADPOLE_MESH_HEADERS})
 source_group ("Header Files\\\\node" FILES ${TADPOLE_NODE_HEADERS})
 
 
 # Source and headers
-set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_BSP_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MESH_SRC} ${TADPOLE_NODE_SRC})
-set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_BSP_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_MESH_HEADERS} ${TADPOLE_NODE_HEADERS})
+set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MESH_SRC} ${TADPOLE_NODE_SRC})
+set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_MESH_HEADERS} ${TADPOLE_NODE_HEADERS})
 
+
+if (NOT TOADLET_FIXED_POINT)
+	source_group ("Source Files\\\\bsp" FILES ${TADPOLE_BSP_SRC})
+	source_group ("Header Files\\\\bsp" FILES ${TADPOLE_BSP_HEADERS})
+	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_BSP_SRC})
+	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_BSP_HEADERS})
+endif (NOT TOADLET_FIXED_POINT)
 
 # Setup dependecy specific files and libraries
 # Note the iphone build uses neither freetype or mxml

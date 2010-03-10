@@ -23,13 +23,9 @@
  *
  ********** Copyright header - do not remove **********/
 
-#define CLIP
-
 // TODO:
-// - make AABox & Sphere adaption routines, and then move HopEntities conversion stuff over to that
+// - right now we have aabox in bsp, which goes to a sphere for the localbound, which goes to an aabox for the physics bound.  this should be fixed somehow
 // - clean up the aabox querying so its a lot easier to use
-// - split up queueRenderables into a findVisualNodes, so we have a findVisualNodes and findNodesInAABozx or something
-// - merge external trace function into the class (maybe the Map class?)
 // - make the traceSegment function take a radius perhaps, and then a radius==hull[x] expanded size would be a trace through that hull
 // - modify the rendering to be material based, with objects that it would push into the pipeline, so we don't need to do the preRender crap
 // - make members protected again
@@ -42,6 +38,7 @@
 #include <toadlet/tadpole/bsp/BSP30SceneNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
 #include <toadlet/tadpole/handler/WADArchive.h>
+#include <toadlet/tadpole/PixelPacker.h>
 #include <string.h> // memset
 
 using namespace toadlet::egg;
@@ -50,8 +47,6 @@ using namespace toadlet::peeper;
 using namespace toadlet::tadpole::mesh;
 using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::handler;
-
-float trace(toadlet::tadpole::bsp::BSP30Map *map,int startnode,Vector3 start,Vector3 end,Vector3 &normal);
 
 namespace toadlet{
 namespace tadpole{
@@ -99,10 +94,7 @@ void BSP30ModelNode::setModel(BSP30Map::ptr map,int index){
 	bmodel *model=&mMap->models[mModelIndex];
 
 	Sphere bound;
-	Math::sub(bound.origin,model->maxs,model->mins);
-	Math::div(bound.origin,Math::TWO);
-	bound.radius=Math::length(bound.origin);
-	Math::add(bound.origin,model->mins);
+	set(bound,AABox(model->mins,model->maxs));
 	setLocalBound(bound);
 }
 
@@ -144,8 +136,7 @@ void BSP30ModelNode::render(peeper::Renderer *renderer) const{
 	scene->renderVisibleFaces(renderer);
 }
 
-// TODO: Change the tracing so ONE = no collision, and -ONE is either in solid or unused
-void BSP30ModelNode::traceSegment(Collision &result,const Segment &segment){
+void BSP30ModelNode::traceSegment(Collision &result,const Segment &segment,const Vector3 &size){
 	Segment tseg;
 	Vector3 invtrans=-getTranslate();
 	Quaternion invrot; Math::invert(invrot,getRotate());
@@ -156,21 +147,55 @@ void BSP30ModelNode::traceSegment(Collision &result,const Segment &segment){
 	Vector3 end;
 	segment.getEndPoint(end);
 	if(mMap!=NULL){
-	// TODO: Using headnode[1]!! is that right??
-#if !defined(CLIP)
-result.time=trace(mMap,mMap->models[mModelIndex].headnode[0],segment.origin,end,result.normal);
-#else
-result.time=trace(mMap,mMap->models[mModelIndex].headnode[1],segment.origin,end,result.normal);
-#endif
+		int hullIndex=0;
+		if(mMap->header.version==Q1BSPVERSION){
+			if(size[0]<3){
+				hullIndex=0;
+			}
+			else if(size[0]<=32){
+				hullIndex=1;
+			}
+			else{
+				hullIndex=2;
+			}
+		}
+		else{
+			if(size[0]<3){
+				hullIndex=0; // 0x0x0
+			}
+			else if(size[0]<=32){
+				if(size[2]<54){ // Nearest of 36 or 72
+					hullIndex=3; // 32x32x36
+				}
+				else{
+					hullIndex=1; // 32x32x72
+				}
+			}
+			else{
+				hullIndex=2; // 64x64x64
+			}
+		}
 
-int contents=0;
-BSP30SceneNode *scene=(BSP30SceneNode*)mEngine->getScene()->getRootScene();
-int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,segment.origin);
-if(leaf>=0 && leaf<mMap->nleafs){contents=mMap->leafs[leaf].contents;}
+		int headNode=mMap->models[mModelIndex].headnode[0];
+		int headClipNode=mMap->models[mModelIndex].headnode[hullIndex];
+		if(headClipNode<0 || headNode>=mMap->nclipnodes){
+			return;
+		}
 
-if(result.time==0 && mInternalScope!=0){result.scope|=mInternalScope; result.time=Math::ONE; }
+		if(hullIndex==0){
+			mMap->hullTrace(result,mMap->planes,mMap->leafs,mMap->nodes,sizeof(bnode),headNode,0,Math::ONE,segment.origin,end,0.03125);
+		}
+		else{
+			mMap->hullTrace(result,mMap->planes,NULL,mMap->clipnodes,sizeof(bclipnode),headClipNode,0,Math::ONE,segment.origin,end,0.03125);
+		}
 
-if(contents<=-1){ result.scope|=(-1-contents)<<1; } // Would be nice to merge this into the trace
+		int contents=mMap->leafs[mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),headNode,segment.origin)].contents;
+		if(contents!=CONTENTS_EMPTY){
+			result.scope|=(-1-contents)<<1;
+		}
+		if(mInternalScope!=0 && (contents=-1-mMap->findPointLeaf(mMap->planes,mMap->clipnodes,sizeof(bclipnode),headClipNode,segment.origin))!=CONTENTS_EMPTY){
+			result.scope|=mInternalScope;
+		}
 	}
 
 	if(result.time==Math::ONE){
@@ -180,7 +205,6 @@ if(contents<=-1){ result.scope|=(-1-contents)<<1; } // Would be nice to merge th
 		Math::madd(result.point,segment.direction,result.time,segment.origin);
 	}
 }
-
 
 TOADLET_NODE_IMPLEMENT(BSP30SceneNode,Categories::TOADLET_TADPOLE_NODE+".BSP30SceneNode");
 
@@ -201,6 +225,7 @@ void BSP30SceneNode::destroy(){
 	super::destroy();
 }
 
+static Texture::ptr GLIGHTMAP;
 void BSP30SceneNode::setMap(BSP30Map::ptr map){
 	int i,j;
 
@@ -227,6 +252,9 @@ void BSP30SceneNode::setMap(BSP30Map::ptr map){
 	vertexFormat->addVertexElement(VertexElement(VertexElement::Type_TEX_COORD_2,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_2));
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,vertexCount);
 	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+
+Image::ptr LIGHTMAPIMAGE(new Image(Image::Dimension_D2,Image::Format_RGB_8,1024,1024,0));//2048,2048,0));
+PixelPacker packer(LIGHTMAPIMAGE->getData(),LIGHTMAPIMAGE->getFormat(),LIGHTMAPIMAGE->getWidth(),LIGHTMAPIMAGE->getHeight());
 
 	vertexCount=0;
 	vba.lock(vertexBuffer);
@@ -276,8 +304,9 @@ void BSP30SceneNode::setMap(BSP30Map::ptr map){
 			lightmap=computeLightmap(face,mins,maxs);
 			lmwidth=lightmap->getWidth();
 			lmheight=lightmap->getHeight();
-			mRenderFaces[i].lightmap=mEngine->getTextureManager()->createTexture(lightmap);
-			mRenderFaces[i].lightmap->retain();
+//			mRenderFaces[i].lightmap=mEngine->getTextureManager()->createTexture(lightmap);
+//			mRenderFaces[i].lightmap->retain();
+packer.insert(lmwidth,lmheight,lightmap->getData(),mRenderFaces[i].lightmapTransform);
 		}
 
 		if(width>0 && height>0){
@@ -303,7 +332,10 @@ void BSP30SceneNode::setMap(BSP30Map::ptr map){
 					ls /= (float)lmwidth;
 					lt /= (float)lmheight;
 
-					vba.set2(vertexCount+j,3,ls,lt);
+Vector3 l(ls,lt,1);
+Math::mulPoint3Fast(l,mRenderFaces[i].lightmapTransform);
+//					vba.set2(vertexCount+j,3,ls,lt);
+vba.set2(vertexCount+j,3,l.x,l.y);
 				}
 			}
 		}
@@ -312,7 +344,8 @@ void BSP30SceneNode::setMap(BSP30Map::ptr map){
 		vertexCount+=face->numedges;
 	}
 	vba.unlock();
-
+GLIGHTMAP=mEngine->getTextureManager()->createTexture(LIGHTMAPIMAGE);
+GLIGHTMAP->retain();
 	mRendererData.markedFaces.resize((mMap->nfaces+7)/8);
 
 	getRenderLayer(0)->forceRender=true;
@@ -461,15 +494,21 @@ void BSP30SceneNode::queueRenderables(){
 		mCounter++;
 		const Collection<int> &leafvis=mMap->parsedVisibility[leaf];
 		for(i=0;i<leafvis.size();i++){
-			const Collection<Node*> &occupants=mLeafData[leafvis[i]].occupants;
-			for(j=0;j<occupants.size();++j){
-				Node *occupant=occupants[j];
-				childdata *data=(childdata*)occupant->getParentData();
-				if(data->counter!=mCounter && mCamera->culled(occupant->getWorldBound())==false){
-					data->counter=mCounter;
-					super::queueRenderables(occupant);
+			bleaf *leaf=mMap->leafs+leafvis[i];
+			AABox box(leaf->mins[0],leaf->mins[1],leaf->mins[2],leaf->maxs[0],leaf->maxs[1],leaf->maxs[2]); // TODO: not have to create a temp box
+			if(mCamera->culled(box)==false){
+				const Collection<Node*> &occupants=mLeafData[leafvis[i]].occupants;
+				for(j=0;j<occupants.size();++j){
+					Node *occupant=occupants[j];
+					childdata *data=(childdata*)occupant->getParentData();
+					if(data->counter!=mCounter){
+						data->counter=mCounter;
+						if(mCamera->culled(occupant->getWorldBound())==false){
+							super::queueRenderables(occupant);
+						}
+					}
 				}
-			} 
+			}
 		}
 	}
 }
@@ -526,12 +565,15 @@ void BSP30SceneNode::renderVisibleFaces(Renderer *renderer){
 
 	TextureStage::ptr lightmapStage(new TextureStage());
 	lightmapStage->setTexCoordIndex(1);
-	lightmapStage->setBlend(TextureBlend(TextureBlend::Operation_MODULATE_2X,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
+	lightmapStage->setBlend(TextureBlend(TextureBlend::Operation_MODULATE,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
 	lightmapStage->setMinFilter(TextureStage::Filter_LINEAR);
 	lightmapStage->setMipFilter(TextureStage::Filter_LINEAR);
 	lightmapStage->setMagFilter(TextureStage::Filter_LINEAR);
-	lightmapStage->setUAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
-	lightmapStage->setVAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
+	//lightmapStage->setUAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
+	//lightmapStage->setVAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
+
+lightmapStage->setTexture(GLIGHTMAP);
+renderer->setTextureStage(1,lightmapStage);
 
 	for(i=0;i<data.textureVisibleFaces.size();i++){
 		Collection<int> &visibleFaces=data.textureVisibleFaces[i];
@@ -543,8 +585,8 @@ if(mMap->parsedTextures.size()>i) textureStage->setTexture(mMap->parsedTextures[
 			for(j=0;j<visibleFaces.size();++j){
 				int vf=visibleFaces[j];
 
-				lightmapStage->setTexture(mRenderFaces[vf].lightmap);
-				renderer->setTextureStage(1,lightmapStage);
+//				lightmapStage->setTexture(mRenderFaces[vf].lightmap);
+//				renderer->setTextureStage(1,lightmapStage);
 
 				renderer->renderPrimitive(mVertexData,mRenderFaces[vf].indexData);
 			}
@@ -552,7 +594,7 @@ if(mMap->parsedTextures.size()>i) textureStage->setTexture(mMap->parsedTextures[
 
 		visibleFaces.clear();
 	}
-	
+
 	renderer->setTextureStage(0,NULL);
 	renderer->setTextureStage(1,NULL);
 }
@@ -681,190 +723,4 @@ Image::ptr BSP30SceneNode::computeLightmap(bface *face,const Vector2 &mins,const
 
 }
 }
-}
-
-
-
-// Code structure from
-// http://svn.jansson.be/foreign/quake/q1/trunk/QW/client/pmovetst.c
-
-using namespace toadlet::egg;
-using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::bsp;
-
-struct pmtrace_t{
-	pmtrace_t(){memset(this,0,sizeof(pmtrace_t));
-		fraction = 1;
-		allsolid = true;}
-
-	bool allsolid;
-	bool inopen;
-	bool inwater;
-	bool startsolid;
-	Plane plane;
-	float fraction;
-	Vector3 endpos;
-};
-
-#if !defined(CLIP)
-typedef bnode dclipnode_t;
-#else
-typedef bclipnode dclipnode_t;
-#endif
-typedef BSP30Map hull_t;
-typedef Vector3 vec3_t;
-typedef bplane mplane_t;
-
-#define qfalse false
-#define qtrue true
-#define DotProduct Math::dot
-#define VectorCopy(v1,v2) v2.set(v1)
-#define	DIST_EPSILON	(0.03125)
-#define vec3_origin Math::ZERO_VECTOR3
-#define VectorSubtract(v1,v2,r) Math::sub(r,v1,v2);
-
-bool RecursiveHullCheck (hull_t *hull, int num, float p1f, float p2f, Vector3 p1, Vector3 p2, pmtrace_t *trace)
-{
-	dclipnode_t	*node;
-	bplane		*plane;
-	float		t1, t2;
-	float		frac;
-	int			i;
-	Vector3		mid;
-	int			side;
-	float		midf;
-
-// check for empty
-	if (num < 0)
-	{
-		if (num != CONTENTS_SOLID)
-		{
-			trace->allsolid = qfalse;
-			if (num == CONTENTS_EMPTY)
-				trace->inopen = qtrue;
-			else
-				trace->inwater = qtrue;
-		}
-		else
-			trace->startsolid = qtrue;
-		return qtrue;		// empty
-	}
-
-//
-// find the point distances
-//
-#if !defined(CLIP)
-		node = &hull->nodes[num];
-#else
-		node = &hull->clipnodes[num];
-#endif
-	plane = &hull->planes[node->planenum];
-
-	if (plane->type < 3)
-	{
-		t1 = p1[plane->type] - plane->dist;
-		t2 = p2[plane->type] - plane->dist;
-	}
-	else
-	{
-		t1 = DotProduct (plane->normal, p1) - plane->dist;
-		t2 = DotProduct (plane->normal, p2) - plane->dist;
-	}
-	
-#if 1
-	if (t1 >= 0 && t2 >= 0)
-		return RecursiveHullCheck (hull, node->children[0], p1f, p2f, p1, p2, trace);
-	if (t1 < 0 && t2 < 0)
-		return RecursiveHullCheck (hull, node->children[1], p1f, p2f, p1, p2, trace);
-#else
-	if ( (t1 >= DIST_EPSILON && t2 >= DIST_EPSILON) || (t2 > t1 && t1 >= 0) )
-		return RecursiveHullCheck (hull, node->children[0], p1f, p2f, p1, p2, trace);
-	if ( (t1 <= -DIST_EPSILON && t2 <= -DIST_EPSILON) || (t2 < t1 && t1 <= 0) )
-		return RecursiveHullCheck (hull, node->children[1], p1f, p2f, p1, p2, trace);
-#endif
-
-// put the crosspoint DIST_EPSILON pixels on the near side
-	if (t1 < 0)
-		frac = (t1 + DIST_EPSILON)/(t1-t2);
-	else
-		frac = (t1 - DIST_EPSILON)/(t1-t2);
-	if (frac < 0)
-		frac = 0;
-	if (frac > 1)
-		frac = 1;
-		
-	midf = p1f + (p2f - p1f)*frac;
-	for (i=0 ; i<3 ; i++)
-		mid[i] = p1[i] + frac*(p2[i] - p1[i]);
-
-	side = (t1 < 0);
-
-// move up to the node
-	if (!RecursiveHullCheck (hull, node->children[side], p1f, midf, p1, mid, trace) )
-		return qfalse;
-	
-#if !defined(CLIP)
-	int contents=hull->leafs[hull->findPointLeaf(hull->planes,hull->nodes,sizeof(bnode),node->children[side^1],mid)].contents;
-#else
-	int contents=-1-hull->findPointLeaf(hull->planes,hull->clipnodes,sizeof(bclipnode),node->children[side^1],mid);
-#endif
-	if(contents!=CONTENTS_SOLID)
-		return RecursiveHullCheck (hull, node->children[side^1], midf, p2f, mid, p2, trace);
-	
-	if (trace->allsolid)
-		return qfalse;		// never got out of the solid area
-		
-//==================
-// the other side of the node is solid, this is the impact point
-//==================
-	if (!side)
-	{
-		VectorCopy (plane->normal, trace->plane.normal);
-		trace->plane.distance = plane->dist;
-	}
-	else
-	{
-		VectorSubtract (vec3_origin, plane->normal, trace->plane.normal);
-		trace->plane.distance = -plane->dist;
-	}
-
-#if !defined(CLIP)
-	while (hull->leafs[hull->findPointLeaf(hull->planes,hull->nodes,sizeof(bnode),0,mid)].contents
-#else
-	while (-1-hull->findPointLeaf(hull->planes,hull->clipnodes,sizeof(bclipnode),0,mid)
-#endif
-	== CONTENTS_SOLID)
-	{ // shouldn't really happen, but does occasionally
-		frac -= 0.1;
-		if (frac < 0)
-		{
-			trace->fraction = midf;
-			VectorCopy (mid, trace->endpos);
-//			Con_DPrintf ("backup past 0\n");
-			return qfalse;
-		}
-		midf = p1f + (p2f - p1f)*frac;
-		for (i=0 ; i<3 ; i++)
-			mid[i] = p1[i] + frac*(p2[i] - p1[i]);
-	}
-
-	trace->fraction = midf;
-	VectorCopy (mid, trace->endpos);
-
-	return qfalse;
-}
-
-float trace(BSP30Map *map,int startnode,Vector3 start,Vector3 end,Vector3 &normal){
-	pmtrace_t t;
-	bool result=RecursiveHullCheck(map,startnode,0,1,start,end,&t);
-	normal=t.plane.normal;
-
-	if (t.allsolid)
-		t.startsolid = qtrue;
-	if (t.startsolid)
-		t.fraction = 0;
-
-	if(t.allsolid==false && t.startsolid==true){t.fraction=Math::ONE;}
-
-	return t.fraction;
 }

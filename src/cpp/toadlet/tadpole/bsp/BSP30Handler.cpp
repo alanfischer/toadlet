@@ -42,42 +42,41 @@ BSP30Handler::BSP30Handler(Engine *engine):ResourceHandler(),
 	mEngine(NULL)
 {
 	mEngine=engine;
-	memset(&header,0,sizeof(header));
 }
 
 BSP30Handler::~BSP30Handler(){}
 
 Resource::ptr BSP30Handler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
 	DataStream::ptr dataStream(new DataStream(stream));
-	header.version=dataStream->readLittleInt32();
+	int version=dataStream->readLittleInt32();
 	dataStream->reset();
 
-	if(header.version!=BSPVERSION){
-		Error::unknown(String("incorrect bsp version:")+header.version);
+	if(version!=Q1BSPVERSION && version!=HLBSPVERSION){
+		Error::unknown(String("incorrect bsp version:")+version);
 		return NULL;
 	}
 
 	Logger::debug(Categories::TOADLET_TADPOLE,"Reading map");
 
-	stream->read((byte*)&header,sizeof(header));
-
 	BSP30Map::ptr map(new BSP30Map());
 
-	readLump(stream,LUMP_MODELS,		(void**)&map->models,sizeof(bmodel),			&map->nmodels);
-	readLump(stream,LUMP_VERTEXES,		(void**)&map->vertexes,sizeof(bvertex),			&map->nvertexes);
-	readLump(stream,LUMP_PLANES,		(void**)&map->planes,sizeof(bplane),			&map->nplanes);
-	readLump(stream,LUMP_LEAFS,			(void**)&map->leafs,sizeof(bleaf),				&map->nleafs);
-	readLump(stream,LUMP_NODES,			(void**)&map->nodes,sizeof(bnode),				&map->nnodes);
-	readLump(stream,LUMP_TEXINFO,		(void**)&map->texinfos,sizeof(btexinfo),		&map->ntexinfos);
-	readLump(stream,LUMP_CLIPNODES,		(void**)&map->clipnodes,sizeof(bclipnode),		&map->nclipnodes);
-	readLump(stream,LUMP_FACES,			(void**)&map->faces,sizeof(bface),				&map->nfaces);
-	readLump(stream,LUMP_MARKSURFACES,	(void**)&map->marksurfaces,sizeof(bmarksurface),&map->nmarksurfaces);
-	readLump(stream,LUMP_SURFEDGES,		(void**)&map->surfedges,sizeof(bsurfedge),		&map->nsurfedges);
-	readLump(stream,LUMP_EDGES,			(void**)&map->edges,sizeof(bedge),				&map->nedges);
-	readLump(stream,LUMP_VISIBILITY,	(void**)&map->visibility,1,						&map->nvisibility);
-	readLump(stream,LUMP_TEXTURES,		(void**)&map->textures,1,						&map->ntextures);
-	readLump(stream,LUMP_LIGHTING,		(void**)&map->lighting,1,						&map->nlighting);
-	readLump(stream,LUMP_ENTITIES,		(void**)&map->entities,1,						&map->nentities);
+	stream->read((byte*)&map->header,sizeof(map->header));
+
+	readLump(stream,&map->header.lumps[LUMP_MODELS],		(void**)&map->models,sizeof(bmodel),			&map->nmodels);
+	readLump(stream,&map->header.lumps[LUMP_VERTEXES],		(void**)&map->vertexes,sizeof(bvertex),			&map->nvertexes);
+	readLump(stream,&map->header.lumps[LUMP_PLANES],		(void**)&map->planes,sizeof(bplane),			&map->nplanes);
+	readLump(stream,&map->header.lumps[LUMP_LEAFS],			(void**)&map->leafs,sizeof(bleaf),				&map->nleafs);
+	readLump(stream,&map->header.lumps[LUMP_NODES],			(void**)&map->nodes,sizeof(bnode),				&map->nnodes);
+	readLump(stream,&map->header.lumps[LUMP_TEXINFO],		(void**)&map->texinfos,sizeof(btexinfo),		&map->ntexinfos);
+	readLump(stream,&map->header.lumps[LUMP_CLIPNODES],		(void**)&map->clipnodes,sizeof(bclipnode),		&map->nclipnodes);
+	readLump(stream,&map->header.lumps[LUMP_FACES],			(void**)&map->faces,sizeof(bface),				&map->nfaces);
+	readLump(stream,&map->header.lumps[LUMP_MARKSURFACES],	(void**)&map->marksurfaces,sizeof(bmarksurface),&map->nmarksurfaces);
+	readLump(stream,&map->header.lumps[LUMP_SURFEDGES],		(void**)&map->surfedges,sizeof(bsurfedge),		&map->nsurfedges);
+	readLump(stream,&map->header.lumps[LUMP_EDGES],			(void**)&map->edges,sizeof(bedge),				&map->nedges);
+	readLump(stream,&map->header.lumps[LUMP_VISIBILITY],	(void**)&map->visibility,1,						&map->nvisibility);
+	readLump(stream,&map->header.lumps[LUMP_TEXTURES],		(void**)&map->textures,1,						&map->ntextures);
+	readLump(stream,&map->header.lumps[LUMP_LIGHTING],		(void**)&map->lighting,1,						&map->nlighting);
+	readLump(stream,&map->header.lumps[LUMP_ENTITIES],		(void**)&map->entities,1,						&map->nentities);
 
 	parseVisibility(map);
 	parseEntities(map);
@@ -87,9 +86,9 @@ Resource::ptr BSP30Handler::load(Stream::ptr stream,const ResourceHandlerData *h
 	return map;
 }
 
-void BSP30Handler::readLump(Stream *stream,int lump,void **data,int size,int *count){
-	int length=header.lumps[lump].filelen;
-	int ofs=header.lumps[lump].fileofs;
+void BSP30Handler::readLump(Stream *stream,blump *lump,void **data,int size,int *count){
+	int length=lump->filelen;
+	int ofs=lump->fileofs;
 
 	stream->seek(ofs);
 	*data=malloc(length);
