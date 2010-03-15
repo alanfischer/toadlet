@@ -79,8 +79,8 @@ void MeshNode::MeshAnimationController::start(){
 	mMeshNode->setReceiveUpdates(true);
 
 	AnimationController::start();
-	if(mMeshNode->getEngine()->getScene()!=NULL){
-		mStartingFrame=mMeshNode->getEngine()->getScene()->getLogicFrame();
+	if(mMeshNode->getScene()!=NULL){
+		mStartingFrame=mMeshNode->getScene()->getLogicFrame();
 	}
 }
 
@@ -95,7 +95,7 @@ void MeshNode::MeshAnimationController::stop(){
 }	
 
 void MeshNode::MeshAnimationController::logicUpdate(int dt){
-	if(mMeshNode->getEngine()->getScene()==NULL || mStartingFrame!=mMeshNode->getEngine()->getScene()->getLogicFrame()){
+	if(mStartingFrame!=mMeshNode->getScene()->getLogicFrame()){
 		AnimationController::logicUpdate(dt);
 	}
 }
@@ -118,8 +118,8 @@ MeshNode::MeshNode():super()
 {
 }
 
-Node *MeshNode::create(Engine *engine){
-	super::create(engine);
+Node *MeshNode::create(Scene *scene){
+	super::create(scene);
 
 	mMesh=NULL;
 	mSubMeshes.clear();

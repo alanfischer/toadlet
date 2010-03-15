@@ -39,8 +39,8 @@ TOADLET_NODE_IMPLEMENT(AudioNode,Categories::TOADLET_TADPOLE_NODE+".AudioNode");
 
 AudioNode::AudioNode():super(){}
 
-Node *AudioNode::create(Engine *engine){
-	super::create(engine);
+Node *AudioNode::create(Scene *scene){
+	super::create(scene);
 	return this;
 }
 
@@ -75,6 +75,7 @@ bool AudioNode::setAudioStream(Stream::ptr stream,const String &mimeType){
 
 	mAudio=Audio::ptr(mEngine->getAudioPlayer()->createStreamingAudio());
 	if(mAudio!=NULL){
+
 		mAudio->create(stream,mimeType);
 		return true;
 	}

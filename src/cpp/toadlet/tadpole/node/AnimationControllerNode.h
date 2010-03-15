@@ -40,7 +40,7 @@ public:
 	TOADLET_NODE(AnimationControllerNode,Node);
 
 	AnimationControllerNode();
-	virtual Node *create(Engine *engine);
+	virtual Node *create(Scene *scene);
 	virtual void destroy();
 
 	inline void setTime(int time,bool setagain=true){mAnimationController->setTime(time,setagain);}

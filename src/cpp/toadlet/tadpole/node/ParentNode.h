@@ -39,7 +39,7 @@ public:
 	TOADLET_NODE(ParentNode,Node);
 
 	ParentNode();
-	virtual Node *create(Engine *engine);
+	virtual Node *create(Scene *scene);
 	virtual void destroy();
 
 	virtual ParentNode *isParent(){return this;}

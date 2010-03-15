@@ -25,6 +25,7 @@ public:
 	void render(Renderer *renderer);
 	void update(int dt);
 
+	Scene::ptr scene;
 	CameraNode::ptr cameraNode;
 	MeshNode::ptr meshNode;
 };

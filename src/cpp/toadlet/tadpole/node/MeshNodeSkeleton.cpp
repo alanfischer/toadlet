@@ -69,8 +69,8 @@ void MeshNodeSkeleton::updateBones(){
 		updateVertexData();
 	}
 
-	if(mNode!=NULL && mNode->getEngine()!=NULL && mNode->getEngine()->getScene()!=NULL){
-		mLastRenderUpdateFrame=mNode->getEngine()->getScene()->getRenderFrame();
+	if(mNode!=NULL){
+		mLastRenderUpdateFrame=mNode->getScene()->getRenderFrame();
 	}
 	else{
 		mLastRenderUpdateFrame=-1;

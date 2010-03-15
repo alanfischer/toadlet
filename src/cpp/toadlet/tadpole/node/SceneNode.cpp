@@ -43,13 +43,10 @@ namespace node{
 // Immediate TODO:
 //	- Fix Bounding Volumes, so we have Logic & Render volumes properly updated with child volumes
 //	- Test that SceneNode returns proper AABoxQuery results
-//	- Modify SpacialQuery so it can specify Logic or Render volumes.  Logic volume will use Physics volumes.  Maybe I need to make that more clear somehow.
-//	- Modify HopScene so it prunes the results to the Spacial volumes if the bit is set.
-//	- Test that SceneNode returns proper AABoxQuery results for logic volumes
 
 TOADLET_NODE_IMPLEMENT(SceneNode,Categories::TOADLET_TADPOLE_NODE+".SceneNode");
 
-SceneNode::SceneNode():super(),
+SceneNode::SceneNode(Engine *engine):super(),
 	mChildScene (NULL),
 
 	mExcessiveDT(0),
@@ -68,20 +65,22 @@ SceneNode::SceneNode():super(),
 
 	mCamera(NULL),
 	mPreviousMaterial(NULL)
-{}
+{
+	mEngine=engine;
+}
 
 SceneNode::~SceneNode(){
 }
 
-Node *SceneNode::create(Engine *engine){
-	super::create(engine);
+Node *SceneNode::create(Scene *scene){
+	super::create(this);
 
 	setChildScene(this);
 	setExcessiveDT(5000);
 	setRangeLogicDT(0,0);
 	setAmbientColor(Colors::GREY);
 
-	mBackground=mEngine->createNodeType(ParentNode::type());
+	mBackground=mEngine->createNodeType(ParentNode::type(),this);
 
 	return this;
 }
@@ -256,7 +255,7 @@ void SceneNode::logicUpdate(Node::ptr node,int dt,int scope){
 		Math::add(node->mWorldTranslate,node->mParent->mWorldTranslate);
 	}
 
-	mul(node->mWorldBound,node->mWorldTranslate,node->mWorldScale,node->mLocalBound);
+	mul(node->mWorldBound,node->mWorldTranslate,node->mWorldRotate,node->mWorldScale,node->mLocalBound);
 
 	ParentNode *parent=node->isParent();
 	bool childrenActive=false;
@@ -507,23 +506,17 @@ void SceneNode::queueRenderables(Node *node){
 	}
 
 	if(node->mCameraAligned){
-		if(true){//mCamera->mAlignmentCalculationsUseOrigin){
+		Matrix3x3 rotate;
+		if(mCamera->mAlignmentCalculationsUseOrigin){
 			Vector3 nodeWorldTranslate; Math::setTranslateFromMatrix4x4(nodeWorldTranslate,node->mWorldRenderTransform);
 			Vector3 cameraWorldTranslate; Math::setTranslateFromMatrix4x4(cameraWorldTranslate,mCamera->mWorldRenderTransform);
 			Matrix4x4 lookAtCamera; Math::setMatrix4x4FromLookAt(lookAtCamera,cameraWorldTranslate,nodeWorldTranslate,Math::Z_UNIT_VECTOR3,false);
-			Matrix3x3 rotate; Math::setMatrix3x3FromMatrix4x4Transpose(rotate,lookAtCamera);
-
-			// TODO: Switch this to RenderWorldScale when its available
-			Vector3 worldScale; Math::setScaleFromMatrix4x4(worldScale,node->mWorldRenderTransform);
-			Math::setMatrix4x4FromRotateScale(node->mWorldRenderTransform,rotate,worldScale);
+			Math::setMatrix3x3FromMatrix4x4Transpose(rotate,lookAtCamera);
 		}
 		else{
-			Matrix3x3 rotate; Math::setMatrix3x3FromMatrix4x4Transpose(rotate,mCamera->getViewTransform());
-
-			// TODO: Switch this to RenderWorldScale when its available
-			Vector3 worldScale; Math::setScaleFromMatrix4x4(worldScale,node->mWorldRenderTransform);
-			Math::setMatrix4x4FromRotateScale(node->mWorldRenderTransform,rotate,worldScale);
+			Math::setMatrix3x3FromMatrix4x4Transpose(rotate,mCamera->getViewTransform());
 		}
+		Math::setMatrix4x4FromRotateScale(node->mWorldRenderTransform,rotate,node->mWorldScale); // TODO: Switch to mRenderWorldScale if ever available
 	}
 
 	ParentNode *parent=node->isParent();

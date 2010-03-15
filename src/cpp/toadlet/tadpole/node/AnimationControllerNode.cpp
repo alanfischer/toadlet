@@ -42,8 +42,8 @@ AnimationControllerNode::AnimationControllerNode():super(),
 	mDestroyOnFinish(false)
 {}
 
-Node *AnimationControllerNode::create(Engine *engine){
-	super::create(engine);
+Node *AnimationControllerNode::create(Scene *scene){
+	super::create(scene);
 
 	mStartingFrame=0;
 	mDestroyOnFinish=false;
@@ -75,9 +75,7 @@ void AnimationControllerNode::start(){
 	setReceiveUpdates(true);
 
 	mAnimationController->start();
-	if(mEngine->getScene()!=NULL){
-		mStartingFrame=mEngine->getScene()->getLogicFrame();
-	}
+	mStartingFrame=mScene->getLogicFrame();
 }
 
 void AnimationControllerNode::stop(){
@@ -91,7 +89,7 @@ void AnimationControllerNode::stop(){
 }
 
 void AnimationControllerNode::logicUpdate(int dt){
-	if(mEngine->getScene()==NULL || mStartingFrame!=mEngine->getScene()->getLogicFrame()){
+	if(mStartingFrame!=mScene->getLogicFrame()){
 		mAnimationController->logicUpdate(dt);
 	}
 }

@@ -1444,7 +1444,7 @@ void Simulator::constraintLink(Vector3 &result,Solid *solid,const Vector3 &solid
 	int i;
 	for(i=0;i<solid->mConstraints.size();++i){
 		c=solid->mConstraints[i];
-		if(c->getActive()==false){
+		if(c->active()==false){
 			continue;
 		}
 		else if(solid==c->mStartSolid){

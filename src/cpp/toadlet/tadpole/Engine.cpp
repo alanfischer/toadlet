@@ -238,11 +238,6 @@ Engine::~Engine(){
 }
 
 void Engine::destroy(){
-	if(mScene!=NULL){
-		mScene->destroy();
-		mScene=NULL;
-	}
-
 	mAudioBufferManager->destroy();
 	mMeshManager->destroy();
 	mMaterialManager->destroy();
@@ -250,14 +245,6 @@ void Engine::destroy(){
 	mBufferManager->destroy();
 	mTextureManager->destroy();
 	mArchiveManager->destroy();
-}
-
-void Engine::setScene(const Scene::ptr &scene){
-	mScene=scene;
-}
-
-const Scene::ptr &Engine::getScene() const{
-	return mScene;
 }
 
 void Engine::setRenderer(Renderer *renderer){
@@ -411,18 +398,18 @@ Node *Engine::allocNode(const String &fullName){
 	return node;
 }
 
-Node *Engine::createNode(const BaseType<Node> &type){
+Node *Engine::createNode(const BaseType<Node> &type,Scene *scene){
 	Node *node=allocNode(type);
 	if(node!=NULL){
-		node->create(this);
+		node->create(scene);
 	}
 	return node;
 }
 
-Node *Engine::createNode(const String &fullName){
+Node *Engine::createNode(const String &fullName,Scene *scene){
 	Node *node=allocNode(fullName);
 	if(node!=NULL){
-		node->create(this);
+		node->create(scene);
 	}
 	return node;
 }

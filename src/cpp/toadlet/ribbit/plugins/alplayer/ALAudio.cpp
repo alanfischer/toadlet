@@ -26,8 +26,9 @@
 #include "ALPlayer.h"
 #include "ALAudio.h"
 #include "ALAudioBuffer.h"
-#include "toadlet/egg/MathConversion.h"
+#include <toadlet/egg/MathConversion.h>
 #include <toadlet/egg/EndianConversion.h>
+#include <toadlet/egg/Exception.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
@@ -84,7 +85,12 @@ bool ALAudio::create(AudioBuffer::ptr audioBuffer){
 bool ALAudio::create(Stream::ptr stream,const String &mimeType){
 	destroy();
 
-	AudioStream::ptr decoder=mAudioPlayer->startAudioStream(stream,mimeType);
+	AudioStream::ptr decoder=NULL;
+	TOADLET_TRY{
+		decoder=mAudioPlayer->startAudioStream(stream,mimeType);
+	}TOADLET_CATCH(const Exception &){
+		decoder=NULL;
+	}
 
 	if(decoder==NULL){
 		return false;

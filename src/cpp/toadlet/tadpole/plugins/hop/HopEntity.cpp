@@ -45,7 +45,7 @@ HopEntity::HopEntity():ParentNode(),
 	//mTraceableShape,
 	mTraceable(NULL),
 
-	//mScene,
+	//mHopScene,
 	//mLastPosition,
 	mActivePrevious(false),
 
@@ -59,8 +59,8 @@ HopEntity::HopEntity():ParentNode(),
 	//mShadowNode
 {}
 
-Node *HopEntity::create(Engine *engine){
-	super::create(engine);
+Node *HopEntity::create(Scene *scene){
+	super::create(scene);
 
 	// No need to worry about this
 	mIdentityTransform=false;
@@ -68,7 +68,7 @@ Node *HopEntity::create(Engine *engine){
 	mNextThink=0;
 	mSolid->reset();
 	mSolid->setUserData(this);
-	mScene=NULL;
+	mHopScene=NULL;
 	mLastPosition.reset();
 	mActivePrevious=true;
 
@@ -83,28 +83,22 @@ Node *HopEntity::create(Engine *engine){
 
 	mIdentityTransform=false;
 
-	mScene=shared_static_cast<HopScene>(mEngine->getScene());
+	mHopScene=(HopScene*)(mScene);
 
-	if(mScene==NULL){
+	if(mHopScene==NULL){
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"Invalid scene");
 		return this;
 	}
 
-	mScene->registerHopEntity(this);
+	mHopScene->registerHopEntity(this);
 
 	return this;
 }
 
 void HopEntity::destroy(){
-	if(mScene!=NULL){
-		mScene->unregisterHopEntity(this);
-	}
-
-	// We handle this here, because destroy() must be last, but we would normally need mScene when parentChanged is called
-	if(mScene!=NULL && mScene->getSimulator()!=NULL){
-		mScene->getSimulator()->removeSolid(getSolid());
-		mScene=NULL;
+	if(mHopScene!=NULL){
+		mHopScene->unregisterHopEntity(this);
 	}
 
 	super::destroy();
@@ -269,7 +263,7 @@ void HopEntity::setShadowMesh(Mesh::ptr shadow,scalar scale,scalar testLength,sc
 	mShadowOffset=offset;
 	if(mShadowMesh!=NULL){
 		if(mShadowNode==NULL){
-			mShadowNode=mEngine->createNodeType(MeshNode::type());
+			mShadowNode=mEngine->createNodeType(MeshNode::type(),mScene);
 			mScene->getRootNode()->attach(mShadowNode);
 		}
 		mShadowNode->setMesh(mShadowMesh);
@@ -287,12 +281,12 @@ void HopEntity::setShadowMesh(Mesh::ptr shadow,scalar scale,scalar testLength,sc
 }
 
 void HopEntity::parentChanged(ParentNode *parent){
-	if(mScene!=NULL){
+	if(mHopScene!=NULL){
 		if(parent==mScene->getRootNode()){
-			mScene->getSimulator()->addSolid(getSolid());
+			mHopScene->getSimulator()->addSolid(getSolid());
 		}
 		else{
-			mScene->getSimulator()->removeSolid(getSolid());
+			mHopScene->getSimulator()->removeSolid(getSolid());
 		}
 	}
 
@@ -328,7 +322,7 @@ void HopEntity::traceSolid(hop::Collision &result,const Segment &segment,const h
 
 void HopEntity::collision(const hop::Collision &c){
 	tadpole::Collision collision;
-	mScene->set(collision,c);
+	mHopScene->set(collision,c);
 	touch(collision);
 }
 
@@ -364,11 +358,11 @@ void HopEntity::castShadow(){
 	Matrix3x3 rotate;
 	Math::setTranslateFromMatrix4x4(segment.origin,mRenderTransform);
 	Math::setMatrix3x3FromMatrix4x4(rotate,mRenderTransform);
-	Math::normalize(vector,mScene->getSimulator()->getGravity());
+	Math::normalize(vector,mSolid->getSimulator()->getGravity());
 	Math::mul(segment.direction,vector,mShadowTestLength);
 
 	hop::Collision collision;
-	mScene->getSimulator()->traceSegment(collision,segment,-1,mSolid);
+	mSolid->getSimulator()->traceSegment(collision,segment,-1,mSolid);
 	// Shadow if the object beneath us is of infinite mass (eg static)
 	if(collision.collider!=NULL && collision.collider->hasInfiniteMass()){
 		Math::mul(vector,collision.normal,mShadowOffset);
@@ -394,7 +388,7 @@ void HopEntity::castShadow(){
 void HopEntity::showCollisionVolumes(bool show){
 	if(show){
 		if(mVolumeNode==NULL){
-			mVolumeNode=mEngine->createNodeType(ParentNode::type());
+			mVolumeNode=mEngine->createNodeType(ParentNode::type(),mScene);
 			mScene->getRootNode()->attach(mVolumeNode);
 		}
 		else{
@@ -426,7 +420,7 @@ void HopEntity::showCollisionVolumes(bool show){
 			mesh->subMeshes[0]->indexData->destroy();
 			mesh->subMeshes[0]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,indexBuffer));
 			mesh->subMeshes[0]->material->setLighting(false);
-			MeshNode *meshNode=mEngine->createNodeType(MeshNode::type());
+			MeshNode *meshNode=mEngine->createNodeType(MeshNode::type(),mScene);
 			meshNode->setMesh(mesh);
 			mVolumeNode->attach(meshNode);
 		}

@@ -42,6 +42,7 @@ Node::Node():
 
 	mCreated(false),
 	mEngine(NULL),
+	mScene(NULL),
 
 	mNodeDestroyedListener(NULL),
 	mOwnsNodeDestroyedListener(false),
@@ -70,13 +71,16 @@ Node::~Node(){
 	TOADLET_ASSERT(!mCreated);
 }
 
-Node *Node::create(Engine *engine){
+Node *Node::create(Scene *scene){
 	if(mCreated){
 		return this;
 	}
 
 	mCreated=true;
-	mEngine=engine;
+	if(scene!=NULL){
+		mEngine=scene->getEngine();
+	}
+	mScene=scene;
 
 	mNodeDestroyedListener=NULL;
 	mOwnsNodeDestroyedListener=false;
@@ -131,6 +135,7 @@ void Node::destroy(){
 
 	mEngine->freeNode(this);
 	mEngine=NULL;
+	mScene=NULL;
 }
 
 void Node::setNodeDestroyedListener(NodeDestroyedListener *listener,bool owns){

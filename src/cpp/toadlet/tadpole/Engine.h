@@ -61,11 +61,6 @@ public:
 
 	void destroy();
 
-	/// @todo: Remove the Scene in Engine completely.  I believe we only need it currently for some HopNode stuff.
-	///  This would let us have multiple Scenes in an application, pretty neat.
-	void setScene(const node::Scene::ptr &scene);
-	const node::Scene::ptr &getScene() const;
-
 	void setRenderer(peeper::Renderer *renderer);
 	peeper::Renderer *getRenderer() const;
 	void updateVertexFormats();
@@ -81,13 +76,13 @@ public:
 	void registerNodeType(const egg::BaseType<node::Node> &type);
 	node::Node *allocNode(const egg::BaseType<node::Node> &type);
 	node::Node *allocNode(const egg::String &fullName);
-	node::Node *createNode(const egg::BaseType<node::Node> &type);
-	node::Node *createNode(const egg::String &fullName);
+	node::Node *createNode(const egg::BaseType<node::Node> &type,node::Scene *scene);
+	node::Node *createNode(const egg::String &fullName,node::Scene *scene);
 	void destroyNode(node::Node *node);
 	void freeNode(node::Node *node);
 
 	template<typename Type> Type *allocNodeType(const egg::Type<Type,node::Node> &type){return (Type*)allocNode(type);}
-	template<typename Type> Type *createNodeType(const egg::Type<Type,node::Node> &type){return (Type*)createNode(type);}
+	template<typename Type> Type *createNodeType(const egg::Type<Type,node::Node> &type,node::Scene *scene){return (Type*)createNode(type,scene);}
 
 	// Context methods
 	void contextReset(peeper::Renderer *renderer);
@@ -110,7 +105,6 @@ public:
 
 protected:
 	egg::String mDirectory;
-	node::Scene::ptr mScene;
 	peeper::Renderer *mRenderer;
 	ribbit::AudioPlayer *mAudioPlayer;
 

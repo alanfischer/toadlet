@@ -134,7 +134,7 @@ rect{
 
 - (void) update{
 	toadlet::uint64 currentTime=System::mtime();
-	if(mApplication->isActive()){
+	if(mApplication->active()){
 		mApplication->update(currentTime-mLastTime);
 		if(mApplication->getRenderer()!=NULL){
 			mApplication->render(mApplication->getRenderer());
@@ -150,7 +150,7 @@ rect{
 #endif
 	mApplication->resized([self bounds].size.width,[self bounds].size.height);
 
-	if(mApplication->isActive() && mApplication->getRenderer()!=NULL){
+	if(mApplication->active() && mApplication->getRenderer()!=NULL){
 		if(mApplication->getRenderer()->getCapabilitySet().resetOnResize){
 			mApplication->getEngine()->contextReset(mApplication->getRenderer());
 		}

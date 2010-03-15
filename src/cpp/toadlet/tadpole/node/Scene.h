@@ -53,6 +53,7 @@ public:
 	virtual void setChildScene(Scene *scene)=0;
 	virtual Scene *getRootScene()=0;
 
+	virtual Engine *getEngine()=0;
 	virtual ParentNode *getBackground()=0;
 	virtual SceneNode *getRootNode()=0;
 

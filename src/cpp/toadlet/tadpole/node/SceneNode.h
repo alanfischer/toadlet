@@ -56,16 +56,17 @@ class PhysicallyTraceable;
 
 class TOADLET_API SceneNode:public ParentNode,public Scene{
 public:
-	TOADLET_NODE(SceneNode,ParentNode);
+	TOADLET_NONINSTANCIABLENODE(SceneNode,ParentNode);
 
-	SceneNode();
+	SceneNode(Engine *engine);
 	virtual ~SceneNode();
-	virtual Node *create(Engine *engine);
+	virtual Node *create(Scene *scene);
 	virtual void destroy();
 
 	virtual void setChildScene(Scene *scene){mChildScene=scene;}
 	virtual Scene *getRootScene(){return this;}
 
+	virtual Engine *getEngine(){return mEngine;}
 	virtual ParentNode *getBackground(){return mBackground;}
 	virtual SceneNode *getRootNode(){return this;}
 

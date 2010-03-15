@@ -42,6 +42,15 @@
 		TOADLET_INTRUSIVE_POINTERS(Class)
 #endif
 
+#ifndef TOADLET_NONINSTANCIABLENODE
+	#define TOADLET_NONINSTANCIABLENODE(Class,SuperClass) \
+		typedef SuperClass super; \
+		typedef toadlet::egg::NonInstantiableType<Class,toadlet::tadpole::node::Node> ThisType; \
+		static const ThisType &type(); \
+		virtual const toadlet::egg::BaseType<toadlet::tadpole::node::Node> &getType(){return Class::type();} \
+		TOADLET_INTRUSIVE_POINTERS(Class)
+#endif
+
 #ifndef TOADLET_NODE_IMPLEMENT
 	#define TOADLET_NODE_IMPLEMENT(Class,FullName) \
 		const Class::ThisType &Class::type(){static ThisType t(FullName);return t;}
@@ -65,7 +74,7 @@ public:
 
 	Node();
 	virtual ~Node();
-	virtual Node *create(Engine *engine);
+	virtual Node *create(Scene *scene);
 	inline bool created() const{return mCreated;}
 	virtual void destroy();
 
@@ -113,7 +122,7 @@ public:
 	virtual void findTransformTo(Matrix4x4 &result,Node *node);
 
 	virtual void handleEvent(const egg::Event::ptr &event){}
-	
+
 	virtual void setScope(int scope);
 	inline int getScope() const{return mScope;}
 
@@ -141,6 +150,7 @@ public:
 	inline bool active() const{return mActive;}
 
 	inline Engine *getEngine() const{return mEngine;}
+	inline Scene *getScene() const{return mScene;}
 
 	inline egg::PointerCounter *pointerCounter() const{return mPointerCounter;}
 	inline const Matrix4x4 &getRenderTransform() const{return mRenderTransform;}
@@ -157,10 +167,11 @@ public:
 		Math::mulPoint3Fast(r.origin,m,s.origin);
 	}
 
-	static void mul(Sphere &r,const Vector3 &translate,const Vector3 &scale,const Sphere &s){
+	static void mul(Sphere &r,const Vector3 &translate,const Quaternion &rotate,const Vector3 &scale,const Sphere &s){
 		Math::mul(r.origin,scale,s.radius);
 		r.radius=Math::maxVal(Math::maxVal(r.origin.x,r.origin.y),r.origin.z);
-		Math::add(r.origin,translate,s.origin);
+		Math::mul(r.origin,rotate,s.origin);
+		Math::add(r.origin,translate);
 	}
 
 	// Merge two spheres, passing along -1 radius, and ignoring 0 radius
@@ -205,6 +216,7 @@ protected:
 	// Engine items
 	bool mCreated;
 	Engine *mEngine;
+	Scene *mScene;
 
 	// Node items
 	NodeDestroyedListener *mNodeDestroyedListener;

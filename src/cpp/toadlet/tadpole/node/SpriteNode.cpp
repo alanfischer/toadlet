@@ -61,9 +61,7 @@ void SpriteNode::SpriteAnimationController::start(){
 	mSpriteNode->setReceiveUpdates(true);
 
 	AnimationController::start();
-	if(mSpriteNode->getEngine()->getScene()!=NULL){
-		mStartingFrame=mSpriteNode->getEngine()->getScene()->getLogicFrame();
-	}
+	mStartingFrame=mSpriteNode->getScene()->getLogicFrame();
 }
 
 void SpriteNode::SpriteAnimationController::stop(){
@@ -77,7 +75,7 @@ void SpriteNode::SpriteAnimationController::stop(){
 }	
 
 void SpriteNode::SpriteAnimationController::logicUpdate(int dt){
-	if(mSpriteNode->getEngine()->getScene()==NULL || mStartingFrame!=mSpriteNode->getEngine()->getScene()->getLogicFrame()){
+	if(mSpriteNode->getScene()==NULL || mStartingFrame!=mSpriteNode->getScene()->getLogicFrame()){
 		AnimationController::logicUpdate(dt);
 	}
 }
@@ -104,8 +102,8 @@ SpriteNode::SpriteNode():super(),
 	//mSpriteTransform
 {}
 
-Node *SpriteNode::create(Engine *engine){
-	super::create(engine);
+Node *SpriteNode::create(Scene *scene){
+	super::create(scene);
 
 	setPerspective(true);
 	setCameraAligned(true);

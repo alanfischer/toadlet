@@ -45,8 +45,6 @@ public:
 
 	BSP30ModelNode();
 	virtual ~BSP30ModelNode();
-	virtual node::Node *create(Engine *engine);
-	virtual void destroy();
 
 	void setModel(BSP30Map::ptr map,const egg::String &name);
 	void setModel(BSP30Map::ptr map,int index);
@@ -77,12 +75,10 @@ protected:
 
 class TOADLET_API BSP30SceneNode:public node::SceneNode{
 public:
-	TOADLET_NODE(BSP30SceneNode,SceneNode);
+	TOADLET_NONINSTANCIABLENODE(BSP30SceneNode,SceneNode);
 
-	BSP30SceneNode();
+	BSP30SceneNode(Engine *engine);
 	virtual ~BSP30SceneNode();
-	virtual node::Node *create(Engine *engine);
-	virtual void destroy();
 
 	Scene *getRootScene(){return this;}
 
