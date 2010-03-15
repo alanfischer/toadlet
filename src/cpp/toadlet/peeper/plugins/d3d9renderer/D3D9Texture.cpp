@@ -441,6 +441,12 @@ int D3D9Texture::getClosestTextureFormat(int format){
 			return Format_BGR_8;
 		case Format_RGBA_8:
 			return Format_BGRA_8;
+		case Format_RGB_5_6_5:
+			return Format_BGR_5_6_5;
+		case Format_RGBA_5_5_5_1:
+			return Format_BGRA_5_5_5_1;
+		case Format_RGBA_4_4_4_4:
+			return Format_BGRA_4_4_4_4;
 		default:
 			return format;
 	}

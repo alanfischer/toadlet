@@ -54,6 +54,7 @@ public:
 	virtual void setChildScene(node::Scene *scene){mChildScene=scene;}
 	virtual node::Scene *getRootScene(){return mScene;}
 
+	virtual Engine *getEngine(){return mScene->getEngine();}
 	virtual node::ParentNode *getBackground(){return mScene->getBackground();}
 	virtual node::SceneNode *getRootNode(){return mScene->getRootNode();}
 

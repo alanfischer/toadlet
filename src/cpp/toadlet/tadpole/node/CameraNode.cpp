@@ -62,8 +62,8 @@ CameraNode::CameraNode():super(),
 	mFPS(0)
 {}
 
-Node *CameraNode::create(Engine *engine){
-	super::create(engine);
+Node *CameraNode::create(Scene *scene){
+	super::create(scene);
 
 	setProjectionFovX(Math::HALF_PI,Math::fromInt(1),Math::fromInt(1),Math::fromInt(100));
 	mViewportSet=false;
@@ -209,7 +209,7 @@ void CameraNode::setViewport(int x,int y,int width,int height){
 
 ParentNode::ptr CameraNode::getMidNode(){
 	if(mMidNode==NULL){
-		mMidNode=mEngine->createNodeType(ParentNode::type());
+		mMidNode=mEngine->createNodeType(ParentNode::type(),getScene());
 		attach(mMidNode);
 		update();
 	}
@@ -280,7 +280,7 @@ bool CameraNode::culled(const AABox &box){
 
 void CameraNode::updateFramesPerSecond(){
 	mFPSFrameCount++;
-	int fpsTime=mEngine->getScene()->getRenderTime();
+	int fpsTime=mScene->getRenderTime();
 	if(mFPSLastTime==0 || fpsTime-mFPSLastTime>5000){
 		scalar fps=0;
 		if(mFPSLastTime>0){

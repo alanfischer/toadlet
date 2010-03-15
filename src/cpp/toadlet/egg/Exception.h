@@ -28,23 +28,21 @@
 
 #include <toadlet/Types.h>
 #include <toadlet/egg/String.h>
+#include <stdexcept>
 
 namespace toadlet{
 namespace egg{
 
-class TOADLET_API Exception{
+class TOADLET_API Exception:public std::exception{
 public:
 	Exception(int type);
 	Exception(int type,const char *description);
-	Exception(int type,const String &description);
 
 	int getError();
 	const char *getDescription();
 
 protected:
-	static const int MAX_DESCRIPTION_LENGTH=1024;
 	int mError;
-	char mDescription[MAX_DESCRIPTION_LENGTH+1];
 };
 
 }

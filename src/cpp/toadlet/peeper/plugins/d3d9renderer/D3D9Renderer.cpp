@@ -881,7 +881,7 @@ void D3D9Renderer::setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D
 	capabilitySet.maxTextureStages=caps.MaxTextureBlendStages;
 	capabilitySet.maxTextureSize=math::Math::minVal(caps.MaxTextureWidth,caps.MaxTextureHeight);
 	capabilitySet.textureDot3=(caps.TextureOpCaps & D3DTEXOPCAPS_DOTPRODUCT3)!=0;
-	capabilitySet.textureNonPowerOf2=(caps.TextureCaps & D3DPTEXTURECAPS_POW2)==0 && (caps.TextureCaps & D3DPTEXTURECAPS_SQUAREONLY)==0;
+	capabilitySet.textureNonPowerOf2=false;//(caps.TextureCaps & D3DPTEXTURECAPS_POW2)==0 && (caps.TextureCaps & D3DPTEXTURECAPS_SQUAREONLY)==0;
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 		capabilitySet.textureNonPowerOf2Restricted=false;
 	#else

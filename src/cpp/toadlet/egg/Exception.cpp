@@ -31,28 +31,10 @@ namespace egg{
 
 Exception::Exception(int error){
 	mError=error;
-	mDescription[0]=0;
 }
 
-Exception::Exception(int error,const char *description){
+Exception::Exception(int error,const char *description):std::exception(description){
 	mError=error;
-	int c=0;
-	while(description[c]!=0 && c<MAX_DESCRIPTION_LENGTH){
-		mDescription[c]=description[c];
-		c++;
-	}
-	mDescription[c]=0;
-}
-
-Exception::Exception(int error,const String &description){
-	mError=error;
-	int c=0;
-	const char *p=description.c_str();
-	while(p[c]!=0 && c<MAX_DESCRIPTION_LENGTH){
-		mDescription[c]=p[c];
-		c++;
-	}
-	mDescription[c]=0;
 }
 
 int Exception::getError(){
@@ -60,7 +42,7 @@ int Exception::getError(){
 }
 
 const char *Exception::getDescription(){
-	return mDescription;
+	return what();
 }
 
 }

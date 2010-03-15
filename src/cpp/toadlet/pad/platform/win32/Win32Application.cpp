@@ -802,7 +802,7 @@ LRESULT CALLBACK wndProc(HWND wnd,UINT msg,WPARAM wParam,LPARAM lParam){
 		case WM_SETTINGCHANGE:
 			#if defined(TOADLET_PLATFORM_WINCE)
 				// We have to re-hide the items when it issues the SETTINGCHANGE, but only if we're not in any sub windows
-				if(application->getFullscreen() && application->isActive()){
+				if(application->getFullscreen() && application->active()){
 					ShowWindow(wnd,SW_SHOWNORMAL);
 					SetFocus(wnd);
 					SHFullScreen(wnd,SHFS_HIDESIPBUTTON|SHFS_HIDETASKBAR|SHFS_HIDESTARTICON);

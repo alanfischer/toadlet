@@ -85,8 +85,8 @@ ParticleNode::ParticleNode():super(),
 	mEpsilon(0)
 {}
 
-Node *ParticleNode::create(Engine *engine){
-	super::create(engine);
+Node *ParticleNode::create(Scene *scene){
+	super::create(scene);
 
 	mDestroyNextLogicFrame=false;
 

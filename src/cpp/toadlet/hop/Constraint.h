@@ -63,7 +63,7 @@ public:
 	scalar getDistanceThreshold() const{return mDistanceThreshold;}
 
 	void activate(){}
-	bool getActive() const{return (mSimulator!=NULL);}
+	bool active() const{return (mSimulator!=NULL);}
 
 	inline Simulator *getSimulator() const{return mSimulator;}
 

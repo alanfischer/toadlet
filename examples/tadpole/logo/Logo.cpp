@@ -18,23 +18,23 @@ void Logo::create(){
 		Logger::alert(entries->at(i));
 	}
 
-	getEngine()->setScene(mEngine->createNodeType(SceneNode::type()));
+	scene=mEngine->allocNodeType(SceneNode::type())->create(mEngine);
 
 	MemoryStream::ptr in(new MemoryStream(lt_mmsh::data,lt_mmsh::length,lt_mmsh::length,false));
 	Mesh::ptr mesh=shared_static_cast<Mesh>(getEngine()->getMeshManager()->getHandler("mmsh")->load(in,NULL));
 	//MemoryInputStream::ptr in(new MemoryInputStream(lt_xmsh::data,lt_xmsh::length));
 	//Mesh::ptr mesh=shared_static_cast<Mesh>(getEngine()->getMeshManager()->getHandler("xmsh")->load(in,NULL));
 
-	meshNode=getEngine()->createNodeType(MeshNode::type());
+	meshNode=getEngine()->createNodeType(MeshNode::type(),scene);
 	meshNode->setMesh(mesh);
 	meshNode->getAnimationController()->start();
 	meshNode->getAnimationController()->setCycling(MeshNode::MeshAnimationController::Cycling_REFLECT);
-	getEngine()->getScene()->getRootNode()->attach(meshNode);
+	scene->getRootNode()->attach(meshNode);
 
-	cameraNode=getEngine()->createNodeType(CameraNode::type());
+	cameraNode=getEngine()->createNodeType(CameraNode::type(),scene);
 	cameraNode->setLookDir(Vector3(Math::fromInt(25),-Math::fromInt(100),0),Math::Y_UNIT_VECTOR3,Math::Z_UNIT_VECTOR3);
 	cameraNode->setClearColor(Colors::BLUE);
-	getEngine()->getScene()->getRootNode()->attach(cameraNode);
+	scene->getRootNode()->attach(cameraNode);
 }
 
 void Logo::resized(int width,int height){
@@ -51,13 +51,13 @@ void Logo::resized(int width,int height){
 
 void Logo::render(Renderer *renderer){
 	renderer->beginScene();
-		getEngine()->getScene()->render(renderer,cameraNode,NULL);
+		scene->render(renderer,cameraNode,NULL);
 	renderer->endScene();
 	renderer->swap();
 }
 
 void Logo::update(int dt){
-	getEngine()->getScene()->update(dt);
+	scene->update(dt);
 }
 
 #if !defined(TOADLET_PLATFORM_OSX)

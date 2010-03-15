@@ -47,7 +47,7 @@ public:
 	};
 
 	CameraNode();
-	virtual Node *create(Engine *engine);
+	virtual Node *create(Scene *scene);
 
 	void setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,scalar farDist);
 	void setProjectionFovY(scalar fovy,scalar aspect,scalar nearDist,scalar farDist);

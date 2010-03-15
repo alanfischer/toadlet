@@ -42,7 +42,7 @@ public:
 	TOADLET_NODE(LightNode,Node);
 
 	LightNode();
-	virtual Node *create(Engine *engine);
+	virtual Node *create(Scene *scene);
 	virtual void destroy();
 
 	virtual Renderable *isRenderable(){return this;}

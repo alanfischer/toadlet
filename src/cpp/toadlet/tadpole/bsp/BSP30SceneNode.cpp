@@ -26,7 +26,6 @@
 // TODO:
 // - right now we have aabox in bsp, which goes to a sphere for the localbound, which goes to an aabox for the physics bound.  this should be fixed somehow
 // - clean up the aabox querying so its a lot easier to use
-// - make the traceSegment function take a radius perhaps, and then a radius==hull[x] expanded size would be a trace through that hull
 // - modify the rendering to be material based, with objects that it would push into the pipeline, so we don't need to do the preRender crap
 // - make members protected again
 // - MAYBE: eliminate the need to create a worldspawn model, and that would instead all be handled by the Scene's rendering + Scene's tracing (however... that now needs the hopScene to be aware of us, not just our solids, but that wouldn't be impossible with the Traceable interface)
@@ -62,14 +61,6 @@ BSP30ModelNode::BSP30ModelNode():Node(),
 {}
 
 BSP30ModelNode::~BSP30ModelNode(){
-}
-
-Node *BSP30ModelNode::create(Engine *engine){
-	return super::create(engine);
-}
-
-void BSP30ModelNode::destroy(){
-	super::destroy();
 }
 
 void BSP30ModelNode::setModel(BSP30Map::ptr map,const String &name){
@@ -117,12 +108,14 @@ void BSP30ModelNode::render(peeper::Renderer *renderer) const{
 		return;		// TODO: I believe we could just check to see if visdata is available for this model, and if so then render it that way, otherwise without.  Then the world model would be rendered same way.
 	}
 
-	BSP30SceneNode *scene=(BSP30SceneNode*)mEngine->getScene()->getRootScene();
-	BSP30SceneNode::RendererData &data=(BSP30SceneNode::RendererData&)scene->mRendererData;
+//	Logger::error("get bsp node rendering without using scene");
+/*
+//	BSP30SceneNode *scene=(BSP30SceneNode*)mEngine->getScene()->getRootScene();
+//	BSP30SceneNode::RendererData &data=(BSP30SceneNode::RendererData&)scene->mRendererData;
 
 	// clear stuff
-	memset(&data.markedFaces[0],0,data.markedFaces.size()*sizeof(unsigned char));
-	data.textureVisibleFaces.resize(mMap->parsedTextures.size());
+//	memset(&data.markedFaces[0],0,data.markedFaces.size()*sizeof(unsigned char));
+//	data.textureVisibleFaces.resize(mMap->parsedTextures.size());
 
 	bmodel *model=&mMap->models[mModelIndex];
 	for(int i=0;i<model->numfaces;++i){
@@ -134,18 +127,20 @@ void BSP30ModelNode::render(peeper::Renderer *renderer) const{
 	renderer->setAlphaTest(Renderer::AlphaTest_GEQUAL,0.9);
 
 	scene->renderVisibleFaces(renderer);
+*/
 }
 
 void BSP30ModelNode::traceSegment(Collision &result,const Segment &segment,const Vector3 &size){
-	Segment tseg;
-	Vector3 invtrans=-getTranslate();
-	Quaternion invrot; Math::invert(invrot,getRotate());
-	Math::add(tseg.origin,invtrans,segment.origin);
-	Math::mul(tseg.direction,invrot,segment.direction);
+	Segment localSegment;
+	Vector3 invtrans=-getWorldTranslate();
+	Quaternion invrot; Math::invert(invrot,getWorldRotate());
+	Math::add(localSegment.origin,invtrans,segment.origin);
+	Math::mul(localSegment.origin,invrot);
+	Math::mul(localSegment.direction,invrot,segment.direction);
 
 	result.time=Math::ONE;
 	Vector3 end;
-	segment.getEndPoint(end);
+	localSegment.getEndPoint(end);
 	if(mMap!=NULL){
 		int hullIndex=0;
 		if(mMap->header.version==Q1BSPVERSION){
@@ -178,26 +173,31 @@ void BSP30ModelNode::traceSegment(Collision &result,const Segment &segment,const
 
 		int headNode=mMap->models[mModelIndex].headnode[0];
 		int headClipNode=mMap->models[mModelIndex].headnode[hullIndex];
-		if(headClipNode<0 || headNode>=mMap->nclipnodes){
+		if(headNode<0 || headNode>=mMap->nnodes || headClipNode<0 || headClipNode>=mMap->nclipnodes){
 			return;
 		}
 
 		if(hullIndex==0){
-			mMap->hullTrace(result,mMap->planes,mMap->leafs,mMap->nodes,sizeof(bnode),headNode,0,Math::ONE,segment.origin,end,0.03125);
+			mMap->hullTrace(result,mMap->planes,mMap->leafs,mMap->nodes,sizeof(bnode),headNode,0,Math::ONE,localSegment.origin,end,0.03125);
 		}
 		else{
-			mMap->hullTrace(result,mMap->planes,NULL,mMap->clipnodes,sizeof(bclipnode),headClipNode,0,Math::ONE,segment.origin,end,0.03125);
+			mMap->hullTrace(result,mMap->planes,NULL,mMap->clipnodes,sizeof(bclipnode),headClipNode,0,Math::ONE,localSegment.origin,end,0.03125);
 		}
 
-		int contents=mMap->leafs[mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),headNode,segment.origin)].contents;
+		int contents=mMap->leafs[mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),headNode,localSegment.origin)].contents;
 		if(contents!=CONTENTS_EMPTY){
 			result.scope|=(-1-contents)<<1;
 		}
-		if(mInternalScope!=0 && (contents=-1-mMap->findPointLeaf(mMap->planes,mMap->clipnodes,sizeof(bclipnode),headClipNode,segment.origin))!=CONTENTS_EMPTY){
+		if(mInternalScope!=0 && (contents=-1-mMap->findPointLeaf(mMap->planes,mMap->clipnodes,sizeof(bclipnode),headClipNode,localSegment.origin))!=CONTENTS_EMPTY){
 			result.scope|=mInternalScope;
 		}
 	}
 
+	Math::mul(result.normal,getWorldRotate());
+	Math::mul(result.point,getWorldRotate());
+	Math::add(result.point,getWorldTranslate());
+
+	// We just use segment here because we only care about the actual result.time
 	if(result.time==Math::ONE){
 		Math::add(result.point,segment.direction,segment.origin);
 	}
@@ -208,22 +208,12 @@ void BSP30ModelNode::traceSegment(Collision &result,const Segment &segment,const
 
 TOADLET_NODE_IMPLEMENT(BSP30SceneNode,Categories::TOADLET_TADPOLE_NODE+".BSP30SceneNode");
 
-BSP30SceneNode::BSP30SceneNode():super(),
+BSP30SceneNode::BSP30SceneNode(Engine *engine):super(engine),
 	mCounter(1)
 {
 }
 
 BSP30SceneNode::~BSP30SceneNode(){}
-
-node::Node *BSP30SceneNode::create(Engine *engine){
-	super::create(engine);
-
-	return this;
-}
-
-void BSP30SceneNode::destroy(){
-	super::destroy();
-}
 
 static Texture::ptr GLIGHTMAP;
 void BSP30SceneNode::setMap(BSP30Map::ptr map){
@@ -371,7 +361,7 @@ GLIGHTMAP->retain();
 		mesh->subMeshes[i]->material->setLayer(-1);
 	}
 
-	node::MeshNode::ptr node=mEngine->createNodeType(node::MeshNode::type());
+	node::MeshNode::ptr node=mEngine->createNodeType(node::MeshNode::type(),getScene());
 	node->setMesh(mesh);
 	getBackground()->attach(node);
 	// END: Needs to be removed
@@ -431,7 +421,7 @@ bool BSP30SceneNode::remove(Node *node){
 			removeNodeLeafIndexes(((childdata*)node->getParentData())->leafs,node);
 		}
 
-		delete node->getParentData();
+		delete (childdata*)node->getParentData();
 		node->setParentData(NULL);
 	}
 	return result;

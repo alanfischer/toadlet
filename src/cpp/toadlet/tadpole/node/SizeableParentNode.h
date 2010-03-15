@@ -45,7 +45,7 @@ public:
 	};
 
 	SizeableParentNode();
-	virtual Node *create(Engine *engine);
+	virtual Node *create(Scene *scene);
 	virtual void destroy();
 
 	Sizeable *isSizeable(){return this;}

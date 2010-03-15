@@ -62,7 +62,7 @@ public:
 	const static int NETWORKID_NOT_NETWORKED=-1;
 
 	HopEntity();
-	virtual Node *create(Engine *engine);
+	virtual Node *create(node::Scene *scene);
 	virtual void destroy();
 
 	virtual Node *isEntity(){return this;}
@@ -118,7 +118,6 @@ public:
 	virtual hop::Shape::ptr getShape(int i) const{return mSolid->getShape(i);}
 	virtual int getNumShapes() const{return mSolid->getNumShapes();}
 
-	inline HopScene::ptr getScene() const{return mScene;}
 	inline hop::Solid::ptr getSolid() const{return mSolid;}
 
 	virtual void think();
@@ -127,7 +126,7 @@ public:
 	virtual void setNextThink(int nextThink){mNextThink=nextThink;}
 	inline int getNextThink() const{return mNextThink;}
 
-	virtual void changeNetworkID(int id){mScene->setHopEntityNetworkID(this,id);}
+//	virtual void changeNetworkID(int id){mScene->setHopEntityNetworkID(this,id);}
 	inline int getNetworkID() const{return mNetworkID;}
 	inline bool isNetworked() const{return mNetworkID!=NETWORKID_NOT_NETWORKED;}
 
@@ -163,7 +162,7 @@ protected:
 	hop::Shape::ptr mTraceableShape;
 	node::Traceable *mTraceable;
 	
-	HopScene::ptr mScene;
+	HopScene *mHopScene;
 	Vector3 mLastPosition;
 	bool mActivePrevious;
 

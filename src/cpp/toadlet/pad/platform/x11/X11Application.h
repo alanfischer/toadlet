@@ -52,7 +52,7 @@ public:
 	virtual bool getAutoActivate() const{return mAutoActivate;}
 	virtual void activate();
 	virtual void deactivate();
-	virtual bool isActive() const{return mActive;}
+	virtual bool active() const{return mActive;}
 
 	virtual void setTitle(const egg::String &title);
 	virtual const egg::String &getTitle() const;

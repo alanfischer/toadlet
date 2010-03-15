@@ -87,7 +87,7 @@ public:
 	virtual bool getAutoActivate() const=0;
 	virtual void activate()=0;
 	virtual void deactivate()=0;
-	virtual bool isActive() const=0;
+	virtual bool active() const=0;
 
 	virtual void setTitle(const egg::String &title)=0;
 	virtual const egg::String &getTitle() const=0;

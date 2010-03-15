@@ -115,7 +115,7 @@ peeper::Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager 
 		return NULL;
 	}
 
-	if(hasNonPowerOf2 && (Math::isPowerOf2(swidth)==false || Math::isPowerOf2(sheight)==false)){
+	if(hasNonPowerOf2==false && (Math::isPowerOf2(swidth)==false || Math::isPowerOf2(sheight)==false)){
 		dwidth=Math::nextPowerOf2(swidth)>>1;
 		dheight=Math::nextPowerOf2(sheight)>>1;
 	}

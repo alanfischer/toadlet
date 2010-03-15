@@ -42,8 +42,8 @@ ParentNode::ParentNode():super(),
 {
 }
 
-Node *ParentNode::create(Engine *engine){
-	super::create(engine);
+Node *ParentNode::create(Scene *scene){
+	super::create(scene);
 
 	mChildren.clear();
 	mActivateChildren=true;

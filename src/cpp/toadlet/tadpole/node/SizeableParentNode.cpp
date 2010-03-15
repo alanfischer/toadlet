@@ -39,8 +39,8 @@ SizeableParentNode::SizeableParentNode():super(),
 	mLayout(Layout_NONE)
 {}
 
-Node *SizeableParentNode::create(Engine *engine){
-	super::create(engine);
+Node *SizeableParentNode::create(Scene *scene){
+	super::create(scene);
 
 	mLayout=Layout_NONE;
 	mSizeableChildren.clear();

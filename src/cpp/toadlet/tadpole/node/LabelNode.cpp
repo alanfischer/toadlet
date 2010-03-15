@@ -55,8 +55,8 @@ LabelNode::LabelNode():super(),
 	//mIndexData
 {}
 
-Node *LabelNode::create(Engine *engine){
-	super::create(engine);
+Node *LabelNode::create(Scene *scene){
+	super::create(scene);
 
 	setPerspective(true);
 	setCameraAligned(true);
@@ -65,7 +65,7 @@ Node *LabelNode::create(Engine *engine){
 	setWordWrap(false);
 	mSize.reset();
 
-	mMaterial=engine->getMaterialManager()->createMaterial();
+	mMaterial=getEngine()->getMaterialManager()->createMaterial();
 	mMaterial->retain();
 	mMaterial->setFaceCulling(Renderer::FaceCulling_NONE);
 	mMaterial->setDepthWrite(false);

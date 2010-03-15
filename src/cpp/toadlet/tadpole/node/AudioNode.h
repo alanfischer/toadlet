@@ -39,7 +39,7 @@ public:
 	TOADLET_NODE(AudioNode,Node);
 
 	AudioNode();
-	virtual Node *create(Engine *engine);
+	virtual Node *create(Scene *scene);
 	virtual void destroy();
 
 	bool setAudioBuffer(const ribbit::AudioBuffer::ptr &audioBuffer);
