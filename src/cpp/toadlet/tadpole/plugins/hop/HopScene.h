@@ -27,15 +27,13 @@
 #define TOADLET_TADPOLE_HOPSCENE_H
 
 #include <toadlet/hop/Simulator.h>
-#include <toadlet/tadpole/plugins/hop/HopEntityFactory.h>
 #include <toadlet/tadpole/node/Scene.h>
 #include <toadlet/tadpole/Collision.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class HopNode;
-class HopEntityMessage;
+class HopEntity;
 
 // I'm not 100% sure that the decorator pattern was the correct hammer for this nail, but thats to be seen.
 // Because we really have several subsystems we want to tie together in the Scene
@@ -57,6 +55,10 @@ public:
 	virtual Engine *getEngine(){return mScene->getEngine();}
 	virtual node::ParentNode *getBackground(){return mScene->getBackground();}
 	virtual node::SceneNode *getRootNode(){return mScene->getRootNode();}
+	virtual int getScope(){return mScene->getScope();}
+
+	virtual node::Node *findNodeByName(const egg::String &name,node::Node *node=NULL){return mScene->findNodeByName(name,node);}
+	virtual node::Node *findNodeByHandle(int handle){return mScene->findNodeByHandle(handle);}
 
 	virtual void setAmbientColor(peeper::Color ambientColor){mScene->setAmbientColor(ambientColor);}
 	virtual const peeper::Color &getAmbientColor() const{return mScene->getAmbientColor();}
@@ -97,21 +99,14 @@ public:
 	virtual void traceEntity(Collision &result,HopEntity *entity,const Segment &segment,int collideWithBits);
 	virtual void testEntity(Collision &result,HopEntity *entity1,const Segment &segment,HopEntity *entity2);
 
-	inline int getNumHopEntities() const{return mHopEntities.size();}
-	inline HopEntity *getHopEntity(int i) const{return mHopEntities[i];}
-	HopEntity *getHopEntityFromNetworkID(int id) const;
-	void setHopEntityNetworkID(HopEntity *entity,int id);
-	inline void addFreeNetworkID(int id){mFreeNetworkIDs.add(id);}
-	virtual void resetNetworkIDs();
-
-	virtual void setHopEntityFactory(HopEntityFactory *factory);
-
 	virtual void showCollisionVolumes(bool show,bool interpolate);
 
 	inline hop::Simulator *getSimulator(){return mSimulator;}
 
-	virtual void registerHopEntity(HopEntity *entity);
-	virtual void unregisterHopEntity(HopEntity *entity);
+	virtual int nodeCreated(node::Node *node){return mScene->nodeCreated(node);}
+	virtual void nodeDestroyed(node::Node *node){mScene->nodeDestroyed(node);}
+	virtual int nodeCreated(HopEntity *entity);
+	virtual void nodeDestroyed(HopEntity *entity);
 
 	virtual void preLogicUpdateLoop(int dt);
 	virtual void preLogicUpdate(int dt);
@@ -135,9 +130,6 @@ public:
 	virtual bool collisionResponse(hop::Solid *solid,Vector3 &position,Vector3 &remainder,hop::Collision &collision){return false;}
 	virtual void postUpdate(hop::Solid *solid,int dt,scalar fdt){}
 
-	virtual bool isServer(){return mServer;}
-void setServer(bool server){mServer=server;}
-
 	virtual egg::PointerCounter *pointerCounter() const{return mCounter;}
 
 	static void set(tadpole::Collision &r,const hop::Collision &c);
@@ -146,10 +138,6 @@ void setServer(bool server){mServer=server;}
 	hop::Collision cache_traceSegment_collision;
 
 protected:
-
-	virtual void defaultRegisterHopEntity(HopEntity *entity);
-	virtual void defaultUnregisterHopEntity(HopEntity *entity);
-
 	void castShadow(peeper::Renderer *renderer,HopEntity *entity);
 
 	egg::PointerCounter *mCounter;
@@ -163,13 +151,6 @@ protected:
 	int mExcessiveDT;
 	hop::Simulator *mSimulator;
 	hop::Solid::ptr mWorld;
-
-	egg::Collection<int> mFreeNetworkIDs;
-	egg::Collection<egg::IntrusivePointer<HopEntity> > mNetworkIDMap;
-	HopEntityFactory *mHopEntityFactory;
-bool mServer;
-
-	egg::Collection<hop::Solid*> mSolidCollection;
 
 	friend class HopEntity;
 };

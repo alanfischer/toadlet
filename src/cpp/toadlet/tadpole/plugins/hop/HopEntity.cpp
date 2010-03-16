@@ -49,9 +49,6 @@ HopEntity::HopEntity():ParentNode(),
 	//mLastPosition,
 	mActivePrevious(false),
 
-	mNetworkID(0),
-	mModifiedFields(0),
-
 	mShadowTestLength(0),
 	mShadowOffset(0)
 	//mShadowMesh,
@@ -72,9 +69,6 @@ Node *HopEntity::create(Scene *scene){
 	mLastPosition.reset();
 	mActivePrevious=true;
 
-	mNetworkID=0;
-	mModifiedFields=0;
-
 	mShadowTestLength=0;
 	mShadowOffset=0;
 	mShadowMesh=NULL;
@@ -91,14 +85,14 @@ Node *HopEntity::create(Scene *scene){
 		return this;
 	}
 
-	mHopScene->registerHopEntity(this);
+	mHopScene->nodeCreated(this);
 
 	return this;
 }
 
 void HopEntity::destroy(){
 	if(mHopScene!=NULL){
-		mHopScene->unregisterHopEntity(this);
+		mHopScene->nodeDestroyed(this);
 	}
 
 	super::destroy();
@@ -114,14 +108,10 @@ void HopEntity::setCollideWithBits(int bits){
 
 void HopEntity::setMass(scalar mass){
 	mSolid->setMass(mass);
-
-	mModifiedFields|=ENTITY_BIT_MASS;
 }
 
 void HopEntity::setInfiniteMass(){
 	mSolid->setInfiniteMass();
-
-	mModifiedFields|=ENTITY_BIT_MASS;
 }
 
 void HopEntity::setTranslate(const Vector3 &translate){
@@ -130,8 +120,6 @@ void HopEntity::setTranslate(const Vector3 &translate){
 	mSolid->setPosition(mTranslate);
 
 	mLastPosition.set(mTranslate);
-
-	mModifiedFields|=ENTITY_BIT_POSITION;
 }
 
 void HopEntity::setTranslate(scalar x,scalar y,scalar z){
@@ -146,14 +134,10 @@ void HopEntity::setTransform(const Matrix4x4 &transform){
 	mSolid->setPosition(mTranslate);
 
 	mLastPosition.set(mTranslate);
-
-	mModifiedFields|=ENTITY_BIT_POSITION;
 }
 
 void HopEntity::setVelocity(const Vector3 &velocity){
 	mSolid->setVelocity(velocity);
-
-	mModifiedFields|=ENTITY_BIT_VELOCITY;
 }
 
 void HopEntity::setVelocity(scalar x,scalar y,scalar z){
@@ -163,50 +147,34 @@ void HopEntity::setVelocity(scalar x,scalar y,scalar z){
 
 void HopEntity::addForce(const Vector3 &force){
 	mSolid->addForce(force);
-
-	mModifiedFields|=ENTITY_BIT_FORCE;
 }
 
 void HopEntity::clearForce(){
 	mSolid->clearForce();
-
-	mModifiedFields|=ENTITY_BIT_FORCE;
 }
 
 void HopEntity::setCoefficientOfGravity(scalar coeff){
 	mSolid->setCoefficientOfGravity(coeff);
-
-	mModifiedFields|=ENTITY_BIT_CO_GRAVITY;
 }
 
 void HopEntity::setCoefficientOfRestitution(scalar coeff){
 	mSolid->setCoefficientOfRestitution(coeff);
-
-	mModifiedFields|=ENTITY_BIT_CO_RESTITUTION;
 }
 
 void HopEntity::setCoefficientOfRestitutionOverride(bool over){
 	mSolid->setCoefficientOfRestitutionOverride(over);
-
-	mModifiedFields|=ENTITY_BIT_CO_RESTITUTIONOVERRIDE;
 }
 
 void HopEntity::setCoefficientOfStaticFriction(scalar coeff){
 	mSolid->setCoefficientOfStaticFriction(coeff);
-
-	mModifiedFields|=ENTITY_BIT_CO_STATICFRICTION;
 }
 
 void HopEntity::setCoefficientOfDynamicFriction(scalar coeff){
 	mSolid->setCoefficientOfDynamicFriction(coeff);
-
-	mModifiedFields|=ENTITY_BIT_CO_DYNAMICFRICTION;
 }
 
 void HopEntity::setCoefficientOfEffectiveDrag(scalar coeff){
 	mSolid->setCoefficientOfEffectiveDrag(coeff);
-
-	mModifiedFields|=ENTITY_BIT_CO_EFFECTIVEDRAG;
 }
 
 void HopEntity::setTraceableShape(Traceable *traceable){

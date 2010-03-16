@@ -33,7 +33,7 @@
 namespace toadlet{
 namespace egg{
 
-class TOADLET_API Exception:public std::exception{
+class TOADLET_API Exception:public std::runtime_error{
 public:
 	Exception(int type);
 	Exception(int type,const char *description);

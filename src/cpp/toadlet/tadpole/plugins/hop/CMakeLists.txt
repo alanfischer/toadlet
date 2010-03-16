@@ -9,7 +9,6 @@ set (TADPOLE_HOP_SRC
 # Headers
 set (TADPOLE_HOP_HEADERS
 	HopEntity.h
-	HopEntityFactory.h
 	HopParticleSimulator.h
 	HopScene.h
 )

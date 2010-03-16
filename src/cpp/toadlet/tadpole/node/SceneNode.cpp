@@ -102,6 +102,39 @@ void SceneNode::destroy(){
 	super::destroy();
 }
 
+Node *SceneNode::findNodeByName(const String &name,Node *node){
+	if(node==NULL){
+		node=this;
+	}
+
+	if(node->mName!=(char*)NULL && node->mName.equals(name)){
+		return node;
+	}
+	else{
+		ParentNode *parent=node->isParent();
+		if(parent!=NULL){
+			int i;
+			for(i=0;i<parent->getNumChildren();++i){
+				Node *found=findNodeByName(name,parent->getChild(i));
+				if(found!=NULL){
+					return found;
+				}
+			}
+		}
+
+		return NULL;
+	}
+}
+
+Node *SceneNode::findNodeByHandle(int handle){
+	if(handle>=0 || handle<mNodesFromHandles.size()){
+		return mNodesFromHandles[handle];
+	}
+	else{
+		return NULL;
+	}
+}
+
 void SceneNode::setRangeLogicDT(int minDT,int maxDT){
 	#if defined(TOADLET_DEBUG)
 		if(minDT<0 || maxDT<0){
@@ -320,6 +353,32 @@ void SceneNode::renderUpdate(int dt,int scope){
 }
 
 void SceneNode::postRenderUpdate(int dt){
+}
+
+int SceneNode::nodeCreated(Node *node){
+	int handle=-1;
+	int size=mFreeHandles.size();
+	if(size>0){
+		handle=mFreeHandles.at(size-1);
+		mFreeHandles.removeAt(size-1);
+	}
+	else{
+		handle=size;
+	}
+
+	if(handle>=0 && mNodesFromHandles.size()<=handle){
+		mNodesFromHandles.resize(handle+1);
+		mNodesFromHandles[handle]=node;
+	}
+	return handle;
+}
+
+void SceneNode::nodeDestroyed(Node *node){
+	int handle=node->getHandle();
+	if(handle>=0){
+		mNodesFromHandles[handle]=NULL;
+		mFreeHandles.add(handle);
+	}
 }
 
 void SceneNode::renderUpdate(Node::ptr node,int dt,int scope){

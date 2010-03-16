@@ -56,6 +56,10 @@ public:
 	virtual Engine *getEngine()=0;
 	virtual ParentNode *getBackground()=0;
 	virtual SceneNode *getRootNode()=0;
+	virtual int getScope()=0;
+
+	virtual Node *findNodeByName(const egg::String &name,Node *node=NULL)=0;
+	virtual Node *findNodeByHandle(int handle)=0;
 
 	virtual void setAmbientColor(peeper::Color ambientColor)=0;
 	virtual const peeper::Color &getAmbientColor() const=0;
@@ -84,6 +88,9 @@ public:
 	virtual void preRenderUpdate(int dt)=0;
 	virtual void renderUpdate(int dt)=0;
 	virtual void postRenderUpdate(int dt)=0;
+
+	virtual int nodeCreated(Node *node)=0;
+	virtual void nodeDestroyed(Node *node)=0;
 
 	virtual void setUpdateListener(UpdateListener *updateListener)=0;
 	virtual UpdateListener *getUpdateListener() const=0;

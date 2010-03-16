@@ -52,22 +52,13 @@ HopScene::HopScene(Scene::ptr scene):
 	mInterpolateCollisionVolumes(false),
 
 	mExcessiveDT(0),
-	mSimulator(NULL),
-	
-	//mFreeNetworkIDs,
-	//mNetworkIDMap,
-	mHopEntityFactory(NULL),
-mServer(false)
-
-	//mSolidCollection
+	mSimulator(NULL)
 {
 	mSimulator=new Simulator();
 	mSimulator->setManager(this);
 	mScene=scene;
 	mScene->setChildScene(this);
 	
-	resetNetworkIDs();
-
 	mWorld=Solid::ptr(new Solid());
 	mWorld->setCoefficientOfGravity(0);
 	mWorld->setInfiniteMass();
@@ -120,43 +111,6 @@ void HopScene::testEntity(Collision &result,HopEntity *entity1,const Segment &se
 	set(result,collision);
 }
 
-HopEntity *HopScene::getHopEntityFromNetworkID(int id) const{
-	if(id>=0 && id<mNetworkIDMap.size()){
-		return mNetworkIDMap[id];
-	}
-	else{
-		return NULL;
-	}
-}
-
-void HopScene::setHopEntityNetworkID(HopEntity *entity,int id){
-	if(entity->getNetworkID()>=0 && entity->getNetworkID()<mNetworkIDMap.size()){
-		mFreeNetworkIDs.add(entity->mNetworkID);
-		mNetworkIDMap[entity->mNetworkID]=NULL;
-
-//		Logger::alert(Categories::TOADLET_TADPOLE,String("Freeing NetworkID:")+entity->mNetworkID);
-	}
-	if(id>=0){
-		if(id>=mNetworkIDMap.size()){
-			mNetworkIDMap.resize(id+1);
-		}
-		mNetworkIDMap[id]=entity;
-	}
-
-	entity->mNetworkID=id;
-//	Logger::alert(Categories::TOADLET_TADPOLE,String("Assigning NetworkID:")+entity->mNetworkID);
-}
-
-void HopScene::resetNetworkIDs(){
-	mNetworkIDMap.clear();
-	mNetworkIDMap.add(NULL);
-	mFreeNetworkIDs.clear();
-}
-
-void HopScene::setHopEntityFactory(HopEntityFactory *factory){
-	mHopEntityFactory=factory;
-}
-
 void HopScene::showCollisionVolumes(bool show,bool interpolate){
 	mShowCollisionVolumes=show;
 	mInterpolateCollisionVolumes=interpolate;
@@ -167,28 +121,20 @@ void HopScene::showCollisionVolumes(bool show,bool interpolate){
 	}
 }
 
-//ParticleNode::ParticleSimulator::ptr HopScene::newParticleSimulator(ParticleNode *particleNode){
-//	return ParticleNode::ParticleSimulator::ptr(new HopParticleSimulator(this,particleNode));
-//}
-
-void HopScene::registerHopEntity(HopEntity *entity){
+int HopScene::nodeCreated(HopEntity *entity){
 	if(mHopEntities.contains(entity)==false){
 		mHopEntities.add(entity);
 
 		if(mShowCollisionVolumes){
 			entity->showCollisionVolumes(true);
 		}
-
-		if(entity->getNetworkID()!=HopEntity::NETWORKID_NOT_NETWORKED){
-			defaultRegisterHopEntity(entity);
-		}
 	}
+
+	return entity->getHandle();
 }
 
-void HopScene::unregisterHopEntity(HopEntity *entity){
+void HopScene::nodeDestroyed(HopEntity *entity){
 	if(mHopEntities.contains(entity)){
-		defaultUnregisterHopEntity(entity);
-
 		if(mShowCollisionVolumes){
 			entity->showCollisionVolumes(false);
 		}
@@ -330,30 +276,6 @@ void HopScene::set(hop::Collision &r,const tadpole::Collision &c,HopEntity *coll
 	// Since the c.collider passed in could be any Node, not necessarily a HopEntity, we force a passing in of a Collider
 	if(collider!=NULL){r.collider=collider->getSolid();}
 	r.scope=c.scope;
-}
-
-void HopScene::defaultRegisterHopEntity(HopEntity *entity){
-	int networkID=0;
-	if(mFreeNetworkIDs.size()>0){
-		networkID=mFreeNetworkIDs[0];
-		mFreeNetworkIDs.removeAt(0);
-	}
-	else{
-		networkID=mNetworkIDMap.size();
-	}
-
-	entity->mNetworkID=networkID;
-	if(networkID>=mNetworkIDMap.size()){
-		mNetworkIDMap.resize(networkID+1);
-	}
-	mNetworkIDMap[networkID]=entity;
-}
-
-void HopScene::defaultUnregisterHopEntity(HopEntity *entity){
-	if(entity->getNetworkID()>0){
-		mFreeNetworkIDs.add(entity->getNetworkID());
-		mNetworkIDMap[entity->getNetworkID()]=NULL;
-	}
 }
 
 }

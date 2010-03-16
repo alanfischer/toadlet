@@ -55,8 +55,6 @@ public:
 
 	virtual void handleEvent(const egg::Event::ptr &event);
 
-	virtual Node *findNodeByName(const egg::String &name);
-
 	virtual void activate();
 
 	virtual void childTransformUpdated(Node *child){}

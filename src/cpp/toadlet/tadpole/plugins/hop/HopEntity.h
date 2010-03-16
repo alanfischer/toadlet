@@ -39,28 +39,6 @@ class TOADLET_API HopEntity:public node::ParentNode,public hop::TraceCallback,pu
 public:
 	TOADLET_NODE(HopEntity,node::ParentNode);
 
-	// TODO: Rename this to fit with new enum standards when reworking client/server
-	enum{
-		ENTITY_BITS_NONE=0,
-		ENTITY_BITS_ALL=0xFFFFFFFF,
-
-		ENTITY_BIT_SHAPE=1<<1,
-		ENTITY_BIT_MASS=1<<2,
-		ENTITY_BIT_POSITION=1<<3,
-		ENTITY_BIT_VELOCITY=1<<4,
-		ENTITY_BIT_FORCE=1<<5,
-		ENTITY_BIT_CO_GRAVITY=1<<6,
-		ENTITY_BIT_CO_RESTITUTION=1<<7,
-		ENTITY_BIT_CO_RESTITUTIONOVERRIDE=1<<8,
-		ENTITY_BIT_CO_STATICFRICTION=1<<9,
-		ENTITY_BIT_CO_DYNAMICFRICTION=1<<10,
-		ENTITY_BIT_CO_EFFECTIVEDRAG=1<<11,
-
-		ENTITY_BITS_PHYSICS_UPDATE=ENTITY_BIT_POSITION | ENTITY_BIT_VELOCITY,
-	};
-
-	const static int NETWORKID_NOT_NETWORKED=-1;
-
 	HopEntity();
 	virtual Node *create(node::Scene *scene);
 	virtual void destroy();
@@ -126,14 +104,6 @@ public:
 	virtual void setNextThink(int nextThink){mNextThink=nextThink;}
 	inline int getNextThink() const{return mNextThink;}
 
-//	virtual void changeNetworkID(int id){mScene->setHopEntityNetworkID(this,id);}
-	inline int getNetworkID() const{return mNetworkID;}
-	inline bool isNetworked() const{return mNetworkID!=NETWORKID_NOT_NETWORKED;}
-
-	void resetModifiedFields(){mModifiedFields=0;}
-	void addModifiedFields(int fields){mModifiedFields|=fields;}
-	inline int getModifiedFields() const{return mModifiedFields;}
-
 	void setShadowMesh(mesh::Mesh::ptr shadow,scalar scale,scalar testLength,scalar offset);
 	inline mesh::Mesh::ptr setShadowMesh() const{return mShadowMesh;}
 
@@ -165,9 +135,6 @@ protected:
 	HopScene *mHopScene;
 	Vector3 mLastPosition;
 	bool mActivePrevious;
-
-	int mNetworkID;
-	uint32 mModifiedFields;
 
 	scalar mShadowTestLength;
 	scalar mShadowOffset;
