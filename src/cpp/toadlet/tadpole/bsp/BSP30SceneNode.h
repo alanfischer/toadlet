@@ -82,6 +82,7 @@ public:
 
 	Scene *getRootScene(){return this;}
 
+	void setMap(const egg::String &name);
 	void setMap(BSP30Map::ptr map);
 	BSP30Map::ptr getMap() const{return mMap;}
 

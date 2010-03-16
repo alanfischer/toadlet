@@ -49,7 +49,7 @@ Node::Node():
 
 	//mParent,
 	mParentData(NULL),
-
+	mHandle(0),
 	mIdentityTransform(false),
 	//mTranslate,
 	//mRotate,
@@ -77,17 +77,16 @@ Node *Node::create(Scene *scene){
 	}
 
 	mCreated=true;
-	if(scene!=NULL){
-		mEngine=scene->getEngine();
-	}
+	mEngine=scene->getEngine();
 	mScene=scene;
+	mHandle=mScene->nodeCreated(this);
 
 	mNodeDestroyedListener=NULL;
 	mOwnsNodeDestroyedListener=false;
 
 	mParent=NULL;
 	mParentData=NULL;
-
+	mHandle=0;
 	mIdentityTransform=true;
 	mTranslate.reset();
 	mRotate.reset();
@@ -131,7 +130,7 @@ void Node::destroy(){
 		setNodeDestroyedListener(NULL,false);
 	}
 
-	mReceiveUpdates=false;
+	mScene->nodeDestroyed(this);
 
 	mEngine->freeNode(this);
 	mEngine=NULL;
@@ -156,6 +155,10 @@ void Node::parentChanged(ParentNode *parent){
 
 ParentNode *Node::getParent() const{
 	return (ParentNode*)mParent.get();
+}
+
+void Node::parentDataChanged(void *parentData){
+	mParentData=parentData;
 }
 
 void Node::setTranslate(const Vector3 &translate){
@@ -228,10 +231,6 @@ void Node::setScope(int scope){
 
 void Node::setName(const String &name){
 	mName=name;
-}
-
-Node *Node::findNodeByName(const String &name){
-	return (mName!=(char*)NULL && mName.equals(name))?this:NULL;
 }
 
 void Node::setCameraAligned(bool cameraAligned){

@@ -12,6 +12,7 @@ set (TADPOLE_SRC
 	KeyFrame.cpp
 	Material.cpp
 	MaterialManager.cpp
+	MathFormatter.cpp
 	MeshManager.cpp
 	Noise.cpp
 	QueryManager.cpp
@@ -102,6 +103,7 @@ set (TADPOLE_HEADERS
 	KeyFrame.h
 	Material.h
 	MaterialManager.h
+	MathFormatter.h
 	MeshManager.h
 	Noise.h
 	QueryManager.h

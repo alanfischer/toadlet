@@ -29,11 +29,11 @@
 namespace toadlet{
 namespace egg{
 
-Exception::Exception(int error){
+Exception::Exception(int error):std::runtime_error("unknown"){
 	mError=error;
 }
 
-Exception::Exception(int error,const char *description):std::exception(description){
+Exception::Exception(int error,const char *description):std::runtime_error(description){
 	mError=error;
 }
 

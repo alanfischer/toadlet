@@ -35,12 +35,14 @@
 #include <toadlet/peeper/VertexFormat.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/bsp/BSP30SceneNode.h>
+#include <toadlet/tadpole/bsp/BSP30Handler.h>
 #include <toadlet/tadpole/node/MeshNode.h>
 #include <toadlet/tadpole/handler/WADArchive.h>
 #include <toadlet/tadpole/PixelPacker.h>
 #include <string.h> // memset
 
 using namespace toadlet::egg;
+using namespace toadlet::egg::io;
 using namespace toadlet::egg::image;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole::mesh;
@@ -109,13 +111,13 @@ void BSP30ModelNode::render(peeper::Renderer *renderer) const{
 	}
 
 //	Logger::error("get bsp node rendering without using scene");
-/*
-//	BSP30SceneNode *scene=(BSP30SceneNode*)mEngine->getScene()->getRootScene();
-//	BSP30SceneNode::RendererData &data=(BSP30SceneNode::RendererData&)scene->mRendererData;
+
+	BSP30SceneNode *scene=(BSP30SceneNode*)mScene->getRootScene();
+	BSP30SceneNode::RendererData &data=(BSP30SceneNode::RendererData&)scene->mRendererData;
 
 	// clear stuff
-//	memset(&data.markedFaces[0],0,data.markedFaces.size()*sizeof(unsigned char));
-//	data.textureVisibleFaces.resize(mMap->parsedTextures.size());
+	memset(&data.markedFaces[0],0,data.markedFaces.size()*sizeof(unsigned char));
+	data.textureVisibleFaces.resize(mMap->parsedTextures.size());
 
 	bmodel *model=&mMap->models[mModelIndex];
 	for(int i=0;i<model->numfaces;++i){
@@ -127,7 +129,6 @@ void BSP30ModelNode::render(peeper::Renderer *renderer) const{
 	renderer->setAlphaTest(Renderer::AlphaTest_GEQUAL,0.9);
 
 	scene->renderVisibleFaces(renderer);
-*/
 }
 
 void BSP30ModelNode::traceSegment(Collision &result,const Segment &segment,const Vector3 &size){
@@ -214,6 +215,19 @@ BSP30SceneNode::BSP30SceneNode(Engine *engine):super(engine),
 }
 
 BSP30SceneNode::~BSP30SceneNode(){}
+
+void BSP30SceneNode::setMap(const String &name){
+	Stream::ptr stream=mEngine->openStream(name);
+	if(stream==NULL){
+		Error::unknown("Unable to find level");
+		return;
+	}
+
+	BSP30Handler::ptr handler(new BSP30Handler(mEngine));
+	BSP30Map::ptr map=shared_static_cast<BSP30Map>(handler->load(stream,NULL));
+	map->setName(name);
+	setMap(map);
+}
 
 static Texture::ptr GLIGHTMAP;
 void BSP30SceneNode::setMap(BSP30Map::ptr map){
@@ -394,7 +408,7 @@ bool BSP30SceneNode::performAABoxQuery(SpacialQuery *query,const AABox &box,bool
 bool BSP30SceneNode::attach(Node *node){
 	bool result=super::attach(node);
 	if(result){
-		node->setParentData(new childdata());
+		node->parentDataChanged(new childdata());
 
 		if(mMap!=NULL){
 			// HACK: Need to make sure the node is updated before we check its bounds.
@@ -422,7 +436,7 @@ bool BSP30SceneNode::remove(Node *node){
 		}
 
 		delete (childdata*)node->getParentData();
-		node->setParentData(NULL);
+		node->parentDataChanged(NULL);
 	}
 	return result;
 }

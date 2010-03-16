@@ -94,8 +94,7 @@ public:
 
 	virtual void parentChanged(ParentNode *parent);
 	ParentNode *getParent() const;
-
-	void setParentData(void *data){mParentData=data;}
+	virtual void parentDataChanged(void *parentData);
 	void *getParentData() const{return mParentData;}
 
 	virtual void setTranslate(const Vector3 &translate);
@@ -123,12 +122,13 @@ public:
 
 	virtual void handleEvent(const egg::Event::ptr &event){}
 
+	inline int getHandle() const{return mHandle;}
+
 	virtual void setScope(int scope);
 	inline int getScope() const{return mScope;}
 
 	virtual void setName(const egg::String &name);
 	inline const egg::String &getName() const{return mName;}
-	virtual Node *findNodeByName(const egg::String &name);
 
 	virtual void setCameraAligned(bool aligned);
 	inline bool getCameraAligned() const{return mCameraAligned;}
@@ -224,7 +224,7 @@ protected:
 
 	Node::ptr mParent;
 	void *mParentData;
-
+	int mHandle;
 	bool mIdentityTransform;
 	Vector3 mTranslate;
 	Quaternion mRotate;

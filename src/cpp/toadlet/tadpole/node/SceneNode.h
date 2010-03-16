@@ -69,6 +69,10 @@ public:
 	virtual Engine *getEngine(){return mEngine;}
 	virtual ParentNode *getBackground(){return mBackground;}
 	virtual SceneNode *getRootNode(){return this;}
+	virtual int getScope(){return super::getScope();}
+
+	virtual Node *findNodeByName(const egg::String &name,Node *node=NULL);
+	virtual Node *findNodeByHandle(int handle);
 
 	virtual void setAmbientColor(peeper::Color ambientColor){mAmbientColor.set(ambientColor);}
 	virtual const peeper::Color &getAmbientColor() const{return mAmbientColor;}
@@ -101,6 +105,9 @@ public:
 	virtual void renderUpdate(int dt,int scope);
 	virtual void renderUpdate(Node::ptr node,int dt,int scope);
 	virtual void postRenderUpdate(int dt);
+
+	virtual int nodeCreated(Node *node);
+	virtual void nodeDestroyed(Node *node);
 
 	virtual void setUpdateListener(UpdateListener *updateListener);
 	virtual UpdateListener *getUpdateListener() const{return mUpdateListener;}
@@ -148,6 +155,8 @@ protected:
 	virtual bool postLayerRender(peeper::Renderer *renderer,int layer);
 
 	Scene *mChildScene;
+	egg::Collection<int> mFreeHandles;
+	egg::Collection<Node*> mNodesFromHandles;
 
 	int mExcessiveDT;
 	int mMinLogicDT;
@@ -159,7 +168,6 @@ protected:
 
 	ParentNode::ptr mBackground;
 
-	egg::Collection<Node::ptr> mUpdateEntities;
 	UpdateListener *mUpdateListener;
 
 	peeper::Color mAmbientColor;

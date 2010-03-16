@@ -132,21 +132,6 @@ void ParentNode::handleEvent(const Event::ptr &event){
 	}
 }
 
-Node *ParentNode::findNodeByName(const String &name){
-	Node *node=super::findNodeByName(name);
-	if(node==NULL){
-		int numChildren=mChildren.size();
-		int i;
-		for(i=0;i<numChildren;++i){
-			node=mChildren[i]->findNodeByName(name);
-			if(node!=NULL){
-				return node;
-			}
-		}
-	}
-	return node;
-}
-
 void ParentNode::activate(){
 	mActivateChildren=true;
 	super::activate();

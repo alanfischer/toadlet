@@ -36,8 +36,8 @@ namespace tadpole{
 namespace bsp{
 
 class TOADLET_API BSP30Map:public egg::BaseResource{
-	TOADLET_BASERESOURCE_PASSTHROUGH(BaseResource);
 public:
+	TOADLET_BASERESOURCE_PASSTHROUGH(BaseResource);
 	TOADLET_SHARED_POINTERS(BSP30Map);
 
 	BSP30Map():
