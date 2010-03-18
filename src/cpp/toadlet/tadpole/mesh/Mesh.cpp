@@ -33,7 +33,7 @@ namespace tadpole{
 namespace mesh{
 
 Mesh::Mesh():BaseResource(),
-	boundingRadius(-Math::ONE),
+	bound(-Math::ONE),
 	worldScale(Math::ONE)
 {}
 

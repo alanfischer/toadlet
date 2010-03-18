@@ -712,8 +712,8 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 						if(vertexFormat->getVertexElement(c).type==VertexElement::Type_POSITION){
 							Vector3 position=parseVector3(element);
 							scalar length=Math::length(position);;
-							if(mesh->boundingRadius<length){
-								mesh->boundingRadius=length;
+							if(mesh->bound.radius<length){
+								mesh->bound.radius=length;
 							}
 							vba.set3(l,pi,position);
 						}

@@ -99,8 +99,7 @@ Mesh::ptr MeshManager::createBox(const AABox &box){
 	Mesh::ptr mesh(new Mesh());
 	mesh->subMeshes.resize(1);
 	mesh->subMeshes[0]=subMesh;
-	mesh->boundingRadius=Math::maxVal(Math::maxVal(
-		Math::maxVal(-box.mins.x,box.maxs.x),Math::maxVal(-box.mins.y,box.maxs.y)),Math::maxVal(-box.mins.z,box.maxs.z));
+	node::Node::set(mesh->bound,box);
 	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 
 	return mesh;
@@ -184,7 +183,7 @@ Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded,bool invert,Textur
 
 	Mesh::ptr mesh(new Mesh());
 	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
-	mesh->boundingRadius=size;
+	mesh->bound.radius=-Math::ONE;
 
 	if(unfolded){
 		mesh->subMeshes.add(Mesh::SubMesh::ptr(new Mesh::SubMesh()));

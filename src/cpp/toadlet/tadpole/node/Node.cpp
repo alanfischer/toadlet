@@ -86,7 +86,6 @@ Node *Node::create(Scene *scene){
 
 	mParent=NULL;
 	mParentData=NULL;
-	mHandle=0;
 	mIdentityTransform=true;
 	mTranslate.reset();
 	mRotate.reset();

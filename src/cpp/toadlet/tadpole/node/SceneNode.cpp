@@ -363,13 +363,12 @@ int SceneNode::nodeCreated(Node *node){
 		mFreeHandles.removeAt(size-1);
 	}
 	else{
-		handle=size;
+		handle=mNodesFromHandles.size();
+		mNodesFromHandles.resize(handle+1);
 	}
 
-	if(handle>=0 && mNodesFromHandles.size()<=handle){
-		mNodesFromHandles.resize(handle+1);
-		mNodesFromHandles[handle]=node;
-	}
+	mNodesFromHandles[handle]=node;
+
 	return handle;
 }
 
