@@ -183,12 +183,8 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 	mMesh=mesh;
 	mMesh->retain();
 
-	if(mMesh->boundingRadius!=Math::ONE){
-		mLocalBound.radius=Math::mul(mMesh->worldScale,mMesh->boundingRadius);
-	}
-	else{
-		mLocalBound.radius=-Math::ONE;
-	}
+	mLocalBound.origin.set(mMesh->bound.origin);
+	mLocalBound.radius=Math::mul(mMesh->bound.radius,mMesh->worldScale);
 
 	if(mMesh->skeleton!=NULL){
 		mSkeleton=MeshNodeSkeleton::ptr(new MeshNodeSkeleton(this,mMesh->skeleton));

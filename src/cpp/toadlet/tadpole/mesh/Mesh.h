@@ -78,7 +78,7 @@ public:
 	void destroy();
 	void compile();
 
-	scalar boundingRadius; // Before world scale
+	Sphere bound; // Before world scale
 	scalar worldScale;
 
 	egg::Collection<SubMesh::ptr> subMeshes;
