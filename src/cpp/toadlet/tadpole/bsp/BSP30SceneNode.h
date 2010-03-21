@@ -43,6 +43,23 @@ class TOADLET_API BSP30ModelNode:public node::Node,public node::Renderable,publi
 public:
 	TOADLET_NODE(BSP30ModelNode,Node);
 
+	class TOADLET_API SubModel:public Renderable{
+	public:
+		TOADLET_SHARED_POINTERS(SubModel);
+
+		SubModel(BSP30ModelNode *modelNode,BSP30Map *map);
+
+		void queueRenderable(node::SceneNode *queue,node::CameraNode *camera){} // Queuing done by parent
+		Material *getRenderMaterial() const{return material;}
+		const Matrix4x4 &getRenderTransform() const{return modelNode->getWorldRenderTransform();}
+		void render(peeper::Renderer *renderer) const;
+
+		BSP30ModelNode *modelNode;
+		BSP30Map *map;
+		Material::ptr material;
+		BSP30Map::facedata *faces;
+	};
+
 	BSP30ModelNode();
 	virtual ~BSP30ModelNode();
 
@@ -58,10 +75,13 @@ public:
 	void setInternalScope(int scope){mInternalScope=scope;}
 	int getInternalScope() const{return mInternalScope;}
 
+	inline int getNumSubModels() const{return mSubModels.size();}
+	SubModel *getSubModel(int i){return mSubModels[i];}
+
 	void queueRenderable(node::SceneNode *queue,node::CameraNode *camera);
-	Material *getRenderMaterial() const;
-	const Matrix4x4 &getRenderTransform() const;
-	void render(peeper::Renderer *renderer) const;
+	Material *getRenderMaterial() const{return NULL;}
+	const Matrix4x4 &getRenderTransform() const{return mWorldRenderTransform;}
+	void render(peeper::Renderer *renderer) const{}
 
 	const Sphere &getLocalBound() const{return super::getLocalBound();}
 	void traceSegment(Collision &result,const Segment &segment,const Vector3 &size);
@@ -69,11 +89,12 @@ public:
 protected:
 	BSP30Map::ptr mMap;
 	int mModelIndex;
-	bool mVisible;
+	bool mVisible; // Should be moved to the overall 'mesh/visible/renderable' class perhaps
 	int mInternalScope;
+	egg::Collection<SubModel::ptr> mSubModels;
 };
 
-class TOADLET_API BSP30SceneNode:public node::SceneNode{
+class TOADLET_API BSP30SceneNode:public node::SceneNode,public node::Traceable{
 public:
 	TOADLET_NONINSTANCIABLENODE(BSP30SceneNode,SceneNode);
 
@@ -88,6 +109,9 @@ public:
 
 	bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact);
 
+	const Sphere &getLocalBound() const{return super::getLocalBound();}
+	void traceSegment(Collision &result,const Segment &segment,const Vector3 &size);
+
 	bool attach(Node *node);
 	bool remove(Node *node);
 	void insertNodeLeafIndexes(const egg::Collection<int> &indexes,Node *node);
@@ -95,41 +119,12 @@ public:
 
 	void childTransformUpdated(Node *child);
 
-//protected:
-	// TODO: We need to get away from this markfaces stuff, make it more universal
-	class RendererData{
-	public:
-		toadlet::egg::Collection<uint8> markedFaces;
-		toadlet::egg::Collection<toadlet::egg::Collection<int> > textureVisibleFaces;
-	};
-
-	// TODO: Switch this to using an index into the lightmap array, and a matrix offset/scale
-	class RenderFace{
-	public:
-		peeper::IndexData::ptr indexData;
-		//peeper::Texture::ptr lightmap;
-Matrix4x4 lightmapTransform;
-	};
-
-	// TODO: We need a better hook to start rendering the level, since in theory this wont have access to preLayerRender,
-	//  cause it wont be a main scene node
+protected:
 	void queueRenderables();
 	bool preLayerRender(peeper::Renderer *renderer,int layer);
-	void processVisibleFaces(node::CameraNode *camera);
-	void renderVisibleFaces(peeper::Renderer *renderer);
-	void addLeafToVisible(bleaf *leaf,RendererData &data,node::CameraNode *camera) const;
-	void calculateSurfaceExtents(bface *face,Vector2 &mins,Vector2 &maxs);
-	egg::image::Image::ptr computeLightmap(bface *face,const Vector2 &mins,const Vector2 &maxs);
-
-	peeper::VertexBufferAccessor vba;
+	void addLeafToVisible(bleaf *leaf,node::CameraNode *camera);
 
 	BSP30Map::ptr mMap;
-	RendererData mRendererData;
-	peeper::VertexData::ptr mVertexData;
-	egg::Collection<RenderFace> mRenderFaces;
-
-	int mCounter;
-	egg::Collection<int> mLeafIndexes;
 
 	class childdata{
 	public:
@@ -138,11 +133,17 @@ Matrix4x4 lightmapTransform;
 		int counter;
 	};
 
-	class bleafdata{
+	class leafdata{
 	public:
 		egg::Collection<Node*> occupants;
 	};
-	egg::Collection<bleafdata> mLeafData;
+
+	egg::Collection<leafdata> mLeafData;
+	uint8 *mMarkedFaces;
+	toadlet::egg::Collection<BSP30Map::facedata*> mVisibleMaterialFaces;
+
+	int mCounter;
+	egg::Collection<int> mLeafIndexes;
 };
 
 }

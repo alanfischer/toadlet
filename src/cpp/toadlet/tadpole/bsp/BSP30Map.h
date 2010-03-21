@@ -78,6 +78,55 @@ public:
 		if(entities!=NULL){		free(entities);		nentities=0;}
 	}
 
+	int modelTrace(Collision &result,int model,const Vector3 &size,const Vector3 &start,const Vector3 &end){
+		int hullIndex=0;
+		if(header.version==Q1BSPVERSION){
+			if(size[0]<3){
+				hullIndex=0;
+			}
+			else if(size[0]<=32){
+				hullIndex=1;
+			}
+			else{
+				hullIndex=2;
+			}
+		}
+		else{
+			if(size[0]<3){
+				hullIndex=0; // 0x0x0
+			}
+			else if(size[0]<=32){
+				if(size[2]<54){ // Nearest of 36 or 72
+					hullIndex=3; // 32x32x36
+				}
+				else{
+					hullIndex=1; // 32x32x72
+				}
+			}
+			else{
+				hullIndex=2; // 64x64x64
+			}
+		}
+
+		int headNode=models[model].headnode[0];
+		int headClipNode=models[model].headnode[hullIndex];
+		if(headNode<0 || headNode>=nnodes || headClipNode<0 || headClipNode>=nclipnodes){
+			return 0;
+		}
+
+		int contents=0;
+		if(hullIndex==0){
+			hullTrace(result,planes,leafs,nodes,sizeof(bnode),headNode,0,Math::ONE,start,end,0.03125);
+			contents=leafs[findPointLeaf(planes,nodes,sizeof(bnode),headNode,start)].contents;
+		}
+		else{
+			hullTrace(result,planes,NULL,clipnodes,sizeof(bclipnode),headClipNode,0,Math::ONE,start,end,0.03125);
+			contents=-1-findPointLeaf(planes,clipnodes,sizeof(bclipnode),headClipNode,start);
+		}
+
+		return contents;
+	}
+
 	static int findPointLeaf(bplane *planes,void *hull,int hullStride,int index,const Vector3 &point){
 		scalar d=0;
 		bclipnode *node=NULL;
@@ -117,7 +166,10 @@ public:
 		if(index<0){
 			int contents=(leafs!=NULL)?(leafs[-1-index].contents):(index);
 			result.scope=(-1-contents)<<1;
-			if(contents==CONTENTS_SOLID) result.time=0;
+			if(contents==CONTENTS_SOLID){
+				result.time=0;
+				result.point.set(p1);
+			}
 			return true;
 		}
 
@@ -265,6 +317,12 @@ public:
 		return d<=Math::mul(sphere.radius,sphere.radius);
 	}
 
+	struct facedata{
+		peeper::IndexData::ptr indexData;
+		Matrix4x4 lightmapTransform;
+		facedata *next;
+	};
+
 	bheader header;
 	bmodel *models;				int nmodels;
 	bvertex *vertexes;			int nvertexes;
@@ -282,9 +340,14 @@ public:
 	void *lighting;				int nlighting;
 	char *entities;				int nentities;
 
+	bmiptexlump *miptexlump;
 	egg::Collection<egg::Collection<int> > parsedVisibility;
 	egg::Collection<egg::Map<egg::String,egg::String> > parsedEntities;
 	egg::Collection<peeper::Texture::ptr> parsedTextures;
+	egg::Collection<Material::ptr> materials;
+	peeper::VertexData::ptr vertexData;
+	egg::Collection<facedata> facedatas;
+	peeper::Texture::ptr lightmap;
 };
 
 }

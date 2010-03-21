@@ -43,7 +43,7 @@ int MathFormatter::parseInteger(const char *string){
 
 String MathFormatter::formatScalar(scalar s){
 	#if defined(TOADLET_FIXED_POINT)
-		return String()+Math::fromFixed(s);
+		return String()+Math::toFloat(s);
 	#else
 		return String()+s;
 	#endif
@@ -51,7 +51,7 @@ String MathFormatter::formatScalar(scalar s){
 
 scalar MathFormatter::parseScalar(const char *string){
 	#if defined(TOADLET_FIXED_POINT)
-		return Math::toFixed(String(string).toFloat());
+		return Math::fromFloat(String(string).toFloat());
 	#else
 		return String(string).toFloat();
 	#endif
@@ -59,18 +59,18 @@ scalar MathFormatter::parseScalar(const char *string){
 
 String MathFormatter::formatVector2(const Vector2 &v,char *separator){
 	#if defined(TOADLET_FIXED_POINT)
-		return String()+Math::fromFixed(v.x)+separator+Math::fromFixed(v.y);
+		return String()+Math::toFloat(v.x)+separator+Math::toFloat(v.y);
 	#else
 		return String()+v.x+separator+v.y;
 	#endif
 }
 
 Vector2 &MathFormatter::parseVector2(Vector2 &r,const char *string){
-	char *parse=strchr(string,',')!=NULL?"%f,%f":"%f %f";
+	char *parse=strchr((char*)string,',')!=NULL?"%f,%f":"%f %f";
 	float x=0,y=0;
 	sscanf(string,parse,&x,&y);
 	#if defined(TOADLET_FIXED_POINT)
-		r.x=Math::toFixed(x);r.y=Math::toFixed(y);
+		r.x=Math::fromFloat(x);r.y=Math::fromFloat(y);
 	#else
 		r.x=x;r.y=y;
 	#endif
@@ -79,18 +79,18 @@ Vector2 &MathFormatter::parseVector2(Vector2 &r,const char *string){
 
 String MathFormatter::formatVector3(const Vector3 &v,char *separator){
 	#if defined(TOADLET_FIXED_POINT)
-		return String()+Math::fromFixed(v.x)+separator+Math::fromFixed(v.y)+separator+Math::fromFixed(v.z);
+		return String()+Math::toFloat(v.x)+separator+Math::toFloat(v.y)+separator+Math::toFloat(v.z);
 	#else
 		return String()+v.x+separator+v.y+separator+v.z;
 	#endif
 }
 
 Vector3 &MathFormatter::parseVector3(Vector3 &r,const char *string){
-	char *parse=strchr(string,',')!=NULL?"%f,%f,%f":"%f %f %f";
+	char *parse=strchr((char*)string,',')!=NULL?"%f,%f,%f":"%f %f %f";
 	float x=0,y=0,z=0;
 	sscanf(string,parse,&x,&y,&z);
 	#if defined(TOADLET_FIXED_POINT)
-		r.x=Math::toFixed(x);r.y=Math::toFixed(y);r.z=Math::toFixed(z);
+		r.x=Math::fromFloat(x);r.y=Math::fromFloat(y);r.z=Math::fromFloat(z);
 	#else
 		r.x=x;r.y=y;r.z=z;
 	#endif
@@ -99,18 +99,18 @@ Vector3 &MathFormatter::parseVector3(Vector3 &r,const char *string){
 
 String MathFormatter::formatVector4(const Vector4 &v,char *separator){
 	#if defined(TOADLET_FIXED_POINT)
-		return String()+Math::fromFixed(v.x)+separator+Math::fromFixed(v.y)+separator+Math::fromFixed(v.z)+separator+Math::fromFixed(v.w);
+		return String()+Math::toFloat(v.x)+separator+Math::toFloat(v.y)+separator+Math::toFloat(v.z)+separator+Math::toFloat(v.w);
 	#else
 		return String()+v.x+separator+v.y+separator+v.z+separator+v.w;
 	#endif
 }
 
 Vector4 &MathFormatter::parseVector4(Vector4 &r,const char *string){
-	char *parse=strchr(string,',')!=NULL?"%f,%f,%f,%f":"%f %f %f %f";
+	char *parse=strchr((char*)string,',')!=NULL?"%f,%f,%f,%f":"%f %f %f %f";
 	float x=0,y=0,z=0,w=0;
 	sscanf(string,parse,&x,&y,&z,&w);
 	#if defined(TOADLET_FIXED_POINT)
-		r.x=Math::toFixed(x);r.y=Math::toFixed(y);r.z=Math::toFixed(z);r.w=Math::toFixed(w);
+		r.x=Math::fromFloat(x);r.y=Math::fromFloat(y);r.z=Math::fromFloat(z);r.w=Math::fromFloat(w);
 	#else
 		r.x=x;r.y=y;r.z=z;r.w=w;
 	#endif
@@ -119,18 +119,18 @@ Vector4 &MathFormatter::parseVector4(Vector4 &r,const char *string){
 
 String MathFormatter::formatQuaternion(const Quaternion &q,char *separator){
 	#if defined(TOADLET_FIXED_POINT)
-		return String()+Math::fromFixed(q.x)+separator+Math::fromFixed(q.y)+separator+Math::fromFixed(q.z)+separator+Math::fromFixed(q.w);
+		return String()+Math::toFloat(q.x)+separator+Math::toFloat(q.y)+separator+Math::toFloat(q.z)+separator+Math::toFloat(q.w);
 	#else
 		return String()+q.x+separator+q.y+separator+q.z+separator+q.w;
 	#endif
 }
 
 Quaternion &MathFormatter::parseQuaternion(Quaternion &r,const char *string){
-	char *parse=strchr(string,',')!=NULL?"%f,%f,%f,%f":"%f %f %f %f";
+	char *parse=strchr((char*)string,',')!=NULL?"%f,%f,%f,%f":"%f %f %f %f";
 	float x=0,y=0,z=0,w=0;
 	sscanf(string,parse,&x,&y,&z,&w);
 	#if defined(TOADLET_FIXED_POINT)
-		r.x=Math::toFixed(x);r.y=Math::toFixed(y);r.z=Math::toFixed(z);r.w=Math::toFixed(w);
+		r.x=Math::fromFloat(x);r.y=Math::fromFloat(y);r.z=Math::fromFloat(z);r.w=Math::fromFloat(w);
 	#else
 		r.x=x;r.y=y;r.z=z;r.w=w;
 	#endif
@@ -139,18 +139,18 @@ Quaternion &MathFormatter::parseQuaternion(Quaternion &r,const char *string){
 
 String MathFormatter::formatColor(const Color &c,char *separator){
 	#if defined(TOADLET_FIXED_POINT)
-		return String()+Math::fromFixed(c.r)+separator+Math::fromFixed(c.g)+separator+Math::fromFixed(c.b)+separator+Math::fromFixed(c.a);
+		return String()+Math::toFloat(c.r)+separator+Math::toFloat(c.g)+separator+Math::toFloat(c.b)+separator+Math::toFloat(c.a);
 	#else
 		return String()+c.r+separator+c.g+separator+c.b+separator+c.a;
 	#endif
 }
 
 Color &MathFormatter::parseColor(Color &r,const char *string){
-	char *parse=strchr(string,',')!=NULL?"%f,%f,%f,%f":"%f %f %f %f";
+	char *parse=strchr((char*)string,',')!=NULL?"%f,%f,%f,%f":"%f %f %f %f";
 	float R=0,g=0,b=0,a=0;
 	sscanf(string,parse,&R,&g,&b,&a);
 	#if defined(TOADLET_FIXED_POINT)
-		r.r=Math::toFixed(R);r.g=Math::toFixed(g);r.b=Math::toFixed(b);r.a=Math::toFixed(a);
+		r.r=Math::fromFloat(R);r.g=Math::fromFloat(g);r.b=Math::fromFloat(b);r.a=Math::fromFloat(a);
 	#else
 		r.r=R;r.g=g;r.b=b;r.a=a;
 	#endif
@@ -163,7 +163,7 @@ String MathFormatter::formatByteColor(const Color &c,char *separator){
 }
 
 Color &MathFormatter::parseByteColor(Color &r,const char *string){
-	char *parse=strchr(string,',')!=NULL?"%d,%d,%d,%d":"%d %d %d %d";
+	char *parse=strchr((char*)string,',')!=NULL?"%d,%d,%d,%d":"%d %d %d %d";
 	int R=0,g=0,b=0,a=0;
 	sscanf(string,parse,&R,&g,&b,&a);
 	r.r=Math::fromInt(R)/255;r.g=Math::fromInt(g)/255;r.b=Math::fromInt(b)/255;r.a=Math::fromInt(a)/255;

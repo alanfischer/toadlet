@@ -49,6 +49,7 @@ const Color LIGHT_VIOLET=				Color::rgba(0x7FFFFFFF);
 const Color VIOLET=						Color::rgba(0x7F00FFFF);
 const Color GREY=						Color::rgba(0x7F7F7FFF);
 const Color BLACK=						Color::rgba(0x000000FF);
+const Color BROWN=						Color::rgba(0x964B00FF);
 
 const Color TRANSPARENT_WHITE=			Color::rgba(0xFFFFFF00);
 const Color TRANSPARENT_RED=			Color::rgba(0xFF000000);
@@ -66,6 +67,7 @@ const Color TRANSPARENT_LIGHT_VIOLET=	Color::rgba(0x7FFFFF00);
 const Color TRANSPARENT_VIOLET=			Color::rgba(0x7F00FF00);
 const Color TRANSPARENT_GREY=			Color::rgba(0x7F7F7F00);
 const Color TRANSPARENT_BLACK=			Color::rgba(0x00000000);
+const Color TRANSPARENT_BROWN=			Color::rgba(0x964B0000);
 
 }
 

@@ -26,11 +26,13 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/bsp/BSP30Handler.h>
 #include <toadlet/tadpole/handler/WADArchive.h>
+#include <toadlet/tadpole/PixelPacker.h>
 #include <stdlib.h>
 #include <string.h> // memset
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
+using namespace toadlet::egg::image;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole::handler;
 
@@ -78,10 +80,16 @@ Resource::ptr BSP30Handler::load(Stream::ptr stream,const ResourceHandlerData *h
 	readLump(stream,&map->header.lumps[LUMP_LIGHTING],		(void**)&map->lighting,1,						&map->nlighting);
 	readLump(stream,&map->header.lumps[LUMP_ENTITIES],		(void**)&map->entities,1,						&map->nentities);
 
+	map->miptexlump=(bmiptexlump*)map->textures;
+
 	parseVisibility(map);
 	parseEntities(map);
 	parseWADs(map);
 	parseTextures(map);
+	buildBuffers(map);
+	buildMaterials(map);
+
+	Logger::debug(Categories::TOADLET_TADPOLE,"Reading map finished");
 
 	return map;
 }
@@ -100,6 +108,8 @@ void BSP30Handler::readLump(Stream *stream,blump *lump,void **data,int size,int 
 }
 
 void BSP30Handler::parseVisibility(BSP30Map *map){
+	Logger::debug(Categories::TOADLET_TADPOLE,"Parsing visibility");
+
 	int count;
 	int i,c,index;
 	unsigned char bit;
@@ -165,8 +175,11 @@ void BSP30Handler::parseVisibility(BSP30Map *map){
 }
 
 void BSP30Handler::parseEntities(BSP30Map *map){
+	Logger::debug(Categories::TOADLET_TADPOLE,"Parsing entities");
+
 	char *data=map->entities;
 	Map<String,String> keyValues;
+
 	while(*data!=0){
 		if(*data=='{'){
 			keyValues.clear();
@@ -192,6 +205,8 @@ void BSP30Handler::parseEntities(BSP30Map *map){
 }
 
 void BSP30Handler::parseWADs(BSP30Map *map){
+	Logger::debug(Categories::TOADLET_TADPOLE,"Parsing WADs");
+
 	if(map->parsedEntities.size()>0 && map->parsedEntities[0]["classname"].equals("worldspawn")){
 		String wad=map->parsedEntities[0]["wad"];
 		int start=0,end=0;
@@ -207,13 +222,15 @@ void BSP30Handler::parseWADs(BSP30Map *map){
 }
 
 void BSP30Handler::parseTextures(BSP30Map *map){
-	bmiptexlump *lump=(bmiptexlump*)map->textures;
-	map->parsedTextures.resize(lump->nummiptex);
+	Logger::debug(Categories::TOADLET_TADPOLE,"Parsing textures");
+
+	map->parsedTextures.resize(map->miptexlump->nummiptex);
 	int i;
-	for(i=0;i<lump->nummiptex;i++){
+	for(i=0;i<map->miptexlump->nummiptex;i++){
 		Texture::ptr texture;
-		if(lump->dataofs[i]!=-1){
-			WADArchive::wmiptex *miptex=(WADArchive::wmiptex*)(&((byte*)map->textures)[lump->dataofs[i]]);
+		int miptexofs=map->miptexlump->dataofs[i];
+		if(miptexofs!=-1){
+			WADArchive::wmiptex *miptex=(WADArchive::wmiptex*)(&((byte*)map->textures)[miptexofs]);
 			texture=WADArchive::createTexture(mEngine->getTextureManager(),miptex);
 			if(texture==NULL){
 				texture=mEngine->getTextureManager()->findTexture(miptex->name);
@@ -223,6 +240,150 @@ void BSP30Handler::parseTextures(BSP30Map *map){
 			}
 		}
 		map->parsedTextures[i]=texture;
+	}
+}
+
+void BSP30Handler::buildBuffers(BSP30Map *map){
+	Logger::debug(Categories::TOADLET_TADPOLE,"Building buffers and lightmaps");
+
+	int i,j;
+
+	VertexFormat::ptr vertexFormat(new VertexFormat(4));
+	vertexFormat->addVertexElement(VertexElement(VertexElement::Type_POSITION,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3));
+	vertexFormat->addVertexElement(VertexElement(VertexElement::Type_NORMAL,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3));
+	vertexFormat->addVertexElement(VertexElement(VertexElement::Type_TEX_COORD,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_2));
+	vertexFormat->addVertexElement(VertexElement(VertexElement::Type_TEX_COORD_2,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_2));
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,map->nsurfedges);
+
+	// TODO: Figure out maximum required size, or allow multiple images
+	Image::ptr lightmapImage(new Image(Image::Dimension_D2,Image::Format_RGB_8,1024,1024,0));//2048,2048,0));
+	PixelPacker packer(lightmapImage->getData(),lightmapImage->getFormat(),lightmapImage->getWidth(),lightmapImage->getHeight());
+
+	int width=0,height=0;
+	float iwidth=0,iheight=0;
+	float s=0,t=0;
+	Vector2 surfmins,surfmaxs;
+	float surfmids=0,surfmidt=0;
+	int lmwidth=0,lmheight=0;
+	float lmmids=0,lmmidt=0;
+	float ilmwidth=0,ilmheight=0;
+	float ls=0,lt=0;
+
+	map->facedatas.resize(map->nfaces);
+	peeper::VertexBufferAccessor vba;
+	vba.lock(vertexBuffer);
+	for(i=0;i<map->nfaces;i++){
+		bface *face=&map->faces[i];
+
+		// Find texture width & height for this face.
+		// We have to use the information from the actual BSP here, instead of the found texture,
+		//  since the found texture may be of different dimensions than what was used when the BSP was compiled.
+		btexinfo *texinfo=&map->texinfos[face->texinfo];
+		int miptexofs=map->miptexlump->dataofs[texinfo->miptex];
+		if(miptexofs!=-1){
+			WADArchive::wmiptex *miptex=(WADArchive::wmiptex*)(&((byte*)map->textures)[miptexofs]);
+			width=miptex->width;
+			height=miptex->height;
+			if(width>0 && height>0){
+				iwidth=1.0f/(float)width;
+				iheight=1.0f/(float)height;
+			}
+		}
+
+		if((texinfo->flags&TEX_SPECIAL)==0){
+			findSurfaceExtents(map,face,surfmins,surfmaxs);
+			surfmids=(surfmins[0]+surfmaxs[0])/2.0f;
+			surfmidt=(surfmins[1]+surfmaxs[1])/2.0f;
+			lmwidth=(ceil(surfmaxs[0]/16.0) - floor(surfmins[0]/16.0)) + 1;
+			lmheight=(ceil(surfmaxs[1]/16.0) - floor(surfmins[1]/16.0)) + 1;
+			lmmids=(float)lmwidth/2.0;
+			lmmidt=(float)lmheight/2.0;
+			ilmwidth=1.0/(float)lmwidth;
+			ilmheight=1.0/(float)lmheight;
+
+			packer.insert(lmwidth,lmheight,((byte*)map->lighting)+face->lightofs,map->facedatas[i].lightmapTransform);
+		}
+
+		map->facedatas[i].indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIFAN,NULL,face->firstedge,face->numedges));
+		for(j=0;j<face->numedges;j++){
+			int faceedge=face->firstedge+j;
+			int surfedge=map->surfedges[faceedge];
+			bvertex *v=&map->vertexes[surfedge<0?map->edges[-surfedge].v[1]:map->edges[surfedge].v[0]];
+			bplane *p=&map->planes[face->planenum];
+			int side=-2*face->side+1;
+
+			vba.set3(faceedge,0,v->point);
+
+			// Flip the face normal around if necessary
+			vba.set3(faceedge,1,side*p->normal[0],side*p->normal[1],side*p->normal[2]);
+
+			// Project the texture using the projection vectors to find our texture coordinates
+			s=Math::dot((Vector3)v->point,texinfo->vecs[0]) + texinfo->vecs[0][3];
+			t=Math::dot((Vector3)v->point,texinfo->vecs[1]) + texinfo->vecs[1][3];
+			// The texture projection information is not normalized when stored.  So normalize it here.
+			vba.set2(faceedge,2,s*iwidth,t*iheight);
+
+			// Calculate lightmap coordinates
+			if((texinfo->flags&TEX_SPECIAL)==0){
+				ls=(lmmids + (s-surfmids)/16.0);
+				lt=(lmmidt + (t-surfmidt)/16.0);
+				Vector3 lc(ls*ilmwidth,lt*ilmheight,Math::ONE);
+				Math::mulPoint3Fast(lc,map->facedatas[i].lightmapTransform);
+				vba.set2(faceedge,3,lc.x,lc.y);
+			}
+		}
+	}
+	vba.unlock();
+
+	map->vertexData=VertexData::ptr(new VertexData(vertexBuffer));
+
+	map->lightmap=mEngine->getTextureManager()->createTexture(lightmapImage);
+	map->lightmap->retain();
+}
+
+void BSP30Handler::buildMaterials(BSP30Map *map){
+	Logger::debug(Categories::TOADLET_TADPOLE,"Building materials");
+
+	map->materials.resize(map->miptexlump->nummiptex);
+	int i;
+	for(i=0;i<map->miptexlump->nummiptex;i++){
+		Material::ptr material=mEngine->getMaterialManager()->createMaterial();
+		material->retain();
+		material->setLighting(false);
+		material->setFaceCulling(Renderer::FaceCulling_FRONT);
+		material->setDepthWrite(true);
+
+		TextureStage::ptr primary=mEngine->getMaterialManager()->createTextureStage(map->parsedTextures[i]);
+		material->setTextureStage(0,primary);
+
+		TextureStage::ptr secondary=mEngine->getMaterialManager()->createTextureStage(map->lightmap);
+		secondary->setTexCoordIndex(1);
+		secondary->setBlend(TextureBlend(TextureBlend::Operation_MODULATE,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
+		material->setTextureStage(1,secondary);
+
+		map->materials[i]=material;
+	}
+}
+
+void BSP30Handler::findSurfaceExtents(BSP30Map *map,bface *face,Vector2 &mins,Vector2 &maxs){
+	float val;
+	int i,j,surfedge;
+	bvertex *v;
+
+	mins[0]=mins[1]=999999;
+	maxs[0]=maxs[1]=-999999;
+
+	btexinfo *texinfo=&map->texinfos[face->texinfo];
+	for(i=0;i<face->numedges;i++){
+		surfedge=map->surfedges[face->firstedge+i];
+		v=&map->vertexes[surfedge<0?map->edges[-surfedge].v[1]:map->edges[surfedge].v[0]];
+
+		for(j=0;j<2;j++){
+			val=Math::dot((Vector3)v->point,texinfo->vecs[j]) + texinfo->vecs[j][3];
+
+			if(val<mins[j])	mins[j]=val;
+			if(val>maxs[j])	maxs[j]=val;
+		}
 	}
 }
 
