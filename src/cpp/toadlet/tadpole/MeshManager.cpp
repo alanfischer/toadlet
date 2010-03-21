@@ -38,21 +38,51 @@ MeshManager::MeshManager(Engine *engine):ResourceManager(engine->getArchiveManag
 	mEngine=engine;
 }
 
-// TODO: Add proper tex coords to this box
 Mesh::ptr MeshManager::createBox(const AABox &box){
-	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,8);
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,24);
 	{
 		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
 
-		int i=0;
-		vba.set3(i,0,box.mins.x,box.mins.y,box.mins.z); vba.set3(i,1,Math::Z_UNIT_VECTOR3); vba.set2(i,2,Math::ZERO_VECTOR2); ++i;
-		vba.set3(i,0,box.maxs.x,box.mins.y,box.mins.z); vba.set3(i,1,Math::Z_UNIT_VECTOR3); vba.set2(i,2,Math::ZERO_VECTOR2); ++i;
-		vba.set3(i,0,box.mins.x,box.maxs.y,box.mins.z); vba.set3(i,1,Math::Z_UNIT_VECTOR3); vba.set2(i,2,Math::ZERO_VECTOR2); ++i;
-		vba.set3(i,0,box.maxs.x,box.maxs.y,box.mins.z); vba.set3(i,1,Math::Z_UNIT_VECTOR3); vba.set2(i,2,Math::ZERO_VECTOR2); ++i;
-		vba.set3(i,0,box.mins.x,box.mins.y,box.maxs.z); vba.set3(i,1,Math::Z_UNIT_VECTOR3); vba.set2(i,2,Math::ZERO_VECTOR2); ++i;
-		vba.set3(i,0,box.maxs.x,box.mins.y,box.maxs.z); vba.set3(i,1,Math::Z_UNIT_VECTOR3); vba.set2(i,2,Math::ZERO_VECTOR2); ++i;
-		vba.set3(i,0,box.mins.x,box.maxs.y,box.maxs.z); vba.set3(i,1,Math::Z_UNIT_VECTOR3); vba.set2(i,2,Math::ZERO_VECTOR2); ++i;
-		vba.set3(i,0,box.maxs.x,box.maxs.y,box.maxs.z); vba.set3(i,1,Math::Z_UNIT_VECTOR3); vba.set2(i,2,Math::ZERO_VECTOR2); ++i;
+		int vi=0;
+
+
+		// TODO: These front/etc comments aren't correcvt.  fix em!
+
+		// Front
+		vba.set3(vi,0,box.mins.x,box.mins.y,box.maxs.z); vba.set3(vi,1,0,0,Math::ONE); vba.set2(vi,2,0,Math::ONE); ++vi;
+		vba.set3(vi,0,box.maxs.x,box.mins.y,box.maxs.z); vba.set3(vi,1,0,0,Math::ONE); vba.set2(vi,2,Math::ONE,Math::ONE); ++vi;
+		vba.set3(vi,0,box.maxs.x,box.maxs.y,box.maxs.z); vba.set3(vi,1,0,0,Math::ONE); vba.set2(vi,2,Math::ONE,0); ++vi;
+		vba.set3(vi,0,box.mins.x,box.maxs.y,box.maxs.z); vba.set3(vi,1,0,0,Math::ONE); vba.set2(vi,2,0,0); ++vi;
+
+		// Back
+		vba.set3(vi,0,box.maxs.x,box.mins.y,box.mins.z); vba.set3(vi,1,0,0,-Math::ONE); vba.set2(vi,2,0,Math::ONE); ++vi;
+		vba.set3(vi,0,box.mins.x,box.mins.y,box.mins.z); vba.set3(vi,1,0,0,-Math::ONE); vba.set2(vi,2,Math::ONE,Math::ONE); ++vi;
+		vba.set3(vi,0,box.mins.x,box.maxs.y,box.mins.z); vba.set3(vi,1,0,0,-Math::ONE); vba.set2(vi,2,Math::ONE,0); ++vi;
+		vba.set3(vi,0,box.maxs.x,box.maxs.y,box.mins.z); vba.set3(vi,1,0,0,-Math::ONE); vba.set2(vi,2,0,0); ++vi;
+
+		// Left
+		vba.set3(vi,0,box.mins.x,box.mins.y,box.mins.z); vba.set3(vi,1,-Math::ONE,0,0); vba.set2(vi,2,0,Math::ONE); ++vi;
+		vba.set3(vi,0,box.mins.x,box.mins.y,box.maxs.z); vba.set3(vi,1,-Math::ONE,0,0); vba.set2(vi,2,Math::ONE,Math::ONE); ++vi;
+		vba.set3(vi,0,box.mins.x,box.maxs.y,box.maxs.z); vba.set3(vi,1,-Math::ONE,0,0); vba.set2(vi,2,Math::ONE,0); ++vi;
+		vba.set3(vi,0,box.mins.x,box.maxs.y,box.mins.z); vba.set3(vi,1,-Math::ONE,0,0); vba.set2(vi,2,0,0); ++vi;
+
+		// Right
+		vba.set3(vi,0,box.maxs.x,box.mins.y,box.maxs.z); vba.set3(vi,1,Math::ONE,0,0); vba.set2(vi,2,0,Math::ONE); ++vi;
+		vba.set3(vi,0,box.maxs.x,box.mins.y,box.mins.z); vba.set3(vi,1,Math::ONE,0,0); vba.set2(vi,2,Math::ONE,Math::ONE); ++vi;
+		vba.set3(vi,0,box.maxs.x,box.maxs.y,box.mins.z); vba.set3(vi,1,Math::ONE,0,0); vba.set2(vi,2,Math::ONE,0); ++vi;
+		vba.set3(vi,0,box.maxs.x,box.maxs.y,box.maxs.z); vba.set3(vi,1,Math::ONE,0,0); vba.set2(vi,2,0,0); ++vi;
+
+		// Top
+		vba.set3(vi,0,box.mins.x,box.maxs.y,box.maxs.z); vba.set3(vi,1,0,Math::ONE,0); vba.set2(vi,2,0,Math::ONE); ++vi;
+		vba.set3(vi,0,box.maxs.x,box.maxs.y,box.maxs.z); vba.set3(vi,1,0,Math::ONE,0); vba.set2(vi,2,Math::ONE,Math::ONE); ++vi;
+		vba.set3(vi,0,box.maxs.x,box.maxs.y,box.mins.z); vba.set3(vi,1,0,Math::ONE,0); vba.set2(vi,2,Math::ONE,0); ++vi;
+		vba.set3(vi,0,box.mins.x,box.maxs.y,box.mins.z); vba.set3(vi,1,0,Math::ONE,0); vba.set2(vi,2,0,0); ++vi;
+
+		// Bottom
+		vba.set3(vi,0,box.mins.x,box.mins.y,box.mins.z); vba.set3(vi,1,0,-Math::ONE,0); vba.set2(vi,2,0,Math::ONE); ++vi;
+		vba.set3(vi,0,box.maxs.x,box.mins.y,box.mins.z); vba.set3(vi,1,0,-Math::ONE,0); vba.set2(vi,2,Math::ONE,Math::ONE); ++vi;
+		vba.set3(vi,0,box.maxs.x,box.mins.y,box.maxs.z); vba.set3(vi,1,0,-Math::ONE,0); vba.set2(vi,2,Math::ONE,0); ++vi;
+		vba.set3(vi,0,box.mins.x,box.mins.y,box.maxs.z); vba.set3(vi,1,0,-Math::ONE,0); vba.set2(vi,2,0,0); ++vi;
 
 		vba.unlock();
 	}
@@ -62,29 +92,23 @@ Mesh::ptr MeshManager::createBox(const AABox &box){
 		iba.lock(indexBuffer,Buffer::AccessType_WRITE_ONLY);
 
 		int i=0;
-		// Bottom
-		iba.set(i++,3);	iba.set(i++,1); iba.set(i++,2);
-		iba.set(i++,2);	iba.set(i++,1); iba.set(i++,0);
+		iba.set(i++,0);	iba.set(i++,1); iba.set(i++,2);
+		iba.set(i++,0);	iba.set(i++,2); iba.set(i++,3);
 
-		// Back
-		iba.set(i++,7); iba.set(i++,3); iba.set(i++,6);
-		iba.set(i++,6); iba.set(i++,3); iba.set(i++,2);
+		iba.set(i++,4);	iba.set(i++,5); iba.set(i++,6);
+		iba.set(i++,4);	iba.set(i++,6); iba.set(i++,7);
 
-		// Left
-		iba.set(i++,6);	iba.set(i++,2); iba.set(i++,4);
-		iba.set(i++,4);	iba.set(i++,2); iba.set(i++,0);
+		iba.set(i++,8);	iba.set(i++,9); iba.set(i++,10);
+		iba.set(i++,8);	iba.set(i++,10); iba.set(i++,11);
 
-		// Front
-		iba.set(i++,0);	iba.set(i++,1);	iba.set(i++,4);
-		iba.set(i++,4);	iba.set(i++,1);	iba.set(i++,5);
+		iba.set(i++,12);iba.set(i++,13); iba.set(i++,14);
+		iba.set(i++,12);iba.set(i++,14); iba.set(i++,15);
 
-		// Right
-		iba.set(i++,1);	iba.set(i++,3); iba.set(i++,5);
-		iba.set(i++,5);	iba.set(i++,3);	iba.set(i++,7);
+		iba.set(i++,16);iba.set(i++,17); iba.set(i++,18);
+		iba.set(i++,16);iba.set(i++,18); iba.set(i++,19);
 
-		// Top
-		iba.set(i++,4); iba.set(i++,5); iba.set(i++,6);
-		iba.set(i++,6); iba.set(i++,5); iba.set(i++,7);
+		iba.set(i++,20);iba.set(i++,21); iba.set(i++,22);
+		iba.set(i++,20);iba.set(i++,22); iba.set(i++,23);
 
 		iba.unlock();
 	}

@@ -52,17 +52,13 @@ HopScene::HopScene(Scene::ptr scene):
 	mInterpolateCollisionVolumes(false),
 
 	mExcessiveDT(0),
-	mSimulator(NULL)
+	mSimulator(NULL),
+	mTraceable(NULL)
 {
 	mSimulator=new Simulator();
 	mSimulator->setManager(this);
 	mScene=scene;
 	mScene->setChildScene(this);
-	
-	mWorld=Solid::ptr(new Solid());
-	mWorld->setCoefficientOfGravity(0);
-	mWorld->setInfiniteMass();
-	mSimulator->addSolid(mWorld);
 
 	mScene->getRootNode()->getEngine()->registerNodeType(HopEntity::type());
 }
@@ -242,9 +238,9 @@ public:
 	}
 
 	void resultFound(Node *result){
-		Node *entity=result->isEntity();
-		if(entity!=NULL && mCounter<mMaxSolids){
-			mSolids[mCounter++]=((HopEntity*)entity)->getSolid();
+		HopEntity *entity=(HopEntity*)result->isEntity();
+		if(entity!=NULL && mCounter<mMaxSolids && entity->getNumShapes()>0){
+			mSolids[mCounter++]=entity->getSolid();
 		}
 	}
 
@@ -259,6 +255,25 @@ int HopScene::findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids){
 	query.setResultsListener(&listener);
 	performAABoxQuery(&query,box,false);
 	return listener.mCounter;
+}
+
+void HopScene::traceSegment(hop::Collision &result,const Segment &segment){
+	if(mTraceable!=NULL){
+		tadpole::Collision collision;
+		mTraceable->traceSegment(collision,segment,Math::ZERO_VECTOR3);
+		set(result,collision,NULL);
+	}
+}
+
+void HopScene::traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid){
+	if(mTraceable!=NULL){
+		tadpole::Collision collision;
+		const AABox &bound=solid->getLocalBound();
+		Vector3 size;
+		Math::sub(size,bound.maxs,bound.mins);
+		mTraceable->traceSegment(collision,segment,size);
+		set(result,collision,NULL);
+	}
 }
 
 void HopScene::set(tadpole::Collision &r,const hop::Collision &c){

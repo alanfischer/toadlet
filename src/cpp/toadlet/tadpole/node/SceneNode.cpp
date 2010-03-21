@@ -61,6 +61,8 @@ SceneNode::SceneNode(Engine *engine):super(),
 
 	mUpdateListener(NULL),
 
+	mNumLastUpdatedNodes(0),
+
 	//mAmbientColor
 
 	mCamera(NULL),
@@ -199,6 +201,8 @@ void SceneNode::update(int dt){
 			}
 		}
 		else{
+			mAccumulatedDT=0;
+
 			if(mUpdateListener!=NULL){
 				mUpdateListener->preLogicUpdate(dt);
 				mUpdateListener->logicUpdate(dt);
@@ -242,6 +246,7 @@ void SceneNode::preLogicUpdateLoop(int dt){
 }
 
 void SceneNode::preLogicUpdate(int dt){
+	mNumLastUpdatedNodes=0;
 }
 
 void SceneNode::logicUpdate(int dt){
@@ -328,6 +333,8 @@ void SceneNode::logicUpdate(Node::ptr node,int dt,int scope){
 			node->mDeactivateCount=0;
 		}
 	}
+
+	mNumLastUpdatedNodes++;
 }
 
 void SceneNode::postLogicUpdateLoop(int dt){

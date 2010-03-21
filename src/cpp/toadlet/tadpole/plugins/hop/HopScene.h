@@ -27,8 +27,9 @@
 #define TOADLET_TADPOLE_HOPSCENE_H
 
 #include <toadlet/hop/Simulator.h>
-#include <toadlet/tadpole/node/Scene.h>
 #include <toadlet/tadpole/Collision.h>
+#include <toadlet/tadpole/node/Traceable.h>
+#include <toadlet/tadpole/node/Scene.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -95,6 +96,8 @@ public:
 		virtual scalar getEpsilon() const{return mSimulator->getEpsilon();}
 	#endif
 
+	virtual void setTraceable(node::Traceable *traceable){mTraceable=traceable;}
+
 	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits,HopEntity *ignore);
 	virtual void traceEntity(Collision &result,HopEntity *entity,const Segment &segment,int collideWithBits);
 	virtual void testEntity(Collision &result,HopEntity *entity1,const Segment &segment,HopEntity *entity2);
@@ -121,8 +124,8 @@ public:
 	virtual bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact){return mScene->performAABoxQuery(query,box,exact);}
 
 	virtual int findSolidsInAABox(const AABox &box,hop::Solid *solids[],int maxSolids);
-	virtual void traceSegment(hop::Collision &result,const Segment &segment){}
-	virtual void traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid){}
+	virtual void traceSegment(hop::Collision &result,const Segment &segment);
+	virtual void traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid);
 	virtual void preUpdate(int dt,scalar fdt){}
 	virtual void postUpdate(int dt,scalar fdt){}
 	virtual void preUpdate(hop::Solid *solid,int dt,scalar fdt){}
@@ -150,7 +153,7 @@ protected:
 
 	int mExcessiveDT;
 	hop::Simulator *mSimulator;
-	hop::Solid::ptr mWorld;
+	node::Traceable *mTraceable;
 
 	friend class HopEntity;
 };

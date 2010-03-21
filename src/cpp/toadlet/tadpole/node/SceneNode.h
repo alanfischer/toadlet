@@ -88,6 +88,7 @@ public:
 	virtual scalar getLogicFraction() const{return (mMinLogicDT==0 || mMinLogicDT!=mMaxLogicDT)?0:Math::div(Math::fromInt(mAccumulatedDT),Math::fromInt(mMinLogicDT));}
 	virtual int getRenderTime() const{return mLogicTime+mAccumulatedDT;}
 	virtual int getRenderFrame() const{return mRenderFrame;}
+	virtual int getNumLastUpdatedNodes() const{return mNumLastUpdatedNodes;}
 
 	virtual void update(int dt);
 	virtual void render(peeper::Renderer *renderer,CameraNode *cameraNode,Node *node);
@@ -169,6 +170,8 @@ protected:
 	ParentNode::ptr mBackground;
 
 	UpdateListener *mUpdateListener;
+
+	int mNumLastUpdatedNodes;
 
 	peeper::Color mAmbientColor;
 

@@ -148,10 +148,11 @@ public:
 		return direction;
 	}
 	
-	inline void getEndPoint(Vector3 &endPoint) const{
+	inline Vector3 &getEndPoint(Vector3 &endPoint) const{
 		endPoint.x=origin.x+direction.x;
 		endPoint.y=origin.y+direction.y;
 		endPoint.z=origin.z+direction.z;
+		return endPoint;
 	}
 
 	inline bool equals(const Segment &segment) const{

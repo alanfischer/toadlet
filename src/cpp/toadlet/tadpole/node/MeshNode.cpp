@@ -251,7 +251,7 @@ void MeshNode::renderUpdate(int dt){
 	}
 }
 
-void MeshNode::queueRenderable(SceneNode *scene,CameraNode *camera){
+void MeshNode::queueRenderable(SceneNode *queue,CameraNode *camera){
 	if(mMesh!=NULL && mMesh->worldScale!=Math::ONE){
 		mWorldRenderTransform.reset();
 		mWorldRenderTransform.setAt(0,0,mMesh->worldScale);
@@ -263,18 +263,18 @@ void MeshNode::queueRenderable(SceneNode *scene,CameraNode *camera){
 
 	if(mSkeleton!=NULL){
 		int lastRenderUpdateFrame=mSkeleton->getLastRenderUpdateFrame();
-		if(lastRenderUpdateFrame==-1 || lastRenderUpdateFrame==scene->getRenderFrame()){
+		if(lastRenderUpdateFrame==-1 || lastRenderUpdateFrame==queue->getRenderFrame()){
 			updateVertexBuffer();
 		}
 	}
 
 	int i;
 	for(i=0;i<mSubMeshes.size();++i){
-		scene->queueRenderable(mSubMeshes[i]);
+		queue->queueRenderable(mSubMeshes[i]);
 	}
 
 	if(mSkeleton!=NULL && mSkeleton->getRenderMaterial()!=NULL){
-		scene->queueRenderable(mSkeleton);
+		queue->queueRenderable(mSkeleton);
 	}
 }
 

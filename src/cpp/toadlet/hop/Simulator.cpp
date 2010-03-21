@@ -432,10 +432,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 		// Loop to use up available momentum
 		loop=0;
 		while(skip==false){
-			if(first==true){
-				first=false;
-			}
-			else{
+			if(first==false){
 				snapToGrid(oldPosition);
 				snapToGrid(newPosition);
 
@@ -491,7 +488,12 @@ void Simulator::update(int dt,int scope,Solid *solid){
 						cor=(solid->mCoefficientOfRestitution+hitSolid->mCoefficientOfRestitution)/2;
 					}
 
-					sub(temp,hitSolid->mVelocity,solid->mVelocity);
+					if(hitSolid!=NULL){
+						sub(temp,hitSolid->mVelocity,solid->mVelocity);
+					}
+					else{
+						neg(temp,solid->mVelocity);
+					}
 
 					// Attempt to detect a microcollision
 					if(dot(temp,c.normal)<mMicroCollisionThreshold){
@@ -503,9 +505,9 @@ void Simulator::update(int dt,int scope,Solid *solid){
 					// Temp stores the velocity change on hitSolid
 					temp.reset();
 
-					if(solid->mMass!=0 && hitSolid->mMass!=0){
+					if(solid->mMass!=0 && (hitSolid==NULL || hitSolid->mMass!=0)){
 						oneOverMass=solid->mInvMass;
-						oneOverHitMass=hitSolid->mInvMass;
+						oneOverHitMass=hitSolid!=NULL?hitSolid->mInvMass:0;
 
 						// Check to make sure its not two infinite mass solids interacting
 						if(oneOverMass+oneOverHitMass!=0){
@@ -524,7 +526,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 							mul(t,oneOverMass);
 							add(solid->mVelocity,t);
 						}
-						if(hitSolid->mMass!=Solid::INFINITE_MASS){
+						if(hitSolid!=NULL && hitSolid->mMass!=Solid::INFINITE_MASS){
 							if(solid->mMass==Solid::INFINITE_MASS){
 								// Infinite mass trains assume a CoefficientOfRestitution of 1 
 								// for the hitSolid calculation to avoid having gravity jam objects against them 
@@ -545,7 +547,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 							}
 						}
 					}
-					else if(hitSolid->mMass==0){
+					else if(hitSolid!=NULL || hitSolid->mMass==0){
 						mul(temp,c.normal,numerator);
 					}
 					else if(solid->mMass==0){
@@ -554,7 +556,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 					}
 
 					// Only affect hitSolid if hitSolid would have collided with solid.
-					if(	(hitSolid->mCollideWithBits&solid->mCollisionBits)!=0 &&
+					if(hitSolid!=NULL && (hitSolid->mCollideWithBits&solid->mCollisionBits)!=0 &&
 						(Math::abs(temp.x)>=mDeactivateSpeed || Math::abs(temp.y)>=mDeactivateSpeed || Math::abs(temp.z)>=mDeactivateSpeed))
 					{
 						hitSolid->activate();
@@ -602,6 +604,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 						sub(velocity,temp);
 						add(newPosition,oldPosition,velocity);
 					}
+					first=false;
 				}
 			}
 			else{
@@ -723,30 +726,11 @@ void Simulator::traceSegment(Collision &result,const Segment &segment,int collid
 }
 
 void Simulator::traceSolid(Collision &result,Solid *solid,const Segment &segment,int collideWithBits){
-	#if defined(TOADLET_FIXED_POINT)
-		scalar x=TOADLET_MAX_XX(-segment.direction.x,segment.direction.x);
-		scalar y=TOADLET_MAX_XX(-segment.direction.y,segment.direction.y);
-		scalar z=TOADLET_MAX_XX(-segment.direction.z,segment.direction.z);
-		scalar m=TOADLET_MAX_XX(x,y);
-		m=TOADLET_MAX_XX(m,z);
-	#else
-		scalar x=TOADLET_MAX_RR(-segment.direction.x,segment.direction.x);
-		scalar y=TOADLET_MAX_RR(-segment.direction.y,segment.direction.y);
-		scalar z=TOADLET_MAX_RR(-segment.direction.z,segment.direction.z);
-		scalar m=TOADLET_MAX_RR(x,y);
-		m=TOADLET_MAX_RR(m,z);
-	#endif
-	m+=mEpsilon; // Move it out by epsilon, since we haven't snapped yet
-
-	AABox &box=cache_update_box.set(solid->mLocalBound);
-
-	add(box,segment.origin);
-	box.mins.x-=m;
-	box.mins.y-=m;
-	box.mins.z-=m;
-	box.maxs.x+=m;
-	box.maxs.y+=m;
-	box.maxs.z+=m;
+	Vector3 &end=segment.getEndPoint(cache_testSolid_origin);
+	AABox &box=cache_testSolid_box.set(segment.origin,segment.origin);
+	box.mergeWith(end);
+	Math::add(box.mins,solid->mLocalBound.mins);
+	Math::add(box.maxs,solid->mLocalBound.maxs);
 
 	mNumSpacialCollection=findSolidsInAABox(box,mSpacialCollection.begin(),mSpacialCollection.size());
 
