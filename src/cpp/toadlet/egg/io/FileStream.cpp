@@ -30,20 +30,20 @@ namespace toadlet{
 namespace egg{
 namespace io{
 
-FileStream::FileStream(const String &filename,int openFlags):
-	mOpenFlags(0),
+FileStream::FileStream(const String &filename,int open):
+	mOpen(0),
 	mFile(NULL),
 	mAutoClose(false)
 {
 	Logger::excess(Categories::TOADLET_EGG,"Opening file: "+filename);
 
 	const char *mode=NULL;
-	if((openFlags&OpenFlags_READ)>0 && (openFlags&OpenFlags_BINARY)>0) mode="rb";
-	else if((openFlags&OpenFlags_READ)>0) mode="r";
-	else if((openFlags&OpenFlags_WRITE)>0 && (openFlags&OpenFlags_BINARY)>0) mode="wb";
-	else if((openFlags&OpenFlags_WRITE)>0) mode="w";
+	if(open==(Open_BIT_READ|Open_BIT_BINARY)) mode="rb";
+	else if(open==(Open_BIT_READ)) mode="r";
+	else if(open==(Open_BIT_WRITE|Open_BIT_BINARY)) mode="wb";
+	else if(open==(Open_BIT_WRITE)) mode="w";
 
-	mOpenFlags=openFlags;
+	mOpen=open;
 	mFile=fopen(filename,mode);
 	mAutoClose=true;
 }

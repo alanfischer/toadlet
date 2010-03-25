@@ -49,26 +49,26 @@ public:
 	CameraNode();
 	virtual Node *create(Scene *scene);
 
-	void setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,scalar farDist);
-	void setProjectionFovY(scalar fovy,scalar aspect,scalar nearDist,scalar farDist);
-	void setProjectionOrtho(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist);
-	void setProjectionFrustum(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist);
-	void setProjectionTransform(const Matrix4x4 &transform);
-	void setProjectionRotation(scalar rotate);
-	void setNearAndFarDist(scalar nearDist,scalar farDist);
+	virtual void setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,scalar farDist);
+	virtual void setProjectionFovY(scalar fovy,scalar aspect,scalar nearDist,scalar farDist);
+	virtual void setProjectionOrtho(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist);
+	virtual void setProjectionFrustum(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist);
+	virtual void setProjectionTransform(const Matrix4x4 &transform);
+	virtual void setProjectionRotation(scalar rotate);
+	virtual void setNearAndFarDist(scalar nearDist,scalar farDist);
 
-	void setAlignmentCalculationsUseOrigin(bool origin){mAlignmentCalculationsUseOrigin=origin;}
-	bool getAlignmentCalculationsUseOrigin() const{return mAlignmentCalculationsUseOrigin;}
+	virtual void setAlignmentCalculationsUseOrigin(bool origin){mAlignmentCalculationsUseOrigin=origin;}
+	virtual bool getAlignmentCalculationsUseOrigin() const{return mAlignmentCalculationsUseOrigin;}
 
-	void setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up);
-	void setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up);
+	virtual void setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up);
+	virtual void setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up);
 
-	void setViewport(const peeper::Viewport &viewport);
-	void setViewport(int x,int y,int width,int height);
+	virtual void setViewport(const peeper::Viewport &viewport);
+	virtual void setViewport(int x,int y,int width,int height);
 
-	void setClearFlags(int clearFlags){mClearFlags=clearFlags;}
-	void setClearColor(peeper::Color clearColor){mClearColor.set(clearColor);}
-	void setSkipFirstClear(bool skip){mSkipFirstClear=skip;}
+	virtual void setClearFlags(int clearFlags){mClearFlags=clearFlags;}
+	virtual void setClearColor(peeper::Color clearColor){mClearColor.set(clearColor);}
+	virtual void setSkipFirstClear(bool skip){mSkipFirstClear=skip;}
 
 	ParentNode::ptr getMidNode();
 
@@ -94,7 +94,7 @@ public:
 	inline peeper::Color getClearColor() const{return mClearColor;}
 	inline bool getSkipFirstClear() const{return mSkipFirstClear;}
 
-	void updateViewTransform();
+	virtual void updateViewTransform();
 	inline const Matrix4x4 &getViewTransform() const{return mViewTransform;}  /// Only valid during rendering
 	inline const Vector3 &getWorldRenderTranslate() const{return mWorldRenderTranslate;}  /// Only valid during rendering
 
@@ -103,7 +103,7 @@ public:
 	bool culled(const AABox &box);
 	inline int getNumCulledEntities() const{return mNumCulledEntities;}
 
-	void updateFramesPerSecond();
+	virtual void updateFramesPerSecond();
 	inline scalar getFramesPerSecond() const{return mFPS;}
 
 protected:

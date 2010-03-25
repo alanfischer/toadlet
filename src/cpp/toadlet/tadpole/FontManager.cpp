@@ -24,6 +24,9 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/FontManager.h>
+#if defined(TOADLET_PLATFORM_WIN32)
+	#include <shlobj.h>
+#endif
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
@@ -45,6 +48,19 @@ Resource::ptr FontManager::manage(const Resource::ptr &resource){
 	}
 
 	return resource;
+}
+
+Font::ptr FontManager::getDefaultFont(){
+	if(mDefaultFont==NULL){
+		String file;
+		#if defined(TOADLET_PLATFORM_WIN32)
+			TCHAR path[MAX_PATH];
+			SHGetSpecialFolderPath(0,path,CSIDL_FONTS,false);
+			file=path+String("\\Arial.ttf");
+		#endif
+		mDefaultFont=findFont(file,24);
+	}
+	return mDefaultFont;
 }
 
 void FontManager::unmanage(Resource *resource){

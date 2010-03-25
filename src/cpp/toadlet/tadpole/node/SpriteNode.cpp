@@ -92,9 +92,7 @@ SpriteNode::SpriteNode():super(),
 	TOADLET_GIB_IMPLEMENT()
 
 	mPerspective(false),
-	mAlignment(0),
-	mPixelSpace(false)
-	//mSize,
+	mAlignment(0)
 
 	//mMaterial,
 	//mVertexData,
@@ -108,8 +106,6 @@ Node *SpriteNode::create(Scene *scene){
 	setPerspective(true);
 	setCameraAligned(true);
 	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
-	setPixelSpace(false);
-	mSize.set(Math::ONE,Math::ONE,Math::ONE);
 
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,4);
 	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
@@ -192,29 +188,11 @@ void SpriteNode::setMaterial(Material::ptr material){
 void SpriteNode::setPerspective(bool perspective){
 	mPerspective=perspective;
 
-	updateBound();
+	updateSprite();
 }
 
 void SpriteNode::setAlignment(int alignment){
 	mAlignment=alignment;
-
-	updateSprite();
-}
-
-void SpriteNode::setPixelSpace(bool pixelSpace){
-	mPixelSpace=pixelSpace;
-
-	updateSprite();
-}
-
-void SpriteNode::setSize(scalar x,scalar y,scalar z){
-	mSize.set(x,y,z);
-
-	updateSprite();
-}
-
-void SpriteNode::setSize(const Vector3 &size){
-	mSize.set(size);
 
 	updateSprite();
 }
@@ -274,7 +252,9 @@ void SpriteNode::render(Renderer *renderer) const{
 void SpriteNode::updateSprite(){
 	mSpriteTransform.reset();
 
+	// Update offset
 	scalar x=0,y=0;
+	scalar width=Math::ONE,height=Math::ONE; // If we add in a non-normalized option, then this would be the size in non-normalized space.
 	if((mAlignment&Font::Alignment_BIT_LEFT)>0){
 		x=Math::HALF;
 	}
@@ -289,43 +269,10 @@ void SpriteNode::updateSprite(){
 	}
 	Math::setMatrix4x4FromTranslate(mSpriteTransform,x,y,0);
 
-	scalar scaleX=Math::ONE;
-	scalar scaleY=Math::ONE;
-	scalar scaleZ=Math::ONE;
-/*	if(mMaterial!=NULL && mPixelSpace){
-		TextureStage::ptr textureStage=mMaterial->getTextureStage(0);
-		if(textureStage!=NULL){
-			Texture::ptr texture=textureStage->getTexture();
-			if(texture!=NULL){
-				widthScale=Math::fromInt(texture->getWidth());
-				heightScale=Math::fromInt(texture->getHeight());
-				depthScale=Math::fromInt(texture->getDepth());
-			}
-		}
-	}
-*/
-	scaleX=Math::mul(scaleX,Math::mul(mSize.x,mScale.x));
-	scaleY=Math::mul(scaleY,Math::mul(mSize.y,mScale.y));
-	scaleZ=Math::mul(scaleZ,Math::mul(mSize.z,mScale.z));
-
-	Matrix4x4 scale;
-	Math::setMatrix4x4FromScale(scale,scaleX,scaleY,scaleZ);
-	Math::postMul(mSpriteTransform,scale);
-
-	updateBound();
-}
-
-void SpriteNode::updateBound(){
+	// Update bound
+	mLocalBound.origin.set(x,y,0);
 	if(mPerspective){
-		scalar x=Math::mul(mScale.x,mSize.x);
-		scalar y=Math::mul(mScale.y,mSize.y);
-
-		if(mAlignment==(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER)){
-			mLocalBound.radius=Math::sqrt(Math::square(x/2) + Math::square(y/2));
-		}
-		else{
-			mLocalBound.radius=Math::sqrt(Math::square(x) + Math::square(y));
-		}
+		mLocalBound.radius=Math::sqrt(Math::square(width/2) + Math::square(height/2));
 	}
 	else{
 		mLocalBound.radius=-Math::ONE;

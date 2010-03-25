@@ -42,11 +42,11 @@ MemoryStream::MemoryStream(Stream::ptr stream):
 	byte data[1024];
 	int i;
 	for(i=stream->read(data,sizeof(data));i>0;i=stream->read(data,sizeof(data))){
-		byte *newData=new byte[mLength+i];
+		byte *newData=new byte[mDataLength+i];
 		if(mData!=NULL){
-			memcpy(newData,mData,mLength);
+			memcpy(newData,mData,mDataLength);
 		}
-		memcpy(newData+mLength,data,i);
+		memcpy(newData+mDataLength,data,i);
 		delete[] mData;
 		mData=newData;
 		mDataLength+=i;

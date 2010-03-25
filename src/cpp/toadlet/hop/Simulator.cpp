@@ -459,7 +459,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 
 				// If its a valid collision, and someone is listening, then store it
 				if(c.collider!=solid->mTouching &&
-					(solid->mCollisionListener!=NULL || c.collider->mCollisionListener!=NULL))
+					(solid->mCollisionListener!=NULL || (c.collider!=NULL && c.collider->mCollisionListener!=NULL)))
 				{
 					c.collidee=solid;
 					sub(c.velocity,solid->mVelocity,c.collider->mVelocity);

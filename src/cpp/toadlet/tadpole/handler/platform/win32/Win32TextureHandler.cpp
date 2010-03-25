@@ -28,6 +28,7 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/SequenceTexture.h>
 #include <toadlet/tadpole/handler/platform/win32/Win32TextureHandler.h>
+#include <toadlet/tadpole/handler/platform/win32/StreamIStream.h>
 
 #if defined(TOADLET_PLATFORM_WINCE)
 	#include <Imaging.h>
@@ -48,73 +49,6 @@ using namespace toadlet::peeper;
 namespace toadlet{
 namespace tadpole{
 namespace handler{
-
-class StreamIStream:public IStream{
-public:
-	TOADLET_INTRUSIVE_POINTERS(StreamIStream);
-	
-	StreamIStream(Stream::ptr base):
-		mPointerCounter(new PointerCounter(0)),
-		mBase(base)
-	{}
-
-	PointerCounter *pointerCounter(){return mPointerCounter;}
-
-	HRESULT STDMETHODCALLTYPE QueryInterface(const IID &riid,void **ppvObject){return E_NOINTERFACE;}
-	ULONG STDMETHODCALLTYPE AddRef(){return mPointerCounter->incSharedCount();}
-	ULONG STDMETHODCALLTYPE Release(){return mPointerCounter->decSharedCount();}
-
-	HRESULT STDMETHODCALLTYPE Read(void *pv,ULONG cb,ULONG *pcbRead){
-		int amount=mBase->read((byte*)pv,cb);
-		if(pcbRead!=NULL){*pcbRead=amount;}
-		return S_OK;
-	}
-
-	HRESULT STDMETHODCALLTYPE Write(const void *pv,ULONG cb,ULONG *pcbWritten){
-		int amount=mBase->write((const byte*)pv,cb);
-		if(pcbWritten!=NULL){*pcbWritten=amount;}
-		return S_OK;
-	}
-
-	HRESULT STDMETHODCALLTYPE Seek(LARGE_INTEGER dlibMove,DWORD dwOrigin,ULARGE_INTEGER *plibNewPosition){
-		bool result=false;
-		if(dwOrigin==STREAM_SEEK_SET){
-			result=mBase->seek(dlibMove.QuadPart);
-		}
-		else if(dwOrigin==STREAM_SEEK_CUR){
-			int position=mBase->position();
-			result=mBase->seek(position+dlibMove.QuadPart);
-		}
-		else if(dwOrigin==STREAM_SEEK_END){
-			int length=mBase->length();
-			result=mBase->seek(length+dlibMove.QuadPart);
-		}
-		if(plibNewPosition!=NULL){
-			(*plibNewPosition).QuadPart=mBase->position();
-		}
-		return result?S_OK:E_FAIL;
-	}
-
-	HRESULT STDMETHODCALLTYPE Stat(STATSTG *pstatstg,DWORD grfStatFlag){
-		memset(pstatstg,0,sizeof(STATSTG));
-		pstatstg->type=STGTY_STREAM;
-		pstatstg->cbSize.QuadPart=mBase->length();
-		pstatstg->clsid=CLSID_NULL;
-		return S_OK;
-	}
-
-	HRESULT STDMETHODCALLTYPE SetSize(ULARGE_INTEGER libNewSize){return E_NOTIMPL;}
-	HRESULT STDMETHODCALLTYPE CopyTo(IStream *pstm,ULARGE_INTEGER cb,ULARGE_INTEGER *pcbRead,ULARGE_INTEGER *pcbWritten){return E_NOTIMPL;}
-	HRESULT STDMETHODCALLTYPE Commit(DWORD grfCommitFlags){return E_NOTIMPL;}
-	HRESULT STDMETHODCALLTYPE Revert(){return E_NOTIMPL;}
-	HRESULT STDMETHODCALLTYPE LockRegion(ULARGE_INTEGER libOffset,ULARGE_INTEGER cb,DWORD dwLockType){return E_NOTIMPL;}
-	HRESULT STDMETHODCALLTYPE UnlockRegion(ULARGE_INTEGER libOffset,ULARGE_INTEGER cb,DWORD dwLockType){return E_NOTIMPL;}
-	HRESULT STDMETHODCALLTYPE Clone(IStream **ppstm){return E_NOTIMPL;}
-
-protected:
-	PointerCounter *mPointerCounter;
-	Stream::ptr mBase;
-};
 
 Win32TextureHandler::Win32TextureHandler(TextureManager *textureManager):
 	mTextureManager(NULL),

@@ -34,13 +34,18 @@
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/node/Node.h>
 #include <toadlet/tadpole/node/Renderable.h>
-#include <toadlet/tadpole/node/Sizeable.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class TOADLET_API LabelNode:public Node,public Renderable,public Sizeable{
+// TODO: Look more into letting the nodes be used for 2D widget layouts.
+//  Originally we had the Sizeable interface for this, but it was removed
+//  in favor of eventually letting us set the LocalBound as a AABox, then
+//  the layout of a LabelNode or possibly size of a SpriteNode would be
+//  determined by the LocalBound, if it was externally set.
+
+class TOADLET_API LabelNode:public Node,public Renderable{
 public:
 	TOADLET_NODE(LabelNode,Node);
 
@@ -49,7 +54,6 @@ public:
 	virtual void destroy();
 
 	Renderable *isRenderable(){return this;}
-	Sizeable *isSizeable(){return this;}
 
 	void setFont(const Font::ptr &font);
 	Font::ptr getFont() const{return mFont;}
@@ -63,16 +67,11 @@ public:
 	void setAlignment(int alignment);
 	int getAlignment() const{return mAlignment;}
 
-	void setPixelSpace(bool pixelSpace);
-	bool getPixelSpace() const{return mPixelSpace;}
+	void setNormalized(bool normalized);
+	bool getNormalized() const{return mNormalized;}
 
 	void setWordWrap(bool wordWrap);
 	bool getWordWrap() const{return mWordWrap;}
-
-	void setSize(scalar x,scalar y,scalar z);
-	void setSize(const Vector3 &size);
-	const Vector3 &getSize() const{return mSize;}
-	const Vector3 &getDesiredSize();
 
 	void queueRenderable(SceneNode *scene,CameraNode *camera);
 	Material *getRenderMaterial() const{return mMaterial;}
@@ -85,7 +84,6 @@ protected:
 	TOADLET_GIB_DEFINE(LabelNode);
 
 	void updateLabel();
-	void updateBound();
 
 	static egg::String wordWrap(Font::ptr font,float width,const egg::String &text);
 
@@ -93,9 +91,8 @@ protected:
 	egg::String mText;
 	bool mPerspective;
 	int mAlignment;
-	bool mPixelSpace;
+	bool mNormalized;
 	bool mWordWrap;
-	Vector3 mSize;
 
 	Material::ptr mMaterial;
 	peeper::VertexData::ptr mVertexData;

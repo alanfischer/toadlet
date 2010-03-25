@@ -23,13 +23,22 @@
  *
  ********** Copyright header - do not remove **********/
 
+#define _WIN32_WINNT 0x0500
+
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/io/MemoryStream.h>
 #include <toadlet/tadpole/handler/platform/win32/Win32FontHandler.h>
-#include <windows.h>
 #include <stdlib.h>
+
+#if !defined(TOADLET_PLATFORM_WINCE)
+	#include <OleCtl.h>
+	#include <gdiplus.h>
+	#pragma comment(lib,"gdiplus.lib")
+#endif
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::image;
+using namespace toadlet::egg::io;
 using namespace toadlet::peeper;
 
 namespace toadlet{
@@ -38,11 +47,34 @@ namespace handler{
 
 static String defaultCharacterSet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()_+|{}:\"'<>?`-=\\/[];,. \t");
 
-Win32FontHandler::Win32FontHandler(TextureManager *textureManager){
+Win32FontHandler::Win32FontHandler(TextureManager *textureManager):
+	mTextureManager(NULL),
+	#if !defined(TOADLET_PLATFORM_WINCE)
+		mToken(0)
+	#endif
+{
 	mTextureManager=textureManager;
+	#if !defined(TOADLET_PLATFORM_WINCE)
+		Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+		Gdiplus::GdiplusStartup(&mToken,&gdiplusStartupInput,NULL);
+	#endif
 }
 
-Resource *Win32FontHandler::load(const ResourceHandlerData *handlerData){
+bool Win32FontHandler::valid(){
+	#if !defined(TOADLET_PLATFORM_WINCE)
+		return true;
+	#endif
+}
+
+Win32FontHandler::~Win32FontHandler(){
+	#if !defined(TOADLET_PLATFORM_WINCE)
+		Gdiplus::GdiplusShutdown(mToken);
+	#endif
+}
+
+Resource::ptr Win32FontHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+	int i=0,j=0;
+
 	FontData *fontData=(FontData*)handlerData;
 	if(fontData==NULL){
 		Error::nullPointer(Categories::TOADLET_TADPOLE,
@@ -61,14 +93,39 @@ Resource *Win32FontHandler::load(const ResourceHandlerData *handlerData){
 		numChars=defaultCharacterSet.length();
 	}
 
-	int i,j;
+	MemoryStream::ptr memoryStream(new MemoryStream(stream));
+
+	String name;
+	#if !defined(TOADLET_PLATFORM_WINCE)
+		// This is hacky, but for now we grab the font name by loading it using Gdiplus
+		// Then we need to actually load the font using regular Gdi.  Could be replaced with an all Gdiplus font loader.
+		Gdiplus::PrivateFontCollection *collection=new Gdiplus::PrivateFontCollection();
+		collection->AddMemoryFont(memoryStream->getOriginalDataPointer(),memoryStream->length());
+
+		Gdiplus::FontFamily fontFamily;
+		int numFamilys=0;
+		collection->GetFamilies(1,&fontFamily,&numFamilys);
+		WCHAR wname[1024];
+		fontFamily.GetFamilyName(wname);
+		name=wname;
+		
+		// We're done with the collection, so delete it
+		delete collection;
+		collection=NULL;
+
+		DWORD amount=0;
+		HANDLE handle=AddFontMemResourceEx(memoryStream->getOriginalDataPointer(),memoryStream->length(),0,&amount);
+	#else
+		// TODO: Implement this
+	#endif
 
 	LOGFONT logFont={0};
 	logFont.lfWidth=Math::fromInt(fontData->pointSize/2);
 	logFont.lfHeight=Math::fromInt(fontData->pointSize);
 	logFont.lfWeight=FW_BOLD;
 	logFont.lfCharSet=DEFAULT_CHARSET;
-	logFont.lfPitchAndFamily=VARIABLE_PITCH | FF_SWISS;
+	logFont.lfPitchAndFamily=VARIABLE_PITCH;
+	memcpy(logFont.lfFaceName,name.c_str(),name.length());
 
 	HFONT fontHandle=CreateFontIndirect(&logFont);
 	if(fontHandle==NULL){
@@ -189,7 +246,7 @@ Resource *Win32FontHandler::load(const ResourceHandlerData *handlerData){
 		glyph->width=sizes[i].right;
 		glyph->height=sizes[i].bottom;
 		glyph->offsetx=0;
-		glyph->offsety=0;
+		glyph->offsety=-fontData->pointSize; // It appears the win32 fonts are 1 point size lower than the TTF (standard) fonts, so raise it up.
 		glyphs[i]=glyph;
 
 		if(i%charCountWidth==charCountWidth-1){
@@ -202,6 +259,7 @@ Resource *Win32FontHandler::load(const ResourceHandlerData *handlerData){
 	}
 
 	#if !defined(TOADLET_PLATFORM_WINCE)
+		RemoveFontMemResourceEx(handle);
 		GdiFlush();
 	#endif
 
@@ -216,7 +274,7 @@ Resource *Win32FontHandler::load(const ResourceHandlerData *handlerData){
 		memcpy(imageData+imageStride*(textureHeight-i-1),buffer+bitmapStride*i,bitmapStride);
 	}
 
-	Font *font=new Font(fontData->pointSize,0,shared_static_cast<Texture>(mTextureManager->createTexture(image)),charArray,&glyphs[0],glyphs.size());
+	Font::ptr font(new Font(fontData->pointSize,0,shared_static_cast<Texture>(mTextureManager->createTexture(image)),charArray,&glyphs[0],glyphs.size()));
 
 	SelectObject(cdc,oldBitmap);
 	DeleteObject(bitmap);

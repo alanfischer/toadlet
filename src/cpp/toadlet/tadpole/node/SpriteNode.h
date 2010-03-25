@@ -35,7 +35,6 @@
 #include <toadlet/tadpole/animation/TextureStageAnimation.h>
 #include <toadlet/tadpole/node/Node.h>
 #include <toadlet/tadpole/node/Renderable.h>
-#include <toadlet/tadpole/node/Sizeable.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -43,7 +42,7 @@ namespace node{
 
 class Scene;
 
-class TOADLET_API SpriteNode:public Node,public Renderable,public Sizeable{
+class TOADLET_API SpriteNode:public Node,public Renderable{
 public:
 	TOADLET_NODE(SpriteNode,Node);
 
@@ -73,7 +72,6 @@ public:
 	virtual void destroy();
 
 	Renderable *isRenderable(){return this;}
-	Sizeable *isSizeable(){return this;}
 
 	void setMaterial(const egg::String &name);
 	void setMaterial(Material::ptr material);
@@ -84,14 +82,6 @@ public:
 
 	void setAlignment(int alignment);
 	int getAlignment() const{return mAlignment;}
-
-	void setPixelSpace(bool pixelSpace);
-	bool getPixelSpace() const{return mPixelSpace;}
-
-	void setSize(scalar x,scalar y,scalar z);
-	void setSize(const Vector3 &size);
-	const Vector3 &getSize() const{return mSize;}
-	const Vector3 &getDesiredSize(){return Math::ZERO_VECTOR3;}
 
 	SpriteAnimationController::ptr getAnimationController();
 
@@ -108,12 +98,9 @@ protected:
 	TOADLET_GIB_DEFINE(SpriteNode);
 
 	void updateSprite();
-	void updateBound();
 
 	bool mPerspective;
 	int mAlignment;
-	bool mPixelSpace;
-	Vector3 mSize;
 	SpriteAnimationController::ptr mAnimationController;
 
 	Material::ptr mMaterial;
