@@ -117,6 +117,10 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		for(i=0;i<numTextureStages;++i){
 			renderer->setTextureStage(i,mTextureStages[i]);
 		}
+		int maxTextureStages=renderer->getCapabilitySet().maxTextureStages;
+		for(;i<maxTextureStages;++i){
+			renderer->setTextureStage(i,NULL);
+		}
 	}
 	else{
 		if(previousMaterial->mFaceCulling!=mFaceCulling){

@@ -23,6 +23,10 @@
  *
  ********** Copyright header - do not remove **********/
 
+// OVERALL TODO:
+// - clean up the aabox querying so its a lot easier to use
+// - Sprites and animated meshes need to if(no event frames){deactivate if not being looked at}
+
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/CapabilitySet.h>
@@ -64,7 +68,9 @@
 	#endif
 #endif
 
-#if defined(TOADLET_PLATFORM_OSX)
+#if defined(TOADLET_PLATFORM_WIN32)
+	#include <toadlet/tadpole/handler/platform/win32/Win32FontHandler.h>
+#elif defined(TOADLET_PLATFORM_OSX)
 	#include <toadlet/tadpole/handler/platform/osx/OSXFontHandler.h>
 #elif defined(TOADLET_HAS_FREETYPE)
 	#include <toadlet/tadpole/handler/FreeTypeHandler.h>
@@ -171,14 +177,12 @@ Engine::Engine():
 	mTextureManager->setHandler(SPRHandler::ptr(new SPRHandler(mTextureManager)),"spr");
 
 	// Font handlers
-	#if defined(TOADLET_PLATFORM_OSX)
-		OSXFontHandler::ptr osxFontHandler(new OSXFontHandler(mTextureManager));
-		mFontManager->setHandler(osxFontHandler,"ttf");
-		mFontManager->setHandler(osxFontHandler,"dfont");
+	#if defined(TOADLET_HAS_GDIPLUS)
+		mFontManager->setDefaultHandler(Win32FontHandler::ptr(new Win32FontHandler(mTextureManager)));
+	#elif defined(TOADLET_PLATFORM_OSX)
+		mFontManager->setDefaultHandler(OSXFontHandler::ptr(new OSXFontHandler(mTextureManager)));
 	#elif defined(TOADLET_HAS_FREETYPE)
-		FreeTypeHandler::ptr freeTypeHandler(new FreeTypeHandler(mTextureManager));
-		mFontManager->setHandler(freeTypeHandler,"ttf");
-		mFontManager->setHandler(freeTypeHandler,"dfont");
+		mFontManager->setDefaultHandler(FreeTypeHandler::ptr(new FreeTypeHandler(mTextureManager)));
 	#endif
 
 	// Material handlers

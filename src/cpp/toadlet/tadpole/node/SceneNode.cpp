@@ -40,10 +40,6 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-// Immediate TODO:
-//	- Fix Bounding Volumes, so we have Logic & Render volumes properly updated with child volumes
-//	- Test that SceneNode returns proper AABoxQuery results
-
 TOADLET_NODE_IMPLEMENT(SceneNode,Categories::TOADLET_TADPOLE_NODE+".SceneNode");
 
 SceneNode::SceneNode(Engine *engine):super(),
@@ -294,6 +290,7 @@ void SceneNode::logicUpdate(Node::ptr node,int dt,int scope){
 	}
 
 	mul(node->mWorldBound,node->mWorldTranslate,node->mWorldRotate,node->mWorldScale,node->mLocalBound);
+	if(node->mLocalBound.radius<0) node->mWorldBound.radius=-Math::ONE;
 
 	ParentNode *parent=node->isParent();
 	bool childrenActive=false;
@@ -407,6 +404,7 @@ void SceneNode::renderUpdate(Node::ptr node,int dt,int scope){
 	}
 
 	mul(node->mRenderWorldBound,node->mWorldRenderTransform,node->mLocalBound);
+	if(node->mLocalBound.radius<0) node->mRenderWorldBound.radius=-Math::ONE;
 
 	ParentNode *parent=node->isParent();
 	if(parent!=NULL){
@@ -521,9 +519,12 @@ void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
 		layer->renderables.clear();
 
 		postLayerRender(renderer,layerNum);
+
+		// Reset previous material each time, to avoid pre/postLayerRender messing up what we though the state of things were
+		// We could also use the true/false return of pre/postLayerRender, but it could be easy to forget to change that.
+		mPreviousMaterial=NULL;
 	}
 
-	mPreviousMaterial=NULL;
 	mCamera=NULL;
 }
 

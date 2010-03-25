@@ -23,11 +23,6 @@
  *
  ********** Copyright header - do not remove **********/
 
-// TODO:
-// - right now we have aabox in bsp, which goes to a sphere for the localbound, which goes to an aabox for the physics bound.  this should be fixed somehow
-// - clean up the aabox querying so its a lot easier to use
-// - Sprites and animated meshes need to if(no event frames){deactivate if not being looked at}
-
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/peeper/VertexFormat.h>
 #include <toadlet/tadpole/Engine.h>
@@ -359,7 +354,7 @@ void BSP30SceneNode::queueRenderables(){
 					childdata *data=(childdata*)occupant->getParentData();
 					if(data->counter!=mCounter){
 						data->counter=mCounter;
-						if(mCamera->culled(occupant->getWorldBound())==false){
+						if(culled(occupant)==false){
 							super::queueRenderables(occupant);
 						}
 					}

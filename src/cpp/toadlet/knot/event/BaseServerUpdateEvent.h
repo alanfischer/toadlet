@@ -52,20 +52,20 @@ public:
 
 	virtual int read(egg::io::DataStream *stream){
 		int amount=0;
-		amount+=stream->readBigInt16(mLastCounter);
+		amount+=stream->readBigInt32(mLastCounter);
 		amount+=stream->readBigInt32(mTime);
 		return amount;
 	}
 
 	virtual int write(egg::io::DataStream *stream){
 		int amount=0;
-		amount+=stream->writeBigInt16(mLastCounter);
+		amount+=stream->writeBigInt32(mLastCounter);
 		amount+=stream->writeBigInt32(mTime);
 		return amount;
 	}
 
 protected:
-	short mLastCounter;
+	int mLastCounter; // Use an int, a short overflows too quickly.
 	int mTime;
 };
 

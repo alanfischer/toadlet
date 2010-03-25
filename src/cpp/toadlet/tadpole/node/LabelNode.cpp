@@ -46,7 +46,7 @@ LabelNode::LabelNode():super(),
 	//mText,
 	mPerspective(false),
 	mAlignment(0),
-	mPixelSpace(false),
+	mNormalized(false),
 	mWordWrap(false)
 	//mSize,
 
@@ -61,9 +61,8 @@ Node *LabelNode::create(Scene *scene){
 	setPerspective(true);
 	setCameraAligned(true);
 	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
-	setPixelSpace(false);
+	setNormalized(true);
 	setWordWrap(false);
-	mSize.reset();
 
 	mMaterial=getEngine()->getMaterialManager()->createMaterial();
 	mMaterial->retain();
@@ -120,7 +119,7 @@ void LabelNode::setText(const String &text){
 void LabelNode::setPerspective(bool perspective){
 	mPerspective=perspective;
 
-	updateBound();
+	updateLabel();
 }
 
 void LabelNode::setAlignment(int alignment){
@@ -129,8 +128,8 @@ void LabelNode::setAlignment(int alignment){
 	updateLabel();
 }
 
-void LabelNode::setPixelSpace(bool pixelSpace){
-	mPixelSpace=pixelSpace;
+void LabelNode::setNormalized(bool normalized){
+	mNormalized=normalized;
 
 	updateLabel();
 }
@@ -139,22 +138,6 @@ void LabelNode::setWordWrap(bool wordWrap){
 	mWordWrap=wordWrap;
 
 	updateLabel();
-}
-
-void LabelNode::setSize(scalar x,scalar y,scalar z){
-	mSize.set(x,y,z);
-
-	updateLabel();
-}
-
-void LabelNode::setSize(const Vector3 &size){
-	mSize.set(size);
-
-	updateLabel();
-}
-
-const Vector3 &LabelNode::getDesiredSize(){
-	return Math::ZERO_VECTOR3;
 }
 
 void LabelNode::queueRenderable(SceneNode *scene,CameraNode *camera){
@@ -192,21 +175,22 @@ void LabelNode::updateLabel(){
 		return;
 	}
 
+	// Update word wrap
 	String text;
 	if(mWordWrap){
-		if(mPixelSpace){
-			text=wordWrap(mFont,mSize.x,mText);
+		if(mNormalized){
+			text=wordWrap(mFont,mFont->getPointSize(),mText);
 		}
 		else{
-			text=wordWrap(mFont,Math::toInt(mSize.x*mFont->getPointSize()),mText);
+			text=wordWrap(mFont,Math::ONE,mText);
 		}
 	}
 	else{
 		text=mText;
 	}
 
+	// Update buffers
 	int length=text.length();
-
 	if(mVertexData==NULL || mVertexData->getVertexBuffer(0)->getSize()/4<length){
 		int i,ix;
 
@@ -230,10 +214,10 @@ void LabelNode::updateLabel(){
 			indexBuffer->unlock();
 		}
 	}
-
-	mFont->updateVertexBufferForString(mVertexData->getVertexBuffer(0),text,Colors::WHITE,mAlignment,mPixelSpace);
+	mFont->updateVertexBufferForString(mVertexData->getVertexBuffer(0),text,Colors::WHITE,mAlignment,!mNormalized,true);
 	mIndexData->setCount(length*6);
 
+	// Update material
 	Texture::ptr texture=mFont->getTexture();
 	mMaterial->setTextureStage(0,TextureStage::ptr(new TextureStage(texture)));
 	if((texture->getFormat()&Texture::Format_BIT_A)>0){
@@ -243,10 +227,7 @@ void LabelNode::updateLabel(){
 		mMaterial->setBlend(Blend::Combination_COLOR);
 	}
 
-	updateBound();
-}
-
-void LabelNode::updateBound(){
+	// Update bound
 	if(mFont==NULL){
 		mLocalBound.radius=0;
 	}
@@ -255,11 +236,7 @@ void LabelNode::updateBound(){
 		int ih=mFont->getStringHeight(mText);
 
 		scalar width,height;
-		if(mPixelSpace){
-			width=Math::fromInt(iw);
-			height=Math::fromInt(ih);
-		}
-		else{
+		if(mNormalized){
 			scalar pointSize=
 			#if defined(TOADLET_FIXED_POINT)
 				Math::fromFloat(mFont->getPointSize());
@@ -269,6 +246,10 @@ void LabelNode::updateBound(){
 
 			width=Math::div(Math::fromInt(iw),pointSize);
 			height=Math::div(Math::fromInt(ih),pointSize);
+		}
+		else{
+			width=Math::fromInt(iw);
+			height=Math::fromInt(ih);
 		}
 
 		if(mAlignment==(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER)){

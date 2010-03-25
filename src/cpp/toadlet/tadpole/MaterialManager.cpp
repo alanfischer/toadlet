@@ -53,7 +53,7 @@ TextureStage::ptr MaterialManager::createTextureStage(Texture::ptr texture,bool 
 	TextureStage::ptr textureStage(new TextureStage(texture));
 	textureStage->setMinFilter(mDefaultMinFilter);
 	textureStage->setMagFilter(mDefaultMagFilter);
-	if(texture!=NULL && texture->getNumMipLevels()>1){
+	if(texture!=NULL && texture->getNumMipLevels()!=1){ // Only enable mipmap filtering if we have 0 for autogen, or > 1 mipmap levels
 		textureStage->setMipFilter(mDefaultMipFilter);
 	}
 	else{

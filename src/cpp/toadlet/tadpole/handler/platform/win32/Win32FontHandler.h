@@ -29,24 +29,27 @@
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/FontData.h>
 #include <toadlet/tadpole/TextureManager.h>
+#include <windows.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace handler{
 
 /// @brief  A lighter weight font handling class for the Win32 platform
-///  If the FreeTypeHandler is unavailable or too heavy weight to include, this class may be used.
-///  At the current time it does not implement the ResourceHandler interface, so it must be used manually
 
-class TOADLET_API Win32FontHandler{
+class TOADLET_API Win32FontHandler:public ResourceHandler{
 public:
 	Win32FontHandler(TextureManager *textureManager);
-	virtual ~Win32FontHandler(){}
+	virtual ~Win32FontHandler();
+	bool valid();
 
-	egg::Resource *load(const ResourceHandlerData *handlerData);
+	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
 
 protected:
 	TextureManager *mTextureManager;
+	#if !defined(TOADLET_PLATFORM_WINCE)
+		ULONG_PTR mToken;
+	#endif
 };
 
 }

@@ -38,24 +38,24 @@ class TOADLET_API FileStream:public Stream{
 public:
 	TOADLET_SHARED_POINTERS(FileStream);
 
-	enum OpenFlags{
-		OpenFlags_UNKNOWN=	0,
-		OpenFlags_READ=		1<<0,
-		OpenFlags_WRITE=	1<<1,
-		OpenFlags_CREATE=	1<<2,
-		OpenFlags_BINARY=	1<<3,
+	enum Open{
+		Open_BIT_UNKNOWN=	0,
+		Open_BIT_READ=		1<<0,
+		Open_BIT_WRITE=		1<<1,
+		Open_BIT_CREATE=	1<<2,
+		Open_BIT_BINARY=	1<<3,
 	};
 	
-	FileStream(const String &filename,int openFlags);
+	FileStream(const String &filename,int open);
 	virtual ~FileStream();
 
 	virtual bool isOpen() const;
 	virtual void close();
 
-	virtual bool isReadable(){return (mOpenFlags&OpenFlags_READ)>0;}
+	virtual bool isReadable(){return (mOpen&Open_BIT_READ)>0;}
 	virtual int read(byte *buffer,int length);
 
-	virtual bool isWriteable(){return (mOpenFlags&OpenFlags_WRITE)>0;}
+	virtual bool isWriteable(){return (mOpen&Open_BIT_WRITE)>0;}
 	virtual int write(const byte *buffer,int length);
 
 	virtual bool reset();
@@ -67,7 +67,7 @@ public:
 	FILE *getFILE(){return mFile;}
 
 protected:
-	int mOpenFlags;
+	int mOpen;
 	FILE *mFile;
 	bool mAutoClose;
 };

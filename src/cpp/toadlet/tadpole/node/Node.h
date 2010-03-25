@@ -81,12 +81,6 @@ public:
 	virtual ParentNode *isParent(){return NULL;}
 	virtual Renderable *isRenderable(){return NULL;}
 	virtual Node *isEntity(){return NULL;}
-	// TODO: I am still not 100% sure on using the Sizeable interface.
-	//  Not only does it seem to conflict with the idea of Scalable nodes,
-	//  it also seems like it would be better handled using OrientedBoundingBoxes.
-	//  That way the size of a node could be gotten just by getting its OBB, and perhaps nodes would also
-	//  offer a method to set the OBB, and just return some error condition if that was not possible.
-	virtual Sizeable *isSizeable(){return NULL;}
 
 	virtual void setNodeDestroyedListener(NodeDestroyedListener *listener,bool owns);
 	inline NodeDestroyedListener *getNodeDestroyedListener() const{return mNodeDestroyedListener;}
