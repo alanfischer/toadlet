@@ -82,6 +82,8 @@ public:
 	virtual Renderable *isRenderable(){return NULL;}
 	virtual Node *isEntity(){return NULL;}
 
+	inline int getHandle() const{return mHandle;}
+
 	virtual void setNodeDestroyedListener(NodeDestroyedListener *listener,bool owns);
 	inline NodeDestroyedListener *getNodeDestroyedListener() const{return mNodeDestroyedListener;}
 	virtual void removeAllNodeDestroyedListeners();
@@ -116,8 +118,6 @@ public:
 
 	virtual void handleEvent(const egg::Event::ptr &event){}
 
-	inline int getHandle() const{return mHandle;}
-
 	virtual void setScope(int scope);
 	inline int getScope() const{return mScope;}
 
@@ -129,16 +129,13 @@ public:
 
 	virtual void setReceiveUpdates(bool receiveUpdates);
 	inline bool getReceiveUpdates() const{return mReceiveUpdates;}
+	virtual void logicUpdate(int dt){}
+	virtual void renderUpdate(int dt){}
 
 	virtual void setLocalBound(const Sphere &bound);
 	inline const Sphere &getLocalBound() const{return mLocalBound;}
 	inline const Sphere &getWorldBound() const{return mWorldBound;}
 	inline const Sphere &getRenderWorldBound() const{return mRenderWorldBound;}
-
-	/// Only called if the Node registers itself with the Scene in registerUpdateNode.
-	/// Dont forget to call unregisterUpdateNode in its destroy.
-	virtual void logicUpdate(int dt){}
-	virtual void renderUpdate(int dt){}
 
 	virtual void activate();
 	inline bool active() const{return mActive;}
