@@ -36,6 +36,17 @@ using namespace toadlet::egg;
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 
+// renderUpdate rework:
+//	logicUpdate updates the worldBound, but passes down a Vector3, of the area its children should pass their bounds through.
+//	EX: HopEntity finds out its going to move (1,0,0) in the next logicUpdate loop, so its children will get passed down (1,0,0),
+//		so a localBound of sphere(5) will actually be a worldBound of a sphere at (0.5,0,0), of radius (5.5).
+//	Then, renderUpdate isn't called in update(), but instead called in render(), and the DT for each node is calculated from its previous renderUpdate to the currentTime.
+//		and at each node, if its a renderable, it's added to the renderQueue.
+//	Now we have 1 less pass through the scene each time.
+//	Alignment is handled by the CameraNode portion of the scene being updated initially with some sort of single walk down
+//		(Then if a Camera depends on another node, it could trigger that node being renderUpdated.)
+//		Then the camera view transform is updated, and visible nodes are found and renderUpdated()
+
 namespace toadlet{
 namespace tadpole{
 namespace node{
