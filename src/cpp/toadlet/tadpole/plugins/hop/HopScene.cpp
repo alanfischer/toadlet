@@ -181,54 +181,6 @@ void HopScene::intraUpdate(int dt){
 	mScene->intraUpdate(dt);
 }
 
-void HopScene::preRenderUpdate(int dt){
-	int i;
-	bool active,activePrevious;
-
-	scalar f=mScene->getLogicFraction();
-
-	for(i=mHopEntities.size()-1;i>=0;--i){
-		HopEntity *entity=mHopEntities[i];
-		active=entity->mSolid->active();
-		activePrevious=entity->mActivePrevious;
-		if(active || activePrevious){
-			// TODO: Add an option to either use strict interpolation, or fuzzy interpolation
-			// If we are deactivating, then make sure we are at our rest point
-#if 1
-			if(active==false && activePrevious){
-				entity->interpolatePhysicalParameters(Math::ONE);
-			}
-			else{
-				entity->interpolatePhysicalParameters(f);
-			}
-#elif 1
-			Vector3 last;Math::setTranslateFromMatrix4x4(last,entity->getRenderTransform());
-			Vector3 translate;Math::lerp(translate,last,entity->getTranslate(),0.3);
-			entity->setRenderTransformTranslate(translate);
-#else
-			entity->setRenderTransformTranslate(entity->getTranslate());
-#endif
-
-			if(entity->mShadowMesh!=NULL){
-				entity->castShadow();
-			}
-			if(entity->mVolumeNode!=NULL){
-				entity->updateVolumes(mInterpolateCollisionVolumes);
-			}
-		}
-	}
-
-	mScene->preRenderUpdate(dt);
-}
-
-void HopScene::renderUpdate(int dt){
-	mScene->renderUpdate(dt);
-}
-
-void HopScene::postRenderUpdate(int dt){
-	mScene->postRenderUpdate(dt);
-}
-
 class QueryListener:public SpacialQueryResultsListener{
 public:
 	QueryListener(Solid *solids[],int maxSolids){

@@ -26,12 +26,12 @@
 #ifndef TOADLET_TADPOLE_BSP_BSPSCENENODE_H
 #define TOADLET_TADPOLE_BSP_BSPSCENENODE_H
 
-#include <toadlet/tadpole/node/SceneNode.h>
-#include <toadlet/tadpole/node/Traceable.h>
-#include <toadlet/tadpole/bsp/BSP30Map.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/Texture.h>
+#include <toadlet/tadpole/Traceable.h>
+#include <toadlet/tadpole/node/SceneNode.h>
+#include <toadlet/tadpole/bsp/BSP30Map.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -39,7 +39,7 @@ namespace bsp{
 
 // TODO: When we switch the nodes to using an AABox bound, then modify these classes so we don't go bsp(aabox)->sphere(local)->aabox(physics);
 
-class TOADLET_API BSP30ModelNode:public node::Node,public node::Renderable,public node::Traceable{
+class TOADLET_API BSP30ModelNode:public node::Node,public Traceable{
 public:
 	TOADLET_NODE(BSP30ModelNode,Node);
 
@@ -49,7 +49,6 @@ public:
 
 		SubModel(BSP30ModelNode *modelNode,BSP30Map *map);
 
-		void queueRenderable(node::SceneNode *queue,node::CameraNode *camera){} // Queuing done by parent
 		Material *getRenderMaterial() const{return material;}
 		const Matrix4x4 &getRenderTransform() const{return modelNode->getWorldRenderTransform();}
 		void render(peeper::Renderer *renderer) const;
@@ -67,8 +66,6 @@ public:
 	void setModel(BSP30Map::ptr map,int index);
 	int getModel() const{return mModelIndex;}
 
-	virtual node::Renderable *isRenderable(){return this;}
-
 	void setVisible(bool visible){mVisible=visible;}
 	bool getVisible() const{return mVisible;}
 
@@ -78,10 +75,7 @@ public:
 	inline int getNumSubModels() const{return mSubModels.size();}
 	SubModel *getSubModel(int i){return mSubModels[i];}
 
-	void queueRenderable(node::SceneNode *queue,node::CameraNode *camera);
-	Material *getRenderMaterial() const{return NULL;}
-	const Matrix4x4 &getRenderTransform() const{return mWorldRenderTransform;}
-	void render(peeper::Renderer *renderer) const{}
+	void renderUpdate(node::CameraNode *camera,RenderQueue *queue);
 
 	const Sphere &getLocalBound() const{return super::getLocalBound();}
 	void traceSegment(Collision &result,const Segment &segment,const Vector3 &size);
@@ -94,7 +88,7 @@ protected:
 	egg::Collection<SubModel::ptr> mSubModels;
 };
 
-class TOADLET_API BSP30SceneNode:public node::SceneNode,public node::Traceable{
+class TOADLET_API BSP30SceneNode:public node::SceneNode,public Traceable{
 public:
 	TOADLET_NONINSTANCIABLENODE(BSP30SceneNode,SceneNode);
 
@@ -119,9 +113,10 @@ public:
 
 	void childTransformUpdated(Node *child);
 
+	void renderUpdate(node::CameraNode *camera,RenderQueue *queue);
+
 protected:
-	void queueRenderables();
-	bool preLayerRender(peeper::Renderer *renderer,int layer);
+	bool preLayerRender(peeper::Renderer *renderer,node::CameraNode *camera,int layer);
 	void addLeafToVisible(bleaf *leaf,node::CameraNode *camera);
 
 	BSP30Map::ptr mMap;

@@ -52,7 +52,7 @@
 				PreprocessorDefinitions="WIN32;_DEBUG;DEBUG;_WINDOWS;_UNICODE;UNICODE;TOADLET_USE_STATIC"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
-				RuntimeLibrary="0"
+				RuntimeLibrary="1"
 				BufferSecurityCheck="false"
 				TreatWChar_tAsBuiltInType="false"
 				UsePrecompiledHeader="0"

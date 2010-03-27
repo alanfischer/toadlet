@@ -28,12 +28,12 @@
 
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
+#include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/animation/AnimationController.h>
 #include <toadlet/tadpole/animation/SkeletonAnimation.h>
 #include <toadlet/tadpole/mesh/Mesh.h>
 #include <toadlet/tadpole/node/MeshNodeSkeleton.h>
 #include <toadlet/tadpole/node/Node.h>
-#include <toadlet/tadpole/node/Renderable.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -48,7 +48,7 @@ class Scene;
 //  Another nice feature would be the ability for Animations to be run by a Thread pool, so a central AnimationManager would take
 //   care of the updating.  But perhaps this would be better suited by having Nodes update their Animations as we do now, and then the
 //   whole scenegraph be updated by a ThreadPool, taking into account dependencies
-class TOADLET_API MeshNode:public Node,public Renderable{
+class TOADLET_API MeshNode:public Node{
 public:
 	TOADLET_NODE(MeshNode,Node);
 
@@ -58,7 +58,6 @@ public:
 
 		SubMesh(MeshNode *meshNode,mesh::Mesh::SubMesh *meshSubMesh);
 
-		void queueRenderable(SceneNode *queue,CameraNode *camera){} // Queuing done by parent
 		Material *getRenderMaterial() const{return material;}
 		const Matrix4x4 &getRenderTransform() const{return meshNode->getWorldRenderTransform();}
 		void render(peeper::Renderer *renderer) const;
@@ -84,7 +83,6 @@ public:
 		virtual void stop();
 
 		virtual void logicUpdate(int dt);
-		virtual void renderUpdate(int dt);
 
 		void skeletonChanged();
 
@@ -97,8 +95,6 @@ public:
 	MeshNode();
 	virtual Node *create(Scene *scene);
 	virtual void destroy();
-
-	Renderable *isRenderable(){return this;}
 
 	void setMesh(const egg::String &name);
 	void setMesh(mesh::Mesh::ptr mesh);
@@ -115,8 +111,7 @@ public:
 	MeshAnimationController::ptr getAnimationController();
 
 	void logicUpdate(int dt);
-	void renderUpdate(int dt);
-	void queueRenderables(Scene *scene);
+	void renderUpdate(CameraNode *camera,RenderQueue *queue);
 
 	peeper::VertexBufferAccessor svba;
 	peeper::VertexBufferAccessor dvba;
@@ -124,10 +119,7 @@ public:
 	void createVertexBuffer();
 	void updateVertexBuffer();
 
-	void queueRenderable(SceneNode *queue,CameraNode *camera);
-	Material *getRenderMaterial() const{return NULL;}
 	const Matrix4x4 &getRenderTransform() const{return mWorldRenderTransform;}
-	void render(peeper::Renderer *renderer) const{} // Rendering done by children
 
 protected:
 	mesh::Mesh::ptr mMesh;

@@ -35,15 +35,14 @@
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/tadpole/Material.h>
+#include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/node/CameraNode.h>
-#include <toadlet/tadpole/node/Renderable.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace node{
 
 class Scene;
-class CameraNode;
 
 class TOADLET_API ParticleNode:public Node,public Renderable{
 public:
@@ -133,8 +132,7 @@ public:
 	inline void destroyNextLogicFrame(){mDestroyNextLogicFrame=true;}
 	
 	virtual void logicUpdate(int dt);
-	virtual void renderUpdate(int dt);
-	virtual void queueRenderable(SceneNode *scene,CameraNode *camera);
+	virtual void renderUpdate(CameraNode *camera,RenderQueue *queue);
 
 	virtual Material *getRenderMaterial() const{return mMaterial;}
 	virtual const Matrix4x4 &getRenderTransform() const;

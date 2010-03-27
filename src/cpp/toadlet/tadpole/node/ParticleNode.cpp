@@ -363,25 +363,16 @@ void ParticleNode::startSimulating(ParticleSimulator::ptr particleSimulator){
 
 	// Disable the bounding radius, cause they may very well bounce out of it
 	mLocalBound.radius=-Math::ONE;
-
-	setReceiveUpdates(true);
 }
 
 void ParticleNode::stopSimulating(){
-	setReceiveUpdates(false);
-
 	mParticleSimulator=NULL;
 }
 
 void ParticleNode::logicUpdate(int dt){
 	super::logicUpdate(dt);
 
-	if(mDestroyNextLogicFrame){
-		destroy();
-	}
-}
-	
-void ParticleNode::renderUpdate(int dt){
+	// TODO: Move this to a per-render-frame update
 	if(mParticleSimulator!=NULL){
 		if(mWorldSpace){
 			Math::mul(mWorldRenderTransform,mParent->getWorldRenderTransform(),mRenderTransform);
@@ -392,9 +383,15 @@ void ParticleNode::renderUpdate(int dt){
 		}
 		mUpdateParticles=true;
 	}
+
+	if(mDestroyNextLogicFrame){
+		destroy();
+	}
 }
 	
-void ParticleNode::queueRenderable(SceneNode *scene,CameraNode *camera){
+void ParticleNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
+	super::renderUpdate(camera,queue);
+
 	if(mUpdateParticles){
 		if(mHasIdealViewTransform){
 			updateVertexBuffer(mIdealViewTransform);
@@ -406,9 +403,9 @@ void ParticleNode::queueRenderable(SceneNode *scene,CameraNode *camera){
 	}
 
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
-	scene->queueRenderable(&renderable);
+	queue->queueRenderable(&renderable);
 #else
-	scene->queueRenderable(this);
+	queue->queueRenderable(this);
 #endif
 }
 

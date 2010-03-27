@@ -72,8 +72,6 @@ void AnimationControllerNode::start(){
 		stop();
 	}
 
-	setReceiveUpdates(true);
-
 	mAnimationController->start();
 	mStartingFrame=mScene->getLogicFrame();
 }
@@ -83,19 +81,15 @@ void AnimationControllerNode::stop(){
 		return;
 	}
 
-	setReceiveUpdates(false);
-
 	mAnimationController->stop();
 }
 
 void AnimationControllerNode::logicUpdate(int dt){
+	super::logicUpdate(dt);
+
 	if(mStartingFrame!=mScene->getLogicFrame()){
 		mAnimationController->logicUpdate(dt);
 	}
-}
-
-void AnimationControllerNode::renderUpdate(int dt){
-	mAnimationController->renderUpdate(dt);
 }
 
 void AnimationControllerNode::controllerFinished(AnimationController *controller){

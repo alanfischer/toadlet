@@ -23,25 +23,45 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_NODE_TRACEABLE_H
-#define TOADLET_TADPOLE_NODE_TRACEABLE_H
+#ifndef TOADLET_TADPOLE_RENDERQUEUE_H
+#define TOADLET_TADPOLE_RENDERQUEUE_H
 
-#include <toadlet/tadpole/Types.h>
-#include <toadlet/tadpole/Collision.h>
+#include <toadlet/tadpole/Renderable.h>
+#include <toadlet/tadpole/node/LightNode.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
 
-class Traceable{
+class TOADLET_API RenderQueue{
 public:
-	virtual ~Traceable(){}
+	TOADLET_SHARED_POINTERS(RenderQueue);
 
-	virtual const Sphere &getLocalBound() const=0;
-	virtual void traceSegment(Collision &result,const Segment &segment,const Vector3 &size)=0;
+	class RenderLayer{
+	public:
+		RenderLayer():
+			forceRender(false),
+			clearLayer(true){}
+
+		egg::Collection<Renderable*> renderables;
+
+		bool forceRender;
+		bool clearLayer;
+	};
+	
+	RenderQueue();
+	virtual ~RenderQueue();
+
+	virtual void queueRenderable(Renderable *renderable);
+	virtual void queueLight(node::LightNode *light);
+	inline RenderLayer *getRenderLayer(int layer);
+	inline const egg::Collection<RenderLayer*> getRenderLayers(){return mRenderLayers;}
+	inline node::LightNode *getLight(){return mLight;}
+
+protected:
+	egg::Collection<RenderLayer*> mRenderLayers;
+	node::LightNode::ptr mLight;
 };
 
-}
 }
 }
 

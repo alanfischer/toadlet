@@ -23,38 +23,48 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_NODE_RENDERABLE_H
-#define TOADLET_TADPOLE_NODE_RENDERABLE_H
-
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/RenderQueue.h>
+#include <toadlet/tadpole/Material.h>
 
 namespace toadlet{
-namespace peeper{
-
-class Renderer;
-
-}
 namespace tadpole{
-	
-class Material;
 
-namespace node{
+RenderQueue::RenderQueue(){
+}
 
-class SceneNode;
-class CameraNode;
+RenderQueue::~RenderQueue(){
+	int i;
+	for(i=0;i<mRenderLayers.size();++i){
+		if(mRenderLayers[i]!=NULL){
+			delete mRenderLayers[i];
+		}
+	}
+}
 
-class Renderable{
-public:
-	virtual ~Renderable(){}
+void RenderQueue::queueRenderable(Renderable *renderable){
+	Material *material=renderable->getRenderMaterial();
+	int layer=(material==NULL)?0:material->getLayer();
+	getRenderLayer(layer)->renderables.add(renderable);
+}
 
-	virtual void queueRenderable(SceneNode *queue,CameraNode *camera)=0;
-	virtual Material *getRenderMaterial() const=0;
-	virtual const tadpole::Matrix4x4 &getRenderTransform() const=0;
-	virtual void render(peeper::Renderer *renderer) const=0;
-};
+void RenderQueue::queueLight(node::LightNode *light){
+	// TODO: Find best light
+	mLight=light;
+}
+
+RenderQueue::RenderLayer *RenderQueue::getRenderLayer(int layer){
+	layer-=Material::MIN_LAYER;
+	if(mRenderLayers.size()<=layer){
+		mRenderLayers.resize(layer+1,NULL);
+	}
+
+	RenderLayer *renderLayer=mRenderLayers[layer];
+	if(renderLayer==NULL){
+		renderLayer=new RenderLayer();
+		mRenderLayers[layer]=renderLayer;
+	}
+	return renderLayer;
+}
 
 }
 }
-}
-
-#endif

@@ -58,8 +58,6 @@ void SpriteNode::SpriteAnimationController::start(){
 		stop();
 	}
 
-	mSpriteNode->setReceiveUpdates(true);
-
 	AnimationController::start();
 	mStartingFrame=mSpriteNode->getScene()->getLogicFrame();
 }
@@ -69,19 +67,14 @@ void SpriteNode::SpriteAnimationController::stop(){
 		return;
 	}
 
-	mSpriteNode->setReceiveUpdates(false);
-
 	AnimationController::stop();
 }	
 
 void SpriteNode::SpriteAnimationController::logicUpdate(int dt){
 	if(mSpriteNode->getScene()==NULL || mStartingFrame!=mSpriteNode->getScene()->getLogicFrame()){
 		AnimationController::logicUpdate(dt);
+		AnimationController::renderUpdate(dt); //TODO: Shouldn't be here!
 	}
-}
-
-void SpriteNode::SpriteAnimationController::renderUpdate(int dt){
-	AnimationController::renderUpdate(dt);
 }
 
 void SpriteNode::SpriteAnimationController::materialChanged(){
@@ -91,7 +84,6 @@ void SpriteNode::SpriteAnimationController::materialChanged(){
 SpriteNode::SpriteNode():super(),
 	TOADLET_GIB_IMPLEMENT()
 
-	mPerspective(false),
 	mAlignment(0)
 
 	//mMaterial,
@@ -103,7 +95,6 @@ SpriteNode::SpriteNode():super(),
 Node *SpriteNode::create(Scene *scene){
 	super::create(scene);
 
-	setPerspective(true);
 	setCameraAligned(true);
 	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
 
@@ -185,12 +176,6 @@ void SpriteNode::setMaterial(Material::ptr material){
 	updateSprite();
 }
 
-void SpriteNode::setPerspective(bool perspective){
-	mPerspective=perspective;
-
-	updateSprite();
-}
-
 void SpriteNode::setAlignment(int alignment){
 	mAlignment=alignment;
 
@@ -206,42 +191,26 @@ SpriteNode::SpriteAnimationController::ptr SpriteNode::getAnimationController(){
 }
 
 void SpriteNode::logicUpdate(int dt){
+	super::logicUpdate(dt);
+
 	if(mAnimationController!=NULL){
 		mAnimationController->logicUpdate(dt);
 	}
 }
 
-void SpriteNode::renderUpdate(int dt){
-	if(mAnimationController!=NULL){
-		mAnimationController->renderUpdate(dt);
-	}
-}
+void SpriteNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
+	super::renderUpdate(camera,queue);
 
-void SpriteNode::queueRenderable(SceneNode *scene,CameraNode *camera){
 	if(mVertexData==NULL || mIndexData==NULL){
 		return;
 	}
 
 	Math::mul(mWorldSpriteTransform,mWorldRenderTransform,mSpriteTransform);
 
-	if(!mPerspective){
-		Matrix4x4 &scale=cache_queueRenderable_scale.reset();
-		Vector4 &point=cache_queueRenderable_point.reset();
-
-		point.set(mWorldRenderTransform.at(0,3),mWorldRenderTransform.at(1,3),mWorldRenderTransform.at(2,3),Math::ONE);
-		Math::mul(point,camera->getViewTransform());
-		Math::mul(point,camera->getProjectionTransform());
-		scale.setAt(0,0,point.w);
-		scale.setAt(1,1,point.w);
-		scale.setAt(2,2,point.w);
-
-		Math::postMul(mWorldSpriteTransform,scale);
-	}
-
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
-	scene->queueRenderable(&renderable);
+	queue->queueRenderable(&renderable);
 #else
-	scene->queueRenderable(this);
+	queue->queueRenderable(this);
 #endif
 }
 
@@ -271,12 +240,7 @@ void SpriteNode::updateSprite(){
 
 	// Update bound
 	mLocalBound.origin.set(x,y,0);
-	if(mPerspective){
-		mLocalBound.radius=Math::sqrt(Math::square(width/2) + Math::square(height/2));
-	}
-	else{
-		mLocalBound.radius=-Math::ONE;
-	}
+	mLocalBound.radius=Math::sqrt(Math::square(width/2) + Math::square(height/2));
 }
 
 }

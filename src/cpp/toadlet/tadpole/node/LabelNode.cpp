@@ -44,7 +44,6 @@ LabelNode::LabelNode():super(),
 
 	//mFont,
 	//mText,
-	mPerspective(false),
 	mAlignment(0),
 	mNormalized(false),
 	mWordWrap(false)
@@ -116,12 +115,6 @@ void LabelNode::setText(const String &text){
 	updateLabel();
 }
 
-void LabelNode::setPerspective(bool perspective){
-	mPerspective=perspective;
-
-	updateLabel();
-}
-
 void LabelNode::setAlignment(int alignment){
 	mAlignment=alignment;
 
@@ -140,29 +133,17 @@ void LabelNode::setWordWrap(bool wordWrap){
 	updateLabel();
 }
 
-void LabelNode::queueRenderable(SceneNode *scene,CameraNode *camera){
+void LabelNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
+	super::renderUpdate(camera,queue);
+
 	if(mVertexData==NULL || mIndexData==NULL){
 		return;
 	}
 
-	if(!mPerspective){
-		Matrix4x4 &scale=cache_queueRenderable_scale.reset();
-		Vector4 &point=cache_queueRenderable_point.reset();
-
-		point.set(mWorldRenderTransform.at(0,3),mWorldRenderTransform.at(1,3),mWorldRenderTransform.at(2,3),Math::ONE);
-		Math::mul(point,camera->getViewTransform());
-		Math::mul(point,camera->getProjectionTransform());
-		scale.setAt(0,0,point.w);
-		scale.setAt(1,1,point.w);
-		scale.setAt(2,2,point.w);
-
-		Math::postMul(mWorldRenderTransform,scale);
-	}
-
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
-	scene->queueRenderable(&renderable);
+	queue->queueRenderable(&renderable);
 #else
-	scene->queueRenderable(this);
+	queue->queueRenderable(this);
 #endif
 }
 
@@ -231,7 +212,7 @@ void LabelNode::updateLabel(){
 	if(mFont==NULL){
 		mLocalBound.radius=0;
 	}
-	else if(mPerspective){
+	else{
 		int iw=mFont->getStringWidth(mText);
 		int ih=mFont->getStringHeight(mText);
 
@@ -258,9 +239,6 @@ void LabelNode::updateLabel(){
 		else{
 			mLocalBound.radius=Math::sqrt(Math::square(width) + Math::square(height));
 		}
-	}
-	else{
-		mLocalBound.radius=-Math::ONE;
 	}
 }
 

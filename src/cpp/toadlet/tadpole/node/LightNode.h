@@ -28,7 +28,6 @@
 
 #include <toadlet/peeper/Light.h>
 #include <toadlet/tadpole/node/Node.h>
-#include <toadlet/tadpole/node/Renderable.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -37,15 +36,13 @@ namespace node{
 class Scene;
 
 /// @todo: Add proper world position & direction updating of the Light, same with AudioNode
-class TOADLET_API LightNode:public Node,public Renderable{
+class TOADLET_API LightNode:public Node{
 public:
 	TOADLET_NODE(LightNode,Node);
 
 	LightNode();
 	virtual Node *create(Scene *scene);
 	virtual void destroy();
-
-	virtual Renderable *isRenderable(){return this;}
 
 	inline void setSpecularColor(const peeper::Color &specularColor){mLight->setSpecularColor(specularColor);}
 	inline const peeper::Color &getSpecularColor() const{return mLight->getSpecularColor();}
@@ -70,10 +67,7 @@ public:
 
 	inline peeper::Light *internal_getLight(){return mLight;}
 
-	void queueRenderable(SceneNode *queue,CameraNode *camera);
-	Material *getRenderMaterial() const{return NULL;}
-	const tadpole::Matrix4x4 &getRenderTransform() const{return Math::IDENTITY_MATRIX4X4;}
-	void render(peeper::Renderer *renderer) const{return;}
+	void renderUpdate(RenderQueue *queue,CameraNode *camera);
 
 protected:
 	peeper::Light::ptr mLight;

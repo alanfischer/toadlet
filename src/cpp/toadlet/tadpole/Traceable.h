@@ -23,51 +23,24 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Error.h>
-#include <toadlet/tadpole/node/SkeletonParentNode.h>
+#ifndef TOADLET_TADPOLE_TRACEABLE_H
+#define TOADLET_TADPOLE_TRACEABLE_H
 
-using namespace toadlet::egg;
+#include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/Collision.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
 
-TOADLET_NODE_IMPLEMENT(SkeletonParentNode,Categories::TOADLET_TADPOLE_NODE+".SkeletonParentNode");
+class Traceable{
+public:
+	virtual ~Traceable(){}
 
-SkeletonParentNode::SkeletonParentNode():super(){}
-
-void SkeletonParentNode::setSkeleton(MeshNodeSkeleton::ptr skeleton){
-	mSkeleton=skeleton;
-}
-
-bool SkeletonParentNode::attach(Node *node,int bone){
-	bool result=super::attach(node);
-	if(result){
-		mChildrenBones.add(bone);
-	}
-	return result;
-}
-
-bool SkeletonParentNode::remove(Node *node){
-	int i;
-	for(i=0;i<mChildren.size();++i){
-		if(mChildren[i]==node){
-			mChildrenBones.removeAt(i);
-			break;
-		}
-	}
-	return super::remove(node);
-}
-
-void SkeletonParentNode::renderUpdate(int dt){
-	int i;
-	for(i=0;i<mChildren.size();++i){
-		MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(mChildrenBones[i]);
-		mChildren[i]->setTranslate(bone->worldTranslate);
-		mChildren[i]->setRotate(bone->worldRotateMatrix);
-	}
-}
+	virtual const Sphere &getLocalBound() const=0;
+	virtual void traceSegment(Collision &result,const Segment &segment,const Vector3 &size)=0;
+};
 
 }
 }
-}
+
+#endif

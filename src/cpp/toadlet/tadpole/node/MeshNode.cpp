@@ -76,7 +76,8 @@ void MeshNode::MeshAnimationController::start(){
 		stop();
 	}
 
-	mMeshNode->setReceiveUpdates(true);
+	// TODO: hacky hack
+	mMeshNode->mDeactivateCount=-1;
 
 	AnimationController::start();
 	if(mMeshNode->getScene()!=NULL){
@@ -89,7 +90,8 @@ void MeshNode::MeshAnimationController::stop(){
 		return;
 	}
 
-	mMeshNode->setReceiveUpdates(false);
+	// TODO: hacky hack
+	mMeshNode->mDeactivateCount=0;
 
 	AnimationController::stop();
 }	
@@ -97,11 +99,8 @@ void MeshNode::MeshAnimationController::stop(){
 void MeshNode::MeshAnimationController::logicUpdate(int dt){
 	if(mStartingFrame!=mMeshNode->getScene()->getLogicFrame()){
 		AnimationController::logicUpdate(dt);
+		AnimationController::renderUpdate(dt); // TODO: Move me!
 	}
-}
-
-void MeshNode::MeshAnimationController::renderUpdate(int dt){
-	AnimationController::renderUpdate(dt);
 }
 
 void MeshNode::MeshAnimationController::skeletonChanged(){
@@ -240,18 +239,17 @@ MeshNode::MeshAnimationController::ptr MeshNode::getAnimationController(){
 }
 
 void MeshNode::logicUpdate(int dt){
+	super::logicUpdate(dt);
+
 	if(mAnimationController!=NULL){
 		mAnimationController->logicUpdate(dt);
+		mAnimationController->renderUpdate(dt); //TODO: shouldn't be here!
 	}
 }
 
-void MeshNode::renderUpdate(int dt){
-	if(mAnimationController!=NULL){
-		mAnimationController->renderUpdate(dt);
-	}
-}
+void MeshNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
+	super::renderUpdate(camera,queue);
 
-void MeshNode::queueRenderable(SceneNode *queue,CameraNode *camera){
 	if(mMesh!=NULL && mMesh->worldScale!=Math::ONE){
 		mWorldRenderTransform.reset();
 		mWorldRenderTransform.setAt(0,0,mMesh->worldScale);
@@ -263,9 +261,10 @@ void MeshNode::queueRenderable(SceneNode *queue,CameraNode *camera){
 
 	if(mSkeleton!=NULL){
 		int lastRenderUpdateFrame=mSkeleton->getLastRenderUpdateFrame();
-		if(lastRenderUpdateFrame==-1 || lastRenderUpdateFrame==queue->getRenderFrame()){
+// TODO: For shared skeletons & rendering
+//		if(lastRenderUpdateFrame==-1 || lastRenderUpdateFrame==queue->getRenderFrame()){
 			updateVertexBuffer();
-		}
+//		}
 	}
 
 	int i;

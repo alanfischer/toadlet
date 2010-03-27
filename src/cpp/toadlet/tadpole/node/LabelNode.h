@@ -32,8 +32,8 @@
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/Material.h>
+#include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/node/Node.h>
-#include <toadlet/tadpole/node/Renderable.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -53,16 +53,11 @@ public:
 	virtual Node *create(Scene *scene);
 	virtual void destroy();
 
-	Renderable *isRenderable(){return this;}
-
 	void setFont(const Font::ptr &font);
 	Font::ptr getFont() const{return mFont;}
 
 	void setText(const egg::String &text);
 	const egg::String &getText() const{return mText;}
-
-	void setPerspective(bool perspective);
-	bool getPerspective() const{return mPerspective;}
 
 	void setAlignment(int alignment);
 	int getAlignment() const{return mAlignment;}
@@ -73,7 +68,7 @@ public:
 	void setWordWrap(bool wordWrap);
 	bool getWordWrap() const{return mWordWrap;}
 
-	void queueRenderable(SceneNode *scene,CameraNode *camera);
+	void renderUpdate(CameraNode *camera,RenderQueue *queue);
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Matrix4x4 &getRenderTransform() const{return super::getWorldRenderTransform();}
 	void render(peeper::Renderer *renderer) const;
@@ -89,7 +84,6 @@ protected:
 
 	Font::ptr mFont;
 	egg::String mText;
-	bool mPerspective;
 	int mAlignment;
 	bool mNormalized;
 	bool mWordWrap;
@@ -97,9 +91,6 @@ protected:
 	Material::ptr mMaterial;
 	peeper::VertexData::ptr mVertexData;
 	peeper::IndexData::ptr mIndexData;
-
-	Matrix4x4 cache_queueRenderable_scale;
-	Vector4 cache_queueRenderable_point;
 };
 
 }
