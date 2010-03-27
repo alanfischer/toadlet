@@ -16,6 +16,7 @@ set (TADPOLE_SRC
 	MeshManager.cpp
 	Noise.cpp
 	QueryManager.cpp
+	RenderQueue.cpp
 	ResourceManager.cpp
 	SpacialQuery.cpp
 	Track.cpp
@@ -106,11 +107,13 @@ set (TADPOLE_HEADERS
 	MeshManager.h
 	Noise.h
 	QueryManager.h
+	Renderable.h
 	ResourceHandler.h
 	ResourceHandlerData.h
 	ResourceManager.h
 	SpacialQuery.h
 	TextureManager.h
+	Traceable.h
 	Track.h
 	Types.h
 	UpdateListener.h
@@ -188,12 +191,10 @@ set (TADPOLE_NODE_HEADERS
 	node/NodeDestroyedListener.h
 	node/ParentNode.h
 	node/ParticleNode.h
-	node/Renderable.h
 	node/Scene.h
 	node/SceneNode.h
 	node/SkeletonParentNode.h
 	node/SpriteNode.h
-	node/Traceable.h
 )
 
 

@@ -31,8 +31,8 @@
 #include <toadlet/peeper/TextureStage.h>
 #include <toadlet/tadpole/UpdateListener.h>
 #include <toadlet/tadpole/SpacialQuery.h>
+#include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/node/ParentNode.h>
-#include <toadlet/tadpole/node/Renderable.h>
 #include <toadlet/tadpole/node/Scene.h>
 
 namespace toadlet{
@@ -44,6 +44,7 @@ class SceneNode;
 class Scene{
 public:
 	TOADLET_INTRUSIVE_POINTERS(Scene);
+	virtual egg::PointerCounter *pointerCounter() const=0;
 
 	virtual ~Scene(){}
 
@@ -77,17 +78,14 @@ public:
 	virtual int getRenderFrame() const=0;
 
 	virtual void update(int dt)=0;
-	virtual void render(peeper::Renderer *renderer,CameraNode *cameraNode,Node *node)=0;
-
 	virtual void preLogicUpdateLoop(int dt)=0;
 	virtual void preLogicUpdate(int dt)=0;
 	virtual void logicUpdate(int dt)=0;
 	virtual void postLogicUpdate(int dt)=0;
 	virtual void postLogicUpdateLoop(int dt)=0;
 	virtual void intraUpdate(int dt)=0;
-	virtual void preRenderUpdate(int dt)=0;
-	virtual void renderUpdate(int dt)=0;
-	virtual void postRenderUpdate(int dt)=0;
+
+	virtual void render(peeper::Renderer *renderer,CameraNode *cameraNode,Node *node)=0;
 
 	virtual int nodeCreated(Node *node)=0;
 	virtual void nodeDestroyed(Node *node)=0;
@@ -97,11 +95,17 @@ public:
 
 	virtual bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact)=0;
 
-	virtual egg::PointerCounter *pointerCounter() const=0;
+	virtual void updateRenderTransformsToRoot(Node *node)=0;
 };
 
 }
 }
 }
+
+// Help to work around an annoying issue with c++ inheritance issues
+//  Since I can't just expect it to figure out the implementation of an interface method on its own
+//  This issue doesn't exist in other languages (Java)
+#define TOADLET_POINTERCOUNTER_PASSTHROUGH(BaseClass)\
+	virtual egg::PointerCounter *pointerCounter() const{return BaseClass::pointerCounter();}
 
 #endif

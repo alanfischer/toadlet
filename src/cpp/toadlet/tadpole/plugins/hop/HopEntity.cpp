@@ -314,6 +314,48 @@ void HopEntity::postLogicUpdate(int dt){
 	}
 }
 
+void HopEntity::renderUpdate(CameraNode *camera,RenderQueue *queue){
+	bool active=mSolid->active();
+	bool activePrevious=mActivePrevious;
+	if(active || activePrevious){
+		if(mShadowMesh!=NULL){
+			castShadow();
+		}
+		if(mVolumeNode!=NULL){
+			updateVolumes(mHopScene->mInterpolateCollisionVolumes);
+		}
+	}
+}
+
+void HopEntity::updateRenderTransforms(){
+	scalar f=mScene->getLogicFraction();
+
+	bool active=mSolid->active();
+	bool activePrevious=mActivePrevious;
+	if(active || activePrevious){
+		// TODO: Add an option to either use strict interpolation, or fuzzy interpolation
+		// If we are deactivating, then make sure we are at our rest point
+#if 1
+		if(active==false && activePrevious){
+			interpolatePhysicalParameters(Math::ONE);
+		}
+		else{
+			interpolatePhysicalParameters(f);
+		}
+#elif 0
+		// TODO: This needs to be based on the logicFraction SOMEHOW,otherwise the result of calling this method multiple timer per frame will be bad
+
+		Vector3 last;Math::setTranslateFromMatrix4x4(last,entity->getRenderTransform());
+		Vector3 translate;Math::lerp(translate,last,entity->getTranslate(),0.3);
+		setRenderTransformTranslate(translate);
+#else
+		setRenderTransformTranslate(getTranslate());
+#endif
+	}
+
+	super::updateRenderTransforms();
+}
+
 void HopEntity::interpolatePhysicalParameters(scalar f){
 	Vector3 &interpolate=cache_interpolatePhysicalParameters_interpolate;
 	Math::lerp(interpolate,mLastPosition,mSolid->getPosition(),f);

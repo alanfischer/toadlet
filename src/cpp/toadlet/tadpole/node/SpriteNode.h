@@ -31,10 +31,10 @@
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/Material.h>
+#include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/animation/AnimationController.h>
 #include <toadlet/tadpole/animation/TextureStageAnimation.h>
 #include <toadlet/tadpole/node/Node.h>
-#include <toadlet/tadpole/node/Renderable.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -57,7 +57,7 @@ public:
 		virtual void stop();
 
 		virtual void logicUpdate(int dt);
-		virtual void renderUpdate(int dt);
+		// virtual void renderUpdate(int dt); // TODO
 
 		void materialChanged();
 
@@ -71,14 +71,9 @@ public:
 	virtual Node *create(Scene *scene);
 	virtual void destroy();
 
-	Renderable *isRenderable(){return this;}
-
 	void setMaterial(const egg::String &name);
 	void setMaterial(Material::ptr material);
 	Material::ptr getMaterial() const{return mMaterial;}
-
-	void setPerspective(bool perspective);
-	bool getPerspective() const{return mPerspective;}
 
 	void setAlignment(int alignment);
 	int getAlignment() const{return mAlignment;}
@@ -86,8 +81,7 @@ public:
 	SpriteAnimationController::ptr getAnimationController();
 
 	void logicUpdate(int dt);
-	void renderUpdate(int dt);
-	void queueRenderable(SceneNode *scene,CameraNode *camera);
+	void renderUpdate(CameraNode *camera,RenderQueue *queue);
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Matrix4x4 &getRenderTransform() const{return mWorldSpriteTransform;}
 	void render(peeper::Renderer *renderer) const;
@@ -99,7 +93,6 @@ protected:
 
 	void updateSprite();
 
-	bool mPerspective;
 	int mAlignment;
 	SpriteAnimationController::ptr mAnimationController;
 
@@ -108,9 +101,6 @@ protected:
 	peeper::IndexData::ptr mIndexData;
 	Matrix4x4 mSpriteTransform;
 	Matrix4x4 mWorldSpriteTransform;
-
-	Matrix4x4 cache_queueRenderable_scale;
-	Vector4 cache_queueRenderable_point;
 };
 
 }

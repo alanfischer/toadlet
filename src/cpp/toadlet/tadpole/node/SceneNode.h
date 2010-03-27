@@ -30,18 +30,15 @@
 #include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/peeper/TextureStage.h>
 #include <toadlet/tadpole/UpdateListener.h>
+#include <toadlet/tadpole/RenderQueue.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/LightNode.h>
 #include <toadlet/tadpole/node/ParticleNode.h>
-#include <toadlet/tadpole/node/Renderable.h>
 #include <toadlet/tadpole/node/Scene.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace node{
-
-class CameraNode;
-class PhysicallyTraceable;
 
 /// @todo  I think a good way to let us use EventKeyFrames with the Controller framework is to:
 ///   1: Have a way of ensuring that the EventKeyFrames are aligned on LogicDT times.
@@ -54,9 +51,12 @@ class PhysicallyTraceable;
 ///   Down sides are that its harder to do logic based updating, since you'd have to handle the checking to see if its
 ///    been a logicDT yourself.
 
+// TODO: Force no-scene-graph updates in renderUpdate, to allow us to thread that easily
+
 class TOADLET_API SceneNode:public ParentNode,public Scene{
 public:
 	TOADLET_NONINSTANCIABLENODE(SceneNode,ParentNode);
+	TOADLET_POINTERCOUNTER_PASSTHROUGH(ParentNode);
 
 	SceneNode(Engine *engine);
 	virtual ~SceneNode();
@@ -91,69 +91,33 @@ public:
 	virtual int getNumLastUpdatedNodes() const{return mNumLastUpdatedNodes;}
 
 	virtual void update(int dt);
-	virtual void render(peeper::Renderer *renderer,CameraNode *cameraNode,Node *node);
-
-	virtual void preLogicUpdateLoop(int dt);
-	virtual void preLogicUpdate(int dt);
+	virtual void preLogicUpdateLoop(int dt){}
+	virtual void preLogicUpdate(int dt){}
 	virtual void logicUpdate(int dt);
 	virtual void logicUpdate(int dt,int scope);
-	virtual void logicUpdate(Node::ptr node,int dt,int scope);
-	virtual void postLogicUpdate(int dt);
-	virtual void postLogicUpdateLoop(int dt);
-	virtual void intraUpdate(int dt);
-	virtual void preRenderUpdate(int dt);
-	virtual void renderUpdate(int dt);
-	virtual void renderUpdate(int dt,int scope);
-	virtual void renderUpdate(Node::ptr node,int dt,int scope);
-	virtual void postRenderUpdate(int dt);
+	virtual void logicUpdate(Node *node,int dt,int scope);
+	virtual void postLogicUpdate(int dt){}
+	virtual void postLogicUpdateLoop(int dt){}
+	virtual void intraUpdate(int dt){}
 
-	virtual int nodeCreated(Node *node);
-	virtual void nodeDestroyed(Node *node);
+	virtual void render(peeper::Renderer *renderer,CameraNode *cameraNode,Node *node);
+	virtual void renderUpdate(CameraNode *camera,RenderQueue *queue);
+	virtual void renderUpdate(Node *node,CameraNode *camera,RenderQueue *queue);
 
-	virtual void setUpdateListener(UpdateListener *updateListener);
+	virtual void setUpdateListener(UpdateListener *updateListener){mUpdateListener=updateListener;}
 	virtual UpdateListener *getUpdateListener() const{return mUpdateListener;}
 
 	virtual bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact);
 
-	void queueRenderable(Renderable *renderable);
-	void queueLight(LightNode *light);
-	CameraNode *getCamera() const{return mCamera;} // Only valid during rendering operations
-
-	virtual egg::PointerCounter *pointerCounter() const{return super::pointerCounter();}
+	virtual void updateRenderTransformsToRoot(Node *node);
+	virtual bool culled(Node *node,CameraNode *camera);
+	virtual int nodeCreated(Node *node);
+	virtual void nodeDestroyed(Node *node);
 
 protected:
-	class RenderLayer{
-	public:
-		RenderLayer():
-			forceRender(false),
-			clearLayer(true){}
-
-		egg::Collection<Renderable*> renderables;
-
-		bool forceRender;
-		bool clearLayer;
-	};
-
-	inline RenderLayer *getRenderLayer(int layer){
-		layer-=Material::MIN_LAYER;
-		if(mRenderLayers.size()<=layer){
-			mRenderLayers.resize(layer+1,NULL);
-		}
-
-		RenderLayer *renderLayer=mRenderLayers[layer];
-		if(renderLayer==NULL){
-			renderLayer=new RenderLayer();
-			mRenderLayers[layer]=renderLayer;
-		}
-		return renderLayer;
-	}
-
-	virtual void queueRenderables();
-	virtual void queueRenderables(Node *node);
-	virtual bool culled(Node *node);
-
-	virtual bool preLayerRender(peeper::Renderer *renderer,int layer);
-	virtual bool postLayerRender(peeper::Renderer *renderer,int layer);
+	virtual void renderRenderables(peeper::Renderer *renderer,CameraNode *camera,RenderQueue *queue);
+	virtual bool preLayerRender(peeper::Renderer *renderer,CameraNode *camera,int layer){return false;}
+	virtual bool postLayerRender(peeper::Renderer *renderer,CameraNode *camera,int layer){return false;}
 
 	Scene *mChildScene;
 	egg::Collection<int> mFreeHandles;
@@ -168,20 +132,13 @@ protected:
 	int mRenderFrame;
 
 	ParentNode::ptr mBackground;
-
-	UpdateListener *mUpdateListener;
-
-	int mNumLastUpdatedNodes;
-
 	peeper::Color mAmbientColor;
 
-	Matrix4x4 mIdealParticleViewTransform;
+	UpdateListener *mUpdateListener;
+	int mNumLastUpdatedNodes;
 
-	LightNode *mLight;
-	CameraNode *mCamera;
+	RenderQueue::ptr mRenderQueue;
 	Material *mPreviousMaterial;
-
-	egg::Collection<RenderLayer*> mRenderLayers;
 
 	peeper::Viewport cache_render_viewport;
 };

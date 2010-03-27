@@ -12,13 +12,7 @@ Logo::~Logo(){
 void Logo::create(){
 	Application::create();
 
-	Archive::ptr archive=mEngine->getArchiveManager()->findArchive("c:\\Users\\siralanf\\ShovelStuff\\build\\android\\assets\\shovelstuff.tpkg");
-	Collection<String>::ptr entries=archive->getEntries();
-	for(int i=0;i<entries->size();++i){
-		Logger::alert(entries->at(i));
-	}
-
-	scene=mEngine->allocNodeType(SceneNode::type())->create(mEngine);
+	scene=((new SceneNode(mEngine))->create(NULL))->getScene();
 
 	MemoryStream::ptr in(new MemoryStream(lt_mmsh::data,lt_mmsh::length,lt_mmsh::length,false));
 	Mesh::ptr mesh=shared_static_cast<Mesh>(getEngine()->getMeshManager()->getHandler("mmsh")->load(in,NULL));

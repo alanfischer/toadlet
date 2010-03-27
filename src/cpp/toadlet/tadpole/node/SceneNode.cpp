@@ -26,11 +26,10 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Profile.h>
-#include <toadlet/tadpole/node/CameraNode.h>
-#include <toadlet/tadpole/node/Renderable.h>
-#include <toadlet/tadpole/node/SceneNode.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/SpacialQuery.h>
+#include <toadlet/tadpole/node/CameraNode.h>
+#include <toadlet/tadpole/node/SceneNode.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
@@ -65,14 +64,12 @@ SceneNode::SceneNode(Engine *engine):super(),
 	mRenderFrame(0),
 
 	//mBackground,
+	//mAmbientColor,
 
 	mUpdateListener(NULL),
-
 	mNumLastUpdatedNodes(0),
 
-	//mAmbientColor
-
-	mCamera(NULL),
+	//mRenderQueue,
 	mPreviousMaterial(NULL)
 {
 	mEngine=engine;
@@ -90,6 +87,8 @@ Node *SceneNode::create(Scene *scene){
 	setAmbientColor(Colors::GREY);
 
 	mBackground=mEngine->createNodeType(ParentNode::type(),this);
+	
+	mRenderQueue=RenderQueue::ptr(new RenderQueue());
 
 	return this;
 }
@@ -99,14 +98,6 @@ void SceneNode::destroy(){
 		mBackground->destroy();
 		mBackground=NULL;
 	}
-
-	int i;
-	for(i=0;i<mRenderLayers.size();++i){
-		if(mRenderLayers[i]!=NULL){
-			delete mRenderLayers[i];
-		}
-	}
-	mRenderLayers.clear();
 
 	super::destroy();
 }
@@ -179,6 +170,7 @@ void SceneNode::update(int dt){
 		return;
 	}
 
+	mNumLastUpdatedNodes=0;
 	mAccumulatedDT+=dt;
 
 	if(mAccumulatedDT>=mMinLogicDT){
@@ -232,28 +224,10 @@ void SceneNode::update(int dt){
 		mChildScene->intraUpdate(dt);
 	}
 
-	if(mUpdateListener!=NULL){
-		mUpdateListener->preRenderUpdate(dt);
-		mUpdateListener->renderUpdate(dt);
-		mUpdateListener->postRenderUpdate(dt);
-	}
-	else{
-		mChildScene->preRenderUpdate(dt);
-		mChildScene->renderUpdate(dt);
-		mChildScene->postRenderUpdate(dt);
-	}
-
 	AudioPlayer *audioPlayer=mEngine->getAudioPlayer();
 	if(audioPlayer!=NULL){
 		audioPlayer->update(dt);
 	}
-}
-
-void SceneNode::preLogicUpdateLoop(int dt){
-}
-
-void SceneNode::preLogicUpdate(int dt){
-	mNumLastUpdatedNodes=0;
 }
 
 void SceneNode::logicUpdate(int dt){
@@ -264,44 +238,20 @@ void SceneNode::logicUpdate(int dt,int scope){
 	mLogicTime+=dt;
 	mLogicFrame++;
 
-	if(mBackground->getNumChildren()>0){
-		logicUpdate(mBackground,dt,scope);
-	}
+	logicUpdate(mBackground,dt,scope);
 	logicUpdate(this,dt,scope);
 }
 
-void SceneNode::postLogicUpdate(int dt){
-}
-
-void SceneNode::logicUpdate(Node::ptr node,int dt,int scope){
+void SceneNode::logicUpdate(Node *node,int dt,int scope){
 	if((node->mScope&scope)==0){
 		return;
 	}
 
-	if(node->mReceiveUpdates){
+	if(node!=this){
 		node->logicUpdate(dt);
 	}
 
-	if(node->mParent==NULL){
-		node->mWorldScale.set(node->mScale);
-		node->mWorldRotate.set(node->mRotate);
-		node->mWorldTranslate.set(node->mTranslate);
-	}
-	else if(node->mIdentityTransform){
-		node->mWorldScale.set(node->mParent->mScale);
-		node->mWorldRotate.set(node->mParent->mRotate);
-		node->mWorldTranslate.set(node->mParent->mTranslate);
-	}
-	else{
-		Math::mul(node->mWorldScale,node->mParent->mWorldScale,node->mScale);
-		Math::mul(node->mWorldRotate,node->mParent->mWorldRotate,node->mRotate);
-		Math::mul(node->mWorldTranslate,node->mParent->mWorldRotate,node->mTranslate);
-		Math::mul(node->mWorldTranslate,node->mParent->mWorldScale);
-		Math::add(node->mWorldTranslate,node->mParent->mWorldTranslate);
-	}
-
-	mul(node->mWorldBound,node->mWorldTranslate,node->mWorldRotate,node->mWorldScale,node->mLocalBound);
-	if(node->mLocalBound.radius<0) node->mWorldBound.radius=-Math::ONE;
+	node->updateLogicTransforms();
 
 	ParentNode *parent=node->isParent();
 	bool childrenActive=false;
@@ -345,29 +295,117 @@ void SceneNode::logicUpdate(Node::ptr node,int dt,int scope){
 	mNumLastUpdatedNodes++;
 }
 
-void SceneNode::postLogicUpdateLoop(int dt){
-}
+void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
+	#if defined(TOADLET_DEBUG)
+		if(!created()){
+			Error::unknown(Categories::TOADLET_TADPOLE,
+				"render called on a desroyed Scene");
+		}
+	#endif
 
-void SceneNode::intraUpdate(int dt){
-}
-
-void SceneNode::preRenderUpdate(int dt){
-}
-
-void SceneNode::renderUpdate(int dt){
-	renderUpdate(dt,-1);
-}
-
-void SceneNode::renderUpdate(int dt,int scope){
 	mRenderFrame++;
+	camera->updateFramesPerSecond();
+	camera->mNumCulledEntities=0; // TODO: Move into camera more automatically somehow
 
-	if(mBackground->getNumChildren()>0){
-		renderUpdate(mBackground,dt,scope);
-	}
-	renderUpdate(this,dt,scope);
+	camera->updateViewTransform();
+
+	// TODO: I'd like to be able to update this differently, so i'm not touching rendTransform in render.
+	//  Actually, mRenderTransform, shouldn't be called that.  Since its updated in logic!@
+	Math::setMatrix4x4FromTranslate(mBackground->mRenderTransform,camera->getWorldRenderTranslate());
+
+	renderUpdate(camera,mRenderQueue);
+
+	renderRenderables(renderer,camera,mRenderQueue);
 }
 
-void SceneNode::postRenderUpdate(int dt){
+void SceneNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
+	renderUpdate(mBackground,camera,queue);
+	renderUpdate(this,camera,queue);
+}
+
+void SceneNode::renderUpdate(Node *node,CameraNode *camera,RenderQueue *queue){
+	if(culled(node,camera)){
+		return;
+	}
+
+	node->updateRenderTransforms();
+
+	// TODO: Move these 'render alignment' commands into the node or some attribute of a node somehow
+	if(node->mCameraAligned){
+		Matrix3x3 rotate;
+		if(camera->mAlignmentCalculationsUseOrigin){
+			Vector3 nodeWorldTranslate; Math::setTranslateFromMatrix4x4(nodeWorldTranslate,node->mWorldRenderTransform);
+			Vector3 cameraWorldTranslate; Math::setTranslateFromMatrix4x4(cameraWorldTranslate,camera->mWorldRenderTransform);
+			Matrix4x4 lookAtCamera; Math::setMatrix4x4FromLookAt(lookAtCamera,cameraWorldTranslate,nodeWorldTranslate,Math::Z_UNIT_VECTOR3,false);
+			Math::setMatrix3x3FromMatrix4x4Transpose(rotate,lookAtCamera);
+		}
+		else{
+			Math::setMatrix3x3FromMatrix4x4Transpose(rotate,camera->getViewTransform());
+		}
+		Math::setMatrix4x4FromRotateScale(node->mWorldRenderTransform,rotate,node->mWorldScale);
+	}
+	if(!node->mPerspective){
+		Matrix4x4 scale;
+		Vector4 point;
+
+		point.set(node->mWorldRenderTransform.at(0,3),node->mWorldRenderTransform.at(1,3),node->mWorldRenderTransform.at(2,3),Math::ONE);
+		Math::mul(point,camera->getViewTransform());
+		Math::mul(point,camera->getProjectionTransform());
+		scale.setAt(0,0,point.w);
+		scale.setAt(1,1,point.w);
+		scale.setAt(2,2,point.w);
+
+		Math::postMul(node->mWorldRenderTransform,scale);
+	}
+
+	if(node!=this){
+		node->renderUpdate(camera,queue);
+	}
+
+	ParentNode *parent=node->isParent();
+	if(parent!=NULL){
+		if(parent->mShadowChildrenDirty){
+			parent->updateShadowChildren();
+		}
+
+		Node *child;
+		int numChildren=parent->mShadowChildren.size();
+		int i;
+		for(i=0;i<numChildren;++i){
+			child=parent->mShadowChildren[i];
+			renderUpdate(child,camera,queue);
+		}
+	}
+}
+
+bool SceneNode::performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact){
+	SpacialQueryResultsListener *listener=query->getSpacialQueryResultsListener();
+
+	// TODO: Child Nodes should have proper bounding shapes (either a generic Volume which can be Sphere, etc, or just an actual Sphere)
+	int i;
+	for(i=0;i<mChildren.size();++i){
+		Node *child=mChildren[i];
+		if(Math::testIntersection(child->mWorldBound,box)){
+			listener->resultFound(child);
+		}
+	}
+	return true;
+}
+
+void SceneNode::updateRenderTransformsToRoot(Node *node){
+	if(node->mParent!=NULL){
+		updateRenderTransformsToRoot(node->mParent);
+	}
+	
+	node->updateRenderTransforms();
+}
+
+bool SceneNode::culled(Node *node,CameraNode *camera){
+	bool cull=(node->mScope&camera->mScope)==0 || (node->mWorldBound.radius>=0 && camera->culled(node->mWorldBound));
+	if(cull){
+		camera->mNumCulledEntities++;
+	}
+	return cull;
 }
 
 int SceneNode::nodeCreated(Node *node){
@@ -395,112 +433,41 @@ void SceneNode::nodeDestroyed(Node *node){
 	}
 }
 
-void SceneNode::renderUpdate(Node::ptr node,int dt,int scope){
-	if((node->mScope&scope)==0){
-		return;
-	}
-
-	if(node->mReceiveUpdates){
-		node->renderUpdate(dt);
-	}
-
-	if(node->mParent==NULL){
-		node->mWorldRenderTransform.set(node->mRenderTransform);
-	}
-	else if(node->mIdentityTransform){
-		node->mWorldRenderTransform.set(node->mParent->mWorldRenderTransform);
-	}
-	else{
-		Math::mul(node->mWorldRenderTransform,node->mParent->mWorldRenderTransform,node->mRenderTransform);
-	}
-
-	mul(node->mRenderWorldBound,node->mWorldRenderTransform,node->mLocalBound);
-	if(node->mLocalBound.radius<0) node->mRenderWorldBound.radius=-Math::ONE;
-
-	ParentNode *parent=node->isParent();
-	if(parent!=NULL){
-		if(parent->mShadowChildrenDirty){
-			parent->updateShadowChildren();
-		}
-
-		Node *child;
-		int numChildren=parent->mShadowChildren.size();
-		int i;
-		for(i=0;i<numChildren;++i){
-			child=parent->mShadowChildren[i];
-			if(child->active()){
-				renderUpdate(child,dt,scope);
-			}
-
-			merge(parent->mRenderWorldBound,child->mRenderWorldBound);
-		}
-	}
-}
-
-void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
-	#if defined(TOADLET_DEBUG)
-		if(!created()){
-			Error::unknown(Categories::TOADLET_TADPOLE,
-				"render called on a desroyed Scene");
-		}
-	#endif
-
-	if(node==NULL){
-		node=this;
-	}
-
-	int i,j;
-
-	mCamera=camera;
-
-	mCamera->updateFramesPerSecond();
-	mCamera->updateViewTransform();
-
-	if(mCamera->getViewportSet()){
-		renderer->setViewport(mCamera->getViewport());
+void SceneNode::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue *queue){
+	if(camera->getViewportSet()){
+		renderer->setViewport(camera->getViewport());
 	}
 	else{
 		RenderTarget *renderTarget=renderer->getRenderTarget();
 		renderer->setViewport(cache_render_viewport.set(0,0,renderTarget->getWidth(),renderTarget->getHeight()));
 	}
 
-	int clearFlags=mCamera->getClearFlags();
-	if(clearFlags>0 && !mCamera->getSkipFirstClear()){
+	int clearFlags=camera->getClearFlags();
+	if(clearFlags>0 && !camera->getSkipFirstClear()){
 		renderer->setDepthWrite(true);
-		renderer->clear(clearFlags,mCamera->getClearColor());
+		renderer->clear(clearFlags,camera->getClearColor());
 	}
 
 	renderer->setDefaultStates();
-	renderer->setProjectionMatrix(mCamera->mProjectionTransform);
-	renderer->setViewMatrix(mCamera->mViewTransform);
+	renderer->setProjectionMatrix(camera->mProjectionTransform);
+	renderer->setViewMatrix(camera->mViewTransform);
 	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
 	renderer->setAmbientColor(mAmbientColor);
 
-	mCamera->mNumCulledEntities=0;
-
-	mLight=NULL;
-
-	// Only render background when rendering from the scene
-	if(node==this && mBackground->getNumChildren()>0){
-		mBackground->setTranslate(mCamera->getWorldRenderTranslate());
-		renderUpdate(mBackground,0,mCamera->getScope());
-		queueRenderables(mBackground);
-	}
-	queueRenderables();
-
-	if(mLight!=NULL){
-		renderer->setLight(0,mLight->internal_getLight());
+	if(queue->getLight()!=NULL){
+		renderer->setLight(0,queue->getLight()->internal_getLight());
 		renderer->setLightEnabled(0,true);
-		mLight=NULL;
 	}
 	else{
 		renderer->setLightEnabled(0,false);
 	}
 
 	bool renderedLayer=false;
-	for(i=0;i<mRenderLayers.size();++i){
+	const egg::Collection<RenderQueue::RenderLayer*> &layers=queue->getRenderLayers();
+	int i,j;
+	for(i=0;i<layers.size();++i){
 		int layerNum=i+Material::MIN_LAYER;
-		RenderLayer *layer=mRenderLayers[i];
+		RenderQueue::RenderLayer *layer=layers[i];
 		if(layer==NULL || (layer->renderables.size()==0 && layer->forceRender==false)){
 			continue;
 		}
@@ -514,7 +481,7 @@ void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
 			renderedLayer=true;
 		}
 
-		preLayerRender(renderer,layerNum);
+		preLayerRender(renderer,camera,layerNum);
 
 		int numRenderables=layer->renderables.size();
 		for(j=0;j<numRenderables;++j){
@@ -529,103 +496,12 @@ void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
 		}
 		layer->renderables.clear();
 
-		postLayerRender(renderer,layerNum);
+		postLayerRender(renderer,camera,layerNum);
 
 		// Reset previous material each time, to avoid pre/postLayerRender messing up what we though the state of things were
 		// We could also use the true/false return of pre/postLayerRender, but it could be easy to forget to change that.
 		mPreviousMaterial=NULL;
 	}
-
-	mCamera=NULL;
-}
-
-void SceneNode::queueRenderable(Renderable *renderable){
-	Material *material=renderable->getRenderMaterial();
-	int layer=(material==NULL)?0:material->getLayer();
-	getRenderLayer(layer)->renderables.add(renderable);
-}
-
-void SceneNode::queueLight(LightNode *light){
-	// TODO: Find best light
-	mLight=light;
-}
-
-void SceneNode::setUpdateListener(UpdateListener *updateListener){
-	mUpdateListener=updateListener;
-}
-
-bool SceneNode::performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact){
-	SpacialQueryResultsListener *listener=query->getSpacialQueryResultsListener();
-
-	// TODO: Child Nodes should have proper bounding shapes (either a generic Volume which can be Sphere, etc, or just an actual Sphere)
-	int i;
-	for(i=0;i<mChildren.size();++i){
-		Node *child=mChildren[i];
-		if(Math::testIntersection(child->mWorldBound,box)){
-			listener->resultFound(child);
-		}
-	}
-	return true;
-}
-
-void SceneNode::queueRenderables(){
-	queueRenderables(this);
-}
-
-void SceneNode::queueRenderables(Node *node){
-	if((node->mScope&mCamera->mScope)==0){
-		return;
-	}
-
-	if(culled(node)){
-		mCamera->mNumCulledEntities++;
-		return;
-	}
-
-	if(node->mCameraAligned){
-		Matrix3x3 rotate;
-		if(mCamera->mAlignmentCalculationsUseOrigin){
-			Vector3 nodeWorldTranslate; Math::setTranslateFromMatrix4x4(nodeWorldTranslate,node->mWorldRenderTransform);
-			Vector3 cameraWorldTranslate; Math::setTranslateFromMatrix4x4(cameraWorldTranslate,mCamera->mWorldRenderTransform);
-			Matrix4x4 lookAtCamera; Math::setMatrix4x4FromLookAt(lookAtCamera,cameraWorldTranslate,nodeWorldTranslate,Math::Z_UNIT_VECTOR3,false);
-			Math::setMatrix3x3FromMatrix4x4Transpose(rotate,lookAtCamera);
-		}
-		else{
-			Math::setMatrix3x3FromMatrix4x4Transpose(rotate,mCamera->getViewTransform());
-		}
-		Math::setMatrix4x4FromRotateScale(node->mWorldRenderTransform,rotate,node->mWorldScale); // TODO: Switch to mRenderWorldScale if ever available
-	}
-
-	ParentNode *parent=node->isParent();
-	if(parent!=NULL){
-		int numChildren=parent->mChildren.size();
-		int i;
-		for(i=0;i<numChildren;++i){
-			queueRenderables(parent->mChildren[i]);
-		}
-	}
-	else{
-		Renderable *renderable=node->isRenderable();
-		if(renderable!=NULL){
-			renderable->queueRenderable(this,mCamera);
-		}
-	}
-}
-
-bool SceneNode::culled(Node *node){
-	if(node->mRenderWorldBound.radius<0){
-		return false;
-	}
-
-	return mCamera->culled(node->mRenderWorldBound);
-}
-
-bool SceneNode::preLayerRender(Renderer *renderer,int layer){
-	return false;
-}
-
-bool SceneNode::postLayerRender(Renderer *renderer,int layer){
-	return false;
 }
 
 }

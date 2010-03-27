@@ -56,7 +56,7 @@ void LightNode::destroy(){
 	super::destroy();
 }
 
-void LightNode::queueRenderable(SceneNode *queue,CameraNode *node){
+void LightNode::renderUpdate(RenderQueue *queue,CameraNode *node){
 	queue->queueLight(this);
 }
 

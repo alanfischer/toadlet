@@ -217,6 +217,8 @@ ParentNode::ptr CameraNode::getMidNode(){
 }
 
 void CameraNode::updateViewTransform(){
+	mScene->updateRenderTransformsToRoot(this);
+
 	scalar wt00=mWorldRenderTransform.at(0,0),wt01=mWorldRenderTransform.at(0,1),wt02=mWorldRenderTransform.at(0,2);
 	scalar wt10=mWorldRenderTransform.at(1,0),wt11=mWorldRenderTransform.at(1,1),wt12=mWorldRenderTransform.at(1,2);
 	scalar wt20=mWorldRenderTransform.at(2,0),wt21=mWorldRenderTransform.at(2,1),wt22=mWorldRenderTransform.at(2,2);

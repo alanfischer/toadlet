@@ -26,11 +26,12 @@
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/peeper/VertexFormat.h>
 #include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/PixelPacker.h>
+#include <toadlet/tadpole/RenderQueue.h>
 #include <toadlet/tadpole/bsp/BSP30SceneNode.h>
 #include <toadlet/tadpole/bsp/BSP30Handler.h>
 #include <toadlet/tadpole/node/MeshNode.h>
 #include <toadlet/tadpole/handler/WADArchive.h>
-#include <toadlet/tadpole/PixelPacker.h>
 #include <string.h> // memset
 
 using namespace toadlet::egg;
@@ -117,8 +118,8 @@ void BSP30ModelNode::setModel(BSP30Map::ptr map,int index){
 	}
 }
 
-void BSP30ModelNode::queueRenderable(SceneNode *queue,CameraNode *camera){
-	if(mVisible){
+void BSP30ModelNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
+	if(mVisible && queue!=NULL){
 		int i;
 		for(i=0;i<mSubModels.size();++i){
 			queue->queueRenderable(mSubModels[i]);
@@ -189,7 +190,8 @@ void BSP30SceneNode::setMap(BSP30Map::ptr map){
 	mMarkedFaces=new uint8[(mMap->nfaces+7)>>3]; // Allocate enough markedfaces for 1 bit for each face
 	mVisibleMaterialFaces.resize(map->miptexlump->nummiptex);
 
-	getRenderLayer(0)->forceRender=true;
+// TODO: HACK: Clean this up
+mRenderQueue->getRenderLayer(0)->forceRender=true;
 
 	for(i=0;i<mChildren.size();++i){
 		Node *node=mChildren[i];
@@ -327,18 +329,20 @@ void BSP30SceneNode::childTransformUpdated(Node *child){
 	memcpy(&oldIndexes[0],&newIndexes[0],newIndexes.size()*sizeof(int));
 }
 
-void BSP30SceneNode::queueRenderables(){
+void BSP30SceneNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
 	if(mMap==NULL){
-		super::queueRenderables();
+		super::renderUpdate(camera,queue);
 		return;
 	}
 
+	super::renderUpdate(mBackground,camera,queue);
+
 	int i,j;
-	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,mCamera->getWorldTranslate());
+	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,camera->getWorldTranslate());
 	// If no visibility information just test all leaves
 	if(leaf==0 || mMap->parsedVisibility.size()==0){
 		for(i=0;i<mChildren.size();++i){
-			super::queueRenderables(mChildren[i]);
+			super::renderUpdate(mChildren[i],camera,queue);
 		}
 	}
 	else{
@@ -347,15 +351,15 @@ void BSP30SceneNode::queueRenderables(){
 		for(i=0;i<leafvis.size();i++){
 			bleaf *leaf=mMap->leafs+leafvis[i];
 			AABox box(leaf->mins[0],leaf->mins[1],leaf->mins[2],leaf->maxs[0],leaf->maxs[1],leaf->maxs[2]); // TODO: not have to create a temp box
-			if(mCamera->culled(box)==false){
+			if(camera->culled(box)==false){
 				const Collection<Node*> &occupants=mLeafData[leafvis[i]].occupants;
 				for(j=0;j<occupants.size();++j){
 					Node *occupant=occupants[j];
 					childdata *data=(childdata*)occupant->getParentData();
 					if(data->counter!=mCounter){
 						data->counter=mCounter;
-						if(culled(occupant)==false){
-							super::queueRenderables(occupant);
+						if(culled(occupant,camera)==false){
+							super::renderUpdate(occupant,camera,queue);
 						}
 					}
 				}
@@ -364,7 +368,7 @@ void BSP30SceneNode::queueRenderables(){
 	}
 }
 
-bool BSP30SceneNode::preLayerRender(Renderer *renderer,int layer){
+bool BSP30SceneNode::preLayerRender(Renderer *renderer,CameraNode *camera,int layer){
 	if(layer!=0 || mMap==NULL){
 		return false;
 	}
@@ -372,17 +376,17 @@ bool BSP30SceneNode::preLayerRender(Renderer *renderer,int layer){
 	memset(mMarkedFaces,0,(mMap->nfaces+7)>>3);
 	memset(&mVisibleMaterialFaces[0],0,sizeof(BSP30Map::facedata*)*mVisibleMaterialFaces.size());
 
-	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,mCamera->getWorldTranslate());
+	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,camera->getWorldTranslate());
 
 	int i;
 	if(leaf==0 || mMap->nvisibility==0){
 		for(i=0;i<mMap->nleafs;i++){
-			addLeafToVisible(&mMap->leafs[i],mCamera);
+			addLeafToVisible(&mMap->leafs[i],camera);
 		}
 	}
 	else{
 		for(i=0;i<mMap->parsedVisibility[leaf].size();i++){
-			addLeafToVisible(&mMap->leafs[mMap->parsedVisibility[leaf][i]],mCamera);
+			addLeafToVisible(&mMap->leafs[mMap->parsedVisibility[leaf][i]],camera);
 		}
 	}
 

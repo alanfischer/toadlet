@@ -60,13 +60,13 @@ namespace toadlet{
 namespace tadpole{
 
 class Engine;
+class RenderQueue;
 
 namespace node{
 
+class CameraNode;
 class ParentNode;
-class Renderable;
 class Scene;
-class Sizeable;
 
 class TOADLET_API Node{
 public:
@@ -79,7 +79,6 @@ public:
 	virtual void destroy();
 
 	virtual ParentNode *isParent(){return NULL;}
-	virtual Renderable *isRenderable(){return NULL;}
 	virtual Node *isEntity(){return NULL;}
 
 	inline int getHandle() const{return mHandle;}
@@ -118,24 +117,26 @@ public:
 
 	virtual void handleEvent(const egg::Event::ptr &event){}
 
-	virtual void setScope(int scope);
+	virtual void setScope(int scope){mScope=scope;}
 	inline int getScope() const{return mScope;}
 
-	virtual void setName(const egg::String &name);
+	virtual void setName(const egg::String &name){mName=name;}
 	inline const egg::String &getName() const{return mName;}
 
-	virtual void setCameraAligned(bool aligned);
+	virtual void setCameraAligned(bool aligned){mCameraAligned=aligned;}
 	inline bool getCameraAligned() const{return mCameraAligned;}
 
-	virtual void setReceiveUpdates(bool receiveUpdates);
-	inline bool getReceiveUpdates() const{return mReceiveUpdates;}
-	virtual void logicUpdate(int dt){}
-	virtual void renderUpdate(int dt){}
+	virtual void setPerspective(bool perspective){mPerspective=perspective;}
+	inline bool getPerspective() const{return mPerspective;}
 
 	virtual void setLocalBound(const Sphere &bound);
 	inline const Sphere &getLocalBound() const{return mLocalBound;}
 	inline const Sphere &getWorldBound() const{return mWorldBound;}
-	inline const Sphere &getRenderWorldBound() const{return mRenderWorldBound;}
+
+	virtual void logicUpdate(int dt);
+	virtual void renderUpdate(CameraNode *camera,RenderQueue *queue);
+	virtual void updateLogicTransforms();
+	virtual void updateRenderTransforms();
 
 	virtual void activate();
 	inline bool active() const{return mActive;}
@@ -208,6 +209,7 @@ protected:
 	bool mCreated;
 	Engine *mEngine;
 	Scene *mScene;
+	int mHandle;
 
 	// Node items
 	NodeDestroyedListener *mNodeDestroyedListener;
@@ -215,7 +217,6 @@ protected:
 
 	Node::ptr mParent;
 	void *mParentData;
-	int mHandle;
 	bool mIdentityTransform;
 	Vector3 mTranslate;
 	Quaternion mRotate;
@@ -226,15 +227,15 @@ protected:
 	int mScope;
 	egg::String mName;
 	bool mCameraAligned;
-	bool mReceiveUpdates;
+	bool mPerspective;
 
 	bool mActive;
 	int mDeactivateCount;	
 
 	Sphere mLocalBound;
 	Sphere mWorldBound;
-	Sphere mRenderWorldBound;
-	Matrix4x4 mRenderTransform;
+
+	Matrix4x4 mRenderTransform; // TODO: See if this could be removed, and instead be replaced with building the worldRenderTransform as parent->worldRenderTransform*translate*rotate*scale
 	Matrix4x4 mWorldRenderTransform;
 
 	Vector3 cache_setRotate_vector;

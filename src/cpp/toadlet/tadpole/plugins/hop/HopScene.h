@@ -28,7 +28,7 @@
 
 #include <toadlet/hop/Simulator.h>
 #include <toadlet/tadpole/Collision.h>
-#include <toadlet/tadpole/node/Traceable.h>
+#include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/node/Scene.h>
 
 namespace toadlet{
@@ -96,7 +96,7 @@ public:
 		virtual scalar getEpsilon() const{return mSimulator->getEpsilon();}
 	#endif
 
-	virtual void setTraceable(node::Traceable *traceable){mTraceable=traceable;}
+	virtual void setTraceable(Traceable *traceable){mTraceable=traceable;}
 
 	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits,HopEntity *ignore);
 	virtual void traceEntity(Collision &result,HopEntity *entity,const Segment &segment,int collideWithBits);
@@ -117,9 +117,6 @@ public:
 	virtual void postLogicUpdate(int dt);
 	virtual void postLogicUpdateLoop(int dt);
 	virtual void intraUpdate(int dt);
-	virtual void preRenderUpdate(int dt);
-	virtual void renderUpdate(int dt);
-	virtual void postRenderUpdate(int dt);
 
 	virtual bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact){return mScene->performAABoxQuery(query,box,exact);}
 
@@ -132,6 +129,8 @@ public:
 	virtual void intraUpdate(hop::Solid *solid,int dt,scalar fdt){}
 	virtual bool collisionResponse(hop::Solid *solid,Vector3 &position,Vector3 &remainder,hop::Collision &collision){return false;}
 	virtual void postUpdate(hop::Solid *solid,int dt,scalar fdt){}
+
+	virtual void updateRenderTransformsToRoot(node::Node *node){mScene->updateRenderTransformsToRoot(node);}
 
 	virtual egg::PointerCounter *pointerCounter() const{return mCounter;}
 
@@ -153,7 +152,7 @@ protected:
 
 	int mExcessiveDT;
 	hop::Simulator *mSimulator;
-	node::Traceable *mTraceable;
+	Traceable *mTraceable;
 
 	friend class HopEntity;
 };

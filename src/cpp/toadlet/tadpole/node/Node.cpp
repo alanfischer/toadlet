@@ -43,13 +43,13 @@ Node::Node():
 	mCreated(false),
 	mEngine(NULL),
 	mScene(NULL),
+	mHandle(0),
 
 	mNodeDestroyedListener(NULL),
 	mOwnsNodeDestroyedListener(false),
 
 	//mParent,
 	mParentData(NULL),
-	mHandle(0),
 	mIdentityTransform(false),
 	//mTranslate,
 	//mRotate,
@@ -60,10 +60,16 @@ Node::Node():
 	mScope(0),
 	//mName,
 	mCameraAligned(false),
-	mReceiveUpdates(false),
+	mPerspective(true),
 	
 	mActive(false),
 	mDeactivateCount(0)
+
+	//mLocalBound,
+	//mWorldBound,
+
+	//mRenderTransform,
+	//mWorldRenderTransform
 {
 }
 
@@ -96,14 +102,14 @@ Node *Node::create(Scene *scene){
 	mScope=-1;
 	mName="";
 	mCameraAligned=false;
-	mReceiveUpdates=false;
+	mPerspective=true;
 
 	mActive=true;
 	mDeactivateCount=0;
 
 	mLocalBound.reset();
 	mWorldBound.reset();
-	mRenderWorldBound.reset();
+
 	mRenderTransform.reset();
 	mWorldRenderTransform.reset();
 
@@ -224,27 +230,50 @@ void Node::findTransformTo(Matrix4x4 &result,Node *node){
 	Math::postMul(result,mWorldRenderTransform);
 }
 
-void Node::setScope(int scope){
-	mScope=scope;
-}
-
-void Node::setName(const String &name){
-	mName=name;
-}
-
-void Node::setCameraAligned(bool cameraAligned){
-	mCameraAligned=cameraAligned;
-}
-
 void Node::setLocalBound(const Sphere &bound){
 	mLocalBound.set(bound);
 	transformUpdated();
 }
 
-void Node::setReceiveUpdates(bool receiveUpdates){
-	mReceiveUpdates=receiveUpdates;
-	mDeactivateCount=(receiveUpdates?-1:0);
-	activate();
+void Node::logicUpdate(int dt){
+}
+
+void Node::renderUpdate(CameraNode *camera,RenderQueue *queue){
+}
+
+void Node::updateLogicTransforms(){
+	if(mParent==NULL){
+		mWorldScale.set(mScale);
+		mWorldRotate.set(mRotate);
+		mWorldTranslate.set(mTranslate);
+	}
+	else if(mIdentityTransform){
+		mWorldScale.set(mParent->mScale);
+		mWorldRotate.set(mParent->mRotate);
+		mWorldTranslate.set(mParent->mTranslate);
+	}
+	else{
+		Math::mul(mWorldScale,mParent->mWorldScale,mScale);
+		Math::mul(mWorldRotate,mParent->mWorldRotate,mRotate);
+		Math::mul(mWorldTranslate,mParent->mWorldRotate,mTranslate);
+		Math::mul(mWorldTranslate,mParent->mWorldScale);
+		Math::add(mWorldTranslate,mParent->mWorldTranslate);
+	}
+
+	mul(mWorldBound,mWorldTranslate,mWorldRotate,mWorldScale,mLocalBound);
+	if(mLocalBound.radius<0 || mPerspective==false) mWorldBound.radius=-Math::ONE;
+}
+
+void Node::updateRenderTransforms(){
+	if(mParent==NULL){
+		mWorldRenderTransform.set(mRenderTransform);
+	}
+	else if(mIdentityTransform){
+		mWorldRenderTransform.set(mParent->mWorldRenderTransform);
+	}
+	else{
+		Math::mul(mWorldRenderTransform,mParent->mWorldRenderTransform,mRenderTransform);
+	}
 }
 
 void Node::activate(){

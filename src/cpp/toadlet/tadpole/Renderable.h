@@ -23,51 +23,37 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Error.h>
-#include <toadlet/tadpole/node/SkeletonParentNode.h>
+#ifndef TOADLET_TADPOLE_RENDERABLE_H
+#define TOADLET_TADPOLE_RENDERABLE_H
 
-using namespace toadlet::egg;
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
+namespace peeper{
+
+class Renderer;
+
+}
 namespace tadpole{
 namespace node{
 
-TOADLET_NODE_IMPLEMENT(SkeletonParentNode,Categories::TOADLET_TADPOLE_NODE+".SkeletonParentNode");
+class CameraNode;
 
-SkeletonParentNode::SkeletonParentNode():super(){}
-
-void SkeletonParentNode::setSkeleton(MeshNodeSkeleton::ptr skeleton){
-	mSkeleton=skeleton;
 }
 
-bool SkeletonParentNode::attach(Node *node,int bone){
-	bool result=super::attach(node);
-	if(result){
-		mChildrenBones.add(bone);
-	}
-	return result;
-}
+class RenderQueue;
+class Material;
 
-bool SkeletonParentNode::remove(Node *node){
-	int i;
-	for(i=0;i<mChildren.size();++i){
-		if(mChildren[i]==node){
-			mChildrenBones.removeAt(i);
-			break;
-		}
-	}
-	return super::remove(node);
-}
+class Renderable{
+public:
+	virtual ~Renderable(){}
 
-void SkeletonParentNode::renderUpdate(int dt){
-	int i;
-	for(i=0;i<mChildren.size();++i){
-		MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(mChildrenBones[i]);
-		mChildren[i]->setTranslate(bone->worldTranslate);
-		mChildren[i]->setRotate(bone->worldRotateMatrix);
-	}
-}
+	virtual Material *getRenderMaterial() const=0;
+	virtual const tadpole::Matrix4x4 &getRenderTransform() const=0;
+	virtual void render(peeper::Renderer *renderer) const=0;
+};
 
 }
 }
-}
+
+#endif

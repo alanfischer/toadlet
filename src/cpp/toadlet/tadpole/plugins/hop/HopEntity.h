@@ -27,9 +27,9 @@
 #define TOADLET_TADPOLE_HOPENTITY_H
 
 #include <toadlet/egg/MathConversion.h>
+#include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
-#include <toadlet/tadpole/node/Traceable.h>
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
 
 namespace toadlet{
@@ -89,7 +89,7 @@ public:
 	virtual void setCoefficientOfEffectiveDrag(scalar coeff);
 	virtual scalar getCoefficientOfEffectiveDrag() const{return mSolid->getCoefficientOfEffectiveDrag();}
 
-	virtual void setTraceableShape(node::Traceable *traceable);
+	virtual void setTraceableShape(Traceable *traceable);
 	virtual void addShape(hop::Shape::ptr shape);
 	virtual void removeShape(hop::Shape *shape);
 	virtual void removeAllShapes();
@@ -120,6 +120,8 @@ public:
 
 	virtual void preLogicUpdateLoop(int dt);
 	virtual void postLogicUpdate(int dt);
+	virtual void renderUpdate(node::CameraNode *camera,RenderQueue *queue);
+	virtual void updateRenderTransforms();
 	virtual void interpolatePhysicalParameters(scalar f);
 
 protected:
@@ -130,7 +132,7 @@ protected:
 	int mNextThink;
 	hop::Solid::ptr mSolid;
 	hop::Shape::ptr mTraceableShape;
-	node::Traceable *mTraceable;
+	Traceable *mTraceable;
 	
 	HopScene *mHopScene;
 	Vector3 mLastPosition;
