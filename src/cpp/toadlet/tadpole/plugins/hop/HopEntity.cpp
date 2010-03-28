@@ -299,12 +299,17 @@ void HopEntity::preLogicUpdateLoop(int dt){
 	mActivePrevious=mSolid->active();
 }
 
-void HopEntity::postLogicUpdate(int dt){
+void HopEntity::logicUpdate(int dt){
 	if(mSolid->active()){
-		mTranslate.set(mSolid->getPosition());
-		activate();
+		super::setTranslate(mSolid->getPosition());
+		Math::sub(mBoundExpansion,mTranslate,mLastPosition);
+		Math::div(mBoundExpansion,Math::TWO);
 	}
 
+	super::logicUpdate(dt);
+}
+
+void HopEntity::postLogicUpdate(int dt){
 	if(mNextThink>0){
 		mNextThink-=dt;
 		if(mNextThink<=0){
@@ -315,6 +320,8 @@ void HopEntity::postLogicUpdate(int dt){
 }
 
 void HopEntity::renderUpdate(CameraNode *camera,RenderQueue *queue){
+	super::renderUpdate(camera,queue);
+
 	bool active=mSolid->active();
 	bool activePrevious=mActivePrevious;
 	if(active || activePrevious){

@@ -50,6 +50,17 @@ public:
 
 	class Particle{
 	public:
+		Particle():
+		  x(0),y(0),z(0),
+		  ox(0),oy(0),oz(0),
+		  vx(0),vy(0),vz(0),
+		  frame(0),
+		  startColor(0),endColor(0),
+		  startScale(0),endScale(0),
+		  age(0),
+		  visible(false){}
+
+
 		scalar x,y,z; // local space
 		scalar ox,oy,oz; // orientation vector
 		scalar vx,vy,vz; // velocity vector

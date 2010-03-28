@@ -376,7 +376,7 @@ bool BSP30SceneNode::preLayerRender(Renderer *renderer,CameraNode *camera,int la
 	memset(mMarkedFaces,0,(mMap->nfaces+7)>>3);
 	memset(&mVisibleMaterialFaces[0],0,sizeof(BSP30Map::facedata*)*mVisibleMaterialFaces.size());
 
-	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,camera->getWorldTranslate());
+	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,camera->getWorldRenderTranslate());
 
 	int i;
 	if(leaf==0 || mMap->nvisibility==0){

@@ -47,6 +47,7 @@ Node *AnimationControllerNode::create(Scene *scene){
 
 	mStartingFrame=0;
 	mDestroyOnFinish=false;
+	mDeactivateCount=-1; // TODO: HACK
 
 	mAnimationController=AnimationController::ptr(new AnimationController());
 	mAnimationController->setAnimationControllerFinishedListener(this,false);
@@ -58,6 +59,7 @@ void AnimationControllerNode::destroy(){
 	if(mAnimationController!=NULL){
 		mAnimationController->setAnimationControllerFinishedListener(NULL,false);
 		mAnimationController=NULL;
+Logger::alert(String("DESTROYING:")+(int)this);
 	}
 
 	super::destroy();
@@ -89,6 +91,7 @@ void AnimationControllerNode::logicUpdate(int dt){
 
 	if(mStartingFrame!=mScene->getLogicFrame()){
 		mAnimationController->logicUpdate(dt);
+		if(mAnimationController!=NULL) mAnimationController->renderUpdate(dt);
 	}
 }
 

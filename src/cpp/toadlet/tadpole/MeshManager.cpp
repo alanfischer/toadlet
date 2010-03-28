@@ -314,6 +314,7 @@ Mesh::ptr MeshManager::createSphere(const Sphere &sphere,int numSegments,int num
 	mesh->subMeshes.resize(1);
 	mesh->subMeshes[0]=subMesh;
 	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+	mesh->bound.set(sphere);
 
 	return mesh;
 }
@@ -471,6 +472,7 @@ Mesh::ptr MeshManager::createGeoSphere(const Sphere &sphere,int depth,bool icosa
 	mesh->subMeshes.resize(1);
 	mesh->subMeshes[0]=subMesh;
 	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+	mesh->bound.set(sphere);
 
 	return mesh;
 }
@@ -527,6 +529,7 @@ Mesh::ptr MeshManager::createTorus(scalar majorRadius,scalar minorRadius,int num
 	mesh->subMeshes.resize(1);
 	mesh->subMeshes[0]=subMesh;
 	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+	mesh->bound.radius=majorRadius;
 
 	return mesh;
 }
