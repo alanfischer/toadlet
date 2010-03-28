@@ -154,13 +154,11 @@ void HopScene::preLogicUpdate(int dt){
 }
 
 void HopScene::logicUpdate(int dt){
-	mScene->logicUpdate(dt);
-
 	TOADLET_PROFILE_BEGINSECTION(Simulator::update);
-
 	mSimulator->update(dt);
-
 	TOADLET_PROFILE_ENDSECTION(Simulator::update);
+
+	mScene->logicUpdate(dt);
 }
 
 void HopScene::postLogicUpdate(int dt){

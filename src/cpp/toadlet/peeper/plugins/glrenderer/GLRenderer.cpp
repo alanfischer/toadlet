@@ -749,6 +749,8 @@ void GLRenderer::setDefaultStates(){
 	setNormalize(Normalize_RESCALE);
 	#if defined(TOADLET_HAS_GLES)
 		setTexturePerspective(true);
+	#else
+		setFill(Fill_SOLID);
 	#endif
 
 	int i;

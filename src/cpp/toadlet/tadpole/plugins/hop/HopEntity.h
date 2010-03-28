@@ -119,6 +119,7 @@ public:
 	virtual void collision(const hop::Collision &c);
 
 	virtual void preLogicUpdateLoop(int dt);
+	virtual void logicUpdate(int dt);
 	virtual void postLogicUpdate(int dt);
 	virtual void renderUpdate(node::CameraNode *camera,RenderQueue *queue);
 	virtual void updateRenderTransforms();

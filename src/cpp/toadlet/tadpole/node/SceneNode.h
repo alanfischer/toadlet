@@ -35,6 +35,7 @@
 #include <toadlet/tadpole/node/LightNode.h>
 #include <toadlet/tadpole/node/ParticleNode.h>
 #include <toadlet/tadpole/node/Scene.h>
+#include <toadlet/tadpole/mesh/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -116,6 +117,7 @@ public:
 
 protected:
 	virtual void renderRenderables(peeper::Renderer *renderer,CameraNode *camera,RenderQueue *queue);
+	virtual void renderBoundingVolumes(Node *node,peeper::Renderer *renderer,CameraNode *camera);
 	virtual bool preLayerRender(peeper::Renderer *renderer,CameraNode *camera,int layer){return false;}
 	virtual bool postLayerRender(peeper::Renderer *renderer,CameraNode *camera,int layer){return false;}
 
@@ -139,6 +141,8 @@ protected:
 
 	RenderQueue::ptr mRenderQueue;
 	Material *mPreviousMaterial;
+
+	mesh::Mesh::ptr mBoundMesh;
 
 	peeper::Viewport cache_render_viewport;
 };

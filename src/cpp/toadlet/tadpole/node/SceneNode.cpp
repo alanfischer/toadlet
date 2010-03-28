@@ -35,17 +35,6 @@ using namespace toadlet::egg;
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 
-// renderUpdate rework:
-//	logicUpdate updates the worldBound, but passes down a Vector3, of the area its children should pass their bounds through.
-//	EX: HopEntity finds out its going to move (1,0,0) in the next logicUpdate loop, so its children will get passed down (1,0,0),
-//		so a localBound of sphere(5) will actually be a worldBound of a sphere at (0.5,0,0), of radius (5.5).
-//	Then, renderUpdate isn't called in update(), but instead called in render(), and the DT for each node is calculated from its previous renderUpdate to the currentTime.
-//		and at each node, if its a renderable, it's added to the renderQueue.
-//	Now we have 1 less pass through the scene each time.
-//	Alignment is handled by the CameraNode portion of the scene being updated initially with some sort of single walk down
-//		(Then if a Camera depends on another node, it could trigger that node being renderUpdated.)
-//		Then the camera view transform is updated, and visible nodes are found and renderUpdated()
-
 namespace toadlet{
 namespace tadpole{
 namespace node{
@@ -73,6 +62,8 @@ SceneNode::SceneNode(Engine *engine):super(),
 	mPreviousMaterial(NULL)
 {
 	mEngine=engine;
+
+	mBoundMesh=mEngine->getMeshManager()->createSphere(Sphere(Math::ONE),8,8);
 }
 
 SceneNode::~SceneNode(){
@@ -316,6 +307,13 @@ void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
 	renderUpdate(camera,mRenderQueue);
 
 	renderRenderables(renderer,camera,mRenderQueue);
+
+	if(false){
+		renderer->setDefaultStates();
+		renderer->setFaceCulling(Renderer::FaceCulling_NONE);
+		renderer->setFill(Renderer::Fill_LINE);
+		renderBoundingVolumes(this,renderer,camera);
+	}
 }
 
 void SceneNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
@@ -364,16 +362,10 @@ void SceneNode::renderUpdate(Node *node,CameraNode *camera,RenderQueue *queue){
 
 	ParentNode *parent=node->isParent();
 	if(parent!=NULL){
-		if(parent->mShadowChildrenDirty){
-			parent->updateShadowChildren();
-		}
-
-		Node *child;
-		int numChildren=parent->mShadowChildren.size();
+		int numChildren=parent->mChildren.size();
 		int i;
 		for(i=0;i<numChildren;++i){
-			child=parent->mShadowChildren[i];
-			renderUpdate(child,camera,queue);
+			renderUpdate(parent->mChildren[i],camera,queue);
 		}
 	}
 }
@@ -381,7 +373,6 @@ void SceneNode::renderUpdate(Node *node,CameraNode *camera,RenderQueue *queue){
 bool SceneNode::performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact){
 	SpacialQueryResultsListener *listener=query->getSpacialQueryResultsListener();
 
-	// TODO: Child Nodes should have proper bounding shapes (either a generic Volume which can be Sphere, etc, or just an actual Sphere)
 	int i;
 	for(i=0;i<mChildren.size();++i){
 		Node *child=mChildren[i];
@@ -501,6 +492,25 @@ void SceneNode::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQu
 		// Reset previous material each time, to avoid pre/postLayerRender messing up what we though the state of things were
 		// We could also use the true/false return of pre/postLayerRender, but it could be easy to forget to change that.
 		mPreviousMaterial=NULL;
+	}
+}
+
+void SceneNode::renderBoundingVolumes(Node *node,Renderer *renderer,CameraNode *camera){
+	if(node->getWorldBound().radius>0){
+		Matrix4x4 transform;
+		Math::setMatrix4x4FromTranslate(transform,node->getWorldBound().origin);
+		Math::setMatrix4x4FromScale(transform,node->getWorldBound().radius,node->getWorldBound().radius,node->getWorldBound().radius);
+		renderer->setModelMatrix(transform);
+		renderer->renderPrimitive(mBoundMesh->staticVertexData,mBoundMesh->subMeshes[0]->indexData);
+	}
+
+	ParentNode *parent=node->isParent();
+	if(parent!=NULL){
+		int numChildren=parent->mChildren.size();
+		int i;
+		for(i=0;i<numChildren;++i){
+			renderBoundingVolumes(parent->mChildren[i],renderer,camera);
+		}
 	}
 }
 

@@ -109,6 +109,9 @@ public:
 	inline const Vector3 &getScale() const{return mScale;}
 	inline const Vector3 &getWorldScale() const{return mWorldScale;}
 
+	inline const Vector3 &getBoundExpansion() const{return mBoundExpansion;}
+	inline const Vector3 &getWorldBoundExpansion() const{return mWorldBoundExpansion;}
+
 	virtual void setTransform(const Matrix4x4 &transform);
 
 	inline bool isIdentityTransform() const{return mIdentityTransform;}
@@ -159,11 +162,15 @@ public:
 		Math::mulPoint3Fast(r.origin,m,s.origin);
 	}
 
-	static void mul(Sphere &r,const Vector3 &translate,const Quaternion &rotate,const Vector3 &scale,const Sphere &s){
+	static void mul(Sphere &r,const Vector3 &translate,const Quaternion &rotate,const Vector3 &scale,const Sphere &s,const Vector3 &expand){
 		Math::mul(r.origin,scale,s.radius);
+		r.origin.x+=Math::abs(expand.x);
+		r.origin.y+=Math::abs(expand.y);
+		r.origin.z+=Math::abs(expand.z);
 		r.radius=Math::maxVal(Math::maxVal(r.origin.x,r.origin.y),r.origin.z);
 		Math::mul(r.origin,rotate,s.origin);
 		Math::add(r.origin,translate);
+		Math::sub(r.origin,expand);
 	}
 
 	// Merge two spheres, passing along -1 radius, and ignoring 0 radius
@@ -221,9 +228,14 @@ protected:
 	Vector3 mTranslate;
 	Quaternion mRotate;
 	Vector3 mScale;
+	Sphere mLocalBound;
+	Vector3 mBoundExpansion; // This is used by nodes that interpolate positions in-between logic frames to expand the bound to account for the interpolation
 	Vector3 mWorldTranslate;
 	Quaternion mWorldRotate;
 	Vector3 mWorldScale;
+	Sphere mWorldBound;
+	Vector3 mWorldBoundExpansion;
+
 	int mScope;
 	egg::String mName;
 	bool mCameraAligned;
@@ -231,9 +243,6 @@ protected:
 
 	bool mActive;
 	int mDeactivateCount;	
-
-	Sphere mLocalBound;
-	Sphere mWorldBound;
 
 	Matrix4x4 mRenderTransform; // TODO: See if this could be removed, and instead be replaced with building the worldRenderTransform as parent->worldRenderTransform*translate*rotate*scale
 	Matrix4x4 mWorldRenderTransform;

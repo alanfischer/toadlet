@@ -223,11 +223,16 @@ void Node::setTransform(const Matrix4x4 &transform){
 	transformUpdated();
 }
 
-// Currently just uses the worldRenderTransform, should be changed to walk up the scene till it finds a common parent,
-//  and then calculate the transform walking that path.
 void Node::findTransformTo(Matrix4x4 &result,Node *node){
-	Math::invert(result,node->mWorldRenderTransform);
-	Math::postMul(result,mWorldRenderTransform);
+	Matrix3x3 rotate;
+	Matrix4x4 transform;
+	Math::setMatrix3x3FromQuaternion(rotate,getWorldRotate());
+	Math::setMatrix4x4FromTranslateRotateScale(transform,getWorldTranslate(),rotate,getWorldScale());
+	Matrix4x4 nodeTransform;
+	Math::setMatrix3x3FromQuaternion(rotate,node->getWorldRotate());
+	Math::setMatrix4x4FromTranslateRotateScale(nodeTransform,node->getWorldTranslate(),rotate,node->getWorldScale());
+	Math::invert(result,nodeTransform);
+	Math::postMul(result,transform);
 }
 
 void Node::setLocalBound(const Sphere &bound){
@@ -246,11 +251,13 @@ void Node::updateLogicTransforms(){
 		mWorldScale.set(mScale);
 		mWorldRotate.set(mRotate);
 		mWorldTranslate.set(mTranslate);
+		mWorldBoundExpansion.set(mBoundExpansion);
 	}
 	else if(mIdentityTransform){
 		mWorldScale.set(mParent->mScale);
 		mWorldRotate.set(mParent->mRotate);
 		mWorldTranslate.set(mParent->mTranslate);
+		mWorldBoundExpansion.set(mParent->mBoundExpansion);
 	}
 	else{
 		Math::mul(mWorldScale,mParent->mWorldScale,mScale);
@@ -258,9 +265,10 @@ void Node::updateLogicTransforms(){
 		Math::mul(mWorldTranslate,mParent->mWorldRotate,mTranslate);
 		Math::mul(mWorldTranslate,mParent->mWorldScale);
 		Math::add(mWorldTranslate,mParent->mWorldTranslate);
+		Math::add(mWorldBoundExpansion,mBoundExpansion,mParent->mWorldBoundExpansion);
 	}
 
-	mul(mWorldBound,mWorldTranslate,mWorldRotate,mWorldScale,mLocalBound);
+	mul(mWorldBound,mWorldTranslate,mWorldRotate,mWorldScale,mLocalBound,mWorldBoundExpansion);
 	if(mLocalBound.radius<0 || mPerspective==false) mWorldBound.radius=-Math::ONE;
 }
 

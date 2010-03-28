@@ -396,6 +396,7 @@ void D3D9Renderer::setDefaultStates(){
 	setLighting(false);
 	setShading(Shading_SMOOTH);
 	setNormalize(Normalize_RESCALE);
+	setFill(Fill_SOLID);
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 		setTexturePerspective(true);
 	#endif
