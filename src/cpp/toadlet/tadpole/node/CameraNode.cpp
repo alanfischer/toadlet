@@ -267,7 +267,7 @@ bool CameraNode::culled(const Sphere &sphere) const{
 	return false;
 }
 
-// TODO: Test this culling algorithm, remove the use of the temporary to make something this important threadsafe
+// TODO: Remove the use of the temporary to make something this important threadsafe
 bool CameraNode::culled(const AABox &box){
 	Vector3 &vertex=cache_culled_vertex;
 	int i;

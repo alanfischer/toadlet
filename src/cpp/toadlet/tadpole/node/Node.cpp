@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/egg/Error.h>
@@ -60,7 +61,7 @@ Node::Node():
 	mScope(0),
 	//mName,
 	mCameraAligned(false),
-	mPerspective(true),
+	mPerspective(false),
 	
 	mActive(false),
 	mDeactivateCount(0)
@@ -243,7 +244,35 @@ void Node::setLocalBound(const Sphere &bound){
 void Node::logicUpdate(int dt){
 }
 
+// THOUGHT: Should we move these alignment & perspective commands into a separate AlignableNode?
 void Node::renderUpdate(CameraNode *camera,RenderQueue *queue){
+	if(mCameraAligned){
+		Matrix3x3 rotate;
+		if(camera->getAlignmentCalculationsUseOrigin()){
+			Vector3 nodeWorldTranslate; Math::setTranslateFromMatrix4x4(nodeWorldTranslate,mWorldRenderTransform);
+			Vector3 cameraWorldTranslate; Math::setTranslateFromMatrix4x4(cameraWorldTranslate,camera->mWorldRenderTransform);
+			Matrix4x4 lookAtCamera; Math::setMatrix4x4FromLookAt(lookAtCamera,cameraWorldTranslate,nodeWorldTranslate,Math::Z_UNIT_VECTOR3,false);
+			Math::setMatrix3x3FromMatrix4x4Transpose(rotate,lookAtCamera);
+		}
+		else{
+			Math::setMatrix3x3FromMatrix4x4Transpose(rotate,camera->getViewTransform());
+		}
+		Math::setMatrix4x4FromRotateScale(mWorldRenderTransform,rotate,mWorldScale);
+	}
+
+	if(!mPerspective){
+		Matrix4x4 scale;
+		Vector4 point;
+
+		point.set(mWorldRenderTransform.at(0,3),mWorldRenderTransform.at(1,3),mWorldRenderTransform.at(2,3),Math::ONE);
+		Math::mul(point,camera->getViewTransform());
+		Math::mul(point,camera->getProjectionTransform());
+		scale.setAt(0,0,point.w);
+		scale.setAt(1,1,point.w);
+		scale.setAt(2,2,point.w);
+
+		Math::postMul(mWorldRenderTransform,scale);
+	}
 }
 
 void Node::updateLogicTransforms(){

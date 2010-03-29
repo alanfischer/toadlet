@@ -356,10 +356,10 @@ void BSP30Handler::buildMaterials(BSP30Map *map){
 		TextureStage::ptr primary=mEngine->getMaterialManager()->createTextureStage(map->parsedTextures[i]);
 		material->setTextureStage(0,primary);
 
-		TextureStage::ptr secondary=mEngine->getMaterialManager()->createTextureStage(map->lightmap);
-		secondary->setTexCoordIndex(1);
-		secondary->setBlend(TextureBlend(TextureBlend::Operation_MODULATE,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
-		material->setTextureStage(1,secondary);
+//		TextureStage::ptr secondary=mEngine->getMaterialManager()->createTextureStage(map->lightmap);
+//		secondary->setTexCoordIndex(1);
+//		secondary->setBlend(TextureBlend(TextureBlend::Operation_MODULATE,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
+//		material->setTextureStage(1,secondary);
 
 		map->materials[i]=material;
 	}
