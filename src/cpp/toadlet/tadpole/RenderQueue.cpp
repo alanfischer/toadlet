@@ -30,6 +30,7 @@ namespace toadlet{
 namespace tadpole{
 
 RenderQueue::RenderQueue(){
+	getRenderLayer(0)->forceRender=true; // Always render layer 0
 }
 
 RenderQueue::~RenderQueue(){

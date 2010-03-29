@@ -34,7 +34,6 @@ namespace egg{
 namespace io{
 
 // This does not properly support both reading & writing of the same stream
-// TODO: Unit test me
 class TOADLET_API MemoryStream:public Stream{
 public:
 	TOADLET_SHARED_POINTERS(MemoryStream);

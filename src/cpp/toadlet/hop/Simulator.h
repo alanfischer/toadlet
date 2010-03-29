@@ -78,8 +78,6 @@ public:
 	void setGravity(const Vector3 &gravity);
 	const Vector3 &getGravity() const{return mGravity;}
 
-	// TODO: If this manager doesnt start actually doing some managing before we opensource, it needs to be renamed
-	//  to something that just does callbacks
 	void setManager(Manager *manager);
 	Manager *getManager() const{return mManager;}
 
