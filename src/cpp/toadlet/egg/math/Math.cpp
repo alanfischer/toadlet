@@ -132,7 +132,6 @@ real Math::determinant(const Matrix4x4 &m){
 			(m.data[3+3*4]*((m.data[0+0*4]*det3) - (m.data[0+1*4]*det5) + (m.data[0+2*4]*det6)));
 }
 
-// TODO: Remove duplicate multiplications (there are some in there)
 bool Math::invert(Matrix4x4 &r,const Matrix4x4 &m){
 	real det=determinant(m);
 

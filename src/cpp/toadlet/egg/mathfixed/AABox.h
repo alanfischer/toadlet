@@ -28,6 +28,7 @@
 
 #include <toadlet/egg/mathfixed/Vector3.h>
 #include <toadlet/egg/mathfixed/Matrix3x3.h>
+#include <toadlet/egg/mathfixed/Plane.h>
 
 namespace toadlet{
 namespace egg{
@@ -155,23 +156,29 @@ public:
 	}
 
 	inline void findPVertex(Vector3 &r,const Vector3 &normal) const{
-		r.set(mins);
-		if(normal.x>=0)
-			r.x=maxs.x;
-		if(normal.y>=0)
-			r.y=maxs.y;
-		if(normal.z>=0)
-			r.z=maxs.z;
+		r.x=normal.x>=0?maxs.x:mins.x;
+		r.y=normal.y>=0?maxs.y:mins.y;
+		r.z=normal.z>=0?maxs.z:mins.z;
+	}
+
+	inline float findPVertexLength(const Plane &plane) const{
+		fixed x=plane.normal.x>=0?maxs.x:mins.x;
+		fixed y=plane.normal.y>=0?maxs.y:mins.y;
+		fixed z=plane.normal.z>=0?maxs.z:mins.z;
+		return TOADLET_MUL_XX(plane.normal.x,x) + TOADLET_MUL_XX(plane.normal.y,y) + TOADLET_MUL_XX(plane.normal.z,z) + plane.distance;
 	}
 
 	inline void findNVertex(Vector3 &r,const Vector3 &normal) const{
-		r.set(maxs);
-		if(normal.x>=0)
-			r.x=mins.x;
-		if(normal.y>=0)
-			r.y=mins.y;
-		if(normal.z>=0)
-			r.z=mins.z;
+		r.x=normal.x>=0?mins.x:maxs.x;
+		r.y=normal.y>=0?mins.y:maxs.y;
+		r.z=normal.z>=0?mins.z:maxs.z;
+	}
+
+	inline float findNVertexLength(const Plane &plane) const{
+		fixed x=plane.normal.x>=0?mins.x:maxs.x;
+		fixed y=plane.normal.y>=0?mins.y:maxs.y;
+		fixed z=plane.normal.z>=0?mins.z:maxs.z;
+		return TOADLET_MUL_XX(plane.normal.x,x) + TOADLET_MUL_XX(plane.normal.y,y) + TOADLET_MUL_XX(plane.normal.z,z) + plane.distance;
 	}
 
 	inline void mergeWith(const AABox &box){

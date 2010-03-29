@@ -101,7 +101,7 @@ public:
 	// TODO: These should probably be moved into the Math library, and passing in a list of planes
 	bool culled(const Sphere &sphere) const;
 	bool culled(const AABox &box);
-	inline int getNumCulledEntities() const{return mNumCulledEntities;}
+	inline int getNumCulled() const{return mNumCulled;}
 
 	virtual void updateFramesPerSecond();
 	inline scalar getFramesPerSecond() const{return mFPS;}
@@ -128,8 +128,7 @@ protected:
 	Matrix4x4 mViewProjectionTransform;
 	Plane mClipPlanes[6];
 
-	int mNumCulledEntities;
-
+	int mNumCulled;
 	int mFPSLastTime;
 	int mFPSFrameCount;
 	scalar mFPS;

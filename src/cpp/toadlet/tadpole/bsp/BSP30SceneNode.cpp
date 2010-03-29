@@ -192,9 +192,6 @@ void BSP30SceneNode::setMap(BSP30Map::ptr map){
 	mMarkedFaces=new uint8[(mMap->nfaces+7)>>3]; // Allocate enough markedfaces for 1 bit for each face
 	mVisibleMaterialFaces.resize(map->miptexlump->nummiptex);
 
-// TODO: HACK: Clean this up
-mRenderQueue->getRenderLayer(0)->forceRender=true;
-
 	for(i=0;i<mChildren.size();++i){
 		Node *node=mChildren[i];
 		Collection<int> &indexes=((childdata*)node->getParentData())->leafs;
@@ -352,7 +349,7 @@ void BSP30SceneNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
 		const Collection<int> &leafvis=mMap->parsedVisibility[leaf];
 		for(i=0;i<leafvis.size();i++){
 			bleaf *leaf=mMap->leafs+leafvis[i];
-			AABox box(leaf->mins[0],leaf->mins[1],leaf->mins[2],leaf->maxs[0],leaf->maxs[1],leaf->maxs[2]); // TODO: not have to create a temp box
+			AABox box(leaf->mins[0],leaf->mins[1],leaf->mins[2],leaf->maxs[0],leaf->maxs[1],leaf->maxs[2]);
 			if(camera->culled(box)==false){
 				const Collection<Node*> &occupants=mLeafData[leafvis[i]].occupants;
 				for(j=0;j<occupants.size();++j){

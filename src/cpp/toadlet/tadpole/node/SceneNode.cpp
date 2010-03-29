@@ -296,7 +296,6 @@ void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
 
 	mRenderFrame++;
 	camera->updateFramesPerSecond();
-	camera->mNumCulledEntities=0; // TODO: Move into camera more automatically somehow
 
 	camera->updateViewTransform();
 
@@ -364,11 +363,7 @@ void SceneNode::updateRenderTransformsToRoot(Node *node){
 }
 
 bool SceneNode::culled(Node *node,CameraNode *camera){
-	bool cull=(node->mScope&camera->mScope)==0 || (node->mWorldBound.radius>=0 && camera->culled(node->mWorldBound));
-	if(cull){
-		camera->mNumCulledEntities++;
-	}
-	return cull;
+	return (node->mScope&camera->mScope)==0 || camera->culled(node->mWorldBound);
 }
 
 int SceneNode::nodeCreated(Node *node){

@@ -55,8 +55,7 @@ CameraNode::CameraNode():super(),
 	//mWorldTranslate,
 	//mViewTransform,
 
-	mNumCulledEntities(0),
-
+	mNumCulled(0),
 	mFPSLastTime(0),
 	mFPSFrameCount(0),
 	mFPS(0)
@@ -75,8 +74,7 @@ Node *CameraNode::create(Scene *scene){
 
 	updateViewTransform();
 
-	mNumCulledEntities=0;
-
+	mNumCulled=0;
 	mFPSLastTime=0;
 	mFPSFrameCount=0;
 	mFPS=0;
@@ -87,6 +85,8 @@ Node *CameraNode::create(Scene *scene){
 void CameraNode::setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,scalar farDist){
 	mProjectionType=ProjectionType_FOVX;
 	mFov=fovx;mAspect=aspect;
+	mLeftDist=0;mRightDist=0;
+	mBottomDist=0;mTopDist=0;
 	mNearDist=nearDist;mFarDist=farDist;
 
 	Math::setMatrix4x4FromPerspectiveX(mProjectionTransform,fovx,aspect,nearDist,farDist);
@@ -97,6 +97,8 @@ void CameraNode::setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,sca
 void CameraNode::setProjectionFovY(scalar fovy,scalar aspect,scalar nearDist,scalar farDist){
 	mProjectionType=ProjectionType_FOVY;
 	mFov=fovy;mAspect=aspect;
+	mLeftDist=0;mRightDist=0;
+	mBottomDist=0;mTopDist=0;
 	mNearDist=nearDist;mFarDist=farDist;
 
 	Math::setMatrix4x4FromPerspectiveY(mProjectionTransform,fovy,aspect,nearDist,farDist);
@@ -106,6 +108,7 @@ void CameraNode::setProjectionFovY(scalar fovy,scalar aspect,scalar nearDist,sca
 
 void CameraNode::setProjectionOrtho(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist){
 	mProjectionType=ProjectionType_ORTHO;
+	mFov=0;mAspect=0;
 	mLeftDist=leftDist;mRightDist=rightDist;
 	mBottomDist=bottomDist;mTopDist=topDist;
 	mNearDist=nearDist;mFarDist=farDist;
@@ -117,6 +120,7 @@ void CameraNode::setProjectionOrtho(scalar leftDist,scalar rightDist,scalar bott
 
 void CameraNode::setProjectionFrustum(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist){
 	mProjectionType=ProjectionType_FRUSTUM;
+	mFov=0;mAspect=0;
 	mLeftDist=leftDist;mRightDist=rightDist;
 	mBottomDist=bottomDist;mTopDist=topDist;
 	mNearDist=nearDist;mFarDist=farDist;
@@ -128,10 +132,12 @@ void CameraNode::setProjectionFrustum(scalar leftDist,scalar rightDist,scalar bo
 
 void CameraNode::setProjectionTransform(const Matrix4x4 &transform){
 	mProjectionType=ProjectionType_MATRIX;
+	mFov=0;mAspect=0;
+	mLeftDist=0;mRightDist=0;
+	mBottomDist=0;mTopDist=0;
+	mNearDist=0;mFarDist=0;
 
 	mProjectionTransform.set(transform);
-
-	// TODO: Set mNearDist and mFarDist
 
 	update();
 }
@@ -256,6 +262,7 @@ void CameraNode::updateViewTransform(){
 }
 
 bool CameraNode::culled(const Sphere &sphere) const{
+	if(sphere.radius<0) return false;
 	scalar distance=0;
 	int i;
 	for(i=0;i<6;++i){
@@ -267,13 +274,10 @@ bool CameraNode::culled(const Sphere &sphere) const{
 	return false;
 }
 
-// TODO: Remove the use of the temporary to make something this important threadsafe
 bool CameraNode::culled(const AABox &box){
-	Vector3 &vertex=cache_culled_vertex;
 	int i;
 	for(i=0;i<6;i++){
-		box.findPVertex(vertex,mClipPlanes[i].normal);
-		if(Math::dot(mClipPlanes[i].normal,vertex)+mClipPlanes[i].distance<0){
+		if(box.findPVertexLength(mClipPlanes[i])<0){
 			return true;
 		}
 	}
@@ -281,6 +285,7 @@ bool CameraNode::culled(const AABox &box){
 }
 
 void CameraNode::updateFramesPerSecond(){
+	mNumCulled=0;
 	mFPSFrameCount++;
 	int fpsTime=mScene->getRenderTime();
 	if(mFPSLastTime==0 || fpsTime-mFPSLastTime>5000){

@@ -421,10 +421,15 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 	}
 	else{
 		mxml_node_t *textureStageNode=node->child;
-		// TODO: Support more than 1 texture stage
 		while((textureStageNode=textureStageNode->next)!=NULL){
 			if(strcmp(mxmlGetElementName(textureStageNode),"TextureStage")!=0){
 				continue;
+			}
+
+			int index=0;
+			prop=mxmlElementGetAttr(textureStageNode,"Index");
+			if(prop!=NULL){
+				index=String(prop).toInt32();
 			}
 
 			TextureStage::ptr textureStage(new TextureStage());
@@ -455,7 +460,7 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 				textureStage->setMipFilter(materialManager->getDefaultMipFilter());
 			}
 
-			material->setTextureStage(0,textureStage);
+			material->setTextureStage(index,textureStage);
 		}
 	}
 
@@ -711,7 +716,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 						String element=line.substr(j,space);
 						if(vertexFormat->getVertexElement(c).type==VertexElement::Type_POSITION){
 							Vector3 position=parseVector3(element);
-							scalar length=Math::length(position);;
+							scalar length=Math::length(position);
 							if(mesh->bound.radius<length){
 								mesh->bound.radius=length;
 							}

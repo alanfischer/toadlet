@@ -313,7 +313,6 @@ void MeshNode::updateVertexBuffer(){
 			// Basically, if you want to write any of it, you have to write it all.
 			// So we re-copy over all the data to start
 			// NOTE: Probably due to UT_WRITE_ONLY on creation, makes it mean if we lock it, we will rewrite all that data
-			// TODO: Research this more, and see if this is a known problem
 			memcpy(dvba.getData(),svba.getData(),srcVertexBuffer->getDataSize());
 
 			Vector3 &positionVector=cache_updateVertexBuffer_positionVector.reset();
