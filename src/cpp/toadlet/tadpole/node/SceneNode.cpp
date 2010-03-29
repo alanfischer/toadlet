@@ -328,34 +328,6 @@ void SceneNode::renderUpdate(Node *node,CameraNode *camera,RenderQueue *queue){
 
 	node->updateRenderTransforms();
 
-	// TODO: Move these 'render alignment' commands into the node or some attribute of a node somehow
-	if(node->mCameraAligned){
-		Matrix3x3 rotate;
-		if(camera->mAlignmentCalculationsUseOrigin){
-			Vector3 nodeWorldTranslate; Math::setTranslateFromMatrix4x4(nodeWorldTranslate,node->mWorldRenderTransform);
-			Vector3 cameraWorldTranslate; Math::setTranslateFromMatrix4x4(cameraWorldTranslate,camera->mWorldRenderTransform);
-			Matrix4x4 lookAtCamera; Math::setMatrix4x4FromLookAt(lookAtCamera,cameraWorldTranslate,nodeWorldTranslate,Math::Z_UNIT_VECTOR3,false);
-			Math::setMatrix3x3FromMatrix4x4Transpose(rotate,lookAtCamera);
-		}
-		else{
-			Math::setMatrix3x3FromMatrix4x4Transpose(rotate,camera->getViewTransform());
-		}
-		Math::setMatrix4x4FromRotateScale(node->mWorldRenderTransform,rotate,node->mWorldScale);
-	}
-	if(!node->mPerspective){
-		Matrix4x4 scale;
-		Vector4 point;
-
-		point.set(node->mWorldRenderTransform.at(0,3),node->mWorldRenderTransform.at(1,3),node->mWorldRenderTransform.at(2,3),Math::ONE);
-		Math::mul(point,camera->getViewTransform());
-		Math::mul(point,camera->getProjectionTransform());
-		scale.setAt(0,0,point.w);
-		scale.setAt(1,1,point.w);
-		scale.setAt(2,2,point.w);
-
-		Math::postMul(node->mWorldRenderTransform,scale);
-	}
-
 	if(node!=this){
 		node->renderUpdate(camera,queue);
 	}

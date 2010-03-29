@@ -119,6 +119,8 @@ void BSP30ModelNode::setModel(BSP30Map::ptr map,int index){
 }
 
 void BSP30ModelNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
+	super::renderUpdate(camera,queue);
+
 	if(mVisible && queue!=NULL){
 		int i;
 		for(i=0;i<mSubModels.size();++i){
@@ -338,7 +340,7 @@ void BSP30SceneNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
 	super::renderUpdate(mBackground,camera,queue);
 
 	int i,j;
-	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,camera->getWorldTranslate());
+	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,camera->getWorldRenderTranslate());
 	// If no visibility information just test all leaves
 	if(leaf==0 || mMap->parsedVisibility.size()==0){
 		for(i=0;i<mChildren.size();++i){

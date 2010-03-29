@@ -95,7 +95,6 @@ protected:
 	peeper::Renderer::DepthTest mDepthTest;
 	int mLayer;
 	egg::Collection<peeper::TextureStage::ptr> mTextureStages;
-	egg::Collection<peeper::Texture::ptr> mAnimatedTextures;
 	bool mSaveLocally;
 };
 

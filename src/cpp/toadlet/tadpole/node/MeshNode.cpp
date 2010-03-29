@@ -250,6 +250,7 @@ void MeshNode::logicUpdate(int dt){
 void MeshNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
 	super::renderUpdate(camera,queue);
 
+	// TODO: Remove this scale system?  or do we need to leave it in for fixed point support?
 	if(mMesh!=NULL && mMesh->worldScale!=Math::ONE){
 		mWorldRenderTransform.reset();
 		mWorldRenderTransform.setAt(0,0,mMesh->worldScale);
