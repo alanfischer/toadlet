@@ -89,7 +89,6 @@ SpriteNode::SpriteNode():super(),
 	//mMaterial,
 	//mVertexData,
 	//mIndexData,
-	//mSpriteTransform
 {}
 
 Node *SpriteNode::create(Scene *scene){
@@ -97,26 +96,6 @@ Node *SpriteNode::create(Scene *scene){
 
 	setCameraAligned(true);
 	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
-
-	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,4);
-	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
-	{
-		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
-
-		vba.set3(0,0, -Math::HALF,-Math::HALF,0);
-		vba.set2(0,1, 0,0);
-
-		vba.set3(1,0, -Math::HALF,Math::HALF,0);
-		vba.set2(1,1, 0,Math::ONE);
-
-		vba.set3(2,0, Math::HALF,-Math::HALF,0);
-		vba.set2(2,1, Math::ONE,0);
-
-		vba.set3(3,0, Math::HALF,Math::HALF,0);
-		vba.set2(3,1, Math::ONE,Math::ONE);
-
-		vba.unlock();
-	}
 
 	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,4));
 
@@ -205,8 +184,6 @@ void SpriteNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
 		return;
 	}
 
-	Math::mul(mWorldSpriteTransform,mWorldRenderTransform,mSpriteTransform);
-
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
 	queue->queueRenderable(&renderable);
 #else
@@ -219,24 +196,40 @@ void SpriteNode::render(Renderer *renderer) const{
 }
 
 void SpriteNode::updateSprite(){
-	mSpriteTransform.reset();
-
-	// Update offset
 	scalar x=0,y=0;
 	scalar width=Math::ONE,height=Math::ONE; // If we add in a non-normalized option, then this would be the size in non-normalized space.
-	if((mAlignment&Font::Alignment_BIT_LEFT)>0){
-		x=Math::HALF;
+	if((mAlignment&Font::Alignment_BIT_HCENTER)>0){
+		x=-width/2;
 	}
 	else if((mAlignment&Font::Alignment_BIT_RIGHT)>0){
-		x=-Math::HALF;
+		x=-width;
 	}
-	if((mAlignment&Font::Alignment_BIT_BOTTOM)>0){
-		y=Math::HALF;
+	if((mAlignment&Font::Alignment_BIT_VCENTER)>0){
+		y=-height/2;
 	}
 	else if((mAlignment&Font::Alignment_BIT_TOP)>0){
-		y=-Math::HALF;
+		y=-height;
 	}
-	Math::setMatrix4x4FromTranslate(mSpriteTransform,x,y,0);
+
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,4);
+	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+	{
+		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
+
+		vba.set3(0,0, x,y,0);
+		vba.set2(0,1, 0,0);
+
+		vba.set3(1,0, x,y+height,0);
+		vba.set2(1,1, 0,Math::ONE);
+
+		vba.set3(2,0, x+width,y,0);
+		vba.set2(2,1, Math::ONE,0);
+
+		vba.set3(3,0, x+width,y+height,0);
+		vba.set2(3,1, Math::ONE,Math::ONE);
+
+		vba.unlock();
+	}
 
 	// Update bound
 	mLocalBound.origin.set(x,y,0);

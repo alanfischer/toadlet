@@ -83,7 +83,7 @@ public:
 	void logicUpdate(int dt);
 	void renderUpdate(CameraNode *camera,RenderQueue *queue);
 	Material *getRenderMaterial() const{return mMaterial;}
-	const Matrix4x4 &getRenderTransform() const{return mWorldSpriteTransform;}
+	const Matrix4x4 &getRenderTransform() const{return mWorldRenderTransform;}
 	void render(peeper::Renderer *renderer) const;
 
 	peeper::VertexBufferAccessor vba;
@@ -99,8 +99,6 @@ protected:
 	Material::ptr mMaterial;
 	peeper::VertexData::ptr mVertexData;
 	peeper::IndexData::ptr mIndexData;
-	Matrix4x4 mSpriteTransform;
-	Matrix4x4 mWorldSpriteTransform;
 };
 
 }
