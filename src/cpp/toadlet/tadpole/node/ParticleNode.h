@@ -60,7 +60,6 @@ public:
 		  age(0),
 		  visible(false){}
 
-
 		scalar x,y,z; // local space
 		scalar ox,oy,oz; // orientation vector
 		scalar vx,vy,vz; // velocity vector
@@ -69,22 +68,6 @@ public:
 		scalar startScale,endScale;
 		scalar age;
 		bool visible;
-	};
-
-	class ParticleSimulator{
-	public:
-		TOADLET_SHARED_POINTERS(ParticleSimulator);
-
-		virtual ~ParticleSimulator(){}
-
-		virtual void setParticleLife(int life)=0;
-		virtual void setParticleInitialVelocity(const Vector3 &velocity,const Vector3 &variance)=0;
-		virtual void setSpawnAABox(const AABox &box)=0;
-		virtual void setCoefficientOfGravity(scalar cog)=0;
-		virtual void setLife(int life)=0;
-		virtual void setLocalGravity(const Vector3 &gravity)=0;
-
-		virtual void updateParticles(int dt,const Matrix4x4 &transform)=0;
 	};
 
 	ParticleNode();
@@ -137,11 +120,6 @@ public:
 
 	virtual void setIdealViewTransform(const Matrix4x4 &transform){mIdealViewTransform.set(transform);mHasIdealViewTransform=true;}
 
-	virtual void startSimulating(ParticleSimulator::ptr particleSimulator=ParticleSimulator::ptr());
-	virtual void stopSimulating();
-	inline ParticleSimulator *getParticleSimulator() const{return mParticleSimulator;}
-	inline void destroyNextLogicFrame(){mDestroyNextLogicFrame=true;}
-	
 	virtual void logicUpdate(int dt);
 	virtual void renderUpdate(CameraNode *camera,RenderQueue *queue);
 
@@ -195,7 +173,6 @@ protected:
 	Matrix4x4 mWorldTransform;
 
 	bool mUpdateParticles;
-	ParticleSimulator::ptr mParticleSimulator;
 
 	bool mHasIdealViewTransform;
 	Matrix4x4 mIdealViewTransform;

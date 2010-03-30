@@ -35,6 +35,9 @@ namespace tadpole{
 
 class HopScene;
 
+// THe particle simulator should be replace with whatever sort of 'animation' effect we have that we can attach to a node to trigger on renderUpdate
+//  Then it'd just be a thingie we attach to a particle node, telling it "use this node". and boom it would be simulated.
+
 class TOADLET_API HopParticleSimulator:public node::ParticleNode::ParticleSimulator{
 public:
 	HopParticleSimulator(HopScene *scene,node::ParticleNode *node);

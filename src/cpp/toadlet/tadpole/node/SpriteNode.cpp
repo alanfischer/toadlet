@@ -32,54 +32,12 @@
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
-using namespace toadlet::tadpole::animation;
 
 namespace toadlet{
 namespace tadpole{
 namespace node{
 
 TOADLET_NODE_IMPLEMENT(SpriteNode,Categories::TOADLET_TADPOLE_NODE+".SpriteNode");
-
-SpriteNode::SpriteAnimationController::SpriteAnimationController(SpriteNode *node):AnimationController(),
-	mSpriteNode(NULL),
-	//mAnimation,
-	mStartingFrame(0)
-{
-	mSpriteNode=node;
-	mAnimation=TextureStageAnimation::ptr(new TextureStageAnimation());
-	if(mSpriteNode->getMaterial()!=NULL && mSpriteNode->getMaterial()->getNumTextureStages()>0){
-		mAnimation->setTarget(mSpriteNode->getMaterial()->getTextureStage(0));
-	}
-	attach(mAnimation);
-}
-
-void SpriteNode::SpriteAnimationController::start(){
-	if(isRunning()){
-		stop();
-	}
-
-	AnimationController::start();
-	mStartingFrame=mSpriteNode->getScene()->getLogicFrame();
-}
-
-void SpriteNode::SpriteAnimationController::stop(){
-	if(isRunning()==false){
-		return;
-	}
-
-	AnimationController::stop();
-}	
-
-void SpriteNode::SpriteAnimationController::logicUpdate(int dt){
-	if(mSpriteNode->getScene()==NULL || mStartingFrame!=mSpriteNode->getScene()->getLogicFrame()){
-		AnimationController::logicUpdate(dt);
-		AnimationController::renderUpdate(dt); //TODO: Shouldn't be here!
-	}
-}
-
-void SpriteNode::SpriteAnimationController::materialChanged(){
-	mAnimation->setTarget(mSpriteNode->getMaterial()->getTextureStage(0));
-}
 
 SpriteNode::SpriteNode():super(),
 	TOADLET_GIB_IMPLEMENT()
@@ -94,7 +52,6 @@ SpriteNode::SpriteNode():super(),
 Node *SpriteNode::create(Scene *scene){
 	super::create(scene);
 
-	setCameraAligned(true);
 	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
 
 	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,4));
@@ -148,10 +105,6 @@ void SpriteNode::setMaterial(Material::ptr material){
 		}
 	}
 
-	if(mAnimationController!=NULL){
-		mAnimationController->materialChanged();
-	}
-
 	updateSprite();
 }
 
@@ -159,22 +112,6 @@ void SpriteNode::setAlignment(int alignment){
 	mAlignment=alignment;
 
 	updateSprite();
-}
-
-SpriteNode::SpriteAnimationController::ptr SpriteNode::getAnimationController(){
-	if(mAnimationController==NULL){
-		mAnimationController=SpriteAnimationController::ptr(new SpriteAnimationController(this));
-	}
-
-	return mAnimationController;
-}
-
-void SpriteNode::logicUpdate(int dt){
-	super::logicUpdate(dt);
-
-	if(mAnimationController!=NULL){
-		mAnimationController->logicUpdate(dt);
-	}
 }
 
 void SpriteNode::renderUpdate(CameraNode *camera,RenderQueue *queue){

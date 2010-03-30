@@ -73,6 +73,7 @@ set (TADPOLE_NODE_SRC
 	node/AnimationControllerNode.cpp
 	node/AudioNode.cpp
 	node/CameraNode.cpp
+	node/CameraAlignedNode.cpp
 	node/LabelNode.cpp
 	node/LightNode.cpp
 	node/MeshNode.cpp
@@ -183,6 +184,7 @@ set (TADPOLE_NODE_HEADERS
 	node/AnimationControllerNode.h
 	node/AudioNode.h
 	node/CameraNode.h
+	node/CameraAlignedNode.h
 	node/LabelNode.h
 	node/LightNode.h
 	node/MeshNode.h

@@ -65,7 +65,6 @@ ParticleNode::ParticleNode():super(),
 	mStartScale(0),
 	mEndScale(0),
 
-	//mTextureSection,
 	//mMaterial,
 	//mVertexBuffer,
 	//mVertexData,
@@ -77,7 +76,6 @@ ParticleNode::ParticleNode():super(),
 	//mWorldRotate,
 
 	mUpdateParticles(false),
-	//mParticleSimulator,
 
 	mHasIdealViewTransform(false),
 	//mIdealViewTransform,
@@ -107,7 +105,6 @@ Node *ParticleNode::create(Scene *scene){
 	mStartScale=0;
 	mEndScale=0;
 
-//	mTextureSection=NULL;
 	mMaterial=NULL;
 	mVertexBuffer=NULL;
 	mVertexData=NULL;
@@ -118,7 +115,6 @@ Node *ParticleNode::create(Scene *scene){
 	mWorldTransform.reset();
 
 	mUpdateParticles=true;
-	mParticleSimulator=NULL;
 
 	mHasIdealViewTransform=false;
 	mIdealViewTransform.reset();
@@ -136,8 +132,6 @@ Node *ParticleNode::create(Scene *scene){
 }
 
 void ParticleNode::destroy(){
-	stopSimulating();
-
 	if(mVertexBuffer!=NULL){
 		mVertexBuffer->destroy();
 		mVertexBuffer=NULL;
@@ -166,9 +160,6 @@ bool ParticleNode::start(int particlesPerBeam,int numParticles,bool hasColor,con
 	mParticlesPerBeam=particlesPerBeam;
 
 	int numFrames=1;
-//	if(mTextureSection!=NULL){
-//		numFrames=mTextureSection->getNumFrames();
-//	}
 
 	uint32 startColor=mStartColor.getABGR();
 	uint32 endColor=mEndColor.getABGR();
@@ -355,34 +346,8 @@ void ParticleNode::setMaterial(Material::ptr material){
 	}
 }
 
-void ParticleNode::startSimulating(ParticleSimulator::ptr particleSimulator){
-	if(particleSimulator==NULL){
-//		particleSimulator=mEngine->getScene()->newParticleSimulator(this);
-	}
-	mParticleSimulator=particleSimulator;
-
-	// Disable the bounding radius, cause they may very well bounce out of it
-	mLocalBound.radius=-Math::ONE;
-}
-
-void ParticleNode::stopSimulating(){
-	mParticleSimulator=NULL;
-}
-
 void ParticleNode::logicUpdate(int dt){
 	super::logicUpdate(dt);
-
-	// TODO: Move this to a per-render-frame update
-	if(mParticleSimulator!=NULL){
-		if(mWorldSpace){
-			Math::mul(mWorldRenderTransform,mParent->getWorldRenderTransform(),mRenderTransform);
-			mParticleSimulator->updateParticles(dt,mWorldRenderTransform);
-		}
-		else{
-			mParticleSimulator->updateParticles(dt,mRenderTransform);
-		}
-		mUpdateParticles=true;
-	}
 
 	if(mDestroyNextLogicFrame){
 		destroy();
@@ -529,8 +494,6 @@ void ParticleNode::createVertexBuffer(){
 }
 
 void ParticleNode::updateVertexBuffer(const Matrix4x4 &viewTransform){
-	TOADLET_PROFILE_BEGINSECTION(ParticleNode::updateVertexBuffer);
-
 	int i=0,j=0;
 
 	Vector3 &viewUp=cache_updateVertexBuffer_viewUp.reset(),&viewRight=cache_updateVertexBuffer_viewRight.reset(),&viewForward=cache_updateVertexBuffer_viewForward.reset();
@@ -548,11 +511,6 @@ void ParticleNode::updateVertexBuffer(const Matrix4x4 &viewTransform){
 
 		if(mParticlesPerBeam<2){
 			int frameOffset=0,widthFrames=1,heightFrames=1;
-//			if(mTextureSection!=NULL){
-//				frameOffset=mTextureSection->getFrameOffset();
-//				widthFrames=mTextureSection->getWidthFrames();
-//				heightFrames=mTextureSection->getHeightFrames();
-//			}
 
 			for(i=mParticles.size()-1;i>=0;--i){
 				const Particle &p=mParticles[i];
@@ -894,8 +852,6 @@ void ParticleNode::updateVertexBuffer(const Matrix4x4 &viewTransform){
 
 		vba.unlock();
 	}
-
-	TOADLET_PROFILE_ENDSECTION(ParticleNode::updateVertexBuffer);
 }
 
 }

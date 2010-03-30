@@ -33,7 +33,7 @@
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/Renderable.h>
-#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/node/CameraAlignedNode.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -45,9 +45,9 @@ namespace node{
 //  the layout of a LabelNode or possibly size of a SpriteNode would be
 //  determined by the LocalBound, if it was externally set.
 
-class TOADLET_API LabelNode:public Node,public Renderable{
+class TOADLET_API LabelNode:public CameraAlignedNode,public Renderable{
 public:
-	TOADLET_NODE(LabelNode,Node);
+	TOADLET_NODE(LabelNode,CameraAlignedNode);
 
 	LabelNode();
 	virtual Node *create(Scene *scene);

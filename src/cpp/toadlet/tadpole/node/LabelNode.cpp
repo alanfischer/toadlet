@@ -47,7 +47,6 @@ LabelNode::LabelNode():super(),
 	mAlignment(0),
 	mNormalized(false),
 	mWordWrap(false)
-	//mSize,
 
 	//mMaterial,
 	//mVertexData,
@@ -57,8 +56,6 @@ LabelNode::LabelNode():super(),
 Node *LabelNode::create(Scene *scene){
 	super::create(scene);
 
-	setPerspective(true);
-	setCameraAligned(true);
 	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
 	setNormalized(true);
 	setWordWrap(false);

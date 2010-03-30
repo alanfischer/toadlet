@@ -22,7 +22,7 @@
  * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
  *
  ********** Copyright header - do not remove **********/
-
+#if 0
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/tadpole/plugins/hop/HopParticleSimulator.h>
@@ -146,11 +146,8 @@ void HopParticleSimulator::updateParticles(int dt,const Matrix4x4 &transform){
 	}
 
 	mSpawnExistingParticles=false;
-
-	if(allDead){
-		mParticleNode->destroyNextLogicFrame();
-	}
 }
 
 }
 }
+#endif
