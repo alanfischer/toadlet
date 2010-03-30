@@ -26,6 +26,8 @@
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <stdlib.h>
 
+using namespace toadlet::egg;
+
 namespace toadlet{
 namespace peeper{
 

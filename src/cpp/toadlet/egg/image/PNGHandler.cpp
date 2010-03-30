@@ -25,6 +25,7 @@
 
 #include <toadlet/egg/image/PNGHandler.h>
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Logger.h>
 #include <stdlib.h>
 extern "C"{
 	#include <png.h>
@@ -132,17 +133,8 @@ Image *PNGHandler::loadImage(Stream *stream){
 
 	Image *image=NULL;
 
-	if(color_type==PNG_COLOR_TYPE_GRAY){
-		image=new Image(Image::Dimension_D2,Image::Format_L_8,width,height);
-
-		byte *data=image->getData();
-
-		for(y=0;y<height;++y){
-			memcpy(data+width*y,row_pointers[y],width);
-		}
-	}
 	#if 0 // This code is removed until I have time to update it to all the non-depreciated & new trans stuff
-	else if(color_type==PNG_COLOR_TYPE_PALETTE){
+	if(color_type==PNG_COLOR_TYPE_PALETTE){
 		#define PNGHANDLER_GET_INDEX \
 			(row[x/a]>>((8-bit_depth)-bit_depth*(x%a)))&b
 
@@ -197,38 +189,35 @@ Image *PNGHandler::loadImage(Stream *stream){
 		}
 	}
 	#endif
-	else if(color_type==PNG_COLOR_TYPE_GRAY_ALPHA){
-		image=new Image(Image::Dimension_D2,Image::Format_LA_8,width,height);
-
-		byte *data=image->getData();
-
-		for(y=0;y<height;++y){
-			memcpy(data+width*2*y,row_pointers[y],width*2);
-		}
-	}
-	else if(color_type==PNG_COLOR_TYPE_RGB){
-		image=new Image(Image::Dimension_D2,Image::Format_RGB_8,width,height);
-
-		byte *data=image->getData();
-
-		for(y=0;y<height;++y){
-			memcpy(data+width*3*y,row_pointers[y],width*3);
-		}
-	}
-	else if(color_type==PNG_COLOR_TYPE_RGB_ALPHA){
-		image=new Image(Image::Dimension_D2,Image::Format_RGBA_8,width,height);
-
-		byte *data=image->getData();
-
-		for(y=0;y<height;++y){
-			memcpy(data+width*4*y,row_pointers[y],width*4);
-		}
-	}
-	else{
-		Error::loadingImage(Categories::TOADLET_EGG,
-			String("PNGHandler::loadImage: Unknown PNG type:")+color_type);
+	int format=0;
+	switch(color_type){
+		case(PNG_COLOR_TYPE_GRAY):
+			format=Image::Format_L_8;
+		break;
+		case(PNG_COLOR_TYPE_GRAY_ALPHA):
+			format=Image::Format_LA_8;
+		break;
+		case(PNG_COLOR_TYPE_RGB):
+			format=Image::Format_RGB_8;
+		break;
+		case(PNG_COLOR_TYPE_RGB_ALPHA):
+			format=Image::Format_RGBA_8;
+		break;
+		default:
+			png_destroy_read_struct(&png_ptr,&info_ptr,NULL);
+			Error::loadingImage(Categories::TOADLET_EGG,
+				String("PNGHandler::loadImage: Unknown PNG type:")+color_type);
+		break;
 	}
 
+	image=new Image(Image::Dimension_D2,format,width,height);
+	int bytewidth=width*image->getPixelSize();
+	byte *data=image->getData();
+	for(y=0;y<height;++y){
+		// Flip image in this copy
+		memcpy(data+bytewidth*(height-y-1),row_pointers[y],bytewidth);
+	}
+	
 	for(y=0;y<height;++y){
 		free(row_pointers[y]);
 	}

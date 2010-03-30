@@ -40,7 +40,7 @@ Image::Image(){
 	mData=NULL;
 }
 
-Image::Image(Dimension dimension,int format,unsigned int width,unsigned int height,unsigned int depth){
+Image::Image(Dimension dimension,int format,int width,int height,int depth){
 	mData=NULL;
 	reallocate(dimension,format,width,height,depth,true);
 }
@@ -68,7 +68,7 @@ Image *Image::clone(){
 	return image;
 }
 
-bool Image::reallocate(Dimension dimension,int format,unsigned int width,unsigned int height,unsigned int depth,bool clear){
+bool Image::reallocate(Dimension dimension,int format,int width,int height,int depth,bool clear){
 	if(mData){
 		delete[] mData;
 		mData=NULL;
@@ -118,7 +118,7 @@ bool Image::hasSameParametersAs(const Image *image) const{
 		mDepth==image->mDepth;
 }
 
-unsigned int Image::getPixelSize() const{
+int Image::getPixelSize() const{
 	return ImageFormatConversion::getPixelSize(mFormat);
 }
 
