@@ -32,9 +32,7 @@
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/Renderable.h>
-#include <toadlet/tadpole/animation/AnimationController.h>
-#include <toadlet/tadpole/animation/TextureStageAnimation.h>
-#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/node/CameraAlignedNode.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -42,30 +40,9 @@ namespace node{
 
 class Scene;
 
-class TOADLET_API SpriteNode:public Node,public Renderable{
+class TOADLET_API SpriteNode:public CameraAlignedNode,public Renderable{
 public:
-	TOADLET_NODE(SpriteNode,Node);
-
-	/// Specialization of the AnimationController that allows for easy access to playing sprites.
-	class TOADLET_API SpriteAnimationController:public animation::AnimationController{
-	public:
-		TOADLET_SHARED_POINTERS(SpriteAnimationController);
-
-		SpriteAnimationController(SpriteNode *node);
-
-		virtual void start();
-		virtual void stop();
-
-		virtual void logicUpdate(int dt);
-		// virtual void renderUpdate(int dt); // TODO
-
-		void materialChanged();
-
-	protected:
-		SpriteNode *mSpriteNode;
-		animation::TextureStageAnimation::ptr mAnimation;
-		int mStartingFrame;
-	};
+	TOADLET_NODE(SpriteNode,CameraAlignedNode);
 	
 	SpriteNode();
 	virtual Node *create(Scene *scene);
@@ -78,12 +55,9 @@ public:
 	void setAlignment(int alignment);
 	int getAlignment() const{return mAlignment;}
 
-	SpriteAnimationController::ptr getAnimationController();
-
-	void logicUpdate(int dt);
 	void renderUpdate(CameraNode *camera,RenderQueue *queue);
 	Material *getRenderMaterial() const{return mMaterial;}
-	const Matrix4x4 &getRenderTransform() const{return mWorldRenderTransform;}
+	const Matrix4x4 &getRenderTransform() const{return super::getWorldRenderTransform();}
 	void render(peeper::Renderer *renderer) const;
 
 	peeper::VertexBufferAccessor vba;
@@ -94,7 +68,6 @@ protected:
 	void updateSprite();
 
 	int mAlignment;
-	SpriteAnimationController::ptr mAnimationController;
 
 	Material::ptr mMaterial;
 	peeper::VertexData::ptr mVertexData;

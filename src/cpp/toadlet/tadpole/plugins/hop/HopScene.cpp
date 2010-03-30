@@ -32,7 +32,6 @@
 #include <toadlet/tadpole/node/SceneNode.h>
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
 #include <toadlet/tadpole/plugins/hop/HopEntity.h>
-#include <toadlet/tadpole/plugins/hop/HopParticleSimulator.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::hop;

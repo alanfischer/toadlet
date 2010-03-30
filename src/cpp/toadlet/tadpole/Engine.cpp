@@ -27,16 +27,24 @@
 // - clean up the aabox querying so its a lot easier to use
 // - Sprites and animated meshes need to if(no event frames){deactivate if not being looked at}
 
+// I REALLY NEED TO PLAY WITH THIS, IT WILL LET ME USE A THREADPOOL AND HAUL ASS THROUGH NODE UPDATES
+// In theory, each child of a parent node should be updated simultaniously
+// Meaning, a child can get the parent node's translate at any time & be correct.
+// But a child can not get a sisters or cousins translate at any time & be correct.
+//  So nodes should have 2 translates.  The immediate one and the public one.
+//  After a node is completely updated, then all public transforms are made to equal the immediate transforms.
+
 // - We want ONE transform per node.  Not a Logic & a Render transform.  Since there shouldn't be separate
 //		transforms per camera, or per rendering thread, or anything like that really.  The scene position is absolute.
+// - The node transform should also be buffered.  As in, the order of the nodes to a parent shouldn't affect what order they get updated.
+//		So we could have localTransform, and workingLocalTransform.  worldTransform and workingWorldTransform.
+//		When we're actually in an update, we would update the workingLocalTransform, and the... FINISH FIGURING THIS OUT
 // - Interpolation will be handled by some Interpolator which will do the actual HopEntity interpolation between frames,
 //		so we can still have just a Transform(world & local), and the localTransform will be modified by the Interpolator each renderFrame,
 //		until a logicFrame, at which point the interpolator should be at the exact position as the solid (or exactly 1 logic dt behind)
 // - There are two types of alignments.
 //		= Regular Alignments are in the scene, and would be a model pointing at something else, or a billboard pointing a certain direction.
-//			Regular Alignments are applied to the rotation of the node.
-//		= Camera Alignments are almost 'hacks' in a way, which exist to align certain nodes to the camera, something that should be done in a shader, but wasn't for some reason, or wasnt available.
-//			These are applied just at the render time, so you could have multiple cameras rendering a scene, and each object that is 'camera aligned' could be pointing at each camera correctly.
+//			Regular Alignments are applied to the rotation of the node.  THIS IS WHAT THE SQUIREL CAMERA IS
 // - Dependencies.
 //		These are used to get the proper regular alignments.  this is NOT QUITE FIGURED OUT.
 //		But basically, a scene-branch can be set to be dependent on another sister scene branch.

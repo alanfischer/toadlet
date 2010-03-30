@@ -126,18 +126,12 @@ public:
 	virtual void setName(const egg::String &name){mName=name;}
 	inline const egg::String &getName() const{return mName;}
 
-	virtual void setCameraAligned(bool aligned){mCameraAligned=aligned;}
-	inline bool getCameraAligned() const{return mCameraAligned;}
-
-	virtual void setPerspective(bool perspective){mPerspective=perspective;}
-	inline bool getPerspective() const{return mPerspective;}
-
 	virtual void setLocalBound(const Sphere &bound);
 	inline const Sphere &getLocalBound() const{return mLocalBound;}
 	inline const Sphere &getWorldBound() const{return mWorldBound;}
 
 	virtual void logicUpdate(int dt);
-	virtual void renderUpdate(CameraNode *camera,RenderQueue *queue);
+	virtual void renderUpdate(CameraNode *camera,RenderQueue *queue){}
 	virtual void updateLogicTransforms();
 	virtual void updateRenderTransforms();
 
@@ -238,8 +232,6 @@ protected:
 
 	int mScope;
 	egg::String mName;
-	bool mCameraAligned;
-	bool mPerspective;
 
 	bool mActive;
 	int mDeactivateCount;	
