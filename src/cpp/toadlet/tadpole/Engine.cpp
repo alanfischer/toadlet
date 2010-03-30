@@ -27,6 +27,21 @@
 // - clean up the aabox querying so its a lot easier to use
 // - Sprites and animated meshes need to if(no event frames){deactivate if not being looked at}
 
+// - We want ONE transform per node.  Not a Logic & a Render transform.  Since there shouldn't be separate
+//		transforms per camera, or per rendering thread, or anything like that really.  The scene position is absolute.
+// - Interpolation will be handled by some Interpolator which will do the actual HopEntity interpolation between frames,
+//		so we can still have just a Transform(world & local), and the localTransform will be modified by the Interpolator each renderFrame,
+//		until a logicFrame, at which point the interpolator should be at the exact position as the solid (or exactly 1 logic dt behind)
+// - There are two types of alignments.
+//		= Regular Alignments are in the scene, and would be a model pointing at something else, or a billboard pointing a certain direction.
+//			Regular Alignments are applied to the rotation of the node.
+//		= Camera Alignments are almost 'hacks' in a way, which exist to align certain nodes to the camera, something that should be done in a shader, but wasn't for some reason, or wasnt available.
+//			These are applied just at the render time, so you could have multiple cameras rendering a scene, and each object that is 'camera aligned' could be pointing at each camera correctly.
+// - Dependencies.
+//		These are used to get the proper regular alignments.  this is NOT QUITE FIGURED OUT.
+//		But basically, a scene-branch can be set to be dependent on another sister scene branch.
+//		Then the first branch will be updated before the dependent ones.
+
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/CapabilitySet.h>
