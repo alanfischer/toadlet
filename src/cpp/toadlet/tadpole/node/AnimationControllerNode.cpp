@@ -59,7 +59,6 @@ void AnimationControllerNode::destroy(){
 	if(mAnimationController!=NULL){
 		mAnimationController->setAnimationControllerFinishedListener(NULL,false);
 		mAnimationController=NULL;
-Logger::alert(String("DESTROYING:")+(int)this);
 	}
 
 	super::destroy();

@@ -66,7 +66,7 @@ String MathFormatter::formatVector2(const Vector2 &v,char *separator){
 }
 
 Vector2 &MathFormatter::parseVector2(Vector2 &r,const char *string){
-	char *parse=strchr((char*)string,',')!=NULL?"%f,%f":"%f %f";
+	const char *parse=strchr(string,',')!=NULL?"%f,%f":"%f %f";
 	float x=0,y=0;
 	sscanf(string,parse,&x,&y);
 	#if defined(TOADLET_FIXED_POINT)
@@ -86,7 +86,7 @@ String MathFormatter::formatVector3(const Vector3 &v,char *separator){
 }
 
 Vector3 &MathFormatter::parseVector3(Vector3 &r,const char *string){
-	char *parse=strchr((char*)string,',')!=NULL?"%f,%f,%f":"%f %f %f";
+	const char *parse=strchr(string,',')!=NULL?"%f,%f,%f":"%f %f %f";
 	float x=0,y=0,z=0;
 	sscanf(string,parse,&x,&y,&z);
 	#if defined(TOADLET_FIXED_POINT)
@@ -106,7 +106,7 @@ String MathFormatter::formatVector4(const Vector4 &v,char *separator){
 }
 
 Vector4 &MathFormatter::parseVector4(Vector4 &r,const char *string){
-	char *parse=strchr((char*)string,',')!=NULL?"%f,%f,%f,%f":"%f %f %f %f";
+	const char *parse=strchr(string,',')!=NULL?"%f,%f,%f,%f":"%f %f %f %f";
 	float x=0,y=0,z=0,w=0;
 	sscanf(string,parse,&x,&y,&z,&w);
 	#if defined(TOADLET_FIXED_POINT)
@@ -126,7 +126,7 @@ String MathFormatter::formatQuaternion(const Quaternion &q,char *separator){
 }
 
 Quaternion &MathFormatter::parseQuaternion(Quaternion &r,const char *string){
-	char *parse=strchr((char*)string,',')!=NULL?"%f,%f,%f,%f":"%f %f %f %f";
+	const char *parse=strchr(string,',')!=NULL?"%f,%f,%f,%f":"%f %f %f %f";
 	float x=0,y=0,z=0,w=0;
 	sscanf(string,parse,&x,&y,&z,&w);
 	#if defined(TOADLET_FIXED_POINT)
@@ -146,7 +146,7 @@ String MathFormatter::formatColor(const Color &c,char *separator){
 }
 
 Color &MathFormatter::parseColor(Color &r,const char *string){
-	char *parse=strchr((char*)string,',')!=NULL?"%f,%f,%f,%f":"%f %f %f %f";
+	const char *parse=strchr(string,',')!=NULL?"%f,%f,%f,%f":"%f %f %f %f";
 	float R=0,g=0,b=0,a=0;
 	sscanf(string,parse,&R,&g,&b,&a);
 	#if defined(TOADLET_FIXED_POINT)
@@ -163,7 +163,7 @@ String MathFormatter::formatByteColor(const Color &c,char *separator){
 }
 
 Color &MathFormatter::parseByteColor(Color &r,const char *string){
-	char *parse=strchr((char*)string,',')!=NULL?"%d,%d,%d,%d":"%d %d %d %d";
+	const char *parse=strchr(string,',')!=NULL?"%d,%d,%d,%d":"%d %d %d %d";
 	int R=0,g=0,b=0,a=0;
 	sscanf(string,parse,&R,&g,&b,&a);
 	r.r=Math::fromInt(R)/255;r.g=Math::fromInt(g)/255;r.b=Math::fromInt(b)/255;r.a=Math::fromInt(a)/255;

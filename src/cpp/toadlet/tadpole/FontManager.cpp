@@ -57,6 +57,8 @@ Font::ptr FontManager::getDefaultFont(){
 			TCHAR path[MAX_PATH];
 			SHGetSpecialFolderPath(0,path,CSIDL_FONTS,false);
 			file=path+String("\\Arial.ttf");
+		#elif defined(TOADLET_PLATFORM_POSIX)
+			file="/usr/share/fonts/TTF/DejaVuSerif.ttf";
 		#endif
 		mDefaultFont=findFont(file,24);
 	}

@@ -59,29 +59,29 @@ public:
 	TOADLET_SHARED_POINTERS(Image);
 
 	Image();
-	Image(Dimension dimension,int format,unsigned int width,unsigned int height=1,unsigned int depth=1);
+	Image(Dimension dimension,int format,int width,int height=1,int depth=1);
 
 	virtual ~Image();
 
 	Image *clone();
 
-	bool reallocate(Dimension dimension,int format,unsigned int width,unsigned int height=1,unsigned int depth=1,bool clear=true);
+	bool reallocate(Dimension dimension,int format,int width,int height=1,int depth=1,bool clear=true);
 	bool reallocate(const Image *image,bool clear);
 
 	bool hasSameParametersAs(const Image *image) const;
 
-	inline unsigned int getWidth() const{return mWidth;}
-	inline unsigned int getHeight() const{return mHeight;}
-	inline unsigned int getDepth() const{return mDepth;}
+	inline int getWidth() const{return mWidth;}
+	inline int getHeight() const{return mHeight;}
+	inline int getDepth() const{return mDepth;}
 
 	inline Dimension getDimension() const{return mDimension;}
 	inline int getFormat() const{return mFormat;}
 	inline byte *getData(){return mData;}
 	inline const byte *getData() const{return mData;}
 	
-	unsigned int getPixelSize() const;
+	int getPixelSize() const;
 
-	void getPixel(Pixel<uint8> &pixel,unsigned int x,unsigned int y=0,unsigned int z=0) const{
+	void getPixel(Pixel<uint8> &pixel,int x,int y=0,int z=0) const{
 		int o=((z*mHeight*mWidth)+(y*mWidth)+x);
 
 		switch(mFormat){
@@ -144,7 +144,7 @@ public:
 		}
 	}
 
-	void getPixel(Pixel<float> &pixel,unsigned int x,unsigned int y=0,unsigned int z=0) const{
+	void getPixel(Pixel<float> &pixel,int x,int y=0,int z=0) const{
 		int o=((z*mHeight*mWidth)+(y*mWidth)+x);
 
 		switch(mFormat){
@@ -177,7 +177,7 @@ public:
 		}
 	}
 
-	void setPixel(const Pixel<uint8> &pixel,unsigned int x,unsigned int y=0,unsigned int z=0){
+	void setPixel(const Pixel<uint8> &pixel,int x,int y=0,int z=0){
 		int o=((z*mHeight*mWidth)+(y*mWidth)+x);
 
 		switch(mFormat){
@@ -232,7 +232,7 @@ public:
 		}
 	}
 
-	void setPixel(const Pixel<float> &pixel,unsigned int x,unsigned int y=0,unsigned int z=0){
+	void setPixel(const Pixel<float> &pixel,int x,int y=0,int z=0){
 		int o=((z*mHeight*mWidth)+(y*mWidth)+x);
 
 		switch(mFormat){
@@ -268,7 +268,7 @@ public:
 protected:
 	Dimension mDimension;
 	int mFormat;
-	unsigned int mWidth,mHeight,mDepth;
+	int mWidth,mHeight,mDepth;
 	byte *mData;
 };
 
