@@ -59,7 +59,9 @@ Win32Player::Win32Player():
 	mWaveOut(NULL),
 	mNextSoundTime(0)
 {
-	mCapabilitySet.maxSources=waveOutGetNumDevs();
+	// Actually calling waveOutGetNumDevs here seems to hang the console window upon shutdown SOMETIMES, not always.
+	// So for now lets just leave it at one and look into this later.
+	mCapabilitySet.maxSources=1;//waveOutGetNumDevs();
 	mCapabilitySet.mimeTypes.add("audio/x-wav");
 }
 
