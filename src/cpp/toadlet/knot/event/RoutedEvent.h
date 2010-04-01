@@ -32,7 +32,7 @@ namespace toadlet{
 namespace knot{
 namespace event{
 
-// TODO: Replace IDs with an Address structure
+/// @todo: Replace IDs with an Address structure
 class RoutedEvent:public egg::Event{
 public:
 	TOADLET_SHARED_POINTERS(RoutedEvent);

@@ -250,7 +250,7 @@ int SynchronizedPeerEventConnection::update(){
 			}
 
 			// Package up and send pending event groups
-			mDataPacketOut->writeBigInt32(frame-mFrameGroupSize+1); // TODO: extra, can be calculated & removed?
+			mDataPacketOut->writeBigInt32(frame-mFrameGroupSize+1); /// @todo: extra, can be calculated & removed?
 			mDataPacketOut->writeUInt8(mFrameGroupSize);
 			for(j=0;j<mFrameGroupSize;++j){
 				EventGroup::ptr events=mLocalEventGroups[frameAdvance-mFrameGroupSize+1+j];

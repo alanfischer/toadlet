@@ -43,7 +43,7 @@ XMATHandler::XMATHandler(MaterialManager *materialManager,TextureManager *textur
 Resource::ptr XMATHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
 	Material::ptr material=NULL;
 
-	// TODO: Replace the following when mxml implements custom load/save callbacks
+	/// @todo: Replace the following when mxml implements custom load/save callbacks
 	char buffer[1025];
 	int amount=0;
 	String string;

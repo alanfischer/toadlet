@@ -51,7 +51,7 @@ public:
 
 		Vector3 translate;
 		Quaternion rotate;
-		Vector3 scale; // TODO: Implement bone scaling
+		Vector3 scale; /// @todo: Implement bone scaling
 
 		Vector3 worldToBoneTranslate;
 		Quaternion worldToBoneRotate;

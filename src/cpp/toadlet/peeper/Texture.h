@@ -67,7 +67,7 @@ public:
 	virtual int getNumMipLevels() const=0;
 	virtual scalar getLength() const=0;
 
-	// TODO: Perhaps the whole frame portion of getRootTexture could be combined with this mipsurface thing somehow
+	/// @todo: Perhaps the whole frame portion of getRootTexture could be combined with this mipsurface thing somehow
 	//  Where Textures would just have SubTextures, which would be the surfaces perhaps?
 	virtual Surface::ptr getMipSurface(int i,int cubeSide)=0;
 	virtual bool load(int format,int width,int height,int depth,int mipLevel,uint8 *data)=0;

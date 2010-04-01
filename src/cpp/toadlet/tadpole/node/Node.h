@@ -148,7 +148,7 @@ public:
 	inline void internal_setManaged(bool managed){mManaged=managed;}
 	inline bool internal_getManaged() const{return mManaged;}
 
-	// TODO: Make a SphereBound class, and have it contain these methods
+	/// @todo: Make a SphereBound class, and have it contain these methods
 	// Not in Math currently, because its not technically correct, a Matrix*Sphere=Eplisoid
 	static void mul(Sphere &r,const Matrix4x4 &m,const Sphere &s){
 		Math::mul(r.origin.set(s.radius,s.radius,s.radius),m);
@@ -236,7 +236,7 @@ protected:
 	bool mActive;
 	int mDeactivateCount;	
 
-	Matrix4x4 mRenderTransform; // TODO: See if this could be removed, and instead be replaced with building the worldRenderTransform as parent->worldRenderTransform*translate*rotate*scale
+	Matrix4x4 mRenderTransform; /// @todo: See if this could be removed, and instead be replaced with building the worldRenderTransform as parent->worldRenderTransform*translate*rotate*scale
 	Matrix4x4 mWorldRenderTransform;
 
 	Vector3 cache_setRotate_vector;

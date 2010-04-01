@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-// OVERALL TODO:
+/// @todo: OVERALL
 // - clean up the aabox querying so its a lot easier to use
 // - Sprites and animated meshes need to if(no event frames){deactivate if not being looked at}
 
@@ -398,7 +398,7 @@ void Engine::registerNodeType(const BaseType<Node> &type){
 	mNodeFactory.registerType(type);
 }
 
-// TODO: Use a pool for these entities
+/// @todo: Use a pool for these entities
 Node *Engine::allocNode(const BaseType<Node> &type){
 	Logger::excess(Categories::TOADLET_TADPOLE,String("Allocating: ")+type.getFullName());
 

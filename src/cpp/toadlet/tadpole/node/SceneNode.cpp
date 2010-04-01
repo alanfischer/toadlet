@@ -299,7 +299,7 @@ void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
 
 	camera->updateViewTransform();
 
-	// TODO: I'd like to be able to update this differently, so i'm not touching rendTransform in render.
+	/// @todo: I'd like to be able to update this differently, so i'm not touching rendTransform in render.
 	//  Actually, mRenderTransform, shouldn't be called that.  Since its updated in logic!@
 	Math::setMatrix4x4FromTranslate(mBackground->mRenderTransform,camera->getWorldRenderTranslate());
 

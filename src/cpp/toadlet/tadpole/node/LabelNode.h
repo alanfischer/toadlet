@@ -39,7 +39,7 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-// TODO: Look more into letting the nodes be used for 2D widget layouts.
+/// @todo: Look more into letting the nodes be used for 2D widget layouts.
 //  Originally we had the Sizeable interface for this, but it was removed
 //  in favor of eventually letting us set the LocalBound as a AABox, then
 //  the layout of a LabelNode or possibly size of a SpriteNode would be

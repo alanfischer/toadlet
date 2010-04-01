@@ -32,7 +32,7 @@ namespace toadlet{
 namespace egg{
 namespace io{
 
-// TODO: Ideally the zlib usage would be replaced with zziplib, but zziplib does not support writing
+/// @todo: Ideally the zlib usage would be replaced with zziplib, but zziplib does not support writing
 class TOADLET_API ZIPStream:public Stream{
 public:
 	TOADLET_SHARED_POINTERS(ZIPStream);

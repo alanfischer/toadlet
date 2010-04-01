@@ -47,7 +47,7 @@ Node *AnimationControllerNode::create(Scene *scene){
 
 	mStartingFrame=0;
 	mDestroyOnFinish=false;
-	mDeactivateCount=-1; // TODO: HACK
+	mDeactivateCount=-1; /// @todo: HACK
 
 	mAnimationController=AnimationController::ptr(new AnimationController());
 	mAnimationController->setAnimationControllerFinishedListener(this,false);

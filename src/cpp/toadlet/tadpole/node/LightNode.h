@@ -35,7 +35,7 @@ namespace node{
 
 class Scene;
 
-// TODO: Add proper world position & direction updating of the Light, same with AudioNode
+/// @todo: Add proper world position & direction updating of the Light, same with AudioNode
 class TOADLET_API LightNode:public Node{
 public:
 	TOADLET_NODE(LightNode,Node);

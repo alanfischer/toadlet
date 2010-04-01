@@ -772,7 +772,7 @@ void GLRenderer::setDefaultStates(){
 		}
 		#endif
 
-		// TODO: Change the texture loading to agree with this?
+		/// @todo: Change the texture loading to agree with this?
 		glPixelStorei(GL_PACK_ALIGNMENT,1);
 		glPixelStorei(GL_UNPACK_ALIGNMENT,1);
 	}
@@ -1006,7 +1006,7 @@ void GLRenderer::setNormalize(const Normalize &normalize){
 }
 
 void GLRenderer::setDepthBias(scalar constant,scalar slope){
-	// TODO: We may need to scale these to be more in tune with the Direct3D ones
+	/// @todo: We may need to scale these to be more in tune with the Direct3D ones
 
 	if(constant!=0 && slope!=0){
 		#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
@@ -1650,8 +1650,8 @@ GLenum GLRenderer::getGLDataType(int format){
 
 GLuint GLClientStates[6]={
 	GL_VERTEX_ARRAY,
-	0, // Blend Weights - TODO
-	0, // Blend Indices - TODO
+	0, /// @todo: Blend Weights
+	0, /// @todo: Blend Indices
 	GL_NORMAL_ARRAY,
 	GL_COLOR_ARRAY,
 	#if defined(TOADLET_HAS_GLEW)

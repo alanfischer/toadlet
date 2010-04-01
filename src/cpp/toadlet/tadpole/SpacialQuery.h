@@ -33,7 +33,7 @@
 namespace toadlet{
 namespace tadpole{
 
-// TODO: The SpacialQuery structure really needs to be refactored
+/// @todo: The SpacialQuery structure really needs to be refactored
 class TOADLET_API SpacialQuery:public peeper::Query{
 public:
 	TOADLET_SHARED_POINTERS(SpacialQuery);

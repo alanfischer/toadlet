@@ -340,7 +340,7 @@ void HopEntity::updateRenderTransforms(){
 	bool active=mSolid->active();
 	bool activePrevious=mActivePrevious;
 	if(active || activePrevious){
-		// TODO: Add an option to either use strict interpolation, or fuzzy interpolation
+		/// @todo: Add an option to either use strict interpolation, or fuzzy interpolation
 		// If we are deactivating, then make sure we are at our rest point
 #if 1
 		if(active==false && activePrevious){
@@ -350,7 +350,7 @@ void HopEntity::updateRenderTransforms(){
 			interpolatePhysicalParameters(f);
 		}
 #elif 0
-		// TODO: This needs to be based on the logicFraction SOMEHOW,otherwise the result of calling this method multiple timer per frame will be bad
+		/// @todo: This needs to be based on the logicFraction SOMEHOW,otherwise the result of calling this method multiple timer per frame will be bad
 
 		Vector3 last;Math::setTranslateFromMatrix4x4(last,entity->getRenderTransform());
 		Vector3 translate;Math::lerp(translate,last,entity->getTranslate(),0.3);
@@ -431,7 +431,7 @@ void HopEntity::showCollisionVolumes(bool show){
 				}break;
 			}
 
-			// TODO: Use LINES for bounding volumes
+			/// @todo: Use LINES for bounding volumes
 			IndexBuffer::ptr indexBuffer=mesh->subMeshes[0]->indexData->indexBuffer;
 			mesh->subMeshes[0]->indexData->setIndexBuffer(NULL);
 			mesh->subMeshes[0]->indexData->destroy();

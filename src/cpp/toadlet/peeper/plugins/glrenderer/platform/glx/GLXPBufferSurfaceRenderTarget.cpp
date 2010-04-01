@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-// TODO: This needs to be run through and tested thoroughly, plus remove the SGIX stuff in favor of EXT
+/// @todo: This needs to be run through and tested thoroughly, plus remove the SGIX stuff in favor of EXT
  
 #include "GLXPBufferSurfaceRenderTarget.h"
 #include "../../GLRenderer.h"

@@ -116,7 +116,7 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr ver
 		mBacking=true;
 	}
 
-	// TODO: This will be converted to a a GLVertexFormat type
+	/// @todo: This will be converted to a a GLVertexFormat type
 	int numVertexElements=mVertexFormat->vertexElements.size();
 	mElementTypes.resize(numVertexElements);
 	mElementCounts.resize(numVertexElements);

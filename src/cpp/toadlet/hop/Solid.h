@@ -102,7 +102,7 @@ public:
 	inline const AABox &getLocalBound() const{return mLocalBound;}
 	inline const AABox &getWorldBound() const{return mWorldBound;}
 
-	// TODO: Fix touching when manually running the simulation, like we do in networking.
+	/// @todo: Fix touching when manually running the simulation, like we do in networking.
 	//  I'm not sure how this will be done quite yet, but we'll figure something out.
 	Solid *getTouching() const{return mTouching;}
 	const Vector3 &getTouchingNormal() const{return mTouchingNormal;}

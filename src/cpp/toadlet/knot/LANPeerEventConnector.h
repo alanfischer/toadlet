@@ -40,9 +40,9 @@ namespace knot{
 
 // This is a class that can be used to easily set up a peer to peer game over a LAN, with one client randomly being the primary one.
 
-// TODO: This class can be separated out to base PeerEventConnector, which will contain the Events & connected(), and then specialize it for BluetoothPeerConnector, LANPeerConnector, etc
+/// @todo: This class can be separated out to base PeerEventConnector, which will contain the Events & connected(), and then specialize it for BluetoothPeerConnector, LANPeerConnector, etc
 
-// TODO: The LANPeerConnector could really just be a LANConnector, and would do broadcasting, and generate client/server connections.  Then we would have a PeerNegotiator, which would take connections, and do the whole "send events and see who is server" thing, and return a PeerEventSynchronizer.
+/// @todo: The LANPeerConnector could really just be a LANConnector, and would do broadcasting, and generate client/server connections.  Then we would have a PeerNegotiator, which would take connections, and do the whole "send events and see who is server" thing, and return a PeerEventSynchronizer.
 //  That would let us re-use the LANConnector in the server stuff to automatically find a server on the LAN
 class TOADLET_API LANPeerEventConnector:public Connector,public egg::EventFactory{
 public:
@@ -60,7 +60,6 @@ public:
 	LANPeerEventConnector();
 	virtual ~LANPeerEventConnector();
 
-	// TODO: Replace int uuid with an actual UUID class
 	bool create(bool udp,int broadcastPort,int serverPort,const egg::String &uuid,int version,EventFactory *factory);
 
 	bool opened(){return mConnection!=NULL;}

@@ -543,7 +543,7 @@ void LANPeerEventConnector::connected(Connection::ptr connection){
 		// Now that we have sent the proper connection messages
 		eventConnection->reset(4,1);
 
-		// TODO: Add a disconnected & dataReady notification to the listeners
+		/// @todo: Add a disconnected & dataReady notification to the listeners
 		mListenersMutex.lock();
 			for(i=0;i<mListeners.size();++i){
 				mListeners[i]->connected(connection);

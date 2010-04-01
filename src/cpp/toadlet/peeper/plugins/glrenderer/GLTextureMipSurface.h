@@ -58,7 +58,7 @@ public:
 	GLuint getHandle() const;
 	GLuint getTarget() const;
 
-	// TODO: Implement these
+	/// @todo: Implement these
 	virtual int getUsageFlags() const{return 0;}
 	virtual AccessType getAccessType() const{return AccessType_NO_ACCESS;}
 	virtual int getDataSize() const{return 0;}
