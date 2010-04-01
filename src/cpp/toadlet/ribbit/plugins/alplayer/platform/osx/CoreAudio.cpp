@@ -137,7 +137,7 @@ bool CoreAudio::getPlaying() const{
 }
 
 bool CoreAudio::getFinished() const{
-	return false; // TODO FINISH ME
+	return false; /// @todo FINISH ME
 }
 
 void CoreAudio::setGain(scalar gain){
@@ -341,7 +341,7 @@ bool CoreAudio::setupQueue(){
 		}
 	}
 
-	// TODO: Why is this commented out?
+	/// @todo: Why is this commented out?
 //	result=AudioQueueAddPropertyListener(mAudioQueue,kAudioQueueProperty_IsRunning,queueStopped,this);
 //	if(result!=0){
 //		Error::unknown(Logger::TOADLET_RIBBIT,
@@ -372,7 +372,7 @@ bool CoreAudio::setupBuffers(){
 	UInt32 bufferByteSize=0;
 	calculateBytesForTime(mStream->getStreamDescription(),maxPacketSize,0.5/*seconds*/,&bufferByteSize,(UInt32*)&mNumPacketsToRead);
 
-	// TODO: Why is this all commented out?
+	/// @todo: Why is this all commented out?
 	// if the file is smaller than the capacity of all the buffer queues, always load it at once
 //	if((bufferByteSize*numBuffersToQueue)>mFileDataSize){
 //		mLoadAtOnce=true;
@@ -411,7 +411,7 @@ bool CoreAudio::setupBuffers(){
 		}
 
 		queueCallback(this,mAudioQueue,mBuffers[i]);
-		// TODO: Why is this commented out?
+		/// @todo: Why is this commented out?
 //		if(mLoadAtOnce){
 //			mFileDataInQueue=true;
 //		}

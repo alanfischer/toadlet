@@ -47,7 +47,7 @@ MMSHHandler::MMSHHandler(Engine *engine){
 	mEngine=engine;
 }
 
-// TODO: Calculate a boundingRadius for the Mesh
+/// @todo: Calculate a boundingRadius for the Mesh
 Resource::ptr MMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
 	DataStream::ptr dataStream(new DataStream(stream));
 

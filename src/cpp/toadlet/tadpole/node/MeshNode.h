@@ -41,14 +41,14 @@ namespace node{
 
 class Scene;
 
-// TODO: Make MeshNode a ParentNode, and integrate the SkeletonParentNode into this
-// TODO: Maybe rework how the animation framework ties into non-parent nodes.
+/// @todo: Make MeshNode a ParentNode, and integrate the SkeletonParentNode into this
+/// @todo: Maybe rework how the animation framework ties into non-parent nodes.
 //  It would be handy to have the MeshNode & SpriteNode be able to have their dedicated controllers without the support work of
 //   setting the Node to receive callbacks etc.
 //  Another nice feature would be the ability for Animations to be run by a Thread pool, so a central AnimationManager would take
 //   care of the updating.  But perhaps this would be better suited by having Nodes update their Animations as we do now, and then the
 //   whole scenegraph be updated by a ThreadPool, taking into account dependencies
-// TODO: Also we need a way to determine "velocity" from an animation bone, and then remove that bone from the effect.
+/// @todo: Also we need a way to determine "velocity" from an animation bone, and then remove that bone from the effect.
 //	That way we can embed "running" into an animation, and then extract the information from the animation and apply it to a solid.
 class TOADLET_API MeshNode:public Node{
 public:

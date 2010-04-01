@@ -31,7 +31,7 @@
 namespace toadlet{
 namespace egg{
 
-// TODO: Perhaps we could replace this Factory interface with some clever use of the Type system, like we did with Entities
+/// @todo: Perhaps we could replace this Factory interface with some clever use of the Type system, like we did with Entities
 class EventFactory{
 public:
 	virtual ~EventFactory(){}

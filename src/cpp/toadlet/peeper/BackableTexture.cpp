@@ -93,7 +93,7 @@ void BackableTexture::destroy(){
 	}
 }
 
-// TODO: This should return a BackableSurface, which will be able to change surface pointers
+/// @todo: This should return a BackableSurface, which will be able to change surface pointers
 Surface::ptr BackableTexture::getMipSurface(int level,int cubeSide){
 	return mBack->getMipSurface(level,cubeSide);
 }
@@ -103,7 +103,7 @@ bool BackableTexture::load(int format,int width,int height,int depth,int mipLeve
 		return mBack->load(format,width,height,depth,mipLevel,data);
 	}
 	else{
-		// TODO: This should modify the data to fit into our buffer
+		/// @todo: This should modify the data to fit into our buffer
 		if(mipLevel==0){
 			memcpy(mData,data,mDataSize);
 			return true;
@@ -119,7 +119,7 @@ bool BackableTexture::read(int format,int width,int height,int depth,int mipLeve
 		return mBack->read(format,width,height,depth,mipLevel,data);
 	}
 	else{
-		// TODO: This should modify the data to fit into our buffer
+		/// @todo: This should modify the data to fit into our buffer
 		if(mipLevel==0){
 			memcpy(data,mData,mDataSize);
 			return true;

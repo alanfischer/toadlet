@@ -57,7 +57,7 @@ public:
 			peeper::SequenceTexture::ptr sequence(new peeper::SequenceTexture(peeper::Texture::Dimension_D2,images.size()));
 			int i;
 			for(i=0;i<images.size();++i){
-				// TODO: Add in timing information
+				/// @todo: Add in timing information
 				sequence->setTexture(i,mTextureManager->createTexture(egg::image::Image::ptr(images[i])),Math::fromMilli(delays[i]));
 			}
 			return egg::shared_static_cast<peeper::Texture>(sequence);

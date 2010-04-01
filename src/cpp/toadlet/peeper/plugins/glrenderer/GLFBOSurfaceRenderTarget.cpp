@@ -130,7 +130,7 @@ bool GLFBOSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment
 		mHeight=textureSurface->getHeight();
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER,getGLAttachment(attachment),target,handle,level);
-		// TODO: Figure out EXACTLY when we need these and when we dont, I think we just need them if its ONLY a SHADOWMAP
+		/// @todo: Figure out EXACTLY when we need these and when we dont, I think we just need them if its ONLY a SHADOWMAP
 		#if !defined(TOADLET_HAS_GLES)
 			//glDrawBuffer(GL_NONE);
 			//glReadBuffer(GL_NONE);
@@ -193,7 +193,7 @@ bool GLFBOSurfaceRenderTarget::remove(Surface::ptr surface){
 	return true;
 }
 
-// TODO: Make it check to see if a pre-existing self-created depth surface is compatible, and if not, destroy & recreate it
+/// @todo: Make it check to see if a pre-existing self-created depth surface is compatible, and if not, destroy & recreate it
 bool GLFBOSurfaceRenderTarget::compile(){
 	Surface::ptr depth;
 	Surface::ptr color;

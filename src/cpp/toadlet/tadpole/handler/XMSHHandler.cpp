@@ -45,7 +45,7 @@ XMSHHandler::XMSHHandler(BufferManager *bufferManager,MaterialManager *materialM
 Resource::ptr XMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
 	Mesh::ptr mesh;
 
-	// TODO: Replace the following when mxml implements custom load/save callbacks
+	/// @todo: Replace the following when mxml implements custom load/save callbacks
 	char buffer[1025];
 	int amount=0;
 	String string;

@@ -76,7 +76,7 @@ void MeshNode::MeshAnimationController::start(){
 		stop();
 	}
 
-	// TODO: hacky hack
+	/// @todo: hacky hack
 	mMeshNode->mDeactivateCount=-1;
 
 	AnimationController::start();
@@ -90,7 +90,7 @@ void MeshNode::MeshAnimationController::stop(){
 		return;
 	}
 
-	// TODO: hacky hack
+	/// @todo: hacky hack
 	mMeshNode->mDeactivateCount=0;
 
 	AnimationController::stop();
@@ -99,7 +99,7 @@ void MeshNode::MeshAnimationController::stop(){
 void MeshNode::MeshAnimationController::logicUpdate(int dt){
 	if(mStartingFrame!=mMeshNode->getScene()->getLogicFrame()){
 		AnimationController::logicUpdate(dt);
-		AnimationController::renderUpdate(dt); // TODO: Move me!
+		AnimationController::renderUpdate(dt); /// @todo: Move me!
 	}
 }
 
@@ -243,14 +243,14 @@ void MeshNode::logicUpdate(int dt){
 
 	if(mAnimationController!=NULL){
 		mAnimationController->logicUpdate(dt);
-		mAnimationController->renderUpdate(dt); //TODO: shouldn't be here!
+		mAnimationController->renderUpdate(dt); /// @todo: shouldn't be here!
 	}
 }
 
 void MeshNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
 	super::renderUpdate(camera,queue);
 
-	// TODO: Remove this scale system?  or do we need to leave it in for fixed point support?
+	/// @todo: Remove this scale system?  or do we need to leave it in for fixed point support?
 	if(mMesh!=NULL && mMesh->worldScale!=Math::ONE){
 		mWorldRenderTransform.reset();
 		mWorldRenderTransform.setAt(0,0,mMesh->worldScale);
@@ -262,7 +262,7 @@ void MeshNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
 
 	if(mSkeleton!=NULL){
 		int lastRenderUpdateFrame=mSkeleton->getLastRenderUpdateFrame();
-// TODO: For shared skeletons & rendering
+/// @todo: For shared skeletons & rendering
 //		if(lastRenderUpdateFrame==-1 || lastRenderUpdateFrame==queue->getRenderFrame()){
 			updateVertexBuffer();
 //		}
@@ -327,7 +327,7 @@ void MeshNode::updateVertexBuffer(){
 
 					const Mesh::VertexBoneAssignmentList &vba=mMesh->vertexBoneAssignments[i];
 					if(vba.size()>0){
-						MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(mMesh->vertexBoneAssignments[i][0].bone); // TODO: Implement all bones
+						MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(mMesh->vertexBoneAssignments[i][0].bone); /// @todo: Implement all bones
 
 						Math::mul(positionVector,bone->boneSpaceRotate);
 						Math::add(positionVector,bone->boneSpaceTranslate);
@@ -345,7 +345,7 @@ void MeshNode::updateVertexBuffer(){
 
 					const Mesh::VertexBoneAssignmentList &vba=mMesh->vertexBoneAssignments[i];
 					if(vba.size()>0){
-						MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(mMesh->vertexBoneAssignments[i][0].bone); // TODO: Implement all bones
+						MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(mMesh->vertexBoneAssignments[i][0].bone); /// @todo: Implement all bones
 
 						Math::mul(positionVector,bone->boneSpaceRotate);
 						Math::add(positionVector,bone->boneSpaceTranslate);

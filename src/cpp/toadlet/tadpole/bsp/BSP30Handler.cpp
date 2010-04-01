@@ -255,7 +255,7 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 	vertexFormat->addVertexElement(VertexElement(VertexElement::Type_TEX_COORD_2,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_2));
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,map->nsurfedges);
 
-	// TODO: Figure out maximum required size, or allow multiple images
+	/// @todo: Figure out maximum required size, or allow multiple images
 	Image::ptr lightmapImage(new Image(Image::Dimension_D2,Image::Format_RGB_8,1024,1024,0));//2048,2048,0));
 	PixelPacker packer(lightmapImage->getData(),lightmapImage->getFormat(),lightmapImage->getWidth(),lightmapImage->getHeight());
 
@@ -356,10 +356,10 @@ void BSP30Handler::buildMaterials(BSP30Map *map){
 		TextureStage::ptr primary=mEngine->getMaterialManager()->createTextureStage(map->parsedTextures[i]);
 		material->setTextureStage(0,primary);
 
-		TextureStage::ptr secondary=mEngine->getMaterialManager()->createTextureStage(map->lightmap);
-		secondary->setTexCoordIndex(1);
-		secondary->setBlend(TextureBlend(TextureBlend::Operation_MODULATE,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
-		material->setTextureStage(1,secondary);
+//		TextureStage::ptr secondary=mEngine->getMaterialManager()->createTextureStage(map->lightmap);
+//		secondary->setTexCoordIndex(1);
+//		secondary->setBlend(TextureBlend(TextureBlend::Operation_MODULATE,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
+//		material->setTextureStage(1,secondary);
 
 		map->materials[i]=material;
 	}

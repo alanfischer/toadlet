@@ -116,7 +116,7 @@ Resource::ptr Win32FontHandler::load(Stream::ptr stream,const ResourceHandlerDat
 		DWORD amount=0;
 		HANDLE handle=AddFontMemResourceEx(memoryStream->getOriginalDataPointer(),memoryStream->length(),0,&amount);
 	#else
-		// TODO: Implement this
+		/// @todo: Implement this
 	#endif
 
 	LOGFONT logFont={0};

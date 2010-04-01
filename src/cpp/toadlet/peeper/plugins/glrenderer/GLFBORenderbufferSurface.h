@@ -54,7 +54,7 @@ public:
 	virtual int getHeight() const{return mHeight;}
 	inline GLuint getHandle() const{return mHandle;}
 
-	// TODO: Implement these
+	/// @todo: Implement these
 	virtual int getUsageFlags() const{return 0;}
 	virtual AccessType getAccessType() const{return AccessType_NO_ACCESS;}
 	virtual int getDataSize() const{return 0;}

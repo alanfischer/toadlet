@@ -36,7 +36,7 @@ bool XMLParticleHandler::loadParticleFile(egg::Collection<Vector3> &points,Input
 		return false;
 	}
 
-	// TODO: Replace the following when mxml implements custom load/save callbacks
+	/// @todo: Replace the following when mxml implements custom load/save callbacks
 	char buffer[1025];
 	int amount=0;
 	String string;

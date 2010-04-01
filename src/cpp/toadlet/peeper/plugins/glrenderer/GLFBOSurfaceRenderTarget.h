@@ -35,7 +35,7 @@ namespace peeper{
 
 class GLRenderer;
 
-// TODO: Make the D3D9SurfaceRenderTarget & the GLFBOSurfaceRenderTarget more strict about Surface sizes,
+/// @todo: Make the D3D9SurfaceRenderTarget & the GLFBOSurfaceRenderTarget more strict about Surface sizes,
 //  and smarter about destroying their temporary depth buffer when not needed
 class TOADLET_API GLFBOSurfaceRenderTarget:public GLRenderTarget,public SurfaceRenderTarget{
 public:

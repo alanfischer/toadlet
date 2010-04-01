@@ -67,7 +67,7 @@ int glesem_toChar(glesem_Char *dest,const char *src,int length){
 }
 
 int glesem_pathJoin(glesem_Char *dest,const glesem_Char *p1,const glesem_Char *p2,int length){
-	/// @todo  Make this truely length aware, not just sorta-kinda like it is now
+	/// @todo: Make this truely length aware, not just sorta-kinda like it is now
 	length--; // For the /
 	while((*dest++=*p1++)!=0 && (length--)>0);
 	*(dest-1)='/';

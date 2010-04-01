@@ -61,13 +61,14 @@ Texture::ptr TextureManager::createTexture(const Image::ptr &image,int usageFlag
 
 		scaledImage=Image::ptr(new Image(dimension,format,dwidth,dheight,ddepth));
 
-		// TODO: Add depth
 		Pixel<uint8> pixel;
-		int x,y;
-		for(y=0;y<dheight;y++){
-			for(x=0;x<dwidth;x++){
-				image->getPixel(pixel,x*width/dwidth,y*height/dheight);
-				scaledImage->setPixel(pixel,x,y);
+		int x,y,z;
+		for(z=0;z<ddepth;++z){
+			for(y=0;y<dheight;++y){
+				for(x=0;x<dwidth;++x){
+					image->getPixel(pixel,x*width/dwidth,y*height/dheight,z*depth/ddepth);
+					scaledImage->setPixel(pixel,x,y,z);
+				}
 			}
 		}
 
@@ -116,18 +117,19 @@ Texture::ptr TextureManager::createTexture(const Image::ptr &image,int usageFlag
 		int hwidth=width,hheight=height,hdepth=depth;
 		int i;
 		for(i=1;i<mipLevels;++i){
-			hwidth/=2; hheight/=2;
-			int xoff=width/(hwidth+1),yoff=height/(hheight+1);
+			hwidth/=2; hheight/=2; hdepth/=2;
+			int xoff=width/(hwidth+1),yoff=height/(hheight+1),zoff=depth/(hdepth+1);
 
 			Image::ptr mipImage(new Image(dimension,format,hwidth,hheight,hdepth));
 
-			// TODO: Add depth
 			Pixel<uint8> pixel;
-			int x,y;
-			for(y=0;y<hheight;++y){
-				for(x=0;x<hwidth;++x){
-					image->getPixel(pixel,xoff+x*(1<<i),yoff+y*(1<<i));
-					mipImage->setPixel(pixel,x,y);
+			int x,y,z;
+			for(z=0;z<hdepth;++z){
+				for(y=0;y<hheight;++y){
+					for(x=0;x<hwidth;++x){
+						image->getPixel(pixel,xoff+x*(1<<i),yoff+y*(1<<i),zoff+z*(1<<i));
+						mipImage->setPixel(pixel,x,y,z);
+					}
 				}
 			}
 
@@ -173,7 +175,7 @@ Image::ptr TextureManager::createImage(Texture *texture){
 }
 
 SurfaceRenderTarget::ptr TextureManager::createSurfaceRenderTarget(){
-	// TODO: Make this use a BackableSufaceRenderTarget
+	/// @todo: Make this use a BackableSufaceRenderTarget
 	if(mEngine->getRenderer()!=NULL){
 		SurfaceRenderTarget::ptr back(mEngine->getRenderer()->createSurfaceRenderTarget());
 		if(back!=NULL){

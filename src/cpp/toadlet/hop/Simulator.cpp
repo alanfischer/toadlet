@@ -473,7 +473,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 				}
 				hitSolid=c.collider;
 
-				// TODO: We need to add a flag to regather possible solids if this callback is performed
+				/// @todo: We need to add a flag to regather possible solids if this callback is performed
 				bool responded=false;
 				if(solid->mDoUpdateCallback){
 					responded=(solid->mManager!=NULL?solid->mManager:mManager)->collisionResponse(solid,oldPosition,leftOver,c);
@@ -873,8 +873,7 @@ void Simulator::testSolid(Collision &result,Solid *solid1,const Segment &segment
 				traceAABox(collision,segment,box);
 			}
 			else if(shape1->mType==Shape::Type_AABOX && shape2->mType==Shape::Type_CONVEXSOLID){
-				//TODO: Create a specialized "super solid" by only bumping out plane normal components in the
-				// directions/sizes of the AABOX's
+				/// @todo: Create a specialized "super solid" by only bumping out plane normal components in the directions/sizes of the AABOX's
 				//traceConvexSolid(collision,segment,convexsolid);
 			}
 			// Sphere collisions
@@ -1328,8 +1327,7 @@ void Simulator::traceConvexSolid(Collision &c,const Segment &segment,const Conve
 
 			// Now check to see if this intersection point falls within the bounds of this planar face
 			// by checking it against all other planes, and seeing if dot(u-planepoint,planenormal)<0
-			// TODO: We could save some time here by precomputing "next door" surfaces for each surface, to
-			// cut down on the number of checks made
+			/// @todo: We could save some time here by precomputing "next door" surfaces for each surface, to cut down on the number of checks made
 			b=true;
 			for(j=0;j<convexSolid.planes.size();++j){
 				if(i==j) continue;

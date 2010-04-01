@@ -49,7 +49,7 @@ void RenderQueue::queueRenderable(Renderable *renderable){
 }
 
 void RenderQueue::queueLight(node::LightNode *light){
-	// TODO: Find best light
+	/// @todo: Find best light
 	mLight=light;
 }
 

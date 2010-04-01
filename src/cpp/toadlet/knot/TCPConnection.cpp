@@ -374,7 +374,7 @@ void TCPConnection::setConnectionListener(TCPConnector *listener){
 	mConnectionListener=listener;
 }
 
-// TODO: Switch the TCPConnection to be polling in debug mode, so we can have a send & recv delay time, with one thread running both.
+/// @todo: Switch the TCPConnection to be polling in debug mode, so we can have a send & recv delay time, with one thread running both.
 void TCPConnection::debugSetPacketDelayTime(int minTime,int maxTime){
 	if(minTime<0) minTime=0;
 	if(maxTime<0) maxTime=0;

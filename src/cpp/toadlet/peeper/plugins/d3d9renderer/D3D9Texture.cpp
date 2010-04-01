@@ -35,7 +35,7 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-// TODO: Add a dynamic usage flag, and also use D3DLOCK_DISCARD when using that
+/// @todo: Add a dynamic usage flag, and also use D3DLOCK_DISCARD when using that
 D3D9Texture::D3D9Texture(D3D9Renderer *renderer):BaseResource(),
 	mRenderer(NULL),
 

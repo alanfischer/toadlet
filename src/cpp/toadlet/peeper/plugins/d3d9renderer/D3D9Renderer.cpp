@@ -106,7 +106,7 @@ bool D3D9Renderer::create(RenderTarget *target,int *options){
 		return false;
 	}
 
-	// TODO: Get these from the D3D9RenderTarget
+	/// @todo: Get these from the D3D9RenderTarget
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 		mD3DDevType=D3DMDEVTYPE_DEFAULT;
 	#else
@@ -605,7 +605,7 @@ void D3D9Renderer::setDepthBias(scalar constant,scalar slope){
 	float fconstant=scalarToFloat(constant);
 	float fslope=scalarToFloat(slope);
 
-	// TODO: We may need to scale these values to be more in-tune with the OpenGL ones
+	/// @todo: We may need to scale these values to be more in-tune with the OpenGL ones
 	mD3DDevice->SetRenderState(D3DRS_DEPTHBIAS,*(DWORD*)&fconstant);
 	mD3DDevice->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS,*(DWORD*)&fslope);
 }
@@ -661,7 +661,7 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 		result=mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXCOORDINDEX,textureStage->texCoordIndex);
 		TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
 
-		// TODO: Only if we're not using shaders
+		/// @todo: Only if we're not using shaders
 		TextureStage::Calculation calculation=textureStage->calculation;
 		Matrix4x4 &transform=cache_setTextureStage_transform;
 		bool identityTransform=texture->getRootTransform(textureStage->textureTime,transform);
@@ -671,7 +671,7 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 
 		if(calculation!=TextureStage::Calculation_DISABLED){
 			if(calculation==TextureStage::Calculation_NORMAL){
-				// TODO: Get this working with 3D Texture coordinates.  Doesnt seem to currently
+				/// @todo: Get this working with 3D Texture coordinates.  Doesnt seem to currently
 				//  I have tried just switching to D3DTTFF_COUNT3, but nothing changed, I'm pretty sure it has
 				//  something to do with the setup of the cacheD3DMatrix below
 				result=mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT2);

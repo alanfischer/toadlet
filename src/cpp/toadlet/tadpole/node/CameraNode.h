@@ -98,7 +98,7 @@ public:
 	inline const Matrix4x4 &getViewTransform() const{return mViewTransform;}  /// Only valid during rendering
 	inline const Vector3 &getWorldRenderTranslate() const{return mWorldRenderTranslate;}  /// Only valid during rendering
 
-	// TODO: These should probably be moved into the Math library, and passing in a list of planes
+	/// @todo: These should probably be moved into the Math library, and passing in a list of planes
 	bool culled(const Sphere &sphere) const;
 	bool culled(const AABox &box);
 	inline int getNumCulled() const{return mNumCulled;}

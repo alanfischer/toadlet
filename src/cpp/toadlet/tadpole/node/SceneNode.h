@@ -52,7 +52,7 @@ namespace node{
 ///   Down sides are that its harder to do logic based updating, since you'd have to handle the checking to see if its
 ///    been a logicDT yourself.
 
-// TODO: Force no-scene-graph updates in renderUpdate, to allow us to thread that easily
+/// @todo: Force no-scene-graph updates in renderUpdate, to allow us to thread that easily
 
 class TOADLET_API SceneNode:public ParentNode,public Scene{
 public:

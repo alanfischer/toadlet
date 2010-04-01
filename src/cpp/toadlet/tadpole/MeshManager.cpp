@@ -45,20 +45,17 @@ Mesh::ptr MeshManager::createBox(const AABox &box){
 
 		int vi=0;
 
-
-		// TODO: These front/etc comments aren't correcvt.  fix em!
-
-		// Front
-		vba.set3(vi,0,box.mins.x,box.mins.y,box.maxs.z); vba.set3(vi,1,0,0,Math::ONE); vba.set2(vi,2,0,Math::ONE); ++vi;
-		vba.set3(vi,0,box.maxs.x,box.mins.y,box.maxs.z); vba.set3(vi,1,0,0,Math::ONE); vba.set2(vi,2,Math::ONE,Math::ONE); ++vi;
-		vba.set3(vi,0,box.maxs.x,box.maxs.y,box.maxs.z); vba.set3(vi,1,0,0,Math::ONE); vba.set2(vi,2,Math::ONE,0); ++vi;
-		vba.set3(vi,0,box.mins.x,box.maxs.y,box.maxs.z); vba.set3(vi,1,0,0,Math::ONE); vba.set2(vi,2,0,0); ++vi;
-
-		// Back
+		// Bottom
 		vba.set3(vi,0,box.maxs.x,box.mins.y,box.mins.z); vba.set3(vi,1,0,0,-Math::ONE); vba.set2(vi,2,0,Math::ONE); ++vi;
 		vba.set3(vi,0,box.mins.x,box.mins.y,box.mins.z); vba.set3(vi,1,0,0,-Math::ONE); vba.set2(vi,2,Math::ONE,Math::ONE); ++vi;
 		vba.set3(vi,0,box.mins.x,box.maxs.y,box.mins.z); vba.set3(vi,1,0,0,-Math::ONE); vba.set2(vi,2,Math::ONE,0); ++vi;
 		vba.set3(vi,0,box.maxs.x,box.maxs.y,box.mins.z); vba.set3(vi,1,0,0,-Math::ONE); vba.set2(vi,2,0,0); ++vi;
+
+		// Top
+		vba.set3(vi,0,box.mins.x,box.mins.y,box.maxs.z); vba.set3(vi,1,0,0,Math::ONE); vba.set2(vi,2,0,Math::ONE); ++vi;
+		vba.set3(vi,0,box.maxs.x,box.mins.y,box.maxs.z); vba.set3(vi,1,0,0,Math::ONE); vba.set2(vi,2,Math::ONE,Math::ONE); ++vi;
+		vba.set3(vi,0,box.maxs.x,box.maxs.y,box.maxs.z); vba.set3(vi,1,0,0,Math::ONE); vba.set2(vi,2,Math::ONE,0); ++vi;
+		vba.set3(vi,0,box.mins.x,box.maxs.y,box.maxs.z); vba.set3(vi,1,0,0,Math::ONE); vba.set2(vi,2,0,0); ++vi;
 
 		// Left
 		vba.set3(vi,0,box.mins.x,box.mins.y,box.mins.z); vba.set3(vi,1,-Math::ONE,0,0); vba.set2(vi,2,0,Math::ONE); ++vi;
@@ -72,17 +69,17 @@ Mesh::ptr MeshManager::createBox(const AABox &box){
 		vba.set3(vi,0,box.maxs.x,box.maxs.y,box.mins.z); vba.set3(vi,1,Math::ONE,0,0); vba.set2(vi,2,Math::ONE,0); ++vi;
 		vba.set3(vi,0,box.maxs.x,box.maxs.y,box.maxs.z); vba.set3(vi,1,Math::ONE,0,0); vba.set2(vi,2,0,0); ++vi;
 
-		// Top
-		vba.set3(vi,0,box.mins.x,box.maxs.y,box.maxs.z); vba.set3(vi,1,0,Math::ONE,0); vba.set2(vi,2,0,Math::ONE); ++vi;
-		vba.set3(vi,0,box.maxs.x,box.maxs.y,box.maxs.z); vba.set3(vi,1,0,Math::ONE,0); vba.set2(vi,2,Math::ONE,Math::ONE); ++vi;
-		vba.set3(vi,0,box.maxs.x,box.maxs.y,box.mins.z); vba.set3(vi,1,0,Math::ONE,0); vba.set2(vi,2,Math::ONE,0); ++vi;
-		vba.set3(vi,0,box.mins.x,box.maxs.y,box.mins.z); vba.set3(vi,1,0,Math::ONE,0); vba.set2(vi,2,0,0); ++vi;
-
-		// Bottom
+		// Back
 		vba.set3(vi,0,box.mins.x,box.mins.y,box.mins.z); vba.set3(vi,1,0,-Math::ONE,0); vba.set2(vi,2,0,Math::ONE); ++vi;
 		vba.set3(vi,0,box.maxs.x,box.mins.y,box.mins.z); vba.set3(vi,1,0,-Math::ONE,0); vba.set2(vi,2,Math::ONE,Math::ONE); ++vi;
 		vba.set3(vi,0,box.maxs.x,box.mins.y,box.maxs.z); vba.set3(vi,1,0,-Math::ONE,0); vba.set2(vi,2,Math::ONE,0); ++vi;
 		vba.set3(vi,0,box.mins.x,box.mins.y,box.maxs.z); vba.set3(vi,1,0,-Math::ONE,0); vba.set2(vi,2,0,0); ++vi;
+
+		// Front
+		vba.set3(vi,0,box.mins.x,box.maxs.y,box.maxs.z); vba.set3(vi,1,0,Math::ONE,0); vba.set2(vi,2,0,Math::ONE); ++vi;
+		vba.set3(vi,0,box.maxs.x,box.maxs.y,box.maxs.z); vba.set3(vi,1,0,Math::ONE,0); vba.set2(vi,2,Math::ONE,Math::ONE); ++vi;
+		vba.set3(vi,0,box.maxs.x,box.maxs.y,box.mins.z); vba.set3(vi,1,0,Math::ONE,0); vba.set2(vi,2,Math::ONE,0); ++vi;
+		vba.set3(vi,0,box.mins.x,box.maxs.y,box.mins.z); vba.set3(vi,1,0,Math::ONE,0); vba.set2(vi,2,0,0); ++vi;
 
 		vba.unlock();
 	}

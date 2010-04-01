@@ -98,7 +98,7 @@ bool GLTexture::createContext(){
 	glBindTexture(mTarget,mHandle);
 
 	// Set defaults for now
-	// TODO: See if we want to add these as texture parameters to the texture?  Or just leave them to the textureStages?
+	/// @todo: See if we want to add these as texture parameters to the texture?  Or just leave them to the textureStages?
 	glTexParameteri(mTarget,GL_TEXTURE_WRAP_S,GL_REPEAT);
 	glTexParameteri(mTarget,GL_TEXTURE_WRAP_T,GL_REPEAT);
 	glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
@@ -146,7 +146,7 @@ bool GLTexture::createContext(){
 					glTexImage3D(mTarget,level,glinternalFormat,width,height,depth,0,glformat,gltype,NULL);
 				break;
 				case GL_TEXTURE_CUBE_MAP:{
-					// TODO: Is the following required?
+					/// @todo: Is the following required?
 					glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 					glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 
@@ -177,7 +177,7 @@ bool GLTexture::createContext(){
 		mManuallyGenerateMipLevels=false;
 	}
 
-	// TODO: Add mBacking data
+	/// @todo: Add mBacking data
 
 	TOADLET_CHECK_GLERROR("GLTexture::createContext");
 
@@ -186,7 +186,7 @@ bool GLTexture::createContext(){
 
 void GLTexture::destroyContext(bool backData){
 	if(backData){
-		// TODO: backup data
+		/// @todo: backup data
 	}
 
 	if(mHandle!=0){
