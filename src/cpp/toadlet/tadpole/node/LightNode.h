@@ -67,7 +67,7 @@ public:
 
 	inline peeper::Light *internal_getLight(){return mLight;}
 
-	void renderUpdate(RenderQueue *queue,CameraNode *camera);
+	void queueRenderables(RenderQueue *queue,CameraNode *camera);
 
 protected:
 	peeper::Light::ptr mLight;

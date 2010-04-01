@@ -96,10 +96,9 @@ void MeshNode::MeshAnimationController::stop(){
 	AnimationController::stop();
 }	
 
-void MeshNode::MeshAnimationController::logicUpdate(int dt){
+void MeshNode::MeshAnimationController::update(int dt){
 	if(mStartingFrame!=mMeshNode->getScene()->getLogicFrame()){
-		AnimationController::logicUpdate(dt);
-		AnimationController::renderUpdate(dt); /// @todo: Move me!
+		AnimationController::update(dt);
 	}
 }
 
@@ -238,17 +237,19 @@ MeshNode::MeshAnimationController::ptr MeshNode::getAnimationController(){
 	return mAnimationController;
 }
 
-void MeshNode::logicUpdate(int dt){
-	super::logicUpdate(dt);
+void MeshNode::frameUpdate(CameraNode *camera,RenderQueue *queue){
+	super::frameUpdate(camera,queue);
 
-	if(mAnimationController!=NULL){
-		mAnimationController->logicUpdate(dt);
-		mAnimationController->renderUpdate(dt); /// @todo: shouldn't be here!
+	if(mSkeleton!=NULL){
+		int lastRenderUpdateFrame=mSkeleton->getLastRenderUpdateFrame();
+		if(lastRenderUpdateFrame==-1 || lastRenderUpdateFrame==queue->getRenderFrame()){
+			updateVertexBuffer();
+		}
 	}
 }
 
-void MeshNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
-	super::renderUpdate(camera,queue);
+void MeshNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
+	super::queueRenderables(camera,queue);
 
 	/// @todo: Remove this scale system?  or do we need to leave it in for fixed point support?
 	if(mMesh!=NULL && mMesh->worldScale!=Math::ONE){
@@ -258,14 +259,6 @@ void MeshNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
 		mWorldRenderTransform.setAt(2,2,mMesh->worldScale);
 		Math::preMul(mWorldRenderTransform,mRenderTransform);
 		Math::preMul(mWorldRenderTransform,mParent->getWorldRenderTransform());
-	}
-
-	if(mSkeleton!=NULL){
-		int lastRenderUpdateFrame=mSkeleton->getLastRenderUpdateFrame();
-/// @todo: For shared skeletons & rendering
-//		if(lastRenderUpdateFrame==-1 || lastRenderUpdateFrame==queue->getRenderFrame()){
-			updateVertexBuffer();
-//		}
 	}
 
 	int i;

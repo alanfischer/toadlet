@@ -49,8 +49,8 @@ public:
 	virtual void setPerspective(bool perspective){mPerspective=perspective;}
 	inline bool getPerspective() const{return mPerspective;}
 
-	virtual void logicUpdate(int dt);
-	virtual void renderUpdate(CameraNode *camera,RenderQueue *queue);
+	virtual void frameUpdate(int dt);
+	virtual void renderQueue(CameraNode *camera,RenderQueue *queue);
 
 protected:
 	bool mCameraAligned;

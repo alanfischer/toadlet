@@ -237,21 +237,18 @@ void Node::setLocalBound(const Sphere &bound){
 	transformUpdated();
 }
 
-void Node::logicUpdate(int dt){
-}
+void Node::logicUpdate(int dt){}
 
-void Node::updateLogicTransforms(){
+void Node::frameUpdate(indt dt){
 	if(mParent==NULL){
 		mWorldScale.set(mScale);
 		mWorldRotate.set(mRotate);
 		mWorldTranslate.set(mTranslate);
-		mWorldBoundExpansion.set(mBoundExpansion);
 	}
 	else if(mIdentityTransform){
 		mWorldScale.set(mParent->mScale);
 		mWorldRotate.set(mParent->mRotate);
 		mWorldTranslate.set(mParent->mTranslate);
-		mWorldBoundExpansion.set(mParent->mBoundExpansion);
 	}
 	else{
 		Math::mul(mWorldScale,mParent->mWorldScale,mScale);
@@ -259,22 +256,11 @@ void Node::updateLogicTransforms(){
 		Math::mul(mWorldTranslate,mParent->mWorldRotate,mTranslate);
 		Math::mul(mWorldTranslate,mParent->mWorldScale);
 		Math::add(mWorldTranslate,mParent->mWorldTranslate);
-		Math::add(mWorldBoundExpansion,mBoundExpansion,mParent->mWorldBoundExpansion);
 	}
 
-	mul(mWorldBound,mWorldTranslate,mWorldRotate,mWorldScale,mLocalBound,mWorldBoundExpansion);
-}
+	mul(mWorldBound,mWorldTranslate,mWorldRotate,mWorldScale,mLocalBound);
 
-void Node::updateRenderTransforms(){
-	if(mParent==NULL){
-		mWorldRenderTransform.set(mRenderTransform);
-	}
-	else if(mIdentityTransform){
-		mWorldRenderTransform.set(mParent->mWorldRenderTransform);
-	}
-	else{
-		Math::mul(mWorldRenderTransform,mParent->mWorldRenderTransform,mRenderTransform);
-	}
+	Math::setMatrix4x4FromTranslateRotateScale(mWorldTransform,mWorldTranslate,mWorldRotate,mWorldScale);
 }
 
 void Node::activate(){
@@ -287,15 +273,6 @@ void Node::activate(){
 			mParent->activate();
 		}
 	}
-}
-
-void Node::setRenderTransformTranslate(const Vector3 &translate){
-	Math::setMatrix4x4FromTranslate(mRenderTransform,translate);
-}
-
-void Node::setRenderTransformRotateScale(const Quaternion &rotate,const Vector3 &scale){
-	Math::setMatrix3x3FromQuaternion(cache_setTransform_matrix,rotate);
-	Math::setMatrix4x4FromRotateScale(mRenderTransform,cache_setTransform_matrix,scale);
 }
 
 void Node::transformUpdated(){

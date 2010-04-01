@@ -114,8 +114,8 @@ void SpriteNode::setAlignment(int alignment){
 	updateSprite();
 }
 
-void SpriteNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
-	super::renderUpdate(camera,queue);
+void SpriteNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
+	super::queueRenderables(camera,queue);
 
 	if(mVertexData==NULL || mIndexData==NULL){
 		return;

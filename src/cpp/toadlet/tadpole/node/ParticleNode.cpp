@@ -346,16 +346,8 @@ void ParticleNode::setMaterial(Material::ptr material){
 	}
 }
 
-void ParticleNode::logicUpdate(int dt){
+void ParticleNode::frameUpdateUpdate(int dt){
 	super::logicUpdate(dt);
-
-	if(mDestroyNextLogicFrame){
-		destroy();
-	}
-}
-	
-void ParticleNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
-	super::renderUpdate(camera,queue);
 
 	if(mUpdateParticles){
 		if(mHasIdealViewTransform){
@@ -366,6 +358,14 @@ void ParticleNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
 		}
 		mUpdateParticles=false;
 	}
+
+	if(mDestroyNextFrame){
+		destroy();
+	}
+}
+	
+void ParticleNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
+	super::queueRenderables(camera,queue);
 
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
 	queue->queueRenderable(&renderable);
@@ -379,7 +379,7 @@ const Matrix4x4 &ParticleNode::getRenderTransform() const{
 		return Math::IDENTITY_MATRIX4X4;
 	}
 	else{
-		return super::getWorldRenderTransform();
+		return super::getWorldTransform();
 	}
 }
 

@@ -209,10 +209,14 @@ void SceneNode::update(int dt){
 	}
 
 	if(mUpdateListener!=NULL){
-		mUpdateListener->intraUpdate(dt);
+		mUpdateListener->preFrameUpdate(dt);
+		mUpdateListener->frameUpdate(dt);
+		mUpdateListener->postFrameUpdate(dt);
 	}
 	else{
-		mChildScene->intraUpdate(dt);
+		mChildScene->preFrameUpdate(dt);
+		mChildScene->frameUpdate(dt);
+		mChildScene->postFrameUpdate(dt);
 	}
 
 	AudioPlayer *audioPlayer=mEngine->getAudioPlayer();
@@ -242,8 +246,6 @@ void SceneNode::logicUpdate(Node *node,int dt,int scope){
 		node->logicUpdate(dt);
 	}
 
-	node->updateLogicTransforms();
-
 	ParentNode *parent=node->isParent();
 	bool childrenActive=false;
 	if(parent!=NULL){
@@ -263,8 +265,6 @@ void SceneNode::logicUpdate(Node *node,int dt,int scope){
 				logicUpdate(child,dt,scope);
 				childrenActive=true;
 			}
-
-			merge(parent->mWorldBound,child->mWorldBound);
 		}
 
 		parent->mActivateChildren=false;
@@ -282,7 +282,48 @@ void SceneNode::logicUpdate(Node *node,int dt,int scope){
 			node->mDeactivateCount=0;
 		}
 	}
+}
 
+void SceneNode::frameUpdate(int dt){
+	frameUpdate(dt,-1);
+}
+
+void SceneNode::frameUpdate(int dt,int scope){
+	mFrameTime+=dt;
+	mFrameFrame++;
+
+	frameUpdate(mBackground,dt,scope);
+	frameUpdate(this,dt,scope);
+}
+
+void SceneNode::frameUpdate(Node *node,int dt,int scope){
+	if((node->mScope&scope)==0){
+		return;
+	}
+
+	if(node!=this){
+		node->frameUpdate(dt);
+	}
+
+	ParentNode *parent=node->isParent();
+	if(parent!=NULL){
+		if(parent->mShadowChildrenDirty){
+			parent->updateShadowChildren();
+		}
+
+		int numChildren=parent->mShadowChildren.size();
+		Node *child=NULL;
+		int i;
+		for(i=0;i<numChildren;++i){
+			child=parent->mShadowChildren[i];
+			if(child->active()){
+				frameUpdate(child,dt,scope);
+			}
+
+			merge(parent->mWorldBound,child->mWorldBound);
+		}
+	}
+	
 	mNumLastUpdatedNodes++;
 }
 
@@ -297,35 +338,12 @@ void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
 	mRenderFrame++;
 	camera->updateFramesPerSecond();
 
-	camera->updateViewTransform();
+	Math::setMatrix4x4FromTranslate(mBackground->mWorldTransform,camera->getWorldTranslate());
 
-	/// @todo: I'd like to be able to update this differently, so i'm not touching rendTransform in render.
-	//  Actually, mRenderTransform, shouldn't be called that.  Since its updated in logic!@
-	Math::setMatrix4x4FromTranslate(mBackground->mRenderTransform,camera->getWorldRenderTranslate());
-
-	renderUpdate(camera,mRenderQueue);
-
-	renderRenderables(renderer,camera,mRenderQueue);
-
-	if(false){
-		renderer->setDefaultStates();
-		renderer->setFaceCulling(Renderer::FaceCulling_NONE);
-		renderer->setFill(Renderer::Fill_LINE);
-		renderBoundingVolumes(this,renderer,camera);
-	}
-}
-
-void SceneNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
-	renderUpdate(mBackground,camera,queue);
-	renderUpdate(this,camera,queue);
-}
-
-void SceneNode::renderUpdate(Node *node,CameraNode *camera,RenderQueue *queue){
+	queueRenderables(node,camera,mRenderQueue);
 	if(culled(node,camera)){
 		return;
 	}
-
-	node->updateRenderTransforms();
 
 	if(node!=this){
 		node->renderUpdate(camera,queue);
@@ -338,6 +356,33 @@ void SceneNode::renderUpdate(Node *node,CameraNode *camera,RenderQueue *queue){
 		for(i=0;i<numChildren;++i){
 			renderUpdate(parent->mChildren[i],camera,queue);
 		}
+	}
+///
+		if(culled(node,camera)){
+		return;
+	}
+
+	if(node!=this){
+		node->renderUpdate(camera,queue);
+	}
+
+	ParentNode *parent=node->isParent();
+	if(parent!=NULL){
+		int numChildren=parent->mChildren.size();
+		int i;
+		for(i=0;i<numChildren;++i){
+			renderUpdate(parent->mChildren[i],camera,queue);
+		}
+	}
+///
+
+	renderRenderables(renderer,camera,mRenderQueue);
+
+	if(false){
+		renderer->setDefaultStates();
+		renderer->setFaceCulling(Renderer::FaceCulling_NONE);
+		renderer->setFill(Renderer::Fill_LINE);
+		renderBoundingVolumes(this,renderer,camera);
 	}
 }
 

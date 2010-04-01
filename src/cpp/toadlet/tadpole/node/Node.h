@@ -109,9 +109,6 @@ public:
 	inline const Vector3 &getScale() const{return mScale;}
 	inline const Vector3 &getWorldScale() const{return mWorldScale;}
 
-	inline const Vector3 &getBoundExpansion() const{return mBoundExpansion;}
-	inline const Vector3 &getWorldBoundExpansion() const{return mWorldBoundExpansion;}
-
 	virtual void setTransform(const Matrix4x4 &transform);
 
 	inline bool isIdentityTransform() const{return mIdentityTransform;}
@@ -131,9 +128,8 @@ public:
 	inline const Sphere &getWorldBound() const{return mWorldBound;}
 
 	virtual void logicUpdate(int dt);
-	virtual void renderUpdate(CameraNode *camera,RenderQueue *queue){}
-	virtual void updateLogicTransforms();
-	virtual void updateRenderTransforms();
+	virtual void frameUpdate(int dt);
+	virtual void queueRenderables(CameraNode *camera,RenderQueue *queue);
 
 	virtual void activate();
 	inline bool active() const{return mActive;}
@@ -150,21 +146,17 @@ public:
 
 	/// @todo: Make a SphereBound class, and have it contain these methods
 	// Not in Math currently, because its not technically correct, a Matrix*Sphere=Eplisoid
-	static void mul(Sphere &r,const Matrix4x4 &m,const Sphere &s){
-		Math::mul(r.origin.set(s.radius,s.radius,s.radius),m);
-		r.radius=Math::maxVal(Math::maxVal(r.origin.x,r.origin.y),r.origin.z);
-		Math::mulPoint3Fast(r.origin,m,s.origin);
-	}
+//	static void mul(Sphere &r,const Matrix4x4 &m,const Sphere &s){
+//		Math::mul(r.origin.set(s.radius,s.radius,s.radius),m);
+//		r.radius=Math::maxVal(Math::maxVal(r.origin.x,r.origin.y),r.origin.z);
+//		Math::mulPoint3Fast(r.origin,m,s.origin);
+//	}
 
-	static void mul(Sphere &r,const Vector3 &translate,const Quaternion &rotate,const Vector3 &scale,const Sphere &s,const Vector3 &expand){
+	static void mul(Sphere &r,const Vector3 &translate,const Quaternion &rotate,const Vector3 &scale,const Sphere &s){
 		Math::mul(r.origin,scale,s.radius);
-		r.origin.x+=Math::abs(expand.x);
-		r.origin.y+=Math::abs(expand.y);
-		r.origin.z+=Math::abs(expand.z);
 		r.radius=Math::maxVal(Math::maxVal(r.origin.x,r.origin.y),r.origin.z);
 		Math::mul(r.origin,rotate,s.origin);
 		Math::add(r.origin,translate);
-		Math::sub(r.origin,expand);
 	}
 
 	// Merge two spheres, passing along -1 radius, and ignoring 0 radius
@@ -223,21 +215,17 @@ protected:
 	Quaternion mRotate;
 	Vector3 mScale;
 	Sphere mLocalBound;
-	Vector3 mBoundExpansion; // This is used by nodes that interpolate positions in-between logic frames to expand the bound to account for the interpolation
 	Vector3 mWorldTranslate;
 	Quaternion mWorldRotate;
 	Vector3 mWorldScale;
 	Sphere mWorldBound;
-	Vector3 mWorldBoundExpansion;
+	Matrix4x4 mWorldTransform;
 
 	int mScope;
 	egg::String mName;
 
 	bool mActive;
 	int mDeactivateCount;	
-
-	Matrix4x4 mRenderTransform; /// @todo: See if this could be removed, and instead be replaced with building the worldRenderTransform as parent->worldRenderTransform*translate*rotate*scale
-	Matrix4x4 mWorldRenderTransform;
 
 	Vector3 cache_setRotate_vector;
 	Matrix3x3 cache_setTransform_matrix;

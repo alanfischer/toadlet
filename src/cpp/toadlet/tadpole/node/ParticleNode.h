@@ -120,8 +120,8 @@ public:
 
 	virtual void setIdealViewTransform(const Matrix4x4 &transform){mIdealViewTransform.set(transform);mHasIdealViewTransform=true;}
 
-	virtual void logicUpdate(int dt);
-	virtual void renderUpdate(CameraNode *camera,RenderQueue *queue);
+	virtual void fameUpdate(int dt);
+	virtual void queueRenderables(CameraNode *camera,RenderQueue *queue);
 
 	virtual Material *getRenderMaterial() const{return mMaterial;}
 	virtual const Matrix4x4 &getRenderTransform() const;

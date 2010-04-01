@@ -94,9 +94,8 @@ public:
 	inline peeper::Color getClearColor() const{return mClearColor;}
 	inline bool getSkipFirstClear() const{return mSkipFirstClear;}
 
-	virtual void updateViewTransform();
-	inline const Matrix4x4 &getViewTransform() const{return mViewTransform;}  /// Only valid during rendering
-	inline const Vector3 &getWorldRenderTranslate() const{return mWorldRenderTranslate;}  /// Only valid during rendering
+	virtual void frameUpdate(int dt);
+	inline const Matrix4x4 &getViewTransform() const{return mViewTransform;}
 
 	/// @todo: These should probably be moved into the Math library, and passing in a list of planes
 	bool culled(const Sphere &sphere) const;
@@ -123,7 +122,6 @@ protected:
 	bool mAlignmentCalculationsUseOrigin;
 	ParentNode::ptr mMidNode;
 
-	Vector3 mWorldRenderTranslate; // Can I just use WorldTranslate for this instead, or is that too logic bound?
 	Matrix4x4 mViewTransform;
 	Matrix4x4 mViewProjectionTransform;
 	Plane mClipPlanes[6];

@@ -75,8 +75,7 @@ public:
 	virtual void stop();
 	inline bool isRunning() const{return mRunning;}
 
-	virtual void logicUpdate(int dt);
-	virtual void renderUpdate(int dt);
+	virtual void update(int dt);
 
 	virtual void set(scalar value);
 
@@ -88,8 +87,7 @@ public:
 protected:
 	egg::Collection<Animation::ptr> mAnimations;
 
-	int mLogicTime;
-	int mRenderTime;
+	int mTime;
 	scalar mMinValue;
 	scalar mMaxValue;
 	int mMinTime;
