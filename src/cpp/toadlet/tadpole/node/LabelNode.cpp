@@ -130,8 +130,8 @@ void LabelNode::setWordWrap(bool wordWrap){
 	updateLabel();
 }
 
-void LabelNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
-	super::renderUpdate(camera,queue);
+void LabelNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
+	super::queueRenderables(camera,queue);
 
 	if(mVertexData==NULL || mIndexData==NULL){
 		return;

@@ -69,8 +69,7 @@ public:
 	void stop();
 	inline bool isRunning() const{return mAnimationController->isRunning();}
 
-	void logicUpdate(int dt);
-	void renderUpdate(int dt); /// @todo: this is gone!  Its a sign that the animation framework needs to be updated to accommodate the understanding that renderUpdate can happen multiple times per time step
+	void frameUpdate(int dt);
 
 	void controllerFinished(animation::AnimationController *controller);
 

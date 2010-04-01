@@ -59,7 +59,7 @@ bool SkeletonParentNode::remove(Node *node){
 	return super::remove(node);
 }
 
-void SkeletonParentNode::renderUpdate(int dt){
+void SkeletonParentNode::frameUpdate(int dt){
 	int i;
 	for(i=0;i<mChildren.size();++i){
 		MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(mChildrenBones[i]);

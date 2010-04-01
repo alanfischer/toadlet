@@ -54,11 +54,10 @@ AnimationController::~AnimationController(){
 }
 
 void AnimationController::setTime(int time,bool setagain){
-	mLogicTime=time;
-	mRenderTime=time;
+	mTime=time;
 
 	if(setagain){
-		set(Math::fromMilli(mRenderTime));
+		set(Math::fromMilli(mTime));
 	}
 }
 
@@ -85,15 +84,13 @@ void AnimationController::setAnimationControllerFinishedListener(AnimationContro
 void AnimationController::start(){
 	mRunning=true;
 
-	mLogicTime=0;
-	mRenderTime=0;
+	mTime=0;
 }
 
 void AnimationController::stop(){
 	mRunning=false;
 
-	mLogicTime=0;
-	mRenderTime=0;
+	mTime=0;
 
 	set(0);
 }
@@ -111,14 +108,12 @@ void AnimationController::logicUpdate(int dt){
 		mLogicTime+=Math::toMilli(Math::mul(Math::fromMilli(dt),mTimeScale));
 
 		if(mMaxTime!=0 && mLogicTime>=mMaxTime){
-			mLogicTime=mMaxTime;
-			mRenderTime=mMaxTime;
+			mTime=mMaxTime;
 
-			set(Math::fromMilli(mRenderTime));
+			set(Math::fromMilli(mTime));
 
 			if(mCycling==Cycling_LOOP){
-				mLogicTime=0;
-				mRenderTime=0;
+				mTime=0;
 			}
 			else if(mCycling==Cycling_REFLECT){
 				mTimeScale*=-1;
@@ -133,14 +128,12 @@ void AnimationController::logicUpdate(int dt){
 		mLogicTime+=Math::toMilli(Math::mul(Math::fromMilli(dt),mTimeScale));
 
 		if(mLogicTime<0){
-			mLogicTime=0;
-			mRenderTime=0;
+			mTime=0;
 
 			set(Math::fromMilli(0));
 
 			if(mCycling==Cycling_LOOP){
-				mLogicTime=mMaxTime;
-				mRenderTime=mMaxTime;
+				mTime=mMaxTime;
 			}
 			else if(mCycling==Cycling_REFLECT){
 				mTimeScale*=-1;
@@ -153,35 +146,35 @@ void AnimationController::logicUpdate(int dt){
 	}
 }
 
-void AnimationController::renderUpdate(int dt){
+void AnimationController::update(int dt){
 	if(mRunning==false){
 		return;
 	}
 
 	if(mTimeScale>0){
-		if(mMaxTime>0 && mRenderTime>=mMaxTime){
+		if(mMaxTime>0 && mTime>=mMaxTime){
 			return;
 		}
 
-		mRenderTime+=Math::toMilli(Math::mul(Math::fromMilli(dt),mTimeScale));
+		mTime+=Math::toMilli(Math::mul(Math::fromMilli(dt),mTimeScale));
 
-		if(mMaxTime>0 && mRenderTime>=mMaxTime){
-			mRenderTime=mMaxTime;
+		if(mMaxTime>0 && mTime>=mMaxTime){
+			mTime=mMaxTime;
 		}
 	}
 	else if(mTimeScale<0){
-		if(mRenderTime<0){
+		if(mTime<0){
 			return;
 		}
 
-		mRenderTime+=Math::toMilli(Math::mul(Math::fromMilli(dt),mTimeScale));
+		mTime+=Math::toMilli(Math::mul(Math::fromMilli(dt),mTimeScale));
 
-		if(mRenderTime<0){
-			mRenderTime=0;
+		if(mTime<0){
+			mTime=0;
 		}
 	}
 
-	set(Math::fromMilli(mRenderTime));
+	set(Math::fromMilli(mTime));
 }
 
 void AnimationController::set(scalar value){

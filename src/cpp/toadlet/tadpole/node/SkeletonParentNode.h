@@ -33,7 +33,6 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-/// WARNING: This class is not currently logic-safe.  Avoid using the locations of these nodes in logic calculations.
 class TOADLET_API SkeletonParentNode:public ParentNode{
 public:
 	TOADLET_NODE(SkeletonParentNode,ParentNode);
@@ -45,7 +44,7 @@ public:
 	virtual bool attach(Node *node,int bone);
 	virtual bool remove(Node *node);
 
-	virtual void renderUpdate(int dt);
+	virtual void frameUpdate(int dt);
 
 protected:
 	MeshNodeSkeleton::ptr mSkeleton;

@@ -47,14 +47,14 @@ CameraAlignedNode::CameraAlignedNode():super(),
 	setPerspective(true);
 }
 
-void CameraAlignedNode::logicUpdate(int dt){
-	super::logicUpdate(dt);
+void CameraAlignedNode::frameUpdate(int dt){
+	super::frameUpdate(dt);
 
 	if(mLocalBound.radius<0 || mPerspective==false) mWorldBound.radius=-Math::ONE;
 }
 
-void CameraAlignedNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
-	super::renderUpdate(camera,queue);
+void CameraAlignedNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
+	super::queueRenderables(camera,queue);
 
 	if(mCameraAligned){
 		Matrix3x3 rotate;
@@ -67,21 +67,21 @@ void CameraAlignedNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
 		else{
 			Math::setMatrix3x3FromMatrix4x4Transpose(rotate,camera->getViewTransform());
 		}
-		Math::setMatrix4x4FromRotateScale(mWorldRenderTransform,rotate,mWorldScale);
+		Math::setMatrix4x4FromRotateScale(mWorldTransform,rotate,mWorldScale);
 	}
 
 	if(!mPerspective){
 		Matrix4x4 scale;
 		Vector4 point;
 
-		point.set(mWorldRenderTransform.at(0,3),mWorldRenderTransform.at(1,3),mWorldRenderTransform.at(2,3),Math::ONE);
+		point.set(mWorldTransform.at(0,3),mWorldTransform.at(1,3),mWorldTransform.at(2,3),Math::ONE);
 		Math::mul(point,camera->getViewTransform());
 		Math::mul(point,camera->getProjectionTransform());
 		scale.setAt(0,0,point.w);
 		scale.setAt(1,1,point.w);
 		scale.setAt(2,2,point.w);
 
-		Math::postMul(mWorldRenderTransform,scale);
+		Math::postMul(mWorldTransform,scale);
 	}
 }
 

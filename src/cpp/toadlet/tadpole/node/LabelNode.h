@@ -68,7 +68,7 @@ public:
 	void setWordWrap(bool wordWrap);
 	bool getWordWrap() const{return mWordWrap;}
 
-	void renderUpdate(CameraNode *camera,RenderQueue *queue);
+	void queueRenderables(CameraNode *camera,RenderQueue *queue);
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Matrix4x4 &getRenderTransform() const{return super::getWorldRenderTransform();}
 	void render(peeper::Renderer *renderer) const;
