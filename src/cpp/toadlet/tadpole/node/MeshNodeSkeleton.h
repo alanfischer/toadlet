@@ -104,7 +104,7 @@ public:
 
 	void updateBones();
 	void updateBones(int sequenceIndex,scalar sequenceTime);
-	inline int getLastRenderUpdateFrame() const{return mLastRenderUpdateFrame;}
+	inline int getLastUpdateFrame() const{return mLastUpdateFrame;}
 
 	inline int getNumBones() const{return mBones.size();}
 	inline Bone *getBone(int index) const{return mBones[index];}
@@ -129,7 +129,7 @@ protected:
 	MeshNode *mNode;
 	mesh::Skeleton::ptr mSkeleton;
 	egg::Collection<Bone::ptr> mBones;
-	int mLastRenderUpdateFrame;
+	int mLastUpdateFrame;
 
 	mesh::Sequence::ptr mSequence;
 	scalar mSequenceTime;

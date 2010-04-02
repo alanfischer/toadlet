@@ -41,19 +41,6 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-/// @todo  I think a good way to let us use EventKeyFrames with the Controller framework is to:
-///   1: Have a way of ensuring that the EventKeyFrames are aligned on LogicDT times.
-///   2: Have the AnimationControllerNode not issue a renderUpdate until we have enough logicUpdates to keep up with it.
-///  That way, entities without EventKeyFrames should update smoothly if something keeps the logic from flowing, but
-///   we will still be able to have any logic dependent stuff happen at the correct times.
-///
-///  Or perhaps, we could use the above tactic for all the update entities.  There is just 1 function, update
-///   But it stops being called if logic updates cease due to networking issues.
-///   Down sides are that its harder to do logic based updating, since you'd have to handle the checking to see if its
-///    been a logicDT yourself.
-
-/// @todo: Force no-scene-graph updates in renderUpdate, to allow us to thread that easily
-
 class TOADLET_API SceneNode:public ParentNode,public Scene{
 public:
 	TOADLET_NONINSTANCIABLENODE(SceneNode,ParentNode);
@@ -87,9 +74,8 @@ public:
 	virtual int getLogicTime() const{return mLogicTime;}
 	virtual int getLogicFrame() const{return mLogicFrame;}
 	virtual scalar getLogicFraction() const{return (mMinLogicDT==0 || mMinLogicDT!=mMaxLogicDT)?0:Math::div(Math::fromInt(mAccumulatedDT),Math::fromInt(mMinLogicDT));}
-	virtual int getRenderTime() const{return mLogicTime+mAccumulatedDT;}
-	virtual int getRenderFrame() const{return mRenderFrame;}
-	virtual int getNumLastUpdatedNodes() const{return mNumLastUpdatedNodes;}
+	virtual int getTime() const{return mLogicTime+mAccumulatedDT;}
+	virtual int getFrame() const{return mFrame;}
 
 	virtual void update(int dt);
 	virtual void preLogicUpdateLoop(int dt){}
@@ -99,24 +85,29 @@ public:
 	virtual void logicUpdate(Node *node,int dt,int scope);
 	virtual void postLogicUpdate(int dt){}
 	virtual void postLogicUpdateLoop(int dt){}
-	virtual void intraUpdate(int dt){}
+	virtual void preFrameUpdate(int dt){}
+	virtual void frameUpdate(int dt);
+	virtual void frameUpdate(int dt,int scope);
+	virtual void frameUpdate(Node *node,int dt,int scope);
+	virtual void postFrameUpdate(int dt){}
 
 	virtual void render(peeper::Renderer *renderer,CameraNode *cameraNode,Node *node);
-	virtual void renderUpdate(CameraNode *camera,RenderQueue *queue);
-	virtual void renderUpdate(Node *node,CameraNode *camera,RenderQueue *queue);
+	virtual void queueRenderables(CameraNode *camera,RenderQueue *queue);
+	virtual void queueRenderables(Node *node,CameraNode *camera,RenderQueue *queue);
+	virtual void renderRenderables(peeper::Renderer *renderer,CameraNode *camera,RenderQueue *queue);
 
 	virtual void setUpdateListener(UpdateListener *updateListener){mUpdateListener=updateListener;}
 	virtual UpdateListener *getUpdateListener() const{return mUpdateListener;}
 
 	virtual bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact);
 
-	virtual void updateRenderTransformsToRoot(Node *node);
 	virtual bool culled(Node *node,CameraNode *camera);
 	virtual int nodeCreated(Node *node);
 	virtual void nodeDestroyed(Node *node);
 
+	inline int getNumUpdatedNodes() const{return mNumUpdatedNodes;}
+
 protected:
-	virtual void renderRenderables(peeper::Renderer *renderer,CameraNode *camera,RenderQueue *queue);
 	virtual void renderBoundingVolumes(Node *node,peeper::Renderer *renderer,CameraNode *camera);
 	virtual bool preLayerRender(peeper::Renderer *renderer,CameraNode *camera,int layer){return false;}
 	virtual bool postLayerRender(peeper::Renderer *renderer,CameraNode *camera,int layer){return false;}
@@ -131,13 +122,14 @@ protected:
 	int mLogicTime;
 	int mLogicFrame;
 	int mAccumulatedDT;
-	int mRenderFrame;
+	int mFrame;
 
 	ParentNode::ptr mBackground;
 	peeper::Color mAmbientColor;
 
 	UpdateListener *mUpdateListener;
-	int mNumLastUpdatedNodes;
+	int mNumUpdatedNodes;
+	egg::Collection<Node::ptr> mDependents;
 
 	RenderQueue::ptr mRenderQueue;
 	Material *mPreviousMaterial;

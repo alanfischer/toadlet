@@ -44,8 +44,6 @@ TOADLET_NODE_IMPLEMENT(ParticleNode,Categories::TOADLET_TADPOLE_NODE+".ParticleN
 ParticleNode::ParticleNode():super(),
 	TOADLET_GIB_IMPLEMENT()
 
-	mDestroyNextLogicFrame(false),
-	
 	mWorldSpace(false),
 	mOrientation(false),
 	mIndividualAttributes(false),
@@ -85,8 +83,6 @@ ParticleNode::ParticleNode():super(),
 
 Node *ParticleNode::create(Scene *scene){
 	super::create(scene);
-
-	mDestroyNextLogicFrame=false;
 
 	mWorldSpace=false;
 	mOrientation=false;
@@ -346,8 +342,8 @@ void ParticleNode::setMaterial(Material::ptr material){
 	}
 }
 
-void ParticleNode::frameUpdateUpdate(int dt){
-	super::logicUpdate(dt);
+void ParticleNode::frameUpdate(int dt){
+	super::frameUpdate(dt);
 
 	if(mUpdateParticles){
 		if(mHasIdealViewTransform){
@@ -357,10 +353,6 @@ void ParticleNode::frameUpdateUpdate(int dt){
 //			updateVertexBuffer(scene->getIdealParticleViewTransform());
 		}
 		mUpdateParticles=false;
-	}
-
-	if(mDestroyNextFrame){
-		destroy();
 	}
 }
 	
@@ -531,7 +523,7 @@ void ParticleNode::updateVertexBuffer(const Matrix4x4 &viewTransform){
 				if(mOrientation){
 					up.set(p.ox,p.oy,p.oz);
 					if(mWorldSpace==false){
-						Math::mul(up,mWorldRenderTransform);
+						Math::mul(up,mWorldTransform);
 					}
 					Math::mul(up,scale);
 					Math::mul(right,viewRight,scale);

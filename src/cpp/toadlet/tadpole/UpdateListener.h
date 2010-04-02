@@ -36,7 +36,9 @@ public:
 	virtual void preLogicUpdate(int dt)=0;
 	virtual void logicUpdate(int dt)=0;
 	virtual void postLogicUpdate(int dt)=0;
-	virtual void intraUpdate(int dt)=0;
+	virtual void preFrameUpdate(int dt)=0;
+	virtual void frameUpdate(int dt)=0;
+	virtual void postFrameUpdate(int dt)=0;
 };
 
 }

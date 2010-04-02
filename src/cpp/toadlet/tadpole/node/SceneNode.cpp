@@ -50,13 +50,13 @@ SceneNode::SceneNode(Engine *engine):super(),
 	mLogicTime(0),
 	mLogicFrame(0),
 	mAccumulatedDT(0),
-	mRenderFrame(0),
+	mFrame(0),
 
 	//mBackground,
 	//mAmbientColor,
 
 	mUpdateListener(NULL),
-	mNumLastUpdatedNodes(0),
+	mNumUpdatedNodes(0),
 
 	//mRenderQueue,
 	mPreviousMaterial(NULL)
@@ -143,7 +143,7 @@ void SceneNode::setLogicTimeAndFrame(int time,int frame){
 	mLogicTime=time;
 	mLogicFrame=frame;
 	mAccumulatedDT=0;
-	mRenderFrame=0;
+	mFrame=0;
 }
 
 void SceneNode::update(int dt){
@@ -161,7 +161,6 @@ void SceneNode::update(int dt){
 		return;
 	}
 
-	mNumLastUpdatedNodes=0;
 	mAccumulatedDT+=dt;
 
 	if(mAccumulatedDT>=mMinLogicDT){
@@ -233,12 +232,31 @@ void SceneNode::logicUpdate(int dt,int scope){
 	mLogicTime+=dt;
 	mLogicFrame++;
 
+	mDependents.clear();
+
 	logicUpdate(mBackground,dt,scope);
 	logicUpdate(this,dt,scope);
+
+	while(mDependents.size()>0){
+		Collection<Node::ptr> dependents=mDependents; mDependents.clear();
+		for(int i=0;i<dependents.size();++i){
+			logicUpdate(dependents[i],dt,scope);
+		}
+		/// @todo: This isnt the best check, since we could have an equal amount of dependents added and removed in a frame, and thats not circular
+		if(dependents.size()==mDependents.size()){
+			Error::unknown("Circular dependencies detected!");
+			return;
+		}
+	}
 }
 
 void SceneNode::logicUpdate(Node *node,int dt,int scope){
 	if((node->mScope&scope)==0){
+		return;
+	}
+	
+	if(node->mDependsUpon!=NULL && node->mDependsUpon->mLastLogicFrame!=mLogicFrame){
+		mDependents.add(node);
 		return;
 	}
 
@@ -289,15 +307,34 @@ void SceneNode::frameUpdate(int dt){
 }
 
 void SceneNode::frameUpdate(int dt,int scope){
-	mFrameTime+=dt;
-	mFrameFrame++;
+	mNumUpdatedNodes=0;
+	mFrame++;
+
+	mDependents.clear();
 
 	frameUpdate(mBackground,dt,scope);
 	frameUpdate(this,dt,scope);
+
+	while(mDependents.size()>0){
+		Collection<Node::ptr> dependents=mDependents; mDependents.clear();
+		for(int i=0;i<dependents.size();++i){
+			frameUpdate(dependents[i],dt,scope);
+		}
+		/// @todo: This isnt the best check, since we could have an equal amount of dependents added and removed in a frame, and thats not circular
+		if(dependents.size()==mDependents.size()){
+			Error::unknown("Circular dependencies detected!");
+			return;
+		}
+	}
 }
 
 void SceneNode::frameUpdate(Node *node,int dt,int scope){
 	if((node->mScope&scope)==0){
+		return;
+	}
+
+	if(node->mDependsUpon!=NULL && node->mDependsUpon->mLastFrame!=mFrame){
+		mDependents.add(node);
 		return;
 	}
 
@@ -324,7 +361,7 @@ void SceneNode::frameUpdate(Node *node,int dt,int scope){
 		}
 	}
 	
-	mNumLastUpdatedNodes++;
+	mNumUpdatedNodes++;
 }
 
 void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
@@ -335,46 +372,18 @@ void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
 		}
 	#endif
 
-	mRenderFrame++;
 	camera->updateFramesPerSecond();
 
-	Math::setMatrix4x4FromTranslate(mBackground->mWorldTransform,camera->getWorldTranslate());
+	// Reposition our background node & update it to update the world positions
+	mBackground->setTranslate(camera->getWorldTranslate());
+	frameUpdate(mBackground,0,-1);
 
-	queueRenderables(node,camera,mRenderQueue);
-	if(culled(node,camera)){
-		return;
+	if(node!=NULL){
+		queueRenderables(node,camera,mRenderQueue);
 	}
-
-	if(node!=this){
-		node->renderUpdate(camera,queue);
+	else{
+		queueRenderables(camera,mRenderQueue);
 	}
-
-	ParentNode *parent=node->isParent();
-	if(parent!=NULL){
-		int numChildren=parent->mChildren.size();
-		int i;
-		for(i=0;i<numChildren;++i){
-			renderUpdate(parent->mChildren[i],camera,queue);
-		}
-	}
-///
-		if(culled(node,camera)){
-		return;
-	}
-
-	if(node!=this){
-		node->renderUpdate(camera,queue);
-	}
-
-	ParentNode *parent=node->isParent();
-	if(parent!=NULL){
-		int numChildren=parent->mChildren.size();
-		int i;
-		for(i=0;i<numChildren;++i){
-			renderUpdate(parent->mChildren[i],camera,queue);
-		}
-	}
-///
 
 	renderRenderables(renderer,camera,mRenderQueue);
 
@@ -386,53 +395,27 @@ void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
 	}
 }
 
-bool SceneNode::performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact){
-	SpacialQueryResultsListener *listener=query->getSpacialQueryResultsListener();
+void SceneNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
+	queueRenderables(mBackground,camera,queue);
+	queueRenderables(this,camera,queue);
+}
 
-	int i;
-	for(i=0;i<mChildren.size();++i){
-		Node *child=mChildren[i];
-		if(Math::testIntersection(child->mWorldBound,box)){
-			listener->resultFound(child);
+void SceneNode::queueRenderables(Node *node,CameraNode *camera,RenderQueue *queue){
+	if(culled(node,camera)){
+		return;
+	}
+
+	if(node!=this){
+		node->queueRenderables(camera,queue);
+	}
+
+	ParentNode *parent=node->isParent();
+	if(parent!=NULL){
+		int numChildren=parent->mChildren.size();
+		int i;
+		for(i=0;i<numChildren;++i){
+			queueRenderables(parent->mChildren[i],camera,queue);
 		}
-	}
-	return true;
-}
-
-void SceneNode::updateRenderTransformsToRoot(Node *node){
-	if(node->mParent!=NULL){
-		updateRenderTransformsToRoot(node->mParent);
-	}
-	
-	node->updateRenderTransforms();
-}
-
-bool SceneNode::culled(Node *node,CameraNode *camera){
-	return (node->mScope&camera->mScope)==0 || camera->culled(node->mWorldBound);
-}
-
-int SceneNode::nodeCreated(Node *node){
-	int handle=-1;
-	int size=mFreeHandles.size();
-	if(size>0){
-		handle=mFreeHandles.at(size-1);
-		mFreeHandles.removeAt(size-1);
-	}
-	else{
-		handle=mNodesFromHandles.size();
-		mNodesFromHandles.resize(handle+1);
-	}
-
-	mNodesFromHandles[handle]=node;
-
-	return handle;
-}
-
-void SceneNode::nodeDestroyed(Node *node){
-	int handle=node->getHandle();
-	if(handle>=0){
-		mNodesFromHandles[handle]=NULL;
-		mFreeHandles.add(handle);
 	}
 }
 
@@ -504,6 +487,48 @@ void SceneNode::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQu
 		// Reset previous material each time, to avoid pre/postLayerRender messing up what we though the state of things were
 		// We could also use the true/false return of pre/postLayerRender, but it could be easy to forget to change that.
 		mPreviousMaterial=NULL;
+	}
+}
+
+bool SceneNode::performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact){
+	SpacialQueryResultsListener *listener=query->getSpacialQueryResultsListener();
+
+	int i;
+	for(i=0;i<mChildren.size();++i){
+		Node *child=mChildren[i];
+		if(Math::testIntersection(child->mWorldBound,box)){
+			listener->resultFound(child);
+		}
+	}
+	return true;
+}
+
+bool SceneNode::culled(Node *node,CameraNode *camera){
+	return (node->mScope&camera->mScope)==0 || camera->culled(node->mWorldBound);
+}
+
+int SceneNode::nodeCreated(Node *node){
+	int handle=-1;
+	int size=mFreeHandles.size();
+	if(size>0){
+		handle=mFreeHandles.at(size-1);
+		mFreeHandles.removeAt(size-1);
+	}
+	else{
+		handle=mNodesFromHandles.size();
+		mNodesFromHandles.resize(handle+1);
+	}
+
+	mNodesFromHandles[handle]=node;
+
+	return handle;
+}
+
+void SceneNode::nodeDestroyed(Node *node){
+	int handle=node->getHandle();
+	if(handle>=0){
+		mNodesFromHandles[handle]=NULL;
+		mFreeHandles.add(handle);
 	}
 }
 

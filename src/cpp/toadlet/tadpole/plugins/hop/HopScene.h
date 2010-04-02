@@ -73,8 +73,8 @@ public:
 	virtual int getLogicTime() const{return mScene->getLogicTime();}
 	virtual int getLogicFrame() const{return mScene->getLogicFrame();}
 	virtual scalar getLogicFraction() const{return mScene->getLogicFraction();}
-	virtual int getRenderTime() const{return mScene->getRenderTime();}
-	virtual int getRenderFrame() const{return mScene->getRenderFrame();}
+	virtual int getTime() const{return mScene->getTime();}
+	virtual int getFrame() const{return mScene->getFrame();}
 
 	virtual void update(int dt){mScene->update(dt);}
 	virtual void render(peeper::Renderer *renderer,node::CameraNode *cameraNode,node::Node *node){mScene->render(renderer,cameraNode,node);}
@@ -116,7 +116,9 @@ public:
 	virtual void logicUpdate(int dt);
 	virtual void postLogicUpdate(int dt);
 	virtual void postLogicUpdateLoop(int dt);
-	virtual void intraUpdate(int dt);
+	virtual void preFrameUpdate(int dt);
+	virtual void frameUpdate(int dt);
+	virtual void postFrameUpdate(int dt);
 
 	virtual bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact){return mScene->performAABoxQuery(query,box,exact);}
 
@@ -129,8 +131,6 @@ public:
 	virtual void intraUpdate(hop::Solid *solid,int dt,scalar fdt){}
 	virtual bool collisionResponse(hop::Solid *solid,Vector3 &position,Vector3 &remainder,hop::Collision &collision){return false;}
 	virtual void postUpdate(hop::Solid *solid,int dt,scalar fdt){}
-
-	virtual void updateRenderTransformsToRoot(node::Node *node){mScene->updateRenderTransformsToRoot(node);}
 
 	virtual egg::PointerCounter *pointerCounter() const{return mCounter;}
 

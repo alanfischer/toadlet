@@ -50,7 +50,7 @@ public:
 	inline bool getPerspective() const{return mPerspective;}
 
 	virtual void frameUpdate(int dt);
-	virtual void renderQueue(CameraNode *camera,RenderQueue *queue);
+	virtual void queueRenderables(CameraNode *camera,RenderQueue *queue);
 
 protected:
 	bool mCameraAligned;

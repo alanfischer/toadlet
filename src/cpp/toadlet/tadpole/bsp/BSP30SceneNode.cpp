@@ -118,8 +118,8 @@ void BSP30ModelNode::setModel(BSP30Map::ptr map,int index){
 	}
 }
 
-void BSP30ModelNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
-	super::renderUpdate(camera,queue);
+void BSP30ModelNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
+	super::queueRenderables(camera,queue);
 
 	if(mVisible && queue!=NULL){
 		int i;
@@ -328,20 +328,20 @@ void BSP30SceneNode::childTransformUpdated(Node *child){
 	memcpy(&oldIndexes[0],&newIndexes[0],newIndexes.size()*sizeof(int));
 }
 
-void BSP30SceneNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
+void BSP30SceneNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	if(mMap==NULL){
-		super::renderUpdate(camera,queue);
+		super::queueRenderables(camera,queue);
 		return;
 	}
 
-	super::renderUpdate(mBackground,camera,queue);
+	super::queueRenderables(mBackground,camera,queue);
 
 	int i,j;
-	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,camera->getWorldRenderTranslate());
+	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,camera->getWorldTranslate());
 	// If no visibility information just test all leaves
 	if(leaf==0 || mMap->parsedVisibility.size()==0){
 		for(i=0;i<mChildren.size();++i){
-			super::renderUpdate(mChildren[i],camera,queue);
+			super::queueRenderables(mChildren[i],camera,queue);
 		}
 	}
 	else{
@@ -358,7 +358,7 @@ void BSP30SceneNode::renderUpdate(CameraNode *camera,RenderQueue *queue){
 					if(data->counter!=mCounter){
 						data->counter=mCounter;
 						if(culled(occupant,camera)==false){
-							super::renderUpdate(occupant,camera,queue);
+							super::queueRenderables(occupant,camera,queue);
 						}
 					}
 				}
@@ -375,7 +375,7 @@ bool BSP30SceneNode::preLayerRender(Renderer *renderer,CameraNode *camera,int la
 	memset(mMarkedFaces,0,(mMap->nfaces+7)>>3);
 	memset(&mVisibleMaterialFaces[0],0,sizeof(BSP30Map::facedata*)*mVisibleMaterialFaces.size());
 
-	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,camera->getWorldRenderTranslate());
+	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,camera->getWorldTranslate());
 
 	int i;
 	if(leaf==0 || mMap->nvisibility==0){
@@ -420,7 +420,7 @@ void BSP30SceneNode::addLeafToVisible(bleaf *leaf,CameraNode *camera){
 			if(!(mMarkedFaces[faceIndex>>3]&(1<<(faceIndex&7)))){
 				bface *face=&mMap->faces[faceIndex];
 
-				float d=Math::length(*(Plane*)&mMap->planes[face->planenum],camera->getWorldRenderTranslate());
+				float d=Math::length(*(Plane*)&mMap->planes[face->planenum],camera->getWorldTranslate());
 				if(face->side){
 					if(d>0) continue;
 				}

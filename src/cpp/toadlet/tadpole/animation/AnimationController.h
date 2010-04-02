@@ -53,7 +53,7 @@ public:
 	virtual ~AnimationController();
 
 	virtual void setTime(int time,bool setagain=true);
-	inline int getTime() const{return mLogicTime;}
+	inline int getTime() const{return mTime;}
 
 	virtual void setCycling(Cycling cycling);
 	inline Cycling getCycling() const{return mCycling;}

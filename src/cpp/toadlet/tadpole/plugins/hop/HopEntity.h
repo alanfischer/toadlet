@@ -121,8 +121,7 @@ public:
 	virtual void preLogicUpdateLoop(int dt);
 	virtual void logicUpdate(int dt);
 	virtual void postLogicUpdate(int dt);
-	virtual void renderUpdate(node::CameraNode *camera,RenderQueue *queue);
-	virtual void updateRenderTransforms();
+	virtual void frameUpdate(int dt);
 	virtual void interpolatePhysicalParameters(scalar f);
 
 protected:

@@ -40,7 +40,7 @@ namespace node{
 MeshNodeSkeleton::MeshNodeSkeleton(MeshNode* node,Skeleton::ptr skeleton):
 	//mSkeleton,
 	//mBones,
-	mLastRenderUpdateFrame(-1),
+	mLastUpdateFrame(-1),
 
 	//mSequence,
 	mSequenceTime(0)
@@ -70,10 +70,10 @@ void MeshNodeSkeleton::updateBones(){
 	}
 
 	if(mNode!=NULL){
-		mLastRenderUpdateFrame=mNode->getScene()->getRenderFrame();
+		mLastUpdateFrame=mNode->getScene()->getFrame();
 	}
 	else{
-		mLastRenderUpdateFrame=-1;
+		mLastUpdateFrame=-1;
 	}
 }
 
@@ -318,7 +318,7 @@ void MeshNodeSkeleton::updateVertexData(){
 }
 
 const Matrix4x4 &MeshNodeSkeleton::getRenderTransform() const{
-	return mNode!=NULL?mNode->getWorldRenderTransform():Math::IDENTITY_MATRIX4X4;
+	return mNode!=NULL?mNode->getRenderTransform():Math::IDENTITY_MATRIX4X4;
 }
 
 void MeshNodeSkeleton::render(Renderer *renderer) const{

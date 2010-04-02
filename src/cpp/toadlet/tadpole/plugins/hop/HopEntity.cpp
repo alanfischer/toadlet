@@ -302,8 +302,6 @@ void HopEntity::preLogicUpdateLoop(int dt){
 void HopEntity::logicUpdate(int dt){
 	if(mSolid->active()){
 		super::setTranslate(mSolid->getPosition());
-		Math::sub(mBoundExpansion,mTranslate,mLastPosition);
-		Math::div(mBoundExpansion,Math::TWO);
 	}
 
 	super::logicUpdate(dt);
@@ -319,11 +317,23 @@ void HopEntity::postLogicUpdate(int dt){
 	}
 }
 
-void HopEntity::renderUpdate(CameraNode *camera,RenderQueue *queue){
-	super::renderUpdate(camera,queue);
-
+void HopEntity::frameUpdate(int dt){
+	scalar f=mScene->getLogicFraction();
 	bool active=mSolid->active();
 	bool activePrevious=mActivePrevious;
+	if(active || activePrevious){
+		/// @todo: Add an option to either use strict interpolation, or fuzzy interpolation
+		// If we are deactivating, then make sure we are at our rest point
+		if(active==false && activePrevious){
+			interpolatePhysicalParameters(Math::ONE);
+		}
+		else{
+			interpolatePhysicalParameters(f);
+		}
+	}
+
+	super::frameUpdate(dt);
+
 	if(active || activePrevious){
 		if(mShadowMesh!=NULL){
 			castShadow();
@@ -334,47 +344,18 @@ void HopEntity::renderUpdate(CameraNode *camera,RenderQueue *queue){
 	}
 }
 
-void HopEntity::updateRenderTransforms(){
-	scalar f=mScene->getLogicFraction();
-
-	bool active=mSolid->active();
-	bool activePrevious=mActivePrevious;
-	if(active || activePrevious){
-		/// @todo: Add an option to either use strict interpolation, or fuzzy interpolation
-		// If we are deactivating, then make sure we are at our rest point
-#if 1
-		if(active==false && activePrevious){
-			interpolatePhysicalParameters(Math::ONE);
-		}
-		else{
-			interpolatePhysicalParameters(f);
-		}
-#elif 0
-		/// @todo: This needs to be based on the logicFraction SOMEHOW,otherwise the result of calling this method multiple timer per frame will be bad
-
-		Vector3 last;Math::setTranslateFromMatrix4x4(last,entity->getRenderTransform());
-		Vector3 translate;Math::lerp(translate,last,entity->getTranslate(),0.3);
-		setRenderTransformTranslate(translate);
-#else
-		setRenderTransformTranslate(getTranslate());
-#endif
-	}
-
-	super::updateRenderTransforms();
-}
-
 void HopEntity::interpolatePhysicalParameters(scalar f){
 	Vector3 &interpolate=cache_interpolatePhysicalParameters_interpolate;
 	Math::lerp(interpolate,mLastPosition,mSolid->getPosition(),f);
-	setRenderTransformTranslate(interpolate);
+	super::setTranslate(interpolate);
 }
 
 void HopEntity::castShadow(){
 	Segment segment;
 	Vector3 vector;
 	Matrix3x3 rotate;
-	Math::setTranslateFromMatrix4x4(segment.origin,mRenderTransform);
-	Math::setMatrix3x3FromMatrix4x4(rotate,mRenderTransform);
+	segment.origin.set(mWorldTranslate);
+	Math::setMatrix3x3FromQuaternion(rotate,mWorldRotate);
 	Math::normalize(vector,mSolid->getSimulator()->getGravity());
 	Math::mul(segment.direction,vector,mShadowTestLength);
 
@@ -452,12 +433,10 @@ void HopEntity::showCollisionVolumes(bool show){
 
 void HopEntity::updateVolumes(bool interpolate){
 	if(interpolate){
-		Vector3 translate;
-		Math::setTranslateFromMatrix4x4(translate,mRenderTransform);
-		mVolumeNode->setTranslate(translate);
+		mVolumeNode->setTranslate(getTranslate());
 	}
 	else{
-		mVolumeNode->setTranslate(getTranslate());
+		mVolumeNode->setTranslate(mSolid->getPosition());
 	}
 }
 

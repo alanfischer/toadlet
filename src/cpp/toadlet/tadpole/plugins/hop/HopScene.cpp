@@ -174,8 +174,16 @@ void HopScene::postLogicUpdateLoop(int dt){
 	mScene->postLogicUpdateLoop(dt);
 }
 
-void HopScene::intraUpdate(int dt){
-	mScene->intraUpdate(dt);
+void HopScene::preFrameUpdate(int dt){
+	mScene->preFrameUpdate(dt);
+}
+
+void HopScene::frameUpdate(int dt){
+	mScene->frameUpdate(dt);
+}
+
+void HopScene::postFrameUpdate(int dt){
+	mScene->postFrameUpdate(dt);
 }
 
 class QueryListener:public SpacialQueryResultsListener{

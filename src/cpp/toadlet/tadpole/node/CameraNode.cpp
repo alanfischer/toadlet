@@ -64,15 +64,13 @@ CameraNode::CameraNode():super(),
 Node *CameraNode::create(Scene *scene){
 	super::create(scene);
 
-	setProjectionFovX(Math::HALF_PI,Math::fromInt(1),Math::fromInt(1),Math::fromInt(100));
+	setProjectionFovX(Math::HALF_PI,Math::fromInt(1),Math::fromInt(1),Math::fromInt(1000));
 	mViewportSet=false;
 	mViewport.reset();
 	mClearFlags=Renderer::ClearFlag_COLOR|Renderer::ClearFlag_DEPTH;
 	mClearColor.reset();
 	mSkipFirstClear=false;
 	mMidNode=NULL;
-
-	updateViewTransform();
 
 	mNumCulled=0;
 	mFPSLastTime=0;
@@ -91,7 +89,7 @@ void CameraNode::setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,sca
 
 	Math::setMatrix4x4FromPerspectiveX(mProjectionTransform,fovx,aspect,nearDist,farDist);
 
-	update();
+	updateMidNode();
 }
 
 void CameraNode::setProjectionFovY(scalar fovy,scalar aspect,scalar nearDist,scalar farDist){
@@ -103,7 +101,7 @@ void CameraNode::setProjectionFovY(scalar fovy,scalar aspect,scalar nearDist,sca
 
 	Math::setMatrix4x4FromPerspectiveY(mProjectionTransform,fovy,aspect,nearDist,farDist);
 
-	update();
+	updateMidNode();
 }
 
 void CameraNode::setProjectionOrtho(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist){
@@ -115,7 +113,7 @@ void CameraNode::setProjectionOrtho(scalar leftDist,scalar rightDist,scalar bott
 
 	Math::setMatrix4x4FromOrtho(mProjectionTransform,leftDist,rightDist,bottomDist,topDist,nearDist,farDist);
 
-	update();
+	updateMidNode();
 }
 
 void CameraNode::setProjectionFrustum(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist){
@@ -127,7 +125,7 @@ void CameraNode::setProjectionFrustum(scalar leftDist,scalar rightDist,scalar bo
 
 	Math::setMatrix4x4FromFrustum(mProjectionTransform,leftDist,rightDist,bottomDist,topDist,nearDist,farDist);
 
-	update();
+	updateMidNode();
 }
 
 void CameraNode::setProjectionTransform(const Matrix4x4 &transform){
@@ -139,7 +137,7 @@ void CameraNode::setProjectionTransform(const Matrix4x4 &transform){
 
 	mProjectionTransform.set(transform);
 
-	update();
+	updateMidNode();
 }
 
 void CameraNode::setProjectionRotation(scalar rotate){
@@ -184,21 +182,57 @@ void CameraNode::setNearAndFarDist(scalar nearDist,scalar farDist){
 }
 
 void CameraNode::setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up){
-	Math::setMatrix4x4FromLookAt(mRenderTransform,eye,point,up,true);
+	Matrix4x4 &transform=cache_setProjectionRotation_projection;
+	Math::setMatrix4x4FromLookAt(transform,eye,point,up,true);
 
-	Math::setTranslateFromMatrix4x4(mTranslate,mRenderTransform);
-	Math::setQuaternionFromMatrix4x4(mRotate,mRenderTransform);
+	Math::setTranslateFromMatrix4x4(mTranslate,transform);
+	Math::setQuaternionFromMatrix4x4(mRotate,transform);
+	mIdentityTransform=false;
+	activate();
+}
 
+void CameraNode::setWorldLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up){
+	Matrix4x4 &transform=cache_setProjectionRotation_projection;
+	Math::setMatrix4x4FromLookAt(transform,eye,point,up,true);
+
+	Math::setTranslateFromMatrix4x4(mWorldTranslate,transform);
+	Math::setQuaternionFromMatrix4x4(mWorldRotate,transform);
+	if(mParent!=NULL){
+		Quaternion invrot;
+		Math::invert(invrot,mParent->getWorldRotate());
+		Math::sub(mWorldTranslate,mParent->getWorldTranslate());
+		Math::div(mWorldTranslate,mParent->getWorldScale());
+		Math::mul(mTranslate,invrot,mWorldTranslate);
+		Math::mul(mRotate,invrot,mWorldRotate);
+	}
 	mIdentityTransform=false;
 	activate();
 }
 
 void CameraNode::setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up){
-	Math::setMatrix4x4FromLookDir(mRenderTransform,eye,dir,up,true);
+	Matrix4x4 &transform=cache_setProjectionRotation_projection;
+	Math::setMatrix4x4FromLookDir(transform,eye,dir,up,true);
 
-	Math::setTranslateFromMatrix4x4(mTranslate,mRenderTransform);
-	Math::setQuaternionFromMatrix4x4(mRotate,mRenderTransform);
+	Math::setTranslateFromMatrix4x4(mTranslate,transform);
+	Math::setQuaternionFromMatrix4x4(mRotate,transform);
+	mIdentityTransform=false;
+	activate();
+}
 
+void CameraNode::setWorldLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up){
+	Matrix4x4 &transform=cache_setProjectionRotation_projection;
+	Math::setMatrix4x4FromLookDir(transform,eye,dir,up,true);
+
+	Math::setTranslateFromMatrix4x4(mWorldTranslate,transform);
+	Math::setQuaternionFromMatrix4x4(mWorldRotate,transform);
+	if(mParent!=NULL){
+		Quaternion invrot;
+		Math::invert(invrot,mParent->getWorldRotate());
+		Math::sub(mWorldTranslate,mParent->getWorldTranslate());
+		Math::div(mWorldTranslate,mParent->getWorldScale());
+		Math::mul(mTranslate,invrot,mWorldTranslate);
+		Math::mul(mRotate,invrot,mWorldRotate);
+	}
 	mIdentityTransform=false;
 	activate();
 }
@@ -217,7 +251,7 @@ ParentNode::ptr CameraNode::getMidNode(){
 	if(mMidNode==NULL){
 		mMidNode=mEngine->createNodeType(ParentNode::type(),getScene());
 		attach(mMidNode);
-		update();
+		updateMidNode();
 	}
 	return mMidNode;
 }
@@ -225,6 +259,48 @@ ParentNode::ptr CameraNode::getMidNode(){
 void CameraNode::frameUpdate(int dt){
 	super::frameUpdate(dt);
 
+	updateViewTransform();
+}
+
+bool CameraNode::culled(const Sphere &sphere) const{
+	if(sphere.radius<0) return false;
+	scalar distance=0;
+	int i;
+	for(i=0;i<6;++i){
+		distance=Math::dot(mClipPlanes[i].normal,sphere.origin)+mClipPlanes[i].distance;
+		if(distance<-sphere.radius){
+			return true;
+		}
+	}
+	return false;
+}
+
+bool CameraNode::culled(const AABox &box){
+	int i;
+	for(i=0;i<6;i++){
+		if(box.findPVertexLength(mClipPlanes[i])<0){
+			return true;
+		}
+	}
+	return false;
+}
+
+void CameraNode::updateFramesPerSecond(){
+	mNumCulled=0;
+	mFPSFrameCount++;
+	int fpsTime=mScene->getTime();
+	if(mFPSLastTime==0 || fpsTime-mFPSLastTime>5000){
+		scalar fps=0;
+		if(mFPSLastTime>0){
+			fps=Math::div(Math::fromInt(mFPSFrameCount),Math::fromMilli(fpsTime-mFPSLastTime));
+		}
+		mFPSLastTime=fpsTime;
+		mFPSFrameCount=0;
+		mFPS=fps;
+	}
+}
+
+void CameraNode::updateViewTransform(){
 	scalar wt00=mWorldTransform.at(0,0),wt01=mWorldTransform.at(0,1),wt02=mWorldTransform.at(0,2);
 	scalar wt10=mWorldTransform.at(1,0),wt11=mWorldTransform.at(1,1),wt12=mWorldTransform.at(1,2);
 	scalar wt20=mWorldTransform.at(2,0),wt21=mWorldTransform.at(2,1),wt22=mWorldTransform.at(2,2);
@@ -260,45 +336,7 @@ void CameraNode::frameUpdate(int dt){
 	Math::normalize(mClipPlanes[5].set(vpt[3]+vpt[2], vpt[7]+vpt[6], vpt[11]+vpt[10], vpt[15]+vpt[14]));
 }
 
-bool CameraNode::culled(const Sphere &sphere) const{
-	if(sphere.radius<0) return false;
-	scalar distance=0;
-	int i;
-	for(i=0;i<6;++i){
-		distance=Math::dot(mClipPlanes[i].normal,sphere.origin)+mClipPlanes[i].distance;
-		if(distance<-sphere.radius){
-			return true;
-		}
-	}
-	return false;
-}
-
-bool CameraNode::culled(const AABox &box){
-	int i;
-	for(i=0;i<6;i++){
-		if(box.findPVertexLength(mClipPlanes[i])<0){
-			return true;
-		}
-	}
-	return false;
-}
-
-void CameraNode::updateFramesPerSecond(){
-	mNumCulled=0;
-	mFPSFrameCount++;
-	int fpsTime=mScene->getRenderTime();
-	if(mFPSLastTime==0 || fpsTime-mFPSLastTime>5000){
-		scalar fps=0;
-		if(mFPSLastTime>0){
-			fps=Math::div(Math::fromInt(mFPSFrameCount),Math::fromMilli(fpsTime-mFPSLastTime));
-		}
-		mFPSLastTime=fpsTime;
-		mFPSFrameCount=0;
-		mFPS=fps;
-	}
-}
-
-void CameraNode::update(){
+void CameraNode::updateMidNode(){
 	if(mMidNode!=NULL){
 		mMidNode->setTranslate(0,0,(mFarDist-mNearDist)/2);
 	}
