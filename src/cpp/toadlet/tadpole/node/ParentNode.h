@@ -48,7 +48,9 @@ public:
 	virtual void removeAllNodeDestroyedListeners();
 
 	virtual bool attach(Node *node);
+	virtual void nodeAttached(Node *node){}
 	virtual bool remove(Node *node);
+	virtual void nodeRemoved(Node *node){}
 
 	inline int getNumChildren() const{return mChildren.size();}
 	inline Node *getChild(int i) const{return mChildren[i];}

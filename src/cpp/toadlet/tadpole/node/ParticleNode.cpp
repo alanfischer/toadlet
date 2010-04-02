@@ -35,6 +35,8 @@
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
 
+/// @todo: Particles only work in debug mode??
+
 namespace toadlet{
 namespace tadpole{
 namespace node{
@@ -114,6 +116,7 @@ Node *ParticleNode::create(Scene *scene){
 
 	mHasIdealViewTransform=false;
 	mIdealViewTransform.reset();
+	mDeactivateCount=-1; /// @todo: HACK
 
 	mEpsilon=
 		#if defined(TOADLET_FIXED_POINT)

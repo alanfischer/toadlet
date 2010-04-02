@@ -240,6 +240,7 @@ bool GLTexture::load(int format,int width,int height,int depth,int mipLevel,uint
 	if(format!=closestFormat){
 		finalData=new uint8[width*ImageFormatConversion::getPixelSize(closestFormat)*height*depth];
 		int rowPitch=width*ImageFormatConversion::getPixelSize(format),slicePitch=width*height*ImageFormatConversion::getPixelSize(format);
+		Logger::alert(String("COPYIN!:")+format+":"+closestFormat);
 		ImageFormatConversion::convert(data,format,rowPitch,slicePitch,finalData,closestFormat,rowPitch,slicePitch,width,height,depth);
 	}
 

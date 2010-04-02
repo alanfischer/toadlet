@@ -414,6 +414,9 @@ void D3D9Renderer::setDefaultStates(){
 	{
 		mD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE,true);
 		mD3DDevice->SetRenderState(D3DRS_SPECULARENABLE,true);
+
+		/// @todo: Move this to a render state
+		mD3DDevice->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS,true);
 	}
 }
 
@@ -770,10 +773,13 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 	}
 	else{
 		result=mD3DDevice->SetTexture(stage,NULL);
-		TOADLET_CHECK_D3D9ERROR(result,"disableTextureStage");
+		TOADLET_CHECK_D3D9ERROR(result,"SetTexture");
 
 		result=mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXCOORDINDEX,0);
-		TOADLET_CHECK_D3D9ERROR(result,"disableTextureStage");
+		TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
+
+		result=mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_DISABLE);
+		TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
 	}
 }
 
@@ -882,7 +888,7 @@ void D3D9Renderer::setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D
 	capabilitySet.maxTextureStages=caps.MaxTextureBlendStages;
 	capabilitySet.maxTextureSize=math::Math::minVal(caps.MaxTextureWidth,caps.MaxTextureHeight);
 	capabilitySet.textureDot3=(caps.TextureOpCaps & D3DTEXOPCAPS_DOTPRODUCT3)!=0;
-	capabilitySet.textureNonPowerOf2=false;//(caps.TextureCaps & D3DPTEXTURECAPS_POW2)==0 && (caps.TextureCaps & D3DPTEXTURECAPS_SQUAREONLY)==0;
+	capabilitySet.textureNonPowerOf2=(caps.TextureCaps & D3DPTEXTURECAPS_POW2)==0 && (caps.TextureCaps & D3DPTEXTURECAPS_SQUAREONLY)==0;
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 		capabilitySet.textureNonPowerOf2Restricted=false;
 	#else

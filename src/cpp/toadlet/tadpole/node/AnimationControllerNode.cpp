@@ -87,7 +87,6 @@ void AnimationControllerNode::stop(){
 
 void AnimationControllerNode::frameUpdate(int dt){
 	super::frameUpdate(dt);
-
 	if(mStartingFrame!=mScene->getLogicFrame()){
 		mAnimationController->update(dt);
 	}

@@ -67,13 +67,13 @@ D3D9WindowRenderTarget::~D3D9WindowRenderTarget(){
 bool D3D9WindowRenderTarget::makeCurrent(IDirect3DDevice9 *device){
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 		HRESULT result=device->SetRenderTarget(mColorSurface,mDepthSurface);
-		TOADLET_CHECK_D3D9ERROR(result,"Error in SetRenderTarget");
+		TOADLET_CHECK_D3D9ERROR(result,"SetRenderTarget");
 	#else
 		HRESULT result=device->SetRenderTarget(0,mColorSurface);
-		TOADLET_CHECK_D3D9ERROR(result,"Error in SetRenderTarget");
+		TOADLET_CHECK_D3D9ERROR(result,"SetRenderTarget");
 
 		result=device->SetDepthStencilSurface(mDepthSurface);
-		TOADLET_CHECK_D3D9ERROR(result,"Error in SetDepthStencilSurface");
+		TOADLET_CHECK_D3D9ERROR(result,"SetDepthStencilSurface");
 	#endif
 
 	return true;
@@ -93,7 +93,7 @@ void D3D9WindowRenderTarget::reset(){
 	fillPresentParameters(mPresentParameters);
 
 	HRESULT result=mD3DDevice->Reset(&mPresentParameters);
-	TOADLET_CHECK_D3D9ERROR(result,"reset");
+	TOADLET_CHECK_D3D9ERROR(result,"Reset");
 
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 		mD3DDevice->GetRenderTarget(&mColorSurface);
@@ -187,11 +187,21 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual){
 		else{
 			mPresentParameters.PresentationInterval=D3DPRESENT_INTERVAL_IMMEDIATE;
 		}
+
+		if(visual.multisamples>0){
+			int samples=visual.multisamples;
+			HRESULT result;
+			do{
+				result=mD3D->CheckDeviceMultiSampleType(adaptor,devtype,mPresentParameters.BackBufferFormat,mPresentParameters.Windowed,(D3DMULTISAMPLE_TYPE)samples,NULL);
+			}while(FAILED(result) && --samples>0);
+			Logger::alert(String("SAMPS:")+samples);
+			mPresentParameters.MultiSampleType=(D3DMULTISAMPLE_TYPE)samples;
+		}
 	#endif
 
 	result=mD3D->CreateDevice(adaptor,devtype,wnd,flags,&mPresentParameters,&mD3DDevice);
 	if(FAILED(result)){
-		TOADLET_CHECK_D3D9ERROR(result,"Error creating D3D Device");
+		TOADLET_CHECK_D3D9ERROR(result,"CreateDevice");
 		return false;
 	}
 

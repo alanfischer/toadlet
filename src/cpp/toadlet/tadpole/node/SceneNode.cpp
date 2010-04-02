@@ -32,6 +32,7 @@
 #include <toadlet/tadpole/node/SceneNode.h>
 
 using namespace toadlet::egg;
+using namespace toadlet::egg::image;
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 
@@ -490,6 +491,10 @@ void SceneNode::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQu
 	}
 }
 
+bool SceneNode::culled(Node *node,CameraNode *camera){
+	return (node->mScope&camera->mScope)==0 || camera->culled(node->mWorldBound);
+}
+
 bool SceneNode::performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact){
 	SpacialQueryResultsListener *listener=query->getSpacialQueryResultsListener();
 
@@ -503,8 +508,27 @@ bool SceneNode::performAABoxQuery(SpacialQuery *query,const AABox &box,bool exac
 	return true;
 }
 
-bool SceneNode::culled(Node *node,CameraNode *camera){
-	return (node->mScope&camera->mScope)==0 || camera->culled(node->mWorldBound);
+Image::ptr SceneNode::renderToImage(Renderer *renderer,CameraNode *camera,int format,int width,int height){
+	Texture::ptr renderTexture=mEngine->getTextureManager()->createTexture(Texture::UsageFlags_RENDERTARGET,Texture::Dimension_D2,format,width,height,0,1);
+	SurfaceRenderTarget::ptr renderTarget=mEngine->getTextureManager()->createSurfaceRenderTarget();
+	renderTarget->attach(renderTexture->getMipSurface(0,0),SurfaceRenderTarget::Attachment_COLOR_0);
+
+	RenderTarget *oldTarget=renderer->getRenderTarget();
+	renderer->setRenderTarget(renderTarget);
+	Viewport oldView=camera->getViewport();
+	camera->setViewport(Viewport(0,0,width,height));
+	renderer->beginScene();
+		render(renderer,camera,NULL);
+	renderer->endScene();
+	renderer->setRenderTarget(oldTarget);
+	camera->setViewport(oldView);
+
+	Image::ptr image=mEngine->getTextureManager()->createImage(renderTexture);
+
+	renderTarget->destroy();
+	renderTexture->release();
+
+	return image;
 }
 
 int SceneNode::nodeCreated(Node *node){

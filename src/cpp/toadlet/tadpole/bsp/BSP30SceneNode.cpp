@@ -253,40 +253,27 @@ void BSP30SceneNode::traceSegment(Collision &result,const Segment &segment,const
 	}
 }
 
-bool BSP30SceneNode::attach(Node *node){
-	bool result=super::attach(node);
-	if(result){
-		node->parentDataChanged(new childdata());
+void BSP30SceneNode::nodeAttached(Node *node){
+	super::nodeAttached(node);
 
-		if(mMap!=NULL){
-			// HACK: Need to make sure the node is updated before we check its bounds.
-			//  This requirement will go away once we move the SceneNode's node updating into the nodes themselves
-			super::logicUpdate(node,0,-1);
+	node->parentDataChanged(new childdata());
 
-			Collection<int> &newIndexes=((childdata*)node->getParentData())->leafs;
-			mMap->findBoundLeafs(newIndexes,mMap->nodes,0,node->getWorldBound());
-			insertNodeLeafIndexes(newIndexes,node);
-		}
+	if(mMap!=NULL){
+		Collection<int> &newIndexes=((childdata*)node->getParentData())->leafs;
+		mMap->findBoundLeafs(newIndexes,mMap->nodes,0,node->getWorldBound());
+		insertNodeLeafIndexes(newIndexes,node);
 	}
-	return result;
 }
 
-bool BSP30SceneNode::remove(Node *node){
-	int i;
-	for(i=mChildren.size()-1;i>=0;--i){
-		if(mChildren[i]==node)break;
+void BSP30SceneNode::nodeRemoved(Node *node){
+	super::nodeRemoved(node);
+
+	if(mMap!=NULL){
+		removeNodeLeafIndexes(((childdata*)node->getParentData())->leafs,node);
 	}
 
-	bool result=super::remove(node);
-	if(result){
-		if(mMap!=NULL){
-			removeNodeLeafIndexes(((childdata*)node->getParentData())->leafs,node);
-		}
-
-		delete (childdata*)node->getParentData();
-		node->parentDataChanged(NULL);
-	}
-	return result;
+	delete (childdata*)node->getParentData();
+	node->parentDataChanged(NULL);
 }
 
 void BSP30SceneNode::insertNodeLeafIndexes(const Collection<int> &indexes,Node *node){

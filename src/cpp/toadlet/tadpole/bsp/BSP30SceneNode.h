@@ -106,8 +106,8 @@ public:
 	const Sphere &getLocalBound() const{return super::getLocalBound();}
 	void traceSegment(Collision &result,const Segment &segment,const Vector3 &size);
 
-	bool attach(Node *node);
-	bool remove(Node *node);
+	void nodeAttached(Node *node);
+	void nodeRemoved(Node *node);
 	void insertNodeLeafIndexes(const egg::Collection<int> &indexes,Node *node);
 	void removeNodeLeafIndexes(const egg::Collection<int> &indexes,Node *node);
 
