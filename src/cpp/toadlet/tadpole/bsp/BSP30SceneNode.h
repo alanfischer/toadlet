@@ -50,7 +50,7 @@ public:
 		SubModel(BSP30ModelNode *modelNode,BSP30Map *map);
 
 		Material *getRenderMaterial() const{return material;}
-		const Matrix4x4 &getRenderTransform() const{return modelNode->getWorldRenderTransform();}
+		const Matrix4x4 &getRenderTransform() const{return modelNode->getWorldTransform();}
 		void render(peeper::Renderer *renderer) const;
 
 		BSP30ModelNode *modelNode;
@@ -75,7 +75,7 @@ public:
 	inline int getNumSubModels() const{return mSubModels.size();}
 	SubModel *getSubModel(int i){return mSubModels[i];}
 
-	void renderUpdate(node::CameraNode *camera,RenderQueue *queue);
+	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 
 	const Sphere &getLocalBound() const{return super::getLocalBound();}
 	void traceSegment(Collision &result,const Segment &segment,const Vector3 &size);
@@ -113,7 +113,7 @@ public:
 
 	void childTransformUpdated(Node *child);
 
-	void renderUpdate(node::CameraNode *camera,RenderQueue *queue);
+	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 
 protected:
 	bool preLayerRender(peeper::Renderer *renderer,node::CameraNode *camera,int layer);

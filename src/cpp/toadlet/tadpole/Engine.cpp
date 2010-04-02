@@ -50,6 +50,24 @@
 //		But basically, a scene-branch can be set to be dependent on another sister scene branch.
 //		Then the first branch will be updated before the dependent ones.
 
+
+
+/// @todo  I think a good way to let us use EventKeyFrames with the Controller framework is to:
+///   1: Have a way of ensuring that the EventKeyFrames are aligned on LogicDT times.
+///   2: Have the AnimationControllerNode not issue a renderUpdate until we have enough logicUpdates to keep up with it.
+///  That way, entities without EventKeyFrames should update smoothly if something keeps the logic from flowing, but
+///   we will still be able to have any logic dependent stuff happen at the correct times.
+///
+///  Or perhaps, we could use the above tactic for all the update entities.  There is just 1 function, update
+///   But it stops being called if logic updates cease due to networking issues.
+///   Down sides are that its harder to do logic based updating, since you'd have to handle the checking to see if its
+///    been a logicDT yourself.
+
+/// @todo: Force no-scene-graph updates in renderUpdate, to allow us to thread that easily
+
+// Look at doing partial updates whenever an object is attached.  We do this in BSP30Scene to keep the bounding volumes up-to-date.  i think we need to finalize it
+
+
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/CapabilitySet.h>

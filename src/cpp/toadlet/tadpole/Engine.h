@@ -47,7 +47,7 @@
 #include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/QueryManager.h>
 #include <toadlet/tadpole/ResourceManager.h>
-#include <toadlet/tadpole/node/Scene.h>
+#include <toadlet/tadpole/node/SceneNode.h>
 #include <toadlet/tadpole/handler/AudioBufferHandler.h>
 #include <toadlet/tadpole/mesh/Mesh.h>
 

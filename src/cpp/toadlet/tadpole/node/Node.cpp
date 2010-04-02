@@ -51,6 +51,9 @@ Node::Node():
 
 	//mParent,
 	mParentData(NULL),
+
+	//mDependsUpon,
+
 	mIdentityTransform(false),
 	//mTranslate,
 	//mRotate,
@@ -91,6 +94,9 @@ Node *Node::create(Scene *scene){
 
 	mParent=NULL;
 	mParentData=NULL;
+
+	mDependsUpon=NULL;
+
 	mIdentityTransform=true;
 	mTranslate.reset();
 	mRotate.reset();
@@ -98,6 +104,7 @@ Node *Node::create(Scene *scene){
 	mWorldTranslate.reset();
 	mWorldRotate.reset();
 	mWorldScale.set(Math::ONE,Math::ONE,Math::ONE);
+	mWorldTransform.reset();
 	mScope=-1;
 	mName="";
 
@@ -106,9 +113,6 @@ Node *Node::create(Scene *scene){
 
 	mLocalBound.reset();
 	mWorldBound.reset();
-
-	mRenderTransform.reset();
-	mWorldRenderTransform.reset();
 
 	return this;
 }
@@ -126,6 +130,8 @@ void Node::destroy(){
 		((ParentNode*)mParent.get())->remove(this);
 		mParent=NULL;
 	}
+
+	mDependsUpon=NULL;
 
 	if(mNodeDestroyedListener!=NULL){
 		mNodeDestroyedListener->nodeDestroyed(this);
@@ -165,49 +171,41 @@ void Node::parentDataChanged(void *parentData){
 
 void Node::setTranslate(const Vector3 &translate){
 	mTranslate.set(translate);
-	setRenderTransformTranslate(mTranslate);
 	transformUpdated();
 }
 
 void Node::setTranslate(scalar x,scalar y,scalar z){
 	mTranslate.set(x,y,z);
-	setRenderTransformTranslate(mTranslate);
 	transformUpdated();
 }
 
 void Node::setRotate(const Matrix3x3 &rotate){
 	Math::setQuaternionFromMatrix3x3(mRotate,rotate);
-	setRenderTransformRotateScale(mRotate,mScale);
 	transformUpdated();
 }
 
 void Node::setRotate(const Quaternion &rotate){
 	mRotate.set(rotate);
-	setRenderTransformRotateScale(mRotate,mScale);
 	transformUpdated();
 }
 
 void Node::setRotate(scalar x,scalar y,scalar z,scalar angle){
 	Math::setQuaternionFromAxisAngle(mRotate,cache_setRotate_vector.set(x,y,z),angle);
-	setRenderTransformRotateScale(mRotate,mScale);
 	transformUpdated();
 }
 
 void Node::setScale(const Vector3 &scale){
 	mScale.set(scale);
-	setRenderTransformRotateScale(mRotate,mScale);
 	transformUpdated();
 }
 
 void Node::setScale(scalar x,scalar y,scalar z){
 	mScale.set(x,y,z);
-	setRenderTransformRotateScale(mRotate,mScale);
 	transformUpdated();
 }
 
 void Node::setScale(scalar s){
 	mScale.set(s,s,s);
-	setRenderTransformRotateScale(mRotate,mScale);
 	transformUpdated();
 }
 
@@ -216,7 +214,6 @@ void Node::setTransform(const Matrix4x4 &transform){
 	Math::setRotateFromMatrix4x4(cache_setTransform_matrix,transform,mScale);
 	Math::setQuaternionFromMatrix3x3(mRotate,cache_setTransform_matrix);
 	Math::setTranslateFromMatrix4x4(mTranslate,transform);
-	mRenderTransform.set(transform);
 	transformUpdated();
 }
 
@@ -237,9 +234,11 @@ void Node::setLocalBound(const Sphere &bound){
 	transformUpdated();
 }
 
-void Node::logicUpdate(int dt){}
+void Node::logicUpdate(int dt){
+	mLastLogicFrame=mScene->getLogicFrame();
+}
 
-void Node::frameUpdate(indt dt){
+void Node::frameUpdate(int dt){
 	if(mParent==NULL){
 		mWorldScale.set(mScale);
 		mWorldRotate.set(mRotate);
@@ -260,7 +259,10 @@ void Node::frameUpdate(indt dt){
 
 	mul(mWorldBound,mWorldTranslate,mWorldRotate,mWorldScale,mLocalBound);
 
-	Math::setMatrix4x4FromTranslateRotateScale(mWorldTransform,mWorldTranslate,mWorldRotate,mWorldScale);
+	Math::setMatrix3x3FromQuaternion(cache_setTransform_matrix,mWorldRotate);
+	Math::setMatrix4x4FromTranslateRotateScale(mWorldTransform,mWorldTranslate,cache_setTransform_matrix,mWorldScale);
+
+	mLastFrame=mScene->getFrame();
 }
 
 void Node::activate(){

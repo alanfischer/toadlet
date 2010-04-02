@@ -61,7 +61,7 @@ public:
 		SubMesh(MeshNode *meshNode,mesh::Mesh::SubMesh *meshSubMesh);
 
 		Material *getRenderMaterial() const{return material;}
-		const Matrix4x4 &getRenderTransform() const{return meshNode->getWorldRenderTransform();}
+		const Matrix4x4 &getRenderTransform() const{return meshNode->getWorldTransform();}
 		void render(peeper::Renderer *renderer) const;
 
 		Material::ptr material;
@@ -84,7 +84,7 @@ public:
 		virtual void start();
 		virtual void stop();
 
-		virtual void logicUpdate(int dt);
+		virtual void update(int dt);
 
 		void skeletonChanged();
 
@@ -121,7 +121,7 @@ public:
 	void createVertexBuffer();
 	void updateVertexBuffer();
 
-	const Matrix4x4 &getRenderTransform() const{return mWorldRenderTransform;}
+	const Matrix4x4 &getRenderTransform() const{return mWorldTransform;}
 
 protected:
 	mesh::Mesh::ptr mMesh;

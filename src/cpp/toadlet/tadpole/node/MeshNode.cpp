@@ -181,6 +181,8 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 	mMesh=mesh;
 	mMesh->retain();
 
+	setScale(mMesh->worldScale);
+
 	mLocalBound.origin.set(mMesh->bound.origin);
 	mLocalBound.radius=Math::mul(mMesh->bound.radius,mMesh->worldScale);
 
@@ -237,12 +239,12 @@ MeshNode::MeshAnimationController::ptr MeshNode::getAnimationController(){
 	return mAnimationController;
 }
 
-void MeshNode::frameUpdate(CameraNode *camera,RenderQueue *queue){
-	super::frameUpdate(camera,queue);
+void MeshNode::frameUpdate(int dt){
+	super::frameUpdate(dt);
 
 	if(mSkeleton!=NULL){
-		int lastRenderUpdateFrame=mSkeleton->getLastRenderUpdateFrame();
-		if(lastRenderUpdateFrame==-1 || lastRenderUpdateFrame==queue->getRenderFrame()){
+		int lastUpdateFrame=mSkeleton->getLastUpdateFrame();
+		if(lastUpdateFrame==-1 || lastUpdateFrame==mScene->getFrame()){
 			updateVertexBuffer();
 		}
 	}
@@ -250,16 +252,6 @@ void MeshNode::frameUpdate(CameraNode *camera,RenderQueue *queue){
 
 void MeshNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	super::queueRenderables(camera,queue);
-
-	/// @todo: Remove this scale system?  or do we need to leave it in for fixed point support?
-	if(mMesh!=NULL && mMesh->worldScale!=Math::ONE){
-		mWorldRenderTransform.reset();
-		mWorldRenderTransform.setAt(0,0,mMesh->worldScale);
-		mWorldRenderTransform.setAt(1,1,mMesh->worldScale);
-		mWorldRenderTransform.setAt(2,2,mMesh->worldScale);
-		Math::preMul(mWorldRenderTransform,mRenderTransform);
-		Math::preMul(mWorldRenderTransform,mParent->getWorldRenderTransform());
-	}
 
 	int i;
 	for(i=0;i<mSubMeshes.size();++i){

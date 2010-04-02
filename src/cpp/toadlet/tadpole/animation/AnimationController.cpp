@@ -33,8 +33,7 @@ namespace tadpole{
 namespace animation{
 
 AnimationController::AnimationController():
-	mLogicTime(0),
-	mRenderTime(0),
+	mTime(0),
 	mMinValue(0),
 	mMaxValue(0),
 	mMinTime(0),
@@ -95,19 +94,19 @@ void AnimationController::stop(){
 	set(0);
 }
 
-void AnimationController::logicUpdate(int dt){
+void AnimationController::update(int dt){
 	if(mRunning==false){
 		return;
 	}
 
 	if(mTimeScale>0){
-		if(mMaxTime>0 && mLogicTime>=mMaxTime){
+		if(mMaxTime>0 && mTime>=mMaxTime){
 			return;
 		}
 
-		mLogicTime+=Math::toMilli(Math::mul(Math::fromMilli(dt),mTimeScale));
+		mTime+=Math::toMilli(Math::mul(Math::fromMilli(dt),mTimeScale));
 
-		if(mMaxTime!=0 && mLogicTime>=mMaxTime){
+		if(mMaxTime!=0 && mTime>=mMaxTime){
 			mTime=mMaxTime;
 
 			set(Math::fromMilli(mTime));
@@ -125,9 +124,9 @@ void AnimationController::logicUpdate(int dt){
 		}
 	}
 	else if(mTimeScale<0){
-		mLogicTime+=Math::toMilli(Math::mul(Math::fromMilli(dt),mTimeScale));
+		mTime+=Math::toMilli(Math::mul(Math::fromMilli(dt),mTimeScale));
 
-		if(mLogicTime<0){
+		if(mTime<0){
 			mTime=0;
 
 			set(Math::fromMilli(0));
@@ -144,37 +143,6 @@ void AnimationController::logicUpdate(int dt){
 			}
 		}
 	}
-}
-
-void AnimationController::update(int dt){
-	if(mRunning==false){
-		return;
-	}
-
-	if(mTimeScale>0){
-		if(mMaxTime>0 && mTime>=mMaxTime){
-			return;
-		}
-
-		mTime+=Math::toMilli(Math::mul(Math::fromMilli(dt),mTimeScale));
-
-		if(mMaxTime>0 && mTime>=mMaxTime){
-			mTime=mMaxTime;
-		}
-	}
-	else if(mTimeScale<0){
-		if(mTime<0){
-			return;
-		}
-
-		mTime+=Math::toMilli(Math::mul(Math::fromMilli(dt),mTimeScale));
-
-		if(mTime<0){
-			mTime=0;
-		}
-	}
-
-	set(Math::fromMilli(mTime));
 }
 
 void AnimationController::set(scalar value){

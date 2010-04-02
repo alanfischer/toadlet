@@ -92,6 +92,9 @@ public:
 	virtual void parentDataChanged(void *parentData);
 	void *getParentData() const{return mParentData;}
 
+	virtual void setDependsUpon(Node *node){mDependsUpon=node;}
+	inline Node *getDependsUpon() const{return mDependsUpon;}
+
 	virtual void setTranslate(const Vector3 &translate);
 	virtual void setTranslate(scalar x,scalar y,scalar z);
 	inline const Vector3 &getTranslate() const{return mTranslate;}
@@ -110,6 +113,7 @@ public:
 	inline const Vector3 &getWorldScale() const{return mWorldScale;}
 
 	virtual void setTransform(const Matrix4x4 &transform);
+	inline const Matrix4x4 &getWorldTransform() const{return mWorldTransform;}
 
 	inline bool isIdentityTransform() const{return mIdentityTransform;}
 
@@ -129,7 +133,7 @@ public:
 
 	virtual void logicUpdate(int dt);
 	virtual void frameUpdate(int dt);
-	virtual void queueRenderables(CameraNode *camera,RenderQueue *queue);
+	virtual void queueRenderables(CameraNode *camera,RenderQueue *queue){}
 
 	virtual void activate();
 	inline bool active() const{return mActive;}
@@ -138,9 +142,6 @@ public:
 	inline Scene *getScene() const{return mScene;}
 
 	inline egg::PointerCounter *pointerCounter() const{return mPointerCounter;}
-	inline const Matrix4x4 &getRenderTransform() const{return mRenderTransform;}
-	inline const Matrix4x4 &getWorldRenderTransform() const{return mWorldRenderTransform;}
-
 	inline void internal_setManaged(bool managed){mManaged=managed;}
 	inline bool internal_getManaged() const{return mManaged;}
 
@@ -190,8 +191,6 @@ public:
 	}
 
 protected:
-	void setRenderTransformTranslate(const Vector3 &translate);
-	void setRenderTransformRotateScale(const Quaternion &rotate,const Vector3 &scale);
 	void transformUpdated();
 
 	// Allocation items
@@ -210,6 +209,9 @@ protected:
 
 	Node::ptr mParent;
 	void *mParentData;
+	
+	Node::ptr mDependsUpon;
+
 	bool mIdentityTransform;
 	Vector3 mTranslate;
 	Quaternion mRotate;
@@ -225,7 +227,9 @@ protected:
 	egg::String mName;
 
 	bool mActive;
-	int mDeactivateCount;	
+	int mDeactivateCount;
+	int mLastLogicFrame;
+	int mLastFrame;
 
 	Vector3 cache_setRotate_vector;
 	Matrix3x3 cache_setTransform_matrix;

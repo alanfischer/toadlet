@@ -61,7 +61,9 @@ public:
 	virtual bool getAlignmentCalculationsUseOrigin() const{return mAlignmentCalculationsUseOrigin;}
 
 	virtual void setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up);
+	virtual void setWorldLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up);
 	virtual void setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up);
+	virtual void setWorldLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up);
 
 	virtual void setViewport(const peeper::Viewport &viewport);
 	virtual void setViewport(int x,int y,int width,int height);
@@ -98,15 +100,16 @@ public:
 	inline const Matrix4x4 &getViewTransform() const{return mViewTransform;}
 
 	/// @todo: These should probably be moved into the Math library, and passing in a list of planes
-	bool culled(const Sphere &sphere) const;
-	bool culled(const AABox &box);
+	virtual bool culled(const Sphere &sphere) const;
+	virtual bool culled(const AABox &box);
 	inline int getNumCulled() const{return mNumCulled;}
 
 	virtual void updateFramesPerSecond();
 	inline scalar getFramesPerSecond() const{return mFPS;}
 
 protected:
-	void update();
+	virtual void updateViewTransform();
+	virtual void updateMidNode();
 
 	ProjectionType mProjectionType;
 	scalar mFov,mAspect;

@@ -74,8 +74,8 @@ public:
 	virtual int getLogicTime() const=0;
 	virtual int getLogicFrame() const=0;
 	virtual scalar getLogicFraction() const=0;
-	virtual int getRenderTime() const=0;
-	virtual int getRenderFrame() const=0;
+	virtual int getTime() const=0;
+	virtual int getFrame() const=0;
 
 	virtual void update(int dt)=0;
 	virtual void preLogicUpdateLoop(int dt)=0;
@@ -83,7 +83,9 @@ public:
 	virtual void logicUpdate(int dt)=0;
 	virtual void postLogicUpdate(int dt)=0;
 	virtual void postLogicUpdateLoop(int dt)=0;
-	virtual void intraUpdate(int dt)=0;
+	virtual void preFrameUpdate(int dt)=0;
+	virtual void frameUpdate(int dt)=0;
+	virtual void postFrameUpdate(int dt)=0;
 
 	virtual void render(peeper::Renderer *renderer,CameraNode *cameraNode,Node *node)=0;
 
@@ -94,8 +96,6 @@ public:
 	virtual UpdateListener *getUpdateListener() const=0;
 
 	virtual bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact)=0;
-
-	virtual void updateRenderTransformsToRoot(Node *node)=0;
 };
 
 }
