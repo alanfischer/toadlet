@@ -118,6 +118,7 @@ MeshNode::MeshNode():super()
 
 Node *MeshNode::create(Scene *scene){
 	super::create(scene);
+	setCameraAligned(false);
 
 	mMesh=NULL;
 	mSubMeshes.clear();

@@ -122,6 +122,9 @@ void AnimationController::update(int dt){
 				mFinishedListener->controllerFinished(this); // Must be last since it may delete this
 			}
 		}
+		else{
+			set(Math::fromMilli(mTime));
+		}
 	}
 	else if(mTimeScale<0){
 		mTime+=Math::toMilli(Math::mul(Math::fromMilli(dt),mTimeScale));

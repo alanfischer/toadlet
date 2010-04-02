@@ -35,15 +35,15 @@ class Visual{
 public:
 	Visual():
 		pixelFormat(egg::image::ImageDefinitions::Format_RGB_5_6_5),
-		depthBits(16),
+		depthBits(24),
 		stencilBits(0),
-		multisamples(0),
+		multisamples(2),
 		vsync(true)
 	{}
 
-		Visual(int pixelFormat,int depthBits):
+	Visual(int pixelFormat,int depthBits):
 		stencilBits(0),
-		multisamples(0),
+		multisamples(2),
 		vsync(true)
 	{
 		this->pixelFormat=pixelFormat;

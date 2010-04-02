@@ -775,6 +775,9 @@ void GLRenderer::setDefaultStates(){
 		/// @todo: Change the texture loading to agree with this?
 		glPixelStorei(GL_PACK_ALIGNMENT,1);
 		glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+		
+		/// @todo: Move this to a render state
+		glEnable(GL_MULTISAMPLE_ARB);
 	}
 
 	TOADLET_CHECK_GLERROR("setDefaultStates");

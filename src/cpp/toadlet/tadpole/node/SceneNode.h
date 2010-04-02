@@ -91,17 +91,19 @@ public:
 	virtual void frameUpdate(Node *node,int dt,int scope);
 	virtual void postFrameUpdate(int dt){}
 
-	virtual void render(peeper::Renderer *renderer,CameraNode *cameraNode,Node *node);
+	virtual void render(peeper::Renderer *renderer,CameraNode *camera,Node *node);
 	virtual void queueRenderables(CameraNode *camera,RenderQueue *queue);
 	virtual void queueRenderables(Node *node,CameraNode *camera,RenderQueue *queue);
 	virtual void renderRenderables(peeper::Renderer *renderer,CameraNode *camera,RenderQueue *queue);
+	virtual bool culled(Node *node,CameraNode *camera);
 
 	virtual void setUpdateListener(UpdateListener *updateListener){mUpdateListener=updateListener;}
 	virtual UpdateListener *getUpdateListener() const{return mUpdateListener;}
 
 	virtual bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact);
 
-	virtual bool culled(Node *node,CameraNode *camera);
+	virtual egg::image::Image::ptr renderToImage(peeper::Renderer *renderer,CameraNode *camera,int format,int width,int height);
+
 	virtual int nodeCreated(Node *node);
 	virtual void nodeDestroyed(Node *node);
 

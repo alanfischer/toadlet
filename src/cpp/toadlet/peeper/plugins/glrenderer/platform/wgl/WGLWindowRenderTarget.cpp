@@ -43,11 +43,12 @@ WGLWindowRenderTarget::WGLWindowRenderTarget():WGLRenderTarget(),
 {}
 
 WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,const Visual &visual,int pixelFormat):WGLRenderTarget(),
-	mWnd(wnd)
+	mWnd(NULL)
 	//mPFD
 {
 	if(pixelFormat==0 && visual.multisamples>1){
-		bool result=createContext(wnd,visual,pixelFormat);
+		HWND tmpWnd=CreateWindow(TEXT("Static"),NULL,0,0,0,0,0,0,0,0,0);
+		bool result=createContext(tmpWnd,visual,pixelFormat);
 
 		PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB=NULL;
 		if(result && wglIsExtensionSupported("WGL_ARB_multisample") && (wglChoosePixelFormatARB=(PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB"))!=NULL){
@@ -82,6 +83,7 @@ WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,const Visual &visual,int p
 		}
 
 		destroyContext();
+		DestroyWindow(tmpWnd);
 	}
 
 	createContext(wnd,visual,pixelFormat);
@@ -94,6 +96,7 @@ WGLWindowRenderTarget::~WGLWindowRenderTarget(){
 bool WGLWindowRenderTarget::createContext(HWND wnd,const Visual &visual,int pixelFormat){
 	BOOL result=0;
 
+	mWnd=wnd;
 	mDC=GetDC(mWnd);
 	if(mDC==0){
 		Error::unknown(Categories::TOADLET_PEEPER,

@@ -26,6 +26,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/tadpole/node/ParentNode.h>
+#include <toadlet/tadpole/node/SceneNode.h>
 
 using namespace toadlet::egg;
 
@@ -94,10 +95,16 @@ bool ParentNode::attach(Node *node){
 	mChildren.add(node);
 
 	node->parentChanged(this);
+	nodeAttached(node);
 
 	mShadowChildrenDirty=true;
 
 	activate();
+
+	/// @todo: Maybe all of the frameUpdateness should be moved just to the parentNode, so I can just update & remerge bounds, without calling into mScene
+	/// @todo: This should actually call to the parent, and update the bounds as far as needed.  If at some point, worldBound didnt change, then don't call further
+	mScene->getRootNode()->frameUpdate(node,0,-1);
+	merge(mWorldBound,node->getWorldBound());
 
 	return true;
 }
@@ -112,6 +119,7 @@ bool ParentNode::remove(Node *node){
 		mChildren.removeAt(i);
 
 		node->parentChanged(NULL);
+		nodeRemoved(node);
 
 		mShadowChildrenDirty=true;
 

@@ -52,12 +52,11 @@ Texture::ptr TextureManager::createTexture(const Image::ptr &image,int usageFlag
 	bool hasAutogen=mEngine->getRenderer()==NULL?false:mEngine->getRenderer()->getCapabilitySet().textureAutogenMipMaps;
 	// Only handle any autogen simulation if we actually have a renderer
 	bool wantsAutogen=mEngine->getRenderer()==NULL?false:(usageFlags&Texture::UsageFlags_AUTOGEN_MIPMAPS)>0;
-
 	Image::ptr scaledImage;
 	if(hasNonPowerOf2==false && (Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false) || Math::isPowerOf2(depth)==false){
-		int dwidth=Math::nextPowerOf2(width)>>1;
-		int dheight=Math::nextPowerOf2(height)>>1;
-		int ddepth=Math::nextPowerOf2(depth)>>1;
+		int dwidth=width>1?(Math::nextPowerOf2(width)>>1):1;
+		int dheight=height>1?(Math::nextPowerOf2(height)>>1):1;
+		int ddepth=depth>1?(Math::nextPowerOf2(depth)>>1):1;
 
 		scaledImage=Image::ptr(new Image(dimension,format,dwidth,dheight,ddepth));
 

@@ -33,7 +33,7 @@
 #include <toadlet/tadpole/animation/SkeletonAnimation.h>
 #include <toadlet/tadpole/mesh/Mesh.h>
 #include <toadlet/tadpole/node/MeshNodeSkeleton.h>
-#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/node/CameraAlignedNode.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -50,9 +50,9 @@ class Scene;
 //   whole scenegraph be updated by a ThreadPool, taking into account dependencies
 /// @todo: Also we need a way to determine "velocity" from an animation bone, and then remove that bone from the effect.
 //	That way we can embed "running" into an animation, and then extract the information from the animation and apply it to a solid.
-class TOADLET_API MeshNode:public Node{
+class TOADLET_API MeshNode:public CameraAlignedNode{
 public:
-	TOADLET_NODE(MeshNode,Node);
+	TOADLET_NODE(MeshNode,CameraAlignedNode);
 
 	class TOADLET_API SubMesh:public Renderable{
 	public:
