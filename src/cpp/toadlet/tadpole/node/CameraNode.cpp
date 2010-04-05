@@ -338,7 +338,7 @@ void CameraNode::updateViewTransform(){
 
 void CameraNode::updateMidNode(){
 	if(mMidNode!=NULL){
-		mMidNode->setTranslate(0,0,(mFarDist-mNearDist)/2);
+		mMidNode->setTranslate(0,0,-(mFarDist-mNearDist)/2);
 	}
 }
 

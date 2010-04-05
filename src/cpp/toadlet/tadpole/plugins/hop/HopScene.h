@@ -140,8 +140,6 @@ public:
 	hop::Collision cache_traceSegment_collision;
 
 protected:
-	void castShadow(peeper::Renderer *renderer,HopEntity *entity);
-
 	egg::PointerCounter *mCounter;
 	node::Scene *mChildScene;
 	node::Scene::ptr mScene;

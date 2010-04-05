@@ -585,6 +585,10 @@ RenderTarget *Win32Application::makeRenderTarget(int rendererPlugin){
 			target=new_D3D10WindowRenderTarget(win32->mWnd,mVisual);
 		#endif
 	}
+	if(target==NULL){
+		Error::unknown("no renderers defined");
+		return NULL;
+	}
 	if(target!=NULL && target->isValid()==false){
 		delete target;
 		target=NULL;

@@ -162,12 +162,6 @@ void HopScene::logicUpdate(int dt){
 
 void HopScene::postLogicUpdate(int dt){
 	mScene->postLogicUpdate(dt);
-
-	int i;
-	for(i=mHopEntities.size()-1;i>=0;--i){
-		HopEntity *entity=mHopEntities[i];
-		entity->postLogicUpdate(dt);
-	}
 }
 
 void HopScene::postLogicUpdateLoop(int dt){

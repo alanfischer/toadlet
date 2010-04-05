@@ -71,12 +71,12 @@ void ParentNode::destroyAllChildren(){
 	}
 }
 
-void ParentNode::removeAllNodeDestroyedListeners(){
-	super::removeAllNodeDestroyedListeners();
+void ParentNode::removeAllNodeListeners(){
+	super::removeAllNodeListeners();
 
 	int i;
 	for(i=mChildren.size()-1;i>=0;--i){
-		mChildren[i]->removeAllNodeDestroyedListeners();
+		mChildren[i]->removeAllNodeListeners();
 	}
 }
 

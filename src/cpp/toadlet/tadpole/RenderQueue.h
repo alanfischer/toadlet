@@ -27,6 +27,7 @@
 #define TOADLET_TADPOLE_RENDERQUEUE_H
 
 #include <toadlet/tadpole/Renderable.h>
+#include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/node/LightNode.h>
 
 namespace toadlet{
@@ -36,12 +37,27 @@ class TOADLET_API RenderQueue{
 public:
 	TOADLET_SHARED_POINTERS(RenderQueue);
 
+	class DepthRenderable{
+	public:
+		DepthRenderable():
+			renderable(NULL),
+			depth(0){}
+	
+		DepthRenderable(Renderable *r,scalar d):
+			renderable(r),
+			depth(d){}
+
+		Renderable *renderable;
+		scalar depth;
+	};
+
 	class RenderLayer{
 	public:
 		RenderLayer():
 			forceRender(false),
 			clearLayer(true){}
 
+		egg::Collection<DepthRenderable> depthSortedRenderables;
 		egg::Collection<Renderable*> renderables;
 
 		bool forceRender;
@@ -51,6 +67,7 @@ public:
 	RenderQueue();
 	virtual ~RenderQueue();
 
+	virtual void setCamera(node::CameraNode *camera){mCamera=camera;}
 	virtual void queueRenderable(Renderable *renderable);
 	virtual void queueLight(node::LightNode *light);
 	inline RenderLayer *getRenderLayer(int layer);
@@ -58,6 +75,7 @@ public:
 	inline node::LightNode *getLight(){return mLight;}
 
 protected:
+	node::CameraNode::ptr mCamera;
 	egg::Collection<RenderLayer*> mRenderLayers;
 	node::LightNode::ptr mLight;
 };

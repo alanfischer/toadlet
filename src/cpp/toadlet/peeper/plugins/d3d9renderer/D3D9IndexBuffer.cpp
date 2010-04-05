@@ -26,6 +26,7 @@
 #include "D3D9IndexBuffer.h"
 #include "D3D9Renderer.h"
 #include <toadlet/peeper/CapabilitySet.h>
+#include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 
 using namespace toadlet::egg;
@@ -123,9 +124,14 @@ void D3D9IndexBuffer::destroyContext(bool backData){
 		mBackingData=new uint8[mDataSize];
 		mBacking=true;
 
-		uint8 *data=lock(AccessType_READ_ONLY);
-		memcpy(mBackingData,data,mDataSize);
-		unlock();
+		uint8 *data=NULL;
+		TOADLET_TRY
+			data=lock(AccessType_READ_ONLY);
+		TOADLET_CATCH(const Exception &){data=NULL;}
+		if(data!=NULL){
+			memcpy(mBackingData,data,mDataSize);
+			unlock();
+		}
 	}
 
 	if(mIndexBuffer!=NULL){
@@ -144,6 +150,11 @@ bool D3D9IndexBuffer::contextNeedsReset(){
 
 uint8 *D3D9IndexBuffer::lock(AccessType lockType){
 	if(mIndexBuffer==NULL){
+		return NULL;
+	}
+
+	if(mAccessType==AccessType_NO_ACCESS || (mAccessType==AccessType_READ_ONLY && lockType==AccessType_WRITE_ONLY) || (mAccessType==AccessType_WRITE_ONLY && lockType==AccessType_READ_ONLY)){
+		Logger::error(Categories::TOADLET_PEEPER,"invalid lock type on buffer");
 		return NULL;
 	}
 

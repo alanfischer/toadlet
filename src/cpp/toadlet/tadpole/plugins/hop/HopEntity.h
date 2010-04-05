@@ -96,16 +96,9 @@ public:
 	virtual hop::Shape::ptr getShape(int i) const{return mSolid->getShape(i);}
 	virtual int getNumShapes() const{return mSolid->getNumShapes();}
 
+	virtual void touch(const tadpole::Collision &c){}
+
 	inline hop::Solid::ptr getSolid() const{return mSolid;}
-
-	virtual void think();
-	virtual void touch(const Collision &c);
-
-	virtual void setNextThink(int nextThink){mNextThink=nextThink;}
-	inline int getNextThink() const{return mNextThink;}
-
-	void setShadowMesh(mesh::Mesh::ptr shadow,scalar scale,scalar testLength,scalar offset);
-	inline mesh::Mesh::ptr setShadowMesh() const{return mShadowMesh;}
 
 	// Node callbacks
 	virtual void parentChanged(node::ParentNode *parent);
@@ -120,16 +113,13 @@ public:
 
 	virtual void preLogicUpdateLoop(int dt);
 	virtual void logicUpdate(int dt);
-	virtual void postLogicUpdate(int dt);
 	virtual void frameUpdate(int dt);
 	virtual void interpolatePhysicalParameters(scalar f);
 
 protected:
-	virtual void castShadow();
 	virtual void showCollisionVolumes(bool show);
 	virtual void updateVolumes(bool interpolate);
 
-	int mNextThink;
 	hop::Solid::ptr mSolid;
 	hop::Shape::ptr mTraceableShape;
 	Traceable *mTraceable;
@@ -137,12 +127,6 @@ protected:
 	HopScene *mHopScene;
 	Vector3 mLastPosition;
 	bool mActivePrevious;
-
-	scalar mShadowTestLength;
-	scalar mShadowOffset;
-	mesh::Mesh::ptr mShadowMesh;
-	Material::ptr mShadowMaterial;
-	node::MeshNode::ptr mShadowNode;
 
 	node::ParentNode::ptr mVolumeNode;
 
