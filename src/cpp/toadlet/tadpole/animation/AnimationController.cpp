@@ -72,6 +72,7 @@ void AnimationController::setTimeScale(scalar scale){
 	mTimeScale=scale;
 }
 
+/// @todo: this should go to a sharedptr, like the node listener
 void AnimationController::setAnimationControllerFinishedListener(AnimationControllerFinishedListener *listener,bool owns){
 	if(mOwnsFinishedListener && mFinishedListener!=NULL){
 		delete mFinishedListener;

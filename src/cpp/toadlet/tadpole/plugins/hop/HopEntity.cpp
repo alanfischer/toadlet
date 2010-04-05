@@ -40,20 +40,13 @@ namespace tadpole{
 TOADLET_NODE_IMPLEMENT(HopEntity,Categories::TOADLET_TADPOLE+".HopEntity");
 
 HopEntity::HopEntity():ParentNode(),
-	mNextThink(0),
 	mSolid(new Solid()),
 	//mTraceableShape,
 	mTraceable(NULL),
 
 	//mHopScene,
 	//mLastPosition,
-	mActivePrevious(false),
-
-	mShadowTestLength(0),
-	mShadowOffset(0)
-	//mShadowMesh,
-	//mShadowMaterial,
-	//mShadowNode
+	mActivePrevious(false)
 {}
 
 Node *HopEntity::create(Scene *scene){
@@ -62,18 +55,11 @@ Node *HopEntity::create(Scene *scene){
 	// No need to worry about this
 	mIdentityTransform=false;
 
-	mNextThink=0;
 	mSolid->reset();
 	mSolid->setUserData(this);
 	mHopScene=NULL;
 	mLastPosition.reset();
 	mActivePrevious=true;
-
-	mShadowTestLength=0;
-	mShadowOffset=0;
-	mShadowMesh=NULL;
-	mShadowMaterial=NULL;
-	mShadowNode=NULL;
 
 	mIdentityTransform=false;
 
@@ -219,35 +205,6 @@ void HopEntity::removeAllShapes(){
 	}
 }
 
-void HopEntity::think(){
-}
-
-void HopEntity::touch(const tadpole::Collision &c){
-}
-
-void HopEntity::setShadowMesh(Mesh::ptr shadow,scalar scale,scalar testLength,scalar offset){
-	mShadowMesh=shadow;
-	mShadowTestLength=testLength;
-	mShadowOffset=offset;
-	if(mShadowMesh!=NULL){
-		if(mShadowNode==NULL){
-			mShadowNode=mEngine->createNodeType(MeshNode::type(),mScene);
-			mScene->getRootNode()->attach(mShadowNode);
-		}
-		mShadowNode->setMesh(mShadowMesh);
-		mShadowNode->setScale(scale,scale,scale);
-		// We assume the shadow only has 1 subMesh
-		mShadowMaterial=mShadowNode->getSubMesh(0)->material;
-		mShadowMaterial->setBlend(Blend::Combination_ALPHA);
-	}
-	else{
-		if(mShadowNode!=NULL){
-			mShadowNode->destroy();
-			mShadowNode=NULL;
-		}
-	}
-}
-
 void HopEntity::parentChanged(ParentNode *parent){
 	if(mHopScene!=NULL){
 		if(parent==mScene->getRootNode()){
@@ -307,16 +264,6 @@ void HopEntity::logicUpdate(int dt){
 	super::logicUpdate(dt);
 }
 
-void HopEntity::postLogicUpdate(int dt){
-	if(mNextThink>0){
-		mNextThink-=dt;
-		if(mNextThink<=0){
-			mNextThink=0;
-			think();
-		}
-	}
-}
-
 void HopEntity::frameUpdate(int dt){
 	scalar f=mScene->getLogicFraction();
 	bool active=mSolid->active();
@@ -335,9 +282,6 @@ void HopEntity::frameUpdate(int dt){
 	super::frameUpdate(dt);
 
 	if(active || activePrevious){
-		if(mShadowMesh!=NULL){
-			castShadow();
-		}
 		if(mVolumeNode!=NULL){
 			updateVolumes(mHopScene->mInterpolateCollisionVolumes);
 		}
@@ -348,39 +292,6 @@ void HopEntity::interpolatePhysicalParameters(scalar f){
 	Vector3 &interpolate=cache_interpolatePhysicalParameters_interpolate;
 	Math::lerp(interpolate,mLastPosition,mSolid->getPosition(),f);
 	super::setTranslate(interpolate);
-}
-
-void HopEntity::castShadow(){
-	Segment segment;
-	Vector3 vector;
-	Matrix3x3 rotate;
-	segment.origin.set(mWorldTranslate);
-	Math::setMatrix3x3FromQuaternion(rotate,mWorldRotate);
-	Math::normalize(vector,mSolid->getSimulator()->getGravity());
-	Math::mul(segment.direction,vector,mShadowTestLength);
-
-	hop::Collision collision;
-	mSolid->getSimulator()->traceSegment(collision,segment,-1,mSolid);
-	// Shadow if the object beneath us is of infinite mass (eg static)
-	if(collision.collider!=NULL && collision.collider->hasInfiniteMass()){
-		Math::mul(vector,collision.normal,mShadowOffset);
-		Math::add(collision.point,vector);
-		mShadowNode->setTranslate(collision.point);
-
-		Vector3 zAxis;
-		Math::mul(zAxis,rotate,Math::Z_UNIT_VECTOR3);
-		Matrix3x3 shadowRotate;
-		Math::setMatrix3x3FromVector3ToVector3(shadowRotate,collision.normal,zAxis,Math::ONE/2048);
-		Math::postMul(rotate,shadowRotate);
-		mShadowNode->setRotate(rotate);
-
-		LightEffect le(Color(0,0,0,Math::ONE-collision.time));
-		mShadowMaterial->setLightEffect(le);
-	}
-	else{
-		LightEffect le(Colors::TRANSPARENT_BLACK);
-		mShadowMaterial->setLightEffect(le);
-	}
 }
 
 void HopEntity::showCollisionVolumes(bool show){

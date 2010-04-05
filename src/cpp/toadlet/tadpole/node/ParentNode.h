@@ -45,7 +45,7 @@ public:
 	virtual ParentNode *isParent(){return this;}
 
 	virtual void destroyAllChildren();
-	virtual void removeAllNodeDestroyedListeners();
+	virtual void removeAllNodeListeners();
 
 	virtual bool attach(Node *node);
 	virtual void nodeAttached(Node *node){}

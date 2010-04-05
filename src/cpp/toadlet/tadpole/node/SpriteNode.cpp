@@ -148,6 +148,11 @@ void SpriteNode::updateSprite(){
 		y=-height;
 	}
 
+	if(mVertexData!=NULL){
+		mVertexData->destroy();
+		mVertexData=NULL;
+	}
+
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,4);
 	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 	{

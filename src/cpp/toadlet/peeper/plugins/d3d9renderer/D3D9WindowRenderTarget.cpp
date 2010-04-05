@@ -128,31 +128,33 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual){
 		return false;
 	}
 
-	UINT adaptor=D3DADAPTER_DEFAULT;
+	mVisual=visual;
+
+	mAdaptor=D3DADAPTER_DEFAULT;
 	D3DADAPTER_IDENTIFIER9 identifier={0};
-	mD3D->GetAdapterIdentifier(adaptor,0,&identifier);
+	mD3D->GetAdapterIdentifier(mAdaptor,0,&identifier);
 	Logger::alert(Categories::TOADLET_PEEPER,
 		String("D3D Driver:") + identifier.Driver);
 	Logger::alert(Categories::TOADLET_PEEPER,
 		String("D3D Description:") + identifier.Description);
 
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		D3DMDEVTYPE devtype=D3DMDEVTYPE_DEFAULT;
+		mDevType=D3DMDEVTYPE_DEFAULT;
 	#else
-		D3DDEVTYPE devtype=D3DDEVTYPE_HAL;
+		mDevType=D3DDEVTYPE_HAL;
 	#endif
-
+	
 	DWORD flags=0;
 
 	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
-		result=mD3D->CheckDeviceType(adaptor,devtype,D3DFMT_X8R8G8B8,D3DFMT_X8R8G8B8,FALSE);
+		result=mD3D->CheckDeviceType(mAdaptor,mDevType,D3DFMT_X8R8G8B8,D3DFMT_X8R8G8B8,FALSE);
 		if(FAILED(result)){
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"D3D9RenderWindow: Error creating 8,8,8 bit back buffer");
 			return false;
 		}
 
-		result=mD3D->CheckDeviceFormat(adaptor,devtype,D3DFMT_X8R8G8B8,D3DUSAGE_DEPTHSTENCIL,D3DRTYPE_SURFACE,D3DFMT_D24S8);
+		result=mD3D->CheckDeviceFormat(mAdaptor,mDevType,D3DFMT_X8R8G8B8,D3DUSAGE_DEPTHSTENCIL,D3DRTYPE_SURFACE,D3DFMT_D24S8);
 		if(FAILED(result)){
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"D3D9RenderWindow: Error creating 16 bit depth, 8 bit stencil back buffer");
@@ -161,7 +163,7 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual){
 
 		D3DCAPS9 caps;
 		ZeroMemory(&caps,sizeof(D3DCAPS9));
-		result=mD3D->GetDeviceCaps(adaptor,devtype,&caps);
+		result=mD3D->GetDeviceCaps(mAdaptor,mDevType,&caps);
 		if(FAILED(result)){
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"D3D9RenderWindow: Error getting device caps");
@@ -180,26 +182,7 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual){
 
 	fillPresentParameters(mPresentParameters);
 
-	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
-		if(visual.vsync){
-			mPresentParameters.PresentationInterval=D3DPRESENT_INTERVAL_DEFAULT;
-		}
-		else{
-			mPresentParameters.PresentationInterval=D3DPRESENT_INTERVAL_IMMEDIATE;
-		}
-
-		if(visual.multisamples>0){
-			int samples=visual.multisamples;
-			HRESULT result;
-			do{
-				result=mD3D->CheckDeviceMultiSampleType(adaptor,devtype,mPresentParameters.BackBufferFormat,mPresentParameters.Windowed,(D3DMULTISAMPLE_TYPE)samples,NULL);
-			}while(FAILED(result) && --samples>0);
-			Logger::alert(String("SAMPS:")+samples);
-			mPresentParameters.MultiSampleType=(D3DMULTISAMPLE_TYPE)samples;
-		}
-	#endif
-
-	result=mD3D->CreateDevice(adaptor,devtype,wnd,flags,&mPresentParameters,&mD3DDevice);
+	result=mD3D->CreateDevice(mAdaptor,mDevType,wnd,flags,&mPresentParameters,&mD3DDevice);
 	if(FAILED(result)){
 		TOADLET_CHECK_D3D9ERROR(result,"CreateDevice");
 		return false;
@@ -266,6 +249,25 @@ void D3D9WindowRenderTarget::fillPresentParameters(D3DPRESENT_PARAMETERS &presen
 		presentParameters.BackBufferHeight	=mHeight;
 		presentParameters.BackBufferFormat	=D3DFMT_X8R8G8B8;
 	#endif
+
+	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+		if(mVisual.vsync){
+			mPresentParameters.PresentationInterval=D3DPRESENT_INTERVAL_DEFAULT;
+		}
+		else{
+			mPresentParameters.PresentationInterval=D3DPRESENT_INTERVAL_IMMEDIATE;
+		}
+
+		if(mVisual.multisamples>0){
+			int samples=mVisual.multisamples;
+			HRESULT result;
+			do{
+				result=mD3D->CheckDeviceMultiSampleType(mAdaptor,mDevType,mPresentParameters.BackBufferFormat,mPresentParameters.Windowed,(D3DMULTISAMPLE_TYPE)samples,NULL);
+			}while(FAILED(result) && --samples>0);
+			mPresentParameters.MultiSampleType=(D3DMULTISAMPLE_TYPE)samples;
+		}
+	#endif
+
 }
 
 }

@@ -45,10 +45,6 @@
 // - There are two types of alignments.
 //		= Regular Alignments are in the scene, and would be a model pointing at something else, or a billboard pointing a certain direction.
 //			Regular Alignments are applied to the rotation of the node.  THIS IS WHAT THE SQUIREL CAMERA IS
-// - Dependencies.
-//		These are used to get the proper regular alignments.  this is NOT QUITE FIGURED OUT.
-//		But basically, a scene-branch can be set to be dependent on another sister scene branch.
-//		Then the first branch will be updated before the dependent ones.
 
 
 
@@ -64,8 +60,6 @@
 ///    been a logicDT yourself.
 
 /// @todo: Force no-scene-graph updates in renderUpdate, to allow us to thread that easily
-
-// Look at doing partial updates whenever an object is attached.  We do this in BSP30Scene to keep the bounding volumes up-to-date.  i think we need to finalize it
 
 
 #include <toadlet/egg/Logger.h>

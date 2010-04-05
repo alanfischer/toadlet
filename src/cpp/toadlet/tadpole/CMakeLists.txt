@@ -190,7 +190,7 @@ set (TADPOLE_NODE_HEADERS
 	node/MeshNode.h
 	node/MeshNodeSkeleton.h
 	node/Node.h
-	node/NodeDestroyedListener.h
+	node/NodeListener.h
 	node/ParentNode.h
 	node/ParticleNode.h
 	node/Scene.h

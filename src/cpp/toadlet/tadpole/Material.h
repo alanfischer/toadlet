@@ -66,6 +66,9 @@ public:
 	void setBlend(const peeper::Blend &blend){mBlend=blend;}
 	inline const peeper::Blend &getBlend() const{return mBlend;}
 
+	void setDepthSorted(bool sorted){mDepthSorted=sorted;}
+	inline bool getDepthSorted() const{return mDepthSorted;}
+
 	void setDepthWrite(bool depthWrite){mDepthWrite=depthWrite;}
 	inline bool getDepthWrite() const{return mDepthWrite;}
 
@@ -91,6 +94,7 @@ protected:
 	peeper::Renderer::AlphaTest mAlphaTest;
 	scalar mAlphaTestCutoff;
 	peeper::Blend mBlend;
+	bool mDepthSorted;
 	bool mDepthWrite;
 	peeper::Renderer::DepthTest mDepthTest;
 	int mLayer;

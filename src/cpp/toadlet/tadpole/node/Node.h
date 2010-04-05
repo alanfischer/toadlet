@@ -31,7 +31,7 @@
 #include <toadlet/egg/WeakPointer.h>
 #include <toadlet/egg/Type.h>
 #include <toadlet/tadpole/Types.h>
-#include <toadlet/tadpole/node/NodeDestroyedListener.h>
+#include <toadlet/tadpole/node/NodeListener.h>
 
 #ifndef TOADLET_NODE
 	#define TOADLET_NODE(Class,SuperClass) \
@@ -83,10 +83,10 @@ public:
 
 	inline int getHandle() const{return mHandle;}
 
-	virtual void setNodeDestroyedListener(NodeDestroyedListener *listener,bool owns);
-	inline NodeDestroyedListener *getNodeDestroyedListener() const{return mNodeDestroyedListener;}
-	virtual void removeAllNodeDestroyedListeners();
-
+	virtual void addNodeListener(NodeListener::ptr listener);
+	virtual void removeNodeListener(NodeListener::ptr listener);
+	virtual void removeAllNodeListeners();
+	
 	virtual void parentChanged(ParentNode *parent);
 	ParentNode *getParent() const;
 	virtual void parentDataChanged(void *parentData);
@@ -204,8 +204,7 @@ protected:
 	int mHandle;
 
 	// Node items
-	NodeDestroyedListener *mNodeDestroyedListener;
-	bool mOwnsNodeDestroyedListener;
+	egg::Collection<NodeListener::ptr>::ptr mNodeListeners;
 
 	Node::ptr mParent;
 	void *mParentData;

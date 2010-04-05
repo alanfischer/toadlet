@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_NODE_NODEDESTROYEDLISTENER_H
-#define TOADLET_TADPOLE_NODE_NODEDESTROYEDLISTENER_H
+#ifndef TOADLET_TADPOLE_NODE_NODELISTENER_H
+#define TOADLET_TADPOLE_NODE_NODELISTENER_H
 
 #include <toadlet/tadpole/Types.h>
 
@@ -34,23 +34,44 @@ namespace node{
 
 class Node;
 
-class NodeDestroyedListener{
+class NodeListener{
 public:
-	virtual ~NodeDestroyedListener(){}
+	TOADLET_SHARED_POINTERS(NodeListener);
+
+	virtual ~NodeListener(){}
 
 	virtual void nodeDestroyed(Node *node)=0;
+	virtual void logicUpdate(Node *node,int dt)=0;
+	virtual void frameUpdate(Node *node,int dt)=0;
 };
 
 template<class Type>
-class NodeDestroyedFunctor:public NodeDestroyedListener{
+class NodeDestroyedFunctor:public NodeListener{
 public:
 	NodeDestroyedFunctor(Type *obj,void (Type::*func)(void)):mObject(obj),mFunction(func){}
 
 	virtual void nodeDestroyed(Node *node){(mObject->*mFunction)();}
+	virtual void logicUpdate(Node *node,int dt){}
+	virtual void frameUpdate(Node *node,int dt){}
 
 protected:
 	Type *mObject;
 	void (Type::*mFunction)(void);
+};
+
+template<class Type>
+class NodeUpdateFunctor:public NodeListener{
+public:
+	NodeUpdateFunctor(Type *obj,void (Type::*logicFunc)(int),void (Type::*frameFunc)(int)):mObject(obj),mLogicFunction(logicFunc),mFrameFunction(frameFunc){}
+
+	virtual void nodeDestroyed(Node *node){}
+	virtual void logicUpdate(Node *node,int dt){(mObject->*mLogicFunction)(dt);}
+	virtual void frameUpdate(Node *node,int dt){(mObject->*mFrameFunction)(dt);}
+
+protected:
+	Type *mObject;
+	void (Type::*mLogicFunction)(int);
+	void (Type::*mFrameFunction)(int);
 };
 
 }

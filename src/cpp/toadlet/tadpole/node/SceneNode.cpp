@@ -119,7 +119,7 @@ Node *SceneNode::findNodeByName(const String &name,Node *node){
 }
 
 Node *SceneNode::findNodeByHandle(int handle){
-	if(handle>=0 || handle<mNodesFromHandles.size()){
+	if(handle>=0 && handle<mNodesFromHandles.size()){
 		return mNodesFromHandles[handle];
 	}
 	else{
@@ -379,6 +379,7 @@ void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
 	mBackground->setTranslate(camera->getWorldTranslate());
 	frameUpdate(mBackground,0,-1);
 
+	mRenderQueue->setCamera(camera);
 	if(node!=NULL){
 		queueRenderables(node,camera,mRenderQueue);
 	}
@@ -482,6 +483,19 @@ void SceneNode::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQu
 			renderable->render(renderer);
 		}
 		layer->renderables.clear();
+
+		numRenderables=layer->depthSortedRenderables.size();
+		for(j=0;j<numRenderables;++j){
+			Renderable *renderable=layer->depthSortedRenderables[j].renderable;
+			Material *material=renderable->getRenderMaterial();
+			if(material!=NULL && mPreviousMaterial!=material){
+				material->setupRenderer(renderer,mPreviousMaterial);
+			}
+			mPreviousMaterial=material;
+			renderer->setModelMatrix(renderable->getRenderTransform());
+			renderable->render(renderer);
+		}
+		layer->depthSortedRenderables.clear();
 
 		postLayerRender(renderer,camera,layerNum);
 

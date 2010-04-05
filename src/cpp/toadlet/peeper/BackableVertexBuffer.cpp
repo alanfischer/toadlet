@@ -24,7 +24,10 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/peeper/BackableVertexBuffer.h>
+#include <toadlet/egg/Error.h>
 #include <string.h>
+
+using namespace toadlet::egg;
 
 namespace toadlet{
 namespace peeper{
@@ -97,16 +100,22 @@ bool BackableVertexBuffer::unlock(){
 void BackableVertexBuffer::setBack(VertexBuffer::ptr back,bool initial){
 	if(back!=mBack && mBack!=NULL){
 		mData=new uint8[mDataSize];
-		uint8 *backData=mBack->lock(AccessType_READ_ONLY);
-		memcpy(mData,backData,mDataSize);
+		uint8 *data=NULL;
+		TOADLET_TRY
+			data=lock(AccessType_READ_ONLY);
+		TOADLET_CATCH(const Exception &){data=NULL;}
+		memcpy(mData,data,mDataSize);
 		mBack->unlock();
 	}
 
 	mBack=back;
 	
 	if(initial==false && mBack!=NULL && mData!=NULL){
-		uint8 *backData=mBack->lock(AccessType_WRITE_ONLY);
-		memcpy(backData,mData,mDataSize);
+		uint8 *data=NULL;
+		TOADLET_TRY
+			data=lock(AccessType_WRITE_ONLY);
+		TOADLET_CATCH(const Exception &){data=NULL;}
+		memcpy(data,mData,mDataSize);
 		mBack->unlock();
 		delete[] mData;
 		mData=NULL;

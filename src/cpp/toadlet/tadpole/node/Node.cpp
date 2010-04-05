@@ -46,8 +46,7 @@ Node::Node():
 	mScene(NULL),
 	mHandle(0),
 
-	mNodeDestroyedListener(NULL),
-	mOwnsNodeDestroyedListener(false),
+	//mNodeListeners,
 
 	//mParent,
 	mParentData(NULL),
@@ -89,8 +88,7 @@ Node *Node::create(Scene *scene){
 	mScene=scene;
 	mHandle=mScene->nodeCreated(this);
 
-	mNodeDestroyedListener=NULL;
-	mOwnsNodeDestroyedListener=false;
+	mNodeListeners=NULL;
 
 	mParent=NULL;
 	mParentData=NULL;
@@ -133,9 +131,12 @@ void Node::destroy(){
 
 	mDependsUpon=NULL;
 
-	if(mNodeDestroyedListener!=NULL){
-		mNodeDestroyedListener->nodeDestroyed(this);
-		setNodeDestroyedListener(NULL,false);
+	if(mNodeListeners!=NULL){
+		int i;
+		for(i=0;i<mNodeListeners->size();++i){
+			mNodeListeners->at(i)->nodeDestroyed(this);
+		}
+		mNodeListeners=NULL;
 	}
 
 	mScene->nodeDestroyed(this);
@@ -145,16 +146,21 @@ void Node::destroy(){
 	mScene=NULL;
 }
 
-void Node::setNodeDestroyedListener(NodeDestroyedListener *listener,bool owns){
-	if(mOwnsNodeDestroyedListener && mNodeDestroyedListener!=NULL){
-		delete mNodeDestroyedListener;
+void Node::addNodeListener(NodeListener::ptr listener){
+	if(mNodeListeners==NULL){
+		mNodeListeners=Collection<NodeListener::ptr>::ptr(new egg::Collection<NodeListener::ptr>());
 	}
-	mNodeDestroyedListener=listener;
-	mOwnsNodeDestroyedListener=owns;
+	mNodeListeners->add(listener);
 }
 
-void Node::removeAllNodeDestroyedListeners(){
-	setNodeDestroyedListener(NULL,false);
+void Node::removeNodeListener(NodeListener::ptr listener){
+	if(mNodeListeners!=NULL){
+		mNodeListeners->remove(listener);
+	}
+}
+
+void Node::removeAllNodeListeners(){
+	mNodeListeners=NULL;
 }
 
 void Node::parentChanged(ParentNode *parent){
@@ -235,10 +241,24 @@ void Node::setLocalBound(const Sphere &bound){
 }
 
 void Node::logicUpdate(int dt){
+	if(mNodeListeners!=NULL){
+		int i;
+		for(i=0;i<mNodeListeners->size();++i){
+			mNodeListeners->at(i)->logicUpdate(this,dt);
+		}
+	}
+
 	mLastLogicFrame=mScene->getLogicFrame();
 }
 
 void Node::frameUpdate(int dt){
+	if(mNodeListeners!=NULL){
+		int i;
+		for(i=0;i<mNodeListeners->size();++i){
+			mNodeListeners->at(i)->frameUpdate(this,dt);
+		}
+	}
+
 	if(mParent==NULL){
 		mWorldScale.set(mScale);
 		mWorldRotate.set(mRotate);

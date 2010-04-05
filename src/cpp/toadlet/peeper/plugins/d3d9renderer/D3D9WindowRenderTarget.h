@@ -63,6 +63,13 @@ public:
 protected:
 	void fillPresentParameters(D3DPRESENT_PARAMETERS &presentParameters);
 
+	Visual mVisual;
+	UINT mAdaptor;
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		D3DMDEVTYPE mDevType;
+	#else
+		D3DDEVTYPE mDevType;
+	#endif
 	D3DPRESENT_PARAMETERS mPresentParameters;
 	HINSTANCE mLibrary;
 	IDirect3D9 *mD3D;
