@@ -164,7 +164,7 @@ int main(int argc,char **argv){
 			}
 		}
 
-		FileStream::ptr fout(new FileStream(mshFileName,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
+		FileStream::ptr fout(new FileStream(mshFileName,FileStream::Open_WRITE_BINARY));
 
 		String extension;
 		int index=mshFileName.rfind('.');

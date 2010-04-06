@@ -151,7 +151,7 @@ protected:
 	};
 
 	bool extractMeshData(toadlet::tadpole::mesh::Mesh::ptr mesh,bool submeshes=true);
-	void buildBones(toadlet::tadpole::mesh::Mesh *mesh,toadlet::tadpole::node::MeshNode *meshNode,int bone);
+	void buildBones(toadlet::tadpole::mesh::Mesh *mesh,toadlet::tadpole::node::MeshNodeSkeleton *nodeSkeleton,int bone);
 	void constructQuads();
 	void rewindTriangles();
 	void adjustVertexes(float amount);

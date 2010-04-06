@@ -138,7 +138,7 @@ int
 cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
     int i,j;
 
-	FileStream::ptr stream(new FileStream(name,FileStream::OpenFlags_READ|FileStream::OpenFlags_BINARY));
+	FileStream::ptr stream(new FileStream(name,FileStream::Open_READ_BINARY));
 	if(stream->isOpen()==false){
 		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error opening file",MB_OK);
 		return -1;
@@ -391,7 +391,7 @@ int
 cPlugIn::importAnimation(msModel *pModel,const String &name,int flags){
 	Skeleton::ptr skeleton=buildSkeleton(pModel);
 
-	FileStream::ptr stream(new FileStream(name,FileStream::OpenFlags_READ|FileStream::OpenFlags_BINARY));
+	FileStream::ptr stream(new FileStream(name,FileStream::Open_READ_BINARY));
 	if(stream->isOpen()==false){
 		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error opening file",MB_OK);
 		return -1;

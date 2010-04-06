@@ -95,7 +95,7 @@ int main(int argc,char **argv){
 	// Prepare the output file
 	int loc=mshFileName.rfind('.');
 	String mmshFileName=mshFileName.substr(0,loc)+String(".mmsh");
-	FileStream::ptr stream(new FileStream(mmshFileName,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
+	FileStream::ptr stream(new FileStream(mmshFileName,FileStream::Open_WRITE_BINARY));
 
 	// Write to .mmsh format
 	MicroMeshConverter converter;

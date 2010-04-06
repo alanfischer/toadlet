@@ -352,7 +352,7 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 		mesh->skeleton=buildSkeleton(pModel,emptyBones);
 	}
 
-	FileStream::ptr stream(new FileStream(name,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
+	FileStream::ptr stream(new FileStream(name,FileStream::Open_WRITE_BINARY));
 	XMSHHandler::ptr handler(new XMSHHandler(NULL,NULL,NULL));
 
 	handler->save(mesh,stream);
@@ -662,7 +662,7 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 
 	sequence->length=maxTime/fps;
 
-	FileStream::ptr stream(new FileStream(name,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
+	FileStream::ptr stream(new FileStream(name,FileStream::Open_WRITE_BINARY));
 	XANMHandler::ptr handler(new XANMHandler());
 
 	handler->save(sequence,stream);

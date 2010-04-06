@@ -76,7 +76,7 @@ int main(int argc,char **argv){
 
 		std::cout << "Loading " << (const char*)fileName << std::endl;
 
-		FileStream::ptr stream(new FileStream(fileName,FileStream::OpenFlags_READ|FileStream::OpenFlags_BINARY));
+		FileStream::ptr stream(new FileStream(fileName,FileStream::Open_READ_BINARY));
 		if(stream->isOpen()){
 			smd.load(engine,stream,fileName);
 		}
@@ -93,7 +93,7 @@ int main(int argc,char **argv){
 
 		std::cout << "Saving " << (const char*)outputName << std::endl;
 
-		FileStream::ptr stream(new FileStream(outputName,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
+		FileStream::ptr stream(new FileStream(outputName,FileStream::Open_WRITE_BINARY));
 		if(stream->isOpen()){
 			XMSHHandler handler(NULL,NULL,NULL);
 			handler.save(smd.getMesh(),stream);

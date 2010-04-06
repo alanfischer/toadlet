@@ -88,7 +88,7 @@ int main(int argc,char **argv){
 
 			std::cout << "Extracting " << (const char*)name << std::endl;
 
-			FileStream::ptr stream(new FileStream(name,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
+			FileStream::ptr stream(new FileStream(name,FileStream::Open_WRITE_BINARY));
 			if(stream->isOpen()==false){
 				std::cout << "Error opening " << (const char*)name << std::endl;
 				return 0;
@@ -109,7 +109,7 @@ int main(int argc,char **argv){
 
 		for(i=3;i<argc;++i){
 			std::cout << "Inserting " << argv[i] << std::endl;
-			FileStream::ptr stream(new FileStream(argv[i],FileStream::OpenFlags_READ|FileStream::OpenFlags_BINARY));
+			FileStream::ptr stream(new FileStream(argv[i],FileStream::Open_READ_BINARY));
 			if(stream->isOpen()==false){
 				std::cout << "Error opening " << argv[i] << std::endl;
 				return 0;
@@ -119,7 +119,7 @@ int main(int argc,char **argv){
 			skeleton->sequences.add(sequence);
 		}
 
-		FileStream::ptr stream(new FileStream(mshFileName,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
+		FileStream::ptr stream(new FileStream(mshFileName,FileStream::Open_WRITE_BINARY));
 		if(stream->isOpen()==false){
 			std::cout << "Error opening " << (const char*)mshFileName << std::endl;
 			return 0;
@@ -157,7 +157,7 @@ int main(int argc,char **argv){
 			}
 		}
 
-		FileStream::ptr stream(new FileStream(mshFileName,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
+		FileStream::ptr stream(new FileStream(mshFileName,FileStream::Open_WRITE_BINARY));
 		if(stream->isOpen()==false){
 			std::cout << "Error opening " << (const char*)mshFileName << std::endl;
 			return 0;

@@ -44,6 +44,9 @@ public:
 		Open_BIT_WRITE=		1<<1,
 		Open_BIT_CREATE=	1<<2,
 		Open_BIT_BINARY=	1<<3,
+		Open_READ_BINARY=	Open_BIT_READ|Open_BIT_BINARY,
+		Open_WRITE_BINARY=	Open_BIT_WRITE|Open_BIT_BINARY,
+		Open_READ_WRITE_BINARY=Open_BIT_READ|Open_BIT_WRITE|Open_BIT_BINARY,
 	};
 	
 	FileStream(const String &filename,int open);
