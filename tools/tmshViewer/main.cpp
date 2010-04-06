@@ -53,7 +53,7 @@ int main(int argc,char **argv){
 		return -1;
 	}
 
-	MeshNode::ptr meshNode=engine->createNodeType(MeshNode::type());
+	MeshNode::ptr meshNode=engine->createNodeType(MeshNode::type(),viewer->getScene());
 	meshNode->setMesh(mesh);
 
 	if(mesh->skeleton!=NULL){

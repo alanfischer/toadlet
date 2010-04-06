@@ -384,16 +384,14 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 		mBones.add(bone);
 	}
 	else{
-		MeshNode::ptr meshNode=mEngine->createNodeType(MeshNode::type());
-		meshNode->setMesh(mesh);
-		buildBones(mesh,meshNode,0);
-		meshNode->destroy();
+		MeshNodeSkeleton::ptr skeleton(new MeshNodeSkeleton(NULL,mesh->skeleton));
+		buildBones(mesh,skeleton,0);
 	}
 
 	return true;
 }
 
-void BACConverter::buildBones(Mesh *mesh,MeshNode *meshNode,int bone){
+void BACConverter::buildBones(Mesh *mesh,MeshNodeSkeleton *nodeSkeleton,int bone){
 	Skeleton *skeleton=mesh->skeleton;
 	Skeleton::Bone *meshBone=skeleton->bones[bone];
 	int i;
@@ -412,9 +410,9 @@ void BACConverter::buildBones(Mesh *mesh,MeshNode *meshNode,int bone){
 		bacBone->name=meshBone->name;
 	}
 
-	Vector3 worldTranslate=meshNode->getSkeleton()->getBone(bone)->worldTranslate;
+	Vector3 worldTranslate=nodeSkeleton->getBone(bone)->worldTranslate;
 	Matrix3x3 worldRotateMatrix;
-	Math::setMatrix3x3FromQuaternion(worldRotateMatrix,meshNode->getSkeleton()->getBone(bone)->worldRotate);
+	Math::setMatrix3x3FromQuaternion(worldRotateMatrix,nodeSkeleton->getBone(bone)->worldRotate);
 	Vector3 worldRotate=Vector3(worldRotateMatrix.at(0,2),
 								worldRotateMatrix.at(1,2),
 								worldRotateMatrix.at(2,2));
@@ -461,10 +459,10 @@ void BACConverter::buildBones(Mesh *mesh,MeshNode *meshNode,int bone){
 	mBones.add(bacBone);
 
 	if(nextChild!=-1){
-		buildBones(mesh,meshNode,nextChild);
+		buildBones(mesh,nodeSkeleton,nextChild);
 	}
 	if(nextBrother!=-1){
-		buildBones(mesh,meshNode,nextBrother);
+		buildBones(mesh,nodeSkeleton,nextBrother);
 	}
 }
 

@@ -105,7 +105,7 @@ int main(int argc,char **argv){
 	// Prepare the output file
 	int loc=mshFileName.rfind('.');
 	String m3gFileName=mshFileName.substr(0,loc)+String(".m3g");
-	FileStream::ptr stream(new FileStream(m3gFileName,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
+	FileStream::ptr stream(new FileStream(m3gFileName,FileStream::Open_WRITE_BINARY));
 
 	// Write to .mmsh format
 	M3GConverter converter;

@@ -11,6 +11,7 @@ class Viewer:public toadlet::pad::Application{
 public:
 	Viewer();
 
+	void create();
 	void start(toadlet::tadpole::node::MeshNode::ptr meshNode);
 
 	void update(int dt);
@@ -22,9 +23,12 @@ public:
 	void resized(int width,int height);
 	void focusLost();
 
+	inline toadlet::tadpole::node::Scene::ptr getScene(){return mScene;}
+
 protected:
 	void updateCamera();
 
+	toadlet::tadpole::node::Scene::ptr mScene;
 	toadlet::tadpole::node::ParentNode::ptr mParent;
 	toadlet::tadpole::node::CameraNode::ptr mCamera;
 	toadlet::tadpole::node::LightNode::ptr mLight;

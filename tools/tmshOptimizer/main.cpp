@@ -60,7 +60,7 @@ int main(int argc,char **argv){
 	MeshOptimizer optimizer;
 	bool result=optimizer.optimizeMesh(mesh,engine);
 
-	FileStream::ptr stream(new FileStream(mshFileName,FileStream::OpenFlags_WRITE|FileStream::OpenFlags_BINARY));
+	FileStream::ptr stream(new FileStream(mshFileName,FileStream::Open_WRITE_BINARY));
 	if(stream->isOpen()==false){
 		std::cout << "Error opening " << (const char*)mshFileName << std::endl;
 		return 0;

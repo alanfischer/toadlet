@@ -68,26 +68,31 @@ Viewer::Viewer():Application(),
 	mZoom(false)
 {}
 
+void Viewer::create(){
+	Application::create();
+
+	mScene=(new SceneNode(mEngine))->create(NULL)->getScene();
+}
+
 void Viewer::start(MeshNode::ptr meshNode){
-	mEngine->setScene(mEngine->createNodeType(SceneNode::type()));
-	mParent=mEngine->createNodeType(ParentNode::type());
-	mEngine->getScene()->getRootNode()->attach(mParent);
+	mParent=mEngine->createNodeType(ParentNode::type(),mScene);
+	mScene->getRootNode()->attach(mParent);
 	mParent->attach(meshNode);
 
-	mCamera=mEngine->createNodeType(CameraNode::type());
+	mCamera=mEngine->createNodeType(CameraNode::type(),mScene);
 	mCamera->setClearColor(Colors::ORANGE);
-	mEngine->getScene()->getRootNode()->attach(mCamera);
+	mScene->getRootNode()->attach(mCamera);
 
 	mDistance=meshNode->getLocalBound().radius*2;
 
-	mEngine->getScene()->setAmbientColor(Color(Math::QUARTER,Math::QUARTER,Math::QUARTER,Math::ONE));
+	mScene->setAmbientColor(Color(Math::QUARTER,Math::QUARTER,Math::QUARTER,Math::ONE));
 
-	mLight=mEngine->createNodeType(LightNode::type());
+	mLight=mEngine->createNodeType(LightNode::type(),mScene);
 	mLight->setLightType(Light::Type_DIRECTION);
 	mLight->setDirection(Math::Y_UNIT_VECTOR3);
 	mLight->setDiffuseColor(Colors::WHITE);
 	mLight->setSpecularColor(Colors::WHITE);
-	mEngine->getScene()->getRootNode()->attach(mLight);
+	mScene->getRootNode()->attach(mLight);
 
 	updateCamera();
 
@@ -95,12 +100,12 @@ void Viewer::start(MeshNode::ptr meshNode){
 }
 
 void Viewer::update(int dt){
-	mEngine->getScene()->update(dt);
+	mScene->update(dt);
 }
 
 void Viewer::render(Renderer *renderer){
 	renderer->beginScene();
-		mEngine->getScene()->render(renderer,mCamera,NULL);
+		mScene->render(renderer,mCamera,NULL);
 	renderer->endScene();
 	renderer->swap();
 }
