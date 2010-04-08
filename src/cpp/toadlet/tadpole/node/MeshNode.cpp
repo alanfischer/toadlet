@@ -240,8 +240,8 @@ MeshNode::MeshAnimationController::ptr MeshNode::getAnimationController(){
 	return mAnimationController;
 }
 
-void MeshNode::frameUpdate(int dt){
-	super::frameUpdate(dt);
+void MeshNode::frameUpdate(int dt,int scope){
+	super::frameUpdate(dt,scope);
 
 	if(mSkeleton!=NULL){
 		int lastUpdateFrame=mSkeleton->getLastUpdateFrame();

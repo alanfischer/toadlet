@@ -37,6 +37,7 @@ namespace node{
 TOADLET_NODE_IMPLEMENT(ParentNode,Categories::TOADLET_TADPOLE_NODE+".ParentNode");
 
 ParentNode::ParentNode():super(),
+	mChildrenActive(false),
 	mActivateChildren(false),
 
 	mShadowChildrenDirty(false)
@@ -47,6 +48,7 @@ Node *ParentNode::create(Scene *scene){
 	super::create(scene);
 
 	mChildren.clear();
+	mChildrenActive=false;
 	mActivateChildren=true;
 
 	mShadowChildren.clear();
@@ -101,9 +103,7 @@ bool ParentNode::attach(Node *node){
 
 	activate();
 
-	/// @todo: Maybe all of the frameUpdateness should be moved just to the parentNode, so I can just update & remerge bounds, without calling into mScene
-	/// @todo: This should actually call to the parent, and update the bounds as far as needed.  If at some point, worldBound didnt change, then don't call further
-	mScene->frameUpdate(node,0,-1);
+	node->frameUpdate(0,-1);
 	merge(mWorldBound,node->getWorldBound());
 
 	return true;
@@ -140,9 +140,101 @@ void ParentNode::handleEvent(const Event::ptr &event){
 	}
 }
 
+void ParentNode::logicUpdate(int dt,int scope){
+	super::logicUpdate(dt,scope);
+
+	mChildrenActive=false;
+	if(mShadowChildrenDirty){
+		updateShadowChildren();
+	}
+
+	int numChildren=mShadowChildren.size();
+	Node *child=NULL;
+	int i;
+	for(i=0;i<numChildren;++i){
+		child=mShadowChildren[i];
+		if(mActivateChildren){
+			child->activate();
+		}
+		if(child->active() && (child->getScope()&scope)!=0){
+			Node *depends=child->getDependsUpon();
+			if(depends!=NULL && depends->mLastLogicFrame!=mScene->getLogicFrame()){
+				mScene->queueDependent(child);
+			}
+			else{
+				child->logicUpdate(dt,scope);
+				child->tryDeactivate();
+				mChildrenActive=true;
+			}
+		}
+	}
+
+	mActivateChildren=false;
+}
+
+void ParentNode::frameUpdate(int dt,int scope){
+	super::frameUpdate(dt,scope);
+
+	if(mShadowChildrenDirty){
+		updateShadowChildren();
+	}
+
+	int numChildren=mShadowChildren.size();
+	Node *child=NULL;
+	int i;
+	for(i=0;i<numChildren;++i){
+		child=mShadowChildren[i];
+		bool dependent=false;
+		if(child->active() && (child->getScope()&scope)!=0){
+			Node *depends=child->getDependsUpon();
+			if(depends!=NULL && depends->mLastFrame!=mScene->getFrame()){
+				mScene->queueDependent(child);
+				dependent=true;
+			}
+			else{
+				child->frameUpdate(dt,scope);
+			}
+		}
+
+		if(dependent==false){
+			mergeWorldBound(child);
+		}
+	}
+}
+
+void ParentNode::mergeWorldBound(Node *child){
+	Node::merge(mWorldBound,child->getWorldBound());
+}
+
 void ParentNode::activate(){
 	mActivateChildren=true;
 	super::activate();
+}
+
+void ParentNode::deactivate(){
+	if(mActive==false){
+		return;
+	}
+
+	super::deactivate();
+	int i;
+	for(i=0;i<mChildren.size();++i){
+		mChildren[i]->deactivate();
+	}
+}
+
+void ParentNode::tryDeactivate(){
+	if(mDeactivateCount>=0){
+		if(mChildrenActive==false){
+			mDeactivateCount++;
+			if(mDeactivateCount>4){
+				deactivate();
+			}
+		}
+		else{
+			mDeactivateCount=0;
+		}
+	}
 }
 
 void ParentNode::updateShadowChildren(){

@@ -143,12 +143,13 @@ public:
 	inline const Sphere &getLocalBound() const{return mLocalBound;}
 	inline const Sphere &getWorldBound() const{return mWorldBound;}
 
-	virtual void logicUpdate(int dt);
-	virtual void frameUpdate(int dt);
+	virtual void logicUpdate(int dt,int scope);
+	virtual void frameUpdate(int dt,int scope);
 	virtual void queueRenderables(CameraNode *camera,RenderQueue *queue){}
 
 	virtual void activate();
 	virtual void deactivate();
+	virtual void tryDeactivate();
 	inline bool active() const{return mActive;}
 
 	inline Engine *getEngine() const{return mEngine;}
@@ -239,6 +240,8 @@ protected:
 
 	Vector3 cache_setRotate_vector;
 	Matrix3x3 cache_setTransform_matrix;
+	
+	friend class ParentNode;
 };
 
 }

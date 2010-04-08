@@ -241,7 +241,10 @@ void Node::setLocalBound(const Sphere &bound){
 	transformUpdated(0);
 }
 
-void Node::logicUpdate(int dt){
+void Node::logicUpdate(int dt,int scope){
+	mLastLogicFrame=mScene->getLogicFrame();
+
+	// Update listeners
 	if(mNodeListeners!=NULL){
 		int i;
 		for(i=0;i<mNodeListeners->size();++i){
@@ -252,11 +255,12 @@ void Node::logicUpdate(int dt){
 	if(mNodeInterpolator!=NULL){
 		mNodeInterpolator->logicFrame(this,mScene->getLogicFrame());
 	}
-
-	mLastLogicFrame=mScene->getLogicFrame();
 }
 
-void Node::frameUpdate(int dt){
+void Node::frameUpdate(int dt,int scope){
+	mLastFrame=mScene->getFrame();
+
+	// Update listeners
 	if(mNodeListeners!=NULL){
 		int i;
 		for(i=0;i<mNodeListeners->size();++i){
@@ -290,8 +294,6 @@ void Node::frameUpdate(int dt){
 
 	Math::setMatrix3x3FromQuaternion(cache_setTransform_matrix,mWorldRotate);
 	Math::setMatrix4x4FromTranslateRotateScale(mWorldTransform,mWorldTranslate,cache_setTransform_matrix,mWorldScale);
-
-	mLastFrame=mScene->getFrame();
 }
 
 void Node::activate(){
@@ -309,6 +311,15 @@ void Node::activate(){
 void Node::deactivate(){
 	mActive=false;
 	mDeactivateCount=0;
+}
+
+void Node::tryDeactivate(){
+	if(mDeactivateCount>=0){
+		mDeactivateCount++;
+		if(mDeactivateCount>4){
+			deactivate();
+		}
+	}
 }
 
 void Node::transformUpdated(int transformBits){

@@ -49,7 +49,7 @@ public:
 	virtual void setPerspective(bool perspective){mPerspective=perspective;}
 	inline bool getPerspective() const{return mPerspective;}
 
-	virtual void frameUpdate(int dt);
+	virtual void frameUpdate(int dt,int scope);
 	virtual void queueRenderables(CameraNode *camera,RenderQueue *queue);
 
 protected:
