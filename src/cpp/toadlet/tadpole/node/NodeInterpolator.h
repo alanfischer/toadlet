@@ -23,31 +23,27 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/SpacialQuery.h>
-#include <toadlet/tadpole/node/Scene.h>
-
-using namespace toadlet::tadpole::node;
+#ifndef TOADLET_TADPOLE_NODE_NODEINTERPOLATOR_H
+#define TOADLET_TADPOLE_NODE_NODEINTERPOLATOR_H
 
 namespace toadlet{
 namespace tadpole{
+namespace node{
 
-SpacialQuery::SpacialQuery():
-	mDestroyedListener(NULL),
-	mResultsListener(NULL)
-{}
+/// This can be used to automatically interpolate different values of the node between logic frames
+/// Most probably translation & rotation between the physics simulator.
+class TOADLET_API NodeInterpolator{
+public:
+	TOADLET_SHARED_POINTERS(NodeInterpolator);
 
-SpacialQuery::~SpacialQuery(){
-	destroy();
-}
-
-void SpacialQuery::create(){
-}
-
-void SpacialQuery::destroy(){
-	if(mDestroyedListener!=NULL){
-		mDestroyedListener->queryDestroyed(this);
-	}	
-}
+	virtual void transformUpdated(Node *node,int transformBits)=0;
+	
+	virtual void logicFrame(Node *node,int frame)=0;
+	virtual void interpolate(Node *node,scalar value)=0;
+};
 
 }
 }
+}
+
+#endif

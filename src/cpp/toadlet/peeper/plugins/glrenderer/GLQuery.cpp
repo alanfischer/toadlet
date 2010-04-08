@@ -35,7 +35,6 @@ namespace peeper{
 GLQuery::GLQuery(GLRenderer *renderer):
 	mRenderer(NULL),
 
-	mListener(NULL),
 	mQueryType(QueryType_UNKNOWN),
 
 	mHandle(0)
@@ -68,10 +67,6 @@ void GLQuery::destroy(){
 	if(mHandle!=0){
 		glDeleteQueries(1,&mHandle);
 		mHandle=0;
-	}
-
-	if(mListener!=NULL){
-		mListener->queryDestroyed(this);
 	}
 
 	TOADLET_CHECK_GLERROR("GLQuery::destroy");

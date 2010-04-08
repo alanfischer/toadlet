@@ -33,8 +33,6 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class Scene;
-
 class TOADLET_API AnimationControllerNode:public Node,public animation::AnimationControllerFinishedListener{
 public:
 	TOADLET_NODE(AnimationControllerNode,Node);

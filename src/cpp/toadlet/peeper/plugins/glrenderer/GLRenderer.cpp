@@ -349,7 +349,7 @@ Shader *GLRenderer::createShader(){
 	return NULL;
 }
 
-RenderQuery *GLRenderer::createQuery(){
+Query *GLRenderer::createQuery(){
 	#if defined(TOADLET_HAS_GLQUERY)
 		return new GLQuery(this);
 	#else

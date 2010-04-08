@@ -50,8 +50,6 @@ protected:
 	MeshNodeSkeleton::ptr mSkeleton;
 
 	egg::Collection<int> mChildrenBones;
-
-	friend class Scene;
 };
 
 }

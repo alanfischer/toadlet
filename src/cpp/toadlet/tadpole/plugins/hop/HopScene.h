@@ -29,58 +29,23 @@
 #include <toadlet/hop/Simulator.h>
 #include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/Traceable.h>
-#include <toadlet/tadpole/node/Scene.h>
+#include <toadlet/tadpole/Scene.h>
 
 namespace toadlet{
 namespace tadpole{
 
 class HopEntity;
 
-// I'm not 100% sure that the decorator pattern was the correct hammer for this nail, but thats to be seen.
-// Because we really have several subsystems we want to tie together in the Scene
-//	- Scene Management	(bsp)
-//	- Physics			(hop)
-//	- Networking		(knot)
-class TOADLET_API HopScene:public node::Scene,public hop::Manager{
+class TOADLET_API HopScene:public Scene,public hop::Manager{
 public:
-	TOADLET_INTRUSIVE_POINTERS(HopScene);
+	TOADLET_SHARED_POINTERS(HopScene);
 
-	HopScene(node::Scene::ptr scene);
+	HopScene(Engine *engine);
 	virtual ~HopScene();
 
-	virtual void destroy(){mScene->destroy();}
-
-	virtual void setChildScene(node::Scene *scene){mChildScene=scene;}
-	virtual node::Scene *getRootScene(){return mScene;}
-
-	virtual Engine *getEngine(){return mScene->getEngine();}
-	virtual node::ParentNode *getBackground(){return mScene->getBackground();}
-	virtual node::SceneNode *getRootNode(){return mScene->getRootNode();}
-	virtual int getScope(){return mScene->getScope();}
-
-	virtual node::Node *findNodeByName(const egg::String &name,node::Node *node=NULL){return mScene->findNodeByName(name,node);}
-	virtual node::Node *findNodeByHandle(int handle){return mScene->findNodeByHandle(handle);}
-
-	virtual void setAmbientColor(peeper::Color ambientColor){mScene->setAmbientColor(ambientColor);}
-	virtual const peeper::Color &getAmbientColor() const{return mScene->getAmbientColor();}
-
-	virtual void setExcessiveDT(int dt){mScene->setExcessiveDT(dt);}
-	virtual int getExcessiveDT() const{return mScene->getExcessiveDT();}
-	virtual void setRangeLogicDT(int minDT,int maxDT){mScene->setRangeLogicDT(minDT,maxDT);}
-	virtual int getMinLogicDT() const{return mScene->getMinLogicDT();}
-	virtual int getMaxLogicDT() const{return mScene->getMaxLogicDT();}
-	virtual void setLogicTimeAndFrame(int time,int frame){mScene->setLogicTimeAndFrame(time,frame);}
-	virtual int getLogicTime() const{return mScene->getLogicTime();}
-	virtual int getLogicFrame() const{return mScene->getLogicFrame();}
-	virtual scalar getLogicFraction() const{return mScene->getLogicFraction();}
-	virtual int getTime() const{return mScene->getTime();}
-	virtual int getFrame() const{return mScene->getFrame();}
-
-	virtual void update(int dt){mScene->update(dt);}
-	virtual void render(peeper::Renderer *renderer,node::CameraNode *cameraNode,node::Node *node){mScene->render(renderer,cameraNode,node);}
-
-	virtual void setUpdateListener(UpdateListener *updateListener){mScene->setUpdateListener(updateListener);}
-	virtual UpdateListener *getUpdateListener() const{return mScene->getUpdateListener();}
+	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits,HopEntity *ignore);
+	virtual void traceEntity(Collision &result,HopEntity *entity,const Segment &segment,int collideWithBits);
+	virtual void testEntity(Collision &result,HopEntity *entity1,const Segment &segment,HopEntity *entity2);
 
 	virtual void setFluidVelocity(const Vector3 &fluidVelocity){mSimulator->setFluidVelocity(fluidVelocity);}
 	virtual const Vector3 &getFluidVelocity() const{return mSimulator->getFluidVelocity();}
@@ -96,32 +61,12 @@ public:
 		virtual scalar getEpsilon() const{return mSimulator->getEpsilon();}
 	#endif
 
-	virtual void setTraceable(Traceable *traceable){mTraceable=traceable;}
+	virtual void logicUpdate(int dt);
 
-	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits,HopEntity *ignore);
-	virtual void traceEntity(Collision &result,HopEntity *entity,const Segment &segment,int collideWithBits);
-	virtual void testEntity(Collision &result,HopEntity *entity1,const Segment &segment,HopEntity *entity2);
-
-	virtual void showCollisionVolumes(bool show,bool interpolate);
-
+	// Hop items
 	inline hop::Simulator *getSimulator(){return mSimulator;}
 
-	virtual int nodeCreated(node::Node *node){return mScene->nodeCreated(node);}
-	virtual void nodeDestroyed(node::Node *node){mScene->nodeDestroyed(node);}
-	virtual int nodeCreated(HopEntity *entity);
-	virtual void nodeDestroyed(HopEntity *entity);
-
-	virtual void preLogicUpdateLoop(int dt);
-	virtual void preLogicUpdate(int dt);
-	virtual void logicUpdate(int dt);
-	virtual void postLogicUpdate(int dt);
-	virtual void postLogicUpdateLoop(int dt);
-	virtual void preFrameUpdate(int dt);
-	virtual void frameUpdate(int dt);
-	virtual void postFrameUpdate(int dt);
-
-	virtual bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact){return mScene->performAABoxQuery(query,box,exact);}
-
+	virtual void setTraceable(Traceable *traceable){mTraceable=traceable;}
 	virtual int findSolidsInAABox(const AABox &box,hop::Solid *solids[],int maxSolids);
 	virtual void traceSegment(hop::Collision &result,const Segment &segment);
 	virtual void traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid);
@@ -132,23 +77,12 @@ public:
 	virtual bool collisionResponse(hop::Solid *solid,Vector3 &position,Vector3 &remainder,hop::Collision &collision){return false;}
 	virtual void postUpdate(hop::Solid *solid,int dt,scalar fdt){}
 
-	virtual egg::PointerCounter *pointerCounter() const{return mCounter;}
-
 	static void set(tadpole::Collision &r,const hop::Collision &c);
 	static void set(hop::Collision &r,const tadpole::Collision &c,HopEntity *collider);
 
 	hop::Collision cache_traceSegment_collision;
 
 protected:
-	egg::PointerCounter *mCounter;
-	node::Scene *mChildScene;
-	node::Scene::ptr mScene;
-
-	egg::Collection<HopEntity*> mHopEntities;
-	bool mShowCollisionVolumes;
-	bool mInterpolateCollisionVolumes;
-
-	int mExcessiveDT;
 	hop::Simulator *mSimulator;
 	Traceable *mTraceable;
 

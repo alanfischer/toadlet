@@ -24,9 +24,10 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
+#include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
-#include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;

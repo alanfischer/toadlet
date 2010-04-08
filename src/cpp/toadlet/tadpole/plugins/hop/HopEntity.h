@@ -40,8 +40,7 @@ public:
 	TOADLET_NODE(HopEntity,node::ParentNode);
 
 	HopEntity();
-	virtual Node *create(node::Scene *scene);
-	virtual void destroy();
+	virtual Node *create(Scene *scene);
 
 	virtual Node *isEntity(){return this;}
 
@@ -64,7 +63,6 @@ public:
 	virtual const Vector3 &getPosition(){return getTranslate();}
 
 	virtual void setVelocity(const Vector3 &velocity);
-	virtual void setVelocity(scalar x,scalar y,scalar z);
 	virtual const Vector3 &getVelocity() const{return mSolid->getVelocity();}
 
 	virtual void addForce(const Vector3 &force);
@@ -100,8 +98,11 @@ public:
 
 	inline hop::Solid::ptr getSolid() const{return mSolid;}
 
+	virtual void setCollisionVolumesVisible(bool visible);
+
 	// Node callbacks
 	virtual void parentChanged(node::ParentNode *parent);
+	virtual void logicUpdate(int dt);
 
 	// TraceCallback callbacks
 	virtual void getBound(AABox &result);
@@ -111,27 +112,15 @@ public:
 	// CollisionListener callbacks
 	virtual void collision(const hop::Collision &c);
 
-	virtual void preLogicUpdateLoop(int dt);
-	virtual void logicUpdate(int dt);
-	virtual void frameUpdate(int dt);
-	virtual void interpolatePhysicalParameters(scalar f);
-
 protected:
-	virtual void showCollisionVolumes(bool show);
-	virtual void updateVolumes(bool interpolate);
+	virtual void updateCollisionVolumes();
 
 	hop::Solid::ptr mSolid;
 	hop::Shape::ptr mTraceableShape;
 	Traceable *mTraceable;
-	
-	HopScene *mHopScene;
-	Vector3 mLastPosition;
-	bool mActivePrevious;
-
 	node::ParentNode::ptr mVolumeNode;
 
-	Vector3 cache_setVelocity_velocity;
-	Vector3 cache_interpolatePhysicalParameters_interpolate;
+	HopScene *mHopScene;
 
 	friend class HopScene;
 };

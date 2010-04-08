@@ -34,8 +34,6 @@
 //  So nodes should have 2 translates.  The immediate one and the public one.
 //  After a node is completely updated, then all public transforms are made to equal the immediate transforms.
 
-// - We want ONE transform per node.  Not a Logic & a Render transform.  Since there shouldn't be separate
-//		transforms per camera, or per rendering thread, or anything like that really.  The scene position is absolute.
 // - The node transform should also be buffered.  As in, the order of the nodes to a parent shouldn't affect what order they get updated.
 //		So we could have localTransform, and workingLocalTransform.  worldTransform and workingWorldTransform.
 //		When we're actually in an update, we would update the workingLocalTransform, and the... FINISH FIGURING THIS OUT
@@ -46,7 +44,14 @@
 //		= Regular Alignments are in the scene, and would be a model pointing at something else, or a billboard pointing a certain direction.
 //			Regular Alignments are applied to the rotation of the node.  THIS IS WHAT THE SQUIREL CAMERA IS
 
-
+// - Interpolation:
+//		Can be used by Nodes as they move through space, or by Skeleton's as they move their bones through space.
+//		Biggest difference is Skeletons you know all your keyframes.  General nodes you may only know 2, or a few more if we allow it.
+//		Should I allow other things besides transforms to be interpolated?  What about general color interpolation?
+//		Maybe this needs to be tied into the keyFrame stuff.  We have a keyframe, which can be position, rotation, color, who knows.
+//		Then the interpolator will operate on the KeyFrames & time, and change something based on that.
+//		Then nodes can be assigned an interpolator...  But how?  Is it a node property?  Or maybe a NodeListener?  This is like the M3G Sequence or whatever.  They have it part of the node.
+//		HopEntity's interpolator will listen to the logicFrame.  
 
 /// @todo  I think a good way to let us use EventKeyFrames with the Controller framework is to:
 ///   1: Have a way of ensuring that the EventKeyFrames are aligned on LogicDT times.
@@ -122,7 +127,7 @@
 #endif
 
 #if !defined(TOADLET_FIXED_POINT)
-	#include <toadlet/tadpole/bsp/BSP30SceneNode.h>
+	#include <toadlet/tadpole/bsp/BSP30Node.h>
 #endif
 
 using namespace toadlet::egg;
@@ -175,7 +180,7 @@ Engine::Engine():
 
 	// Plugin types, should be removed from here somehow
 	#if !defined(TOADLET_FIXED_POINT)
-		registerNodeType(bsp::BSP30SceneNode::type());
+		registerNodeType(bsp::BSP30Node::type());
 		registerNodeType(bsp::BSP30ModelNode::type());
 	#endif
 

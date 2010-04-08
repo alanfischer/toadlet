@@ -55,9 +55,6 @@ public:
 	scalar getMin() const;
 	scalar getMax() const;
 
-	void attached(AnimationController *){}
-	void removed(AnimationController *){}
-
 protected:
 	node::Node::ptr mTarget;
 	Track::ptr mTrack;

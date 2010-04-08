@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/plugins/hop/HopEntity.h>
-#include <toadlet/tadpole/node/SceneNode.h>
+#include <toadlet/tadpole/node/NodePositionInterpolator.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/egg/Error.h>
 
@@ -42,46 +42,30 @@ TOADLET_NODE_IMPLEMENT(HopEntity,Categories::TOADLET_TADPOLE+".HopEntity");
 HopEntity::HopEntity():ParentNode(),
 	mSolid(new Solid()),
 	//mTraceableShape,
-	mTraceable(NULL),
-
-	//mHopScene,
-	//mLastPosition,
-	mActivePrevious(false)
+	mTraceable(NULL)
+	//mVolumeNode
 {}
 
 Node *HopEntity::create(Scene *scene){
 	super::create(scene);
 
-	// No need to worry about this
-	mIdentityTransform=false;
-
 	mSolid->reset();
 	mSolid->setUserData(this);
-	mHopScene=NULL;
-	mLastPosition.reset();
-	mActivePrevious=true;
+	mTraceableShape=NULL;
+	mTraceable=NULL;
+	mVolumeNode=NULL;
 
-	mIdentityTransform=false;
-
+	/// @todo: I need to remove the mScene casting here, its pretty dirty
 	mHopScene=(HopScene*)(mScene);
-
 	if(mHopScene==NULL){
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"Invalid scene");
 		return this;
 	}
 
-	mHopScene->nodeCreated(this);
+	setNodeInterpolator(NodeInterpolator::ptr(new NodeTranslationInterpolator()));
 
 	return this;
-}
-
-void HopEntity::destroy(){
-	if(mHopScene!=NULL){
-		mHopScene->nodeDestroyed(this);
-	}
-
-	super::destroy();
 }
 
 void HopEntity::setCollisionBits(int bits){
@@ -104,8 +88,6 @@ void HopEntity::setTranslate(const Vector3 &translate){
 	super::setTranslate(translate);
 
 	mSolid->setPosition(mTranslate);
-
-	mLastPosition.set(mTranslate);
 }
 
 void HopEntity::setTranslate(scalar x,scalar y,scalar z){
@@ -118,17 +100,10 @@ void HopEntity::setTransform(const Matrix4x4 &transform){
 	super::setTransform(transform);
 
 	mSolid->setPosition(mTranslate);
-
-	mLastPosition.set(mTranslate);
 }
 
 void HopEntity::setVelocity(const Vector3 &velocity){
 	mSolid->setVelocity(velocity);
-}
-
-void HopEntity::setVelocity(scalar x,scalar y,scalar z){
-	Vector3 &velocity=cache_setVelocity_velocity.set(x,y,z);
-	setVelocity(velocity);
 }
 
 void HopEntity::addForce(const Vector3 &force){
@@ -184,30 +159,41 @@ void HopEntity::addShape(hop::Shape::ptr shape){
 	set(bound,mSolid->getLocalBound());
 	setLocalBound(bound);
 
-	if(mVolumeNode!=NULL){
-		showCollisionVolumes(true);
-	}
+	updateCollisionVolumes();
 }
 
 void HopEntity::removeShape(Shape *shape){
 	mSolid->removeShape(shape);
 
-	if(mVolumeNode!=NULL){
-		showCollisionVolumes(true);
-	}
+	updateCollisionVolumes();
 }
 
 void HopEntity::removeAllShapes(){
 	mSolid->removeAllShapes();
 
-	if(mVolumeNode!=NULL){
-		showCollisionVolumes(true);
+	updateCollisionVolumes();
+}
+
+void HopEntity::setCollisionVolumesVisible(bool visible){
+	if(visible){
+		if(mVolumeNode==NULL){
+			mVolumeNode=mEngine->createNodeType(ParentNode::type(),mScene);
+			attach(mVolumeNode);
+		}
 	}
+	else{
+		if(mVolumeNode!=NULL){
+			mVolumeNode->destroy();
+			mVolumeNode=NULL;
+		}
+	}
+
+	updateCollisionVolumes();
 }
 
 void HopEntity::parentChanged(ParentNode *parent){
 	if(mHopScene!=NULL){
-		if(parent==mScene->getRootNode()){
+		if(parent==mScene->getRoot()){
 			mHopScene->getSimulator()->addSolid(getSolid());
 		}
 		else{
@@ -216,6 +202,19 @@ void HopEntity::parentChanged(ParentNode *parent){
 	}
 
 	super::parentChanged(parent);
+}
+
+void HopEntity::logicUpdate(int dt){
+	if(mSolid->active()){
+		setNodeInterpolatorEnabled(false);
+		super::setTranslate(mSolid->getPosition());
+		setNodeInterpolatorEnabled(true);
+	}
+	else{
+		deactivate();
+	}
+
+	super::logicUpdate(dt);
 }
 
 void HopEntity::getBound(AABox &result){
@@ -247,62 +246,13 @@ void HopEntity::traceSolid(hop::Collision &result,const Segment &segment,const h
 
 void HopEntity::collision(const hop::Collision &c){
 	tadpole::Collision collision;
-	mHopScene->set(collision,c);
+	HopScene::set(collision,c);
 	touch(collision);
 }
 
-void HopEntity::preLogicUpdateLoop(int dt){
-	mLastPosition.set(mSolid->getPosition());
-	mActivePrevious=mSolid->active();
-}
-
-void HopEntity::logicUpdate(int dt){
-	if(mSolid->active()){
-		super::setTranslate(mSolid->getPosition());
-	}
-
-	super::logicUpdate(dt);
-}
-
-void HopEntity::frameUpdate(int dt){
-	scalar f=mScene->getLogicFraction();
-	bool active=mSolid->active();
-	bool activePrevious=mActivePrevious;
-	if(active || activePrevious){
-		/// @todo: Add an option to either use strict interpolation, or fuzzy interpolation
-		// If we are deactivating, then make sure we are at our rest point
-		if(active==false && activePrevious){
-			interpolatePhysicalParameters(Math::ONE);
-		}
-		else{
-			interpolatePhysicalParameters(f);
-		}
-	}
-
-	super::frameUpdate(dt);
-
-	if(active || activePrevious){
-		if(mVolumeNode!=NULL){
-			updateVolumes(mHopScene->mInterpolateCollisionVolumes);
-		}
-	}
-}
-
-void HopEntity::interpolatePhysicalParameters(scalar f){
-	Vector3 &interpolate=cache_interpolatePhysicalParameters_interpolate;
-	Math::lerp(interpolate,mLastPosition,mSolid->getPosition(),f);
-	super::setTranslate(interpolate);
-}
-
-void HopEntity::showCollisionVolumes(bool show){
-	if(show){
-		if(mVolumeNode==NULL){
-			mVolumeNode=mEngine->createNodeType(ParentNode::type(),mScene);
-			mScene->getRootNode()->attach(mVolumeNode);
-		}
-		else{
-			mVolumeNode->destroyAllChildren();
-		}
+void HopEntity::updateCollisionVolumes(){
+	if(mVolumeNode!=NULL){
+		mVolumeNode->destroyAllChildren();
 
 		int i;
 		for(i=0;i<mSolid->getNumShapes();++i){
@@ -333,21 +283,6 @@ void HopEntity::showCollisionVolumes(bool show){
 			meshNode->setMesh(mesh);
 			mVolumeNode->attach(meshNode);
 		}
-	}
-	else{
-		if(mVolumeNode!=NULL){
-			mVolumeNode->destroy();
-			mVolumeNode=NULL;
-		}
-	}
-}
-
-void HopEntity::updateVolumes(bool interpolate){
-	if(interpolate){
-		mVolumeNode->setTranslate(getTranslate());
-	}
-	else{
-		mVolumeNode->setTranslate(mSolid->getPosition());
 	}
 }
 

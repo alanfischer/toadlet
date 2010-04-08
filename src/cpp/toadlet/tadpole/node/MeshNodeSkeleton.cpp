@@ -23,10 +23,10 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/node/MeshNodeSkeleton.h>
 #include <toadlet/tadpole/node/MeshNode.h>
-#include <toadlet/tadpole/node/Scene.h>
-#include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet;
 using namespace toadlet::egg;

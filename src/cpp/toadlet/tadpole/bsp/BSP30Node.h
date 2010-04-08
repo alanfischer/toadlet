@@ -23,14 +23,15 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BSP_BSPSCENENODE_H
-#define TOADLET_TADPOLE_BSP_BSPSCENENODE_H
+#ifndef TOADLET_TADPOLE_BSP_BSPNODE_H
+#define TOADLET_TADPOLE_BSP_BSPNODE_H
 
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/tadpole/Traceable.h>
-#include <toadlet/tadpole/node/SceneNode.h>
+#include <toadlet/tadpole/Renderable.h>
+#include <toadlet/tadpole/node/PartitionNode.h>
 #include <toadlet/tadpole/bsp/BSP30Map.h>
 
 namespace toadlet{
@@ -77,6 +78,7 @@ public:
 
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 
+	// Traceable items
 	const Sphere &getLocalBound() const{return super::getLocalBound();}
 	void traceSegment(Collision &result,const Segment &segment,const Vector3 &size);
 
@@ -88,24 +90,18 @@ protected:
 	egg::Collection<SubModel::ptr> mSubModels;
 };
 
-class TOADLET_API BSP30SceneNode:public node::SceneNode,public Traceable{
+class TOADLET_API BSP30Node:public node::PartitionNode,public Traceable,public Renderable{
 public:
-	TOADLET_NONINSTANCIABLENODE(BSP30SceneNode,SceneNode);
+	TOADLET_NODE(BSP30Node,node::PartitionNode);
 
-	BSP30SceneNode(Engine *engine);
-	virtual ~BSP30SceneNode();
-
-	Scene *getRootScene(){return this;}
+	BSP30Node();
+	virtual ~BSP30Node();
 
 	void setMap(const egg::String &name);
 	void setMap(BSP30Map::ptr map);
 	BSP30Map::ptr getMap() const{return mMap;}
 
-	bool performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact);
-
-	const Sphere &getLocalBound() const{return super::getLocalBound();}
-	void traceSegment(Collision &result,const Segment &segment,const Vector3 &size);
-
+	// Node items
 	void nodeAttached(Node *node);
 	void nodeRemoved(Node *node);
 	void insertNodeLeafIndexes(const egg::Collection<int> &indexes,Node *node);
@@ -115,8 +111,18 @@ public:
 
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 
+	bool senseBoundingVolumes(SensorResultsListener *listener,const Sphere &volume);
+
+	// Traceable items
+	const Sphere &getLocalBound() const{return super::getLocalBound();}
+	void traceSegment(Collision &result,const Segment &segment,const Vector3 &size);
+
+	// Renderable items
+	Material *getRenderMaterial() const{return NULL;}
+	const Matrix4x4 &getRenderTransform() const{return Math::IDENTITY_MATRIX4X4;}
+	void render(peeper::Renderer *renderer) const;
+
 protected:
-	bool preLayerRender(peeper::Renderer *renderer,node::CameraNode *camera,int layer);
 	void addLeafToVisible(bleaf *leaf,node::CameraNode *camera);
 
 	BSP30Map::ptr mMap;

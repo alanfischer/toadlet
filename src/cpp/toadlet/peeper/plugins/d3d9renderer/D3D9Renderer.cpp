@@ -192,7 +192,7 @@ Shader *D3D9Renderer::createShader(){
 	return NULL;
 }
 
-RenderQuery *D3D9Renderer::createQuery(){
+Query *D3D9Renderer::createQuery(){
 	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
 		return new D3D9Query(this);
 	#else

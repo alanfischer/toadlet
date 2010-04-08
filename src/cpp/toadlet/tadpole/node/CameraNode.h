@@ -136,8 +136,6 @@ protected:
 
 	Matrix4x4 cache_setProjectionRotation_projection;
 	Vector3 cache_culled_vertex;
-
-	friend class SceneNode;
 };
 
 }

@@ -26,9 +26,9 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
-#include <toadlet/tadpole/node/SceneNode.h>
 #include <toadlet/tadpole/node/SpriteNode.h>
 #include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/RenderQueue.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;

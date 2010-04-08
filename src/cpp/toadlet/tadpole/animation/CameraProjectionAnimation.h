@@ -52,9 +52,6 @@ public:
 	scalar getMin() const{return 0;}
 	scalar getMax() const{return mEndTime;}
 
-	void attached(AnimationController *){}
-	void removed(AnimationController *){}
-
 protected:
 	node::CameraNode::ptr mTarget;
 	scalar mStartLeft,mStartRight,mStartBottom,mStartTop,mStartNear,mStartFar;

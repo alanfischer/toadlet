@@ -53,8 +53,6 @@ public:
 	Audio *createBufferedAudio();
 	Audio *createStreamingAudio();
 
-	void update(int dt){} // milliseconds
-
 	void suspend(){}
 	void resume(){}
 

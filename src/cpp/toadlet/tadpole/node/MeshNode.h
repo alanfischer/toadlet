@@ -39,8 +39,6 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class Scene;
-
 /// @todo: Make MeshNode a ParentNode, and integrate the SkeletonParentNode into this
 /// @todo: Maybe rework how the animation framework ties into non-parent nodes.
 //  It would be handy to have the MeshNode & SpriteNode be able to have their dedicated controllers without the support work of

@@ -45,9 +45,6 @@ public:
 
 	virtual scalar getMin() const=0;
 	virtual scalar getMax() const=0;
-
-	virtual void attached(AnimationController *controller)=0;
-	virtual void removed(AnimationController *controller)=0;
 };
 
 }

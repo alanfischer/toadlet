@@ -6,6 +6,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.in ${CMAKE_CURRENT_BINARY_
 set (TADPOLE_SRC
 	ArchiveManager.cpp
 	BufferManager.cpp
+	BoundingVolumeSensor.cpp
 	Engine.cpp
 	Font.cpp
 	FontManager.cpp
@@ -15,10 +16,9 @@ set (TADPOLE_SRC
 	MathFormatter.cpp
 	MeshManager.cpp
 	Noise.cpp
-	QueryManager.cpp
 	RenderQueue.cpp
 	ResourceManager.cpp
-	SpacialQuery.cpp
+	Scene.cpp
 	Track.cpp
 	TextureManager.cpp
 	Version.cpp
@@ -32,7 +32,7 @@ set (TADPOLE_ANIMATION_SRC
 )
 
 set (TADPOLE_BSP_SRC
-	bsp/BSP30SceneNode.cpp
+	bsp/BSP30Node.cpp
 	bsp/BSP30Handler.cpp
 )
 
@@ -81,13 +81,9 @@ set (TADPOLE_NODE_SRC
 	node/Node.cpp
 	node/ParentNode.cpp
 	node/ParticleNode.cpp
-	node/SceneNode.cpp
+	node/PartitionNode.cpp
 	node/SkeletonParentNode.cpp
 	node/SpriteNode.cpp
-)
-
-set (TADPOLE_QUERY_SRC
-	query/AABoxQuery.cpp
 )
 
 
@@ -96,6 +92,7 @@ set (TADPOLE_HEADERS
 	ArchiveManager.h
 	AudioBufferData.h
 	BufferManager.h
+	BoundingVolumeSensor.h
 	Collision.h
 	Engine.h
 	Font.h
@@ -107,12 +104,12 @@ set (TADPOLE_HEADERS
 	MathFormatter.h
 	MeshManager.h
 	Noise.h
-	QueryManager.h
 	Renderable.h
 	ResourceHandler.h
 	ResourceHandlerData.h
 	ResourceManager.h
-	SpacialQuery.h
+	Scene.h
+	SensorResultsListener.h
 	TextureManager.h
 	Traceable.h
 	Track.h
@@ -134,7 +131,7 @@ set (TADPOLE_ANIMATION_HEADERS
 set (TADPOLE_BSP_HEADERS
 	bsp/BSP30Handler.h
 	bsp/BSP30Map.h
-	bsp/BSP30SceneNode.h
+	bsp/BSP30Node.h
 	bsp/BSP30Types.h
 )
 
@@ -193,8 +190,7 @@ set (TADPOLE_NODE_HEADERS
 	node/NodeListener.h
 	node/ParentNode.h
 	node/ParticleNode.h
-	node/Scene.h
-	node/SceneNode.h
+	node/PartitionNode.h
 	node/SkeletonParentNode.h
 	node/SpriteNode.h
 )

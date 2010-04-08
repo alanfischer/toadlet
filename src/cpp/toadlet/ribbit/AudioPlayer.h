@@ -45,8 +45,6 @@ public:
 	virtual Audio *createBufferedAudio()=0;
 	virtual Audio *createStreamingAudio()=0;
 
-	virtual void update(int dt)=0; // milliseconds
-
 	virtual void setListenerTranslate(const ribbit::Vector3 &translate)=0; // Prefix with ribbit for vc6 compatability
 	virtual void setListenerRotate(const ribbit::Matrix3x3 &rotate)=0; // Prefix with ribbit for vc6 compatability
 	virtual void setListenerVelocity(const ribbit::Vector3 &velocity)=0; // Prefix with ribbit for vc6 compatability

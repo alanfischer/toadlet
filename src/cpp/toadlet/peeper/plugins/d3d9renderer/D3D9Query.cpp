@@ -35,7 +35,6 @@ namespace peeper{
 D3D9Query::D3D9Query(D3D9Renderer *renderer):
 	mRenderer(NULL),
 
-	mListener(NULL),
 	mQueryType(QueryType_UNKNOWN),
 
 	mD3DQueryType((D3DQUERYTYPE)0),
@@ -64,10 +63,6 @@ void D3D9Query::destroy(){
 	if(mQuery!=NULL){
 		mQuery->Release();
 		mQuery=NULL;
-	}
-
-	if(mListener!=NULL){
-		mListener->queryDestroyed(this);
 	}
 }
 

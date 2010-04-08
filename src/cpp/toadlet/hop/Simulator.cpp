@@ -641,8 +641,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 						}
 					}
 					if(j<0){
-						solid->mActive=false;
-						solid->mDeactivateCount=0;
+						solid->deactivate();
 					}
 				}
 			}

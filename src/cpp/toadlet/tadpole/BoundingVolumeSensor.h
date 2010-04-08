@@ -23,33 +23,30 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_RENDERQUERY_H
-#define TOADLET_PEEPER_RENDERQUERY_H
+#ifndef TOADLET_TADPOLE_BOUNDINGVOLUMESENSOR_H
+#define TOADLET_TADPOLE_BOUNDINGVOLUMESENSOR_H
 
-#include <toadlet/peeper/Query.h>
+#include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/Scene.h>
+#include <toadlet/tadpole/SensorResultsListener.h>
 
 namespace toadlet{
-namespace peeper{
+namespace tadpole{
 
-class TOADLET_API RenderQuery:public Query{
+class Scene;
+
+/// @todo: perhaps these sensors should be nodes, so they can easily be attached to the scene and then their transforms will be relative, just like opal
+class TOADLET_API BoundingVolumeSensor{
 public:
-	TOADLET_SHARED_POINTERS(RenderQuery);
+	TOADLET_SHARED_POINTERS(BoundingVolumeSensor);
 
-	enum QueryType{
-		QueryType_UNKNOWN,
-		QueryType_OCCLUSION,
-		QueryType_FINISHED,
-	};
-	
-	virtual ~RenderQuery(){}
+	BoundingVolumeSensor(Scene *scene);
+	virtual ~BoundingVolumeSensor();
 
-	virtual bool create(QueryType type)=0;
-	virtual void destroy()=0;
+	virtual bool senseBoundingVolumes(SensorResultsListener *results,const Sphere &volume);
 
-	virtual void beginQuery()=0;
-	virtual void endQuery()=0;
-
-	virtual uint64 getResult()=0;
+protected:
+	Scene *mScene;
 };
 
 }

@@ -23,25 +23,26 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_SPACIALQUERYRESULTSLISTENER_H
-#define TOADLET_TADPOLE_SPACIALQUERYRESULTSLISTENER_H
+#include <toadlet/tadpole/BoundingVolumeSensor.h>
+#include <toadlet/tadpole/Scene.h>
+
+using namespace toadlet::tadpole::node;
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
-	class Node;
+
+BoundingVolumeSensor::BoundingVolumeSensor(Scene *scene):
+	mScene(NULL)
+{
+	mScene=scene;
 }
 
-class SpacialQuery;
+BoundingVolumeSensor::~BoundingVolumeSensor(){
+}
 
-class SpacialQueryResultsListener{
-public:
-	virtual ~SpacialQueryResultsListener(){}
-
-	virtual void resultFound(node::Node *result)=0;
-};
+bool BoundingVolumeSensor::senseBoundingVolumes(SensorResultsListener *results,const Sphere &volume){
+	return mScene->getRoot()->senseBoundingVolumes(results,volume);
+}
 
 }
 }
-
-#endif

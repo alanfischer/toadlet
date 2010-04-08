@@ -23,9 +23,10 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/node/AnimationControllerNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
-#include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::tadpole::animation;

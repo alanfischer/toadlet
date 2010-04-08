@@ -23,35 +23,20 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_QUERYMANAGER_H
-#define TOADLET_TADPOLE_QUERYMANAGER_H
-
-#include <toadlet/peeper/RenderQuery.h>
-#include <toadlet/tadpole/Types.h>
-#include <toadlet/tadpole/SpacialQuery.h>
+#ifndef TOADLET_TADPOLE_SENSORRESULTSLISTENER_H
+#define TOADLET_TADPOLE_SENSORRESULTSLISTENER_H
 
 namespace toadlet{
 namespace tadpole{
+namespace node{
+	class Node;
+}
 
-class Engine;
-
-class TOADLET_API QueryManager:public peeper::QueryDestroyedListener{
+class SensorResultsListener{
 public:
-	QueryManager(Engine *engine);
-	virtual ~QueryManager();
+	virtual ~SensorResultsListener(){}
 
-	void destroy();
-
-	peeper::RenderQuery::ptr createOcclusionQuery();
-	peeper::RenderQuery::ptr createFinishedQuery();
-	SpacialQuery::ptr createSpacialQuery();
-
-	virtual void queryDestroyed(peeper::Query *query);
-
-protected:
-	egg::Collection<peeper::Query::ptr> mQueries;
-
-	Engine *mEngine;
+	virtual void resultFound(node::Node *result)=0;
 };
 
 }

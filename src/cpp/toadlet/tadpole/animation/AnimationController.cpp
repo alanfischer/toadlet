@@ -187,15 +187,11 @@ void AnimationController::extentsChanged(){
 void AnimationController::attach(Animation::ptr animation){
 	mAnimations.add(animation);
 
-	animation->attached(this);
-
 	extentsChanged();
 }
 
 void AnimationController::remove(Animation::ptr animation){
 	mAnimations.remove(animation);
-
-	animation->removed(this);
 
 	extentsChanged();
 }

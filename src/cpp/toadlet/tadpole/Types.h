@@ -55,7 +55,7 @@ class RenderableWorkaround:public Renderable{
 public:
 	RenderableWorkaround(RenderableType *type):renderable(type){}
 	RenderableType *renderable;
-	void queueRenderable(SceneNode *queue,CameraNode *camera){renderable->queueRenderable(queue,camera);}
+	void queueRenderable(Scene *queue,CameraNode *camera){renderable->queueRenderable(queue,camera);}
 	Material *getRenderMaterial() const{return renderable->getRenderMaterial();}
 	const Matrix4x4 &getRenderTransform() const{return renderable->getRenderTransform();}
 	void render(peeper::Renderer *renderer) const{renderable->render(renderer);}

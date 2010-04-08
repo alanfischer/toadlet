@@ -271,10 +271,6 @@ void ALPlayer::resume(){
 	alcProcessContext(mContext);
 }
 
-void ALPlayer::update(int dt){
-	// This has been moved to a thread
-}
-
 void ALPlayer::run(){
 	uint64 startTime=System::mtime();
 	uint64 dt=33; // Update audio at about 60 times a second

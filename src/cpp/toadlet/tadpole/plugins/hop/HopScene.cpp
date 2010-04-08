@@ -29,7 +29,7 @@
 #include <toadlet/peeper/CapabilitySet.h> 
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Collision.h>
-#include <toadlet/tadpole/node/SceneNode.h>
+#include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
 #include <toadlet/tadpole/plugins/hop/HopEntity.h>
 
@@ -41,25 +41,14 @@ using namespace toadlet::tadpole::node;
 namespace toadlet{
 namespace tadpole{
 
-HopScene::HopScene(Scene::ptr scene):
-	mCounter(new PointerCounter(0)),
-	//mScene,
-	//mChildScene,
-
-	//mHopEntities,
-	mShowCollisionVolumes(false),
-	mInterpolateCollisionVolumes(false),
-
-	mExcessiveDT(0),
+HopScene::HopScene(Engine *engine):Scene(engine),
 	mSimulator(NULL),
 	mTraceable(NULL)
 {
 	mSimulator=new Simulator();
 	mSimulator->setManager(this);
-	mScene=scene;
-	mScene->setChildScene(this);
 
-	mScene->getRootNode()->getEngine()->registerNodeType(HopEntity::type());
+	mEngine->registerNodeType(HopEntity::type());
 }
 
 HopScene::~HopScene(){
@@ -106,83 +95,27 @@ void HopScene::testEntity(Collision &result,HopEntity *entity1,const Segment &se
 	set(result,collision);
 }
 
-void HopScene::showCollisionVolumes(bool show,bool interpolate){
-	mShowCollisionVolumes=show;
-	mInterpolateCollisionVolumes=interpolate;
-
-	int i;
-	for(i=0;i<mHopEntities.size();++i){
-		mHopEntities[i]->showCollisionVolumes(mShowCollisionVolumes);
-	}
-}
-
-int HopScene::nodeCreated(HopEntity *entity){
-	if(mHopEntities.contains(entity)==false){
-		mHopEntities.add(entity);
-
-		if(mShowCollisionVolumes){
-			entity->showCollisionVolumes(true);
-		}
-	}
-
-	return entity->getHandle();
-}
-
-void HopScene::nodeDestroyed(HopEntity *entity){
-	if(mHopEntities.contains(entity)){
-		if(mShowCollisionVolumes){
-			entity->showCollisionVolumes(false);
-		}
-
-		mHopEntities.remove(entity);
-	}
-}
-
-void HopScene::preLogicUpdateLoop(int dt){
-	int i;
-	for(i=mHopEntities.size()-1;i>=0;--i){
-		HopEntity *entity=mHopEntities[i];
-		entity->preLogicUpdateLoop(dt);
-	}
-
-	mScene->preLogicUpdateLoop(dt);
-}
-
-void HopScene::preLogicUpdate(int dt){
-	mScene->preLogicUpdate(dt);
-}
-
 void HopScene::logicUpdate(int dt){
 	TOADLET_PROFILE_BEGINSECTION(Simulator::update);
 	mSimulator->update(dt);
 	TOADLET_PROFILE_ENDSECTION(Simulator::update);
 
-	mScene->logicUpdate(dt);
+	// Reactivate any nodes that might have been deactivated
+	int i;
+	for(i=mSimulator->getNumSolids()-1;i>=0;--i){
+		Solid *solid=mSimulator->getSolid(i);
+		HopEntity *entity=(HopEntity*)(solid->getUserData());
+		if(entity->active()==false && solid->active()==true){
+			entity->activate();
+		}
+	}
+
+	Scene::logicUpdate(dt);
 }
 
-void HopScene::postLogicUpdate(int dt){
-	mScene->postLogicUpdate(dt);
-}
-
-void HopScene::postLogicUpdateLoop(int dt){
-	mScene->postLogicUpdateLoop(dt);
-}
-
-void HopScene::preFrameUpdate(int dt){
-	mScene->preFrameUpdate(dt);
-}
-
-void HopScene::frameUpdate(int dt){
-	mScene->frameUpdate(dt);
-}
-
-void HopScene::postFrameUpdate(int dt){
-	mScene->postFrameUpdate(dt);
-}
-
-class QueryListener:public SpacialQueryResultsListener{
+class SolidSensorResults:public SensorResultsListener{
 public:
-	QueryListener(Solid *solids[],int maxSolids){
+	SolidSensorResults(Solid *solids[],int maxSolids){
 		mSolids=solids;
 		mMaxSolids=maxSolids;
 		mCounter=0;
@@ -201,11 +134,12 @@ public:
 };
 
 int HopScene::findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids){
-	QueryListener listener(solids,maxSolids);
-	SpacialQuery query;
-	query.setResultsListener(&listener);
-	performAABoxQuery(&query,box,false);
-	return listener.mCounter;
+	/// @todo: just clean this up a bit, maybe cache the SolidSensorResults as a ::ptr
+	SolidSensorResults results(solids,maxSolids);
+	Sphere bound;
+	Node::set(bound,box);
+	mRoot->senseBoundingVolumes(&results,bound);
+	return results.mCounter;
 }
 
 void HopScene::traceSegment(hop::Collision &result,const Segment &segment){

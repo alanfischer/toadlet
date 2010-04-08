@@ -48,9 +48,6 @@ public:
 	scalar getMin() const{return 0;}
 	scalar getMax() const{return mTarget!=NULL?mTarget->getLength():0;}
 
-	void attached(AnimationController *){}
-	void removed(AnimationController *){}
-
 protected:
 	peeper::TextureStage::ptr mTarget;
 };

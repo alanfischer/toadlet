@@ -666,6 +666,10 @@ bool Math::testIntersection(const AABox &box1,const AABox &box2){
 			  box2.mins.x>box1.maxs.x || box2.mins.y>box1.maxs.y || box2.mins.z>box1.maxs.z);
 }
 
+bool Math::testIntersection(const Sphere &sphere1,const Sphere &sphere2){
+	return lengthSquared(sphere1.origin,sphere2.origin) <= square(sphere1.radius+sphere2.radius);
+}
+
 bool Math::testIntersection(const Sphere &sphere,const AABox &box){
 	real s=0;
 	real d=0;

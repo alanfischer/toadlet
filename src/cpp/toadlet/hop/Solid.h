@@ -115,6 +115,7 @@ public:
 
 	void activate();
 	void setStayActive(bool active);
+	void deactivate();
 	bool active() const{return (mActive && mSimulator!=NULL);}
 
 	void setDoUpdateCallback(bool callback){mDoUpdateCallback=callback;}
