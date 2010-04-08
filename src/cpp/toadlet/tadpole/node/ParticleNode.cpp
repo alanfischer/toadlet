@@ -345,8 +345,8 @@ void ParticleNode::setMaterial(Material::ptr material){
 	}
 }
 
-void ParticleNode::frameUpdate(int dt){
-	super::frameUpdate(dt);
+void ParticleNode::frameUpdate(int dt,int scope){
+	super::frameUpdate(dt,scope);
 
 	if(mUpdateParticles){
 		if(mHasIdealViewTransform){

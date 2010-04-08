@@ -204,17 +204,14 @@ void HopEntity::parentChanged(ParentNode *parent){
 	super::parentChanged(parent);
 }
 
-void HopEntity::logicUpdate(int dt){
+void HopEntity::logicUpdate(int dt,int scope){
 	if(mSolid->active()){
 		setNodeInterpolatorEnabled(false);
 		super::setTranslate(mSolid->getPosition());
 		setNodeInterpolatorEnabled(true);
 	}
-	else{
-		deactivate();
-	}
 
-	super::logicUpdate(dt);
+	super::logicUpdate(dt,scope);
 }
 
 void HopEntity::getBound(AABox &result){

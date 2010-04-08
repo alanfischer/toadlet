@@ -56,7 +56,6 @@ CameraNode::CameraNode():super(),
 	//mWorldTranslate,
 	//mViewTransform,
 
-	mNumCulled(0),
 	mFPSLastTime(0),
 	mFPSFrameCount(0),
 	mFPS(0)
@@ -73,7 +72,6 @@ Node *CameraNode::create(Scene *scene){
 	mSkipFirstClear=false;
 	mMidNode=NULL;
 
-	mNumCulled=0;
 	mFPSLastTime=0;
 	mFPSFrameCount=0;
 	mFPS=0;
@@ -257,8 +255,8 @@ ParentNode::ptr CameraNode::getMidNode(){
 	return mMidNode;
 }
 
-void CameraNode::frameUpdate(int dt){
-	super::frameUpdate(dt);
+void CameraNode::frameUpdate(int dt,int scope){
+	super::frameUpdate(dt,scope);
 
 	updateViewTransform();
 }
@@ -287,7 +285,6 @@ bool CameraNode::culled(const AABox &box){
 }
 
 void CameraNode::updateFramesPerSecond(){
-	mNumCulled=0;
 	mFPSFrameCount++;
 	int fpsTime=mScene->getTime();
 	if(mFPSLastTime==0 || fpsTime-mFPSLastTime>5000){

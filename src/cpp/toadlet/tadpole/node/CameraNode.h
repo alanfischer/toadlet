@@ -96,13 +96,12 @@ public:
 	inline peeper::Color getClearColor() const{return mClearColor;}
 	inline bool getSkipFirstClear() const{return mSkipFirstClear;}
 
-	virtual void frameUpdate(int dt);
+	virtual void frameUpdate(int dt,int scope);
 	inline const Matrix4x4 &getViewTransform() const{return mViewTransform;}
 
 	/// @todo: These should probably be moved into the Math library, and passing in a list of planes
 	virtual bool culled(const Sphere &sphere) const;
 	virtual bool culled(const AABox &box);
-	inline int getNumCulled() const{return mNumCulled;}
 
 	virtual void updateFramesPerSecond();
 	inline scalar getFramesPerSecond() const{return mFPS;}
@@ -129,7 +128,6 @@ protected:
 	Matrix4x4 mViewProjectionTransform;
 	Plane mClipPlanes[6];
 
-	int mNumCulled;
 	int mFPSLastTime;
 	int mFPSFrameCount;
 	scalar mFPS;

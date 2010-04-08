@@ -102,7 +102,7 @@ public:
 
 	// Node callbacks
 	virtual void parentChanged(node::ParentNode *parent);
-	virtual void logicUpdate(int dt);
+	virtual void logicUpdate(int dt,int scope);
 
 	// TraceCallback callbacks
 	virtual void getBound(AABox &result);

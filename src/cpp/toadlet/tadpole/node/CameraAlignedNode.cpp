@@ -45,8 +45,8 @@ CameraAlignedNode::CameraAlignedNode():super(),
 	setPerspective(true);
 }
 
-void CameraAlignedNode::frameUpdate(int dt){
-	super::frameUpdate(dt);
+void CameraAlignedNode::frameUpdate(int dt,int scope){
+	super::frameUpdate(dt,scope);
 
 	if(mLocalBound.radius<0 || mPerspective==false) mWorldBound.radius=-Math::ONE;
 }

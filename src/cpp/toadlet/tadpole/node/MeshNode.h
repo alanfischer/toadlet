@@ -110,7 +110,7 @@ public:
 
 	MeshAnimationController::ptr getAnimationController();
 
-	void frameUpdate(int dt);
+	void frameUpdate(int dt,int scope);
 	void queueRenderables(CameraNode *camera,RenderQueue *queue);
 
 	peeper::VertexBufferAccessor svba;

@@ -67,7 +67,7 @@ public:
 	void stop();
 	inline bool isRunning() const{return mAnimationController->isRunning();}
 
-	void frameUpdate(int dt);
+	void frameUpdate(int dt,int scope);
 
 	void controllerFinished(animation::AnimationController *controller);
 

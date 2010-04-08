@@ -69,15 +69,14 @@ public:
 
 	virtual void update(int dt);
 	virtual void preLogicUpdate(int dt){}
-	virtual void logicUpdate(int dt);
+	virtual void logicUpdate(int dt){logicUpdate(dt,-1);}
 	virtual void logicUpdate(int dt,int scope);
-	virtual void logicUpdate(node::Node *node,int dt,int scope);
 	virtual void postLogicUpdate(int dt){}
 	virtual void preFrameUpdate(int dt){}
-	virtual void frameUpdate(int dt);
+	virtual void frameUpdate(int dt){frameUpdate(dt,-1);}
 	virtual void frameUpdate(int dt,int scope);
-	virtual void frameUpdate(node::Node *node,int dt,int scope);
 	virtual void postFrameUpdate(int dt){}
+	virtual void queueDependent(node::Node *dependent);
 
 	virtual void render(peeper::Renderer *renderer,node::CameraNode *camera,node::Node *node);
 	virtual void renderRenderables(peeper::Renderer *renderer,node::CameraNode *camera,RenderQueue *queue);
@@ -90,13 +89,14 @@ public:
 
 	virtual egg::image::Image::ptr renderToImage(peeper::Renderer *renderer,node::CameraNode *camera,int format,int width,int height);
 
+	int countActiveNodes(node::Node *node=NULL);
+	int countLastRendered();
+	void renderBoundingVolumes(peeper::Renderer *renderer,node::Node *node=NULL);
+
 	virtual int nodeCreated(node::Node *node);
 	virtual void nodeDestroyed(node::Node *node);
 
-	inline int getNumUpdatedNodes() const{return mNumUpdatedNodes;}
-
 protected:
-	virtual void renderBoundingVolumes(node::Node *node,peeper::Renderer *renderer);
 	virtual bool preLayerRender(peeper::Renderer *renderer,node::CameraNode *camera,int layer){return false;}
 	virtual bool postLayerRender(peeper::Renderer *renderer,node::CameraNode *camera,int layer){return false;}
 
@@ -111,7 +111,6 @@ protected:
 	int mLogicFrame;
 	int mAccumulatedDT;
 	int mFrame;
-	int mNumUpdatedNodes;
 	egg::Collection<node::Node::ptr> mDependents;
 
 	Engine *mEngine;
@@ -122,6 +121,7 @@ protected:
 
 	RenderQueue::ptr mRenderQueue;
 	Material *mPreviousMaterial;
+	int mCountLastRendered;
 
 	peeper::Viewport cache_render_viewport;
 };

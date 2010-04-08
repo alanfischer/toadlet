@@ -118,7 +118,7 @@ public:
 
 	virtual void setIdealViewTransform(const Matrix4x4 &transform){mIdealViewTransform.set(transform);mHasIdealViewTransform=true;}
 
-	virtual void frameUpdate(int dt);
+	virtual void frameUpdate(int dt,int scope);
 	virtual void queueRenderables(CameraNode *camera,RenderQueue *queue);
 
 	virtual Material *getRenderMaterial() const{return mMaterial;}

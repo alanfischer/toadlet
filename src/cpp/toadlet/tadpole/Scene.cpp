@@ -48,7 +48,6 @@ Scene::Scene(Engine *engine):
 	mLogicFrame(0),
 	mAccumulatedDT(0),
 	mFrame(0),
-	mNumUpdatedNodes(0),
 
 	//mBackground,
 	//mRoot,
@@ -56,7 +55,8 @@ Scene::Scene(Engine *engine):
 	//mBoundMesh,
 
 	//mRenderQueue,
-	mPreviousMaterial(NULL)
+	mPreviousMaterial(NULL),
+	mCountLastRendered(0)
 {
 	mEngine=engine;
 
@@ -169,6 +169,9 @@ void Scene::update(int dt){
 					mAccumulatedDT=0;
 				}
 
+				mLogicTime+=dt;
+				mLogicFrame++;
+
 				if(mUpdateListener!=NULL){
 					mUpdateListener->preLogicUpdate(logicDT);
 					mUpdateListener->logicUpdate(logicDT);
@@ -184,6 +187,9 @@ void Scene::update(int dt){
 		else{
 			mAccumulatedDT=0;
 
+			mLogicTime+=dt;
+			mLogicFrame++;
+
 			if(mUpdateListener!=NULL){
 				mUpdateListener->preLogicUpdate(dt);
 				mUpdateListener->logicUpdate(dt);
@@ -197,6 +203,8 @@ void Scene::update(int dt){
 		}
 	}
 
+	mFrame++;
+
 	if(mUpdateListener!=NULL){
 		mUpdateListener->preFrameUpdate(dt);
 		mUpdateListener->frameUpdate(dt);
@@ -209,24 +217,18 @@ void Scene::update(int dt){
 	}
 }
 
-void Scene::logicUpdate(int dt){
-	logicUpdate(dt,-1);
-}
-
-// I keep the time & frame incrementing in logicUpdate(dt,scope), instead of just (dt), since WizardWars may choose to update only parts of the scene
 void Scene::logicUpdate(int dt,int scope){
-	mLogicTime+=dt;
-	mLogicFrame++;
-
 	mDependents.clear();
 
-	logicUpdate(mBackground,dt,scope);
-	logicUpdate(mRoot,dt,scope);
+	mBackground->logicUpdate(dt,scope);
+	mRoot->logicUpdate(dt,scope);
 
+	/// @todo: dependents are currently broken if they're more than 1 deep.  This code doesnt check if the dependent is ready. That should be a function in node?
 	while(mDependents.size()>0){
 		Collection<Node::ptr> dependents=mDependents; mDependents.clear();
 		for(int i=0;i<dependents.size();++i){
-			logicUpdate(dependents[i],dt,scope);
+			Node *dependent=dependents[i];
+			dependent->logicUpdate(dt,scope);
 		}
 		/// @todo: This isnt the best check, since we could have an equal amount of dependents added and removed in a frame, and thats not circular
 		if(dependents.size()==mDependents.size()){
@@ -234,74 +236,20 @@ void Scene::logicUpdate(int dt,int scope){
 			return;
 		}
 	}
-}
-
-void Scene::logicUpdate(Node *node,int dt,int scope){
-	if((node->getScope()&scope)==0){
-		return;
-	}
-	
-	if(node->getDependsUpon()!=NULL && node->getDependsUpon()->getLastLogicFrame()!=mLogicFrame){
-		mDependents.add(node);
-		return;
-	}
-
-	node->logicUpdate(dt);
-
-	ParentNode *parent=node->isParent();
-	bool childrenActive=false;
-	if(parent!=NULL){
-		if(parent->mShadowChildrenDirty){
-			parent->updateShadowChildren();
-		}
-
-		int numChildren=parent->mShadowChildren.size();
-		Node *child=NULL;
-		int i;
-		for(i=0;i<numChildren;++i){
-			child=parent->mShadowChildren[i];
-			if(parent->mActivateChildren){
-				child->activate();
-			}
-			if(child->active()){
-				logicUpdate(child,dt,scope);
-				childrenActive=true;
-			}
-		}
-
-		parent->mActivateChildren=false;
-	}
-	
-	if(node->mDeactivateCount>=0){
-		if(childrenActive==false){
-			node->mDeactivateCount++;
-			if(node->mDeactivateCount>4){
-				node->deactivate();
-			}
-		}
-		else{
-			node->mDeactivateCount=0;
-		}
-	}
-}
-
-void Scene::frameUpdate(int dt){
-	frameUpdate(dt,-1);
 }
 
 void Scene::frameUpdate(int dt,int scope){
-	mNumUpdatedNodes=0;
-	mFrame++;
-
 	mDependents.clear();
 
-	frameUpdate(mBackground,dt,scope);
-	frameUpdate(mRoot,dt,scope);
+	mBackground->frameUpdate(dt,scope);
+	mRoot->frameUpdate(dt,scope);
 
 	while(mDependents.size()>0){
 		Collection<Node::ptr> dependents=mDependents; mDependents.clear();
 		for(int i=0;i<dependents.size();++i){
-			frameUpdate(dependents[i],dt,scope);
+			Node *dependent=dependents[i];
+			dependent->frameUpdate(dt,scope);
+			dependent->getParent()->mergeWorldBound(dependents[i]);
 		}
 		/// @todo: This isnt the best check, since we could have an equal amount of dependents added and removed in a frame, and thats not circular
 		if(dependents.size()==mDependents.size()){
@@ -311,38 +259,8 @@ void Scene::frameUpdate(int dt,int scope){
 	}
 }
 
-void Scene::frameUpdate(Node *node,int dt,int scope){
-	if((node->getScope()&scope)==0){
-		return;
-	}
-
-	if(node->mDependsUpon!=NULL && node->mDependsUpon->mLastFrame!=mFrame){
-		mDependents.add(node);
-		return;
-	}
-
-	node->frameUpdate(dt);
-
-	ParentNode *parent=node->isParent();
-	if(parent!=NULL){
-		if(parent->mShadowChildrenDirty){
-			parent->updateShadowChildren();
-		}
-
-		int numChildren=parent->mShadowChildren.size();
-		Node *child=NULL;
-		int i;
-		for(i=0;i<numChildren;++i){
-			child=parent->mShadowChildren[i];
-			if(child->active()){
-				frameUpdate(child,dt,scope);
-			}
-
-			Node::merge(parent->mWorldBound,child->mWorldBound);
-		}
-	}
-	
-	mNumUpdatedNodes++;
+void Scene::queueDependent(Node *dependent){
+	mDependents.add(dependent);
 }
 
 void Scene::render(Renderer *renderer,CameraNode *camera,Node *node){
@@ -350,7 +268,7 @@ void Scene::render(Renderer *renderer,CameraNode *camera,Node *node){
 
 	// Reposition our background node & update it to update the world positions
 	mBackground->setTranslate(camera->getWorldTranslate());
-	frameUpdate(mBackground,0,-1);
+	mBackground->frameUpdate(0,-1);
 
 	mRenderQueue->setCamera(camera);
 	if(node!=NULL){
@@ -362,17 +280,11 @@ void Scene::render(Renderer *renderer,CameraNode *camera,Node *node){
 	}
 
 	renderRenderables(renderer,camera,mRenderQueue);
-
-	/// @todo: Add an option for rendering bounding volumes
-	if(false){
-		renderer->setDefaultStates();
-		renderer->setFaceCulling(Renderer::FaceCulling_NONE);
-		renderer->setFill(Renderer::Fill_LINE);
-		renderBoundingVolumes(mRoot,renderer);
-	}
 }
 
 void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue *queue){
+	mCountLastRendered=0;
+
 	if(camera->getViewportSet()){
 		renderer->setViewport(camera->getViewport());
 	}
@@ -432,6 +344,7 @@ void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue 
 			mPreviousMaterial=material;
 			renderer->setModelMatrix(renderable->getRenderTransform());
 			renderable->render(renderer);
+			mCountLastRendered++;
 		}
 		layer->renderables.clear();
 
@@ -445,6 +358,7 @@ void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue 
 			mPreviousMaterial=material;
 			renderer->setModelMatrix(renderable->getRenderTransform());
 			renderable->render(renderer);
+			mCountLastRendered++;
 		}
 		layer->depthSortedRenderables.clear();
 
@@ -479,6 +393,54 @@ Image::ptr Scene::renderToImage(Renderer *renderer,CameraNode *camera,int format
 	return image;
 }
 
+int Scene::countActiveNodes(Node *node){
+	if(node==NULL){
+		return countActiveNodes(mRoot);
+	}
+	
+	int count=node->active()?1:0;
+
+	ParentNode *parent=node->isParent();
+	if(parent!=NULL){
+		int numChildren=parent->getNumChildren();
+		int i;
+		for(i=0;i<numChildren;++i){
+			count+=countActiveNodes(parent->getChild(i));
+		}
+	}
+	
+	return count;
+}
+
+int Scene::countLastRendered(){
+	return mCountLastRendered;
+}
+
+void Scene::renderBoundingVolumes(Renderer *renderer,Node *node){
+	if(node==NULL){
+		mBoundMesh->subMeshes[0]->material->setupRenderer(renderer,NULL);
+		renderBoundingVolumes(renderer,mRoot);
+		return;
+	}
+
+	if(node->getWorldBound().radius>0){
+		Matrix4x4 transform;
+		Math::setMatrix4x4FromTranslate(transform,node->getWorldBound().origin);
+		Math::setMatrix4x4FromScale(transform,node->getWorldBound().radius,node->getWorldBound().radius,node->getWorldBound().radius);
+		renderer->setModelMatrix(transform);
+		renderer->renderPrimitive(mBoundMesh->staticVertexData,mBoundMesh->subMeshes[0]->indexData);
+	}
+
+	ParentNode *parent=node->isParent();
+	if(parent!=NULL){
+		int numChildren=parent->getNumChildren();
+		int i;
+		for(i=0;i<numChildren;++i){
+			renderBoundingVolumes(renderer,parent->getChild(i));
+		}
+	}
+}
+
 int Scene::nodeCreated(Node *node){
 	int handle=-1;
 	int size=mFreeHandles.size();
@@ -501,25 +463,6 @@ void Scene::nodeDestroyed(Node *node){
 	if(handle>=0){
 		mNodesFromHandles[handle]=NULL;
 		mFreeHandles.add(handle);
-	}
-}
-
-void Scene::renderBoundingVolumes(Node *node,Renderer *renderer){
-	if(node->getWorldBound().radius>0){
-		Matrix4x4 transform;
-		Math::setMatrix4x4FromTranslate(transform,node->getWorldBound().origin);
-		Math::setMatrix4x4FromScale(transform,node->getWorldBound().radius,node->getWorldBound().radius,node->getWorldBound().radius);
-		renderer->setModelMatrix(transform);
-		renderer->renderPrimitive(mBoundMesh->staticVertexData,mBoundMesh->subMeshes[0]->indexData);
-	}
-
-	ParentNode *parent=node->isParent();
-	if(parent!=NULL){
-		int numChildren=parent->mChildren.size();
-		int i;
-		for(i=0;i<numChildren;++i){
-			renderBoundingVolumes(parent->mChildren[i],renderer);
-		}
 	}
 }
 
