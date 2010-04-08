@@ -23,11 +23,12 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Error.h>
+#include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/node/Node.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
-#include <toadlet/tadpole/Engine.h>
-#include <toadlet/egg/Error.h>
 
 using namespace toadlet::egg;
 
@@ -47,6 +48,8 @@ Node::Node():
 	mHandle(0),
 
 	//mNodeListeners,
+	//mNodeInterpolator,
+	mNodeInterpolatorEnabled(false),
 
 	//mParent,
 	mParentData(NULL),
@@ -89,6 +92,8 @@ Node *Node::create(Scene *scene){
 	mHandle=mScene->nodeCreated(this);
 
 	mNodeListeners=NULL;
+	mNodeInterpolator=NULL;
+	mNodeInterpolatorEnabled=true;
 
 	mParent=NULL;
 	mParentData=NULL;
@@ -159,10 +164,6 @@ void Node::removeNodeListener(NodeListener::ptr listener){
 	}
 }
 
-void Node::removeAllNodeListeners(){
-	mNodeListeners=NULL;
-}
-
 void Node::parentChanged(ParentNode *parent){
 	mParent=(Node*)parent;
 }
@@ -177,42 +178,42 @@ void Node::parentDataChanged(void *parentData){
 
 void Node::setTranslate(const Vector3 &translate){
 	mTranslate.set(translate);
-	transformUpdated();
+	transformUpdated(Transform_BIT_TRANSLATE);
 }
 
 void Node::setTranslate(scalar x,scalar y,scalar z){
 	mTranslate.set(x,y,z);
-	transformUpdated();
+	transformUpdated(Transform_BIT_TRANSLATE);
 }
 
 void Node::setRotate(const Matrix3x3 &rotate){
 	Math::setQuaternionFromMatrix3x3(mRotate,rotate);
-	transformUpdated();
+	transformUpdated(Transform_BIT_ROTATE);
 }
 
 void Node::setRotate(const Quaternion &rotate){
 	mRotate.set(rotate);
-	transformUpdated();
+	transformUpdated(Transform_BIT_ROTATE);
 }
 
 void Node::setRotate(scalar x,scalar y,scalar z,scalar angle){
 	Math::setQuaternionFromAxisAngle(mRotate,cache_setRotate_vector.set(x,y,z),angle);
-	transformUpdated();
+	transformUpdated(Transform_BIT_ROTATE);
 }
 
 void Node::setScale(const Vector3 &scale){
 	mScale.set(scale);
-	transformUpdated();
+	transformUpdated(Transform_BIT_SCALE);
 }
 
 void Node::setScale(scalar x,scalar y,scalar z){
 	mScale.set(x,y,z);
-	transformUpdated();
+	transformUpdated(Transform_BIT_SCALE);
 }
 
 void Node::setScale(scalar s){
 	mScale.set(s,s,s);
-	transformUpdated();
+	transformUpdated(Transform_BIT_SCALE);
 }
 
 void Node::setTransform(const Matrix4x4 &transform){
@@ -220,7 +221,7 @@ void Node::setTransform(const Matrix4x4 &transform){
 	Math::setRotateFromMatrix4x4(cache_setTransform_matrix,transform,mScale);
 	Math::setQuaternionFromMatrix3x3(mRotate,cache_setTransform_matrix);
 	Math::setTranslateFromMatrix4x4(mTranslate,transform);
-	transformUpdated();
+	transformUpdated(Transform_BIT_TRANSLATE|Transform_BIT_ROTATE|Transform_BIT_SCALE);
 }
 
 void Node::findTransformTo(Matrix4x4 &result,Node *node){
@@ -237,7 +238,7 @@ void Node::findTransformTo(Matrix4x4 &result,Node *node){
 
 void Node::setLocalBound(const Sphere &bound){
 	mLocalBound.set(bound);
-	transformUpdated();
+	transformUpdated(0);
 }
 
 void Node::logicUpdate(int dt){
@@ -246,6 +247,10 @@ void Node::logicUpdate(int dt){
 		for(i=0;i<mNodeListeners->size();++i){
 			mNodeListeners->at(i)->logicUpdate(this,dt);
 		}
+	}
+
+	if(mNodeInterpolator!=NULL){
+		mNodeInterpolator->logicFrame(this,mScene->getLogicFrame());
 	}
 
 	mLastLogicFrame=mScene->getLogicFrame();
@@ -257,6 +262,10 @@ void Node::frameUpdate(int dt){
 		for(i=0;i<mNodeListeners->size();++i){
 			mNodeListeners->at(i)->frameUpdate(this,dt);
 		}
+	}
+
+	if(mNodeInterpolator!=NULL){
+		mNodeInterpolator->interpolate(this,mScene->getLogicFraction());
 	}
 
 	if(mParent==NULL){
@@ -297,11 +306,21 @@ void Node::activate(){
 	}
 }
 
-void Node::transformUpdated(){
+void Node::deactivate(){
+	mActive=false;
+	mDeactivateCount=0;
+}
+
+void Node::transformUpdated(int transformBits){
 	mIdentityTransform=false;
 	activate();
+
 	if(mParent!=NULL){
 		shared_static_cast<ParentNode>(mParent)->childTransformUpdated(this);
+	}
+
+	if(mNodeInterpolator!=NULL && mNodeInterpolatorEnabled){
+		mNodeInterpolator->transformUpdated(this,transformBits);
 	}
 }
 

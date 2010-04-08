@@ -39,10 +39,8 @@ set (PEEPER_HEADERS
 	LightEffect.h
 	Program.h
 	Query.h
-	QueryDestroyedListener.h
 	RenderTarget.h
 	Renderer.h
-	RenderQuery.h
 	SectionTexture.h
 	SequenceTexture.h
 	Shader.h

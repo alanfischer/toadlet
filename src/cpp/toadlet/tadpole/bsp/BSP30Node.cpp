@@ -25,10 +25,12 @@
 
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/peeper/VertexFormat.h>
+#include <toadlet/tadpole/BoundingVolumeSensor.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/PixelPacker.h>
 #include <toadlet/tadpole/RenderQueue.h>
-#include <toadlet/tadpole/bsp/BSP30SceneNode.h>
+#include <toadlet/tadpole/Scene.h>
+#include <toadlet/tadpole/bsp/BSP30Node.h>
 #include <toadlet/tadpole/bsp/BSP30Handler.h>
 #include <toadlet/tadpole/node/MeshNode.h>
 #include <toadlet/tadpole/handler/WADArchive.h>
@@ -155,16 +157,16 @@ void BSP30ModelNode::traceSegment(Collision &result,const Segment &segment,const
 	Math::add(result.point,getWorldTranslate());
 }
 
-TOADLET_NODE_IMPLEMENT(BSP30SceneNode,Categories::TOADLET_TADPOLE_NODE+".BSP30SceneNode");
+TOADLET_NODE_IMPLEMENT(BSP30Node,Categories::TOADLET_TADPOLE_NODE+".BSP30Node");
 
-BSP30SceneNode::BSP30SceneNode(Engine *engine):super(engine),
+BSP30Node::BSP30Node():super(),
 	mCounter(1)
 {
 }
 
-BSP30SceneNode::~BSP30SceneNode(){}
+BSP30Node::~BSP30Node(){}
 
-void BSP30SceneNode::setMap(const String &name){
+void BSP30Node::setMap(const String &name){
 	Stream::ptr stream=mEngine->openStream(name);
 	if(stream==NULL){
 		Error::unknown("Unable to find level");
@@ -177,7 +179,7 @@ void BSP30SceneNode::setMap(const String &name){
 	setMap(map);
 }
 
-void BSP30SceneNode::setMap(BSP30Map::ptr map){
+void BSP30Node::setMap(BSP30Map::ptr map){
 	int i;
 
 	for(i=0;i<mChildren.size();++i){
@@ -216,44 +218,10 @@ void BSP30SceneNode::setMap(BSP30Map::ptr map){
 
 	node::MeshNode::ptr node=mEngine->createNodeType(node::MeshNode::type(),getScene());
 	node->setMesh(mesh);
-	getBackground()->attach(node);
-	// END: Needs to be removed
+	mScene->getBackground()->attach(node);
 }
 
-bool BSP30SceneNode::performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact){
-	if(mMap==NULL){
-		return false;
-	}
-
-	SpacialQueryResultsListener *listener=query->getSpacialQueryResultsListener();
-	mCounter++;
-	Collection<int> &newIndexes=mLeafIndexes; 
-	newIndexes.clear();
-	mMap->findBoundLeafs(newIndexes,mMap->nodes,0,box);
-	for(int i=0;i<newIndexes.size();i++){
-		const Collection<Node*> &occupants=mLeafData[newIndexes[i]].occupants;
-		for(int j=0;j<occupants.size();++j){
-			Node *occupant=occupants[j];
-			childdata *data=(childdata*)occupant->getParentData();
-			if(data->counter!=mCounter && Math::testIntersection(occupant->getWorldBound(),box)){
-				data->counter=mCounter;
-				listener->resultFound(occupant);
-			}
-		}
-	}
-	return true;
-}
-
-void BSP30SceneNode::traceSegment(Collision &result,const Segment &segment,const Vector3 &size){
-	result.time=Math::ONE;
-	segment.getEndPoint(result.point);
-	if(mMap!=NULL){
-		int contents=mMap->modelTrace(result,0,size,segment.origin,result.point);
-		if(contents!=CONTENTS_EMPTY) result.scope|=(-1-contents)<<1;
-	}
-}
-
-void BSP30SceneNode::nodeAttached(Node *node){
+void BSP30Node::nodeAttached(Node *node){
 	super::nodeAttached(node);
 
 	node->parentDataChanged(new childdata());
@@ -265,7 +233,7 @@ void BSP30SceneNode::nodeAttached(Node *node){
 	}
 }
 
-void BSP30SceneNode::nodeRemoved(Node *node){
+void BSP30Node::nodeRemoved(Node *node){
 	super::nodeRemoved(node);
 
 	if(mMap!=NULL){
@@ -276,21 +244,21 @@ void BSP30SceneNode::nodeRemoved(Node *node){
 	node->parentDataChanged(NULL);
 }
 
-void BSP30SceneNode::insertNodeLeafIndexes(const Collection<int> &indexes,Node *node){
+void BSP30Node::insertNodeLeafIndexes(const Collection<int> &indexes,Node *node){
 	int i;
 	for(i=indexes.size()-1;i>=0;--i){
 		mLeafData[indexes[i]].occupants.add(node);
 	}
 }
 
-void BSP30SceneNode::removeNodeLeafIndexes(const Collection<int> &indexes,Node *node){
+void BSP30Node::removeNodeLeafIndexes(const Collection<int> &indexes,Node *node){
 	int i;
 	for(i=indexes.size()-1;i>=0;--i){
 		mLeafData[indexes[i]].occupants.remove(node);
 	}
 }
 
-void BSP30SceneNode::childTransformUpdated(Node *child){
+void BSP30Node::childTransformUpdated(Node *child){
 	if(mMap==NULL){
 		return;
 	}
@@ -315,23 +283,34 @@ void BSP30SceneNode::childTransformUpdated(Node *child){
 	memcpy(&oldIndexes[0],&newIndexes[0],newIndexes.size()*sizeof(int));
 }
 
-void BSP30SceneNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
+void BSP30Node::queueRenderables(CameraNode *camera,RenderQueue *queue){
+	int i,j;
+
 	if(mMap==NULL){
 		super::queueRenderables(camera,queue);
 		return;
 	}
 
-	super::queueRenderables(mBackground,camera,queue);
+	queue->queueRenderable(this);
 
-	int i,j;
+	// Queue up the visible faces and nodes
+	memset(mMarkedFaces,0,(mMap->nfaces+7)>>3);
+	memset(&mVisibleMaterialFaces[0],0,sizeof(BSP30Map::facedata*)*mVisibleMaterialFaces.size());
 	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,camera->getWorldTranslate());
-	// If no visibility information just test all leaves
-	if(leaf==0 || mMap->parsedVisibility.size()==0){
+	if(leaf==0 || mMap->nvisibility==0){
+		for(i=0;i<mMap->nleafs;i++){
+			addLeafToVisible(&mMap->leafs[i],camera);
+		}
+
 		for(i=0;i<mChildren.size();++i){
 			super::queueRenderables(mChildren[i],camera,queue);
 		}
 	}
 	else{
+		for(i=0;i<mMap->parsedVisibility[leaf].size();i++){
+			addLeafToVisible(&mMap->leafs[mMap->parsedVisibility[leaf][i]],camera);
+		}
+
 		mCounter++;
 		const Collection<int> &leafvis=mMap->parsedVisibility[leaf];
 		for(i=0;i<leafvis.size();i++){
@@ -354,29 +333,42 @@ void BSP30SceneNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	}
 }
 
-bool BSP30SceneNode::preLayerRender(Renderer *renderer,CameraNode *camera,int layer){
-	if(layer!=0 || mMap==NULL){
+bool BSP30Node::senseBoundingVolumes(SensorResultsListener *listener,const Sphere &volume){
+	if(mMap==NULL){
 		return false;
 	}
 
-	memset(mMarkedFaces,0,(mMap->nfaces+7)>>3);
-	memset(&mVisibleMaterialFaces[0],0,sizeof(BSP30Map::facedata*)*mVisibleMaterialFaces.size());
+	mCounter++;
+	Collection<int> &newIndexes=mLeafIndexes; 
+	newIndexes.clear();
+	mMap->findBoundLeafs(newIndexes,mMap->nodes,0,volume);
+	for(int i=0;i<newIndexes.size();i++){
+		const Collection<Node*> &occupants=mLeafData[newIndexes[i]].occupants;
+		for(int j=0;j<occupants.size();++j){
+			Node *occupant=occupants[j];
+			childdata *data=(childdata*)occupant->getParentData();
+			if(data->counter!=mCounter && Math::testIntersection(occupant->getWorldBound(),volume)){
+				data->counter=mCounter;
+				listener->resultFound(occupant);
+			}
+		}
+	}
+	return true;
+}
 
-	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,camera->getWorldTranslate());
+void BSP30Node::traceSegment(Collision &result,const Segment &segment,const Vector3 &size){
+	result.time=Math::ONE;
+	segment.getEndPoint(result.point);
+	if(mMap!=NULL){
+		int contents=mMap->modelTrace(result,0,size,segment.origin,result.point);
+		if(contents!=CONTENTS_EMPTY) result.scope|=(-1-contents)<<1;
+	}
+}
 
+void BSP30Node::render(Renderer *renderer) const{
 	int i;
-	if(leaf==0 || mMap->nvisibility==0){
-		for(i=0;i<mMap->nleafs;i++){
-			addLeafToVisible(&mMap->leafs[i],camera);
-		}
-	}
-	else{
-		for(i=0;i<mMap->parsedVisibility[leaf].size();i++){
-			addLeafToVisible(&mMap->leafs[mMap->parsedVisibility[leaf][i]],camera);
-		}
-	}
 
-	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
+	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4); // Technically I dont need this anymore, since its a renderable.  But i'll keep it in case it ever gets changed again
 
 	Material *previousMaterial=NULL;
 	for(i=0;i<mVisibleMaterialFaces.size();i++){
@@ -391,11 +383,9 @@ bool BSP30SceneNode::preLayerRender(Renderer *renderer,CameraNode *camera,int la
 
 	renderer->setTextureStage(0,NULL);
 	renderer->setTextureStage(1,NULL);
-
-	return true;
 }
 
-void BSP30SceneNode::addLeafToVisible(bleaf *leaf,CameraNode *camera){
+void BSP30Node::addLeafToVisible(bleaf *leaf,CameraNode *camera){
 	AABox bound(leaf->mins[0],leaf->mins[1],leaf->mins[2],leaf->maxs[0],leaf->maxs[1],leaf->maxs[2]);
 	if(camera->culled(bound)==false){
 		const bmarksurface *p=&mMap->marksurfaces[leaf->firstmarksurface];

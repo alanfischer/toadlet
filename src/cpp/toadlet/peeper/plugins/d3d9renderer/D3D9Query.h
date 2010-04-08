@@ -27,14 +27,14 @@
 #define TOADLET_PEEPER_D3D9QUERY_H
 
 #include "D3D9Includes.h"
-#include <toadlet/peeper/RenderQuery.h>
+#include <toadlet/peeper/Query.h>
 
 namespace toadlet{
 namespace peeper{
 
 class D3D9Renderer;
 
-class TOADLET_API D3D9Query:public RenderQuery{
+class TOADLET_API D3D9Query:public Query{
 public:
 	D3D9Query(D3D9Renderer *renderer);
 	virtual ~D3D9Query();
@@ -43,8 +43,6 @@ public:
 
 	virtual bool create(QueryType queryType);
 	virtual void destroy();
-
-	virtual void setQueryDestroyedListener(QueryDestroyedListener *listener){mListener=listener;}
 
 	virtual void beginQuery();
 	virtual void endQuery();
@@ -57,7 +55,6 @@ protected:
 
 	D3D9Renderer *mRenderer;
 
-	QueryDestroyedListener *mListener;
 	QueryType mQueryType;
 
 	D3DQUERYTYPE mD3DQueryType;

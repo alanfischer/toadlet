@@ -24,11 +24,11 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
+#include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/RenderQueue.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/node/LabelNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
-#include <toadlet/tadpole/node/SceneNode.h>
-#include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
@@ -170,34 +170,36 @@ void LabelNode::updateLabel(){
 	}
 
 	// Update buffers
-	int length=text.length();
 	if(mVertexData!=NULL){
 		mVertexData->destroy();
 		mVertexData=NULL;
 	}
 
-	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,length*4);
-	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+	int length=text.length();
+	if(length>0){
+		VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,length*4);
+		mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 
-	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,length*6);
-	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,length*6));
+		IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,length*6);
+		mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,length*6));
 
-	{
-		uint16 *data=(uint16*)indexBuffer->lock(Buffer::AccessType_WRITE_ONLY);
-		for(i=0;i<length;i++){
-			ix=i*6;
-			data[ix+0]=i*4+0;
-			data[ix+1]=i*4+1;
-			data[ix+2]=i*4+3;
-			data[ix+3]=i*4+3;
-			data[ix+4]=i*4+1;
-			data[ix+5]=i*4+2;
+		{
+			uint16 *data=(uint16*)indexBuffer->lock(Buffer::AccessType_WRITE_ONLY);
+			for(i=0;i<length;i++){
+				ix=i*6;
+				data[ix+0]=i*4+0;
+				data[ix+1]=i*4+1;
+				data[ix+2]=i*4+3;
+				data[ix+3]=i*4+3;
+				data[ix+4]=i*4+1;
+				data[ix+5]=i*4+2;
+			}
+			indexBuffer->unlock();
 		}
-		indexBuffer->unlock();
-	}
 
-	mFont->updateVertexBufferForString(mVertexData->getVertexBuffer(0),text,Colors::WHITE,mAlignment,!mNormalized,true);
-	mIndexData->setCount(length*6);
+		mFont->updateVertexBufferForString(mVertexData->getVertexBuffer(0),text,Colors::WHITE,mAlignment,!mNormalized,true);
+		mIndexData->setCount(length*6);
+	}
 
 	// Update material
 	Texture::ptr texture=mFont->getTexture();

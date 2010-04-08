@@ -27,24 +27,20 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Profile.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/SpacialQuery.h>
+#include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/node/CameraNode.h>
-#include <toadlet/tadpole/node/SceneNode.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::image;
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
+using namespace toadlet::tadpole::node;
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
 
-TOADLET_NODE_IMPLEMENT(SceneNode,Categories::TOADLET_TADPOLE_NODE+".SceneNode");
-
-SceneNode::SceneNode(Engine *engine):super(),
-	mChildScene (NULL),
-
+Scene::Scene(Engine *engine):
+	mUpdateListener(NULL),
 	mExcessiveDT(0),
 	mMinLogicDT(0),
 	mMaxLogicDT(0),
@@ -52,51 +48,56 @@ SceneNode::SceneNode(Engine *engine):super(),
 	mLogicFrame(0),
 	mAccumulatedDT(0),
 	mFrame(0),
+	mNumUpdatedNodes(0),
 
 	//mBackground,
+	//mRoot,
 	//mAmbientColor,
-
-	mUpdateListener(NULL),
-	mNumUpdatedNodes(0),
+	//mBoundMesh,
 
 	//mRenderQueue,
 	mPreviousMaterial(NULL)
 {
 	mEngine=engine;
 
-	mBoundMesh=mEngine->getMeshManager()->createSphere(Sphere(Math::ONE),8,8);
-}
-
-SceneNode::~SceneNode(){
-}
-
-Node *SceneNode::create(Scene *scene){
-	super::create(this);
-
-	setChildScene(this);
 	setExcessiveDT(5000);
 	setRangeLogicDT(0,0);
 	setAmbientColor(Colors::GREY);
 
-	mBackground=mEngine->createNodeType(ParentNode::type(),this);
-	
+	mBackground=mEngine->createNodeType(PartitionNode::type(),this);
+	mRoot=mEngine->createNodeType(PartitionNode::type(),this);
+
 	mRenderQueue=RenderQueue::ptr(new RenderQueue());
 
-	return this;
+	mBoundMesh=mEngine->getMeshManager()->createSphere(Sphere(Math::ONE),8,8);
 }
 
-void SceneNode::destroy(){
+Scene::~Scene(){
+}
+
+void Scene::destroy(){
 	if(mBackground!=NULL){
 		mBackground->destroy();
 		mBackground=NULL;
 	}
-
-	super::destroy();
+	
+	if(mRoot!=NULL){
+		mRoot->destroy();
+		mRoot=NULL;
+	}
 }
 
-Node *SceneNode::findNodeByName(const String &name,Node *node){
+void Scene::setRoot(PartitionNode *root){
+	if(mRoot!=NULL){
+		mRoot->destroy();
+	}
+
+	mRoot=root;
+}
+
+Node *Scene::findNodeByName(const String &name,Node *node){
 	if(node==NULL){
-		node=this;
+		node=mRoot;
 	}
 
 	if(node->mName!=(char*)NULL && node->mName.equals(name)){
@@ -118,7 +119,7 @@ Node *SceneNode::findNodeByName(const String &name,Node *node){
 	}
 }
 
-Node *SceneNode::findNodeByHandle(int handle){
+Node *Scene::findNodeByHandle(int handle){
 	if(handle>=0 && handle<mNodesFromHandles.size()){
 		return mNodesFromHandles[handle];
 	}
@@ -127,7 +128,7 @@ Node *SceneNode::findNodeByHandle(int handle){
 	}
 }
 
-void SceneNode::setRangeLogicDT(int minDT,int maxDT){
+void Scene::setRangeLogicDT(int minDT,int maxDT){
 	#if defined(TOADLET_DEBUG)
 		if(minDT<0 || maxDT<0){
 			Error::unknown(Categories::TOADLET_TADPOLE,
@@ -140,22 +141,14 @@ void SceneNode::setRangeLogicDT(int minDT,int maxDT){
 	mMaxLogicDT=maxDT;
 }
 
-void SceneNode::setLogicTimeAndFrame(int time,int frame){
+void Scene::setLogicTimeAndFrame(int time,int frame){
 	mLogicTime=time;
 	mLogicFrame=frame;
 	mAccumulatedDT=0;
 	mFrame=0;
 }
 
-void SceneNode::update(int dt){
-	#if defined(TOADLET_DEBUG)
-		if(!created()){
-			Error::unknown(Categories::TOADLET_TADPOLE,
-				"update called on a destroyed Scene");
-			return;
-		}
-	#endif
-
+void Scene::update(int dt){
 	if(mExcessiveDT>0 && dt>mExcessiveDT){
 		Logger::alert(Categories::TOADLET_TADPOLE,
 			String("skipping excessive dt:")+dt);
@@ -165,8 +158,6 @@ void SceneNode::update(int dt){
 	mAccumulatedDT+=dt;
 
 	if(mAccumulatedDT>=mMinLogicDT){
-		mChildScene->preLogicUpdateLoop(dt);
-
 		if(mMaxLogicDT>0){
 			while(mAccumulatedDT>0 && mAccumulatedDT>=mMinLogicDT){
 				int logicDT=mAccumulatedDT;
@@ -184,9 +175,9 @@ void SceneNode::update(int dt){
 					mUpdateListener->postLogicUpdate(logicDT);
 				}
 				else{
-					mChildScene->preLogicUpdate(logicDT);
-					mChildScene->logicUpdate(logicDT);
-					mChildScene->postLogicUpdate(logicDT);
+					preLogicUpdate(logicDT);
+					logicUpdate(logicDT);
+					postLogicUpdate(logicDT);
 				}
 			}
 		}
@@ -199,13 +190,11 @@ void SceneNode::update(int dt){
 				mUpdateListener->postLogicUpdate(dt);
 			}
 			else{
-				mChildScene->preLogicUpdate(dt);
-				mChildScene->logicUpdate(dt);
-				mChildScene->postLogicUpdate(dt);
+				preLogicUpdate(dt);
+				logicUpdate(dt);
+				postLogicUpdate(dt);
 			}
 		}
-
-		mChildScene->postLogicUpdateLoop(dt);
 	}
 
 	if(mUpdateListener!=NULL){
@@ -214,29 +203,25 @@ void SceneNode::update(int dt){
 		mUpdateListener->postFrameUpdate(dt);
 	}
 	else{
-		mChildScene->preFrameUpdate(dt);
-		mChildScene->frameUpdate(dt);
-		mChildScene->postFrameUpdate(dt);
-	}
-
-	AudioPlayer *audioPlayer=mEngine->getAudioPlayer();
-	if(audioPlayer!=NULL){
-		audioPlayer->update(dt);
+		preFrameUpdate(dt);
+		frameUpdate(dt);
+		postFrameUpdate(dt);
 	}
 }
 
-void SceneNode::logicUpdate(int dt){
+void Scene::logicUpdate(int dt){
 	logicUpdate(dt,-1);
 }
 
-void SceneNode::logicUpdate(int dt,int scope){
+// I keep the time & frame incrementing in logicUpdate(dt,scope), instead of just (dt), since WizardWars may choose to update only parts of the scene
+void Scene::logicUpdate(int dt,int scope){
 	mLogicTime+=dt;
 	mLogicFrame++;
 
 	mDependents.clear();
 
 	logicUpdate(mBackground,dt,scope);
-	logicUpdate(this,dt,scope);
+	logicUpdate(mRoot,dt,scope);
 
 	while(mDependents.size()>0){
 		Collection<Node::ptr> dependents=mDependents; mDependents.clear();
@@ -251,7 +236,7 @@ void SceneNode::logicUpdate(int dt,int scope){
 	}
 }
 
-void SceneNode::logicUpdate(Node *node,int dt,int scope){
+void Scene::logicUpdate(Node *node,int dt,int scope){
 	if((node->mScope&scope)==0){
 		return;
 	}
@@ -261,9 +246,7 @@ void SceneNode::logicUpdate(Node *node,int dt,int scope){
 		return;
 	}
 
-	if(node!=this){
-		node->logicUpdate(dt);
-	}
+	node->logicUpdate(dt);
 
 	ParentNode *parent=node->isParent();
 	bool childrenActive=false;
@@ -293,8 +276,7 @@ void SceneNode::logicUpdate(Node *node,int dt,int scope){
 		if(childrenActive==false){
 			node->mDeactivateCount++;
 			if(node->mDeactivateCount>4){
-				node->mActive=false;
-				node->mDeactivateCount=0;
+				node->deactivate();
 			}
 		}
 		else{
@@ -303,18 +285,18 @@ void SceneNode::logicUpdate(Node *node,int dt,int scope){
 	}
 }
 
-void SceneNode::frameUpdate(int dt){
+void Scene::frameUpdate(int dt){
 	frameUpdate(dt,-1);
 }
 
-void SceneNode::frameUpdate(int dt,int scope){
+void Scene::frameUpdate(int dt,int scope){
 	mNumUpdatedNodes=0;
 	mFrame++;
 
 	mDependents.clear();
 
 	frameUpdate(mBackground,dt,scope);
-	frameUpdate(this,dt,scope);
+	frameUpdate(mRoot,dt,scope);
 
 	while(mDependents.size()>0){
 		Collection<Node::ptr> dependents=mDependents; mDependents.clear();
@@ -329,7 +311,7 @@ void SceneNode::frameUpdate(int dt,int scope){
 	}
 }
 
-void SceneNode::frameUpdate(Node *node,int dt,int scope){
+void Scene::frameUpdate(Node *node,int dt,int scope){
 	if((node->mScope&scope)==0){
 		return;
 	}
@@ -339,9 +321,7 @@ void SceneNode::frameUpdate(Node *node,int dt,int scope){
 		return;
 	}
 
-	if(node!=this){
-		node->frameUpdate(dt);
-	}
+	node->frameUpdate(dt);
 
 	ParentNode *parent=node->isParent();
 	if(parent!=NULL){
@@ -358,21 +338,14 @@ void SceneNode::frameUpdate(Node *node,int dt,int scope){
 				frameUpdate(child,dt,scope);
 			}
 
-			merge(parent->mWorldBound,child->mWorldBound);
+			Node::merge(parent->mWorldBound,child->mWorldBound);
 		}
 	}
 	
 	mNumUpdatedNodes++;
 }
 
-void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
-	#if defined(TOADLET_DEBUG)
-		if(!created()){
-			Error::unknown(Categories::TOADLET_TADPOLE,
-				"render called on a desroyed Scene");
-		}
-	#endif
-
+void Scene::render(Renderer *renderer,CameraNode *camera,Node *node){
 	camera->updateFramesPerSecond();
 
 	// Reposition our background node & update it to update the world positions
@@ -381,47 +354,25 @@ void SceneNode::render(Renderer *renderer,CameraNode *camera,Node *node){
 
 	mRenderQueue->setCamera(camera);
 	if(node!=NULL){
-		queueRenderables(node,camera,mRenderQueue);
+		node->queueRenderables(camera,mRenderQueue);
 	}
 	else{
-		queueRenderables(camera,mRenderQueue);
+		mBackground->queueRenderables(camera,mRenderQueue);
+		mRoot->queueRenderables(camera,mRenderQueue);
 	}
 
 	renderRenderables(renderer,camera,mRenderQueue);
 
+	/// @todo: Add an option for rendering bounding volumes
 	if(false){
 		renderer->setDefaultStates();
 		renderer->setFaceCulling(Renderer::FaceCulling_NONE);
 		renderer->setFill(Renderer::Fill_LINE);
-		renderBoundingVolumes(this,renderer,camera);
+		renderBoundingVolumes(mRoot,renderer);
 	}
 }
 
-void SceneNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
-	queueRenderables(mBackground,camera,queue);
-	queueRenderables(this,camera,queue);
-}
-
-void SceneNode::queueRenderables(Node *node,CameraNode *camera,RenderQueue *queue){
-	if(culled(node,camera)){
-		return;
-	}
-
-	if(node!=this){
-		node->queueRenderables(camera,queue);
-	}
-
-	ParentNode *parent=node->isParent();
-	if(parent!=NULL){
-		int numChildren=parent->mChildren.size();
-		int i;
-		for(i=0;i<numChildren;++i){
-			queueRenderables(parent->mChildren[i],camera,queue);
-		}
-	}
-}
-
-void SceneNode::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue *queue){
+void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue *queue){
 	if(camera->getViewportSet()){
 		renderer->setViewport(camera->getViewport());
 	}
@@ -437,8 +388,8 @@ void SceneNode::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQu
 	}
 
 	renderer->setDefaultStates();
-	renderer->setProjectionMatrix(camera->mProjectionTransform);
-	renderer->setViewMatrix(camera->mViewTransform);
+	renderer->setProjectionMatrix(camera->getProjectionTransform());
+	renderer->setViewMatrix(camera->getViewTransform());
 	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
 	renderer->setAmbientColor(mAmbientColor);
 
@@ -505,24 +456,7 @@ void SceneNode::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQu
 	}
 }
 
-bool SceneNode::culled(Node *node,CameraNode *camera){
-	return (node->mScope&camera->mScope)==0 || camera->culled(node->mWorldBound);
-}
-
-bool SceneNode::performAABoxQuery(SpacialQuery *query,const AABox &box,bool exact){
-	SpacialQueryResultsListener *listener=query->getSpacialQueryResultsListener();
-
-	int i;
-	for(i=0;i<mChildren.size();++i){
-		Node *child=mChildren[i];
-		if(Math::testIntersection(child->mWorldBound,box)){
-			listener->resultFound(child);
-		}
-	}
-	return true;
-}
-
-Image::ptr SceneNode::renderToImage(Renderer *renderer,CameraNode *camera,int format,int width,int height){
+Image::ptr Scene::renderToImage(Renderer *renderer,CameraNode *camera,int format,int width,int height){
 	Texture::ptr renderTexture=mEngine->getTextureManager()->createTexture(Texture::UsageFlags_RENDERTARGET,Texture::Dimension_D2,format,width,height,0,1);
 	SurfaceRenderTarget::ptr renderTarget=mEngine->getTextureManager()->createSurfaceRenderTarget();
 	renderTarget->attach(renderTexture->getMipSurface(0,0),SurfaceRenderTarget::Attachment_COLOR_0);
@@ -545,7 +479,7 @@ Image::ptr SceneNode::renderToImage(Renderer *renderer,CameraNode *camera,int fo
 	return image;
 }
 
-int SceneNode::nodeCreated(Node *node){
+int Scene::nodeCreated(Node *node){
 	int handle=-1;
 	int size=mFreeHandles.size();
 	if(size>0){
@@ -562,7 +496,7 @@ int SceneNode::nodeCreated(Node *node){
 	return handle;
 }
 
-void SceneNode::nodeDestroyed(Node *node){
+void Scene::nodeDestroyed(Node *node){
 	int handle=node->getHandle();
 	if(handle>=0){
 		mNodesFromHandles[handle]=NULL;
@@ -570,7 +504,7 @@ void SceneNode::nodeDestroyed(Node *node){
 	}
 }
 
-void SceneNode::renderBoundingVolumes(Node *node,Renderer *renderer,CameraNode *camera){
+void Scene::renderBoundingVolumes(Node *node,Renderer *renderer){
 	if(node->getWorldBound().radius>0){
 		Matrix4x4 transform;
 		Math::setMatrix4x4FromTranslate(transform,node->getWorldBound().origin);
@@ -584,11 +518,10 @@ void SceneNode::renderBoundingVolumes(Node *node,Renderer *renderer,CameraNode *
 		int numChildren=parent->mChildren.size();
 		int i;
 		for(i=0;i<numChildren;++i){
-			renderBoundingVolumes(parent->mChildren[i],renderer,camera);
+			renderBoundingVolumes(parent->mChildren[i],renderer);
 		}
 	}
 }
 
-}
 }
 }

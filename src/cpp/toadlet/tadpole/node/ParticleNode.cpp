@@ -26,11 +26,11 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Profile.h>
+#include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/RenderQueue.h>
 #include <toadlet/tadpole/node/ParticleNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/CameraNode.h>
-#include <toadlet/tadpole/node/SceneNode.h>
-#include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;

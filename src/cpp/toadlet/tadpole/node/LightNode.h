@@ -33,8 +33,6 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class Scene;
-
 /// @todo: Add proper world position & direction updating of the Light, same with AudioNode
 class TOADLET_API LightNode:public Node{
 public:

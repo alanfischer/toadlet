@@ -29,6 +29,7 @@
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/tadpole/bsp/BSP30Types.h>
 #include <toadlet/tadpole/Collision.h>
+#include <toadlet/tadpole/Material.h>
 #include <stdlib.h>
 
 namespace toadlet{

@@ -38,8 +38,6 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class Scene;
-
 class TOADLET_API SpriteNode:public CameraAlignedNode,public Renderable{
 public:
 	TOADLET_NODE(SpriteNode,CameraAlignedNode);

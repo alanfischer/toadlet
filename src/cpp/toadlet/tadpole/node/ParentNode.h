@@ -70,7 +70,7 @@ protected:
 	bool mShadowChildrenDirty;
 	egg::Collection<Node::ptr> mShadowChildren;
 
-	friend class SceneNode;
+	friend class Scene;
 };
 
 }

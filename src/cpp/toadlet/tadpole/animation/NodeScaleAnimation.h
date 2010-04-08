@@ -81,9 +81,6 @@ public:
 	scalar getMin() const{return 0;}
 	scalar getMax() const{return mEndTime;}
 
-	void attached(AnimationController *){}
-	void removed(AnimationController *){}
-
 protected:
 	entity::Entity::ptr mTarget;
 	Vector3 mStart;

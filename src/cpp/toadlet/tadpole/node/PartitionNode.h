@@ -23,42 +23,35 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_SPACIALQUERY_H
-#define TOADLET_TADPOLE_SPACIALQUERY_H
+#ifndef TOADLET_TADPOLE_NODE_PARTITIONNODE_H
+#define TOADLET_TADPOLE_NODE_PARTITIONNODE_H
 
-#include <toadlet/peeper/Query.h>
-#include <toadlet/tadpole/Types.h>
-#include <toadlet/tadpole/SpacialQueryResultsListener.h>
+#include <toadlet/tadpole/SensorResultsListener.h>
+#include <toadlet/tadpole/node/ParentNode.h>
 
 namespace toadlet{
 namespace tadpole{
 
-/// @todo: The SpacialQuery structure really needs to be refactored
-class TOADLET_API SpacialQuery:public peeper::Query{
+namespace node{
+
+class TOADLET_API PartitionNode:public ParentNode{
 public:
-	TOADLET_SHARED_POINTERS(SpacialQuery);
+	TOADLET_NODE(PartitionNode,ParentNode);
 
-	SpacialQuery();
-	virtual ~SpacialQuery();
-
-	virtual SpacialQuery *getRootQuery(){return this;}
-
-	virtual void create();
+	PartitionNode();
+	virtual Node *create(Scene *scene);
 	virtual void destroy();
 
-	virtual void setQueryDestroyedListener(peeper::QueryDestroyedListener *listener){mDestroyedListener=listener;}
-	virtual peeper::QueryDestroyedListener *getQueryDestroyedListener() const{return mDestroyedListener;}
-	virtual void setResultsListener(SpacialQueryResultsListener *listener){mResultsListener=listener;}
-	virtual SpacialQueryResultsListener *getSpacialQueryResultsListener() const{return mResultsListener;}
-
-	virtual void beginQuery(){}
-	virtual void endQuery(){}
+	virtual bool senseBoundingVolumes(SensorResultsListener *listener,const Sphere &volume);
+	
+	virtual void queueRenderables(CameraNode *camera,RenderQueue *queue);
 
 protected:
-	peeper::QueryDestroyedListener *mDestroyedListener;
-	SpacialQueryResultsListener *mResultsListener;
+	virtual void queueRenderables(Node *node,CameraNode *camera,RenderQueue *queue);
+	virtual bool culled(Node *node,CameraNode *camera);
 };
 
+}
 }
 }
 

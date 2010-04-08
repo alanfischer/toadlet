@@ -23,10 +23,10 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/RenderQueue.h>
 #include <toadlet/tadpole/node/LightNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
-#include <toadlet/tadpole/node/SceneNode.h>
-#include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;

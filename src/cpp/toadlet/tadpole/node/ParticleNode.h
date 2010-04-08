@@ -42,8 +42,6 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class Scene;
-
 class TOADLET_API ParticleNode:public Node,public Renderable{
 public:
 	TOADLET_NODE(ParticleNode,Node);

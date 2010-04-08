@@ -32,6 +32,7 @@
 #include <toadlet/egg/Type.h>
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/node/NodeListener.h>
+#include <toadlet/tadpole/node/NodeInterpolator.h>
 
 #ifndef TOADLET_NODE
 	#define TOADLET_NODE(Class,SuperClass) \
@@ -61,16 +62,22 @@ namespace tadpole{
 
 class Engine;
 class RenderQueue;
+class Scene;
 
 namespace node{
 
 class CameraNode;
 class ParentNode;
-class Scene;
 
 class TOADLET_API Node{
 public:
 	TOADLET_NODE(Node,Node);
+
+	enum{
+		Transform_BIT_TRANSLATE=1<<0,
+		Transform_BIT_ROTATE=	1<<1,
+		Transform_BIT_SCALE=	1<<2,
+	};
 
 	Node();
 	virtual ~Node();
@@ -85,8 +92,13 @@ public:
 
 	virtual void addNodeListener(NodeListener::ptr listener);
 	virtual void removeNodeListener(NodeListener::ptr listener);
-	virtual void removeAllNodeListeners();
+	virtual void removeAllNodeListeners(){mNodeListeners=NULL;}
 	
+	virtual void setNodeInterpolator(NodeInterpolator::ptr interpolator){mNodeInterpolator=interpolator;}
+	inline NodeInterpolator::ptr getNodeInterpolator() const{return mNodeInterpolator;}
+	virtual void setNodeInterpolatorEnabled(bool enabled){mNodeInterpolatorEnabled=enabled;}
+	inline bool getNodeInterpolatorEnabled() const{return mNodeInterpolatorEnabled;}
+
 	virtual void parentChanged(ParentNode *parent);
 	ParentNode *getParent() const;
 	virtual void parentDataChanged(void *parentData);
@@ -114,7 +126,7 @@ public:
 
 	virtual void setTransform(const Matrix4x4 &transform);
 	inline const Matrix4x4 &getWorldTransform() const{return mWorldTransform;}
-
+	
 	inline bool isIdentityTransform() const{return mIdentityTransform;}
 
 	virtual void findTransformTo(Matrix4x4 &result,Node *node);
@@ -136,6 +148,7 @@ public:
 	virtual void queueRenderables(CameraNode *camera,RenderQueue *queue){}
 
 	virtual void activate();
+	virtual void deactivate();
 	inline bool active() const{return mActive;}
 
 	inline Engine *getEngine() const{return mEngine;}
@@ -144,14 +157,6 @@ public:
 	inline egg::PointerCounter *pointerCounter() const{return mPointerCounter;}
 	inline void internal_setManaged(bool managed){mManaged=managed;}
 	inline bool internal_getManaged() const{return mManaged;}
-
-	/// @todo: Make a SphereBound class, and have it contain these methods
-	// Not in Math currently, because its not technically correct, a Matrix*Sphere=Eplisoid
-//	static void mul(Sphere &r,const Matrix4x4 &m,const Sphere &s){
-//		Math::mul(r.origin.set(s.radius,s.radius,s.radius),m);
-//		r.radius=Math::maxVal(Math::maxVal(r.origin.x,r.origin.y),r.origin.z);
-//		Math::mulPoint3Fast(r.origin,m,s.origin);
-//	}
 
 	static void mul(Sphere &r,const Vector3 &translate,const Quaternion &rotate,const Vector3 &scale,const Sphere &s){
 		Math::mul(r.origin,scale,s.radius);
@@ -191,7 +196,7 @@ public:
 	}
 
 protected:
-	void transformUpdated();
+	void transformUpdated(int transformBits);
 
 	// Allocation items
 	egg::PointerCounter *mPointerCounter;
@@ -205,6 +210,8 @@ protected:
 
 	// Node items
 	egg::Collection<NodeListener::ptr>::ptr mNodeListeners;
+	NodeInterpolator::ptr mNodeInterpolator;
+	bool mNodeInterpolatorEnabled;
 
 	Node::ptr mParent;
 	void *mParentData;
@@ -233,7 +240,7 @@ protected:
 	Vector3 cache_setRotate_vector;
 	Matrix3x3 cache_setTransform_matrix;
 
-	friend class SceneNode;
+	friend class Scene;
 };
 
 }

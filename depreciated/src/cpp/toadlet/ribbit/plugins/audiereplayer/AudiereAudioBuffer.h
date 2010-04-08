@@ -23,19 +23,22 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_QUERYDESTROYEDLISTENER_H
-#define TOADLET_PEEPER_QUERYDESTROYEDLISTENER_H
+#ifndef TOADLET_RIBBIT_ALAUDIOBUFFERPEER_H
+#define TOADLET_RIBBIT_ALAUDIOBUFFERPEER_H
+
+#include <toadlet/ribbit/Types.h>
+#include <toadlet/ribbit/AudioBuffer.h>
+#include <audiere.h>
 
 namespace toadlet{
-namespace peeper{
+namespace ribbit{
 
-class Query;
-
-class QueryDestroyedListener{
+class TOADLET_API AudiereAudioBufferPeer:public AudioBufferPeer{
 public:
-	virtual ~QueryDestroyedListener(){}
+	AudiereAudioBufferPeer(){}
+	virtual ~AudiereAudioBufferPeer(){}
 
-	virtual void queryDestroyed(Query *query)=0;
+	audiere::SampleBufferPtr sampleBuffer;
 };
 
 }
