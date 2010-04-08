@@ -239,8 +239,6 @@ protected:
 
 	Vector3 cache_setRotate_vector;
 	Matrix3x3 cache_setTransform_matrix;
-
-	friend class Scene;
 };
 
 }

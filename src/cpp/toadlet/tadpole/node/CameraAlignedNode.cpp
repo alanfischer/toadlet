@@ -38,8 +38,6 @@ namespace node{
 TOADLET_NODE_IMPLEMENT(CameraAlignedNode,Categories::TOADLET_TADPOLE_NODE+".CameraAlignedNode");
 
 CameraAlignedNode::CameraAlignedNode():super(),
-	TOADLET_GIB_IMPLEMENT()
-
 	mCameraAligned(false),
 	mPerspective(false)
 {

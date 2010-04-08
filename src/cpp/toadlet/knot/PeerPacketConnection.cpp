@@ -44,6 +44,8 @@ public:
 };
 
 PeerPacketConnection::PeerPacket::PeerPacket():
+	debugDeliverTime(0),
+
 	mData(NULL),
 	mDataLength(0),
 	mDataMaxSize(0),
@@ -52,9 +54,7 @@ PeerPacketConnection::PeerPacket::PeerPacket():
 	mFrameBits(0),
 	mFrameBitsReferenceFrame(0),
 
-	mTimeHandled(0),
-
-	debugDeliverTime(0)
+	mTimeHandled(0)
 {}
 
 PeerPacketConnection::PeerPacket::~PeerPacket(){

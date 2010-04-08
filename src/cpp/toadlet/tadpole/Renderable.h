@@ -26,6 +26,7 @@
 #ifndef TOADLET_TADPOLE_RENDERABLE_H
 #define TOADLET_TADPOLE_RENDERABLE_H
 
+#include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
@@ -35,13 +36,7 @@ class Renderer;
 
 }
 namespace tadpole{
-namespace node{
 
-class CameraNode;
-
-}
-
-class RenderQueue;
 class Material;
 
 class Renderable{

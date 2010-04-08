@@ -36,6 +36,8 @@ class TOADLET_API NodeInterpolator{
 public:
 	TOADLET_SHARED_POINTERS(NodeInterpolator);
 
+	virtual ~NodeInterpolator(){}
+	
 	virtual void transformUpdated(Node *node,int transformBits)=0;
 	
 	virtual void logicFrame(Node *node,int frame)=0;

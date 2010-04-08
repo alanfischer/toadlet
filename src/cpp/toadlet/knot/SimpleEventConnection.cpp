@@ -147,7 +147,6 @@ bool SimpleEventConnection::send(Event::ptr event){
 
 Event::ptr SimpleEventConnection::receive(){	
 	Event::ptr event;
-	int clientID=0;
 
 	mEventsMutex.lock();
 		int size=mEvents.size();
