@@ -222,6 +222,7 @@ typedef unsigned int uint32;
 	static char uint64SizeTest[sizeof(uint64)== 8 ?1:-1];
 
 	inline void silenceUnusedVariableWarnings(){
+		TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(byteSizeTest);
 		TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(int8SizeTest);
 		TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(uint8SizeTest);
 		TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(int16SizeTest);

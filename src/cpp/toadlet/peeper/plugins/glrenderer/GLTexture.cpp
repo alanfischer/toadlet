@@ -107,12 +107,16 @@ bool GLTexture::createContext(){
 	// If we don't support partial miplevel specification, then calculate the amount of levels we'll need
 	int mipLevels=0;
 	if(mMipLevels>0){
-		if(mRenderer->gl_version>=12){
-			glTexParameteri(mTarget,GL_TEXTURE_BASE_LEVEL,0);
-			glTexParameteri(mTarget,GL_TEXTURE_MAX_LEVEL,mMipLevels-1);
-			mipLevels=mMipLevels;
-		}
-		else{
+		/// @todo: Determine if GLES will let us do particle specifications anyway, and if so, enable that
+		#if !defined(TOADLET_HAS_GLES)
+			if(mRenderer->gl_version>=12){
+				glTexParameteri(mTarget,GL_TEXTURE_BASE_LEVEL,0);
+				glTexParameteri(mTarget,GL_TEXTURE_MAX_LEVEL,mMipLevels-1);
+				mipLevels=mMipLevels;
+			}
+			else
+		#endif
+		{
 			int width=mWidth,height=mHeight,depth=mDepth;
 			for(mipLevels=1;width>=2 || height>=2 || depth>=2;++mipLevels,width/=2,height/=2,depth/=2);
 

@@ -100,7 +100,7 @@ Node *Scene::findNodeByName(const String &name,Node *node){
 		node=mRoot;
 	}
 
-	if(node->mName!=(char*)NULL && node->mName.equals(name)){
+	if(name.equals(node->getName())){
 		return node;
 	}
 	else{
@@ -237,11 +237,11 @@ void Scene::logicUpdate(int dt,int scope){
 }
 
 void Scene::logicUpdate(Node *node,int dt,int scope){
-	if((node->mScope&scope)==0){
+	if((node->getScope()&scope)==0){
 		return;
 	}
 	
-	if(node->mDependsUpon!=NULL && node->mDependsUpon->mLastLogicFrame!=mLogicFrame){
+	if(node->getDependsUpon()!=NULL && node->getDependsUpon()->getLastLogicFrame()!=mLogicFrame){
 		mDependents.add(node);
 		return;
 	}
@@ -312,7 +312,7 @@ void Scene::frameUpdate(int dt,int scope){
 }
 
 void Scene::frameUpdate(Node *node,int dt,int scope){
-	if((node->mScope&scope)==0){
+	if((node->getScope()&scope)==0){
 		return;
 	}
 

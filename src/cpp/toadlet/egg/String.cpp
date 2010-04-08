@@ -398,7 +398,7 @@ float String::toFloat() const{
 }
 
 double String::toDouble() const{
-	double f=0;
+	long double f=0;
 	TOADLET_SSCANF(*this,"%Lf",&f);
 	return f;
 }
@@ -505,7 +505,7 @@ String String::operator+(float f) const{
 
 String String::operator+(double f) const{
 	String result(128);
-	TOADLET_SPRINTF(result,"%Lf",f);
+	TOADLET_SPRINTF(result,"%lf",f);
 	return (*this)+result;
 }
 
@@ -715,7 +715,7 @@ String operator+(float f,const String &string){
 
 String operator+(double f,const String &string){
 	String result(128);
-	TOADLET_SPRINTF(result,"%Lf",f);
+	TOADLET_SPRINTF(result,"%lf",f);
 	return result+string;
 }
 

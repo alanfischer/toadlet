@@ -44,26 +44,23 @@ namespace tadpole{
 }
 
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
-#include <toadlet/tadpole/node/Renderable.h>
+#include <toadlet/tadpole/Renderable.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
 
 template<typename RenderableType>
 class RenderableWorkaround:public Renderable{
 public:
-	RenderableWorkaround(RenderableType *type):renderable(type){}
 	RenderableType *renderable;
-	void queueRenderable(Scene *queue,CameraNode *camera){renderable->queueRenderable(queue,camera);}
+	RenderableWorkaround(RenderableType *type):renderable(type){}
 	Material *getRenderMaterial() const{return renderable->getRenderMaterial();}
 	const Matrix4x4 &getRenderTransform() const{return renderable->getRenderTransform();}
 	void render(peeper::Renderer *renderer) const{renderable->render(renderer);}
 };
-#define TOADLET_GIB_DEFINE(type) toadlet::tadpole::node::RenderableWorkaround<type> renderable;
+#define TOADLET_GIB_DEFINE(type) toadlet::tadpole::RenderableWorkaround<type> renderable;
 #define TOADLET_GIB_IMPLEMENT() renderable(this),
 
-}
 }
 }
 #else
