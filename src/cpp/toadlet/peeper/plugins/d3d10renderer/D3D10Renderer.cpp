@@ -36,7 +36,7 @@
 #include <toadlet/peeper/Viewport.h>
 
 #include <d3dx10.h>
-#pragma comment(lib,"c:\\Program Files\\Microsoft DirectX SDK (March 2009)\\Lib\\x86\\d3dx10.lib")
+//#pragma comment(lib,"d3dx10.lib")
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::MathConversion;
@@ -122,7 +122,7 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 // Create the effect
 HRESULT res;
 LPD3D10BLOB errorBuffer;
-D3DX10CreateEffectFromFile( TEXT("D3D10_Tut4.fx"), NULL, NULL, TEXT("fx_4_0"),D3D10_SHADER_ENABLE_STRICTNESS, 0, mD3DDevice, NULL, NULL, &g_lpEffect, &errorBuffer, &res );
+//10CreateEffectFromFile( TEXT("D3D10_Tut4.fx"), NULL, NULL, TEXT("fx_4_0"),D3D10_SHADER_ENABLE_STRICTNESS, 0, mD3DDevice, NULL, NULL, &g_lpEffect, &errorBuffer, &res );
 if( FAILED(res ))
 {
 	TCHAR* error = (TCHAR*)errorBuffer->GetBufferPointer();

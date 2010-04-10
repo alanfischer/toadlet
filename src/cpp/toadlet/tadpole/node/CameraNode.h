@@ -107,6 +107,7 @@ public:
 	inline scalar getFramesPerSecond() const{return mFPS;}
 
 protected:
+	virtual void projectionUpdated();
 	virtual void updateWorldTransform();
 	virtual void updateViewTransform();
 	virtual void updateMidNode();

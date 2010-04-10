@@ -272,7 +272,9 @@ void Scene::render(Renderer *renderer,CameraNode *camera,Node *node){
 
 	mRenderQueue->setCamera(camera);
 	if(node!=NULL){
-		node->queueRenderables(camera,mRenderQueue);
+		/// @todo: This should call node->queueRenderables instead of mRoot with the node.
+		//  BUT, since queueRenderables doesn't traverse yet, it doesnt work.  Why doesnt it traverse??
+		mRoot->queueRenderables(node,camera,mRenderQueue);
 	}
 	else{
 		mBackground->queueRenderables(camera,mRenderQueue);
