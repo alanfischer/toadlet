@@ -35,6 +35,9 @@
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/Viewport.h>
 
+#include <d3dx10.h>
+#pragma comment(lib,"c:\\Program Files\\Microsoft DirectX SDK (March 2009)\\Lib\\x86\\d3dx10.lib")
+
 using namespace toadlet::egg;
 using namespace toadlet::egg::MathConversion;
 
@@ -64,6 +67,10 @@ D3D10Renderer::D3D10Renderer():
 D3D10Renderer::~D3D10Renderer(){
 	destroy();
 }
+
+
+LPD3D10EFFECT g_lpEffect = NULL;
+LPD3D10EFFECTTECHNIQUE pTechnique=NULL;
 
 bool D3D10Renderer::create(RenderTarget *target,int *options){
 	Logger::alert(Categories::TOADLET_PEEPER,
@@ -109,6 +116,42 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 
 	Logger::alert(Categories::TOADLET_PEEPER,
 		"created D3D10Renderer");
+
+
+
+// Create the effect
+HRESULT res;
+LPD3D10BLOB errorBuffer;
+D3DX10CreateEffectFromFile( TEXT("D3D10_Tut4.fx"), NULL, NULL, TEXT("fx_4_0"),D3D10_SHADER_ENABLE_STRICTNESS, 0, mD3DDevice, NULL, NULL, &g_lpEffect, &errorBuffer, &res );
+if( FAILED(res ))
+{
+	TCHAR* error = (TCHAR*)errorBuffer->GetBufferPointer();
+//	return FALSE;
+}
+// Obtain the technique
+pTechnique = g_lpEffect->GetTechniqueByName( "Render" );
+
+
+	// Define the input layout (replaces VertexDeclaration from D3D9)
+	D3D10_INPUT_ELEMENT_DESC elementDesc[] =
+	{
+		{ TEXT("POSITION"), 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D10_INPUT_PER_VERTEX_DATA, 0 },  
+		{ TEXT("COLOR"),    0, DXGI_FORMAT_R32G32B32_FLOAT,  0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0 },  
+		{ TEXT("TEXCOORD"), 0, DXGI_FORMAT_R32G32_FLOAT,    0, 24, D3D10_INPUT_PER_VERTEX_DATA, 0 },
+	};
+	UINT numElements = sizeof(elementDesc)/sizeof(elementDesc[0]);
+
+	// Create the input layout
+	ID3D10InputLayout* pVertexLayout = NULL;
+	D3D10_PASS_DESC PassDesc;
+	pTechnique->GetPassByIndex( 0 )->GetDesc( &PassDesc );
+	if( FAILED( mD3DDevice->CreateInputLayout( elementDesc, numElements, PassDesc.pIAInputSignature, 
+		PassDesc.IAInputSignatureSize, &pVertexLayout ) ) )
+		return FALSE;
+	// Set the input layout
+	mD3DDevice->IASetInputLayout( pVertexLayout );
+
+
 
 	return true;
 }
@@ -233,6 +276,25 @@ void D3D10Renderer::endScene(){
 	}
 }
 
+inline void toD3DMATRIX(D3DMATRIX &r,const Matrix4x4 &s){
+	r.m[0][0]=s.at(0,0);
+	r.m[1][0]=s.at(0,1);
+	r.m[2][0]=s.at(0,2);
+	r.m[3][0]=s.at(0,3);
+	r.m[0][1]=s.at(1,0);
+	r.m[1][1]=s.at(1,1);
+	r.m[2][1]=s.at(1,2);
+	r.m[3][1]=s.at(1,3);
+	r.m[0][2]=s.at(2,0);
+	r.m[1][2]=s.at(2,1);
+	r.m[2][2]=s.at(2,2);
+	r.m[3][2]=s.at(2,3);
+	r.m[0][3]=s.at(3,0);
+	r.m[1][3]=s.at(3,1);
+	r.m[2][3]=s.at(3,2);
+	r.m[3][3]=s.at(3,3);
+}
+
 void D3D10Renderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData){
 	if(vertexData==NULL || indexData==NULL){
 		Error::nullPointer(Categories::TOADLET_PEEPER,
@@ -245,21 +307,43 @@ void D3D10Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Inde
 			"D3D10Renderer does not support multiple streams yet");
 		return;
 	}
-/*
+
 	// Set vertex buffer
-	D3DVertexBuffer *vertexBuffer=(D3DVertexBuffer*)vertexData->getVertexBuffer(0)->getRootVertexBuffer();
-	int offset=0;
-	mD3DDevice->IASetVertexBuffers(0,1,&vertexBuffer->getVertexBuffer(),vertexBuffer->getStride(),&offset);
+	D3D10Buffer *vertexBuffer=(D3D10Buffer*)vertexData->getVertexBuffer(0)->getRootVertexBuffer();
+	UINT stride=vertexBuffer->mVertexFormat->getVertexSize();
+	UINT offset=0;
+mD3DDevice->IASetVertexBuffers(0,1,&vertexBuffer->mBuffer,&stride,&offset);
 
-	pWorldMatrixEffectVariable->SetMatrix(w);
-	pViewMatrixEffectVariable->SetMatrix(viewMatrix);
-	pProjectionMatrixEffectVariable->SetMatrix(projectionMatrix);
+//	pWorldMatrixEffectVariable->SetMatrix(w);
+//	pViewMatrixEffectVariable->SetMatrix(viewMatrix);
+//	pProjectionMatrixEffectVariable->SetMatrix(projectionMatrix);
+//Matrix4x4 shaderMatrix=mViewMatrix*mProjectionMatrix*mModelMatrix;
+Matrix4x4 shaderMatrix=mProjectionMatrix*mViewMatrix*mModelMatrix;
+//	g_ShaderMatrix = ViewMatrix * PerspectiveMatrix * WorldMatrix;
+D3DMATRIX result;
+toD3DMATRIX(result,shaderMatrix);
+//Math::transpose(result,shaderMatrix);
 
-	mD3DDevice->IASetIndexBuffer(indexBuffer,indexBuffer->getFormat(),0);
+		//handover the matrix to the effect.
+		LPD3D10EFFECTMATRIXVARIABLE lpEffectMatrixVar = g_lpEffect->GetVariableByName("ShaderMatrix")->AsMatrix();
+		lpEffectMatrixVar->SetMatrix((float*)&result);
 
-	mD3DDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLES);
+	D3D10Buffer *buffer=(D3D10Buffer*)(indexData->getIndexBuffer()->getRootIndexBuffer());
+	mD3DDevice->IASetIndexBuffer(buffer->mBuffer,DXGI_FORMAT_R16_UINT,0);
 
-	mD3DDevice->Draw(numVertices,0);
+	mD3DDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+D3D10_TECHNIQUE_DESC techDesc;
+pTechnique->GetDesc( &techDesc );
+for( UINT p = 0; p < techDesc.Passes; ++p )
+{
+	pTechnique->GetPassByIndex( p )->Apply(0);
+	mD3DDevice->Draw(indexData->getCount(),0);
+//	pd3dDevice->Draw( 4, 0 );
+}
+
+
+//	mD3DDevice->Draw(numVertices,0);
 
 /*
 	HRESULT result;

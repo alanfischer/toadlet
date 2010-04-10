@@ -31,8 +31,8 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,const Visual &visual){
-	return new D3D9WindowRenderTarget(wnd,visual);
+TOADLET_C_API RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,const Visual &visual,bool debug){
+	return new D3D9WindowRenderTarget(wnd,visual,debug);
 }
 
 D3D9WindowRenderTarget::D3D9WindowRenderTarget():D3D9RenderTarget(),
@@ -47,7 +47,7 @@ D3D9WindowRenderTarget::D3D9WindowRenderTarget():D3D9RenderTarget(),
 {
 }
 
-D3D9WindowRenderTarget::D3D9WindowRenderTarget(HWND wnd,const Visual &visual):D3D9RenderTarget(),
+D3D9WindowRenderTarget::D3D9WindowRenderTarget(HWND wnd,const Visual &visual,bool debug):D3D9RenderTarget(),
 	mLibrary(0),
 	mD3D(NULL),
 	mD3DDevice(NULL),
@@ -57,7 +57,7 @@ D3D9WindowRenderTarget::D3D9WindowRenderTarget(HWND wnd,const Visual &visual):D3
 	mWidth(0),
 	mHeight(0)
 {
-	createContext(wnd,visual);
+	createContext(wnd,visual,debug);
 }
 
 D3D9WindowRenderTarget::~D3D9WindowRenderTarget(){
@@ -103,10 +103,11 @@ void D3D9WindowRenderTarget::reset(){
 	mD3DDevice->GetDepthStencilSurface(&mDepthSurface);
 }
 
-bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual){
+bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual,bool debug){
 	HRESULT result;
 
-	mLibrary=LoadLibrary(TOADLET_D3D9_DLL_NAME);
+	mLibrary=LoadLibrary(debug?TOADLET_D3D9_DEBUG_DLL_NAME:TOADLET_D3D9_DLL_NAME);
+
 	if(mLibrary==0){
 		Error::libraryNotFound(Categories::TOADLET_PEEPER,
 			String("D3D9RenderWindow: Error loading ")+TOADLET_D3D9_DLL_NAME);

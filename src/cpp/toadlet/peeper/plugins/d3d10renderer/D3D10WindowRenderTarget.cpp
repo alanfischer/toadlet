@@ -32,8 +32,8 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_D3D10WindowRenderTarget(HWND wnd,const Visual &visual){
-	return new D3D10WindowRenderTarget(wnd,visual);
+TOADLET_C_API RenderTarget *new_D3D10WindowRenderTarget(HWND wnd,const Visual &visual,bool debug){
+	return new D3D10WindowRenderTarget(wnd,visual,debug);
 }
 
 D3D10WindowRenderTarget::D3D10WindowRenderTarget():D3D10RenderTarget(),
@@ -47,7 +47,7 @@ D3D10WindowRenderTarget::D3D10WindowRenderTarget():D3D10RenderTarget(),
 {
 }
 
-D3D10WindowRenderTarget::D3D10WindowRenderTarget(HWND wnd,const Visual &visual):D3D10RenderTarget(),
+D3D10WindowRenderTarget::D3D10WindowRenderTarget(HWND wnd,const Visual &visual,bool debug):D3D10RenderTarget(),
 	mLibrary(0),
 	mSwapChain(NULL),
 	mD3DDevice(NULL),
@@ -57,7 +57,7 @@ D3D10WindowRenderTarget::D3D10WindowRenderTarget(HWND wnd,const Visual &visual):
 	mWidth(0),
 	mHeight(0)
 {
-	createContext(wnd,visual);
+	createContext(wnd,visual,debug);
 }
 
 D3D10WindowRenderTarget::~D3D10WindowRenderTarget(){
@@ -104,7 +104,7 @@ void D3D10WindowRenderTarget::reset(){
 	mD3DDevice->OMGetRenderTargets(1,&mRenderTargetView,&mDepthStencilView);
 }
 
-bool D3D10WindowRenderTarget::createContext(HWND wnd,const Visual &visual){
+bool D3D10WindowRenderTarget::createContext(HWND wnd,const Visual &visual,bool debug){
 	HRESULT result;
 
 	mLibrary=LoadLibrary(TOADLET_D3D10_DLL_NAME);
@@ -153,8 +153,10 @@ bool D3D10WindowRenderTarget::createContext(HWND wnd,const Visual &visual){
 		return NULL;
 	}
 
+	UINT flags=debug?D3D10_CREATE_DEVICE_DEBUG:0;
+
 	typedef HRESULT(WINAPI *D3D10CreateDeviceAndSwapChain)(IDXGIAdapter *pAdapter,D3D10_DRIVER_TYPE DriverType,HMODULE Software,UINT Flags,UINT SDKVersion,DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,IDXGISwapChain **ppSwapChain,ID3D10Device **ppDevice);
-	result=((D3D10CreateDeviceAndSwapChain)symbol)(NULL,D3D10_DRIVER_TYPE_HARDWARE,NULL,0,D3D10_SDK_VERSION,&desc,&mSwapChain,&mD3DDevice);
+	result=((D3D10CreateDeviceAndSwapChain)symbol)(NULL,D3D10_DRIVER_TYPE_HARDWARE,NULL,flags,D3D10_SDK_VERSION,&desc,&mSwapChain,&mD3DDevice);
 	if(FAILED(result) || mD3DDevice==NULL){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"D3D10RenderWindow: Error creating D3D10Device object");
