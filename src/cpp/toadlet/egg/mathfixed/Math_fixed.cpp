@@ -852,24 +852,24 @@ fixed Math::findIntersection(const Segment &segment,const AABox &box,Vector3 &po
 		maxTX=TOADLET_DIV_XX(candPlaneX-segOrigin.x,segDirection.x);
 	}
 	else{
-		maxTX=ONE;
+		maxTX=-ONE;
 	}
 	// Y
 	if(quadY!=2 /*Middle*/ && segDirection.y!=0){
 		maxTY=TOADLET_DIV_XX(candPlaneY-segOrigin.y,segDirection.y);
 	}
 	else{
-		maxTY=ONE;
+		maxTY=-ONE;
 	}
 	// Z
 	if(quadZ!=2 /*Middle*/ && segDirection.z!=0){
 		maxTZ=TOADLET_DIV_XX(candPlaneZ-segOrigin.z,segDirection.z);
 	}
 	else{
-		maxTZ=ONE;
+		maxTZ=-ONE;
 	}
 
-	// Find largets of maxT's
+	// Find largest of maxT's
 	// X
 	if(maxTX>maxTY && maxTX>maxTZ){
 		whichPlane=0;

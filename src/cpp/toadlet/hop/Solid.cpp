@@ -91,7 +91,7 @@ void Solid::reset(){
 	mPosition.reset();
 	mVelocity.reset();
 	mForce.reset();
-	mCoefficientOfGravity=0;
+	mCoefficientOfGravity=Math::ONE;
 	mCoefficientOfRestitution=Math::HALF;
 	mCoefficientOfRestitutionOverride=false;
 	mCoefficientOfStaticFriction=Math::HALF;

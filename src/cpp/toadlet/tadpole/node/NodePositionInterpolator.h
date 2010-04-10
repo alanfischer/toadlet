@@ -36,39 +36,26 @@ class TOADLET_API NodeTranslationInterpolator:public NodeInterpolator{
 public:
 	TOADLET_SHARED_POINTERS(NodeTranslationInterpolator);
 
-	NodeTranslationInterpolator():
-		mActive(false)
-	{}
+	NodeTranslationInterpolator(){}
 
-	virtual void transformUpdated(Node *node,int transformBits){
-		if(mInterpolating==false && transformBits==Node::Transform_BIT_TRANSLATE){
-			mLastTranslate.set(node->getTranslate());
-			mTranslate.set(node->getTranslate());
-		}
+	virtual void transformUpdated(Node *node){
+		mLastTranslate.set(node->getTranslate());
+		mTranslate.set(node->getTranslate());
 	}
 
-	virtual void logicFrame(Node *node,int frame){
-		mActive=true;
+	virtual void logicUpdate(Node *node,int dt){
 		mLastTranslate=mTranslate;
 		mTranslate=node->getTranslate();
 	}
 
 	virtual void interpolate(Node *node,scalar value){
-		if(mActive){
-			mInterpolating=true;
-
-			Vector3 result;
-			Math::lerp(result,mLastTranslate,mTranslate,value);
-			// Only call the base setTranslate, so Physics implementations don't get all flustered and continually reactivate & reset their positions
-			node->Node::setTranslate(result);
-
-			mInterpolating=false;
-		}
+		Vector3 result;
+		Math::lerp(result,mLastTranslate,mTranslate,value);
+		// Only call the base setTranslate, so Physics implementations don't get all flustered and continually reactivate & reset their positions
+		node->Node::setTranslate(result);
 	}
 	
 protected:
-	bool mActive;
-	bool mInterpolating;
 	Vector3 mTranslate;
 	Vector3 mLastTranslate;
 };

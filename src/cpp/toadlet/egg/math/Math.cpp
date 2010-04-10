@@ -853,24 +853,24 @@ real Math::findIntersection(const Segment &segment,const AABox &box,Vector3 &poi
 		maxTX=(candPlaneX-segOrigin.x)/segDirection.x;
 	}
 	else{
-		maxTX=1.0;
+		maxTX=-1.0;
 	}
 	// Y
 	if(quadY!=2 /*Middle*/ && segDirection.y!=0){
 		maxTY=(candPlaneY-segOrigin.y)/segDirection.y;
 	}
 	else{
-		maxTY=1.0;
+		maxTY=-1.0;
 	}
 	// Z
 	if(quadZ!=2 /*Middle*/ && segDirection.z!=0){
 		maxTZ=(candPlaneZ-segOrigin.z)/segDirection.z;
 	}
 	else{
-		maxTZ=1.0;
+		maxTZ=-1.0;
 	}
 
-	// Find largets of maxT's
+	// Find largest of maxT's
 	// X
 	if(maxTX>maxTY && maxTX>maxTZ){
 		whichPlane=0;

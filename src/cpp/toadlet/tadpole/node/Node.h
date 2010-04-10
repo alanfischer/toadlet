@@ -73,12 +73,6 @@ class TOADLET_API Node{
 public:
 	TOADLET_NODE(Node,Node);
 
-	enum{
-		Transform_BIT_TRANSLATE=1<<0,
-		Transform_BIT_ROTATE=	1<<1,
-		Transform_BIT_SCALE=	1<<2,
-	};
-
 	Node();
 	virtual ~Node();
 	virtual Node *create(Scene *scene);
@@ -93,11 +87,6 @@ public:
 	virtual void addNodeListener(NodeListener::ptr listener);
 	virtual void removeNodeListener(NodeListener::ptr listener);
 	virtual void removeAllNodeListeners(){mNodeListeners=NULL;}
-	
-	virtual void setNodeInterpolator(NodeInterpolator::ptr interpolator){mNodeInterpolator=interpolator;}
-	inline NodeInterpolator::ptr getNodeInterpolator() const{return mNodeInterpolator;}
-	virtual void setNodeInterpolatorEnabled(bool enabled){mNodeInterpolatorEnabled=enabled;}
-	inline bool getNodeInterpolatorEnabled() const{return mNodeInterpolatorEnabled;}
 
 	virtual void parentChanged(ParentNode *parent);
 	ParentNode *getParent() const;
@@ -112,8 +101,8 @@ public:
 	inline const Vector3 &getTranslate() const{return mTranslate;}
 	inline const Vector3 &getWorldTranslate() const{return mWorldTranslate;}
 
-	virtual void setRotate(const Matrix3x3 &rotate);
 	virtual void setRotate(const Quaternion &rotate);
+	virtual void setRotate(const Matrix3x3 &rotate);
 	virtual void setRotate(scalar x,scalar y,scalar z,scalar angle);
 	inline const Quaternion &getRotate() const{return mRotate;}
 	inline const Quaternion &getWorldRotate() const{return mWorldRotate;}
@@ -197,7 +186,10 @@ public:
 	}
 
 protected:
-	void transformUpdated(int transformBits);
+	virtual void logicUpdateListeners(int dt);
+	virtual void frameUpdateListeners(int dt);
+	virtual void updateWorldTransform();
+	virtual void transformUpdated();
 
 	// Allocation items
 	egg::PointerCounter *mPointerCounter;
@@ -211,8 +203,6 @@ protected:
 
 	// Node items
 	egg::Collection<NodeListener::ptr>::ptr mNodeListeners;
-	NodeInterpolator::ptr mNodeInterpolator;
-	bool mNodeInterpolatorEnabled;
 
 	Node::ptr mParent;
 	void *mParentData;

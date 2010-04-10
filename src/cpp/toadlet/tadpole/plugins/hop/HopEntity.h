@@ -56,11 +56,8 @@ public:
 	virtual void setInfiniteMass();
 	virtual bool hasInfiniteMass() const{return mSolid->hasInfiniteMass();}
 
-	virtual void setTranslate(const Vector3 &translate);
-	virtual void setTranslate(scalar x,scalar y,scalar z);
-	virtual void setTransform(const Matrix4x4 &transform);
-	virtual void setPosition(const Vector3 &position){setTranslate(position);}
-	virtual const Vector3 &getPosition(){return getTranslate();}
+	virtual void setPosition(const Vector3 &position){mSolid->setPosition(position);}
+	virtual const Vector3 &getPosition(){return mSolid->getPosition();}
 
 	virtual void setVelocity(const Vector3 &velocity);
 	virtual const Vector3 &getVelocity() const{return mSolid->getVelocity();}
@@ -101,8 +98,11 @@ public:
 	virtual void setCollisionVolumesVisible(bool visible);
 
 	// Node callbacks
+	virtual void setTranslate(const Vector3 &translate);
+	virtual void setTranslate(scalar x,scalar y,scalar z){super::setTranslate(x,y,z);}
 	virtual void parentChanged(node::ParentNode *parent);
 	virtual void logicUpdate(int dt,int scope);
+	virtual void frameUpdate(int dt,int scope);
 
 	// TraceCallback callbacks
 	virtual void getBound(AABox &result);
@@ -118,6 +118,7 @@ protected:
 	hop::Solid::ptr mSolid;
 	hop::Shape::ptr mTraceableShape;
 	Traceable *mTraceable;
+	node::NodeInterpolator::ptr mInterpolator;
 	node::ParentNode::ptr mVolumeNode;
 
 	HopScene *mHopScene;
