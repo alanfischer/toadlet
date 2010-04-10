@@ -45,9 +45,9 @@ public:
 	virtual bool senseBoundingVolumes(SensorResultsListener *listener,const Sphere &volume);
 	
 	virtual void queueRenderables(CameraNode *camera,RenderQueue *queue);
+	virtual void queueRenderables(Node *node,CameraNode *camera,RenderQueue *queue);
 
 protected:
-	virtual void queueRenderables(Node *node,CameraNode *camera,RenderQueue *queue);
 	virtual bool culled(Node *node,CameraNode *camera);
 };
 

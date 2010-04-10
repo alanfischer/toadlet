@@ -89,7 +89,7 @@ void CameraNode::setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,sca
 
 	Math::setMatrix4x4FromPerspectiveX(mProjectionTransform,fovx,aspect,nearDist,farDist);
 
-	updateMidNode();
+	projectionUpdated();
 }
 
 void CameraNode::setProjectionFovY(scalar fovy,scalar aspect,scalar nearDist,scalar farDist){
@@ -101,7 +101,7 @@ void CameraNode::setProjectionFovY(scalar fovy,scalar aspect,scalar nearDist,sca
 
 	Math::setMatrix4x4FromPerspectiveY(mProjectionTransform,fovy,aspect,nearDist,farDist);
 
-	updateMidNode();
+	projectionUpdated();
 }
 
 void CameraNode::setProjectionOrtho(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist){
@@ -113,7 +113,7 @@ void CameraNode::setProjectionOrtho(scalar leftDist,scalar rightDist,scalar bott
 
 	Math::setMatrix4x4FromOrtho(mProjectionTransform,leftDist,rightDist,bottomDist,topDist,nearDist,farDist);
 
-	updateMidNode();
+	projectionUpdated();
 }
 
 void CameraNode::setProjectionFrustum(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist){
@@ -125,7 +125,7 @@ void CameraNode::setProjectionFrustum(scalar leftDist,scalar rightDist,scalar bo
 
 	Math::setMatrix4x4FromFrustum(mProjectionTransform,leftDist,rightDist,bottomDist,topDist,nearDist,farDist);
 
-	updateMidNode();
+	projectionUpdated();
 }
 
 void CameraNode::setProjectionTransform(const Matrix4x4 &transform){
@@ -137,7 +137,7 @@ void CameraNode::setProjectionTransform(const Matrix4x4 &transform){
 
 	mProjectionTransform.set(transform);
 
-	updateMidNode();
+	projectionUpdated();
 }
 
 void CameraNode::setProjectionRotation(scalar rotate){
@@ -156,6 +156,8 @@ void CameraNode::setProjectionRotation(scalar rotate){
 	projection.reset();
 	Math::setMatrix4x4FromTranslate(projection,-x,-y,0);
 	Math::postMul(mProjectionTransform,projection);
+
+	projectionUpdated();
 }
 
 void CameraNode::setNearAndFarDist(scalar nearDist,scalar farDist){
@@ -259,6 +261,11 @@ ParentNode::ptr CameraNode::getMidNode(){
 		updateMidNode();
 	}
 	return mMidNode;
+}
+
+void CameraNode::projectionUpdated(){
+	updateViewTransform();
+	updateMidNode();
 }
 
 void CameraNode::updateWorldTransform(){
