@@ -129,7 +129,7 @@ bool D3D10Texture::createContext(){
 			desc.CPUAccessFlags=0;
 			desc.BindFlags=D3D10_BIND_SHADER_RESOURCE;//bindFlags;
 			desc.MiscFlags=0;//miscFlags;
-			desc.Format=mDXGIFormat;
+			desc.Format=DXGI_FORMAT_R8G8B8A8_UINT;//mDXGIFormat;
 
 			if(mDimension==Texture::Dimension_CUBE){
 				desc.ArraySize=6;
