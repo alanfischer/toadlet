@@ -48,8 +48,6 @@ Node::Node():
 	mHandle(0),
 
 	//mNodeListeners,
-	//mNodeInterpolator,
-	mNodeInterpolatorEnabled(false),
 
 	//mParent,
 	mParentData(NULL),
@@ -92,8 +90,6 @@ Node *Node::create(Scene *scene){
 	mHandle=mScene->nodeCreated(this);
 
 	mNodeListeners=NULL;
-	mNodeInterpolator=NULL;
-	mNodeInterpolatorEnabled=true;
 
 	mParent=NULL;
 	mParentData=NULL;
@@ -178,50 +174,52 @@ void Node::parentDataChanged(void *parentData){
 
 void Node::setTranslate(const Vector3 &translate){
 	mTranslate.set(translate);
-	transformUpdated(Transform_BIT_TRANSLATE);
+	transformUpdated();
 }
 
 void Node::setTranslate(scalar x,scalar y,scalar z){
 	mTranslate.set(x,y,z);
-	transformUpdated(Transform_BIT_TRANSLATE);
-}
-
-void Node::setRotate(const Matrix3x3 &rotate){
-	Math::setQuaternionFromMatrix3x3(mRotate,rotate);
-	transformUpdated(Transform_BIT_ROTATE);
+	setTranslate(mTranslate);
 }
 
 void Node::setRotate(const Quaternion &rotate){
 	mRotate.set(rotate);
-	transformUpdated(Transform_BIT_ROTATE);
+	transformUpdated();
+}
+
+void Node::setRotate(const Matrix3x3 &rotate){
+	Math::setQuaternionFromMatrix3x3(mRotate,rotate);
+	setRotate(mRotate);
 }
 
 void Node::setRotate(scalar x,scalar y,scalar z,scalar angle){
 	Math::setQuaternionFromAxisAngle(mRotate,cache_setRotate_vector.set(x,y,z),angle);
-	transformUpdated(Transform_BIT_ROTATE);
+	setRotate(mRotate);
 }
 
 void Node::setScale(const Vector3 &scale){
 	mScale.set(scale);
-	transformUpdated(Transform_BIT_SCALE);
+	transformUpdated();
 }
 
 void Node::setScale(scalar x,scalar y,scalar z){
 	mScale.set(x,y,z);
-	transformUpdated(Transform_BIT_SCALE);
+	setScale(mScale);
 }
 
 void Node::setScale(scalar s){
 	mScale.set(s,s,s);
-	transformUpdated(Transform_BIT_SCALE);
+	setScale(mScale);
 }
 
 void Node::setTransform(const Matrix4x4 &transform){
 	Math::setScaleFromMatrix4x4(mScale,transform);
+	setScale(mScale);
 	Math::setRotateFromMatrix4x4(cache_setTransform_matrix,transform,mScale);
 	Math::setQuaternionFromMatrix3x3(mRotate,cache_setTransform_matrix);
+	setRotate(mRotate);
 	Math::setTranslateFromMatrix4x4(mTranslate,transform);
-	transformUpdated(Transform_BIT_TRANSLATE|Transform_BIT_ROTATE|Transform_BIT_SCALE);
+	setTranslate(mTranslate);
 }
 
 void Node::findTransformTo(Matrix4x4 &result,Node *node){
@@ -238,62 +236,21 @@ void Node::findTransformTo(Matrix4x4 &result,Node *node){
 
 void Node::setLocalBound(const Sphere &bound){
 	mLocalBound.set(bound);
-	transformUpdated(0);
+	transformUpdated();
 }
 
 void Node::logicUpdate(int dt,int scope){
 	mLastLogicFrame=mScene->getLogicFrame();
 
-	// Update listeners
-	if(mNodeListeners!=NULL){
-		int i;
-		for(i=0;i<mNodeListeners->size();++i){
-			mNodeListeners->at(i)->logicUpdate(this,dt);
-		}
-	}
-
-	if(mNodeInterpolator!=NULL){
-		mNodeInterpolator->logicFrame(this,mScene->getLogicFrame());
-	}
+	logicUpdateListeners(dt);
 }
 
 void Node::frameUpdate(int dt,int scope){
 	mLastFrame=mScene->getFrame();
 
-	// Update listeners
-	if(mNodeListeners!=NULL){
-		int i;
-		for(i=0;i<mNodeListeners->size();++i){
-			mNodeListeners->at(i)->frameUpdate(this,dt);
-		}
-	}
+	frameUpdateListeners(dt);
 
-	if(mNodeInterpolator!=NULL){
-		mNodeInterpolator->interpolate(this,mScene->getLogicFraction());
-	}
-
-	if(mParent==NULL){
-		mWorldScale.set(mScale);
-		mWorldRotate.set(mRotate);
-		mWorldTranslate.set(mTranslate);
-	}
-	else if(mIdentityTransform){
-		mWorldScale.set(mParent->mScale);
-		mWorldRotate.set(mParent->mRotate);
-		mWorldTranslate.set(mParent->mTranslate);
-	}
-	else{
-		Math::mul(mWorldScale,mParent->mWorldScale,mScale);
-		Math::mul(mWorldRotate,mParent->mWorldRotate,mRotate);
-		Math::mul(mWorldTranslate,mParent->mWorldRotate,mTranslate);
-		Math::mul(mWorldTranslate,mParent->mWorldScale);
-		Math::add(mWorldTranslate,mParent->mWorldTranslate);
-	}
-
-	mul(mWorldBound,mWorldTranslate,mWorldRotate,mWorldScale,mLocalBound);
-
-	Math::setMatrix3x3FromQuaternion(cache_setTransform_matrix,mWorldRotate);
-	Math::setMatrix4x4FromTranslateRotateScale(mWorldTransform,mWorldTranslate,cache_setTransform_matrix,mWorldScale);
+	updateWorldTransform();
 }
 
 void Node::activate(){
@@ -322,16 +279,55 @@ void Node::tryDeactivate(){
 	}
 }
 
-void Node::transformUpdated(int transformBits){
+void Node::logicUpdateListeners(int dt){
+	if(mNodeListeners!=NULL){
+		int i;
+		for(i=0;i<mNodeListeners->size();++i){
+			mNodeListeners->at(i)->logicUpdate(this,dt);
+		}
+	}
+}
+
+void Node::frameUpdateListeners(int dt){
+	if(mNodeListeners!=NULL){
+		int i;
+		for(i=0;i<mNodeListeners->size();++i){
+			mNodeListeners->at(i)->frameUpdate(this,dt);
+		}
+	}
+}
+
+void Node::updateWorldTransform(){
+	if(mParent==NULL){
+		mWorldScale.set(mScale);
+		mWorldRotate.set(mRotate);
+		mWorldTranslate.set(mTranslate);
+	}
+	else if(mIdentityTransform){
+		mWorldScale.set(mParent->mScale);
+		mWorldRotate.set(mParent->mRotate);
+		mWorldTranslate.set(mParent->mTranslate);
+	}
+	else{
+		Math::mul(mWorldScale,mParent->mWorldScale,mScale);
+		Math::mul(mWorldRotate,mParent->mWorldRotate,mRotate);
+		Math::mul(mWorldTranslate,mParent->mWorldRotate,mTranslate);
+		Math::mul(mWorldTranslate,mParent->mWorldScale);
+		Math::add(mWorldTranslate,mParent->mWorldTranslate);
+	}
+
+	mul(mWorldBound,mWorldTranslate,mWorldRotate,mWorldScale,mLocalBound);
+
+	Math::setMatrix3x3FromQuaternion(cache_setTransform_matrix,mWorldRotate);
+	Math::setMatrix4x4FromTranslateRotateScale(mWorldTransform,mWorldTranslate,cache_setTransform_matrix,mWorldScale);
+}
+
+void Node::transformUpdated(){
 	mIdentityTransform=false;
 	activate();
 
 	if(mParent!=NULL){
 		shared_static_cast<ParentNode>(mParent)->childTransformUpdated(this);
-	}
-
-	if(mNodeInterpolator!=NULL && mNodeInterpolatorEnabled){
-		mNodeInterpolator->transformUpdated(this,transformBits);
 	}
 }
 

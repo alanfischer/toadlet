@@ -51,7 +51,8 @@ CameraNode::CameraNode():super(),
 	//mClearColor,
 	mSkipFirstClear(false),
 	mAlignmentCalculationsUseOrigin(false),
-	mMidNode(NULL),
+	//mMidNode,
+	//mTarget,
 
 	//mWorldTranslate,
 	//mViewTransform,
@@ -236,6 +237,11 @@ void CameraNode::setWorldLookDir(const Vector3 &eye,const Vector3 &dir,const Vec
 	activate();
 }
 
+void CameraNode::setTarget(Node *node){
+	mTarget=node;
+	setDependsUpon(mTarget);
+}
+
 void CameraNode::setViewport(const Viewport &viewport){
 	mViewportSet=true;
 	mViewport.set(viewport);
@@ -255,8 +261,12 @@ ParentNode::ptr CameraNode::getMidNode(){
 	return mMidNode;
 }
 
-void CameraNode::frameUpdate(int dt,int scope){
-	super::frameUpdate(dt,scope);
+void CameraNode::updateWorldTransform(){
+	if(mTarget!=NULL){
+		setLookAt(getTranslate(),mTarget->getWorldTranslate(),Math::Z_UNIT_VECTOR3);
+	}
+
+	super::updateWorldTransform();
 
 	updateViewTransform();
 }

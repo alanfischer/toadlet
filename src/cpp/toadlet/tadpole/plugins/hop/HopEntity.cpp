@@ -43,6 +43,7 @@ HopEntity::HopEntity():ParentNode(),
 	mSolid(new Solid()),
 	//mTraceableShape,
 	mTraceable(NULL)
+	//mInterpolator,
 	//mVolumeNode
 {}
 
@@ -53,6 +54,7 @@ Node *HopEntity::create(Scene *scene){
 	mSolid->setUserData(this);
 	mTraceableShape=NULL;
 	mTraceable=NULL;
+	mInterpolator=NULL;
 	mVolumeNode=NULL;
 
 	/// @todo: I need to remove the mScene casting here, its pretty dirty
@@ -63,7 +65,7 @@ Node *HopEntity::create(Scene *scene){
 		return this;
 	}
 
-	setNodeInterpolator(NodeInterpolator::ptr(new NodeTranslationInterpolator()));
+	mInterpolator=NodeInterpolator::ptr(new NodeTranslationInterpolator());
 
 	return this;
 }
@@ -82,24 +84,6 @@ void HopEntity::setMass(scalar mass){
 
 void HopEntity::setInfiniteMass(){
 	mSolid->setInfiniteMass();
-}
-
-void HopEntity::setTranslate(const Vector3 &translate){
-	super::setTranslate(translate);
-
-	mSolid->setPosition(mTranslate);
-}
-
-void HopEntity::setTranslate(scalar x,scalar y,scalar z){
-	mTranslate.set(x,y,z);
-
-	setTranslate(mTranslate);
-}
-
-void HopEntity::setTransform(const Matrix4x4 &transform){
-	super::setTransform(transform);
-
-	mSolid->setPosition(mTranslate);
 }
 
 void HopEntity::setVelocity(const Vector3 &velocity){
@@ -191,6 +175,14 @@ void HopEntity::setCollisionVolumesVisible(bool visible){
 	updateCollisionVolumes();
 }
 
+void HopEntity::setTranslate(const Vector3 &translate){
+	super::setTranslate(translate);
+
+	mSolid->setPosition(mTranslate);
+	
+	mInterpolator->transformUpdated(this);
+}
+
 void HopEntity::parentChanged(ParentNode *parent){
 	if(mHopScene!=NULL){
 		if(parent==mScene->getRoot()){
@@ -206,12 +198,18 @@ void HopEntity::parentChanged(ParentNode *parent){
 
 void HopEntity::logicUpdate(int dt,int scope){
 	if(mSolid->active()){
-		setNodeInterpolatorEnabled(false);
 		super::setTranslate(mSolid->getPosition());
-		setNodeInterpolatorEnabled(true);
 	}
 
+	mInterpolator->logicUpdate(this,mScene->getLogicFrame());
+
 	super::logicUpdate(dt,scope);
+}
+
+void HopEntity::frameUpdate(int dt,int scope){
+	mInterpolator->interpolate(this,mScene->getLogicFraction());
+
+	super::frameUpdate(dt,scope);
 }
 
 void HopEntity::getBound(AABox &result){
