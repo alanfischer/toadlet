@@ -84,6 +84,8 @@ public:
 	virtual void setCoefficientOfEffectiveDrag(scalar coeff);
 	virtual scalar getCoefficientOfEffectiveDrag() const{return mSolid->getCoefficientOfEffectiveDrag();}
 
+	virtual void setScope(int scope){mSolid->setScope(scope); super::setScope(scope);}
+
 	virtual void setTraceableShape(Traceable *traceable);
 	virtual void addShape(hop::Shape::ptr shape);
 	virtual void removeShape(hop::Shape *shape);
