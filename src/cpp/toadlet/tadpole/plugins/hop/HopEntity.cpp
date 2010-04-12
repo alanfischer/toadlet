@@ -180,7 +180,9 @@ void HopEntity::setTranslate(const Vector3 &translate){
 
 	mSolid->setPosition(mTranslate);
 	
-	mInterpolator->transformUpdated(this);
+	if(mInterpolator!=NULL){
+		mInterpolator->transformUpdated(this);
+	}
 }
 
 void HopEntity::parentChanged(ParentNode *parent){
@@ -201,13 +203,17 @@ void HopEntity::logicUpdate(int dt,int scope){
 		super::setTranslate(mSolid->getPosition());
 	}
 
-	mInterpolator->logicUpdate(this,mScene->getLogicFrame());
+	if(mInterpolator!=NULL){
+		mInterpolator->logicUpdate(this,mScene->getLogicFrame());
+	}
 
 	super::logicUpdate(dt,scope);
 }
 
 void HopEntity::frameUpdate(int dt,int scope){
-	mInterpolator->interpolate(this,mScene->getLogicFraction());
+	if(mInterpolator!=NULL){
+		mInterpolator->interpolate(this,mScene->getLogicFraction());
+	}
 
 	super::frameUpdate(dt,scope);
 }

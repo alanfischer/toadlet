@@ -26,6 +26,7 @@
 #ifndef TOADLET_TADPOLE_NODE_NODETRANSLATIONINTERPOLATOR_H
 #define TOADLET_TADPOLE_NODE_NODETRANSLATIONINTERPOLATOR_H
 
+#include <toadlet/egg/Logger.h>
 #include <toadlet/tadpole/node/NodeInterpolator.h>
 
 namespace toadlet{
@@ -50,6 +51,7 @@ public:
 
 	virtual void interpolate(Node *node,scalar value){
 		Vector3 result;
+
 		Math::lerp(result,mLastTranslate,mTranslate,value);
 		// Only call the base setTranslate, so Physics implementations don't get all flustered and continually reactivate & reset their positions
 		node->Node::setTranslate(result);
