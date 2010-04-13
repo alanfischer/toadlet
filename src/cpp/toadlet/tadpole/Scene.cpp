@@ -159,7 +159,21 @@ void Scene::update(int dt){
 
 	if(mAccumulatedDT>=mMinLogicDT){
 		if(mMaxLogicDT>0){
+			bool firstRun=true;
 			while(mAccumulatedDT>0 && mAccumulatedDT>=mMinLogicDT){
+				if(firstRun==false){
+					if(mUpdateListener!=NULL){
+						mUpdateListener->preFrameUpdate(0);
+						mUpdateListener->frameUpdate(0);
+						mUpdateListener->postFrameUpdate(0);
+					}
+					else{
+						preFrameUpdate(0);
+						frameUpdate(0);
+						postFrameUpdate(0);
+					}
+				}
+
 				int logicDT=mAccumulatedDT;
 				if(mAccumulatedDT>mMaxLogicDT){
 					mAccumulatedDT-=mMaxLogicDT;
@@ -169,7 +183,7 @@ void Scene::update(int dt){
 					mAccumulatedDT=0;
 				}
 
-				mLogicTime+=dt;
+				mLogicTime+=logicDT;
 				mLogicFrame++;
 
 				if(mUpdateListener!=NULL){
@@ -182,6 +196,8 @@ void Scene::update(int dt){
 					logicUpdate(logicDT);
 					postLogicUpdate(logicDT);
 				}
+				
+				firstRun=false;
 			}
 		}
 		else{
@@ -249,7 +265,7 @@ void Scene::frameUpdate(int dt,int scope){
 		for(int i=0;i<dependents.size();++i){
 			Node *dependent=dependents[i];
 			dependent->frameUpdate(dt,scope);
-			dependent->getParent()->mergeWorldBound(dependents[i]);
+			dependent->getParent()->mergeWorldBound(dependents[i],false);
 		}
 		/// @todo: This isnt the best check, since we could have an equal amount of dependents added and removed in a frame, and thats not circular
 		if(dependents.size()==mDependents.size()){

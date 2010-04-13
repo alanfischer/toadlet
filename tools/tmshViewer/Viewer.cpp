@@ -71,17 +71,17 @@ Viewer::Viewer():Application(),
 void Viewer::create(){
 	Application::create();
 
-	mScene=(new SceneNode(mEngine))->create(NULL)->getScene();
+	mScene=Scene::ptr(new Scene(mEngine));
 }
 
 void Viewer::start(MeshNode::ptr meshNode){
 	mParent=mEngine->createNodeType(ParentNode::type(),mScene);
-	mScene->getRootNode()->attach(mParent);
+	mScene->getRoot()->attach(mParent);
 	mParent->attach(meshNode);
 
 	mCamera=mEngine->createNodeType(CameraNode::type(),mScene);
 	mCamera->setClearColor(Colors::ORANGE);
-	mScene->getRootNode()->attach(mCamera);
+	mScene->getRoot()->attach(mCamera);
 
 	mDistance=meshNode->getLocalBound().radius*2;
 
@@ -92,7 +92,7 @@ void Viewer::start(MeshNode::ptr meshNode){
 	mLight->setDirection(Math::Y_UNIT_VECTOR3);
 	mLight->setDiffuseColor(Colors::WHITE);
 	mLight->setSpecularColor(Colors::WHITE);
-	mScene->getRootNode()->attach(mLight);
+	mScene->getRoot()->attach(mLight);
 
 	updateCamera();
 
