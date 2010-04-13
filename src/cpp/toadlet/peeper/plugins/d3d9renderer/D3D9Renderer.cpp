@@ -907,6 +907,7 @@ void D3D9Renderer::setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D
 	#else
 		capabilitySet.idealVertexFormatBit=VertexElement::Format_BIT_FLOAT_32;
 	#endif
+	capabilitySet.triangleFan=true;
 
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 		Logger::alert(Categories::TOADLET_PEEPER,

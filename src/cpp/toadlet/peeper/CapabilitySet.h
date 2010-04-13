@@ -53,7 +53,8 @@ public:
 		textureNonPowerOf2Restricted(false),
 		textureNonPowerOf2(false),
 		textureAutogenMipMaps(false),
-		idealVertexFormatBit(VertexElement::Format_BIT_FLOAT_32)
+		idealVertexFormatBit(VertexElement::Format_BIT_FLOAT_32),
+		triangleFan(false)
 	{}
 
 	bool resetOnResize;
@@ -76,6 +77,7 @@ public:
 	bool textureNonPowerOf2;
 	bool textureAutogenMipMaps;
 	int idealVertexFormatBit;
+	bool triangleFan;
 };
 
 }

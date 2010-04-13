@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
+#include <toadlet/peeper/CapabilitySet.h>
 #include <toadlet/tadpole/bsp/BSP30Handler.h>
 #include <toadlet/tadpole/handler/WADArchive.h>
 #include <toadlet/tadpole/PixelPacker.h>
@@ -252,7 +253,7 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 	vertexFormat->addVertexElement(VertexElement(VertexElement::Type_POSITION,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3));
 	vertexFormat->addVertexElement(VertexElement(VertexElement::Type_NORMAL,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3));
 	vertexFormat->addVertexElement(VertexElement(VertexElement::Type_TEX_COORD,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_2));
-	vertexFormat->addVertexElement(VertexElement(VertexElement::Type_TEX_COORD_2,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_2));
+//	vertexFormat->addVertexElement(VertexElement(VertexElement::Type_TEX_COORD_2,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_2));
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,map->nsurfedges);
 
 	/// @todo: Figure out maximum required size, or allow multiple images
@@ -270,7 +271,8 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 	float ls=0,lt=0;
 
 	map->facedatas.resize(map->nfaces);
-	peeper::VertexBufferAccessor vba;
+	VertexBufferAccessor vba;
+	IndexBufferAccessor iba;
 	vba.lock(vertexBuffer);
 	for(i=0;i<map->nfaces;i++){
 		bface *face=&map->faces[i];
@@ -304,7 +306,22 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 			packer.insert(lmwidth,lmheight,((byte*)map->lighting)+face->lightofs,map->facedatas[i].lightmapTransform);
 		}
 
-		map->facedatas[i].indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIFAN,NULL,face->firstedge,face->numedges));
+		if(mEngine->getRenderer()==NULL || mEngine->getRenderer()->getCapabilitySet().triangleFan){
+			map->facedatas[i].indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIFAN,NULL,face->firstedge,face->numedges));
+		}
+		else{
+			int indexes=(face->numedges-2)*3;
+			IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,indexes);
+			iba.lock(indexBuffer);
+			for(j=1;j<face->numedges-1;++j){
+				iba.set((j-1)*3+0,face->firstedge);
+				iba.set((j-1)*3+1,face->firstedge+j);
+				iba.set((j-1)*3+2,face->firstedge+j+1);
+			}
+			iba.unlock();
+			map->facedatas[i].indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexes));
+		}
+
 		for(j=0;j<face->numedges;j++){
 			int faceedge=face->firstedge+j;
 			int surfedge=map->surfedges[faceedge];
@@ -329,7 +346,7 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 				lt=(lmmidt + (t-surfmidt)/16.0);
 				Vector3 lc(ls*ilmwidth,lt*ilmheight,Math::ONE);
 				Math::mulPoint3Fast(lc,map->facedatas[i].lightmapTransform);
-				vba.set2(faceedge,3,lc.x,lc.y);
+//				vba.set2(faceedge,3,lc.x,lc.y);
 			}
 		}
 	}
