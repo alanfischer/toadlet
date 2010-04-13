@@ -54,7 +54,7 @@ Node::Node():
 
 	//mDependsUpon,
 
-	mIdentityTransform(false),
+	mTransformUpdatedFrame(0),
 	//mTranslate,
 	//mRotate,
 	//mScale,
@@ -96,7 +96,7 @@ Node *Node::create(Scene *scene){
 
 	mDependsUpon=NULL;
 
-	mIdentityTransform=true;
+	mTransformUpdatedFrame=-1;
 	mTranslate.reset();
 	mRotate.reset();
 	mScale.set(Math::ONE,Math::ONE,Math::ONE);
@@ -243,6 +243,8 @@ void Node::logicUpdate(int dt,int scope){
 	mLastLogicFrame=mScene->getLogicFrame();
 
 	logicUpdateListeners(dt);
+
+	updateWorldTransform();
 }
 
 void Node::frameUpdate(int dt,int scope){
@@ -279,6 +281,8 @@ void Node::tryDeactivate(){
 	}
 }
 
+bool Node::getTransformUpdated(){return mScene->getFrame()==mTransformUpdatedFrame;}
+
 void Node::logicUpdateListeners(int dt){
 	if(mNodeListeners!=NULL){
 		int i;
@@ -303,7 +307,7 @@ void Node::updateWorldTransform(){
 		mWorldRotate.set(mRotate);
 		mWorldTranslate.set(mTranslate);
 	}
-	else if(mIdentityTransform){
+	else if(mTransformUpdatedFrame==-1){
 		mWorldScale.set(mParent->mScale);
 		mWorldRotate.set(mParent->mRotate);
 		mWorldTranslate.set(mParent->mTranslate);
@@ -323,12 +327,8 @@ void Node::updateWorldTransform(){
 }
 
 void Node::transformUpdated(){
-	mIdentityTransform=false;
+	mTransformUpdatedFrame=mScene->getFrame();
 	activate();
-
-	if(mParent!=NULL){
-		shared_static_cast<ParentNode>(mParent)->childTransformUpdated(this);
-	}
 }
 
 }

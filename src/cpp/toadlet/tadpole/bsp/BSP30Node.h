@@ -107,8 +107,7 @@ public:
 	void insertNodeLeafIndexes(const egg::Collection<int> &indexes,Node *node);
 	void removeNodeLeafIndexes(const egg::Collection<int> &indexes,Node *node);
 
-	void childTransformUpdated(Node *child);
-
+	void mergeWorldBound(Node *child,bool justAttached);
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 
 	bool senseBoundingVolumes(SensorResultsListener *listener,const Sphere &volume);
@@ -123,6 +122,7 @@ public:
 	void render(peeper::Renderer *renderer) const;
 
 protected:
+	void childTransformUpdated(Node *child);
 	void addLeafToVisible(bleaf *leaf,node::CameraNode *camera);
 
 	BSP30Map::ptr mMap;
