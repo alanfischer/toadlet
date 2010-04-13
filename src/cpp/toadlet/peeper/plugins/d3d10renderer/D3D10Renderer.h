@@ -113,6 +113,9 @@ public:
 
 	inline ID3D10Device *getD3D10Device(){return mD3DDevice;}
 
+	D3D10_PRIMITIVE_TOPOLOGY getD3D10_PRIMITIVE_TOPOLOGY(IndexData::Primitive primitive);
+	DXGI_FORMAT getDXGI_FORMAT(IndexBuffer::IndexFormat format);
+
 protected:
 	ID3D10Device *mD3DDevice;
 	RenderTarget *mPrimaryRenderTarget;

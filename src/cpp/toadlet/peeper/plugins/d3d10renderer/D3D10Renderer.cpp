@@ -36,7 +36,7 @@
 #include <toadlet/peeper/Viewport.h>
 
 #include <d3dx10.h>
-//#pragma comment(lib,"d3dx10.lib")
+#pragma comment(lib,"c:\\Program Files\\Microsoft DirectX SDK (March 2009)\\lib\\x86\\d3dx10.lib")
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::MathConversion;
@@ -111,6 +111,7 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 	mCapabilitySet.renderToDepthTexture=true;
 	mCapabilitySet.renderToTextureNonPowerOf2Restricted=true;
 	mCapabilitySet.idealVertexFormatBit=VertexElement::Format_BIT_FLOAT_32;
+	mCapabilitySet.triangleFan=false;
 
 	setDefaultStates();
 
@@ -122,7 +123,7 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 // Create the effect
 HRESULT res;
 LPD3D10BLOB errorBuffer;
-//10CreateEffectFromFile( TEXT("D3D10_Tut4.fx"), NULL, NULL, TEXT("fx_4_0"),D3D10_SHADER_ENABLE_STRICTNESS, 0, mD3DDevice, NULL, NULL, &g_lpEffect, &errorBuffer, &res );
+D3DX10CreateEffectFromFile( TEXT("D3D10_Tut4.fx"), NULL, NULL, TEXT("fx_4_0"),D3D10_SHADER_ENABLE_STRICTNESS, 0, mD3DDevice, NULL, NULL, &g_lpEffect, &errorBuffer, &res );
 if( FAILED(res ))
 {
 	TCHAR* error = (TCHAR*)errorBuffer->GetBufferPointer();
@@ -328,18 +329,24 @@ toD3DMATRIX(result,shaderMatrix);
 		LPD3D10EFFECTMATRIXVARIABLE lpEffectMatrixVar = g_lpEffect->GetVariableByName("ShaderMatrix")->AsMatrix();
 		lpEffectMatrixVar->SetMatrix((float*)&result);
 
-	D3D10Buffer *buffer=(D3D10Buffer*)(indexData->getIndexBuffer()->getRootIndexBuffer());
-	mD3DDevice->IASetIndexBuffer(buffer->mBuffer,DXGI_FORMAT_R16_UINT,0);
+	if(indexData->getIndexBuffer()!=NULL){
+		D3D10Buffer *buffer=(D3D10Buffer*)(indexData->getIndexBuffer()->getRootIndexBuffer());
+		mD3DDevice->IASetIndexBuffer(buffer->mBuffer,getDXGI_FORMAT(buffer->getIndexFormat()),0);
+	}
 
-	mD3DDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	mD3DDevice->IASetPrimitiveTopology(getD3D10_PRIMITIVE_TOPOLOGY(indexData->primitive));
 
 D3D10_TECHNIQUE_DESC techDesc;
 pTechnique->GetDesc( &techDesc );
 for( UINT p = 0; p < techDesc.Passes; ++p )
 {
 	pTechnique->GetPassByIndex( p )->Apply(0);
-	mD3DDevice->Draw(indexData->getCount(),0);
-//	pd3dDevice->Draw( 4, 0 );
+	if(indexData->getIndexBuffer()){
+		mD3DDevice->DrawIndexed(indexData->count,indexData->start,0);
+	}
+	else{
+		mD3DDevice->Draw(indexData->count,indexData->start);
+	}
 }
 
 
@@ -669,6 +676,43 @@ void D3D10Renderer::setMirrorY(bool mirrorY){
 */}
 
 void D3D10Renderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){
+}
+
+D3D10_PRIMITIVE_TOPOLOGY D3D10Renderer::getD3D10_PRIMITIVE_TOPOLOGY(IndexData::Primitive primitive){
+	switch(primitive){
+		case IndexData::Primitive_POINTS:
+			return D3D10_PRIMITIVE_TOPOLOGY_POINTLIST;
+		case IndexData::Primitive_LINES:
+			return D3D10_PRIMITIVE_TOPOLOGY_LINELIST;
+		case IndexData::Primitive_LINESTRIP:
+			return D3D10_PRIMITIVE_TOPOLOGY_LINESTRIP;
+		case IndexData::Primitive_TRIS:
+			return D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		case IndexData::Primitive_TRISTRIP:
+			return D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+		default:
+			Logger::error(Categories::TOADLET_PEEPER,
+				"D3D10Renderer::getD3D10_PRIMITIVE_FORMAT: Invalid format");
+			return D3D10_PRIMITIVE_TOPOLOGY_UNDEFINED;
+		break;
+	}
+}
+
+DXGI_FORMAT D3D10Renderer::getDXGI_FORMAT(IndexBuffer::IndexFormat format){
+	switch(format){
+		case IndexBuffer::IndexFormat_UINT_8:
+		case IndexBuffer::IndexFormat_UINT_16:
+			return DXGI_FORMAT_R16_UINT;
+		break;
+		case IndexBuffer::IndexFormat_UINT_32:
+			return DXGI_FORMAT_R32_UINT;
+		break;
+		default:
+			Logger::error(Categories::TOADLET_PEEPER,
+				"D3D10Renderer::getDXGI_FORMAT: Invalid format");
+			return DXGI_FORMAT_UNKNOWN;
+		break;
+	}
 }
 
 }

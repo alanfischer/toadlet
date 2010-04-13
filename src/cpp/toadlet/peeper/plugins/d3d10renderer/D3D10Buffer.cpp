@@ -67,7 +67,7 @@ bool D3D10Buffer::create(int usageFlags,AccessType accessType,IndexFormat indexF
 	mAccessType=accessType;
 	mSize=size;
 	mIndexFormat=indexFormat;
-	mDataSize=mIndexFormat*mSize;
+	mDataSize=((indexFormat==IndexFormat_UINT_8)?2:mIndexFormat)*mSize;
 
 	mBindFlags|=D3D10_BIND_INDEX_BUFFER;
 
@@ -96,6 +96,7 @@ bool D3D10Buffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr 
 
 	mBindFlags|=D3D10_BIND_VERTEX_BUFFER;
 
+	// Having issues with being able to Map a DYANMIC buffer, not sure why, so dont map for now
 	mMapping=false;//(mUsageFlags&Buffer::UsageFlags_STATIC)==0;//mRenderer->useMapping(this);
 	if(mMapping){
 		createContext();
@@ -223,7 +224,16 @@ uint8 *D3D10Buffer::lock(AccessType lockType){
 				color=(color&0xFF000000)|((color&0x000000FF)<<16)|(color&0x0000FF00)|((color&0x00FF0000)>>16);
 			}
 		}
+		if(mIndexFormat==IndexFormat_UINT_8){
+			// Pack the indexes
+			uint16 *data16=(uint16*)mData;
+			int i;
+			for(i=0;i<mSize;++i){
+				mData[i]=data16[i];
+			}
+		}
 	}
+
 
 	return mData;
 }
@@ -237,6 +247,14 @@ bool D3D10Buffer::unlock(){
 			for(j=0;j<mSize;++j){
 				uint32 &color=*(uint32*)(mData+mVertexSize*j+vertexElement.offset);
 				color=(color&0xFF000000)|((color&0x000000FF)<<16)|(color&0x0000FF00)|((color&0x00FF0000)>>16);
+			}
+		}
+		if(mIndexFormat==IndexFormat_UINT_8){
+			// Unpack the indexes
+			uint16 *data16=(uint16*)mData;
+			int i;
+			for(i=mSize-1;i>=0;--i){
+				data16[i]=mData[i];
 			}
 		}
 	}

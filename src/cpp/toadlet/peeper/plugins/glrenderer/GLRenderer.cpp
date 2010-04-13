@@ -288,6 +288,8 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 		mCapabilitySet.idealVertexFormatBit=VertexElement::Format_BIT_FLOAT_32;
 	#endif
 
+	mCapabilitySet.triangleFan=true;
+
 	setDefaultStates();
 
 	TOADLET_CHECK_GLERROR("create");
