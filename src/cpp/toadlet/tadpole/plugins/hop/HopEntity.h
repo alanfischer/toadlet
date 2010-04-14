@@ -114,6 +114,8 @@ public:
 	// CollisionListener callbacks
 	virtual void collision(const hop::Collision &c);
 
+int flags;
+
 protected:
 	virtual void updateCollisionVolumes();
 

@@ -104,7 +104,7 @@ bool ParentNode::attach(Node *node){
 	activate();
 
 	node->frameUpdate(0,-1);
-	merge(mWorldBound,node->getWorldBound());
+	mergeWorldBound(node,true);
 
 	return true;
 }
@@ -197,12 +197,12 @@ void ParentNode::frameUpdate(int dt,int scope){
 		}
 
 		if(dependent==false){
-			mergeWorldBound(child);
+			mergeWorldBound(child,false);
 		}
 	}
 }
 
-void ParentNode::mergeWorldBound(Node *child){
+void ParentNode::mergeWorldBound(Node *child,bool justAttached){
 	Node::merge(mWorldBound,child->getWorldBound());
 }
 

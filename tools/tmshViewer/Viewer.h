@@ -1,11 +1,11 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
-#include <toadlet/pad/Application.h>
+#include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/node/LightNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
-#include <toadlet/tadpole/node/SceneNode.h>
+#include <toadlet/pad/Application.h>
 
 class Viewer:public toadlet::pad::Application{
 public:
@@ -23,12 +23,12 @@ public:
 	void resized(int width,int height);
 	void focusLost();
 
-	inline toadlet::tadpole::node::Scene::ptr getScene(){return mScene;}
+	inline toadlet::tadpole::Scene::ptr getScene(){return mScene;}
 
 protected:
 	void updateCamera();
 
-	toadlet::tadpole::node::Scene::ptr mScene;
+	toadlet::tadpole::Scene::ptr mScene;
 	toadlet::tadpole::node::ParentNode::ptr mParent;
 	toadlet::tadpole::node::CameraNode::ptr mCamera;
 	toadlet::tadpole::node::LightNode::ptr mLight;

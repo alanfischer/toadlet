@@ -115,8 +115,6 @@ public:
 
 	virtual void setTransform(const Matrix4x4 &transform);
 	inline const Matrix4x4 &getWorldTransform() const{return mWorldTransform;}
-	
-	inline bool isIdentityTransform() const{return mIdentityTransform;}
 
 	virtual void findTransformTo(Matrix4x4 &result,Node *node);
 
@@ -140,6 +138,7 @@ public:
 	virtual void deactivate();
 	virtual void tryDeactivate();
 	inline bool active() const{return mActive;}
+	bool getTransformUpdated();
 
 	inline Engine *getEngine() const{return mEngine;}
 	inline Scene *getScene() const{return mScene;}
@@ -209,7 +208,7 @@ protected:
 	
 	Node::ptr mDependsUpon;
 
-	bool mIdentityTransform;
+	int mTransformUpdatedFrame;
 	Vector3 mTranslate;
 	Quaternion mRotate;
 	Vector3 mScale;
