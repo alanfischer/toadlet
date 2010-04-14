@@ -35,9 +35,6 @@
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/Viewport.h>
 
-#include <d3dx10.h>
-#pragma comment(lib,"c:\\Program Files\\Microsoft DirectX SDK (March 2009)\\lib\\x86\\d3dx10.lib")
-
 using namespace toadlet::egg;
 using namespace toadlet::egg::MathConversion;
 
@@ -120,15 +117,52 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 
 
 
-// Create the effect
-HRESULT res;
-LPD3D10BLOB errorBuffer;
-D3DX10CreateEffectFromFile( TEXT("D3D10_Tut4.fx"), NULL, NULL, TEXT("fx_4_0"),D3D10_SHADER_ENABLE_STRICTNESS, 0, mD3DDevice, NULL, NULL, &g_lpEffect, &errorBuffer, &res );
-if( FAILED(res ))
-{
-	TCHAR* error = (TCHAR*)errorBuffer->GetBufferPointer();
-//	return FALSE;
-}
+	char *effect=
+"float4x4 ShaderMatrix;\n"
+"Texture2D diffuseTexture;\n"
+"SamplerState samLinear{\n"
+    "Filter = MIN_MAG_MIP_LINEAR;\n"
+    "AddressU = Wrap;\n"
+    "AddressV = Wrap;\n"
+"};\n"
+
+"struct VS_OUTPUT{\n"
+    "float4 Pos : SV_POSITION;\n"
+    "float4 Color : COLOR0;\n"
+    "float2 TexCoords : TEXCOORD0;\n"
+"};\n"
+
+"VS_OUTPUT VS( float4 Pos : POSITION, float4 Color : COLOR, float2 TexCoords : TEXCOORD){\n"
+  "VS_OUTPUT Output = (VS_OUTPUT)0;\n"
+  "Output.Pos = mul(Pos, ShaderMatrix);\n"
+  "Output.Color = Color;\n"
+  "Output.TexCoords = TexCoords;\n"
+  "return Output;\n"
+"}\n"
+
+"float4 PS( VS_OUTPUT Input ) : SV_Target{\n"
+    "return Input.Color;\n"
+"}\n"
+
+"technique10 Render{\n"
+    "pass P0{\n"
+        "SetVertexShader( CompileShader( vs_4_0, VS() ) );\n"
+        "SetGeometryShader( NULL );\n"
+        "SetPixelShader( CompileShader( ps_4_0, PS() ) );\n"
+    "}\n"
+"}\n";
+
+HMODULE library=LoadLibrary(TOADLET_D3D10_DLL_NAME);
+
+ID3D10Blob *compiledEffect=NULL;
+typedef HRESULT(WINAPI *D3D10CompileEffectFromMemory)(void *pData,SIZE_T DataLength,LPCSTR pSrcFileName,const D3D10_SHADER_MACRO *pDefines,ID3D10Include *pInclude,UINT HLSLFlags,UINT FXFlags,ID3D10Blob **ppCompiledEffect,ID3D10Blob **ppErrors);
+void *compile=GetProcAddress(library,"D3D10CompileEffectFromMemory");
+((D3D10CompileEffectFromMemory)compile)(effect,strlen(effect),0,0,0,0,0,&compiledEffect,0);
+
+typedef HRESULT(WINAPI *D3D10CreateEffectFromMemory)(void *pData,SIZE_T DataLength,UINT FXFlags,ID3D10Device *pDevice,ID3D10EffectPool *pEffectPool,ID3D10Effect **ppEffect);
+void *create=GetProcAddress(library,"D3D10CreateEffectFromMemory");
+((D3D10CreateEffectFromMemory)create)(compiledEffect->GetBufferPointer(),compiledEffect->GetBufferSize(),0,mD3DDevice,NULL,&g_lpEffect);
+
 // Obtain the technique
 pTechnique = g_lpEffect->GetTechniqueByName( "Render" );
 
@@ -277,25 +311,6 @@ void D3D10Renderer::endScene(){
 	}
 }
 
-inline void toD3DMATRIX(D3DMATRIX &r,const Matrix4x4 &s){
-	r.m[0][0]=s.at(0,0);
-	r.m[1][0]=s.at(0,1);
-	r.m[2][0]=s.at(0,2);
-	r.m[3][0]=s.at(0,3);
-	r.m[0][1]=s.at(1,0);
-	r.m[1][1]=s.at(1,1);
-	r.m[2][1]=s.at(1,2);
-	r.m[3][1]=s.at(1,3);
-	r.m[0][2]=s.at(2,0);
-	r.m[1][2]=s.at(2,1);
-	r.m[2][2]=s.at(2,2);
-	r.m[3][2]=s.at(2,3);
-	r.m[0][3]=s.at(3,0);
-	r.m[1][3]=s.at(3,1);
-	r.m[2][3]=s.at(3,2);
-	r.m[3][3]=s.at(3,3);
-}
-
 void D3D10Renderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData){
 	if(vertexData==NULL || indexData==NULL){
 		Error::nullPointer(Categories::TOADLET_PEEPER,
@@ -313,21 +328,13 @@ void D3D10Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Inde
 	D3D10Buffer *vertexBuffer=(D3D10Buffer*)vertexData->getVertexBuffer(0)->getRootVertexBuffer();
 	UINT stride=vertexBuffer->mVertexFormat->getVertexSize();
 	UINT offset=0;
-mD3DDevice->IASetVertexBuffers(0,1,&vertexBuffer->mBuffer,&stride,&offset);
+	mD3DDevice->IASetVertexBuffers(0,1,&vertexBuffer->mBuffer,&stride,&offset);
 
 //	pWorldMatrixEffectVariable->SetMatrix(w);
 //	pViewMatrixEffectVariable->SetMatrix(viewMatrix);
 //	pProjectionMatrixEffectVariable->SetMatrix(projectionMatrix);
-//Matrix4x4 shaderMatrix=mViewMatrix*mProjectionMatrix*mModelMatrix;
-Matrix4x4 shaderMatrix=mProjectionMatrix*mViewMatrix*mModelMatrix;
-//	g_ShaderMatrix = ViewMatrix * PerspectiveMatrix * WorldMatrix;
-D3DMATRIX result;
-toD3DMATRIX(result,shaderMatrix);
-//Math::transpose(result,shaderMatrix);
-
-		//handover the matrix to the effect.
-		LPD3D10EFFECTMATRIXVARIABLE lpEffectMatrixVar = g_lpEffect->GetVariableByName("ShaderMatrix")->AsMatrix();
-		lpEffectMatrixVar->SetMatrix((float*)&result);
+	Matrix4x4 shaderMatrix=mProjectionMatrix*mViewMatrix*mModelMatrix;
+	g_lpEffect->GetVariableByName("ShaderMatrix")->AsMatrix()->SetMatrix(shaderMatrix.data);
 
 	if(indexData->getIndexBuffer()!=NULL){
 		D3D10Buffer *buffer=(D3D10Buffer*)(indexData->getIndexBuffer()->getRootIndexBuffer());
