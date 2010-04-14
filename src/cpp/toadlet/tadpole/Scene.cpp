@@ -73,6 +73,7 @@ Scene::Scene(Engine *engine):
 }
 
 Scene::~Scene(){
+	destroy();
 }
 
 void Scene::destroy(){
