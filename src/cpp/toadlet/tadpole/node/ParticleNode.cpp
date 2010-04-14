@@ -315,7 +315,6 @@ void ParticleNode::setScale(scalar scale){
 void ParticleNode::setWorldSpace(bool worldSpace){
 	mWorldSpace=worldSpace;
 
-	updateWorldTransform(this);
 	Matrix4x4 &m=mWorldTransform;
 	int i;
 	for(i=0;i<mParticles.size();++i){
@@ -380,28 +379,6 @@ const Matrix4x4 &ParticleNode::getRenderTransform() const{
 
 void ParticleNode::render(Renderer *renderer) const{
 	renderer->renderPrimitive(mVertexData,mLineBeams?mLineIndexData:mIndexData);
-}
-
-void ParticleNode::updateWorldTransform(Node *node){
-	if(node->getParent()==NULL){
-		Matrix3x3 &temp=cache_updateWorldTransform_temp3;
-		Math::setMatrix3x3FromQuaternion(temp,node->getRotate());
-		Math::setMatrix4x4FromTranslateRotateScale(mWorldTransform,node->getTranslate(),temp,node->getScale());
-	}
-	else{
-		updateWorldTransform(node->getParent());
-
-		if(node->isIdentityTransform()==false){
-			Matrix4x4 &temp1=cache_updateWorldTransform_temp1;
-			Matrix4x4 &temp2=cache_updateWorldTransform_temp2;
-			Matrix3x3 &temp3=cache_updateWorldTransform_temp3;
-
-			Math::setMatrix3x3FromQuaternion(temp3,node->getRotate());
-			Math::setMatrix4x4FromTranslateRotateScale(temp1,node->getTranslate(),temp3,node->getScale());
-			Math::mul(temp2,mWorldTransform,temp1);
-			mWorldTransform.set(temp2);
-		}
-	}
 }
 
 void ParticleNode::createVertexBuffer(){

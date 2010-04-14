@@ -161,8 +161,7 @@ TOADLET_NODE_IMPLEMENT(BSP30Node,Categories::TOADLET_TADPOLE_NODE+".BSP30Node");
 
 BSP30Node::BSP30Node():super(),
 	mCounter(1)
-{
-}
+{}
 
 BSP30Node::~BSP30Node(){}
 
@@ -258,29 +257,11 @@ void BSP30Node::removeNodeLeafIndexes(const Collection<int> &indexes,Node *node)
 	}
 }
 
-void BSP30Node::childTransformUpdated(Node *child){
-	if(mMap==NULL){
-		return;
+void BSP30Node::mergeWorldBound(Node *child,bool justAttached){
+	super::mergeWorldBound(child,justAttached);
+	if(justAttached || child->getTransformUpdated()){
+		childTransformUpdated(child);
 	}
-
-	Collection<int> &oldIndexes=((childdata*)child->getParentData())->leafs;
-	Collection<int> &newIndexes=mLeafIndexes; 
-	newIndexes.clear();
-	mMap->findBoundLeafs(newIndexes,mMap->nodes,0,child->getWorldBound());
-
-	if(newIndexes.size()==oldIndexes.size()){
-		int i;
-		for(i=oldIndexes.size()-1;i>=0;--i){
-			if(oldIndexes[i]!=newIndexes[i]) break;
-		}
-		if(i==-1) return; // No changes necessary
-	}
-
-	removeNodeLeafIndexes(oldIndexes,child);
-	insertNodeLeafIndexes(newIndexes,child);
-
-	oldIndexes.resize(newIndexes.size());
-	memcpy(&oldIndexes[0],&newIndexes[0],newIndexes.size()*sizeof(int));
 }
 
 void BSP30Node::queueRenderables(CameraNode *camera,RenderQueue *queue){
@@ -383,6 +364,31 @@ void BSP30Node::render(Renderer *renderer) const{
 
 	renderer->setTextureStage(0,NULL);
 	renderer->setTextureStage(1,NULL);
+}
+
+void BSP30Node::childTransformUpdated(Node *child){
+	if(mMap==NULL){
+		return;
+	}
+
+	Collection<int> &oldIndexes=((childdata*)child->getParentData())->leafs;
+	Collection<int> &newIndexes=mLeafIndexes; 
+	newIndexes.clear();
+	mMap->findBoundLeafs(newIndexes,mMap->nodes,0,child->getWorldBound());
+
+	if(newIndexes.size()==oldIndexes.size()){
+		int i;
+		for(i=oldIndexes.size()-1;i>=0;--i){
+			if(oldIndexes[i]!=newIndexes[i]) break;
+		}
+		if(i==-1) return; // No changes necessary
+	}
+
+	removeNodeLeafIndexes(oldIndexes,child);
+	insertNodeLeafIndexes(newIndexes,child);
+
+	oldIndexes.resize(newIndexes.size());
+	memcpy(&oldIndexes[0],&newIndexes[0],newIndexes.size()*sizeof(int));
 }
 
 void BSP30Node::addLeafToVisible(bleaf *leaf,CameraNode *camera){

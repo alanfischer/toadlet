@@ -59,13 +59,11 @@ public:
 
 	virtual void logicUpdate(int dt,int scope);
 	virtual void frameUpdate(int dt,int scope);
-	virtual void mergeWorldBound(Node *child);
+	virtual void mergeWorldBound(Node *child,bool justAttached);
 
 	virtual void activate();
 	virtual void deactivate();
 	virtual void tryDeactivate();
-
-	virtual void childTransformUpdated(Node *child){}
 
 protected:
 	virtual void updateShadowChildren();

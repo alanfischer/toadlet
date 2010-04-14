@@ -36,7 +36,7 @@ namespace toadlet{
 namespace knot{
 
 SimpleClient::SimpleClient(EventFactory *eventFactory,Connector::ptr connector):SimpleEventConnection(eventFactory),
-	mClientID(0)
+	mClientID(-1)
 	//mConnector
 {
 	if(connector!=NULL){

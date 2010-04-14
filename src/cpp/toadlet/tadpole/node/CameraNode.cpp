@@ -189,8 +189,7 @@ void CameraNode::setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3
 
 	Math::setTranslateFromMatrix4x4(mTranslate,transform);
 	Math::setQuaternionFromMatrix4x4(mRotate,transform);
-	mIdentityTransform=false;
-	activate();
+	transformUpdated();
 }
 
 void CameraNode::setWorldLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up){
@@ -207,8 +206,7 @@ void CameraNode::setWorldLookAt(const Vector3 &eye,const Vector3 &point,const Ve
 		Math::mul(mTranslate,invrot,mWorldTranslate);
 		Math::mul(mRotate,invrot,mWorldRotate);
 	}
-	mIdentityTransform=false;
-	activate();
+	transformUpdated();
 }
 
 void CameraNode::setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up){
@@ -217,8 +215,8 @@ void CameraNode::setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 
 
 	Math::setTranslateFromMatrix4x4(mTranslate,transform);
 	Math::setQuaternionFromMatrix4x4(mRotate,transform);
-	mIdentityTransform=false;
-	activate();
+	transformUpdated();
+
 }
 
 void CameraNode::setWorldLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up){
@@ -235,8 +233,7 @@ void CameraNode::setWorldLookDir(const Vector3 &eye,const Vector3 &dir,const Vec
 		Math::mul(mTranslate,invrot,mWorldTranslate);
 		Math::mul(mRotate,invrot,mWorldRotate);
 	}
-	mIdentityTransform=false;
-	activate();
+	transformUpdated();
 }
 
 void CameraNode::setTarget(Node *node){
