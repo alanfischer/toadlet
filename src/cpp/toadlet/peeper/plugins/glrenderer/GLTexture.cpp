@@ -308,8 +308,6 @@ bool GLTexture::read(int format,int width,int height,int depth,int mipLevel,uint
 			glGetTexImage(mTarget,mipLevel,glformat,gltype,finalData);
 		}
 		else{
-			int pixelSize=ImageFormatConversion::getPixelSize(closestFormat);
-
 			int i;
 			for(i=0;i<6;++i){
 				glGetTexImage(GLCubeFaces[i],mipLevel,glformat,gltype,finalData+width*height*closestFormat*i);
