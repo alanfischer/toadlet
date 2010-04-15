@@ -153,6 +153,7 @@ void ParentNode::logicUpdate(int dt,int scope){
 	int i;
 	for(i=0;i<numChildren;++i){
 		child=mShadowChildren[i];
+		bool dependent=false;
 		if(mActivateChildren){
 			child->activate();
 		}
@@ -166,6 +167,10 @@ void ParentNode::logicUpdate(int dt,int scope){
 				child->tryDeactivate();
 				mChildrenActive=true;
 			}
+		}
+
+		if(dependent==false){
+			mergeWorldBound(child,false);
 		}
 	}
 

@@ -241,11 +241,13 @@ void Scene::logicUpdate(int dt,int scope){
 	mRoot->logicUpdate(dt,scope);
 
 	/// @todo: dependents are currently broken if they're more than 1 deep.  This code doesnt check if the dependent is ready. That should be a function in node?
+	/// @todo: Also, the world bound updating needs to go all the way to the root.
 	while(mDependents.size()>0){
 		Collection<Node::ptr> dependents=mDependents; mDependents.clear();
 		for(int i=0;i<dependents.size();++i){
 			Node *dependent=dependents[i];
 			dependent->logicUpdate(dt,scope);
+			dependent->getParent()->mergeWorldBound(dependents[i],false);
 		}
 		/// @todo: This isnt the best check, since we could have an equal amount of dependents added and removed in a frame, and thats not circular
 		if(dependents.size()==mDependents.size()){
