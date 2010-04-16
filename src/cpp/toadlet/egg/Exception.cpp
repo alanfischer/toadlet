@@ -26,6 +26,8 @@
 #include <toadlet/egg/Exception.h>
 #include <toadlet/egg/Error.h>
 
+#if defined(TOADLET_EXCEPTIONS)
+
 namespace toadlet{
 namespace egg{
 
@@ -47,3 +49,5 @@ const char *Exception::getDescription(){
 
 }
 }
+
+#endif

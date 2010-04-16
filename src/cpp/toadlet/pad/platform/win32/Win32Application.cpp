@@ -58,6 +58,7 @@ using namespace toadlet::egg;
 using namespace toadlet::egg::image;
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
+using namespace toadlet::flick;
 using namespace toadlet::tadpole;
 
 #if defined(TOADLET_HAS_OPENGL)
@@ -86,6 +87,12 @@ using namespace toadlet::tadpole;
 #if defined(TOADLET_HAS_OPENAL)
 	#pragma comment(lib,"toadlet_ribbit_alplayer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" AudioPlayer *new_ALPlayer();
+#endif
+#if defined(TOADLET_PLATFORM_WINCE)
+	#pragma comment(lib,"toadlet_flick_htcmotiondetector" TOADLET_LIBRARY_EXTENSION)
+	extern "C" MotionDetector *new_HTCMotionDetector();
+	#pragma comment(lib,"toadlet_flick_samsungmotiondetector" TOADLET_LIBRARY_EXTENSION)
+	extern "C" MotionDetector *new_SamsungMotionDetector();
 #endif
 
 namespace toadlet{
@@ -126,7 +133,7 @@ Win32Application::Win32Application():
 	mChangeRendererPlugin(RendererPlugin_NONE),
 	mRendererOptions(NULL),
 	mAudioPlayer(NULL),
-	mChangeAudioPlayerPlugin(false),
+	mMotionDetector(NULL),
 
 	mRun(false),
 	#if defined(TOADLET_PLATFORM_WINCE)
@@ -143,9 +150,6 @@ Win32Application::Win32Application():
 	win32->mWnd=0;
 	win32->mIcon=0;
 
-	changeRendererPlugin(RendererPlugin_OPENGL); // OpenGL by default
-	changeAudioPlayerPlugin(true); // Use Audio by default
-
 	win32->mInstance=GetModuleHandle(NULL);
 }
 
@@ -157,11 +161,17 @@ Win32Application::~Win32Application(){
 	delete win32;
 }
 
-void Win32Application::create(){
+void Win32Application::create(int renderer,int audioPlayer,int motionDetector){
 	mEngine=new Engine();
 
-	if(mChangeAudioPlayerPlugin){
+	if(renderer!=RendererPlugin_NONE){
+		changeRendererPlugin(renderer);
+	}
+	if(audioPlayer!=AudioPlayerPlugin_NONE){
 		createAudioPlayer();
+	}
+	if(motionDetector!=MotionDetectorPlugin_NONE){
+		createMotionDetector();
 	}
 	createWindow();
 	activate();
@@ -181,6 +191,7 @@ void Win32Application::destroy(){
 	deactivate();
 	destroyWindow();
 	destroyAudioPlayer();
+	destroyMotionDetector();
 
 	if(mEngine!=NULL){
 		delete mEngine;
@@ -550,10 +561,6 @@ void Win32Application::setRendererOptions(int *options,int length){
 	memcpy(mRendererOptions,options,length*sizeof(int));
 }
 
-void Win32Application::changeAudioPlayerPlugin(bool audio){
-	mChangeAudioPlayerPlugin=audio;
-}
-
 void Win32Application::setIcon(void *icon){
 	win32->mIcon=(HICON)icon;
 	if(win32->mWnd!=0){
@@ -740,6 +747,43 @@ bool Win32Application::destroyAudioPlayer(){
 		mAudioPlayer->destroy();
 		delete mAudioPlayer;
 		mAudioPlayer=NULL;
+	}
+	return true;
+}
+
+bool Win32Application::createMotionDetector(){
+	#if defined(TOADLET_PLATFORM_WINCE)
+		if(mMotionDetector==NULL){
+			mMotionDetector=new_HTCMotionDetector();
+			bool result=false;
+			TOADLET_TRY
+				result=mMotionDetector->create();
+			TOADLET_CATCH(const Exception &){result=false;}
+			if(result==false){
+				delete mMotionDetector;
+				mMotionDetector=NULL;
+			}
+		}
+		if(mMotionDetector==NULL){
+			mMotionDetector=new_SamsungMotionDetector();
+			bool result=false;
+			TOADLET_TRY
+				result=mMotionDetector->create();
+			TOADLET_CATCH(const Exception &){result=false;}
+			if(result==false){
+				delete mMotionDetector;
+				mMotionDetector=NULL;
+			}
+		}
+	#endif
+	return true;
+}
+
+bool Win32Application::destroyMotionDetector(){
+	if(mMotionDetector!=NULL){
+		mMotionDetector->destroy();
+		delete mMotionDetector;
+		mMotionDetector=NULL;
 	}
 	return true;
 }

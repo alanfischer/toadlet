@@ -48,9 +48,9 @@ namespace handler{
 static String defaultCharacterSet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()_+|{}:\"'<>?`-=\\/[];,. \t");
 
 Win32FontHandler::Win32FontHandler(TextureManager *textureManager):
-	mTextureManager(NULL),
+	mTextureManager(NULL)
 	#if !defined(TOADLET_PLATFORM_WINCE)
-		mToken(0)
+		,mToken(0)
 	#endif
 {
 	mTextureManager=textureManager;
@@ -63,6 +63,8 @@ Win32FontHandler::Win32FontHandler(TextureManager *textureManager):
 bool Win32FontHandler::valid(){
 	#if !defined(TOADLET_PLATFORM_WINCE)
 		return true;
+	#else
+		return false;
 	#endif
 }
 

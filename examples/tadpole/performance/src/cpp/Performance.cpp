@@ -11,25 +11,25 @@ Performance::~Performance(){
 void Performance::create(){
 	Application::create();
 
-	getEngine()->setScene(mEngine->createNodeType(SceneNode::type()));
+	scene=Scene::ptr(new Scene(mEngine));
 
-	cameraNode=getEngine()->createNodeType(CameraNode::type());
+	cameraNode=getEngine()->createNodeType(CameraNode::type(),scene);
 	cameraNode->setLookAt(Vector3(0,-Math::fromInt(5),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
-	getEngine()->getScene()->getRootNode()->attach(cameraNode);
+	scene->getRoot()->attach(cameraNode);
 
 	setupTest(test++,10);
 }
 
 void Performance::update(int dt){
-	parentNode->setRotate(0,0,Math::ONE,Math::fromMilli(getEngine()->getScene()->getRenderTime())*4);
+	parentNode->setRotate(0,0,Math::ONE,Math::fromMilli(scene->getTime())*4);
 
-	getEngine()->getScene()->update(dt);
+	scene->update(dt);
 }
 
 void Performance::render(Renderer *renderer){
 	renderer->beginScene();
 
-	getEngine()->getScene()->render(renderer,cameraNode,NULL);
+	scene->render(renderer,cameraNode,NULL);
 
 	renderer->endScene();
 
@@ -59,8 +59,8 @@ bool Performance::setupTest(int test,int intensity){
 	if(parentNode!=NULL){
 		parentNode->destroy();
 	}
-	parentNode=getEngine()->createNodeType(ParentNode::type());
-	getEngine()->getScene()->getRootNode()->attach(parentNode);
+	parentNode=getEngine()->createNodeType(ParentNode::type(),scene);
+	scene->getRoot()->attach(parentNode);
 
 	bool result=true;
 	for(int i=0;i<intensity+1;++i){
@@ -87,7 +87,7 @@ bool Performance::setupTest(int test,int intensity){
 }
 
 Node::ptr Performance::setupMinimumTest(){
-	MeshNode::ptr cubeNode=getEngine()->createNodeType(MeshNode::type());
+	MeshNode::ptr cubeNode=getEngine()->createNodeType(MeshNode::type(),scene);
 	cubeNode->setMesh(getEngine()->getMeshManager()->createBox(AABox(-Math::HALF,-Math::HALF,-Math::HALF,Math::HALF,Math::HALF,Math::HALF)));
 	return cubeNode;
 }
@@ -95,10 +95,10 @@ Node::ptr Performance::setupMinimumTest(){
 Node::ptr Performance::setupFillrateTest(){
 	int i;
 	Mesh::ptr cubeMesh=getEngine()->getMeshManager()->createBox(AABox(-Math::HALF,-Math::HALF,-Math::HALF,Math::HALF,Math::HALF,Math::HALF));
-	ParentNode::ptr node=getEngine()->createNodeType(ParentNode::type());
+	ParentNode::ptr node=getEngine()->createNodeType(ParentNode::type(),scene);
 
 	for(i=0;i<10;++i){
-		MeshNode::ptr cubeNode=getEngine()->createNodeType(MeshNode::type());
+		MeshNode::ptr cubeNode=getEngine()->createNodeType(MeshNode::type(),scene);
 		cubeNode->setMesh(cubeMesh);
 		cubeNode->setScale(Math::fromInt(5),Math::fromInt(5),Math::fromInt(5));
 		node->attach(cubeNode);
@@ -112,25 +112,26 @@ Node::ptr Performance::setupFillrateTest(){
 }
 
 Node::ptr Performance::setupVertexrateTest(){
-	MeshNode::ptr sphereNode=getEngine()->createNodeType(MeshNode::type());
+	MeshNode::ptr sphereNode=getEngine()->createNodeType(MeshNode::type(),scene);
 	sphereNode->setMesh(getEngine()->getMeshManager()->createSphere(Sphere(Math::HALF)));
 	return sphereNode;
 }
 
 Node::ptr Performance::setupDynamicTest(){
 	// TODO
-	Node::ptr node=getEngine()->createNodeType(Node::type());
+	Node::ptr node=getEngine()->createNodeType(Node::type(),scene);
 	return node;
 }
 
 #if defined(TOADLET_PLATFORM_WINCE)
+#include <windows.h>
 int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,int nCmdShow){
 #else
 int main(int argc,char **argv){
 #endif
 	Performance app;
 	app.create();
-	app.start(true);
+	app.start();
 	app.destroy();
 	return 0;
 }

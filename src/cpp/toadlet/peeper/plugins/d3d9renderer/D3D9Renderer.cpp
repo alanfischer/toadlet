@@ -415,8 +415,10 @@ void D3D9Renderer::setDefaultStates(){
 		mD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE,true);
 		mD3DDevice->SetRenderState(D3DRS_SPECULARENABLE,true);
 
-		/// @todo: Move this to a render state
-		mD3DDevice->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS,true);
+		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+			/// @todo: Move this to a render state
+			mD3DDevice->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS,true);
+		#endif
 	}
 }
 

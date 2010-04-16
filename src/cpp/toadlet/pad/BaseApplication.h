@@ -31,6 +31,7 @@
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/Visual.h>
 #include <toadlet/ribbit/AudioPlayer.h>
+#include <toadlet/flick/MotionDetector.h>
 #include <toadlet/tadpole/Engine.h>
 
 namespace toadlet{
@@ -69,12 +70,9 @@ public:
 		Key_BACK,
 	};
 
-	static const bool START_STEP_EVENT_LOOP=false;
-	static const bool START_RUN_EVENT_LOOP=true;
-
 	virtual ~BaseApplication(){}
 
-	virtual void create()=0;
+	virtual void create(int renderer,int audioPlayer,int motionDetector)=0;
 	virtual void destroy()=0;
 
 	virtual void start()=0;
@@ -112,6 +110,7 @@ public:
 	virtual tadpole::Engine *getEngine() const=0;
 	virtual peeper::Renderer *getRenderer() const=0;
 	virtual ribbit::AudioPlayer *getAudioPlayer() const=0;
+	virtual flick::MotionDetector *getMotionDetector() const=0;
 
 	virtual void resized(int width,int height)=0;
 	virtual void focusGained()=0;
