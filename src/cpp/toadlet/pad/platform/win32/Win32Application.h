@@ -37,16 +37,26 @@ struct Win32Attributes;
 class TOADLET_API Win32Application:public BaseApplication{
 public:
 	enum RendererPlugin{
-		RendererPlugin_NONE,
+		RendererPlugin_NONE=-1,
 		RendererPlugin_OPENGL,
 		RendererPlugin_DIRECT3D9,
 		RendererPlugin_DIRECT3D10,
 	};
 
+	enum AudioPlayerPlugin{
+		AudioPlayerPlugin_NONE=-1,
+		AudioPlayerPlugin_ANY,
+	};
+
+	enum MotionDetectorPlugin{
+		MotionDetectorPlugin_NONE=-1,
+		MotionDetectorPlugin_ANY,
+	};
+
 	Win32Application();
 	virtual ~Win32Application();
 
-	virtual void create();
+	virtual void create(int renderer=0,int audioPlayer=0,int motionDetector=0);
 	virtual void destroy();
 
 	virtual void start();
@@ -84,6 +94,7 @@ public:
 	virtual tadpole::Engine *getEngine() const{return mEngine;}
 	virtual peeper::Renderer *getRenderer() const{return mRenderer;}
 	virtual ribbit::AudioPlayer *getAudioPlayer() const{return mAudioPlayer;}
+	virtual flick::MotionDetector *getMotionDetector() const{return mMotionDetector;}
 
 	virtual peeper::RenderTarget *getRootRenderTarget(){return mRenderTarget;}
 	virtual bool isPrimary() const{return mRenderTarget->isPrimary();}
@@ -107,9 +118,6 @@ public:
 	void changeRendererPlugin(int index);
 	void setRendererOptions(int *options,int length);
 
-	// Isn't as flexible as the RendererPlugin yet, you can just set true/false before creating the Application
-	void changeAudioPlayerPlugin(bool audio);
-
 	void setIcon(void *icon);
 	void *getHINSTANCE() const;
 	void *getHWND() const;
@@ -129,9 +137,13 @@ protected:
 	peeper::Renderer *makeRenderer(int plugin);
 	bool createContextAndRenderer(int plugin);
 	bool destroyRendererAndContext();
+	bool changeVideoMode(int width,int height,int colorBits);
+
 	bool createAudioPlayer();
 	bool destroyAudioPlayer();
-	bool changeVideoMode(int width,int height,int colorBits);
+
+	bool createMotionDetector();
+	bool destroyMotionDetector();
 
 	egg::String mTitle;
 	int mPositionX,mPositionY;
@@ -149,7 +161,7 @@ protected:
 	int mChangeRendererPlugin;
 	int *mRendererOptions;
 	ribbit::AudioPlayer *mAudioPlayer;
-	int mChangeAudioPlayerPlugin;
+	flick::MotionDetector *mMotionDetector;
 
 	bool mRun;
 	bool mAutoActivate;

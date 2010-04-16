@@ -25,6 +25,7 @@
 
 #include <toadlet/tadpole/FontManager.h>
 #if defined(TOADLET_PLATFORM_WIN32)
+	#include <windows.h>
 	#include <shlobj.h>
 #endif
 

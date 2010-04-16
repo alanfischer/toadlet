@@ -28,6 +28,9 @@
 
 #include <toadlet/Types.h>
 #include <toadlet/egg/String.h>
+
+#if defined(TOADLET_EXCEPTIONS)
+
 #include <stdexcept>
 
 namespace toadlet{
@@ -47,5 +50,7 @@ protected:
 
 }
 }
+
+#endif
 
 #endif

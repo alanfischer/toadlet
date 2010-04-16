@@ -132,7 +132,7 @@ endif (TOADLET_PLATFORM_WINCE)
 if (NOT TOADLET_PLATFORM_IPHONE)
 	add_library (toadlet_pad SHARED ${PAD_SRC} ${PAD_HEADERS})
 	set_target_properties (toadlet_pad PROPERTIES ${DYNAMIC_LIB_PROPS})
-	target_link_libraries (toadlet_pad toadlet_tadpole ${PAD_LIBS})
+	target_link_libraries (toadlet_pad toadlet_flick toadlet_tadpole ${PAD_LIBS})
 	install (TARGETS toadlet_pad DESTINATION lib)
 endif (NOT TOADLET_PLATFORM_IPHONE)
 
@@ -140,6 +140,6 @@ endif (NOT TOADLET_PLATFORM_IPHONE)
 # Static Library
 add_library (toadlet_pad_s STATIC ${PAD_SRC} ${PAD_HEADERS})
 set_target_properties (toadlet_pad_s PROPERTIES ${STATIC_LIB_PROPS})
-target_link_libraries (toadlet_pad_s toadlet_tadpole_s ${PAD_LIBS_S})
+target_link_libraries (toadlet_pad_s toadlet_flick_s toadlet_tadpole_s ${PAD_LIBS_S})
 install (TARGETS toadlet_pad_s DESTINATION lib)
 
