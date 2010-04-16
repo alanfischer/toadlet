@@ -273,19 +273,28 @@ void D3D9Renderer::setViewMatrix(const Matrix4x4 &matrix){
 }
 
 void D3D9Renderer::setProjectionMatrix(const Matrix4x4 &matrix){
+	D3DMATRIX &d3dmatrix=cacheD3DMatrix;
+
 	if(mMirrorY){
 		cacheMatrix4x4.set(matrix);
 		cacheMatrix4x4.setAt(1,0,-cacheMatrix4x4.at(1,0));
 		cacheMatrix4x4.setAt(1,1,-cacheMatrix4x4.at(1,1));
 		cacheMatrix4x4.setAt(1,2,-cacheMatrix4x4.at(1,2));
 		cacheMatrix4x4.setAt(1,3,-cacheMatrix4x4.at(1,3));
-		toD3DMATRIX(cacheD3DMatrix,cacheMatrix4x4);
+		toD3DMATRIX(d3dmatrix,cacheMatrix4x4);
 	}
 	else{
-		toD3DMATRIX(cacheD3DMatrix,matrix);
+		toD3DMATRIX(d3dmatrix,matrix);
 	}
 
-	HRESULT result=mD3DDevice->SetTransform(D3DTS_PROJECTION,&cacheD3DMatrix TOADLET_D3DMFMT);
+	// Convert depth ranges from -1,1 to 0,1
+	//  Thanks to the OGRE project
+	int i;
+	for(i=0;i<4;++i){
+		d3dmatrix.m[i][2]=(d3dmatrix.m[i][2]+d3dmatrix.m[i][3])/2;
+	};
+
+	HRESULT result=mD3DDevice->SetTransform(D3DTS_PROJECTION,&d3dmatrix TOADLET_D3DMFMT);
 	TOADLET_CHECK_D3D9ERROR(result,"setProjectionMatrix");
 }
 
@@ -669,7 +678,7 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 		/// @todo: Only if we're not using shaders
 		TextureStage::Calculation calculation=textureStage->calculation;
 		Matrix4x4 &transform=cache_setTextureStage_transform;
-		bool identityTransform=texture->getRootTransform(textureStage->textureTime,transform);
+		bool identityTransform=(texture==NULL)?true:texture->getRootTransform(textureStage->textureTime,transform);
 		if(identityTransform==false){
 			calculation=TextureStage::Calculation_NORMAL;
 		}
