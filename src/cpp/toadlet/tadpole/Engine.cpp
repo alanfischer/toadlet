@@ -91,28 +91,30 @@
 #include <toadlet/tadpole/handler/TPKGHandler.h>
 #include <toadlet/tadpole/handler/WADHandler.h>
 
-#if defined(TOADLET_PLATFORM_WIN32)
+#if defined(TOADLET_HAS_GDIPLUS)
 	#include <toadlet/tadpole/handler/platform/win32/Win32TextureHandler.h>
-#elif defined(TOADLET_PLATFORM_OSX)
+#endif
+#if defined(TOADLET_PLATFORM_OSX)
 	#include <toadlet/tadpole/handler/platform/osx/OSXTextureHandler.h>
-#else
-	#include <toadlet/tadpole/handler/BMPHandler.h>
-	#if defined(TOADLET_HAS_GIF)
-		#include <toadlet/tadpole/handler/GIFHandler.h>
-	#endif
-	#if defined(TOADLET_HAS_JPEG)
-		#include <toadlet/tadpole/handler/JPEGHandler.h>
-	#endif
-	#if defined(TOADLET_HAS_PNG)
-		#include <toadlet/tadpole/handler/PNGHandler.h>
-	#endif
+#endif
+#include <toadlet/tadpole/handler/BMPHandler.h>
+#if defined(TOADLET_HAS_GIF)
+	#include <toadlet/tadpole/handler/GIFHandler.h>
+#endif
+#if defined(TOADLET_HAS_JPEG)
+	#include <toadlet/tadpole/handler/JPEGHandler.h>
+#endif
+#if defined(TOADLET_HAS_PNG)
+	#include <toadlet/tadpole/handler/PNGHandler.h>
 #endif
 
-#if defined(TOADLET_PLATFORM_WIN32)
+#if defined(TOADLET_HAS_GDIPLUS)
 	#include <toadlet/tadpole/handler/platform/win32/Win32FontHandler.h>
-#elif defined(TOADLET_PLATFORM_OSX)
+#endif
+#if defined(TOADLET_PLATFORM_OSX)
 	#include <toadlet/tadpole/handler/platform/osx/OSXFontHandler.h>
-#elif defined(TOADLET_HAS_FREETYPE)
+#endif
+#if defined(TOADLET_HAS_FREETYPE)
 	#include <toadlet/tadpole/handler/FreeTypeHandler.h>
 #endif
 
@@ -216,13 +218,13 @@ Engine::Engine():
 	#endif
 	mTextureManager->setHandler(SPRHandler::ptr(new SPRHandler(mTextureManager)),"spr");
 
-	// Font handlers
-	#if defined(TOADLET_HAS_GDIPLUS)
+	// Font handlers, try for freetype first, since it currently looks best.  This can be changed back once the others look as nice
+	#if defined(TOADLET_HAS_FREETYPE)
+		mFontManager->setDefaultHandler(FreeTypeHandler::ptr(new FreeTypeHandler(mTextureManager)));
+	#elif defined(TOADLET_HAS_GDIPLUS)
 		mFontManager->setDefaultHandler(Win32FontHandler::ptr(new Win32FontHandler(mTextureManager)));
 	#elif defined(TOADLET_PLATFORM_OSX)
 		mFontManager->setDefaultHandler(OSXFontHandler::ptr(new OSXFontHandler(mTextureManager)));
-	#elif defined(TOADLET_HAS_FREETYPE)
-		mFontManager->setDefaultHandler(FreeTypeHandler::ptr(new FreeTypeHandler(mTextureManager)));
 	#endif
 
 	// Material handlers
