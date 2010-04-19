@@ -62,7 +62,6 @@
 
 #include <toadlet/egg/mathfixed/Math.h>
 
-#include <toadlet/egg/net/ConnectionManager.h>
 #include <toadlet/egg/net/Socket.h>
 
 #endif

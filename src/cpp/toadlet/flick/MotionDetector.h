@@ -43,6 +43,16 @@ public:
 
 	class MotionData{
 	public:
+		MotionData():
+			time(0){}
+
+		void set(const MotionData &data){
+			time=data.time;
+			acceleration.set(data.acceleration);
+			velocity.set(data.velocity);
+			velocityFiltered.set(data.velocityFiltered);
+		}
+
 		uint64 time;
 		egg::math::Vector3 acceleration;
 		egg::math::Vector3 velocity;

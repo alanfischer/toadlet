@@ -2,6 +2,41 @@
 #include "lt_xmsh.h"
 #include "lt_mmsh.h"
 
+class GravityFollower:public NodeListener,MotionDetectorListener{
+public:
+	GravityFollower(MotionDetector *detector,float offset){
+		mDetector=detector;
+		mDetector->setListener(this);
+		mOffset=offset;
+	}
+
+	void nodeDestroyed(Node *node){
+		mDetector->setListener(NULL);
+	}
+
+	void logicUpdate(Node *node,int dt){}
+	
+	void frameUpdate(Node *node,int dt){
+		mMotionMutex.lock();
+		Vector3 gravity(mMotionData.acceleration);
+		Math::normalize(gravity);
+		Math::mul(gravity,mOffset);
+		node->setTranslate(gravity);
+		mMotionMutex.unlock();
+	}
+	
+	void motionDetected(const MotionDetector::MotionData &motionData){
+		mMotionMutex.lock();
+		mMotionData.set(motionData);
+		mMotionMutex.unlock();
+	}
+
+	MotionDetector *mDetector;
+	float mOffset;
+	Mutex mMotionMutex;
+	MotionDetector::MotionData mMotionData;
+};
+
 // To keep this example as simple as possible, it does not require any other data files, instead getting its data from lt_xmsh
 Logo::Logo():Application(){
 }
@@ -12,23 +47,29 @@ Logo::~Logo(){
 void Logo::create(){
 	Application::create();
 
-	scene=((new SceneNode(mEngine))->create(NULL))->getScene();
+	scene=Scene::ptr(new Scene(mEngine));
 
 	MemoryStream::ptr in(new MemoryStream(lt_mmsh::data,lt_mmsh::length,lt_mmsh::length,false));
 	Mesh::ptr mesh=shared_static_cast<Mesh>(getEngine()->getMeshManager()->getHandler("mmsh")->load(in,NULL));
-	//MemoryInputStream::ptr in(new MemoryInputStream(lt_xmsh::data,lt_xmsh::length));
+	//MemoryStream::ptr in(new MemoryStream(lt_xmsh::data,lt_xmsh::length,lt_xmsh::length,false));
 	//Mesh::ptr mesh=shared_static_cast<Mesh>(getEngine()->getMeshManager()->getHandler("xmsh")->load(in,NULL));
 
 	meshNode=getEngine()->createNodeType(MeshNode::type(),scene);
 	meshNode->setMesh(mesh);
 	meshNode->getAnimationController()->start();
 	meshNode->getAnimationController()->setCycling(MeshNode::MeshAnimationController::Cycling_REFLECT);
-	scene->getRootNode()->attach(meshNode);
+	scene->getRoot()->attach(meshNode);
 
 	cameraNode=getEngine()->createNodeType(CameraNode::type(),scene);
-	cameraNode->setLookDir(Vector3(Math::fromInt(25),-Math::fromInt(100),0),Math::Y_UNIT_VECTOR3,Math::Z_UNIT_VECTOR3);
+	cameraNode->setLookAt(Vector3(0,0,Math::fromInt(25)),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
+	cameraNode->setTarget(meshNode);
 	cameraNode->setClearColor(Colors::BLUE);
-	scene->getRootNode()->attach(cameraNode);
+	scene->getRoot()->attach(cameraNode);
+
+	MotionDetector *motionDetector=getMotionDetector();
+	if(motionDetector!=NULL){
+		cameraNode->addNodeListener(NodeListener::ptr(new GravityFollower(motionDetector,Math::length(cameraNode->getTranslate()))));
+	}
 }
 
 void Logo::resized(int width,int height){

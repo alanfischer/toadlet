@@ -1,14 +1,14 @@
 #ifndef LOGO_H
 #define LOGO_H
 
-#include <toadlet/egg/io/MemoryStream.h>
-#include <toadlet/tadpole/node/CameraNode.h>
-#include <toadlet/tadpole/node/MeshNode.h>
-#include <toadlet/tadpole/node/SceneNode.h>
-#include <toadlet/pad/Application.h>
+#include <toadlet/egg.h>
+#include <toadlet/flick.h>
+#include <toadlet/tadpole.h>
+#include <toadlet/pad.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
+using namespace toadlet::flick;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole;
 using namespace toadlet::tadpole::node;
