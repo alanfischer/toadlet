@@ -17,7 +17,8 @@ set (LIBS ${TOADLET_EGG_LIB} ${TOADLET_PEEPER_LIB} ${TOADLET_RIBBIT_LIB} ${TOADL
 # Source files
 set (SRC
 	Logo.cpp
-	main.cpp
+	lt_xmsh.cpp
+	lt_mmsh.cpp
 )
 
 # Headers
