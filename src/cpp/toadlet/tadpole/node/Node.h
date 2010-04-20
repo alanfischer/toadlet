@@ -78,6 +78,7 @@ public:
 	virtual Node *create(Scene *scene);
 	inline bool created() const{return mCreated;}
 	virtual void destroy();
+	inline bool destroyed() const{return !mCreated;}
 
 	virtual ParentNode *isParent(){return NULL;}
 	virtual Node *isEntity(){return NULL;}

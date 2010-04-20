@@ -57,6 +57,7 @@
 #include <toadlet/egg/io/DataStream.h>
 #include <toadlet/egg/io/FileStream.h>
 #include <toadlet/egg/io/MemoryStream.h>
+#include <toadlet/egg/io/SocketStream.h>
 
 #include <toadlet/egg/math/Math.h>
 

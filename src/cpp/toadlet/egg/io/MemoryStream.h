@@ -44,11 +44,12 @@ public:
 	virtual ~MemoryStream();
 
 	virtual void close(){}
+	virtual bool closed(){return false;}
 
-	virtual bool isReadable(){return true;}
+	virtual bool readable(){return true;}
 	virtual int read(byte *buffer,int length);
 
-	virtual bool isWriteable(){return true;}
+	virtual bool writeable(){return true;}
 	virtual int write(const byte *buffer,int length);
 
 	virtual bool reset();

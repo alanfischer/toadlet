@@ -68,8 +68,8 @@ public:
 	/// Wait for a connection
 	bool accept(int localPort);
 
-	bool opened(){return mRun;}
 	void close();
+	bool closed(){return mRun==false;}
 
 	bool blocking(){return false;}
 

@@ -40,6 +40,7 @@ set (EGG_IO_SRC
 	io/DataStream.cpp
 	io/FileStream.cpp
 	io/MemoryStream.cpp
+	io/SocketStream.cpp
 	io/TPKGArchive.cpp
 )
 set (EGG_IO_ZZIP_SRC
@@ -161,6 +162,7 @@ set (EGG_IO_HEADERS
 	io/DataStream.h
 	io/FileStream.h
 	io/MemoryStream.h
+	io/SocketStream.h
 	io/Stream.h
 	io/TPKGArchive.h
 )

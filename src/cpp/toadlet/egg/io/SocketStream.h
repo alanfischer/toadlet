@@ -23,35 +23,40 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_IO_STREAM_H
-#define TOADLET_EGG_IO_STREAM_H
+#ifndef TOADLET_EGG_IO_SOCKETSTREAM_H
+#define TOADLET_EGG_IO_SOCKETSTREAM_H
 
-#include <toadlet/Types.h>
-#include <toadlet/egg/WeakPointer.h>
+#include <toadlet/egg/io/Stream.h>
+#include <toadlet/egg/net/Socket.h>
+#include <stdio.h>
 
 namespace toadlet{
 namespace egg{
 namespace io{
 
-class Stream{
+class TOADLET_API SocketStream:public Stream{
 public:
-	TOADLET_SHARED_POINTERS(Stream);
+	TOADLET_SHARED_POINTERS(SocketStream);
 
-	virtual ~Stream(){}
+	SocketStream(net::Socket::ptr socket);
+	virtual ~SocketStream();
 
-	virtual void close()=0;
-	virtual bool closed()=0;
+	virtual void close(){mSocket->close();}
+	virtual bool closed(){return mSocket->closed();}
 
-	virtual bool readable()=0;
-	virtual int read(byte *buffer,int length)=0;
+	virtual bool readable(){return true;}
+	virtual int read(byte *buffer,int length);
 
-	virtual bool writeable()=0;
-	virtual int write(const byte *buffer,int length)=0;
+	virtual bool writeable(){return true;}
+	virtual int write(const byte *buffer,int length);
 
-	virtual bool reset()=0;
-	virtual int length()=0;
-	virtual int position()=0;
-	virtual bool seek(int offs)=0;
+	virtual bool reset(){return false;}
+	virtual int length(){return 0;}
+	virtual int position(){return 0;}
+	virtual bool seek(int offs){return false;}
+
+protected:
+	net::Socket::ptr mSocket;
 };
 
 }
