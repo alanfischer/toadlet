@@ -14,6 +14,7 @@ set (FLICK_HEADERS
 	FilteredMotionDetector.h
 	MotionDetector.h
 	MotionDetectorListener.h
+	Types.h
 	Version.h
 )
 

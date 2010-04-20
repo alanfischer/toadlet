@@ -198,14 +198,14 @@ void SamsungMotionDetector::run(){
 		}
 
 		int values[3]={0};
-		real scale=9.8 * 3.3793103448275862068965517241379;
+		float scale=9.8 * 3.3793103448275862068965517241379;
 		DeviceIoControl(mSensor,CONTROL_TILT_READ,NULL,0,values,sizeof(values),NULL,NULL);
 		bool result=false;
 		if(mNative){
-			result=updateAcceleration(System::mtime(),values[0]*scale,values[1]*scale,values[2]*scale);
+			result=updateAcceleration(System::mtime(),Math::fromFloat(values[0]*scale),Math::fromFloat(values[1]*scale),Math::fromFloat(values[2]*scale));
 		}
 		else{
-			result=updateAcceleration(System::mtime(),values[1]*scale,values[0]*scale,-values[2]*scale);
+			result=updateAcceleration(System::mtime(),Math::fromFloat(values[1]*scale),Math::fromFloat(values[0]*scale),Math::fromFloat(-values[2]*scale));
 		}
 		if(result){
 			mOuterMutex.lock();

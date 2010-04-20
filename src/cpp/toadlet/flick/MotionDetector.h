@@ -26,7 +26,7 @@
 #ifndef TOADLET_FLICK_MOTIONDETECTOR_H
 #define TOADLET_FLICK_MOTIONDETECTOR_H
 
-#include <toadlet/egg/math/Vector3.h>
+#include <toadlet/flick/Types.h>
 
 namespace toadlet{
 namespace flick{
@@ -54,9 +54,9 @@ public:
 		}
 
 		uint64 time;
-		egg::math::Vector3 acceleration;
-		egg::math::Vector3 velocity;
-		egg::math::Vector3 velocityFiltered;
+		Vector3 acceleration;
+		Vector3 velocity;
+		Vector3 velocityFiltered;
 	};
 
 	virtual ~MotionDetector(){}
@@ -73,7 +73,7 @@ public:
 
 	virtual void setPollSleep(int ms)=0; // Milliseconds to sleep between polls
 
-	virtual void setFilterAlpha(egg::math::real alpha)=0;
+	virtual void setFilterAlpha(scalar alpha)=0;
 
 	virtual void setNativeOrientation(bool native)=0;
 

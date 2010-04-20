@@ -229,7 +229,7 @@ void ParentNode::deactivate(){
 }
 
 void ParentNode::tryDeactivate(){
-	if(mDeactivateCount>=0){
+	if(mDeactivateCount>=0 && mNodeListeners==NULL){
 		if(mChildrenActive==false){
 			mDeactivateCount++;
 			if(mDeactivateCount>4){
