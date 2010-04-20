@@ -40,7 +40,6 @@ namespace peeper{
 	using namespace toadlet::egg::math;
 #endif
 
-
 }
 }
 

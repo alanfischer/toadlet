@@ -236,7 +236,7 @@ void HTCMotionDetector::run(){
 		ZeroMemory(&mSensorData,sizeof(mSensorData));
 		pfnHTCSensorGetDataOutput(mSensor,&mSensorData);
 		// No need to swap anything around, since HTC native orientation is flick orientation
-		if(updateAcceleration(System::mtime(),(float)mSensorData.TiltX/1000.0,(float)mSensorData.TiltY/1000.0,(float)mSensorData.TiltZ/1000.0)){
+		if(updateAcceleration(System::mtime(),Math::fromMilli(mSensorData.TiltX),Math::fromMilli(mSensorData.TiltY),Math::fromMilli(mSensorData.TiltZ))){
 			mOuterMutex.lock();
 				mListenerLocked=true;
 			mInnerMutex.lock();

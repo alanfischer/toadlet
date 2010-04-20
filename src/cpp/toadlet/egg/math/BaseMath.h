@@ -92,6 +92,10 @@ namespace Math{
 
 	inline int toInt(real r){return (int)r;}
 
+	inline real fromFloat(float f){return f;}
+
+	inline float toFloat(real r){return r;}
+
 	inline real abs(real r){return ::fabs(r);}
 	inline int abs(int i){return (i^(i>>31))-(i>>31);}
 
