@@ -23,6 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
+#if 0
+
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
@@ -167,3 +169,5 @@ void Win32BluetoothServerQuery::clearServers(){
 }
 }
 }
+
+#endif

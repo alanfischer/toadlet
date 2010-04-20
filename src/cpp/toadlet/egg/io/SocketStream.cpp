@@ -23,40 +23,33 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_IO_STREAM_H
-#define TOADLET_EGG_IO_STREAM_H
+#include <toadlet/egg/io/SocketStream.h>
 
-#include <toadlet/Types.h>
-#include <toadlet/egg/WeakPointer.h>
+using namespace toadlet::egg::net;
 
 namespace toadlet{
 namespace egg{
 namespace io{
 
-class Stream{
-public:
-	TOADLET_SHARED_POINTERS(Stream);
-
-	virtual ~Stream(){}
-
-	virtual void close()=0;
-	virtual bool closed()=0;
-
-	virtual bool readable()=0;
-	virtual int read(byte *buffer,int length)=0;
-
-	virtual bool writeable()=0;
-	virtual int write(const byte *buffer,int length)=0;
-
-	virtual bool reset()=0;
-	virtual int length()=0;
-	virtual int position()=0;
-	virtual bool seek(int offs)=0;
-};
-
-}
-}
+SocketStream::SocketStream(Socket::ptr socket)
+	//mSocket
+{
+	mSocket=socket;
 }
 
-#endif
+SocketStream::~SocketStream(){
+	// Don't close the socket on destruction, we'll leave that up to the socket itself
+}
+
+int SocketStream::read(byte *buffer,int length){
+	return mSocket->receive(buffer,length);
+}
+
+int SocketStream::write(const byte *buffer,int length){
+	return mSocket->send(buffer,length);
+}
+
+}	
+}
+}
 

@@ -52,10 +52,6 @@ FileStream::~FileStream(){
 	close();
 }
 
-bool FileStream::isOpen() const{
-	return mFile!=NULL;
-}
-
 void FileStream::close(){
 	if(mFile && mAutoClose){
 		fclose(mFile);

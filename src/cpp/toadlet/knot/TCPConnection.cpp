@@ -263,7 +263,7 @@ int TCPConnection::send(const byte *data,int length){
 
 	mOutPacket->reset();
 
-	if(amount<0 && opened()){
+	if(amount<0 && closed()==false){
 		close();
 	}
 
@@ -276,7 +276,7 @@ int TCPConnection::receive(byte *data,int length){
 
 	mMutex->lock();
 		// Start or notify the debug thread to stop if necessary
-		if(mSocket->isClosed()==false && mDebugPacketDelayMinTime>0 && mDebugThread==NULL){
+		if(mSocket->closed()==false && mDebugPacketDelayMinTime>0 && mDebugThread==NULL){
 			mDebugThread=Thread::ptr(new Thread(this));
 			mDebugRun=true;
 			mDebugThread->start();
@@ -363,7 +363,7 @@ int TCPConnection::receive(byte *data,int length){
 		TOADLET_CATCH(const Exception &){amount=-1;}
 	}
 
-	if(amount<0 && opened()){
+	if(amount<0 && closed()==false){
 		close();
 	}
 

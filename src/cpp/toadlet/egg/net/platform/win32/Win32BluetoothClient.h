@@ -40,7 +40,7 @@ public:
 	virtual ~Win32BluetoothClient();
 
 	virtual bool connect(BluetoothAddress *address);
-	virtual bool isConnected() const;
+	virtual bool connected() const;
 
 	virtual void close();
 

@@ -32,7 +32,7 @@
 #	define WIN32_LEAN_AND_MEAN 1
 #endif
 #include <windows.h>
-#include <winsock2.h>
+#include <winsock.h>
 #include <ws2bth.h>
 #include <bthapi.h>
 #include <bthutil.h>

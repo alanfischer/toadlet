@@ -76,7 +76,7 @@ Stream::ptr ArchiveManager::openStream(const String &name){
 		else{
 			fileStream=FileStream::ptr(new FileStream(name,FileStream::Open_READ_BINARY));
 		}
-		if(fileStream->isOpen()){
+		if(fileStream->closed()==false){
 			stream=fileStream;
 		}
 	}

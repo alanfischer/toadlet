@@ -170,7 +170,7 @@ Stream::ptr ZIPArchive::openStream(const String &name){
 	}
 
 	ZIPStream::ptr stream(new ZIPStream((ZZIP_DIR*)mDir,name));
-	if(stream->isOpen()){
+	if(stream->closed()==false){
 		return stream;
 	}
 	else{
