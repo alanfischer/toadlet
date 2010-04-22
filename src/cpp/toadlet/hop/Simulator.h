@@ -111,6 +111,8 @@ public:
 	void snapToGrid(Vector3 &position) const;
 	bool toSmall(const Vector3 &dist) const;
 
+	int countActiveSolids();
+
 protected:
 	void traceSegmentWithCurrentSpacials(Collision &result,const Segment &segment,int collideWithBits,Solid *ignore);
 	void traceSolidWithCurrentSpacials(Collision &result,Solid *solid,const Segment &segment,int collideWithBits);

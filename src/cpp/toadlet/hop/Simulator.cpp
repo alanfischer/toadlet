@@ -1509,6 +1509,16 @@ void Simulator::integrationStep(Solid *solid,const Vector3 &x,const Vector3 &v,c
 	updateAcceleration(resultV,solid,tx,tv,fdt);
 }
 
+int Simulator::countActiveSolids(){
+	int active=0;
+	int i;
+	for(i=0;i<mSolids.size();++i){
+		if(mSolids[i]->mActive){
+			active++;
+		}
+	}
+	return active;
+}
 
 }
 }
