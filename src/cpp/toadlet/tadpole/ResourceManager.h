@@ -62,6 +62,8 @@ public:
 	virtual void setDefaultHandler(ResourceHandler::ptr handler);
 	virtual ResourceHandler::ptr getDefaultHandler(){return mDefaultHandler;}
 
+	virtual ResourceHandler::ptr findHandler(const egg::String &extension);
+
 	virtual void setDefaultExtension(const egg::String &extension){mDefaultExtension=extension;}
 	virtual const egg::String &getDefaultExtension(){return mDefaultExtension;}
 
