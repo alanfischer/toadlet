@@ -23,6 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
+#if 0
+
 #include <toadlet/egg/net/platform/win32/Win32BluetoothClient.h>
 #include <toadlet/egg/net/platform/win32/Win32BluetoothIncludes.h>
 
@@ -58,8 +60,8 @@ bool Win32BluetoothClient::connect(BluetoothAddress *btAddress){
 	return true;
 }
 
-bool Win32BluetoothClient::isConnected() const{
-	return Socket::isConnected();
+bool Win32BluetoothClient::connected() const{
+	return Socket::connected();
 }
 
 void Win32BluetoothClient::close(){
@@ -77,3 +79,5 @@ int Win32BluetoothClient::send(const byte *buffer,int length){
 }
 }
 }
+
+#endif

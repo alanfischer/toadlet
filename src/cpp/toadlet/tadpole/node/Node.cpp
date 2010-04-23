@@ -157,6 +157,9 @@ void Node::addNodeListener(NodeListener::ptr listener){
 void Node::removeNodeListener(NodeListener::ptr listener){
 	if(mNodeListeners!=NULL){
 		mNodeListeners->remove(listener);
+		if(mNodeListeners->size()==0){
+			mNodeListeners=NULL;
+		}
 	}
 }
 
@@ -275,7 +278,7 @@ void Node::deactivate(){
 }
 
 void Node::tryDeactivate(){
-	if(mDeactivateCount>=0){
+	if(mDeactivateCount>=0 && mNodeListeners==NULL){
 		mDeactivateCount++;
 		if(mDeactivateCount>4){
 			deactivate();

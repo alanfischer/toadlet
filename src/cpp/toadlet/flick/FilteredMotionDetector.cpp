@@ -33,18 +33,18 @@ namespace toadlet{
 namespace flick{
 
 FilteredMotionDetector::FilteredMotionDetector():
-	mAlpha(0.667)
+	mAlpha(Math::fromMilli(667))
 	//mMotionData
 {}
 
 FilteredMotionDetector::~FilteredMotionDetector(){
 }
 
-void FilteredMotionDetector::setFilterAlpha(real alpha){
+void FilteredMotionDetector::setFilterAlpha(scalar alpha){
 	mAlpha=alpha;
 }
 
-bool FilteredMotionDetector::updateAcceleration(int time,float x,float y,float z){
+bool FilteredMotionDetector::updateAcceleration(int time,scalar x,scalar y,scalar z){
 	Vector3 &lastAcceleration=cache_updateAcceleration_lastAcceleration.set(mMotionData.acceleration);
 	Vector3 &lastVelocity=cache_updateAcceleration_lastAcceleration.set(mMotionData.velocity);
 	Vector3 &lastVelocityFiltered=cache_updateAcceleration_lastVelocityFiltered.set(mMotionData.velocityFiltered);

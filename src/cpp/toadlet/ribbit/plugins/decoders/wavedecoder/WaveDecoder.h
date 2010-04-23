@@ -37,11 +37,12 @@ public:
 	virtual ~WaveDecoder();
 
 	void close(){}
+	bool closed(){return false;}
 
-	bool isReadable(){return true;}
+	bool readable(){return true;}
 	int read(byte *buffer,int length);
 
-	bool isWriteable(){return false;}
+	bool writeable(){return false;}
 	int write(const byte *buffer,int length){return 0;}
 
 	bool startStream(egg::io::Stream::ptr stream);

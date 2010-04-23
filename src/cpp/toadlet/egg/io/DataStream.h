@@ -42,11 +42,12 @@ public:
 	virtual ~DataStream();
 
 	virtual void close(){mStream->close();}
+	virtual bool closed(){return mStream->closed();}
 
-	virtual bool isReadable(){return mStream->isReadable();}
+	virtual bool readable(){return mStream->readable();}
 	virtual int read(byte *buffer,int length){return mStream->read(buffer,length);}
 
-	virtual bool isWriteable(){return mStream->isWriteable();}
+	virtual bool writeable(){return mStream->writeable();}
 	virtual int write(const byte *buffer,int length){return mStream->write(buffer,length);}
 
 	virtual bool reset(){return mStream->reset();}

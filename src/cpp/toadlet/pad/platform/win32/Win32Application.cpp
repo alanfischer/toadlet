@@ -118,9 +118,9 @@ Win32Application::Win32Application():
 	mHeight(-1),
 	mFullscreen(false),
 	#if defined(TOADLET_PLATFORM_WINCE)
-		mVisual(ImageDefinitions::Format_RGB_5_6_5,16),
+		mVisual(ImageDefinitions::Format_RGB_5_6_5,16,0),
 	#else
-		mVisual(ImageDefinitions::Format_RGB_8,16),
+		mVisual(ImageDefinitions::Format_RGB_8,16,2),
 	#endif
 	mApplicationListener(NULL),
 	mMouseLocked(false),

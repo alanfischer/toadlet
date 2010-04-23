@@ -6,6 +6,7 @@
 #include <toadlet/tadpole.h>
 #include <toadlet/pad.h>
 
+using namespace toadlet;
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
 using namespace toadlet::flick;

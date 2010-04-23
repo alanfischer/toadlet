@@ -126,14 +126,6 @@ Socket::~Socket(){
 	close();
 }
 
-bool Socket::isBound() const{
-	return mBound;
-}
-
-bool Socket::isConnected() const{
-	return mConnected;
-}
-
 void Socket::close(){
 	int result=0;
 	if(mHandle!=TOADLET_INVALID_SOCKET){
@@ -154,18 +146,6 @@ void Socket::close(){
 	if(result==TOADLET_SOCKET_ERROR){
 		error("closesocket");
 	}
-}
-
-bool Socket::isClosed() const{
-	return mHandle==TOADLET_INVALID_SOCKET;
-}
-
-uint32 Socket::getHostIPAddress(){
-	return mHostIPAddress;
-}
-
-int Socket::getHostPort() const{
-	return mHostPort;
 }
 
 bool Socket::setSendBufferSize(int size){

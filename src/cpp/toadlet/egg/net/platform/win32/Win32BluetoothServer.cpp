@@ -23,6 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
+#if 0
+
 #include <toadlet/egg/net/platform/win32/Win32BluetoothServer.h>
 
 namespace toadlet{
@@ -188,3 +190,5 @@ int Win32BluetoothServer::registerService(const GUID &guid,unsigned char port){
 }
 }
 }
+
+#endif

@@ -40,11 +40,12 @@ public:
 	virtual ~Stream(){}
 
 	virtual void close()=0;
+	virtual bool closed()=0;
 
-	virtual bool isReadable()=0;
+	virtual bool readable()=0;
 	virtual int read(byte *buffer,int length)=0;
 
-	virtual bool isWriteable()=0;
+	virtual bool writeable()=0;
 	virtual int write(const byte *buffer,int length)=0;
 
 	virtual bool reset()=0;

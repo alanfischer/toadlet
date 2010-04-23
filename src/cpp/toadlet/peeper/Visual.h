@@ -41,13 +41,13 @@ public:
 		vsync(true)
 	{}
 
-	Visual(int pixelFormat,int depthBits):
+	Visual(int pixelFormat,int depthBits,int multisamples):
 		stencilBits(0),
-		multisamples(2),
 		vsync(true)
 	{
 		this->pixelFormat=pixelFormat;
 		this->depthBits=depthBits;
+		this->multisamples=multisamples;
 	}
 
 	int pixelFormat;

@@ -43,7 +43,7 @@ ZIPStream::ZIPStream(Stream::ptr stream,int openFlags):
 	mFile(NULL)
 {
 	if(openFlags==OpenFlags_UNKNOWN){
-		openFlags=(stream->isReadable()?OpenFlags_READ:0) | (stream->isWriteable()?OpenFlags_WRITE:0);
+		openFlags=(stream->readable()?OpenFlags_READ:0) | (stream->writeable()?OpenFlags_WRITE:0);
 	}
 
 	if(openFlags==(OpenFlags_READ|OpenFlags_WRITE)){
@@ -83,8 +83,8 @@ ZIPStream::~ZIPStream(){
 	close();
 }
 
-bool ZIPStream::isOpen(){
-	return mStream!=NULL?true:(mFile!=NULL);
+bool ZIPStream::closed(){
+	return mStream==NULL?true:(mFile==NULL);
 }
 
 void ZIPStream::close(){

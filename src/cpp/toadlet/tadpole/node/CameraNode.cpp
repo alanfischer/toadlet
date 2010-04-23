@@ -216,7 +216,6 @@ void CameraNode::setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 
 	Math::setTranslateFromMatrix4x4(mTranslate,transform);
 	Math::setQuaternionFromMatrix4x4(mRotate,transform);
 	transformUpdated();
-
 }
 
 void CameraNode::setWorldLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up){

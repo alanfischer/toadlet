@@ -36,7 +36,7 @@
 		#define WIN32_LEAN_AND_MEAN 1
 	#endif
 	#include <windows.h>
-	#include <winsock2.h>
+	#include <winsock.h>
 #else
 	#include <unistd.h>
 	#include <netdb.h> 
@@ -72,20 +72,20 @@ public:
 	static Socket *createUDPSocket();
 
 	virtual bool bind(int port=0);
-	virtual bool isBound() const;
+	virtual bool bound(){return mBound;}
 
 	virtual bool connect(uint32 ipAddress,int port);
 	virtual bool connect(const String &name,int port);
-	virtual bool isConnected() const;
+	virtual bool connected(){return mConnected;}
 
 	virtual bool listen(int backlog);
 	virtual Socket *accept();
 
 	virtual void close();
-	virtual bool isClosed() const;
+	virtual bool closed(){return mHandle==TOADLET_INVALID_SOCKET;}
 
-	virtual uint32 getHostIPAddress();
-	virtual int getHostPort() const;
+	virtual uint32 getHostIPAddress() const{return mHostIPAddress;}
+	virtual int getHostPort() const{return mHostPort;}
 
 	virtual bool setSendBufferSize(int size);
 	virtual int getSendBufferSize() const;

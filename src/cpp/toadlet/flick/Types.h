@@ -23,33 +23,22 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_FILTEREDMOTIONDETECTOR_H
-#define TOADLET_FLICK_FILTEREDMOTIONDETECTOR_H
+#ifndef TOADLET_FLICK_TYPES_H
+#define TOADLET_FLICK_TYPES_H
 
-#include <toadlet/flick/MotionDetector.h>
-#include <toadlet/flick/MotionDetectorListener.h>
+#include <toadlet/Types.h>
+#include <toadlet/egg/mathfixed/Math.h>
+#include <toadlet/egg/math/Math.h>
+#include <toadlet/egg/SharedPointer.h>
 
 namespace toadlet{
 namespace flick{
 
-class TOADLET_API FilteredMotionDetector:public MotionDetector{
-public:
-	FilteredMotionDetector();
-	virtual ~FilteredMotionDetector();
-
-	virtual void setFilterAlpha(scalar alpha);
-
-protected:
-	virtual bool updateAcceleration(int time,scalar x,scalar y,scalar z);
-
-	scalar mAlpha;
-	MotionData mMotionData;
-
-	Vector3 cache_updateAcceleration_lastAcceleration;
-	Vector3 cache_updateAcceleration_lastVelocity;
-	Vector3 cache_updateAcceleration_lastVelocityFiltered;
-	Vector3 cache_updateAcceleration_vector;
-};
+#if defined(TOADLET_FIXED_POINT)
+	using namespace toadlet::egg::mathfixed;
+#else
+	using namespace toadlet::egg::math;
+#endif
 
 }
 }

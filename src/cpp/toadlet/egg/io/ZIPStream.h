@@ -51,13 +51,13 @@ public:
 
 	virtual ~ZIPStream();
 
-	bool isOpen();
 	void close();
+	bool closed();
 
-	bool isReadable(){return mStream!=NULL?mStream->isReadable():true;}
+	bool readable(){return mStream!=NULL?mStream->readable():true;}
 	int read(byte *buffer,int length);
 
-	bool isWriteable(){return mStream!=NULL?mStream->isWriteable():false;}
+	bool writeable(){return mStream!=NULL?mStream->writeable():false;}
 	int write(const byte *buffer,int length);
 
 	bool reset();
