@@ -100,7 +100,7 @@ bool BackableIndexBuffer::unlock(){
 void BackableIndexBuffer::setBack(IndexBuffer::ptr back,bool initial){
 	if(back!=mBack && mBack!=NULL){
 		mData=new uint8[mDataSize];
-		uint8 *data=NULL;
+		byte *data=NULL;
 		TOADLET_TRY
 			data=lock(AccessType_READ_ONLY);
 		TOADLET_CATCH(const Exception &){data=NULL;}
@@ -111,7 +111,7 @@ void BackableIndexBuffer::setBack(IndexBuffer::ptr back,bool initial){
 	mBack=back;
 	
 	if(initial==false && mBack!=NULL && mData!=NULL){
-		uint8 *data=NULL;
+		byte *data=NULL;
 		TOADLET_TRY
 			data=lock(AccessType_WRITE_ONLY);
 		TOADLET_CATCH(const Exception &){data=NULL;}

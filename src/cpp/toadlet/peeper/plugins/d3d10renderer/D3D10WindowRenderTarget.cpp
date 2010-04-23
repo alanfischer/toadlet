@@ -47,6 +47,7 @@ D3D10WindowRenderTarget::D3D10WindowRenderTarget():D3D10RenderTarget(),
 {
 }
 
+/// @todo: Move the debug command to some "parameters" sort of thing that I can pass in, maybe like the Renderer?
 D3D10WindowRenderTarget::D3D10WindowRenderTarget(HWND wnd,const Visual &visual,bool debug):D3D10RenderTarget(),
 	mLibrary(0),
 	mSwapChain(NULL),

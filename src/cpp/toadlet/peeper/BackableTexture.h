@@ -43,12 +43,11 @@ public:
 	virtual Texture *getRootTexture(scalar time){return mBack!=NULL?mBack->getRootTexture(time):NULL;}
 	virtual bool getRootTransform(scalar time,Matrix4x4 &transform){return mBack!=NULL?mBack->getRootTransform(time,transform):true;}
 
-	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels);
+	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]);
 	virtual void destroy();
 
-	virtual bool createContext(){return mBack->createContext();}
-	virtual void destroyContext(bool backData){mBack->destroyContext(backData);}
-	virtual bool contextNeedsReset(){return mBack->contextNeedsReset();}
+	virtual void resetCreate(){}
+	virtual void resetDestroy(){}
 
 	virtual int getUsageFlags() const{return mUsageFlags;}
 	virtual Dimension getDimension() const{return mDimension;}
@@ -60,10 +59,10 @@ public:
 	virtual scalar getLength() const{return 0;}
 
 	virtual Surface::ptr getMipSurface(int level,int cubeSide);
-	virtual bool load(int format,int width,int height,int depth,int mipLevel,uint8 *data);
-	virtual bool read(int format,int width,int height,int depth,int mipLevel,uint8 *data);
+	virtual bool load(int width,int height,int depth,int mipLevel,byte *mipData);
+	virtual bool read(int width,int height,int depth,int mipLevel,byte *mipData);
 
-	virtual void setBack(Texture::ptr back,bool initial=false);
+	virtual void setBack(Texture::ptr back);
 	virtual Texture::ptr getBack(){return mBack;}
 
 protected:
@@ -75,8 +74,10 @@ protected:
 	int mDepth;
 	int mMipLevels;
 
+	int mRowPitch;
+	int mSlicePitch;
 	int mDataSize;
-	uint8 *mData;
+	byte *mData;
 	Texture::ptr mBack;
 };
 

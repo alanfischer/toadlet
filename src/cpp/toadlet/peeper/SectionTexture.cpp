@@ -108,28 +108,11 @@ bool SectionTexture::getRootTransform(int frame,Matrix4x4 &transform){
 	return false;
 }
 
-bool SectionTexture::create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels){
-	Error::unimplemented("create not implemented for SectionTexture");
-	return false;
-}
-
 void SectionTexture::destroy(){
 	if(mTexture!=NULL){
 		mTexture->release();
 		mTexture=NULL;
 	}
-}
-
-bool SectionTexture::createContext(){
-	return mTexture!=NULL?mTexture->createContext():false;
-}
-
-void SectionTexture::destroyContext(bool backData){
-	if(mTexture!=NULL) mTexture->destroyContext(backData);
-}
-
-bool SectionTexture::contextNeedsReset(){
-	return mTexture!=NULL?mTexture->contextNeedsReset():false;
 }
 
 int SectionTexture::getWidth() const{

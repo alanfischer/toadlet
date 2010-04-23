@@ -71,17 +71,17 @@ bool D3D10Buffer::create(int usageFlags,AccessType accessType,IndexFormat indexF
 
 	mBindFlags|=D3D10_BIND_INDEX_BUFFER;
 
-	// Having issues with being able to Map a DYANMIC buffer, not sure why, so dont map for now
-	mMapping=false;//(mUsageFlags&Buffer::UsageFlags_STATIC)==0;//mRenderer->useMapping(this);
+	bool result=true;
+	mMapping=(mUsageFlags&Buffer::UsageFlags_STATIC)==0;
 	if(mMapping){
-		createContext();
+		result=createContext();
 	}
 	else{
 		mData=new uint8[mDataSize];
 		mBacking=true;
 	}
 
-	return true;
+	return result;
 }
 
 bool D3D10Buffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size){
@@ -96,17 +96,17 @@ bool D3D10Buffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr 
 
 	mBindFlags|=D3D10_BIND_VERTEX_BUFFER;
 
-	// Having issues with being able to Map a DYANMIC buffer, not sure why, so dont map for now
-	mMapping=false;//(mUsageFlags&Buffer::UsageFlags_STATIC)==0;//mRenderer->useMapping(this);
+	bool result=true;
+	mMapping=(mUsageFlags&Buffer::UsageFlags_STATIC)==0;
 	if(mMapping){
-		createContext();
+		result=createContext();
 	}
 	else{
 		mData=new uint8[mDataSize];
 		mBacking=true;
 	}
 
-	return true;
+	return result;
 }
 
 void D3D10Buffer::destroy(){
@@ -173,7 +173,7 @@ void D3D10Buffer::destroyContext(bool backData){
 		mData=new uint8[mDataSize];
 		mBacking=true;
 
-		uint8 *data=lock(AccessType_READ_ONLY);
+		byte *data=lock(AccessType_READ_ONLY);
 		memcpy(mData,data,mDataSize);
 		unlock();
 	}
@@ -196,7 +196,7 @@ uint8 *D3D10Buffer::lock(AccessType lockType){
 				mapType=D3D10_MAP_READ;
 			break;
 			case AccessType_WRITE_ONLY:
-				mapType=D3D10_MAP_WRITE;
+				mapType=D3D10_MAP_WRITE_DISCARD;
 			break;
 			case AccessType_READ_WRITE:
 				mapType=D3D10_MAP_READ_WRITE;

@@ -46,12 +46,11 @@ public:
 	virtual Texture *getRootTexture(scalar time){return this;}
 	virtual bool getRootTransform(scalar time,Matrix4x4 &transform){return true;}
 
-	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels);
+	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]);
 	virtual void destroy();
 
-	virtual bool createContext();
-	virtual void destroyContext(bool backData);
-	virtual bool contextNeedsReset();
+	virtual void resetCreate();
+	virtual void resetDestroy();
 
 	virtual int getUsageFlags() const{return mUsageFlags;}
 	virtual Dimension getDimension() const{return mDimension;}
@@ -59,12 +58,14 @@ public:
 	virtual int getWidth() const{return mWidth;}
 	virtual int getHeight() const{return mHeight;}
 	virtual int getDepth() const{return mDepth;}
-	virtual int getNumMipLevels() const{return mTexture==NULL?0:mTexture->GetLevelCount();}
+	virtual int getNumMipLevels() const{return mMipLevels;} // If we just returned mTexture->GetLevelCount(), it could return 1 if we had autogenerate on, which isn't what is desired.
 	virtual scalar getLength() const{return 0;}
 
 	virtual Surface::ptr getMipSurface(int level,int cubeSide);
-	virtual bool load(int format,int width,int height,int depth,int mipLevel,uint8 *data);
-	virtual bool read(int format,int width,int height,int depth,int mipLevel,uint8 *data);
+	virtual bool load(int width,int height,int depth,int mipLevel,byte *mipData);
+	virtual bool read(int width,int height,int depth,int mipLevel,byte *mipData);
+
+	bool needsReset();
 
 	static int getClosestTextureFormat(int textureFormat);
 	static D3DFORMAT getD3DFORMAT(int textureFormat);
@@ -72,6 +73,9 @@ public:
 	static DWORD getD3DTEXF(TextureStage::Filter filter);
 
 protected:
+	void createContext(bool restore);
+	void destroyContext(bool backup);
+
 	D3D9Renderer *mRenderer;
 
 	int mUsageFlags;

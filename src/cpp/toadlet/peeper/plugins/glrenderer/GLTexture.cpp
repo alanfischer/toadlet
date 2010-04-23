@@ -62,7 +62,7 @@ GLTexture::~GLTexture(){
 	}
 }
 
-bool GLTexture::create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels){
+bool GLTexture::create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
 	destroy();
 
 	if((Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || Math::isPowerOf2(depth)==false) &&
@@ -82,92 +82,16 @@ bool GLTexture::create(int usageFlags,Dimension dimension,int format,int width,i
 	mDepth=depth;
 	mMipLevels=mipLevels;
 
-	// Create texture
-	bool result=createContext();
-
-	return result;
-}
-
-void GLTexture::destroy(){
-	destroyContext(false);
-}
-
-bool GLTexture::createContext(){
+	// Create context data
 	mTarget=getGLTarget();
 	glGenTextures(1,&mHandle);
 	glBindTexture(mTarget,mHandle);
 
-	// Set defaults for now
-	/// @todo: See if we want to add these as texture parameters to the texture?  Or just leave them to the textureStages?
+	// GL specific states
 	glTexParameteri(mTarget,GL_TEXTURE_WRAP_S,GL_REPEAT);
 	glTexParameteri(mTarget,GL_TEXTURE_WRAP_T,GL_REPEAT);
 	glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 	glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-
-	// If we don't support partial miplevel specification, then calculate the amount of levels we'll need
-	int mipLevels=0;
-	if(mMipLevels>0){
-		/// @todo: Determine if GLES will let us do particle specifications anyway, and if so, enable that
-		#if !defined(TOADLET_HAS_GLES)
-			if(mRenderer->gl_version>=12){
-				glTexParameteri(mTarget,GL_TEXTURE_BASE_LEVEL,0);
-				glTexParameteri(mTarget,GL_TEXTURE_MAX_LEVEL,mMipLevels-1);
-				mipLevels=mMipLevels;
-			}
-			else
-		#endif
-		{
-			int width=mWidth,height=mHeight,depth=mDepth;
-			for(mipLevels=1;width>=2 || height>=2 || depth>=2;++mipLevels,width/=2,height/=2,depth/=2);
-
-			if(mipLevels!=mMipLevels){
-				Logger::debug(Categories::TOADLET_PEEPER,
-					"partial mipmap specification not supported!");
-			}
-		}
-	}
-	else{
-		mipLevels=1;
-	}
-
-	// Allocate space for texture
-	GLint glformat=getGLFormat(mFormat);
-	GLint glinternalFormat=glformat;
-	GLint gltype=getGLType(mFormat);
-	int level=0,width=mWidth,height=mHeight,depth=mDepth;
-	for(level=0;level<mipLevels;++level,width/=2,height/=2,depth/=2){
-		switch(mTarget){
-			#if !defined(TOADLET_HAS_GLES)
-				case GL_TEXTURE_1D:
-					glTexImage1D(mTarget,level,glinternalFormat,width,0,glformat,gltype,NULL);
-				break;
-			#endif
-			case GL_TEXTURE_2D:
-				glTexImage2D(mTarget,level,glinternalFormat,width,height,0,glformat,gltype,NULL);
-			break;
-			#if !defined(TOADLET_HAS_GLES)
-				case GL_TEXTURE_3D:
-					glTexImage3D(mTarget,level,glinternalFormat,width,height,depth,0,glformat,gltype,NULL);
-				break;
-				case GL_TEXTURE_CUBE_MAP:{
-					/// @todo: Is the following required?
-					glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-					glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-
-					int i;
-					for(i=0;i<6;++i){
-						glTexImage2D(GLCubeFaces[i],level,glinternalFormat,width,height,0,glformat,gltype,NULL);
-					}
-				}break;
-				case GL_TEXTURE_RECTANGLE_ARB:
-					// Set up rectangle scale matrix
-					Math::setMatrix4x4FromScale(mMatrix,mWidth,mHeight,Math::ONE);
-
-					glTexImage2D(mTarget,level,glinternalFormat,width,height,0,glformat,gltype,NULL);
-				break;
-			#endif
-		}
-	}
 
 	mManuallyGenerateMipLevels=(mUsageFlags&UsageFlags_AUTOGEN_MIPMAPS)>0;
 	if(mManuallyGenerateMipLevels &&
@@ -181,25 +105,96 @@ bool GLTexture::createContext(){
 		mManuallyGenerateMipLevels=false;
 	}
 
-	/// @todo: Add mBacking data
+	// If we don't support partial miplevel specification, then calculate the amount of levels we'll need
+	int specifiedMipLevels=1;
+	if(mMipLevels>0){
+		/// @todo: Determine if GLES will let us do partial specifications anyway, and if so, enable that
+		#if !defined(TOADLET_HAS_GLES)
+			if(mRenderer->gl_version>=12){
+				glTexParameteri(mTarget,GL_TEXTURE_BASE_LEVEL,0);
+				glTexParameteri(mTarget,GL_TEXTURE_MAX_LEVEL,mMipLevels-1);
+				specifiedMipLevels=mMipLevels;
+			}
+			else
+		#endif
+		{
+			int mipWidth=mWidth,mipHeight=mHeight,mipDepth=mDepth;
+			for(specifiedMipLevels=1;mipWidth>=2 || mipHeight>=2 || mipDepth>=2;++specifiedMipLevels,mipWidth/=2,mipHeight/=2,mipDepth/=2);
+
+			if(specifiedMipLevels!=mMipLevels){
+				Logger::debug(Categories::TOADLET_PEEPER,
+					"partial mipmap specification not supported!");
+			}
+		}
+	}
+
+	GLint glinternalFormat=getGLFormat(mFormat);
+	GLint glformat=getGLFormat(mFormat);
+	GLint gltype=getGLType(mFormat);
+
+	// Allocate texture memory
+	int level=0;
+	for(level=0;level<specifiedMipLevels;++level,width/=2,height/=2,depth/=2){
+		int rowPitch=width*ImageFormatConversion::getPixelSize(mFormat);
+ 		int slicePitch=rowPitch*height;
+		byte *data=NULL;
+		if(mipDatas!=NULL && (level==0 || level<mMipLevels)){
+			data=mipDatas[level];
+			int alignment=1,pitch=rowPitch;
+			while(pitch>0 && (pitch&1)==0){alignment<<=1;pitch>>=1;}
+			glPixelStorei(GL_PACK_ALIGNMENT,alignment<8?alignment:8);
+		}
+
+		switch(mTarget){
+			#if !defined(TOADLET_HAS_GLES)
+				case GL_TEXTURE_1D:
+					glTexImage1D(mTarget,level,glinternalFormat,width,0,glformat,gltype,data);
+				break;
+			#endif
+			case GL_TEXTURE_2D:
+				glTexImage2D(mTarget,level,glinternalFormat,width,height,0,glformat,gltype,data);
+			break;
+			#if !defined(TOADLET_HAS_GLES)
+				case GL_TEXTURE_3D:
+					glTexImage3D(mTarget,level,glinternalFormat,width,height,depth,0,glformat,gltype,data);
+				break;
+				case GL_TEXTURE_CUBE_MAP:{
+					/// @todo: Is the following required?
+					glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+					glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+
+					int i;
+					for(i=0;i<6;++i){
+						glTexImage2D(GLCubeFaces[i],level,glinternalFormat,width,height,0,glformat,gltype,data);
+					}
+				}break;
+				case GL_TEXTURE_RECTANGLE_ARB:
+					// Set up rectangle scale matrix
+					Math::setMatrix4x4FromScale(mMatrix,mWidth,mHeight,Math::ONE);
+
+					glTexImage2D(mTarget,level,glinternalFormat,width,height,0,glformat,gltype,data);
+				break;
+			#endif
+		}
+	}
+
+	if(mipDatas!=NULL && mManuallyGenerateMipLevels){
+		generateMipLevels();
+	}
 
 	TOADLET_CHECK_GLERROR("GLTexture::createContext");
 
 	return true;
 }
 
-void GLTexture::destroyContext(bool backData){
-	if(backData){
-		/// @todo: backup data
-	}
-
+void GLTexture::destroy(){
 	if(mHandle!=0){
 		glDeleteTextures(1,&mHandle);
 		mHandle=0;
 		mTarget=0;
 	}
 
-	TOADLET_CHECK_GLERROR("GLTexture::destroyContext");
+	TOADLET_CHECK_GLERROR("GLTexture::destroy");
 }
 
 Surface::ptr GLTexture::getMipSurface(int level,int cubeSide){
@@ -226,10 +221,12 @@ Surface::ptr GLTexture::getMipSurface(int level,int cubeSide){
 	return mSurfaces[index];
 }
 
-bool GLTexture::load(int format,int width,int height,int depth,int mipLevel,uint8 *data){
+bool GLTexture::load(int width,int height,int depth,int mipLevel,byte *mipData){
 	if(mHandle==0){
 		return false;
 	}
+
+	width=width>0?width:1;height=height>0?height:1;depth=depth>0?depth:1;
 
 	if(mipLevel==0 && (width!=mWidth || height!=mHeight || depth!=mDepth)){
 		Error::unknown(Categories::TOADLET_PEEPER,
@@ -239,43 +236,38 @@ bool GLTexture::load(int format,int width,int height,int depth,int mipLevel,uint
 
 	glBindTexture(mTarget,mHandle);
 
-	uint8 *finalData=data;
-	int closestFormat=getClosestTextureFormat(format);
-	if(format!=closestFormat){
-		finalData=new uint8[width*ImageFormatConversion::getPixelSize(closestFormat)*height*depth];
-		int rowPitch=width*ImageFormatConversion::getPixelSize(format),slicePitch=width*height*ImageFormatConversion::getPixelSize(format);
-		ImageFormatConversion::convert(data,format,rowPitch,slicePitch,finalData,closestFormat,rowPitch,slicePitch,width,height,depth);
-	}
+	int format=mFormat;
+	int rowPitch=width*ImageFormatConversion::getPixelSize(format);
+	int slicePitch=rowPitch*height;
+	GLint glformat=getGLFormat(format);
+	GLint gltype=getGLType(format);
 
-	GLint glformat=getGLFormat(closestFormat);
-	GLint gltype=getGLType(closestFormat);
+	int alignment=1,pitch=rowPitch;
+	while((pitch&1)==0){alignment<<=1;pitch>>=1;}
+	glPixelStorei(GL_PACK_ALIGNMENT,alignment<8?alignment:8);
+
 	switch(mTarget){
 		#if !defined(TOADLET_HAS_GLES)
 			case GL_TEXTURE_1D:
-				glTexSubImage1D(mTarget,mipLevel,0,width,glformat,gltype,finalData);
+				glTexSubImage1D(mTarget,mipLevel,0,width,glformat,gltype,mipData);
 			break;
 		#endif
 		case GL_TEXTURE_2D:
-			glTexSubImage2D(mTarget,mipLevel,0,0,width,height,glformat,gltype,finalData);
+			glTexSubImage2D(mTarget,mipLevel,0,0,width,height,glformat,gltype,mipData);
 		break;
 		#if !defined(TOADLET_HAS_GLES)
 			case GL_TEXTURE_3D:
-				glTexSubImage3D(mTarget,mipLevel,0,0,0,width,height,depth,glformat,gltype,finalData);
+				glTexSubImage3D(mTarget,mipLevel,0,0,0,width,height,depth,glformat,gltype,mipData);
 			break;
 			case GL_TEXTURE_CUBE_MAP:
 				for(int i=0;i<6;++i){
-					glTexSubImage2D(GLCubeFaces[i],mipLevel,0,0,width,height,glformat,gltype,
-						finalData+(width*height*ImageFormatConversion::getPixelSize(format)*i));
+					glTexSubImage2D(GLCubeFaces[i],mipLevel,0,0,width,height,glformat,gltype,mipData+slicePitch*i);
 				}
 			break;
 			case GL_TEXTURE_RECTANGLE_ARB:
-				glTexSubImage2D(mTarget,mipLevel,0,0,width,height,glformat,gltype,finalData);
+				glTexSubImage2D(mTarget,mipLevel,0,0,width,height,glformat,gltype,mipData);
 			break;
 		#endif
-	}
-
-	if(format!=closestFormat){
-		delete[] finalData;
 	}
 
 	if(mManuallyGenerateMipLevels){
@@ -287,37 +279,40 @@ bool GLTexture::load(int format,int width,int height,int depth,int mipLevel,uint
 	return true;
 }
 
-bool GLTexture::read(int format,int width,int height,int depth,int mipLevel,uint8 *data){
+bool GLTexture::read(int width,int height,int depth,int mipLevel,byte *mipData){
 	if(mHandle==0){
 		return false;
 	}
 
+	width=width>0?width:1;height=height>0?height:1;depth=depth>0?depth:1;
+
+	if(mipLevel==0 && (width!=mWidth || height!=mHeight || depth!=mDepth)){
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"GLTexture: Texture data of incorrect dimensions");
+		return false;
+	}
+
+	glBindTexture(mTarget,mHandle);
+
+	int format=mFormat;
+	int rowPitch=width*ImageFormatConversion::getPixelSize(format);
+	int slicePitch=rowPitch*height;
+	GLint glformat=getGLFormat(format);
+	GLint gltype=getGLType(format);
+
+	int alignment=1,pitch=rowPitch;
+	while((pitch&1)==0){alignment<<=1;pitch>>=1;}
+	glPixelStorei(GL_UNPACK_ALIGNMENT,alignment<8?alignment:8);
+
 	#if !defined(TOADLET_HAS_GLES)
-		uint8 *finalData=data;
-		int closestFormat=getClosestTextureFormat(format);
-		if(format!=closestFormat){
-			finalData=new uint8[width*ImageFormatConversion::getPixelSize(closestFormat)*height*depth];
-		}
-
-		GLint glformat=getGLFormat(closestFormat);
-		GLint gltype=getGLType(closestFormat);
-
-		glBindTexture(mTarget,mHandle);
-
 		if(mTarget!=GL_TEXTURE_CUBE_MAP){
-			glGetTexImage(mTarget,mipLevel,glformat,gltype,finalData);
+			glGetTexImage(mTarget,mipLevel,glformat,gltype,mipData);
 		}
 		else{
 			int i;
 			for(i=0;i<6;++i){
-				glGetTexImage(GLCubeFaces[i],mipLevel,glformat,gltype,finalData+width*height*closestFormat*i);
+				glGetTexImage(GLCubeFaces[i],mipLevel,glformat,gltype,mipData+slicePitch*i);
 			}
-		}
-
-		if(format!=closestFormat){
-			int rowPitch=width*ImageFormatConversion::getPixelSize(format),slicePitch=width*height*ImageFormatConversion::getPixelSize(format);
-			ImageFormatConversion::convert(finalData,closestFormat,rowPitch,slicePitch,data,format,rowPitch,slicePitch,width,height,depth);
-			delete[] finalData;
 		}
 
 		TOADLET_CHECK_GLERROR("GLTexture::read");
