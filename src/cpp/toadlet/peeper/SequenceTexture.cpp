@@ -77,11 +77,6 @@ bool SequenceTexture::getRootTransform(scalar time,Matrix4x4 &transform){
 	}
 }
 
-bool SequenceTexture::create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels){
-	Error::unimplemented("create not implemented for SequenceTexture");
-	return false;
-}
-
 void SequenceTexture::destroy(){
 	int i;
 	for(i=0;i<mTextures.size();++i){
@@ -90,38 +85,6 @@ void SequenceTexture::destroy(){
 		}
 	}
 	mTextures.clear();
-}
-
-bool SequenceTexture::createContext(){
-	bool result=true;
-	int i;
-	for(i=0;i<mTextures.size();++i){
-		if(mTextures[i]!=NULL){
-			result&=mTextures[i]->createContext();
-		}
-	}
-	return result;
-}
-
-void SequenceTexture::destroyContext(bool backData){
-	int i;
-	for(i=0;i<mTextures.size();++i){
-		if(mTextures[i]!=NULL){
-			mTextures[i]->destroyContext(backData);
-		}
-	}
-}
-
-bool SequenceTexture::contextNeedsReset(){
-	int i;
-	for(i=0;i<mTextures.size();++i){
-		if(mTextures[i]!=NULL){
-			if(mTextures[i]->contextNeedsReset()){
-				return true;
-			}
-		}
-	}
-	return false;
 }
 
 int SequenceTexture::getWidth() const{

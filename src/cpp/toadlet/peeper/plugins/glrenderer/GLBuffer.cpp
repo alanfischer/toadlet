@@ -171,7 +171,7 @@ bool GLBuffer::createContext(){
 
 	#if !defined(TOADLET_HAS_GLES)
 		if(mMapping && mBacking){
-			uint8 *data=lock(AccessType_WRITE_ONLY);
+			byte *data=lock(AccessType_WRITE_ONLY);
 			memcpy(data,mData,mDataSize);
 			unlock();
 
@@ -192,7 +192,7 @@ void GLBuffer::destroyContext(bool backData){
 			mData=new uint8[mDataSize];
 			mBacking=true;
 
-			uint8 *data=lock(AccessType_READ_ONLY);
+			byte *data=lock(AccessType_READ_ONLY);
 			memcpy(mData,data,mDataSize);
 			unlock();
 		}

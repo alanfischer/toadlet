@@ -763,7 +763,7 @@ void GLRenderer::setDefaultStates(){
 
 	setLightEffect(LightEffect());
 	setAmbientColor(Colors::WHITE);
-	// We leave the current lights enabled because the SceneManager does not re-set the lights between layers
+	// We leave the current lights enabled because the Scene does not re-set the lights between layers
 
 	// GL specific states
 	{
@@ -774,7 +774,6 @@ void GLRenderer::setDefaultStates(){
 		}
 		#endif
 
-		/// @todo: Change the texture loading to agree with this?
 		glPixelStorei(GL_PACK_ALIGNMENT,1);
 		glPixelStorei(GL_UNPACK_ALIGNMENT,1);
 		

@@ -23,12 +23,10 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/peeper/BackableIndexBuffer.h>
 #include <toadlet/peeper/BackableVertexBuffer.h>
-#include <toadlet/egg/Error.h>
 #include <string.h> //memcpy
 
 using namespace toadlet::egg;
@@ -183,7 +181,8 @@ void BufferManager::contextActivate(Renderer *renderer){
 			shared_static_cast<BackableIndexBuffer>(indexBuffer)->setBack(back);
 		}
 		else{
-			indexBuffer->createContext();
+			Error::unknown(Categories::TOADLET_TADPOLE,"unable to contextActivate a non-backed resource");
+			return;
 		}
 	}
 	for(i=0;i<mVertexBuffers.size();++i){
@@ -194,7 +193,8 @@ void BufferManager::contextActivate(Renderer *renderer){
 			shared_static_cast<BackableVertexBuffer>(vertexBuffer)->setBack(back);
 		}
 		else{
-			vertexBuffer->createContext();
+			Error::unknown(Categories::TOADLET_TADPOLE,"unable to contextActivate a non-backed resource");
+			return;
 		}
 	}
 }
@@ -207,7 +207,8 @@ void BufferManager::contextDeactivate(Renderer *renderer){
 			shared_static_cast<BackableIndexBuffer>(indexBuffer)->setBack(NULL);
 		}
 		else{
-			indexBuffer->destroyContext(true);
+			Error::unknown(Categories::TOADLET_TADPOLE,"unable to contextDeactivate a non-backed resource");
+			return;
 		}
 	}
 	for(i=0;i<mVertexBuffers.size();++i){
@@ -216,7 +217,8 @@ void BufferManager::contextDeactivate(Renderer *renderer){
 			shared_static_cast<BackableVertexBuffer>(vertexBuffer)->setBack(NULL);
 		}
 		else{
-			vertexBuffer->destroyContext(true);
+			Error::unknown(Categories::TOADLET_TADPOLE,"unable to contextDeactivate a non-backed resource");
+			return;
 		}
 	}
 }
@@ -225,15 +227,11 @@ void BufferManager::preContextReset(Renderer *renderer){
 	int i;
 	for(i=0;i<mIndexBuffers.size();++i){
 		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
-		if(indexBuffer->contextNeedsReset()){
-			indexBuffer->destroyContext(true);
-		}
+		indexBuffer->destroyContext(true);
 	}
 	for(i=0;i<mVertexBuffers.size();++i){
 		VertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
-		if(vertexBuffer->contextNeedsReset()){
-			vertexBuffer->destroyContext(true);
-		}
+		vertexBuffer->destroyContext(true);
 	}
 }
 
@@ -241,15 +239,11 @@ void BufferManager::postContextReset(Renderer *renderer){
 	int i;
 	for(i=0;i<mIndexBuffers.size();++i){
 		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
-		if(indexBuffer->contextNeedsReset()){
-			indexBuffer->createContext();
-		}
+		indexBuffer->createContext();
 	}
 	for(i=0;i<mVertexBuffers.size();++i){
 		VertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
-		if(vertexBuffer->contextNeedsReset()){
-			vertexBuffer->createContext();
-		}
+		vertexBuffer->createContext();
 	}
 }
 

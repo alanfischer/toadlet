@@ -45,12 +45,14 @@ public:
 	Texture *getRootTexture(int frame);
 	bool getRootTransform(int frame,Matrix4x4 &transform);
 
-	bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels);// Throw not implemented
+	bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,int rowPitches[],int slicePitches[],byte *mipDatas[]){
+		egg::Error::unimplemented("create not implemented for SectionTexture");
+		return false;
+	}
 	void destroy();
 
-	bool createContext();
-	void destroyContext(bool backData);
-	bool contextNeedsReset();
+	void resetCreate(){}
+	void resetDestroy(){}
 
 	int getUsageFlags() const{return 0;}
 	Dimension getDimension() const{return mDimension;}
@@ -62,8 +64,8 @@ public:
 
 	Surface::ptr getMipSurface(int i,int cubeSide){return NULL;}
 	// These two methods could be implemented, but we would need to basically find which frame we are talking about, and then call load/read on that
-	bool load(int format,int width,int height,int depth,int mipLevel,uint8 *data){return false;}
-	bool read(int format,int width,int height,int depth,int mipLevel,uint8 *data){return false;}
+	bool load(int width,int height,int depth,int mipLevel,int rowPitch,int slicePitch,byte *mipData){return false;}
+	bool read(int width,int height,int depth,int mipLevel,int rowPitch,int slicePitch,byte *mipData){return false;}
 
 	inline int getWidthFrames() const{return mWidthFrames;}
 	inline int getHeightFrames() const{return mHeightFrames;}

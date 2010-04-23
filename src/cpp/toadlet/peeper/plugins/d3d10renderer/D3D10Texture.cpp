@@ -62,7 +62,7 @@ D3D10Texture::~D3D10Texture(){
 	}
 }
 
-bool D3D10Texture::create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels){
+bool D3D10Texture::create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
 	destroy();
 
 	mUsageFlags=usageFlags;
@@ -73,24 +73,13 @@ bool D3D10Texture::create(int usageFlags,Dimension dimension,int format,int widt
 	mDepth=depth;
 	mMipLevels=mipLevels;
 
-	bool result=createContext();
-
-	return result;
-}
-
-void D3D10Texture::destroy(){
-	destroyContext(false);
-}
-
-bool D3D10Texture::createContext(){
 	ID3D10Device *device=mRenderer->getD3D10Device();
-
 	// TODO: Get Usage flags working
 	mD3DUsage=D3D10_USAGE_DEFAULT;
-	int miscFlags=((mUsageFlags&UsageFlags_AUTOGEN_MIPMAPS)>0)?D3D10_RESOURCE_MISC_GENERATE_MIPS:0;
+	int miscFlags=0;//((mUsageFlags&UsageFlags_AUTOGEN_MIPMAPS)>0)?D3D10_RESOURCE_MISC_GENERATE_MIPS:0;
 	int bindFlags=D3D10_BIND_SHADER_RESOURCE;
 
-	mInternalFormat=getClosestTextureFormat(mFormat);
+	mInternalFormat=getClosestTextureFormat(format);
 	mDXGIFormat=getDXGI_FORMAT(mInternalFormat);
 
 	D3D10_SHADER_RESOURCE_VIEW_DESC srvDesc;
@@ -122,25 +111,25 @@ bool D3D10Texture::createContext(){
 			D3D10_TEXTURE2D_DESC desc={0};
 			desc.Width=mWidth;
 			desc.Height=mHeight;
-			desc.MipLevels=mMipLevels;
+			desc.MipLevels=1;//mMipLevels;
 			desc.SampleDesc.Count=1;
 			desc.SampleDesc.Quality=0;
-			desc.Usage=D3D10_USAGE_DEFAULT;//mD3DUsage;
-			desc.CPUAccessFlags=0;
+			desc.Usage=D3D10_USAGE_DYNAMIC;//D3D10_USAGE_DEFAULT;//mD3DUsage;
+			desc.CPUAccessFlags= D3D10_CPU_ACCESS_WRITE;//0;
 			desc.BindFlags=D3D10_BIND_SHADER_RESOURCE;//bindFlags;
 			desc.MiscFlags=0;//miscFlags;
-			desc.Format=DXGI_FORMAT_R8G8B8A8_UINT;//mDXGIFormat;
+			desc.Format=mDXGIFormat;
 
 			if(mDimension==Texture::Dimension_CUBE){
 				desc.ArraySize=6;
 				srvDesc.ViewDimension=D3D10_SRV_DIMENSION_TEXTURECUBE;
-				srvDesc.TextureCube.MipLevels=mMipLevels;
+				srvDesc.TextureCube.MipLevels=-1;//mMipLevels;
 				srvDesc.TextureCube.MostDetailedMip=0;
 			}
 			else{
 				desc.ArraySize=1;
 				srvDesc.ViewDimension=D3D10_SRV_DIMENSION_TEXTURE2D;
-				srvDesc.Texture2D.MipLevels=mMipLevels;
+				srvDesc.Texture2D.MipLevels=-1;//mMipLevels;
 				srvDesc.Texture2D.MostDetailedMip=0;
 			}
 
@@ -170,18 +159,17 @@ bool D3D10Texture::createContext(){
 		}break;
 	}
 
-//	device->CreateShaderResourceView(mTexture,&srvDesc,&mShaderResourceView);
+	device->CreateShaderResourceView(mTexture,&srvDesc,&mShaderResourceView);
 
-	// TODO: Add mBacking data
-
-	return SUCCEEDED(result);
-}
-
-void D3D10Texture::destroyContext(bool backData){
-	if(backData){
-		// TODO: backup data
+	// TODO: Move this to the actual creation params instead of the load
+	if(mipDatas!=NULL){
+		load(width,height,depth,0,mipDatas[0]);
 	}
 
+	return mTexture!=NULL;
+}
+
+void D3D10Texture::destroy(){
 	if(mTexture!=NULL){
 		HRESULT result=mTexture->Release();
 		mTexture=NULL;
@@ -222,10 +210,12 @@ return NULL;
 	}*/
 }
 
-bool D3D10Texture::load(int format,int width,int height,int depth,int mipLevel,uint8 *data){
+bool D3D10Texture::load(int width,int height,int depth,int mipLevel,byte *mipData){
 	if(mTexture==NULL){
 		return false;
 	}
+
+	width=width>0?width:1;height=height>0?height:1;depth=depth>0?depth:1;
 
 	if(mipLevel==0 && (width!=mWidth || height!=mHeight || depth!=mDepth)){
 		Error::unknown(Categories::TOADLET_PEEPER,
@@ -233,9 +223,13 @@ bool D3D10Texture::load(int format,int width,int height,int depth,int mipLevel,u
 		return false;
 	}
 
-	// TODO:
-	D3D10_MAP mapType=D3D10_MAP_READ_WRITE;
+	int format=mFormat;
 
+	// TODO:
+	D3D10_MAP mapType=D3D10_MAP_WRITE_DISCARD;
+
+	int rowPitch=ImageFormatConversion::getPixelSize(format)*width;
+	int slicePitch=rowPitch*height;
 	HRESULT result;
 	if(mDimension==Texture::Dimension_D1){
 		int subresource=D3D10CalcSubresource(mipLevel,1,1);
@@ -248,32 +242,30 @@ bool D3D10Texture::load(int format,int width,int height,int depth,int mipLevel,u
 			return false;
 		}
 
-		int pixelSize=ImageFormatConversion::getPixelSize(format);
 		unsigned char *dst=(unsigned char*)pData;
-		unsigned char *src=(unsigned char*)data;
+		unsigned char *src=(unsigned char*)mipData;
 
-		ImageFormatConversion::convert(src,format,width*pixelSize,width*height*pixelSize,dst,mInternalFormat,width,width*height,width,height,depth);
+		ImageFormatConversion::convert(src,format,rowPitch,slicePitch,dst,mInternalFormat,width,width*height,width,height,depth);
 
 		texture->Unmap(subresource);
 	}
 	else if(mDimension==Texture::Dimension_D2 || mDimension==Texture::Dimension_CUBE){ // TODO: Do cube
-		int subresource=D3D10CalcSubresource(mipLevel,1,1);
+		int subresource=D3D10CalcSubresource(mipLevel,0,0);//1,1);
 
 		D3D10_MAPPED_TEXTURE2D mappedTex;
 		ID3D10Texture2D *texture=(ID3D10Texture2D*)mTexture;
-//		result=texture->Map(subresource,mapType,0,&mappedTex);
-//		if(FAILED(result)){
-//			TOADLET_CHECK_D3D10ERROR(result,"Map");
-//			return false;
-//		}
+		result=texture->Map(subresource,mapType,0,&mappedTex);
+		if(FAILED(result)){
+			TOADLET_CHECK_D3D10ERROR(result,"Map");
+			return false;
+		}
 
-//		int pixelSize=ImageFormatConversion::getPixelSize(format);
-//		unsigned char *dst=(unsigned char*)mappedTex.pData;
-//		unsigned char *src=(unsigned char*)data;
+		unsigned char *dst=(unsigned char*)mappedTex.pData;
+		unsigned char *src=(unsigned char*)mipData;
 
-//		ImageFormatConversion::convert(src,format,width*pixelSize,width*height*pixelSize,dst,mInternalFormat,mappedTex.RowPitch,mappedTex.RowPitch*height,width,height,depth);
+		ImageFormatConversion::convert(src,format,rowPitch,slicePitch,dst,mInternalFormat,mappedTex.RowPitch,mappedTex.RowPitch*height,width,height,depth);
 
-//		texture->Unmap(subresource);
+		texture->Unmap(subresource);
 	}
 	else if(mDimension==Texture::Dimension_D3){
 		int subresource=D3D10CalcSubresource(mipLevel,1,1);
@@ -286,11 +278,10 @@ bool D3D10Texture::load(int format,int width,int height,int depth,int mipLevel,u
 			return false;
 		}
 
-		int pixelSize=ImageFormatConversion::getPixelSize(format);
 		unsigned char *dst=(unsigned char*)mappedTex.pData;
-		unsigned char *src=(unsigned char*)data;
+		unsigned char *src=(unsigned char*)mipData;
 
-		ImageFormatConversion::convert(src,format,width*pixelSize,width*height*pixelSize,dst,mInternalFormat,mappedTex.RowPitch,mappedTex.DepthPitch,width,height,depth);
+		ImageFormatConversion::convert(src,format,rowPitch,slicePitch,dst,mInternalFormat,mappedTex.RowPitch,mappedTex.DepthPitch,width,height,depth);
 
 		texture->Unmap(subresource);
 	}
@@ -307,10 +298,12 @@ bool D3D10Texture::load(int format,int width,int height,int depth,int mipLevel,u
 	return true;
 }
 
-bool D3D10Texture::read(int format,int width,int height,int depth,int mipLevel,uint8 *data){
+bool D3D10Texture::read(int width,int height,int depth,int mipLevel,byte *mipData){
 /*	if(mTexture==NULL){
 		return false;
 	}
+
+	width=width>0?width:1;height=height>0?height:1;depth=depth>0?depth:1;
 
 	if(mipLevel==0 && (width!=mWidth || height!=mHeight || depth!=mDepth)){
 		Error::unknown(Categories::TOADLET_PEEPER,
@@ -370,16 +363,24 @@ return false;
 }
 
 int D3D10Texture::getClosestTextureFormat(int textureFormat){
-	if(textureFormat==Format_A_8){
-		textureFormat=Format_LA_8;
+	if(textureFormat==Format_L_8){
+		return textureFormat;
 	}
-	else if(textureFormat==Format_RGB_8){
-		textureFormat=Format_RGBA_8;
+	else if(textureFormat==Format_LA_8){
+		return textureFormat;
 	}
-
-textureFormat=Format_RGBA_8;
-
-	return textureFormat;
+	else if(textureFormat==Format_RGBA_8){
+		return textureFormat;
+	}
+	else if(textureFormat==Format_RGB_F32){
+		return textureFormat;
+	}
+	else if(textureFormat==Format_RGBA_F32){
+		return textureFormat;
+	}
+	else{
+		return Format_RGBA_8;
+	}
 }
 
 DXGI_FORMAT D3D10Texture::getDXGI_FORMAT(int textureFormat){
@@ -388,14 +389,12 @@ DXGI_FORMAT D3D10Texture::getDXGI_FORMAT(int textureFormat){
 			return DXGI_FORMAT_R8_UNORM;
 		case Format_LA_8:
 			return DXGI_FORMAT_R8G8_UNORM;
-		case Format_BGRA_8:
-			return DXGI_FORMAT_R8G8B8A8_UNORM;
 		case Format_RGBA_8:
-			return DXGI_FORMAT_B8G8R8A8_UNORM;
-		case Format_RGB_5_6_5:
-			return DXGI_FORMAT_B5G6R5_UNORM;
-		case Format_RGBA_5_5_5_1:
-			return DXGI_FORMAT_B5G5R5A1_UNORM;
+			return DXGI_FORMAT_R8G8B8A8_UNORM;
+		case Format_RGB_F32:
+			return DXGI_FORMAT_R32G32B32_FLOAT;
+		case Format_RGBA_F32:
+			return DXGI_FORMAT_R32G32B32A32_FLOAT;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"D3D10Texture::getDXGI_FORMAT: Invalid type");

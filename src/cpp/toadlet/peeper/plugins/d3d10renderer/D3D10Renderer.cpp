@@ -68,6 +68,7 @@ D3D10Renderer::~D3D10Renderer(){
 
 LPD3D10EFFECT g_lpEffect = NULL;
 LPD3D10EFFECTTECHNIQUE pTechnique=NULL;
+ID3D10ShaderResourceView *g_texture=NULL;
 
 bool D3D10Renderer::create(RenderTarget *target,int *options){
 	Logger::alert(Categories::TOADLET_PEEPER,
@@ -141,7 +142,8 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 "}\n"
 
 "float4 PS( VS_OUTPUT Input ) : SV_Target{\n"
-    "return Input.Color;\n"
+	//"return (Input.TexCoords,0,0);\n"
+    "return diffuseTexture.Sample(samLinear,Input.TexCoords);\n"
 "}\n"
 
 "technique10 Render{\n"
@@ -335,6 +337,7 @@ void D3D10Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Inde
 //	pProjectionMatrixEffectVariable->SetMatrix(projectionMatrix);
 	Matrix4x4 shaderMatrix=mProjectionMatrix*mViewMatrix*mModelMatrix;
 	g_lpEffect->GetVariableByName("ShaderMatrix")->AsMatrix()->SetMatrix(shaderMatrix.data);
+	g_lpEffect->GetVariableByName("diffuseTexture")->AsShaderResource()->SetResource(g_texture);
 
 	if(indexData->getIndexBuffer()!=NULL){
 		D3D10Buffer *buffer=(D3D10Buffer*)(indexData->getIndexBuffer()->getRootIndexBuffer());
@@ -500,6 +503,13 @@ void D3D10Renderer::setTexturePerspective(bool texturePerspective){
 }
 
 void D3D10Renderer::setTextureStage(int stage,TextureStage *textureStage){
+	if(textureStage!=NULL && textureStage->texture!=NULL){
+		g_texture=((D3D10Texture*)(textureStage->texture->getRootTexture(0)))->mShaderResourceView;
+	}
+	else{
+		g_texture=NULL;
+	}
+
 /*	HRESULT result=S_OK;
 
 	if(textureStage!=NULL){

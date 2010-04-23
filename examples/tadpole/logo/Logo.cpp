@@ -45,7 +45,7 @@ Logo::~Logo(){
 }
 
 void Logo::create(){
-	Application::create();
+	Application::create(RendererPlugin_DIRECT3D10);
 
 	scene=Scene::ptr(new Scene(mEngine));
 
@@ -61,7 +61,7 @@ void Logo::create(){
 	scene->getRoot()->attach(meshNode);
 
 	cameraNode=getEngine()->createNodeType(CameraNode::type(),scene);
-	cameraNode->setLookAt(Vector3(0,0,Math::fromInt(25)),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
+	cameraNode->setLookAt(Vector3(0,Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
 	cameraNode->setTarget(meshNode);
 	cameraNode->setClearColor(Colors::BLUE);
 	scene->getRoot()->attach(cameraNode);

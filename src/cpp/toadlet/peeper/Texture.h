@@ -51,12 +51,11 @@ public:
 	virtual Texture *getRootTexture(scalar time)=0;
 	virtual bool getRootTransform(scalar time,Matrix4x4 &transform)=0;
 
-	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels)=0;
+	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[])=0;
 	virtual void destroy()=0;
 
-	virtual bool createContext()=0;
-	virtual void destroyContext(bool backData)=0;
-	virtual bool contextNeedsReset()=0;
+	virtual void resetCreate()=0;
+	virtual void resetDestroy()=0;
 
 	virtual int getUsageFlags() const=0;
 	virtual Dimension getDimension() const=0;
@@ -70,8 +69,8 @@ public:
 	/// @todo: Perhaps the whole frame portion of getRootTexture could be combined with this mipsurface thing somehow
 	//  Where Textures would just have SubTextures, which would be the surfaces perhaps?
 	virtual Surface::ptr getMipSurface(int i,int cubeSide)=0;
-	virtual bool load(int format,int width,int height,int depth,int mipLevel,uint8 *data)=0;
-	virtual bool read(int format,int width,int height,int depth,int mipLevel,uint8 *data)=0;
+	virtual bool load(int width,int height,int depth,int mipLevel,byte *mipData)=0;
+	virtual bool read(int width,int height,int depth,int mipLevel,byte *mipData)=0;
 };
 
 }

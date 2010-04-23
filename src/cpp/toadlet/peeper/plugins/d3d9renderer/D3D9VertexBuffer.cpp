@@ -114,7 +114,7 @@ void D3D9VertexBuffer::destroyContext(bool backData){
 		mBackingData=new uint8[mDataSize];
 		mBacking=true;
 
-		uint8 *data=NULL;
+		byte *data=NULL;
 		TOADLET_TRY
 			data=lock(AccessType_READ_ONLY);
 		TOADLET_CATCH(const Exception &){data=NULL;}

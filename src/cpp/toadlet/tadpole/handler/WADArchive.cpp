@@ -128,37 +128,63 @@ peeper::Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager 
 		format=Texture::Format_RGBA_8;
 	}
 
-	Texture::ptr texture=textureManager->createTexture(0,Texture::Dimension_D2,format,dwidth,dheight,0,4);
-	if(texture!=NULL){
-		textureManager->manage(texture,miptex->name);
+	Image::ptr images[4];
+	int hswidth=swidth,hsheight=sheight;
+	int hdwidth=dwidth,hdheight=dheight;
+	int mipLevel;
+	for(mipLevel=0;mipLevel<4;++mipLevel){
+		images[mipLevel]=Image::ptr(new Image(Image::Dimension_D2,format,dwidth,dheight));
 
-		Image::ptr image(new Image(Image::Dimension_D2,format,dwidth,dheight));
+		byte *src=(byte*)miptex + littleInt32(miptex->offsets[mipLevel]);
+		byte *data=images[mipLevel]->getData();
 
-		int hswidth=swidth,hsheight=sheight;
-		int hdwidth=dwidth,hdheight=dheight;
-		int mipLevel;
-		for(mipLevel=0;mipLevel<4;++mipLevel){
-			byte *src=(byte*)miptex + littleInt32(miptex->offsets[mipLevel]);
-			byte *data=image->getData();
+		if(hswidth==hdwidth && hsheight==hdheight){
+			int j=0,k=0,j3=0,k3=0;
+			if(format==Texture::Format_RGB_8){
+				for(j=0;j<hswidth*hsheight;j++){
+					k=*(src+j);
 
-			if(hswidth==hdwidth && hsheight==hdheight){
-				int j=0,k=0,j3=0,k3=0;
-				if(format==Texture::Format_RGB_8){
-					for(j=0;j<hswidth*hsheight;j++){
-						k=*(src+j);
+					j3=j*3;
+					k3=k*3;
+					*(data+j3+0)=*(pal+k3+0);
+					*(data+j3+1)=*(pal+k3+1);
+					*(data+j3+2)=*(pal+k3+2);
+				}
+			}
+			else{
+				for(j=0;j<hswidth*hsheight;j++){
+					k=*(src+j);
 
-						j3=j*3;
+					j3=j*4;
+					k3=k*3;
+					*(data+j3+0)=*(pal+k3+0);
+					*(data+j3+1)=*(pal+k3+1);
+					*(data+j3+2)=*(pal+k3+2);
+					*(data+j3+3)=(*(data+j3+0)==0 && *(data+j3+1)==0 && *(data+j3+2)==255)?0:255;
+				}
+			}
+		}
+		else{
+			int i=0,j=0,k=0,j3=0,k3=0;
+			if(format==Texture::Format_RGB_8){
+				for(j=0;j<hdheight;j++){
+					for(i=0;i<hdwidth;i++){
+						k=*(src+((j*hsheight/hdheight)*hswidth+(i*hswidth/hdwidth)));
+
+						j3=((j*hdwidth)+i)*3;
 						k3=k*3;
 						*(data+j3+0)=*(pal+k3+0);
 						*(data+j3+1)=*(pal+k3+1);
 						*(data+j3+2)=*(pal+k3+2);
 					}
 				}
-				else{
-					for(j=0;j<hswidth*hsheight;j++){
-						k=*(src+j);
+			}
+			else{
+				for(j=0;j<hdheight;j++){
+					for(i=0;i<hdwidth;i++){
+						k=*(src+((j*hsheight/hdheight)*hswidth+(i*hswidth/hdwidth)));
 
-						j3=j*4;
+						j3=((j*hdwidth)+i)*4;
 						k3=k*3;
 						*(data+j3+0)=*(pal+k3+0);
 						*(data+j3+1)=*(pal+k3+1);
@@ -167,42 +193,15 @@ peeper::Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager 
 					}
 				}
 			}
-			else{
-				int i=0,j=0,k=0,j3=0,k3=0;
-				if(format==Texture::Format_RGB_8){
-					for(j=0;j<hdheight;j++){
-						for(i=0;i<hdwidth;i++){
-							k=*(src+((j*hsheight/hdheight)*hswidth+(i*hswidth/hdwidth)));
-
-							j3=((j*hdwidth)+i)*3;
-							k3=k*3;
-							*(data+j3+0)=*(pal+k3+0);
-							*(data+j3+1)=*(pal+k3+1);
-							*(data+j3+2)=*(pal+k3+2);
-						}
-					}
-				}
-				else{
-					for(j=0;j<hdheight;j++){
-						for(i=0;i<hdwidth;i++){
-							k=*(src+((j*hsheight/hdheight)*hswidth+(i*hswidth/hdwidth)));
-
-							j3=((j*hdwidth)+i)*4;
-							k3=k*3;
-							*(data+j3+0)=*(pal+k3+0);
-							*(data+j3+1)=*(pal+k3+1);
-							*(data+j3+2)=*(pal+k3+2);
-							*(data+j3+3)=(*(data+j3+0)==0 && *(data+j3+1)==0 && *(data+j3+2)==255)?0:255;
-						}
-					}
-				}
-			}
-
-			texture->load(format,hdwidth,hdheight,0,mipLevel,image->getData());
-
-			if(hswidth>=2) hswidth/=2; if(hsheight>=2) hsheight/=2;
-			if(hdwidth>=2) hdwidth/=2; if(hdheight>=2) hdheight/=2;
 		}
+
+		if(hswidth>=2) hswidth/=2; if(hsheight>=2) hsheight/=2;
+		if(hdwidth>=2) hdwidth/=2; if(hdheight>=2) hdheight/=2;
+	}
+
+	Texture::ptr texture=textureManager->createTexture(images,0,4);
+	if(texture!=NULL){
+		textureManager->manage(texture,miptex->name);
 	}
 
 	return texture;
