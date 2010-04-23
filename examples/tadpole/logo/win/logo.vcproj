@@ -164,7 +164,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/subsystem:$(CESubsystem) /MACHINE:ARM "
-				AdditionalDependencies="toadlet_egg_sd.lib toadlet_peeper_sd.lib toadlet_ribbit_sd.lib toadlet_tadpole_sd.lib toadlet_pad_sd.lib"
+				AdditionalDependencies="toadlet_egg_sd.lib toadlet_flick_sd.lib toadlet_peeper_sd.lib toadlet_ribbit_sd.lib toadlet_tadpole_sd.lib toadlet_pad_sd.lib"
 				OutputFile="$(OutDir)/logo.exe"
 				LinkIncremental="2"
 				DelayLoadDLLs="$(NOINHERIT)"

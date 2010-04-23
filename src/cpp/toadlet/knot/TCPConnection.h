@@ -59,8 +59,8 @@ public:
 	bool accept(int localPort);
 	bool accept(egg::net::Socket::ptr socket);
 
-	bool opened(){return !mSocket->isClosed();}
 	void close();
+	bool closed(){return mSocket->closed();}
 
 	bool blocking(){return mBlocking;}
 

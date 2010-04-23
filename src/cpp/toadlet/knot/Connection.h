@@ -43,8 +43,8 @@ public:
 
 	virtual ~Connection(){}
 
-	virtual bool opened()=0;
 	virtual void close()=0;
+	virtual bool closed()=0;
 
 	/// If the connection is blocking or not
 	virtual bool blocking()=0;

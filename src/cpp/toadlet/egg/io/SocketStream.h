@@ -23,35 +23,45 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_FILTEREDMOTIONDETECTOR_H
-#define TOADLET_FLICK_FILTEREDMOTIONDETECTOR_H
+#ifndef TOADLET_EGG_IO_SOCKETSTREAM_H
+#define TOADLET_EGG_IO_SOCKETSTREAM_H
 
-#include <toadlet/flick/MotionDetector.h>
-#include <toadlet/flick/MotionDetectorListener.h>
+#include <toadlet/egg/io/Stream.h>
+#include <toadlet/egg/net/Socket.h>
+#include <stdio.h>
 
 namespace toadlet{
-namespace flick{
+namespace egg{
+namespace io{
 
-class TOADLET_API FilteredMotionDetector:public MotionDetector{
+class TOADLET_API SocketStream:public Stream{
 public:
-	FilteredMotionDetector();
-	virtual ~FilteredMotionDetector();
+	TOADLET_SHARED_POINTERS(SocketStream);
 
-	virtual void setFilterAlpha(scalar alpha);
+	SocketStream(net::Socket::ptr socket);
+	virtual ~SocketStream();
+
+	virtual void close(){mSocket->close();}
+	virtual bool closed(){return mSocket->closed();}
+
+	virtual bool readable(){return true;}
+	virtual int read(byte *buffer,int length);
+
+	virtual bool writeable(){return true;}
+	virtual int write(const byte *buffer,int length);
+
+	virtual bool reset(){return false;}
+	virtual int length(){return 0;}
+	virtual int position(){return 0;}
+	virtual bool seek(int offs){return false;}
 
 protected:
-	virtual bool updateAcceleration(int time,scalar x,scalar y,scalar z);
-
-	scalar mAlpha;
-	MotionData mMotionData;
-
-	Vector3 cache_updateAcceleration_lastAcceleration;
-	Vector3 cache_updateAcceleration_lastVelocity;
-	Vector3 cache_updateAcceleration_lastVelocityFiltered;
-	Vector3 cache_updateAcceleration_vector;
+	net::Socket::ptr mSocket;
 };
 
 }
 }
+}
 
 #endif
+

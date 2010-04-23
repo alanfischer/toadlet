@@ -107,6 +107,10 @@ public final class Math{
 
 	public static int toInt(real r){return (int)r;}
 
+	public static real fromFloat(float f){return (real)f;}
+
+	public static float toFloat(real r){return (float)r;}
+
 	public static real abs(real r){return (real)java.lang.Math.abs(r);}
 
 	public static real ceil(real r){return (real)java.lang.Math.ceil(r);}

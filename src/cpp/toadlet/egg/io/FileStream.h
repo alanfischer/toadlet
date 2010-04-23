@@ -52,13 +52,13 @@ public:
 	FileStream(const String &filename,int open);
 	virtual ~FileStream();
 
-	virtual bool isOpen() const;
 	virtual void close();
+	virtual bool closed(){return mFile==NULL;}
 
-	virtual bool isReadable(){return (mOpen&Open_BIT_READ)>0;}
+	virtual bool readable(){return (mOpen&Open_BIT_READ)>0;}
 	virtual int read(byte *buffer,int length);
 
-	virtual bool isWriteable(){return (mOpen&Open_BIT_WRITE)>0;}
+	virtual bool writeable(){return (mOpen&Open_BIT_WRITE)>0;}
 	virtual int write(const byte *buffer,int length);
 
 	virtual bool reset();

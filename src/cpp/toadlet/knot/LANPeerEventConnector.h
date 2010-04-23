@@ -62,8 +62,8 @@ public:
 
 	bool create(bool udp,int broadcastPort,int serverPort,const egg::String &uuid,int version,EventFactory *factory);
 
-	bool opened(){return mConnection!=NULL;}
 	void close();
+	bool closed(){return mConnection==NULL;}
 
 	void addConnectionListener(ConnectionListener *listener,bool notifyAboutCurrent);
 	void removeConnectionListener(ConnectionListener *listener,bool notifyAboutCurrent);

@@ -165,10 +165,10 @@ MotionDetector::State IPhoneMotionDetector::getState(){
 void IPhoneMotionDetector::didAccelerate(UIAcceleration *acceleration){
 	bool result=false;
 	if(mNative){
-		result=updateAcceleration((int)acceleration.timestamp*1000,acceleration.x,acceleration.y,acceleration.z);
+		result=updateAcceleration((int)acceleration.timestamp*1000,Math::fromFloat(acceleration.x),Math::fromFloat(acceleration.y),Math::fromFloat(acceleration.z));
 	}
 	else{
-		result=updateAcceleration((int)acceleration.timestamp*1000,acceleration.x,-acceleration.y,acceleration.z);
+		result=updateAcceleration((int)acceleration.timestamp*1000,Math::fromFloat(acceleration.x),Math::fromFloat(-acceleration.y),Math::fromFloat(acceleration.z));
 	}
 	if(result && mListener!=NULL){
 		mListener->motionDetected(mMotionData);
