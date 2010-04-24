@@ -73,8 +73,8 @@ public:
 	static DWORD getD3DTEXF(TextureStage::Filter filter);
 
 protected:
-	void createContext(bool restore);
-	void destroyContext(bool backup);
+	bool createContext(bool restore);
+	bool destroyContext(bool backup);
 
 	D3D9Renderer *mRenderer;
 

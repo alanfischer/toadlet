@@ -97,26 +97,32 @@ bool BackableVertexBuffer::unlock(){
 	}
 }
 
-void BackableVertexBuffer::setBack(VertexBuffer::ptr back,bool initial){
+void BackableVertexBuffer::setBack(VertexBuffer::ptr back){
 	if(back!=mBack && mBack!=NULL){
 		mData=new uint8[mDataSize];
-		byte *data=NULL;
 		TOADLET_TRY
-			data=lock(AccessType_READ_ONLY);
-		TOADLET_CATCH(const Exception &){data=NULL;}
-		memcpy(mData,data,mDataSize);
-		mBack->unlock();
+			byte *data=lock(AccessType_READ_ONLY);
+			if(data!=NULL){
+				memcpy(mData,data,mDataSize);
+				mBack->unlock();
+			}
+		TOADLET_CATCH(const Exception &){}
+		mBack->destroy();
 	}
 
 	mBack=back;
 	
-	if(initial==false && mBack!=NULL && mData!=NULL){
-		byte *data=NULL;
+	if(mBack!=NULL && mData!=NULL){
+		// Create texture on setting the back, otherwise D3D10 static textures will not load data in load
+		mBack->create(mUsageFlags,mAccessType,mVertexFormat,mSize);
+
 		TOADLET_TRY
-			data=lock(AccessType_WRITE_ONLY);
-		TOADLET_CATCH(const Exception &){data=NULL;}
-		memcpy(data,mData,mDataSize);
-		mBack->unlock();
+			byte *data=lock(AccessType_WRITE_ONLY);
+			if(data!=NULL){
+				memcpy(data,mData,mDataSize);
+				mBack->unlock();
+			}
+		TOADLET_CATCH(const Exception &){}
 		delete[] mData;
 		mData=NULL;
 	}

@@ -38,7 +38,7 @@ class Engine;
 
 class TOADLET_API BufferManager:public peeper::BufferDestroyedListener{
 public:
-	BufferManager(Engine *engine);
+	BufferManager(Engine *engine,bool backable);
 	virtual ~BufferManager();
 
 	virtual void destroy();
@@ -60,6 +60,7 @@ protected:
 	egg::Collection<peeper::VertexBuffer::ptr> mVertexBuffers;
 
 	Engine *mEngine;
+	bool mBackable;
 };
 
 }

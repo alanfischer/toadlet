@@ -40,14 +40,13 @@ public:
 
 	virtual VertexBuffer *getRootVertexBuffer(){return mBack;}
 
+	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
+
 	virtual bool create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size);
 	virtual void destroy();
 
-	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
-
-	virtual bool createContext(){return mBack->createContext();}
-	virtual void destroyContext(bool backData){mBack->destroyContext(backData);}
-	virtual bool contextNeedsReset(){return mBack->contextNeedsReset();}
+	virtual void resetCreate(){}
+	virtual void resetDestroy(){}
 
 	virtual int getUsageFlags() const{return mUsageFlags;}
 	virtual AccessType getAccessType() const{return mAccessType;}
@@ -58,7 +57,7 @@ public:
 	virtual uint8 *lock(AccessType accessType);
 	virtual bool unlock();
 
-	virtual void setBack(VertexBuffer::ptr back,bool initial=false);
+	virtual void setBack(VertexBuffer::ptr back);
 	virtual VertexBuffer::ptr getBack(){return mBack;}
 	
 protected:

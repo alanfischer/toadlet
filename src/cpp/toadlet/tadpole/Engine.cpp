@@ -24,7 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 /// @todo: OVERALL
-// - clean up the aabox querying so its a lot easier to use
 // - Sprites and animated meshes need to if(no event frames){deactivate if not being looked at}
 
 // I REALLY NEED TO PLAY WITH THIS, IT WILL LET ME USE A THREADPOOL AND HAUL ASS THROUGH NODE UPDATES
@@ -149,6 +148,8 @@ Engine::Engine():
 	mRenderer(NULL),
 	mAudioPlayer(NULL)
 {
+	bool backable=false;
+
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"creating Engine");
 
@@ -161,8 +162,8 @@ Engine::Engine():
 	updateVertexFormats();
 
 	mArchiveManager=new ArchiveManager();
-	mTextureManager=new TextureManager(this);
-	mBufferManager=new BufferManager(this);
+	mTextureManager=new TextureManager(this,backable);
+	mBufferManager=new BufferManager(this,backable);
 	mMaterialManager=new MaterialManager(this);
 	mFontManager=new FontManager(this->getArchiveManager());
 	mMeshManager=new MeshManager(this);
@@ -193,8 +194,7 @@ Engine::Engine():
 	mArchiveManager->setHandler(TPKGHandler::ptr(new TPKGHandler()),"tpkg");
 	mArchiveManager->setHandler(WADHandler::ptr(new WADHandler(mTextureManager)),"wad");
 	#if defined(TOADLET_HAS_ZZIP)
-		ZIPHandler::ptr zipHandler(new ZIPHandler());
-		mArchiveManager->setHandler(zipHandler,"zip");
+		mArchiveManager->setHandler(ZIPHandler::ptr(new ZIPHandler()),"zip");
 	#endif
 
 	// Texture handlers

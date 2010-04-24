@@ -38,7 +38,7 @@ class Engine;
 
 class TOADLET_API TextureManager:public ResourceManager{
 public:
-	TextureManager(Engine *engine);
+	TextureManager(Engine *engine,bool backable);
 
 	peeper::Texture::ptr createTexture(egg::image::Image::ptr image,int usageFlags=peeper::Texture::UsageFlags_AUTOGEN_MIPMAPS,int mipLevels=0);
 	peeper::Texture::ptr createTexture(egg::image::Image::ptr images[],int usageFlags,int mipLevels);

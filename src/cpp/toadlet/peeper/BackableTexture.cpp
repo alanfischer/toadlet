@@ -139,6 +139,7 @@ void BackableTexture::setBack(Texture::ptr back){
 	if(back!=mBack && mBack!=NULL){
 		mData=new uint8[mDataSize];
 		mBack->read(mWidth,mHeight,mDepth,0,mData);
+		mBack->destroy();
 	}
 
 	mBack=back;

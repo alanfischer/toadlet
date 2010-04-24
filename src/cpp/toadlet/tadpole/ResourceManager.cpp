@@ -165,6 +165,16 @@ ResourceHandler::ptr ResourceManager::getHandler(const String &extension){
 	}
 }
 
+ResourceHandler::ptr ResourceManager::findHandler(const String &extension){
+	ExtensionHandlerMap::iterator it=mExtensionHandlerMap.find(extension);
+	if(it!=mExtensionHandlerMap.end()){
+		return it->second;
+	}
+	else{
+		return mDefaultHandler;
+	}
+}
+
 void ResourceManager::resourceFullyReleased(Resource *resource){
 	unmanage(resource);
 }
@@ -234,22 +244,11 @@ Resource::ptr ResourceManager::findFromFile(const String &name,const ResourceHan
 		filename+="."+extension;
 	}
 	if(extension!=(char*)NULL){
-		ExtensionHandlerMap::iterator it=mExtensionHandlerMap.find(extension);
-		if(it!=mExtensionHandlerMap.end()){
+		ResourceHandler *handler=findHandler(extension);
+		if(handler!=NULL){
 			Stream::ptr stream=mArchive->openStream(filename);
 			if(stream!=NULL){
-				return Resource::ptr(it->second->load(stream,handlerData));
-			}
-			else{
-				Error::unknown(Categories::TOADLET_TADPOLE,
-					"File "+filename+" not found");
-				return NULL;
-			}
-		}
-		else if(mDefaultHandler!=NULL){
-			Stream::ptr stream=mArchive->openStream(filename);
-			if(stream!=NULL){
-				return Resource::ptr(mDefaultHandler->load(stream,handlerData));
+				return Resource::ptr(handler->load(stream,handlerData));
 			}
 			else{
 				Error::unknown(Categories::TOADLET_TADPOLE,

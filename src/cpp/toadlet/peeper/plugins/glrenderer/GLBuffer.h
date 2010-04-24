@@ -45,15 +45,14 @@ public:
 	IndexBuffer *getRootIndexBuffer(){return this;}
 	VertexBuffer *getRootVertexBuffer(){return this;}
 
+	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
+
 	virtual bool create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size);
 	virtual bool create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size);
 	virtual void destroy();
 
-	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
-
-	virtual bool createContext();
-	virtual void destroyContext(bool backData);
-	virtual bool contextNeedsReset(){return false;}
+	virtual void resetCreate(){}
+	virtual void resetDestroy(){}
 
 	virtual int getUsageFlags() const{return mUsageFlags;}
 	virtual AccessType getAccessType() const{return mAccessType;}
@@ -67,6 +66,9 @@ public:
 	virtual bool unlock();
 
 protected:
+	bool createContext();
+	bool destroyContext();
+
 	static GLenum getBufferUsage(int usageFlags,AccessType accessType);
 
 	GLRenderer *mRenderer;
@@ -89,7 +91,6 @@ protected:
 	GLenum mTarget;
 	AccessType mLockType;
 	bool mMapping;
-	bool mBacking;
 	uint8 *mData;
 
 	friend class GLRenderer;

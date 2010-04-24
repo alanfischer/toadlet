@@ -51,7 +51,6 @@ GLBuffer::GLBuffer(GLRenderer *renderer):
 	mHandle(0),
 	mTarget(0),
 	mLockType(AccessType_NO_ACCESS),
-	mBacking(false),
 	mData(NULL)
 {
 	mRenderer=renderer;
@@ -71,15 +70,14 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,IndexFormat indexForm
 	mDataSize=mIndexFormat*mSize;
 
 	mTarget=GL_ELEMENT_ARRAY_BUFFER;
-	bool result=createContext();
+	createContext();
 
 	mMapping=mRenderer->useMapping(this);
 	if(mRenderer->getCapabilitySet().hardwareIndexBuffers==false || mMapping==false){
 		mData=new uint8[mDataSize];
-		mBacking=true;
 	}
 	
-	return result;
+	return true;
 }
 
 bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size){
@@ -93,7 +91,7 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr ver
 	mDataSize=mVertexSize*mSize;
 	
 	mTarget=GL_ARRAY_BUFFER;
-	bool result=createContext();
+	createContext();
 
 	#if defined(TOADLET_BIG_ENDIAN)
 		int i;
@@ -113,7 +111,6 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr ver
 		#endif
 	if(mMapping==false){
 		mData=new uint8[mDataSize];
-		mBacking=true;
 	}
 
 	/// @todo: This will be converted to a a GLVertexFormat type
@@ -134,11 +131,11 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr ver
 		}
 	}
 
-	return result;
+	return true;
 }
 
 void GLBuffer::destroy(){
-	destroyContext(false);
+	destroyContext();
 
 	if(mData!=NULL){
 		delete[] mData;
@@ -169,41 +166,20 @@ bool GLBuffer::createContext(){
 		glBufferData(mTarget,mDataSize,NULL,usage);
 	}
 
-	#if !defined(TOADLET_HAS_GLES)
-		if(mMapping && mBacking){
-			byte *data=lock(AccessType_WRITE_ONLY);
-			memcpy(data,mData,mDataSize);
-			unlock();
-
-			delete[] mData;
-			mData=NULL;
-			mBacking=true;
-		}
-	#endif
-
 	TOADLET_CHECK_GLERROR("GLBuffer::createContext");
-
-	return true;
+	
+	return mHandle!=0;
 }
 
-void GLBuffer::destroyContext(bool backData){
-	#if !defined(TOADLET_HAS_GLES)
-		if(mMapping && backData){
-			mData=new uint8[mDataSize];
-			mBacking=true;
-
-			byte *data=lock(AccessType_READ_ONLY);
-			memcpy(mData,data,mDataSize);
-			unlock();
-		}
-	#endif
-
+bool GLBuffer::destroyContext(){
 	if(mHandle!=0){
 		glDeleteBuffers(1,&mHandle);
 		mHandle=0;
 	}
 
 	TOADLET_CHECK_GLERROR("GLBuffer::destroyContext");
+	
+	return true;
 }
 
 uint8 *GLBuffer::lock(AccessType accessType){
