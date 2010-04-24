@@ -36,11 +36,12 @@ using namespace toadlet::peeper;
 namespace toadlet{
 namespace tadpole{
 
-TextureManager::TextureManager(Engine *engine):ResourceManager(engine->getArchiveManager()),
+TextureManager::TextureManager(Engine *engine,bool backable):ResourceManager(engine->getArchiveManager()),
 	mEngine(NULL),
-	mBackable(true)
+	mBackable(false)
 {
 	mEngine=engine;
+	mBackable=backable;
 }
 
 Texture::ptr TextureManager::createTexture(Image::ptr image,int usageFlags,int mipLevels){
@@ -137,8 +138,43 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usageFlags,int m
 }
 
 Texture::ptr TextureManager::createTexture(Image::ptr images[],int usageFlags,int mipLevels){
-	Error::unimplemented("yep!");
-	return NULL;
+	if(images==NULL || mipLevels==0){
+		Error::nullPointer("createTexture called without images or mipLevels");
+		return NULL;
+	}
+
+	Image::Dimension dimension=images[0]->getDimension();
+	int format=images[0]->getFormat();
+	int width=images[0]->getWidth(),height=images[0]->getHeight(),depth=images[0]->getDepth();
+
+	egg::Collection<byte*> mipDatas;
+	int i;
+	for(i=0;i<mipLevels;++i){
+		mipDatas.add(images[i]->getData());
+	}
+
+	Texture::ptr texture;
+	if(mBackable){
+		BackableTexture::ptr backableTexture(new BackableTexture());
+		backableTexture->create(usageFlags,dimension,format,width,height,depth,mipLevels,mipDatas.begin());
+		if(mEngine->getRenderer()!=NULL){
+			Texture::ptr back(mEngine->getRenderer()->createTexture());
+			backableTexture->setBack(back);
+		}
+		texture=backableTexture;
+	}
+	else if(mEngine->getRenderer()!=NULL){
+		texture=Texture::ptr(mEngine->getRenderer()->createTexture());
+		texture->create(usageFlags,dimension,format,width,height,depth,mipLevels,mipDatas.begin());
+	}
+	else{
+		Error::nullPointer("can not create a non-backable Texture without a renderer");
+		return NULL;
+	}
+
+	manage(shared_static_cast<Texture>(texture));
+
+	return texture;
 }
 
 Texture::ptr TextureManager::createTexture(int usageFlags,Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels){

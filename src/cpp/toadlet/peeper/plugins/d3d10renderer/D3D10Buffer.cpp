@@ -71,17 +71,16 @@ bool D3D10Buffer::create(int usageFlags,AccessType accessType,IndexFormat indexF
 
 	mBindFlags|=D3D10_BIND_INDEX_BUFFER;
 
-	bool result=true;
 	mMapping=(mUsageFlags&Buffer::UsageFlags_STATIC)==0;
 	if(mMapping){
-		result=createContext();
+		createContext();
 	}
 	else{
 		mData=new uint8[mDataSize];
 		mBacking=true;
 	}
 
-	return result;
+	return true;
 }
 
 bool D3D10Buffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size){
@@ -96,21 +95,20 @@ bool D3D10Buffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr 
 
 	mBindFlags|=D3D10_BIND_VERTEX_BUFFER;
 
-	bool result=true;
 	mMapping=(mUsageFlags&Buffer::UsageFlags_STATIC)==0;
 	if(mMapping){
-		result=createContext();
+		createContext();
 	}
 	else{
 		mData=new uint8[mDataSize];
 		mBacking=true;
 	}
 
-	return result;
+	return true;
 }
 
 void D3D10Buffer::destroy(){
-	destroyContext(false);
+	destroyContext();
 
 	if(mData!=NULL){
 		delete[] mData;
@@ -154,7 +152,7 @@ bool D3D10Buffer::createContext(){
 		}
 	}
 
-	HRESULT result;
+	HRESULT result=S_OK;
 	if(mMapping){
 		result=mRenderer->getD3D10Device()->CreateBuffer(&desc,NULL,&mBuffer);
 	}
@@ -168,20 +166,14 @@ bool D3D10Buffer::createContext(){
 	return SUCCEEDED(result);
 }
 
-void D3D10Buffer::destroyContext(bool backData){
-	if(mMapping && backData){
-		mData=new uint8[mDataSize];
-		mBacking=true;
-
-		byte *data=lock(AccessType_READ_ONLY);
-		memcpy(mData,data,mDataSize);
-		unlock();
-	}
-
+bool D3D10Buffer::destroyContext(){
+	HRESULT result=S_OK;
 	if(mBuffer!=NULL){
-		mBuffer->Release();
+		result=mBuffer->Release();
 		mBuffer=NULL;
 	}
+
+	return SUCCEEDED(result);
 }
 
 uint8 *D3D10Buffer::lock(AccessType lockType){

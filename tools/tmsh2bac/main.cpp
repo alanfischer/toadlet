@@ -46,10 +46,10 @@ public:
 
 	Stream::ptr openStream(const String &name){
 		FileStream::ptr stream(new FileStream(mDirectory+name,FileStream::Open_READ_BINARY));
-		if(stream->isOpen()==false){
+		if(stream->closed()){
 			if(mSecondaryDirectory.length()>0){
 				stream=FileStream::ptr(new FileStream(mSecondaryDirectory+name,FileStream::Open_READ_BINARY));
-				if(stream->isOpen()==false){
+				if(stream->closed()){
 					stream=NULL;
 				}
 			}

@@ -82,6 +82,16 @@ bool GLTexture::create(int usageFlags,Dimension dimension,int format,int width,i
 	mDepth=depth;
 	mMipLevels=mipLevels;
 
+	createContext(mipLevels,mipDatas);
+
+	return true;
+}
+
+void GLTexture::destroy(){
+	destroyContext();
+}
+
+bool GLTexture::createContext(int mipLevels,byte *mipDatas[]){
 	// Create context data
 	mTarget=getGLTarget();
 	glGenTextures(1,&mHandle);
@@ -133,7 +143,7 @@ bool GLTexture::create(int usageFlags,Dimension dimension,int format,int width,i
 	GLint gltype=getGLType(mFormat);
 
 	// Allocate texture memory
-	int level=0;
+	int level=0,width=mWidth,height=mHeight,depth=mDepth;
 	for(level=0;level<specifiedMipLevels;++level,width/=2,height/=2,depth/=2){
 		int rowPitch=width*ImageFormatConversion::getPixelSize(mFormat);
  		int slicePitch=rowPitch*height;
@@ -183,11 +193,11 @@ bool GLTexture::create(int usageFlags,Dimension dimension,int format,int width,i
 	}
 
 	TOADLET_CHECK_GLERROR("GLTexture::createContext");
-
-	return true;
+	
+	return mHandle!=0;
 }
 
-void GLTexture::destroy(){
+bool GLTexture::destroyContext(){
 	if(mHandle!=0){
 		glDeleteTextures(1,&mHandle);
 		mHandle=0;
@@ -195,6 +205,8 @@ void GLTexture::destroy(){
 	}
 
 	TOADLET_CHECK_GLERROR("GLTexture::destroy");
+	
+	return true;
 }
 
 Surface::ptr GLTexture::getMipSurface(int level,int cubeSide){

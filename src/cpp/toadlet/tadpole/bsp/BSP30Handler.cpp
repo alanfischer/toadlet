@@ -273,7 +273,7 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 	map->facedatas.resize(map->nfaces);
 	VertexBufferAccessor vba;
 	IndexBufferAccessor iba;
-	vba.lock(vertexBuffer);
+	vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
 	for(i=0;i<map->nfaces;i++){
 		bface *face=&map->faces[i];
 
@@ -312,7 +312,7 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 		else{
 			int indexes=(face->numedges-2)*3;
 			IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,indexes);
-			iba.lock(indexBuffer);
+			iba.lock(indexBuffer,Buffer::AccessType_WRITE_ONLY);
 			for(j=1;j<face->numedges-1;++j){
 				iba.set((j-1)*3+0,face->firstedge);
 				iba.set((j-1)*3+1,face->firstedge+j);

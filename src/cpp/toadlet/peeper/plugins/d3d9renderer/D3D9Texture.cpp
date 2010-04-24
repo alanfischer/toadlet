@@ -115,7 +115,7 @@ void D3D9Texture::resetDestroy(){
 	}
 }
 
-void D3D9Texture::createContext(bool restore){
+bool D3D9Texture::createContext(bool restore){
 	IDirect3DDevice9 *device=mRenderer->getDirect3DDevice9();
 	IDirect3D9 *d3d=NULL; device->GetDirect3D(&d3d);
 
@@ -185,15 +185,14 @@ void D3D9Texture::createContext(bool restore){
 		}
 	#endif
 
-	if(FAILED(result)){
-		TOADLET_CHECK_D3D9ERROR(result,"CreateTexture");
-	}
+	TOADLET_CHECK_D3D9ERROR(result,"CreateTexture");
+
+	return SUCCEEDED(result);
 }
 
-void D3D9Texture::destroyContext(bool backup){
-	HRESULT result=S_OK;
-
+bool D3D9Texture::destroyContext(bool backup){
 	if(backup){
+		HRESULT result=S_OK;
 		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
 			if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
 				result=mRenderer->getDirect3DDevice9()->CreateOffscreenPlainSurface(mWidth,mHeight,mD3DFormat,D3DPOOL_SYSTEMMEM,&mBackupSurface,NULL);
@@ -217,11 +216,13 @@ void D3D9Texture::destroyContext(bool backup){
 		mBackupSurface=NULL;
 	}
 
+	HRESULT result=S_OK;
 	if(mTexture!=NULL){
-		HRESULT result=mTexture->Release();
-		TOADLET_CHECK_D3D9ERROR(result,"Release");
+		result=mTexture->Release();
 		mTexture=NULL;
 	}
+
+	return SUCCEEDED(result);
 }
 
 Surface::ptr D3D9Texture::getMipSurface(int level,int cubeSide){

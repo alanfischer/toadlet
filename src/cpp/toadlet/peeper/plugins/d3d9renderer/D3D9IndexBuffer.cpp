@@ -50,7 +50,6 @@ D3D9IndexBuffer::D3D9IndexBuffer(D3D9Renderer *renderer):
 	mIndexBuffer(NULL),
 	mLockType(AccessType_NO_ACCESS),
 	mData(NULL),
-	mBacking(false),
 	mBackingData(NULL)
 {
 	mRenderer=renderer;
@@ -71,7 +70,7 @@ bool D3D9IndexBuffer::create(int usageFlags,AccessType accessType,IndexFormat in
 	if(mIndexFormat==IndexFormat_UINT_8) mDataSize*=2;
 	mD3DFormat=getD3DFORMAT(mIndexFormat);
 
-	createContext();
+	createContext(false);
 
 	return true;
 }
@@ -89,7 +88,19 @@ void D3D9IndexBuffer::destroy(){
 	}
 }
 
-bool D3D9IndexBuffer::createContext(){
+void D3D9IndexBuffer::resetCreate(){
+	if(needsReset()){
+		createContext(true);
+	}
+}
+
+void D3D9IndexBuffer::resetDestroy(){
+	if(needsReset()){
+		destroyContext(true);
+	}
+}
+
+bool D3D9IndexBuffer::createContext(bool restore){
 	mD3DUsage=0;
 	mD3DPool=D3DPOOL_MANAGED;
 	if((mUsageFlags&UsageFlags_DYNAMIC)>0){
@@ -106,46 +117,38 @@ bool D3D9IndexBuffer::createContext(){
 	HRESULT result=mRenderer->getDirect3DDevice9()->CreateIndexBuffer(mDataSize,mD3DUsage,mD3DFormat,mD3DPool,&mIndexBuffer TOADLET_SHAREDHANDLE);
 	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: CreateVertexBuffer");
 
-	if(mBacking){
+	if(restore){
 		byte *data=lock(AccessType_WRITE_ONLY);
 		memcpy(data,mBackingData,mDataSize);
 		unlock();
 
 		delete[] mBackingData;
 		mBackingData=NULL;
-		mBacking=true;
 	}
-
+	
 	return SUCCEEDED(result);
 }
 
-void D3D9IndexBuffer::destroyContext(bool backData){
-	if(backData){
+bool D3D9IndexBuffer::destroyContext(bool backup){
+	if(backup){
 		mBackingData=new uint8[mDataSize];
-		mBacking=true;
 
-		byte *data=NULL;
 		TOADLET_TRY
-			data=lock(AccessType_READ_ONLY);
-		TOADLET_CATCH(const Exception &){data=NULL;}
-		if(data!=NULL){
-			memcpy(mBackingData,data,mDataSize);
-			unlock();
-		}
+			byte *data=lock(AccessType_READ_ONLY);
+			if(data!=NULL){
+				memcpy(mBackingData,data,mDataSize);
+				unlock();
+			}
+		TOADLET_CATCH(const Exception &){}
 	}
 
+	HRESULT result=S_OK;
 	if(mIndexBuffer!=NULL){
-		mIndexBuffer->Release();
+		result=mIndexBuffer->Release();
 		mIndexBuffer=NULL;
 	}
-}
 
-bool D3D9IndexBuffer::contextNeedsReset(){
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		return false;
-	#else
-		return mD3DPool==D3DPOOL_DEFAULT;
-	#endif
+	return SUCCEEDED(result);
 }
 
 uint8 *D3D9IndexBuffer::lock(AccessType lockType){
@@ -167,7 +170,7 @@ uint8 *D3D9IndexBuffer::lock(AccessType lockType){
 				d3dflags|=D3DLOCK_DISCARD;
 			}
 		break;
-		case AccessType_READ_WRITE:
+		case AccessType_READ_ONLY:
 			d3dflags|=D3DLOCK_READONLY;
 		break;
 	}
@@ -209,6 +212,14 @@ bool D3D9IndexBuffer::unlock(){
 	mData=NULL;
 
 	return SUCCEEDED(result);
+}
+
+bool D3D9IndexBuffer::needsReset(){
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		return false;
+	#else
+		return mD3DPool==D3DPOOL_DEFAULT;
+	#endif
 }
 
 D3DFORMAT D3D9IndexBuffer::getD3DFORMAT(IndexFormat format){

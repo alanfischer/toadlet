@@ -179,14 +179,14 @@ void HopEntity::setTranslate(const Vector3 &translate){
 	super::setTranslate(translate);
 
 	mSolid->setPosition(mTranslate);
-	
+
 	if(mInterpolator!=NULL){
 		mInterpolator->transformUpdated(this);
 	}
 }
 
 void HopEntity::parentChanged(ParentNode *parent){
-	if(mHopScene!=NULL){
+	if(mHopScene!=NULL && mHopScene->getSimulator()!=NULL){
 		if(parent==mScene->getRoot()){
 			mHopScene->getSimulator()->addSolid(getSolid());
 		}

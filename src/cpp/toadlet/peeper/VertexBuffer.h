@@ -40,14 +40,13 @@ public:
 
 	virtual VertexBuffer *getRootVertexBuffer()=0;
 
+	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener)=0;
+
 	virtual bool create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size)=0;
 	virtual void destroy()=0;
 
-	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener)=0;
-
-	virtual bool createContext()=0;
-	virtual void destroyContext(bool backData)=0;
-	virtual bool contextNeedsReset()=0;
+	virtual void resetCreate()=0;
+	virtual void resetDestroy()=0;
 
 	virtual VertexFormat::ptr getVertexFormat()=0;
 	virtual int getSize() const=0;

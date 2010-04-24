@@ -80,6 +80,9 @@ public:
 	inline void setMatrix(const Matrix4x4 &matrix){mMatrix.set(matrix);}
 
 protected:
+	bool createContext(int mipLevels,byte *mipDatas[]);
+	bool destroyContext();
+
 	bool generateMipLevels();
 	GLuint getGLTarget();
 
