@@ -42,7 +42,7 @@ VertexBufferAccessor::VertexBufferAccessor():
 {
 }
 
-VertexBufferAccessor::VertexBufferAccessor(VertexBuffer *vertexBuffer,Buffer::AccessType accessType):
+VertexBufferAccessor::VertexBufferAccessor(VertexBuffer *vertexBuffer,int access):
 	mVertexBuffer(NULL),
 	mVertexSize32(0),
 	mNativeFixed(false),
@@ -51,14 +51,14 @@ VertexBufferAccessor::VertexBufferAccessor(VertexBuffer *vertexBuffer,Buffer::Ac
 	mFloatData(NULL),
 	mColorData(NULL)
 {
-	lock(vertexBuffer,accessType);
+	lock(vertexBuffer,access);
 }
 
 VertexBufferAccessor::~VertexBufferAccessor(){
 	unlock();
 }
 
-void VertexBufferAccessor::lock(VertexBuffer *vertexBuffer,Buffer::AccessType accessType){
+void VertexBufferAccessor::lock(VertexBuffer *vertexBuffer,int access){
 	unlock();
 
 	mVertexBuffer=vertexBuffer;
@@ -76,7 +76,7 @@ void VertexBufferAccessor::lock(VertexBuffer *vertexBuffer,Buffer::AccessType ac
 		mNativeFixed=false;
 	}
 
-	mData=mVertexBuffer->lock(accessType);
+	mData=mVertexBuffer->lock(access);
 	if(mNativeFixed){
 		mFixedData=(int32*)mData;
 	}

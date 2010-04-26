@@ -48,7 +48,7 @@ public:
 
 	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener)=0;
 
-	virtual bool create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size)=0;
+	virtual bool create(int usage,int access,IndexFormat indexFormat,int size)=0;
 	virtual void destroy()=0;
 
 	virtual void resetCreate()=0;

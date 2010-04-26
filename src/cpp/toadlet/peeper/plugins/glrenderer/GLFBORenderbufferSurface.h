@@ -55,10 +55,10 @@ public:
 	inline GLuint getHandle() const{return mHandle;}
 
 	/// @todo: Implement these
-	virtual int getUsageFlags() const{return 0;}
-	virtual AccessType getAccessType() const{return AccessType_NO_ACCESS;}
+	virtual int getUsage() const{return 0;}
+	virtual int getAccess() const{return 0;}
 	virtual int getDataSize() const{return 0;}
-	virtual uint8 *lock(AccessType accessType){return NULL;}
+	virtual uint8 *lock(int access){return NULL;}
 	virtual bool unlock(){return false;}
 
 protected:

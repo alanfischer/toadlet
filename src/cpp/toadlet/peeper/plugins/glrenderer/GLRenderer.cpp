@@ -1112,7 +1112,7 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 			TextureStage::Calculation calculation=textureStage->calculation;
 			Matrix4x4 &transform=cache_setTextureStage_transform;
 			bool identityTransform=texture->getRootTransform(textureStage->textureTime,transform);
-			if((gltexture->mUsageFlags&(Texture::UsageFlags_NPOT_RESTRICTED|Texture::UsageFlags_RENDERTARGET))>0 || identityTransform==false){
+			if((gltexture->mUsage&(Texture::Usage_BIT_NPOT_RESTRICTED|Texture::Usage_BIT_RENDERTARGET))>0 || identityTransform==false){
 				calculation=TextureStage::Calculation_NORMAL;
 			}
 
@@ -1292,8 +1292,8 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 			else{
 				glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_COMBINE);
 				glTexEnvi(GL_TEXTURE_ENV,GL_COMBINE_RGB,mode);
-				glTexEnvi(GL_TEXTURE_ENV,GL_SRC0_RGB,GLTexture::getGLTextureBlendSource(blend.source1));
-				glTexEnvi(GL_TEXTURE_ENV,GL_SRC1_RGB,GLTexture::getGLTextureBlendSource(blend.source2));
+				glTexEnvi(GL_TEXTURE_ENV,GL_SRC0_RGB,getGLTextureBlendSource(blend.source1));
+				glTexEnvi(GL_TEXTURE_ENV,GL_SRC1_RGB,getGLTextureBlendSource(blend.source2));
 				glTexEnvi(GL_TEXTURE_ENV,GL_SRC2_RGB,GL_CONSTANT);
 			}
 		}
@@ -1307,16 +1307,16 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 			#else
 				gl_version>=12;
 			#endif
-		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_S,GLTexture::getGLWrap(textureStage->uAddressMode,hasClampToEdge));
-		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_T,GLTexture::getGLWrap(textureStage->vAddressMode,hasClampToEdge));
+		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_S,getGLWrap(textureStage->uAddressMode,hasClampToEdge));
+		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_T,getGLWrap(textureStage->vAddressMode,hasClampToEdge));
 		#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_12)
 		if(gl_version>=12){
-			glTexParameteri(textureTarget,GL_TEXTURE_WRAP_R,GLTexture::getGLWrap(textureStage->wAddressMode,hasClampToEdge));
+			glTexParameteri(textureTarget,GL_TEXTURE_WRAP_R,getGLWrap(textureStage->wAddressMode,hasClampToEdge));
 		}
 		#endif
 
-		glTexParameteri(textureTarget,GL_TEXTURE_MIN_FILTER,GLTexture::getGLMinFilter(textureStage->minFilter,textureStage->mipFilter));
-		glTexParameteri(textureTarget,GL_TEXTURE_MAG_FILTER,GLTexture::getGLMagFilter(textureStage->magFilter));
+		glTexParameteri(textureTarget,GL_TEXTURE_MIN_FILTER,getGLMinFilter(textureStage->minFilter,textureStage->mipFilter));
+		glTexParameteri(textureTarget,GL_TEXTURE_MAG_FILTER,getGLMagFilter(textureStage->magFilter));
 
 		#if !defined(TOADLET_HAS_GLES)
 			if(gl_version>=14){
@@ -1531,139 +1531,20 @@ void GLRenderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &res
 				0,          0,          0,          Math::ONE);
 }
 
+int GLRenderer::getClosestTextureFormat(int textureFormat){
+	if(textureFormat==Texture::Format_BGR_8){
+		textureFormat=Texture::Format_RGB_8;
+	}
+	if(textureFormat==Texture::Format_BGRA_8){
+		textureFormat=Texture::Format_RGBA_8;
+	}
+	return textureFormat;
+}
+
 // Thanks to Ogre3D for this threshold
 bool GLRenderer::useMapping(GLBuffer *buffer) const{
 	return buffer->mDataSize>(1024 * 32);
 }
-
-GLenum GLRenderer::getGLDepthFunc(DepthTest depthTest){
-	switch(depthTest){
-		case DepthTest_NEVER:
-			return GL_NEVER;
-		case DepthTest_LESS:
-			return GL_LESS;
-		case DepthTest_EQUAL:
-			return GL_EQUAL;
-		case DepthTest_LEQUAL:
-			return GL_LEQUAL;
-		case DepthTest_GREATER:
-			return GL_GREATER;
-		case DepthTest_NOTEQUAL:
-			return GL_NOTEQUAL;
-		case DepthTest_GEQUAL:
-			return GL_GEQUAL;
-		case DepthTest_ALWAYS:
-			return GL_ALWAYS;
-		default:
-			return 0;
-	}
-}
-
-GLenum GLRenderer::getGLAlphaFunc(AlphaTest alphaTest){
-	switch(alphaTest){
-		case AlphaTest_LESS:
-			return GL_LESS;
-		case AlphaTest_EQUAL:
-			return GL_EQUAL;
-		case AlphaTest_LEQUAL:
-			return GL_LEQUAL;
-		case AlphaTest_GREATER:
-			return GL_GREATER;
-		case AlphaTest_NOTEQUAL:
-			return GL_NOTEQUAL;
-		case AlphaTest_GEQUAL:
-			return GL_GEQUAL;
-		case AlphaTest_ALWAYS:
-			return GL_ALWAYS;
-		default:
-			return 0;
-	}
-}
-
-GLenum GLRenderer::getGLBlendOperation(Blend::Operation blend){
-	switch(blend){
-		case Blend::Operation_ONE:
-			return GL_ONE;
-		case Blend::Operation_ZERO:
-			return GL_ZERO;
-		case Blend::Operation_DEST_COLOR:
-			return GL_DST_COLOR;
-		case Blend::Operation_SOURCE_COLOR:
-			return GL_SRC_COLOR;
-		case Blend::Operation_ONE_MINUS_DEST_COLOR:
-			return GL_ONE_MINUS_DST_COLOR;
-		case Blend::Operation_ONE_MINUS_SOURCE_COLOR:
-			return GL_ONE_MINUS_SRC_COLOR;
-		case Blend::Operation_DEST_ALPHA:
-			return GL_ONE_MINUS_DST_ALPHA;
-		case Blend::Operation_SOURCE_ALPHA:
-			return GL_SRC_ALPHA;
-		case Blend::Operation_ONE_MINUS_DEST_ALPHA:
-			return GL_ONE_MINUS_DST_ALPHA;
-		case Blend::Operation_ONE_MINUS_SOURCE_ALPHA:
-			return GL_ONE_MINUS_SRC_ALPHA;
-		default:
-			return 0;
-	}
-}
-
-GLint GLRenderer::getGLElementCount(int format){
-	switch(format&~VertexElement::Format_MASK_TYPES){ // Mask out the types
-		case VertexElement::Format_BIT_COUNT_1:
-			return 1;
-		case VertexElement::Format_BIT_COUNT_2:
-			return 2;
-		case VertexElement::Format_BIT_COUNT_3:
-			return 3;
-		case VertexElement::Format_BIT_COUNT_4:
-		case VertexElement::Format_COLOR_RGBA:
-			return 4;
-		default:
-			Error::unknown(Categories::TOADLET_PEEPER,
-				"getGLElementCount: Invalid element count");
-			return 0;
-	}
-}
-
-GLenum GLRenderer::getGLDataType(int format){
-	switch(format&~VertexElement::Format_MASK_COUNTS){ // Mask out the counts
-		case VertexElement::Format_BIT_UINT_8:
-		case VertexElement::Format_COLOR_RGBA:
-			return GL_UNSIGNED_BYTE;
-		case VertexElement::Format_BIT_INT_8:
-			return GL_BYTE;
-		case VertexElement::Format_BIT_INT_16:
-			return GL_SHORT;
-		case VertexElement::Format_BIT_FLOAT_32:
-			return GL_FLOAT;
-		#if !defined(TOADLET_HAS_GLES)
-			case VertexElement::Format_BIT_INT_32:
-				return GL_INT;
-			case VertexElement::Format_BIT_DOUBLE_64:
-				return GL_DOUBLE;
-		#else
-			case VertexElement::Format_BIT_FIXED_32:
-				return GL_FIXED;
-		#endif
-		default:
-			Error::unknown(Categories::TOADLET_PEEPER,
-				"getGLDataType: Invalid data type");
-			return 0;
-	}
-}
-
-GLuint GLClientStates[6]={
-	GL_VERTEX_ARRAY,
-	0, /// @todo: Blend Weights
-	0, /// @todo: Blend Indices
-	GL_NORMAL_ARRAY,
-	GL_COLOR_ARRAY,
-	#if defined(TOADLET_HAS_GLEW)
-		GL_SECONDARY_COLOR_ARRAY,
-	#else
-		0,
-	#endif
-};
 
 int GLRenderer::setVertexData(const VertexData *vertexData,int lastTypeBits){
 	int numVertexBuffers=0;
@@ -1804,6 +1685,310 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastTypeBits){
 
 	return typeBits;
 }
+
+GLenum GLRenderer::getGLDepthFunc(DepthTest depthTest){
+	switch(depthTest){
+		case DepthTest_NEVER:
+			return GL_NEVER;
+		case DepthTest_LESS:
+			return GL_LESS;
+		case DepthTest_EQUAL:
+			return GL_EQUAL;
+		case DepthTest_LEQUAL:
+			return GL_LEQUAL;
+		case DepthTest_GREATER:
+			return GL_GREATER;
+		case DepthTest_NOTEQUAL:
+			return GL_NOTEQUAL;
+		case DepthTest_GEQUAL:
+			return GL_GEQUAL;
+		case DepthTest_ALWAYS:
+			return GL_ALWAYS;
+		default:
+			return 0;
+	}
+}
+
+GLenum GLRenderer::getGLAlphaFunc(AlphaTest alphaTest){
+	switch(alphaTest){
+		case AlphaTest_LESS:
+			return GL_LESS;
+		case AlphaTest_EQUAL:
+			return GL_EQUAL;
+		case AlphaTest_LEQUAL:
+			return GL_LEQUAL;
+		case AlphaTest_GREATER:
+			return GL_GREATER;
+		case AlphaTest_NOTEQUAL:
+			return GL_NOTEQUAL;
+		case AlphaTest_GEQUAL:
+			return GL_GEQUAL;
+		case AlphaTest_ALWAYS:
+			return GL_ALWAYS;
+		default:
+			return 0;
+	}
+}
+
+GLenum GLRenderer::getGLBlendOperation(Blend::Operation blend){
+	switch(blend){
+		case Blend::Operation_ONE:
+			return GL_ONE;
+		case Blend::Operation_ZERO:
+			return GL_ZERO;
+		case Blend::Operation_DEST_COLOR:
+			return GL_DST_COLOR;
+		case Blend::Operation_SOURCE_COLOR:
+			return GL_SRC_COLOR;
+		case Blend::Operation_ONE_MINUS_DEST_COLOR:
+			return GL_ONE_MINUS_DST_COLOR;
+		case Blend::Operation_ONE_MINUS_SOURCE_COLOR:
+			return GL_ONE_MINUS_SRC_COLOR;
+		case Blend::Operation_DEST_ALPHA:
+			return GL_ONE_MINUS_DST_ALPHA;
+		case Blend::Operation_SOURCE_ALPHA:
+			return GL_SRC_ALPHA;
+		case Blend::Operation_ONE_MINUS_DEST_ALPHA:
+			return GL_ONE_MINUS_DST_ALPHA;
+		case Blend::Operation_ONE_MINUS_SOURCE_ALPHA:
+			return GL_ONE_MINUS_SRC_ALPHA;
+		default:
+			return 0;
+	}
+}
+
+GLint GLRenderer::getGLElementCount(int format){
+	switch(format&~VertexElement::Format_MASK_TYPES){ // Mask out the types
+		case VertexElement::Format_BIT_COUNT_1:
+			return 1;
+		case VertexElement::Format_BIT_COUNT_2:
+			return 2;
+		case VertexElement::Format_BIT_COUNT_3:
+			return 3;
+		case VertexElement::Format_BIT_COUNT_4:
+		case VertexElement::Format_COLOR_RGBA:
+			return 4;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"getGLElementCount: Invalid element count");
+			return 0;
+	}
+}
+
+GLenum GLRenderer::getGLDataType(int format){
+	switch(format&~VertexElement::Format_MASK_COUNTS){ // Mask out the counts
+		case VertexElement::Format_BIT_UINT_8:
+		case VertexElement::Format_COLOR_RGBA:
+			return GL_UNSIGNED_BYTE;
+		case VertexElement::Format_BIT_INT_8:
+			return GL_BYTE;
+		case VertexElement::Format_BIT_INT_16:
+			return GL_SHORT;
+		case VertexElement::Format_BIT_FLOAT_32:
+			return GL_FLOAT;
+		#if !defined(TOADLET_HAS_GLES)
+			case VertexElement::Format_BIT_INT_32:
+				return GL_INT;
+			case VertexElement::Format_BIT_DOUBLE_64:
+				return GL_DOUBLE;
+		#else
+			case VertexElement::Format_BIT_FIXED_32:
+				return GL_FIXED;
+		#endif
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"getGLDataType: Invalid data type");
+			return 0;
+	}
+}
+
+GLuint GLRenderer::getGLFormat(int textureFormat){
+	GLuint format=0;
+
+	if((textureFormat&Texture::Format_BIT_L)>0){
+		format=GL_LUMINANCE;
+	}
+	else if((textureFormat&Texture::Format_BIT_A)>0){
+		format=GL_ALPHA;
+	}
+	else if((textureFormat&Texture::Format_BIT_LA)>0){
+		format=GL_LUMINANCE_ALPHA;
+	}
+	else if((textureFormat&Texture::Format_BIT_RGB)>0){
+		format=GL_RGB;
+	}
+	else if((textureFormat&Texture::Format_BIT_RGBA)>0){
+		format=GL_RGBA;
+	}
+
+	#if !defined(TOADLET_HAS_GLES) || defined(TOADLET_HAS_EAGL)
+		else if((textureFormat&Texture::Format_BIT_DEPTH)>0){
+			if((textureFormat&Texture::Format_BIT_UINT_16)>0){
+				format=GL_DEPTH_COMPONENT16;
+			}
+			else if((textureFormat&Texture::Format_BIT_UINT_24)>0){
+				format=GL_DEPTH_COMPONENT24;
+			}
+			#if !defined(TOADLET_HAS_EAGL)
+				else if((textureFormat&Texture::Format_BIT_UINT_32)>0){
+					format=GL_DEPTH_COMPONENT32;
+				}
+				else{
+					format=GL_DEPTH_COMPONENT;
+				}
+			#endif
+		}
+	#endif
+
+	if(format==0){
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"GLTexture::getGLFormat: Invalid format");
+		return 0;
+	}
+
+	return format;
+}
+
+GLuint GLRenderer::getGLType(int textureFormat){
+	GLuint type=0;
+
+	if((textureFormat&Texture::Format_BIT_UINT_8)>0){
+		type=GL_UNSIGNED_BYTE;
+	}
+	else if((textureFormat&Texture::Format_BIT_FLOAT_32)>0){
+		type=GL_FLOAT;
+	}
+	else if((textureFormat&Texture::Format_BIT_UINT_5_6_5)>0){
+		type=GL_UNSIGNED_SHORT_5_6_5;
+	}
+	else if((textureFormat&Texture::Format_BIT_UINT_5_5_5_1)>0){
+		type=GL_UNSIGNED_SHORT_5_5_5_1;
+	}
+	else if((textureFormat&Texture::Format_BIT_UINT_4_4_4_4)>0){
+		type=GL_UNSIGNED_SHORT_4_4_4_4;
+	}
+
+	if(type==0){
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"GLTexture::getGLType: Invalid type");
+		return 0;
+	}
+
+	return type;
+}
+
+GLuint GLRenderer::getGLWrap(TextureStage::AddressMode addressMode,bool hasClampToEdge){
+	switch(addressMode){
+		case TextureStage::AddressMode_REPEAT:
+			return GL_REPEAT;
+		#if !defined(TOADLET_HAS_GLES)
+			case TextureStage::AddressMode_CLAMP_TO_BORDER:
+				return GL_CLAMP_TO_BORDER;
+			case TextureStage::AddressMode_MIRRORED_REPEAT:
+				return GL_MIRRORED_REPEAT;
+			case TextureStage::AddressMode_CLAMP_TO_EDGE:
+				return hasClampToEdge?GL_CLAMP_TO_EDGE:GL_CLAMP;
+		#else
+			case TextureStage::AddressMode_CLAMP_TO_EDGE:
+				return GL_CLAMP_TO_EDGE;
+		#endif
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"GLTexture::getGLWrap: Invalid address mode");
+			return 0;
+	}
+}
+
+GLuint GLRenderer::getGLMinFilter(TextureStage::Filter minFilter,TextureStage::Filter mipFilter){
+	switch(mipFilter){
+		case TextureStage::Filter_NONE:
+			switch(minFilter){
+				case TextureStage::Filter_NEAREST:
+					return GL_NEAREST;
+				case TextureStage::Filter_LINEAR:
+					return GL_LINEAR;
+				default:
+				break;
+			}
+		break;
+		case TextureStage::Filter_NEAREST:
+			switch(minFilter){
+				case TextureStage::Filter_NEAREST:
+					return GL_NEAREST_MIPMAP_NEAREST;
+				case TextureStage::Filter_LINEAR:
+					return GL_NEAREST_MIPMAP_LINEAR;
+				default:
+				break;
+			}
+		break;
+		case TextureStage::Filter_LINEAR:
+			switch(minFilter){
+				case TextureStage::Filter_NEAREST:
+					return GL_LINEAR_MIPMAP_NEAREST;
+				case TextureStage::Filter_LINEAR:
+					return GL_LINEAR_MIPMAP_LINEAR;
+				default:
+				break;
+			}
+		break;
+	}
+
+	Error::unknown(Categories::TOADLET_PEEPER,
+		"GLTexture::getGLMinFilter: Invalid filter");
+	return 0;
+}
+
+GLuint GLRenderer::getGLMagFilter(TextureStage::Filter magFilter){
+	switch(magFilter){
+		case TextureStage::Filter_NEAREST:
+			return GL_NEAREST;
+		case TextureStage::Filter_LINEAR:
+			return GL_LINEAR;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"GLTexture::getGLMagFilter: Invalid filter");
+			return 0;
+	}
+}
+
+GLuint GLRenderer::getGLTextureBlendSource(TextureBlend::Source blend){
+	switch(blend){
+		case TextureBlend::Source_PREVIOUS:
+			return GL_PREVIOUS;
+		case TextureBlend::Source_TEXTURE:
+			return GL_TEXTURE;
+		case TextureBlend::Source_PRIMARY_COLOR:
+			return GL_PRIMARY_COLOR;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"GLTexture::getGLTextureBlendSource: Invalid source");
+			return 0;
+	}
+}
+
+GLuint GLRenderer::GLClientStates[6]={
+	GL_VERTEX_ARRAY,
+	0, /// @todo: Blend Weights
+	0, /// @todo: Blend Indices
+	GL_NORMAL_ARRAY,
+	GL_COLOR_ARRAY,
+	#if defined(TOADLET_HAS_GLEW)
+		GL_SECONDARY_COLOR_ARRAY,
+	#else
+		0,
+	#endif
+};
+
+#if !defined(TOADLET_HAS_GLES)
+	GLuint GLRenderer::GLCubeFaces[6]={
+		GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+	};
+#endif
 
 }
 }

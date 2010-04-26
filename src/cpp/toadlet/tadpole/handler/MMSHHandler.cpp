@@ -108,16 +108,11 @@ Resource::ptr MMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 			}
 
 			// HACK: Due to a bug in reading back vertexes from a hardware buffer in OGLES, we only load the static VertexBuffer of a Mesh if its not animated.
-			VertexBuffer::ptr vertexBuffer;
-			if((vertexType&VT_BONE)>0){
-				vertexBuffer=mBufferManager->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_READ_WRITE,vertexFormat,numVertexes);
-			}
-			else{
-				vertexBuffer=mBufferManager->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,numVertexes);
-			}
+			// UPDATE: This actually isnt a bug I believe, but instead the fact that OGLES doesnt use map, and instead bufferSubData, which obviously cant get the previous data
+			VertexBuffer::ptr vertexBuffer=vertexBuffer=mBufferManager->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,numVertexes);
 
 			VertexBufferAccessor vba;
-			vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
+			vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
 
 			if((vertexType&VT_POSITION)>0){
 				uint8 bytes=dataStream->readUInt8();
@@ -290,9 +285,9 @@ Resource::ptr MMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 					newNumIndexes+=(stripLengths[j]-2)*3;
 				}
 
-				IndexBuffer::ptr indexBuffer=mBufferManager->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,newNumIndexes);
+				IndexBuffer::ptr indexBuffer=mBufferManager->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,newNumIndexes);
 				{
-					uint16 *indexData=(uint16*)indexBuffer->lock(Buffer::AccessType_WRITE_ONLY);
+					uint16 *indexData=(uint16*)indexBuffer->lock(Buffer::Access_BIT_WRITE);
 					int ipo=0;
 					int ipn=0;
 					for(j=0;j<numStrips;++j){

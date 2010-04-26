@@ -25,7 +25,6 @@
 
 #include "D3D9Renderer.h"
 #include "D3D9SurfaceRenderTarget.h"
-#include "D3D9Texture.h"
 #include <toadlet/egg/Error.h>
 
 using namespace toadlet::egg;
@@ -169,7 +168,7 @@ bool D3D9SurfaceRenderTarget::compile(){
 Surface::ptr D3D9SurfaceRenderTarget::createBufferSurface(int format,int width,int height){
 	IDirect3DSurface9 *d3dsurface=NULL;
 
-	D3DFORMAT d3dformat=D3D9Texture::getD3DFORMAT(format);
+	D3DFORMAT d3dformat=D3D9Renderer::getD3DFORMAT(format);
 
 	HRESULT result;
 	if((format&Texture::Format_BIT_DEPTH)>0){

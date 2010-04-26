@@ -43,10 +43,10 @@ public:
 
 	virtual void destroy();
 
-	virtual peeper::IndexBuffer::ptr createIndexBuffer(int usageFlags,peeper::Buffer::AccessType accessType,peeper::IndexBuffer::IndexFormat indexFormat,int size);
-	virtual peeper::VertexBuffer::ptr createVertexBuffer(int usageFlags,peeper::Buffer::AccessType accessType,peeper::VertexFormat::ptr vertexFormat,int size);
-	virtual peeper::IndexBuffer::ptr cloneIndexBuffer(peeper::IndexBuffer::ptr oldIndexBuffer,int usageFlags,peeper::Buffer::AccessType accessType,peeper::IndexBuffer::IndexFormat indexFormat,int size);
-	virtual peeper::VertexBuffer::ptr cloneVertexBuffer(peeper::VertexBuffer::ptr oldVertexBuffer,int usageFlags,peeper::Buffer::AccessType accessType,peeper::VertexFormat::ptr vertexFormat,int size);
+	virtual peeper::IndexBuffer::ptr createIndexBuffer(int usage,int access,peeper::IndexBuffer::IndexFormat indexFormat,int size);
+	virtual peeper::VertexBuffer::ptr createVertexBuffer(int usage,int access,peeper::VertexFormat::ptr vertexFormat,int size);
+	virtual peeper::IndexBuffer::ptr cloneIndexBuffer(peeper::IndexBuffer::ptr oldIndexBuffer,int usage,int access,peeper::IndexBuffer::IndexFormat indexFormat,int size);
+	virtual peeper::VertexBuffer::ptr cloneVertexBuffer(peeper::VertexBuffer::ptr oldVertexBuffer,int usage,int access,peeper::VertexFormat::ptr vertexFormat,int size);
 
 	virtual void contextActivate(peeper::Renderer *renderer);
 	virtual void contextDeactivate(peeper::Renderer *renderer);

@@ -107,6 +107,7 @@ public:
 	// Misc operations
 	void setMirrorY(bool mirrorY);
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
+	int getClosestTextureFormat(int textureFormat);
 
 	const StatisticsSet &getStatisticsSet(){return mStatisticsSet;}
 	const CapabilitySet &getCapabilitySet(){return mCapabilitySet;}
@@ -117,6 +118,10 @@ public:
 
 	Matrix4x4 cacheMatrix4x4;
 	D3DMATRIX cacheD3DMatrix;
+
+	static D3DFORMAT getD3DFORMAT(int textureFormat);
+	static DWORD getD3DTADDRESS(TextureStage::AddressMode addressMode);
+	static DWORD getD3DTEXF(TextureStage::Filter filter);
 
 protected:
 	static void setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D3DCAPS9 &caps,bool renderToTexture,bool renderToDepthTexture);

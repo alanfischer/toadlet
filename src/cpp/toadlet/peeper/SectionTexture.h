@@ -45,7 +45,7 @@ public:
 	Texture *getRootTexture(int frame);
 	bool getRootTransform(int frame,Matrix4x4 &transform);
 
-	bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,int rowPitches[],int slicePitches[],byte *mipDatas[]){
+	bool create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,int rowPitches[],int slicePitches[],byte *mipDatas[]){
 		egg::Error::unimplemented("create not implemented for SectionTexture");
 		return false;
 	}
@@ -54,7 +54,7 @@ public:
 	void resetCreate(){}
 	void resetDestroy(){}
 
-	int getUsageFlags() const{return 0;}
+	int getUsage() const{return 0;}
 	Dimension getDimension() const{return mDimension;}
 	int getFormat() const{return Format_UNKNOWN;}
 	int getWidth() const;

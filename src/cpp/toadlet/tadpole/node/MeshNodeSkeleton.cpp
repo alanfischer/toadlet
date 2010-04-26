@@ -283,10 +283,10 @@ void MeshNodeSkeleton::setRenderable(bool renderable){
 		mMaterial->setDepthTest(Renderer::DepthTest_NONE);
 		mMaterial->setLayer(1);
 
-		IndexBuffer::ptr indexBuffer=engine->getBufferManager()->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,(mBones.size()-1)*2);
+		IndexBuffer::ptr indexBuffer=engine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,(mBones.size()-1)*2);
 		IndexBufferAccessor iba;
 		{
-			iba.lock(indexBuffer,Buffer::AccessType_WRITE_ONLY);
+			iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
 			for(i=1;i<mBones.size();++i){
 				iba.set((i-1)*2+0,mSkeleton->bones[i]->parentIndex<0?0:mSkeleton->bones[i]->parentIndex);
 				iba.set((i-1)*2+1,i);
@@ -295,7 +295,7 @@ void MeshNodeSkeleton::setRenderable(bool renderable){
 		}
 		mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,indexBuffer));
 
-		VertexBuffer::ptr vertexBuffer=engine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_DYNAMIC,Buffer::AccessType_WRITE_ONLY,engine->getVertexFormats().POSITION,mBones.size());
+		VertexBuffer::ptr vertexBuffer=engine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,engine->getVertexFormats().POSITION,mBones.size());
 		mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 
 		updateVertexData();
@@ -309,7 +309,7 @@ void MeshNodeSkeleton::setRenderable(bool renderable){
 
 void MeshNodeSkeleton::updateVertexData(){
 	VertexBufferAccessor vba;
-	vba.lock(mVertexData->getVertexBuffer(0),Buffer::AccessType_WRITE_ONLY);
+	vba.lock(mVertexData->getVertexBuffer(0),Buffer::Access_BIT_WRITE);
 	int i;
 	for(i=0;i<mBones.size();++i){
 		vba.set3(i,0,mBones[i]->worldTranslate);

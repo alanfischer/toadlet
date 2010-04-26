@@ -44,16 +44,16 @@ public:
 	Texture *getRootTexture(scalar time);
 	bool getRootTransform(scalar time,Matrix4x4 &transform);
 
-	bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
+	bool create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
 		egg::Error::unimplemented("create not implemented for SectionTexture");
 		return false;
 	}
 	void destroy();
 
-		void resetCreate(){}
+	void resetCreate(){}
 	void resetDestroy(){}
 
-	int getUsageFlags() const{return 0;}
+	int getUsage() const{return 0;}
 	Dimension getDimension() const{return mDimension;}
 	int getFormat() const{return Format_UNKNOWN;}
 	int getWidth() const;

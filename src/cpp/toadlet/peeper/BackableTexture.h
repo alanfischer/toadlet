@@ -43,13 +43,13 @@ public:
 	virtual Texture *getRootTexture(scalar time){return mBack!=NULL?mBack->getRootTexture(time):NULL;}
 	virtual bool getRootTransform(scalar time,Matrix4x4 &transform){return mBack!=NULL?mBack->getRootTransform(time,transform):true;}
 
-	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]);
+	virtual bool create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]);
 	virtual void destroy();
 
 	virtual void resetCreate(){}
 	virtual void resetDestroy(){}
 
-	virtual int getUsageFlags() const{return mUsageFlags;}
+	virtual int getUsage() const{return mUsage;}
 	virtual Dimension getDimension() const{return mDimension;}
 	virtual int getFormat() const{return mFormat;}
 	virtual int getWidth() const{return mWidth;}
@@ -66,7 +66,7 @@ public:
 	virtual Texture::ptr getBack(){return mBack;}
 
 protected:
-	int mUsageFlags;
+	int mUsage;
 	Dimension mDimension;
 	int mFormat;
 	int mWidth;

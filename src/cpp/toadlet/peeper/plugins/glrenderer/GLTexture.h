@@ -52,7 +52,7 @@ public:
 	virtual void resetCreate(){}
 	virtual void resetDestroy(){}
 
-	virtual int getUsageFlags() const{return mUsageFlags;}
+	virtual int getUsage() const{return mUsage;}
 	virtual Dimension getDimension() const{return mDimension;}
 	virtual int getFormat() const{return mFormat;}
 	virtual int getWidth() const{return mWidth;}
@@ -68,15 +68,6 @@ public:
 	inline GLuint getHandle() const{return mHandle;}
 	inline GLenum getTarget() const{return mTarget;}
 
-	static int getClosestTextureFormat(int textureFormat);
-	static GLuint getGLFormat(int textureFormat);
-	static GLuint getGLType(int textureFormat);
-	static GLuint getGLWrap(TextureStage::AddressMode addressMode,bool hasClampToEdge=true);
-	static GLuint getGLMinFilter(TextureStage::Filter minFilter,TextureStage::Filter mipFilter);
-	static GLuint getGLMagFilter(TextureStage::Filter magFilter);
-	static GLuint getGLTextureBlendSource(TextureBlend::Source blend);
-	static GLuint GLCubeFaces[6];
-
 	inline void setMatrix(const Matrix4x4 &matrix){mMatrix.set(matrix);}
 
 protected:
@@ -88,7 +79,7 @@ protected:
 
 	GLRenderer *mRenderer;
 
-	int mUsageFlags;
+	int mUsage;
 	Dimension mDimension;
 	int mFormat;
 	int mWidth;

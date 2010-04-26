@@ -44,15 +44,20 @@ TextureManager::TextureManager(Engine *engine,bool backable):ResourceManager(eng
 	mBackable=backable;
 }
 
-Texture::ptr TextureManager::createTexture(Image::ptr image,int usageFlags,int mipLevels){
+Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLevels){
+	Renderer *renderer=getRenderer();
+
 	Image::Dimension dimension=image->getDimension();
 	int format=image->getFormat();
 	int width=image->getWidth(),height=image->getHeight(),depth=image->getDepth();
+	int closestFormat=renderer==NULL?format:renderer->getClosestTextureFormat(format);
 
-	bool hasNonPowerOf2=mEngine->getRenderer()==NULL?false:mEngine->getRenderer()->getCapabilitySet().textureNonPowerOf2;
-	bool hasAutogen=mEngine->getRenderer()==NULL?false:mEngine->getRenderer()->getCapabilitySet().textureAutogenMipMaps;
-	// Only handle any autogen simulation if we actually have a renderer
-	bool wantsAutogen=mEngine->getRenderer()==NULL?false:(usageFlags&Texture::UsageFlags_AUTOGEN_MIPMAPS)>0;
+	// Check if the renderer supports npot textures
+	bool hasNonPowerOf2=renderer==NULL?false:renderer->getCapabilitySet().textureNonPowerOf2;
+	// Check if the renderer can autogenerate mipmaps
+	bool hasAutogen=renderer==NULL?false:renderer->getCapabilitySet().textureAutogenMipMaps;
+	// See if we want autogenerate, and only do so if we have a renderer
+	bool wantsAutogen=renderer==NULL?false:(usage&Texture::Usage_BIT_AUTOGEN_MIPMAPS)>0;
 
 	Image::ptr finalImage=image;
 	if((hasAutogen==false || hasNonPowerOf2==false) && (Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || Math::isPowerOf2(depth)==false)){
@@ -78,13 +83,23 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usageFlags,int m
 		depth=ddepth;
 	}
 
+	if(format!=closestFormat){
+		Image::ptr convertedImage=Image::ptr(new Image(dimension,closestFormat,width,height,depth));
+		ImageFormatConversion::convert(
+			finalImage->getData(),finalImage->getFormat(),finalImage->getRowPitch(),finalImage->getSlicePitch(),
+			convertedImage->getData(),convertedImage->getFormat(),convertedImage->getRowPitch(),convertedImage->getSlicePitch(),width,height,depth);
+		finalImage=convertedImage;
+		format=closestFormat;
+	}
+
 	egg::Collection<Image::ptr> mipImages;
-	mipImages.add(finalImage);
 	egg::Collection<byte*> mipDatas;
+
+	mipImages.add(finalImage);
 	mipDatas.add(finalImage->getData());
 
 	if(hasAutogen==false && wantsAutogen==true){
-		usageFlags&=~Texture::UsageFlags_AUTOGEN_MIPMAPS;
+		usage&=~Texture::Usage_BIT_AUTOGEN_MIPMAPS;
 
 		if(mipLevels==0){
 			int hwidth=width,hheight=height,hdepth=depth;
@@ -116,16 +131,16 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usageFlags,int m
 	Texture::ptr texture;
 	if(mBackable){
 		BackableTexture::ptr backableTexture(new BackableTexture());
-		backableTexture->create(usageFlags,dimension,format,width,height,depth,mipLevels,mipDatas.begin());
+		backableTexture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas.begin());
 		if(mEngine->getRenderer()!=NULL){
-			Texture::ptr back(mEngine->getRenderer()->createTexture());
+			Texture::ptr back(renderer->createTexture());
 			backableTexture->setBack(back);
 		}
 		texture=backableTexture;
 	}
-	else if(mEngine->getRenderer()!=NULL){
-		texture=Texture::ptr(mEngine->getRenderer()->createTexture());
-		texture->create(usageFlags,dimension,format,width,height,depth,mipLevels,mipDatas.begin());
+	else if(renderer!=NULL){
+		texture=Texture::ptr(renderer->createTexture());
+		texture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas.begin());
 	}
 	else{
 		Error::nullPointer("can not create a non-backable Texture without a renderer");
@@ -137,26 +152,48 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usageFlags,int m
 	return texture;
 }
 
-Texture::ptr TextureManager::createTexture(Image::ptr images[],int usageFlags,int mipLevels){
+Texture::ptr TextureManager::createTexture(Image::ptr images[],int usage,int mipLevels){
 	if(images==NULL || mipLevels==0){
 		Error::nullPointer("createTexture called without images or mipLevels");
 		return NULL;
 	}
 
+	Renderer *renderer=getRenderer();
+
 	Image::Dimension dimension=images[0]->getDimension();
 	int format=images[0]->getFormat();
 	int width=images[0]->getWidth(),height=images[0]->getHeight(),depth=images[0]->getDepth();
+	int closestFormat=renderer==NULL?format:renderer->getClosestTextureFormat(format);
 
+	egg::Collection<Image::ptr> mipImages;
 	egg::Collection<byte*> mipDatas;
-	int i;
-	for(i=0;i<mipLevels;++i){
-		mipDatas.add(images[i]->getData());
+
+	if(format!=closestFormat){
+		int i;
+		for(i=0;i<mipLevels;++i){
+			Image::ptr convertedImage=Image::ptr(new Image(dimension,closestFormat,images[i]->getWidth(),images[i]->getHeight(),images[i]->getDepth()));
+			ImageFormatConversion::convert(
+				images[i]->getData(),images[i]->getFormat(),images[i]->getRowPitch(),images[i]->getSlicePitch(),
+				convertedImage->getData(),convertedImage->getFormat(),convertedImage->getRowPitch(),convertedImage->getSlicePitch(),convertedImage->getWidth(),convertedImage->getHeight(),convertedImage->getDepth());
+
+			mipImages.add(convertedImage);
+			mipDatas.add(convertedImage->getData());
+
+			format=closestFormat;
+		}
+	}
+	else{
+		int i;
+		for(i=0;i<mipLevels;++i){
+			mipImages.add(images[i]);
+			mipDatas.add(images[i]->getData());
+		}
 	}
 
 	Texture::ptr texture;
 	if(mBackable){
 		BackableTexture::ptr backableTexture(new BackableTexture());
-		backableTexture->create(usageFlags,dimension,format,width,height,depth,mipLevels,mipDatas.begin());
+		backableTexture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas.begin());
 		if(mEngine->getRenderer()!=NULL){
 			Texture::ptr back(mEngine->getRenderer()->createTexture());
 			backableTexture->setBack(back);
@@ -165,7 +202,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr images[],int usageFlags,in
 	}
 	else if(mEngine->getRenderer()!=NULL){
 		texture=Texture::ptr(mEngine->getRenderer()->createTexture());
-		texture->create(usageFlags,dimension,format,width,height,depth,mipLevels,mipDatas.begin());
+		texture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas.begin());
 	}
 	else{
 		Error::nullPointer("can not create a non-backable Texture without a renderer");
@@ -177,21 +214,21 @@ Texture::ptr TextureManager::createTexture(Image::ptr images[],int usageFlags,in
 	return texture;
 }
 
-Texture::ptr TextureManager::createTexture(int usageFlags,Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels){
+Texture::ptr TextureManager::createTexture(int usage,Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels){
 	Texture::ptr texture;
 	if(mBackable){
 		BackableTexture::ptr backableTexture(new BackableTexture());
-		backableTexture->create(usageFlags,dimension,format,width,height,depth,mipLevels,NULL);
+		backableTexture->create(usage,dimension,format,width,height,depth,mipLevels,NULL);
 		if(mEngine->getRenderer()!=NULL){
 			Texture::ptr back(mEngine->getRenderer()->createTexture());
-			back->create(usageFlags,dimension,format,width,height,depth,mipLevels,NULL);
+			back->create(usage,dimension,format,width,height,depth,mipLevels,NULL);
 			backableTexture->setBack(back);
 		}
 		texture=backableTexture;
 	}
 	else if(mEngine->getRenderer()!=NULL){
 		texture=Texture::ptr(mEngine->getRenderer()->createTexture());
-		texture->create(usageFlags,dimension,format,width,height,depth,mipLevels,NULL);
+		texture->create(usage,dimension,format,width,height,depth,mipLevels,NULL);
 	}
 	else{
 		Error::nullPointer("can not create a non-backable Texture without a renderer");

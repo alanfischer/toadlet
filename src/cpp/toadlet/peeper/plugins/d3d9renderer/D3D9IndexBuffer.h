@@ -43,19 +43,19 @@ public:
 
 	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
-	virtual bool create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size);
+	virtual bool create(int usage,int access,IndexFormat indexFormat,int size);
 	virtual void destroy();
 
 	virtual void resetCreate();
 	virtual void resetDestroy();
 
-	virtual int getUsageFlags() const{return mUsageFlags;}
-	virtual AccessType getAccessType() const{return mAccessType;}
+	virtual int getUsage() const{return mUsage;}
+	virtual int getAccess() const{return mAccess;}
 	virtual int getDataSize() const{return mDataSize;}
 	virtual IndexFormat getIndexFormat(){return mIndexFormat;}
 	virtual int getSize() const{return mSize;}
 
-	virtual uint8 *lock(AccessType accessType);
+	virtual uint8 *lock(int lockAccess);
 	virtual bool unlock();
 
 	bool needsReset();
@@ -69,8 +69,8 @@ protected:
 	D3D9Renderer *mRenderer;
 
 	BufferDestroyedListener *mListener;
-	int mUsageFlags;
-	AccessType mAccessType;
+	int mUsage;
+	int mAccess;
 	int mSize;
 	IndexFormat mIndexFormat;
 	int mDataSize;
@@ -79,7 +79,7 @@ protected:
 	DWORD mD3DUsage;
 	D3DPOOL mD3DPool;
 	IDirect3DIndexBuffer9 *mIndexBuffer;
-	AccessType mLockType;
+	int mLockAccess;
 	uint8 *mData;
 	uint8 *mBackingData;
 

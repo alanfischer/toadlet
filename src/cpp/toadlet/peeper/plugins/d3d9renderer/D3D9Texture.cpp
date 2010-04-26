@@ -39,7 +39,7 @@ namespace peeper{
 D3D9Texture::D3D9Texture(D3D9Renderer *renderer):BaseResource(),
 	mRenderer(NULL),
 
-	mUsageFlags(UsageFlags_NONE),
+	mUsage(0),
 	mDimension(Dimension_UNKNOWN),
 	mFormat(0),
 	mWidth(0),
@@ -64,19 +64,25 @@ D3D9Texture::~D3D9Texture(){
 	}
 }
 
-bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
+bool D3D9Texture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
 	destroy();
 
 	if((Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || Math::isPowerOf2(depth)==false) &&
 		mRenderer->getCapabilitySet().textureNonPowerOf2==false &&
-		(mRenderer->getCapabilitySet().textureNonPowerOf2==false || (usageFlags&UsageFlags_NPOT_RESTRICTED)==0))
+		(mRenderer->getCapabilitySet().textureNonPowerOf2==false || (usage&Usage_BIT_NPOT_RESTRICTED)==0))
 	{
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"D3D9Texture: Cannot load a non power of 2 texture");
 		return false;
 	}
 
-	mUsageFlags=usageFlags;
+	if(format!=mRenderer->getClosestTextureFormat(format)){
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"D3D9Texture: Invalid texture format");
+		return false;
+	}
+
+	mUsage=usage;
 	mDimension=dimension;
 	mFormat=format;
 	mWidth=width;
@@ -87,7 +93,6 @@ bool D3D9Texture::create(int usageFlags,Dimension dimension,int format,int width
 	createContext(false);
 
 	int specifiedMipLevels=mMipLevels>0?mMipLevels:1;
-
 	if(mipDatas!=NULL){
 		int level;
 		for(level=0;level<specifiedMipLevels;++level){
@@ -119,26 +124,34 @@ bool D3D9Texture::createContext(bool restore){
 	IDirect3DDevice9 *device=mRenderer->getDirect3DDevice9();
 	IDirect3D9 *d3d=NULL; device->GetDirect3D(&d3d);
 
-	mD3DUsage=(mUsageFlags&UsageFlags_RENDERTARGET)>0 ? D3DUSAGE_RENDERTARGET : 0;
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		mD3DUsage|=D3DUSAGE_LOCKABLE;
-	#endif
+	mD3DUsage=
+		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+			D3DUSAGE_LOCKABLE;
+		#else
+			0;
+		#endif
+	if((mUsage&Usage_BIT_RENDERTARGET)>0){
+		mD3DUsage|=D3DUSAGE_RENDERTARGET;
+	}
+	if((mUsage&Usage_BIT_STREAM)>0){
+		mD3DUsage|=D3DUSAGE_DYNAMIC;
+	}
 
 	mD3DPool=
 		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 			D3DPOOL_MANAGED;
 		#else
-			(mUsageFlags&UsageFlags_RENDERTARGET)>0 ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
+			(mUsage&Usage_BIT_RENDERTARGET)>0 ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
 		#endif
 
-	mInternalFormat=getClosestTextureFormat(mFormat);
-	mD3DFormat=getD3DFORMAT(mInternalFormat);
+	mInternalFormat=mRenderer->getClosestTextureFormat(mFormat);
+	mD3DFormat=D3D9Renderer::getD3DFORMAT(mInternalFormat);
 	if(!mRenderer->isD3DFORMATValid(mD3DFormat,mD3DUsage)){
 		mInternalFormat=Format_BGRA_8;
 		mD3DFormat=D3DFMT_X8R8G8B8;
 	}
 
-	mManuallyGenerateMipLevels=(mUsageFlags&UsageFlags_AUTOGEN_MIPMAPS)>0;
+	mManuallyGenerateMipLevels=(mUsage&Usage_BIT_AUTOGEN_MIPMAPS)>0;
 	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
 		if(mManuallyGenerateMipLevels && mRenderer->isD3DFORMATValid(mD3DFormat,D3DUSAGE_AUTOGENMIPMAP)){
 			mD3DUsage|=D3DUSAGE_AUTOGENMIPMAP;
@@ -455,108 +468,6 @@ bool D3D9Texture::needsReset(){
 	#else
 		return mD3DPool==D3DPOOL_DEFAULT;
 	#endif
-}
-
-int D3D9Texture::getClosestTextureFormat(int format){
-	switch(format){
-		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-			case Format_L_8:
-				return Format_BGR_5_6_5;
-			case Format_A_8:
-			case Format_LA_8:
-				return Format_BGRA_8;
-		#else
-			case Format_A_8:
-				return Format_LA_8;
-		#endif
-		case Format_RGB_8:
-			return Format_BGR_8;
-		case Format_RGBA_8:
-			return Format_BGRA_8;
-		case Format_RGB_5_6_5:
-			return Format_BGR_5_6_5;
-		case Format_RGBA_5_5_5_1:
-			return Format_BGRA_5_5_5_1;
-		case Format_RGBA_4_4_4_4:
-			return Format_BGRA_4_4_4_4;
-		default:
-			return format;
-	}
-}
-
-D3DFORMAT D3D9Texture::getD3DFORMAT(int format){
-	switch(format){
-		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
-			case Format_L_8:
-				return D3DFMT_L8;
-			case Format_LA_8:
-				return D3DFMT_A8L8;
-		#endif
-		case Format_BGR_8:
-			return D3DFMT_R8G8B8;
-		case Format_BGRA_8:
-			return D3DFMT_A8R8G8B8;
-		case Format_BGR_5_6_5:
-			return D3DFMT_R5G6B5;
-		case Format_BGRA_5_5_5_1:
-			return D3DFMT_A1R5G5B5;
-		case Format_BGRA_4_4_4_4:
-			return D3DFMT_A4R4G4B4;
-		case Format_DEPTH_16:
-			return D3DFMT_D16;
-		case Format_DEPTH_24:
-			return D3DFMT_D24X8;
-		case Format_DEPTH_32:
-			return D3DFMT_D32;
-		default:
-			Error::unknown(Categories::TOADLET_PEEPER,
-				"D3D9Texture::getD3DFORMAT: Invalid type");
-			return D3DFMT_UNKNOWN;
-	}
-}
-
-DWORD D3D9Texture::getD3DTADDRESS(TextureStage::AddressMode addressMode){
-	DWORD taddress=0;
-
-	switch(addressMode){
-		case TextureStage::AddressMode_REPEAT:
-			taddress=D3DTADDRESS_WRAP;
-		break;
-		case TextureStage::AddressMode_CLAMP_TO_EDGE:
-			taddress=D3DTADDRESS_CLAMP;
-		break;
-		case TextureStage::AddressMode_CLAMP_TO_BORDER:
-			taddress=D3DTADDRESS_BORDER;
-		break;
-		case TextureStage::AddressMode_MIRRORED_REPEAT:
-			taddress=D3DTADDRESS_MIRROR;
-		break;
-	}
-
-	if(taddress==0){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"D3D9Texture::getD3DTADDRESS: Invalid address mode");
-	}
-
-	return taddress;
-}
-
-DWORD D3D9Texture::getD3DTEXF(TextureStage::Filter filter){
-	DWORD texf=D3DTEXF_NONE;
-
-	switch(filter){
-		case TextureStage::Filter_NONE:
-			texf=D3DTEXF_NONE;
-		break;
-		case TextureStage::Filter_NEAREST:
-			texf=D3DTEXF_POINT;
-		break;
-		case TextureStage::Filter_LINEAR:
-			texf=D3DTEXF_LINEAR;
-		break;
-	}
-
-	return texf;
 }
 
 }
