@@ -40,9 +40,9 @@ class TOADLET_API TextureManager:public ResourceManager{
 public:
 	TextureManager(Engine *engine,bool backable);
 
-	peeper::Texture::ptr createTexture(egg::image::Image::ptr image,int usageFlags=peeper::Texture::UsageFlags_AUTOGEN_MIPMAPS,int mipLevels=0);
-	peeper::Texture::ptr createTexture(egg::image::Image::ptr images[],int usageFlags,int mipLevels);
-	peeper::Texture::ptr createTexture(int usageFlags,peeper::Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels);
+	peeper::Texture::ptr createTexture(egg::image::Image::ptr image,int usage=peeper::Texture::Usage_BIT_STATIC|peeper::Texture::Usage_BIT_AUTOGEN_MIPMAPS,int mipLevels=0);
+	peeper::Texture::ptr createTexture(egg::image::Image::ptr images[],int usage,int mipLevels);
+	peeper::Texture::ptr createTexture(int usage,peeper::Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels);
 	egg::image::Image::ptr createImage(peeper::Texture *texture);
 	peeper::SurfaceRenderTarget::ptr createSurfaceRenderTarget();
 

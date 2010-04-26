@@ -34,8 +34,8 @@ namespace peeper{
 
 BackableIndexBuffer::BackableIndexBuffer():
 	mListener(NULL),
-	mUsageFlags(0),
-	mAccessType(AccessType_NO_ACCESS),
+	mUsage(0),
+	mAccess(0),
 	mDataSize(0),
 	mIndexFormat(IndexFormat_UINT_8),
 	mSize(0),
@@ -49,11 +49,11 @@ BackableIndexBuffer::~BackableIndexBuffer(){
 	destroy();
 }
 
-bool BackableIndexBuffer::create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size){
+bool BackableIndexBuffer::create(int usage,int access,IndexFormat indexFormat,int size){
 	destroy();
 
-	mUsageFlags=usageFlags;
-	mAccessType=accessType;
+	mUsage=usage;
+	mAccess=access;
 	mIndexFormat=indexFormat;
 	mSize=size;
 	mDataSize=mIndexFormat*mSize;
@@ -79,9 +79,9 @@ void BackableIndexBuffer::destroy(){
 	}
 }
 
-uint8 *BackableIndexBuffer::lock(AccessType accessType){
+uint8 *BackableIndexBuffer::lock(int lockAccess){
 	if(mBack!=NULL){
-		return mBack->lock(accessType);
+		return mBack->lock(lockAccess);
 	}
 	else{
 		return mData;
@@ -101,7 +101,7 @@ void BackableIndexBuffer::setBack(IndexBuffer::ptr back){
 	if(back!=mBack && mBack!=NULL){
 		mData=new uint8[mDataSize];
 		TOADLET_TRY
-			byte *data=lock(AccessType_READ_ONLY);
+			byte *data=lock(Access_BIT_READ);
 			if(data!=NULL){
 				memcpy(mData,data,mDataSize);
 				mBack->unlock();
@@ -114,10 +114,10 @@ void BackableIndexBuffer::setBack(IndexBuffer::ptr back){
 	
 	if(mBack!=NULL && mData!=NULL){
 		// Create texture on setting the back, otherwise D3D10 static textures will not load data in load
-		mBack->create(mUsageFlags,mAccessType,mIndexFormat,mSize);
+		mBack->create(mUsage,mAccess,mIndexFormat,mSize);
 
 		TOADLET_TRY
-			byte *data=mBack->lock(AccessType_WRITE_ONLY);
+			byte *data=mBack->lock(Access_BIT_WRITE);
 			if(data!=NULL){
 				memcpy(data,mData,mDataSize);
 				mBack->unlock();

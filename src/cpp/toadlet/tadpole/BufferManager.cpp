@@ -70,21 +70,21 @@ void BufferManager::destroy(){
 	mVertexBuffers.clear();
 }
 
-IndexBuffer::ptr BufferManager::createIndexBuffer(int usageFlags,Buffer::AccessType accessType,IndexBuffer::IndexFormat indexFormat,int size){
+IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuffer::IndexFormat indexFormat,int size){
 	IndexBuffer::ptr indexBuffer;
 	if(mBackable){
 		BackableIndexBuffer::ptr backableIndexBuffer(new BackableIndexBuffer());
-		backableIndexBuffer->create(usageFlags,accessType,indexFormat,size);
+		backableIndexBuffer->create(usage,access,indexFormat,size);
 		if(mEngine->getRenderer()!=NULL){
 			IndexBuffer::ptr back(mEngine->getRenderer()->createIndexBuffer());
-			back->create(usageFlags,accessType,indexFormat,size);
+			back->create(usage,access,indexFormat,size);
 			backableIndexBuffer->setBack(back);
 		}
 		indexBuffer=backableIndexBuffer;
 	}
 	else if(mEngine->getRenderer()!=NULL){
 		indexBuffer=IndexBuffer::ptr(mEngine->getRenderer()->createIndexBuffer());
-		indexBuffer->create(usageFlags,accessType,indexFormat,size);
+		indexBuffer->create(usage,access,indexFormat,size);
 	}
 	else{
 		Error::nullPointer("can not create a non-backable Buffer without a renderer");
@@ -98,21 +98,21 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usageFlags,Buffer::AccessT
 	return indexBuffer;
 }
 
-VertexBuffer::ptr BufferManager::createVertexBuffer(int usageFlags,Buffer::AccessType accessType,VertexFormat::ptr vertexFormat,int size){
+VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexFormat::ptr vertexFormat,int size){
 	VertexBuffer::ptr vertexBuffer;
 	if(mBackable){
 		BackableVertexBuffer::ptr backableVertexBuffer(new BackableVertexBuffer());
-		backableVertexBuffer->create(usageFlags,accessType,vertexFormat,size);
+		backableVertexBuffer->create(usage,access,vertexFormat,size);
 		if(mEngine->getRenderer()!=NULL){
 			VertexBuffer::ptr back(mEngine->getRenderer()->createVertexBuffer());
-			back->create(usageFlags,accessType,vertexFormat,size);
+			back->create(usage,access,vertexFormat,size);
 			backableVertexBuffer->setBack(back);
 		}
 		vertexBuffer=backableVertexBuffer;
 	}
 	else if(mEngine->getRenderer()!=NULL){
 		vertexBuffer=VertexBuffer::ptr(mEngine->getRenderer()->createVertexBuffer());
-		vertexBuffer->create(usageFlags,accessType,vertexFormat,size);
+		vertexBuffer->create(usage,access,vertexFormat,size);
 	}
 	else{
 		Error::nullPointer("can not create a non-backable Buffer without a renderer");
@@ -126,7 +126,7 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usageFlags,Buffer::Acces
 	return vertexBuffer;
 }
 
-IndexBuffer::ptr BufferManager::cloneIndexBuffer(IndexBuffer::ptr oldIndexBuffer,int usageFlags,Buffer::AccessType accessType,IndexBuffer::IndexFormat indexFormat,int size){
+IndexBuffer::ptr BufferManager::cloneIndexBuffer(IndexBuffer::ptr oldIndexBuffer,int usage,int access,IndexBuffer::IndexFormat indexFormat,int size){
 	IndexBuffer::IndexFormat oldIndexFormat=oldIndexBuffer->getIndexFormat();
 	int oldSize=oldIndexBuffer->getSize();
 
@@ -138,11 +138,11 @@ IndexBuffer::ptr BufferManager::cloneIndexBuffer(IndexBuffer::ptr oldIndexBuffer
 		}
 	#endif
 
-	IndexBuffer::ptr indexBuffer=createIndexBuffer(usageFlags,accessType,indexFormat,size);
+	IndexBuffer::ptr indexBuffer=createIndexBuffer(usage,access,indexFormat,size);
 
 	int numElements=oldSize<size?oldSize:size;
-	uint8 *srcData=oldIndexBuffer->lock(Buffer::AccessType_READ_ONLY);
-	uint8 *dstData=indexBuffer->lock(Buffer::AccessType_WRITE_ONLY);
+	uint8 *srcData=oldIndexBuffer->lock(Buffer::Access_BIT_READ);
+	uint8 *dstData=indexBuffer->lock(Buffer::Access_BIT_WRITE);
 
 	memcpy(dstData,srcData,indexFormat*numElements);
 
@@ -152,7 +152,7 @@ IndexBuffer::ptr BufferManager::cloneIndexBuffer(IndexBuffer::ptr oldIndexBuffer
 	return indexBuffer;
 }
 
-VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBuffer,int usageFlags,Buffer::AccessType accessType,VertexFormat::ptr vertexFormat,int size){
+VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBuffer,int usage,int access,VertexFormat::ptr vertexFormat,int size){
 	int i,j;
 
 	VertexFormat::ptr oldVertexFormat=oldVertexBuffer->getVertexFormat();
@@ -175,10 +175,10 @@ VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBu
 		}
 	#endif
 
-	VertexBuffer::ptr vertexBuffer=createVertexBuffer(usageFlags,accessType,vertexFormat,size);
+	VertexBuffer::ptr vertexBuffer=createVertexBuffer(usage,access,vertexFormat,size);
 
-	uint8 *srcData=oldVertexBuffer->lock(Buffer::AccessType_READ_ONLY);
-	uint8 *dstData=vertexBuffer->lock(Buffer::AccessType_WRITE_ONLY);
+	uint8 *srcData=oldVertexBuffer->lock(Buffer::Access_BIT_READ);
+	uint8 *dstData=vertexBuffer->lock(Buffer::Access_BIT_WRITE);
 
 	int numVerts=oldSize<size?oldSize:size;
 	int srcVertSize=oldVertexFormat->getVertexSize();

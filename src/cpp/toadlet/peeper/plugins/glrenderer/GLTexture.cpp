@@ -37,7 +37,7 @@ namespace peeper{
 GLTexture::GLTexture(GLRenderer *renderer):BaseResource(),
 	mRenderer(NULL),
 
-	mUsageFlags(UsageFlags_NONE),
+	mUsage(0),
 	mDimension(Dimension_UNKNOWN),
 	mFormat(0),
 	mWidth(0),
@@ -62,21 +62,27 @@ GLTexture::~GLTexture(){
 	}
 }
 
-bool GLTexture::create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
+bool GLTexture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
 	destroy();
 
 	if((Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || Math::isPowerOf2(depth)==false) &&
 		mRenderer->getCapabilitySet().textureNonPowerOf2==false &&
-		(mRenderer->getCapabilitySet().textureNonPowerOf2==false || (usageFlags&UsageFlags_NPOT_RESTRICTED)==0))
+		(mRenderer->getCapabilitySet().textureNonPowerOf2==false || (usage&Usage_BIT_NPOT_RESTRICTED)==0))
 	{
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"GLTexture: Cannot load a non power of 2 texture");
 		return false;
 	}
 
-	mUsageFlags=usageFlags;
+	if(format!=mRenderer->getClosestTextureFormat(format)){
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"GLTexture: Invalid texture format");
+		return false;
+	}
+
+	mUsage=usage;
 	mDimension=dimension;
-	mFormat=getClosestTextureFormat(format);
+	mFormat=format;
 	mWidth=width;
 	mHeight=height;
 	mDepth=depth;
@@ -103,7 +109,7 @@ bool GLTexture::createContext(int mipLevels,byte *mipDatas[]){
 	glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 	glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
 
-	mManuallyGenerateMipLevels=(mUsageFlags&UsageFlags_AUTOGEN_MIPMAPS)>0;
+	mManuallyGenerateMipLevels=(mUsage&Usage_BIT_AUTOGEN_MIPMAPS)>0;
 	if(mManuallyGenerateMipLevels &&
 		#if defined(TOADLET_HAS_GLES)
 			mRenderer->gl_version>=11
@@ -138,9 +144,9 @@ bool GLTexture::createContext(int mipLevels,byte *mipDatas[]){
 		}
 	}
 
-	GLint glinternalFormat=getGLFormat(mFormat);
-	GLint glformat=getGLFormat(mFormat);
-	GLint gltype=getGLType(mFormat);
+	GLint glinternalFormat=GLRenderer::getGLFormat(mFormat);
+	GLint glformat=GLRenderer::getGLFormat(mFormat);
+	GLint gltype=GLRenderer::getGLType(mFormat);
 
 	// Allocate texture memory
 	int level=0,width=mWidth,height=mHeight,depth=mDepth;
@@ -175,7 +181,7 @@ bool GLTexture::createContext(int mipLevels,byte *mipDatas[]){
 
 					int i;
 					for(i=0;i<6;++i){
-						glTexImage2D(GLCubeFaces[i],level,glinternalFormat,width,height,0,glformat,gltype,data);
+						glTexImage2D(GLRenderer::GLCubeFaces[i],level,glinternalFormat,width,height,0,glformat,gltype,data);
 					}
 				}break;
 				case GL_TEXTURE_RECTANGLE_ARB:
@@ -251,8 +257,8 @@ bool GLTexture::load(int width,int height,int depth,int mipLevel,byte *mipData){
 	int format=mFormat;
 	int rowPitch=width*ImageFormatConversion::getPixelSize(format);
 	int slicePitch=rowPitch*height;
-	GLint glformat=getGLFormat(format);
-	GLint gltype=getGLType(format);
+	GLint glformat=GLRenderer::getGLFormat(format);
+	GLint gltype=GLRenderer::getGLType(format);
 
 	int alignment=1,pitch=rowPitch;
 	while((pitch&1)==0){alignment<<=1;pitch>>=1;}
@@ -273,7 +279,7 @@ bool GLTexture::load(int width,int height,int depth,int mipLevel,byte *mipData){
 			break;
 			case GL_TEXTURE_CUBE_MAP:
 				for(int i=0;i<6;++i){
-					glTexSubImage2D(GLCubeFaces[i],mipLevel,0,0,width,height,glformat,gltype,mipData+slicePitch*i);
+					glTexSubImage2D(GLRenderer::GLCubeFaces[i],mipLevel,0,0,width,height,glformat,gltype,mipData+slicePitch*i);
 				}
 			break;
 			case GL_TEXTURE_RECTANGLE_ARB:
@@ -309,8 +315,8 @@ bool GLTexture::read(int width,int height,int depth,int mipLevel,byte *mipData){
 	int format=mFormat;
 	int rowPitch=width*ImageFormatConversion::getPixelSize(format);
 	int slicePitch=rowPitch*height;
-	GLint glformat=getGLFormat(format);
-	GLint gltype=getGLType(format);
+	GLint glformat=GLRenderer::getGLFormat(format);
+	GLint gltype=GLRenderer::getGLType(format);
 
 	int alignment=1,pitch=rowPitch;
 	while((pitch&1)==0){alignment<<=1;pitch>>=1;}
@@ -323,7 +329,7 @@ bool GLTexture::read(int width,int height,int depth,int mipLevel,byte *mipData){
 		else{
 			int i;
 			for(i=0;i<6;++i){
-				glGetTexImage(GLCubeFaces[i],mipLevel,glformat,gltype,mipData+slicePitch*i);
+				glGetTexImage(GLRenderer::GLCubeFaces[i],mipLevel,glformat,gltype,mipData+slicePitch*i);
 			}
 		}
 
@@ -373,7 +379,7 @@ GLuint GLTexture::getGLTarget(){
 		#endif
 		case Texture::Dimension_D2:
 			#if !defined(TOADLET_HAS_GLES)
-				if((mUsageFlags&UsageFlags_NPOT_RESTRICTED)>0){
+				if((mUsage&Usage_BIT_NPOT_RESTRICTED)>0){
 					return GL_TEXTURE_RECTANGLE_ARB;
 				}
 			#endif
@@ -391,191 +397,6 @@ GLuint GLTexture::getGLTarget(){
 			return 0;
 	}
 }
-
-int GLTexture::getClosestTextureFormat(int textureFormat){
-	if(textureFormat==Format_BGR_8){
-		textureFormat=Format_RGB_8;
-	}
-	if(textureFormat==Format_BGRA_8){
-		textureFormat=Format_RGBA_8;
-	}
-	return textureFormat;
-}
-
-GLuint GLTexture::getGLFormat(int textureFormat){
-	GLuint format=0;
-
-	if((textureFormat&Texture::Format_BIT_L)>0){
-		format=GL_LUMINANCE;
-	}
-	else if((textureFormat&Texture::Format_BIT_A)>0){
-		format=GL_ALPHA;
-	}
-	else if((textureFormat&Texture::Format_BIT_LA)>0){
-		format=GL_LUMINANCE_ALPHA;
-	}
-	else if((textureFormat&Texture::Format_BIT_RGB)>0){
-		format=GL_RGB;
-	}
-	else if((textureFormat&Texture::Format_BIT_RGBA)>0){
-		format=GL_RGBA;
-	}
-
-	#if !defined(TOADLET_HAS_GLES) || defined(TOADLET_HAS_EAGL)
-		else if((textureFormat&Texture::Format_BIT_DEPTH)>0){
-			if((textureFormat&Texture::Format_BIT_UINT_16)>0){
-				format=GL_DEPTH_COMPONENT16;
-			}
-			else if((textureFormat&Texture::Format_BIT_UINT_24)>0){
-				format=GL_DEPTH_COMPONENT24;
-			}
-			#if !defined(TOADLET_HAS_EAGL)
-				else if((textureFormat&Texture::Format_BIT_UINT_32)>0){
-					format=GL_DEPTH_COMPONENT32;
-				}
-				else{
-					format=GL_DEPTH_COMPONENT;
-				}
-			#endif
-		}
-	#endif
-
-	if(format==0){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"GLTexture::getGLFormat: Invalid format");
-		return 0;
-	}
-
-	return format;
-}
-
-GLuint GLTexture::getGLType(int textureFormat){
-	GLuint type=0;
-
-	if((textureFormat&Texture::Format_BIT_UINT_8)>0){
-		type=GL_UNSIGNED_BYTE;
-	}
-	else if((textureFormat&Texture::Format_BIT_FLOAT_32)>0){
-		type=GL_FLOAT;
-	}
-	else if((textureFormat&Texture::Format_BIT_UINT_5_6_5)>0){
-		type=GL_UNSIGNED_SHORT_5_6_5;
-	}
-	else if((textureFormat&Texture::Format_BIT_UINT_5_5_5_1)>0){
-		type=GL_UNSIGNED_SHORT_5_5_5_1;
-	}
-	else if((textureFormat&Texture::Format_BIT_UINT_4_4_4_4)>0){
-		type=GL_UNSIGNED_SHORT_4_4_4_4;
-	}
-
-	if(type==0){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"GLTexture::getGLType: Invalid type");
-		return 0;
-	}
-
-	return type;
-}
-
-GLuint GLTexture::getGLWrap(TextureStage::AddressMode addressMode,bool hasClampToEdge){
-	switch(addressMode){
-		case TextureStage::AddressMode_REPEAT:
-			return GL_REPEAT;
-		#if !defined(TOADLET_HAS_GLES)
-			case TextureStage::AddressMode_CLAMP_TO_BORDER:
-				return GL_CLAMP_TO_BORDER;
-			case TextureStage::AddressMode_MIRRORED_REPEAT:
-				return GL_MIRRORED_REPEAT;
-			case TextureStage::AddressMode_CLAMP_TO_EDGE:
-				return hasClampToEdge?GL_CLAMP_TO_EDGE:GL_CLAMP;
-		#else
-			case TextureStage::AddressMode_CLAMP_TO_EDGE:
-				return GL_CLAMP_TO_EDGE;
-		#endif
-		default:
-			Error::unknown(Categories::TOADLET_PEEPER,
-				"GLTexture::getGLWrap: Invalid address mode");
-			return 0;
-	}
-}
-
-GLuint GLTexture::getGLMinFilter(TextureStage::Filter minFilter,TextureStage::Filter mipFilter){
-	switch(mipFilter){
-		case TextureStage::Filter_NONE:
-			switch(minFilter){
-				case TextureStage::Filter_NEAREST:
-					return GL_NEAREST;
-				case TextureStage::Filter_LINEAR:
-					return GL_LINEAR;
-				default:
-				break;
-			}
-		break;
-		case TextureStage::Filter_NEAREST:
-			switch(minFilter){
-				case TextureStage::Filter_NEAREST:
-					return GL_NEAREST_MIPMAP_NEAREST;
-				case TextureStage::Filter_LINEAR:
-					return GL_NEAREST_MIPMAP_LINEAR;
-				default:
-				break;
-			}
-		break;
-		case TextureStage::Filter_LINEAR:
-			switch(minFilter){
-				case TextureStage::Filter_NEAREST:
-					return GL_LINEAR_MIPMAP_NEAREST;
-				case TextureStage::Filter_LINEAR:
-					return GL_LINEAR_MIPMAP_LINEAR;
-				default:
-				break;
-			}
-		break;
-	}
-
-	Error::unknown(Categories::TOADLET_PEEPER,
-		"GLTexture::getGLMinFilter: Invalid filter");
-	return 0;
-}
-
-GLuint GLTexture::getGLMagFilter(TextureStage::Filter magFilter){
-	switch(magFilter){
-		case TextureStage::Filter_NEAREST:
-			return GL_NEAREST;
-		case TextureStage::Filter_LINEAR:
-			return GL_LINEAR;
-		default:
-			Error::unknown(Categories::TOADLET_PEEPER,
-				"GLTexture::getGLMagFilter: Invalid filter");
-			return 0;
-	}
-}
-
-GLuint GLTexture::getGLTextureBlendSource(TextureBlend::Source blend){
-	switch(blend){
-		case TextureBlend::Source_PREVIOUS:
-			return GL_PREVIOUS;
-		case TextureBlend::Source_TEXTURE:
-			return GL_TEXTURE;
-		case TextureBlend::Source_PRIMARY_COLOR:
-			return GL_PRIMARY_COLOR;
-		default:
-			Error::unknown(Categories::TOADLET_PEEPER,
-				"GLTexture::getGLTextureBlendSource: Invalid source");
-			return 0;
-	}
-}
-
-#if !defined(TOADLET_HAS_GLES)
-	GLuint GLTexture::GLCubeFaces[6]={
-		GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-		GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-		GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
-	};
-#endif
 
 }
 }

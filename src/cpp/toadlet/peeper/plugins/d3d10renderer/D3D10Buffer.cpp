@@ -36,8 +36,8 @@ D3D10Buffer::D3D10Buffer(D3D10Renderer *renderer):
 	mRenderer(NULL),
 
 	mListener(NULL),
-	mUsageFlags(0),
-	mAccessType(AccessType_NO_ACCESS),
+	mUsage(0),
+	mAccess(0),
 	mSize(0),
 	mDataSize(0),
 
@@ -48,7 +48,7 @@ D3D10Buffer::D3D10Buffer(D3D10Renderer *renderer):
 	mBindFlags(0),
 	mBuffer(NULL),
 	//mColorElements,
-	mLockType(AccessType_NO_ACCESS),
+	mLockAccess(0),
 	mMapping(false),
 	mBacking(false),
 	mData(NULL)
@@ -60,18 +60,18 @@ D3D10Buffer::~D3D10Buffer(){
 	destroy();
 }
 
-bool D3D10Buffer::create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size){
+bool D3D10Buffer::create(int usage,int access,IndexFormat indexFormat,int size){
 	destroy();
 
-	mUsageFlags=usageFlags;
-	mAccessType=accessType;
+	mUsage=usage;
+	mAccess=access;
 	mSize=size;
 	mIndexFormat=indexFormat;
 	mDataSize=((indexFormat==IndexFormat_UINT_8)?2:mIndexFormat)*mSize;
 
 	mBindFlags|=D3D10_BIND_INDEX_BUFFER;
 
-	mMapping=(mUsageFlags&Buffer::UsageFlags_STATIC)==0;
+	mMapping=(mUsage&Buffer::Usage_BIT_STATIC)==0;
 	if(mMapping){
 		createContext();
 	}
@@ -83,11 +83,11 @@ bool D3D10Buffer::create(int usageFlags,AccessType accessType,IndexFormat indexF
 	return true;
 }
 
-bool D3D10Buffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size){
+bool D3D10Buffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int size){
 	destroy();
 
-	mUsageFlags=usageFlags;
-	mAccessType=accessType;
+	mUsage=usage;
+	mAccess=access;
 	mSize=size;
 	mVertexFormat=vertexFormat;
 	mVertexSize=mVertexFormat->vertexSize;
@@ -95,7 +95,7 @@ bool D3D10Buffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr 
 
 	mBindFlags|=D3D10_BIND_VERTEX_BUFFER;
 
-	mMapping=(mUsageFlags&Buffer::UsageFlags_STATIC)==0;
+	mMapping=(mUsage&Buffer::Usage_BIT_STATIC)==0;
 	if(mMapping){
 		createContext();
 	}
@@ -128,27 +128,23 @@ void D3D10Buffer::destroy(){
 bool D3D10Buffer::createContext(){
 	D3D10_BUFFER_DESC desc={0};
 
+	desc.BindFlags=mBindFlags;
 	desc.ByteWidth=mDataSize;
-	if((mUsageFlags&UsageFlags_STATIC)>0){
+
+	desc.Usage=D3D10_USAGE_DEFAULT;
+	if((mUsage&Usage_BIT_STATIC)>0){
 		desc.Usage=D3D10_USAGE_IMMUTABLE;
 	}
-	else if((mUsageFlags&UsageFlags_DYNAMIC)>0){
+	else if((mUsage&Usage_BIT_STREAM)>0){
 		desc.Usage=D3D10_USAGE_DYNAMIC;
 	}
-	else{
-		desc.Usage=D3D10_USAGE_DEFAULT;
-	}
-	desc.BindFlags=mBindFlags;
 
-	if((mUsageFlags&UsageFlags_STATIC)==0){
-		if(mAccessType==AccessType_READ_ONLY){
+	if((mUsage&Usage_BIT_STATIC)==0){
+		if((mAccess&Access_BIT_READ)>0){
 			desc.CPUAccessFlags|=D3D10_CPU_ACCESS_READ;
 		}
-		else if(mAccessType==AccessType_WRITE_ONLY){
+		if((mAccess&Access_BIT_WRITE)>0){
 			desc.CPUAccessFlags|=D3D10_CPU_ACCESS_WRITE;
-		}
-		else if(mAccessType==AccessType_READ_WRITE){
-			desc.CPUAccessFlags|=D3D10_CPU_ACCESS_READ|D3D10_CPU_ACCESS_WRITE;
 		}
 	}
 
@@ -176,21 +172,21 @@ bool D3D10Buffer::destroyContext(){
 	return SUCCEEDED(result);
 }
 
-uint8 *D3D10Buffer::lock(AccessType lockType){
+uint8 *D3D10Buffer::lock(int lockAccess){
 	mRenderer->mStatisticsSet.bufferLockCount++;
 
-	mLockType=lockType;
+	mLockAccess=lockAccess;
 
 	if(mMapping){
 		D3D10_MAP mapType=(D3D10_MAP)0;
-		switch(mLockType){
-			case AccessType_READ_ONLY:
+		switch(mLockAccess){
+			case Access_BIT_READ:
 				mapType=D3D10_MAP_READ;
 			break;
-			case AccessType_WRITE_ONLY:
+			case Access_BIT_WRITE:
 				mapType=D3D10_MAP_WRITE_DISCARD;
 			break;
-			case AccessType_READ_WRITE:
+			case Access_READ_WRITE:
 				mapType=D3D10_MAP_READ_WRITE;
 			break;
 		}
@@ -263,7 +259,7 @@ bool D3D10Buffer::unlock(){
 			mRenderer->getD3D10Device()->UpdateSubresource(mBuffer,0,NULL,mData,0,0);
 		}
 
-		if((mUsageFlags&UsageFlags_STATIC)>0){
+		if((mUsage&Usage_BIT_STATIC)>0){
 			delete[] mData;
 			mData=NULL;
 		}

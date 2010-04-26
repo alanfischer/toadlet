@@ -52,7 +52,7 @@ public:
 	virtual void resetCreate(){}
 	virtual void resetDestroy(){}
 
-	virtual int getUsageFlags() const{return mUsageFlags;}
+	virtual int getUsage() const{return mUsage;}
 	virtual Dimension getDimension() const{return mDimension;}
 	virtual int getFormat() const{return mFormat;}
 	virtual int getWidth() const{return mWidth;}
@@ -66,14 +66,12 @@ public:
 	virtual bool read(int width,int height,int depth,int mipLevel,byte *mipData);
 
 protected:
-	static int getClosestTextureFormat(int textureFormat);
-	static DXGI_FORMAT getDXGI_FORMAT(int textureFormat);
-//	static DWORD getD3DTADDRESS(TextureStage::AddressMode addressMode);
-//	static DWORD getD3DTEXF(TextureStage::Filter filter);
+	bool createContext(int mipLevels,byte *mipDatas[]);
+	bool destroyContext();
 
 	D3D10Renderer *mRenderer;
 
-	int mUsageFlags;
+	int mUsage;
 	Dimension mDimension;
 	int mFormat;
 	int mWidth;
@@ -81,12 +79,8 @@ protected:
 	int mDepth;
 	int mMipLevels;
 
-	int mInternalFormat;
-	DXGI_FORMAT mDXGIFormat;
-	D3D10_USAGE mD3DUsage;
 	ID3D10Resource *mTexture;
 	ID3D10ShaderResourceView *mShaderResourceView;
-	bool mManuallyGenerateMipLevels;
 
 	friend D3D10Renderer;
 };

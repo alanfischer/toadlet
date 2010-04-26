@@ -42,7 +42,7 @@ public:
 
 	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener)=0;
 
-	virtual bool create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size)=0;
+	virtual bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size)=0;
 	virtual void destroy()=0;
 
 	virtual void resetCreate()=0;

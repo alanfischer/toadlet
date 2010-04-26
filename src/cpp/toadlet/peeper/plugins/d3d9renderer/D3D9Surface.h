@@ -46,14 +46,14 @@ public:
 	virtual bool destroy();
 
 	/// @todo: Implement these, or somehow remove them from the Surface requirements
-	virtual int getUsageFlags() const{return 0;}
-	virtual AccessType getAccessType() const{return AccessType_NO_ACCESS;}
+	virtual int getUsage() const{return 0;}
+	virtual int getAccess() const{return 0;}
 	virtual int getDataSize() const{return 0;}
 
 	virtual int getWidth() const{return mWidth;}
 	virtual int getHeight() const{return mHeight;}
 
-	virtual uint8 *lock(AccessType accessType);
+	virtual uint8 *lock(int lockAccess);
 	virtual bool unlock();
 
 	inline IDirect3DSurface9 *getSurface() const{return mSurface;}

@@ -46,13 +46,13 @@ public:
 	virtual Texture *getRootTexture(scalar time){return this;}
 	virtual bool getRootTransform(scalar time,Matrix4x4 &transform){return true;}
 
-	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]);
+	virtual bool create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]);
 	virtual void destroy();
 
 	virtual void resetCreate();
 	virtual void resetDestroy();
 
-	virtual int getUsageFlags() const{return mUsageFlags;}
+	virtual int getUsage() const{return mUsage;}
 	virtual Dimension getDimension() const{return mDimension;}
 	virtual int getFormat() const{return mFormat;}
 	virtual int getWidth() const{return mWidth;}
@@ -67,18 +67,13 @@ public:
 
 	bool needsReset();
 
-	static int getClosestTextureFormat(int textureFormat);
-	static D3DFORMAT getD3DFORMAT(int textureFormat);
-	static DWORD getD3DTADDRESS(TextureStage::AddressMode addressMode);
-	static DWORD getD3DTEXF(TextureStage::Filter filter);
-
 protected:
 	bool createContext(bool restore);
 	bool destroyContext(bool backup);
 
 	D3D9Renderer *mRenderer;
 
-	int mUsageFlags;
+	int mUsage;
 	Dimension mDimension;
 	int mFormat;
 	int mWidth;

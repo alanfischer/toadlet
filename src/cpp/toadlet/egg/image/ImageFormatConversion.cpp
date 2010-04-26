@@ -60,7 +60,29 @@ bool ImageFormatConversion::convert(uint8 *src,int srcFormat,int srcRowPitch,int
 			}
 		}
 	}
-	else if(srcFormat==Format_L_8 && dstFormat==Format_RGBA_8){
+	if(srcFormat==Format_A_8 && dstFormat==Format_LA_8){
+		for(k=0;k<depth;++k){
+			for(j=0;j<height;++j){
+				for(i=0;i<width;++i){
+					uint8 *s=(uint8*)(src+k*srcSlicePitch+j*srcRowPitch+i);
+					uint16 *d=(uint16*)(dst+k*dstSlicePitch+j*dstRowPitch+i*2);
+					*d=((*s)|0xFF00);
+				}
+			}
+		}
+	}
+	else if(srcFormat==Format_LA_8 && dstFormat==Format_A_8){
+		for(k=0;k<depth;++k){
+			for(j=0;j<height;++j){
+				for(i=0;i<width;++i){
+					uint16 *s=(uint16*)(src+k*srcSlicePitch+j*srcRowPitch+i*2);
+					uint8 *d=(uint8*)(dst+k*dstSlicePitch+j*dstRowPitch+i);
+					*d=((*s)&0xFF);
+				}
+			}
+		}
+	}
+	else if(srcFormat==Format_L_8 && (dstFormat==Format_RGBA_8 || dstFormat==Format_BGRA_8)){
 		for(k=0;k<depth;++k){
 			for(j=0;j<height;++j){
 				for(i=0;i<width;++i){
@@ -71,7 +93,7 @@ bool ImageFormatConversion::convert(uint8 *src,int srcFormat,int srcRowPitch,int
 			}
 		}
 	}
-	else if(srcFormat==Format_RGBA_8 && dstFormat==Format_L_8){
+	else if((srcFormat==Format_RGBA_8 || srcFormat==Format_BGRA_8) && dstFormat==Format_L_8){
 		for(k=0;k<depth;++k){
 			for(j=0;j<height;++j){
 				for(i=0;i<width;++i){
@@ -82,7 +104,7 @@ bool ImageFormatConversion::convert(uint8 *src,int srcFormat,int srcRowPitch,int
 			}
 		}
 	}
-	else if(srcFormat==Format_L_8 && dstFormat==Format_RGB_8){
+	else if(srcFormat==Format_L_8 && (dstFormat==Format_RGB_8 || dstFormat==Format_BGR_8)){
 		for(k=0;k<depth;++k){
 			for(j=0;j<height;++j){
 				for(i=0;i<width;++i){
@@ -95,7 +117,7 @@ bool ImageFormatConversion::convert(uint8 *src,int srcFormat,int srcRowPitch,int
 			}
 		}
 	}
-	else if(srcFormat==Format_RGB_8 && dstFormat==Format_L_8){
+	else if((srcFormat==Format_RGB_8 || srcFormat==Format_BGR_8) && dstFormat==Format_L_8){
 		for(k=0;k<depth;++k){
 			for(j=0;j<height;++j){
 				for(i=0;i<width;++i){
@@ -106,7 +128,29 @@ bool ImageFormatConversion::convert(uint8 *src,int srcFormat,int srcRowPitch,int
 			}
 		}
 	}
-	else if(srcFormat==Format_LA_8 && dstFormat==Format_RGBA_8){
+	else if(srcFormat==Format_A_8 && (dstFormat==Format_RGBA_8 || dstFormat==Format_BGRA_8)){
+		for(k=0;k<depth;++k){
+			for(j=0;j<height;++j){
+				for(i=0;i<width;++i){
+					uint8 *s=(uint8*)(src+k*srcSlicePitch+j*srcRowPitch+i);
+					uint32 *d=(uint32*)(dst+k*dstSlicePitch+j*dstRowPitch+i*4);
+					*d=0xFFFFFF|((*s)<<24);
+				}
+			}
+		}
+	}
+	else if((srcFormat==Format_RGBA_8 || srcFormat==Format_BGRA_8) && dstFormat==Format_A_8){
+		for(k=0;k<depth;++k){
+			for(j=0;j<height;++j){
+				for(i=0;i<width;++i){
+					uint32 *s=(uint32*)(src+k*srcSlicePitch+j*srcRowPitch+i*4);
+					uint8 *d=(uint8*)(dst+k*dstSlicePitch+j*dstRowPitch+i);
+					*d=((*s)&0xFF000000)>>24;
+				}
+			}
+		}
+	}
+	else if(srcFormat==Format_LA_8 && (dstFormat==Format_RGBA_8 || dstFormat==Format_BGRA_8)){
 		for(k=0;k<depth;++k){
 			for(j=0;j<height;++j){
 				for(i=0;i<width;++i){
@@ -117,7 +161,7 @@ bool ImageFormatConversion::convert(uint8 *src,int srcFormat,int srcRowPitch,int
 			}
 		}
 	}
-	else if(srcFormat==Format_RGBA_8 && dstFormat==Format_LA_8){
+	else if((srcFormat==Format_RGBA_8 || srcFormat==Format_BGRA_8) && dstFormat==Format_LA_8){
 		for(k=0;k<depth;++k){
 			for(j=0;j<height;++j){
 				for(i=0;i<width;++i){

@@ -36,27 +36,27 @@ class TOADLET_API Buffer{
 public:
 	TOADLET_SHARED_POINTERS(Buffer);
 
-	enum UsageFlags{
-		UsageFlags_NONE=		0,
-		UsageFlags_STATIC=		1<<0,	// Buffer data is never changed
-		UsageFlags_STREAM=		1<<1,	// Buffer data changes once per frame
-		UsageFlags_DYNAMIC=		1<<2,	// Buffer data changes frequently
+	enum Usage{
+		Usage_NONE=			0,
+		Usage_BIT_STATIC=	1<<0,	// Data is never changed
+		Usage_BIT_STREAM=	1<<1,	// Data changes once per frame
+		Usage_BIT_DYNAMIC=	1<<2,	// Data changes frequently
 	};
 
-	enum AccessType{
-		AccessType_NO_ACCESS,			// Buffer data is inaccessable
-		AccessType_READ_ONLY,			// Buffer data is only readable
-		AccessType_WRITE_ONLY,			// Buffer data is only writeable
-		AccessType_READ_WRITE,
+	enum Access{
+		Access_NONE=		0,		// Data is inaccessable
+		Access_BIT_READ=	1<<0,	// Data is readable
+		Access_BIT_WRITE=	1<<1,	// Data is writeable
+		Access_READ_WRITE=	Access_BIT_READ|Access_BIT_WRITE,
 	};
 
 	virtual ~Buffer(){}
 
-	virtual int getUsageFlags() const=0;
-	virtual AccessType getAccessType() const=0;
+	virtual int getUsage() const=0;
+	virtual int getAccess() const=0;
 	virtual int getDataSize() const=0;
 
-	virtual uint8 *lock(AccessType accessType)=0;
+	virtual uint8 *lock(int lockAccess)=0;
 	virtual bool unlock()=0;
 };
 

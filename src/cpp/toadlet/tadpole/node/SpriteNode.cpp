@@ -153,10 +153,10 @@ void SpriteNode::updateSprite(){
 		mVertexData=NULL;
 	}
 
-	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,mEngine->getVertexFormats().POSITION_TEX_COORD,4);
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_TEX_COORD,4);
 	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 	{
-		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
+		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
 
 		vba.set3(0,0, x,y,0);
 		vba.set2(0,1, 0,0);

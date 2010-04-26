@@ -116,6 +116,7 @@ public:
 	// Misc operations
 	void setMirrorY(bool mirrorY);
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
+	int getClosestTextureFormat(int textureFormat);
 
 	const StatisticsSet &getStatisticsSet(){return mStatisticsSet;}
 	const CapabilitySet &getCapabilitySet(){return mCapabilitySet;}
@@ -142,6 +143,14 @@ public:
 	static GLenum getGLBlendOperation(Blend::Operation blend);
 	static GLint getGLElementCount(int format);
 	static GLenum getGLDataType(int format);
+	static GLuint getGLFormat(int textureFormat);
+	static GLuint getGLType(int textureFormat);
+	static GLuint getGLWrap(TextureStage::AddressMode addressMode,bool hasClampToEdge=true);
+	static GLuint getGLMinFilter(TextureStage::Filter minFilter,TextureStage::Filter mipFilter);
+	static GLuint getGLMagFilter(TextureStage::Filter magFilter);
+	static GLuint getGLTextureBlendSource(TextureBlend::Source blend);
+	static GLuint GLClientStates[6];
+	static GLuint GLCubeFaces[6];
 
 protected:
 	inline int setVertexData(const VertexData *vertexData,int lastTypeBits);

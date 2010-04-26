@@ -47,35 +47,35 @@ public:
 
 	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
-	virtual bool create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size);
-	virtual bool create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size);
+	virtual bool create(int usage,int access,IndexFormat indexFormat,int size);
+	virtual bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size);
 	virtual void destroy();
 
 	virtual void resetCreate(){}
 	virtual void resetDestroy(){}
 
-	virtual int getUsageFlags() const{return mUsageFlags;}
-	virtual AccessType getAccessType() const{return mAccessType;}
+	virtual int getUsage() const{return mUsage;}
+	virtual int getAccess() const{return mAccess;}
 	virtual int getDataSize() const{return mDataSize;}
 	virtual int getSize() const{return mSize;}
 
 	virtual IndexFormat getIndexFormat(){return mIndexFormat;}
 	virtual VertexFormat::ptr getVertexFormat(){return mVertexFormat;}
 
-	virtual uint8 *lock(AccessType accessType);
+	virtual uint8 *lock(int lockAccess);
 	virtual bool unlock();
 
 protected:
 	bool createContext();
 	bool destroyContext();
 
-	static GLenum getBufferUsage(int usageFlags,AccessType accessType);
+	static GLenum getBufferUsage(int usage,int access);
 
 	GLRenderer *mRenderer;
 
 	BufferDestroyedListener *mListener;
-	int mUsageFlags;
-	AccessType mAccessType;
+	int mUsage;
+	int mAccess;
 	int mSize;
 	int mDataSize;
 
@@ -89,7 +89,7 @@ protected:
 
 	GLuint mHandle;
 	GLenum mTarget;
-	AccessType mLockType;
+	int mLockAccess;
 	bool mMapping;
 	uint8 *mData;
 

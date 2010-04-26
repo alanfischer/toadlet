@@ -34,7 +34,7 @@ namespace toadlet{
 namespace peeper{
 
 BackableTexture::BackableTexture():BaseResource(),
-	mUsageFlags(0),
+	mUsage(0),
 	mDimension(Dimension_UNKNOWN),
 	mFormat(0),
 	mWidth(0),
@@ -54,10 +54,10 @@ BackableTexture::~BackableTexture(){
 	destroy();
 }
 
-bool BackableTexture::create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
+bool BackableTexture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
 	destroy();
 
-	mUsageFlags=usageFlags;
+	mUsage=usage;
 	mDimension=dimension;
 	mFormat=format;
 	mWidth=width;
@@ -148,7 +148,7 @@ void BackableTexture::setBack(Texture::ptr back){
 		// Create texture on setting the back, otherwise D3D10 static textures will not load data in load
 		if(true){
 			byte *mipDatas[1]={mData};
-			mBack->create(mUsageFlags,mDimension,mFormat,mWidth,mHeight,mDepth,0,mipDatas);
+			mBack->create(mUsage,mDimension,mFormat,mWidth,mHeight,mDepth,0,mipDatas);
 		}
 		else{
 			mBack->load(mWidth,mHeight,mDepth,0,mData);

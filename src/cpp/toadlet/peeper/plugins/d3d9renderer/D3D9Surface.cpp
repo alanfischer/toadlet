@@ -52,7 +52,7 @@ bool D3D9Surface::destroy(){
 	return true;
 }
 
-uint8 *D3D9Surface::lock(AccessType accessType){
+uint8 *D3D9Surface::lock(int lockAccess){
 	D3DLOCKED_RECT d3drect={0};
 
 	RECT rect={0};
@@ -62,7 +62,7 @@ uint8 *D3D9Surface::lock(AccessType accessType){
 	rect.right=mWidth;
 
 	DWORD d3dflags=0;
-	if(accessType==AccessType_READ_ONLY){
+	if(lockAccess==Access_BIT_READ){
 		d3dflags|=D3DLOCK_READONLY;
 	}
 

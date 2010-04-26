@@ -42,19 +42,19 @@ public:
 
 	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
-	virtual bool create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size);
+	virtual bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size);
 	virtual void destroy();
 
 	virtual void resetCreate(){}
 	virtual void resetDestroy(){}
 
-	virtual int getUsageFlags() const{return mUsageFlags;}
-	virtual AccessType getAccessType() const{return mAccessType;}
+	virtual int getUsage() const{return mUsage;}
+	virtual int getAccess() const{return mAccess;}
 	virtual int getDataSize() const{return mDataSize;}
 	virtual VertexFormat::ptr getVertexFormat(){return mVertexFormat;}
 	virtual int getSize() const{return mSize;}
 
-	virtual uint8 *lock(AccessType accessType);
+	virtual uint8 *lock(int lockAccess);
 	virtual bool unlock();
 
 	virtual void setBack(VertexBuffer::ptr back);
@@ -62,8 +62,8 @@ public:
 	
 protected:
 	BufferDestroyedListener *mListener;
-	int mUsageFlags;
-	AccessType mAccessType;
+	int mUsage;
+	int mAccess;
 	int mDataSize;
 	VertexFormat::ptr mVertexFormat;
 	int mSize;

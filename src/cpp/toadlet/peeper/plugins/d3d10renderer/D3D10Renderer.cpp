@@ -104,7 +104,7 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 	mCapabilitySet.textureDot3=false;
 	mCapabilitySet.textureNonPowerOf2=true;
 	mCapabilitySet.textureNonPowerOf2Restricted=true;
-	mCapabilitySet.textureAutogenMipMaps=true;
+	mCapabilitySet.textureAutogenMipMaps=false;
 	mCapabilitySet.renderToTexture=true;
 	mCapabilitySet.renderToDepthTexture=true;
 	mCapabilitySet.renderToTextureNonPowerOf2Restricted=true;
@@ -341,7 +341,7 @@ void D3D10Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Inde
 
 	if(indexData->getIndexBuffer()!=NULL){
 		D3D10Buffer *buffer=(D3D10Buffer*)(indexData->getIndexBuffer()->getRootIndexBuffer());
-		mD3DDevice->IASetIndexBuffer(buffer->mBuffer,getDXGI_FORMAT(buffer->getIndexFormat()),0);
+		mD3DDevice->IASetIndexBuffer(buffer->mBuffer,getIndexDXGI_FORMAT(buffer->getIndexFormat()),0);
 	}
 
 	mD3DDevice->IASetPrimitiveTopology(getD3D10_PRIMITIVE_TOPOLOGY(indexData->primitive));
@@ -695,6 +695,27 @@ void D3D10Renderer::setMirrorY(bool mirrorY){
 void D3D10Renderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){
 }
 
+int D3D10Renderer::getClosestTextureFormat(int textureFormat){
+	if(textureFormat==Texture::Format_L_8){
+		return textureFormat;
+	}
+	else if(textureFormat==Texture::Format_LA_8){
+		return textureFormat;
+	}
+	else if(textureFormat==Texture::Format_RGBA_8){
+		return textureFormat;
+	}
+	else if(textureFormat==Texture::Format_RGB_F32){
+		return textureFormat;
+	}
+	else if(textureFormat==Texture::Format_RGBA_F32){
+		return textureFormat;
+	}
+	else{
+		return Texture::Format_RGBA_8;
+	}
+}
+
 D3D10_PRIMITIVE_TOPOLOGY D3D10Renderer::getD3D10_PRIMITIVE_TOPOLOGY(IndexData::Primitive primitive){
 	switch(primitive){
 		case IndexData::Primitive_POINTS:
@@ -715,7 +736,7 @@ D3D10_PRIMITIVE_TOPOLOGY D3D10Renderer::getD3D10_PRIMITIVE_TOPOLOGY(IndexData::P
 	}
 }
 
-DXGI_FORMAT D3D10Renderer::getDXGI_FORMAT(IndexBuffer::IndexFormat format){
+DXGI_FORMAT D3D10Renderer::getIndexDXGI_FORMAT(IndexBuffer::IndexFormat format){
 	switch(format){
 		case IndexBuffer::IndexFormat_UINT_8:
 		case IndexBuffer::IndexFormat_UINT_16:
@@ -729,6 +750,25 @@ DXGI_FORMAT D3D10Renderer::getDXGI_FORMAT(IndexBuffer::IndexFormat format){
 				"D3D10Renderer::getDXGI_FORMAT: Invalid format");
 			return DXGI_FORMAT_UNKNOWN;
 		break;
+	}
+}
+
+DXGI_FORMAT D3D10Renderer::getTextureDXGI_FORMAT(int textureFormat){
+	switch(textureFormat){
+		case Texture::Format_L_8:
+			return DXGI_FORMAT_R8_UNORM;
+		case Texture::Format_LA_8:
+			return DXGI_FORMAT_R8G8_UNORM;
+		case Texture::Format_RGBA_8:
+			return DXGI_FORMAT_R8G8B8A8_UNORM;
+		case Texture::Format_RGB_F32:
+			return DXGI_FORMAT_R32G32B32_FLOAT;
+		case Texture::Format_RGBA_F32:
+			return DXGI_FORMAT_R32G32B32A32_FLOAT;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"D3D10Texture::getDXGI_FORMAT: Invalid type");
+			return DXGI_FORMAT_UNKNOWN;
 	}
 }
 
