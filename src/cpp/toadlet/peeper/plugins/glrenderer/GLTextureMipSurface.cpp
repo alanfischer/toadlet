@@ -25,6 +25,7 @@
 
 #include "GLTextureMipSurface.h"
 #include "GLTexture.h"
+#include "GLRenderer.h"
 
 namespace toadlet{
 namespace peeper{
@@ -57,7 +58,7 @@ GLuint GLTextureMipSurface::getHandle() const{
 GLuint GLTextureMipSurface::getTarget() const{
 	#if !defined(TOADLET_HAS_GLES)
 		if(mTexture->getTarget()==GL_TEXTURE_CUBE_MAP){
-			return GLTexture::GLCubeFaces[mCubeSide];
+			return GLRenderer::GLCubeFaces[mCubeSide];
 		}
 	#endif
 	return mTexture->getTarget();

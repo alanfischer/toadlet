@@ -42,32 +42,36 @@ public:
 
 	VertexBuffer *getRootVertexBuffer(){return this;}
 
-	virtual bool create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size);
-	virtual void destroy();
-
 	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
-	virtual bool createContext();
-	virtual void destroyContext(bool backData);
-	virtual bool contextNeedsReset();
+	virtual bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size);
+	virtual void destroy();
 
-	virtual int getUsageFlags() const{return mUsageFlags;}
-	virtual AccessType getAccessType() const{return mAccessType;}
+	virtual void resetCreate();
+	virtual void resetDestroy();
+
+	virtual int getUsage() const{return mUsage;}
+	virtual int getAccess() const{return mAccess;}
 	virtual int getDataSize() const{return mDataSize;}
 	virtual VertexFormat::ptr getVertexFormat(){return mVertexFormat;}
 	virtual int getSize() const{return mSize;}
 
-	virtual uint8 *lock(AccessType accessType);
+	virtual uint8 *lock(int lockAccess);
 	virtual bool unlock();
 
-protected:
+	bool needsReset();
+
 	static DWORD getFVF(VertexFormat *vertexFormat,egg::Collection<VertexElement> *colorElements);
+
+protected:
+	bool createContext(bool restore);
+	bool destroyContext(bool backup);
 
 	D3D9Renderer *mRenderer;
 
 	BufferDestroyedListener *mListener;
-	int mUsageFlags;
-	AccessType mAccessType;
+	int mUsage;
+	int mAccess;
 	int mSize;
 	VertexFormat::ptr mVertexFormat;
 	short mVertexSize;
@@ -78,9 +82,8 @@ protected:
 	D3DPOOL mD3DPool;
 	IDirect3DVertexBuffer9 *mVertexBuffer;
 	egg::Collection<VertexElement> mColorElements;
-	AccessType mLockType;
+	int mLockAccess;
 	uint8 *mData;
-	bool mBacking;
 	uint8 *mBackingData;
 
 	friend D3D9Renderer;

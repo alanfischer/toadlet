@@ -79,7 +79,9 @@ public:
 	inline byte *getData(){return mData;}
 	inline const byte *getData() const{return mData;}
 	
-	int getPixelSize() const;
+	inline int getPixelSize() const{return ImageFormatConversion::getPixelSize(mFormat);}
+	inline int getRowPitch() const{return getPixelSize()*mWidth;}
+	inline int getSlicePitch() const{return getRowPitch()*mHeight;}
 
 	void getPixel(Pixel<uint8> &pixel,int x,int y=0,int z=0) const{
 		int o=((z*mHeight*mWidth)+(y*mWidth)+x);

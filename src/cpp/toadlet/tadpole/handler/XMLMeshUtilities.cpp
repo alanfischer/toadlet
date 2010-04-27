@@ -657,15 +657,15 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 		VertexBuffer::ptr vertexBuffer;
 		if(bufferManager!=NULL){
 			if(mesh->vertexBoneAssignments.size()>0){
-				vertexBuffer=bufferManager->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_READ_WRITE,vertexFormat,count);
+				vertexBuffer=bufferManager->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,vertexFormat,count);
 			}
 			else{
-				vertexBuffer=bufferManager->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,count);
+				vertexBuffer=bufferManager->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,count);
 			}
 		}
 		else{
 			vertexBuffer=VertexBuffer::ptr(new BackableVertexBuffer());
-			vertexBuffer->create(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,count);
+			vertexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,count);
 		}
 
 		int pi=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_POSITION);
@@ -674,7 +674,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 		int ci=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_COLOR_DIFFUSE);
 
 		VertexBufferAccessor vba;
-		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
+		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
 
 		const char *cdata=mxmlGetOpaque(vertexNode->child);
 		if(cdata!=NULL){
@@ -787,17 +787,17 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 
 			IndexBuffer::ptr indexBuffer;
 			if(bufferManager!=NULL){
-				indexBuffer=bufferManager->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,count);
+				indexBuffer=bufferManager->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,count);
 			}
 			else{
 				indexBuffer=IndexBuffer::ptr(new BackableIndexBuffer());
-				indexBuffer->create(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,count);
+				indexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,count);
 			}
 
 			subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,count));
 
 			IndexBufferAccessor iba;
-			iba.lock(indexBuffer,Buffer::AccessType_WRITE_ONLY);
+			iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
 
 			const char *cdata=mxmlGetOpaque(indexesNode->child);
 			if(cdata!=NULL){
@@ -914,7 +914,7 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version){
 		int ci=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_COLOR_DIFFUSE);
 
 		VertexBufferAccessor vba;
-		vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
+		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
 
 		Vector3 v3;
 		Vector2 v2;
@@ -976,7 +976,7 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version){
 			const IndexBuffer::ptr &indexBuffer=indexData->getIndexBuffer();
 
 			IndexBufferAccessor iba;
-			iba.lock(indexBuffer,Buffer::AccessType_WRITE_ONLY);
+			iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
 
 			mxml_node_t *indexNode=mxmlNewElement(subMeshNode,"Indexes");
 			{

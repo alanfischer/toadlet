@@ -40,31 +40,30 @@ public:
 
 	virtual IndexBuffer *getRootIndexBuffer(){return mBack;}
 
-	virtual bool create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size);
-	virtual void destroy();
-
 	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
-	virtual bool createContext(){return mBack->createContext();}
-	virtual void destroyContext(bool backData){mBack->destroyContext(backData);}
-	virtual bool contextNeedsReset(){return mBack->contextNeedsReset();}
+	virtual bool create(int usage,int access,IndexFormat indexFormat,int size);
+	virtual void destroy();
 
-	virtual int getUsageFlags() const{return mUsageFlags;}
-	virtual AccessType getAccessType() const{return mAccessType;}
+	virtual void resetCreate(){}
+	virtual void resetDestroy(){}
+
+	virtual int getUsage() const{return mUsage;}
+	virtual int getAccess() const{return mAccess;}
 	virtual int getDataSize() const{return mDataSize;}
 	virtual IndexFormat getIndexFormat(){return mIndexFormat;}
 	virtual int getSize() const{return mSize;}
 
-	virtual uint8 *lock(AccessType accessType);
+	virtual uint8 *lock(int lockAccess);
 	virtual bool unlock();
 
-	virtual void setBack(IndexBuffer::ptr back,bool initial=false);
+	virtual void setBack(IndexBuffer::ptr back);
 	virtual IndexBuffer::ptr getBack(){return mBack;}
 	
 protected:
 	BufferDestroyedListener *mListener;
-	int mUsageFlags;
-	AccessType mAccessType;
+	int mUsage;
+	int mAccess;
 	int mDataSize;
 	IndexFormat mIndexFormat;
 	int mSize;

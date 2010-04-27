@@ -253,8 +253,8 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 	vertexFormat->addVertexElement(VertexElement(VertexElement::Type_POSITION,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3));
 	vertexFormat->addVertexElement(VertexElement(VertexElement::Type_NORMAL,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3));
 	vertexFormat->addVertexElement(VertexElement(VertexElement::Type_TEX_COORD,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_2));
-//	vertexFormat->addVertexElement(VertexElement(VertexElement::Type_TEX_COORD_2,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_2));
-	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,map->nsurfedges);
+	vertexFormat->addVertexElement(VertexElement(VertexElement::Type_TEX_COORD_2,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_2));
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,map->nsurfedges);
 
 	/// @todo: Figure out maximum required size, or allow multiple images
 	Image::ptr lightmapImage(new Image(Image::Dimension_D2,Image::Format_RGB_8,1024,1024,0));//2048,2048,0));
@@ -273,7 +273,7 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 	map->facedatas.resize(map->nfaces);
 	VertexBufferAccessor vba;
 	IndexBufferAccessor iba;
-	vba.lock(vertexBuffer);
+	vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
 	for(i=0;i<map->nfaces;i++){
 		bface *face=&map->faces[i];
 
@@ -311,8 +311,8 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 		}
 		else{
 			int indexes=(face->numedges-2)*3;
-			IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,indexes);
-			iba.lock(indexBuffer);
+			IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,indexes);
+			iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
 			for(j=1;j<face->numedges-1;++j){
 				iba.set((j-1)*3+0,face->firstedge);
 				iba.set((j-1)*3+1,face->firstedge+j);
@@ -346,7 +346,7 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 				lt=(lmmidt + (t-surfmidt)/16.0);
 				Vector3 lc(ls*ilmwidth,lt*ilmheight,Math::ONE);
 				Math::mulPoint3Fast(lc,map->facedatas[i].lightmapTransform);
-//				vba.set2(faceedge,3,lc.x,lc.y);
+				vba.set2(faceedge,3,lc.x,lc.y);
 			}
 		}
 	}

@@ -25,7 +25,7 @@
 
 #include "GLFBORenderbufferSurface.h"
 #include "GLFBOSurfaceRenderTarget.h"
-#include "GLTexture.h"
+#include "GLRenderer.h"
 
 namespace toadlet{
 namespace peeper{
@@ -51,7 +51,7 @@ bool GLFBORenderbufferSurface::create(int format,int width,int height){
 
 	glGenRenderbuffers(1,&mHandle);
 	glBindRenderbuffer(GL_RENDERBUFFER,mHandle);
-	glRenderbufferStorage(GL_RENDERBUFFER,GLTexture::getGLFormat(mFormat),mWidth,mHeight);
+	glRenderbufferStorage(GL_RENDERBUFFER,GLRenderer::getGLFormat(mFormat),mWidth,mHeight);
 
 	TOADLET_CHECK_GLERROR("GLFBORenderbufferSurface::create");
 

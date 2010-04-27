@@ -34,8 +34,8 @@ namespace peeper{
 
 BackableVertexBuffer::BackableVertexBuffer():
 	mListener(NULL),
-	mUsageFlags(0),
-	mAccessType(AccessType_NO_ACCESS),
+	mUsage(0),
+	mAccess(0),
 	mDataSize(0),
 	//mVertexFormat,
 	mSize(0),
@@ -49,11 +49,11 @@ BackableVertexBuffer::~BackableVertexBuffer(){
 	destroy();
 }
 
-bool BackableVertexBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size){
+bool BackableVertexBuffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int size){
 	destroy();
 
-	mUsageFlags=usageFlags;
-	mAccessType=accessType;
+	mUsage=usage;
+	mAccess=access;
 	mVertexFormat=vertexFormat;
 	mSize=size;
 	mDataSize=mVertexFormat->getVertexSize()*mSize;
@@ -79,9 +79,9 @@ void BackableVertexBuffer::destroy(){
 	}
 }
 
-uint8 *BackableVertexBuffer::lock(AccessType accessType){
+uint8 *BackableVertexBuffer::lock(int lockAccess){
 	if(mBack!=NULL){
-		return mBack->lock(accessType);
+		return mBack->lock(lockAccess);
 	}
 	else{
 		return mData;
@@ -97,26 +97,32 @@ bool BackableVertexBuffer::unlock(){
 	}
 }
 
-void BackableVertexBuffer::setBack(VertexBuffer::ptr back,bool initial){
+void BackableVertexBuffer::setBack(VertexBuffer::ptr back){
 	if(back!=mBack && mBack!=NULL){
 		mData=new uint8[mDataSize];
-		uint8 *data=NULL;
 		TOADLET_TRY
-			data=lock(AccessType_READ_ONLY);
-		TOADLET_CATCH(const Exception &){data=NULL;}
-		memcpy(mData,data,mDataSize);
-		mBack->unlock();
+			byte *data=lock(Access_BIT_READ);
+			if(data!=NULL){
+				memcpy(mData,data,mDataSize);
+				mBack->unlock();
+			}
+		TOADLET_CATCH(const Exception &){}
+		mBack->destroy();
 	}
 
 	mBack=back;
 	
-	if(initial==false && mBack!=NULL && mData!=NULL){
-		uint8 *data=NULL;
+	if(mBack!=NULL && mData!=NULL){
+		// Create texture on setting the back, otherwise D3D10 static textures will not load data in load
+		mBack->create(mUsage,mAccess,mVertexFormat,mSize);
+
 		TOADLET_TRY
-			data=lock(AccessType_WRITE_ONLY);
-		TOADLET_CATCH(const Exception &){data=NULL;}
-		memcpy(data,mData,mDataSize);
-		mBack->unlock();
+			byte *data=lock(Access_BIT_WRITE);
+			if(data!=NULL){
+				memcpy(data,mData,mDataSize);
+				mBack->unlock();
+			}
+		TOADLET_CATCH(const Exception &){}
 		delete[] mData;
 		mData=NULL;
 	}

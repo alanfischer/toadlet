@@ -23,12 +23,10 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/peeper/BackableIndexBuffer.h>
 #include <toadlet/peeper/BackableVertexBuffer.h>
-#include <toadlet/egg/Error.h>
 #include <string.h> //memcpy
 
 using namespace toadlet::egg;
@@ -37,8 +35,12 @@ using namespace toadlet::peeper;
 namespace toadlet{
 namespace tadpole{
 
-BufferManager::BufferManager(Engine *engine){
+BufferManager::BufferManager(Engine *engine,bool backable):
+	mEngine(NULL),
+	mBackable(false)
+{
 	mEngine=engine;
+	mBackable=backable;
 }
 
 BufferManager::~BufferManager(){
@@ -68,14 +70,27 @@ void BufferManager::destroy(){
 	mVertexBuffers.clear();
 }
 
-IndexBuffer::ptr BufferManager::createIndexBuffer(int usageFlags,Buffer::AccessType accessType,IndexBuffer::IndexFormat indexFormat,int size){
-	BackableIndexBuffer::ptr indexBuffer(new BackableIndexBuffer());
-	indexBuffer->create(usageFlags,accessType,indexFormat,size);
-	if(mEngine->getRenderer()!=NULL){
-		IndexBuffer::ptr back(mEngine->getRenderer()->createIndexBuffer());
-		back->create(usageFlags,accessType,indexFormat,size);
-		indexBuffer->setBack(back,true);
+IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuffer::IndexFormat indexFormat,int size){
+	IndexBuffer::ptr indexBuffer;
+	if(mBackable){
+		BackableIndexBuffer::ptr backableIndexBuffer(new BackableIndexBuffer());
+		backableIndexBuffer->create(usage,access,indexFormat,size);
+		if(mEngine->getRenderer()!=NULL){
+			IndexBuffer::ptr back(mEngine->getRenderer()->createIndexBuffer());
+			back->create(usage,access,indexFormat,size);
+			backableIndexBuffer->setBack(back);
+		}
+		indexBuffer=backableIndexBuffer;
 	}
+	else if(mEngine->getRenderer()!=NULL){
+		indexBuffer=IndexBuffer::ptr(mEngine->getRenderer()->createIndexBuffer());
+		indexBuffer->create(usage,access,indexFormat,size);
+	}
+	else{
+		Error::nullPointer("can not create a non-backable Buffer without a renderer");
+		return NULL;
+	}
+
 	mIndexBuffers.add(indexBuffer);
 
 	indexBuffer->setBufferDestroyedListener(this);
@@ -83,14 +98,27 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usageFlags,Buffer::AccessT
 	return indexBuffer;
 }
 
-VertexBuffer::ptr BufferManager::createVertexBuffer(int usageFlags,Buffer::AccessType accessType,VertexFormat::ptr vertexFormat,int size){
-	BackableVertexBuffer::ptr vertexBuffer(new BackableVertexBuffer());
-	vertexBuffer->create(usageFlags,accessType,vertexFormat,size);
-	if(mEngine->getRenderer()!=NULL){
-		VertexBuffer::ptr back(mEngine->getRenderer()->createVertexBuffer());
-		back->create(usageFlags,accessType,vertexFormat,size);
-		vertexBuffer->setBack(back,true);
+VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexFormat::ptr vertexFormat,int size){
+	VertexBuffer::ptr vertexBuffer;
+	if(mBackable){
+		BackableVertexBuffer::ptr backableVertexBuffer(new BackableVertexBuffer());
+		backableVertexBuffer->create(usage,access,vertexFormat,size);
+		if(mEngine->getRenderer()!=NULL){
+			VertexBuffer::ptr back(mEngine->getRenderer()->createVertexBuffer());
+			back->create(usage,access,vertexFormat,size);
+			backableVertexBuffer->setBack(back);
+		}
+		vertexBuffer=backableVertexBuffer;
 	}
+	else if(mEngine->getRenderer()!=NULL){
+		vertexBuffer=VertexBuffer::ptr(mEngine->getRenderer()->createVertexBuffer());
+		vertexBuffer->create(usage,access,vertexFormat,size);
+	}
+	else{
+		Error::nullPointer("can not create a non-backable Buffer without a renderer");
+		return NULL;
+	}
+
 	mVertexBuffers.add(vertexBuffer);
 
 	vertexBuffer->setBufferDestroyedListener(this);
@@ -98,7 +126,7 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usageFlags,Buffer::Acces
 	return vertexBuffer;
 }
 
-IndexBuffer::ptr BufferManager::cloneIndexBuffer(IndexBuffer::ptr oldIndexBuffer,int usageFlags,Buffer::AccessType accessType,IndexBuffer::IndexFormat indexFormat,int size){
+IndexBuffer::ptr BufferManager::cloneIndexBuffer(IndexBuffer::ptr oldIndexBuffer,int usage,int access,IndexBuffer::IndexFormat indexFormat,int size){
 	IndexBuffer::IndexFormat oldIndexFormat=oldIndexBuffer->getIndexFormat();
 	int oldSize=oldIndexBuffer->getSize();
 
@@ -110,11 +138,11 @@ IndexBuffer::ptr BufferManager::cloneIndexBuffer(IndexBuffer::ptr oldIndexBuffer
 		}
 	#endif
 
-	IndexBuffer::ptr indexBuffer=createIndexBuffer(usageFlags,accessType,indexFormat,size);
+	IndexBuffer::ptr indexBuffer=createIndexBuffer(usage,access,indexFormat,size);
 
 	int numElements=oldSize<size?oldSize:size;
-	uint8 *srcData=oldIndexBuffer->lock(Buffer::AccessType_READ_ONLY);
-	uint8 *dstData=indexBuffer->lock(Buffer::AccessType_WRITE_ONLY);
+	uint8 *srcData=oldIndexBuffer->lock(Buffer::Access_BIT_READ);
+	uint8 *dstData=indexBuffer->lock(Buffer::Access_BIT_WRITE);
 
 	memcpy(dstData,srcData,indexFormat*numElements);
 
@@ -124,7 +152,7 @@ IndexBuffer::ptr BufferManager::cloneIndexBuffer(IndexBuffer::ptr oldIndexBuffer
 	return indexBuffer;
 }
 
-VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBuffer,int usageFlags,Buffer::AccessType accessType,VertexFormat::ptr vertexFormat,int size){
+VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBuffer,int usage,int access,VertexFormat::ptr vertexFormat,int size){
 	int i,j;
 
 	VertexFormat::ptr oldVertexFormat=oldVertexBuffer->getVertexFormat();
@@ -147,10 +175,10 @@ VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBu
 		}
 	#endif
 
-	VertexBuffer::ptr vertexBuffer=createVertexBuffer(usageFlags,accessType,vertexFormat,size);
+	VertexBuffer::ptr vertexBuffer=createVertexBuffer(usage,access,vertexFormat,size);
 
-	uint8 *srcData=oldVertexBuffer->lock(Buffer::AccessType_READ_ONLY);
-	uint8 *dstData=vertexBuffer->lock(Buffer::AccessType_WRITE_ONLY);
+	uint8 *srcData=oldVertexBuffer->lock(Buffer::Access_BIT_READ);
+	uint8 *dstData=vertexBuffer->lock(Buffer::Access_BIT_WRITE);
 
 	int numVerts=oldSize<size?oldSize:size;
 	int srcVertSize=oldVertexFormat->getVertexSize();
@@ -179,22 +207,22 @@ void BufferManager::contextActivate(Renderer *renderer){
 		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
 		if(indexBuffer->getRootIndexBuffer()!=indexBuffer){
 			IndexBuffer::ptr back(renderer->createIndexBuffer());
-			back->create(indexBuffer->getUsageFlags(),indexBuffer->getAccessType(),indexBuffer->getIndexFormat(),indexBuffer->getSize());
 			shared_static_cast<BackableIndexBuffer>(indexBuffer)->setBack(back);
 		}
 		else{
-			indexBuffer->createContext();
+			Error::unknown(Categories::TOADLET_TADPOLE,"unable to contextActivate a non-backed resource");
+			return;
 		}
 	}
 	for(i=0;i<mVertexBuffers.size();++i){
 		VertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
 		if(vertexBuffer->getRootVertexBuffer()!=vertexBuffer){
 			VertexBuffer::ptr back(renderer->createVertexBuffer());
-			back->create(vertexBuffer->getUsageFlags(),vertexBuffer->getAccessType(),vertexBuffer->getVertexFormat(),vertexBuffer->getSize());
 			shared_static_cast<BackableVertexBuffer>(vertexBuffer)->setBack(back);
 		}
 		else{
-			vertexBuffer->createContext();
+			Error::unknown(Categories::TOADLET_TADPOLE,"unable to contextActivate a non-backed resource");
+			return;
 		}
 	}
 }
@@ -207,7 +235,8 @@ void BufferManager::contextDeactivate(Renderer *renderer){
 			shared_static_cast<BackableIndexBuffer>(indexBuffer)->setBack(NULL);
 		}
 		else{
-			indexBuffer->destroyContext(true);
+			Error::unknown(Categories::TOADLET_TADPOLE,"unable to contextDeactivate a non-backed resource");
+			return;
 		}
 	}
 	for(i=0;i<mVertexBuffers.size();++i){
@@ -216,7 +245,8 @@ void BufferManager::contextDeactivate(Renderer *renderer){
 			shared_static_cast<BackableVertexBuffer>(vertexBuffer)->setBack(NULL);
 		}
 		else{
-			vertexBuffer->destroyContext(true);
+			Error::unknown(Categories::TOADLET_TADPOLE,"unable to contextDeactivate a non-backed resource");
+			return;
 		}
 	}
 }
@@ -225,15 +255,11 @@ void BufferManager::preContextReset(Renderer *renderer){
 	int i;
 	for(i=0;i<mIndexBuffers.size();++i){
 		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
-		if(indexBuffer->contextNeedsReset()){
-			indexBuffer->destroyContext(true);
-		}
+		indexBuffer->resetDestroy();
 	}
 	for(i=0;i<mVertexBuffers.size();++i){
 		VertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
-		if(vertexBuffer->contextNeedsReset()){
-			vertexBuffer->destroyContext(true);
-		}
+		vertexBuffer->resetDestroy();
 	}
 }
 
@@ -241,15 +267,11 @@ void BufferManager::postContextReset(Renderer *renderer){
 	int i;
 	for(i=0;i<mIndexBuffers.size();++i){
 		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
-		if(indexBuffer->contextNeedsReset()){
-			indexBuffer->createContext();
-		}
+		indexBuffer->resetCreate();
 	}
 	for(i=0;i<mVertexBuffers.size();++i){
 		VertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
-		if(vertexBuffer->contextNeedsReset()){
-			vertexBuffer->createContext();
-		}
+		vertexBuffer->resetCreate();
 	}
 }
 

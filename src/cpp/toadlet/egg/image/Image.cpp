@@ -63,7 +63,7 @@ Image *Image::clone(){
 
 	image->reallocate(mDimension,mFormat,mWidth,mHeight,mDepth,false);
 
-	memcpy(image->mData,mData,getPixelSize()*mWidth*mHeight*mDepth);
+	memcpy(image->mData,mData,getSlicePitch()*mDepth);
 
 	return image;
 }
@@ -96,7 +96,7 @@ bool Image::reallocate(Dimension dimension,int format,int width,int height,int d
 	mHeight=height;
 	mDepth=depth;
 
-	int size=getPixelSize()*mWidth*mHeight*mDepth;
+	int size=getSlicePitch()*mDepth;
 	mData=new byte[size];
 	if(clear){
 		memset(mData,0,size);
@@ -116,10 +116,6 @@ bool Image::hasSameParametersAs(const Image *image) const{
 		mWidth==image->mWidth &&
 		mHeight==image->mHeight &&
 		mDepth==image->mDepth;
-}
-
-int Image::getPixelSize() const{
-	return ImageFormatConversion::getPixelSize(mFormat);
 }
 
 }

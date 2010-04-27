@@ -38,7 +38,7 @@ namespace peeper{
 D3D10Texture::D3D10Texture(D3D10Renderer *renderer):BaseResource(),
 	mRenderer(NULL),
 
-	mUsageFlags(UsageFlags_NONE),
+	mUsage(0),
 	mDimension(Dimension_UNKNOWN),
 	mFormat(0),
 	mWidth(0),
@@ -46,12 +46,8 @@ D3D10Texture::D3D10Texture(D3D10Renderer *renderer):BaseResource(),
 	mDepth(0),
 	mMipLevels(0),
 
-	mInternalFormat(0),
-	mDXGIFormat(DXGI_FORMAT_UNKNOWN),
-	mD3DUsage((D3D10_USAGE)0),
 	mTexture(NULL),
-	mShaderResourceView(NULL),
-	mManuallyGenerateMipLevels(false)
+	mShaderResourceView(NULL)
 {
 	mRenderer=renderer;
 }
@@ -62,10 +58,10 @@ D3D10Texture::~D3D10Texture(){
 	}
 }
 
-bool D3D10Texture::create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels){
+bool D3D10Texture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
 	destroy();
 
-	mUsageFlags=usageFlags;
+	mUsage=usage;
 	mDimension=dimension;
 	mFormat=format;
 	mWidth=width;
@@ -73,28 +69,79 @@ bool D3D10Texture::create(int usageFlags,Dimension dimension,int format,int widt
 	mDepth=depth;
 	mMipLevels=mipLevels;
 
-	bool result=createContext();
+	if((mUsage&Usage_BIT_STATIC)>0){
+		if(mMipLevels!=0){
+			createContext(mipLevels,mipDatas);
+		}
+		else{
+			mUsage&=~Usage_BIT_STATIC;
+			mUsage|=Usage_BIT_DYNAMIC;
+		}
+	}
+	
+	if((mUsage&Usage_BIT_STATIC)==0){
+		createContext(0,NULL);
 
-	return result;
+		int specifiedMipLevels=mMipLevels>0?mMipLevels:1;
+		if(mipDatas!=NULL){
+			int level;
+			for(level=0;level<specifiedMipLevels;++level){
+				load(width,height,depth,level,mipDatas[level]);
+				width/=2;height/=2;depth/=2;
+			}
+		}
+	}
+
+	return true;
 }
 
 void D3D10Texture::destroy(){
-	destroyContext(false);
+	destroyContext();
 }
 
-bool D3D10Texture::createContext(){
+bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
 	ID3D10Device *device=mRenderer->getD3D10Device();
 
-	// TODO: Get Usage flags working
-	mD3DUsage=D3D10_USAGE_DEFAULT;
-	int miscFlags=((mUsageFlags&UsageFlags_AUTOGEN_MIPMAPS)>0)?D3D10_RESOURCE_MISC_GENERATE_MIPS:0;
+	D3D10_USAGE d3dUsage=D3D10_USAGE_DEFAULT;
+	if((mUsage&Usage_BIT_STATIC)>0){
+		d3dUsage=D3D10_USAGE_IMMUTABLE;
+	}
+	else if((mUsage&Usage_BIT_STREAM)>0){
+		d3dUsage=D3D10_USAGE_DYNAMIC;
+	}
+
+	int cpuFlags=0;
+//  Perhaps we need to add a flag to specify we want to read from a texture
+//	if((mUsage&Usage_BIT_STATIC)==0){
+//		if((mUsage&(Usage_BIT_DYNAMIC|Usage_BIT_STREAM))>0){
+//			cpuFlags|=D3D10_CPU_ACCESS_WRITE;
+//		}
+//	}
+
+	int miscFlags=0;
 	int bindFlags=D3D10_BIND_SHADER_RESOURCE;
+	if((mUsage&(Usage_BIT_AUTOGEN_MIPMAPS|Usage_BIT_RENDERTARGET))==(Usage_BIT_AUTOGEN_MIPMAPS|Usage_BIT_RENDERTARGET)){
+		miscFlags|=D3D10_RESOURCE_MISC_GENERATE_MIPS;
+		bindFlags|=D3D10_BIND_RENDER_TARGET;
+	}
 
-	mInternalFormat=getClosestTextureFormat(mFormat);
-	mDXGIFormat=getDXGI_FORMAT(mInternalFormat);
+	DXGI_FORMAT dxgiFormat=D3D10Renderer::getTextureDXGI_FORMAT(mFormat);
 
-	D3D10_SHADER_RESOURCE_VIEW_DESC srvDesc;
-	srvDesc.Format=mDXGIFormat;
+	D3D10_SUBRESOURCE_DATA *sData=NULL;
+	if(mipDatas!=NULL){
+		int numMipDatas=mipLevels>0?mipLevels:1;
+		int hwidth=mWidth,hheight=mHeight,hdepth=mDepth;
+		sData=new D3D10_SUBRESOURCE_DATA[numMipDatas];
+		int i;
+		for(i=0;i<numMipDatas;++i){
+			sData[i].pSysMem=mipDatas[i];
+			sData[i].SysMemPitch=ImageFormatConversion::getPixelSize(mFormat)*hwidth;
+			sData[i].SysMemSlicePitch=sData[i].SysMemPitch*hheight;
+
+			hwidth/=2;hheight/=2;hdepth/=2;
+			hwidth=hwidth>0?hwidth:1;hheight=hheight>0?hheight:1;hdepth=hdepth>0?hdepth:1;
+		}
+	}
 
 	HRESULT result=E_FAIL;
 	switch(mDimension){
@@ -102,50 +149,34 @@ bool D3D10Texture::createContext(){
 			D3D10_TEXTURE1D_DESC desc={0};
 			desc.Width=mWidth;
 			desc.MipLevels=mMipLevels;
-			desc.Usage=mD3DUsage;
-			desc.CPUAccessFlags=0;
+			desc.Usage=d3dUsage;
+			desc.CPUAccessFlags=cpuFlags;
 			desc.BindFlags=bindFlags;
 			desc.MiscFlags=miscFlags;
-			desc.Format=mDXGIFormat;
+			desc.Format=dxgiFormat;
 			desc.ArraySize=1;
-			srvDesc.ViewDimension=D3D10_SRV_DIMENSION_TEXTURE1D;
-			srvDesc.Texture1D.MipLevels=mMipLevels;
-			srvDesc.Texture1D.MostDetailedMip=0;
 
 			ID3D10Texture1D *texture=NULL;
-			result=device->CreateTexture1D(&desc,NULL,&texture);
+			result=device->CreateTexture1D(&desc,sData,&texture);
 			TOADLET_CHECK_D3D10ERROR(result,"CreateTexture1D");
 			mTexture=texture;
 		}break;
-		case Texture::Dimension_D2:
-		case Texture::Dimension_CUBE:{
+		case Texture::Dimension_D2:{
 			D3D10_TEXTURE2D_DESC desc={0};
 			desc.Width=mWidth;
 			desc.Height=mHeight;
 			desc.MipLevels=mMipLevels;
 			desc.SampleDesc.Count=1;
 			desc.SampleDesc.Quality=0;
-			desc.Usage=D3D10_USAGE_DEFAULT;//mD3DUsage;
-			desc.CPUAccessFlags=0;
-			desc.BindFlags=D3D10_BIND_SHADER_RESOURCE;//bindFlags;
-			desc.MiscFlags=0;//miscFlags;
-			desc.Format=DXGI_FORMAT_R8G8B8A8_UINT;//mDXGIFormat;
-
-			if(mDimension==Texture::Dimension_CUBE){
-				desc.ArraySize=6;
-				srvDesc.ViewDimension=D3D10_SRV_DIMENSION_TEXTURECUBE;
-				srvDesc.TextureCube.MipLevels=mMipLevels;
-				srvDesc.TextureCube.MostDetailedMip=0;
-			}
-			else{
-				desc.ArraySize=1;
-				srvDesc.ViewDimension=D3D10_SRV_DIMENSION_TEXTURE2D;
-				srvDesc.Texture2D.MipLevels=mMipLevels;
-				srvDesc.Texture2D.MostDetailedMip=0;
-			}
+			desc.Usage=d3dUsage;
+			desc.CPUAccessFlags=cpuFlags;
+			desc.BindFlags=bindFlags;
+			desc.MiscFlags=miscFlags;
+			desc.Format=dxgiFormat;
+			desc.ArraySize=1;
 
 			ID3D10Texture2D *texture=NULL;
-			result=device->CreateTexture2D(&desc,NULL,&texture);
+			result=device->CreateTexture2D(&desc,sData,&texture);
 			TOADLET_CHECK_D3D10ERROR(result,"CreateTexture2D");
 			mTexture=texture;
 		}break;
@@ -155,77 +186,51 @@ bool D3D10Texture::createContext(){
 			desc.Height=mHeight;
 			desc.Depth=mDepth;
 			desc.MipLevels=mMipLevels;
-			desc.Usage=mD3DUsage;
+			desc.Usage=d3dUsage;
+			desc.CPUAccessFlags=cpuFlags;
 			desc.BindFlags=bindFlags;
 			desc.MiscFlags=miscFlags;
-			desc.Format=mDXGIFormat;
-			srvDesc.ViewDimension=D3D10_SRV_DIMENSION_TEXTURE3D;
-			srvDesc.Texture3D.MipLevels=mMipLevels;
-			srvDesc.Texture3D.MostDetailedMip=0;
+			desc.Format=dxgiFormat;
 
 			ID3D10Texture3D *texture=NULL;
-			result=device->CreateTexture3D(&desc,NULL,&texture);
+			result=device->CreateTexture3D(&desc,sData,&texture);
 			TOADLET_CHECK_D3D10ERROR(result,"CreateTexture3D");
 			mTexture=texture;
 		}break;
 	}
 
-//	device->CreateShaderResourceView(mTexture,&srvDesc,&mShaderResourceView);
+	if(SUCCEEDED(result)){
+		result=device->CreateShaderResourceView(mTexture,NULL,&mShaderResourceView);
+	}
 
-	// TODO: Add mBacking data
+	if(sData!=NULL){
+		delete sData;
+	}
 
 	return SUCCEEDED(result);
 }
 
-void D3D10Texture::destroyContext(bool backData){
-	if(backData){
-		// TODO: backup data
-	}
-
+bool D3D10Texture::destroyContext(){
+	HRESULT result=S_OK;
 	if(mTexture!=NULL){
-		HRESULT result=mTexture->Release();
+		result=mTexture->Release();
 		mTexture=NULL;
-
-		if(FAILED(result)){
-			TOADLET_CHECK_D3D10ERROR(result,"Release");
-			return;
-		}
 	}
+
+	return SUCCEEDED(result);
 }
 
 Surface::ptr D3D10Texture::getMipSurface(int level,int cubeSide){
-return NULL;
-/*	if(mTexture==NULL){
-		return NULL;
-	}
-
-	IDirect3DSurface9 *surface=NULL;
-
-	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
-		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
-		texture->GetSurfaceLevel(level,&surface);
-	}
-	else if(mDimension==Texture::Dimension_D3){
-		Error::unimplemented("D3D9Texture::getMipSurface not implement for volume textures");
-		return NULL;
-	}
-	else if(mDimension==Texture::Dimension_CUBE){
-		IDirect3DCubeTexture9 *texture=(IDirect3DCubeTexture9*)mTexture;
-		texture->GetCubeMapSurface((D3DCUBEMAP_FACES)cubeSide,level,&surface);
-	}
-
-	if(surface!=NULL){
-		return Surface::ptr(new D3D9Surface(surface));
-	}
-	else{
-		return NULL;
-	}*/
+	/// @todo: Check our cached list of SubTextures, and if the requested one isn't available, create it, and then return it.
+	return NULL;
 }
 
-bool D3D10Texture::load(int format,int width,int height,int depth,int mipLevel,uint8 *data){
+bool D3D10Texture::load(int width,int height,int depth,int mipLevel,byte *mipData){
 	if(mTexture==NULL){
 		return false;
 	}
+
+	width=width>0?width:1;height=height>0?height:1;depth=depth>0?depth:1;
 
 	if(mipLevel==0 && (width!=mWidth || height!=mHeight || depth!=mDepth)){
 		Error::unknown(Categories::TOADLET_PEEPER,
@@ -233,174 +238,24 @@ bool D3D10Texture::load(int format,int width,int height,int depth,int mipLevel,u
 		return false;
 	}
 
-	// TODO:
-	D3D10_MAP mapType=D3D10_MAP_READ_WRITE;
+	ID3D10Device *device=mRenderer->getD3D10Device();
 
-	HRESULT result;
-	if(mDimension==Texture::Dimension_D1){
-		int subresource=D3D10CalcSubresource(mipLevel,1,1);
+	int format=mFormat;
+	int rowPitch=ImageFormatConversion::getPixelSize(format)*width;
+	int slicePitch=rowPitch*height;
+	int subresource=D3D10CalcSubresource(mipLevel,0,0);
+	device->UpdateSubresource(mTexture,subresource,NULL,mipData,rowPitch,slicePitch);
 
-		void *pData=NULL;
-		ID3D10Texture1D *texture=(ID3D10Texture1D*)mTexture;
-		result=texture->Map(subresource,mapType,0,&pData);
-		if(FAILED(result)){
-			TOADLET_CHECK_D3D10ERROR(result,"Map");
-			return false;
-		}
-
-		int pixelSize=ImageFormatConversion::getPixelSize(format);
-		unsigned char *dst=(unsigned char*)pData;
-		unsigned char *src=(unsigned char*)data;
-
-		ImageFormatConversion::convert(src,format,width*pixelSize,width*height*pixelSize,dst,mInternalFormat,width,width*height,width,height,depth);
-
-		texture->Unmap(subresource);
-	}
-	else if(mDimension==Texture::Dimension_D2 || mDimension==Texture::Dimension_CUBE){ // TODO: Do cube
-		int subresource=D3D10CalcSubresource(mipLevel,1,1);
-
-		D3D10_MAPPED_TEXTURE2D mappedTex;
-		ID3D10Texture2D *texture=(ID3D10Texture2D*)mTexture;
-//		result=texture->Map(subresource,mapType,0,&mappedTex);
-//		if(FAILED(result)){
-//			TOADLET_CHECK_D3D10ERROR(result,"Map");
-//			return false;
-//		}
-
-//		int pixelSize=ImageFormatConversion::getPixelSize(format);
-//		unsigned char *dst=(unsigned char*)mappedTex.pData;
-//		unsigned char *src=(unsigned char*)data;
-
-//		ImageFormatConversion::convert(src,format,width*pixelSize,width*height*pixelSize,dst,mInternalFormat,mappedTex.RowPitch,mappedTex.RowPitch*height,width,height,depth);
-
-//		texture->Unmap(subresource);
-	}
-	else if(mDimension==Texture::Dimension_D3){
-		int subresource=D3D10CalcSubresource(mipLevel,1,1);
-
-		D3D10_MAPPED_TEXTURE3D mappedTex;
-		ID3D10Texture3D *texture=(ID3D10Texture3D*)mTexture;
-		result=texture->Map(subresource,mapType,0,&mappedTex);
-		if(FAILED(result)){
-			TOADLET_CHECK_D3D10ERROR(result,"Map");
-			return false;
-		}
-
-		int pixelSize=ImageFormatConversion::getPixelSize(format);
-		unsigned char *dst=(unsigned char*)mappedTex.pData;
-		unsigned char *src=(unsigned char*)data;
-
-		ImageFormatConversion::convert(src,format,width*pixelSize,width*height*pixelSize,dst,mInternalFormat,mappedTex.RowPitch,mappedTex.DepthPitch,width,height,depth);
-
-		texture->Unmap(subresource);
-	}
-	else{
-		Error::unimplemented(Categories::TOADLET_PEEPER,
-			"D3D10Texture: unimplemented");
-		return false;
-	}
-
-	if(mManuallyGenerateMipLevels){
-		mRenderer->getD3D10Device()->GenerateMips(mShaderResourceView);
+	if((mUsage&(Usage_BIT_RENDERTARGET|Usage_BIT_AUTOGEN_MIPMAPS))==(Usage_BIT_RENDERTARGET|Usage_BIT_AUTOGEN_MIPMAPS)){
+		device->GenerateMips(mShaderResourceView);
 	}
 
 	return true;
 }
 
-bool D3D10Texture::read(int format,int width,int height,int depth,int mipLevel,uint8 *data){
-/*	if(mTexture==NULL){
-		return false;
-	}
-
-	if(mipLevel==0 && (width!=mWidth || height!=mHeight || depth!=mDepth)){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"D3D9Texture: data of incorrect dimensions");
-		return false;
-	}
-
-	if(mDimension==Texture::Dimension_D1){
-	}
-	else if(mDimension==Texture::Dimension_D2 || mDimension==Texture::Dimension_CUBE){
-		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
-
-		D3DLOCKED_RECT rect={0};
-		HRESULT result=texture->LockRect(mipLevel,&rect,NULL,D3DLOCK_READONLY);
-		if(FAILED(result)){
-			TOADLET_CHECK_D3D9ERROR(result,"LockRect");
-			return false;
-		}
-
-		int pixelSize=ImageFormatConversion::getPixelSize(format);
-		unsigned char *dst=(unsigned char*)data;
-		unsigned char *src=(unsigned char*)rect.pBits;
-
-		ImageFormatConversion::convert(src,mInternalFormat,rect.Pitch,rect.Pitch*height,dst,format,width*pixelSize,width*height*pixelSize,width,height,depth);
-
-		texture->UnlockRect(mipLevel);
-
-		return true;
-	}
-	else if(mDimension==Texture::Dimension_D3){
-		IDirect3DVolumeTexture9 *texture=(IDirect3DVolumeTexture9*)mTexture;
-
-		D3DLOCKED_BOX box={0};
-		HRESULT result=texture->LockBox(mipLevel,&box,NULL,D3DLOCK_READONLY);
-		if(FAILED(result)){
-			TOADLET_CHECK_D3D9ERROR(result,"LockBox");
-			return false;
-		}
-
-		int pixelSize=ImageFormatConversion::getPixelSize(format);
-		unsigned char *dst=(unsigned char*)data;
-		unsigned char *src=(unsigned char*)box.pBits;
-
-		ImageFormatConversion::convert(src,mInternalFormat,box.RowPitch,box.SlicePitch,dst,format,width*pixelSize,width*height*pixelSize,width,height,depth);
-
-		texture->UnlockBox(mipLevel);
-
-		return true;
-	}
-	else{
-		Error::unimplemented(Categories::TOADLET_PEEPER,
-			"D3D9Texture: unimplemented");
-		return false;
-	}
-*/
-return false;
-}
-
-int D3D10Texture::getClosestTextureFormat(int textureFormat){
-	if(textureFormat==Format_A_8){
-		textureFormat=Format_LA_8;
-	}
-	else if(textureFormat==Format_RGB_8){
-		textureFormat=Format_RGBA_8;
-	}
-
-textureFormat=Format_RGBA_8;
-
-	return textureFormat;
-}
-
-DXGI_FORMAT D3D10Texture::getDXGI_FORMAT(int textureFormat){
-	switch(textureFormat){
-		case Format_L_8:
-			return DXGI_FORMAT_R8_UNORM;
-		case Format_LA_8:
-			return DXGI_FORMAT_R8G8_UNORM;
-		case Format_BGRA_8:
-			return DXGI_FORMAT_R8G8B8A8_UNORM;
-		case Format_RGBA_8:
-			return DXGI_FORMAT_B8G8R8A8_UNORM;
-		case Format_RGB_5_6_5:
-			return DXGI_FORMAT_B5G6R5_UNORM;
-		case Format_RGBA_5_5_5_1:
-			return DXGI_FORMAT_B5G5R5A1_UNORM;
-		default:
-			Error::unknown(Categories::TOADLET_PEEPER,
-				"D3D10Texture::getDXGI_FORMAT: Invalid type");
-			return DXGI_FORMAT_UNKNOWN;
-	}
+bool D3D10Texture::read(int width,int height,int depth,int mipLevel,byte *mipData){
+	/// @todo: Lock the SubTexture and copy the data from there
+	return false;
 }
 
 }

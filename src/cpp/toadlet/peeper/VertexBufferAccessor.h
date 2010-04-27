@@ -50,11 +50,11 @@ namespace peeper{
 class TOADLET_API VertexBufferAccessor{
 public:
 	VertexBufferAccessor();
-	VertexBufferAccessor(VertexBuffer *vertexBuffer,Buffer::AccessType accessType=Buffer::AccessType_READ_WRITE);
+	VertexBufferAccessor(VertexBuffer *vertexBuffer,int access=Buffer::Access_READ_WRITE);
 
 	virtual ~VertexBufferAccessor();
 
-	void lock(VertexBuffer *vertexBuffer,Buffer::AccessType accessType=Buffer::AccessType_READ_WRITE);
+	void lock(VertexBuffer *vertexBuffer,int access=Buffer::Access_READ_WRITE);
 	void unlock();
 
 	inline int getSize() const{return mVertexBuffer->getSize();}

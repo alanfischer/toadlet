@@ -182,6 +182,7 @@ public:
 	// Misc operations
 	virtual void setMirrorY(bool mirrorY)=0;
 	virtual void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result)=0;
+	virtual int getClosestTextureFormat(int textureFormat)=0;
 
 	virtual const StatisticsSet &getStatisticsSet()=0;
 	virtual const CapabilitySet &getCapabilitySet()=0;
