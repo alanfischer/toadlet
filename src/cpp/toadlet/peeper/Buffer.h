@@ -56,6 +56,7 @@ public:
 	virtual int getAccess() const=0;
 	virtual int getDataSize() const=0;
 
+	/// @todo: Need to add stride information to the locking somehow, necessary for SubTextures
 	virtual uint8 *lock(int lockAccess)=0;
 	virtual bool unlock()=0;
 };

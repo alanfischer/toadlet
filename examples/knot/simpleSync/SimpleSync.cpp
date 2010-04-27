@@ -180,7 +180,6 @@ SimpleSync::SimpleSync():Application(),
 {
 	lastClientUpdateCounter[0]=0;
 	lastClientUpdateCounter[1]=0;
-//changeRendererPlugin(RendererPlugin_DIRECT3D9);
 }
 
 enum{
