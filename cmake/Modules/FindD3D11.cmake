@@ -36,7 +36,7 @@ if (WIN32)
 			DOC "Path to the d3d11x.lib file"
 		)
 
-		find_library (DXERR11_LIB NAMES dxerr dxerr11
+		find_library (DXERR11_LIB NAMES dxerr 
 			PATHS "$ENV{DXSDK_DIR}/Lib/${D3D11_LIB_PATH}"
 			NO_DEFAULT_PATH
 			DOC "Path to the dxerr11x.lib file"
