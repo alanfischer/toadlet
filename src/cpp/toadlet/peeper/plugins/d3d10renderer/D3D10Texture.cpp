@@ -221,32 +221,8 @@ bool D3D10Texture::destroyContext(){
 }
 
 Surface::ptr D3D10Texture::getMipSurface(int level,int cubeSide){
-return NULL;
-/*	if(mTexture==NULL){
-		return NULL;
-	}
-
-	IDirect3DSurface9 *surface=NULL;
-
-	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
-		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
-		texture->GetSurfaceLevel(level,&surface);
-	}
-	else if(mDimension==Texture::Dimension_D3){
-		Error::unimplemented("D3D9Texture::getMipSurface not implement for volume textures");
-		return NULL;
-	}
-	else if(mDimension==Texture::Dimension_CUBE){
-		IDirect3DCubeTexture9 *texture=(IDirect3DCubeTexture9*)mTexture;
-		texture->GetCubeMapSurface((D3DCUBEMAP_FACES)cubeSide,level,&surface);
-	}
-
-	if(surface!=NULL){
-		return Surface::ptr(new D3D9Surface(surface));
-	}
-	else{
-		return NULL;
-	}*/
+	/// @todo: Check our cached list of SubTextures, and if the requested one isn't available, create it, and then return it.
+	return NULL;
 }
 
 bool D3D10Texture::load(int width,int height,int depth,int mipLevel,byte *mipData){
@@ -278,6 +254,7 @@ bool D3D10Texture::load(int width,int height,int depth,int mipLevel,byte *mipDat
 }
 
 bool D3D10Texture::read(int width,int height,int depth,int mipLevel,byte *mipData){
+	/// @todo: Lock the SubTexture and copy the data from there
 	return false;
 }
 
