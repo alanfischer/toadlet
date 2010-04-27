@@ -5,7 +5,7 @@
 #  TOADLET_INCLUDE_DIR	- path to the toadlet include directory
 #  TOADLET_LIBRARY_DIR	- path to the toadlet library installation dir
 #
-# Also defines each toadlet library individually, both dynamic and static (_S) versions. Release chosen first, then debug:
+# Also defines each toadlet library individually, both dynamic and static (_S) versions. Release chosen first, then debug (_D):
 #  TOADLET_EGG_LIB
 #  TOADLET_FLICK_LIB
 #  TOADLET_FLICK_HTCMOTIONDETECTOR_LIB
@@ -49,7 +49,7 @@ else (WIN32)
 endif (WIN32)
 
 # Headers
-find_path (TOADLET_INCLUDE_DIR toadlet/Config.h PATHS ${HEADER_SEARCH_PATHS})
+find_path (TOADLET_INCLUDE_DIR toadlet/toadlet.h PATHS ${HEADER_SEARCH_PATHS})
 
 # Dynamic Libraries
 find_library (TOADLET_EGG_LIB NAMES toadlet_egg PATHS ${LIBRARY_SEARCH_PATHS})
@@ -127,7 +127,7 @@ find_library (TOADLET_TADPOLE_LIB_SD NAMES toadlet_tadpole_sd PATHS ${LIBRARY_SE
 find_library (TOADLET_TADPOLE_HOP_LIB_SD NAMES toadlet_tadpole_hop_sd PATHS ${LIBRARY_SEARCH_PATHS})
 find_library (TOADLET_PAD_LIB_SD NAMES toadlet_pad_sd PATHS ${LIBRARY_SEARCH_PATHS})
 
-# Prevent appearing in regular variable list
+# Prevent these from appearing in the regular variable list
 mark_as_advanced (
 	TOADLET_INCLUDE_DIR
 	TOADLET_LIBRARY_DIR
