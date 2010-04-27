@@ -270,10 +270,10 @@ void MeshNode::createVertexBuffer(){
 			VertexBuffer::ptr srcVertexBuffer=mMesh->staticVertexData->getVertexBuffer(0);
 			VertexFormat::ptr vertexFormat=srcVertexBuffer->getVertexFormat();
 			int numVertexes=srcVertexBuffer->getSize();
-			VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_DYNAMIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,numVertexes);
+			VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,vertexFormat,numVertexes);
 
-			uint8 *srcData=srcVertexBuffer->lock(Buffer::AccessType_READ_ONLY);
-			uint8 *dstData=vertexBuffer->lock(Buffer::AccessType_WRITE_ONLY);
+			uint8 *srcData=srcVertexBuffer->lock(Buffer::Access_BIT_READ);
+			uint8 *dstData=vertexBuffer->lock(Buffer::Access_BIT_WRITE);
 			memcpy(dstData,srcData,srcVertexBuffer->getDataSize());
 			vertexBuffer->unlock();
 			srcVertexBuffer->unlock();
@@ -292,8 +292,8 @@ void MeshNode::updateVertexBuffer(){
 		int positionElement=format->getVertexElementIndexOfType(VertexElement::Type_POSITION);
 
 		{
-			svba.lock(srcVertexBuffer,Buffer::AccessType_READ_ONLY);
-			dvba.lock(dstVertexBuffer,Buffer::AccessType_WRITE_ONLY);
+			svba.lock(srcVertexBuffer,Buffer::Access_BIT_READ);
+			dvba.lock(dstVertexBuffer,Buffer::Access_BIT_WRITE);
 
 			// It appears that hardware buffers in opengl don't store their previous data if you want to write to them.
 			// Basically, if you want to write any of it, you have to write it all.

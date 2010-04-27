@@ -38,8 +38,8 @@ D3D9VertexBuffer::D3D9VertexBuffer(D3D9Renderer *renderer):
 	mRenderer(NULL),
 
 	mListener(NULL),
-	mUsageFlags(0),
-	mAccessType(AccessType_NO_ACCESS),
+	mUsage(0),
+	mAccess(0),
 	mSize(0),
 	//mVertexFormat,
 	mVertexSize(0),
@@ -50,9 +50,8 @@ D3D9VertexBuffer::D3D9VertexBuffer(D3D9Renderer *renderer):
 	mD3DPool(D3DPOOL_MANAGED),
 	mVertexBuffer(NULL),
 	//mColorElements,
-	mLockType(AccessType_NO_ACCESS),
+	mLockAccess(0),
 	mData(NULL),
-	mBacking(false),
 	mBackingData(NULL)
 {
 	mRenderer=renderer;
@@ -62,18 +61,20 @@ D3D9VertexBuffer::~D3D9VertexBuffer(){
 	destroy();
 }
 
-bool D3D9VertexBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size){
+bool D3D9VertexBuffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int size){
 	destroy();
 
-	mUsageFlags=usageFlags;
-	mAccessType=accessType;
+	mUsage=usage;
+	mAccess=access;
 	mSize=size;
 	mVertexFormat=vertexFormat;
 	mVertexSize=mVertexFormat->vertexSize;
 	mDataSize=mVertexSize*mSize;
 	mFVF=getFVF(mVertexFormat,&mColorElements);
 
-	return createContext();
+	createContext(false);
+	
+	return true;
 }
 
 void D3D9VertexBuffer::destroy(){
@@ -89,75 +90,89 @@ void D3D9VertexBuffer::destroy(){
 	}
 }
 
-bool D3D9VertexBuffer::createContext(){
+void D3D9VertexBuffer::resetCreate(){
+	if(needsReset()){
+		createContext(true);
+	}
+}
+
+void D3D9VertexBuffer::resetDestroy(){
+	if(needsReset()){
+		destroyContext(true);
+	}
+}
+
+bool D3D9VertexBuffer::createContext(bool restore){
 	mD3DUsage=0;
 	mD3DPool=D3DPOOL_MANAGED;
-	if((mUsageFlags&UsageFlags_DYNAMIC)>0){
+	if((mUsage&Usage_BIT_DYNAMIC)>0){
 		mD3DUsage|=D3DUSAGE_DYNAMIC;
 		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
 			mD3DPool=D3DPOOL_DEFAULT;
 		#endif
 	}
 
-	if(mAccessType==AccessType_WRITE_ONLY){
+	if(mAccess==Access_BIT_WRITE){
 		mD3DUsage|=D3DUSAGE_WRITEONLY;
 	}
 
 	HRESULT result=mRenderer->getDirect3DDevice9()->CreateVertexBuffer(mDataSize,mD3DUsage,mFVF,mD3DPool,&mVertexBuffer TOADLET_SHAREDHANDLE);
 	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: CreateVertexBuffer");
 
+	if(restore){
+		byte *data=lock(Access_BIT_WRITE);
+		memcpy(data,mBackingData,mDataSize);
+		unlock();
+
+		delete[] mBackingData;
+		mBackingData=NULL;
+	}
+
 	return SUCCEEDED(result);
 }
 
-void D3D9VertexBuffer::destroyContext(bool backData){
+bool D3D9VertexBuffer::destroyContext(bool backData){
 	if(backData){
 		mBackingData=new uint8[mDataSize];
-		mBacking=true;
 
-		uint8 *data=NULL;
 		TOADLET_TRY
-			data=lock(AccessType_READ_ONLY);
-		TOADLET_CATCH(const Exception &){data=NULL;}
-		if(data!=NULL){
-			memcpy(mBackingData,data,mDataSize);
-		}
-		unlock();
+			byte *data=lock(Access_BIT_READ);
+			if(data!=NULL){
+				memcpy(mBackingData,data,mDataSize);
+				unlock();
+			}
+		TOADLET_CATCH(const Exception &){}
 	}
 
+	HRESULT result=S_OK;
 	if(mVertexBuffer!=NULL){
-		mVertexBuffer->Release();
+		result=mVertexBuffer->Release();
 		mVertexBuffer=NULL;
 	}
+
+	return SUCCEEDED(result);
 }
 
-bool D3D9VertexBuffer::contextNeedsReset(){
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		return false;
-	#else
-		return mD3DPool==D3DPOOL_DEFAULT;
-	#endif
-}
-
-uint8 *D3D9VertexBuffer::lock(AccessType lockType){
+uint8 *D3D9VertexBuffer::lock(int lockAccess){
 	if(mVertexBuffer==NULL){
 		return NULL;
 	}
 
-	if(mAccessType==AccessType_NO_ACCESS || (mAccessType==AccessType_READ_ONLY && lockType==AccessType_WRITE_ONLY) || (mAccessType==AccessType_WRITE_ONLY && lockType==AccessType_READ_ONLY)){
+	if(mAccess==0 || (mAccess==Access_BIT_READ && lockAccess==Access_BIT_WRITE) || (mAccess==Access_BIT_WRITE && lockAccess==Access_BIT_READ)){
 		Logger::error(Categories::TOADLET_PEEPER,"invalid lock type on buffer");
 		return NULL;
 	}
 
-	mLockType=lockType;
+	mLockAccess=lockAccess;
 
 	DWORD d3dflags=0;
-	switch(mLockType){
-		case AccessType_WRITE_ONLY:
-			if((mUsageFlags&UsageFlags_DYNAMIC)>0){
+	switch(mLockAccess){
+		case Access_BIT_WRITE:
+			if((mUsage&Usage_BIT_DYNAMIC)>0){
 				d3dflags|=D3DLOCK_DISCARD;
 			}
 		break;
-		case AccessType_READ_WRITE:
+		case Access_BIT_READ:
 			d3dflags|=D3DLOCK_READONLY;
 		break;
 	}
@@ -203,6 +218,14 @@ bool D3D9VertexBuffer::unlock(){
 	mData=NULL;
 
 	return SUCCEEDED(result);
+}
+
+bool D3D9VertexBuffer::needsReset(){
+	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		return false;
+	#else
+		return mD3DPool==D3DPOOL_DEFAULT;
+	#endif
 }
 
 DWORD D3D9VertexBuffer::getFVF(VertexFormat *vertexFormat,Collection<VertexElement> *colorElements){

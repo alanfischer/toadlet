@@ -39,11 +39,14 @@ class Texture:public egg::Resource,public egg::image::ImageDefinitions{
 public:
 	TOADLET_SHARED_POINTERS(Texture);
 
-	enum UsageFlags{
-		UsageFlags_NONE=			0,
-		UsageFlags_NPOT_RESTRICTED=	1<<0,	// Texture is a size thats non-power-of-two, but restricted in usage
-		UsageFlags_RENDERTARGET=	1<<1,	// Texture will have its surfaces used by a SurfaceRenderTarget
-		UsageFlags_AUTOGEN_MIPMAPS=	1<<2,	// Texture autogenerates its mipmap levels
+	enum Usage{
+		Usage_NONE=			0,
+		Usage_BIT_STATIC=	1<<0,	// Data is never changed
+		Usage_BIT_STREAM=	1<<1,	// Data changes once per frame
+		Usage_BIT_DYNAMIC=	1<<2,	// Data changes frequently
+		Usage_BIT_NPOT_RESTRICTED=	1<<3,	// Texture is a size thats non-power-of-two, but restricted in usage
+		Usage_BIT_RENDERTARGET=		1<<4,	// Texture will have its surfaces used by a SurfaceRenderTarget
+		Usage_BIT_AUTOGEN_MIPMAPS=	1<<5,	// Texture autogenerates its mipmap levels
 	};
 
 	virtual ~Texture(){}
@@ -51,14 +54,13 @@ public:
 	virtual Texture *getRootTexture(scalar time)=0;
 	virtual bool getRootTransform(scalar time,Matrix4x4 &transform)=0;
 
-	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels)=0;
+	virtual bool create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[])=0;
 	virtual void destroy()=0;
 
-	virtual bool createContext()=0;
-	virtual void destroyContext(bool backData)=0;
-	virtual bool contextNeedsReset()=0;
+	virtual void resetCreate()=0;
+	virtual void resetDestroy()=0;
 
-	virtual int getUsageFlags() const=0;
+	virtual int getUsage() const=0;
 	virtual Dimension getDimension() const=0;
 	virtual int getFormat() const=0;
 	virtual int getWidth() const=0;
@@ -70,8 +72,8 @@ public:
 	/// @todo: Perhaps the whole frame portion of getRootTexture could be combined with this mipsurface thing somehow
 	//  Where Textures would just have SubTextures, which would be the surfaces perhaps?
 	virtual Surface::ptr getMipSurface(int i,int cubeSide)=0;
-	virtual bool load(int format,int width,int height,int depth,int mipLevel,uint8 *data)=0;
-	virtual bool read(int format,int width,int height,int depth,int mipLevel,uint8 *data)=0;
+	virtual bool load(int width,int height,int depth,int mipLevel,byte *mipData)=0;
+	virtual bool read(int width,int height,int depth,int mipLevel,byte *mipData)=0;
 };
 
 }

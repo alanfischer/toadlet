@@ -126,7 +126,7 @@ bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const Stri
 		}
 	}
 
-	vba.lock(vertexBuffer,Buffer::AccessType_WRITE_ONLY);
+	vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
 
 	int lineLength=0;
 	char c=(char)10;

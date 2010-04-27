@@ -765,21 +765,21 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 		}
 
 		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-			mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSU,D3D9Texture::getD3DTADDRESS(textureStage->uAddressMode));
-			mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSV,D3D9Texture::getD3DTADDRESS(textureStage->vAddressMode));
-			mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSW,D3D9Texture::getD3DTADDRESS(textureStage->wAddressMode));
+			mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSU,D3D9Renderer::getD3DTADDRESS(textureStage->uAddressMode));
+			mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSV,D3D9Renderer::getD3DTADDRESS(textureStage->vAddressMode));
+			mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSW,D3D9Renderer::getD3DTADDRESS(textureStage->wAddressMode));
 
-			mD3DDevice->SetTextureStageState(stage,D3DMTSS_MINFILTER,D3D9Texture::getD3DTEXF(textureStage->minFilter));
-			mD3DDevice->SetTextureStageState(stage,D3DMTSS_MIPFILTER,D3D9Texture::getD3DTEXF(textureStage->mipFilter));
-			mD3DDevice->SetTextureStageState(stage,D3DMTSS_MAGFILTER,D3D9Texture::getD3DTEXF(textureStage->magFilter));
+			mD3DDevice->SetTextureStageState(stage,D3DMTSS_MINFILTER,D3D9Renderer::getD3DTEXF(textureStage->minFilter));
+			mD3DDevice->SetTextureStageState(stage,D3DMTSS_MIPFILTER,D3D9Renderer::getD3DTEXF(textureStage->mipFilter));
+			mD3DDevice->SetTextureStageState(stage,D3DMTSS_MAGFILTER,D3D9Renderer::getD3DTEXF(textureStage->magFilter));
 		#else
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSU,D3D9Texture::getD3DTADDRESS(textureStage->uAddressMode));
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSV,D3D9Texture::getD3DTADDRESS(textureStage->vAddressMode));
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSW,D3D9Texture::getD3DTADDRESS(textureStage->wAddressMode));
+			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSU,D3D9Renderer::getD3DTADDRESS(textureStage->uAddressMode));
+			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSV,D3D9Renderer::getD3DTADDRESS(textureStage->vAddressMode));
+			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSW,D3D9Renderer::getD3DTADDRESS(textureStage->wAddressMode));
 
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_MINFILTER,D3D9Texture::getD3DTEXF(textureStage->minFilter));
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_MIPFILTER,D3D9Texture::getD3DTEXF(textureStage->mipFilter));
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_MAGFILTER,D3D9Texture::getD3DTEXF(textureStage->magFilter));
+			mD3DDevice->SetSamplerState(stage,D3DSAMP_MINFILTER,D3D9Renderer::getD3DTEXF(textureStage->minFilter));
+			mD3DDevice->SetSamplerState(stage,D3DSAMP_MIPFILTER,D3D9Renderer::getD3DTEXF(textureStage->mipFilter));
+			mD3DDevice->SetSamplerState(stage,D3DSAMP_MAGFILTER,D3D9Renderer::getD3DTEXF(textureStage->magFilter));
 		#endif
 	}
 	else{
@@ -1014,8 +1014,110 @@ void D3D9Renderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &r
 				0,          0,           0,         Math::ONE);
 }
 
+int D3D9Renderer::getClosestTextureFormat(int format){
+	switch(format){
+		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+			case Texture::Format_L_8:
+				return Texture::Format_BGR_5_6_5;
+			case Texture::Format_A_8:
+			case Texture::Format_LA_8:
+				return Texture::Format_BGRA_8;
+		#else
+			case Texture::Format_A_8:
+				return Texture::Format_LA_8;
+		#endif
+		case Texture::Format_RGB_8:
+			return Texture::Format_BGR_8;
+		case Texture::Format_RGBA_8:
+			return Texture::Format_BGRA_8;
+		case Texture::Format_RGB_5_6_5:
+			return Texture::Format_BGR_5_6_5;
+		case Texture::Format_RGBA_5_5_5_1:
+			return Texture::Format_BGRA_5_5_5_1;
+		case Texture::Format_RGBA_4_4_4_4:
+			return Texture::Format_BGRA_4_4_4_4;
+		default:
+			return format;
+	}
+}
+
 bool D3D9Renderer::isD3DFORMATValid(D3DFORMAT textureFormat,DWORD usage){
 	return SUCCEEDED(mD3D->CheckDeviceFormat(mD3DAdapter,mD3DDevType,mD3DAdapterFormat,usage,D3DRTYPE_TEXTURE,textureFormat));
+}
+
+D3DFORMAT D3D9Renderer::getD3DFORMAT(int format){
+	switch(format){
+		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+			case Texture::Format_L_8:
+				return D3DFMT_L8;
+			case Texture::Format_LA_8:
+				return D3DFMT_A8L8;
+		#endif
+		case Texture::Format_BGR_8:
+			return D3DFMT_R8G8B8;
+		case Texture::Format_BGRA_8:
+			return D3DFMT_A8R8G8B8;
+		case Texture::Format_BGR_5_6_5:
+			return D3DFMT_R5G6B5;
+		case Texture::Format_BGRA_5_5_5_1:
+			return D3DFMT_A1R5G5B5;
+		case Texture::Format_BGRA_4_4_4_4:
+			return D3DFMT_A4R4G4B4;
+		case Texture::Format_DEPTH_16:
+			return D3DFMT_D16;
+		case Texture::Format_DEPTH_24:
+			return D3DFMT_D24X8;
+		case Texture::Format_DEPTH_32:
+			return D3DFMT_D32;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"D3D9Texture::getD3DFORMAT: Invalid type");
+			return D3DFMT_UNKNOWN;
+	}
+}
+
+DWORD D3D9Renderer::getD3DTADDRESS(TextureStage::AddressMode addressMode){
+	DWORD taddress=0;
+
+	switch(addressMode){
+		case TextureStage::AddressMode_REPEAT:
+			taddress=D3DTADDRESS_WRAP;
+		break;
+		case TextureStage::AddressMode_CLAMP_TO_EDGE:
+			taddress=D3DTADDRESS_CLAMP;
+		break;
+		case TextureStage::AddressMode_CLAMP_TO_BORDER:
+			taddress=D3DTADDRESS_BORDER;
+		break;
+		case TextureStage::AddressMode_MIRRORED_REPEAT:
+			taddress=D3DTADDRESS_MIRROR;
+		break;
+	}
+
+	if(taddress==0){
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"D3D9Texture::getD3DTADDRESS: Invalid address mode");
+	}
+
+	return taddress;
+}
+
+DWORD D3D9Renderer::getD3DTEXF(TextureStage::Filter filter){
+	DWORD texf=D3DTEXF_NONE;
+
+	switch(filter){
+		case TextureStage::Filter_NONE:
+			texf=D3DTEXF_NONE;
+		break;
+		case TextureStage::Filter_NEAREST:
+			texf=D3DTEXF_POINT;
+		break;
+		case TextureStage::Filter_LINEAR:
+			texf=D3DTEXF_LINEAR;
+		break;
+	}
+
+	return texf;
 }
 
 }

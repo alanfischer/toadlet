@@ -38,8 +38,8 @@ GLBuffer::GLBuffer(GLRenderer *renderer):
 	mRenderer(NULL),
 
 	mListener(NULL),
-	mUsageFlags(0),
-	mAccessType(AccessType_NO_ACCESS),
+	mUsage(0),
+	mAccess(0),
 	mSize(0),
 	mDataSize(0),
 
@@ -50,8 +50,7 @@ GLBuffer::GLBuffer(GLRenderer *renderer):
 
 	mHandle(0),
 	mTarget(0),
-	mLockType(AccessType_NO_ACCESS),
-	mBacking(false),
+	mLockAccess(0),
 	mData(NULL)
 {
 	mRenderer=renderer;
@@ -61,39 +60,38 @@ GLBuffer::~GLBuffer(){
 	destroy();
 }
 
-bool GLBuffer::create(int usageFlags,AccessType accessType,IndexFormat indexFormat,int size){
+bool GLBuffer::create(int usage,int access,IndexFormat indexFormat,int size){
 	destroy();
 
-	mUsageFlags=usageFlags;
-	mAccessType=accessType;
+	mUsage=usage;
+	mAccess=access;
 	mSize=size;
 	mIndexFormat=indexFormat;
 	mDataSize=mIndexFormat*mSize;
 
 	mTarget=GL_ELEMENT_ARRAY_BUFFER;
-	bool result=createContext();
+	createContext();
 
 	mMapping=mRenderer->useMapping(this);
 	if(mRenderer->getCapabilitySet().hardwareIndexBuffers==false || mMapping==false){
 		mData=new uint8[mDataSize];
-		mBacking=true;
 	}
 	
-	return result;
+	return true;
 }
 
-bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr vertexFormat,int size){
+bool GLBuffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int size){
 	destroy();
 
-	mUsageFlags=usageFlags;
-	mAccessType=accessType;
+	mUsage=usage;
+	mAccess=access;
 	mSize=size;
 	mVertexFormat=vertexFormat;
 	mVertexSize=vertexFormat->vertexSize;
 	mDataSize=mVertexSize*mSize;
 	
 	mTarget=GL_ARRAY_BUFFER;
-	bool result=createContext();
+	createContext();
 
 	#if defined(TOADLET_BIG_ENDIAN)
 		int i;
@@ -113,7 +111,6 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr ver
 		#endif
 	if(mMapping==false){
 		mData=new uint8[mDataSize];
-		mBacking=true;
 	}
 
 	/// @todo: This will be converted to a a GLVertexFormat type
@@ -134,11 +131,11 @@ bool GLBuffer::create(int usageFlags,AccessType accessType,VertexFormat::ptr ver
 		}
 	}
 
-	return result;
+	return true;
 }
 
 void GLBuffer::destroy(){
-	destroyContext(false);
+	destroyContext();
 
 	if(mData!=NULL){
 		delete[] mData;
@@ -165,71 +162,50 @@ bool GLBuffer::createContext(){
 	{
 		glGenBuffers(1,&mHandle);
 		glBindBuffer(mTarget,mHandle);
-		GLenum usage=getBufferUsage(mUsageFlags,mAccessType);
+		GLenum usage=getBufferUsage(mUsage,mAccess);
 		glBufferData(mTarget,mDataSize,NULL,usage);
 	}
 
-	#if !defined(TOADLET_HAS_GLES)
-		if(mMapping && mBacking){
-			uint8 *data=lock(AccessType_WRITE_ONLY);
-			memcpy(data,mData,mDataSize);
-			unlock();
-
-			delete[] mData;
-			mData=NULL;
-			mBacking=true;
-		}
-	#endif
-
 	TOADLET_CHECK_GLERROR("GLBuffer::createContext");
-
-	return true;
+	
+	return mHandle!=0;
 }
 
-void GLBuffer::destroyContext(bool backData){
-	#if !defined(TOADLET_HAS_GLES)
-		if(mMapping && backData){
-			mData=new uint8[mDataSize];
-			mBacking=true;
-
-			uint8 *data=lock(AccessType_READ_ONLY);
-			memcpy(mData,data,mDataSize);
-			unlock();
-		}
-	#endif
-
+bool GLBuffer::destroyContext(){
 	if(mHandle!=0){
 		glDeleteBuffers(1,&mHandle);
 		mHandle=0;
 	}
 
 	TOADLET_CHECK_GLERROR("GLBuffer::destroyContext");
+	
+	return true;
 }
 
-uint8 *GLBuffer::lock(AccessType accessType){
+uint8 *GLBuffer::lock(int lockAccess){
 	mRenderer->mStatisticsSet.bufferLockCount++;
 
-	mLockType=accessType;
+	mLockAccess=lockAccess;
 
 	#if !defined(TOADLET_HAS_GLES)
 		if(mMapping){
-			GLenum lock=0;
-			switch(accessType){
-				case AccessType_READ_ONLY:
-					lock=GL_READ_ONLY;
+			GLenum gllock=0;
+			switch(mLockAccess){
+				case Access_BIT_READ:
+					gllock=GL_READ_ONLY;
 				break;
-				case AccessType_WRITE_ONLY:
-					lock=GL_WRITE_ONLY;
+				case Access_BIT_WRITE:
+					gllock=GL_WRITE_ONLY;
 				break;
-				case AccessType_READ_WRITE:
-					lock=GL_READ_WRITE;
+				case Access_READ_WRITE:
+					gllock=GL_READ_WRITE;
 				break;
 				default:
 				break;
 			}
 
 			glBindBuffer(mTarget,mHandle);
-			mData=(uint8*)glMapBuffer(mTarget,lock);
+			mData=(uint8*)glMapBuffer(mTarget,gllock);
 		}
 	#endif
 
@@ -269,7 +245,7 @@ bool GLBuffer::unlock(){
 		}
 		else
 	#endif
-	if(mLockType!=AccessType_READ_ONLY && mHandle!=0){
+	if(mLockAccess!=Access_BIT_READ && mHandle!=0){
 		glBindBuffer(mTarget,mHandle);
 		glBufferSubData(mTarget,0,mDataSize,mData);
 	}
@@ -279,65 +255,65 @@ bool GLBuffer::unlock(){
 	return true;
 }
 
-GLenum GLBuffer::getBufferUsage(int usageFlags,AccessType accessType){
-	GLenum usage=0;
-	switch(usageFlags){
-		case UsageFlags_STATIC:
+GLenum GLBuffer::getBufferUsage(int usage,int access){
+	GLenum glusage=0;
+	switch(usage){
+		case Usage_BIT_STATIC:
 			#if defined(TOADLET_HAS_GLES)
-				usage=GL_STATIC_DRAW;
+				glusage=GL_STATIC_DRAW;
 			#else
-				switch(accessType){
-					case AccessType_READ_ONLY:
-						usage=GL_STATIC_READ;
+				switch(access){
+					case Access_BIT_READ:
+						glusage=GL_STATIC_READ;
 					break;
-					case AccessType_WRITE_ONLY:
-					case AccessType_READ_WRITE:
-						usage=GL_STATIC_DRAW;
+					case Access_BIT_WRITE:
+					case Access_READ_WRITE:
+						glusage=GL_STATIC_DRAW;
 					break;
-					case AccessType_NO_ACCESS:
-						usage=GL_STATIC_COPY;
+					case 0:
+						glusage=GL_STATIC_COPY;
 					break;
 				}
 			#endif
 		break;
-		case UsageFlags_STREAM:
+		case Usage_BIT_STREAM:
 			#if defined(TOADLET_HAS_GLES)
-				usage=GL_DYNAMIC_DRAW;
+				glusage=GL_DYNAMIC_DRAW;
 			#else
-				switch(accessType){
-					case AccessType_READ_ONLY:
-						usage=GL_STREAM_READ;
+				switch(access){
+					case Access_BIT_READ:
+						glusage=GL_STREAM_READ;
 					break;
-					case AccessType_WRITE_ONLY:
-					case AccessType_READ_WRITE:
-						usage=GL_STREAM_DRAW;
+					case Access_BIT_WRITE:
+					case Access_READ_WRITE:
+						glusage=GL_STREAM_DRAW;
 					break;
-					case AccessType_NO_ACCESS:
-						usage=GL_STREAM_COPY;
+					case 0:
+						glusage=GL_STREAM_COPY;
 					break;
 				}
 			#endif
 		break;
-		case UsageFlags_DYNAMIC:
+		case Usage_BIT_DYNAMIC:
 			#if defined(TOADLET_HAS_GLES)
-				usage=GL_DYNAMIC_DRAW;
+				glusage=GL_DYNAMIC_DRAW;
 			#else
-				switch(accessType){
-					case AccessType_READ_ONLY:
-						usage=GL_DYNAMIC_READ;
+				switch(access){
+					case Access_BIT_READ:
+						glusage=GL_DYNAMIC_READ;
 					break;
-					case AccessType_WRITE_ONLY:
-					case AccessType_READ_WRITE:
-						usage=GL_DYNAMIC_DRAW;
+					case Access_BIT_WRITE:
+					case Access_READ_WRITE:
+						glusage=GL_DYNAMIC_DRAW;
 					break;
-					case AccessType_NO_ACCESS:
-						usage=GL_DYNAMIC_COPY;
+					case 0:
+						glusage=GL_DYNAMIC_COPY;
 					break;
 				}
 			#endif
 		break;
 	}
-	return usage;
+	return glusage;
 }
 
 }

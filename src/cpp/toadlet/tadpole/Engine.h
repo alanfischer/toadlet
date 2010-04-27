@@ -26,7 +26,7 @@
 #ifndef TOADLET_TADPOLE_ENGINE_H
 #define TOADLET_TADPOLE_ENGINE_H
 
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/egg/Categories.h>
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/peeper/IndexBuffer.h>
@@ -35,6 +35,7 @@
 #include <toadlet/peeper/Program.h>
 #include <toadlet/ribbit/AudioPlayer.h>
 #include <toadlet/ribbit/AudioBuffer.h>
+#include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/ArchiveManager.h>
 #include <toadlet/tadpole/AudioBufferData.h>
 #include <toadlet/tadpole/Font.h>
@@ -46,9 +47,9 @@
 #include <toadlet/tadpole/MaterialManager.h>
 #include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/tadpole/mesh/Mesh.h>
 #include <toadlet/tadpole/node/Node.h>
 #include <toadlet/tadpole/handler/AudioBufferHandler.h>
-#include <toadlet/tadpole/mesh/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{

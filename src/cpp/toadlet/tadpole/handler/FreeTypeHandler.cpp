@@ -145,7 +145,7 @@ Resource::ptr FreeTypeHandler::load(Stream::ptr stream,const ResourceHandlerData
 
 	Collection<Font::Glyph*> glyphs(bitmapGlyphs.size());
 	Image::ptr image(new Image(Image::Dimension_D2,Image::Format_A_8,textureWidth,textureHeight));
-	uint8 *data=image->getData();
+	byte *data=image->getData();
 	int x=0,y=0;
 	for(i=0;i<bitmapGlyphs.size();++i){
 		FT_BitmapGlyph bitmapGlyph=bitmapGlyphs[i];
