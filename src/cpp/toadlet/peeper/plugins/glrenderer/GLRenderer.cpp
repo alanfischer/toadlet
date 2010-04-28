@@ -301,6 +301,18 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 }
 
 bool GLRenderer::destroy(){
+	if(mPrimaryRenderTarget!=NULL){
+		mPrimaryRenderTarget=NULL;
+		mGLPrimaryRenderTarget=NULL;
+		mRenderTarget=NULL;
+		mGLRenderTarget=NULL;
+
+		TOADLET_CHECK_GLERROR("destroy");
+
+		Logger::alert(Categories::TOADLET_PEEPER,
+			"destroyed GLRenderer");
+	}
+
 	return true;
 }
 

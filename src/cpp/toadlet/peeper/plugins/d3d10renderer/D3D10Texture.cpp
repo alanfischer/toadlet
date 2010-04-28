@@ -212,6 +212,11 @@ bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
 
 bool D3D10Texture::destroyContext(){
 	HRESULT result=S_OK;
+	if(mShaderResourceView!=NULL){
+		result=mShaderResourceView->Release();
+		mShaderResourceView=NULL;
+	}
+
 	if(mTexture!=NULL){
 		result=mTexture->Release();
 		mTexture=NULL;

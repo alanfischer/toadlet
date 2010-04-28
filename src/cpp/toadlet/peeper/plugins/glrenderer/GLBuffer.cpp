@@ -164,10 +164,10 @@ bool GLBuffer::createContext(){
 		glBindBuffer(mTarget,mHandle);
 		GLenum usage=getBufferUsage(mUsage,mAccess);
 		glBufferData(mTarget,mDataSize,NULL,usage);
+
+		TOADLET_CHECK_GLERROR("GLBuffer::createContext");
 	}
 
-	TOADLET_CHECK_GLERROR("GLBuffer::createContext");
-	
 	return mHandle!=0;
 }
 
@@ -175,10 +175,10 @@ bool GLBuffer::destroyContext(){
 	if(mHandle!=0){
 		glDeleteBuffers(1,&mHandle);
 		mHandle=0;
+
+		TOADLET_CHECK_GLERROR("GLBuffer::destroyContext");
 	}
 
-	TOADLET_CHECK_GLERROR("GLBuffer::destroyContext");
-	
 	return true;
 }
 

@@ -122,7 +122,6 @@ void D3D9Texture::resetDestroy(){
 
 bool D3D9Texture::createContext(bool restore){
 	IDirect3DDevice9 *device=mRenderer->getDirect3DDevice9();
-	IDirect3D9 *d3d=NULL; device->GetDirect3D(&d3d);
 
 	mD3DUsage=
 		#if defined(TOADLET_HAS_DIRECT3DMOBILE)

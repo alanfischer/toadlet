@@ -209,20 +209,12 @@ void BufferManager::contextActivate(Renderer *renderer){
 			IndexBuffer::ptr back(renderer->createIndexBuffer());
 			shared_static_cast<BackableIndexBuffer>(indexBuffer)->setBack(back);
 		}
-		else{
-			Error::unknown(Categories::TOADLET_TADPOLE,"unable to contextActivate a non-backed resource");
-			return;
-		}
 	}
 	for(i=0;i<mVertexBuffers.size();++i){
 		VertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
 		if(vertexBuffer->getRootVertexBuffer()!=vertexBuffer){
 			VertexBuffer::ptr back(renderer->createVertexBuffer());
 			shared_static_cast<BackableVertexBuffer>(vertexBuffer)->setBack(back);
-		}
-		else{
-			Error::unknown(Categories::TOADLET_TADPOLE,"unable to contextActivate a non-backed resource");
-			return;
 		}
 	}
 }
@@ -234,19 +226,11 @@ void BufferManager::contextDeactivate(Renderer *renderer){
 		if(indexBuffer->getRootIndexBuffer()!=indexBuffer){
 			shared_static_cast<BackableIndexBuffer>(indexBuffer)->setBack(NULL);
 		}
-		else{
-			Error::unknown(Categories::TOADLET_TADPOLE,"unable to contextDeactivate a non-backed resource");
-			return;
-		}
 	}
 	for(i=0;i<mVertexBuffers.size();++i){
 		VertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
 		if(vertexBuffer->getRootVertexBuffer()!=vertexBuffer){
 			shared_static_cast<BackableVertexBuffer>(vertexBuffer)->setBack(NULL);
-		}
-		else{
-			Error::unknown(Categories::TOADLET_TADPOLE,"unable to contextDeactivate a non-backed resource");
-			return;
 		}
 	}
 }

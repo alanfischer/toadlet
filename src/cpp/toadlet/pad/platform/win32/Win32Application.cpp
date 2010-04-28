@@ -175,6 +175,9 @@ void Win32Application::create(int renderer,int audioPlayer,int motionDetector){
 	}
 	createWindow();
 	activate();
+	
+	mRendererPlugin=mChangeRendererPlugin;
+	createContextAndRenderer(mRendererPlugin);
 }
 
 void Win32Application::destroy(){
@@ -189,6 +192,10 @@ void Win32Application::destroy(){
 	}
 
 	deactivate();
+	
+	mEngine->destroy();
+	
+	destroyRendererAndContext();
 	destroyWindow();
 	destroyAudioPlayer();
 	destroyMotionDetector();
@@ -260,17 +267,12 @@ void Win32Application::activate(){
 			// On Win32, we need to call resized, since it is apparently not called
 			resized(mWidth,mHeight);
 		#endif
-
-		mRendererPlugin=mChangeRendererPlugin;
-		createContextAndRenderer(mRendererPlugin);
 	}
 }
 
 void Win32Application::deactivate(){
 	if(mActive==true){
 		mActive=false;
-
-		destroyRendererAndContext();
 
 		if(mFullscreen){
 			#if defined(TOADLET_PLATFORM_WINCE)
