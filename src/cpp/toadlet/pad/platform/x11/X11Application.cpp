@@ -112,6 +112,7 @@ void X11Application::create(){
 
 	createAudioPlayer();
 	createWindow();
+	createContextAndRenderer();
 	activate();
 }
 
@@ -127,6 +128,8 @@ void X11Application::destroy(){
 	}
 
 	deactivate();
+	
+	destroyRendererAndContext();
 	destroyWindow();
 	destroyAudioPlayer();
 
@@ -240,7 +243,7 @@ void X11Application::activate(){
 	if(mActive==false){
 		mActive=true;
 
-		createContextAndRenderer();
+		// See Win32Application::activate notes
 	}
 }
 
@@ -248,7 +251,7 @@ void X11Application::deactivate(){
 	if(mActive==true){
 		mActive=false;
 
-		destroyRendererAndContext();
+		// See Win32Application::activate notes
 	}
 }
 
