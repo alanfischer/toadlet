@@ -267,6 +267,10 @@ void Win32Application::activate(){
 			// On Win32, we need to call resized, since it is apparently not called
 			resized(mWidth,mHeight);
 		#endif
+
+		// Context activation notes:		
+		// We do not handle render or audio resources contexts here anymore
+		//  We did just handle render, but we should do either all or none, and only the d3d9 resources handle context restore currently
 	}
 }
 
@@ -280,6 +284,8 @@ void Win32Application::deactivate(){
 				SHFullScreen(win32->mWnd,SHFS_SHOWSIPBUTTON|SHFS_SHOWTASKBAR|SHFS_SHOWSTARTICON);
 			#endif
 		}
+		
+		// See Win32Application::activate notes
 	}
 }
 

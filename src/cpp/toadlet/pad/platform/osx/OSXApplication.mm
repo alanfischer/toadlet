@@ -326,6 +326,8 @@ void OSXApplication::create(){
 	#endif
 	
 	activate();
+	
+	createContextAndRenderer();
 }
 
 void OSXApplication::destroy(){
@@ -334,6 +336,8 @@ void OSXApplication::destroy(){
 	}
 
 	deactivate();
+
+	destroyRendererAndContext();
 	destroyAudioPlayer();
 
 	if(mEngine!=NULL){
@@ -359,7 +363,7 @@ void OSXApplication::activate(){
 	if(mActive==false){
 		mActive=true;
 
-		createContextAndRenderer();
+		// See Win32Application::activate notes
 	}
 }
 
@@ -367,7 +371,7 @@ void OSXApplication::deactivate(){
 	if(mActive==true){
 		mActive=false;
 
-		destroyRendererAndContext();
+		// See Win32Application::activate notes
 	}
 }
 
