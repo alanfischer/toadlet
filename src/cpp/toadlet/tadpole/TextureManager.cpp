@@ -266,10 +266,6 @@ void TextureManager::contextActivate(peeper::Renderer *renderer){
 			Texture::ptr back(renderer->createTexture());
 			shared_static_cast<BackableTexture>(texture)->setBack(back);
 		}
-		else{
-			Error::unknown(Categories::TOADLET_TADPOLE,"unable to contextActivate a non-backed resource");
-			return;
-		}
 	}
 }
 
@@ -279,10 +275,6 @@ void TextureManager::contextDeactivate(peeper::Renderer *renderer){
 		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
 		if(texture->getRootTexture(0)!=texture){
 			shared_static_cast<BackableTexture>(texture)->setBack(NULL);
-		}
-		else{
-			Error::unknown(Categories::TOADLET_TADPOLE,"unable to contextDeactivate a non-backed resource");
-			return;
 		}
 	}
 }

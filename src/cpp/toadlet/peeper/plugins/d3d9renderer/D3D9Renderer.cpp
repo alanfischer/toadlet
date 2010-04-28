@@ -142,6 +142,19 @@ bool D3D9Renderer::create(RenderTarget *target,int *options){
 }
 
 bool D3D9Renderer::destroy(){
+	if(mD3D!=NULL){
+		mD3D=NULL;
+		mD3DDevice=NULL;
+		
+		mPrimaryRenderTarget=NULL;
+		mD3DPrimaryRenderTarget=NULL;
+		mRenderTarget=NULL;
+		mD3DRenderTarget=NULL;
+		
+		Logger::alert(Categories::TOADLET_PEEPER,
+			"destroyed D3D9Renderer");
+	}
+
 	return true;
 }
 
