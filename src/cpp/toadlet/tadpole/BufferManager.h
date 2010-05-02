@@ -43,6 +43,7 @@ public:
 
 	virtual void destroy();
 
+	virtual peeper::VertexFormat::ptr createVertexFormat();
 	virtual peeper::IndexBuffer::ptr createIndexBuffer(int usage,int access,peeper::IndexBuffer::IndexFormat indexFormat,int size);
 	virtual peeper::VertexBuffer::ptr createVertexBuffer(int usage,int access,peeper::VertexFormat::ptr vertexFormat,int size);
 	virtual peeper::IndexBuffer::ptr cloneIndexBuffer(peeper::IndexBuffer::ptr oldIndexBuffer,int usage,int access,peeper::IndexBuffer::IndexFormat indexFormat,int size);
@@ -56,6 +57,7 @@ public:
 	virtual void bufferDestroyed(peeper::Buffer *buffer);
 
 protected:
+	egg::Collection<peeper::VertexFormat::ptr> mVertexFormats;
 	egg::Collection<peeper::IndexBuffer::ptr> mIndexBuffers;
 	egg::Collection<peeper::VertexBuffer::ptr> mVertexBuffers;
 

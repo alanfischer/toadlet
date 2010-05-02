@@ -82,30 +82,32 @@ Resource::ptr MMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 			uint16 vertexType=dataStream->readBigUInt16();
 			int formatBit=mEngine->getIdealVertexFormatBit();
 
-			VertexFormat::ptr vertexFormat(new VertexFormat());
+			VertexFormat::ptr vertexFormat=mBufferManager->createVertexFormat();
 			int positionElement=0;
 			if((vertexType&VT_POSITION)>0){
-				vertexFormat->addVertexElement(VertexElement(VertexElement::Type_POSITION,formatBit|VertexElement::Format_BIT_COUNT_3));
+				vertexFormat->addElement(VertexFormat::Semantic_POSITION,formatBit|VertexFormat::Format_BIT_COUNT_3);
 			}
 			int normalElement=positionElement;
 			if((vertexType&VT_NORMAL)>0){
 				normalElement++;
-				vertexFormat->addVertexElement(VertexElement(VertexElement::Type_NORMAL,formatBit|VertexElement::Format_BIT_COUNT_3));
+				vertexFormat->addElement(VertexFormat::Semantic_NORMAL,formatBit|VertexFormat::Format_BIT_COUNT_3);
 			}
 			int colorElement=normalElement;
 			if((vertexType&VT_COLOR)>0){
 				colorElement++;
-				vertexFormat->addVertexElement(VertexElement(VertexElement::Type_COLOR_DIFFUSE,VertexElement::Format_COLOR_RGBA));
+				vertexFormat->addElement(VertexFormat::Semantic_COLOR_DIFFUSE,VertexFormat::Format_COLOR_RGBA);
 			}
 			int texCoordElement=colorElement;
 			if((vertexType&VT_TEXCOORD1)>0){
 				texCoordElement++;
-				vertexFormat->addVertexElement(VertexElement(VertexElement::Type_TEX_COORD,formatBit|VertexElement::Format_BIT_COUNT_2));
+				vertexFormat->addElement(VertexFormat::Semantic_TEX_COORD,formatBit|VertexFormat::Format_BIT_COUNT_2);
 			}
 
 			if((vertexType&VT_BONE)>0){
 				mesh->vertexBoneAssignments.resize(numVertexes);
 			}
+
+			vertexFormat->create();
 
 			// HACK: Due to a bug in reading back vertexes from a hardware buffer in OGLES, we only load the static VertexBuffer of a Mesh if its not animated.
 			// UPDATE: This actually isnt a bug I believe, but instead the fact that OGLES doesnt use map, and instead bufferSubData, which obviously cant get the previous data

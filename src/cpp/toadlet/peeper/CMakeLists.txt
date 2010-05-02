@@ -15,8 +15,6 @@ set (PEEPER_SRC
 	TextureStage.cpp
 	VertexBufferAccessor.cpp
 	VertexData.cpp
-	VertexElement.cpp
-	VertexFormat.cpp
 	Version.cpp
 )
 
@@ -54,7 +52,6 @@ set (PEEPER_HEADERS
 	VertexBuffer.h
 	VertexBufferAccessor.h
 	VertexData.h
-	VertexElement.h
 	VertexFormat.h
 	Viewport.h
 	Visual.h

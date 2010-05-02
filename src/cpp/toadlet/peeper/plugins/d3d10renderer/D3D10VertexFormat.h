@@ -1,0 +1,78 @@
+/********** Copyright header - do not remove **********
+ *
+ * The Toadlet Engine
+ *
+ * Copyright 2009, Lightning Toads Productions, LLC
+ *
+ * Author(s): Alan Fischer, Andrew Fischer
+ *
+ * This file is part of The Toadlet Engine.
+ *
+ * The Toadlet Engine is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * The Toadlet Engine is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ ********** Copyright header - do not remove **********/
+
+#ifndef TOADLET_PEEPER_D3D9VERTEXFORMAT_H
+#define TOADLET_PEEPER_D3D9VERTEXFORMAT_H
+
+#include <toadlet/peeper/VertexFormat.h>
+#include "D3D9Includes.h"
+
+namespace toadlet{
+namespace peeper{
+
+class D3D9Renderer;
+
+class TOADLET_API D3D9VertexFormat:public VertexFormat{
+public:
+	D3D9VertexFormat(D3D9Renderer *renderer);
+	virtual ~D3D9VertexFormat();
+
+	VertexFormat *getRootVertexFormat(){return this;}
+
+	void addElement(int semantic,int format);
+	bool create();
+	void destroy();
+
+	int getNumElements() const{return mSemantics.size();}
+	int getSemantic(int i) const{return mSemantics[i];}
+	int getFormat(int i) const{return mFormats[i];}
+	int getOffset(int i) const{return mOffsets[i];}
+	int getIndexOfSemantic(int semantic);
+	int getVertexSize() const{return mVertexSize;}
+
+	inline DWORD getFVF() const{return mFVF;}
+
+	BYTE getD3DDECLTYPE(int format);
+	BYTE getD3DDECLUSAGE(int semantic);
+	BYTE getUsageIndex(int semantic);
+
+protected:
+	D3D9Renderer *mRenderer;
+
+	egg::Collection<int> mSemantics;
+	egg::Collection<int> mFormats;
+	egg::Collection<int> mOffsets;
+
+	DWORD mFVF;
+	IDirect3DVertexDeclaration9 *mDeclaration;
+	int mVertexSize;
+
+	friend class D3D9Renderer;
+};
+
+}
+}
+
+#endif

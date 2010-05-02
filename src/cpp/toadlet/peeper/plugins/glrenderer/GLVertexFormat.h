@@ -23,46 +23,50 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/peeper/VertexElement.h>
+#ifndef TOADLET_PEEPER_GLVERTEXFORMAT_H
+#define TOADLET_PEEPER_GLVERTEXFORMAT_H
+
+#include <toadlet/peeper/VertexFormat.h>
+#include "GLIncludes.h"
 
 namespace toadlet{
 namespace peeper{
 
-int VertexElement::getSize() const{
-	int size=0;
+class GLRenderer;
 
-	if((format&(Format_BIT_UINT_8|Format_BIT_INT_8))>0){
-		size=1;
-	}
-	else if((format&Format_BIT_INT_16)>0){
-		size=2;
-	}
-	else if((format&(Format_BIT_INT_32|Format_BIT_FIXED_32|Format_BIT_FLOAT_32))>0){
-		size=4;
-	}
-	else if((format&Format_BIT_DOUBLE_64)>0){
-		size=8;
-	}
-	else if(format==Format_COLOR_RGBA){
-		size=4;
-	}
+class TOADLET_API GLVertexFormat:public VertexFormat{
+public:
+	GLVertexFormat(GLRenderer *renderer);
+	virtual ~GLVertexFormat();
 
-	if((format&Format_BIT_COUNT_2)>0){
-		size*=2;
-	}
-	else if((format&Format_BIT_COUNT_3)>0){
-		size*=3;
-	}
-	else if((format&Format_BIT_COUNT_4)>0){
-		size*=4;
-	}
+	VertexFormat *getRootVertexFormat(){return this;}
 
-	return size;
-}
+	void addElement(int semantic,int format);
+	bool create();
+	void destroy();
 
-bool VertexElement::equals(const VertexElement &element) const{
-	return element.type==type && element.format==format && element.offset==offset;
-}
+	int getNumElements() const{return mSemantics.size();}
+	int getSemantic(int i) const{return mSemantics[i];}
+	int getFormat(int i) const{return mFormats[i];}
+	int getOffset(int i) const{return mOffsets[i];}
+	int getIndexOfSemantic(int semantic);
+	int getVertexSize() const{return mVertexSize;}
+
+protected:
+	GLRenderer *mRenderer;
+
+	egg::Collection<int> mSemantics;
+	egg::Collection<int> mFormats;
+	egg::Collection<int> mOffsets;
+	egg::Collection<GLenum> mGLDataTypes;
+	egg::Collection<GLuint> mGLElementCounts;
+
+	int mVertexSize;
+
+	friend class GLRenderer;
+};
 
 }
 }
+
+#endif

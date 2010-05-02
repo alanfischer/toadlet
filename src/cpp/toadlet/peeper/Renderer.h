@@ -50,6 +50,7 @@ class Surface;
 class Texture;
 class TextureStage;
 class VertexBuffer;
+class VertexFormat;
 class Viewport;
 
 class Renderer{
@@ -128,6 +129,7 @@ public:
 	// Resource operations
 	virtual Texture *createTexture()=0;
 	virtual SurfaceRenderTarget *createSurfaceRenderTarget()=0;
+	virtual VertexFormat *createVertexFormat()=0;
 	virtual VertexBuffer *createVertexBuffer()=0;
 	virtual IndexBuffer *createIndexBuffer()=0;
 	virtual Program *createProgram()=0;

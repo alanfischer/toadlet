@@ -29,6 +29,7 @@
 #include "D3D9SurfaceRenderTarget.h"
 #include "D3D9VertexBuffer.h"
 #include "D3D9IndexBuffer.h"
+#include "D3D9VertexFormat.h"
 #if !defined(TOADLET_HAS_DIRECT3DMOBILE)
 	#include "D3D9Query.h"
 #endif
@@ -189,6 +190,10 @@ SurfaceRenderTarget *D3D9Renderer::createSurfaceRenderTarget(){
 	return new D3D9SurfaceRenderTarget(this);
 }
 
+VertexFormat *D3D9Renderer::createVertexFormat(){
+	return new D3D9VertexFormat(this);
+}
+
 VertexBuffer *D3D9Renderer::createVertexBuffer(){
 	return new D3D9VertexBuffer(this);
 }
@@ -245,7 +250,7 @@ void D3D9Renderer::setViewport(const Viewport &viewport){
 	d3dviewport.MinZ=0.0f;
 	d3dviewport.MaxZ=1.0f;
 
-	int result=mD3DDevice->SetViewport(&d3dviewport);
+	HRESULT result=mD3DDevice->SetViewport(&d3dviewport);
 	TOADLET_CHECK_D3D9ERROR(result,"setViewport");
 }
 
@@ -351,6 +356,7 @@ void D3D9Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Index
 	int numVertexBuffers=vertexData->vertexBuffers.size();
 	for(i=0;i<numVertexBuffers;++i){
 		D3D9VertexBuffer *d3dvertexBuffer=(D3D9VertexBuffer*)vertexData->vertexBuffers[i]->getRootVertexBuffer();
+		D3D9VertexFormat *d3dvertexFormat=(D3D9VertexFormat*)d3dvertexBuffer->mVertexFormat->getRootVertexFormat();
 		if(numVertexes==0){
 			numVertexes=d3dvertexBuffer->mSize;
 		}
@@ -361,7 +367,13 @@ void D3D9Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Index
 		#endif
 		TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: SetStreamSource");
 		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
-			result=mD3DDevice->SetFVF(d3dvertexBuffer->mFVF);
+		/// @todo: check if not using a vp
+			//if(mLastProgram==NULL){
+			//	result=mD3DDevice->SetFVF(d3dvertexFormat->mFVF);
+			//}
+			//else{
+				mD3DDevice->SetVertexDeclaration(d3dvertexFormat->mDeclaration);
+			//}
 			TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: SetFVF");
 		#endif
 	}
@@ -927,9 +939,9 @@ void D3D9Renderer::setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D
 	capabilitySet.renderToDepthTexture=renderToDepthTexture;
 	capabilitySet.renderToTextureNonPowerOf2Restricted=capabilitySet.textureNonPowerOf2Restricted && capabilitySet.renderToTexture;
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE) && defined(TOADLET_FIXED_POINT)
-		capabilitySet.idealVertexFormatBit=VertexElement::Format_BIT_FIXED_32;
+		capabilitySet.idealVertexFormatBit=VertexFormat::Format_BIT_FIXED_32;
 	#else
-		capabilitySet.idealVertexFormatBit=VertexElement::Format_BIT_FLOAT_32;
+		capabilitySet.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
 	#endif
 	capabilitySet.triangleFan=true;
 
@@ -1084,7 +1096,7 @@ D3DFORMAT D3D9Renderer::getD3DFORMAT(int format){
 			return D3DFMT_D32;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
-				"D3D9Texture::getD3DFORMAT: Invalid type");
+				"invalid type");
 			return D3DFMT_UNKNOWN;
 	}
 }
@@ -1109,7 +1121,7 @@ DWORD D3D9Renderer::getD3DTADDRESS(TextureStage::AddressMode addressMode){
 
 	if(taddress==0){
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"D3D9Texture::getD3DTADDRESS: Invalid address mode");
+			"invalid address mode");
 	}
 
 	return taddress;
@@ -1131,6 +1143,115 @@ DWORD D3D9Renderer::getD3DTEXF(TextureStage::Filter filter){
 	}
 
 	return texf;
+}
+
+DWORD D3D9Renderer::getFVF(VertexFormat *vertexFormat){
+	DWORD fvf=0;
+
+	int i;
+	int texCoordCount=0;
+	for(i=0;i<vertexFormat->getNumElements();++i){
+		int semantic=vertexFormat->getSemantic(i);
+		int format=vertexFormat->getFormat(i);
+		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+			if(semantic==VertexFormat::Semantic_POSITION && format==(VertexFormat::Format_BIT_FIXED_32|VertexFormat::Format_BIT_COUNT_3)){
+				fvf|=D3DMFVF_XYZ_FIXED;
+			}
+			else if(semantic==VertexFormat::Semantic_POSITION && format==(VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3)){
+				fvf|=D3DMFVF_XYZ_FLOAT;
+			}
+			else if(semantic==VertexFormat::Semantic_NORMAL && format==(VertexFormat::Format_BIT_FIXED_32|VertexFormat::Format_BIT_COUNT_3)){
+				fvf|=D3DMFVF_NORMAL_FIXED;
+			}
+			else if(semantic==VertexFormat::Semantic_NORMAL && format==(VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3)){
+				fvf|=D3DMFVF_NORMAL_FLOAT;
+			}
+		#else
+			if(semantic==VertexFormat::Semantic_POSITION && format==(VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3)){
+				fvf|=D3DFVF_XYZ;
+			}
+			else if(semantic==VertexFormat::Semantic_NORMAL && format==(VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3)){
+				fvf|=D3DFVF_NORMAL;
+			}
+		#endif
+		else if(semantic==VertexFormat::Semantic_COLOR_DIFFUSE && format==VertexFormat::Format_COLOR_RGBA){
+			fvf|=D3DFVF_DIFFUSE;
+		}
+		else if(semantic==VertexFormat::Semantic_COLOR_SPECULAR && format==VertexFormat::Format_COLOR_RGBA){
+			fvf|=D3DFVF_SPECULAR;
+		}
+		else if(semantic>=VertexFormat::Semantic_TEX_COORD){
+			if((format&VertexFormat::Format_BIT_COUNT_1)>0){
+				fvf|=D3DFVF_TEXCOORDSIZE1(texCoordCount);
+			}
+			else if((format&VertexFormat::Format_BIT_COUNT_2)>0){
+				fvf|=D3DFVF_TEXCOORDSIZE2(texCoordCount);
+			}
+			else if((format&VertexFormat::Format_BIT_COUNT_3)>0){
+				fvf|=D3DFVF_TEXCOORDSIZE3(texCoordCount);
+			}
+			else if((format&VertexFormat::Format_BIT_COUNT_4)>0){
+				#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+					Logger::error(Categories::TOADLET_PEEPER,
+						"D3D9VertexBuffer: Invalid tex coord count");
+				#else
+					fvf|=D3DFVF_TEXCOORDSIZE4(texCoordCount);
+				#endif
+			}
+
+			#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+				if((format&VertexFormat::Format_BIT_FIXED_32)>0){
+					fvf|=D3DMFVF_TEXCOORDFIXED(texCoordCount);
+				}
+				else if((format&VertexFormat::Format_BIT_FLOAT_32)>0){
+					fvf|=D3DMFVF_TEXCOORDFLOAT(texCoordCount);
+				}
+			#endif
+
+			texCoordCount++;
+		}
+		else{
+			Logger::error(Categories::TOADLET_PEEPER,
+				String("invalid vertex element:")+semantic+","+format);
+		}
+	}
+
+	switch(texCoordCount){
+		case 0:
+			fvf|=D3DFVF_TEX0;
+		break;
+		case 1:
+			fvf|=D3DFVF_TEX1;
+		break;
+		case 2:
+			fvf|=D3DFVF_TEX2;
+		break;
+		case 3:
+			fvf|=D3DFVF_TEX3;
+		break;
+		case 4:
+			fvf|=D3DFVF_TEX4;
+		break;
+		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+			case 5:
+				fvf|=D3DFVF_TEX5;
+			break;
+			case 6:
+				fvf|=D3DFVF_TEX6;
+			break;
+			case 7:
+				fvf|=D3DFVF_TEX7;
+			break;
+			case 8:
+				fvf|=D3DFVF_TEX8;
+			break;
+		#endif
+		default:
+			Logger::error(Categories::TOADLET_PEEPER,
+				String("invalid tex coord number:")+texCoordCount);
+	}
+
+	return fvf;
 }
 
 }

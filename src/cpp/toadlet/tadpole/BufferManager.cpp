@@ -45,6 +45,10 @@ BufferManager::BufferManager(Engine *engine,bool backable):
 
 BufferManager::~BufferManager(){
 	int i;
+	for(i=0;i<mVertexFormats.size();++i){
+		/// @todo: add VertexFormatDestroyedListeners
+		//mVertexFormats[i]->setVertexFormatDestroyedListener(NULL);
+	}
 	for(i=0;i<mIndexBuffers.size();++i){
 		mIndexBuffers[i]->setBufferDestroyedListener(NULL);
 	}
@@ -55,6 +59,14 @@ BufferManager::~BufferManager(){
 
 void BufferManager::destroy(){
 	int i;
+	for(i=0;i<mVertexFormats.size();++i){
+		VertexFormat::ptr vertexFormat=mVertexFormats[i];
+		/// @todo: add VertexFormatDestroyedListeners
+		//vertexFormat->setVertexFormatDestroyedListener(NULL);
+		vertexFormat->destroy();
+	}
+	mVertexFormats.clear();
+
 	for(i=0;i<mIndexBuffers.size();++i){
 		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
 		indexBuffer->setBufferDestroyedListener(NULL);
@@ -68,6 +80,25 @@ void BufferManager::destroy(){
 		vertexBuffer->destroy();
 	}
 	mVertexBuffers.clear();
+}
+
+VertexFormat::ptr BufferManager::createVertexFormat(){
+	VertexFormat::ptr vertexFormat;
+	if(mBackable){
+		Error::unimplemented("need to write BackableVertexFormat");
+		return NULL;
+	}
+	else if(mEngine->getRenderer()!=NULL){
+		vertexFormat=VertexFormat::ptr(mEngine->getRenderer()->createVertexFormat());
+	}
+	else{
+		Error::nullPointer("can not create a non-backable VertexFormat without a renderer");
+		return NULL;
+	}
+
+	mVertexFormats.add(vertexFormat);
+
+	return vertexFormat;
 }
 
 IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuffer::IndexFormat indexFormat,int size){
@@ -159,16 +190,14 @@ VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBu
 	int oldSize=oldVertexBuffer->getSize();
 
 	#if defined(TOADLET_DEBUG)
-		for(i=0;i<vertexFormat->getNumVertexElements();++i){
-			const VertexElement &dstElement=vertexFormat->getVertexElement(i);
-			int dstElementSize=dstElement.getSize();
-			int oldElementIndex=oldVertexFormat->getVertexElementIndexOfType(dstElement.type);
-			if(oldElementIndex>0){
-				const VertexElement &srcElement=oldVertexFormat->vertexElements[oldElementIndex];
-				int srcElementSize=srcElement.getSize();
+		for(i=0;i<vertexFormat->getNumElements();++i){
+			int oldElementIndex=oldVertexFormat->getIndexOfSemantic(vertexFormat->getSemantic(i));
+			if(oldElementIndex>=0){
+				int dstElementSize=VertexFormat::getFormatSize(vertexFormat->getFormat(i));
+				int srcElementSize=VertexFormat::getFormatSize(oldVertexFormat->getFormat(oldElementIndex));
 				if(dstElementSize!=srcElementSize){
 					Error::invalidParameters(Categories::TOADLET_TADPOLE,
-						"cloneWithNewParameters does not support changing size of elements");
+						"cloneVertexBuffer does not support changing size of elements");
 					return NULL;
 				}
 			}
@@ -183,14 +212,14 @@ VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBu
 	int numVerts=oldSize<size?oldSize:size;
 	int srcVertSize=oldVertexFormat->getVertexSize();
 	int dstVertSize=vertexFormat->getVertexSize();
-	for(i=0;i<vertexFormat->getNumVertexElements();++i){
-		const VertexElement &dstElement=vertexFormat->getVertexElement(i);
-		int elementSize=dstElement.getSize();
-		int oldElementIndex=oldVertexFormat->getVertexElementIndexOfType(dstElement.type);
+	for(i=0;i<vertexFormat->getNumElements();++i){
+		int oldElementIndex=oldVertexFormat->getIndexOfSemantic(vertexFormat->getSemantic(i));
 		if(oldElementIndex>0){
-			const VertexElement &srcElement=oldVertexFormat->vertexElements[oldElementIndex];
+			int elementSize=VertexFormat::getFormatSize(vertexFormat->getFormat(i));
+			int srcOffset=oldVertexFormat->getOffset(oldElementIndex);
+			int dstOffset=vertexFormat->getOffset(i);
 			for(j=0;j<numVerts;++j){
-				memcpy(dstData+dstVertSize*j+dstElement.offset,srcData+srcVertSize*j+srcElement.offset,elementSize);
+				memcpy(dstData+dstVertSize*j+dstOffset,srcData+srcVertSize*j+srcOffset,elementSize);
 			}
 		}
 	}

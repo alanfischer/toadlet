@@ -26,8 +26,7 @@
 #ifndef TOADLET_PEEPER_VERTEXFORMAT_H
 #define TOADLET_PEEPER_VERTEXFORMAT_H
 
-#include <toadlet/egg/Collection.h>
-#include <toadlet/peeper/VertexElement.h>
+#include <toadlet/peeper/Types.h>
 
 namespace toadlet{
 namespace peeper{
@@ -36,24 +35,96 @@ class TOADLET_API VertexFormat{
 public:
 	TOADLET_SHARED_POINTERS(VertexFormat);
 
-	VertexFormat(int numVertexElements=0);
+	/// @todo: expand semantic to allow multiple indexes for more than just texcoords.  maybe just a TEX_COORD semantic, then the upper bits would be the index?
+	enum Semantic{
+		Semantic_UNKNOWN=			-1,
 
-	const VertexElement &addVertexElement(const VertexElement &element);
-	inline int getNumVertexElements() const{return vertexElements.size();}
-	inline const VertexElement &getVertexElement(int index) const{return vertexElements[index];}
-	inline bool hasVertexElementOfType(int type) const{return vertexElementsByType.size()>type && vertexElementsByType[type]!=-1;}
-	inline int getVertexElementIndexOfType(int type) const{return vertexElementsByType.size()>type ? vertexElementsByType[type] : -1;}
-	inline short getVertexSize() const{return vertexSize;}
-	inline int getTypeBits() const{return typeBits;}
+		Semantic_POSITION=			0,
+		Semantic_BLEND_WEIGHTS=		1,
+		Semantic_BLEND_INDICES=		2,
+		Semantic_NORMAL=			3,
+		Semantic_COLOR_DIFFUSE=		4,
+		Semantic_COLOR_SPECULAR=	5,
+		Semantic_MASK_NON_TEX_COORD=0x3FF,
 
-	bool equals(const VertexFormat &format) const;
-	inline bool equals(const VertexFormat::ptr &format) const{return equals(*format);}
-	inline bool operator==(const VertexFormat &format) const{return equals(format);}
+		Semantic_TEX_COORD=			10,
+		Semantic_TEX_COORD_2=		11,
+		Semantic_TEX_COORD_3=		12,
+		Semantic_TEX_COORD_4=		13,
+		Semantic_TEX_COORD_5=		14,
+		Semantic_TEX_COORD_6=		15,
+		Semantic_TEX_COORD_7=		16,
+		Semantic_TEX_COORD_8=		17,
+	};
 
-	egg::Collection<VertexElement> vertexElements;
-	short vertexSize;
-	int typeBits;
-	egg::Collection<short> vertexElementsByType;
+	enum Format{
+		Format_UNKNOWN=			0,
+
+		// Format types
+		Format_BIT_UINT_8=		1<<0,
+		Format_BIT_INT_8=		1<<1,
+		Format_BIT_INT_16=		1<<2,
+		Format_BIT_INT_32=		1<<3,
+		Format_BIT_FIXED_32=	1<<4,
+		Format_BIT_FLOAT_32=	1<<5,
+		Format_BIT_DOUBLE_64=	1<<6,
+		Format_MASK_TYPES=		0x3FF,
+
+		// Format counts
+		Format_COUNT_SHIFT=		10,
+		Format_BIT_COUNT_1=		1<<10,
+		Format_BIT_COUNT_2=		1<<11,
+		Format_BIT_COUNT_3=		1<<12,
+		Format_BIT_COUNT_4=		1<<13,
+		Format_MASK_COUNTS=		0xFFC00,
+		// Formats
+		Format_COLOR_RGBA=		1<<20,
+	};
+
+	// static methods aren't allowed in Interfaces, but technically enums shouldn't be either, so these need to be separated to an alongside class
+	static int getFormatSize(int format){
+		int size;
+		if((format&(Format_BIT_UINT_8|Format_BIT_INT_8))>0){
+			size=1;
+		}
+		else if((format&Format_BIT_INT_16)>0){
+			size=2;
+		}
+		else if((format&(Format_BIT_INT_32|Format_BIT_FIXED_32|Format_BIT_FLOAT_32))>0){
+			size=4;
+		}
+		else if((format&Format_BIT_DOUBLE_64)>0){
+			size=8;
+		}
+		else if(format==Format_COLOR_RGBA){
+			size=4;
+		}
+
+		if((format&Format_BIT_COUNT_2)>0){
+			size*=2;
+		}
+		else if((format&Format_BIT_COUNT_3)>0){
+			size*=3;
+		}
+		else if((format&Format_BIT_COUNT_4)>0){
+			size*=4;
+		}
+
+		return size;
+	}
+
+	virtual VertexFormat *getRootVertexFormat()=0;
+
+	virtual void addElement(int semantic,int format)=0;
+	virtual bool create()=0;
+	virtual void destroy()=0;
+
+	virtual int getNumElements() const=0;
+	virtual int getSemantic(int i) const=0;
+	virtual int getFormat(int i) const=0;
+	virtual int getOffset(int i) const=0;
+	virtual int getIndexOfSemantic(int semantic)=0;
+	virtual int getVertexSize() const=0;
 };
 
 }

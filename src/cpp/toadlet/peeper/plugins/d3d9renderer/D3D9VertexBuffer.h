@@ -61,8 +61,6 @@ public:
 
 	bool needsReset();
 
-	static DWORD getFVF(VertexFormat *vertexFormat,egg::Collection<VertexElement> *colorElements);
-
 protected:
 	bool createContext(bool restore);
 	bool destroyContext(bool backup);
@@ -77,11 +75,9 @@ protected:
 	short mVertexSize;
 	int mDataSize;
 
-	DWORD mFVF;
 	DWORD mD3DUsage;
 	D3DPOOL mD3DPool;
 	IDirect3DVertexBuffer9 *mVertexBuffer;
-	egg::Collection<VertexElement> mColorElements;
 	int mLockAccess;
 	uint8 *mData;
 	uint8 *mBackingData;

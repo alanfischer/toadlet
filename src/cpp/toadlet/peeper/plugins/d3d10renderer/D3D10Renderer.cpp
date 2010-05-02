@@ -108,7 +108,7 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 	mCapabilitySet.renderToTexture=true;
 	mCapabilitySet.renderToDepthTexture=true;
 	mCapabilitySet.renderToTextureNonPowerOf2Restricted=true;
-	mCapabilitySet.idealVertexFormatBit=VertexElement::Format_BIT_FLOAT_32;
+	mCapabilitySet.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
 	mCapabilitySet.triangleFan=false;
 
 	setDefaultStates();
@@ -215,6 +215,10 @@ Texture *D3D10Renderer::createTexture(){
 
 SurfaceRenderTarget *D3D10Renderer::createSurfaceRenderTarget(){
 	return NULL;//new D3D10SurfaceRenderTarget(this);
+}
+
+VertexFormat *D3D10Renderer::createVertexFormat(){
+	return NULL;
 }
 
 VertexBuffer *D3D10Renderer::createVertexBuffer(){

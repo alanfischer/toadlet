@@ -45,8 +45,7 @@ GLBuffer::GLBuffer(GLRenderer *renderer):
 
 	mIndexFormat(IndexFormat_UINT_8),
 	//mVertexFormat,
-	mVertexSize(0),
-	//mColorElements,
+	//mElementOffsets,
 
 	mHandle(0),
 	mTarget(0),
@@ -87,21 +86,10 @@ bool GLBuffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int si
 	mAccess=access;
 	mSize=size;
 	mVertexFormat=vertexFormat;
-	mVertexSize=vertexFormat->vertexSize;
-	mDataSize=mVertexSize*mSize;
+	mDataSize=mVertexFormat->getVertexSize()*mSize;
 	
 	mTarget=GL_ARRAY_BUFFER;
 	createContext();
-
-	#if defined(TOADLET_BIG_ENDIAN)
-		int i;
-		for(i=0;i<mVertexFormat->vertexElements.size();++i){
-			const VertexElement &vertexElement=mVertexFormat->vertexElements[i];
-			if(vertexElement.format==VertexElement::Format_COLOR_RGBA){
-				mColorElementsToEndianSwap.add(vertexElement);
-			}
-		}
-	#endif
 
 	mMapping=
 		#if defined(TOADLET_HAS_GLES)
@@ -113,21 +101,13 @@ bool GLBuffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int si
 		mData=new uint8[mDataSize];
 	}
 
-	/// @todo: This will be converted to a a GLVertexFormat type
-	int numVertexElements=mVertexFormat->vertexElements.size();
-	mElementTypes.resize(numVertexElements);
-	mElementCounts.resize(numVertexElements);
-	mElementOffsets.resize(numVertexElements);
 	int i;
-	for(i=0;i<numVertexElements;++i){
-		const VertexElement &element=mVertexFormat->vertexElements[i];
-		mElementTypes[i]=GLRenderer::getGLDataType(element.format);
-		mElementCounts[i]=GLRenderer::getGLElementCount(element.format);
+	for(i=0;i<mVertexFormat->getNumElements();++i){
 		if(mHandle!=0){
-			mElementOffsets[i]=(uint8*)element.offset;
+			mElementOffsets.add((uint8*)mVertexFormat->getOffset(i));
 		}
 		else{
-			mElementOffsets[i]=mData+element.offset;
+			mElementOffsets.add(mData+mVertexFormat->getOffset(i));
 		}
 	}
 
@@ -142,8 +122,6 @@ void GLBuffer::destroy(){
 		mData=NULL;
 	}
 
-	mElementTypes.clear();
-	mElementCounts.clear();
 	mElementOffsets.clear();
 
 	if(mListener!=NULL){
@@ -211,11 +189,13 @@ uint8 *GLBuffer::lock(int lockAccess){
 
 	#if defined(TOADLET_BIG_ENDIAN)
 		// We do this even if its write only, since the unlocking will write it back, it would get messed up if we didn't swap in all situations
+		GLVertexFormat *vertexFormat=(GLVertexFormat*)mVertexFormat->getRootVertexFormat();
 		int i,j;
-		for(i=0;i<mColorElementsToEndianSwap.size();++i){
-			const VertexElement &vertexElement=mColorElementsToEndianSwap[i];
-			for(j=0;j<numVertexes;++j){
-				littleUInt32InPlace(*(ByteColor*)(mData+vertexSize*j+vertexElement.offset));
+		for(i=0;i<vertexFormat->mFormats.size();++i){
+			if(vertexFormat->mFormats[i]==VertexFormat::Format_COLOR_RGBA){
+				for(j=0;j<numVertexes;++j){
+					littleUInt32InPlace(*(ByteColor*)(mData+vertexSize*j+vertexElement.offset));
+				}
 			}
 		}
 	#endif
@@ -228,11 +208,13 @@ uint8 *GLBuffer::lock(int lockAccess){
 bool GLBuffer::unlock(){
 	#if defined(TOADLET_BIG_ENDIAN)
 		// We do this even if its read only, since we have to do it in all situations for locking
+		GLVertexFormat *vertexFormat=(GLVertexFormat*)mVertexFormat->getRootVertexFormat();
 		int i,j;
-		for(i=0;i<mColorElementsToEndianSwap.size();++i){
-			const VertexElement &vertexElement=mColorElementsToEndianSwap[i];
-			for(j=0;j<numVertexes;++j){
-				littleUInt32InPlace(*(ByteColor*)(mData+vertexSize*j+vertexElement.offset));
+		for(i=0;i<vertexFormat->mFormats.size();++i){
+			if(vertexFormat->mFormats[i]==VertexFormat::Format_COLOR_RGBA){
+				for(j=0;j<numVertexes;++j){
+					littleUInt32InPlace(*(ByteColor*)(mData+vertexSize*j+vertexElement.offset));
+				}
 			}
 		}
 	#endif

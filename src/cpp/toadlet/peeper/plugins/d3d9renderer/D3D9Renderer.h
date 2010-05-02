@@ -35,7 +35,6 @@
 #include <toadlet/peeper/StatisticsSet.h>
 #include <toadlet/peeper/CapabilitySet.h>
 #include <toadlet/peeper/IndexData.h>
-#include <toadlet/peeper/VertexElement.h>
 
 namespace toadlet{
 namespace peeper{
@@ -54,6 +53,7 @@ public:
 	// Resource operations
 	Texture *createTexture();
 	SurfaceRenderTarget *createSurfaceRenderTarget();
+	VertexFormat *createVertexFormat();
 	VertexBuffer *createVertexBuffer();
 	IndexBuffer *createIndexBuffer();
 	Program *createProgram();
@@ -122,6 +122,7 @@ public:
 	static D3DFORMAT getD3DFORMAT(int textureFormat);
 	static DWORD getD3DTADDRESS(TextureStage::AddressMode addressMode);
 	static DWORD getD3DTEXF(TextureStage::Filter filter);
+	static DWORD getFVF(VertexFormat *vertexFormat);
 
 protected:
 	static void setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D3DCAPS9 &caps,bool renderToTexture,bool renderToDepthTexture);

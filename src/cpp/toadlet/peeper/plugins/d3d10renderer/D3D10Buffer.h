@@ -80,7 +80,6 @@ protected:
 	IndexFormat mIndexFormat;
 	VertexFormat::ptr mVertexFormat;
 	short mVertexSize;
-	egg::Collection<VertexElement> mColorElements;
 
 	int mBindFlags;
 	ID3D10Buffer *mBuffer;

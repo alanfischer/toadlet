@@ -602,7 +602,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 	mxml_node_t *vertexNode=mxmlFindChild(node,"Vertexes");
 	{
 		int count=0;
-		VertexFormat::ptr vertexFormat(new VertexFormat());
+		VertexFormat::ptr vertexFormat=bufferManager->createVertexFormat();
 
 		prop=mxmlElementGetAttr(vertexNode,"Count");
 		if(prop!=NULL){
@@ -625,16 +625,16 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 				}
 
 				if(t=="Position"){
-					vertexFormat->addVertexElement(VertexElement(VertexElement::Type_POSITION,VertexElement::Format(VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3)));
+					vertexFormat->addElement(VertexFormat::Semantic_POSITION,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3);
 				}
 				else if(t=="Normal"){
-					vertexFormat->addVertexElement(VertexElement(VertexElement::Type_NORMAL,VertexElement::Format(VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3)));
+					vertexFormat->addElement(VertexFormat::Semantic_NORMAL,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3);
 				}
 				else if(t=="TexCoord"){
-					vertexFormat->addVertexElement(VertexElement(VertexElement::Type_TEX_COORD,VertexElement::Format(VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_2)));
+					vertexFormat->addElement(VertexFormat::Semantic_TEX_COORD,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_2);
 				}
 				else if(t=="Color"){
-					vertexFormat->addVertexElement(VertexElement(VertexElement::Type_COLOR_DIFFUSE,VertexElement::Format_COLOR_RGBA));
+					vertexFormat->addElement(VertexFormat::Semantic_COLOR_DIFFUSE,VertexFormat::Format_COLOR_RGBA);
 				}
 				else if(t=="Bone"){
 					mesh->vertexBoneAssignments.resize(count);
@@ -653,6 +653,8 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 			}
 		}
 
+		vertexFormat->create();
+
 		// HACK: Due to a bug in reading back vertexes from a hardware buffer in OGLES, we only load the static VertexBuffer of a Mesh if its not animated.
 		VertexBuffer::ptr vertexBuffer;
 		if(bufferManager!=NULL){
@@ -668,10 +670,10 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 			vertexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,count);
 		}
 
-		int pi=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_POSITION);
-		int ni=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_NORMAL);
-		int ti=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_TEX_COORD);
-		int ci=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_COLOR_DIFFUSE);
+		int pi=vertexFormat->getIndexOfSemantic(VertexFormat::Semantic_POSITION);
+		int ni=vertexFormat->getIndexOfSemantic(VertexFormat::Semantic_NORMAL);
+		int ti=vertexFormat->getIndexOfSemantic(VertexFormat::Semantic_TEX_COORD);
+		int ci=vertexFormat->getIndexOfSemantic(VertexFormat::Semantic_COLOR_DIFFUSE);
 
 		VertexBufferAccessor vba;
 		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
@@ -714,7 +716,8 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 						}
 
 						String element=line.substr(j,space);
-						if(vertexFormat->getVertexElement(c).type==VertexElement::Type_POSITION){
+						int sematic=vertexFormat->getSemantic(c);
+						if(sematic==VertexFormat::Semantic_POSITION){
 							Vector3 position=parseVector3(element);
 							scalar length=Math::length(position);
 							if(mesh->bound.radius<length){
@@ -722,13 +725,13 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 							}
 							vba.set3(l,pi,position);
 						}
-						else if(vertexFormat->getVertexElement(c).type==VertexElement::Type_NORMAL){
+						else if(sematic==VertexFormat::Semantic_NORMAL){
 							vba.set3(l,ni,parseVector3(element));
 						}
-						else if(vertexFormat->getVertexElement(c).type==VertexElement::Type_TEX_COORD){
+						else if(sematic==VertexFormat::Semantic_TEX_COORD){
 							vba.set2(l,ti,parseVector2(element));
 						}
-						else if(vertexFormat->getVertexElement(c).type==VertexElement::Type_COLOR_DIFFUSE){
+						else if(sematic==VertexFormat::Semantic_COLOR_DIFFUSE){
 							vba.setRGBA(l,ci,parseColor(element).getRGBA());
 						}
 						else if(mesh->vertexBoneAssignments.size()>0){
@@ -885,17 +888,21 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version){
 
 		VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
 		String type;
+		int pi=vertexFormat->getIndexOfSemantic(VertexFormat::Semantic_POSITION);
+		int ni=vertexFormat->getIndexOfSemantic(VertexFormat::Semantic_NORMAL);
+		int ti=vertexFormat->getIndexOfSemantic(VertexFormat::Semantic_TEX_COORD);
+		int ci=vertexFormat->getIndexOfSemantic(VertexFormat::Semantic_COLOR_DIFFUSE);
 
-		if(vertexFormat->hasVertexElementOfType(VertexElement::Type_POSITION)){
+		if(pi>=0){
 			type+="Position,";
 		}
-		if(vertexFormat->hasVertexElementOfType(VertexElement::Type_NORMAL)){
+		if(ni>=0){
 			type+="Normal,";
 		}
-		if(vertexFormat->hasVertexElementOfType(VertexElement::Type_TEX_COORD)){
+		if(ti>=0){
 			type+="TexCoord,";
 		}
-		if(vertexFormat->hasVertexElementOfType(VertexElement::Type_COLOR_DIFFUSE)){
+		if(ci>=0){
 			type+="Color,";
 		}
 		if(mesh->vertexBoneAssignments.size()>0){
@@ -907,11 +914,6 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version){
 			type=type.substr(0,type.length()-1);
 		}
 		mxmlElementSetAttr(vertexNode,"Type",type);
-
-		int pi=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_POSITION);
-		int ni=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_NORMAL);
-		int ti=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_TEX_COORD);
-		int ci=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_COLOR_DIFFUSE);
 
 		VertexBufferAccessor vba;
 		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
@@ -929,16 +931,16 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version){
 			if(i==0) strcat(line,"\n");
 			strcat(line,"\t\t\t");
 
-			if(vertexFormat->hasVertexElementOfType(VertexElement::Type_POSITION)){
+			if(pi>=0){
 				vba.get3(i,pi,v3); strcat(line,makeVector3(buffer,v3));
 			}
-			if(vertexFormat->hasVertexElementOfType(VertexElement::Type_NORMAL)){
+			if(ni>=0){
 				vba.get3(i,ni,v3); strcat(line,makeVector3(buffer,v3));
 			}
-			if(vertexFormat->hasVertexElementOfType(VertexElement::Type_TEX_COORD)){
+			if(ti>=0){
 				vba.get2(i,ti,v2); strcat(line,makeVector2(buffer,v2));
 			}
-			if(vertexFormat->hasVertexElementOfType(VertexElement::Type_COLOR_DIFFUSE)){
+			if(ci>=0){
 				strcat(line,makeColor(buffer,Color::rgba(vba.getRGBA(i,ci))));
 			}
 			if(mesh->vertexBoneAssignments.size()>0){
