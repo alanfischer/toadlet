@@ -63,13 +63,14 @@ void VertexBufferAccessor::lock(VertexBuffer *vertexBuffer,int access){
 
 	mVertexBuffer=vertexBuffer;
 	VertexFormat *vertexFormat=mVertexBuffer->getVertexFormat();
-	mVertexSize32=vertexFormat->vertexSize/sizeof(int32);
-	TOADLET_ASSERT(vertexFormat->vertexElements.size()>0 && vertexFormat->vertexElements.size()<16);
-	for(int i=0;i<vertexFormat->vertexElements.size();++i){
-		mElementOffsets32[i]=vertexFormat->vertexElements[i].offset/sizeof(int32);
+	mVertexSize32=vertexFormat->getVertexSize()/sizeof(int32);
+	int numElements=vertexFormat->getNumElements();
+	TOADLET_ASSERT(numElements>0 && numElements<16);
+	for(int i=0;i<numElements;++i){
+		mElementOffsets32[i]=vertexFormat->getOffset(i)/sizeof(int32);
 	}
 
-	if((vertexFormat->vertexElements[0].format&VertexElement::Format_BIT_FIXED_32)>0){
+	if((vertexFormat->getFormat(0)&VertexFormat::Format_BIT_FIXED_32)>0){
 		mNativeFixed=true;
 	}
 	else{
@@ -83,7 +84,7 @@ void VertexBufferAccessor::lock(VertexBuffer *vertexBuffer,int access){
 	else{
 		mFloatData=(float*)mData;
 	}
-	if(vertexFormat->hasVertexElementOfType(VertexElement::Type_COLOR_DIFFUSE)){
+	if(vertexFormat->getIndexOfSemantic(VertexFormat::Semantic_COLOR_DIFFUSE)){
 		mColorData=(uint32*)mData;
 	}
 }

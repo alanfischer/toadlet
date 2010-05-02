@@ -78,11 +78,11 @@ void Font::destroy(){
 bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const String &string,const Color &color,int alignment,bool pixelSpace,bool flip){
 	VertexFormat *format=vertexBuffer->getVertexFormat();
 
-	int positionElement=format->getVertexElementIndexOfType(VertexElement::Type_POSITION);
-	int texCoordElement=format->getVertexElementIndexOfType(VertexElement::Type_TEX_COORD);
-	int colorElement=format->getVertexElementIndexOfType(VertexElement::Type_COLOR_DIFFUSE);
+	int positionIndex=format->getIndexOfSemantic(VertexFormat::Semantic_POSITION);
+	int texCoordIndex=format->getIndexOfSemantic(VertexFormat::Semantic_TEX_COORD);
+	int colorIndex=format->getIndexOfSemantic(VertexFormat::Semantic_COLOR_DIFFUSE);
 
-	if(positionElement<0 || texCoordElement<0){
+	if(positionIndex<0 || texCoordIndex<0){
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"invalid VertexFormat");
 		return false;
@@ -184,48 +184,48 @@ bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const Stri
 			}
 
 			if(pixelSpace){
-				vba.set3(i4+0,positionElement,	Math::fromInt(x+g->offsetx),			Math::fromInt(y+goffsety+gheight), 0);
-				vba.set3(i4+1,positionElement,	Math::fromInt(x+g->offsetx+g->width),	Math::fromInt(y+goffsety+gheight), 0);
-				vba.set3(i4+2,positionElement,	Math::fromInt(x+g->offsetx+g->width),	Math::fromInt(y+goffsety), 0);
-				vba.set3(i4+3,positionElement,	Math::fromInt(x+g->offsetx),			Math::fromInt(y+goffsety), 0);
+				vba.set3(i4+0,positionIndex,	Math::fromInt(x+g->offsetx),			Math::fromInt(y+goffsety+gheight), 0);
+				vba.set3(i4+1,positionIndex,	Math::fromInt(x+g->offsetx+g->width),	Math::fromInt(y+goffsety+gheight), 0);
+				vba.set3(i4+2,positionIndex,	Math::fromInt(x+g->offsetx+g->width),	Math::fromInt(y+goffsety), 0);
+				vba.set3(i4+3,positionIndex,	Math::fromInt(x+g->offsetx),			Math::fromInt(y+goffsety), 0);
 			}
 			else{
-				vba.set3(i4+0,positionElement,	Math::div(Math::fromInt(x+g->offsetx),pointSize),			Math::div(Math::fromInt(y+goffsety+gheight),pointSize), 0);
-				vba.set3(i4+1,positionElement,	Math::div(Math::fromInt(x+g->offsetx+g->width),pointSize),	Math::div(Math::fromInt(y+goffsety+gheight),pointSize), 0);
-				vba.set3(i4+2,positionElement,	Math::div(Math::fromInt(x+g->offsetx+g->width),pointSize),	Math::div(Math::fromInt(y+goffsety),pointSize), 0);
-				vba.set3(i4+3,positionElement,	Math::div(Math::fromInt(x+g->offsetx),pointSize),			Math::div(Math::fromInt(y+goffsety),pointSize), 0);
+				vba.set3(i4+0,positionIndex,	Math::div(Math::fromInt(x+g->offsetx),pointSize),			Math::div(Math::fromInt(y+goffsety+gheight),pointSize), 0);
+				vba.set3(i4+1,positionIndex,	Math::div(Math::fromInt(x+g->offsetx+g->width),pointSize),	Math::div(Math::fromInt(y+goffsety+gheight),pointSize), 0);
+				vba.set3(i4+2,positionIndex,	Math::div(Math::fromInt(x+g->offsetx+g->width),pointSize),	Math::div(Math::fromInt(y+goffsety),pointSize), 0);
+				vba.set3(i4+3,positionIndex,	Math::div(Math::fromInt(x+g->offsetx),pointSize),			Math::div(Math::fromInt(y+goffsety),pointSize), 0);
 			}
 
-			vba.set2(i4+0,texCoordElement,	Math::div(Math::fromInt(g->x),scalarTexWidth),			Math::div(Math::fromInt(g->y+g->height),scalarTexHeight));
-			vba.set2(i4+1,texCoordElement,	Math::div(Math::fromInt(g->x+g->width),scalarTexWidth),	Math::div(Math::fromInt(g->y+g->height),scalarTexHeight));
-			vba.set2(i4+2,texCoordElement,	Math::div(Math::fromInt(g->x+g->width),scalarTexWidth),	Math::div(Math::fromInt(g->y),scalarTexHeight));
-			vba.set2(i4+3,texCoordElement,	Math::div(Math::fromInt(g->x),scalarTexWidth),			Math::div(Math::fromInt(g->y),scalarTexHeight));
+			vba.set2(i4+0,texCoordIndex,	Math::div(Math::fromInt(g->x),scalarTexWidth),			Math::div(Math::fromInt(g->y+g->height),scalarTexHeight));
+			vba.set2(i4+1,texCoordIndex,	Math::div(Math::fromInt(g->x+g->width),scalarTexWidth),	Math::div(Math::fromInt(g->y+g->height),scalarTexHeight));
+			vba.set2(i4+2,texCoordIndex,	Math::div(Math::fromInt(g->x+g->width),scalarTexWidth),	Math::div(Math::fromInt(g->y),scalarTexHeight));
+			vba.set2(i4+3,texCoordIndex,	Math::div(Math::fromInt(g->x),scalarTexWidth),			Math::div(Math::fromInt(g->y),scalarTexHeight));
 
 			x+=Math::toInt(g->advancex);
 			y+=Math::toInt(g->advancey);
 
-			if(colorElement>=0){
-				vba.setABGR(i4+0,colorElement,abgr);
-				vba.setABGR(i4+1,colorElement,abgr);
-				vba.setABGR(i4+2,colorElement,abgr);
-				vba.setABGR(i4+3,colorElement,abgr);
+			if(colorIndex>=0){
+				vba.setABGR(i4+0,colorIndex,abgr);
+				vba.setABGR(i4+1,colorIndex,abgr);
+				vba.setABGR(i4+2,colorIndex,abgr);
+				vba.setABGR(i4+3,colorIndex,abgr);
 			}
 		}
 		else{
-			vba.set3(i4+0,positionElement,0,0,0);
-			vba.set3(i4+1,positionElement,0,0,0);
-			vba.set3(i4+2,positionElement,0,0,0);
-			vba.set3(i4+3,positionElement,0,0,0);
+			vba.set3(i4+0,positionIndex,0,0,0);
+			vba.set3(i4+1,positionIndex,0,0,0);
+			vba.set3(i4+2,positionIndex,0,0,0);
+			vba.set3(i4+3,positionIndex,0,0,0);
 		}
 	}
 
 	// Zero out the rest of the vertex buffer
 	for(;i<maxLength;++i){
 		int i4=i*4;
-		vba.set3(i4+0,positionElement,0,0,0);
-		vba.set3(i4+1,positionElement,0,0,0);
-		vba.set3(i4+2,positionElement,0,0,0);
-		vba.set3(i4+3,positionElement,0,0,0);
+		vba.set3(i4+0,positionIndex,0,0,0);
+		vba.set3(i4+1,positionIndex,0,0,0);
+		vba.set3(i4+2,positionIndex,0,0,0);
+		vba.set3(i4+3,positionIndex,0,0,0);
 	}
 
 	vba.unlock();

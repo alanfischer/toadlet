@@ -4,6 +4,7 @@ set (PEEPER_GLRENDERER_SRC
 	GLRenderer.cpp
 	GLTexture.cpp
 	GLTextureMipSurface.cpp
+	GLVertexFormat.cpp
 )
 if (NOT TOADLET_PLATFORM_WINCE)
 	set (PEEPER_GLRENDERER_SRC ${PEEPER_GLRENDERER_SRC} GLFBOSurfaceRenderTarget.cpp GLFBORenderbufferSurface.cpp)
@@ -51,6 +52,7 @@ set (PEEPER_GLRENDERER_HEADERS
 	GLTexture.h
 	GLTextureMipSurface.h
 	GLSurface.h
+	GLVertexFormat.h
 )
 if (NOT TOADLET_PLATFORM_WINCE)
 	set (PEEPER_GLRENDERER_HEADERS ${PEEPER_GLRENDERER_HEADERS} GLFBOSurfaceRenderTarget.h GLFBORenderbufferSurface.h)

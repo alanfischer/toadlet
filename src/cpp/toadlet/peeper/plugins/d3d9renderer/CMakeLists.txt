@@ -6,6 +6,7 @@ set (PEEPER_D3D9RENDERER_SRC
 	D3D9Surface.cpp
 	D3D9SurfaceRenderTarget.cpp
 	D3D9VertexBuffer.cpp
+	D3D9VertexFormat.cpp
 	D3D9WindowRenderTarget.cpp
 )
 if (NOT TOADLET_PLATFORM_WINCE)
@@ -23,6 +24,7 @@ set (PEEPER_D3D9RENDERER_HEADERS
 	D3D9SurfaceRenderTarget.h
 	D3D9Texture.h
 	D3D9VertexBuffer.h
+	D3D9VertexFormat.h
 	D3D9WindowRenderTarget.h
 )
 if (NOT TOADLET_PLATFORM_WINCE)

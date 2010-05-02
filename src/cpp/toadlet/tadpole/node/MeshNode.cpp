@@ -289,7 +289,8 @@ void MeshNode::updateVertexBuffer(){
 		VertexBuffer::ptr dstVertexBuffer=mDynamicVertexData->getVertexBuffer(0);
 
 		VertexFormat *format=srcVertexBuffer->getVertexFormat();
-		int positionElement=format->getVertexElementIndexOfType(VertexElement::Type_POSITION);
+		int positionIndex=format->getIndexOfSemantic(VertexFormat::Semantic_POSITION);
+		int normalIndex=format->getIndexOfSemantic(VertexFormat::Semantic_NORMAL);
 
 		{
 			svba.lock(srcVertexBuffer,Buffer::Access_BIT_READ);
@@ -305,11 +306,10 @@ void MeshNode::updateVertexBuffer(){
 			Vector3 &normalVector=cache_updateVertexBuffer_normalVector.reset();
 
 			int i;
-			if(format->hasVertexElementOfType(VertexElement::Type_NORMAL)){
-				int normalElement=format->getVertexElementIndexOfType(VertexElement::Type_NORMAL);
+			if(normalIndex>=0){
 				for(i=0;i<srcVertexBuffer->getSize();++i){
-					svba.get3(i,positionElement,positionVector);
-					svba.get3(i,normalElement,normalVector);
+					svba.get3(i,positionIndex,positionVector);
+					svba.get3(i,normalIndex,normalVector);
 
 					const Mesh::VertexBoneAssignmentList &vba=mMesh->vertexBoneAssignments[i];
 					if(vba.size()>0){
@@ -321,13 +321,13 @@ void MeshNode::updateVertexBuffer(){
 						Math::mul(normalVector,bone->boneSpaceRotate);
 					}
 				
-					dvba.set3(i,positionElement,positionVector);
-					dvba.set3(i,normalElement,normalVector);
+					dvba.set3(i,positionIndex,positionVector);
+					dvba.set3(i,normalIndex,normalVector);
 				}
 			}
 			else{
 				for(i=0;i<srcVertexBuffer->getSize();++i){
-					svba.get3(i,positionElement,positionVector);
+					svba.get3(i,positionIndex,positionVector);
 
 					const Mesh::VertexBoneAssignmentList &vba=mMesh->vertexBoneAssignments[i];
 					if(vba.size()>0){
@@ -337,7 +337,7 @@ void MeshNode::updateVertexBuffer(){
 						Math::add(positionVector,bone->boneSpaceTranslate);
 					}
 
-					dvba.set3(i,positionElement,positionVector);
+					dvba.set3(i,positionIndex,positionVector);
 				}
 			}
 

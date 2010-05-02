@@ -27,7 +27,7 @@
 #define TOADLET_PEEPER_CAPABILITYSET_H
 
 #include <toadlet/peeper/Types.h>
-#include <toadlet/peeper/VertexElement.h>
+#include <toadlet/peeper/VertexFormat.h>
 
 namespace toadlet{
 namespace peeper{
@@ -53,7 +53,7 @@ public:
 		textureNonPowerOf2Restricted(false),
 		textureNonPowerOf2(false),
 		textureAutogenMipMaps(false),
-		idealVertexFormatBit(VertexElement::Format_BIT_FLOAT_32),
+		idealVertexFormatBit(VertexFormat::Format_BIT_FLOAT_32),
 		triangleFan(false)
 	{}
 

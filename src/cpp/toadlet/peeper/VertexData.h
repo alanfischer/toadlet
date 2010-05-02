@@ -35,13 +35,13 @@ class TOADLET_API VertexData{
 public:
 	TOADLET_SHARED_POINTERS(VertexData);
 
-	VertexData(int numVertexBuffers=0);
-	VertexData(const VertexBuffer::ptr &vertexBuffer);
+	VertexData(VertexFormat::ptr vertexFormat);
+	VertexData(VertexBuffer::ptr vertexBuffer);
 	virtual ~VertexData();
 
 	void destroy();
 
-	void addVertexBuffer(const VertexBuffer::ptr &vertexBuffer1);
+	bool addVertexBuffer(const VertexBuffer::ptr &vertexBuffer);
 
 	inline int getNumVertexBuffers() const{return vertexBuffers.size();}
 	inline const VertexBuffer::ptr &getVertexBuffer(int index) const{return vertexBuffers[index];}

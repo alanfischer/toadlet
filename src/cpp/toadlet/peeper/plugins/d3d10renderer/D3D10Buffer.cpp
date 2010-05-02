@@ -90,7 +90,7 @@ bool D3D10Buffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int
 	mAccess=access;
 	mSize=size;
 	mVertexFormat=vertexFormat;
-	mVertexSize=mVertexFormat->vertexSize;
+	mVertexSize=mVertexFormat->getVertexSize();
 	mDataSize=mVertexSize*mSize;
 
 	mBindFlags|=D3D10_BIND_VERTEX_BUFFER;
@@ -205,11 +205,15 @@ uint8 *D3D10Buffer::lock(int lockAccess){
 	// We do this even if its write only, since the unlocking will write it back, it would get messed up if we didn't swap in all situations
 	if(mData!=NULL){
 		int i,j;
-		for(i=0;i<mColorElements.size();++i){
-			const VertexElement &vertexElement=mColorElements[i];
-			for(j=0;j<mSize;++j){
-				uint32 &color=*(uint32*)(mData+mVertexSize*j+vertexElement.offset);
-				color=(color&0xFF000000)|((color&0x000000FF)<<16)|(color&0x0000FF00)|((color&0x00FF0000)>>16);
+		if(mVertexFormat!=NULL){
+			for(i=0;i<mVertexFormat->getNumElements();++i){
+				if(mVertexFormat->getFormat(i)==VertexFormat::Format_COLOR_RGBA){
+					byte *data=mData+mVertexFormat->getOffset(i);
+					for(j=0;j<mSize;++j){
+						uint32 &color=*(uint32*)(data+mVertexSize);
+						color=(color&0xFF000000)|((color&0x000000FF)<<16)|(color&0x0000FF00)|((color&0x00FF0000)>>16);
+					}
+				}
 			}
 		}
 		if(mIndexFormat==IndexFormat_UINT_8){
@@ -230,11 +234,15 @@ bool D3D10Buffer::unlock(){
 	// We do this even if its read only, since we have to do it in all situations for locking
 	if(mData!=NULL){
 		int i,j;
-		for(i=0;i<mColorElements.size();++i){
-			const VertexElement &vertexElement=mColorElements[i];
-			for(j=0;j<mSize;++j){
-				uint32 &color=*(uint32*)(mData+mVertexSize*j+vertexElement.offset);
-				color=(color&0xFF000000)|((color&0x000000FF)<<16)|(color&0x0000FF00)|((color&0x00FF0000)>>16);
+		if(mVertexFormat!=NULL){
+			for(i=0;i<mVertexFormat->getNumElements();++i){
+				if(mVertexFormat->getFormat(i)==VertexFormat::Format_COLOR_RGBA){
+					byte *data=mData+mVertexFormat->getOffset(i);
+					for(j=0;j<mSize;++j){
+						uint32 &color=*(uint32*)(data+mVertexSize);
+						color=(color&0xFF000000)|((color&0x000000FF)<<16)|(color&0x0000FF00)|((color&0x00FF0000)>>16);
+					}
+				}
 			}
 		}
 		if(mIndexFormat==IndexFormat_UINT_8){

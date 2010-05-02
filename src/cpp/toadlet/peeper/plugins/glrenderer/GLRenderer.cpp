@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include "GLBuffer.h"
+#include "GLVertexFormat.h"
 #include "GLRenderer.h"
 #include "GLRenderTarget.h"
 #include "GLTexture.h"
@@ -285,7 +286,7 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 	#if defined(TOADLET_HAS_GLES) && defined(TOADLET_FIXED_POINT)
 		mCapabilitySet.idealVertexFormatBit=VertexElement::Format_BIT_FIXED_32;
 	#else
-		mCapabilitySet.idealVertexFormatBit=VertexElement::Format_BIT_FLOAT_32;
+		mCapabilitySet.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
 	#endif
 
 	mCapabilitySet.triangleFan=true;
@@ -343,6 +344,10 @@ SurfaceRenderTarget *GLRenderer::createSurfaceRenderTarget(){
 
 	Error::unimplemented("GLRenderer::createSurfaceRenderTarget is unavailable");
 	return NULL;
+}
+
+VertexFormat *GLRenderer::createVertexFormat(){
+	return new GLVertexFormat(this);
 }
 
 VertexBuffer *GLRenderer::createVertexBuffer(){
@@ -1558,11 +1563,11 @@ bool GLRenderer::useMapping(GLBuffer *buffer) const{
 	return buffer->mDataSize>(1024 * 32);
 }
 
-int GLRenderer::setVertexData(const VertexData *vertexData,int lastTypeBits){
+int GLRenderer::setVertexData(const VertexData *vertexData,int lastSemanticBits){
 	int numVertexBuffers=0;
-	// Type bits are a bitfield covering all the non-texture element types,
+	// Semantic bits are a bitfield covering all the non-texture element semantics,
 	//  bitwise ORed with which texture stages are enabled.
-	int typeBits=0;
+	int semanticBits=0;
 
 	if(vertexData!=NULL){
 		numVertexBuffers=vertexData->vertexBuffers.size();
@@ -1572,9 +1577,9 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastTypeBits){
 	for(i=0;i<numVertexBuffers;++i){
 		GLBuffer *glvertexBuffer=(GLBuffer*)vertexData->vertexBuffers[i]->getRootVertexBuffer();
 
-		VertexFormat *vertexFormat=glvertexBuffer->mVertexFormat;
-		GLsizei vertexSize=vertexFormat->vertexSize;
-		int numVertexElements=vertexFormat->vertexElements.size();
+		GLVertexFormat *glvertexFormat=(GLVertexFormat*)(glvertexBuffer->mVertexFormat->getRootVertexFormat());
+		GLsizei vertexSize=glvertexFormat->mVertexSize;
+		int numElements=glvertexFormat->mSemantics.size();
 
 		if(glvertexBuffer->mHandle==0){
 			if(mCapabilitySet.hardwareVertexBuffers){
@@ -1585,55 +1590,55 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastTypeBits){
 			glBindBuffer(glvertexBuffer->mTarget,glvertexBuffer->mHandle);
 		}
 
-		for(j=0;j<numVertexElements;++j){
-			int type=vertexFormat->vertexElements[j].type;
-			switch(type){
-				case VertexElement::Type_POSITION:
-					typeBits|=(1<<type);
+		for(j=0;j<numElements;++j){
+			int semantic=glvertexFormat->mSemantics[j];
+			switch(semantic){
+				case VertexFormat::Semantic_POSITION:
+					semanticBits|=(1<<semantic);
 					glVertexPointer(
-						glvertexBuffer->mElementCounts[j],
-						glvertexBuffer->mElementTypes[j],
+						glvertexFormat->mGLElementCounts[j],
+						glvertexFormat->mGLDataTypes[j],
 						vertexSize,
 						glvertexBuffer->mElementOffsets[j]);
 				break;
-				case VertexElement::Type_NORMAL:
-					typeBits|=(1<<type);
+				case VertexFormat::Semantic_NORMAL:
+					semanticBits|=(1<<semantic);
 					glNormalPointer(
-						glvertexBuffer->mElementTypes[j],
+						glvertexFormat->mGLDataTypes[j],
 						vertexSize,
 						glvertexBuffer->mElementOffsets[j]);
 				break;
-				case VertexElement::Type_COLOR_DIFFUSE:
-					typeBits|=(1<<type);
+				case VertexFormat::Semantic_COLOR_DIFFUSE:
+					semanticBits|=(1<<semantic);
 					glColorPointer(
-						glvertexBuffer->mElementCounts[j],
-						glvertexBuffer->mElementTypes[j],
+						glvertexFormat->mGLElementCounts[j],
+						glvertexFormat->mGLDataTypes[j],
 						vertexSize,
 						glvertexBuffer->mElementOffsets[j]);
 				break;
-				case VertexElement::Type_COLOR_SPECULAR:
+				case VertexFormat::Semantic_COLOR_SPECULAR:
 					#if defined(TOADLET_HAS_GLEW)
 						if(GLEW_EXT_secondary_color){
-							typeBits|=(1<<type);
+							semanticBits|=(1<<semantic);
 	 						glSecondaryColorPointerEXT(
-								glvertexBuffer->mElementCounts[j],
-								glvertexBuffer->mElementTypes[j],
+								glvertexFormat->mGLElementCounts[j],
+								glvertexFormat->mGLDataTypes[j],
 								vertexSize,
 								glvertexBuffer->mElementOffsets[j]);
 						}
 					#endif
 				break;
 				default:{
-					int texCoordIndex=type-VertexElement::Type_TEX_COORD;
+					int texCoordIndex=semantic-VertexFormat::Semantic_TEX_COORD;
 					for(k=0;k<mMaxTexCoordIndex;++k){
 						if(mTexCoordIndexes[k]==texCoordIndex){
-							typeBits|=(1<<(k+VertexElement::Type_TEX_COORD));
+							semanticBits|=(1<<(k+VertexFormat::Semantic_TEX_COORD));
 							if(mMultiTexture){
 								glClientActiveTexture(GL_TEXTURE0+k);
 							}
 							glTexCoordPointer(
-								glvertexBuffer->mElementCounts[j],
-								glvertexBuffer->mElementTypes[j],
+								glvertexFormat->mGLElementCounts[j],
+								glvertexFormat->mGLDataTypes[j],
 								vertexSize,
 								glvertexBuffer->mElementOffsets[j]);
 							mLastTexCoordIndexes[k]=texCoordIndex;
@@ -1644,37 +1649,37 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastTypeBits){
 		}
 	}
 
-	if(typeBits!=lastTypeBits){
+	if(semanticBits!=lastSemanticBits){
 		// Go through all the non-texture VertexElement types, check to see if the enabling state between now and last were different.
 		//  If so check to see if the state needs to be enabled or disabled.
 		int state=0;
-		int tb=(typeBits&VertexElement::Type_MASK_NON_TEX_COORD),ltb=(lastTypeBits&VertexElement::Type_MASK_NON_TEX_COORD);
-		while(tb>0 || ltb>0){
-			if((tb&1)!=(ltb&1)){
-				if((tb&1)>(ltb&1)){
+		int sb=(semanticBits&VertexFormat::Semantic_MASK_NON_TEX_COORD),lsb=(lastSemanticBits&VertexFormat::Semantic_MASK_NON_TEX_COORD);
+		while(sb>0 || lsb>0){
+			if((sb&1)!=(lsb&1)){
+				if((sb&1)>(lsb&1)){
 					glEnableClientState(GLClientStates[state]);
 				}
 				else{
 					glDisableClientState(GLClientStates[state]);
 				}
 			}
-			tb>>=1;
-			ltb>>=1;
+			sb>>=1;
+			lsb>>=1;
 			state++;
 		}
 
 		// Go through all used texture stages, and see if the enabling state betwen now and last were different.
 		//  If so check to see if the state needs to be enabled or disabled.
-		tb=typeBits>>VertexElement::Type_TEX_COORD;
-		ltb=lastTypeBits>>VertexElement::Type_TEX_COORD;
+		sb=semanticBits>>VertexFormat::Semantic_TEX_COORD;
+		lsb=lastSemanticBits>>VertexFormat::Semantic_TEX_COORD;
 		int stci; // Shifted Tex Coord Indexes
-		for(i=0;((tb|ltb)>>i)>0;++i){
+		for(i=0;((sb|lsb)>>i)>0;++i){
 			stci=(1<<i);
-			if((tb&stci)!=(ltb&stci)){
+			if((sb&stci)!=(lsb&stci)){
 				if(mMultiTexture){
 					glClientActiveTexture(GL_TEXTURE0+i);
 				}
-				if((tb&stci)>(ltb&stci)){
+				if((sb&stci)>(lsb&stci)){
 					glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 				}
 				else{
@@ -1684,18 +1689,18 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastTypeBits){
 		}
 	}
 
-	if((typeBits&(1<<VertexElement::Type_COLOR_DIFFUSE))==0){
+	if((semanticBits&(1<<VertexFormat::Semantic_COLOR_DIFFUSE))==0){
 		glColor4f(1.0f,1.0f,1.0f,1.0f);
 	}
 	#if defined(TOADLET_HAS_GLEW)
-		if((typeBits&(1<<VertexElement::Type_COLOR_SPECULAR))==0 && GLEW_EXT_secondary_color){
+		if((semanticBits&(1<<VertexFormat::Semantic_COLOR_SPECULAR))==0 && GLEW_EXT_secondary_color){
 			glSecondaryColor3fEXT(1.0f,1.0f,1.0f);
 		}
 	#endif
 
 	TOADLET_CHECK_GLERROR("setVertexData");
 
-	return typeBits;
+	return semanticBits;
 }
 
 GLenum GLRenderer::getGLDepthFunc(DepthTest depthTest){
@@ -1770,15 +1775,15 @@ GLenum GLRenderer::getGLBlendOperation(Blend::Operation blend){
 }
 
 GLint GLRenderer::getGLElementCount(int format){
-	switch(format&~VertexElement::Format_MASK_TYPES){ // Mask out the types
-		case VertexElement::Format_BIT_COUNT_1:
+	switch(format&~VertexFormat::Format_MASK_TYPES){ // Mask out the types
+		case VertexFormat::Format_BIT_COUNT_1:
 			return 1;
-		case VertexElement::Format_BIT_COUNT_2:
+		case VertexFormat::Format_BIT_COUNT_2:
 			return 2;
-		case VertexElement::Format_BIT_COUNT_3:
+		case VertexFormat::Format_BIT_COUNT_3:
 			return 3;
-		case VertexElement::Format_BIT_COUNT_4:
-		case VertexElement::Format_COLOR_RGBA:
+		case VertexFormat::Format_BIT_COUNT_4:
+		case VertexFormat::Format_COLOR_RGBA:
 			return 4;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
@@ -1788,23 +1793,23 @@ GLint GLRenderer::getGLElementCount(int format){
 }
 
 GLenum GLRenderer::getGLDataType(int format){
-	switch(format&~VertexElement::Format_MASK_COUNTS){ // Mask out the counts
-		case VertexElement::Format_BIT_UINT_8:
-		case VertexElement::Format_COLOR_RGBA:
+	switch(format&~VertexFormat::Format_MASK_COUNTS){ // Mask out the counts
+		case VertexFormat::Format_BIT_UINT_8:
+		case VertexFormat::Format_COLOR_RGBA:
 			return GL_UNSIGNED_BYTE;
-		case VertexElement::Format_BIT_INT_8:
+		case VertexFormat::Format_BIT_INT_8:
 			return GL_BYTE;
-		case VertexElement::Format_BIT_INT_16:
+		case VertexFormat::Format_BIT_INT_16:
 			return GL_SHORT;
-		case VertexElement::Format_BIT_FLOAT_32:
+		case VertexFormat::Format_BIT_FLOAT_32:
 			return GL_FLOAT;
 		#if !defined(TOADLET_HAS_GLES)
-			case VertexElement::Format_BIT_INT_32:
+			case VertexFormat::Format_BIT_INT_32:
 				return GL_INT;
-			case VertexElement::Format_BIT_DOUBLE_64:
+			case VertexFormat::Format_BIT_DOUBLE_64:
 				return GL_DOUBLE;
 		#else
-			case VertexElement::Format_BIT_FIXED_32:
+			case VertexFormat::Format_BIT_FIXED_32:
 				return GL_FIXED;
 		#endif
 		default:

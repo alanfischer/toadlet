@@ -23,48 +23,67 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/peeper/VertexFormat.h>
+#include "GLVertexFormat.h"
+#include "GLRenderer.h"
 
 namespace toadlet{
 namespace peeper{
 
-VertexFormat::VertexFormat(int numVertexElements):
-	//vertexElements,
-	vertexSize(0),
-	typeBits(0)
-	//vertexElementsByType
+GLVertexFormat::GLVertexFormat(GLRenderer *renderer):
+	mRenderer(NULL),
+
+	//mSemantics,
+	//mFormats,
+	//mSemantics,
+	//mFormats,
+	//mOffsets,
+	//mGLDataTypes,
+	//mGLElementCount,
+
+	mVertexSize(0)
 {
-	vertexElements.reserve(numVertexElements);
+	mRenderer=renderer;
 }
 
-const VertexElement &VertexFormat::addVertexElement(const VertexElement &element){
-	short index=vertexElements.size();
-
-	vertexElements.add(element);
-	vertexElements[index].offset=vertexSize;
-
-	vertexSize+=element.getSize();
-	typeBits|=element.type;
-
-	if(element.type>=vertexElementsByType.size()){
-		vertexElementsByType.resize(element.type+1,-1);
-	}
-	vertexElementsByType[element.type]=index;
-
-	return vertexElements[index];
+GLVertexFormat::~GLVertexFormat(){
+	destroy();
 }
 
-bool VertexFormat::equals(const VertexFormat &format) const{
-	if(format.vertexElements.size()!=vertexElements.size()){
-		return false;
-	}
+void GLVertexFormat::addElement(int semantic,int format){
+	mSemantics.add(semantic);
+	mFormats.add(format);
+	mOffsets.add(mVertexSize);
+
+	mVertexSize+=getFormatSize(format);
+}
+
+bool GLVertexFormat::create(){
+	destroy();
+
 	int i;
-	for(i=0;i<vertexElements.size();++i){
-		if(format.vertexElements[i].equals(vertexElements[i])==false){
-			return false;
+	for(i=0;i<mSemantics.size();++i){
+		mGLDataTypes.add(GLRenderer::getGLDataType(mFormats[i]));
+		mGLElementCounts.add(GLRenderer::getGLElementCount(mFormats[i]));
+	}
+
+	return true;
+}
+
+void GLVertexFormat::destroy(){
+	mGLDataTypes.clear();
+	mGLElementCounts.clear();
+}
+
+int GLVertexFormat::getIndexOfSemantic(int semantic){
+	TOADLET_ASSERT(mGLDataTypes.size()==mSemantics.size());
+
+	int i;
+	for(i=0;i<mSemantics.size();++i){
+		if(mSemantics[i]==semantic){
+			return i;
 		}
 	}
-	return true;
+	return -1;
 }
 
 }

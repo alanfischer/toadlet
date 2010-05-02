@@ -23,22 +23,26 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Error.h>
 #include <toadlet/peeper/VertexData.h>
+
+using namespace toadlet::egg;
 
 namespace toadlet{
 namespace peeper{
 
-VertexData::VertexData(int numVertexBuffers)
+VertexData::VertexData(VertexFormat::ptr vertexFormat)
 	//vertexFormat,
 	//vertexBuffers
 {
-	vertexBuffers.reserve(numVertexBuffers);
+	vertexFormat=vertexFormat;
 }
 
-VertexData::VertexData(const VertexBuffer::ptr &vertexBuffer)
+VertexData::VertexData(VertexBuffer::ptr vertexBuffer)
 	//vertexFormat,
 	//vertexBuffers
 {
+	vertexFormat=vertexBuffer->getVertexFormat();
 	addVertexBuffer(vertexBuffer);
 }
 
@@ -54,24 +58,15 @@ void VertexData::destroy(){
 	vertexBuffers.clear();
 }
 
-void VertexData::addVertexBuffer(const VertexBuffer::ptr &vertexBuffer){
-	if(vertexBuffers.size()==0){
-		vertexFormat=vertexBuffer->getVertexFormat();
-	}
-	else{
-		if(vertexBuffers.size()==1){
-			vertexFormat=VertexFormat::ptr(new VertexFormat());
-		}
-
-		VertexFormat::ptr bufferFormat=vertexBuffer->getVertexFormat();
-
-		int i;
-		for(i=0;i<bufferFormat->getNumVertexElements();++i){
-			vertexFormat->addVertexElement(vertexFormat->getVertexElement(i));
-		}
+bool VertexData::addVertexBuffer(const VertexBuffer::ptr &vertexBuffer){
+	if(vertexBuffers.size()>0 && vertexFormat==vertexBuffers[0]->getVertexFormat()){
+		Error::unknown(Categories::TOADLET_PEEPER,"cannot add multiple buffers to a VertexData with an unspecified VertexFormat");
+		return false;
 	}
 
 	vertexBuffers.add(vertexBuffer);
+
+	return true;
 }
 
 }

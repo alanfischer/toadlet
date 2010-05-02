@@ -34,7 +34,6 @@
 #include <toadlet/peeper/TextureStage.h>
 #include <toadlet/peeper/StatisticsSet.h>
 #include <toadlet/peeper/CapabilitySet.h>
-#include <toadlet/peeper/VertexElement.h>
 
 namespace toadlet{
 namespace peeper{
@@ -63,6 +62,7 @@ public:
 	// Resource operations
 	Texture *createTexture();
 	SurfaceRenderTarget *createSurfaceRenderTarget();
+	VertexFormat *createVertexFormat();
 	VertexBuffer *createVertexBuffer();
 	IndexBuffer *createIndexBuffer();
 	Program *createProgram();

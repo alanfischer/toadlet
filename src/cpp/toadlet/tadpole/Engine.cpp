@@ -153,14 +153,6 @@ Engine::Engine():
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"creating Engine");
 
-	// Make a guess at what the ideal format is.
-	#if defined(TOADLET_FIXED_POINT) && (defined(TOADLET_PLATFORM_WINCE) || defined(TOADLET_PLATFORM_IPHONE) || defined(TOADLET_PLATFORM_ANDROID))
-		mIdealVertexFormatBit=VertexElement::Format_BIT_FIXED_32;
-	#else
-		mIdealVertexFormatBit=VertexElement::Format_BIT_FLOAT_32;
-	#endif
-	updateVertexFormats();
-
 	mArchiveManager=new ArchiveManager();
 	mTextureManager=new TextureManager(this,backable);
 	mBufferManager=new BufferManager(this,backable);
@@ -168,6 +160,13 @@ Engine::Engine():
 	mFontManager=new FontManager(this->getArchiveManager());
 	mMeshManager=new MeshManager(this);
 	mAudioBufferManager=new ResourceManager(this->getArchiveManager());
+
+	// Make a guess at what the ideal format is.
+	#if defined(TOADLET_FIXED_POINT) && (defined(TOADLET_PLATFORM_WINCE) || defined(TOADLET_PLATFORM_IPHONE) || defined(TOADLET_PLATFORM_ANDROID))
+		mIdealVertexFormatBit=VertexFormat::Format_BIT_FIXED_32;
+	#else
+		mIdealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
+	#endif
 
 	registerNodeType(AnimationControllerNode::type());
 	registerNodeType(AudioNode::type());
@@ -337,12 +336,14 @@ void Engine::setRenderer(Renderer *renderer){
 	}
 	if(renderer!=mRenderer && renderer!=NULL){
 		contextActivate(renderer);
-
-		mIdealVertexFormatBit=renderer->getCapabilitySet().idealVertexFormatBit;
-		updateVertexFormats();
 	}
 
 	mRenderer=renderer;
+
+	if(mRenderer!=NULL){
+		mIdealVertexFormatBit=mRenderer->getCapabilitySet().idealVertexFormatBit;
+		updateVertexFormats();
+	}
 }
 
 Renderer *Engine::getRenderer() const{
@@ -352,55 +353,58 @@ Renderer *Engine::getRenderer() const{
 void Engine::updateVertexFormats(){
 	int formatBit=mIdealVertexFormatBit;
 
-	VertexElement position(VertexElement::Type_POSITION,formatBit|VertexElement::Format_BIT_COUNT_3);
-	VertexElement normal(VertexElement::Type_NORMAL,formatBit|VertexElement::Format_BIT_COUNT_3);
-	VertexElement color(VertexElement::Type_COLOR_DIFFUSE,VertexElement::Format_COLOR_RGBA);
-	VertexElement texCoord(VertexElement::Type_TEX_COORD,formatBit|VertexElement::Format_BIT_COUNT_2);
-
 	VertexFormat::ptr format;
 
-	format=VertexFormat::ptr(new VertexFormat(1));
-	format->addVertexElement(position);
+	format=mBufferManager->createVertexFormat();
+	format->addElement(VertexFormat::Semantic_POSITION,formatBit|VertexFormat::Format_BIT_COUNT_3);
+	format->create();
 	mVertexFormats.POSITION=format;
 
-	format=VertexFormat::ptr(new VertexFormat(2));
-	format->addVertexElement(position);
-	format->addVertexElement(normal);
+	format=mBufferManager->createVertexFormat();
+	format->addElement(VertexFormat::Semantic_POSITION,formatBit|VertexFormat::Format_BIT_COUNT_3);
+	format->addElement(VertexFormat::Semantic_NORMAL,formatBit|VertexFormat::Format_BIT_COUNT_3);
+	format->create();
 	mVertexFormats.POSITION_NORMAL=format;
 
-	format=VertexFormat::ptr(new VertexFormat(2));
-	format->addVertexElement(position);
-	format->addVertexElement(color);
+	format=mBufferManager->createVertexFormat();
+	format->addElement(VertexFormat::Semantic_POSITION,formatBit|VertexFormat::Format_BIT_COUNT_3);
+	format->addElement(VertexFormat::Semantic_COLOR_DIFFUSE,VertexFormat::Format_COLOR_RGBA);
+	format->create();
 	mVertexFormats.POSITION_COLOR=format;
 
-	format=VertexFormat::ptr(new VertexFormat(2));
-	format->addVertexElement(position);
-	format->addVertexElement(texCoord);
+	format=mBufferManager->createVertexFormat();
+	format->addElement(VertexFormat::Semantic_POSITION,formatBit|VertexFormat::Format_BIT_COUNT_3);
+	format->addElement(VertexFormat::Semantic_TEX_COORD,formatBit|VertexFormat::Format_BIT_COUNT_2);
+	format->create();
 	mVertexFormats.POSITION_TEX_COORD=format;
 
-	format=VertexFormat::ptr(new VertexFormat(3));
-	format->addVertexElement(position);
-	format->addVertexElement(normal);
-	format->addVertexElement(color);
+	format=mBufferManager->createVertexFormat();
+	format->addElement(VertexFormat::Semantic_POSITION,formatBit|VertexFormat::Format_BIT_COUNT_3);
+	format->addElement(VertexFormat::Semantic_NORMAL,formatBit|VertexFormat::Format_BIT_COUNT_3);
+	format->addElement(VertexFormat::Semantic_COLOR_DIFFUSE,VertexFormat::Format_COLOR_RGBA);
+	format->create();
 	mVertexFormats.POSITION_NORMAL_COLOR=format;
 
-	format=VertexFormat::ptr(new VertexFormat(3));
-	format->addVertexElement(position);
-	format->addVertexElement(normal);
-	format->addVertexElement(texCoord);
+	format=mBufferManager->createVertexFormat();
+	format->addElement(VertexFormat::Semantic_POSITION,formatBit|VertexFormat::Format_BIT_COUNT_3);
+	format->addElement(VertexFormat::Semantic_NORMAL,formatBit|VertexFormat::Format_BIT_COUNT_3);
+	format->addElement(VertexFormat::Semantic_TEX_COORD,formatBit|VertexFormat::Format_BIT_COUNT_2);
+	format->create();
 	mVertexFormats.POSITION_NORMAL_TEX_COORD=format;
 
-	format=VertexFormat::ptr(new VertexFormat(3));
-	format->addVertexElement(position);
-	format->addVertexElement(color);
-	format->addVertexElement(texCoord);
+	format=mBufferManager->createVertexFormat();
+	format->addElement(VertexFormat::Semantic_POSITION,formatBit|VertexFormat::Format_BIT_COUNT_3);
+	format->addElement(VertexFormat::Semantic_COLOR_DIFFUSE,VertexFormat::Format_COLOR_RGBA);
+	format->addElement(VertexFormat::Semantic_TEX_COORD,formatBit|VertexFormat::Format_BIT_COUNT_2);
+	format->create();
 	mVertexFormats.POSITION_COLOR_TEX_COORD=format;
 
-	format=VertexFormat::ptr(new VertexFormat(4));
-	format->addVertexElement(position);
-	format->addVertexElement(normal);
-	format->addVertexElement(color);
-	format->addVertexElement(texCoord);
+	format=mBufferManager->createVertexFormat();
+	format->addElement(VertexFormat::Semantic_POSITION,formatBit|VertexFormat::Format_BIT_COUNT_3);
+	format->addElement(VertexFormat::Semantic_NORMAL,formatBit|VertexFormat::Format_BIT_COUNT_3);
+	format->addElement(VertexFormat::Semantic_COLOR_DIFFUSE,VertexFormat::Format_COLOR_RGBA);
+	format->addElement(VertexFormat::Semantic_TEX_COORD,formatBit|VertexFormat::Format_BIT_COUNT_2);
+	format->create();
 	mVertexFormats.POSITION_NORMAL_COLOR_TEX_COORD=format;
 }
 
