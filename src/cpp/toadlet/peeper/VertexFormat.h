@@ -35,7 +35,6 @@ class TOADLET_API VertexFormat{
 public:
 	TOADLET_SHARED_POINTERS(VertexFormat);
 
-	/// @todo: expand semantic to allow multiple indexes for more than just texcoords.  maybe just a TEX_COORD semantic, then the upper bits would be the index?
 	enum Semantic{
 		Semantic_UNKNOWN=			-1,
 
@@ -43,18 +42,11 @@ public:
 		Semantic_BLEND_WEIGHTS=		1,
 		Semantic_BLEND_INDICES=		2,
 		Semantic_NORMAL=			3,
-		Semantic_COLOR_DIFFUSE=		4,
-		Semantic_COLOR_SPECULAR=	5,
-		Semantic_MASK_NON_TEX_COORD=0x3FF,
+		Semantic_COLOR=				4,
+		Semantic_TEX_COORD=			5,
 
-		Semantic_TEX_COORD=			10,
-		Semantic_TEX_COORD_2=		11,
-		Semantic_TEX_COORD_3=		12,
-		Semantic_TEX_COORD_4=		13,
-		Semantic_TEX_COORD_5=		14,
-		Semantic_TEX_COORD_6=		15,
-		Semantic_TEX_COORD_7=		16,
-		Semantic_TEX_COORD_8=		17,
+		/// @todo: Remove this, its only GLRenderer specific
+		Semantic_MASK_NON_TEX_COORD=	0x1F,
 	};
 
 	enum Format{
@@ -115,16 +107,17 @@ public:
 
 	virtual VertexFormat *getRootVertexFormat()=0;
 
-	virtual void addElement(int semantic,int format)=0;
+	virtual void addElement(int semantic,int index,int format)=0;
 	virtual bool create()=0;
 	virtual void destroy()=0;
 
 	virtual int getNumElements() const=0;
 	virtual int getSemantic(int i) const=0;
+	virtual int getIndex(int i) const=0;
 	virtual int getFormat(int i) const=0;
 	virtual int getOffset(int i) const=0;
-	virtual int getIndexOfSemantic(int semantic)=0;
 	virtual int getVertexSize() const=0;
+	virtual int findSemantic(int semantic)=0;
 };
 
 }

@@ -41,27 +41,29 @@ public:
 
 	VertexFormat *getRootVertexFormat(){return this;}
 
-	void addElement(int semantic,int format);
+	void addElement(int semantic,int index,int format);
 	bool create();
 	void destroy();
 
 	int getNumElements() const{return mSemantics.size();}
 	int getSemantic(int i) const{return mSemantics[i];}
+	int getIndex(int i) const{return mIndexes[i];}
 	int getFormat(int i) const{return mFormats[i];}
 	int getOffset(int i) const{return mOffsets[i];}
-	int getIndexOfSemantic(int semantic);
 	int getVertexSize() const{return mVertexSize;}
+	int findSemantic(int semantic);
 
 protected:
 	GLRenderer *mRenderer;
 
 	egg::Collection<int> mSemantics;
+	egg::Collection<int> mIndexes;
 	egg::Collection<int> mFormats;
 	egg::Collection<int> mOffsets;
+	int mVertexSize;
+
 	egg::Collection<GLenum> mGLDataTypes;
 	egg::Collection<GLuint> mGLElementCounts;
-
-	int mVertexSize;
 
 	friend class GLRenderer;
 };

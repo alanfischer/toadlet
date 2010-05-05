@@ -63,7 +63,7 @@ void BufferManager::destroy(){
 		VertexFormat::ptr vertexFormat=mVertexFormats[i];
 		/// @todo: add VertexFormatDestroyedListeners
 		//vertexFormat->setVertexFormatDestroyedListener(NULL);
-		vertexFormat->destroy();
+ 		vertexFormat->destroy();
 	}
 	mVertexFormats.clear();
 
@@ -191,7 +191,7 @@ VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBu
 
 	#if defined(TOADLET_DEBUG)
 		for(i=0;i<vertexFormat->getNumElements();++i){
-			int oldElementIndex=oldVertexFormat->getIndexOfSemantic(vertexFormat->getSemantic(i));
+			int oldElementIndex=oldVertexFormat->findSemantic(vertexFormat->getSemantic(i));
 			if(oldElementIndex>=0){
 				int dstElementSize=VertexFormat::getFormatSize(vertexFormat->getFormat(i));
 				int srcElementSize=VertexFormat::getFormatSize(oldVertexFormat->getFormat(oldElementIndex));
@@ -213,7 +213,7 @@ VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBu
 	int srcVertSize=oldVertexFormat->getVertexSize();
 	int dstVertSize=vertexFormat->getVertexSize();
 	for(i=0;i<vertexFormat->getNumElements();++i){
-		int oldElementIndex=oldVertexFormat->getIndexOfSemantic(vertexFormat->getSemantic(i));
+		int oldElementIndex=oldVertexFormat->findSemantic(vertexFormat->getSemantic(i));
 		if(oldElementIndex>0){
 			int elementSize=VertexFormat::getFormatSize(vertexFormat->getFormat(i));
 			int srcOffset=oldVertexFormat->getOffset(oldElementIndex);

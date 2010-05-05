@@ -30,7 +30,7 @@
 #include "D3D9VertexBuffer.h"
 #include "D3D9IndexBuffer.h"
 #include "D3D9VertexFormat.h"
-#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+#if !defined(TOADLET_SET_D3DM)
 	#include "D3D9Query.h"
 #endif
 #include <toadlet/egg/MathConversion.h>
@@ -43,7 +43,7 @@
 using namespace toadlet::egg;
 using namespace toadlet::egg::MathConversion;
 
-#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+#if defined(TOADLET_SET_D3DM)
 	#if defined(TOADLET_FIXED_POINT)
 		#define	TOADLET_D3DMFMT ,D3DMFMT_D3DMVALUE_FIXED
 	#else
@@ -56,9 +56,15 @@ using namespace toadlet::egg::MathConversion;
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API Renderer* new_D3D9Renderer(){
-	return new D3D9Renderer();
-}
+#if defined(TOADLET_SET_D3DM)
+	TOADLET_C_API Renderer* new_D3DMRenderer(){
+		return new D3D9Renderer();
+	}
+#else
+	TOADLET_C_API Renderer* new_D3D9Renderer(){
+		return new D3D9Renderer();
+	}
+#endif
 
 #if defined(TOADLET_BUILD_DYNAMIC)
 	TOADLET_C_API Renderer* new_Renderer(){
@@ -108,7 +114,7 @@ bool D3D9Renderer::create(RenderTarget *target,int *options){
 	}
 
 	/// @todo: Get these from the D3D9RenderTarget
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if defined(TOADLET_SET_D3DM)
 		mD3DDevType=D3DMDEVTYPE_DEFAULT;
 	#else
 		mD3DDevType=D3DDEVTYPE_HAL;
@@ -127,7 +133,7 @@ bool D3D9Renderer::create(RenderTarget *target,int *options){
 
 	HRESULT renderToTextureResult=isD3DFORMATValid(D3DFMT_X8R8G8B8,D3DUSAGE_RENDERTARGET);
 	HRESULT renderToDepthTextureResult=
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if defined(TOADLET_SET_D3DM)
 		E_FAIL;
 	#else
 		isD3DFORMATValid(D3DFMT_D24S8,D3DUSAGE_DEPTHSTENCIL);
@@ -211,7 +217,7 @@ Shader *D3D9Renderer::createShader(){
 }
 
 Query *D3D9Renderer::createQuery(){
-	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if !defined(TOADLET_SET_D3DM)
 		return new D3D9Query(this);
 	#else
 		Error::unimplemented("D3D9Renderer::createQuery is unavailable");
@@ -360,13 +366,13 @@ void D3D9Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Index
 		if(numVertexes==0){
 			numVertexes=d3dvertexBuffer->mSize;
 		}
-		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		#if defined(TOADLET_SET_D3DM)
 			result=mD3DDevice->SetStreamSource(i,d3dvertexBuffer->mVertexBuffer,d3dvertexBuffer->mVertexSize);
 		#else
 			result=mD3DDevice->SetStreamSource(i,d3dvertexBuffer->mVertexBuffer,0,d3dvertexBuffer->mVertexSize);
 		#endif
 		TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: SetStreamSource");
-		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+		#if !defined(TOADLET_SET_D3DM)
 		/// @todo: check if not using a vp
 			//if(mLastProgram==NULL){
 			//	result=mD3DDevice->SetFVF(d3dvertexFormat->mFVF);
@@ -397,7 +403,7 @@ bool D3D9Renderer::copyToSurface(Surface *surface){
 	D3D9Surface *d3dsurface=(D3D9Surface*)surface->getRootSurface();
 
 	IDirect3DSurface9 *currentSurface=NULL;
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if defined(TOADLET_SET_D3DM)
 		mD3DDevice->GetRenderTarget(&currentSurface);
 	#else
 		mD3DDevice->GetRenderTarget(0,&currentSurface);
@@ -431,7 +437,7 @@ void D3D9Renderer::setDefaultStates(){
 	setShading(Shading_SMOOTH);
 	setNormalize(Normalize_RESCALE);
 	setFill(Fill_SOLID);
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if defined(TOADLET_SET_D3DM)
 		setTexturePerspective(true);
 	#endif
 
@@ -449,7 +455,7 @@ void D3D9Renderer::setDefaultStates(){
 		mD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE,true);
 		mD3DDevice->SetRenderState(D3DRS_SPECULARENABLE,true);
 
-		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+		#if !defined(TOADLET_SET_D3DM)
 			/// @todo: Move this to a render state
 			mD3DDevice->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS,true);
 		#endif
@@ -618,12 +624,12 @@ void D3D9Renderer::setLightEffect(const LightEffect &lightEffect){
 	toD3DCOLORVALUE(material.Ambient,lightEffect.ambient);
 	toD3DCOLORVALUE(material.Diffuse,lightEffect.diffuse);
 	toD3DCOLORVALUE(material.Specular,lightEffect.specular);
-	#if !defined(TOADLET_HAS_DIRECT3DMOBILE) && defined(TOADLET_FIXED_POINT)
+	#if !defined(TOADLET_SET_D3DM) && defined(TOADLET_FIXED_POINT)
 		material.Power=scalarToFloat(lightEffect.shininess);
 	#else
 		material.Power=lightEffect.shininess;
 	#endif
-	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if !defined(TOADLET_SET_D3DM)
 		toD3DCOLORVALUE(material.Emissive,lightEffect.emissive);
 	#endif
 
@@ -652,7 +658,7 @@ void D3D9Renderer::setDepthBias(scalar constant,scalar slope){
 void D3D9Renderer::setPointParameters(bool sprite,scalar size,bool attenuated,scalar constant,scalar linear,scalar quadratic,scalar minSize,scalar maxSize){
 	HRESULT result=S_OK;
 
-	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if !defined(TOADLET_SET_D3DM)
 		// pointsize = size / sqrt(constant + linear*d + quadratic*d*d)
 		// if a&b = 0, then quadratic = 1/(C*C) where C = first component of projMatrix * 1/2 screen width
 		if(mCapabilitySet.pointSprites){
@@ -676,7 +682,7 @@ void D3D9Renderer::setPointParameters(bool sprite,scalar size,bool attenuated,sc
 }
 
 void D3D9Renderer::setTexturePerspective(bool texturePerspective){
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if defined(TOADLET_SET_D3DM)
 		HRESULT hr=mD3DDevice->SetRenderState(D3DMRS_TEXTUREPERSPECTIVE,texturePerspective);
 		TOADLET_CHECK_D3D9ERROR(hr,"setTexturePerspective");
 	#endif
@@ -723,7 +729,7 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 				else{
 					toD3DMATRIX(cacheD3DMatrix,textureStage->matrix);
 				}
-				#if defined(TOADLET_HAS_DIRECT3DMOBILE) && defined(TOADLET_FIXED_POINT)
+				#if defined(TOADLET_SET_D3DM) && defined(TOADLET_FIXED_POINT)
 					scalar t;
 				#else
 					float t;
@@ -789,7 +795,7 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 			TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
 		}
 
-		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		#if defined(TOADLET_SET_D3DM)
 			mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSU,D3D9Renderer::getD3DTADDRESS(textureStage->uAddressMode));
 			mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSV,D3D9Renderer::getD3DTADDRESS(textureStage->vAddressMode));
 			mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSW,D3D9Renderer::getD3DTADDRESS(textureStage->wAddressMode));
@@ -879,7 +885,7 @@ void D3D9Renderer::setLight(int i,Light *light){
 			break;
 		}
 		case Light::Type_SPOT:{
-			#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+			#if !defined(TOADLET_SET_D3DM)
 				d3dlight.Type=D3DLIGHT_SPOT;
 				toD3DVECTOR(d3dlight.Position,light->position);
 			#endif
@@ -889,7 +895,7 @@ void D3D9Renderer::setLight(int i,Light *light){
 
 	toD3DCOLORVALUE(d3dlight.Diffuse,light->diffuseColor);
 	toD3DCOLORVALUE(d3dlight.Specular,light->specularColor);
-	#if !defined(TOADLET_HAS_DIRECT3DMOBILE) && defined(TOADLET_FIXED_POINT)
+	#if !defined(TOADLET_SET_D3DM) && defined(TOADLET_FIXED_POINT)
 		d3dlight.Attenuation1=scalarToFloat(light->linearAttenuation);
 		d3dlight.Range=scalarToFloat(light->radius);
 	#else
@@ -915,7 +921,7 @@ void D3D9Renderer::setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D
 	capabilitySet.hardwareTextures=true;
 	capabilitySet.hardwareIndexBuffers=true;
 	capabilitySet.hardwareVertexBuffers=true;
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if defined(TOADLET_SET_D3DM)
 		capabilitySet.pointSprites=false;
 	#else
 		capabilitySet.pointSprites=(caps.FVFCaps & D3DFVFCAPS_PSIZE)!=0 && caps.MaxPointSize>1.0f;
@@ -925,12 +931,12 @@ void D3D9Renderer::setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D
 	capabilitySet.maxTextureSize=math::Math::minVal(caps.MaxTextureWidth,caps.MaxTextureHeight);
 	capabilitySet.textureDot3=(caps.TextureOpCaps & D3DTEXOPCAPS_DOTPRODUCT3)!=0;
 	capabilitySet.textureNonPowerOf2=(caps.TextureCaps & D3DPTEXTURECAPS_POW2)==0 && (caps.TextureCaps & D3DPTEXTURECAPS_SQUAREONLY)==0;
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if defined(TOADLET_SET_D3DM)
 		capabilitySet.textureNonPowerOf2Restricted=false;
 	#else
 		capabilitySet.textureNonPowerOf2Restricted=(caps.TextureCaps & D3DPTEXTURECAPS_NONPOW2CONDITIONAL)!=0;
 	#endif
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if defined(TOADLET_SET_D3DM)
 		capabilitySet.textureAutogenMipMaps=false;
 	#else
 		capabilitySet.textureAutogenMipMaps=(caps.Caps2 & D3DCAPS2_CANAUTOGENMIPMAP)!=0;
@@ -938,14 +944,14 @@ void D3D9Renderer::setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D
 	capabilitySet.renderToTexture=renderToTexture;
 	capabilitySet.renderToDepthTexture=renderToDepthTexture;
 	capabilitySet.renderToTextureNonPowerOf2Restricted=capabilitySet.textureNonPowerOf2Restricted && capabilitySet.renderToTexture;
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE) && defined(TOADLET_FIXED_POINT)
+	#if defined(TOADLET_SET_D3DM) && defined(TOADLET_FIXED_POINT)
 		capabilitySet.idealVertexFormatBit=VertexFormat::Format_BIT_FIXED_32;
 	#else
 		capabilitySet.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
 	#endif
 	capabilitySet.triangleFan=true;
 
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if defined(TOADLET_SET_D3DM)
 		Logger::alert(Categories::TOADLET_PEEPER,
 			String("D3DM has lockable textures:")+((caps.SurfaceCaps & D3DMSURFCAPS_LOCKTEXTURE)>0));
 	#endif
@@ -1041,7 +1047,7 @@ void D3D9Renderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &r
 
 int D3D9Renderer::getClosestTextureFormat(int format){
 	switch(format){
-		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		#if defined(TOADLET_SET_D3DM)
 			case Texture::Format_L_8:
 				return Texture::Format_BGR_5_6_5;
 			case Texture::Format_A_8:
@@ -1072,7 +1078,7 @@ bool D3D9Renderer::isD3DFORMATValid(D3DFORMAT textureFormat,DWORD usage){
 
 D3DFORMAT D3D9Renderer::getD3DFORMAT(int format){
 	switch(format){
-		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+		#if !defined(TOADLET_SET_D3DM)
 			case Texture::Format_L_8:
 				return D3DFMT_L8;
 			case Texture::Format_LA_8:
@@ -1152,8 +1158,9 @@ DWORD D3D9Renderer::getFVF(VertexFormat *vertexFormat){
 	int texCoordCount=0;
 	for(i=0;i<vertexFormat->getNumElements();++i){
 		int semantic=vertexFormat->getSemantic(i);
+		int index=vertexFormat->getIndex(i);
 		int format=vertexFormat->getFormat(i);
-		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		#if defined(TOADLET_SET_D3DM)
 			if(semantic==VertexFormat::Semantic_POSITION && format==(VertexFormat::Format_BIT_FIXED_32|VertexFormat::Format_BIT_COUNT_3)){
 				fvf|=D3DMFVF_XYZ_FIXED;
 			}
@@ -1174,13 +1181,15 @@ DWORD D3D9Renderer::getFVF(VertexFormat *vertexFormat){
 				fvf|=D3DFVF_NORMAL;
 			}
 		#endif
-		else if(semantic==VertexFormat::Semantic_COLOR_DIFFUSE && format==VertexFormat::Format_COLOR_RGBA){
-			fvf|=D3DFVF_DIFFUSE;
+		else if(semantic==VertexFormat::Semantic_COLOR && format==VertexFormat::Format_COLOR_RGBA){
+			if(index==0){
+				fvf|=D3DFVF_DIFFUSE;
+			}
+			else if(index==1){
+				fvf|=D3DFVF_SPECULAR;
+			}
 		}
-		else if(semantic==VertexFormat::Semantic_COLOR_SPECULAR && format==VertexFormat::Format_COLOR_RGBA){
-			fvf|=D3DFVF_SPECULAR;
-		}
-		else if(semantic>=VertexFormat::Semantic_TEX_COORD){
+		else if(semantic==VertexFormat::Semantic_TEX_COORD){
 			if((format&VertexFormat::Format_BIT_COUNT_1)>0){
 				fvf|=D3DFVF_TEXCOORDSIZE1(texCoordCount);
 			}
@@ -1191,7 +1200,7 @@ DWORD D3D9Renderer::getFVF(VertexFormat *vertexFormat){
 				fvf|=D3DFVF_TEXCOORDSIZE3(texCoordCount);
 			}
 			else if((format&VertexFormat::Format_BIT_COUNT_4)>0){
-				#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+				#if defined(TOADLET_SET_D3DM)
 					Logger::error(Categories::TOADLET_PEEPER,
 						"D3D9VertexBuffer: Invalid tex coord count");
 				#else
@@ -1199,7 +1208,7 @@ DWORD D3D9Renderer::getFVF(VertexFormat *vertexFormat){
 				#endif
 			}
 
-			#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+			#if defined(TOADLET_SET_D3DM)
 				if((format&VertexFormat::Format_BIT_FIXED_32)>0){
 					fvf|=D3DMFVF_TEXCOORDFIXED(texCoordCount);
 				}
@@ -1232,7 +1241,7 @@ DWORD D3D9Renderer::getFVF(VertexFormat *vertexFormat){
 		case 4:
 			fvf|=D3DFVF_TEX4;
 		break;
-		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+		#if !defined(TOADLET_SET_D3DM)
 			case 5:
 				fvf|=D3DFVF_TEX5;
 			break;

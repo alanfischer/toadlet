@@ -289,8 +289,8 @@ void MeshNode::updateVertexBuffer(){
 		VertexBuffer::ptr dstVertexBuffer=mDynamicVertexData->getVertexBuffer(0);
 
 		VertexFormat *format=srcVertexBuffer->getVertexFormat();
-		int positionIndex=format->getIndexOfSemantic(VertexFormat::Semantic_POSITION);
-		int normalIndex=format->getIndexOfSemantic(VertexFormat::Semantic_NORMAL);
+		int positionIndex=format->findSemantic(VertexFormat::Semantic_POSITION);
+		int normalIndex=format->findSemantic(VertexFormat::Semantic_NORMAL);
 
 		{
 			svba.lock(srcVertexBuffer,Buffer::Access_BIT_READ);

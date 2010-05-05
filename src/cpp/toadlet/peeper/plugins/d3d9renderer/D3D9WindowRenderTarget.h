@@ -65,7 +65,7 @@ protected:
 
 	Visual mVisual;
 	UINT mAdaptor;
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if defined(TOADLET_SET_D3DM)
 		D3DMDEVTYPE mDevType;
 	#else
 		D3DDEVTYPE mDevType;

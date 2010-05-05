@@ -78,9 +78,9 @@ void Font::destroy(){
 bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const String &string,const Color &color,int alignment,bool pixelSpace,bool flip){
 	VertexFormat *format=vertexBuffer->getVertexFormat();
 
-	int positionIndex=format->getIndexOfSemantic(VertexFormat::Semantic_POSITION);
-	int texCoordIndex=format->getIndexOfSemantic(VertexFormat::Semantic_TEX_COORD);
-	int colorIndex=format->getIndexOfSemantic(VertexFormat::Semantic_COLOR_DIFFUSE);
+	int positionIndex=format->findSemantic(VertexFormat::Semantic_POSITION);
+	int texCoordIndex=format->findSemantic(VertexFormat::Semantic_TEX_COORD);
+	int colorIndex=format->findSemantic(VertexFormat::Semantic_COLOR);
 
 	if(positionIndex<0 || texCoordIndex<0){
 		Error::unknown(Categories::TOADLET_TADPOLE,

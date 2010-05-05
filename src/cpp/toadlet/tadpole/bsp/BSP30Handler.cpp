@@ -250,10 +250,10 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 	int i,j;
 
 	VertexFormat::ptr vertexFormat=mEngine->getBufferManager()->createVertexFormat();
-	vertexFormat->addElement(VertexFormat::Semantic_POSITION,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3);
-	vertexFormat->addElement(VertexFormat::Semantic_NORMAL,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3);
-	vertexFormat->addElement(VertexFormat::Semantic_TEX_COORD,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_2);
-	vertexFormat->addElement(VertexFormat::Semantic_TEX_COORD_2,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_2);
+	vertexFormat->addElement(VertexFormat::Semantic_POSITION,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3);
+	vertexFormat->addElement(VertexFormat::Semantic_NORMAL,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3);
+	vertexFormat->addElement(VertexFormat::Semantic_TEX_COORD,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_2);
+	vertexFormat->addElement(VertexFormat::Semantic_TEX_COORD,1,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_2);
 	vertexFormat->create();
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,map->nsurfedges);
 

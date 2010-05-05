@@ -31,7 +31,7 @@
 #include <toadlet/egg/Logger.h>
 #include <windows.h>
 #include <commctrl.h>
-#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+#if defined(TOADLET_SET_D3DM)
 	#include <d3dm.h>
 #else
 	#include <d3d9.h>
@@ -42,19 +42,29 @@
 namespace toadlet{
 namespace peeper{
 
-#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+#if defined(TOADLET_SET_D3DM)
 	#if defined(TOADLET_FIXED_POINT)
 		#define	TOADLET_D3DMFMT ,D3DMFMT_D3DMVALUE_FIXED
 	#else
 		#define	TOADLET_D3DMFMT ,D3DMFMT_D3DMVALUE_FLOAT
 	#endif
 	#define TOADLET_SHAREDHANDLE
+
+	#define D3D9Buffer					D3DMBuffer
+	#define D3D9Query					D3DMQuery
+	#define D3D9Renderer				D3DMRenderer
+	#define D3D9RenderTarget			D3DMRenderTarget
+	#define D3D9Surface					D3DMSurface
+	#define D3D9SurfaceRenderTarget		D3DMSurfaceRenderTarget
+	#define D3D9Texture					D3DMTexture
+	#define D3D9VertexFormat			D3DMVertexFormat
+	#define D3D9WindowRenderTarget		D3DMWindowRenderTarget
 #else
 	#define	TOADLET_D3DMFMT
 	#define	TOADLET_SHAREDHANDLE ,NULL
 #endif
 
-#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+#if defined(TOADLET_SET_D3DM)
 	inline D3DMCOLOR toD3DCOLOR(const Color &c){
 		return D3DMCOLOR_RGBA(Math::toInt(c.r*255),Math::toInt(c.g*255),Math::toInt(c.b*255),Math::toInt(c.a*255));
 	}
@@ -64,7 +74,7 @@ namespace peeper{
 	}
 #endif
 
-#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+#if defined(TOADLET_SET_D3DM)
 	inline void toD3DCOLORVALUE(D3DMCOLORVALUE &r,const Color &c){
 		r.r=c.r; r.g=c.g; r.b=c.b; r.a=c.a;
 	}
@@ -80,7 +90,7 @@ namespace peeper{
 	#endif
 #endif
 
-#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+#if defined(TOADLET_SET_D3DM)
 	inline void toD3DVECTOR(D3DMVECTOR &r,const Vector3 &s){
 		r.x=s.x; r.y=s.y; r.z=s.z;
 	}
@@ -96,7 +106,7 @@ namespace peeper{
 	#endif
 #endif
 
-#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+#if defined(TOADLET_SET_D3DM)
 	inline void toD3DMATRIX(D3DMMATRIX &r,const Matrix4x4 &s){
 		r.m[0][0]=s.at(0,0);
 		r.m[1][0]=s.at(0,1);
@@ -157,7 +167,7 @@ namespace peeper{
 	#endif
 #endif
 
-#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+#if defined(TOADLET_SET_D3DM)
 	#define TOADLET_D3D9_DLL_NAME TEXT("D3DM.DLL")
 	#define TOADLET_D3D9_DEBUG_DLL_NAME TEXT("D3DM.DLL")
 	#define TOADLET_D3D9_CREATE_NAME TEXT("Direct3DMobileCreate")
@@ -167,7 +177,7 @@ namespace peeper{
 	#define TOADLET_D3D9_CREATE_NAME TEXT("Direct3DCreate9")
 #endif
 
-#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+#if defined(TOADLET_SET_D3DM)
 	#define D3D_SDK_VERSION		D3DM_SDK_VERSION
 	#define D3DADAPTER_DEFAULT	D3DMADAPTER_DEFAULT
 	#define D3DDEVTYPE			D3DMDEVTYPE

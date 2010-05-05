@@ -124,7 +124,7 @@ bool D3D9Texture::createContext(bool restore){
 	IDirect3DDevice9 *device=mRenderer->getDirect3DDevice9();
 
 	mD3DUsage=
-		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		#if defined(TOADLET_SET_D3DM)
 			D3DUSAGE_LOCKABLE;
 		#else
 			0;
@@ -137,7 +137,7 @@ bool D3D9Texture::createContext(bool restore){
 	}
 
 	mD3DPool=
-		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		#if defined(TOADLET_SET_D3DM)
 			D3DPOOL_MANAGED;
 		#else
 			(mUsage&Usage_BIT_RENDERTARGET)>0 ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
@@ -151,7 +151,7 @@ bool D3D9Texture::createContext(bool restore){
 	}
 
 	mManuallyGenerateMipLevels=(mUsage&Usage_BIT_AUTOGEN_MIPMAPS)>0;
-	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if !defined(TOADLET_SET_D3DM)
 		if(mManuallyGenerateMipLevels && mRenderer->isD3DFORMATValid(mD3DFormat,D3DUSAGE_AUTOGENMIPMAP)){
 			mD3DUsage|=D3DUSAGE_AUTOGENMIPMAP;
 			mManuallyGenerateMipLevels=false;
@@ -166,7 +166,7 @@ bool D3D9Texture::createContext(bool restore){
 			result=device->CreateTexture(mWidth,mHeight,mMipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
 			mTexture=texture;
 		}break;
-		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+		#if !defined(TOADLET_SET_D3DM)
 			case Texture::Dimension_D3:{
 				IDirect3DVolumeTexture9 *texture=NULL;
 				result=device->CreateVolumeTexture(mWidth,mHeight,mDepth,mMipLevels,mD3DUsage,mD3DFormat,mD3DPool,&texture TOADLET_SHAREDHANDLE);
@@ -180,7 +180,7 @@ bool D3D9Texture::createContext(bool restore){
 		#endif
 	}
 
-	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if !defined(TOADLET_SET_D3DM)
 		if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
 			if(restore && mBackupSurface!=NULL){
 				IDirect3DSurface9 *surface=NULL;
@@ -205,7 +205,7 @@ bool D3D9Texture::createContext(bool restore){
 bool D3D9Texture::destroyContext(bool backup){
 	if(backup){
 		HRESULT result=S_OK;
-		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+		#if !defined(TOADLET_SET_D3DM)
 			if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
 				result=mRenderer->getDirect3DDevice9()->CreateOffscreenPlainSurface(mWidth,mHeight,mD3DFormat,D3DPOOL_SYSTEMMEM,&mBackupSurface,NULL);
 				TOADLET_CHECK_D3D9ERROR(result,"CreateOffscreenPlainSurface");
@@ -248,7 +248,7 @@ Surface::ptr D3D9Texture::getMipSurface(int level,int cubeSide){
 		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
 		texture->GetSurfaceLevel(level,&surface);
 	}
-	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if !defined(TOADLET_SET_D3DM)
 		else if(mDimension==Texture::Dimension_CUBE){
 			IDirect3DCubeTexture9 *texture=(IDirect3DCubeTexture9*)mTexture;
 			texture->GetCubeMapSurface((D3DCUBEMAP_FACES)cubeSide,level,&surface);
@@ -288,7 +288,7 @@ bool D3D9Texture::load(int width,int height,int depth,int mipLevel,byte *mipData
 	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
 		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
 
-		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+		#if !defined(TOADLET_SET_D3DM)
 			if(mD3DPool==D3DPOOL_DEFAULT){
 				IDirect3DSurface9 *offscreenSurface=NULL;
 				result=mRenderer->getDirect3DDevice9()->CreateOffscreenPlainSurface(mWidth,mHeight,mD3DFormat,D3DPOOL_SYSTEMMEM,&offscreenSurface,NULL);
@@ -328,7 +328,7 @@ bool D3D9Texture::load(int width,int height,int depth,int mipLevel,byte *mipData
 			}
 		}
 	}
-	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if !defined(TOADLET_SET_D3DM)
 		else if(mDimension==Texture::Dimension_D3){
 			IDirect3DVolumeTexture9 *texture=(IDirect3DVolumeTexture9*)mTexture;
 
@@ -364,7 +364,7 @@ bool D3D9Texture::load(int width,int height,int depth,int mipLevel,byte *mipData
 	}
 
 	if(mManuallyGenerateMipLevels){
-		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+		#if !defined(TOADLET_SET_D3DM)
 			mTexture->GenerateMipSubLevels();
 		#endif
 	}
@@ -394,7 +394,7 @@ bool D3D9Texture::read(int width,int height,int depth,int mipLevel,byte *mipData
 	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
 		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
 
-		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+		#if !defined(TOADLET_SET_D3DM)
 			if(mD3DPool==D3DPOOL_DEFAULT){
 				IDirect3DSurface9 *offscreenSurface=NULL;
 				result=mRenderer->getDirect3DDevice9()->CreateOffscreenPlainSurface(mWidth,mHeight,mD3DFormat,D3DPOOL_SYSTEMMEM,&offscreenSurface,NULL);
@@ -434,7 +434,7 @@ bool D3D9Texture::read(int width,int height,int depth,int mipLevel,byte *mipData
 			}
 		}
 	}
-	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if !defined(TOADLET_SET_D3DM)
 		else if(mDimension==Texture::Dimension_D3){
 			if(mD3DPool==D3DPOOL_DEFAULT){
 				return false;
@@ -462,7 +462,7 @@ bool D3D9Texture::read(int width,int height,int depth,int mipLevel,byte *mipData
 }
 
 bool D3D9Texture::needsReset(){
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if defined(TOADLET_SET_D3DM)
 		return false;
 	#else
 		return mD3DPool==D3DPOOL_DEFAULT;

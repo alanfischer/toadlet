@@ -625,16 +625,16 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 				}
 
 				if(t=="Position"){
-					vertexFormat->addElement(VertexFormat::Semantic_POSITION,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3);
+					vertexFormat->addElement(VertexFormat::Semantic_POSITION,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3);
 				}
 				else if(t=="Normal"){
-					vertexFormat->addElement(VertexFormat::Semantic_NORMAL,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3);
+					vertexFormat->addElement(VertexFormat::Semantic_NORMAL,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3);
 				}
 				else if(t=="TexCoord"){
-					vertexFormat->addElement(VertexFormat::Semantic_TEX_COORD,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_2);
+					vertexFormat->addElement(VertexFormat::Semantic_TEX_COORD,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_2);
 				}
 				else if(t=="Color"){
-					vertexFormat->addElement(VertexFormat::Semantic_COLOR_DIFFUSE,VertexFormat::Format_COLOR_RGBA);
+					vertexFormat->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_COLOR_RGBA);
 				}
 				else if(t=="Bone"){
 					mesh->vertexBoneAssignments.resize(count);
@@ -670,10 +670,10 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 			vertexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,count);
 		}
 
-		int pi=vertexFormat->getIndexOfSemantic(VertexFormat::Semantic_POSITION);
-		int ni=vertexFormat->getIndexOfSemantic(VertexFormat::Semantic_NORMAL);
-		int ti=vertexFormat->getIndexOfSemantic(VertexFormat::Semantic_TEX_COORD);
-		int ci=vertexFormat->getIndexOfSemantic(VertexFormat::Semantic_COLOR_DIFFUSE);
+		int pi=vertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
+		int ni=vertexFormat->findSemantic(VertexFormat::Semantic_NORMAL);
+		int ti=vertexFormat->findSemantic(VertexFormat::Semantic_TEX_COORD);
+		int ci=vertexFormat->findSemantic(VertexFormat::Semantic_COLOR);
 
 		VertexBufferAccessor vba;
 		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
@@ -731,7 +731,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 						else if(sematic==VertexFormat::Semantic_TEX_COORD){
 							vba.set2(l,ti,parseVector2(element));
 						}
-						else if(sematic==VertexFormat::Semantic_COLOR_DIFFUSE){
+						else if(sematic==VertexFormat::Semantic_COLOR){
 							vba.setRGBA(l,ci,parseColor(element).getRGBA());
 						}
 						else if(mesh->vertexBoneAssignments.size()>0){
@@ -888,10 +888,10 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version){
 
 		VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
 		String type;
-		int pi=vertexFormat->getIndexOfSemantic(VertexFormat::Semantic_POSITION);
-		int ni=vertexFormat->getIndexOfSemantic(VertexFormat::Semantic_NORMAL);
-		int ti=vertexFormat->getIndexOfSemantic(VertexFormat::Semantic_TEX_COORD);
-		int ci=vertexFormat->getIndexOfSemantic(VertexFormat::Semantic_COLOR_DIFFUSE);
+		int pi=vertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
+		int ni=vertexFormat->findSemantic(VertexFormat::Semantic_NORMAL);
+		int ti=vertexFormat->findSemantic(VertexFormat::Semantic_TEX_COORD);
+		int ci=vertexFormat->findSemantic(VertexFormat::Semantic_COLOR);
 
 		if(pi>=0){
 			type+="Position,";

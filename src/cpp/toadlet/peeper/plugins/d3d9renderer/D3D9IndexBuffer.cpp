@@ -105,7 +105,7 @@ bool D3D9IndexBuffer::createContext(bool restore){
 	mD3DPool=D3DPOOL_MANAGED;
 	if((mUsage&Usage_BIT_DYNAMIC)>0){
 		mD3DUsage|=D3DUSAGE_DYNAMIC;
-		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+		#if !defined(TOADLET_SET_D3DM)
 			mD3DPool=D3DPOOL_DEFAULT;
 		#endif
 	}
@@ -215,7 +215,7 @@ bool D3D9IndexBuffer::unlock(){
 }
 
 bool D3D9IndexBuffer::needsReset(){
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if defined(TOADLET_SET_D3DM)
 		return false;
 	#else
 		return mD3DPool==D3DPOOL_DEFAULT;

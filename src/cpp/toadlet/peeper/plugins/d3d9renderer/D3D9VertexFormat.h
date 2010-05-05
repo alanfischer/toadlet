@@ -41,33 +41,35 @@ public:
 
 	VertexFormat *getRootVertexFormat(){return this;}
 
-	void addElement(int semantic,int format);
+	void addElement(int semantic,int index,int format);
 	bool create();
 	void destroy();
 
 	int getNumElements() const{return mSemantics.size();}
 	int getSemantic(int i) const{return mSemantics[i];}
+	int getIndex(int i) const{return mIndexes[i];}
 	int getFormat(int i) const{return mFormats[i];}
 	int getOffset(int i) const{return mOffsets[i];}
-	int getIndexOfSemantic(int semantic);
+	int findSemantic(int semantic);
 	int getVertexSize() const{return mVertexSize;}
 
 	inline DWORD getFVF() const{return mFVF;}
 
 	BYTE getD3DDECLTYPE(int format);
 	BYTE getD3DDECLUSAGE(int semantic);
-	BYTE getUsageIndex(int semantic);
 
 protected:
 	D3D9Renderer *mRenderer;
 
 	egg::Collection<int> mSemantics;
+	egg::Collection<int> mIndexes;
 	egg::Collection<int> mFormats;
 	egg::Collection<int> mOffsets;
+	int mVertexSize;
 
 	DWORD mFVF;
+	D3DVERTEXELEMENT9 *mElements;
 	IDirect3DVertexDeclaration9 *mDeclaration;
-	int mVertexSize;
 
 	friend class D3D9Renderer;
 };

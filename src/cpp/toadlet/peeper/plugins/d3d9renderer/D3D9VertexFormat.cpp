@@ -35,13 +35,15 @@ namespace peeper{
 D3D9VertexFormat::D3D9VertexFormat(D3D9Renderer *renderer):
 	mRenderer(NULL),
 
-	//mSemantics.add(semantic);
-	//mFormats.add(format);
-	//mOffsets.add(mVertexSize);
+	//mSemantics,
+	//mIndexes,
+	//mFormats,
+	//mOffsets,
+	mVertexSize(0),
 
 	mFVF(0),
-	mDeclaration(NULL),
-	mVertexSize(0)
+	mElements(NULL),
+	mDeclaration(NULL)
 {
 	mRenderer=renderer;
 }
@@ -50,8 +52,9 @@ D3D9VertexFormat::~D3D9VertexFormat(){
 	destroy();
 }
 
-void D3D9VertexFormat::addElement(int semantic,int format){
+void D3D9VertexFormat::addElement(int semantic,int index,int format){
 	mSemantics.add(semantic);
+	mIndexes.add(index);
 	mFormats.add(format);
 	mOffsets.add(mVertexSize);
 
@@ -67,29 +70,33 @@ bool D3D9VertexFormat::create(){
 	int i;
 	for(i=0;i<mSemantics.size();++i){
 		D3DVERTEXELEMENT9 element={
-			0,mOffsets[i],getD3DDECLTYPE(mFormats[i]),D3DDECLMETHOD_DEFAULT,getD3DDECLUSAGE(mSemantics[i]),getUsageIndex(mSemantics[i])
+			0,mOffsets[i],getD3DDECLTYPE(mFormats[i]),D3DDECLMETHOD_DEFAULT,getD3DDECLUSAGE(mSemantics[i]),mIndexes[i]
 		};
 		elements[i]=element;
 	}
 	D3DVERTEXELEMENT9 element=D3DDECL_END();
 	elements[mSemantics.size()]=element;
+	mElements=elements;
 
-	HRESULT result=mRenderer->getDirect3DDevice9()->CreateVertexDeclaration(elements,&mDeclaration);
+	HRESULT result=mRenderer->getDirect3DDevice9()->CreateVertexDeclaration(mElements,&mDeclaration);
 	TOADLET_CHECK_D3D9ERROR(result,"CreateVertexDeclaration");
-
-	delete[] elements;
 
 	return SUCCEEDED(result);
 }
 
 void D3D9VertexFormat::destroy(){
+	if(mElements!=NULL){
+		delete[] mElements;
+		mElements=NULL;
+	}
+
 	if(mDeclaration!=NULL){
 		mDeclaration->Release();
 		mDeclaration=NULL;
 	}
 }
 
-int D3D9VertexFormat::getIndexOfSemantic(int semantic){
+int D3D9VertexFormat::findSemantic(int semantic){
 	TOADLET_ASSERT(mFVF!=0);
 
 	int i;
@@ -138,28 +145,13 @@ BYTE D3D9VertexFormat::getD3DDECLUSAGE(int semantic){
 			return D3DDECLUSAGE_BLENDINDICES;
 		case Semantic_NORMAL:
 			return D3DDECLUSAGE_NORMAL;
-		case Semantic_COLOR_DIFFUSE:
-		case Semantic_COLOR_SPECULAR:
+		case Semantic_COLOR:
 			return D3DDECLUSAGE_COLOR;
-	}
-	if(semantic>=Semantic_TEX_COORD){
-		return D3DDECLUSAGE_TEXCOORD;
-	}
-	else{
-		Error::unknown("unknown D3DDECLUSAGE");
-		return -1;
-	}
-}
-
-BYTE D3D9VertexFormat::getUsageIndex(int semantic){
-	if(semantic==Semantic_COLOR_SPECULAR){
-		return 1;
-	}
-	else if(semantic>Semantic_TEX_COORD){
-		return semantic-Semantic_TEX_COORD;
-	}
-	else{
-		return 0;
+		case Semantic_TEX_COORD:
+			return D3DDECLUSAGE_TEXCOORD;
+		default:
+			Error::unknown("unknown D3DDECLUSAGE");
+			return -1;
 	}
 }
 

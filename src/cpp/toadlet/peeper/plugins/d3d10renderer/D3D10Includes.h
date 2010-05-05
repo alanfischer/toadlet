@@ -32,12 +32,28 @@
 #include <toadlet/egg/Error.h>
 #include <windows.h>
 #include <commctrl.h>
-#include <d3d10.h>
+#if defined(TOADLET_SET_D3D10)
+	#include <d3d10.h>
+#else
+	#include <d3d11.h>
+#endif
 
 #include <toadlet/egg/EndianConversion.h>
 
 namespace toadlet{
 namespace peeper{
+
+#if !defined(TOADLET_SET_D3D10)
+	#define D3D10Buffer					D3D11Buffer
+	#define D3D10Query					D3D11Query
+	#define D3D10Renderer				D3D11Renderer
+	#define D3D10RenderTarget			D3D11RenderTarget
+	#define D3D10Surface				D3D11Surface
+	#define D3D10SurfaceRenderTarget	D3D11SurfaceRenderTarget
+	#define D3D10Texture				D3D11Texture
+	#define D3D10VertexFormat			D3D11VertexFormat
+	#define D3D10WindowRenderTarget		D3D11WindowRenderTarget
+#endif
 /*
 inline D3DCOLOR toD3DCOLOR(const Color &c){
 	return D3DCOLOR_RGBA(Math::toInt(c.r*255),Math::toInt(c.g*255),Math::toInt(c.b*255),Math::toInt(c.a*255));

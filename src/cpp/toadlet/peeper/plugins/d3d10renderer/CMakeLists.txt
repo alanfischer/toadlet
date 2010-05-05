@@ -5,6 +5,7 @@ set (PEEPER_D3D10RENDERER_SRC
 	D3D10Texture.cpp
 	D3D10Surface.cpp
 	D3D10SurfaceRenderTarget.cpp
+	D3D10VertexFormat.cpp
 	D3D10WindowRenderTarget.cpp
 )
 
@@ -18,8 +19,13 @@ set (PEEPER_D3D10RENDERER_HEADERS
 	D3D10Surface.h
 	D3D10SurfaceRenderTarget.h
 	D3D10Texture.h
+	D3D10VertexFormat.h
 	D3D10WindowRenderTarget.h
 )
+
+
+# Definitions
+add_definitions(-DTOADLET_SET_D3D10)
 
 
 # Dependencies - note that D3D10 has already been found

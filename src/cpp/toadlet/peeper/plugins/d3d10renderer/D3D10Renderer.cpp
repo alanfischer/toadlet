@@ -24,10 +24,11 @@
  ********** Copyright header - do not remove **********/
 
 #include "D3D10Renderer.h"
-#include "D3D10Texture.h"
+#include "D3D10Buffer.h"
 #include "D3D10RenderTarget.h"
 #include "D3D10SurfaceRenderTarget.h"
-#include "D3D10Buffer.h"
+#include "D3D10Texture.h"
+#include "D3D10VertexFormat.h"
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/LightEffect.h>
@@ -41,9 +42,15 @@ using namespace toadlet::egg::MathConversion;
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API Renderer* new_D3D10Renderer(){
-	return new D3D10Renderer();
-}
+#if defined(TOADLET_SET_D3D10)
+	TOADLET_C_API Renderer* new_D3D10Renderer(){
+		return new D3D10Renderer();
+	}
+#else
+	TOADLET_C_API Renderer* new_D3D11Renderer(){
+		return new D3D10Renderer();
+	}
+#endif
 
 #if defined(TOADLET_BUILD_DYNAMIC)
 	TOADLET_C_API Renderer* new_Renderer(){
@@ -64,11 +71,6 @@ D3D10Renderer::D3D10Renderer():
 D3D10Renderer::~D3D10Renderer(){
 	destroy();
 }
-
-
-LPD3D10EFFECT g_lpEffect = NULL;
-LPD3D10EFFECTTECHNIQUE pTechnique=NULL;
-ID3D10ShaderResourceView *g_texture=NULL;
 
 bool D3D10Renderer::create(RenderTarget *target,int *options){
 	Logger::alert(Categories::TOADLET_PEEPER,
@@ -118,7 +120,7 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 
 
 
-	char *effect=
+	char *effectstring=
 "float4x4 ShaderMatrix;\n"
 "Texture2D diffuseTexture;\n"
 "SamplerState samLinear{\n"
@@ -133,7 +135,7 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
     "float2 TexCoords : TEXCOORD0;\n"
 "};\n"
 
-"VS_OUTPUT VS( float4 Pos : POSITION, float4 Color : COLOR, float2 TexCoords : TEXCOORD){\n"
+"VS_OUTPUT VS( float4 Pos : POSITION, float4 Color : NORMAL, float2 TexCoords : TEXCOORD){\n"
   "VS_OUTPUT Output = (VS_OUTPUT)0;\n"
   "Output.Pos = mul(Pos, ShaderMatrix);\n"
   "Output.Color = Color;\n"
@@ -159,36 +161,15 @@ HMODULE library=LoadLibrary(TOADLET_D3D10_DLL_NAME);
 ID3D10Blob *compiledEffect=NULL;
 typedef HRESULT(WINAPI *D3D10CompileEffectFromMemory)(void *pData,SIZE_T DataLength,LPCSTR pSrcFileName,const D3D10_SHADER_MACRO *pDefines,ID3D10Include *pInclude,UINT HLSLFlags,UINT FXFlags,ID3D10Blob **ppCompiledEffect,ID3D10Blob **ppErrors);
 void *compile=GetProcAddress(library,"D3D10CompileEffectFromMemory");
-((D3D10CompileEffectFromMemory)compile)(effect,strlen(effect),0,0,0,0,0,&compiledEffect,0);
+((D3D10CompileEffectFromMemory)compile)(effectstring,strlen(effectstring),0,0,0,0,0,&compiledEffect,0);
 
 typedef HRESULT(WINAPI *D3D10CreateEffectFromMemory)(void *pData,SIZE_T DataLength,UINT FXFlags,ID3D10Device *pDevice,ID3D10EffectPool *pEffectPool,ID3D10Effect **ppEffect);
 void *create=GetProcAddress(library,"D3D10CreateEffectFromMemory");
-((D3D10CreateEffectFromMemory)create)(compiledEffect->GetBufferPointer(),compiledEffect->GetBufferSize(),0,mD3DDevice,NULL,&g_lpEffect);
+((D3D10CreateEffectFromMemory)create)(compiledEffect->GetBufferPointer(),compiledEffect->GetBufferSize(),0,mD3DDevice,NULL,&effect);
 
 // Obtain the technique
-pTechnique = g_lpEffect->GetTechniqueByName( "Render" );
-
-
-	// Define the input layout (replaces VertexDeclaration from D3D9)
-	D3D10_INPUT_ELEMENT_DESC elementDesc[] =
-	{
-		{ TEXT("POSITION"), 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D10_INPUT_PER_VERTEX_DATA, 0 },  
-		{ TEXT("COLOR"),    0, DXGI_FORMAT_R32G32B32_FLOAT,  0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0 },  
-		{ TEXT("TEXCOORD"), 0, DXGI_FORMAT_R32G32_FLOAT,    0, 24, D3D10_INPUT_PER_VERTEX_DATA, 0 },
-	};
-	UINT numElements = sizeof(elementDesc)/sizeof(elementDesc[0]);
-
-	// Create the input layout
-	ID3D10InputLayout* pVertexLayout = NULL;
-	D3D10_PASS_DESC PassDesc;
-	pTechnique->GetPassByIndex( 0 )->GetDesc( &PassDesc );
-	if( FAILED( mD3DDevice->CreateInputLayout( elementDesc, numElements, PassDesc.pIAInputSignature, 
-		PassDesc.IAInputSignatureSize, &pVertexLayout ) ) )
-		return FALSE;
-	// Set the input layout
-	mD3DDevice->IASetInputLayout( pVertexLayout );
-
-
+technique = effect->GetTechniqueByName( "Render" );
+technique->GetPassByIndex( 0 )->GetDesc( &passDesc);
 
 	return true;
 }
@@ -218,7 +199,7 @@ SurfaceRenderTarget *D3D10Renderer::createSurfaceRenderTarget(){
 }
 
 VertexFormat *D3D10Renderer::createVertexFormat(){
-	return NULL;
+	return new D3D10VertexFormat(this);
 }
 
 VertexBuffer *D3D10Renderer::createVertexBuffer(){
@@ -332,6 +313,10 @@ void D3D10Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Inde
 
 	// Set vertex buffer
 	D3D10Buffer *vertexBuffer=(D3D10Buffer*)vertexData->getVertexBuffer(0)->getRootVertexBuffer();
+	D3D10VertexFormat *vertexFormat=(D3D10VertexFormat*)vertexBuffer->mVertexFormat->getRootVertexFormat();
+
+	mD3DDevice->IASetInputLayout(vertexFormat->mLayout);
+
 	UINT stride=vertexBuffer->mVertexFormat->getVertexSize();
 	UINT offset=0;
 	mD3DDevice->IASetVertexBuffers(0,1,&vertexBuffer->mBuffer,&stride,&offset);
@@ -340,8 +325,8 @@ void D3D10Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Inde
 //	pViewMatrixEffectVariable->SetMatrix(viewMatrix);
 //	pProjectionMatrixEffectVariable->SetMatrix(projectionMatrix);
 	Matrix4x4 shaderMatrix=mProjectionMatrix*mViewMatrix*mModelMatrix;
-	g_lpEffect->GetVariableByName("ShaderMatrix")->AsMatrix()->SetMatrix(shaderMatrix.data);
-	g_lpEffect->GetVariableByName("diffuseTexture")->AsShaderResource()->SetResource(g_texture);
+	effect->GetVariableByName("ShaderMatrix")->AsMatrix()->SetMatrix(shaderMatrix.data);
+	effect->GetVariableByName("diffuseTexture")->AsShaderResource()->SetResource(texture);
 
 	if(indexData->getIndexBuffer()!=NULL){
 		D3D10Buffer *buffer=(D3D10Buffer*)(indexData->getIndexBuffer()->getRootIndexBuffer());
@@ -350,11 +335,12 @@ void D3D10Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Inde
 
 	mD3DDevice->IASetPrimitiveTopology(getD3D10_PRIMITIVE_TOPOLOGY(indexData->primitive));
 
+
 D3D10_TECHNIQUE_DESC techDesc;
-pTechnique->GetDesc( &techDesc );
+technique->GetDesc( &techDesc );
 for( UINT p = 0; p < techDesc.Passes; ++p )
 {
-	pTechnique->GetPassByIndex( p )->Apply(0);
+	technique->GetPassByIndex( p )->Apply(0);
 	if(indexData->getIndexBuffer()){
 		mD3DDevice->DrawIndexed(indexData->count,indexData->start,0);
 	}
@@ -508,10 +494,10 @@ void D3D10Renderer::setTexturePerspective(bool texturePerspective){
 
 void D3D10Renderer::setTextureStage(int stage,TextureStage *textureStage){
 	if(textureStage!=NULL && textureStage->texture!=NULL){
-		g_texture=((D3D10Texture*)(textureStage->texture->getRootTexture(0)))->mShaderResourceView;
+		texture=((D3D10Texture*)(textureStage->texture->getRootTexture(0)))->mShaderResourceView;
 	}
 	else{
-		g_texture=NULL;
+		texture=NULL;
 	}
 
 /*	HRESULT result=S_OK;
@@ -751,14 +737,60 @@ DXGI_FORMAT D3D10Renderer::getIndexDXGI_FORMAT(IndexBuffer::IndexFormat format){
 		break;
 		default:
 			Logger::error(Categories::TOADLET_PEEPER,
-				"D3D10Renderer::getDXGI_FORMAT: Invalid format");
+				"D3D10Renderer::getIndexDXGI_FORMAT: Invalid format");
 			return DXGI_FORMAT_UNKNOWN;
 		break;
 	}
 }
 
-DXGI_FORMAT D3D10Renderer::getTextureDXGI_FORMAT(int textureFormat){
-	switch(textureFormat){
+DXGI_FORMAT D3D10Renderer::getVertexDXGI_FORMAT(int format){
+	switch(format){
+		case VertexFormat::Format_BIT_UINT_8|VertexFormat::Format_BIT_COUNT_1:
+			return DXGI_FORMAT_R8_UINT;
+		case VertexFormat::Format_BIT_UINT_8|VertexFormat::Format_BIT_COUNT_2:
+			return DXGI_FORMAT_R8G8_UINT;
+		case VertexFormat::Format_BIT_UINT_8|VertexFormat::Format_BIT_COUNT_4:
+			return DXGI_FORMAT_R8G8B8A8_UINT;
+
+		case VertexFormat::Format_BIT_INT_8|VertexFormat::Format_BIT_COUNT_1:
+			return DXGI_FORMAT_R8_SINT;
+		case VertexFormat::Format_BIT_INT_8|VertexFormat::Format_BIT_COUNT_2:
+			return DXGI_FORMAT_R8G8_SINT;
+		case VertexFormat::Format_BIT_INT_8|VertexFormat::Format_BIT_COUNT_4:
+			return DXGI_FORMAT_R8G8B8A8_SINT;
+
+		case VertexFormat::Format_BIT_INT_16|VertexFormat::Format_BIT_COUNT_1:
+			return DXGI_FORMAT_R16_SINT;
+		case VertexFormat::Format_BIT_INT_16|VertexFormat::Format_BIT_COUNT_2:
+			return DXGI_FORMAT_R16G16_SINT;
+		case VertexFormat::Format_BIT_INT_16|VertexFormat::Format_BIT_COUNT_4:
+			return DXGI_FORMAT_R16G16B16A16_SINT;
+
+		case VertexFormat::Format_BIT_INT_32|VertexFormat::Format_BIT_COUNT_1:
+			return DXGI_FORMAT_R32_SINT;
+		case VertexFormat::Format_BIT_INT_32|VertexFormat::Format_BIT_COUNT_2:
+			return DXGI_FORMAT_R32G32_SINT;
+		case VertexFormat::Format_BIT_INT_32|VertexFormat::Format_BIT_COUNT_4:
+			return DXGI_FORMAT_R32G32B32A32_SINT;
+
+		case VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_1:
+			return DXGI_FORMAT_R32_FLOAT;
+		case VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_2:
+			return DXGI_FORMAT_R32G32_FLOAT;
+		case VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3:
+			return DXGI_FORMAT_R32G32B32_FLOAT;
+		case VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_4:
+			return DXGI_FORMAT_R32G32B32A32_FLOAT;
+		default:
+			Logger::error(Categories::TOADLET_PEEPER,
+				"D3D10Renderer::getVertexDXGI_FORMAT: Invalid format");
+			return DXGI_FORMAT_UNKNOWN;
+		break;
+	}
+}
+
+DXGI_FORMAT D3D10Renderer::getTextureDXGI_FORMAT(int format){
+	switch(format){
 		case Texture::Format_L_8:
 			return DXGI_FORMAT_R8_UNORM;
 		case Texture::Format_LA_8:
@@ -773,6 +805,19 @@ DXGI_FORMAT D3D10Renderer::getTextureDXGI_FORMAT(int textureFormat){
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"D3D10Texture::getDXGI_FORMAT: Invalid type");
 			return DXGI_FORMAT_UNKNOWN;
+	}
+}
+
+char *D3D10Renderer::getSemanticName(int semantic){
+	switch(semantic){
+		case VertexFormat::Semantic_POSITION:
+			return "POSITION";
+		case VertexFormat::Semantic_NORMAL:
+			return "NORMAL";
+		case VertexFormat::Semantic_TEX_COORD:
+			return "TEXCOORD";
+		default:
+			return "UNKNOWN";
 	}
 }
 

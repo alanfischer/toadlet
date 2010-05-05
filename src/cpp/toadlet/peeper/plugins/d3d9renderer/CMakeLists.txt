@@ -1,6 +1,7 @@
 # Source files for toadlet_peeper_d3d9renderer
 set (PEEPER_D3D9RENDERER_SRC
 	D3D9IndexBuffer.cpp
+	D3D9Query.cpp
 	D3D9Renderer.cpp
 	D3D9Texture.cpp
 	D3D9Surface.cpp
@@ -9,15 +10,13 @@ set (PEEPER_D3D9RENDERER_SRC
 	D3D9VertexFormat.cpp
 	D3D9WindowRenderTarget.cpp
 )
-if (NOT TOADLET_PLATFORM_WINCE)
-	set (PEEPER_D3D9RENDERER_SRC ${PEEPER_D3D9RENDERER_SRC} D3D9Query.cpp)
-endif (NOT TOADLET_PLATFORM_WINCE)
 
 
 # Headers
 set (PEEPER_D3D9RENDERER_HEADERS
 	D3D9Includes.h
 	D3D9IndexBuffer.h
+	D3D9Query.h
 	D3D9RenderTarget.h
 	D3D9Renderer.h
 	D3D9Surface.h
@@ -27,20 +26,11 @@ set (PEEPER_D3D9RENDERER_HEADERS
 	D3D9VertexFormat.h
 	D3D9WindowRenderTarget.h
 )
-if (NOT TOADLET_PLATFORM_WINCE)
-	set (PEEPER_D3D9RENDERER_HEADERS ${PEEPER_D3D9RENDERER_HEADERS} D3D9Query.h)
-endif (NOT TOADLET_PLATFORM_WINCE)
 
 
 # Dependencies - note that D3D9 has already been found
-# TODO: Replace TOADLET_PLATFORM_WINCE with TOADLET_HAS_DIRECT3DMOBILE here, but I'm not sure why its not working
-if (TOADLET_PLATFORM_WINCE)
-	include_directories (${D3DM_INCLUDE_PATH})
-	set (PEEPER_D3D9RENDERER_LIBS ${D3DM_LIBRARIES})
-else (TOADLET_PLATFORM_WINCE)
-	include_directories (${D3D9_INCLUDE_PATH})
-	set (PEEPER_D3D9RENDERER_LIBS ${D3D9_LIBRARIES})
-endif (TOADLET_PLATFORM_WINCE)
+include_directories (${D3D9_INCLUDE_PATH})
+set (PEEPER_D3D9RENDERER_LIBS ${D3D9_LIBRARIES})
 
 
 # Dynamic library

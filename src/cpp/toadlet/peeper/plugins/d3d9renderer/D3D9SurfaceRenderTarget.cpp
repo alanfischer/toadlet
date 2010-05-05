@@ -75,7 +75,7 @@ bool D3D9SurfaceRenderTarget::makeCurrent(IDirect3DDevice9 *device){
 	}
 
 	bool result=false;
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if defined(TOADLET_SET_D3DM)
 		if(mSurfaces.size()>=2 && mSurfaces[0]!=NULL && mSurfaces[1]!=NULL){
 			D3D9Surface *renderSurface=(D3D9Surface*)mSurfaces[0]->getRootSurface();
 			D3D9Surface *depthSurface=(D3D9Surface*)mSurfaces[1]->getRootSurface();
@@ -100,7 +100,7 @@ bool D3D9SurfaceRenderTarget::makeCurrent(IDirect3DDevice9 *device){
 }
 
 bool D3D9SurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if defined(TOADLET_SET_D3DM)
 		mSurfaces.resize(2);
 		mSurfaceAttachments.resize(2);
 		if(attachment==Attachment_DEPTH_STENCIL){
@@ -172,7 +172,7 @@ Surface::ptr D3D9SurfaceRenderTarget::createBufferSurface(int format,int width,i
 
 	HRESULT result;
 	if((format&Texture::Format_BIT_DEPTH)>0){
-		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		#if defined(TOADLET_SET_D3DM)
 			result=mRenderer->getDirect3DDevice9()->CreateDepthStencilSurface(width,height,d3dformat,D3DMULTISAMPLE_NONE,&d3dsurface TOADLET_SHAREDHANDLE);
 		#else
 			result=mRenderer->getDirect3DDevice9()->CreateDepthStencilSurface(width,height,d3dformat,D3DMULTISAMPLE_NONE,NULL,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
@@ -183,7 +183,7 @@ Surface::ptr D3D9SurfaceRenderTarget::createBufferSurface(int format,int width,i
 		}
 	}
 	else{
-		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+		#if defined(TOADLET_SET_D3DM)
 			result=mRenderer->getDirect3DDevice9()->CreateRenderTarget(width,height,d3dformat,D3DMULTISAMPLE_NONE,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
 		#else
 			result=mRenderer->getDirect3DDevice9()->CreateRenderTarget(width,height,d3dformat,D3DMULTISAMPLE_NONE,NULL,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);

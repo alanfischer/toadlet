@@ -70,15 +70,25 @@ using namespace toadlet::tadpole;
 		extern "C" RenderTarget *new_WGLWindowRenderTarget(HWND wnd,const Visual &visual);
 	#endif
 #endif
-#if defined(TOADLET_HAS_DIRECT3D9) || defined(TOADLET_HAS_DIRECT3DMOBILE)
+#if defined(TOADLET_HAS_D3DM)
+	#pragma comment(lib,"toadlet_peeper_d3dmrenderer" TOADLET_LIBRARY_EXTENSION)
+	extern "C" Renderer *new_D3DMRenderer();
+	extern "C" RenderTarget *new_D3DMWindowRenderTarget(HWND wnd,const Visual &visual,bool debug);
+#endif
+#if defined(TOADLET_HAS_D3D9)
 	#pragma comment(lib,"toadlet_peeper_d3d9renderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_D3D9Renderer();
 	extern "C" RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,const Visual &visual,bool debug);
 #endif
-#if defined(TOADLET_HAS_DIRECT3D10)
+#if defined(TOADLET_HAS_D3D10)
 	#pragma comment(lib,"toadlet_peeper_d3d10renderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_D3D10Renderer();
 	extern "C" RenderTarget *new_D3D10WindowRenderTarget(HWND wnd,const Visual &visual,bool debug);
+#endif
+#if defined(TOADLET_HAS_D3D11)
+	#pragma comment(lib,"toadlet_peeper_d3d11renderer" TOADLET_LIBRARY_EXTENSION)
+	extern "C" Renderer *new_D3D11Renderer();
+	extern "C" RenderTarget *new_D3D11WindowRenderTarget(HWND wnd,const Visual &visual,bool debug);
 #endif
 #if defined(TOADLET_PLATFORM_WIN32)
 	#pragma comment(lib,"toadlet_ribbit_win32player" TOADLET_LIBRARY_EXTENSION)
@@ -590,14 +600,24 @@ RenderTarget *Win32Application::makeRenderTarget(int rendererPlugin){
 			#endif
 		#endif
 	}
-	else if(rendererPlugin==RendererPlugin_DIRECT3D9){
-		#if defined(TOADLET_HAS_DIRECT3D9) || defined(TOADLET_HAS_DIRECT3DMOBILE)
+	else if(rendererPlugin==RendererPlugin_D3DM){
+		#if defined(TOADLET_HAS_D3DM)
+			target=new_D3DMWindowRenderTarget(win32->mWnd,mVisual,true);
+		#endif
+	}
+	else if(rendererPlugin==RendererPlugin_D3D9){
+		#if defined(TOADLET_HAS_D3D9)
 			target=new_D3D9WindowRenderTarget(win32->mWnd,mVisual,true);
 		#endif
 	}
-	else if(rendererPlugin==RendererPlugin_DIRECT3D10){
-		#if defined(TOADLET_HAS_DIRECT3D10)
+	else if(rendererPlugin==RendererPlugin_D3D10){
+		#if defined(TOADLET_HAS_D3D10)
 			target=new_D3D10WindowRenderTarget(win32->mWnd,mVisual,true);
+		#endif
+	}
+	else if(rendererPlugin==RendererPlugin_D3D11){
+		#if defined(TOADLET_HAS_D3D11)
+			target=new_D3D11WindowRenderTarget(win32->mWnd,mVisual,true);
 		#endif
 	}
 	if(target==NULL){
@@ -618,14 +638,24 @@ Renderer *Win32Application::makeRenderer(int plugin){
 			renderer=new_GLRenderer();
 		#endif
 	}
-	else if(plugin==RendererPlugin_DIRECT3D9){
-		#if defined(TOADLET_HAS_DIRECT3D9) || defined(TOADLET_HAS_DIRECT3DMOBILE)
+	else if(plugin==RendererPlugin_D3DM){
+		#if defined(TOADLET_HAS_D3DM)
+			renderer=new_D3DMRenderer();
+		#endif
+	}
+	else if(plugin==RendererPlugin_D3D9){
+		#if defined(TOADLET_HAS_D3D9)
 			renderer=new_D3D9Renderer();
 		#endif
 	}
-	else if(plugin==RendererPlugin_DIRECT3D10){
-		#if defined(TOADLET_HAS_DIRECT3D10)
+	else if(plugin==RendererPlugin_D3D10){
+		#if defined(TOADLET_HAS_D3D10)
 			renderer=new_D3D10Renderer();
+		#endif
+	}
+	else if(plugin==RendererPlugin_D3D11){
+		#if defined(TOADLET_HAS_D3D11)
+			renderer=new_D3D11Renderer();
 		#endif
 	}
 	return renderer;

@@ -48,10 +48,10 @@
 #cmakedefine TOADLET_HAS_FREETYPE
 #cmakedefine TOADLET_HAS_MXML
 #cmakedefine TOADLET_HAS_ZZIP
-#cmakedefine TOADLET_HAS_DIRECT3D9
-#cmakedefine TOADLET_HAS_DIRECT3D10
-#cmakedefine TOADLET_HAS_DIRECT3D11
-#cmakedefine TOADLET_HAS_DIRECT3DMOBILE
+#cmakedefine TOADLET_HAS_D3DM
+#cmakedefine TOADLET_HAS_D3D9
+#cmakedefine TOADLET_HAS_D3D10
+#cmakedefine TOADLET_HAS_D3D11
 #cmakedefine TOADLET_HAS_OPENGL
 #cmakedefine TOADLET_HAS_OPENAL
 #cmakedefine TOADLET_HAS_OGGVORBIS

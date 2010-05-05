@@ -1565,6 +1565,7 @@ bool GLRenderer::useMapping(GLBuffer *buffer) const{
 
 int GLRenderer::setVertexData(const VertexData *vertexData,int lastSemanticBits){
 	int numVertexBuffers=0;
+	/// @todo: Move all the semantic bit calculation to GLVertexFormat
 	// Semantic bits are a bitfield covering all the non-texture element semantics,
 	//  bitwise ORed with which texture stages are enabled.
 	int semanticBits=0;
@@ -1592,9 +1593,14 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastSemanticBits)
 
 		for(j=0;j<numElements;++j){
 			int semantic=glvertexFormat->mSemantics[j];
+			int index=glvertexFormat->mIndexes[j];
+
+			/// @todo: Only use the semanticBits like this if we're not in a shader.
+			/// Otherwise we will be using the attribute indexes
+
+			semanticBits|=(1<<semantic);
 			switch(semantic){
 				case VertexFormat::Semantic_POSITION:
-					semanticBits|=(1<<semantic);
 					glVertexPointer(
 						glvertexFormat->mGLElementCounts[j],
 						glvertexFormat->mGLDataTypes[j],
@@ -1602,36 +1608,33 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastSemanticBits)
 						glvertexBuffer->mElementOffsets[j]);
 				break;
 				case VertexFormat::Semantic_NORMAL:
-					semanticBits|=(1<<semantic);
 					glNormalPointer(
 						glvertexFormat->mGLDataTypes[j],
 						vertexSize,
 						glvertexBuffer->mElementOffsets[j]);
 				break;
-				case VertexFormat::Semantic_COLOR_DIFFUSE:
-					semanticBits|=(1<<semantic);
-					glColorPointer(
-						glvertexFormat->mGLElementCounts[j],
-						glvertexFormat->mGLDataTypes[j],
-						vertexSize,
-						glvertexBuffer->mElementOffsets[j]);
+				case VertexFormat::Semantic_COLOR:
+					if(index==0){
+						glColorPointer(
+							glvertexFormat->mGLElementCounts[j],
+							glvertexFormat->mGLDataTypes[j],
+							vertexSize,
+							glvertexBuffer->mElementOffsets[j]);
+					}
+					// This is no longer implemented, we would have to rework the semanticBits
+					//#if defined(TOADLET_HAS_GLEW)
+					//	else if(GLEW_EXT_secondary_color){
+	 				//		glSecondaryColorPointerEXT(
+					//			glvertexFormat->mGLElementCounts[j],
+					//			glvertexFormat->mGLDataTypes[j],
+					//			vertexSize,
+					//			glvertexBuffer->mElementOffsets[j]);
+					//	}
+					//#endif
 				break;
-				case VertexFormat::Semantic_COLOR_SPECULAR:
-					#if defined(TOADLET_HAS_GLEW)
-						if(GLEW_EXT_secondary_color){
-							semanticBits|=(1<<semantic);
-	 						glSecondaryColorPointerEXT(
-								glvertexFormat->mGLElementCounts[j],
-								glvertexFormat->mGLDataTypes[j],
-								vertexSize,
-								glvertexBuffer->mElementOffsets[j]);
-						}
-					#endif
-				break;
-				default:{
-					int texCoordIndex=semantic-VertexFormat::Semantic_TEX_COORD;
+				case VertexFormat::Semantic_TEX_COORD:
 					for(k=0;k<mMaxTexCoordIndex;++k){
-						if(mTexCoordIndexes[k]==texCoordIndex){
+						if(mTexCoordIndexes[k]==index){
 							semanticBits|=(1<<(k+VertexFormat::Semantic_TEX_COORD));
 							if(mMultiTexture){
 								glClientActiveTexture(GL_TEXTURE0+k);
@@ -1641,10 +1644,10 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastSemanticBits)
 								glvertexFormat->mGLDataTypes[j],
 								vertexSize,
 								glvertexBuffer->mElementOffsets[j]);
-							mLastTexCoordIndexes[k]=texCoordIndex;
+							mLastTexCoordIndexes[k]=index;
 						}
 					}
-				}break;
+				break;
 			}
 		}
 	}
@@ -1689,14 +1692,15 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastSemanticBits)
 		}
 	}
 
-	if((semanticBits&(1<<VertexFormat::Semantic_COLOR_DIFFUSE))==0){
+	if((semanticBits&(1<<VertexFormat::Semantic_COLOR))==0){
 		glColor4f(1.0f,1.0f,1.0f,1.0f);
 	}
-	#if defined(TOADLET_HAS_GLEW)
-		if((semanticBits&(1<<VertexFormat::Semantic_COLOR_SPECULAR))==0 && GLEW_EXT_secondary_color){
-			glSecondaryColor3fEXT(1.0f,1.0f,1.0f);
-		}
-	#endif
+	// No longer implemented, see the SPECULAR stuff above
+	//#if defined(TOADLET_HAS_GLEW)
+	//	if((semanticBits&(1<<VertexFormat::Semantic_COLOR_SPECULAR))==0 && GLEW_EXT_secondary_color){
+	//		glSecondaryColor3fEXT(1.0f,1.0f,1.0f);
+	//	}
+	//#endif
 
 	TOADLET_CHECK_GLERROR("setVertexData");
 
