@@ -23,53 +23,49 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_D3D9VERTEXFORMAT_H
-#define TOADLET_PEEPER_D3D9VERTEXFORMAT_H
+#ifndef TOADLET_PEEPER_D3D10VERTEXFORMAT_H
+#define TOADLET_PEEPER_D3D10VERTEXFORMAT_H
 
 #include <toadlet/peeper/VertexFormat.h>
-#include "D3D9Includes.h"
+#include "D3D10Includes.h"
 
 namespace toadlet{
 namespace peeper{
 
-class D3D9Renderer;
+class D3D10Renderer;
 
-class TOADLET_API D3D9VertexFormat:public VertexFormat{
+class TOADLET_API D3D10VertexFormat:public VertexFormat{
 public:
-	D3D9VertexFormat(D3D9Renderer *renderer);
-	virtual ~D3D9VertexFormat();
+	D3D10VertexFormat(D3D10Renderer *renderer);
+	virtual ~D3D10VertexFormat();
 
 	VertexFormat *getRootVertexFormat(){return this;}
 
-	void addElement(int semantic,int format);
+	void addElement(int semantic,int index,int format);
 	bool create();
 	void destroy();
 
 	int getNumElements() const{return mSemantics.size();}
 	int getSemantic(int i) const{return mSemantics[i];}
+	int getIndex(int i) const{return mIndexes[i];}
 	int getFormat(int i) const{return mFormats[i];}
 	int getOffset(int i) const{return mOffsets[i];}
-	int getIndexOfSemantic(int semantic);
+	int findSemantic(int semantic);
 	int getVertexSize() const{return mVertexSize;}
 
-	inline DWORD getFVF() const{return mFVF;}
-
-	BYTE getD3DDECLTYPE(int format);
-	BYTE getD3DDECLUSAGE(int semantic);
-	BYTE getUsageIndex(int semantic);
-
 protected:
-	D3D9Renderer *mRenderer;
+	D3D10Renderer *mRenderer;
 
 	egg::Collection<int> mSemantics;
+	egg::Collection<int> mIndexes;
 	egg::Collection<int> mFormats;
 	egg::Collection<int> mOffsets;
-
-	DWORD mFVF;
-	IDirect3DVertexDeclaration9 *mDeclaration;
 	int mVertexSize;
 
-	friend class D3D9Renderer;
+	D3D10_INPUT_ELEMENT_DESC *mElements;
+	ID3D10InputLayout *mLayout;
+
+	friend class D3D10Renderer;
 };
 
 }

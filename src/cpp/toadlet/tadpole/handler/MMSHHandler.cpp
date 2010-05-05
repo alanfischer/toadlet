@@ -85,22 +85,22 @@ Resource::ptr MMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 			VertexFormat::ptr vertexFormat=mBufferManager->createVertexFormat();
 			int positionElement=0;
 			if((vertexType&VT_POSITION)>0){
-				vertexFormat->addElement(VertexFormat::Semantic_POSITION,formatBit|VertexFormat::Format_BIT_COUNT_3);
+				vertexFormat->addElement(VertexFormat::Semantic_POSITION,0,formatBit|VertexFormat::Format_BIT_COUNT_3);
 			}
 			int normalElement=positionElement;
 			if((vertexType&VT_NORMAL)>0){
 				normalElement++;
-				vertexFormat->addElement(VertexFormat::Semantic_NORMAL,formatBit|VertexFormat::Format_BIT_COUNT_3);
+				vertexFormat->addElement(VertexFormat::Semantic_NORMAL,0,formatBit|VertexFormat::Format_BIT_COUNT_3);
 			}
 			int colorElement=normalElement;
 			if((vertexType&VT_COLOR)>0){
 				colorElement++;
-				vertexFormat->addElement(VertexFormat::Semantic_COLOR_DIFFUSE,VertexFormat::Format_COLOR_RGBA);
+				vertexFormat->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_COLOR_RGBA);
 			}
 			int texCoordElement=colorElement;
 			if((vertexType&VT_TEXCOORD1)>0){
 				texCoordElement++;
-				vertexFormat->addElement(VertexFormat::Semantic_TEX_COORD,formatBit|VertexFormat::Format_BIT_COUNT_2);
+				vertexFormat->addElement(VertexFormat::Semantic_TEX_COORD,0,formatBit|VertexFormat::Format_BIT_COUNT_2);
 			}
 
 			if((vertexType&VT_BONE)>0){

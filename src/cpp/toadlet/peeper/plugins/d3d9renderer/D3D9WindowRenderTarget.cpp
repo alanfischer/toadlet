@@ -31,9 +31,15 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,const Visual &visual,bool debug){
-	return new D3D9WindowRenderTarget(wnd,visual,debug);
-}
+#if defined(TOADLET_SET_D3DM)
+	TOADLET_C_API RenderTarget *new_D3DMWindowRenderTarget(HWND wnd,const Visual &visual,bool debug){
+		return new D3D9WindowRenderTarget(wnd,visual,debug);
+	}
+#else
+	TOADLET_C_API RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,const Visual &visual,bool debug){
+		return new D3D9WindowRenderTarget(wnd,visual,debug);
+	}
+#endif
 
 D3D9WindowRenderTarget::D3D9WindowRenderTarget():D3D9RenderTarget(),
 	mLibrary(0),
@@ -65,7 +71,7 @@ D3D9WindowRenderTarget::~D3D9WindowRenderTarget(){
 }
 
 bool D3D9WindowRenderTarget::makeCurrent(IDirect3DDevice9 *device){
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if defined(TOADLET_SET_D3DM)
 		HRESULT result=device->SetRenderTarget(mColorSurface,mDepthSurface);
 		TOADLET_CHECK_D3D9ERROR(result,"SetRenderTarget");
 	#else
@@ -95,7 +101,7 @@ void D3D9WindowRenderTarget::reset(){
 	HRESULT result=mD3DDevice->Reset(&mPresentParameters);
 	TOADLET_CHECK_D3D9ERROR(result,"Reset");
 
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if defined(TOADLET_SET_D3DM)
 		mD3DDevice->GetRenderTarget(&mColorSurface);
 	#else
 		mD3DDevice->GetRenderTarget(0,&mColorSurface);
@@ -139,7 +145,7 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual,bool de
 	Logger::alert(Categories::TOADLET_PEEPER,
 		String("D3D Description:") + identifier.Description);
 
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if defined(TOADLET_SET_D3DM)
 		mDevType=D3DMDEVTYPE_DEFAULT;
 	#else
 		mDevType=D3DDEVTYPE_HAL;
@@ -147,7 +153,7 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual,bool de
 	
 	DWORD flags=0;
 
-	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if !defined(TOADLET_SET_D3DM)
 		result=mD3D->CheckDeviceType(mAdaptor,mDevType,D3DFMT_X8R8G8B8,D3DFMT_X8R8G8B8,FALSE);
 		if(FAILED(result)){
 			Error::unknown(Categories::TOADLET_PEEPER,
@@ -189,7 +195,7 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual,bool de
 		return false;
 	}
 
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if defined(TOADLET_SET_D3DM)
 		mD3DDevice->GetRenderTarget(&mColorSurface);
 	#else
 		mD3DDevice->GetRenderTarget(0,&mColorSurface);
@@ -235,7 +241,7 @@ void D3D9WindowRenderTarget::fillPresentParameters(D3DPRESENT_PARAMETERS &presen
 	mHeight=rect.bottom-rect.top;
 
 	memset(&presentParameters,0,sizeof(presentParameters));
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if defined(TOADLET_SET_D3DM)
 		presentParameters.AutoDepthStencilFormat=D3DMFMT_D16;
 		presentParameters.EnableAutoDepthStencil=TRUE;
 		presentParameters.Windowed			=TRUE;
@@ -251,7 +257,7 @@ void D3D9WindowRenderTarget::fillPresentParameters(D3DPRESENT_PARAMETERS &presen
 		presentParameters.BackBufferFormat	=D3DFMT_X8R8G8B8;
 	#endif
 
-	#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
+	#if !defined(TOADLET_SET_D3DM)
 		if(mVisual.vsync){
 			mPresentParameters.PresentationInterval=D3DPRESENT_INTERVAL_DEFAULT;
 		}

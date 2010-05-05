@@ -39,8 +39,10 @@ public:
 	enum RendererPlugin{
 		RendererPlugin_NONE=-1,
 		RendererPlugin_OPENGL,
-		RendererPlugin_DIRECT3D9,
-		RendererPlugin_DIRECT3D10,
+		RendererPlugin_D3DM,
+		RendererPlugin_D3D9,
+		RendererPlugin_D3D10,
+		RendererPlugin_D3D11,
 	};
 
 	enum AudioPlayerPlugin{

@@ -32,9 +32,15 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_D3D10WindowRenderTarget(HWND wnd,const Visual &visual,bool debug){
-	return new D3D10WindowRenderTarget(wnd,visual,debug);
-}
+#if defined(TOADLET_SET_D3D10)
+	TOADLET_C_API RenderTarget *new_D3D10WindowRenderTarget(HWND wnd,const Visual &visual,bool debug){
+		return new D3D10WindowRenderTarget(wnd,visual,debug);
+	}
+#else
+	TOADLET_C_API RenderTarget *new_D3D11WindowRenderTarget(HWND wnd,const Visual &visual,bool debug){
+		return new D3D10WindowRenderTarget(wnd,visual,debug);
+	}
+#endif
 
 D3D10WindowRenderTarget::D3D10WindowRenderTarget():D3D10RenderTarget(),
 	mLibrary(0),

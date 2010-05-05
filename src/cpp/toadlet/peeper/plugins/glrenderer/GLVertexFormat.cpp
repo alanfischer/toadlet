@@ -33,14 +33,13 @@ GLVertexFormat::GLVertexFormat(GLRenderer *renderer):
 	mRenderer(NULL),
 
 	//mSemantics,
-	//mFormats,
-	//mSemantics,
+	//mIndexes,
 	//mFormats,
 	//mOffsets,
+	mVertexSize(0)
+
 	//mGLDataTypes,
 	//mGLElementCount,
-
-	mVertexSize(0)
 {
 	mRenderer=renderer;
 }
@@ -49,8 +48,9 @@ GLVertexFormat::~GLVertexFormat(){
 	destroy();
 }
 
-void GLVertexFormat::addElement(int semantic,int format){
+void GLVertexFormat::addElement(int semantic,int index,int format){
 	mSemantics.add(semantic);
+	mIndexes.add(index);
 	mFormats.add(format);
 	mOffsets.add(mVertexSize);
 
@@ -74,7 +74,7 @@ void GLVertexFormat::destroy(){
 	mGLElementCounts.clear();
 }
 
-int GLVertexFormat::getIndexOfSemantic(int semantic){
+int GLVertexFormat::findSemantic(int semantic){
 	TOADLET_ASSERT(mGLDataTypes.size()==mSemantics.size());
 
 	int i;

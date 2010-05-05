@@ -41,6 +41,11 @@ namespace peeper{
 
 class D3D10Renderer:public Renderer{
 public:
+LPD3D10EFFECT effect;
+LPD3D10EFFECTTECHNIQUE technique;
+ID3D10ShaderResourceView *texture;
+D3D10_PASS_DESC passDesc;
+
 	D3D10Renderer();
 	virtual ~D3D10Renderer();
 
@@ -116,7 +121,9 @@ public:
 
 	static D3D10_PRIMITIVE_TOPOLOGY getD3D10_PRIMITIVE_TOPOLOGY(IndexData::Primitive primitive);
 	static DXGI_FORMAT getIndexDXGI_FORMAT(IndexBuffer::IndexFormat format);
+	static DXGI_FORMAT getVertexDXGI_FORMAT(int format);
 	static DXGI_FORMAT getTextureDXGI_FORMAT(int textureFormat);
+	static char *getSemanticName(int semantic);
 
 protected:
 	ID3D10Device *mD3DDevice;
