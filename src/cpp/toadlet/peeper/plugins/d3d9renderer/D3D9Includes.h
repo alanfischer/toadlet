@@ -49,16 +49,6 @@ namespace peeper{
 		#define	TOADLET_D3DMFMT ,D3DMFMT_D3DMVALUE_FLOAT
 	#endif
 	#define TOADLET_SHAREDHANDLE
-
-	#define D3D9Buffer					D3DMBuffer
-	#define D3D9Query					D3DMQuery
-	#define D3D9Renderer				D3DMRenderer
-	#define D3D9RenderTarget			D3DMRenderTarget
-	#define D3D9Surface					D3DMSurface
-	#define D3D9SurfaceRenderTarget		D3DMSurfaceRenderTarget
-	#define D3D9Texture					D3DMTexture
-	#define D3D9VertexFormat			D3DMVertexFormat
-	#define D3D9WindowRenderTarget		D3DMWindowRenderTarget
 #else
 	#define	TOADLET_D3DMFMT
 	#define	TOADLET_SHAREDHANDLE ,NULL
@@ -406,6 +396,16 @@ namespace peeper{
 	#define IDirect3DSurface9 IDirect3DMobileSurface
 	#define IDirect3DBaseTexture9 IDirect3DMobileBaseTexture
 	#define IDirect3DTexture9 IDirect3DMobileTexture
+
+	#define D3D9Buffer					D3DMBuffer
+	#define D3D9Query					D3DMQuery
+	#define D3D9Renderer				D3DMRenderer
+	#define D3D9RenderTarget			D3DMRenderTarget
+	#define D3D9Surface					D3DMSurface
+	#define D3D9SurfaceRenderTarget		D3DMSurfaceRenderTarget
+	#define D3D9Texture					D3DMTexture
+	#define D3D9VertexFormat			D3DMVertexFormat
+	#define D3D9WindowRenderTarget		D3DMWindowRenderTarget
 #endif
 
 #if defined(TOADLET_DEBUG)
