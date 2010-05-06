@@ -55,8 +55,10 @@ public:
 
 	inline DWORD getFVF() const{return mFVF;}
 
-	BYTE getD3DDECLTYPE(int format);
-	BYTE getD3DDECLUSAGE(int semantic);
+	#if !defined(TOADLET_SET_D3DM)
+		BYTE getD3DDECLTYPE(int format);
+		BYTE getD3DDECLUSAGE(int semantic);
+	#endif
 
 protected:
 	D3D9Renderer *mRenderer;
@@ -68,8 +70,10 @@ protected:
 	int mVertexSize;
 
 	DWORD mFVF;
-	D3DVERTEXELEMENT9 *mElements;
-	IDirect3DVertexDeclaration9 *mDeclaration;
+	#if !defined(TOADLET_SET_D3DM)
+		D3DVERTEXELEMENT9 *mElements;
+		IDirect3DVertexDeclaration9 *mDeclaration;
+	#endif
 
 	friend class D3D9Renderer;
 };

@@ -41,9 +41,11 @@ D3D9VertexFormat::D3D9VertexFormat(D3D9Renderer *renderer):
 	//mOffsets,
 	mVertexSize(0),
 
-	mFVF(0),
-	mElements(NULL),
-	mDeclaration(NULL)
+	mFVF(0)
+	#if !defined(TOADLET_SET_D3DM)
+		,mElements(NULL),
+		mDeclaration(NULL)
+	#endif
 {
 	mRenderer=renderer;
 }
@@ -66,34 +68,39 @@ bool D3D9VertexFormat::create(){
 
 	mFVF=D3D9Renderer::getFVF(this);
 
-	D3DVERTEXELEMENT9 *elements=new D3DVERTEXELEMENT9[mSemantics.size()+1];
-	int i;
-	for(i=0;i<mSemantics.size();++i){
-		D3DVERTEXELEMENT9 element={
-			0,mOffsets[i],getD3DDECLTYPE(mFormats[i]),D3DDECLMETHOD_DEFAULT,getD3DDECLUSAGE(mSemantics[i]),mIndexes[i]
-		};
-		elements[i]=element;
-	}
-	D3DVERTEXELEMENT9 element=D3DDECL_END();
-	elements[mSemantics.size()]=element;
-	mElements=elements;
+	HRESULT result=S_OK;
+	#if !defined(TOADLET_SET_D3DM)
+		D3DVERTEXELEMENT9 *elements=new D3DVERTEXELEMENT9[mSemantics.size()+1];
+		int i;
+		for(i=0;i<mSemantics.size();++i){
+			D3DVERTEXELEMENT9 element={
+				0,mOffsets[i],getD3DDECLTYPE(mFormats[i]),D3DDECLMETHOD_DEFAULT,getD3DDECLUSAGE(mSemantics[i]),mIndexes[i]
+			};
+			elements[i]=element;
+		}
+		D3DVERTEXELEMENT9 element=D3DDECL_END();
+		elements[mSemantics.size()]=element;
+		mElements=elements;
 
-	HRESULT result=mRenderer->getDirect3DDevice9()->CreateVertexDeclaration(mElements,&mDeclaration);
-	TOADLET_CHECK_D3D9ERROR(result,"CreateVertexDeclaration");
+		result=mRenderer->getDirect3DDevice9()->CreateVertexDeclaration(mElements,&mDeclaration);
+		TOADLET_CHECK_D3D9ERROR(result,"CreateVertexDeclaration");
+	#endif
 
 	return SUCCEEDED(result);
 }
 
 void D3D9VertexFormat::destroy(){
-	if(mElements!=NULL){
-		delete[] mElements;
-		mElements=NULL;
-	}
+	#if !defined(TOADLET_SET_D3DM)
+		if(mElements!=NULL){
+			delete[] mElements;
+			mElements=NULL;
+		}
 
-	if(mDeclaration!=NULL){
-		mDeclaration->Release();
-		mDeclaration=NULL;
-	}
+		if(mDeclaration!=NULL){
+			mDeclaration->Release();
+			mDeclaration=NULL;
+		}
+	#endif
 }
 
 int D3D9VertexFormat::findSemantic(int semantic){
@@ -108,52 +115,54 @@ int D3D9VertexFormat::findSemantic(int semantic){
 	return -1;
 }
 
-BYTE D3D9VertexFormat::getD3DDECLTYPE(int format){
-	if(format==Format_COLOR_RGBA){
-		return D3DDECLTYPE_D3DCOLOR;
+#if !defined(TOADLET_SET_D3DM)
+	BYTE D3D9VertexFormat::getD3DDECLTYPE(int format){
+		if(format==Format_COLOR_RGBA){
+			return D3DDECLTYPE_D3DCOLOR;
+		}
+		else{
+			switch(format){
+				case Format_BIT_FLOAT_32|Format_BIT_COUNT_1:
+					return D3DDECLTYPE_FLOAT1;
+				case Format_BIT_FLOAT_32|Format_BIT_COUNT_2:
+					return D3DDECLTYPE_FLOAT2;
+				case Format_BIT_FLOAT_32|Format_BIT_COUNT_3:
+					return D3DDECLTYPE_FLOAT3;
+				case Format_BIT_FLOAT_32|Format_BIT_COUNT_4:
+					return D3DDECLTYPE_FLOAT4;
+				case Format_BIT_INT_16|Format_BIT_COUNT_2:
+					return D3DDECLTYPE_SHORT2;
+				case Format_BIT_INT_16|Format_BIT_COUNT_4:
+					return D3DDECLTYPE_SHORT4;
+				case Format_BIT_UINT_8|Format_BIT_COUNT_4:
+					return D3DDECLTYPE_UBYTE4;
+				default:
+					Error::unknown("unknown D3DDECLTYPE");
+					return -1;
+			}
+		}
 	}
-	else{
-		switch(format){
-			case Format_BIT_FLOAT_32|Format_BIT_COUNT_1:
-				return D3DDECLTYPE_FLOAT1;
-			case Format_BIT_FLOAT_32|Format_BIT_COUNT_2:
-				return D3DDECLTYPE_FLOAT2;
-			case Format_BIT_FLOAT_32|Format_BIT_COUNT_3:
-				return D3DDECLTYPE_FLOAT3;
-			case Format_BIT_FLOAT_32|Format_BIT_COUNT_4:
-				return D3DDECLTYPE_FLOAT4;
-			case Format_BIT_INT_16|Format_BIT_COUNT_2:
-				return D3DDECLTYPE_SHORT2;
-			case Format_BIT_INT_16|Format_BIT_COUNT_4:
-				return D3DDECLTYPE_SHORT4;
-			case Format_BIT_UINT_8|Format_BIT_COUNT_4:
-				return D3DDECLTYPE_UBYTE4;
+
+	BYTE D3D9VertexFormat::getD3DDECLUSAGE(int semantic){
+		switch(semantic){
+			case Semantic_POSITION:
+				return D3DDECLUSAGE_POSITION;
+			case Semantic_BLEND_WEIGHTS:
+				return D3DDECLUSAGE_BLENDWEIGHT;
+			case Semantic_BLEND_INDICES:
+				return D3DDECLUSAGE_BLENDINDICES;
+			case Semantic_NORMAL:
+				return D3DDECLUSAGE_NORMAL;
+			case Semantic_COLOR:
+				return D3DDECLUSAGE_COLOR;
+			case Semantic_TEX_COORD:
+				return D3DDECLUSAGE_TEXCOORD;
 			default:
-				Error::unknown("unknown D3DDECLTYPE");
+				Error::unknown("unknown D3DDECLUSAGE");
 				return -1;
 		}
 	}
-}
-
-BYTE D3D9VertexFormat::getD3DDECLUSAGE(int semantic){
-	switch(semantic){
-		case Semantic_POSITION:
-			return D3DDECLUSAGE_POSITION;
-		case Semantic_BLEND_WEIGHTS:
-			return D3DDECLUSAGE_BLENDWEIGHT;
-		case Semantic_BLEND_INDICES:
-			return D3DDECLUSAGE_BLENDINDICES;
-		case Semantic_NORMAL:
-			return D3DDECLUSAGE_NORMAL;
-		case Semantic_COLOR:
-			return D3DDECLUSAGE_COLOR;
-		case Semantic_TEX_COORD:
-			return D3DDECLUSAGE_TEXCOORD;
-		default:
-			Error::unknown("unknown D3DDECLUSAGE");
-			return -1;
-	}
-}
+#endif
 
 }
 }
