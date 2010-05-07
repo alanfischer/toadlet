@@ -35,6 +35,7 @@ namespace peeper{
 D3D9VertexFormat::D3D9VertexFormat(D3D9Renderer *renderer):
 	mRenderer(NULL),
 
+	mListener(NULL),
 	//mSemantics,
 	//mIndexes,
 	//mFormats,
@@ -64,8 +65,6 @@ void D3D9VertexFormat::addElement(int semantic,int index,int format){
 }
 
 bool D3D9VertexFormat::create(){
-	destroy();
-
 	mFVF=D3D9Renderer::getFVF(this);
 
 	HRESULT result=S_OK;
@@ -101,6 +100,10 @@ void D3D9VertexFormat::destroy(){
 			mDeclaration=NULL;
 		}
 	#endif
+
+	if(mListener!=NULL){
+		mListener->vertexFormatDestroyed(this);
+	}
 }
 
 int D3D9VertexFormat::findSemantic(int semantic){

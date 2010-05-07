@@ -35,6 +35,7 @@ namespace peeper{
 D3D10VertexFormat::D3D10VertexFormat(D3D10Renderer *renderer):
 	mRenderer(NULL),
 
+	mListener(NULL),
 	//mSemantics,
 	//mFormats,
 	//mOffsets,
@@ -60,8 +61,6 @@ void D3D10VertexFormat::addElement(int semantic,int index,int format){
 }
 
 bool D3D10VertexFormat::create(){
-	destroy();
-
 	D3D10_INPUT_ELEMENT_DESC *elements=new D3D10_INPUT_ELEMENT_DESC[mSemantics.size()];
 	int i;
 	for(i=0;i<mSemantics.size();++i){
@@ -88,6 +87,10 @@ void D3D10VertexFormat::destroy(){
 	if(mLayout!=NULL){
 		mLayout->Release();
 		mLayout=NULL;
+	}
+
+	if(mListener!=NULL){
+		mListener->vertexFormatDestroyed(this);
 	}
 }
 

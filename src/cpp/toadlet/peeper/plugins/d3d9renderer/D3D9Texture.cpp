@@ -65,8 +65,6 @@ D3D9Texture::~D3D9Texture(){
 }
 
 bool D3D9Texture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
-	destroy();
-
 	if((Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || Math::isPowerOf2(depth)==false) &&
 		mRenderer->getCapabilitySet().textureNonPowerOf2==false &&
 		(mRenderer->getCapabilitySet().textureNonPowerOf2==false || (usage&Usage_BIT_NPOT_RESTRICTED)==0))

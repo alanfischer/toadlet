@@ -48,8 +48,6 @@ D3D9Query::~D3D9Query(){
 }
 
 bool D3D9Query::create(QueryType queryType){
-	destroy();
-
 	mQueryType=queryType;
 	mD3DQueryType=getD3DQUERYTYPE(mQueryType);
 

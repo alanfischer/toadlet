@@ -129,7 +129,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 	}
 
 	Texture::ptr texture;
-	if(mBackable){
+	if(mBackable || renderer==NULL){
 		BackableTexture::ptr backableTexture(new BackableTexture());
 		backableTexture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas.begin());
 		if(mEngine->getRenderer()!=NULL){
@@ -138,13 +138,9 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 		}
 		texture=backableTexture;
 	}
-	else if(renderer!=NULL){
+	else{
 		texture=Texture::ptr(renderer->createTexture());
 		texture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas.begin());
-	}
-	else{
-		Error::nullPointer("can not create a non-backable Texture without a renderer");
-		return NULL;
 	}
 
 	manage(shared_static_cast<Texture>(texture));
@@ -191,7 +187,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr images[],int usage,int mip
 	}
 
 	Texture::ptr texture;
-	if(mBackable){
+	if(mBackable || mEngine->getRenderer()==NULL){
 		BackableTexture::ptr backableTexture(new BackableTexture());
 		backableTexture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas.begin());
 		if(mEngine->getRenderer()!=NULL){
@@ -200,13 +196,9 @@ Texture::ptr TextureManager::createTexture(Image::ptr images[],int usage,int mip
 		}
 		texture=backableTexture;
 	}
-	else if(mEngine->getRenderer()!=NULL){
+	else{
 		texture=Texture::ptr(mEngine->getRenderer()->createTexture());
 		texture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas.begin());
-	}
-	else{
-		Error::nullPointer("can not create a non-backable Texture without a renderer");
-		return NULL;
 	}
 
 	manage(shared_static_cast<Texture>(texture));
@@ -216,7 +208,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr images[],int usage,int mip
 
 Texture::ptr TextureManager::createTexture(int usage,Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels){
 	Texture::ptr texture;
-	if(mBackable){
+	if(mBackable || mEngine->getRenderer()==NULL){
 		BackableTexture::ptr backableTexture(new BackableTexture());
 		backableTexture->create(usage,dimension,format,width,height,depth,mipLevels,NULL);
 		if(mEngine->getRenderer()!=NULL){
@@ -226,13 +218,9 @@ Texture::ptr TextureManager::createTexture(int usage,Texture::Dimension dimensio
 		}
 		texture=backableTexture;
 	}
-	else if(mEngine->getRenderer()!=NULL){
+	else{
 		texture=Texture::ptr(mEngine->getRenderer()->createTexture());
 		texture->create(usage,dimension,format,width,height,depth,mipLevels,NULL);
-	}
-	else{
-		Error::nullPointer("can not create a non-backable Texture without a renderer");
-		return NULL;
 	}
 
 	manage(shared_static_cast<Texture>(texture));

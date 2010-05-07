@@ -60,8 +60,6 @@ GLBuffer::~GLBuffer(){
 }
 
 bool GLBuffer::create(int usage,int access,IndexFormat indexFormat,int size){
-	destroy();
-
 	mUsage=usage;
 	mAccess=access;
 	mSize=size;

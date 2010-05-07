@@ -32,6 +32,7 @@ namespace toadlet{
 namespace peeper{
 
 BackableVertexFormat::BackableVertexFormat():
+	mListener(NULL),
 	//mSemantics,
 	//mIndexes,
 	//mFormats,
@@ -60,17 +61,22 @@ void BackableVertexFormat::addElement(int semantic,int index,int format){
 }
 
 bool BackableVertexFormat::create(){
+	bool result=true;
 	if(mBack!=NULL){
-		mBack->create();
+		result=mBack->create();
 	}
 
-	return true;
+	return result;
 }
 
 void BackableVertexFormat::destroy(){
 	if(mBack!=NULL){
 		mBack->destroy();
 		mBack=NULL;
+	}
+	
+	if(mListener!=NULL){
+		mListener->vertexFormatDestroyed(this);
 	}
 }
 

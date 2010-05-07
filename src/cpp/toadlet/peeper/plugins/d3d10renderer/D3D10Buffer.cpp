@@ -61,8 +61,6 @@ D3D10Buffer::~D3D10Buffer(){
 }
 
 bool D3D10Buffer::create(int usage,int access,IndexFormat indexFormat,int size){
-	destroy();
-
 	mUsage=usage;
 	mAccess=access;
 	mSize=size;
