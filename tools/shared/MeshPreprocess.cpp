@@ -47,11 +47,11 @@ void MeshPreprocess::adjustTexCoords(Mesh *mesh,float texCoordAdjust){
 	VertexData::ptr vertexData=mesh->staticVertexData;
 	VertexBuffer::ptr vertexBuffer=vertexData->getVertexBuffer(0);
 	VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
-	int texCoordIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_TEX_COORD);
+	int texCoordIndex=vertexFormat->findSemantic(VertexFormat::Semantic_TEX_COORD);
 
 	VertexBufferAccessor vba(vertexBuffer);
 	if(texCoordAdjust>0 && texCoordIndex>=0){
-		TOADLET_ASSERT(vertexFormat->getVertexElement(texCoordIndex).format==(VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_2));
+		TOADLET_ASSERT(vertexFormat->getFormat(texCoordIndex)==(VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_2));
 
 		Collection<Collection<int> > texCoordFriends;
 		texCoordFriends.resize(vertexBuffer->getSize());
@@ -119,7 +119,7 @@ void MeshPreprocess::adjustPositions(Mesh *mesh,float positionAdjust){
 	VertexData::ptr vertexData=mesh->staticVertexData;
 	VertexBuffer::ptr vertexBuffer=vertexData->getVertexBuffer(0);
 	VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
-	int positionIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_POSITION);
+	int positionIndex=vertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
 
 	VertexBufferAccessor vba(vertexBuffer);
 	if(positionAdjust!=0){

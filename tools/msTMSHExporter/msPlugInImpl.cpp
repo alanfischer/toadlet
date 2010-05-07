@@ -269,7 +269,7 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 	}
 
 	VertexFormat::ptr vertexFormat=engine->getVertexFormats().POSITION_NORMAL_TEX_COORD;
-	VertexBuffer::ptr vertexBuffer=engine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_READ_WRITE,vertexFormat,vertexes.size());
+	VertexBuffer::ptr vertexBuffer=engine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,vertexFormat,vertexes.size());
 	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 
 	if(bones){
@@ -297,7 +297,7 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 
 		sub->name=meshNames[i];
 
-		IndexBuffer::ptr indexBuffer=engine->getBufferManager()->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_READ_WRITE,IndexBuffer::IndexFormat_UINT_16,indexes[i].size());
+		IndexBuffer::ptr indexBuffer=engine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,IndexBuffer::IndexFormat_UINT_16,indexes[i].size());
 		sub->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexes[i].size()));
 
 		{

@@ -6,6 +6,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.in ${CMAKE_CURRENT_BINARY_
 set (PEEPER_SRC
 	BackableIndexBuffer.cpp
 	BackableVertexBuffer.cpp
+	BackableVertexFormat.cpp
 	BackableTexture.cpp
 	IndexBufferAccessor.cpp
 	IndexData.cpp
@@ -23,6 +24,7 @@ set (PEEPER_SRC
 set (PEEPER_HEADERS
 	BackableIndexBuffer.h
 	BackableVertexBuffer.h
+	BackableVertexFormat.h
 	BackableTexture.h
 	Blend.h
 	Buffer.h

@@ -139,13 +139,13 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 
 	VertexBuffer *vertexBuffer=mesh->staticVertexData->getVertexBuffer(0);
 	VertexFormat *vertexFormat=vertexBuffer->getVertexFormat();
-	mHasNormal=vertexFormat->hasVertexElementOfType(VertexElement::Type_NORMAL);
+	mHasNormal=vertexFormat->findSemantic(VertexFormat::Semantic_NORMAL)>=0;
 	mHasBone=mesh->vertexBoneAssignments.size()>0;
 
 	// Collect vertices and texture coordinates
-	int positionIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_POSITION);
-	int normalIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_NORMAL);
-	int texCoordIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_TEX_COORD);
+	int positionIndex=vertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
+	int normalIndex=vertexFormat->findSemantic(VertexFormat::Semantic_NORMAL);
+	int texCoordIndex=vertexFormat->findSemantic(VertexFormat::Semantic_TEX_COORD);
 	VertexBufferAccessor vba(vertexBuffer);
 	for(i=0;i<vba.getSize();++i){
 		BACVertex *v=new BACVertex();

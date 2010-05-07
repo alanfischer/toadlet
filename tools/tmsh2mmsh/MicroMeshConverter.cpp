@@ -65,12 +65,12 @@ bool MicroMeshConverter::convertMesh(Mesh *mesh,Stream *outStream,float meshScal
 		VertexData::ptr vertexData=mesh->staticVertexData;
 		VertexBuffer::ptr vertexBuffer=vertexData->getVertexBuffer(0);
 		VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
-		int positionIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_POSITION);
-		int positionOffset=positionIndex>=0?vertexFormat->getVertexElement(positionIndex).offset:0;
-		int normalIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_NORMAL);
-		int colorIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_COLOR_DIFFUSE);
-		int texCoordIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_TEX_COORD);
-		int texCoordOffset=texCoordIndex>=0?vertexFormat->getVertexElement(texCoordIndex).offset:0;
+		int positionIndex=vertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
+		int positionOffset=positionIndex>=0?vertexFormat->getOffset(positionIndex):0;
+		int normalIndex=vertexFormat->findSemantic(VertexFormat::Semantic_NORMAL);
+		int colorIndex=vertexFormat->findSemantic(VertexFormat::Semantic_COLOR);
+		int texCoordIndex=vertexFormat->findSemantic(VertexFormat::Semantic_TEX_COORD);
+		int texCoordOffset=texCoordIndex>=0?vertexFormat->getOffset(texCoordIndex):0;
 		VertexBufferAccessor vba(vertexBuffer);
 
 		if(scaleModifier!=1.0f){

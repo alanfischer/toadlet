@@ -602,7 +602,13 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 	mxml_node_t *vertexNode=mxmlFindChild(node,"Vertexes");
 	{
 		int count=0;
-		VertexFormat::ptr vertexFormat=bufferManager->createVertexFormat();
+		VertexFormat::ptr vertexFormat;
+		if(bufferManager!=NULL){
+			vertexFormat=bufferManager->createVertexFormat();
+		}
+		else{
+			vertexFormat=VertexFormat::ptr(new BackableVertexFormat());
+		}
 
 		prop=mxmlElementGetAttr(vertexNode,"Count");
 		if(prop!=NULL){

@@ -49,26 +49,26 @@ void VertexLighter::lightMesh(Mesh *mesh){
 
 	VertexBuffer::ptr vertexBuffer=mesh->staticVertexData->getVertexBuffer(0);
 	VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
-	if(vertexFormat->hasVertexElementOfType(VertexElement::Type_NORMAL)==false){
+	if(vertexFormat->findSemantic(VertexFormat::Semantic_NORMAL)<0){
 		return; // Cannot be lit
 	}
 
-	VertexFormat::ptr newVertexFormat(new VertexFormat());
-	for(i=0;i<vertexFormat->getNumVertexElements();++i){
-		if(vertexFormat->getVertexElement(i).type!=VertexElement::Type_NORMAL || mKeepNormals){
-			newVertexFormat->addVertexElement(vertexFormat->getVertexElement(i));
+	VertexFormat::ptr newVertexFormat=mEngine->getBufferManager()->createVertexFormat();
+	for(i=0;i<vertexFormat->getNumElements();++i){
+		if(vertexFormat->getSemantic(i)!=VertexFormat::Semantic_NORMAL || mKeepNormals){
+			newVertexFormat->addElement(vertexFormat->getSemantic(i),vertexFormat->getIndex(i),vertexFormat->getFormat(i));
 		}
 	}
-	if(vertexFormat->hasVertexElementOfType(VertexElement::Type_COLOR_DIFFUSE)==false){
-		newVertexFormat->addVertexElement(VertexElement(VertexElement::Type_COLOR_DIFFUSE,VertexElement::Format_COLOR_RGBA));
+	if(vertexFormat->findSemantic(VertexFormat::Semantic_COLOR)<0){
+		newVertexFormat->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_COLOR_RGBA);
 	}
 
-	VertexBuffer::ptr newVertexBuffer=mEngine->getBufferManager()->cloneVertexBuffer(vertexBuffer,Buffer::UsageFlags_STATIC,Buffer::AccessType_READ_WRITE,newVertexFormat,vertexBuffer->getSize());
+	VertexBuffer::ptr newVertexBuffer=mEngine->getBufferManager()->cloneVertexBuffer(vertexBuffer,Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,newVertexFormat,vertexBuffer->getSize());
 	mesh->staticVertexData=VertexData::ptr(new VertexData(newVertexBuffer));
 
-	int pi=newVertexFormat->getVertexElementIndexOfType(VertexElement::Type_POSITION);
-	int ni=newVertexFormat->getVertexElementIndexOfType(VertexElement::Type_NORMAL);
-	int ci=newVertexFormat->getVertexElementIndexOfType(VertexElement::Type_TEX_COORD);
+	int pi=newVertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
+	int ni=newVertexFormat->findSemantic(VertexFormat::Semantic_NORMAL);
+	int ci=newVertexFormat->findSemantic(VertexFormat::Semantic_TEX_COORD);
 
 	VertexBufferAccessor vba;(vertexBuffer);
 	VertexBufferAccessor nvba(newVertexBuffer);
