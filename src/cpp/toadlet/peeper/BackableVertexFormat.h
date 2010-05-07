@@ -56,6 +56,7 @@ public:
 	virtual VertexFormat::ptr getBack(){return mBack;}
 	
 protected:
+	VertexFormatDestroyedListener *mListener;
 	egg::Collection<int> mSemantics;
 	egg::Collection<int> mIndexes;
 	egg::Collection<int> mFormats;

@@ -46,8 +46,7 @@ BufferManager::BufferManager(Engine *engine,bool backable):
 BufferManager::~BufferManager(){
 	int i;
 	for(i=0;i<mVertexFormats.size();++i){
-		/// @todo: add VertexFormatDestroyedListeners
-		//mVertexFormats[i]->setVertexFormatDestroyedListener(NULL);
+		mVertexFormats[i]->setVertexFormatDestroyedListener(NULL);
 	}
 	for(i=0;i<mIndexBuffers.size();++i){
 		mIndexBuffers[i]->setBufferDestroyedListener(NULL);
@@ -61,8 +60,7 @@ void BufferManager::destroy(){
 	int i;
 	for(i=0;i<mVertexFormats.size();++i){
 		VertexFormat::ptr vertexFormat=mVertexFormats[i];
-		/// @todo: add VertexFormatDestroyedListeners
-		//vertexFormat->setVertexFormatDestroyedListener(NULL);
+		vertexFormat->setVertexFormatDestroyedListener(NULL);
  		vertexFormat->destroy();
 	}
 	mVertexFormats.clear();
@@ -84,16 +82,11 @@ void BufferManager::destroy(){
 
 VertexFormat::ptr BufferManager::createVertexFormat(){
 	VertexFormat::ptr vertexFormat;
-	if(mBackable){
-		Error::unimplemented("need to write BackableVertexFormat");
-		return NULL;
-	}
-	else if(mEngine->getRenderer()!=NULL){
-		vertexFormat=VertexFormat::ptr(mEngine->getRenderer()->createVertexFormat());
+	if(mBackable || mEngine->getRenderer()==NULL){
+		vertexFormat=VertexFormat::ptr(new BackableVertexFormat());
 	}
 	else{
-		Error::nullPointer("can not create a non-backable VertexFormat without a renderer");
-		return NULL;
+		vertexFormat=VertexFormat::ptr(mEngine->getRenderer()->createVertexFormat());
 	}
 
 	mVertexFormats.add(vertexFormat);
@@ -103,7 +96,7 @@ VertexFormat::ptr BufferManager::createVertexFormat(){
 
 IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuffer::IndexFormat indexFormat,int size){
 	IndexBuffer::ptr indexBuffer;
-	if(mBackable){
+	if(mBackable || mEngine->getRenderer()==NULL){
 		BackableIndexBuffer::ptr backableIndexBuffer(new BackableIndexBuffer());
 		backableIndexBuffer->create(usage,access,indexFormat,size);
 		if(mEngine->getRenderer()!=NULL){
@@ -113,13 +106,9 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuff
 		}
 		indexBuffer=backableIndexBuffer;
 	}
-	else if(mEngine->getRenderer()!=NULL){
+	else{
 		indexBuffer=IndexBuffer::ptr(mEngine->getRenderer()->createIndexBuffer());
 		indexBuffer->create(usage,access,indexFormat,size);
-	}
-	else{
-		Error::nullPointer("can not create a non-backable Buffer without a renderer");
-		return NULL;
 	}
 
 	mIndexBuffers.add(indexBuffer);
@@ -131,7 +120,7 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuff
 
 VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexFormat::ptr vertexFormat,int size){
 	VertexBuffer::ptr vertexBuffer;
-	if(mBackable){
+	if(mBackable || mEngine->getRenderer()==NULL){
 		BackableVertexBuffer::ptr backableVertexBuffer(new BackableVertexBuffer());
 		backableVertexBuffer->create(usage,access,vertexFormat,size);
 		if(mEngine->getRenderer()!=NULL){
@@ -141,13 +130,9 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexF
 		}
 		vertexBuffer=backableVertexBuffer;
 	}
-	else if(mEngine->getRenderer()!=NULL){
+	else{
 		vertexBuffer=VertexBuffer::ptr(mEngine->getRenderer()->createVertexBuffer());
 		vertexBuffer->create(usage,access,vertexFormat,size);
-	}
-	else{
-		Error::nullPointer("can not create a non-backable Buffer without a renderer");
-		return NULL;
 	}
 
 	mVertexBuffers.add(vertexBuffer);

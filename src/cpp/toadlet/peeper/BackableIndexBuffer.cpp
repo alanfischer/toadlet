@@ -50,14 +50,17 @@ BackableIndexBuffer::~BackableIndexBuffer(){
 }
 
 bool BackableIndexBuffer::create(int usage,int access,IndexFormat indexFormat,int size){
-	destroy();
-
 	mUsage=usage;
 	mAccess=access;
 	mIndexFormat=indexFormat;
 	mSize=size;
 	mDataSize=mIndexFormat*mSize;
-	
+
+	if(mData!=NULL){
+		delete[] mData;
+		mData=NULL;
+	}
+
 	mData=new uint8[mDataSize];
 
 	return true;

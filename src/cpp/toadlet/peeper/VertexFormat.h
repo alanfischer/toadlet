@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_VERTEXFORMAT_H
 
 #include <toadlet/peeper/Types.h>
+#include <toadlet/peeper/VertexFormatDestroyedListener.h>
 
 namespace toadlet{
 namespace peeper{
@@ -106,6 +107,8 @@ public:
 	}
 
 	virtual VertexFormat *getRootVertexFormat()=0;
+
+	virtual void setVertexFormatDestroyedListener(VertexFormatDestroyedListener *listener)=0;
 
 	virtual void addElement(int semantic,int index,int format)=0;
 	virtual bool create()=0;

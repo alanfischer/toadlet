@@ -56,6 +56,7 @@ public:
 protected:
 	GLRenderer *mRenderer;
 
+	VertexFormatDestroyedListener *mListener;
 	egg::Collection<int> mSemantics;
 	egg::Collection<int> mIndexes;
 	egg::Collection<int> mFormats;

@@ -50,14 +50,17 @@ BackableVertexBuffer::~BackableVertexBuffer(){
 }
 
 bool BackableVertexBuffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int size){
-	destroy();
-
 	mUsage=usage;
 	mAccess=access;
 	mVertexFormat=vertexFormat;
 	mSize=size;
 	mDataSize=mVertexFormat->getVertexSize()*mSize;
 	
+	if(mData!=NULL){
+		delete[] mData;
+		mData=NULL;
+	}
+
 	mData=new uint8[mDataSize];
 
 	return true;

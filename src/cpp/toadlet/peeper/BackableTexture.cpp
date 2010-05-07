@@ -55,8 +55,6 @@ BackableTexture::~BackableTexture(){
 }
 
 bool BackableTexture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
-	destroy();
-
 	mUsage=usage;
 	mDimension=dimension;
 	mFormat=format;
@@ -75,6 +73,11 @@ bool BackableTexture::create(int usage,Dimension dimension,int format,int width,
 	}
 	else if(mDimension==Dimension_D3 || mDimension==Dimension_CUBE){
 		mDataSize=mSlicePitch*mDepth;
+	}
+
+	if(mData!=NULL){
+		delete[] mData;
+		mData=NULL;
 	}
 
 	mData=new byte[mDataSize];

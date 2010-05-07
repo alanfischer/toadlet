@@ -32,6 +32,7 @@ namespace peeper{
 GLVertexFormat::GLVertexFormat(GLRenderer *renderer):
 	mRenderer(NULL),
 
+	mListener(NULL),
 	//mSemantics,
 	//mIndexes,
 	//mFormats,
@@ -58,8 +59,6 @@ void GLVertexFormat::addElement(int semantic,int index,int format){
 }
 
 bool GLVertexFormat::create(){
-	destroy();
-
 	int i;
 	for(i=0;i<mSemantics.size();++i){
 		mGLDataTypes.add(GLRenderer::getGLDataType(mFormats[i]));
@@ -72,6 +71,10 @@ bool GLVertexFormat::create(){
 void GLVertexFormat::destroy(){
 	mGLDataTypes.clear();
 	mGLElementCounts.clear();
+
+	if(mListener!=NULL){
+		mListener->vertexFormatDestroyed(this);
+	}
 }
 
 int GLVertexFormat::findSemantic(int semantic){

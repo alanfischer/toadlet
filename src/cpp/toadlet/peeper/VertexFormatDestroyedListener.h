@@ -23,69 +23,22 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "GLQuery.h"
-#include "GLRenderer.h"
-#include <toadlet/egg/Error.h>
-
-using namespace toadlet::egg;
+#ifndef TOADLET_PEEPER_VERTEXFORMATDESTROYEDLISTENER_H
+#define TOADLET_PEEPER_VERTEXFORMATDESTROYEDLISTENER_H
 
 namespace toadlet{
 namespace peeper{
 
-GLQuery::GLQuery(GLRenderer *renderer):
-	mRenderer(NULL),
+class VertexFormat;
 
-	mQueryType(QueryType_UNKNOWN),
+class VertexFormatDestroyedListener{
+public:
+	virtual ~VertexFormatDestroyedListener(){}
 
-	mHandle(0)
-{
-	mRenderer=renderer;
-}
-
-GLQuery::~GLQuery(){
-	destroy();
-}
-
-bool GLQuery::create(QueryType queryType){
-	if(queryType!=QueryType_OCCLUSION){
-		Error::unknown("GLQuery only supports QueryType_OCCLUSION");
-		return false;
-	}
-	
-	mQueryType=queryType;
-
-	glGenQueries(1,&mHandle);
-	
-	TOADLET_CHECK_GLERROR("GLQuery::create");
-
-	return true;
-}
-
-void GLQuery::destroy(){
-	if(mHandle!=0){
-		glDeleteQueries(1,&mHandle);
-		mHandle=0;
-	}
-
-	TOADLET_CHECK_GLERROR("GLQuery::destroy");
-}
-
-void GLQuery::beginQuery(){
-	glBeginQuery(GL_SAMPLES_PASSED_ARB,mHandle);
-}
-
-void GLQuery::endQuery(){
-	glEndQuery(GL_SAMPLES_PASSED_ARB);
-}
-
-uint64 GLQuery::getResult(){
-	GLuint result=0;
-
-    glGetQueryObjectuiv(mHandle,GL_QUERY_RESULT_ARB,&result);
-	TOADLET_CHECK_GLERROR("GLQuery::getResult");
-
-	return result;
-}
+	virtual void vertexFormatDestroyed(VertexFormat *vertexFormat)=0;
+};
 
 }
 }
+
+#endif

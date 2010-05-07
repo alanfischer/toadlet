@@ -50,8 +50,6 @@ D3D9SurfaceRenderTarget::~D3D9SurfaceRenderTarget(){
 }
 
 bool D3D9SurfaceRenderTarget::create(){
-	destroy();
-
 	mWidth=0;
 	mHeight=0;
 	mNeedsCompile=true;

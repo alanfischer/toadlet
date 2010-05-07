@@ -63,6 +63,7 @@ public:
 protected:
 	D3D9Renderer *mRenderer;
 
+	VertexFormatDestroyedListener *mListener;
 	egg::Collection<int> mSemantics;
 	egg::Collection<int> mIndexes;
 	egg::Collection<int> mFormats;
