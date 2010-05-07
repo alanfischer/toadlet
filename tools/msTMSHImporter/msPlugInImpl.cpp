@@ -190,9 +190,9 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 
 			VertexBuffer::ptr vertexBuffer=mesh->staticVertexData->getVertexBuffer(0);
 			VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
-			int positionIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_POSITION);
-			int normalIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_NORMAL);
-			int texCoordIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_TEX_COORD);
+			int positionIndex=vertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
+			int normalIndex=vertexFormat->findSemantic(VertexFormat::Semantic_NORMAL);
+			int texCoordIndex=vertexFormat->findSemantic(VertexFormat::Semantic_TEX_COORD);
 			VertexBufferAccessor vba(vertexBuffer);
 			for(j=0;j<vertexesToAdd.size();++j){
 				msVertex *vertex=msMesh_GetVertexAt(msmesh,msMesh_AddVertex(msmesh));

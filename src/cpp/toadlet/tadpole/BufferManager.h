@@ -28,6 +28,7 @@
 
 #include <toadlet/peeper/BackableIndexBuffer.h>
 #include <toadlet/peeper/BackableVertexBuffer.h>
+#include <toadlet/peeper/BackableVertexFormat.h>
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/tadpole/Types.h>
 

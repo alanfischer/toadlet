@@ -256,11 +256,8 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 			}
 		}
 
-		VertexFormat::ptr vertexFormat(new VertexFormat(3));
-		vertexFormat->addVertexElement(VertexElement(VertexElement::Type_POSITION,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3));
-		vertexFormat->addVertexElement(VertexElement(VertexElement::Type_NORMAL,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_3));
-		vertexFormat->addVertexElement(VertexElement(VertexElement::Type_TEX_COORD,VertexElement::Format_BIT_FLOAT_32|VertexElement::Format_BIT_COUNT_2));
-		VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,vertexFormat,verts.size());
+		VertexFormat::ptr vertexFormat=mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD;
+		VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,verts.size());
 		{
 			VertexBufferAccessor vba(vertexBuffer);
 			for(i=0;i<verts.size();++i){
@@ -285,7 +282,7 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 			const String &materialName=materialIndexLists.at(j).first;
 			const Collection<int> &indexList=materialIndexLists.at(j).second;
 
-			IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::UsageFlags_STATIC,Buffer::AccessType_WRITE_ONLY,IndexBuffer::IndexFormat_UINT_16,indexList.size());
+			IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,indexList.size());
 			{
 				IndexBufferAccessor iba(indexBuffer);
 

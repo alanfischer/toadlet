@@ -64,7 +64,7 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 				if(same){
 					IndexBuffer::ptr ib1=subMesh1->indexData->getIndexBuffer();
 					IndexBuffer::ptr ib2=subMesh2->indexData->getIndexBuffer();
-					IndexBuffer::ptr cib=engine->getBufferManager()->cloneIndexBuffer(ib1,ib1->getUsageFlags(),ib1->getAccessType(),ib1->getIndexFormat(),ib1->getSize()+ib2->getSize());
+					IndexBuffer::ptr cib=engine->getBufferManager()->cloneIndexBuffer(ib1,ib1->getUsage(),ib1->getAccess(),ib1->getIndexFormat(),ib1->getSize()+ib2->getSize());
 
 					IndexBufferAccessor ciba(cib);
 					IndexBufferAccessor iba2(ib2);
@@ -90,10 +90,10 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 	// Zero out unused texture coodinates
 	VertexBuffer::ptr vertexBuffer=mesh->staticVertexData->getVertexBuffer(0);
 	VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
-	int positionIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_POSITION);
-	int normalIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_NORMAL);
-	int colorIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_COLOR_DIFFUSE);
-	int texCoordIndex=vertexFormat->getVertexElementIndexOfType(VertexElement::Type_TEX_COORD);
+	int positionIndex=vertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
+	int normalIndex=vertexFormat->findSemantic(VertexFormat::Semantic_NORMAL);
+	int colorIndex=vertexFormat->findSemantic(VertexFormat::Semantic_COLOR);
+	int texCoordIndex=vertexFormat->findSemantic(VertexFormat::Semantic_TEX_COORD);
 	if(texCoordIndex>=0){
 		Collection<uint8> vertHasTex;
 		vertHasTex.resize(vertexBuffer->getSize(),0);
@@ -241,7 +241,7 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 		}
 	}
 
-	VertexBuffer::ptr newVertexBuffer=engine->getBufferManager()->cloneVertexBuffer(vertexBuffer,vertexBuffer->getUsageFlags(),vertexBuffer->getAccessType(),vertexBuffer->getVertexFormat(),vertexBuffer->getSize()-unusedCount);
+	VertexBuffer::ptr newVertexBuffer=engine->getBufferManager()->cloneVertexBuffer(vertexBuffer,vertexBuffer->getUsage(),vertexBuffer->getAccess(),vertexBuffer->getVertexFormat(),vertexBuffer->getSize()-unusedCount);
 	Collection<Mesh::VertexBoneAssignmentList> nvertexBoneAssignments;
 	if(mesh->vertexBoneAssignments.size()>0){
 		nvertexBoneAssignments.resize(mesh->vertexBoneAssignments.size()-unusedCount);
@@ -293,7 +293,7 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 	for(i=0;i<mesh->subMeshes.size();++i){
 		Mesh::SubMesh::ptr subMesh=mesh->subMeshes[i];
 		IndexBuffer::ptr indexBuffer=subMesh->indexData->getIndexBuffer();
-		IndexBuffer::ptr newIndexBuffer=engine->getBufferManager()->createIndexBuffer(indexBuffer->getUsageFlags(),indexBuffer->getAccessType(),indexBuffer->getIndexFormat(),newIndexBufferSizes[i]);
+		IndexBuffer::ptr newIndexBuffer=engine->getBufferManager()->createIndexBuffer(indexBuffer->getUsage(),indexBuffer->getAccess(),indexBuffer->getIndexFormat(),newIndexBufferSizes[i]);
 
 		IndexBufferAccessor iba(indexBuffer);
 		IndexBufferAccessor niba(newIndexBuffer);
