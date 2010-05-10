@@ -41,6 +41,8 @@ public:
 
 	VertexFormat *getRootVertexFormat(){return this;}
 
+	void setVertexFormatDestroyedListener(VertexFormatDestroyedListener *listener){mListener=listener;}
+
 	void addElement(int semantic,int index,int format);
 	bool create();
 	void destroy();
@@ -53,14 +55,18 @@ public:
 	int findSemantic(int semantic);
 	int getVertexSize() const{return mVertexSize;}
 
-	inline DWORD getFVF() const{return mFVF;}
+	inline DWORD getFVF(){if(mFVF==0){createContext();}return mFVF;}
+	inline IDirect3DVertexDeclaration9 *getDeclaration(){if(mDeclaration==NULL){createContext();}return mDeclaration;}
 
 	#if !defined(TOADLET_SET_D3DM)
-		BYTE getD3DDECLTYPE(int format);
-		BYTE getD3DDECLUSAGE(int semantic);
+		static BYTE getD3DDECLTYPE(int format);
+		static BYTE getD3DDECLUSAGE(int semantic);
 	#endif
 
 protected:
+	bool createContext();
+	bool destroyContext();
+
 	D3D9Renderer *mRenderer;
 
 	VertexFormatDestroyedListener *mListener;

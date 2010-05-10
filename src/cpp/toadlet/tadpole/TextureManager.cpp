@@ -213,7 +213,6 @@ Texture::ptr TextureManager::createTexture(int usage,Texture::Dimension dimensio
 		backableTexture->create(usage,dimension,format,width,height,depth,mipLevels,NULL);
 		if(mEngine->getRenderer()!=NULL){
 			Texture::ptr back(mEngine->getRenderer()->createTexture());
-			back->create(usage,dimension,format,width,height,depth,mipLevels,NULL);
 			backableTexture->setBack(back);
 		}
 		texture=backableTexture;

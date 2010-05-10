@@ -83,10 +83,17 @@ void BufferManager::destroy(){
 VertexFormat::ptr BufferManager::createVertexFormat(){
 	VertexFormat::ptr vertexFormat;
 	if(mBackable || mEngine->getRenderer()==NULL){
-		vertexFormat=VertexFormat::ptr(new BackableVertexFormat());
+		BackableVertexFormat::ptr backableVertexFormat(new BackableVertexFormat());
+		backableVertexFormat->create();
+		if(mEngine->getRenderer()!=NULL){
+			VertexFormat::ptr back(mEngine->getRenderer()->createVertexFormat());
+			backableVertexFormat->setBack(back);
+		}
+		vertexFormat=backableVertexFormat;
 	}
 	else{
 		vertexFormat=VertexFormat::ptr(mEngine->getRenderer()->createVertexFormat());
+		vertexFormat->create();
 	}
 
 	mVertexFormats.add(vertexFormat);
@@ -101,7 +108,6 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuff
 		backableIndexBuffer->create(usage,access,indexFormat,size);
 		if(mEngine->getRenderer()!=NULL){
 			IndexBuffer::ptr back(mEngine->getRenderer()->createIndexBuffer());
-			back->create(usage,access,indexFormat,size);
 			backableIndexBuffer->setBack(back);
 		}
 		indexBuffer=backableIndexBuffer;
@@ -125,7 +131,6 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexF
 		backableVertexBuffer->create(usage,access,vertexFormat,size);
 		if(mEngine->getRenderer()!=NULL){
 			VertexBuffer::ptr back(mEngine->getRenderer()->createVertexBuffer());
-			back->create(usage,access,vertexFormat,size);
 			backableVertexBuffer->setBack(back);
 		}
 		vertexBuffer=backableVertexBuffer;

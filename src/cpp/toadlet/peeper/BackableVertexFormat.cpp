@@ -47,19 +47,6 @@ BackableVertexFormat::~BackableVertexFormat(){
 	destroy();
 }
 
-void BackableVertexFormat::addElement(int semantic,int index,int format){
-	mSemantics.add(semantic);
-	mIndexes.add(index);
-	mFormats.add(format);
-	mOffsets.add(mVertexSize);
-
-	mVertexSize+=getFormatSize(format);
-	
-	if(mBack!=NULL){
-		mBack->addElement(semantic,index,format);
-	}
-}
-
 bool BackableVertexFormat::create(){
 	bool result=true;
 	if(mBack!=NULL){
@@ -77,6 +64,19 @@ void BackableVertexFormat::destroy(){
 	
 	if(mListener!=NULL){
 		mListener->vertexFormatDestroyed(this);
+	}
+}
+
+void BackableVertexFormat::addElement(int semantic,int index,int format){
+	mSemantics.add(semantic);
+	mIndexes.add(index);
+	mFormats.add(format);
+	mOffsets.add(mVertexSize);
+
+	mVertexSize+=getFormatSize(format);
+	
+	if(mBack!=NULL){
+		mBack->addElement(semantic,index,format);
 	}
 }
 
@@ -98,11 +98,11 @@ void BackableVertexFormat::setBack(VertexFormat::ptr back){
 	mBack=back;
 	
 	if(mBack!=NULL && mSemantics.size()>0){
+		mBack->create();
 		int i;
 		for(i=0;i<mSemantics.size();++i){
 			mBack->addElement(mSemantics[i],mIndexes[i],mFormats[i]);
 		}
-		mBack->create();
 	}
 }
 
