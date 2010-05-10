@@ -3,7 +3,6 @@
 #include "../shared/msConversion.h"
 
 #include <toadlet/egg/io/FileStream.h>
-#include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/handler/XMSHHandler.h>
 #include <toadlet/tadpole/handler/XANMHandler.h>

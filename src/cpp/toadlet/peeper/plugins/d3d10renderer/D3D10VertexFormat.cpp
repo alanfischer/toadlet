@@ -41,7 +41,7 @@ D3D10VertexFormat::D3D10VertexFormat(D3D10Renderer *renderer):
 	//mOffsets,
 	mVertexSize(0),
 
-	mElements(NULL),
+	//mElements,
 	mLayout(NULL)
 {
 	mRenderer=renderer;
@@ -51,49 +51,56 @@ D3D10VertexFormat::~D3D10VertexFormat(){
 	destroy();
 }
 
-void D3D10VertexFormat::addElement(int semantic,int index,int format){
-	mSemantics.add(semantic);
-	mIndexes.add(index);
-	mFormats.add(format);
-	mOffsets.add(mVertexSize);
-
-	mVertexSize+=getFormatSize(format);
-
-	destroyContext();
+bool D3D10VertexFormat::create(){
+	return true;
 }
 
-bool D3D10VertexFormat::create(){
-	D3D10_INPUT_ELEMENT_DESC *elements=new D3D10_INPUT_ELEMENT_DESC[mSemantics.size()];
-	int i;
-	for(i=0;i<mSemantics.size();++i){
-		D3D10_INPUT_ELEMENT_DESC element={
-			D3D10Renderer::getSemanticName(mSemantics[i]),mIndexes[i],D3D10Renderer::getVertexDXGI_FORMAT(mFormats[i]),0,mOffsets[i],D3D10_INPUT_PER_VERTEX_DATA,0
-		};
-		elements[i]=element;
-	}
-	mElements=elements;
+void D3D10VertexFormat::destroy(){
+	destroyContext();
 
+	mSemantics.clear();
+	mIndexes.clear();
+	mFormats.clear();
+	mOffsets.clear();
+	mElements.clear();
+
+	if(mListener!=NULL){
+		mListener->vertexFormatDestroyed(this);
+	}
+}
+
+bool D3D10VertexFormat::createContext(){
 	HRESULT result=mRenderer->getD3D10Device()->CreateInputLayout(
-		mElements,mSemantics.size(),mRenderer->passDesc.pIAInputSignature,mRenderer->passDesc.IAInputSignatureSize,&mLayout
+		mElements.begin(),mElements.size(),mRenderer->passDesc.pIAInputSignature,mRenderer->passDesc.IAInputSignatureSize,&mLayout
 	);
 
 	return SUCCEEDED(result);
 }
 
-void D3D10VertexFormat::destroy(){
-	if(mElements!=NULL){
-		delete[] mElements;
-		mElements=NULL;
-	}
-
+bool D3D10VertexFormat::destroyContext(){
 	if(mLayout!=NULL){
 		mLayout->Release();
 		mLayout=NULL;
 	}
+	
+	return true;
+}
 
-	if(mListener!=NULL){
-		mListener->vertexFormatDestroyed(this);
-	}
+void D3D10VertexFormat::addElement(int semantic,int index,int format){
+	int offset=mVertexSize;
+	mSemantics.add(semantic);
+	mIndexes.add(index);
+	mFormats.add(format);
+	mOffsets.add(offset);
+
+	mVertexSize+=getFormatSize(format);
+
+	D3D10_INPUT_ELEMENT_DESC element={
+		D3D10Renderer::getSemanticName(semantic),index,D3D10Renderer::getVertexDXGI_FORMAT(format),0,offset,D3D10_INPUT_PER_VERTEX_DATA,0
+	};
+	mElements.add(element);
+
+	destroyContext();
 }
 
 int D3D10VertexFormat::findSemantic(int semantic){

@@ -67,10 +67,11 @@ void GLVertexFormat::destroy(){
 }
 
 void GLVertexFormat::addElement(int semantic,int index,int format){
+	int offset=mVertexSize;
 	mSemantics.add(semantic);
 	mIndexes.add(index);
 	mFormats.add(format);
-	mOffsets.add(mVertexSize);
+	mOffsets.add(offset);
 
 	mVertexSize+=getFormatSize(format);
 

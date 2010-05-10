@@ -315,7 +315,7 @@ void D3D10Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Inde
 	D3D10Buffer *vertexBuffer=(D3D10Buffer*)vertexData->getVertexBuffer(0)->getRootVertexBuffer();
 	D3D10VertexFormat *vertexFormat=(D3D10VertexFormat*)vertexBuffer->mVertexFormat->getRootVertexFormat();
 
-	mD3DDevice->IASetInputLayout(vertexFormat->mLayout);
+	mD3DDevice->IASetInputLayout(vertexFormat->getLayout());
 
 	UINT stride=vertexBuffer->mVertexFormat->getVertexSize();
 	UINT offset=0;

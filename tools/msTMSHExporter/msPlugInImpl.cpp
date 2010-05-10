@@ -3,7 +3,6 @@
 #include "../shared/msConversion.h"
 
 #include <toadlet/egg/io/FileStream.h>
-#include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/handler/XMSHHandler.h>
 #include <toadlet/tadpole/handler/XANMHandler.h>
@@ -185,8 +184,6 @@ cPlugIn::findEmptyBones(msModel *pModel,Collection<int> &emptyBones){
 
 int
 cPlugIn::exportMesh(msModel *pModel,const String &name){
-	Engine *engine=new Engine();
-
 	Mesh::ptr mesh(new Mesh());
 
 	Collection<Vertex> vertexes;
@@ -268,8 +265,14 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 		}
 	}
 
-	VertexFormat::ptr vertexFormat=engine->getVertexFormats().POSITION_NORMAL_TEX_COORD;
-	VertexBuffer::ptr vertexBuffer=engine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,vertexFormat,vertexes.size());
+	VertexFormat::ptr vertexFormat(new BackableVertexFormat());
+	vertexFormat->create();
+	vertexFormat->addElement(VertexFormat::Semantic_POSITION,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3);
+	vertexFormat->addElement(VertexFormat::Semantic_NORMAL,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3);
+	vertexFormat->addElement(VertexFormat::Semantic_TEX_COORD,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_2);
+
+	VertexBuffer::ptr vertexBuffer(new BackableVertexBuffer());
+	vertexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,vertexFormat,vertexes.size());
 	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 
 	if(bones){
@@ -297,7 +300,8 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 
 		sub->name=meshNames[i];
 
-		IndexBuffer::ptr indexBuffer=engine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,IndexBuffer::IndexFormat_UINT_16,indexes[i].size());
+		IndexBuffer::ptr indexBuffer(new BackableIndexBuffer());
+		indexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,IndexBuffer::IndexFormat_UINT_16,indexes[i].size());
 		sub->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexes[i].size()));
 
 		{
@@ -356,8 +360,6 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 	XMSHHandler::ptr handler(new XMSHHandler(NULL,NULL,NULL));
 
 	handler->save(mesh,stream);
-
-	delete engine;
 
 	return 0;
 }
@@ -448,8 +450,6 @@ cPlugIn::buildSkeleton(msModel *pModel,const Collection<int> &emptyBones){
 
 int
 cPlugIn::exportAnimation(msModel *pModel,const String &name){
-	Engine *engine=new Engine();
-
 	Collection<int> emptyBones;
 	findEmptyBones(pModel,emptyBones);
 
@@ -666,8 +666,6 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 	XANMHandler::ptr handler(new XANMHandler());
 
 	handler->save(sequence,stream);
-
-	delete engine;
 
 	return 0;
 }
