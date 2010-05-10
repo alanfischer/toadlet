@@ -49,6 +49,23 @@ GLVertexFormat::~GLVertexFormat(){
 	destroy();
 }
 
+bool GLVertexFormat::create(){
+	return true;
+}
+
+void GLVertexFormat::destroy(){
+	mSemantics.clear();
+	mIndexes.clear();
+	mFormats.clear();
+	mOffsets.clear();
+	mGLDataTypes.clear();
+	mGLElementCounts.clear();
+
+	if(mListener!=NULL){
+		mListener->vertexFormatDestroyed(this);
+	}
+}
+
 void GLVertexFormat::addElement(int semantic,int index,int format){
 	mSemantics.add(semantic);
 	mIndexes.add(index);
@@ -56,25 +73,9 @@ void GLVertexFormat::addElement(int semantic,int index,int format){
 	mOffsets.add(mVertexSize);
 
 	mVertexSize+=getFormatSize(format);
-}
 
-bool GLVertexFormat::create(){
-	int i;
-	for(i=0;i<mSemantics.size();++i){
-		mGLDataTypes.add(GLRenderer::getGLDataType(mFormats[i]));
-		mGLElementCounts.add(GLRenderer::getGLElementCount(mFormats[i]));
-	}
-
-	return true;
-}
-
-void GLVertexFormat::destroy(){
-	mGLDataTypes.clear();
-	mGLElementCounts.clear();
-
-	if(mListener!=NULL){
-		mListener->vertexFormatDestroyed(this);
-	}
+	mGLDataTypes.add(GLRenderer::getGLDataType(format));
+	mGLElementCounts.add(GLRenderer::getGLElementCount(format));
 }
 
 int GLVertexFormat::findSemantic(int semantic){

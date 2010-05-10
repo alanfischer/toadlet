@@ -110,10 +110,10 @@ public:
 
 	virtual void setVertexFormatDestroyedListener(VertexFormatDestroyedListener *listener)=0;
 
-	virtual void addElement(int semantic,int index,int format)=0;
 	virtual bool create()=0;
 	virtual void destroy()=0;
 
+	virtual void addElement(int semantic,int index,int format)=0;
 	virtual int getNumElements() const=0;
 	virtual int getSemantic(int i) const=0;
 	virtual int getIndex(int i) const=0;

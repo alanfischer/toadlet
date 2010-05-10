@@ -40,10 +40,12 @@ public:
 
 	virtual VertexFormat *getRootVertexFormat(){return mBack;}
 
-	virtual void addElement(int semantic,int index,int format);
+	virtual void setVertexFormatDestroyedListener(VertexFormatDestroyedListener *listener){mListener=listener;}
+
 	virtual bool create();
 	virtual void destroy();
 
+	virtual void addElement(int semantic,int index,int format);
 	virtual int getNumElements() const{return mSemantics.size();}
 	virtual int getSemantic(int i) const{return mSemantics[i];}
 	virtual int getIndex(int i) const{return mIndexes[i];}

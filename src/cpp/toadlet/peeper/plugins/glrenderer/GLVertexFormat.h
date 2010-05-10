@@ -41,10 +41,12 @@ public:
 
 	VertexFormat *getRootVertexFormat(){return this;}
 
-	void addElement(int semantic,int index,int format);
+	void setVertexFormatDestroyedListener(VertexFormatDestroyedListener *listener){mListener=listener;}
+
 	bool create();
 	void destroy();
 
+	void addElement(int semantic,int index,int format);
 	int getNumElements() const{return mSemantics.size();}
 	int getSemantic(int i) const{return mSemantics[i];}
 	int getIndex(int i) const{return mIndexes[i];}

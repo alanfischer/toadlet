@@ -58,6 +58,8 @@ void D3D10VertexFormat::addElement(int semantic,int index,int format){
 	mOffsets.add(mVertexSize);
 
 	mVertexSize+=getFormatSize(format);
+
+	destroyContext();
 }
 
 bool D3D10VertexFormat::create(){

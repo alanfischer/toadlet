@@ -41,6 +41,8 @@ public:
 
 	VertexFormat *getRootVertexFormat(){return this;}
 
+	void setVertexFormatDestroyedListener(VertexFormatDestroyedListener *listener){mListener=listener;}
+
 	void addElement(int semantic,int index,int format);
 	bool create();
 	void destroy();
@@ -54,6 +56,9 @@ public:
 	int getVertexSize() const{return mVertexSize;}
 
 protected:
+	bool createContext();
+	bool destroyContext();
+
 	D3D10Renderer *mRenderer;
 
 	VertexFormatDestroyedListener *mListener;

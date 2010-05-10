@@ -55,16 +55,19 @@ D3D9VertexFormat::~D3D9VertexFormat(){
 	destroy();
 }
 
-void D3D9VertexFormat::addElement(int semantic,int index,int format){
-	mSemantics.add(semantic);
-	mIndexes.add(index);
-	mFormats.add(format);
-	mOffsets.add(mVertexSize);
-
-	mVertexSize+=getFormatSize(format);
+bool D3D9VertexFormat::create(){
+	return true;
 }
 
-bool D3D9VertexFormat::create(){
+void D3D9VertexFormat::destroy(){
+	destroyContext();
+
+	if(mListener!=NULL){
+		mListener->vertexFormatDestroyed(this);
+	}
+}
+
+bool D3D9VertexFormat::createContext(){
 	mFVF=D3D9Renderer::getFVF(this);
 
 	HRESULT result=S_OK;
@@ -88,7 +91,9 @@ bool D3D9VertexFormat::create(){
 	return SUCCEEDED(result);
 }
 
-void D3D9VertexFormat::destroy(){
+bool D3D9VertexFormat::destroyContext(){
+	mFVF=0;
+
 	#if !defined(TOADLET_SET_D3DM)
 		if(mElements!=NULL){
 			delete[] mElements;
@@ -101,9 +106,18 @@ void D3D9VertexFormat::destroy(){
 		}
 	#endif
 
-	if(mListener!=NULL){
-		mListener->vertexFormatDestroyed(this);
-	}
+	return true;
+}
+
+void D3D9VertexFormat::addElement(int semantic,int index,int format){
+	mSemantics.add(semantic);
+	mIndexes.add(index);
+	mFormats.add(format);
+	mOffsets.add(mVertexSize);
+
+	mVertexSize+=getFormatSize(format);
+
+	destroyContext();
 }
 
 int D3D9VertexFormat::findSemantic(int semantic){

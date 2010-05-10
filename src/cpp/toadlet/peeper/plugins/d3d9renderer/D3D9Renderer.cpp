@@ -375,10 +375,10 @@ void D3D9Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Index
 		#if !defined(TOADLET_SET_D3DM)
 		/// @todo: check if not using a vp
 			//if(mLastProgram==NULL){
-			//	result=mD3DDevice->SetFVF(d3dvertexFormat->mFVF);
+			//	result=mD3DDevice->SetFVF(d3dvertexFormat->getFVF());
 			//}
 			//else{
-				mD3DDevice->SetVertexDeclaration(d3dvertexFormat->mDeclaration);
+				mD3DDevice->SetVertexDeclaration(d3dvertexFormat->getDeclaration());
 			//}
 			TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: SetFVF");
 		#endif
