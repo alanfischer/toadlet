@@ -659,8 +659,6 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 			}
 		}
 
-		vertexFormat->create();
-
 		// HACK: Due to a bug in reading back vertexes from a hardware buffer in OGLES, we only load the static VertexBuffer of a Mesh if its not animated.
 		VertexBuffer::ptr vertexBuffer;
 		if(bufferManager!=NULL){

@@ -43,10 +43,10 @@ public:
 
 	void setVertexFormatDestroyedListener(VertexFormatDestroyedListener *listener){mListener=listener;}
 
-	void addElement(int semantic,int index,int format);
 	bool create();
 	void destroy();
 
+	void addElement(int semantic,int index,int format);
 	int getNumElements() const{return mSemantics.size();}
 	int getSemantic(int i) const{return mSemantics[i];}
 	int getIndex(int i) const{return mIndexes[i];}
@@ -54,6 +54,8 @@ public:
 	int getOffset(int i) const{return mOffsets[i];}
 	int findSemantic(int semantic);
 	int getVertexSize() const{return mVertexSize;}
+
+	inline ID3D10InputLayout *getLayout(){if(mLayout==NULL){createContext();}return mLayout;}
 
 protected:
 	bool createContext();
@@ -68,7 +70,7 @@ protected:
 	egg::Collection<int> mOffsets;
 	int mVertexSize;
 
-	D3D10_INPUT_ELEMENT_DESC *mElements;
+	egg::Collection<D3D10_INPUT_ELEMENT_DESC> mElements;
 	ID3D10InputLayout *mLayout;
 
 	friend class D3D10Renderer;

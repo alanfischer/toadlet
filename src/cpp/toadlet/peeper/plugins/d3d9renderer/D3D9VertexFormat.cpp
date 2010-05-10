@@ -62,6 +62,11 @@ bool D3D9VertexFormat::create(){
 void D3D9VertexFormat::destroy(){
 	destroyContext();
 
+	mSemantics.clear();
+	mIndexes.clear();
+	mFormats.clear();
+	mOffsets.clear();
+
 	if(mListener!=NULL){
 		mListener->vertexFormatDestroyed(this);
 	}
@@ -110,10 +115,11 @@ bool D3D9VertexFormat::destroyContext(){
 }
 
 void D3D9VertexFormat::addElement(int semantic,int index,int format){
+	int offset=mVertexSize;
 	mSemantics.add(semantic);
 	mIndexes.add(index);
 	mFormats.add(format);
-	mOffsets.add(mVertexSize);
+	mOffsets.add(offset);
 
 	mVertexSize+=getFormatSize(format);
 
