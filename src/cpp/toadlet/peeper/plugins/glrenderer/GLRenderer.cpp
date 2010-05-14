@@ -284,7 +284,7 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 	#endif
 
 	#if defined(TOADLET_HAS_GLES) && defined(TOADLET_FIXED_POINT)
-		mCapabilitySet.idealVertexFormatBit=VertexElement::Format_BIT_FIXED_32;
+		mCapabilitySet.idealVertexFormatBit=VertexFormat::Format_BIT_FIXED_32;
 	#else
 		mCapabilitySet.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
 	#endif
@@ -1653,7 +1653,7 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastSemanticBits)
 	}
 
 	if(semanticBits!=lastSemanticBits){
-		// Go through all the non-texture VertexElement types, check to see if the enabling state between now and last were different.
+		// Go through all the non-texture VertexFormat types, check to see if the enabling state between now and last were different.
 		//  If so check to see if the state needs to be enabled or disabled.
 		int state=0;
 		int sb=(semanticBits&VertexFormat::Semantic_MASK_NON_TEX_COORD),lsb=(lastSemanticBits&VertexFormat::Semantic_MASK_NON_TEX_COORD);

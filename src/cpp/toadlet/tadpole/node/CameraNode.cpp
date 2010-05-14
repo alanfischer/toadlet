@@ -56,6 +56,7 @@ CameraNode::CameraNode():super(),
 
 	//mWorldTranslate,
 	//mViewTransform,
+	//mForward,
 
 	mFPSLastTime(0),
 	mFPSFrameCount(0),
@@ -270,6 +271,8 @@ void CameraNode::updateWorldTransform(){
 	}
 
 	super::updateWorldTransform();
+	
+	Math::mul(mForward,mWorldTransform,Math::NEG_Z_UNIT_VECTOR3);
 
 	updateViewTransform();
 }

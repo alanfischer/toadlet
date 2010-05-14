@@ -778,12 +778,11 @@ void Simulator::testSegment(Collision &result,const Segment &segment,Solid *soli
 			break;
 			case Shape::Type_CALLBACK:
 				shape->mCallback->traceSegment(collision,segment);
-				modifyScope=true;
 			break;
 		}
 
-		if(shape->mType!=Shape::Type_CALLBACK && collision.time==0){
-			collision.scope=solid->mScope;
+		if(collision.time==0){
+			collision.scope|=solid->mInternalScope; // Bitwise OR here since the above functions may also set the scope
 		}
 
 		int scope=result.scope;
@@ -996,15 +995,17 @@ void Simulator::testSolid(Collision &result,Solid *solid1,const Segment &segment
 				Error::unimplemented("from Type_CONVEXSOLID to Type_CONVEXSOLID unimplemented");
 			}
 			else if(shape1->mType==Shape::Type_CALLBACK){
-//				Error::unimplemented("from Type_CALLBACK unimplemented");
+				Error::unimplemented("from Type_CALLBACK unimplemented");
 			}
 			else if(shape2->mType==Shape::Type_CALLBACK){
 				shape2->mCallback->traceSolid(collision,segment,solid1);
-				modifyScope=true;
 			}
 
 			if(shape1->mType!=Shape::Type_CALLBACK && shape2->mType!=Shape::Type_CALLBACK && collision.time==0){
 				collision.scope=solid2->mScope;
+			}
+			if(collision.time==0){
+				collision.scope|=solid2->mInternalScope; // Bitwise OR here since the above functions may also set the scope
 			}
 
 			int scope=result.scope;
