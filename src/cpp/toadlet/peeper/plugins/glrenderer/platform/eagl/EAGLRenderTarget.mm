@@ -37,7 +37,7 @@ namespace toadlet{
 namespace peeper{
 
 TOADLET_C_API RenderTarget *new_EAGLRenderTarget(CAEAGLLayer *layer,const Visual &visual){
-	return new EAGLRenderTarget(layer,visual);
+	return (GLRenderTarget*)(new EAGLRenderTarget(layer,visual));
 }
 
 EAGLRenderTarget::EAGLRenderTarget():GLFBOSurfaceRenderTarget(NULL),
