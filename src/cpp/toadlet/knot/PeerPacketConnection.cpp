@@ -359,7 +359,7 @@ int PeerPacketConnection::receive(byte *data,int length){
 //	if(mBlocking){
 	mMutex->lock();
 
-	if((mNewFrameBits&(0x1<<index))!=0 && mRemotePackets[index]->debugDeliverTime<=System::mtime()){ // If the NewPacketBit for the current packet is on
+	if((mNewFrameBits&(0x1<<index))!=0 && mRemotePackets[index]->debugDeliverTime<=(int)System::mtime()){ // If the NewPacketBit for the current packet is on
 		mNewFrameBits&=(~(0x1<<index)); // Turn it off
 
 		mMasterFrame++;
