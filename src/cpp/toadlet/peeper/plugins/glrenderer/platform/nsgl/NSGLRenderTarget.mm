@@ -31,6 +31,10 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
+TOADLET_C_API RenderTarget *new_NSGLRenderTarget(NSView *view,const Visual &visual){
+	return new NSGLRenderTarget(view,visual);
+}
+	
 NSGLRenderTarget::NSGLRenderTarget():
 	mView(nil),
 	mPixelFormat(nil),

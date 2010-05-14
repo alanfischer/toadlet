@@ -105,6 +105,8 @@ public:
 
 		return size;
 	}
+	
+	virtual ~VertexFormat(){}
 
 	virtual VertexFormat *getRootVertexFormat()=0;
 

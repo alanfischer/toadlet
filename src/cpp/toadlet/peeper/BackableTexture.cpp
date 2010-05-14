@@ -112,7 +112,7 @@ bool BackableTexture::load(int width,int height,int depth,int mipLevel,byte *mip
 	}
 	else{
 		if(mipLevel==0){
-			ImageFormatConversion::convert(mipData,mFormat,mRowPitch,mSlicePitch,mData,mFormat,mRowPitch,mSlicePitch,mWidth,mHeight,mDepth);
+			ImageFormatConversion::convert(mipData,mFormat,mRowPitch,mSlicePitch,mData,mFormat,mRowPitch,mSlicePitch,width,height,depth);
 			return true;
 		}
 		else{
@@ -127,9 +127,7 @@ bool BackableTexture::read(int width,int height,int depth,int mipLevel,byte *mip
 	}
 	else{
 		if(mipLevel==0){
-			int rowPitch=ImageFormatConversion::getPixelSize(mFormat)*mWidth;
-			int slicePitch=rowPitch*mHeight;
-			ImageFormatConversion::convert(mData,mFormat,mRowPitch,mSlicePitch,mipData,mFormat,mRowPitch,mSlicePitch,mWidth,mHeight,mDepth);
+			ImageFormatConversion::convert(mData,mFormat,mRowPitch,mSlicePitch,mipData,mFormat,mRowPitch,mSlicePitch,width,height,depth);
 			return true;
 		}
 		else{
