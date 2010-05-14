@@ -66,6 +66,7 @@ public:
 	void setModel(BSP30Map::ptr map,const egg::String &name);
 	void setModel(BSP30Map::ptr map,int index);
 	int getModel() const{return mModelIndex;}
+	BSP30Map::ptr getMap(){return mMap;}
 
 	void setVisible(bool visible){mVisible=visible;}
 	bool getVisible() const{return mVisible;}

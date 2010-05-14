@@ -57,7 +57,9 @@ BSP30ModelNode::SubModel::SubModel(BSP30ModelNode *modelNode,BSP30Map *map){
 void BSP30ModelNode::SubModel::render(peeper::Renderer *renderer) const{
 	BSP30Map::facedata *face=faces;
 	while(face!=NULL){
-		renderer->renderPrimitive(map->vertexData,face->indexData);
+		if(face->visible){
+			renderer->renderPrimitive(map->vertexData,face->indexData);
+		}
 		face=face->next;
 	}
 }
@@ -350,7 +352,9 @@ void BSP30Node::render(Renderer *renderer) const{
 		mMap->materials[i]->setupRenderer(renderer,previousMaterial);
 		BSP30Map::facedata *face=mVisibleMaterialFaces[i];
 		while(face!=NULL){
-			renderer->renderPrimitive(mMap->vertexData,face->indexData);
+			if(face->visible){
+				renderer->renderPrimitive(mMap->vertexData,face->indexData);
+			}
 			face=face->next;
 		}
 		previousMaterial=mMap->materials[i];
