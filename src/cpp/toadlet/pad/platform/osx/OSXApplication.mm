@@ -31,17 +31,7 @@
  
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Error.h>
-#if defined(TOADLET_HAS_OPENGL)
-	#include <toadlet/peeper/plugins/glrenderer/GLRenderer.h>
-	#if defined(TOADLET_HAS_UIKIT)
-		#include <toadlet/peeper/plugins/glrenderer/platform/eagl/EAGLRenderTarget.h>
-	#else
-		#include <toadlet/peeper/plugins/glrenderer/platform/nsgl/NSGLRenderTarget.h>
-	#endif
-#endif
-#if defined(TOADLET_HAS_OPENAL)
-	#include <toadlet/ribbit/plugins/alplayer/ALPlayer.h>
-#endif
+#include <toadlet/peeper/CapabilitySet.h>
 #include <toadlet/pad/platform/osx/OSXApplication.h>
 #include <toadlet/pad/ApplicationListener.h>
 
@@ -58,6 +48,18 @@ using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 using namespace toadlet::tadpole;
 using namespace toadlet::pad;
+
+#if defined(TOADLET_HAS_OPENGL)
+	extern "C" Renderer *new_GLRenderer();
+	#if defined(TOADLET_HAS_UIKIT)
+		extern "C" RenderTarget *new_EAGLRenderTarget(CAEAGLLayer *layer,const Visual &visual);
+	#else
+		extern "C" RenderTarget *new_NSGLRenderTarget(NSView *view,const Visual &visual);
+	#endif
+#endif
+#if defined(TOADLET_HAS_OPENAL)
+	extern "C" AudioPlayer *new_ALPlayer();
+#endif
 
 @interface ApplicationView:
 #if defined(TOADLET_HAS_UIKIT)
@@ -436,9 +438,9 @@ ApplicationListener *OSXApplication::getApplicationListener() const{
 RenderTarget *OSXApplication::makeRenderTarget(){
 	#if defined(TOADLET_HAS_OPENGL)
 		#if defined(TOADLET_HAS_UIKIT)
-			return (GLRenderTarget*)new EAGLRenderTarget((CAEAGLLayer*)[(UIView*)mView layer],mVisual);
+			return new_EAGLRenderTarget((CAEAGLLayer*)[(UIView*)mView layer],mVisual);
 		#else
-			return new NSGLRenderTarget((NSView*)mView,mVisual);
+			return new_NSGLRenderTarget((NSView*)mView,mVisual);
 	#endif
 	#else
 		return NULL;
@@ -447,7 +449,7 @@ RenderTarget *OSXApplication::makeRenderTarget(){
 
 Renderer *OSXApplication::makeRenderer(){
 	#if defined(TOADLET_HAS_OPENGL)
-		return new GLRenderer();
+		return new_GLRenderer();
 	#else
 		return NULL;
 	#endif
@@ -511,7 +513,7 @@ bool OSXApplication::destroyRendererAndContext(){
 
 bool OSXApplication::createAudioPlayer(){
 	#if defined(TOADLET_HAS_OPENAL)
-		mAudioPlayer=new ALPlayer();
+		mAudioPlayer=new_ALPlayer();
 		// Fade in buffers over 100 ms, reduces popping
 		int options[]={1,100,0};
 		bool result=false;
