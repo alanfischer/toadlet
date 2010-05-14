@@ -131,20 +131,17 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 
 "struct VS_OUTPUT{\n"
     "float4 Pos : SV_POSITION;\n"
-    "float4 Color : COLOR0;\n"
     "float2 TexCoords : TEXCOORD0;\n"
 "};\n"
 
-"VS_OUTPUT VS( float4 Pos : POSITION, float4 Color : NORMAL, float2 TexCoords : TEXCOORD){\n"
+"VS_OUTPUT VS( float4 Pos : POSITION, float2 TexCoords : TEXCOORD){\n"
   "VS_OUTPUT Output = (VS_OUTPUT)0;\n"
   "Output.Pos = mul(Pos, ShaderMatrix);\n"
-  "Output.Color = Color;\n"
   "Output.TexCoords = TexCoords;\n"
   "return Output;\n"
 "}\n"
 
 "float4 PS( VS_OUTPUT Input ) : SV_Target{\n"
-	//"return (Input.TexCoords,0,0);\n"
     "return diffuseTexture.Sample(samLinear,Input.TexCoords);\n"
 "}\n"
 
@@ -493,7 +490,7 @@ void D3D10Renderer::setTexturePerspective(bool texturePerspective){
 }
 
 void D3D10Renderer::setTextureStage(int stage,TextureStage *textureStage){
-	if(textureStage!=NULL && textureStage->texture!=NULL){
+	if(textureStage!=NULL && stage==0 && textureStage->texture!=NULL){
 		texture=((D3D10Texture*)(textureStage->texture->getRootTexture(0)))->mShaderResourceView;
 	}
 	else{
@@ -750,6 +747,7 @@ DXGI_FORMAT D3D10Renderer::getVertexDXGI_FORMAT(int format){
 		case VertexFormat::Format_BIT_UINT_8|VertexFormat::Format_BIT_COUNT_2:
 			return DXGI_FORMAT_R8G8_UINT;
 		case VertexFormat::Format_BIT_UINT_8|VertexFormat::Format_BIT_COUNT_4:
+		case VertexFormat::Format_COLOR_RGBA:
 			return DXGI_FORMAT_R8G8B8A8_UINT;
 
 		case VertexFormat::Format_BIT_INT_8|VertexFormat::Format_BIT_COUNT_1:

@@ -277,6 +277,8 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 	for(i=0;i<map->nfaces;i++){
 		bface *face=&map->faces[i];
 
+		map->facedatas[i].index=i;
+
 		// Find texture width & height for this face.
 		// We have to use the information from the actual BSP here, instead of the found texture,
 		//  since the found texture may be of different dimensions than what was used when the BSP was compiled.

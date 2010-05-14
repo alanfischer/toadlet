@@ -319,8 +319,12 @@ public:
 	}
 
 	struct facedata{
+		facedata():index(0),visible(true),next(NULL){}
+
+		int index;
 		peeper::IndexData::ptr indexData;
 		Matrix4x4 lightmapTransform;
+		bool visible;
 		facedata *next;
 	};
 
