@@ -26,7 +26,6 @@
 #ifndef TOADLET_KNOT_H
 #define TOADLET_KNOT_H
 
-#include <toadlet/knot/ClientEventConnection.h>
 #include <toadlet/knot/Connection.h>
 #include <toadlet/knot/Connector.h>
 #include <toadlet/knot/DebugListener.h>

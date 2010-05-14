@@ -43,11 +43,9 @@ public:
 	virtual bool isValid() const{return mD3DDevice!=NULL;}
 
 	virtual bool createContext(HWND wnd,const Visual &visual,bool debug);
-
 	virtual bool destroyContext();
 
 	virtual int getWidth() const{return mWidth;}
-
 	virtual int getHeight() const{return mHeight;}
 
 	virtual void makeCurrent(ID3D10Device *device);

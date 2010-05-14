@@ -53,6 +53,9 @@ public:
 	void setScope(int scope){mScope=scope;}
 	int getScope() const{return mScope;}
 
+	void setInternalScope(int scope){mInternalScope=scope;}
+	int getInternalScope() const{return mInternalScope;}
+
 	void setCollisionBits(int bits){mCollisionBits=bits;}
 	int getCollisionBits() const{return mCollisionBits;}
 
@@ -133,6 +136,7 @@ protected:
 	void internal_removeConstraint(Constraint *constraint){mConstraints.remove(constraint);}
 
 	int mScope;
+	int mInternalScope;
 	int mCollisionBits;
 	int mCollideWithBits;
 	scalar mMass;

@@ -70,9 +70,6 @@ public:
 	void setVisible(bool visible){mVisible=visible;}
 	bool getVisible() const{return mVisible;}
 
-	void setInternalScope(int scope){mInternalScope=scope;}
-	int getInternalScope() const{return mInternalScope;}
-
 	inline int getNumSubModels() const{return mSubModels.size();}
 	SubModel *getSubModel(int i){return mSubModels[i];}
 
@@ -86,7 +83,6 @@ protected:
 	BSP30Map::ptr mMap;
 	int mModelIndex;
 	bool mVisible; // Should be moved to the overall 'mesh/visible/renderable' class perhaps
-	int mInternalScope;
 	egg::Collection<SubModel::ptr> mSubModels;
 };
 

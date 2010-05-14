@@ -98,6 +98,7 @@ public:
 	inline bool getSkipFirstClear() const{return mSkipFirstClear;}
 
 	inline const Matrix4x4 &getViewTransform() const{return mViewTransform;}
+	inline const Vector3 &getForward() const{return mForward;}
 
 	/// @todo: These should probably be moved into the Math library, and passing in a list of planes
 	virtual bool culled(const Sphere &sphere) const;
@@ -130,6 +131,7 @@ protected:
 	Matrix4x4 mViewTransform;
 	Matrix4x4 mViewProjectionTransform;
 	Plane mClipPlanes[6];
+	Vector3 mForward;
 
 	int mFPSLastTime;
 	int mFPSFrameCount;

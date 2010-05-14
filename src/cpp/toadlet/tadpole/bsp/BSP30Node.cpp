@@ -67,8 +67,7 @@ TOADLET_NODE_IMPLEMENT(BSP30ModelNode,Categories::TOADLET_TADPOLE_BSP+".BSP30Mod
 BSP30ModelNode::BSP30ModelNode():Node(),
 	//mMap,
 	mModelIndex(-1),
-	mVisible(true),
-	mInternalScope(0)
+	mVisible(true)
 {}
 
 BSP30ModelNode::~BSP30ModelNode(){
@@ -143,12 +142,7 @@ void BSP30ModelNode::traceSegment(Collision &result,const Segment &segment,const
 	if(mMap!=NULL){
 		int contents=mMap->modelTrace(result,mModelIndex,size,localSegment.origin,result.point);
 		if(contents!=CONTENTS_EMPTY){
-			if(mInternalScope==0){
-				result.scope|=(-1-contents)<<1;
-			}
-			else{
-				result.scope|=mInternalScope;
-			}
+			result.scope|=(-1-contents)<<1;
 		}
 	}
 
