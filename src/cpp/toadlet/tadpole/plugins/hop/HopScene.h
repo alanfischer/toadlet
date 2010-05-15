@@ -61,7 +61,7 @@ public:
 		virtual scalar getEpsilon() const{return mSimulator->getEpsilon();}
 	#endif
 
-	virtual void logicUpdate(int dt);
+	virtual void logicUpdate(int dt,int scope);
 
 	// Hop items
 	inline hop::Simulator *getSimulator(){return mSimulator;}

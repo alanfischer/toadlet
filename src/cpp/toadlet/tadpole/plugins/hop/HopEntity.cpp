@@ -52,6 +52,8 @@ Node *HopEntity::create(Scene *scene){
 
 	mSolid->reset();
 	mSolid->setUserData(this);
+	mSolid->setCollisionListener(this);
+
 	mTraceableShape=NULL;
 	mTraceable=NULL;
 	mInterpolator=NULL;

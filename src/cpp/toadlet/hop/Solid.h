@@ -101,6 +101,7 @@ public:
 	void removeAllShapes();
 	Shape::ptr getShape(int i) const{return mShapes[i];}
 	int getNumShapes() const{return mShapes.size();}
+	int getShapeTypes() const{return mShapeTypes;}
 
 	inline const AABox &getLocalBound() const{return mLocalBound;}
 	inline const AABox &getWorldBound() const{return mWorldBound;}
@@ -152,6 +153,7 @@ protected:
 	scalar mCoefficientOfEffectiveDrag;
 
 	egg::Collection<Shape::ptr> mShapes;
+	int mShapeTypes;
 	AABox mLocalBound;
 	AABox mWorldBound;
 
