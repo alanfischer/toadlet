@@ -394,7 +394,10 @@ void Simulator::update(int dt,int scope,Solid *solid){
 			(solid->mManager!=NULL?solid->mManager:mManager)->intraUpdate(solid,dt,fdt);
 		}
 
+		// In most cases we don't need to cap the oldPosition, but if our position is set outside of the max,
+		//  then when we cap the newPosition, it will think we are attempting to move from the old to the new, instead of just setting there
 		snapToGrid(oldPosition);
+		capVector3(oldPosition,mMaxPositionComponent);
 		snapToGrid(newPosition);
 		capVector3(newPosition,mMaxPositionComponent);
 
@@ -462,7 +465,12 @@ void Simulator::update(int dt,int scope,Solid *solid){
 					(solid->mCollisionListener!=NULL || (c.collider!=NULL && c.collider->mCollisionListener!=NULL)))
 				{
 					c.collidee=solid;
-					sub(c.velocity,solid->mVelocity,c.collider->mVelocity);
+					if(c.collider!=NULL){
+						sub(c.velocity,solid->mVelocity,c.collider->mVelocity);
+					}
+					else{
+						c.velocity.set(solid->mVelocity);
+					}
 
 					if(mCollisions.size()<=numCollisions){
 						mCollisions.resize(numCollisions+1);
@@ -481,7 +489,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 
 				if(responded==false){
 					// Conservation of momentum
-					if(solid->mCoefficientOfRestitutionOverride){
+					if(solid->mCoefficientOfRestitutionOverride || hitSolid==NULL){
 						cor=solid->mCoefficientOfRestitution;
 					}
 					else{
@@ -995,7 +1003,8 @@ void Simulator::testSolid(Collision &result,Solid *solid1,const Segment &segment
 				Error::unimplemented("from Type_CONVEXSOLID to Type_CONVEXSOLID unimplemented");
 			}
 			else if(shape1->mType==Shape::Type_CALLBACK){
-				Error::unimplemented("from Type_CALLBACK unimplemented");
+//				Error::unimplemented("from Type_CALLBACK unimplemented");
+collision.reset();
 			}
 			else if(shape2->mType==Shape::Type_CALLBACK){
 				shape2->mCallback->traceSolid(collision,segment,solid1);

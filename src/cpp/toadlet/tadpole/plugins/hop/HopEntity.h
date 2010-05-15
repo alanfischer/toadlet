@@ -84,6 +84,8 @@ public:
 	virtual void setCoefficientOfEffectiveDrag(scalar coeff);
 	virtual scalar getCoefficientOfEffectiveDrag() const{return mSolid->getCoefficientOfEffectiveDrag();}
 
+	virtual const AABox &getBound(){return mSolid->getLocalBound();}
+
 	virtual void setScope(int scope){mSolid->setScope(scope); super::setScope(scope);}
 
 	virtual void setTraceableShape(Traceable *traceable);
@@ -113,8 +115,6 @@ public:
 
 	// CollisionListener callbacks
 	virtual void collision(const hop::Collision &c);
-
-int flags;
 
 protected:
 	virtual void updateCollisionVolumes();

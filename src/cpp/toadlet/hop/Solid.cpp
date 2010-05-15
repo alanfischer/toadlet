@@ -52,6 +52,7 @@ Solid::Solid():
 	mCoefficientOfEffectiveDrag(0),
 
 	//mShapes,
+	mShapeTypes(0),
 	//mLocalBound,
 	//mWorldBound,
 
@@ -101,6 +102,7 @@ void Solid::reset(){
 	mCoefficientOfDynamicFriction=Math::HALF;
 	mCoefficientOfEffectiveDrag=0;
 
+	mShapeTypes=0;
 	mLocalBound.reset();
 	mWorldBound.reset();
 
@@ -231,14 +233,17 @@ void Solid::setPositionDirect(const Vector3 &position){
 }
 
 void Solid::updateLocalBound(){
+	mShapeTypes=0;
 	if(mShapes.size()==0){
 		mLocalBound.reset();
 	}
 	else{
+		mShapeTypes|=mShapes[0]->getType();
 		mShapes[0]->getBound(mLocalBound);
 		AABox box;
 		int i;
 		for(i=1;i<mShapes.size();++i){
+			mShapeTypes|=mShapes[i]->getType();
 			mShapes[i]->getBound(box);
 			mLocalBound.mergeWith(box);
 		}

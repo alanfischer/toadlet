@@ -223,6 +223,7 @@ void BSP30Node::nodeAttached(Node *node){
 
 	if(mMap!=NULL){
 		Collection<int> &newIndexes=((childdata*)node->getParentData())->leafs;
+		/// @todo: Is this initial placement necessary, or will this get taken care of by the mergeWorldBounds at the end of the node attachment?
 		mMap->findBoundLeafs(newIndexes,mMap->nodes,0,node->getWorldBound());
 		insertNodeLeafIndexes(newIndexes,node);
 	}

@@ -95,9 +95,9 @@ void HopScene::testEntity(Collision &result,HopEntity *entity1,const Segment &se
 	set(result,collision);
 }
 
-void HopScene::logicUpdate(int dt){
+void HopScene::logicUpdate(int dt,int scope){
 	TOADLET_PROFILE_BEGINSECTION(Simulator::update);
-	mSimulator->update(dt);
+	mSimulator->update(dt,scope);
 	TOADLET_PROFILE_ENDSECTION(Simulator::update);
 
 	// Reactivate any nodes that might have been deactivated
@@ -110,7 +110,7 @@ void HopScene::logicUpdate(int dt){
 		}
 	}
 
-	Scene::logicUpdate(dt);
+	Scene::logicUpdate(dt,scope);
 }
 
 class SolidSensorResults:public SensorResultsListener{
@@ -151,7 +151,8 @@ void HopScene::traceSegment(hop::Collision &result,const Segment &segment){
 }
 
 void HopScene::traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid){
-	if(mTraceable!=NULL){
+	// Only trace shapes that aren't a callback
+	if(mTraceable!=NULL && (solid->getShapeTypes()&Shape::Type_CALLBACK)==0){
 		tadpole::Collision collision;
 		const AABox &bound=solid->getLocalBound();
 		Vector3 size;

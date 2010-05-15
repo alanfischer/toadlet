@@ -40,11 +40,11 @@ public:
 	TOADLET_SHARED_POINTERS(Shape);
 
 	enum Type{
-		Type_AABOX=0,
-		Type_SPHERE,
-		Type_CAPSULE,
-		Type_CONVEXSOLID,
-		Type_CALLBACK,
+		Type_AABOX=			1<<0,
+		Type_SPHERE=		1<<1,
+		Type_CAPSULE=		1<<2,
+		Type_CONVEXSOLID=	1<<3,
+		Type_CALLBACK=		1<<4,
 	};
 
 	Shape();
