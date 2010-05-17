@@ -60,6 +60,7 @@ Simulator::Simulator():
 	mMaxVelocityComponent(0),
 	mMaxForceComponent(0),
 	//mCollisions,
+	mNumCollisions(0),
 	//mSolids,
 	//mSpacialCollection,
 	mNumSpacialCollection(0),
@@ -243,7 +244,6 @@ void Simulator::update(int dt,int scope,Solid *solid){
 	int loop=0;
 	Solid *hitSolid=NULL;
 	Collision &c=cache_update_c.reset();
-	int numCollisions=0;
 	int i,j;
 
 	scalar fdt=fromMilli(dt);
@@ -472,12 +472,12 @@ void Simulator::update(int dt,int scope,Solid *solid){
 						c.velocity.set(solid->mVelocity);
 					}
 
-					if(mCollisions.size()<=numCollisions){
-						mCollisions.resize(numCollisions+1);
+					if(mCollisions.size()<=mNumCollisions){
+						mCollisions.resize(mNumCollisions+1);
 					}
 
-					mCollisions[numCollisions].set(c);
-					numCollisions++;
+					mCollisions[mNumCollisions].set(c);
+					mNumCollisions++;
 				}
 				hitSolid=c.collider;
 
@@ -665,9 +665,20 @@ void Simulator::update(int dt,int scope,Solid *solid){
 		}
 	}
 
-	// Now report all collisions to both solids
+	if((scope&Scope_REPORT_COLLISIONS)>0){
+		reportCollisions();
+	}
+
+	if(mManager!=NULL){
+		mManager->postUpdate(dt,fdt);
+	}
+}
+
+void Simulator::reportCollisions(){
 	mReportingCollisions=true;
-	for(i=0;i<numCollisions;++i){
+	int reportedCollisions=0;
+	int i;
+	for(i=0;i<mNumCollisions;++i){
 		Collision &col=mCollisions[i];
 
 		// We must do these as 2 separate ifs, because the collision functions may destroy the solids they are hitting
@@ -680,22 +691,13 @@ void Simulator::update(int dt,int scope,Solid *solid){
 		if(col.collider!=NULL){
 			CollisionListener *listener=col.collider->mCollisionListener;
 			if(listener!=NULL && col.collidee!=NULL && (col.collider->mCollideWithBits&col.collidee->mCollisionBits)!=0){
-				Solid *s=col.collider;
-				col.collider=col.collidee;
-				col.collidee=s;
-
-				neg(col.normal);
-				neg(col.velocity);
-
+				col.invert();
 				listener->collision(col);
 			}
 		}
 	}
+	mNumCollisions=0;
 	mReportingCollisions=false;
-
-	if(mManager!=NULL){
-		mManager->postUpdate(dt,fdt);
-	}
 }
 
 int Simulator::findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids) const{
@@ -1003,9 +1005,20 @@ void Simulator::testSolid(Collision &result,Solid *solid1,const Segment &segment
 				Error::unimplemented("from Type_CONVEXSOLID to Type_CONVEXSOLID unimplemented");
 			}
 			else if(shape1->mType==Shape::Type_CALLBACK){
-//				Error::unimplemented("from Type_CALLBACK unimplemented");
-collision.reset();
-			}
+/*				Segment invertedSegment;
+				segment.getEndPoint(invertedSegment.origin);
+				Math::mul(invertedSegment.direction,segment.direction,-Math::ONE);
+//collision.reset();
+				shape1->mCallback->traceSolid(collision,invertedSegment,solid2);
+
+				// This will do most of the inverting, but the point still needs to be recalculated,
+				//  since invert is mainly used for swapping reference solid
+				collision.invert();
+
+				Vector3 v;
+				Math::sub(v,invertedSegment.origin,collision.point);
+				Math::add(collision.point,segment.origin,v);
+*/			}
 			else if(shape2->mType==Shape::Type_CALLBACK){
 				shape2->mCallback->traceSolid(collision,segment,solid1);
 			}

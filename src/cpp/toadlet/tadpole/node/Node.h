@@ -135,6 +135,7 @@ public:
 	virtual void frameUpdate(int dt,int scope);
 	virtual void queueRenderables(CameraNode *camera,RenderQueue *queue){}
 
+	virtual void setStayActive(bool active);
 	virtual void activate();
 	virtual void deactivate();
 	virtual void tryDeactivate();
@@ -148,6 +149,15 @@ public:
 	inline void internal_setManaged(bool managed){mManaged=managed;}
 	inline bool internal_getManaged() const{return mManaged;}
 
+	// These functions should be moved to a Bound class
+	inline bool testWorldBound(const Sphere &bound){
+		if(mWorldBound.radius<0 || bound.radius<0){
+			return true;
+		}
+
+		return Math::testIntersection(mWorldBound,bound);
+	}
+
 	static void mul(Sphere &r,const Vector3 &translate,const Quaternion &rotate,const Vector3 &scale,const Sphere &s){
 		Math::mul(r.origin,scale,s.radius);
 		r.radius=Math::maxVal(Math::maxVal(r.origin.x,r.origin.y),r.origin.z);
@@ -157,16 +167,13 @@ public:
 
 	// Merge two spheres, passing along -1 radius, and ignoring 0 radius
 	static void merge(Sphere &r,const Sphere &s){
-		if(r.radius>0 && s.radius>0){
-			Vector3 origin=(r.origin+s.origin)/2;
-			scalar radius=Math::maxVal(Math::length(r.origin-origin)+r.radius,Math::length(s.origin-origin)+s.radius);
-			r.origin=origin;
+		Vector3 origin=(r.origin+s.origin)/2;
+		scalar radius=Math::maxVal(Math::length(r.origin,origin)+Math::maxVal(r.radius,0),Math::length(s.origin,origin)+Math::maxVal(s.radius,0));
+		r.origin.set(origin);
+		if(r.radius>=0 && s.radius>=0){
 			r.radius=radius;
 		}
-		else if(r.radius==0 && s.radius>0){
-			r.set(s);
-		}
-		else if(s.radius<0){
+		else{
 			r.radius=-Math::ONE;
 		}
 	}
@@ -181,7 +188,9 @@ public:
 	}
 
 	static void set(AABox &box,const Sphere &sphere){
-		box.set(sphere.radius);
+		if(sphere.radius<0){
+			box.set(1000);
+		}
 		Math::add(box,sphere.origin);
 	}
 

@@ -46,6 +46,10 @@ public:
 		Integrator_RUNGE_KUTTA,
 	};
 
+	enum Scope{
+		Scope_REPORT_COLLISIONS=1<<30,
+	};
+
 	Simulator();
 	virtual ~Simulator();
 
@@ -114,6 +118,8 @@ public:
 	int countActiveSolids();
 
 protected:
+	void reportCollisions();
+
 	void traceSegmentWithCurrentSpacials(Collision &result,const Segment &segment,int collideWithBits,Solid *ignore);
 	void traceSolidWithCurrentSpacials(Collision &result,Solid *solid,const Segment &segment,int collideWithBits);
 
@@ -146,6 +152,7 @@ protected:
 	scalar mMaxVelocityComponent;
 	scalar mMaxForceComponent;
 	egg::Collection<Collision> mCollisions;
+	int mNumCollisions;
 	egg::Collection<Solid::ptr> mSolids;
 	egg::Collection<Constraint::ptr> mConstraints;
 	egg::Collection<Solid*> mSpacialCollection;

@@ -96,6 +96,7 @@ public:
 	virtual int getNumShapes() const{return mSolid->getNumShapes();}
 
 	virtual void touch(const tadpole::Collision &c){}
+	virtual void think(){}
 
 	inline hop::Solid::ptr getSolid() const{return mSolid;}
 

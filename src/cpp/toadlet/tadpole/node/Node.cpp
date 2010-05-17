@@ -260,6 +260,16 @@ void Node::frameUpdate(int dt,int scope){
 	updateWorldTransform();
 }
 
+void Node::setStayActive(bool active){
+	if(active){
+		activate();
+		mDeactivateCount=-1;
+	}
+	else{
+		mDeactivateCount=0;
+	}
+}
+
 void Node::activate(){
 	if(mDeactivateCount>0){
 		mDeactivateCount=0;
