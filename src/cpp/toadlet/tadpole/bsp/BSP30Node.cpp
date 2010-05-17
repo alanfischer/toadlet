@@ -192,7 +192,12 @@ void BSP30Node::setMap(BSP30Map::ptr map){
 	for(i=0;i<mChildren.size();++i){
 		Node *node=mChildren[i];
 		Collection<int> &indexes=((childdata*)node->getParentData())->leafs;
-		mMap->findBoundLeafs(indexes,mMap->nodes,0,node->getWorldBound());
+		if(node->getWorldBound().radius<0){
+			indexes.add(-1);
+		}
+		else{
+			mMap->findBoundLeafs(indexes,mMap->nodes,0,node->getWorldBound());
+		}
 		insertNodeLeafIndexes(indexes,node);
 	}
 
@@ -224,7 +229,12 @@ void BSP30Node::nodeAttached(Node *node){
 	if(mMap!=NULL){
 		Collection<int> &newIndexes=((childdata*)node->getParentData())->leafs;
 		/// @todo: Is this initial placement necessary, or will this get taken care of by the mergeWorldBounds at the end of the node attachment?
-		mMap->findBoundLeafs(newIndexes,mMap->nodes,0,node->getWorldBound());
+		if(node->getWorldBound().radius<0){
+			newIndexes.add(-1);
+		}
+		else{
+			mMap->findBoundLeafs(newIndexes,mMap->nodes,0,node->getWorldBound());
+		}
 		insertNodeLeafIndexes(newIndexes,node);
 	}
 }
@@ -243,14 +253,24 @@ void BSP30Node::nodeRemoved(Node *node){
 void BSP30Node::insertNodeLeafIndexes(const Collection<int> &indexes,Node *node){
 	int i;
 	for(i=indexes.size()-1;i>=0;--i){
-		mLeafData[indexes[i]].occupants.add(node);
+		if(indexes[i]<0){
+			mGlobalLeafData.occupants.add(node);
+		}
+		else{
+			mLeafData[indexes[i]].occupants.add(node);
+		}
 	}
 }
 
 void BSP30Node::removeNodeLeafIndexes(const Collection<int> &indexes,Node *node){
 	int i;
 	for(i=indexes.size()-1;i>=0;--i){
-		mLeafData[indexes[i]].occupants.remove(node);
+		if(indexes[i]<0){
+			mGlobalLeafData.occupants.remove(node);
+		}
+		else{
+			mLeafData[indexes[i]].occupants.remove(node);
+		}
 	}
 }
 
@@ -308,6 +328,12 @@ void BSP30Node::queueRenderables(CameraNode *camera,RenderQueue *queue){
 				}
 			}
 		}
+
+		const Collection<Node*> &occupants=mGlobalLeafData.occupants;
+		for(j=0;j<occupants.size();++j){
+			Node *occupant=occupants[j];
+			super::queueRenderables(occupant,camera,queue);
+		}
 	}
 }
 
@@ -316,21 +342,34 @@ bool BSP30Node::senseBoundingVolumes(SensorResultsListener *listener,const Spher
 		return false;
 	}
 
+	int i,j;
 	mCounter++;
 	Collection<int> &newIndexes=mLeafIndexes; 
 	newIndexes.clear();
-	mMap->findBoundLeafs(newIndexes,mMap->nodes,0,volume);
-	for(int i=0;i<newIndexes.size();i++){
+	if(volume.radius<0){
+		newIndexes.add(-1);
+	}
+	else{
+		mMap->findBoundLeafs(newIndexes,mMap->nodes,0,volume);
+	}
+	for(i=0;i<newIndexes.size();i++){
 		const Collection<Node*> &occupants=mLeafData[newIndexes[i]].occupants;
-		for(int j=0;j<occupants.size();++j){
+		for(j=0;j<occupants.size();++j){
 			Node *occupant=occupants[j];
 			childdata *data=(childdata*)occupant->getParentData();
-			if(data->counter!=mCounter && Math::testIntersection(occupant->getWorldBound(),volume)){
+			if(data->counter!=mCounter && occupant->testWorldBound(volume)){
 				data->counter=mCounter;
 				listener->resultFound(occupant);
 			}
 		}
 	}
+
+	const Collection<Node*> &occupants=mGlobalLeafData.occupants;
+	for(j=0;j<occupants.size();++j){
+		Node *occupant=occupants[j];
+		listener->resultFound(occupant);
+	}
+
 	return true;
 }
 
@@ -373,7 +412,12 @@ void BSP30Node::childTransformUpdated(Node *child){
 	Collection<int> &oldIndexes=((childdata*)child->getParentData())->leafs;
 	Collection<int> &newIndexes=mLeafIndexes; 
 	newIndexes.clear();
-	mMap->findBoundLeafs(newIndexes,mMap->nodes,0,child->getWorldBound());
+	if(child->getWorldBound().radius<0){
+		newIndexes.add(-1);
+	}
+	else{
+		mMap->findBoundLeafs(newIndexes,mMap->nodes,0,child->getWorldBound());
+	}
 
 	if(newIndexes.size()==oldIndexes.size()){
 		int i;

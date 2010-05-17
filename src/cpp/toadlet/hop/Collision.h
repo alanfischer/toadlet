@@ -67,7 +67,16 @@ public:
 
 		return *this;
 	}
-	
+
+	inline void invert(){
+		Solid *s=collider;
+		collider=collidee;
+		collidee=s;
+
+		Math::neg(normal);
+		Math::neg(velocity);
+	}
+
 	scalar time;
 	Vector3 point; // This is the point at which the tracing solid would stop
 	Vector3 normal;

@@ -137,6 +137,7 @@ protected:
 	};
 
 	egg::Collection<leafdata> mLeafData;
+	leafdata mGlobalLeafData;
 	uint8 *mMarkedFaces;
 	toadlet::egg::Collection<BSP30Map::facedata*> mVisibleMaterialFaces;
 

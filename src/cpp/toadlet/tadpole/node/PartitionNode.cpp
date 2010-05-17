@@ -52,7 +52,7 @@ bool PartitionNode::senseBoundingVolumes(SensorResultsListener *listener,const S
 	int i;
 	for(i=0;i<mChildren.size();++i){
 		Node *child=mChildren[i];
-		if(Math::testIntersection(volume,child->getWorldBound())){
+		if(child->testWorldBound(volume)){
 			listener->resultFound(child);
 		}
 	}
