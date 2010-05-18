@@ -145,7 +145,7 @@ int HopScene::findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids){
 void HopScene::traceSegment(hop::Collision &result,const Segment &segment){
 	if(mTraceable!=NULL){
 		tadpole::Collision collision;
-		mTraceable->traceSegment(collision,segment,Math::ZERO_VECTOR3);
+		mTraceable->traceSegment(collision,Math::ZERO_VECTOR3,segment,Math::ZERO_VECTOR3);
 		set(result,collision,NULL);
 	}
 }
@@ -157,7 +157,7 @@ void HopScene::traceSolid(hop::Collision &result,const Segment &segment,const ho
 		const AABox &bound=solid->getLocalBound();
 		Vector3 size;
 		Math::sub(size,bound.maxs,bound.mins);
-		mTraceable->traceSegment(collision,segment,size);
+		mTraceable->traceSegment(collision,Math::ZERO_VECTOR3,segment,size);
 		set(result,collision,NULL);
 	}
 }

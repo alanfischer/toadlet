@@ -226,21 +226,21 @@ void HopEntity::getBound(AABox &result){
 	}
 }
 
-void HopEntity::traceSegment(hop::Collision &result,const Segment &segment){
+void HopEntity::traceSegment(hop::Collision &result,const Vector3 &position,const Segment &segment){
 	if(mTraceable!=NULL){
 		tadpole::Collision collision;
-		mTraceable->traceSegment(collision,segment,Math::ZERO_VECTOR3);
+		mTraceable->traceSegment(collision,position,segment,Math::ZERO_VECTOR3);
 		HopScene::set(result,collision,this);
 	}
 }
 
-void HopEntity::traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid){
+void HopEntity::traceSolid(hop::Collision &result,const Vector3 &position,const Segment &segment,const hop::Solid *solid){
 	if(mTraceable!=NULL){
 		tadpole::Collision collision;
 		const AABox &bound=solid->getLocalBound();
 		Vector3 size;
 		Math::sub(size,bound.maxs,bound.mins);
-		mTraceable->traceSegment(collision,segment,size);
+		mTraceable->traceSegment(collision,position,segment,size);
 		HopScene::set(result,collision,this);
 	}
 }

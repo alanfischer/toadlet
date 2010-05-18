@@ -37,7 +37,7 @@ public:
 	virtual ~Traceable(){}
 
 	virtual const Sphere &getLocalBound() const=0;
-	virtual void traceSegment(Collision &result,const Segment &segment,const Vector3 &size)=0;
+	virtual void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size)=0;
 };
 
 }

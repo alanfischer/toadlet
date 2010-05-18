@@ -787,7 +787,7 @@ void Simulator::testSegment(Collision &result,const Segment &segment,Solid *soli
 				Error::unimplemented("traceSegment not implemented for Type_CONVEXSOLID"); 
 			break;
 			case Shape::Type_CALLBACK:
-				shape->mCallback->traceSegment(collision,segment);
+				shape->mCallback->traceSegment(collision,solid->mPosition,segment);
 			break;
 		}
 
@@ -1004,23 +1004,28 @@ void Simulator::testSolid(Collision &result,Solid *solid1,const Segment &segment
 			else if(shape1->mType==Shape::Type_CONVEXSOLID && shape2->mType==Shape::Type_CONVEXSOLID){
 				Error::unimplemented("from Type_CONVEXSOLID to Type_CONVEXSOLID unimplemented");
 			}
-			else if(shape1->mType==Shape::Type_CALLBACK){
-/*				Segment invertedSegment;
-				segment.getEndPoint(invertedSegment.origin);
-				Math::mul(invertedSegment.direction,segment.direction,-Math::ONE);
-//collision.reset();
-				shape1->mCallback->traceSolid(collision,invertedSegment,solid2);
+			else if(shape1->mType==Shape::Type_CALLBACK && shape2->mType!=Shape::Type_CALLBACK){
+				Segment isegment;
+				isegment.origin.set(solid2->mPosition);
+				Math::mul(isegment.direction,segment.direction,-Math::ONE);
+
+				shape1->mCallback->traceSolid(collision,segment.origin,isegment,solid2);
 
 				// This will do most of the inverting, but the point still needs to be recalculated,
 				//  since invert is mainly used for swapping reference solid
 				collision.invert();
 
-				Vector3 v;
-				Math::sub(v,invertedSegment.origin,collision.point);
-				Math::add(collision.point,segment.origin,v);
-*/			}
-			else if(shape2->mType==Shape::Type_CALLBACK){
-				shape2->mCallback->traceSolid(collision,segment,solid1);
+				/// @todo: The bottom is 100% correct, and I think the top one is correct, but I'd like to make sure,
+				///  And then only keep the top, since it's more precise.
+				#if 1
+					Math::sub(isegment.origin,collision.point);
+					Math::add(collision.point,segment.origin,isegment.origin);
+				#else
+					Math::madd(collision.point,segment.direction,collision.time,segment.origin);
+				#endif
+			}
+			else if(shape1->mType!=Shape::Type_CALLBACK && shape2->mType==Shape::Type_CALLBACK){
+				shape2->mCallback->traceSolid(collision,solid2->mPosition,segment,solid1);
 			}
 
 			if(shape1->mType!=Shape::Type_CALLBACK && shape2->mType!=Shape::Type_CALLBACK && collision.time==0){

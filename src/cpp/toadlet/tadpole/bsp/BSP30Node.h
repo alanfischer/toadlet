@@ -78,7 +78,7 @@ public:
 
 	// Traceable items
 	const Sphere &getLocalBound() const{return super::getLocalBound();}
-	void traceSegment(Collision &result,const Segment &segment,const Vector3 &size);
+	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 protected:
 	BSP30Map::ptr mMap;
@@ -111,7 +111,7 @@ public:
 
 	// Traceable items
 	const Sphere &getLocalBound() const{return super::getLocalBound();}
-	void traceSegment(Collision &result,const Segment &segment,const Vector3 &size);
+	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 	// Renderable items
 	Material *getRenderMaterial() const{return NULL;}
@@ -121,6 +121,7 @@ public:
 protected:
 	void childTransformUpdated(Node *child);
 	void addLeafToVisible(bleaf *leaf,node::CameraNode *camera);
+	void findBoundLeafs(egg::Collection<int> &leafs,Node *node);
 
 	BSP30Map::ptr mMap;
 

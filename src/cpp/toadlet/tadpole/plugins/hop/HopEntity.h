@@ -35,6 +35,8 @@
 namespace toadlet{
 namespace tadpole{
 
+/// This ties a hop::Solid to a tadpole::node::ParentNode.  It will adjust its node transform based on the hop::Solid.
+///  It's localBound is by default set to the localBound of the hop::Solid
 class TOADLET_API HopEntity:public node::ParentNode,public hop::TraceCallback,public hop::CollisionListener{
 public:
 	TOADLET_NODE(HopEntity,node::ParentNode);
@@ -111,8 +113,8 @@ public:
 
 	// TraceCallback callbacks
 	virtual void getBound(AABox &result);
-	virtual void traceSegment(hop::Collision &result,const Segment &segment);
-	virtual void traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid);
+	virtual void traceSegment(hop::Collision &result,const Vector3 &position,const Segment &segment);
+	virtual void traceSolid(hop::Collision &result,const Vector3 &position,const Segment &segment,const hop::Solid *solid);
 
 	// CollisionListener callbacks
 	virtual void collision(const hop::Collision &c);

@@ -132,10 +132,10 @@ void BSP30ModelNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	}
 }
 
-void BSP30ModelNode::traceSegment(Collision &result,const Segment &segment,const Vector3 &size){
+void BSP30ModelNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	Segment localSegment;
 	Quaternion invrot; Math::invert(invrot,getWorldRotate());
-	Math::sub(localSegment.origin,segment.origin,getWorldTranslate());
+	Math::sub(localSegment.origin,segment.origin,position);
 	Math::mul(localSegment.origin,invrot);
 	Math::mul(localSegment.direction,invrot,segment.direction);
 
@@ -150,7 +150,7 @@ void BSP30ModelNode::traceSegment(Collision &result,const Segment &segment,const
 
 	Math::mul(result.normal,getWorldRotate());
 	Math::mul(result.point,getWorldRotate());
-	Math::add(result.point,getWorldTranslate());
+	Math::add(result.point,position);
 }
 
 TOADLET_NODE_IMPLEMENT(BSP30Node,Categories::TOADLET_TADPOLE_NODE+".BSP30Node");
@@ -192,12 +192,7 @@ void BSP30Node::setMap(BSP30Map::ptr map){
 	for(i=0;i<mChildren.size();++i){
 		Node *node=mChildren[i];
 		Collection<int> &indexes=((childdata*)node->getParentData())->leafs;
-		if(node->getWorldBound().radius<0){
-			indexes.add(-1);
-		}
-		else{
-			mMap->findBoundLeafs(indexes,mMap->nodes,0,node->getWorldBound());
-		}
+		findBoundLeafs(indexes,node);
 		insertNodeLeafIndexes(indexes,node);
 	}
 
@@ -229,12 +224,7 @@ void BSP30Node::nodeAttached(Node *node){
 	if(mMap!=NULL){
 		Collection<int> &newIndexes=((childdata*)node->getParentData())->leafs;
 		/// @todo: Is this initial placement necessary, or will this get taken care of by the mergeWorldBounds at the end of the node attachment?
-		if(node->getWorldBound().radius<0){
-			newIndexes.add(-1);
-		}
-		else{
-			mMap->findBoundLeafs(newIndexes,mMap->nodes,0,node->getWorldBound());
-		}
+		findBoundLeafs(newIndexes,node);
 		insertNodeLeafIndexes(newIndexes,node);
 	}
 }
@@ -346,12 +336,8 @@ bool BSP30Node::senseBoundingVolumes(SensorResultsListener *listener,const Spher
 	mCounter++;
 	Collection<int> &newIndexes=mLeafIndexes; 
 	newIndexes.clear();
-	if(volume.radius<0){
-		newIndexes.add(-1);
-	}
-	else{
-		mMap->findBoundLeafs(newIndexes,mMap->nodes,0,volume);
-	}
+	mMap->findBoundLeafs(newIndexes,mMap->nodes,0,volume);
+
 	for(i=0;i<newIndexes.size();i++){
 		const Collection<Node*> &occupants=mLeafData[newIndexes[i]].occupants;
 		for(j=0;j<occupants.size();++j){
@@ -373,7 +359,7 @@ bool BSP30Node::senseBoundingVolumes(SensorResultsListener *listener,const Spher
 	return true;
 }
 
-void BSP30Node::traceSegment(Collision &result,const Segment &segment,const Vector3 &size){
+void BSP30Node::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	result.time=Math::ONE;
 	segment.getEndPoint(result.point);
 	if(mMap!=NULL){
@@ -412,12 +398,7 @@ void BSP30Node::childTransformUpdated(Node *child){
 	Collection<int> &oldIndexes=((childdata*)child->getParentData())->leafs;
 	Collection<int> &newIndexes=mLeafIndexes; 
 	newIndexes.clear();
-	if(child->getWorldBound().radius<0){
-		newIndexes.add(-1);
-	}
-	else{
-		mMap->findBoundLeafs(newIndexes,mMap->nodes,0,child->getWorldBound());
-	}
+	findBoundLeafs(newIndexes,child);
 
 	if(newIndexes.size()==oldIndexes.size()){
 		int i;
@@ -465,6 +446,18 @@ void BSP30Node::addLeafToVisible(bleaf *leaf,CameraNode *camera){
 				}
 			}
 		}
+	}
+}
+
+void BSP30Node::findBoundLeafs(egg::Collection<int> &leafs,Node *node){
+	const Sphere &bound=node->getWorldBound();
+
+	// If the radius is infinite or greater than our threshold, assume its global
+	if(bound.radius<0 || bound.radius>=512){
+		leafs.add(-1);
+	}
+	else{
+		mMap->findBoundLeafs(leafs,mMap->nodes,0,bound);
 	}
 }
 
