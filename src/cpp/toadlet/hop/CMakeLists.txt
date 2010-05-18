@@ -21,6 +21,7 @@ set (HOP_HEADERS
 	Shape.h
 	Simulator.h
 	Solid.h
+	TraceCallback.h
 	Types.h
 	Version.h
 )
