@@ -788,6 +788,7 @@ void Simulator::testSegment(Collision &result,const Segment &segment,Solid *soli
 			break;
 			case Shape::Type_CALLBACK:
 				shape->mCallback->traceSegment(collision,solid->mPosition,segment);
+				modifyScope=true;
 			break;
 		}
 
@@ -807,7 +808,7 @@ void Simulator::testSegment(Collision &result,const Segment &segment,Solid *soli
 					result.set(collision);
 				}
 			}
-			modifyScope=(collision.time==0);
+			modifyScope|=(collision.time==0);
 		}
 
 		if(modifyScope){
@@ -1023,9 +1024,11 @@ void Simulator::testSolid(Collision &result,Solid *solid1,const Segment &segment
 				#else
 					Math::madd(collision.point,segment.direction,collision.time,segment.origin);
 				#endif
+				modifyScope=true;
 			}
 			else if(shape1->mType!=Shape::Type_CALLBACK && shape2->mType==Shape::Type_CALLBACK){
 				shape2->mCallback->traceSolid(collision,solid2->mPosition,segment,solid1);
+				modifyScope=true;
 			}
 
 			if(shape1->mType!=Shape::Type_CALLBACK && shape2->mType!=Shape::Type_CALLBACK && collision.time==0){
@@ -1047,7 +1050,7 @@ void Simulator::testSolid(Collision &result,Solid *solid1,const Segment &segment
 						result.set(collision);
 					}
 				}
-				modifyScope=(collision.time==0);
+				modifyScope|=(collision.time==0);
 			}
 
 			if(modifyScope){
