@@ -93,7 +93,7 @@ alem_Char alem_softwareLibraryPath[1024]={0};
 	};
 #else
 #	define ALEM_NUM_LIBRARYNAMES 1
-	alem_Char *alem_alLibraryNames[ALEM_NUM_LIBRARYNAMES]={"openal.so",};
+	alem_Char *alem_alLibraryNames[ALEM_NUM_LIBRARYNAMES]={"libopenal.so",};
 
 #	define ALEM_NUM_LIBRARIESANDPREFIXES 1
 	const int alem_prefixLibraryNames[ALEM_NUM_LIBRARIESANDPREFIXES*2]={
