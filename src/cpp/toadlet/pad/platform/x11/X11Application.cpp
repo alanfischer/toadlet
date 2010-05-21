@@ -88,6 +88,7 @@ X11Application::X11Application():
 	mRenderer(NULL),
 	mRendererOptions(NULL),
 	mAudioPlayer(NULL),
+	mMotionDetector(NULL),
 
 	mRun(false),
 	mAutoActivate(false),
@@ -107,12 +108,20 @@ X11Application::~X11Application(){
 	delete x11;
 }
 
-void X11Application::create(){
+void X11Application::create(int renderer,int audioPlayer,int motionDetector){
 	mEngine=new Engine();
 
-	createAudioPlayer();
 	createWindow();
-	createContextAndRenderer();
+	if(renderer!=RendererPlugin_NONE){
+		createContextAndRenderer();
+	}
+	if(audioPlayer!=AudioPlayerPlugin_NONE){
+		createAudioPlayer();
+	}
+	if(motionDetector!=MotionDetectorPlugin_NONE){
+		createMotionDetector();
+	}
+
 	activate();
 }
 
@@ -130,8 +139,9 @@ void X11Application::destroy(){
 	deactivate();
 	
 	destroyRendererAndContext();
-	destroyWindow();
 	destroyAudioPlayer();
+	destroyMotionDetector();
+	destroyWindow();
 
 	if(mEngine!=NULL){
 		delete mEngine;
@@ -682,6 +692,19 @@ bool X11Application::destroyAudioPlayer(){
 		mAudioPlayer->destroy();
 		delete mAudioPlayer;
 		mAudioPlayer=NULL;
+	}
+	return true;
+}
+
+bool X11Application::createMotionDetector(){
+	return false;
+}
+
+bool X11Application::destroyMotionDetector(){
+	if(mMotionDetector!=NULL){
+		mMotionDetector->destroy();
+		delete mMotionDetector;
+		mMotionDetector=NULL;
 	}
 	return true;
 }
