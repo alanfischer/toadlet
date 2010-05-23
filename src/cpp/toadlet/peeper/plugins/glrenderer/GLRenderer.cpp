@@ -1598,9 +1598,9 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastSemanticBits)
 			/// @todo: Only use the semanticBits like this if we're not in a shader.
 			/// Otherwise we will be using the attribute indexes
 
-			semanticBits|=(1<<semantic);
 			switch(semantic){
 				case VertexFormat::Semantic_POSITION:
+					semanticBits|=(1<<semantic);
 					glVertexPointer(
 						glvertexFormat->mGLElementCounts[j],
 						glvertexFormat->mGLDataTypes[j],
@@ -1608,6 +1608,7 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastSemanticBits)
 						glvertexBuffer->mElementOffsets[j]);
 				break;
 				case VertexFormat::Semantic_NORMAL:
+					semanticBits|=(1<<semantic);
 					glNormalPointer(
 						glvertexFormat->mGLDataTypes[j],
 						vertexSize,
@@ -1615,6 +1616,7 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastSemanticBits)
 				break;
 				case VertexFormat::Semantic_COLOR:
 					if(index==0){
+						semanticBits|=(1<<semantic);
 						glColorPointer(
 							glvertexFormat->mGLElementCounts[j],
 							glvertexFormat->mGLDataTypes[j],

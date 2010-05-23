@@ -36,10 +36,16 @@ struct X11Attributes;
 
 class X11Application:public BaseApplication{
 public:
+	enum{
+		RendererPlugin_NONE=-1,
+		AudioPlayerPlugin_NONE=-1,
+		MotionDetectorPlugin_NONE=-1,
+	};
+
 	X11Application();
 	virtual ~X11Application();
 
-	virtual void create();
+	virtual void create(int renderer=0,int audioPlayer=0,int motionDetector=0);
 	virtual void destroy();
 
 	virtual void start();
@@ -77,6 +83,7 @@ public:
 	virtual tadpole::Engine *getEngine() const{return mEngine;}
 	virtual peeper::Renderer *getRenderer() const{return mRenderer;}
 	virtual ribbit::AudioPlayer *getAudioPlayer() const{return mAudioPlayer;}
+	virtual flick::MotionDetector *getMotionDetector() const{return mMotionDetector;}
 
 	virtual peeper::RenderTarget *getRootRenderTarget(){return mRenderTarget;}
 	virtual bool isPrimary() const{return mRenderTarget->isPrimary();}
@@ -112,10 +119,14 @@ protected:
 	peeper::Renderer *makeRenderer();
 	bool createContextAndRenderer();
 	bool destroyRendererAndContext();
-	bool createAudioPlayer();
-	bool destroyAudioPlayer();
 	void originalResolution();
 	void originalEnv();
+
+	bool createAudioPlayer();
+	bool destroyAudioPlayer();
+	
+	bool createMotionDetector();
+	bool destroyMotionDetector();
 
 	void configured(int x,int y,int width,int height);
 
@@ -135,6 +146,7 @@ protected:
 	peeper::Renderer *mRenderer;
 	int *mRendererOptions;
 	ribbit::AudioPlayer *mAudioPlayer;
+	flick::MotionDetector *mMotionDetector;
 
 	bool mRun;
 	bool mAutoActivate;

@@ -266,6 +266,7 @@ OSXApplication::OSXApplication():
 	mRenderer(NULL),
 	mRendererOptions(NULL),
 	mAudioPlayer(NULL),
+	mMotionDetector(NULL),
 
 	mRun(false),
 	mAutoActivate(false),
@@ -285,13 +286,13 @@ OSXApplication::~OSXApplication(){
 	}
 }
 
-void OSXApplication::create(void *window){
+void OSXApplication::create(void *window,int renderer,int audioPlayer,int motionDetector){
 	mWindow=window;
 
-	create();
+	create(renderer,audioPlayer,motionDetector);
 }
 
-void OSXApplication::create(){
+void OSXApplication::create(int renderer,int audioPlayer,int motionDetector){
 	if(mWindow==nil){
 		Error::nullPointer("invalid window");
 		return;
@@ -299,7 +300,12 @@ void OSXApplication::create(){
 
 	mEngine=new Engine();
 
-	createAudioPlayer();
+	if(audioPlayer!=AudioPlayerPlugin_NONE){
+		createAudioPlayer();
+	}
+	if(motionDetector!=MotionDetectorPlugin_NONE){
+		createMotionDetector();
+	}
 	
 	#if defined(TOADLET_HAS_UIKIT)
 		mWidth=[(UIWindow*)mWindow bounds].size.width;
@@ -329,7 +335,9 @@ void OSXApplication::create(){
 	
 	activate();
 	
-	createContextAndRenderer();
+	if(renderer!=RendererPlugin_NONE){
+		createContextAndRenderer();
+	}
 }
 
 void OSXApplication::destroy(){
@@ -341,6 +349,7 @@ void OSXApplication::destroy(){
 
 	destroyRendererAndContext();
 	destroyAudioPlayer();
+	destroyMotionDetector();
 
 	if(mEngine!=NULL){
 		delete mEngine;
@@ -537,6 +546,32 @@ bool OSXApplication::destroyAudioPlayer(){
 		mAudioPlayer->destroy();
 		delete mAudioPlayer;
 		mAudioPlayer=NULL;
+	}
+	return true;
+}
+
+bool OSXApplication::createMotionDetector(){
+	#if defined(TOADLET_PLATFORM_IPHONE)
+		if(mMotionDetector==NULL){
+			mMotionDetector=new_IPhoneMotionDetector();
+			bool result=false;
+			TOADLET_TRY
+				reuslt=mMotionDetector->create();
+			TOADLET_CATCH(const Exception &){result=false:}
+			if(result==false){
+				delete mMotionDetector;
+				mMotionDetector=NULL;
+			}
+		}	
+	#endif
+	return true;
+}
+
+bool OSXApplication::destroyMotionDetector(){
+	if(mMotionDetector!=NULL){
+		mMotionDetector->destroy();
+		delete mMotionDetector();
+		mMotionDetector=NULL;
 	}
 	return true;
 }

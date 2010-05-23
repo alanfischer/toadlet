@@ -203,12 +203,10 @@ void Win32Application::destroy(){
 
 	deactivate();
 	
-	mEngine->destroy();
-	
 	destroyRendererAndContext();
-	destroyWindow();
 	destroyAudioPlayer();
 	destroyMotionDetector();
+	destroyWindow();
 
 	if(mEngine!=NULL){
 		delete mEngine;
