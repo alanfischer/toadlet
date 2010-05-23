@@ -98,7 +98,6 @@ void BSP30ModelNode::setModel(BSP30Map::ptr map,int index){
 	bmodel *model=&mMap->models[mModelIndex];
 
 	set(mLocalBound,AABox(model->mins,model->maxs));
-
 	int i,j;
 	for(i=0;i<model->numfaces;++i){
 		bface *face=&map->faces[model->firstface+i];
@@ -286,8 +285,16 @@ void BSP30Node::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	memset(&mVisibleMaterialFaces[0],0,sizeof(BSP30Map::facedata*)*mVisibleMaterialFaces.size());
 	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,camera->getWorldTranslate());
 	if(leaf==0 || mMap->nvisibility==0){
-		for(i=0;i<mMap->nleafs;i++){
-			addLeafToVisible(&mMap->leafs[i],camera);
+		bmodel *world=&mMap->models[0];
+		// Instead of enumerating all leaves, we just enumerate all faces
+		//  Otherwise, the changing of facedata->next that aren't in the world model can mess up other node's rendering
+		for(i=0;i<world->numfaces;i++){
+			int faceIndex=world->firstface+i;
+			bface *face=&mMap->faces[faceIndex];
+			BSP30Map::facedata *facedata=&mMap->facedatas[faceIndex];
+			btexinfo *texinfo=&mMap->texinfos[face->texinfo];
+			facedata->next=mVisibleMaterialFaces[texinfo->miptex];
+			mVisibleMaterialFaces[texinfo->miptex]=facedata;
 		}
 
 		for(i=0;i<mChildren.size();++i){

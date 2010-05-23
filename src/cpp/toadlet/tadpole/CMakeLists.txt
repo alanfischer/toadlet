@@ -15,6 +15,7 @@ set (TADPOLE_SRC
 	MaterialManager.cpp
 	MathFormatter.cpp
 	MeshManager.cpp
+	NameSensor.cpp
 	Noise.cpp
 	RenderQueue.cpp
 	ResourceManager.cpp
@@ -103,6 +104,7 @@ set (TADPOLE_HEADERS
 	MaterialManager.h
 	MathFormatter.h
 	MeshManager.h
+	NameSensor.h
 	Noise.h
 	Renderable.h
 	ResourceHandler.h
