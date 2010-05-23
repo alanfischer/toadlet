@@ -76,8 +76,7 @@ void MeshNode::MeshAnimationController::start(){
 		stop();
 	}
 
-	/// @todo: hacky hack
-	mMeshNode->mDeactivateCount=-1;
+	mMeshNode->setStayActive(true);
 
 	AnimationController::start();
 	if(mMeshNode->getScene()!=NULL){
@@ -90,8 +89,7 @@ void MeshNode::MeshAnimationController::stop(){
 		return;
 	}
 
-	/// @todo: hacky hack
-	mMeshNode->mDeactivateCount=0;
+	mMeshNode->setStayActive(false);
 
 	AnimationController::stop();
 }	
@@ -242,6 +240,10 @@ MeshNode::MeshAnimationController::ptr MeshNode::getAnimationController(){
 
 void MeshNode::frameUpdate(int dt,int scope){
 	super::frameUpdate(dt,scope);
+
+	if(mAnimationController!=NULL){
+		mAnimationController->update(dt);
+	}
 
 	if(mSkeleton!=NULL){
 		int lastUpdateFrame=mSkeleton->getLastUpdateFrame();
