@@ -87,6 +87,9 @@ public:
 	virtual uint32 getHostIPAddress() const{return mHostIPAddress;}
 	virtual int getHostPort() const{return mHostPort;}
 
+	virtual bool setBlocking(bool blocking);
+	virtual bool getBlocking() const;
+
 	virtual bool setSendBufferSize(int size);
 	virtual int getSendBufferSize() const;
 
@@ -122,6 +125,7 @@ protected:
 	int mHandle;
 	bool mBound;
 	bool mConnected;
+	bool mBlocking;
 	uint32 mHostIPAddress;
 	uint32 mHostPort;
 

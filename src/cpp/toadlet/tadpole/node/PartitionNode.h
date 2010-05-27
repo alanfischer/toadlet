@@ -43,6 +43,7 @@ public:
 	virtual void destroy();
 
 	virtual bool senseBoundingVolumes(SensorResultsListener *listener,const Sphere &volume);
+	virtual bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);
 	
 	virtual void queueRenderables(CameraNode *camera,RenderQueue *queue);
 	virtual void queueRenderables(Node *node,CameraNode *camera,RenderQueue *queue);

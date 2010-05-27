@@ -17,6 +17,7 @@ set (TADPOLE_SRC
 	MeshManager.cpp
 	NameSensor.cpp
 	Noise.cpp
+	PotentiallyVisibleSensor.cpp
 	RenderQueue.cpp
 	ResourceManager.cpp
 	Scene.cpp
@@ -106,6 +107,7 @@ set (TADPOLE_HEADERS
 	MeshManager.h
 	NameSensor.h
 	Noise.h
+	PotentiallyVisibleSensor.h
 	Renderable.h
 	ResourceHandler.h
 	ResourceHandlerData.h

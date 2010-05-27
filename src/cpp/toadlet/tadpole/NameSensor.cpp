@@ -42,21 +42,32 @@ NameSensor::~NameSensor(){
 }
 
 bool NameSensor::senseNames(SensorResultsListener *results,const String &name){
-	return senseNames(mScene->getRoot(),results,name);
+	int result=senseNames(mScene->getRoot(),results,name);
+	return result!=0;
 }
 
-bool NameSensor::senseNames(Node *node,SensorResultsListener *results,const String &name){
-	bool result=false;
+int NameSensor::senseNames(Node *node,SensorResultsListener *results,const String &name){
+	int result=0;
 	if(name.equals(node->getName())){
-		results->resultFound(node);
-		result=true;
+		if(results->resultFound(node)){
+			result=1;
+		}
+		else{
+			return -1;
+		}
 	}
 
 	ParentNode *parent=node->isParent();
 	if(parent!=NULL){
 		int i;
 		for(i=0;i<parent->getNumChildren();++i){
-			result|=senseNames(parent->getChild(i),results,name);
+			int r=senseNames(parent->getChild(i),results,name);
+			if(r<0){
+				return -1;
+			}
+			else if(r>0){
+				result=1;
+			}
 		}
 	}
 

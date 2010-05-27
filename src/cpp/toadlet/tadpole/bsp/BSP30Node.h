@@ -108,6 +108,7 @@ public:
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 
 	bool senseBoundingVolumes(SensorResultsListener *listener,const Sphere &volume);
+	bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);
 
 	// Traceable items
 	const Sphere &getLocalBound() const{return super::getLocalBound();}

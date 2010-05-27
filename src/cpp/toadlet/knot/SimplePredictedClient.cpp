@@ -32,18 +32,18 @@ namespace toadlet{
 namespace knot{
 
 SimplePredictedClient::SimplePredictedClient(EventFactory *factory,Connector::ptr connector):SimpleClient(factory,connector),
-	mLastReceivedClientUpdateCount(0),
-	mLastAppliedClientUpdateCount(0)
+	mLastReceivedClientFrameNumber(0),
+	mLastAppliedClientFrameNumber(0)
 {}
 
 SimplePredictedClient::~SimplePredictedClient(){}
 
 void SimplePredictedClient::handleServerUpdateEvent(BaseServerUpdateEvent::ptr event){
-	mLastReceivedClientUpdateCount=event->getLastClientUpdateCounter();
-	while(mSentClientEvents.size()>1 && mSentClientEvents[0]->getCounter()<=mLastReceivedClientUpdateCount){
+	mLastReceivedClientFrameNumber=event->getLastClientFrameNumber();
+	while(mSentClientEvents.size()>1 && mSentClientEvents[0]->getClientFrameNumber()<=mLastReceivedClientFrameNumber){
 		mSentClientEvents.removeAt(0);
 	}
-	mLastAppliedClientUpdateCount=mLastReceivedClientUpdateCount;
+	mLastAppliedClientFrameNumber=mLastReceivedClientFrameNumber;
 }
 
 void SimplePredictedClient::sendClientUpdateEvent(BaseClientUpdateEvent::ptr event){
@@ -55,8 +55,8 @@ Collection<BaseClientUpdateEvent::ptr> SimplePredictedClient::enumerateClientUpd
 	Collection<BaseClientUpdateEvent::ptr> events;
 	int i;
 	for(i=0;i<mSentClientEvents.size();++i){
-		if(mLastAppliedClientUpdateCount<mSentClientEvents[i]->getCounter()){
-			mLastAppliedClientUpdateCount=mSentClientEvents[i]->getCounter();
+		if(mLastAppliedClientFrameNumber<mSentClientEvents[i]->getClientFrameNumber()){
+			mLastAppliedClientFrameNumber=mSentClientEvents[i]->getClientFrameNumber();
 			events.add(mSentClientEvents[i]);
 		}
 	}

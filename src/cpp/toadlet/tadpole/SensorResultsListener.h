@@ -36,7 +36,8 @@ class SensorResultsListener{
 public:
 	virtual ~SensorResultsListener(){}
 
-	virtual void resultFound(node::Node *result)=0;
+	// Return true to continue sensing
+	virtual bool resultFound(node::Node *result)=0;
 };
 
 }

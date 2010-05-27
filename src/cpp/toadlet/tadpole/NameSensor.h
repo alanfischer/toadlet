@@ -46,7 +46,7 @@ public:
 	virtual bool senseNames(SensorResultsListener *results,const egg::String &name);
 
 protected:
-	bool senseNames(node::Node *node,SensorResultsListener *results,const egg::String &name);
+	int senseNames(node::Node *node,SensorResultsListener *results,const egg::String &name);
 
 	Scene *mScene;
 };

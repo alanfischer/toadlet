@@ -90,6 +90,8 @@ public:
 
 	virtual void setScope(int scope){mSolid->setScope(scope); super::setScope(scope);}
 
+	virtual void setNextThink(int think);
+
 	virtual void setTraceableShape(Traceable *traceable);
 	virtual void addShape(hop::Shape::ptr shape);
 	virtual void removeShape(hop::Shape *shape);
@@ -127,6 +129,7 @@ protected:
 	Traceable *mTraceable;
 	node::NodeInterpolator::ptr mInterpolator;
 	node::ParentNode::ptr mVolumeNode;
+	int mNextThink;
 
 	HopScene *mHopScene;
 

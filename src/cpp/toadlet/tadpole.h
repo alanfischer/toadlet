@@ -42,6 +42,7 @@
 #include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/Noise.h>
 #include <toadlet/tadpole/PixelPacker.h>
+#include <toadlet/tadpole/PotentiallyVisibleSensor.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/RenderQueue.h>
 #include <toadlet/tadpole/ResourceHandler.h>

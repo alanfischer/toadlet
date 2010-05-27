@@ -70,6 +70,7 @@ Socket::Socket():
 	mHandle(TOADLET_INVALID_SOCKET),
 	mBound(false),
 	mConnected(false),
+	mBlocking(true),
 	mHostIPAddress(0),
 	mHostPort(0)
 {
@@ -79,6 +80,7 @@ Socket::Socket(int domain,int type,int protocol):
 	mHandle(TOADLET_INVALID_SOCKET),
 	mBound(false),
 	mConnected(false),
+	mBlocking(true),
 	mHostIPAddress(0),
 	mHostPort(0)
 {
@@ -101,6 +103,7 @@ Socket::Socket(int handle,struct sockaddr_in *address):
 	mHandle(handle),
 	mBound(true),
 	mConnected(true),
+	mBlocking(true),
 	mHostIPAddress(address->sin_addr.s_addr),
 	mHostPort(address->sin_port)
 {
@@ -146,6 +149,26 @@ void Socket::close(){
 	if(result==TOADLET_SOCKET_ERROR){
 		error("closesocket");
 	}
+}
+
+bool Socket::setBlocking(bool blocking){
+	unsigned long value=!blocking;
+	int result=0;
+	#if defined(TOADLET_PLATFORM_WIN32)
+		result=ioctlsocket(mHandle,FIONBIO,&value);
+	#else
+		result=ioctl(mHandle,FIONBIO,&value);
+	#endif
+	if(result==TOADLET_SOCKET_ERROR){
+		error("ioctlsocket");
+		return false;
+	}
+	mBlocking=blocking;
+	return true;
+}
+
+bool Socket::getBlocking() const{
+	return mBlocking;
 }
 
 bool Socket::setSendBufferSize(int size){

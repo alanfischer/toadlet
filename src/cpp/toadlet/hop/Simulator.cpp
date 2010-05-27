@@ -677,6 +677,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 void Simulator::reportCollisions(){
 	mReportingCollisions=true;
 	int reportedCollisions=0;
+
 	int i;
 	for(i=0;i<mNumCollisions;++i){
 		Collision &col=mCollisions[i];

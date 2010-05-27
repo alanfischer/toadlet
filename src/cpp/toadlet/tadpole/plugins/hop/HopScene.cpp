@@ -48,6 +48,10 @@ HopScene::HopScene(Engine *engine):Scene(engine),
 	mSimulator=new Simulator();
 	mSimulator->setManager(this);
 
+	mSolid=Solid::ptr(new Solid());
+	mSolid->setCoefficientOfGravity(0);
+	mSolid->setInfiniteMass();
+
 	mEngine->registerNodeType(HopEntity::type());
 }
 
@@ -121,11 +125,12 @@ public:
 		mCounter=0;
 	}
 
-	void resultFound(Node *result){
+	bool resultFound(Node *result){
 		HopEntity *entity=(HopEntity*)result->isEntity();
 		if(entity!=NULL && mCounter<mMaxSolids && entity->getNumShapes()>0){
 			mSolids[mCounter++]=entity->getSolid();
 		}
+		return true;
 	}
 
 	Solid **mSolids;
@@ -147,6 +152,7 @@ void HopScene::traceSegment(hop::Collision &result,const Segment &segment){
 		tadpole::Collision collision;
 		mTraceable->traceSegment(collision,Math::ZERO_VECTOR3,segment,Math::ZERO_VECTOR3);
 		set(result,collision,NULL);
+		result.collider=mSolid;
 	}
 }
 
@@ -159,6 +165,7 @@ void HopScene::traceSolid(hop::Collision &result,const Segment &segment,const ho
 		Math::sub(size,bound.maxs,bound.mins);
 		mTraceable->traceSegment(collision,Math::ZERO_VECTOR3,segment,size);
 		set(result,collision,NULL);
+		result.collider=mSolid;
 	}
 }
 
