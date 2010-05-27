@@ -39,33 +39,39 @@ public:
 	TOADLET_SHARED_POINTERS(BaseClientUpdateEvent);
 
 	BaseClientUpdateEvent(int type):Event(type),
-		mCounter(0),
+		mClientFrameNumber(0),
+		mLastServerFrameNumber(0),
 		mDT(0)
 	{}
-	BaseClientUpdateEvent(int type,int counter,int dt):Event(type){
-		mCounter=counter;
+	BaseClientUpdateEvent(int type,int clientFrameNumber,int lastServerFrameNumber,int dt):Event(type){
+		mClientFrameNumber=clientFrameNumber;
+		mLastServerFrameNumber=lastServerFrameNumber;
 		mDT=dt;
 	}
 
-	int getCounter(){return mCounter;}
+	int getClientFrameNumber(){return mClientFrameNumber;}
+	int getLastServerFrameNumber(){return mLastServerFrameNumber;}
 	int getDT(){return mDT;}
 
 	virtual int read(egg::io::DataStream *stream){
 		int amount=0;
-		amount+=stream->readBigInt32(mCounter);
+		amount+=stream->readBigInt32(mClientFrameNumber);
+		amount+=stream->readBigInt32(mLastServerFrameNumber);
 		amount+=stream->readBigInt32(mDT);
 		return amount;
 	}
 
 	virtual int write(egg::io::DataStream *stream){
 		int amount=0;
-		amount+=stream->writeBigInt32(mCounter);
+		amount+=stream->writeBigInt32(mClientFrameNumber);
+		amount+=stream->writeBigInt32(mLastServerFrameNumber);
 		amount+=stream->writeBigInt32(mDT);
 		return amount;
 	}
 
 protected:
-	int mCounter; // Use an int, a short overflows too quickly.
+	int mClientFrameNumber; // Use an int, a short overflows too quickly.
+	int mLastServerFrameNumber; // Use an int, a short overflows too quickly.
 	int mDT;
 };
 

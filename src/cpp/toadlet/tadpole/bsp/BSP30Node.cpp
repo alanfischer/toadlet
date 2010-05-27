@@ -339,6 +339,7 @@ bool BSP30Node::senseBoundingVolumes(SensorResultsListener *listener,const Spher
 		return false;
 	}
 
+	bool result=false;
 	int i,j;
 	mCounter++;
 	Collection<int> &newIndexes=mLeafIndexes; 
@@ -352,7 +353,10 @@ bool BSP30Node::senseBoundingVolumes(SensorResultsListener *listener,const Spher
 			childdata *data=(childdata*)occupant->getParentData();
 			if(data->counter!=mCounter && occupant->testWorldBound(volume)){
 				data->counter=mCounter;
-				listener->resultFound(occupant);
+				result|=true;
+				if(listener->resultFound(occupant)==false){
+					return true;
+				}
 			}
 		}
 	}
@@ -360,7 +364,67 @@ bool BSP30Node::senseBoundingVolumes(SensorResultsListener *listener,const Spher
 	const Collection<Node*> &occupants=mGlobalLeafData.occupants;
 	for(j=0;j<occupants.size();++j){
 		Node *occupant=occupants[j];
-		listener->resultFound(occupant);
+		childdata *data=(childdata*)occupant->getParentData();
+		if(data->counter!=mCounter && occupant->testWorldBound(volume)){
+			data->counter=mCounter;
+			result|=true;
+			if(listener->resultFound(occupant)==false){
+				return true;
+			}
+		}
+	}
+
+	return result;
+}
+
+bool BSP30Node::sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point){
+	if(mMap==NULL){
+		return false;
+	}
+
+	bool result=false;
+	int i,j;
+	mCounter++;
+
+	// Queue up the visible faces and nodes
+	memset(mMarkedFaces,0,(mMap->nfaces+7)>>3);
+	memset(&mVisibleMaterialFaces[0],0,sizeof(BSP30Map::facedata*)*mVisibleMaterialFaces.size());
+	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,point);
+	if(leaf==0 || mMap->nvisibility==0){
+		for(i=0;i<mChildren.size();++i){
+			result|=true;
+			if(listener->resultFound(mChildren[i])==false){
+				return true;
+			}
+		}
+	}
+	else{
+		mCounter++;
+		const Collection<int> &leafvis=mMap->parsedVisibility[leaf];
+		for(i=0;i<leafvis.size();i++){
+			bleaf *leaf=mMap->leafs+leafvis[i];
+			const Collection<Node*> &occupants=mLeafData[leafvis[i]].occupants;
+			for(j=0;j<occupants.size();++j){
+				Node *occupant=occupants[j];
+				childdata *data=(childdata*)occupant->getParentData();
+				if(data->counter!=mCounter){
+					data->counter=mCounter;
+					result|=true;
+					if(listener->resultFound(occupant)==false){
+						return true;
+					}
+				}
+			}
+		}
+
+		const Collection<Node*> &occupants=mGlobalLeafData.occupants;
+		for(j=0;j<occupants.size();++j){
+			Node *occupant=occupants[j];
+			result|=true;
+			if(listener->resultFound(occupant)==false){
+				return true;
+			}
+		}
 	}
 
 	return true;

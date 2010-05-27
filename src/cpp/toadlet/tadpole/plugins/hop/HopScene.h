@@ -85,6 +85,7 @@ public:
 protected:
 	hop::Simulator *mSimulator;
 	Traceable *mTraceable;
+	hop::Solid::ptr mSolid;
 
 	friend class HopEntity;
 };

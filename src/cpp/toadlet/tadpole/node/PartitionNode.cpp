@@ -49,15 +49,33 @@ void PartitionNode::destroy(){
 }
 
 bool PartitionNode::senseBoundingVolumes(SensorResultsListener *listener,const Sphere &volume){
+	bool result=false;
 	int i;
 	for(i=0;i<mChildren.size();++i){
 		Node *child=mChildren[i];
 		if(child->testWorldBound(volume)){
-			listener->resultFound(child);
+			result|=true;
+			if(listener->resultFound(child)==false){
+				return true;
+			}
 		}
 	}
 	
-	return true;
+	return result;
+}
+
+bool PartitionNode::sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point){
+	bool result=false;
+	int i;
+	for(i=0;i<mChildren.size();++i){
+		Node *child=mChildren[i];
+		result|=true;
+		if(listener->resultFound(child)==false){
+			return true;
+		}
+	}
+	
+	return result;
 }
 
 void PartitionNode::queueRenderables(CameraNode *camera,RenderQueue *queue){

@@ -42,9 +42,10 @@ TOADLET_NODE_IMPLEMENT(HopEntity,Categories::TOADLET_TADPOLE+".HopEntity");
 HopEntity::HopEntity():ParentNode(),
 	mSolid(new Solid()),
 	//mTraceableShape,
-	mTraceable(NULL)
+	mTraceable(NULL),
 	//mInterpolator,
-	//mVolumeNode
+	//mVolumeNode,
+	mNextThink(0)
 {}
 
 Node *HopEntity::create(Scene *scene){
@@ -58,6 +59,7 @@ Node *HopEntity::create(Scene *scene){
 	mTraceable=NULL;
 	mInterpolator=NULL;
 	mVolumeNode=NULL;
+	mNextThink=0;
 
 	/// @todo: I need to remove the mScene casting here, its pretty dirty
 	mHopScene=(HopScene*)(mScene);
@@ -122,6 +124,16 @@ void HopEntity::setCoefficientOfDynamicFriction(scalar coeff){
 
 void HopEntity::setCoefficientOfEffectiveDrag(scalar coeff){
 	mSolid->setCoefficientOfEffectiveDrag(coeff);
+}
+
+void HopEntity::setNextThink(int think){
+	if(think>0){
+		mNextThink=mScene->getLogicTime()+think;
+	}
+	else{
+		mNextThink=0;
+	}
+	setStayActive(mNextThink>0);
 }
 
 void HopEntity::setTraceableShape(Traceable *traceable){
@@ -203,8 +215,12 @@ void HopEntity::parentChanged(ParentNode *parent){
 void HopEntity::logicUpdate(int dt,int scope){
 	if(mSolid->active()){
 		super::setTranslate(mSolid->getPosition());
-
 		mInterpolator->logicUpdate(this,mScene->getLogicFrame());
+	}
+
+	if(mNextThink<=mScene->getLogicTime()){
+		setNextThink(0);
+		think();
 	}
 
 	super::logicUpdate(dt,scope);

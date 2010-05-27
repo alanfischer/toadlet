@@ -49,8 +49,8 @@ public:
 	
 protected:
 	egg::Collection<event::BaseClientUpdateEvent::ptr> mSentClientEvents;
-	int mLastReceivedClientUpdateCount;
-	int mLastAppliedClientUpdateCount;
+	int mLastReceivedClientFrameNumber;
+	int mLastAppliedClientFrameNumber;
 };
 
 }
