@@ -25,6 +25,7 @@
 
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/LoggerListener.h>
+#include <time.h>
 
 // Choose output method
 #if defined(TOADLET_PLATFORM_WIN32)
@@ -33,7 +34,7 @@
 
 #if !defined(TOADLET_PLATFORM_WINCE)
 	#define TOADLET_USE_STDERR_LOGGING
-#endif	
+#endif
 
 // Include appropriate files
 #if defined(TOADLET_USE_OUTPUTDEBUGSTRING_LOGGING)
@@ -197,40 +198,45 @@ void Logger::addCompleteLogString(Category *category,Level level,const String &d
 	}
 
 	if(mOutputLogString || mStoreLogString){
-		String prefix;
+	    char timeString[128];
+		time_t currentTime;
+		time(&currentTime);
+	    struct tm *ts=localtime(&currentTime);
+	    strftime(timeString,sizeof(timeString),"%Y-%m-%d %H:%M:%S :",ts);
 
+		char *levelString=NULL;
 		switch(level){
 			case Level_DISABLED:
-				prefix="LOGGER:  ";
+				levelString="LOGGER:  ";
 			break;
 			case Level_ERROR:
-				prefix="ERROR:   ";
+				levelString="ERROR:   ";
 			break;
 			case Level_WARNING:
-				prefix="WARNING: ";
+				levelString="WARNING: ";
 			break;
 			case Level_ALERT:
-				prefix="ALERT:   ";
+				levelString="ALERT:   ";
 			break;
 			case Level_DEBUG:
-				prefix="DEBUG:   ";
+				levelString="DEBUG:   ";
 			break;
 			case Level_EXCESS:
-				prefix="EXCESS:  ";
+				levelString="EXCESS:  ";
 			break;
 			default:
-				prefix="UNKNOWN: ";
+				levelString="UNKNOWN: ";
 			break;
 		}
-
-		String line=prefix+data+(char)10;
+		
+		String line=String()+timeString+levelString+data+(char)10;
 
 		if(mOutputLogString){
 			#if defined(TOADLET_USE_OUTPUTDEBUGSTRING_LOGGING)
 				int len=line.length();
 				// If we go above a certain amount, windows apparently just starts ignoring messages
 				if(len>=8192){
-					OutputDebugStringW(L"WARNING: Excessive string length, may be truncated and near future messages dropped\n");
+					OutputDebugString(TEXT("WARNING: Excessive string length, may be truncated and near future messages dropped\n"));
 				}
 				int i=0;
 				while(i<len){
@@ -238,7 +244,7 @@ void Logger::addCompleteLogString(Category *category,Level level,const String &d
 					if(newi>len){
 						newi=len;
 					}
-					OutputDebugStringW(line.substr(i,newi-i));
+					OutputDebugString(line.substr(i,newi-i));
 					i=newi;
 				}
 			#endif
