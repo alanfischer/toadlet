@@ -61,6 +61,7 @@ public:
 		virtual scalar getEpsilon() const{return mSimulator->getEpsilon();}
 	#endif
 
+	virtual void logicUpdate(int dt){Scene::logicUpdate(dt);}
 	virtual void logicUpdate(int dt,int scope);
 
 	// Hop items
