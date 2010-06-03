@@ -81,6 +81,7 @@ public:
 	virtual void render(peeper::Renderer *renderer,node::CameraNode *camera,node::Node *node);
 	virtual void renderRenderables(peeper::Renderer *renderer,node::CameraNode *camera,RenderQueue *queue);
 
+	/// @todo: replace with just a sensor?
 	virtual node::Node *findNodeByName(const egg::String &name,node::Node *node=NULL);
 	virtual node::Node *findNodeByHandle(int handle);
 

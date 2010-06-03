@@ -286,6 +286,10 @@ int String::internal_find(const stringchar *text,int i) const{
 }
 
 String String::substr(int start,int amt) const{
+	if(start>=mLength){
+		start=mLength;
+	}
+
 	if(start+amt>mLength){
 		amt=mLength-start;
 	}
