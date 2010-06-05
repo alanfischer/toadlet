@@ -570,7 +570,7 @@ bool OSXApplication::createMotionDetector(){
 bool OSXApplication::destroyMotionDetector(){
 	if(mMotionDetector!=NULL){
 		mMotionDetector->destroy();
-		delete mMotionDetector();
+		delete mMotionDetector;
 		mMotionDetector=NULL;
 	}
 	return true;
