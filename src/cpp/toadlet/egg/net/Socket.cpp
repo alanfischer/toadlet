@@ -30,6 +30,7 @@
 #include <string.h> // memset
 
 #if !defined(TOADLET_PLATFORM_WIN32)
+	#include <sys/ioctl.h>
 	#include <errno.h>
 #endif
 
