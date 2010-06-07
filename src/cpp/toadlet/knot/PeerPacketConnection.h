@@ -71,8 +71,6 @@ public:
 	void close();
 	bool closed(){return mRun==false;}
 
-	bool blocking(){return false;}
-
 	// This connection is always non-blocking
 	int send(const byte *data,int length);
 	int receive(byte *data,int length);

@@ -360,7 +360,7 @@ void LANPeerEventConnector::ipServerThread(int port){
 		connection=con;
 	}
 	else{
-		TCPConnection::ptr con(new TCPConnection(mIPServerSocket,false));
+		TCPConnection::ptr con(new TCPConnection(mIPServerSocket));
 		result=con->accept(port);
 		connection=con;
 	}
@@ -427,7 +427,7 @@ void LANPeerEventConnector::ipClientThread(int ip,int port){
 		connection=con;
 	}
 	else{
-		TCPConnection::ptr con(new TCPConnection(mIPClientSocket,false));
+		TCPConnection::ptr con(new TCPConnection(mIPClientSocket));
 		result=con->connect(ip,port);
 		connection=con;
 	}

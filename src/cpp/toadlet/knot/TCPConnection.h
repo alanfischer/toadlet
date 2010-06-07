@@ -27,9 +27,6 @@
 #define TOADLET_KNOT_TCPCONNECTION_H
 
 #include <toadlet/egg/String.h>
-#include <toadlet/egg/Mutex.h>
-#include <toadlet/egg/Thread.h>
-#include <toadlet/egg/Runnable.h>
 #include <toadlet/egg/Random.h>
 #include <toadlet/egg/io/DataStream.h>
 #include <toadlet/egg/io/MemoryStream.h>
@@ -47,11 +44,11 @@ class TCPConnector;
  It can either be created via a TCPConnector, or a One to One connection can be achieved via the connect & accept methods.
  It currently is synchronous.
 */
-class TOADLET_API TCPConnection:public Connection,egg::Runnable{
+class TOADLET_API TCPConnection:public Connection{
 public:
 	TOADLET_SHARED_POINTERS(TCPConnection);
 
-	TCPConnection(egg::net::Socket::ptr socket=egg::net::Socket::ptr(),bool blocking=true); // Supply a socket to use, this lets the socket be controlled externally
+	TCPConnection(egg::net::Socket::ptr socket=egg::net::Socket::ptr()); // Supply a socket to use, this lets the socket be controlled externally
 	virtual ~TCPConnection();
 
 	bool connect(uint32 remoteHost,int remotePort);
@@ -61,8 +58,6 @@ public:
 
 	void close();
 	bool closed(){return mSocket->closed();}
-
-	bool blocking(){return mBlocking;}
 
 	int send(const byte *data,int length);
 	int receive(byte *data,int length);
@@ -75,7 +70,6 @@ public:
 
 	/// Debug methods
 	void debugSetPacketDelayTime(int minTime,int maxTime);
-	void run();
 
 protected:
 	class Packet{
@@ -120,8 +114,6 @@ protected:
 	egg::Random mDebugRandom;
 	int mDebugPacketDelayMinTime;
 	int mDebugPacketDelayMaxTime;
-	egg::Thread::ptr mDebugThread;
-	bool mDebugRun;
 
 	static const int mDummyDataLength=1024;
 	byte mDummyData[mDummyDataLength];

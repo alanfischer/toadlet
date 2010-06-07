@@ -86,6 +86,9 @@ public:
 	virtual void setCoefficientOfEffectiveDrag(scalar coeff);
 	virtual scalar getCoefficientOfEffectiveDrag() const{return mSolid->getCoefficientOfEffectiveDrag();}
 
+	virtual void setInternalScope(int scope){mSolid->setInternalScope(scope);}
+	virtual int getInternalScope() const{return mSolid->getInternalScope();}
+
 	virtual const AABox &getBound(){return mSolid->getLocalBound();}
 
 	virtual void setScope(int scope){mSolid->setScope(scope); super::setScope(scope);}
