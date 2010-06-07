@@ -48,7 +48,7 @@ void SimplePredictedClient::handleServerUpdateEvent(BaseServerUpdateEvent::ptr e
 
 void SimplePredictedClient::sendClientUpdateEvent(BaseClientUpdateEvent::ptr event){
 	mSentClientEvents.add(event);
-	send(event);
+//	send(event); // HACK: NO longer send events
 }
 
 Collection<BaseClientUpdateEvent::ptr> SimplePredictedClient::enumerateClientUpdateEvents(){

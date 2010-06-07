@@ -65,15 +65,8 @@ SynchronizedPeerEventConnection::SynchronizedPeerEventConnection(Connection::ptr
 	adjustFrameBuffer(1,1,true);
 
 	mEventFactory=factory;
-
-	if(connection->blocking()){
-		Error::unknown(Categories::TOADLET_KNOT,
-			"SynchronizedPeerEventConnection requires a non blocking Connection");
-	}
-	else{
-		mConnection=connection;
-		mEventFactory=factory;
-	}
+	mConnection=connection;
+	mEventFactory=factory;
 }
 
 void SynchronizedPeerEventConnection::reset(int frameBuffer,int frameGroupSize){

@@ -26,6 +26,8 @@
 #ifndef TOADLET_KNOT_TCPCONNECTOR_H
 #define TOADLET_KNOT_TCPCONNECTOR_H
 
+#include <toadlet/egg/Thread.h>
+#include <toadlet/egg/Mutex.h>
 #include <toadlet/knot/Connector.h>
 #include <toadlet/knot/ConnectionListener.h>
 #include <toadlet/knot/TCPConnection.h>

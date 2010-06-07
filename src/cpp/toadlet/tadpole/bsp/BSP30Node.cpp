@@ -347,7 +347,9 @@ bool BSP30Node::senseBoundingVolumes(SensorResultsListener *listener,const Spher
 	mMap->findBoundLeafs(newIndexes,mMap->nodes,0,volume);
 
 	for(i=0;i<newIndexes.size();i++){
-		const Collection<Node*> &occupants=mLeafData[newIndexes[i]].occupants;
+		int index=newIndexes[i];
+		leafdata *data=&mLeafData[index];
+		const Collection<Node*> &occupants=data->occupants;
 		for(j=0;j<occupants.size();++j){
 			Node *occupant=occupants[j];
 			childdata *data=(childdata*)occupant->getParentData();
