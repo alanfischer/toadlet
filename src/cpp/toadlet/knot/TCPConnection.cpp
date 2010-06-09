@@ -277,7 +277,7 @@ int TCPConnection::receive(byte *data,int length){
 					int packetLength=mDataInPacket->readBigInt16();
 					mInPacket->reset();
 
-					amount=mSocket->receive(packet->data,packetLength<packet->maxLength?packetLength:packet->maxLength);
+					amount=mSocket->receive(packet->data,packetLength<maxLength?packetLength:maxLength);
 					if(amount>=0){
 						packet->length=amount;
 						int remaining=amount-packetLength;

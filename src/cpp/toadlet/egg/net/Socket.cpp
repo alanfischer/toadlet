@@ -265,7 +265,7 @@ bool Socket::pollRead(int millis){
 	tv.tv_sec=millis/1000;
 	tv.tv_usec=(millis%1000)*1000;
 
-	return select(1,&fd,NULL,NULL,&tv)!=0;
+	return select(mHandle+1,&fd,NULL,NULL,&tv)!=0;
 }
 
 bool Socket::pollWrite(int millis){
@@ -277,7 +277,7 @@ bool Socket::pollWrite(int millis){
 	tv.tv_sec=millis/1000;
 	tv.tv_usec=(millis%1000)*1000;
 
-	return select(1,NULL,&fd,NULL,&tv)!=0;
+	return select(mHandle+1,NULL,&fd,NULL,&tv)!=0;
 }
 
 bool Socket::bind(int port){

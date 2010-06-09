@@ -72,6 +72,8 @@ public:
 	void debugSetPacketDelayTime(int minTime,int maxTime);
 
 protected:
+	static const int maxLength=8192;
+
 	class Packet{
 	public:
 		TOADLET_SHARED_POINTERS(Packet);
@@ -83,7 +85,6 @@ protected:
 			debugDeliverTime=0;
 		}
 
-		static const int maxLength=8192;
 		byte data[maxLength];
 		int length;
 		uint64 debugDeliverTime;

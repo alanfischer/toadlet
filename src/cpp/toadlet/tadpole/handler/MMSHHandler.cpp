@@ -109,7 +109,7 @@ Resource::ptr MMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 
 			// HACK: Due to a bug in reading back vertexes from a hardware buffer in OGLES, we only load the static VertexBuffer of a Mesh if its not animated.
 			// UPDATE: This actually isnt a bug I believe, but instead the fact that OGLES doesnt use map, and instead bufferSubData, which obviously cant get the previous data
-			VertexBuffer::ptr vertexBuffer=vertexBuffer=mBufferManager->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,numVertexes);
+			VertexBuffer::ptr vertexBuffer=mBufferManager->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,numVertexes);
 
 			VertexBufferAccessor vba;
 			vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
