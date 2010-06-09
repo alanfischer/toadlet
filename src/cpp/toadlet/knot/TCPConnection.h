@@ -83,7 +83,8 @@ protected:
 			debugDeliverTime=0;
 		}
 
-		byte data[1024];
+		static const int maxLength=8192;
+		byte data[maxLength];
 		int length;
 		uint64 debugDeliverTime;
 	};
