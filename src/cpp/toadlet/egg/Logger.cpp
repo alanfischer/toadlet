@@ -204,7 +204,7 @@ void Logger::addCompleteLogString(Category *category,Level level,const String &d
 	    struct tm *ts=localtime(&currentTime);
 	    strftime(timeString,sizeof(timeString),"%Y-%m-%d %H:%M:%S :",ts);
 
-		char *levelString=NULL;
+		const char *levelString=NULL;
 		switch(level){
 			case Level_DISABLED:
 				levelString="LOGGER:  ";
