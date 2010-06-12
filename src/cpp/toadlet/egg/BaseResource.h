@@ -36,7 +36,7 @@ class BaseResource:public Resource{
 public:
 	TOADLET_SHARED_POINTERS(BaseResource);
 
-	BaseResource():mReference(0),mListener(NULL),mName(){}
+	BaseResource():mReference(0),mListener(NULL),mName(),mUniqueHandle(0){}
 	virtual ~BaseResource(){}
 
 	virtual void destroy()=0;
@@ -49,10 +49,14 @@ public:
 	void setName(const String &name){mName=name;}
 	const String &getName() const{return mName;}
 
+	void internal_setUniqueHandle(int handle){mUniqueHandle=handle;}
+	int getUniqueHandle() const{return mUniqueHandle;}
+
 protected:
 	int mReference;
 	ResourceFullyReleasedListener *mListener;
 	String mName;
+	int mUniqueHandle;
 };
 
 }
@@ -66,6 +70,8 @@ protected:
 	void release(){if(--mReference==0){mListener!=NULL?mListener->resourceFullyReleased((BaseClass*)this):destroy();}} \
 	void setFullyReleasedListener(toadlet::egg::ResourceFullyReleasedListener *listener){toadlet::egg::BaseResource::setFullyReleasedListener(listener);} \
 	void setName(const toadlet::egg::String &name){toadlet::egg::BaseResource::setName(name);}\
-	const toadlet::egg::String &getName() const{return toadlet::egg::BaseResource::getName();}
+	const toadlet::egg::String &getName() const{return toadlet::egg::BaseResource::getName();}\
+	void internal_setUniqueHandle(int handle){toadlet::egg::BaseResource::internal_setUniqueHandle(handle);}\
+	int getUniqueHandle() const{return toadlet::egg::BaseResource::getUniqueHandle();}
 
 #endif

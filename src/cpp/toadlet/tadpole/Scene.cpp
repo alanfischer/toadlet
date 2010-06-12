@@ -64,6 +64,7 @@ Scene::Scene(Engine *engine):
 	setRangeLogicDT(0,0);
 	setAmbientColor(Colors::GREY);
 
+	mHandles.resize(1); // Handle 0 is always NULL
 	mBackground=mEngine->createNodeType(PartitionNode::type(),this);
 	mRoot=mEngine->createNodeType(PartitionNode::type(),this);
 
@@ -96,6 +97,15 @@ void Scene::setRoot(PartitionNode *root){
 	mRoot=root;
 }
 
+Node *Scene::getNodeByHandle(int handle){
+	if(handle>=0 && handle<mHandles.size()){
+		return mHandles[handle];
+	}
+	else{
+		return NULL;
+	}
+}
+
 Node *Scene::findNodeByName(const String &name,Node *node){
 	if(node==NULL){
 		node=mRoot;
@@ -116,15 +126,6 @@ Node *Scene::findNodeByName(const String &name,Node *node){
 			}
 		}
 
-		return NULL;
-	}
-}
-
-Node *Scene::findNodeByHandle(int handle){
-	if(handle>=0 && handle<mNodesFromHandles.size()){
-		return mNodesFromHandles[handle];
-	}
-	else{
 		return NULL;
 	}
 }
@@ -470,19 +471,19 @@ int Scene::nodeCreated(Node *node){
 		mFreeHandles.removeAt(size-1);
 	}
 	else{
-		handle=mNodesFromHandles.size();
-		mNodesFromHandles.resize(handle+1);
+		handle=mHandles.size();
+		mHandles.resize(handle+1);
 	}
 
-	mNodesFromHandles[handle]=node;
+	mHandles[handle]=node;
 
 	return handle;
 }
 
 void Scene::nodeDestroyed(Node *node){
-	int handle=node->getHandle();
+	int handle=node->getUniqueHandle();
 	if(handle>=0){
-		mNodesFromHandles[handle]=NULL;
+		mHandles[handle]=NULL;
 		mFreeHandles.add(handle);
 	}
 }

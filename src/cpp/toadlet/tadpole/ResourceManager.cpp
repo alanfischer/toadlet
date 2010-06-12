@@ -36,6 +36,7 @@ namespace tadpole{
 
 ResourceManager::ResourceManager(Archive *archive){
 	mArchive=archive;
+	mHandles.resize(1); // Handle 0 is always NULL
 }
 
 ResourceManager::~ResourceManager(){
@@ -113,6 +114,22 @@ Resource::ptr ResourceManager::manage(const Resource::ptr &resource,const String
 		mNameResourceMap[resource->getName()]=resource;
 	}
 
+	{
+		int handle=-1;
+		int size=mFreeHandles.size();
+		if(size>0){
+			handle=mFreeHandles.at(size-1);
+			mFreeHandles.removeAt(size-1);
+		}
+		else{
+			handle=mHandles.size();
+			mHandles.resize(handle+1);
+		}
+
+		mHandles[handle]=resource;
+		resource->internal_setUniqueHandle(handle);
+	}
+
 	return resource;
 }
 
@@ -120,6 +137,15 @@ void ResourceManager::unmanage(Resource *resource){
 	if(mResources.remove(resource)==false){
 		Logger::alert(Categories::TOADLET_TADPOLE,
 			"Error unmanaging resource, check inheritance heiarchy");
+	}
+
+	{
+		int handle=resource->getUniqueHandle();
+		if(handle>=0){
+			mHandles[handle]=NULL;
+			mFreeHandles.add(handle);
+			resource->internal_setUniqueHandle(0);
+		}
 	}
 
 	if(resource->getName()!=(char*)NULL){
@@ -130,6 +156,15 @@ void ResourceManager::unmanage(Resource *resource){
 	}
 
 	resource->destroy();
+}
+
+Resource::ptr ResourceManager::getByHandle(int handle){
+	if(handle>=0 && handle<mHandles.size()){
+		return mHandles[handle];
+	}
+	else{
+		return NULL;
+	}
 }
 
 void ResourceManager::setHandler(ResourceHandler::ptr handler,const String &extension){
