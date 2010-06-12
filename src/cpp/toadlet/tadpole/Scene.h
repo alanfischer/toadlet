@@ -81,9 +81,9 @@ public:
 	virtual void render(peeper::Renderer *renderer,node::CameraNode *camera,node::Node *node);
 	virtual void renderRenderables(peeper::Renderer *renderer,node::CameraNode *camera,RenderQueue *queue);
 
+	virtual node::Node *getNodeByHandle(int handle);
 	/// @todo: replace with just a sensor?
 	virtual node::Node *findNodeByName(const egg::String &name,node::Node *node=NULL);
-	virtual node::Node *findNodeByHandle(int handle);
 
 	virtual void setAmbientColor(peeper::Color ambientColor){mAmbientColor.set(ambientColor);}
 	virtual const peeper::Color &getAmbientColor() const{return mAmbientColor;}
@@ -102,7 +102,7 @@ protected:
 	virtual bool postLayerRender(peeper::Renderer *renderer,node::CameraNode *camera,int layer){return false;}
 
 	egg::Collection<int> mFreeHandles;
-	egg::Collection<node::Node*> mNodesFromHandles;
+	egg::Collection<node::Node*> mHandles;
 
 	UpdateListener *mUpdateListener;
 	int mExcessiveDT;

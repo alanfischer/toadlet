@@ -45,7 +45,7 @@ Node::Node():
 	mCreated(false),
 	mEngine(NULL),
 	mScene(NULL),
-	mHandle(0),
+	mUniqueHandle(0),
 
 	//mNodeListeners,
 
@@ -87,7 +87,7 @@ Node *Node::create(Scene *scene){
 	mCreated=true;
 	mEngine=scene->getEngine();
 	mScene=scene;
-	mHandle=mScene->nodeCreated(this);
+	mUniqueHandle=mScene->nodeCreated(this);
 
 	mNodeListeners=NULL;
 
@@ -145,6 +145,7 @@ void Node::destroy(){
 	mEngine->freeNode(this);
 	mEngine=NULL;
 	mScene=NULL;
+	mUniqueHandle=0;
 }
 
 void Node::addNodeListener(NodeListener::ptr listener){

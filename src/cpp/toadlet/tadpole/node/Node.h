@@ -83,7 +83,7 @@ public:
 	virtual ParentNode *isParent(){return NULL;}
 	virtual Node *isEntity(){return NULL;}
 
-	inline int getHandle() const{return mHandle;}
+	inline int getUniqueHandle() const{return mUniqueHandle;}
 
 	virtual void addNodeListener(NodeListener::ptr listener);
 	virtual void removeNodeListener(NodeListener::ptr listener);
@@ -208,7 +208,7 @@ protected:
 	bool mCreated;
 	Engine *mEngine;
 	Scene *mScene;
-	int mHandle;
+	int mUniqueHandle;
 
 	// Node items
 	egg::Collection<NodeListener::ptr>::ptr mNodeListeners;
