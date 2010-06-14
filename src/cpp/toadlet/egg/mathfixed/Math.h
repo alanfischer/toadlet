@@ -1362,6 +1362,19 @@ namespace Math{
 
 	TOADLET_API void setQuaternionFromMatrix4x4(Quaternion &r,const Matrix4x4 &m);
 
+	inline void setQuaternionFromAxes(Quaternion &r,const Vector3 &xAxis,const Vector3 &yAxis,const Vector3 &zAxis){
+		Matrix3x3 cacheMatrix;
+		setMatrix3x3FromAxes(cacheMatrix,xAxis,yAxis,zAxis);
+		setQuaternionFromMatrix3x3(r,cacheMatrix);
+		normalizeCarefully(r,0);
+	}
+
+	inline void setAxesFromQuaternion(const Quaternion &q,Vector3 &xAxis,Vector3 &yAxis,Vector3 &zAxis){
+		Matrix3x3 cacheMatrix;
+		setMatrix3x3FromQuaternion(cacheMatrix,q);
+		setAxesFromMatrix3x3(cacheMatrix,xAxis,yAxis,zAxis);
+	}
+
 	inline void setQuaternionFromAxisAngle(Quaternion &r,const Vector3 &axis,fixed angle){
 		fixed halfAngle=angle>>1;
 		fixed sinHalfAngle=sin(halfAngle);
