@@ -36,7 +36,7 @@ namespace tadpole{
 
 ResourceManager::ResourceManager(Archive *archive){
 	mArchive=archive;
-	mHandles.resize(1); // Handle 0 is always NULL
+	mResources.resize(1); // Handle 0 is always NULL
 }
 
 ResourceManager::~ResourceManager(){
@@ -47,8 +47,10 @@ void ResourceManager::destroy(){
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Resource::ptr resource=mResources[i];
-		mResources[i]->setFullyReleasedListener(NULL);
-		mResources[i]->destroy();
+		if(resource!=NULL){
+			resource->setFullyReleasedListener(NULL);
+			resource->destroy();
+		}
 	}
 	mResources.clear();
 	mNameResourceMap.clear();
@@ -94,10 +96,22 @@ Resource::ptr ResourceManager::find(const egg::String &name,ResourceHandlerData:
 
 Resource::ptr ResourceManager::manage(const Resource::ptr &resource,const String &name){
 	if(mResources.contains(resource)==false){
-		mResources.add(resource);
+		int handle=-1;
+		int size=mFreeHandles.size();
+		if(size>0){
+			handle=mFreeHandles.at(size-1);
+			mFreeHandles.removeAt(size-1);
+		}
+		else{
+			handle=mResources.size();
+			mResources.resize(handle+1);
+		}
+
+		mResources[handle]=resource;
+		resource->internal_setUniqueHandle(handle);
 		resource->setFullyReleasedListener(this);
 	}
-	else {
+	else{
 		if(resource->getName()!=(char*)NULL){
 			NameResourceMap::iterator it=mNameResourceMap.find(resource->getName());
 			if(it!=mNameResourceMap.end()){
@@ -114,35 +128,18 @@ Resource::ptr ResourceManager::manage(const Resource::ptr &resource,const String
 		mNameResourceMap[resource->getName()]=resource;
 	}
 
-	{
-		int handle=-1;
-		int size=mFreeHandles.size();
-		if(size>0){
-			handle=mFreeHandles.at(size-1);
-			mFreeHandles.removeAt(size-1);
-		}
-		else{
-			handle=mHandles.size();
-			mHandles.resize(handle+1);
-		}
-
-		mHandles[handle]=resource;
-		resource->internal_setUniqueHandle(handle);
-	}
-
 	return resource;
 }
 
 void ResourceManager::unmanage(Resource *resource){
-	if(mResources.remove(resource)==false){
+	if(mResources.contains(resource)==false){
 		Logger::alert(Categories::TOADLET_TADPOLE,
 			"Error unmanaging resource, check inheritance heiarchy");
 	}
-
-	{
+	else{
 		int handle=resource->getUniqueHandle();
 		if(handle>=0){
-			mHandles[handle]=NULL;
+			mResources[handle]=NULL;
 			mFreeHandles.add(handle);
 			resource->internal_setUniqueHandle(0);
 		}
@@ -159,8 +156,8 @@ void ResourceManager::unmanage(Resource *resource){
 }
 
 Resource::ptr ResourceManager::getByHandle(int handle){
-	if(handle>=0 && handle<mHandles.size()){
-		return mHandles[handle];
+	if(handle>=0 && handle<mResources.size()){
+		return mResources[handle];
 	}
 	else{
 		return NULL;
