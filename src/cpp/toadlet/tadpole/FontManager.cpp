@@ -37,15 +37,12 @@ namespace tadpole{
 
 FontManager::FontManager(Archive *archive):ResourceManager(archive){}
 
-Resource::ptr FontManager::manage(const Resource::ptr &resource){
-	if(mResources.contains(resource)==false){
-		mResources.add(resource);
-		resource->setFullyReleasedListener(this);
-	}
-
-	String name=resource->getName();
+Resource::ptr FontManager::manage(const Resource::ptr &resource,const egg::String &name){
 	if(name!=(char*)NULL){
-		mNameResourceMap[name+String(":")+shared_static_cast<Font>(resource)->getPointSize()]=resource;
+		ResourceManager::manage(resource,name+String(":")+shared_static_cast<Font>(resource)->getPointSize());
+	}
+	else{
+		ResourceManager::manage(resource);
 	}
 
 	return resource;
@@ -67,17 +64,7 @@ Font::ptr FontManager::getDefaultFont(){
 }
 
 void FontManager::unmanage(Resource *resource){
-	mResources.remove(resource);
-
-	String name=resource->getName();
-	if(name!=(char*)NULL){
-		NameResourceMap::iterator it=mNameResourceMap.find(name+String(":")+((Font*)resource)->getPointSize());
-		if(it!=mNameResourceMap.end()){
-			mNameResourceMap.erase(it);
-		}
-	}
-
-	resource->destroy();
+	return ResourceManager::unmanage(resource);
 }
 
 }

@@ -86,8 +86,6 @@ protected:
 	egg::Collection<egg::io::Archive::ptr> mResourceArchives;
 
 	egg::Collection<int> mFreeHandles;
-	egg::Collection<egg::Resource::ptr> mHandles;
-
 	egg::Collection<egg::Resource::ptr> mResources;
 	NameResourceMap mNameResourceMap;
 

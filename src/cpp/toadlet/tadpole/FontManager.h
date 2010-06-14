@@ -43,7 +43,7 @@ public:
 	Font::ptr findFont(const egg::String &name,float pointSize){return egg::shared_static_cast<Font>(ResourceManager::find(name,FontData::ptr(new FontData(pointSize))));}
 	Font::ptr getDefaultFont();
 	
-	egg::Resource::ptr manage(const egg::Resource::ptr &resource);
+	egg::Resource::ptr manage(const egg::Resource::ptr &resource,const egg::String &name=(char*)NULL);
 	void unmanage(egg::Resource *resource);
 
 protected:
