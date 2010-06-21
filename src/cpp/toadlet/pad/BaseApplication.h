@@ -27,12 +27,14 @@
 #define TOADLET_PAD_BASEAPPLICATION_H
 
 #include <toadlet/egg/Runnable.h>
+#include <toadlet/egg/String.h>
 #include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/Visual.h>
 #include <toadlet/ribbit/AudioPlayer.h>
 #include <toadlet/flick/MotionDetector.h>
 #include <toadlet/tadpole/Engine.h>
+#include <cctype>
 
 namespace toadlet{
 namespace pad{
@@ -69,6 +71,40 @@ public:
 		Key_ACTION,
 		Key_BACK,
 	};
+
+	static egg::String getKeyName(int key){
+		switch(key){
+			case(Key_ENTER):return		"enter";
+			case(Key_TAB):return		"tab";
+			case(Key_SPACE):return		"space";
+
+			case(Key_LEFT):return		"left";
+			case(Key_RIGHT):return		"right";
+			case(Key_UP):return			"up";
+			case(Key_DOWN):return		"down";
+
+			case(Key_ESC):return		"esc";
+			case(Key_PAUSE):return		"pause";
+			case(Key_SHIFT):return		"shift";
+			case(Key_CTRL):return		"ctrl";
+			case(Key_ALT):return		"alt";
+			case(Key_SPECIAL):return	"special";
+			case(Key_BACKSPACE):return	"backspace";
+			case(Key_DELETE):return		"delete";
+
+			case(Key_SOFTLEFT):return	"softleft";
+			case(Key_SOFTRIGHT):return	"softright";
+			case(Key_ACTION):return		"action";
+			case(Key_BACK):return		"back";
+			default:
+				if(isalpha(key) || isdigit(key)){
+					return egg::String()+(char)key;
+				}
+				else{
+					return (char*)NULL;
+				}
+		}
+	}
 
 	virtual ~BaseApplication(){}
 
