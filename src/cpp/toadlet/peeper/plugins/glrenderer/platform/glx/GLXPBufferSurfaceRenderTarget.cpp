@@ -55,7 +55,7 @@ bool GLXPBufferSurfaceRenderTarget::available(GLRenderer *renderer){
 GLXPBufferSurfaceRenderTarget::GLXPBufferSurfaceRenderTarget(GLRenderer *renderer):GLXRenderTarget(),
 	mRenderer(NULL),
 	mTexture(NULL),
-	mPBuffer(NULL),
+	mPBuffer(0),
 	mWidth(0),
 	mHeight(0),
 	mBound(false),
