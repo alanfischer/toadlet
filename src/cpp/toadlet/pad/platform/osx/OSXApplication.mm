@@ -60,6 +60,10 @@ using namespace toadlet::pad;
 #if defined(TOADLET_HAS_OPENAL)
 	extern "C" AudioPlayer *new_ALPlayer();
 #endif
+#if defined(TOADLET_PLATFORM_IPHONE)
+	#pragma comment(lib,"toadlet_flick_iphonemotiondetector" TOADLET_LIBRARY_EXTENSION)
+	extern "C" MotionDetector *new_IPhoneMotionDetector();
+#endif
 
 @interface ApplicationView:
 #if defined(TOADLET_HAS_UIKIT)
@@ -556,8 +560,8 @@ bool OSXApplication::createMotionDetector(){
 			mMotionDetector=new_IPhoneMotionDetector();
 			bool result=false;
 			TOADLET_TRY
-				reuslt=mMotionDetector->create();
-			TOADLET_CATCH(const Exception &){result=false:}
+				result=mMotionDetector->create();
+			TOADLET_CATCH(const Exception &){result=false;}
 			if(result==false){
 				delete mMotionDetector;
 				mMotionDetector=NULL;
