@@ -198,11 +198,14 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 		mSubMeshes[i]=subMesh;
 		subMesh->material=mMesh->subMeshes[i]->material;
 		subMesh->indexData=mMesh->subMeshes[i]->indexData;
-		if(mDynamicVertexData!=NULL){
-			subMesh->vertexData=mDynamicVertexData;
-		}
-		else{
-			subMesh->vertexData=mMesh->staticVertexData;
+		subMesh->vertexData=mMesh->subMeshes[i]->vertexData;
+		if(subMesh->vertexData==NULL){
+			if(mDynamicVertexData!=NULL){
+				subMesh->vertexData=mDynamicVertexData;
+			}
+			else{
+				subMesh->vertexData=mMesh->staticVertexData;
+			}
 		}
 	}
 }

@@ -38,6 +38,13 @@ MeshManager::MeshManager(Engine *engine):ResourceManager(engine->getArchiveManag
 	mEngine=engine;
 }
 
+Resource::ptr MeshManager::manage(const Resource::ptr &resource,const String &name){
+	Mesh::ptr mesh=shared_static_cast<Mesh>(resource);
+	mesh->compile();
+	ResourceManager::manage(mesh,name);
+	return mesh;
+}
+
 Mesh::ptr MeshManager::createBox(const AABox &box){
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,24);
 	{

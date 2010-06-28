@@ -24,13 +24,17 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Logger.h>
+#include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/tadpole/mesh/Mesh.h>
 
 using namespace toadlet::egg;
+using namespace toadlet::peeper;
 
 namespace toadlet{
 namespace tadpole{
 namespace mesh{
+
+Sphere Mesh::Bound_AUTOCALCULATE(-2);
 
 Mesh::Mesh():BaseResource(),
 	bound(-Math::ONE),
@@ -65,6 +69,27 @@ void Mesh::destroy(){
 }
 
 void Mesh::compile(){
+	if(bound.equals(Bound_AUTOCALCULATE)){
+		scalar ls=0;
+		VertexBufferAccessor vba;
+		Vector3 temp;
+		int i,j;
+		for(i=0;i<staticVertexData->getNumVertexBuffers();++i){
+			vba.lock(staticVertexData->getVertexBuffer(0),Buffer::Access_BIT_READ);
+
+			for(j=0;j<vba.getSize();++j){
+				vba.get3(j,0,temp);
+				ls=Math::lengthSquared(temp);
+				if(ls>bound.radius){
+					bound.radius=ls;
+				}
+			}
+
+			vba.unlock();
+		}
+
+		bound.radius=Math::sqrt(bound.radius);
+	}
 }
 
 }
