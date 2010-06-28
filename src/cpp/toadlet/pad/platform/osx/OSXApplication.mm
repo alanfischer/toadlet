@@ -44,6 +44,7 @@
 
 using namespace toadlet;
 using namespace toadlet::egg;
+using namespace toadlet::flick;
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 using namespace toadlet::tadpole;

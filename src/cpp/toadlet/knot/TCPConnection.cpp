@@ -258,7 +258,6 @@ int TCPConnection::send(const byte *data,int length){
 
 int TCPConnection::receive(byte *data,int length){
 	int amount=0;
-	int numPackets=0;
 
 	if(mDebugPacketDelayMaxTime>0){
 		TOADLET_TRY
