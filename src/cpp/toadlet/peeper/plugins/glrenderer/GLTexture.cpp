@@ -149,6 +149,8 @@ bool GLTexture::createContext(int mipLevels,byte *mipDatas[]){
 	for(level=0;level<specifiedMipLevels;++level,width/=2,height/=2,depth/=2){
 		int rowPitch=width*ImageFormatConversion::getPixelSize(mFormat);
  		int slicePitch=rowPitch*height;
+		TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(slicePitch);
+
 		byte *data=NULL;
 		if(mipDatas!=NULL && (level==0 || level<mMipLevels)){
 			data=mipDatas[level];
@@ -253,6 +255,8 @@ bool GLTexture::load(int width,int height,int depth,int mipLevel,byte *mipData){
 	int format=mFormat;
 	int rowPitch=width*ImageFormatConversion::getPixelSize(format);
 	int slicePitch=rowPitch*height;
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(slicePitch);
+	
 	GLint glformat=GLRenderer::getGLFormat(format);
 	GLint gltype=GLRenderer::getGLType(format);
 
@@ -311,8 +315,11 @@ bool GLTexture::read(int width,int height,int depth,int mipLevel,byte *mipData){
 	int format=mFormat;
 	int rowPitch=width*ImageFormatConversion::getPixelSize(format);
 	int slicePitch=rowPitch*height;
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(slicePitch);
 	GLint glformat=GLRenderer::getGLFormat(format);
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(glformat);
 	GLint gltype=GLRenderer::getGLType(format);
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(gltype);
 
 	int alignment=1,pitch=rowPitch;
 	while((pitch&1)==0){alignment<<=1;pitch>>=1;}
