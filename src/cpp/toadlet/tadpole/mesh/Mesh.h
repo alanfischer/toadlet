@@ -41,6 +41,8 @@ class TOADLET_API Mesh:public egg::BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(Mesh);
 
+	static Sphere Bound_AUTOCALCULATE;
+
 	class TOADLET_API SubMesh{
 	public:
 		TOADLET_SHARED_POINTERS(SubMesh);
@@ -48,6 +50,7 @@ public:
 		SubMesh(){}
 		virtual ~SubMesh(){}
 
+		peeper::VertexData::ptr vertexData;
 		peeper::IndexData::ptr indexData;
 		
 		Material::ptr material;

@@ -41,6 +41,7 @@ public:
 	MeshManager(Engine *engine);
 
 	mesh::Mesh::ptr findMesh(const egg::String &name){return egg::shared_static_cast<mesh::Mesh>(ResourceManager::find(name));}
+	egg::Resource::ptr manage(const egg::Resource::ptr &resource,const egg::String &name=(char*)NULL);
 
 	mesh::Mesh::ptr createBox(const AABox &box);
 	mesh::Mesh::ptr createSkyBox(scalar size,bool unfolded,bool invert,peeper::Texture::ptr bottom=NULL,peeper::Texture::ptr top=NULL,peeper::Texture::ptr left=NULL,peeper::Texture::ptr right=NULL,peeper::Texture::ptr back=NULL,peeper::Texture::ptr front=NULL);
