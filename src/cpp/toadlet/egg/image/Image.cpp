@@ -97,7 +97,7 @@ bool Image::reallocate(Dimension dimension,int format,int width,int height,int d
 	mDepth=depth;
 
 	int size=getSlicePitch()*mDepth;
-	mData=new byte[size];
+	mData=new tbyte[size];
 	if(clear){
 		memset(mData,0,size);
 	}

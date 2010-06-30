@@ -49,7 +49,7 @@ public:
 		bool assigned;
 	};
 
-	PixelPacker(byte *data,int format,int width,int height){
+	PixelPacker(tbyte *data,int format,int width,int height){
 		mData=data;
 		mFormat=format;
 		mWidth=width;
@@ -60,7 +60,7 @@ public:
 	
 	virtual ~PixelPacker(){}
 
-	bool insert(int width,int height,byte *data,Matrix4x4 &result){
+	bool insert(int width,int height,tbyte *data,Matrix4x4 &result){
 		Node *node=insert(mRootNode,width,height);
 		if(node!=NULL){
 			node->assigned=true;
@@ -68,8 +68,8 @@ public:
 			int pixelSize=egg::image::ImageFormatConversion::getPixelSize(mFormat);
 			int y=0;
 			for(y=0;y<height;++y){
-				byte *src=data + (y*width*pixelSize);
-				byte *dst=mData + ((node->y+y)*mWidth+node->x)*pixelSize;
+				tbyte *src=data + (y*width*pixelSize);
+				tbyte *dst=mData + ((node->y+y)*mWidth+node->x)*pixelSize;
 				memcpy(dst,src,width*pixelSize);
 			}
 
@@ -115,7 +115,7 @@ public:
 protected:
 	Node *mRootNode;
 
-	byte *mData;
+	tbyte *mData;
 	int mFormat;
 	int mWidth;
 	int mHeight;

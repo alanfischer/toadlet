@@ -453,7 +453,7 @@ void LANPeerEventConnector::findLANGameThread(){
 	broadcastSocket->setBroadcast(true);
 
 	String message=mUUID+":"+mServerPort;
-	amount+=broadcastSocket->sendTo((byte*)message.c_str(),message.length(),mBroadcastIP,mBroadcastPort);
+	amount+=broadcastSocket->sendTo((tbyte*)message.c_str(),message.length(),mBroadcastIP,mBroadcastPort);
 
 	broadcastSocket->close();
 
@@ -467,7 +467,7 @@ void LANPeerEventConnector::findLANGameThread(){
 	uint32 ip=0;
 	int port=0;
 	TOADLET_TRY
-		amount=mLANListenerSocket->receiveFrom((byte*)receivedData,sizeof(receivedData),ip,port);
+		amount=mLANListenerSocket->receiveFrom((tbyte*)receivedData,sizeof(receivedData),ip,port);
 	TOADLET_CATCH(const Exception &){}
 
 	TOADLET_TRY

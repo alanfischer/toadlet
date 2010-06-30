@@ -134,7 +134,7 @@ public:
 		bplane *plane=NULL;
 
 		while(index>=0){
-			node=(bclipnode*)(((byte*)hull)+hullStride*index);
+			node=(bclipnode*)(((tbyte*)hull)+hullStride*index);
 			plane=planes+node->planenum;
 
 			if(plane->type<3){
@@ -174,7 +174,7 @@ public:
 			return true;
 		}
 
-		node=(bclipnode*)(((byte*)hull)+hullStride*index);
+		node=(bclipnode*)(((tbyte*)hull)+hullStride*index);
 		plane=planes+node->planenum;
 
 		if(plane->type<3){

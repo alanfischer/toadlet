@@ -355,7 +355,7 @@ Socket *Socket::accept(){
 	}
 }
 
-int Socket::receive(byte *buffer,int length){
+int Socket::receive(tbyte *buffer,int length){
 	int flags=0;
 	int result=::recv(mHandle,(char*)buffer,length,flags);
 	if(result==TOADLET_SOCKET_ERROR){
@@ -364,7 +364,7 @@ int Socket::receive(byte *buffer,int length){
 	return result;
 }
 
-int Socket::receiveFrom(byte *buffer,int length,uint32 &ipAddress,int &port){
+int Socket::receiveFrom(tbyte *buffer,int length,uint32 &ipAddress,int &port){
 	int flags=0;
 	struct sockaddr_in from={0};
 	TOADLET_SOCKLEN fromLength=sizeof(sockaddr_in);
@@ -377,7 +377,7 @@ int Socket::receiveFrom(byte *buffer,int length,uint32 &ipAddress,int &port){
 	return result;
 }
 
-int Socket::send(const byte *buffer,int length){
+int Socket::send(const tbyte *buffer,int length){
 	#if defined(MSG_NOSIGNAL)
 		int flags=MSG_NOSIGNAL;
 	#else
@@ -390,7 +390,7 @@ int Socket::send(const byte *buffer,int length){
 	return result;
 }
 
-int Socket::sendTo(const byte *buffer,int length,uint32 ipAddress,int port){
+int Socket::sendTo(const tbyte *buffer,int length,uint32 ipAddress,int port){
 	#if defined(MSG_NOSIGNAL)
 		int flags=MSG_NOSIGNAL;
 	#else

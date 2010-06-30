@@ -81,7 +81,7 @@ protected:
 
 	IndexFormat mIndexFormat;
 	VertexFormat::ptr mVertexFormat;
-	egg::Collection<byte*> mElementOffsets;
+	egg::Collection<tbyte*> mElementOffsets;
 
 	GLuint mHandle;
 	GLenum mTarget;

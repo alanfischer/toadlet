@@ -46,7 +46,7 @@ public:
 	virtual Texture *getRootTexture(scalar time){return this;}
 	virtual bool getRootTransform(scalar time,Matrix4x4 &transform){return true;}
 
-	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]);
+	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]);
 	virtual void destroy();
 
 	virtual void resetCreate(){}
@@ -62,8 +62,8 @@ public:
 	virtual scalar getLength() const{return 0;}
 
 	virtual Surface::ptr getMipSurface(int level,int cubeSide);
-	virtual bool load(int width,int height,int depth,int mipLevel,byte *mipData);
-	virtual bool read(int width,int height,int depth,int mipLevel,byte *mipData);
+	virtual bool load(int width,int height,int depth,int mipLevel,tbyte *mipData);
+	virtual bool read(int width,int height,int depth,int mipLevel,tbyte *mipData);
 
 	inline GLuint getHandle() const{return mHandle;}
 	inline GLenum getTarget() const{return mTarget;}
@@ -71,7 +71,7 @@ public:
 	inline void setMatrix(const Matrix4x4 &matrix){mMatrix.set(matrix);}
 
 protected:
-	bool createContext(int mipLevels,byte *mipDatas[]);
+	bool createContext(int mipLevels,tbyte *mipDatas[]);
 	bool destroyContext();
 
 	bool generateMipLevels();

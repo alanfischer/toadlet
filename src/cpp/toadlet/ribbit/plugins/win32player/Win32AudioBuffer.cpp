@@ -54,7 +54,7 @@ bool Win32AudioBuffer::create(Stream::ptr stream,const String &mimeType){
 		return false;
 	}
 
-	byte *buffer=0;
+	tbyte *buffer=0;
 	int length=0;
 	int channels=decoder->getChannels();
 	int sps=decoder->getSamplesPerSecond();

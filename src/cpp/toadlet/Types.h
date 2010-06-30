@@ -184,7 +184,7 @@ namespace toadlet{
 
 typedef signed char int8;
 typedef unsigned char uint8;
-typedef uint8 byte;
+typedef uint8 tbyte;
 
 typedef signed short int16;
 typedef unsigned short uint16;
@@ -211,7 +211,7 @@ typedef unsigned int uint32;
 #endif
 
 #if defined(TOADLET_DEBUG)
-	static char byteSizeTest  [sizeof(byte)==   1 ?1:-1];
+	static char tbyteSizeTest [sizeof(tbyte)==  1 ?1:-1];
 	static char int8SizeTest  [sizeof(int8)==   1 ?1:-1];
 	static char uint8SizeTest [sizeof(uint8)==  1 ?1:-1];
 	static char int16SizeTest [sizeof(int16)==  2 ?1:-1];
@@ -222,7 +222,7 @@ typedef unsigned int uint32;
 	static char uint64SizeTest[sizeof(uint64)== 8 ?1:-1];
 
 	inline void silenceUnusedVariableWarnings(){
-		TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(byteSizeTest);
+		TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(tbyteSizeTest);
 		TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(int8SizeTest);
 		TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(uint8SizeTest);
 		TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(int16SizeTest);

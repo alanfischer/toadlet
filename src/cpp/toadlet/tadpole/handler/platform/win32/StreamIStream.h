@@ -55,7 +55,7 @@ public:
 	}
 
 	HRESULT STDMETHODCALLTYPE Write(const void *pv,ULONG cb,ULONG *pcbWritten){
-		int amount=mBase->write((const byte*)pv,cb);
+		int amount=mBase->write((const tbyte*)pv,cb);
 		if(pcbWritten!=NULL){*pcbWritten=amount;}
 		return S_OK;
 	}

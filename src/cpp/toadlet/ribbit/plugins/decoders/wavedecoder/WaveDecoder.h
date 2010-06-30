@@ -40,10 +40,10 @@ public:
 	bool closed(){return false;}
 
 	bool readable(){return true;}
-	int read(byte *buffer,int length);
+	int read(tbyte *buffer,int length);
 
 	bool writeable(){return false;}
-	int write(const byte *buffer,int length){return 0;}
+	int write(const tbyte *buffer,int length){return 0;}
 
 	bool startStream(egg::io::Stream::ptr stream);
 	bool stopStream();
@@ -64,7 +64,7 @@ private:
 	int mChannels;
 	int mSamplesPerSecond;
 	int mBitsPerSample;
-	byte *mData;
+	tbyte *mData;
 	int mSize;
 	int mPosition;
 	egg::io::Stream::ptr mStream;

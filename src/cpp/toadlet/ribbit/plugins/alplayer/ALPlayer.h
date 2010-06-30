@@ -79,7 +79,7 @@ public:
 
 	// Methods not part of the AudioPlayer interface
 	AudioStream::ptr startAudioStream(egg::io::Stream::ptr stream,const egg::String &mimeType);
-	void decodeStream(AudioStream *decoder,byte *&finalBuffer,int &finalLength);
+	void decodeStream(AudioStream *decoder,tbyte *&finalBuffer,int &finalLength);
 	ALuint checkoutSourceHandle(ALAudio *audio);
 	void checkinSourceHandle(ALAudio *audio,ALuint source);
 	int getBufferFadeInTime() const{return mBufferFadeInTime;}

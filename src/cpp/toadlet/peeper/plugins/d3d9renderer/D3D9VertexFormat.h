@@ -56,9 +56,10 @@ public:
 	int getVertexSize() const{return mVertexSize;}
 
 	inline DWORD getFVF(){if(mFVF==0){createContext();}return mFVF;}
-	inline IDirect3DVertexDeclaration9 *getDeclaration(){if(mDeclaration==NULL){createContext();}return mDeclaration;}
 
 	#if !defined(TOADLET_SET_D3DM)
+		inline IDirect3DVertexDeclaration9 *getDeclaration(){if(mDeclaration==NULL){createContext();}return mDeclaration;}
+
 		static BYTE getD3DDECLTYPE(int format);
 		static BYTE getD3DDECLUSAGE(int semantic);
 	#endif

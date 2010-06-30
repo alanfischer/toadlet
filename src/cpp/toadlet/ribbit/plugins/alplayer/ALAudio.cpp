@@ -368,7 +368,7 @@ void ALAudio::update(int dt){
 	}
 }
 
-int ALAudio::readAudioData(byte *buffer,int bsize){
+int ALAudio::readAudioData(tbyte *buffer,int bsize){
 	int amount=mAudioStream->read(buffer,bsize);
 	if(amount==0 && mLooping){
 		mAudioStream->reset();

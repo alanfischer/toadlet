@@ -39,10 +39,10 @@ MemoryStream::MemoryStream(Stream::ptr stream):
 	mPosition(0),
 	mOwnsData(false)
 {
-	byte data[1024];
+	tbyte data[1024];
 	int i;
 	for(i=stream->read(data,sizeof(data));i>0;i=stream->read(data,sizeof(data))){
-		byte *newData=new byte[mDataLength+i];
+		tbyte *newData=new tbyte[mDataLength+i];
 		if(mData!=NULL){
 			memcpy(newData,mData,mDataLength);
 		}
@@ -56,7 +56,7 @@ MemoryStream::MemoryStream(Stream::ptr stream):
 	mInitialLength=mDataLength;
 }
 
-MemoryStream::MemoryStream(byte *data,int dataLength,int initialLength,bool ownsData):
+MemoryStream::MemoryStream(tbyte *data,int dataLength,int initialLength,bool ownsData):
 	mData(NULL),
 	mDataLength(0),
 	mInternalData(NULL),
@@ -81,7 +81,7 @@ MemoryStream::MemoryStream():
 	mPosition(0),
 	mOwnsData(false)
 {
-	mInternalData=new Collection<byte>();
+	mInternalData=new Collection<tbyte>();
 }
 
 MemoryStream::~MemoryStream(){
@@ -96,15 +96,15 @@ MemoryStream::~MemoryStream(){
 	}
 }
 
-int MemoryStream::read(byte *buffer,int length){
-	byte *data=(mData!=NULL)?mData:mInternalData->begin();
+int MemoryStream::read(tbyte *buffer,int length){
+	tbyte *data=(mData!=NULL)?mData:mInternalData->begin();
 	int amt=(length<(mLength-mPosition)?length:(mLength-mPosition));
 	memcpy(buffer,data+mPosition,amt);
 	mPosition+=amt;
 	return amt;
 }
 
-int MemoryStream::write(const byte *buffer,int length){
+int MemoryStream::write(const tbyte *buffer,int length){
 	if(mData!=NULL){
 		length=((mDataLength-mPosition)<length?(mDataLength-mPosition):length);
 		memcpy(mData+mPosition,buffer,length);
@@ -120,7 +120,7 @@ int MemoryStream::write(const byte *buffer,int length){
 
 		mInternalData->resize(newsize);
 
-		byte *data=&mInternalData->at(oldsize);
+		tbyte *data=&mInternalData->at(oldsize);
 		memcpy(data,buffer,length);
 	}
 	mPosition+=length;
@@ -147,13 +147,13 @@ bool MemoryStream::seek(int offs){
 	return true;
 }
 
-byte *MemoryStream::getCurrentDataPointer(){
-	byte *data=(mData!=NULL)?mData:mInternalData->begin();
+tbyte *MemoryStream::getCurrentDataPointer(){
+	tbyte *data=(mData!=NULL)?mData:mInternalData->begin();
 	return data+mPosition;
 }
 
-byte *MemoryStream::getOriginalDataPointer(){
-	byte *data=(mData!=NULL)?mData:mInternalData->begin();
+tbyte *MemoryStream::getOriginalDataPointer(){
+	tbyte *data=(mData!=NULL)?mData:mInternalData->begin();
 	return data;
 }
 

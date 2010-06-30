@@ -55,10 +55,10 @@ public:
 	bool closed();
 
 	bool readable(){return mStream!=NULL?mStream->readable():true;}
-	int read(byte *buffer,int length);
+	int read(tbyte *buffer,int length);
 
 	bool writeable(){return mStream!=NULL?mStream->writeable():false;}
-	int write(const byte *buffer,int length);
+	int write(const tbyte *buffer,int length);
 
 	bool reset();
 	int length();

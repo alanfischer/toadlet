@@ -125,7 +125,7 @@ Resource::ptr ResourceManager::manage(const Resource::ptr &resource,const String
 	}
 
 	if(resource->getName()!=(char*)NULL){
-		mNameResourceMap[resource->getName()]=resource;
+		mNameResourceMap.add(resource->getName(),resource);
 	}
 
 	return resource;
@@ -176,7 +176,7 @@ void ResourceManager::setHandler(ResourceHandler::ptr handler,const String &exte
 	if(handler!=NULL){
 		Logger::debug(Categories::TOADLET_TADPOLE,
 			"Adding handler for extension "+extension);
-		mExtensionHandlerMap[extension]=handler;
+		mExtensionHandlerMap.add(extension,handler);
 	}
 }
 

@@ -104,7 +104,7 @@ void BackableIndexBuffer::setBack(IndexBuffer::ptr back){
 	if(back!=mBack && mBack!=NULL){
 		mData=new uint8[mDataSize];
 		TOADLET_TRY
-			byte *data=lock(Access_BIT_READ);
+			tbyte *data=lock(Access_BIT_READ);
 			if(data!=NULL){
 				memcpy(mData,data,mDataSize);
 				mBack->unlock();
@@ -120,7 +120,7 @@ void BackableIndexBuffer::setBack(IndexBuffer::ptr back){
 		mBack->create(mUsage,mAccess,mIndexFormat,mSize);
 
 		TOADLET_TRY
-			byte *data=mBack->lock(Access_BIT_WRITE);
+			tbyte *data=mBack->lock(Access_BIT_WRITE);
 			if(data!=NULL){
 				memcpy(data,mData,mDataSize);
 				mBack->unlock();

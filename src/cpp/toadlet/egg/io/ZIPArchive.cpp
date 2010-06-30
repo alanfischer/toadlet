@@ -83,7 +83,7 @@ int toadlet_zzip_close(int fd){
 zzip_ssize_t toadlet_zzip_read(int fd,void *buf,zzip_size_t len){
 	Stream::ptr stream=toadlet_zzip_findStream(fd);
 
-	return stream->read((byte*)buf,len);
+	return stream->read((tbyte*)buf,len);
 }
 
 zzip_off_t toadlet_zzip_seeks(int fd,zzip_off_t offset,int whence){
@@ -113,7 +113,7 @@ zzip_off_t toadlet_zzip_filesize(int fd){
 zzip_ssize_t toadlet_zzip_write(int fd,_zzip_const void* buf,zzip_size_t len){
 	Stream::ptr stream=toadlet_zzip_findStream(fd);
 
-	return stream->write((byte*)buf,len);
+	return stream->write((tbyte*)buf,len);
 }
 
 ZIPArchive::ZIPArchive():

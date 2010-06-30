@@ -54,7 +54,7 @@ BackableTexture::~BackableTexture(){
 	destroy();
 }
 
-bool BackableTexture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
+bool BackableTexture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]){
 	mUsage=usage;
 	mDimension=dimension;
 	mFormat=format;
@@ -80,7 +80,7 @@ bool BackableTexture::create(int usage,Dimension dimension,int format,int width,
 		mData=NULL;
 	}
 
-	mData=new byte[mDataSize];
+	mData=new tbyte[mDataSize];
 
 	if(mipDatas!=NULL){
 		load(width,height,depth,0,mipDatas[0]);
@@ -106,7 +106,7 @@ Surface::ptr BackableTexture::getMipSurface(int level,int cubeSide){
 	return mBack->getMipSurface(level,cubeSide);
 }
 
-bool BackableTexture::load(int width,int height,int depth,int mipLevel,byte *mipData){
+bool BackableTexture::load(int width,int height,int depth,int mipLevel,tbyte *mipData){
 	if(mBack!=NULL){
 		return mBack->load(width,height,depth,mipLevel,mipData);
 	}
@@ -121,7 +121,7 @@ bool BackableTexture::load(int width,int height,int depth,int mipLevel,byte *mip
 	}
 }
 
-bool BackableTexture::read(int width,int height,int depth,int mipLevel,byte *mipData){
+bool BackableTexture::read(int width,int height,int depth,int mipLevel,tbyte *mipData){
 	if(mBack!=NULL){
 		return mBack->read(width,height,depth,mipLevel,mipData);
 	}
@@ -148,7 +148,7 @@ void BackableTexture::setBack(Texture::ptr back){
 	if(mBack!=NULL && mData!=NULL){
 		// Create texture on setting the back, otherwise D3D10 static textures will not load data in load
 		if(true){
-			byte *mipDatas[1]={mData};
+			tbyte *mipDatas[1]={mData};
 			mBack->create(mUsage,mDimension,mFormat,mWidth,mHeight,mDepth,0,mipDatas);
 		}
 		else{

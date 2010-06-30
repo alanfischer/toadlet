@@ -212,7 +212,7 @@ Image *PNGHandler::loadImage(Stream *stream){
 
 	image=new Image(Image::Dimension_D2,format,width,height);
 	int bytewidth=width*image->getPixelSize();
-	byte *data=image->getData();
+	tbyte *data=image->getData();
 	for(y=0;y<height;++y){
 		// Flip image in this copy
 		memcpy(data+bytewidth*(height-y-1),row_pointers[y],bytewidth);

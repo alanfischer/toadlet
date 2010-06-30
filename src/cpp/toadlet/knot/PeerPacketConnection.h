@@ -72,8 +72,8 @@ public:
 	bool closed(){return mRun==false;}
 
 	// This connection is always non-blocking
-	int send(const byte *data,int length);
-	int receive(byte *data,int length);
+	int send(const tbyte *data,int length);
+	int receive(tbyte *data,int length);
 
 	/*!
 	 * This is not an accurate ping value.  Since the soonest an acknowledgement of a received packet can be sent is
@@ -105,10 +105,10 @@ protected:
 
 		void set(PeerPacket *packet);
 		
-		inline byte *getData() const{return mData;}
+		inline tbyte *getData() const{return mData;}
 		inline int getDataLength() const{return mDataLength;}
 
-		int setData(const byte *data,int length);
+		int setData(const tbyte *data,int length);
 
 		inline int getFrame() const{return mFrame;}
 		void setFrame(int frame){mFrame=frame;}
@@ -123,7 +123,7 @@ protected:
 		int debugDeliverTime;
 
 	protected:
-		byte *mData;
+		tbyte *mData;
 		int mDataLength;
 		int mDataMaxSize;
 

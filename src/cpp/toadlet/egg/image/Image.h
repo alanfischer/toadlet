@@ -76,8 +76,8 @@ public:
 
 	inline Dimension getDimension() const{return mDimension;}
 	inline int getFormat() const{return mFormat;}
-	inline byte *getData(){return mData;}
-	inline const byte *getData() const{return mData;}
+	inline tbyte *getData(){return mData;}
+	inline const tbyte *getData() const{return mData;}
 	
 	inline int getPixelSize() const{return ImageFormatConversion::getPixelSize(mFormat);}
 	inline int getRowPitch() const{return getPixelSize()*mWidth;}
@@ -271,7 +271,7 @@ protected:
 	Dimension mDimension;
 	int mFormat;
 	int mWidth,mHeight,mDepth;
-	byte *mData;
+	tbyte *mData;
 };
 
 }

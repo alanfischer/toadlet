@@ -63,7 +63,7 @@ Resource::ptr BSP30Handler::load(Stream::ptr stream,const ResourceHandlerData *h
 
 	BSP30Map::ptr map(new BSP30Map());
 
-	stream->read((byte*)&map->header,sizeof(map->header));
+	stream->read((tbyte*)&map->header,sizeof(map->header));
 
 	readLump(stream,&map->header.lumps[LUMP_MODELS],		(void**)&map->models,sizeof(bmodel),			&map->nmodels);
 	readLump(stream,&map->header.lumps[LUMP_VERTEXES],		(void**)&map->vertexes,sizeof(bvertex),			&map->nvertexes);
@@ -101,7 +101,7 @@ void BSP30Handler::readLump(Stream *stream,blump *lump,void **data,int size,int 
 
 	stream->seek(ofs);
 	*data=malloc(length);
-	stream->read((byte*)*data,length);
+	stream->read((tbyte*)*data,length);
 
 	if(count!=NULL){
 		*count=length/size;
@@ -130,14 +130,14 @@ void BSP30Handler::parseVisibility(BSP30Map *map){
 			// We enumerate through all possible leafs
 			for(c=1;c<map->models[0].visleafs;v++){
 				// If the whole byte is zero, that means the nextvis*8 leafs are invisible, so skip them
-				if(((byte*)map->visibility)[v]==0){
+				if(((tbyte*)map->visibility)[v]==0){
 					v++;
-					c+=(((byte*)map->visibility)[v]<<3);
+					c+=(((tbyte*)map->visibility)[v]<<3);
 				}
 				// Otherwise, we need to check each bit to see if that leaf is visible
 				else{
 					for(bit=1;bit;bit<<=1,c++){
-						if(((byte*)map->visibility)[v]&bit){
+						if(((tbyte*)map->visibility)[v]&bit){
 							count++;
 						}
 					}
@@ -157,14 +157,14 @@ void BSP30Handler::parseVisibility(BSP30Map *map){
 			// We enumerate through all possible leafs
 			for(c=1;c<map->models[0].visleafs;v++){
 				// If the whole byte is zero, that means the nextvis*8 leafs are invisible, so skip them
-				if(((byte*)map->visibility)[v]==0){
+				if(((tbyte*)map->visibility)[v]==0){
 					v++;
-					c+=(((byte*)map->visibility)[v]<<3);
+					c+=(((tbyte*)map->visibility)[v]<<3);
 				}
 				// Otherwise, we need to check each bit to see if that leaf is visible
 				else{
 					for(bit=1;bit;bit<<=1,c++){
-						if(((byte*)map->visibility)[v]&bit){
+						if(((tbyte*)map->visibility)[v]&bit){
 							map->parsedVisibility[i][index]=c;
 							index++;
 						}
@@ -231,7 +231,7 @@ void BSP30Handler::parseTextures(BSP30Map *map){
 		Texture::ptr texture;
 		int miptexofs=map->miptexlump->dataofs[i];
 		if(miptexofs!=-1){
-			WADArchive::wmiptex *miptex=(WADArchive::wmiptex*)(&((byte*)map->textures)[miptexofs]);
+			WADArchive::wmiptex *miptex=(WADArchive::wmiptex*)(&((tbyte*)map->textures)[miptexofs]);
 			texture=WADArchive::createTexture(mEngine->getTextureManager(),miptex);
 			if(texture==NULL){
 				texture=mEngine->getTextureManager()->findTexture(miptex->name);
@@ -285,7 +285,7 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 		btexinfo *texinfo=&map->texinfos[face->texinfo];
 		int miptexofs=map->miptexlump->dataofs[texinfo->miptex];
 		if(miptexofs!=-1){
-			WADArchive::wmiptex *miptex=(WADArchive::wmiptex*)(&((byte*)map->textures)[miptexofs]);
+			WADArchive::wmiptex *miptex=(WADArchive::wmiptex*)(&((tbyte*)map->textures)[miptexofs]);
 			width=miptex->width;
 			height=miptex->height;
 			if(width>0 && height>0){
@@ -305,7 +305,7 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 			ilmwidth=1.0/(float)lmwidth;
 			ilmheight=1.0/(float)lmheight;
 
-			packer.insert(lmwidth,lmheight,((byte*)map->lighting)+face->lightofs,map->facedatas[i].lightmapTransform);
+			packer.insert(lmwidth,lmheight,((tbyte*)map->lighting)+face->lightofs,map->facedatas[i].lightmapTransform);
 		}
 
 		if(mEngine->getRenderer()==NULL || mEngine->getRenderer()->getCapabilitySet().triangleFan){

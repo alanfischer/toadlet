@@ -26,8 +26,9 @@
 #ifndef TOADLET_PAD_WIN32APPLICATION_H
 #define TOADLET_PAD_WIN32APPLICATION_H
 
-#include <toadlet/pad/BaseApplication.h>
 #include <toadlet/egg/Thread.h>
+#include <toadlet/egg/platform/win32/io/Win32ResourceArchive.h>
+#include <toadlet/pad/BaseApplication.h>
 
 namespace toadlet{
 namespace pad{
@@ -97,6 +98,7 @@ public:
 	virtual peeper::Renderer *getRenderer() const{return mRenderer;}
 	virtual ribbit::AudioPlayer *getAudioPlayer() const{return mAudioPlayer;}
 	virtual flick::MotionDetector *getMotionDetector() const{return mMotionDetector;}
+	egg::io::Win32ResourceArchive::ptr getResourceArchive() const{return mResourceArchive;}
 
 	virtual peeper::RenderTarget *getRootRenderTarget(){return mRenderTarget;}
 	virtual bool isPrimary() const{return mRenderTarget->isPrimary();}
@@ -164,6 +166,7 @@ protected:
 	int *mRendererOptions;
 	ribbit::AudioPlayer *mAudioPlayer;
 	flick::MotionDetector *mMotionDetector;
+	egg::io::Win32ResourceArchive::ptr mResourceArchive;
 
 	bool mRun;
 	bool mAutoActivate;

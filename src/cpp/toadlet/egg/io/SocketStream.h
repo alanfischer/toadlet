@@ -45,10 +45,10 @@ public:
 	virtual bool closed(){return mSocket->closed();}
 
 	virtual bool readable(){return true;}
-	virtual int read(byte *buffer,int length);
+	virtual int read(tbyte *buffer,int length);
 
 	virtual bool writeable(){return true;}
-	virtual int write(const byte *buffer,int length);
+	virtual int write(const tbyte *buffer,int length);
 
 	virtual bool reset(){return false;}
 	virtual int length(){return 0;}

@@ -41,11 +41,11 @@ SocketStream::~SocketStream(){
 	// Don't close the socket on destruction, we'll leave that up to the socket itself
 }
 
-int SocketStream::read(byte *buffer,int length){
+int SocketStream::read(tbyte *buffer,int length){
 	return mSocket->receive(buffer,length);
 }
 
-int SocketStream::write(const byte *buffer,int length){
+int SocketStream::write(const tbyte *buffer,int length){
 	return mSocket->send(buffer,length);
 }
 

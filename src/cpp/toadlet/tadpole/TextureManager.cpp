@@ -93,7 +93,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 	}
 
 	egg::Collection<Image::ptr> mipImages;
-	egg::Collection<byte*> mipDatas;
+	egg::Collection<tbyte*> mipDatas;
 
 	mipImages.add(finalImage);
 	mipDatas.add(finalImage->getData());
@@ -162,7 +162,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr images[],int usage,int mip
 	int closestFormat=renderer==NULL?format:renderer->getClosestTextureFormat(format);
 
 	egg::Collection<Image::ptr> mipImages;
-	egg::Collection<byte*> mipDatas;
+	egg::Collection<tbyte*> mipDatas;
 
 	if(format!=closestFormat){
 		int i;
