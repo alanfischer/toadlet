@@ -25,7 +25,11 @@
 
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/LoggerListener.h>
-#include <time.h>
+#if defined(TOADLET_PLATFORM_WIN32)
+	#include <windows.h>
+#else
+	#include <time.h>
+#endif
 
 // Choose output method
 #if defined(TOADLET_PLATFORM_WIN32)
@@ -37,10 +41,6 @@
 #endif
 
 // Include appropriate files
-#if defined(TOADLET_USE_OUTPUTDEBUGSTRING_LOGGING)
-	#include <windows.h>
-#endif
-
 #if defined(TOADLET_USE_STDERR_LOGGING)
 	#include <stdio.h>
 #endif
@@ -199,10 +199,16 @@ void Logger::addCompleteLogString(Category *category,Level level,const String &d
 
 	if(mOutputLogString || mStoreLogString){
 	    char timeString[128];
-		time_t currentTime;
-		time(&currentTime);
-	    struct tm *ts=localtime(&currentTime);
-	    strftime(timeString,sizeof(timeString),"%Y-%m-%d %H:%M:%S :",ts);
+	    #if defined(TOADLET_PLATFORM_WIN32)
+			SYSTEMTIME currentTime;
+			GetLocalTime(&currentTime);
+			sprintf(timeString,"%04d-%02d-%02d %02d:%02d:%02d :",currentTime.wYear,currentTime.wMonth,currentTime.wDay,currentTime.wHour,currentTime.wMinute,currentTime.wSecond);
+		#else
+			time_t currentTime;
+			time(&currentTime);
+			struct tm *ts=localtime(&currentTime);
+			strftime(timeString,sizeof(timeString),"%Y-%m-%d %H:%M:%S :",ts);
+		#endif
 
 		const char *levelString=NULL;
 		switch(level){
@@ -263,7 +269,7 @@ void Logger::addCompleteLogString(Category *category,Level level,const String &d
 Logger::Category *Logger::addCategory(const String &categoryName){
 	Category *category=new Category(categoryName);
 	lock();
-		mCategoryNameCategoryMap[categoryName]=category;
+		mCategoryNameCategoryMap.add(categoryName,category);
 	unlock();
 	return category;
 }

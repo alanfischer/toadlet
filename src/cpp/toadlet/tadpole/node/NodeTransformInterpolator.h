@@ -33,33 +33,45 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class TOADLET_API NodeTranslationInterpolator:public NodeInterpolator{
+class TOADLET_API NodeTransformInterpolator:public NodeInterpolator{
 public:
-	TOADLET_SHARED_POINTERS(NodeTranslationInterpolator);
+	TOADLET_SHARED_POINTERS(NodeTransformInterpolator);
 
-	NodeTranslationInterpolator(){}
+	NodeTransformInterpolator(){}
 
 	virtual void transformUpdated(Node *node){
 		mLastTranslate.set(node->getTranslate());
-		mTranslate.set(node->getTranslate());
+		mLastRotate.set(node->getRotate());
+
+		mTranslate.set(mLastTranslate);
+		mRotate.set(mLastRotate);
 	}
 
 	virtual void logicUpdate(Node *node,int dt){
-		mLastTranslate=mTranslate;
-		mTranslate=node->getTranslate();
+		mLastTranslate.set(mTranslate);
+		mLastRotate.set(mRotate);
+
+		mTranslate.set(node->getTranslate());
+		mRotate.set(node->getRotate());
 	}
 
 	virtual void interpolate(Node *node,scalar value){
-		Vector3 result;
+		Math::lerp(mTranslateLerp,mLastTranslate,mTranslate,value);
+		Math::slerp(mRotateLerp,mLastRotate,mRotate,value);
 
-		Math::lerp(result,mLastTranslate,mTranslate,value);
-		// Only call the base setTranslate, so Physics implementations don't get all flustered and continually reactivate & reset their positions
-		node->Node::setTranslate(result);
+		// Only call the base function, so Physics implementations don't get all flustered and continually reactivate & reset their positions
+		node->Node::setTranslate(mTranslateLerp);
+		node->Node::setRotate(mRotateLerp);
 	}
 	
 protected:
 	Vector3 mTranslate;
+	Quaternion mRotate;
 	Vector3 mLastTranslate;
+	Quaternion mLastRotate;
+
+	Vector3 mTranslateLerp;
+	Quaternion mRotateLerp;
 };
 
 }

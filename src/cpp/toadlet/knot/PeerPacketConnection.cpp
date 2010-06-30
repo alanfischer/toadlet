@@ -70,13 +70,13 @@ void PeerPacketConnection::PeerPacket::set(PeerPacket *packet){
 	setFrameBits(packet->getFrameBits(),packet->getFrameBitsReferenceFrame());
 }
 
-int PeerPacketConnection::PeerPacket::setData(const byte *data,int length){
+int PeerPacketConnection::PeerPacket::setData(const tbyte *data,int length){
 	if(mDataMaxSize<length){
 		if(mData!=NULL){
 			delete[] mData;
 			mData=NULL;
 		}
-		mData=new byte[length];
+		mData=new tbyte[length];
 		mDataMaxSize=length;
 	}
 	memcpy(mData,data,length);
@@ -124,9 +124,9 @@ PeerPacketConnection::PeerPacketConnection(Socket::ptr socket):
 	mSocket=socket;
 
 	int maxSize=1024;
-	mOutPacket=MemoryStream::ptr(new MemoryStream(new byte[maxSize],maxSize,0,true));
+	mOutPacket=MemoryStream::ptr(new MemoryStream(new tbyte[maxSize],maxSize,0,true));
 	mDataOutPacket=DataStream::ptr(new DataStream(Stream::ptr(mOutPacket)));
-	mInPacket=MemoryStream::ptr(new MemoryStream(new byte[maxSize],maxSize,maxSize,true));
+	mInPacket=MemoryStream::ptr(new MemoryStream(new tbyte[maxSize],maxSize,maxSize,true));
 	mDataInPacket=DataStream::ptr(new DataStream(Stream::ptr(mInPacket)));
 
 	mWindowSize=32;
@@ -319,7 +319,7 @@ void PeerPacketConnection::close(){
 	mSocket=NULL;
 }
 
-int PeerPacketConnection::send(const byte *data,int length){
+int PeerPacketConnection::send(const tbyte *data,int length){
 	mMutex->lock();
 
 	mLocalFrame++;
@@ -353,7 +353,7 @@ int PeerPacketConnection::send(const byte *data,int length){
 	return length;
 }
 
-int PeerPacketConnection::receive(byte *data,int length){
+int PeerPacketConnection::receive(tbyte *data,int length){
 	int index=mHalfWindowSize;
 
 //	if(mBlocking){
@@ -465,7 +465,7 @@ int PeerPacketConnection::buildConnectionPacket(DataStream *stream){
 	int size=0;
 
 	size+=stream->writeBigInt32(CONNECTION_FRAME);
-	size+=stream->write((byte*)CONNECTION_PACKET,CONNECTION_PACKET_LENGTH);
+	size+=stream->write((tbyte*)CONNECTION_PACKET,CONNECTION_PACKET_LENGTH);
 	size+=stream->writeBigInt32(CONNECTION_VERSION);
 
 	return size; 
@@ -478,7 +478,7 @@ bool PeerPacketConnection::verifyConnectionPacket(DataStream *stream){
 	}
 
 	char packet[CONNECTION_PACKET_LENGTH];
-	stream->read((byte*)packet,CONNECTION_PACKET_LENGTH);
+	stream->read((tbyte*)packet,CONNECTION_PACKET_LENGTH);
 	if(memcmp(packet,CONNECTION_PACKET,CONNECTION_PACKET_LENGTH)!=0){
 		return false;
 	}

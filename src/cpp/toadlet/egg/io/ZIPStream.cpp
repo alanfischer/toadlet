@@ -104,7 +104,7 @@ void ZIPStream::close(){
 	}
 }
 
-int ZIPStream::read(byte *buffer,int length){
+int ZIPStream::read(tbyte *buffer,int length){
 	if(mStream!=NULL && (mOpenFlags&OpenFlags_READ)>0){
 		/// @todo: Finish zlib stremaing
 		return -1;
@@ -115,7 +115,7 @@ int ZIPStream::read(byte *buffer,int length){
 	return -1;
 }
 
-int ZIPStream::write(const byte *buffer,int length){
+int ZIPStream::write(const tbyte *buffer,int length){
 	if(mStream!=NULL && (mOpenFlags&OpenFlags_WRITE)>0){
 		/// @todo: Finish zlib stremaing
 		return -1;

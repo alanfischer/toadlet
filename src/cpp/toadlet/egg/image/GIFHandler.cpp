@@ -106,7 +106,7 @@ void copyGIFLine(	unsigned char *dest,
 }
 
 void setImagePortion(Image *dest,int x,int y,int width,int height,int red,int green,int blue){
-	byte *data=dest->getData();
+	tbyte *data=dest->getData();
 	int i,j;
 	for(j=y;j<y+height;++j){
 		for(i=x;i<x+width;++i){

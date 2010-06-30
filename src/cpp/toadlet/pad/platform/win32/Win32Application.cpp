@@ -56,6 +56,7 @@
 using namespace toadlet;
 using namespace toadlet::egg;
 using namespace toadlet::egg::image;
+using namespace toadlet::egg::io;
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 using namespace toadlet::flick;
@@ -173,6 +174,10 @@ Win32Application::~Win32Application(){
 
 void Win32Application::create(int renderer,int audioPlayer,int motionDetector){
 	mEngine=new Engine();
+
+	mResourceArchive=Win32ResourceArchive::ptr(new Win32ResourceArchive());
+	mResourceArchive->open(win32->mInstance);
+	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(mResourceArchive));
 
 	if(renderer!=RendererPlugin_NONE){
 		changeRendererPlugin(renderer);
@@ -405,7 +410,7 @@ bool Win32Application::createWindow(){
 	mHeight=rect.bottom-rect.top;
 	mWidth=rect.right-rect.left;
 
-	mApplicationMap[win32->mWnd]=this;
+	mApplicationMap.add(win32->mWnd,this);
 
 	ShowWindow(win32->mWnd,SW_SHOW);
 	SetForegroundWindow(win32->mWnd);

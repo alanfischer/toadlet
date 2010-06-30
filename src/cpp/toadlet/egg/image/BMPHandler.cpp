@@ -127,10 +127,10 @@ Image *BMPHandler::loadImage(Stream *stream){
 	}
 
 	Image *image=new Image(Image::Dimension_D2,format,width,height);
-	byte *imageData=image->getData();
+	tbyte *imageData=image->getData();
 
 	if(bmih.biBitCount==1 || bmih.biBitCount==2 || bmih.biBitCount==4 || bmih.biBitCount==8){
-		byte *palette=new byte[(1<<bmih.biBitCount)*4];
+		tbyte *palette=new tbyte[(1<<bmih.biBitCount)*4];
 		stream->read(palette,(1<<bmih.biBitCount)*4);
 
 		int byteWidth=(width*bmih.biBitCount)/8 + ((((width*bmih.biBitCount)%8)>0)?1:0);
@@ -138,7 +138,7 @@ Image *BMPHandler::loadImage(Stream *stream){
 
 		stream->seek(bmfh.bfOffBits);
 
-		byte *rawData=new byte[rowSize*height];
+		tbyte *rawData=new tbyte[rowSize*height];
 		stream->read(rawData,rowSize*height);
 
 		for(j=0;j<height;++j){
@@ -162,8 +162,8 @@ Image *BMPHandler::loadImage(Stream *stream){
 
 		int rowSize=(width*3) + (4-(width*3)%4)%4;
 
-		byte *rawData=new byte[rowSize*height];
-		stream->read((byte*)rawData,rowSize*height);
+		tbyte *rawData=new tbyte[rowSize*height];
+		stream->read((tbyte*)rawData,rowSize*height);
 
 		for(j=0;j<height;++j){
 			for(i=0;i<width;++i){
@@ -181,12 +181,12 @@ Image *BMPHandler::loadImage(Stream *stream){
 	else if(bmih.biBitCount==32){
 		stream->seek(bmfh.bfOffBits);
 
-		stream->read((byte*)imageData,width*height*4);
+		stream->read((tbyte*)imageData,width*height*4);
 
 		for(j=0;j<height;++j){
 			for(i=0;i<width;++i){
 				int imageDataOffset=i*4 + j*width*4;
-				byte temp=imageData[imageDataOffset+2];
+				tbyte temp=imageData[imageDataOffset+2];
 
 				imageData[imageDataOffset+2]=imageData[imageDataOffset+0];
 				imageData[imageDataOffset+0]=temp;
@@ -297,10 +297,10 @@ bool BMPHandler::saveImage(Image *image,Stream *stream){
 		delete[] rawData;
 	}
 	else if(image->getFormat()==Image::Format_RGBA_8){
-		byte *rawData=new byte[width*height*4];
+		tbyte *rawData=new tbyte[width*height*4];
 		memset(rawData,0,width*height*4);
 
-		byte *imageData=image->getData();
+		tbyte *imageData=image->getData();
 
 		for(j=0;j<height;++j){
 			for(i=0;i<width;++i){

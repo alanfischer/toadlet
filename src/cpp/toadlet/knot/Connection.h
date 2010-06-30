@@ -47,9 +47,9 @@ public:
 	virtual bool closed()=0;
 
 	/// Send a packet of data
-	virtual int send(const byte *data,int length)=0;
+	virtual int send(const tbyte *data,int length)=0;
 	/// Receive a packet of data
-	virtual int receive(byte *data,int length)=0;
+	virtual int receive(tbyte *data,int length)=0;
 };
 
 }

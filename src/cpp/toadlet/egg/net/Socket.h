@@ -105,11 +105,11 @@ public:
 	virtual bool pollRead(int millis);
 	virtual bool pollWrite(int millis);
 
-	virtual int receive(byte *buffer,int length);
-	virtual int receiveFrom(byte *buffer,int length,uint32 &ipAddress,int &port);
+	virtual int receive(tbyte *buffer,int length);
+	virtual int receiveFrom(tbyte *buffer,int length,uint32 &ipAddress,int &port);
 
-	virtual int send(const byte *buffer,int length);
-	virtual int sendTo(const byte *buffer,int length,uint32 ipAddress,int port);
+	virtual int send(const tbyte *buffer,int length);
+	virtual int sendTo(const tbyte *buffer,int length,uint32 ipAddress,int port);
 
 public:
 	static String ipToString(uint32 ip);

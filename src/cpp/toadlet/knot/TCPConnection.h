@@ -59,8 +59,8 @@ public:
 	void close();
 	bool closed(){return mSocket->closed();}
 
-	int send(const byte *data,int length);
-	int receive(byte *data,int length);
+	int send(const tbyte *data,int length);
+	int receive(tbyte *data,int length);
 
 	egg::net::Socket::ptr getSocket(){return mSocket;}
 
@@ -85,7 +85,7 @@ protected:
 			debugDeliverTime=0;
 		}
 
-		byte data[maxLength];
+		tbyte data[maxLength];
 		int length;
 		uint64 debugDeliverTime;
 	};
@@ -118,7 +118,7 @@ protected:
 	int mDebugPacketDelayMaxTime;
 
 	static const int mDummyDataLength=1024;
-	byte mDummyData[mDummyDataLength];
+	tbyte mDummyData[mDummyDataLength];
 };
 
 }

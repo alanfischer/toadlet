@@ -59,7 +59,7 @@ OggVorbisDecoder::~OggVorbisDecoder(){
 }
 
 size_t OggVorbisDecoder::read_func(void *ptr,size_t size,size_t nmemb, void *datasource){
-	return ((egg::io::Stream*)datasource)->read((byte*)ptr,size*nmemb);
+	return ((egg::io::Stream*)datasource)->read((tbyte*)ptr,size*nmemb);
 }
 
 int OggVorbisDecoder::seek_func(void *datasource, ogg_int64_t offset, int whence){
@@ -119,7 +119,7 @@ bool OggVorbisDecoder::startStream(egg::io::Stream::ptr stream){
 	return true;
 }
 
-int OggVorbisDecoder::read(byte *buffer,int length){
+int OggVorbisDecoder::read(tbyte *buffer,int length){
 	int sec;
 	int tempLength;
 	int count=length;

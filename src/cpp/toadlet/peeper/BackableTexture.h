@@ -43,7 +43,7 @@ public:
 	virtual Texture *getRootTexture(scalar time){return mBack!=NULL?mBack->getRootTexture(time):NULL;}
 	virtual bool getRootTransform(scalar time,Matrix4x4 &transform){return mBack!=NULL?mBack->getRootTransform(time,transform):true;}
 
-	virtual bool create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]);
+	virtual bool create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]);
 	virtual void destroy();
 
 	virtual void resetCreate(){}
@@ -59,8 +59,8 @@ public:
 	virtual scalar getLength() const{return 0;}
 
 	virtual Surface::ptr getMipSurface(int level,int cubeSide);
-	virtual bool load(int width,int height,int depth,int mipLevel,byte *mipData);
-	virtual bool read(int width,int height,int depth,int mipLevel,byte *mipData);
+	virtual bool load(int width,int height,int depth,int mipLevel,tbyte *mipData);
+	virtual bool read(int width,int height,int depth,int mipLevel,tbyte *mipData);
 
 	virtual void setBack(Texture::ptr back);
 	virtual Texture::ptr getBack(){return mBack;}
@@ -77,7 +77,7 @@ protected:
 	int mRowPitch;
 	int mSlicePitch;
 	int mDataSize;
-	byte *mData;
+	tbyte *mData;
 	Texture::ptr mBack;
 };
 

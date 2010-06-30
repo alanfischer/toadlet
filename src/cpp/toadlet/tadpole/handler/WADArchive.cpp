@@ -59,7 +59,7 @@ bool WADArchive::open(Stream::ptr stream){
 	destroy();
 
 	mStream=DataStream::ptr(new DataStream(stream));
-	mStream->read((byte*)mHeader.identification,sizeof(mHeader.identification));
+	mStream->read((tbyte*)mHeader.identification,sizeof(mHeader.identification));
 	mHeader.numlumps=mStream->readLittleInt32();
 	mHeader.infotableofs=mStream->readLittleInt32();
 
@@ -72,12 +72,12 @@ bool WADArchive::open(Stream::ptr stream){
 	mLumpinfos.resize(mHeader.numlumps);
 	mStream->seek(mHeader.infotableofs);
 
-	mStream->read((byte*)&mLumpinfos[0],sizeof(wlumpinfo)*mHeader.numlumps);
+	mStream->read((tbyte*)&mLumpinfos[0],sizeof(wlumpinfo)*mHeader.numlumps);
 	int i;
 	for(i=0;i<mHeader.numlumps;i++){
 		mLumpinfos[i].filepos=littleInt32(mLumpinfos[i].filepos);
 		mLumpinfos[i].size=littleInt32(mLumpinfos[i].size);
-		mNameMap[String(mLumpinfos[i].name).toLower()]=i;
+		mNameMap.add(String(mLumpinfos[i].name).toLower(),i);
 	}
 
 	return true;
@@ -91,7 +91,7 @@ Resource::ptr WADArchive::openResource(const String &name){
 	
 	wlumpinfo *info=&mLumpinfos[texindex->second];
 	mStream->seek(info->filepos);
-	mStream->read((byte*)mInBuffer,info->size);
+	mStream->read((tbyte*)mInBuffer,info->size);
 
 	return createTexture(mTextureManager,(wmiptex*)mInBuffer);
 }
@@ -121,7 +121,7 @@ peeper::Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager 
 	}
 
 	int datasize=size + (size/4) + (size/16) + (size/64);
-	byte *pal=(byte*)miptex + littleInt32(miptex->offsets[0]) + datasize + 2;
+	tbyte *pal=(tbyte*)miptex + littleInt32(miptex->offsets[0]) + datasize + 2;
 
 	int format=Texture::Format_RGB_8;
 	if(miptex->name[0]=='{'){
@@ -135,8 +135,8 @@ peeper::Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager 
 	for(mipLevel=0;mipLevel<4;++mipLevel){
 		images[mipLevel]=Image::ptr(new Image(Image::Dimension_D2,format,dwidth,dheight));
 
-		byte *src=(byte*)miptex + littleInt32(miptex->offsets[mipLevel]);
-		byte *data=images[mipLevel]->getData();
+		tbyte *src=(tbyte*)miptex + littleInt32(miptex->offsets[mipLevel]);
+		tbyte *data=images[mipLevel]->getData();
 
 		if(hswidth==hdwidth && hsheight==hdheight){
 			int j=0,k=0,j3=0,k3=0;

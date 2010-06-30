@@ -119,6 +119,7 @@ public:
 	inline iterator		erase (iterator ep)	{ return (base_class::erase (ep)); }
 	inline iterator		erase (iterator ep1, iterator ep2) { return (base_class::erase (ep1, ep2)); }
 	inline void			clear (void)		{ base_class::clear(); }
+	inline void add(const_key_ref key,const_data_ref value);
 private:
 	const_iterator		lower_bound (const_key_ref k) const;
 	inline iterator		lower_bound (const_key_ref k) { return (const_cast<iterator>(const_cast<rcself_t>(*this).lower_bound (k))); }
@@ -173,6 +174,14 @@ typename Map<K,V>::data_type& Map<K,V>::operator[] (const_key_ref k){
 	if (ip == end() || k < ip->first)
 	ip = base_class::insert (ip, make_pair (k, V()));
 	return (ip->second);
+}
+
+template <typename K, typename V>
+typename void Map<K,V>::add(const_key_ref k,const_data_ref v){
+	iterator ip = lower_bound (k);
+	if (ip == end() || k < ip->first)
+	ip = base_class::insert (ip, make_pair (k, V()));
+	ip->second=v;
 }
 
 /// Inserts the Pair into the container.

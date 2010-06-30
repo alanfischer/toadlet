@@ -45,10 +45,10 @@ public:
 	virtual bool closed(){return mStream->closed();}
 
 	virtual bool readable(){return mStream->readable();}
-	virtual int read(byte *buffer,int length){return mStream->read(buffer,length);}
+	virtual int read(tbyte *buffer,int length){return mStream->read(buffer,length);}
 
 	virtual bool writeable(){return mStream->writeable();}
-	virtual int write(const byte *buffer,int length){return mStream->write(buffer,length);}
+	virtual int write(const tbyte *buffer,int length){return mStream->write(buffer,length);}
 
 	virtual bool reset(){return mStream->reset();}
 	virtual int length(){return mStream->length();}

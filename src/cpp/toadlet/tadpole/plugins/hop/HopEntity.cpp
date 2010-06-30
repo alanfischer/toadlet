@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/plugins/hop/HopEntity.h>
-#include <toadlet/tadpole/node/NodePositionInterpolator.h>
+#include <toadlet/tadpole/node/NodeTransformInterpolator.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/egg/Error.h>
 
@@ -69,7 +69,7 @@ Node *HopEntity::create(Scene *scene){
 		return this;
 	}
 
-	mInterpolator=NodeInterpolator::ptr(new NodeTranslationInterpolator());
+	mInterpolator=NodeInterpolator::ptr(new NodeTransformInterpolator());
 
 	return this;
 }

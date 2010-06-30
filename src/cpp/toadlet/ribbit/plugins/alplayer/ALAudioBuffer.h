@@ -51,7 +51,7 @@ public:
 protected:
 	ALPlayer *mAudioPlayer;
 	ALuint mHandle;
-	byte *mStaticData;
+	tbyte *mStaticData;
 
 	friend class ALPlayer;
 };

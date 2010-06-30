@@ -83,7 +83,7 @@
 #include <toadlet/tadpole/node/SpriteNode.h>
 #include <toadlet/tadpole/node/NodeListener.h>
 #include <toadlet/tadpole/node/NodeInterpolator.h>
-#include <toadlet/tadpole/node/NodePositionInterpolator.h>
+#include <toadlet/tadpole/node/NodeTransformInterpolator.h>
 
 #include <toadlet/tadpole/plugins/hop/HopEntity.h>
 #include <toadlet/tadpole/plugins/hop/HopScene.h>

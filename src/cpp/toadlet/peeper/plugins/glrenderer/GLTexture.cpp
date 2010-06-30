@@ -60,7 +60,7 @@ GLTexture::~GLTexture(){
 	destroy();
 }
 
-bool GLTexture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
+bool GLTexture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]){
 	if((Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || Math::isPowerOf2(depth)==false) &&
 		mRenderer->getCapabilitySet().textureNonPowerOf2==false &&
 		(mRenderer->getCapabilitySet().textureNonPowerOf2==false || (usage&Usage_BIT_NPOT_RESTRICTED)==0))
@@ -93,7 +93,7 @@ void GLTexture::destroy(){
 	destroyContext();
 }
 
-bool GLTexture::createContext(int mipLevels,byte *mipDatas[]){
+bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 	// Create context data
 	mTarget=getGLTarget();
 	glGenTextures(1,&mHandle);
@@ -151,7 +151,7 @@ bool GLTexture::createContext(int mipLevels,byte *mipDatas[]){
  		int slicePitch=rowPitch*height;
 		TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(slicePitch);
 
-		byte *data=NULL;
+		tbyte *data=NULL;
 		if(mipDatas!=NULL && (level==0 || level<mMipLevels)){
 			data=mipDatas[level];
 			int alignment=1,pitch=rowPitch;
@@ -237,7 +237,7 @@ Surface::ptr GLTexture::getMipSurface(int level,int cubeSide){
 	return mSurfaces[index];
 }
 
-bool GLTexture::load(int width,int height,int depth,int mipLevel,byte *mipData){
+bool GLTexture::load(int width,int height,int depth,int mipLevel,tbyte *mipData){
 	if(mHandle==0){
 		return false;
 	}
@@ -297,7 +297,7 @@ bool GLTexture::load(int width,int height,int depth,int mipLevel,byte *mipData){
 	return true;
 }
 
-bool GLTexture::read(int width,int height,int depth,int mipLevel,byte *mipData){
+bool GLTexture::read(int width,int height,int depth,int mipLevel,tbyte *mipData){
 	if(mHandle==0){
 		return false;
 	}

@@ -126,7 +126,7 @@ bool SPRHandler::openFile(Stream *stream){
 	short paletteSize=0;
 	paletteSize=dataStream->readLittleInt16();
 
-	byte *palette=new byte[paletteSize*3];
+	tbyte *palette=new tbyte[paletteSize*3];
 	dataStream->read(palette,paletteSize*3);
 
 	mDataStream=dataStream;
@@ -171,11 +171,11 @@ Image *SPRHandler::getNextImage(){
 			frame.height=mDataStream->readLittleInt32();
 
 			int readSize=(frame.width*frame.height);
-			byte *data=new byte[readSize];
+			tbyte *data=new tbyte[readSize];
 			mDataStream->read(data,readSize);
 
 			image=new Image(Image::Dimension_D2,Image::Format_RGBA_8,frame.width,frame.height,1);
-			byte *imageData=image->getData();
+			tbyte *imageData=image->getData();
 			int x,y;
 			for(y=0;y<frame.height;++y){
 				for(x=0;x<frame.width;++x){
