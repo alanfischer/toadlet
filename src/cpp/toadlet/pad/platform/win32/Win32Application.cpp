@@ -162,6 +162,13 @@ Win32Application::Win32Application():
 	win32->mIcon=0;
 
 	win32->mInstance=GetModuleHandle(NULL);
+	
+	#if defined(TOADLET_PLATFORM_WINCE)
+		HRSRC res=FindResource((HMODULE)win32->mInstance,TEXT("HI_RES_AWARE"),TEXT("CEUX"));
+		if(res==NULL){
+			Logger::error(Categories::TOADLET_PAD,"No resource of type CEUX with name HI_RES_AWARE, may not render on all devices");
+		}
+	#endif
 }
 
 Win32Application::~Win32Application(){
@@ -177,6 +184,7 @@ void Win32Application::create(int renderer,int audioPlayer,int motionDetector){
 
 	mResourceArchive=Win32ResourceArchive::ptr(new Win32ResourceArchive());
 	mResourceArchive->open(win32->mInstance);
+	mResourceArchive->buildMapFromStringTable(101); // Default string table start
 	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(mResourceArchive));
 
 	if(renderer!=RendererPlugin_NONE){

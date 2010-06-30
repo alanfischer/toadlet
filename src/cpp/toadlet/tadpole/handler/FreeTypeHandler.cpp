@@ -143,8 +143,12 @@ Resource::ptr FreeTypeHandler::load(Stream::ptr stream,const ResourceHandlerData
 	int textureWidth=Math::nextPowerOf2(charmapWidth);
 	int textureHeight=Math::nextPowerOf2(charmapHeight);
 
-	Collection<Font::Glyph*> glyphs(bitmapGlyphs.size());
-	Image::ptr image(new Image(Image::Dimension_D2,Image::Format_A_8,textureWidth,textureHeight));
+	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_A_8,textureWidth,textureHeight));
+	if(image==NULL){
+		return NULL;
+	}
+
+	Collection<Font::Glyph*> glyphs(bitmapGlyphs.size());	
 	tbyte *data=image->getData();
 	int x=0,y=0;
 	for(i=0;i<bitmapGlyphs.size();++i){

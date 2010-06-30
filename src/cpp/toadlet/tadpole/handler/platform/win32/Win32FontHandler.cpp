@@ -265,7 +265,11 @@ Resource::ptr Win32FontHandler::load(Stream::ptr stream,const ResourceHandlerDat
 		GdiFlush();
 	#endif
 
-	Image::ptr image(new Image(Image::Dimension_D2,Image::Format_RGB_5_6_5,textureWidth,textureHeight));
+	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGB_5_6_5,textureWidth,textureHeight));
+	if(image==NULL){
+		return NULL;
+	}
+	
 	uint8 *imageData=image->getData();
 
 	int imageStride=textureWidth*image->getPixelSize();

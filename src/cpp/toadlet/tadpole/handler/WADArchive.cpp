@@ -133,7 +133,10 @@ peeper::Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager 
 	int hdwidth=dwidth,hdheight=dheight;
 	int mipLevel;
 	for(mipLevel=0;mipLevel<4;++mipLevel){
-		images[mipLevel]=Image::ptr(new Image(Image::Dimension_D2,format,dwidth,dheight));
+		images[mipLevel]=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,format,dwidth,dheight));
+		if(images[mipLevel]==NULL){
+			return NULL;
+		}
 
 		tbyte *src=(tbyte*)miptex + littleInt32(miptex->offsets[mipLevel]);
 		tbyte *data=images[mipLevel]->getData();

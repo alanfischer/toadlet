@@ -29,6 +29,10 @@
 #include <toadlet/egg/platform/win32/io/Win32ResourceArchive.h>
 #include <windows.h>
 
+#ifndef IS_INTRESOURCE
+	#define IS_INTRESOURCE(_r) ((((ULONG_PTR)(_r)) >> 16) == 0)
+#endif
+
 namespace toadlet{
 namespace egg{
 namespace io{
@@ -39,7 +43,7 @@ BOOL CALLBACK resourceFoundCallback(HMODULE module,LPCTSTR type,LPTSTR name,LONG
 		archive->resourceFound(String("#")+(int)name);
 	}
 	else{
-		archive->resourceFound(String("#")+(int)name);
+		archive->resourceFound(name);
 	}
 	return TRUE;
 }
@@ -57,10 +61,6 @@ void Win32ResourceArchive::destroy(){
 	mModule=0;
 }
 
-void Win32ResourceArchive::setMap(Map<String,int>::ptr idMap){
-	mIDMap=idMap;
-}
-
 bool Win32ResourceArchive::open(void *module){
 	mModule=module;
 
@@ -71,6 +71,26 @@ bool Win32ResourceArchive::open(void *module){
 	#endif
 	
 	return result>0;
+}
+
+void Win32ResourceArchive::setMap(Map<String,int>::ptr idMap){
+	mIDMap=idMap;
+}
+
+void Win32ResourceArchive::buildMapFromStringTable(int startID){
+	Map<String,int>::ptr idMap(new Map<String,int>());
+
+	TCHAR buffer[1024];
+	int result=1;
+	int i;
+	for(i=startID;result!=0;++i){
+		result=LoadString((HMODULE)mModule,i,buffer,sizeof(buffer)/sizeof(TCHAR));
+		if(result>=0){
+			idMap->add(buffer,i);
+		}
+	}
+
+	mIDMap=idMap;
 }
 
 Stream::ptr Win32ResourceArchive::openStream(const String &name){
@@ -103,14 +123,14 @@ void *Win32ResourceArchive::findResourceName(const String &name){
 		return NULL;
 	}
 
-	LPTSTR resName=(char*)name.c_str();
+	LPCTSTR resName=name;
 	if(mIDMap!=NULL){
 		Map<String,int>::iterator result=mIDMap->find(name);
 		if(result!=mIDMap->end()){
 			resName=MAKEINTRESOURCE(result->second);
 		}
 	}
-	return resName;
+	return (void*)resName;
 }
 
 }
