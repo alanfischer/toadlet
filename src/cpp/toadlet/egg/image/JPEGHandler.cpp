@@ -238,7 +238,10 @@ Image *JPEGHandler::loadImage(io::Stream *stream){
 		return NULL;
 	}
 
-	image=new Image(Image::Dimension_D2,format,cinfo.output_width,cinfo.output_height);
+	image=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,format,cinfo.output_width,cinfo.output_height));
+	if(image==NULL){
+		return NULL;
+	}
 
 	/* while (scan lines remain to be read) */
 	/*           jpeg_read_scanlines(...); */

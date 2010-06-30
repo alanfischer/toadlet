@@ -210,7 +210,11 @@ Image *PNGHandler::loadImage(Stream *stream){
 		break;
 	}
 
-	image=new Image(Image::Dimension_D2,format,width,height);
+	image=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,format,width,height));
+	if(image==NULL){
+		return NULL;
+	}
+	
 	int bytewidth=width*image->getPixelSize();
 	tbyte *data=image->getData();
 	for(y=0;y<height;++y){

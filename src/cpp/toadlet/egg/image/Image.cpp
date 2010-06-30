@@ -31,6 +31,26 @@ namespace toadlet{
 namespace egg{
 namespace image{
 
+Image *Image::createAndReallocate(Dimension dimension,int format,int width,int height,int depth){
+	Image *image=new Image();
+	
+	bool result=false;
+	TOADLET_TRY
+		result=image->reallocate(dimension,format,width,height,depth);
+	TOADLET_CATCH(Exception){
+		result=false;
+	}
+	
+	if(result==false){
+		delete image;
+		Error::insufficientMemory(Categories::TOADLET_EGG,
+			"Image::createAndReallocate");
+		return NULL;
+	}
+	
+	return image;
+}
+
 Image::Image(){
 	mDimension=Dimension_UNKNOWN;
 	mFormat=Format_UNKNOWN;
@@ -38,11 +58,6 @@ Image::Image(){
 	mHeight=0;
 	mDepth=0;
 	mData=NULL;
-}
-
-Image::Image(Dimension dimension,int format,int width,int height,int depth){
-	mData=NULL;
-	reallocate(dimension,format,width,height,depth,true);
 }
 
 Image::~Image(){
@@ -61,9 +76,22 @@ Image::~Image(){
 Image *Image::clone(){
 	Image *image=new Image();
 
-	image->reallocate(mDimension,mFormat,mWidth,mHeight,mDepth,false);
+	bool result=false;
+	TOADLET_TRY
+		result=image->reallocate(mDimension,mFormat,mWidth,mHeight,mDepth,false);
+	TOADLET_CATCH(Exception){
+		result=false;
+	}
 
-	memcpy(image->mData,mData,getSlicePitch()*mDepth);
+	if(result==true){
+		memcpy(image->mData,mData,getSlicePitch()*mDepth);
+	}
+	else{
+		delete image;
+		Error::insufficientMemory(Categories::TOADLET_EGG,
+			"Image::clone");
+		return NULL;
+	}
 
 	return image;
 }
@@ -87,7 +115,7 @@ bool Image::reallocate(Dimension dimension,int format,int width,int height,int d
 	if(dimension==Dimension_CUBE && depth!=CubeSide_MAX){
 		Error::invalidParameters(Categories::TOADLET_EGG,
 			"Image::reallocate: Dimension_CUBEMAP not used with depth of CubeSide_MAX");
-		return false; 
+		return false;
 	}
 
 	mDimension=dimension;
@@ -98,6 +126,12 @@ bool Image::reallocate(Dimension dimension,int format,int width,int height,int d
 
 	int size=getSlicePitch()*mDepth;
 	mData=new tbyte[size];
+	if(mData==NULL){
+		Error::insufficientMemory(Categories::TOADLET_EGG,
+			"Image::reallocate");
+		return false;
+	}
+
 	if(clear){
 		memset(mData,0,size);
 	}

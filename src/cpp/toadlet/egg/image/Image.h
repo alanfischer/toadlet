@@ -58,8 +58,9 @@ class TOADLET_API Image:public ImageDefinitions{
 public:
 	TOADLET_SHARED_POINTERS(Image);
 
+	static Image *createAndReallocate(Dimension dimension,int format,int width,int height=1,int depth=1);
+
 	Image();
-	Image(Dimension dimension,int format,int width,int height=1,int depth=1);
 
 	virtual ~Image();
 

@@ -94,6 +94,10 @@ bool Win32TextureHandler::valid(){
 }
 
 Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData *handlerData){
+	Logger::debug("Win32TextureHandler.load");
+
+	Texture::ptr texture=NULL;
+
 	StreamIStream::ptr stream(new StreamIStream(in));
 	HRESULT hr=0;
 
@@ -101,12 +105,14 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData
 		IImage *iimage=NULL;
 		hr=((IImagingFactory*)mImagingFactory)->CreateImageFromStream(stream,&iimage);
 		if(FAILED(hr) || iimage==NULL){
+			Error::unknown("CreateImageFromStream failed");
 			return NULL;
 		}
 
 		IBitmapImage *bitmap=NULL;
 		hr=((IImagingFactory*)mImagingFactory)->CreateBitmapFromImage(iimage,0,0,0,InterpolationHintDefault,&bitmap);
 		if(FAILED(hr) || bitmap==NULL){
+			Error::unknown("CreateBitmapFromImage failed");
 			return NULL;
 		}
 
@@ -115,8 +121,11 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData
 		int format=getFormat(&gdiformat);
 		SIZE size={0};
 		hr=bitmap->GetSize(&size);
-		image::Image::ptr image(new image::Image(image::Image::Dimension_D2,format,size.cx,size.cy));
-
+		image::Image::ptr image(image::Image::createAndReallocate(image::Image::Dimension_D2,format,size.cx,size.cy));
+		if(image==NULL){
+			return NULL;
+		}
+		
 		RECT rect={0};
 		rect.right=size.cx;
 		rect.bottom=size.cy;
@@ -129,18 +138,19 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData
 		}
 
 		bitmap->UnlockBits(&data);
-		return mTextureManager->createTexture(image);
+
+		texture=mTextureManager->createTexture(image);
 	#else
 		Bitmap *bitmap=Bitmap::FromStream(stream);
 		if(bitmap==NULL){
-			Error::unknown("error creating bitmap");
+			Error::unknown("Bitmap::FromStream failed");
 			return NULL;
 		}
 
 		int status=bitmap->GetLastStatus();
 		if(status!=Ok){
 			delete bitmap;
-			Error::unknown("error after creating bitmap");
+			Error::unknown("Bitmap::FromStream errored");
 			return NULL;
 		}
 
@@ -164,7 +174,11 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData
 			PixelFormat gdiformat=bitmap->GetPixelFormat();
 			int format=getFormat(&gdiformat);
 
-			image::Image::ptr image(new image::Image(image::Image::Dimension_D2,format,bitmap->GetWidth(),bitmap->GetHeight()));
+			image::Image::ptr image(image::Image::createAndReallocate(image::Image::Dimension_D2,format,bitmap->GetWidth(),bitmap->GetHeight()));
+			if(image==NULL){
+				return NULL;
+			}
+			
 			Rect rect(0,0,bitmap->GetWidth(),bitmap->GetHeight());
 			BitmapData data;
 			bitmap->LockBits(&rect,ImageLockModeRead,gdiformat,&data);
@@ -195,7 +209,7 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData
 			return NULL;
 		}
 		else if(images.size()==1){
-			return mTextureManager->createTexture(image::Image::ptr(images[0]));
+			texture=mTextureManager->createTexture(image::Image::ptr(images[0]));
 		}
  		else{
 			SequenceTexture::ptr sequence(new SequenceTexture(Texture::Dimension_D2,images.size()));
@@ -203,11 +217,11 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData
 			for(i=0;i<images.size();++i){
 				sequence->setTexture(i,mTextureManager->createTexture(image::Image::ptr(images[i])),Math::fromMilli(delayMilliseconds[i]));
 			}
-			return shared_static_cast<Texture>(sequence);
+			texture=shared_static_cast<Texture>(sequence);
 		}
 	#endif
 
-	return NULL;
+	return texture;
 }
 
 int Win32TextureHandler::getFormat(PixelFormat *gdiformat){

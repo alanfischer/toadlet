@@ -45,6 +45,8 @@ TextureManager::TextureManager(Engine *engine,bool backable):ResourceManager(eng
 }
 
 Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLevels){
+	Logger::debug("TextureManager.createTexture");
+
 	Renderer *renderer=getRenderer();
 
 	Image::Dimension dimension=image->getDimension();
@@ -61,11 +63,16 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 
 	Image::ptr finalImage=image;
 	if((hasAutogen==false || hasNonPowerOf2==false) && (Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || Math::isPowerOf2(depth)==false)){
+		Logger::debug("making image power of 2");
+
 		int dwidth=width>1?(Math::nextPowerOf2(width)>>1):1;
 		int dheight=height>1?(Math::nextPowerOf2(height)>>1):1;
 		int ddepth=depth>1?(Math::nextPowerOf2(depth)>>1):1;
 
-		finalImage=Image::ptr(new Image(dimension,format,dwidth,dheight,ddepth));
+		finalImage=Image::ptr(Image::createAndReallocate(dimension,format,dwidth,dheight,ddepth));
+		if(finalImage==NULL){
+			return NULL;
+		}
 
 		Pixel<uint8> pixel;
 		int x,y,z;
@@ -84,7 +91,13 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 	}
 
 	if(format!=closestFormat){
-		Image::ptr convertedImage=Image::ptr(new Image(dimension,closestFormat,width,height,depth));
+		Logger::debug(String("converting image from:")+format+" to:"+closestFormat);
+
+		Image::ptr convertedImage(Image::createAndReallocate(dimension,closestFormat,width,height,depth));
+		if(convertedImage==NULL){
+			return NULL;
+		}
+
 		ImageFormatConversion::convert(
 			finalImage->getData(),finalImage->getFormat(),finalImage->getRowPitch(),finalImage->getSlicePitch(),
 			convertedImage->getData(),convertedImage->getFormat(),convertedImage->getRowPitch(),convertedImage->getSlicePitch(),width,height,depth);
@@ -99,6 +112,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 	mipDatas.add(finalImage->getData());
 
 	if(hasAutogen==false && wantsAutogen==true){
+		Logger::debug("simulating mipmap generation");
 		usage&=~Texture::Usage_BIT_AUTOGEN_MIPMAPS;
 
 		if(mipLevels==0){
@@ -109,7 +123,10 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 				hwidth=hwidth>0?hwidth:1;hheight=hheight>0?hheight:1;hdepth=hdepth>0?hdepth:1;
 				int xoff=width/(hwidth+1),yoff=height/(hheight+1),zoff=depth/(hdepth+1);
 
-				Image::ptr mipImage(new Image(dimension,format,hwidth,hheight,hdepth));
+				Image::ptr mipImage(Image::createAndReallocate(dimension,format,hwidth,hheight,hdepth));
+				if(mipImage==NULL){
+					return NULL;
+				}
 
 				Pixel<uint8> pixel;
 				int x,y,z;
@@ -130,6 +147,8 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 
 	Texture::ptr texture;
 	if(mBackable || renderer==NULL){
+		Logger::debug("creating BackableTexture");
+
 		BackableTexture::ptr backableTexture(new BackableTexture());
 		backableTexture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas.begin());
 		if(mEngine->getRenderer()!=NULL){
@@ -139,11 +158,15 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 		texture=backableTexture;
 	}
 	else{
+		Logger::debug("creating Texture");
+
 		texture=Texture::ptr(renderer->createTexture());
 		texture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas.begin());
 	}
 
 	manage(shared_static_cast<Texture>(texture));
+
+	Logger::debug("TextureManager.createTexture finished");
 
 	return texture;
 }
@@ -165,9 +188,15 @@ Texture::ptr TextureManager::createTexture(Image::ptr images[],int usage,int mip
 	egg::Collection<tbyte*> mipDatas;
 
 	if(format!=closestFormat){
+		Logger::debug(String("converting image from:")+format+" to:"+closestFormat);
+
 		int i;
 		for(i=0;i<mipLevels;++i){
-			Image::ptr convertedImage=Image::ptr(new Image(dimension,closestFormat,images[i]->getWidth(),images[i]->getHeight(),images[i]->getDepth()));
+			Image::ptr convertedImage(Image::createAndReallocate(dimension,closestFormat,images[i]->getWidth(),images[i]->getHeight(),images[i]->getDepth()));
+			if(convertedImage==NULL){
+				return NULL;
+			}
+			
 			ImageFormatConversion::convert(
 				images[i]->getData(),images[i]->getFormat(),images[i]->getRowPitch(),images[i]->getSlicePitch(),
 				convertedImage->getData(),convertedImage->getFormat(),convertedImage->getRowPitch(),convertedImage->getSlicePitch(),convertedImage->getWidth(),convertedImage->getHeight(),convertedImage->getDepth());
@@ -228,7 +257,11 @@ Texture::ptr TextureManager::createTexture(int usage,Texture::Dimension dimensio
 }
 
 Image::ptr TextureManager::createImage(Texture *texture){
-	Image::ptr image(new Image(texture->getDimension(),texture->getFormat(),texture->getWidth(),texture->getHeight(),texture->getDepth()));
+	Image::ptr image(Image::createAndReallocate(texture->getDimension(),texture->getFormat(),texture->getWidth(),texture->getHeight(),texture->getDepth()));
+	if(image==NULL){
+		return NULL;
+	}
+	
 	texture->read(image->getWidth(),image->getHeight(),image->getDepth(),0,image->getData());
 	return image;
 }

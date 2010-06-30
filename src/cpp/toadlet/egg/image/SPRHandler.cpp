@@ -170,11 +170,15 @@ Image *SPRHandler::getNextImage(){
 			frame.width=mDataStream->readLittleInt32();
 			frame.height=mDataStream->readLittleInt32();
 
+			image=Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGBA_8,frame.width,frame.height,1);
+			if(image==NULL){
+				return NULL;
+			}
+
 			int readSize=(frame.width*frame.height);
 			tbyte *data=new tbyte[readSize];
 			mDataStream->read(data,readSize);
 
-			image=new Image(Image::Dimension_D2,Image::Format_RGBA_8,frame.width,frame.height,1);
 			tbyte *imageData=image->getData();
 			int x,y;
 			for(y=0;y<frame.height;++y){

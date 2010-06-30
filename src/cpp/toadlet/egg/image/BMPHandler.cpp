@@ -126,7 +126,11 @@ Image *BMPHandler::loadImage(Stream *stream){
 		return NULL;
 	}
 
-	Image *image=new Image(Image::Dimension_D2,format,width,height);
+	Image *image=Image::createAndReallocate(Image::Dimension_D2,format,width,height);
+	if(image==NULL){
+		return NULL;
+	}
+	
 	tbyte *imageData=image->getData();
 
 	if(bmih.biBitCount==1 || bmih.biBitCount==2 || bmih.biBitCount==4 || bmih.biBitCount==8){

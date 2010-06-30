@@ -188,7 +188,11 @@ int GIFHandler::getNextImage(GifFileType *gifFile,Image *&image,int &frameDelay)
 				}
 
 				if(mWorking==NULL){
-					mWorking=new Image(Image::Dimension_D2,format,width,height);
+					mWorking=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,format,width,height));
+					if(mWorking==NULL){
+						return NULL;
+					}
+
 					memset(mWorking->getData(),0,pixelSize*width*height);
 
 					GifColorType *color=gifFile->SColorMap->Colors + gifFile->SBackGroundColor;
@@ -196,7 +200,11 @@ int GIFHandler::getNextImage(GifFileType *gifFile,Image *&image,int &frameDelay)
 				}
 
 				if(mBase==NULL){
-					mBase=new Image(Image::Dimension_D2,format,width,height);
+					mBase=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,format,width,height));
+					if(mBase==NULL){
+						return NULL;
+					}
+					
 					memset(mWorking->getData(),0,pixelSize*width*height);
 
 					GifColorType *color=gifFile->SColorMap->Colors + gifFile->SBackGroundColor;

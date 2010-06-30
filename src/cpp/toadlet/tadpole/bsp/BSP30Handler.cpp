@@ -257,7 +257,13 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,map->nsurfedges);
 
 	/// @todo: Figure out maximum required size, or allow multiple images
-	Image::ptr lightmapImage(new Image(Image::Dimension_D2,Image::Format_RGB_8,1024,1024,0));//2048,2048,0));
+	Image::ptr lightmapImage(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGB_8,1024,1024,0));
+	if(lightmapImage==NULL){
+		Error::insufficientMemory(Categories::TOADLET_TADPOLE,
+			"insufficient memory for lightmapImage");
+		return;
+	}
+
 	PixelPacker packer(lightmapImage->getData(),lightmapImage->getFormat(),lightmapImage->getWidth(),lightmapImage->getHeight());
 
 	int width=0,height=0;
