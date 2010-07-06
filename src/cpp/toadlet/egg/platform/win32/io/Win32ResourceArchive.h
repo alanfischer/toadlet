@@ -49,8 +49,6 @@ public:
 
 	bool open(void *module);
 	void setMap(Map<String,int>::ptr idMap);
-	/// @todo: See if we can replace this with changing our resource names from numbers to their actual string, then it would work as expected without the ID lookup
-	void buildMapFromStringTable(int startID);
 
 	Stream::ptr openStream(const String &name);
 	Resource::ptr openResource(const String &name){return NULL;}

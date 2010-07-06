@@ -184,7 +184,6 @@ void Win32Application::create(int renderer,int audioPlayer,int motionDetector){
 
 	mResourceArchive=Win32ResourceArchive::ptr(new Win32ResourceArchive());
 	mResourceArchive->open(win32->mInstance);
-	mResourceArchive->buildMapFromStringTable(101); // Default string table start
 	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(mResourceArchive));
 
 	if(renderer!=RendererPlugin_NONE){
