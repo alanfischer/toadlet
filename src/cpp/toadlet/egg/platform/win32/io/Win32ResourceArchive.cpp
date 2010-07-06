@@ -77,26 +77,10 @@ void Win32ResourceArchive::setMap(Map<String,int>::ptr idMap){
 	mIDMap=idMap;
 }
 
-void Win32ResourceArchive::buildMapFromStringTable(int startID){
-	Map<String,int>::ptr idMap(new Map<String,int>());
-
-	TCHAR buffer[1024];
-	int result=1;
-	int i;
-	for(i=startID;result!=0;++i){
-		result=LoadString((HMODULE)mModule,i,buffer,sizeof(buffer)/sizeof(TCHAR));
-		if(result>=0){
-			idMap->add(buffer,i);
-		}
-	}
-
-	mIDMap=idMap;
-}
-
 Stream::ptr Win32ResourceArchive::openStream(const String &name){
 	LPTSTR resName=(LPTSTR)findResourceName(name);
 
-	HRSRC src=FindResource((HMODULE)mModule,resName,RT_RCDATA);
+	HRSRC src=FindResource((HMODULE)mModule,IS_INTRESOURCE(resName)?resName:"\""+String(resName)+"\"",RT_RCDATA);
 	if(src==NULL) return NULL;
 	
 	HGLOBAL handle=LoadResource((HMODULE)mModule,src);
