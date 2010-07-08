@@ -258,6 +258,12 @@ void Logger::addCompleteLogString(Category *category,Level level,const String &d
 			#if defined(TOADLET_USE_STDERR_LOGGING)
 				fprintf(stderr,line);
 			#endif
+
+//			if(level==Level_ERROR){
+//				#if defined(TOADLET_PLATFORM_WIN32)
+//					MessageBox(NULL,data,TEXT("Logger::error"),MB_OK);
+//				#endif
+//			}
 		}
 
 		if(mStoreLogString){

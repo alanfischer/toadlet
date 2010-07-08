@@ -41,8 +41,6 @@ public:
 
 	void destroy();
 
-	bool isResourceArchive() const{return false;}
-
 	bool open(egg::io::Stream::ptr stream){return true;}
 
 	egg::io::Archive::ptr findArchive(const egg::String &name){return egg::shared_static_cast<egg::io::Archive>(ResourceManager::find(name));}

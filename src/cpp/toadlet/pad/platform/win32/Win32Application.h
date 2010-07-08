@@ -27,13 +27,15 @@
 #define TOADLET_PAD_WIN32APPLICATION_H
 
 #include <toadlet/egg/Thread.h>
-#include <toadlet/egg/platform/win32/io/Win32ResourceArchive.h>
+#include <toadlet/tadpole/handler/platform/win32/Win32ResourceArchive.h>
 #include <toadlet/pad/BaseApplication.h>
 
 namespace toadlet{
 namespace pad{
 
 struct Win32Attributes;
+
+/// @todo: We get a crash on WinCE when rotating the screen.  Not specifically a crash, but a hang 2 renders afterwords.  I'm wondering if not all resources are being destroyed when we redo the surface on rotation.
 
 class TOADLET_API Win32Application:public BaseApplication{
 public:
@@ -65,7 +67,7 @@ public:
 	virtual void start();
 	virtual void runEventLoop();
 	virtual void stepEventLoop();
-	virtual void stop(){mRun=false;}
+	virtual void stop();
 	virtual bool isRunning() const{return mRun;}
 
 	virtual void setAutoActivate(bool autoActivate){mAutoActivate=autoActivate;}
@@ -98,7 +100,7 @@ public:
 	virtual peeper::Renderer *getRenderer() const{return mRenderer;}
 	virtual ribbit::AudioPlayer *getAudioPlayer() const{return mAudioPlayer;}
 	virtual flick::MotionDetector *getMotionDetector() const{return mMotionDetector;}
-	egg::io::Win32ResourceArchive::ptr getResourceArchive() const{return mResourceArchive;}
+	tadpole::handler::Win32ResourceArchive::ptr getResourceArchive() const{return mResourceArchive;}
 
 	virtual peeper::RenderTarget *getRootRenderTarget(){return mRenderTarget;}
 	virtual bool isPrimary() const{return mRenderTarget->isPrimary();}
@@ -118,6 +120,9 @@ public:
 
 	virtual void setMouseLocked(bool locked);
 	virtual bool getMouseLocked() const{return mMouseLocked;}
+
+	virtual void setStopOnDeactivate(bool stopOnDeactivate){mStopOnDeactivate=stopOnDeactivate;}
+	virtual bool getStopOnDeactivate(){return mStopOnDeactivate;}
 
 	void changeRendererPlugin(int index);
 	void setRendererOptions(int *options,int length);
@@ -166,12 +171,13 @@ protected:
 	int *mRendererOptions;
 	ribbit::AudioPlayer *mAudioPlayer;
 	flick::MotionDetector *mMotionDetector;
-	egg::io::Win32ResourceArchive::ptr mResourceArchive;
+	tadpole::handler::Win32ResourceArchive::ptr mResourceArchive;
 
 	bool mRun;
 	bool mAutoActivate;
 	bool mActive;
 	bool mDestroyed;
+	bool mStopOnDeactivate;
 
 	Win32Attributes *win32;
 };

@@ -46,8 +46,6 @@ public:
 
 	void destroy();
 
-	bool isResourceArchive() const{return false;}
-
 	bool open(MemoryStream::ptr memoryStream);
 	bool open(Stream::ptr stream);
 

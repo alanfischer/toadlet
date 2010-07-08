@@ -81,24 +81,23 @@ void Logo::create(){
 	Mesh::ptr mesh=shared_static_cast<Mesh>(getEngine()->getMeshManager()->findHandler("mmsh")->load(in,NULL));
 	//MemoryStream::ptr in(new MemoryStream(lt_xmsh::data,lt_xmsh::length,lt_xmsh::length,false));
 	//Mesh::ptr mesh=shared_static_cast<Mesh>(getEngine()->getMeshManager()->findHandler("xmsh")->load(in,NULL));
-/*
+
 	meshNode=getEngine()->createNodeType(MeshNode::type(),scene);
 	meshNode->setMesh(mesh);
 	meshNode->getAnimationController()->start();
 	meshNode->getAnimationController()->setCycling(MeshNode::MeshAnimationController::Cycling_REFLECT);
 	scene->getRoot()->attach(meshNode);
-*/
+
 	cameraNode=getEngine()->createNodeType(CameraNode::type(),scene);
 	cameraNode->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
 	cameraNode->setClearColor(Colors::BLUE);
 	scene->getRoot()->attach(cameraNode);
-/*
+
 	MotionDetector *motionDetector=getMotionDetector();
 	if(motionDetector!=NULL){
 		cameraNode->addNodeListener(NodeListener::ptr(new GravityFollower(motionDetector,Math::length(cameraNode->getTranslate()))));
 		motionDetector->startup();
 	}
-*/
 }
 
 void Logo::resized(int width,int height){

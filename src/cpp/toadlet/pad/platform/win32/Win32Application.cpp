@@ -61,6 +61,7 @@ using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 using namespace toadlet::flick;
 using namespace toadlet::tadpole;
+using namespace toadlet::tadpole::handler;
 
 #if defined(TOADLET_HAS_OPENGL)
 	#pragma comment(lib,"toadlet_peeper_glrenderer" TOADLET_LIBRARY_EXTENSION)
@@ -154,6 +155,11 @@ Win32Application::Win32Application():
 	#endif
 	mActive(false),
 	mDestroyed(false),
+	#if defined(TOADLET_PLATFORM_WINCE)
+		mStopOnDeactivate(true),
+	#else
+		mStopOnDeactivate(false),
+	#endif
 	win32(NULL)
 {
 	win32=new Win32Attributes();
@@ -182,9 +188,10 @@ Win32Application::~Win32Application(){
 void Win32Application::create(int renderer,int audioPlayer,int motionDetector){
 	mEngine=new Engine();
 
-	mResourceArchive=Win32ResourceArchive::ptr(new Win32ResourceArchive());
+	mResourceArchive=Win32ResourceArchive::ptr(new Win32ResourceArchive(mEngine->getTextureManager()));
 	mResourceArchive->open(win32->mInstance);
 	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(mResourceArchive));
+	mEngine->getTextureManager()->addResourceArchive(mResourceArchive);
 
 	if(renderer!=RendererPlugin_NONE){
 		changeRendererPlugin(renderer);
@@ -273,8 +280,14 @@ void Win32Application::stepEventLoop(){
 	}
 }
 
+void Win32Application::stop(){
+	Logger::debug(Categories::TOADLET_PAD,"Win32Application::stop");
+	mRun=false;
+}
+
 void Win32Application::activate(){
 	if(mActive==false){
+		Logger::debug(Categories::TOADLET_PAD,"Win32Application::activate");
 		mActive=true;
 
 		if(mFullscreen){
@@ -296,6 +309,7 @@ void Win32Application::activate(){
 
 void Win32Application::deactivate(){
 	if(mActive==true){
+		Logger::debug(Categories::TOADLET_PAD,"Win32Application::deactivate");
 		mActive=false;
 
 		if(mFullscreen){
@@ -304,8 +318,12 @@ void Win32Application::deactivate(){
 				SHFullScreen(win32->mWnd,SHFS_SHOWSIPBUTTON|SHFS_SHOWTASKBAR|SHFS_SHOWSTARTICON);
 			#endif
 		}
-		
+
 		// See Win32Application::activate notes
+		
+		if(mStopOnDeactivate){
+			stop();
+		}
 	}
 }
 
@@ -848,6 +866,9 @@ void Win32Application::internal_resize(int width,int height){
 	resized(width,height);
 
 	if(mActive && mRenderer!=NULL){
+// Experimenting with destory&create on wince to fix screen rotation
+//destroyRendererAndContext();
+//createContextAndRenderer(mRendererPlugin);
 		if(mRenderer->getCapabilitySet().resetOnResize){
 			mEngine->contextReset(mRenderer);
 		}
@@ -882,6 +903,7 @@ LRESULT CALLBACK wndProc(HWND wnd,UINT msg,WPARAM wParam,LPARAM lParam){
 	}
 
 	int key=0;
+Logger::alert(String("MSG:")+msg);
 	switch(msg){
 		case WM_SETFOCUS:
 			if(application->getAutoActivate()){

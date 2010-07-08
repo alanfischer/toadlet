@@ -26,9 +26,9 @@
 #ifndef TOADLET_TADPOLE_HANDLER_WADARCHIVE_H
 #define TOADLET_TADPOLE_HANDLER_WADARCHIVE_H
 
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/egg/io/Archive.h>
 #include <toadlet/egg/io/DataStream.h>
-#include <toadlet/egg/BaseResource.h>
 #include <toadlet/tadpole/TextureManager.h>
 
 namespace toadlet{
@@ -44,8 +44,6 @@ public:
 	virtual ~WADArchive();
 
 	void destroy();
-
-	bool isResourceArchive() const{return true;}
 
 	bool open(egg::io::Stream::ptr stream);
 
@@ -77,13 +75,13 @@ public:
 		unsigned int offsets[MIPLEVELS]; // four mip maps stored
 	};
 
-	static peeper::Texture::ptr createTexture(toadlet::tadpole::TextureManager *textureManager,wmiptex *miptex);
+	static peeper::Texture::ptr createTexture(TextureManager *textureManager,wmiptex *miptex);
 
 protected:
 	unsigned char mInBuffer[640*480*85/64]; // Maxlump
 
-	toadlet::tadpole::TextureManager *mTextureManager;
-	toadlet::egg::io::DataStream::ptr mStream;
+	TextureManager *mTextureManager;
+	egg::io::DataStream::ptr mStream;
 
 	wheader mHeader;
 	egg::Collection<wlumpinfo> mLumpinfos;
