@@ -89,7 +89,7 @@ bool CoreAudioDecoder::stopStream(){
 	return true;
 }
 
-int CoreAudioDecoder::read(byte *buffer,int length){
+int CoreAudioDecoder::read(tbyte *buffer,int length){
 	AudioFileReadBytes(mAudioFile,false,mPosition,(UInt32*)&length,buffer);
 	mPosition+=length;
 	return length;
@@ -113,7 +113,7 @@ OSStatus CoreAudioDecoder::audioFileRead(void *inRefCon,SInt64 inPosition,ByteCo
 		decoder->mSourcePosition=inPosition;
 	}
 
-	*actualCount=decoder->mIn->read((byte*)buffer,requestCount);
+	*actualCount=decoder->mIn->read((tbyte*)buffer,requestCount);
 
 	decoder->mSourcePosition+=*actualCount;
 

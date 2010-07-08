@@ -155,6 +155,8 @@ rect{
 #else
 - (void) windowResized:(NSNotification*)notification{
 #endif
+	Logger::debug(Categories::TOADLET_PAD,String("resized:")+[self bounds].size.width+","+[self bounds].size.height);	
+
 	mApplication->resized([self bounds].size.width,[self bounds].size.height);
 
 	if(mApplication->active() && mApplication->getRenderer()!=NULL){
@@ -279,7 +281,8 @@ OSXApplication::OSXApplication():
 	mDestroyed(false),
 	mWindow(nil),
 	mView(nil)
-{}
+{
+}
 
 OSXApplication::~OSXApplication(){
 	destroy();
@@ -291,12 +294,10 @@ OSXApplication::~OSXApplication(){
 	}
 }
 
-void OSXApplication::create(void *window,int renderer,int audioPlayer,int motionDetector){
+void OSXApplication::setWindow(void *window){
 	mWindow=window;
-
-	create(renderer,audioPlayer,motionDetector);
 }
-
+	
 void OSXApplication::create(int renderer,int audioPlayer,int motionDetector){
 	if(mWindow==nil){
 		Error::nullPointer("invalid window");

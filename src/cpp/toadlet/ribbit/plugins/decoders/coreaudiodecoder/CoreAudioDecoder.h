@@ -45,7 +45,7 @@ public:
 	void close();
 
 	bool readable(){return true;}
-	int read(byte *buffer,int length);
+	int read(tbyte *buffer,int length);
 
 	bool writeable(){return false;}
 	int write(const tbyte *buffer,int length){return 0;}

@@ -42,7 +42,7 @@ public:
 	OSXApplication();
 	virtual ~OSXApplication();
 
-	virtual void create(void *window,int renderer=0,int audioPlayer=0,int motionDetector=0);
+	virtual void setWindow(void *window);
 	virtual void create(int renderer=0,int audioPlayer=0,int motionDetector=0);
 	virtual void destroy();
 	

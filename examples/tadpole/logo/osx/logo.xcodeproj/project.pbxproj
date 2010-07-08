@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* MainMenu.xib */; };
+		8C6D302C11E66BBF005DCD9B /* lt_xmsh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C6D302911E66BBF005DCD9B /* lt_xmsh.cpp */; };
+		8C6D302D11E66BBF005DCD9B /* lt_mmsh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C6D302B11E66BBF005DCD9B /* lt_mmsh.cpp */; };
 		8C76412C1098AFC900A21904 /* Logo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8C76412A1098AFC900A21904 /* Logo.cpp */; };
 		8C7641331098B02300A21904 /* LogoAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8C7641321098B02300A21904 /* LogoAppDelegate.mm */; };
 		8C76417B1098B3ED00A21904 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C7641761098B3ED00A21904 /* AGL.framework */; };
@@ -15,7 +17,6 @@
 		8C76417D1098B3ED00A21904 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C7641781098B3ED00A21904 /* OpenAL.framework */; };
 		8C76417E1098B3ED00A21904 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C7641791098B3ED00A21904 /* OpenGL.framework */; };
 		8C76417F1098B3ED00A21904 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C76417A1098B3ED00A21904 /* QuartzCore.framework */; };
-		8C7641971098B80000A21904 /* lt.xmsh in Resources */ = {isa = PBXBuildFile; fileRef = 8C7641961098B80000A21904 /* lt.xmsh */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -30,6 +31,10 @@
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		32CA4F630368D1EE00C91783 /* logo_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = logo_Prefix.pch; sourceTree = "<group>"; };
+		8C6D302811E66BBF005DCD9B /* lt_xmsh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lt_xmsh.h; path = ../lt_xmsh.h; sourceTree = SOURCE_ROOT; };
+		8C6D302911E66BBF005DCD9B /* lt_xmsh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lt_xmsh.cpp; path = ../lt_xmsh.cpp; sourceTree = SOURCE_ROOT; };
+		8C6D302A11E66BBF005DCD9B /* lt_mmsh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lt_mmsh.h; path = ../lt_mmsh.h; sourceTree = SOURCE_ROOT; };
+		8C6D302B11E66BBF005DCD9B /* lt_mmsh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lt_mmsh.cpp; path = ../lt_mmsh.cpp; sourceTree = SOURCE_ROOT; };
 		8C76412A1098AFC900A21904 /* Logo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Logo.cpp; path = ../Logo.cpp; sourceTree = SOURCE_ROOT; };
 		8C76412B1098AFC900A21904 /* Logo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Logo.h; path = ../Logo.h; sourceTree = SOURCE_ROOT; };
 		8C7641311098B02300A21904 /* LogoAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogoAppDelegate.h; sourceTree = "<group>"; };
@@ -39,7 +44,6 @@
 		8C7641781098B3ED00A21904 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = /System/Library/Frameworks/OpenAL.framework; sourceTree = "<absolute>"; };
 		8C7641791098B3ED00A21904 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		8C76417A1098B3ED00A21904 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = /System/Library/Frameworks/QuartzCore.framework; sourceTree = "<absolute>"; };
-		8C7641961098B80000A21904 /* lt.xmsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = lt.xmsh; path = ../../../data/lt.xmsh; sourceTree = SOURCE_ROOT; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* logo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = logo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -64,6 +68,10 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				8C6D302811E66BBF005DCD9B /* lt_xmsh.h */,
+				8C6D302911E66BBF005DCD9B /* lt_xmsh.cpp */,
+				8C6D302A11E66BBF005DCD9B /* lt_mmsh.h */,
+				8C6D302B11E66BBF005DCD9B /* lt_mmsh.cpp */,
 				8C76412A1098AFC900A21904 /* Logo.cpp */,
 				8C76412B1098AFC900A21904 /* Logo.h */,
 			);
@@ -125,7 +133,6 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				8C7641961098B80000A21904 /* lt.xmsh */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				1DDD58140DA1D0A300B32029 /* MainMenu.xib */,
@@ -189,7 +196,6 @@
 			files = (
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */,
-				8C7641971098B80000A21904 /* lt.xmsh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -203,6 +209,8 @@
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
 				8C76412C1098AFC900A21904 /* Logo.cpp in Sources */,
 				8C7641331098B02300A21904 /* LogoAppDelegate.mm in Sources */,
+				8C6D302C11E66BBF005DCD9B /* lt_xmsh.cpp in Sources */,
+				8C6D302D11E66BBF005DCD9B /* lt_mmsh.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,6 +282,7 @@
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
+					"-lfreetype",
 					"-lGLEW",
 					"-lmxml",
 					"-ltoadlet_ribbit_alplayer_sd",
@@ -296,6 +305,8 @@
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				LIBRARY_SEARCH_PATHS = /sw/lib;
+				OTHER_LDFLAGS = "-lfreetype";
 				PREBINDING = NO;
 				SDKROOT = macosx10.5;
 			};
