@@ -118,7 +118,7 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 	}
 
 	// If we don't support partial miplevel specification, then calculate the amount of levels we'll need
-	int specifiedMipLevels=1;
+	int specifiedMipLevels=0;
 	if(mMipLevels>0){
 		/// @todo: Determine if GLES will let us do partial specifications anyway, and if so, enable that
 		#if !defined(TOADLET_HAS_GLES)
@@ -130,12 +130,16 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 			else
 		#endif
 		{
-			int mipWidth=mWidth,mipHeight=mHeight,mipDepth=mDepth;
-			for(specifiedMipLevels=1;mipWidth>=2 || mipHeight>=2 || mipDepth>=2;++specifiedMipLevels,mipWidth/=2,mipHeight/=2,mipDepth/=2);
+			int hwidth=mWidth,hheight=mHeight,hdepth=mDepth;
+			while(hwidth>1 || hheight>1 || hdepth>1){
+				specifiedMipLevels++;
+				hwidth/=2;hheight/=2;hdepth/=2;
+				hwidth=hwidth>0?hwidth:1;hheight=hheight>0?hheight:1;hdepth=hdepth>0?hdepth:1;
+			}
 
 			if(specifiedMipLevels!=mMipLevels){
 				Logger::debug(Categories::TOADLET_PEEPER,
-					"partial mipmap specification not supported!");
+					String("partial mipmap specification not supported.  calculated:")+specifiedMipLevels+" requested:"+mMipLevels);
 			}
 		}
 	}
@@ -146,7 +150,7 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 
 	// Allocate texture memory
 	int level=0,width=mWidth,height=mHeight,depth=mDepth;
-	for(level=0;level<specifiedMipLevels;++level,width/=2,height/=2,depth/=2){
+	for(level=0;level<=specifiedMipLevels;++level,width/=2,height/=2,depth/=2){
 		int rowPitch=width*ImageFormatConversion::getPixelSize(mFormat);
  		int slicePitch=rowPitch*height;
 		TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(slicePitch);

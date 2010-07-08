@@ -23,46 +23,46 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_IO_WIN32RESOURCEARCHIVE_H
-#define TOADLET_EGG_IO_WIN32RESOURCEARCHIVE_H
+#ifndef TOADLET_TADPOLE_HANDLER_WIN32RESOURCEARCHIVE_H
+#define TOADLET_TADPOLE_HANDLER_WIN32RESOURCEARCHIVE_H
 
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/egg/Map.h>
 #include <toadlet/egg/io/Archive.h>
+#include <toadlet/tadpole/TextureManager.h>
 
 namespace toadlet{
-namespace egg{
-namespace io{
+namespace tadpole{
+namespace handler{
 
-class TOADLET_API Win32ResourceArchive:public Archive,public BaseResource{
+class TOADLET_API Win32ResourceArchive:public egg::io::Archive,public egg::BaseResource{
 	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 public:
 	TOADLET_SHARED_POINTERS(Win32ResourceArchive);
 
-	Win32ResourceArchive();
+	Win32ResourceArchive(TextureManager *textureManager);
 	virtual ~Win32ResourceArchive();
 
 	void destroy();
 
-	/// @todo: Move this to tadpole/handlers, and have it be a ResourceArchive if we loaded HBITMAP/HICON resources directly into Textures.
-	bool isResourceArchive() const{return false;}
-
 	bool open(void *module);
-	void setMap(Map<String,int>::ptr idMap);
+	void setMap(egg::Map<egg::String,int>::ptr idMap);
 
-	Stream::ptr openStream(const String &name);
-	Resource::ptr openResource(const String &name){return NULL;}
+	egg::io::Stream::ptr openStream(const egg::String &name);
+	egg::Resource::ptr openResource(const egg::String &name);
 
-	Collection<String>::ptr getEntries();
+	egg::Collection<egg::String>::ptr getEntries();
 
-	void resourceFound(const String &name);
+	void resourceFound(const egg::String &name);
 
 protected:
-	void *findResourceName(const String &name);
+	void *findResourceName(const egg::String &name);
 
 	void *mModule;
-	Collection<String>::ptr mEntries;
-	Map<String,int>::ptr mIDMap;
+	egg::Collection<egg::String>::ptr mEntries;
+	egg::Map<egg::String,int>::ptr mIDMap;
+
+	TextureManager *mTextureManager;
 };
 
 }

@@ -45,7 +45,7 @@ TextureManager::TextureManager(Engine *engine,bool backable):ResourceManager(eng
 }
 
 Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLevels){
-	Logger::debug("TextureManager.createTexture");
+	Logger::debug(Categories::TOADLET_TADPOLE,"TextureManager.createTexture");
 
 	Renderer *renderer=getRenderer();
 
@@ -63,7 +63,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 
 	Image::ptr finalImage=image;
 	if((hasAutogen==false || hasNonPowerOf2==false) && (Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || Math::isPowerOf2(depth)==false)){
-		Logger::debug("making image power of 2");
+		Logger::debug(Categories::TOADLET_TADPOLE,"making image power of 2");
 
 		int dwidth=width>1?(Math::nextPowerOf2(width)>>1):1;
 		int dheight=height>1?(Math::nextPowerOf2(height)>>1):1;
@@ -91,7 +91,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 	}
 
 	if(format!=closestFormat){
-		Logger::debug(String("converting image from:")+format+" to:"+closestFormat);
+		Logger::debug(Categories::TOADLET_TADPOLE,String("converting image from:")+format+" to:"+closestFormat);
 
 		Image::ptr convertedImage(Image::createAndReallocate(dimension,closestFormat,width,height,depth));
 		if(convertedImage==NULL){
@@ -112,7 +112,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 	mipDatas.add(finalImage->getData());
 
 	if(hasAutogen==false && wantsAutogen==true){
-		Logger::debug("simulating mipmap generation");
+		Logger::debug(Categories::TOADLET_TADPOLE,"simulating mipmap generation");
 		usage&=~Texture::Usage_BIT_AUTOGEN_MIPMAPS;
 
 		if(mipLevels==0){
@@ -147,7 +147,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 
 	Texture::ptr texture;
 	if(mBackable || renderer==NULL){
-		Logger::debug("creating BackableTexture");
+		Logger::debug(Categories::TOADLET_TADPOLE,"creating BackableTexture");
 
 		BackableTexture::ptr backableTexture(new BackableTexture());
 		backableTexture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas.begin());
@@ -158,7 +158,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 		texture=backableTexture;
 	}
 	else{
-		Logger::debug("creating Texture");
+		Logger::debug(Categories::TOADLET_TADPOLE,"creating Texture");
 
 		texture=Texture::ptr(renderer->createTexture());
 		texture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas.begin());
@@ -166,7 +166,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 
 	manage(shared_static_cast<Texture>(texture));
 
-	Logger::debug("TextureManager.createTexture finished");
+	Logger::debug(Categories::TOADLET_TADPOLE,"TextureManager.createTexture finished");
 
 	return texture;
 }
@@ -188,7 +188,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr images[],int usage,int mip
 	egg::Collection<tbyte*> mipDatas;
 
 	if(format!=closestFormat){
-		Logger::debug(String("converting image from:")+format+" to:"+closestFormat);
+		Logger::debug(Categories::TOADLET_TADPOLE,String("converting image from:")+format+" to:"+closestFormat);
 
 		int i;
 		for(i=0;i<mipLevels;++i){

@@ -148,7 +148,7 @@ Engine::Engine():
 	mRenderer(NULL),
 	mAudioPlayer(NULL)
 {
-	bool backable=false;
+	bool backable=true;
 
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"creating Engine");

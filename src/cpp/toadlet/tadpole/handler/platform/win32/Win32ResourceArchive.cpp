@@ -26,16 +26,21 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/io/MemoryStream.h>
-#include <toadlet/egg/platform/win32/io/Win32ResourceArchive.h>
+#include <toadlet/egg/image/Image.h>
+#include <toadlet/tadpole/handler/platform/win32/Win32ResourceArchive.h>
 #include <windows.h>
 
 #ifndef IS_INTRESOURCE
 	#define IS_INTRESOURCE(_r) ((((ULONG_PTR)(_r)) >> 16) == 0)
 #endif
 
+using namespace toadlet::egg;
+using namespace toadlet::egg::io;
+using namespace toadlet::egg::image;
+
 namespace toadlet{
-namespace egg{
-namespace io{
+namespace tadpole{
+namespace handler{
 
 BOOL CALLBACK resourceFoundCallback(HMODULE module,LPCTSTR type,LPTSTR name,LONG_PTR param){
 	Win32ResourceArchive *archive=(Win32ResourceArchive*)param;
@@ -48,9 +53,10 @@ BOOL CALLBACK resourceFoundCallback(HMODULE module,LPCTSTR type,LPTSTR name,LONG
 	return TRUE;
 }
 
-Win32ResourceArchive::Win32ResourceArchive():
+Win32ResourceArchive::Win32ResourceArchive(TextureManager *textureManager):
 	mModule(0)
 {
+	mTextureManager=textureManager;
 }
 
 Win32ResourceArchive::~Win32ResourceArchive(){
@@ -68,6 +74,10 @@ bool Win32ResourceArchive::open(void *module){
 	BOOL result=FALSE;
 	#if !defined(TOADLET_PLATFORM_WINCE)
 		result=EnumResourceNames((HMODULE)mModule,RT_RCDATA,&resourceFoundCallback,(LONG_PTR)this);
+
+		if(mTextureManager!=NULL){
+			result=EnumResourceNames((HMODULE)mModule,RT_BITMAP,&resourceFoundCallback,(LONG_PTR)this);
+		}
 	#endif
 	
 	return result>0;
@@ -91,6 +101,68 @@ Stream::ptr Win32ResourceArchive::openStream(const String &name){
 	
 	MemoryStream::ptr stream(new MemoryStream((tbyte*)data,length,length,false));
 	return stream;
+}
+
+Resource::ptr Win32ResourceArchive::openResource(const String &name){
+Logger::alert(String("Opening resource:")+name);
+	if(mTextureManager==NULL){
+		return NULL;
+	}
+
+	LPTSTR resName=(LPTSTR)findResourceName(name);
+
+	HBITMAP hbitmap=LoadBitmap((HMODULE)mModule,IS_INTRESOURCE(resName)?resName:"\""+String(resName)+"\"");
+	if(hbitmap==NULL) return NULL;
+	
+	BITMAP bitmap={0};
+	int result=GetObject(hbitmap,sizeof(bitmap),&bitmap);
+
+	int textureWidth=bitmap.bmWidth;
+	int textureHeight=bitmap.bmWidth;
+	int textureFormat=0;
+	switch(bitmap.bmBitsPixel){
+		case(16):
+			textureFormat=Image::Format_BGR_5_6_5;
+		break;
+		case(24):
+			textureFormat=Image::Format_BGR_8;
+		break;
+		case(32):
+			textureFormat=Image::Format_BGRA_8;
+		break;
+	}
+
+	if(textureFormat==0){
+		DeleteObject(hbitmap);
+		return NULL;
+	}
+	
+	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,textureFormat,textureWidth,textureHeight));
+	if(image==NULL){
+		DeleteObject(hbitmap);
+		return NULL;
+	}
+
+	tbyte *imageData=image->getData();
+	int imageStride=textureWidth*image->getPixelSize();
+	/// @todo: Figure out bitmapStride
+	int bitmapStride=imageStride;//((imageWidth*2+sizeof(DWORD)-1)>>2)<<2; // stride is in DWORDs
+
+	tbyte *bitmapData=new tbyte[bitmapStride*textureHeight];
+
+	GetBitmapBits(hbitmap,bitmapStride*textureHeight,bitmapData);
+
+	// Flip the bitmap and copy it into the image
+	int i;
+	for(i=0;i<textureHeight;++i){
+		memcpy(imageData+imageStride*(textureHeight-i-1),bitmapData+bitmapStride*i,bitmapStride);
+	}
+	
+	delete[] bitmapData;
+
+	DeleteObject(hbitmap);
+
+	return mTextureManager->createTexture(image);
 }
 
 Collection<String>::ptr Win32ResourceArchive::getEntries(){

@@ -43,8 +43,6 @@ public:
 
 	void destroy();
 
-	bool isResourceArchive() const{return false;}
-
 	bool open(Stream::ptr stream);
 
 	Stream::ptr openStream(const String &name);

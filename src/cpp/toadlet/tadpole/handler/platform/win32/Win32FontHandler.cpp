@@ -270,8 +270,7 @@ Resource::ptr Win32FontHandler::load(Stream::ptr stream,const ResourceHandlerDat
 		return NULL;
 	}
 	
-	uint8 *imageData=image->getData();
-
+	tbyte *imageData=image->getData();
 	int imageStride=textureWidth*image->getPixelSize();
 	int bitmapStride=((textureWidth*2+sizeof(DWORD)-1)>>2)<<2; // stride is in DWORDs
 

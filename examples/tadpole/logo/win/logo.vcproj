@@ -344,7 +344,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/ALIGN:4096 /subsystem:$(CESubsystem) /MACHINE:ARM "
-				AdditionalDependencies="toadlet_egg_s.lib toadlet_peeper_s.lib toadlet_ribbit_s.lib toadlet_tadpole_s.lib toadlet_pad_s.lib"
+				AdditionalDependencies="toadlet_egg_s.lib toadlet_peeper_s.lib toadlet_ribbit_s.lib toadlet_flick_s.lib toadlet_tadpole_s.lib toadlet_pad_s.lib"
 				OutputFile="$(OutDir)/logo.exe"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="false"

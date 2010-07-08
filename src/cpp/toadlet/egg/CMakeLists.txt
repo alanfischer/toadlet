@@ -96,7 +96,6 @@ set (EGG_PLATFORM_WIN32_SRC
 	platform/win32/Win32System.cpp
 	platform/win32/Win32Thread.cpp
 	platform/win32/Win32WaitCondition.cpp
-	platform/win32/io/Win32ResourceArchive.cpp
 )
 
 
@@ -242,7 +241,6 @@ set (EGG_PLATFORM_WIN32_HEADERS
 	platform/win32/Win32System.h
 	platform/win32/Win32Thread.h
 	platform/win32/Win32WaitCondition.h
-	platform/win32/io/Win32ResourceArchive.h
 )
 
 

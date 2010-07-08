@@ -276,6 +276,14 @@ Resource::ptr ResourceManager::findFromFile(const String &name,const ResourceHan
 		filename+="."+extension;
 	}
 	if(extension!=(char*)NULL){
+		int i;
+		for(i=0;i<mResourceArchives.size();++i){
+			Resource::ptr resource=mResourceArchives[i]->openResource(filename);
+			if(resource!=NULL){
+				return resource;
+			}
+		}
+
 		ResourceHandler *handler=findHandler(extension);
 		if(handler!=NULL){
 			Stream::ptr stream=mArchive->openStream(filename);
@@ -288,16 +296,8 @@ Resource::ptr ResourceManager::findFromFile(const String &name,const ResourceHan
 				return NULL;
 			}
 		}
-		else{
-			int i;
-			for(i=0;i<mResourceArchives.size();++i){
-				Resource::ptr resource=mResourceArchives[i]->openResource(filename);
-				if(resource!=NULL){
-					return resource;
-				}
-			}
-			return Resource::ptr(unableToFindHandler(name,handlerData));
-		}
+
+		return Resource::ptr(unableToFindHandler(name,handlerData));
 	}
 	else{
 		int i;
