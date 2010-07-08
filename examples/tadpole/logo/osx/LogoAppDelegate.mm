@@ -23,19 +23,18 @@
 		return;
 	}
 	
-	String resources;
-	NSString *nsresources=[[NSBundle mainBundle] pathForResource:@"lt" ofType:@"xmsh"];
-	if(nsresources!=nil){
-		resources=[nsresources cStringUsingEncoding:NSASCIIStringEncoding];
-	}
-	logo=new Logo(resources);
-	
-	((Application*)logo)->create(mainWindow);
-	logo->start(false);
+	logo=new Logo();
+	logo->setWindow(mainWindow);
+	logo->create();
+	logo->start();
 }
 
 
 - (BOOL) applicationShouldTerminateAfterLastWindowClosed:(NSApplication*) app{
+	return YES;
+}
+
+- (NSApplicationTerminateReply) applicationShouldTerminate:(NSApplication*) app{
 	return YES;
 }
 

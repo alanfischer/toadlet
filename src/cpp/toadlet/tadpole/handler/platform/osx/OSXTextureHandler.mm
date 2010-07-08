@@ -43,11 +43,11 @@ namespace tadpole{
 namespace handler{
 
 size_t TextureStreamGetBytes(void *info,void *buffer,size_t count){
-	return ((Stream*)info)->read((byte*)buffer,count);
+	return ((Stream*)info)->read((tbyte*)buffer,count);
 }
 
 off_t TextureStreamSkipForward(void *info,off_t count){
-	byte *buffer=new byte[count];
+	tbyte *buffer=new tbyte[count];
 	int amount=((Stream*)info)->read(buffer,count);
 	delete[] buffer;
 	return amount;
@@ -100,8 +100,12 @@ Resource::ptr OSXTextureHandler::load(Stream::ptr in,const ResourceHandlerData *
 	CGContextDrawImage(context,CGRectMake(0,0,textureWidth,textureHeight),cgimage);
 
 	// Build texture
-	Image::ptr image(new Image(Image::Dimension_D2,Image::Format_RGBA_8,textureWidth,textureHeight));
-	uint8 *imageData=image->getData();
+	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGBA_8,textureWidth,textureHeight));
+	if(image==NULL){
+		return NULL;
+	}
+	
+	tbyte *imageData=image->getData();
 
 	int imageStride=textureWidth*image->getPixelSize();
 	memcpy(imageData,data,imageStride*textureHeight);

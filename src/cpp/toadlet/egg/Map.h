@@ -177,7 +177,7 @@ typename Map<K,V>::data_type& Map<K,V>::operator[] (const_key_ref k){
 }
 
 template <typename K, typename V>
-typename void Map<K,V>::add(const_key_ref k,const_data_ref v){
+inline void Map<K,V>::add(const_key_ref k,const_data_ref v){
 	iterator ip = lower_bound (k);
 	if (ip == end() || k < ip->first)
 	ip = base_class::insert (ip, make_pair (k, V()));
