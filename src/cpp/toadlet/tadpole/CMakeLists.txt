@@ -56,6 +56,7 @@ set (TADPOLE_HANDLER_FREETYPE_SRC
 )
 
 set (TADPOLE_HANDLER_PLATFORM_OSX_SRC
+	handler/platform/osx/OSXBundleArchive.mm
 	handler/platform/osx/OSXFontHandler.mm
 	handler/platform/osx/OSXTextureHandler.mm
 )
@@ -166,6 +167,7 @@ set (TADPOLE_HANDLER_FREETYPE_HEADERS
 )
 
 set (TADPOLE_HANDLER_PLATFORM_OSX_HEADERS
+	handler/platform/osx/OSXBundleArchive.h
 	handler/platform/osx/OSXFontHandler.h
 	handler/platform/osx/OSXTextureHandler.h
 ) 
