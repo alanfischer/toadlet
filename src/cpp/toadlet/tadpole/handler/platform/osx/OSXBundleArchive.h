@@ -29,7 +29,7 @@
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/egg/Map.h>
 #include <toadlet/egg/io/Archive.h>
-#include <NSBundle.h>
+#include <Foundation/NSBundle.h>
 
 namespace toadlet{
 namespace tadpole{

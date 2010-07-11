@@ -37,6 +37,7 @@ public:
 
 	virtual bool makeCurrent()=0;
 	virtual bool swap()=0;
+	virtual void reset(){} // Mostly unused except for NSGLRenderTarget
 };
 
 }

@@ -404,7 +404,6 @@ bool BSP30Node::sensePotentiallyVisible(SensorResultsListener *listener,const Ve
 		mCounter++;
 		const Collection<int> &leafvis=mMap->parsedVisibility[leaf];
 		for(i=0;i<leafvis.size();i++){
-			bleaf *leaf=mMap->leafs+leafvis[i];
 			const Collection<Node*> &occupants=mLeafData[leafvis[i]].occupants;
 			for(j=0;j<occupants.size();++j){
 				Node *occupant=occupants[j];

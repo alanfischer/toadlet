@@ -50,6 +50,7 @@ public:
 
 	virtual bool makeCurrent();
 	virtual bool swap();
+	virtual void reset();
 
 	virtual bool isPrimary() const{return true;}
 	virtual bool isValid() const{return mContext!=NULL;}
