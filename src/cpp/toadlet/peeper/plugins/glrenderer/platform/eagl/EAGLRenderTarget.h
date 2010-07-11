@@ -53,7 +53,7 @@ public:
 
 	virtual bool makeCurrent();
 	virtual bool swap();
-	
+
 	virtual bool isPrimary() const{return true;}
 	virtual bool isValid() const{return mContext!=nil && GLFBOSurfaceRenderTarget::isValid();}
 	virtual int getWidth() const;
