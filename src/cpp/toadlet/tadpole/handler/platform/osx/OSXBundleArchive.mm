@@ -27,6 +27,7 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/handler/platform/osx/OSXBundleArchive.h>
+#include <Foundation/Foundation.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
@@ -51,7 +52,7 @@ void OSXBundleArchive::destroy(){
 bool OSXBundleArchive::open(NSBundle *bundle){
 	mBundle=bundle;
 
-	mEntries=Collection<String>::ptr(new Collection<String>());
+	mEntries=egg::Collection<String>::ptr(new egg::Collection<String>());
 	/// @todo: Enumerate directories and insert them into mEntries
 	
 	return true;
@@ -66,7 +67,7 @@ Stream::ptr OSXBundleArchive::openStream(const String &name){
 	return stream;
 }
 
-Collection<String>::ptr OSXBundleArchive::getEntries(){
+egg::Collection<String>::ptr OSXBundleArchive::getEntries(){
 	return mEntries;
 }
 

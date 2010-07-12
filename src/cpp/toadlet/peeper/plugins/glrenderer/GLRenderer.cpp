@@ -293,6 +293,11 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 		mCapabilitySet.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
 	#endif
 
+	// OSX needs a notification to update the back buffer on a resize
+	#if defined(TOADLET_PLATFORM_OSX) && !defined(TOADLET_PLATFORM_EAGL)
+		mCapabilitySet.resetOnResize=true;
+	#endif
+
 	mCapabilitySet.triangleFan=true;
 
 	setDefaultStates();
@@ -322,7 +327,9 @@ bool GLRenderer::destroy(){
 }
 
 bool GLRenderer::reset(){
-	// No device reset necessary
+	if(mGLPrimaryRenderTarget!=NULL){
+		mGLPrimaryRenderTarget->reset();
+	}
 
 	setDefaultStates();
 

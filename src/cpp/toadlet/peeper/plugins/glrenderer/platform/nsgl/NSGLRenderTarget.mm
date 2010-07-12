@@ -109,7 +109,6 @@ bool NSGLRenderTarget::makeCurrent(){
 
 bool NSGLRenderTarget::swap(){
 	[mContext flushBuffer];
-	
 	return true;
 }
 
@@ -119,6 +118,10 @@ int NSGLRenderTarget::getWidth() const{
 
 int NSGLRenderTarget::getHeight() const{
 	return [[mContext view] bounds].size.height;
+}
+
+void NSGLRenderTarget::reset(){
+	[mContext update];
 }
 
 }
