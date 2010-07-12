@@ -106,8 +106,7 @@ Image *BMPHandler::loadImage(Stream *stream){
 		return NULL;
 	}
 
-	int format;
-
+	int format=0;
 	if(bmih.biBitCount==1 || bmih.biBitCount==2 || bmih.biBitCount==4 || bmih.biBitCount==8 || bmih.biBitCount==16 || bmih.biBitCount==24){
 		format=Image::Format_RGB_8;
 	}
@@ -174,9 +173,9 @@ Image *BMPHandler::loadImage(Stream *stream){
 				int rawDataOffset=i*3 + j*rowSize;
 				int imageDataOffset=i*3 + j*width*3;
 
-				imageData[imageDataOffset+0]=rawData[rawDataOffset+0];
+				imageData[imageDataOffset+0]=rawData[rawDataOffset+2];
 				imageData[imageDataOffset+1]=rawData[rawDataOffset+1];
-				imageData[imageDataOffset+2]=rawData[rawDataOffset+2];
+				imageData[imageDataOffset+2]=rawData[rawDataOffset+0];
 			}
 		}
 

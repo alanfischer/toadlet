@@ -903,7 +903,6 @@ LRESULT CALLBACK wndProc(HWND wnd,UINT msg,WPARAM wParam,LPARAM lParam){
 	}
 
 	int key=0;
-Logger::alert(String("MSG:")+msg);
 	switch(msg){
 		case WM_SETFOCUS:
 			if(application->getAutoActivate()){
