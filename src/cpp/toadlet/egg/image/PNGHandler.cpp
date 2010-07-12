@@ -210,7 +210,7 @@ Image *PNGHandler::loadImage(Stream *stream){
 		break;
 	}
 
-	image=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,format,width,height));
+	image=Image::createAndReallocate(Image::Dimension_D2,format,width,height);
 	if(image==NULL){
 		return NULL;
 	}

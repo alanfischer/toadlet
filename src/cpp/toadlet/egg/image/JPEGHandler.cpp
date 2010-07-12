@@ -238,7 +238,7 @@ Image *JPEGHandler::loadImage(io::Stream *stream){
 		return NULL;
 	}
 
-	image=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,format,cinfo.output_width,cinfo.output_height));
+	image=Image::createAndReallocate(Image::Dimension_D2,format,cinfo.output_width,cinfo.output_height);
 	if(image==NULL){
 		return NULL;
 	}
