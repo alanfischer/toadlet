@@ -6,7 +6,7 @@ class GravityFollower:public NodeListener,MotionDetectorListener{
 public:
 	GravityFollower(MotionDetector *detector,float offset){
 		mDetector=detector;
-		mDetector->setListener(this);
+	mDetector->setListener(this);
 		mOffset=offset;
 	}
 

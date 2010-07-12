@@ -155,9 +155,10 @@ rect{
 #else
 - (void) windowResized:(NSNotification*)notification{
 #endif
-	Logger::debug(Categories::TOADLET_PAD,String("resized:")+[self bounds].size.width+","+[self bounds].size.height);	
+	int width=[self bounds].size.width,height=[self bounds].size.height;
+	Logger::debug(Categories::TOADLET_PAD,String("resized:")+width+","+height);
 
-	mApplication->resized([self bounds].size.width,[self bounds].size.height);
+	mApplication->resized(width,height);
 
 	if(mApplication->active() && mApplication->getRenderer()!=NULL){
 		if(mApplication->getRenderer()->getCapabilitySet().resetOnResize){
