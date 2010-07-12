@@ -60,7 +60,7 @@ bool OSXBundleArchive::open(NSBundle *bundle){
 
 Stream::ptr OSXBundleArchive::openStream(const String &name){
 	NSString *filePath=[[NSBundle mainBundle] pathForResource:[NSString stringWithUTF8String:name.c_str()] ofType:nil];
-	FileStream::ptr stream(new FileStream([filePath UTF8String],FileStream::Open_READ_WRITE_BINARY));
+	FileStream::ptr stream(new FileStream([filePath UTF8String],FileStream::Open_READ_BINARY));
 	if(stream->closed()){
 		stream=NULL;
 	}

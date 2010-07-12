@@ -32,6 +32,7 @@
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/CapabilitySet.h>
+#include <toadlet/tadpole/handler/platform/osx/OSXBundleArchive.h>
 #include <toadlet/pad/platform/osx/OSXApplication.h>
 #include <toadlet/pad/ApplicationListener.h>
 
@@ -44,10 +45,12 @@
 
 using namespace toadlet;
 using namespace toadlet::egg;
+using namespace toadlet::egg::io;
 using namespace toadlet::flick;
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 using namespace toadlet::tadpole;
+using namespace toadlet::tadpole::handler;
 using namespace toadlet::pad;
 
 #if defined(TOADLET_HAS_OPENGL)
@@ -306,6 +309,10 @@ void OSXApplication::create(int renderer,int audioPlayer,int motionDetector){
 	}
 
 	mEngine=new Engine();
+
+	mBundleArchive=OSXBundleArchive::ptr(new OSXBundleArchive());
+	shared_static_cast<OSXBundleArchive>(mBundleArchive)->open([NSBundle mainBundle]);
+	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(mBundleArchive));
 
 	if(audioPlayer!=AudioPlayerPlugin_NONE){
 		createAudioPlayer();

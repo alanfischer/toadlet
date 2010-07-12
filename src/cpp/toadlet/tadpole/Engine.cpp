@@ -200,6 +200,7 @@ Engine::Engine():
 	#if defined(TOADLET_HAS_GDIPLUS)
 		mTextureManager->setDefaultHandler(Win32TextureHandler::ptr(new Win32TextureHandler(mTextureManager)));
 	#elif defined(TOADLET_PLATFORM_OSX)
+		mTextureManager->setHandler(BMPHandler::ptr(new BMPHandler(mTextureManager)),"bmp"); // OSXTextureHandler only handles jpgs & pngs currently, so add our own bmp handler
 		mTextureManager->setDefaultHandler(OSXTextureHandler::ptr(new OSXTextureHandler(mTextureManager)));
 	#else
 		mTextureManager->setHandler(BMPHandler::ptr(new BMPHandler(mTextureManager)),"bmp");

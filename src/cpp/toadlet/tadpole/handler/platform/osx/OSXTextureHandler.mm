@@ -72,6 +72,9 @@ Resource::ptr OSXTextureHandler::load(Stream::ptr in,const ResourceHandlerData *
 	CGDataProviderRef dataProvider=CGDataProviderCreateSequential(in.get(),&callbacks);
 
 	CGImageRef cgimage=CGImageCreateWithPNGDataProvider(dataProvider,NULL,false,kCGRenderingIntentDefault);
+	if(cgimage==NULL){
+		cgimage=CGImageCreateWithJPEGDataProvider(dataProvider,NULL,false,kCGRenderingIntentDefault);
+	}
 
 	CGDataProviderRelease(dataProvider);
 
@@ -87,10 +90,10 @@ Resource::ptr OSXTextureHandler::load(Stream::ptr in,const ResourceHandlerData *
 
 	// Create context
 	CGColorSpaceRef colorSpace=CGColorSpaceCreateDeviceRGB();
-	void *data=calloc(textureHeight,textureWidth*4);
+	tbyte *bitmapData=(tbyte*)calloc(textureHeight,textureWidth*4);
 	int bitsPerComponent=8;
 	int bytesPerRow=textureWidth*4;
-	CGContextRef context=CGBitmapContextCreate(data,
+	CGContextRef context=CGBitmapContextCreate(bitmapData,
 		textureWidth,textureHeight,
 		bitsPerComponent,bytesPerRow,colorSpace,
 		kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big
@@ -108,12 +111,17 @@ Resource::ptr OSXTextureHandler::load(Stream::ptr in,const ResourceHandlerData *
 	tbyte *imageData=image->getData();
 
 	int imageStride=textureWidth*image->getPixelSize();
-	memcpy(imageData,data,imageStride*textureHeight);
+
+	// Flip the bitmap and copy it into the image
+	int i;
+	for(i=0;i<textureHeight;++i){
+		memcpy(imageData+imageStride*(textureHeight-i-1),bitmapData+imageStride*i,imageStride);
+	}
 
 	Texture::ptr texture=mTextureManager->createTexture(image);
 
 	CGContextRelease(context);
-	free(data);
+	free(bitmapData);
 
 	CGImageRelease(cgimage);
 
