@@ -188,7 +188,7 @@ int GIFHandler::getNextImage(GifFileType *gifFile,Image *&image,int &frameDelay)
 				}
 
 				if(mWorking==NULL){
-					mWorking=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,format,width,height));
+					mWorking=Image::createAndReallocate(Image::Dimension_D2,format,width,height);
 					if(mWorking==NULL){
 						return NULL;
 					}
@@ -200,7 +200,7 @@ int GIFHandler::getNextImage(GifFileType *gifFile,Image *&image,int &frameDelay)
 				}
 
 				if(mBase==NULL){
-					mBase=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,format,width,height));
+					mBase=Image::createAndReallocate(Image::Dimension_D2,format,width,height);
 					if(mBase==NULL){
 						return NULL;
 					}
