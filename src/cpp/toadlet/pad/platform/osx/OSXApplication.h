@@ -26,6 +26,7 @@
 #ifndef TOADLET_PAD_OSXAPPLICATION_H
 #define TOADLET_PAD_OSXAPPLICATION_H
 
+#include <toadlet/egg/io/Archive.h>
 #include <toadlet/pad/BaseApplication.h>
 
 namespace toadlet{
@@ -131,7 +132,8 @@ protected:
 	int *mRendererOptions;
 	ribbit::AudioPlayer *mAudioPlayer;
 	flick::MotionDetector *mMotionDetector;
-
+	egg::io::Archive::ptr mBundleArchive;
+	
 	bool mRun;
 	bool mAutoActivate;
 	bool mActive;
