@@ -95,8 +95,6 @@ void SpriteNode::setMaterial(Material::ptr material){
 	if(mMaterial!=NULL){
 		mMaterial->retain();
 
-		mMaterial->setFaceCulling(Renderer::FaceCulling_NONE);
-		mMaterial->setDepthWrite(false);
 		int i;
 		for(i=0;i<mMaterial->getNumTextureStages();++i){
 			mMaterial->getTextureStage(i)->setUAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
