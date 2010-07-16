@@ -1331,7 +1331,7 @@ void Simulator::traceCapsule(Collision &c,const Segment &segment,const Capsule &
 	// Capsules are really just segments, so test against a sphere located at the closest point of the capsule segment
 	s.origin.set(capsule.origin);
 	s.direction.set(capsule.direction);
-	getClosestPointsOnSegments(p1,p2,s,segment,mEpsilon);
+	project(p1,p2,s,segment,mEpsilon);
 	
 	Sphere &sphere=cache_traceCapsule_sphere.set(p1,capsule.radius);
 	traceSphere(c,segment,sphere);

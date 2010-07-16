@@ -381,7 +381,7 @@ void Math::slerp(Quaternion &r,const Quaternion &q1,const Quaternion &q2,fixed t
 	r.w=mul(scl1,q1.w) + mul(scl2,q2.w);
 }
 
-void Math::getClosestPointOnSegment(Vector3 &result,const Segment &segment,const Vector3 &point){
+void Math::project(Vector3 &result,const Segment &segment,const Vector3 &point,bool limitToSegment){
 	const Vector3 &o=segment.origin;
 	const Vector3 &d=segment.direction;
 
@@ -390,15 +390,17 @@ void Math::getClosestPointOnSegment(Vector3 &result,const Segment &segment,const
 	}
 	else{
 		fixed u=div(mul(d.x,point.x-o.x)+mul(d.y,point.y-o.y)+mul(d.z,point.z-o.z),mul(d.x,d.x)+mul(d.y,d.y)+mul(d.z,d.z));
-		if(u<0) u=0;
-		else if(u>ONE) u=ONE;
+		if(limitToSegment){
+			if(u<0) u=0;
+			else if(u>ONE) u=ONE;
+		}
 		result.x=o.x+mul(u,d.x);
 		result.y=o.y+mul(u,d.y);
 		result.z=o.z+mul(u,d.z);
 	}
 }
 
-void Math::getClosestPointsOnSegments(Vector3 &point1,Vector3 &point2,const Segment &seg1, const Segment &seg2,fixed epsilon){
+void Math::project(Vector3 &point1,Vector3 &point2,const Segment &seg1, const Segment &seg2,fixed epsilon){
 	// For a full discussion of this method see Dan Sunday's Geometry Algorithms web site: http://www.geometryalgorithms.com/
 	fixed a=dot(seg1.direction,seg1.direction);
 	fixed b=dot(seg1.direction,seg2.direction);
@@ -407,12 +409,12 @@ void Math::getClosestPointsOnSegments(Vector3 &point1,Vector3 &point2,const Segm
 	// Make sure we don't have a very small segment somewhere, if so we treat it as a point
 	if(a<=epsilon){
 		point1=seg1.origin;
-		getClosestPointOnSegment(point2,seg2,point1);
+		project(point2,seg2,point1,true);
 		return;
 	}
 	else if(c<epsilon){
 		point2=seg2.origin;
-		getClosestPointOnSegment(point1,seg1,point2);
+		project(point1,seg1,point2,true);
 		return;
 	}
 

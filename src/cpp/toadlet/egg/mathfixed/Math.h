@@ -1410,9 +1410,9 @@ namespace Math{
 	TOADLET_API void slerp(Quaternion &r,const Quaternion &q1,const Quaternion &q2,fixed t);
 
 	// Segment operations
-	TOADLET_API void getClosestPointOnSegment(Vector3 &result,const Segment &segment,const Vector3 &point);
+	TOADLET_API void project(Vector3 &result,const Segment &segment,const Vector3 &point,bool limitToSegment);
 
-	TOADLET_API void getClosestPointsOnSegments(Vector3 &point1,Vector3 &point2,const Segment &seg1,const Segment &seg2,fixed epsilon);
+	TOADLET_API void project(Vector3 &point1,Vector3 &point2,const Segment &seg1,const Segment &seg2,fixed epsilon);
 
 	TOADLET_API bool unprojectSegment(Segment &result,const Matrix4x4 &projViewMatrix,int x,int y,unsigned int viewportX,unsigned int viewportY,unsigned int viewportWidth,unsigned int viewportHeight,Matrix4x4 &scratchMatrix);
 	inline bool unprojectSegment(Segment &result,const Matrix4x4 &projViewMatrix,int x,int y,unsigned int viewportX,unsigned int viewportY,unsigned int viewportWidth,unsigned int viewportHeight){Matrix4x4 scratchMatrix;return unprojectSegment(result,projViewMatrix,x,y,viewportX,viewportY,viewportWidth,viewportHeight,scratchMatrix);}
