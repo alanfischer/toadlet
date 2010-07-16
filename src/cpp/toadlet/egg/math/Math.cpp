@@ -382,7 +382,7 @@ void Math::slerp(Quaternion &r,const Quaternion &q1,const Quaternion &q2,real t)
 	r.w=scl1*q1.w + scl2*q2.w;
 }
 
-void Math::getClosestPointOnSegment(Vector3 &result,const Segment &segment,const Vector3 &point){
+void Math::project(Vector3 &result,const Segment &segment,const Vector3 &point,bool limitToSegment){
 	const Vector3 &o=segment.origin;
 	const Vector3 &d=segment.direction;
 	
@@ -391,15 +391,17 @@ void Math::getClosestPointOnSegment(Vector3 &result,const Segment &segment,const
 	}
 	else{
 		real u=(d.x*(point.x-o.x)+d.y*(point.y-o.y)+d.z*(point.z-o.z))/(d.x*d.x+d.y*d.y+d.z*d.z);
-		if(u<0) u=0;
-		else if(u>1) u=1;
+		if(limitToSegment){
+			if(u<0) u=0;
+			else if(u>1) u=1;
+		}
 		result.x=o.x+u*(d.x);
 		result.y=o.y+u*(d.y);
 		result.z=o.z+u*(d.z);
 	}
 }
 
-void Math::getClosestPointsOnSegments(Vector3 &point1,Vector3 &point2,const Segment &seg1, const Segment &seg2,real epsilon){
+void Math::project(Vector3 &point1,Vector3 &point2,const Segment &seg1, const Segment &seg2,real epsilon){
 	// For a full discussion of this method see Dan Sunday's Geometry Algorithms web site: http://www.geometryalgorithms.com/
 	real a=dot(seg1.direction,seg1.direction);
 	real b=dot(seg1.direction,seg2.direction);
@@ -408,12 +410,12 @@ void Math::getClosestPointsOnSegments(Vector3 &point1,Vector3 &point2,const Segm
 	// Make sure we don't have a very small segment somewhere, if so we treat it as a point
 	if(a<=epsilon){
 		point1=seg1.origin;
-		getClosestPointOnSegment(point2,seg2,point1);
+		project(point2,seg2,point1,true);
 		return;
 	}
 	else if(c<epsilon){
 		point2=seg2.origin;
-		getClosestPointOnSegment(point1,seg1,point2);
+		project(point1,seg1,point2,true);
 		return;
 	}
 
