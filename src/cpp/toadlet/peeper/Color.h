@@ -31,7 +31,7 @@
 namespace toadlet{
 namespace peeper{
 
-class Color{
+class TOADLET_API Color{
 public:
 	scalar r,g,b,a;
 

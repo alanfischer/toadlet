@@ -154,7 +154,7 @@ are using makefiles. A typical command might look like:
 
 
 3.5 OSX
-    Toadlet if OSX is easy to build using Xcode Projects. You only
+    Toadlet for OSX is easy to build using Xcode Projects. You only
 need to make sure you tell cmake to use the Xcode generator with
 the -G switch as follows:
 

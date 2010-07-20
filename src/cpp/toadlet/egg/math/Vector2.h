@@ -32,7 +32,7 @@ namespace toadlet{
 namespace egg{
 namespace math{
 
-class Vector2{
+class TOADLET_API Vector2{
 public:
 	real x,y;
 

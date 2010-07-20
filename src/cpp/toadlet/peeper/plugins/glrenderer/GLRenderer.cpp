@@ -159,17 +159,14 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 			String("glesem_getAccelerated result:")+glesemAcceleratedResult);
 
 		gl_version=glesem_gl_majorVersion*10+glesem_gl_minorVersion;
-	#elif defined(TOADLET_HAS_GLEW)
+	#elif defined(TOADLET_HAS_GLEW) && !defined(TOADLET_PLATFORM_OSX)
 		glewExperimental=true;
 		GLenum glewInitResult=glewInit();
 	
 		if(glewInitResult!=GLEW_OK){
-			// Skip the erroring on OSX, since it seems to error always at this point.
-			#if !defined(TOADLET_PLATFORM_OSX)
-				Error::unknown(Categories::TOADLET_PEEPER,
-				   "glewInit failed");
-				return false;
-			#endif
+			Error::unknown(Categories::TOADLET_PEEPER,
+			   "glewInit failed");
+			return false;
 		}
 
 		gl_version=GLEW_VERSION_2_1?21:(GLEW_VERSION_2_0?20:(GLEW_VERSION_1_5?15:(GLEW_VERSION_1_4?14:(GLEW_VERSION_1_3?13:(GLEW_VERSION_1_2?12:(GLEW_VERSION_1_1?11:00))))));
@@ -203,7 +200,9 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 	#endif
 
 	GLint maxTextureStages=0;
-	glGetIntegerv(GL_MAX_TEXTURE_UNITS,&maxTextureStages);
+	if(gl_version>10){ // 1.0 doesn't support multitexturing
+		glGetIntegerv(GL_MAX_TEXTURE_UNITS,&maxTextureStages);
+	}
 	if(maxTextureStages<=0){
 		maxTextureStages=1;
 	}

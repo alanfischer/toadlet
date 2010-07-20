@@ -32,7 +32,7 @@
 namespace toadlet{
 namespace pad{
 
-class OSXApplication:public BaseApplication{
+class TOADLET_API OSXApplication:public BaseApplication{
 public:
 	enum{
 		RendererPlugin_NONE=-1,

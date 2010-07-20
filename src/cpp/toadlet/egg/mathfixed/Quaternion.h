@@ -33,7 +33,7 @@ namespace toadlet{
 namespace egg{
 namespace mathfixed{
 
-class Quaternion{
+class TOADLET_API Quaternion{
 public:
 	fixed x,y,z,w;
 

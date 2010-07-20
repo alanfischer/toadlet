@@ -31,7 +31,7 @@
 namespace toadlet{
 namespace egg{
 
-class PointerCounter{
+class TOADLET_API PointerCounter{
 public:
 	PointerCounter(int c){
 		mSharedCount=c;

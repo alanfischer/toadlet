@@ -34,7 +34,7 @@ namespace toadlet{
 namespace egg{
 namespace mathfixed{ 
 
-class AABox{
+class TOADLET_API AABox{
 public:
 	inline AABox(){}
 	

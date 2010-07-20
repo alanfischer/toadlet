@@ -33,7 +33,7 @@ namespace toadlet{
 namespace egg{
 
 template<typename Type>
-class Collection{
+class TOADLET_API Collection{
 public:
 	TOADLET_SHARED_POINTERS(Collection);
 
