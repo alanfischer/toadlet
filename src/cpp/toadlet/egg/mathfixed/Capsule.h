@@ -34,7 +34,7 @@ namespace toadlet{
 namespace egg{
 namespace mathfixed{
 
-class Capsule{
+class TOADLET_API Capsule{
 public:
 	inline Capsule():radius(0){}
 

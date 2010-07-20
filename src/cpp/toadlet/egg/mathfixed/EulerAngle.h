@@ -32,7 +32,7 @@ namespace toadlet{
 namespace egg{
 namespace mathfixed{
 
-class EulerAngle{
+class TOADLET_API EulerAngle{
 public:
 	fixed x,y,z;
 

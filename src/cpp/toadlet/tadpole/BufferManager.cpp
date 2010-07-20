@@ -148,10 +148,10 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexF
 }
 
 IndexBuffer::ptr BufferManager::cloneIndexBuffer(IndexBuffer::ptr oldIndexBuffer,int usage,int access,IndexBuffer::IndexFormat indexFormat,int size){
-	IndexBuffer::IndexFormat oldIndexFormat=oldIndexBuffer->getIndexFormat();
 	int oldSize=oldIndexBuffer->getSize();
 
 	#if defined(TOADLET_DEBUG)
+		IndexBuffer::IndexFormat oldIndexFormat=oldIndexBuffer->getIndexFormat();
 		if(indexFormat!=oldIndexFormat){
 			Error::invalidParameters(Categories::TOADLET_TADPOLE,
 				"cloneWithNewParameters does not support changing size of elements");

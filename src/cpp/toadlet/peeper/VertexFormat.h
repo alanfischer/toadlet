@@ -76,7 +76,7 @@ public:
 
 	// static methods aren't allowed in Interfaces, but technically enums shouldn't be either, so these need to be separated to an alongside class
 	static int getFormatSize(int format){
-		int size;
+		int size=0;
 		if((format&(Format_BIT_UINT_8|Format_BIT_INT_8))>0){
 			size=1;
 		}

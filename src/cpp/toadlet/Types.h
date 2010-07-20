@@ -109,11 +109,11 @@
 		#error "Unknown byte order!"
 	#endif
 	#define TOADLET_C_API extern "C"
-	//#if defined(TOADLET_PLATFORM_OSX)
-		//#define TOADLET_API __attribute__ ((visibility("default")))
-	//#else
+	#if defined(TOADLET_PLATFORM_OSX)
+		#define TOADLET_API __attribute__((visibility("default")))
+	#else
 		#define TOADLET_API
-	//#endif
+	#endif
 	#if defined(TOADLET_PLATFORM_IPHONE)
 		#define TOADLET_GCC_INHERITANCE_BUG
 	#endif

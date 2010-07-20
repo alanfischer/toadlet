@@ -45,7 +45,7 @@ TextureManager::TextureManager(Engine *engine,bool backable):ResourceManager(eng
 }
 
 Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLevels){
-	Logger::debug(Categories::TOADLET_TADPOLE,"TextureManager.createTexture");
+	Logger::debug(Categories::TOADLET_TADPOLE,"TextureManager::createTexture");
 
 	Renderer *renderer=getRenderer();
 
@@ -166,7 +166,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 
 	manage(shared_static_cast<Texture>(texture));
 
-	Logger::debug(Categories::TOADLET_TADPOLE,"TextureManager.createTexture finished");
+	Logger::debug(Categories::TOADLET_TADPOLE,"TextureManager::createTexture finished");
 
 	return texture;
 }

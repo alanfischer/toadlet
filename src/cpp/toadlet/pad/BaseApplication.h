@@ -41,7 +41,7 @@ namespace pad{
 
 class ApplicationListener;
 
-class BaseApplication:public peeper::RenderTarget{
+class TOADLET_API BaseApplication:public peeper::RenderTarget{
 public:
 	TOADLET_SHARED_POINTERS(BaseApplication);
 

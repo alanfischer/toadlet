@@ -37,7 +37,7 @@ namespace egg{
 #else
 	template<typename Type,typename PointerSemantics>
 #endif
-class WeakPointer{
+class TOADLET_API WeakPointer{
 public:
 	inline WeakPointer(){
 		mPointer=NULL;

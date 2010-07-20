@@ -32,7 +32,7 @@ namespace toadlet{
 namespace egg{
 namespace math{
 
-class Segment{
+class TOADLET_API Segment{
 public:
 	inline Segment(){}
 

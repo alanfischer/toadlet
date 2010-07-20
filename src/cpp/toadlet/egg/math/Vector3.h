@@ -33,7 +33,7 @@ namespace toadlet{
 namespace egg{
 namespace math{
 
-class Vector3{
+class TOADLET_API Vector3{
 public:
 	real x,y,z;
 

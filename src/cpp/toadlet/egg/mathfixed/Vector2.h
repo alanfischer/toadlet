@@ -32,7 +32,7 @@ namespace toadlet{
 namespace egg{
 namespace mathfixed{
 
-class Vector2{
+class TOADLET_API Vector2{
 public:
 	fixed x,y;
 

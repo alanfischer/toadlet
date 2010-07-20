@@ -69,8 +69,8 @@ bool GLBuffer::create(int usage,int access,IndexFormat indexFormat,int size){
 	mTarget=GL_ELEMENT_ARRAY_BUFFER;
 	createContext();
 
-	mMapping=mRenderer->useMapping(this);
-	if(mRenderer->getCapabilitySet().hardwareIndexBuffers==false || mMapping==false){
+	mMapping=mRenderer->useMapping(this) && mRenderer->getCapabilitySet().hardwareIndexBuffers;
+	if(mMapping==false){
 		mData=new uint8[mDataSize];
 	}
 	
@@ -89,15 +89,10 @@ bool GLBuffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int si
 	mTarget=GL_ARRAY_BUFFER;
 	createContext();
 
-	mMapping=
-		#if defined(TOADLET_HAS_GLES)
-			false;
-		#else
-			mRenderer->getCapabilitySet().hardwareVertexBuffers && mRenderer->useMapping(this);
-		#endif
+	mMapping=mRenderer->useMapping(this) && mRenderer->getCapabilitySet().hardwareVertexBuffers;
 	if(mMapping==false){
 		mData=new uint8[mDataSize];
-	}
+		}
 
 	int i;
 	for(i=0;i<mVertexFormat->getNumElements();++i){

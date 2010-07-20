@@ -59,7 +59,7 @@ class WeakPointer;
 #else
 	template<typename Type,typename PointerSemantics=DefaultSharedSemantics>
 #endif
-class SharedPointer{
+class TOADLET_API SharedPointer{
 	class NullType{};
 public:
 	explicit inline SharedPointer(Type *pointer){

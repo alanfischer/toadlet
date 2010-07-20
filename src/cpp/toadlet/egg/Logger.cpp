@@ -256,7 +256,7 @@ void Logger::addCompleteLogString(Category *category,Level level,const String &d
 			#endif
 
 			#if defined(TOADLET_USE_STDERR_LOGGING)
-				fprintf(stderr,line);
+				fputs(line,stderr);
 			#endif
 
 //			if(level==Level_ERROR){
