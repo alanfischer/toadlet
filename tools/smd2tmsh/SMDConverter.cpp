@@ -318,7 +318,7 @@ String SMDConverter::readLine(Stream *stream){
 	String string;
 	char c=0;
 	while(stream->length()>stream->position()){
-		stream->read((byte*)&c,1);
+		stream->read((tbyte*)&c,1);
 		if(c==10 || c==13){
 			if(string.length()>0){
 				break;
