@@ -938,7 +938,7 @@ void BACConverter::writeOutModelVersion6(Stream *tout){
 	out << ") ; Figure" << std::endl;
 
 	std::string string=out.str();
-	tout->write((byte*)string.c_str(),string.length());
+	tout->write((tbyte*)string.c_str(),string.length());
 }
 
 void BACConverter::writeOutModelVersion5(Stream *tout){
@@ -956,7 +956,7 @@ void BACConverter::writeOutModelVersion5(Stream *tout){
 	}
 	out->writeLittleInt32(bacAttr);
 
-	byte dummy[8];
+	tbyte dummy[8];
 	memset(dummy,0,sizeof(dummy));
 	out->write(dummy,sizeof(dummy));
 
@@ -999,7 +999,7 @@ void BACConverter::writeOutModelVersion5(Stream *tout){
 			out->writeUInt8(0);
 		}
 
-		out->write((byte*)b->name.c_str(),b->name.length()+1);
+		out->write((tbyte*)b->name.c_str(),b->name.length()+1);
 
 		out->writeLittleFloat(b->translate.x);
 		out->writeLittleFloat(b->translate.y);
@@ -1390,7 +1390,7 @@ void BACConverter::writeOutAnimationVersion4(Stream *tout){
 	out << ") ; Figure" << std::endl;
 
 	std::string string=out.str();
-	tout->write((byte*)string.c_str(),string.length());
+	tout->write((tbyte*)string.c_str(),string.length());
 }
 
 void BACConverter::writeOutAnimationVersion3(Stream *tout){
@@ -1406,9 +1406,9 @@ void BACConverter::writeOutAnimationVersion3(Stream *tout){
 	for(i=0;i<mAnimationBones.size();++i){
 		BACAnimationBone *bone=mAnimationBones[i];
 
-		out->write((byte*)bone->name.c_str(),bone->name.length()+1);
+		out->write((tbyte*)bone->name.c_str(),bone->name.length()+1);
 
-		byte dummy[48];
+		tbyte dummy[48];
 		memset(dummy,0,sizeof(dummy));
 		out->write(dummy,sizeof(dummy));
 
