@@ -40,7 +40,7 @@ bool MicroMeshConverter::convertMesh(Mesh *mesh,Stream *outStream,float meshScal
 	DataStream::ptr out(new DataStream(outStream));
 
 	// Header
-	out->write((byte*)"TMMH",4);
+	out->write((tbyte*)"TMMH",4);
 
 	// Version 1 - Initial version
 	// Version 2 - Added skeleton information
