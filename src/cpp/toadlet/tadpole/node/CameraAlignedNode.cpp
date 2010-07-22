@@ -55,7 +55,8 @@ void CameraAlignedNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	super::queueRenderables(camera,queue);
 
 	if(mCameraAligned){
-		Matrix3x3 rotate;
+		Matrix3x3 rotate,localRotate;
+		Math::setMatrix3x3FromQuaternion(localRotate,mRotate);
 		if(camera->getAlignmentCalculationsUseOrigin()){
 			Vector3 nodeWorldTranslate; Math::setTranslateFromMatrix4x4(nodeWorldTranslate,mWorldTransform);
 			Vector3 cameraWorldTranslate; Math::setTranslateFromMatrix4x4(cameraWorldTranslate,camera->getWorldTransform());
@@ -65,6 +66,7 @@ void CameraAlignedNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 		else{
 			Math::setMatrix3x3FromMatrix4x4Transpose(rotate,camera->getViewTransform());
 		}
+		Math::postMul(rotate,localRotate);
 		Math::setMatrix4x4FromRotateScale(mWorldTransform,rotate,mWorldScale);
 	}
 
