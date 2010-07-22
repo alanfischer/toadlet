@@ -126,11 +126,11 @@ public:
 		return radius;
 	}
 
-	void TOADLET_API setLength(fixed length);
+	void setLength(fixed length);
 
-	fixed TOADLET_API getLength() const;
+	fixed getLength() const;
 
-	void TOADLET_API rotate(const Matrix3x3 &rotation);
+	void rotate(const Matrix3x3 &rotation);
 
 	inline bool equals(const Capsule &capsule) const{
 		return (capsule.origin.equals(origin) && capsule.direction.equals(direction) && capsule.radius==radius);

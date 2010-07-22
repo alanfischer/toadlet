@@ -62,9 +62,12 @@ set (TADPOLE_HANDLER_PLATFORM_OSX_SRC
 )
 
 set (TADPOLE_HANDLER_PLATFORM_WIN32_SRC
+	handler/platform/win32/Win32ResourceArchive.cpp
+)
+
+set (TADPOLE_HANDLER_PLATFORM_WIN32_GDIPLUS_SRC
 	handler/platform/win32/Win32FontHandler.cpp
 	handler/platform/win32/Win32TextureHandler.cpp
-	handler/platform/win32/Win32ResourceArchive.cpp
 )
 
 set (TADPOLE_MESH_SRC
@@ -173,11 +176,14 @@ set (TADPOLE_HANDLER_PLATFORM_OSX_HEADERS
 ) 
 
 set (TADPOLE_HANDLER_PLATFORM_WIN32_HEADERS
+	handler/platform/win32/Win32ResourceArchive.h
+)
+
+set (TADPOLE_HANDLER_PLATFORM_WIN32_GDIPLUS_HEADERS
 	handler/platform/win32/StreamIStream.h
 	handler/platform/win32/Win32FontHandler.h
 	handler/platform/win32/Win32TextureHandler.h
-	handler/platform/win32/Win32ResourceArchive.h
-) 
+)
 
 set (TADPOLE_MESH_HEADERS
 	mesh/Mesh.h
@@ -301,11 +307,15 @@ elseif (TOADLET_PLATFORM_WIN32)
 	if (GDIPLUS_FOUND)
 		set (TOADLET_HAS_GDIPLUS ON PARENT_SCOPE)
 		include_directories (${GDIPLUS_INCLUDE_PATH})
-		source_group ("Source Files\\\\handler\\\\platform\\\\win32" FILES ${TADPOLE_HANDLER_PLATFORM_WIN32_SRC})
-		source_group ("Header Files\\\\handler\\\\platform\\\\win32" FILES ${TADPOLE_HANDLER_PLATFORM_WIN32_HEADERS})
-		set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_PLATFORM_WIN32_SRC})
-		set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_PLATFORM_WIN32_HEADERS})
+		source_group ("Source Files\\\\handler\\\\platform\\\\win32" FILES ${TADPOLE_HANDLER_PLATFORM_GDIPLUS_WIN32_SRC})
+		source_group ("Header Files\\\\handler\\\\platform\\\\win32" FILES ${TADPOLE_HANDLER_PLATFORM_GDIPLUS_WIN32_HEADERS})
+		set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_PLATFORM_GDIPLUS_WIN32_SRC})
+		set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_PLATFORM_GDIPLUS_WIN32_HEADERS})
 	endif (GDIPLUS_FOUND)
+	source_group ("Source Files\\\\handler\\\\platform\\\\win32" FILES ${TADPOLE_HANDLER_PLATFORM_WIN32_SRC})
+	source_group ("Header Files\\\\handler\\\\platform\\\\win32" FILES ${TADPOLE_HANDLER_PLATFORM_WIN32_HEADERS})
+	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_HANDLER_PLATFORM_WIN32_SRC})
+	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_HANDLER_PLATFORM_WIN32_HEADERS})
 endif (TOADLET_PLATFORM_OSX)
 
 
