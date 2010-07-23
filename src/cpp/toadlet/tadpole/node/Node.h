@@ -162,6 +162,7 @@ public:
 		Math::mul(r.origin,scale,s.radius);
 		r.radius=Math::maxVal(Math::maxVal(r.origin.x,r.origin.y),r.origin.z);
 		Math::mul(r.origin,rotate,s.origin);
+		Math::mul(r.origin,scale);
 		Math::add(r.origin,translate);
 	}
 

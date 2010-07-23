@@ -102,8 +102,7 @@ void PartitionNode::queueRenderables(Node *node,CameraNode *camera,RenderQueue *
 }
 
 bool PartitionNode::culled(Node *node,CameraNode *camera){
-//	return (node->getScope()&camera->getScope())==0 || camera->culled(node->getWorldBound());
-return false;
+	return (node->getScope()&camera->getScope())==0 || camera->culled(node->getWorldBound());
 }
 
 }
