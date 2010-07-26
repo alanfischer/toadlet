@@ -58,6 +58,13 @@
 
 #include <toadlet/tadpole/animation/Animation.h>
 #include <toadlet/tadpole/animation/AnimationController.h>
+#include <toadlet/tadpole/animation/AnimationControllerFinishedListener.h>
+#include <toadlet/tadpole/animation/CameraProjectionAnimation.h>
+#include <toadlet/tadpole/animation/MaterialColorAnimation.h>
+#include <toadlet/tadpole/animation/NodePathAnimation.h>
+#include <toadlet/tadpole/animation/SkeletonAnimation.h>
+#include <toadlet/tadpole/animation/TextureMatrixAnimation.h>
+#include <toadlet/tadpole/animation/TextureStageAnimation.h>
 
 #include <toadlet/tadpole/bsp/BSP30Handler.h>
 #include <toadlet/tadpole/bsp/BSP30Map.h>

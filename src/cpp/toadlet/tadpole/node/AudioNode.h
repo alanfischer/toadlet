@@ -50,7 +50,7 @@ public:
 	inline bool getPlaying() const{if(mAudio!=NULL){return mAudio->getPlaying();}else{return false;}}
 	inline bool getFinished() const{if(mAudio!=NULL){return mAudio->getFinished();}else{return false;}}
 
-	inline void setGain(scalar gain){if(mAudio!=NULL){setGain(gain);}}
+	inline void setGain(scalar gain){if(mAudio!=NULL){mAudio->setGain(gain);}}
 	inline void fadeToGain(scalar gain,int time){if(mAudio!=NULL){mAudio->fadeToGain(gain,time);}}
 	inline scalar getGain() const{if(mAudio!=NULL){return mAudio->getGain();}else{return 0;}}
 

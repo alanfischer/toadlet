@@ -47,7 +47,7 @@ public:
 	virtual bool getPlaying() const{return false;}
 	virtual bool getFinished() const{return false;}
 
-	virtual void setGain(scalar gain){}
+	virtual void setGain(scalar gain);
 	virtual void fadeToGain(scalar gain,int time){}
 	virtual scalar getGain() const{return 0;}
 
