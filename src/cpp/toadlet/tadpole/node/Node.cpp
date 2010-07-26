@@ -299,24 +299,6 @@ void Node::tryDeactivate(){
 
 bool Node::getTransformUpdated(){return mScene->getFrame()==mTransformUpdatedFrame;}
 
-void Node::logicUpdateListeners(int dt){
-	if(mNodeListeners!=NULL){
-		int i;
-		for(i=0;i<mNodeListeners->size();++i){
-			mNodeListeners->at(i)->logicUpdate(this,dt);
-		}
-	}
-}
-
-void Node::frameUpdateListeners(int dt){
-	if(mNodeListeners!=NULL){
-		int i;
-		for(i=0;i<mNodeListeners->size();++i){
-			mNodeListeners->at(i)->frameUpdate(this,dt);
-		}
-	}
-}
-
 void Node::updateWorldTransform(){
 	if(mParent==NULL){
 		mWorldScale.set(mScale);
@@ -345,6 +327,24 @@ void Node::updateWorldTransform(){
 void Node::transformUpdated(){
 	mTransformUpdatedFrame=mScene->getFrame();
 	activate();
+}
+
+void Node::logicUpdateListeners(int dt){
+	if(mNodeListeners!=NULL){
+		int i;
+		for(i=0;i<mNodeListeners->size();++i){
+			mNodeListeners->at(i)->logicUpdate(this,dt);
+		}
+	}
+}
+
+void Node::frameUpdateListeners(int dt){
+	if(mNodeListeners!=NULL){
+		int i;
+		for(i=0;i<mNodeListeners->size();++i){
+			mNodeListeners->at(i)->frameUpdate(this,dt);
+		}
+	}
 }
 
 }

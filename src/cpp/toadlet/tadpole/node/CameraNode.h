@@ -29,6 +29,7 @@
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/peeper/Color.h>
 #include <toadlet/peeper/Viewport.h>
+#include <toadlet/peeper/Renderer.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -64,7 +65,6 @@ public:
 	virtual void setWorldLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up);
 	virtual void setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up);
 	virtual void setWorldLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up);
-	virtual void setTarget(Node *node);
 
 	virtual void setViewport(const peeper::Viewport &viewport);
 	virtual void setViewport(int x,int y,int width,int height);
@@ -100,6 +100,8 @@ public:
 	inline const Matrix4x4 &getViewTransform() const{return mViewTransform;}
 	inline const Vector3 &getForward() const{return mForward;}
 
+	virtual void render(peeper::Renderer *renderer,Node *node=NULL);
+
 	/// @todo: These should probably be moved into the Math library, and passing in a list of planes
 	virtual bool culled(const Sphere &sphere) const;
 	virtual bool culled(const AABox &box);
@@ -107,9 +109,10 @@ public:
 	virtual void updateFramesPerSecond();
 	inline scalar getFramesPerSecond() const{return mFPS;}
 
+	virtual void updateWorldTransform();
+
 protected:
 	virtual void projectionUpdated();
-	virtual void updateWorldTransform();
 	virtual void updateViewTransform();
 	virtual void updateMidNode();
 
@@ -126,7 +129,6 @@ protected:
 	bool mSkipFirstClear;
 	bool mAlignmentCalculationsUseOrigin;
 	ParentNode::ptr mMidNode;
-	Node::ptr mTarget;
 
 	Matrix4x4 mViewTransform;
 	Matrix4x4 mViewProjectionTransform;

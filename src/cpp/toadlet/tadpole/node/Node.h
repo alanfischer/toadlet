@@ -142,6 +142,9 @@ public:
 	inline bool active() const{return mActive;}
 	bool getTransformUpdated();
 
+	virtual void updateWorldTransform();
+	virtual void transformUpdated();
+
 	inline Engine *getEngine() const{return mEngine;}
 	inline Scene *getScene() const{return mScene;}
 
@@ -198,8 +201,6 @@ public:
 protected:
 	virtual void logicUpdateListeners(int dt);
 	virtual void frameUpdateListeners(int dt);
-	virtual void updateWorldTransform();
-	virtual void transformUpdated();
 
 	// Allocation items
 	egg::PointerCounter *mPointerCounter;

@@ -52,7 +52,6 @@ CameraNode::CameraNode():super(),
 	mSkipFirstClear(false),
 	mAlignmentCalculationsUseOrigin(false),
 	//mMidNode,
-	//mTarget,
 
 	//mWorldTranslate,
 	//mViewTransform,
@@ -236,11 +235,6 @@ void CameraNode::setWorldLookDir(const Vector3 &eye,const Vector3 &dir,const Vec
 	transformUpdated();
 }
 
-void CameraNode::setTarget(Node *node){
-	mTarget=node;
-	setDependsUpon(mTarget);
-}
-
 void CameraNode::setViewport(const Viewport &viewport){
 	mViewportSet=true;
 	mViewport.set(viewport);
@@ -266,15 +260,15 @@ void CameraNode::projectionUpdated(){
 }
 
 void CameraNode::updateWorldTransform(){
-	if(mTarget!=NULL){
-		setLookAt(getTranslate(),mTarget->getWorldTranslate(),Math::Z_UNIT_VECTOR3);
-	}
-
 	super::updateWorldTransform();
-	
+
 	Math::mul(mForward,mWorldTransform,Math::NEG_Z_UNIT_VECTOR3);
 
 	updateViewTransform();
+}
+
+void CameraNode::render(Renderer *renderer,Node *node){
+	mScene->render(renderer,this,node);
 }
 
 bool CameraNode::culled(const Sphere &sphere) const{

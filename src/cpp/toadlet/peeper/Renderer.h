@@ -166,7 +166,7 @@ public:
 	virtual void setLightEffect(const LightEffect &lightEffect)=0;
 	virtual void setFill(const Fill &fill)=0;
 	virtual void setShading(const Shading &shading)=0;
-	virtual void setColorWrite(bool color)=0;
+	virtual void setColorWrite(bool r,bool g,bool b,bool a)=0;
 	virtual void setNormalize(const Normalize &normalize)=0;
 	virtual void setDepthBias(scalar constant,scalar slope)=0;
 	virtual void setTexturePerspective(bool texturePerspective)=0;
