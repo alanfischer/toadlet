@@ -839,16 +839,13 @@ void D3D9Renderer::setShading(const Shading &shading){
 	}
 }
 
-void D3D9Renderer::setColorWrite(bool color){
-	if(color){
-		mD3DDevice->SetRenderState(D3DRS_COLORWRITEENABLE,	D3DCOLORWRITEENABLE_RED		|
-															D3DCOLORWRITEENABLE_GREEN	|
-															D3DCOLORWRITEENABLE_BLUE	|
-															D3DCOLORWRITEENABLE_ALPHA);
-	}
-	else{
-		mD3DDevice->SetRenderState(D3DRS_COLORWRITEENABLE,0);
-	}
+void D3D9Renderer::setColorWrite(bool r,bool g,bool b,bool a){
+	mD3DDevice->SetRenderState(D3DRS_COLORWRITEENABLE,
+		(r?D3DCOLORWRITEENABLE_RED:0)	|
+		(g?D3DCOLORWRITEENABLE_GREEN:0)	|
+		(b?D3DCOLORWRITEENABLE_BLUE:0)	|
+		(a?D3DCOLORWRITEENABLE_ALPHA:0)
+	);
 }
 
 void D3D9Renderer::setNormalize(const Normalize &normalize){

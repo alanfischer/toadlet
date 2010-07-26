@@ -1006,13 +1006,8 @@ void GLRenderer::setShading(const Shading &shading){
 	TOADLET_CHECK_GLERROR("setShading");
 }
 
-void GLRenderer::setColorWrite(bool color){
-	if(color){
-		glColorMask(true,true,true,true);
-	}
-	else{
-		glColorMask(false,false,false,false);
-	}
+void GLRenderer::setColorWrite(bool r,bool g,bool b,bool a){
+	glColorMask(r,g,b,a);
 
 	TOADLET_CHECK_GLERROR("setColorWrite");
 }
