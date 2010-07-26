@@ -35,14 +35,14 @@ namespace animation{
 
 class TextureMatrixAnimation:public Animation{
 public:
-	TOADLET_SHARED_POINTERS(TextureMatrixAnimation,Animation);
+	TOADLET_SHARED_POINTERS(TextureMatrixAnimation);
 
 	TextureMatrixAnimation(peeper::TextureStage::ptr target){mTarget=target;}
 	virtual ~TextureMatrixAnimation(){}
 
 	void setTarget(peeper::TextureStage::ptr target){
 		mTarget=target;
-		mOffset.set(target->getTextureMatrix());
+		mOffset.set(target->getMatrix());
 	}
 	inline peeper::TextureStage::ptr getTarget() const{return mTarget;}
 
@@ -52,7 +52,7 @@ public:
 		Math::setMatrix4x4AsTextureRotation(matrix);
 		Matrix4x4 &temp=cache_set_temp;
 		Math::mul(temp,mOffset,matrix);
-		mTarget->setTextureMatrix(temp);
+		mTarget->setCalculation(peeper::TextureStage::Calculation_NORMAL,temp);
 	}
 
 	scalar getMin() const{return 0;}

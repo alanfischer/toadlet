@@ -97,6 +97,13 @@ bool Win32Audio::stop(){
 	return true;
 }
 
+void Win32Audio::setGain(scalar gain){
+	if(gain<0) gain=0;
+	if(gain>Math::ONE) gain=Math::ONE;
+	DWORD volume=0xFFFF*gain / Math::ONE;
+	waveOutSetVolume(mPlayer->getWaveOut(),(volume<<16) | volume);
+}
+
 void Win32Audio::setLooping(bool looping){
 	Win32AudioBuffer *audioBuffer=((Win32AudioBuffer*)mAudioBuffer->getRootAudioBuffer());
 	audioBuffer->setLoopCount(looping?Extents::MAX_INT:0);
