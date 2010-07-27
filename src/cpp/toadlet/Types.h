@@ -110,7 +110,7 @@
 	#endif
 	#define TOADLET_C_API extern "C"
 	#if defined(TOADLET_PLATFORM_OSX)
-		#define TOADLET_API __attribute__((visibility("default")))
+		#define TOADLET_API __attribute__ ((visibility("default")))
 	#else
 		#define TOADLET_API
 	#endif
