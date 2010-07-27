@@ -28,6 +28,8 @@
 
 #include <toadlet/egg/Categories.h>
 #include <toadlet/egg/String.h>
+#include <toadlet/egg/StackTraceListener.h>
+#include <toadlet/egg/ErrorHandler.h>
 
 #if defined(TOADLET_EXCEPTIONS)
 	#include <toadlet/egg/Exception.h>
@@ -52,7 +54,7 @@
 namespace toadlet{
 namespace egg{
 
-class TOADLET_API Error{
+class TOADLET_API Error:public StackTraceListener{
 public:
 	enum Type{
 		// General errors
@@ -119,6 +121,11 @@ public:
 	// a value other than ERROR_NONE
 	const char *getDescription();
 
+	void installHandler();
+	void uninstallHandler();
+
+	void backtrace(char **stack,int count);
+
 protected:
 	Error();
 
@@ -129,6 +136,8 @@ protected:
 	static const int MAX_DESCRIPTION_LENGTH=1024;
 	int mLastError;
 	char mLastDescription[MAX_DESCRIPTION_LENGTH+1];
+
+	ErrorHandler mErrorHandler;
 };
 
 }
