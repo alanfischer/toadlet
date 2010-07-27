@@ -93,5 +93,22 @@ void Error::errorLog(const String &categoryName,const String &description){
 	Logger::getInstance()->addLogString(categoryName,Logger::Level_ERROR,description);
 }
 
+void Error::installHandler(){
+	mErrorHandler.installHandler();
+}
+	
+void Error::uninstallHandler(){
+	mErrorHandler.uninstallHandler();
+}
+	
+void Error::backtrace(char **stack,int count){
+	Logger::getInstance()->addLogString(Logger::Level_ERROR,"Backtrace starting");
+	int i;
+	for(i=0;i<count;++i){
+		Logger::getInstance()->addLogString(Logger::Level_ERROR,stack[i]);
+	}
+	Logger::getInstance()->addLogString(Logger::Level_ERROR,"Backtrace ended");
+}
+	
 }
 }

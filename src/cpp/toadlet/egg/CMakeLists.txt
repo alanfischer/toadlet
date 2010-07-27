@@ -84,10 +84,15 @@ set (EGG_NET_PLATFORM_WINCE_SRC
 
 set (EGG_PLATFORM_POSIX_SRC
 	platform/posix/PosixDynamicLibrary.cpp
+	platform/posix/PosixErrorHandler.cpp
 	platform/posix/PosixMutex.cpp
 	platform/posix/PosixSystem.cpp
 	platform/posix/PosixThread.cpp
 	platform/posix/PosixWaitCondition.cpp
+)
+
+set (EGG_PLATFORM_POSIX_OSX_SRC
+	platform/posix/PosixErrorHandler_osx.mm
 )
 
 set (EGG_PLATFORM_WIN32_SRC
@@ -229,10 +234,14 @@ set (EGG_NET_PLATFORM_WINCE_HEADERS
 
 set (EGG_PLATFORM_POSIX_HEADERS
 	platform/posix/PosixDynamicLibrary.h
+	platform/posix/PosixErrorHandler.h
 	platform/posix/PosixMutex.h
 	platform/posix/PosixSystem.h
 	platform/posix/PosixThread.h
 	platform/posix/PosixWaitCondition.h
+)
+
+set (EGG_PLATFORM_POSIX_OSX_HEADERS
 )
 
 set (EGG_PLATFORM_WIN32_HEADERS
@@ -292,6 +301,14 @@ elseif (TOADLET_PLATFORM_POSIX)
 	set (EGG_SRC ${EGG_SRC} ${EGG_PLATFORM_POSIX_SRC})
 	set (EGG_HEADERS ${EGG_HEADERS} ${EGG_PLATFORM_POSIX_HEADERS})
 	set (EGG_LIBS ${EGG_LIBS} pthread)
+	if (TOADLET_PLATFORM_OSX)
+		source_group ("Source Files\\\\platform\\\\posix" FILES ${EGG_PLATFORM_POSIX_OSX_SRC})
+		source_group ("Header Files\\\\platform\\\\posix" FILES ${EGG_PLATFORM_POSIX_OSX_HEADERS})
+		set (EGG_SRC ${EGG_SRC} ${EGG_PLATFORM_POSIX_OSX_SRC})
+		set (EGG_HEADERS ${EGG_HEADERS} ${EGG_PLATFORM_POSIX_OSX_HEADERS})
+		find_library (FOUNDATION_LIBS Foundation)
+		set (EGG_LIBS objc ${EGG_LIBS} ${FOUNDATION_LIBS})
+	endif (TOADLET_PLATFORM_OSX)
 endif (TOADLET_PLATFORM_WIN32)
 
 
