@@ -74,10 +74,10 @@ if (TOADLET_PLATFORM_WIN32)
 	set (DYNAMIC_LIB_PROPS ${DYNAMIC_LIB_PROPS} LINK_FLAGS ${DYNAMIC_LIB_LINK})
 	set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} LINK_FLAGS ${STATIC_LIB_LINK})
 endif (TOADLET_PLATFORM_WIN32)
-if (TOADLET_PLATFORM_IPHONE)
-	# iPhone builds require hidden visibility in their libraries
-	set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS "-fvisibility=hidden")
-endif (TOADLET_PLATFORM_IPHONE)
+if (TOADLET_PLATFORM_IPHONE OR TOADLET_PLATFORM_OSX)
+	# iPhone/osx builds require hidden visibility in their libraries
+	set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS "-fvisibility-inlines-hidden")
+endif (TOADLET_PLATFORM_IPHONE OR TOADLET_PLATFORM_OSX)
 
 
 # Add the individual toadlet libraries
