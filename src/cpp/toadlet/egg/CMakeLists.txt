@@ -97,6 +97,7 @@ set (EGG_PLATFORM_POSIX_OSX_SRC
 
 set (EGG_PLATFORM_WIN32_SRC
 	platform/win32/Win32DynamicLibrary.cpp
+	platform/win32/Win32ErrorHandler.cpp
 	platform/win32/Win32Mutex.cpp
 	platform/win32/Win32System.cpp
 	platform/win32/Win32Thread.cpp
@@ -246,6 +247,7 @@ set (EGG_PLATFORM_POSIX_OSX_HEADERS
 
 set (EGG_PLATFORM_WIN32_HEADERS
 	platform/win32/Win32DynamicLibrary.h
+	platform/win32/Win32ErrorHandler.h
 	platform/win32/Win32Mutex.h
 	platform/win32/Win32System.h
 	platform/win32/Win32Thread.h
