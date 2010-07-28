@@ -3,6 +3,8 @@
 #include <execinfo.h>
 #include <string.h> //memset
 
+#include <stdio.h>
+
 namespace toadlet{
 namespace egg{
 
@@ -15,7 +17,7 @@ int PosixErrorHandler::mSignals[]={
 	SIGQUIT,
 	SIGILL ,
 	SIGTRAP,
-	SIGABRT,
+//	SIGABRT,
 	SIGEMT ,
 	SIGFPE ,
 	SIGBUS ,
@@ -28,15 +30,18 @@ int PosixErrorHandler::mSignals[]={
 	0,
 };
 
-StackTraceListener *PosixErrorHandler::mListener;
+PosixErrorHandler *PosixErrorHandler::instance=NULL;
 
-PosixErrorHandler::PosixErrorHandler(){
+PosixErrorHandler::PosixErrorHandler():
+	mListener(NULL)
+{
 	memset(&mAction,0,sizeof(mAction));
-	mListener=NULL;
+	instance=this;
 }
 
 PosixErrorHandler::~PosixErrorHandler(){
 	uninstallHandler();
+	instance=NULL;
 }
 
 void PosixErrorHandler::installHandler(){
@@ -74,7 +79,8 @@ void PosixErrorHandler::uninstallHandler(){
 void PosixErrorHandler::signalHandler(int sig,siginfo_t *info,void *context){
 	void *backtraceFrames[128];
 	int frameCount=backtrace(backtraceFrames,128);
-	handleFrames(backtraceFrames,frameCount);
+	instance->handleFrames(backtraceFrames,frameCount);
+	instance->errorHandled();
 }
 
 void PosixErrorHandler::handleFrames(void **frames,int count){
@@ -83,6 +89,10 @@ void PosixErrorHandler::handleFrames(void **frames,int count){
 		mListener->backtrace(strings,count);
 	}
 	free(strings);
+}
+	
+void PosixErrorHandler::errorHandled(){
+	abort();
 }
 
 }
