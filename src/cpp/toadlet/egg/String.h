@@ -27,6 +27,9 @@
 #define TOADLET_EGG_STRING_H
 
 #include <toadlet/Types.h>
+#if defined(__OBJC__)
+	#import <Foundation/Foundation.h>
+#endif
 
 namespace toadlet{
 namespace egg{
@@ -50,11 +53,15 @@ public:
 	static const int npos=-1;
 
 	String();
-	String(const char *text);
-	String(const unsigned char *text);
+	void internal_String(const char *text);
+	inline String(const char *text){internal_String(text);}
+	void internal_String(const unsigned char *text);
+	inline String(const unsigned char *text){internal_String(text);}
 	void internal_String(const stringchar *text);
 	inline String(const wchar *text){internal_String((const stringchar*)text);}
-
+	#if defined(__OBJC__)
+		inline String(NSString *string){internal_String([string UTF8String]);}
+	#endif
 	String(const String &string);
 	explicit String(int length);
 
@@ -115,6 +122,10 @@ public:
 	const stringchar *internal_wc_str() const;
 	inline const wchar *wc_str() const{return (const wchar*)internal_wc_str();}
 	inline operator const wchar *() const{return wc_str();}
+
+	#if defined(__OBJC__)
+		inline operator NSString *() const{return [NSString stringWithUTF8String:c_str()];}
+	#endif
 
 	inline wchar at(int i) const{return mData[i];}
 
