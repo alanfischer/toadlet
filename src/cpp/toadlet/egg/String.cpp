@@ -67,7 +67,7 @@ String::String(){
 	mNarrowData=NULL;
 }
 
-String::String(const char *text){
+void String::internal_String(const char *text){
 	if(text==NULL){
 		mLength=0;
 		mData=new stringchar[1];
@@ -85,7 +85,7 @@ String::String(const char *text){
 	update();
 }
 
-String::String(const unsigned char *text){
+void String::internal_String(const unsigned char *text){
 	if(text==NULL){
 		mLength=0;
 		mData=new stringchar[1];
