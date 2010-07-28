@@ -51,6 +51,8 @@ void Error::destroy(){
 Error::Error(){
 	mLastError=Type_NONE;
 	memset(mLastDescription,0,sizeof(mLastDescription));
+
+	mErrorHandler.setStackTraceListener(this);
 }
 
 void Error::setError(int error){

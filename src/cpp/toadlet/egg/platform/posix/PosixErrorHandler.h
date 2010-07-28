@@ -17,14 +17,18 @@ public:
 
 	virtual void installHandler();
 	virtual void uninstallHandler();
-	
-	static void handleFrames(void **frames,int count);
+
+	virtual void handleFrames(void **frames,int count);
+	virtual void errorHandled();
+
+	static PosixErrorHandler *instance;
 
 protected:
 	static void signalHandler(int sig,siginfo_t *info,void *context);
 
 	static int mSignals[NSIG];
-	static StackTraceListener *mListener;
+
+	StackTraceListener *mListener;
 
 	struct sigaction mAction;
 	struct sigaction mOldActions[NSIG];

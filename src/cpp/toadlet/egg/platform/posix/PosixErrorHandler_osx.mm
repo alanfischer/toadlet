@@ -15,7 +15,9 @@ void PosixErrorHandler_exceptionHandler(NSException *exception){
 	for(i=0;i<frameCount;i++){
 		backtraceFrames[i]=(void*)[[callStackArray objectAtIndex:i] unsignedIntegerValue];
 	}
-	PosixErrorHandler::handleFrames(backtraceFrames,frameCount);
+	
+	PosixErrorHandler::instance->handleFrames(backtraceFrames,frameCount);
+	PosixErrorHandler::instance->errorHandled();
 }
 
 void PosixErrorHandler_installNSHandler(){
