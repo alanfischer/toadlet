@@ -190,7 +190,7 @@ int GIFHandler::getNextImage(GifFileType *gifFile,Image *&image,int &frameDelay)
 				if(mWorking==NULL){
 					mWorking=Image::createAndReallocate(Image::Dimension_D2,format,width,height);
 					if(mWorking==NULL){
-						return NULL;
+						return GIF_ERROR;
 					}
 
 					memset(mWorking->getData(),0,pixelSize*width*height);
@@ -202,7 +202,7 @@ int GIFHandler::getNextImage(GifFileType *gifFile,Image *&image,int &frameDelay)
 				if(mBase==NULL){
 					mBase=Image::createAndReallocate(Image::Dimension_D2,format,width,height);
 					if(mBase==NULL){
-						return NULL;
+						return GIF_ERROR;
 					}
 					
 					memset(mWorking->getData(),0,pixelSize*width*height);
