@@ -86,6 +86,7 @@
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/ParticleNode.h>
 #include <toadlet/tadpole/node/PartitionNode.h>
+#include <toadlet/tadpole/node/RedBlueCameraNode.h>
 #include <toadlet/tadpole/node/SkeletonParentNode.h>
 #include <toadlet/tadpole/node/SpriteNode.h>
 #include <toadlet/tadpole/node/NodeListener.h>

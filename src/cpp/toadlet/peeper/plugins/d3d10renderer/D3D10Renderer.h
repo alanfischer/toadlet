@@ -95,7 +95,7 @@ D3D10_PASS_DESC passDesc;
 	void setLightEffect(const LightEffect &lightEffect);
 	void setFill(const Fill &fill);
 	void setShading(const Shading &shading);
-	void setColorWrite(bool color);
+	void setColorWrite(bool r,bool b,bool g,bool a);
 	void setNormalize(const Normalize &normalize);
 	void setDepthBias(scalar constant,scalar slope);
 	void setTexturePerspective(bool texturePerspective);
