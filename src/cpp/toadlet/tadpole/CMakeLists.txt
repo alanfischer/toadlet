@@ -89,6 +89,7 @@ set (TADPOLE_NODE_SRC
 	node/ParentNode.cpp
 	node/ParticleNode.cpp
 	node/PartitionNode.cpp
+	node/RedBlueCameraNode.cpp
 	node/SkeletonParentNode.cpp
 	node/SpriteNode.cpp
 )
@@ -205,6 +206,7 @@ set (TADPOLE_NODE_HEADERS
 	node/ParentNode.h
 	node/ParticleNode.h
 	node/PartitionNode.h
+	node/RedBlueCameraNode.h
 	node/SkeletonParentNode.h
 	node/SpriteNode.h
 )
