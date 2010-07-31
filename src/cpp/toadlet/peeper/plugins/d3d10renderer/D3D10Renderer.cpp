@@ -624,7 +624,7 @@ void D3D10Renderer::setProgram(const Program *program){
 void D3D10Renderer::setShading(const Shading &shading){
 }
 
-void D3D10Renderer::setColorWrite(bool color){
+void D3D10Renderer::setColorWrite(bool r,bool g,bool b,bool a){
 }
 
 void D3D10Renderer::setNormalize(const Normalize &normalize){

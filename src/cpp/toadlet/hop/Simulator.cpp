@@ -1176,6 +1176,10 @@ void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment 
 		}
 		result.scope=(scope|collision.scope);
 	}
+
+	if(result.time==Math::ONE){
+		segment.getEndPoint(result.point);
+	}
 }
 
 void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,const Segment &segment,int collideWithBits){
@@ -1228,6 +1232,10 @@ void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,con
 			}
 		}
 		result.scope=(scope|collision.scope);
+	}
+
+	if(result.time==Math::ONE){
+		segment.getEndPoint(result.point);
 	}
 }
 
