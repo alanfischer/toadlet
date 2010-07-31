@@ -77,7 +77,7 @@ bool GLFBOSurfaceRenderTarget::destroy(){
 	if(mRenderer==NULL || mRenderer->getRenderTarget()->getRootRenderTarget()==(GLRenderTarget*)this){
 		glBindFramebuffer(GL_FRAMEBUFFER,0);
 	}
-
+ 
 	int i;
 	for(i=0;i<mOwnedSurfaces.size();++i){
 		mOwnedSurfaces[i]->destroy();
@@ -88,6 +88,8 @@ bool GLFBOSurfaceRenderTarget::destroy(){
 		glDeleteFramebuffers(1,&mHandle);
 		mHandle=0;
 	}
+
+	mRenderer=NULL;
 
 	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::destroy");
 
