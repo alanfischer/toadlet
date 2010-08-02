@@ -77,6 +77,7 @@ set (TADPOLE_MESH_SRC
 )
 
 set (TADPOLE_NODE_SRC
+	node/AnaglyphCameraNode.cpp
 	node/AnimationControllerNode.cpp
 	node/AudioNode.cpp
 	node/CameraNode.cpp
@@ -89,7 +90,6 @@ set (TADPOLE_NODE_SRC
 	node/ParentNode.cpp
 	node/ParticleNode.cpp
 	node/PartitionNode.cpp
-	node/RedBlueCameraNode.cpp
 	node/SkeletonParentNode.cpp
 	node/SpriteNode.cpp
 )
@@ -193,6 +193,7 @@ set (TADPOLE_MESH_HEADERS
 )
 
 set (TADPOLE_NODE_HEADERS
+	node/AnaglyphCameraNode.h
 	node/AnimationControllerNode.h
 	node/AudioNode.h
 	node/CameraNode.h
@@ -206,7 +207,6 @@ set (TADPOLE_NODE_HEADERS
 	node/ParentNode.h
 	node/ParticleNode.h
 	node/PartitionNode.h
-	node/RedBlueCameraNode.h
 	node/SkeletonParentNode.h
 	node/SpriteNode.h
 )

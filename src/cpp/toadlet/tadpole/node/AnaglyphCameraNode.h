@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_REDBLUECAMERANODE_H
-#define TOADLET_TADPOLE_REDBLUECAMERANODE_H
+#ifndef TOADLET_TADPOLE_ANAGLYPHCAMERANODE_H
+#define TOADLET_TADPOLE_ANAGLYPHCAMERANODE_H
 
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/peeper/SurfaceRenderTarget.h>
@@ -35,17 +35,23 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class RedBlueCameraNode:public CameraNode{
+class AnaglyphCameraNode:public CameraNode{
 public:
-	TOADLET_NODE(RedBlueCameraNode,CameraNode);
+	TOADLET_NODE(AnaglyphCameraNode,CameraNode);
 
-	RedBlueCameraNode();
+	AnaglyphCameraNode();
 
 	Node *create(Scene *scene);
 	void destroy();
 
 	void setSeparation(scalar separation){mSeparation=separation;}
 	scalar getSeparation() const{return mSeparation;}
+
+	void setLeftColor(const peeper::Color &color){mLeftMaterial->setLightEffect(peeper::LightEffect(color));}
+	const peeper::Color &getLeftColor() const{return mLeftMaterial->getLightEffect().diffuse;}
+
+	void setRightColor(const peeper::Color &color){mRightMaterial->setLightEffect(peeper::LightEffect(color));}
+	const peeper::Color &getRightColor() const{return mLeftMaterial->getLightEffect().diffuse;}
 
 	virtual void render(peeper::Renderer *renderer,Node *node);
 
@@ -54,12 +60,12 @@ protected:
 
 	peeper::VertexData::ptr mVertexData;
 	peeper::IndexData::ptr mIndexData;
-	peeper::Texture::ptr mRedTexture;
-	peeper::SurfaceRenderTarget::ptr mRedRenderTarget;
-	Material::ptr mRedMaterial;
-	peeper::Texture::ptr mBlueTexture;
-	peeper::SurfaceRenderTarget::ptr mBlueRenderTarget;
-	Material::ptr mBlueMaterial;
+	peeper::Texture::ptr mLeftTexture;
+	peeper::SurfaceRenderTarget::ptr mLeftRenderTarget;
+	Material::ptr mLeftMaterial;
+	peeper::Texture::ptr mRightTexture;
+	peeper::SurfaceRenderTarget::ptr mRightRenderTarget;
+	Material::ptr mRightMaterial;
 };
 
 }
