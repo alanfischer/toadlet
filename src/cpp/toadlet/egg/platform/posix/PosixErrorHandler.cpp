@@ -18,7 +18,7 @@ int PosixErrorHandler::mSignals[]={
 	SIGILL ,
 	SIGTRAP,
 //	SIGABRT,
-	SIGEMT ,
+//	SIGEMT ,
 	SIGFPE ,
 	SIGBUS ,
 	SIGSEGV,
