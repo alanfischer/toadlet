@@ -55,7 +55,7 @@ public:
 	virtual int getWidth() const{return mWidth;}
 	virtual int getHeight() const{return mHeight;}
 	virtual int getDepth() const{return mDepth;}
-	virtual int getNumMipLevels() const{return mMipLevels;}
+	virtual int getNumMipLevels() const{return 1;}
 	virtual scalar getLength() const{return 0;}
 
 	virtual Surface::ptr getMipSurface(int level,int cubeSide);
@@ -72,7 +72,6 @@ protected:
 	int mWidth;
 	int mHeight;
 	int mDepth;
-	int mMipLevels;
 
 	int mRowPitch;
 	int mSlicePitch;

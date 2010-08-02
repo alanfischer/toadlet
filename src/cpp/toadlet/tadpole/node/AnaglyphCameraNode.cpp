@@ -25,7 +25,7 @@
 
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
-#include <toadlet/tadpole/node/RedBlueCameraNode.h>
+#include <toadlet/tadpole/node/AnaglyphCameraNode.h>
 
 using namespace toadlet;
 using namespace toadlet::egg;
@@ -35,25 +35,25 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-TOADLET_NODE_IMPLEMENT(RedBlueCameraNode,Categories::TOADLET_TADPOLE_NODE+".RedBlueCameraNode");
+TOADLET_NODE_IMPLEMENT(AnaglyphCameraNode,Categories::TOADLET_TADPOLE_NODE+".AnaglyphCameraNode");
 
-RedBlueCameraNode::RedBlueCameraNode():super(),mSeparation(Math::ONE){
+AnaglyphCameraNode::AnaglyphCameraNode():super(),mSeparation(Math::ONE){
 }
 
-Node *RedBlueCameraNode::create(Scene *scene){
+Node *AnaglyphCameraNode::create(Scene *scene){
 	super::create(scene);
 
 	int flags=Texture::Usage_BIT_RENDERTARGET;
 	int size=1024;//Math::nextPowerOf2((getWidth()<getHeight()?getWidth():getHeight())/2);
 	int format=Texture::Format_L_8;
 
-	mRedTexture=mEngine->getTextureManager()->createTexture(flags,Texture::Dimension_D2,format,size,size,0,1);
-	mRedRenderTarget=mEngine->getTextureManager()->createSurfaceRenderTarget();
-	mRedRenderTarget->attach(mRedTexture->getMipSurface(0,0),SurfaceRenderTarget::Attachment_COLOR_0);
+	mLeftTexture=mEngine->getTextureManager()->createTexture(flags,Texture::Dimension_D2,format,size,size,0,1);
+	mLeftRenderTarget=mEngine->getTextureManager()->createSurfaceRenderTarget();
+	mLeftRenderTarget->attach(mLeftTexture->getMipSurface(0,0),SurfaceRenderTarget::Attachment_COLOR_0);
 
-	mBlueTexture=mEngine->getTextureManager()->createTexture(flags,Texture::Dimension_D2,format,size,size,0,1);
-	mBlueRenderTarget=mEngine->getTextureManager()->createSurfaceRenderTarget();
-	mBlueRenderTarget->attach(mBlueTexture->getMipSurface(0,0),SurfaceRenderTarget::Attachment_COLOR_0);
+	mRightTexture=mEngine->getTextureManager()->createTexture(flags,Texture::Dimension_D2,format,size,size,0,1);
+	mRightRenderTarget=mEngine->getTextureManager()->createSurfaceRenderTarget();
+	mRightRenderTarget->attach(mRightTexture->getMipSurface(0,0),SurfaceRenderTarget::Attachment_COLOR_0);
 
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,4);
 	VertexBufferAccessor vba(vertexBuffer);
@@ -73,45 +73,45 @@ Node *RedBlueCameraNode::create(Scene *scene){
 	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,vertexBuffer->getSize()));
 
-	mRedMaterial=mEngine->getMaterialManager()->createMaterial();
-	mRedMaterial->setDepthTest(Renderer::DepthTest_NONE);
-	mRedMaterial->setLighting(true);
-	mRedMaterial->setLightEffect(LightEffect(Color(2.0,0,0,1)));
-	mRedMaterial->setTextureStage(0,TextureStage::ptr(new TextureStage(mRedTexture)));
-	mRedMaterial->retain();
+	mLeftMaterial=mEngine->getMaterialManager()->createMaterial();
+	mLeftMaterial->setDepthTest(Renderer::DepthTest_NONE);
+	mLeftMaterial->setLighting(true);
+	mLeftMaterial->setLightEffect(LightEffect(Colors::RED));
+	mLeftMaterial->setTextureStage(0,TextureStage::ptr(new TextureStage(mLeftTexture)));
+	mLeftMaterial->retain();
 
-	mBlueMaterial=mEngine->getMaterialManager()->createMaterial();
-	mBlueMaterial->setDepthTest(Renderer::DepthTest_NONE);
-	mBlueMaterial->setLighting(true);
-	mBlueMaterial->setLightEffect(LightEffect(Color(0,0,2.0,1)));
-	mBlueMaterial->setBlend(Blend::Combination_COLOR_ADDITIVE);
-	mBlueMaterial->setTextureStage(0,TextureStage::ptr(new TextureStage(mBlueTexture)));
-	mBlueMaterial->retain();
+	mRightMaterial=mEngine->getMaterialManager()->createMaterial();
+	mRightMaterial->setDepthTest(Renderer::DepthTest_NONE);
+	mRightMaterial->setLighting(true);
+	mRightMaterial->setLightEffect(LightEffect(Colors::CYAN));
+	mRightMaterial->setTextureStage(0,TextureStage::ptr(new TextureStage(mRightTexture)));
+	mRightMaterial->setBlend(Blend::Combination_COLOR_ADDITIVE);
+	mRightMaterial->retain();
 
 	return this;
 }
 
-void RedBlueCameraNode::destroy(){
-	mRedRenderTarget->destroy();
-	mBlueRenderTarget->destroy();
+void AnaglyphCameraNode::destroy(){
+	mLeftRenderTarget->destroy();
+	mRightRenderTarget->destroy();
 
-	mRedMaterial->release();
-	mBlueMaterial->release();
+	mLeftMaterial->release();
+	mRightMaterial->release();
 
 	super::destroy();
 }
 
-void RedBlueCameraNode::render(Renderer *renderer,Node *node){
+void AnaglyphCameraNode::render(Renderer *renderer,Node *node){
 	Vector3 translate=getTranslate();
 
-	renderer->setRenderTarget(mRedRenderTarget);
+	renderer->setRenderTarget(mLeftRenderTarget);
 	translate.x-=mSeparation;
 	setTranslate(translate);
 	updateWorldTransform();
 		mScene->render(renderer,this,NULL);
 	renderer->swap();
 
-	renderer->setRenderTarget(mBlueRenderTarget);
+	renderer->setRenderTarget(mRightRenderTarget);
 	translate.x+=2*mSeparation;
 	setTranslate(translate);
 	updateWorldTransform();
@@ -137,9 +137,9 @@ void RedBlueCameraNode::render(Renderer *renderer,Node *node){
 	renderer->setProjectionMatrix(matrix);
 	renderer->setViewMatrix(Math::IDENTITY_MATRIX4X4);
 	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
-	mRedMaterial->setupRenderer(renderer);
+	mLeftMaterial->setupRenderer(renderer);
 	renderer->renderPrimitive(mVertexData,mIndexData);
-	mBlueMaterial->setupRenderer(renderer);
+	mRightMaterial->setupRenderer(renderer);
 	renderer->renderPrimitive(mVertexData,mIndexData);
 }
 

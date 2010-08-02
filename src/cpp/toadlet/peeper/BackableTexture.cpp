@@ -40,7 +40,6 @@ BackableTexture::BackableTexture():BaseResource(),
 	mWidth(0),
 	mHeight(0),
 	mDepth(0),
-	mMipLevels(0),
 	
 	mRowPitch(0),
 	mSlicePitch(0),
@@ -61,7 +60,6 @@ bool BackableTexture::create(int usage,Dimension dimension,int format,int width,
 	mWidth=width;
 	mHeight=height;
 	mDepth=depth;
-	mMipLevels=mipLevels;
 
 	mRowPitch=ImageFormatConversion::getPixelSize(mFormat)*mWidth;
 	mSlicePitch=mRowPitch*mHeight;
