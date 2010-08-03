@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_IMAGE_BMPHANDLER_H
-#define TOADLET_EGG_IMAGE_BMPHANDLER_H
+#ifndef TOADLET_EGG_IMAGE_TGAHANDLER_H
+#define TOADLET_EGG_IMAGE_TGAHANDLER_H
 
 #include <toadlet/egg/image/Image.h>
 #include <toadlet/egg/io/Stream.h>
@@ -33,10 +33,10 @@ namespace toadlet{
 namespace egg{
 namespace image{
 
-class TOADLET_API BMPHandler{
+class TOADLET_API TGAHandler{
 public:
-	BMPHandler();
-	virtual ~BMPHandler();
+	TGAHandler();
+	virtual ~TGAHandler();
 
 	virtual Image *loadImage(io::Stream *stream);
 	virtual bool saveImage(Image *image,io::Stream *stream);

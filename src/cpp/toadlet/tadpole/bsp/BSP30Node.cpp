@@ -32,8 +32,6 @@
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/bsp/BSP30Node.h>
 #include <toadlet/tadpole/bsp/BSP30Handler.h>
-#include <toadlet/tadpole/node/MeshNode.h>
-#include <toadlet/tadpole/handler/WADArchive.h>
 #include <string.h> // memset
 
 using namespace toadlet::egg;
@@ -194,25 +192,47 @@ void BSP30Node::setMap(BSP30Map::ptr map){
 		findBoundLeafs(indexes,node);
 		insertNodeLeafIndexes(indexes,node);
 	}
+}
 
-	Logger::debug(Categories::TOADLET_TADPOLE,"Creating skybox");
+void BSP30Node::setSkyName(const String &skyName){
+	mSkyName=skyName;
 
-	// START: Needs to be removed, or a map/member setting, so skyboxes could be added outside of this class
-	Texture::ptr bottom=mEngine->getTextureManager()->findTexture("nightsky/nightsky_down.png");
-	Texture::ptr top=mEngine->getTextureManager()->findTexture("nightsky/nightsky_up.png");
-	Texture::ptr left=mEngine->getTextureManager()->findTexture("nightsky/nightsky_west.png");
-	Texture::ptr right=mEngine->getTextureManager()->findTexture("nightsky/nightsky_east.png");
-	Texture::ptr back=mEngine->getTextureManager()->findTexture("nightsky/nightsky_south.png");
-	Texture::ptr front=mEngine->getTextureManager()->findTexture("nightsky/nightsky_north.png");
+	setSkyTextures(
+		skyName+"dn.tga",
+		skyName+"up.tga",
+		skyName+"ft.tga",
+		skyName+"bk.tga",
+		skyName+"rt.tga",
+		skyName+"lf.tga"
+	);
+}
 
-	Mesh::ptr mesh=mEngine->getMeshManager()->createSkyBox(1024,false,false,bottom,top,left,right,back,front);
-	for(i=0;i<mesh->subMeshes.size();++i){
-		mesh->subMeshes[i]->material->setLayer(-1);
+void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const String &skyWest,const String &skyEast,const String &skySouth,const String &skyNorth){
+	Logger::debug(Categories::TOADLET_TADPOLE,"Creating sky box");
+
+	if(mSkyNode!=NULL){
+		mSkyNode->destroy();
+		mSkyNode=NULL;
 	}
 
-	node::MeshNode::ptr node=mEngine->createNodeType(node::MeshNode::type(),getScene());
-	node->setMesh(mesh);
-	mScene->getBackground()->attach(node);
+	Texture::ptr down=mEngine->getTextureManager()->findTexture(skyDown);
+	Texture::ptr up=mEngine->getTextureManager()->findTexture(skyUp);
+	Texture::ptr front=mEngine->getTextureManager()->findTexture(skyWest);
+	Texture::ptr back=mEngine->getTextureManager()->findTexture(skyEast);
+	Texture::ptr right=mEngine->getTextureManager()->findTexture(skySouth);
+	Texture::ptr left=mEngine->getTextureManager()->findTexture(skyNorth);
+
+	if(down!=NULL || up!=NULL || front!=NULL || back!=NULL || right!=NULL || left==NULL){
+		Mesh::ptr mesh=mEngine->getMeshManager()->createSkyBox(1024,false,false,down,up,front,back,right,left);
+		int i;
+		for(i=0;i<mesh->subMeshes.size();++i){
+			mesh->subMeshes[i]->material->setLayer(-1);
+		}
+
+		mSkyNode=mEngine->createNodeType(node::MeshNode::type(),getScene());
+		mSkyNode->setMesh(mesh);
+		mScene->getBackground()->attach(mSkyNode);
+	}
 }
 
 void BSP30Node::nodeAttached(Node *node){

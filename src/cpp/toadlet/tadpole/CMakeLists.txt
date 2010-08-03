@@ -153,6 +153,7 @@ set (TADPOLE_HANDLER_HEADERS
 	handler/MMSHHandler.h
 	handler/PNGHandler.h
 	handler/SPRHandler.h
+	handler/TGAHandler.h
 	handler/TPKGHandler.h
 	handler/WADArchive.h
 	handler/WADHandler.h
