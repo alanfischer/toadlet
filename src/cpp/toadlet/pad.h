@@ -28,4 +28,7 @@
 
 #include <toadlet/pad/Application.h>
 
+using namespace toadlet;
+using namespace toadlet::pad;
+
 #endif

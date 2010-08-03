@@ -96,4 +96,11 @@
 #include <toadlet/tadpole/plugins/hop/HopEntity.h>
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
 
+using namespace toadlet;
+using namespace toadlet::tadpole;
+using namespace toadlet::tadpole::animation;
+using namespace toadlet::tadpole::bsp;
+using namespace toadlet::tadpole::mesh;
+using namespace toadlet::tadpole::node;
+
 #endif

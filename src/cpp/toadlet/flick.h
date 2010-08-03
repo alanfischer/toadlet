@@ -29,4 +29,7 @@
 #include <toadlet/flick/FilteredMotionDetector.h>
 #include <toadlet/flick/MotionDetector.h>
 
+using namespace toadlet;
+using namespace toadlet::flick;
+
 #endif
