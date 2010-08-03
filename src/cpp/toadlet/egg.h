@@ -65,4 +65,9 @@
 
 #include <toadlet/egg/net/Socket.h>
 
+using namespace toadlet;
+using namespace toadlet::egg;
+using namespace toadlet::egg::image;
+using namespace toadlet::egg::io;
+
 #endif

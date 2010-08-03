@@ -34,4 +34,7 @@
 #include <toadlet/hop/Solid.h>
 #include <toadlet/hop/TraceCallback.h>
 
+using namespace toadlet;
+using namespace toadlet::hop;
+
 #endif

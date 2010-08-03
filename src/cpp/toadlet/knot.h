@@ -46,4 +46,8 @@
 #include <toadlet/knot/event/BaseClientUpdateEvent.h>
 #include <toadlet/knot/event/BaseServerUpdateEvent.h>
 
+using namespace toadlet;
+using namespace toadlet::knot;
+using namespace toadlet::knot::event;
+
 #endif
