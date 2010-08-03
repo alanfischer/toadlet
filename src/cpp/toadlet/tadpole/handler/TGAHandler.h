@@ -23,48 +23,40 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANAGLYPHCAMERANODE_H
-#define TOADLET_TADPOLE_ANAGLYPHCAMERANODE_H
+#ifndef TOADLET_TADPOLE_HANDLER_TGAHANDLER_H
+#define TOADLET_TADPOLE_HANDLER_TGAHANDLER_H
 
+#include <toadlet/egg/image/TGAHandler.h>
 #include <toadlet/peeper/Texture.h>
-#include <toadlet/peeper/SurfaceRenderTarget.h>
-#include <toadlet/tadpole/node/CameraNode.h>
+#include <toadlet/tadpole/ResourceHandler.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
+namespace handler{
 
-class AnaglyphCameraNode:public CameraNode{
+class TOADLET_API TGAHandler:public ResourceHandler{
 public:
-	TOADLET_NODE(AnaglyphCameraNode,CameraNode);
+	TOADLET_SHARED_POINTERS(TGAHandler);
 
-	AnaglyphCameraNode();
+	TGAHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 
-	Node *create(Scene *scene);
-	void destroy();
+	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData){
+		egg::image::Image::ptr image(mHandler.loadImage(stream));
+		if(image!=NULL){
+			return mTextureManager->createTexture(image);
+		}
+		else{
+			return NULL;
+		}
+	}
 
-	void setSeparation(scalar separation){mSeparation=separation;}
-	scalar getSeparation() const{return mSeparation;}
-
-	void setLeftColor(const peeper::Color &color);
-	const peeper::Color &getLeftColor() const{return mLeftColor;}
-
-	void setRightColor(const peeper::Color &color);
-	const peeper::Color &getRightColor() const{return mRightColor;}
-
-	virtual void render(peeper::Renderer *renderer,Node *node);
+	bool save(peeper::Texture::ptr resource,egg::io::Stream::ptr stream){
+		return mHandler.saveImage(mTextureManager->createImage(resource),stream);
+	}
 
 protected:
-	scalar mSeparation;
-
-	peeper::Texture::ptr mLeftTexture;
-	peeper::SurfaceRenderTarget::ptr mLeftRenderTarget;
-	peeper::Color mLeftColor;
-	Material::ptr mLeftMaterial;
-	peeper::Texture::ptr mRightTexture;
-	peeper::SurfaceRenderTarget::ptr mRightRenderTarget;
-	peeper::Color mRightColor;
-	Material::ptr mRightMaterial;
+	TextureManager *mTextureManager;
+	egg::image::TGAHandler mHandler;
 };
 
 }
@@ -72,3 +64,4 @@ protected:
 }
 
 #endif
+

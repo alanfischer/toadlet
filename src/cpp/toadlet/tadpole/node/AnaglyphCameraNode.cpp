@@ -55,24 +55,6 @@ Node *AnaglyphCameraNode::create(Scene *scene){
 	mRightRenderTarget=mEngine->getTextureManager()->createSurfaceRenderTarget();
 	mRightRenderTarget->attach(mRightTexture->getMipSurface(0,0),SurfaceRenderTarget::Attachment_COLOR_0);
 
-	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,4);
-	VertexBufferAccessor vba(vertexBuffer);
-	vba.set3(0,0,0,0,0);
-	vba.set3(0,1,0,0,0);
-	vba.set2(0,2,0,1);
-	vba.set3(1,0,1,0,0);
-	vba.set3(1,1,0,0,0);
-	vba.set2(1,2,1,1);
-	vba.set3(2,0,0,1,0);
-	vba.set3(2,1,0,0,0);
-	vba.set2(2,2,0,0);
-	vba.set3(3,0,1,1,0);
-	vba.set3(3,1,0,0,0);
-	vba.set2(3,2,1,0);
-	vba.unlock();
-	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
-	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,vertexBuffer->getSize()));
-
 	mLeftMaterial=mEngine->getMaterialManager()->createMaterial();
 	mLeftMaterial->setDepthTest(Renderer::DepthTest_NONE);
 	mLeftMaterial->setLighting(true);
@@ -99,6 +81,16 @@ void AnaglyphCameraNode::destroy(){
 	mRightMaterial->release();
 
 	super::destroy();
+}
+
+void AnaglyphCameraNode::setLeftColor(const Color &color){
+	mLeftColor.set(color);
+	mLeftMaterial->setLightEffect(LightEffect(mLeftColor));
+}
+
+void AnaglyphCameraNode::setRightColor(const Color &color){
+	mRightColor.set(color);
+	mRightMaterial->setLightEffect(LightEffect(mRightColor));
 }
 
 void AnaglyphCameraNode::render(Renderer *renderer,Node *node){
@@ -132,15 +124,15 @@ void AnaglyphCameraNode::render(Renderer *renderer,Node *node){
 		renderer->setViewport(viewport.set(0,0,renderTarget->getWidth(),renderTarget->getHeight()));
 	}
 
-	Matrix4x4 matrix;
-	Math::setMatrix4x4FromOrtho(matrix,0,1,0,1,-1,1);
-	renderer->setProjectionMatrix(matrix);
+	renderer->setProjectionMatrix(mOverlayMatrix);
 	renderer->setViewMatrix(Math::IDENTITY_MATRIX4X4);
 	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
 	mLeftMaterial->setupRenderer(renderer);
-	renderer->renderPrimitive(mVertexData,mIndexData);
+	renderer->renderPrimitive(mOverlayVertexData,mOverlayIndexData);
 	mRightMaterial->setupRenderer(renderer);
-	renderer->renderPrimitive(mVertexData,mIndexData);
+	renderer->renderPrimitive(mOverlayVertexData,mOverlayIndexData);
+
+	renderOverlayGamma(renderer);
 }
 
 }

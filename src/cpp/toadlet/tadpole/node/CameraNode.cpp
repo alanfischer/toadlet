@@ -51,11 +51,15 @@ CameraNode::CameraNode():super(),
 	//mClearColor,
 	mSkipFirstClear(false),
 	mAlignmentCalculationsUseOrigin(false),
-	//mMidNode,
 
 	//mWorldTranslate,
 	//mViewTransform,
 	//mForward,
+	//mOverlayMatrix,
+	//mOverlayVertexData,
+	//mOverlayIndexData,
+	mGamma(0),
+	//mGammaMaterial,
 
 	mFPSLastTime(0),
 	mFPSFrameCount(0),
@@ -71,13 +75,48 @@ Node *CameraNode::create(Scene *scene){
 	mClearFlags=Renderer::ClearFlag_COLOR|Renderer::ClearFlag_DEPTH;
 	mClearColor.reset();
 	mSkipFirstClear=false;
-	mMidNode=NULL;
+
+	Math::setMatrix4x4FromOrtho(mOverlayMatrix,0,Math::ONE,0,Math::ONE,-Math::ONE,Math::ONE);
+
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,4);
+	VertexBufferAccessor vba(vertexBuffer);
+	vba.set3(0,0,0,0,0);
+	vba.set3(0,1,0,0,0);
+	vba.set2(0,2,0,1);
+	vba.set3(1,0,1,0,0);
+	vba.set3(1,1,0,0,0);
+	vba.set2(1,2,1,1);
+	vba.set3(2,0,0,1,0);
+	vba.set3(2,1,0,0,0);
+	vba.set2(2,2,0,0);
+	vba.set3(3,0,1,1,0);
+	vba.set3(3,1,0,0,0);
+	vba.set2(3,2,1,0);
+	vba.unlock();
+	mOverlayVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+	mOverlayIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,vertexBuffer->getSize()));
+
+	mGamma=Math::ONE;
+	mGammaMaterial=mEngine->getMaterialManager()->createMaterial();
+	mGammaMaterial->setDepthTest(Renderer::DepthTest_NONE);
+	mGammaMaterial->setLighting(true);
+	mGammaMaterial->setLightEffect(LightEffect(Colors::BLACK));
+	mGammaMaterial->setBlend(Blend::Combination_COLOR_ADDITIVE);
+	mGammaMaterial->retain();
 
 	mFPSLastTime=0;
 	mFPSFrameCount=0;
 	mFPS=0;
 
 	return this;
+}
+
+void CameraNode::destroy(){
+	mGammaMaterial->release();
+	mOverlayVertexData->destroy();
+	mOverlayIndexData->destroy();
+
+	super::destroy();
 }
 
 void CameraNode::setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,scalar farDist){
@@ -245,18 +284,13 @@ void CameraNode::setViewport(int x,int y,int width,int height){
 	mViewport.set(x,y,width,height);
 }
 
-ParentNode::ptr CameraNode::getMidNode(){
-	if(mMidNode==NULL){
-		mMidNode=mEngine->createNodeType(ParentNode::type(),getScene());
-		attach(mMidNode);
-		updateMidNode();
-	}
-	return mMidNode;
+void CameraNode::setGamma(scalar gamma){
+	mGamma=gamma;
+	mGammaMaterial->setLightEffect(LightEffect(Color(gamma-Math::ONE,gamma-Math::ONE,gamma-Math::ONE,Math::ONE)));
 }
 
 void CameraNode::projectionUpdated(){
 	updateViewTransform();
-	updateMidNode();
 }
 
 void CameraNode::updateWorldTransform(){
@@ -269,6 +303,8 @@ void CameraNode::updateWorldTransform(){
 
 void CameraNode::render(Renderer *renderer,Node *node){
 	mScene->render(renderer,this,node);
+
+	renderOverlayGamma(renderer);
 }
 
 bool CameraNode::culled(const Sphere &sphere) const{
@@ -344,9 +380,13 @@ void CameraNode::updateViewTransform(){
 	Math::normalize(mClipPlanes[5].set(vpt[3]+vpt[2], vpt[7]+vpt[6], vpt[11]+vpt[10], vpt[15]+vpt[14]));
 }
 
-void CameraNode::updateMidNode(){
-	if(mMidNode!=NULL){
-		mMidNode->setTranslate(0,0,-(mFarDist-mNearDist)/2);
+void CameraNode::renderOverlayGamma(Renderer *renderer){
+	if(mGamma!=Math::ONE){
+		mGammaMaterial->setupRenderer(renderer);
+		renderer->setProjectionMatrix(mOverlayMatrix);
+		renderer->setViewMatrix(Math::IDENTITY_MATRIX4X4);
+		renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
+		renderer->renderPrimitive(mOverlayVertexData,mOverlayIndexData);
 	}
 }
 
