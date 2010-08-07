@@ -121,7 +121,6 @@ Mesh::ptr MeshManager::createBox(const AABox &box){
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
 	subMesh->material=mEngine->getMaterialManager()->createMaterial();
 	subMesh->material->retain();
-	subMesh->material->setFaceCulling(Renderer::FaceCulling_BACK);
 	subMesh->material->setLighting(true);
 
 	Mesh::ptr mesh(new Mesh());
@@ -311,7 +310,6 @@ Mesh::ptr MeshManager::createSphere(const Sphere &sphere,int numSegments,int num
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
 	subMesh->material=mEngine->getMaterialManager()->createMaterial();
 	subMesh->material->retain();
-	subMesh->material->setFaceCulling(Renderer::FaceCulling_BACK);
 	subMesh->material->setLighting(true);
 
 	Mesh::ptr mesh(new Mesh());
@@ -319,6 +317,76 @@ Mesh::ptr MeshManager::createSphere(const Sphere &sphere,int numSegments,int num
 	mesh->subMeshes[0]=subMesh;
 	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 	mesh->bound.set(sphere);
+
+	return mesh;
+}
+
+Mesh::ptr MeshManager::createSkyDome(scalar radius,int numSegments,int numRings,Texture::ptr texture){
+	int numVertexes=(numRings+1)*(numSegments+1);
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,numVertexes);
+	int numIndexes=6*numRings*(numSegments+1);
+	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,numIndexes);
+
+	{
+		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
+		iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
+
+		scalar deltaRingAngle=Math::div(Math::HALF_PI,Math::fromInt(numRings));
+		scalar deltaSegAngle=Math::div(Math::TWO_PI,Math::fromInt(numSegments));
+		unsigned short verticeIndex=0;
+		unsigned short indexIndex=0;
+
+		Vector3 normal;
+
+		// Generate the group of rings for the sphere
+		int ring;
+		for(ring=0;ring<=numRings;++ring){
+			scalar r0=Math::mul(radius,Math::sin(Math::mul(Math::fromInt(ring),deltaRingAngle)));
+			scalar z0=Math::mul(radius,Math::cos(Math::mul(Math::fromInt(ring),deltaRingAngle)));
+
+			// Generate the group of segments for the current ring
+			int seg;
+			for(seg=0;seg<=numSegments;seg++){
+				scalar x0=Math::mul(r0,Math::cos(Math::mul(Math::fromInt(seg),deltaSegAngle)));
+				scalar y0=Math::mul(r0,Math::sin(Math::mul(Math::fromInt(seg),deltaSegAngle)));
+
+				// Add one vertex to the strip which makes up the sphere
+				vba.set3(verticeIndex,0,x0,y0,z0);
+				normal.set(x0,y0,z0);
+				Math::normalize(normal);
+				vba.set3(verticeIndex,1,normal.x,normal.y,normal.z);
+
+				vba.set2(verticeIndex,2,normal.x*(1-normal.z)/2+Math::HALF,normal.y*(1-normal.z)/2+Math::HALF);
+
+				if(ring!=numRings){
+					iba.set(indexIndex++,verticeIndex+numSegments);
+					iba.set(indexIndex++,verticeIndex);
+					iba.set(indexIndex++,verticeIndex+numSegments+1);
+					iba.set(indexIndex++,verticeIndex);
+					iba.set(indexIndex++,verticeIndex+1);
+					iba.set(indexIndex++,verticeIndex+numSegments+1);
+				}
+				verticeIndex++;
+			}
+		}
+
+		iba.unlock();
+		vba.unlock();
+	}
+
+	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
+	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
+	subMesh->material=mEngine->getMaterialManager()->createMaterial();
+	subMesh->material->retain();
+	subMesh->material->setDepthWrite(false);
+	subMesh->material->setLighting(false);
+	subMesh->material->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(texture,true));
+
+	Mesh::ptr mesh(new Mesh());
+	mesh->subMeshes.resize(1);
+	mesh->subMeshes[0]=subMesh;
+	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+	mesh->bound.radius=radius;
 
 	return mesh;
 }
@@ -469,7 +537,6 @@ Mesh::ptr MeshManager::createGeoSphere(const Sphere &sphere,int depth,bool icosa
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
 	subMesh->material=mEngine->getMaterialManager()->createMaterial();
 	subMesh->material->retain();
-	subMesh->material->setFaceCulling(Renderer::FaceCulling_BACK);
 	subMesh->material->setLighting(true);
 
 	Mesh::ptr mesh(new Mesh());
@@ -526,7 +593,6 @@ Mesh::ptr MeshManager::createTorus(scalar majorRadius,scalar minorRadius,int num
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,vertexBuffer->getSize()));
 	subMesh->material=mEngine->getMaterialManager()->createMaterial();
 	subMesh->material->retain();
-	subMesh->material->setFaceCulling(Renderer::FaceCulling_BACK);
 	subMesh->material->setLighting(true);
 
 	Mesh::ptr mesh(new Mesh());

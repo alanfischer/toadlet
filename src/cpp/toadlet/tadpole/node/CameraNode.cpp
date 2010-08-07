@@ -307,6 +307,10 @@ void CameraNode::render(Renderer *renderer,Node *node){
 	renderOverlayGamma(renderer);
 }
 
+bool CameraNode::culled(Node *node){
+	return (node->getScope()&getScope())==0 || culled(node->getWorldBound());
+}
+
 bool CameraNode::culled(const Sphere &sphere) const{
 	if(sphere.radius<0) return false;
 	scalar distance=0;
@@ -320,7 +324,7 @@ bool CameraNode::culled(const Sphere &sphere) const{
 	return false;
 }
 
-bool CameraNode::culled(const AABox &box){
+bool CameraNode::culled(const AABox &box) const{
 	int i;
 	for(i=0;i<6;i++){
 		if(box.findPVertexLength(mClipPlanes[i])<0){

@@ -318,7 +318,10 @@ void BSP30Node::queueRenderables(CameraNode *camera,RenderQueue *queue){
 		}
 
 		for(i=0;i<mChildren.size();++i){
-			super::queueRenderables(mChildren[i],camera,queue);
+			Node *child=mChildren[i];
+			if(camera->culled(child)==false){
+				child->queueRenderables(camera,queue);
+			}
 		}
 	}
 	else{
@@ -338,8 +341,8 @@ void BSP30Node::queueRenderables(CameraNode *camera,RenderQueue *queue){
 					childdata *data=(childdata*)occupant->getParentData();
 					if(data->counter!=mCounter){
 						data->counter=mCounter;
-						if(culled(occupant,camera)==false){
-							super::queueRenderables(occupant,camera,queue);
+						if(camera->culled(occupant)==false){
+							occupant->queueRenderables(camera,queue);
 						}
 					}
 				}
@@ -349,7 +352,9 @@ void BSP30Node::queueRenderables(CameraNode *camera,RenderQueue *queue){
 		const Collection<Node*> &occupants=mGlobalLeafData.occupants;
 		for(j=0;j<occupants.size();++j){
 			Node *occupant=occupants[j];
-			super::queueRenderables(occupant,camera,queue);
+			if(camera->culled(occupant)==false){
+				occupant->queueRenderables(camera,queue);
+			}
 		}
 	}
 }

@@ -207,6 +207,17 @@ void ParentNode::frameUpdate(int dt,int scope){
 	}
 }
 
+void ParentNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
+	int numChildren=getNumChildren();
+	int i;
+	for(i=0;i<numChildren;++i){
+		Node *child=getChild(i);
+		if(camera->culled(child)==false){
+			child->queueRenderables(camera,queue);
+		}
+	}
+}
+
 void ParentNode::mergeWorldBound(Node *child,bool justAttached){
 	Node::merge(mWorldBound,child->getWorldBound());
 }
