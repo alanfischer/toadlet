@@ -107,9 +107,10 @@ public:
 
 	virtual void render(peeper::Renderer *renderer,Node *node=NULL);
 
+	virtual bool culled(Node *node);
 	/// @todo: These should probably be moved into the Math library, and passing in a list of planes
 	virtual bool culled(const Sphere &sphere) const;
-	virtual bool culled(const AABox &box);
+	virtual bool culled(const AABox &box) const;
 
 	virtual void updateFramesPerSecond();
 	inline scalar getFramesPerSecond() const{return mFPS;}

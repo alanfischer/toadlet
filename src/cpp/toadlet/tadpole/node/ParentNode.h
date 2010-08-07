@@ -59,6 +59,7 @@ public:
 
 	virtual void logicUpdate(int dt,int scope);
 	virtual void frameUpdate(int dt,int scope);
+	virtual void queueRenderables(CameraNode *camera,RenderQueue *queue);
 	virtual void mergeWorldBound(Node *child,bool justAttached);
 
 	virtual void activate();

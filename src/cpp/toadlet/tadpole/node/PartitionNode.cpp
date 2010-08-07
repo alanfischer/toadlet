@@ -78,33 +78,6 @@ bool PartitionNode::sensePotentiallyVisible(SensorResultsListener *listener,cons
 	return result;
 }
 
-void PartitionNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
-	queueRenderables(this,camera,queue);
-}
-
-void PartitionNode::queueRenderables(Node *node,CameraNode *camera,RenderQueue *queue){
-	if(culled(node,camera)){
-		return;
-	}
-
-	if(node!=this){
-		node->queueRenderables(camera,queue);
-	}
-
-	ParentNode *parent=node->isParent();
-	if(parent!=NULL){
-		int numChildren=parent->getNumChildren();
-		int i;
-		for(i=0;i<numChildren;++i){
-			queueRenderables(parent->getChild(i),camera,queue);
-		}
-	}
-}
-
-bool PartitionNode::culled(Node *node,CameraNode *camera){
-	return (node->getScope()&camera->getScope())==0 || camera->culled(node->getWorldBound());
-}
-
 }
 }
 }
