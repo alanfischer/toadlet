@@ -79,7 +79,7 @@ Node *CameraNode::create(Scene *scene){
 	Math::setMatrix4x4FromOrtho(mOverlayMatrix,0,Math::ONE,0,Math::ONE,-Math::ONE,Math::ONE);
 
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,4);
-	VertexBufferAccessor vba(vertexBuffer);
+	VertexBufferAccessor vba(vertexBuffer,Buffer::Access_BIT_WRITE);
 	vba.set3(0,0,0,0,0);
 	vba.set3(0,1,0,0,0);
 	vba.set2(0,2,0,1);

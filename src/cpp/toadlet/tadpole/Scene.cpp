@@ -335,11 +335,11 @@ void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue 
 
 	bool renderedLayer=false;
 	const egg::Collection<RenderQueue::RenderLayer*> &layers=queue->getRenderLayers();
-	int i,j;
+	int i,j,k;
 	for(i=0;i<layers.size();++i){
 		int layerNum=i+Material::MIN_LAYER;
 		RenderQueue::RenderLayer *layer=layers[i];
-		if(layer==NULL || (layer->renderables.size()==0 && layer->forceRender==false)){
+		if(layer==NULL || (layer->depthSortedRenderables.size()==0 && layer->materialSortedRenderables.size()==0 && layer->forceRender==false)){
 			continue;
 		}
 
@@ -353,21 +353,25 @@ void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue 
 		}
 
 		preLayerRender(renderer,camera,layerNum);
-
-		int numRenderables=layer->renderables.size();
+int swaps=0;
+		int numRenderables=layer->materialSortedRenderables.size();
 		for(j=0;j<numRenderables;++j){
-			Renderable *renderable=layer->renderables[j];
-			Material *material=renderable->getRenderMaterial();
+			Material *material=layer->materialSortedRenderables[j].material;
 			if(material!=NULL && mPreviousMaterial!=material){
 				material->setupRenderer(renderer,mPreviousMaterial);
+swaps++;
 			}
 			mPreviousMaterial=material;
-			renderer->setModelMatrix(renderable->getRenderTransform());
-			renderable->render(renderer);
-			mCountLastRendered++;
-		}
-		layer->renderables.clear();
 
+			int numRenderables2=layer->materialSortedRenderables[j].renderables.size();
+			for(k=0;k<numRenderables2;++k){
+				Renderable *renderable=layer->materialSortedRenderables[j].renderables[k];
+				renderer->setModelMatrix(renderable->getRenderTransform());
+				renderable->render(renderer);
+				mCountLastRendered++;
+			}
+		}
+		layer->materialSortedRenderables.clear();
 		numRenderables=layer->depthSortedRenderables.size();
 		for(j=0;j<numRenderables;++j){
 			Renderable *renderable=layer->depthSortedRenderables[j].renderable;
@@ -388,6 +392,9 @@ void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue 
 		// We could also use the true/false return of pre/postLayerRender, but it could be easy to forget to change that.
 		mPreviousMaterial=NULL;
 	}
+
+//Logger::alert(String("REALLOCS:")+Profile::getInstance()->collectionAllocations);
+//Profile::getInstance()->collectionAllocations=0;
 }
 
 Image::ptr Scene::renderToImage(Renderer *renderer,CameraNode *camera,int format,int width,int height){
