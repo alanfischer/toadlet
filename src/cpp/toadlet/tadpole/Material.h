@@ -106,3 +106,45 @@ protected:
 }
 
 #endif
+
+/*
+#include <toadlet/egg/BaseResource.h>
+#include <toadlet/tadpole/RenderPass.h>
+
+namespace toadlet{
+namespace tadpole{
+
+class TOADLET_API Material:public egg::BaseResource{
+public:
+	TOADLET_SHARED_POINTERS(Material);
+
+	// Min/Max Layers
+	const static int MIN_LAYER=-63;
+	const static int MAX_LAYER=63;
+
+	Material();
+	virtual ~Material();
+
+	void destroy();
+	Material::ptr clone();
+
+	void setLayer(int layer){mLayer=layer;}
+	inline int getLayer() const{return mLayer;}
+
+	void setSaveLocally(bool local){mSaveLocally=local;}
+	inline bool getSaveLocally() const{return mSaveLocally;}
+
+	inline void getNumRenderPasses(){return mRenderPasses.size();}
+	inline RenderPass::ptr getRenderPass(int i){return mRenderPasses[i];}
+	RenderPass::ptr addRenderPass();
+	void removeRenderPass(RenderPass *pass);
+
+protected:
+	int mLayer;
+	bool mSaveLocally;
+	egg::Collection<RenderPass::ptr> mRenderPasses;
+};
+
+}
+}
+*/

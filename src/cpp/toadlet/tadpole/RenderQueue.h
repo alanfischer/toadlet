@@ -33,6 +33,9 @@
 namespace toadlet{
 namespace tadpole{
 
+/// @todo: Cleaned up to obey coding standards
+/// @todo: Not reallocate memory in the collections
+/// @todo: Add a 'collection reallocated count' that we can check
 class TOADLET_API RenderQueue{
 public:
 	TOADLET_SHARED_POINTERS(RenderQueue);
@@ -51,6 +54,21 @@ public:
 		scalar depth;
 	};
 
+	class MaterialRenderable{
+	public:
+		MaterialRenderable():
+			material(NULL){}
+	
+		MaterialRenderable(Renderable *r,Material *m):
+			material(m)
+		{
+			renderables.add(r);
+		}
+
+		Material *material;
+		egg::Collection<Renderable*> renderables;
+	};
+
 	class RenderLayer{
 	public:
 		RenderLayer():
@@ -58,7 +76,7 @@ public:
 			clearLayer(true){}
 
 		egg::Collection<DepthRenderable> depthSortedRenderables;
-		egg::Collection<Renderable*> renderables;
+		egg::Collection<MaterialRenderable> materialSortedRenderables;
 
 		bool forceRender;
 		bool clearLayer;

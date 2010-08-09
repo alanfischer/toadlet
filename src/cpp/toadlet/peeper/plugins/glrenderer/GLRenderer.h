@@ -148,7 +148,9 @@ public:
 	static GLuint getGLWrap(TextureStage::AddressMode addressMode,bool hasClampToEdge=true);
 	static GLuint getGLMinFilter(TextureStage::Filter minFilter,TextureStage::Filter mipFilter);
 	static GLuint getGLMagFilter(TextureStage::Filter magFilter);
-	static GLuint getGLTextureBlendSource(TextureBlend::Source blend);
+	static GLuint getGLTextureBlendSource(TextureBlend::Source source);
+	static GLuint getGLTextureBlendOperation(TextureBlend::Operation operation);
+	static float getGLTextureBlendScale(TextureBlend::Operation operation);
 	static GLuint GLClientStates[6];
 	static GLuint GLCubeFaces[6];
 

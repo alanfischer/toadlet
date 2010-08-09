@@ -321,7 +321,7 @@ Mesh::ptr MeshManager::createSphere(const Sphere &sphere,int numSegments,int num
 	return mesh;
 }
 
-Mesh::ptr MeshManager::createSkyDome(scalar radius,int numSegments,int numRings,Texture::ptr texture){
+Mesh::ptr MeshManager::createSkyDome(const Sphere &sphere,int numSegments,int numRings,scalar fade,Texture::ptr texture){
 	int numVertexes=(numRings+1)*(numSegments+1);
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,numVertexes);
 	int numIndexes=6*numRings*(numSegments+1);
@@ -341,8 +341,8 @@ Mesh::ptr MeshManager::createSkyDome(scalar radius,int numSegments,int numRings,
 		// Generate the group of rings for the sphere
 		int ring;
 		for(ring=0;ring<=numRings;++ring){
-			scalar r0=Math::mul(radius,Math::sin(Math::mul(Math::fromInt(ring),deltaRingAngle)));
-			scalar z0=Math::mul(radius,Math::cos(Math::mul(Math::fromInt(ring),deltaRingAngle)));
+			scalar r0=Math::mul(sphere.radius,Math::sin(Math::mul(Math::fromInt(ring),deltaRingAngle)));
+			scalar z0=Math::mul(sphere.radius,Math::cos(Math::mul(Math::fromInt(ring),deltaRingAngle)));
 
 			// Generate the group of segments for the current ring
 			int seg;
@@ -351,12 +351,20 @@ Mesh::ptr MeshManager::createSkyDome(scalar radius,int numSegments,int numRings,
 				scalar y0=Math::mul(r0,Math::sin(Math::mul(Math::fromInt(seg),deltaSegAngle)));
 
 				// Add one vertex to the strip which makes up the sphere
-				vba.set3(verticeIndex,0,x0,y0,z0);
+				vba.set3(verticeIndex,0,sphere.origin.x+x0,sphere.origin.y+y0,sphere.origin.z+z0);
 				normal.set(x0,y0,z0);
 				Math::normalize(normal);
 				vba.set3(verticeIndex,1,normal.x,normal.y,normal.z);
 
-				vba.set2(verticeIndex,2,normal.x*(1-normal.z)/2+Math::HALF,normal.y*(1-normal.z)/2+Math::HALF);
+				normal.z=Math::ONE-normal.z;
+				scalar l=Math::length(normal);
+				normal.z=0;
+				Math::normalize(normal);
+				Math::mul(normal,l);
+				scalar tx=Math::mul(normal.x,fade)+Math::HALF,ty=Math::mul(normal.y,fade)+Math::HALF;
+				tx=Math::clamp(0,Math::ONE,tx);
+				ty=Math::clamp(0,Math::ONE,ty);
+				vba.set2(verticeIndex,2,tx,ty);
 
 				if(ring!=numRings){
 					iba.set(indexIndex++,verticeIndex+numSegments);
@@ -386,7 +394,7 @@ Mesh::ptr MeshManager::createSkyDome(scalar radius,int numSegments,int numRings,
 	mesh->subMeshes.resize(1);
 	mesh->subMeshes[0]=subMesh;
 	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
-	mesh->bound.radius=radius;
+	mesh->bound.set(sphere);
 
 	return mesh;
 }
