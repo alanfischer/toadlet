@@ -46,7 +46,7 @@ public:
 	mesh::Mesh::ptr createBox(const AABox &box);
 	mesh::Mesh::ptr createSkyBox(scalar size,bool unfolded,bool invert,peeper::Texture::ptr bottom=NULL,peeper::Texture::ptr top=NULL,peeper::Texture::ptr left=NULL,peeper::Texture::ptr right=NULL,peeper::Texture::ptr back=NULL,peeper::Texture::ptr front=NULL);
 	mesh::Mesh::ptr createSphere(const Sphere &sphere,int numSegments=16,int numRings=16);
-	mesh::Mesh::ptr createSkyDome(const Sphere &sphere,int numSegments=16,int numRings=16,scalar fade=0.5,peeper::Texture::ptr texture=NULL);
+	mesh::Mesh::ptr createSkyDome(peeper::VertexFormat::ptr format,const Sphere &sphere,int numSegments=16,int numRings=16,scalar fade=0.5,peeper::Texture::ptr texture=NULL);
 	mesh::Mesh::ptr createGeoSphere(const Sphere &sphere,int depth,bool icosahedron);
 	mesh::Mesh::ptr createTorus(scalar majorRadius,scalar minorRadius,int numMajor,int numMinor);
 

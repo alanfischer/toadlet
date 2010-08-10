@@ -321,9 +321,9 @@ Mesh::ptr MeshManager::createSphere(const Sphere &sphere,int numSegments,int num
 	return mesh;
 }
 
-Mesh::ptr MeshManager::createSkyDome(const Sphere &sphere,int numSegments,int numRings,scalar fade,Texture::ptr texture){
+Mesh::ptr MeshManager::createSkyDome(VertexFormat::ptr format,const Sphere &sphere,int numSegments,int numRings,scalar fade,Texture::ptr texture){
 	int numVertexes=(numRings+1)*(numSegments+1);
-	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,numVertexes);
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,format,numVertexes);
 	int numIndexes=6*numRings*(numSegments+1);
 	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,numIndexes);
 
@@ -354,7 +354,10 @@ Mesh::ptr MeshManager::createSkyDome(const Sphere &sphere,int numSegments,int nu
 				vba.set3(verticeIndex,0,sphere.origin.x+x0,sphere.origin.y+y0,sphere.origin.z+z0);
 				normal.set(x0,y0,z0);
 				Math::normalize(normal);
-				vba.set3(verticeIndex,1,normal.x,normal.y,normal.z);
+				int ni=format->findSemantic(VertexFormat::Semantic_NORMAL);
+				if(ni>=0){
+					vba.set3(verticeIndex,ni,normal.x,normal.y,normal.z);
+				}
 
 				normal.z=Math::ONE-normal.z;
 				scalar l=Math::length(normal);
@@ -364,7 +367,11 @@ Mesh::ptr MeshManager::createSkyDome(const Sphere &sphere,int numSegments,int nu
 				scalar tx=Math::mul(normal.x,fade)+Math::HALF,ty=Math::mul(normal.y,fade)+Math::HALF;
 				tx=Math::clamp(0,Math::ONE,tx);
 				ty=Math::clamp(0,Math::ONE,ty);
-				vba.set2(verticeIndex,2,tx,ty);
+
+				int tci=format->findSemantic(VertexFormat::Semantic_TEX_COORD);
+				if(tci>0){
+					vba.set2(verticeIndex,tci,tx,ty);
+				}
 
 				if(ring!=numRings){
 					iba.set(indexIndex++,verticeIndex+numSegments);
