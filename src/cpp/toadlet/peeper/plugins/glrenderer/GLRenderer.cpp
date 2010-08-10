@@ -1302,13 +1302,17 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 			if(specifyColor){
 				glTexEnvi(GL_TEXTURE_ENV,GL_SRC0_RGB,getGLTextureBlendSource(blend.colorSource1));
 				glTexEnvi(GL_TEXTURE_ENV,GL_SRC1_RGB,getGLTextureBlendSource(blend.colorSource2));
-				glTexEnvi(GL_TEXTURE_ENV,GL_SRC2_RGB,getGLTextureBlendSource(blend.colorSource3));
+				if(blend.colorSource3!=TextureBlend::Source_UNSPECIFIED){
+					glTexEnvi(GL_TEXTURE_ENV,GL_SRC2_RGB,getGLTextureBlendSource(blend.colorSource3));
+				}
 				// No need to specify GL_OPERANDs for ALPHABLEND, since RGB defaults are COLOR,COLOR,ALPHA
 			}
 			if(specifyAlpha){
 				glTexEnvi(GL_TEXTURE_ENV,GL_SRC0_ALPHA,getGLTextureBlendSource(blend.alphaSource1));
 				glTexEnvi(GL_TEXTURE_ENV,GL_SRC1_ALPHA,getGLTextureBlendSource(blend.alphaSource2));
-				glTexEnvi(GL_TEXTURE_ENV,GL_SRC2_ALPHA,getGLTextureBlendSource(blend.alphaSource3));
+				if(blend.alphaSource3!=TextureBlend::Source_UNSPECIFIED){
+					glTexEnvi(GL_TEXTURE_ENV,GL_SRC2_ALPHA,getGLTextureBlendSource(blend.alphaSource3));
+				}
 				// No need to specify GL_OPERANDs for ALPHABLEND, since ALPHA defaults are ALPHA,ALPHA,ALPHA
 			}
 		}
