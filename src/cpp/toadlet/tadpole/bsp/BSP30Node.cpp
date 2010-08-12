@@ -215,12 +215,12 @@ void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const S
 		mSkyNode=NULL;
 	}
 
-	Texture::ptr down=mEngine->getTextureManager()->findTexture(skyDown);
-	Texture::ptr up=mEngine->getTextureManager()->findTexture(skyUp);
-	Texture::ptr front=mEngine->getTextureManager()->findTexture(skyWest);
-	Texture::ptr back=mEngine->getTextureManager()->findTexture(skyEast);
-	Texture::ptr right=mEngine->getTextureManager()->findTexture(skySouth);
-	Texture::ptr left=mEngine->getTextureManager()->findTexture(skyNorth);
+	Material::ptr down=mEngine->getMaterialManager()->findMaterial(skyDown);
+	Material::ptr up=mEngine->getMaterialManager()->findMaterial(skyUp);
+	Material::ptr front=mEngine->getMaterialManager()->findMaterial(skyWest);
+	Material::ptr back=mEngine->getMaterialManager()->findMaterial(skyEast);
+	Material::ptr right=mEngine->getMaterialManager()->findMaterial(skySouth);
+	Material::ptr left=mEngine->getMaterialManager()->findMaterial(skyNorth);
 
 	if(down!=NULL || up!=NULL || front!=NULL || back!=NULL || right!=NULL || left==NULL){
 		Mesh::ptr mesh=mEngine->getMeshManager()->createSkyBox(1024,false,false,down,up,front,back,right,left);

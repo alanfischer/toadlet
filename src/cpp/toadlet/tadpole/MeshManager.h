@@ -44,11 +44,29 @@ public:
 	egg::Resource::ptr manage(const egg::Resource::ptr &resource,const egg::String &name=(char*)NULL);
 
 	mesh::Mesh::ptr createBox(const AABox &box);
-	mesh::Mesh::ptr createSkyBox(scalar size,bool unfolded,bool invert,peeper::Texture::ptr bottom=NULL,peeper::Texture::ptr top=NULL,peeper::Texture::ptr left=NULL,peeper::Texture::ptr right=NULL,peeper::Texture::ptr back=NULL,peeper::Texture::ptr front=NULL);
-	mesh::Mesh::ptr createSphere(const Sphere &sphere,int numSegments=16,int numRings=16);
-	mesh::Mesh::ptr createSkyDome(peeper::VertexFormat::ptr format,const Sphere &sphere,int numSegments=16,int numRings=16,scalar fade=0.5,peeper::Texture::ptr texture=NULL);
-	mesh::Mesh::ptr createGeoSphere(const Sphere &sphere,int depth,bool icosahedron);
-	mesh::Mesh::ptr createTorus(scalar majorRadius,scalar minorRadius,int numMajor,int numMinor);
+	mesh::Mesh::ptr createSkyBox(scalar size,bool unfolded,bool invert,Material::ptr bottom=NULL,Material::ptr top=NULL,Material::ptr left=NULL,Material::ptr right=NULL,Material::ptr back=NULL,Material::ptr front=NULL);
+
+	int getSphereVertexCount(int numSegments,int numRings){return (numRings+1)*(numSegments+1);}
+	int getSphereIndexCount(int numSegments,int numRings){return 6*numRings*(numSegments+1);}
+	mesh::Mesh::ptr createSphere(const Sphere &sphere,int numSegments=16,int numRings=16,Material::ptr material=NULL);
+	mesh::Mesh::ptr createSphere(peeper::VertexBuffer::ptr vertexBuffer,peeper::IndexBuffer::ptr indexBuffer,const Sphere &sphere,int numSegments,int numRings);
+
+	int getSkyDomeVertexCount(int numSegments,int numRings){return (numRings+1)*(numSegments+1);}
+	int getSkyDomeIndexCount(int numSegments,int numRings){return 6*numRings*(numSegments+1);}
+	mesh::Mesh::ptr createSkyDome(const Sphere &sphere,int numSegments=16,int numRings=16,scalar fade=0.5,Material::ptr material=NULL);
+	mesh::Mesh::ptr createSkyDome(peeper::VertexBuffer::ptr vertexBuffer,peeper::IndexBuffer::ptr indexBuffer,const Sphere &sphere,int numSegments,int numRings,scalar fade);
+
+	inline int getGeoSphereInitialTriangleCount(bool icosahedron){return icosahedron?20:8;}
+	inline int getGeoSphereInitialVertexCount(bool icosahedron){return icosahedron?12:6;}
+	inline int getGeoSphereTriangleCount(int depth,bool icosahedron){return getGeoSphereInitialTriangleCount(icosahedron)<<(depth*2);}
+	int getGeoSphereVertexCount(int depth,bool icosahedron){return getGeoSphereInitialTriangleCount(icosahedron) * (((1 << ((depth+1) * 2)) - 1) / (4 - 1) - 1) + getGeoSphereInitialVertexCount(icosahedron);}
+	int getGeoSphereIndexCount(int depth,bool icosahedron){return getGeoSphereTriangleCount(depth,icosahedron)*3;}
+	mesh::Mesh::ptr createGeoSphere(const Sphere &sphere,int depth=3,bool icosahedron=false,Material::ptr material=NULL);
+	mesh::Mesh::ptr createGeoSphere(peeper::VertexBuffer::ptr vertexBuffer,peeper::IndexBuffer::ptr indexBuffer,const Sphere &sphere,int depth,bool icosahedron);
+
+	int getTorusVertexCount(int numMajor,int numMinor){return numMajor*(numMinor+1)*2;}
+	mesh::Mesh::ptr createTorus(scalar majorRadius,scalar minorRadius,int numMajor=16,int numMinor=16,Material::ptr material=NULL);
+	mesh::Mesh::ptr createTorus(peeper::VertexBuffer::ptr vertexBuffer,scalar majorRadius,scalar minorRadius,int numMajor,int numMinor);
 
 protected:
 	class IndexTri{
