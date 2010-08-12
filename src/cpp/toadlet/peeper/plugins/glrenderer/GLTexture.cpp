@@ -177,13 +177,15 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 					glTexImage3D(mTarget,level,glinternalFormat,width,height,depth,0,glformat,gltype,data);
 				break;
 				case GL_TEXTURE_CUBE_MAP:{
-					/// @todo: Is the following required?
+					glTexParameteri(mTarget,GL_TEXTURE_WRAP_S,GL_CLAMP);
+					glTexParameteri(mTarget,GL_TEXTURE_WRAP_T,GL_CLAMP);
+					glTexParameteri(mTarget,GL_TEXTURE_WRAP_R,GL_CLAMP);
 					glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 					glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 
 					int i;
 					for(i=0;i<6;++i){
-						glTexImage2D(GLRenderer::GLCubeFaces[i],level,glinternalFormat,width,height,0,glformat,gltype,data);
+						glTexImage2D(GLRenderer::GLCubeFaces[i],level,glinternalFormat,width,height,0,glformat,gltype,data+slicePitch*i);
 					}
 				}break;
 				case GL_TEXTURE_RECTANGLE_ARB:

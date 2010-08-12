@@ -59,7 +59,7 @@ TextureStage::ptr MaterialManager::createTextureStage(Texture::ptr texture,bool 
 	else{
 		textureStage->setMipFilter(TextureStage::Filter_NONE);
 	}
-	if(clamped){
+	if(clamped || texture->getDimension()==Texture::Dimension_CUBE){
 		textureStage->setUAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
 		textureStage->setVAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
 		textureStage->setWAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);

@@ -132,7 +132,7 @@ Mesh::ptr MeshManager::createBox(const AABox &box){
 	return mesh;
 }
 
-Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded,bool invert,Texture::ptr bottom,Texture::ptr top,Texture::ptr left,Texture::ptr right,Texture::ptr back,Texture::ptr front){
+Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded,bool invert,Material::ptr bottom,Material::ptr top,Material::ptr left,Material::ptr right,Material::ptr back,Material::ptr front){
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_TEX_COORD,24);
 	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_8,36);
 	{
@@ -240,25 +240,35 @@ Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded,bool invert,Textur
 		mesh->subMeshes[i]->material=material;
 	}
 
-	mesh->subMeshes[0]->material->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(bottom,true));
+	mesh->subMeshes[0]->material=bottom;
 	if(unfolded==false){
-		mesh->subMeshes[1]->material->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(top,true));
-		mesh->subMeshes[2]->material->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(left,true));
-		mesh->subMeshes[3]->material->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(right,true));
-		mesh->subMeshes[4]->material->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(back,true));
-		mesh->subMeshes[5]->material->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(front,true));
+		mesh->subMeshes[1]->material=top;
+		mesh->subMeshes[2]->material=left;
+		mesh->subMeshes[3]->material=right;
+		mesh->subMeshes[4]->material=back;
+		mesh->subMeshes[5]->material=front;
 	}
 
 	return mesh;
 }
 
-// Thanks to Ogre3D for this sphere routine
-Mesh::ptr MeshManager::createSphere(const Sphere &sphere,int numSegments,int numRings){
-	int numVertexes=(numRings+1)*(numSegments+1);
-	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,numVertexes);
-	int numIndexes=6*numRings*(numSegments+1);
-	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,numIndexes);
+Mesh::ptr MeshManager::createSphere(const Sphere &sphere,int numSegments,int numRings,Material::ptr material){
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,getSphereVertexCount(numSegments,numRings));
+	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,getSphereIndexCount(numSegments,numRings));
 
+	Mesh::ptr mesh=createSphere(vertexBuffer,indexBuffer,sphere,numSegments,numRings);
+	if(material==NULL){
+		material=mEngine->getMaterialManager()->createMaterial();
+		material->setLighting(true);
+	}
+	material->retain();
+	mesh->subMeshes[0]->material=material;
+
+	return mesh;
+}
+
+// Thanks to Ogre3D for this sphere routine
+Mesh::ptr MeshManager::createSphere(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,const Sphere &sphere,int numSegments,int numRings){
 	{
 		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
 		iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
@@ -308,9 +318,6 @@ Mesh::ptr MeshManager::createSphere(const Sphere &sphere,int numSegments,int num
 
 	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
-	subMesh->material=mEngine->getMaterialManager()->createMaterial();
-	subMesh->material->retain();
-	subMesh->material->setLighting(true);
 
 	Mesh::ptr mesh(new Mesh());
 	mesh->subMeshes.resize(1);
@@ -321,12 +328,23 @@ Mesh::ptr MeshManager::createSphere(const Sphere &sphere,int numSegments,int num
 	return mesh;
 }
 
-Mesh::ptr MeshManager::createSkyDome(VertexFormat::ptr format,const Sphere &sphere,int numSegments,int numRings,scalar fade,Texture::ptr texture){
-	int numVertexes=(numRings+1)*(numSegments+1);
-	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,format,numVertexes);
-	int numIndexes=6*numRings*(numSegments+1);
-	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,numIndexes);
+Mesh::ptr MeshManager::createSkyDome(const Sphere &sphere,int numSegments,int numRings,scalar fade,Material::ptr material){
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,getSphereVertexCount(numSegments,numRings));
+	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,getSphereIndexCount(numSegments,numRings));
 
+	Mesh::ptr mesh=createSphere(vertexBuffer,indexBuffer,sphere,numSegments,numRings);
+	if(material==NULL){
+		material=mEngine->getMaterialManager()->createMaterial();
+		material->setDepthWrite(false);
+		material->setLighting(false);
+	}
+	material->retain();
+	mesh->subMeshes[0]->material=material;
+
+	return mesh;
+}
+
+Mesh::ptr MeshManager::createSkyDome(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,const Sphere &sphere,int numSegments,int numRings,scalar fade){
 	{
 		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
 		iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
@@ -354,7 +372,7 @@ Mesh::ptr MeshManager::createSkyDome(VertexFormat::ptr format,const Sphere &sphe
 				vba.set3(verticeIndex,0,sphere.origin.x+x0,sphere.origin.y+y0,sphere.origin.z+z0);
 				normal.set(x0,y0,z0);
 				Math::normalize(normal);
-				int ni=format->findSemantic(VertexFormat::Semantic_NORMAL);
+				int ni=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_NORMAL);
 				if(ni>=0){
 					vba.set3(verticeIndex,ni,normal.x,normal.y,normal.z);
 				}
@@ -362,13 +380,13 @@ Mesh::ptr MeshManager::createSkyDome(VertexFormat::ptr format,const Sphere &sphe
 				normal.z=Math::ONE-normal.z;
 				scalar l=Math::length(normal);
 				normal.z=0;
-				Math::normalize(normal);
+				Math::normalizeCarefully(normal,0);
 				Math::mul(normal,l);
 				scalar tx=Math::mul(normal.x,fade)+Math::HALF,ty=Math::mul(normal.y,fade)+Math::HALF;
 				tx=Math::clamp(0,Math::ONE,tx);
 				ty=Math::clamp(0,Math::ONE,ty);
 
-				int tci=format->findSemantic(VertexFormat::Semantic_TEX_COORD);
+				int tci=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_TEX_COORD);
 				if(tci>0){
 					vba.set2(verticeIndex,tci,tx,ty);
 				}
@@ -391,11 +409,6 @@ Mesh::ptr MeshManager::createSkyDome(VertexFormat::ptr format,const Sphere &sphe
 
 	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
-	subMesh->material=mEngine->getMaterialManager()->createMaterial();
-	subMesh->material->retain();
-	subMesh->material->setDepthWrite(false);
-	subMesh->material->setLighting(false);
-	subMesh->material->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(texture,true));
 
 	Mesh::ptr mesh(new Mesh());
 	mesh->subMeshes.resize(1);
@@ -406,16 +419,23 @@ Mesh::ptr MeshManager::createSkyDome(VertexFormat::ptr format,const Sphere &sphe
 	return mesh;
 }
 
-Mesh::ptr MeshManager::createGeoSphere(const Sphere &sphere,int depth,bool icosahedron){
-	depth++;
+Mesh::ptr MeshManager::createGeoSphere(const Sphere &sphere,int depth,bool icosahedron,Material::ptr material){
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,getGeoSphereVertexCount(depth,icosahedron));
+	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,getGeoSphereIndexCount(depth,icosahedron));
 
-	int initialTriangleCount=icosahedron ? 20 : 8;
-	int initialVertexCount=icosahedron ? 12 : 6;
-	int triangleQuantity=initialTriangleCount << ((depth - 1) * 2);
-	int vertQuantity = initialTriangleCount * (((1 << (depth * 2)) - 1) / (4 - 1) - 1) + initialVertexCount;
+	Mesh::ptr mesh=createGeoSphere(vertexBuffer,indexBuffer,sphere,depth,icosahedron);
+	if(material==NULL){
+		material=mEngine->getMaterialManager()->createMaterial();
+		material->setLighting(true);
+	}
+	material->retain();
+	mesh->subMeshes[0]->material=material;
 
+	return mesh;
+}
+
+Mesh::ptr MeshManager::createGeoSphere(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,const Sphere &sphere,int depth,bool icosahedron){
 	currentSphere=sphere;
-	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,vertQuantity);
 	vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
 
 	int vertexIndex=0;
@@ -485,7 +505,7 @@ Mesh::ptr MeshManager::createGeoSphere(const Sphere &sphere,int depth,bool icosa
 
 	/* Subdivide each starting triangle (maxlevels - 1) times */
 	int level;
-	for(level=1;level<depth;++level){
+	for(level=1;level<=depth;++level){
 		Collection<IndexTri> next(old.size()*4);
 
 		/*
@@ -539,7 +559,6 @@ Mesh::ptr MeshManager::createGeoSphere(const Sphere &sphere,int depth,bool icosa
 
 	vba.unlock();
 
-	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,triangleQuantity*3);
 	iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
 	for(i=0;i<old.size();++i){
 		for(j=0;j<3;++j){
@@ -550,9 +569,6 @@ Mesh::ptr MeshManager::createGeoSphere(const Sphere &sphere,int depth,bool icosa
 
 	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
-	subMesh->material=mEngine->getMaterialManager()->createMaterial();
-	subMesh->material->retain();
-	subMesh->material->setLighting(true);
 
 	Mesh::ptr mesh(new Mesh());
 	mesh->subMeshes.resize(1);
@@ -563,8 +579,21 @@ Mesh::ptr MeshManager::createGeoSphere(const Sphere &sphere,int depth,bool icosa
 	return mesh;
 }
 
-Mesh::ptr MeshManager::createTorus(scalar majorRadius,scalar minorRadius,int numMajor,int numMinor){
-	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,numMajor*(numMinor+1)*2);
+Mesh::ptr MeshManager::createTorus(scalar majorRadius,scalar minorRadius,int numMajor,int numMinor,Material::ptr material){
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,getTorusVertexCount(numMajor,numMinor));
+
+	Mesh::ptr mesh=createTorus(vertexBuffer,majorRadius,minorRadius,numMajor,numMinor);
+	if(material==NULL){
+		material=mEngine->getMaterialManager()->createMaterial();
+		material->setLighting(true);
+	}
+	material->retain();
+	mesh->subMeshes[0]->material=material;
+
+	return mesh;
+}
+
+Mesh::ptr MeshManager::createTorus(VertexBuffer::ptr vertexBuffer,scalar majorRadius,scalar minorRadius,int numMajor,int numMinor){
 	{
 		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
 
@@ -606,9 +635,6 @@ Mesh::ptr MeshManager::createTorus(scalar majorRadius,scalar minorRadius,int num
 
 	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,vertexBuffer->getSize()));
-	subMesh->material=mEngine->getMaterialManager()->createMaterial();
-	subMesh->material->retain();
-	subMesh->material->setLighting(true);
 
 	Mesh::ptr mesh(new Mesh());
 	mesh->subMeshes.resize(1);
