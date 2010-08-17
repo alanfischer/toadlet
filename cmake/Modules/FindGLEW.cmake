@@ -32,7 +32,6 @@ else (WIN32)
 	set (HEADERS
 		GL/glew.h
 		GL/glxew.h
-		GL/wglew.h
 	)
 	set (INCLUDE_PATHS
 		/usr/include

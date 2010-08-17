@@ -240,8 +240,8 @@ if (NOT TOADLET_FIXED_POINT)
 endif (NOT TOADLET_FIXED_POINT)
 
 # Setup dependecy specific files and libraries
-# Note the iphone build uses neither freetype or mxml
-if (NOT TOADLET_PLATFORM_IPHONE)
+# Freetype is not required on OSX
+if (NOT TOADLET_PLATFORM_OSX)
 	find_package (Freetype)
 	if (FREETYPE_FOUND)
 		set (TOADLET_HAS_FREETYPE ON PARENT_SCOPE)
@@ -264,7 +264,10 @@ if (NOT TOADLET_PLATFORM_IPHONE)
 		set (TADPOLE_DEFS_S TOADLET_LIBFREETYPE_NAME="${FREETYPE_LIBRARY}")
 		set (TADPOLE_LIBS_S libfreetype_s)
 	endif (FREETYPE_FOUND)
+endif (NOT TOADLET_PLATFORM_OSX)
 
+# TODO: For now, the iPhone build does not use mxml, but I think that should be changed
+if (NOT TOADLET_PLATFORM_IPHONE)
 	find_package (MXML)
 	if (MXML_FOUND)
 		# Files
