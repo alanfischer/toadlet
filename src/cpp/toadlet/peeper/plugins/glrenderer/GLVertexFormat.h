@@ -69,6 +69,7 @@ protected:
 	egg::Collection<GLuint> mGLElementCounts;
 
 	friend class GLRenderer;
+	friend class GLBuffer;
 };
 
 }

@@ -159,7 +159,7 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 			String("glesem_getAccelerated result:")+glesemAcceleratedResult);
 
 		gl_version=glesem_gl_majorVersion*10+glesem_gl_minorVersion;
-	#elif defined(TOADLET_HAS_GLEW) && !defined(TOADLET_PLATFORM_OSX)
+	#elif defined(TOADLET_HAS_GLEW)
 		glewExperimental=true;
 		GLenum glewInitResult=glewInit();
 	

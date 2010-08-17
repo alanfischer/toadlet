@@ -67,7 +67,7 @@ public:
 	bool isVariableBitRate() const;
 
 private:
-	static OSStatus audioFileRead(void *inRefCon,SInt64 inPosition,ByteCount requestCount,void *buffer,ByteCount *actualCount);
+	static OSStatus audioFileRead(void *inRefCon,SInt64 inPosition,UInt32 requestCount,void *buffer,UInt32 *actualCount);
 	static SInt64 audioFileGetSize(void *inRefCon);
 
 	int mPosition;

@@ -160,6 +160,25 @@ the -G switch as follows:
 
    cmake -GXcode -DCMAKE_INSTALL_PREFIX=$HOME/toadlet/osx  ..
 
+   If you wish to build a universal binary, you may specify additional
+architectures as such:
+
+   cmake -GXcode -DCMAKE_OSX_ARCHITECTURES="i386;ppc" -GDCMAKE_INSTALL_PREFIX=$HOME/toadlet/osx ..
+
+   Valid options for architectures are: i386, ppc, x86_64, ppc64
+
+3.5.1 OSX Dependencies
+   To build GLEW as a universal binary, you must edit glew/config/Makefile.darwin
+Change the CC and LD lines as follows:
+
+   CC = cc -arch i386 -arch ppc
+   LD = cc -arch i386 -arch ppc
+
+   To build MiniXML as a universal binary, run it's configure script as follows:
+
+   CFLAGS="-arch i386 -arch ppc" LDFLAGS="-arch i386 -arch ppc" ./configure --prefix=$HOME/mxml
+
+   The same valid architectures are as above 
 
 3.6 iPhoneOS
     Toadlet is avaialble for the iPhoneOS platform using 

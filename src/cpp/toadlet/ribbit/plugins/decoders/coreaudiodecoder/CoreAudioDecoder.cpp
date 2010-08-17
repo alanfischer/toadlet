@@ -104,7 +104,7 @@ bool CoreAudioDecoder::isVariableBitRate() const{
 	return mStreamDescription.mBytesPerPacket==0 || mStreamDescription.mFramesPerPacket==0;
 }
 
-OSStatus CoreAudioDecoder::audioFileRead(void *inRefCon,SInt64 inPosition,ByteCount requestCount,void *buffer,ByteCount *actualCount){
+OSStatus CoreAudioDecoder::audioFileRead(void *inRefCon,SInt64 inPosition,UInt32 requestCount,void *buffer,UInt32 *actualCount){
 	CoreAudioDecoder *decoder=(CoreAudioDecoder*)inRefCon;
 
 	if(inPosition!=decoder->mSourcePosition){
