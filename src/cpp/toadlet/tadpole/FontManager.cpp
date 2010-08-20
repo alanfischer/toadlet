@@ -60,7 +60,7 @@ Font::ptr FontManager::getDefaultFont(){
 		#elif defined(TOADLET_PLATFORM_POSIX)
 			file="/usr/share/fonts/TTF/DejaVuSerif.ttf";
 		#endif
-		mDefaultFont=findFont(file,24);
+		mDefaultFont=findFont(file,64);
 	}
 	return mDefaultFont;
 }
