@@ -203,7 +203,7 @@ void LabelNode::updateLabel(){
 
 	// Update material
 	Texture::ptr texture=mFont->getTexture();
-	mMaterial->setTextureStage(0,TextureStage::ptr(new TextureStage(texture)));
+	mMaterial->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(texture));
 	if((texture->getFormat()&Texture::Format_BIT_A)>0){
 		mMaterial->setBlend(Blend::Combination_ALPHA);
 	}
