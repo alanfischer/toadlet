@@ -169,14 +169,15 @@ Resource::ptr Win32FontHandler::load(Stream::ptr stream,const ResourceHandlerDat
 
 	int charCountHeight=Math::toInt(Math::sqrt(Math::fromInt(numChars)));
 	int charCountWidth=Math::intCeil(Math::div(Math::fromInt(numChars),Math::fromInt(charCountHeight)));
+	int pad=8;
 
 	int charmapWidth=0;
-	int charmapHeight=charCountWidth*Math::fromInt(fontData->pointSize);
+	int charmapHeight=charCountWidth*Math::fromInt(fontData->pointSize+pad);
 
 	for(i=0;i<charCountHeight;++i){
 		int w=0;
 		for(j=0;j<charCountWidth;++j){
-			w+=sizes[i].right;
+			w+=sizes[i].right+pad;
 		}
 		if(w>charmapWidth){
 			charmapWidth=w;
@@ -256,7 +257,7 @@ Resource::ptr Win32FontHandler::load(Stream::ptr stream,const ResourceHandlerDat
 			y+=fontData->pointSize;
 		}
 		else{
-			x+=sizes[i].right;
+			x+=glyph->width+pad;
 		}
 	}
 
