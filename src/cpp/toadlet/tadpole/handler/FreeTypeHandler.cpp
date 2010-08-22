@@ -46,8 +46,6 @@ inline int floatToFixed26_6(float f){
 	return (int)(f*(float)(1<<6));
 }
 
-static String defaultCharacterSet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()_+|{}:\"'<>?`-=\\/[];,. \t");
-
 FreeTypeHandler::FreeTypeHandler(TextureManager *textureManager){
 	mTextureManager=textureManager;
 
@@ -72,16 +70,8 @@ Resource::ptr FreeTypeHandler::load(Stream::ptr stream,const ResourceHandlerData
 		return NULL;
 	}
 
-	const wchar_t *charArray=NULL;
-	int numChars=0;
-	if(fontData->characterSet!=(char*)NULL){
-		charArray=fontData->characterSet.wc_str();
-		numChars=fontData->characterSet.length();
-	}
-	else{
-		charArray=defaultCharacterSet.wc_str();
-		numChars=defaultCharacterSet.length();
-	}
+	const wchar_t *charArray=fontData->characterSet.wc_str();
+	int numChars=numChars=fontData->characterSet.length();
 
 	MemoryStream::ptr memoryStream(new MemoryStream(stream));
 	int i=0,j=0;
@@ -126,14 +116,15 @@ Resource::ptr FreeTypeHandler::load(Stream::ptr stream,const ResourceHandlerData
 
 	int charCountHeight=Math::toInt(Math::sqrt(Math::fromInt(numChars)));
 	int charCountWidth=Math::intCeil(Math::div(Math::fromInt(numChars),Math::fromInt(charCountHeight)));
+	int pad=2;
 
 	int charmapWidth=0;
-	int charmapHeight=charCountHeight*maxHeight;
+	int charmapHeight=charCountHeight*(maxHeight+pad);
 
 	for(i=0;i<charCountHeight;++i){
 		int w=0;
 		for(j=0;j<charCountWidth;++j){
-			w+=bitmapGlyphs[i]->bitmap.width;
+			w+=bitmapGlyphs[i]->bitmap.width+pad;
 		}
 		if(w>charmapWidth){
 			charmapWidth=w;
@@ -178,10 +169,10 @@ Resource::ptr FreeTypeHandler::load(Stream::ptr stream,const ResourceHandlerData
 
 			if(i%charCountWidth==charCountWidth-1){
 				x=0;
-				y+=maxHeight;
+				y+=maxHeight+pad;
 			}
 			else{
-				x+=bitmapGlyph->bitmap.width;
+				x+=bitmapGlyph->bitmap.width+pad;
 			}
 		}
 	}

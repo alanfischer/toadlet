@@ -23,6 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/FontManager.h>
 #if defined(TOADLET_PLATFORM_WIN32)
 	#include <windows.h>
@@ -35,7 +36,9 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace tadpole{
 
-FontManager::FontManager(Archive *archive):ResourceManager(archive){}
+FontManager::FontManager(Archive *archive):ResourceManager(archive){
+	mDefaultCharacterSet=String("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()_+|{}:\"'<>?`-=\\/[];,. \t");
+}
 
 Resource::ptr FontManager::manage(const Resource::ptr &resource,const egg::String &name){
 	if(name!=(char*)NULL){
@@ -67,6 +70,21 @@ Font::ptr FontManager::getDefaultFont(){
 
 void FontManager::unmanage(Resource *resource){
 	return ResourceManager::unmanage(resource);
+}
+
+Resource::ptr FontManager::find(const String &name,ResourceHandlerData::ptr handlerData){
+	FontData *fontData=(FontData*)handlerData.get();
+	if(fontData==NULL){
+		Error::nullPointer(Categories::TOADLET_TADPOLE,
+			"invalid FontData");
+		return NULL;
+	}
+
+//	if(fontData->characterSet==(char*)NULL){
+		fontData->characterSet=mDefaultCharacterSet;
+//	}
+
+	return ResourceManager::find(name,handlerData);
 }
 
 }
