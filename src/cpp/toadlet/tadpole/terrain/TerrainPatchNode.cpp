@@ -17,18 +17,34 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/terrain/TerrainPatchNode.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole;
+using namespace toadlet::tadpole::node;
 
 namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-TerrainPatch::TerrainPatch(Engine *engine){
-	mEngine=engine;
+TerrainPatchNode::TerrainPatchNode():Node(),
+	mMinTolerance(0),
+	mMaxTolerance(0),
+
+	mS1(0),
+	mS2(0),
+
+	mSize(0)
+{
+}
+
+TerrainPatchNode::~TerrainPatchNode(){
+}
+
+Node *TerrainPatchNode::create(Scene *scene){
+	super::create(scene);
 
 	mMinTolerance=0;
 	mMaxTolerance=1;
@@ -38,42 +54,35 @@ TerrainPatch::TerrainPatch(Engine *engine){
 
 	mSize=0;
 
-	mEngine->addRendererListener(this);
+	return this;
 }
 
-TerrainPatch::~TerrainPatch(){
-	mEngine->removeRendererListener(this);
-}
-
-void TerrainPatch::load(TerrainData *data){
-	if(data->width!=data->height){
-		throw std::runtime_error("width!=height");
-	}
-
+bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
 	mSize=0;
 	mSizeN=0;
 
-	for(mSize=1;mSize<=data->width;mSize<<=1)mSizeN++;
+	for(mSize=1;mSize<=width;mSize<<=1)mSizeN++;
 
 	mSizeN--;
 	mSize>>=1;
 	mSize++;
 
-	if(mSize!=data->width){
-		throw std::runtime_error("width & height not a power of 2 + 1");
+	if(width!=height){
+		Error::invalidParameters(Categories::TOADLET_TADPOLE_TERRAIN,"width!=height");
+		return false;
 	}
 
-	int squareSize=square(mSize);
+	if(mSize!=width){
+		Error::invalidParameters(Categories::TOADLET_TADPOLE_TERRAIN,"width & height not a power of 2 + 1");
+		return false;
+	}
 
-	// Load height data
-	mTerrainVertexTypes.resize(squareSize);
-	mTerrainVertexes.resize(squareSize);
+	int numVertexes=Math::square(mSize);
+	int numIndexes=Math::square(mSize-1)*6;
 
-	mVertexBuffer=mEngine->getVertexBufferManager()->load(new VertexBuffer());
-	mVertexBuffer->resize(VertexBuffer::VertexType(VertexBuffer::VT_POSITION|VertexBuffer::VT_NORMAL|VertexBuffer::VT_TEXCOORD1_DIM2),squareSize);
-
-	mIndexBuffer=mEngine->getIndexBufferManager()->load(new IndexBuffer());
-	mIndexBuffer->setStatic(false);
+	mTerrainVertexes.resize(numVertexes);
+	mVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,numVertexes);
+	mIndexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,numIndexes);
 
 	int i,j;
 	for(i=0;i<mSize;++i){
@@ -138,26 +147,36 @@ void TerrainPatch::load(TerrainData *data){
 	addBlockToBack(0);
 }
 
-void TerrainPatch::updateBlocks(const Vector3 &position,const Vector3 &direction){
-	mPosition=position;
-	mDirection=direction;
+void TerrainPatchNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
+	super::queueRenderables(camera,queue);
 
-	mTolerance=lerp(mMaxTolerance,mMinTolerance,0.5f);
+	updateBlocks(camera);
+	updateIndexBuffers(camera);
+
+#if defined(TOADLET_GCC_INHERITANCE_BUG)
+	queue->queueRenderable(&renderable);
+#else
+	queue->queueRenderable(this);
+#endif
+}
+
+void TerrainPatchNode::updateBlocks(CameraNode *camera){
+	mPosition.set(camera->getWorldTranslate());
+	mDirection.set(camera->getForward());
+
+	mTolerance=Math::lerp(mMaxTolerance,mMinTolerance,0.5f);
 
 	resetBlocks();
 	simplifyBlocks();
 	simplifyVertexes();
 }
 
-void TerrainPatch::updateIndexBuffers(Renderer *renderer,Frustum *frustum){
-	IndexBuffer *indexes=mRendererData.find(renderer)->second.indexBuffer;
-	indexes->resize(square(mSize-1)*6);
-
-	int indexCount=gatherBlocks(frustum,indexes);
-	indexes->resize(indexCount);
+void TerrainPatchNode::updateIndexBuffers(CameraNode *camera){
+	int indexCount=gatherBlocks(mIndexBuffer,camera);
+	mIndexData->setCount(indexCount);
 }
 
-void TerrainPatch::render(Renderer *renderer) const{
+void TerrainPatchNode::render(Renderer *renderer) const{
 #if 1
 	{
 		// TODO: Introduce this to multitexturing :D
@@ -222,9 +241,9 @@ void TerrainPatch::render(Renderer *renderer) const{
 #endif
 }
 
-void TerrainPatch::stitchToRight(TerrainPatch *terrain){
-	TerrainPatch *tLeft=this;
-	TerrainPatch *tRight=terrain;
+void TerrainPatchNode::stitchToRight(TerrainPatchNode *terrain){
+	TerrainPatchNode *tLeft=this;
+	TerrainPatchNode *tRight=terrain;
 	int row;
 
 	if(tLeft->getSizeN()!=tRight->getSizeN()){
@@ -241,9 +260,9 @@ void TerrainPatch::stitchToRight(TerrainPatch *terrain){
 	}
 }
 
-void TerrainPatch::unstitchFromRight(TerrainPatch *terrain){
-	TerrainPatch *tLeft=this;
-	TerrainPatch *tRight=terrain;
+void TerrainPatchNode::unstitchFromRight(TerrainPatchNode *terrain){
+	TerrainPatchNode *tLeft=this;
+	TerrainPatchNode *tRight=terrain;
 	int row;
 
 	if(tLeft->getSizeN()!=tRight->getSizeN()){
@@ -256,9 +275,9 @@ void TerrainPatch::unstitchFromRight(TerrainPatch *terrain){
 	}
 }
 
-void TerrainPatch::stitchToBottom(TerrainPatch *terrain){
-	TerrainPatch *tTop=this;
-	TerrainPatch *tBottom=terrain;
+void TerrainPatchNode::stitchToBottom(TerrainPatchNode *terrain){
+	TerrainPatchNode *tTop=this;
+	TerrainPatchNode *tBottom=terrain;
 	int col;
 
 	if(tTop->getSizeN()!=tBottom->getSizeN()){
@@ -275,9 +294,9 @@ void TerrainPatch::stitchToBottom(TerrainPatch *terrain){
 	}
 }
 
-void TerrainPatch::unstitchFromBottom(TerrainPatch *terrain){
-	TerrainPatch *tTop=this;
-	TerrainPatch *tBottom=terrain;
+void TerrainPatchNode::unstitchFromBottom(TerrainPatchNode *terrain){
+	TerrainPatchNode *tTop=this;
+	TerrainPatchNode *tBottom=terrain;
 	int col;
 
 	if(tTop->getSizeN()!=tBottom->getSizeN()){
@@ -290,7 +309,7 @@ void TerrainPatch::unstitchFromBottom(TerrainPatch *terrain){
 	}
 }
 
-void TerrainPatch::initBlocks(Block *block,int q,int x,int y,int s,bool e){
+void TerrainPatchNode::initBlocks(Block *block,int q,int x,int y,int s,bool e){
 	int i=0;
 	int j=0;
 	float delta[5];
@@ -385,7 +404,7 @@ void TerrainPatch::initBlocks(Block *block,int q,int x,int y,int s,bool e){
 	}
 }
 
-void TerrainPatch::resetBlocks(){
+void TerrainPatchNode::resetBlocks(){
 	int i;
 	int x,y,s;
 
@@ -417,7 +436,7 @@ void TerrainPatch::resetBlocks(){
 	}
 }
 
-void TerrainPatch::enableVertex(Vertex *v){
+void TerrainPatchNode::enableVertex(Vertex *v){
 	if(v->enabled==false){
 		v->enabled=true;
 		if(v->dependent0){
@@ -429,7 +448,7 @@ void TerrainPatch::enableVertex(Vertex *v){
 	}
 }
 
-void TerrainPatch::disableVertex(Vertex *v){
+void TerrainPatchNode::disableVertex(Vertex *v){
 	if(v->enabled==true){
 		v->enabled=false;
 		if(v->dependent0){
@@ -441,7 +460,7 @@ void TerrainPatch::disableVertex(Vertex *v){
 	}
 }
 
-void TerrainPatch::simplifyBlocks(){
+void TerrainPatchNode::simplifyBlocks(){
 	int blockNum;
 	int i;
 
@@ -485,7 +504,7 @@ void TerrainPatch::simplifyBlocks(){
 
 			// Is block interrior node?
 			if(mBlocks[blockNum].stride>1){
-				// TODO: Put back in optional blockIntersectsFrustum test here if on single pipe machine
+				// TODO: Put back in optional blockIntersectsCamera test here if on single pipe machine
 				bool shouldSubdivide=false;
 					
 				for(i=0;i<4;i++){
@@ -510,7 +529,7 @@ void TerrainPatch::simplifyBlocks(){
 	}
 }
 
-bool TerrainPatch::blockShouldSubdivide(Block *block){
+bool TerrainPatchNode::blockShouldSubdivide(Block *block){
 #if 1
 	Vector3 bo=(block->mins+block->maxs)/2.0f;
 	float size=(block->maxs.z-block->mins.z);
@@ -539,7 +558,7 @@ bool TerrainPatch::blockShouldSubdivide(Block *block){
 }
 
 #if 0
-void TerrainPatch::computeDelta(Block *block,Vector3 origin,Vector3 forward,float tolerance){
+void TerrainPatchNode::computeDelta(Block *block,Vector3 origin,Vector3 forward,float tolerance){
     float fHMin;
 
 	origin=origin-mTranslate.x;
@@ -641,7 +660,7 @@ void TerrainPatch::computeDelta(Block *block,Vector3 origin,Vector3 forward,floa
 }
 #endif
 
-void TerrainPatch::simplifyVertexes(){
+void TerrainPatchNode::simplifyVertexes(){
 	int i;
 	Block *b;
 	for(i=0;i<mNumBlocksInQueue;i++){
@@ -664,26 +683,26 @@ void TerrainPatch::simplifyVertexes(){
 	}
 }
 
-bool TerrainPatch::blockIntersectsFrustum(const Block *block,Frustum *f) const{
+bool TerrainPatchNode::blockIntersectsCamera(const Block *block,Camera *camera) const{
 	AABox box(block->mins/*+mTranslate*/,block->maxs/*+mTranslate*/);
-	return f->testIntersection(box,false);
+	return camera->testIntersection(box,false);
 }
 
-int TerrainPatch::gatherBlocks(Frustum *f,IndexBuffer *indexes) const{
+int TerrainPatchNode::gatherBlocks(IndexBuffer *indexes,CameraNode *camera) const{
 	int indexCount=0;
+	const Block *block=NULL;
+
 	int i;
-	const Block *b;
-
 	for(i=0;i<mNumBlocksInQueue;i++){
-		b=getBlockNumber(i);
+		block=getBlockNumber(i);
 
-		if(blockIntersectsFrustum(b,f)){
-			int x0=b->xOrigin;
-			int y0=b->yOrigin;
-			int x1=b->xOrigin+b->stride*2;
-			int y1=b->yOrigin+b->stride*2;
+		if(blockIntersectsFrustum(block,camera)){
+			int x0=block->xOrigin;
+			int y0=block->yOrigin;
+			int x1=block->xOrigin+block->stride*2;
+			int y1=block->yOrigin+block->stride*2;
 
-			if(b->even==true){
+			if(block->even==true){
 				indexCount=gatherTriangle(indexes,indexCount,x0,y0,x0,y1,x1,y0);
 				indexCount=gatherTriangle(indexes,indexCount,x1,y1,x1,y0,x0,y1);
 			}
@@ -697,7 +716,7 @@ int TerrainPatch::gatherBlocks(Frustum *f,IndexBuffer *indexes) const{
 	return indexCount;
 }
 
-int TerrainPatch::gatherTriangle(IndexBuffer *indexes,int indexCount,int x0,int y0,int x1,int y1,int x2,int y2) const{
+int TerrainPatchNode::gatherTriangle(IndexBuffer *indexes,int indexCount,int x0,int y0,int x1,int y1,int x2,int y2) const{
 	if(Math::abs(x0-x1)>1 || Math::abs(x2-x1)>1 || Math::abs(y0-y1)>1 || Math::abs(y2-y1)>1){
 		int mx,my;
 
