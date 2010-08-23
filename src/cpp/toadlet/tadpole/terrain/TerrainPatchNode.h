@@ -20,6 +20,8 @@
 #ifndef TOADLET_TADPOLE_TERRAIN_TERRAINPATCH_H
 #define TOADLET_TADPOLE_TERRAIN_TERRAINPATCH_H
 
+#include <toadlet/peeper/IndexBuffer.h>
+#include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/node/Node.h>
@@ -73,20 +75,21 @@ public:
 	TerrainPatchNode();
 	~TerrainPatchNode();
 
-	void create(Scene *scene);
+	node::Node *create(Scene *scene);
 
-	void load(scalar *data,int rowPitch,int width,int height);
+	bool setData(scalar *data,int rowPitch,int width,int height);
 
+	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 	void updateBlocks(const Vector3 &position,const Vector3 &direction);
-	void updateIndexBuffers(peeper::Renderer *renderer,peeper::Frustum *frustum);
+	void updateIndexBuffers(node::CameraNode *camera);
 
 	const Sphere &getLocalBound() const{return super::getLocalBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
-	void stitchToRight(TerrainPatch *terrain);
-	void unstitchFromRight(TerrainPatch *terrain);
-	void stitchToBottom(TerrainPatch *terrain);
-	void unstitchFromBottom(TerrainPatch *terrain);
+	void stitchToRight(TerrainPatchNode *terrain);
+	void unstitchFromRight(TerrainPatchNode *terrain);
+	void stitchToBottom(TerrainPatchNode *terrain);
+	void unstitchFromBottom(TerrainPatchNode *terrain);
 	void setMinTolerance(scalar minTol){mMinTolerance=minTol;}
 	void setMaxTolerance(scalar maxTol){mMaxTolerance=maxTol;}
 
@@ -134,24 +137,24 @@ protected:
 	bool blockShouldSubdivide(Block *block);
 	void computeDelta(Block *block);
 	void simplifyVertexes();
-	bool blockIntersectsFrustum(const Block *block,peeper::Frustum *f) const;
-	int gatherBlocks(peeper::Frustum *f,peeper::IndexBuffer *indexes) const;
+	bool blockIntersectsCamera(const Block *block,node::CameraNode *camera) const;
+	int gatherBlocks(peeper::IndexBuffer *indexes,node::CameraNode *camera) const;
 	int gatherTriangle(peeper::IndexBuffer *indexes,int indexCount,int x0,int y0,int x1,int y1,int x2,int y2) const;
 
 	// BlockQueue methods
 	inline int getNumBlocksInQueue(){return mNumBlocksInQueue;}
 
-	inline Block *getBlockNumber(BlockQueueType t){return &mBlocks[getBlockNumberInQueue(t)];}
-	inline const Block *getBlockNumber(BlockQueueType t) const{return &mBlocks[getBlockNumberInQueue(t)];}
+	inline Block *getBlockNumber(int t){return &mBlocks[getBlockNumberInQueue(t)];}
+	inline const Block *getBlockNumber(int t) const{return &mBlocks[getBlockNumberInQueue(t)];}
 
-	inline BlockQueueType getBlockNumberInQueue(int blockNum) const{
+	inline int getBlockNumberInQueue(int blockNum) const{
 		blockNum=blockNum+mBlockQueueStart;
 		if(blockNum>=mBlockQueueSize)
 			blockNum=blockNum-mBlockQueueSize;
 		return mBlockQueue[blockNum];
 	}
 
-	inline BlockQueueType popBlockFromFront(){
+	inline int popBlockFromFront(){
 		int block=mBlockQueue[mBlockQueueStart];
 		mBlockQueueStart++;
 		if(mBlockQueueStart>=mBlockQueueSize)
@@ -160,7 +163,7 @@ protected:
 		return block;
 	}
 
-	inline void addBlockToBack(BlockQueueType block){
+	inline void addBlockToBack(int block){
 		mBlockQueue[mBlockQueueEnd]=block;
 		mBlockQueueEnd++;
 		if(mBlockQueueEnd>=mBlockQueueSize)
@@ -171,7 +174,7 @@ protected:
 	tadpole::Engine *mEngine;
 
 	egg::Collection<Block> mBlocks;
-	egg::Collection<BlockQueueType> mBlockQueue;
+	egg::Collection<int> mBlockQueue;
 	unsigned int mBlockQueueSize;
 	unsigned int mBlockQueueStart;
 	unsigned int mBlockQueueEnd;
@@ -191,7 +194,8 @@ protected:
 	float mMaxTolerance;
 	float mTolerance;
 
-	peeper::VertexBuffer::Ptr mVertexBuffer;
+	peeper::VertexBuffer::ptr mVertexBuffer;
+	peeper::IndexBuffer::ptr mIndexBuffer;
 	float mS1,mS2;
 };
 

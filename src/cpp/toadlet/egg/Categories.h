@@ -32,19 +32,20 @@ namespace toadlet{
 namespace egg{
 
 namespace Categories{
-	const static String TOADLET=				"toadlet";
-	const static String TOADLET_EGG=			TOADLET+".egg";
-	const static String TOADLET_EGG_LOGGER=		TOADLET_EGG+".Logger";
-	const static String TOADLET_EGG_NET=		TOADLET_EGG+".net";
-	const static String TOADLET_FLICK=			TOADLET+".flick";
-	const static String TOADLET_HOP=			TOADLET+".hop";
-	const static String TOADLET_KNOT=			TOADLET+".knot";
-	const static String TOADLET_PEEPER=			TOADLET+".peeper";
-	const static String TOADLET_RIBBIT=			TOADLET+".ribbit";
-	const static String TOADLET_TADPOLE=		TOADLET+".tadpole";
-	const static String TOADLET_TADPOLE_BSP=	TOADLET_TADPOLE+".bsp";
-	const static String TOADLET_TADPOLE_NODE=	TOADLET_TADPOLE+".node";
-	const static String TOADLET_PAD=			TOADLET+".pad";
+	const static String TOADLET=					"toadlet";
+	const static String TOADLET_EGG=				TOADLET+".egg";
+	const static String TOADLET_EGG_LOGGER=			TOADLET_EGG+".Logger";
+	const static String TOADLET_EGG_NET=			TOADLET_EGG+".net";
+	const static String TOADLET_FLICK=				TOADLET+".flick";
+	const static String TOADLET_HOP=				TOADLET+".hop";
+	const static String TOADLET_KNOT=				TOADLET+".knot";
+	const static String TOADLET_PEEPER=				TOADLET+".peeper";
+	const static String TOADLET_RIBBIT=				TOADLET+".ribbit";
+	const static String TOADLET_TADPOLE=			TOADLET+".tadpole";
+	const static String TOADLET_TADPOLE_BSP=		TOADLET_TADPOLE+".bsp";
+	const static String TOADLET_TADPOLE_NODE=		TOADLET_TADPOLE+".node";
+	const static String TOADLET_TADPOLE_TERRAIN=	TOADLET_TADPOLE+".terrain";
+	const static String TOADLET_PAD=				TOADLET+".pad";
 }
 
 }
