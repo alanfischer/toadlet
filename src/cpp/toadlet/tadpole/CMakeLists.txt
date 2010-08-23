@@ -94,6 +94,10 @@ set (TADPOLE_NODE_SRC
 	node/SpriteNode.cpp
 )
 
+set (TADPOLE_TERRAIN_SRC
+	terrain/TerrainPatchNode.cpp
+)
+
 
 # Headers
 set (TADPOLE_HEADERS
@@ -212,12 +216,17 @@ set (TADPOLE_NODE_HEADERS
 	node/SpriteNode.h
 )
 
+set (TADPOLE_TERRAIN_HEADERS
+	terrain/TerrainPatchNode.h
+)
+
 
 # Bundle source
 source_group ("Source Files\\\\animation" FILES ${TADPOLE_ANIMATION_SRC})
 source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_SRC})
 source_group ("Source Files\\\\mesh" FILES ${TADPOLE_MESH_SRC})
 source_group ("Source Files\\\\node" FILES ${TADPOLE_NODE_SRC})
+source_group ("Source Files\\\\terrain" FILES ${TADPOLE_TERRAIN_SRC})
 
 
 # Bundle headers
@@ -225,11 +234,12 @@ source_group ("Header Files\\\\animation" FILES ${TADPOLE_ANIMATION_HEADERS})
 source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_HEADERS})
 source_group ("Header Files\\\\mesh" FILES ${TADPOLE_MESH_HEADERS})
 source_group ("Header Files\\\\node" FILES ${TADPOLE_NODE_HEADERS})
+source_group ("Header Files\\\\terrain" FILES ${TADPOLE_TERRAIN_HEADERS})
 
 
 # Source and headers
-set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MESH_SRC} ${TADPOLE_NODE_SRC})
-set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_MESH_HEADERS} ${TADPOLE_NODE_HEADERS})
+set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MESH_SRC} ${TADPOLE_NODE_SRC} ${TADPOLE_TERRAIN_SRC})
+set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_MESH_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_TERRAIN_HEADERS})
 
 
 if (NOT TOADLET_FIXED_POINT)
