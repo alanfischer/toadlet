@@ -68,6 +68,9 @@ public:
 	void setWordWrap(bool wordWrap);
 	bool getWordWrap() const{return mWordWrap;}
 
+	void setColor(const peeper::Color &color);
+	const peeper::Color &getColor(){return mColor;}
+
 	void queueRenderables(CameraNode *camera,RenderQueue *queue);
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Matrix4x4 &getRenderTransform() const{return super::getWorldTransform();}
@@ -87,6 +90,7 @@ protected:
 	int mAlignment;
 	bool mNormalized;
 	bool mWordWrap;
+	peeper::Color mColor;
 
 	Material::ptr mMaterial;
 	peeper::VertexData::ptr mVertexData;

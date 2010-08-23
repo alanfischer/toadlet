@@ -43,8 +43,6 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-static String defaultCharacterSet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()_+|{}:\"'<>?`-=\\/[];,. \t");
-
 size_t FontStreamGetBytes(void *info,void *buffer,size_t count){
 	return ((Stream*)info)->read((tbyte*)buffer,count);
 }
@@ -119,16 +117,8 @@ Resource::ptr OSXFontHandler::load(Stream::ptr in,const ResourceHandlerData *han
 	int unitsPerEm=CGFontGetUnitsPerEm(cgfont);
 	int pad=3;
 	
-	const wchar_t *wcharArray=NULL;
-	int numChars=0;
-	if(fontData->characterSet!=(char*)NULL){
-		wcharArray=fontData->characterSet.wc_str();
-		numChars=fontData->characterSet.length();
-	}
-	else{
-		wcharArray=defaultCharacterSet.wc_str();
-		numChars=defaultCharacterSet.length();
-	}
+	const wchar_t *wcharArray=fontData->characterSet.wc_str();
+	int numChars=numChars=fontData->characterSet.length();
 	UniChar charArray[numChars+1];
 	int i;
 	for(i=0;i<numChars+1;++i){
