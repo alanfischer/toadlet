@@ -32,15 +32,19 @@ namespace terrain{
 
 class TOADLET_API TerrainPatchNode:public node::Node,public Renderable,public Traceable{
 public:
+	TOADLET_NODE(TerrainPatchNode,node::Node);
+
 	class Vertex{
 	public:
-		Vertex(){
-			height=0;
-			dependent0=0;
-			dependent1=0;
-			enabled=false;
-		}
+		Vertex():
+			index(0),
+			height(0),
+			dependent0(NULL),
+			dependent1(NULL),
+			enabled(false)
+		{}
 		
+		int index;
 		scalar height;
 		Vertex *dependent0;
 		Vertex *dependent1;
@@ -76,29 +80,30 @@ public:
 	~TerrainPatchNode();
 
 	node::Node *create(Scene *scene);
+	void destroy();
 
 	bool setData(scalar *data,int rowPitch,int width,int height);
+	bool setMaterial(Material::ptr material);
+
+	bool stitchToRight(TerrainPatchNode *terrain);
+	bool unstitchFromRight(TerrainPatchNode *terrain);
+	bool stitchToBottom(TerrainPatchNode *terrain);
+	bool unstitchFromBottom(TerrainPatchNode *terrain);
+	void setMinTolerance(scalar minTol){mMinTolerance=minTol;}
+	void setMaxTolerance(scalar maxTol){mMaxTolerance=maxTol;}
 
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
-	void updateBlocks(const Vector3 &position,const Vector3 &direction);
+	void updateBlocks(node::CameraNode *camera);
 	void updateIndexBuffers(node::CameraNode *camera);
+	Material *getRenderMaterial() const{return mMaterial;}
+	const Matrix4x4 &getRenderTransform() const{return super::getWorldTransform();}
+	void render(peeper::Renderer *renderer) const;
 
 	const Sphere &getLocalBound() const{return super::getLocalBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
-	void stitchToRight(TerrainPatchNode *terrain);
-	void unstitchFromRight(TerrainPatchNode *terrain);
-	void stitchToBottom(TerrainPatchNode *terrain);
-	void unstitchFromBottom(TerrainPatchNode *terrain);
-	void setMinTolerance(scalar minTol){mMinTolerance=minTol;}
-	void setMaxTolerance(scalar maxTol){mMaxTolerance=maxTol;}
-
-	void render(peeper::Renderer *renderer) const;
-
-//	inline egg::math::Vector3 &position(int x,int y){return mVertexBuffer->position(y*mSize+x);}
-//	inline egg::math::Vector3 &normal(int x,int y){return mVertexBuffer->normal(y*mSize+x);}
-//	inline egg::math::Vector2 &texCoord(int x,int y){return mVertexBuffer->texCoord2d(y*mSize+x);}
-	inline Vertex *vertex(int x,int y){return &mTerrainVertexes[y*mSize+x];}
+	inline Vertex *vertexAt(int x,int y){return &mTerrainVertexes[y*mSize+x];}
+	inline const Vertex *vertexAt(int x,int y) const{return &mTerrainVertexes[y*mSize+x];}
 
 	inline void setScale1(float s1){mS1=s1;}
 	inline void setScale2(float s2){mS2=s2;}
@@ -133,13 +138,13 @@ protected:
 	void resetBlocks();
 	void enableVertex(Vertex *v);
 	void disableVertex(Vertex *v);
-	void simplifyBlocks();
-	bool blockShouldSubdivide(Block *block);
+	void simplifyBlocks(const Vector3 &cameraTranslate);
+	bool blockShouldSubdivide(Block *block,const Vector3 &cameraTranslate);
 	void computeDelta(Block *block);
 	void simplifyVertexes();
 	bool blockIntersectsCamera(const Block *block,node::CameraNode *camera) const;
-	int gatherBlocks(peeper::IndexBuffer *indexes,node::CameraNode *camera) const;
-	int gatherTriangle(peeper::IndexBuffer *indexes,int indexCount,int x0,int y0,int x1,int y1,int x2,int y2) const;
+	int gatherBlocks(peeper::IndexBuffer *indexBuffer,node::CameraNode *camera) const;
+	int gatherTriangle(peeper::IndexBufferAccessor &iba,int indexCount,int x0,int y0,int x1,int y1,int x2,int y2) const;
 
 	// BlockQueue methods
 	inline int getNumBlocksInQueue(){return mNumBlocksInQueue;}
@@ -171,8 +176,6 @@ protected:
 		mNumBlocksInQueue++;
 	}
 
-	tadpole::Engine *mEngine;
-
 	egg::Collection<Block> mBlocks;
 	egg::Collection<int> mBlockQueue;
 	unsigned int mBlockQueueSize;
@@ -187,15 +190,18 @@ protected:
 	egg::Collection<int> mTerrainVertexIndexes;
 	egg::Collection<int> mDetailVertexIndexes;
 
-	egg::math::Vector3 mPosition;
-	egg::math::Vector3 mDirection;
+	// TODO: This should just be passed as method input
+	egg::math::Vector3 mCameraTranslate;
 
 	float mMinTolerance;
 	float mMaxTolerance;
 	float mTolerance;
 
+	Material::ptr mMaterial;
 	peeper::VertexBuffer::ptr mVertexBuffer;
 	peeper::IndexBuffer::ptr mIndexBuffer;
+	peeper::VertexData::ptr mVertexData;
+	peeper::IndexData::ptr mIndexData;
 	float mS1,mS2;
 };
 

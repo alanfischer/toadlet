@@ -131,10 +131,7 @@ void BSP30ModelNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 
 void BSP30ModelNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	Segment localSegment;
-	Quaternion invrot; Math::invert(invrot,getWorldRotate());
-	Math::sub(localSegment.origin,segment.origin,position);
-	Math::mul(localSegment.origin,invrot);
-	Math::mul(localSegment.direction,invrot,segment.direction);
+	inverseTransform(localSegment,segment,position,mWorldScale,mWorldRotate);
 
 	result.time=Math::ONE;
 	localSegment.getEndPoint(result.point);

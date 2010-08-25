@@ -17,7 +17,9 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Extents.h>
 #include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/RenderQueue.h>
 #include <toadlet/tadpole/terrain/TerrainPatchNode.h>
 
 using namespace toadlet::egg;
@@ -28,6 +30,8 @@ using namespace toadlet::tadpole::node;
 namespace toadlet{
 namespace tadpole{
 namespace terrain{
+
+TOADLET_NODE_IMPLEMENT(TerrainPatchNode,Categories::TOADLET_TADPOLE_TERRAIN+".TerrainPatchNode");
 
 TerrainPatchNode::TerrainPatchNode():Node(),
 	mMinTolerance(0),
@@ -57,6 +61,14 @@ Node *TerrainPatchNode::create(Scene *scene){
 	return this;
 }
 
+void TerrainPatchNode::destroy(){
+	if(mMaterial!=NULL){
+		mMaterial->release();
+	}
+
+	super::destroy();
+}
+
 bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
 	mSize=0;
 	mSizeN=0;
@@ -84,26 +96,49 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
 	mVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,numVertexes);
 	mIndexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,numIndexes);
 
+	VertexBufferAccessor vba(mVertexBuffer,Buffer::Access_BIT_WRITE);
+
+	Vector3 normal;
 	int i,j;
-	for(i=0;i<mSize;++i){
-		for(j=0;j<mSize;++j){
+	for(j=0;j<mSize;++j){
+		for(i=0;i<mSize;++i){
 			int index=j*mSize+i;
+			scalar height=data[j*rowPitch+i];
 
-			vertex(i,j)->index=index;
+			Vertex *vertex=vertexAt(i,j);
+			vertex->index=index;
+			vertex->height=height;
 
-			float height=data->heightData[index];
+			vba.set3(index,0,i,j,height);
 
-			position(i,j).z=height;
-			position(i,j).x=i;
-			position(i,j).y=j;
+			if(i>0 && j>0){
+				scalar heightl=vertexAt(i-1,j)->height;
+				scalar heightu=vertexAt(i,j-1)->height;
 
-			texCoord(i,j).x=(float)i/(float)(mSize)+.5/(float)mSize;
-			texCoord(i,j).y=(float)j/(float)(mSize)+.5/(float)mSize;
+				// Result of cross(height(i-1,j)-height(i,j),height(i,j-1)-height(i,j))
+				normal.set(heightl-height,heightu-height,Math::ONE);
+				Math::normalize(normal);
+				vba.set3(index,1,normal);
+			}
 
-			// TODO: Set type
-			// terrainVertexType
+			vba.set2(index,2,Math::div(Math::fromInt(i)+Math::HALF,mSize),Math::div(Math::fromInt(j)+Math::HALF,mSize));
 		}
 	}
+
+	for(i=0;i<mSize;i++){
+		vba.get3(i+mSize,1,normal);
+		vba.set3(i,1,normal);
+	}
+
+	for(j=0;j<mSize;j++){
+		vba.get3(1+mSize*j,1,normal);
+		vba.set3(mSize*j,1,normal);
+	}
+
+	vba.unlock();
+
+	mVertexData=VertexData::ptr(new VertexData(mVertexBuffer));
+	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,mIndexBuffer));
 
 	// Build blocks
 	int numBlocks=1;
@@ -121,30 +156,108 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
 	mBlockQueueStart=0;
 	mBlockQueueEnd=0;
 
-	for(i=0;i<mSize;i++){
-		for(j=0;j<mSize;j++){
-			if(i>0 && j>0){
-				cross(normal(i,j),position(i-1,j)-position(i,j),position(i,j-1)-position(i,j));
-				normalize(normal(i,j));
-			}
-		}
-	}
-
-	for(i=0;i<mSize;i++){
-		normal(i,0)=normal(i,1);
-	}
-
-	for(j=0;j<mSize;j++){
-		normal(0,j)=normal(1,j);
-	}
-
-	int numInitBlocks=1;
-	for(i=0;i<mSizeN-1;i++){
-		numInitBlocks*=2;
-	}
+	int numInitBlocks=1<<(mSizeN-1);
 	initBlocks(&mBlocks[0],0,0,0,numInitBlocks,true);
 
 	addBlockToBack(0);
+
+	set(mLocalBound,AABox(mBlocks[0].mins,mBlocks[0].maxs));
+
+	return true;
+}
+
+bool TerrainPatchNode::setMaterial(Material::ptr material){
+	if(mMaterial!=NULL){
+		mMaterial->release();
+	}
+
+	mMaterial=material;
+
+	if(mMaterial!=NULL){
+		mMaterial->retain();
+	}
+
+	return true;
+}
+
+bool TerrainPatchNode::stitchToRight(TerrainPatchNode *terrain){
+	TerrainPatchNode *tLeft=this;
+	TerrainPatchNode *tRight=terrain;
+	int row;
+
+	if(tLeft->getSizeN()!=tRight->getSizeN()){
+		Error::unknown("left->sizeN!=right->sizeN");
+		return false;
+	}
+
+	for(row=1;row<mSize-1;row++){
+		tRight->vertexAt(0,row)->dependent0=tLeft->vertexAt(mSize-1,row);
+		tLeft->vertexAt(mSize-1,row)->dependent1=tRight->vertexAt(0,row);
+	}
+
+	for(row=0;row<mSize;row++){
+//		tRight->normal(0,row)=tLeft->normal(mSize-1,row);
+	}
+
+	return true;
+}
+
+bool TerrainPatchNode::unstitchFromRight(TerrainPatchNode *terrain){
+	TerrainPatchNode *tLeft=this;
+	TerrainPatchNode *tRight=terrain;
+	int row;
+
+	if(tLeft->getSizeN()!=tRight->getSizeN()){
+		Error::unknown("left->sizeN!=right->sizeN");
+		return false;
+	}
+
+	for(row=1;row<mSize-1;row++){
+		tRight->vertexAt(0,row)->dependent0=NULL;
+		tLeft->vertexAt(mSize-1,row)->dependent1=NULL;
+	}
+
+	return true;
+}
+
+bool TerrainPatchNode::stitchToBottom(TerrainPatchNode *terrain){
+	TerrainPatchNode *tTop=this;
+	TerrainPatchNode *tBottom=terrain;
+	int col;
+
+	if(tTop->getSizeN()!=tBottom->getSizeN()){
+		Error::unknown("top->sizeN!=bottom->sizeN");
+		return false;
+	}
+
+	for(col=1;col<mSize-1;col++){
+		tBottom->vertexAt(col,mSize-1)->dependent0=tTop->vertexAt(col,0);
+		tTop->vertexAt(col,0)->dependent1=tBottom->vertexAt(col,mSize-1);
+	}
+
+	for(col=0;col<mSize;col++){
+//		tBottom->normal(col,mSize-1)=tTop->normal(col,0);
+	}
+
+	return true;
+}
+
+bool TerrainPatchNode::unstitchFromBottom(TerrainPatchNode *terrain){
+	TerrainPatchNode *tTop=this;
+	TerrainPatchNode *tBottom=terrain;
+	int col;
+
+	if(tTop->getSizeN()!=tBottom->getSizeN()){
+		Error::unknown("top->sizeN!=bottom->sizeN");
+		return false;
+	}
+
+	for(col=1;col<mSize-1;col++){
+		tTop->vertexAt(col,mSize-1)->dependent0=NULL;
+		tBottom->vertexAt(col,0)->dependent1=NULL;
+	}
+
+	return true;
 }
 
 void TerrainPatchNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
@@ -161,13 +274,13 @@ void TerrainPatchNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 }
 
 void TerrainPatchNode::updateBlocks(CameraNode *camera){
-	mPosition.set(camera->getWorldTranslate());
-	mDirection.set(camera->getForward());
+	Vector3 cameraTranslate;
+	inverseTransform(cameraTranslate,camera->getWorldTranslate(),mWorldTranslate,mWorldScale,mWorldRotate);
 
 	mTolerance=Math::lerp(mMaxTolerance,mMinTolerance,0.5f);
 
 	resetBlocks();
-	simplifyBlocks();
+	simplifyBlocks(cameraTranslate);
 	simplifyVertexes();
 }
 
@@ -177,166 +290,42 @@ void TerrainPatchNode::updateIndexBuffers(CameraNode *camera){
 }
 
 void TerrainPatchNode::render(Renderer *renderer) const{
-#if 1
-	{
-		// TODO: Introduce this to multitexturing :D
-
-//		renderer->setTextureState(TextureState(mTerrainTexture));
-		renderer->renderPrimitive(PRIMITIVE_TRIS,mVertexBuffer,indexes);
-
-//		renderer->setTextureMatrix(
-//		renderer->setTextureState(TextureState(mDetailTexture));
-//		renderer->setBlendFunction(BC_ALPHA);
-//		renderer->setColor(Vector4(1,1,1,0.3f));
-
-//		renderer->renderPrimitive(PRIMITIVE_TRIS,mVertexBuffer,indexes);
-
-//		renderer->setTextureState(Math::IDENTITY_MATRIX4X4);
-	}
-#else
-	{
-		mVertexBuffer->mColors.clear();
-
-		renderer->setRenderState(TextureRenderState(terrainTexture));
-		renderer->renderTriangleList(mVertexBuffer,mIndexBuffer);
-
-		renderer->pushRenderStates();
-		renderer->setRenderState(BlendRenderState(BC_ALPHA));
-
-		renderer->pushMatrix(RendererI::MATRIX_TEXTURE);
-		renderer->multMatrix(RendererI::MATRIX_TEXTURE,Matrix4x4::makeMatrixFromScale(getWorldScale()));
-
-		mVertexBuffer->mColors.resize(size*size,Vector4(1,1,1,1));
-
-		for(j=0;j<numDetailTextures;j++){
-			mDetailIndexBuffer->mIndexes.clear();
-
-			for(i=0;i<mIndexBuffer->mIndexes.size();i+=3){
-				float t1=.5f;
-				float t2=.5f;
-				float t3=.5f;
-
-				if(terrainVertexTypes[mIndexBuffer->mIndexes[i+0]]!=j)t1=0;
-				if(terrainVertexTypes[mIndexBuffer->mIndexes[i+1]]!=j)t2=0;
-				if(terrainVertexTypes[mIndexBuffer->mIndexes[i+2]]!=j)t3=0;
-
-				if(t1>0 || t2>0 || t3>0){
-					mDetailIndexBuffer->mIndexes.push_back(mIndexBuffer->mIndexes[i+0]);
-					mDetailIndexBuffer->mIndexes.push_back(mIndexBuffer->mIndexes[i+1]);
-					mDetailIndexBuffer->mIndexes.push_back(mIndexBuffer->mIndexes[i+2]);
-
-					mVertexBuffer->mColors[mIndexBuffer->mIndexes[i+0]]=Vector4(1,1,1,t1);
-					mVertexBuffer->mColors[mIndexBuffer->mIndexes[i+1]]=Vector4(1,1,1,t2);
-					mVertexBuffer->mColors[mIndexBuffer->mIndexes[i+2]]=Vector4(1,1,1,t3);
-				}
-			}
-
-			renderer->setRenderState(TextureRenderState(detailTextures[j]));
-			renderer->renderTriangleList(mVertexBuffer,mDetailIndexBuffer);
-		}
-
-		renderer->popMatrix(RendererI::MATRIX_TEXTURE);
-		renderer->popRenderStates();
-	}
-#endif
+	renderer->renderPrimitive(mVertexData,mIndexData);
 }
 
-void TerrainPatchNode::stitchToRight(TerrainPatchNode *terrain){
-	TerrainPatchNode *tLeft=this;
-	TerrainPatchNode *tRight=terrain;
-	int row;
-
-	if(tLeft->getSizeN()!=tRight->getSizeN()){
-		throw std::runtime_error("left->sizeN!=right->sizeN");
-	}
-
-	for(row=1;row<mSize-1;row++){
-		tRight->vertex(0,row)->dependent0=tLeft->vertex(mSize-1,row);
-		tLeft->vertex(mSize-1,row)->dependent1=tRight->vertex(0,row);
-	}
-
-	for(row=0;row<mSize;row++){
-		tRight->normal(0,row)=tLeft->normal(mSize-1,row);
-	}
-}
-
-void TerrainPatchNode::unstitchFromRight(TerrainPatchNode *terrain){
-	TerrainPatchNode *tLeft=this;
-	TerrainPatchNode *tRight=terrain;
-	int row;
-
-	if(tLeft->getSizeN()!=tRight->getSizeN()){
-		throw std::runtime_error("left->sizeN!=right->sizeN");
-	}
-
-	for(row=1;row<mSize-1;row++){
-		tRight->vertex(0,row)->dependent0=0;
-		tLeft->vertex(mSize-1,row)->dependent1=0;
-	}
-}
-
-void TerrainPatchNode::stitchToBottom(TerrainPatchNode *terrain){
-	TerrainPatchNode *tTop=this;
-	TerrainPatchNode *tBottom=terrain;
-	int col;
-
-	if(tTop->getSizeN()!=tBottom->getSizeN()){
-		throw std::runtime_error("top->sizeN!=bottom->sizeN");
-	}
-
-	for(col=1;col<mSize-1;col++){
-		tBottom->vertex(col,mSize-1)->dependent0=tTop->vertex(col,0);
-		tTop->vertex(col,0)->dependent1=tBottom->vertex(col,mSize-1);
-	}
-
-	for(col=0;col<mSize;col++){
-		tBottom->normal(col,mSize-1)=tTop->normal(col,0);
-	}
-}
-
-void TerrainPatchNode::unstitchFromBottom(TerrainPatchNode *terrain){
-	TerrainPatchNode *tTop=this;
-	TerrainPatchNode *tBottom=terrain;
-	int col;
-
-	if(tTop->getSizeN()!=tBottom->getSizeN()){
-		throw std::runtime_error("top->sizeN!=bottom->sizeN");
-	}
-
-	for(col=1;col<mSize-1;col++){
-		tTop->vertex(col,mSize-1)->dependent0=NULL;
-		tBottom->vertex(col,0)->dependent1=NULL;
-	}
+void TerrainPatchNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
+	result.time=Math::ONE;
+	return; // dont do a thing
 }
 
 void TerrainPatchNode::initBlocks(Block *block,int q,int x,int y,int s,bool e){
 	int i=0;
 	int j=0;
-	float delta[5];
+	scalar delta[5];
 	
 	block->xOrigin=x;
 	block->yOrigin=y;
 	block->stride=s;
 	block->even=e;
 	block->delta0=0;
-	block->delta1=MAX_FLOAT;
+	block->delta1=Extents::MAX_SCALAR;
 	block->processed=false;
 
-	delta[0]=(float)(position(x,y).z+position(x+2*s,y).z)/2-position(x+s,y).z;
-	delta[0]*=delta[0];
-	delta[1]=(float)(position(x+2*s,y).z+position(x+2*s,y+2*s).z)/2-position(x+2*s,y+s).z;
-	delta[1]*=delta[1];
-	delta[2]=(float)(position(x,y+2*s).z+position(x+2*s,y+2*s).z)/2-position(x+s,y+2*s).z;
-	delta[2]*=delta[2];
-	delta[3]=(float)(position(x,y).z+position(x,y+2*s).z)/2-position(x,y+s).z;
-	delta[3]*=delta[3];
+	delta[0]=(vertexAt(x,y)->height+vertexAt(x+2*s,y)->height)/2-vertexAt(x+s,y)->height;
+	delta[0]=Math::square(delta[0]);
+	delta[1]=(vertexAt(x+2*s,y)->height+vertexAt(x+2*s,y+2*s)->height)/2-vertexAt(x+2*s,y+s)->height;
+	delta[1]=Math::square(delta[1]);
+	delta[2]=(vertexAt(x,y+2*s)->height+vertexAt(x+2*s,y+2*s)->height)/2-vertexAt(x+s,y+2*s)->height;
+	delta[2]=Math::square(delta[2]);
+	delta[3]=(vertexAt(x,y)->height+vertexAt(x,y+2*s)->height)/2-vertexAt(x,y+s)->height;
+	delta[3]=Math::square(delta[3]);
 	if(block->even){
-		delta[4]=(float)(position(x,y+2*s).z+position(x+2*s,y).z)/2-position(x+s,y+s).z;
+		delta[4]=(vertexAt(x,y+2*s)->height+vertexAt(x+2*s,y)->height)/2-vertexAt(x+s,y+s)->height;
 	}
 	else{
-		delta[4]=(float)(position(x,y).z+position(x+2*s,y+2*s).z)/2-position(x+s,y+s).z;
+		delta[4]=(vertexAt(x,y)->height+vertexAt(x+2*s,y+2*s)->height)/2-vertexAt(x+s,y+s)->height;
 	}
-	delta[4]*=delta[4];
+	delta[4]=Math::square(delta[4]);
 
 	block->deltaMax=delta[0];
 	for(i=1;i<5;i++){
@@ -345,24 +334,24 @@ void TerrainPatchNode::initBlocks(Block *block,int q,int x,int y,int s,bool e){
 		}
 	}
 
-	block->mins.x=position(x,y).x;
-	block->maxs.x=position(x+s*2,y+s*2).x;
-	block->mins.y=position(x,y).y;
-	block->maxs.y=position(x+s*2,y+s*2).y;
+	block->mins.x=x;
+	block->maxs.x=(x+s*2);
+	block->mins.y=y;
+	block->maxs.y=(y+s*2);
 
 	// Dependents set correctly! :)
-	vertex(x+s,y)->dependent0=vertex(x+s,y+s);
-	vertex(x,y+s)->dependent1=vertex(x+s,y+s);
-	vertex(x+2*s,y+s)->dependent0=vertex(x+s,y+s);
-	vertex(x+s,y+2*s)->dependent1=vertex(x+s,y+s);
+	vertexAt(x+s,y)->dependent0=vertexAt(x+s,y+s);
+	vertexAt(x,y+s)->dependent1=vertexAt(x+s,y+s);
+	vertexAt(x+2*s,y+s)->dependent0=vertexAt(x+s,y+s);
+	vertexAt(x+s,y+2*s)->dependent1=vertexAt(x+s,y+s);
 
 	if(block->even==true){
-		vertex(x+s,y+s)->dependent0=vertex(x,y+2*s);
-		vertex(x+s,y+s)->dependent1=vertex(x+2*s,y);
+		vertexAt(x+s,y+s)->dependent0=vertexAt(x,y+2*s);
+		vertexAt(x+s,y+s)->dependent1=vertexAt(x+2*s,y);
 	}
 	else{
-		vertex(x+s,y+s)->dependent0=vertex(x,y);
-		vertex(x+s,y+s)->dependent1=vertex(x+2*s,y+2*s);
+		vertexAt(x+s,y+s)->dependent0=vertexAt(x,y);
+		vertexAt(x+s,y+s)->dependent1=vertexAt(x+2*s,y+2*s);
 	}
 
 	// Initialization set correctly! :)
@@ -390,15 +379,15 @@ void TerrainPatchNode::initBlocks(Block *block,int q,int x,int y,int s,bool e){
 		}
 	}
 	else{
-		block->mins.z=position(x,y).z;
-		block->maxs.z=position(x,y).z;
+		block->mins.z=vertexAt(x,y)->height;
+		block->maxs.z=vertexAt(x,y)->height;
 
 		for(i=x;i<=x+2;i++){
 			for(j=y;j<=y+2;j++){
-				if(position(i,j).z<block->mins.z)
-					block->mins.z=position(i,j).z;
-				if(position(i,j).z>block->maxs.z)
-					block->maxs.z=position(i,j).z;
+				if(vertexAt(i,j)->height<block->mins.z)
+					block->mins.z=vertexAt(i,j)->height;
+				if(vertexAt(i,j)->height>block->maxs.z)
+					block->maxs.z=vertexAt(i,j)->height;
 			}
 		}
 	}
@@ -419,19 +408,19 @@ void TerrainPatchNode::resetBlocks(){
 
 		b->processed=false;
 
-		disableVertex(vertex(x+s,y));
-		disableVertex(vertex(x,y+s));
-		disableVertex(vertex(x+s,y+s));
-		disableVertex(vertex(x+2*s,y+s));
-		disableVertex(vertex(x+s,y+s*2));
+		disableVertex(vertexAt(x+s,y));
+		disableVertex(vertexAt(x,y+s));
+		disableVertex(vertexAt(x+s,y+s));
+		disableVertex(vertexAt(x+2*s,y+s));
+		disableVertex(vertexAt(x+s,y+s*2));
 
 		if(b->even==true){
-			disableVertex(vertex(x,y+s*2));
-			disableVertex(vertex(x+2*s,y));
+			disableVertex(vertexAt(x,y+s*2));
+			disableVertex(vertexAt(x+2*s,y));
 		}
 		else{
-			disableVertex(vertex(x,y));
-			disableVertex(vertex(x+2*s,y+s*2));
+			disableVertex(vertexAt(x,y));
+			disableVertex(vertexAt(x+2*s,y+s*2));
 		}
 	}
 }
@@ -460,7 +449,7 @@ void TerrainPatchNode::disableVertex(Vertex *v){
 	}
 }
 
-void TerrainPatchNode::simplifyBlocks(){
+void TerrainPatchNode::simplifyBlocks(const Vector3 &cameraTranslate){
 	int blockNum;
 	int i;
 
@@ -478,7 +467,7 @@ void TerrainPatchNode::simplifyBlocks(){
 					bool replaceParent=true;
 					
 					for(i=0;i<4;i++){
-						if(blockShouldSubdivide(&mBlocks[blockNum+i])){
+						if(blockShouldSubdivide(&mBlocks[blockNum+i],cameraTranslate)){
 							replaceParent=false;
 						}
 					}
@@ -508,7 +497,7 @@ void TerrainPatchNode::simplifyBlocks(){
 				bool shouldSubdivide=false;
 					
 				for(i=0;i<4;i++){
-					if(blockShouldSubdivide(mBlocks[blockNum].children[i])){
+					if(blockShouldSubdivide(mBlocks[blockNum].children[i],cameraTranslate)){
 						shouldSubdivide=true;
 					}
 				}
@@ -529,18 +518,18 @@ void TerrainPatchNode::simplifyBlocks(){
 	}
 }
 
-bool TerrainPatchNode::blockShouldSubdivide(Block *block){
+bool TerrainPatchNode::blockShouldSubdivide(Block *block,const Vector3 &cameraTranslate){
 #if 1
 	Vector3 bo=(block->mins+block->maxs)/2.0f;
-	float size=(block->maxs.z-block->mins.z);
-	float distx=fabs(bo.x-(mPosition.x/*-mTranslate.x*/));
-	float disty=fabs(bo.y-(mPosition.y/*-mTranslate.y*/));
-	float dist=maxVal(distx,disty);
+	scalar size=(block->maxs.z-block->mins.z);
+	scalar distx=Math::abs(bo.x-cameraTranslate.x);
+	scalar disty=Math::abs(bo.y-cameraTranslate.y);
+	scalar dist=Math::maxVal(distx,disty);
 
-	dist*=square(mS1);
-	size*=square(mS2);
+	dist=Math::mul(dist,Math::square(mS1));
+	size=Math::mul(size,Math::square(mS2));
 
-	if(dist*mS1-size*mS2<=0){
+	if(Math::mul(dist,mS1)-Math::mul(size,mS2)<=0){
 		return true;
 	}
 	else{
@@ -666,73 +655,81 @@ void TerrainPatchNode::simplifyVertexes(){
 	for(i=0;i<mNumBlocksInQueue;i++){
 		b=getBlockNumber(i);
 
-		enableVertex(vertex(b->xOrigin+b->stride,b->yOrigin));
-		enableVertex(vertex(b->xOrigin,b->yOrigin+b->stride));
-		enableVertex(vertex(b->xOrigin+b->stride,b->yOrigin+b->stride));
-		enableVertex(vertex(b->xOrigin+b->stride*2,b->yOrigin+b->stride));
-		enableVertex(vertex(b->xOrigin+b->stride,b->yOrigin+b->stride*2));
+		enableVertex(vertexAt(b->xOrigin+b->stride,b->yOrigin));
+		enableVertex(vertexAt(b->xOrigin,b->yOrigin+b->stride));
+		enableVertex(vertexAt(b->xOrigin+b->stride,b->yOrigin+b->stride));
+		enableVertex(vertexAt(b->xOrigin+b->stride*2,b->yOrigin+b->stride));
+		enableVertex(vertexAt(b->xOrigin+b->stride,b->yOrigin+b->stride*2));
 
 		if(b->even==true){
-			enableVertex(vertex(b->xOrigin,b->yOrigin+b->stride*2));
-			enableVertex(vertex(b->xOrigin+b->stride*2,b->yOrigin));
+			enableVertex(vertexAt(b->xOrigin,b->yOrigin+b->stride*2));
+			enableVertex(vertexAt(b->xOrigin+b->stride*2,b->yOrigin));
 		}
 		else{
-			enableVertex(vertex(b->xOrigin,b->yOrigin));
-			enableVertex(vertex(b->xOrigin+b->stride*2,b->yOrigin+b->stride*2));
+			enableVertex(vertexAt(b->xOrigin,b->yOrigin));
+			enableVertex(vertexAt(b->xOrigin+b->stride*2,b->yOrigin+b->stride*2));
 		}
 	}
 }
 
-bool TerrainPatchNode::blockIntersectsCamera(const Block *block,Camera *camera) const{
-	AABox box(block->mins/*+mTranslate*/,block->maxs/*+mTranslate*/);
-	return camera->testIntersection(box,false);
+bool TerrainPatchNode::blockIntersectsCamera(const Block *block,CameraNode *camera) const{
+	AABox box(block->mins,block->maxs);
+
+	Math::mul(box.mins,mWorldTransform);
+	Math::mul(box.maxs,mWorldTransform);
+
+	return camera->culled(box)==false;
 }
 
-int TerrainPatchNode::gatherBlocks(IndexBuffer *indexes,CameraNode *camera) const{
+int TerrainPatchNode::gatherBlocks(IndexBuffer *indexBuffer,CameraNode *camera) const{
 	int indexCount=0;
 	const Block *block=NULL;
+
+	IndexBufferAccessor iba(indexBuffer,Buffer::Access_BIT_WRITE);
 
 	int i;
 	for(i=0;i<mNumBlocksInQueue;i++){
 		block=getBlockNumber(i);
 
-		if(blockIntersectsFrustum(block,camera)){
+		if(blockIntersectsCamera(block,camera)){
 			int x0=block->xOrigin;
 			int y0=block->yOrigin;
 			int x1=block->xOrigin+block->stride*2;
 			int y1=block->yOrigin+block->stride*2;
 
 			if(block->even==true){
-				indexCount=gatherTriangle(indexes,indexCount,x0,y0,x0,y1,x1,y0);
-				indexCount=gatherTriangle(indexes,indexCount,x1,y1,x1,y0,x0,y1);
+				indexCount=gatherTriangle(iba,indexCount,x0,y0,x0,y1,x1,y0);
+				indexCount=gatherTriangle(iba,indexCount,x1,y1,x1,y0,x0,y1);
 			}
 			else{
-				indexCount=gatherTriangle(indexes,indexCount,x1,y0,x0,y0,x1,y1);
-				indexCount=gatherTriangle(indexes,indexCount,x0,y1,x1,y1,x0,y0);
+				indexCount=gatherTriangle(iba,indexCount,x1,y0,x0,y0,x1,y1);
+				indexCount=gatherTriangle(iba,indexCount,x0,y1,x1,y1,x0,y0);
 			}
 		}
 	}
 
+	iba.unlock();
+
 	return indexCount;
 }
 
-int TerrainPatchNode::gatherTriangle(IndexBuffer *indexes,int indexCount,int x0,int y0,int x1,int y1,int x2,int y2) const{
+int TerrainPatchNode::gatherTriangle(IndexBufferAccessor &iba,int indexCount,int x0,int y0,int x1,int y1,int x2,int y2) const{
 	if(Math::abs(x0-x1)>1 || Math::abs(x2-x1)>1 || Math::abs(y0-y1)>1 || Math::abs(y2-y1)>1){
 		int mx,my;
 
 		mx=(x1+x2)/2;
 		my=(y1+y2)/2;
 
-		if(vertex(mx,my)->enabled){
-			indexCount=gatherTriangle(indexes,indexCount,mx,my,x0,y0,x1,y1);
-			indexCount=gatherTriangle(indexes,indexCount,mx,my,x2,y2,x0,y0);
+		if(vertexAt(mx,my)->enabled){
+			indexCount=gatherTriangle(iba,indexCount,mx,my,x0,y0,x1,y1);
+			indexCount=gatherTriangle(iba,indexCount,mx,my,x2,y2,x0,y0);
 			return indexCount;
 		}
 	}
 
-	indexes->index(indexCount++)=x0+y0*mSize;
-	indexes->index(indexCount++)=x2+y2*mSize;
-	indexes->index(indexCount++)=x1+y1*mSize;
+	iba.set(indexCount++,x0+y0*mSize);
+	iba.set(indexCount++,x2+y2*mSize);
+	iba.set(indexCount++,x1+y1*mSize);
 
 	return indexCount;
 }
