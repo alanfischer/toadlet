@@ -36,6 +36,7 @@ namespace tadpole{
 Material::Material():BaseResource(),
 	mLighting(false),
 	mFaceCulling(Renderer::FaceCulling_BACK),
+	mFill(Renderer::Fill_SOLID),
 	mAlphaTest(Renderer::AlphaTest_NONE),
 	mAlphaTestCutoff(0),
 	mDepthSorted(false),
@@ -68,6 +69,7 @@ Material::ptr Material::clone(){
 	material->mLightEffect.set(mLightEffect);
 	material->mLighting=mLighting;
 	material->mFaceCulling=mFaceCulling;
+	material->mFill=mFill;
 	material->mAlphaTest=mAlphaTest;
 	material->mAlphaTestCutoff=mAlphaTestCutoff;
 	material->mBlend.set(mBlend);
@@ -110,6 +112,7 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		renderer->setDepthTest(mDepthTest);
 		renderer->setDepthWrite(mDepthWrite);
 		renderer->setFaceCulling(mFaceCulling);
+		renderer->setFill(mFill);
 		renderer->setLighting(mLighting);
 		renderer->setLightEffect(mLightEffect); // We set this even if lighting isnt enabled, since it includes color tracking
 
@@ -126,6 +129,9 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 	else{
 		if(previousMaterial->mFaceCulling!=mFaceCulling){
 			renderer->setFaceCulling(mFaceCulling);
+		}
+		if(previousMaterial->mFill!=mFill){
+			renderer->setFill(mFill);
 		}
 		if(previousMaterial->mLighting!=mLighting){
 			renderer->setLighting(mLighting);

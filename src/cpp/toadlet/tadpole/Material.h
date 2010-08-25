@@ -59,6 +59,9 @@ public:
 	void setFaceCulling(const peeper::Renderer::FaceCulling &faceCulling){mFaceCulling=faceCulling;}
 	inline const peeper::Renderer::FaceCulling &getFaceCulling() const{return mFaceCulling;}
 
+	void setFill(const peeper::Renderer::Fill &fill){mFill=fill;}
+	inline const peeper::Renderer::Fill &getFill() const{return mFill;}
+
 	void setAlphaTest(peeper::Renderer::AlphaTest alphaTest,scalar cutoff);
 	inline const peeper::Renderer::AlphaTest &getAlphaTest() const{return mAlphaTest;}
 	inline scalar getAlphaTestCutoff() const{return mAlphaTestCutoff;}
@@ -91,6 +94,7 @@ protected:
 	peeper::LightEffect mLightEffect;
 	bool mLighting;
 	peeper::Renderer::FaceCulling mFaceCulling;
+	peeper::Renderer::Fill mFill;
 	peeper::Renderer::AlphaTest mAlphaTest;
 	scalar mAlphaTestCutoff;
 	peeper::Blend mBlend;

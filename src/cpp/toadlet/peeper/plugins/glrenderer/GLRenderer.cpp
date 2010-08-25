@@ -694,23 +694,7 @@ void GLRenderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexDa
 
 	IndexBuffer *indexBuffer=indexData->indexBuffer;
 	if(indexBuffer!=NULL){
-		GLenum indexType=0;
-		switch(indexBuffer->getIndexFormat()){
-			case IndexBuffer::IndexFormat_UINT_8:
-				indexType=GL_UNSIGNED_BYTE;
-			break;
-			case IndexBuffer::IndexFormat_UINT_16:
-				indexType=GL_UNSIGNED_SHORT;
-			break;
-			#if !defined(TOADLET_HAS_GLES)
-				case IndexBuffer::IndexFormat_UINT_32:
-					indexType=GL_UNSIGNED_INT;
-				break;
-			#endif
-			default:
-			break;
-		}
-
+		GLenum indexType=getGLIndexType(indexBuffer->getIndexFormat());
 		GLBuffer *glindexBuffer=(GLBuffer*)indexBuffer->getRootIndexBuffer();
 		if(glindexBuffer->mHandle==0){
 			if(mCapabilitySet.hardwareIndexBuffers){
@@ -1878,7 +1862,7 @@ GLuint GLRenderer::getGLFormat(int textureFormat){
 
 	if(format==0){
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"GLTexture::getGLFormat: Invalid format");
+			"getGLFormat: Invalid format");
 		return 0;
 	}
 
@@ -1886,31 +1870,47 @@ GLuint GLRenderer::getGLFormat(int textureFormat){
 }
 
 GLuint GLRenderer::getGLType(int textureFormat){
-	GLuint type=0;
-
 	if((textureFormat&Texture::Format_BIT_UINT_8)>0){
-		type=GL_UNSIGNED_BYTE;
+		return GL_UNSIGNED_BYTE;
 	}
 	else if((textureFormat&Texture::Format_BIT_FLOAT_32)>0){
-		type=GL_FLOAT;
+		return GL_FLOAT;
 	}
 	else if((textureFormat&Texture::Format_BIT_UINT_5_6_5)>0){
-		type=GL_UNSIGNED_SHORT_5_6_5;
+		return GL_UNSIGNED_SHORT_5_6_5;
 	}
 	else if((textureFormat&Texture::Format_BIT_UINT_5_5_5_1)>0){
-		type=GL_UNSIGNED_SHORT_5_5_5_1;
+		return GL_UNSIGNED_SHORT_5_5_5_1;
 	}
 	else if((textureFormat&Texture::Format_BIT_UINT_4_4_4_4)>0){
-		type=GL_UNSIGNED_SHORT_4_4_4_4;
+		return GL_UNSIGNED_SHORT_4_4_4_4;
 	}
-
-	if(type==0){
+	else{
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"GLTexture::getGLType: Invalid type");
+			"getGLType: Invalid type");
 		return 0;
 	}
+}
 
-	return type;
+GLuint GLRenderer::getGLIndexType(int indexFormat){
+	switch(indexFormat){
+		case IndexBuffer::IndexFormat_UINT_8:
+			return GL_UNSIGNED_BYTE;
+		break;
+		case IndexBuffer::IndexFormat_UINT_16:
+			return GL_UNSIGNED_SHORT;
+		break;
+		#if !defined(TOADLET_HAS_GLES)
+			case IndexBuffer::IndexFormat_UINT_32:
+				return GL_UNSIGNED_INT;
+			break;
+		#endif
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"getGLIndexType: Invalid type");
+			return 0;
+		break;
+	}
 }
 
 GLuint GLRenderer::getGLWrap(TextureStage::AddressMode addressMode,bool hasClampToEdge){
@@ -1930,7 +1930,7 @@ GLuint GLRenderer::getGLWrap(TextureStage::AddressMode addressMode,bool hasClamp
 		#endif
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
-				"GLTexture::getGLWrap: Invalid address mode");
+				"getGLWrap: Invalid address mode");
 			return 0;
 	}
 }
@@ -1970,7 +1970,7 @@ GLuint GLRenderer::getGLMinFilter(TextureStage::Filter minFilter,TextureStage::F
 	}
 
 	Error::unknown(Categories::TOADLET_PEEPER,
-		"GLTexture::getGLMinFilter: Invalid filter");
+		"getGLMinFilter: Invalid filter");
 	return 0;
 }
 
@@ -1982,7 +1982,7 @@ GLuint GLRenderer::getGLMagFilter(TextureStage::Filter magFilter){
 			return GL_LINEAR;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
-				"GLTexture::getGLMagFilter: Invalid filter");
+				"getGLMagFilter: Invalid filter");
 			return 0;
 	}
 }
@@ -1997,7 +1997,7 @@ GLuint GLRenderer::getGLTextureBlendSource(TextureBlend::Source source){
 			return GL_PRIMARY_COLOR;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
-				"GLTexture::getGLTextureBlendSource: Invalid source");
+				"getGLTextureBlendSource: Invalid source");
 			return 0;
 	}
 }

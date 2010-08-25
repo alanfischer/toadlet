@@ -93,6 +93,8 @@
 #include <toadlet/tadpole/node/NodeInterpolator.h>
 #include <toadlet/tadpole/node/NodeTransformInterpolator.h>
 
+#include <toadlet/tadpole/terrain/TerrainPatchNode.h>
+
 #include <toadlet/tadpole/plugins/hop/HopEntity.h>
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
 

@@ -152,7 +152,24 @@ public:
 	inline void internal_setManaged(bool managed){mManaged=managed;}
 	inline bool internal_getManaged() const{return mManaged;}
 
-	// These functions should be moved to a Bound class
+	/// @todo: These functions should be moved to a Transform class
+	static void inverseTransform(Vector3 &r,const Vector3 &t,const Vector3 &translate,const Vector3 &scale,const Quaternion &rotate){
+		Quaternion invrot; Math::invert(invrot,rotate);
+		Math::sub(r,t,translate);
+		Math::div(r,scale);
+		Math::mul(r,invrot);
+	}
+
+	inline void inverseTransform(Segment &r,const Segment &s,const Vector3 &translate,const Vector3 &scale,const Quaternion &rotate){
+		Quaternion invrot; Math::invert(invrot,rotate);
+		Math::sub(r.origin,s.origin,translate);
+		Math::div(r.origin,scale);
+		Math::mul(r.origin,invrot);
+		Math::mul(r.direction,invrot,s.direction);
+		Math::div(r.direction,scale);
+	}
+
+	/// @todo: These functions should be moved to a Bound class
 	inline bool testWorldBound(const Sphere &bound){
 		if(mWorldBound.radius<0 || bound.radius<0){
 			return true;
