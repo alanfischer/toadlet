@@ -518,8 +518,9 @@ void TerrainPatchNode::simplifyBlocks(const Vector3 &cameraTranslate){
 	}
 }
 
+#if 0
+// A simple distance calculation
 bool TerrainPatchNode::blockShouldSubdivide(Block *block,const Vector3 &cameraTranslate){
-#if 1
 	Vector3 bo=(block->mins+block->maxs)/2.0f;
 	scalar size=(block->maxs.z-block->mins.z);
 	scalar distx=Math::abs(bo.x-cameraTranslate.x);
@@ -535,117 +536,102 @@ bool TerrainPatchNode::blockShouldSubdivide(Block *block,const Vector3 &cameraTr
 	else{
 		return false;
 	}
+}
 #else
-	computeDelta(block,f->origin,f->forward,tolerance);
+bool TerrainPatchNode::blockShouldSubdivide(Block *block,const Vector3 &cameraTranslate){
+	computeDelta(block,cameraTranslate,mTolerance);
 
 	if(block->deltaMax>block->delta0){
 		return true;
 	}
 
 	return false;
-#endif
 }
 
-#if 0
-void TerrainPatchNode::computeDelta(Block *block,Vector3 origin,Vector3 forward,float tolerance){
-    float fHMin;
+/// @todo: Document this section some, it's from the geometric tools engine books.
+void TerrainPatchNode::computeDelta(Block *block,const Vector3 &cameraTranslate,float tolerance){
+	float fHMin;
 
-	origin=origin-mTranslate.x;
+	if(cameraTranslate.z<block->mins.z){
+		fHMin = cameraTranslate.z - block->mins.z;
+		fHMin *= fHMin;
+	}
+	else if(cameraTranslate.z>block->maxs.z){
+		fHMin = cameraTranslate.z - block->maxs.z;
+		fHMin *= fHMin;
+	}
+	else{
+		fHMin = 0.0;
+	}
 
-    if ( origin.z < block->mins.z)
-    {
-        fHMin = origin.z - block->mins.z;
-        fHMin *= fHMin;
-    }
-    else if ( origin.z > block->maxs.z )
-    {
-        fHMin = origin.z - block->maxs.z;
-        fHMin *= fHMin;
-    }
-    else
-    {
-        fHMin = 0.0;
-    }
+	// compute hmax = max{|eye.z - bmin.z|,|eye.z - bmax.z|}
+	float fHMax = cameraTranslate.z - block->mins.z;
+	fHMax *= fHMax;
+	float fTmp = cameraTranslate.z - block->maxs.z;
+	fTmp *= fTmp;
+	if ( fTmp > fHMax )
+		fHMax = fTmp;
 
-    // compute hmax = max{|eye.z - bmin.z|,|eye.z - bmax.z|}
-    float fHMax = origin.z - block->mins.z;
-    fHMax *= fHMax;
-    float fTmp = origin.z - block->maxs.z;
-    fTmp *= fTmp;
-    if ( fTmp > fHMax )
-        fHMax = fTmp;
+	// compute rmin and rmax
+	float fDxMin = cameraTranslate.x - block->mins.x;
+	float fDxMax = cameraTranslate.x - block->maxs.x;
+	float fDyMin = cameraTranslate.y - block->mins.y;
+	float fDyMax = cameraTranslate.y - block->maxs.y;
+	fDxMin *= fDxMin;
+	fDxMax *= fDxMax;
+	fDyMin *= fDyMin;
+	fDyMax *= fDyMax;
+	float fRMin = 0.0, fRMax = 0.0;
 
-    // compute rmin and rmax
-    float fDxMin = origin.x - block->mins.x;
-    float fDxMax = origin.x - block->maxs.x;
-    float fDyMin = origin.y - block->mins.y;
-    float fDyMax = origin.y - block->maxs.y;
-    fDxMin *= fDxMin;
-    fDxMax *= fDxMax;
-    fDyMin *= fDyMin;
-    fDyMax *= fDyMax;
-    float fRMin = 0.0, fRMax = 0.0;
+	if(cameraTranslate.x < block->mins.x){
+		fRMin += fDxMin;
+		fRMax += fDxMax;
+	}
+	else if(cameraTranslate.x <= block->maxs.x){
+		fRMax += ( fDxMax >= fDxMin ? fDxMax : fDxMin );
+	}
+	else{
+		fRMin += fDxMax;
+		fRMax += fDxMin;
+	}
 
-    if ( origin.x < block->mins.x )
-    {
-        fRMin += fDxMin;
-        fRMax += fDxMax;
-    }
-    else if ( origin.x <= block->maxs.x )
-    {
-        fRMax += ( fDxMax >= fDxMin ? fDxMax : fDxMin );
-    }
-    else
-    {
-        fRMin += fDxMax;
-        fRMax += fDxMin;
-    }
+	if(cameraTranslate.y < block->mins.y){
+		fRMin += fDyMin;
+		fRMax += fDyMax;
+	}
+	else if(cameraTranslate.y <= block->maxs.y){
+		fRMax += ( fDyMax >= fDyMin ? fDyMax : fDyMin );
+	}
+	else{
+		fRMin += fDyMax;
+		fRMax += fDyMin;
+	}
 
-    if ( origin.y < block->mins.y )
-    {
-        fRMin += fDyMin;
-        fRMax += fDyMax;
-    }
-    else if ( origin.y <= block->maxs.y )
-    {
-        fRMax += ( fDyMax >= fDyMin ? fDyMax : fDyMin );
-    }
-    else
-    {
-        fRMin += fDyMax;
-        fRMax += fDyMin;
-    }
+	// compute fmin
+	float fDenom = fRMin + fHMax;
+	float fFMin =
+		(fDenom > 0.0 ? fRMin/(fDenom*fDenom) : 9999999);
+	fDenom = fRMax + fHMax;
+	fTmp = (fDenom > 0.0 ? fRMax/(fDenom*fDenom) : 9999999);
+	if(fTmp < fFMin)
+		fFMin = fTmp;
 
-    // compute fmin
-    float fDenom = fRMin + fHMax;
-    float fFMin =
-        (fDenom > 0.0 ? fRMin/(fDenom*fDenom) : vrInfinity);
-    fDenom = fRMax + fHMax;
-    fTmp = (fDenom > 0.0 ? fRMax/(fDenom*fDenom) : vrInfinity);
-    if ( fTmp < fFMin )
-        fFMin = fTmp;
-    
-    // compute fmax
-    float fFMax;
-    if ( fRMin >= fHMin )
-    {
-        fDenom = fRMin + fHMin;
-        fFMax =
-            (fDenom > 0.0 ? fRMin/(fDenom*fDenom) : vrInfinity);
-    }
-    else if ( fRMax <= fHMin )
-    {
-        fDenom = fRMax + fHMin;
-        fFMax =
-            (fDenom > 0.0 ? fRMax/(fDenom*fDenom) : vrInfinity);
-    }
-    else
-    {
-        fFMax = (fHMin > 0.0 ? 0.25/fHMin : vrInfinity);
-    }
+	// compute fmax
+	float fFMax;
+	if(fRMin >= fHMin){
+		fDenom = fRMin + fHMin;
+		fFMax = (fDenom > 0.0 ? fRMin/(fDenom*fDenom) : 9999999);
+	}
+	else if(fRMax <= fHMin){
+		fDenom = fRMax + fHMin;
+		fFMax = (fDenom > 0.0 ? fRMax/(fDenom*fDenom) : 9999999);
+	}
+	else{
+		fFMax = (fHMin > 0.0 ? 0.25/fHMin : 9999999);
+	}
 
-    block->delta0=tolerance/fFMax;
-    block->delta1=(fFMin > 0.0 ? tolerance/fFMin : vrInfinity);
+	block->delta0=tolerance/fFMax;
+	block->delta1=(fFMin > 0.0 ? tolerance/fFMin : 9999999);
 }
 #endif
 
