@@ -140,7 +140,7 @@ protected:
 	void disableVertex(Vertex *v);
 	void simplifyBlocks(const Vector3 &cameraTranslate);
 	bool blockShouldSubdivide(Block *block,const Vector3 &cameraTranslate);
-	void computeDelta(Block *block);
+	void computeDelta(Block *block,const Vector3 &cameraTranslate,float tolerance);
 	void simplifyVertexes();
 	bool blockIntersectsCamera(const Block *block,node::CameraNode *camera) const;
 	int gatherBlocks(peeper::IndexBuffer *indexBuffer,node::CameraNode *camera) const;
