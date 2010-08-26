@@ -518,7 +518,7 @@ void TerrainPatchNode::simplifyBlocks(const Vector3 &cameraTranslate){
 	}
 }
 
-#if 0
+#if 1
 // A simple distance calculation
 bool TerrainPatchNode::blockShouldSubdivide(Block *block,const Vector3 &cameraTranslate){
 	Vector3 bo=(block->mins+block->maxs)/2.0f;
