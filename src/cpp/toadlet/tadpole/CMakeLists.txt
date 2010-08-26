@@ -95,6 +95,7 @@ set (TADPOLE_NODE_SRC
 )
 
 set (TADPOLE_TERRAIN_SRC
+	terrain/TerrainNode.cpp
 	terrain/TerrainPatchNode.cpp
 )
 
@@ -217,6 +218,7 @@ set (TADPOLE_NODE_HEADERS
 )
 
 set (TADPOLE_TERRAIN_HEADERS
+	terrain/TerrainNode.h
 	terrain/TerrainPatchNode.h
 )
 
