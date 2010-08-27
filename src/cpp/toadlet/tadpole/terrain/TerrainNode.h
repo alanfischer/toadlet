@@ -39,7 +39,7 @@ public:
 	TerrainNode();
 	virtual ~TerrainNode();
 
-	void setBaseName(const egg::String &name);
+	node::Node *create(Scene *scene);
 
 	// Node items
 /*	void nodeAttached(Node *node);

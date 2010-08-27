@@ -96,7 +96,7 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
 	mVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,numVertexes);
 	mIndexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,numIndexes);
 
-	VertexBufferAccessor vba(mVertexBuffer,Buffer::Access_BIT_WRITE);
+	vba.lock(mVertexBuffer,Buffer::Access_BIT_WRITE);
 
 	Vector3 normal;
 	int i,j;
@@ -195,9 +195,14 @@ bool TerrainPatchNode::stitchToRight(TerrainPatchNode *terrain){
 		tLeft->vertexAt(mSize-1,row)->dependent1=tRight->vertexAt(0,row);
 	}
 
+	vba.lock(tRight->mVertexBuffer,Buffer::Access_BIT_WRITE);
+
 	for(row=0;row<mSize;row++){
 //		tRight->normal(0,row)=tLeft->normal(mSize-1,row);
+		
 	}
+
+	vba.unlock();
 
 	return true;
 }
@@ -659,10 +664,10 @@ void TerrainPatchNode::simplifyVertexes(){
 }
 
 bool TerrainPatchNode::blockIntersectsCamera(const Block *block,CameraNode *camera) const{
-	AABox box(block->mins,block->maxs);
+	AABox box;
 
-	Math::mul(box.mins,mWorldTransform);
-	Math::mul(box.maxs,mWorldTransform);
+	transform(box.mins,block->mins,mWorldTranslate,mWorldScale,mWorldRotate);
+	transform(box.maxs,block->maxs,mWorldTranslate,mWorldScale,mWorldRotate);
 
 	return camera->culled(box)==false;
 }
