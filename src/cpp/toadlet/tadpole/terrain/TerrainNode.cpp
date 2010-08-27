@@ -27,6 +27,7 @@
 #include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
+#include <toadlet/tadpole/Noise.h>
 #include <toadlet/tadpole/terrain/TerrainNode.h>
 #include <toadlet/tadpole/terrain/TerrainPatchNode.h>
 
@@ -48,35 +49,41 @@ TerrainNode::TerrainNode():super(){}
 
 TerrainNode::~TerrainNode(){}
 
-void TerrainNode::setBaseName(const String &name){
-	mBaseName=name;
+Node *TerrainNode::create(Scene *scene){
+	super::create(scene);
 
-	BMPHandler handler;
+	Noise noise(4,16,1,1,256);
 
-	TerrainPatchNode::ptr patches[3][3];
-	int i,j;
-	for(i=0;i<3;++i){
-		for(j=0;j<3;++j){
-			patches[i][j]=mEngine->createNodeType(TerrainPatchNode::type(),mScene);
-			FileStream stream(name+":"+i+":"+j+".bmp",FileStream::Open_READ_BINARY);
-			Image::ptr image(handler.loadImage(&stream));
-			attach(patches[i][j]);
+	const int ts=3;
+	const int ps=129;
+	TerrainPatchNode::ptr patches[ts*ts];
+	float data[ps*ps];
+
+	int tx=0,ty=0,px=0,py=0;
+	for(ty=0;ty<ts;ty++){
+		for(tx=0;tx<ts;tx++){
+			TerrainPatchNode::ptr patch=mEngine->createNodeType(TerrainPatchNode::type(),mScene);
+
+			for(px=0;px<ps;++px){
+				for(py=0;py<ps;++py){
+					int x=tx*ps+px;
+					int width=ts*ps;
+					int y=ty*ps+py;
+					int height=ts*ps;
+					float n=(noise.perlin2((float)x/(float)width,(float)y/(float)height)*0.5 + 0.5);
+					data[py*ps+px]=-n*20;
+				}
+			}
+
+			patch->setData(data,ps,ps,ps);
+patch->setMaterial(mEngine->getMaterialManager()->findMaterial("grass.jpg"));
+			patch->setTranslate((ps-1)*tx,(ps-1)*ty,0);	
+			attach(patch);
+			// STITCHING
 		}
 	}
 
-	patches[0][0]->stitchTop(patches[0][1]);
-	patches[0][1]->stitchTop(patches[0][2]);
-	patches[1][0]->stitchTop(patches[1][1]);
-	patches[1][1]->stitchTop(patches[1][2]);
-	patches[2][0]->stitchTop(patches[2][1]);
-	patches[2][1]->stitchTop(patches[2][2]);
-
-	patches[0][0]->stitchRight(patches[1][0]);
-	patches[1][0]->stitchRight(patches[2][0]);
-	patches[0][1]->stitchRight(patches[1][1]);
-	patches[1][1]->stitchRight(patches[2][1]);
-	patches[0][2]->stitchRight(patches[1][2]);
-	patches[1][2]->stitchRight(patches[2][2]);
+	return this;
 }
 
 }

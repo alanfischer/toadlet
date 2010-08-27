@@ -108,6 +108,8 @@ public:
 	inline void setScale1(float s1){mS1=s1;}
 	inline void setScale2(float s2){mS2=s2;}
 
+	VertexBufferAccessor vba;
+
 protected:
 	/*
 		Block vertexes ordered as follows:
