@@ -85,12 +85,19 @@ public:
 	bool setData(scalar *data,int rowPitch,int width,int height);
 	bool setMaterial(Material::ptr material);
 
+	int getSize() const{return mSize;}
+	inline Vertex *vertexAt(int x,int y){return &mVertexes[y*(mSize+1)+x];}
+	inline const Vertex *vertexAt(int x,int y) const{return &mVertexes[y*(mSize+1)+x];}
+	inline int indexOf(int x,int y) const{return y*(mSize+1)+x;}
+
 	bool stitchToRight(TerrainPatchNode *terrain);
 	bool unstitchFromRight(TerrainPatchNode *terrain);
 	bool stitchToBottom(TerrainPatchNode *terrain);
 	bool unstitchFromBottom(TerrainPatchNode *terrain);
 	void setMinTolerance(scalar minTol){mMinTolerance=minTol;}
 	void setMaxTolerance(scalar maxTol){mMaxTolerance=maxTol;}
+	void setScale1(float s1){mS1=s1;}
+	void setScale2(float s2){mS2=s2;}
 
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 	void updateBlocks(node::CameraNode *camera);
@@ -102,13 +109,7 @@ public:
 	const Sphere &getLocalBound() const{return super::getLocalBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
-	inline Vertex *vertexAt(int x,int y){return &mTerrainVertexes[y*mSize+x];}
-	inline const Vertex *vertexAt(int x,int y) const{return &mTerrainVertexes[y*mSize+x];}
-
-	inline void setScale1(float s1){mS1=s1;}
-	inline void setScale2(float s2){mS2=s2;}
-
-	VertexBufferAccessor vba;
+	peeper::VertexBufferAccessor vba;
 
 protected:
 	/*
@@ -135,7 +136,6 @@ protected:
 		T0-1,T1-1   T1-2
 	*/
 
-	int getSizeN(){return mSizeN;}
 	void initBlocks(Block *block,int q,int x,int y,int s,bool e);
 	void resetBlocks();
 	void enableVertex(Vertex *v);
@@ -187,10 +187,7 @@ protected:
 	int mNumUnprocessedBlocks;
 
 	int mSize;
-	int mSizeN;
-	egg::Collection<Vertex> mTerrainVertexes;
-	egg::Collection<int> mTerrainVertexIndexes;
-	egg::Collection<int> mDetailVertexIndexes;
+	egg::Collection<Vertex> mVertexes;
 
 	// TODO: This should just be passed as method input
 	egg::math::Vector3 mCameraTranslate;

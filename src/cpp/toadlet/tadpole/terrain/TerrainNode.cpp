@@ -55,7 +55,7 @@ Node *TerrainNode::create(Scene *scene){
 	Noise noise(4,16,1,1,256);
 
 	const int ts=3;
-	const int ps=129;
+	const int ps=64;
 	TerrainPatchNode::ptr patches[ts*ts];
 	float data[ps*ps];
 
@@ -77,9 +77,17 @@ Node *TerrainNode::create(Scene *scene){
 
 			patch->setData(data,ps,ps,ps);
 patch->setMaterial(mEngine->getMaterialManager()->findMaterial("grass.jpg"));
-			patch->setTranslate((ps-1)*tx,(ps-1)*ty,0);	
+patch->getRenderMaterial()->setFill(Renderer::Fill_LINE);
+			patch->setTranslate(ps*tx,ps*ty,0);	
 			attach(patch);
-			// STITCHING
+			patches[ty*ts+tx]=patch;
+
+			if(tx>0){
+				patches[ty*ts+(tx-1)]->stitchToRight(patches[ty*ts+tx]);
+			}
+			if(ty>0){
+				patches[ty*ts+tx]->stitchToBottom(patches[(ty-1)*ts+tx]);
+			}
 		}
 	}
 
