@@ -70,42 +70,37 @@ void TerrainPatchNode::destroy(){
 }
 
 bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
-	mSize=0;
-	mSizeN=0;
-
-	for(mSize=1;mSize<=width;mSize<<=1)mSizeN++;
-
-	mSizeN--;
-	mSize>>=1;
-	mSize++;
+	int sizeN=0;
+	for(sizeN=0;(1<<(sizeN+1))<=width;sizeN++);
 
 	if(width!=height){
 		Error::invalidParameters(Categories::TOADLET_TADPOLE_TERRAIN,"width!=height");
 		return false;
 	}
 
-	if(mSize!=width){
-		Error::invalidParameters(Categories::TOADLET_TADPOLE_TERRAIN,"width & height not a power of 2 + 1");
+	if(width!=(1<<sizeN)){
+		Error::invalidParameters(Categories::TOADLET_TADPOLE_TERRAIN,"width & height not a power of 2");
 		return false;
 	}
 
-	int numVertexes=Math::square(mSize);
-	int numIndexes=Math::square(mSize-1)*6;
+	mSize=width;
+	int numVertexes=Math::square(mSize+1);
+	int numIndexes=Math::square(mSize)*6;
 
-	mTerrainVertexes.resize(numVertexes);
+	mVertexes.resize(numVertexes);
 	mVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,numVertexes);
 	mIndexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,numIndexes);
 
 	vba.lock(mVertexBuffer,Buffer::Access_BIT_WRITE);
 
-	Vector3 normal;
+	Vector3 position,normal;
 	int i,j;
 	for(j=0;j<mSize;++j){
 		for(i=0;i<mSize;++i){
-			int index=j*mSize+i;
-			scalar height=data[j*rowPitch+i];
-
+			int index=indexOf(i,j);
 			Vertex *vertex=vertexAt(i,j);
+
+			scalar height=data[j*rowPitch+i];
 			vertex->index=index;
 			vertex->height=height;
 
@@ -121,18 +116,38 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
 				vba.set3(index,1,normal);
 			}
 
-			vba.set2(index,2,Math::div(Math::fromInt(i)+Math::HALF,mSize),Math::div(Math::fromInt(j)+Math::HALF,mSize));
+			vba.set2(index,2,Math::div(Math::fromInt(i)+Math::HALF,mSize+1),Math::div(Math::fromInt(j)+Math::HALF,mSize+1));
 		}
 	}
 
-	for(i=0;i<mSize;i++){
-		vba.get3(i+mSize,1,normal);
-		vba.set3(i,1,normal);
+	j=mSize;
+	for(i=0;i<mSize+1;i++){
+		int gi=indexOf(i,j-1);
+		int si=indexOf(i,j);
+
+		vertexAt(i,j)->height=vertexAt(i,j-1)->height;
+
+		vba.set3(si,0,i,j,vertexAt(i,j)->height);
+
+		vba.get3(gi,1,normal);
+		vba.set3(si,1,normal);
+
+		vba.set2(si,2,Math::div(Math::fromInt(i)+Math::HALF,mSize+1),Math::div(Math::fromInt(j)+Math::HALF,mSize+1));
 	}
 
-	for(j=0;j<mSize;j++){
-		vba.get3(1+mSize*j,1,normal);
-		vba.set3(mSize*j,1,normal);
+	i=mSize;
+	for(j=0;j<mSize+1;j++){
+		int gi=indexOf(i-1,j);
+		int si=indexOf(i,j);
+
+		vertexAt(i,j)->height=vertexAt(i-1,j)->height;
+
+		vba.set3(si,0,i,j,vertexAt(i,j)->height);
+
+		vba.get3(gi,1,normal);
+		vba.set3(si,1,normal);
+
+		vba.set2(si,2,Math::div(Math::fromInt(i)+Math::HALF,mSize+1),Math::div(Math::fromInt(j)+Math::HALF,mSize+1));
 	}
 
 	vba.unlock();
@@ -141,14 +156,10 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
 	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,mIndexBuffer));
 
 	// Build blocks
-	int numBlocks=1;
-	for(i=0;i<mSizeN;i++){
-		numBlocks*=4;
-	}
+	int numBlocks=1<<(2*sizeN);
 	numBlocks=(int)((numBlocks-1)/3) + 1;
 
 	mBlocks.resize(numBlocks);
-
 	mBlockQueueSize=numBlocks;
 	mBlockQueue.resize(mBlockQueueSize);
 
@@ -156,7 +167,7 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
 	mBlockQueueStart=0;
 	mBlockQueueEnd=0;
 
-	int numInitBlocks=1<<(mSizeN-1);
+	int numInitBlocks=1<<(sizeN-1);
 	initBlocks(&mBlocks[0],0,0,0,numInitBlocks,true);
 
 	addBlockToBack(0);
@@ -183,23 +194,23 @@ bool TerrainPatchNode::setMaterial(Material::ptr material){
 bool TerrainPatchNode::stitchToRight(TerrainPatchNode *terrain){
 	TerrainPatchNode *tLeft=this;
 	TerrainPatchNode *tRight=terrain;
-	int row;
+	int y=0;
 
-	if(tLeft->getSizeN()!=tRight->getSizeN()){
-		Error::unknown("left->sizeN!=right->sizeN");
+	if(tLeft->getSize()!=tRight->getSize()){
+		Error::unknown("left->size!=right->size");
 		return false;
 	}
 
-	for(row=1;row<mSize-1;row++){
-		tRight->vertexAt(0,row)->dependent0=tLeft->vertexAt(mSize-1,row);
-		tLeft->vertexAt(mSize-1,row)->dependent1=tRight->vertexAt(0,row);
+	for(y=0;y<mSize+1;y++){
+		tRight->vertexAt(0,y)->dependent0=tLeft->vertexAt(mSize,y);
+		tLeft->vertexAt(mSize,y)->dependent1=tRight->vertexAt(0,y);
 	}
 
 	vba.lock(tRight->mVertexBuffer,Buffer::Access_BIT_WRITE);
 
-	for(row=0;row<mSize;row++){
-//		tRight->normal(0,row)=tLeft->normal(mSize-1,row);
-		
+	for(y=0;y<mSize+1;y++){
+//		tRight->normal(0,y)=tLeft->normal(mSize,x);
+		vba.set3(indexOf(0,y),0,0,y,tLeft->vertexAt(mSize,y)->height);
 	}
 
 	vba.unlock();
@@ -210,16 +221,16 @@ bool TerrainPatchNode::stitchToRight(TerrainPatchNode *terrain){
 bool TerrainPatchNode::unstitchFromRight(TerrainPatchNode *terrain){
 	TerrainPatchNode *tLeft=this;
 	TerrainPatchNode *tRight=terrain;
-	int row;
+	int y;
 
-	if(tLeft->getSizeN()!=tRight->getSizeN()){
-		Error::unknown("left->sizeN!=right->sizeN");
+	if(tLeft->getSize()!=tRight->getSize()){
+		Error::unknown("left->size!=right->size");
 		return false;
 	}
 
-	for(row=1;row<mSize-1;row++){
-		tRight->vertexAt(0,row)->dependent0=NULL;
-		tLeft->vertexAt(mSize-1,row)->dependent1=NULL;
+	for(y=0;y<mSize+1;y++){
+		tRight->vertexAt(0,y)->dependent0=NULL;
+		tLeft->vertexAt(mSize,y)->dependent1=NULL;
 	}
 
 	return true;
@@ -228,21 +239,26 @@ bool TerrainPatchNode::unstitchFromRight(TerrainPatchNode *terrain){
 bool TerrainPatchNode::stitchToBottom(TerrainPatchNode *terrain){
 	TerrainPatchNode *tTop=this;
 	TerrainPatchNode *tBottom=terrain;
-	int col;
+	int x;
 
-	if(tTop->getSizeN()!=tBottom->getSizeN()){
-		Error::unknown("top->sizeN!=bottom->sizeN");
+	if(tTop->getSize()!=tBottom->getSize()){
+		Error::unknown("top->size!=bottom->size");
 		return false;
 	}
 
-	for(col=1;col<mSize-1;col++){
-		tBottom->vertexAt(col,mSize-1)->dependent0=tTop->vertexAt(col,0);
-		tTop->vertexAt(col,0)->dependent1=tBottom->vertexAt(col,mSize-1);
+	for(x=0;x<mSize+1;x++){
+		tBottom->vertexAt(x,mSize)->dependent0=tTop->vertexAt(x,0);
+		tTop->vertexAt(x,0)->dependent1=tBottom->vertexAt(x,mSize);
 	}
 
-	for(col=0;col<mSize;col++){
-//		tBottom->normal(col,mSize-1)=tTop->normal(col,0);
+	vba.lock(tBottom->mVertexBuffer,Buffer::Access_BIT_WRITE);
+
+	for(x=0;x<mSize+1;x++){
+//		tBottom->normal(0,y)=tTop->normal(mSize,x);
+		vba.set3(indexOf(x,mSize),0,x,mSize,tTop->vertexAt(x,0)->height);
 	}
+
+	vba.unlock();
 
 	return true;
 }
@@ -250,16 +266,16 @@ bool TerrainPatchNode::stitchToBottom(TerrainPatchNode *terrain){
 bool TerrainPatchNode::unstitchFromBottom(TerrainPatchNode *terrain){
 	TerrainPatchNode *tTop=this;
 	TerrainPatchNode *tBottom=terrain;
-	int col;
+	int x;
 
-	if(tTop->getSizeN()!=tBottom->getSizeN()){
-		Error::unknown("top->sizeN!=bottom->sizeN");
+	if(tTop->getSize()!=tBottom->getSize()){
+		Error::unknown("top->size!=bottom->size");
 		return false;
 	}
 
-	for(col=1;col<mSize-1;col++){
-		tTop->vertexAt(col,mSize-1)->dependent0=NULL;
-		tBottom->vertexAt(col,0)->dependent1=NULL;
+	for(x=0;x<mSize+1;x++){
+		tTop->vertexAt(x,mSize)->dependent0=NULL;
+		tBottom->vertexAt(x,0)->dependent1=NULL;
 	}
 
 	return true;
@@ -718,9 +734,9 @@ int TerrainPatchNode::gatherTriangle(IndexBufferAccessor &iba,int indexCount,int
 		}
 	}
 
-	iba.set(indexCount++,x0+y0*mSize);
-	iba.set(indexCount++,x2+y2*mSize);
-	iba.set(indexCount++,x1+y1*mSize);
+	iba.set(indexCount++,indexOf(x0,y0));
+	iba.set(indexCount++,indexOf(x2,y2));
+	iba.set(indexCount++,indexOf(x1,y1));
 
 	return indexCount;
 }
