@@ -20,6 +20,7 @@
 #include <toadlet/egg/Extents.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/RenderQueue.h>
+#include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/terrain/TerrainPatchNode.h>
 
 using namespace toadlet::egg;
@@ -34,13 +35,25 @@ namespace terrain{
 TOADLET_NODE_IMPLEMENT(TerrainPatchNode,Categories::TOADLET_TADPOLE_TERRAIN+".TerrainPatchNode");
 
 TerrainPatchNode::TerrainPatchNode():Node(),
+	mSize(0),
+	//mVertexes,
+	//mBlocks,
+	//mBlockQueue,
+	mBlockQueueSize(0),
+	mBlockQueueStart(0),
+	mBlockQueueEnd(0),
+	mNumBlocksInQueue(0),
+	mNumUnprocessedBlocks(0),
+	mLastBlockUpdateFrame(0),
+
+	//mLeftDependent,
+	//mTopDependent,
+
 	mMinTolerance(0),
 	mMaxTolerance(0),
+	mTolerance(0),
 
-	mS1(0),
-	mS2(0),
-
-	mSize(0)
+	mS1(0),mS2(0)
 {
 }
 
@@ -50,13 +63,25 @@ TerrainPatchNode::~TerrainPatchNode(){
 Node *TerrainPatchNode::create(Scene *scene){
 	super::create(scene);
 
-	mMinTolerance=0;
-	mMaxTolerance=1;
-
-	mS1=0.5;
-	mS2=1;
-
 	mSize=0;
+	mVertexes.clear();
+	mBlocks.clear();
+	mBlockQueue.clear();
+	mBlockQueueSize=0;
+	mBlockQueueStart=0;
+	mBlockQueueEnd=0;
+	mNumBlocksInQueue=0;
+	mNumUnprocessedBlocks=0;
+	mLastBlockUpdateFrame=0;
+
+	mLeftDependent=NULL;
+	mTopDependent=NULL;
+
+	mMinTolerance=0;
+	mMaxTolerance=0.0005;
+	mTolerance=0;
+
+	mS1=Math::HALF;mS2=Math::ONE;
 
 	return this;
 }
@@ -64,6 +89,23 @@ Node *TerrainPatchNode::create(Scene *scene){
 void TerrainPatchNode::destroy(){
 	if(mMaterial!=NULL){
 		mMaterial->release();
+		mMaterial=NULL;
+	}
+	if(mVertexBuffer!=NULL){
+		mVertexBuffer->destroy();
+		mVertexBuffer=NULL;
+	}
+	if(mIndexBuffer!=NULL){
+		mIndexBuffer->destroy();
+		mIndexBuffer=NULL;
+	}
+	if(mVertexData!=NULL){
+		mVertexData->destroy();
+		mVertexData=NULL;
+	}
+	if(mIndexData!=NULL){
+		mIndexData->destroy();
+		mIndexData=NULL;
 	}
 
 	super::destroy();
@@ -297,6 +339,10 @@ void TerrainPatchNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 }
 
 void TerrainPatchNode::updateBlocks(CameraNode *camera){
+	if(mScene->getFrame()==mLastBlockUpdateFrame){
+		return;
+	}
+
 	Vector3 cameraTranslate;
 	inverseTransform(cameraTranslate,camera->getWorldTranslate(),mWorldTranslate,mWorldScale,mWorldRotate);
 
@@ -305,6 +351,8 @@ void TerrainPatchNode::updateBlocks(CameraNode *camera){
 	resetBlocks();
 	simplifyBlocks(cameraTranslate);
 	simplifyVertexes();
+
+	mLastBlockUpdateFrame=mScene->getFrame();
 }
 
 void TerrainPatchNode::updateIndexBuffers(CameraNode *camera){
@@ -541,7 +589,7 @@ void TerrainPatchNode::simplifyBlocks(const Vector3 &cameraTranslate){
 	}
 }
 
-#if 1
+#if 0
 // A simple distance calculation
 bool TerrainPatchNode::blockShouldSubdivide(Block *block,const Vector3 &cameraTranslate){
 	Vector3 bo=(block->mins+block->maxs)/2.0f;
