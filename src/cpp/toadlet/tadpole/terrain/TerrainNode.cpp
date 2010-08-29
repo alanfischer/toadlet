@@ -52,7 +52,7 @@ TerrainNode::~TerrainNode(){}
 Node *TerrainNode::create(Scene *scene){
 	super::create(scene);
 
-	Noise noise(4,16,1,1,256);
+	Noise noise(4,4,1,1,256);
 
 	const int ts=3;
 	const int ps=64;
@@ -77,7 +77,7 @@ Node *TerrainNode::create(Scene *scene){
 
 			patch->setData(data,ps,ps,ps);
 patch->setMaterial(mEngine->getMaterialManager()->findMaterial("grass.jpg"));
-patch->getRenderMaterial()->setFill(Renderer::Fill_LINE);
+//patch->getRenderMaterial()->setFill(Renderer::Fill_LINE);
 			patch->setTranslate(ps*tx,ps*ty,0);	
 			attach(patch);
 			patches[ty*ts+tx]=patch;
@@ -86,10 +86,11 @@ patch->getRenderMaterial()->setFill(Renderer::Fill_LINE);
 				patches[ty*ts+(tx-1)]->stitchToRight(patches[ty*ts+tx]);
 			}
 			if(ty>0){
-				patches[ty*ts+tx]->stitchToBottom(patches[(ty-1)*ts+tx]);
+				patches[(ty-1)*ts+tx]->stitchToBottom(patches[ty*ts+tx]);
 			}
 		}
 	}
+
 
 	return this;
 }
