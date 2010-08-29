@@ -93,46 +93,33 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
 
 	vba.lock(mVertexBuffer,Buffer::Access_BIT_WRITE);
 
-	Vector3 position,normal;
 	int i,j;
-	for(j=0;j<mSize;++j){
-		for(i=0;i<mSize;++i){
+	// Iterate backwards so verts needed for normals are set
+	for(j=mSize-1;j>=0;--j){
+		for(i=mSize-1;i>=0;--i){
 			int index=indexOf(i,j);
 			Vertex *vertex=vertexAt(i,j);
 
-			scalar height=data[j*rowPitch+i];
 			vertex->index=index;
-			vertex->height=height;
+			vertex->height=data[j*rowPitch+i];
+			vertex->normal.set(vertex->height-vertexAt(i+1,j)->height,vertex->height-vertexAt(i,j+1)->height,Math::ONE);
+			Math::normalize(vertex->normal);
 
-			vba.set3(index,0,i,j,height);
-
-			if(i>0 && j>0){
-				scalar heightl=vertexAt(i-1,j)->height;
-				scalar heightu=vertexAt(i,j-1)->height;
-
-				// Result of cross(height(i-1,j)-height(i,j),height(i,j-1)-height(i,j))
-				normal.set(heightl-height,heightu-height,Math::ONE);
-				Math::normalize(normal);
-				vba.set3(index,1,normal);
-			}
-
-			vba.set2(index,2,Math::div(Math::fromInt(i)+Math::HALF,mSize+1),Math::div(Math::fromInt(j)+Math::HALF,mSize+1));
+			vba.set3(index,0,i,j,vertex->height);
+			vba.set3(index,1,vertex->normal);
+			vba.set2(index,2,Math::div(Math::fromInt(i)+Math::HALF,mSize),Math::div(Math::fromInt(j)+Math::HALF,mSize));
 		}
 	}
 
 	j=mSize;
 	for(i=0;i<mSize+1;i++){
-		int gi=indexOf(i,j-1);
 		int si=indexOf(i,j);
 
 		vertexAt(i,j)->height=vertexAt(i,j-1)->height;
 
 		vba.set3(si,0,i,j,vertexAt(i,j)->height);
-
-		vba.get3(gi,1,normal);
-		vba.set3(si,1,normal);
-
-		vba.set2(si,2,Math::div(Math::fromInt(i)+Math::HALF,mSize+1),Math::div(Math::fromInt(j)+Math::HALF,mSize+1));
+		vba.set3(si,1,0,0,Math::ONE);
+		vba.set2(si,2,Math::div(Math::fromInt(i)+Math::HALF,mSize),Math::div(Math::fromInt(j)+Math::HALF,mSize));
 	}
 
 	i=mSize;
@@ -143,11 +130,8 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
 		vertexAt(i,j)->height=vertexAt(i-1,j)->height;
 
 		vba.set3(si,0,i,j,vertexAt(i,j)->height);
-
-		vba.get3(gi,1,normal);
-		vba.set3(si,1,normal);
-
-		vba.set2(si,2,Math::div(Math::fromInt(i)+Math::HALF,mSize+1),Math::div(Math::fromInt(j)+Math::HALF,mSize+1));
+		vba.set3(si,1,0,0,Math::ONE);
+		vba.set2(si,2,Math::div(Math::fromInt(i)+Math::HALF,mSize),Math::div(Math::fromInt(j)+Math::HALF,mSize));
 	}
 
 	vba.unlock();
@@ -191,92 +175,110 @@ bool TerrainPatchNode::setMaterial(Material::ptr material){
 	return true;
 }
 
-bool TerrainPatchNode::stitchToRight(TerrainPatchNode *terrain){
-	TerrainPatchNode *tLeft=this;
-	TerrainPatchNode *tRight=terrain;
+bool TerrainPatchNode::stitchToRight(TerrainPatchNode *terrain,bool restitchDependents){
+	TerrainPatchNode *lt=this;
+	TerrainPatchNode *rt=terrain;
 	int y=0;
 
-	if(tLeft->getSize()!=tRight->getSize()){
-		Error::unknown("left->size!=right->size");
+	if(lt->getSize()!=rt->getSize()){
+		Error::unknown("lt->getSize()!=rt->getSize()");
 		return false;
 	}
 
-	for(y=0;y<mSize+1;y++){
-		tRight->vertexAt(0,y)->dependent0=tLeft->vertexAt(mSize,y);
-		tLeft->vertexAt(mSize,y)->dependent1=tRight->vertexAt(0,y);
-	}
-
-	vba.lock(tRight->mVertexBuffer,Buffer::Access_BIT_WRITE);
+	vba.lock(lt->mVertexBuffer,Buffer::Access_BIT_WRITE);
 
 	for(y=0;y<mSize+1;y++){
-//		tRight->normal(0,y)=tLeft->normal(mSize,x);
-		vba.set3(indexOf(0,y),0,0,y,tLeft->vertexAt(mSize,y)->height);
+		Vertex *lv=lt->vertexAt(mSize,y),*rv=rt->vertexAt(0,y);
+		rv->dependent0=lv;
+		lv->dependent1=rv;
+		lv->height=rv->height;
+		lv->normal.set(rv->normal);
+
+		vba.set3(indexOf(mSize,y),0,mSize,y,lv->height);
+		vba.set3(indexOf(mSize,y),1,lv->normal);
 	}
 
 	vba.unlock();
+
+	// This fixes corner issues, allowing you to stitch in any order
+	if(restitchDependents && mTopDependent!=NULL){
+		mTopDependent->stitchToBottom(this,false);
+	}
 
 	return true;
 }
 
 bool TerrainPatchNode::unstitchFromRight(TerrainPatchNode *terrain){
-	TerrainPatchNode *tLeft=this;
-	TerrainPatchNode *tRight=terrain;
+	TerrainPatchNode *lt=this;
+	TerrainPatchNode *rt=terrain;
 	int y;
 
-	if(tLeft->getSize()!=tRight->getSize()){
-		Error::unknown("left->size!=right->size");
+	if(rt->mTopDependent!=lt){
+		Error::unknown("right is not stitched to this");
 		return false;
 	}
 
 	for(y=0;y<mSize+1;y++){
-		tRight->vertexAt(0,y)->dependent0=NULL;
-		tLeft->vertexAt(mSize,y)->dependent1=NULL;
+		rt->vertexAt(0,y)->dependent0=NULL;
+		lt->vertexAt(mSize,y)->dependent1=NULL;
 	}
+
+	rt->mLeftDependent=NULL;
 
 	return true;
 }
 
-bool TerrainPatchNode::stitchToBottom(TerrainPatchNode *terrain){
-	TerrainPatchNode *tTop=this;
-	TerrainPatchNode *tBottom=terrain;
+bool TerrainPatchNode::stitchToBottom(TerrainPatchNode *terrain,bool restitchDependents){
+	TerrainPatchNode *tt=this;
+	TerrainPatchNode *bt=terrain;
 	int x;
 
-	if(tTop->getSize()!=tBottom->getSize()){
-		Error::unknown("top->size!=bottom->size");
+	bt->mTopDependent=this;
+
+	if(tt->getSize()!=bt->getSize()){
+		Error::unknown("tt->getSize()!=bt->getSize()");
 		return false;
 	}
 
-	for(x=0;x<mSize+1;x++){
-		tBottom->vertexAt(x,mSize)->dependent0=tTop->vertexAt(x,0);
-		tTop->vertexAt(x,0)->dependent1=tBottom->vertexAt(x,mSize);
-	}
-
-	vba.lock(tBottom->mVertexBuffer,Buffer::Access_BIT_WRITE);
+	vba.lock(tt->mVertexBuffer,Buffer::Access_BIT_WRITE);
 
 	for(x=0;x<mSize+1;x++){
-//		tBottom->normal(0,y)=tTop->normal(mSize,x);
-		vba.set3(indexOf(x,mSize),0,x,mSize,tTop->vertexAt(x,0)->height);
+		Vertex *bv=bt->vertexAt(x,0),*tv=tt->vertexAt(x,mSize);
+		bv->dependent1=tv;
+		tv->dependent0=bv;
+		tv->height=bv->height;
+		tv->normal.set(bv->normal);
+
+		vba.set3(indexOf(x,mSize),0,x,mSize,tv->height);
+		vba.set3(indexOf(x,mSize),1,tv->normal);
 	}
 
 	vba.unlock();
+
+	// This fixes corner issues, allowing you to stitch in any order
+	if(restitchDependents && mLeftDependent){
+		mLeftDependent->stitchToRight(this,false);
+	}
 
 	return true;
 }
 
 bool TerrainPatchNode::unstitchFromBottom(TerrainPatchNode *terrain){
-	TerrainPatchNode *tTop=this;
-	TerrainPatchNode *tBottom=terrain;
+	TerrainPatchNode *tt=this;
+	TerrainPatchNode *bt=terrain;
 	int x;
 
-	if(tTop->getSize()!=tBottom->getSize()){
-		Error::unknown("top->size!=bottom->size");
+	if(bt->mTopDependent=tt){
+		Error::unknown("bottom is not stitched to this");
 		return false;
 	}
 
 	for(x=0;x<mSize+1;x++){
-		tTop->vertexAt(x,mSize)->dependent0=NULL;
-		tBottom->vertexAt(x,0)->dependent1=NULL;
+		bt->vertexAt(x,0)->dependent1=NULL;
+		tt->vertexAt(x,mSize)->dependent0=NULL;
 	}
+
+	bt->mTopDependent=NULL;
 
 	return true;
 }

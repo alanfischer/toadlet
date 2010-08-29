@@ -45,6 +45,7 @@ public:
 		{}
 		
 		int index;
+		Vector3 normal;
 		scalar height;
 		Vertex *dependent0;
 		Vertex *dependent1;
@@ -90,9 +91,9 @@ public:
 	inline const Vertex *vertexAt(int x,int y) const{return &mVertexes[y*(mSize+1)+x];}
 	inline int indexOf(int x,int y) const{return y*(mSize+1)+x;}
 
-	bool stitchToRight(TerrainPatchNode *terrain);
+	bool stitchToRight(TerrainPatchNode *terrain,bool restitchDependents=true);
 	bool unstitchFromRight(TerrainPatchNode *terrain);
-	bool stitchToBottom(TerrainPatchNode *terrain);
+	bool stitchToBottom(TerrainPatchNode *terrain,bool restitchDependents=true);
 	bool unstitchFromBottom(TerrainPatchNode *terrain);
 	void setMinTolerance(scalar minTol){mMinTolerance=minTol;}
 	void setMaxTolerance(scalar maxTol){mMaxTolerance=maxTol;}
@@ -188,9 +189,8 @@ protected:
 
 	int mSize;
 	egg::Collection<Vertex> mVertexes;
-
-	// TODO: This should just be passed as method input
-	egg::math::Vector3 mCameraTranslate;
+	TerrainPatchNode::ptr mLeftDependent;
+	TerrainPatchNode::ptr mTopDependent;
 
 	float mMinTolerance;
 	float mMaxTolerance;
