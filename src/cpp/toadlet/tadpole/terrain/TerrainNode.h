@@ -27,6 +27,7 @@
 #define TOADLET_TADPOLE_TERRAIN_TERRAINNODE_H
 
 #include <toadlet/tadpole/node/PartitionNode.h>
+#include <toadlet/tadpole/terrain/TerrainPatchNode.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -41,6 +42,8 @@ public:
 
 	node::Node *create(Scene *scene);
 
+	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
+
 	// Node items
 /*	void nodeAttached(Node *node);
 	void nodeRemoved(Node *node);
@@ -54,7 +57,9 @@ public:
 protected:
 	void childTransformUpdated(Node *child);
 */
-	egg::String mBaseName;
+
+	const static int ts=3;
+	TerrainPatchNode::ptr patches[ts*ts];
 };
 
 }

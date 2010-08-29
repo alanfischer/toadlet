@@ -54,10 +54,10 @@ Node *TerrainNode::create(Scene *scene){
 
 	Noise noise(4,4,1,1,256);
 
-	const int ts=3;
 	const int ps=64;
-	TerrainPatchNode::ptr patches[ts*ts];
 	float data[ps*ps];
+
+	float scale=5;
 
 	int tx=0,ty=0,px=0,py=0;
 	for(ty=0;ty<ts;ty++){
@@ -78,7 +78,8 @@ Node *TerrainNode::create(Scene *scene){
 			patch->setData(data,ps,ps,ps);
 patch->setMaterial(mEngine->getMaterialManager()->findMaterial("grass.jpg"));
 //patch->getRenderMaterial()->setFill(Renderer::Fill_LINE);
-			patch->setTranslate(ps*tx,ps*ty,0);	
+			patch->setTranslate(ps*tx*scale,ps*ty*scale,0);	
+			patch->setScale(scale);
 			attach(patch);
 			patches[ty*ts+tx]=patch;
 
@@ -93,6 +94,17 @@ patch->setMaterial(mEngine->getMaterialManager()->findMaterial("grass.jpg"));
 
 
 	return this;
+}
+
+void TerrainNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
+	int tx=0,ty=0;
+	for(ty=0;ty<ts;ty++){
+		for(tx=0;tx<ts;tx++){
+			patches[ty*ts+tx]->updateBlocks(camera);
+		}
+	}
+
+	super::queueRenderables(camera,queue);
 }
 
 }

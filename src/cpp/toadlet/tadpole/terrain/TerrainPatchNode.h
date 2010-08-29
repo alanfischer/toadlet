@@ -179,6 +179,8 @@ protected:
 		mNumBlocksInQueue++;
 	}
 
+	int mSize;
+	egg::Collection<Vertex> mVertexes;
 	egg::Collection<Block> mBlocks;
 	egg::Collection<int> mBlockQueue;
 	unsigned int mBlockQueueSize;
@@ -186,9 +188,8 @@ protected:
 	unsigned int mBlockQueueEnd;
 	int mNumBlocksInQueue;
 	int mNumUnprocessedBlocks;
+	int mLastBlockUpdateFrame;
 
-	int mSize;
-	egg::Collection<Vertex> mVertexes;
 	TerrainPatchNode::ptr mLeftDependent;
 	TerrainPatchNode::ptr mTopDependent;
 
