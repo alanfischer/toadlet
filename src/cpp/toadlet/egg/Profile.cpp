@@ -27,9 +27,18 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/System.h>
+#include <toadlet/egg/Map.h>
+#include <toadlet/egg/Collection.h>
 
 namespace toadlet{
 namespace egg{
+
+class ProfileData{
+public:
+	Map<String,Profile::Timing::ptr> timings;
+	Collection<Profile::Timing::ptr> timingStack;
+	Collection<Map<String,Profile::Timing::ptr> > timingHistory;
+};
 
 Profile *Profile::getInstance(){
 	if(mTheProfile==NULL){
@@ -38,18 +47,25 @@ Profile *Profile::getInstance(){
 	return mTheProfile;
 }
 
-Profile::Profile(){
+Profile::Profile():
+	collectionAllocations(0)
+{
+	mData=new ProfileData();
+}
+
+Profile::~Profile(){
+	delete mData;
 }
 
 void Profile::beginSection(const String &name){
 	Timing::ptr timing;
-	Map<String,Timing::ptr>::iterator it=mTimings.find(name);
-	if(it!=mTimings.end()){
+	Map<String,Timing::ptr>::iterator it=mData->timings.find(name);
+	if(it!=mData->timings.end()){
 		timing=it->second;
 	}
 	else{
 		timing=Timing::ptr(new Timing(name));
-		mTimings[name]=timing;
+		mData->timings[name]=timing;
 	}
 
 	timing->depth++;
@@ -62,19 +78,19 @@ void Profile::beginSection(const String &name){
 		return;
 	}
 
-	mTimingStack.add(timing);
+	mData->timingStack.add(timing);
 }
 
 void Profile::endSection(const String &name){
 	uint64 time=System::utime();
 
-	if(mTimingStack.size()==0){
+	if(mData->timingStack.size()==0){
 		Error::unknown(Categories::TOADLET_EGG,
 			"empty timing stack");
 	}
 
-	Timing::ptr timing=mTimingStack.back();
-	mTimingStack.removeAt(mTimingStack.size()-1);
+	Timing::ptr timing=mData->timingStack.back();
+	mData->timingStack.removeAt(mData->timingStack.size()-1);
 
 	if(timing->name.equals(name)==false){
 		Error::unknown(Categories::TOADLET_EGG,
@@ -94,26 +110,26 @@ void Profile::endSection(const String &name){
 }
 
 void Profile::addTimings(){
-	if(mTimingStack.size()!=0){
+	if(mData->timingStack.size()!=0){
 		Error::unknown(Categories::TOADLET_EGG,
 			"non empty timing stack");
 	}
 
-	mTimingHistory.add(mTimings);
-	mTimings.clear();
+	mData->timingHistory.add(mData->timings);
+	mData->timings.clear();
 }
 
 void Profile::clearTimings(){
-	mTimings.clear();
-	mTimingStack.clear();
-	mTimingHistory.clear();
+	mData->timings.clear();
+	mData->timingStack.clear();
+	mData->timingHistory.clear();
 }
 
 int Profile::getTimingAverage(const String &name) const{
 	uint64 time=0,count=0;
 	int i;
-	for(i=mTimingHistory.size()-1;i>=0;--i){
-		const Map<String,Timing::ptr> &item=mTimingHistory.at(i);
+	for(i=mData->timingHistory.size()-1;i>=0;--i){
+		const Map<String,Timing::ptr> &item=mData->timingHistory.at(i);
 		Map<String,Timing::ptr>::const_iterator it=item.find(name);
 		if(it!=item.end()){
 			time+=it->second->total;

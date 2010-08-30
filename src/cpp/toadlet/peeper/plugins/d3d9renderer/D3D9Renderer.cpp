@@ -503,8 +503,8 @@ void D3D9Renderer::setBlend(const Blend &blend){
 		mD3DDevice->SetRenderState(D3DRS_DESTBLEND,D3DBLEND_ZERO);
 	}
 	else{
-		D3DBLEND src=getD3DBlendOperation(blend.source);
-		D3DBLEND dest=getD3DBlendOperation(blend.dest);
+		D3DBLEND src=getD3DBLEND(blend.source);
+		D3DBLEND dest=getD3DBLEND(blend.dest);
 
 		HRESULT hr;
 		hr=mD3DDevice->SetRenderState(D3DRS_SRCBLEND,src);
@@ -756,41 +756,27 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 		}
 
 		const TextureBlend &blend=textureStage->blend;
-		if(blend.operation!=TextureBlend::Operation_UNSPECIFIED){
-			DWORD mode=0;
-			switch(blend.operation){
-				case TextureBlend::Operation_REPLACE:
-					mode=D3DTOP_DISABLE;
-				break;
-				case TextureBlend::Operation_MODULATE:
-					mode=D3DTOP_MODULATE;
-				break;
-				case TextureBlend::Operation_MODULATE_2X:
-					mode=D3DTOP_MODULATE2X;
-				break;
-				case TextureBlend::Operation_MODULATE_4X:
-					mode=D3DTOP_MODULATE4X;
-				break;
-				case TextureBlend::Operation_ADD:
-					mode=D3DTOP_ADD;
-				break;
-				case TextureBlend::Operation_DOTPRODUCT:
-					mode=D3DTOP_DOTPRODUCT3;
-				break;
-			}
-
-			result=mD3DDevice->SetTextureStageState(stage,D3DTSS_COLOROP,mode);
+		if(blend.colorOperation!=TextureBlend::Operation_UNSPECIFIED){
+			result=mD3DDevice->SetTextureStageState(stage,D3DTSS_COLOROP,getD3DTOP(blend.colorOperation,blend.colorSource3));
 			TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
-			result=mD3DDevice->SetTextureStageState(stage,D3DTSS_ALPHAOP,mode);
-			TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
-			if(blend.source1!=TextureBlend::Source_UNSPECIFIED && blend.source2!=TextureBlend::Source_UNSPECIFIED){
-				mD3DDevice->SetTextureStageState(stage,D3DTSS_COLORARG1,getD3DTextureBlendSource(blend.source1));
-				mD3DDevice->SetTextureStageState(stage,D3DTSS_COLORARG2,getD3DTextureBlendSource(blend.source2));
+			if(blend.colorSource1!=TextureBlend::Source_UNSPECIFIED && blend.colorSource2!=TextureBlend::Source_UNSPECIFIED){
+				mD3DDevice->SetTextureStageState(stage,D3DTSS_COLORARG1,getD3DTA(blend.colorSource1));
+				mD3DDevice->SetTextureStageState(stage,D3DTSS_COLORARG2,getD3DTA(blend.colorSource2));
 			}
 		}
 		else{
 			result=mD3DDevice->SetTextureStageState(stage,D3DTSS_COLOROP,D3DTOP_MODULATE);
 			TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
+		}
+		if(blend.alphaOperation!=TextureBlend::Operation_UNSPECIFIED){
+			result=mD3DDevice->SetTextureStageState(stage,D3DTSS_ALPHAOP,getD3DTOP(blend.alphaOperation,blend.alphaSource3));
+			TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
+			if(blend.alphaSource1!=TextureBlend::Source_UNSPECIFIED && blend.alphaSource2!=TextureBlend::Source_UNSPECIFIED){
+				mD3DDevice->SetTextureStageState(stage,D3DTSS_ALPHAARG1,getD3DTA(blend.alphaSource1));
+				mD3DDevice->SetTextureStageState(stage,D3DTSS_ALPHAARG2,getD3DTA(blend.alphaSource2));
+			}
+		}
+		else{
 			result=mD3DDevice->SetTextureStageState(stage,D3DTSS_ALPHAOP,D3DTOP_MODULATE);
 			TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
 		}
@@ -954,46 +940,6 @@ void D3D9Renderer::setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D
 	#endif
 }
 
-DWORD D3D9Renderer::getD3DTextureBlendSource(TextureBlend::Source blend){
-	switch(blend){
-		case TextureBlend::Source_PREVIOUS:
-			return D3DTA_CURRENT;
-		case TextureBlend::Source_TEXTURE:
-			return D3DTA_TEXTURE;
-		case TextureBlend::Source_PRIMARY_COLOR:
-			return D3DTA_DIFFUSE;
-		default:
-			return 0;
-	}
-}
-
-D3DBLEND D3D9Renderer::getD3DBlendOperation(Blend::Operation blend){
-	switch(blend){
-		case Blend::Operation_ONE:
-			return D3DBLEND_ONE;
-		case Blend::Operation_ZERO:
-			return D3DBLEND_ZERO;
-		case Blend::Operation_DEST_COLOR:
-			return D3DBLEND_DESTCOLOR;
-		case Blend::Operation_SOURCE_COLOR:
-			return D3DBLEND_SRCCOLOR;
-		case Blend::Operation_ONE_MINUS_DEST_COLOR:
-			return D3DBLEND_INVDESTCOLOR;
-		case Blend::Operation_ONE_MINUS_SOURCE_COLOR:
-			return D3DBLEND_INVSRCCOLOR;
-		case Blend::Operation_DEST_ALPHA:
-			return D3DBLEND_DESTALPHA;
-		case Blend::Operation_SOURCE_ALPHA:
-			return D3DBLEND_SRCALPHA;
-		case Blend::Operation_ONE_MINUS_DEST_ALPHA:
-			return D3DBLEND_INVDESTALPHA;
-		case Blend::Operation_ONE_MINUS_SOURCE_ALPHA:
-			return D3DBLEND_INVSRCALPHA;
-		default:
-			return (D3DBLEND)0;
-	}
-}
-
 void D3D9Renderer::getPrimitiveTypeAndCount(D3DPRIMITIVETYPE &d3dpt,int &count,IndexData::Primitive prim,int numIndexes){
 	switch(prim){
 		case IndexData::Primitive_POINTS:
@@ -1073,6 +1019,34 @@ bool D3D9Renderer::isD3DFORMATValid(D3DFORMAT textureFormat,DWORD usage){
 	return SUCCEEDED(mD3D->CheckDeviceFormat(mD3DAdapter,mD3DDevType,mD3DAdapterFormat,usage,D3DRTYPE_TEXTURE,textureFormat));
 }
 
+DWORD D3D9Renderer::getD3DTOP(TextureBlend::Operation operation,TextureBlend::Source alphaSource){
+	switch(operation){
+		case TextureBlend::Operation_REPLACE:
+			return D3DTOP_DISABLE;
+		case TextureBlend::Operation_MODULATE:
+			return D3DTOP_MODULATE;
+		case TextureBlend::Operation_MODULATE_2X:
+			return D3DTOP_MODULATE2X;
+		case TextureBlend::Operation_MODULATE_4X:
+			return D3DTOP_MODULATE4X;
+		case TextureBlend::Operation_ADD:
+			return D3DTOP_ADD;
+		case TextureBlend::Operation_DOTPRODUCT:
+			return D3DTOP_DOTPRODUCT3;
+		case TextureBlend::Operation_ALPHABLEND:
+			if(alphaSource==TextureBlend::Source_PREVIOUS){
+				return D3DTOP_BLENDCURRENTALPHA;
+			}
+			else if(alphaSource==TextureBlend::Source_TEXTURE){
+				return D3DTOP_BLENDTEXTUREALPHA;
+			}
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"invalid type");
+			return D3DTOP_DISABLE;
+	}
+}
+
 D3DFORMAT D3D9Renderer::getD3DFORMAT(int format){
 	switch(format){
 		#if !defined(TOADLET_SET_D3DM)
@@ -1105,47 +1079,79 @@ D3DFORMAT D3D9Renderer::getD3DFORMAT(int format){
 }
 
 DWORD D3D9Renderer::getD3DTADDRESS(TextureStage::AddressMode addressMode){
-	DWORD taddress=0;
-
 	switch(addressMode){
 		case TextureStage::AddressMode_REPEAT:
-			taddress=D3DTADDRESS_WRAP;
-		break;
+			return D3DTADDRESS_WRAP;
 		case TextureStage::AddressMode_CLAMP_TO_EDGE:
-			taddress=D3DTADDRESS_CLAMP;
-		break;
+			return D3DTADDRESS_CLAMP;
 		case TextureStage::AddressMode_CLAMP_TO_BORDER:
-			taddress=D3DTADDRESS_BORDER;
-		break;
+			return D3DTADDRESS_BORDER;
 		case TextureStage::AddressMode_MIRRORED_REPEAT:
-			taddress=D3DTADDRESS_MIRROR;
-		break;
+			return D3DTADDRESS_MIRROR;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"invalid address mode");
+			return D3DTADDRESS_WRAP;
 	}
-
-	if(taddress==0){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"invalid address mode");
-	}
-
-	return taddress;
 }
 
 DWORD D3D9Renderer::getD3DTEXF(TextureStage::Filter filter){
-	DWORD texf=D3DTEXF_NONE;
-
 	switch(filter){
 		case TextureStage::Filter_NONE:
-			texf=D3DTEXF_NONE;
-		break;
+			return D3DTEXF_NONE;
 		case TextureStage::Filter_NEAREST:
-			texf=D3DTEXF_POINT;
-		break;
+			return D3DTEXF_POINT;
 		case TextureStage::Filter_LINEAR:
-			texf=D3DTEXF_LINEAR;
-		break;
+			return D3DTEXF_LINEAR;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"invalid filter mode");
+			return D3DTEXF_NONE;
 	}
+}
 
-	return texf;
+DWORD D3D9Renderer::getD3DTA(TextureBlend::Source blend){
+	switch(blend){
+		case TextureBlend::Source_PREVIOUS:
+			return D3DTA_CURRENT;
+		case TextureBlend::Source_TEXTURE:
+			return D3DTA_TEXTURE;
+		case TextureBlend::Source_PRIMARY_COLOR:
+			return D3DTA_DIFFUSE;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"invalid source");
+			return 0;
+	}
+}
+
+D3DBLEND D3D9Renderer::getD3DBLEND(Blend::Operation blend){
+	switch(blend){
+		case Blend::Operation_ONE:
+			return D3DBLEND_ONE;
+		case Blend::Operation_ZERO:
+			return D3DBLEND_ZERO;
+		case Blend::Operation_DEST_COLOR:
+			return D3DBLEND_DESTCOLOR;
+		case Blend::Operation_SOURCE_COLOR:
+			return D3DBLEND_SRCCOLOR;
+		case Blend::Operation_ONE_MINUS_DEST_COLOR:
+			return D3DBLEND_INVDESTCOLOR;
+		case Blend::Operation_ONE_MINUS_SOURCE_COLOR:
+			return D3DBLEND_INVSRCCOLOR;
+		case Blend::Operation_DEST_ALPHA:
+			return D3DBLEND_DESTALPHA;
+		case Blend::Operation_SOURCE_ALPHA:
+			return D3DBLEND_SRCALPHA;
+		case Blend::Operation_ONE_MINUS_DEST_ALPHA:
+			return D3DBLEND_INVDESTALPHA;
+		case Blend::Operation_ONE_MINUS_SOURCE_ALPHA:
+			return D3DBLEND_INVSRCALPHA;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"invalid operation");
+			return D3DBLEND_ZERO;
+	}
 }
 
 DWORD D3D9Renderer::getFVF(VertexFormat *vertexFormat){

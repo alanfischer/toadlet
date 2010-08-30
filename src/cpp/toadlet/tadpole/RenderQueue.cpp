@@ -57,7 +57,18 @@ void RenderQueue::queueRenderable(Renderable *renderable){
 		layer->depthSortedRenderables.insert(i,DepthRenderable(renderable,depth));
 	}
 	else{
-		layer->renderables.add(renderable);
+		Material *material=renderable->getRenderMaterial();
+		int numRenderables=layer->materialSortedRenderables.size();
+		int i;
+		for(i=0;i<layer->materialSortedRenderables.size();++i){
+			if(layer->materialSortedRenderables[i].material==material) break;
+		}
+		if(i<numRenderables){
+			layer->materialSortedRenderables[i].renderables.add(renderable);
+		}
+		else{
+			layer->materialSortedRenderables.add(MaterialRenderable(renderable,material));
+		}
 	}
 }
 

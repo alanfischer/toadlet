@@ -77,6 +77,7 @@ set (TADPOLE_MESH_SRC
 )
 
 set (TADPOLE_NODE_SRC
+	node/AnaglyphCameraNode.cpp
 	node/AnimationControllerNode.cpp
 	node/AudioNode.cpp
 	node/CameraNode.cpp
@@ -89,9 +90,13 @@ set (TADPOLE_NODE_SRC
 	node/ParentNode.cpp
 	node/ParticleNode.cpp
 	node/PartitionNode.cpp
-	node/RedBlueCameraNode.cpp
 	node/SkeletonParentNode.cpp
 	node/SpriteNode.cpp
+)
+
+set (TADPOLE_TERRAIN_SRC
+	terrain/TerrainNode.cpp
+	terrain/TerrainPatchNode.cpp
 )
 
 
@@ -153,6 +158,7 @@ set (TADPOLE_HANDLER_HEADERS
 	handler/MMSHHandler.h
 	handler/PNGHandler.h
 	handler/SPRHandler.h
+	handler/TGAHandler.h
 	handler/TPKGHandler.h
 	handler/WADArchive.h
 	handler/WADHandler.h
@@ -193,6 +199,7 @@ set (TADPOLE_MESH_HEADERS
 )
 
 set (TADPOLE_NODE_HEADERS
+	node/AnaglyphCameraNode.h
 	node/AnimationControllerNode.h
 	node/AudioNode.h
 	node/CameraNode.h
@@ -206,9 +213,13 @@ set (TADPOLE_NODE_HEADERS
 	node/ParentNode.h
 	node/ParticleNode.h
 	node/PartitionNode.h
-	node/RedBlueCameraNode.h
 	node/SkeletonParentNode.h
 	node/SpriteNode.h
+)
+
+set (TADPOLE_TERRAIN_HEADERS
+	terrain/TerrainNode.h
+	terrain/TerrainPatchNode.h
 )
 
 
@@ -217,6 +228,7 @@ source_group ("Source Files\\\\animation" FILES ${TADPOLE_ANIMATION_SRC})
 source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_SRC})
 source_group ("Source Files\\\\mesh" FILES ${TADPOLE_MESH_SRC})
 source_group ("Source Files\\\\node" FILES ${TADPOLE_NODE_SRC})
+source_group ("Source Files\\\\terrain" FILES ${TADPOLE_TERRAIN_SRC})
 
 
 # Bundle headers
@@ -224,11 +236,12 @@ source_group ("Header Files\\\\animation" FILES ${TADPOLE_ANIMATION_HEADERS})
 source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_HEADERS})
 source_group ("Header Files\\\\mesh" FILES ${TADPOLE_MESH_HEADERS})
 source_group ("Header Files\\\\node" FILES ${TADPOLE_NODE_HEADERS})
+source_group ("Header Files\\\\terrain" FILES ${TADPOLE_TERRAIN_HEADERS})
 
 
 # Source and headers
-set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MESH_SRC} ${TADPOLE_NODE_SRC})
-set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_MESH_HEADERS} ${TADPOLE_NODE_HEADERS})
+set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MESH_SRC} ${TADPOLE_NODE_SRC} ${TADPOLE_TERRAIN_SRC})
+set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_MESH_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_TERRAIN_HEADERS})
 
 
 if (NOT TOADLET_FIXED_POINT)
@@ -239,8 +252,8 @@ if (NOT TOADLET_FIXED_POINT)
 endif (NOT TOADLET_FIXED_POINT)
 
 # Setup dependecy specific files and libraries
-# Note the iphone build uses neither freetype or mxml
-if (NOT TOADLET_PLATFORM_IPHONE)
+# Freetype is not required on OSX
+if (NOT TOADLET_PLATFORM_OSX)
 	find_package (Freetype)
 	if (FREETYPE_FOUND)
 		set (TOADLET_HAS_FREETYPE ON PARENT_SCOPE)
@@ -263,7 +276,10 @@ if (NOT TOADLET_PLATFORM_IPHONE)
 		set (TADPOLE_DEFS_S TOADLET_LIBFREETYPE_NAME="${FREETYPE_LIBRARY}")
 		set (TADPOLE_LIBS_S libfreetype_s)
 	endif (FREETYPE_FOUND)
+endif (NOT TOADLET_PLATFORM_OSX)
 
+# TODO: For now, the iPhone build does not use mxml, but I think that should be changed
+if (NOT TOADLET_PLATFORM_IPHONE)
 	find_package (MXML)
 	if (MXML_FOUND)
 		# Files

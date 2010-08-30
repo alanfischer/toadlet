@@ -26,10 +26,11 @@
 #ifndef TOADLET_TADPOLE_NODE_CAMERANODE_H
 #define TOADLET_TADPOLE_NODE_CAMERANODE_H
 
-#include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/peeper/Color.h>
 #include <toadlet/peeper/Viewport.h>
 #include <toadlet/peeper/Renderer.h>
+#include <toadlet/tadpole/Material.h>
+#include <toadlet/tadpole/node/ParentNode.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -49,12 +50,26 @@ public:
 
 	CameraNode();
 	virtual Node *create(Scene *scene);
+	virtual void destroy();
+
+	inline ProjectionType getProjectionType() const{return mProjectionType;}
 
 	virtual void setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,scalar farDist);
 	virtual void setProjectionFovY(scalar fovy,scalar aspect,scalar nearDist,scalar farDist);
 	virtual void setProjectionOrtho(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist);
 	virtual void setProjectionFrustum(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist);
+	inline scalar getFov() const{return mFov;}
+	inline scalar getAspect() const{return mAspect;}
+	inline scalar getLeftDist() const{return mLeftDist;}
+	inline scalar getRightDist() const{return mRightDist;}
+	inline scalar getBottomDist() const{return mBottomDist;}
+	inline scalar getTopDist() const{return mTopDist;}
+	inline scalar getNearDist() const{return mNearDist;}
+	inline scalar getFarDist() const{return mFarDist;}
+
 	virtual void setProjectionTransform(const Matrix4x4 &transform);
+	inline const Matrix4x4 &getProjectionTransform() const{return mProjectionTransform;}
+
 	virtual void setProjectionRotation(scalar rotate);
 	virtual void setNearAndFarDist(scalar nearDist,scalar farDist);
 
@@ -68,24 +83,6 @@ public:
 
 	virtual void setViewport(const peeper::Viewport &viewport);
 	virtual void setViewport(int x,int y,int width,int height);
-
-	virtual void setClearFlags(int clearFlags){mClearFlags=clearFlags;}
-	virtual void setClearColor(peeper::Color clearColor){mClearColor.set(clearColor);}
-	virtual void setSkipFirstClear(bool skip){mSkipFirstClear=skip;}
-
-	ParentNode::ptr getMidNode();
-
-	inline ProjectionType getProjectionType() const{return mProjectionType;}
-	inline const Matrix4x4 &getProjectionTransform() const{return mProjectionTransform;}
-	inline scalar getFov() const{return mFov;}
-	inline scalar getAspect() const{return mAspect;}
-	inline scalar getLeftDist() const{return mLeftDist;}
-	inline scalar getRightDist() const{return mRightDist;}
-	inline scalar getBottomDist() const{return mBottomDist;}
-	inline scalar getTopDist() const{return mTopDist;}
-	inline scalar getNearDist() const{return mNearDist;}
-	inline scalar getFarDist() const{return mFarDist;}
-
 	inline bool getViewportSet() const{return mViewportSet;}
 	inline const peeper::Viewport &getViewport() const{return mViewport;}
 	inline int getViewportX() const{return mViewport.x;}
@@ -93,18 +90,27 @@ public:
 	inline int getViewportWidth() const{return mViewport.width;}
 	inline int getViewportHeight() const{return mViewport.height;}
 
+	virtual void setClearFlags(int clearFlags){mClearFlags=clearFlags;}
 	inline int getClearFlags() const{return mClearFlags;}
+
+	virtual void setClearColor(peeper::Color clearColor){mClearColor.set(clearColor);}
 	inline peeper::Color getClearColor() const{return mClearColor;}
+
+	virtual void setSkipFirstClear(bool skip){mSkipFirstClear=skip;}
 	inline bool getSkipFirstClear() const{return mSkipFirstClear;}
+
+	virtual void setGamma(scalar gamma);
+	virtual scalar getGamma() const{return mGamma;}
 
 	inline const Matrix4x4 &getViewTransform() const{return mViewTransform;}
 	inline const Vector3 &getForward() const{return mForward;}
 
 	virtual void render(peeper::Renderer *renderer,Node *node=NULL);
 
+	virtual bool culled(Node *node);
 	/// @todo: These should probably be moved into the Math library, and passing in a list of planes
 	virtual bool culled(const Sphere &sphere) const;
-	virtual bool culled(const AABox &box);
+	virtual bool culled(const AABox &box) const;
 
 	virtual void updateFramesPerSecond();
 	inline scalar getFramesPerSecond() const{return mFPS;}
@@ -114,7 +120,7 @@ public:
 protected:
 	virtual void projectionUpdated();
 	virtual void updateViewTransform();
-	virtual void updateMidNode();
+	virtual void renderOverlayGamma(peeper::Renderer *renderer);
 
 	ProjectionType mProjectionType;
 	scalar mFov,mAspect;
@@ -128,12 +134,16 @@ protected:
 	peeper::Color mClearColor;
 	bool mSkipFirstClear;
 	bool mAlignmentCalculationsUseOrigin;
-	ParentNode::ptr mMidNode;
 
 	Matrix4x4 mViewTransform;
 	Matrix4x4 mViewProjectionTransform;
 	Plane mClipPlanes[6];
 	Vector3 mForward;
+	Matrix4x4 mOverlayMatrix;
+	peeper::VertexData::ptr mOverlayVertexData;
+	peeper::IndexData::ptr mOverlayIndexData;
+	scalar mGamma;
+	Material::ptr mGammaMaterial;
 
 	int mFPSLastTime;
 	int mFPSFrameCount;

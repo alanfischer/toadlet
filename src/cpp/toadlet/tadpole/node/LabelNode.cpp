@@ -46,7 +46,8 @@ LabelNode::LabelNode():super(),
 	//mText,
 	mAlignment(0),
 	mNormalized(false),
-	mWordWrap(false)
+	mWordWrap(false),
+	mColor(Colors::WHITE)
 
 	//mMaterial,
 	//mVertexData,
@@ -130,6 +131,12 @@ void LabelNode::setWordWrap(bool wordWrap){
 	updateLabel();
 }
 
+void LabelNode::setColor(const Color &color){
+	mColor.set(color);
+
+	updateLabel();
+}
+
 void LabelNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	super::queueRenderables(camera,queue);
 
@@ -177,7 +184,7 @@ void LabelNode::updateLabel(){
 
 	int length=text.length();
 	if(length>0){
-		VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_TEX_COORD,length*4);
+		VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_COLOR_TEX_COORD,length*4);
 		mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 
 		IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,length*6);
@@ -197,13 +204,13 @@ void LabelNode::updateLabel(){
 			indexBuffer->unlock();
 		}
 
-		mFont->updateVertexBufferForString(mVertexData->getVertexBuffer(0),text,Colors::WHITE,mAlignment,!mNormalized,true);
+		mFont->updateVertexBufferForString(mVertexData->getVertexBuffer(0),text,mColor,mAlignment,!mNormalized,true);
 		mIndexData->setCount(length*6);
 	}
 
 	// Update material
 	Texture::ptr texture=mFont->getTexture();
-	mMaterial->setTextureStage(0,TextureStage::ptr(new TextureStage(texture)));
+	mMaterial->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(texture));
 	if((texture->getFormat()&Texture::Format_BIT_A)>0){
 		mMaterial->setBlend(Blend::Combination_ALPHA);
 	}

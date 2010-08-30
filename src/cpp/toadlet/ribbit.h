@@ -32,4 +32,7 @@
 #include <toadlet/ribbit/AudioStream.h>
 #include <toadlet/ribbit/CapabilitySet.h>
 
+using namespace toadlet;
+using namespace toadlet::ribbit;
+
 #endif

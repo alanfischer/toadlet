@@ -23,43 +23,23 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_REDBLUECAMERANODE_H
-#define TOADLET_TADPOLE_REDBLUECAMERANODE_H
+#ifndef TOADLET_EGG_IMAGE_TGAHANDLER_H
+#define TOADLET_EGG_IMAGE_TGAHANDLER_H
 
-#include <toadlet/peeper/Texture.h>
-#include <toadlet/peeper/SurfaceRenderTarget.h>
-#include <toadlet/tadpole/Material.h>
-#include <toadlet/tadpole/node/CameraNode.h>
+#include <toadlet/egg/image/Image.h>
+#include <toadlet/egg/io/Stream.h>
 
 namespace toadlet{
-namespace tadpole{
-namespace node{
+namespace egg{
+namespace image{
 
-class RedBlueCameraNode:public CameraNode{
+class TOADLET_API TGAHandler{
 public:
-	TOADLET_NODE(RedBlueCameraNode,CameraNode);
+	TGAHandler();
+	virtual ~TGAHandler();
 
-	RedBlueCameraNode();
-
-	Node *create(Scene *scene);
-	void destroy();
-
-	void setSeparation(scalar separation){mSeparation=separation;}
-	scalar getSeparation() const{return mSeparation;}
-
-	virtual void render(peeper::Renderer *renderer,Node *node);
-
-protected:
-	scalar mSeparation;
-
-	peeper::VertexData::ptr mVertexData;
-	peeper::IndexData::ptr mIndexData;
-	peeper::Texture::ptr mRedTexture;
-	peeper::SurfaceRenderTarget::ptr mRedRenderTarget;
-	Material::ptr mRedMaterial;
-	peeper::Texture::ptr mBlueTexture;
-	peeper::SurfaceRenderTarget::ptr mBlueRenderTarget;
-	Material::ptr mBlueMaterial;
+	virtual Image *loadImage(io::Stream *stream);
+	virtual bool saveImage(Image *image,io::Stream *stream);
 };
 
 }
@@ -67,3 +47,4 @@ protected:
 }
 
 #endif
+

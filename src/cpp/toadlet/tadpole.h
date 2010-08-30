@@ -74,6 +74,7 @@
 #include <toadlet/tadpole/mesh/Sequence.h>
 #include <toadlet/tadpole/mesh/Skeleton.h>
 
+#include <toadlet/tadpole/node/AnaglyphCameraNode.h>
 #include <toadlet/tadpole/node/AnimationControllerNode.h>
 #include <toadlet/tadpole/node/AudioNode.h>
 #include <toadlet/tadpole/node/CameraAlignedNode.h>
@@ -86,14 +87,22 @@
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/ParticleNode.h>
 #include <toadlet/tadpole/node/PartitionNode.h>
-#include <toadlet/tadpole/node/RedBlueCameraNode.h>
 #include <toadlet/tadpole/node/SkeletonParentNode.h>
 #include <toadlet/tadpole/node/SpriteNode.h>
 #include <toadlet/tadpole/node/NodeListener.h>
 #include <toadlet/tadpole/node/NodeInterpolator.h>
 #include <toadlet/tadpole/node/NodeTransformInterpolator.h>
 
+#include <toadlet/tadpole/terrain/TerrainPatchNode.h>
+
 #include <toadlet/tadpole/plugins/hop/HopEntity.h>
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
+
+using namespace toadlet;
+using namespace toadlet::tadpole;
+using namespace toadlet::tadpole::animation;
+using namespace toadlet::tadpole::bsp;
+using namespace toadlet::tadpole::mesh;
+using namespace toadlet::tadpole::node;
 
 #endif

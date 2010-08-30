@@ -28,6 +28,7 @@
 
 #include <toadlet/Types.h>
 #include <toadlet/egg/WeakPointer.h>
+#include <toadlet/egg/Profile.h>
 
 namespace toadlet{
 namespace egg{
@@ -266,6 +267,8 @@ public:
 			}
 			delete[] mData;
 			mData=data;
+
+			Profile::getInstance()->collectionAllocations++;
 		}
 		mCapacity=s;
 	}

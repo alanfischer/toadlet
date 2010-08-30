@@ -86,7 +86,9 @@
 
 #include <toadlet/tadpole/handler/AudioBufferHandler.h>
 #include <toadlet/tadpole/handler/MMSHHandler.h>
+#include <toadlet/tadpole/handler/BMPHandler.h>
 #include <toadlet/tadpole/handler/SPRHandler.h>
+#include <toadlet/tadpole/handler/TGAHandler.h>
 #include <toadlet/tadpole/handler/TPKGHandler.h>
 #include <toadlet/tadpole/handler/WADHandler.h>
 
@@ -96,7 +98,6 @@
 #if defined(TOADLET_PLATFORM_OSX)
 	#include <toadlet/tadpole/handler/platform/osx/OSXTextureHandler.h>
 #endif
-#include <toadlet/tadpole/handler/BMPHandler.h>
 #if defined(TOADLET_HAS_GIF)
 	#include <toadlet/tadpole/handler/GIFHandler.h>
 #endif
@@ -217,6 +218,7 @@ Engine::Engine():
 		#endif
 	#endif
 	mTextureManager->setHandler(SPRHandler::ptr(new SPRHandler(mTextureManager)),"spr");
+	mTextureManager->setHandler(TGAHandler::ptr(new TGAHandler(mTextureManager)),"tga");
 
 	// Font handlers, try for freetype first, since it currently looks best.  This can be changed back once the others look as nice
 	#if defined(TOADLET_HAS_FREETYPE)

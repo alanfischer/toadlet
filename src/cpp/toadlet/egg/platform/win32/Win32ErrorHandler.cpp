@@ -1,7 +1,7 @@
 #include <toadlet/egg/platform/win32/Win32ErrorHandler.h>
 
-#include "StackWalker.h"
-#include "StackWalker.cpp"
+//#include "StackWalker.h"
+//#include "StackWalker.cpp"
 
 namespace toadlet{
 namespace egg{
@@ -20,7 +20,7 @@ Win32ErrorHandler::~Win32ErrorHandler(){
 
 	instance=NULL;
 }
-
+/*
 class MyStackWalker : public StackWalker
 {
 public:
@@ -28,10 +28,10 @@ public:
   MyStackWalker(DWORD dwProcessId, HANDLE hProcess) : StackWalker(dwProcessId, hProcess) {}
   virtual void OnOutput(LPCSTR szText) { printf(szText); StackWalker::OnOutput(szText); }
 };
-
+*/
 LONG __stdcall exceptionFilter(LPEXCEPTION_POINTERS e){
-	MyStackWalker walker;
-	walker.ShowCallstack(GetCurrentThread(),e->ContextRecord);
+//	MyStackWalker walker;
+//	walker.ShowCallstack(GetCurrentThread(),e->ContextRecord);
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 

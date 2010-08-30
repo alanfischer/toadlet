@@ -23,61 +23,52 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/node/CameraNode.h>
-#include <toadlet/tadpole/node/ParentNode.h>
-#include <toadlet/tadpole/node/PartitionNode.h>
+#ifndef TOADLET_TADPOLE_ANAGLYPHCAMERANODE_H
+#define TOADLET_TADPOLE_ANAGLYPHCAMERANODE_H
 
-using namespace toadlet::egg;
+#include <toadlet/peeper/Texture.h>
+#include <toadlet/peeper/SurfaceRenderTarget.h>
+#include <toadlet/tadpole/node/CameraNode.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace node{
 
-TOADLET_NODE_IMPLEMENT(PartitionNode,Categories::TOADLET_TADPOLE_NODE+".PartitionNode");
+class AnaglyphCameraNode:public CameraNode{
+public:
+	TOADLET_NODE(AnaglyphCameraNode,CameraNode);
 
-PartitionNode::PartitionNode():super(){
-}
+	AnaglyphCameraNode();
 
-Node *PartitionNode::create(Scene *scene){
-	super::create(scene);
+	Node *create(Scene *scene);
+	void destroy();
 
-	return this;
-}
+	void setSeparation(scalar separation){mSeparation=separation;}
+	scalar getSeparation() const{return mSeparation;}
 
-void PartitionNode::destroy(){
-	super::destroy();
-}
+	void setLeftColor(const peeper::Color &color);
+	const peeper::Color &getLeftColor() const{return mLeftColor;}
 
-bool PartitionNode::senseBoundingVolumes(SensorResultsListener *listener,const Sphere &volume){
-	bool result=false;
-	int i;
-	for(i=0;i<mChildren.size();++i){
-		Node *child=mChildren[i];
-		if(child->testWorldBound(volume)){
-			result|=true;
-			if(listener->resultFound(child)==false){
-				return true;
-			}
-		}
-	}
-	
-	return result;
-}
+	void setRightColor(const peeper::Color &color);
+	const peeper::Color &getRightColor() const{return mRightColor;}
 
-bool PartitionNode::sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point){
-	bool result=false;
-	int i;
-	for(i=0;i<mChildren.size();++i){
-		Node *child=mChildren[i];
-		result|=true;
-		if(listener->resultFound(child)==false){
-			return true;
-		}
-	}
-	
-	return result;
-}
+	virtual void render(peeper::Renderer *renderer,Node *node);
+
+protected:
+	scalar mSeparation;
+
+	peeper::Texture::ptr mLeftTexture;
+	peeper::SurfaceRenderTarget::ptr mLeftRenderTarget;
+	peeper::Color mLeftColor;
+	Material::ptr mLeftMaterial;
+	peeper::Texture::ptr mRightTexture;
+	peeper::SurfaceRenderTarget::ptr mRightRenderTarget;
+	peeper::Color mRightColor;
+	Material::ptr mRightMaterial;
+};
 
 }
 }
 }
+
+#endif

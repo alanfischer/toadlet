@@ -60,6 +60,14 @@ namespace Extents{
 		const math::real MAX_REAL=MAX_FLOAT;
 	#endif
 
+	#if defined(TOADLET_FIXED_POINT)
+		const mathfixed::fixed MIN_SCALAR=MIN_FIXED;
+		const mathfixed::fixed MAX_SCALAR=MAX_FIXED;
+	#else
+		const math::real MIN_SCALAR=MIN_REAL;
+		const math::real MAX_SCALAR=MAX_REAL;
+	#endif
+
 	const int8 MAX_INT8=127;
 	const int8 MIN_INT8=-128;
 	const uint8 MAX_UINT8=255;

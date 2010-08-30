@@ -64,6 +64,11 @@ ALAudio::~ALAudio(){
 bool ALAudio::create(AudioBuffer::ptr audioBuffer){
 	destroy();
 
+	if(audioBuffer==NULL){
+		Logger::warning(Categories::TOADLET_RIBBIT,"invalid audioBuffer");
+		return false;
+	}
+	
 	mHandle=mAudioPlayer->checkoutSourceHandle(this);
 
 	mAudioStream=NULL;

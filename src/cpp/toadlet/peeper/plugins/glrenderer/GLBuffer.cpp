@@ -25,7 +25,9 @@
 
 #include "GLBuffer.h"
 #include "GLRenderer.h"
+#include "GLVertexFormat.h"
 #include <toadlet/peeper/CapabilitySet.h>
+#include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/Logger.h>
 #include <string.h>
 
@@ -186,8 +188,8 @@ uint8 *GLBuffer::lock(int lockAccess){
 		int i,j;
 		for(i=0;i<vertexFormat->mFormats.size();++i){
 			if(vertexFormat->mFormats[i]==VertexFormat::Format_COLOR_RGBA){
-				for(j=0;j<numVertexes;++j){
-					littleUInt32InPlace(*(ByteColor*)(mData+vertexSize*j+vertexElement.offset));
+				for(j=0;j<mSize;++j){
+					littleUInt32InPlace(*(uint32*)(mData+vertexFormat->mVertexSize*j+vertexFormat->mOffsets[i]));
 				}
 			}
 		}
@@ -205,8 +207,8 @@ bool GLBuffer::unlock(){
 		int i,j;
 		for(i=0;i<vertexFormat->mFormats.size();++i){
 			if(vertexFormat->mFormats[i]==VertexFormat::Format_COLOR_RGBA){
-				for(j=0;j<numVertexes;++j){
-					littleUInt32InPlace(*(ByteColor*)(mData+vertexSize*j+vertexElement.offset));
+				for(j=0;j<mSize;++j){
+					littleUInt32InPlace(*(uint32*)(mData+vertexFormat->mVertexSize*j+vertexFormat->mOffsets[i]));
 				}
 			}
 		}
