@@ -142,9 +142,8 @@ void BSP30ModelNode::traceSegment(Collision &result,const Vector3 &position,cons
 		}
 	}
 
-	Math::mul(result.normal,getWorldRotate());
-	Math::mul(result.point,getWorldRotate());
-	Math::add(result.point,position);
+	Math::mul(result.normal,mWorldRotate);
+	transform(result.point,result.point,position,mWorldScale,mWorldRotate);
 }
 
 TOADLET_NODE_IMPLEMENT(BSP30Node,Categories::TOADLET_TADPOLE_NODE+".BSP30Node");
@@ -223,7 +222,9 @@ void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const S
 		Mesh::ptr mesh=mEngine->getMeshManager()->createSkyBox(1024,false,false,down,up,front,back,right,left);
 		int i;
 		for(i=0;i<mesh->subMeshes.size();++i){
-			mesh->subMeshes[i]->material->setLayer(-1);
+			if(mesh->subMeshes[i]->material!=NULL){
+				mesh->subMeshes[i]->material->setLayer(-1);
+			}
 		}
 
 		mSkyNode=mEngine->createNodeType(node::MeshNode::type(),getScene());

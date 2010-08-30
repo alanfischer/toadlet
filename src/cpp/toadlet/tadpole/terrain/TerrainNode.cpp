@@ -57,7 +57,7 @@ Node *TerrainNode::create(Scene *scene){
 	const int ps=64;
 	float data[ps*ps];
 
-	float scale=5;
+	float scale=16;
 
 	int tx=0,ty=0,px=0,py=0;
 	for(ty=0;ty<ts;ty++){
@@ -105,6 +105,17 @@ void TerrainNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	}
 
 	super::queueRenderables(camera,queue);
+}
+
+void TerrainNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
+	result.time=Math::ONE;
+
+	int tx=0,ty=0;
+	for(ty=0;ty<ts;ty++){
+		for(tx=0;tx<ts;tx++){
+			patches[ty*ts+tx]->traceSegment(result,patches[ty*ts+tx]->getWorldTranslate(),segment,size);
+		}
+	}
 }
 
 }
