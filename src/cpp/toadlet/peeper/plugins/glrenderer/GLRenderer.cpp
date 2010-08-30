@@ -159,7 +159,7 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 			String("glesem_getAccelerated result:")+glesemAcceleratedResult);
 
 		gl_version=glesem_gl_majorVersion*10+glesem_gl_minorVersion;
-	#elif defined(TOADLET_HAS_GLEW) && !defined(TOADLET_PLATFORM_OSX)
+	#elif defined(TOADLET_HAS_GLEW)
 		glewExperimental=true;
 		GLenum glewInitResult=glewInit();
 	
@@ -694,23 +694,7 @@ void GLRenderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexDa
 
 	IndexBuffer *indexBuffer=indexData->indexBuffer;
 	if(indexBuffer!=NULL){
-		GLenum indexType=0;
-		switch(indexBuffer->getIndexFormat()){
-			case IndexBuffer::IndexFormat_UINT_8:
-				indexType=GL_UNSIGNED_BYTE;
-			break;
-			case IndexBuffer::IndexFormat_UINT_16:
-				indexType=GL_UNSIGNED_SHORT;
-			break;
-			#if !defined(TOADLET_HAS_GLES)
-				case IndexBuffer::IndexFormat_UINT_32:
-					indexType=GL_UNSIGNED_INT;
-				break;
-			#endif
-			default:
-			break;
-		}
-
+		GLenum indexType=getGLIndexType(indexBuffer->getIndexFormat());
 		GLBuffer *glindexBuffer=(GLBuffer*)indexBuffer->getRootIndexBuffer();
 		if(glindexBuffer->mHandle==0){
 			if(mCapabilitySet.hardwareIndexBuffers){
@@ -1272,55 +1256,63 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 			mLastTexTargets[stage]=textureTarget;
 		}
 
+		// Setup combiners
 		const TextureBlend &blend=textureStage->blend;
-		if(blend.operation!=TextureBlend::Operation_UNSPECIFIED){
-			int mode=0;
-			switch(blend.operation){
-				case TextureBlend::Operation_REPLACE:
-					mode=GL_REPLACE;
-				break;
-				case TextureBlend::Operation_MODULATE:
-				case TextureBlend::Operation_MODULATE_2X:
-				case TextureBlend::Operation_MODULATE_4X:
-					mode=GL_MODULATE;
-				break;
-				case TextureBlend::Operation_ADD:
-					mode=GL_ADD;
-				break;
-				case TextureBlend::Operation_DOTPRODUCT:
-					mode=GL_DOT3_RGB;
-				break;
-				default:
-				break;
-			}
-			
-			switch(blend.operation){
-				case TextureBlend::Operation_MODULATE:
-					glTexEnvf(GL_TEXTURE_ENV,GL_RGB_SCALE,1.0f);
-				break;
-				case TextureBlend::Operation_MODULATE_2X:
-					glTexEnvf(GL_TEXTURE_ENV,GL_RGB_SCALE,2.0f);
-				break;
-				case TextureBlend::Operation_MODULATE_4X:
-					glTexEnvf(GL_TEXTURE_ENV,GL_RGB_SCALE,4.0f);
-				break;
-				default:
-				break;
-			}
-
-			if(blend.source1==TextureBlend::Source_UNSPECIFIED || blend.source2==TextureBlend::Source_UNSPECIFIED){
-				glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,mode);
+		bool specifyColor=(blend.colorOperation!=TextureBlend::Operation_UNSPECIFIED);
+		bool specifyAlpha=(blend.alphaOperation!=TextureBlend::Operation_UNSPECIFIED);
+		bool specifyColorSource=!(blend.colorSource1==TextureBlend::Source_UNSPECIFIED && blend.colorSource2==TextureBlend::Source_UNSPECIFIED);
+		bool specifyAlphaSource=!(blend.alphaSource1==TextureBlend::Source_UNSPECIFIED && blend.alphaSource2==TextureBlend::Source_UNSPECIFIED);
+		if(!specifyColorSource && !specifyAlphaSource){
+			if(specifyColor==false){
+				glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
 			}
 			else{
-				glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_COMBINE);
-				glTexEnvi(GL_TEXTURE_ENV,GL_COMBINE_RGB,mode);
-				glTexEnvi(GL_TEXTURE_ENV,GL_SRC0_RGB,getGLTextureBlendSource(blend.source1));
-				glTexEnvi(GL_TEXTURE_ENV,GL_SRC1_RGB,getGLTextureBlendSource(blend.source2));
-				glTexEnvi(GL_TEXTURE_ENV,GL_SRC2_RGB,GL_CONSTANT);
+				glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,getGLTextureBlendOperation(blend.colorOperation));
 			}
 		}
 		else{
-			glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
+			glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_COMBINE);
+			if(blend.colorOperation==TextureBlend::Operation_DOTPRODUCT && blend.alphaOperation==TextureBlend::Operation_DOTPRODUCT){
+				glTexEnvi(GL_TEXTURE_ENV,GL_COMBINE_RGB,GL_DOT3_RGBA);
+			}
+			else{
+				if(specifyColor){
+					glTexEnvi(GL_TEXTURE_ENV,GL_COMBINE_RGB,getGLTextureBlendOperation(blend.colorOperation));
+				}
+				if(specifyAlpha){
+					glTexEnvi(GL_TEXTURE_ENV,GL_COMBINE_ALPHA,getGLTextureBlendOperation(blend.alphaOperation));
+				}
+			}
+			if(specifyColor){
+				if(blend.colorSource1!=TextureBlend::Source_UNSPECIFIED){
+					glTexEnvi(GL_TEXTURE_ENV,GL_SRC0_RGB,getGLTextureBlendSource(blend.colorSource1));
+				}
+				if(blend.colorSource2!=TextureBlend::Source_UNSPECIFIED){
+					glTexEnvi(GL_TEXTURE_ENV,GL_SRC1_RGB,getGLTextureBlendSource(blend.colorSource2));
+				}
+				if(blend.colorSource3!=TextureBlend::Source_UNSPECIFIED){
+					glTexEnvi(GL_TEXTURE_ENV,GL_SRC2_RGB,getGLTextureBlendSource(blend.colorSource3));
+				}
+				// No need to specify GL_OPERANDs for ALPHABLEND, since RGB defaults are COLOR,COLOR,ALPHA
+			}
+			if(specifyAlpha){
+				if(blend.alphaSource1!=TextureBlend::Source_UNSPECIFIED){
+					glTexEnvi(GL_TEXTURE_ENV,GL_SRC0_ALPHA,getGLTextureBlendSource(blend.alphaSource1));
+				}
+				if(blend.alphaSource2!=TextureBlend::Source_UNSPECIFIED){
+					glTexEnvi(GL_TEXTURE_ENV,GL_SRC1_ALPHA,getGLTextureBlendSource(blend.alphaSource2));
+				}
+				if(blend.alphaSource3!=TextureBlend::Source_UNSPECIFIED){
+					glTexEnvi(GL_TEXTURE_ENV,GL_SRC2_ALPHA,getGLTextureBlendSource(blend.alphaSource3));
+				}
+				// No need to specify GL_OPERANDs for ALPHABLEND, since ALPHA defaults are ALPHA,ALPHA,ALPHA
+			}
+		}
+		if(specifyColor){
+			glTexEnvf(GL_TEXTURE_ENV,GL_RGB_SCALE,getGLTextureBlendScale(blend.colorOperation));
+		}
+		if(specifyAlpha){
+			glTexEnvf(GL_TEXTURE_ENV,GL_ALPHA_SCALE,getGLTextureBlendScale(blend.alphaOperation));
 		}
 
 		bool hasClampToEdge=
@@ -1870,7 +1862,7 @@ GLuint GLRenderer::getGLFormat(int textureFormat){
 
 	if(format==0){
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"GLTexture::getGLFormat: Invalid format");
+			"getGLFormat: Invalid format");
 		return 0;
 	}
 
@@ -1878,31 +1870,47 @@ GLuint GLRenderer::getGLFormat(int textureFormat){
 }
 
 GLuint GLRenderer::getGLType(int textureFormat){
-	GLuint type=0;
-
 	if((textureFormat&Texture::Format_BIT_UINT_8)>0){
-		type=GL_UNSIGNED_BYTE;
+		return GL_UNSIGNED_BYTE;
 	}
 	else if((textureFormat&Texture::Format_BIT_FLOAT_32)>0){
-		type=GL_FLOAT;
+		return GL_FLOAT;
 	}
 	else if((textureFormat&Texture::Format_BIT_UINT_5_6_5)>0){
-		type=GL_UNSIGNED_SHORT_5_6_5;
+		return GL_UNSIGNED_SHORT_5_6_5;
 	}
 	else if((textureFormat&Texture::Format_BIT_UINT_5_5_5_1)>0){
-		type=GL_UNSIGNED_SHORT_5_5_5_1;
+		return GL_UNSIGNED_SHORT_5_5_5_1;
 	}
 	else if((textureFormat&Texture::Format_BIT_UINT_4_4_4_4)>0){
-		type=GL_UNSIGNED_SHORT_4_4_4_4;
+		return GL_UNSIGNED_SHORT_4_4_4_4;
 	}
-
-	if(type==0){
+	else{
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"GLTexture::getGLType: Invalid type");
+			"getGLType: Invalid type");
 		return 0;
 	}
+}
 
-	return type;
+GLuint GLRenderer::getGLIndexType(int indexFormat){
+	switch(indexFormat){
+		case IndexBuffer::IndexFormat_UINT_8:
+			return GL_UNSIGNED_BYTE;
+		break;
+		case IndexBuffer::IndexFormat_UINT_16:
+			return GL_UNSIGNED_SHORT;
+		break;
+		#if !defined(TOADLET_HAS_GLES)
+			case IndexBuffer::IndexFormat_UINT_32:
+				return GL_UNSIGNED_INT;
+			break;
+		#endif
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"getGLIndexType: Invalid type");
+			return 0;
+		break;
+	}
 }
 
 GLuint GLRenderer::getGLWrap(TextureStage::AddressMode addressMode,bool hasClampToEdge){
@@ -1922,7 +1930,7 @@ GLuint GLRenderer::getGLWrap(TextureStage::AddressMode addressMode,bool hasClamp
 		#endif
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
-				"GLTexture::getGLWrap: Invalid address mode");
+				"getGLWrap: Invalid address mode");
 			return 0;
 	}
 }
@@ -1962,7 +1970,7 @@ GLuint GLRenderer::getGLMinFilter(TextureStage::Filter minFilter,TextureStage::F
 	}
 
 	Error::unknown(Categories::TOADLET_PEEPER,
-		"GLTexture::getGLMinFilter: Invalid filter");
+		"getGLMinFilter: Invalid filter");
 	return 0;
 }
 
@@ -1974,13 +1982,13 @@ GLuint GLRenderer::getGLMagFilter(TextureStage::Filter magFilter){
 			return GL_LINEAR;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
-				"GLTexture::getGLMagFilter: Invalid filter");
+				"getGLMagFilter: Invalid filter");
 			return 0;
 	}
 }
 
-GLuint GLRenderer::getGLTextureBlendSource(TextureBlend::Source blend){
-	switch(blend){
+GLuint GLRenderer::getGLTextureBlendSource(TextureBlend::Source source){
+	switch(source){
 		case TextureBlend::Source_PREVIOUS:
 			return GL_PREVIOUS;
 		case TextureBlend::Source_TEXTURE:
@@ -1989,8 +1997,40 @@ GLuint GLRenderer::getGLTextureBlendSource(TextureBlend::Source blend){
 			return GL_PRIMARY_COLOR;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
-				"GLTexture::getGLTextureBlendSource: Invalid source");
+				"getGLTextureBlendSource: Invalid source");
 			return 0;
+	}
+}
+
+GLuint GLRenderer::getGLTextureBlendOperation(TextureBlend::Operation operation){
+	switch(operation){
+		case TextureBlend::Operation_REPLACE:
+			return GL_REPLACE;
+		case TextureBlend::Operation_MODULATE:
+		case TextureBlend::Operation_MODULATE_2X:
+		case TextureBlend::Operation_MODULATE_4X:
+			return GL_MODULATE;
+		case TextureBlend::Operation_ADD:
+			return GL_ADD;
+		case TextureBlend::Operation_DOTPRODUCT:
+			return GL_DOT3_RGB;
+		case TextureBlend::Operation_ALPHABLEND:
+			return GL_INTERPOLATE;
+		default:
+			return 0;
+	}
+}
+
+float GLRenderer::getGLTextureBlendScale(TextureBlend::Operation operation){
+	switch(operation){
+		case TextureBlend::Operation_MODULATE:
+			return 1.0f;
+		case TextureBlend::Operation_MODULATE_2X:
+			return 2.0f;
+		case TextureBlend::Operation_MODULATE_4X:
+			return 4.0f;
+		default:
+			return 1.0f;
 	}
 }
 

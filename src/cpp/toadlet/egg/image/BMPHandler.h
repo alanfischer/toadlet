@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_IMAGEHANDLER_BMPHANDLER_H
-#define TOADLET_EGG_IMAGEHANDLER_BMPHANDLER_H
+#ifndef TOADLET_EGG_IMAGE_BMPHANDLER_H
+#define TOADLET_EGG_IMAGE_BMPHANDLER_H
 
 #include <toadlet/egg/image/Image.h>
 #include <toadlet/egg/io/Stream.h>

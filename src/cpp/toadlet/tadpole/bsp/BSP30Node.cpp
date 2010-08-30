@@ -32,8 +32,6 @@
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/bsp/BSP30Node.h>
 #include <toadlet/tadpole/bsp/BSP30Handler.h>
-#include <toadlet/tadpole/node/MeshNode.h>
-#include <toadlet/tadpole/handler/WADArchive.h>
 #include <string.h> // memset
 
 using namespace toadlet::egg;
@@ -133,10 +131,7 @@ void BSP30ModelNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 
 void BSP30ModelNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	Segment localSegment;
-	Quaternion invrot; Math::invert(invrot,getWorldRotate());
-	Math::sub(localSegment.origin,segment.origin,position);
-	Math::mul(localSegment.origin,invrot);
-	Math::mul(localSegment.direction,invrot,segment.direction);
+	inverseTransform(localSegment,segment,position,mWorldScale,mWorldRotate);
 
 	result.time=Math::ONE;
 	localSegment.getEndPoint(result.point);
@@ -147,9 +142,8 @@ void BSP30ModelNode::traceSegment(Collision &result,const Vector3 &position,cons
 		}
 	}
 
-	Math::mul(result.normal,getWorldRotate());
-	Math::mul(result.point,getWorldRotate());
-	Math::add(result.point,position);
+	Math::mul(result.normal,mWorldRotate);
+	transform(result.point,result.point,position,mWorldScale,mWorldRotate);
 }
 
 TOADLET_NODE_IMPLEMENT(BSP30Node,Categories::TOADLET_TADPOLE_NODE+".BSP30Node");
@@ -194,25 +188,49 @@ void BSP30Node::setMap(BSP30Map::ptr map){
 		findBoundLeafs(indexes,node);
 		insertNodeLeafIndexes(indexes,node);
 	}
+}
 
-	Logger::debug(Categories::TOADLET_TADPOLE,"Creating skybox");
+void BSP30Node::setSkyName(const String &skyName){
+	mSkyName=skyName;
 
-	// START: Needs to be removed, or a map/member setting, so skyboxes could be added outside of this class
-	Texture::ptr bottom=mEngine->getTextureManager()->findTexture("nightsky/nightsky_down.png");
-	Texture::ptr top=mEngine->getTextureManager()->findTexture("nightsky/nightsky_up.png");
-	Texture::ptr left=mEngine->getTextureManager()->findTexture("nightsky/nightsky_west.png");
-	Texture::ptr right=mEngine->getTextureManager()->findTexture("nightsky/nightsky_east.png");
-	Texture::ptr back=mEngine->getTextureManager()->findTexture("nightsky/nightsky_south.png");
-	Texture::ptr front=mEngine->getTextureManager()->findTexture("nightsky/nightsky_north.png");
+	setSkyTextures(
+		skyName+"dn.tga",
+		skyName+"up.tga",
+		skyName+"ft.tga",
+		skyName+"bk.tga",
+		skyName+"rt.tga",
+		skyName+"lf.tga"
+	);
+}
 
-	Mesh::ptr mesh=mEngine->getMeshManager()->createSkyBox(1024,false,false,bottom,top,left,right,back,front);
-	for(i=0;i<mesh->subMeshes.size();++i){
-		mesh->subMeshes[i]->material->setLayer(-1);
+void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const String &skyWest,const String &skyEast,const String &skySouth,const String &skyNorth){
+	Logger::debug(Categories::TOADLET_TADPOLE,"Creating sky box");
+
+	if(mSkyNode!=NULL){
+		mSkyNode->destroy();
+		mSkyNode=NULL;
 	}
 
-	node::MeshNode::ptr node=mEngine->createNodeType(node::MeshNode::type(),getScene());
-	node->setMesh(mesh);
-	mScene->getBackground()->attach(node);
+	Material::ptr down=mEngine->getMaterialManager()->findMaterial(skyDown);
+	Material::ptr up=mEngine->getMaterialManager()->findMaterial(skyUp);
+	Material::ptr front=mEngine->getMaterialManager()->findMaterial(skyWest);
+	Material::ptr back=mEngine->getMaterialManager()->findMaterial(skyEast);
+	Material::ptr right=mEngine->getMaterialManager()->findMaterial(skySouth);
+	Material::ptr left=mEngine->getMaterialManager()->findMaterial(skyNorth);
+
+	if(down!=NULL || up!=NULL || front!=NULL || back!=NULL || right!=NULL || left==NULL){
+		Mesh::ptr mesh=mEngine->getMeshManager()->createSkyBox(1024,false,false,down,up,front,back,right,left);
+		int i;
+		for(i=0;i<mesh->subMeshes.size();++i){
+			if(mesh->subMeshes[i]->material!=NULL){
+				mesh->subMeshes[i]->material->setLayer(-1);
+			}
+		}
+
+		mSkyNode=mEngine->createNodeType(node::MeshNode::type(),getScene());
+		mSkyNode->setMesh(mesh);
+		mScene->getBackground()->attach(mSkyNode);
+	}
 }
 
 void BSP30Node::nodeAttached(Node *node){
@@ -298,7 +316,10 @@ void BSP30Node::queueRenderables(CameraNode *camera,RenderQueue *queue){
 		}
 
 		for(i=0;i<mChildren.size();++i){
-			super::queueRenderables(mChildren[i],camera,queue);
+			Node *child=mChildren[i];
+			if(camera->culled(child)==false){
+				child->queueRenderables(camera,queue);
+			}
 		}
 	}
 	else{
@@ -318,8 +339,8 @@ void BSP30Node::queueRenderables(CameraNode *camera,RenderQueue *queue){
 					childdata *data=(childdata*)occupant->getParentData();
 					if(data->counter!=mCounter){
 						data->counter=mCounter;
-						if(culled(occupant,camera)==false){
-							super::queueRenderables(occupant,camera,queue);
+						if(camera->culled(occupant)==false){
+							occupant->queueRenderables(camera,queue);
 						}
 					}
 				}
@@ -329,7 +350,9 @@ void BSP30Node::queueRenderables(CameraNode *camera,RenderQueue *queue){
 		const Collection<Node*> &occupants=mGlobalLeafData.occupants;
 		for(j=0;j<occupants.size();++j){
 			Node *occupant=occupants[j];
-			super::queueRenderables(occupant,camera,queue);
+			if(camera->culled(occupant)==false){
+				occupant->queueRenderables(camera,queue);
+			}
 		}
 	}
 }

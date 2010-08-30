@@ -27,11 +27,12 @@
 #define TOADLET_EGG_PROFILE_H
 
 #include <toadlet/egg/String.h>
-#include <toadlet/egg/Map.h>
-#include <toadlet/egg/Collection.h>
+#include <toadlet/egg/WeakPointer.h>
 
 namespace toadlet{
 namespace egg{
+
+class ProfileData;
 
 class TOADLET_API Profile{
 public:
@@ -46,7 +47,8 @@ public:
 
 	int getTimingAverage(const String &name) const;
 
-protected:
+	int collectionAllocations;
+
 	class Timing{
 	public:
 		TOADLET_SHARED_POINTERS(Timing);
@@ -65,13 +67,13 @@ protected:
 		int depth;
 	};
 
+protected:
 	Profile();
+	~Profile();
 
 	static Profile *mTheProfile;
 
-	Map<String,Timing::ptr> mTimings;
-	Collection<Timing::ptr> mTimingStack;
-	Collection<Map<String,Timing::ptr> > mTimingHistory;
+	ProfileData *mData;
 };
 
 class TOADLET_API ScopeProfile{

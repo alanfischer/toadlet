@@ -25,6 +25,7 @@
 
 #include "Win32AudioBuffer.h"
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Logger.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
@@ -74,8 +75,9 @@ bool Win32AudioBuffer::create(Stream::ptr stream,const String &mimeType){
 	mWaveHDR.dwBufferLength=length;
 	// Time
 	mTime=length*1000*8/(channels*bps*sps);
-
+Logger::alert(String("CHAN:")+channels+" SPS:"+sps+" BPS:"+bps);
 	HRESULT hr=0;
+	/// @todo: Either add support for multiple different formats, or test & error if more audio is loaded with a different format
 	if(mAudioPlayer->getWaveOut()==NULL){
 		HWAVEOUT waveOut=0;
 		hr=waveOutOpen(&waveOut,WAVE_MAPPER,&mWaveFormat,NULL,NULL,CALLBACK_NULL);

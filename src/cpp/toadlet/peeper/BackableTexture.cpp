@@ -40,7 +40,6 @@ BackableTexture::BackableTexture():BaseResource(),
 	mWidth(0),
 	mHeight(0),
 	mDepth(0),
-	mMipLevels(0),
 	
 	mRowPitch(0),
 	mSlicePitch(0),
@@ -55,13 +54,12 @@ BackableTexture::~BackableTexture(){
 }
 
 bool BackableTexture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]){
-	mUsage=usage;
+	mUsage=usage|Usage_BIT_AUTOGEN_MIPMAPS; // BackableTextures only store the first mipLevel, so they always need AUTOGEN_MIPMAPS
 	mDimension=dimension;
 	mFormat=format;
 	mWidth=width;
 	mHeight=height;
 	mDepth=depth;
-	mMipLevels=mipLevels;
 
 	mRowPitch=ImageFormatConversion::getPixelSize(mFormat)*mWidth;
 	mSlicePitch=mRowPitch*mHeight;

@@ -55,9 +55,11 @@
 #include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/peeper/VertexData.h>
-#include <toadlet/peeper/VertexElement.h>
 #include <toadlet/peeper/VertexFormat.h>
 #include <toadlet/peeper/Viewport.h>
 #include <toadlet/peeper/Visual.h>
+
+using namespace toadlet;
+using namespace toadlet::peeper;
 
 #endif

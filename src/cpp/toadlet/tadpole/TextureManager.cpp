@@ -62,7 +62,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 	bool wantsAutogen=renderer==NULL?false:(usage&Texture::Usage_BIT_AUTOGEN_MIPMAPS)>0;
 
 	Image::ptr finalImage=image;
-	if((hasAutogen==false || hasNonPowerOf2==false) && (Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || Math::isPowerOf2(depth)==false)){
+	if((hasAutogen==false || hasNonPowerOf2==false) && (Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || (dimension!=Image::Dimension_CUBE && Math::isPowerOf2(depth)==false))){
 		Logger::debug(Categories::TOADLET_TADPOLE,"making image power of 2");
 
 		int dwidth=width>1?(Math::nextPowerOf2(width)>>1):1;

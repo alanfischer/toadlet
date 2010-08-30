@@ -23,6 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
+/// @todo: This handler currently looks pretty poor.
+
 #define _WIN32_WINNT 0x0500
 
 #include <toadlet/egg/Error.h>
@@ -44,8 +46,6 @@ using namespace toadlet::peeper;
 namespace toadlet{
 namespace tadpole{
 namespace handler{
-
-static String defaultCharacterSet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()_+|{}:\"'<>?`-=\\/[];,. \t");
 
 Win32FontHandler::Win32FontHandler(TextureManager *textureManager):
 	mTextureManager(NULL)
@@ -84,16 +84,8 @@ Resource::ptr Win32FontHandler::load(Stream::ptr stream,const ResourceHandlerDat
 		return NULL;
 	}
 
-	const wchar_t *charArray=NULL;
-	int numChars=0;
-	if(fontData->characterSet!=(char*)NULL){
-		charArray=fontData->characterSet.wc_str();
-		numChars=fontData->characterSet.length();
-	}
-	else{
-		charArray=defaultCharacterSet.wc_str();
-		numChars=defaultCharacterSet.length();
-	}
+	const wchar_t *charArray=fontData->characterSet.wc_str();
+	int numChars=numChars=fontData->characterSet.length();
 
 	MemoryStream::ptr memoryStream(new MemoryStream(stream));
 
@@ -121,8 +113,11 @@ Resource::ptr Win32FontHandler::load(Stream::ptr stream,const ResourceHandlerDat
 		/// @todo: Implement this
 	#endif
 
+	HDC dc=GetDC(NULL);
+	HDC cdc=CreateCompatibleDC(dc);
+
 	LOGFONT logFont={0};
-	logFont.lfWidth=Math::fromInt(fontData->pointSize/2);
+	logFont.lfWidth=0;
 	logFont.lfHeight=Math::fromInt(fontData->pointSize);
 	logFont.lfWeight=FW_BOLD;
 	logFont.lfCharSet=DEFAULT_CHARSET;
@@ -131,13 +126,13 @@ Resource::ptr Win32FontHandler::load(Stream::ptr stream,const ResourceHandlerDat
 
 	HFONT fontHandle=CreateFontIndirect(&logFont);
 	if(fontHandle==NULL){
+		DeleteDC(cdc);
+		ReleaseDC(NULL,dc);
+
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			String("CreateFontIndirect failed.  GetLastError():")+(unsigned int)GetLastError());
 		return NULL;
 	}
-
-	HDC dc=GetDC(NULL);
-	HDC cdc=CreateCompatibleDC(dc);
 
 	// We need to set the font first, then set the color.  Otherwise it seems on Win32, the font overwrites the color with black
 	HGDIOBJ lastObject=SelectObject(cdc,fontHandle);
@@ -169,14 +164,15 @@ Resource::ptr Win32FontHandler::load(Stream::ptr stream,const ResourceHandlerDat
 
 	int charCountHeight=Math::toInt(Math::sqrt(Math::fromInt(numChars)));
 	int charCountWidth=Math::intCeil(Math::div(Math::fromInt(numChars),Math::fromInt(charCountHeight)));
+	int pad=2;
 
 	int charmapWidth=0;
-	int charmapHeight=charCountWidth*Math::fromInt(fontData->pointSize);
+	int charmapHeight=charCountWidth*Math::fromInt(fontData->pointSize+pad);
 
 	for(i=0;i<charCountHeight;++i){
 		int w=0;
 		for(j=0;j<charCountWidth;++j){
-			w+=sizes[i].right;
+			w+=sizes[i].right+pad;
 		}
 		if(w>charmapWidth){
 			charmapWidth=w;
@@ -256,7 +252,7 @@ Resource::ptr Win32FontHandler::load(Stream::ptr stream,const ResourceHandlerDat
 			y+=fontData->pointSize;
 		}
 		else{
-			x+=sizes[i].right;
+			x+=glyph->width+pad;
 		}
 	}
 
@@ -265,7 +261,7 @@ Resource::ptr Win32FontHandler::load(Stream::ptr stream,const ResourceHandlerDat
 		GdiFlush();
 	#endif
 
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGB_5_6_5,textureWidth,textureHeight));
+	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_A_8,textureWidth,textureHeight));
 	if(image==NULL){
 		return NULL;
 	}
@@ -276,7 +272,11 @@ Resource::ptr Win32FontHandler::load(Stream::ptr stream,const ResourceHandlerDat
 
 	// Flip the bitmap and copy it into the image
 	for(i=0;i<textureHeight;++i){
-		memcpy(imageData+imageStride*(textureHeight-i-1),buffer+bitmapStride*i,bitmapStride);
+		for(j=0;j<textureWidth;++j){
+			uint16 *s=(uint16*)(buffer+bitmapStride*i+j*2);
+			tbyte *d=(tbyte*)(imageData+imageStride*(textureHeight-i-1)+j);
+			*d=(tbyte)((*s)&0x1F)<<3;
+		}
 	}
 
 	Font::ptr font(new Font(fontData->pointSize,0,shared_static_cast<Texture>(mTextureManager->createTexture(image)),charArray,&glyphs[0],glyphs.size()));

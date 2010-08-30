@@ -32,6 +32,7 @@
 #include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/node/PartitionNode.h>
+#include <toadlet/tadpole/node/MeshNode.h>
 #include <toadlet/tadpole/bsp/BSP30Map.h>
 
 namespace toadlet{
@@ -98,6 +99,11 @@ public:
 	void setMap(BSP30Map::ptr map);
 	BSP30Map::ptr getMap() const{return mMap;}
 
+	void setSkyName(const egg::String &skyName);
+	const egg::String &getSkyName() const{return mSkyName;}
+	void setSkyTextures(const egg::String &skyDown,const egg::String &skyUp,const egg::String &skyWest,const egg::String &skyEast,const egg::String &skySouth,const egg::String &skyNorth);
+	node::MeshNode *getSkyNode() const{return mSkyNode;}
+
 	// Node items
 	void nodeAttached(Node *node);
 	void nodeRemoved(Node *node);
@@ -125,6 +131,8 @@ protected:
 	void findBoundLeafs(egg::Collection<int> &leafs,Node *node);
 
 	BSP30Map::ptr mMap;
+	egg::String mSkyName;
+	node::MeshNode::ptr mSkyNode;
 
 	class childdata{
 	public:

@@ -41,6 +41,7 @@ public:
 		Operation_MODULATE_2X,
 		Operation_MODULATE_4X,
 		Operation_DOTPRODUCT,
+		Operation_ALPHABLEND,
 	};
 
 	enum Source{
@@ -50,37 +51,66 @@ public:
 		Source_PRIMARY_COLOR,
 	};
 
-	TextureBlend(Operation op=Operation_UNSPECIFIED,Source src1=Source_UNSPECIFIED,Source src2=Source_UNSPECIFIED){
-		set(op,src1,src2);
+	TextureBlend(Operation colorOp=Operation_UNSPECIFIED,Source colorSrc1=Source_UNSPECIFIED,Source colorSrc2=Source_UNSPECIFIED,Source colorSrc3=Source_UNSPECIFIED,Operation alphaOp=Operation_UNSPECIFIED,Source alphaSrc1=Source_UNSPECIFIED,Source alphaSrc2=Source_UNSPECIFIED,Source alphaSrc3=Source_UNSPECIFIED){
+		set(colorOp,colorSrc1,colorSrc2,colorSrc3,alphaOp,alphaSrc1,alphaSrc2,alphaSrc3);
 	}
 
 	TextureBlend &set(const TextureBlend &blend){
-		operation=blend.operation;
-		source1=blend.source1;
-		source2=blend.source2;
+		colorOperation=blend.colorOperation;
+		colorSource1=blend.colorSource1;
+		colorSource2=blend.colorSource2;
+		colorSource3=blend.colorSource3;
+		alphaOperation=blend.alphaOperation;
+		alphaSource1=blend.alphaSource1;
+		alphaSource2=blend.alphaSource2;
+		alphaSource3=blend.alphaSource3;
 
 		return *this;
 	}
 
-	TextureBlend &set(Operation op,Source src1,Source src2){
-		operation=op;
-		source1=src1;
-		source2=src2;
+	TextureBlend &set(Operation colorOp,Source colorSrc1,Source colorSrc2,Source colorSrc3,Operation alphaOp,Source alphaSrc1,Source alphaSrc2,Source alphaSrc3){
+		setColor(colorOp,colorSrc1,colorSrc2,colorSrc3);
+		setAlpha(alphaOp,alphaSrc1,alphaSrc2,colorSrc3);
+
+		return *this;
+	}
+
+	TextureBlend &setColor(Operation colorOp,Source colorSrc1,Source colorSrc2,Source colorSrc3){
+		colorOperation=colorOp;
+		colorSource1=colorSrc1;
+		colorSource2=colorSrc2;
+		colorSource3=colorSrc3;
+
+		return *this;
+	}
+
+	TextureBlend &setAlpha(Operation alphaOp,Source alphaSrc1,Source alphaSrc2,Source alphaSrc3){
+		alphaOperation=alphaOp;
+		alphaSource1=alphaSrc1;
+		alphaSource2=alphaSrc2;
+		alphaSource3=alphaSrc3;
 
 		return *this;
 	}
 
 	inline bool operator==(const TextureBlend &blend) const{
-		return (operation==blend.operation && source1==blend.source1 && source2==blend.source2);
+		return (colorOperation==blend.colorOperation&& colorSource1==blend.colorSource1 && colorSource2==blend.colorSource2 && colorSource3==blend.colorSource3 &&
+			alphaOperation==blend.alphaOperation && alphaSource1==blend.alphaSource1 && alphaSource2==blend.alphaSource2 && alphaSource3==blend.alphaSource3);
 	}
 
 	inline bool operator!=(const TextureBlend &blend) const{
-		return !(operation==blend.operation && source1==blend.source1 && source2==blend.source2);
+		return !(colorOperation==blend.colorOperation&& colorSource1==blend.colorSource1 && colorSource2==blend.colorSource2 && colorSource3==blend.colorSource3 &&
+			alphaOperation==blend.alphaOperation && alphaSource1==blend.alphaSource1 && alphaSource2==blend.alphaSource2 && alphaSource3==blend.alphaSource3);
 	}
 
-	Operation operation;
-	Source source1;
-	Source source2;
+	Operation colorOperation;
+	Source colorSource1;
+	Source colorSource2;
+	Source colorSource3;
+	Operation alphaOperation;
+	Source alphaSource1;
+	Source alphaSource2;
+	Source alphaSource3;
 };
 
 }

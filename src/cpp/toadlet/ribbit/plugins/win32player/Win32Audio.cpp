@@ -101,7 +101,8 @@ void Win32Audio::setGain(scalar gain){
 	if(gain<0) gain=0;
 	if(gain>Math::ONE) gain=Math::ONE;
 	DWORD volume=0xFFFF*gain / Math::ONE;
-	waveOutSetVolume(mPlayer->getWaveOut(),(volume<<16) | volume);
+	// This is currently removed, due to waveOutSetVolume being able to zombie the process if it's killed at the wrong time (I believe)
+	//waveOutSetVolume(mPlayer->getWaveOut(),(volume<<16) | volume);
 }
 
 void Win32Audio::setLooping(bool looping){

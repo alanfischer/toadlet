@@ -43,8 +43,6 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-static String defaultCharacterSet("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()_+|{}:\"'<>?`-=\\/[];,. \t");
-
 size_t FontStreamGetBytes(void *info,void *buffer,size_t count){
 	return ((Stream*)info)->read((tbyte*)buffer,count);
 }
@@ -78,6 +76,11 @@ OSXFontHandler::OSXFontHandler(TextureManager *textureManager){
 	mTextureManager=textureManager;
 }
 
+float fromEm(float e,float pointSize,float unitsPerEm){
+	e*=pointSize;
+	return unitsPerEm!=0?(e/unitsPerEm):e;
+}
+
 Resource::ptr OSXFontHandler::load(Stream::ptr in,const ResourceHandlerData *handlerData){
 	if(!CGFontGetGlyphsForUnichars){
 		Error::nullPointer(Categories::TOADLET_TADPOLE,
@@ -93,8 +96,6 @@ Resource::ptr OSXFontHandler::load(Stream::ptr in,const ResourceHandlerData *han
 	}
 
 	float pointSize=fontData->pointSize;
-	
-	int i,j;
 
 	CGDataProviderSequentialCallbacks callbacks={0};
 	callbacks.version=0;
@@ -104,9 +105,7 @@ Resource::ptr OSXFontHandler::load(Stream::ptr in,const ResourceHandlerData *han
 	callbacks.releaseInfo=NULL;
 
 	CGDataProviderRef dataProvider=CGDataProviderCreateSequential(in.get(),&callbacks);
-
 	CGFontRef cgfont=CGFontCreateWithDataProvider(dataProvider);
-	
 	CGDataProviderRelease(dataProvider);
 
 	if(cgfont==NULL){
@@ -115,17 +114,13 @@ Resource::ptr OSXFontHandler::load(Stream::ptr in,const ResourceHandlerData *han
 		return NULL;
 	}
 
-	const wchar_t *wcharArray=NULL;
-	int numChars=0;
-	if(fontData->characterSet!=(char*)NULL){
-		wcharArray=fontData->characterSet.wc_str();
-		numChars=fontData->characterSet.length();
-	}
-	else{
-		wcharArray=defaultCharacterSet.wc_str();
-		numChars=defaultCharacterSet.length();
-	}
+	int unitsPerEm=CGFontGetUnitsPerEm(cgfont);
+	int pad=3;
+	
+	const wchar_t *wcharArray=fontData->characterSet.wc_str();
+	int numChars=numChars=fontData->characterSet.length();
 	UniChar charArray[numChars+1];
+	int i;
 	for(i=0;i<numChars+1;++i){
 		charArray[i]=wcharArray[i];
 	}
@@ -143,11 +138,11 @@ Resource::ptr OSXFontHandler::load(Stream::ptr in,const ResourceHandlerData *han
 	CGFontGetGlyphAdvances(cgfont,cgglyphs.begin(),numChars,iadvances.begin());
 	egg::Collection<float> advances(numChars);
 	for(i=0;i<sizes.size();++i){
-		sizes[i].origin.x=sizes[i].origin.x*pointSize/1000.0;
-		sizes[i].origin.y=sizes[i].origin.y*pointSize/1000.0;
-		sizes[i].size.width=sizes[i].size.width*pointSize/1000.0+1;
-		sizes[i].size.height=sizes[i].size.height*pointSize/1000.0+1;
-		advances[i]=(float)iadvances[i]*pointSize/1000.0+1;
+		sizes[i].origin.x=fromEm(sizes[i].origin.x,pointSize,unitsPerEm)-1;
+		sizes[i].origin.y=fromEm(sizes[i].origin.y,pointSize,unitsPerEm)-1;
+		sizes[i].size.width=fromEm(sizes[i].size.width,pointSize,unitsPerEm)+2;
+		sizes[i].size.height=fromEm(sizes[i].size.height,pointSize,unitsPerEm)+2;
+		advances[i]=fromEm(iadvances[i],pointSize,unitsPerEm);
 	}
 
 	// Find bitmap sizes
@@ -157,26 +152,26 @@ Resource::ptr OSXFontHandler::load(Stream::ptr in,const ResourceHandlerData *han
 	int charmapHeight=0;
 	egg::Collection<float> heights(charHeight);
 	int reportedHeight=0;
-	for(i=0;i<charHeight;++i){
-		int w=0;
-		int h=0;
-
-		for(j=0;j<charWidth;++j){
-			w+=sizes[i].size.width-sizes[i].origin.x + 1;
-
-			if(h<sizes[i].size.height-sizes[i].origin.y +1){
-				h=sizes[i].size.height-sizes[i].origin.y +1;
+	int x=0,y=0;
+	for(i=0;i<numChars;++i){
+		int width=sizes[i].size.width-(0<sizes[i].origin.x?0:sizes[i].origin.x);
+		int height=sizes[i].size.height-(0<sizes[i].origin.y?0:sizes[i].origin.y);
+		if(i%charWidth==charWidth-1){
+			if(x>charmapWidth){
+				charmapWidth=x;
+			}
+			x=0;
+			heights[i/charWidth]=y;
+			charmapHeight+=y+pad;
+			if(reportedHeight<y){
+				reportedHeight=y;
 			}
 		}
-
-		if(w>charmapWidth){
-			charmapWidth=w;
-		}
-
-		heights[i]=h;
-		charmapHeight+=h;
-		if(reportedHeight<h){
-			reportedHeight=h;
+		else{
+			x+=width+pad;
+			if(y<height){
+				y=height;
+			}
 		}
 	}
 
@@ -186,38 +181,58 @@ Resource::ptr OSXFontHandler::load(Stream::ptr in,const ResourceHandlerData *han
 
 	// Create context
 	CGColorSpaceRef colorSpace=CGColorSpaceCreateDeviceGray();
-	void *data=calloc(textureHeight,textureWidth);
+	uint8 *data=(uint8*)calloc(textureHeight,textureWidth);
 	CGContextRef context=CGBitmapContextCreate(data,textureWidth,textureHeight,8,textureWidth,colorSpace,kCGImageAlphaNone);
 	CGColorSpaceRelease(colorSpace);
 	CGContextSetGrayFillColor(context,1.0,1.0);
 
 	CGContextSetFont(context,cgfont);
 	CGContextSetFontSize(context,pointSize);
-	
+
+	CGContextTranslateCTM(context,0.f,textureHeight);
+	CGContextScaleCTM(context,1.0f,-1.0f);
+
 	// Draw characters
 	egg::Collection<Font::Glyph*> glyphs(numChars);
-	int x=0,y=0;
+	x=0,y=0;
 	for(i=0;i<numChars;++i){
-		CGContextShowGlyphsAtPoint(context,x-sizes[i].origin.x,textureHeight-y-sizes[i].size.height-sizes[i].origin.y,&cgglyphs[i],1);
+		int px=x-sizes[i].origin.x;
+		int py=(y-sizes[i].origin.y);
+		CGContextShowGlyphsAtPoint(context,px,py,&cgglyphs[i],1);
 
 		Font::Glyph *glyph=new Font::Glyph();
 		glyph->advancex=Math::fromInt(advances[i]);
 		glyph->advancey=0;
 		glyph->x=x;
 		glyph->y=y;
-		glyph->width=sizes[i].size.width;
-		glyph->height=sizes[i].size.height;
-		glyph->offsetx=0;
-		glyph->offsety=-sizes[i].size.height;
+		glyph->width=sizes[i].size.width-(0<sizes[i].origin.x?0:sizes[i].origin.x);
+		glyph->height=sizes[i].size.height-(0<sizes[i].origin.y?0:sizes[i].origin.y);
+		glyph->offsetx=sizes[i].origin.x;
+		glyph->offsety=sizes[i].origin.y;
 		glyphs[i]=glyph;
+		
+		#if 0
+			CGRect rect;
+			rect.origin.x=glyph->x;
+			rect.origin.y=glyph->y;
+			rect.size.width=glyph->width;
+			rect.size.height=glyph->height;
+			CGFloat color[]={1,1,1,1};
+			CGContextSetStrokeColor(context,color);
+			CGContextStrokeRect(context,rect);
+		#endif
 
 		if(i%charWidth==charWidth-1){
 			x=0;
-			y+=heights[i/charWidth]+1; // Font antialising can make them bleed, so pad by 1
+			y+=heights[i/charWidth]+pad; // Font antialising can make them bleed, so pad by 1
 		}
 		else{
-			x+=sizes[i].size.width+1; // Font antialising can make them bleed, so pad by 1
+			x+=glyph->width+pad; // Font antialising can make them bleed, so pad by 1
 		}
+		
+		glyph->width+=1;
+		glyph->y=textureHeight-(glyph->y+glyph->height);
+		glyph->offsety=-glyph->offsety-glyph->height;
 	}
 
 	// Build texture
@@ -230,7 +245,9 @@ Resource::ptr OSXFontHandler::load(Stream::ptr in,const ResourceHandlerData *han
 
 	int imageStride=textureWidth*image->getPixelSize();
 
-	memcpy(imageData,data,imageStride*charmapHeight);
+	for(i=0;i<charmapHeight;++i){
+		memcpy(imageData+imageStride*(textureHeight-i-1),data+imageStride*i,imageStride);
+	}
 
 	// Build font
 	Font::ptr font(new Font(fontData->pointSize,0,mTextureManager->createTexture(image),wcharArray,glyphs.begin(),glyphs.size()));

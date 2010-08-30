@@ -119,15 +119,16 @@ public:
 	Matrix4x4 cacheMatrix4x4;
 	D3DMATRIX cacheD3DMatrix;
 
+	static DWORD getD3DTOP(TextureBlend::Operation operation,TextureBlend::Source alphaSource);
 	static D3DFORMAT getD3DFORMAT(int textureFormat);
 	static DWORD getD3DTADDRESS(TextureStage::AddressMode addressMode);
 	static DWORD getD3DTEXF(TextureStage::Filter filter);
+	static DWORD getD3DTA(TextureBlend::Source blend);
+	static D3DBLEND getD3DBLEND(Blend::Operation blend);
 	static DWORD getFVF(VertexFormat *vertexFormat);
 
 protected:
 	static void setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D3DCAPS9 &caps,bool renderToTexture,bool renderToDepthTexture);
-	static DWORD getD3DTextureBlendSource(TextureBlend::Source blend);
-	static D3DBLEND getD3DBlendOperation(Blend::Operation blend);
 	static void getPrimitiveTypeAndCount(D3DPRIMITIVETYPE &d3dpt,int &count,IndexData::Primitive prim,int numIndexes);
 
 	IDirect3D9 *mD3D;

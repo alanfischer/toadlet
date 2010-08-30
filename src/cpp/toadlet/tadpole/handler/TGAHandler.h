@@ -23,31 +23,45 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_KNOT_H
-#define TOADLET_KNOT_H
+#ifndef TOADLET_TADPOLE_HANDLER_TGAHANDLER_H
+#define TOADLET_TADPOLE_HANDLER_TGAHANDLER_H
 
-#include <toadlet/knot/Connection.h>
-#include <toadlet/knot/Connector.h>
-#include <toadlet/knot/DebugListener.h>
-#include <toadlet/knot/EventConnection.h>
-#include <toadlet/knot/LANPeerEventConnector.h>
-#include <toadlet/knot/PeerPacketConnection.h>
-#include <toadlet/knot/SimpleClient.h>
-#include <toadlet/knot/SimpleEventConnection.h>
-#include <toadlet/knot/SimpleServer.h>
-#include <toadlet/knot/SynchronizedPeerEventConnection.h>
-#include <toadlet/knot/TCPConnection.h>
-#include <toadlet/knot/TCPConnector.h>
-#include <toadlet/knot/SimplePredictedClient.h>
+#include <toadlet/egg/image/TGAHandler.h>
+#include <toadlet/peeper/Texture.h>
+#include <toadlet/tadpole/ResourceHandler.h>
 
-#include <toadlet/knot/event/PingEvent.h>
-#include <toadlet/knot/event/RoutedEvent.h>
-#include <toadlet/knot/event/BaseConnectionEvent.h>
-#include <toadlet/knot/event/BaseClientUpdateEvent.h>
-#include <toadlet/knot/event/BaseServerUpdateEvent.h>
+namespace toadlet{
+namespace tadpole{
+namespace handler{
 
-using namespace toadlet;
-using namespace toadlet::knot;
-using namespace toadlet::knot::event;
+class TOADLET_API TGAHandler:public ResourceHandler{
+public:
+	TOADLET_SHARED_POINTERS(TGAHandler);
+
+	TGAHandler(TextureManager *textureManager){mTextureManager=textureManager;}
+
+	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData){
+		egg::image::Image::ptr image(mHandler.loadImage(stream));
+		if(image!=NULL){
+			return mTextureManager->createTexture(image);
+		}
+		else{
+			return NULL;
+		}
+	}
+
+	bool save(peeper::Texture::ptr resource,egg::io::Stream::ptr stream){
+		return mHandler.saveImage(mTextureManager->createImage(resource),stream);
+	}
+
+protected:
+	TextureManager *mTextureManager;
+	egg::image::TGAHandler mHandler;
+};
+
+}
+}
+}
 
 #endif
+

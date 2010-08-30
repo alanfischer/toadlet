@@ -69,7 +69,8 @@ void Mesh::destroy(){
 }
 
 void Mesh::compile(){
-	if(bound.equals(Bound_AUTOCALCULATE)){
+	/// @todo: We cant always read the VB here if it wasnt created with the proper bits.  So this needs to be rethought
+/*	if(bound.equals(Bound_AUTOCALCULATE)){
 		scalar ls=0;
 		VertexBufferAccessor vba;
 		Vector3 temp;
@@ -90,7 +91,7 @@ void Mesh::compile(){
 
 		bound.radius=Math::sqrt(bound.radius);
 	}
-}
+*/}
 
 }
 }
