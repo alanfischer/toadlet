@@ -68,12 +68,12 @@ Image *TGAHandler::loadImage(Stream *stream){
 	int idLength=dataStream->readUInt8();
 	int colorMapType=dataStream->readUInt8();
 	int imageType=dataStream->readUInt8();
-//	int colorMapStart=dataStream->readLittleUInt16();
-//	int colorMapLength=dataStream->readLittleUInt16();
-//	int colorMapBPP=dataStream->readUInt8();
+	int colorMapStart=dataStream->readLittleUInt16();
+	int colorMapLength=dataStream->readLittleUInt16();
+	int colorMapBPP=dataStream->readUInt8();
 
-//	int x=dataStream->readLittleUInt16();
-//	int y=dataStream->readLittleUInt16();
+	int x=dataStream->readLittleUInt16();
+	int y=dataStream->readLittleUInt16();
 	int width=dataStream->readLittleUInt16();
 	int height=dataStream->readLittleUInt16();
 	int bpp=dataStream->readUInt8();
@@ -106,7 +106,7 @@ Image *TGAHandler::loadImage(Stream *stream){
 	}
 	else{
 		Error::loadingImage(Categories::TOADLET_EGG,
-			String("BMPHandler: Format is ")+bpp+", not 1, 2, 4, 8, 24, or 32 bit");
+			String("TGAHandler: Format is ")+bpp+", not 1, 2, 4, 8, 24, or 32 bit");
 		return NULL;
 	}
 

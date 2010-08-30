@@ -161,9 +161,9 @@ public:
 	}
 
 	static void transform(Vector3 &r,const Vector3 &t,const Vector3 &translate,const Vector3 &scale,const Quaternion &rotate){
-		Math::add(r,t,translate);
+		Math::mul(r,rotate,t);
 		Math::mul(r,scale);
-		Math::mul(r,rotate);
+		Math::add(r,translate);
 	}
 
 	inline void inverseTransform(Segment &r,const Segment &s,const Vector3 &translate,const Vector3 &scale,const Quaternion &rotate){

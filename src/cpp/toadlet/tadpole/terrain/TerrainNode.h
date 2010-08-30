@@ -33,7 +33,7 @@ namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-class TOADLET_API TerrainNode:public node::PartitionNode{
+class TOADLET_API TerrainNode:public node::PartitionNode,public Traceable{
 public:
 	TOADLET_NODE(TerrainNode,node::PartitionNode);
 
@@ -43,6 +43,9 @@ public:
 	node::Node *create(Scene *scene);
 
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
+
+	const Sphere &getLocalBound() const{return super::getWorldBound();} // We're always at the origin, and we need the bound of our children included
+	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 	// Node items
 /*	void nodeAttached(Node *node);

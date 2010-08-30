@@ -365,8 +365,61 @@ void TerrainPatchNode::render(Renderer *renderer) const{
 }
 
 void TerrainPatchNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
-	result.time=Math::ONE;
-	return; // dont do a thing
+	Segment localSegment;
+	inverseTransform(localSegment,segment,position,mWorldScale,mWorldRotate);
+
+	const Vector3 &mins1=mBlocks[0].mins;
+	const Vector3 &maxs1=mBlocks[0].maxs;
+	scalar mins2x=Math::minVal(localSegment.origin.x,localSegment.origin.x+localSegment.direction.x);
+	scalar mins2y=Math::minVal(localSegment.origin.y,localSegment.origin.y+localSegment.direction.y);
+	scalar maxs2x=Math::maxVal(localSegment.origin.x,localSegment.origin.x+localSegment.direction.x);
+	scalar maxs2y=Math::maxVal(localSegment.origin.y,localSegment.origin.y+localSegment.direction.y);
+	if(!(mins1.x>=maxs2x || mins1.y>=maxs2y || mins2x>=maxs1.x || mins2y>=maxs1.y)){
+		testSegment(result,localSegment);
+	}
+
+	Math::mul(result.normal,mWorldRotate);
+	transform(result.point,result.point,position,mWorldScale,mWorldRotate);
+}
+
+void TerrainPatchNode::testSegment(Collision &result,const Segment &segment){
+	scalar t=0;
+	scalar x0=segment.origin.x;
+	scalar y0=segment.origin.y;
+	scalar x1=segment.origin.x+segment.direction.x;
+	scalar y1=segment.origin.y+segment.direction.y;
+	bool steep=Math::abs(y1-y0)>abs(x1-x0);
+	if(steep){
+		t=x0;x0=y0;y0=t;
+		t=x1;x1=y1;y1=t;
+	}
+	if(x0>x1){
+		t=x0;x0=x1;x1=t;
+		t=y0;y0=y1;y1=t;
+	}
+	int deltax=x1-x0;
+	int deltay=Math::abs(y1-y0);
+	int error=deltax/2;
+	int ystep=y0<y1?1:-1;
+	int x=0;
+	int y=y0;
+	for(x=x0;x<x1;++x){
+		if(x>=0 && y>=0 && x<mSize+1 && y<mSize+1){
+			if(steep){
+				Logger::alert(String("CHECK:")+y+","+x);
+//				plot(y,x);
+			}
+			else{
+				Logger::alert(String("CHECK:")+x+","+y);
+//				plot(x,y);
+			}
+		}
+		error-=deltay;
+		if(error<0){
+			y+=ystep;
+			error+=deltax;
+		}
+	}
 }
 
 void TerrainPatchNode::initBlocks(Block *block,int q,int x,int y,int s,bool e){
