@@ -44,8 +44,10 @@ public:
 
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 
-	const Sphere &getLocalBound() const{return super::getWorldBound();} // We're always at the origin, and we need the bound of our children included
+	const Sphere &getLocalBound() const{return super::getLocalBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
+
+	void updateLocalBound();
 
 	// Node items
 /*	void nodeAttached(Node *node);
@@ -61,8 +63,8 @@ protected:
 	void childTransformUpdated(Node *child);
 */
 
-	const static int ts=3;
-	TerrainPatchNode::ptr patches[ts*ts];
+	int mSideCount;
+	egg::Collection<TerrainPatchNode::ptr> mTerrainPatches;
 };
 
 }

@@ -54,11 +54,14 @@ Node *TerrainNode::create(Scene *scene){
 
 	Noise noise(4,4,1,1,256);
 
+	mSideCount=3;
+	const int ts=mSideCount;
 	const int ps=64;
 	float data[ps*ps];
 
 	float scale=16;
 
+	mTerrainPatches.resize(ts*ts);
 	int tx=0,ty=0,px=0,py=0;
 	for(ty=0;ty<ts;ty++){
 		for(tx=0;tx<ts;tx++){
@@ -77,31 +80,30 @@ Node *TerrainNode::create(Scene *scene){
 
 			patch->setData(data,ps,ps,ps);
 patch->setMaterial(mEngine->getMaterialManager()->findMaterial("grass.jpg"));
-//patch->getRenderMaterial()->setFill(Renderer::Fill_LINE);
-			patch->setTranslate(ps*tx*scale,ps*ty*scale,0);	
+patch->getRenderMaterial()->setFill(Renderer::Fill_LINE);
+			patch->setTranslate(ps*tx*scale-ps*scale,ps*ty*scale-ps*scale,0);	
 			patch->setScale(scale);
 			attach(patch);
-			patches[ty*ts+tx]=patch;
+			mTerrainPatches[ty*ts+tx]=patch;
 
 			if(tx>0){
-				patches[ty*ts+(tx-1)]->stitchToRight(patches[ty*ts+tx]);
+				mTerrainPatches[ty*ts+(tx-1)]->stitchToRight(mTerrainPatches[ty*ts+tx]);
 			}
 			if(ty>0){
-				patches[(ty-1)*ts+tx]->stitchToBottom(patches[ty*ts+tx]);
+				mTerrainPatches[(ty-1)*ts+tx]->stitchToBottom(mTerrainPatches[ty*ts+tx]);
 			}
 		}
 	}
 
+	updateLocalBound();
 
 	return this;
 }
 
 void TerrainNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
-	int tx=0,ty=0;
-	for(ty=0;ty<ts;ty++){
-		for(tx=0;tx<ts;tx++){
-			patches[ty*ts+tx]->updateBlocks(camera);
-		}
+	int i;
+	for(i=0;i<mTerrainPatches.size();++i){
+		mTerrainPatches[i]->updateBlocks(camera);
 	}
 
 	super::queueRenderables(camera,queue);
@@ -110,11 +112,26 @@ void TerrainNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 void TerrainNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	result.time=Math::ONE;
 
-	int tx=0,ty=0;
-	for(ty=0;ty<ts;ty++){
-		for(tx=0;tx<ts;tx++){
-			patches[ty*ts+tx]->traceSegment(result,patches[ty*ts+tx]->getWorldTranslate(),segment,size);
+	Sphere segbound;
+	Math::madd(segbound.origin,segment.direction,Math::HALF,segment.origin);
+	segbound.radius=Math::length(segment.direction)/2;
+
+	int i;
+	for(i=0;i<mTerrainPatches.size();++i){
+		if(Math::testIntersection(segbound,mTerrainPatches[i]->getWorldBound())){
+			mTerrainPatches[i]->traceSegment(result,mTerrainPatches[i]->getWorldTranslate(),segment,size);
 		}
+	}
+}
+
+void TerrainNode::updateLocalBound(){
+	Sphere bound;
+	int i;
+	for(i=0;i<mTerrainPatches.size();++i){
+		bound.set(mTerrainPatches[i]->getLocalBound());
+		Math::add(bound,mTerrainPatches[i]->getTranslate());
+		if(i==0) mLocalBound.set(bound);
+		else Node::merge(mLocalBound,bound);
 	}
 }
 
