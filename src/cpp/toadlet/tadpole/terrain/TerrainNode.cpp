@@ -119,7 +119,11 @@ void TerrainNode::traceSegment(Collision &result,const Vector3 &position,const S
 	int i;
 	for(i=0;i<mTerrainPatches.size();++i){
 		if(Math::testIntersection(segbound,mTerrainPatches[i]->getWorldBound())){
-			mTerrainPatches[i]->traceSegment(result,mTerrainPatches[i]->getWorldTranslate(),segment,size);
+			Collision r;
+			mTerrainPatches[i]->traceSegment(r,mTerrainPatches[i]->getWorldTranslate(),segment,size);
+			if(r.time<result.time){
+				result.set(r);
+			}
 		}
 	}
 }

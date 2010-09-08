@@ -109,7 +109,8 @@ public:
 
 	const Sphere &getLocalBound() const{return super::getLocalBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
-	void testSegment(Collision &result,const Segment &segment);
+	void traceLocalSegment(Collision &result,const Segment &segment);
+	bool traceCell(Collision &result,int x,int y,const Segment &segment);
 
 	peeper::VertexBufferAccessor vba;
 
