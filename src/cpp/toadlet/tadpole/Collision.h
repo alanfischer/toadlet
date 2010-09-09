@@ -39,7 +39,7 @@ class Node;
 class Collision{
 public:
 	Collision():
-		time(-Math::ONE),
+		time(Math::ONE),
 		//point,
 		//normal,
 		collider(NULL),
@@ -55,7 +55,7 @@ public:
 	}
 
 	inline void reset(){
-		time=-Math::ONE;
+		time=Math::ONE;
 		point.set(Math::ZERO_VECTOR3);
 		normal.set(Math::ZERO_VECTOR3);
 		collider=NULL;
