@@ -365,9 +365,11 @@ void TerrainPatchNode::render(Renderer *renderer) const{
 }
 
 void TerrainPatchNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
-//	Segment localSegment;
-//	inverseTransform(localSegment,segment,position,mWorldScale,mWorldRotate);
-/*
+	Segment localSegment;
+	inverseTransform(localSegment,segment,position,mWorldScale,mWorldRotate);
+
+	result.time=Math::ONE;
+
 	Block *block=&mBlocks[0];
 	const Vector3 &mins1=block->mins;
 	const Vector3 &maxs1=block->maxs;
@@ -378,14 +380,11 @@ void TerrainPatchNode::traceSegment(Collision &result,const Vector3 &position,co
 	if(!(mins1.x>=maxs2x || mins1.y>=maxs2y || mins2x>=maxs1.x || mins2y>=maxs1.y)){
 		traceLocalSegment(result,localSegment);
 	}
-*/
-//AABox box(0,0,0,mSize+1,mSize+1,1);
-//result.time=Math::findIntersection(localSegment,box,result.point,result.normal);
-AABox box(position.x,position.y,0,position.x+(mSize+1)*mScale.x,position.y+(mSize+1)*mScale.y,1);
-result.time=Math::findIntersection(segment,box,result.point,result.normal);
 
-//	Math::mul(result.normal,mWorldRotate);
-//	transform(result.point,result.point,position,mWorldScale,mWorldRotate);
+	if(result.time<Math::ONE){
+		Math::mul(result.normal,mWorldRotate);
+		transform(result.point,result.point,position,mWorldScale,mWorldRotate);
+	}
 }
 
 void TerrainPatchNode::traceLocalSegment(Collision &result,const Segment &segment){
@@ -431,6 +430,11 @@ void TerrainPatchNode::traceLocalSegment(Collision &result,const Segment &segmen
 	}
 
 	do{
+		if(x>=0 && y>=0 && x<mSize && y<mSize){
+			if(traceCell(result,x,y,segment)){
+				break;
+			}
+		}
 		if(tMaxX<tMaxY){
 			tMaxX+=tDeltaX;
 			x+=stepX;
@@ -439,35 +443,28 @@ void TerrainPatchNode::traceLocalSegment(Collision &result,const Segment &segmen
 			tMaxY+=tDeltaY;
 			y+=stepY;
 		}
-		if(x>=0 && y>=0 && x<mSize && y<mSize){
-			if(traceCell(result,x,y,segment)){
-				break;
-			}
-		}
-	}while((stepX>0 && x<x1) || (stepX<0 && x>x1) || (stepY>0 && y<y1) || (stepY<0 && y>y1));
+	}while(((stepX>0 && x<x1) || (stepX<0 && x>x1)) && ((stepY>0 && y<y1) || (stepY<0 && y>y1)));
 
 	Logger::alert("PATCHDONE");
 }
 
 bool TerrainPatchNode::traceCell(Collision &result,int x,int y,const Segment &segment){
-	x=0,y=0;
-	int s=mSize+1;
+	int s=1;
 	Vertex *vxy=vertexAt(x,y),*vx1y=vertexAt(x+s,y),*vxy1=vertexAt(x,y+s),*vx1y1=vertexAt(x+s,y+s);
 	scalar mins=Math::minVal(Math::minVal(vxy->height,vx1y->height),Math::minVal(vxy1->height,vx1y1->height));
 	scalar maxs=Math::maxVal(Math::maxVal(vxy->height,vx1y->height),Math::maxVal(vxy1->height,vx1y1->height));
+mins=-9999;
 	AABox box(x,y,mins,x+s,y+s,maxs);
-	result.time=Math::findIntersection(segment,box,result.point,result.normal);
-	Logger::alert(String("TIME:")+result.time);
-	/*
-			int ix=(int)x,iy=(int)y;
-			vba.lock(mVertexBuffer);
-			vba.set3(indexOf(ix,iy),0,ix,iy,-1);
-			vba.set3(indexOf(ix+1,iy),0,ix+1,iy,-1);
-			vba.set3(indexOf(ix+1,iy+1),0,ix+1,iy+1,-1);
-			vba.set3(indexOf(ix,iy+1),0,ix,iy+1,-1);
-			vba.unlock();
-			Logger::alert(String("CHECK:")+(int)x+","+(int)y);
-	*/
+	if(Math::testInside(segment.origin,box)){
+		if(segment.direction.z<0){
+			result.time=0;
+			result.point=segment.origin;
+			result.normal=Vector3(0,0,1);
+		}
+	}
+	else{
+		result.time=Math::findIntersection(segment,box,result.point,result.normal);
+	}
 	return result.time<Math::ONE;
 }
 

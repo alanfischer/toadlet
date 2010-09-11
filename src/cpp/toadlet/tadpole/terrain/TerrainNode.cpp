@@ -112,20 +112,13 @@ void TerrainNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 void TerrainNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	result.time=Math::ONE;
 
-	Sphere segbound;
-	Math::madd(segbound.origin,segment.direction,Math::HALF,segment.origin);
-	segbound.radius=Math::length(segment.direction)/2;
-
+	Collision r;
 	int i;
 	for(i=0;i<mTerrainPatches.size();++i){
-//		if(Math::testIntersection(segbound,mTerrainPatches[i]->getWorldBound())){
-			Collision r;
-			mTerrainPatches[i]->traceSegment(r,mTerrainPatches[i]->getWorldTranslate(),segment,size);
-			if(r.time<result.time){
-Logger::alert(String("TIME:")+r.time);
-				result.set(r);
-			}
-//		}
+		mTerrainPatches[i]->traceSegment(r,mTerrainPatches[i]->getWorldTranslate(),segment,size);
+		if(r.time<result.time){
+			result.set(r);
+		}
 	}
 }
 
