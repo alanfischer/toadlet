@@ -18,16 +18,21 @@ public:
 
 	virtual void installHandler();
 	virtual void uninstallHandler();
-	
-	void buildStacktrace(DWORD EBP,DWORD EIP);
+
+	virtual void errorHandled();
 
 	static Win32ErrorHandler *instance;
 
 protected:
+	static LONG __stdcall exceptionFilter(LPEXCEPTION_POINTERS e);
+
 	bool mInstalled;
 	StackTraceListener *mListener;
 
 	LPTOP_LEVEL_EXCEPTION_FILTER mOldFilter;
+
+	const static int MAX_STACKFRAMES=128;
+//	STACKFRAME64 mStackFrames[MAX_STACKFRAMES];
 };
 
 }
