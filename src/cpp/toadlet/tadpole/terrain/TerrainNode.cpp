@@ -80,9 +80,9 @@ Node *TerrainNode::create(Scene *scene){
 
 			patch->setData(data,ps,ps,ps);
 patch->setMaterial(mEngine->getMaterialManager()->findMaterial("grass.jpg"));
-patch->getRenderMaterial()->setFill(Renderer::Fill_LINE);
+//patch->getRenderMaterial()->setFill(Renderer::Fill_LINE);
 			patch->setTranslate(ps*tx*scale-ps*scale,ps*ty*scale-ps*scale,0);	
-			patch->setScale(scale);
+			patch->setScale(scale,scale,16);
 			attach(patch);
 			mTerrainPatches[ty*ts+tx]=patch;
 

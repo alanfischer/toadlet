@@ -32,6 +32,8 @@ namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
+scalar epsilon=0.001;
+
 TOADLET_NODE_IMPLEMENT(TerrainPatchNode,Categories::TOADLET_TADPOLE_TERRAIN+".TerrainPatchNode");
 
 TerrainPatchNode::TerrainPatchNode():Node(),
@@ -382,7 +384,9 @@ void TerrainPatchNode::traceSegment(Collision &result,const Vector3 &position,co
 	}
 
 	if(result.time<Math::ONE){
+		Math::div(result.normal,mWorldScale);
 		Math::mul(result.normal,mWorldRotate);
+		Math::normalize(result.normal);
 		transform(result.point,result.point,position,mWorldScale,mWorldRotate);
 	}
 }
@@ -401,7 +405,6 @@ void TerrainPatchNode::traceLocalSegment(Collision &result,const Segment &segmen
 	scalar tMaxY=0;
 	scalar tDeltaX=0;
 	scalar tDeltaY=0;
-	scalar epsilon=0.00001;
 	
 	scalar x=x0,y=y0;
 
@@ -443,201 +446,96 @@ void TerrainPatchNode::traceLocalSegment(Collision &result,const Segment &segmen
 			tMaxY+=tDeltaY;
 			y+=stepY;
 		}
-	}while(((stepX>0 && x<x1) || (stepX<0 && x>x1)) && ((stepY>0 && y<y1) || (stepY<0 && y>y1)));
-
-	Logger::alert("PATCHDONE");
+	}while(((stepX>0 && (int)x<=(int)x1) || (stepX<0 && (int)x>=(int)x1)) && ((stepY>0 && (int)y<=(int)y1) || (stepY<0 && (int)y>=(int)y1)));
 }
 
 bool TerrainPatchNode::traceCell(Collision &result,int x,int y,const Segment &segment){
-	int s=1;
-	Vertex *vxy=vertexAt(x,y),*vx1y=vertexAt(x+s,y),*vxy1=vertexAt(x,y+s),*vx1y1=vertexAt(x+s,y+s);
-	scalar mins=Math::minVal(Math::minVal(vxy->height,vx1y->height),Math::minVal(vxy1->height,vx1y1->height));
-	scalar maxs=Math::maxVal(Math::maxVal(vxy->height,vx1y->height),Math::maxVal(vxy1->height,vx1y1->height));
-mins=-9999;
-	AABox box(x,y,mins,x+s,y+s,maxs);
-	if(Math::testInside(segment.origin,box)){
-		if(segment.direction.z<0){
+	Vertex *vxy=vertexAt(x,y),*vx1y=vertexAt(x+1,y),*vxy1=vertexAt(x,y+1),*vx1y1=vertexAt(x+1,y+1);
+
+	Plane p1,p2;
+	bool even=(((x+y)%2)==0);
+	if(even){
+		p1.set(Vector3(x,y,vxy->height),Vector3(x+1,y,vx1y->height),Vector3(x+1,y+1,vx1y1->height));
+		p2.set(Vector3(x,y+1,vxy1->height),Vector3(x,y,vxy->height),Vector3(x+1,y+1,vx1y1->height));
+	}
+	else{
+		p1.set(Vector3(x,y,vxy->height),Vector3(x+1,y,vx1y->height),Vector3(x,y+1,vxy1->height));
+		p2.set(Vector3(x+1,y,vx1y->height),Vector3(x+1,y+1,vx1y1->height),Vector3(x,y+1,vxy1->height));
+	}
+
+	Vector3 nc;
+	Math::cross(nc,p1.normal,p2.normal);
+	bool concave=(nc.x>0);
+
+	Math::add(result.point,segment.origin,segment.direction);
+	scalar d1o=Math::length(p1,segment.origin),d2o=Math::length(p2,segment.origin);
+	scalar d1e=Math::length(p1,result.point),d2e=Math::length(p2,result.point);
+
+	if((concave && (d1o<=0 || d2o<=0)) || (!concave && (d1o<=0 && d2o<=0))){
+		//return false;
+		if(d1o<=0 && (d1o>d2o || d2o>0)){
+			result.normal.set(p1.normal);
+		}
+		else{
+			result.normal.set(p2.normal);
+		}
+		if(Math::dot(segment.direction,result.normal)<-epsilon){
+			result.point.set(segment.origin);
 			result.time=0;
-			result.point=segment.origin;
-			result.normal=Vector3(0,0,1);
 		}
 	}
 	else{
-		result.time=Math::findIntersection(segment,box,result.point,result.normal);
+		result.time=Math::ONE;
+		Collision result2;
+
+		if(d1o>0 && d1e<0){
+			if(d1o<0){
+				result.time=Math::div(d1o+epsilon,d1o-d1e);
+			}
+			else{
+				result.time=Math::div(d1o-epsilon,d1o-d1e);
+			}
+			result.time=Math::clamp(0,Math::ONE,result.time);
+			result.normal.set(p1.normal);
+		}
+
+		if(d2o>0 && d2e<0){
+			if(d2o<0){
+				result2.time=Math::div(d2o+epsilon,d2o-d2e);
+			}
+			else{
+				result2.time=Math::div(d2o-epsilon,d2o-d2e);
+			}
+			result2.time=Math::clamp(0,Math::ONE,result2.time);
+			result2.normal.set(p2.normal);
+		}
+
+		Math::madd(result.point,segment.direction,result.time,segment.origin);
+		Math::madd(result2.point,segment.direction,result2.time,segment.origin);
+
+		if(concave){
+			if(result.time>result2.time){
+				result.set(result2);
+			}
+		}
+		else{
+			if(result2.time<Math::ONE && Math::length(p1,result2.point)<0){
+				result.set(result2);
+			}
+			else if(!(result.time<Math::ONE && Math::length(p2,result.point)<0)){
+				result.reset();
+			}
+		}
 	}
+
+	if(result.time<Math::ONE){
+		if(result.point.x<x || result.point.y<y || result.point.x>x+1 || result.point.y>y+1){
+			result.reset();
+		}
+	}
+
 	return result.time<Math::ONE;
 }
-
-/*
-
-	int retval = MISS;
-	vector3 raydir, curpos;
-	Box e = m_Scene->GetExtends();
-	curpos = a_Ray.GetOrigin();
-	raydir = a_Ray.GetDirection();
-	// setup 3DDDA (double check reusability of primary ray data)
-	vector3 cb, tmax, tdelta, cell;
-	cell = (curpos - e.GetPos()) * m_SR;
-	int stepX, outX, X = (int)cell.x;
-	int stepY, outY, Y = (int)cell.y;
-	int stepZ, outZ, Z = (int)cell.z;
-	if ((X < 0) || (X >= GRIDSIZE) || (Y < 0) || (Y >= GRIDSIZE) || (Z < 0) || (Z >= GRIDSIZE)) return 0;
-	if (raydir.x > 0)
-	{
-		stepX = 1, outX = GRIDSIZE;
-		cb.x = e.GetPos().x + (X + 1) * m_CW.x;
-	}
-	else 
-	{
-		stepX = -1, outX = -1;
-		cb.x = e.GetPos().x + X * m_CW.x;
-	}
-	if (raydir.y > 0.0f)
-	{
-		stepY = 1, outY = GRIDSIZE;
-		cb.y = e.GetPos().y + (Y + 1) * m_CW.y; 
-	}
-	else 
-	{
-		stepY = -1, outY = -1;
-		cb.y = e.GetPos().y + Y * m_CW.y;
-	}
-	if (raydir.z > 0.0f)
-	{
-		stepZ = 1, outZ = GRIDSIZE;
-		cb.z = e.GetPos().z + (Z + 1) * m_CW.z;
-	}
-	else 
-	{
-		stepZ = -1, outZ = -1;
-		cb.z = e.GetPos().z + Z * m_CW.z;
-	}
-	float rxr, ryr, rzr;
-	if (raydir.x != 0)
-	{
-		rxr = 1.0f / raydir.x;
-		tmax.x = (cb.x - curpos.x) * rxr; 
-		tdelta.x = m_CW.x * stepX * rxr;
-	}
-	else tmax.x = 1000000;
-	if (raydir.y != 0)
-	{
-		ryr = 1.0f / raydir.y;
-		tmax.y = (cb.y - curpos.y) * ryr; 
-		tdelta.y = m_CW.y * stepY * ryr;
-	}
-	else tmax.y = 1000000;
-	if (raydir.z != 0)
-	{
-		rzr = 1.0f / raydir.z;
-		tmax.z = (cb.z - curpos.z) * rzr; 
-		tdelta.z = m_CW.z * stepZ * rzr;
-	}
-	else tmax.z = 1000000;
-	// start stepping
-	ObjectList* list = 0;
-	ObjectList** grid = m_Scene->GetGrid();
-	a_Prim = 0;
-	// trace primary ray
-	while (1)
-	{
-		list = grid[X + (Y << GRIDSHFT) + (Z << (GRIDSHFT * 2))];
-		while (list)
-		{
-			Primitive* pr = list->GetPrimitive();
-			int result;
-			if (pr->GetLastRayID() != a_Ray.GetID()) if (result = pr->Intersect( a_Ray, a_Dist )) 
-			{
-				retval = result;
-				a_Prim = pr;
-				goto testloop;
-			}
-			list = list->GetNext();
-		}
-		if (tmax.x < tmax.y)
-		{
-			if (tmax.x < tmax.z)
-			{
-				X = X + stepX;
-				if (X == outX) return MISS;
-				tmax.x += tdelta.x;
-			}
-			else
-			{
-				Z = Z + stepZ;
-				if (Z == outZ) return MISS;
-				tmax.z += tdelta.z;
-			}
-		}
-		else
-		{
-			if (tmax.y < tmax.z)
-			{
-				Y = Y + stepY;
-				if (Y == outY) return MISS;
-				tmax.y += tdelta.y;
-			}
-			else
-			{
-				Z = Z + stepZ;
-				if (Z == outZ) return MISS;
-				tmax.z += tdelta.z;
-			}
-		}
-	}
-testloop:
-	while (1)
-	{
-		list = grid[X + (Y << GRIDSHFT) + (Z << (GRIDSHFT * 2))];
-		while (list)
-		{
-			Primitive* pr = list->GetPrimitive();
-			int result;
-			if (pr->GetLastRayID() != a_Ray.GetID()) if (result = pr->Intersect( a_Ray, a_Dist )) 
-			{
-				a_Prim = pr;
-				retval = result;
-			}
-			list = list->GetNext();
-		}
-		if (tmax.x < tmax.y)
-		{
-			if (tmax.x < tmax.z)
-			{
-				if (a_Dist < tmax.x) break;
-				X = X + stepX;
-				if (X == outX) break;
-				tmax.x += tdelta.x;
-			}
-			else
-			{
-				if (a_Dist < tmax.z) break;
-				Z = Z + stepZ;
-				if (Z == outZ) break;
-				tmax.z += tdelta.z;
-			}
-		}
-		else
-		{
-			if (tmax.y < tmax.z)
-			{
-				if (a_Dist < tmax.y) break;
-				Y = Y + stepY;
-				if (Y == outY) break;
-				tmax.y += tdelta.y;
-			}
-			else
-			{
-				if (a_Dist < tmax.z) break;
-				Z = Z + stepZ;
-				if (Z == outZ) break;
-				tmax.z += tdelta.z;
-			}
-		}
-	}
-	return retval;
-}
-*/
 
 void TerrainPatchNode::initBlocks(Block *block,int q,int x,int y,int s,bool e){
 	int i=0;

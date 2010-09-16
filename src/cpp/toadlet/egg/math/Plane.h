@@ -88,10 +88,6 @@ public:
 		return *this;
 	}
 
-	inline bool isPointOutside(const Vector3 &point,real epsilon=0) const{
-		return normal.x*point.x+normal.y*point.y+normal.z*point.z-distance>epsilon;
-	}
-
 	inline bool equals(const Plane &plane) const{
 		return (plane.normal.equals(normal) && plane.distance==distance);
 	}
