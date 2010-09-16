@@ -712,7 +712,12 @@ fixed Math::findIntersection(const Segment &segment,const Plane &plane,Vector3 &
 		mul(point,segment.direction,t);
 		add(point,segment.origin);
 		normal.set(plane.normal);
-		return t;
+		if(t<0 || t>ONE){
+			return ONE;
+		}
+		else{
+			return t;
+		}
 	}
 	else{
 		return ONE;

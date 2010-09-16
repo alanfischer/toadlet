@@ -84,10 +84,6 @@ public:
 		return *this;
 	}
 
-	inline bool isPointOutside(const Vector3 &point,fixed epsilon=0) const{
-		return Math::mul(normal.x,point.x)+Math::mul(normal.y,point.y)+Math::mul(normal.z,point.z)-distance>epsilon;
-	}
-
 	inline bool equals(const Plane &plane) const{
 		return (plane.normal.equals(normal) && plane.distance==distance);
 	}

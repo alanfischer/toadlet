@@ -713,7 +713,12 @@ real Math::findIntersection(const Segment &segment,const Plane &plane,Vector3 &p
 		mul(point,segment.direction,t);
 		add(point,segment.origin);
 		normal.set(plane.normal);
-		return t;
+		if(t<0 || t>1.0){
+			return 1.0;
+		}
+		else{
+			return t;
+		}
 	}
 	else{
 		return 1.0;
