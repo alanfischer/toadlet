@@ -166,6 +166,12 @@ public:
 		Math::add(r,translate);
 	}
 
+	static void transformNormal(Vector3 &r,const Vector3 &n,const Vector3 &scale,const Quaternion &rotate){
+		Math::mul(r,rotate,n);
+		Math::div(r,scale);
+		Math::normalize(r);
+	}
+
 	inline void inverseTransform(Segment &r,const Segment &s,const Vector3 &translate,const Vector3 &scale,const Quaternion &rotate){
 		Quaternion invrot; Math::invert(invrot,rotate);
 		Math::sub(r.origin,s.origin,translate);

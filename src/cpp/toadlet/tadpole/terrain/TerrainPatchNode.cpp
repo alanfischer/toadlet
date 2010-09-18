@@ -32,8 +32,6 @@ namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-scalar epsilon=0.001;
-
 TOADLET_NODE_IMPLEMENT(TerrainPatchNode,Categories::TOADLET_TADPOLE_TERRAIN+".TerrainPatchNode");
 
 TerrainPatchNode::TerrainPatchNode():Node(),
@@ -50,6 +48,7 @@ TerrainPatchNode::TerrainPatchNode():Node(),
 
 	//mLeftDependent,
 	//mTopDependent,
+	mEpsilon(0),
 
 	mMinTolerance(0),
 	mMaxTolerance(0),
@@ -75,12 +74,13 @@ Node *TerrainPatchNode::create(Scene *scene){
 	mNumBlocksInQueue=0;
 	mNumUnprocessedBlocks=0;
 	mLastBlockUpdateFrame=0;
+	mEpsilon=Math::fromMilli(1);
 
 	mLeftDependent=NULL;
 	mTopDependent=NULL;
 
 	mMinTolerance=0;
-	mMaxTolerance=0;//0.0001;
+	mMaxTolerance=0.001;
 	mTolerance=0;
 
 	mS1=Math::HALF;mS2=Math::ONE;
@@ -184,19 +184,19 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
 	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,mIndexBuffer));
 
 	// Build blocks
-	int numBlocks=1<<(2*sizeN);
-	numBlocks=(int)((numBlocks-1)/3) + 1;
+	mNumBlocks=1<<(2*sizeN);
+	mNumBlocks=(int)((mNumBlocks-1)/3) + 1;
 
-	mBlocks.resize(numBlocks);
-	mBlockQueueSize=numBlocks;
+	mBlocks.resize(mNumBlocks);
+	mBlockQueueSize=mNumBlocks;
 	mBlockQueue.resize(mBlockQueueSize);
 
 	mNumBlocksInQueue=0;
 	mBlockQueueStart=0;
 	mBlockQueueEnd=0;
 
-	int numInitBlocks=1<<(sizeN-1);
-	initBlocks(&mBlocks[0],0,0,0,numInitBlocks,true);
+	mInitialStride=1<<(sizeN-1);
+	initBlocks(&mBlocks[0],0,0,0,mInitialStride,true);
 
 	addBlockToBack(0);
 
@@ -238,11 +238,18 @@ bool TerrainPatchNode::stitchToRight(TerrainPatchNode *terrain,bool restitchDepe
 		lv->height=rv->height;
 		lv->normal.set(rv->normal);
 
+		Vertex *llv=lt->vertexAt(mSize-1,y);
+		llv->normal.set(llv->height-lt->vertexAt(mSize,y)->height,llv->height-lt->vertexAt(mSize-1,y+1)->height,Math::ONE);
+		Math::normalize(llv->normal);
+
 		vba.set3(indexOf(mSize,y),0,mSize,y,lv->height);
 		vba.set3(indexOf(mSize,y),1,lv->normal);
+		vba.set3(indexOf(mSize-1,y),1,llv->normal);
 	}
 
 	vba.unlock();
+
+	updateBlockBoundsRight(&mBlocks[0],0,0,0,mInitialStride);
 
 	// This fixes corner issues, allowing you to stitch in any order
 	if(restitchDependents && mTopDependent!=NULL){
@@ -250,6 +257,37 @@ bool TerrainPatchNode::stitchToRight(TerrainPatchNode *terrain,bool restitchDepe
 	}
 
 	return true;
+}
+
+void TerrainPatchNode::updateBlockBoundsRight(Block *block,int q,int x,int y,int s){
+	int i,j;
+	if(s>1){
+		updateBlockBoundsRight(block->children[1],4*q+2,x+s,y,s/2);
+		updateBlockBoundsRight(block->children[3],4*q+4,x+s,y+s,s/2);
+
+		block->mins.z=block->children[0]->mins.z;
+		block->maxs.z=block->children[0]->maxs.z;
+
+		for(i=1;i<4;i++){
+			if(block->mins.z>block->children[i]->mins.z)
+				block->mins.z=block->children[i]->mins.z;
+			if(block->maxs.z<block->children[i]->maxs.z)
+				block->maxs.z=block->children[i]->maxs.z;
+		}
+	}
+	else{
+		block->mins.z=vertexAt(x,y)->height;
+		block->maxs.z=vertexAt(x,y)->height;
+
+		for(i=x;i<=x+2;i++){
+			for(j=y;j<=y+2;j++){
+				if(vertexAt(i,j)->height<block->mins.z)
+					block->mins.z=vertexAt(i,j)->height;
+				if(vertexAt(i,j)->height>block->maxs.z)
+					block->maxs.z=vertexAt(i,j)->height;
+			}
+		}
+	}
 }
 
 bool TerrainPatchNode::unstitchFromRight(TerrainPatchNode *terrain){
@@ -293,11 +331,18 @@ bool TerrainPatchNode::stitchToBottom(TerrainPatchNode *terrain,bool restitchDep
 		tv->height=bv->height;
 		tv->normal.set(bv->normal);
 
+		Vertex *ttv=tt->vertexAt(x,mSize-1);
+		ttv->normal.set(ttv->height-tt->vertexAt(x,mSize)->height,ttv->height-tt->vertexAt(x+1,mSize-1)->height,Math::ONE);
+		Math::normalize(ttv->normal);
+
 		vba.set3(indexOf(x,mSize),0,x,mSize,tv->height);
 		vba.set3(indexOf(x,mSize),1,tv->normal);
+		vba.set3(indexOf(x,mSize-1),1,ttv->normal);
 	}
 
 	vba.unlock();
+
+	updateBlockBoundsBottom(&mBlocks[0],0,0,0,mInitialStride);
 
 	// This fixes corner issues, allowing you to stitch in any order
 	if(restitchDependents && mLeftDependent){
@@ -305,6 +350,37 @@ bool TerrainPatchNode::stitchToBottom(TerrainPatchNode *terrain,bool restitchDep
 	}
 
 	return true;
+}
+
+void TerrainPatchNode::updateBlockBoundsBottom(Block *block,int q,int x,int y,int s){
+	int i,j;
+	if(s>1){
+		updateBlockBoundsBottom(block->children[2],4*q+3,x,y+s,s/2);
+		updateBlockBoundsBottom(block->children[3],4*q+4,x+s,y+s,s/2);
+
+		block->mins.z=block->children[0]->mins.z;
+		block->maxs.z=block->children[0]->maxs.z;
+
+		for(i=1;i<4;i++){
+			if(block->mins.z>block->children[i]->mins.z)
+				block->mins.z=block->children[i]->mins.z;
+			if(block->maxs.z<block->children[i]->maxs.z)
+				block->maxs.z=block->children[i]->maxs.z;
+		}
+	}
+	else{
+		block->mins.z=vertexAt(x,y)->height;
+		block->maxs.z=vertexAt(x,y)->height;
+
+		for(i=x;i<=x+2;i++){
+			for(j=y;j<=y+2;j++){
+				if(vertexAt(i,j)->height<block->mins.z)
+					block->mins.z=vertexAt(i,j)->height;
+				if(vertexAt(i,j)->height>block->maxs.z)
+					block->maxs.z=vertexAt(i,j)->height;
+			}
+		}
+	}
 }
 
 bool TerrainPatchNode::unstitchFromBottom(TerrainPatchNode *terrain){
@@ -375,23 +451,22 @@ void TerrainPatchNode::traceSegment(Collision &result,const Vector3 &position,co
 	Block *block=&mBlocks[0];
 	const Vector3 &mins1=block->mins;
 	const Vector3 &maxs1=block->maxs;
+
 	scalar mins2x=Math::minVal(localSegment.origin.x,localSegment.origin.x+localSegment.direction.x);
 	scalar mins2y=Math::minVal(localSegment.origin.y,localSegment.origin.y+localSegment.direction.y);
 	scalar maxs2x=Math::maxVal(localSegment.origin.x,localSegment.origin.x+localSegment.direction.x);
 	scalar maxs2y=Math::maxVal(localSegment.origin.y,localSegment.origin.y+localSegment.direction.y);
-	if(!(mins1.x>=maxs2x || mins1.y>=maxs2y || mins2x>=maxs1.x || mins2y>=maxs1.y)){
-		traceLocalSegment(result,localSegment);
+	if(!(mins1.x>maxs2x || mins1.y>maxs2y || mins2x>maxs1.x || mins2y>maxs1.y)){
+		traceLocalSegment(result,localSegment,mEpsilon);
 	}
 
 	if(result.time<Math::ONE){
-		Math::div(result.normal,mWorldScale);
-		Math::mul(result.normal,mWorldRotate);
-		Math::normalize(result.normal);
+		transformNormal(result.normal,result.normal,mWorldScale,mWorldRotate);
 		transform(result.point,result.point,position,mWorldScale,mWorldRotate);
 	}
 }
 
-void TerrainPatchNode::traceLocalSegment(Collision &result,const Segment &segment){
+void TerrainPatchNode::traceLocalSegment(Collision &result,const Segment &segment,scalar epsilon){
 	scalar t=0;
 	scalar x0=segment.origin.x,y0=segment.origin.y,z0=segment.origin.z;
 	scalar x1=segment.origin.x+segment.direction.x,y1=segment.origin.y+segment.direction.y,z1=segment.origin.z+segment.direction.z;
@@ -434,7 +509,7 @@ void TerrainPatchNode::traceLocalSegment(Collision &result,const Segment &segmen
 
 	do{
 		if(x>=0 && y>=0 && x<mSize && y<mSize){
-			if(traceCell(result,x,y,segment)){
+			if(traceCell(result,x,y,segment,epsilon)){
 				break;
 			}
 		}
@@ -449,7 +524,7 @@ void TerrainPatchNode::traceLocalSegment(Collision &result,const Segment &segmen
 	}while(((stepX>0 && (int)x<=(int)x1) || (stepX<0 && (int)x>=(int)x1)) && ((stepY>0 && (int)y<=(int)y1) || (stepY<0 && (int)y>=(int)y1)));
 }
 
-bool TerrainPatchNode::traceCell(Collision &result,int x,int y,const Segment &segment){
+bool TerrainPatchNode::traceCell(Collision &result,int x,int y,const Segment &segment,scalar epsilon){
 	Vertex *vxy=vertexAt(x,y),*vx1y=vertexAt(x+1,y),*vxy1=vertexAt(x,y+1),*vx1y1=vertexAt(x+1,y+1);
 
 	Plane p1,p2;
@@ -599,10 +674,10 @@ void TerrainPatchNode::initBlocks(Block *block,int q,int x,int y,int s,bool e){
 		block->children[1]=&mBlocks[4*q+2];
 		block->children[2]=&mBlocks[4*q+3];
 		block->children[3]=&mBlocks[4*q+4];
-		initBlocks(block->children[0],4*q+1,x,y,(int)s/2,true);
-		initBlocks(block->children[1],4*q+2,x+s,y,(int)s/2,false);
-		initBlocks(block->children[2],4*q+3,x,y+s,(int)s/2,false);
-		initBlocks(block->children[3],4*q+4,x+s,y+s,(int)s/2,true);
+		initBlocks(block->children[0],4*q+1,x,y,s/2,true);
+		initBlocks(block->children[1],4*q+2,x+s,y,s/2,false);
+		initBlocks(block->children[2],4*q+3,x,y+s,s/2,false);
+		initBlocks(block->children[3],4*q+4,x+s,y+s,s/2,true);
 
 		block->mins.z=block->children[0]->mins.z;
 		block->maxs.z=block->children[0]->maxs.z;

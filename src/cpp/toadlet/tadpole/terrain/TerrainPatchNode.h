@@ -92,8 +92,10 @@ public:
 	inline int indexOf(int x,int y) const{return y*(mSize+1)+x;}
 
 	bool stitchToRight(TerrainPatchNode *terrain,bool restitchDependents=true);
+	void updateBlockBoundsRight(Block *block,int q,int x,int y,int s);
 	bool unstitchFromRight(TerrainPatchNode *terrain);
 	bool stitchToBottom(TerrainPatchNode *terrain,bool restitchDependents=true);
+	void updateBlockBoundsBottom(Block *block,int q,int x,int y,int s);
 	bool unstitchFromBottom(TerrainPatchNode *terrain);
 	void setMinTolerance(scalar minTol){mMinTolerance=minTol;}
 	void setMaxTolerance(scalar maxTol){mMaxTolerance=maxTol;}
@@ -109,12 +111,12 @@ public:
 
 	const Sphere &getLocalBound() const{return super::getLocalBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
-	void traceLocalSegment(Collision &result,const Segment &segment);
-	bool traceCell(Collision &result,int x,int y,const Segment &segment);
+	void traceLocalSegment(Collision &result,const Segment &segment,scalar epsilon);
+	bool traceCell(Collision &result,int x,int y,const Segment &segment,scalar epsilon);
 
 	peeper::VertexBufferAccessor vba;
 
-protected:
+//protected:
 	/*
 		Block vertexes ordered as follows:
 		
@@ -185,12 +187,15 @@ protected:
 	egg::Collection<Vertex> mVertexes;
 	egg::Collection<Block> mBlocks;
 	egg::Collection<int> mBlockQueue;
+	int mNumBlocks;
+	int mInitialStride;
 	unsigned int mBlockQueueSize;
 	unsigned int mBlockQueueStart;
 	unsigned int mBlockQueueEnd;
 	int mNumBlocksInQueue;
 	int mNumUnprocessedBlocks;
 	int mLastBlockUpdateFrame;
+	scalar mEpsilon;
 
 	TerrainPatchNode::ptr mLeftDependent;
 	TerrainPatchNode::ptr mTopDependent;
