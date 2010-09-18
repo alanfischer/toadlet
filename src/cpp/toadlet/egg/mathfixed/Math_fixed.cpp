@@ -663,8 +663,8 @@ bool Math::testInside(const Vector3 &point,const AABox &box){
 }
 
 bool Math::testIntersection(const AABox &box1,const AABox &box2){
-	return	!(box1.mins.x>=box2.maxs.x || box1.mins.y>=box2.maxs.y || box1.mins.z>=box2.maxs.z ||
-			  box2.mins.x>=box1.maxs.x || box2.mins.y>=box1.maxs.y || box2.mins.z>=box1.maxs.z);
+	return	!(box1.mins.x>box2.maxs.x || box1.mins.y>box2.maxs.y || box1.mins.z>box2.maxs.z ||
+			  box2.mins.x>box1.maxs.x || box2.mins.y>box1.maxs.y || box2.mins.z>box1.maxs.z);
 }
 
 bool Math::testIntersection(const Sphere &sphere1,const Sphere &sphere2){

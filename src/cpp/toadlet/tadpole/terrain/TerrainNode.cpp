@@ -31,6 +31,8 @@
 #include <toadlet/tadpole/terrain/TerrainNode.h>
 #include <toadlet/tadpole/terrain/TerrainPatchNode.h>
 
+#include <toadlet/tadpole/node/MeshNode.h>
+
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
 using namespace toadlet::egg::image;
@@ -81,6 +83,8 @@ Node *TerrainNode::create(Scene *scene){
 			patch->setData(data,ps,ps,ps);
 patch->setMaterial(mEngine->getMaterialManager()->findMaterial("grass.jpg"));
 //patch->getRenderMaterial()->setFill(Renderer::Fill_LINE);
+Matrix4x4 matrix;Math::setMatrix4x4FromScale(matrix,16,16,16);
+patch->getRenderMaterial()->getTextureStage(0)->setCalculation(TextureStage::Calculation_NORMAL,matrix);
 			patch->setTranslate(ps*tx*scale-ps*scale,ps*ty*scale-ps*scale,0);	
 			patch->setScale(scale,scale,16);
 			attach(patch);

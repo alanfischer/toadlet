@@ -142,7 +142,7 @@ void BSP30ModelNode::traceSegment(Collision &result,const Vector3 &position,cons
 		}
 	}
 
-	Math::mul(result.normal,mWorldRotate);
+	transformNormal(result.normal,result.normal,mWorldScale,mWorldRotate);
 	transform(result.point,result.point,position,mWorldScale,mWorldRotate);
 }
 
