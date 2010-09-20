@@ -594,10 +594,10 @@ bool TerrainPatchNode::traceCell(Collision &result,int x,int y,const Segment &se
 			}
 		}
 		else{
-			if(result2.time<Math::ONE && Math::length(p1,result2.point)<0){
+			if(result2.time<Math::ONE && Math::length(p1,result2.point)<epsilon){
 				result.set(result2);
 			}
-			else if(!(result.time<Math::ONE && Math::length(p2,result.point)<0)){
+			else if(!(result.time<Math::ONE && Math::length(p2,result.point)<epsilon)){
 				result.reset();
 			}
 		}
