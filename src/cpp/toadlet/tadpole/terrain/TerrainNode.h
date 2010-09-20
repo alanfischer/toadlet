@@ -33,6 +33,8 @@ namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
+class TerrainDataSource;
+
 class TOADLET_API TerrainNode:public node::PartitionNode,public Traceable{
 public:
 	TOADLET_NODE(TerrainNode,node::PartitionNode);
@@ -41,6 +43,12 @@ public:
 	virtual ~TerrainNode();
 
 	node::Node *create(Scene *scene);
+	void destroy();
+
+	void setDataSource(TerrainDataSource *dataSource,const Vector3 &scale,Material::ptr material);
+
+	void setMaterial(Material::ptr material);
+	Material::ptr getMaterial() const{return mPatchMaterial;}
 
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 
@@ -63,8 +71,13 @@ protected:
 	void childTransformUpdated(Node *child);
 */
 
-	int mSideCount;
+	TerrainDataSource *mDataSource;
+
+	int mSize;
 	egg::Collection<TerrainPatchNode::ptr> mTerrainPatches;
+	int mPatchSize;
+	Material::ptr mPatchMaterial;
+	Vector3 mPatchScale;
 };
 
 }

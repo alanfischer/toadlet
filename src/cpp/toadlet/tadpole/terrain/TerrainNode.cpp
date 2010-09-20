@@ -54,9 +54,62 @@ TerrainNode::~TerrainNode(){}
 Node *TerrainNode::create(Scene *scene){
 	super::create(scene);
 
+	return this;
+}
+
+void TerrainNode::setDataSource(TerrainDataSource *dataSource,const Vector3 &scale,Material::ptr material){
+	mDataSource=dataSource;
+
+	mPatchSize=64;//mDataSource->getSize();
+	mPatchScale.set(scale);
+	setMaterial(material);
+
+	mSize=3;
+	mTerrainPatches.resize(mSize*mSize);
+
+	int i,j;
+	for(j=0;j<mSize;++j){
+		for(i=0;i<mSize;++i){
+			TerrainPatchNode::ptr patch=mEngine->createNodeType(TerrainPatchNode::type(),mScene);
+			patch->setScale(mPatchScale);
+			patch->setTranslate(i*mPatchSize*mPatchScale.x - mPatchSize*mPatchScale.x*(float)mSize/3.0,j*mPatchSize*mPatchScale.y - mPatchSize*mPatchScale.y*(float)mSize/3.0,0);
+			attach(patch);
+			mTerrainPatches[j*mSize+i]=patch;
+		}
+	}
+
+	Noise noise(4,4,1,1,256);
+	float data[64*64];
+	memset(data,0,mPatchSize*mPatchSize*sizeof(float));
+	for(j=0;j<mSize;j++){
+		for(i=0;i<mSize;i++){
+			for(int px=0;px<64;++px){
+				for(int py=0;py<64;++py){
+					int x=i*64+px;
+					int width=3*64;
+					int y=j*64+py;
+					int height=3*64;
+					float n=(noise.perlin2((float)x/(float)width,(float)y/(float)height)*0.5 + 0.5);
+					data[py*64+px]=-n*20;
+				}
+			}
+
+			TerrainPatchNode::ptr patch=mTerrainPatches[j*mSize+i];
+			patch->setData(data,mPatchSize,mPatchSize,mPatchSize);
+			patch->setMaterial(material);
+
+			if(i>0){
+				mTerrainPatches[j*3+(i-1)]->stitchToRight(mTerrainPatches[j*3+i]);
+			}
+			if(j>0){
+				mTerrainPatches[(j-1)*3+i]->stitchToBottom(mTerrainPatches[j*3+i]);
+			}
+		}
+	}
+
+/*
 	Noise noise(4,4,1,1,256);
 
-	mSideCount=3;
 	const int ts=mSideCount;
 	const int ps=64;
 	float data[ps*ps];
@@ -81,27 +134,43 @@ Node *TerrainNode::create(Scene *scene){
 			}
 
 			patch->setData(data,ps,ps,ps);
-patch->setMaterial(mEngine->getMaterialManager()->findMaterial("grass.jpg"));
-//patch->getRenderMaterial()->setFill(Renderer::Fill_LINE);
-Matrix4x4 matrix;Math::setMatrix4x4FromScale(matrix,16,16,16);
-patch->getRenderMaterial()->getTextureStage(0)->setCalculation(TextureStage::Calculation_NORMAL,matrix);
 			patch->setTranslate(ps*tx*scale-ps*scale,ps*ty*scale-ps*scale,0);	
 			patch->setScale(scale,scale,16);
 			attach(patch);
 			mTerrainPatches[ty*ts+tx]=patch;
 
-			if(tx>0){
-				mTerrainPatches[ty*ts+(tx-1)]->stitchToRight(mTerrainPatches[ty*ts+tx]);
-			}
-			if(ty>0){
-				mTerrainPatches[(ty-1)*ts+tx]->stitchToBottom(mTerrainPatches[ty*ts+tx]);
-			}
+		}
+	}
+*/
+	updateLocalBound();
+}
+
+void TerrainNode::destroy(){
+	if(mPatchMaterial!=NULL){
+		mPatchMaterial->release();
+		mPatchMaterial=NULL;
+	}
+
+	super::destroy();
+}
+
+void TerrainNode::setMaterial(Material::ptr material){
+	if(mPatchMaterial!=material){
+		if(mPatchMaterial!=NULL){
+			mPatchMaterial->release();
+		}
+
+		mPatchMaterial=material;
+
+		if(mPatchMaterial!=NULL){
+			mPatchMaterial->retain();
 		}
 	}
 
-	updateLocalBound();
-
-	return this;
+	int i;
+	for(i=0;i<mTerrainPatches.size();++i){
+		mTerrainPatches[i]->setMaterial(mPatchMaterial);
+	}
 }
 
 void TerrainNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
