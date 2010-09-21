@@ -118,7 +118,7 @@ Resource::ptr OSXFontHandler::load(Stream::ptr in,const ResourceHandlerData *han
 	int pad=3;
 	
 	const wchar_t *wcharArray=fontData->characterSet.wc_str();
-	int numChars=numChars=fontData->characterSet.length();
+	int numChars=fontData->characterSet.length();
 	UniChar charArray[numChars+1];
 	int i;
 	for(i=0;i<numChars+1;++i){

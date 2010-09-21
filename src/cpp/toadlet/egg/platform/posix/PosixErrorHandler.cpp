@@ -81,7 +81,7 @@ bool PosixErrorHandler::uninstallHandler(){
 }
 
 void PosixErrorHandler::signalHandler(int sig,siginfo_t *info,void *context){
-	void *stackFrames=instance->mStackFrames;
+	void **stackFrames=instance->mStackFrames;
 	int frameCount=backtrace(stackFrames,MAX_STACKFRAMES);
 	instance->handleFrames(stackFrames,frameCount);
 	instance->errorHandled();

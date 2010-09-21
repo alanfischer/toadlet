@@ -189,9 +189,9 @@ public:
 	egg::Collection<int> mBlockQueue;
 	int mNumBlocks;
 	int mInitialStride;
-	unsigned int mBlockQueueSize;
-	unsigned int mBlockQueueStart;
-	unsigned int mBlockQueueEnd;
+	int mBlockQueueSize;
+	int mBlockQueueStart;
+	int mBlockQueueEnd;
 	int mNumBlocksInQueue;
 	int mNumUnprocessedBlocks;
 	int mLastBlockUpdateFrame;
