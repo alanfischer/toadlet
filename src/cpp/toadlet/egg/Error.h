@@ -124,7 +124,9 @@ public:
 	void installHandler();
 	void uninstallHandler();
 
-	void backtrace(char **stack,int count);
+	void startTrace();
+	void traceFrame(const char *description);
+	void endTrace();
 
 protected:
 	Error();

@@ -6,7 +6,9 @@ namespace egg{
 
 class StackTraceListener{
 public:
-	virtual void backtrace(char **stack,int count)=0;
+	virtual void startTrace()=0;
+	virtual void traceFrame(const char *description)=0; ///@todo: Change this to file,function,line parameters
+	virtual void endTrace()=0;
 };
 
 }
