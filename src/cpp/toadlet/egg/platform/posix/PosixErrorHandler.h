@@ -15,8 +15,8 @@ public:
 	virtual void setStackTraceListener(StackTraceListener *listener){mListener=listener;}
 	virtual StackTraceListener *getStackTraceListener(){return mListener;}
 
-	virtual void installHandler();
-	virtual void uninstallHandler();
+	virtual bool installHandler();
+	virtual bool uninstallHandler();
 
 	virtual void handleFrames(void **frames,int count);
 	virtual void errorHandled();
@@ -32,6 +32,9 @@ protected:
 
 	struct sigaction mAction;
 	struct sigaction mOldActions[NSIG];
+	
+	const static int MAX_STACKFRAMES=128;
+	void *mStackFrames[MAX_STACKFRAMES];
 };
 
 }

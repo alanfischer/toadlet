@@ -44,8 +44,8 @@ PosixErrorHandler::~PosixErrorHandler(){
 	instance=NULL;
 }
 
-void PosixErrorHandler::installHandler(){
-	if(mAction.sa_sigaction!=NULL) return;
+bool PosixErrorHandler::installHandler(){
+	if(mAction.sa_sigaction!=NULL) return true;
 
 	mAction.sa_sigaction=signalHandler;
 	mAction.sa_flags=SA_SIGINFO;
@@ -59,10 +59,12 @@ void PosixErrorHandler::installHandler(){
 	#if defined(TOADLET_PLATFORM_OSX)
 		PosixErrorHandler_installNSHandler();
 	#endif
+	
+	return true;
 }
 
-void PosixErrorHandler::uninstallHandler(){
-	if(mAction.sa_sigaction==NULL) return;
+bool PosixErrorHandler::uninstallHandler(){
+	if(mAction.sa_sigaction==NULL) return true;
 
 	int i;
 	for(i=0;mSignals[i]>0;++i){
@@ -74,20 +76,35 @@ void PosixErrorHandler::uninstallHandler(){
 	#if defined(TOADLET_PLATFORM_OSX)
 		PosixErrorHandler_uninstallNSHandler();
 	#endif
+	
+	return true;
 }
 
 void PosixErrorHandler::signalHandler(int sig,siginfo_t *info,void *context){
-	void *backtraceFrames[128];
-	int frameCount=backtrace(backtraceFrames,128);
-	instance->handleFrames(backtraceFrames,frameCount);
+	void *stackFrames=instance->mStackFrames;
+	int frameCount=backtrace(stackFrames,MAX_STACKFRAMES);
+	instance->handleFrames(stackFrames,frameCount);
 	instance->errorHandled();
 }
 
 void PosixErrorHandler::handleFrames(void **frames,int count){
 	char **strings=backtrace_symbols(frames,count);
+
 	if(mListener!=NULL){
-		mListener->backtrace(strings,count);
+		mListener->startTrace();
 	}
+
+	int i;
+	for(i=0;i<count;++i){
+		if(mListener!=NULL){
+			mListener->traceFrame(strings[i]);
+		}
+	}
+
+	if(mListener!=NULL){
+		mListener->endTrace();
+	}
+
 	free(strings);
 }
 	
