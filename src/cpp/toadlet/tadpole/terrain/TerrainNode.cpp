@@ -31,7 +31,7 @@
 #include <toadlet/tadpole/terrain/TerrainNode.h>
 #include <toadlet/tadpole/terrain/TerrainPatchNode.h>
 
-#include <toadlet/tadpole/node/MeshNode.h>
+#include <string.h> //temp
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;

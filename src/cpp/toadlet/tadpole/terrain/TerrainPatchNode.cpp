@@ -168,7 +168,6 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
 
 	i=mSize;
 	for(j=0;j<mSize+1;j++){
-		int gi=indexOf(i-1,j);
 		int si=indexOf(i,j);
 
 		vertexAt(i,j)->height=vertexAt(i-1,j)->height;
@@ -467,9 +466,8 @@ void TerrainPatchNode::traceSegment(Collision &result,const Vector3 &position,co
 }
 
 void TerrainPatchNode::traceLocalSegment(Collision &result,const Segment &segment,scalar epsilon){
-	scalar t=0;
-	scalar x0=segment.origin.x,y0=segment.origin.y,z0=segment.origin.z;
-	scalar x1=segment.origin.x+segment.direction.x,y1=segment.origin.y+segment.direction.y,z1=segment.origin.z+segment.direction.z;
+	scalar x0=segment.origin.x,y0=segment.origin.y;
+	scalar x1=segment.origin.x+segment.direction.x,y1=segment.origin.y+segment.direction.y;
 
 	scalar stepX=segment.direction.x>0?Math::ONE:-Math::ONE;
 	scalar stepY=segment.direction.y>0?Math::ONE:-Math::ONE;

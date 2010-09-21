@@ -79,6 +79,12 @@ Image *TGAHandler::loadImage(Stream *stream){
 	int bpp=dataStream->readUInt8();
 	int descriptor=dataStream->readUInt8();
 
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(colorMapStart);
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(colorMapLength);
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(colorMapBPP);
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(x);
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(y);
+	
 	if(colorMapType>1){
 		Error::loadingImage(Categories::TOADLET_EGG,
 			"Invalid color map type");
