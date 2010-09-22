@@ -54,7 +54,9 @@ public:
 		textureNonPowerOf2(false),
 		textureAutogenMipMaps(false),
 		idealVertexFormatBit(VertexFormat::Format_BIT_FLOAT_32),
-		triangleFan(false)
+		triangleFan(false),
+		fill(false),
+		texturePerspective(false)
 	{}
 
 	bool resetOnResize;
@@ -78,6 +80,8 @@ public:
 	bool textureAutogenMipMaps;
 	int idealVertexFormatBit;
 	bool triangleFan;
+	bool fill;
+	bool texturePerspective;
 };
 
 }

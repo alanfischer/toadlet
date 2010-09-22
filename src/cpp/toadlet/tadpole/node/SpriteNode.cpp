@@ -161,11 +161,11 @@ void SpriteNode::updateSprite(){
 		vba.set3(0,0, x,y,0);
 		vba.set2(0,1, 0,0);
 
-		vba.set3(1,0, x,y+height,0);
-		vba.set2(1,1, 0,Math::ONE);
+		vba.set3(1,0, x+width,y,0);
+		vba.set2(1,1, Math::ONE,0);
 
-		vba.set3(2,0, x+width,y,0);
-		vba.set2(2,1, Math::ONE,0);
+		vba.set3(2,0, x,y+height,0);
+		vba.set2(2,1, 0,Math::ONE);
 
 		vba.set3(3,0, x+width,y+height,0);
 		vba.set2(3,1, Math::ONE,Math::ONE);

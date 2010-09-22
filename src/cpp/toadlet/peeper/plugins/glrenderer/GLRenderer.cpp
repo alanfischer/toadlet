@@ -298,6 +298,10 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 	#endif
 
 	mCapabilitySet.triangleFan=true;
+	#if !defined(TOADLET_HAS_GLES)
+		mCapabilitySet.fill=true;
+		mCapabilitySet.texturePerspective=true;
+	#endif
 
 	setDefaultStates();
 
