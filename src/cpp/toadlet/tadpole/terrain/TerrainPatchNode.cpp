@@ -35,6 +35,8 @@ namespace terrain{
 TOADLET_NODE_IMPLEMENT(TerrainPatchNode,Categories::TOADLET_TADPOLE_TERRAIN+".TerrainPatchNode");
 
 TerrainPatchNode::TerrainPatchNode():Node(),
+	TOADLET_GIB_IMPLEMENT()
+
 	mSize(0),
 	//mVertexes,
 	//mBlocks,

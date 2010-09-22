@@ -34,6 +34,7 @@ namespace toadlet{
 namespace tadpole{
 
 Material::Material():BaseResource(),
+	mStates(0),
 	mLighting(false),
 	mFaceCulling(Renderer::FaceCulling_BACK),
 	mFill(Renderer::Fill_SOLID),
@@ -66,6 +67,7 @@ Material::ptr Material::clone(){
 	//  Of an unused material being cloned, so the unused original will get cleaned up
 	retain();
 
+	material->mStates=mStates;
 	material->mLightEffect.set(mLightEffect);
 	material->mLighting=mLighting;
 	material->mFaceCulling=mFaceCulling;
@@ -86,11 +88,6 @@ Material::ptr Material::clone(){
 	return material;
 }
 
-void Material::setAlphaTest(Renderer::AlphaTest alphaTest,scalar cutoff){
-	mAlphaTest=alphaTest;
-	mAlphaTestCutoff=cutoff;
-}
-
 bool Material::setTextureStage(int stage,const TextureStage::ptr &textureStage){
 	if(mTextureStages.size()<=stage){
 		mTextureStages.resize(stage+1);
@@ -106,15 +103,32 @@ bool Material::setTextureStage(int stage,const TextureStage::ptr &textureStage){
 }
 
 void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
+	int states=mStates;
 	if(previousMaterial==NULL){
-		renderer->setAlphaTest(mAlphaTest,mAlphaTestCutoff);
-		renderer->setBlend(mBlend);
-		renderer->setDepthTest(mDepthTest);
-		renderer->setDepthWrite(mDepthWrite);
-		renderer->setFaceCulling(mFaceCulling);
-		renderer->setFill(mFill);
-		renderer->setLighting(mLighting);
-		renderer->setLightEffect(mLightEffect); // We set this even if lighting isnt enabled, since it includes color tracking
+		if((states&State_ALPHATEST)>0){
+			renderer->setAlphaTest(mAlphaTest,mAlphaTestCutoff);
+		}
+		if((states&State_BLEND)>0){
+			renderer->setBlend(mBlend);
+		}
+		if((states&State_DEPTHTEST)>0){
+			renderer->setDepthTest(mDepthTest);
+		}
+		if((states&State_DEPTHWRITE)>0){
+			renderer->setDepthWrite(mDepthWrite);
+		}
+		if((states&State_FACECULLING)>0){
+			renderer->setFaceCulling(mFaceCulling);
+		}
+		if((states&State_FILL)>0){
+			renderer->setFill(mFill);
+		}
+		if((states&State_LIGHTING)>0){
+			renderer->setLighting(mLighting);
+		}
+		if((states&State_LIGHTEFFECT)>0){
+			renderer->setLightEffect(mLightEffect); // We set this even if lighting isnt enabled, since it includes color tracking
+		}
 
 		int numTextureStages=mTextureStages.size();
 		int i;
@@ -127,28 +141,29 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		}
 	}
 	else{
-		if(previousMaterial->mFaceCulling!=mFaceCulling){
+		int pstates=previousMaterial->mStates;
+		if((states&State_FACECULLING)>0 && ((pstates&State_FACECULLING)==0 || previousMaterial->mFaceCulling!=mFaceCulling)){
 			renderer->setFaceCulling(mFaceCulling);
 		}
-		if(previousMaterial->mFill!=mFill){
+		if((states&State_FILL)>0 && ((pstates&State_FILL)==0 || previousMaterial->mFill!=mFill)){
 			renderer->setFill(mFill);
 		}
-		if(previousMaterial->mLighting!=mLighting){
+		if((states&State_LIGHTING)>0 && ((pstates&State_LIGHTING)==0 || previousMaterial->mLighting!=mLighting)){
 			renderer->setLighting(mLighting);
 		}
-
-		renderer->setLightEffect(mLightEffect);
-
-		if(previousMaterial->mAlphaTest!=mAlphaTest || previousMaterial->mAlphaTestCutoff!=mAlphaTestCutoff){
+		if((states&State_LIGHTEFFECT)>0 && ((pstates&State_LIGHTEFFECT)==0 || previousMaterial->mLightEffect!=mLightEffect)){
+			renderer->setLightEffect(mLightEffect);
+		}
+		if((states&State_ALPHATEST)>0 && ((pstates&State_ALPHATEST)==0 || previousMaterial->mAlphaTest!=mAlphaTest || previousMaterial->mAlphaTestCutoff!=mAlphaTestCutoff)){
 			renderer->setAlphaTest(mAlphaTest,mAlphaTestCutoff);
 		}
-		if(previousMaterial->mBlend!=mBlend){
+		if((states&State_BLEND)>0 && ((pstates&State_BLEND)==0 || previousMaterial->mBlend!=mBlend)){
 			renderer->setBlend(mBlend);
 		}
-		if(previousMaterial->mDepthWrite!=mDepthWrite){
+		if((states&State_DEPTHWRITE)>0 && ((pstates&State_DEPTHWRITE)==0 || previousMaterial->mDepthWrite!=mDepthWrite)){
 			renderer->setDepthWrite(mDepthWrite);
 		}
-		if(previousMaterial->mDepthTest!=mDepthTest){
+		if((states&State_DEPTHTEST)>0 && ((pstates&State_DEPTHTEST)==0 || previousMaterial->mDepthTest!=mDepthTest)){
 			renderer->setDepthTest(mDepthTest);
 		}
 
