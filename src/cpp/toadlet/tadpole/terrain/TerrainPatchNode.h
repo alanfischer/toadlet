@@ -116,7 +116,9 @@ public:
 
 	peeper::VertexBufferAccessor vba;
 
-//protected:
+protected:
+	TOADLET_GIB_DEFINE(TerrainPatchNode);
+
 	/*
 		Block vertexes ordered as follows:
 		

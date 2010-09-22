@@ -45,6 +45,10 @@ MaterialManager::MaterialManager(Engine *engine):ResourceManager(engine->getArch
 
 Material::ptr MaterialManager::createMaterial(){
 	Material::ptr material(new Material());
+	material->setFaceCulling(Renderer::FaceCulling_BACK);
+	material->setLighting(true);
+	material->setDepthTest(Renderer::DepthTest_LESS);
+	material->setDepthWrite(true);
 	manage(material);
 	return material;
 }
@@ -71,12 +75,8 @@ TextureStage::ptr MaterialManager::createTextureStage(Texture::ptr texture,bool 
 Resource::ptr MaterialManager::unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData){
 	Texture::ptr texture=mTextureManager->findTexture(name);
 	if(texture!=NULL){
-		Material::ptr material(new Material());
-
+		Material::ptr material=createMaterial();
 		material->setTextureStage(0,createTextureStage(texture));
-
-		material->setLighting(true);
-
 		return material;
 	}
 	else{

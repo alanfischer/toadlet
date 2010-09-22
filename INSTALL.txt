@@ -141,7 +141,7 @@ the special UPDATE_WINCE variable off. Then you call cmake again
 with UPDATE_WINCE on. Ignore the complaints it makes, you're 
 ready to go. Otherwise the WinCE build is similar to the win32 build:
    
-   cmake -DCMAKE_TOOLCHAIN_FILE=..\cmake\Toolchains\WindowsCE.cmake -DCMAKE_INSTALL_PREFIX=%HOME%\toadlet\wince -DCMAKE_PREFIX_PATH="C:\Program Files\Microsoft Visual Studio 8\SmartDevices\SDK\PocketPC2003" -DTOADLET_FIXED_POINT=ON -DUPDATE_WINCE=OFF ..
+   cmake -DCMAKE_TOOLCHAIN_FILE=..\cmake\Toolchains\WindowsCE.cmake -DCMAKE_INSTALL_PREFIX=%HOME%\toadlet\wince -DCMAKE_PREFIX_PATH="C:\Program Files\Microsoft Visual Studio 8\SmartDevices\SDK\PocketPC2003" -DUPDATE_WINCE=OFF ..
 
    cmake -DUPDATE_WINCE=ON ..
 
@@ -191,7 +191,7 @@ the wrong platform. You need to manually update. First call cmake
 with the toolchain file and the special UPDATE_IPHONE variable off. 
 Then you call cmake again with UPDATE_IPHONE on.
 
-   cmake -GXcode -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/iPhoneOS.cmake -DCMAKE_INSTALL_PREFIX=$HOME/iPhoneOS -DCMAKE_PREFIX_PATH=$HOME/toadlet/iphone/deps -DTOADLET_FIXED_POINT=ON -DUPDATE_IPHONE=OFF ..
+   cmake -GXcode -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchains/iPhoneOS.cmake -DCMAKE_INSTALL_PREFIX=$HOME/iPhoneOS -DCMAKE_PREFIX_PATH=$HOME/toadlet/iphone/deps -DUPDATE_IPHONE=OFF ..
 
    cmake -DUPDATE_IPHONE=ON ..
 
@@ -203,7 +203,7 @@ NOTE: Be sure you set your xcodeproject to use the same iPhoneOS SDK that cmake 
 android.jar for the android sdk you wish to build against, 
 using ANDROID_JAR. 
 
-   cmake -DCMAKE_INSTALL_PREFIX=$HOME/toadlet/android -DTOADLET_PLATFORM_ANDROID=ON -DANDROID_JAR=$HOME/android/android.jar -DTOADLET_FIXED_POINT=ON ..
+   cmake -DCMAKE_INSTALL_PREFIX=$HOME/toadlet/android -DTOADLET_PLATFORM_ANDROID=ON -DANDROID_JAR=$HOME/android/android.jar ..
 	
     On Windows systems, the Visual Studio generators for
 cmake java tend to be annoying to use, since Visual 
@@ -214,7 +214,7 @@ instead of the original source files.
 builds, and a separate editor for the .java sources. It is
 so much nicer to use.
 
-   cmake -G"NMake Makefiles" -DCMAKE_INSTALL_PREFIX=$HOME/toadlet/android -DTOADLET_PLATFORM_ANDROID=ON -DANDROID_JAR=$HOME/android/android.jar -DTOADLET_FIXED_POINT=ON ..
+   cmake -G"NMake Makefiles" -DCMAKE_INSTALL_PREFIX=$HOME/toadlet/android -DTOADLET_PLATFORM_ANDROID=ON -DANDROID_JAR=$HOME/android/android.jar ..
 
 
 4. Doxygen
