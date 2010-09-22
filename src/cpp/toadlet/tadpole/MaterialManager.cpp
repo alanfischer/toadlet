@@ -25,6 +25,7 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/peeper/CapabilitySet.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/MaterialManager.h>
@@ -45,11 +46,24 @@ MaterialManager::MaterialManager(Engine *engine):ResourceManager(engine->getArch
 
 Material::ptr MaterialManager::createMaterial(){
 	Material::ptr material(new Material());
+
+	Renderer *renderer=mTextureManager->getRenderer();
+	material->setAlphaTest(Renderer::AlphaTest_NONE,0);
+	material->setBlend(Blend::Combination_DISABLED);
 	material->setFaceCulling(Renderer::FaceCulling_BACK);
 	material->setLighting(true);
 	material->setDepthTest(Renderer::DepthTest_LESS);
 	material->setDepthWrite(true);
+	material->setDepthSorted(false);
+	material->setLightEffect(LightEffect());
+	if(renderer!=NULL){
+		if(renderer->getCapabilitySet().fill){
+			material->setFill(Renderer::Fill_SOLID);
+		}
+	}
+
 	manage(material);
+	
 	return material;
 }
 

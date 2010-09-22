@@ -142,8 +142,20 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 	}
 	else{
 		int pstates=previousMaterial->mStates;
+		if((states&State_ALPHATEST)>0 && ((pstates&State_ALPHATEST)==0 || previousMaterial->mAlphaTest!=mAlphaTest || previousMaterial->mAlphaTestCutoff!=mAlphaTestCutoff)){
+			renderer->setAlphaTest(mAlphaTest,mAlphaTestCutoff);
+		}
 		if((states&State_FACECULLING)>0 && ((pstates&State_FACECULLING)==0 || previousMaterial->mFaceCulling!=mFaceCulling)){
 			renderer->setFaceCulling(mFaceCulling);
+		}
+		if((states&State_BLEND)>0 && ((pstates&State_BLEND)==0 || previousMaterial->mBlend!=mBlend)){
+			renderer->setBlend(mBlend);
+		}
+		if((states&State_DEPTHTEST)>0 && ((pstates&State_DEPTHTEST)==0 || previousMaterial->mDepthTest!=mDepthTest)){
+			renderer->setDepthTest(mDepthTest);
+		}
+		if((states&State_DEPTHWRITE)>0 && ((pstates&State_DEPTHWRITE)==0 || previousMaterial->mDepthWrite!=mDepthWrite)){
+			renderer->setDepthWrite(mDepthWrite);
 		}
 		if((states&State_FILL)>0 && ((pstates&State_FILL)==0 || previousMaterial->mFill!=mFill)){
 			renderer->setFill(mFill);
@@ -151,20 +163,8 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		if((states&State_LIGHTING)>0 && ((pstates&State_LIGHTING)==0 || previousMaterial->mLighting!=mLighting)){
 			renderer->setLighting(mLighting);
 		}
-		if((states&State_LIGHTEFFECT)>0 && ((pstates&State_LIGHTEFFECT)==0 || previousMaterial->mLightEffect!=mLightEffect)){
+		if((states&State_LIGHTEFFECT)>0){// && ((pstates&State_LIGHTEFFECT)==0 || previousMaterial->mLightEffect!=mLightEffect)){
 			renderer->setLightEffect(mLightEffect);
-		}
-		if((states&State_ALPHATEST)>0 && ((pstates&State_ALPHATEST)==0 || previousMaterial->mAlphaTest!=mAlphaTest || previousMaterial->mAlphaTestCutoff!=mAlphaTestCutoff)){
-			renderer->setAlphaTest(mAlphaTest,mAlphaTestCutoff);
-		}
-		if((states&State_BLEND)>0 && ((pstates&State_BLEND)==0 || previousMaterial->mBlend!=mBlend)){
-			renderer->setBlend(mBlend);
-		}
-		if((states&State_DEPTHWRITE)>0 && ((pstates&State_DEPTHWRITE)==0 || previousMaterial->mDepthWrite!=mDepthWrite)){
-			renderer->setDepthWrite(mDepthWrite);
-		}
-		if((states&State_DEPTHTEST)>0 && ((pstates&State_DEPTHTEST)==0 || previousMaterial->mDepthTest!=mDepthTest)){
-			renderer->setDepthTest(mDepthTest);
 		}
 
 		int numTextureStages=mTextureStages.size();

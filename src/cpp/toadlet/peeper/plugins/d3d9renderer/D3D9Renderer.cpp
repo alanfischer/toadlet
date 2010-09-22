@@ -933,7 +933,12 @@ void D3D9Renderer::setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D
 		capabilitySet.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
 	#endif
 	capabilitySet.triangleFan=true;
+	capabilitySet.fill=true;
+	#if !defined(TOADLET_SET_D3DM)
+		capabilitySet.texturePerspective=true;
+	#endif
 
+	
 	#if defined(TOADLET_SET_D3DM)
 		Logger::alert(Categories::TOADLET_PEEPER,
 			String("D3DM has lockable textures:")+((caps.SurfaceCaps & D3DMSURFCAPS_LOCKTEXTURE)>0));
