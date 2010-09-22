@@ -61,7 +61,7 @@ GLTexture::~GLTexture(){
 }
 
 bool GLTexture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]){
-	if((Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || Math::isPowerOf2(depth)==false) &&
+	if((Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || (dimension!=Dimension_CUBE && Math::isPowerOf2(depth)==false)) &&
 		mRenderer->getCapabilitySet().textureNonPowerOf2==false &&
 		(mRenderer->getCapabilitySet().textureNonPowerOf2==false || (usage&Usage_BIT_NPOT_RESTRICTED)==0))
 	{
@@ -172,22 +172,26 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 			case GL_TEXTURE_2D:
 				glTexImage2D(mTarget,level,glinternalFormat,width,height,0,glformat,gltype,data);
 			break;
-			#if !defined(TOADLET_HAS_GLES)
-				case GL_TEXTURE_3D:
-					glTexImage3D(mTarget,level,glinternalFormat,width,height,depth,0,glformat,gltype,data);
-				break;
+			#if !defined(TOADLET_HAS_GLES) || defined(TOADLET_HAS_GL_20)
 				case GL_TEXTURE_CUBE_MAP:{
 					glTexParameteri(mTarget,GL_TEXTURE_WRAP_S,GL_CLAMP);
 					glTexParameteri(mTarget,GL_TEXTURE_WRAP_T,GL_CLAMP);
 					glTexParameteri(mTarget,GL_TEXTURE_WRAP_R,GL_CLAMP);
 					glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 					glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-
+				
 					int i;
 					for(i=0;i<6;++i){
 						glTexImage2D(GLRenderer::GLCubeFaces[i],level,glinternalFormat,width,height,0,glformat,gltype,data+slicePitch*i);
 					}
 				}break;
+			#endif
+			#if !defined(TOADLET_HAS_GLES)
+				case GL_TEXTURE_3D:
+					glTexImage3D(mTarget,level,glinternalFormat,width,height,depth,0,glformat,gltype,data);
+				break;
+			#endif
+			#if !defined(TOADLET_HAS_GLES)
 				case GL_TEXTURE_RECTANGLE_ARB:
 					// Set up rectangle scale matrix
 					Math::setMatrix4x4FromScale(mMatrix,mWidth,mHeight,Math::ONE);

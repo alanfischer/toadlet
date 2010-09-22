@@ -58,14 +58,25 @@
 	#define GL_POINT_SPRITE GL_POINT_SPRITE_OES 
 	#define GL_COORD_REPLACE GL_COORD_REPLACE_OES
 #elif defined(TOADLET_PLATFORM_IPHONE)
-	#include <OpenGLES/ES1/gl.h>
-	#include <OpenGLES/ES1/glext.h>
-	// Has defines
-	#define TOADLET_HAS_EAGL
-	#define TOADLET_HAS_EGL
-	#define TOADLET_HAS_EGL_11
-	#define TOADLET_HAS_GLES
-	#define TOADLET_HAS_GL_11
+	#if 1
+		#include <OpenGLES/ES1/gl.h>
+		#include <OpenGLES/ES1/glext.h>
+		// Has defines
+		#define TOADLET_HAS_EAGL
+		#define TOADLET_HAS_EGL
+		#define TOADLET_HAS_EGL_11
+		#define TOADLET_HAS_GLES
+		#define TOADLET_HAS_GL_11
+	#else
+		#include <OpenGLES/ES2/gl.h>
+		#include <OpenGLES/ES2/glext.h>
+		#define TOADLET_HAS_EAGL
+		#define TOADLET_HAS_EGL
+		#define TOADLET_HAS_EGL_11
+		#define TOADLET_HAS_GLES
+		#define TOADLET_HAS_GL_11
+		#define TOADLET_HAS_GL_20
+	#endif
 #else
 	#if defined(TOADLET_PLATFORM_WIN32)
 		#define GLEW_STATIC
@@ -129,7 +140,7 @@
 	#define GL_SRC2_RGB GL_SOURCE2_RGB 
 #endif
 
-#if defined(TOADLET_HAS_EAGL)
+#if defined(TOADLET_HAS_EAGL) && !defined(TOADLET_HAS_GL_20)
 	#define GL_RENDERBUFFER GL_RENDERBUFFER_OES
 	#define GL_COLOR_ATTACHMENT0 GL_COLOR_ATTACHMENT0_OES
 	#define GL_DEPTH_ATTACHMENT GL_DEPTH_ATTACHMENT_OES

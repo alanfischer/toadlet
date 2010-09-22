@@ -161,7 +161,9 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 		Logger::debug(Categories::TOADLET_TADPOLE,"creating Texture");
 
 		texture=Texture::ptr(renderer->createTexture());
-		texture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas.begin());
+		if(texture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas.begin())==false){
+			return NULL;
+		}
 	}
 
 	manage(shared_static_cast<Texture>(texture));
@@ -227,7 +229,9 @@ Texture::ptr TextureManager::createTexture(Image::ptr images[],int usage,int mip
 	}
 	else{
 		texture=Texture::ptr(mEngine->getRenderer()->createTexture());
-		texture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas.begin());
+		if(texture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas.begin())==false){
+			return NULL;
+		}
 	}
 
 	manage(shared_static_cast<Texture>(texture));
@@ -248,7 +252,9 @@ Texture::ptr TextureManager::createTexture(int usage,Texture::Dimension dimensio
 	}
 	else{
 		texture=Texture::ptr(mEngine->getRenderer()->createTexture());
-		texture->create(usage,dimension,format,width,height,depth,mipLevels,NULL);
+		if(texture->create(usage,dimension,format,width,height,depth,mipLevels,NULL)==false){
+			return NULL;
+		}
 	}
 
 	manage(shared_static_cast<Texture>(texture));
