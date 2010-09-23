@@ -29,24 +29,28 @@ namespace toadlet{
 namespace egg{
 namespace mathfixed{
 
-Plane::Plane(const Vector3 &point,const Vector3 &normal1){
+Plane &Plane::set(const Vector3 &point,const Vector3 &normal1){
 	normal.x=normal1.x;
 	normal.y=normal1.y;
 	normal.z=normal1.z;
 	distance=Math::dot(normal,point);
+		
+	return *this;
 }
-
-Plane::Plane(const Vector3 &point1,const Vector3 &point2,const Vector3 &point3){
+	
+Plane &Plane::set(const Vector3 &point1,const Vector3 &point2,const Vector3 &point3){
 	Vector3 v1,v2;
-
+		
 	Math::sub(v1,point3,point1);
 	Math::sub(v2,point2,point1);
-
+		
 	Math::cross(normal,v2,v1);
-
+		
 	distance=Math::dot(normal,point1);
-
+		
 	Math::normalize(*this);
+		
+	return *this;
 }
 
 }

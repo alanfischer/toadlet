@@ -40,9 +40,9 @@ public:
 	
 	inline Plane(real x1,real y1,real z1,real distance1):normal(x1,y1,z1),distance(distance1){}
 
-	Plane(const Vector3 &point,const Vector3 &normal1);
+	inline Plane(const Vector3 &point,const Vector3 &normal1){set(point,normal1);}
 
-	Plane(const Vector3 &point1,const Vector3 &point2,const Vector3 &point3);
+	inline Plane(const Vector3 &point1,const Vector3 &point2,const Vector3 &point3){set(point1,point2,point3);}
 
 	inline Plane &set(const Plane &p){
 		normal.x=p.normal.x;

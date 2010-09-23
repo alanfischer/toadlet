@@ -40,9 +40,9 @@ public:
 
 	inline Plane(fixed x1,fixed y1,fixed z1,fixed distance1):normal(x1,y1,z1),distance(distance1){}
 
-	Plane(const Vector3 &point,const Vector3 &normal1);
+	inline Plane(const Vector3 &point,const Vector3 &normal1){set(point,normal1);}
 
-	Plane(const Vector3 &point1,const Vector3 &point2,const Vector3 &point3);
+	inline Plane(const Vector3 &point1,const Vector3 &point2,const Vector3 &point3){set(point1,point2,point3);}
 
 	inline Plane &set(const Plane &p){
 		normal.x=p.normal.x;
@@ -74,6 +74,10 @@ public:
 		return *this;
 	}
 
+	Plane &set(const Vector3 &point,const Vector3 &normal1);
+	
+	Plane &set(const Vector3 &point1,const Vector3 &point2,const Vector3 &point3);
+	
 	inline Plane &reset(){
 		normal.x=0;
 		normal.y=0;
