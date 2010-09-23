@@ -79,7 +79,7 @@ void TerrainNode::setDataSource(TerrainDataSource *dataSource,const Vector3 &sca
 	}
 
 	Noise noise(4,4,1,1,256);
-	float data[64*64];
+	scalar data[64*64];
 	memset(data,0,mPatchSize*mPatchSize*sizeof(float));
 	for(j=0;j<mSize;j++){
 		for(i=0;i<mSize;i++){
