@@ -47,6 +47,7 @@ TerrainPatchNode::TerrainPatchNode():Node(),
 	mNumBlocksInQueue(0),
 	mNumUnprocessedBlocks(0),
 	mLastBlockUpdateFrame(0),
+	mLastVertexesUpdateFrame(0),
 
 	//mLeftDependent,
 	//mTopDependent,
@@ -82,7 +83,7 @@ Node *TerrainPatchNode::create(Scene *scene){
 	mTopDependent=NULL;
 
 	mMinTolerance=0;
-	mMaxTolerance=0.01;
+	mMaxTolerance=0.001;
 	mTolerance=0;
 
 	mS1=Math::HALF;mS2=Math::ONE;
@@ -408,6 +409,7 @@ void TerrainPatchNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	super::queueRenderables(camera,queue);
 
 	updateBlocks(camera);
+	updateVertexes();
 	updateIndexBuffers(camera);
 
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
@@ -429,7 +431,6 @@ void TerrainPatchNode::updateBlocks(CameraNode *camera){
 
 	resetBlocks();
 	simplifyBlocks(cameraTranslate);
-	simplifyVertexes();
 
 	mLastBlockUpdateFrame=mScene->getFrame();
 }
@@ -445,7 +446,9 @@ void TerrainPatchNode::render(Renderer *renderer) const{
 
 void TerrainPatchNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	Segment localSegment;
+	scalar sizeAdjust=Math::div(size.z,mWorldScale.z);
 	inverseTransform(localSegment,segment,position,mWorldScale,mWorldRotate);
+	localSegment.origin.z-=sizeAdjust;
 
 	result.time=Math::ONE;
 
@@ -461,6 +464,7 @@ void TerrainPatchNode::traceSegment(Collision &result,const Vector3 &position,co
 		traceLocalSegment(result,localSegment,mEpsilon);
 	}
 
+	result.point.z+=sizeAdjust;
 	if(result.time<Math::ONE){
 		transformNormal(result.normal,result.normal,mWorldScale,mWorldRotate);
 		transform(result.point,result.point,position,mWorldScale,mWorldRotate);
@@ -773,10 +777,10 @@ void TerrainPatchNode::simplifyBlocks(const Vector3 &cameraTranslate){
 		if(mBlocks[blockNum].processed==false){
 			mNumUnprocessedBlocks--;
 
-			//Is block a first child?
+			// Is block a first child?
 			if(blockNum>0 && ((blockNum-1)%4)==0){
 
-				//Does block have a sibling?
+				// Does block have a sibling?
 				if(mNumBlocksInQueue>2 && (blockNum-1)>>2==(getBlockNumberInQueue(2)-1)>>2){
 					bool replaceParent=true;
 					
@@ -949,7 +953,11 @@ void TerrainPatchNode::computeDelta(Block *block,const Vector3 &cameraTranslate,
 }
 #endif
 
-void TerrainPatchNode::simplifyVertexes(){
+void TerrainPatchNode::updateVertexes(){
+	if(mScene->getFrame()==mLastVertexesUpdateFrame){
+		return;
+	}
+
 	int i;
 	Block *b;
 	for(i=0;i<mNumBlocksInQueue;i++){
@@ -970,6 +978,8 @@ void TerrainPatchNode::simplifyVertexes(){
 			enableVertex(vertexAt(b->xOrigin+b->stride*2,b->yOrigin+b->stride*2));
 		}
 	}
+	
+	mLastVertexesUpdateFrame=mScene->getFrame();
 }
 
 bool TerrainPatchNode::blockIntersectsCamera(const Block *block,CameraNode *camera) const{

@@ -180,10 +180,10 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 	mMesh=mesh;
 	mMesh->retain();
 
-	setScale(mMesh->worldScale);
-
-	mLocalBound.origin.set(mMesh->bound.origin);
-	mLocalBound.radius=Math::mul(mMesh->bound.radius,mMesh->worldScale);
+	setTranslate(mMesh->translate);
+	setRotate(mMesh->rotate);
+	setScale(mMesh->scale);
+	setLocalBound(mMesh->bound);
 
 	if(mMesh->skeleton!=NULL){
 		mSkeleton=MeshNodeSkeleton::ptr(new MeshNodeSkeleton(this,mMesh->skeleton));

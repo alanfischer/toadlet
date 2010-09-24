@@ -302,7 +302,14 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 	mCapabilitySet.triangleFan=true;
 	#if !defined(TOADLET_HAS_GLES)
 		mCapabilitySet.fill=true;
+		mCapabilitySet.cubeMap=true;
+	#else
 		mCapabilitySet.texturePerspective=true;
+		#if TOADLET_HAS_GL_20
+			mCapabilitySet.cubeMap=true;
+		#else
+			mCapabilitySet.cubeMap=false;
+		#endif
 	#endif
 
 	setDefaultStates();

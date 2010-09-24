@@ -76,7 +76,7 @@ Resource::ptr MMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 	while(dataStream->position()<dataStream->length()){
 		uint8 block=dataStream->readUInt8();
 		if(block==MESH_BLOCK){
-			mesh->worldScale=MathConversion::fixedToScalar(dataStream->readBigInt32());
+			mesh->scale.x=mesh->scale.y=mesh->scale.z=MathConversion::fixedToScalar(dataStream->readBigInt32());
 
 			uint16 numVertexes=dataStream->readBigUInt16();
 			uint16 vertexType=dataStream->readBigUInt16();
