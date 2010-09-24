@@ -81,8 +81,10 @@ public:
 	void destroy();
 	void compile();
 
-	Sphere bound; // Before world scale
-	scalar worldScale;
+	Vector3 translate;
+	Quaternion rotate;
+	Vector3 scale;
+	Sphere bound;
 
 	egg::Collection<SubMesh::ptr> subMeshes;
 	peeper::VertexData::ptr staticVertexData;

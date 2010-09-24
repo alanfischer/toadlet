@@ -37,8 +37,8 @@ namespace mesh{
 Sphere Mesh::Bound_AUTOCALCULATE(-2);
 
 Mesh::Mesh():BaseResource(),
-	bound(-Math::ONE),
-	worldScale(Math::ONE)
+	scale(Math::ONE,Math::ONE,Math::ONE),
+	bound(-Math::ONE)
 {}
 
 Mesh::~Mesh(){

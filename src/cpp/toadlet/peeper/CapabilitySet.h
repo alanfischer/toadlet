@@ -56,7 +56,8 @@ public:
 		idealVertexFormatBit(VertexFormat::Format_BIT_FLOAT_32),
 		triangleFan(false),
 		fill(false),
-		texturePerspective(false)
+		texturePerspective(false),
+		cubeMap(false)
 	{}
 
 	bool resetOnResize;
@@ -82,6 +83,7 @@ public:
 	bool triangleFan;
 	bool fill;
 	bool texturePerspective;
+	bool cubeMap;
 };
 
 }

@@ -104,6 +104,7 @@ public:
 
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 	void updateBlocks(node::CameraNode *camera);
+	void updateVertexes();
 	void updateIndexBuffers(node::CameraNode *camera);
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Matrix4x4 &getRenderTransform() const{return super::getWorldTransform();}
@@ -150,7 +151,6 @@ protected:
 	void simplifyBlocks(const Vector3 &cameraTranslate);
 	bool blockShouldSubdivide(Block *block,const Vector3 &cameraTranslate);
 	void computeDelta(Block *block,const Vector3 &cameraTranslate,float tolerance);
-	void simplifyVertexes();
 	bool blockIntersectsCamera(const Block *block,node::CameraNode *camera) const;
 	int gatherBlocks(peeper::IndexBuffer *indexBuffer,node::CameraNode *camera) const;
 	int gatherTriangle(peeper::IndexBufferAccessor &iba,int indexCount,int x0,int y0,int x1,int y1,int x2,int y2) const;
@@ -197,6 +197,7 @@ protected:
 	int mNumBlocksInQueue;
 	int mNumUnprocessedBlocks;
 	int mLastBlockUpdateFrame;
+	int mLastVertexesUpdateFrame;
 	scalar mEpsilon;
 
 	TerrainPatchNode::ptr mLeftDependent;
