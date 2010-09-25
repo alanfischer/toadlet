@@ -179,6 +179,10 @@ void TerrainNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 		mTerrainPatches[i]->updateBlocks(camera);
 	}
 
+	for(i=0;i<mTerrainPatches.size();++i){
+		mTerrainPatches[i]->updateVertexes();
+	}
+
 	super::queueRenderables(camera,queue);
 }
 
