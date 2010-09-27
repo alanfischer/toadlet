@@ -43,7 +43,7 @@ public:
 	HopScene(Engine *engine);
 	virtual ~HopScene();
 
-	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits,HopEntity *ignore);
+	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits,node::Node *ignore);
 	virtual void traceEntity(Collision &result,HopEntity *entity,const Segment &segment,int collideWithBits);
 	virtual void testEntity(Collision &result,HopEntity *entity1,const Segment &segment,HopEntity *entity2);
 

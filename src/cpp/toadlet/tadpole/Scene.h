@@ -29,6 +29,7 @@
 #include <toadlet/peeper/Color.h>
 #include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/peeper/TextureStage.h>
+#include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/UpdateListener.h>
 #include <toadlet/tadpole/RenderQueue.h>
 #include <toadlet/tadpole/node/PartitionNode.h>
@@ -84,6 +85,7 @@ public:
 	virtual node::Node *getNodeByHandle(int handle);
 	/// @todo: replace with just a sensor?
 	virtual node::Node *findNodeByName(const egg::String &name,node::Node *node=NULL);
+	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits=-1,node::Node *ignore=NULL){result.time=Math::ONE;}
 
 	virtual void setAmbientColor(peeper::Color ambientColor){mAmbientColor.set(ambientColor);}
 	virtual const peeper::Color &getAmbientColor() const{return mAmbientColor;}

@@ -62,12 +62,12 @@ HopScene::~HopScene(){
 	}
 }
 
-void HopScene::traceSegment(Collision &result,const Segment &segment,int collideWithBits,HopEntity *ignore){
+void HopScene::traceSegment(Collision &result,const Segment &segment,int collideWithBits,Node *ignore){
 	result.reset();
 
 	Solid *ignoreSolid=NULL;
-	if(ignore!=NULL){
-		ignoreSolid=ignore->getSolid();
+	if(ignore!=NULL && ignore->isEntity()!=NULL){
+		ignoreSolid=((HopEntity*)ignore)->getSolid();
 	}
 
 	hop::Collision &collision=cache_traceSegment_collision.reset();
