@@ -65,6 +65,8 @@ Node *LabelNode::create(Scene *scene){
 	mMaterial->retain();
 	mMaterial->setFaceCulling(Renderer::FaceCulling_NONE);
 	mMaterial->setDepthWrite(false);
+	mMaterial->setLighting(true);
+	mMaterial->setLightEffect(LightEffect(true));
 
 	return this;
 }

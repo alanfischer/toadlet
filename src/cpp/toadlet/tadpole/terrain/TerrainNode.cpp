@@ -107,41 +107,6 @@ void TerrainNode::setDataSource(TerrainDataSource *dataSource,const Vector3 &sca
 		}
 	}
 
-/*
-	Noise noise(4,4,1,1,256);
-
-	const int ts=mSideCount;
-	const int ps=64;
-	float data[ps*ps];
-
-	float scale=16;
-
-	mTerrainPatches.resize(ts*ts);
-	int tx=0,ty=0,px=0,py=0;
-	for(ty=0;ty<ts;ty++){
-		for(tx=0;tx<ts;tx++){
-			TerrainPatchNode::ptr patch=mEngine->createNodeType(TerrainPatchNode::type(),mScene);
-
-			for(px=0;px<ps;++px){
-				for(py=0;py<ps;++py){
-					int x=tx*ps+px;
-					int width=ts*ps;
-					int y=ty*ps+py;
-					int height=ts*ps;
-					float n=(noise.perlin2((float)x/(float)width,(float)y/(float)height)*0.5 + 0.5);
-					data[py*ps+px]=-n*20;
-				}
-			}
-
-			patch->setData(data,ps,ps,ps);
-			patch->setTranslate(ps*tx*scale-ps*scale,ps*ty*scale-ps*scale,0);	
-			patch->setScale(scale,scale,16);
-			attach(patch);
-			mTerrainPatches[ty*ts+tx]=patch;
-
-		}
-	}
-*/
 	updateLocalBound();
 }
 
