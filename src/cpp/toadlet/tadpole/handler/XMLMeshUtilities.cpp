@@ -245,7 +245,7 @@ const char *MAP_NAMES[]={
 int MAX_MAP=8;
 
 Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,MaterialManager *materialManager,TextureManager *textureManager){
-	Material::ptr material(new Material());
+	Material::ptr material=materialManager->createMaterial();
 
 	const char *prop=mxmlElementGetAttr(node,"Name");
 	if(prop!=NULL){
