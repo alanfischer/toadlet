@@ -28,13 +28,13 @@
 
 #include <toadlet/tadpole/node/PartitionNode.h>
 #include <toadlet/tadpole/terrain/TerrainPatchNode.h>
+#include <toadlet/tadpole/terrain/TerrainDataSource.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-class TerrainDataSource;
-
+/// @todo: Use the quadtree to store child nodes and implement the commented out methods
 class TOADLET_API TerrainNode:public node::PartitionNode,public Traceable{
 public:
 	TOADLET_NODE(TerrainNode,node::PartitionNode);
@@ -45,7 +45,8 @@ public:
 	node::Node *create(Scene *scene);
 	void destroy();
 
-	void setDataSource(TerrainDataSource *dataSource,const Vector3 &scale,Material::ptr material);
+	void setDataSource(TerrainDataSource *dataSource);
+	TerrainDataSource *getDataSource(){return mDataSource;}
 
 	void setMaterial(Material::ptr material);
 	Material::ptr getMaterial() const{return mPatchMaterial;}
@@ -72,8 +73,8 @@ protected:
 */
 
 	TerrainDataSource *mDataSource;
-
 	int mSize;
+	egg::Collection<scalar> mPatchData;
 	egg::Collection<TerrainPatchNode::ptr> mTerrainPatches;
 	int mPatchSize;
 	Material::ptr mPatchMaterial;
