@@ -68,7 +68,7 @@ public:
 	inline scalar getFarDist() const{return mFarDist;}
 
 	virtual void setProjectionTransform(const Matrix4x4 &transform);
-	inline const Matrix4x4 &getProjectionTransform() const{return mProjectionTransform;}
+	inline const Matrix4x4 &getProjectionTransform() const{return mFinalProjectionTransform;}
 
 	virtual void setProjectionRotation(scalar rotate);
 	virtual void setNearAndFarDist(scalar nearDist,scalar farDist);
@@ -127,7 +127,6 @@ protected:
 	scalar mLeftDist,mRightDist;
 	scalar mBottomDist,mTopDist;
 	scalar mNearDist,mFarDist;
-	Matrix4x4 mProjectionTransform;
 	bool mViewportSet;
 	peeper::Viewport mViewport;
 	int mClearFlags;
@@ -135,10 +134,14 @@ protected:
 	bool mSkipFirstClear;
 	bool mAlignmentCalculationsUseOrigin;
 
+	Matrix4x4 mProjectionTransform;
+	scalar mProjectionRotation;
+	Matrix4x4 mFinalProjectionTransform;
 	Matrix4x4 mViewTransform;
 	Matrix4x4 mViewProjectionTransform;
 	Plane mClipPlanes[6];
 	Vector3 mForward;
+
 	Matrix4x4 mOverlayMatrix;
 	peeper::VertexData::ptr mOverlayVertexData;
 	peeper::IndexData::ptr mOverlayIndexData;
@@ -149,7 +152,6 @@ protected:
 	int mFPSFrameCount;
 	scalar mFPS;
 
-	Matrix4x4 cache_setProjectionRotation_projection;
 	Vector3 cache_culled_vertex;
 };
 

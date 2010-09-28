@@ -45,6 +45,8 @@ CameraNode::CameraNode():super(),
 	mBottomDist(0),mTopDist(0),
 	mNearDist(0),mFarDist(0),
 	//mProjectionTransform
+	mProjectionRotation(0),
+	//mFinalProjectionTransform
 	mViewportSet(false),
 	//mViewport,
 	mClearFlags(0),
@@ -55,6 +57,7 @@ CameraNode::CameraNode():super(),
 	//mWorldTranslate,
 	//mViewTransform,
 	//mForward,
+
 	//mOverlayMatrix,
 	//mOverlayVertexData,
 	//mOverlayIndexData,
@@ -180,21 +183,7 @@ void CameraNode::setProjectionTransform(const Matrix4x4 &transform){
 }
 
 void CameraNode::setProjectionRotation(scalar rotate){
-	Matrix4x4 projection=cache_setProjectionRotation_projection.reset();
-
-	scalar x=mViewport.x+mViewport.width/2;
-	scalar y=mViewport.y+mViewport.height/2;
-
-	Math::setMatrix4x4FromTranslate(projection,x,y,0);
-	Math::preMul(projection,mProjectionTransform);
-
-	projection.reset();
-	Math::setMatrix4x4FromZ(projection,rotate);
-	Math::postMul(mProjectionTransform,projection);
-
-	projection.reset();
-	Math::setMatrix4x4FromTranslate(projection,-x,-y,0);
-	Math::postMul(mProjectionTransform,projection);
+	mProjectionRotation=rotate;
 
 	projectionUpdated();
 }
@@ -223,7 +212,7 @@ void CameraNode::setNearAndFarDist(scalar nearDist,scalar farDist){
 }
 
 void CameraNode::setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up){
-	Matrix4x4 &transform=cache_setProjectionRotation_projection;
+	Matrix4x4 transform;
 	Math::setMatrix4x4FromLookAt(transform,eye,point,up,true);
 
 	Math::setTranslateFromMatrix4x4(mTranslate,transform);
@@ -232,7 +221,7 @@ void CameraNode::setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3
 }
 
 void CameraNode::setWorldLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up){
-	Matrix4x4 &transform=cache_setProjectionRotation_projection;
+	Matrix4x4 transform;
 	Math::setMatrix4x4FromLookAt(transform,eye,point,up,true);
 
 	Math::setTranslateFromMatrix4x4(mWorldTranslate,transform);
@@ -249,7 +238,7 @@ void CameraNode::setWorldLookAt(const Vector3 &eye,const Vector3 &point,const Ve
 }
 
 void CameraNode::setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up){
-	Matrix4x4 &transform=cache_setProjectionRotation_projection;
+	Matrix4x4 transform;
 	Math::setMatrix4x4FromLookDir(transform,eye,dir,up,true);
 
 	Math::setTranslateFromMatrix4x4(mTranslate,transform);
@@ -258,7 +247,7 @@ void CameraNode::setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 
 }
 
 void CameraNode::setWorldLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up){
-	Matrix4x4 &transform=cache_setProjectionRotation_projection;
+	Matrix4x4 transform;
 	Math::setMatrix4x4FromLookDir(transform,eye,dir,up,true);
 
 	Math::setTranslateFromMatrix4x4(mWorldTranslate,transform);
@@ -290,6 +279,24 @@ void CameraNode::setGamma(scalar gamma){
 }
 
 void CameraNode::projectionUpdated(){
+	Matrix4x4 transform;
+
+	scalar x=mViewport.x+mViewport.width/2;
+	scalar y=mViewport.y+mViewport.height/2;
+	mFinalProjectionTransform.set(mProjectionTransform);
+
+	transform.reset();
+	Math::setMatrix4x4FromTranslate(transform,x,y,0);
+	Math::preMul(transform,mFinalProjectionTransform);
+
+	transform.reset();
+	Math::setMatrix4x4FromZ(transform,mProjectionRotation);
+	Math::postMul(mFinalProjectionTransform,transform);
+
+	transform.reset();
+	Math::setMatrix4x4FromTranslate(transform,-x,-y,0);
+	Math::postMul(mFinalProjectionTransform,transform);
+
 	updateViewTransform();
 }
 
@@ -368,7 +375,7 @@ void CameraNode::updateViewTransform(){
 	mViewTransform.setAt(2,3,-(Math::mul(wt02,mWorldTranslate.x) + Math::mul(wt12,mWorldTranslate.y) + Math::mul(wt22,mWorldTranslate.z)));
 
 	// Update frustum planes
-	Math::mul(mViewProjectionTransform,mProjectionTransform,mViewTransform);
+	Math::mul(mViewProjectionTransform,mFinalProjectionTransform,mViewTransform);
 	scalar *vpt=mViewProjectionTransform.data;
 	// Right clipping plane.
 	Math::normalize(mClipPlanes[0].set(vpt[3]-vpt[0], vpt[7]-vpt[4], vpt[11]-vpt[8], vpt[15]-vpt[12]));
