@@ -160,8 +160,21 @@ public:
 		Math::mul(r,invrot);
 	}
 
+	static void inverseTransform(Vector3 &r,const Vector3 &translate,const Vector3 &scale,const Quaternion &rotate){
+		Quaternion invrot; Math::invert(invrot,rotate);
+		Math::sub(r,translate);
+		Math::div(r,scale);
+		Math::mul(r,invrot);
+	}
+
 	static void transform(Vector3 &r,const Vector3 &t,const Vector3 &translate,const Vector3 &scale,const Quaternion &rotate){
 		Math::mul(r,rotate,t);
+		Math::mul(r,scale);
+		Math::add(r,translate);
+	}
+
+	static void transform(Vector3 &r,const Vector3 &translate,const Vector3 &scale,const Quaternion &rotate){
+		Math::mul(r,rotate);
 		Math::mul(r,scale);
 		Math::add(r,translate);
 	}
@@ -172,12 +185,27 @@ public:
 		Math::normalize(r);
 	}
 
+	static void transformNormal(Vector3 &r,const Vector3 &scale,const Quaternion &rotate){
+		Math::mul(r,rotate);
+		Math::div(r,scale);
+		Math::normalize(r);
+	}
+
 	inline void inverseTransform(Segment &r,const Segment &s,const Vector3 &translate,const Vector3 &scale,const Quaternion &rotate){
 		Quaternion invrot; Math::invert(invrot,rotate);
 		Math::sub(r.origin,s.origin,translate);
 		Math::div(r.origin,scale);
 		Math::mul(r.origin,invrot);
 		Math::mul(r.direction,invrot,s.direction);
+		Math::div(r.direction,scale);
+	}
+
+	inline void inverseTransform(Segment &r,const Vector3 &translate,const Vector3 &scale,const Quaternion &rotate){
+		Quaternion invrot; Math::invert(invrot,rotate);
+		Math::sub(r.origin,translate);
+		Math::div(r.origin,scale);
+		Math::mul(r.origin,invrot);
+		Math::mul(r.direction,invrot);
 		Math::div(r.direction,scale);
 	}
 

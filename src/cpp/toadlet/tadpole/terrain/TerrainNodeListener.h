@@ -23,20 +23,18 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_TERRAIN_TERRAINDATASOURCE_H
-#define TOADLET_TADPOLE_TERRAIN_TERRAINDATASOURCE_H
-
-#include <toadlet/tadpole/Types.h>
-
+#ifndef TOADLET_TADPOLE_TERRAIN_TERRAINNODELISTENER_H
+#define TOADLET_TADPOLE_TERRAIN_TERRAINNODELISTENER_H
+ 
 namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-class TerrainDataSource{
+class TerrainNodeListener{
 public:
-	virtual int getPatchSize()=0;
-	virtual const Vector3 &getPatchScale()=0;
-	virtual bool getPatchData(scalar *data,int px,int py)=0;
+	virtual void terrainUpdated(int oldX,int oldY,int newX,int newY)=0;
+	virtual void terrainPatchCreated(int x,int y,const AABox &patchBound)=0;
+	virtual void terrainPatchDestroyed(int x,int y,const AABox &patchBound)=0;
 };
 
 }
