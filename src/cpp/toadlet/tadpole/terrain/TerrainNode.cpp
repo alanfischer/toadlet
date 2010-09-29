@@ -23,15 +23,10 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/image/BMPHandler.h>
-#include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
-#include <toadlet/tadpole/Noise.h>
 #include <toadlet/tadpole/terrain/TerrainNode.h>
 #include <toadlet/tadpole/terrain/TerrainPatchNode.h>
-
-#include <string.h> //temp
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
@@ -66,37 +61,10 @@ Node *TerrainNode::create(Scene *scene){
 		}
 	}
 
+	mTerrainX=0;
+	mTerrainY=0;
+
 	return this;
-}
-
-void TerrainNode::setDataSource(TerrainDataSource *dataSource){
-	mDataSource=dataSource;
-
-	mPatchSize=mDataSource->getPatchSize();
-	mPatchScale.set(mDataSource->getPatchScale());
-	mPatchData.resize(mPatchSize*mPatchSize);
-
-	int i,j;
-	for(j=0;j<mSize;++j){
-		for(i=0;i<mSize;++i){
-			TerrainPatchNode::ptr patch=mTerrainPatches[j*mSize+i];
-			patch->setScale(mPatchScale);
-			patch->setTranslate(i*mPatchSize*mPatchScale.x - mPatchSize*mPatchScale.x*(float)mSize/3.0,j*mPatchSize*mPatchScale.y - mPatchSize*mPatchScale.y*(float)mSize/3.0,0);
-			mDataSource->getPatchData(&mPatchData[0],i-mSize/2,j-mSize/2);
-			patch->setData(&mPatchData[0],mPatchSize,mPatchSize,mPatchSize);
-			mTerrainPatches[j*mSize+i]=patch;
-
-			// Only stitch once we have data
-			if(i>0){
-				mTerrainPatches[j*3+(i-1)]->stitchToRight(mTerrainPatches[j*3+i]);
-			}
-			if(j>0){
-				mTerrainPatches[(j-1)*3+i]->stitchToBottom(mTerrainPatches[j*3+i]);
-			}
-		}
-	}
-
-	updateLocalBound();
 }
 
 void TerrainNode::destroy(){
@@ -106,6 +74,32 @@ void TerrainNode::destroy(){
 	}
 
 	super::destroy();
+}
+
+void TerrainNode::setTarget(Node *target){
+	mTarget=target;
+
+	updateTarget();
+}
+
+void TerrainNode::setDataSource(TerrainDataSource *dataSource){
+	mDataSource=dataSource;
+
+	mPatchSize=mDataSource->getPatchSize();
+	mPatchScale.set(mDataSource->getPatchScale());
+	mPatchData.resize(mPatchSize*mPatchSize);
+
+	updateTarget();
+
+	int i,j;
+	for(j=0;j<mSize;++j){
+		for(i=0;i<mSize;++i){
+			patchAt(i,j)->setScale(mPatchScale);
+			updatePatch(i,j);
+		}
+	}
+
+	updateLocalBound();
 }
 
 void TerrainNode::setMaterial(Material::ptr material){
@@ -140,6 +134,12 @@ void TerrainNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	super::queueRenderables(camera,queue);
 }
 
+void TerrainNode::logicUpdate(int dt,int scope){
+	super::logicUpdate(dt,scope);
+
+	updateTarget();
+}
+
 void TerrainNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	result.time=Math::ONE;
 
@@ -151,6 +151,30 @@ void TerrainNode::traceSegment(Collision &result,const Vector3 &position,const S
 			result.set(r);
 		}
 	}
+}
+
+void TerrainNode::updateTarget(){
+	if(mTarget!=NULL){
+		const Vector3 &translate=mTarget->getWorldTranslate();
+		mTerrainX=fromWorldX(translate.x);
+		mTerrainY=fromWorldY(translate.y);
+	}
+}
+
+void TerrainNode::updatePatch(int x,int y){
+	int tx=mTerrainX+x-mSize/2,ty=mTerrainY+y-mSize/2;
+	patchAt(x,y)->setTranslate(toWorldX(tx)-mPatchSize*mPatchScale.x/2,toWorldY(ty)-mPatchSize*mPatchScale.y/2,0);
+	mDataSource->getPatchData(&mPatchData[0],tx,ty);
+	patchAt(x,y)->setData(&mPatchData[0],mPatchSize,mPatchSize,mPatchSize);
+
+	if(x>0){
+		patchAt(x-1,y)->stitchToRight(patchAt(x,y));
+	}
+	if(y>0){
+		patchAt(x,y-1)->stitchToBottom(patchAt(x,y));
+	}
+
+	patchAt(x,y)->updateWorldTransform();
 }
 
 void TerrainNode::updateLocalBound(){

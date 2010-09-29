@@ -45,17 +45,30 @@ public:
 	node::Node *create(Scene *scene);
 	void destroy();
 
+	void setTarget(node::Node *target);
+	node::Node *getTarget(){return mTarget;}
+
 	void setDataSource(TerrainDataSource *dataSource);
 	TerrainDataSource *getDataSource(){return mDataSource;}
 
 	void setMaterial(Material::ptr material);
 	Material::ptr getMaterial() const{return mPatchMaterial;}
 
+	TerrainPatchNode::ptr patchAt(int x,int y){return mTerrainPatches[y*mSize+x];}
+	int fromWorldX(scalar x){x=Math::div(x,mPatchSize*mPatchScale.x);return Math::toInt(x>=0?x+Math::HALF:x-Math::HALF);}
+	int fromWorldY(scalar y){y=Math::div(y,mPatchSize*mPatchScale.y);return Math::toInt(y>=0?y+Math::HALF:y-Math::HALF);}
+	scalar toWorldX(int x){return Math::mul(Math::fromInt(x),mPatchSize*mPatchScale.x);}
+	scalar toWorldY(int y){return Math::mul(Math::fromInt(y),mPatchSize*mPatchScale.y);}
+
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
+
+	void logicUpdate(int dt,int scope);
 
 	const Sphere &getLocalBound() const{return super::getLocalBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
+	void updateTarget();
+	void updatePatch(int x,int y);
 	void updateLocalBound();
 
 	// Node items
@@ -67,11 +80,12 @@ public:
 
 	bool senseBoundingVolumes(SensorResultsListener *listener,const Sphere &volume);
 	bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);
-
-protected:
-	void childTransformUpdated(Node *child);
 */
+protected:
+//	void childTransformUpdated(Node *child);
 
+	int mTerrainX,mTerrainY;
+	node::Node::ptr mTarget;
 	TerrainDataSource *mDataSource;
 	int mSize;
 	egg::Collection<scalar> mPatchData;
