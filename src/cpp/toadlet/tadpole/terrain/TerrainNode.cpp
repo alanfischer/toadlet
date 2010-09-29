@@ -79,6 +79,10 @@ void TerrainNode::destroy(){
 void TerrainNode::setTarget(Node *target){
 	mTarget=target;
 
+	const Vector3 &translate=mTarget->getWorldTranslate();
+	mTerrainX=fromWorldXi(translate.x);
+	mTerrainY=fromWorldYi(translate.y);
+
 	updateTarget();
 }
 
@@ -156,14 +160,46 @@ void TerrainNode::traceSegment(Collision &result,const Vector3 &position,const S
 void TerrainNode::updateTarget(){
 	if(mTarget!=NULL){
 		const Vector3 &translate=mTarget->getWorldTranslate();
-		mTerrainX=fromWorldX(translate.x);
-		mTerrainY=fromWorldY(translate.y);
+
+		scalar centerX=fromWorldXf(toWorldXi(mTerrainX));
+		scalar centerY=fromWorldYf(toWorldYi(mTerrainY));
+		scalar currentX=fromWorldXf(translate.x);
+		scalar currentY=fromWorldYf(translate.y);
+		scalar bias=0.15;
+
+		/// @todo: Instead of just shifting 1 tile, we should check so we can shift any amount of tiles.
+		///  This would let us follow the player when teleporting cleanly.
+		///  However, when we thread this, we will only allow the threaded version to work when moving 1 tile.
+		///  Any more than that means a teleport, which would cause us to reload all the terrain, and require a pause.
+		///  We could just notify the TerrainListener about the pause being needed, so it could show a dialog to the player.
+		int newTerrainX=mTerrainX,newTerrainY=mTerrainY;
+		if(currentX-centerX>Math::HALF+bias){
+			newTerrainX++;
+			Logger::alert("Should be moving to the +x!");
+		}
+		else if(currentX-centerX<-Math::HALF-bias){
+			newTerrainX--;
+			Logger::alert("Should be moving to the -x!");
+		}
+		else if(currentY-centerY>Math::HALF+bias){
+			newTerrainY++;
+			Logger::alert("Should be moving to the +y!");
+		}
+		else if(currentY-centerY<-Math::HALF-bias){
+			newTerrainY--;
+			Logger::alert("Should be moving to the -y!");
+		}
+
+		if(newTerrainX!=mTerrainX || newTerrainY!=mTerrainY){
+			mTerrainX=newTerrainX;
+			mTerrainY=newTerrainY;
+		}
 	}
 }
 
 void TerrainNode::updatePatch(int x,int y){
 	int tx=mTerrainX+x-mSize/2,ty=mTerrainY+y-mSize/2;
-	patchAt(x,y)->setTranslate(toWorldX(tx)-mPatchSize*mPatchScale.x/2,toWorldY(ty)-mPatchSize*mPatchScale.y/2,0);
+	patchAt(x,y)->setTranslate(toWorldXi(tx)-mPatchSize*mPatchScale.x/2,toWorldYi(ty)-mPatchSize*mPatchScale.y/2,0);
 	mDataSource->getPatchData(&mPatchData[0],tx,ty);
 	patchAt(x,y)->setData(&mPatchData[0],mPatchSize,mPatchSize,mPatchSize);
 

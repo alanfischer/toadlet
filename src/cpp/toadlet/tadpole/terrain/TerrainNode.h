@@ -55,10 +55,15 @@ public:
 	Material::ptr getMaterial() const{return mPatchMaterial;}
 
 	TerrainPatchNode::ptr patchAt(int x,int y){return mTerrainPatches[y*mSize+x];}
-	int fromWorldX(scalar x){x=Math::div(x,mPatchSize*mPatchScale.x);return Math::toInt(x>=0?x+Math::HALF:x-Math::HALF);}
-	int fromWorldY(scalar y){y=Math::div(y,mPatchSize*mPatchScale.y);return Math::toInt(y>=0?y+Math::HALF:y-Math::HALF);}
-	scalar toWorldX(int x){return Math::mul(Math::fromInt(x),mPatchSize*mPatchScale.x);}
-	scalar toWorldY(int y){return Math::mul(Math::fromInt(y),mPatchSize*mPatchScale.y);}
+
+	int fromWorldXi(scalar x){x=Math::div(x,mPatchSize*mPatchScale.x);return Math::toInt(x>=0?x+Math::HALF:x-Math::HALF);}
+	int fromWorldYi(scalar y){y=Math::div(y,mPatchSize*mPatchScale.y);return Math::toInt(y>=0?y+Math::HALF:y-Math::HALF);}
+	scalar fromWorldXf(scalar x){return Math::div(x,mPatchSize*mPatchScale.x);}
+	scalar fromWorldYf(scalar y){return Math::div(y,mPatchSize*mPatchScale.y);}
+	scalar toWorldXi(int x){return Math::mul(Math::fromInt(x),mPatchSize*mPatchScale.x);}
+	scalar toWorldYi(int y){return Math::mul(Math::fromInt(y),mPatchSize*mPatchScale.y);}
+	scalar toWorldXf(scalar x){return Math::mul(x,mPatchSize*mPatchScale.x);}
+	scalar toWorldYf(scalar y){return Math::mul(y,mPatchSize*mPatchScale.y);}
 
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 
