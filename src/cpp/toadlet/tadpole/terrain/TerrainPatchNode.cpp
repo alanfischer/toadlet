@@ -202,7 +202,8 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
 
 	addBlockToBack(0);
 
-	set(mLocalBound,AABox(mBlocks[0].mins,mBlocks[0].maxs));
+	mLocalBoundAABox.set(mBlocks[0].mins,mBlocks[0].maxs);
+	set(mLocalBound,mLocalBoundAABox);
 
 	return true;
 }
@@ -225,6 +226,8 @@ bool TerrainPatchNode::stitchToRight(TerrainPatchNode *terrain,bool restitchDepe
 	TerrainPatchNode *lt=this;
 	TerrainPatchNode *rt=terrain;
 	int y=0;
+
+	rt->mLeftDependent=this;
 
 	if(lt->getSize()!=rt->getSize()){
 		Error::unknown("lt->getSize()!=rt->getSize()");
@@ -297,7 +300,10 @@ bool TerrainPatchNode::unstitchFromRight(TerrainPatchNode *terrain){
 	TerrainPatchNode *rt=terrain;
 	int y;
 
-	if(rt->mTopDependent!=lt){
+	if(rt->mLeftDependent==NULL){
+		return false;
+	}
+	else if(rt->mLeftDependent!=lt){
 		Error::unknown("right is not stitched to this");
 		return false;
 	}
@@ -390,7 +396,10 @@ bool TerrainPatchNode::unstitchFromBottom(TerrainPatchNode *terrain){
 	TerrainPatchNode *bt=terrain;
 	int x;
 
-	if(bt->mTopDependent=tt){
+	if(bt->mTopDependent==NULL){
+		return false;
+	}
+	else if(bt->mTopDependent!=tt){
 		Error::unknown("bottom is not stitched to this");
 		return false;
 	}

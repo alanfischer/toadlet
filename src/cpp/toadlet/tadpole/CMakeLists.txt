@@ -218,7 +218,8 @@ set (TADPOLE_NODE_HEADERS
 )
 
 set (TADPOLE_TERRAIN_HEADERS
-	terrain/TerrainDataSource.h
+	terrain/TerrainNodeDataSource.h
+	terrain/TerrainNodeListener.h
 	terrain/TerrainNode.h
 	terrain/TerrainPatchNode.h
 )

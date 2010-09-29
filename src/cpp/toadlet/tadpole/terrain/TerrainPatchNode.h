@@ -110,6 +110,7 @@ public:
 	const Matrix4x4 &getRenderTransform() const{return super::getWorldTransform();}
 	void render(peeper::Renderer *renderer) const;
 
+	const AABox &getLocalBoundAABox() const{return mLocalBoundAABox;}
 	const Sphere &getLocalBound() const{return super::getLocalBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 	void traceLocalSegment(Collision &result,const Segment &segment,scalar epsilon);
@@ -186,6 +187,7 @@ protected:
 	}
 
 	int mSize;
+	AABox mLocalBoundAABox;
 	egg::Collection<Vertex> mVertexes;
 	egg::Collection<Block> mBlocks;
 	egg::Collection<int> mBlockQueue;

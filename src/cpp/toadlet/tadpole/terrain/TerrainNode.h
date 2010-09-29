@@ -27,8 +27,9 @@
 #define TOADLET_TADPOLE_TERRAIN_TERRAINNODE_H
 
 #include <toadlet/tadpole/node/PartitionNode.h>
+#include <toadlet/tadpole/terrain/TerrainNodeDataSource.h>
+#include <toadlet/tadpole/terrain/TerrainNodeListener.h>
 #include <toadlet/tadpole/terrain/TerrainPatchNode.h>
-#include <toadlet/tadpole/terrain/TerrainDataSource.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -45,16 +46,28 @@ public:
 	node::Node *create(Scene *scene);
 	void destroy();
 
+	void setListener(TerrainNodeListener *listener){mListener=listener;}
+	TerrainNodeListener *getListener(){return mListener;}
+
 	void setTarget(node::Node *target);
 	node::Node *getTarget(){return mTarget;}
 
-	void setDataSource(TerrainDataSource *dataSource);
-	TerrainDataSource *getDataSource(){return mDataSource;}
+	void setDataSource(TerrainNodeDataSource *dataSource);
+	TerrainNodeDataSource *getDataSource(){return mDataSource;}
 
 	void setMaterial(Material::ptr material);
 	Material::ptr getMaterial() const{return mPatchMaterial;}
 
-	TerrainPatchNode::ptr patchAt(int x,int y){return mTerrainPatches[y*mSize+x];}
+	int localPatchIndex(int x,int y){return (y+mHalfSize)*mSize+(x+mHalfSize);}
+	TerrainPatchNode::ptr patchAt(int x,int y){
+		int index=localPatchIndex(x-mTerrainX,y-mTerrainY);
+		if(index>=0 && index<mPatchGrid.size()) return mPatchGrid[index];
+		else return NULL;
+	}
+	void setPatchAt(int x,int y,TerrainPatchNode::ptr patch){
+		int index=localPatchIndex(x-mTerrainX,y-mTerrainY);
+		if(index>=0 && index<mPatchGrid.size()) mPatchGrid[index]=patch;
+	}
 
 	int fromWorldXi(scalar x){x=Math::div(x,mPatchSize*mPatchScale.x);return Math::toInt(x>=0?x+Math::HALF:x-Math::HALF);}
 	int fromWorldYi(scalar y){y=Math::div(y,mPatchSize*mPatchScale.y);return Math::toInt(y>=0?y+Math::HALF:y-Math::HALF);}
@@ -73,8 +86,11 @@ public:
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 	void updateTarget();
-	void updatePatch(int x,int y);
+	void createPatch(int x,int y);
+	void destroyPatch(int x,int y);
 	void updateLocalBound();
+
+	void boundForPatch(AABox &r,int x,int y);
 
 	// Node items
 /*	void nodeAttached(Node *node);
@@ -89,15 +105,17 @@ public:
 protected:
 //	void childTransformUpdated(Node *child);
 
-	int mTerrainX,mTerrainY;
+	TerrainNodeListener *mListener;
 	node::Node::ptr mTarget;
-	TerrainDataSource *mDataSource;
-	int mSize;
-	egg::Collection<scalar> mPatchData;
-	egg::Collection<TerrainPatchNode::ptr> mTerrainPatches;
+	TerrainNodeDataSource *mDataSource;
+	int mSize,mHalfSize;
+	int mTerrainX,mTerrainY;
+	egg::Collection<TerrainPatchNode::ptr> mUnactivePatches;
+	egg::Collection<TerrainPatchNode::ptr> mPatchGrid;
 	int mPatchSize;
 	Material::ptr mPatchMaterial;
 	Vector3 mPatchScale;
+	egg::Collection<scalar> mPatchData;
 };
 
 }

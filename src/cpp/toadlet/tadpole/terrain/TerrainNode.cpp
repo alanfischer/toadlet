@@ -42,7 +42,19 @@ namespace terrain{
 
 TOADLET_NODE_IMPLEMENT(TerrainNode,Categories::TOADLET_TADPOLE_TERRAIN+".TerrainNode");
 
-TerrainNode::TerrainNode():super(){}
+TerrainNode::TerrainNode():super(),
+	mListener(NULL),
+	//mTarget,
+	mDataSource(NULL),
+	mSize(0),mHalfSize(0),
+	mTerrainX(0),mTerrainY(0),
+	//mUnactivePatches,
+	//mPatchGrid,
+	mPatchSize(0)
+	//mPatchMaterial,
+	//mPatchScale,
+	//mPatchData
+{}
 
 TerrainNode::~TerrainNode(){}
 
@@ -50,14 +62,15 @@ Node *TerrainNode::create(Scene *scene){
 	super::create(scene);
 
 	mSize=3;
-	mTerrainPatches.resize(mSize*mSize);
+	mHalfSize=mSize/2;
+	mPatchGrid.resize(mSize*mSize);
 
 	int i,j;
 	for(j=0;j<mSize;++j){
 		for(i=0;i<mSize;++i){
 			TerrainPatchNode::ptr patch=mEngine->createNodeType(TerrainPatchNode::type(),mScene);
 			attach(patch);
-			mTerrainPatches[j*mSize+i]=patch;
+			mUnactivePatches.add(patch);
 		}
 	}
 
@@ -86,21 +99,22 @@ void TerrainNode::setTarget(Node *target){
 	updateTarget();
 }
 
-void TerrainNode::setDataSource(TerrainDataSource *dataSource){
+void TerrainNode::setDataSource(TerrainNodeDataSource *dataSource){
 	mDataSource=dataSource;
 
 	mPatchSize=mDataSource->getPatchSize();
 	mPatchScale.set(mDataSource->getPatchScale());
 	mPatchData.resize(mPatchSize*mPatchSize);
 
-	updateTarget();
-
-	int i,j;
-	for(j=0;j<mSize;++j){
-		for(i=0;i<mSize;++i){
-			patchAt(i,j)->setScale(mPatchScale);
-			updatePatch(i,j);
+	int x,y;
+	for(y=mTerrainY-mHalfSize;y<=mTerrainY+mHalfSize;++y){
+		for(x=mTerrainX-mHalfSize;x<=mTerrainX+mHalfSize;++x){
+			createPatch(x,y);
 		}
+	}
+
+	if(mListener!=NULL){
+		mListener->terrainUpdated(mTerrainX,mTerrainY,mTerrainX,mTerrainY);
 	}
 
 	updateLocalBound();
@@ -120,19 +134,21 @@ void TerrainNode::setMaterial(Material::ptr material){
 	}
 
 	int i;
-	for(i=0;i<mTerrainPatches.size();++i){
-		mTerrainPatches[i]->setMaterial(mPatchMaterial);
+	for(i=0;i<mPatchGrid.size();++i){
+		if(mPatchGrid[i]!=NULL){
+			mPatchGrid[i]->setMaterial(mPatchMaterial);
+		}
 	}
 }
 
 void TerrainNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	int i;
-	for(i=0;i<mTerrainPatches.size();++i){
-		mTerrainPatches[i]->updateBlocks(camera);
+	for(i=0;i<mPatchGrid.size();++i){
+		mPatchGrid[i]->updateBlocks(camera);
 	}
 
-	for(i=0;i<mTerrainPatches.size();++i){
-		mTerrainPatches[i]->updateVertexes();
+	for(i=0;i<mPatchGrid.size();++i){
+		mPatchGrid[i]->updateVertexes();
 	}
 
 	super::queueRenderables(camera,queue);
@@ -149,8 +165,11 @@ void TerrainNode::traceSegment(Collision &result,const Vector3 &position,const S
 
 	Collision r;
 	int i;
-	for(i=0;i<mTerrainPatches.size();++i){
-		mTerrainPatches[i]->traceSegment(r,mTerrainPatches[i]->getWorldTranslate(),segment,size);
+	for(i=0;i<mPatchGrid.size();++i){
+		r.reset();
+		if(mPatchGrid[i]!=NULL){
+			mPatchGrid[i]->traceSegment(r,mPatchGrid[i]->getWorldTranslate(),segment,size);
+		}
 		if(r.time<result.time){
 			result.set(r);
 		}
@@ -172,55 +191,151 @@ void TerrainNode::updateTarget(){
 		///  However, when we thread this, we will only allow the threaded version to work when moving 1 tile.
 		///  Any more than that means a teleport, which would cause us to reload all the terrain, and require a pause.
 		///  We could just notify the TerrainListener about the pause being needed, so it could show a dialog to the player.
+		int oldTerrainX=mTerrainX,oldTerrainY=mTerrainY;
 		int newTerrainX=mTerrainX,newTerrainY=mTerrainY;
+		int halfSize=mHalfSize;
+
 		if(currentX-centerX>Math::HALF+bias){
 			newTerrainX++;
-			Logger::alert("Should be moving to the +x!");
 		}
 		else if(currentX-centerX<-Math::HALF-bias){
 			newTerrainX--;
-			Logger::alert("Should be moving to the -x!");
 		}
-		else if(currentY-centerY>Math::HALF+bias){
+
+		if(currentY-centerY>Math::HALF+bias){
 			newTerrainY++;
-			Logger::alert("Should be moving to the +y!");
 		}
 		else if(currentY-centerY<-Math::HALF-bias){
 			newTerrainY--;
-			Logger::alert("Should be moving to the -y!");
 		}
 
-		if(newTerrainX!=mTerrainX || newTerrainY!=mTerrainY){
+		if(newTerrainX!=oldTerrainX || newTerrainY!=oldTerrainY){
+			int x,y;
+			for(y=oldTerrainY-halfSize;y<=oldTerrainY+halfSize;++y){
+				for(x=oldTerrainX-halfSize;x<=oldTerrainX+halfSize;++x){
+					bool inOld=Math::abs(x-oldTerrainX)<=halfSize && Math::abs(y-oldTerrainY)<=halfSize;
+					bool inNew=Math::abs(x-newTerrainX)<=halfSize && Math::abs(y-newTerrainY)<=halfSize;
+					if(inOld && !inNew){
+						Logger::debug(Categories::TOADLET_TADPOLE_TERRAIN,String("destroying terrain at:")+x+","+y+" local:"+(x-oldTerrainX)+","+(y-oldTerrainY));
+						destroyPatch(x,y);
+					}
+				}
+			}
+
+			Collection<TerrainPatchNode::ptr> newPatchGrid(mPatchGrid.size());
+			Collection<TerrainPatchNode::ptr> &oldPatchGrid=mPatchGrid;
+			for(y=newTerrainY-halfSize;y<=newTerrainY+halfSize;++y){
+				for(x=newTerrainX-halfSize;x<=newTerrainX+halfSize;++x){
+					bool inOld=Math::abs(x-oldTerrainX)<=halfSize && Math::abs(y-oldTerrainY)<=halfSize;
+					bool inNew=Math::abs(x-newTerrainX)<=halfSize && Math::abs(y-newTerrainY)<=halfSize;
+					if(inOld && inNew){
+						Logger::debug(Categories::TOADLET_TADPOLE_TERRAIN,String("moving terrain at:")+x+","+y+" from local:"+(x-oldTerrainX)+","+(y-oldTerrainY)+" to local:"+(x-newTerrainX)+","+(y-newTerrainY));
+						newPatchGrid[localPatchIndex(x-newTerrainX,y-newTerrainY)]=oldPatchGrid[localPatchIndex(x-oldTerrainX,y-oldTerrainY)];
+					}
+				}
+			}
+			mPatchGrid=newPatchGrid;
 			mTerrainX=newTerrainX;
 			mTerrainY=newTerrainY;
+
+			for(y=newTerrainY-halfSize;y<=newTerrainY+halfSize;++y){
+				for(x=newTerrainX-halfSize;x<=newTerrainX+halfSize;++x){
+					bool inOld=Math::abs(x-oldTerrainX)<=halfSize && Math::abs(y-oldTerrainY)<=halfSize;
+					bool inNew=Math::abs(x-newTerrainX)<=halfSize && Math::abs(y-newTerrainY)<=halfSize;
+					if(!inOld && inNew){
+						Logger::debug(Categories::TOADLET_TADPOLE_TERRAIN,String("creating terrain at:")+x+","+y+" local:"+(x-newTerrainX)+","+(y-newTerrainY));
+						createPatch(x,y);
+					}
+				}
+			}
+
+			if(mListener!=NULL){
+				mListener->terrainUpdated(oldTerrainX,oldTerrainY,newTerrainX,newTerrainY);
+			}
 		}
 	}
 }
 
-void TerrainNode::updatePatch(int x,int y){
-	int tx=mTerrainX+x-mSize/2,ty=mTerrainY+y-mSize/2;
-	patchAt(x,y)->setTranslate(toWorldXi(tx)-mPatchSize*mPatchScale.x/2,toWorldYi(ty)-mPatchSize*mPatchScale.y/2,0);
-	mDataSource->getPatchData(&mPatchData[0],tx,ty);
-	patchAt(x,y)->setData(&mPatchData[0],mPatchSize,mPatchSize,mPatchSize);
+void TerrainNode::createPatch(int x,int y){
+	TerrainPatchNode::ptr patch=mUnactivePatches.back();mUnactivePatches.pop_back();
+	setPatchAt(x,y,patch);
 
-	if(x>0){
-		patchAt(x-1,y)->stitchToRight(patchAt(x,y));
+	patch->setScale(mPatchScale);
+	patch->setTranslate(toWorldXi(x)-mPatchSize*mPatchScale.x/2,toWorldYi(y)-mPatchSize*mPatchScale.y/2,0);
+	patch->setMaterial(mPatchMaterial);
+
+	mDataSource->getPatchData(&mPatchData[0],x,y);
+	patch->setData(&mPatchData[0],mPatchSize,mPatchSize,mPatchSize);
+
+	if(patchAt(x-1,y)!=NULL){
+		patchAt(x-1,y)->stitchToRight(patch);
 	}
-	if(y>0){
-		patchAt(x,y-1)->stitchToBottom(patchAt(x,y));
+	if(patchAt(x+1,y)!=NULL){
+		patch->stitchToRight(patchAt(x+1,y));
+	}
+	if(patchAt(x,y-1)!=NULL){
+		patchAt(x,y-1)->stitchToBottom(patch);
+	}
+	if(patchAt(x,y+1)!=NULL){
+		patch->stitchToBottom(patchAt(x,y+1));
 	}
 
-	patchAt(x,y)->updateWorldTransform();
+	patch->updateWorldTransform();
+
+	if(mListener!=NULL){
+		AABox bound;
+		transform(bound.mins,patch->getLocalBoundAABox().mins,patch->getWorldTranslate(),patch->getWorldScale(),patch->getWorldRotate());
+		transform(bound.maxs,patch->getLocalBoundAABox().maxs,patch->getWorldTranslate(),patch->getWorldScale(),patch->getWorldRotate());
+		mListener->terrainPatchCreated(x,y,bound);
+	}
+}
+
+void TerrainNode::destroyPatch(int x,int y){
+	TerrainPatchNode::ptr patch=patchAt(x,y);
+
+	if(mListener!=NULL){
+		AABox bound;
+		transform(bound.mins,patch->getLocalBoundAABox().mins,patch->getWorldTranslate(),patch->getWorldScale(),patch->getWorldRotate());
+		transform(bound.maxs,patch->getLocalBoundAABox().maxs,patch->getWorldTranslate(),patch->getWorldScale(),patch->getWorldRotate());
+		mListener->terrainPatchDestroyed(x,y,bound);
+	}
+
+	if(patchAt(x-1,y)!=NULL){
+		patchAt(x-1,y)->unstitchFromRight(patch);
+	}
+	if(patchAt(x+1,y)!=NULL){
+		patch->unstitchFromRight(patchAt(x+1,y));
+	}
+	if(patchAt(x,y-1)!=NULL){
+		patchAt(x,y-1)->unstitchFromBottom(patch);
+	}
+	if(patchAt(x,y+1)!=NULL){
+		patch->unstitchFromBottom(patchAt(x,y+1));
+	}
+
+	mUnactivePatches.add(patch);
+	setPatchAt(x,y,NULL);
 }
 
 void TerrainNode::updateLocalBound(){
 	Sphere bound;
 	int i;
-	for(i=0;i<mTerrainPatches.size();++i){
-		bound.set(mTerrainPatches[i]->getLocalBound());
-		Math::add(bound,mTerrainPatches[i]->getTranslate());
+	for(i=0;i<mPatchGrid.size();++i){
+		bound.set(mPatchGrid[i]->getLocalBound());
+		Math::add(bound,mPatchGrid[i]->getTranslate());
 		if(i==0) mLocalBound.set(bound);
 		else Node::merge(mLocalBound,bound);
+	}
+}
+
+void TerrainNode::boundForPatch(AABox &r,int x,int y){
+	if(patchAt(x,y)!=NULL){
+		r.set(patchAt(x,y)->getLocalBoundAABox());
+	}
+	else{
+		scalar wx=toWorldXi(x),wy=toWorldYi(y);
+		scalar halfPatchWorldSize=mPatchSize*mPatchScale.x/2;
+		r.set(wx-halfPatchWorldSize,wy-halfPatchWorldSize,0,wx+halfPatchWorldSize,wy+halfPatchWorldSize,0);
 	}
 }
 
