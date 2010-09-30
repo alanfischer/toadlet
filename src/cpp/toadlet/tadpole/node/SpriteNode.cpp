@@ -173,9 +173,9 @@ void SpriteNode::updateSprite(){
 		vba.unlock();
 	}
 
-	// Update bound
-	mLocalBound.origin.set(x,y,0);
-	mLocalBound.radius=Math::sqrt(Math::square(width/2) + Math::square(height/2));
+	Vector3 origin(x,y,0);
+	scalar radius=Math::sqrt(Math::square(width/2) + Math::square(height/2));
+	mLocalBound.set(origin,radius);
 }
 
 }

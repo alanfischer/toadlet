@@ -52,6 +52,8 @@ public:
 	void internal_setUniqueHandle(int handle){mUniqueHandle=handle;}
 	int getUniqueHandle() const{return mUniqueHandle;}
 
+	int getReferenceCount(){return mReference;}
+
 protected:
 	int mReference;
 	ResourceFullyReleasedListener *mListener;

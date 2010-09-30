@@ -450,10 +450,10 @@ void Scene::renderBoundingVolumes(Renderer *renderer,Node *node){
 		return;
 	}
 
-	if(node->getWorldBound().radius>0){
+	if(node->getWorldBound().getSphere().radius>0){
 		Matrix4x4 transform;
-		Math::setMatrix4x4FromTranslate(transform,node->getWorldBound().origin);
-		Math::setMatrix4x4FromScale(transform,node->getWorldBound().radius,node->getWorldBound().radius,node->getWorldBound().radius);
+		Math::setMatrix4x4FromTranslate(transform,node->getWorldBound().getSphere().origin);
+		Math::setMatrix4x4FromScale(transform,node->getWorldBound().getSphere().radius,node->getWorldBound().getSphere().radius,node->getWorldBound().getSphere().radius);
 		renderer->setModelMatrix(transform);
 		renderer->renderPrimitive(mBoundMesh->staticVertexData,mBoundMesh->subMeshes[0]->indexData);
 	}

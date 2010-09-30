@@ -222,7 +222,7 @@ void LabelNode::updateLabel(){
 
 	// Update bound
 	if(mFont==NULL){
-		mLocalBound.radius=0;
+		mLocalBound.reset();
 	}
 	else{
 		int iw=mFont->getStringWidth(mText);
@@ -246,10 +246,10 @@ void LabelNode::updateLabel(){
 		}
 
 		if(mAlignment==(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER)){
-			mLocalBound.radius=Math::sqrt(Math::square(width/2) + Math::square(height/2));
+			mLocalBound.set(Math::sqrt(Math::square(width/2) + Math::square(height/2)));
 		}
 		else{
-			mLocalBound.radius=Math::sqrt(Math::square(width) + Math::square(height));
+			mLocalBound.set(Math::sqrt(Math::square(width) + Math::square(height)));
 		}
 	}
 }

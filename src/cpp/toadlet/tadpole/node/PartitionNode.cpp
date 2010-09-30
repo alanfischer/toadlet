@@ -48,12 +48,12 @@ void PartitionNode::destroy(){
 	super::destroy();
 }
 
-bool PartitionNode::senseBoundingVolumes(SensorResultsListener *listener,const Sphere &volume){
+bool PartitionNode::senseBoundingVolumes(SensorResultsListener *listener,const Bound &bound){
 	bool result=false;
 	int i;
 	for(i=0;i<mChildren.size();++i){
 		Node *child=mChildren[i];
-		if(child->testWorldBound(volume)){
+		if(child->getWorldBound().testIntersection(bound)){
 			result|=true;
 			if(listener->resultFound(child)==false){
 				return true;

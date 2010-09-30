@@ -153,9 +153,7 @@ void HopEntity::setTraceableShape(Traceable *traceable){
 void HopEntity::addShape(hop::Shape::ptr shape){
 	mSolid->addShape(shape);
 
-	Sphere bound;
-	set(bound,mSolid->getLocalBound());
-	setLocalBound(bound);
+	setLocalBound(Bound(mSolid->getLocalBound()));
 
 	updateCollisionVolumes();
 }
@@ -236,9 +234,7 @@ void HopEntity::frameUpdate(int dt,int scope){
 
 void HopEntity::getBound(AABox &result){
 	if(mTraceable!=NULL){
-		const Sphere &bound=mTraceable->getLocalBound();
-		result.set(bound.radius);
-		Math::add(result,bound.origin);
+		result.set(mTraceable->getLocalBound().getAABox());
 	}
 }
 

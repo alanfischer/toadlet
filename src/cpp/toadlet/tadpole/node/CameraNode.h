@@ -107,7 +107,8 @@ public:
 
 	virtual void render(peeper::Renderer *renderer,Node *node=NULL);
 
-	virtual bool culled(Node *node);
+	virtual bool culled(Node *node) const;
+	virtual bool culled(const Bound &bound) const;
 	/// @todo: These should probably be moved into the Math library, and passing in a list of planes
 	virtual bool culled(const Sphere &sphere) const;
 	virtual bool culled(const AABox &box) const;

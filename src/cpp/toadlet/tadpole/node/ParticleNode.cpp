@@ -169,7 +169,7 @@ bool ParticleNode::start(int particlesPerBeam,int numParticles,bool hasColor,con
 
 	int i;
 	if(points!=NULL){
-		mLocalBound.radius=0;
+		scalar radiusSquared=0;
 		if(ages!=NULL){
 			for(i=0;i<numParticles;++i){
 				Particle &p=mParticles[i];
@@ -186,8 +186,8 @@ bool ParticleNode::start(int particlesPerBeam,int numParticles,bool hasColor,con
 				p.age=ages[i];
 				p.visible=visible;
 
-				scalar ls=Math::lengthSquared(point);
-				if(mLocalBound.radius<ls) mLocalBound.radius=ls;
+				scalar rs=Math::lengthSquared(point);
+				if(radiusSquared<rs) radiusSquared=rs;
 			}
 		}
 		else{
@@ -206,11 +206,11 @@ bool ParticleNode::start(int particlesPerBeam,int numParticles,bool hasColor,con
 				p.age=defaultAge>=0?defaultAge:Math::div(Math::fromInt(i),Math::fromInt(numParticles));
 				p.visible=visible;
 
-				scalar ls=Math::lengthSquared(point);
-				if(mLocalBound.radius<ls) mLocalBound.radius=ls;
+				scalar rs=Math::lengthSquared(point);
+				if(radiusSquared<rs) radiusSquared=rs;
 			}
 		}
-		mLocalBound.radius=Math::sqrt(mLocalBound.radius);
+		mLocalBound.set(Math::sqrt(radiusSquared));
 	}
 	else if(ages!=NULL){
 		for(i=0;i<numParticles;++i){

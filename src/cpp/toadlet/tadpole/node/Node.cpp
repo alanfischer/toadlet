@@ -238,7 +238,7 @@ void Node::findTransformTo(Matrix4x4 &result,Node *node){
 	Math::postMul(result,transform);
 }
 
-void Node::setLocalBound(const Sphere &bound){
+void Node::setLocalBound(const Bound &bound){
 	mLocalBound.set(bound);
 	transformUpdated();
 }
@@ -318,7 +318,7 @@ void Node::updateWorldTransform(){
 		Math::add(mWorldTranslate,mParent->mWorldTranslate);
 	}
 
-	mul(mWorldBound,mWorldTranslate,mWorldRotate,mWorldScale,mLocalBound);
+	mWorldBound.transform(mWorldTranslate,mWorldRotate,mWorldScale,mLocalBound);
 
 	Math::setMatrix3x3FromQuaternion(cache_setTransform_matrix,mWorldRotate);
 	Math::setMatrix4x4FromTranslateRotateScale(mWorldTransform,mWorldTranslate,cache_setTransform_matrix,mWorldScale);

@@ -679,6 +679,8 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 		int ti=vertexFormat->findSemantic(VertexFormat::Semantic_TEX_COORD);
 		int ci=vertexFormat->findSemantic(VertexFormat::Semantic_COLOR);
 
+		scalar radiusSquared=0;
+
 		VertexBufferAccessor vba;
 		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
 
@@ -723,9 +725,9 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 						int sematic=vertexFormat->getSemantic(c);
 						if(sematic==VertexFormat::Semantic_POSITION){
 							Vector3 position=parseVector3(element);
-							scalar length=Math::length(position);
-							if(mesh->bound.radius<length){
-								mesh->bound.radius=length;
+							scalar rs=Math::lengthSquared(position);
+							if(radiusSquared<rs){
+								radiusSquared=rs;
 							}
 							vba.set3(l,pi,position);
 						}
@@ -760,6 +762,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 
 		vba.unlock();
 
+		mesh->bound.set(Math::sqrt(radiusSquared));
 		mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 	}
 
