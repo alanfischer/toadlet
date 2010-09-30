@@ -31,6 +31,7 @@
 #include <toadlet/egg/WeakPointer.h>
 #include <toadlet/egg/Type.h>
 #include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/Bound.h>
 #include <toadlet/tadpole/node/NodeListener.h>
 #include <toadlet/tadpole/node/NodeInterpolator.h>
 
@@ -127,9 +128,9 @@ public:
 	virtual void setName(const egg::String &name){mName=name;}
 	inline const egg::String &getName() const{return mName;}
 
-	virtual void setLocalBound(const Sphere &bound);
-	inline const Sphere &getLocalBound() const{return mLocalBound;}
-	inline const Sphere &getWorldBound() const{return mWorldBound;}
+	virtual void setLocalBound(const Bound &bound);
+	inline const Bound &getLocalBound() const{return mLocalBound;}
+	inline const Bound &getWorldBound() const{return mWorldBound;}
 
 	virtual void logicUpdate(int dt,int scope);
 	virtual void frameUpdate(int dt,int scope);
@@ -209,52 +210,6 @@ public:
 		Math::div(r.direction,scale);
 	}
 
-	/// @todo: These functions should be moved to a Bound class
-	inline bool testWorldBound(const Sphere &bound){
-		if(mWorldBound.radius<0 || bound.radius<0){
-			return true;
-		}
-
-		return Math::testIntersection(mWorldBound,bound);
-	}
-
-	static void mul(Sphere &r,const Vector3 &translate,const Quaternion &rotate,const Vector3 &scale,const Sphere &s){
-		Math::mul(r.origin,scale,s.radius);
-		r.radius=Math::maxVal(Math::maxVal(r.origin.x,r.origin.y),r.origin.z);
-		Math::mul(r.origin,rotate,s.origin);
-		Math::mul(r.origin,scale);
-		Math::add(r.origin,translate);
-	}
-
-	// Merge two spheres, passing along -1 radius, and ignoring 0 radius
-	static void merge(Sphere &r,const Sphere &s){
-		Vector3 origin=(r.origin+s.origin)/2;
-		scalar radius=Math::maxVal(Math::length(r.origin,origin)+Math::maxVal(r.radius,0),Math::length(s.origin,origin)+Math::maxVal(s.radius,0));
-		r.origin.set(origin);
-		if(r.radius>=0 && s.radius>=0){
-			r.radius=radius;
-		}
-		else{
-			r.radius=-Math::ONE;
-		}
-	}
-
-	static void set(Sphere &sphere,const AABox &box){
-		Math::add(sphere.origin,box.mins,box.maxs);
-		Math::div(sphere.origin,Math::TWO);
-		scalar x=Math::maxVal(sphere.origin.x-box.mins.x,box.maxs.x-sphere.origin.x);
-		scalar y=Math::maxVal(sphere.origin.y-box.mins.y,box.maxs.y-sphere.origin.y);
-		scalar z=Math::maxVal(sphere.origin.z-box.mins.z,box.maxs.z-sphere.origin.z);
-		sphere.radius=Math::sqrt(Math::square(x)+Math::square(y)+Math::square(z));
-	}
-
-	static void set(AABox &box,const Sphere &sphere){
-		if(sphere.radius<0){
-			box.set(1000);
-		}
-		Math::add(box,sphere.origin);
-	}
-
 protected:
 	virtual void logicUpdateListeners(int dt);
 	virtual void frameUpdateListeners(int dt);
@@ -281,11 +236,11 @@ protected:
 	Vector3 mTranslate;
 	Quaternion mRotate;
 	Vector3 mScale;
-	Sphere mLocalBound;
+	Bound mLocalBound;
 	Vector3 mWorldTranslate;
 	Quaternion mWorldRotate;
 	Vector3 mWorldScale;
-	Sphere mWorldBound;
+	Bound mWorldBound;
 	Matrix4x4 mWorldTransform;
 
 	int mScope;

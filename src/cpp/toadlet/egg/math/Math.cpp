@@ -551,6 +551,49 @@ void Math::getLineOfIntersection(Segment &result,const Plane &plane1,const Plane
 	add(result.origin,n1,n2);
 }
 
+void Math::findBoundingBox(AABox &r,const Sphere &sphere){
+	scalar radius=sphere.radius;
+	r.mins.x=-radius;
+	r.mins.y=-radius;
+	r.mins.z=-radius;
+	r.maxs.x=radius;
+	r.maxs.y=radius;
+	r.maxs.z=radius;
+	Math::add(r,sphere.origin);
+}
+
+void Math::findBoundingBox(AABox &r,const Capsule &capsule){
+	scalar radius=capsule.radius;
+	const Vector3 &direction=capsule.direction;
+
+	if(direction.x<0){
+		r.mins.x=direction.x-radius;
+		r.maxs.x=radius;
+	}
+	else{
+		r.mins.x=-radius;
+		r.maxs.x=direction.x+radius;
+	}
+	if(direction.y<0){
+		r.mins.y=direction.y-radius;
+		r.maxs.y=radius;
+	}
+	else{
+		r.mins.y=-radius;
+		r.maxs.y=direction.y+radius;
+	}
+	if(direction.z<0){
+		r.mins.z=direction.z-radius;
+		r.maxs.z=radius;
+	}
+	else{
+		r.mins.z=-radius;
+		r.maxs.z=direction.z+radius;
+	}
+
+	Math::add(r,capsule.origin);
+}
+
 void Math::findBoundingBox(AABox &r,const Vector3 *vertexes,int amount){
 	int i;
 

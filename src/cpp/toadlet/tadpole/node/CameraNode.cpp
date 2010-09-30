@@ -314,11 +314,16 @@ void CameraNode::render(Renderer *renderer,Node *node){
 	renderOverlayGamma(renderer);
 }
 
-bool CameraNode::culled(Node *node){
+bool CameraNode::culled(Node *node) const{
 	return (node->getScope()&getScope())==0 || culled(node->getWorldBound());
 }
 
+bool CameraNode::culled(const Bound &bound) const{
+	return culled(bound.getSphere());
+}
+
 bool CameraNode::culled(const Sphere &sphere) const{
+Logger::alert(String("RAD:")+sphere.radius);
 	if(sphere.radius<0) return false;
 	scalar distance=0;
 	int i;

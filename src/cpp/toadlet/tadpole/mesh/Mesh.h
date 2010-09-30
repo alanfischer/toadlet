@@ -31,6 +31,7 @@
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
+#include <toadlet/tadpole/Bound.h>
 #include <toadlet/tadpole/mesh/Skeleton.h>
 
 namespace toadlet{
@@ -53,7 +54,7 @@ public:
 		peeper::VertexData::ptr vertexData;
 		peeper::IndexData::ptr indexData;
 		
-		Material::ptr material;
+		Material::ptr material; // Must be retained when assigned
 		egg::String materialName;
 
 		egg::String name;
@@ -84,12 +85,12 @@ public:
 	Vector3 translate;
 	Quaternion rotate;
 	Vector3 scale;
-	Sphere bound;
+	Bound bound;
 
 	egg::Collection<SubMesh::ptr> subMeshes;
 	peeper::VertexData::ptr staticVertexData;
 
-	Skeleton::ptr skeleton;
+	Skeleton::ptr skeleton; // Must be retained when assigned
 	egg::Collection<VertexBoneAssignmentList> vertexBoneAssignments;
 };
 

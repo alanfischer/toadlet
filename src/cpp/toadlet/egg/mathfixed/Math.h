@@ -1521,6 +1521,10 @@ namespace Math{
 		b.maxs.z-=p.z;
 	}
 
+	TOADLET_API void findBoundingBox(AABox &r,const Sphere &sphere);
+
+	TOADLET_API void findBoundingBox(AABox &r,const Capsule &capsule);
+
 	TOADLET_API void findBoundingBox(AABox &r,const Vector3 *vertexes,int amount);
 
 	TOADLET_API void findFitBox(AABox &r,const Vector3 *vertexes,int amount);

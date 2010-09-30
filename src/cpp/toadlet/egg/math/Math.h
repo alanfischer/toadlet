@@ -1464,10 +1464,6 @@ namespace Math{
 	TOADLET_API void getLineOfIntersection(Segment &result,const Plane &plane1,const Plane &plane2);
 
 	// AABox operations
-	TOADLET_API void findBoundingBox(AABox &r,const Vector3 *vertexes,int amount);
-
-	TOADLET_API void findFitBox(AABox &r,const Vector3 *vertexes,int amount);
-
 	inline void add(AABox &r,const AABox &b,const Vector3 &p){
 		r.mins.x=b.mins.x+p.x;
 		r.mins.y=b.mins.y+p.y;
@@ -1508,11 +1504,15 @@ namespace Math{
 		b.maxs.z-=p.z;
 	}
 
-	// Sphere operations
-	TOADLET_API void findBoundingSphere(Sphere &r,const AABox &box);
-	
-	TOADLET_API void findFitSphere(Sphere &r,const AABox &box);
+	TOADLET_API void findBoundingBox(AABox &r,const Sphere &sphere);
 
+	TOADLET_API void findBoundingBox(AABox &r,const Capsule &capsule);
+
+	TOADLET_API void findBoundingBox(AABox &r,const Vector3 *vertexes,int amount);
+
+	TOADLET_API void findFitBox(AABox &r,const Vector3 *vertexes,int amount);
+
+	// Sphere operations
 	inline void add(Sphere &r,const Sphere &s,const Vector3 &p){
 		r.origin.x=s.origin.x+p.x;
 		r.origin.y=s.origin.y+p.y;
@@ -1537,11 +1537,11 @@ namespace Math{
 		s.origin.z-=p.z;
 	}
 	
+	TOADLET_API void findBoundingSphere(Sphere &r,const AABox &box);
+	
+	TOADLET_API void findFitSphere(Sphere &r,const AABox &box);
+
 	// Capsule operations
-	TOADLET_API void findBoundingCapsule(Capsule &r,const AABox &box);
-
-	TOADLET_API void findFitCapsule(Capsule &r,const AABox &box);
-
 	inline void add(Capsule &r,const Capsule &c,const Vector3 &p){
 		r.origin.x=c.origin.x+p.x;
 		r.origin.y=c.origin.y+p.y;
@@ -1565,6 +1565,10 @@ namespace Math{
 		c.origin.y-=p.y;
 		c.origin.z-=p.z;
 	}
+
+	TOADLET_API void findBoundingCapsule(Capsule &r,const AABox &box);
+
+	TOADLET_API void findFitCapsule(Capsule &r,const AABox &box);
 
 	// Intersection operations
 	TOADLET_API bool testInside(const Vector3 &point,const Plane &plane);

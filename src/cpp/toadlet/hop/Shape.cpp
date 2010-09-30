@@ -165,49 +165,10 @@ void Shape::getBound(AABox &box) const{
 			box.set(mAABox);
 		break;
 		case Type_SPHERE:
-		{
-			scalar r=mSphere.radius;
-			box.mins.x=-r;
-			box.mins.y=-r;
-			box.mins.z=-r;
-			box.maxs.x=r;
-			box.maxs.y=r;
-			box.maxs.z=r;
-			Math::add(box,mSphere.origin);
-		}
+			Math::findBoundingBox(box,mSphere);
 		break;
 		case Type_CAPSULE:
-		{
-			scalar r=mCapsule.radius;
-			const Vector3 &d=mCapsule.direction;
-
-			if(d.x<0){
-				box.mins.x=d.x-r;	
-				box.maxs.x=r;
-			}
-			else{
-				box.mins.x=-r;	
-				box.maxs.x=d.x+r;
-			}
-			if(d.y<0){
-				box.mins.y=d.y-r;	
-				box.maxs.y=r;
-			}
-			else{
-				box.mins.y=-r;	
-				box.maxs.y=d.y+r;
-			}
-			if(d.z<0){
-				box.mins.z=d.z-r;	
-				box.maxs.z=r;
-			}
-			else{
-				box.mins.z=-r;	
-				box.maxs.z=d.z+r;
-			}
-
-			Math::add(box,mCapsule.origin);
-		}
+			Math::findBoundingBox(box,mCapsule);
 		break;
 		case Type_CONVEXSOLID:
 		{

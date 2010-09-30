@@ -262,8 +262,7 @@ public:
 		return false;
 	}
 
-	template<typename Bound>
-	static void findBoundLeafs(egg::Collection<int> &leafs,bnode *hull,int index,const Bound &bound){
+	static void findBoundLeafs(egg::Collection<int> &leafs,bnode *hull,int index,const AABox &box){
 		if(index<0){
 			// Ignore solid leaf
 			if((-1-index)>0){
@@ -273,49 +272,15 @@ public:
 		}
 
 		bnode *node=hull+index;
-		if(testIntersection(node,bound)){
-			findBoundLeafs(leafs,hull,node->children[0],bound);
-			findBoundLeafs(leafs,hull,node->children[1],bound);
+		if(testIntersection(node,box)){
+			findBoundLeafs(leafs,hull,node->children[0],box);
+			findBoundLeafs(leafs,hull,node->children[1],box);
 		}
 	}
 
 	static bool testIntersection(bnode *node,const AABox &box){
 		return	!(Math::fromInt(node->mins[0])>box.maxs.x || Math::fromInt(node->mins[1])>box.maxs.y || Math::fromInt(node->mins[2])>box.maxs.z ||
 				  box.mins.x>Math::fromInt(node->maxs[0]) || box.mins.y>Math::fromInt(node->maxs[1]) || box.mins.z>Math::fromInt(node->maxs[2]));
-	}
-
-	static bool testIntersection(bnode *node,const Sphere &sphere){
-		scalar s=0;
-		scalar d=0;
-
-		if(sphere.origin.x<Math::fromInt(node->mins[0])){
-			s=sphere.origin.x-(node->mins[0]);
-			d+=Math::mul(s,s);
-		}
-		else if(sphere.origin.x>Math::fromInt(node->maxs[0])){
-			s=sphere.origin.x-Math::fromInt(node->maxs[0]);
-			d+=Math::mul(s,s);
-		}
-
-		if(sphere.origin.y<Math::fromInt(node->mins[1])){
-			s=sphere.origin.y-Math::fromInt(node->mins[1]);
-			d+=Math::mul(s,s);
-		}
-		else if(sphere.origin.y>Math::fromInt(node->maxs[1])){
-			s=sphere.origin.y-Math::fromInt(node->maxs[1]);
-			d+=Math::mul(s,s);
-		}
-
-		if(sphere.origin.z<Math::fromInt(node->mins[2])){
-			s=sphere.origin.z-Math::fromInt(node->mins[2]);
-			d+=Math::mul(s,s);
-		}
-		else if(sphere.origin.z>Math::fromInt(node->maxs[2])){
-			s=sphere.origin.z-Math::fromInt(node->maxs[2]);
-			d+=Math::mul(s,s);
-		}
-
-		return d<=Math::mul(sphere.radius,sphere.radius);
 	}
 
 	struct facedata{

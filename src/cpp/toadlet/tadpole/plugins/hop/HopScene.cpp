@@ -141,8 +141,8 @@ public:
 int HopScene::findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids){
 	/// @todo: just clean this up a bit, maybe cache the SolidSensorResults as a ::ptr
 	SolidSensorResults results(solids,maxSolids);
-	Sphere bound;
-	Node::set(bound,box);
+	Bound bound;
+	bound.set(box);
 	mRoot->senseBoundingVolumes(&results,bound);
 	return results.mCounter;
 }

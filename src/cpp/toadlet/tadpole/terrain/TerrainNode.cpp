@@ -283,10 +283,7 @@ void TerrainNode::createPatch(int x,int y){
 	patch->updateWorldTransform();
 
 	if(mListener!=NULL){
-		AABox bound;
-		transform(bound.mins,patch->getLocalBoundAABox().mins,patch->getWorldTranslate(),patch->getWorldScale(),patch->getWorldRotate());
-		transform(bound.maxs,patch->getLocalBoundAABox().maxs,patch->getWorldTranslate(),patch->getWorldScale(),patch->getWorldRotate());
-		mListener->terrainPatchCreated(x,y,bound);
+		mListener->terrainPatchCreated(x,y,patch->getWorldBound());
 	}
 }
 
@@ -294,10 +291,7 @@ void TerrainNode::destroyPatch(int x,int y){
 	TerrainPatchNode::ptr patch=patchAt(x,y);
 
 	if(mListener!=NULL){
-		AABox bound;
-		transform(bound.mins,patch->getLocalBoundAABox().mins,patch->getWorldTranslate(),patch->getWorldScale(),patch->getWorldRotate());
-		transform(bound.maxs,patch->getLocalBoundAABox().maxs,patch->getWorldTranslate(),patch->getWorldScale(),patch->getWorldRotate());
-		mListener->terrainPatchDestroyed(x,y,bound);
+		mListener->terrainPatchDestroyed(x,y,patch->getWorldBound());
 	}
 
 	if(patchAt(x-1,y)!=NULL){
@@ -318,24 +312,10 @@ void TerrainNode::destroyPatch(int x,int y){
 }
 
 void TerrainNode::updateLocalBound(){
-	Sphere bound;
 	int i;
 	for(i=0;i<mPatchGrid.size();++i){
-		bound.set(mPatchGrid[i]->getLocalBound());
-		Math::add(bound,mPatchGrid[i]->getTranslate());
-		if(i==0) mLocalBound.set(bound);
-		else Node::merge(mLocalBound,bound);
-	}
-}
-
-void TerrainNode::boundForPatch(AABox &r,int x,int y){
-	if(patchAt(x,y)!=NULL){
-		r.set(patchAt(x,y)->getLocalBoundAABox());
-	}
-	else{
-		scalar wx=toWorldXi(x),wy=toWorldYi(y);
-		scalar halfPatchWorldSize=mPatchSize*mPatchScale.x/2;
-		r.set(wx-halfPatchWorldSize,wy-halfPatchWorldSize,0,wx+halfPatchWorldSize,wy+halfPatchWorldSize,0);
+		if(i==0) mLocalBound.set(mPatchGrid[i]->getWorldBound());
+		else mLocalBound.merge(mPatchGrid[i]->getWorldBound());
 	}
 }
 

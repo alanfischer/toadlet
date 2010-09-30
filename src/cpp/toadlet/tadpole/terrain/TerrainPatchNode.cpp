@@ -202,8 +202,7 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
 
 	addBlockToBack(0);
 
-	mLocalBoundAABox.set(mBlocks[0].mins,mBlocks[0].maxs);
-	set(mLocalBound,mLocalBoundAABox);
+	mLocalBound.set(mBlocks[0].mins,mBlocks[0].maxs);
 
 	return true;
 }

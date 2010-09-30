@@ -78,7 +78,7 @@ public:
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 
 	// Traceable items
-	const Sphere &getLocalBound() const{return super::getLocalBound();}
+	const Bound &getLocalBound() const{return super::getLocalBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 protected:
@@ -113,11 +113,11 @@ public:
 	void mergeWorldBound(Node *child,bool justAttached);
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 
-	bool senseBoundingVolumes(SensorResultsListener *listener,const Sphere &volume);
+	bool senseBoundingVolumes(SensorResultsListener *listener,const Bound &bound);
 	bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);
 
 	// Traceable items
-	const Sphere &getLocalBound() const{return super::getLocalBound();}
+	const Bound &getLocalBound() const{return super::getLocalBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 	// Renderable items

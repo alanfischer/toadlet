@@ -38,7 +38,7 @@ Sphere Mesh::Bound_AUTOCALCULATE(-2);
 
 Mesh::Mesh():BaseResource(),
 	scale(Math::ONE,Math::ONE,Math::ONE),
-	bound(-Math::ONE)
+	bound(Bound::Type_INFINITE)
 {}
 
 Mesh::~Mesh(){

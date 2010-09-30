@@ -27,6 +27,7 @@
 #define TOADLET_TADPOLE_TRACEABLE_H
 
 #include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/Bound.h>
 #include <toadlet/tadpole/Collision.h>
 
 namespace toadlet{
@@ -36,7 +37,7 @@ class Traceable{
 public:
 	virtual ~Traceable(){}
 
-	virtual const Sphere &getLocalBound() const=0;
+	virtual const Bound &getLocalBound() const=0;
 	virtual void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size)=0;
 };
 

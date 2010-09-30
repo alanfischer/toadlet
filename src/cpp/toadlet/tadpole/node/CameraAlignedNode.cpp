@@ -48,7 +48,7 @@ CameraAlignedNode::CameraAlignedNode():super(),
 void CameraAlignedNode::frameUpdate(int dt,int scope){
 	super::frameUpdate(dt,scope);
 
-	if(mLocalBound.radius<0 || mPerspective==false) mWorldBound.radius=-Math::ONE;
+	if(mPerspective==false) mWorldBound.setInfinite();
 }
 
 void CameraAlignedNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
