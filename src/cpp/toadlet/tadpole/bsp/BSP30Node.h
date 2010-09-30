@@ -39,8 +39,6 @@ namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-/// @todo: When we switch the nodes to using an AABox bound, then modify these classes so we don't go bsp(aabox)->sphere(local)->aabox(physics);
-
 class TOADLET_API BSP30ModelNode:public node::Node,public Traceable{
 public:
 	TOADLET_NODE(BSP30ModelNode,Node);

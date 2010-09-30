@@ -319,11 +319,19 @@ bool CameraNode::culled(Node *node) const{
 }
 
 bool CameraNode::culled(const Bound &bound) const{
-	return culled(bound.getSphere());
+	if(bound.getType()==Bound::Type_SPHERE){
+		return culled(bound.getSphere());
+	}
+	else if(bound.getType()==Bound::Type_AABOX){
+		return culled(bound.getAABox());
+	}
+	else{
+		Error::unimplemented("unknown bound type");
+		return false;
+	}
 }
 
 bool CameraNode::culled(const Sphere &sphere) const{
-Logger::alert(String("RAD:")+sphere.radius);
 	if(sphere.radius<0) return false;
 	scalar distance=0;
 	int i;

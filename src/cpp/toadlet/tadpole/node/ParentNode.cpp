@@ -219,7 +219,7 @@ void ParentNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 }
 
 void ParentNode::mergeWorldBound(Node *child,bool justAttached){
-	mWorldBound.merge(child->getWorldBound());
+	Bound::merge(mWorldBound,child->getWorldBound());
 }
 
 void ParentNode::activate(){
