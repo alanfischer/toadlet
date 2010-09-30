@@ -69,7 +69,6 @@ Node *TerrainNode::create(Scene *scene){
 	for(j=0;j<mSize;++j){
 		for(i=0;i<mSize;++i){
 			TerrainPatchNode::ptr patch=mEngine->createNodeType(TerrainPatchNode::type(),mScene);
-			attach(patch);
 			mUnactivePatches.add(patch);
 		}
 	}
@@ -267,6 +266,8 @@ void TerrainNode::createPatch(int x,int y){
 	mDataSource->getPatchData(&mPatchData[0],x,y);
 	patch->setData(&mPatchData[0],mPatchSize,mPatchSize,mPatchSize);
 
+	attach(patch);
+
 	if(patchAt(x-1,y)!=NULL){
 		patchAt(x-1,y)->stitchToRight(patch);
 	}
@@ -290,10 +291,6 @@ void TerrainNode::createPatch(int x,int y){
 void TerrainNode::destroyPatch(int x,int y){
 	TerrainPatchNode::ptr patch=patchAt(x,y);
 
-	if(mListener!=NULL){
-		mListener->terrainPatchDestroyed(x,y,patch->getWorldBound());
-	}
-
 	if(patchAt(x-1,y)!=NULL){
 		patchAt(x-1,y)->unstitchFromRight(patch);
 	}
@@ -305,6 +302,12 @@ void TerrainNode::destroyPatch(int x,int y){
 	}
 	if(patchAt(x,y+1)!=NULL){
 		patch->unstitchFromBottom(patchAt(x,y+1));
+	}
+
+	remove(patch);
+
+	if(mListener!=NULL){
+		mListener->terrainPatchDestroyed(x,y,patch->getWorldBound());
 	}
 
 	mUnactivePatches.add(patch);
