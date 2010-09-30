@@ -318,7 +318,7 @@ void Node::updateWorldTransform(){
 		Math::add(mWorldTranslate,mParent->mWorldTranslate);
 	}
 
-	mWorldBound.transform(mWorldTranslate,mWorldRotate,mWorldScale,mLocalBound);
+	Bound::transform(mWorldBound,mLocalBound,mWorldTranslate,mWorldRotate,mWorldScale);
 
 	Math::setMatrix3x3FromQuaternion(cache_setTransform_matrix,mWorldRotate);
 	Math::setMatrix4x4FromTranslateRotateScale(mWorldTransform,mWorldTranslate,cache_setTransform_matrix,mWorldScale);
