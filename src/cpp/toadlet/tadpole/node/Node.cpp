@@ -320,6 +320,7 @@ void Node::updateWorldTransform(){
 
 	Bound::transform(mWorldBound,mLocalBound,mWorldTranslate,mWorldRotate,mWorldScale);
 
+	/// @todo: add a setMatrix4x4FromTRS that can take a quat?
 	Math::setMatrix3x3FromQuaternion(cache_setTransform_matrix,mWorldRotate);
 	Math::setMatrix4x4FromTranslateRotateScale(mWorldTransform,mWorldTranslate,cache_setTransform_matrix,mWorldScale);
 }

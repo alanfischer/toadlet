@@ -213,7 +213,9 @@ void HopEntity::parentChanged(ParentNode *parent){
 void HopEntity::logicUpdate(int dt,int scope){
 	if(mSolid->active()){
 		super::setTranslate(mSolid->getPosition());
-		mInterpolator->logicUpdate(this,mScene->getLogicFrame());
+		if(mInterpolator!=NULL){
+			mInterpolator->logicUpdate(this,mScene->getLogicFrame());
+		}
 	}
 
 	if(mNextThink<=mScene->getLogicTime()){
@@ -226,7 +228,9 @@ void HopEntity::logicUpdate(int dt,int scope){
 
 void HopEntity::frameUpdate(int dt,int scope){
 	if(mSolid->active()){
-		mInterpolator->interpolate(this,mScene->getLogicFraction());
+		if(mInterpolator!=NULL){
+			mInterpolator->interpolate(this,mScene->getLogicFraction());
+		}
 	}
 
 	super::frameUpdate(dt,scope);

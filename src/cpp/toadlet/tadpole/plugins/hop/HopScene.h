@@ -64,6 +64,8 @@ public:
 	virtual void logicUpdate(int dt){Scene::logicUpdate(dt);}
 	virtual void logicUpdate(int dt,int scope);
 
+	virtual hop::Solid::ptr getSolid(){return mSolid;}
+
 	// Hop items
 	inline hop::Simulator *getSimulator(){return mSimulator;}
 
