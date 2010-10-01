@@ -77,13 +77,13 @@ Node *TerrainPatchNode::create(Scene *scene){
 	mNumBlocksInQueue=0;
 	mNumUnprocessedBlocks=0;
 	mLastBlockUpdateFrame=0;
-	mEpsilon=Math::fromMilli(1);
+	mEpsilon=0.03125/16;
 
 	mLeftDependent=NULL;
 	mTopDependent=NULL;
 
 	mMinTolerance=0;
-	mMaxTolerance=0.001;
+	mMaxTolerance=0.00001;
 	mTolerance=0;
 
 	mS1=Math::HALF;mS2=Math::ONE;
@@ -485,6 +485,7 @@ void TerrainPatchNode::traceLocalSegment(Collision &result,const Segment &segmen
 
 	scalar stepX=segment.direction.x>0?Math::ONE:-Math::ONE;
 	scalar stepY=segment.direction.y>0?Math::ONE:-Math::ONE;
+Logger::alert(String("start"));
 
 	scalar fractionX=x0-Math::floor(x0);
 	scalar fractionY=y0-Math::floor(y0);
@@ -537,6 +538,7 @@ void TerrainPatchNode::traceLocalSegment(Collision &result,const Segment &segmen
 }
 
 bool TerrainPatchNode::traceCell(Collision &result,int x,int y,const Segment &segment,scalar epsilon){
+Logger::alert(String("TEST:")+x+","+y);
 	Vertex *vxy=vertexAt(x,y),*vx1y=vertexAt(x+1,y),*vxy1=vertexAt(x,y+1),*vx1y1=vertexAt(x+1,y+1);
 
 	Plane p1,p2;
@@ -558,15 +560,17 @@ bool TerrainPatchNode::traceCell(Collision &result,int x,int y,const Segment &se
 	scalar d1o=Math::length(p1,segment.origin),d2o=Math::length(p2,segment.origin);
 	scalar d1e=Math::length(p1,result.point),d2e=Math::length(p2,result.point);
 
+	Logger::alert(String("TEST:")+segment.origin.x+","+segment.origin.y+" :"+result.point.x+","+result.point.y+" : concave:"+concave+" "+d1o+","+d2o);
 	if((concave && (d1o<=0 || d2o<=0)) || (!concave && (d1o<=0 && d2o<=0))){
-		//return false;
+		Logger::alert(String("FELL THRU!"));
+return false;
 		if(d1o<=0 && (d1o>d2o || d2o>0)){
 			result.normal.set(p1.normal);
 		}
 		else{
 			result.normal.set(p2.normal);
 		}
-		if(Math::dot(segment.direction,result.normal)<-epsilon){
+		if(Math::dot(segment.direction,result.normal)<0){
 			result.point.set(segment.origin);
 			result.time=0;
 		}
