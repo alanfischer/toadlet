@@ -404,8 +404,11 @@ void Simulator::update(int dt,int scope,Solid *solid){
 		// Collect all possible solids in the whole movement area
 		if(solid->mCollideWithBits!=0){
 			sub(temp,newPosition,oldPosition);
-			if(toSmall(temp)){
+			if(toSmall(temp,mEpsilon)){
 				newPosition.set(oldPosition);
+				if(solid->mTouching!=NULL){
+					solid->mVelocity.reset();
+				}
 				skip=true;
 			}
 			else{
@@ -440,7 +443,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 				snapToGrid(newPosition);
 
 				sub(temp,newPosition,oldPosition);
-				if(toSmall(temp)){
+				if(toSmall(temp,mEpsilon)){
 					newPosition.set(oldPosition);
 					break;
 				}
@@ -585,7 +588,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 					solid->mTouching=NULL;
 				}
 
-				if(toSmall(leftOver)){
+				if(toSmall(leftOver,mEpsilon)){
 					newPosition.set(oldPosition);
 					break;
 				}
@@ -1124,8 +1127,8 @@ void Simulator::snapToGrid(Vector3 &pos) const{
 	}
 }
 
-bool Simulator::toSmall(const Vector3 &value) const{
-	return (value.x<mEpsilon && value.x>-mEpsilon && value.y<mEpsilon && value.y>-mEpsilon && value.z<mEpsilon && value.z>-mEpsilon);
+bool Simulator::toSmall(const Vector3 &value,scalar epsilon) const{
+	return (value.x<epsilon && value.x>-epsilon && value.y<epsilon && value.y>-epsilon && value.z<epsilon && value.z>-epsilon);
 }
 
 void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment &segment,int collideWithBits,Solid *ignore){

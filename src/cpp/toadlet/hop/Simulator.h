@@ -113,7 +113,7 @@ public:
 	void capVector3(Vector3 &vector,scalar value) const;
 	void calculateEpsilonOffset(Vector3 &result,const Vector3 &direction,const Vector3 &normal) const;
 	void snapToGrid(Vector3 &position) const;
-	bool toSmall(const Vector3 &dist) const;
+	bool toSmall(const Vector3 &dist,scalar epsilon) const;
 
 	int countActiveSolids();
 
