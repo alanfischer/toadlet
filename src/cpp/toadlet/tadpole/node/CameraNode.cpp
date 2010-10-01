@@ -44,9 +44,6 @@ CameraNode::CameraNode():super(),
 	mLeftDist(0),mRightDist(0),
 	mBottomDist(0),mTopDist(0),
 	mNearDist(0),mFarDist(0),
-	//mProjectionTransform
-	mProjectionRotation(0),
-	//mFinalProjectionTransform
 	mViewportSet(false),
 	//mViewport,
 	mClearFlags(0),
@@ -54,6 +51,9 @@ CameraNode::CameraNode():super(),
 	mSkipFirstClear(false),
 	mAlignmentCalculationsUseOrigin(false),
 
+	//mProjectionTransform
+	mProjectionRotation(0),
+	//mFinalProjectionTransform
 	//mWorldTranslate,
 	//mViewTransform,
 	//mForward,
