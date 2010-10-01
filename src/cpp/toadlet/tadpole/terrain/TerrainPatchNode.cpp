@@ -52,6 +52,7 @@ TerrainPatchNode::TerrainPatchNode():Node(),
 	//mLeftDependent,
 	//mTopDependent,
 	mEpsilon(0),
+	mCellEpsilon(0),
 
 	mMinTolerance(0),
 	mMaxTolerance(0),
@@ -77,7 +78,10 @@ Node *TerrainPatchNode::create(Scene *scene){
 	mNumBlocksInQueue=0;
 	mNumUnprocessedBlocks=0;
 	mLastBlockUpdateFrame=0;
-	mEpsilon=0.03125/16;
+	mEpsilon=0.03125/16; // Epsilon for tracing against planes
+	// Epsilon for checking neighboring cells.  Must be decently large since we need to catch a plane 
+	//  that, offset via epsilon at a shallow angle, would be interested outside of the cell 
+	mCellEpsilon=0.03125*4;
 
 	mLeftDependent=NULL;
 	mTopDependent=NULL;
@@ -469,7 +473,7 @@ void TerrainPatchNode::traceSegment(Collision &result,const Vector3 &position,co
 	scalar maxs2x=Math::maxVal(localSegment.origin.x,localSegment.origin.x+localSegment.direction.x);
 	scalar maxs2y=Math::maxVal(localSegment.origin.y,localSegment.origin.y+localSegment.direction.y);
 	if(!(mins1.x>maxs2x || mins1.y>maxs2y || mins2x>maxs1.x || mins2y>maxs1.y)){
-		traceLocalSegment(result,localSegment,mEpsilon);
+		traceLocalSegment(result,localSegment,mEpsilon,mCellEpsilon);
 	}
 
 	result.point.z+=sizeAdjust;
@@ -479,13 +483,12 @@ void TerrainPatchNode::traceSegment(Collision &result,const Vector3 &position,co
 	}
 }
 
-void TerrainPatchNode::traceLocalSegment(Collision &result,const Segment &segment,scalar epsilon){
+void TerrainPatchNode::traceLocalSegment(Collision &result,const Segment &segment,scalar epsilon,scalar cellEpsilon){
 	scalar x0=segment.origin.x,y0=segment.origin.y;
 	scalar x1=segment.origin.x+segment.direction.x,y1=segment.origin.y+segment.direction.y;
 
 	scalar stepX=segment.direction.x>0?Math::ONE:-Math::ONE;
 	scalar stepY=segment.direction.y>0?Math::ONE:-Math::ONE;
-Logger::alert(String("start"));
 
 	scalar fractionX=x0-Math::floor(x0);
 	scalar fractionY=y0-Math::floor(y0);
@@ -522,7 +525,7 @@ Logger::alert(String("start"));
 
 	do{
 		if(x>=0 && y>=0 && x<mSize && y<mSize){
-			if(traceCell(result,x,y,segment,epsilon)){
+			if(traceCell(result,x,y,segment,epsilon,cellEpsilon)){
 				break;
 			}
 		}
@@ -534,11 +537,10 @@ Logger::alert(String("start"));
 			tMaxY+=tDeltaY;
 			y+=stepY;
 		}
-	}while(((stepX>0 && (int)x<=(int)x1) || (stepX<0 && (int)x>=(int)x1)) && ((stepY>0 && (int)y<=(int)y1) || (stepY<0 && (int)y>=(int)y1)));
+	}while(((stepX>0 && (int)(x-cellEpsilon)<=(int)x1) || (stepX<0 && (int)(x+cellEpsilon)>=(int)x1)) && ((stepY>0 && (int)(y-cellEpsilon)<=(int)y1) || (stepY<0 && (int)(y+cellEpsilon)>=(int)y1)));
 }
 
-bool TerrainPatchNode::traceCell(Collision &result,int x,int y,const Segment &segment,scalar epsilon){
-Logger::alert(String("TEST:")+x+","+y);
+bool TerrainPatchNode::traceCell(Collision &result,int x,int y,const Segment &segment,scalar epsilon,scalar cellEpsilon){
 	Vertex *vxy=vertexAt(x,y),*vx1y=vertexAt(x+1,y),*vxy1=vertexAt(x,y+1),*vx1y1=vertexAt(x+1,y+1);
 
 	Plane p1,p2;
@@ -560,17 +562,15 @@ Logger::alert(String("TEST:")+x+","+y);
 	scalar d1o=Math::length(p1,segment.origin),d2o=Math::length(p2,segment.origin);
 	scalar d1e=Math::length(p1,result.point),d2e=Math::length(p2,result.point);
 
-	Logger::alert(String("TEST:")+segment.origin.x+","+segment.origin.y+" :"+result.point.x+","+result.point.y+" : concave:"+concave+" "+d1o+","+d2o);
 	if((concave && (d1o<=0 || d2o<=0)) || (!concave && (d1o<=0 && d2o<=0))){
-		Logger::alert(String("FELL THRU!"));
-return false;
+		// If a trace gets into the terrain, we just try to force it out.
 		if(d1o<=0 && (d1o>d2o || d2o>0)){
 			result.normal.set(p1.normal);
 		}
 		else{
 			result.normal.set(p2.normal);
 		}
-		if(Math::dot(segment.direction,result.normal)<0){
+		if(Math::dot(segment.direction,result.normal)<-epsilon){
 			result.point.set(segment.origin);
 			result.time=0;
 		}
@@ -620,7 +620,7 @@ return false;
 	}
 
 	if(result.time<Math::ONE){
-		if(result.point.x<x || result.point.y<y || result.point.x>x+1 || result.point.y>y+1){
+		if(result.point.x+cellEpsilon<x || result.point.y+cellEpsilon<y || result.point.x-cellEpsilon>x+1 || result.point.y-cellEpsilon>y+1){
 			result.reset();
 		}
 	}

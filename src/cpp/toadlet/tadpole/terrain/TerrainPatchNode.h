@@ -110,11 +110,10 @@ public:
 	const Matrix4x4 &getRenderTransform() const{return super::getWorldTransform();}
 	void render(peeper::Renderer *renderer) const;
 
-//	const AABox &getLocalBoundAABox() const{return mLocalBoundAABox;}
 	const Bound &getLocalBound() const{return super::getLocalBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
-	void traceLocalSegment(Collision &result,const Segment &segment,scalar epsilon);
-	bool traceCell(Collision &result,int x,int y,const Segment &segment,scalar epsilon);
+	void traceLocalSegment(Collision &result,const Segment &segment,scalar epsilon,scalar cellEpsilon);
+	bool traceCell(Collision &result,int x,int y,const Segment &segment,scalar epsilon,scalar cellEpsilon);
 
 	peeper::VertexBufferAccessor vba;
 
@@ -200,6 +199,7 @@ protected:
 	int mLastBlockUpdateFrame;
 	int mLastVertexesUpdateFrame;
 	scalar mEpsilon;
+	scalar mCellEpsilon;
 
 	TerrainPatchNode::ptr mLeftDependent;
 	TerrainPatchNode::ptr mTopDependent;

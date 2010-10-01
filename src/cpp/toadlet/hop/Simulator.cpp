@@ -404,14 +404,17 @@ void Simulator::update(int dt,int scope,Solid *solid){
 		// Collect all possible solids in the whole movement area
 		if(solid->mCollideWithBits!=0){
 			sub(temp,newPosition,oldPosition);
-			if(toSmall(temp,mEpsilon)){
-				newPosition.set(oldPosition);
-				if(solid->mTouching!=NULL){
-					solid->mVelocity.reset();
-				}
-				skip=true;
-			}
-			else{
+
+			// Remove this check.  It resulted in objects being able to slide down slopes, since the velocity would build up
+			//  It's better to just run the simulation so everything resolves and let them deactivate
+			#if 0
+				if(toSmall(temp,mEpsilon)){
+					newPosition.set(oldPosition);
+					skip=true;
+				}else
+			#endif
+			
+			{
 				if(temp.x<0){temp.x=-temp.x;}
 				if(temp.y<0){temp.y=-temp.y;}
 				if(temp.z<0){temp.z=-temp.z;}
