@@ -610,10 +610,11 @@ bool TerrainPatchNode::traceCell(Collision &result,int x,int y,const Segment &se
 			}
 		}
 		else{
-			if(result2.time<Math::ONE && Math::length(p1,result2.point)<epsilon){
+			// Use epsilon*2 here since our point is already an epsilon off the plane
+			if(result2.time<Math::ONE && Math::length(p1,result2.point)<epsilon*2){
 				result.set(result2);
 			}
-			else if(!(result.time<Math::ONE && Math::length(p2,result.point)<epsilon)){
+			else if(!(result.time<Math::ONE && Math::length(p2,result.point)<epsilon*2)){
 				result.reset();
 			}
 		}
