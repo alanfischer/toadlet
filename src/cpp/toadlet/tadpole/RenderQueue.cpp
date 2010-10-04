@@ -60,7 +60,7 @@ void RenderQueue::queueRenderable(Renderable *renderable){
 		Material *material=renderable->getRenderMaterial();
 		int numRenderables=layer->materialSortedRenderables.size();
 		int i;
-		for(i=0;i<layer->materialSortedRenderables.size();++i){
+		for(i=0;i<numRenderables;++i){
 			if(layer->materialSortedRenderables[i].material==material) break;
 		}
 		if(i<numRenderables){

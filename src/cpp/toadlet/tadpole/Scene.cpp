@@ -353,13 +353,12 @@ void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue 
 		}
 
 		preLayerRender(renderer,camera,layerNum);
-int swaps=0;
+
 		int numRenderables=layer->materialSortedRenderables.size();
 		for(j=0;j<numRenderables;++j){
 			Material *material=layer->materialSortedRenderables[j].material;
 			if(material!=NULL && mPreviousMaterial!=material){
 				material->setupRenderer(renderer,mPreviousMaterial);
-swaps++;
 			}
 			mPreviousMaterial=material;
 
@@ -367,6 +366,7 @@ swaps++;
 			for(k=0;k<numRenderables2;++k){
 				Renderable *renderable=layer->materialSortedRenderables[j].renderables[k];
 				renderer->setModelMatrix(renderable->getRenderTransform());
+				material->setupRenderer(renderer,mPreviousMaterial);
 				renderable->render(renderer);
 				mCountLastRendered++;
 			}
@@ -393,7 +393,6 @@ swaps++;
 		mPreviousMaterial=NULL;
 	}
 
-//Logger::alert(String("REALLOCS:")+Profile::getInstance()->collectionAllocations);
 //Profile::getInstance()->collectionAllocations=0;
 }
 
