@@ -23,6 +23,8 @@
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/terrain/TerrainPatchNode.h>
 
+#include <toadlet/egg/System.h>
+
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole;
@@ -139,8 +141,20 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
 	int numIndexes=Math::square(mSize)*6;
 
 	mVertexes.resize(numVertexes);
-	mVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,numVertexes);
-	mIndexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,numIndexes);
+	if(mVertexBuffer==NULL || mVertexBuffer->getSize()!=numVertexes){
+		if(mVertexBuffer!=NULL){
+			mVertexBuffer->destroy();
+		}
+		mVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,numVertexes);
+		mVertexData=VertexData::ptr(new VertexData(mVertexBuffer));
+	}
+	if(mIndexBuffer==NULL || mIndexBuffer->getSize()!=numIndexes){
+		if(mIndexBuffer!=NULL){
+			mIndexBuffer->destroy();
+		}
+		mIndexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,numIndexes);
+		mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,mIndexBuffer));
+	}
 
 	vba.lock(mVertexBuffer,Buffer::Access_BIT_WRITE);
 
@@ -186,9 +200,6 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
 
 	vba.unlock();
 
-	mVertexData=VertexData::ptr(new VertexData(mVertexBuffer));
-	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,mIndexBuffer));
-
 	// Build blocks
 	mNumBlocks=1<<(2*sizeN);
 	mNumBlocks=(int)((mNumBlocks-1)/3) + 1;
@@ -230,16 +241,18 @@ bool TerrainPatchNode::stitchToRight(TerrainPatchNode *terrain,bool restitchDepe
 	TerrainPatchNode *rt=terrain;
 	int y=0;
 
-	rt->mLeftDependent=this;
+	if(restitchDependents){
+		rt->mLeftDependent=this;
 
-	if(lt->getSize()!=rt->getSize()){
-		Error::unknown("lt->getSize()!=rt->getSize()");
-		return false;
+		if(lt->getSize()!=rt->getSize()){
+			Error::unknown("lt->getSize()!=rt->getSize()");
+			return false;
+		}
 	}
 
 	vba.lock(lt->mVertexBuffer,Buffer::Access_BIT_WRITE);
 
-	for(y=0;y<mSize+1;y++){
+	for(y=restitchDependents?0:mSize-1;y<mSize+1;y++){
 		Vertex *lv=lt->vertexAt(mSize,y),*rv=rt->vertexAt(0,y);
 		rv->dependent0=lv;
 		lv->dependent1=rv;
@@ -257,11 +270,12 @@ bool TerrainPatchNode::stitchToRight(TerrainPatchNode *terrain,bool restitchDepe
 
 	vba.unlock();
 
-	updateBlockBoundsRight(&mBlocks[0],0,0,0,mInitialStride);
-
-	// This fixes corner issues, allowing you to stitch in any order
-	if(restitchDependents && mTopDependent!=NULL){
-		mTopDependent->stitchToBottom(this,false);
+	if(restitchDependents){
+		updateBlockBoundsRight(&mBlocks[0],0,0,0,mInitialStride);
+		if(mTopDependent!=NULL){
+			// This fixes corner issues, allowing you to stitch in any order
+			mTopDependent->stitchToBottom(this,false);
+		}
 	}
 
 	return true;
@@ -284,15 +298,15 @@ void TerrainPatchNode::updateBlockBoundsRight(Block *block,int q,int x,int y,int
 		}
 	}
 	else{
-		block->mins.z=vertexAt(x,y)->height;
-		block->maxs.z=vertexAt(x,y)->height;
+		block->maxs.z=block->mins.z=vertexAt(x,y)->height;
 
 		for(i=x;i<=x+2;i++){
 			for(j=y;j<=y+2;j++){
-				if(vertexAt(i,j)->height<block->mins.z)
-					block->mins.z=vertexAt(i,j)->height;
-				if(vertexAt(i,j)->height>block->maxs.z)
-					block->maxs.z=vertexAt(i,j)->height;
+				Vertex *vertex=vertexAt(i,j);
+				if(vertex->height<block->mins.z)
+					block->mins.z=vertex->height;
+				if(vertex->height>block->maxs.z)
+					block->maxs.z=vertex->height;
 			}
 		}
 	}
@@ -326,16 +340,18 @@ bool TerrainPatchNode::stitchToBottom(TerrainPatchNode *terrain,bool restitchDep
 	TerrainPatchNode *bt=terrain;
 	int x;
 
-	bt->mTopDependent=this;
+	if(restitchDependents){
+		bt->mTopDependent=this;
 
-	if(tt->getSize()!=bt->getSize()){
-		Error::unknown("tt->getSize()!=bt->getSize()");
-		return false;
+		if(tt->getSize()!=bt->getSize()){
+			Error::unknown("tt->getSize()!=bt->getSize()");
+			return false;
+		}
 	}
 
 	vba.lock(tt->mVertexBuffer,Buffer::Access_BIT_WRITE);
 
-	for(x=0;x<mSize+1;x++){
+	for(x=restitchDependents?0:mSize-1;x<mSize+1;x++){
 		Vertex *bv=bt->vertexAt(x,0),*tv=tt->vertexAt(x,mSize);
 		bv->dependent1=tv;
 		tv->dependent0=bv;
@@ -353,11 +369,12 @@ bool TerrainPatchNode::stitchToBottom(TerrainPatchNode *terrain,bool restitchDep
 
 	vba.unlock();
 
-	updateBlockBoundsBottom(&mBlocks[0],0,0,0,mInitialStride);
-
-	// This fixes corner issues, allowing you to stitch in any order
-	if(restitchDependents && mLeftDependent){
-		mLeftDependent->stitchToRight(this,false);
+	if(restitchDependents){
+		updateBlockBoundsBottom(&mBlocks[0],0,0,0,mInitialStride);
+		if(mLeftDependent!=NULL){
+			// This fixes corner issues, allowing you to stitch in any order
+			mLeftDependent->stitchToRight(this,false);
+		}
 	}
 
 	return true;
@@ -380,15 +397,15 @@ void TerrainPatchNode::updateBlockBoundsBottom(Block *block,int q,int x,int y,in
 		}
 	}
 	else{
-		block->mins.z=vertexAt(x,y)->height;
-		block->maxs.z=vertexAt(x,y)->height;
+		block->maxs.z=block->mins.z=vertexAt(x,y)->height;
 
 		for(i=x;i<=x+2;i++){
 			for(j=y;j<=y+2;j++){
-				if(vertexAt(i,j)->height<block->mins.z)
-					block->mins.z=vertexAt(i,j)->height;
-				if(vertexAt(i,j)->height>block->maxs.z)
-					block->maxs.z=vertexAt(i,j)->height;
+				Vertex *vertex=vertexAt(i,j);
+				if(vertex->height<block->mins.z)
+					block->mins.z=vertex->height;
+				if(vertex->height>block->maxs.z)
+					block->maxs.z=vertex->height;
 			}
 		}
 	}
@@ -710,15 +727,15 @@ void TerrainPatchNode::initBlocks(Block *block,int q,int x,int y,int s,bool e){
 		}
 	}
 	else{
-		block->mins.z=vertexAt(x,y)->height;
-		block->maxs.z=vertexAt(x,y)->height;
+		block->maxs.z=block->mins.z=vertexAt(x,y)->height;
 
 		for(i=x;i<=x+2;i++){
 			for(j=y;j<=y+2;j++){
-				if(vertexAt(i,j)->height<block->mins.z)
-					block->mins.z=vertexAt(i,j)->height;
-				if(vertexAt(i,j)->height>block->maxs.z)
-					block->maxs.z=vertexAt(i,j)->height;
+				Vertex *vertex=vertexAt(i,j);
+				if(vertex->height<block->mins.z)
+					block->mins.z=vertex->height;
+				if(vertex->height>block->maxs.z)
+					block->maxs.z=vertex->height;
 			}
 		}
 	}
