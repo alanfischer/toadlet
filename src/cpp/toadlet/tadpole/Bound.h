@@ -105,8 +105,26 @@ public:
 		update();
 	}
 
+	bool testIntersection(const Vector3 &v) const{
+		if(type==Type_AABOX){
+			return Math::testInside(v,box);
+		}
+		else{
+			if(sphere.radius<0){
+				return true;
+			}
+			return Math::testInside(v,sphere);
+		}
+	}
+
 	bool testIntersection(const Bound &b) const{
-		return testIntersection(b.sphere);
+		if(type==Type_AABOX && b.type==Type_AABOX){
+			return testIntersection(b.box);
+		}
+		/// @todo: Add checks for AABox to Sphere, which take into account infinite.  Or just move Inifinite to its own proper type
+		else{
+			return testIntersection(b.sphere);
+		}
 	}
 
 	bool testIntersection(const AABox &a) const{
