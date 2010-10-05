@@ -318,7 +318,7 @@ void TerrainNode::updateLocalBound(){
 	int i;
 	for(i=0;i<mPatchGrid.size();++i){
 		if(i==0) mLocalBound.set(mPatchGrid[i]->getWorldBound());
-		else Bound::merge(mLocalBound,mPatchGrid[i]->getWorldBound());
+		else mLocalBound.merge(mPatchGrid[i]->getWorldBound());
 	}
 }
 

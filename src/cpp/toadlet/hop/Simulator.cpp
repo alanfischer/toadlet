@@ -734,7 +734,7 @@ void Simulator::traceSegment(Collision &result,const Segment &segment,int collid
 	Vector3 endPoint=cache_traceSegment_endPoint;
 	segment.getEndPoint(endPoint);
 	AABox total=cache_traceSegment_total.set(segment.origin,segment.origin);
-	total.mergeWith(endPoint);
+	total.merge(endPoint);
 	mNumSpacialCollection=findSolidsInAABox(total,mSpacialCollection.begin(),mSpacialCollection.size());
 
 	traceSegmentWithCurrentSpacials(result,segment,collideWithBits,ignore);
@@ -743,7 +743,7 @@ void Simulator::traceSegment(Collision &result,const Segment &segment,int collid
 void Simulator::traceSolid(Collision &result,Solid *solid,const Segment &segment,int collideWithBits){
 	Vector3 &end=segment.getEndPoint(cache_testSolid_origin);
 	AABox &box=cache_testSolid_box.set(segment.origin,segment.origin);
-	box.mergeWith(end);
+	box.merge(end);
 	Math::add(box.mins,solid->mLocalBound.mins);
 	Math::add(box.maxs,solid->mLocalBound.maxs);
 

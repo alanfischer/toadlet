@@ -105,6 +105,27 @@ public:
 		update();
 	}
 
+	void merge(const Bound &b){
+		if(type==Type_AABOX && b.type==Type_AABOX){
+			box.merge(b.box);
+		}
+		else{
+			// Just switch to a sphere
+			type=Type_SPHERE;
+			Vector3 origin=(sphere.origin+b.sphere.origin)/2;
+			scalar radius=Math::maxVal(Math::length(sphere.origin,origin)+Math::maxVal(sphere.radius,0),Math::length(b.sphere.origin,origin)+Math::maxVal(b.sphere.radius,0));
+			sphere.origin.set(origin);
+			if(sphere.radius>=0 && b.sphere.radius>=0){
+				sphere.radius=radius;
+			}
+			else{
+				sphere.radius=-Math::ONE;
+			}
+		}
+		update();
+	}
+
+
 	bool testIntersection(const Vector3 &v) const{
 		if(type==Type_AABOX){
 			return Math::testInside(v,box);
@@ -146,26 +167,6 @@ public:
 	Type getType() const{return type;}
 	const Sphere &getSphere() const{return sphere;}
 	const AABox &getAABox() const{return box;}
-
-	static void merge(Bound &r,const Bound &b){
-		if(r.type==Type_AABOX && b.type==Type_AABOX){
-			r.box.mergeWith(b.box);
-		}
-		else{
-			// Just switch to a sphere
-			r.type=Type_SPHERE;
-			Vector3 origin=(r.sphere.origin+b.sphere.origin)/2;
-			scalar radius=Math::maxVal(Math::length(r.sphere.origin,origin)+Math::maxVal(r.sphere.radius,0),Math::length(b.sphere.origin,origin)+Math::maxVal(b.sphere.radius,0));
-			r.sphere.origin.set(origin);
-			if(r.sphere.radius>=0 && b.sphere.radius>=0){
-				r.sphere.radius=radius;
-			}
-			else{
-				r.sphere.radius=-Math::ONE;
-			}
-		}
-		r.update();
-	}
 
 	static void transform(Bound &r,const Bound &b,const Vector3 &translate,const Quaternion &rotate,const Vector3 &scale){
 		r.type=b.type;

@@ -245,7 +245,7 @@ void Solid::updateLocalBound(){
 		for(i=1;i<mShapes.size();++i){
 			mShapeTypes|=mShapes[i]->getType();
 			mShapes[i]->getBound(box);
-			mLocalBound.mergeWith(box);
+			mLocalBound.merge(box);
 		}
 	}
 
