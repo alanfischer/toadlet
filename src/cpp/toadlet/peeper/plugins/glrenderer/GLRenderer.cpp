@@ -901,6 +901,7 @@ void GLRenderer::setFogParameters(const Fog &fog,scalar nearDistance,scalar farD
 	}
 	else{
 		glEnable(GL_FOG);
+		glFogi(GL_FOG_MODE,getGLFogType(fog));
 		#if defined(TOADLET_FIXED_POINT)
 			#if defined(TOADLET_HAS_GLES)
 				glFogx(GL_FOG_START,nearDistance);
@@ -1738,6 +1739,8 @@ GLenum GLRenderer::getGLDepthFunc(DepthTest depthTest){
 		case DepthTest_ALWAYS:
 			return GL_ALWAYS;
 		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"getGLDepthFunc: Invalid depth test");
 			return 0;
 	}
 }
@@ -1759,6 +1762,8 @@ GLenum GLRenderer::getGLAlphaFunc(AlphaTest alphaTest){
 		case AlphaTest_ALWAYS:
 			return GL_ALWAYS;
 		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"getGLAlphaFunc: Invalid alpha test");
 			return 0;
 	}
 }
@@ -1786,6 +1791,19 @@ GLenum GLRenderer::getGLBlendOperation(Blend::Operation blend){
 		case Blend::Operation_ONE_MINUS_SOURCE_ALPHA:
 			return GL_ONE_MINUS_SRC_ALPHA;
 		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"getGLBlendOperation: Invalid blend operation");
+			return 0;
+	}
+}
+
+GLint GLRenderer::getGLFogType(Fog type){
+	switch(type){
+		case Fog_LINEAR:
+			return GL_LINEAR;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"getGLFogType: Invalid fog type");
 			return 0;
 	}
 }

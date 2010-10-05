@@ -49,11 +49,12 @@ public:
 		State_LIGHTEFFECT=1<<1,
 		State_FACECULLING=1<<2,
 		State_FILL=		1<<3,
-		State_ALPHATEST=1<<4,
-		State_BLEND=	1<<5,
-		State_DEPTHSORT=1<<6,
-		State_DEPTHWRITE=1<<7,
-		State_DEPTHTEST=1<<8,
+		State_FOG=		1<<4,
+		State_ALPHATEST=1<<5,
+		State_BLEND=	1<<6,
+		State_DEPTHSORT=1<<7,
+		State_DEPTHWRITE=1<<8,
+		State_DEPTHTEST=1<<9,
 	};
 	
 	Material();
@@ -85,6 +86,13 @@ public:
 		mFill=fill;
 	}
 	inline const peeper::Renderer::Fill &getFill() const{return mFill;}
+
+	void setFogParameters(const peeper::Renderer::Fog &fog,scalar nearDistance,scalar farDistance,const peeper::Color &color){
+		mStates|=State_FOG;
+		mFog=fog;
+		mFogNearDistance=nearDistance;mFogFarDistance=farDistance;
+		mFogColor.set(color);
+	}
 
 	void setAlphaTest(peeper::Renderer::AlphaTest alphaTest,scalar cutoff){
 		mStates|=State_ALPHATEST;
@@ -128,6 +136,8 @@ public:
 	void setSaveLocally(bool local){mSaveLocally=local;}
 	bool getSaveLocally() const{return mSaveLocally;}
 
+	int getStates(){return mStates;}
+
 	void setupRenderer(peeper::Renderer *renderer,Material *previousMaterial=NULL);
 	
 protected:
@@ -136,6 +146,9 @@ protected:
 	bool mLighting;
 	peeper::Renderer::FaceCulling mFaceCulling;
 	peeper::Renderer::Fill mFill;
+	peeper::Renderer::Fog mFog;
+	scalar mFogNearDistance,mFogFarDistance;
+	peeper::Color mFogColor;
 	peeper::Renderer::AlphaTest mAlphaTest;
 	scalar mAlphaTestCutoff;
 	peeper::Blend mBlend;
