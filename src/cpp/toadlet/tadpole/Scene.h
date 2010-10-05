@@ -88,7 +88,7 @@ public:
 	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits=-1,node::Node *ignore=NULL){result.time=Math::ONE;}
 
 	virtual void setAmbientColor(peeper::Color ambientColor){mAmbientColor.set(ambientColor);}
-	virtual const peeper::Color &getAmbientColor() const{return mAmbientColor;}
+	virtual void setFogParameters(const peeper::Renderer::Fog &fog,scalar nearDistance,scalar farDistance,const peeper::Color &color){mFog=fog;mFogNearDistance=nearDistance;mFogFarDistance=farDistance;mFogColor.set(color);}
 
 	virtual egg::image::Image::ptr renderToImage(peeper::Renderer *renderer,node::CameraNode *camera,int format,int width,int height);
 
@@ -119,12 +119,17 @@ protected:
 	Engine *mEngine;
 	node::PartitionNode::ptr mBackground;
 	node::PartitionNode::ptr mRoot;
+
 	peeper::Color mAmbientColor;
-	mesh::Mesh::ptr mBoundMesh;
+	peeper::Renderer::Fog mFog;
+	scalar mFogNearDistance,mFogFarDistance;
+	peeper::Color mFogColor;
 
 	RenderQueue::ptr mRenderQueue;
 	Material *mPreviousMaterial;
 	int mCountLastRendered;
+
+	mesh::Mesh::ptr mBoundMesh;
 
 	peeper::Viewport cache_render_viewport;
 };
