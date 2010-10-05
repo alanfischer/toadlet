@@ -141,6 +141,7 @@ public:
 	static GLenum getGLDepthFunc(DepthTest alphaTest);
 	static GLenum getGLAlphaFunc(AlphaTest alphaTest);
 	static GLenum getGLBlendOperation(Blend::Operation blend);
+	static GLint getGLFogType(Fog type);
 	static GLint getGLElementCount(int format);
 	static GLenum getGLDataType(int format);
 	static GLuint getGLFormat(int textureFormat);

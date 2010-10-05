@@ -155,11 +155,11 @@ void Scene::setLogicTimeAndFrame(int time,int frame){
 }
 
 void Scene::update(int dt){
-	if(mExcessiveDT>0 && dt>mExcessiveDT){
-		Logger::alert(Categories::TOADLET_TADPOLE,
-			String("skipping excessive dt:")+dt);
-		return;
-	}
+//	if(mExcessiveDT>0 && dt>mExcessiveDT){
+//		Logger::alert(Categories::TOADLET_TADPOLE,
+//			String("skipping excessive dt:")+dt);
+//		return;
+//	}
 
 	mAccumulatedDT+=dt;
 
@@ -376,6 +376,11 @@ void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue 
 				renderable->render(renderer);
 				mCountLastRendered++;
 			}
+
+			/// @todo: Replace this specific state setting with a more generic Scene Default Material, that will be reset its specific states
+			if((material->getStates()&Material::State_FOG)>0){
+				renderer->setFogParameters(mFog,mFogNearDistance,mFogFarDistance,mFogColor);
+			}
 		}
 		layer->materialSortedRenderables.clear();
 		numRenderables=layer->depthSortedRenderables.size();
@@ -389,6 +394,10 @@ void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue 
 			renderer->setModelMatrix(renderable->getRenderTransform());
 			renderable->render(renderer);
 			mCountLastRendered++;
+
+			if((material->getStates()&Material::State_FOG)>0){
+				renderer->setFogParameters(mFog,mFogNearDistance,mFogFarDistance,mFogColor);
+			}
 		}
 		layer->depthSortedRenderables.clear();
 
