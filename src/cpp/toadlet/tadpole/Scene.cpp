@@ -52,11 +52,15 @@ Scene::Scene(Engine *engine):
 	//mBackground,
 	//mRoot,
 	//mAmbientColor,
-	//mBoundMesh,
+	mFog(Renderer::Fog_NONE),
+	mFogNearDistance(0),mFogFarDistance(0),
+	//mFogColor,
 
 	//mRenderQueue,
 	mPreviousMaterial(NULL),
 	mCountLastRendered(0)
+
+	//mBoundMesh
 {
 	mEngine=engine;
 
@@ -323,7 +327,9 @@ void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue 
 	renderer->setProjectionMatrix(camera->getProjectionTransform());
 	renderer->setViewMatrix(camera->getViewTransform());
 	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
+
 	renderer->setAmbientColor(mAmbientColor);
+	renderer->setFogParameters(mFog,mFogNearDistance,mFogFarDistance,mFogColor);
 
 	if(queue->getLight()!=NULL){
 		renderer->setLight(0,queue->getLight()->internal_getLight());
