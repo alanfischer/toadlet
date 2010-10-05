@@ -181,7 +181,7 @@ public:
 		return TOADLET_MUL_XX(plane.normal.x,x) + TOADLET_MUL_XX(plane.normal.y,y) + TOADLET_MUL_XX(plane.normal.z,z) + plane.distance;
 	}
 
-	inline void mergeWith(const AABox &box){
+	inline void merge(const AABox &box){
 		if(box.mins.x<mins.x)mins.x=box.mins.x;
 		if(box.mins.y<mins.y)mins.y=box.mins.y;
 		if(box.mins.z<mins.z)mins.z=box.mins.z;
@@ -190,7 +190,7 @@ public:
 		if(box.maxs.z>maxs.z)maxs.z=box.maxs.z;
 	}
 
-	inline void mergeWith(const Vector3 &vec){
+	inline void merge(const Vector3 &vec){
 		if(vec.x<mins.x)mins.x=vec.x;
 		if(vec.y<mins.y)mins.y=vec.y;
 		if(vec.z<mins.z)mins.z=vec.z;
