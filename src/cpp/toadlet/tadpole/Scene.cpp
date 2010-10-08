@@ -372,13 +372,12 @@ void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue 
 			for(k=0;k<numRenderables2;++k){
 				Renderable *renderable=layer->materialSortedRenderables[j].renderables[k];
 				renderer->setModelMatrix(renderable->getRenderTransform());
-				material->setupRenderer(renderer,mPreviousMaterial);
 				renderable->render(renderer);
 				mCountLastRendered++;
 			}
 
 			/// @todo: Replace this specific state setting with a more generic Scene Default Material, that will be reset its specific states
-			if((material->getStates()&Material::State_FOG)>0){
+			if(material!=NULL && (material->getStates()&Material::State_FOG)>0){
 				renderer->setFogParameters(mFog,mFogNearDistance,mFogFarDistance,mFogColor);
 			}
 		}
@@ -395,7 +394,7 @@ void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue 
 			renderable->render(renderer);
 			mCountLastRendered++;
 
-			if((material->getStates()&Material::State_FOG)>0){
+			if(material!=NULL && (material->getStates()&Material::State_FOG)>0){
 				renderer->setFogParameters(mFog,mFogNearDistance,mFogFarDistance,mFogColor);
 			}
 		}

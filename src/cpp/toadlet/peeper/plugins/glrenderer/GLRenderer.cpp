@@ -901,7 +901,7 @@ void GLRenderer::setFogParameters(const Fog &fog,scalar nearDistance,scalar farD
 	}
 	else{
 		glEnable(GL_FOG);
-		glFogi(GL_FOG_MODE,getGLFogType(fog));
+		glFogf(GL_FOG_MODE,getGLFogType(fog));
 		#if defined(TOADLET_FIXED_POINT)
 			#if defined(TOADLET_HAS_GLES)
 				glFogx(GL_FOG_START,nearDistance);

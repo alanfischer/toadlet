@@ -88,7 +88,7 @@ Node *TerrainPatchNode::create(Scene *scene){
 	mTopDependent=NULL;
 
 	mMinTolerance=0;
-	mMaxTolerance=0.00001;
+	mMaxTolerance=0.001;
 	mTolerance=0;
 	mS1=Math::HALF;mS2=Math::ONE;
 
