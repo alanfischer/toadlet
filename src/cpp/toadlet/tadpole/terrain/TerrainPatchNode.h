@@ -83,8 +83,9 @@ public:
 	node::Node *create(Scene *scene);
 	void destroy();
 
-	bool setData(scalar *data,int rowPitch,int width,int height);
+	bool setData(scalar *data,int rowPitch,int width,int height,bool water);
 	bool setMaterial(Material::ptr material);
+	bool setWaterMaterial(Material::ptr material);
 
 	int getSize() const{return mSize;}
 	inline Vertex *vertexAt(int x,int y){return &mVertexes[y*(mSize+1)+x];}
@@ -106,6 +107,7 @@ public:
 	void updateBlocks(node::CameraNode *camera);
 	void updateVertexes();
 	void updateIndexBuffers(node::CameraNode *camera);
+	void updateWaterIndexBuffers(node::CameraNode *camera);
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Matrix4x4 &getRenderTransform() const{return super::getWorldTransform();}
 	void render(peeper::Renderer *renderer) const;
@@ -119,6 +121,21 @@ public:
 
 protected:
 	TOADLET_GIB_DEFINE(TerrainPatchNode);
+
+	/// @todo: Could be replaced by a MeshNode for the Water & the Terrain
+	class WaterRenderable:public Renderable{
+	public:
+		TOADLET_SHARED_POINTERS(WaterRenderable);
+
+		WaterRenderable(TerrainPatchNode *terrain){mTerrain=terrain;}
+
+		Material *getRenderMaterial() const{return mTerrain->mWaterMaterial;}
+		const Matrix4x4 &getRenderTransform() const{return mTerrain->getWorldTransform();}
+		void render(peeper::Renderer *renderer) const{renderer->renderPrimitive(mTerrain->mWaterVertexData,mTerrain->mWaterIndexData);}
+
+	protected:
+		TerrainPatchNode *mTerrain;
+	};
 
 	/*
 		Block vertexes ordered as follows:
@@ -151,8 +168,8 @@ protected:
 	void simplifyBlocks(const Vector3 &cameraTranslate);
 	bool blockShouldSubdivide(Block *block,const Vector3 &cameraTranslate);
 	void computeDelta(Block *block,const Vector3 &cameraTranslate,float tolerance);
-	bool blockIntersectsCamera(const Block *block,node::CameraNode *camera) const;
-	int gatherBlocks(peeper::IndexBuffer *indexBuffer,node::CameraNode *camera) const;
+	bool blockIntersectsCamera(const Block *block,node::CameraNode *camera,bool water) const;
+	int gatherBlocks(peeper::IndexBuffer *indexBuffer,node::CameraNode *camera,bool water) const;
 	int gatherTriangle(peeper::IndexBufferAccessor &iba,int indexCount,int x0,int y0,int x1,int y1,int x2,int y2) const;
 
 	// BlockQueue methods
@@ -207,13 +224,21 @@ protected:
 	float mMinTolerance;
 	float mMaxTolerance;
 	float mTolerance;
+	float mS1,mS2;
 
 	Material::ptr mMaterial;
 	peeper::VertexBuffer::ptr mVertexBuffer;
 	peeper::IndexBuffer::ptr mIndexBuffer;
 	peeper::VertexData::ptr mVertexData;
 	peeper::IndexData::ptr mIndexData;
-	float mS1,mS2;
+
+	Material::ptr mWaterMaterial;
+	peeper::VertexBuffer::ptr mWaterVertexBuffer;
+	peeper::IndexBuffer::ptr mWaterIndexBuffer;
+	peeper::VertexData::ptr mWaterVertexData;
+	peeper::IndexData::ptr mWaterIndexData;
+	WaterRenderable::ptr mWaterRenderable;
+	friend class WaterRenderable;
 };
 
 }
