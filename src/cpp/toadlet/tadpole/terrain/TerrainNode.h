@@ -52,11 +52,17 @@ public:
 	void setTarget(node::Node *target);
 	node::Node *getTarget(){return mTarget;}
 
+	void setUpdateTargetBias(scalar bias){mUpdateTargetBias=bias;}
+	scalar getUpdateTargetBias(){return mUpdateTargetBias;}
+
 	void setDataSource(TerrainNodeDataSource *dataSource);
 	TerrainNodeDataSource *getDataSource(){return mDataSource;}
 
 	void setMaterial(Material::ptr material);
 	Material::ptr getMaterial() const{return mPatchMaterial;}
+
+	void setWaterMaterial(Material::ptr material);
+	Material::ptr getWaterMaterial() const{return mPatchWaterMaterial;}
 
 	int localPatchIndex(int x,int y){return (y+mHalfSize)*mSize+(x+mHalfSize);}
 	TerrainPatchNode::ptr patchAt(int x,int y){
@@ -68,6 +74,9 @@ public:
 		int index=localPatchIndex(x-mTerrainX,y-mTerrainY);
 		if(index>=0 && index<mPatchGrid.size()) mPatchGrid[index]=patch;
 	}
+
+	int getTerrainX(){return mTerrainX;}
+	int getTerrainY(){return mTerrainY;}
 
 	int fromWorldXi(scalar x){x=Math::div(x,mPatchSize*mPatchScale.x);return Math::toInt(x>=0?x+Math::HALF:x-Math::HALF);}
 	int fromWorldYi(scalar y){y=Math::div(y,mPatchSize*mPatchScale.y);return Math::toInt(y>=0?y+Math::HALF:y-Math::HALF);}
@@ -112,8 +121,10 @@ protected:
 	egg::Collection<TerrainPatchNode::ptr> mPatchGrid;
 	int mPatchSize;
 	Material::ptr mPatchMaterial;
+	Material::ptr mPatchWaterMaterial;
 	Vector3 mPatchScale;
 	egg::Collection<scalar> mPatchData;
+	scalar mUpdateTargetBias;
 };
 
 }

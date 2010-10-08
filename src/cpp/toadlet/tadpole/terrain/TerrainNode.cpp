@@ -50,10 +50,11 @@ TerrainNode::TerrainNode():super(),
 	mTerrainX(0),mTerrainY(0),
 	//mUnactivePatches,
 	//mPatchGrid,
-	mPatchSize(0)
+	mPatchSize(0),
 	//mPatchMaterial,
 	//mPatchScale,
-	//mPatchData
+	//mPatchData,
+	mUpdateTargetBias(0)
 {}
 
 TerrainNode::~TerrainNode(){}
@@ -64,6 +65,7 @@ Node *TerrainNode::create(Scene *scene){
 	mSize=3;
 	mHalfSize=mSize/2;
 	mPatchGrid.resize(mSize*mSize);
+	mUpdateTargetBias=Math::fromMilli(150);
 
 	int i,j;
 	for(j=0;j<mSize;++j){
@@ -140,6 +142,27 @@ void TerrainNode::setMaterial(Material::ptr material){
 	}
 }
 
+void TerrainNode::setWaterMaterial(Material::ptr material){
+	if(mPatchWaterMaterial!=material){
+		if(mPatchWaterMaterial!=NULL){
+			mPatchWaterMaterial->release();
+		}
+
+		mPatchWaterMaterial=material;
+
+		if(mPatchWaterMaterial!=NULL){
+			mPatchWaterMaterial->retain();
+		}
+	}
+
+	int i;
+	for(i=0;i<mPatchGrid.size();++i){
+		if(mPatchGrid[i]!=NULL){
+			mPatchGrid[i]->setWaterMaterial(mPatchWaterMaterial);
+		}
+	}
+}
+
 void TerrainNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	int i;
 	for(i=0;i<mPatchGrid.size();++i){
@@ -183,7 +206,7 @@ void TerrainNode::updateTarget(){
 		scalar centerY=fromWorldYf(toWorldYi(mTerrainY));
 		scalar currentX=fromWorldXf(translate.x);
 		scalar currentY=fromWorldYf(translate.y);
-		scalar bias=0.15;
+		scalar bias=mUpdateTargetBias;
 
 		/// @todo: Instead of just shifting 1 tile, we should check so we can shift any amount of tiles.
 		///  This would let us follow the player when teleporting cleanly.
@@ -262,9 +285,10 @@ void TerrainNode::createPatch(int x,int y){
 	patch->setScale(mPatchScale);
 	patch->setTranslate(toWorldXi(x)-mPatchSize*mPatchScale.x/2,toWorldYi(y)-mPatchSize*mPatchScale.y/2,0);
 	patch->setMaterial(mPatchMaterial);
+	patch->setWaterMaterial(mPatchWaterMaterial);
 
 	mDataSource->getPatchData(&mPatchData[0],x,y);
-	patch->setData(&mPatchData[0],mPatchSize,mPatchSize,mPatchSize);
+	patch->setData(&mPatchData[0],mPatchSize,mPatchSize,mPatchSize,true);
 
 	attach(patch);
 

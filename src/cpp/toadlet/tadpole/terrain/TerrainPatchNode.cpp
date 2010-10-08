@@ -59,7 +59,6 @@ TerrainPatchNode::TerrainPatchNode():Node(),
 	mMinTolerance(0),
 	mMaxTolerance(0),
 	mTolerance(0),
-
 	mS1(0),mS2(0)
 {
 }
@@ -91,7 +90,6 @@ Node *TerrainPatchNode::create(Scene *scene){
 	mMinTolerance=0;
 	mMaxTolerance=0.00001;
 	mTolerance=0;
-
 	mS1=Math::HALF;mS2=Math::ONE;
 
 	return this;
@@ -119,10 +117,31 @@ void TerrainPatchNode::destroy(){
 		mIndexData=NULL;
 	}
 
+	if(mWaterMaterial!=NULL){
+		mWaterMaterial->release();
+		mWaterMaterial=NULL;
+	} 
+	if(mWaterVertexBuffer!=NULL){
+		mWaterVertexBuffer->destroy();
+		mWaterVertexBuffer=NULL;
+	}
+	if(mWaterIndexBuffer!=NULL){
+		mWaterIndexBuffer->destroy();
+		mWaterIndexBuffer=NULL;
+	}
+	if(mWaterVertexData!=NULL){
+		mWaterVertexData->destroy();
+		mWaterVertexData=NULL;
+	}
+	if(mWaterIndexData!=NULL){
+		mWaterIndexData->destroy();
+		mWaterIndexData=NULL;
+	}
+
 	super::destroy();
 }
 
-bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
+bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height,bool water){
 	int sizeN=0;
 	for(sizeN=0;(1<<(sizeN+1))<=width;sizeN++);
 
@@ -141,6 +160,8 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
 	int numIndexes=Math::square(mSize)*6;
 
 	mVertexes.resize(numVertexes);
+
+	// Terrain buffers
 	if(mVertexBuffer==NULL || mVertexBuffer->getSize()!=numVertexes){
 		if(mVertexBuffer!=NULL){
 			mVertexBuffer->destroy();
@@ -157,47 +178,47 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
 	}
 
 	vba.lock(mVertexBuffer,Buffer::Access_BIT_WRITE);
+	{
+		int i,j;
+		// Iterate backwards so verts needed for normals are set
+		for(j=mSize-1;j>=0;--j){
+			for(i=mSize-1;i>=0;--i){
+				int index=indexOf(i,j);
+				Vertex *vertex=vertexAt(i,j);
 
-	int i,j;
-	// Iterate backwards so verts needed for normals are set
-	for(j=mSize-1;j>=0;--j){
-		for(i=mSize-1;i>=0;--i){
-			int index=indexOf(i,j);
-			Vertex *vertex=vertexAt(i,j);
+				vertex->index=index;
+				vertex->height=data[j*rowPitch+i];
+				vertex->normal.set(vertex->height-vertexAt(i+1,j)->height,vertex->height-vertexAt(i,j+1)->height,Math::ONE);
+				Math::normalize(vertex->normal);
 
-			vertex->index=index;
-			vertex->height=data[j*rowPitch+i];
-			vertex->normal.set(vertex->height-vertexAt(i+1,j)->height,vertex->height-vertexAt(i,j+1)->height,Math::ONE);
-			Math::normalize(vertex->normal);
+				vba.set3(index,0,i,j,vertex->height);
+				vba.set3(index,1,vertex->normal);
+				vba.set2(index,2,Math::div(Math::fromInt(i)+Math::HALF,mSize),Math::div(Math::fromInt(j)+Math::HALF,mSize));
+			}
+		}
 
-			vba.set3(index,0,i,j,vertex->height);
-			vba.set3(index,1,vertex->normal);
-			vba.set2(index,2,Math::div(Math::fromInt(i)+Math::HALF,mSize),Math::div(Math::fromInt(j)+Math::HALF,mSize));
+		j=mSize;
+		for(i=0;i<mSize+1;i++){
+			int si=indexOf(i,j);
+
+			vertexAt(i,j)->height=vertexAt(i,j-1)->height;
+
+			vba.set3(si,0,i,j,vertexAt(i,j)->height);
+			vba.set3(si,1,0,0,Math::ONE);
+			vba.set2(si,2,Math::div(Math::fromInt(i)+Math::HALF,mSize),Math::div(Math::fromInt(j)+Math::HALF,mSize));
+		}
+
+		i=mSize;
+		for(j=0;j<mSize+1;j++){
+			int si=indexOf(i,j);
+
+			vertexAt(i,j)->height=vertexAt(i-1,j)->height;
+
+			vba.set3(si,0,i,j,vertexAt(i,j)->height);
+			vba.set3(si,1,0,0,Math::ONE);
+			vba.set2(si,2,Math::div(Math::fromInt(i)+Math::HALF,mSize),Math::div(Math::fromInt(j)+Math::HALF,mSize));
 		}
 	}
-
-	j=mSize;
-	for(i=0;i<mSize+1;i++){
-		int si=indexOf(i,j);
-
-		vertexAt(i,j)->height=vertexAt(i,j-1)->height;
-
-		vba.set3(si,0,i,j,vertexAt(i,j)->height);
-		vba.set3(si,1,0,0,Math::ONE);
-		vba.set2(si,2,Math::div(Math::fromInt(i)+Math::HALF,mSize),Math::div(Math::fromInt(j)+Math::HALF,mSize));
-	}
-
-	i=mSize;
-	for(j=0;j<mSize+1;j++){
-		int si=indexOf(i,j);
-
-		vertexAt(i,j)->height=vertexAt(i-1,j)->height;
-
-		vba.set3(si,0,i,j,vertexAt(i,j)->height);
-		vba.set3(si,1,0,0,Math::ONE);
-		vba.set2(si,2,Math::div(Math::fromInt(i)+Math::HALF,mSize),Math::div(Math::fromInt(j)+Math::HALF,mSize));
-	}
-
 	vba.unlock();
 
 	// Build blocks
@@ -219,6 +240,41 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height){
 
 	mLocalBound.set(mBlocks[0].mins,mBlocks[0].maxs);
 
+	// Water buffers
+	if(water){
+		if(mWaterVertexBuffer==NULL || mWaterVertexBuffer->getSize()!=numVertexes){
+			if(mWaterVertexBuffer!=NULL){
+				mWaterVertexBuffer->destroy();
+			}
+			mWaterVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,numVertexes);
+			mWaterVertexData=VertexData::ptr(new VertexData(mWaterVertexBuffer));
+		}
+		if(mWaterIndexBuffer==NULL || mWaterIndexBuffer->getSize()!=numIndexes){
+			if(mWaterIndexBuffer!=NULL){
+				mWaterIndexBuffer->destroy();
+			}
+			mWaterIndexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,numIndexes);
+			mWaterIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,mWaterIndexBuffer));
+		}
+
+		vba.lock(mWaterVertexBuffer,Buffer::Access_BIT_WRITE);
+		{
+			int i,j;
+			// Iterate backwards so verts needed for normals are set
+			for(j=mSize;j>=0;--j){
+				for(i=mSize;i>=0;--i){
+					int index=indexOf(i,j);
+					vba.set3(index,0,i,j,0);
+					vba.set3(index,1,Math::Z_UNIT_VECTOR3);
+					vba.set2(index,2,Math::div(Math::fromInt(i)+Math::HALF,mSize),Math::div(Math::fromInt(j)+Math::HALF,mSize));
+				}
+			}
+		}
+		vba.unlock();
+
+		mWaterRenderable=WaterRenderable::ptr(new WaterRenderable(this));
+	}
+
 	return true;
 }
 
@@ -231,6 +287,20 @@ bool TerrainPatchNode::setMaterial(Material::ptr material){
 
 	if(mMaterial!=NULL){
 		mMaterial->retain();
+	}
+
+	return true;
+}
+
+bool TerrainPatchNode::setWaterMaterial(Material::ptr material){
+	if(mWaterMaterial!=NULL){
+		mWaterMaterial->release();
+	}
+
+	mWaterMaterial=material;
+
+	if(mWaterMaterial!=NULL){
+		mWaterMaterial->retain();
 	}
 
 	return true;
@@ -446,6 +516,12 @@ void TerrainPatchNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 #else
 	queue->queueRenderable(this);
 #endif
+
+	if(mWaterRenderable!=NULL){
+		updateWaterIndexBuffers(camera);
+
+		queue->queueRenderable(mWaterRenderable);
+	}
 }
 
 void TerrainPatchNode::updateBlocks(CameraNode *camera){
@@ -465,8 +541,13 @@ void TerrainPatchNode::updateBlocks(CameraNode *camera){
 }
 
 void TerrainPatchNode::updateIndexBuffers(CameraNode *camera){
-	int indexCount=gatherBlocks(mIndexBuffer,camera);
+	int indexCount=gatherBlocks(mIndexBuffer,camera,false);
 	mIndexData->setCount(indexCount);
+}
+
+void TerrainPatchNode::updateWaterIndexBuffers(CameraNode *camera){
+	int indexCount=gatherBlocks(mWaterIndexBuffer,camera,true);
+	mWaterIndexData->setCount(indexCount);
 }
 
 void TerrainPatchNode::render(Renderer *renderer) const{
@@ -1012,18 +1093,24 @@ void TerrainPatchNode::updateVertexes(){
 	mLastVertexesUpdateFrame=mScene->getFrame();
 }
 
-bool TerrainPatchNode::blockIntersectsCamera(const Block *block,CameraNode *camera) const{
-	AABox box;
+bool TerrainPatchNode::blockIntersectsCamera(const Block *block,CameraNode *camera,bool water) const{
+	AABox box(block->mins,block->maxs);
 
-	transform(box.mins,block->mins,mWorldTranslate,mWorldScale,mWorldRotate);
-	transform(box.maxs,block->maxs,mWorldTranslate,mWorldScale,mWorldRotate);
+	if(water){
+		box.mins.z=0;
+		box.maxs.z=0;
+	}
+
+	transform(box.mins,mWorldTranslate,mWorldScale,mWorldRotate);
+	transform(box.maxs,mWorldTranslate,mWorldScale,mWorldRotate);
 
 	return camera->culled(box)==false;
 }
 
-int TerrainPatchNode::gatherBlocks(IndexBuffer *indexBuffer,CameraNode *camera) const{
+int TerrainPatchNode::gatherBlocks(IndexBuffer *indexBuffer,CameraNode *camera,bool water) const{
 	int indexCount=0;
 	const Block *block=NULL;
+	scalar waterLevel=0; /// @todo: Make this a class variable, and have it come from the TerrainNodeDataSource
 
 	IndexBufferAccessor iba(indexBuffer,Buffer::Access_BIT_WRITE);
 
@@ -1031,7 +1118,10 @@ int TerrainPatchNode::gatherBlocks(IndexBuffer *indexBuffer,CameraNode *camera) 
 	for(i=0;i<mNumBlocksInQueue;i++){
 		block=getBlockNumber(i);
 
-		if(blockIntersectsCamera(block,camera)){
+		if(blockIntersectsCamera(block,camera,water) &&
+			(camera->getWorldTranslate().z>waterLevel && ((water==false && block->maxs.z>waterLevel) || (water==true && block->mins.z<=waterLevel)) ||
+			(camera->getWorldTranslate().z<waterLevel && block->mins.z<=waterLevel))
+		){
 			int x0=block->xOrigin;
 			int y0=block->yOrigin;
 			int x1=block->xOrigin+block->stride*2;
