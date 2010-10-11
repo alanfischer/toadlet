@@ -88,7 +88,7 @@ Node *TerrainPatchNode::create(Scene *scene){
 	mTopDependent=NULL;
 
 	mMinTolerance=0;
-	mMaxTolerance=0.0001;
+	mMaxTolerance=0.00001;
 	mTolerance=0;
 	mS1=Math::HALF;mS2=Math::ONE;
 
@@ -971,7 +971,12 @@ bool TerrainPatchNode::blockShouldSubdivide(Block *block,const Vector3 &cameraTr
 	}
 }
 #else
+/// @todo: Work blockIntersectsCamera in here, but that would require a local space camera transform.  Maybe a transform object with some CameraNode modifications to pass in a transform would work?
 bool TerrainPatchNode::blockShouldSubdivide(Block *block,const Vector3 &cameraTranslate){
+	if(blockVisibleByWater(block,cameraTranslate,false)==false){
+		return false;
+	}
+
 	computeDelta(block,cameraTranslate,mTolerance);
 
 	if(block->deltaMax>block->delta0){
@@ -1111,10 +1116,16 @@ bool TerrainPatchNode::blockIntersectsCamera(const Block *block,CameraNode *came
 	return camera->culled(box)==false;
 }
 
+bool TerrainPatchNode::blockVisibleByWater(const Block *block,const Vector3 &cameraTranslate,bool water) const{
+	scalar waterLevel=0; /// @todo: Make this a class variable, and have it come from the TerrainNodeDataSource
+	return
+		(cameraTranslate.z>waterLevel && ((water==false && block->maxs.z>waterLevel) || (water==true && block->mins.z<=waterLevel)) ||
+		(cameraTranslate.z<waterLevel && block->mins.z<=waterLevel));
+}
+
 int TerrainPatchNode::gatherBlocks(IndexBuffer *indexBuffer,CameraNode *camera,bool water) const{
 	int indexCount=0;
 	const Block *block=NULL;
-	scalar waterLevel=0; /// @todo: Make this a class variable, and have it come from the TerrainNodeDataSource
 
 	IndexBufferAccessor iba(indexBuffer,Buffer::Access_BIT_WRITE);
 
@@ -1122,10 +1133,7 @@ int TerrainPatchNode::gatherBlocks(IndexBuffer *indexBuffer,CameraNode *camera,b
 	for(i=0;i<mNumBlocksInQueue;i++){
 		block=getBlockNumber(i);
 
-		if(blockIntersectsCamera(block,camera,water) &&
-			(camera->getWorldTranslate().z>waterLevel && ((water==false && block->maxs.z>waterLevel) || (water==true && block->mins.z<=waterLevel)) ||
-			(camera->getWorldTranslate().z<waterLevel && block->mins.z<=waterLevel))
-		){
+		if(blockIntersectsCamera(block,camera,water) && blockVisibleByWater(block,camera->getWorldTranslate(),water)){
 			int x0=block->xOrigin;
 			int y0=block->yOrigin;
 			int x1=block->xOrigin+block->stride*2;
