@@ -1276,6 +1276,7 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 		bool specifyAlpha=(blend.alphaOperation!=TextureBlend::Operation_UNSPECIFIED);
 		bool specifyColorSource=!(blend.colorSource1==TextureBlend::Source_UNSPECIFIED && blend.colorSource2==TextureBlend::Source_UNSPECIFIED);
 		bool specifyAlphaSource=!(blend.alphaSource1==TextureBlend::Source_UNSPECIFIED && blend.alphaSource2==TextureBlend::Source_UNSPECIFIED);
+
 		if(!specifyColorSource && !specifyAlphaSource){
 			if(specifyColor==false){
 				glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
@@ -1297,6 +1298,13 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 					glTexEnvi(GL_TEXTURE_ENV,GL_COMBINE_ALPHA,getGLTextureBlendOperation(blend.alphaOperation));
 				}
 			}
+
+			#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
+				glTexEnvxv(GL_TEXTURE_ENV,GL_TEXTURE_ENV_COLOR,textureState->constantColor.getData());
+			#else
+				glTexEnvfv(GL_TEXTURE_ENV,GL_TEXTURE_ENV_COLOR,colorArray(cacheArray,textureStage->constantColor));
+			#endif
+
 			if(specifyColor){
 				if(blend.colorSource1!=TextureBlend::Source_UNSPECIFIED){
 					glTexEnvi(GL_TEXTURE_ENV,GL_SRC0_RGB,getGLTextureBlendSource(blend.colorSource1));
@@ -2026,6 +2034,8 @@ GLuint GLRenderer::getGLTextureBlendSource(TextureBlend::Source source){
 			return GL_TEXTURE;
 		case TextureBlend::Source_PRIMARY_COLOR:
 			return GL_PRIMARY_COLOR;
+		case TextureBlend::Source_CONSTANT_COLOR:
+			return GL_CONSTANT;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"getGLTextureBlendSource: Invalid source");

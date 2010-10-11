@@ -49,6 +49,7 @@ public:
 		Source_PREVIOUS,
 		Source_TEXTURE,
 		Source_PRIMARY_COLOR,
+		Source_CONSTANT_COLOR,
 	};
 
 	TextureBlend(Operation colorOp=Operation_UNSPECIFIED,Source colorSrc1=Source_UNSPECIFIED,Source colorSrc2=Source_UNSPECIFIED,Source colorSrc3=Source_UNSPECIFIED,Operation alphaOp=Operation_UNSPECIFIED,Source alphaSrc1=Source_UNSPECIFIED,Source alphaSrc2=Source_UNSPECIFIED,Source alphaSrc3=Source_UNSPECIFIED){
