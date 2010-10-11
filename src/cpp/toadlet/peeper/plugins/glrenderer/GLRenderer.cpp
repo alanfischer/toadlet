@@ -1295,7 +1295,12 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 					glTexEnvi(GL_TEXTURE_ENV,GL_COMBINE_RGB,getGLTextureBlendOperation(blend.colorOperation));
 				}
 				if(specifyAlpha){
-					glTexEnvi(GL_TEXTURE_ENV,GL_COMBINE_ALPHA,getGLTextureBlendOperation(blend.alphaOperation));
+					if(blend.alphaOperation==TextureBlend::Operation_DOTPRODUCT){
+						Error::unknown(Categories::TOADLET_PEEPER,"can not use Operation_DOTPRODUCT in only alpha channel");
+					}
+					else{
+						glTexEnvi(GL_TEXTURE_ENV,GL_COMBINE_ALPHA,getGLTextureBlendOperation(blend.alphaOperation));
+					}
 				}
 			}
 
