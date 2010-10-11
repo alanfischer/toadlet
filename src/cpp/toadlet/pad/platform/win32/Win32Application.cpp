@@ -132,7 +132,7 @@ Win32Application::Win32Application():
 	#if defined(TOADLET_PLATFORM_WINCE)
 		mVisual(ImageDefinitions::Format_RGB_5_6_5,16,0),
 	#else
-		mVisual(ImageDefinitions::Format_RGB_8,16,2),
+		mVisual(ImageDefinitions::Format_RGBA_8,16,2),
 	#endif
 	mApplicationListener(NULL),
 	mMouseLocked(false),
@@ -380,24 +380,31 @@ bool Win32Application::createWindow(){
 		int redBits=ImageFormatConversion::getRedBits(format);
 		int greenBits=ImageFormatConversion::getGreenBits(format);
 		int blueBits=ImageFormatConversion::getBlueBits(format);
-		bool result=changeVideoMode(mWidth,mHeight,redBits+greenBits+blueBits);
+		int alphaBits=ImageFormatConversion::getAlphaBits(format);
+		bool result=changeVideoMode(mWidth,mHeight,redBits+greenBits+blueBits+alphaBits);
 
 		if(result==false){
 			UnregisterClass(win32->mClassName,win32->mInstance);
 			win32->mClassName=String();
 
 			Error::unknown(Categories::TOADLET_PAD,
-				String("Fullscreen size not available:")+mWidth+","+mHeight);
+				String("Fullscreen size not available:")+mWidth+","+mHeight+" bits:"+(redBits+greenBits+blueBits));
 			return false;
 		}
 	}
 
-	DWORD style=WS_VISIBLE;
+	DWORD style=WS_VISIBLE,exStyle=0;
 	if(mFullscreen==false){
 		#if defined(TOADLET_PLATFORM_WINCE)
 			style|=WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_THICKFRAME|WS_MINIMIZEBOX|WS_MAXIMIZEBOX;
 		#else
 			style|=WS_OVERLAPPEDWINDOW;
+		#endif
+	}
+	else{
+		#if !defined(TOADLET_PLATFORM_WINCE)
+			style|=WS_POPUP;
+			exStyle|=WS_EX_APPWINDOW;
 		#endif
 	}
 
@@ -407,7 +414,7 @@ bool Win32Application::createWindow(){
 	rect.top=mPositionY;
 	rect.bottom=mPositionY+mHeight;
 	if(adjustPosition || adjustSize){ // If the specified size is the size of the client area, otherwise its the window and decorations
-		AdjustWindowRectEx(&rect,style,false,0);
+		AdjustWindowRectEx(&rect,style,false,exStyle);
 		if(adjustPosition==false){
 			rect.right=mPositionX+(rect.right-rect.left);
 			rect.bottom=mPositionY+(rect.bottom-rect.top);
@@ -420,7 +427,7 @@ bool Win32Application::createWindow(){
 		}
 	}
 
-	win32->mWnd=CreateWindow(win32->mClassName,mTitle,style,rect.left,rect.top,rect.right-rect.left,rect.bottom-rect.top,NULL,NULL,win32->mInstance,NULL);
+	win32->mWnd=CreateWindowEx(exStyle,win32->mClassName,mTitle,style,rect.left,rect.top,rect.right-rect.left,rect.bottom-rect.top,NULL,NULL,win32->mInstance,NULL);
 	if(win32->mWnd==0){
 		UnregisterClass(win32->mClassName,win32->mInstance);
 		win32->mClassName=String();
@@ -768,7 +775,8 @@ bool Win32Application::changeVideoMode(int width,int height,int colorBits){
 		dmScreenSettings.dmBitsPerPel=colorBits;
 		dmScreenSettings.dmFields=DM_BITSPERPEL|DM_PELSWIDTH|DM_PELSHEIGHT;
 		// Try to set mode and get results.  CDS_FULLSCREEN gets rid of start bar.
-		result=(ChangeDisplaySettings(&dmScreenSettings,CDS_FULLSCREEN)==DISP_CHANGE_SUCCESSFUL);
+		LONG dispResult=ChangeDisplaySettings(&dmScreenSettings,CDS_FULLSCREEN);
+		result=(dispResult==DISP_CHANGE_SUCCESSFUL);
 	#endif
 
 	return result;
