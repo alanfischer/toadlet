@@ -169,6 +169,7 @@ protected:
 	bool blockShouldSubdivide(Block *block,const Vector3 &cameraTranslate);
 	void computeDelta(Block *block,const Vector3 &cameraTranslate,float tolerance);
 	bool blockIntersectsCamera(const Block *block,node::CameraNode *camera,bool water) const;
+	bool blockVisibleByWater(const Block *block,const Vector3 &cameraTranslate,bool water) const;
 	int gatherBlocks(peeper::IndexBuffer *indexBuffer,node::CameraNode *camera,bool water) const;
 	int gatherTriangle(peeper::IndexBufferAccessor &iba,int indexCount,int x0,int y0,int x1,int y1,int x2,int y2) const;
 
