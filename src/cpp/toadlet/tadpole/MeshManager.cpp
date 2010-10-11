@@ -273,6 +273,10 @@ Mesh::ptr MeshManager::createSphere(VertexBuffer::ptr vertexBuffer,IndexBuffer::
 		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
 		iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
 
+		int positionIndex=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_POSITION);
+		int normalIndex=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_NORMAL);
+		int texCoordIndex=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_TEX_COORD);
+
 		scalar deltaRingAngle=Math::div(Math::PI,Math::fromInt(numRings));
 		scalar deltaSegAngle=Math::div(Math::TWO_PI,Math::fromInt(numSegments));
 		unsigned short verticeIndex=0;
@@ -293,12 +297,19 @@ Mesh::ptr MeshManager::createSphere(VertexBuffer::ptr vertexBuffer,IndexBuffer::
 				scalar z0=Math::mul(r0,Math::cos(Math::mul(Math::fromInt(seg),deltaSegAngle)));
 
 				// Add one vertex to the strip which makes up the sphere
-				vba.set3(verticeIndex,0,sphere.origin.x+x0,sphere.origin.y+y0,sphere.origin.z+z0);
-				normal.set(x0,y0,z0);
-				Math::normalize(normal);
-				vba.set3(verticeIndex,1,normal.x,normal.y,normal.z);
+				if(positionIndex>=0){
+					vba.set3(verticeIndex,positionIndex,sphere.origin.x+x0,sphere.origin.y+y0,sphere.origin.z+z0);
+				}
 
-				vba.set2(verticeIndex,2,Math::div(Math::fromInt(seg),Math::fromInt(numSegments)),Math::div(Math::fromInt(ring),Math::fromInt(numRings)));
+				if(normalIndex>=0){
+					normal.set(x0,y0,z0);
+					Math::normalize(normal);
+					vba.set3(verticeIndex,normalIndex,normal.x,normal.y,normal.z);
+				}
+
+				if(texCoordIndex>=0){
+					vba.set2(verticeIndex,texCoordIndex,Math::div(Math::fromInt(seg),Math::fromInt(numSegments)),Math::div(Math::fromInt(ring),Math::fromInt(numRings)));
+				}
 
 				if(ring!=numRings){
 					iba.set(indexIndex++,verticeIndex+numSegments+1);
@@ -349,6 +360,10 @@ Mesh::ptr MeshManager::createSkyDome(VertexBuffer::ptr vertexBuffer,IndexBuffer:
 		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
 		iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
 
+		int positionIndex=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_POSITION);
+		int normalIndex=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_NORMAL);
+		int texCoordIndex=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_TEX_COORD);
+
 		scalar deltaRingAngle=Math::div(Math::HALF_PI,Math::fromInt(numRings));
 		scalar deltaSegAngle=Math::div(Math::TWO_PI,Math::fromInt(numSegments));
 		unsigned short verticeIndex=0;
@@ -369,12 +384,14 @@ Mesh::ptr MeshManager::createSkyDome(VertexBuffer::ptr vertexBuffer,IndexBuffer:
 				scalar y0=Math::mul(r0,Math::sin(Math::mul(Math::fromInt(seg),deltaSegAngle)));
 
 				// Add one vertex to the strip which makes up the sphere
-				vba.set3(verticeIndex,0,sphere.origin.x+x0,sphere.origin.y+y0,sphere.origin.z+z0);
+				if(positionIndex>=0){
+					vba.set3(verticeIndex,positionIndex,sphere.origin.x+x0,sphere.origin.y+y0,sphere.origin.z+z0);
+				}
+
 				normal.set(x0,y0,z0);
 				Math::normalize(normal);
-				int ni=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_NORMAL);
-				if(ni>=0){
-					vba.set3(verticeIndex,ni,normal.x,normal.y,normal.z);
+				if(normalIndex>=0){
+					vba.set3(verticeIndex,normalIndex,normal.x,normal.y,normal.z);
 				}
 
 				normal.z=Math::ONE-normal.z;
@@ -386,9 +403,8 @@ Mesh::ptr MeshManager::createSkyDome(VertexBuffer::ptr vertexBuffer,IndexBuffer:
 				tx=Math::clamp(0,Math::ONE,tx);
 				ty=Math::clamp(0,Math::ONE,ty);
 
-				int tci=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_TEX_COORD);
-				if(tci>0){
-					vba.set2(verticeIndex,tci,tx,ty);
+				if(texCoordIndex>=0){
+					vba.set2(verticeIndex,texCoordIndex,tx,ty);
 				}
 
 				if(ring!=numRings){
