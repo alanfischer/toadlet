@@ -356,6 +356,9 @@ void D3D9Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Index
 	D3DPRIMITIVETYPE d3dpt;
 	int count;
 	getPrimitiveTypeAndCount(d3dpt,count,indexData->primitive,indexData->count);
+	if(count==0){
+		return;
+	}
 
 	int i;
 	int numVertexes=0;
@@ -756,6 +759,10 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 		}
 
 		const TextureBlend &blend=textureStage->blend;
+
+		result=mD3DDevice->SetTextureStageState(stage,D3DTSS_CONSTANT,toD3DCOLOR(textureStage->constantColor));
+		TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
+
 		if(blend.colorOperation!=TextureBlend::Operation_UNSPECIFIED){
 			result=mD3DDevice->SetTextureStageState(stage,D3DTSS_COLOROP,getD3DTOP(blend.colorOperation,blend.colorSource3));
 			TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
@@ -807,6 +814,12 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 		TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
 
 		result=mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_DISABLE);
+		TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
+
+		result=mD3DDevice->SetTextureStageState(stage,D3DTSS_CONSTANT,0);
+		TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
+
+		result=mD3DDevice->SetTextureStageState(stage,D3DTSS_COLOROP,D3DTOP_DISABLE);
 		TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
 	}
 }
@@ -936,6 +949,7 @@ void D3D9Renderer::setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D
 	capabilitySet.fill=true;
 	#if !defined(TOADLET_SET_D3DM)
 		capabilitySet.texturePerspective=true;
+		capabilitySet.cubeMap=true;
 	#endif
 
 	
@@ -1027,7 +1041,7 @@ bool D3D9Renderer::isD3DFORMATValid(D3DFORMAT textureFormat,DWORD usage){
 DWORD D3D9Renderer::getD3DTOP(TextureBlend::Operation operation,TextureBlend::Source alphaSource){
 	switch(operation){
 		case TextureBlend::Operation_REPLACE:
-			return D3DTOP_DISABLE;
+			return D3DTOP_SELECTARG1;
 		case TextureBlend::Operation_MODULATE:
 			return D3DTOP_MODULATE;
 		case TextureBlend::Operation_MODULATE_2X:
@@ -1123,6 +1137,8 @@ DWORD D3D9Renderer::getD3DTA(TextureBlend::Source blend){
 			return D3DTA_TEXTURE;
 		case TextureBlend::Source_PRIMARY_COLOR:
 			return D3DTA_DIFFUSE;
+		case TextureBlend::Source_CONSTANT_COLOR:
+			return D3DTA_CONSTANT;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"invalid source");

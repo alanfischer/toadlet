@@ -60,7 +60,7 @@ namespace peeper{
 	}
 #else
 	inline D3DCOLOR toD3DCOLOR(const Color &c){
-		return D3DCOLOR_RGBA(Math::toInt(c.r*255),Math::toInt(c.g*255),Math::toInt(c.b*255),Math::toInt(c.a*255));
+			return D3DCOLOR_RGBA(Math::toInt(c.r*255),Math::toInt(c.g*255),Math::toInt(c.b*255),Math::toInt(c.a*255));
 	}
 #endif
 

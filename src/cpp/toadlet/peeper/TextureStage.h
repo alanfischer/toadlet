@@ -26,6 +26,7 @@
 #ifndef TOADLET_PEEPER_TEXTURESTAGE_H
 #define TOADLET_PEEPER_TEXTURESTAGE_H
 
+#include <toadlet/peeper/Color.h>
 #include <toadlet/peeper/TextureBlend.h>
 #include <toadlet/peeper/Texture.h>
 
@@ -71,6 +72,9 @@ public:
 	void setBlend(const TextureBlend &blend1){blend.set(blend1);}
 	inline const TextureBlend &getBlend() const{return blend;}
 
+	void setConstantColor(const Color &color){constantColor.set(color);}
+	inline const Color &getConstantColor() const{return constantColor;}
+
 	void setUAddressMode(AddressMode addressMode){uAddressMode=addressMode;}
 	inline AddressMode getUAddressMode() const{return uAddressMode;}
 	void setVAddressMode(AddressMode addressMode){vAddressMode=addressMode;}
@@ -100,6 +104,7 @@ public:
 	scalar textureTime;
 
 	TextureBlend blend;
+	Color constantColor;
 
 	AddressMode uAddressMode;
 	AddressMode vAddressMode;

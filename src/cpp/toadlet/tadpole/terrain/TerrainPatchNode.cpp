@@ -88,7 +88,7 @@ Node *TerrainPatchNode::create(Scene *scene){
 	mTopDependent=NULL;
 
 	mMinTolerance=0;
-	mMaxTolerance=0.001;
+	mMaxTolerance=0.0001;
 	mTolerance=0;
 	mS1=Math::HALF;mS2=Math::ONE;
 
@@ -511,16 +511,20 @@ void TerrainPatchNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	updateVertexes();
 	updateIndexBuffers(camera);
 
-#if defined(TOADLET_GCC_INHERITANCE_BUG)
-	queue->queueRenderable(&renderable);
-#else
-	queue->queueRenderable(this);
-#endif
+	if(mIndexData->getCount()>0){
+		#if defined(TOADLET_GCC_INHERITANCE_BUG)
+			queue->queueRenderable(&renderable);
+		#else
+			queue->queueRenderable(this);
+		#endif
+	}
 
 	if(mWaterRenderable!=NULL){
 		updateWaterIndexBuffers(camera);
 
-		queue->queueRenderable(mWaterRenderable);
+		if(mWaterIndexData->getCount()>0){
+			queue->queueRenderable(mWaterRenderable);
+		}
 	}
 }
 
