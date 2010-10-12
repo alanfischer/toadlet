@@ -167,7 +167,7 @@ void X11Application::runEventLoop(){
 		}
 		lastTime=currentTime;
 
-		System::msleep(10);
+		System::msleep(0);
 	}
 }
 
