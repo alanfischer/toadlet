@@ -343,7 +343,7 @@ Mesh::ptr MeshManager::createSkyDome(const Sphere &sphere,int numSegments,int nu
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,getSphereVertexCount(numSegments,numRings));
 	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,getSphereIndexCount(numSegments,numRings));
 
-	Mesh::ptr mesh=createSphere(vertexBuffer,indexBuffer,sphere,numSegments,numRings);
+	Mesh::ptr mesh=createSkyDome(vertexBuffer,indexBuffer,sphere,numSegments,numRings,fade);
 	if(material==NULL){
 		material=mEngine->getMaterialManager()->createMaterial();
 		material->setDepthWrite(false);
