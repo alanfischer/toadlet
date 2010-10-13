@@ -64,6 +64,8 @@ public:
 	void setWaterMaterial(Material::ptr material);
 	Material::ptr getWaterMaterial() const{return mPatchWaterMaterial;}
 
+	void setTolerance(scalar tolerance);
+
 	int localPatchIndex(int x,int y){return (y+mHalfSize)*mSize+(x+mHalfSize);}
 	TerrainPatchNode::ptr patchAt(int x,int y){
 		int index=localPatchIndex(x-mTerrainX,y-mTerrainY);
@@ -122,6 +124,7 @@ protected:
 	int mPatchSize;
 	Material::ptr mPatchMaterial;
 	Material::ptr mPatchWaterMaterial;
+	scalar mPatchTolerance;
 	Vector3 mPatchScale;
 	egg::Collection<scalar> mPatchData;
 	scalar mUpdateTargetBias;

@@ -98,8 +98,7 @@ public:
 	bool stitchToBottom(TerrainPatchNode *terrain,bool restitchDependents=true);
 	void updateBlockBoundsBottom(Block *block,int q,int x,int y,int s);
 	bool unstitchFromBottom(TerrainPatchNode *terrain);
-	void setMinTolerance(scalar minTol){mMinTolerance=minTol;}
-	void setMaxTolerance(scalar maxTol){mMaxTolerance=maxTol;}
+	void setTolerance(scalar tolerance){mTolerance=tolerance;}
 	void setScale1(float s1){mS1=s1;}
 	void setScale2(float s2){mS2=s2;}
 
@@ -116,6 +115,8 @@ public:
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 	void traceLocalSegment(Collision &result,const Segment &segment,scalar epsilon,scalar cellEpsilon);
 	bool traceCell(Collision &result,int x,int y,const Segment &segment,scalar epsilon,scalar cellEpsilon);
+
+	inline Renderable *internal_getWaterRenderable(){return mWaterRenderable;}
 
 	peeper::VertexBufferAccessor vba;
 
@@ -222,10 +223,8 @@ protected:
 	TerrainPatchNode::ptr mLeftDependent;
 	TerrainPatchNode::ptr mTopDependent;
 
-	float mMinTolerance;
-	float mMaxTolerance;
-	float mTolerance;
-	float mS1,mS2;
+	scalar mTolerance;
+	scalar mS1,mS2;
 
 	Material::ptr mMaterial;
 	peeper::VertexBuffer::ptr mVertexBuffer;
