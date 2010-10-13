@@ -56,8 +56,6 @@ TerrainPatchNode::TerrainPatchNode():Node(),
 	mEpsilon(0),
 	mCellEpsilon(0),
 
-	mMinTolerance(0),
-	mMaxTolerance(0),
 	mTolerance(0),
 	mS1(0),mS2(0)
 {
@@ -87,9 +85,7 @@ Node *TerrainPatchNode::create(Scene *scene){
 	mLeftDependent=NULL;
 	mTopDependent=NULL;
 
-	mMinTolerance=0;
-	mMaxTolerance=0.00001;
-	mTolerance=0;
+	mTolerance=0.00001f;
 	mS1=Math::HALF;mS2=Math::ONE;
 
 	return this;
@@ -535,8 +531,6 @@ void TerrainPatchNode::updateBlocks(CameraNode *camera){
 
 	Vector3 cameraTranslate;
 	inverseTransform(cameraTranslate,camera->getWorldTranslate(),mWorldTranslate,mWorldScale,mWorldRotate);
-
-	mTolerance=Math::lerp(mMaxTolerance,mMinTolerance,0.5f);
 
 	resetBlocks();
 	simplifyBlocks(cameraTranslate);

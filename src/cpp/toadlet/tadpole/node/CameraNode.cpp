@@ -281,8 +281,9 @@ void CameraNode::setGamma(scalar gamma){
 void CameraNode::projectionUpdated(){
 	Matrix4x4 transform;
 
-	scalar x=mViewport.x+mViewport.width/2;
-	scalar y=mViewport.y+mViewport.height/2;
+/// @todo: Make some test cases for the projection rotation, and get this debugged
+	scalar x=0;//mViewport.x+mViewport.width/2;
+	scalar y=0;//mViewport.y+mViewport.height/2;
 	mFinalProjectionTransform.set(mProjectionTransform);
 
 	transform.reset();

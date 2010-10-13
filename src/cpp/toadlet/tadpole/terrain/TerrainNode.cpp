@@ -52,6 +52,7 @@ TerrainNode::TerrainNode():super(),
 	//mPatchGrid,
 	mPatchSize(0),
 	//mPatchMaterial,
+	mPatchTolerance(0),
 	//mPatchScale,
 	//mPatchData,
 	mUpdateTargetBias(0)
@@ -66,6 +67,7 @@ Node *TerrainNode::create(Scene *scene){
 	mHalfSize=mSize/2;
 	mPatchGrid.resize(mSize*mSize);
 	mUpdateTargetBias=Math::fromMilli(150);
+	mPatchTolerance=0.00001f;
 
 	int i,j;
 	for(j=0;j<mSize;++j){
@@ -161,6 +163,17 @@ void TerrainNode::setWaterMaterial(Material::ptr material){
 			mPatchGrid[i]->setWaterMaterial(mPatchWaterMaterial);
 		}
 	}
+}
+
+void TerrainNode::setTolerance(scalar tolerance){
+	mPatchTolerance=tolerance;
+	
+	int i;
+	for(i=0;i<mPatchGrid.size();++i){
+		if(mPatchGrid[i]!=NULL){
+			mPatchGrid[i]->setTolerance(tolerance);
+		}
+	}	
 }
 
 void TerrainNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
@@ -286,6 +299,7 @@ void TerrainNode::createPatch(int x,int y){
 	patch->setTranslate(toWorldXi(x)-mPatchSize*mPatchScale.x/2,toWorldYi(y)-mPatchSize*mPatchScale.y/2,0);
 	patch->setMaterial(mPatchMaterial);
 	patch->setWaterMaterial(mPatchWaterMaterial);
+	patch->setTolerance(mPatchTolerance);
 
 	mDataSource->getPatchData(&mPatchData[0],x,y);
 	patch->setData(&mPatchData[0],mPatchSize,mPatchSize,mPatchSize,true);
