@@ -1112,7 +1112,8 @@ bool TerrainPatchNode::blockIntersectsCamera(const Block *block,CameraNode *came
 
 bool TerrainPatchNode::blockVisibleByWater(const Block *block,const Vector3 &cameraTranslate,bool water) const{
 	scalar waterLevel=0; /// @todo: Make this a class variable, and have it come from the TerrainNodeDataSource
-	return
+	bool waterOpaque=false; /// @todo: Make this a class variable, and have it come from the TerrainNodeDataSource
+	return (water==false && waterOpaque==false) || 
 		(cameraTranslate.z>waterLevel && ((water==false && block->maxs.z>waterLevel) || (water==true && block->mins.z<=waterLevel)) ||
 		(cameraTranslate.z<waterLevel && block->mins.z<=waterLevel));
 }
