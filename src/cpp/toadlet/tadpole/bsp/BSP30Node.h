@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BSP_BSPNODE_H
-#define TOADLET_TADPOLE_BSP_BSPNODE_H
+#ifndef TOADLET_TADPOLE_BSP_BSP30NODE_H
+#define TOADLET_TADPOLE_BSP_BSP30NODE_H
 
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
