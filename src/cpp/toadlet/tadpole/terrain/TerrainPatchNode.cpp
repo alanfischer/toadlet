@@ -666,7 +666,7 @@ bool TerrainPatchNode::traceCell(Collision &result,int x,int y,const Segment &se
 		else{
 			result.normal.set(p2.normal);
 		}
-		if(Math::dot(segment.direction,result.normal)<-epsilon){
+		if(Math::dot(segment.direction,result.normal)<0){
 			result.point.set(segment.origin);
 			result.time=0;
 		}
