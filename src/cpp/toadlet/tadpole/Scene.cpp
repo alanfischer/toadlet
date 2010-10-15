@@ -290,16 +290,16 @@ void Scene::queueDependent(Node *dependent){
 void Scene::render(Renderer *renderer,CameraNode *camera,Node *node){
 	camera->updateFramesPerSecond();
 
-	// Reposition our background node & update it to update the world positions
-	mBackground->setTranslate(camera->getWorldTranslate());
-	mBackground->frameUpdate(0,-1);
-
 	mRenderQueue->setCamera(camera);
 	if(node!=NULL){
 		node->queueRenderables(camera,mRenderQueue);
 	}
 	else{
+		// Reposition our background node & update it to update the world positions
+		mBackground->setTranslate(camera->getWorldTranslate());
+		mBackground->frameUpdate(0,-1);
 		mBackground->queueRenderables(camera,mRenderQueue);
+
 		mRoot->queueRenderables(camera,mRenderQueue);
 	}
 
