@@ -246,13 +246,17 @@ void Win32Application::runEventLoop(){
 
 		if(mActive){
 			uint64 currentTime=System::mtime();
-			update(currentTime-lastTime);
+			int dt=currentTime-lastTime;
+			update(dt);
 			if(mRenderer!=NULL){
 				if(mRenderer->getStatus()==Renderer::RendererStatus_NEEDSRESET){
 					mEngine->contextReset(mRenderer);
 				}
 
 				render(mRenderer);
+			}
+			if(mAudioPlayer!=NULL){
+				mAudioPlayer->update(dt);
 			}
 			lastTime=currentTime;
 		}

@@ -161,9 +161,13 @@ void X11Application::runEventLoop(){
 		stepEventLoop();
 
 		uint64 currentTime=System::mtime();
-		update(currentTime-lastTime);
+		int dt=currentTime-lastTime;
+		update(dt);
 		if(mRenderer!=NULL){
 			render(mRenderer);
+		}
+		if(mAudioPlayer!=NULL){
+			mAudioPlayer->update(dt);
 		}
 		lastTime=currentTime;
 

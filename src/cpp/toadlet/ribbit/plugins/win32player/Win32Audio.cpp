@@ -39,7 +39,12 @@ namespace ribbit{
 Win32Audio::Win32Audio(Win32Player *player):
 	mPlayer(NULL),
 	//mAudioBuffer,
-	mPitch(Math::ONE)
+	mPlaying(false),
+	mLooping(false),
+	mGain(Math::ONE),
+	mPitch(Math::ONE),
+
+	mPosition(0)
 {
 	mPlayer=player;
 }
@@ -51,8 +56,13 @@ Win32Audio::~Win32Audio(){
 bool Win32Audio::create(AudioBuffer::ptr audioBuffer){
 	destroy();
 
+	// For now we just make sure things are in the correct format, in the future we will convert them
+	Win32AudioBuffer::ptr win32AudioBuffer=shared_static_cast<Win32AudioBuffer>(audioBuffer);
+	TOADLET_ASSERT(win32AudioBuffer->mChannels==1);
+	TOADLET_ASSERT(win32AudioBuffer->mBitsPerSample==8);
+
 	mPlayer->internal_audioCreate(this);
-	mAudioBuffer=audioBuffer;
+	mAudioBuffer=win32AudioBuffer;
 	return true;
 }
 
@@ -66,53 +76,14 @@ void Win32Audio::destroy(){
 	mPlayer->internal_audioDestroy(this);
 }
 
-bool Win32Audio::play(){
-	if(mAudioBuffer==NULL || !mPlayer->canPlaySound()){
-		return false;
-	}
+int Win32Audio::read(int8 *data,int length){
+	int byteAmount=Math::minVal(length*1 /* channels * bps */,mAudioBuffer->mLength-mPosition);
 
-	Win32AudioBuffer *audioBuffer=((Win32AudioBuffer*)mAudioBuffer->getRootAudioBuffer());
+	memcpy(data,mAudioBuffer->mData,byteAmount);
 
-	stop();
+	mPosition+=byteAmount;
 
-	HRESULT hr=waveOutSetPitch(mPlayer->getWaveOut(),MathConversion::scalarToFixed(mPitch));
-
-	hr=waveOutWrite(mPlayer->getWaveOut(),audioBuffer->getLPWAVEHDR(),sizeof(WAVEHDR)); 
-	if(hr!=MMSYSERR_NOERROR){
-		Error::unknown(Categories::TOADLET_RIBBIT,
-			"error in waveOutWrite");
-		return false;
-	}
-
-	// We'll just use a set time of 400 ms between allowed sounds, otherwise it gets too quiet
-	//  Alternatly, we could use audioBuffer->time, which would be the whole sound time
-	mPlayer->playedSound(400);
-
-	return true;
-}
-
-bool Win32Audio::stop(){
-	waveOutReset(mPlayer->getWaveOut());
-
-	return true;
-}
-
-void Win32Audio::setGain(scalar gain){
-	if(gain<0) gain=0;
-	if(gain>Math::ONE) gain=Math::ONE;
-	DWORD volume=0xFFFF*gain / Math::ONE;
-	// This is currently removed, due to waveOutSetVolume being able to zombie the process if it's killed at the wrong time (I believe)
-	//waveOutSetVolume(mPlayer->getWaveOut(),(volume<<16) | volume);
-}
-
-void Win32Audio::setLooping(bool looping){
-	Win32AudioBuffer *audioBuffer=((Win32AudioBuffer*)mAudioBuffer->getRootAudioBuffer());
-	audioBuffer->setLoopCount(looping?Extents::MAX_INT:0);
-}
-
-bool Win32Audio::getLooping() const{
-	Win32AudioBuffer *audioBuffer=((Win32AudioBuffer*)mAudioBuffer->getRootAudioBuffer());
-	return audioBuffer->getLoopCount()>0;;
+	return byteAmount/1;
 }
 
 }

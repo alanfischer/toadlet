@@ -49,15 +49,15 @@ public:
 	bool getPlaying() const;
 	bool getFinished() const;
 
+	void setLooping(bool looping);
+	bool getLooping() const;
+
 	void setGain(scalar gain);
 	void fadeToGain(scalar gain,int time);
 	scalar getGain() const{return mGain;}
 
 	void setRolloffFactor(scalar factor);
 	scalar getRolloffFactor() const;
-
-	void setLooping(bool looping);
-	bool getLooping() const;
 
 	void setGlobal(bool global);
 	bool getGlobal() const{return mGlobal;}

@@ -34,7 +34,6 @@
 #include <toadlet/ribbit/CapabilitySet.h>
 #include <toadlet/egg/Collection.h>
 #include <toadlet/egg/Map.h>
-#include <toadlet/egg/Thread.h>
 #include <toadlet/egg/Mutex.h>
 #include <toadlet/egg/Logger.h>
 
@@ -48,7 +47,7 @@ class ALAudio;
 
 typedef void (*proc_alBufferDataStatic)(ALuint buffer,ALenum format,ALvoid *data,ALsizei size,ALsizei freq);
 
-class TOADLET_API ALPlayer:public AudioPlayer,public egg::Runnable{
+class TOADLET_API ALPlayer:public AudioPlayer{
 public:
 	// Options
 	const static int Option_FADE_IN_BUFFER_TIME=1;
@@ -63,17 +62,15 @@ public:
 	Audio *createBufferedAudio();
 	Audio *createStreamingAudio();
 
-	void suspend();
-	void resume();
-
 	void setListenerTranslate(const Vector3 &translate);
 	void setListenerRotate(const Matrix3x3 &rotate);
 	void setListenerVelocity(const Vector3 &velocity);
 	void setListenerGain(scalar gain);
 
-	void setDopplerFactor(scalar factor);
-	void setDopplerVelocity(scalar velocity);
-	void setDefaultRolloffFactor(scalar factor);
+	void suspend();
+	void resume();
+
+	void update(int dt);
 
 	const CapabilitySet &getCapabilitySet();
 
@@ -97,8 +94,6 @@ public:
 	#endif
 	
 protected:
-	void run();
-
 	ALCdevice *mDevice;
 	ALCcontext *mContext;
 	egg::Collection<ALAudio*> mAudios;
@@ -107,8 +102,6 @@ protected:
 	scalar mDefaultRolloffFactor;
 	int mBufferFadeInTime;
 
-	bool mStopThread;
-	egg::Thread::ptr mThread;
 	egg::Mutex mMutex;
 
 	CapabilitySet mCapabilitySet;

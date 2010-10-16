@@ -36,6 +36,8 @@ namespace ribbit{
 class TOADLET_API Win32AudioBuffer:protected egg::BaseResource,public AudioBuffer{
 	TOADLET_BASERESOURCE_PASSTHROUGH(AudioBuffer);
 public:
+	TOADLET_SHARED_POINTERS(Win32AudioBuffer);
+
 	Win32AudioBuffer(Win32Player *player);
 	virtual ~Win32AudioBuffer();
 
@@ -44,21 +46,15 @@ public:
 	bool create(egg::io::Stream::ptr stream,const egg::String &mimeType);
 	void destroy();
 
-	void setLoopCount(int loopCount);
-	int getLoopCount() const;
-
-	inline WAVEFORMATEX *getLPWAVEFORMATEX(){return &mWaveFormat;}
-	inline WAVEHDR *getLPWAVEHDR(){return &mWaveHDR;}
-	inline int getTime() const{return mTime;}
-
 protected:
-	bool prepareHeader();
-	void unprepareHeader();
-
 	Win32Player *mAudioPlayer;
-	WAVEFORMATEX mWaveFormat;
-	WAVEHDR mWaveHDR;
-	int mTime;
+	int mChannels;
+	int mSamplesPerSecond;
+	int mBitsPerSample;
+	tbyte *mData;
+	int mLength;
+
+	friend class Win32Audio;
 };
 
 }

@@ -79,8 +79,6 @@ ALPlayer::ALPlayer():
 	mDefaultRolloffFactor(0),
 	mBufferFadeInTime(0),
 
-	mStopThread(false),
-	//mThread,
 	//mMutex,
 
 	//mCapabilitySet,
@@ -193,28 +191,12 @@ bool ALPlayer::create(int *options){
 	}
 	TOADLET_CHECK_ALERROR("Initialize sources");
 
-	Logger::debug(Categories::TOADLET_RIBBIT,
-		"starting thread");
-
-	mStopThread=false;
-	mThread=Thread::ptr(new Thread(this));
-	mThread->start();
-
-	Logger::alert(Categories::TOADLET_RIBBIT,
-		"created ALPlayer");
-
 	return true;
 }
 
 bool ALPlayer::destroy(){
 	Logger::alert(Categories::TOADLET_RIBBIT,
 		"shutingdown ALPlayer");
-
-	mStopThread=true;
-	if(mThread!=NULL){
-		mThread->join();
-		mThread=NULL;
-	}
 
 	int i;
 	for(i=0;i<mAudios.size();++i){
@@ -271,30 +253,18 @@ void ALPlayer::resume(){
 	alcProcessContext(mContext);
 }
 
-void ALPlayer::run(){
-	uint64 startTime=System::mtime();
-	uint64 dt=33; // Update audio at about 60 times a second
-	int i=0;
-	while(mStopThread==false){
-		uint64 curTime=System::mtime();
-		uint64 diff=curTime-startTime;
-		if(diff>=dt){
-			lock();
-				for(i=0;i<mAudios.size();++i){
-					mAudios[i]->update(dt);
-				}
-				#if defined(TOADLET_PLATFORM_OSX)
-					for(i=0;i<mCoreAudios.size();++i){
-						mCoreAudios[i]->update(dt);
-					}
-				#endif
-			unlock();
-			// I realize that this won't correctly keep count of the 'extra' chunks of time
-			// in an update, but doing that is unnecessary for audio at least
-			startTime=curTime;
+void ALPlayer::update(int dt){
+	lock();
+		int i;
+		for(i=0;i<mAudios.size();++i){
+			mAudios[i]->update(dt);
 		}
-		System::msleep(10);
-	}
+		#if defined(TOADLET_PLATFORM_OSX)
+			for(i=0;i<mCoreAudios.size();++i){
+				mCoreAudios[i]->update(dt);
+			}
+		#endif
+	unlock();
 }
 
 void ALPlayer::decodeStream(AudioStream *decoder,tbyte *&finalBuffer,int &finalLength){
@@ -428,51 +398,10 @@ void ALPlayer::setListenerVelocity(const Vector3 &velocity){
 	TOADLET_CHECK_ALERROR("end setListenerVelocity");
 }
 
-ALenum ALPlayer::getALFormat(int bitsPerSample,int channels){
-	ALenum format=0;
-
-	if(bitsPerSample==8 && channels==1){
-		format=AL_FORMAT_MONO8;
-	}
-	else if(bitsPerSample==16 && channels==1){
-		format=AL_FORMAT_MONO16;
-	}
-	else if(bitsPerSample==8 && channels==2){
-		format=AL_FORMAT_STEREO8;
-	}
-	else if(bitsPerSample==16 && channels==2){
-		format=AL_FORMAT_STEREO16;
-	}
-
-	return format;
-}
-
 void ALPlayer::setListenerGain(scalar gain){
 	alListenerf(AL_GAIN,MathConversion::scalarToFloat(gain));
 	
 	TOADLET_CHECK_ALERROR("setListenerGain");
-}
-
-void ALPlayer::setDopplerFactor(scalar factor){
-	alDopplerFactor(factor);
-
-	TOADLET_CHECK_ALERROR("setDopplerFactor");
-}
-
-void ALPlayer::setDopplerVelocity(scalar velocity){
-	alDopplerVelocity(velocity);
-
-	TOADLET_CHECK_ALERROR("setDopplerVelocity");
-}
-
-void ALPlayer::setDefaultRolloffFactor(scalar factor){
-	mDefaultRolloffFactor=factor;
-	int i;
-	for(i=0;i<mAllSources.size();++i){
-		alSourcef(mAllSources[i],AL_ROLLOFF_FACTOR,MathConversion::scalarToFloat(mDefaultRolloffFactor));
-	}
-
-	TOADLET_CHECK_ALERROR("setDefaultRolloffFactor");
 }
 
 const CapabilitySet &ALPlayer::getCapabilitySet(){
@@ -491,6 +420,25 @@ void ALPlayer::checkinSourceHandle(ALAudio *audio,ALuint source){
 	mSourcePool.add(source);
 
 	mAudios.remove(audio);
+}
+
+ALenum ALPlayer::getALFormat(int bitsPerSample,int channels){
+	ALenum format=0;
+
+	if(bitsPerSample==8 && channels==1){
+		format=AL_FORMAT_MONO8;
+	}
+	else if(bitsPerSample==16 && channels==1){
+		format=AL_FORMAT_MONO16;
+	}
+	else if(bitsPerSample==8 && channels==2){
+		format=AL_FORMAT_STEREO8;
+	}
+	else if(bitsPerSample==16 && channels==2){
+		format=AL_FORMAT_STEREO16;
+	}
+
+	return format;
 }
 
 }
