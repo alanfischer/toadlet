@@ -50,12 +50,10 @@ public:
 	virtual void setListenerVelocity(const ribbit::Vector3 &velocity)=0; // Prefix with ribbit for vc6 compatability
 	virtual void setListenerGain(scalar gain)=0;
 
+	virtual void update(int dt)=0;
+
 	virtual void suspend()=0;
 	virtual void resume()=0;
-
-	virtual void setDopplerFactor(scalar factor)=0;
-	virtual void setDopplerVelocity(scalar velocity)=0;
-	virtual void setDefaultRolloffFactor(scalar factor)=0;
 
 	virtual const CapabilitySet &getCapabilitySet()=0;
 };

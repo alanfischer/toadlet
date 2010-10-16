@@ -53,41 +53,38 @@ public:
 	Audio *createBufferedAudio();
 	Audio *createStreamingAudio();
 
-	void suspend(){}
-	void resume(){}
-
 	void setListenerTranslate(const Vector3 &translate){}
 	void setListenerRotate(const Matrix3x3 &rotate){}
 	void setListenerVelocity(const Vector3 &velocity){}
 	void setListenerGain(scalar gain){}
-	scalar getListenerGain() const{return 0;}
 
-	void setDopplerFactor(scalar factor){}
-	void setDopplerVelocity(scalar velocity){}
+	void suspend(){}
+	void resume(){}
 
-	void setDefaultRolloffFactor(scalar factor){}
-	scalar getDefaultRolloffFactor(){return 0;}
+	void update(int dt);
 
 	const CapabilitySet &getCapabilitySet(){return mCapabilitySet;}
 
 	AudioStream::ptr startAudioStream(egg::io::Stream::ptr stream,const egg::String &mimeType);
 	void decodeStream(AudioStream *decoder,tbyte *&finalBuffer,int &finalLength);
 
-	void setWaveOut(HWAVEOUT waveOut){mWaveOut=waveOut;}
-	HWAVEOUT getWaveOut() const{return mWaveOut;}
-	bool canPlaySound();
-	void playedSound(int time);
-
 	void internal_audioCreate(Win32Audio *audio);
 	void internal_audioDestroy(Win32Audio *audio);
 
 protected:
+	int read(int8 *data,int length);
+
 	CapabilitySet mCapabilitySet;
 
 	egg::Collection<Win32Audio*> mAudios;
 
-	HWAVEOUT mWaveOut;
-	int64 mNextSoundTime;
+	int mChannels;
+	int mSamplesPerSecond;
+	int mBitsPerSample;
+
+	HWAVEOUT mDevice;
+	WAVEHDR *mBuffers;
+	int16 *mBufferData;
 };
 
 }

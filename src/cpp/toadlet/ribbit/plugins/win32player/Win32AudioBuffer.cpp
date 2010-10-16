@@ -35,13 +35,12 @@ namespace ribbit{
 
 Win32AudioBuffer::Win32AudioBuffer(Win32Player *player):BaseResource(),
 	mAudioPlayer(NULL),
-	//mWaveFormat(0),
-	//mWaveHDR(0),
-	mTime(0)
+	mChannels(0),
+	mSamplesPerSecond(0),
+	mBitsPerSample(0),
+	mData(NULL),
+	mLength(0)
 {
-	memset(&mWaveFormat,0,sizeof(mWaveFormat));
-	memset(&mWaveHDR,0,sizeof(mWaveHDR));
-
 	mAudioPlayer=player;
 }
 
@@ -55,86 +54,19 @@ bool Win32AudioBuffer::create(Stream::ptr stream,const String &mimeType){
 		return false;
 	}
 
-	tbyte *buffer=0;
-	int length=0;
-	int channels=decoder->getChannels();
-	int sps=decoder->getSamplesPerSecond();
-	int bps=decoder->getBitsPerSample();
+	mChannels=decoder->getChannels();
+	mSamplesPerSecond=decoder->getSamplesPerSecond();
+	mBitsPerSample=decoder->getBitsPerSample();
+	mAudioPlayer->decodeStream(decoder,mData,mLength);
 
-	mAudioPlayer->decodeStream(decoder,buffer,length);
-
-	// WaveFormat
-	mWaveFormat.wFormatTag=WAVE_FORMAT_PCM;
-	mWaveFormat.nChannels=channels;
-	mWaveFormat.nSamplesPerSec=sps;
-    mWaveFormat.wBitsPerSample=bps;
-	mWaveFormat.nBlockAlign=channels*bps/8;
-	mWaveFormat.nAvgBytesPerSec=sps*mWaveFormat.nBlockAlign;
-	// WaveHDR
-	mWaveHDR.lpData=(LPSTR)buffer;
-	mWaveHDR.dwBufferLength=length;
-	// Time
-	mTime=length*1000*8/(channels*bps*sps);
-Logger::alert(String("CHAN:")+channels+" SPS:"+sps+" BPS:"+bps);
-	HRESULT hr=0;
-	/// @todo: Either add support for multiple different formats, or test & error if more audio is loaded with a different format
-	if(mAudioPlayer->getWaveOut()==NULL){
-		HWAVEOUT waveOut=0;
-		hr=waveOutOpen(&waveOut,WAVE_MAPPER,&mWaveFormat,NULL,NULL,CALLBACK_NULL);
-		if(hr!=MMSYSERR_NOERROR){
-			Error::unknown(Categories::TOADLET_RIBBIT,
-				"error in waveOutOpen");
-			return false;
-		}
-
-		mAudioPlayer->setWaveOut(waveOut);
-	}
-
-	return prepareHeader();
-}
-
-void Win32AudioBuffer::destroy(){
-	unprepareHeader();
-
-	if(mWaveHDR.lpData!=NULL){
-		delete[] mWaveHDR.lpData;
-		mWaveHDR.lpData=NULL;
-	}
-}
-
-void Win32AudioBuffer::setLoopCount(int loopCount){
-	if(loopCount!=mWaveHDR.dwLoops){
-		unprepareHeader();
-
-		if(loopCount>0){
-			mWaveHDR.dwFlags=WHDR_BEGINLOOP|WHDR_ENDLOOP;
-			mWaveHDR.dwLoops=loopCount;
-		}
-		else{
-			mWaveHDR.dwFlags=0;
-			mWaveHDR.dwLoops=0;
-		}
-
-		prepareHeader();
-	}
-}
-
-int Win32AudioBuffer::getLoopCount() const{
-	return mWaveHDR.dwLoops;
-}
-
-bool Win32AudioBuffer::prepareHeader(){
-	HRESULT hr=waveOutPrepareHeader(mAudioPlayer->getWaveOut(),&mWaveHDR,sizeof(mWaveHDR));
-	if(hr!=MMSYSERR_NOERROR){
-		Error::unknown(Categories::TOADLET_RIBBIT,
-			"error in waveOutPrepareHeader");
-		return false;
-	}
 	return true;
 }
 
-void Win32AudioBuffer::unprepareHeader(){
-	waveOutUnprepareHeader(mAudioPlayer->getWaveOut(),&mWaveHDR,sizeof(mWaveHDR));
+void Win32AudioBuffer::destroy(){
+	if(mData!=NULL){
+		delete[] mData;
+		mData=NULL;
+	}
 }
 
 }

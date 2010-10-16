@@ -27,8 +27,8 @@
 #define TOADLET_RIBBIT_WIN32AUDIO_H
 
 #include "Win32Player.h"
+#include "Win32AudioBuffer.h"
 #include <toadlet/ribbit/Audio.h>
-#include <toadlet/ribbit/AudioBuffer.h>
 
 namespace toadlet{
 namespace ribbit{
@@ -42,17 +42,17 @@ public:
 	virtual bool create(egg::io::Stream::ptr stream,const egg::String &mimeType);
 	virtual void destroy();
 
-	virtual bool play();
-	virtual bool stop();
-	virtual bool getPlaying() const{return false;}
-	virtual bool getFinished() const{return false;}
+	virtual bool play(){mPlaying=true;return true;}
+	virtual bool stop(){mPlaying=false;return false;}
+	virtual bool getPlaying() const{return mPlaying;}
+	virtual bool getFinished() const{return !mPlaying;}
 
-	virtual void setGain(scalar gain);
-	virtual void fadeToGain(scalar gain,int time){}
-	virtual scalar getGain() const{return 0;}
+	virtual void setLooping(bool looping){mLooping=looping;}
+	virtual bool getLooping() const{return mLooping;}
 
-	virtual void setLooping(bool looping);
-	virtual bool getLooping() const;
+	virtual void setGain(scalar gain){mGain=gain;}
+	virtual void fadeToGain(scalar gain,int time){mGain=gain;}
+	virtual scalar getGain() const{return mGain;}
 
 	virtual void setPitch(scalar pitch){mPitch=pitch;}
 	virtual scalar getPitch() const{return mPitch;}
@@ -70,10 +70,18 @@ public:
 	virtual const Vector3 &getVelocity() const{return Math::ZERO_VECTOR3;}
 
 protected:
+	int read(int8 *data,int length);
+
 	Win32Player *mPlayer;
-	AudioBuffer::ptr mAudioBuffer;
+	Win32AudioBuffer::ptr mAudioBuffer;
+	bool mPlaying;
+	bool mLooping;
+	scalar mGain;
 	scalar mPitch;
-	uint64 mLastSoundTime;
+
+	int mPosition;
+
+	friend class Win32Player;
 };
 
 }

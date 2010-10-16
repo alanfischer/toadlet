@@ -168,6 +168,27 @@ bool ALAudio::getFinished() const{
 	return false;
 }
 
+void ALAudio::setLooping(bool looping){
+	mLooping=looping;
+	if(mAudioStream==NULL && alIsSource(mHandle)){
+		alSourcei(mHandle,AL_LOOPING,looping);
+	}
+}
+
+bool ALAudio::getLooping() const{
+	int looping=0;
+	if(alIsSource(mHandle)){
+		alGetSourcei(mHandle,AL_LOOPING,&looping);
+	}
+
+	if(looping>0){
+		return true;
+	}
+	else{
+		return mLooping;
+	}
+}
+
 void ALAudio::setGain(scalar gain){
 	if(mAudioPlayer!=NULL){
 		mAudioPlayer->lock();
@@ -199,27 +220,6 @@ scalar ALAudio::getRolloffFactor() const{
 		alGetSourcef(mHandle,AL_ROLLOFF_FACTOR,&r);
 	}
 	return MathConversion::floatToScalar(r);
-}
-
-void ALAudio::setLooping(bool looping){
-	mLooping=looping;
-	if(mAudioStream==NULL && alIsSource(mHandle)){
-		alSourcei(mHandle,AL_LOOPING,looping);
-	}
-}
-
-bool ALAudio::getLooping() const{
-	int looping=0;
-	if(alIsSource(mHandle)){
-		alGetSourcei(mHandle,AL_LOOPING,&looping);
-	}
-
-	if(looping>0){
-		return true;
-	}
-	else{
-		return mLooping;
-	}
 }
 
 void ALAudio::setGlobal(bool global){

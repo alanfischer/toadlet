@@ -144,10 +144,14 @@ rect{
 
 - (void) update{
 	toadlet::uint64 currentTime=System::mtime();
+	int dt=currentTime-mLastTime;
 	if(mApplication->active()){
-		mApplication->update(currentTime-mLastTime);
+		mApplication->update(dt);
 		if(mApplication->getRenderer()!=NULL){
 			mApplication->render(mApplication->getRenderer());
+		}
+		if(mApplication->getAudioPlayer()!=NULL){
+			mApplication->getAudioPlayer()->update(dt);
 		}
 	}
 	mLastTime=currentTime;
