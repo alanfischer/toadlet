@@ -31,7 +31,7 @@ namespace toadlet{
 namespace egg{
 namespace image{
 
-bool ImageFormatConversion::convert(uint8 *src,int srcFormat,int srcRowPitch,int srcSlicePitch,uint8 *dst,int dstFormat,int dstRowPitch,int dstSlicePitch,int width,int height,int depth){
+bool ImageFormatConversion::convert(tbyte *src,int srcFormat,int srcRowPitch,int srcSlicePitch,tbyte *dst,int dstFormat,int dstRowPitch,int dstSlicePitch,int width,int height,int depth){
 	int i,j,k;
 
 	if(width==0) width=1;

@@ -145,6 +145,7 @@ Win32Application::Win32Application():
 	mChangeRendererPlugin(RendererPlugin_NONE),
 	mRendererOptions(NULL),
 	mAudioPlayer(NULL),
+	mAudioPlayerOptions(NULL),
 	mMotionDetector(NULL),
 
 	mRun(false),
@@ -181,6 +182,7 @@ Win32Application::~Win32Application(){
 	destroy();
 
 	delete[] mRendererOptions;
+	delete[] mAudioPlayerOptions;
 
 	delete win32;
 }
@@ -197,7 +199,7 @@ void Win32Application::create(int renderer,int audioPlayer,int motionDetector){
 		changeRendererPlugin(renderer);
 	}
 	if(audioPlayer!=AudioPlayerPlugin_NONE){
-		createAudioPlayer();
+		createAudioPlayer(audioPlayer);
 	}
 	if(motionDetector!=MotionDetectorPlugin_NONE){
 		createMotionDetector();
@@ -618,6 +620,15 @@ void Win32Application::setRendererOptions(int *options,int length){
 	memcpy(mRendererOptions,options,length*sizeof(int));
 }
 
+void Win32Application::setAudioPlayerOptions(int *options,int length){
+	if(mAudioPlayerOptions!=NULL){
+		delete[] mAudioPlayerOptions;
+	}
+
+	mAudioPlayerOptions=new int[length];
+	memcpy(mAudioPlayerOptions,options,length*sizeof(int));
+}
+
 void Win32Application::setIcon(void *icon){
 	win32->mIcon=(HICON)icon;
 	if(win32->mWnd!=0){
@@ -660,7 +671,7 @@ RenderTarget *Win32Application::makeRenderTarget(int rendererPlugin){
 		#endif
 	}
 	if(target==NULL){
-		Error::unknown("no renderers defined");
+		Error::unknown("no Renderers defined");
 		return NULL;
 	}
 	if(target!=NULL && target->isValid()==false){
@@ -706,7 +717,7 @@ bool Win32Application::createContextAndRenderer(int plugin){
 	}
 
 	Logger::debug(Categories::TOADLET_PAD,
-		"Win32Application: creating context and renderer");
+		"Win32Application: creating RenderTarget and Renderer");
 
 	RenderTarget *renderTarget=makeRenderTarget(plugin);
 	if(renderTarget!=NULL){
@@ -714,7 +725,11 @@ bool Win32Application::createContextAndRenderer(int plugin){
 
 		mRenderer=makeRenderer(plugin);
 		if(mRenderer!=NULL){
-			if(mRenderer->create(this,mRendererOptions)==false){
+			bool result=false;
+			TOADLET_TRY
+				result=mRenderer->create(this,mRendererOptions);
+			TOADLET_CATCH(const Exception &){result=false;}
+			if(result==false){
 				delete mRenderer;
 				mRenderer=NULL;
 				Error::unknown(Categories::TOADLET_PAD,
@@ -786,33 +801,53 @@ bool Win32Application::changeVideoMode(int width,int height,int colorBits){
 	return result;
 }
 
-bool Win32Application::createAudioPlayer(){
-	#if defined(TOADLET_HAS_OPENAL)
-		if(mAudioPlayer==NULL){
-			mAudioPlayer=new_ALPlayer();
-			bool result=false;
-			TOADLET_TRY
-				result=mAudioPlayer->create(NULL);
-			TOADLET_CATCH(const Exception &){result=false;}
-			if(result==false){
-				delete mAudioPlayer;
-				mAudioPlayer=NULL;
-			}
+AudioPlayer *Win32Application::makeAudioPlayer(int plugin){
+	AudioPlayer *audioPlayer=NULL;
+	if(plugin==AudioPlayerPlugin_OPENAL){
+		#if defined(TOADLET_HAS_OPENAL)
+			audioPlayer=new_ALPlayer();
+		#endif
+	}
+	else if(plugin==AudioPlayerPlugin_WIN32){
+		#if defined(TOADLET_PLATFORM_WIN32)
+			audioPlayer=new_Win32Player();
+		#endif
+	}
+	if(audioPlayer==NULL){
+		Error::unknown("no AudioPlayers defined");
+		return NULL;
+	}
+	return audioPlayer;
+}
+
+bool Win32Application::createAudioPlayer(int plugin){
+	if(plugin==AudioPlayerPlugin_NONE){
+		return false;
+	}
+
+	Logger::debug(Categories::TOADLET_PAD,
+		"Win32Application: creating AudioPlayer");
+
+	mAudioPlayer=makeAudioPlayer(plugin);
+	if(mAudioPlayer!=NULL){
+		bool result=false;
+		TOADLET_TRY
+			result=mAudioPlayer->create(mAudioPlayerOptions);
+		TOADLET_CATCH(const Exception &){result=false;}
+		if(result==false){
+			delete mAudioPlayer;
+			mAudioPlayer=NULL;
+			Error::unknown(Categories::TOADLET_PAD,
+				"Error starting AudioPlayer");
+			return false;
 		}
-	#endif
-	#if defined(TOADLET_PLATFORM_WIN32)
-		if(mAudioPlayer==NULL){
-			mAudioPlayer=new_Win32Player();
-			bool result=false;
-			TOADLET_TRY
-				result=mAudioPlayer->create(NULL);
-			TOADLET_CATCH(const Exception &){result=false;}
-			if(result==false){
-				delete mAudioPlayer;
-				mAudioPlayer=NULL;
-			}
-		}
-	#endif
+	}
+	else{
+		Error::unknown(Categories::TOADLET_PAD,
+			"Error creating AudioPlayer");
+		return false;
+	}
+
 	if(mAudioPlayer!=NULL){
 		mEngine->setAudioPlayer(mAudioPlayer);
 	}

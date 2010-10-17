@@ -50,7 +50,8 @@ public:
 
 	enum AudioPlayerPlugin{
 		AudioPlayerPlugin_NONE=-1,
-		AudioPlayerPlugin_ANY,
+		AudioPlayerPlugin_OPENAL,
+		AudioPlayerPlugin_WIN32,
 	};
 
 	enum MotionDetectorPlugin{
@@ -126,6 +127,7 @@ public:
 
 	void changeRendererPlugin(int index);
 	void setRendererOptions(int *options,int length);
+	void setAudioPlayerOptions(int *options,int length);
 
 	void setIcon(void *icon);
 	void *getHINSTANCE() const;
@@ -148,7 +150,8 @@ protected:
 	bool destroyRendererAndContext();
 	bool changeVideoMode(int width,int height,int colorBits);
 
-	bool createAudioPlayer();
+	ribbit::AudioPlayer *makeAudioPlayer(int plugin);
+	bool createAudioPlayer(int plugin);
 	bool destroyAudioPlayer();
 
 	bool createMotionDetector();
@@ -170,6 +173,7 @@ protected:
 	int mChangeRendererPlugin;
 	int *mRendererOptions;
 	ribbit::AudioPlayer *mAudioPlayer;
+	int *mAudioPlayerOptions;
 	flick::MotionDetector *mMotionDetector;
 	tadpole::handler::Win32ResourceArchive::ptr mResourceArchive;
 

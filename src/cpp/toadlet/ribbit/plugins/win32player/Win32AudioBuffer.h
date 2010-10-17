@@ -48,9 +48,6 @@ public:
 
 protected:
 	Win32Player *mAudioPlayer;
-	int mChannels;
-	int mSamplesPerSecond;
-	int mBitsPerSample;
 	tbyte *mData;
 	int mLength;
 

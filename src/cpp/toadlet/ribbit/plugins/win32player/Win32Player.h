@@ -43,6 +43,9 @@ class Win32AudioBuffer;
 
 class TOADLET_API Win32Player:public AudioPlayer{
 public:
+	// Options
+	const static int Option_BUFFER_FADE_TIME=1;
+	
 	Win32Player();
 	virtual ~Win32Player();
 
@@ -67,24 +70,29 @@ public:
 
 	AudioStream::ptr startAudioStream(egg::io::Stream::ptr stream,const egg::String &mimeType);
 	void decodeStream(AudioStream *decoder,tbyte *&finalBuffer,int &finalLength);
+	int getBufferFadeTime() const{return mBufferFadeTime;}
+	int getChannels() const{return mChannels;}
+	int getBitsPerSample() const{return mBitsPerSample;}
+	int getSamplesPerSecond() const{return mSamplesPerSecond;}
 
 	void internal_audioCreate(Win32Audio *audio);
 	void internal_audioDestroy(Win32Audio *audio);
 
 protected:
-	int read(int8 *data,int length);
+	int read(tbyte *data,int length);
 
 	CapabilitySet mCapabilitySet;
 
-	egg::Collection<Win32Audio*> mAudios;
-
 	int mChannels;
-	int mSamplesPerSecond;
 	int mBitsPerSample;
-
+	int mSamplesPerSecond;
 	HWAVEOUT mDevice;
 	WAVEHDR *mBuffers;
-	int16 *mBufferData;
+	tbyte *mBufferData;
+	egg::Collection<Win32Audio*> mAudios;
+	int mBufferFadeTime;
+	int mNumBuffers;
+	int mBufferSize;
 };
 
 }

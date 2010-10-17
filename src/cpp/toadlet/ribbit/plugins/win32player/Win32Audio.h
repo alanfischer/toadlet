@@ -42,7 +42,7 @@ public:
 	virtual bool create(egg::io::Stream::ptr stream,const egg::String &mimeType);
 	virtual void destroy();
 
-	virtual bool play(){mPlaying=true;return true;}
+	virtual bool play(){mPosition=0;mPlaying=true;return true;}
 	virtual bool stop(){mPlaying=false;return false;}
 	virtual bool getPlaying() const{return mPlaying;}
 	virtual bool getFinished() const{return !mPlaying;}
@@ -70,7 +70,7 @@ public:
 	virtual const Vector3 &getVelocity() const{return Math::ZERO_VECTOR3;}
 
 protected:
-	int read(int8 *data,int length);
+	int read(tbyte *data,int length);
 
 	Win32Player *mPlayer;
 	Win32AudioBuffer::ptr mAudioBuffer;

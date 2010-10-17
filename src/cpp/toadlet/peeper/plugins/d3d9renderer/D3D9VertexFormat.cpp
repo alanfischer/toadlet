@@ -42,6 +42,7 @@ D3D9VertexFormat::D3D9VertexFormat(D3D9Renderer *renderer):
 	//mOffsets,
 	mVertexSize(0),
 
+	mContextCreated(false),
 	mFVF(0)
 	#if !defined(TOADLET_SET_D3DM)
 		,mElements(NULL),
@@ -93,6 +94,8 @@ bool D3D9VertexFormat::createContext(){
 		TOADLET_CHECK_D3D9ERROR(result,"CreateVertexDeclaration");
 	#endif
 
+	mContextCreated=true;
+
 	return SUCCEEDED(result);
 }
 
@@ -110,6 +113,8 @@ bool D3D9VertexFormat::destroyContext(){
 			mDeclaration=NULL;
 		}
 	#endif
+
+	mContextCreated=false;
 
 	return true;
 }

@@ -596,7 +596,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 					break;
 				}
 				else if(loop>4){
-					// We keep hitting something, so zero our velocity and break out
+					// We keep hitting something, so zero the velocity and break out
 					solid->mVelocity.reset();
 					newPosition.set(oldPosition);
 					break;

@@ -55,10 +55,12 @@ public:
 	int findSemantic(int semantic);
 	int getVertexSize() const{return mVertexSize;}
 
-	inline DWORD getFVF(){if(mFVF==0){createContext();}return mFVF;}
+	inline bool getContextCreated(){return mContextCreated;}
+
+	inline DWORD getFVF(){return mFVF;}
 
 	#if !defined(TOADLET_SET_D3DM)
-		inline IDirect3DVertexDeclaration9 *getDeclaration(){if(mDeclaration==NULL){createContext();}return mDeclaration;}
+		inline IDirect3DVertexDeclaration9 *getDeclaration(){return mDeclaration;}
 
 		static BYTE getD3DDECLTYPE(int format);
 		static BYTE getD3DDECLUSAGE(int semantic);
@@ -77,6 +79,7 @@ protected:
 	egg::Collection<int> mOffsets;
 	int mVertexSize;
 
+	bool mContextCreated;
 	DWORD mFVF;
 	#if !defined(TOADLET_SET_D3DM)
 		D3DVERTEXELEMENT9 *mElements;
@@ -84,6 +87,7 @@ protected:
 	#endif
 
 	friend class D3D9Renderer;
+	friend class D3D9VertexBuffer;
 };
 
 }
