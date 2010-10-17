@@ -23,22 +23,17 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_ALAUDIOBUFFERPEER_H
-#define TOADLET_RIBBIT_ALAUDIOBUFFERPEER_H
+#ifndef TOADLET_RIBBIT_AUDIOFORMATCONVERSION_H
+#define TOADLET_RIBBIT_AUDIOFORMATCONVERSION_H
 
 #include <toadlet/ribbit/Types.h>
-#include <toadlet/ribbit/AudioBuffer.h>
-#include <audiere.h>
 
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API AudiereAudioBufferPeer:public AudioBufferPeer{
+class TOADLET_API AudioFormatConversion{
 public:
-	AudiereAudioBufferPeer(){}
-	virtual ~AudiereAudioBufferPeer(){}
-
-	audiere::SampleBufferPtr sampleBuffer;
+	static bool convert(tbyte *src,int srcChannels,int srcBitsPerSample,int srcSamplesPerSecond,tbyte *dst,int dstChannels,int dstBitsPerSample,int dstSamplesPerSecond,int length);
 };
 
 }

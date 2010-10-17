@@ -170,7 +170,7 @@ public:
 		}
 	}
 
-	static bool convert(uint8 *src,int srcFormat,int srcRowPitch,int srcSlicePitch,uint8 *dst,int dstFormat,int dstRowPitch,int dstSlicePitch,int width,int height,int depth);
+	static bool convert(tbyte *src,int srcFormat,int srcRowPitch,int srcSlicePitch,tbyte *dst,int dstFormat,int dstRowPitch,int dstSlicePitch,int width,int height,int depth);
 };
 
 }

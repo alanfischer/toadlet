@@ -50,7 +50,7 @@ typedef void (*proc_alBufferDataStatic)(ALuint buffer,ALenum format,ALvoid *data
 class TOADLET_API ALPlayer:public AudioPlayer{
 public:
 	// Options
-	const static int Option_FADE_IN_BUFFER_TIME=1;
+	const static int Option_BUFFER_FADE_TIME=1;
 	
 	ALPlayer();
 	virtual ~ALPlayer();
@@ -79,7 +79,7 @@ public:
 	void decodeStream(AudioStream *decoder,tbyte *&finalBuffer,int &finalLength);
 	ALuint checkoutSourceHandle(ALAudio *audio);
 	void checkinSourceHandle(ALAudio *audio,ALuint source);
-	int getBufferFadeInTime() const{return mBufferFadeInTime;}
+	int getBufferFadeTime() const{return mBufferFadeTime;}
 
 	void lock(){mMutex.lock();}
 	void unlock(){mMutex.unlock();}
@@ -99,8 +99,8 @@ protected:
 	egg::Collection<ALAudio*> mAudios;
 	egg::Collection<unsigned int> mSourcePool;
 	egg::Collection<unsigned int> mAllSources;
-	scalar mDefaultRolloffFactor;
-	int mBufferFadeInTime;
+	int mBufferFadeTime;
+	int mBufferSize;
 
 	egg::Mutex mMutex;
 

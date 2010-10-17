@@ -56,13 +56,8 @@ Win32Audio::~Win32Audio(){
 bool Win32Audio::create(AudioBuffer::ptr audioBuffer){
 	destroy();
 
-	// For now we just make sure things are in the correct format, in the future we will convert them
-	Win32AudioBuffer::ptr win32AudioBuffer=shared_static_cast<Win32AudioBuffer>(audioBuffer);
-	TOADLET_ASSERT(win32AudioBuffer->mChannels==1);
-	TOADLET_ASSERT(win32AudioBuffer->mBitsPerSample==8);
-
 	mPlayer->internal_audioCreate(this);
-	mAudioBuffer=win32AudioBuffer;
+	mAudioBuffer=shared_static_cast<Win32AudioBuffer>(audioBuffer);
 	return true;
 }
 
@@ -76,14 +71,46 @@ void Win32Audio::destroy(){
 	mPlayer->internal_audioDestroy(this);
 }
 
-int Win32Audio::read(int8 *data,int length){
-	int byteAmount=Math::minVal(length*1 /* channels * bps */,mAudioBuffer->mLength-mPosition);
+int Win32Audio::read(tbyte *data,int length){
+	if(mPlaying==false){
+		return 0;
+	}
 
-	memcpy(data,mAudioBuffer->mData,byteAmount);
+	int amount=Math::minVal(length,mAudioBuffer->mLength-mPosition);
+	memcpy(data,mAudioBuffer->mData+mPosition,amount);
+	mPosition+=amount;
 
-	mPosition+=byteAmount;
+	if(amount>0){
+		int i;
+		if(mGain!=Math::ONE){
+			if(mPlayer->getBitsPerSample()==8){
+				for(i=0;i<amount;++i){
+					data[i]=Math::toInt(Math::mul(Math::fromInt(data[i]),mGain));
+				}
+			}
+			else if(mPlayer->getBitsPerSample()==16){
+				for(i=0;i<amount;++i){
+					/// @todo: make this work on uin16 instead of just tbytes
+					data[i]=Math::toInt(Math::mul(Math::fromInt(data[i]),mGain));
+				}
+			}
+		}
 
-	return byteAmount/1;
+		for(i=amount;i<length;++i){
+			data[i]=data[amount-1];
+		}
+	}
+
+	if(mPosition>=mAudioBuffer->mLength){
+		if(mLooping){
+			mPosition=0;
+		}
+		else{
+			mPlaying=false;
+		}
+	}
+
+	return amount;
 }
 
 }

@@ -68,6 +68,11 @@ bool D3D9VertexBuffer::create(int usage,int access,VertexFormat::ptr vertexForma
 	mVertexSize=mVertexFormat->getVertexSize();
 	mDataSize=mVertexSize*mSize;
 
+	D3D9VertexFormat *d3dvertexFormat=(D3D9VertexFormat*)mVertexFormat->getRootVertexFormat();
+	if(d3dvertexFormat->getContextCreated()==false){
+		d3dvertexFormat->createContext();
+	}
+
 	createContext(false);
 	
 	return true;
@@ -112,7 +117,7 @@ bool D3D9VertexBuffer::createContext(bool restore){
 		mD3DUsage|=D3DUSAGE_WRITEONLY;
 	}
 
-	D3D9VertexFormat *d3dvertexFormat=(D3D9VertexFormat*)mVertexFormat.get();
+	D3D9VertexFormat *d3dvertexFormat=(D3D9VertexFormat*)mVertexFormat->getRootVertexFormat();
 	HRESULT result=mRenderer->getDirect3DDevice9()->CreateVertexBuffer(mDataSize,mD3DUsage,d3dvertexFormat->getFVF(),mD3DPool,&mVertexBuffer TOADLET_SHAREDHANDLE);
 	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: CreateVertexBuffer");
 

@@ -26,6 +26,7 @@
 #include "Win32AudioBuffer.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/ribbit/AudioFormatConversion.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
@@ -35,9 +36,6 @@ namespace ribbit{
 
 Win32AudioBuffer::Win32AudioBuffer(Win32Player *player):BaseResource(),
 	mAudioPlayer(NULL),
-	mChannels(0),
-	mSamplesPerSecond(0),
-	mBitsPerSample(0),
 	mData(NULL),
 	mLength(0)
 {
@@ -54,10 +52,54 @@ bool Win32AudioBuffer::create(Stream::ptr stream,const String &mimeType){
 		return false;
 	}
 
-	mChannels=decoder->getChannels();
-	mSamplesPerSecond=decoder->getSamplesPerSecond();
-	mBitsPerSample=decoder->getBitsPerSample();
-	mAudioPlayer->decodeStream(decoder,mData,mLength);
+	int channels=decoder->getChannels();
+	int sps=decoder->getSamplesPerSecond();
+	int bps=decoder->getBitsPerSample();
+	tbyte *buffer=NULL;
+	int length=0;
+
+	mAudioPlayer->decodeStream(decoder,buffer,length);
+	int numsamps=length/channels/(bps/8);
+
+	// Lets us programatically reduce popping on some platforms
+	if(mAudioPlayer->getBufferFadeTime()>0){
+		int stf=sps*mAudioPlayer->getBufferFadeTime()/1000;
+		if(stf>numsamps){stf=numsamps;}
+		int sampsize=channels*(bps/8);
+		int i,j;
+		for(i=0;i<stf;++i){
+			// Fade front
+			for(j=0;j<sampsize;++j){
+				buffer[i*sampsize+j]=(tbyte)(((int)buffer[i*sampsize+j])*i/stf);
+			}
+			// Fade back
+			for(j=0;j<sampsize;++j){
+				buffer[(numsamps-i-1)*sampsize+j]=(tbyte)(((int)buffer[(numsamps-i-1)*sampsize+j])*i/stf);
+			}
+		}
+	}
+
+	int nchannels=mAudioPlayer->getChannels();	
+	int nbps=mAudioPlayer->getBitsPerSample();
+	int nsps=mAudioPlayer->getSamplesPerSecond();
+
+	if(nchannels!=channels || nbps!=bps || nsps!=sps){
+		Logger::debug(Categories::TOADLET_RIBBIT,String("converting audio from ")+channels+","+bps+","+sps+" to "+nchannels+","+nbps+","+nsps);
+
+		int nlength=numsamps*nchannels*(nbps/8);
+		tbyte *nbuffer=new tbyte[nlength];
+
+		AudioFormatConversion::convert(buffer,channels,bps,sps,nbuffer,nchannels,nbps,nsps,length);
+
+		delete[] buffer;
+
+		mLength=nlength;
+		mData=nbuffer;
+	}
+	else{
+		mLength=length;
+		mData=buffer;
+	}
 
 	return true;
 }

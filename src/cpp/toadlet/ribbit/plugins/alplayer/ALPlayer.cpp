@@ -58,8 +58,6 @@ extern AudioStream *new_CoreAudioDecoder();
 extern AudioStream *new_OggVorbisDecoder();
 extern AudioStream *new_WaveDecoder();
 
-const int DECODE_BUFFER_SIZE=4096;
-
 TOADLET_C_API AudioPlayer* new_ALPlayer(){
 	return new ALPlayer();
 }
@@ -76,15 +74,17 @@ ALPlayer::ALPlayer():
 	//mAudios,
 	//mSourcePool,
 	//mAllSources,
-	mDefaultRolloffFactor(0),
-	mBufferFadeInTime(0),
+	mBufferFadeTime(0),
+	mBufferSize(0),
 
 	//mMutex,
 
 	//mCapabilitySet,
 
 	alBufferDataStatic(NULL)
-{}
+{
+	mBufferFadeTime=100;
+}
 
 ALPlayer::~ALPlayer(){
 	destroy();
@@ -98,10 +98,10 @@ bool ALPlayer::create(int *options){
 		int i=0;
 		while(options[i]!=0){
 			switch(options[i++]){
-				case Option_FADE_IN_BUFFER_TIME:
-					mBufferFadeInTime=options[i++];
+				case Option_BUFFER_FADE_TIME:
+					mBufferFadeTime=options[i++];
 					Logger::alert(Categories::TOADLET_PEEPER,
-						String("Setting BufferFadeInTime to:")+mBufferFadeInTime);
+						String("Setting BufferFadeTime to:")+mBufferFadeTime);
 					break;
 			}
 		}
@@ -121,6 +121,8 @@ bool ALPlayer::create(int *options){
 		Logger::alert(Categories::TOADLET_RIBBIT,
 			String("alem_getAccelerated result:")+alemAcceleratedResult);
 	#endif
+
+	mBufferSize=4096;
 
 	// Initialize Open AL manually
 	mDevice=alcOpenDevice(NULL);
@@ -173,8 +175,6 @@ bool ALPlayer::create(int *options){
 	alListener3f(AL_POSITION,0.001,0.001,0.001);
 	TOADLET_CHECK_ALERROR("alListener3f");
 
-	mDefaultRolloffFactor=Math::ONE;
-
 	mAllSources.resize(mCapabilitySet.maxSources);
 	alGenSources(mAllSources.size(),&mAllSources[0]);
 	TOADLET_CHECK_ALERROR("alGenSources");
@@ -196,7 +196,7 @@ bool ALPlayer::create(int *options){
 
 bool ALPlayer::destroy(){
 	Logger::alert(Categories::TOADLET_RIBBIT,
-		"shutingdown ALPlayer");
+		"destroying ALPlayer");
 
 	int i;
 	for(i=0;i<mAudios.size();++i){
@@ -222,9 +222,6 @@ bool ALPlayer::destroy(){
 		alcCloseDevice(mDevice);
 		mDevice=NULL;
 	}
-
-	Logger::alert(Categories::TOADLET_RIBBIT,
-		"shutdown ALPlayer");
 
 	return true;
 }
@@ -273,8 +270,8 @@ void ALPlayer::decodeStream(AudioStream *decoder,tbyte *&finalBuffer,int &finalL
 	int i=0;
 
 	while(true){
-		tbyte *buffer=new tbyte[DECODE_BUFFER_SIZE];
-		amount=decoder->read(buffer,DECODE_BUFFER_SIZE);
+		tbyte *buffer=new tbyte[mBufferSize];
+		amount=decoder->read(buffer,mBufferSize);
 		if(amount==0){
 			delete[] buffer;
 			break;
@@ -289,12 +286,12 @@ void ALPlayer::decodeStream(AudioStream *decoder,tbyte *&finalBuffer,int &finalL
 	finalLength=total;
 
 	for(i=0;i<buffers.size();++i){
-		int thing=DECODE_BUFFER_SIZE;
+		int thing=mBufferSize;
 		if(total<thing){
 			thing=total;
 		}
-		memcpy(finalBuffer+i*DECODE_BUFFER_SIZE,buffers[i],thing);
-		total-=DECODE_BUFFER_SIZE;
+		memcpy(finalBuffer+i*mBufferSize,buffers[i],thing);
+		total-=mBufferSize;
 		delete[] buffers[i];
 	}
 

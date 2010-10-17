@@ -4,6 +4,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.in ${CMAKE_CURRENT_BINARY_
 
 # Source files for toadlet_ribbit
 set (RIBBIT_SRC
+	AudioFormatConversion.cpp
 	Version.cpp
 )
 
@@ -12,6 +13,7 @@ set (RIBBIT_SRC
 set (RIBBIT_HEADERS
 	Audio.h
 	AudioBuffer.h
+	AudioFormatConversion.h
 	AudioPlayer.h
 	AudioStream.h
 	CapabilitySet.h

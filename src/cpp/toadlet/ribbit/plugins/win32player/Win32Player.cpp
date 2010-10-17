@@ -44,9 +44,6 @@ namespace ribbit{
 extern AudioStream *new_OggVorbisDecoder();
 extern AudioStream *new_WaveDecoder();
 
-const static int bufferSize=4096*4;
-const static int numBuffers=8;
-
 TOADLET_C_API AudioPlayer* new_Win32Player(){
 	return new Win32Player();
 }
@@ -59,19 +56,22 @@ TOADLET_C_API AudioPlayer* new_Win32Player(){
 
 Win32Player::Win32Player():
 	mChannels(0),
-	mSamplesPerSecond(0),
 	mBitsPerSample(0),
-
+	mSamplesPerSecond(0),
 	mDevice(NULL),
 	mBuffers(NULL),
-	mBufferData(NULL)
+	mBufferData(NULL),
+	mBufferFadeTime(0),
+	mNumBuffers(0),
+	mBufferSize(0)
 {
 	mChannels=1;
+	mBitsPerSample=16;
 	mSamplesPerSecond=11025;//44100;
-	mBitsPerSample=8;
+	mBufferFadeTime=100;
+	mNumBuffers=4;
+	mBufferSize=2048;
 
-	// Actually calling waveOutGetNumDevs here seems to hang the console window upon shutdown SOMETIMES, not always.
-	// So for now lets just leave it at one and look into this later.
 	mCapabilitySet.maxSources=16;
 	mCapabilitySet.mimeTypes.add("audio/x-wav");
 }
@@ -81,6 +81,21 @@ Win32Player::~Win32Player(){
 }
 
 bool Win32Player::create(int *options){
+	Logger::alert(Categories::TOADLET_RIBBIT,
+		"creating Win32Player");
+
+	if(options!=NULL){
+		int i=0;
+		while(options[i]!=0){
+			switch(options[i++]){
+				case Option_BUFFER_FADE_TIME:
+					mBufferFadeTime=options[i++];
+					Logger::alert(Categories::TOADLET_PEEPER,
+						String("Setting BufferFadeTime to:")+mBufferFadeTime);
+					break;
+			}
+		}
+	}
 	WAVEFORMATEX format={0};
 	format.cbSize=sizeof(WAVEFORMATEX);
 	format.wFormatTag=WAVE_FORMAT_PCM;
@@ -95,17 +110,17 @@ bool Win32Player::create(int *options){
 		return false;
 	}
 
-	mBuffers=new WAVEHDR[numBuffers];
-	memset(mBuffers,0,sizeof(WAVEHDR)*numBuffers);
+	mBuffers=new WAVEHDR[mNumBuffers];
+	memset(mBuffers,0,sizeof(WAVEHDR)*mNumBuffers);
 
-	mBufferData=new int16[numBuffers*bufferSize];
-	memset(mBufferData,0,numBuffers*bufferSize);
+	mBufferData=new tbyte[mNumBuffers*mBufferSize];
+	memset(mBufferData,0,mNumBuffers*mBufferSize);
 
 	int i;
-	for(i=0;i<numBuffers;++i){
+	for(i=0;i<mNumBuffers;++i){
 		WAVEHDR *header=&mBuffers[i];
-		header->lpData=(LPSTR)(mBufferData+bufferSize*i);
-		header->dwBufferLength=bufferSize;
+		header->lpData=(LPSTR)(mBufferData+mBufferSize*i);
+		header->dwBufferLength=mBufferSize;
 
 		result=waveOutPrepareHeader(mDevice,header,sizeof(WAVEHDR));
 		if(result!=MMSYSERR_NOERROR){
@@ -122,11 +137,14 @@ bool Win32Player::create(int *options){
 }
 
 bool Win32Player::destroy(){
+	Logger::alert(Categories::TOADLET_RIBBIT,
+		"destroying Win32Player");
+
 	if(mDevice!=NULL){
 	    waveOutReset(mDevice);
 
 		int i;
-	    for(i=0;i<numBuffers;++i){
+	    for(i=0;i<mNumBuffers;++i){
 			WAVEHDR *header=&mBuffers[i];
 			if((header->dwFlags&WHDR_PREPARED)>0 || (header->dwFlags&WHDR_DONE)>0){
 				waveOutUnprepareHeader(mDevice,header,sizeof(WAVEHDR));
@@ -169,7 +187,7 @@ Audio *Win32Player::createStreamingAudio(){
 
 void Win32Player::update(int dt){
 	int i;
-	for(i=0;i<numBuffers;++i){
+	for(i=0;i<mNumBuffers;++i){
 		WAVEHDR *header=&mBuffers[i];
 		if((header->dwFlags&WHDR_DONE)>0){
 			MMRESULT result=waveOutUnprepareHeader(mDevice,header,sizeof(WAVEHDR));
@@ -177,7 +195,7 @@ void Win32Player::update(int dt){
 				Logger::warning(Categories::TOADLET_RIBBIT,"waveOutUnprepareHeader error");
 			}
 
-			read((int8*)header->lpData,bufferSize/(mChannels*(mBitsPerSample/8)));
+			read((tbyte*)header->lpData,mBufferSize);
 			header->dwFlags=0;
 
 			result=waveOutPrepareHeader(mDevice,header,sizeof(WAVEHDR));
@@ -231,8 +249,8 @@ void Win32Player::decodeStream(AudioStream *decoder,tbyte *&finalBuffer,int &fin
 	int i=0;
 
 	while(true){
-		tbyte *buffer=new tbyte[bufferSize];
-		amount=decoder->read(buffer,bufferSize);
+		tbyte *buffer=new tbyte[mBufferSize];
+		amount=decoder->read(buffer,mBufferSize);
 		if(amount==0){
 			delete[] buffer;
 			break;
@@ -247,12 +265,12 @@ void Win32Player::decodeStream(AudioStream *decoder,tbyte *&finalBuffer,int &fin
 	finalLength=total;
 
 	for(i=0;i<buffers.size();++i){
-		int thing=bufferSize;
+		int thing=mBufferSize;
 		if(total<thing){
 			thing=total;
 		}
-		memcpy(finalBuffer+i*bufferSize,buffers[i],thing);
-		total-=bufferSize;
+		memcpy(finalBuffer+i*mBufferSize,buffers[i],thing);
+		total-=mBufferSize;
 		delete[] buffers[i];
 	}
 
@@ -277,9 +295,7 @@ void Win32Player::internal_audioDestroy(Win32Audio *audio){
 }
 
 // Mix all the currently playing audios
-int Win32Player::read(int8 *samples,int length){
-	const int bufferSampleSize=bufferSize/1; /* channels */
-
+int Win32Player::read(tbyte *data,int length){
 	bool playing=false;
 	int i,j;
 	for(i=0;i<mAudios.size();++i){
@@ -287,38 +303,64 @@ int Win32Player::read(int8 *samples,int length){
 	}
 
 	if(!playing){
-		memset(samples,0,length*1 /* channels * bps */);
+		memset(data,0,length);
 		return length;
 	}
 
-	int mixBuffer[bufferSampleSize];
-	int8 singleBuffer[bufferSampleSize];
+	const int bufferSize=1024;
+	int mixBuffer[bufferSize];
+	byte singleBuffer[bufferSize];
 
-	int samplesNeeded=length;
-	while(samplesNeeded>0){
+	int bps=mBitsPerSample;
+
+	int amount=0;
+	for(amount=0;amount<length;){
 		memset(mixBuffer,0,sizeof(mixBuffer));
 
-		int sampleAmount=Math::minVal(length,bufferSampleSize);
+		int newamt=Math::minVal(length-amount,bufferSize);
 
 		for(i=0;i<mAudios.size();++i){
-			int amount=mAudios[i]->read(singleBuffer,sampleAmount);
-			for(j=0;j<amount;++j){
-				mixBuffer[j]+=singleBuffer[j];
+			if(mAudios[i]->getPlaying()==false) continue;
+
+			mAudios[i]->read(singleBuffer,newamt);
+			if(bps==8){
+				for(j=0;j<newamt;++j){
+					mixBuffer[j]+=((uint8*)singleBuffer)[j];
+				}
+			}
+			else if(bps==16){
+				for(j=0;j<newamt/2;++j){
+					mixBuffer[j]+=((uint16*)singleBuffer)[j];
+				}
 			}
 		}
 
-		for(i=0;i<sampleAmount;++i){
-			int v=mixBuffer[i];
-			if(v<Extents::MIN_INT16){
-				v=Extents::MIN_INT16;
+		if(bps==8){
+			for(i=0;i<newamt;++i){
+				int v=mixBuffer[i];
+				if(v<Extents::MIN_INT8){
+					v=Extents::MIN_INT8;
+				}
+				else if(v>Extents::MAX_INT8){
+					v=Extents::MAX_INT8;
+				}
+				((uint8*)(data+amount))[i]=v;
 			}
-			else if(v>Extents::MAX_INT16){
-				v=Extents::MAX_INT16;
+		}
+		else if(bps==16){
+			for(i=0;i<newamt/2;++i){
+				int v=mixBuffer[i];
+				if(v<Extents::MIN_INT16){
+					v=Extents::MIN_INT16;
+				}
+				else if(v>Extents::MAX_INT16){
+					v=Extents::MAX_INT16;
+				}
+				((uint16*)(data+amount))[i]=v;
 			}
-			samples[i]=v;
 		}
 
-		samplesNeeded-=sampleAmount;
+		amount+=newamt;
 	}
 
 	return length;
