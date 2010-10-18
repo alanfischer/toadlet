@@ -54,7 +54,7 @@ ALAudio::ALAudio(ALPlayer *audioPlayer):
 {
 	mAudioPlayer=audioPlayer;
 
-	setGain(Math::ONE);
+	mGain=Math::ONE;
 }
 
 ALAudio::~ALAudio(){
@@ -263,7 +263,6 @@ void ALAudio::setPosition(const Vector3 &position){
 }
 
 void ALAudio::setVelocity(const Vector3 &velocity){
-	// Since doppler doesn't work on most *nix OpenALs
 	if(alIsSource(mHandle)){
 		if(mGlobal){
 			MathConversion::scalarToFloat(mAudioPlayer->cacheVector3,Math::ZERO_VECTOR3);

@@ -68,8 +68,8 @@ public:
 	void setWordWrap(bool wordWrap);
 	bool getWordWrap() const{return mWordWrap;}
 
-	void setColor(const peeper::Color &color);
-	const peeper::Color &getColor(){return mColor;}
+	void setColor(const peeper::Color &color){mMaterial->setLightEffect(peeper::LightEffect(color));}
+	const peeper::Color &getColor(){return mMaterial->getLightEffect().diffuse;}
 
 	void queueRenderables(CameraNode *camera,RenderQueue *queue);
 	Material *getRenderMaterial() const{return mMaterial;}
@@ -90,7 +90,7 @@ protected:
 	int mAlignment;
 	bool mNormalized;
 	bool mWordWrap;
-	peeper::Color mColor;
+peeper::Color mColor;
 
 	Material::ptr mMaterial;
 	peeper::VertexData::ptr mVertexData;

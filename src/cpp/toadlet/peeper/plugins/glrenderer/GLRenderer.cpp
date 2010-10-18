@@ -1718,6 +1718,9 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastSemanticBits)
 		}
 	}
 
+	if((semanticBits&(1<<VertexFormat::Semantic_NORMAL))==0){
+		glNormal3f(0,0,0);
+	}
 	if((semanticBits&(1<<VertexFormat::Semantic_COLOR))==0){
 		glColor4f(1.0f,1.0f,1.0f,1.0f);
 	}

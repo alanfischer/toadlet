@@ -66,6 +66,7 @@ public:
 		Format_BIT_RGBA=			1<<5,
 		Format_BIT_BGRA=			1<<6,
 		Format_BIT_DEPTH=			1<<10,
+		Format_ALL_COLOR=			0xFFFF,
 
 		// These formats are stored sequentially in memory
 		Format_BIT_UINT_8=			1<<20,
@@ -78,6 +79,7 @@ public:
 		Format_BIT_UINT_5_6_5=		1<<26,
 		Format_BIT_UINT_5_5_5_1=	1<<27,
 		Format_BIT_UINT_4_4_4_4=	1<<28,
+		Format_ALL_SIZE=			0xFFFF0000,
 
 		Format_L_8=					Format_BIT_L|Format_BIT_UINT_8,
 		Format_A_8=					Format_BIT_A|Format_BIT_UINT_8,
