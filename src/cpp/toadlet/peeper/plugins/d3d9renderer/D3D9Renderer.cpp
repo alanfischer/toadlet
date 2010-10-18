@@ -1011,13 +1011,16 @@ int D3D9Renderer::getClosestTextureFormat(int format){
 	switch(format){
 		#if defined(TOADLET_SET_D3DM)
 			case Texture::Format_L_8:
-				return Texture::Format_BGR_5_6_5;
+				return Texture::Format_BGR_8;
 			case Texture::Format_A_8:
 			case Texture::Format_LA_8:
 				return Texture::Format_BGRA_8;
 		#else
+			case Texture::Format_L_8:
+				return Texture::Format_BGR_8;
 			case Texture::Format_A_8:
-				return Texture::Format_LA_8;
+			case Texture::Format_LA_8:
+				return Texture::Format_BGRA_8;
 		#endif
 		case Texture::Format_RGB_8:
 			return Texture::Format_BGR_8;
@@ -1071,6 +1074,8 @@ D3DFORMAT D3D9Renderer::getD3DFORMAT(int format){
 		#if !defined(TOADLET_SET_D3DM)
 			case Texture::Format_L_8:
 				return D3DFMT_L8;
+			case Texture::Format_A_8:
+				return D3DFMT_A8;
 			case Texture::Format_LA_8:
 				return D3DFMT_A8L8;
 		#endif

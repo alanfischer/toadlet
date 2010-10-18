@@ -171,10 +171,6 @@ bool ALPlayer::create(int *options){
 	alDopplerVelocity(340.0); /// @todo: Move the doppler parameters to the interface
 	TOADLET_CHECK_ALERROR("alDopplerVelocity");
 
-	// We use a small epsilon here, since I believe an AL_POSITION of 0,0,0 on the listener results in no sound volume scaling for distances
-	alListener3f(AL_POSITION,0.001,0.001,0.001);
-	TOADLET_CHECK_ALERROR("alListener3f");
-
 	mAllSources.resize(mCapabilitySet.maxSources);
 	alGenSources(mAllSources.size(),&mAllSources[0]);
 	TOADLET_CHECK_ALERROR("alGenSources");
