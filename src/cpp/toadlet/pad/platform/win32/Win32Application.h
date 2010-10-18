@@ -41,22 +41,27 @@ class TOADLET_API Win32Application:public BaseApplication{
 public:
 	enum RendererPlugin{
 		RendererPlugin_NONE=-1,
+		RendererPlugin_ANY,
 		RendererPlugin_OPENGL,
 		RendererPlugin_D3DM,
 		RendererPlugin_D3D9,
 		RendererPlugin_D3D10,
 		RendererPlugin_D3D11,
+		RendererPlugin_MAX,
 	};
 
 	enum AudioPlayerPlugin{
 		AudioPlayerPlugin_NONE=-1,
+		AudioPlayerPlugin_ANY,
 		AudioPlayerPlugin_OPENAL,
 		AudioPlayerPlugin_WIN32,
+		AudioPlayerPlugin_MAX
 	};
 
 	enum MotionDetectorPlugin{
 		MotionDetectorPlugin_NONE=-1,
 		MotionDetectorPlugin_ANY,
+		MotionDetectorPlugin_MAX,
 	};
 
 	Win32Application();

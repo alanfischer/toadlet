@@ -670,10 +670,6 @@ RenderTarget *Win32Application::makeRenderTarget(int rendererPlugin){
 			target=new_D3D11WindowRenderTarget(win32->mWnd,mVisual,true);
 		#endif
 	}
-	if(target==NULL){
-		Error::unknown("no Renderers defined");
-		return NULL;
-	}
 	if(target!=NULL && target->isValid()==false){
 		delete target;
 		target=NULL;
@@ -719,38 +715,35 @@ bool Win32Application::createContextAndRenderer(int plugin){
 	Logger::debug(Categories::TOADLET_PAD,
 		"Win32Application: creating RenderTarget and Renderer");
 
-	RenderTarget *renderTarget=makeRenderTarget(plugin);
-	if(renderTarget!=NULL){
-		mRenderTarget=renderTarget;
-
-		mRenderer=makeRenderer(plugin);
-		if(mRenderer!=NULL){
-			bool result=false;
+	bool result=false;
+	int trying=plugin;
+	do{
+		mRenderTarget=makeRenderTarget(trying);
+		if(mRenderTarget!=NULL){
+			mRenderer=makeRenderer(trying);
 			TOADLET_TRY
 				result=mRenderer->create(this,mRendererOptions);
 			TOADLET_CATCH(const Exception &){result=false;}
 			if(result==false){
 				delete mRenderer;
 				mRenderer=NULL;
-				Error::unknown(Categories::TOADLET_PAD,
-					"Error starting Renderer");
-				return false;
 			}
 		}
-		else{
-			Error::unknown(Categories::TOADLET_PAD,
-				"Error creating Renderer");
-			return false;
-		}
-
-		if(mRenderer==NULL){
+		if(result==false){
 			delete mRenderTarget;
 			mRenderTarget=NULL;
 		}
-	}
-	else{
+		trying++;
+	}while(mRenderer==NULL && plugin==RendererPlugin_ANY && trying!=RendererPlugin_MAX);
+
+	if(result==false){
 		Error::unknown(Categories::TOADLET_PAD,
-			"Error creating RenderTarget");
+			"Error starting Renderer");
+		return false;
+	}
+	else if(mRenderer==NULL){
+		Error::unknown(Categories::TOADLET_PAD,
+			"Error creating Renderer");
 		return false;
 	}
 
@@ -813,10 +806,6 @@ AudioPlayer *Win32Application::makeAudioPlayer(int plugin){
 			audioPlayer=new_Win32Player();
 		#endif
 	}
-	if(audioPlayer==NULL){
-		Error::unknown("no AudioPlayers defined");
-		return NULL;
-	}
 	return audioPlayer;
 }
 
@@ -828,21 +817,28 @@ bool Win32Application::createAudioPlayer(int plugin){
 	Logger::debug(Categories::TOADLET_PAD,
 		"Win32Application: creating AudioPlayer");
 
-	mAudioPlayer=makeAudioPlayer(plugin);
-	if(mAudioPlayer!=NULL){
-		bool result=false;
-		TOADLET_TRY
-			result=mAudioPlayer->create(mAudioPlayerOptions);
-		TOADLET_CATCH(const Exception &){result=false;}
-		if(result==false){
-			delete mAudioPlayer;
-			mAudioPlayer=NULL;
-			Error::unknown(Categories::TOADLET_PAD,
-				"Error starting AudioPlayer");
-			return false;
+	bool result=false;
+	int trying=plugin;
+	do{
+		mAudioPlayer=makeAudioPlayer(trying);
+		if(mAudioPlayer!=NULL){
+			TOADLET_TRY
+				result=mAudioPlayer->create(mAudioPlayerOptions);
+			TOADLET_CATCH(const Exception &){result=false;}
+			if(result==false){
+				delete mAudioPlayer;
+				mAudioPlayer=NULL;
+			}
 		}
+		trying++;
+	}while(mAudioPlayer==NULL && plugin==AudioPlayerPlugin_ANY && trying!=AudioPlayerPlugin_MAX);
+
+	if(result==false){
+		Error::unknown(Categories::TOADLET_PAD,
+			"Error starting AudioPlayer");
+		return false;
 	}
-	else{
+	else if(mAudioPlayer==NULL){
 		Error::unknown(Categories::TOADLET_PAD,
 			"Error creating AudioPlayer");
 		return false;
