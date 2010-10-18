@@ -156,11 +156,24 @@ namespace Math{
 		return TOADLET_MIN_XX(x,y);
 	}
 
+	inline int intMinVal(int x,int y){
+		return TOADLET_MIN_XX(x,y);
+	}
+
 	inline fixed maxVal(fixed x,fixed y){
 		return TOADLET_MAX_XX(x,y);
 	}
 
+	inline int intMaxVal(int x,int y){
+		return TOADLET_MAX_XX(x,y);
+	}
+
 	inline fixed clamp(fixed low,fixed high,fixed value){
+		low=TOADLET_MAX_XX(low,value);
+		return TOADLET_MIN_XX(high,low);
+	}
+
+	inline int intClamp(int low,int high,int value){
 		low=TOADLET_MAX_XX(low,value);
 		return TOADLET_MIN_XX(high,low);
 	}

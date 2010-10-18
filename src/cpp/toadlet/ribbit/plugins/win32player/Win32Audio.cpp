@@ -76,22 +76,23 @@ int Win32Audio::read(tbyte *data,int length){
 		return 0;
 	}
 
+	int bps=mPlayer->getBitsPerSample();
+
 	int amount=Math::minVal(length,mAudioBuffer->mLength-mPosition);
 	memcpy(data,mAudioBuffer->mData+mPosition,amount);
 	mPosition+=amount;
 
 	if(amount>0){
 		int i;
-		if(mGain!=Math::ONE){
-			if(mPlayer->getBitsPerSample()==8){
+		if(mGain<Math::ONE){
+			if(bps==8){
 				for(i=0;i<amount;++i){
-					data[i]=Math::toInt(Math::mul(Math::fromInt(data[i]),mGain));
+					((uint8*)data)[i]=Math::toInt(Math::mul(Math::fromInt(((int)((uint8*)data)[i])-128),mGain))+128;
 				}
 			}
-			else if(mPlayer->getBitsPerSample()==16){
-				for(i=0;i<amount;++i){
-					/// @todo: make this work on uin16 instead of just tbytes
-					data[i]=Math::toInt(Math::mul(Math::fromInt(data[i]),mGain));
+			else if(bps==16){
+				for(i=0;i<amount/2;++i){
+					((int16*)data)[i]=Math::toInt(Math::mul(Math::fromInt(((int)((int16*)data)[i])),mGain));
 				}
 			}
 		}

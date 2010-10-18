@@ -69,7 +69,6 @@ public:
 	const CapabilitySet &getCapabilitySet(){return mCapabilitySet;}
 
 	AudioStream::ptr startAudioStream(egg::io::Stream::ptr stream,const egg::String &mimeType);
-	void decodeStream(AudioStream *decoder,tbyte *&finalBuffer,int &finalLength);
 	int getBufferFadeTime() const{return mBufferFadeTime;}
 	int getChannels() const{return mChannels;}
 	int getBitsPerSample() const{return mBitsPerSample;}

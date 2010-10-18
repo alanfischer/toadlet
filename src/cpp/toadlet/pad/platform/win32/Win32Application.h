@@ -61,6 +61,8 @@ public:
 	enum MotionDetectorPlugin{
 		MotionDetectorPlugin_NONE=-1,
 		MotionDetectorPlugin_ANY,
+		MotionDetectorPlugin_HTC,
+		MotionDetectorPlugin_SAMSUNG,
 		MotionDetectorPlugin_MAX,
 	};
 
@@ -159,7 +161,8 @@ protected:
 	bool createAudioPlayer(int plugin);
 	bool destroyAudioPlayer();
 
-	bool createMotionDetector();
+	flick::MotionDetector *makeMotionDetector(int plugin);
+	bool createMotionDetector(int plugin);
 	bool destroyMotionDetector();
 
 	egg::String mTitle;

@@ -75,7 +75,6 @@ ALPlayer::ALPlayer():
 	//mSourcePool,
 	//mAllSources,
 	mBufferFadeTime(0),
-	mBufferSize(0),
 
 	//mMutex,
 
@@ -121,8 +120,6 @@ bool ALPlayer::create(int *options){
 		Logger::alert(Categories::TOADLET_RIBBIT,
 			String("alem_getAccelerated result:")+alemAcceleratedResult);
 	#endif
-
-	mBufferSize=4096;
 
 	// Initialize Open AL manually
 	mDevice=alcOpenDevice(NULL);
@@ -260,53 +257,10 @@ void ALPlayer::update(int dt){
 	unlock();
 }
 
-void ALPlayer::decodeStream(AudioStream *decoder,tbyte *&finalBuffer,int &finalLength){
-	Collection<tbyte*> buffers;
-	int amount=0,total=0;
-	int i=0;
-
-	while(true){
-		tbyte *buffer=new tbyte[mBufferSize];
-		amount=decoder->read(buffer,mBufferSize);
-		if(amount==0){
-			delete[] buffer;
-			break;
-		}
-		else{
-			total+=amount;
-			buffers.add(buffer);
-		}
-	}
-
-	finalBuffer=new tbyte[total];
-	finalLength=total;
-
-	for(i=0;i<buffers.size();++i){
-		int thing=mBufferSize;
-		if(total<thing){
-			thing=total;
-		}
-		memcpy(finalBuffer+i*mBufferSize,buffers[i],thing);
-		total-=mBufferSize;
-		delete[] buffers[i];
-	}
-
-	#if !defined(TOADLET_NATIVE_FORMAT)
-		int bps=decoder->getBitsPerSample();
-		if(bps==16){
-			int i=0;
-			while(i<finalLength){
-				littleInt16InPlace((int16&)finalBuffer[i]);
-				i+=2;
-			}
-		}
-	#endif
-}
-
 AudioStream::ptr ALPlayer::startAudioStream(io::Stream::ptr stream,const String &mimeType){
 	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_RIBBIT,
-			"ALPlayer: Null Stream");
+			"null Stream");
 		return NULL;
 	}
 
@@ -326,13 +280,13 @@ AudioStream::ptr ALPlayer::startAudioStream(io::Stream::ptr stream,const String 
 
 	if(decoder==NULL){
 		Error::unknown(Categories::TOADLET_RIBBIT,
-			"ALPlayer: MIME type not supported: " + mimeType);
+			"MIME type not supported: " + mimeType);
 		return NULL;
 	}
 
 	if(decoder->startStream(stream)==false){
 		Error::unknown(Categories::TOADLET_RIBBIT,
-			"ALPlayer: Error starting decoder stream");
+			"error starting decoder stream");
 		return NULL;
 	}
 

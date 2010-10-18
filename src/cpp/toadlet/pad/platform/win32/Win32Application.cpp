@@ -202,7 +202,7 @@ void Win32Application::create(int renderer,int audioPlayer,int motionDetector){
 		createAudioPlayer(audioPlayer);
 	}
 	if(motionDetector!=MotionDetectorPlugin_NONE){
-		createMotionDetector();
+		createMotionDetector(motionDetector);
 	}
 	createWindow();
 	activate();
@@ -737,12 +737,12 @@ bool Win32Application::createContextAndRenderer(int plugin){
 	}while(mRenderer==NULL && plugin==RendererPlugin_ANY && trying!=RendererPlugin_MAX);
 
 	if(result==false){
-		Error::unknown(Categories::TOADLET_PAD,
+		Logger::error(Categories::TOADLET_PAD,
 			"Error starting Renderer");
 		return false;
 	}
 	else if(mRenderer==NULL){
-		Error::unknown(Categories::TOADLET_PAD,
+		Logger::error(Categories::TOADLET_PAD,
 			"Error creating Renderer");
 		return false;
 	}
@@ -834,12 +834,12 @@ bool Win32Application::createAudioPlayer(int plugin){
 	}while(mAudioPlayer==NULL && plugin==AudioPlayerPlugin_ANY && trying!=AudioPlayerPlugin_MAX);
 
 	if(result==false){
-		Error::unknown(Categories::TOADLET_PAD,
+		Logger::error(Categories::TOADLET_PAD,
 			"Error starting AudioPlayer");
 		return false;
 	}
 	else if(mAudioPlayer==NULL){
-		Error::unknown(Categories::TOADLET_PAD,
+		Logger::error(Categories::TOADLET_PAD,
 			"Error creating AudioPlayer");
 		return false;
 	}
@@ -860,11 +860,34 @@ bool Win32Application::destroyAudioPlayer(){
 	return true;
 }
 
-bool Win32Application::createMotionDetector(){
-	#if defined(TOADLET_PLATFORM_WINCE)
-		if(mMotionDetector==NULL){
-			mMotionDetector=new_HTCMotionDetector();
-			bool result=false;
+MotionDetector *Win32Application::makeMotionDetector(int plugin){
+	MotionDetector *motionDetector=NULL;
+	if(plugin==MotionDetectorPlugin_HTC){
+		#if defined(TOADLET_PLATFORM_WINCE)
+			motionDetector=new_HTCMotionDetector();
+		#endif
+	}
+	else if(plugin==MotionDetectorPlugin_SAMSUNG){
+		#if defined(TOADLET_PLATFORM_WINCE)
+			motionDetector=new_SamsungMotionDetector();
+		#endif
+	}
+	return motionDetector;
+}
+
+bool Win32Application::createMotionDetector(int plugin){
+	if(plugin==MotionDetectorPlugin_NONE){
+		return false;
+	}
+
+	Logger::debug(Categories::TOADLET_PAD,
+		"Win32Application: creating MotionDetector");
+
+	bool result=false;
+	int trying=plugin;
+	do{
+		mMotionDetector=makeMotionDetector(trying);
+		if(mMotionDetector!=NULL){
 			TOADLET_TRY
 				result=mMotionDetector->create();
 			TOADLET_CATCH(const Exception &){result=false;}
@@ -873,18 +896,19 @@ bool Win32Application::createMotionDetector(){
 				mMotionDetector=NULL;
 			}
 		}
-		if(mMotionDetector==NULL){
-			mMotionDetector=new_SamsungMotionDetector();
-			bool result=false;
-			TOADLET_TRY
-				result=mMotionDetector->create();
-			TOADLET_CATCH(const Exception &){result=false;}
-			if(result==false){
-				delete mMotionDetector;
-				mMotionDetector=NULL;
-			}
-		}
-	#endif
+		trying++;
+	}while(mMotionDetector==NULL && plugin==MotionDetectorPlugin_ANY && trying!=MotionDetectorPlugin_MAX);
+
+	if(result==false){
+		Logger::error(Categories::TOADLET_PAD,
+			"Error starting MotionDetector");
+		return false;
+	}
+	else if(mAudioPlayer==NULL){
+		Logger::error(Categories::TOADLET_PAD,
+			"Error creating MotionDetector");
+		return false;
+	}
 	return true;
 }
 
@@ -909,9 +933,6 @@ void Win32Application::internal_resize(int width,int height){
 	resized(width,height);
 
 	if(mActive && mRenderer!=NULL){
-// Experimenting with destory&create on wince to fix screen rotation
-//destroyRendererAndContext();
-//createContextAndRenderer(mRendererPlugin);
 		if(mRenderer->getCapabilitySet().resetOnResize){
 			mEngine->contextReset(mRenderer);
 		}
