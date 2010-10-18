@@ -58,7 +58,7 @@ bool Win32AudioBuffer::create(Stream::ptr stream,const String &mimeType){
 	tbyte *buffer=NULL;
 	int length=0;
 
-	mAudioPlayer->decodeStream(decoder,buffer,length);
+	AudioFormatConversion::decode(decoder,buffer,length);
 	int numsamps=length/channels/(bps/8);
 
 	// Lets us programatically reduce popping on some platforms
@@ -67,14 +67,28 @@ bool Win32AudioBuffer::create(Stream::ptr stream,const String &mimeType){
 		if(stf>numsamps){stf=numsamps;}
 		int sampsize=channels*(bps/8);
 		int i,j;
-		for(i=0;i<stf;++i){
-			// Fade front
-			for(j=0;j<sampsize;++j){
-				buffer[i*sampsize+j]=(tbyte)(((int)buffer[i*sampsize+j])*i/stf);
+		if(bps==8){
+			for(i=0;i<stf;++i){
+				// Fade front
+				for(j=0;j<sampsize;++j){
+					buffer[i*sampsize+j]=(uint8)(((((int)buffer[i*sampsize+j])-128)*i/stf)+128);
+				}
+				// Fade back
+				for(j=0;j<sampsize;++j){
+					buffer[(numsamps-i-1)*sampsize+j]=(uint8)(((((int)buffer[(numsamps-i-1)*sampsize+j])-128)*i/stf)+128);
+				}
 			}
-			// Fade back
-			for(j=0;j<sampsize;++j){
-				buffer[(numsamps-i-1)*sampsize+j]=(tbyte)(((int)buffer[(numsamps-i-1)*sampsize+j])*i/stf);
+		}
+		else if(bps==16){
+			for(i=0;i<stf;++i){
+				// Fade front
+				for(j=0;j<sampsize;++j){
+					buffer[i*sampsize+j]=(tbyte)(((int)buffer[i*sampsize+j])*i/stf);
+				}
+				// Fade back
+				for(j=0;j<sampsize;++j){
+					buffer[(numsamps-i-1)*sampsize+j]=(tbyte)(((int)buffer[(numsamps-i-1)*sampsize+j])*i/stf);
+				}
 			}
 		}
 	}

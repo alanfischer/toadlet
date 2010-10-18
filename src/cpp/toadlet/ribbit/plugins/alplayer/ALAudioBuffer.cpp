@@ -25,6 +25,7 @@
 
 #include "ALAudioBuffer.h"
 #include "ALPlayer.h"
+#include <toadlet/ribbit/AudioFormatConversion.h>
 
 #if defined(TOADLET_PLATFORM_OSX)
 	#include <toadlet/egg/Error.h>
@@ -72,7 +73,7 @@ bool ALAudioBuffer::create(Stream::ptr stream,const String &mimeType){
 	int sps=decoder->getSamplesPerSecond();
 	int bps=decoder->getBitsPerSample();
 
-	mAudioPlayer->decodeStream(decoder,buffer,length);
+	AudioFormatConversion::decode(decoder,buffer,length);
 	int numsamps=length/channels/(bps/8);
 
 	// Lets us programatically reduce popping on some platforms

@@ -65,15 +65,6 @@ Win32Player::Win32Player():
 	mNumBuffers(0),
 	mBufferSize(0)
 {
-	mChannels=1;
-	mBitsPerSample=16;
-	mSamplesPerSecond=11025;//44100;
-	mBufferFadeTime=100;
-	mNumBuffers=4;
-	mBufferSize=2048;
-
-	mCapabilitySet.maxSources=16;
-	mCapabilitySet.mimeTypes.add("audio/x-wav");
 }
 
 Win32Player::~Win32Player(){
@@ -96,6 +87,20 @@ bool Win32Player::create(int *options){
 			}
 		}
 	}
+
+	mChannels=2;
+	mBitsPerSample=16;
+	mSamplesPerSecond=11025;//44100;
+	mBufferFadeTime=100;
+	mNumBuffers=4;
+	mBufferSize=2048;
+
+	mCapabilitySet.maxSources=16;
+	mCapabilitySet.mimeTypes.add("audio/x-wav");
+	#if defined(TOADLET_HAS_OGGVORBIS)
+		mCapabilitySet.mimeTypes.add("application/ogg");
+	#endif
+
 	WAVEFORMATEX format={0};
 	format.cbSize=sizeof(WAVEFORMATEX);
 	format.wFormatTag=WAVE_FORMAT_PCM;
@@ -114,7 +119,12 @@ bool Win32Player::create(int *options){
 	memset(mBuffers,0,sizeof(WAVEHDR)*mNumBuffers);
 
 	mBufferData=new tbyte[mNumBuffers*mBufferSize];
-	memset(mBufferData,0,mNumBuffers*mBufferSize);
+	if(mBitsPerSample==8){
+		memset(mBufferData,128,mNumBuffers*mBufferSize);
+	}
+	else{
+		memset(mBufferData,0,mNumBuffers*mBufferSize);
+	}
 
 	int i;
 	for(i=0;i<mNumBuffers;++i){
@@ -214,7 +224,7 @@ void Win32Player::update(int dt){
 AudioStream::ptr Win32Player::startAudioStream(Stream::ptr stream,const String &mimeType){
 	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_RIBBIT,
-			"Win32Player: Null Stream");
+			"null Stream");
 		return NULL;
 	}
 
@@ -230,60 +240,17 @@ AudioStream::ptr Win32Player::startAudioStream(Stream::ptr stream,const String &
 
 	if(decoder==NULL){
 		Error::unknown(Categories::TOADLET_RIBBIT,
-			"Win32Player: MIME type not supported: " + mimeType);
+			"MIME type not supported: " + mimeType);
 		return NULL;
 	}
 
 	if(decoder->startStream(stream)==false){
 		Error::unknown(Categories::TOADLET_RIBBIT,
-			"Win32Player: Error starting decoder stream");
+			"error starting decoder stream");
 		return NULL;
 	}
 
 	return decoder;
-}
-
-void Win32Player::decodeStream(AudioStream *decoder,tbyte *&finalBuffer,int &finalLength){
-	Collection<tbyte*> buffers;
-	int amount=0,total=0;
-	int i=0;
-
-	while(true){
-		tbyte *buffer=new tbyte[mBufferSize];
-		amount=decoder->read(buffer,mBufferSize);
-		if(amount==0){
-			delete[] buffer;
-			break;
-		}
-		else{
-			total+=amount;
-			buffers.add(buffer);
-		}
-	}
-
-	finalBuffer=new tbyte[total];
-	finalLength=total;
-
-	for(i=0;i<buffers.size();++i){
-		int thing=mBufferSize;
-		if(total<thing){
-			thing=total;
-		}
-		memcpy(finalBuffer+i*mBufferSize,buffers[i],thing);
-		total-=mBufferSize;
-		delete[] buffers[i];
-	}
-
-	#if !defined(TOADLET_NATIVE_FORMAT)
-		int bps=decoder->getBitsPerSample();
-		if(bps==16){
-			int i=0;
-			while(i<finalLength){
-				littleInt16InPlace((int16&)finalBuffer[i]);
-				i+=2;
-			}
-		}
-	#endif
 }
 
 void Win32Player::internal_audioCreate(Win32Audio *audio){
@@ -296,6 +263,8 @@ void Win32Player::internal_audioDestroy(Win32Audio *audio){
 
 // Mix all the currently playing audios
 int Win32Player::read(tbyte *data,int length){
+	int bps=mBitsPerSample;
+
 	bool playing=false;
 	int i,j;
 	for(i=0;i<mAudios.size();++i){
@@ -303,34 +272,37 @@ int Win32Player::read(tbyte *data,int length){
 	}
 
 	if(!playing){
-		memset(data,0,length);
+		if(bps==8){
+			memset(data,128,length);
+		}
+		else{
+			memset(data,0,length);
+		}
 		return length;
 	}
 
 	const int bufferSize=1024;
 	int mixBuffer[bufferSize];
-	byte singleBuffer[bufferSize];
+	tbyte singleBuffer[bufferSize];
 
-	int bps=mBitsPerSample;
-
-	int amount=0;
-	for(amount=0;amount<length;){
+	int amount=0,newamt=0;
+	for(amount=0;amount<length;amount+=newamt){
 		memset(mixBuffer,0,sizeof(mixBuffer));
 
-		int newamt=Math::minVal(length-amount,bufferSize);
+		newamt=Math::intMinVal(length-amount,bufferSize);
 
 		for(i=0;i<mAudios.size();++i){
 			if(mAudios[i]->getPlaying()==false) continue;
 
-			mAudios[i]->read(singleBuffer,newamt);
+			int readamt=mAudios[i]->read(singleBuffer,newamt);
 			if(bps==8){
-				for(j=0;j<newamt;++j){
-					mixBuffer[j]+=((uint8*)singleBuffer)[j];
+				for(j=0;j<readamt;++j){
+					mixBuffer[j]+=(int)(((uint8*)singleBuffer)[j])-128;
 				}
 			}
 			else if(bps==16){
-				for(j=0;j<newamt/2;++j){
-					mixBuffer[j]+=((uint16*)singleBuffer)[j];
+				for(j=0;j<readamt/2;++j){
+					mixBuffer[j]+=(int)((int16*)singleBuffer)[j];
 				}
 			}
 		}
@@ -338,29 +310,15 @@ int Win32Player::read(tbyte *data,int length){
 		if(bps==8){
 			for(i=0;i<newamt;++i){
 				int v=mixBuffer[i];
-				if(v<Extents::MIN_INT8){
-					v=Extents::MIN_INT8;
-				}
-				else if(v>Extents::MAX_INT8){
-					v=Extents::MAX_INT8;
-				}
-				((uint8*)(data+amount))[i]=v;
+				((uint8*)(data+amount))[i]=Math::intClamp(0,Extents::MAX_UINT8,v+128);
 			}
 		}
 		else if(bps==16){
 			for(i=0;i<newamt/2;++i){
 				int v=mixBuffer[i];
-				if(v<Extents::MIN_INT16){
-					v=Extents::MIN_INT16;
-				}
-				else if(v>Extents::MAX_INT16){
-					v=Extents::MAX_INT16;
-				}
-				((uint16*)(data+amount))[i]=v;
+				((int16*)(data+amount))[i]=Math::intClamp(Extents::MIN_INT16,Extents::MAX_INT16,v);
 			}
 		}
-
-		amount+=newamt;
 	}
 
 	return length;

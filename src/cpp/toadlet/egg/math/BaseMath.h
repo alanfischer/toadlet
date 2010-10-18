@@ -121,13 +121,26 @@ namespace Math{
 		return TOADLET_MIN_RR(x,y);
 	}
 
+	inline int intMinVal(int x,int y){
+		return TOADLET_MIN_RR(x,y);
+	}
+
 	inline real maxVal(real x,real y){
+		return TOADLET_MAX_RR(x,y);
+	}
+
+	inline int intMaxVal(int x,int y){
 		return TOADLET_MAX_RR(x,y);
 	}
 
 	inline real clamp(real low,real high,real value){
 		low=TOADLET_MAX_RR(low,value);
 		return TOADLET_MIN_RR(high,low);
+	}
+
+	inline int intClamp(int low,int high,int value){
+		low=TOADLET_MAX_RR(low,value);
+		return TOADLET_MIN_RR(high,value);
 	}
 
 	inline real lerp(real t1,real t2,real time){

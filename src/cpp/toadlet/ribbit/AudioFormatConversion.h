@@ -27,12 +27,14 @@
 #define TOADLET_RIBBIT_AUDIOFORMATCONVERSION_H
 
 #include <toadlet/ribbit/Types.h>
+#include <toadlet/ribbit/AudioStream.h>
 
 namespace toadlet{
 namespace ribbit{
 
 class TOADLET_API AudioFormatConversion{
 public:
+	static void decode(AudioStream *stream,tbyte *&finalBuffer,int &finalLength);
 	static bool convert(tbyte *src,int srcChannels,int srcBitsPerSample,int srcSamplesPerSecond,tbyte *dst,int dstChannels,int dstBitsPerSample,int dstSamplesPerSecond,int length);
 };
 

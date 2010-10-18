@@ -24,6 +24,8 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Extents.h>
+#include <toadlet/egg/EndianConversion.h>
 #include <toadlet/ribbit/AudioFormatConversion.h>
 #include <string.h> //memcpy
 
@@ -31,6 +33,50 @@ using namespace toadlet::egg;
 
 namespace toadlet{
 namespace ribbit{
+
+void AudioFormatConversion::decode(AudioStream *stream,tbyte *&finalBuffer,int &finalLength){
+	const static int bufferSize=4096;
+	Collection<tbyte*> buffers;
+	int amount=0,total=0;
+	int i=0;
+
+	while(true){
+		tbyte *buffer=new tbyte[bufferSize];
+		amount=stream->read(buffer,bufferSize);
+		if(amount==0){
+			delete[] buffer;
+			break;
+		}
+		else{
+			total+=amount;
+			buffers.add(buffer);
+		}
+	}
+
+	finalBuffer=new tbyte[total];
+	finalLength=total;
+
+	for(i=0;i<buffers.size();++i){
+		int thing=bufferSize;
+		if(total<thing){
+			thing=total;
+		}
+		memcpy(finalBuffer+i*bufferSize,buffers[i],thing);
+		total-=bufferSize;
+		delete[] buffers[i];
+	}
+
+	#if !defined(TOADLET_NATIVE_FORMAT)
+		int bps=stream->getBitsPerSample();
+		if(bps==16){
+			int i=0;
+			while(i<finalLength){
+				littleInt16InPlace((int16&)finalBuffer[i]);
+				i+=2;
+			}
+		}
+	#endif
+}
 
 bool AudioFormatConversion::convert(tbyte *src,int srcChannels,int srcBitsPerSample,int srcSamplesPerSecond,tbyte *dst,int dstChannels,int dstBitsPerSample,int dstSamplesPerSecond,int length){
 	/// @todo: Add in sps conversion
@@ -41,26 +87,25 @@ bool AudioFormatConversion::convert(tbyte *src,int srcChannels,int srcBitsPerSam
 	int ss=srcChannels*(srcBitsPerSample/8);
 	int ds=dstChannels*(dstBitsPerSample/8);
 	int numSamples=length/srcChannels/(srcBitsPerSample/8);
-	int bpsDiff=srcBitsPerSample-dstBitsPerSample;
 
 	/// @todo: Replace this with individual optimized versions
 	for(i=0;i<numSamples;++i){
-		if(sbps==8) v=*(uint8*)(src+i*ss);
-		else v=*(uint16*)(src+i*ss);
-		if(bpsDiff>0) v>>=bpsDiff;
-		else if(bpsDiff<0) v<<=(-bpsDiff);
-		if(dbps==8) *(uint8*)(dst+i*ds)=v;
-		else *(uint16*)(dst+i*ds)=v;
+		if(sbps==8) v=(*(uint8*)(src+i*ss))-128;
+		else v=*(int16*)(src+i*ss);
+		if(srcBitsPerSample==8 && dstBitsPerSample==16){v=Math::intClamp(Extents::MIN_INT16,Extents::MAX_INT16,v*256);}
+		else if(srcBitsPerSample==16 && dstBitsPerSample==8){v=Math::intClamp(Extents::MIN_INT8,Extents::MAX_INT8,v/256);}
+		if(dbps==8) *(uint8*)(dst+i*ds)=v+128;
+		else *(int16*)(dst+i*ds)=v;
 
 		if(dstChannels==2){
 			if(srcChannels==2){
-				if(sbps==8) v=*(uint8*)(src+i*ss+ss/2);
-				else v=*(uint16*)(src+i*ss+ss/2);
-				if(bpsDiff>0) v>>=bpsDiff;
-				else if(bpsDiff<0) v<<=(-bpsDiff);
+				if(sbps==8) v=(*(uint8*)(src+i*ss+ss/2))-128;
+				else v=*(int16*)(src+i*ss+ss/2);
+				if(srcBitsPerSample==8 && dstBitsPerSample==16){v=Math::intClamp(Extents::MIN_INT16,Extents::MAX_INT16,v*256);}
+				else if(srcBitsPerSample==16 && dstBitsPerSample==8){v=Math::intClamp(Extents::MIN_INT8,Extents::MAX_INT8,v/256);}
 			}
-			if(dbps==8) *(uint8*)(dst+i*ds+ds/2)=v;
-			else *(uint16*)(dst+i*ds+ds/2)=v;
+			if(dbps==8) *(uint8*)(dst+i*ds+ds/2)=v+128;
+			else *(int16*)(dst+i*ds+ds/2)=v;
 		}
 	}
 
