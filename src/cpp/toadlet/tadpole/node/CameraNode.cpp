@@ -320,7 +320,10 @@ bool CameraNode::culled(Node *node) const{
 }
 
 bool CameraNode::culled(const Bound &bound) const{
-	if(bound.getType()==Bound::Type_SPHERE){
+	if(bound.getType()==Bound::Type_INFINITE){
+		return false;
+	}
+	else if(bound.getType()==Bound::Type_SPHERE){
 		return culled(bound.getSphere());
 	}
 	else if(bound.getType()==Bound::Type_AABOX){

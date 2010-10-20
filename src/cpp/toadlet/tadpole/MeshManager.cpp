@@ -210,7 +210,7 @@ Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded,bool invert,Materi
 
 	Mesh::ptr mesh(new Mesh());
 	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
-	mesh->bound.setInfinite();
+	mesh->bound.set(AABox(-size,-size,-size,size,size,size));
 
 	if(unfolded){
 		mesh->subMeshes.add(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
@@ -231,22 +231,19 @@ Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded,bool invert,Materi
 		mesh->subMeshes[5]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,30,6));
 	}
 
-	int i;
-	for(i=0;i<mesh->subMeshes.size();++i){
-		Material::ptr material=mEngine->getMaterialManager()->createMaterial();
-		material->retain();
-		material->setDepthWrite(false);
-		material->setLighting(false);
-		mesh->subMeshes[i]->material=material;
-	}
-
 	mesh->subMeshes[0]->material=bottom;
+	bottom->retain();
 	if(unfolded==false){
 		mesh->subMeshes[1]->material=top;
+		top->retain();
 		mesh->subMeshes[2]->material=left;
+		left->retain();
 		mesh->subMeshes[3]->material=right;
+		right->retain();
 		mesh->subMeshes[4]->material=back;
+		back->retain();
 		mesh->subMeshes[5]->material=front;
+		front->retain();
 	}
 
 	return mesh;
