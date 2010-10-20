@@ -42,9 +42,9 @@ public:
 	Bound():type(Type_AABOX){}
 
 	/// @todo: Eliminiate the -1 for inifinite, and just replace it with the infinits type checks
-	Bound(Type type){
-		TOADLET_ASSERT(type==Type_INFINITE);
-		set(-Math::ONE);
+	Bound(Type t){
+		TOADLET_ASSERT(t==Type_INFINITE);
+		type=t;
 	}
 
 	explicit Bound(const Sphere &s){
@@ -62,13 +62,13 @@ public:
 	}
 
 	void setInfinite(){
-		type=Type_SPHERE;
-		sphere.radius=-Math::ONE;
-		update();
+		type=Type_INFINITE; 
+		box.reset();
+		sphere.reset();
 	}
 
 	void set(const Bound &b){
-		type=b.Type_AABOX;
+		type=b.type;
 		sphere.set(b.sphere);
 		box.set(b.box);
 	}
@@ -106,7 +106,10 @@ public:
 	}
 
 	void merge(const Bound &b){
-		if(type==Type_AABOX && b.type==Type_AABOX){
+		if(type==Type_INFINITE || b.type==Type_INFINITE){
+			type=Type_INFINITE;
+		}
+		else if(type==Type_AABOX && b.type==Type_AABOX){
 			box.merge(b.box);
 		}
 		else{
@@ -115,53 +118,52 @@ public:
 			Vector3 origin=(sphere.origin+b.sphere.origin)/2;
 			scalar radius=Math::maxVal(Math::length(sphere.origin,origin)+Math::maxVal(sphere.radius,0),Math::length(b.sphere.origin,origin)+Math::maxVal(b.sphere.radius,0));
 			sphere.origin.set(origin);
-			if(sphere.radius>=0 && b.sphere.radius>=0){
-				sphere.radius=radius;
-			}
-			else{
-				sphere.radius=-Math::ONE;
-			}
+			sphere.radius=radius;
 		}
 		update();
 	}
 
 
 	bool testIntersection(const Vector3 &v) const{
-		if(type==Type_AABOX){
+		if(type==Type_INFINITE){
+			return true;
+		}
+		else if(type==Type_AABOX){
 			return Math::testInside(v,box);
 		}
 		else{
-			if(sphere.radius<0){
-				return true;
-			}
 			return Math::testInside(v,sphere);
 		}
 	}
 
 	bool testIntersection(const Bound &b) const{
-		if(type==Type_AABOX && b.type==Type_AABOX){
+		if(type==Type_INFINITE || b.type==Type_INFINITE){
+			return true;
+		}
+		else if(type==Type_AABOX && b.type==Type_AABOX){
 			return testIntersection(b.box);
 		}
-		/// @todo: Add checks for AABox to Sphere, which take into account infinite.  Or just move Inifinite to its own proper type
 		else{
 			return testIntersection(b.sphere);
 		}
 	}
 
 	bool testIntersection(const AABox &a) const{
-		if(sphere.radius<0){
+		if(type==Type_INFINITE){
 			return true;
 		}
-
-		return Math::testIntersection(sphere,a);
+		else{
+			return Math::testIntersection(box,a);
+		}
 	}
 
 	bool testIntersection(const Sphere &s) const{
-		if(sphere.radius<0 || s.radius<0){
+		if(type==Type_INFINITE){
 			return true;
 		}
-
-		return Math::testIntersection(sphere,s);
+		else{
+			return Math::testIntersection(sphere,s);
+		}
 	}
 
 	Type getType() const{return type;}

@@ -25,6 +25,7 @@
 
 #include "WaveDecoder.h"
 #include <toadlet/egg/EndianConversion.h>
+#include <toadlet/egg/Logger.h>
 #include <memory.h>
 
 using namespace toadlet::egg;
@@ -93,6 +94,7 @@ bool WaveDecoder::startStream(Stream::ptr stream){
 	mSamplesPerSecond=22050;
 
 	if(stream->read((tbyte*)&header,sizeof(header))!=sizeof(header)){
+		Logger::error("unable to read header");
 		return false;
 	}
 
@@ -103,6 +105,7 @@ bool WaveDecoder::startStream(Stream::ptr stream){
 	//littleUInt32InPlace(header.fccType);
 
 	if(memcmp(&header.fccID,"RIFF",4)!=0 || memcmp(&header.fccType,"WAVE",4)!=0){
+		Logger::error("not RIFF WAVE format");
 		return false;
 	}
 
