@@ -222,11 +222,16 @@ void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const S
 		Mesh::ptr mesh=mEngine->getMeshManager()->createSkyBox(1024,false,false,down,up,front,back,right,left);
 		int i;
 		for(i=0;i<mesh->subMeshes.size();++i){
-			if(mesh->subMeshes[i]->material!=NULL){
-				mesh->subMeshes[i]->material->setDepthWrite(false);
-				mesh->subMeshes[i]->material->setLighting(false);
-mesh->subMeshes[i]->material->setFaceCulling(Renderer::FaceCulling_NONE);
-				mesh->subMeshes[i]->material->setLayer(-1);
+			Material *material=mesh->subMeshes[i]->material;
+			if(material!=NULL){
+				TextureStage::ptr textureStage=material->getTextureStage(0);
+				if(textureStage!=NULL){
+					textureStage->setUAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
+					textureStage->setVAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
+				}
+				material->setDepthWrite(false);
+				material->setLighting(false);
+				material->setLayer(-1);
 			}
 		}
 
