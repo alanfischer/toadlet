@@ -55,6 +55,8 @@ public:
 
 	peeper::Renderer *getRenderer();
 
+	peeper::Texture::ptr createNormalization(int size);
+
 protected:
 	Engine *mEngine;
 	bool mBackable;

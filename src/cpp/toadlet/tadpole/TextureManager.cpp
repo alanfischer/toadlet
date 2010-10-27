@@ -327,6 +327,105 @@ void TextureManager::postContextReset(peeper::Renderer *renderer){
 
 Renderer *TextureManager::getRenderer(){return mEngine->getRenderer();}
 
+Texture::ptr TextureManager::createNormalization(int size){
+	Image::ptr image(Image::createAndReallocate(Image::Dimension_CUBE,Image::Format_RGB_8,size,size,Image::CubeSide_MAX));
+
+	Vector3 HALF_VECTOR3(Math::HALF,Math::HALF,Math::HALF);
+
+	uint8 *data=image->getData();
+
+	float offset = 0.5f;
+	float halfSize = size * 0.5f;
+	Vector3 temp;
+	int pos=0;
+
+	int i,j;
+	for(j=0;j<size;++j){
+		for(i=0;i<size;++i){
+			temp.set(halfSize,(j+offset-halfSize),-(i+offset-halfSize));
+			Math::normalize(temp);
+			Math::madd(temp,Math::HALF,HALF_VECTOR3);
+			data[pos+0]=(tbyte)(temp.x*255);
+			data[pos+1]=(tbyte)(temp.y*255);
+			data[pos+2]=(tbyte)(temp.z*255);
+
+			pos+=3;
+		}
+	}
+
+	for(j=0;j<size;++j){
+		for(i=0;i<size;++i){
+			temp.set(-halfSize,(j+offset-halfSize),(i+offset-halfSize));
+			Math::normalize(temp);
+			Math::madd(temp,Math::HALF,HALF_VECTOR3);
+
+			data[pos+0]=(tbyte)(temp.x*255);
+			data[pos+1]=(tbyte)(temp.y*255);
+			data[pos+2]=(tbyte)(temp.z*255);
+
+			pos+=3;
+		}
+	}
+
+	for(j=0;j<size;++j){
+		for(i=0;i<size;++i){
+			temp.set((i+offset-halfSize),-halfSize,(j+offset-halfSize));
+			Math::normalize(temp);
+			Math::madd(temp,Math::HALF,HALF_VECTOR3);
+
+			data[pos+0]=(tbyte)(temp.x*255);
+			data[pos+1]=(tbyte)(temp.y*255);
+			data[pos+2]=(tbyte)(temp.z*255);
+
+			pos+=3;
+		}
+	}
+
+	for(j=0;j<size;++j){
+		for(i=0;i<size;++i){
+			temp.set((i+offset-halfSize),halfSize,-(j+offset-halfSize));
+			Math::normalize(temp);
+			Math::madd(temp,Math::HALF,HALF_VECTOR3);
+
+			data[pos+0]=(tbyte)(temp.x*255);
+			data[pos+1]=(tbyte)(temp.y*255);
+			data[pos+2]=(tbyte)(temp.z*255);
+
+			pos+=3;
+		}
+	}
+
+	for(j=0;j<size;++j){
+		for(i=0;i<size;++i){
+			temp.set((i+offset-halfSize),(j+offset-halfSize),halfSize);
+			Math::normalize(temp);
+			Math::madd(temp,Math::HALF,HALF_VECTOR3);
+
+			data[pos+0]=(tbyte)(temp.x*255);
+			data[pos+1]=(tbyte)(temp.y*255);
+			data[pos+2]=(tbyte)(temp.z*255);
+
+			pos+=3;
+		}
+	}
+
+	for(j=0;j<size;++j){
+		for(i=0;i<size;++i){
+			temp.set(-(i+offset-halfSize),(j+offset-halfSize),-halfSize);
+			Math::normalize(temp);
+			Math::madd(temp,Math::HALF,HALF_VECTOR3);
+
+			data[pos+0]=(tbyte)(temp.x*255);
+			data[pos+1]=(tbyte)(temp.y*255);
+			data[pos+2]=(tbyte)(temp.z*255);
+
+			pos+=3;
+		}
+	}
+
+	return createTexture(image,Texture::Usage_BIT_STATIC,1);
+}
+
 }
 }
 
