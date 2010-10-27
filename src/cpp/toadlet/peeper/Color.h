@@ -346,7 +346,21 @@ public:
 		return *(&r+i);
 	}
 
-	static inline void neg(Color &r,Color &c){
+	static inline void clamp(Color &r,const Color &c){
+		r.r=Math::clamp(0,Math::ONE,c.r);
+		r.g=Math::clamp(0,Math::ONE,c.g);
+		r.b=Math::clamp(0,Math::ONE,c.b);
+		r.a=Math::clamp(0,Math::ONE,c.a);
+	}
+
+	static inline void clamp(Color &r){
+		r.r=Math::clamp(0,Math::ONE,r.r);
+		r.g=Math::clamp(0,Math::ONE,r.g);
+		r.b=Math::clamp(0,Math::ONE,r.b);
+		r.a=Math::clamp(0,Math::ONE,r.a);
+	}
+
+	static inline void neg(Color &r,const Color &c){
 		r.r=-c.r;
 		r.g=-c.g;
 		r.b=-c.b;
