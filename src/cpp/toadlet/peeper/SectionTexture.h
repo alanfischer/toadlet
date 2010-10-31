@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_SECTIONTEXTURE_H
 
 #include <toadlet/egg/BaseResource.h>
+#include <toadlet/egg/Error.h>
 #include <toadlet/peeper/Texture.h>
 
 namespace toadlet{

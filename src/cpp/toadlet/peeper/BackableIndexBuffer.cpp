@@ -79,6 +79,7 @@ void BackableIndexBuffer::destroy(){
 
 	if(mListener!=NULL){
 		mListener->bufferDestroyed(this);
+		mListener=NULL;
 	}
 }
 
