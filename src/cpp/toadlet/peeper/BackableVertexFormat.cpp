@@ -64,6 +64,7 @@ void BackableVertexFormat::destroy(){
 	
 	if(mListener!=NULL){
 		mListener->vertexFormatDestroyed(this);
+		mListener=NULL;
 	}
 }
 

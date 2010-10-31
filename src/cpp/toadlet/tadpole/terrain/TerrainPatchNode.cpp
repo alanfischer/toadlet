@@ -619,7 +619,12 @@ void TerrainPatchNode::traceLocalSegment(Collision &result,const Segment &segmen
 		tMaxY=9999999;
 	}
 
+	int count=0;
 	do{
+		if(count++>mSize){
+			break;
+		}
+
 		if(x>=0 && y>=0 && x<mSize && y<mSize){
 			if(traceCell(result,x,y,segment,epsilon,cellEpsilon)){
 				break;
