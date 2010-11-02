@@ -42,7 +42,8 @@ namespace ribbit{
 ALAudioBuffer::ALAudioBuffer(ALPlayer *player):BaseResource(),
 	mAudioPlayer(NULL),
 	mHandle(0),
-	mStaticData(NULL)
+	mStaticData(NULL),
+	mLengthTime(0)
 {
 	mAudioPlayer=player;
 }
@@ -75,6 +76,7 @@ bool ALAudioBuffer::create(Stream::ptr stream,const String &mimeType){
 
 	AudioFormatConversion::decode(decoder,buffer,length);
 	int numsamps=length/channels/(bps/8);
+	mLengthTime=numsamps*1000/sps;
 
 	// Lets us programatically reduce popping on some platforms
 	if(mAudioPlayer->getBufferFadeTime()>0){

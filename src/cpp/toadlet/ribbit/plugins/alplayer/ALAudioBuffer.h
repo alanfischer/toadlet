@@ -52,8 +52,10 @@ protected:
 	ALPlayer *mAudioPlayer;
 	ALuint mHandle;
 	tbyte *mStaticData;
+	int mLengthTime;
 
 	friend class ALPlayer;
+	friend class ALAudio;
 };
 
 }
