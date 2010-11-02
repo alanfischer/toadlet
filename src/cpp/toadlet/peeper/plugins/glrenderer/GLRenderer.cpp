@@ -1305,7 +1305,7 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 			}
 
 			#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
-				glTexEnvxv(GL_TEXTURE_ENV,GL_TEXTURE_ENV_COLOR,textureState->constantColor.getData());
+				glTexEnvxv(GL_TEXTURE_ENV,GL_TEXTURE_ENV_COLOR,textureStage->constantColor.getData());
 			#else
 				glTexEnvfv(GL_TEXTURE_ENV,GL_TEXTURE_ENV_COLOR,colorArray(cacheArray,textureStage->constantColor));
 			#endif
