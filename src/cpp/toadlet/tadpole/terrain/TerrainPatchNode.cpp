@@ -182,7 +182,6 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height,bo
 				int index=indexOf(i,j);
 				Vertex *vertex=vertexAt(i,j);
 
-				vertex->index=index;
 				vertex->height=data[j*rowPitch+i];
 				vertex->normal.set(vertex->height-vertexAt(i+1,j)->height,vertex->height-vertexAt(i,j+1)->height,Math::ONE);
 				Math::normalize(vertex->normal);
@@ -318,7 +317,7 @@ bool TerrainPatchNode::stitchToRight(TerrainPatchNode *terrain,bool restitchDepe
 
 	vba.lock(lt->mVertexBuffer,Buffer::Access_BIT_WRITE);
 
-	for(y=restitchDependents?0:mSize-1;y<mSize+1;y++){
+	for(y=(restitchDependents?0:mSize-1);y<mSize+1;y++){
 		Vertex *lv=lt->vertexAt(mSize,y),*rv=rt->vertexAt(0,y);
 		rv->dependent0=lv;
 		lv->dependent1=rv;
@@ -326,8 +325,10 @@ bool TerrainPatchNode::stitchToRight(TerrainPatchNode *terrain,bool restitchDepe
 		lv->normal.set(rv->normal);
 
 		Vertex *llv=lt->vertexAt(mSize-1,y);
-		llv->normal.set(llv->height-lt->vertexAt(mSize,y)->height,llv->height-lt->vertexAt(mSize-1,y+1)->height,Math::ONE);
-		Math::normalize(llv->normal);
+		if(y<mSize){
+			llv->normal.set(llv->height-lt->vertexAt(mSize,y)->height,llv->height-lt->vertexAt(mSize-1,y+1)->height,Math::ONE);
+			Math::normalize(llv->normal);
+		}
 
 		vba.set3(indexOf(mSize,y),0,mSize,y,lv->height);
 		vba.set3(indexOf(mSize,y),1,lv->normal);
@@ -417,7 +418,7 @@ bool TerrainPatchNode::stitchToBottom(TerrainPatchNode *terrain,bool restitchDep
 
 	vba.lock(tt->mVertexBuffer,Buffer::Access_BIT_WRITE);
 
-	for(x=restitchDependents?0:mSize-1;x<mSize+1;x++){
+	for(x=(restitchDependents?0:mSize-1);x<mSize+1;x++){
 		Vertex *bv=bt->vertexAt(x,0),*tv=tt->vertexAt(x,mSize);
 		bv->dependent1=tv;
 		tv->dependent0=bv;
@@ -425,8 +426,10 @@ bool TerrainPatchNode::stitchToBottom(TerrainPatchNode *terrain,bool restitchDep
 		tv->normal.set(bv->normal);
 
 		Vertex *ttv=tt->vertexAt(x,mSize-1);
-		ttv->normal.set(ttv->height-tt->vertexAt(x,mSize)->height,ttv->height-tt->vertexAt(x+1,mSize-1)->height,Math::ONE);
-		Math::normalize(ttv->normal);
+		if(x<mSize){
+			ttv->normal.set(ttv->height-tt->vertexAt(x,mSize)->height,ttv->height-tt->vertexAt(x+1,mSize-1)->height,Math::ONE);
+			Math::normalize(ttv->normal);
+		}
 
 		vba.set3(indexOf(x,mSize),0,x,mSize,tv->height);
 		vba.set3(indexOf(x,mSize),1,tv->normal);

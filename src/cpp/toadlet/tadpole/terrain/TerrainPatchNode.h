@@ -37,14 +37,12 @@ public:
 	class Vertex{
 	public:
 		Vertex():
-			index(0),
 			height(0),
 			dependent0(NULL),
 			dependent1(NULL),
 			enabled(false)
 		{}
 		
-		int index;
 		Vector3 normal;
 		scalar height;
 		Vertex *dependent0;
