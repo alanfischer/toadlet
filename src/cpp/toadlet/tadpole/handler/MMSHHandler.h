@@ -47,14 +47,19 @@ public:
 	egg::Resource::ptr load(egg::io::Stream::ptr in,const ResourceHandlerData *handlerData);
 
 protected:
+	mesh::Mesh::ptr loadMeshVersion3(egg::io::DataStream::ptr stream);
+	mesh::Mesh::ptr loadMeshVersion4Up(egg::io::DataStream::ptr stream,int version);
+	bool saveMeshVersion4Up(egg::io::DataStream::ptr stream,int version);
+
 	// Blocks for the mmsh format
 	enum{
 		MESH_BLOCK=1,
 		SKELETON_BLOCK=2,
 		ANIMATION_BLOCK=3,
+		MATERIAL_BLOCK=4,
 	};
 
-	// VertexTypes for the mmsh format
+	// VertexTypes for the mmsh v3 format
 	enum{
 		VT_POSITION=1<<0,
 		VT_NORMAL=1<<1,

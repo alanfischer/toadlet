@@ -61,6 +61,19 @@ const char *TABS[MAX_TABS]={
 	"\t\t\t\t\t\t\t\t\t",
 };
 
+// For version 2
+const int MAX_MAP_NAMES=8;
+const char *MAP_NAMES[MAX_MAP_NAMES]={
+	"Diffuse",
+	"Ambient",
+	"Specular",
+	"SelfIllumination",
+	"Opacity",
+	"Bump",
+	"Reflection",
+	"Refraction",
+};
+
 const char *XMLMeshUtilities::mxmlSaveCallback(mxml_node_t *node,int ws){
 	bool oneLiner=false;
 
@@ -231,19 +244,6 @@ const char *makeBoneAssignment(char *buffer,const Mesh::VertexBoneAssignmentList
 	return buffer;
 }
 
-const char *MAP_NAMES[]={
-	"Diffuse",
-	"Ambient",
-	"Specular",
-	"SelfIllumination",
-	"Opacity",
-	"Bump",
-	"Reflection",
-	"Refraction",
-};
-
-int MAX_MAP=8;
-
 Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,MaterialManager *materialManager,TextureManager *textureManager){
 	Material::ptr material=materialManager->createMaterial();
 
@@ -362,14 +362,14 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 				continue;
 			}
 
-			int type=MAX_MAP;
+			int type=MAX_MAP_NAMES;
 			String textureName;
 			float amount;
 
 			const char *prop=mxmlElementGetAttr(mapNode,"Type");
 			if(prop!=NULL){
 				int i;
-				for(i=0;i<MAX_MAP;++i){
+				for(i=0;i<MAX_MAP_NAMES;++i){
 					if(strcmp(prop,MAP_NAMES[i])==0){
 						type=i;
 						break;
@@ -377,7 +377,7 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 				}
 			}
 
-			if(type!=MAX_MAP){
+			if(type!=MAX_MAP_NAMES){
 				mxml_node_t *fileNode=mxmlFindChild(mapNode,"File");
 				if(fileNode!=NULL){
 					const char *data=mxmlGetOpaque(fileNode->child);
@@ -659,7 +659,6 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 			}
 		}
 
-		// HACK: Due to a bug in reading back vertexes from a hardware buffer in OGLES, we only load the static VertexBuffer of a Mesh if its not animated.
 		VertexBuffer::ptr vertexBuffer;
 		if(bufferManager!=NULL){
 			if(mesh->vertexBoneAssignments.size()>0){

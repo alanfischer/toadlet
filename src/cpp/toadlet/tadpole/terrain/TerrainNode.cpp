@@ -66,7 +66,7 @@ Node *TerrainNode::create(Scene *scene){
 	mSize=3;
 	mHalfSize=mSize/2;
 	mPatchGrid.resize(mSize*mSize);
-	mUpdateTargetBias=Math::fromMilli(150);
+	mUpdateTargetBias=Math::fromMilli(250);
 	mPatchTolerance=0.00001f;
 
 	int i,j;
