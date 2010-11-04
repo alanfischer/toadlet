@@ -1941,14 +1941,14 @@ GLuint GLRenderer::getGLType(int textureFormat){
 
 GLuint GLRenderer::getGLIndexType(int indexFormat){
 	switch(indexFormat){
-		case IndexBuffer::IndexFormat_UINT_8:
+		case IndexBuffer::IndexFormat_UINT8:
 			return GL_UNSIGNED_BYTE;
 		break;
-		case IndexBuffer::IndexFormat_UINT_16:
+		case IndexBuffer::IndexFormat_UINT16:
 			return GL_UNSIGNED_SHORT;
 		break;
 		#if !defined(TOADLET_HAS_GLES)
-			case IndexBuffer::IndexFormat_UINT_32:
+			case IndexBuffer::IndexFormat_UINT32:
 				return GL_UNSIGNED_INT;
 			break;
 		#endif
