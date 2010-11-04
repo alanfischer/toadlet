@@ -37,7 +37,7 @@ BackableIndexBuffer::BackableIndexBuffer():
 	mUsage(0),
 	mAccess(0),
 	mDataSize(0),
-	mIndexFormat(IndexFormat_UINT_8),
+	mIndexFormat(IndexFormat_UINT8),
 	mSize(0),
 	
 	mData(NULL)

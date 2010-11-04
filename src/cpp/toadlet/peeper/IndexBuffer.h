@@ -37,9 +37,9 @@ public:
 
 	// Convinently equals size of index
 	enum IndexFormat{
-		IndexFormat_UINT_8=1,
-		IndexFormat_UINT_16=2,
-		IndexFormat_UINT_32=4,
+		IndexFormat_UINT8=1,
+		IndexFormat_UINT16=2,
+		IndexFormat_UINT32=4,
 	};
 
 	virtual ~IndexBuffer(){}
