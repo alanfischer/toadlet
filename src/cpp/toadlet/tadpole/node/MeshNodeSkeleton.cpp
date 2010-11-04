@@ -283,7 +283,7 @@ void MeshNodeSkeleton::setRenderable(bool renderable){
 		mMaterial->setDepthTest(Renderer::DepthTest_NONE);
 		mMaterial->setLayer(1);
 
-		IndexBuffer::ptr indexBuffer=engine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,(mBones.size()-1)*2);
+		IndexBuffer::ptr indexBuffer=engine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,(mBones.size()-1)*2);
 		IndexBufferAccessor iba;
 		{
 			iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);

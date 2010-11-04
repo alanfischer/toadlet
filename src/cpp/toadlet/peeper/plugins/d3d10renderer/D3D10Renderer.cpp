@@ -725,11 +725,11 @@ D3D10_PRIMITIVE_TOPOLOGY D3D10Renderer::getD3D10_PRIMITIVE_TOPOLOGY(IndexData::P
 
 DXGI_FORMAT D3D10Renderer::getIndexDXGI_FORMAT(IndexBuffer::IndexFormat format){
 	switch(format){
-		case IndexBuffer::IndexFormat_UINT_8:
-		case IndexBuffer::IndexFormat_UINT_16:
+		case IndexBuffer::IndexFormat_UINT8:
+		case IndexBuffer::IndexFormat_UINT16:
 			return DXGI_FORMAT_R16_UINT;
 		break;
-		case IndexBuffer::IndexFormat_UINT_32:
+		case IndexBuffer::IndexFormat_UINT32:
 			return DXGI_FORMAT_R32_UINT;
 		break;
 		default:

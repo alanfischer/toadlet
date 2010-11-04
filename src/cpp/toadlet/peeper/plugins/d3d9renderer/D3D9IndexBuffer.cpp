@@ -41,7 +41,7 @@ D3D9IndexBuffer::D3D9IndexBuffer(D3D9Renderer *renderer):
 	mUsage(0),
 	mAccess(0),
 	mSize(0),
-	mIndexFormat(IndexFormat_UINT_8),
+	mIndexFormat(IndexFormat_UINT8),
 	mDataSize(0),
 
 	mD3DFormat(D3DFMT_INDEX16),
@@ -65,7 +65,7 @@ bool D3D9IndexBuffer::create(int usage,int access,IndexFormat indexFormat,int si
 	mSize=size;
 	mIndexFormat=indexFormat;
 	mDataSize=mIndexFormat*mSize;
-	if(mIndexFormat==IndexFormat_UINT_8) mDataSize*=2;
+	if(mIndexFormat==IndexFormat_UINT8) mDataSize*=2;
 	mD3DFormat=getD3DFORMAT(mIndexFormat);
 
 	createContext(false);
@@ -177,7 +177,7 @@ uint8 *D3D9IndexBuffer::lock(int lockAccess){
 	TOADLET_CHECK_D3D9ERROR(result,"D3D9IndexBuffer: Lock");
 
 	// We do this even if its write only, since the unlocking will write it back, it would get messed up if we didn't swap in all situations
-	if(mData!=NULL && mIndexFormat==IndexFormat_UINT_8){
+	if(mData!=NULL && mIndexFormat==IndexFormat_UINT8){
 		// Pack the indexes
 		uint16 *data16=(uint16*)mData;
 		int i;
@@ -195,7 +195,7 @@ bool D3D9IndexBuffer::unlock(){
 	}
 
 	// We do this even if its read only, since we have to do it in all situations for locking
-	if(mData!=NULL && mIndexFormat==IndexFormat_UINT_8){
+	if(mData!=NULL && mIndexFormat==IndexFormat_UINT8){
 		// Unpack the indexes
 		uint16 *data16=(uint16*)mData;
 		int i;
@@ -223,11 +223,11 @@ bool D3D9IndexBuffer::needsReset(){
 D3DFORMAT D3D9IndexBuffer::getD3DFORMAT(IndexFormat format){
 	D3DFORMAT d3dFormat=(D3DFORMAT)0;
 	switch(format){
-		case IndexFormat_UINT_8:
-		case IndexFormat_UINT_16:
+		case IndexFormat_UINT8:
+		case IndexFormat_UINT16:
 			d3dFormat=D3DFMT_INDEX16;
 		break;
-		case IndexFormat_UINT_32:
+		case IndexFormat_UINT32:
 			d3dFormat=D3DFMT_INDEX32;
 		break;
 		default:

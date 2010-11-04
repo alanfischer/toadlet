@@ -91,7 +91,7 @@ Mesh::ptr MeshManager::createBox(const AABox &box){
 		vba.unlock();
 	}
 
-	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_8,36);
+	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT8,36);
 	{
 		iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
 
@@ -134,7 +134,7 @@ Mesh::ptr MeshManager::createBox(const AABox &box){
 
 Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded,bool invert,Material::ptr bottom,Material::ptr top,Material::ptr left,Material::ptr right,Material::ptr back,Material::ptr front){
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_TEX_COORD,24);
-	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_8,36);
+	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT8,36);
 	{
 		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
 		iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
@@ -251,7 +251,7 @@ Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded,bool invert,Materi
 
 Mesh::ptr MeshManager::createSphere(const Sphere &sphere,int numSegments,int numRings,Material::ptr material){
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,getSphereVertexCount(numSegments,numRings));
-	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,getSphereIndexCount(numSegments,numRings));
+	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,getSphereIndexCount(numSegments,numRings));
 
 	Mesh::ptr mesh=createSphere(vertexBuffer,indexBuffer,sphere,numSegments,numRings);
 	if(material==NULL){
@@ -338,7 +338,7 @@ Mesh::ptr MeshManager::createSphere(VertexBuffer::ptr vertexBuffer,IndexBuffer::
 
 Mesh::ptr MeshManager::createSkyDome(const Sphere &sphere,int numSegments,int numRings,scalar fade,Material::ptr material){
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,getSphereVertexCount(numSegments,numRings));
-	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,getSphereIndexCount(numSegments,numRings));
+	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,getSphereIndexCount(numSegments,numRings));
 
 	Mesh::ptr mesh=createSkyDome(vertexBuffer,indexBuffer,sphere,numSegments,numRings,fade);
 	if(material==NULL){
@@ -434,7 +434,7 @@ Mesh::ptr MeshManager::createSkyDome(VertexBuffer::ptr vertexBuffer,IndexBuffer:
 
 Mesh::ptr MeshManager::createGeoSphere(const Sphere &sphere,int depth,bool icosahedron,Material::ptr material){
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,getGeoSphereVertexCount(depth,icosahedron));
-	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,getGeoSphereIndexCount(depth,icosahedron));
+	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,getGeoSphereIndexCount(depth,icosahedron));
 
 	Mesh::ptr mesh=createGeoSphere(vertexBuffer,indexBuffer,sphere,depth,icosahedron);
 	if(material==NULL){

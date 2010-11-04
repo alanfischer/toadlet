@@ -307,7 +307,7 @@ Mesh::ptr MMSHHandler::loadMeshVersion3(DataStream::ptr stream){
 					newNumIndexes+=(stripLengths[j]-2)*3;
 				}
 
-				IndexBuffer::ptr indexBuffer=mBufferManager->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,newNumIndexes);
+				IndexBuffer::ptr indexBuffer=mBufferManager->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,newNumIndexes);
 				{
 					uint16 *indexData=(uint16*)indexBuffer->lock(Buffer::Access_BIT_WRITE);
 					int ipo=0;

@@ -33,14 +33,14 @@ namespace peeper{
 
 IndexBufferAccessor::IndexBufferAccessor():
 	mIndexBuffer(NULL),
-	mIndexFormat(IndexBuffer::IndexFormat_UINT_8),
+	mIndexFormat(IndexBuffer::IndexFormat_UINT8),
 	mData(NULL)
 {
 }
 
 IndexBufferAccessor::IndexBufferAccessor(IndexBuffer *indexBuffer,int access):
 	mIndexBuffer(NULL),
-	mIndexFormat(IndexBuffer::IndexFormat_UINT_8),
+	mIndexFormat(IndexBuffer::IndexFormat_UINT8),
 	mData(NULL)
 {
 	lock(indexBuffer,access);

@@ -319,7 +319,7 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 		}
 		else{
 			int indexes=(face->numedges-2)*3;
-			IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,indexes);
+			IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,indexes);
 			iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
 			for(j=1;j<face->numedges-1;++j){
 				iba.set((j-1)*3+0,face->firstedge);
