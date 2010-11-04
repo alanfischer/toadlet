@@ -26,6 +26,7 @@
 #ifndef TOADLET_PEEPER_INDEXBUFFERACCESSOR_H
 #define TOADLET_PEEPER_INDEXBUFFERACCESSOR_H
 
+#include <toadlet/egg/Extents.h>
 #include <toadlet/peeper/IndexBuffer.h>
 
 namespace toadlet{
@@ -47,27 +48,29 @@ public:
 
 	inline void set(int i,uint32 x){
 		TOADLET_ASSERT(i>=0 && i<=getSize()); // "index out of bounds"
-		TOADLET_ASSERT(x<(uint32)(1<<(8*mIndexFormat))); // "out of datatype range"
-		if(mIndexFormat==IndexBuffer::IndexFormat_UINT_8){
+		if(mIndexFormat==IndexBuffer::IndexFormat_UINT8){
+			TOADLET_ASSERT(x<egg::Extents::MAX_UINT8); // "out of datatype range"
 			((uint8*)mData)[i]=x;
 		}
-		else if(mIndexFormat==IndexBuffer::IndexFormat_UINT_16){
+		else if(mIndexFormat==IndexBuffer::IndexFormat_UINT16){
+			TOADLET_ASSERT(x<egg::Extents::MAX_UINT16); // "out of datatype range"
 			((uint16*)mData)[i]=x;
 		}
-		else{ // IndexBuffer::IndexFormat_UINT_32
+		else{ // IndexBuffer::IndexFormat_UINT32
+			TOADLET_ASSERT(x<egg::Extents::MAX_UINT32); // "out of datatype range"
 			((uint32*)mData)[i]=x;
 		}
 	}
 
 	inline uint32 get(int i){
 		TOADLET_ASSERT(i>=0 && i<=getSize()); // "index out of bounds"
-		if(mIndexFormat==IndexBuffer::IndexFormat_UINT_8){
+		if(mIndexFormat==IndexBuffer::IndexFormat_UINT8){
 			return ((uint8*)mData)[i];
 		}
-		else if(mIndexFormat==IndexBuffer::IndexFormat_UINT_16){
+		else if(mIndexFormat==IndexBuffer::IndexFormat_UINT16){
 			return ((uint16*)mData)[i];
 		}
-		else{ // IndexBuffer::IndexFormat_UINT_32
+		else{ // IndexBuffer::IndexFormat_UINT32
 			return ((uint32*)mData)[i];
 		}
 	}

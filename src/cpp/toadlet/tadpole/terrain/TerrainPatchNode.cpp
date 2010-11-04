@@ -154,6 +154,8 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height,bo
 	mSize=width;
 	int numVertexes=Math::square(mSize+1);
 	int numIndexes=Math::square(mSize)*6;
+	VertexFormat::ptr vertexFormat=mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD;
+	IndexBuffer::IndexFormat indexFormat=IndexBuffer::IndexFormat_UINT16;
 
 	mVertexes.resize(numVertexes);
 
@@ -162,14 +164,14 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height,bo
 		if(mVertexBuffer!=NULL){
 			mVertexBuffer->destroy();
 		}
-		mVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,numVertexes);
+		mVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,numVertexes);
 		mVertexData=VertexData::ptr(new VertexData(mVertexBuffer));
 	}
 	if(mIndexBuffer==NULL || mIndexBuffer->getSize()!=numIndexes){
 		if(mIndexBuffer!=NULL){
 			mIndexBuffer->destroy();
 		}
-		mIndexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,numIndexes);
+		mIndexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,indexFormat,numIndexes);
 		mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,mIndexBuffer));
 	}
 
@@ -241,14 +243,14 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height,bo
 			if(mWaterVertexBuffer!=NULL){
 				mWaterVertexBuffer->destroy();
 			}
-			mWaterVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,numVertexes);
+			mWaterVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,numVertexes);
 			mWaterVertexData=VertexData::ptr(new VertexData(mWaterVertexBuffer));
 		}
 		if(mWaterIndexBuffer==NULL || mWaterIndexBuffer->getSize()!=numIndexes){
 			if(mWaterIndexBuffer!=NULL){
 				mWaterIndexBuffer->destroy();
 			}
-			mWaterIndexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,numIndexes);
+			mWaterIndexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,indexFormat,numIndexes);
 			mWaterIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,mWaterIndexBuffer));
 		}
 

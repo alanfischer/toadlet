@@ -41,7 +41,7 @@ D3D10Buffer::D3D10Buffer(D3D10Renderer *renderer):
 	mSize(0),
 	mDataSize(0),
 
-	mIndexFormat(IndexBuffer::IndexFormat_UINT_8),
+	mIndexFormat(IndexBuffer::IndexFormat_UINT8),
 	//mVertexFormat,
 	mVertexSize(0),
 
@@ -65,7 +65,7 @@ bool D3D10Buffer::create(int usage,int access,IndexFormat indexFormat,int size){
 	mAccess=access;
 	mSize=size;
 	mIndexFormat=indexFormat;
-	mDataSize=((indexFormat==IndexFormat_UINT_8)?2:mIndexFormat)*mSize;
+	mDataSize=((indexFormat==IndexFormat_UINT8)?2:mIndexFormat)*mSize;
 
 	mBindFlags|=D3D10_BIND_INDEX_BUFFER;
 
@@ -214,7 +214,7 @@ uint8 *D3D10Buffer::lock(int lockAccess){
 				}
 			}
 		}
-		if(mIndexFormat==IndexFormat_UINT_8){
+		if(mIndexFormat==IndexFormat_UINT8){
 			// Pack the indexes
 			uint16 *data16=(uint16*)mData;
 			int i;
@@ -243,7 +243,7 @@ bool D3D10Buffer::unlock(){
 				}
 			}
 		}
-		if(mIndexFormat==IndexFormat_UINT_8){
+		if(mIndexFormat==IndexFormat_UINT8){
 			// Unpack the indexes
 			uint16 *data16=(uint16*)mData;
 			int i;

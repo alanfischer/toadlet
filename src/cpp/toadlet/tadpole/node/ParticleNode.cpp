@@ -409,7 +409,7 @@ void ParticleNode::createVertexBuffer(){
 		numIndexes=(numParticles/mParticlesPerBeam)*((mParticlesPerBeam-2)*2+6)*3;
 	}
 
-	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,numVertexes<256?IndexBuffer::IndexFormat_UINT_8:IndexBuffer::IndexFormat_UINT_16,numIndexes);
+	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,numVertexes<256?IndexBuffer::IndexFormat_UINT8:IndexBuffer::IndexFormat_UINT16,numIndexes);
 	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,numIndexes));
 	mLineIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,NULL,0,numParticles));
 
