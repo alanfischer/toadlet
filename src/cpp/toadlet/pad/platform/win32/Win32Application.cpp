@@ -135,7 +135,8 @@ Win32Application::Win32Application():
 		mVisual(ImageDefinitions::Format_RGBA_8,16,2),
 	#endif
 	mApplicationListener(NULL),
-	mMouseLocked(false),
+	mDifferenceMouse(false),
+	mLastXMouse(0),mLastYMouse(0),
 	mSkipNextMove(false),
 
 	mEngine(NULL),
@@ -600,11 +601,11 @@ void Win32Application::render(Renderer *renderer){
 	}
 }
 
-void Win32Application::setMouseLocked(bool locked){
-	mMouseLocked=locked;
+void Win32Application::setDifferenceMouse(bool difference){
+	mDifferenceMouse=difference;
 	mSkipNextMove=true;
 
-	ShowCursor(!mMouseLocked);
+	ShowCursor(!mDifferenceMouse);
 }
 
 void Win32Application::changeRendererPlugin(int rendererPlugin){
@@ -942,15 +943,24 @@ void Win32Application::internal_resize(int width,int height){
 }
 
 void Win32Application::internal_mouseMoved(int x,int y){
-	if(mMouseLocked && (getWidth()/2!=x || getHeight()/2!=y)){
-		POINT pt={getWidth()/2,getHeight()/2};
-		ClientToScreen((HWND)getHWND(),&pt);
-		SetCursorPos(pt.x,pt.y);
+	if(mSkipNextMove){
+		mLastXMouse=x;mLastYMouse=y;
+		mSkipNextMove=false;
+		return;
+	}
 
-		if(mSkipNextMove){
-			mSkipNextMove=false;
-			return;
-		}
+	if(mDifferenceMouse){
+		int dx=x-mLastXMouse,dy=y-mLastYMouse;
+		mLastXMouse=x;mLastYMouse=y;
+
+		#if !defined(TOADLET_PLATFORM_WINCE)
+			POINT pt={getWidth()/2,getHeight()/2};
+			ClientToScreen((HWND)getHWND(),&pt);
+			SetCursorPos(pt.x,pt.y);
+			mSkipNextMove=true;
+		#endif
+
+		x=dx;y=dy;
 	}
 
 	mouseMoved(x,y);

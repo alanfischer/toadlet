@@ -94,6 +94,11 @@ set (TADPOLE_NODE_SRC
 	node/SpriteNode.cpp
 )
 
+set (TADPOLE_STUDIO_SRC
+	studio/StudioHandler.cpp
+	studio/StudioModelNode.cpp
+)
+
 set (TADPOLE_TERRAIN_SRC
 	terrain/TerrainNode.cpp
 	terrain/TerrainPatchNode.cpp
@@ -217,6 +222,13 @@ set (TADPOLE_NODE_HEADERS
 	node/SpriteNode.h
 )
 
+set (TADPOLE_STUDIO_HEADERS
+	studio/StudioHandler.h
+	studio/StudioModel.h
+	studio/StudioModelNode.h
+	studio/StudioTypes.h
+)
+
 set (TADPOLE_TERRAIN_HEADERS
 	terrain/TerrainNodeDataSource.h
 	terrain/TerrainNodeListener.h
@@ -249,8 +261,10 @@ set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_H
 if (NOT TOADLET_FIXED_POINT)
 	source_group ("Source Files\\\\bsp" FILES ${TADPOLE_BSP_SRC})
 	source_group ("Header Files\\\\bsp" FILES ${TADPOLE_BSP_HEADERS})
-	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_BSP_SRC})
-	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_BSP_HEADERS})
+	source_group ("Source Files\\\\studio" FILES ${TADPOLE_STUDIO_SRC})
+	source_group ("Header Files\\\\studio" FILES ${TADPOLE_STUDIO_HEADERS})
+	set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_BSP_SRC} ${TADPOLE_STUDIO_SRC})
+	set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_BSP_HEADERS} ${TADPOLE_STUDIO_HEADERS})
 endif (NOT TOADLET_FIXED_POINT)
 
 # Setup dependecy specific files and libraries
