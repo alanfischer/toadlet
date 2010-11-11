@@ -79,7 +79,6 @@ void StudioHandler::buildBuffers(StudioModel *model){
 			studiomodel *smodel=model->model(sbodyparts,j);
 			for(k=0;k<smodel->nummesh;++k){
 				studiomesh *smesh=model->mesh(smodel,k);
-
 				short *tricmds=(short*)(model->data+smesh->triindex);
 				while(l=*(tricmds++)){
 					if(l<0){
@@ -89,7 +88,6 @@ void StudioHandler::buildBuffers(StudioModel *model){
 						vertexCount++;
 					}
 				}
-
 				meshCount++;
 			}
 		}
@@ -97,10 +95,10 @@ void StudioHandler::buildBuffers(StudioModel *model){
 
 	model->meshdatas.resize(meshCount);
 
-	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,vertexCount);
+	model->vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,vertexCount);
 
 	VertexBufferAccessor vba;
-	vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
+	vba.lock(model->vertexBuffer,Buffer::Access_BIT_WRITE);
 
 	meshCount=0;
 	vertexCount=0;
@@ -127,7 +125,7 @@ void StudioHandler::buildBuffers(StudioModel *model){
 					}
 
 					IndexData::ptr indexData(new IndexData(primitive,NULL,vertexCount,l));
-					model->meshdatas[meshCount].indexdatas.add(indexData);
+					model->meshdatas[meshCount].indexDatas.add(indexData);
 
 					for(;l>0;l--,tricmds+=4){
 						vba.set3(vertexCount,0,verts[tricmds[0]]);
@@ -144,7 +142,7 @@ void StudioHandler::buildBuffers(StudioModel *model){
 
 	vba.unlock();
 
-	model->vertexdata=VertexData::ptr(new VertexData(vertexBuffer));
+	model->vertexData=VertexData::ptr(new VertexData(model->vertexBuffer));
 }
 
 void StudioHandler::buildTextures(StudioModel *model){

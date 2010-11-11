@@ -104,6 +104,7 @@ public:
 
 	inline const Matrix4x4 &getViewTransform() const{return mViewTransform;}
 	inline const Vector3 &getForward() const{return mForward;}
+	inline const Vector3 &getRight() const{return mRight;}
 
 	virtual void render(peeper::Renderer *renderer,Node *node=NULL);
 
@@ -141,7 +142,7 @@ protected:
 	Matrix4x4 mViewTransform;
 	Matrix4x4 mViewProjectionTransform;
 	Plane mClipPlanes[6];
-	Vector3 mForward;
+	Vector3 mForward,mRight;
 
 	Matrix4x4 mOverlayMatrix;
 	peeper::VertexData::ptr mOverlayVertexData;
