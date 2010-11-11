@@ -28,7 +28,6 @@
 
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
-#include <toadlet/peeper/Texture.h>
 #include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/node/PartitionNode.h>
@@ -67,9 +66,6 @@ public:
 	int getModel() const{return mModelIndex;}
 	BSP30Map::ptr getMap(){return mMap;}
 
-	void setVisible(bool visible){mVisible=visible;}
-	bool getVisible() const{return mVisible;}
-
 	inline int getNumSubModels() const{return mSubModels.size();}
 	SubModel *getSubModel(int i){return mSubModels[i];}
 
@@ -82,7 +78,6 @@ public:
 protected:
 	BSP30Map::ptr mMap;
 	int mModelIndex;
-	bool mVisible; // Should be moved to the overall 'mesh/visible/renderable' class perhaps
 	egg::Collection<SubModel::ptr> mSubModels;
 };
 

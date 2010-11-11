@@ -44,6 +44,7 @@ namespace Categories{
 	const static String TOADLET_TADPOLE=			TOADLET+".tadpole";
 	const static String TOADLET_TADPOLE_BSP=		TOADLET_TADPOLE+".bsp";
 	const static String TOADLET_TADPOLE_NODE=		TOADLET_TADPOLE+".node";
+	const static String TOADLET_TADPOLE_STUDIO=		TOADLET_TADPOLE+".studio";
 	const static String TOADLET_TADPOLE_TERRAIN=	TOADLET_TADPOLE+".terrain";
 	const static String TOADLET_PAD=				TOADLET+".pad";
 }

@@ -59,9 +59,39 @@ public:
 		textures.clear();
 	}
 
+	studiobodyparts *bodyparts(int i){return &((studiobodyparts*)(data+header->bodypartindex))[i];}
+	studiomodel *model(studiobodyparts *bodyparts,int i){return &((studiomodel*)(data+bodyparts->modelindex))[i];}
+	studiomesh *mesh(studiomodel *model,int i){return &((studiomesh*)(data+model->meshindex))[i];}
+	studiotexture *texture(int i){return &((studiotexture*)(data+header->textureindex))[i];}
+	short skin(int i){return ((short*)(data+header->skinindex))[i];}
+
+	struct meshdata{
+		egg::Collection<peeper::IndexData::ptr> indexdatas;
+	};
+
+	meshdata *findmeshdata(int bodypartIndex,int modelIndex,int meshIndex){
+		int i,j,k,index=0;
+		for(i=0;i<=header->numbodyparts;++i){
+			studiobodyparts *sbodyparts=bodyparts(i);
+			for(j=0;j<sbodyparts->nummodels;++j){
+				studiomodel *smodel=model(sbodyparts,j);
+				for(k=0;k<smodel->nummesh;++k){
+					if(i==bodypartIndex && j==modelIndex && k==meshIndex){
+						return &meshdatas[index];
+					}
+					index++;
+				}
+			}
+		}
+		return NULL;
+	}
+
 	tbyte *data;
 	studiohdr *header;
 	egg::Collection<peeper::Texture::ptr> textures;
+	egg::Collection<Material::ptr> materials;
+	egg::Collection<meshdata> meshdatas;
+	peeper::VertexData::ptr vertexdata;
 };
 
 }

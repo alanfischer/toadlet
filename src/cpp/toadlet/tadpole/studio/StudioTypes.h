@@ -204,8 +204,8 @@ struct studioanim{
 // animation frames
 union studioanimvalue{
 	struct {
-		byte	valid;
-		byte	total;
+		tbyte	valid;
+		tbyte	total;
 	} num;
 	short		value;
 };

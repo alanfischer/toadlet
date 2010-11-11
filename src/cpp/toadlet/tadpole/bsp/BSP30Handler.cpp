@@ -55,7 +55,8 @@ Resource::ptr BSP30Handler::load(Stream::ptr stream,const ResourceHandlerData *h
 	dataStream->reset();
 
 	if(version!=Q1BSPVERSION && version!=HLBSPVERSION){
-		Error::unknown(String("incorrect bsp version:")+version);
+		Error::unknown(Categories::TOADLET_TADPOLE_BSP,
+			String("incorrect bsp version:")+version);
 		return NULL;
 	}
 
@@ -259,7 +260,7 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 	/// @todo: Figure out maximum required size, or allow multiple images
 	Image::ptr lightmapImage(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGB_8,1024,1024,0));
 	if(lightmapImage==NULL){
-		Error::insufficientMemory(Categories::TOADLET_TADPOLE,
+		Error::insufficientMemory(Categories::TOADLET_TADPOLE_BSP,
 			"insufficient memory for lightmapImage");
 		return;
 	}
