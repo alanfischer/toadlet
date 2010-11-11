@@ -55,6 +55,7 @@ public:
 		State_DEPTHSORT=1<<7,
 		State_DEPTHWRITE=1<<8,
 		State_DEPTHTEST=1<<9,
+		State_SHADING=1<<10,
 	};
 	
 	Material();
@@ -86,6 +87,12 @@ public:
 		mFill=fill;
 	}
 	inline const peeper::Renderer::Fill &getFill() const{return mFill;}
+
+	void setShading(const peeper::Renderer::Shading &shading){
+		mStates|=State_SHADING;
+		mShading=shading;
+	}
+	inline const peeper::Renderer::Shading &getShading() const{return mShading;}
 
 	void setFogParameters(const peeper::Renderer::Fog &fog,scalar nearDistance,scalar farDistance,const peeper::Color &color){
 		mStates|=State_FOG;
@@ -146,6 +153,7 @@ protected:
 	bool mLighting;
 	peeper::Renderer::FaceCulling mFaceCulling;
 	peeper::Renderer::Fill mFill;
+	peeper::Renderer::Shading mShading;
 	peeper::Renderer::Fog mFog;
 	scalar mFogNearDistance,mFogFarDistance;
 	peeper::Color mFogColor;

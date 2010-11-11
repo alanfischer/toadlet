@@ -23,7 +23,6 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/EndianConversion.h>
 #include <toadlet/peeper/VertexFormat.h>
 #include <toadlet/tadpole/BoundingVolumeSensor.h>
 #include <toadlet/tadpole/Engine.h>
@@ -66,8 +65,7 @@ TOADLET_NODE_IMPLEMENT(BSP30ModelNode,Categories::TOADLET_TADPOLE_BSP+".BSP30Mod
 
 BSP30ModelNode::BSP30ModelNode():Node(),
 	//mMap,
-	mModelIndex(-1),
-	mVisible(true)
+	mModelIndex(-1)
 {}
 
 BSP30ModelNode::~BSP30ModelNode(){
@@ -121,7 +119,7 @@ void BSP30ModelNode::setModel(BSP30Map::ptr map,int index){
 void BSP30ModelNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	super::queueRenderables(camera,queue);
 
-	if(mVisible && queue!=NULL){
+	if(queue!=NULL){
 		int i;
 		for(i=0;i<mSubModels.size();++i){
 			queue->queueRenderable(mSubModels[i]);

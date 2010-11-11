@@ -38,6 +38,7 @@ Material::Material():BaseResource(),
 	mLighting(false),
 	mFaceCulling(Renderer::FaceCulling_BACK),
 	mFill(Renderer::Fill_SOLID),
+	mShading(Renderer::Shading_SMOOTH),
 	mFog(Renderer::Fog_NONE),
 	mFogNearDistance(0),mFogFarDistance(0),
 	//mFogColor,
@@ -79,6 +80,7 @@ Material::ptr Material::clone(){
 	material->mFogFarDistance=mFogFarDistance;
 	material->mFogColor.set(mFogColor);
 	material->mFill=mFill;
+	material->mShading=mShading;
 	material->mAlphaTest=mAlphaTest;
 	material->mAlphaTestCutoff=mAlphaTestCutoff;
 	material->mBlend.set(mBlend);
@@ -130,6 +132,9 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		if((states&State_FILL)>0){
 			renderer->setFill(mFill);
 		}
+		if((states&State_SHADING)>0){
+			renderer->setShading(mShading);
+		}
 		if((states&State_FOG)>0){
 			renderer->setFogParameters(mFog,mFogNearDistance,mFogFarDistance,mFogColor);
 		}
@@ -169,6 +174,9 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		}
 		if((states&State_FILL)>0 && ((pstates&State_FILL)==0 || previousMaterial->mFill!=mFill)){
 			renderer->setFill(mFill);
+		}
+		if((states&State_SHADING)>0 && ((pstates&State_SHADING)==0 || previousMaterial->mShading!=mShading)){
+			renderer->setShading(mShading);
 		}
 		if((states&State_FOG)>0){
 			renderer->setFogParameters(mFog,mFogNearDistance,mFogFarDistance,mFogColor);

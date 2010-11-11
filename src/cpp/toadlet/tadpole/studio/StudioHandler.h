@@ -44,6 +44,9 @@ public:
 	virtual egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
 
 protected:
+	void buildBuffers(StudioModel *model);
+	void buildTextures(StudioModel *model);
+	void buildMaterials(StudioModel *model);
 	peeper::Texture::ptr createTexture(studiotexture *ptexture,tbyte *data,tbyte *pal);
 
 	Engine *mEngine;
