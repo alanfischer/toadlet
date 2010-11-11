@@ -47,6 +47,11 @@ Material::Material():BaseResource(),
 	mDepthSorted(false),
 	mDepthWrite(true),
 	mDepthTest(Renderer::DepthTest_LEQUAL),
+	mPointSprite(false),
+	mPointSize(0),
+	mPointAttenuated(false),
+	mPointConstant(0),mPointLinear(0),mPointQuadratic(0),mPointMinSize(0),mPointMaxSize(0),
+
 	mLayer(0),
 	mSaveLocally(false)
 {
@@ -144,6 +149,9 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		if((states&State_LIGHTEFFECT)>0){
 			renderer->setLightEffect(mLightEffect); // We set this even if lighting isnt enabled, since it includes color tracking
 		}
+		if((states&State_POINT)>0){
+			renderer->setPointParameters(mPointSprite,mPointSize,mPointAttenuated,mPointConstant,mPointLinear,mPointQuadratic,mPointMinSize,mPointMaxSize);
+		}
 
 		int numTextureStages=mTextureStages.size();
 		int i;
@@ -186,6 +194,9 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		}
 		if((states&State_LIGHTEFFECT)>0){
 			renderer->setLightEffect(mLightEffect);
+		}
+		if((states&State_POINT)>0){
+			renderer->setPointParameters(mPointSprite,mPointSize,mPointAttenuated,mPointConstant,mPointLinear,mPointQuadratic,mPointMinSize,mPointMaxSize);
 		}
 
 		int numTextureStages=mTextureStages.size();

@@ -45,17 +45,18 @@ public:
 	const static int MAX_LAYER=63;
 
 	enum States{
-		State_LIGHTING=	1<<0,
-		State_LIGHTEFFECT=1<<1,
-		State_FACECULLING=1<<2,
-		State_FILL=		1<<3,
-		State_FOG=		1<<4,
-		State_ALPHATEST=1<<5,
-		State_BLEND=	1<<6,
-		State_DEPTHSORT=1<<7,
-		State_DEPTHWRITE=1<<8,
-		State_DEPTHTEST=1<<9,
-		State_SHADING=1<<10,
+		State_LIGHTING=		1<<0,
+		State_LIGHTEFFECT=	1<<1,
+		State_FACECULLING=	1<<2,
+		State_FILL=			1<<3,
+		State_FOG=			1<<4,
+		State_ALPHATEST=	1<<5,
+		State_BLEND=		1<<6,
+		State_DEPTHSORT=	1<<7,
+		State_DEPTHWRITE=	1<<8,
+		State_DEPTHTEST=	1<<9,
+		State_SHADING=		1<<10,
+		State_POINT=		1<<11,
 	};
 	
 	Material();
@@ -64,74 +65,58 @@ public:
 	void destroy();
 	Material::ptr clone();
 
-	void setLighting(bool lighting){
-		mStates|=State_LIGHTING;
-		mLighting=lighting;
-	}
+	void setLighting(bool lighting){mStates|=State_LIGHTING;mLighting=lighting;}
 	inline bool getLighting() const{return mLighting;}
 
-	void setLightEffect(const peeper::LightEffect &lightEffect){
-		mStates|=State_LIGHTEFFECT;
-		mLightEffect.set(lightEffect);
-	}
+	void setLightEffect(const peeper::LightEffect &lightEffect){mStates|=State_LIGHTEFFECT;mLightEffect.set(lightEffect);}
 	inline const peeper::LightEffect &getLightEffect() const{return mLightEffect;}
 
-	void setFaceCulling(const peeper::Renderer::FaceCulling &faceCulling){
-		mStates|=State_FACECULLING;
-		mFaceCulling=faceCulling;
-	}
+	void setFaceCulling(const peeper::Renderer::FaceCulling &faceCulling){mStates|=State_FACECULLING;mFaceCulling=faceCulling;}
 	inline const peeper::Renderer::FaceCulling &getFaceCulling() const{return mFaceCulling;}
 
-	void setFill(const peeper::Renderer::Fill &fill){
-		mStates|=State_FILL;
-		mFill=fill;
-	}
+	void setFill(const peeper::Renderer::Fill &fill){mStates|=State_FILL;mFill=fill;}
 	inline const peeper::Renderer::Fill &getFill() const{return mFill;}
 
-	void setShading(const peeper::Renderer::Shading &shading){
-		mStates|=State_SHADING;
-		mShading=shading;
-	}
+	void setShading(const peeper::Renderer::Shading &shading){mStates|=State_SHADING;mShading=shading;}
 	inline const peeper::Renderer::Shading &getShading() const{return mShading;}
 
 	void setFogParameters(const peeper::Renderer::Fog &fog,scalar nearDistance,scalar farDistance,const peeper::Color &color){
-		mStates|=State_FOG;
-		mFog=fog;
-		mFogNearDistance=nearDistance;mFogFarDistance=farDistance;
-		mFogColor.set(color);
+		mStates|=State_FOG;mFog=fog;mFogNearDistance=nearDistance;mFogFarDistance=farDistance;mFogColor.set(color);
 	}
+	inline const peeper::Renderer::Fog &getFog() const{return mFog;}
+	inline scalar getFogNearDistance() const{return mFogNearDistance;}
+	inline scalar getFogFarDistance() const{return mFogFarDistance;}
+	inline const peeper::Color &getFogColor() const{return mFogColor;}
 
 	void setAlphaTest(peeper::Renderer::AlphaTest alphaTest,scalar cutoff){
-		mStates|=State_ALPHATEST;
-		mAlphaTest=alphaTest;
-		mAlphaTestCutoff=cutoff;
+		mStates|=State_ALPHATEST;mAlphaTest=alphaTest;mAlphaTestCutoff=cutoff;
 	}
 	inline const peeper::Renderer::AlphaTest &getAlphaTest() const{return mAlphaTest;}
 	inline scalar getAlphaTestCutoff() const{return mAlphaTestCutoff;}
 
-	void setBlend(const peeper::Blend &blend){
-		mStates|=State_BLEND;
-		mBlend=blend;
-	}
+	void setBlend(const peeper::Blend &blend){mStates|=State_BLEND;mBlend=blend;}
 	inline const peeper::Blend &getBlend() const{return mBlend;}
 
-	void setDepthSorted(bool sorted){
-		mStates|=State_DEPTHSORT;
-		mDepthSorted=sorted;
-	}
+	void setDepthSorted(bool sorted){mStates|=State_DEPTHSORT;mDepthSorted=sorted;}
 	inline bool getDepthSorted() const{return mDepthSorted;}
 
-	void setDepthWrite(bool depthWrite){
-		mStates|=State_DEPTHWRITE;
-		mDepthWrite=depthWrite;
-	}
+	void setDepthWrite(bool depthWrite){mStates|=State_DEPTHWRITE;mDepthWrite=depthWrite;}
 	inline bool getDepthWrite() const{return mDepthWrite;}
 
-	void setDepthTest(peeper::Renderer::DepthTest depthTest){
-		mStates|=State_DEPTHTEST;
-		mDepthTest=depthTest;
-	}
+	void setDepthTest(peeper::Renderer::DepthTest depthTest){mStates|=State_DEPTHTEST;mDepthTest=depthTest;}
 	inline peeper::Renderer::DepthTest getDepthTest() const{return mDepthTest;}
+
+	void setPointParameters(bool sprite,scalar size,bool attenuated,scalar constant,scalar linear,scalar quadratic,scalar minSize,scalar maxSize){
+		mStates|=State_POINT;mPointSprite=sprite;mPointSize=size;mPointAttenuated=attenuated;mPointConstant=constant;mPointLinear=linear;mPointQuadratic=quadratic;mPointMinSize=minSize;mPointMaxSize=maxSize;
+	}
+	inline bool getPointSprite() const{return mPointSprite;}
+	inline scalar getPointSize() const{return mPointSize;}
+	inline bool getPointAttenuated() const{return mPointAttenuated;}
+	inline scalar getPointConstant() const{return mPointConstant;}
+	inline scalar getPointLinear() const{return mPointLinear;}
+	inline scalar getPointQuadratic() const{return mPointQuadratic;}
+	inline scalar getPointMinSize() const{return mPointMinSize;}
+	inline scalar getPointMaxSize() const{return mPointMaxSize;}
 
 	void setLayer(int layer){mLayer=layer;}
 	inline int getLayer() const{return mLayer;}
@@ -163,6 +148,10 @@ protected:
 	bool mDepthSorted;
 	bool mDepthWrite;
 	peeper::Renderer::DepthTest mDepthTest;
+	bool mPointSprite;
+	scalar mPointSize;
+	bool mPointAttenuated;
+	scalar mPointConstant,mPointLinear,mPointQuadratic,mPointMinSize,mPointMaxSize;
 	int mLayer;
 	egg::Collection<peeper::TextureStage::ptr> mTextureStages;
 	bool mSaveLocally;

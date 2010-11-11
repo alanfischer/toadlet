@@ -35,7 +35,7 @@ namespace toadlet{
 namespace tadpole{
 namespace studio{
 
-class TOADLET_API StudioModelNode:public node::Node{
+class TOADLET_API StudioModelNode:public node::Node,public Renderable{
 public:
 	TOADLET_NODE(StudioModelNode,Node);
 
@@ -63,14 +63,38 @@ public:
 	StudioModelNode();
 	virtual ~StudioModelNode();
 
+	void destroy();
+
 	void setModel(StudioModel::ptr model);
 	StudioModel::ptr getModel() const{return mModel;}
 
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
+	Material *getRenderMaterial() const{return mSkeletonMaterial;}
+	const Matrix4x4 &getRenderTransform() const{return getWorldTransform();}
+	void render(peeper::Renderer *renderer) const;
+
+	peeper::VertexBufferAccessor vba;
+	peeper::IndexBufferAccessor iba;
 
 protected:
+	void updateChrome(StudioModel *model,int bodypartsIndex,int modelIndex,node::CameraNode *camera);
+	void findChrome(Vector2 &chrome,const Vector3 &normal,const Vector3 &forward,const Vector3 &right);
+
+	void createSkeletonBuffers();
+	void updateSkeletonBuffers();
+
 	StudioModel::ptr mModel;
 	egg::Collection<SubModel::ptr> mSubModels;
+	egg::Collection<Vector3> mBoneTranslates;
+	egg::Collection<Quaternion> mBoneRotates;
+	egg::Collection<Vector3> mTransformedPoints;
+	egg::Collection<Vector3> mTransformedNormals;
+	egg::Collection<Vector2> mTransformedChromes;
+
+	Material::ptr mSkeletonMaterial;
+	peeper::VertexBuffer::ptr mSkeletonVertexBuffer;
+	peeper::VertexData::ptr mSkeletonVertexData;
+	peeper::IndexData::ptr mSkeletonIndexData;
 };
 
 }

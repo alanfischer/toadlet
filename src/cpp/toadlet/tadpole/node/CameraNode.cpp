@@ -56,7 +56,7 @@ CameraNode::CameraNode():super(),
 	//mFinalProjectionTransform
 	//mWorldTranslate,
 	//mViewTransform,
-	//mForward,
+	//mForward,mRight,
 
 	//mOverlayMatrix,
 	//mOverlayVertexData,
@@ -305,6 +305,7 @@ void CameraNode::updateWorldTransform(){
 	super::updateWorldTransform();
 
 	Math::mul(mForward,mWorldTransform,Math::NEG_Z_UNIT_VECTOR3);
+	Math::mul(mRight,mWorldTransform,Math::X_UNIT_VECTOR3);
 
 	updateViewTransform();
 }

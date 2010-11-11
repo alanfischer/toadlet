@@ -63,10 +63,12 @@ public:
 	studiomodel *model(studiobodyparts *bodyparts,int i){return &((studiomodel*)(data+bodyparts->modelindex))[i];}
 	studiomesh *mesh(studiomodel *model,int i){return &((studiomesh*)(data+model->meshindex))[i];}
 	studiotexture *texture(int i){return &((studiotexture*)(data+header->textureindex))[i];}
+	studioseqdesc *seqdesc(int i){return &((studioseqdesc*)(data+header->seqindex))[i];}
 	short skin(int i){return ((short*)(data+header->skinindex))[i];}
+	studiobone *bone(int i){return &((studiobone*)(data+header->boneindex))[i];}
 
 	struct meshdata{
-		egg::Collection<peeper::IndexData::ptr> indexdatas;
+		egg::Collection<peeper::IndexData::ptr> indexDatas;
 	};
 
 	meshdata *findmeshdata(int bodypartIndex,int modelIndex,int meshIndex){
@@ -91,7 +93,8 @@ public:
 	egg::Collection<peeper::Texture::ptr> textures;
 	egg::Collection<Material::ptr> materials;
 	egg::Collection<meshdata> meshdatas;
-	peeper::VertexData::ptr vertexdata;
+	peeper::VertexBuffer::ptr vertexBuffer;
+	peeper::VertexData::ptr vertexData;
 };
 
 }
