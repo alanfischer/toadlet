@@ -140,8 +140,10 @@ void BSP30ModelNode::traceSegment(Collision &result,const Vector3 &position,cons
 		}
 	}
 
-	transformNormal(result.normal,result.normal,mWorldScale,mWorldRotate);
-	transform(result.point,result.point,position,mWorldScale,mWorldRotate);
+	if(result.time<Math::ONE){
+		transformNormal(result.normal,result.normal,mWorldScale,mWorldRotate);
+		transform(result.point,result.point,position,mWorldScale,mWorldRotate);
+	}
 }
 
 TOADLET_NODE_IMPLEMENT(BSP30Node,Categories::TOADLET_TADPOLE_NODE+".BSP30Node");

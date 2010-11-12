@@ -72,6 +72,7 @@ public:
 		return ((studioanim*)(data+sseqgroup->data+seqdesc->animindex));
 	}
 	studioanimvalue *animvalue(studioanim *anim,int i){return ((studioanimvalue*)((tbyte*)anim+anim->offset[i]));}
+	studiobbox *bbox(int i){return &((studiobbox*)(data+header->hitboxindex))[i];}
 
 	struct meshdata{
 		egg::Collection<peeper::IndexData::ptr> indexDatas;
