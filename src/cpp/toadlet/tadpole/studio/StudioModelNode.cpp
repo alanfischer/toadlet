@@ -139,7 +139,12 @@ void StudioModelNode::frameUpdate(int dt,int scope){
 
 	mSequenceTime+=Math::fromMilli(dt)*20;
 	if(mSequenceTime>=mModel->seqdesc(mSequenceIndex)->numframes-1){
-		mSequenceTime=fmod(mSequenceTime,mModel->seqdesc(mSequenceIndex)->numframes-1);
+		if(mModel->seqdesc(mSequenceIndex)->numframes>1){
+			mSequenceTime=fmod(mSequenceTime,mModel->seqdesc(mSequenceIndex)->numframes-1);
+		}
+		else{
+			mSequenceTime=0;
+		}
 	}
 	activate();
 

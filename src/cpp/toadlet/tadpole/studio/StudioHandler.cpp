@@ -108,6 +108,7 @@ void StudioHandler::buildBuffers(StudioModel *model){
 			studiomodel *smodel=model->model(sbodyparts,j);
 			Vector3 *verts=(Vector3*)(model->data+smodel->vertindex);
 			Vector3 *norms=(Vector3*)(model->data+smodel->normindex);
+			tbyte *snormbone=((tbyte*)model->data+smodel->norminfoindex);
 			for(k=0;k<smodel->nummesh;++k){
 				studiomesh *smesh=model->mesh(smodel,k);
 
@@ -131,6 +132,12 @@ void StudioHandler::buildBuffers(StudioModel *model){
 						vba.set3(vertexCount,0,verts[tricmds[0]]);
 						vba.set3(vertexCount,1,norms[tricmds[1]]);
 						vba.set2(vertexCount,2,tricmds[2]*s,tricmds[3]*t);
+
+						// Setting these manually, they dont appear to be set in the mdl
+						if((stexture->flags&STUDIO_NF_CHROME)>0){
+							model->bone(snormbone[tricmds[1]])->flags|=STUDIO_HAS_CHROME;
+						}
+
 						vertexCount++;
 					}
 				}
