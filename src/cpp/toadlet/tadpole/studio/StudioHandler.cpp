@@ -163,7 +163,7 @@ void StudioHandler::buildMaterials(StudioModel *model){
 
 		Material::ptr material=mEngine->getMaterialManager()->createMaterial();
 		material->retain();
-		material->setLighting(false);
+		material->setLighting(true);
 		material->setFaceCulling(Renderer::FaceCulling_FRONT);
 		material->setDepthWrite(true);
 		if((stexture->flags&STUDIO_NF_FLATSHADE)>0){

@@ -62,6 +62,8 @@ void StudioModelNode::SubModel::render(Renderer *renderer) const{
 }
 
 StudioModelNode::StudioModelNode():super(){
+	mSequenceIndex=0;
+	mSequenceTime=0;
 }
 
 StudioModelNode::~StudioModelNode(){
@@ -97,8 +99,8 @@ void StudioModelNode::setModel(StudioModel::ptr model){
 	mBoneTranslates.resize(model->header->numbones);
 	mBoneRotates.resize(model->header->numbones);
 
-	mTransformedPoints.resize(MAXSTUDIOVERTS);
-	mTransformedNormals.resize(MAXSTUDIOVERTS);
+	mTransformedVerts.resize(MAXSTUDIOVERTS);
+	mTransformedNorms.resize(MAXSTUDIOVERTS);
 	mTransformedChromes.resize(MAXSTUDIOVERTS);
 
 	int i,j,k;
@@ -113,31 +115,41 @@ void StudioModelNode::setModel(StudioModel::ptr model){
 		}
 	}
 
-	studioseqdesc *sseqdesc=model->seqdesc(0);
-	mLocalBound.set(sseqdesc->bbmin,sseqdesc->bbmax);
+	updateSkeleton();
 
-	mSkeletonMaterial=mEngine->getMaterialManager()->createMaterial();
-	mSkeletonMaterial->setDepthTest(Renderer::DepthTest_NONE);
-	mSkeletonMaterial->setDepthWrite(false);
-	mSkeletonMaterial->setPointParameters(true,8,false,0,0,0,0,0);
-	createSkeletonBuffers();
+	if(true){
+		mSkeletonMaterial=mEngine->getMaterialManager()->createMaterial();
+		mSkeletonMaterial->setDepthTest(Renderer::DepthTest_NONE);
+		mSkeletonMaterial->setDepthWrite(false);
+		mSkeletonMaterial->setPointParameters(true,8,false,0,0,0,0,0);
+		createSkeletonBuffers();
+	}
+}
+
+void StudioModelNode::frameUpdate(int dt,int scope){
+	super::frameUpdate(dt,scope);
+
+	mSequenceTime+=Math::fromMilli(dt)*20;
+	if(mSequenceTime>=mModel->seqdesc(mSequenceIndex)->numframes-1){
+		mSequenceTime=fmod(mSequenceTime,mModel->seqdesc(mSequenceIndex)->numframes-1);
+	}
+	activate();
+
+	updateSkeleton();
 }
 
 void StudioModelNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	super::queueRenderables(camera,queue);
 
+	Math::sub(mChromeForward,getWorldTranslate(),camera->getWorldTranslate());
+	Math::normalize(mChromeForward);
+	mChromeRight.set(camera->getRight());
+
 	int i,j;
-	for(i=0;i<mModel->header->numtextures;++i){
-		if((mModel->texture(i)->flags&STUDIO_NF_CHROME)>0){
-			break;
-		}
-	}
-	if(i<mModel->header->numtextures){
-		for(i=0;i<=mModel->header->numbodyparts;++i){
-			studiobodyparts *sbodyparts=mModel->bodyparts(i);
-			for(j=0;j<sbodyparts->nummodels;++j){
-				updateChrome(mModel,i,j,camera);
-			}
+	for(i=0;i<=mModel->header->numbodyparts;++i){
+		studiobodyparts *sbodyparts=mModel->bodyparts(i);
+		for(j=0;j<sbodyparts->nummodels;++j){
+			updateVertexes(mModel,i,j);
 		}
 	}
 
@@ -158,51 +170,58 @@ void StudioModelNode::render(Renderer *renderer) const{
 	mSkeletonIndexData->primitive=IndexData::Primitive_LINES;
 }
 
-void StudioModelNode::updateChrome(StudioModel *model,int bodypartsIndex,int modelIndex,CameraNode *camera){
+void StudioModelNode::updateVertexes(StudioModel *model,int bodypartsIndex,int modelIndex){
 	int i,l;
-
-	Vector3 forward,right;
-	Math::sub(forward,getWorldTranslate(),camera->getWorldTranslate());
-	Math::normalize(forward);
-	right.set(camera->getRight());
-
-	Vector3 normal;
-	Vector2 chrome;
-	Vector3 *normals=&mTransformedNormals[0];
-	Vector2 *chromes=&mTransformedChromes[0];
 
 	studiobodyparts *sbodyparts=model->bodyparts(bodypartsIndex);
 	studiomodel *smodel=model->model(sbodyparts,modelIndex);
+	tbyte *svertbone=((tbyte*)model->data+smodel->vertinfoindex);
+	tbyte *snormbone=((tbyte*)model->data+smodel->norminfoindex);
+	Vector3 *sverts=(Vector3*)(model->data+smodel->vertindex);
+	Vector3 *snorms=(Vector3*)(model->data+smodel->normindex);
 
-	// HACK: Just copy over the norms till we properly calculate them
-	memcpy(normals,model->data+smodel->normindex,smodel->numnorms*sizeof(Vector3));
+	Vector3 normal;
+	Vector2 chrome;
+	Vector3 *verts=mTransformedVerts;
+	Vector3 *norms=mTransformedNorms;
+	Vector2 *chromes=mTransformedChromes;
+	Vector3 *boneTranslates=mBoneTranslates;
+	Quaternion *boneRotates=mBoneRotates;
 
-	vba.lock(model->vertexBuffer);
+	for(i=0;i<smodel->numverts;++i){
+		Math::mul(verts[i],boneRotates[svertbone[i]],sverts[i]);
+		Math::add(verts[i],boneTranslates[svertbone[i]]);
+	}
 
 	for(i=0;i<smodel->numnorms;++i){
-		// TODO: Just chrome the norms with bones that have the chrome flag
-		findChrome(chromes[i],normals[i],forward,right);
+		Math::mul(norms[i],boneRotates[snormbone[i]],snorms[i]);
+		if((model->bone(snormbone[i])->flags&STUDIO_HAS_CHROME)>0){
+			findChrome(chromes[i],norms[i],mChromeForward,mChromeRight);
+		}
 	}
+
+	vba.lock(model->vertexBuffer);
 
 	for(i=0;i<smodel->nummesh;++i){
 		studiomesh *smesh=model->mesh(smodel,i);
 		StudioModel::meshdata *mdata=model->findmeshdata(bodypartsIndex,modelIndex,i);
 		studiotexture *stexture=model->texture(model->skin(smesh->skinref));
-		Vector3 *norms=(Vector3*)(model->data+smodel->normindex);
 
-		if((stexture->flags&STUDIO_NF_CHROME)>0){
-			int indexDataCount=0;
-			short *tricmds=(short*)(model->data+smesh->triindex);
-			while(l=*(tricmds++)){
-				int vertexCount=mdata->indexDatas[indexDataCount++]->start;
+		int indexDataCount=0;
+		short *tricmds=(short*)(model->data+smesh->triindex);
+		while(l=*(tricmds++)){
+			int vertexCount=mdata->indexDatas[indexDataCount++]->start;
 
-				if(l<0){
-					l=-l;
-				}
-				for(;l>0;l--,tricmds+=4){
+			if(l<0){
+				l=-l;
+			}
+			for(;l>0;l--,tricmds+=4){
+				vba.set3(vertexCount,0,verts[tricmds[0]]);
+				vba.set3(vertexCount,1,norms[tricmds[1]]);
+				if((stexture->flags&STUDIO_NF_CHROME)>0){
 					vba.set2(vertexCount,2,chromes[tricmds[1]]);
-					vertexCount++;
 				}
+				vertexCount++;
 			}
 		}
 	}
@@ -225,6 +244,143 @@ void StudioModelNode::findChrome(Vector2 &chrome,const Vector3 &normal,const Vec
 	chrome.x=(n+1.0f)*32.0f;
 	n=Math::dot(normal,chromeUp);
 	chrome.y=(n+1.0f)*32.0f;
+}
+
+void StudioModelNode::updateSkeleton(){
+	studioseqdesc *sseqdesc=mModel->seqdesc(mSequenceIndex);
+
+	mLocalBound.set(sseqdesc->bbmin,sseqdesc->bbmax);
+
+	studioanim *sanim=mModel->anim(sseqdesc);
+	findBoneTransforms(mBoneTranslates,mBoneRotates,mModel,sseqdesc,sanim,mSequenceTime);
+
+	int i;
+	for(i=0;i<mModel->header->numbones;++i){
+		studiobone *sbone=mModel->bone(i);
+		if(sbone->parent>=0){
+			Math::preMul(mBoneRotates[i],mBoneRotates[sbone->parent]);
+			Math::mul(mBoneTranslates[i],mBoneRotates[sbone->parent]);
+			Math::add(mBoneTranslates[i],mBoneTranslates[sbone->parent]);
+		}
+	}
+}
+
+void StudioModelNode::findBoneTransforms(Vector3 *translates,Quaternion *rotates,StudioModel *model,studioseqdesc *sseqdesc,studioanim *sanim,float t){
+	int frame=Math::intFloor(t);
+	float s=(t-Math::fromInt(frame));
+
+	// TODO: findBoneControllers??
+
+	studiobone *sbone=model->bone(0);
+	int i;
+	for(i=0;i<model->header->numbones;++i,sbone++,sanim++){
+		findBoneTranslate(translates[i],frame,s,sbone,sanim);
+		findBoneRotate(rotates[i],frame,s,sbone,sanim);
+	}
+/*
+	if((sseqdesc->motiontype&STUDIO_X)>0){
+	if (pseqdesc->motiontype & STUDIO_X)
+		pos[pseqdesc->motionbone][0] = 0.0;
+	if (pseqdesc->motiontype & STUDIO_Y)
+		pos[pseqdesc->motionbone][1] = 0.0;
+	if (pseqdesc->motiontype & STUDIO_Z)
+		pos[pseqdesc->motionbone][2] = 0.0;
+*/
+}
+
+void StudioModelNode::findBoneTranslate(Vector3 &r,int frame,float s,studiobone *sbone,studioanim *sanim){
+	studioanimvalue *sanimvalue=NULL;
+	int j,k;
+
+	for(j=0;j<3;j++){
+		r[j]=sbone->value[j];
+		if(sanim->offset[j]!=0){
+			sanimvalue=mModel->animvalue(sanim,j);
+			k=frame;
+			while(sanimvalue->num.total<=k){
+				k-=sanimvalue->num.total;
+				sanimvalue+=sanimvalue->num.valid+1;
+			}
+			if(sanimvalue->num.valid>k){
+				if(sanimvalue->num.valid>k+1){
+					r[j]+=(sanimvalue[k+1].value*(1.0-s)+s*sanimvalue[k+2].value)*sbone->scale[j];
+				}
+				else{
+					r[j]+=sanimvalue[k+1].value*sbone->scale[j];
+				}
+			}
+			else{
+				if(sanimvalue->num.total<=k+1){
+					r[j]+=(sanimvalue[sanimvalue->num.valid].value*(1.0-s)+s*sanimvalue[sanimvalue->num.valid+2].value)*sbone->scale[j];
+				}
+				else{
+					r[j]+=sanimvalue[sanimvalue->num.valid].value*sbone->scale[j];
+				}
+			}
+		}
+		if(sbone->bonecontroller[j]!=-1){
+//			r[j]+=mAdj[sbone->bonecontroller[j]];
+		}
+	}
+}
+
+void StudioModelNode::findBoneRotate(Quaternion &r,int frame,float s,studiobone *sbone,studioanim *sanim){
+	Quaternion q1,q2;
+	EulerAngle angle1,angle2;
+	studioanimvalue *sanimvalue=NULL;
+	int j,k;
+
+	for(j=0;j<3;++j){
+		if(sanim->offset[j+3]==0){
+			angle2[j]=angle1[j]=sbone->value[j+3];
+		}
+		else{
+			sanimvalue=mModel->animvalue(sanim,j+3);
+			k=frame;
+			while(sanimvalue->num.total<=k){
+				k-=sanimvalue->num.total;
+				sanimvalue+=sanimvalue->num.valid+1;
+			}
+			if(sanimvalue->num.valid>k){
+				angle1[j]=sanimvalue[k+1].value;
+				if(sanimvalue->num.valid>k+1){
+					angle2[j]=sanimvalue[k+2].value;
+				}
+				else{
+					if(sanimvalue->num.total>k+1){
+						angle2[j]=angle1[j];
+					}
+					else{
+						angle2[j]=sanimvalue[sanimvalue->num.valid+2].value;
+					}
+				}
+			}
+			else{
+				angle1[j]=sanimvalue[sanimvalue->num.valid].value;
+				if(sanimvalue->num.total>k+1){
+					angle2[j]=angle1[j];
+				}
+				else{
+					angle2[j]=sanimvalue[sanimvalue->num.valid+2].value;
+				}
+			}
+			angle1[j]=sbone->value[j+3]+angle1[j]*sbone->scale[j+3];
+			angle2[j]=sbone->value[j+3]+angle2[j]*sbone->scale[j+3];
+		}
+		if(sbone->bonecontroller[j+3]!=-1){
+//			angle1[j]+=mAdj[sbone->bonecontroller[j+3]];
+//			angle2[j]+=mAdj[sbone->bonecontroller[j+3]];
+		}
+	}
+
+	if(angle1.equals(angle2)==false){
+		setQuaternionFromEulerAngleStudio(q1,angle1);
+		setQuaternionFromEulerAngleStudio(q2,angle2);
+		Math::slerp(r,q1,q2,s);
+	}
+	else{
+		setQuaternionFromEulerAngleStudio(r,angle1);
+	}
 }
 
 void StudioModelNode::createSkeletonBuffers(){
@@ -269,6 +425,27 @@ void StudioModelNode::updateSkeletonBuffers(){
 	}
 
 	vba.unlock();
+}
+
+void StudioModelNode::setQuaternionFromEulerAngleStudio(Quaternion &r,const EulerAngle &euler){
+		real sx=euler.x/2;
+		real cx=cos(sx);
+		sx=sin(sx);
+		real sy=euler.y/2;
+		real cy=cos(sy);
+		sy=sin(sy);
+		real sz=euler.z/2;
+		real cz=cos(sz);
+		sz=sin(sz);
+		real cxcy=cx*cy;
+		real sxsy=sx*sy;
+		real cxsy=cx*sy;
+		real sxcy=sx*cy;
+
+		r.x=(sxcy*cz) - (cxsy*sz);
+		r.y=(cxsy*cz) + (sxcy*sz);
+  		r.z=(cxcy*sz) - (sxsy*cz);
+		r.w=(cxcy*cz) + (sxsy*sz);
 }
 
 }

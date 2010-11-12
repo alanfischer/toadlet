@@ -434,7 +434,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 				box.maxs.y+=m;
 				box.maxs.z+=m;
 
-				mNumSpacialCollection=findSolidsInAABox(box,mSpacialCollection.begin(),mSpacialCollection.size());
+				mNumSpacialCollection=findSolidsInAABox(box,mSpacialCollection,mSpacialCollection.size());
 			}
 		}
 
@@ -736,7 +736,7 @@ void Simulator::traceSegment(Collision &result,const Segment &segment,int collid
 	segment.getEndPoint(endPoint);
 	AABox total=cache_traceSegment_total.set(segment.origin,segment.origin);
 	total.merge(endPoint);
-	mNumSpacialCollection=findSolidsInAABox(total,mSpacialCollection.begin(),mSpacialCollection.size());
+	mNumSpacialCollection=findSolidsInAABox(total,mSpacialCollection,mSpacialCollection.size());
 
 	traceSegmentWithCurrentSpacials(result,segment,collideWithBits,ignore);
 }
@@ -748,7 +748,7 @@ void Simulator::traceSolid(Collision &result,Solid *solid,const Segment &segment
 	Math::add(box.mins,solid->mLocalBound.mins);
 	Math::add(box.maxs,solid->mLocalBound.maxs);
 
-	mNumSpacialCollection=findSolidsInAABox(box,mSpacialCollection.begin(),mSpacialCollection.size());
+	mNumSpacialCollection=findSolidsInAABox(box,mSpacialCollection,mSpacialCollection.size());
 
 	traceSolidWithCurrentSpacials(result,solid,segment,collideWithBits);
 }

@@ -63,9 +63,15 @@ public:
 	studiomodel *model(studiobodyparts *bodyparts,int i){return &((studiomodel*)(data+bodyparts->modelindex))[i];}
 	studiomesh *mesh(studiomodel *model,int i){return &((studiomesh*)(data+model->meshindex))[i];}
 	studiotexture *texture(int i){return &((studiotexture*)(data+header->textureindex))[i];}
-	studioseqdesc *seqdesc(int i){return &((studioseqdesc*)(data+header->seqindex))[i];}
 	short skin(int i){return ((short*)(data+header->skinindex))[i];}
 	studiobone *bone(int i){return &((studiobone*)(data+header->boneindex))[i];}
+	studioseqdesc *seqdesc(int i){return &((studioseqdesc*)(data+header->seqindex))[i];}
+	studioseqgroup *seqgroup(int i){return &((studioseqgroup*)(data+header->seqgroupindex))[i];}
+	studioanim *anim(studioseqdesc *seqdesc){
+		studioseqgroup *sseqgroup=seqgroup(seqdesc->seqgroup);
+		return ((studioanim*)(data+sseqgroup->data+seqdesc->animindex));
+	}
+	studioanimvalue *animvalue(studioanim *anim,int i){return ((studioanimvalue*)((tbyte*)anim+anim->offset[i]));}
 
 	struct meshdata{
 		egg::Collection<peeper::IndexData::ptr> indexDatas;
