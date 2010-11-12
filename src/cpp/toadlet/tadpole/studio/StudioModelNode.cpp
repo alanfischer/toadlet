@@ -88,6 +88,14 @@ void StudioModelNode::destroy(){
 		mSkeletonIndexData=NULL;
 	}
 
+	if(mHitBoxVertexData!=NULL){
+		mHitBoxVertexData->destroy();
+		mHitBoxIndexData->destroy();
+		mHitBoxVertexBuffer=NULL;
+		mHitBoxVertexData=NULL;
+		mHitBoxIndexData=NULL;
+	}
+
 	super::destroy();
 }
 
@@ -138,6 +146,36 @@ void StudioModelNode::frameUpdate(int dt,int scope){
 	updateSkeleton();
 }
 
+void StudioModelNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
+	Vector3 point,normal;
+	Segment localSegment,boxSegment;
+	Quaternion invrot;
+	int i;
+
+	inverseTransform(localSegment,segment,position,mWorldScale,mWorldRotate);
+
+	result.time=Math::ONE;
+	for(i=0;i<mModel->header->numhitboxes;++i){
+		studiobbox *sbbox=mModel->bbox(i);
+		Math::invert(invrot,mBoneRotates[sbbox->bone]);
+		Math::mul(boxSegment.direction,invrot,localSegment.direction);
+		Math::sub(boxSegment.origin,localSegment.origin,mBoneTranslates[sbbox->bone]);
+		Math::mul(boxSegment.origin,invrot);
+		scalar time=Math::findIntersection(boxSegment,AABox(sbbox->bbmin,sbbox->bbmax),point,normal);
+		if(time<result.time){
+			result.time=time;
+			Math::mul(result.point,mBoneRotates[sbbox->bone],point);
+			Math::add(result.point,mBoneTranslates[sbbox->bone]);
+			Math::mul(result.normal,mBoneRotates[sbbox->bone],normal);
+		}
+	}
+
+	if(result.time<Math::ONE){
+		transformNormal(result.normal,result.normal,mWorldScale,mWorldRotate);
+		transform(result.point,result.point,position,mWorldScale,mWorldRotate);
+	}
+}
+
 void StudioModelNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	super::queueRenderables(camera,queue);
 
@@ -165,9 +203,12 @@ void StudioModelNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 
 void StudioModelNode::render(Renderer *renderer) const{
 	renderer->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
+
 	mSkeletonIndexData->primitive=IndexData::Primitive_POINTS;
 	renderer->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
 	mSkeletonIndexData->primitive=IndexData::Primitive_LINES;
+
+	renderer->renderPrimitive(mHitBoxVertexData,mHitBoxIndexData);
 }
 
 void StudioModelNode::updateVertexes(StudioModel *model,int bodypartsIndex,int modelIndex){
@@ -413,39 +454,62 @@ void StudioModelNode::createSkeletonBuffers(){
 	mSkeletonVertexBuffer=skeletonVertexBuffer;
 	mSkeletonVertexData=VertexData::ptr(new VertexData(mSkeletonVertexBuffer));
 	mSkeletonIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,skeletonIndexBuffer));
+
+	VertexBuffer::ptr hitBoxVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION,mModel->header->numhitboxes*8);
+
+	mHitBoxVertexBuffer=hitBoxVertexBuffer;
+	mHitBoxVertexData=VertexData::ptr(new VertexData(mHitBoxVertexBuffer));
+	mHitBoxIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_POINTS,NULL,0,hitBoxVertexBuffer->getSize()));
 }
 
 void StudioModelNode::updateSkeletonBuffers(){
+	int i,j;
+
 	vba.lock(mSkeletonVertexBuffer);
 
-	int i;
 	for(i=0;i<mModel->header->numbones;++i){
 		studiobone *bone=mModel->bone(i);
 		vba.set3(i,0,mBoneTranslates[i]);
 	}
 
 	vba.unlock();
+
+	vba.lock(mHitBoxVertexBuffer);
+
+	Vector3 verts[8];
+	for(i=0;i<mModel->header->numhitboxes;++i){
+		studiobbox *sbbox=mModel->bbox(i);
+
+		AABox(sbbox->bbmin,sbbox->bbmax).getVertexes(verts);
+		for(j=0;j<8;++j){
+			Math::mul(verts[j],mBoneRotates[sbbox->bone]);
+			Math::add(verts[j],mBoneTranslates[sbbox->bone]);
+			vba.set3(i*8+j,0,verts[j]);
+		}
+	}
+
+	vba.unlock();
 }
 
 void StudioModelNode::setQuaternionFromEulerAngleStudio(Quaternion &r,const EulerAngle &euler){
-		real sx=euler.x/2;
-		real cx=cos(sx);
-		sx=sin(sx);
-		real sy=euler.y/2;
-		real cy=cos(sy);
-		sy=sin(sy);
-		real sz=euler.z/2;
-		real cz=cos(sz);
-		sz=sin(sz);
-		real cxcy=cx*cy;
-		real sxsy=sx*sy;
-		real cxsy=cx*sy;
-		real sxcy=sx*cy;
+	real sx=euler.x/2;
+	real cx=cos(sx);
+	sx=sin(sx);
+	real sy=euler.y/2;
+	real cy=cos(sy);
+	sy=sin(sy);
+	real sz=euler.z/2;
+	real cz=cos(sz);
+	sz=sin(sz);
+	real cxcy=cx*cy;
+	real sxsy=sx*sy;
+	real cxsy=cx*sy;
+	real sxcy=sx*cy;
 
-		r.x=(sxcy*cz) - (cxsy*sz);
-		r.y=(cxsy*cz) + (sxcy*sz);
-  		r.z=(cxcy*sz) - (sxsy*cz);
-		r.w=(cxcy*cz) + (sxsy*sz);
+	r.x=(sxcy*cz) - (cxsy*sz);
+	r.y=(cxsy*cz) + (sxcy*sz);
+	r.z=(cxcy*sz) - (sxsy*cz);
+	r.w=(cxcy*cz) + (sxsy*sz);
 }
 
 }

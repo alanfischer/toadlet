@@ -74,11 +74,11 @@ Node::Node():
 	//mRenderTransform,
 	//mWorldRenderTransform
 {
-	TOADLET_PROPERTY_INIT(translate);
-	TOADLET_PROPERTY_INIT(rotate);
-	TOADLET_PROPERTY_INIT(scale);
-	TOADLET_PROPERTY_INIT(scope);
-	TOADLET_PROPERTY_INIT(name);
+//	TOADLET_PROPERTY_INIT(translate);
+//	TOADLET_PROPERTY_INIT(rotate);
+//	TOADLET_PROPERTY_INIT(scale);
+//	TOADLET_PROPERTY_INIT(scope);
+//	TOADLET_PROPERTY_INIT(name);
 }
 
 Node::~Node(){

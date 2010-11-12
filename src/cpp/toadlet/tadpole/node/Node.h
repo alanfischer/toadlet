@@ -28,7 +28,7 @@
 
 #include <toadlet/egg/Event.h>
 #include <toadlet/egg/IntrusivePointer.h>
-#include <toadlet/egg/Property.h>
+//#include <toadlet/egg/Property.h>
 #include <toadlet/egg/WeakPointer.h>
 #include <toadlet/egg/Type.h>
 #include <toadlet/tadpole/Types.h>
@@ -154,12 +154,12 @@ public:
 	inline void internal_setManaged(bool managed){mManaged=managed;}
 	inline bool internal_getManaged() const{return mManaged;}
 
-	TOADLET_PROPERTY(Vector3,translate,Node,getTranslate,setTranslate);
-	TOADLET_PROPERTY(Quaternion,rotate,Node,getRotate,setRotate);
-	TOADLET_PROPERTY(Vector3,scale,Node,getScale,setScale);
+//	TOADLET_PROPERTY(Vector3,translate,Node,getTranslate,setTranslate);
+//	TOADLET_PROPERTY(Quaternion,rotate,Node,getRotate,setRotate);
+//	TOADLET_PROPERTY(Vector3,scale,Node,getScale,setScale);
 
-	TOADLET_PROPERTY(int,scope,Node,getScope,setScope);
-	TOADLET_PROPERTY(egg::String,name,Node,getName,setName);
+//	TOADLET_PROPERTY(int,scope,Node,getScope,setScope);
+//	TOADLET_PROPERTY(egg::String,name,Node,getName,setName);
 
 	/// @todo: These functions should be moved to a Transform class
 	static void inverseTransform(Vector3 &r,const Vector3 &t,const Vector3 &translate,const Vector3 &scale,const Quaternion &rotate){

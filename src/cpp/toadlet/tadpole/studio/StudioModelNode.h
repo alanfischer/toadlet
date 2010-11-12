@@ -29,13 +29,14 @@
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/Renderable.h>
+#include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/studio/StudioModel.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace studio{
 
-class TOADLET_API StudioModelNode:public node::Node,public Renderable{
+class TOADLET_API StudioModelNode:public node::Node,public Traceable,public Renderable{
 public:
 	TOADLET_NODE(StudioModelNode,Node);
 
@@ -69,6 +70,9 @@ public:
 	StudioModel::ptr getModel() const{return mModel;}
 
 	void frameUpdate(int dt,int scope);
+
+	const Bound &getLocalBound() const{return mLocalBound;}
+	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 	Material *getRenderMaterial() const{return mSkeletonMaterial;}
@@ -106,6 +110,9 @@ protected:
 	peeper::VertexBuffer::ptr mSkeletonVertexBuffer;
 	peeper::VertexData::ptr mSkeletonVertexData;
 	peeper::IndexData::ptr mSkeletonIndexData;
+	peeper::VertexBuffer::ptr mHitBoxVertexBuffer;
+	peeper::VertexData::ptr mHitBoxVertexData;
+	peeper::IndexData::ptr mHitBoxIndexData;
 };
 
 }
