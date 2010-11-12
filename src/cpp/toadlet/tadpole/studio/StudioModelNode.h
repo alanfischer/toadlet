@@ -68,6 +68,8 @@ public:
 	void setModel(StudioModel::ptr model);
 	StudioModel::ptr getModel() const{return mModel;}
 
+	void frameUpdate(int dt,int scope);
+
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 	Material *getRenderMaterial() const{return mSkeletonMaterial;}
 	const Matrix4x4 &getRenderTransform() const{return getWorldTransform();}
@@ -77,18 +79,27 @@ public:
 	peeper::IndexBufferAccessor iba;
 
 protected:
-	void updateChrome(StudioModel *model,int bodypartsIndex,int modelIndex,node::CameraNode *camera);
-	void findChrome(Vector2 &chrome,const Vector3 &normal,const Vector3 &forward,const Vector3 &right);
 
+	void updateSkeleton();
+	void findBoneTransforms(Vector3 *translates,Quaternion *rotates,StudioModel *model,studioseqdesc *sseqdesc,studioanim *sanim,float t);
+	void findBoneTranslate(Vector3 &r,int frame,float s,studiobone *sbone,studioanim *sanim);
+	void findBoneRotate(Quaternion &r,int frame,float s,studiobone *sbone,studioanim *sanim);
+	void updateVertexes(StudioModel *model,int bodypartsIndex,int modelIndex);
+	void findChrome(Vector2 &chrome,const Vector3 &normal,const Vector3 &forward,const Vector3 &right);
 	void createSkeletonBuffers();
 	void updateSkeletonBuffers();
+	void setQuaternionFromEulerAngleStudio(Quaternion &r,const EulerAngle &euler);
 
 	StudioModel::ptr mModel;
 	egg::Collection<SubModel::ptr> mSubModels;
+
+	int mSequenceIndex;
+	scalar mSequenceTime;
+	Vector3 mChromeForward,mChromeRight;
 	egg::Collection<Vector3> mBoneTranslates;
 	egg::Collection<Quaternion> mBoneRotates;
-	egg::Collection<Vector3> mTransformedPoints;
-	egg::Collection<Vector3> mTransformedNormals;
+	egg::Collection<Vector3> mTransformedVerts;
+	egg::Collection<Vector3> mTransformedNorms;
 	egg::Collection<Vector2> mTransformedChromes;
 
 	Material::ptr mSkeletonMaterial;

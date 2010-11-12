@@ -71,7 +71,7 @@ void D3D10VertexFormat::destroy(){
 
 bool D3D10VertexFormat::createContext(){
 	HRESULT result=mRenderer->getD3D10Device()->CreateInputLayout(
-		mElements.begin(),mElements.size(),mRenderer->passDesc.pIAInputSignature,mRenderer->passDesc.IAInputSignatureSize,&mLayout
+		mElements,mElements.size(),mRenderer->passDesc.pIAInputSignature,mRenderer->passDesc.IAInputSignatureSize,&mLayout
 	);
 
 	return SUCCEEDED(result);

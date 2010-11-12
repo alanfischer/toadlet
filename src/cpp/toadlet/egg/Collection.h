@@ -334,12 +334,12 @@ public:
 		return mData[n];
 	}
 
-	inline Type &operator[](int n){
-		return mData[n];
+	inline operator Type *(){
+		return mData;
 	}
 
-	inline const Type &operator[](int n) const{
-		return mData[n];
+	inline operator const Type *() const{
+		return mData;
 	}
 
 	Collection &operator=(const Collection &c){
