@@ -40,6 +40,7 @@ public:
 
 	virtual bool create(AudioBuffer::ptr audioBuffer);
 	virtual bool create(egg::io::Stream::ptr stream,const egg::String &mimeType);
+	virtual bool create(AudioStream::ptr stream);
 	virtual void destroy();
 
 	virtual bool play(){mPosition=0;mPlaying=true;return true;}

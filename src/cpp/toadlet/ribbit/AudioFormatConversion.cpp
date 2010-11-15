@@ -30,11 +30,12 @@
 #include <string.h> //memcpy
 
 using namespace toadlet::egg;
+using namespace toadlet::egg::io;
 
 namespace toadlet{
 namespace ribbit{
 
-void AudioFormatConversion::decode(AudioStream *stream,tbyte *&finalBuffer,int &finalLength){
+void AudioFormatConversion::decode(Stream *stream,tbyte *&finalBuffer,int &finalLength){
 	const static int bufferSize=4096;
 	Collection<tbyte*> buffers;
 	int amount=0,total=0;
@@ -65,6 +66,10 @@ void AudioFormatConversion::decode(AudioStream *stream,tbyte *&finalBuffer,int &
 		total-=bufferSize;
 		delete[] buffers[i];
 	}
+}
+
+void AudioFormatConversion::decode(AudioStream *stream,tbyte *&finalBuffer,int &finalLength){
+	decode((Stream*)stream,finalBuffer,finalLength);
 
 	#if !defined(TOADLET_NATIVE_FORMAT)
 		int bps=stream->getBitsPerSample();

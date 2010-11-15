@@ -39,12 +39,9 @@ public:
 	virtual ~AudioStream(){}
 
 	virtual bool startStream(egg::io::Stream::ptr stream)=0;
-	virtual bool stopStream()=0;
 	virtual int getBitsPerSample()=0;
 	virtual int getChannels()=0;
 	virtual int getSamplesPerSecond()=0;
-
-	virtual egg::io::Stream::ptr getParentStream()=0;
 };
 
 }

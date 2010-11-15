@@ -85,10 +85,6 @@ bool CoreAudioDecoder::startStream(Stream::ptr in){
 	return true;
 }
 
-bool CoreAudioDecoder::stopStream(){
-	return true;
-}
-
 int CoreAudioDecoder::read(tbyte *buffer,int length){
 	AudioFileReadBytes(mAudioFile,false,mPosition,(UInt32*)&length,buffer);
 	mPosition+=length;
