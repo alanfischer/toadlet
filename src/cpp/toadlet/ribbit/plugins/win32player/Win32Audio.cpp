@@ -62,6 +62,21 @@ bool Win32Audio::create(AudioBuffer::ptr audioBuffer){
 }
 
 bool Win32Audio::create(Stream::ptr stream,const String &mimeType){
+	AudioStream::ptr audioStream=NULL;
+	TOADLET_TRY{
+		audioStream=mPlayer->startAudioStream(stream,mimeType);
+	}TOADLET_CATCH(const Exception &){
+		audioStream=NULL;
+	}
+
+	if(audioStream==NULL){
+		return false;
+	}
+
+	return create(audioStream);
+}
+
+bool Win32Audio::create(AudioStream::ptr stream){
 	destroy();
 
 	return false;

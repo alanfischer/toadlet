@@ -93,22 +93,26 @@ bool ALAudio::create(AudioBuffer::ptr audioBuffer){
 }
 
 bool ALAudio::create(Stream::ptr stream,const String &mimeType){
-	destroy();
-
-	AudioStream::ptr decoder=NULL;
+	AudioStream::ptr audioStream=NULL;
 	TOADLET_TRY{
-		decoder=mAudioPlayer->startAudioStream(stream,mimeType);
+		audioStream=mAudioPlayer->startAudioStream(stream,mimeType);
 	}TOADLET_CATCH(const Exception &){
-		decoder=NULL;
+		audioStream=NULL;
 	}
 
-	if(decoder==NULL){
+	if(audioStream==NULL){
 		return false;
 	}
 
+	return create(audioStream);
+}
+
+bool ALAudio::create(AudioStream::ptr stream){
+	destroy();
+
 	mHandle=mAudioPlayer->checkoutSourceHandle(this);
 
-	mAudioStream=decoder;
+	mAudioStream=stream;
 	mAudioBuffer=NULL;
 
 	mAudioPlayer->lock();

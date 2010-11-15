@@ -182,10 +182,6 @@ int WaveDecoder::read(tbyte *buffer,int length){
 	return length;
 }
 
-bool WaveDecoder::stopStream(){
-	return true;
-}
-
 bool WaveDecoder::reset(){
 	mPosition=0;
 	return true;

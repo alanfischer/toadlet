@@ -46,7 +46,6 @@ public:
 	int write(const tbyte *buffer,int length){return 0;}
 
 	bool startStream(egg::io::Stream::ptr stream);
-	bool stopStream();
 	bool reset();
 	int length(){return 0;}
 	int position(){return 0;}
@@ -55,7 +54,6 @@ public:
 	int getChannels(){return mChannels;}
 	int getSamplesPerSecond(){return mSamplesPerSecond;}
 	int getBitsPerSample(){return mBitsPerSample;}
-	egg::io::Stream::ptr getParentStream(){return mStream;}
 
 private:
 	void skip(egg::io::Stream::ptr stream,int amount);

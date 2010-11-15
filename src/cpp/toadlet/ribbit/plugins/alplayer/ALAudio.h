@@ -42,6 +42,7 @@ public:
 
 	bool create(AudioBuffer::ptr buffer);
 	bool create(egg::io::Stream::ptr stream,const egg::String &mimeType);
+	bool create(AudioStream::ptr stream);
 	void destroy();
 
 	bool play();

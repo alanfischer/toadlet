@@ -60,7 +60,6 @@ public:
 	int getChannels(){return mStreamDescription.mChannelsPerFrame;}
 	int getSamplesPerSecond(){return mStreamDescription.mSampleRate;}
 	int getBitsPerSample(){return mStreamDescription.mBitsPerChannel;}
-	egg::io::Stream::ptr getParentStream(){return mIn;}
 
 	inline AudioFileID getAudioFileID() const{return mAudioFile;}
 	inline const AudioStreamBasicDescription &getStreamDescription() const{return mStreamDescription;}

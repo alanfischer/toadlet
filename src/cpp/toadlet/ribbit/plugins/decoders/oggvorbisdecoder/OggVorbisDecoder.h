@@ -60,7 +60,6 @@ public:
 	int getChannels();
 	int getSamplesPerSecond();
 	int getBitsPerSample(){return 16;}
-	egg::io::Stream::ptr getParentStream(){return mStream;}
 
 private:
 	static size_t read_func(void *ptr,size_t size,size_t nmemb, void *datasource);

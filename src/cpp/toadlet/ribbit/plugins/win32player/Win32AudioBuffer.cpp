@@ -46,19 +46,24 @@ Win32AudioBuffer::~Win32AudioBuffer(){
 	destroy();
 }
 
+
 bool Win32AudioBuffer::create(Stream::ptr stream,const String &mimeType){
-	AudioStream::ptr decoder=mAudioPlayer->startAudioStream(stream,mimeType);
-	if(decoder==NULL){
+	AudioStream::ptr audioStream=mAudioPlayer->startAudioStream(stream,mimeType);
+	if(audioStream==NULL){
 		return false;
 	}
 
-	int channels=decoder->getChannels();
-	int sps=decoder->getSamplesPerSecond();
-	int bps=decoder->getBitsPerSample();
+	return create(audioStream);
+}
+
+bool Win32AudioBuffer::create(AudioStream::ptr stream){
+	int channels=stream->getChannels();
+	int sps=stream->getSamplesPerSecond();
+	int bps=stream->getBitsPerSample();
 	tbyte *buffer=NULL;
 	int length=0;
 
-	AudioFormatConversion::decode(decoder,buffer,length);
+	AudioFormatConversion::decode(stream,buffer,length);
 	int numsamps=length/channels/(bps/8);
 
 	// Lets us programatically reduce popping on some platforms

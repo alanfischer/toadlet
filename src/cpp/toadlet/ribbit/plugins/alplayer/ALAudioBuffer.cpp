@@ -55,26 +55,30 @@ ALAudioBuffer::~ALAudioBuffer(){
 bool ALAudioBuffer::create(Stream::ptr stream,const String &mimeType){
 	destroy();
 
-	AudioStream::ptr decoder=mAudioPlayer->startAudioStream(stream,mimeType);
-	if(decoder==NULL){
+	AudioStream::ptr audioStream=mAudioPlayer->startAudioStream(stream,mimeType);
+	if(audioStream==NULL){
 		return false;
 	}
 
 	#if defined(TOADLET_PLATFORM_OSX)
-		if(((CoreAudioDecoder*)decoder.get())->isVariableBitRate()){
+		if(((CoreAudioDecoder*)audioStream.get())->isVariableBitRate()){
 			Error::unknown(Categories::TOADLET_RIBBIT,
 				"Variable bit rate streams not supported as Audio Buffers");
 			return false;
 		}
 	#endif
 
+	return create(audioStream);
+}
+
+bool ALAudioBuffer::create(AudioStream::ptr stream){
 	tbyte *buffer=0;
 	int length=0;
-	int channels=decoder->getChannels();
-	int sps=decoder->getSamplesPerSecond();
-	int bps=decoder->getBitsPerSample();
+	int channels=stream->getChannels();
+	int sps=stream->getSamplesPerSecond();
+	int bps=stream->getBitsPerSample();
 
-	AudioFormatConversion::decode(decoder,buffer,length);
+	AudioFormatConversion::decode(stream,buffer,length);
 	int numsamps=length/channels/(bps/8);
 	mLengthTime=numsamps*1000/sps;
 

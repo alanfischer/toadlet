@@ -38,7 +38,9 @@ public:
 	virtual ~Audio(){}
 
 	virtual bool create(AudioBuffer::ptr buffer)=0;
+	/// @todo: Remove all the stream/mimeType methods from Audio & AudioBuffer, and leave just AudioStream methods with a stream creator in AudioPlayer
 	virtual bool create(egg::io::Stream::ptr stream,const egg::String &mimeType)=0;
+	virtual bool create(AudioStream::ptr stream)=0;
 	virtual void destroy()=0;
 
 	virtual bool play()=0;

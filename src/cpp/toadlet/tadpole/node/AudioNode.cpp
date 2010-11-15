@@ -84,6 +84,22 @@ bool AudioNode::setAudioStream(Stream::ptr stream,const String &mimeType){
 	}
 }
 
+bool AudioNode::setAudioStream(AudioStream::ptr stream){
+	if(mAudio!=NULL){
+		mAudio->destroy();
+	}
+
+	mAudio=Audio::ptr(mEngine->getAudioPlayer()->createStreamingAudio());
+	if(mAudio!=NULL){
+
+		mAudio->create(stream);
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
 }
 }
 }
