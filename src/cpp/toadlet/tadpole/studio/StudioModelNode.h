@@ -69,6 +69,12 @@ public:
 	void setModel(StudioModel::ptr model);
 	StudioModel::ptr getModel() const{return mModel;}
 
+	void setRenderSkeleton(bool skeleton);
+	bool getRenderSkeleton() const{return mSkeletonMaterial!=NULL;}
+
+	void setController(int controller,scalar v);
+	scalar getController(int controller){return mControllerValues[controller];}
+
 	void frameUpdate(int dt,int scope);
 
 	const Bound &getLocalBound() const{return mLocalBound;}
@@ -83,7 +89,6 @@ public:
 	peeper::IndexBufferAccessor iba;
 
 protected:
-
 	void updateSkeleton();
 	void findBoneTransforms(Vector3 *translates,Quaternion *rotates,StudioModel *model,studioseqdesc *sseqdesc,studioanim *sanim,float t);
 	void findBoneTranslate(Vector3 &r,int frame,float s,studiobone *sbone,studioanim *sanim);
@@ -92,6 +97,7 @@ protected:
 	void findChrome(Vector2 &chrome,const Vector3 &normal,const Vector3 &forward,const Vector3 &right);
 	void createSkeletonBuffers();
 	void updateSkeletonBuffers();
+	void destroySkeletonBuffers();
 	void setQuaternionFromEulerAngleStudio(Quaternion &r,const EulerAngle &euler);
 
 	StudioModel::ptr mModel;
@@ -100,11 +106,14 @@ protected:
 	int mSequenceIndex;
 	scalar mSequenceTime;
 	Vector3 mChromeForward,mChromeRight;
+	scalar mControllerValues[4],mAdjustedControllerValues[4];
 	egg::Collection<Vector3> mBoneTranslates;
 	egg::Collection<Quaternion> mBoneRotates;
 	egg::Collection<Vector3> mTransformedVerts;
 	egg::Collection<Vector3> mTransformedNorms;
 	egg::Collection<Vector2> mTransformedChromes;
+	peeper::VertexBuffer::ptr mVertexBuffer;
+	peeper::VertexData::ptr mVertexData;
 
 	Material::ptr mSkeletonMaterial;
 	peeper::VertexBuffer::ptr mSkeletonVertexBuffer;

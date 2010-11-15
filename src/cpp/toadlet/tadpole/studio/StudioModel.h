@@ -73,6 +73,7 @@ public:
 	}
 	studioanimvalue *animvalue(studioanim *anim,int i){return ((studioanimvalue*)((tbyte*)anim+anim->offset[i]));}
 	studiobbox *bbox(int i){return &((studiobbox*)(data+header->hitboxindex))[i];}
+	studiobonecontroller *bonecontroller(int i){return &((studiobonecontroller*)(data+header->bonecontrollerindex))[i];}
 
 	struct meshdata{
 		egg::Collection<peeper::IndexData::ptr> indexDatas;
@@ -100,8 +101,7 @@ public:
 	egg::Collection<peeper::Texture::ptr> textures;
 	egg::Collection<Material::ptr> materials;
 	egg::Collection<meshdata> meshdatas;
-	peeper::VertexBuffer::ptr vertexBuffer;
-	peeper::VertexData::ptr vertexData;
+	int vertexCount;
 };
 
 }

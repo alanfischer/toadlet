@@ -94,11 +94,7 @@ void StudioHandler::buildBuffers(StudioModel *model){
 	}
 
 	model->meshdatas.resize(meshCount);
-
-	model->vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,vertexCount);
-
-	VertexBufferAccessor vba;
-	vba.lock(model->vertexBuffer,Buffer::Access_BIT_WRITE);
+	model->vertexCount=vertexCount;
 
 	meshCount=0;
 	vertexCount=0;
@@ -106,8 +102,6 @@ void StudioHandler::buildBuffers(StudioModel *model){
 		studiobodyparts *sbodyparts=model->bodyparts(i);
 		for(j=0;j<sbodyparts->nummodels;++j){
 			studiomodel *smodel=model->model(sbodyparts,j);
-			Vector3 *verts=(Vector3*)(model->data+smodel->vertindex);
-			Vector3 *norms=(Vector3*)(model->data+smodel->normindex);
 			tbyte *snormbone=((tbyte*)model->data+smodel->norminfoindex);
 			for(k=0;k<smodel->nummesh;++k){
 				studiomesh *smesh=model->mesh(smodel,k);
@@ -129,10 +123,6 @@ void StudioHandler::buildBuffers(StudioModel *model){
 					model->meshdatas[meshCount].indexDatas.add(indexData);
 
 					for(;l>0;l--,tricmds+=4){
-						vba.set3(vertexCount,0,verts[tricmds[0]]);
-						vba.set3(vertexCount,1,norms[tricmds[1]]);
-						vba.set2(vertexCount,2,tricmds[2]*s,tricmds[3]*t);
-
 						// Setting these manually, they dont appear to be set in the mdl
 						if((stexture->flags&STUDIO_NF_CHROME)>0){
 							model->bone(snormbone[tricmds[1]])->flags|=STUDIO_HAS_CHROME;
@@ -146,10 +136,6 @@ void StudioHandler::buildBuffers(StudioModel *model){
 			}
 		}
 	}
-
-	vba.unlock();
-
-	model->vertexData=VertexData::ptr(new VertexData(model->vertexBuffer));
 }
 
 void StudioHandler::buildTextures(StudioModel *model){
