@@ -40,7 +40,7 @@ namespace studio{
 
 TOADLET_NODE_IMPLEMENT(StudioModelNode,Categories::TOADLET_TADPOLE_STUDIO+".StudioModelNode");
 
-StudioModelNode::SubModel::SubModel(StudioModelNode *modelNode,int bodypartIndex,int modelIndex,int meshIndex){
+StudioModelNode::SubModel::SubModel(StudioModelNode *modelNode,int bodypartIndex,int modelIndex,int meshIndex,int skinIndex){
 	this->modelNode=modelNode;
 	this->bodypartIndex=bodypartIndex;
 	this->modelIndex=modelIndex;
@@ -51,7 +51,7 @@ StudioModelNode::SubModel::SubModel(StudioModelNode *modelNode,int bodypartIndex
 	smodel=model->model(sbodyparts,modelIndex);
 	smesh=model->mesh(smodel,meshIndex);
 	mdata=model->findmeshdata(bodypartIndex,modelIndex,meshIndex);
-	material=model->materials[smesh->skinref];
+	material=model->materials[model->skin(model->header->numskinref*skinIndex+smesh->skinref)];
 }
 
 void StudioModelNode::SubModel::render(Renderer *renderer) const{
@@ -65,10 +65,14 @@ StudioModelNode::StudioModelNode():super(),
 	//mModel,
 	//mSubModels,
 
+	mBodypartIndex(0),
+	mModelIndex(0),
+	mSkinIndex(0),
 	mSequenceIndex(0),
 	mSequenceTime(0)
 	//mChromeForward,mChromeRight,
 	//mControllerValues[4],mAdjustedControllerValues[4],
+	//mBlenderValues[4],mAdjustedBlenderValues[4],
 	//mBoneTranslates,
 	//mBoneRotates,
 	//mTransformedVerts,
@@ -123,17 +127,7 @@ void StudioModelNode::setModel(StudioModel::ptr model){
 	mVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,model->vertexCount);
 	mVertexData=VertexData::ptr(new VertexData(mVertexBuffer));
 
-	int i,j,k;
-	for(i=0;i<=model->header->numbodyparts;++i){
-		studiobodyparts *sbodyparts=model->bodyparts(i);
-		for(j=0;j<sbodyparts->nummodels;++j){
-			studiomodel *smodel=model->model(sbodyparts,j);
-			for(k=0;k<smodel->nummesh;++k){
-				SubModel::ptr subModel(new SubModel(this,i,j,k));
-				mSubModels.add(subModel);
-			}
-		}
-	}
+	createSubModels();
 
 	updateSkeleton();
 }
@@ -184,6 +178,45 @@ void StudioModelNode::setController(int controller,scalar v){
 	}
 
 	mAdjustedControllerValues[controller]=v;
+}
+
+void StudioModelNode::setBlender(int blender,scalar v){
+	studioseqdesc *sseqdesc=(studioseqdesc*)mModel->seqdesc(mSequenceIndex);
+
+	if((sseqdesc->blendtype[blender]&(STUDIO_XR|STUDIO_YR|STUDIO_ZR))>0){
+		if(sseqdesc->blendend[blender]<sseqdesc->blendstart[blender]){
+			v=-v;
+		}
+
+		v=fmod(v,Math::TWO_PI);
+	}
+
+	mBlenderValues[blender]=v;
+
+	if((sseqdesc->blendtype[blender]&(STUDIO_XR|STUDIO_YR|STUDIO_ZR))>0){
+		v=Math::clamp(Math::degToRad(sseqdesc->blendstart[blender]),Math::degToRad(sseqdesc->blendend[blender]),v);
+		v=(v-Math::degToRad(sseqdesc->blendstart[blender]))/Math::degToRad(sseqdesc->blendend[blender]-sseqdesc->blendstart[blender]);
+	}
+
+	mAdjustedBlenderValues[blender]=v;
+}
+
+void StudioModelNode::setBodypart(int part){
+	mBodypartIndex=part;
+
+	createSubModels();
+}
+
+void StudioModelNode::setBodypartModel(int model){
+	mModelIndex=model;
+
+	createSubModels();
+}
+
+void StudioModelNode::setSkin(int skin){
+	mSkinIndex=skin;
+
+	createSubModels();
 }
 
 void StudioModelNode::frameUpdate(int dt,int scope){
@@ -350,6 +383,8 @@ void StudioModelNode::findChrome(Vector2 &chrome,const Vector3 &normal,const Vec
 }
 
 void StudioModelNode::updateSkeleton(){
+	int i;
+
 	studioseqdesc *sseqdesc=mModel->seqdesc(mSequenceIndex);
 
 	mLocalBound.set(sseqdesc->bbmin,sseqdesc->bbmax);
@@ -357,7 +392,21 @@ void StudioModelNode::updateSkeleton(){
 	studioanim *sanim=mModel->anim(sseqdesc);
 	findBoneTransforms(mBoneTranslates,mBoneRotates,mModel,sseqdesc,sanim,mSequenceTime);
 
-	int i;
+	if(sseqdesc->numblends>1){
+		sanim+=mModel->header->numbones;
+
+		Collection<Vector3> boneTranslates(mModel->header->numbones);
+		Collection<Quaternion> boneRotates(mModel->header->numbones);
+
+		findBoneTransforms(boneTranslates,boneRotates,mModel,sseqdesc,sanim,mSequenceTime);
+
+		for(i=0;i<mModel->header->numbones;++i){
+			Quaternion r;
+			Math::slerp(r,mBoneRotates[i],boneRotates[i],mAdjustedBlenderValues[0]);
+			mBoneRotates[i]=r;
+		}
+	}
+
 	for(i=0;i<mModel->header->numbones;++i){
 		studiobone *sbone=mModel->bone(i);
 		if(sbone->parent>=0){
@@ -380,12 +429,8 @@ void StudioModelNode::findBoneTransforms(Vector3 *translates,Quaternion *rotates
 	}
 /*
 	if((sseqdesc->motiontype&STUDIO_X)>0){
-	if (pseqdesc->motiontype & STUDIO_X)
-		pos[pseqdesc->motionbone][0] = 0.0;
-	if (pseqdesc->motiontype & STUDIO_Y)
-		pos[pseqdesc->motionbone][1] = 0.0;
-	if (pseqdesc->motiontype & STUDIO_Z)
-		pos[pseqdesc->motionbone][2] = 0.0;
+		translates[sseqdesc->motionbone][0]=0;
+	}
 */
 }
 
@@ -481,6 +526,18 @@ void StudioModelNode::findBoneRotate(Quaternion &r,int frame,float s,studiobone 
 	}
 	else{
 		setQuaternionFromEulerAngleStudio(r,angle1);
+	}
+}
+
+void StudioModelNode::createSubModels(){
+	mSubModels.clear();
+
+	int i;
+	studiobodyparts *sbodyparts=mModel->bodyparts(mBodypartIndex);
+	studiomodel *smodel=mModel->model(sbodyparts,mModelIndex);
+	for(i=0;i<smodel->nummesh;++i){
+		SubModel::ptr subModel(new SubModel(this,mBodypartIndex,mModelIndex,i,mSkinIndex));
+		mSubModels.add(subModel);
 	}
 }
 

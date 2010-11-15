@@ -44,7 +44,7 @@ public:
 	public:
 		TOADLET_SHARED_POINTERS(SubModel);
 
-		SubModel(StudioModelNode *modelNode,int bodypartIndex,int modelIndex,int meshIndex);
+		SubModel(StudioModelNode *modelNode,int bodypartIndex,int modelIndex,int meshIndex,int skinIndex);
 
 		Material *getRenderMaterial() const{return material;}
 		const Matrix4x4 &getRenderTransform() const{return modelNode->getWorldTransform();}
@@ -73,7 +73,19 @@ public:
 	bool getRenderSkeleton() const{return mSkeletonMaterial!=NULL;}
 
 	void setController(int controller,scalar v);
-	scalar getController(int controller){return mControllerValues[controller];}
+	scalar getController(int controller) const{return mControllerValues[controller];}
+
+	void setBlender(int blender,scalar v);
+	scalar getBlender(int blender) const{return mBlenderValues[blender];}
+
+	void setBodypart(int bodypart);
+	int getBodypart() const{return mBodypartIndex;}
+
+	void setBodypartModel(int model);
+	int getBodypartModel() const{return mModelIndex;}
+
+	void setSkin(int skin);
+	int getSkin() const{return mSkinIndex;}
 
 	void frameUpdate(int dt,int scope);
 
@@ -95,6 +107,7 @@ protected:
 	void findBoneRotate(Quaternion &r,int frame,float s,studiobone *sbone,studioanim *sanim);
 	void updateVertexes(StudioModel *model,int bodypartsIndex,int modelIndex);
 	void findChrome(Vector2 &chrome,const Vector3 &normal,const Vector3 &forward,const Vector3 &right);
+	void createSubModels();
 	void createSkeletonBuffers();
 	void updateSkeletonBuffers();
 	void destroySkeletonBuffers();
@@ -103,10 +116,14 @@ protected:
 	StudioModel::ptr mModel;
 	egg::Collection<SubModel::ptr> mSubModels;
 
+	int mBodypartIndex;
+	int mModelIndex;
+	int mSkinIndex;
 	int mSequenceIndex;
 	scalar mSequenceTime;
 	Vector3 mChromeForward,mChromeRight;
 	scalar mControllerValues[4],mAdjustedControllerValues[4];
+	scalar mBlenderValues[4],mAdjustedBlenderValues[4];
 	egg::Collection<Vector3> mBoneTranslates;
 	egg::Collection<Quaternion> mBoneRotates;
 	egg::Collection<Vector3> mTransformedVerts;
