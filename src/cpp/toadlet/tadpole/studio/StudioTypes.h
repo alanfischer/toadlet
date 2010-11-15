@@ -296,9 +296,6 @@ static const int STUDIO_HAS_VERTICES=	0x0002;
 static const int STUDIO_HAS_BBOX=		0x0004;
 static const int STUDIO_HAS_CHROME=		0x0008;	// if any of the textures have chrome on them
 
-static const int RAD_TO_STUDIO=		(32768.0/Math::PI);
-static const int STUDIO_TO_RAD=		(Math::PI/32768.0);
-
 }
 }
 }

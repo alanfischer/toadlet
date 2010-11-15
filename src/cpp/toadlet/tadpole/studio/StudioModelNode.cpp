@@ -57,13 +57,36 @@ StudioModelNode::SubModel::SubModel(StudioModelNode *modelNode,int bodypartIndex
 void StudioModelNode::SubModel::render(Renderer *renderer) const{
 	int i;
 	for(i=0;i<mdata->indexDatas.size();++i){
-		renderer->renderPrimitive(model->vertexData,mdata->indexDatas[i]);
+		renderer->renderPrimitive(modelNode->mVertexData,mdata->indexDatas[i]);
 	}
 }
 
-StudioModelNode::StudioModelNode():super(){
-	mSequenceIndex=0;
-	mSequenceTime=0;
+StudioModelNode::StudioModelNode():super(),
+	//mModel,
+	//mSubModels,
+
+	mSequenceIndex(0),
+	mSequenceTime(0)
+	//mChromeForward,mChromeRight,
+	//mControllerValues[4],mAdjustedControllerValues[4],
+	//mBoneTranslates,
+	//mBoneRotates,
+	//mTransformedVerts,
+	//mTransformedNorms,
+	//mTransformedChromes,
+	//mVertexBuffer,
+	//mVertexData,
+
+	//mSkeletonMaterial,
+	//mSkeletonVertexBuffer,
+	//mSkeletonVertexData,
+	//mSkeletonIndexData,
+	//mHitBoxVertexBuffer,
+	//mHitBoxVertexData,
+	//mHitBoxIndexData
+{
+	memset(mControllerValues,0,sizeof(mControllerValues));
+	memset(mAdjustedControllerValues,0,sizeof(mAdjustedControllerValues));
 }
 
 StudioModelNode::~StudioModelNode(){
@@ -78,22 +101,8 @@ void StudioModelNode::destroy(){
 	if(mSkeletonMaterial!=NULL){
 		mSkeletonMaterial->release();
 		mSkeletonMaterial=NULL;
-	}
 
-	if(mSkeletonVertexData!=NULL){
-		mSkeletonVertexData->destroy();
-		mSkeletonIndexData->destroy();
-		mSkeletonVertexBuffer=NULL;
-		mSkeletonVertexData=NULL;
-		mSkeletonIndexData=NULL;
-	}
-
-	if(mHitBoxVertexData!=NULL){
-		mHitBoxVertexData->destroy();
-		mHitBoxIndexData->destroy();
-		mHitBoxVertexBuffer=NULL;
-		mHitBoxVertexData=NULL;
-		mHitBoxIndexData=NULL;
+		destroySkeletonBuffers();
 	}
 
 	super::destroy();
@@ -111,6 +120,9 @@ void StudioModelNode::setModel(StudioModel::ptr model){
 	mTransformedNorms.resize(MAXSTUDIOVERTS);
 	mTransformedChromes.resize(MAXSTUDIOVERTS);
 
+	mVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,model->vertexCount);
+	mVertexData=VertexData::ptr(new VertexData(mVertexBuffer));
+
 	int i,j,k;
 	for(i=0;i<=model->header->numbodyparts;++i){
 		studiobodyparts *sbodyparts=model->bodyparts(i);
@@ -124,14 +136,54 @@ void StudioModelNode::setModel(StudioModel::ptr model){
 	}
 
 	updateSkeleton();
+}
 
-	if(true){
+void StudioModelNode::setRenderSkeleton(bool skeleton){
+	if(skeleton && mSkeletonMaterial==NULL){
 		mSkeletonMaterial=mEngine->getMaterialManager()->createMaterial();
 		mSkeletonMaterial->setDepthTest(Renderer::DepthTest_NONE);
 		mSkeletonMaterial->setDepthWrite(false);
 		mSkeletonMaterial->setPointParameters(true,8,false,0,0,0,0,0);
+
 		createSkeletonBuffers();
 	}
+
+	if(!skeleton && mSkeletonMaterial!=NULL){
+		mSkeletonMaterial->destroy();
+
+		destroySkeletonBuffers();
+	}
+}
+
+void StudioModelNode::setController(int controller,scalar v){
+	studiobonecontroller *sbonecontroller=NULL;
+	int i;
+	for(i=0;i<mModel->header->numbonecontrollers;++i){
+		sbonecontroller=mModel->bonecontroller(i);
+		if(sbonecontroller->index==controller) break;
+	}
+	if(i==mModel->header->numbonecontrollers){
+		return;
+	}
+
+	if((sbonecontroller->type&(STUDIO_XR|STUDIO_YR|STUDIO_ZR))>0){
+		if(sbonecontroller->end<sbonecontroller->start){
+			v=-v;
+		}
+
+		v=fmod(v,Math::TWO_PI);
+	}
+
+	mControllerValues[controller]=v;
+
+	if((sbonecontroller->type&(STUDIO_XR|STUDIO_YR|STUDIO_ZR))>0){
+		v=Math::clamp(Math::degToRad(sbonecontroller->start),Math::degToRad(sbonecontroller->end),v);
+	}
+	if((sbonecontroller->type&(STUDIO_X|STUDIO_Y|STUDIO_Z))>0){
+		v=(Math::ONE-v)*sbonecontroller->start+v*sbonecontroller->end;
+	}
+
+	mAdjustedControllerValues[controller]=v;
 }
 
 void StudioModelNode::frameUpdate(int dt,int scope){
@@ -246,12 +298,14 @@ void StudioModelNode::updateVertexes(StudioModel *model,int bodypartsIndex,int m
 		}
 	}
 
-	vba.lock(model->vertexBuffer);
+	vba.lock(mVertexBuffer);
 
 	for(i=0;i<smodel->nummesh;++i){
 		studiomesh *smesh=model->mesh(smodel,i);
 		StudioModel::meshdata *mdata=model->findmeshdata(bodypartsIndex,modelIndex,i);
 		studiotexture *stexture=model->texture(model->skin(smesh->skinref));
+		float s=1.0f/(float)stexture->width;
+		float t=1.0f/(float)stexture->height;
 
 		int indexDataCount=0;
 		short *tricmds=(short*)(model->data+smesh->triindex);
@@ -266,6 +320,9 @@ void StudioModelNode::updateVertexes(StudioModel *model,int bodypartsIndex,int m
 				vba.set3(vertexCount,1,norms[tricmds[1]]);
 				if((stexture->flags&STUDIO_NF_CHROME)>0){
 					vba.set2(vertexCount,2,chromes[tricmds[1]]);
+				}
+				else{
+					vba.set2(vertexCount,2,tricmds[2]*s,tricmds[3]*t);
 				}
 				vertexCount++;
 			}
@@ -315,8 +372,6 @@ void StudioModelNode::findBoneTransforms(Vector3 *translates,Quaternion *rotates
 	int frame=Math::intFloor(t);
 	float s=(t-Math::fromInt(frame));
 
-	// TODO: findBoneControllers??
-
 	studiobone *sbone=model->bone(0);
 	int i;
 	for(i=0;i<model->header->numbones;++i,sbone++,sanim++){
@@ -365,7 +420,7 @@ void StudioModelNode::findBoneTranslate(Vector3 &r,int frame,float s,studiobone 
 			}
 		}
 		if(sbone->bonecontroller[j]!=-1){
-//			r[j]+=mAdj[sbone->bonecontroller[j]];
+			r[j]+=mAdjustedControllerValues[sbone->bonecontroller[j]];
 		}
 	}
 }
@@ -414,8 +469,8 @@ void StudioModelNode::findBoneRotate(Quaternion &r,int frame,float s,studiobone 
 			angle2[j]=sbone->value[j+3]+angle2[j]*sbone->scale[j+3];
 		}
 		if(sbone->bonecontroller[j+3]!=-1){
-//			angle1[j]+=mAdj[sbone->bonecontroller[j+3]];
-//			angle2[j]+=mAdj[sbone->bonecontroller[j+3]];
+			angle1[j]+=mAdjustedControllerValues[sbone->bonecontroller[j+3]];
+			angle2[j]+=mAdjustedControllerValues[sbone->bonecontroller[j+3]];
 		}
 	}
 
@@ -494,6 +549,24 @@ void StudioModelNode::updateSkeletonBuffers(){
 	}
 
 	vba.unlock();
+}
+
+void StudioModelNode::destroySkeletonBuffers(){
+	if(mSkeletonVertexData!=NULL){
+		mSkeletonVertexData->destroy();
+		mSkeletonIndexData->destroy();
+		mSkeletonVertexBuffer=NULL;
+		mSkeletonVertexData=NULL;
+		mSkeletonIndexData=NULL;
+	}
+
+	if(mHitBoxVertexData!=NULL){
+		mHitBoxVertexData->destroy();
+		mHitBoxIndexData->destroy();
+		mHitBoxVertexBuffer=NULL;
+		mHitBoxVertexData=NULL;
+		mHitBoxIndexData=NULL;
+	}
 }
 
 void StudioModelNode::setQuaternionFromEulerAngleStudio(Quaternion &r,const EulerAngle &euler){
