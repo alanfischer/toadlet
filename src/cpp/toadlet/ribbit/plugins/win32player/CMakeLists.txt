@@ -5,10 +5,6 @@ set (RIBBIT_WIN32PLAYER_SRC
 	Win32Player.cpp
 )
 
-set (RIBBIT_DECODERS_WAVEDECODER_SRC
-	../decoders/wavedecoder/WaveDecoder.cpp
-)
-
 
 # Headers
 set (RIBBIT_WIN32PLAYER_HEADERS
@@ -17,17 +13,11 @@ set (RIBBIT_WIN32PLAYER_HEADERS
 	Win32Player.h
 )
 
-set (RIBBIT_DECODERS_WAVEDECODER_HEADERS
-	../decoders/wavedecoder/WaveDecoder.h
-)
-
 
 source_group ("Source Files\\\\plugins\\\\win32player" FILES ${RIBBIT_WIN32PLAYER_SRC})
 source_group ("Header Files\\\\plugins\\\\win32player" FILES ${RIBBIT_WIN32PLAYER_HEADERS})
-source_group ("Source Files\\\\decoders\\\\wavedecoder" FILES ${RIBBIT_DECODERS_WAVEDECODER_SRC})
-source_group ("Header Files\\\\decoders\\\\wavedecoder" FILES ${RIBBIT_DECODERS_WAVEDECODER_HEADERS})
-set (RIBBIT_WIN32PLAYER_SRC ${RIBBIT_WIN32PLAYER_SRC} ${RIBBIT_DECODERS_WAVEDECODER_SRC})
-set (RIBBIT_WIN32PLAYER_HEADERS ${RIBBIT_WIN32PLAYER_HEADERS} ${RIBBIT_DECODERS_WAVEDECODER_HEADERS})
+set (RIBBIT_WIN32PLAYER_SRC ${RIBBIT_WIN32PLAYER_SRC})
+set (RIBBIT_WIN32PLAYER_HEADERS ${RIBBIT_WIN32PLAYER_HEADERS})
 
 
 # Dynamic library

@@ -31,7 +31,7 @@
 namespace toadlet{
 namespace ribbit{
 
-class WaveDecoder:public AudioStream{
+class TOADLET_API WaveDecoder:public AudioStream{
 public:
 	WaveDecoder();
 	virtual ~WaveDecoder();
@@ -43,17 +43,19 @@ public:
 	int read(tbyte *buffer,int length);
 
 	bool writeable(){return false;}
-	int write(const tbyte *buffer,int length){return 0;}
+	int write(const tbyte *buffer,int length){return -1;}
 
 	bool startStream(egg::io::Stream::ptr stream);
 	bool reset();
-	int length(){return 0;}
-	int position(){return 0;}
+	int length(){return mSize;}
+	int position(){return mPosition;}
 	bool seek(int offs){return false;}
 
 	int getChannels(){return mChannels;}
 	int getSamplesPerSecond(){return mSamplesPerSecond;}
 	int getBitsPerSample(){return mBitsPerSample;}
+
+	static egg::String mimeType(){return "audio/wav";}
 
 private:
 	void skip(egg::io::Stream::ptr stream,int amount);

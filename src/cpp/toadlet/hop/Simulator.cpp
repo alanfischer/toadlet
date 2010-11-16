@@ -465,6 +465,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 
 				// Update leftOver, the energy we still have moving in this direction that we couldnt use
 				sub(leftOver,newPosition,oldPosition);
+Logger::alert(String("LEFTLENGTH:")+Math::length(leftOver));
 
 				// If its a valid collision, and someone is listening, then store it
 				if(c.collider!=solid->mTouching &&
@@ -539,6 +540,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 							mul(t,c.normal,impulse);
 							mul(t,oneOverMass);
 							add(solid->mVelocity,t);
+Logger::alert(String("VELO:")+Math::length(solid->mVelocity));
 						}
 						if(hitSolid!=NULL && hitSolid->mMass!=Solid::INFINITE_MASS){
 							if(solid->mMass==Solid::INFINITE_MASS){
@@ -591,17 +593,19 @@ void Simulator::update(int dt,int scope,Solid *solid){
 					solid->mTouching=NULL;
 				}
 
-				if(toSmall(leftOver,mEpsilon)){
+/*				if(toSmall(leftOver,mEpsilon)){
+Logger::alert(String("small"));
 					newPosition.set(oldPosition);
 					break;
 				}
-				else if(loop>4){
+				else */if(loop>4){
 					// We keep hitting something, so zero the velocity and break out
 					solid->mVelocity.reset();
 					newPosition.set(oldPosition);
 					break;
 				}
 				else{
+Logger::alert(String("dostuff"));
 					// Calculate new destinations from coefficient of restitution applied to velocity
 					if(normalizeCarefully(velocity,solid->mVelocity,mEpsilon)==false){
 						newPosition.set(oldPosition);
@@ -1414,9 +1418,10 @@ void Simulator::traceConvexSolid(Collision &c,const Segment &segment,const Conve
 
 void Simulator::frictionLink(Vector3 &result,Solid *solid,const Vector3 &solidVelocity,Solid *hitSolid,const Vector3 &hitSolidNormal,const Vector3 &appliedForce,scalar fdt){
 	result.set(ZERO_VECTOR3);
-
+return;
 	// Andrew's friction linking code
 	if(solid->mMass>0 && hitSolid->mMass!=0 && (solid->mCoefficientOfStaticFriction>0 || solid->mCoefficientOfDynamicFriction>0)){
+		Logger::alert("FRICTIONING");
 		scalar fn=0,lenVr=0;
 		Vector3 &vr=cache_frictionLink_vr;
 		Vector3 &ff=cache_frictionLink_ff;

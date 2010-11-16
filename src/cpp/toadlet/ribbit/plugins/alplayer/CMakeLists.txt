@@ -17,14 +17,6 @@ set (RIBBIT_DECODERS_COREAUDIODECODER_SRC
 	../decoders/coreaudiodecoder/CoreAudioDecoder.cpp
 )
 
-set (RIBBIT_DECODERS_OGGVORBISDECODER_SRC
-	../decoders/oggvorbisdecoder/OggVorbisDecoder.cpp
-)
-
-set (RIBBIT_DECODERS_WAVEDECODER_SRC
-	../decoders/wavedecoder/WaveDecoder.cpp
-)
-
 
 # Headers
 set (RIBBIT_ALPLAYER_HEADERS
@@ -44,14 +36,6 @@ set (RIBBIT_ALPLAYER_PLATFORM_OSX_HEADERS
 
 set (RIBBIT_DECODERS_COREAUDIODECODER_HEADERS
 	../decoders/coreaudiodecoder/CoreAudioDecoder.h
-)
-
-set (RIBBIT_DECODERS_OGGVORBISDECODER_HEADERS
-	../decoders/oggvorbisdecoder/OggVorbisDecoder.h
-)
-
-set (RIBBIT_DECODERS_WAVEDECODER_HEADERS
-	../decoders/wavedecoder/WaveDecoder.h
 )
 
 
@@ -76,57 +60,10 @@ if (TOADLET_PLATFORM_OSX OR TOADLET_PLATFORM_IPHONE)
 elseif (TOADLET_PLATFORM_WIN32 OR TOADLET_PLATFORM_POSIX)
 	set (RIBBIT_ALPLAYER_DEFS "ALEM_BUILD")
 	set (RIBBIT_ALPLAYER_DEFS_S "ALEM_BUILD" "ALEM_STATIC")
-	source_group ("Source Files\\\\decoders\\\\wavedecoder" FILES ${RIBBIT_DECODERS_WAVEDECODER_SRC})
-	source_group ("Header Files\\\\decoders\\\\wavedecoder" FILES ${RIBBIT_DECODERS_WAVEDECODER_HEADERS})
 	source_group ("Source Files\\\\alem" FILES ${RIBBIT_ALPLAYER_ALEM_SRC})
 	source_group ("Header Files\\\\alem" FILES ${RIBBIT_ALPLAYER_ALEM_HEADERS})
-	set (RIBBIT_ALPLAYER_SRC ${RIBBIT_ALPLAYER_SRC} ${RIBBIT_DECODERS_WAVEDECODER_SRC} ${RIBBIT_ALPLAYER_ALEM_SRC})
-	set (RIBBIT_ALPLAYER_HEADERS ${RIBBIT_ALPLAYER_HEADERS} ${RIBBIT_DECODERS_WAVEDECODER_HEADERS} ${RIBBIT_ALPLAYER_ALEM_HEADERS})
-	find_package (OggVorbis)
-	if (OGGVORBIS_FOUND)
-		set (TOADLET_HAS_OGGVORBIS ON PARENT_SCOPE)
-		
-		source_group ("Source Files\\\\decoders\\\\oggvorbisdecoder" FILES ${RIBBIT_DECODERS_OGGVORBISDECODER_SRC})
-		source_group ("Header Files\\\\decoders\\\\oggvorbisdecoder" FILES ${RIBBIT_DECODERS_OGGVORBISDECODER_HEADERS})
-		set (RIBBIT_ALPLAYER_SRC ${RIBBIT_ALPLAYER_SRC} ${RIBBIT_DECODERS_OGGVORBISDECODER_SRC})
-		set (RIBBIT_ALPLAYER_HEADERS ${RIBBIT_ALPLAYER_HEADERS} ${RIBBIT_DECODERS_OGGVORBISDECODER_HEADERS})
-		include_directories (${OGGVORBIS_INCLUDES})
-
-		# Dynamic libs
-		set (RIBBIT_ALPLAYER_LIBS ${RIBBIT_ALPLAYER_LIBS} ${OGGVORBIS_LIBRARIES})
-
-		# Static libs are ugly since we add references to external static libraries in toadlet
-		add_library (libogg_s STATIC IMPORTED)
-		add_library (libvorbis_s STATIC IMPORTED)
-		add_library (libvorbisfile_s STATIC IMPORTED)
-		add_library (libvorbisenc_s STATIC IMPORTED)
-		if (TOADLET_PLATFORM_POSIX)
-			string (REPLACE ".so" ".a" OGG_A ${OGG_LIBRARY})
-			if (EXISTS ${OGG_A})
-				set (OGG_LIBRARY ${OGG_A})
-			endif (EXISTS ${OGG_A})
-			string (REPLACE ".so" ".a" VORBIS_A ${VORBIS_LIBRARY})
-			if (EXISTS ${VORBIS_A})
-				set (VORBIS_LIBRARY ${VORBIS_A})
-			endif (EXISTS ${VORBIS_A})
-			string (REPLACE ".so" ".a" VORBISFILE_A ${VORBISFILE_LIBRARY})
-			if (EXISTS ${VORBISFILE_A})
-				set (VORBISFILE_LIBRARY ${VORBISFILE_A})
-			endif (EXISTS ${VORBISFILE_A})
-			string (REPLACE ".so" ".a" VORBISENG_A ${VORBISENC_LIBRARY})
-			if (EXISTS ${VORBISENC_A})
-				set (VORBISENC_LIBRARY ${VORBISENC_A})
-			endif (EXISTS ${VORBISENC_A})
-		endif (TOADLET_PLATFORM_POSIX)
-		set_property (TARGET libogg_s PROPERTY IMPORTED_LOCATION ${OGG_LIBRARY})
-		set_property (TARGET libvorbis_s PROPERTY IMPORTED_LOCATION ${VORBIS_LIBRARY})
-		set_property (TARGET libvorbisfile_s PROPERTY IMPORTED_LOCATION ${VORBISFILE_LIBRARY})
-		set_property (TARGET libvorbisenc_s PROPERTY IMPORTED_LOCATION ${VORBISENC_LIBRARY})
-		set (RIBBIT_ALPLAYER_DEFS_S ${RIBBIT_ALPLAYER_DEFS_S} TOADLET_LIBOGG_NAME="${OGG_LIBRARY}" TOADLET_LIBVORBIS_NAME="${VORBIS_LIBRARY}" TOADLET_LIBVORBISFILE_NAME="${VORBISFILE_LIBRARY}" TOADLET_LIBVORBISENC_NAME="${VORBISENC_LIBRARY}")
-		set (RIBBIT_ALPLAYER_LIBS_S ${RIBBIT_ALPLAYER_LIBS_S} libogg_s libvorbis_s libvorbisfile_s libvorbisenc_s)
-	else (OGGVORBIS_FOUND)
-		message ("The ribbit_alplayer will not have Ogg Vorbis support")
-	endif (OGGVORBIS_FOUND)
+	set (RIBBIT_ALPLAYER_SRC ${RIBBIT_ALPLAYER_SRC} ${RIBBIT_ALPLAYER_ALEM_SRC})
+	set (RIBBIT_ALPLAYER_HEADERS ${RIBBIT_ALPLAYER_HEADERS} ${RIBBIT_ALPLAYER_ALEM_HEADERS})
 endif (TOADLET_PLATFORM_OSX OR TOADLET_PLATFORM_IPHONE)
 
 

@@ -51,8 +51,8 @@ public:
 	virtual int write(const tbyte *buffer,int length);
 
 	virtual bool reset(){return false;}
-	virtual int length(){return 0;}
-	virtual int position(){return 0;}
+	virtual int length(){return -1;}
+	virtual int position(){return -1;}
 	virtual bool seek(int offs){return false;}
 
 protected:

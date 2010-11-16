@@ -63,7 +63,10 @@ bool Win32AudioBuffer::create(AudioStream::ptr stream){
 	tbyte *buffer=NULL;
 	int length=0;
 
-	AudioFormatConversion::decode(stream,buffer,length);
+	if(AudioFormatConversion::decode(stream,buffer,length)==false){
+		return false;
+	}
+
 	int numsamps=length/channels/(bps/8);
 
 	if(mPlayer->getBufferFadeTime()>0){

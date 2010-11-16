@@ -35,7 +35,7 @@ namespace ribbit{
 
 const int OGGPACKETSIZE=4096;
 
-class OggVorbisDecoder:public AudioStream{
+class TOADLET_API OggVorbisDecoder:public AudioStream{
 public:
 	OggVorbisDecoder();
 	virtual ~OggVorbisDecoder();
@@ -47,19 +47,21 @@ public:
 	int read(tbyte *buffer,int length);
 
 	bool writeable(){return false;}
-	int write(const tbyte *buffer,int length){return 0;}
+	int write(const tbyte *buffer,int length){return -1;}
 
 	bool startStream(egg::io::Stream::ptr stream);
 	bool stopStream();
 
 	bool reset();
-	int length(){return 0;}
-	int position(){return 0;}
-	bool seek(int offs){return false;}
+	int length();
+	int position();
+	bool seek(int offs);
 
 	int getChannels();
 	int getSamplesPerSecond();
 	int getBitsPerSample(){return 16;}
+
+	static egg::String mimeType(){return "audio/ogg";}
 
 private:
 	static size_t read_func(void *ptr,size_t size,size_t nmemb, void *datasource);
