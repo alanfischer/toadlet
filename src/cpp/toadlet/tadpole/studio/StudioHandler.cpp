@@ -42,6 +42,12 @@ StudioHandler::StudioHandler(Engine *engine){
 StudioHandler::~StudioHandler(){}
 
 Resource::ptr StudioHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+	if(stream==NULL){
+		Error::nullPointer(Categories::TOADLET_TADPOLE_STUDIO,
+			"null stream");
+		return NULL;
+	}
+
 	DataStream::ptr dataStream(new DataStream(stream));
 	int id=dataStream->readLittleInt32();
 	dataStream->reset();

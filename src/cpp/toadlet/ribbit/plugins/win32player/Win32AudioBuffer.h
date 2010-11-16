@@ -48,7 +48,7 @@ public:
 	void destroy();
 
 protected:
-	Win32Player *mAudioPlayer;
+	Win32Player *mPlayer;
 	tbyte *mData;
 	int mLength;
 

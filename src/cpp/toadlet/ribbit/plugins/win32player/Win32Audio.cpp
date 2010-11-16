@@ -27,6 +27,7 @@
 #include "Win32AudioBuffer.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Extents.h>
+#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/MathConversion.h>
 
@@ -57,7 +58,10 @@ bool Win32Audio::create(AudioBuffer::ptr audioBuffer){
 	destroy();
 
 	mPlayer->internal_audioCreate(this);
+
+	mAudioStream=NULL;
 	mAudioBuffer=shared_static_cast<Win32AudioBuffer>(audioBuffer);
+
 	return true;
 }
 
@@ -79,6 +83,11 @@ bool Win32Audio::create(Stream::ptr stream,const String &mimeType){
 bool Win32Audio::create(AudioStream::ptr stream){
 	destroy();
 
+	mPlayer->internal_audioCreate(this);
+
+	mAudioStream=stream;
+	mAudioBuffer=NULL;
+
 	return false;
 }
 
@@ -93,9 +102,46 @@ int Win32Audio::read(tbyte *data,int length){
 
 	int bps=mPlayer->getBitsPerSample();
 
-	int amount=Math::minVal(length,mAudioBuffer->mLength-mPosition);
-	memcpy(data,mAudioBuffer->mData+mPosition,amount);
-	mPosition+=amount;
+	int amount=0;
+	if(mAudioStream!=NULL){
+		int channels=mAudioStream->getChannels();
+		int sps=mAudioStream->getSamplesPerSecond();
+		int bps=mAudioStream->getBitsPerSample();
+
+		int nchannels=mPlayer->getChannels();	
+		int nbps=mPlayer->getBitsPerSample();
+		int nsps=mPlayer->getSamplesPerSecond();
+
+		if(nchannels!=channels || nbps!=bps || nsps!=sps){
+			Error::unimplemented("need to add conversion!  calculate how much data we need in the original format, request it, then convert");
+		}
+		else{
+			amount=mAudioStream->read(data,length);
+			if(amount==0){
+				if(mLooping){
+					mAudioStream->reset();
+					amount=mAudioStream->read(data,length);
+				}
+				else{
+					mPlaying=false;
+				}
+			}
+		}
+	}
+	else if(mAudioBuffer!=NULL){
+		amount=Math::minVal(length,mAudioBuffer->mLength-mPosition);
+		memcpy(data,mAudioBuffer->mData+mPosition,amount);
+		mPosition+=amount;
+
+		if(mPosition>=mAudioBuffer->mLength){
+			if(mLooping){
+				mPosition=0;
+			}
+			else{
+				mPlaying=false;
+			}
+		}
+	}
 
 	if(amount>0){
 		int i;
@@ -114,15 +160,6 @@ int Win32Audio::read(tbyte *data,int length){
 
 		for(i=amount;i<length;++i){
 			data[i]=data[amount-1];
-		}
-	}
-
-	if(mPosition>=mAudioBuffer->mLength){
-		if(mLooping){
-			mPosition=0;
-		}
-		else{
-			mPlaying=false;
 		}
 	}
 

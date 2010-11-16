@@ -88,9 +88,9 @@ bool Win32Player::create(int *options){
 		}
 	}
 
-	mChannels=2;
+	mChannels=1;
 	mBitsPerSample=16;
-	mSamplesPerSecond=11025;//44100;
+	mSamplesPerSecond=44100;
 	mBufferFadeTime=100;
 	mNumBuffers=4;
 	mBufferSize=2048;
@@ -192,7 +192,7 @@ Audio *Win32Player::createBufferedAudio(){
 }
 
 Audio *Win32Player::createStreamingAudio(){
-	return NULL;
+	return new Win32Audio(this);
 }
 
 void Win32Player::update(int dt){

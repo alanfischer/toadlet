@@ -37,6 +37,7 @@ public:
 	static void decode(egg::io::Stream *stream,tbyte *&finalBuffer,int &finalLength);
 	static void decode(AudioStream *stream,tbyte *&finalBuffer,int &finalLength);
 	static bool convert(tbyte *src,int srcChannels,int srcBitsPerSample,int srcSamplesPerSecond,tbyte *dst,int dstChannels,int dstBitsPerSample,int dstSamplesPerSecond,int length);
+	static void fade(tbyte *buffer,int length,int channels,int sps,int bps,int fadeTime);
 };
 
 }

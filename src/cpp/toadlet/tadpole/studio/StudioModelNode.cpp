@@ -149,6 +149,28 @@ void StudioModelNode::setRenderSkeleton(bool skeleton){
 	}
 }
 
+void StudioModelNode::setSequence(int sequence){
+	if(sequence<0 || sequence>=mModel->header->numseq){
+		sequence=0;
+	}
+
+	mSequenceIndex=sequence;
+
+	// Update Blender on sequence change
+	int i;
+	for(i=0;i<4;++i){
+		setBlender(i,mBlenderValues[i]);
+	}
+
+	updateSkeleton();
+}
+
+void StudioModelNode::setSequenceTime(scalar time){
+	mSequenceTime=time;
+
+	updateSkeleton();
+}
+
 void StudioModelNode::setController(int controller,scalar v){
 	studiobonecontroller *sbonecontroller=NULL;
 	int i;
@@ -182,6 +204,9 @@ void StudioModelNode::setController(int controller,scalar v){
 
 void StudioModelNode::setBlender(int blender,scalar v){
 	studioseqdesc *sseqdesc=(studioseqdesc*)mModel->seqdesc(mSequenceIndex);
+	if(blender<0 || blender>=sseqdesc->numblends){
+		return;
+	}
 
 	if((sseqdesc->blendtype[blender]&(STUDIO_XR|STUDIO_YR|STUDIO_ZR))>0){
 		if(sseqdesc->blendend[blender]<sseqdesc->blendstart[blender]){
@@ -214,26 +239,13 @@ void StudioModelNode::setBodypartModel(int model){
 }
 
 void StudioModelNode::setSkin(int skin){
+	if(skin<0 || skin>=mModel->header->numskinfamilies){
+		skin=0;
+	}
+
 	mSkinIndex=skin;
 
 	createSubModels();
-}
-
-void StudioModelNode::frameUpdate(int dt,int scope){
-	super::frameUpdate(dt,scope);
-
-	mSequenceTime+=Math::fromMilli(dt)*20;
-	if(mSequenceTime>=mModel->seqdesc(mSequenceIndex)->numframes-1){
-		if(mModel->seqdesc(mSequenceIndex)->numframes>1){
-			mSequenceTime=fmod(mSequenceTime,mModel->seqdesc(mSequenceIndex)->numframes-1);
-		}
-		else{
-			mSequenceTime=0;
-		}
-	}
-	activate();
-
-	updateSkeleton();
 }
 
 void StudioModelNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
@@ -530,10 +542,16 @@ void StudioModelNode::findBoneRotate(Quaternion &r,int frame,float s,studiobone 
 }
 
 void StudioModelNode::createSubModels(){
+	int i;
 	mSubModels.clear();
 
-	int i;
+	if(mBodypartIndex<0 ||mBodypartIndex>=mModel->header->numbodyparts){
+		return;
+	}
 	studiobodyparts *sbodyparts=mModel->bodyparts(mBodypartIndex);
+	if(mModelIndex<0 || mModelIndex>=sbodyparts->nummodels){
+		return;
+	}
 	studiomodel *smodel=mModel->model(sbodyparts,mModelIndex);
 	for(i=0;i<smodel->nummesh;++i){
 		SubModel::ptr subModel(new SubModel(this,mBodypartIndex,mModelIndex,i,mSkinIndex));

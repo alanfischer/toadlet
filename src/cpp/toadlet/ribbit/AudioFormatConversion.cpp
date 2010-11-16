@@ -117,6 +117,38 @@ bool AudioFormatConversion::convert(tbyte *src,int srcChannels,int srcBitsPerSam
 	return true;
 }
 
+void AudioFormatConversion::fade(tbyte *buffer,int length,int channels,int sps,int bps,int fadeTime){
+	int numsamps=length/channels/(bps/8);
+	int stf=sps*fadeTime/1000;
+	if(stf>numsamps){stf=numsamps;}
+	int i,j;
+	if(bps==8){
+		for(i=0;i<stf;++i){
+			// Fade front
+			for(j=0;j<channels;++j){
+				buffer[i*channels+j]=(uint8)(((((int)buffer[i*channels+j])-128)*i/stf)+128);
+			}
+			// Fade back
+			for(j=0;j<channels;++j){
+				buffer[(numsamps-i-1)*channels+j]=(uint8)(((((int)buffer[(numsamps-i-1)*channels+j])-128)*i/stf)+128);
+			}
+		}
+	}
+	else if(bps==16){
+		int16 *buffer16=(int16*)buffer;
+		for(i=0;i<stf;++i){
+			// Fade front
+			for(j=0;j<channels;++j){
+				buffer16[i*channels+j]=(int16)(((int)buffer16[i*channels+j])*i/stf);
+			}
+			// Fade back
+			for(j=0;j<channels;++j){
+				buffer16[(numsamps-i-1)*channels+j]=(int16)(((int)buffer16[(numsamps-i-1)*channels+j])*i/stf);
+			}
+		}
+	}
+}
+
 }
 }
 

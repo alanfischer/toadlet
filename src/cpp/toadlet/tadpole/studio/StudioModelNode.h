@@ -72,6 +72,12 @@ public:
 	void setRenderSkeleton(bool skeleton);
 	bool getRenderSkeleton() const{return mSkeletonMaterial!=NULL;}
 
+	void setSequence(int sequence);
+	int getSequence() const{return mSequenceIndex;}
+
+	void setSequenceTime(scalar time);
+	scalar getSequenceTime() const{return mSequenceTime;}
+
 	void setController(int controller,scalar v);
 	scalar getController(int controller) const{return mControllerValues[controller];}
 
@@ -86,8 +92,6 @@ public:
 
 	void setSkin(int skin);
 	int getSkin() const{return mSkinIndex;}
-
-	void frameUpdate(int dt,int scope);
 
 	const Bound &getLocalBound() const{return mLocalBound;}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
