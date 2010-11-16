@@ -48,9 +48,7 @@ ALAudio::ALAudio(ALPlayer *audioPlayer):
 	mTotalBuffersPlayed(0),
 	mTargetGain(0),
 	mGain(0),
-	mInternalFadeTime(0),
-	mFadeTime(0),
-	mPlayTime(0)
+	mFadeTime(0)
 	//mAudioBuffer,
 	//mAudioStream,
 {
@@ -58,9 +56,6 @@ ALAudio::ALAudio(ALPlayer *audioPlayer):
 
 	mTargetGain=Math::ONE;
 	mGain=Math::ONE;
-
-	// This is used to reduce popping
-	mInternalFadeTime=100;
 }
 
 ALAudio::~ALAudio(){
@@ -140,17 +135,6 @@ void ALAudio::destroy(){
 }
 
 bool ALAudio::play(){
-	// Check for starting the internal fade in
-	/// @todo: Either get this working, or remove it completely.  Doesnt work right for a looping buffer.
-#if 0
-	if(mFadeTime==0){
-		fadeToGain(mTargetGain,mInternalFadeTime);
-		setImmediateGain(0);
-	}
-#endif
-
-	mPlayTime=0;
-
 	alSourcePlay(mHandle);
 	TOADLET_CHECK_ALERROR("playAudioBuffer::alSourcePlay");
 
@@ -296,20 +280,6 @@ void ALAudio::setVelocity(const Vector3 &velocity){
 }
 
 void ALAudio::update(int dt){
-	/// @todo: Like the fade in, either fix or remove
-#if 0
-	if(mAudioBuffer!=NULL && getPlaying()){
-		mPlayTime+=dt;
-		// Check for starting the internal fade out
-		if(mFadeTime==0){
-			ALAudioBuffer *alaudioBuffer=((ALAudioBuffer*)mAudioBuffer->getRootAudioBuffer());
-			if(mPlayTime>=alaudioBuffer->mLengthTime-mInternalFadeTime){
-				fadeToGain(0,mInternalFadeTime);
-			}
-		}
-	}
-#endif
-
 	scalar fdt=Math::fromMilli(dt);
 	if(mGain!=mTargetGain){
 		scalar speed=Math::div(fdt,Math::fromMilli(mFadeTime));

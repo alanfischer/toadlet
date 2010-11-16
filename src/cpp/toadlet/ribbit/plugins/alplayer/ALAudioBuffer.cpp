@@ -75,15 +75,15 @@ bool ALAudioBuffer::create(AudioStream::ptr stream){
 	tbyte *buffer=0;
 	int length=0;
 	int channels=stream->getChannels();
-	int sps=stream->getSamplesPerSecond();
 	int bps=stream->getBitsPerSample();
+	int sps=stream->getSamplesPerSecond();
 
 	AudioFormatConversion::decode(stream,buffer,length);
 	int numsamps=length/channels/(bps/8);
 	mLengthTime=numsamps*1000/sps;
 
 	if(mAudioPlayer->getBufferFadeTime()>0){
-		AudioFormatConversion::fade(buffer,length,channels,sps,bps,mAudioPlayer->getBufferFadeTime());
+		AudioFormatConversion::fade(buffer,length,channels,bps,sps,mAudioPlayer->getBufferFadeTime());
 	}
 
 	ALenum format=ALPlayer::getALFormat(bps,channels);

@@ -30,6 +30,7 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/MathConversion.h>
+#include <toadlet/ribbit/AudioFormatConversion.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
@@ -105,15 +106,32 @@ int Win32Audio::read(tbyte *data,int length){
 	int amount=0;
 	if(mAudioStream!=NULL){
 		int channels=mAudioStream->getChannels();
-		int sps=mAudioStream->getSamplesPerSecond();
 		int bps=mAudioStream->getBitsPerSample();
+		int sps=mAudioStream->getSamplesPerSecond();
 
-		int nchannels=mPlayer->getChannels();	
+		int nchannels=mPlayer->getChannels();
 		int nbps=mPlayer->getBitsPerSample();
 		int nsps=mPlayer->getSamplesPerSecond();
 
+		/// @todo: This should be removed once conversion works on sps
+		nsps=sps;
+
 		if(nchannels!=channels || nbps!=bps || nsps!=sps){
-			Error::unimplemented("need to add conversion!  calculate how much data we need in the original format, request it, then convert");
+			int olength=AudioFormatConversion::findConvertedLength(length,nchannels,nbps,nsps,channels,bps,sps);
+			tbyte *odata=new tbyte[olength];
+			amount=mAudioStream->read(odata,olength);
+			if(amount==0){
+				if(mLooping){
+					mAudioStream->reset();
+					amount=mAudioStream->read(odata,olength);
+				}
+				else{
+					mPlaying=false;
+				}
+			}
+			AudioFormatConversion::convert(odata,channels,bps,sps,data,nchannels,nbps,nsps,olength);
+			amount=AudioFormatConversion::findConvertedLength(amount,channels,bps,sps,nchannels,nbps,nsps);
+			delete[] odata;
 		}
 		else{
 			amount=mAudioStream->read(data,length);

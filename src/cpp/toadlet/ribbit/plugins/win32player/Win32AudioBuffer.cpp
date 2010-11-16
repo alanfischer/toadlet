@@ -58,8 +58,8 @@ bool Win32AudioBuffer::create(Stream::ptr stream,const String &mimeType){
 
 bool Win32AudioBuffer::create(AudioStream::ptr stream){
 	int channels=stream->getChannels();
-	int sps=stream->getSamplesPerSecond();
 	int bps=stream->getBitsPerSample();
+	int sps=stream->getSamplesPerSecond();
 	tbyte *buffer=NULL;
 	int length=0;
 
@@ -67,7 +67,7 @@ bool Win32AudioBuffer::create(AudioStream::ptr stream){
 	int numsamps=length/channels/(bps/8);
 
 	if(mPlayer->getBufferFadeTime()>0){
-		AudioFormatConversion::fade(buffer,length,channels,sps,bps,mPlayer->getBufferFadeTime());
+		AudioFormatConversion::fade(buffer,length,channels,bps,sps,mPlayer->getBufferFadeTime());
 	}
 
 	int nchannels=mPlayer->getChannels();	

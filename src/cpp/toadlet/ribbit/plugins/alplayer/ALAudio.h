@@ -84,9 +84,7 @@ protected:
 	int mTotalBuffersPlayed;
 	scalar mTargetGain;
 	scalar mGain;
-	int mInternalFadeTime;
 	int mFadeTime;
-	int mPlayTime;
 	AudioBuffer::ptr mAudioBuffer;
 	AudioStream::ptr mAudioStream;
 
