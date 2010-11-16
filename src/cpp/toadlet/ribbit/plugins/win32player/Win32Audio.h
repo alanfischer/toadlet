@@ -74,6 +74,7 @@ protected:
 	int read(tbyte *data,int length);
 
 	Win32Player *mPlayer;
+	AudioStream::ptr mAudioStream;
 	Win32AudioBuffer::ptr mAudioBuffer;
 	bool mPlaying;
 	bool mLooping;

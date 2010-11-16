@@ -82,22 +82,8 @@ bool ALAudioBuffer::create(AudioStream::ptr stream){
 	int numsamps=length/channels/(bps/8);
 	mLengthTime=numsamps*1000/sps;
 
-	// Lets us programatically reduce popping on some platforms
 	if(mAudioPlayer->getBufferFadeTime()>0){
-		int stf=sps*mAudioPlayer->getBufferFadeTime()/1000;
-		if(stf>numsamps){stf=numsamps;}
-		int sampsize=channels*(bps/8);
-		int i,j;
-		for(i=0;i<stf;++i){
-			// Fade front
-			for(j=0;j<sampsize;++j){
-				buffer[i*sampsize+j]=(tbyte)(((int)buffer[i*sampsize+j])*i/stf);
-			}
-			// Fade back
-			for(j=0;j<sampsize;++j){
-				buffer[(numsamps-i-1)*sampsize+j]=(tbyte)(((int)buffer[(numsamps-i-1)*sampsize+j])*i/stf);
-			}
-		}
+		AudioFormatConversion::fade(buffer,length,channels,sps,bps,mAudioPlayer->getBufferFadeTime());
 	}
 
 	ALenum format=ALPlayer::getALFormat(bps,channels);

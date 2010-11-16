@@ -56,6 +56,7 @@ ALAudio::ALAudio(ALPlayer *audioPlayer):
 {
 	mAudioPlayer=audioPlayer;
 
+	mTargetGain=Math::ONE;
 	mGain=Math::ONE;
 
 	// This is used to reduce popping
@@ -140,10 +141,13 @@ void ALAudio::destroy(){
 
 bool ALAudio::play(){
 	// Check for starting the internal fade in
+	/// @todo: Either get this working, or remove it completely.  Doesnt work right for a looping buffer.
+#if 0
 	if(mFadeTime==0){
 		fadeToGain(mTargetGain,mInternalFadeTime);
 		setImmediateGain(0);
 	}
+#endif
 
 	mPlayTime=0;
 
@@ -292,6 +296,8 @@ void ALAudio::setVelocity(const Vector3 &velocity){
 }
 
 void ALAudio::update(int dt){
+	/// @todo: Like the fade in, either fix or remove
+#if 0
 	if(mAudioBuffer!=NULL && getPlaying()){
 		mPlayTime+=dt;
 		// Check for starting the internal fade out
@@ -302,6 +308,7 @@ void ALAudio::update(int dt){
 			}
 		}
 	}
+#endif
 
 	scalar fdt=Math::fromMilli(dt);
 	if(mGain!=mTargetGain){

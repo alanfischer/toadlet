@@ -75,7 +75,6 @@ bool AudioNode::setAudioStream(Stream::ptr stream,const String &mimeType){
 
 	mAudio=Audio::ptr(mEngine->getAudioPlayer()->createStreamingAudio());
 	if(mAudio!=NULL){
-
 		mAudio->create(stream,mimeType);
 		return true;
 	}
@@ -91,7 +90,6 @@ bool AudioNode::setAudioStream(AudioStream::ptr stream){
 
 	mAudio=Audio::ptr(mEngine->getAudioPlayer()->createStreamingAudio());
 	if(mAudio!=NULL){
-
 		mAudio->create(stream);
 		return true;
 	}

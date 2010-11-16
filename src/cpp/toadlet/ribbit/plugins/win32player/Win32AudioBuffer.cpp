@@ -35,11 +35,11 @@ namespace toadlet{
 namespace ribbit{
 
 Win32AudioBuffer::Win32AudioBuffer(Win32Player *player):BaseResource(),
-	mAudioPlayer(NULL),
+	mPlayer(NULL),
 	mData(NULL),
 	mLength(0)
 {
-	mAudioPlayer=player;
+	mPlayer=player;
 }
 
 Win32AudioBuffer::~Win32AudioBuffer(){
@@ -48,7 +48,7 @@ Win32AudioBuffer::~Win32AudioBuffer(){
 
 
 bool Win32AudioBuffer::create(Stream::ptr stream,const String &mimeType){
-	AudioStream::ptr audioStream=mAudioPlayer->startAudioStream(stream,mimeType);
+	AudioStream::ptr audioStream=mPlayer->startAudioStream(stream,mimeType);
 	if(audioStream==NULL){
 		return false;
 	}
@@ -66,41 +66,13 @@ bool Win32AudioBuffer::create(AudioStream::ptr stream){
 	AudioFormatConversion::decode(stream,buffer,length);
 	int numsamps=length/channels/(bps/8);
 
-	// Lets us programatically reduce popping on some platforms
-	if(mAudioPlayer->getBufferFadeTime()>0){
-		int stf=sps*mAudioPlayer->getBufferFadeTime()/1000;
-		if(stf>numsamps){stf=numsamps;}
-		int sampsize=channels*(bps/8);
-		int i,j;
-		if(bps==8){
-			for(i=0;i<stf;++i){
-				// Fade front
-				for(j=0;j<sampsize;++j){
-					buffer[i*sampsize+j]=(uint8)(((((int)buffer[i*sampsize+j])-128)*i/stf)+128);
-				}
-				// Fade back
-				for(j=0;j<sampsize;++j){
-					buffer[(numsamps-i-1)*sampsize+j]=(uint8)(((((int)buffer[(numsamps-i-1)*sampsize+j])-128)*i/stf)+128);
-				}
-			}
-		}
-		else if(bps==16){
-			for(i=0;i<stf;++i){
-				// Fade front
-				for(j=0;j<sampsize;++j){
-					buffer[i*sampsize+j]=(tbyte)(((int)buffer[i*sampsize+j])*i/stf);
-				}
-				// Fade back
-				for(j=0;j<sampsize;++j){
-					buffer[(numsamps-i-1)*sampsize+j]=(tbyte)(((int)buffer[(numsamps-i-1)*sampsize+j])*i/stf);
-				}
-			}
-		}
+	if(mPlayer->getBufferFadeTime()>0){
+		AudioFormatConversion::fade(buffer,length,channels,sps,bps,mPlayer->getBufferFadeTime());
 	}
 
-	int nchannels=mAudioPlayer->getChannels();	
-	int nbps=mAudioPlayer->getBitsPerSample();
-	int nsps=mAudioPlayer->getSamplesPerSecond();
+	int nchannels=mPlayer->getChannels();	
+	int nbps=mPlayer->getBitsPerSample();
+	int nsps=mPlayer->getSamplesPerSecond();
 
 	if(nchannels!=channels || nbps!=bps || nsps!=sps){
 		Logger::debug(Categories::TOADLET_RIBBIT,String("converting audio from ")+channels+","+bps+","+sps+" to "+nchannels+","+nbps+","+nsps);
