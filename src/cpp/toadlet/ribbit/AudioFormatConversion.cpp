@@ -117,12 +117,12 @@ bool AudioFormatConversion::convert(tbyte *src,int srcChannels,int srcBitsPerSam
 	return true;
 }
 
-void AudioFormatConversion::fade(tbyte *buffer,int length,int channels,int sps,int bps,int fadeTime){
-	int numsamps=length/channels/(bps/8);
-	int stf=sps*fadeTime/1000;
+void AudioFormatConversion::fade(tbyte *buffer,int length,int channels,int bitsPerSample,int samplesPerSecond,int fadeTime){
+	int numsamps=length/channels/(bitsPerSample/8);
+	int stf=samplesPerSecond*fadeTime/1000;
 	if(stf>numsamps){stf=numsamps;}
 	int i,j;
-	if(bps==8){
+	if(bitsPerSample==8){
 		for(i=0;i<stf;++i){
 			// Fade front
 			for(j=0;j<channels;++j){
@@ -134,7 +134,7 @@ void AudioFormatConversion::fade(tbyte *buffer,int length,int channels,int sps,i
 			}
 		}
 	}
-	else if(bps==16){
+	else if(bitsPerSample==16){
 		int16 *buffer16=(int16*)buffer;
 		for(i=0;i<stf;++i){
 			// Fade front
@@ -147,6 +147,10 @@ void AudioFormatConversion::fade(tbyte *buffer,int length,int channels,int sps,i
 			}
 		}
 	}
+}
+
+int AudioFormatConversion::findConvertedLength(int length,int srcChannels,int srcBitsPerSample,int srcSamplesPerSecond,int dstChannels,int dstBitsPerSample,int dstSamplesPerSecond){
+	return (int)(length * ((float)(dstChannels*dstBitsPerSample*srcSamplesPerSecond)/(float)(srcChannels*srcBitsPerSample*dstSamplesPerSecond)));
 }
 
 }

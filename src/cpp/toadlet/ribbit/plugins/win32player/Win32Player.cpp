@@ -30,6 +30,7 @@
 #include <toadlet/egg/Extents.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/ribbit/AudioFormatConversion.h>
 
 #if !defined(TOADLET_PLATFORM_WINCE)
 	#pragma comment(lib,"winmm.lib")
@@ -88,12 +89,12 @@ bool Win32Player::create(int *options){
 		}
 	}
 
-	mChannels=1;
+	mChannels=2;
 	mBitsPerSample=16;
 	mSamplesPerSecond=44100;
-	mBufferFadeTime=100;
+	mBufferSize=AudioFormatConversion::findConvertedLength(8192,mChannels,mBitsPerSample,mSamplesPerSecond,2,16,44100);
 	mNumBuffers=4;
-	mBufferSize=2048;
+	mBufferFadeTime=100;
 
 	mCapabilitySet.maxSources=16;
 	mCapabilitySet.mimeTypes.add("audio/x-wav");
