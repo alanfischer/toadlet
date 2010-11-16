@@ -36,6 +36,11 @@
 #if defined(TOADLET_PLATFORM_OSX)
 	#include "../decoders/coreaudiodecoder/CoreAudioDecoder.h"
 	#include "platform/osx/CoreAudio.h"
+#else
+	#include "../decoders/wavedecoder/WaveDecoder.h"
+	#if defined(TOADLET_HAS_OGGVORBIS)
+		#include "../decoders/oggvorbisdecoder/OggVorbisDecoder.h"
+	#endif
 #endif
 
 #if defined(TOADLET_PLATFORM_WIN32)
@@ -53,10 +58,6 @@ namespace ribbit{
 #if defined(TOADLET_PLATFORM_OSX)
 	using toadlet::egg::Collection;
 #endif
-
-extern AudioStream *new_CoreAudioDecoder();
-extern AudioStream *new_OggVorbisDecoder();
-extern AudioStream *new_WaveDecoder();
 
 TOADLET_C_API AudioPlayer* new_ALPlayer(){
 	return new ALPlayer();
@@ -155,9 +156,9 @@ bool ALPlayer::create(int *options){
 	mCapabilitySet.maxSources=8;
 	mCapabilitySet.streaming=true;
 	mCapabilitySet.positional=true;
-	mCapabilitySet.mimeTypes.add("audio/x-wav");
+	mCapabilitySet.mimeTypes.add(WaveDecoder::mimeType());
 	#if defined(TOADLET_HAS_OGGVORBIS)
-		mCapabilitySet.mimeTypes.add("application/ogg");
+		mCapabilitySet.mimeTypes.add(OggVorbisDecoder::mimeType());
 	#endif
 
 	alListenerf(AL_GAIN,1.0);
@@ -266,16 +267,16 @@ AudioStream::ptr ALPlayer::startAudioStream(io::Stream::ptr stream,const String 
 
 	AudioStream::ptr decoder;
 	#if defined(TOADLET_PLATFORM_OSX)
-		decoder=AudioStream::ptr(new_CoreAudioDecoder());
+		decoder=AudioStream::ptr(new CoreAudioDecoder());
 	#else
+		if(mimeType==WaveDecoder::mimeType()){
+			decoder=AudioStream::ptr(new WaveDecoder());
+		}
 		#if defined(TOADLET_HAS_OGGVORBIS)
-			if(mimeType=="application/ogg"){
-				decoder=AudioStream::ptr(new_OggVorbisDecoder());
+			if(mimeType==OggVorbisDecoder::mimeType()){
+				decoder=AudioStream::ptr(new OggVorbisDecoder());
 			}
 		#endif
-		if(mimeType=="audio/x-wav"){
-			decoder=AudioStream::ptr(new_WaveDecoder());
-		}
 	#endif
 
 	if(decoder==NULL){

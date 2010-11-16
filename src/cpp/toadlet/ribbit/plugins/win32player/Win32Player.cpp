@@ -32,6 +32,11 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/ribbit/AudioFormatConversion.h>
 
+#include "../decoders/wavedecoder/WaveDecoder.h"
+#if defined(TOADLET_HAS_OGGVORBIS)
+	#include "../decoders/oggvorbisdecoder/OggVorbisDecoder.h"
+#endif
+
 #if !defined(TOADLET_PLATFORM_WINCE)
 	#pragma comment(lib,"winmm.lib")
 #endif
@@ -41,9 +46,6 @@ using namespace toadlet::egg::io;
 
 namespace toadlet{
 namespace ribbit{
-
-extern AudioStream *new_OggVorbisDecoder();
-extern AudioStream *new_WaveDecoder();
 
 TOADLET_C_API AudioPlayer* new_Win32Player(){
 	return new Win32Player();
@@ -97,9 +99,9 @@ bool Win32Player::create(int *options){
 	mBufferFadeTime=100;
 
 	mCapabilitySet.maxSources=16;
-	mCapabilitySet.mimeTypes.add("audio/x-wav");
+	mCapabilitySet.mimeTypes.add(WaveDecoder::mimeType());
 	#if defined(TOADLET_HAS_OGGVORBIS)
-		mCapabilitySet.mimeTypes.add("application/ogg");
+		mCapabilitySet.mimeTypes.add(OggVorbisDecoder::mimeType());
 	#endif
 
 	WAVEFORMATEX format={0};
@@ -230,14 +232,14 @@ AudioStream::ptr Win32Player::startAudioStream(Stream::ptr stream,const String &
 	}
 
 	AudioStream::ptr decoder;
-	#if defined(TOADLET_HAS_OGG_VORBIS)
-		if(mimeType=="application/ogg"){
-			decoder=AudioStream::ptr(new_OggVorbisDecoder());
+	if(mimeType==WaveDecoder::mimeType()){
+		decoder=AudioStream::ptr(new WaveDecoder());
+	}
+	#if defined(TOADLET_HAS_OGGVORBIS)
+		if(mimeType==OggVorbisDecoder::mimeType()){
+			decoder=AudioStream::ptr(new OggVorbisDecoder());
 		}
 	#endif
-	if(mimeType=="audio/x-wav"){
-		decoder=AudioStream::ptr(new_WaveDecoder());
-	}
 
 	if(decoder==NULL){
 		Error::unknown(Categories::TOADLET_RIBBIT,

@@ -25,6 +25,7 @@
 
 #include "OggVorbisDecoder.h"
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Logger.h>
 #include <string.h> // memcpy
 
 #if defined(TOADLET_PLATFORM_WIN32)
@@ -59,19 +60,40 @@ OggVorbisDecoder::~OggVorbisDecoder(){
 }
 
 size_t OggVorbisDecoder::read_func(void *ptr,size_t size,size_t nmemb, void *datasource){
-	return ((egg::io::Stream*)datasource)->read((tbyte*)ptr,size*nmemb);
+	return ((Stream*)datasource)->read((tbyte*)ptr,size*nmemb);
 }
 
 int OggVorbisDecoder::seek_func(void *datasource, ogg_int64_t offset, int whence){
-	return -1;
+	int length=((Stream*)datasource)->length();
+	int position=((Stream*)datasource)->position();
+	if(length>=0 && position>=0){
+		((Stream*)datasource)->reset();
+		int result=0;
+		switch(whence){
+			case SEEK_SET:
+				result=((Stream*)datasource)->seek(offset);
+			break;
+			case SEEK_CUR:
+				result=((Stream*)datasource)->seek(position+offset);
+			break;
+			case SEEK_END:
+				result=((Stream*)datasource)->seek(length+offset);
+			break;
+		}
+		return result<0?-1:0;
+	}
+	else{
+		return -1;
+	}
 }
 
 int OggVorbisDecoder::close_func(void *datasource){
+	((Stream*)datasource)->close();
 	return 0;
 };
 
 long OggVorbisDecoder::tell_func(void *datasource){
-	return 0;
+	return ((Stream*)datasource)->position();
 }
 
 void OggVorbisDecoder::close(){
@@ -115,7 +137,7 @@ bool OggVorbisDecoder::startStream(egg::io::Stream::ptr stream){
 			"OggVorbisDecoder: ov_info failed");
 		return false;
 	}
-
+	Logger::alert(String("len:")+length());
 	return true;
 }
 
@@ -172,6 +194,18 @@ bool OggVorbisDecoder::reset(){
 	startStream(mStream);
 
 	return b;
+}
+
+int OggVorbisDecoder::length(){
+	return ov_raw_total(&mVorbisFile,-1);
+}
+
+int OggVorbisDecoder::position(){
+	return ov_raw_tell(&mVorbisFile);
+}
+
+bool OggVorbisDecoder::seek(int offs){
+	return ov_raw_seek(&mVorbisFile,offs)>=0;
 }
 
 int OggVorbisDecoder::getChannels(){

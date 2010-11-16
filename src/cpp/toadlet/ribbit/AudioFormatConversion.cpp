@@ -35,11 +35,18 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace ribbit{
 
-void AudioFormatConversion::decode(Stream *stream,tbyte *&finalBuffer,int &finalLength){
+bool AudioFormatConversion::decode(Stream *stream,tbyte *&finalBuffer,int &finalLength){
 	const static int bufferSize=4096;
 	Collection<tbyte*> buffers;
 	int amount=0,total=0;
 	int i=0;
+
+	finalBuffer=NULL;
+	finalLength=0;
+
+	if(stream->length()<=0){
+		return false;
+	}
 
 	while(true){
 		tbyte *buffer=new tbyte[bufferSize];
@@ -66,10 +73,12 @@ void AudioFormatConversion::decode(Stream *stream,tbyte *&finalBuffer,int &final
 		total-=bufferSize;
 		delete[] buffers[i];
 	}
+
+	return true;
 }
 
-void AudioFormatConversion::decode(AudioStream *stream,tbyte *&finalBuffer,int &finalLength){
-	decode((Stream*)stream,finalBuffer,finalLength);
+bool AudioFormatConversion::decode(AudioStream *stream,tbyte *&finalBuffer,int &finalLength){
+	bool result=decode((Stream*)stream,finalBuffer,finalLength);
 
 	#if !defined(TOADLET_NATIVE_FORMAT)
 		int bps=stream->getBitsPerSample();
@@ -81,6 +90,8 @@ void AudioFormatConversion::decode(AudioStream *stream,tbyte *&finalBuffer,int &
 			}
 		}
 	#endif
+
+	return result;
 }
 
 bool AudioFormatConversion::convert(tbyte *src,int srcChannels,int srcBitsPerSample,int srcSamplesPerSecond,tbyte *dst,int dstChannels,int dstBitsPerSample,int dstSamplesPerSecond,int length){
