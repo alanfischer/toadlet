@@ -16,6 +16,10 @@ set (RIBBIT_DECODERS_WAVEDECODER_SRC
 	plugins/decoders/wavedecoder/WaveDecoder.cpp
 )
 
+set (RIBBIT_DECODERS_SIDDECODER_SRC
+	plugins/decoders/siddecoder/SIDDecoder.cpp
+)
+
 
 # Headers
 set (RIBBIT_HEADERS
@@ -35,6 +39,10 @@ set (RIBBIT_DECODERS_OGGVORBISDECODER_HEADERS
 
 set (RIBBIT_DECODERS_WAVEDECODER_HEADERS
 	plugins/decoders/wavedecoder/WaveDecoder.h
+)
+
+set (RIBBIT_DECODERS_SIDDECODER_HEADERS
+	plugins/decoders/siddecoder/SIDDecoder.h
 )
 
 
@@ -89,6 +97,10 @@ if (OGGVORBIS_FOUND)
 else (OGGVORBIS_FOUND)
 	message ("ribbit will not have Ogg Vorbis support")
 endif (OGGVORBIS_FOUND)
+
+find_package (SidPlay2)
+if (SIDPLAY2_FOUND)
+endif (SIDPLAY2_FOUND)
 
 # Dynamic library
 if (NOT TOADLET_PLATFORM_IPHONE)

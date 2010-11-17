@@ -25,6 +25,8 @@
 
 #include "ALAudioBuffer.h"
 #include "ALPlayer.h"
+#include <toadlet/egg/Error.h>
+#include <toadlet/egg/Logger.h>
 #include <toadlet/ribbit/AudioFormatConversion.h>
 
 #if defined(TOADLET_PLATFORM_OSX)
@@ -79,6 +81,8 @@ bool ALAudioBuffer::create(AudioStream::ptr stream){
 	int sps=stream->getSamplesPerSecond();
 
 	if(AudioFormatConversion::decode(stream,buffer,length)==false){
+		Error::unknown(Categories::TOADLET_RIBBIT,
+			"unable to decode entire stream");
 		return false;
 	}
 
