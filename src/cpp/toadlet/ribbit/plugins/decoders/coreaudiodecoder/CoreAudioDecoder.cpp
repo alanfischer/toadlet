@@ -33,10 +33,6 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace ribbit{
 
-AudioStream *new_CoreAudioDecoder(){
-	return new CoreAudioDecoder();
-}
-
 CoreAudioDecoder::CoreAudioDecoder(){
 	mPosition=0;
 	mSourceSize=0;

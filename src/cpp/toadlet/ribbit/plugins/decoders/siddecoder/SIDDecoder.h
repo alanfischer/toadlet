@@ -23,62 +23,50 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_COREAUDIODECODER_H
-#define TOADLET_RIBBIT_COREAUDIODECODER_H
+#ifndef TOADLET_RIBBIT_SIDDECODER_H
+#define TOADLET_RIBBIT_SIDDECODER_H
 
 #include <toadlet/ribbit/AudioStream.h>
-#include <AudioToolbox/AudioToolbox.h>
-
-#include <toadlet/egg/Collection.h>
+#include <sidplay/sidplay2.h>
+#include <sidplay/builders/resid.h>
 
 namespace toadlet{
 namespace ribbit{
 
-class CoreAudioDecoder:public AudioStream{
+/// @todo: Add a cmake check to build this decoder
+class SIDDecoder:public AudioStream{
 public:
-	TOADLET_SHARED_POINTERS(CoreAudioDecoder);
+	SIDDecoder();
+	virtual ~SIDDecoder();
 
-	CoreAudioDecoder();
-	virtual ~CoreAudioDecoder();
+	bool startStream(Stream::ptr stream);
 
-	bool closed(){return mAudioFile==NULL;}
-	void close();
+	int getBitsPerSample(){return mSidplayer.config().precision;}
+	int getChannels(){return mSidplayer.info().channels;}
+	int getSamplesPerSecond(){return mSidplayer.config().frequency;}
 
+
+	void close(){}
+	bool closed(){return false;}
 	bool readable(){return true;}
-	int read(tbyte *buffer,int length);
+	int read(tbyte *buffer,int length){return mSidplayer.play(buffer,length);}
 
 	bool writeable(){return false;}
 	int write(const tbyte *buffer,int length){return -1;}
 
-	bool startStream(egg::io::Stream::ptr stream);
-	bool stopStream();
-	bool reset();
+	bool reset(){return false;}
 	int length(){return -1;}
 	int position(){return -1;}
 	bool seek(int offs){return false;}
 
-	int getChannels(){return mStreamDescription.mChannelsPerFrame;}
-	int getSamplesPerSecond(){return mStreamDescription.mSampleRate;}
-	int getBitsPerSample(){return mStreamDescription.mBitsPerChannel;}
+	egg::String mimeType(){return "audio/psid";}
 
-	inline AudioFileID getAudioFileID() const{return mAudioFile;}
-	inline const AudioStreamBasicDescription &getStreamDescription() const{return mStreamDescription;}
-	bool isVariableBitRate() const;
-
-private:
-	static OSStatus audioFileRead(void *inRefCon,SInt64 inPosition,UInt32 requestCount,void *buffer,UInt32 *actualCount);
-	static SInt64 audioFileGetSize(void *inRefCon);
-
-	int mPosition;
-	int mSourceSize;
-	int mSourcePosition;
-	egg::io::Stream::ptr mIn;
-	AudioFileID mAudioFile;
-	AudioStreamBasicDescription mStreamDescription;
+protected:
+	sidplay2 mSidplayer;
+	SidTune mTune;
 };
 
 }
 }
 
 #endif
-

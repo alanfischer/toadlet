@@ -34,10 +34,6 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace ribbit{
 
-AudioStream *new_WaveDecoder(){
-	return new WaveDecoder();
-}
-
 #if !defined(WAVE_Format_PCM)
 #	define WAVE_Format_PCM 0x0001
 #endif

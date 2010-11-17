@@ -46,10 +46,6 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace ribbit{
 
-AudioStream *new_OggVorbisDecoder(){
-	return new OggVorbisDecoder();
-}
-
 OggVorbisDecoder::OggVorbisDecoder(){
 	mVorbisInfo=NULL;
 	mDataLength=0;

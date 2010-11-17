@@ -64,6 +64,8 @@ bool Win32AudioBuffer::create(AudioStream::ptr stream){
 	int length=0;
 
 	if(AudioFormatConversion::decode(stream,buffer,length)==false){
+		Error::unknown(Categories::TOADLET_RIBBIT,
+			"unable to decode entire stream");
 		return false;
 	}
 
