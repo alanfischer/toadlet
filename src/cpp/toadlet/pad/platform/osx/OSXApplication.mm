@@ -192,7 +192,7 @@ rect{
 	UITouch* touch=[[event touchesForView:self] anyObject];
 	CGPoint location=[touch locationInView:self];
 	mLastLocation=location;
-	mApplication->mouseMoved(location.x,location.y);
+	mApplication->internal_mouseMoved(location.x,location.y);
 }
 
 // Handles the end of a touch event when the touch is a tap.
@@ -201,7 +201,7 @@ rect{
 	UITouch* touch=[[event touchesForView:self] anyObject];
 	CGPoint location=[touch locationInView:self];
 	if(location.x!=mLastLocation.x || location.y!=mLastLocation.y){
-		mApplication->mouseMoved(location.x,location.y);
+		mApplication->internal_mouseMoved(location.x,location.y);
 	}
 	mApplication->mouseReleased(location.x,location.y,0);
 }
@@ -212,7 +212,7 @@ rect{
 	UITouch* touch=[[event touchesForView:self] anyObject];
 	CGPoint location=[touch locationInView:self];
 	if(location.x!=mLastLocation.x || location.y!=mLastLocation.y){
-		mApplication->mouseMoved(location.x,location.y);
+		mApplication->internal_mouseMoved(location.x,location.y);
 	}
 	mApplication->mouseReleased(location.x,location.y,0);
 }
@@ -226,7 +226,7 @@ rect{
 }
 
 - (void) mouseDragged:(NSEvent*)event{
-	mApplication->mouseMoved(
+	mApplication->internal_mouseMoved(
 		[event locationInWindow].x,
 		[self bounds].size.height-[event locationInWindow].y
 	);
@@ -276,6 +276,7 @@ OSXApplication::OSXApplication():
 	mFullscreen(false),
 	//mVisual(),
 	mApplicationListener(NULL),
+	mDifferenceMouse(false),
 
 	mEngine(NULL),
 	mRenderer(NULL),
@@ -660,13 +661,41 @@ void OSXApplication::render(Renderer *renderer){
 	}
 }
 
-void OSXApplication::setRendererOptions(int *options,int length){
-        if(mRendererOptions!=NULL){
-                delete[] mRendererOptions;
-        }
+void OSXApplication::setDifferenceMouse(bool difference){
+	mDifferenceMouse=difference;
+	
+	if(difference){
+		CGDisplayHideCursor(kCGDirectMainDisplay);
+	}
+	else{
+		CGDisplayShowCursor(kCGDirectMainDisplay);
+	}
+}
 
-        mRendererOptions=new int[length];
-        memcpy(mRendererOptions,options,length*sizeof(int));
+void OSXApplication::setRendererOptions(int *options,int length){
+	if(mRendererOptions!=NULL){
+		delete[] mRendererOptions;
+	}
+
+	mRendererOptions=new int[length];
+	memcpy(mRendererOptions,options,length*sizeof(int));
+}
+
+void OSXApplication::internal_mouseMoved(int x,int y){
+	if(mDifferenceMouse){
+		CGGetLastMouseDelta(&x,&y);
+		
+		#if !defined(TOADLET_PLATFORM_IPHONE)
+			NSPoint npoint=NSMakePoint(getWidth()/2,getHeight()/2);
+			npoint=[(ApplicationView*)mView convertPoint:npoint toView:nil];
+			npoint=[[(ApplicationView*)mView window] convertBaseToScreen:npoint];
+			npoint.y=[[NSScreen mainScreen] frame].size.height-npoint.y;
+			CGPoint cpoint=CGPointMake(npoint.x,npoint.y);
+			CGWarpMouseCursorPosition(cpoint);
+		#endif
+	}
+
+	mouseMoved(x,y);
 }
 
 int OSXApplication::translateKey(int key){

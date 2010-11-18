@@ -604,7 +604,6 @@ void StudioModelNode::updateSkeletonBuffers(){
 	vba.lock(mSkeletonVertexBuffer);
 
 	for(i=0;i<mModel->header->numbones;++i){
-		studiobone *bone=mModel->bone(i);
 		vba.set3(i,0,mBoneTranslates[i]);
 	}
 
