@@ -359,8 +359,11 @@ const CapabilitySet &ALPlayer::getCapabilitySet(){
 ALuint ALPlayer::checkoutSourceHandle(ALAudio *audio){
 	mAudios.add(audio);
 
-	ALuint handle=mSourcePool[0];
-	mSourcePool.removeAt(0);
+	ALuint handle=-1;
+	if(mSourcePool.size()>0){
+		handle=mSourcePool[0];
+		mSourcePool.removeAt(0);
+	}
 	return handle;
 }
 

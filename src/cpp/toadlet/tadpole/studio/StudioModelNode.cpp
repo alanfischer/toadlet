@@ -29,6 +29,7 @@
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/studio/StudioModelNode.h>
 #include <toadlet/tadpole/studio/StudioHandler.h>
+#include <string.h> // memset
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;

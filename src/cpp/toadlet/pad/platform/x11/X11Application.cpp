@@ -81,7 +81,8 @@ X11Application::X11Application():
 	mFullscreen(false),
 	//mVisual(),
 	mApplicationListener(NULL),
-	mMouseLocked(false),
+	mDifferenceMouse(false),
+	mLastXMouse(0),mLastYMouse(0),
 	mSkipNextMove(false),
 
 	mEngine(NULL),
@@ -714,13 +715,20 @@ bool X11Application::destroyMotionDetector(){
 }
 
 void X11Application::internal_mouseMoved(int x,int y){
-	if(mMouseLocked && (getWidth()/2!=x || getHeight()/2!=y)){
-		XWarpPointer(x11->mDisplay,None,x11->mWindow,0,0,0,0,getWidth()/2,getHeight()/2);
+	if(mSkipNextMove){
+		mLastXMouse=x;mLastYMouse=y;
+		mSkipNextMove=false;
+		return;
+	}
 
-		if(mSkipNextMove){
-			mSkipNextMove=false;
-			return;
-		}
+	if(mDifferenceMouse){
+		int dx=x-mLastXMouse,dy=y-mLastYMouse;
+		mLastXMouse=x;mLastYMouse=y;
+
+		XWarpPointer(x11->mDisplay,None,x11->mWindow,0,0,0,0,getWidth()/2,getHeight()/2);
+		mSkipNextMove=true;
+
+		x=dx;y=dy;
 	}
 
 	mouseMoved(x,y);
@@ -812,8 +820,8 @@ void X11Application::render(Renderer *renderer){
 	}
 }
 
-void X11Application::setMouseLocked(bool locked){
-	mMouseLocked=locked;
+void X11Application::setDifferenceMouse(bool difference){
+	mDifferenceMouse=difference;
 	mSkipNextMove=true;
 }
 
