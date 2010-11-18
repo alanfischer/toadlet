@@ -114,8 +114,6 @@ void StudioHandler::buildBuffers(StudioModel *model){
 
 				short sskin=model->skin(smesh->skinref);
 				studiotexture *stexture=model->texture(sskin);
-				float s=1.0f/(float)stexture->width;
-				float t=1.0f/(float)stexture->height;
 
 				short *tricmds=(short*)(model->data+smesh->triindex);
 				while(l=*(tricmds++)){

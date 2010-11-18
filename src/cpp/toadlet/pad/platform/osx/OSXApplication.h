@@ -100,12 +100,17 @@ public:
 	virtual void update(int dt);
 	virtual void render(peeper::Renderer *renderer);
 
+	virtual void setDifferenceMouse(bool difference);
+	virtual bool getDifferenceMouse() const{return mDifferenceMouse;}
+
 	void setRendererOptions(int *options,int length);
 
 	static int translateKey(int key);
 
 	inline void *getWindow() const{return mWindow;}
 	inline void *getView() const{return mView;}
+	
+	void internal_mouseMoved(int x,int y);
 	
 protected:
 	peeper::RenderTarget *makeRenderTarget();
@@ -125,6 +130,7 @@ protected:
 	bool mFullscreen;
 	peeper::Visual mVisual;
 	ApplicationListener *mApplicationListener;
+	bool mDifferenceMouse;
 
 	tadpole::Engine *mEngine;
 	peeper::RenderTarget *mRenderTarget;
