@@ -27,8 +27,14 @@
 #define TOADLET_RIBBIT_SIDDECODER_H
 
 #include <toadlet/ribbit/AudioStream.h>
-#include <sidplay/sidplay2.h>
-#include <sidplay/builders/resid.h>
+
+#define SIDPLAY1
+#if defined(SIDPLAY1)
+	#include <sidplay/player.h>
+#else
+	#include <sidplay/sidplay2.h>
+	#include <sidplay/builders/resid.h>
+#endif
 
 namespace toadlet{
 namespace ribbit{
@@ -41,15 +47,14 @@ public:
 
 	bool startStream(Stream::ptr stream);
 
-	int getBitsPerSample(){return mSidplayer.config().precision;}
-	int getChannels(){return mSidplayer.info().channels;}
-	int getSamplesPerSecond(){return mSidplayer.config().frequency;}
-
+	int getBitsPerSample();
+	int getChannels();
+	int getSamplesPerSecond();
 
 	void close(){}
 	bool closed(){return false;}
 	bool readable(){return true;}
-	int read(tbyte *buffer,int length){return mSidplayer.play(buffer,length);}
+	int read(tbyte *buffer,int length);
 
 	bool writeable(){return false;}
 	int write(const tbyte *buffer,int length){return -1;}
@@ -62,8 +67,16 @@ public:
 	egg::String mimeType(){return "audio/psid";}
 
 protected:
-	sidplay2 mSidplayer;
+#if defined(SIDPLAY1)
+	emuEngine mPlayer;
+	emuConfig mConfig;
+	sidTune mTune;
+#else
+	sidplay2 mPlayer;
+	sid2_config_t mConfig;
+	sid2_info_t mInfo;
 	SidTune mTune;
+#endif
 };
 
 }
