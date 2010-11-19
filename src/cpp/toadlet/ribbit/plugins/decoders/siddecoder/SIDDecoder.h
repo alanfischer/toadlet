@@ -28,7 +28,7 @@
 
 #include <toadlet/ribbit/AudioStream.h>
 
-#define SIDPLAY1
+#define SIDPLAY2
 #if defined(SIDPLAY1)
 	#include <sidplay/player.h>
 #else

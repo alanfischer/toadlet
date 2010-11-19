@@ -82,7 +82,7 @@ bool SIDDecoder::startStream(Stream::ptr stream){
 	mInfo=mPlayer.info();
 
 	ReSIDBuilder *resid=new ReSIDBuilder("ReSID");
-	resid->create(mSidplayer.info().maxsids);
+	resid->create(mInfo.maxsids);
 	resid->sampling(getSamplesPerSecond());
 	mConfig.sidEmulation=resid;
 	mConfig.frequency=getSamplesPerSecond();
