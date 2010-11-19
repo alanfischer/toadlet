@@ -33,14 +33,13 @@
 #include <stdlib.h>
 #include <string.h> // memcpy
 
+#include "../decoders/wavedecoder/WaveDecoder.h"
+#if defined(TOADLET_HAS_OGGVORBIS)
+	#include "../decoders/oggvorbisdecoder/OggVorbisDecoder.h"
+#endif
 #if defined(TOADLET_PLATFORM_OSX)
 	#include "../decoders/coreaudiodecoder/CoreAudioDecoder.h"
 	#include "platform/osx/CoreAudio.h"
-#else
-	#include "../decoders/wavedecoder/WaveDecoder.h"
-	#if defined(TOADLET_HAS_OGGVORBIS)
-		#include "../decoders/oggvorbisdecoder/OggVorbisDecoder.h"
-	#endif
 #endif
 
 #if defined(TOADLET_PLATFORM_WIN32)

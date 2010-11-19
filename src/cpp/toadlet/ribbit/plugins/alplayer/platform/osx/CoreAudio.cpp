@@ -67,13 +67,17 @@ bool CoreAudio::create(AudioBuffer::ptr buffer){
 	return false;
 }
 	
-bool CoreAudio::create(Stream::ptr in,const String &mimeType){
-	AudioStream::ptr decoder=mAudioPlayer->startAudioStream(in,mimeType);
-	if(decoder==NULL){
+bool CoreAudio::create(Stream::ptr stream,const String &mimeType){
+	AudioStream::ptr audioStream=mAudioPlayer->startAudioStream(stream,mimeType);
+	if(audioStream==NULL){
 		return false;
 	}
 
-	mStream=shared_static_cast<CoreAudioDecoder>(decoder);
+	return create(audioStream);
+}
+
+bool CoreAudio::create(AudioStream::ptr stream){
+	mStream=shared_static_cast<CoreAudioDecoder>(stream);
 
 	setupQueue();
 
