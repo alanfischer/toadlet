@@ -59,6 +59,7 @@ struct X11Attributes{
 	XVisualInfo *mVisualInfo;
 	int mScrnum;
 	Atom mDeleteWindow;
+	Cursor mBlankCursor;
 
 	struct{
 		char *antialiasing;
@@ -476,11 +477,22 @@ bool X11Application::createWindow(){
 	x11->mDeleteWindow=XInternAtom(x11->mDisplay,"WM_DELETE_WINDOW",false);
 	XSetWMProtocols(x11->mDisplay,x11->mWindow,&x11->mDeleteWindow,1);
 
+	static char cursorData[1]={0};
+	XColor cursorColor;
+	Pixmap cursorPixmap=XCreateBitmapFromData(x11->mDisplay,x11->mWindow,cursorData,1,1);	
+	x11->mBlankCursor=XCreatePixmapCursor(x11->mDisplay,cursorPixmap,cursorPixmap,&cursorColor,&cursorColor,0,0);
+	XFreePixmap(x11->mDisplay,cursorPixmap);
+
 	return true;
 #endif
 }
 
 void X11Application::destroyWindow(){
+	if(x11->mBlankCursor){
+		XFreeCursor(x11->mDisplay,x11->mBlankCursor);
+		x11->mBlankCursor=None;
+	}
+
 	// Just to be safe
 	if(x11->mDisplay){
 		XSync(x11->mDisplay,true);
@@ -823,6 +835,13 @@ void X11Application::render(Renderer *renderer){
 void X11Application::setDifferenceMouse(bool difference){
 	mDifferenceMouse=difference;
 	mSkipNextMove=true;
+
+	if(difference){
+		XDefineCursor(x11->mDisplay,x11->mWindow,x11->mBlankCursor);
+	}
+	else{
+		XUndefineCursor(x11->mDisplay,x11->mWindow);
+	}
 }
 
 void X11Application::setRendererOptions(int *options,int length){
