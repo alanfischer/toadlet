@@ -44,6 +44,9 @@ public:
 	virtual void mouseMoved(int x,int y)=0;
 	virtual void mouseReleased(int x,int y,int button)=0;
 	virtual void mouseScrolled(int x,int y,int scroll)=0;
+	virtual void joyPressed(int button)=0;
+	virtual void joyMoved(int x,int y,int z,int r,int u,int v)=0;
+	virtual void joyReleased(int button)=0;
 	virtual void update(int dt)=0;
 	virtual void render(peeper::Renderer *renderer)=0;
 };

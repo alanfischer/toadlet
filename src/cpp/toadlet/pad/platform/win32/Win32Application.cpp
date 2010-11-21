@@ -30,6 +30,7 @@
 #include <toadlet/pad/platform/win32/Win32Application.h>
 #include <toadlet/pad/ApplicationListener.h>
 #include <windows.h>
+#pragma comment(lib,"winmm.lib")
 #if defined(TOADLET_PLATFORM_WINCE)
 	#include <aygshell.h>
 	#pragma comment(lib,"aygshell.lib")
@@ -115,6 +116,7 @@ struct Win32Attributes{
 	egg::String mClassName;
 	HWND mWnd;
 	HICON mIcon;
+	JOYINFOEX mJoyInfo,mLastJoyInfo;
 };
 
 LRESULT CALLBACK wndProc(HWND wnd,UINT msg,WPARAM wParam,LPARAM lParam);
@@ -168,6 +170,8 @@ Win32Application::Win32Application():
 	win32->mInstance=0;
 	win32->mWnd=0;
 	win32->mIcon=0;
+	memset(&win32->mJoyInfo,0,sizeof(JOYINFOEX));
+	memset(&win32->mLastJoyInfo,0,sizeof(JOYINFOEX));
 
 	win32->mInstance=GetModuleHandle(NULL);
 	
@@ -195,6 +199,10 @@ void Win32Application::create(int renderer,int audioPlayer,int motionDetector){
 	mResourceArchive->open(win32->mInstance);
 	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(mResourceArchive));
 	mEngine->getTextureManager()->addResourceArchive(mResourceArchive);
+
+	win32->mJoyInfo.dwSize=sizeof(JOYINFOEX);
+	win32->mJoyInfo.dwFlags=JOY_RETURNALL;
+	memcpy(&win32->mLastJoyInfo,&win32->mJoyInfo,sizeof(JOYINFOEX));
 
 	if(renderer!=RendererPlugin_NONE){
 		changeRendererPlugin(renderer);
@@ -278,6 +286,32 @@ void Win32Application::stepEventLoop(){
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+	}
+
+	{
+		JOYINFOEX *joyInfo=&win32->mJoyInfo,*lastJoyInfo=&win32->mLastJoyInfo;
+		MMRESULT result=joyGetPosEx(JOYSTICKID1,joyInfo);
+		if(	joyInfo->dwXpos!=lastJoyInfo->dwXpos || joyInfo->dwYpos!=lastJoyInfo->dwYpos || joyInfo->dwZpos!=lastJoyInfo->dwZpos ||
+			joyInfo->dwRpos!=lastJoyInfo->dwRpos || joyInfo->dwUpos!=lastJoyInfo->dwUpos || joyInfo->dwVpos!=lastJoyInfo->dwVpos){
+			joyMoved(joyInfo->dwXpos,joyInfo->dwYpos,joyInfo->dwZpos,joyInfo->dwRpos,joyInfo->dwUpos,joyInfo->dwVpos);
+		}
+		if(joyInfo->dwButtons!=lastJoyInfo->dwButtons){
+			int pressedButtons=(joyInfo->dwButtons^lastJoyInfo->dwButtons)&joyInfo->dwButtons;
+			int releasedButtons=(joyInfo->dwButtons^lastJoyInfo->dwButtons)&lastJoyInfo->dwButtons;
+			int button=0;
+			while(pressedButtons>0 || releasedButtons>0){
+				if((pressedButtons&1)>0){
+					joyPressed(button);
+				}
+				if((releasedButtons&1)>0){
+					joyReleased(button);
+				}
+				pressedButtons>>=1;
+				releasedButtons>>=1;
+				button++;
+			}
+		}
+		memcpy(lastJoyInfo,joyInfo,sizeof(JOYINFOEX));
 	}
 
 	if(mChangeRendererPlugin!=mRendererPlugin){
@@ -586,6 +620,24 @@ void Win32Application::mouseReleased(int x,int y,int button){
 void Win32Application::mouseScrolled(int x,int y,int scroll){
 	if(mApplicationListener!=NULL){
 		mApplicationListener->mouseScrolled(x,y,scroll);
+	}
+}
+
+void Win32Application::joyPressed(int button){
+	if(mApplicationListener!=NULL){
+		mApplicationListener->joyPressed(button);
+	}
+}
+
+void Win32Application::joyMoved(int x,int y,int z,int r,int u,int v){
+	if(mApplicationListener!=NULL){
+		mApplicationListener->joyMoved(x,y,z,r,u,v);
+	}
+}
+
+void Win32Application::joyReleased(int button){
+	if(mApplicationListener!=NULL){
+		mApplicationListener->joyReleased(button);
 	}
 }
 
