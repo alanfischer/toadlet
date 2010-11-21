@@ -123,6 +123,9 @@ public:
 	virtual void mouseMoved(int x,int y);
 	virtual void mouseReleased(int x,int y,int button);
 	virtual void mouseScrolled(int x,int y,int scroll);
+	virtual void joyPressed(int button);
+	virtual void joyMoved(int x,int y,int z,int r,int u,int v);
+	virtual void joyReleased(int button);
 	virtual void update(int dt);
 	virtual void render(peeper::Renderer *renderer);
 
@@ -174,7 +177,7 @@ protected:
 	bool mDifferenceMouse;
 	int mLastXMouse,mLastYMouse;
 	bool mSkipNextMove;
-
+	
 	tadpole::Engine *mEngine;
 	peeper::RenderTarget *mRenderTarget;
 	peeper::Renderer *mRenderer;
