@@ -23,23 +23,23 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_WIN32AUDIOBUFFER_H
-#define TOADLET_RIBBIT_WIN32AUDIOBUFFER_H
+#ifndef TOADLET_RIBBIT_MMAUDIOBUFFER_H
+#define TOADLET_RIBBIT_MMAUDIOBUFFER_H
 
-#include "Win32Player.h"
+#include "MMPlayer.h"
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/ribbit/AudioBuffer.h>
 
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API Win32AudioBuffer:protected egg::BaseResource,public AudioBuffer{
+class TOADLET_API MMAudioBuffer:protected egg::BaseResource,public AudioBuffer{
 	TOADLET_BASERESOURCE_PASSTHROUGH(AudioBuffer);
 public:
-	TOADLET_SHARED_POINTERS(Win32AudioBuffer);
+	TOADLET_SHARED_POINTERS(MMAudioBuffer);
 
-	Win32AudioBuffer(Win32Player *player);
-	virtual ~Win32AudioBuffer();
+	MMAudioBuffer(MMPlayer *player);
+	virtual ~MMAudioBuffer();
 
 	AudioBuffer *getRootAudioBuffer(){return this;}
 
@@ -48,11 +48,11 @@ public:
 	void destroy();
 
 protected:
-	Win32Player *mPlayer;
+	MMPlayer *mPlayer;
 	tbyte *mData;
 	int mLength;
 
-	friend class Win32Audio;
+	friend class MMAudio;
 };
 
 }

@@ -23,9 +23,9 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "Win32Player.h"
-#include "Win32Audio.h"
-#include "Win32AudioBuffer.h"
+#include "MMPlayer.h"
+#include "MMAudio.h"
+#include "MMAudioBuffer.h"
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/Extents.h>
 #include <toadlet/egg/Error.h>
@@ -47,17 +47,17 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace ribbit{
 
-TOADLET_C_API AudioPlayer* new_Win32Player(){
-	return new Win32Player();
+TOADLET_C_API AudioPlayer* new_MMPlayer(){
+	return new MMPlayer();
 }
 
 #if defined(TOADLET_BUILD_DYNAMIC)
 	TOADLET_C_API AudioPlayer* new_AudioPlayer(){
-		return new Win32Player();
+		return new MMPlayer();
 	}
 #endif
 
-Win32Player::Win32Player():
+MMPlayer::MMPlayer():
 	mChannels(0),
 	mBitsPerSample(0),
 	mSamplesPerSecond(0),
@@ -70,13 +70,13 @@ Win32Player::Win32Player():
 {
 }
 
-Win32Player::~Win32Player(){
+MMPlayer::~MMPlayer(){
 	destroy();
 }
 
-bool Win32Player::create(int *options){
+bool MMPlayer::create(int *options){
 	Logger::alert(Categories::TOADLET_RIBBIT,
-		"creating Win32Player");
+		"creating MMPlayer");
 
 	if(options!=NULL){
 		int i=0;
@@ -149,9 +149,9 @@ bool Win32Player::create(int *options){
 	return result==MMSYSERR_NOERROR;
 }
 
-bool Win32Player::destroy(){
+bool MMPlayer::destroy(){
 	Logger::alert(Categories::TOADLET_RIBBIT,
-		"destroying Win32Player");
+		"destroying MMPlayer");
 
 	if(mDevice!=NULL){
 	    waveOutReset(mDevice);
@@ -186,19 +186,19 @@ bool Win32Player::destroy(){
 	return true;
 }
 
-AudioBuffer *Win32Player::createAudioBuffer(){
-	return new Win32AudioBuffer(this);
+AudioBuffer *MMPlayer::createAudioBuffer(){
+	return new MMAudioBuffer(this);
 }
 
-Audio *Win32Player::createBufferedAudio(){
-	return new Win32Audio(this);
+Audio *MMPlayer::createBufferedAudio(){
+	return new MMAudio(this);
 }
 
-Audio *Win32Player::createStreamingAudio(){
-	return new Win32Audio(this);
+Audio *MMPlayer::createStreamingAudio(){
+	return new MMAudio(this);
 }
 
-void Win32Player::update(int dt){
+void MMPlayer::update(int dt){
 	int i;
 	for(i=0;i<mNumBuffers;++i){
 		WAVEHDR *header=&mBuffers[i];
@@ -224,7 +224,7 @@ void Win32Player::update(int dt){
 	}
 }
 
-AudioStream::ptr Win32Player::startAudioStream(Stream::ptr stream,const String &mimeType){
+AudioStream::ptr MMPlayer::startAudioStream(Stream::ptr stream,const String &mimeType){
 	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_RIBBIT,
 			"null Stream");
@@ -256,16 +256,16 @@ AudioStream::ptr Win32Player::startAudioStream(Stream::ptr stream,const String &
 	return decoder;
 }
 
-void Win32Player::internal_audioCreate(Win32Audio *audio){
+void MMPlayer::internal_audioCreate(MMAudio *audio){
 	mAudios.add(audio);
 }
 
-void Win32Player::internal_audioDestroy(Win32Audio *audio){
+void MMPlayer::internal_audioDestroy(MMAudio *audio){
 	mAudios.remove(audio);
 }
 
 // Mix all the currently playing audios
-int Win32Player::read(tbyte *data,int length){
+int MMPlayer::read(tbyte *data,int length){
 	int bps=mBitsPerSample;
 
 	bool playing=false;

@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "Win32Audio.h"
-#include "Win32AudioBuffer.h"
+#include "MMAudio.h"
+#include "MMAudioBuffer.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Extents.h>
 #include <toadlet/egg/Logger.h>
@@ -38,7 +38,7 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace ribbit{
 
-Win32Audio::Win32Audio(Win32Player *player):
+MMAudio::MMAudio(MMPlayer *player):
 	mPlayer(NULL),
 	//mAudioBuffer,
 	mPlaying(false),
@@ -51,22 +51,22 @@ Win32Audio::Win32Audio(Win32Player *player):
 	mPlayer=player;
 }
 
-Win32Audio::~Win32Audio(){
+MMAudio::~MMAudio(){
 	destroy();
 }
 
-bool Win32Audio::create(AudioBuffer::ptr audioBuffer){
+bool MMAudio::create(AudioBuffer::ptr audioBuffer){
 	destroy();
 
 	mPlayer->internal_audioCreate(this);
 
 	mAudioStream=NULL;
-	mAudioBuffer=shared_static_cast<Win32AudioBuffer>(audioBuffer);
+	mAudioBuffer=shared_static_cast<MMAudioBuffer>(audioBuffer);
 
 	return true;
 }
 
-bool Win32Audio::create(Stream::ptr stream,const String &mimeType){
+bool MMAudio::create(Stream::ptr stream,const String &mimeType){
 	AudioStream::ptr audioStream=NULL;
 	TOADLET_TRY{
 		audioStream=mPlayer->startAudioStream(stream,mimeType);
@@ -81,7 +81,7 @@ bool Win32Audio::create(Stream::ptr stream,const String &mimeType){
 	return create(audioStream);
 }
 
-bool Win32Audio::create(AudioStream::ptr stream){
+bool MMAudio::create(AudioStream::ptr stream){
 	destroy();
 
 	mPlayer->internal_audioCreate(this);
@@ -92,11 +92,11 @@ bool Win32Audio::create(AudioStream::ptr stream){
 	return false;
 }
 
-void Win32Audio::destroy(){
+void MMAudio::destroy(){
 	mPlayer->internal_audioDestroy(this);
 }
 
-int Win32Audio::read(tbyte *data,int length){
+int MMAudio::read(tbyte *data,int length){
 	if(mPlaying==false){
 		return 0;
 	}
