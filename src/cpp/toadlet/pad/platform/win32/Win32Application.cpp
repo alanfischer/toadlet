@@ -94,8 +94,8 @@ using namespace toadlet::tadpole::handler;
 	extern "C" RenderTarget *new_D3D11WindowRenderTarget(HWND wnd,const Visual &visual,bool debug);
 #endif
 #if defined(TOADLET_PLATFORM_WIN32)
-	#pragma comment(lib,"toadlet_ribbit_win32player" TOADLET_LIBRARY_EXTENSION)
-	extern "C" AudioPlayer *new_Win32Player();
+	#pragma comment(lib,"toadlet_ribbit_mmplayer" TOADLET_LIBRARY_EXTENSION)
+	extern "C" AudioPlayer *new_MMPlayer();
 #endif
 #if defined(TOADLET_HAS_OPENAL)
 	#pragma comment(lib,"toadlet_ribbit_alplayer" TOADLET_LIBRARY_EXTENSION)
@@ -854,9 +854,9 @@ AudioPlayer *Win32Application::makeAudioPlayer(int plugin){
 			audioPlayer=new_ALPlayer();
 		#endif
 	}
-	else if(plugin==AudioPlayerPlugin_WIN32){
+	else if(plugin==AudioPlayerPlugin_MM){
 		#if defined(TOADLET_PLATFORM_WIN32)
-			audioPlayer=new_Win32Player();
+			audioPlayer=new_MMPlayer();
 		#endif
 	}
 	return audioPlayer;

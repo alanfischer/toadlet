@@ -23,20 +23,20 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_WIN32AUDIO_H
-#define TOADLET_RIBBIT_WIN32AUDIO_H
+#ifndef TOADLET_RIBBIT_MMAUDIO_H
+#define TOADLET_RIBBIT_MMAUDIO_H
 
-#include "Win32Player.h"
-#include "Win32AudioBuffer.h"
+#include "MMPlayer.h"
+#include "MMAudioBuffer.h"
 #include <toadlet/ribbit/Audio.h>
 
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API Win32Audio:public Audio{
+class TOADLET_API MMAudio:public Audio{
 public:
-	Win32Audio(Win32Player *player);
-	virtual ~Win32Audio();
+	MMAudio(MMPlayer *player);
+	virtual ~MMAudio();
 
 	virtual bool create(AudioBuffer::ptr audioBuffer);
 	virtual bool create(egg::io::Stream::ptr stream,const egg::String &mimeType);
@@ -73,9 +73,9 @@ public:
 protected:
 	int read(tbyte *data,int length);
 
-	Win32Player *mPlayer;
+	MMPlayer *mPlayer;
 	AudioStream::ptr mAudioStream;
-	Win32AudioBuffer::ptr mAudioBuffer;
+	MMAudioBuffer::ptr mAudioBuffer;
 	bool mPlaying;
 	bool mLooping;
 	scalar mGain;
@@ -83,7 +83,7 @@ protected:
 
 	int mPosition;
 
-	friend class Win32Player;
+	friend class MMPlayer;
 };
 
 }

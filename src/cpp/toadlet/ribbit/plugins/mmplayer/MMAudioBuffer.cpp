@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "Win32AudioBuffer.h"
+#include "MMAudioBuffer.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/ribbit/AudioFormatConversion.h>
@@ -34,7 +34,7 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace ribbit{
 
-Win32AudioBuffer::Win32AudioBuffer(Win32Player *player):BaseResource(),
+MMAudioBuffer::MMAudioBuffer(MMPlayer *player):BaseResource(),
 	mPlayer(NULL),
 	mData(NULL),
 	mLength(0)
@@ -42,12 +42,12 @@ Win32AudioBuffer::Win32AudioBuffer(Win32Player *player):BaseResource(),
 	mPlayer=player;
 }
 
-Win32AudioBuffer::~Win32AudioBuffer(){
+MMAudioBuffer::~MMAudioBuffer(){
 	destroy();
 }
 
 
-bool Win32AudioBuffer::create(Stream::ptr stream,const String &mimeType){
+bool MMAudioBuffer::create(Stream::ptr stream,const String &mimeType){
 	AudioStream::ptr audioStream=mPlayer->startAudioStream(stream,mimeType);
 	if(audioStream==NULL){
 		return false;
@@ -56,7 +56,7 @@ bool Win32AudioBuffer::create(Stream::ptr stream,const String &mimeType){
 	return create(audioStream);
 }
 
-bool Win32AudioBuffer::create(AudioStream::ptr stream){
+bool MMAudioBuffer::create(AudioStream::ptr stream){
 	int channels=stream->getChannels();
 	int bps=stream->getBitsPerSample();
 	int sps=stream->getSamplesPerSecond();
@@ -100,7 +100,7 @@ bool Win32AudioBuffer::create(AudioStream::ptr stream){
 	return true;
 }
 
-void Win32AudioBuffer::destroy(){
+void MMAudioBuffer::destroy(){
 	if(mData!=NULL){
 		delete[] mData;
 		mData=NULL;

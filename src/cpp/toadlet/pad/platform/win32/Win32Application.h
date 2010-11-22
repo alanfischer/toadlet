@@ -54,7 +54,7 @@ public:
 		AudioPlayerPlugin_NONE=-1,
 		AudioPlayerPlugin_ANY,
 		AudioPlayerPlugin_OPENAL,
-		AudioPlayerPlugin_WIN32,
+		AudioPlayerPlugin_MM,
 		AudioPlayerPlugin_MAX
 	};
 

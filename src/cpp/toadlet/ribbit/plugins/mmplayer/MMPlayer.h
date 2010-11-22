@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_WIN32PLAYER_H
-#define TOADLET_RIBBIT_WIN32PLAYER_H
+#ifndef TOADLET_RIBBIT_MMPLAYER_H
+#define TOADLET_RIBBIT_MMPLAYER_H
 
 #include <toadlet/ribbit/Audio.h>
 #include <toadlet/ribbit/AudioPlayer.h>
@@ -38,16 +38,16 @@
 namespace toadlet{
 namespace ribbit{
 
-class Win32Audio;
-class Win32AudioBuffer;
+class MMAudio;
+class MMAudioBuffer;
 
-class TOADLET_API Win32Player:public AudioPlayer{
+class TOADLET_API MMPlayer:public AudioPlayer{
 public:
 	// Options
 	const static int Option_BUFFER_FADE_TIME=1;
 	
-	Win32Player();
-	virtual ~Win32Player();
+	MMPlayer();
+	virtual ~MMPlayer();
 
 	bool create(int *options);
 	bool destroy();
@@ -74,8 +74,8 @@ public:
 	int getBitsPerSample() const{return mBitsPerSample;}
 	int getSamplesPerSecond() const{return mSamplesPerSecond;}
 
-	void internal_audioCreate(Win32Audio *audio);
-	void internal_audioDestroy(Win32Audio *audio);
+	void internal_audioCreate(MMAudio *audio);
+	void internal_audioDestroy(MMAudio *audio);
 
 protected:
 	int read(tbyte *data,int length);
@@ -88,7 +88,7 @@ protected:
 	HWAVEOUT mDevice;
 	WAVEHDR *mBuffers;
 	tbyte *mBufferData;
-	egg::Collection<Win32Audio*> mAudios;
+	egg::Collection<MMAudio*> mAudios;
 	int mBufferFadeTime;
 	int mNumBuffers;
 	int mBufferSize;
