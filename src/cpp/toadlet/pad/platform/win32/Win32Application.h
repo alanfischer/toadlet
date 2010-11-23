@@ -124,7 +124,7 @@ public:
 	virtual void mouseReleased(int x,int y,int button);
 	virtual void mouseScrolled(int x,int y,int scroll);
 	virtual void joyPressed(int button);
-	virtual void joyMoved(int x,int y,int z,int r,int u,int v);
+	virtual void joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v);
 	virtual void joyReleased(int button);
 	virtual void update(int dt);
 	virtual void render(peeper::Renderer *renderer);
@@ -150,6 +150,7 @@ public:
 	static int mWindowCount;
 	static ApplicationMap mApplicationMap;
 	static int translateKey(int key);
+	static scalar joyToScalar(int joy);
 
 protected:
 	bool createWindow();
