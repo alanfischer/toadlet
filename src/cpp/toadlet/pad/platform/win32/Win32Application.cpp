@@ -293,7 +293,7 @@ void Win32Application::stepEventLoop(){
 		MMRESULT result=joyGetPosEx(JOYSTICKID1,joyInfo);
 		if(	joyInfo->dwXpos!=lastJoyInfo->dwXpos || joyInfo->dwYpos!=lastJoyInfo->dwYpos || joyInfo->dwZpos!=lastJoyInfo->dwZpos ||
 			joyInfo->dwRpos!=lastJoyInfo->dwRpos || joyInfo->dwUpos!=lastJoyInfo->dwUpos || joyInfo->dwVpos!=lastJoyInfo->dwVpos){
-			joyMoved(joyInfo->dwXpos,joyInfo->dwYpos,joyInfo->dwZpos,joyInfo->dwRpos,joyInfo->dwUpos,joyInfo->dwVpos);
+			joyMoved(joyToScalar(joyInfo->dwXpos),joyToScalar(joyInfo->dwYpos),joyToScalar(joyInfo->dwZpos),joyToScalar(joyInfo->dwRpos),joyToScalar(joyInfo->dwUpos),joyToScalar(joyInfo->dwVpos));
 		}
 		if(joyInfo->dwButtons!=lastJoyInfo->dwButtons){
 			int pressedButtons=(joyInfo->dwButtons^lastJoyInfo->dwButtons)&joyInfo->dwButtons;
@@ -629,7 +629,7 @@ void Win32Application::joyPressed(int button){
 	}
 }
 
-void Win32Application::joyMoved(int x,int y,int z,int r,int u,int v){
+void Win32Application::joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v){
 	if(mApplicationListener!=NULL){
 		mApplicationListener->joyMoved(x,y,z,r,u,v);
 	}
@@ -1193,6 +1193,10 @@ int Win32Application::translateKey(int key){
 	}
 
 	return key;
+}
+
+scalar Win32Application::joyToScalar(int joy){
+	return Math::fromFloat(((float)joy/(float)65536)*2-1);
 }
 
 }
