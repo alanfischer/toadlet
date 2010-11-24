@@ -28,10 +28,10 @@
 
 #include <toadlet/ribbit/AudioStream.h>
 
-#define SIDPLAY2
-#if defined(SIDPLAY1)
+#define HAS_SIDPLAY2
+#if defined(HAS_SIDPLAY1)
 	#include <sidplay/player.h>
-#else
+#elif defined(HAS_SIDPLAY2)
 	#include <sidplay/sidplay2.h>
 	#include <sidplay/builders/resid.h>
 #endif
@@ -67,11 +67,11 @@ public:
 	egg::String mimeType(){return "audio/psid";}
 
 protected:
-#if defined(SIDPLAY1)
+#if defined(HAS_SIDPLAY1)
 	emuEngine mPlayer;
 	emuConfig mConfig;
 	sidTune mTune;
-#else
+#elif defined(HAS_SIDPLAY2)
 	sidplay2 mPlayer;
 	sid2_config_t mConfig;
 	sid2_info_t mInfo;

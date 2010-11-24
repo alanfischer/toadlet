@@ -28,8 +28,7 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/ribbit/AudioFormatConversion.h>
 
-#if defined(SIDPLAY1)
-#else
+#if defined(HAS_SIDPLAY2)
 	#pragma comment(lib,"libsidplay2.lib")
 	#pragma comment(lib,"resid_builder.lib")
 #endif
@@ -54,9 +53,9 @@ bool SIDDecoder::startStream(Stream::ptr stream){
 	int song=0;
 
 	AudioFormatConversion::decode(stream,tuneBuffer,tuneBufferLength);
-#if defined(SIDPLAY1)
+#if defined(HAS_SIDPLAY1)
 	result=mTune.load(tuneBuffer,tuneBufferLength);
-#else
+#elif defined(HAS_SIDPLAY2)
 	result=mTune.read(tuneBuffer,tuneBufferLength);
 #endif
 	delete[] tuneBuffer;
@@ -64,11 +63,12 @@ bool SIDDecoder::startStream(Stream::ptr stream){
 		return false;
 	}
 
-#if defined(SIDPLAY1)
+#if defined(HAS_SIDPLAY1)
 	mPlayer.getConfig(mConfig);
 
 	mConfig.sampleFormat=SIDEMU_UNSIGNED_PCM;
 	mConfig.bitsPerSample=16;
+	mConfig.channels=1;
 
 	mPlayer.setConfig(mConfig);
 
@@ -77,7 +77,7 @@ bool SIDDecoder::startStream(Stream::ptr stream){
 		Error::unknown(Categories::TOADLET_RIBBIT,"Error initializing song");
 		return false;
 	}
-#else
+#elif defined(HAS_SIDPLAY2)
 	mConfig=mPlayer.config();
 	mInfo=mPlayer.info();
 
@@ -105,12 +105,12 @@ bool SIDDecoder::startStream(Stream::ptr stream){
 	return result;
 }
 
-#if defined(SIDPLAY1)
+#if defined(HAS_SIDPLAY1)
 	int SIDDecoder::getBitsPerSample(){return mConfig.bitsPerSample;}
 	int SIDDecoder::getChannels(){return mConfig.channels;}
 	int SIDDecoder::getSamplesPerSecond(){return mConfig.frequency;}
 	int SIDDecoder::read(tbyte *buffer,int length){sidEmuFillBuffer(mPlayer,mTune,buffer,length);return length;}
-#else
+#elif defined(HAS_SIDPLAY2)
 	int SIDDecoder::getBitsPerSample(){return mConfig.precision;}
 	int SIDDecoder::getChannels(){return mInfo.channels;}
 	int SIDDecoder::getSamplesPerSecond(){return mConfig.frequency;}
