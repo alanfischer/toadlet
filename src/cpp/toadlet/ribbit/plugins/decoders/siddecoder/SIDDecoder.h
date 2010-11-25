@@ -28,19 +28,12 @@
 
 #include <toadlet/ribbit/AudioStream.h>
 
-#define HAS_SIDPLAY2
-#if defined(HAS_SIDPLAY1)
-	#include <sidplay/player.h>
-#elif defined(HAS_SIDPLAY2)
-	#include <sidplay/sidplay2.h>
-	#include <sidplay/builders/resid.h>
-#endif
-
 namespace toadlet{
 namespace ribbit{
 
-/// @todo: Add a cmake check to build this decoder
-class SIDDecoder:public AudioStream{
+class SIDAttributes;
+
+class TOADLET_API SIDDecoder:public AudioStream{
 public:
 	SIDDecoder();
 	virtual ~SIDDecoder();
@@ -64,19 +57,10 @@ public:
 	int position(){return -1;}
 	bool seek(int offs){return false;}
 
-	egg::String mimeType(){return "audio/psid";}
+	static egg::String mimeType(){return "audio/psid";}
 
 protected:
-#if defined(HAS_SIDPLAY1)
-	emuEngine mPlayer;
-	emuConfig mConfig;
-	sidTune mTune;
-#elif defined(HAS_SIDPLAY2)
-	sidplay2 mPlayer;
-	sid2_config_t mConfig;
-	sid2_info_t mInfo;
-	SidTune mTune;
-#endif
+	class SIDAttributes *sid;
 };
 
 }

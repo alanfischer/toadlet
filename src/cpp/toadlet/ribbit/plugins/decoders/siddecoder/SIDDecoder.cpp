@@ -28,9 +28,18 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/ribbit/AudioFormatConversion.h>
 
-#if defined(HAS_SIDPLAY2)
-	#pragma comment(lib,"libsidplay2.lib")
-	#pragma comment(lib,"resid_builder.lib")
+#if SIDPLAY_VERSION==1
+	#include <sidplay/player.h>
+#elif SIDPLAY_VERSION==2
+	#include <sidplay/sidplay2.h>
+	#include <sidplay/builders/resid.h>
+#endif
+
+#if defined(TOADLET_LIBSIDPLAY_NAME)
+	#pragma comment(lib,TOADLET_LIBSIDPLAY_NAME)
+#endif
+#if defined(TOADLET_LIBRESID_NAME)
+	#pragma comment(lib,TOADLET_LIBRESID_NAME)
 #endif
 
 using namespace toadlet::egg;
@@ -39,11 +48,31 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace ribbit{
 
+class SIDAttributes{
+public:
+	SIDAttributes():
+		tune(0){}
+
+	#if SIDPLAY_VERSION==1
+		emuEngine player;
+		emuConfig config;
+		sidTune tune;
+	#elif SIDPLAY_VERSION==2
+		sidplay2 player;
+		sid2_config_t config;
+		sid2_info_t info;
+		SidTune tune;
+	#endif
+};
+
 SIDDecoder::SIDDecoder():
-	mTune(0)
-{}
+	sid(NULL)
+{
+	sid=new SIDAttributes();
+}
 
 SIDDecoder::~SIDDecoder(){
+	delete sid;
 }
 
 bool SIDDecoder::startStream(Stream::ptr stream){
@@ -53,68 +82,68 @@ bool SIDDecoder::startStream(Stream::ptr stream){
 	int song=0;
 
 	AudioFormatConversion::decode(stream,tuneBuffer,tuneBufferLength);
-#if defined(HAS_SIDPLAY1)
-	result=mTune.load(tuneBuffer,tuneBufferLength);
-#elif defined(HAS_SIDPLAY2)
-	result=mTune.read(tuneBuffer,tuneBufferLength);
+#if SIDPLAY_VERSION==1
+	result=sid->tune.load(tuneBuffer,tuneBufferLength);
+#elif SIDPLAY_VERSION==2
+	result=sid->tune.read(tuneBuffer,tuneBufferLength);
 #endif
 	delete[] tuneBuffer;
 	if(result==false){
 		return false;
 	}
 
-#if defined(HAS_SIDPLAY1)
-	mPlayer.getConfig(mConfig);
+#if SIDPLAY_VERSION==1
+	sid->player.getConfig(mConfig);
 
-	mConfig.sampleFormat=SIDEMU_UNSIGNED_PCM;
-	mConfig.bitsPerSample=16;
-	mConfig.channels=1;
+	sid->config.sampleFormat=SIDEMU_UNSIGNED_PCM;
+	sid->config.bitsPerSample=16;
+	sid->config.channels=1;
 
-	mPlayer.setConfig(mConfig);
+	sid->player.setConfig(sid->config);
 
-	result=sidEmuInitializeSong(mPlayer,mTune,song);
+	result=sidEmuInitializeSong(sid->player,sid->tune,song);
 	if(result==false){
 		Error::unknown(Categories::TOADLET_RIBBIT,"Error initializing song");
 		return false;
 	}
-#elif defined(HAS_SIDPLAY2)
-	mConfig=mPlayer.config();
-	mInfo=mPlayer.info();
+#elif SIDPLAY_VERSION==2
+	sid->config=sid->player.config();
+	sid->info=sid->player.info();
 
 	ReSIDBuilder *resid=new ReSIDBuilder("ReSID");
-	resid->create(mInfo.maxsids);
+	resid->create(sid->info.maxsids);
 	resid->sampling(getSamplesPerSecond());
-	mConfig.sidEmulation=resid;
-	mConfig.frequency=getSamplesPerSecond();
-	mConfig.precision=getBitsPerSample();
-	mConfig.playback=(getChannels()==2?sid2_stereo:sid2_mono);
+	sid->config.sidEmulation=resid;
+	sid->config.frequency=getSamplesPerSecond();
+	sid->config.precision=getBitsPerSample();
+	sid->config.playback=(getChannels()==2?sid2_stereo:sid2_mono);
 
-	mPlayer.config(mConfig);
+	sid->player.config(sid->config);
 
-	mTune.selectSong(song);
+	sid->tune.selectSong(song);
 
-	result=(mPlayer.load(&mTune)>=0);
+	result=(sid->player.load(&sid->tune)>=0);
 	if(result==false){
-		Error::unknown(Categories::TOADLET_RIBBIT,mPlayer.error());
+		Error::unknown(Categories::TOADLET_RIBBIT,sid->player.error());
 		return false;
 	}
 
-	mPlayer.fastForward(100);
+	sid->player.fastForward(100);
 #endif
 
 	return result;
 }
 
-#if defined(HAS_SIDPLAY1)
-	int SIDDecoder::getBitsPerSample(){return mConfig.bitsPerSample;}
-	int SIDDecoder::getChannels(){return mConfig.channels;}
-	int SIDDecoder::getSamplesPerSecond(){return mConfig.frequency;}
-	int SIDDecoder::read(tbyte *buffer,int length){sidEmuFillBuffer(mPlayer,mTune,buffer,length);return length;}
-#elif defined(HAS_SIDPLAY2)
-	int SIDDecoder::getBitsPerSample(){return mConfig.precision;}
-	int SIDDecoder::getChannels(){return mInfo.channels;}
-	int SIDDecoder::getSamplesPerSecond(){return mConfig.frequency;}
-	int SIDDecoder::read(tbyte *buffer,int length){return mPlayer.play(buffer,length);}
+#if SIDPLAY_VERSION==1
+	int SIDDecoder::getBitsPerSample(){return sid->config.bitsPerSample;}
+	int SIDDecoder::getChannels(){return sid->config.channels;}
+	int SIDDecoder::getSamplesPerSecond(){return sid->config.frequency;}
+	int SIDDecoder::read(tbyte *buffer,int length){sidEmuFillBuffer(sid->player,sid->tune,buffer,length);return length;}
+#elif SIDPLAY_VERSION==2
+	int SIDDecoder::getBitsPerSample(){return sid->config.precision;}
+	int SIDDecoder::getChannels(){return sid->info.channels;}
+	int SIDDecoder::getSamplesPerSecond(){return sid->config.frequency;}
+	int SIDDecoder::read(tbyte *buffer,int length){return sid->player.play(buffer,length);}
 #endif
 
 }
