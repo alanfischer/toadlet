@@ -36,6 +36,9 @@
 #if defined(TOADLET_HAS_OGGVORBIS)
 	#include "../decoders/oggvorbisdecoder/OggVorbisDecoder.h"
 #endif
+#if defined(TOADLET_HAS_SIDPLAY)
+	#include "../decoders/siddecoder/SIDDecoder.h"
+#endif
 
 #if !defined(TOADLET_PLATFORM_WINCE)
 	#pragma comment(lib,"winmm.lib")
@@ -102,6 +105,9 @@ bool MMPlayer::create(int *options){
 	mCapabilitySet.mimeTypes.add(WaveDecoder::mimeType());
 	#if defined(TOADLET_HAS_OGGVORBIS)
 		mCapabilitySet.mimeTypes.add(OggVorbisDecoder::mimeType());
+	#endif
+	#if defined(TOADLET_HAS_SIDPLAY)
+		mCapabilitySet.mimeTypes.add(SIDDecoder::mimeType());
 	#endif
 
 	WAVEFORMATEX format={0};
@@ -238,6 +244,11 @@ AudioStream::ptr MMPlayer::startAudioStream(Stream::ptr stream,const String &mim
 	#if defined(TOADLET_HAS_OGGVORBIS)
 		if(mimeType==OggVorbisDecoder::mimeType()){
 			decoder=AudioStream::ptr(new OggVorbisDecoder());
+		}
+	#endif
+	#if defined(TOADLET_HAS_SIDPLAY)
+		if(mimeType==SIDDecoder::mimeType()){
+			decoder=AudioStream::ptr(new SIDDecoder());
 		}
 	#endif
 

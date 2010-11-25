@@ -102,9 +102,25 @@ else (OGGVORBIS_FOUND)
 	message ("ribbit will not have Ogg Vorbis support")
 endif (OGGVORBIS_FOUND)
 
-find_package (SidPlay2)
-if (SIDPLAY2_FOUND)
-endif (SIDPLAY2_FOUND)
+find_package (Sidplay)
+if (SIDPLAY_FOUND)
+	set (TOADLET_HAS_SIDPLAY ON PARENT_SCOPE)
+
+	add_definitions(-DSIDPLAY_VERSION=${SIDPLAY_VERSION})
+	
+	source_group ("Source Files\\\\decoders\\\\siddecoder" FILES ${RIBBIT_DECODERS_SIDDECODER_SRC})
+	source_group ("Header Files\\\\decoders\\\\siddecoder" FILES ${RIBBIT_DECODERS_SIDDECODER_HEADERS})
+	set (RIBBIT_SRC ${RIBBIT_SRC} ${RIBBIT_DECODERS_SIDDECODER_SRC})
+	set (RIBBIT_HEADERS ${RIBBIT_HEADERS} ${RIBBIT_DECODERS_SIDDECODER_HEADERS})
+	include_directories (${SIDPLAY_INCLUDES})
+
+	# Dynamic libs
+	set (RIBBIT_LIBS ${RIBBIT_LIBS} ${SIDPLAY_LIBRARY} ${RESID_LIBRARY})
+
+	# Static libs are ugly since we add references to external static libraries in toadlet
+	set (RIBBIT_DEFS_S ${RIBBIT_DEFS_S} TOADLET_LIBSIDPLAY_NAME="${SIDPLAY_LIBRARY}" TOADLET_LIBRESID_NAME="${RESID_LIBRARY}")
+	set (RIBBIT_LIBS_S ${RIBBIT_LIBS_S} libsidplay_s)
+endif (SIDPLAY_FOUND)
 
 # Dynamic library
 if (NOT TOADLET_PLATFORM_IPHONE)

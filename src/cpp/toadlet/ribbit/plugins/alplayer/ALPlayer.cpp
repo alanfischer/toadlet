@@ -37,6 +37,9 @@
 #if defined(TOADLET_HAS_OGGVORBIS)
 	#include "../decoders/oggvorbisdecoder/OggVorbisDecoder.h"
 #endif
+#if defined(TOADLET_HAS_SIDPLAY)
+	#include "../decoders/siddecoder/SIDDecoder.h"
+#endif
 #if defined(TOADLET_PLATFORM_OSX)
 	#include "../decoders/coreaudiodecoder/CoreAudioDecoder.h"
 	#include "platform/osx/CoreAudio.h"
@@ -159,6 +162,9 @@ bool ALPlayer::create(int *options){
 	#if defined(TOADLET_HAS_OGGVORBIS)
 		mCapabilitySet.mimeTypes.add(OggVorbisDecoder::mimeType());
 	#endif
+	#if defined(TOADLET_HAS_SIDPLAY)
+		mCapabilitySet.mimeTypes.add(SIDDecoder::mimeType());
+	#endif
 
 	alListenerf(AL_GAIN,1.0);
 	TOADLET_CHECK_ALERROR("alListenerf");
@@ -264,6 +270,7 @@ AudioStream::ptr ALPlayer::startAudioStream(io::Stream::ptr stream,const String 
 		return NULL;
 	}
 
+	/// @todo: Change this so the decoder creation is as it is in toadlets resource system, or at least into ribbit core, so we dont duplicate it per player
 	AudioStream::ptr decoder;
 	#if defined(TOADLET_PLATFORM_OSX)
 		decoder=AudioStream::ptr(new CoreAudioDecoder());
@@ -274,6 +281,11 @@ AudioStream::ptr ALPlayer::startAudioStream(io::Stream::ptr stream,const String 
 		#if defined(TOADLET_HAS_OGGVORBIS)
 			if(mimeType==OggVorbisDecoder::mimeType()){
 				decoder=AudioStream::ptr(new OggVorbisDecoder());
+			}
+		#endif
+		#if defined(TOADLET_HAS_SIDPLAY)
+			if(mimeType==SIDDecoder::mimeType()){
+				decoder=AudioStream::ptr(new SIDDecoder());
 			}
 		#endif
 	#endif
