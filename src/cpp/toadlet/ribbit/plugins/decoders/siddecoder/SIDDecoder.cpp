@@ -48,20 +48,24 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace ribbit{
 
+#if SIDPLAY_VERSION==1
+	static emuEngine engine;
+#endif
+
 class SIDAttributes{
 public:
 	SIDAttributes():
 		tune(0){}
 
 	#if SIDPLAY_VERSION==1
-		emuEngine player;
+		emuEngine *player;
 		emuConfig config;
-		sidTune tune;
+		sidTune *tune;
 	#elif SIDPLAY_VERSION==2
-		sidplay2 player;
+		sidplay2 *player;
 		sid2_config_t config;
 		sid2_info_t info;
-		SidTune tune;
+		SidTune *tune;
 	#endif
 };
 
@@ -69,9 +73,18 @@ SIDDecoder::SIDDecoder():
 	sid(NULL)
 {
 	sid=new SIDAttributes();
+	#if SIDPLAY_VERSION==1
+		sid->player=&engine;
+		sid->tune=new sidTune(0);
+	#elif SIDPLAY_VERSION==2
+		sid->player=new sidplay2();
+		sid->tune=new SidTune(0);
+	#endif
 }
 
 SIDDecoder::~SIDDecoder(){
+	delete sid->player;
+	delete sid->tune;
 	delete sid;
 }
 
@@ -83,9 +96,9 @@ bool SIDDecoder::startStream(Stream::ptr stream){
 
 	AudioFormatConversion::decode(stream,tuneBuffer,tuneBufferLength);
 #if SIDPLAY_VERSION==1
-	result=sid->tune.load(tuneBuffer,tuneBufferLength);
+	result=sid->tune->load(tuneBuffer,tuneBufferLength);
 #elif SIDPLAY_VERSION==2
-	result=sid->tune.read(tuneBuffer,tuneBufferLength);
+	result=sid->tune->read(tuneBuffer,tuneBufferLength);
 #endif
 	delete[] tuneBuffer;
 	if(result==false){
@@ -93,13 +106,13 @@ bool SIDDecoder::startStream(Stream::ptr stream){
 	}
 
 #if SIDPLAY_VERSION==1
-	sid->player.getConfig(mConfig);
+	sid->player->getConfig(mConfig);
 
 	sid->config.sampleFormat=SIDEMU_UNSIGNED_PCM;
 	sid->config.bitsPerSample=16;
 	sid->config.channels=1;
 
-	sid->player.setConfig(sid->config);
+	sid->player->setConfig(sid->config);
 
 	result=sidEmuInitializeSong(sid->player,sid->tune,song);
 	if(result==false){
@@ -107,28 +120,26 @@ bool SIDDecoder::startStream(Stream::ptr stream){
 		return false;
 	}
 #elif SIDPLAY_VERSION==2
-	sid->config=sid->player.config();
-	sid->info=sid->player.info();
+	sid->config=sid->player->config();
+	sid->info=sid->player->info();
 
 	ReSIDBuilder *resid=new ReSIDBuilder("ReSID");
 	resid->create(sid->info.maxsids);
-	resid->sampling(getSamplesPerSecond());
+	resid->sampling(sid->config.frequency);
 	sid->config.sidEmulation=resid;
-	sid->config.frequency=getSamplesPerSecond();
-	sid->config.precision=getBitsPerSample();
-	sid->config.playback=(getChannels()==2?sid2_stereo:sid2_mono);
+	sid->config.playback=(sid->info.channels==2?sid2_stereo:sid2_mono);
 
-	sid->player.config(sid->config);
+	sid->player->config(sid->config);
 
-	sid->tune.selectSong(song);
+	sid->tune->selectSong(song);
 
-	result=(sid->player.load(&sid->tune)>=0);
+	result=(sid->player->load(sid->tune)>=0);
 	if(result==false){
-		Error::unknown(Categories::TOADLET_RIBBIT,sid->player.error());
+		Error::unknown(Categories::TOADLET_RIBBIT,sid->player->error());
 		return false;
 	}
 
-	sid->player.fastForward(100);
+	sid->player->fastForward(100);
 #endif
 
 	return result;
@@ -138,12 +149,12 @@ bool SIDDecoder::startStream(Stream::ptr stream){
 	int SIDDecoder::getBitsPerSample(){return sid->config.bitsPerSample;}
 	int SIDDecoder::getChannels(){return sid->config.channels;}
 	int SIDDecoder::getSamplesPerSecond(){return sid->config.frequency;}
-	int SIDDecoder::read(tbyte *buffer,int length){sidEmuFillBuffer(sid->player,sid->tune,buffer,length);return length;}
+	int SIDDecoder::read(tbyte *buffer,int length){sidEmuFillBuffer(&sid->player,&sid->tune,buffer,length);return length;}
 #elif SIDPLAY_VERSION==2
 	int SIDDecoder::getBitsPerSample(){return sid->config.precision;}
 	int SIDDecoder::getChannels(){return sid->info.channels;}
 	int SIDDecoder::getSamplesPerSecond(){return sid->config.frequency;}
-	int SIDDecoder::read(tbyte *buffer,int length){return sid->player.play(buffer,length);}
+	int SIDDecoder::read(tbyte *buffer,int length){return sid->player->play(buffer,length);}
 #endif
 
 }
