@@ -32,6 +32,7 @@
 #include <string.h> // memset
 
 using namespace toadlet::egg;
+using namespace toadlet::egg::io;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole::node;
 
@@ -111,6 +112,19 @@ void StudioModelNode::destroy(){
 	}
 
 	super::destroy();
+}
+
+void StudioModelNode::setModel(const String &name){
+	Stream::ptr stream=mEngine->openStream(name);
+	if(stream==NULL){
+		Error::unknown("Unable to find level");
+		return;
+	}
+
+	StudioHandler::ptr handler(new StudioHandler(mEngine));
+	StudioModel::ptr model=shared_static_cast<StudioModel>(handler->load(stream,NULL));
+	model->setName(name);
+	setModel(model);
 }
 
 void StudioModelNode::setModel(StudioModel::ptr model){

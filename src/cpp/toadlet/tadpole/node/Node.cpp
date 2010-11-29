@@ -312,9 +312,9 @@ void Node::updateWorldTransform(){
 		mWorldTranslate.set(mTranslate);
 	}
 	else if(mTransformUpdatedFrame==-1){
-		mWorldScale.set(mParent->mScale);
-		mWorldRotate.set(mParent->mRotate);
-		mWorldTranslate.set(mParent->mTranslate);
+		mWorldScale.set(mParent->mWorldScale);
+		mWorldRotate.set(mParent->mWorldRotate);
+		mWorldTranslate.set(mParent->mWorldTranslate);
 	}
 	else{
 		Math::mul(mWorldScale,mParent->mWorldScale,mScale);

@@ -66,6 +66,7 @@ public:
 
 	void destroy();
 
+	void setModel(const egg::String &name);
 	void setModel(StudioModel::ptr model);
 	StudioModel::ptr getModel() const{return mModel;}
 
