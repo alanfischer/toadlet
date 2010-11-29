@@ -185,10 +185,12 @@ void ParentNode::frameUpdate(int dt,int scope){
 	}
 
 	int numChildren=mShadowChildren.size();
+
 	Node *child=NULL;
 	int i;
 	for(i=0;i<numChildren;++i){
 		child=mShadowChildren[i];
+
 		bool dependent=false;
 		if(child->active() && (child->getScope()&scope)!=0){
 			Node *depends=child->getDependsUpon();
