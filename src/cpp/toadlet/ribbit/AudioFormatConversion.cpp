@@ -81,7 +81,7 @@ bool AudioFormatConversion::decode(AudioStream *stream,tbyte *&finalBuffer,int &
 	bool result=decode((Stream*)stream,finalBuffer,finalLength);
 
 	#if !defined(TOADLET_NATIVE_FORMAT)
-		int bps=stream->getBitsPerSample();
+		int bps=stream->getAudioFormat().bitsPerSample;
 		if(bps==16){
 			int i=0;
 			while(i<finalLength){

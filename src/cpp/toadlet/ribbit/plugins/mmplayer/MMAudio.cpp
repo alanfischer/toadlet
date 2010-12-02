@@ -101,17 +101,15 @@ int MMAudio::read(tbyte *data,int length){
 		return 0;
 	}
 
-	int bps=mPlayer->getBitsPerSample();
-
 	int amount=0;
 	if(mAudioStream!=NULL){
-		int channels=mAudioStream->getChannels();
-		int bps=mAudioStream->getBitsPerSample();
-		int sps=mAudioStream->getSamplesPerSecond();
+		int channels=mAudioStream->getAudioFormat().channels;
+		int bps=mAudioStream->getAudioFormat().bitsPerSample;
+		int sps=mAudioStream->getAudioFormat().samplesPerSecond;
 
-		int nchannels=mPlayer->getChannels();
-		int nbps=mPlayer->getBitsPerSample();
-		int nsps=mPlayer->getSamplesPerSecond();
+		int nchannels=mPlayer->getAudioFormat().channels;
+		int nbps=mPlayer->getAudioFormat().bitsPerSample;
+		int nsps=mPlayer->getAudioFormat().samplesPerSecond;
 
 		/// @todo: This should be removed once conversion works on sps
 		nsps=sps;
@@ -164,6 +162,7 @@ int MMAudio::read(tbyte *data,int length){
 	if(amount>0){
 		int i;
 		if(mGain<Math::ONE){
+			int bps=mPlayer->getAudioFormat().bitsPerSample;
 			if(bps==8){
 				for(i=0;i<amount;++i){
 					((uint8*)data)[i]=Math::toInt(Math::mul(Math::fromInt(((int)((uint8*)data)[i])-128),mGain))+128;

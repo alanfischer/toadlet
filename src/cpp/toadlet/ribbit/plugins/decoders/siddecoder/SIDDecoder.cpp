@@ -107,10 +107,13 @@ bool SIDDecoder::startStream(Stream::ptr stream){
 
 #if SIDPLAY_VERSION==1
 	sid->player->getConfig(mConfig);
-
 	sid->config.sampleFormat=SIDEMU_UNSIGNED_PCM;
 	sid->config.bitsPerSample=16;
 	sid->config.channels=1;
+
+	mFormat.bitsPerSample=sid->config.bitsPerSample;
+	mFormat.channels=sid->config.channels;
+	mFormat.samplesPerSecond=sid->config.frequency;
 
 	sid->player->setConfig(sid->config);
 
@@ -122,6 +125,10 @@ bool SIDDecoder::startStream(Stream::ptr stream){
 #elif SIDPLAY_VERSION==2
 	sid->config=sid->player->config();
 	sid->info=sid->player->info();
+
+	mFormat.bitsPerSample=sid->config.precision;
+	mFormat.channels=sid->info.channels;
+	mFormat.samplesPerSecond=sid->config.frequency;
 
 	ReSIDBuilder *resid=new ReSIDBuilder("ReSID");
 	resid->create(sid->info.maxsids);
@@ -145,17 +152,14 @@ bool SIDDecoder::startStream(Stream::ptr stream){
 	return result;
 }
 
+int SIDDecoder::read(tbyte *buffer,int length){
 #if SIDPLAY_VERSION==1
-	int SIDDecoder::getBitsPerSample(){return sid->config.bitsPerSample;}
-	int SIDDecoder::getChannels(){return sid->config.channels;}
-	int SIDDecoder::getSamplesPerSecond(){return sid->config.frequency;}
-	int SIDDecoder::read(tbyte *buffer,int length){sidEmuFillBuffer(&sid->player,&sid->tune,buffer,length);return length;}
+	sidEmuFillBuffer(&sid->player,&sid->tune,buffer,length);
 #elif SIDPLAY_VERSION==2
-	int SIDDecoder::getBitsPerSample(){return sid->config.precision;}
-	int SIDDecoder::getChannels(){return sid->info.channels;}
-	int SIDDecoder::getSamplesPerSecond(){return sid->config.frequency;}
-	int SIDDecoder::read(tbyte *buffer,int length){return sid->player->play(buffer,length);}
+	length=sid->player->play(buffer,length);
 #endif
+	return length;
+}
 
 }
 }

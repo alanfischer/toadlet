@@ -26,8 +26,9 @@
 #ifndef TOADLET_RIBBIT_AUDIOSTREAM_H
 #define TOADLET_RIBBIT_AUDIOSTREAM_H
 
-#include <toadlet/ribbit/Types.h>
 #include <toadlet/egg/io/Stream.h>
+#include <toadlet/ribbit/Types.h>
+#include <toadlet/ribbit/AudioFormat.h>
 
 namespace toadlet{
 namespace ribbit{
@@ -39,9 +40,7 @@ public:
 	virtual ~AudioStream(){}
 
 	virtual bool startStream(egg::io::Stream::ptr stream)=0;
-	virtual int getBitsPerSample()=0;
-	virtual int getChannels()=0;
-	virtual int getSamplesPerSecond()=0;
+	virtual const AudioFormat &getAudioFormat()=0;
 };
 
 }

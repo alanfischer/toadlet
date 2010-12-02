@@ -76,9 +76,9 @@ bool ALAudioBuffer::create(Stream::ptr stream,const String &mimeType){
 bool ALAudioBuffer::create(AudioStream::ptr stream){
 	tbyte *buffer=0;
 	int length=0;
-	int channels=stream->getChannels();
-	int bps=stream->getBitsPerSample();
-	int sps=stream->getSamplesPerSecond();
+	int channels=stream->getAudioFormat().channels;
+	int bps=stream->getAudioFormat().bitsPerSample;
+	int sps=stream->getAudioFormat().samplesPerSecond;
 
 	if(AudioFormatConversion::decode(stream,buffer,length)==false){
 		Error::unknown(Categories::TOADLET_RIBBIT,

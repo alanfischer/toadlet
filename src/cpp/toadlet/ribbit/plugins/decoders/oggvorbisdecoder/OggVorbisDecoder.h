@@ -57,9 +57,7 @@ public:
 	int position();
 	bool seek(int offs);
 
-	int getChannels();
-	int getSamplesPerSecond();
-	int getBitsPerSample(){return 16;}
+	const AudioFormat &getAudioFormat(){return mFormat;}
 
 	static egg::String mimeType(){return "audio/ogg";}
 
@@ -73,6 +71,7 @@ private:
 	vorbis_info *mVorbisInfo;
 	char mDataBuffer[OGGPACKETSIZE];
 	int mDataLength;
+	AudioFormat mFormat;
 	egg::io::Stream::ptr mStream;
 };
 

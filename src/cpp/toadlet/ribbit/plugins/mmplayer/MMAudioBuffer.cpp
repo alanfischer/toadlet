@@ -57,9 +57,9 @@ bool MMAudioBuffer::create(Stream::ptr stream,const String &mimeType){
 }
 
 bool MMAudioBuffer::create(AudioStream::ptr stream){
-	int channels=stream->getChannels();
-	int bps=stream->getBitsPerSample();
-	int sps=stream->getSamplesPerSecond();
+	int channels=stream->getAudioFormat().channels;
+	int bps=stream->getAudioFormat().bitsPerSample;
+	int sps=stream->getAudioFormat().samplesPerSecond;
 	tbyte *buffer=NULL;
 	int length=0;
 
@@ -75,9 +75,9 @@ bool MMAudioBuffer::create(AudioStream::ptr stream){
 		AudioFormatConversion::fade(buffer,length,channels,bps,sps,mPlayer->getBufferFadeTime());
 	}
 
-	int nchannels=mPlayer->getChannels();	
-	int nbps=mPlayer->getBitsPerSample();
-	int nsps=mPlayer->getSamplesPerSecond();
+	int nchannels=mPlayer->getAudioFormat().channels;
+	int nbps=mPlayer->getAudioFormat().bitsPerSample;
+	int nsps=mPlayer->getAudioFormat().samplesPerSecond;
 
 	if(nchannels!=channels || nbps!=bps || nsps!=sps){
 		Logger::debug(Categories::TOADLET_RIBBIT,String("converting audio from ")+channels+","+bps+","+sps+" to "+nchannels+","+nbps+","+nsps);
