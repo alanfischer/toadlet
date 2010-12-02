@@ -303,7 +303,7 @@ void ALAudio::update(int dt){
 
 	if(mAudioStream!=NULL){
 		unsigned char buffer[bufferSize];
-		ALenum format=ALPlayer::getALFormat(mAudioStream->getBitsPerSample(),mAudioStream->getChannels());
+		ALenum format=ALPlayer::getALFormat(mAudioStream->getAudioFormat().bitsPerSample,mAudioStream->getAudioFormat().channels);
 		int total=0;
 		if(mStreamingBuffers==NULL){
 			mStreamingBuffers=new unsigned int[numBuffers];
@@ -314,7 +314,7 @@ void ALAudio::update(int dt){
 			for(i=0;i<numBuffers;++i){
 				int amount=readAudioData(buffer,bufferSize);
 				total=total+amount;
-				alBufferData(mStreamingBuffers[i],format,buffer,amount,mAudioStream->getSamplesPerSecond());
+				alBufferData(mStreamingBuffers[i],format,buffer,amount,mAudioStream->getAudioFormat().samplesPerSecond);
 				TOADLET_CHECK_ALERROR("update::alBufferData");
 			}
 			if(total==0){
@@ -350,7 +350,7 @@ void ALAudio::update(int dt){
 					int amount=readAudioData(buffer,bufferSize);
 					total=total+amount;
 					if(amount>0){
-						alBufferData(bufferID,format,buffer,amount,mAudioStream->getSamplesPerSecond());
+						alBufferData(bufferID,format,buffer,amount,mAudioStream->getAudioFormat().samplesPerSecond);
 						TOADLET_CHECK_ALERROR("update::alBufferData");
 						alSourceQueueBuffers(mHandle,1,&bufferID);
 						TOADLET_CHECK_ALERROR("update::alSourceQueueBuffers");

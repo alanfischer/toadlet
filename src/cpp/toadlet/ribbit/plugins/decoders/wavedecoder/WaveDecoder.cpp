@@ -62,9 +62,6 @@ typedef struct {
 } CHUNKHEADER;
 
 WaveDecoder::WaveDecoder(){
-	mChannels=0;
-	mSamplesPerSecond=0;
-	mBitsPerSample=0;
 	mData=NULL;
 	mSize=0;
 	mPosition=0;
@@ -85,9 +82,9 @@ bool WaveDecoder::startStream(Stream::ptr stream){
 	WAVEFORMAT fmt;
 
 	mStream=stream;
-	mChannels=1;
-	mBitsPerSample=16;
-	mSamplesPerSecond=22050;
+	mFormat.channels=1;
+	mFormat.bitsPerSample=16;
+	mFormat.samplesPerSecond=22050;
 
 	if(stream->read((tbyte*)&header,sizeof(header))!=sizeof(header)){
 		Logger::error("unable to read header");
@@ -130,9 +127,9 @@ bool WaveDecoder::startStream(Stream::ptr stream){
 			littleUInt16InPlace(fmt.nBlockAlign);
 			littleUInt16InPlace(fmt.wBitsPerSample);
 
-			mChannels=fmt.nChannels;
-			mBitsPerSample=fmt.wBitsPerSample;
-			mSamplesPerSecond=fmt.nSamplesPerSec;
+			mFormat.channels=fmt.nChannels;
+			mFormat.bitsPerSample=fmt.wBitsPerSample;
+			mFormat.samplesPerSecond=fmt.nSamplesPerSec;
 
 			skip(stream,chunk.dwSize-sizeof(fmt));
 		}

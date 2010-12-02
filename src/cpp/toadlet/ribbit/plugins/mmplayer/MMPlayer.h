@@ -70,9 +70,7 @@ public:
 
 	AudioStream::ptr startAudioStream(egg::io::Stream::ptr stream,const egg::String &mimeType);
 	int getBufferFadeTime() const{return mBufferFadeTime;}
-	int getChannels() const{return mChannels;}
-	int getBitsPerSample() const{return mBitsPerSample;}
-	int getSamplesPerSecond() const{return mSamplesPerSecond;}
+	const AudioFormat &getAudioFormat(){return mFormat;}
 
 	void internal_audioCreate(MMAudio *audio);
 	void internal_audioDestroy(MMAudio *audio);
@@ -82,9 +80,7 @@ protected:
 
 	CapabilitySet mCapabilitySet;
 
-	int mChannels;
-	int mBitsPerSample;
-	int mSamplesPerSecond;
+	AudioFormat mFormat;
 	HWAVEOUT mDevice;
 	WAVEHDR *mBuffers;
 	tbyte *mBufferData;

@@ -36,6 +36,7 @@ class TOADLET_API AudioFormatConversion{
 public:
 	static bool decode(egg::io::Stream *stream,tbyte *&finalBuffer,int &finalLength);
 	static bool decode(AudioStream *stream,tbyte *&finalBuffer,int &finalLength);
+	/// @todo: Pass in an AudioFormat instead of individual elements
 	static bool convert(tbyte *src,int srcChannels,int srcBitsPerSample,int srcSamplesPerSecond,tbyte *dst,int dstChannels,int dstBitsPerSample,int dstSamplesPerSecond,int length);
 	static void fade(tbyte *buffer,int length,int channels,int bitsPerSample,int samplesPerSecond,int fadeTime);
 	static int findConvertedLength(int length,int srcChannels,int srcBitsPerSample,int srcSamplesPerSecond,int dstChannels,int dstBitsPerSample,int dstSamplesPerSecond);

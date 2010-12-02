@@ -51,9 +51,7 @@ public:
 	int position(){return mPosition;}
 	bool seek(int offs){return false;}
 
-	int getChannels(){return mChannels;}
-	int getSamplesPerSecond(){return mSamplesPerSecond;}
-	int getBitsPerSample(){return mBitsPerSample;}
+	const AudioFormat &getAudioFormat(){return mFormat;}
 
 	static egg::String mimeType(){return "audio/wav";}
 
@@ -61,9 +59,7 @@ private:
 	void skip(egg::io::Stream::ptr stream,int amount);
 	void ADPCMDecoder(const char *in,short *out,int len);
 
-	int mChannels;
-	int mSamplesPerSecond;
-	int mBitsPerSample;
+	AudioFormat mFormat;
 	tbyte *mData;
 	int mSize;
 	int mPosition;

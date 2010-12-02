@@ -23,43 +23,25 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_SIDDECODER_H
-#define TOADLET_RIBBIT_SIDDECODER_H
+#ifndef TOADLET_RIBBIT_AUDIOFORMAT_H
+#define TOADLET_RIBBIT_AUDIOFORMAT_H
 
-#include <toadlet/ribbit/AudioStream.h>
+#include <toadlet/ribbit/Types.h>
 
 namespace toadlet{
 namespace ribbit{
 
-class SIDAttributes;
-
-class TOADLET_API SIDDecoder:public AudioStream{
+class AudioFormat{
 public:
-	SIDDecoder();
-	virtual ~SIDDecoder();
+	AudioFormat():
+		bitsPerSample(0),
+		channels(0),
+		samplesPerSecond(0)
+	{}
 
-	bool startStream(Stream::ptr stream);
-
-	const AudioFormat &getAudioFormat(){return mFormat;}
-
-	void close(){}
-	bool closed(){return false;}
-	bool readable(){return true;}
-	int read(tbyte *buffer,int length);
-
-	bool writeable(){return false;}
-	int write(const tbyte *buffer,int length){return -1;}
-
-	bool reset(){return false;}
-	int length(){return -1;}
-	int position(){return -1;}
-	bool seek(int offs){return false;}
-
-	static egg::String mimeType(){return "audio/psid";}
-
-protected:
-	AudioFormat mFormat;
-	SIDAttributes *sid;
+	int bitsPerSample;
+	int channels;
+	int samplesPerSecond;
 };
 
 }

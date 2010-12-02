@@ -61,9 +61,6 @@ TOADLET_C_API AudioPlayer* new_MMPlayer(){
 #endif
 
 MMPlayer::MMPlayer():
-	mChannels(0),
-	mBitsPerSample(0),
-	mSamplesPerSecond(0),
 	mDevice(NULL),
 	mBuffers(NULL),
 	mBufferData(NULL),
@@ -94,10 +91,10 @@ bool MMPlayer::create(int *options){
 		}
 	}
 
-	mChannels=2;
-	mBitsPerSample=16;
-	mSamplesPerSecond=44100;
-	mBufferSize=AudioFormatConversion::findConvertedLength(8192,mChannels,mBitsPerSample,mSamplesPerSecond,2,16,44100);
+	mFormat.channels=2;
+	mFormat.bitsPerSample=16;
+	mFormat.samplesPerSecond=44100;
+	mBufferSize=AudioFormatConversion::findConvertedLength(8192,mFormat.channels,mFormat.bitsPerSample,mFormat.samplesPerSecond,2,16,44100);
 	mNumBuffers=4;
 	mBufferFadeTime=100;
 
@@ -113,9 +110,9 @@ bool MMPlayer::create(int *options){
 	WAVEFORMATEX format={0};
 	format.cbSize=sizeof(WAVEFORMATEX);
 	format.wFormatTag=WAVE_FORMAT_PCM;
-	format.nChannels=mChannels;
-	format.nSamplesPerSec=mSamplesPerSecond;
-	format.wBitsPerSample=mBitsPerSample;
+	format.nChannels=mFormat.channels;
+	format.nSamplesPerSec=mFormat.samplesPerSecond;
+	format.wBitsPerSample=mFormat.bitsPerSample;
 	format.nBlockAlign=format.nChannels*format.wBitsPerSample/8;
 	format.nAvgBytesPerSec=format.nSamplesPerSec*format.nBlockAlign;
 
@@ -128,7 +125,7 @@ bool MMPlayer::create(int *options){
 	memset(mBuffers,0,sizeof(WAVEHDR)*mNumBuffers);
 
 	mBufferData=new tbyte[mNumBuffers*mBufferSize];
-	if(mBitsPerSample==8){
+	if(mFormat.bitsPerSample==8){
 		memset(mBufferData,128,mNumBuffers*mBufferSize);
 	}
 	else{
@@ -277,7 +274,7 @@ void MMPlayer::internal_audioDestroy(MMAudio *audio){
 
 // Mix all the currently playing audios
 int MMPlayer::read(tbyte *data,int length){
-	int bps=mBitsPerSample;
+	int bps=mFormat.bitsPerSample;
 
 	bool playing=false;
 	int i,j;

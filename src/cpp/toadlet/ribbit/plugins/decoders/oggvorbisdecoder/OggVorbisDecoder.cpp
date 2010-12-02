@@ -49,6 +49,7 @@ namespace ribbit{
 OggVorbisDecoder::OggVorbisDecoder(){
 	mVorbisInfo=NULL;
 	mDataLength=0;
+	mFormat.bitsPerSample=16;
 }
 
 OggVorbisDecoder::~OggVorbisDecoder(){
@@ -133,7 +134,10 @@ bool OggVorbisDecoder::startStream(egg::io::Stream::ptr stream){
 			"OggVorbisDecoder: ov_info failed");
 		return false;
 	}
-	Logger::alert(String("len:")+length());
+
+	mFormat.channels=mVorbisInfo->channels;
+	mFormat.samplesPerSecond=mVorbisInfo->rate;
+
 	return true;
 }
 
@@ -202,22 +206,6 @@ int OggVorbisDecoder::position(){
 
 bool OggVorbisDecoder::seek(int offs){
 	return ov_raw_seek(&mVorbisFile,offs)>=0;
-}
-
-int OggVorbisDecoder::getChannels(){
-	if(mVorbisInfo!=NULL){
-		return mVorbisInfo->channels;
-	}
-	
-	return 0;
-}
-
-int OggVorbisDecoder::getSamplesPerSecond(){
-	if(mVorbisInfo!=NULL){
-		return mVorbisInfo->rate;
-	}
-
-	return 0;
 }
 
 }
