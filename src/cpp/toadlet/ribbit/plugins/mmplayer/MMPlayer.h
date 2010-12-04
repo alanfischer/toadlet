@@ -70,7 +70,7 @@ public:
 
 	AudioStream::ptr startAudioStream(egg::io::Stream::ptr stream,const egg::String &mimeType);
 	int getBufferFadeTime() const{return mBufferFadeTime;}
-	const AudioFormat &getAudioFormat(){return mFormat;}
+	AudioFormat::ptr getAudioFormat(){return mFormat;}
 
 	void internal_audioCreate(MMAudio *audio);
 	void internal_audioDestroy(MMAudio *audio);
@@ -80,7 +80,7 @@ protected:
 
 	CapabilitySet mCapabilitySet;
 
-	AudioFormat mFormat;
+	AudioFormat::ptr mFormat;
 	HWAVEOUT mDevice;
 	WAVEHDR *mBuffers;
 	tbyte *mBufferData;

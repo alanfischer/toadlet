@@ -57,7 +57,7 @@ public:
 	int position();
 	bool seek(int offs);
 
-	const AudioFormat &getAudioFormat(){return mFormat;}
+	AudioFormat::ptr getAudioFormat(){return mFormat;}
 
 	static egg::String mimeType(){return "audio/ogg";}
 
@@ -71,7 +71,7 @@ private:
 	vorbis_info *mVorbisInfo;
 	char mDataBuffer[OGGPACKETSIZE];
 	int mDataLength;
-	AudioFormat mFormat;
+	AudioFormat::ptr mFormat;
 	egg::io::Stream::ptr mStream;
 };
 

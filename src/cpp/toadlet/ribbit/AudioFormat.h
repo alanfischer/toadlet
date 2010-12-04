@@ -31,17 +31,22 @@
 namespace toadlet{
 namespace ribbit{
 
-class AudioFormat{
+class TOADLET_API AudioFormat{
 public:
-	AudioFormat():
-		bitsPerSample(0),
-		channels(0),
-		samplesPerSecond(0)
+	TOADLET_SHARED_POINTERS(AudioFormat);
+
+	AudioFormat(int bps=0,int chan=0,int sps=0):
+		bitsPerSample(bps),
+		channels(chan),
+		samplesPerSecond(sps)
 	{}
 
 	int bitsPerSample;
 	int channels;
 	int samplesPerSecond;
+
+	int frameSize() const{return channels*bitsPerSample/8;}
+	bool equals(AudioFormat *format) const{return bitsPerSample!=format->bitsPerSample || channels!=format->channels || samplesPerSecond!=format->samplesPerSecond;}
 };
 
 }

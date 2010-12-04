@@ -57,9 +57,7 @@ bool MMAudioBuffer::create(Stream::ptr stream,const String &mimeType){
 }
 
 bool MMAudioBuffer::create(AudioStream::ptr stream){
-	int channels=stream->getAudioFormat().channels;
-	int bps=stream->getAudioFormat().bitsPerSample;
-	int sps=stream->getAudioFormat().samplesPerSecond;
+	AudioFormat::ptr format=stream->getAudioFormat();
 	tbyte *buffer=NULL;
 	int length=0;
 
@@ -69,28 +67,26 @@ bool MMAudioBuffer::create(AudioStream::ptr stream){
 		return false;
 	}
 
-	int numsamps=length/channels/(bps/8);
-
 	if(mPlayer->getBufferFadeTime()>0){
-		AudioFormatConversion::fade(buffer,length,channels,bps,sps,mPlayer->getBufferFadeTime());
+		AudioFormatConversion::fade(buffer,length,format,mPlayer->getBufferFadeTime());
 	}
 
-	int nchannels=mPlayer->getAudioFormat().channels;
-	int nbps=mPlayer->getAudioFormat().bitsPerSample;
-	int nsps=mPlayer->getAudioFormat().samplesPerSecond;
+	AudioFormat::ptr newFormat=mPlayer->getAudioFormat();
+	if(format!=newFormat){
+		Logger::debug(Categories::TOADLET_RIBBIT,String("converting audio from ")+
+			format->channels+","+format->bitsPerSample+","+format->samplesPerSecond+" to "+
+			newFormat->channels+","+newFormat->bitsPerSample+","+newFormat->samplesPerSecond);
 
-	if(nchannels!=channels || nbps!=bps || nsps!=sps){
-		Logger::debug(Categories::TOADLET_RIBBIT,String("converting audio from ")+channels+","+bps+","+sps+" to "+nchannels+","+nbps+","+nsps);
+		int numFrames=length/format->frameSize();
+		int newLength=numFrames*newFormat->frameSize();
+		tbyte *newBuffer=new tbyte[newLength];
 
-		int nlength=numsamps*nchannels*(nbps/8);
-		tbyte *nbuffer=new tbyte[nlength];
-
-		AudioFormatConversion::convert(buffer,channels,bps,sps,nbuffer,nchannels,nbps,nsps,length);
+		AudioFormatConversion::convert(buffer,format,newBuffer,newFormat,length);
 
 		delete[] buffer;
 
-		mLength=nlength;
-		mData=nbuffer;
+		mLength=newLength;
+		mData=newBuffer;
 	}
 	else{
 		mLength=length;

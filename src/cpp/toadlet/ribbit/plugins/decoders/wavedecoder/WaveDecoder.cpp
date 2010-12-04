@@ -52,19 +52,21 @@ typedef struct {
 
 typedef struct {
 	unsigned int	fccID;
-	int			dwSize;
+	int				dwSize;
 	unsigned int	fccType;
 } RIFFHEADER;
 
 typedef struct {
 	unsigned int	fccTag;
-	int			dwSize;
+	int				dwSize;
 } CHUNKHEADER;
 
-WaveDecoder::WaveDecoder(){
-	mData=NULL;
-	mSize=0;
-	mPosition=0;
+WaveDecoder::WaveDecoder():
+	mData(NULL),
+	mSize(0),
+	mPosition(0)
+{
+	mFormat=AudioFormat::ptr(new AudioFormat());
 }
 
 WaveDecoder::~WaveDecoder(){
@@ -72,8 +74,6 @@ WaveDecoder::~WaveDecoder(){
 		delete[] mData;
 		mData=NULL;
 	}
-
-	mSize=0;
 }
 
 bool WaveDecoder::startStream(Stream::ptr stream){
@@ -82,9 +82,9 @@ bool WaveDecoder::startStream(Stream::ptr stream){
 	WAVEFORMAT fmt;
 
 	mStream=stream;
-	mFormat.channels=1;
-	mFormat.bitsPerSample=16;
-	mFormat.samplesPerSecond=22050;
+	mFormat->channels=1;
+	mFormat->bitsPerSample=16;
+	mFormat->samplesPerSecond=22050;
 
 	if(stream->read((tbyte*)&header,sizeof(header))!=sizeof(header)){
 		Logger::error("unable to read header");
@@ -127,9 +127,9 @@ bool WaveDecoder::startStream(Stream::ptr stream){
 			littleUInt16InPlace(fmt.nBlockAlign);
 			littleUInt16InPlace(fmt.wBitsPerSample);
 
-			mFormat.channels=fmt.nChannels;
-			mFormat.bitsPerSample=fmt.wBitsPerSample;
-			mFormat.samplesPerSecond=fmt.nSamplesPerSec;
+			mFormat->channels=fmt.nChannels;
+			mFormat->bitsPerSample=fmt.wBitsPerSample;
+			mFormat->samplesPerSecond=fmt.nSamplesPerSec;
 
 			skip(stream,chunk.dwSize-sizeof(fmt));
 		}

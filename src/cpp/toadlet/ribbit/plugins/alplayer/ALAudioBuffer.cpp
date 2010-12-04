@@ -76,9 +76,7 @@ bool ALAudioBuffer::create(Stream::ptr stream,const String &mimeType){
 bool ALAudioBuffer::create(AudioStream::ptr stream){
 	tbyte *buffer=0;
 	int length=0;
-	int channels=stream->getAudioFormat().channels;
-	int bps=stream->getAudioFormat().bitsPerSample;
-	int sps=stream->getAudioFormat().samplesPerSecond;
+	AudioFormat::ptr format=stream->getAudioFormat();
 
 	if(AudioFormatConversion::decode(stream,buffer,length)==false){
 		Error::unknown(Categories::TOADLET_RIBBIT,
@@ -86,22 +84,22 @@ bool ALAudioBuffer::create(AudioStream::ptr stream){
 		return false;
 	}
 
-	int numsamps=length/channels/(bps/8);
-	mLengthTime=numsamps*1000/sps;
+	int numFrames=length/format->frameSize();
+	mLengthTime=numFrames*1000/format->samplesPerSecond;
 
 	if(mAudioPlayer->getBufferFadeTime()>0){
-		AudioFormatConversion::fade(buffer,length,channels,bps,sps,mAudioPlayer->getBufferFadeTime());
+		AudioFormatConversion::fade(buffer,length,format,mAudioPlayer->getBufferFadeTime());
 	}
 
-	ALenum format=ALPlayer::getALFormat(bps,channels);
+	ALenum alformat=ALPlayer::getALFormat(format->bitsPerSample,format->channels);
 
 	alGenBuffers(1,&mHandle);
 	if(mAudioPlayer->alBufferDataStatic!=NULL){
 		mStaticData=buffer;
-		mAudioPlayer->alBufferDataStatic(mHandle,format,mStaticData,length,sps);
+		mAudioPlayer->alBufferDataStatic(mHandle,alformat,mStaticData,length,format->samplesPerSecond);
 	}
 	else{
-		alBufferData(mHandle,format,buffer,length,sps);
+		alBufferData(mHandle,alformat,buffer,length,format->samplesPerSecond);
 		delete[] buffer;
 	}
 
