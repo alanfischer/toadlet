@@ -46,10 +46,11 @@ using namespace toadlet::egg::io;
 namespace toadlet{
 namespace ribbit{
 
-OggVorbisDecoder::OggVorbisDecoder(){
-	mVorbisInfo=NULL;
-	mDataLength=0;
-	mFormat.bitsPerSample=16;
+OggVorbisDecoder::OggVorbisDecoder():
+	mVorbisInfo(NULL),
+	mDataLength(0)
+{
+	mFormat=AudioFormat::ptr(new AudioFormat());
 }
 
 OggVorbisDecoder::~OggVorbisDecoder(){
@@ -135,8 +136,9 @@ bool OggVorbisDecoder::startStream(egg::io::Stream::ptr stream){
 		return false;
 	}
 
-	mFormat.channels=mVorbisInfo->channels;
-	mFormat.samplesPerSecond=mVorbisInfo->rate;
+	mFormat->bitsPerSample=16;
+	mFormat->channels=mVorbisInfo->channels;
+	mFormat->samplesPerSecond=mVorbisInfo->rate;
 
 	return true;
 }

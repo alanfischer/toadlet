@@ -68,6 +68,7 @@ MMPlayer::MMPlayer():
 	mNumBuffers(0),
 	mBufferSize(0)
 {
+	mFormat=AudioFormat::ptr(new AudioFormat());
 }
 
 MMPlayer::~MMPlayer(){
@@ -91,10 +92,11 @@ bool MMPlayer::create(int *options){
 		}
 	}
 
-	mFormat.channels=2;
-	mFormat.bitsPerSample=16;
-	mFormat.samplesPerSecond=44100;
-	mBufferSize=AudioFormatConversion::findConvertedLength(8192,mFormat.channels,mFormat.bitsPerSample,mFormat.samplesPerSecond,2,16,44100);
+	mFormat->channels=2;
+	mFormat->bitsPerSample=16;
+	mFormat->samplesPerSecond=44100;
+	AudioFormat standardFormat(2,16,44100);
+	mBufferSize=AudioFormatConversion::findConvertedLength(8192,mFormat,&standardFormat);
 	mNumBuffers=4;
 	mBufferFadeTime=100;
 
@@ -110,9 +112,9 @@ bool MMPlayer::create(int *options){
 	WAVEFORMATEX format={0};
 	format.cbSize=sizeof(WAVEFORMATEX);
 	format.wFormatTag=WAVE_FORMAT_PCM;
-	format.nChannels=mFormat.channels;
-	format.nSamplesPerSec=mFormat.samplesPerSecond;
-	format.wBitsPerSample=mFormat.bitsPerSample;
+	format.nChannels=mFormat->channels;
+	format.nSamplesPerSec=mFormat->samplesPerSecond;
+	format.wBitsPerSample=mFormat->bitsPerSample;
 	format.nBlockAlign=format.nChannels*format.wBitsPerSample/8;
 	format.nAvgBytesPerSec=format.nSamplesPerSec*format.nBlockAlign;
 
@@ -125,7 +127,7 @@ bool MMPlayer::create(int *options){
 	memset(mBuffers,0,sizeof(WAVEHDR)*mNumBuffers);
 
 	mBufferData=new tbyte[mNumBuffers*mBufferSize];
-	if(mFormat.bitsPerSample==8){
+	if(mFormat->bitsPerSample==8){
 		memset(mBufferData,128,mNumBuffers*mBufferSize);
 	}
 	else{
@@ -274,7 +276,7 @@ void MMPlayer::internal_audioDestroy(MMAudio *audio){
 
 // Mix all the currently playing audios
 int MMPlayer::read(tbyte *data,int length){
-	int bps=mFormat.bitsPerSample;
+	int bps=mFormat->bitsPerSample;
 
 	bool playing=false;
 	int i,j;

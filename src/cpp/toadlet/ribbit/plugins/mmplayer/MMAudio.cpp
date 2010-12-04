@@ -103,19 +103,11 @@ int MMAudio::read(tbyte *data,int length){
 
 	int amount=0;
 	if(mAudioStream!=NULL){
-		int channels=mAudioStream->getAudioFormat().channels;
-		int bps=mAudioStream->getAudioFormat().bitsPerSample;
-		int sps=mAudioStream->getAudioFormat().samplesPerSecond;
+		AudioFormat::ptr format=mAudioStream->getAudioFormat();
+		AudioFormat::ptr playerFormat=mPlayer->getAudioFormat();
 
-		int nchannels=mPlayer->getAudioFormat().channels;
-		int nbps=mPlayer->getAudioFormat().bitsPerSample;
-		int nsps=mPlayer->getAudioFormat().samplesPerSecond;
-
-		/// @todo: This should be removed once conversion works on sps
-		nsps=sps;
-
-		if(nchannels!=channels || nbps!=bps || nsps!=sps){
-			int olength=AudioFormatConversion::findConvertedLength(length,nchannels,nbps,nsps,channels,bps,sps);
+		if(format->equals(playerFormat)==false){
+			int olength=AudioFormatConversion::findConvertedLength(length,playerFormat,format);
 			tbyte *odata=new tbyte[olength];
 			amount=mAudioStream->read(odata,olength);
 			if(amount==0){
@@ -127,8 +119,8 @@ int MMAudio::read(tbyte *data,int length){
 					mPlaying=false;
 				}
 			}
-			AudioFormatConversion::convert(odata,channels,bps,sps,data,nchannels,nbps,nsps,olength);
-			amount=AudioFormatConversion::findConvertedLength(amount,channels,bps,sps,nchannels,nbps,nsps);
+			AudioFormatConversion::convert(odata,format,data,playerFormat,olength);
+			amount=AudioFormatConversion::findConvertedLength(amount,format,playerFormat);
 			delete[] odata;
 		}
 		else{
@@ -162,7 +154,7 @@ int MMAudio::read(tbyte *data,int length){
 	if(amount>0){
 		int i;
 		if(mGain<Math::ONE){
-			int bps=mPlayer->getAudioFormat().bitsPerSample;
+			int bps=mPlayer->getAudioFormat()->bitsPerSample;
 			if(bps==8){
 				for(i=0;i<amount;++i){
 					((uint8*)data)[i]=Math::toInt(Math::mul(Math::fromInt(((int)((uint8*)data)[i])-128),mGain))+128;

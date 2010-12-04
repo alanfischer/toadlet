@@ -40,7 +40,7 @@ public:
 	virtual ~AudioStream(){}
 
 	virtual bool startStream(egg::io::Stream::ptr stream)=0;
-	virtual const AudioFormat &getAudioFormat()=0;
+	virtual AudioFormat::ptr getAudioFormat()=0;
 };
 
 }

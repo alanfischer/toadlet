@@ -28,6 +28,8 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/ribbit/AudioFormatConversion.h>
 
+#pragma warning(disable:4231) // nonstandard extension used : 'extern' before template explicit
+
 #if SIDPLAY_VERSION==1
 	#include <sidplay/player.h>
 #elif SIDPLAY_VERSION==2
@@ -72,6 +74,7 @@ public:
 SIDDecoder::SIDDecoder():
 	sid(NULL)
 {
+	mFormat=AudioFormat::ptr(new AudioFormat());
 	sid=new SIDAttributes();
 	#if SIDPLAY_VERSION==1
 		sid->player=&engine;
@@ -111,9 +114,9 @@ bool SIDDecoder::startStream(Stream::ptr stream){
 	sid->config.bitsPerSample=16;
 	sid->config.channels=1;
 
-	mFormat.bitsPerSample=sid->config.bitsPerSample;
-	mFormat.channels=sid->config.channels;
-	mFormat.samplesPerSecond=sid->config.frequency;
+	mFormat->bitsPerSample=sid->config.bitsPerSample;
+	mFormat->channels=sid->config.channels;
+	mFormat->samplesPerSecond=sid->config.frequency;
 
 	sid->player->setConfig(sid->config);
 
@@ -126,9 +129,9 @@ bool SIDDecoder::startStream(Stream::ptr stream){
 	sid->config=sid->player->config();
 	sid->info=sid->player->info();
 
-	mFormat.bitsPerSample=sid->config.precision;
-	mFormat.channels=sid->info.channels;
-	mFormat.samplesPerSecond=sid->config.frequency;
+	mFormat->bitsPerSample=sid->config.precision;
+	mFormat->channels=sid->info.channels;
+	mFormat->samplesPerSecond=sid->config.frequency;
 
 	ReSIDBuilder *resid=new ReSIDBuilder("ReSID");
 	resid->create(sid->info.maxsids);

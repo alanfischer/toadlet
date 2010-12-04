@@ -81,8 +81,7 @@ bool AudioFormatConversion::decode(AudioStream *stream,tbyte *&finalBuffer,int &
 	bool result=decode((Stream*)stream,finalBuffer,finalLength);
 
 	#if !defined(TOADLET_NATIVE_FORMAT)
-		int bps=stream->getAudioFormat().bitsPerSample;
-		if(bps==16){
+		if(stream->getAudioFormat()->bitsPerSample==16){
 			int i=0;
 			while(i<finalLength){
 				littleInt16InPlace((int16&)finalBuffer[i]);
@@ -94,31 +93,33 @@ bool AudioFormatConversion::decode(AudioStream *stream,tbyte *&finalBuffer,int &
 	return result;
 }
 
-bool AudioFormatConversion::convert(tbyte *src,int srcChannels,int srcBitsPerSample,int srcSamplesPerSecond,tbyte *dst,int dstChannels,int dstBitsPerSample,int dstSamplesPerSecond,int length){
+bool AudioFormatConversion::convert(tbyte *src,AudioFormat *srcFormat,tbyte *dst,AudioFormat *dstFormat,int length){
 	/// @todo: Add in sps conversion
 
 	int i=0,v=0;
-	int sbps=srcBitsPerSample;
-	int dbps=dstBitsPerSample;
-	int ss=srcChannels*(srcBitsPerSample/8);
-	int ds=dstChannels*(dstBitsPerSample/8);
-	int numSamples=length/srcChannels/(srcBitsPerSample/8);
+	int sbps=srcFormat->bitsPerSample;
+	int dbps=dstFormat->bitsPerSample;
+	int sc=srcFormat->channels;
+	int dc=dstFormat->channels;
+	int ss=srcFormat->frameSize();
+	int ds=dstFormat->frameSize();
+	int numFrames=length/srcFormat->frameSize();
 
 	/// @todo: Replace this with individual optimized versions
-	for(i=0;i<numSamples;++i){
+	for(i=0;i<numFrames;++i){
 		if(sbps==8) v=(*(uint8*)(src+i*ss))-128;
 		else v=*(int16*)(src+i*ss);
-		if(srcBitsPerSample==8 && dstBitsPerSample==16){v=Math::intClamp(Extents::MIN_INT16,Extents::MAX_INT16,v*256);}
-		else if(srcBitsPerSample==16 && dstBitsPerSample==8){v=Math::intClamp(Extents::MIN_INT8,Extents::MAX_INT8,v/256);}
+		if(sbps==8 && dbps==16){v=Math::intClamp(Extents::MIN_INT16,Extents::MAX_INT16,v*256);}
+		else if(sbps==16 && dbps==8){v=Math::intClamp(Extents::MIN_INT8,Extents::MAX_INT8,v/256);}
 		if(dbps==8) *(uint8*)(dst+i*ds)=v+128;
 		else *(int16*)(dst+i*ds)=v;
 
-		if(dstChannels==2){
-			if(srcChannels==2){
+		if(dc==2){
+			if(sc==2){
 				if(sbps==8) v=(*(uint8*)(src+i*ss+ss/2))-128;
 				else v=*(int16*)(src+i*ss+ss/2);
-				if(srcBitsPerSample==8 && dstBitsPerSample==16){v=Math::intClamp(Extents::MIN_INT16,Extents::MAX_INT16,v*256);}
-				else if(srcBitsPerSample==16 && dstBitsPerSample==8){v=Math::intClamp(Extents::MIN_INT8,Extents::MAX_INT8,v/256);}
+				if(sbps==8 && dbps==16){v=Math::intClamp(Extents::MIN_INT16,Extents::MAX_INT16,v*256);}
+				else if(sbps==16 && dbps==8){v=Math::intClamp(Extents::MIN_INT8,Extents::MAX_INT8,v/256);}
 			}
 			if(dbps==8) *(uint8*)(dst+i*ds+ds/2)=v+128;
 			else *(int16*)(dst+i*ds+ds/2)=v;
@@ -128,40 +129,41 @@ bool AudioFormatConversion::convert(tbyte *src,int srcChannels,int srcBitsPerSam
 	return true;
 }
 
-void AudioFormatConversion::fade(tbyte *buffer,int length,int channels,int bitsPerSample,int samplesPerSecond,int fadeTime){
-	int numsamps=length/channels/(bitsPerSample/8);
-	int stf=samplesPerSecond*fadeTime/1000;
-	if(stf>numsamps){stf=numsamps;}
+void AudioFormatConversion::fade(tbyte *buffer,int length,AudioFormat *format,int fadeTime){
+	int channels=format->channels;
+	int numFrames=length/format->frameSize();
+	int ftf=format->samplesPerSecond*fadeTime/1000;
+	if(ftf>numFrames){ftf=numFrames;}
 	int i,j;
-	if(bitsPerSample==8){
-		for(i=0;i<stf;++i){
+	if(format->bitsPerSample==8){
+		for(i=0;i<ftf;++i){
 			// Fade front
 			for(j=0;j<channels;++j){
-				buffer[i*channels+j]=(uint8)(((((int)buffer[i*channels+j])-128)*i/stf)+128);
+				buffer[i*channels+j]=(uint8)(((((int)buffer[i*channels+j])-128)*i/ftf)+128);
 			}
 			// Fade back
 			for(j=0;j<channels;++j){
-				buffer[(numsamps-i-1)*channels+j]=(uint8)(((((int)buffer[(numsamps-i-1)*channels+j])-128)*i/stf)+128);
+				buffer[(numFrames-i-1)*channels+j]=(uint8)(((((int)buffer[(numFrames-i-1)*channels+j])-128)*i/ftf)+128);
 			}
 		}
 	}
-	else if(bitsPerSample==16){
+	else if(format->bitsPerSample==16){
 		int16 *buffer16=(int16*)buffer;
-		for(i=0;i<stf;++i){
+		for(i=0;i<ftf;++i){
 			// Fade front
 			for(j=0;j<channels;++j){
-				buffer16[i*channels+j]=(int16)(((int)buffer16[i*channels+j])*i/stf);
+				buffer16[i*channels+j]=(int16)(((int)buffer16[i*channels+j])*i/ftf);
 			}
 			// Fade back
 			for(j=0;j<channels;++j){
-				buffer16[(numsamps-i-1)*channels+j]=(int16)(((int)buffer16[(numsamps-i-1)*channels+j])*i/stf);
+				buffer16[(numFrames-i-1)*channels+j]=(int16)(((int)buffer16[(numFrames-i-1)*channels+j])*i/ftf);
 			}
 		}
 	}
 }
 
-int AudioFormatConversion::findConvertedLength(int length,int srcChannels,int srcBitsPerSample,int srcSamplesPerSecond,int dstChannels,int dstBitsPerSample,int dstSamplesPerSecond){
-	return (int)(length * ((float)(dstChannels*dstBitsPerSample*srcSamplesPerSecond)/(float)(srcChannels*srcBitsPerSample*dstSamplesPerSecond)));
+int AudioFormatConversion::findConvertedLength(int length,AudioFormat *srcFormat,AudioFormat *dstFormat){
+	return (int)(length * ((float)(dstFormat->channels*dstFormat->bitsPerSample*srcFormat->samplesPerSecond)/(float)(srcFormat->channels*srcFormat->bitsPerSample*dstFormat->samplesPerSecond)));
 }
 
 }

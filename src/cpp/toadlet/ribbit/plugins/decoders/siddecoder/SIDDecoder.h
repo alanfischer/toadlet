@@ -40,7 +40,7 @@ public:
 
 	bool startStream(Stream::ptr stream);
 
-	const AudioFormat &getAudioFormat(){return mFormat;}
+	AudioFormat::ptr getAudioFormat(){return mFormat;}
 
 	void close(){}
 	bool closed(){return false;}
@@ -58,7 +58,7 @@ public:
 	static egg::String mimeType(){return "audio/psid";}
 
 protected:
-	AudioFormat mFormat;
+	AudioFormat::ptr mFormat;
 	SIDAttributes *sid;
 };
 
