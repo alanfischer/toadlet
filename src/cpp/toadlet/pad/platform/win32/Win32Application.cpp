@@ -116,6 +116,7 @@ struct Win32Attributes{
 	egg::String mClassName;
 	HWND mWnd;
 	HICON mIcon;
+	int mJoyID;
 	JOYINFOEX mJoyInfo,mLastJoyInfo;
 };
 
@@ -170,6 +171,7 @@ Win32Application::Win32Application():
 	win32->mInstance=0;
 	win32->mWnd=0;
 	win32->mIcon=0;
+	win32->mJoyID=0;
 	memset(&win32->mJoyInfo,0,sizeof(JOYINFOEX));
 	memset(&win32->mLastJoyInfo,0,sizeof(JOYINFOEX));
 
@@ -203,6 +205,18 @@ void Win32Application::create(int renderer,int audioPlayer,int motionDetector){
 	win32->mJoyInfo.dwSize=sizeof(JOYINFOEX);
 	win32->mJoyInfo.dwFlags=JOY_RETURNALL;
 	memcpy(&win32->mLastJoyInfo,&win32->mJoyInfo,sizeof(JOYINFOEX));
+	int numJoys=0;
+	int joyID=JOYSTICKID1;
+	HRESULT result=S_OK;
+	while((result=joyGetPosEx(joyID++,&win32->mJoyInfo))!=JOYERR_PARMS){
+		if(result==JOYERR_NOERROR){numJoys++;}
+	}
+	if(numJoys>0){
+		win32->mJoyID=JOYSTICKID1;
+	}
+	else{
+		win32->mJoyID=-1;
+	}
 
 	if(renderer!=RendererPlugin_NONE){
 		changeRendererPlugin(renderer);
@@ -288,9 +302,9 @@ void Win32Application::stepEventLoop(){
 		}
 	}
 
-	{
+	if(win32->mJoyID>=JOYSTICKID1){
 		JOYINFOEX *joyInfo=&win32->mJoyInfo,*lastJoyInfo=&win32->mLastJoyInfo;
-		MMRESULT result=joyGetPosEx(JOYSTICKID1,joyInfo);
+		MMRESULT result=joyGetPosEx(win32->mJoyID,joyInfo);
 		if(	joyInfo->dwXpos!=lastJoyInfo->dwXpos || joyInfo->dwYpos!=lastJoyInfo->dwYpos || joyInfo->dwZpos!=lastJoyInfo->dwZpos ||
 			joyInfo->dwRpos!=lastJoyInfo->dwRpos || joyInfo->dwUpos!=lastJoyInfo->dwUpos || joyInfo->dwVpos!=lastJoyInfo->dwVpos){
 			joyMoved(joyToScalar(joyInfo->dwXpos),joyToScalar(joyInfo->dwYpos),joyToScalar(joyInfo->dwZpos),joyToScalar(joyInfo->dwRpos),joyToScalar(joyInfo->dwUpos),joyToScalar(joyInfo->dwVpos));

@@ -98,7 +98,9 @@ public:
 		return radius;
 	}
 
-	inline bool equals(const Sphere &sphere) const{
+	void merge(const Sphere &sphere);
+
+	inline bool equaxls(const Sphere &sphere) const{
 		return (sphere.origin.equals(origin) && sphere.radius==radius);
 	}
 
