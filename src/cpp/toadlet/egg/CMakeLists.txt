@@ -53,6 +53,7 @@ set (EGG_MATH_SRC
 	math/Matrix4x4.cpp
 	math/Plane.cpp
 	math/Quaternion.cpp
+	math/Sphere.cpp
 )
 
 set (EGG_MATHFIXED_SRC
@@ -62,7 +63,8 @@ set (EGG_MATHFIXED_SRC
 	mathfixed/Matrix3x3_fixed.cpp
 	mathfixed/Matrix4x4_fixed.cpp
 	mathfixed/Plane_fixed.cpp
-	mathfixed/Quaternion.cpp
+	mathfixed/Quaternion_fixed.cpp
+	mathfixed/Sphere_fixed.cpp
 )
 
 set (EGG_NET_SRC

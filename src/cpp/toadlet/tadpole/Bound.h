@@ -115,10 +115,7 @@ public:
 		else{
 			// Just switch to a sphere
 			type=Type_SPHERE;
-			Vector3 origin=(sphere.origin+b.sphere.origin)/2;
-			scalar radius=Math::maxVal(Math::length(sphere.origin,origin)+Math::maxVal(sphere.radius,0),Math::length(b.sphere.origin,origin)+Math::maxVal(b.sphere.radius,0));
-			sphere.origin.set(origin);
-			sphere.radius=radius;
+			sphere.merge(b.sphere);
 		}
 		update();
 	}

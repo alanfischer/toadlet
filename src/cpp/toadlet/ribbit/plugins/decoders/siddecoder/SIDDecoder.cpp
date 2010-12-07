@@ -51,6 +51,7 @@ namespace toadlet{
 namespace ribbit{
 
 #if SIDPLAY_VERSION==1
+	// The sidplay1 engine can not be reused after deallocation, so allocate it statically
 	static emuEngine engine;
 #endif
 

@@ -77,6 +77,11 @@ bool MMAudioBuffer::create(AudioStream::ptr stream){
 			format->channels+","+format->bitsPerSample+","+format->samplesPerSecond+" to "+
 			newFormat->channels+","+newFormat->bitsPerSample+","+newFormat->samplesPerSecond);
 
+		if(format->samplesPerSecond!=newFormat->samplesPerSecond){
+			Logger::warning(Categories::TOADLET_RIBBIT,
+				"audio rate conversion not implemented, not converting rate");
+		}
+
 		int numFrames=length/format->frameSize();
 		int newLength=numFrames*newFormat->frameSize();
 		tbyte *newBuffer=new tbyte[newLength];

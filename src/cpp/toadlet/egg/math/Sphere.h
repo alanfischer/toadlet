@@ -98,6 +98,8 @@ public:
 		return radius;
 	}
 
+	void merge(const Sphere &sphere);
+
 	inline bool equals(const Sphere &sphere) const{
 		return (sphere.origin.equals(origin) && sphere.radius==radius);
 	}

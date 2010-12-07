@@ -50,6 +50,7 @@
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/SensorResultsListener.h>
+#include <toadlet/tadpole/SensorResultsCollection.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/Track.h>
