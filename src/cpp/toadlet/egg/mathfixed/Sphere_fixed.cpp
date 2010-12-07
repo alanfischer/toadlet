@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/math/Sphere.h>
-#include <toadlet/egg/math/Math.h>
+#include <toadlet/egg/mathfixed/Sphere.h>
+#include <toadlet/egg/mathfixed/Math.h>
 
 namespace toadlet{
 namespace egg{
