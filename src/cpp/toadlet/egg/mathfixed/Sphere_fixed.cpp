@@ -30,11 +30,28 @@ namespace toadlet{
 namespace egg{
 namespace mathfixed{
 
-void Sphere::merge(const Sphere &sphere){
-	Vector3 o=(origin+sphere.origin)/2;
-	scalar r=Math::maxVal(Math::length(origin,o)+Math::maxVal(radius,0),Math::length(sphere.origin,o)+Math::maxVal(sphere.radius,0));
-	origin.set(o);
-	radius=r;
+void Sphere::merge(const Sphere &sphere,fixed epsilon){
+	Vector3 originDifference;
+	Math::sub(originDifference,sphere.origin,origin);
+	fixed lengthSquared=Math::lengthSquared(originDifference);
+	fixed radiusDifference=sphere.radius-radius;
+	fixed radiusSquared=Math::square(radiusDifference);
+
+	if(radiusSquared>=lengthSquared){
+		if(radiusSquared>0){
+			origin.set(sphere.origin);
+			radius=sphere.radius;
+		}
+	}
+	else{
+		fixed length=Math::sqrt(lengthSquared);
+		if(length > Math::ONE+epsilon){
+			fixed coefficient=Math::div(length+radiusDifference , length<<1);
+			Math::madd(origin,originDifference,coefficient,origin);
+		}
+
+		radius=(length + radiusDifference + sphere.radius)>>1;
+	}
 }
 
 }

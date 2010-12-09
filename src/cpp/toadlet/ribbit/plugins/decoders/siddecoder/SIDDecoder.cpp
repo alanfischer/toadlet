@@ -98,6 +98,16 @@ bool SIDDecoder::startStream(Stream::ptr stream){
 	int tuneBufferLength=0;
 	int song=0;
 
+	tbyte type[4];
+	int amount=stream->read(type,4);
+	stream->reset();
+
+	if(amount<4 || (memcmp(type,"PSID",4)!=0 && memcmp(type,"RSID",4)!=0)){
+		Error::unknown(Categories::TOADLET_RIBBIT,
+			"not PSID or RSID type");
+		return false;
+	}
+
 	AudioFormatConversion::decode(stream,tuneBuffer,tuneBufferLength);
 #if SIDPLAY_VERSION==1
 	result=sid->tune->load(tuneBuffer,tuneBufferLength);
