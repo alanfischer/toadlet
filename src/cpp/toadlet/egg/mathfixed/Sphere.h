@@ -98,7 +98,7 @@ public:
 		return radius;
 	}
 
-	void merge(const Sphere &sphere);
+	void merge(const Sphere &sphere,fixed epsilon);
 
 	inline bool equaxls(const Sphere &sphere) const{
 		return (sphere.origin.equals(origin) && sphere.radius==radius);

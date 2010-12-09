@@ -39,9 +39,12 @@ public:
 		Type_INFINITE=		1<<2,
 	};
 
-	Bound():type(Type_AABOX){}
+	Bound():
+		type(Type_AABOX),
+		epsilon(Math::fromMilli(1))
+	{}
 
-	/// @todo: Eliminiate the -1 for inifinite, and just replace it with the infinits type checks
+	/// @todo: Eliminiate the -1 for inifinite, and just replace it with the infinite type checks
 	Bound(Type t){
 		TOADLET_ASSERT(t==Type_INFINITE);
 		type=t;
@@ -115,7 +118,7 @@ public:
 		else{
 			// Just switch to a sphere
 			type=Type_SPHERE;
-			sphere.merge(b.sphere);
+			sphere.merge(b.sphere,epsilon);
 		}
 		update();
 	}
@@ -195,6 +198,7 @@ protected:
 	}
 
 	Type type;
+	scalar epsilon;
 	Sphere sphere;
 	AABox box;
 };

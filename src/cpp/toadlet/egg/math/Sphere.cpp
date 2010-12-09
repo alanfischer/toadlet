@@ -30,11 +30,29 @@ namespace toadlet{
 namespace egg{
 namespace math{
 
-void Sphere::merge(const Sphere &sphere){
-	Vector3 o=(origin+sphere.origin)/2;
-	scalar r=Math::maxVal(Math::length(origin,o)+Math::maxVal(radius,0),Math::length(sphere.origin,o)+Math::maxVal(sphere.radius,0));
-	origin.set(o);
-	radius=r;
+/// @todo: Write a unit test for this
+void Sphere::merge(const Sphere &sphere,real epsilon){
+	Vector3 originDifference;
+	Math::sub(originDifference,sphere.origin,origin);
+	real lengthSquared=Math::lengthSquared(originDifference);
+	real radiusDifference=sphere.radius-radius;
+	real radiusSquared=Math::square(radiusDifference);
+
+	if(radiusSquared>=lengthSquared){
+		if(radiusSquared>0){
+			origin.set(sphere.origin);
+			radius=sphere.radius;
+		}
+	}
+	else{
+		real length=Math::sqrt(lengthSquared);
+		if(length > Math::ONE+epsilon){
+			real coefficient=(length+radiusDifference) / (length*2.0f);
+			Math::madd(origin,originDifference,coefficient,origin);
+		}
+
+		radius=Math::HALF * (length + radiusDifference + sphere.radius);
+	}
 }
 
 }
