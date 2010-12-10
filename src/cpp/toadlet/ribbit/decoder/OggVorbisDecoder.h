@@ -23,26 +23,26 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_COREAUDIODECODER_H
-#define TOADLET_RIBBIT_COREAUDIODECODER_H
+#ifndef TOADLET_RIBBIT_DECODER_OGGVORBISDECODER_H
+#define TOADLET_RIBBIT_DECODER_OGGVORBISDECODER_H
 
 #include <toadlet/ribbit/AudioStream.h>
-#include <AudioToolbox/AudioToolbox.h>
-
-#include <toadlet/egg/Collection.h>
+#include <vorbis/codec.h>
+#include <vorbis/vorbisfile.h>
 
 namespace toadlet{
 namespace ribbit{
+namespace decoder{
 
-class CoreAudioDecoder:public AudioStream{
+const int OGGPACKETSIZE=4096;
+
+class TOADLET_API OggVorbisDecoder:public AudioStream{
 public:
-	TOADLET_SHARED_POINTERS(CoreAudioDecoder);
+	OggVorbisDecoder();
+	virtual ~OggVorbisDecoder();
 
-	CoreAudioDecoder();
-	virtual ~CoreAudioDecoder();
-
-	bool closed(){return mAudioFile==NULL;}
 	void close();
+	bool closed(){return mVorbisInfo==NULL;}
 
 	bool readable(){return true;}
 	int read(tbyte *buffer,int length);
@@ -52,33 +52,32 @@ public:
 
 	bool startStream(egg::io::Stream::ptr stream);
 	bool stopStream();
+
 	bool reset();
-	int length(){return -1;}
-	int position(){return -1;}
-	bool seek(int offs){return false;}
+	int length();
+	int position();
+	bool seek(int offs);
 
-	int getChannels(){return mStreamDescription.mChannelsPerFrame;}
-	int getSamplesPerSecond(){return mStreamDescription.mSampleRate;}
-	int getBitsPerSample(){return mStreamDescription.mBitsPerChannel;}
+	AudioFormat::ptr getAudioFormat(){return mFormat;}
 
-	inline AudioFileID getAudioFileID() const{return mAudioFile;}
-	inline const AudioStreamBasicDescription &getStreamDescription() const{return mStreamDescription;}
-	bool isVariableBitRate() const;
+	static egg::String mimeType(){return "audio/ogg";}
 
 private:
-	static OSStatus audioFileRead(void *inRefCon,SInt64 inPosition,UInt32 requestCount,void *buffer,UInt32 *actualCount);
-	static SInt64 audioFileGetSize(void *inRefCon);
+	static size_t read_func(void *ptr,size_t size,size_t nmemb, void *datasource);
+	static int seek_func(void *datasource, ogg_int64_t offset, int whence);
+	static int close_func(void *datasource);
+	static long tell_func(void *datasource);
 
-	int mPosition;
-	int mSourceSize;
-	int mSourcePosition;
-	egg::io::Stream::ptr mIn;
-	AudioFileID mAudioFile;
-	AudioStreamBasicDescription mStreamDescription;
+	OggVorbis_File mVorbisFile;
+	vorbis_info *mVorbisInfo;
+	char mDataBuffer[OGGPACKETSIZE];
+	int mDataLength;
+	AudioFormat::ptr mFormat;
+	egg::io::Stream::ptr mStream;
 };
 
 }
 }
+}
 
 #endif
-

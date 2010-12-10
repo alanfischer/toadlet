@@ -37,7 +37,7 @@
 #include <toadlet/ribbit/AudioBuffer.h>
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/ArchiveManager.h>
-#include <toadlet/tadpole/AudioBufferData.h>
+#include <toadlet/tadpole/AudioBufferManager.h>
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/FontData.h>
 #include <toadlet/tadpole/FontManager.h>
@@ -100,7 +100,7 @@ public:
 	inline MaterialManager *getMaterialManager() const{return  mMaterialManager;}
 	inline FontManager *getFontManager() const{return mFontManager;}
 	inline MeshManager *getMeshManager() const{return mMeshManager;}
-	inline ResourceManager *getAudioBufferManager() const{return mAudioBufferManager;}
+	inline AudioBufferManager *getAudioBufferManager() const{return mAudioBufferManager;}
 
 protected:
 	egg::String mDirectory;
@@ -118,8 +118,7 @@ protected:
 	MaterialManager *mMaterialManager;
 	FontManager *mFontManager;
 	MeshManager *mMeshManager;
-	ResourceManager *mAudioBufferManager;
-	handler::AudioBufferHandler::ptr mAudioBufferHandler;
+	AudioBufferManager *mAudioBufferManager;
 	
 	egg::TypeFactory<node::Node> mNodeFactory;
 };

@@ -42,8 +42,10 @@ public:
 	virtual Node *create(Scene *scene);
 	virtual void destroy();
 
+	bool setAudioBuffer(const egg::String &name);
 	bool setAudioBuffer(const ribbit::AudioBuffer::ptr &audioBuffer);
-	bool setAudioStream(egg::io::Stream::ptr stream,const egg::String &mimeType);
+
+	bool setAudioStream(const egg::String &name);
 	bool setAudioStream(ribbit::AudioStream::ptr stream);
 
 	inline bool play(){if(mAudio!=NULL){return mAudio->play();}else{return false;}}

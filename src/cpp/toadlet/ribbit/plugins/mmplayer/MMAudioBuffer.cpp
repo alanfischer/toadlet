@@ -46,16 +46,6 @@ MMAudioBuffer::~MMAudioBuffer(){
 	destroy();
 }
 
-
-bool MMAudioBuffer::create(Stream::ptr stream,const String &mimeType){
-	AudioStream::ptr audioStream=mPlayer->startAudioStream(stream,mimeType);
-	if(audioStream==NULL){
-		return false;
-	}
-
-	return create(audioStream);
-}
-
 bool MMAudioBuffer::create(AudioStream::ptr stream){
 	AudioFormat::ptr format=stream->getAudioFormat();
 	tbyte *buffer=NULL;

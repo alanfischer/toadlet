@@ -33,18 +33,6 @@
 #include <stdlib.h>
 #include <string.h> // memcpy
 
-#include "../decoders/wavedecoder/WaveDecoder.h"
-#if defined(TOADLET_HAS_OGGVORBIS)
-	#include "../decoders/oggvorbisdecoder/OggVorbisDecoder.h"
-#endif
-#if defined(TOADLET_HAS_SIDPLAY)
-	#include "../decoders/siddecoder/SIDDecoder.h"
-#endif
-#if defined(TOADLET_PLATFORM_OSX)
-	#include "../decoders/coreaudiodecoder/CoreAudioDecoder.h"
-	#include "platform/osx/CoreAudio.h"
-#endif
-
 #if defined(TOADLET_PLATFORM_WIN32)
 	#if defined(TOADLET_LIBOPENAL_NAME)
 		#pragma comment(lib,TOADLET_LIBOPENAL_NAME)
@@ -158,13 +146,6 @@ bool ALPlayer::create(int *options){
 	mCapabilitySet.maxSources=8;
 	mCapabilitySet.streaming=true;
 	mCapabilitySet.positional=true;
-	mCapabilitySet.mimeTypes.add(WaveDecoder::mimeType());
-	#if defined(TOADLET_HAS_OGGVORBIS)
-		mCapabilitySet.mimeTypes.add(OggVorbisDecoder::mimeType());
-	#endif
-	#if defined(TOADLET_HAS_SIDPLAY)
-		mCapabilitySet.mimeTypes.add(SIDDecoder::mimeType());
-	#endif
 
 	alListenerf(AL_GAIN,1.0);
 	TOADLET_CHECK_ALERROR("alListenerf");
@@ -261,48 +242,6 @@ void ALPlayer::update(int dt){
 			}
 		#endif
 	unlock();
-}
-
-AudioStream::ptr ALPlayer::startAudioStream(io::Stream::ptr stream,const String &mimeType){
-	if(stream==NULL){
-		Error::nullPointer(Categories::TOADLET_RIBBIT,
-			"null Stream");
-		return NULL;
-	}
-
-	/// @todo: Change this so the decoder creation is as it is in toadlets resource system, or at least into ribbit core, so we dont duplicate it per player
-	AudioStream::ptr decoder;
-	#if defined(TOADLET_PLATFORM_OSX)
-		decoder=AudioStream::ptr(new CoreAudioDecoder());
-	#else
-		if(mimeType==WaveDecoder::mimeType()){
-			decoder=AudioStream::ptr(new WaveDecoder());
-		}
-		#if defined(TOADLET_HAS_OGGVORBIS)
-			if(mimeType==OggVorbisDecoder::mimeType()){
-				decoder=AudioStream::ptr(new OggVorbisDecoder());
-			}
-		#endif
-		#if defined(TOADLET_HAS_SIDPLAY)
-			if(mimeType==SIDDecoder::mimeType()){
-				decoder=AudioStream::ptr(new SIDDecoder());
-			}
-		#endif
-	#endif
-
-	if(decoder==NULL){
-		Error::unknown(Categories::TOADLET_RIBBIT,
-			"MIME type not supported: " + mimeType);
-		return NULL;
-	}
-
-	if(decoder->startStream(stream)==false){
-		Error::unknown(Categories::TOADLET_RIBBIT,
-			"error starting decoder stream");
-		return NULL;
-	}
-
-	return decoder;
 }
 
 void ALPlayer::setListenerTranslate(const Vector3 &translate){

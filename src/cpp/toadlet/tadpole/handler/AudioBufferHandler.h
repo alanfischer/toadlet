@@ -27,8 +27,7 @@
 #define TOADLET_TADPOLE_HANDLER_AUDIOBUFFERHANDLER_H
 
 #include <toadlet/tadpole/ResourceHandler.h>
-#include <toadlet/ribbit/AudioBuffer.h>
-#include <toadlet/ribbit/AudioPlayer.h>
+#include <toadlet/tadpole/AudioBufferManager.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -36,16 +35,18 @@ namespace handler{
 
 class TOADLET_API AudioBufferHandler:public ResourceHandler{
 public:
-	typedef egg::SharedPointer<AudioBufferHandler> Ptr;
+	TOADLET_SHARED_POINTERS(AudioBufferHandler);
 
-	AudioBufferHandler(ribbit::AudioPlayer *player);
+	AudioBufferHandler(AudioBufferManager *manager){mAudioBufferManager=manager;}
 
-	void setAudioPlayer(ribbit::AudioPlayer *player);
+	virtual ribbit::AudioStream::ptr createAudioStream(egg::io::Stream::ptr stream)=0;
 
-	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
+	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData){
+		return mAudioBufferManager->createAudioBuffer(createAudioStream(stream));
+	}
 
 protected:
-	ribbit::AudioPlayer *mAudioPlayer;
+	AudioBufferManager *mAudioBufferManager;
 };
 
 }

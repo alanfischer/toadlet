@@ -44,7 +44,6 @@ public:
 	int maxSources;
 	bool streaming;
 	bool positional;
-	egg::Collection<egg::String> mimeTypes;
 };
 
 }

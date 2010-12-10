@@ -88,21 +88,6 @@ bool ALAudio::create(AudioBuffer::ptr audioBuffer){
 	return true;
 }
 
-bool ALAudio::create(Stream::ptr stream,const String &mimeType){
-	AudioStream::ptr audioStream=NULL;
-	TOADLET_TRY{
-		audioStream=mAudioPlayer->startAudioStream(stream,mimeType);
-	}TOADLET_CATCH(const Exception &){
-		audioStream=NULL;
-	}
-
-	if(audioStream==NULL){
-		return false;
-	}
-
-	return create(audioStream);
-}
-
 bool ALAudio::create(AudioStream::ptr stream){
 	destroy();
 

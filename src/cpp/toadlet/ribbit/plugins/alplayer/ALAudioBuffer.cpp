@@ -54,25 +54,6 @@ ALAudioBuffer::~ALAudioBuffer(){
 	destroy();
 }
 
-bool ALAudioBuffer::create(Stream::ptr stream,const String &mimeType){
-	destroy();
-
-	AudioStream::ptr audioStream=mAudioPlayer->startAudioStream(stream,mimeType);
-	if(audioStream==NULL){
-		return false;
-	}
-
-	#if defined(TOADLET_PLATFORM_OSX)
-		if(((CoreAudioDecoder*)audioStream.get())->isVariableBitRate()){
-			Error::unknown(Categories::TOADLET_RIBBIT,
-				"Variable bit rate streams not supported as AudioBuffers");
-			return false;
-		}
-	#endif
-
-	return create(audioStream);
-}
-
 bool ALAudioBuffer::create(AudioStream::ptr stream){
 	tbyte *buffer=0;
 	int length=0;

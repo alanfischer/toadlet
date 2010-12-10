@@ -8,16 +8,16 @@ set (RIBBIT_SRC
 	Version.cpp
 )
 
-set (RIBBIT_DECODERS_OGGVORBISDECODER_SRC
-	plugins/decoders/oggvorbisdecoder/OggVorbisDecoder.cpp
+set (RIBBIT_DECODER_OGGVORBISDECODER_SRC
+	decoder/OggVorbisDecoder.cpp
 )
 
-set (RIBBIT_DECODERS_WAVEDECODER_SRC
-	plugins/decoders/wavedecoder/WaveDecoder.cpp
+set (RIBBIT_DECODER_WAVEDECODER_SRC
+	decoder/WaveDecoder.cpp
 )
 
-set (RIBBIT_DECODERS_SIDDECODER_SRC
-	plugins/decoders/siddecoder/SIDDecoder.cpp
+set (RIBBIT_DECODER_SIDDECODER_SRC
+	decoder/SIDDecoder.cpp
 )
 
 
@@ -33,24 +33,24 @@ set (RIBBIT_HEADERS
 	Version.h
 )
 
-set (RIBBIT_DECODERS_OGGVORBISDECODER_HEADERS
-	plugins/decoders/oggvorbisdecoder/OggVorbisDecoder.h
+set (RIBBIT_DECODER_OGGVORBISDECODER_HEADERS
+	decoder/OggVorbisDecoder.h
 )
 
-set (RIBBIT_DECODERS_WAVEDECODER_HEADERS
-	plugins/decoders/wavedecoder/WaveDecoder.h
+set (RIBBIT_DECODER_WAVEDECODER_HEADERS
+	decoder/WaveDecoder.h
 )
 
-set (RIBBIT_DECODERS_SIDDECODER_HEADERS
-	plugins/decoders/siddecoder/SIDDecoder.h
+set (RIBBIT_DECODER_SIDDECODER_HEADERS
+	decoder/SIDDecoder.h
 )
 
 
-source_group ("Source Files\\\\decoders\\\\wavedecoder" FILES ${RIBBIT_DECODERS_WAVEDECODER_SRC})
-source_group ("Header Files\\\\decoders\\\\wavedecoder" FILES ${RIBBIT_DECODERS_WAVEDECODER_HEADERS})
+source_group ("Source Files\\\\decoder" FILES ${RIBBIT_DECODER_WAVEDECODER_SRC})
+source_group ("Header Files\\\\decoder" FILES ${RIBBIT_DECODER_WAVEDECODER_HEADERS})
 
-set (RIBBIT_SRC ${RIBBIT_SRC} ${RIBBIT_DECODERS_WAVEDECODER_SRC})
-set (RIBBIT_HEADERS ${RIBBIT_HEADERS} ${RIBBIT_DECODERS_WAVEDECODER_HEADERS})
+set (RIBBIT_SRC ${RIBBIT_SRC} ${RIBBIT_DECODER_WAVEDECODER_SRC})
+set (RIBBIT_HEADERS ${RIBBIT_HEADERS} ${RIBBIT_DECODER_WAVEDECODER_HEADERS})
 
 # OSX has an issue with linking ppc/i386 versions of oggvorbis currently
 if (NOT TOADLET_PLATFORM_OSX)
@@ -60,10 +60,10 @@ endif (NOT TOADLET_PLATFORM_OSX)
 if (OGGVORBIS_FOUND)
 	set (TOADLET_HAS_OGGVORBIS ON PARENT_SCOPE)
 		
-	source_group ("Source Files\\\\decoders\\\\oggvorbisdecoder" FILES ${RIBBIT_DECODERS_OGGVORBISDECODER_SRC})
-	source_group ("Header Files\\\\decoders\\\\oggvorbisdecoder" FILES ${RIBBIT_DECODERS_OGGVORBISDECODER_HEADERS})
-	set (RIBBIT_SRC ${RIBBIT_SRC} ${RIBBIT_DECODERS_OGGVORBISDECODER_SRC})
-	set (RIBBIT_HEADERS ${RIBBIT_HEADERS} ${RIBBIT_DECODERS_OGGVORBISDECODER_HEADERS})
+	source_group ("Source Files\\\\decoder" FILES ${RIBBIT_DECODER_OGGVORBISDECODER_SRC})
+	source_group ("Header Files\\\\decoder" FILES ${RIBBIT_DECODER_OGGVORBISDECODER_HEADERS})
+	set (RIBBIT_SRC ${RIBBIT_SRC} ${RIBBIT_DECODER_OGGVORBISDECODER_SRC})
+	set (RIBBIT_HEADERS ${RIBBIT_HEADERS} ${RIBBIT_DECODER_OGGVORBISDECODER_HEADERS})
 	include_directories (${OGGVORBIS_INCLUDES})
 
 	# Dynamic libs
@@ -108,10 +108,10 @@ if (SIDPLAY_FOUND)
 
 	add_definitions(-DSIDPLAY_VERSION=${SIDPLAY_VERSION})
 	
-	source_group ("Source Files\\\\decoders\\\\siddecoder" FILES ${RIBBIT_DECODERS_SIDDECODER_SRC})
-	source_group ("Header Files\\\\decoders\\\\siddecoder" FILES ${RIBBIT_DECODERS_SIDDECODER_HEADERS})
-	set (RIBBIT_SRC ${RIBBIT_SRC} ${RIBBIT_DECODERS_SIDDECODER_SRC})
-	set (RIBBIT_HEADERS ${RIBBIT_HEADERS} ${RIBBIT_DECODERS_SIDDECODER_HEADERS})
+	source_group ("Source Files\\\\decoder" FILES ${RIBBIT_DECODER_SIDDECODER_SRC})
+	source_group ("Header Files\\\\decoder" FILES ${RIBBIT_DECODER_SIDDECODER_HEADERS})
+	set (RIBBIT_SRC ${RIBBIT_SRC} ${RIBBIT_DECODER_SIDDECODER_SRC})
+	set (RIBBIT_HEADERS ${RIBBIT_HEADERS} ${RIBBIT_DECODER_SIDDECODER_HEADERS})
 	include_directories (${SIDPLAY_INCLUDES})
 
 	# Dynamic libs

@@ -32,14 +32,6 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/ribbit/AudioFormatConversion.h>
 
-#include "../decoders/wavedecoder/WaveDecoder.h"
-#if defined(TOADLET_HAS_OGGVORBIS)
-	#include "../decoders/oggvorbisdecoder/OggVorbisDecoder.h"
-#endif
-#if defined(TOADLET_HAS_SIDPLAY)
-	#include "../decoders/siddecoder/SIDDecoder.h"
-#endif
-
 #if !defined(TOADLET_PLATFORM_WINCE)
 	#pragma comment(lib,"winmm.lib")
 #endif
@@ -94,20 +86,13 @@ bool MMPlayer::create(int *options){
 
 	mFormat->channels=2;
 	mFormat->bitsPerSample=16;
-	mFormat->samplesPerSecond=44100;
+	mFormat->samplesPerSecond=44100/2;
 	AudioFormat standardFormat(2,16,44100);
 	mBufferSize=AudioFormatConversion::findConvertedLength(8192,mFormat,&standardFormat);
 	mNumBuffers=4;
 	mBufferFadeTime=100;
 
 	mCapabilitySet.maxSources=16;
-	mCapabilitySet.mimeTypes.add(WaveDecoder::mimeType());
-	#if defined(TOADLET_HAS_OGGVORBIS)
-		mCapabilitySet.mimeTypes.add(OggVorbisDecoder::mimeType());
-	#endif
-	#if defined(TOADLET_HAS_SIDPLAY)
-		mCapabilitySet.mimeTypes.add(SIDDecoder::mimeType());
-	#endif
 
 	WAVEFORMATEX format={0};
 	format.cbSize=sizeof(WAVEFORMATEX);
@@ -227,43 +212,6 @@ void MMPlayer::update(int dt){
 			}
 		}
 	}
-}
-
-AudioStream::ptr MMPlayer::startAudioStream(Stream::ptr stream,const String &mimeType){
-	if(stream==NULL){
-		Error::nullPointer(Categories::TOADLET_RIBBIT,
-			"null Stream");
-		return NULL;
-	}
-
-	AudioStream::ptr decoder;
-	if(mimeType==WaveDecoder::mimeType()){
-		decoder=AudioStream::ptr(new WaveDecoder());
-	}
-	#if defined(TOADLET_HAS_OGGVORBIS)
-		if(mimeType==OggVorbisDecoder::mimeType()){
-			decoder=AudioStream::ptr(new OggVorbisDecoder());
-		}
-	#endif
-	#if defined(TOADLET_HAS_SIDPLAY)
-		if(mimeType==SIDDecoder::mimeType()){
-			decoder=AudioStream::ptr(new SIDDecoder());
-		}
-	#endif
-
-	if(decoder==NULL){
-		Error::unknown(Categories::TOADLET_RIBBIT,
-			"MIME type not supported: " + mimeType);
-		return NULL;
-	}
-
-	if(decoder->startStream(stream)==false){
-		Error::unknown(Categories::TOADLET_RIBBIT,
-			"error starting decoder stream");
-		return NULL;
-	}
-
-	return decoder;
 }
 
 void MMPlayer::internal_audioCreate(MMAudio *audio){
