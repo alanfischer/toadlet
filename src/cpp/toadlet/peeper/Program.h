@@ -45,14 +45,8 @@ public:
 	virtual ~Program();
 
 	void addShader(Shader::ptr shader);
-
 	const Shader::ptr &getShader(int i) const;
-
 	int getNumShaders() const;
-
-	virtual void internal_setProgramPeer(ProgramPeer *programPeer,bool own);
-	inline ProgramPeer *internal_getProgramPeer() const{return mProgramPeer;}
-	inline bool internal_ownsProgramPeer() const{return mOwnsProgramPeer;}
 
 protected:
 	egg::Collection<Shader::ptr> mShaders;
