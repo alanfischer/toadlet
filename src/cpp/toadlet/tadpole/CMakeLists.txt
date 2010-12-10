@@ -5,6 +5,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.in ${CMAKE_CURRENT_BINARY_
 # Source files for toadlet_tadpole
 set (TADPOLE_SRC
 	ArchiveManager.cpp
+	AudioBufferManager.cpp
 	BufferManager.cpp
 	BoundingVolumeSensor.cpp
 	Engine.cpp
@@ -39,7 +40,6 @@ set (TADPOLE_BSP_SRC
 )
 
 set (TADPOLE_HANDLER_SRC
-	handler/AudioBufferHandler.cpp
 	handler/MMSHHandler.cpp
 	handler/WADArchive.cpp
 )
@@ -108,7 +108,7 @@ set (TADPOLE_TERRAIN_SRC
 # Headers
 set (TADPOLE_HEADERS
 	ArchiveManager.h
-	AudioBufferData.h
+	AudioBufferManager.h
 	BufferManager.h
 	BoundingVolumeSensor.h
 	Collision.h

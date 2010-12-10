@@ -23,44 +23,34 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/AudioBufferData.h>
-#include <toadlet/tadpole/handler/AudioBufferHandler.h>
-#include <toadlet/egg/Logger.h>
+#ifndef TOADLET_TADPOLE_HANDLER_OGGVORBISHANDLER_H
+#define TOADLET_TADPOLE_HANDLER_OGGVORBISHANDLER_H
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::ribbit;
+#include <toadlet/ribbit/decoder/OggVorbisDecoder.h>
+#include <toadlet/tadpole/handler/AudioBufferHandler.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-AudioBufferHandler::AudioBufferHandler(AudioPlayer *player){
-	mAudioPlayer=player;
-}
+class TOADLET_API OggVorbisHandler:public AudioBufferHandler{
+public:
+	TOADLET_SHARED_POINTERS(OggVorbisHandler);
 
-void AudioBufferHandler::setAudioPlayer(AudioPlayer *player){
-	mAudioPlayer=player;
-}
+	OggVorbisHandler(AudioBufferManager *audioBufferManager):AudioBufferHandler(audioBufferManager){}
 
-Resource::ptr AudioBufferHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
-	AudioBuffer::ptr audioBuffer=NULL;
-	if(mAudioPlayer!=NULL){
-		String mimeType;
-		AudioBufferData *audioBufferData=(AudioBufferData*)handlerData;
-		if(audioBufferData==NULL){
-			Logger::warning(Categories::TOADLET_TADPOLE,
-				"no valid AudioBufferData, audio may not be decoded properly");
+	ribbit::AudioStream::ptr createAudioStream(egg::io::Stream::ptr stream){
+		ribbit::AudioStream::ptr audioStream(new ribbit::decoder::OggVorbisDecoder());
+		if(audioStream->startStream(stream)==false){
+			audioStream=NULL;
 		}
-		else{
-			mimeType=audioBufferData->mimeType;
-		}
-		audioBuffer=AudioBuffer::ptr(mAudioPlayer->createAudioBuffer());
-		audioBuffer->create(stream,mimeType);
+		return audioStream;
 	}
-	return audioBuffer;
-}
+};
 
 }
 }
 }
+
+#endif
+

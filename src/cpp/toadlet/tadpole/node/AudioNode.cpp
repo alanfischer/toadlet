@@ -53,6 +53,10 @@ void AudioNode::destroy(){
 	super::destroy();
 }
 
+bool AudioNode::setAudioBuffer(const String &name){
+	return setAudioBuffer(mEngine->getAudioBufferManager()->findAudioBuffer(name));
+}
+
 bool AudioNode::setAudioBuffer(const AudioBuffer::ptr &audioBuffer){
 	if(mAudio!=NULL){
 		mAudio->destroy();
@@ -68,19 +72,8 @@ bool AudioNode::setAudioBuffer(const AudioBuffer::ptr &audioBuffer){
 	}
 }
 
-bool AudioNode::setAudioStream(Stream::ptr stream,const String &mimeType){
-	if(mAudio!=NULL){
-		mAudio->destroy();
-	}
-
-	mAudio=Audio::ptr(mEngine->getAudioPlayer()->createStreamingAudio());
-	if(mAudio!=NULL){
-		mAudio->create(stream,mimeType);
-		return true;
-	}
-	else{
-		return false;
-	}
+bool AudioNode::setAudioStream(const String &name){
+	return setAudioStream(mEngine->getAudioBufferManager()->findAudioStream(name));
 }
 
 bool AudioNode::setAudioStream(AudioStream::ptr stream){

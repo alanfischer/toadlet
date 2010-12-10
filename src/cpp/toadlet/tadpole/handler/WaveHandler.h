@@ -23,42 +23,34 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_ALAUDIOBUFFER_H
-#define TOADLET_RIBBIT_ALAUDIOBUFFER_H
+#ifndef TOADLET_TADPOLE_HANDLER_WAVEHANDLER_H
+#define TOADLET_TADPOLE_HANDLER_WAVEHANDLER_H
 
-#include "ALIncludes.h"
-#include <toadlet/egg/BaseResource.h>
-#include <toadlet/ribbit/AudioBuffer.h>
+#include <toadlet/ribbit/decoder/WaveDecoder.h>
+#include <toadlet/tadpole/handler/AudioBufferHandler.h>
 
 namespace toadlet{
-namespace ribbit{
+namespace tadpole{
+namespace handler{
 
-class ALPlayer;
-
-class TOADLET_API ALAudioBuffer:protected egg::BaseResource,public AudioBuffer{
-	TOADLET_BASERESOURCE_PASSTHROUGH(AudioBuffer);
+class TOADLET_API WaveHandler:public AudioBufferHandler{
 public:
-	ALAudioBuffer(ALPlayer *player);
-	virtual ~ALAudioBuffer();
+	TOADLET_SHARED_POINTERS(WaveHandler);
 
-	AudioBuffer *getRootAudioBuffer(){return this;}
+	WaveHandler(AudioBufferManager *audioBufferManager):AudioBufferHandler(audioBufferManager){}
 
-	bool create(AudioStream::ptr stream);
-	void destroy();
-
-	inline ALuint getHandle() const{return mHandle;}
-
-protected:
-	ALPlayer *mAudioPlayer;
-	ALuint mHandle;
-	tbyte *mStaticData;
-	int mLengthTime;
-
-	friend class ALPlayer;
-	friend class ALAudio;
+	ribbit::AudioStream::ptr createAudioStream(egg::io::Stream::ptr stream){
+		ribbit::AudioStream::ptr audioStream(new ribbit::decoder::WaveDecoder());
+		if(audioStream->startStream(stream)==false){
+			audioStream=NULL;
+		}
+		return audioStream;
+	}
 };
 
 }
 }
+}
 
 #endif
+

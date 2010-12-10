@@ -84,13 +84,13 @@
 #include <toadlet/tadpole/node/SkeletonParentNode.h>
 #include <toadlet/tadpole/node/SpriteNode.h>
 
-#include <toadlet/tadpole/handler/AudioBufferHandler.h>
 #include <toadlet/tadpole/handler/MMSHHandler.h>
 #include <toadlet/tadpole/handler/BMPHandler.h>
 #include <toadlet/tadpole/handler/SPRHandler.h>
 #include <toadlet/tadpole/handler/TGAHandler.h>
 #include <toadlet/tadpole/handler/TPKGHandler.h>
 #include <toadlet/tadpole/handler/WADHandler.h>
+#include <toadlet/tadpole/handler/WaveHandler.h>
 
 #if defined(TOADLET_HAS_GDIPLUS)
 	#include <toadlet/tadpole/handler/platform/win32/Win32TextureHandler.h>
@@ -128,6 +128,16 @@
 	#include <toadlet/tadpole/handler/XMSHHandler.h>
 #endif
 
+#if defined(TOADLET_HAS_OGGVORBIS)
+	#include <toadlet/tadpole/handler/OggVorbisHandler.h>
+#endif
+#if defined(TOADLET_HAS_SIDPLAY)
+	#include <toadlet/tadpole/handler/SIDHandler.h>
+#endif
+#if defined(TOADLET_PLATFORM_OSX)
+	#include <toadlet/tadpole/handler/CoreAudioHandler.h>
+#endif
+
 #if !defined(TOADLET_FIXED_POINT)
 	#include <toadlet/tadpole/bsp/BSP30Node.h>
 #endif
@@ -163,7 +173,7 @@ Engine::Engine():
 	mMaterialManager=new MaterialManager(this);
 	mFontManager=new FontManager(this->getArchiveManager());
 	mMeshManager=new MeshManager(this);
-	mAudioBufferManager=new ResourceManager(this->getArchiveManager());
+	mAudioBufferManager=new AudioBufferManager(this);
 
 	// Make a guess at what the ideal format is.
 	#if defined(TOADLET_FIXED_POINT) && (defined(TOADLET_PLATFORM_WINCE) || defined(TOADLET_PLATFORM_IPHONE) || defined(TOADLET_PLATFORM_ANDROID))
@@ -245,8 +255,17 @@ Engine::Engine():
 	mMeshManager->setHandler(MMSHHandler::ptr(new MMSHHandler(this)),"mmsh");
 
 	// AudioBuffer handlers
-	mAudioBufferHandler=AudioBufferHandler::ptr(new AudioBufferHandler(mAudioPlayer));
-	mAudioBufferManager->setDefaultHandler(mAudioBufferHandler);
+	mAudioBufferManager->setHandler(WaveHandler::ptr(new WaveHandler(mAudioBufferManager)),"wav");
+	#if defined(TOADLET_HAS_OGGVORBIS)
+		mAudioBufferManager->setHandler(OggVorbisHandler::ptr(new OggVorbisHandler(mAudioBufferManager)),"ogg");
+	#endif
+	#if defined(TOADLET_HAS_SIDPLAY)
+		mAudioBufferManager->setHandler(SIDHandler::ptr(new SIDHandler(mAudioBufferManager)),"sid");
+	#endif
+	#if defined(TOADLET_PLATFORM_OSX)
+		/// @todo: We need to fix the createStream function of AudioBufferManager so it will try the default handler
+		mAudioBufferManager->setDefaultHandler(CoreAudioHandler::ptr(new CoreAudioHandler(mAudioBufferManager)));
+	#endif
 }
 
 Engine::~Engine(){
@@ -408,7 +427,6 @@ void Engine::updateVertexFormats(){
 
 void Engine::setAudioPlayer(AudioPlayer *audioPlayer){
 	mAudioPlayer=audioPlayer;
-	shared_static_cast<AudioBufferHandler>(mAudioBufferHandler)->setAudioPlayer(mAudioPlayer);
 }
 
 AudioPlayer *Engine::getAudioPlayer() const{

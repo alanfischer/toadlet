@@ -68,7 +68,6 @@ public:
 
 	const CapabilitySet &getCapabilitySet(){return mCapabilitySet;}
 
-	AudioStream::ptr startAudioStream(egg::io::Stream::ptr stream,const egg::String &mimeType);
 	int getBufferFadeTime() const{return mBufferFadeTime;}
 	AudioFormat::ptr getAudioFormat(){return mFormat;}
 

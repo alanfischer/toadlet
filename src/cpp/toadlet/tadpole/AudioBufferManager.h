@@ -23,51 +23,34 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_WAVEDECODER_H
-#define TOADLET_RIBBIT_WAVEDECODER_H
+#ifndef TOADLET_TADPOLE_AUDIOBUFFERMANAGER_H
+#define TOADLET_TADPOLE_AUDIOBUFFERMANAGER_H
 
-#include <toadlet/ribbit/AudioStream.h>
+#include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/ribbit/AudioPlayer.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
-namespace ribbit{
+namespace tadpole{
 
-class TOADLET_API WaveDecoder:public AudioStream{
+class Engine;
+
+class TOADLET_API AudioBufferManager:public ResourceManager{
 public:
-	WaveDecoder();
-	virtual ~WaveDecoder();
+	AudioBufferManager(Engine *engine);
 
-	void close(){}
-	bool closed(){return false;}
+	ribbit::AudioBuffer::ptr createAudioBuffer(ribbit::AudioStream::ptr stream);
 
-	bool readable(){return true;}
-	int read(tbyte *buffer,int length);
+	ribbit::AudioStream::ptr findAudioStream(const egg::String &name);
+	ribbit::AudioBuffer::ptr findAudioBuffer(const egg::String &name){return egg::shared_static_cast<ribbit::AudioBuffer>(ResourceManager::find(name));}
 
-	bool writeable(){return false;}
-	int write(const tbyte *buffer,int length){return -1;}
+	ribbit::AudioPlayer *getAudioPlayer();
 
-	bool startStream(egg::io::Stream::ptr stream);
-	bool reset();
-	int length(){return mSize;}
-	int position(){return mPosition;}
-	bool seek(int offs){return false;}
-
-	AudioFormat::ptr getAudioFormat(){return mFormat;}
-
-	static egg::String mimeType(){return "audio/wav";}
-
-private:
-	void skip(egg::io::Stream::ptr stream,int amount);
-	void ADPCMDecoder(const char *in,short *out,int len);
-
-	AudioFormat::ptr mFormat;
-	tbyte *mData;
-	int mSize;
-	int mPosition;
-	egg::io::Stream::ptr mStream;
+protected:
+	Engine *mEngine;
 };
 
 }
 }
 
 #endif
-

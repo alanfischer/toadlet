@@ -23,41 +23,47 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_ALAUDIOBUFFER_H
-#define TOADLET_RIBBIT_ALAUDIOBUFFER_H
+#ifndef TOADLET_RIBBIT_DECODER_SIDDECODER_H
+#define TOADLET_RIBBIT_DECODER_SIDDECODER_H
 
-#include "ALIncludes.h"
-#include <toadlet/egg/BaseResource.h>
-#include <toadlet/ribbit/AudioBuffer.h>
+#include <toadlet/ribbit/AudioStream.h>
 
 namespace toadlet{
 namespace ribbit{
+namespace decoder{
 
-class ALPlayer;
+class SIDAttributes;
 
-class TOADLET_API ALAudioBuffer:protected egg::BaseResource,public AudioBuffer{
-	TOADLET_BASERESOURCE_PASSTHROUGH(AudioBuffer);
+class TOADLET_API SIDDecoder:public AudioStream{
 public:
-	ALAudioBuffer(ALPlayer *player);
-	virtual ~ALAudioBuffer();
+	SIDDecoder();
+	virtual ~SIDDecoder();
 
-	AudioBuffer *getRootAudioBuffer(){return this;}
+	bool startStream(Stream::ptr stream);
 
-	bool create(AudioStream::ptr stream);
-	void destroy();
+	AudioFormat::ptr getAudioFormat(){return mFormat;}
 
-	inline ALuint getHandle() const{return mHandle;}
+	void close(){}
+	bool closed(){return false;}
+	bool readable(){return true;}
+	int read(tbyte *buffer,int length);
+
+	bool writeable(){return false;}
+	int write(const tbyte *buffer,int length){return -1;}
+
+	bool reset(){return false;}
+	int length(){return -1;}
+	int position(){return -1;}
+	bool seek(int offs){return false;}
+
+	static egg::String mimeType(){return "audio/psid";}
 
 protected:
-	ALPlayer *mAudioPlayer;
-	ALuint mHandle;
-	tbyte *mStaticData;
-	int mLengthTime;
-
-	friend class ALPlayer;
-	friend class ALAudio;
+	AudioFormat::ptr mFormat;
+	SIDAttributes *sid;
 };
 
+}
 }
 }
 

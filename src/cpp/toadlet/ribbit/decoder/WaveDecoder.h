@@ -23,42 +23,53 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_ALAUDIOBUFFER_H
-#define TOADLET_RIBBIT_ALAUDIOBUFFER_H
+#ifndef TOADLET_RIBBIT_DECODER_WAVEDECODER_H
+#define TOADLET_RIBBIT_DECODER_WAVEDECODER_H
 
-#include "ALIncludes.h"
-#include <toadlet/egg/BaseResource.h>
-#include <toadlet/ribbit/AudioBuffer.h>
+#include <toadlet/ribbit/AudioStream.h>
 
 namespace toadlet{
 namespace ribbit{
+namespace decoder{
 
-class ALPlayer;
-
-class TOADLET_API ALAudioBuffer:protected egg::BaseResource,public AudioBuffer{
-	TOADLET_BASERESOURCE_PASSTHROUGH(AudioBuffer);
+class TOADLET_API WaveDecoder:public AudioStream{
 public:
-	ALAudioBuffer(ALPlayer *player);
-	virtual ~ALAudioBuffer();
+	WaveDecoder();
+	virtual ~WaveDecoder();
 
-	AudioBuffer *getRootAudioBuffer(){return this;}
+	void close(){}
+	bool closed(){return false;}
 
-	bool create(AudioStream::ptr stream);
-	void destroy();
+	bool readable(){return true;}
+	int read(tbyte *buffer,int length);
 
-	inline ALuint getHandle() const{return mHandle;}
+	bool writeable(){return false;}
+	int write(const tbyte *buffer,int length){return -1;}
 
-protected:
-	ALPlayer *mAudioPlayer;
-	ALuint mHandle;
-	tbyte *mStaticData;
-	int mLengthTime;
+	bool startStream(egg::io::Stream::ptr stream);
+	bool reset();
+	int length(){return mSize;}
+	int position(){return mPosition;}
+	bool seek(int offs){return false;}
 
-	friend class ALPlayer;
-	friend class ALAudio;
+	AudioFormat::ptr getAudioFormat(){return mFormat;}
+
+	static egg::String mimeType(){return "audio/wav";}
+
+private:
+	void skip(egg::io::Stream::ptr stream,int amount);
+	void ADPCMDecoder(const char *in,short *out,int len);
+
+	AudioFormat::ptr mFormat;
+	tbyte *mData;
+	int mSize;
+	int mPosition;
+	egg::io::Stream::ptr mStream;
 };
 
 }
 }
+}
 
 #endif
+

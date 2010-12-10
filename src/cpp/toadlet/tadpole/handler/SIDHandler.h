@@ -23,28 +23,34 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_AUDIOBUFFERDATA_H
-#define TOADLET_TADPOLE_AUDIOBUFFERDATA_H
+#ifndef TOADLET_TADPOLE_HANDLER_SIDHANDLER_H
+#define TOADLET_TADPOLE_HANDLER_SIDHANDLER_H
 
-#include <toadlet/tadpole/Types.h>
-#include <toadlet/egg/String.h>
-#include <toadlet/tadpole/ResourceHandlerData.h>
+#include <toadlet/ribbit/decoder/SIDDecoder.h>
+#include <toadlet/tadpole/handler/AudioBufferHandler.h>
 
 namespace toadlet{
 namespace tadpole{
+namespace handler{
 
-class TOADLET_API AudioBufferData:public ResourceHandlerData{
+class TOADLET_API SIDHandler:public AudioBufferHandler{
 public:
-	TOADLET_SHARED_POINTERS(AudioBufferData);
+	TOADLET_SHARED_POINTERS(SIDHandler);
 
-	AudioBufferData(const egg::String &mimeType){
-		this->mimeType=mimeType;
+	SIDHandler(AudioBufferManager *audioBufferManager):AudioBufferHandler(audioBufferManager){}
+
+	ribbit::AudioStream::ptr createAudioStream(egg::io::Stream::ptr stream){
+		ribbit::AudioStream::ptr audioStream(new ribbit::decoder::SIDDecoder());
+		if(audioStream->startStream(stream)==false){
+			audioStream=NULL;
+		}
+		return audioStream;
 	}
-
-	egg::String mimeType;
 };
 
 }
 }
+}
 
 #endif
+

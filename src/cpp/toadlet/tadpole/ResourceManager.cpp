@@ -259,13 +259,12 @@ String ResourceManager::cleanFilename(const String &name){
 
 Resource::ptr ResourceManager::unableToFindHandler(const String &name,const ResourceHandlerData *handlerData){
 	Error::unknown(Categories::TOADLET_TADPOLE,
-		"Handler for \""+name+"\" not found");
+		"handler for \""+name+"\" not found");
 	return NULL;
 }
 
 Resource::ptr ResourceManager::findFromFile(const String &name,const ResourceHandlerData *handlerData){
 	String filename=cleanFilename(name);
-
 	String extension;
 	int i=filename.rfind('.');
 	if(i!=String::npos){
@@ -275,6 +274,7 @@ Resource::ptr ResourceManager::findFromFile(const String &name,const ResourceHan
 		extension=mDefaultExtension;
 		filename+="."+extension;
 	}
+
 	if(extension!=(char*)NULL){
 		int i;
 		for(i=0;i<mResourceArchives.size();++i){
@@ -292,12 +292,13 @@ Resource::ptr ResourceManager::findFromFile(const String &name,const ResourceHan
 			}
 			else{
 				Error::unknown(Categories::TOADLET_TADPOLE,
-					"File "+filename+" not found");
+					"file "+filename+" not found");
 				return NULL;
 			}
 		}
-
-		return Resource::ptr(unableToFindHandler(name,handlerData));
+		else{
+			return Resource::ptr(unableToFindHandler(name,handlerData));
+		}
 	}
 	else{
 		int i;

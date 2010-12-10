@@ -74,8 +74,6 @@ public:
 
 	const CapabilitySet &getCapabilitySet();
 
-	// Methods not part of the AudioPlayer interface
-	AudioStream::ptr startAudioStream(egg::io::Stream::ptr stream,const egg::String &mimeType);
 	ALuint checkoutSourceHandle(ALAudio *audio);
 	void checkinSourceHandle(ALAudio *audio,ALuint source);
 	int getBufferFadeTime() const{return mBufferFadeTime;}
