@@ -54,8 +54,6 @@ public:
 
 	AudioFormat::ptr getAudioFormat(){return mFormat;}
 
-	static egg::String mimeType(){return "audio/wav";}
-
 private:
 	void skip(egg::io::Stream::ptr stream,int amount);
 	void ADPCMDecoder(const char *in,short *out,int len);
