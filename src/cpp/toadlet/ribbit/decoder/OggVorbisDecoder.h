@@ -60,8 +60,6 @@ public:
 
 	AudioFormat::ptr getAudioFormat(){return mFormat;}
 
-	static egg::String mimeType(){return "audio/ogg";}
-
 private:
 	static size_t read_func(void *ptr,size_t size,size_t nmemb, void *datasource);
 	static int seek_func(void *datasource, ogg_int64_t offset, int whence);

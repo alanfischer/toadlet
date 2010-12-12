@@ -56,8 +56,6 @@ public:
 	int position(){return -1;}
 	bool seek(int offs){return false;}
 
-	static egg::String mimeType(){return "audio/psid";}
-
 protected:
 	AudioFormat::ptr mFormat;
 	SIDAttributes *sid;

@@ -39,7 +39,7 @@ void Sphere::merge(const Sphere &sphere,real epsilon){
 	real radiusSquared=Math::square(radiusDifference);
 
 	if(radiusSquared>=lengthSquared){
-		if(radiusSquared>0){
+		if(radiusDifference>0){
 			origin.set(sphere.origin);
 			radius=sphere.radius;
 		}
@@ -51,7 +51,7 @@ void Sphere::merge(const Sphere &sphere,real epsilon){
 			Math::madd(origin,originDifference,coefficient,origin);
 		}
 
-		radius=Math::HALF * (length + radiusDifference + sphere.radius);
+		radius=(length + radius + sphere.radius) * 0.5f;
 	}
 }
 
