@@ -328,6 +328,27 @@ void StudioModelNode::render(Renderer *renderer) const{
 	renderer->renderPrimitive(mHitBoxVertexData,mHitBoxIndexData);
 }
 
+void StudioModelNode::setQuaternionFromEulerAngleStudio(Quaternion &r,const EulerAngle &euler){
+	real sx=euler.x/2;
+	real cx=cos(sx);
+	sx=sin(sx);
+	real sy=euler.y/2;
+	real cy=cos(sy);
+	sy=sin(sy);
+	real sz=euler.z/2;
+	real cz=cos(sz);
+	sz=sin(sz);
+	real cxcy=cx*cy;
+	real sxsy=sx*sy;
+	real cxsy=cx*sy;
+	real sxcy=sx*cy;
+
+	r.x=(sxcy*cz) - (cxsy*sz);
+	r.y=(cxsy*cz) + (sxcy*sz);
+	r.z=(cxcy*sz) - (sxsy*cz);
+	r.w=(cxcy*cz) + (sxsy*sz);
+}
+
 void StudioModelNode::updateVertexes(StudioModel *model,int bodypartsIndex,int modelIndex){
 	int i,l;
 
@@ -656,27 +677,6 @@ void StudioModelNode::destroySkeletonBuffers(){
 		mHitBoxVertexData=NULL;
 		mHitBoxIndexData=NULL;
 	}
-}
-
-void StudioModelNode::setQuaternionFromEulerAngleStudio(Quaternion &r,const EulerAngle &euler){
-	real sx=euler.x/2;
-	real cx=cos(sx);
-	sx=sin(sx);
-	real sy=euler.y/2;
-	real cy=cos(sy);
-	sy=sin(sy);
-	real sz=euler.z/2;
-	real cz=cos(sz);
-	sz=sin(sz);
-	real cxcy=cx*cy;
-	real sxsy=sx*sy;
-	real cxsy=cx*sy;
-	real sxcy=sx*cy;
-
-	r.x=(sxcy*cz) - (cxsy*sz);
-	r.y=(cxsy*cz) + (sxcy*sz);
-	r.z=(cxcy*sz) - (sxsy*cz);
-	r.w=(cxcy*cz) + (sxsy*sz);
 }
 
 }

@@ -40,7 +40,6 @@ class TOADLET_API Simulator{
 public:
 	enum Integrator{
 		Integrator_EULER,
-		Integrator_VERLET,
 		Integrator_IMPROVED,
 		Integrator_HEUN,
 		Integrator_RUNGE_KUTTA,
@@ -168,6 +167,7 @@ protected:
 
 	Vector3 cache_update_oldPosition;
 	Vector3 cache_update_newPosition;
+	Vector3 cache_update_oldVelocity;
 	Vector3 cache_update_velocity;
 	Vector3 cache_update_temp;
 	Vector3 cache_update_t;

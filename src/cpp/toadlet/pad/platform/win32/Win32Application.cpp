@@ -202,7 +202,8 @@ void Win32Application::create(int renderer,int audioPlayer,int motionDetector){
 	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(mResourceArchive));
 	mEngine->getTextureManager()->addResourceArchive(mResourceArchive);
 
-	win32->mJoyInfo.dwSize=sizeof(JOYINFOEX);
+	/// @todo: The Joystick/Keyboard/Mouse input should be moved to an input abstraction class useabout outside of pad or at least the Application class
+/*	win32->mJoyInfo.dwSize=sizeof(JOYINFOEX);
 	win32->mJoyInfo.dwFlags=JOY_RETURNALL;
 	memcpy(&win32->mLastJoyInfo,&win32->mJoyInfo,sizeof(JOYINFOEX));
 	int numJoys=0;
@@ -215,9 +216,10 @@ void Win32Application::create(int renderer,int audioPlayer,int motionDetector){
 		win32->mJoyID=JOYSTICKID1;
 	}
 	else{
-		win32->mJoyID=-1;
-	}
-
+*/		win32->mJoyID=-1;
+/*	}
+	Logger::alert(Categories::TOADLET_PAD,String("detected ")+numJoys+" joysticks");
+*/
 	if(renderer!=RendererPlugin_NONE){
 		changeRendererPlugin(renderer);
 	}

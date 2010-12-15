@@ -102,6 +102,8 @@ public:
 	const Matrix4x4 &getRenderTransform() const{return getWorldTransform();}
 	void render(peeper::Renderer *renderer) const;
 
+	static void setQuaternionFromEulerAngleStudio(Quaternion &r,const EulerAngle &euler);
+
 	peeper::VertexBufferAccessor vba;
 	peeper::IndexBufferAccessor iba;
 
@@ -116,7 +118,6 @@ protected:
 	void createSkeletonBuffers();
 	void updateSkeletonBuffers();
 	void destroySkeletonBuffers();
-	void setQuaternionFromEulerAngleStudio(Quaternion &r,const EulerAngle &euler);
 
 	StudioModel::ptr mModel;
 	egg::Collection<SubModel::ptr> mSubModels;

@@ -231,6 +231,7 @@ void Simulator::removeConstraint(Constraint *constraint){
 void Simulator::update(int dt,int scope,Solid *solid){
 	Vector3 &oldPosition=cache_update_oldPosition;
 	Vector3 &newPosition=cache_update_newPosition;
+	Vector3 &oldVelocity=cache_update_oldVelocity;
 	Vector3 &velocity=cache_update_velocity;
 	Vector3 &temp=cache_update_temp;
 	Vector3 &t=cache_update_t;
@@ -271,6 +272,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 		}
 
 		oldPosition.set(solid->mPosition);
+		oldVelocity.set(solid->mVelocity);
 
 		// The cheapest, fastest, and worst integrator, it's 1st order
 		// It may have trouble settling, so it is not recommended
@@ -287,9 +289,6 @@ void Simulator::update(int dt,int scope,Solid *solid){
 			add(newPosition,oldPosition);
 			mul(velocity,dv1,fdt);
 			add(velocity,solid->mVelocity);
-		}
-		// Verlet is unimplemented yet
-		else if(mIntegrator==Integrator_VERLET){
 		}
 		// Improved is 2nd order and a nice balance between speed and accuracy
 		else if(mIntegrator==Integrator_IMPROVED){
@@ -405,16 +404,13 @@ void Simulator::update(int dt,int scope,Solid *solid){
 		if(solid->mCollideWithBits!=0){
 			sub(temp,newPosition,oldPosition);
 
-			// Remove this check.  It resulted in objects being able to slide down slopes, since the velocity would build up
-			//  It's better to just run the simulation so everything resolves and let them deactivate
-			#if 0
-				if(toSmall(temp,mEpsilon)){
-					newPosition.set(oldPosition);
-					skip=true;
-				}else
-			#endif
-			
-			{
+			/// @todo: Calculate this 0.5f from the coefficient of static friction between solid & mTouching
+			if(solid->mTouching!=NULL && toSmall(temp,0.5f)){
+				newPosition.set(oldPosition);
+				solid->mVelocity.set(oldVelocity);
+				skip=true;
+			}
+			else{
 				if(temp.x<0){temp.x=-temp.x;}
 				if(temp.y<0){temp.y=-temp.y;}
 				if(temp.z<0){temp.z=-temp.z;}
@@ -465,7 +461,6 @@ void Simulator::update(int dt,int scope,Solid *solid){
 
 				// Update leftOver, the energy we still have moving in this direction that we couldnt use
 				sub(leftOver,newPosition,oldPosition);
-//Logger::alert(String("LEFTLENGTH:")+Math::length(leftOver));
 
 				// If its a valid collision, and someone is listening, then store it
 				if(c.collider!=solid->mTouching &&
@@ -540,7 +535,6 @@ void Simulator::update(int dt,int scope,Solid *solid){
 							mul(t,c.normal,impulse);
 							mul(t,oneOverMass);
 							add(solid->mVelocity,t);
-//Logger::alert(String("VELO:")+Math::length(solid->mVelocity));
 						}
 						if(hitSolid!=NULL && hitSolid->mMass!=Solid::INFINITE_MASS){
 							if(solid->mMass==Solid::INFINITE_MASS){
@@ -593,19 +587,17 @@ void Simulator::update(int dt,int scope,Solid *solid){
 					solid->mTouching=NULL;
 				}
 
-/*				if(toSmall(leftOver,mEpsilon)){
-Logger::alert(String("small"));
+				if(toSmall(leftOver,mEpsilon)){
 					newPosition.set(oldPosition);
 					break;
 				}
-				else */if(loop>4){
+				else if(loop>4){
 					// We keep hitting something, so zero the velocity and break out
 					solid->mVelocity.reset();
 					newPosition.set(oldPosition);
 					break;
 				}
 				else{
-//Logger::alert(String("dostuff"));
 					// Calculate new destinations from coefficient of restitution applied to velocity
 					if(normalizeCarefully(velocity,solid->mVelocity,mEpsilon)==false){
 						newPosition.set(oldPosition);
@@ -633,8 +625,8 @@ Logger::alert(String("small"));
 			loop++;
 		}
 
-		// Touching code
-		if(c.time==ONE && loop==0){
+		// Check to see if we need to reset touching
+		if(skip==false && c.time==ONE && loop==0){
 			solid->mTouching=NULL;
 			solid->mTouched1=NULL;
 			solid->mTouched2=NULL;
@@ -1418,10 +1410,9 @@ void Simulator::traceConvexSolid(Collision &c,const Segment &segment,const Conve
 
 void Simulator::frictionLink(Vector3 &result,Solid *solid,const Vector3 &solidVelocity,Solid *hitSolid,const Vector3 &hitSolidNormal,const Vector3 &appliedForce,scalar fdt){
 	result.set(ZERO_VECTOR3);
-return;
+
 	// Andrew's friction linking code
 	if(solid->mMass>0 && hitSolid->mMass!=0 && (solid->mCoefficientOfStaticFriction>0 || solid->mCoefficientOfDynamicFriction>0)){
-//		Logger::alert("FRICTIONING");
 		scalar fn=0,lenVr=0;
 		Vector3 &vr=cache_frictionLink_vr;
 		Vector3 &ff=cache_frictionLink_ff;
@@ -1522,6 +1513,7 @@ void Simulator::updateAcceleration(Vector3 &result,Solid *solid,const Vector3 &x
 	*/
 
 	mul(result,mGravity,solid->mCoefficientOfGravity);
+
 	if(solid->mMass!=0){
 		constraintLink(constraintForce,solid,x,v);
 		add(constraintForce,solid->mForce);
