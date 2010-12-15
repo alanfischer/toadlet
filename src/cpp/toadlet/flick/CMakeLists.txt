@@ -40,6 +40,6 @@ if (TOADLET_PLATFORM_WINCE)
 	add_subdirectory (plugins/htcmotiondetector)
 	add_subdirectory (plugins/samsungmotiondetector)
 elseif (TOADLET_PLATFORM_IPHONE)
-	add_subdirectory (plugins/iphonemotiondetector)
+	add_subdirectory (plugins/iosmotiondetector)
 endif (TOADLET_PLATFORM_WINCE)
 
