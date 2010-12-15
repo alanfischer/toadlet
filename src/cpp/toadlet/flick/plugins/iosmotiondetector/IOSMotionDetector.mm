@@ -25,14 +25,14 @@
 
 #include <toadlet/egg/math/Math.h>
 #include <toadlet/egg/Error.h>
-#include "IPhoneMotionDetector.h"
+#include "IOSMotionDetector.h"
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::math;
 
 @implementation ToadletAccelerometerDelegate
 
-- (id) initWithMotionDetector:(toadlet::flick::IPhoneMotionDetector*)motionDetector{
+- (id) initWithMotionDetector:(toadlet::flick::IOSMotionDetector*)motionDetector{
 	mMotionDetector=motionDetector;
 	return self;
 }
@@ -46,21 +46,21 @@ using namespace toadlet::egg::math;
 namespace toadlet{
 namespace flick{
 
-bool IPhoneMotionDetector::available(){
+bool IOSMotionDetector::available(){
 	return true;
 }
 
-TOADLET_C_API MotionDetector *new_IPhoneMotionDetector(){
-	return new IPhoneMotionDetector();
+TOADLET_C_API MotionDetector *new_IOSMotionDetector(){
+	return new IOSMotionDetector();
 }
 
 #if defined(TOADLET_BUILD_DYNAMIC)
 	TOADLET_C_API MotionDetector* new_MotionDetector(){
-		return new IPhoneMotionDetector();
+		return new IOSMotionDetector();
 	}
 #endif
 
-IPhoneMotionDetector::IPhoneMotionDetector():
+IOSMotionDetector::IOSMotionDetector():
 	mState(State_DESTROYED),
 	mListener(NULL),
 	mNative(false),
@@ -68,11 +68,11 @@ IPhoneMotionDetector::IPhoneMotionDetector():
 
 {}
 
-IPhoneMotionDetector::~IPhoneMotionDetector(){
+IOSMotionDetector::~IOSMotionDetector(){
 	TOADLET_ASSERT(mState==State_DESTROYED);
 }
 
-bool IPhoneMotionDetector::create(){
+bool IOSMotionDetector::create(){
 	if(mState==State_STOPPED){
 		return true;
 	}
@@ -90,7 +90,7 @@ bool IPhoneMotionDetector::create(){
 	return true;
 }
 
-bool IPhoneMotionDetector::startup(){
+bool IOSMotionDetector::startup(){
 	if(mState==State_RUNNING){
 		return true;
 	}
@@ -109,7 +109,7 @@ bool IPhoneMotionDetector::startup(){
 	return true;
 }
 
-bool IPhoneMotionDetector::shutdown(){
+bool IOSMotionDetector::shutdown(){
 	if(mState==State_STOPPED){
 		return true;
 	}
@@ -127,7 +127,7 @@ bool IPhoneMotionDetector::shutdown(){
 	return true;
 }
 
-bool IPhoneMotionDetector::destroy(){
+bool IOSMotionDetector::destroy(){
 	if(mState==State_DESTROYED){
 		return true;
 	}
@@ -145,24 +145,24 @@ bool IPhoneMotionDetector::destroy(){
 	return true;
 }
 
-void IPhoneMotionDetector::setPollSleep(int ms){
+void IOSMotionDetector::setPollSleep(int ms){
 	[UIAccelerometer sharedAccelerometer].updateInterval=(float)ms/1000.0;
 }
 
-void IPhoneMotionDetector::setNativeOrientation(bool native){
+void IOSMotionDetector::setNativeOrientation(bool native){
 	mNative=native;
 }
 
-void IPhoneMotionDetector::setListener(MotionDetectorListener *listener){
+void IOSMotionDetector::setListener(MotionDetectorListener *listener){
 	mMotionData.time=0;
 	mListener=listener;
 }
 
-MotionDetector::State IPhoneMotionDetector::getState(){
+MotionDetector::State IOSMotionDetector::getState(){
 	return mState;
 }
 
-void IPhoneMotionDetector::didAccelerate(UIAcceleration *acceleration){
+void IOSMotionDetector::didAccelerate(UIAcceleration *acceleration){
 	bool result=false;
 	if(mNative){
 		result=updateAcceleration((int)acceleration.timestamp*1000,Math::fromFloat(acceleration.x),Math::fromFloat(acceleration.y),Math::fromFloat(acceleration.z));

@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_IPHONEMOTIONDETECTOR_H
-#define TOADLET_FLICK_IPHONEMOTIONDETECTOR_H
+#ifndef TOADLET_FLICK_IOSMOTIONDETECTOR_H
+#define TOADLET_FLICK_IOSMOTIONDETECTOR_H
 
 #include <toadlet/flick/FilteredMotionDetector.h>
 #include <toadlet/egg/System.h>
@@ -34,26 +34,26 @@
 namespace toadlet{
 namespace flick{
 
-class IPhoneMotionDetector;
+class IOSMotionDetector;
 
 }
 }
 
 @interface ToadletAccelerometerDelegate:NSObject<UIAccelerometerDelegate>;
 
-- (id) initWithMotionDetector:(toadlet::flick::IPhoneMotionDetector*)motionDetector;
+- (id) initWithMotionDetector:(toadlet::flick::IOSMotionDetector*)motionDetector;
 - (void) accelerometer:(UIAccelerometer*)accelerometer didAccelerate:(UIAcceleration*)acceleration;
-toadlet::flick::IPhoneMotionDetector *mMotionDetector;
+toadlet::flick::IOSMotionDetector *mMotionDetector;
 
 @end
 
 namespace toadlet{
 namespace flick{
 
-class IPhoneMotionDetector:public FilteredMotionDetector{
+class IOSMotionDetector:public FilteredMotionDetector{
 public:
-	IPhoneMotionDetector();
-	virtual ~IPhoneMotionDetector();
+	IOSMotionDetector();
+	virtual ~IOSMotionDetector();
 
 	bool available();
 

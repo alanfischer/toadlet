@@ -6,15 +6,18 @@
 #  SIDPLAY_LIBRARY		- path to the sidplay library
 #  SIDPLAY_VERSION		- Sidplay version (1 or 2)
 #  RESID_LIBRARY		- path to the resid library
+#  HARDSID_LIBRARY		- path to the hardsid library
 
 set (SIDPLAY_FOUND "NO")
 
 find_path (SIDPLAY_INCLUDE_DIR sidplay/sidplay2.h)
 find_library (SIDPLAY_LIBRARY NAMES sidplay2)
 find_library (RESID_LIBRARY NAMES resid_builder)
+find_library (HARDSID_LIBRARY NAMES hardsid_builder)
 
 mark_as_advanced (SIDPLAY_INCLUDE_DIR SIDPLAY_LIBRARY)
 
+# We need to at least have the resid builder
 if (SIDPLAY_INCLUDE_DIR AND SIDPLAY_LIBRARY AND RESID_LIBRARY)
 	set (SIDPLAY_FOUND "YES")
 	set (SIDPLAY_VERSION 2)

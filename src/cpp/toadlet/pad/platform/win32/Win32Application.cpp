@@ -203,7 +203,7 @@ void Win32Application::create(int renderer,int audioPlayer,int motionDetector){
 	mEngine->getTextureManager()->addResourceArchive(mResourceArchive);
 
 	/// @todo: The Joystick/Keyboard/Mouse input should be moved to an input abstraction class useabout outside of pad or at least the Application class
-/*	win32->mJoyInfo.dwSize=sizeof(JOYINFOEX);
+	win32->mJoyInfo.dwSize=sizeof(JOYINFOEX);
 	win32->mJoyInfo.dwFlags=JOY_RETURNALL;
 	memcpy(&win32->mLastJoyInfo,&win32->mJoyInfo,sizeof(JOYINFOEX));
 	int numJoys=0;
@@ -216,10 +216,10 @@ void Win32Application::create(int renderer,int audioPlayer,int motionDetector){
 		win32->mJoyID=JOYSTICKID1;
 	}
 	else{
-*/		win32->mJoyID=-1;
-/*	}
+		win32->mJoyID=-1;
+	}
 	Logger::alert(Categories::TOADLET_PAD,String("detected ")+numJoys+" joysticks");
-*/
+
 	if(renderer!=RendererPlugin_NONE){
 		changeRendererPlugin(renderer);
 	}
@@ -1112,13 +1112,12 @@ LRESULT CALLBACK wndProc(HWND wnd,UINT msg,WPARAM wParam,LPARAM lParam){
 				application->keyPressed(key);
 			}
 			return 0;
-		case WM_KEYUP:
 		case WM_COMMAND: // So the command buttons can be heard
+		case WM_KEYUP:
 			// Just ignore several of these
 			if(wParam==0 || wParam==16 || wParam==132 || wParam==134 || wParam==190 || wParam>=200){
 				return 0;
 			}
-
 			if(wParam==112){
 				application->keyPressed(BaseApplication::Key_SOFTLEFT);
 				application->keyReleased(BaseApplication::Key_SOFTLEFT);
