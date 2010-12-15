@@ -33,7 +33,7 @@
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API AudioStream:public egg::io::Stream{
+class AudioStream:public egg::io::Stream{
 public:
 	TOADLET_SHARED_POINTERS(AudioStream);
 

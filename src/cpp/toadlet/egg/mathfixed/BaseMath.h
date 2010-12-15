@@ -336,6 +336,8 @@ namespace Math{
 		}
 		return y<0?-angle:angle;
 	}
+
+	inline fixed mod(fixed x,fixed y){return x%y;}
 }
 
 }

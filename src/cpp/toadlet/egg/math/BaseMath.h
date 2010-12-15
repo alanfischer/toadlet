@@ -175,6 +175,7 @@ namespace Math{
 	inline real atan(real r){return ::atan(r);}
 	inline real atan2(real r1,real r2){return ::atan2(r1,r2);}
 	inline real log(real r){return ::log(r);}
+	inline real mod(real x,real y){return ::fmod(x,y);}
 }
 
 }
