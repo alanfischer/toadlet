@@ -153,7 +153,8 @@ void HopEntity::setTraceableShape(Traceable *traceable){
 void HopEntity::addShape(hop::Shape::ptr shape){
 	mSolid->addShape(shape);
 
-	setLocalBound(Bound(mSolid->getLocalBound()));
+	Bound::ptr bound(new Bound(mSolid->getLocalBound()));
+	setBound(bound);
 
 	updateCollisionVolumes();
 }
@@ -187,13 +188,16 @@ void HopEntity::setCollisionVolumesVisible(bool visible){
 	updateCollisionVolumes();
 }
 
-void HopEntity::setTranslate(const Vector3 &translate){
-	super::setTranslate(translate);
+void HopEntity::transformUpdated(int tu){
+	super::transformUpdated(tu);
 
-	mSolid->setPosition(mTranslate);
+	// Only modify position on a translation change, and not from the interpolator
+	if((tu&TransformUpdate_TRANSLATE)>0 && (tu&TransformUpdate_INTERPOLATOR)==0){
+		mSolid->setPosition(mTransform->getTranslate());
 
-	if(mInterpolator!=NULL){
-		mInterpolator->transformUpdated(this);
+		if(mInterpolator!=NULL){
+			mInterpolator->transformUpdated(this);
+		}
 	}
 }
 
@@ -238,7 +242,7 @@ void HopEntity::frameUpdate(int dt,int scope){
 
 void HopEntity::getBound(AABox &result){
 	if(mTraceable!=NULL){
-		result.set(mTraceable->getLocalBound().getAABox());
+		result.set(mTraceable->getBound()->getAABox());
 	}
 }
 

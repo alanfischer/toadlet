@@ -37,13 +37,14 @@ class Renderer;
 namespace tadpole{
 
 class Material;
+class Transform;
 
 class Renderable{
 public:
 	virtual ~Renderable(){}
 
 	virtual Material *getRenderMaterial() const=0;
-	virtual const tadpole::Matrix4x4 &getRenderTransform() const=0;
+	virtual Transform *getRenderTransform() const=0;
 	virtual void render(peeper::Renderer *renderer) const=0;
 };
 	
@@ -54,7 +55,7 @@ public:
 	RenderableType *renderable;
 	RenderableWorkaround(RenderableType *type):renderable(type){}
 	Material *getRenderMaterial() const{return renderable->getRenderMaterial();}
-	const Matrix4x4 &getRenderTransform() const{return renderable->getRenderTransform();}
+	Transform *getRenderTransform() const{return renderable->getRenderTransform();}
 	void render(peeper::Renderer *renderer) const{renderable->render(renderer);}
 };
 #define TOADLET_GIB_DEFINE(type) toadlet::tadpole::RenderableWorkaround<type> renderable;

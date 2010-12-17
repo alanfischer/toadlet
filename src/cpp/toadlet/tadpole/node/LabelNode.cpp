@@ -217,7 +217,7 @@ void LabelNode::updateLabel(){
 
 	// Update bound
 	if(mFont==NULL){
-		mLocalBound.reset();
+		mBound->reset();
 	}
 	else{
 		int iw=mFont->getStringWidth(mText);
@@ -241,10 +241,10 @@ void LabelNode::updateLabel(){
 		}
 
 		if(mAlignment==(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER)){
-			mLocalBound.set(Math::sqrt(Math::square(width/2) + Math::square(height/2)));
+			mBound->set(Math::sqrt(Math::square(width/2) + Math::square(height/2)));
 		}
 		else{
-			mLocalBound.set(Math::sqrt(Math::square(width) + Math::square(height)));
+			mBound->set(Math::sqrt(Math::square(width) + Math::square(height)));
 		}
 	}
 }

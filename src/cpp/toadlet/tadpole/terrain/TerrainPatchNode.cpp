@@ -235,7 +235,7 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height,bo
 
 	addBlockToBack(0);
 
-	mLocalBound.set(mBlocks[0].mins,mBlocks[0].maxs);
+	mBound->set(mBlocks[0].mins,mBlocks[0].maxs);
 
 	// Water buffers
 	if(water){
@@ -535,7 +535,7 @@ void TerrainPatchNode::updateBlocks(CameraNode *camera){
 	}
 
 	Vector3 cameraTranslate;
-	inverseTransform(cameraTranslate,camera->getWorldTranslate(),mWorldTranslate,mWorldScale,mWorldRotate);
+	mWorldTransform->inverseTransform(cameraTranslate,camera->getWorldTranslate());
 
 	resetBlocks();
 	simplifyBlocks(cameraTranslate);
@@ -559,8 +559,8 @@ void TerrainPatchNode::render(Renderer *renderer) const{
 
 void TerrainPatchNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	Segment localSegment;
-	scalar sizeAdjust=Math::div(size.z,mWorldScale.z);
-	inverseTransform(localSegment,segment,position,mWorldScale,mWorldRotate);
+	scalar sizeAdjust=Math::div(size.z,mWorldTransform->getScale().z);
+	Transform::inverseTransform(localSegment,segment,position,mWorldTransform->getScale(),mWorldTransform->getRotate());
 	localSegment.origin.z-=sizeAdjust;
 
 	result.time=Math::ONE;
@@ -579,8 +579,8 @@ void TerrainPatchNode::traceSegment(Collision &result,const Vector3 &position,co
 
 	result.point.z+=sizeAdjust;
 	if(result.time<Math::ONE){
-		transformNormal(result.normal,result.normal,mWorldScale,mWorldRotate);
-		transform(result.point,result.point,position,mWorldScale,mWorldRotate);
+		mWorldTransform->transformNormal(result.normal);
+		Transform::transform(result.point,position,mWorldTransform->getScale(),mWorldTransform->getRotate());
 	}
 }
 
@@ -1114,8 +1114,8 @@ bool TerrainPatchNode::blockIntersectsCamera(const Block *block,CameraNode *came
 		box.maxs.z=0;
 	}
 
-	transform(box.mins,mWorldTranslate,mWorldScale,mWorldRotate);
-	transform(box.maxs,mWorldTranslate,mWorldScale,mWorldRotate);
+	mWorldTransform->transform(box.mins);
+	mWorldTransform->transform(box.maxs);
 
 	return camera->culled(box)==false;
 }

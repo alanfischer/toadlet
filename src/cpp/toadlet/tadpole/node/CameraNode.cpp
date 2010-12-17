@@ -51,11 +51,10 @@ CameraNode::CameraNode():super(),
 	mSkipFirstClear(false),
 	mAlignmentCalculationsUseOrigin(false),
 
-	//mProjectionTransform
+	//mProjectionMatrix
 	mProjectionRotation(0),
-	//mFinalProjectionTransform
-	//mWorldTranslate,
-	//mViewTransform,
+	//mFinalProjectionMatrix
+	//mViewMatrix,
 	//mForward,mRight,
 
 	//mOverlayMatrix,
@@ -129,7 +128,7 @@ void CameraNode::setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,sca
 	mBottomDist=0;mTopDist=0;
 	mNearDist=nearDist;mFarDist=farDist;
 
-	Math::setMatrix4x4FromPerspectiveX(mProjectionTransform,fovx,aspect,nearDist,farDist);
+	Math::setMatrix4x4FromPerspectiveX(mProjectionMatrix,fovx,aspect,nearDist,farDist);
 
 	projectionUpdated();
 }
@@ -141,7 +140,7 @@ void CameraNode::setProjectionFovY(scalar fovy,scalar aspect,scalar nearDist,sca
 	mBottomDist=0;mTopDist=0;
 	mNearDist=nearDist;mFarDist=farDist;
 
-	Math::setMatrix4x4FromPerspectiveY(mProjectionTransform,fovy,aspect,nearDist,farDist);
+	Math::setMatrix4x4FromPerspectiveY(mProjectionMatrix,fovy,aspect,nearDist,farDist);
 
 	projectionUpdated();
 }
@@ -153,7 +152,7 @@ void CameraNode::setProjectionOrtho(scalar leftDist,scalar rightDist,scalar bott
 	mBottomDist=bottomDist;mTopDist=topDist;
 	mNearDist=nearDist;mFarDist=farDist;
 
-	Math::setMatrix4x4FromOrtho(mProjectionTransform,leftDist,rightDist,bottomDist,topDist,nearDist,farDist);
+	Math::setMatrix4x4FromOrtho(mProjectionMatrix,leftDist,rightDist,bottomDist,topDist,nearDist,farDist);
 
 	projectionUpdated();
 }
@@ -165,19 +164,19 @@ void CameraNode::setProjectionFrustum(scalar leftDist,scalar rightDist,scalar bo
 	mBottomDist=bottomDist;mTopDist=topDist;
 	mNearDist=nearDist;mFarDist=farDist;
 
-	Math::setMatrix4x4FromFrustum(mProjectionTransform,leftDist,rightDist,bottomDist,topDist,nearDist,farDist);
+	Math::setMatrix4x4FromFrustum(mProjectionMatrix,leftDist,rightDist,bottomDist,topDist,nearDist,farDist);
 
 	projectionUpdated();
 }
 
-void CameraNode::setProjectionTransform(const Matrix4x4 &transform){
+void CameraNode::setProjectionMatrix(const Matrix4x4 &matrix){
 	mProjectionType=ProjectionType_MATRIX;
 	mFov=0;mAspect=0;
 	mLeftDist=0;mRightDist=0;
 	mBottomDist=0;mTopDist=0;
 	mNearDist=0;mFarDist=0;
 
-	mProjectionTransform.set(transform);
+	mProjectionMatrix.set(matrix);
 
 	projectionUpdated();
 }
@@ -212,55 +211,70 @@ void CameraNode::setNearAndFarDist(scalar nearDist,scalar farDist){
 }
 
 void CameraNode::setLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up){
-	Matrix4x4 transform;
-	Math::setMatrix4x4FromLookAt(transform,eye,point,up,true);
+	Matrix4x4 matrix;
+	Vector3 translate;
+	Quaternion rotate;
 
-	Math::setTranslateFromMatrix4x4(mTranslate,transform);
-	Math::setQuaternionFromMatrix4x4(mRotate,transform);
-	transformUpdated();
+	Math::setMatrix4x4FromLookAt(matrix,eye,point,up,true);
+	Math::setTranslateFromMatrix4x4(translate,matrix);
+	Math::setQuaternionFromMatrix4x4(rotate,matrix);
+
+	setTranslate(translate);
+	setRotate(rotate);
 }
 
+/// @todo: Unit test
 void CameraNode::setWorldLookAt(const Vector3 &eye,const Vector3 &point,const Vector3 &up){
-	Matrix4x4 transform;
-	Math::setMatrix4x4FromLookAt(transform,eye,point,up,true);
+	Matrix4x4 matrix;
+	Vector3 translate,worldTranslate;
+	Quaternion rotate,worldRotate;
 
-	Math::setTranslateFromMatrix4x4(mWorldTranslate,transform);
-	Math::setQuaternionFromMatrix4x4(mWorldRotate,transform);
+	Math::setMatrix4x4FromLookAt(matrix,eye,point,up,true);
+	Math::setTranslateFromMatrix4x4(worldTranslate,matrix);
+	Math::setQuaternionFromMatrix4x4(worldRotate,matrix);
 	if(mParent!=NULL){
 		Quaternion invrot;
 		Math::invert(invrot,mParent->getWorldRotate());
-		Math::sub(mWorldTranslate,mParent->getWorldTranslate());
-		Math::div(mWorldTranslate,mParent->getWorldScale());
-		Math::mul(mTranslate,invrot,mWorldTranslate);
-		Math::mul(mRotate,invrot,mWorldRotate);
+		Math::sub(worldTranslate,mParent->getWorldTranslate());
+		Math::div(worldTranslate,mParent->getWorldScale());
+		Math::mul(translate,invrot,worldTranslate);
+		Math::mul(rotate,invrot,worldRotate);
 	}
-	transformUpdated();
+	setTranslate(translate);
+	setRotate(rotate);
 }
 
 void CameraNode::setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up){
-	Matrix4x4 transform;
-	Math::setMatrix4x4FromLookDir(transform,eye,dir,up,true);
+	Matrix4x4 matrix;
+	Vector3 translate;
+	Quaternion rotate;
 
-	Math::setTranslateFromMatrix4x4(mTranslate,transform);
-	Math::setQuaternionFromMatrix4x4(mRotate,transform);
-	transformUpdated();
+	Math::setMatrix4x4FromLookDir(matrix,eye,dir,up,true);
+	Math::setTranslateFromMatrix4x4(translate,matrix);
+	Math::setQuaternionFromMatrix4x4(rotate,matrix);
+
+	setTranslate(translate);
+	setRotate(rotate);
 }
 
 void CameraNode::setWorldLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up){
-	Matrix4x4 transform;
-	Math::setMatrix4x4FromLookDir(transform,eye,dir,up,true);
+	Matrix4x4 matrix;
+	Vector3 translate,worldTranslate;
+	Quaternion rotate,worldRotate;
 
-	Math::setTranslateFromMatrix4x4(mWorldTranslate,transform);
-	Math::setQuaternionFromMatrix4x4(mWorldRotate,transform);
+	Math::setMatrix4x4FromLookDir(matrix,eye,dir,up,true);
+	Math::setTranslateFromMatrix4x4(worldTranslate,matrix);
+	Math::setQuaternionFromMatrix4x4(worldRotate,matrix);
 	if(mParent!=NULL){
 		Quaternion invrot;
 		Math::invert(invrot,mParent->getWorldRotate());
-		Math::sub(mWorldTranslate,mParent->getWorldTranslate());
-		Math::div(mWorldTranslate,mParent->getWorldScale());
-		Math::mul(mTranslate,invrot,mWorldTranslate);
-		Math::mul(mRotate,invrot,mWorldRotate);
+		Math::sub(worldTranslate,mParent->getWorldTranslate());
+		Math::div(worldTranslate,mParent->getWorldScale());
+		Math::mul(translate,invrot,worldTranslate);
+		Math::mul(rotate,invrot,worldRotate);
 	}
-	transformUpdated();
+	setTranslate(translate);
+	setRotate(rotate);
 }
 
 void CameraNode::setViewport(const Viewport &viewport){
@@ -279,24 +293,24 @@ void CameraNode::setGamma(scalar gamma){
 }
 
 void CameraNode::projectionUpdated(){
-	Matrix4x4 transform;
+	Matrix4x4 matrix;
 
 /// @todo: Make some test cases for the projection rotation, and get this debugged
 	scalar x=0;//mViewport.x+mViewport.width/2;
 	scalar y=0;//mViewport.y+mViewport.height/2;
-	mFinalProjectionTransform.set(mProjectionTransform);
+	mFinalProjectionMatrix.set(mProjectionMatrix);
 
-	transform.reset();
-	Math::setMatrix4x4FromTranslate(transform,x,y,0);
-	Math::preMul(transform,mFinalProjectionTransform);
+	matrix.reset();
+	Math::setMatrix4x4FromTranslate(matrix,x,y,0);
+	Math::preMul(matrix,mFinalProjectionMatrix);
 
-	transform.reset();
-	Math::setMatrix4x4FromZ(transform,mProjectionRotation);
-	Math::postMul(mFinalProjectionTransform,transform);
+	matrix.reset();
+	Math::setMatrix4x4FromZ(matrix,mProjectionRotation);
+	Math::postMul(mFinalProjectionMatrix,matrix);
 
-	transform.reset();
-	Math::setMatrix4x4FromTranslate(transform,-x,-y,0);
-	Math::postMul(mFinalProjectionTransform,transform);
+	matrix.reset();
+	Math::setMatrix4x4FromTranslate(matrix,-x,-y,0);
+	Math::postMul(mFinalProjectionMatrix,matrix);
 
 	updateViewTransform();
 }
@@ -304,8 +318,8 @@ void CameraNode::projectionUpdated(){
 void CameraNode::updateWorldTransform(){
 	super::updateWorldTransform();
 
-	Math::mul(mForward,mWorldTransform,Math::NEG_Z_UNIT_VECTOR3);
-	Math::mul(mRight,mWorldTransform,Math::X_UNIT_VECTOR3);
+	mWorldTransform->transformNormal(mForward,Math::NEG_Z_UNIT_VECTOR3);
+	mWorldTransform->transformNormal(mRight,Math::X_UNIT_VECTOR3);
 
 	updateViewTransform();
 }
@@ -320,15 +334,15 @@ bool CameraNode::culled(Node *node) const{
 	return (node->getScope()&getScope())==0 || culled(node->getWorldBound());
 }
 
-bool CameraNode::culled(const Bound &bound) const{
-	if(bound.getType()==Bound::Type_INFINITE){
+bool CameraNode::culled(Bound *bound) const{
+	if(bound->getType()==Bound::Type_INFINITE){
 		return false;
 	}
-	else if(bound.getType()==Bound::Type_SPHERE){
-		return culled(bound.getSphere());
+	else if(bound->getType()==Bound::Type_SPHERE){
+		return culled(bound->getSphere());
 	}
-	else if(bound.getType()==Bound::Type_AABOX){
-		return culled(bound.getAABox());
+	else if(bound->getType()==Bound::Type_AABOX){
+		return culled(bound->getAABox());
 	}
 	else{
 		Error::unimplemented("unknown bound type");
@@ -374,27 +388,30 @@ void CameraNode::updateFramesPerSecond(){
 }
 
 void CameraNode::updateViewTransform(){
-	scalar wt00=mWorldTransform.at(0,0),wt01=mWorldTransform.at(0,1),wt02=mWorldTransform.at(0,2);
-	scalar wt10=mWorldTransform.at(1,0),wt11=mWorldTransform.at(1,1),wt12=mWorldTransform.at(1,2);
-	scalar wt20=mWorldTransform.at(2,0),wt21=mWorldTransform.at(2,1),wt22=mWorldTransform.at(2,2);
+	const Vector3 worldTranslate=mWorldTransform->getTranslate();
+	Matrix4x4 worldMatrix;
+	mWorldTransform->toMatrix(worldMatrix);
+	scalar wt00=worldMatrix.at(0,0),wt01=worldMatrix.at(0,1),wt02=worldMatrix.at(0,2);
+	scalar wt10=worldMatrix.at(1,0),wt11=worldMatrix.at(1,1),wt12=worldMatrix.at(1,2);
+	scalar wt20=worldMatrix.at(2,0),wt21=worldMatrix.at(2,1),wt22=worldMatrix.at(2,2);
 
-	mViewTransform.setAt(0,0,wt00);
-	mViewTransform.setAt(0,1,wt10);
-	mViewTransform.setAt(0,2,wt20);
-	mViewTransform.setAt(1,0,wt01);
-	mViewTransform.setAt(1,1,wt11);
-	mViewTransform.setAt(1,2,wt21);
-	mViewTransform.setAt(2,0,wt02);
-	mViewTransform.setAt(2,1,wt12);
-	mViewTransform.setAt(2,2,wt22);
+	mViewMatrix.setAt(0,0,wt00);
+	mViewMatrix.setAt(0,1,wt10);
+	mViewMatrix.setAt(0,2,wt20);
+	mViewMatrix.setAt(1,0,wt01);
+	mViewMatrix.setAt(1,1,wt11);
+	mViewMatrix.setAt(1,2,wt21);
+	mViewMatrix.setAt(2,0,wt02);
+	mViewMatrix.setAt(2,1,wt12);
+	mViewMatrix.setAt(2,2,wt22);
 
-	mViewTransform.setAt(0,3,-(Math::mul(wt00,mWorldTranslate.x) + Math::mul(wt10,mWorldTranslate.y) + Math::mul(wt20,mWorldTranslate.z)));
-	mViewTransform.setAt(1,3,-(Math::mul(wt01,mWorldTranslate.x) + Math::mul(wt11,mWorldTranslate.y) + Math::mul(wt21,mWorldTranslate.z)));
-	mViewTransform.setAt(2,3,-(Math::mul(wt02,mWorldTranslate.x) + Math::mul(wt12,mWorldTranslate.y) + Math::mul(wt22,mWorldTranslate.z)));
+	mViewMatrix.setAt(0,3,-(Math::mul(wt00,worldTranslate.x) + Math::mul(wt10,worldTranslate.y) + Math::mul(wt20,worldTranslate.z)));
+	mViewMatrix.setAt(1,3,-(Math::mul(wt01,worldTranslate.x) + Math::mul(wt11,worldTranslate.y) + Math::mul(wt21,worldTranslate.z)));
+	mViewMatrix.setAt(2,3,-(Math::mul(wt02,worldTranslate.x) + Math::mul(wt12,worldTranslate.y) + Math::mul(wt22,worldTranslate.z)));
 
 	// Update frustum planes
-	Math::mul(mViewProjectionTransform,mFinalProjectionTransform,mViewTransform);
-	scalar *vpt=mViewProjectionTransform.data;
+	Math::mul(mViewProjectionMatrix,mFinalProjectionMatrix,mViewMatrix);
+	scalar *vpt=mViewProjectionMatrix.data;
 	// Right clipping plane.
 	Math::normalize(mClipPlanes[0].set(vpt[3]-vpt[0], vpt[7]-vpt[4], vpt[11]-vpt[8], vpt[15]-vpt[12]));
 	// Left clipping plane.

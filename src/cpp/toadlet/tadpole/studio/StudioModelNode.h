@@ -47,7 +47,7 @@ public:
 		SubModel(StudioModelNode *modelNode,int bodypartIndex,int modelIndex,int meshIndex,int skinIndex);
 
 		Material *getRenderMaterial() const{return material;}
-		const Matrix4x4 &getRenderTransform() const{return modelNode->getWorldTransform();}
+		Transform *getRenderTransform() const{return modelNode->getWorldTransform();}
 		void render(peeper::Renderer *renderer) const;
 
 		StudioModelNode *modelNode;
@@ -94,12 +94,13 @@ public:
 	void setSkin(int skin);
 	int getSkin() const{return mSkinIndex;}
 
-	const Bound &getLocalBound() const{return mLocalBound;}
+	// Traceable interface
+	Bound *getBound() const{return super::getBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 	Material *getRenderMaterial() const{return mSkeletonMaterial;}
-	const Matrix4x4 &getRenderTransform() const{return getWorldTransform();}
+	Transform *getRenderTransform() const{return getWorldTransform();}
 	void render(peeper::Renderer *renderer) const;
 
 	static void setQuaternionFromEulerAngleStudio(Quaternion &r,const EulerAngle &euler);

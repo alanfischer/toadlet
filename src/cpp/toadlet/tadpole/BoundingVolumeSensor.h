@@ -43,7 +43,7 @@ public:
 	BoundingVolumeSensor(Scene *scene);
 	virtual ~BoundingVolumeSensor();
 
-	virtual bool senseBoundingVolumes(SensorResultsListener *results,const Bound &bound);
+	virtual bool senseBoundingVolumes(SensorResultsListener *results,Bound *bound);
 
 protected:
 	Scene *mScene;

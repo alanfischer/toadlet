@@ -119,7 +119,7 @@ public:
 	void updateVertexData();
 
 	Material *getRenderMaterial() const{return mMaterial;}
-	const Matrix4x4 &getRenderTransform() const;
+	Transform *getRenderTransform() const;
 	void render(peeper::Renderer *renderer) const;
 
 protected:

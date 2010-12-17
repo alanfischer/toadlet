@@ -79,6 +79,11 @@ Node::Node():
 //	TOADLET_PROPERTY_INIT(scale);
 //	TOADLET_PROPERTY_INIT(scope);
 //	TOADLET_PROPERTY_INIT(name);
+
+	mTransform=Transform::ptr(new Transform());
+	mBound=Bound::ptr(new Bound());
+	mWorldTransform=Transform::ptr(new Transform());
+	mWorldBound=Bound::ptr(new Bound());
 }
 
 Node::~Node(){
@@ -103,21 +108,16 @@ Node *Node::create(Scene *scene){
 	mDependsUpon=NULL;
 
 	mTransformUpdatedFrame=-1;
-	mTranslate.reset();
-	mRotate.reset();
-	mScale.set(Math::ONE,Math::ONE,Math::ONE);
-	mWorldTranslate.reset();
-	mWorldRotate.reset();
-	mWorldScale.set(Math::ONE,Math::ONE,Math::ONE);
-	mWorldTransform.reset();
+	mTransform->reset();
+	mWorldTransform->reset();
 	mScope=-1;
 	mName="";
 
 	mActive=true;
 	mDeactivateCount=0;
 
-	mLocalBound.reset();
-	mWorldBound.reset();
+	mBound->reset();
+	mWorldBound->reset();
 
 	return this;
 }
@@ -183,70 +183,48 @@ void Node::parentDataChanged(void *parentData){
 }
 
 void Node::setTranslate(const Vector3 &translate){
-	mTranslate.set(translate);
-	transformUpdated();
+	mTransform->setTranslate(translate);
+	transformUpdated(TransformUpdate_TRANSLATE);
 }
 
 void Node::setTranslate(scalar x,scalar y,scalar z){
-	mTranslate.set(x,y,z);
-	setTranslate(mTranslate);
+	mTransform->setTranslate(x,y,z);
+	transformUpdated(TransformUpdate_TRANSLATE);
 }
 
 void Node::setRotate(const Quaternion &rotate){
-	mRotate.set(rotate);
-	transformUpdated();
+	mTransform->setRotate(rotate);
+	transformUpdated(TransformUpdate_ROTATE);
 }
 
 void Node::setRotate(const Matrix3x3 &rotate){
-	Math::setQuaternionFromMatrix3x3(mRotate,rotate);
-	setRotate(mRotate);
+	mTransform->setRotate(rotate);
+	transformUpdated(TransformUpdate_ROTATE);
 }
 
-void Node::setRotate(scalar x,scalar y,scalar z,scalar angle){
-	Math::setQuaternionFromAxisAngle(mRotate,cache_setRotate_vector.set(x,y,z),angle);
-	setRotate(mRotate);
+void Node::setRotate(const Vector3 &axis,scalar angle){
+	mTransform->setRotate(axis,angle);
+	transformUpdated(TransformUpdate_ROTATE);
 }
 
 void Node::setScale(const Vector3 &scale){
-	mScale.set(scale);
-	transformUpdated();
+	mTransform->setScale(scale);
+	transformUpdated(TransformUpdate_SCALE);
 }
 
 void Node::setScale(scalar x,scalar y,scalar z){
-	mScale.set(x,y,z);
-	setScale(mScale);
+	mTransform->setScale(x,y,z);
+	transformUpdated(TransformUpdate_SCALE);
 }
 
-void Node::setScale(scalar s){
-	mScale.set(s,s,s);
-	setScale(mScale);
+void Node::setTransform(Transform *transform,int tu){
+	mTransform->set(transform);
+	transformUpdated(TransformUpdate_TRANSLATE|TransformUpdate_ROTATE|TransformUpdate_SCALE|tu);
 }
 
-void Node::setTransform(const Matrix4x4 &transform){
-	Math::setScaleFromMatrix4x4(mScale,transform);
-	setScale(mScale);
-	Math::setRotateFromMatrix4x4(cache_setTransform_matrix,transform,mScale);
-	Math::setQuaternionFromMatrix3x3(mRotate,cache_setTransform_matrix);
-	setRotate(mRotate);
-	Math::setTranslateFromMatrix4x4(mTranslate,transform);
-	setTranslate(mTranslate);
-}
-
-void Node::findTransformTo(Matrix4x4 &result,Node *node){
-	Matrix3x3 rotate;
-	Matrix4x4 transform;
-	Math::setMatrix3x3FromQuaternion(rotate,getWorldRotate());
-	Math::setMatrix4x4FromTranslateRotateScale(transform,getWorldTranslate(),rotate,getWorldScale());
-	Matrix4x4 nodeTransform;
-	Math::setMatrix3x3FromQuaternion(rotate,node->getWorldRotate());
-	Math::setMatrix4x4FromTranslateRotateScale(nodeTransform,node->getWorldTranslate(),rotate,node->getWorldScale());
-	Math::invert(result,nodeTransform);
-	Math::postMul(result,transform);
-}
-
-void Node::setLocalBound(const Bound &bound){
-	mLocalBound.set(bound);
-	transformUpdated();
+void Node::setBound(Bound *bound){
+	mBound->set(bound);
+	transformUpdated(0);
 }
 
 void Node::logicUpdate(int dt,int scope){
@@ -307,31 +285,19 @@ bool Node::getTransformUpdated(){return mScene->getFrame()==mTransformUpdatedFra
 
 void Node::updateWorldTransform(){
 	if(mParent==NULL){
-		mWorldScale.set(mScale);
-		mWorldRotate.set(mRotate);
-		mWorldTranslate.set(mTranslate);
+		mWorldTransform->set(mTransform);
 	}
 	else if(mTransformUpdatedFrame==-1){
-		mWorldScale.set(mParent->mWorldScale);
-		mWorldRotate.set(mParent->mWorldRotate);
-		mWorldTranslate.set(mParent->mWorldTranslate);
+		mWorldTransform->set(mParent->mWorldTransform);
 	}
 	else{
-		Math::mul(mWorldScale,mParent->mWorldScale,mScale);
-		Math::mul(mWorldRotate,mParent->mWorldRotate,mRotate);
-		Math::mul(mWorldTranslate,mParent->mWorldRotate,mTranslate);
-		Math::mul(mWorldTranslate,mParent->mWorldScale);
-		Math::add(mWorldTranslate,mParent->mWorldTranslate);
+		mWorldTransform->transform(mParent->mWorldTransform,mTransform);
 	}
 
-	Bound::transform(mWorldBound,mLocalBound,mWorldTranslate,mWorldRotate,mWorldScale);
-
-	/// @todo: add a setMatrix4x4FromTRS that can take a quat?
-	Math::setMatrix3x3FromQuaternion(cache_setTransform_matrix,mWorldRotate);
-	Math::setMatrix4x4FromTranslateRotateScale(mWorldTransform,mWorldTranslate,cache_setTransform_matrix,mWorldScale);
+	mWorldBound->transform(mBound,mWorldTransform);
 }
 
-void Node::transformUpdated(){
+void Node::transformUpdated(int tu){
 	mTransformUpdatedFrame=mScene->getFrame();
 	activate();
 }

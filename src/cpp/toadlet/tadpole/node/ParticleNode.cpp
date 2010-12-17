@@ -210,7 +210,7 @@ bool ParticleNode::start(int particlesPerBeam,int numParticles,bool hasColor,con
 				if(radiusSquared<rs) radiusSquared=rs;
 			}
 		}
-		mLocalBound.set(Math::sqrt(radiusSquared));
+		mBound->set(Math::sqrt(radiusSquared));
 	}
 	else if(ages!=NULL){
 		for(i=0;i<numParticles;++i){
@@ -368,9 +368,9 @@ void ParticleNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 #endif
 }
 
-const Matrix4x4 &ParticleNode::getRenderTransform() const{
+Transform *ParticleNode::getRenderTransform() const{
 	if(mWorldSpace){
-		return Math::IDENTITY_MATRIX4X4;
+		return NULL;
 	}
 	else{
 		return super::getWorldTransform();

@@ -109,6 +109,7 @@ set (TADPOLE_TERRAIN_SRC
 set (TADPOLE_HEADERS
 	ArchiveManager.h
 	AudioBufferManager.h
+	Bound.h
 	BufferManager.h
 	BoundingVolumeSensor.h
 	Collision.h
@@ -133,6 +134,7 @@ set (TADPOLE_HEADERS
 	TextureManager.h
 	Traceable.h
 	Track.h
+	Transform.h
 	Types.h
 	UpdateListener.h
 	VertexFormats.h

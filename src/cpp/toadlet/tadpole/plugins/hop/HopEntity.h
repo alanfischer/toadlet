@@ -114,8 +114,7 @@ public:
 	virtual void setCollisionVolumesVisible(bool visible);
 
 	// Node callbacks
-	virtual void setTranslate(const Vector3 &translate);
-	virtual void setTranslate(scalar x,scalar y,scalar z){super::setTranslate(x,y,z);}
+	virtual void transformUpdated(int tu);
 	virtual void parentChanged(node::ParentNode *parent);
 	virtual void logicUpdate(int dt,int scope);
 	virtual void frameUpdate(int dt,int scope);

@@ -47,8 +47,14 @@ void RenderQueue::queueRenderable(Renderable *renderable){
 	RenderLayer *layer=getRenderLayer((material==NULL)?0:material->getLayer());
 	if(material!=NULL && material->getDepthSorted()){
 		/// @todo: Real sorting algorithm, clean this up
-		Vector3 origin; Math::setTranslateFromMatrix4x4(origin,renderable->getRenderTransform());
-		scalar depth=Math::lengthSquared(origin,mCamera->getWorldTranslate());
+		scalar depth=0;
+		Transform *transform=renderable->getRenderTransform();
+		if(transform!=NULL){
+			depth=Math::lengthSquared(transform->getTranslate(),mCamera->getWorldTranslate());
+		}
+		else{
+			depth=Math::lengthSquared(mCamera->getWorldTranslate());
+		}
 		int numRenderables=layer->depthSortedRenderables.size();
 		int i;
 		for(i=0;i<numRenderables;++i){

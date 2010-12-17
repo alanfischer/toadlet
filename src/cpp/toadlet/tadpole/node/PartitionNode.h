@@ -42,7 +42,7 @@ public:
 	virtual Node *create(Scene *scene);
 	virtual void destroy();
 
-	virtual bool senseBoundingVolumes(SensorResultsListener *listener,const Bound &bound);
+	virtual bool senseBoundingVolumes(SensorResultsListener *listener,Bound *bound);
 	virtual bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);
 };
 

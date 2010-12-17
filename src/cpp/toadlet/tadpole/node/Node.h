@@ -33,6 +33,7 @@
 #include <toadlet/egg/Type.h>
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/Bound.h>
+#include <toadlet/tadpole/Transform.h>
 #include <toadlet/tadpole/node/NodeListener.h>
 #include <toadlet/tadpole/node/NodeInterpolator.h>
 
@@ -75,6 +76,13 @@ class TOADLET_API Node{
 public:
 	TOADLET_NODE(Node,Node);
 
+	enum TransformUpdate{
+		TransformUpdate_TRANSLATE=1<<0,
+		TransformUpdate_ROTATE=1<<1,
+		TransformUpdate_SCALE=1<<2,
+		TransformUpdate_INTERPOLATOR=1<<3,
+	};
+
 	Node();
 	virtual ~Node();
 	virtual Node *create(Scene *scene);
@@ -101,25 +109,36 @@ public:
 
 	virtual void setTranslate(const Vector3 &translate);
 	virtual void setTranslate(scalar x,scalar y,scalar z);
-	inline const Vector3 &getTranslate() const{return mTranslate;}
-	inline const Vector3 &getWorldTranslate() const{return mWorldTranslate;}
+	inline const Vector3 &getTranslate() const{return mTransform->getTranslate();}
 
 	virtual void setRotate(const Quaternion &rotate);
 	virtual void setRotate(const Matrix3x3 &rotate);
-	virtual void setRotate(scalar x,scalar y,scalar z,scalar angle);
-	inline const Quaternion &getRotate() const{return mRotate;}
-	inline const Quaternion &getWorldRotate() const{return mWorldRotate;}
+	virtual void setRotate(const Vector3 &axis,scalar angle);
+	inline const Quaternion &getRotate() const{return mTransform->getRotate();}
 
 	virtual void setScale(const Vector3 &scale);
 	virtual void setScale(scalar x,scalar y,scalar z);
-	virtual void setScale(scalar s);
-	inline const Vector3 &getScale() const{return mScale;}
-	inline const Vector3 &getWorldScale() const{return mWorldScale;}
+	virtual void setScale(scalar s){setScale(s,s,s);}
+	inline const Vector3 &getScale() const{return mTransform->getScale();}
 
-	virtual void setTransform(const Matrix4x4 &transform);
-	inline const Matrix4x4 &getWorldTransform() const{return mWorldTransform;}
+	inline const Vector3 &getWorldTranslate() const{return mWorldTransform->getTranslate();}
+	inline const Quaternion &getWorldRotate() const{return mWorldTransform->getRotate();}
+	inline const Vector3 &getWorldScale() const{return mWorldTransform->getScale();}
 
-	virtual void findTransformTo(Matrix4x4 &result,Node *node);
+	// I suppose we could modify the Transform interface to just be virtual getters only
+	// Then the class Tranform would be a TranslateRotateScaleTransform
+	// Then we could have a getTransform() method in node since it couldn't be set
+	// OR: We could add a listener in the Transform class that notifys the node that it was modified
+	// Then you can freely grab transforms and modify items in them without worry.
+	// That would also make it easier for Animations, since we wouldn't need a Node animation
+	// Instead just an Animation that modifys a Transform would suffice.
+	// Though in the second case, we would still need some way of the Interpolators notifying that it was an interpolation change.
+	virtual void setTransform(Transform *transform,int tu);
+	inline Transform *getWorldTransform() const{return mWorldTransform;}
+
+	virtual void setBound(Bound *bound);
+	inline Bound::ptr getBound() const{return mBound;}
+	inline Bound::ptr getWorldBound() const{return mWorldBound;}
 
 	virtual void handleEvent(const egg::Event::ptr &event){}
 
@@ -128,10 +147,6 @@ public:
 
 	virtual void setName(const egg::String &name){mName=name;}
 	inline const egg::String &getName() const{return mName;}
-
-	virtual void setLocalBound(const Bound &bound);
-	inline const Bound &getLocalBound() const{return mLocalBound;}
-	inline const Bound &getWorldBound() const{return mWorldBound;}
 
 	virtual void logicUpdate(int dt,int scope);
 	virtual void frameUpdate(int dt,int scope);
@@ -145,7 +160,7 @@ public:
 	bool getTransformUpdated();
 
 	virtual void updateWorldTransform();
-	virtual void transformUpdated();
+	virtual void transformUpdated(int tu);
 
 	inline Engine *getEngine() const{return mEngine;}
 	inline Scene *getScene() const{return mScene;}
@@ -160,63 +175,6 @@ public:
 
 //	TOADLET_PROPERTY(int,scope,Node,getScope,setScope);
 //	TOADLET_PROPERTY(egg::String,name,Node,getName,setName);
-
-	/// @todo: These functions should be moved to a Transform class
-	static void inverseTransform(Vector3 &r,const Vector3 &t,const Vector3 &translate,const Vector3 &scale,const Quaternion &rotate){
-		Quaternion invrot; Math::invert(invrot,rotate);
-		Math::sub(r,t,translate);
-		Math::div(r,scale);
-		Math::mul(r,invrot);
-	}
-
-	static void inverseTransform(Vector3 &r,const Vector3 &translate,const Vector3 &scale,const Quaternion &rotate){
-		Quaternion invrot; Math::invert(invrot,rotate);
-		Math::sub(r,translate);
-		Math::div(r,scale);
-		Math::mul(r,invrot);
-	}
-
-	static void transform(Vector3 &r,const Vector3 &t,const Vector3 &translate,const Vector3 &scale,const Quaternion &rotate){
-		Math::mul(r,rotate,t);
-		Math::mul(r,scale);
-		Math::add(r,translate);
-	}
-
-	static void transform(Vector3 &r,const Vector3 &translate,const Vector3 &scale,const Quaternion &rotate){
-		Math::mul(r,rotate);
-		Math::mul(r,scale);
-		Math::add(r,translate);
-	}
-
-	static void transformNormal(Vector3 &r,const Vector3 &n,const Vector3 &scale,const Quaternion &rotate){
-		Math::mul(r,rotate,n);
-		Math::div(r,scale);
-		Math::normalize(r);
-	}
-
-	static void transformNormal(Vector3 &r,const Vector3 &scale,const Quaternion &rotate){
-		Math::mul(r,rotate);
-		Math::div(r,scale);
-		Math::normalize(r);
-	}
-
-	inline void inverseTransform(Segment &r,const Segment &s,const Vector3 &translate,const Vector3 &scale,const Quaternion &rotate){
-		Quaternion invrot; Math::invert(invrot,rotate);
-		Math::sub(r.origin,s.origin,translate);
-		Math::div(r.origin,scale);
-		Math::mul(r.origin,invrot);
-		Math::mul(r.direction,invrot,s.direction);
-		Math::div(r.direction,scale);
-	}
-
-	inline void inverseTransform(Segment &r,const Vector3 &translate,const Vector3 &scale,const Quaternion &rotate){
-		Quaternion invrot; Math::invert(invrot,rotate);
-		Math::sub(r.origin,translate);
-		Math::div(r.origin,scale);
-		Math::mul(r.origin,invrot);
-		Math::mul(r.direction,invrot);
-		Math::div(r.direction,scale);
-	}
 
 protected:
 	virtual void logicUpdateListeners(int dt);
@@ -241,15 +199,10 @@ protected:
 	Node::ptr mDependsUpon;
 
 	int mTransformUpdatedFrame;
-	Vector3 mTranslate;
-	Quaternion mRotate;
-	Vector3 mScale;
-	Bound mLocalBound;
-	Vector3 mWorldTranslate;
-	Quaternion mWorldRotate;
-	Vector3 mWorldScale;
-	Bound mWorldBound;
-	Matrix4x4 mWorldTransform;
+	Transform::ptr mTransform;
+	Bound::ptr mBound;
+	Transform::ptr mWorldTransform;
+	Bound::ptr mWorldBound;
 
 	int mScope;
 	egg::String mName;
@@ -260,7 +213,6 @@ protected:
 	int mLastFrame;
 
 	Vector3 cache_setRotate_vector;
-	Matrix3x3 cache_setTransform_matrix;
 	
 	friend class ParentNode;
 };

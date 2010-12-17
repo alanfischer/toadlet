@@ -88,7 +88,8 @@ Mesh::ptr MMSHHandler::loadMeshVersion3(DataStream::ptr stream){
 	while(stream->position()<stream->length()){
 		uint8 block=stream->readUInt8();
 		if(block==MESH_BLOCK){
-			mesh->scale.x=mesh->scale.y=mesh->scale.z=MathConversion::fixedToScalar(stream->readBigInt32());
+			scalar scale=MathConversion::fixedToScalar(stream->readBigInt32());
+			mesh->transform->setScale(scale,scale,scale);
 
 			uint16 numVertexes=stream->readBigUInt16();
 			uint16 vertexType=stream->readBigUInt16();

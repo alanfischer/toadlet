@@ -1185,6 +1185,21 @@ namespace Math{
 		r.data[2+2*4]=TOADLET_MUL_XX(rotate.data[2+2*3],scale.z);
 	}
 
+	inline void setMatrix4x4FromTranslateRotateScale(Matrix4x4 &r,const Vector3 &translate,const Quaternion &rotate,const Vector3 &scale){
+		r.data[0+3*4]=translate.x;
+		r.data[1+3*4]=translate.y;
+		r.data[2+3*4]=translate.z;
+		r.data[0+0*4]=TOADLET_MUL_XX(r.data[0+0*4],scale.x);
+		r.data[1+0*4]=TOADLET_MUL_XX(r.data[1+0*4],scale.x);
+		r.data[2+0*4]=TOADLET_MUL_XX(r.data[2+0*4],scale.x);
+		r.data[0+1*4]=TOADLET_MUL_XX(r.data[0+1*4],scale.y);
+		r.data[1+1*4]=TOADLET_MUL_XX(r.data[1+1*4],scale.y);
+		r.data[2+1*4]=TOADLET_MUL_XX(r.data[2+1*4],scale.y);
+		r.data[0+2*4]=TOADLET_MUL_XX(r.data[0+2*4],scale.z);
+		r.data[1+2*4]=TOADLET_MUL_XX(r.data[1+2*4],scale.z);
+		r.data[2+2*4]=TOADLET_MUL_XX(r.data[2+2*4],scale.z);
+	}
+
 	inline void setMatrix4x4AsTextureRotation(Matrix4x4 &r){
 		r.data[0+3*4]=TOADLET_MUL_XX(r.data[0+0*4],-HALF) + TOADLET_MUL_XX(r.data[0+1*4],-HALF) + HALF;
 		r.data[1+3*4]=TOADLET_MUL_XX(r.data[1+0*4],-HALF) + TOADLET_MUL_XX(r.data[1+1*4],-HALF) + HALF;
@@ -1588,9 +1603,9 @@ namespace Math{
 	TOADLET_API void findFitCapsule(Capsule &r,const AABox &box);
 
 	// Intersection operations
-	TOADLET_API bool testInside(const Vector3 &point,const Plane &plane);
-	TOADLET_API bool testInside(const Vector3 &point,const Sphere &sphere);
-	TOADLET_API bool testInside(const Vector3 &point,const AABox &box);
+	TOADLET_API bool testInside(const Plane &plane,const Vector3 &point);
+	TOADLET_API bool testInside(const Sphere &sphere,const Vector3 &point);
+	TOADLET_API bool testInside(const AABox &box,const Vector3 &point);
 
 	TOADLET_API bool testIntersection(const AABox &box1,const AABox &box2);
 	TOADLET_API bool testIntersection(const Sphere &sphere1,const Sphere &sphere2);

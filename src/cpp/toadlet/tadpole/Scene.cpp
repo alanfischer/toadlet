@@ -307,6 +307,8 @@ void Scene::render(Renderer *renderer,CameraNode *camera,Node *node){
 }
 
 void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue *queue){
+	Matrix4x4 matrix;
+
 	mCountLastRendered=0;
 
 	if(camera->getViewportSet()){
@@ -324,8 +326,8 @@ void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue 
 	}
 
 	renderer->setDefaultStates();
-	renderer->setProjectionMatrix(camera->getProjectionTransform());
-	renderer->setViewMatrix(camera->getViewTransform());
+	renderer->setProjectionMatrix(camera->getProjectionMatrix());
+	renderer->setViewMatrix(camera->getViewMatrix());
 	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
 
 	renderer->setAmbientColor(mAmbientColor);
@@ -371,8 +373,14 @@ void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue 
 			int numRenderables2=layer->materialSortedRenderables[j].renderables.size();
 			for(k=0;k<numRenderables2;++k){
 				Renderable *renderable=layer->materialSortedRenderables[j].renderables[k];
-				renderer->setModelMatrix(renderable->getRenderTransform());
+				Transform *transform=renderable->getRenderTransform();
+
+				if(transform!=NULL) transform->toMatrix(matrix);
+				else matrix.reset();
+
+				renderer->setModelMatrix(matrix);
 				renderable->render(renderer);
+
 				mCountLastRendered++;
 			}
 
@@ -386,11 +394,17 @@ void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue 
 		for(j=0;j<numRenderables;++j){
 			Renderable *renderable=layer->depthSortedRenderables[j].renderable;
 			Material *material=renderable->getRenderMaterial();
+			Transform *transform=renderable->getRenderTransform();
+
 			if(material!=NULL && mPreviousMaterial!=material){
 				material->setupRenderer(renderer,mPreviousMaterial);
 			}
 			mPreviousMaterial=material;
-			renderer->setModelMatrix(renderable->getRenderTransform());
+
+			if(transform!=NULL) transform->toMatrix(matrix);
+			else matrix.reset();
+
+			renderer->setModelMatrix(matrix);
 			renderable->render(renderer);
 			mCountLastRendered++;
 
@@ -463,8 +477,8 @@ void Scene::renderBoundingVolumes(Renderer *renderer,Node *node){
 		return;
 	}
 
-	if(node->getWorldBound().getSphere().radius>0){
-		const Sphere &sphere=node->getWorldBound().getSphere();
+	if(node->getWorldBound()->getSphere().radius>0){
+		const Sphere &sphere=node->getWorldBound()->getSphere();
 		Matrix4x4 transform;
 		Math::setMatrix4x4FromTranslate(transform,sphere.origin);
 		Math::setMatrix4x4FromScale(transform,sphere.radius,sphere.radius,sphere.radius);

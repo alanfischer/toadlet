@@ -175,7 +175,7 @@ void SpriteNode::updateSprite(){
 
 	Vector3 origin(x,y,0);
 	scalar radius=Math::sqrt(Math::square(width/2) + Math::square(height/2));
-	mLocalBound.set(origin,radius);
+	mBound->set(origin,radius);
 }
 
 }

@@ -40,7 +40,7 @@ BoundingVolumeSensor::BoundingVolumeSensor(Scene *scene):
 BoundingVolumeSensor::~BoundingVolumeSensor(){
 }
 
-bool BoundingVolumeSensor::senseBoundingVolumes(SensorResultsListener *results,const Bound &bound){
+bool BoundingVolumeSensor::senseBoundingVolumes(SensorResultsListener *results,Bound *bound){
 	return mScene->getRoot()->senseBoundingVolumes(results,bound);
 }
 
