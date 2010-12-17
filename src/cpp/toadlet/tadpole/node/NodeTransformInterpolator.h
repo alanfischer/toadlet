@@ -65,10 +65,9 @@ public:
 		Math::lerp(mScaleLerp,mLastTransform->getScale(),mTransform->getScale(),value);
 
 		mLerpedTransform->set(mTranslateLerp,mRotateLerp,mScaleLerp);
-
 		node->setTransform(mLerpedTransform,Node::TransformUpdate_INTERPOLATOR);
 	}
-	
+
 protected:
 	Transform::ptr mTransform;
 	Transform::ptr mLastTransform;

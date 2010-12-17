@@ -30,6 +30,7 @@
 #include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
+#include <toadlet/tadpole/node/NodeTransformInterpolator.h>
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
 
 namespace toadlet{
@@ -133,7 +134,7 @@ protected:
 	hop::Solid::ptr mSolid;
 	hop::Shape::ptr mTraceableShape;
 	Traceable *mTraceable;
-	node::NodeInterpolator::ptr mInterpolator;
+	node::NodeTransformInterpolator::ptr mInterpolator;
 	node::ParentNode::ptr mVolumeNode;
 	int mNextThink;
 
