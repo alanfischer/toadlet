@@ -45,7 +45,7 @@ Node *LightNode::create(Scene *scene){
 	super::create(scene);
 
 	mLight=Light::ptr(new Light());
-	mLocalBound.setInfinite();
+	mBound->setInfinite();
 
 	return this;
 }

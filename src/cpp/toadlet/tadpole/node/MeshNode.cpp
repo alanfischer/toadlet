@@ -180,10 +180,8 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 	mMesh=mesh;
 	mMesh->retain();
 
-	setTranslate(mMesh->translate);
-	setRotate(mMesh->rotate);
-	setScale(mMesh->scale);
-	setLocalBound(mMesh->bound);
+	setTransform(mMesh->transform,0);
+	setBound(mMesh->bound);
 
 	if(mMesh->skeleton!=NULL){
 		mSkeleton=MeshNodeSkeleton::ptr(new MeshNodeSkeleton(this,mMesh->skeleton));

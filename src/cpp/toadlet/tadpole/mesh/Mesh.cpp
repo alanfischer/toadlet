@@ -36,10 +36,10 @@ namespace mesh{
 
 Sphere Mesh::Bound_AUTOCALCULATE(-2);
 
-Mesh::Mesh():BaseResource(),
-	scale(Math::ONE,Math::ONE,Math::ONE),
-	bound(Bound::Type_INFINITE)
-{}
+Mesh::Mesh():BaseResource(){
+	transform=Transform::ptr(new Transform());
+	bound=Bound::ptr(new Bound(Bound::Type_INFINITE));
+}
 
 Mesh::~Mesh(){
 	destroy();

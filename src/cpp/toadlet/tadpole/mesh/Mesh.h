@@ -32,6 +32,7 @@
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/Bound.h>
+#include <toadlet/tadpole/Transform.h>
 #include <toadlet/tadpole/mesh/Skeleton.h>
 
 namespace toadlet{
@@ -82,10 +83,8 @@ public:
 	void destroy();
 	void compile();
 
-	Vector3 translate;
-	Quaternion rotate;
-	Vector3 scale;
-	Bound bound;
+	Transform::ptr transform;
+	Bound::ptr bound;
 
 	egg::Collection<SubMesh::ptr> subMeshes;
 	peeper::VertexData::ptr staticVertexData;

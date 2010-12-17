@@ -49,7 +49,7 @@ public:
 		SubModel(BSP30ModelNode *modelNode,BSP30Map *map);
 
 		Material *getRenderMaterial() const{return material;}
-		const Matrix4x4 &getRenderTransform() const{return modelNode->getWorldTransform();}
+		Transform *getRenderTransform() const{return modelNode->getWorldTransform();}
 		void render(peeper::Renderer *renderer) const;
 
 		BSP30ModelNode *modelNode;
@@ -71,8 +71,8 @@ public:
 
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 
-	// Traceable items
-	const Bound &getLocalBound() const{return super::getLocalBound();}
+	// Traceable interface
+	Bound *getBound() const{return super::getBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 protected:
@@ -106,16 +106,16 @@ public:
 	void mergeWorldBound(Node *child,bool justAttached);
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 
-	bool senseBoundingVolumes(SensorResultsListener *listener,const Bound &bound);
+	bool senseBoundingVolumes(SensorResultsListener *listener,Bound *bound);
 	bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);
 
 	// Traceable items
-	const Bound &getLocalBound() const{return super::getLocalBound();}
+	Bound *getBound() const{return super::getBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 	// Renderable items
 	Material *getRenderMaterial() const{return NULL;}
-	const Matrix4x4 &getRenderTransform() const{return Math::IDENTITY_MATRIX4X4;}
+	Transform *getRenderTransform() const{return mWorldTransform;}
 	void render(peeper::Renderer *renderer) const;
 
 protected:

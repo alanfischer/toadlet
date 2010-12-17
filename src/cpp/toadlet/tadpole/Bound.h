@@ -27,12 +27,15 @@
 #define TOADLET_TADPOLE_BOUND_H
 
 #include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/Transform.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class Bound{
+class TOADLET_API Bound{
 public:
+	TOADLET_SHARED_POINTERS(Bound);
+
 	enum Type{
 		Type_AABOX=			1<<0,
 		Type_SPHERE=		1<<1,
@@ -40,167 +43,180 @@ public:
 	};
 
 	Bound():
-		type(Type_AABOX),
-		epsilon(Math::fromMilli(1))
+		mType(Type_AABOX),
+		mEpsilon(Math::fromMilli(1))
 	{}
 
-	/// @todo: Eliminiate the -1 for inifinite, and just replace it with the infinite type checks
-	Bound(Type t){
-		TOADLET_ASSERT(t==Type_INFINITE);
-		type=t;
-	}
+	Bound(Type type):
+		mType(type),
+		mEpsilon(Math::fromMilli(1))
+	{}
 
-	explicit Bound(const Sphere &s){
-		set(s);
-	}
-	
-	explicit Bound(const AABox &a){
-		set(a);
-	}
+	Bound(Bound *bound):
+		mType(bound->mType),
+		mEpsilon(Math::fromMilli(1)),
+		mBox(bound->mBox),
+		mSphere(bound->mSphere)
+	{}
+
+	Bound(const AABox &box):
+		mType(Type_AABOX),
+		mEpsilon(Math::fromMilli(1)),
+		mBox(box)
+	{}
+
+	Bound(const Sphere &sphere):
+		mType(Type_SPHERE),
+		mEpsilon(Math::fromMilli(1)),
+		mSphere(sphere)
+	{}
 	
 	void reset(){
-		type=Type_AABOX;
-		box.reset();
-		sphere.reset();
+		mType=Type_AABOX;
+		mBox.reset();
+		mSphere.reset();
+	}
+
+	void set(Bound *b){
+		mType=b->mType;
+		mSphere.set(b->mSphere);
+		mBox.set(b->mBox);
 	}
 
 	void setInfinite(){
-		type=Type_INFINITE; 
-		box.reset();
-		sphere.reset();
-	}
-
-	void set(const Bound &b){
-		type=b.type;
-		sphere.set(b.sphere);
-		box.set(b.box);
+		mType=Type_INFINITE; 
+		mBox.reset();
+		mSphere.reset();
 	}
 
 	void set(const Sphere &s){
-		type=Type_SPHERE;
-		sphere.set(s);
+		mType=Type_SPHERE;
+		mSphere.set(s);
 		update();
 	}
 
 	void set(const Vector3 &origin,scalar radius){
-		type=Type_SPHERE;
-		sphere.origin.set(origin);
-		sphere.radius=radius;
+		mType=Type_SPHERE;
+		mSphere.origin.set(origin);
+		mSphere.radius=radius;
 		update();
 	}
 
 	void set(scalar radius){
-		type=Type_SPHERE;
-		sphere.origin.reset();
-		sphere.radius=radius;
+		mType=Type_SPHERE;
+		mSphere.origin.reset();
+		mSphere.radius=radius;
 		update();
 	}
 
 	void set(const AABox &a){
-		type=Type_AABOX;
-		box.set(a);
+		mType=Type_AABOX;
+		mBox.set(a);
 		update();
 	}
 
 	void set(const Vector3 &mins,const Vector3 &maxs){
-		type=Type_AABOX;
-		box.set(mins,maxs);
+		mType=Type_AABOX;
+		mBox.set(mins,maxs);
 		update();
 	}
 
-	void merge(const Bound &b){
-		if(type==Type_INFINITE || b.type==Type_INFINITE){
-			type=Type_INFINITE;
+	void merge(Bound *b){
+		if(mType==Type_INFINITE || b->mType==Type_INFINITE){
+			mType=Type_INFINITE;
 		}
-		else if(type==Type_AABOX && b.type==Type_AABOX){
-			box.merge(b.box);
+		else if(mType==Type_AABOX && b->mType==Type_AABOX){
+			mBox.merge(b->mBox);
 		}
 		else{
 			// Just switch to a sphere
-			type=Type_SPHERE;
-			sphere.merge(b.sphere,epsilon);
+			mType=Type_SPHERE;
+			mSphere.merge(b->mSphere,mEpsilon);
 		}
 		update();
 	}
 
-
-	bool testIntersection(const Vector3 &v) const{
-		if(type==Type_INFINITE){
+	bool testIntersection(Bound *b) const{
+		if(mType==Type_INFINITE || b->mType==Type_INFINITE){
 			return true;
 		}
-		else if(type==Type_AABOX){
-			return Math::testInside(v,box);
+		else if(mType==Type_AABOX && b->mType==Type_AABOX){
+			return testIntersection(b->mBox);
 		}
 		else{
-			return Math::testInside(v,sphere);
+			return testIntersection(b->mSphere);
 		}
 	}
 
-	bool testIntersection(const Bound &b) const{
-		if(type==Type_INFINITE || b.type==Type_INFINITE){
-			return true;
-		}
-		else if(type==Type_AABOX && b.type==Type_AABOX){
-			return testIntersection(b.box);
-		}
-		else{
-			return testIntersection(b.sphere);
+	bool testIntersection(const Vector3 &v) const{
+		switch(mType){
+			case Type_INFINITE:
+				return true;
+			case Type_AABOX:
+				return Math::testInside(mBox,v);
+			default:
+				return Math::testInside(mSphere,v);
 		}
 	}
 
 	bool testIntersection(const AABox &a) const{
-		if(type==Type_INFINITE){
+		if(mType==Type_INFINITE){
 			return true;
 		}
 		else{
-			return Math::testIntersection(box,a);
+			return Math::testIntersection(mBox,a);
 		}
 	}
 
 	bool testIntersection(const Sphere &s) const{
-		if(type==Type_INFINITE){
+		if(mType==Type_INFINITE){
 			return true;
 		}
 		else{
-			return Math::testIntersection(sphere,s);
+			return Math::testIntersection(mSphere,s);
 		}
 	}
 
-	Type getType() const{return type;}
-	const Sphere &getSphere() const{return sphere;}
-	const AABox &getAABox() const{return box;}
+	Type getType() const{return mType;}
+	const Sphere &getSphere() const{return mSphere;}
+	const AABox &getAABox() const{return mBox;}
 
-	static void transform(Bound &r,const Bound &b,const Vector3 &translate,const Quaternion &rotate,const Vector3 &scale){
-		r.type=b.type;
-		if(b.type==Type_SPHERE){
-			Math::mul(r.sphere.origin,scale,b.sphere.radius);
-			r.sphere.radius=Math::maxVal(Math::maxVal(r.sphere.origin.x,r.sphere.origin.y),r.sphere.origin.z);
-			Math::mul(r.sphere.origin,rotate,b.sphere.origin);
-			Math::mul(r.sphere.origin,scale);
-			Math::add(r.sphere.origin,translate);
+	void transform(Bound *source,Transform *transform){
+		mType=source->mType;
+
+		const Vector3 &translate=transform->getTranslate();
+		const Quaternion &rotate=transform->getRotate();
+		const Vector3 &scale=transform->getScale();
+
+		if(source->mType==Type_SPHERE){
+			Math::mul(mSphere.origin,scale,source->mSphere.radius);
+			mSphere.radius=Math::maxVal(Math::maxVal(mSphere.origin.x,mSphere.origin.y),mSphere.origin.z);
+			Math::mul(mSphere.origin,rotate,source->mSphere.origin);
+			Math::mul(mSphere.origin,scale);
+			Math::add(mSphere.origin,translate);
 		}
-		else if(b.type==Type_AABOX){
-			Math::mul(r.box.mins,b.box.mins,scale);
-			Math::mul(r.box.maxs,b.box.maxs,scale);
-			Math::add(r.box,translate);
+		else if(source->mType==Type_AABOX){
+			Math::mul(mBox.mins,source->mBox.mins,scale);
+			Math::mul(mBox.maxs,source->mBox.maxs,scale);
+			Math::add(mBox,translate);
 		}
-		r.update();
+		update();
 	}
 
 protected:
 	void update(){
-		if(type==Type_AABOX){
-			Math::findBoundingSphere(sphere,box);
-		}
-		else if(type==Type_SPHERE){
-			Math::findBoundingBox(box,sphere);
+		switch(mType){
+			case Type_AABOX:
+				Math::findBoundingSphere(mSphere,mBox);
+			case Type_SPHERE:
+				Math::findBoundingBox(mBox,mSphere);
 		}
 	}
 
-	Type type;
-	scalar epsilon;
-	Sphere sphere;
-	AABox box;
+	Type mType;
+	scalar mEpsilon;
+	Sphere mSphere;
+	AABox mBox;
 };
 
 }

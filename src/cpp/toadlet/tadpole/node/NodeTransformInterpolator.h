@@ -37,41 +37,46 @@ class TOADLET_API NodeTransformInterpolator:public NodeInterpolator{
 public:
 	TOADLET_SHARED_POINTERS(NodeTransformInterpolator);
 
-	NodeTransformInterpolator(){}
+	NodeTransformInterpolator(){
+		mTransform=Transform::ptr(new Transform());
+		mLastTransform=Transform::ptr(new Transform());
+		mLerpedTransform=Transform::ptr(new Transform());
+	}
 
 	virtual void transformUpdated(Node *node){
-		mLastTranslate.set(node->getTranslate());
-		mLastRotate.set(node->getRotate());
+		mLastTransform->setTranslate(node->getTranslate());
+		mLastTransform->setRotate(node->getRotate());
+		mLastTransform->setScale(node->getScale());
 
-		mTranslate.set(mLastTranslate);
-		mRotate.set(mLastRotate);
+		mTransform->set(mLastTransform);
 	}
 
 	virtual void logicUpdate(Node *node,int dt){
-		mLastTranslate.set(mTranslate);
-		mLastRotate.set(mRotate);
+		mLastTransform->set(mTransform);
 
-		mTranslate.set(node->getTranslate());
-		mRotate.set(node->getRotate());
+		mTransform->setTranslate(node->getTranslate());
+		mTransform->setRotate(node->getRotate());
+		mTransform->setScale(node->getScale());
 	}
 
 	virtual void interpolate(Node *node,scalar value){
-		Math::lerp(mTranslateLerp,mLastTranslate,mTranslate,value);
-		Math::slerp(mRotateLerp,mLastRotate,mRotate,value);
+		Math::lerp(mTranslateLerp,mLastTransform->getTranslate(),mTransform->getTranslate(),value);
+		Math::slerp(mRotateLerp,mLastTransform->getRotate(),mTransform->getRotate(),value);
+		Math::lerp(mScaleLerp,mLastTransform->getScale(),mTransform->getScale(),value);
 
-		// Only call the base function, so Physics implementations don't get all flustered and continually reactivate & reset their positions
-		node->Node::setTranslate(mTranslateLerp);
-		node->Node::setRotate(mRotateLerp);
+		mLerpedTransform->set(mTranslateLerp,mRotateLerp,mScaleLerp);
+
+		node->setTransform(mLerpedTransform,Node::TransformUpdate_INTERPOLATOR);
 	}
 	
 protected:
-	Vector3 mTranslate;
-	Quaternion mRotate;
-	Vector3 mLastTranslate;
-	Quaternion mLastRotate;
+	Transform::ptr mTransform;
+	Transform::ptr mLastTransform;
 
 	Vector3 mTranslateLerp;
 	Quaternion mRotateLerp;
+	Vector3 mScaleLerp;
+	Transform::ptr mLerpedTransform;
 };
 
 }

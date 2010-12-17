@@ -37,7 +37,7 @@ class Traceable{
 public:
 	virtual ~Traceable(){}
 
-	virtual const Bound &getLocalBound() const=0;
+	virtual Bound *getBound() const=0;
 	virtual void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size)=0;
 };
 

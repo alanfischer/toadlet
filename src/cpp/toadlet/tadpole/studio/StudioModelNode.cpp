@@ -269,7 +269,7 @@ void StudioModelNode::traceSegment(Collision &result,const Vector3 &position,con
 	Quaternion invrot;
 	int i;
 
-	inverseTransform(localSegment,segment,position,mWorldScale,mWorldRotate);
+	Transform::inverseTransform(localSegment,segment,position,mWorldTransform->getScale(),mWorldTransform->getRotate());
 
 	result.time=Math::ONE;
 	for(i=0;i<mModel->header->numhitboxes;++i){
@@ -288,8 +288,8 @@ void StudioModelNode::traceSegment(Collision &result,const Vector3 &position,con
 	}
 
 	if(result.time<Math::ONE){
-		transformNormal(result.normal,result.normal,mWorldScale,mWorldRotate);
-		transform(result.point,result.point,position,mWorldScale,mWorldRotate);
+		mWorldTransform->transformNormal(result.normal);
+		Transform::transform(result.point,position,mWorldTransform->getScale(),mWorldTransform->getRotate());
 	}
 }
 
@@ -435,7 +435,7 @@ void StudioModelNode::updateSkeleton(){
 
 	studioseqdesc *sseqdesc=mModel->seqdesc(mSequenceIndex);
 
-	mLocalBound.set(sseqdesc->bbmin,sseqdesc->bbmax);
+	mBound->set(sseqdesc->bbmin,sseqdesc->bbmax);
 
 	studioanim *sanim=mModel->anim(sseqdesc);
 	findBoneTransforms(mBoneTranslates,mBoneRotates,mModel,sseqdesc,sanim,mSequenceTime);

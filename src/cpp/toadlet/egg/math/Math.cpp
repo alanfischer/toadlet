@@ -693,15 +693,15 @@ void Math::findFitCapsule(Capsule &r,const AABox &box){
 	}
 }
 
-bool Math::testInside(const Vector3 &point,const Plane &plane){
+bool Math::testInside(const Plane &plane,const Vector3 &point){
 	return dot(point,plane.normal)<=plane.distance;
 }
 
-bool Math::testInside(const Vector3 &point,const Sphere &sphere){
+bool Math::testInside(const Sphere &sphere,const Vector3 &point){
 	return lengthSquared(point,sphere.origin)<=square(sphere.radius);
 }
 
-bool Math::testInside(const Vector3 &point,const AABox &box){
+bool Math::testInside(const AABox &box,const Vector3 &point){
 	return	point.x>=box.mins.x && point.y>=box.mins.y && point.z>=box.mins.z &&
 			point.x<=box.maxs.x && point.y<=box.maxs.y && point.z<=box.maxs.z;
 }

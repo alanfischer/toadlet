@@ -120,7 +120,7 @@ void TerrainNode::setDataSource(TerrainNodeDataSource *dataSource){
 		mListener->terrainUpdated(mTerrainX,mTerrainY,mTerrainX,mTerrainY);
 	}
 
-	updateLocalBound();
+	updateBound();
 }
 
 void TerrainNode::setMaterial(Material::ptr material){
@@ -352,11 +352,11 @@ void TerrainNode::destroyPatch(int x,int y){
 	setPatchAt(x,y,NULL);
 }
 
-void TerrainNode::updateLocalBound(){
+void TerrainNode::updateBound(){
 	int i;
 	for(i=0;i<mPatchGrid.size();++i){
-		if(i==0) mLocalBound.set(mPatchGrid[i]->getWorldBound());
-		else mLocalBound.merge(mPatchGrid[i]->getWorldBound());
+		if(i==0) mBound->set(mPatchGrid[i]->getWorldBound());
+		else mBound->merge(mPatchGrid[i]->getWorldBound());
 	}
 }
 

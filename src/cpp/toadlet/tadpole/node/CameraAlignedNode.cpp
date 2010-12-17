@@ -48,15 +48,17 @@ CameraAlignedNode::CameraAlignedNode():super(),
 void CameraAlignedNode::frameUpdate(int dt,int scope){
 	super::frameUpdate(dt,scope);
 
-	if(mPerspective==false) mWorldBound.setInfinite();
+	if(mPerspective==false) mWorldBound->setInfinite();
 }
 
 void CameraAlignedNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	super::queueRenderables(camera,queue);
 
+	/// @todo: BUSTED TILL I GET IT MODIFYING THE WORLD TRANSFORMS?
+/*
 	if(mCameraAligned){
 		Matrix3x3 rotate,localRotate;
-		Math::setMatrix3x3FromQuaternion(localRotate,mRotate);
+		Math::setMatrix3x3FromQuaternion(localRotate,mTransform->getRotate());
 		if(camera->getAlignmentCalculationsUseOrigin()){
 			Vector3 nodeWorldTranslate; Math::setTranslateFromMatrix4x4(nodeWorldTranslate,mWorldTransform);
 			Vector3 cameraWorldTranslate; Math::setTranslateFromMatrix4x4(cameraWorldTranslate,camera->getWorldTransform());
@@ -83,6 +85,7 @@ void CameraAlignedNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 
 		Math::postMul(mWorldTransform,scale);
 	}
+*/
 }
 
 }

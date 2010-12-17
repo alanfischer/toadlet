@@ -67,8 +67,8 @@ public:
 	inline scalar getNearDist() const{return mNearDist;}
 	inline scalar getFarDist() const{return mFarDist;}
 
-	virtual void setProjectionTransform(const Matrix4x4 &transform);
-	inline const Matrix4x4 &getProjectionTransform() const{return mFinalProjectionTransform;}
+	virtual void setProjectionMatrix(const Matrix4x4 &matrix);
+	inline const Matrix4x4 &getProjectionMatrix() const{return mFinalProjectionMatrix;}
 
 	virtual void setProjectionRotation(scalar rotate);
 	virtual void setNearAndFarDist(scalar nearDist,scalar farDist);
@@ -102,14 +102,14 @@ public:
 	virtual void setGamma(scalar gamma);
 	virtual scalar getGamma() const{return mGamma;}
 
-	inline const Matrix4x4 &getViewTransform() const{return mViewTransform;}
+	inline const Matrix4x4 &getViewMatrix() const{return mViewMatrix;}
 	inline const Vector3 &getForward() const{return mForward;}
 	inline const Vector3 &getRight() const{return mRight;}
 
 	virtual void render(peeper::Renderer *renderer,Node *node=NULL);
 
 	virtual bool culled(Node *node) const;
-	virtual bool culled(const Bound &bound) const;
+	virtual bool culled(Bound *bound) const;
 	/// @todo: These should probably be moved into the Math library, and passing in a list of planes
 	virtual bool culled(const Sphere &sphere) const;
 	virtual bool culled(const AABox &box) const;
@@ -136,11 +136,11 @@ protected:
 	bool mSkipFirstClear;
 	bool mAlignmentCalculationsUseOrigin;
 
-	Matrix4x4 mProjectionTransform;
+	Matrix4x4 mProjectionMatrix;
 	scalar mProjectionRotation;
-	Matrix4x4 mFinalProjectionTransform;
-	Matrix4x4 mViewTransform;
-	Matrix4x4 mViewProjectionTransform;
+	Matrix4x4 mFinalProjectionMatrix;
+	Matrix4x4 mViewMatrix;
+	Matrix4x4 mViewProjectionMatrix;
 	Plane mClipPlanes[6];
 	Vector3 mForward,mRight;
 

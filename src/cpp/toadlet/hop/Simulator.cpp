@@ -1243,7 +1243,7 @@ void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,con
 }
 
 void Simulator::traceAABox(Collision &c,const Segment &segment,const AABox &box){
-	if(testInside(segment.origin,box)){
+	if(testInside(box,segment.origin)){
 		scalar x;
 		#if defined(TOADLET_FIXED_POINT)
 			x=segment.origin.x-box.mins.x;scalar dix=(x^(x>>31))-(x>>31);
@@ -1307,7 +1307,7 @@ void Simulator::traceAABox(Collision &c,const Segment &segment,const AABox &box)
 }
 
 void Simulator::traceSphere(Collision &c,const Segment &segment,const Sphere &sphere){
-	if(testInside(segment.origin,sphere)){
+	if(testInside(sphere,segment.origin)){
 		// Skip the 'closer in' checks on spheres, since now matter what we do,
 		// Apparently we still slide in closer to spheres, very slightly.
 		// I'll really need to look at this more some time

@@ -317,8 +317,8 @@ void MeshNodeSkeleton::updateVertexData(){
 	vba.unlock();
 }
 
-const Matrix4x4 &MeshNodeSkeleton::getRenderTransform() const{
-	return mNode!=NULL?mNode->getRenderTransform():Math::IDENTITY_MATRIX4X4;
+Transform *MeshNodeSkeleton::getRenderTransform() const{
+	return mNode!=NULL?mNode->getRenderTransform():NULL;
 }
 
 void MeshNodeSkeleton::render(Renderer *renderer) const{

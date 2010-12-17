@@ -73,7 +73,7 @@ public:
 
 	void queueRenderables(CameraNode *camera,RenderQueue *queue);
 	Material *getRenderMaterial() const{return mMaterial;}
-	const Matrix4x4 &getRenderTransform() const{return super::getWorldTransform();}
+	Transform *getRenderTransform() const{return super::getWorldTransform();}
 	void render(peeper::Renderer *renderer) const;
 
 	peeper::VertexBufferAccessor vba;
@@ -90,7 +90,6 @@ protected:
 	int mAlignment;
 	bool mNormalized;
 	bool mWordWrap;
-peeper::Color mColor;
 
 	Material::ptr mMaterial;
 	peeper::VertexData::ptr mVertexData;

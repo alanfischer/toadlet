@@ -122,7 +122,7 @@ public:
 	virtual void queueRenderables(CameraNode *camera,RenderQueue *queue);
 
 	virtual Material *getRenderMaterial() const{return mMaterial;}
-	virtual const Matrix4x4 &getRenderTransform() const;
+	virtual Transform *getRenderTransform() const;
 	virtual void render(peeper::Renderer *renderer) const;
 
 	peeper::VertexBufferAccessor vba;
