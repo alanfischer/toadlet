@@ -137,7 +137,7 @@ void LabelNode::setWordWrap(bool wordWrap){
 void LabelNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	super::queueRenderables(camera,queue);
 
-	if(mVertexData==NULL || mIndexData==NULL){
+	if(mVertexData==NULL || mIndexData==NULL || mMaterial==NULL){
 		return;
 	}
 

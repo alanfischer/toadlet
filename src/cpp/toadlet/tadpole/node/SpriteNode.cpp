@@ -117,7 +117,7 @@ void SpriteNode::setAlignment(int alignment){
 void SpriteNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	super::queueRenderables(camera,queue);
 
-	if(mVertexData==NULL || mIndexData==NULL){
+	if(mVertexData==NULL || mIndexData==NULL || mMaterial==NULL){
 		return;
 	}
 

@@ -982,6 +982,15 @@ void GLRenderer::setFill(const Fill &fill){
 
 void GLRenderer::setLighting(bool lighting){
 	if(lighting){
+		// 12/19/10
+		// There appears to be a bug in at least:
+		// GL_VENDOR:NVIDIA Corporation
+		// GL_RENDERER:GeForce 9300M GS/PCI/SSE2
+		// GL_VERSION:2.1.2
+		// Where in some cases lighting is not properly enabled unless we disable it first
+		// Found it in WizardWars when rendering multiple labels and then using the camera gamma
+		glDisable(GL_LIGHTING);
+
 		glEnable(GL_LIGHTING);
 	}
 	else{
