@@ -54,38 +54,31 @@ void CameraAlignedNode::frameUpdate(int dt,int scope){
 void CameraAlignedNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	super::queueRenderables(camera,queue);
 
-	/// @todo: BUSTED TILL I GET IT MODIFYING THE WORLD TRANSFORMS?
-/*
 	if(mCameraAligned){
-		Matrix3x3 rotate,localRotate;
-		Math::setMatrix3x3FromQuaternion(localRotate,mTransform->getRotate());
+		Quaternion alignRotate;
 		if(camera->getAlignmentCalculationsUseOrigin()){
-			Vector3 nodeWorldTranslate; Math::setTranslateFromMatrix4x4(nodeWorldTranslate,mWorldTransform);
-			Vector3 cameraWorldTranslate; Math::setTranslateFromMatrix4x4(cameraWorldTranslate,camera->getWorldTransform());
-			Matrix4x4 lookAtCamera; Math::setMatrix4x4FromLookAt(lookAtCamera,cameraWorldTranslate,nodeWorldTranslate,Math::Z_UNIT_VECTOR3,false);
-			Math::setMatrix3x3FromMatrix4x4Transpose(rotate,lookAtCamera);
+			Matrix4x4 lookAtCamera; Math::setMatrix4x4FromLookAt(lookAtCamera,camera->getWorldTranslate(),getWorldTranslate(),Math::Z_UNIT_VECTOR3,false);
+			Math::setQuaternionFromMatrix4x4(alignRotate,lookAtCamera);
 		}
 		else{
-			Math::setMatrix3x3FromMatrix4x4Transpose(rotate,camera->getViewTransform());
+			Math::setQuaternionFromMatrix4x4(alignRotate,camera->getViewMatrix());
 		}
-		Math::postMul(rotate,localRotate);
-		Math::setMatrix4x4FromRotateScale(mWorldTransform,rotate,mWorldScale);
+		Math::invert(alignRotate);
+		Math::postMul(alignRotate,getRotate());
+		mWorldTransform->setRotate(alignRotate);
 	}
 
 	if(!mPerspective){
-		Matrix4x4 scale;
 		Vector4 point;
+		Vector3 scale;
 
-		point.set(mWorldTransform.at(0,3),mWorldTransform.at(1,3),mWorldTransform.at(2,3),Math::ONE);
-		Math::mul(point,camera->getViewTransform());
-		Math::mul(point,camera->getProjectionTransform());
-		scale.setAt(0,0,point.w);
-		scale.setAt(1,1,point.w);
-		scale.setAt(2,2,point.w);
+		point.set(getWorldTranslate(),Math::ONE);
+		Math::mul(point,camera->getViewMatrix());
+		Math::mul(point,camera->getProjectionMatrix());
 
-		Math::postMul(mWorldTransform,scale);
+		Math::mul(scale,getWorldScale(),point.w);
+		mWorldTransform->setScale(scale);
 	}
-*/
 }
 
 }
