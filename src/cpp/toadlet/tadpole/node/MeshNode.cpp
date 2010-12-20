@@ -205,6 +205,13 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 				subMesh->vertexData=mMesh->staticVertexData;
 			}
 		}
+
+		if(subMesh->meshSubMesh->transform!=NULL){
+			subMesh->worldTransform=Transform::ptr(new Transform());
+		}
+		if(subMesh->meshSubMesh->bound!=NULL){
+			subMesh->worldBound=Bound::ptr(new Bound());
+		}
 	}
 }
 
@@ -254,12 +261,39 @@ void MeshNode::frameUpdate(int dt,int scope){
 	}
 }
 
+void MeshNode::updateWorldTransform(){
+	super::updateWorldTransform();
+
+	int i;
+	for(i=0;i<mSubMeshes.size();++i){
+		SubMesh *subMesh=mSubMeshes[i];
+		if(subMesh->worldTransform!=NULL){
+			subMesh->worldTransform->transform(mWorldTransform,subMesh->worldTransform);
+
+			if(subMesh->worldBound!=NULL){
+				subMesh->worldBound->transform(subMesh->meshSubMesh->bound,subMesh->worldTransform);
+			}
+		}
+		else if(subMesh->worldBound!=NULL){
+			subMesh->worldBound->transform(subMesh->meshSubMesh->bound,mWorldTransform);
+		}
+	}
+}
+
 void MeshNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	super::queueRenderables(camera,queue);
 
 	int i;
 	for(i=0;i<mSubMeshes.size();++i){
-		queue->queueRenderable(mSubMeshes[i]);
+		SubMesh *subMesh=mSubMeshes[i];
+		if(subMesh->worldBound!=NULL){
+			if(camera->culled(subMesh->worldBound)==false){
+				queue->queueRenderable(subMesh);
+			}
+		}
+		else{
+			queue->queueRenderable(subMesh);
+		}
 	}
 
 	if(mSkeleton!=NULL && mSkeleton->getRenderMaterial()!=NULL){
