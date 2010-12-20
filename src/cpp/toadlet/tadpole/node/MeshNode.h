@@ -59,7 +59,8 @@ public:
 		SubMesh(MeshNode *meshNode,mesh::Mesh::SubMesh *meshSubMesh);
 
 		Material *getRenderMaterial() const{return material;}
-		Transform *getRenderTransform() const{return meshNode->getWorldTransform();}
+		Transform *getRenderTransform() const{return worldTransform!=NULL?worldTransform:meshNode->getWorldTransform();}
+		Bound *getRenderBound() const{return worldBound!=NULL?worldBound:meshNode->getWorldBound();}
 		void render(peeper::Renderer *renderer) const;
 
 		Material::ptr material;
@@ -67,6 +68,9 @@ public:
 		peeper::VertexData::ptr vertexData;
 		MeshNode *meshNode;
 		mesh::Mesh::SubMesh *meshSubMesh;
+
+		Transform::ptr worldTransform;
+		Bound::ptr worldBound;
 	};
 
 	/// Specialization of the AnimationController that allows for easy access to playing single sequences.
@@ -111,6 +115,7 @@ public:
 	MeshAnimationController::ptr getAnimationController();
 
 	void frameUpdate(int dt,int scope);
+	void updateWorldTransform();
 	void queueRenderables(CameraNode *camera,RenderQueue *queue);
 
 	peeper::VertexBufferAccessor svba;
@@ -118,8 +123,6 @@ public:
 
 	void createVertexBuffer();
 	void updateVertexBuffer();
-
-	Transform *getRenderTransform() const{return mWorldTransform;}
 
 protected:
 	mesh::Mesh::ptr mMesh;

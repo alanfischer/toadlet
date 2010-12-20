@@ -106,7 +106,8 @@ public:
 	void updateIndexBuffers(node::CameraNode *camera);
 	void updateWaterIndexBuffers(node::CameraNode *camera);
 	Material *getRenderMaterial() const{return mMaterial;}
-	Transform *getRenderTransform() const{return super::getWorldTransform();}
+	Transform *getRenderTransform() const{return getWorldTransform();}
+	Bound *getRenderBound() const{return getWorldBound();}
 	void render(peeper::Renderer *renderer) const;
 
 	Bound *getBound() const{return super::getBound();}
@@ -130,6 +131,7 @@ protected:
 
 		Material *getRenderMaterial() const{return mTerrain->mWaterMaterial;}
 		Transform *getRenderTransform() const{return mTerrain->getWorldTransform();}
+		Bound *getRenderBound() const{return mTerrain->getRenderBound();}
 		void render(peeper::Renderer *renderer) const{renderer->renderPrimitive(mTerrain->mWaterVertexData,mTerrain->mWaterIndexData);}
 
 	protected:
