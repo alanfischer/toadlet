@@ -40,6 +40,10 @@
 	#define WM_MOUSEWHEEL 0x020A
 #endif
 
+#ifndef D3DCREATE_MULTITHREADED
+	#define D3DCREATE_MULTITHREADED 0x00000004L
+#endif
+
 #if defined(TOADLET_DEBUG)
 	#if defined(TOADLET_BUILD_STATIC)
 		#define TOADLET_LIBRARY_EXTENSION "_sd"
@@ -76,12 +80,12 @@ using namespace toadlet::tadpole::handler;
 #if defined(TOADLET_HAS_D3DM)
 	#pragma comment(lib,"toadlet_peeper_d3dmrenderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_D3DMRenderer();
-	extern "C" RenderTarget *new_D3DMWindowRenderTarget(HWND wnd,const Visual &visual,bool debug);
+	extern "C" RenderTarget *new_D3DMWindowRenderTarget(HWND wnd,const Visual &visual,DWORD flags,bool debug);
 #endif
 #if defined(TOADLET_HAS_D3D9)
 	#pragma comment(lib,"toadlet_peeper_d3d9renderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_D3D9Renderer();
-	extern "C" RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,const Visual &visual,bool debug);
+	extern "C" RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,const Visual &visual,DWORD flags,bool debug);
 #endif
 #if defined(TOADLET_HAS_D3D10)
 	#pragma comment(lib,"toadlet_peeper_d3d10renderer" TOADLET_LIBRARY_EXTENSION)
@@ -710,6 +714,8 @@ void *Win32Application::getHWND() const{return win32->mWnd;}
 
 RenderTarget *Win32Application::makeRenderTarget(int rendererPlugin){
 	RenderTarget *target=NULL;
+	DWORD flags=D3DCREATE_MULTITHREADED;
+
 	if(rendererPlugin==RendererPlugin_OPENGL){
 		#if defined(TOADLET_HAS_OPENGL)
 			#if defined(TOADLET_PLATFORM_WINCE)
@@ -721,12 +727,12 @@ RenderTarget *Win32Application::makeRenderTarget(int rendererPlugin){
 	}
 	else if(rendererPlugin==RendererPlugin_D3DM){
 		#if defined(TOADLET_HAS_D3DM)
-			target=new_D3DMWindowRenderTarget(win32->mWnd,mVisual,true);
+			target=new_D3DMWindowRenderTarget(win32->mWnd,mVisual,flags,true);
 		#endif
 	}
 	else if(rendererPlugin==RendererPlugin_D3D9){
 		#if defined(TOADLET_HAS_D3D9)
-			target=new_D3D9WindowRenderTarget(win32->mWnd,mVisual,true);
+			target=new_D3D9WindowRenderTarget(win32->mWnd,mVisual,flags,true);
 		#endif
 	}
 	else if(rendererPlugin==RendererPlugin_D3D10){

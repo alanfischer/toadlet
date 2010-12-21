@@ -35,14 +35,14 @@ namespace peeper{
 class TOADLET_API D3D9WindowRenderTarget:public D3D9RenderTarget{
 public:
 	D3D9WindowRenderTarget();
-	D3D9WindowRenderTarget(HWND wnd,const Visual &visual,bool debug);
+	D3D9WindowRenderTarget(HWND wnd,const Visual &visual,DWORD flags,bool debug);
 	virtual ~D3D9WindowRenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return this;}
 	virtual bool isPrimary() const{return true;}
 	virtual bool isValid() const{return mD3DDevice!=NULL;}
 
-	virtual bool createContext(HWND wnd,const Visual &visual,bool debug);
+	virtual bool createContext(HWND wnd,const Visual &visual,DWORD flags,bool debug);
 	virtual bool destroyContext();
 
 	virtual int getWidth() const{return mWidth;}
