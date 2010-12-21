@@ -32,12 +32,12 @@ namespace toadlet{
 namespace peeper{
 
 #if defined(TOADLET_SET_D3DM)
-	TOADLET_C_API RenderTarget *new_D3DMWindowRenderTarget(HWND wnd,const Visual &visual,bool debug){
-		return new D3D9WindowRenderTarget(wnd,visual,debug);
+	TOADLET_C_API RenderTarget *new_D3DMWindowRenderTarget(HWND wnd,const Visual &visual,DWORD flags,bool debug){
+		return new D3D9WindowRenderTarget(wnd,visual,flags,debug);
 	}
 #else
-	TOADLET_C_API RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,const Visual &visual,bool debug){
-		return new D3D9WindowRenderTarget(wnd,visual,debug);
+	TOADLET_C_API RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,const Visual &visual,DWORD flags,bool debug){
+		return new D3D9WindowRenderTarget(wnd,visual,flags,debug);
 	}
 #endif
 
@@ -53,7 +53,7 @@ D3D9WindowRenderTarget::D3D9WindowRenderTarget():D3D9RenderTarget(),
 {
 }
 
-D3D9WindowRenderTarget::D3D9WindowRenderTarget(HWND wnd,const Visual &visual,bool debug):D3D9RenderTarget(),
+D3D9WindowRenderTarget::D3D9WindowRenderTarget(HWND wnd,const Visual &visual,DWORD flags,bool debug):D3D9RenderTarget(),
 	mLibrary(0),
 	mD3D(NULL),
 	mD3DDevice(NULL),
@@ -63,7 +63,7 @@ D3D9WindowRenderTarget::D3D9WindowRenderTarget(HWND wnd,const Visual &visual,boo
 	mWidth(0),
 	mHeight(0)
 {
-	createContext(wnd,visual,debug);
+	createContext(wnd,visual,flags,debug);
 }
 
 D3D9WindowRenderTarget::~D3D9WindowRenderTarget(){
@@ -109,7 +109,7 @@ void D3D9WindowRenderTarget::reset(){
 	mD3DDevice->GetDepthStencilSurface(&mDepthSurface);
 }
 
-bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual,bool debug){
+bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual,DWORD flags,bool debug){
 	HRESULT result;
 
 	mLibrary=LoadLibrary(debug?TOADLET_D3D9_DEBUG_DLL_NAME:TOADLET_D3D9_DLL_NAME);
@@ -151,8 +151,6 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual,bool de
 		mDevType=D3DDEVTYPE_HAL;
 	#endif
 	
-	DWORD flags=0;
-
 	#if !defined(TOADLET_SET_D3DM)
 		result=mD3D->CheckDeviceType(mAdaptor,mDevType,D3DFMT_X8R8G8B8,D3DFMT_X8R8G8B8,FALSE);
 		if(FAILED(result)){
@@ -177,11 +175,13 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual,bool de
 			return false;
 		}
 
-		if(caps.VertexProcessingCaps!=0){
-			flags=D3DCREATE_HARDWARE_VERTEXPROCESSING;
-		}
-		else{
-			flags=D3DCREATE_SOFTWARE_VERTEXPROCESSING;
+		if((flags&(D3DCREATE_HARDWARE_VERTEXPROCESSING|D3DCREATE_SOFTWARE_VERTEXPROCESSING))==0){
+			if(caps.VertexProcessingCaps!=0){
+				flags|=D3DCREATE_HARDWARE_VERTEXPROCESSING;
+			}
+			else{
+				flags|=D3DCREATE_SOFTWARE_VERTEXPROCESSING;
+			}
 		}
 	#endif
 
