@@ -38,10 +38,11 @@ public:
 
 	virtual ~D3D10RenderTarget(){}
 
-	virtual void makeCurrent(ID3D10Device *device)=0;
 	virtual void clear(int clearFlags,const Color &clearColor)=0;
 	virtual void swap()=0;
 	virtual void reset()=0;
+	virtual bool activate()=0;
+	virtual bool deactivate()=0;
 
 	virtual ID3D10Device *getD3D10Device() const=0;
 };

@@ -40,8 +40,12 @@ EGLRenderTarget::EGLRenderTarget():GLRenderTarget(),
 	mContext(EGL_NO_CONTEXT)
 {}
 
-bool EGLRenderTarget::makeCurrent(){
+bool EGLRenderTarget::activate(){
 	return eglMakeCurrent(mDisplay,mSurface,mSurface,mContext)==EGL_TRUE;
+}
+
+bool EGLRenderTarget::deactivate(){
+	return eglMakeCurrent(mDisplay,EGL_NO_SURFACE,EGL_NO_SURFACE,EGL_NO_CONTEXT)==EGL_TRUE;
 }
 
 EGLConfig EGLRenderTarget::chooseEGLConfig(EGLDisplay display,int redBits,int greenBits,int blueBits,int alphaBits,int depthBits,int stencilBits,bool window,bool pixmap,bool pbuffer,int fsaaCount){

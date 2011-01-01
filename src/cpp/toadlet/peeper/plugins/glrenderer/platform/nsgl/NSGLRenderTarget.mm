@@ -81,7 +81,7 @@ bool NSGLRenderTarget::createContext(NSView *view,const Visual &visual,NSOpenGLP
 
 	[pixelFormat release];
 
-	makeCurrent();
+	activate();
 	
 	return mContext!=nil;
 }
@@ -95,7 +95,7 @@ bool NSGLRenderTarget::destroyContext(){
 	return true;
 }
 
-bool NSGLRenderTarget::makeCurrent(){
+bool NSGLRenderTarget::activate(){
 	// If setView is called before the view is ready, this will fail
 	//  so we check to see if it needs to be done each time.
 	if([mContext view]==nil && mView!=nil){
@@ -103,6 +103,18 @@ bool NSGLRenderTarget::makeCurrent(){
 	}
 
 	[mContext makeCurrentContext];
+	
+	return true;
+}
+
+bool NSGLRenderTarget::deactivate(){
+	// If setView is called before the view is ready, this will fail
+	//  so we check to see if it needs to be done each time.
+	if([mContext view]==nil && mView!=nil){
+		[mContext setView:mView];
+	}
+
+	[mContext clearCurrentContext];
 	
 	return true;
 }

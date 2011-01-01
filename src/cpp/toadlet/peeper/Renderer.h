@@ -43,10 +43,10 @@ class LightEffect;
 class Program;
 class Query;
 class RenderTarget;
-class SurfaceRenderTarget;
+class PixelBufferRenderTarget;
+class PixelBuffer;
 class Shader;
 class StatisticsSet;
-class Surface;
 class Texture;
 class TextureStage;
 class VertexBuffer;
@@ -122,13 +122,15 @@ public:
 
 	// Creation/Destruction
 	virtual bool create(RenderTarget *target,int *options)=0;
-	virtual bool destroy()=0;
+	virtual void destroy()=0;
 	virtual RendererStatus getStatus()=0;
 	virtual bool reset()=0;
+	virtual bool activateAdditionalContext()=0;
 
 	// Resource operations
 	virtual Texture *createTexture()=0;
-	virtual SurfaceRenderTarget *createSurfaceRenderTarget()=0;
+	virtual PixelBufferRenderTarget *createPixelBufferRenderTarget()=0;
+	virtual PixelBuffer *createPixelBuffer()=0;
 	virtual VertexFormat *createVertexFormat()=0;
 	virtual VertexBuffer *createVertexBuffer()=0;
 	virtual IndexBuffer *createIndexBuffer()=0;
@@ -151,7 +153,8 @@ public:
 	virtual void beginScene()=0;
 	virtual void endScene()=0;
 	virtual void renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData)=0;
-	virtual bool copyToSurface(Surface *surface)=0;
+	virtual bool copyFrameBufferToPixelBuffer(PixelBuffer *dst)=0;
+	virtual bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src)=0;
 
 	// Render state operations
 	virtual void setDefaultStates()=0;

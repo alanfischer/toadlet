@@ -32,12 +32,12 @@ namespace toadlet{
 namespace peeper{
 
 #if defined(TOADLET_SET_D3DM)
-	TOADLET_C_API RenderTarget *new_D3DMWindowRenderTarget(HWND wnd,const Visual &visual,DWORD flags,bool debug){
-		return new D3D9WindowRenderTarget(wnd,visual,flags,debug);
+	TOADLET_C_API RenderTarget *new_D3DMWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format){
+		return new D3D9WindowRenderTarget(wnd,format);
 	}
 #else
-	TOADLET_C_API RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,const Visual &visual,DWORD flags,bool debug){
-		return new D3D9WindowRenderTarget(wnd,visual,flags,debug);
+	TOADLET_C_API RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format){
+		return new D3D9WindowRenderTarget(wnd,format);
 	}
 #endif
 
@@ -53,7 +53,7 @@ D3D9WindowRenderTarget::D3D9WindowRenderTarget():D3D9RenderTarget(),
 {
 }
 
-D3D9WindowRenderTarget::D3D9WindowRenderTarget(HWND wnd,const Visual &visual,DWORD flags,bool debug):D3D9RenderTarget(),
+D3D9WindowRenderTarget::D3D9WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format):D3D9RenderTarget(),
 	mLibrary(0),
 	mD3D(NULL),
 	mD3DDevice(NULL),
@@ -63,14 +63,16 @@ D3D9WindowRenderTarget::D3D9WindowRenderTarget(HWND wnd,const Visual &visual,DWO
 	mWidth(0),
 	mHeight(0)
 {
-	createContext(wnd,visual,flags,debug);
+	createContext(wnd,format);
 }
 
 D3D9WindowRenderTarget::~D3D9WindowRenderTarget(){
 	destroyContext();
 }
 
-bool D3D9WindowRenderTarget::makeCurrent(IDirect3DDevice9 *device){
+bool D3D9WindowRenderTarget::activate(){
+	IDirect3DDevice9 *device=mD3DDevice;
+
 	#if defined(TOADLET_SET_D3DM)
 		HRESULT result=device->SetRenderTarget(mColorSurface,mDepthSurface);
 		TOADLET_CHECK_D3D9ERROR(result,"SetRenderTarget");
@@ -109,10 +111,10 @@ void D3D9WindowRenderTarget::reset(){
 	mD3DDevice->GetDepthStencilSurface(&mDepthSurface);
 }
 
-bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual,DWORD flags,bool debug){
+bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *format){
 	HRESULT result;
 
-	mLibrary=LoadLibrary(debug?TOADLET_D3D9_DEBUG_DLL_NAME:TOADLET_D3D9_DLL_NAME);
+	mLibrary=LoadLibrary(format->debug?TOADLET_D3D9_DEBUG_DLL_NAME:TOADLET_D3D9_DLL_NAME);
 
 	if(mLibrary==0){
 		Error::libraryNotFound(Categories::TOADLET_PEEPER,
@@ -135,7 +137,7 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual,DWORD f
 		return false;
 	}
 
-	mVisual=visual;
+	mVisual=format->visual;
 
 	mAdaptor=D3DADAPTER_DEFAULT;
 	D3DADAPTER_IDENTIFIER9 identifier={0};
@@ -151,6 +153,8 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual,DWORD f
 		mDevType=D3DDEVTYPE_HAL;
 	#endif
 	
+	int flags=format->flags;
+
 	#if !defined(TOADLET_SET_D3DM)
 		result=mD3D->CheckDeviceType(mAdaptor,mDevType,D3DFMT_X8R8G8B8,D3DFMT_X8R8G8B8,FALSE);
 		if(FAILED(result)){
@@ -184,6 +188,10 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,const Visual &visual,DWORD f
 			}
 		}
 	#endif
+
+	if(format->threads>1){
+		flags|=D3DCREATE_MULTITHREADED;
+	}
 
 	mWindow=wnd;
 

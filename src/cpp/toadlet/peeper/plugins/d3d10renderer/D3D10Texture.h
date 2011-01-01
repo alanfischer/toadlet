@@ -61,7 +61,7 @@ public:
 	virtual int getNumMipLevels() const{return mMipLevels;}
 	virtual scalar getLength() const{return 0;}
 
-	virtual Surface::ptr getMipSurface(int level,int cubeSide);
+	virtual PixelBuffer::ptr getMipPixelBuffer(int level,int cubeSide);
 	virtual bool load(int width,int height,int depth,int mipLevel,byte *mipData);
 	virtual bool read(int width,int height,int depth,int mipLevel,byte *mipData);
 

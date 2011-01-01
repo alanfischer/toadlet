@@ -26,7 +26,7 @@
 #include "D3D10Renderer.h"
 #include "D3D10Buffer.h"
 #include "D3D10RenderTarget.h"
-#include "D3D10SurfaceRenderTarget.h"
+#include "D3D10PixelBufferRenderTarget.h"
 #include "D3D10Texture.h"
 #include "D3D10VertexFormat.h"
 #include <toadlet/egg/MathConversion.h>
@@ -61,7 +61,9 @@ namespace peeper{
 D3D10Renderer::D3D10Renderer():
 	mD3DDevice(NULL),
 	mPrimaryRenderTarget(NULL),
-	mRenderTarget(NULL)
+	mD3DPrimaryRenderTarget(NULL),
+	mRenderTarget(NULL),
+	mD3DRenderTarget(NULL)
 
 	//mStatisticsSet,
 	//mCapabilitySet
@@ -171,9 +173,7 @@ technique->GetPassByIndex( 0 )->GetDesc( &passDesc);
 	return true;
 }
 
-bool D3D10Renderer::destroy(){
-	return true;
-}
+void D3D10Renderer::destroy(){}
 
 Renderer::RendererStatus D3D10Renderer::getStatus(){
 	return RendererStatus_OK;
@@ -191,8 +191,8 @@ Texture *D3D10Renderer::createTexture(){
 	return new D3D10Texture(this);
 }
 
-SurfaceRenderTarget *D3D10Renderer::createSurfaceRenderTarget(){
-	return NULL;//new D3D10SurfaceRenderTarget(this);
+PixelBufferRenderTarget *D3D10Renderer::createPixelBufferRenderTarget(){
+	return NULL;//new D3D10PixelBufferRenderTarget(this);
 }
 
 VertexFormat *D3D10Renderer::createVertexFormat(){
@@ -220,23 +220,26 @@ Query *D3D10Renderer::createQuery(){
 }
 
 bool D3D10Renderer::setRenderTarget(RenderTarget *target){
-	if(target==NULL){
-		Error::nullPointer(Categories::TOADLET_PEEPER,
-			"RenderTarget is NULL");
-		return false;
+	D3D10RenderTarget *d3dtarget=NULL;
+	if(target!=NULL){
+		d3dtarget=(D3D10RenderTarget*)target->getRootRenderTarget();
+		if(d3dtarget==NULL){
+			Error::nullPointer(Categories::TOADLET_PEEPER,
+				"RenderTarget is not a D3D10RenderTarget");
+			return false;
+		}
 	}
 
-	D3D10RenderTarget *d3dtarget=(D3D10RenderTarget*)target->getRootRenderTarget();
-	if(d3dtarget==NULL){
-		Error::nullPointer(Categories::TOADLET_PEEPER,
-			"RenderTarget is not a D3D10RenderTarget");
-		return false;
+	if(mD3DRenderTarget!=NULL){
+		mD3DRenderTarget->deactivate();
 	}
 
 	mRenderTarget=target;
 	mD3DRenderTarget=d3dtarget;
 
-	mD3DRenderTarget->makeCurrent(mD3DDevice);
+	if(mD3DRenderTarget!=NULL){
+		mD3DRenderTarget->activate();
+	}
 
 	return true;
 }
@@ -391,7 +394,7 @@ for( UINT p = 0; p < techDesc.Passes; ++p )
 */
 }
 
-bool D3D10Renderer::copyToSurface(Surface *surface){
+bool D3D10Renderer::copyFrameBufferToPixelBuffer(PixelBuffer *dst){
 /*	D3D9Surface *d3dsurface=(D3D9Surface*)surface->getRootSurface();
 
 	IDirect3DSurface9 *currentSurface=NULL;
@@ -416,6 +419,10 @@ bool D3D10Renderer::copyToSurface(Surface *surface){
 
 	return true;
 */
+return false;
+}
+
+bool D3D10Renderer::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
 return false;
 }
 

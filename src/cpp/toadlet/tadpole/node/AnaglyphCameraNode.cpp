@@ -48,12 +48,12 @@ Node *AnaglyphCameraNode::create(Scene *scene){
 	int format=Texture::Format_L_8;
 
 	mLeftTexture=mEngine->getTextureManager()->createTexture(flags,Texture::Dimension_D2,format,size,size,0,1);
-	mLeftRenderTarget=mEngine->getTextureManager()->createSurfaceRenderTarget();
-	mLeftRenderTarget->attach(mLeftTexture->getMipSurface(0,0),SurfaceRenderTarget::Attachment_COLOR_0);
+	mLeftRenderTarget=mEngine->getTextureManager()->createPixelBufferRenderTarget();
+	mLeftRenderTarget->attach(mLeftTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
 
 	mRightTexture=mEngine->getTextureManager()->createTexture(flags,Texture::Dimension_D2,format,size,size,0,1);
-	mRightRenderTarget=mEngine->getTextureManager()->createSurfaceRenderTarget();
-	mRightRenderTarget->attach(mRightTexture->getMipSurface(0,0),SurfaceRenderTarget::Attachment_COLOR_0);
+	mRightRenderTarget=mEngine->getTextureManager()->createPixelBufferRenderTarget();
+	mRightRenderTarget->attach(mRightTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
 
 	mLeftMaterial=mEngine->getMaterialManager()->createMaterial();
 	mLeftMaterial->setDepthTest(Renderer::DepthTest_NONE);

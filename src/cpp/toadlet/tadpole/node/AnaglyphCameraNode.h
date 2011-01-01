@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_ANAGLYPHCAMERANODE_H
 
 #include <toadlet/peeper/Texture.h>
-#include <toadlet/peeper/SurfaceRenderTarget.h>
+#include <toadlet/peeper/PixelBufferRenderTarget.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 
 namespace toadlet{
@@ -58,11 +58,11 @@ protected:
 	scalar mSeparation;
 
 	peeper::Texture::ptr mLeftTexture;
-	peeper::SurfaceRenderTarget::ptr mLeftRenderTarget;
+	peeper::PixelBufferRenderTarget::ptr mLeftRenderTarget;
 	peeper::Color mLeftColor;
 	Material::ptr mLeftMaterial;
 	peeper::Texture::ptr mRightTexture;
-	peeper::SurfaceRenderTarget::ptr mRightRenderTarget;
+	peeper::PixelBufferRenderTarget::ptr mRightRenderTarget;
 	peeper::Color mRightColor;
 	Material::ptr mRightMaterial;
 };

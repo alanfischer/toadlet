@@ -23,45 +23,61 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_D3D9SURFACE_H
-#define TOADLET_PEEPER_D3D9SURFACE_H
+#ifndef TOADLET_PEEPER_D3D9PIXELBUFFER_H
+#define TOADLET_PEEPER_D3D9PIXELBUFFER_H
 
 #include "D3D9Includes.h"
-#include <toadlet/peeper/Surface.h>
+#include <toadlet/peeper/PixelBuffer.h>
 
 namespace toadlet{
 namespace peeper{
 
 class D3D9Renderer;
 
-class TOADLET_API D3D9Surface:public Surface{
+class TOADLET_API D3D9PixelBuffer:public PixelBuffer{
 public:
-	TOADLET_SHARED_POINTERS(D3D9Surface);
+	TOADLET_SHARED_POINTERS(D3D9PixelBuffer);
 
-	D3D9Surface(IDirect3DSurface9 *surface);
-	virtual ~D3D9Surface();
+	D3D9PixelBuffer(D3D9Renderer *renderer,bool renderTarget);
+	virtual ~D3D9PixelBuffer();
 
-	virtual Surface *getRootSurface(){return this;}
+	virtual PixelBuffer *getRootPixelBuffer(){return this;}
 
-	virtual bool destroy();
+	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
-	/// @todo: Implement these, or somehow remove them from the Surface requirements
-	virtual int getUsage() const{return 0;}
-	virtual int getAccess() const{return 0;}
-	virtual int getDataSize() const{return 0;}
+	virtual bool create(int usage,int access,int pixelFormat,int width,int height,int depth);
+	virtual void destroy();
 
+	virtual void resetCreate();
+	virtual void resetDestroy();
+
+	virtual int getUsage() const{return mUsage;}
+	virtual int getAccess() const{return mAccess;}
+	virtual int getDataSize() const{return mDataSize;}
+
+	virtual int getPixelFormat() const{return mPixelFormat;}
 	virtual int getWidth() const{return mWidth;}
 	virtual int getHeight() const{return mHeight;}
+	virtual int getDepth() const{return mDepth;}
 
 	virtual uint8 *lock(int lockAccess);
 	virtual bool unlock();
 
 	inline IDirect3DSurface9 *getSurface() const{return mSurface;}
+	inline IDirect3DVolume9 *getVolume() const{return mVolume;}
 
 protected:
+	D3D9Renderer *mRenderer;
+
+	BufferDestroyedListener *mListener;
+	bool mRenderTarget;
 	IDirect3DSurface9 *mSurface;
-	int mWidth;
-	int mHeight;
+	IDirect3DVolume9 *mVolume;
+	int mUsage;
+	int mAccess;
+	int mDataSize;
+	int mPixelFormat;
+	int mWidth,mHeight,mDepth;
 
 	friend D3D9Renderer;
 };

@@ -25,7 +25,7 @@
 
 #include "D3D10Renderer.h"
 #include "D3D10Texture.h"
-#include "D3D10Surface.h"
+#include "D3D10PixelBuffer.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 
@@ -108,6 +108,9 @@ bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
 	}
 	else if((mUsage&Usage_BIT_STREAM)>0){
 		d3dUsage=D3D10_USAGE_DYNAMIC;
+	}
+	else if((mUsage&Usage_BIT_STAGING)>0){
+		d3dUsage=D3D10_USAGE_STAGING;
 	}
 
 	int cpuFlags=0;
@@ -225,7 +228,7 @@ bool D3D10Texture::destroyContext(){
 	return SUCCEEDED(result);
 }
 
-Surface::ptr D3D10Texture::getMipSurface(int level,int cubeSide){
+PixelBuffer::ptr D3D10Texture::getMipPixelBuffer(int level,int cubeSide){
 	/// @todo: Check our cached list of SubTextures, and if the requested one isn't available, create it, and then return it.
 	return NULL;
 }

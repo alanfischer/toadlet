@@ -48,7 +48,8 @@ public:
 	virtual bool createContext(NSView *view,const Visual &visual,NSOpenGLPixelFormat *pixelFormat=nil);
 	virtual bool destroyContext();
 
-	virtual bool makeCurrent();
+	virtual bool activate();
+	virtual bool deactivate();
 	virtual bool swap();
 	virtual void reset();
 

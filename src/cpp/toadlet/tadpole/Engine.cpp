@@ -153,17 +153,12 @@ using namespace toadlet::tadpole::mesh;
 namespace toadlet{
 namespace tadpole{
 
-Engine::Engine():
+Engine::Engine(bool backable):
 	//mDirectory,
 	//mScene,
 	mRenderer(NULL),
 	mAudioPlayer(NULL)
 {
-	bool backable=true;
-	#if defined(TOADLET_PLATFORM_IPHONE) || defined(TOADLET_PLATFORM_WINCE)
-		backable=false;
-	#endif
-	
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"creating Engine");
 

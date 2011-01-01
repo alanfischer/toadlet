@@ -39,7 +39,8 @@ public:
 	EGLRenderTarget();
 	virtual ~EGLRenderTarget(){}
 
-	virtual bool makeCurrent();
+	virtual bool activate();
+	virtual bool deactivate();
 
 	inline EGLDisplay getEGLDisplay() const{return mDisplay;}
 	inline EGLSurface getEGLSurface() const{return mSurface;}

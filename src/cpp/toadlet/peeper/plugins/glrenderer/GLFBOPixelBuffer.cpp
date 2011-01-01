@@ -23,50 +23,56 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "GLFBORenderbufferSurface.h"
-#include "GLFBOSurfaceRenderTarget.h"
+#include "GLFBOPixelBuffer.h"
+#include "GLFBORenderTarget.h"
 #include "GLRenderer.h"
+#include <toadlet/egg/image/ImageFormatConversion.h>
+
+using namespace toadlet::egg::image;
 
 namespace toadlet{
 namespace peeper{
 
-GLFBORenderbufferSurface::GLFBORenderbufferSurface(GLFBOSurfaceRenderTarget *target):GLSurface(),
+GLFBOPixelBuffer::GLFBOPixelBuffer(GLFBORenderTarget *target):GLPixelBuffer(),
 	mTarget(NULL),
 	mHandle(0),
-	mFormat(0),
-	mWidth(0),
-	mHeight(0)
+	mPixelFormat(0),
+	mUsage(0),
+	mAccess(0),
+	mDataSize(0),
+	mWidth(0),mHeight(0)
 {
 	mTarget=target;
 }
 
-GLFBORenderbufferSurface::~GLFBORenderbufferSurface(){
+GLFBOPixelBuffer::~GLFBOPixelBuffer(){
 	destroy();
 }
 
-bool GLFBORenderbufferSurface::create(int format,int width,int height){
-	mFormat=format;
+bool GLFBOPixelBuffer::create(int usage,int access,int pixelFormat,int width,int height,int depth){
+	mUsage=usage;
+	mAccess=access;
+	mPixelFormat=pixelFormat;
 	mWidth=width;
 	mHeight=height;
+	mDataSize=ImageFormatConversion::getPixelSize(mPixelFormat)*mWidth*mHeight;
 
 	glGenRenderbuffers(1,&mHandle);
 	glBindRenderbuffer(GL_RENDERBUFFER,mHandle);
-	glRenderbufferStorage(GL_RENDERBUFFER,GLRenderer::getGLFormat(mFormat),mWidth,mHeight);
+	glRenderbufferStorage(GL_RENDERBUFFER,GLRenderer::getGLFormat(mPixelFormat),mWidth,mHeight);
 
-	TOADLET_CHECK_GLERROR("GLFBORenderbufferSurface::create");
+	TOADLET_CHECK_GLERROR("GLFBOPixelBuffer::create");
 
 	return true;
 }
 
-bool GLFBORenderbufferSurface::destroy(){
+void GLFBOPixelBuffer::destroy(){
 	if(mHandle!=0){
 		glDeleteRenderbuffers(1,&mHandle);
 		mHandle=0;
 
-		TOADLET_CHECK_GLERROR("GLFBORenderbufferSurface::destroy");
+		TOADLET_CHECK_GLERROR("GLFBOPixelBuffer::destroy");
 	}
-
-	return true;
 }
 
 }

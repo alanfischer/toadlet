@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_EGLPBUFFERSURFACERENDERTARGET_H
-#define TOADLET_PEEPER_EGLPBUFFERSURFACERENDERTARGET_H
+#ifndef TOADLET_PEEPER_EGLPBUFFERRENDERTARGET_H
+#define TOADLET_PEEPER_EGLPBUFFERRENDERTARGET_H
 
 #include "EGLRenderTarget.h"
 #include "../../GLTexture.h"
@@ -35,24 +35,24 @@ namespace peeper{
 
 class GLRenderer;
 
-class EGLPBufferSurfaceRenderTarget:public EGLRenderTarget,public SurfaceRenderTarget{
+class EGLPBufferRenderTarget:public EGLRenderTarget,public SurfaceRenderTarget{
 public:
 	static bool available(GLRenderer *renderer);
 
-	EGLPBufferSurfaceRenderTarget(GLRenderer *renderer);
-	virtual ~EGLPBufferSurfaceRenderTarget();
+	EGLPBufferRenderTarget(GLRenderer *renderer);
+	virtual ~EGLPBufferRenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
 	virtual bool create();
-	virtual bool destroy();
+	virtual void destroy();
 	virtual bool compile();
 
 	virtual bool makeCurrent();
 	virtual bool swap();
 
-	virtual bool attach(Surface::ptr surface,Attachment attachment);
-	virtual bool remove(Surface::ptr surface);
+	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment);
+	virtual bool remove(PixelBuffer::ptr buffer);
 
 	virtual bool isPrimary() const{return false;}
 	virtual bool isValid() const{return mContext!=NULL && mSurface!=NULL;}
