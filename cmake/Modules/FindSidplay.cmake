@@ -10,25 +10,29 @@
 
 set (SIDPLAY_FOUND "NO")
 
-find_path (SIDPLAY_INCLUDE_DIR sidplay/sidplay2.h)
-find_library (SIDPLAY_LIBRARY NAMES sidplay2)
-find_library (RESID_LIBRARY NAMES resid_builder)
-find_library (HARDSID_LIBRARY NAMES hardsid_builder)
-
 mark_as_advanced (SIDPLAY_INCLUDE_DIR SIDPLAY_LIBRARY)
 
+find_library (HARDSID_LIBRARY NAMES hardsid_builder)
+find_library (RESID_LIBRARY NAMES resid_builder)
+
 # We need to at least have the resid builder
-if (SIDPLAY_INCLUDE_DIR AND SIDPLAY_LIBRARY AND RESID_LIBRARY)
-	set (SIDPLAY_FOUND "YES")
-	set (SIDPLAY_VERSION 2)
-else (SIDPLAY_INCLUDE_DIR AND SIDPLAY_LIBRARY AND RESID_LIBRARY)
-	find_path (SIDPLAY_INCLUDE_DIR sidplay/player.h)
-	find_library (SIDPLAY_LIBRARY NAMES sidplay)
+if (RESID_LIBRARY)
+	# Look for sidplay 2
+	find_path (SIDPLAY_INCLUDE_DIR sidplay/sidplay2.h)
+	find_library (SIDPLAY_LIBRARY NAMES sidplay2)
 	if (SIDPLAY_INCLUDE_DIR AND SIDPLAY_LIBRARY)
 		set (SIDPLAY_FOUND "YES")
-		set (SIDPLAY_VERSION 1)
+		set (SIDPLAY_VERSION 2)
+	else (SIDPLAY_INCLUDE_DIR AND SIDPLAY_LIBRARY)
+		# Otherwise look for sidplay 1
+		find_path (SIDPLAY_INCLUDE_DIR sidplay/player.h)
+		find_library (SIDPLAY_LIBRARY NAMES sidplay)
+		if (SIDPLAY_INCLUDE_DIR AND SIDPLAY_LIBRARY)
+			set (SIDPLAY_FOUND "YES")
+			set (SIDPLAY_VERSION 1)
+		endif (SIDPLAY_INCLUDE_DIR AND SIDPLAY_LIBRARY)
 	endif (SIDPLAY_INCLUDE_DIR AND SIDPLAY_LIBRARY)
-endif (SIDPLAY_INCLUDE_DIR AND SIDPLAY_LIBRARY AND RESID_LIBRARY)
+endif (RESID_LIBRARY)
 
 if (SIDPLAY_FOUND)
 	if (NOT SIDPLAY_FIND_QUITELY)
