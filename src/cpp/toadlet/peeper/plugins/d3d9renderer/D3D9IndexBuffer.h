@@ -52,7 +52,7 @@ public:
 	virtual int getUsage() const{return mUsage;}
 	virtual int getAccess() const{return mAccess;}
 	virtual int getDataSize() const{return mDataSize;}
-	virtual IndexFormat getIndexFormat(){return mIndexFormat;}
+	virtual IndexFormat getIndexFormat() const{return mIndexFormat;}
 	virtual int getSize() const{return mSize;}
 
 	virtual uint8 *lock(int lockAccess);

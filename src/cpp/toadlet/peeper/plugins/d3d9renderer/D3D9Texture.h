@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_D3D9TEXTURE_H
 
 #include "D3D9Includes.h"
+#include "D3D9PixelBuffer.h"
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/peeper/TextureBlend.h>
@@ -35,6 +36,7 @@ namespace toadlet{
 namespace peeper{
 
 class D3D9Renderer;
+class D3D9TextureMipPixelBuffer;
 
 class TOADLET_API D3D9Texture:protected egg::BaseResource,public Texture{
 	TOADLET_BASERESOURCE_PASSTHROUGH(Texture);
@@ -61,7 +63,7 @@ public:
 	virtual int getNumMipLevels() const{return mMipLevels;} // If we just returned mTexture->GetLevelCount(), it could return 1 if we had autogenerate on, which isn't what is desired.
 	virtual scalar getLength() const{return 0;}
 
-	virtual Surface::ptr getMipSurface(int level,int cubeSide);
+	virtual PixelBuffer::ptr getMipPixelBuffer(int level,int cubeSide);
 	virtual bool load(int width,int height,int depth,int mipLevel,byte *mipData);
 	virtual bool read(int width,int height,int depth,int mipLevel,byte *mipData);
 
@@ -87,9 +89,11 @@ protected:
 	D3DPOOL mD3DPool;
 	IDirect3DBaseTexture9 *mTexture;
 	bool mManuallyGenerateMipLevels;
-	IDirect3DSurface9 *mBackupSurface;
+	egg::Collection<PixelBuffer::ptr> mBuffers;
+	D3D9PixelBuffer::ptr mBackingBuffer;
 
 	friend D3D9Renderer;
+	friend D3D9TextureMipPixelBuffer;
 };
 
 }

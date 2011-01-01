@@ -34,8 +34,12 @@ GLXRenderTarget::GLXRenderTarget():GLRenderTarget(),
 	mContext(None)
 {}
 
-bool GLXRenderTarget::makeCurrent(){
+bool GLXRenderTarget::activate(){
 	return glXMakeCurrent(mDisplay,mDrawable,mContext)==True;
+}
+
+bool GLXRenderTarget::deactivate(){
+	return glXMakeCurrent(mDisplay,None,NULL)==True;
 }
 
 }

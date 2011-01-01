@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "GLFBOSurfaceRenderTarget.h"
+#include "GLFBORenderTarget.h"
 #include "GLTexture.h"
 #include "GLRenderer.h"
 #include <toadlet/egg/Error.h>
@@ -34,7 +34,7 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
-bool GLFBOSurfaceRenderTarget::available(GLRenderer *renderer){
+bool GLFBORenderTarget::available(GLRenderer *renderer){
 	#if defined(TOADLET_HAS_GLEW)
 		return GLEW_EXT_framebuffer_object>0;
 	#elif defined(TOADLET_HAS_EAGL)
@@ -44,22 +44,24 @@ bool GLFBOSurfaceRenderTarget::available(GLRenderer *renderer){
 	#endif
 }
 
-GLFBOSurfaceRenderTarget::GLFBOSurfaceRenderTarget(GLRenderer *renderer):GLRenderTarget(),
+GLFBORenderTarget::GLFBORenderTarget(GLRenderer *renderer):GLRenderTarget(),
 	mRenderer(NULL),
 	mWidth(0),
 	mHeight(0),
 	mHandle(0),
 	mNeedsCompile(false)
-	//mSurfaces
+	//mBuffers,
+	//mBufferAttachments,
+	//mDepthBuffer
 {
 	mRenderer=renderer;
 }
 
-GLFBOSurfaceRenderTarget::~GLFBOSurfaceRenderTarget(){
+GLFBORenderTarget::~GLFBORenderTarget(){
 	destroy();
 }
 
-bool GLFBOSurfaceRenderTarget::create(){
+bool GLFBORenderTarget::create(){
 	destroy();
 
 	mWidth=0;
@@ -68,21 +70,20 @@ bool GLFBOSurfaceRenderTarget::create(){
 
 	glGenFramebuffers(1,&mHandle);
 
-	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::create");
+	TOADLET_CHECK_GLERROR("GLFBORenderTarget::create");
 
 	return true;
 }
 
-bool GLFBOSurfaceRenderTarget::destroy(){
+void GLFBORenderTarget::destroy(){
 	if(mRenderer==NULL || mRenderer->getRenderTarget()->getRootRenderTarget()==(GLRenderTarget*)this){
 		glBindFramebuffer(GL_FRAMEBUFFER,0);
 	}
  
-	int i;
-	for(i=0;i<mOwnedSurfaces.size();++i){
-		mOwnedSurfaces[i]->destroy();
+	if(mDepthBuffer!=NULL){
+		mDepthBuffer->destroy();
+		mDepthBuffer=NULL;
 	}
-	mOwnedSurfaces.clear();
 
 	if(mHandle!=0){
 		glDeleteFramebuffers(1,&mHandle);
@@ -91,45 +92,52 @@ bool GLFBOSurfaceRenderTarget::destroy(){
 
 	mRenderer=NULL;
 
-	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::destroy");
-
-	return true;
+	TOADLET_CHECK_GLERROR("GLFBORenderTarget::destroy");
 }
 
-bool GLFBOSurfaceRenderTarget::makeCurrent(){
+bool GLFBORenderTarget::activate(){
 	if(mNeedsCompile){
 		compile();
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 
-	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::makeCurrent");
+	TOADLET_CHECK_GLERROR("GLFBORenderTarget::activate");
 
 	return true;
 }
 
-bool GLFBOSurfaceRenderTarget::swap(){
+bool GLFBORenderTarget::deactivate(){
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 
-	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::swap");
+	TOADLET_CHECK_GLERROR("GLFBORenderTarget::deactivate");
 
 	return true;
 }
 
-bool GLFBOSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
-	GLSurface *glsurface=(GLSurface*)surface->getRootSurface();
+bool GLFBORenderTarget::swap(){
+	glBindFramebuffer(GL_FRAMEBUFFER,0);
 
-	GLTextureMipSurface *textureSurface=glsurface->castToGLTextureMipSurface();
-	GLFBORenderbufferSurface *renderbufferSurface=glsurface->castToGLFBORenderbufferSurface();
+	TOADLET_CHECK_GLERROR("GLFBORenderTarget::swap");
+
+	return true;
+}
+
+bool GLFBORenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachment){
+	GLPixelBuffer *glpixelBuffer=(GLPixelBuffer*)buffer->getRootPixelBuffer();
+
+	GLTextureMipPixelBuffer *textureBuffer=glpixelBuffer->castToGLTextureMipPixelBuffer();
+	GLFBOPixelBuffer *fboBuffer=glpixelBuffer->castToGLFBOPixelBuffer();
+	GLBuffer *pixelBuffer=glpixelBuffer->castToGLBuffer();
 
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
-	if(textureSurface!=NULL){
-		GLTexture *texture=textureSurface->getTexture();
-		GLuint handle=textureSurface->getHandle();
-		GLenum target=textureSurface->getTarget();
-		GLuint level=textureSurface->getLevel();
-		mWidth=textureSurface->getWidth();
-		mHeight=textureSurface->getHeight();
+	if(textureBuffer!=NULL){
+		GLTexture *texture=textureBuffer->getTexture();
+		GLuint handle=textureBuffer->getHandle();
+		GLenum target=textureBuffer->getTarget();
+		GLuint level=textureBuffer->getLevel();
+		mWidth=textureBuffer->getWidth();
+		mHeight=textureBuffer->getHeight();
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER,getGLAttachment(attachment),target,handle,level);
 		/// @todo: Figure out EXACTLY when we need these and when we dont, I think we just need them if its ONLY a SHADOWMAP
@@ -143,76 +151,90 @@ bool GLFBOSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment
 		Math::setMatrix4x4FromTranslate(matrix,0,Math::ONE,0);
 		texture->setMatrix(matrix);
 	}
-	else if(renderbufferSurface!=NULL){
-		GLuint handle=renderbufferSurface->getHandle();
+	else if(fboBuffer!=NULL){
+		GLuint handle=fboBuffer->getHandle();
 
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER,getGLAttachment(attachment),GL_RENDERBUFFER,handle);
 	}
+	else if(pixelBuffer!=NULL){
+		Error::unimplemented("can not bind PixelBuffer to FBO");
+		return false;
+	}
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 
-	mSurfaces.add(surface);
-	mSurfaceAttachments.add(attachment);
+	mBuffers.add(buffer);
+	mBufferAttachments.add(attachment);
 	mNeedsCompile=true;
 
-	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::attach");
+	TOADLET_CHECK_GLERROR("GLFBORenderTarget::attach");
 
 	return true;
 }
 
-bool GLFBOSurfaceRenderTarget::remove(Surface::ptr surface){
+bool GLFBORenderTarget::remove(PixelBuffer::ptr buffer){
 	int i;
-	for(i=0;i<mSurfaces.size();++i){
-		if(mSurfaces[i]==surface){
+	for(i=0;i<mBuffers.size();++i){
+		if(mBuffers[i]==buffer){
 			break;
 		}
 	}
-	if(i==mSurfaces.size()){
+	if(i==mBuffers.size()){
 		return false;
 	}
 
-	GLSurface *glsurface=(GLSurface*)surface->getRootSurface();
+	GLPixelBuffer *glbuffer=(GLPixelBuffer*)buffer->getRootPixelBuffer();
 
-	GLTextureMipSurface *textureSurface=glsurface->castToGLTextureMipSurface();
-	GLFBORenderbufferSurface *renderbufferSurface=glsurface->castToGLFBORenderbufferSurface();
+	GLTextureMipPixelBuffer *texturebuffer=glbuffer->castToGLTextureMipPixelBuffer();
+	GLFBOPixelBuffer *fbobuffer=glbuffer->castToGLFBOPixelBuffer();
 
-	Attachment attachment=mSurfaceAttachments[i];
+	Attachment attachment=mBufferAttachments[i];
 
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
-	if(textureSurface!=NULL){
+	if(texturebuffer!=NULL){
 		glFramebufferTexture2D(GL_FRAMEBUFFER,getGLAttachment(attachment),GL_TEXTURE_2D,0,0);
 	}
-	else if(renderbufferSurface!=NULL){
+	else if(fbobuffer!=NULL){
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER,getGLAttachment(attachment),GL_RENDERBUFFER,0);
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 
-	mSurfaces.removeAt(i);
-	mSurfaceAttachments.removeAt(i);
+	mBuffers.removeAt(i);
+	mBufferAttachments.removeAt(i);
 	mNeedsCompile=true;
 
-	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::remove");
+	TOADLET_CHECK_GLERROR("GLFBORenderTarget::remove");
 
 	return true;
 }
 
-/// @todo: Make it check to see if a pre-existing self-created depth surface is compatible, and if not, destroy & recreate it
-bool GLFBOSurfaceRenderTarget::compile(){
-	Surface::ptr depth;
-	Surface::ptr color;
+/// @todo: Make it check to see if a pre-existing self-created depth buffer is compatible, and if not, destroy & recreate it
+bool GLFBORenderTarget::compile(){
+	PixelBuffer::ptr depth;
+	PixelBuffer::ptr color;
 
 	int i;
-	for(i=0;i<mSurfaceAttachments.size();++i){
-		if(mSurfaceAttachments[i]==Attachment_DEPTH_STENCIL){
-			depth=mSurfaces[i];
+	for(i=0;i<mBufferAttachments.size();++i){
+		if(mBufferAttachments[i]==Attachment_DEPTH_STENCIL){
+			depth=mBuffers[i];
 		}
 		else{
-			color=mSurfaces[i];
+			color=mBuffers[i];
 		}
 	}
 
+	if(mDepthBuffer!=NULL){
+		remove(mDepthBuffer);
+		mDepthBuffer->destroy();
+		mDepthBuffer=NULL;
+	}
+
 	if(color!=NULL && depth==NULL){
-		// No Depth-Stencil surface, so add one
-		attach(createBufferSurface(Texture::Format_DEPTH_16,mWidth,mHeight),Attachment_DEPTH_STENCIL);
+		// No Depth-Stencil buffer, so add one
+		GLFBOPixelBuffer::ptr buffer(new GLFBOPixelBuffer(this));
+		if(buffer->create(Buffer::Usage_NONE,Buffer::Access_NONE,Texture::Format_DEPTH_16,mWidth,mHeight,1)){
+			attach(buffer,Attachment_DEPTH_STENCIL);
+			mDepthBuffer=buffer;
+		}
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
@@ -222,23 +244,14 @@ bool GLFBOSurfaceRenderTarget::compile(){
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 
-	TOADLET_CHECK_GLERROR("GLFBOSurfaceRenderTarget::compile");
+	TOADLET_CHECK_GLERROR("GLFBORenderTarget::compile");
 
 	mNeedsCompile=false;
 
 	return status==GL_FRAMEBUFFER_COMPLETE;
 }
 
-Surface::ptr GLFBOSurfaceRenderTarget::createBufferSurface(int format,int width,int height){
-	GLFBORenderbufferSurface::ptr surface(new GLFBORenderbufferSurface(this));
-	if(surface->create(format,width,height)==false){
-		return NULL;
-	}
-	mOwnedSurfaces.add(surface);
-	return surface;
-}
-
-GLenum GLFBOSurfaceRenderTarget::getGLAttachment(Attachment attachment){
+GLenum GLFBORenderTarget::getGLAttachment(Attachment attachment){
 	switch(attachment){
 		case Attachment_DEPTH_STENCIL:
 			return GL_DEPTH_ATTACHMENT;
@@ -254,12 +267,12 @@ GLenum GLFBOSurfaceRenderTarget::getGLAttachment(Attachment attachment){
 		#endif
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
-				"GLFBOSurfaceRenderTarget::getGLAttachment: Invalid attachment");
+				"GLFBORenderTarget::getGLAttachment: Invalid attachment");
 			return 0;
 	};
 }
 
-const char *GLFBOSurfaceRenderTarget::getFBOMessage(GLenum status){
+const char *GLFBORenderTarget::getFBOMessage(GLenum status){
 	switch(status){
 		case GL_FRAMEBUFFER_COMPLETE:
 			return "GL_FRAMEBUFFER_COMPLETE";

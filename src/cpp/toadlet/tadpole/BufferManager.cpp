@@ -221,6 +221,8 @@ VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBu
 }
 
 void BufferManager::contextActivate(Renderer *renderer){
+	Logger::debug("BufferManager::contextActivate");
+
 	int i;
 	for(i=0;i<mIndexBuffers.size();++i){
 		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
@@ -239,6 +241,8 @@ void BufferManager::contextActivate(Renderer *renderer){
 }
 
 void BufferManager::contextDeactivate(Renderer *renderer){
+	Logger::debug("BufferManager::contextDeactivate");
+
 	int i;
 	for(i=0;i<mIndexBuffers.size();++i){
 		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
@@ -255,6 +259,8 @@ void BufferManager::contextDeactivate(Renderer *renderer){
 }
 
 void BufferManager::preContextReset(Renderer *renderer){
+	Logger::debug("BufferManager::preContextReset");
+
 	int i;
 	for(i=0;i<mIndexBuffers.size();++i){
 		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
@@ -267,6 +273,8 @@ void BufferManager::preContextReset(Renderer *renderer){
 }
 
 void BufferManager::postContextReset(Renderer *renderer){
+	Logger::debug("BufferManager::postContextReset");
+
 	int i;
 	for(i=0;i<mIndexBuffers.size();++i){
 		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];

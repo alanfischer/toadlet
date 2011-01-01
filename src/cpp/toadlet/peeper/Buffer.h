@@ -52,6 +52,8 @@ public:
 
 	virtual ~Buffer(){}
 
+	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener)=0;
+
 	virtual int getUsage() const=0;
 	virtual int getAccess() const=0;
 	virtual int getDataSize() const=0;

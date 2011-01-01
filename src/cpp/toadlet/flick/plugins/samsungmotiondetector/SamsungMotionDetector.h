@@ -61,7 +61,7 @@ public:
 
 	bool shutdown();
 
-	bool destroy();
+	void destroy();
 
 	void setPollSleep(int ms);
 

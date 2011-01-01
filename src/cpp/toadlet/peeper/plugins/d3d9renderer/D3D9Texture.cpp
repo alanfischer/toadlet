@@ -25,7 +25,7 @@
 
 #include "D3D9Renderer.h"
 #include "D3D9Texture.h"
-#include "D3D9Surface.h"
+#include "D3D9TextureMipPixelBuffer.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 
@@ -52,8 +52,9 @@ D3D9Texture::D3D9Texture(D3D9Renderer *renderer):BaseResource(),
 	mD3DUsage(0),
 	mD3DPool(D3DPOOL_MANAGED),
 	mTexture(NULL),
-	mManuallyGenerateMipLevels(false),
-	mBackupSurface(NULL)
+	mManuallyGenerateMipLevels(false)
+	//mBuffers
+	//mBackingBuffer
 {
 	mRenderer=renderer;
 }
@@ -74,11 +75,11 @@ bool D3D9Texture::create(int usage,Dimension dimension,int format,int width,int 
 		return false;
 	}
 
-	if(format!=mRenderer->getClosestTextureFormat(format)){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"D3D9Texture: Invalid texture format");
-		return false;
-	}
+//	if(format!=mRenderer->getClosestTextureFormat(format)){
+//		Error::unknown(Categories::TOADLET_PEEPER,
+//			"D3D9Texture: Invalid texture format");
+//		return false;
+//	}
 
 	mUsage=usage;
 	mDimension=dimension;
@@ -104,6 +105,8 @@ bool D3D9Texture::create(int usage,Dimension dimension,int format,int width,int 
 
 void D3D9Texture::destroy(){
 	destroyContext(false);
+
+	mBuffers.clear();
 }
 
 void D3D9Texture::resetCreate(){
@@ -134,12 +137,19 @@ bool D3D9Texture::createContext(bool restore){
 		mD3DUsage|=D3DUSAGE_DYNAMIC;
 	}
 
-	mD3DPool=
-		#if defined(TOADLET_SET_D3DM)
-			D3DPOOL_MANAGED;
-		#else
-			(mUsage&Usage_BIT_RENDERTARGET)>0 ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
-		#endif
+	#if defined(TOADLET_SET_D3DM)
+		mD3DPool=D3DPOOL_MANAGED;
+	#else
+		if((mUsage&Usage_BIT_STAGING)>0){
+			mD3DPool=D3DPOOL_SYSTEMMEM;
+		}
+		else if((mUsage&Usage_BIT_RENDERTARGET)>0){
+			mD3DPool=D3DPOOL_DEFAULT;
+		}
+		else{
+			mD3DPool=D3DPOOL_MANAGED;
+		}
+	#endif
 
 	mInternalFormat=mRenderer->getClosestTextureFormat(mFormat);
 	mD3DFormat=D3D9Renderer::getD3DFORMAT(mInternalFormat);
@@ -178,22 +188,21 @@ bool D3D9Texture::createContext(bool restore){
 		#endif
 	}
 
-	#if !defined(TOADLET_SET_D3DM)
-		if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
-			if(restore && mBackupSurface!=NULL){
-				IDirect3DSurface9 *surface=NULL;
-				result=((IDirect3DTexture9*)mTexture)->GetSurfaceLevel(0,&surface);
-				TOADLET_CHECK_D3D9ERROR(result,"CreateOffscreenPlainSurface");
-				if(SUCCEEDED(result)){
-					result=mRenderer->getDirect3DDevice9()->UpdateSurface(mBackupSurface,NULL,surface,NULL);
-					TOADLET_CHECK_D3D9ERROR(result,"UpdateSurface");
-					surface->Release();
-				}
-				mBackupSurface->Release();
-				mBackupSurface=NULL;
-			}
+	if(mBackingBuffer!=NULL){
+		IDirect3DSurface9 *surface=NULL;
+		((IDirect3DTexture9*)mTexture)->GetSurfaceLevel(0,&surface);
+		mRenderer->copySurface(surface,mBackingBuffer->getSurface());
+		surface->Release();
+		mBackingBuffer->destroy();
+		mBackingBuffer=NULL;
+	}
+
+	if(restore){
+		int i;
+		for(i=0;i<mBuffers.size();++i){
+			mBuffers[i]->resetCreate();
 		}
-	#endif
+	}
 
 	TOADLET_CHECK_D3D9ERROR(result,"CreateTexture");
 
@@ -201,29 +210,31 @@ bool D3D9Texture::createContext(bool restore){
 }
 
 bool D3D9Texture::destroyContext(bool backup){
+	int i;
 	if(backup){
-		HRESULT result=S_OK;
-		#if !defined(TOADLET_SET_D3DM)
-			if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
-				result=mRenderer->getDirect3DDevice9()->CreateOffscreenPlainSurface(mWidth,mHeight,mD3DFormat,D3DPOOL_SYSTEMMEM,&mBackupSurface,NULL);
-				TOADLET_CHECK_D3D9ERROR(result,"CreateOffscreenPlainSurface");
-				if(SUCCEEDED(result)){
-					IDirect3DSurface9 *surface=NULL;
-					result=((IDirect3DTexture9*)mTexture)->GetSurfaceLevel(0,&surface);
-					TOADLET_CHECK_D3D9ERROR(result,"CreateOffscreenPlainSurface");
-					if(SUCCEEDED(result)){
-						result=mRenderer->getDirect3DDevice9()->GetRenderTargetData(surface,mBackupSurface);
-						TOADLET_CHECK_D3D9ERROR(result,"GetRenderTargetData");
-						surface->Release();
-					}
-				}
-			}
-		#endif
+		for(i=0;i<mBuffers.size();++i){
+			mBuffers[i]->resetDestroy();
+		}
 	}
-	// Otherwise if the backup surface is still around for some reason, just release it
-	else if(mBackupSurface!=NULL){
-		mBackupSurface->Release();
-		mBackupSurface=NULL;
+	else{
+		for(i=0;i<mBuffers.size();++i){
+			mBuffers[i]->destroy();
+		}
+	}
+
+	if(backup && (mUsage&Usage_BIT_DYNAMIC)==0){
+		D3D9PixelBuffer::ptr buffer((D3D9PixelBuffer*)(mRenderer->createPixelBuffer()));
+		if(buffer->create(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_READ_WRITE,mFormat,mWidth,mHeight,mDepth)){
+			IDirect3DSurface9 *surface=NULL;
+			((IDirect3DTexture9*)mTexture)->GetSurfaceLevel(0,&surface);
+			mRenderer->copySurface(buffer->getSurface(),surface);
+			surface->Release();
+			mBackingBuffer=buffer;
+		}
+	}
+	else if(mBackingBuffer!=NULL){
+		mBackingBuffer->destroy();
+		mBackingBuffer=NULL;
 	}
 
 	HRESULT result=S_OK;
@@ -235,34 +246,26 @@ bool D3D9Texture::destroyContext(bool backup){
 	return SUCCEEDED(result);
 }
 
-Surface::ptr D3D9Texture::getMipSurface(int level,int cubeSide){
+PixelBuffer::ptr D3D9Texture::getMipPixelBuffer(int level,int cubeSide){
 	if(mTexture==NULL){
 		return NULL;
 	}
 
-	IDirect3DSurface9 *surface=NULL;
-
-	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
-		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
-		texture->GetSurfaceLevel(level,&surface);
-	}
-	#if !defined(TOADLET_SET_D3DM)
-		else if(mDimension==Texture::Dimension_CUBE){
-			IDirect3DCubeTexture9 *texture=(IDirect3DCubeTexture9*)mTexture;
-			texture->GetCubeMapSurface((D3DCUBEMAP_FACES)cubeSide,level,&surface);
-		}
-	#endif
-	else{
-		Error::unimplemented("D3D9Texture::getMipSurface unimplemented for this texture");
-		return NULL;
+	int index=level;
+	if(mDimension==Dimension_CUBE){
+		index=level*6+cubeSide;
 	}
 
-	if(surface!=NULL){
-		return Surface::ptr(new D3D9Surface(surface));
+	if(mBuffers.size()<=index){
+		mBuffers.resize(index+1);
 	}
-	else{
-		return NULL;
+
+	if(mBuffers[index]==NULL){
+		PixelBuffer::ptr buffer(new D3D9TextureMipPixelBuffer(this,level,cubeSide));
+		mBuffers[index]=buffer;
 	}
+
+	return mBuffers[index];
 }
 
 bool D3D9Texture::load(int width,int height,int depth,int mipLevel,byte *mipData){

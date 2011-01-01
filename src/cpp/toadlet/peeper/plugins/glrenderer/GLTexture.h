@@ -27,7 +27,7 @@
 #define TOADLET_PEEPER_GLTEXTURE_H
 
 #include "GLIncludes.h"
-#include "GLTextureMipSurface.h"
+#include "GLTextureMipPixelBuffer.h"
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/peeper/TextureStage.h>
@@ -61,7 +61,7 @@ public:
 	virtual int getNumMipLevels() const{return mMipLevels;}
 	virtual scalar getLength() const{return 0;}
 
-	virtual Surface::ptr getMipSurface(int level,int cubeSide);
+	virtual PixelBuffer::ptr getMipPixelBuffer(int level,int cubeSide);
 	virtual bool load(int width,int height,int depth,int mipLevel,tbyte *mipData);
 	virtual bool read(int width,int height,int depth,int mipLevel,tbyte *mipData);
 
@@ -91,7 +91,7 @@ protected:
 	GLenum mTarget;
 	Matrix4x4 mMatrix;
 	bool mManuallyGenerateMipLevels;
-	egg::Collection<Surface::ptr> mSurfaces;
+	egg::Collection<PixelBuffer::ptr> mBuffers;
 
 	friend class GLRenderer;
 };

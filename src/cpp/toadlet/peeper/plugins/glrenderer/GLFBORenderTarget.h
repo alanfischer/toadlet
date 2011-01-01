@@ -23,37 +23,40 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_GLFBOSURFACERENDERTARGET_H
-#define TOADLET_PEEPER_GLFBOSURFACERENDERTARGET_H
+#ifndef TOADLET_PEEPER_GLFBORENDERTARGET_H
+#define TOADLET_PEEPER_GLFBORENDERTARGET_H
 
 #include "GLRenderTarget.h"
-#include "GLFBORenderbufferSurface.h"
-#include <toadlet/peeper/SurfaceRenderTarget.h>
+#include "GLFBOPixelBuffer.h"
+#include <toadlet/peeper/PixelBufferRenderTarget.h>
 
 namespace toadlet{
 namespace peeper{
 
 class GLRenderer;
 
-/// @todo: Make the D3D9SurfaceRenderTarget & the GLFBOSurfaceRenderTarget more strict about Surface sizes,
-//  and smarter about destroying their temporary depth buffer when not needed
-class TOADLET_API GLFBOSurfaceRenderTarget:public GLRenderTarget,public SurfaceRenderTarget{
+/// @todo: Make the D3D9PixelBufferRenderTarget & the GLFBORenderTarget more strict about sizes
+class TOADLET_API GLFBORenderTarget:public GLRenderTarget,public PixelBufferRenderTarget{
 public:
 	static bool available(GLRenderer *renderer);
 
-	GLFBOSurfaceRenderTarget(GLRenderer *renderer);
-	virtual ~GLFBOSurfaceRenderTarget();
+	GLFBORenderTarget(GLRenderer *renderer);
+	virtual ~GLFBORenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
 	virtual bool create();
-	virtual bool destroy();
+	virtual void destroy();
 
-	virtual bool makeCurrent();
 	virtual bool swap();
+	virtual bool activate();
+	virtual bool deactivate();
+	virtual bool share(GLRenderTarget *target){return true;}
+	virtual bool activateAdditionalContext(){return false;}
+	virtual void deactivateAdditionalContext(){}
 
-	virtual bool attach(Surface::ptr surface,Attachment attachment);
-	virtual bool remove(Surface::ptr surface);
+	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment);
+	virtual bool remove(PixelBuffer::ptr buffer);
 	virtual bool compile();
 
 	virtual bool isPrimary() const{return false;}
@@ -62,8 +65,6 @@ public:
 	virtual int getHeight() const{return mHeight;}
 
 protected:
-	Surface::ptr createBufferSurface(int format,int width,int height);
-
 	static GLenum getGLAttachment(Attachment attachment);
 	static const char *getFBOMessage(GLenum status);
 
@@ -72,9 +73,9 @@ protected:
 	int mHeight;
 	GLuint mHandle;
 	bool mNeedsCompile;
-	egg::Collection<Surface::ptr> mSurfaces;
-	egg::Collection<Attachment> mSurfaceAttachments;
-	egg::Collection<GLFBORenderbufferSurface::ptr> mOwnedSurfaces;
+	egg::Collection<PixelBuffer::ptr> mBuffers;
+	egg::Collection<Attachment> mBufferAttachments;
+	PixelBuffer::ptr mDepthBuffer;
 };
 
 }

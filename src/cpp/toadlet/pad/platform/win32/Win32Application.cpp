@@ -27,6 +27,7 @@
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/CapabilitySet.h>
+#include <toadlet/peeper/WindowRenderTargetFormat.h>
 #include <toadlet/pad/platform/win32/Win32Application.h>
 #include <toadlet/pad/ApplicationListener.h>
 #include <windows.h>
@@ -35,6 +36,8 @@
 	#include <aygshell.h>
 	#pragma comment(lib,"aygshell.lib")
 #endif
+
+#include <toadlet/peeper/plugins/glrenderer/GLRenderTarget.h>
 
 #ifndef WM_MOUSEWHEEL
 	#define WM_MOUSEWHEEL 0x020A
@@ -72,30 +75,30 @@ using namespace toadlet::tadpole::handler;
 	#pragma comment(lib,"toadlet_peeper_glrenderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_GLRenderer();
 	#if defined(TOADLET_PLATFORM_WINCE)
-		extern "C" RenderTarget *new_EGLWindowRenderTarget(void *nativeDisplay,void *nativeSurface,const Visual &visual);
+		extern "C" RenderTarget *new_EGLWindowRenderTarget(void *nativeDisplay,void *nativeSurface,WindowRenderTargetFormat::ptr format);
 	#else
-		extern "C" RenderTarget *new_WGLWindowRenderTarget(HWND wnd,const Visual &visual);
+		extern "C" RenderTarget *new_WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat::ptr format);
 	#endif
 #endif
 #if defined(TOADLET_HAS_D3DM)
 	#pragma comment(lib,"toadlet_peeper_d3dmrenderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_D3DMRenderer();
-	extern "C" RenderTarget *new_D3DMWindowRenderTarget(HWND wnd,const Visual &visual,DWORD flags,bool debug);
+	extern "C" RenderTarget *new_D3DMWindowRenderTarget(HWND wnd,WindowRenderTargetFormat::ptr format);
 #endif
 #if defined(TOADLET_HAS_D3D9)
 	#pragma comment(lib,"toadlet_peeper_d3d9renderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_D3D9Renderer();
-	extern "C" RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,const Visual &visual,DWORD flags,bool debug);
+	extern "C" RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,WindowRenderTargetFormat::ptr format);
 #endif
 #if defined(TOADLET_HAS_D3D10)
 	#pragma comment(lib,"toadlet_peeper_d3d10renderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_D3D10Renderer();
-	extern "C" RenderTarget *new_D3D10WindowRenderTarget(HWND wnd,const Visual &visual,bool debug);
+	extern "C" RenderTarget *new_D3D10WindowRenderTarget(HWND wnd,WindowRenderTargetFormat::ptr format);
 #endif
 #if defined(TOADLET_HAS_D3D11)
 	#pragma comment(lib,"toadlet_peeper_d3d11renderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_D3D11Renderer();
-	extern "C" RenderTarget *new_D3D11WindowRenderTarget(HWND wnd,const Visual &visual,bool debug);
+	extern "C" RenderTarget *new_D3D11WindowRenderTarget(HWND wnd,WindowRenderTargetFormat::ptr format);
 #endif
 #if defined(TOADLET_PLATFORM_WIN32)
 	#pragma comment(lib,"toadlet_ribbit_mmplayer" TOADLET_LIBRARY_EXTENSION)
@@ -716,33 +719,35 @@ RenderTarget *Win32Application::makeRenderTarget(int rendererPlugin){
 	RenderTarget *target=NULL;
 	DWORD flags=D3DCREATE_MULTITHREADED;
 
+	WindowRenderTargetFormat::ptr format(new WindowRenderTargetFormat(mVisual,2,true,0));
+
 	if(rendererPlugin==RendererPlugin_OPENGL){
 		#if defined(TOADLET_HAS_OPENGL)
 			#if defined(TOADLET_PLATFORM_WINCE)
-				target=new_EGLWindowRenderTarget(GetDC(win32->mWnd),win32->mWnd,mVisual);
+				target=new_EGLWindowRenderTarget(GetDC(win32->mWnd),win32->mWnd,format);
 			#else
-				target=new_WGLWindowRenderTarget(win32->mWnd,mVisual);
+				target=new_WGLWindowRenderTarget(win32->mWnd,format);
 			#endif
 		#endif
 	}
 	else if(rendererPlugin==RendererPlugin_D3DM){
 		#if defined(TOADLET_HAS_D3DM)
-			target=new_D3DMWindowRenderTarget(win32->mWnd,mVisual,flags,true);
+			target=new_D3DMWindowRenderTarget(win32->mWnd,format);
 		#endif
 	}
 	else if(rendererPlugin==RendererPlugin_D3D9){
 		#if defined(TOADLET_HAS_D3D9)
-			target=new_D3D9WindowRenderTarget(win32->mWnd,mVisual,flags,true);
+			target=new_D3D9WindowRenderTarget(win32->mWnd,format);
 		#endif
 	}
 	else if(rendererPlugin==RendererPlugin_D3D10){
 		#if defined(TOADLET_HAS_D3D10)
-			target=new_D3D10WindowRenderTarget(win32->mWnd,mVisual,true);
+			target=new_D3D10WindowRenderTarget(win32->mWnd,format);
 		#endif
 	}
 	else if(rendererPlugin==RendererPlugin_D3D11){
 		#if defined(TOADLET_HAS_D3D11)
-			target=new_D3D11WindowRenderTarget(win32->mWnd,mVisual,true);
+			target=new_D3D11WindowRenderTarget(win32->mWnd,format);
 		#endif
 	}
 	if(target!=NULL && target->isValid()==false){

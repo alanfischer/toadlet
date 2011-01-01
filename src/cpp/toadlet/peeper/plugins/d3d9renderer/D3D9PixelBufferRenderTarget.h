@@ -23,33 +23,33 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_D3D9SURFACERENDERTARGET_H
-#define TOADLET_PEEPER_D3D9SURFACERENDERTARGET_H
+#ifndef TOADLET_PEEPER_D3D9PIXELBUFFERRENDERTARGET_H
+#define TOADLET_PEEPER_D3D9PIXELBUFFERRENDERTARGET_H
 
 #include "D3D9RenderTarget.h"
-#include "D3D9Surface.h"
-#include <toadlet/peeper/SurfaceRenderTarget.h>
+#include "D3D9PixelBuffer.h"
+#include <toadlet/peeper/PixelBufferRenderTarget.h>
 
 namespace toadlet{
 namespace peeper{
 
-/// @todo: Make the D3D9SurfaceRenderTarget & the GLFBOSurfaceRenderTarget more strict about Surface sizes,
-//  and smarter about destroying their temporary depth buffer when not needed
-class TOADLET_API D3D9SurfaceRenderTarget:public D3D9RenderTarget,public SurfaceRenderTarget{
+/// @todo: Make the D3D9SurfaceRenderTarget & the GLFBOSurfaceRenderTarget more strict about Surface sizes
+class TOADLET_API D3D9PixelBufferRenderTarget:public D3D9RenderTarget,public PixelBufferRenderTarget{
 public:
-	D3D9SurfaceRenderTarget(D3D9Renderer *renderer);
-	virtual ~D3D9SurfaceRenderTarget();
+	D3D9PixelBufferRenderTarget(D3D9Renderer *renderer);
+	virtual ~D3D9PixelBufferRenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return (D3D9RenderTarget*)this;}
 
 	virtual bool create();
-	virtual bool destroy();
+	virtual void destroy();
 
-	virtual bool makeCurrent(IDirect3DDevice9 *device);
+	virtual bool activate();
+	virtual bool deactivate(){return true;}
 	virtual void reset(){}
 
-	virtual bool attach(Surface::ptr surface,Attachment attachment);
-	virtual bool remove(Surface::ptr surface);
+	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment);
+	virtual bool remove(PixelBuffer::ptr buffer);
 	virtual bool compile();
 
 	virtual bool isPrimary() const{return false;}
@@ -61,15 +61,13 @@ public:
 	virtual IDirect3DDevice9 *getDirect3DDevice9() const{return NULL;}
 
 protected:
-	Surface::ptr createBufferSurface(int format,int width,int height);
-
 	D3D9Renderer *mRenderer;
 	int mWidth;
 	int mHeight;
 	bool mNeedsCompile;
-	egg::Collection<Surface::ptr> mSurfaces;
-	egg::Collection<Attachment> mSurfaceAttachments;
-	egg::Collection<D3D9Surface::ptr> mOwnedSurfaces;
+	egg::Collection<PixelBuffer::ptr> mBuffers;
+	egg::Collection<Attachment> mBufferAttachments;
+	PixelBuffer::ptr mDepthBuffer;
 };
 
 }

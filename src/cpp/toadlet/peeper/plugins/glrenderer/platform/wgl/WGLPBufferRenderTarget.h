@@ -23,24 +23,24 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_GLXPBUFFERSURFACERENDERTARGET_H
-#define TOADLET_PEEPER_GLXPBUFFERSURFACERENDERTARGET_H
+#ifndef TOADLET_PEEPER_WGLPBUFFERRENDERTARGET_H
+#define TOADLET_PEEPER_WGLPBUFFERRENDERTARGET_H
 
-#include "GLXRenderTarget.h"
+#include "WGLRenderTarget.h"
 #include "../../GLTexture.h"
-#include <toadlet/peeper/SurfaceRenderTarget.h>
+#include <toadlet/peeper/PixelBufferRenderTarget.h>
 
 namespace toadlet{
 namespace peeper{
 
 class GLRenderer;
 
-class GLXPBufferSurfaceRenderTarget:public GLXRenderTarget,public SurfaceRenderTarget{
+class WGLPBufferRenderTarget:public WGLRenderTarget,public PixelBufferRenderTarget{
 public:
 	static bool available(GLRenderer *renderer);
 
-	GLXPBufferSurfaceRenderTarget(GLRenderer *renderer);
-	virtual ~GLXPBufferSurfaceRenderTarget();
+	WGLPBufferRenderTarget(GLRenderer *renderer);
+	virtual ~WGLPBufferRenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
@@ -49,16 +49,19 @@ public:
 	virtual bool compile();
 
 	virtual bool activate();
+	virtual bool deactivate(){return WGLRenderTarget::deactivate();}
 	virtual bool swap();
+	virtual bool activateAdditionalContext(){return false;}
+	virtual void deactivateAdditionalContext(){}
 
-	virtual bool attach(Surface::ptr surface,Attachment attachment);
-	virtual bool remove(Surface::ptr surface);
+	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment);
+	virtual bool remove(PixelBuffer::ptr buffer);
 
 	virtual bool isPrimary() const{return false;}
-	virtual bool isValid() const{return mPBuffer!=0;}
+	virtual bool isValid() const{return mGLRC!=NULL && mPBuffer!=NULL;}
 	virtual int getWidth() const{return mWidth;}
 	virtual int getHeight() const{return mHeight;}
-	inline GLXPbuffer getGLXPbuffer() const{return mPBuffer;}
+	inline HPBUFFERARB getHPBUFFER() const{return mPBuffer;}
 
 protected:
 	bool createBuffer();
@@ -67,8 +70,9 @@ protected:
 	void unbind();
 
 	GLRenderer *mRenderer;
+	bool mCopy;
 	GLTexture *mTexture;
-	GLXPbuffer mPBuffer;
+	HPBUFFERARB mPBuffer;
 	int mWidth;
 	int mHeight;
 	bool mBound;
@@ -79,4 +83,3 @@ protected:
 }
 
 #endif
-

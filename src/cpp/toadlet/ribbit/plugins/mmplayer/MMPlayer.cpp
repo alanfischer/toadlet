@@ -139,7 +139,7 @@ bool MMPlayer::create(int *options){
 	return result==MMSYSERR_NOERROR;
 }
 
-bool MMPlayer::destroy(){
+void MMPlayer::destroy(){
 	Logger::alert(Categories::TOADLET_RIBBIT,
 		"destroying MMPlayer");
 
@@ -172,8 +172,6 @@ bool MMPlayer::destroy(){
 		delete[] mBufferData;
 		mBufferData=NULL;
 	}
-
-	return true;
 }
 
 AudioBuffer *MMPlayer::createAudioBuffer(){

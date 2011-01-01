@@ -46,8 +46,8 @@ public:
 	virtual bool create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]);
 	virtual void destroy();
 
-	virtual void resetCreate(){}
-	virtual void resetDestroy(){}
+	virtual void resetCreate();
+	virtual void resetDestroy();
 
 	virtual int getUsage() const{return mUsage;}
 	virtual Dimension getDimension() const{return mDimension;}
@@ -58,7 +58,7 @@ public:
 	virtual int getNumMipLevels() const{return 0;}
 	virtual scalar getLength() const{return 0;}
 
-	virtual Surface::ptr getMipSurface(int level,int cubeSide);
+	virtual PixelBuffer::ptr getMipPixelBuffer(int level,int cubeSide);
 	virtual bool load(int width,int height,int depth,int mipLevel,tbyte *mipData);
 	virtual bool read(int width,int height,int depth,int mipLevel,tbyte *mipData);
 

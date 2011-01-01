@@ -23,11 +23,11 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_GLTEXTUREMIPSURFACE_H
-#define TOADLET_PEEPER_GLTEXTUREMIPSURFACE_H
+#ifndef TOADLET_PEEPER_GLTEXTUREMIPPIXELBUFFER_H
+#define TOADLET_PEEPER_GLTEXTUREMIPPIXELBUFFER_H
 
 #include "GLIncludes.h"
-#include "GLSurface.h"
+#include "GLPixelBuffer.h"
 
 namespace toadlet{
 namespace peeper{
@@ -35,22 +35,39 @@ namespace peeper{
 class GLTexture;
 class GLRenderer;
 
-class TOADLET_API GLTextureMipSurface:public GLSurface{
+class TOADLET_API GLTextureMipPixelBuffer:public GLPixelBuffer{
 public:
-	TOADLET_SHARED_POINTERS(GLTextureMipSurface);
+	TOADLET_SHARED_POINTERS(GLTextureMipPixelBuffer);
 
 protected:
-	GLTextureMipSurface(GLTexture *texture,GLuint level,GLuint cubeSide);
+	GLTextureMipPixelBuffer(GLTexture *texture,GLuint level,GLuint cubeSide);
 
 public:
-	virtual ~GLTextureMipSurface(){}
+	virtual ~GLTextureMipPixelBuffer(){}
 
-	virtual Surface *getRootSurface(){return this;}
-	virtual GLTextureMipSurface *castToGLTextureMipSurface(){return this;}
-	virtual GLFBORenderbufferSurface *castToGLFBORenderbufferSurface(){return NULL;}
+	void setBufferDestroyedListener(BufferDestroyedListener *listener){}
 
+	virtual PixelBuffer *getRootPixelBuffer(){return this;}
+
+	virtual GLTextureMipPixelBuffer *castToGLTextureMipPixelBuffer(){return this;}
+	virtual GLFBOPixelBuffer *castToGLFBOPixelBuffer(){return NULL;}
+	virtual GLBuffer *castToGLBuffer(){return NULL;}
+
+	virtual bool create(int usage,int access,int pixelFormat,int width,int height,int depth){return false;}
+	virtual void destroy(){}
+
+	virtual void resetCreate(){}
+	virtual void resetDestroy(){}
+
+	/// @todo: implement
+	virtual int getUsage() const{return 0;}
+	virtual int getAccess() const{return 0;}
+	virtual int getDataSize() const{return mDataSize;}
+
+	virtual int getPixelFormat() const;
 	virtual int getWidth() const{return mWidth;}
 	virtual int getHeight() const{return mHeight;}
+	virtual int getDepth() const{return mDepth;}
 
 	inline GLTexture *getTexture() const{return mTexture;}
 	inline GLuint getLevel() const{return mLevel;}
@@ -59,9 +76,6 @@ public:
 	GLuint getTarget() const;
 
 	/// @todo: Implement these
-	virtual int getUsage() const{return 0;}
-	virtual int getAccess() const{return 0;}
-	virtual int getDataSize() const{return 0;}
 	virtual uint8 *lock(int access){return NULL;}
 	virtual bool unlock(){return false;}
 
@@ -69,8 +83,8 @@ protected:
 	GLTexture *mTexture;
 	GLuint mLevel;
 	GLuint mCubeSide;
-	int mWidth;
-	int mHeight;
+	int mDataSize;
+	int mWidth,mHeight,mDepth;
 
 	friend class GLTexture;
 	friend class GLRenderer;
