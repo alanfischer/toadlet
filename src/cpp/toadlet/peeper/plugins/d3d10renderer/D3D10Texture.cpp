@@ -106,7 +106,7 @@ bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
 	if((mUsage&Usage_BIT_STATIC)>0){
 		d3dUsage=D3D10_USAGE_IMMUTABLE;
 	}
-	else if((mUsage&Usage_BIT_STREAM)>0){
+	else if((mUsage&Usage_BIT_DYNAMIC)>0 || (mUsage&Usage_BIT_STREAM)>0){
 		d3dUsage=D3D10_USAGE_DYNAMIC;
 	}
 	else if((mUsage&Usage_BIT_STAGING)>0){
