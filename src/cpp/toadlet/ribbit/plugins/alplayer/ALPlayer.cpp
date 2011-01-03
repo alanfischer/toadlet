@@ -174,7 +174,7 @@ bool ALPlayer::create(int *options){
 	return true;
 }
 
-bool ALPlayer::destroy(){
+void ALPlayer::destroy(){
 	Logger::alert(Categories::TOADLET_RIBBIT,
 		"destroying ALPlayer");
 
@@ -202,8 +202,6 @@ bool ALPlayer::destroy(){
 		alcCloseDevice(mDevice);
 		mDevice=NULL;
 	}
-
-	return true;
 }
 
 AudioBuffer *ALPlayer::createAudioBuffer(){

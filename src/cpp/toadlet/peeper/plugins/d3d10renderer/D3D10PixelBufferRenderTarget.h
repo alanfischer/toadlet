@@ -22,61 +22,58 @@
  * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
  *
  ********** Copyright header - do not remove **********/
+#if 0
+#ifndef TOADLET_PEEPER_D3D10SURFACERENDERTARGET_H
+#define TOADLET_PEEPER_D3D10SURFACERENDERTARGET_H
 
-#ifndef TOADLET_PEEPER_GLXPBUFFERSURFACERENDERTARGET_H
-#define TOADLET_PEEPER_GLXPBUFFERSURFACERENDERTARGET_H
-
-#include "GLXRenderTarget.h"
-#include "../../GLTexture.h"
+#include "D3D10RenderTarget.h"
+#include "D3D10Surface.h"
 #include <toadlet/peeper/SurfaceRenderTarget.h>
 
 namespace toadlet{
 namespace peeper{
 
-class GLRenderer;
-
-class GLXPBufferSurfaceRenderTarget:public GLXRenderTarget,public SurfaceRenderTarget{
+// TODO: Make the D3D9SurfaceRenderTarget & the GLFBOSurfaceRenderTarget more strict about Surface sizes,
+//  and smarter about destroying their temporary depth buffer when not needed
+class TOADLET_API D3D10SurfaceRenderTarget:public D3D10RenderTarget,public SurfaceRenderTarget{
 public:
-	static bool available(GLRenderer *renderer);
+	D3D10SurfaceRenderTarget(D3D10Renderer *renderer);
+	virtual ~D3D10SurfaceRenderTarget();
 
-	GLXPBufferSurfaceRenderTarget(GLRenderer *renderer);
-	virtual ~GLXPBufferSurfaceRenderTarget();
-
-	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
+	virtual RenderTarget *getRootRenderTarget(){return (D3D10RenderTarget*)this;}
 
 	virtual bool create();
 	virtual void destroy();
-	virtual bool compile();
 
-	virtual bool activate();
-	virtual bool swap();
+	virtual bool activate()=0;
+	virtual bool deactivate(){return false;}
+	virtual void reset(){}
 
 	virtual bool attach(Surface::ptr surface,Attachment attachment);
 	virtual bool remove(Surface::ptr surface);
+	virtual bool compile();
 
 	virtual bool isPrimary() const{return false;}
-	virtual bool isValid() const{return mPBuffer!=0;}
+	virtual bool isValid() const{return true;}
 	virtual int getWidth() const{return mWidth;}
 	virtual int getHeight() const{return mHeight;}
-	inline GLXPbuffer getGLXPbuffer() const{return mPBuffer;}
+
+	virtual ID3D10Device *getID3D10Device() const{return NULL;}
 
 protected:
-	bool createBuffer();
-	bool destroyBuffer();
-	void bind();
-	void unbind();
+	Surface::ptr createBufferSurface(int format,int width,int height);
 
-	GLRenderer *mRenderer;
-	GLTexture *mTexture;
-	GLXPbuffer mPBuffer;
+	D3D10Renderer *mRenderer;
 	int mWidth;
 	int mHeight;
-	bool mBound;
-	bool mInitialized;
+	bool mNeedsCompile;
+	egg::Collection<Surface::ptr> mSurfaces;
+	egg::Collection<Attachment> mSurfaceAttachments;
+	egg::Collection<D3D10Surface::ptr> mOwnedSurfaces;
 };
 
 }
 }
 
 #endif
-
+#endif

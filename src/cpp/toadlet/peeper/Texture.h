@@ -30,7 +30,7 @@
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/image/Image.h>
 #include <toadlet/peeper/Types.h>
-#include <toadlet/peeper/Surface.h>
+#include <toadlet/peeper/PixelBuffer.h>
 
 namespace toadlet{
 namespace peeper{
@@ -44,9 +44,10 @@ public:
 		Usage_BIT_STATIC=	1<<0,	// Data is never changed
 		Usage_BIT_STREAM=	1<<1,	// Data changes once per frame
 		Usage_BIT_DYNAMIC=	1<<2,	// Data changes frequently
-		Usage_BIT_NPOT_RESTRICTED=	1<<3,	// Texture is a size thats non-power-of-two, but restricted in usage
-		Usage_BIT_RENDERTARGET=		1<<4,	// Texture will have its surfaces used by a SurfaceRenderTarget
-		Usage_BIT_AUTOGEN_MIPMAPS=	1<<5,	// Texture autogenerates its mipmap levels
+		Usage_BIT_STAGING=	1<<3,	// Data is only used for loading, and is lockable
+		Usage_BIT_NPOT_RESTRICTED=	1<<4,	// Texture is a size thats non-power-of-two, but restricted in usage
+		Usage_BIT_RENDERTARGET=		1<<5,	// Texture will have its surfaces used by a SurfaceRenderTarget
+		Usage_BIT_AUTOGEN_MIPMAPS=	1<<6,	// Texture autogenerates its mipmap levels
 	};
 
 	virtual ~Texture(){}
@@ -71,7 +72,7 @@ public:
 
 	/// @todo: Perhaps the whole frame portion of getRootTexture could be combined with this mipsurface thing somehow
 	//  Where Textures would just have SubTextures, which would be the surfaces perhaps?
-	virtual Surface::ptr getMipSurface(int i,int cubeSide)=0;
+	virtual PixelBuffer::ptr getMipPixelBuffer(int i,int cubeSide)=0;
 	virtual bool load(int width,int height,int depth,int mipLevel,tbyte *mipData)=0;
 	virtual bool read(int width,int height,int depth,int mipLevel,tbyte *mipData)=0;
 };

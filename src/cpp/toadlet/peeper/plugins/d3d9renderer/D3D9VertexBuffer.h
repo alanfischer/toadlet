@@ -53,7 +53,7 @@ public:
 	virtual int getUsage() const{return mUsage;}
 	virtual int getAccess() const{return mAccess;}
 	virtual int getDataSize() const{return mDataSize;}
-	virtual VertexFormat::ptr getVertexFormat(){return mVertexFormat;}
+	virtual VertexFormat::ptr getVertexFormat() const{return mVertexFormat;}
 	virtual int getSize() const{return mSize;}
 
 	virtual uint8 *lock(int lockAccess);

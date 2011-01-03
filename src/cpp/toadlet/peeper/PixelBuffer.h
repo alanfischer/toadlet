@@ -23,46 +23,36 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "GLTextureMipSurface.h"
-#include "GLTexture.h"
-#include "GLRenderer.h"
+#ifndef TOADLET_PEEPER_PIXELBUFFER_H
+#define TOADLET_PEEPER_PIXELBUFFER_H
+
+#include <toadlet/peeper/Buffer.h>
+#include <toadlet/egg/image/ImageDefinitions.h>
 
 namespace toadlet{
 namespace peeper{
 
-GLTextureMipSurface::GLTextureMipSurface(GLTexture *texture,GLuint level,GLuint cubeSide):GLSurface(),
-	mTexture(NULL),
-	mLevel(0),
-	mCubeSide(0),
-	mWidth(0),
-	mHeight(0)
-{
-	mTexture=texture;
-	mLevel=level;
-	mCubeSide=cubeSide;
+class TOADLET_API PixelBuffer:public Buffer{
+public:
+	TOADLET_SHARED_POINTERS(PixelBuffer);
 
-	int l=level;
-	int w=texture->getWidth(),h=texture->getHeight();
-	while(l>0){
-		w/=2; h/=2;
-		l--;
-	}
-	mWidth=w;
-	mHeight=h;
-}
+	virtual ~PixelBuffer(){}
 
-GLuint GLTextureMipSurface::getHandle() const{
-	return mTexture->getHandle();
-}
+	virtual PixelBuffer *getRootPixelBuffer()=0;
 
-GLuint GLTextureMipSurface::getTarget() const{
-	#if !defined(TOADLET_HAS_GLES)
-		if(mTexture->getTarget()==GL_TEXTURE_CUBE_MAP){
-			return GLRenderer::GLCubeFaces[mCubeSide];
-		}
-	#endif
-	return mTexture->getTarget();
-}
+	virtual bool create(int usage,int access,int pixelFormat,int width,int height,int depth)=0;
+	virtual void destroy()=0;
+
+	virtual void resetCreate()=0;
+	virtual void resetDestroy()=0;
+
+	virtual int getPixelFormat() const=0;
+	virtual int getWidth() const=0;
+	virtual int getHeight() const=0;
+	virtual int getDepth() const=0;
+};
 
 }
 }
+
+#endif

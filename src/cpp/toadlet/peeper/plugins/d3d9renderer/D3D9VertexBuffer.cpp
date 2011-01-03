@@ -105,23 +105,33 @@ void D3D9VertexBuffer::resetDestroy(){
 
 bool D3D9VertexBuffer::createContext(bool restore){
 	mD3DUsage=0;
-	mD3DPool=D3DPOOL_MANAGED;
 	if((mUsage&Usage_BIT_DYNAMIC)>0){
 		mD3DUsage|=D3DUSAGE_DYNAMIC;
-		#if !defined(TOADLET_SET_D3DM)
-			mD3DPool=D3DPOOL_DEFAULT;
-		#endif
 	}
-
 	if(mAccess==Access_BIT_WRITE){
 		mD3DUsage|=D3DUSAGE_WRITEONLY;
 	}
+
+	#if defined(TOADLET_SET_D3DM)
+		mD3DPool=D3DPOOL_MANAGED;
+	#else
+		if((mUsage&Usage_BIT_STAGING)>0){
+			mD3DPool=D3DPOOL_SYSTEMMEM;
+		}
+		else if((mUsage&Usage_BIT_DYNAMIC)>0){
+			mD3DPool=D3DPOOL_DEFAULT;
+		}
+		else{
+			mD3DPool=D3DPOOL_MANAGED;
+		}
+	#endif
+
 
 	D3D9VertexFormat *d3dvertexFormat=(D3D9VertexFormat*)mVertexFormat->getRootVertexFormat();
 	HRESULT result=mRenderer->getDirect3DDevice9()->CreateVertexBuffer(mDataSize,mD3DUsage,d3dvertexFormat->getFVF(),mD3DPool,&mVertexBuffer TOADLET_SHAREDHANDLE);
 	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: CreateVertexBuffer");
 
-	if(restore){
+	if(restore && (mUsage&Usage_BIT_DYNAMIC)==0){
 		byte *data=lock(Access_BIT_WRITE);
 		memcpy(data,mBackingData,mDataSize);
 		unlock();
@@ -134,7 +144,7 @@ bool D3D9VertexBuffer::createContext(bool restore){
 }
 
 bool D3D9VertexBuffer::destroyContext(bool backData){
-	if(backData){
+	if(backData && (mUsage&Usage_BIT_DYNAMIC)==0){
 		mBackingData=new uint8[mDataSize];
 
 		TOADLET_TRY

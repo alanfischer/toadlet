@@ -46,15 +46,13 @@ public:
 
 	virtual IndexBuffer *getRootIndexBuffer()=0;
 
-	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener)=0;
-
 	virtual bool create(int usage,int access,IndexFormat indexFormat,int size)=0;
 	virtual void destroy()=0;
 
 	virtual void resetCreate()=0;
 	virtual void resetDestroy()=0;
 
-	virtual IndexFormat getIndexFormat()=0;
+	virtual IndexFormat getIndexFormat() const=0;
 	virtual int getSize() const=0;
 };
 

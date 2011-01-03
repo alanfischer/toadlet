@@ -40,6 +40,8 @@ public:
 	static uint64 utime();
 	static uint64 mtime();
 
+	static int threadID();
+
 	static bool absolutePath(const String &path);
 
 	static String getEnv(const String &name);

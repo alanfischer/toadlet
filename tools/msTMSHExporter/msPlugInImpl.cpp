@@ -301,7 +301,7 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 		sub->name=meshNames[i];
 
 		IndexBuffer::ptr indexBuffer(new BackableIndexBuffer());
-		indexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,IndexBuffer::IndexFormat_UINT_16,indexes[i].size());
+		indexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,IndexBuffer::IndexFormat_UINT16,indexes[i].size());
 		sub->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexes[i].size()));
 
 		{

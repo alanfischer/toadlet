@@ -45,8 +45,8 @@ set (PEEPER_HEADERS
 	SequenceTexture.h
 	Shader.h
 	StatisticsSet.h
-	Surface.h
-	SurfaceRenderTarget.h
+	PixelBuffer.h
+	PixelBufferRenderTarget.h
 	Texture.h
 	TextureBlend.h
 	TextureStage.h

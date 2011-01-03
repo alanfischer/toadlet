@@ -37,7 +37,9 @@ public:
 	WGLRenderTarget();
 	virtual ~WGLRenderTarget(){}
 
-	virtual bool makeCurrent();
+	virtual bool activate();
+	virtual bool deactivate();
+	virtual bool share(GLRenderTarget *target);
 
 	inline HGLRC getGLRC() const{return mGLRC;}
 	inline HDC getDC() const{return mDC;}

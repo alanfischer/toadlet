@@ -69,7 +69,7 @@ public:
 
 	virtual bool shutdown()=0;
 
-	virtual bool destroy()=0;
+	virtual void destroy()=0;
 
 	virtual void setPollSleep(int ms)=0; // Milliseconds to sleep between polls
 

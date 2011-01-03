@@ -318,7 +318,11 @@ void MeshNodeSkeleton::updateVertexData(){
 }
 
 Transform *MeshNodeSkeleton::getRenderTransform() const{
-	return mNode!=NULL?mNode->getRenderTransform():NULL;
+	return mNode!=NULL?mNode->getWorldTransform():NULL;
+}
+
+Bound *MeshNodeSkeleton::getRenderBound() const{
+	return mNode!=NULL?mNode->getWorldBound():NULL;
 }
 
 void MeshNodeSkeleton::render(Renderer *renderer) const{

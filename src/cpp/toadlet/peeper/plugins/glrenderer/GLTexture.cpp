@@ -49,14 +49,12 @@ GLTexture::GLTexture(GLRenderer *renderer):BaseResource(),
 	mTarget(0),
 	//mMatrix,
 	mManuallyGenerateMipLevels(false)
-	//mSurfaces
+	//mBuffers
 {
 	mRenderer=renderer;
 }
 
 GLTexture::~GLTexture(){
-	mSurfaces.clear();
-
 	destroy();
 }
 
@@ -91,6 +89,8 @@ bool GLTexture::create(int usage,Dimension dimension,int format,int width,int he
 
 void GLTexture::destroy(){
 	destroyContext();
+
+	mBuffers.clear();
 }
 
 bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
@@ -212,6 +212,11 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 }
 
 bool GLTexture::destroyContext(){
+	int i;
+	for(i=0;i<mBuffers.size();++i){
+		mBuffers[i]->destroy();
+	}
+
 	if(mHandle!=0){
 		glDeleteTextures(1,&mHandle);
 		mHandle=0;
@@ -223,28 +228,26 @@ bool GLTexture::destroyContext(){
 	return true;
 }
 
-Surface::ptr GLTexture::getMipSurface(int level,int cubeSide){
+PixelBuffer::ptr GLTexture::getMipPixelBuffer(int level,int cubeSide){
 	if(mHandle==0){
 		return NULL;
 	}
 
 	int index=level;
-	#if !defined(TOADLET_HAS_GLES)
-		if(mTarget==GL_TEXTURE_CUBE_MAP){
-			index=level*6+cubeSide;
-		}
-	#endif
-
-	if(mSurfaces.size()<=index){
-		mSurfaces.resize(index+1);
+	if(mDimension==Dimension_CUBE){
+		index=level*6+cubeSide;
 	}
 
-	if(mSurfaces[index]==NULL){
-		Surface::ptr surface(new GLTextureMipSurface(const_cast<GLTexture*>(this),index,cubeSide));
-		mSurfaces[index]=surface;
+	if(mBuffers.size()<=index){
+		mBuffers.resize(index+1);
 	}
 
-	return mSurfaces[index];
+	if(mBuffers[index]==NULL){
+		PixelBuffer::ptr buffer(new GLTextureMipPixelBuffer(const_cast<GLTexture*>(this),index,cubeSide));
+		mBuffers[index]=buffer;
+	}
+
+	return mBuffers[index];
 }
 
 bool GLTexture::load(int width,int height,int depth,int mipLevel,tbyte *mipData){
@@ -266,7 +269,7 @@ bool GLTexture::load(int width,int height,int depth,int mipLevel,tbyte *mipData)
 	int rowPitch=width*ImageFormatConversion::getPixelSize(format);
 	int slicePitch=rowPitch*height;
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(slicePitch);
-	
+
 	GLint glformat=GLRenderer::getGLFormat(format);
 	GLint gltype=GLRenderer::getGLType(format);
 

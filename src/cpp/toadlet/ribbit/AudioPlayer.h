@@ -39,7 +39,7 @@ public:
 	virtual ~AudioPlayer(){}
 
 	virtual bool create(int *options)=0;
-	virtual bool destroy()=0;
+	virtual void destroy()=0;
 
 	virtual AudioBuffer *createAudioBuffer()=0;
 	virtual Audio *createBufferedAudio()=0;
