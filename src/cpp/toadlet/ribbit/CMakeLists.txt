@@ -115,11 +115,17 @@ if (SIDPLAY_FOUND)
 	include_directories (${SIDPLAY_INCLUDES})
 
 	# Dynamic libs
-	set (RIBBIT_LIBS ${RIBBIT_LIBS} ${SIDPLAY_LIBRARY} ${RESID_LIBRARY})
+	set (RIBBIT_LIBS ${RIBBIT_LIBS} ${SIDPLAY_LIBRARY})
 
 	# Static libs are ugly since we add references to external static libraries in toadlet
-	set (RIBBIT_DEFS_S ${RIBBIT_DEFS_S} TOADLET_LIBSIDPLAY_NAME="${SIDPLAY_LIBRARY}" TOADLET_LIBRESID_NAME="${RESID_LIBRARY}")
+	set (RIBBIT_DEFS_S ${RIBBIT_DEFS_S} TOADLET_LIBSIDPLAY_NAME="${SIDPLAY_LIBRARY}")
 	set (RIBBIT_LIBS_S ${RIBBIT_LIBS_S} libsidplay_s)
+
+	# Resid is only used with sidplay 2
+	if (${SIDPLAY_VERSION} EQUAL 2)
+		set (RIBBIT_LIBS ${RIBBIT_LIBS} ${RESID_LIBRARY})
+		set (RIBBIT_DEFS_S ${RIBBIT_DEFS_S} TOADLET_LIBRESID_NAME="${RESID_LIBRARY}")
+	endif (${SIDPLAY_VERSION} EQUAL 2)
 endif (SIDPLAY_FOUND)
 
 # Dynamic library
