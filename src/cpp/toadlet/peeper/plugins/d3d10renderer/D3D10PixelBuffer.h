@@ -22,56 +22,52 @@
  * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
  *
  ********** Copyright header - do not remove **********/
+#if 0
+#ifndef TOADLET_PEEPER_D3D10SURFACE_H
+#define TOADLET_PEEPER_D3D10SURFACE_H
 
-#ifndef TOADLET_PEEPER_GLFBORENDERBUFFERSURFACE_H
-#define TOADLET_PEEPER_GLFBORENDERBUFFERSURFACE_H
-
-#include "GLSurface.h"
+#include "D3D10Includes.h"
+#include <toadlet/peeper/Surface.h>
 
 namespace toadlet{
 namespace peeper{
 
-class GLFBOSurfaceRenderTarget;
+class D3D9Renderer;
 
-class GLFBORenderbufferSurface:public GLSurface{
+class TOADLET_API D3D9Surface:public Surface{
 public:
-	TOADLET_SHARED_POINTERS(GLFBORenderbufferSurface);
+	TOADLET_SHARED_POINTERS(D3D9Surface);
 
-protected:
-	GLFBORenderbufferSurface(GLFBOSurfaceRenderTarget *target);
-
-	virtual bool create(int format,int width,int height);
-	virtual bool destroy();
-
-public:
-	virtual ~GLFBORenderbufferSurface();
+	D3D9Surface(IDirect3DSurface9 *surface);
+	virtual ~D3D9Surface();
 
 	virtual Surface *getRootSurface(){return this;}
-	virtual GLTextureMipSurface *castToGLTextureMipSurface(){return NULL;}
-	virtual GLFBORenderbufferSurface *castToGLFBORenderbufferSurface(){return this;}
+
+	virtual void destroy();
+
+	// TODO: Implement these, or somehow remove them from the Surface requirements
+	virtual int getUsageFlags() const{return 0;}
+	virtual AccessType getAccessType() const{return AccessType_NO_ACCESS;}
+	virtual int getDataSize() const{return 0;}
 
 	virtual int getWidth() const{return mWidth;}
 	virtual int getHeight() const{return mHeight;}
-	inline GLuint getHandle() const{return mHandle;}
 
-	/// @todo: Implement these
-	virtual int getUsage() const{return 0;}
-	virtual int getAccess() const{return 0;}
-	virtual int getDataSize() const{return 0;}
-	virtual uint8 *lock(int access){return NULL;}
-	virtual bool unlock(){return false;}
+	virtual uint8 *lock(AccessType accessType);
+	virtual bool unlock();
+
+	inline IDirect3DSurface9 *getSurface() const{return mSurface;}
 
 protected:
-	GLFBOSurfaceRenderTarget *mTarget;
-	GLuint mHandle;
-	int mFormat;
+	IDirect3DSurface9 *mSurface;
 	int mWidth;
 	int mHeight;
 
-	friend class GLFBOSurfaceRenderTarget;
+	friend D3D9Renderer;
 };
 
 }
 }
 
+#endif
 #endif

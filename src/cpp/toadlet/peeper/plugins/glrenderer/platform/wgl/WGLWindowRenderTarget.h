@@ -27,7 +27,7 @@
 #define TOADLET_PEEPER_WGLWINDOWRENDERTARGET_H
 
 #include "WGLRenderTarget.h"
-#include <toadlet/peeper/Visual.h>
+#include <toadlet/peeper/WindowRenderTargetFormat.h>
 
 namespace toadlet{
 namespace peeper{
@@ -35,13 +35,15 @@ namespace peeper{
 class TOADLET_API WGLWindowRenderTarget:public WGLRenderTarget{
 public:
 	WGLWindowRenderTarget();
-	WGLWindowRenderTarget(HWND wnd,const Visual &visual,int pixelFormat=0);
+	WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
 	virtual ~WGLWindowRenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
-	virtual bool createContext(HWND wnd,const Visual &visual,int pixelFormat=0);
+	virtual bool createContext(HWND wnd,WindowRenderTargetFormat *format,int winPixelFormat=0);
 	virtual bool destroyContext();
+	virtual bool activateAdditionalContext();
+	virtual void deactivateAdditionalContext();
 
 	virtual bool swap();
 
@@ -55,6 +57,8 @@ protected:
 
 	HWND mWnd;
 	PIXELFORMATDESCRIPTOR mPFD;
+	egg::Collection<HGLRC> mThreadContexts;
+	egg::Collection<int> mThreadIDs;
 };
 
 }

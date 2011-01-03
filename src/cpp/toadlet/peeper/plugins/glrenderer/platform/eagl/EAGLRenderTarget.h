@@ -51,7 +51,8 @@ public:
 	virtual bool createContext(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat=nil);
 	virtual bool destroyContext();
 
-	virtual bool makeCurrent();
+	virtual bool activate();
+	virtual bool deactivate();
 	virtual bool swap();
 
 	virtual bool isPrimary() const{return true;}

@@ -54,7 +54,7 @@ BackableTexture::~BackableTexture(){
 }
 
 bool BackableTexture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]){
-	mUsage=usage|Usage_BIT_AUTOGEN_MIPMAPS; // BackableTextures only store the first mipLevel, so they always need AUTOGEN_MIPMAPS
+	mUsage=usage;
 	mDimension=dimension;
 	mFormat=format;
 	mWidth=width;
@@ -71,6 +71,11 @@ bool BackableTexture::create(int usage,Dimension dimension,int format,int width,
 	}
 	else if(mDimension==Dimension_D3 || mDimension==Dimension_CUBE){
 		mDataSize=mSlicePitch*mDepth;
+	}
+
+	if((usage&Usage_BIT_STAGING)==0){
+		// BackableTextures only store the first mipLevel, so if it's not a staging resource, then we need to autogen mipmaps
+		mUsage|=Usage_BIT_AUTOGEN_MIPMAPS;
 	}
 
 	if(mData!=NULL){
@@ -99,9 +104,21 @@ void BackableTexture::destroy(){
 	}
 }
 
-/// @todo: This should return a BackableSurface, which will be able to change surface pointers
-Surface::ptr BackableTexture::getMipSurface(int level,int cubeSide){
-	return mBack->getMipSurface(level,cubeSide);
+void BackableTexture::resetCreate(){
+	if(mBack!=NULL){
+		mBack->resetCreate();
+	}
+}
+
+void BackableTexture::resetDestroy(){
+	if(mBack!=NULL){
+		mBack->resetDestroy();
+	}
+}
+
+/// @todo: This should return a BackablePixelBuffer, which will be able to change surface pointers
+PixelBuffer::ptr BackableTexture::getMipPixelBuffer(int level,int cubeSide){
+	return mBack->getMipPixelBuffer(level,cubeSide);
 }
 
 bool BackableTexture::load(int width,int height,int depth,int mipLevel,tbyte *mipData){

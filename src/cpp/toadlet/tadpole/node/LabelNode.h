@@ -73,7 +73,8 @@ public:
 
 	void queueRenderables(CameraNode *camera,RenderQueue *queue);
 	Material *getRenderMaterial() const{return mMaterial;}
-	Transform *getRenderTransform() const{return super::getWorldTransform();}
+	Transform *getRenderTransform() const{return getWorldTransform();}
+	Bound *getRenderBound() const{return getWorldBound();}
 	void render(peeper::Renderer *renderer) const;
 
 	peeper::VertexBufferAccessor vba;

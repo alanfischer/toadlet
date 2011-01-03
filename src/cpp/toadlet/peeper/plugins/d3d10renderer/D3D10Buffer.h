@@ -59,8 +59,8 @@ public:
 	virtual int getDataSize() const{return mDataSize;}
 	virtual int getSize() const{return mSize;}
 
-	virtual IndexFormat getIndexFormat(){return mIndexFormat;}
-	virtual VertexFormat::ptr getVertexFormat(){return mVertexFormat;}
+	virtual IndexFormat getIndexFormat() const{return mIndexFormat;}
+	virtual VertexFormat::ptr getVertexFormat() const{return mVertexFormat;}
 
 	virtual uint8 *lock(int lockAccess);
 	virtual bool unlock();

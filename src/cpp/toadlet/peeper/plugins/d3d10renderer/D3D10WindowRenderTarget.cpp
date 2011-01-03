@@ -33,12 +33,12 @@ namespace toadlet{
 namespace peeper{
 
 #if defined(TOADLET_SET_D3D10)
-	TOADLET_C_API RenderTarget *new_D3D10WindowRenderTarget(HWND wnd,const Visual &visual,bool debug){
-		return new D3D10WindowRenderTarget(wnd,visual,debug);
+	TOADLET_C_API RenderTarget *new_D3D10WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format){
+		return new D3D10WindowRenderTarget(wnd,format);
 	}
 #else
-	TOADLET_C_API RenderTarget *new_D3D11WindowRenderTarget(HWND wnd,const Visual &visual,bool debug){
-		return new D3D10WindowRenderTarget(wnd,visual,debug);
+	TOADLET_C_API RenderTarget *new_D3D11WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format){
+		return new D3D10WindowRenderTarget(wnd,format);
 	}
 #endif
 
@@ -53,8 +53,7 @@ D3D10WindowRenderTarget::D3D10WindowRenderTarget():D3D10RenderTarget(),
 {
 }
 
-/// @todo: Move the debug command to some "parameters" sort of thing that I can pass in, maybe like the Renderer?
-D3D10WindowRenderTarget::D3D10WindowRenderTarget(HWND wnd,const Visual &visual,bool debug):D3D10RenderTarget(),
+D3D10WindowRenderTarget::D3D10WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format):D3D10RenderTarget(),
 	mLibrary(0),
 	mSwapChain(NULL),
 	mD3DDevice(NULL),
@@ -64,15 +63,17 @@ D3D10WindowRenderTarget::D3D10WindowRenderTarget(HWND wnd,const Visual &visual,b
 	mWidth(0),
 	mHeight(0)
 {
-	createContext(wnd,visual,debug);
+	createContext(wnd,format);
 }
 
 D3D10WindowRenderTarget::~D3D10WindowRenderTarget(){
 	destroyContext();
 }
 
-void D3D10WindowRenderTarget::makeCurrent(ID3D10Device *device){
-	device->OMSetRenderTargets(1,&mRenderTargetView,mDepthStencilView);
+bool D3D10WindowRenderTarget::activate(){
+	mD3DDevice->OMSetRenderTargets(1,&mRenderTargetView,mDepthStencilView);
+
+	return true;
 }
 
 void D3D10WindowRenderTarget::clear(int clearFlags,const Color &clearColor){
@@ -111,7 +112,7 @@ void D3D10WindowRenderTarget::reset(){
 	mD3DDevice->OMGetRenderTargets(1,&mRenderTargetView,&mDepthStencilView);
 }
 
-bool D3D10WindowRenderTarget::createContext(HWND wnd,const Visual &visual,bool debug){
+bool D3D10WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *format){
 	HRESULT result;
 
 	mLibrary=LoadLibrary(TOADLET_D3D10_DLL_NAME);
@@ -160,7 +161,15 @@ bool D3D10WindowRenderTarget::createContext(HWND wnd,const Visual &visual,bool d
 		return NULL;
 	}
 
-	UINT flags=debug?D3D10_CREATE_DEVICE_DEBUG:0;
+	int flags=format->flags;
+
+	if(format->debug){
+		flags|=D3D10_CREATE_DEVICE_DEBUG;
+	}
+
+	if(format->threads<=1){
+		flags|=D3D10_CREATE_DEVICE_SINGLETHREADED;
+	}
 
 	typedef HRESULT(WINAPI *D3D10CreateDeviceAndSwapChain)(IDXGIAdapter *pAdapter,D3D10_DRIVER_TYPE DriverType,HMODULE Software,UINT Flags,UINT SDKVersion,DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,IDXGISwapChain **ppSwapChain,ID3D10Device **ppDevice);
 	result=((D3D10CreateDeviceAndSwapChain)symbol)(NULL,D3D10_DRIVER_TYPE_HARDWARE,NULL,flags,D3D10_SDK_VERSION,&desc,&mSwapChain,&mD3DDevice);

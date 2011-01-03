@@ -63,7 +63,7 @@ public:
 	int getDepth() const;
 	int getNumMipLevels() const{return 0;}
 
-	Surface::ptr getMipSurface(int i,int cubeSide){return NULL;}
+	PixelBuffer::ptr getMipPixelBuffer(int i,int cubeSide){return NULL;}
 	// These two methods could be implemented, but we would need to basically find which frame we are talking about, and then call load/read on that
 	bool load(int width,int height,int depth,int mipLevel,int rowPitch,int slicePitch,tbyte *mipData){return false;}
 	bool read(int width,int height,int depth,int mipLevel,int rowPitch,int slicePitch,tbyte *mipData){return false;}

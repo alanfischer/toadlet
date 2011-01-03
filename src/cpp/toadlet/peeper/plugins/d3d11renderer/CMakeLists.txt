@@ -3,8 +3,8 @@ set (PEEPER_D3D11RENDERER_SRC
 	../d3d10renderer/D3D10Buffer.cpp
 	../d3d10renderer/D3D10Renderer.cpp
 	../d3d10renderer/D3D10Texture.cpp
-	../d3d10renderer/D3D10Surface.cpp
-	../d3d10renderer/D3D10SurfaceRenderTarget.cpp
+	../d3d10renderer/D3D10PixelBuffer.cpp
+	../d3d10renderer/D3D10PixelBufferRenderTarget.cpp
 	../d3d10renderer/D3D10VertexFormat.cpp
 	../d3d10renderer/D3D10WindowRenderTarget.cpp
 )
@@ -16,8 +16,8 @@ set (PEEPER_D3D11RENDERER_HEADERS
 	../d3d10renderer/D3D10Includes.h
 	../d3d10renderer/D3D10RenderTarget.h
 	../d3d10renderer/D3D10Renderer.h
-	../d3d10renderer/D3D10Surface.h
-	../d3d10renderer/D3D10SurfaceRenderTarget.h
+	../d3d10renderer/D3D10PixelBuffer.h
+	../d3d10renderer/D3D10PixelBufferRenderTarget.h
 	../d3d10renderer/D3D10Texture.h
 	../d3d10renderer/D3D10VertexFormat.h
 	../d3d10renderer/D3D10WindowRenderTarget.h

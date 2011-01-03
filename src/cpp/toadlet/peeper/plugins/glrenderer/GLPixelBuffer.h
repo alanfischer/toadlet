@@ -22,52 +22,32 @@
  * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
  *
  ********** Copyright header - do not remove **********/
-#if 0
-#ifndef TOADLET_PEEPER_D3D10SURFACE_H
-#define TOADLET_PEEPER_D3D10SURFACE_H
 
-#include "D3D10Includes.h"
-#include <toadlet/peeper/Surface.h>
+#ifndef TOADLET_PEEPER_GLPIXELBUFFER_H
+#define TOADLET_PEEPER_GLPIXELBUFFER_H
+
+#include "GLIncludes.h"
+#include <toadlet/peeper/PixelBuffer.h>
 
 namespace toadlet{
 namespace peeper{
 
-class D3D9Renderer;
+class GLTextureMipPixelBuffer;
+class GLFBOPixelBuffer;
+class GLBuffer;
 
-class TOADLET_API D3D9Surface:public Surface{
+class GLPixelBuffer:public PixelBuffer{
 public:
-	TOADLET_SHARED_POINTERS(D3D9Surface);
+	TOADLET_SHARED_POINTERS(GLPixelBuffer);
 
-	D3D9Surface(IDirect3DSurface9 *surface);
-	virtual ~D3D9Surface();
+	virtual ~GLPixelBuffer(){}
 
-	virtual Surface *getRootSurface(){return this;}
-
-	virtual bool destroy();
-
-	// TODO: Implement these, or somehow remove them from the Surface requirements
-	virtual int getUsageFlags() const{return 0;}
-	virtual AccessType getAccessType() const{return AccessType_NO_ACCESS;}
-	virtual int getDataSize() const{return 0;}
-
-	virtual int getWidth() const{return mWidth;}
-	virtual int getHeight() const{return mHeight;}
-
-	virtual uint8 *lock(AccessType accessType);
-	virtual bool unlock();
-
-	inline IDirect3DSurface9 *getSurface() const{return mSurface;}
-
-protected:
-	IDirect3DSurface9 *mSurface;
-	int mWidth;
-	int mHeight;
-
-	friend D3D9Renderer;
+	virtual GLTextureMipPixelBuffer *castToGLTextureMipPixelBuffer()=0;
+	virtual GLFBOPixelBuffer *castToGLFBOPixelBuffer()=0;
+	virtual GLBuffer *castToGLBuffer()=0;
 };
 
 }
 }
 
-#endif
 #endif

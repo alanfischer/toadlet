@@ -23,24 +23,34 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_SURFACE_H
-#define TOADLET_PEEPER_SURFACE_H
+#ifndef TOADLET_PEEPER_D3D9TEXTUREMIPPIXELBUFFER_H
+#define TOADLET_PEEPER_D3D9TEXTUREMIPPIXELBUFFER_H
 
-#include <toadlet/peeper/Buffer.h>
+#include "D3D9PixelBuffer.h"
+#include "D3D9Texture.h"
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API Surface:public Buffer{
+class D3D9Renderer;
+
+class TOADLET_API D3D9TextureMipPixelBuffer:public D3D9PixelBuffer{
 public:
-	TOADLET_SHARED_POINTERS(Surface);
+	TOADLET_SHARED_POINTERS(D3D9TextureMipPixelBuffer);
 
-	virtual ~Surface(){}
+	D3D9TextureMipPixelBuffer(D3D9Texture *texture,int level,int cubeSide);
+	virtual ~D3D9TextureMipPixelBuffer();
 
-	virtual Surface *getRootSurface()=0;
+	virtual bool create(int usage,int access,int pixelFormat,int width,int height,int depth);
+	virtual void destroy();
 
-	virtual int getWidth() const=0;
-	virtual int getHeight() const=0;
+	virtual void resetCreate();
+	virtual void resetDestroy();
+
+protected:
+	D3D9Texture *mTexture;
+	int mLevel;
+	int mCubeSide;
 };
 
 }

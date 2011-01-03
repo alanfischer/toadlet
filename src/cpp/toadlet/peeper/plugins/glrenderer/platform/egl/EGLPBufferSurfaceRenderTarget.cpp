@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "EGLPBufferSurfaceRenderTarget.h"
+#include "EGLPBufferRenderTarget.h"
 #include "../../GLRenderer.h"
 #include <toadlet/egg/Error.h>
 #include <windows.h>
@@ -34,19 +34,19 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-bool GLPBufferSurfaceRenderTarget_available(GLRenderer *renderer){
-	return EGLPBufferSurfaceRenderTarget::available(renderer);
+bool GLPBufferRenderTarget_available(GLRenderer *renderer){
+	return EGLPBufferRenderTarget::available(renderer);
 }
 
-SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer){
-	return new EGLPBufferSurfaceRenderTarget(renderer);
+PixelBufferRenderTarget *new_GLPBufferRenderTarget(GLRenderer *renderer){
+	return new EGLPBufferRenderTarget(renderer);
 }
 
-bool EGLPBufferSurfaceRenderTarget::available(GLRenderer *renderer){
+bool EGLPBufferRenderTarget::available(GLRenderer *renderer){
 	return true;
 }
 
-EGLPBufferSurfaceRenderTarget::EGLPBufferSurfaceRenderTarget(GLRenderer *renderer):EGLRenderTarget(),
+EGLPBufferRenderTarget::EGLPBufferRenderTarget(GLRenderer *renderer):EGLRenderTarget(),
 	mRenderer(NULL),
 	mCopy(false),
 	mSeparateContext(false),
@@ -60,11 +60,11 @@ EGLPBufferSurfaceRenderTarget::EGLPBufferSurfaceRenderTarget(GLRenderer *rendere
 	egl_version=((EGLRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->egl_version;
 }
 
-EGLPBufferSurfaceRenderTarget::~EGLPBufferSurfaceRenderTarget(){
+EGLPBufferRenderTarget::~EGLPBufferRenderTarget(){
 	destroy();
 }
 
-bool EGLPBufferSurfaceRenderTarget::create(){
+bool EGLPBufferRenderTarget::create(){
 	mCopy=true;
 	mSeparateContext=false;
 	mWidth=0;
@@ -75,13 +75,13 @@ bool EGLPBufferSurfaceRenderTarget::create(){
 	return true;
 }
 
-bool EGLPBufferSurfaceRenderTarget::destroy(){
+bool EGLPBufferRenderTarget::destroy(){
 	destroyBuffer();
 
 	return true;
 }
 
-bool EGLPBufferSurfaceRenderTarget::makeCurrent(){
+bool EGLPBufferRenderTarget::makeCurrent(){
 	unbind();
 
 	EGLRenderTarget::makeCurrent();
@@ -94,7 +94,7 @@ bool EGLPBufferSurfaceRenderTarget::makeCurrent(){
 	return true;
 }
 
-bool EGLPBufferSurfaceRenderTarget::swap(){
+bool EGLPBufferRenderTarget::swap(){
 	glFlush();
 
 	bind();
@@ -102,8 +102,8 @@ bool EGLPBufferSurfaceRenderTarget::swap(){
 	return true;
 }
 
-bool EGLPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
-	GLTextureMipSurface *gltextureSurface=((GLSurface*)surface->getRootSurface())->castToGLTextureMipSurface();
+bool EGLPBufferRenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachment){
+	GLTextureMipPixelBuffer *glbuffer=((GLPixelBuffer*)buffer->getRootPixelBuffer())->castToGLTextureMipSurface();
 	mTexture=gltextureSurface->getTexture();
 
 	if((mTexture->getFormat()&Texture::Format_BIT_DEPTH)>0){

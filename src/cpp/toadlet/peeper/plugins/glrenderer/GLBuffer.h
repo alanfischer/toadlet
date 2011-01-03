@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_GLBUFFER_H
 
 #include "GLIncludes.h"
+#include "GLPixelBuffer.h"
 #include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/egg/Collection.h>
@@ -37,18 +38,24 @@ namespace peeper{
 class GLRenderer;
 
 // Currently this class inherits all possible types, but perhaps it should just inherit Buffer, and then there would exist subclasses for each type of Buffer
-class TOADLET_API GLBuffer:public IndexBuffer,public VertexBuffer{
+class TOADLET_API GLBuffer:public IndexBuffer,public VertexBuffer,public GLPixelBuffer{
 public:
 	GLBuffer(GLRenderer *renderer);
 	virtual ~GLBuffer();
 
 	IndexBuffer *getRootIndexBuffer(){return this;}
 	VertexBuffer *getRootVertexBuffer(){return this;}
+	PixelBuffer *getRootPixelBuffer(){return this;}
+
+	virtual GLTextureMipPixelBuffer *castToGLTextureMipPixelBuffer(){return NULL;}
+	virtual GLFBOPixelBuffer *castToGLFBOPixelBuffer(){return NULL;}
+	virtual GLBuffer *castToGLBuffer(){return this;}
 
 	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
 	virtual bool create(int usage,int access,IndexFormat indexFormat,int size);
 	virtual bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size);
+	virtual bool create(int usage,int access,int pixelFormat,int width,int height,int depth);
 	virtual void destroy();
 
 	virtual void resetCreate(){}
@@ -58,9 +65,13 @@ public:
 	virtual int getAccess() const{return mAccess;}
 	virtual int getDataSize() const{return mDataSize;}
 	virtual int getSize() const{return mSize;}
+	virtual int getWidth() const{return mWidth;}
+	virtual int getHeight() const{return mHeight;}
+	virtual int getDepth() const{return mDepth;}
 
-	virtual IndexFormat getIndexFormat(){return mIndexFormat;}
-	virtual VertexFormat::ptr getVertexFormat(){return mVertexFormat;}
+	virtual IndexFormat getIndexFormat() const{return mIndexFormat;}
+	virtual VertexFormat::ptr getVertexFormat() const{return mVertexFormat;}
+	virtual int getPixelFormat() const{return mPixelFormat;}
 
 	virtual uint8 *lock(int lockAccess);
 	virtual bool unlock();
@@ -76,11 +87,13 @@ protected:
 	BufferDestroyedListener *mListener;
 	int mUsage;
 	int mAccess;
-	int mSize;
 	int mDataSize;
+	int mSize;
+	int mWidth,mHeight,mDepth;
 
 	IndexFormat mIndexFormat;
 	VertexFormat::ptr mVertexFormat;
+	int mPixelFormat;
 	egg::Collection<tbyte*> mElementOffsets;
 
 	GLuint mHandle;

@@ -123,6 +123,7 @@ public:
 
 	virtual Material *getRenderMaterial() const{return mMaterial;}
 	virtual Transform *getRenderTransform() const;
+	virtual Bound *getRenderBound() const{return getWorldBound();}
 	virtual void render(peeper::Renderer *renderer) const;
 
 	peeper::VertexBufferAccessor vba;

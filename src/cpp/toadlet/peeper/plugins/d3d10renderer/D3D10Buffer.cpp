@@ -129,15 +129,20 @@ bool D3D10Buffer::createContext(){
 	desc.BindFlags=mBindFlags;
 	desc.ByteWidth=mDataSize;
 
-	desc.Usage=D3D10_USAGE_DEFAULT;
 	if((mUsage&Usage_BIT_STATIC)>0){
 		desc.Usage=D3D10_USAGE_IMMUTABLE;
 	}
-	else if((mUsage&Usage_BIT_STREAM)>0){
+	else if((mUsage&Usage_BIT_DYNAMIC)>0 || (mUsage&Usage_BIT_STREAM)>0){
 		desc.Usage=D3D10_USAGE_DYNAMIC;
 	}
+	else if((mUsage&Usage_BIT_STAGING)>0){
+		desc.Usage=D3D10_USAGE_STAGING;
+	}
+	else{
+		desc.Usage=D3D10_USAGE_DEFAULT;
+	}
 
-	if((mUsage&Usage_BIT_STATIC)==0){
+	if((mUsage&Usage_BIT_DYNAMIC)>0 || (mUsage&Usage_BIT_STREAM)>0){
 		if((mAccess&Access_BIT_READ)>0){
 			desc.CPUAccessFlags|=D3D10_CPU_ACCESS_READ;
 		}

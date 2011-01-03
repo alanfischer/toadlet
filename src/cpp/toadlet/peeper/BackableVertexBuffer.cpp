@@ -83,6 +83,18 @@ void BackableVertexBuffer::destroy(){
 	}
 }
 
+void BackableVertexBuffer::resetCreate(){
+	if(mBack!=NULL){
+		mBack->resetCreate();
+	}
+}
+
+void BackableVertexBuffer::resetDestroy(){
+	if(mBack!=NULL){
+		mBack->resetDestroy();
+	}
+}
+
 uint8 *BackableVertexBuffer::lock(int lockAccess){
 	if(mBack!=NULL){
 		return mBack->lock(lockAccess);

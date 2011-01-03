@@ -83,10 +83,10 @@ bool GLXPBufferSurfaceRenderTarget::destroy(){
 	return true;
 }
 
-bool GLXPBufferSurfaceRenderTarget::makeCurrent(){
+bool GLXPBufferSurfaceRenderTarget::activate(){
 	unbind();
 
-	GLXRenderTarget::makeCurrent();
+	GLXRenderTarget::activate();
 
 	if(mInitialized==false){
 		mRenderer->setDefaultStates();
