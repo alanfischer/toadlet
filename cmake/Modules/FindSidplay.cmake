@@ -12,8 +12,8 @@ set (SIDPLAY_FOUND "NO")
 
 find_path (SIDPLAY_INCLUDE_DIR sidplay/sidplay2.h)
 find_library (SIDPLAY_LIBRARY NAMES sidplay2)
-find_library (RESID_LIBRARY NAMES resid_builder)
-find_library (HARDSID_LIBRARY NAMES hardsid_builder)
+find_library (RESID_LIBRARY NAMES resid_builder resid-builder)
+find_library (HARDSID_LIBRARY NAMES hardsid_builder hardsid-builder)
 
 mark_as_advanced (SIDPLAY_INCLUDE_DIR SIDPLAY_LIBRARY)
 
@@ -22,7 +22,9 @@ if (SIDPLAY_INCLUDE_DIR AND SIDPLAY_LIBRARY AND RESID_LIBRARY)
 	set (SIDPLAY_FOUND "YES")
 	set (SIDPLAY_VERSION 2)
 else (SIDPLAY_INCLUDE_DIR AND SIDPLAY_LIBRARY AND RESID_LIBRARY)
-	# Fallback to sidplay1 
+	# Fallback to sidplay1 if found
+	set (SIDPLAY_INCLUDE_DIR "NO")
+	set (SIDPLAY_LIBRARY "NO")
 	find_path (SIDPLAY_INCLUDE_DIR sidplay/player.h)
 	find_library (SIDPLAY_LIBRARY NAMES sidplay)
 	if (SIDPLAY_INCLUDE_DIR AND SIDPLAY_LIBRARY)
