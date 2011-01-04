@@ -23,6 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <string.h>
 #include "SIDDecoder.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
