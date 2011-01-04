@@ -86,6 +86,7 @@
 
 #include <toadlet/tadpole/handler/MMSHHandler.h>
 #include <toadlet/tadpole/handler/BMPHandler.h>
+#include <toadlet/tadpole/handler/DDSHandler.h>
 #include <toadlet/tadpole/handler/SPRHandler.h>
 #include <toadlet/tadpole/handler/TGAHandler.h>
 #include <toadlet/tadpole/handler/TPKGHandler.h>
@@ -206,6 +207,7 @@ Engine::Engine(bool backable):
 	#endif
 
 	// Texture handlers
+	mTextureManager->setHandler(DDSHandler::ptr(new DDSHandler(mTextureManager)),"dds");
 	#if defined(TOADLET_HAS_GDIPLUS)
 		mTextureManager->setDefaultHandler(Win32TextureHandler::ptr(new Win32TextureHandler(mTextureManager)));
 	#elif defined(TOADLET_PLATFORM_OSX)

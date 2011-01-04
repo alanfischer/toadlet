@@ -80,22 +80,29 @@ Image *BMPHandler::loadImage(Stream *stream){
 
 	DataStream::ptr dataStream(new DataStream(stream));
 
-	bmfh.bfType=dataStream->readLittleUInt16();
-	bmfh.bfSize=dataStream->readLittleUInt32();
-	bmfh.bfReserved1=dataStream->readLittleUInt16();
-	bmfh.bfReserved2=dataStream->readLittleUInt16();
-	bmfh.bfOffBits=dataStream->readLittleUInt32();
-	bmih.biSize=dataStream->readLittleUInt32();
-	bmih.biWidth=dataStream->readLittleInt32();
-	bmih.biHeight=dataStream->readLittleInt32();
-	bmih.biPlanes=dataStream->readLittleUInt16();
-	bmih.biBitCount=dataStream->readLittleUInt16();
-	bmih.biCompression=dataStream->readLittleUInt32();
-	bmih.biSizeImage=dataStream->readLittleUInt32();
-	bmih.biXPelsPerMeter=dataStream->readLittleInt32();
-	bmih.biYPelsPerMeter=dataStream->readLittleInt32();
-	bmih.biClrUsed=dataStream->readLittleUInt32();
-	bmih.biClrImportant=dataStream->readLittleUInt32();
+	dataStream->read((tbyte*)&bmfh,sizeof(bmfh));
+	#if defined(TOADLET_BIG_ENDIAN)
+		littleUInt16InPlace(bmfh.bfType);
+		littleUInt32InPlace(bmfh.bfSize);
+		littleUInt16InPlace(bmfh.bfReserved1);
+		littleUInt16InPlace(bmfh.bfReserved2);
+		littleUInt32InPlace(bmfh.bfOffBits);
+	#endif
+
+	dataStream->read((tbyte*)&bmih,sizeof(bmih));
+	#if defined(TOADLET_BIG_ENDIAN)
+		littleUInt32InPlace(bmih.biSize);
+		littleUInt32InPlace(bmih.biWidth);
+		littleUInt32InPlace(bmih.biHeight);
+		littleUInt16InPlace(bmih.biPlanes);
+		littleUInt16InPlace(bmih.biBitCount);
+		littleUInt32InPlace(bmih.biCompression);
+		littleUInt32InPlace(bmih.biSizeImage);
+		littleUInt32InPlace(bmih.biXPelsPerMeter);
+		littleUInt32InPlace(bmih.biYPelsPerMeter);
+		littleUInt32InPlace(bmih.biClrUsed);
+		littleUInt32InPlace(bmih.biClrImportant);
+	#endif
 
 	int width=bmih.biWidth;
 	int height=bmih.biHeight;
