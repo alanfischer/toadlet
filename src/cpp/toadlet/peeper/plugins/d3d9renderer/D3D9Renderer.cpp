@@ -1131,6 +1131,12 @@ D3DFORMAT D3D9Renderer::getD3DFORMAT(int format){
 			return D3DFMT_D24X8;
 		case Texture::Format_DEPTH_32:
 			return D3DFMT_D32;
+		case Texture::Format_RGBA_DXT1:
+			return D3DFMT_DXT1;
+		case Texture::Format_RGBA_DXT3:
+			return D3DFMT_DXT3;
+		case Texture::Format_RGBA_DXT5:
+			return D3DFMT_DXT5;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"invalid type");

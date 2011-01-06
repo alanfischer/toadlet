@@ -55,7 +55,7 @@ bool GLFBOPixelBuffer::create(int usage,int access,int pixelFormat,int width,int
 	mPixelFormat=pixelFormat;
 	mWidth=width;
 	mHeight=height;
-	mDataSize=ImageFormatConversion::getPixelSize(mPixelFormat)*mWidth*mHeight;
+	mDataSize=ImageFormatConversion::getRowPitch(mPixelFormat,mWidth)*mHeight;
 
 	glGenRenderbuffers(1,&mHandle);
 	glBindRenderbuffer(GL_RENDERBUFFER,mHandle);

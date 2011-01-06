@@ -81,7 +81,7 @@ public:
 	inline const tbyte *getData() const{return mData;}
 	
 	inline int getPixelSize() const{return ImageFormatConversion::getPixelSize(mFormat);}
-	inline int getRowPitch() const{return getPixelSize()*mWidth;}
+	inline int getRowPitch() const{return ImageFormatConversion::getRowPitch(mFormat,mWidth);}
 	inline int getSlicePitch() const{return getRowPitch()*mHeight;}
 
 	void getPixel(Pixel<uint8> &pixel,int x,int y=0,int z=0) const{

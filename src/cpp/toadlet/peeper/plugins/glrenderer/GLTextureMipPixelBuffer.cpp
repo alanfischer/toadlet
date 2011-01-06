@@ -53,7 +53,7 @@ GLTextureMipPixelBuffer::GLTextureMipPixelBuffer(GLTexture *texture,GLuint level
 	mHeight=h;
 	mDepth=d;
 
-	mDataSize=ImageFormatConversion::getPixelSize(texture->getFormat())*mWidth*mHeight*mDepth;
+	mDataSize=ImageFormatConversion::getRowPitch(texture->getFormat(),mWidth)*mHeight*mDepth;
 }
 
 int GLTextureMipPixelBuffer::getPixelFormat() const{

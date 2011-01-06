@@ -138,7 +138,7 @@ bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
 		int i;
 		for(i=0;i<numMipDatas;++i){
 			sData[i].pSysMem=mipDatas[i];
-			sData[i].SysMemPitch=ImageFormatConversion::getPixelSize(mFormat)*hwidth;
+			sData[i].SysMemPitch=ImageFormatConversion::getRowPitch(mFormat,hwidth);
 			sData[i].SysMemSlicePitch=sData[i].SysMemPitch*hheight;
 
 			hwidth/=2;hheight/=2;hdepth/=2;
@@ -249,7 +249,7 @@ bool D3D10Texture::load(int width,int height,int depth,int mipLevel,byte *mipDat
 	ID3D10Device *device=mRenderer->getD3D10Device();
 
 	int format=mFormat;
-	int rowPitch=ImageFormatConversion::getPixelSize(format)*width;
+	int rowPitch=ImageFormatConversion::getRowPitch(format,width);
 	int slicePitch=rowPitch*height;
 	int subresource=D3D10CalcSubresource(mipLevel,0,0);
 	device->UpdateSubresource(mTexture,subresource,NULL,mipData,rowPitch,slicePitch);

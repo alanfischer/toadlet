@@ -806,6 +806,12 @@ DXGI_FORMAT D3D10Renderer::getTextureDXGI_FORMAT(int format){
 			return DXGI_FORMAT_R32G32B32_FLOAT;
 		case Texture::Format_RGBA_F32:
 			return DXGI_FORMAT_R32G32B32A32_FLOAT;
+		case Texture::Format_RGBA_DXT1:
+			return DXGI_FORMAT_BC1_UNORM;
+		case Texture::Format_RGBA_DXT3:
+			return DXGI_FORMAT_BC3_UNORM;
+		case Texture::Format_RGBA_DXT5:
+			return DXGI_FORMAT_BC5_UNORM;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"D3D10Texture::getDXGI_FORMAT: Invalid type");

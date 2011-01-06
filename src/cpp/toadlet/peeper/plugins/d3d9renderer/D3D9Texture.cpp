@@ -282,10 +282,10 @@ bool D3D9Texture::load(int width,int height,int depth,int mipLevel,byte *mipData
 	}
 
 	int format=mFormat;
-	int rowPitch=width*ImageFormatConversion::getPixelSize(format);
+	int rowPitch=ImageFormatConversion::getRowPitch(format,width);
 	int slicePitch=rowPitch*height;
 
-	HRESULT result;
+	HRESULT result=S_OK;
 	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
 		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
 
@@ -303,7 +303,6 @@ bool D3D9Texture::load(int width,int height,int depth,int mipLevel,byte *mipData
 						HRESULT result=offscreenSurface->LockRect(&rect,NULL,D3DLOCK_READONLY);
 						TOADLET_CHECK_D3D9ERROR(result,"LockRect");
 						if(SUCCEEDED(result)){
-							int pixelSize=ImageFormatConversion::getPixelSize(format);
 							ImageFormatConversion::convert(mipData,format,rowPitch,slicePitch,(uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,width,height,depth);
 							offscreenSurface->UnlockRect();
 						}
@@ -323,7 +322,6 @@ bool D3D9Texture::load(int width,int height,int depth,int mipLevel,byte *mipData
 			result=texture->LockRect(mipLevel,&rect,NULL,0);
 			TOADLET_CHECK_D3D9ERROR(result,"LockRect");
 			if(SUCCEEDED(result)){
-				int pixelSize=ImageFormatConversion::getPixelSize(format);
 				ImageFormatConversion::convert(mipData,format,rowPitch,slicePitch,(uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,width,height,depth);
 				texture->UnlockRect(mipLevel);
 			}
@@ -337,7 +335,6 @@ bool D3D9Texture::load(int width,int height,int depth,int mipLevel,byte *mipData
 			result=texture->LockBox(mipLevel,&box,NULL,0);
 			TOADLET_CHECK_D3D9ERROR(result,"LockBox");
 			if(SUCCEEDED(result)){
-				int pixelSize=ImageFormatConversion::getPixelSize(format);
 				ImageFormatConversion::convert(mipData,format,rowPitch,slicePitch,(uint8*)box.pBits,mInternalFormat,box.RowPitch,box.SlicePitch,width,height,depth);
 				texture->UnlockBox(mipLevel);
 			}
@@ -351,8 +348,7 @@ bool D3D9Texture::load(int width,int height,int depth,int mipLevel,byte *mipData
 				result=texture->LockRect((D3DCUBEMAP_FACES)i,mipLevel,&rect,NULL,0);
 				TOADLET_CHECK_D3D9ERROR(result,"LockRect");
 				if(SUCCEEDED(result)){
-					int pixelSize=ImageFormatConversion::getPixelSize(format);
-					ImageFormatConversion::convert((mipData+width*height*pixelSize*i),format,rowPitch,slicePitch,(uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,width,height,1);
+					ImageFormatConversion::convert((mipData+slicePitch*i),format,rowPitch,slicePitch,(uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,width,height,1);
 					texture->UnlockRect((D3DCUBEMAP_FACES)i,mipLevel);
 				}
 			}
@@ -387,11 +383,10 @@ bool D3D9Texture::read(int width,int height,int depth,int mipLevel,byte *mipData
 	}
 
 	int format=mFormat;
-	int rowPitch=width*ImageFormatConversion::getPixelSize(format);
+	int rowPitch=ImageFormatConversion::getRowPitch(format,width);
 	int slicePitch=rowPitch*height;
 
 	HRESULT result=S_OK;
-
 	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
 		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
 
@@ -412,7 +407,6 @@ bool D3D9Texture::read(int width,int height,int depth,int mipLevel,byte *mipData
 							HRESULT result=offscreenSurface->LockRect(&rect,NULL,D3DLOCK_READONLY);
 							TOADLET_CHECK_D3D9ERROR(result,"LockRect");
 							if(SUCCEEDED(result)){
-								int pixelSize=ImageFormatConversion::getPixelSize(format);
 								ImageFormatConversion::convert((uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,mipData,format,rowPitch,slicePitch,width,height,depth);
 								offscreenSurface->UnlockRect();
 							}
@@ -429,7 +423,6 @@ bool D3D9Texture::read(int width,int height,int depth,int mipLevel,byte *mipData
 			result=texture->LockRect(mipLevel,&rect,NULL,D3DLOCK_READONLY);
 			TOADLET_CHECK_D3D9ERROR(result,"LockRect");
 			if(SUCCEEDED(result)){
-				int pixelSize=ImageFormatConversion::getPixelSize(format);
 				ImageFormatConversion::convert((uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,mipData,format,rowPitch,slicePitch,width,height,depth);
 				texture->UnlockRect(mipLevel);
 			}
@@ -447,7 +440,6 @@ bool D3D9Texture::read(int width,int height,int depth,int mipLevel,byte *mipData
 			result=texture->LockBox(mipLevel,&box,NULL,D3DLOCK_READONLY);
 			TOADLET_CHECK_D3D9ERROR(result,"LockBox");
 			if(SUCCEEDED(result)){
-				int pixelSize=ImageFormatConversion::getPixelSize(format);
 				ImageFormatConversion::convert((uint8*)box.pBits,mInternalFormat,box.RowPitch,box.SlicePitch,mipData,format,rowPitch,slicePitch,width,height,depth);
 				texture->UnlockBox(mipLevel);
 			}

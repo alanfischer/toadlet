@@ -129,7 +129,7 @@ bool GLBuffer::create(int usage,int access,int pixelFormat,int width,int height,
 	mHeight=height;
 	mDepth=depth;
 	mPixelFormat=pixelFormat;
-	mDataSize=ImageFormatConversion::getPixelSize(mPixelFormat)*mWidth*mHeight*mDepth;
+	mDataSize=ImageFormatConversion::getRowPitch(mPixelFormat,mWidth)*mHeight*mDepth;
 
 	mTarget=GL_PIXEL_UNPACK_BUFFER_ARB;
 	createContext();
