@@ -23,46 +23,32 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_HANDLER_DDSHANDLER_H
-#define TOADLET_TADPOLE_HANDLER_DDSHANDLER_H
+#ifndef TOADLET_PEEPER_WINDOWRENDERTARGETFORMAT_H
+#define TOADLET_PEEPER_WINDOWRENDERTARGETFORMAT_H
 
-#include <toadlet/egg/image/DDSHandler.h>
-#include <toadlet/peeper/Texture.h>
-#include <toadlet/tadpole/ResourceHandler.h>
+#include <toadlet/peeper/Visual.h>
 
 namespace toadlet{
-namespace tadpole{
-namespace handler{
+namespace peeper{
 
-class TOADLET_API DDSHandler:public ResourceHandler{
+class TOADLET_API WindowRenderTargetFormat{
 public:
-	TOADLET_SHARED_POINTERS(DDSHandler);
+	TOADLET_SHARED_POINTERS(WindowRenderTargetFormat);
 
-	DDSHandler(TextureManager *textureManager){mTextureManager=textureManager;}
-
-	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData){
-		egg::Collection<egg::image::Image*> mipLevels;
-		if(mHandler.loadImage(stream,mipLevels)){
-			egg::Logger::warning("TODO: Use all mip levels and such!");
-			return mTextureManager->createTexture(egg::image::Image::ptr(mipLevels[0]));
-		}
-		else{
-			return NULL;
-		}
+	WindowRenderTargetFormat(const Visual &visual,int threads,bool debug,int flags){
+		this->visual=visual;
+		this->threads=threads;
+		this->debug=debug;
+		this->flags=flags;
 	}
 
-	bool save(peeper::Texture::ptr resource,egg::io::Stream::ptr stream){
-		return mHandler.saveImage(mTextureManager->createImage(resource),stream);
-	}
-
-protected:
-	TextureManager *mTextureManager;
-	egg::image::DDSHandler mHandler;
+	Visual visual;
+	int threads;
+	bool debug;
+	int flags;
 };
 
 }
 }
-}
 
 #endif
-

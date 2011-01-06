@@ -198,6 +198,7 @@ bool DDSHandler::loadImage(Stream *stream,Collection<Image*> &mipLevels){
 
 	int width=hdr.dwWidth;
 	int height=hdr.dwHeight;
+	int depth=hdr.dwDepth;
 	int mipCount=(hdr.dwHeaderFlags&DDSD_MIPMAPCOUNT) ? hdr.dwMipMapCount : 1;
 
 	mipLevels.resize(mipCount);
@@ -209,12 +210,46 @@ bool DDSHandler::loadImage(Stream *stream,Collection<Image*> &mipLevels){
 	)){
 		int divSize=4;
 		int blockBytes=(hdr.ddspf.dwFourCC==D3DFMT_DXT1) ? 8 : 16;
-
 		int size=Math::maxVal(divSize,width)/divSize * Math::maxVal(divSize,height)/divSize * blockBytes;
-		TOADLET_ASSERT(hdr.dwHeaderFlags & DDSD_LINEARSIZE);
-		TOADLET_ASSERT(size==hdr.dwPitchOrLinearSize);
 
-		Logger::alert("Other DXT");
+		if((hdr.dwHeaderFlags & DDSD_LINEARSIZE)>0 && size!=hdr.dwPitchOrLinearSize){
+			Error::unknown(Categories::TOADLET_EGG,
+				"incorrect size");
+			return false;
+		}
+
+		int format=0;
+		switch(hdr.ddspf.dwFourCC){
+			case D3DFMT_DXT1:
+				format=Image::Format_RGBA_DXT1;
+			break;
+			case D3DFMT_DXT3:
+				format=Image::Format_RGBA_DXT3;
+			break;
+			case D3DFMT_DXT5:
+				format=Image::Format_RGBA_DXT5;
+			break;
+		}
+
+		Image *image=Image::createAndReallocate(Image::Dimension_D2,format,width,height,depth);
+
+		TOADLET_ASSERT(image->getSlicePitch()==size);
+
+		stream->read(image->getData(),size);
+		
+/*
+		
+    for( unsigned int ix = 0; ix < mipMapCount; ++ix ) {
+      fread( data, 1, size, f );
+      glCompressedTexImage2D( GL_TEXTURE_2D, ix, li->internalFormat, x, y, 0, size, data );
+      gl->updateError();
+      x = (x+1)>>1;
+      y = (y+1)>>1;
+      size = max( li->divSize, x )/li->divSize * max( li->divSize, y )/li->divSize * li->blockBytes;
+    }
+*/
+
+		mipLevels[0]=image;
 	}
 	else if(PF_IS_INDEX8(hdr.ddspf)){
 		Logger::alert("Other pallette");

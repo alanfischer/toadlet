@@ -190,6 +190,29 @@ public:
 		}
 	}
 
+	static inline int getRowPitch(int format,int width){
+		switch(format){
+			case Format_RGBA_DXT1:
+				return width/2;
+			case Format_RGBA_DXT3:
+			case Format_RGBA_DXT5:
+				return width;
+			default:
+				return getPixelSize(format)*width;
+		}
+	}
+
+	static bool isFormatCompressed(int format){
+		switch(format){
+			case Format_RGBA_DXT1:
+			case Format_RGBA_DXT3:
+			case Format_RGBA_DXT5:
+				return true;
+			default:
+				return false;
+		}
+	}
+
 	static bool convert(tbyte *src,int srcFormat,int srcRowPitch,int srcSlicePitch,tbyte *dst,int dstFormat,int dstRowPitch,int dstSlicePitch,int width,int height,int depth);
 };
 

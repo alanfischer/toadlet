@@ -104,7 +104,7 @@ bool D3D9PixelBuffer::create(int usage,int access,int pixelFormat,int width,int 
 	mUsage=usage;
 	mAccess=access;
 	mPixelFormat=pixelFormat;
-	mDataSize=ImageFormatConversion::getPixelSize(pixelFormat)*width*height;
+	mDataSize=ImageFormatConversion::getRowPitch(pixelFormat,width)*height;
 	mWidth=width;
 	mHeight=height;
 	mDepth=1;

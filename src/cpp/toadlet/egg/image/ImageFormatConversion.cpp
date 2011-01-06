@@ -25,6 +25,7 @@
 
 #include <toadlet/egg/image/ImageFormatConversion.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/egg/Error.h>
 #include <string.h> //memcpy
 
 namespace toadlet{
@@ -37,6 +38,12 @@ bool ImageFormatConversion::convert(tbyte *src,int srcFormat,int srcRowPitch,int
 	if(width==0) width=1;
 	if(height==0) height=1;
 	if(depth==0) depth=1;
+
+	if(ImageFormatConversion::isFormatCompressed(srcFormat) || ImageFormatConversion::isFormatCompressed(dstFormat)){
+		Error::unknown(Categories::TOADLET_EGG,
+			"cannot convert compressed format"
+		);
+	}
 
 	if(srcFormat==Format_L_8 && dstFormat==Format_LA_8){
 		for(k=0;k<depth;++k){

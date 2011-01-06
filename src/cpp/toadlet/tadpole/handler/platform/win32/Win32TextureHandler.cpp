@@ -134,7 +134,7 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData
 
 		int i;
 		for(i=0;i<image->getHeight();++i){
-			memcpy(image->getData()+image->getWidth()*image->getPixelSize()*i,((uint8*)data.Scan0)+data.Stride*(size.cy-i-1),image->getWidth()*image->getPixelSize());
+			memcpy(image->getData()+image->getRowPitch()*i,((uint8*)data.Scan0)+data.Stride*(size.cy-i-1),image->getWidth()*image->getPixelSize());
 		}
 
 		bitmap->UnlockBits(&data);
@@ -185,7 +185,7 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData
 
 			int j;
 			for(j=0;j<image->getHeight();++j){
-				memcpy(image->getData()+image->getWidth()*image->getPixelSize()*j,((uint8*)data.Scan0)+data.Stride*(bitmap->GetHeight()-j-1),image->getWidth()*image->getPixelSize());
+				memcpy(image->getData()+image->getRowPitch()*j,((uint8*)data.Scan0)+data.Stride*(bitmap->GetHeight()-j-1),image->getWidth()*image->getPixelSize());
 			}
 
 			bitmap->UnlockBits(&data);
