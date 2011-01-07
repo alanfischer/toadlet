@@ -179,7 +179,14 @@
 			isa = PBXProject;
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "logo" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* logo */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -282,7 +289,6 @@
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
-					"-lfreetype",
 					"-lGLEW",
 					"-lmxml",
 					"-ltoadlet_ribbit_alplayer_sd",
@@ -294,7 +300,6 @@
 					"-ltoadlet_pad_sd",
 				);
 				PREBINDING = NO;
-				SDKROOT = macosx10.5;
 			};
 			name = Debug;
 		};
@@ -306,9 +311,8 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LIBRARY_SEARCH_PATHS = /sw/lib;
-				OTHER_LDFLAGS = "-lfreetype";
+				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
-				SDKROOT = macosx10.5;
 			};
 			name = Release;
 		};

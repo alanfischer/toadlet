@@ -41,9 +41,6 @@ namespace toadlet{
 namespace ribbit{
 	
 class ALAudio;
-#if defined(TOADLET_PLATFORM_OSX)
-	class CoreAudio;
-#endif
 
 typedef void (*proc_alBufferDataStatic)(ALuint buffer,ALenum format,ALvoid *data,ALsizei size,ALsizei freq);
 
@@ -84,11 +81,6 @@ public:
 	static ALenum getALFormat(int bitsPerSample,int channels);
 
 	egg::math::Vector3 cacheVector3;
-
-	#if defined(TOADLET_PLATFORM_OSX)
-		void registerCoreAudio(CoreAudio *audio){mCoreAudios.add(audio);}
-		void unregisterCoreAudio(CoreAudio *audio){mCoreAudios.remove(audio);}
-	#endif
 	
 protected:
 	ALCdevice *mDevice;
@@ -101,10 +93,6 @@ protected:
 	egg::Mutex mMutex;
 
 	CapabilitySet mCapabilitySet;
-
-	#if defined(TOADLET_PLATFORM_OSX)
-		egg::Collection<CoreAudio*> mCoreAudios;
-	#endif
 
 	proc_alBufferDataStatic alBufferDataStatic;
 

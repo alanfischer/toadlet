@@ -28,6 +28,7 @@
 #include <toadlet/egg/math/Math.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/egg/EndianConversion.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
@@ -212,7 +213,7 @@ bool DDSHandler::loadImage(Stream *stream,Collection<Image*> &mipLevels){
 		int blockBytes=(hdr.ddspf.dwFourCC==D3DFMT_DXT1) ? 8 : 16;
 		int size=Math::maxVal(divSize,width)/divSize * Math::maxVal(divSize,height)/divSize * blockBytes;
 
-		if((hdr.dwHeaderFlags & DDSD_LINEARSIZE)>0 && size!=hdr.dwPitchOrLinearSize){
+		if((hdr.dwHeaderFlags & DDSD_LINEARSIZE)>0 && size!=(int)hdr.dwPitchOrLinearSize){
 			Error::unknown(Categories::TOADLET_EGG,
 				"incorrect size");
 			return false;

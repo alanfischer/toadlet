@@ -182,11 +182,6 @@ void ALPlayer::destroy(){
 	for(i=0;i<mAudios.size();++i){
 		mAudios[i]->mAudioPlayer=NULL;
 	}
-	#if defined(TOADLET_PLATFORM_OSX)
-		for(i=0;i<mCoreAudios.size();++i){
-			mCoreAudios[i]->mAudioPlayer=NULL;
-		}
-	#endif
 
 	if(mAllSources.size()>0){
 		alDeleteSources(mAllSources.size(),&mAllSources[0]);
@@ -213,11 +208,7 @@ Audio *ALPlayer::createBufferedAudio(){
 }
 
 Audio *ALPlayer::createStreamingAudio(){
-	#if defined(TOADLET_PLATFORM_OSX)
-		return new CoreAudio(this);
-	#else
-		return new ALAudio(this);
-	#endif
+	return new ALAudio(this);
 }
 
 void ALPlayer::suspend(){
@@ -234,11 +225,6 @@ void ALPlayer::update(int dt){
 		for(i=0;i<mAudios.size();++i){
 			mAudios[i]->update(dt);
 		}
-		#if defined(TOADLET_PLATFORM_OSX)
-			for(i=0;i<mCoreAudios.size();++i){
-				mCoreAudios[i]->update(dt);
-			}
-		#endif
 	unlock();
 }
 

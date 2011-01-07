@@ -40,14 +40,14 @@ TOADLET_C_API RenderTarget *new_EAGLRenderTarget(CAEAGLLayer *layer,const Visual
 	return (GLRenderTarget*)(new EAGLRenderTarget(layer,visual));
 }
 
-EAGLRenderTarget::EAGLRenderTarget():GLFBOSurfaceRenderTarget(NULL),
+EAGLRenderTarget::EAGLRenderTarget():GLFBORenderTarget(NULL),
 	mDrawable(nil),
 	mContext(nil),
 	mRenderBufferHandle(0)
 {
 }
 
-EAGLRenderTarget::EAGLRenderTarget(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat):GLFBOSurfaceRenderTarget(NULL),
+EAGLRenderTarget::EAGLRenderTarget(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat):GLFBORenderTarget(NULL),
 	mDrawable(nil),
 	mContext(nil),
 	mRenderBufferHandle(0)
@@ -85,7 +85,7 @@ bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,const Visual &visual,
 	int width=[drawable bounds].size.width;
 	int height=[drawable bounds].size.height;
 
-	GLFBOSurfaceRenderTarget::create();
+	GLFBORenderTarget::create();
 
 	// Manually create the Color Renderbuffer for now
 	//  We could add another Renderbuffer storage function for EAGL in
@@ -101,10 +101,15 @@ bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,const Visual &visual,
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_RENDERBUFFER,mRenderBufferHandle);
 
 	if(visual.depthBits!=0){
-		attach(createBufferSurface(Texture::Format_DEPTH_16,width,height),Attachment_DEPTH_STENCIL);
+		// No Depth-Stencil buffer, so add one
+		GLFBOPixelBuffer::ptr buffer(new GLFBOPixelBuffer(this));
+		if(buffer->create(Buffer::Usage_NONE,Buffer::Access_NONE,Texture::Format_DEPTH_16,width,height,1)){
+			attach(buffer,Attachment_DEPTH_STENCIL);
+			mDepthBuffer=buffer;
+		}
 	}
 
-	GLFBOSurfaceRenderTarget::makeCurrent();
+	GLFBORenderTarget::activate();
 
 	return true;
 }
@@ -117,7 +122,7 @@ bool EAGLRenderTarget::destroyContext(){
 			[EAGLContext setCurrentContext:mContext];
 		}
 
-		GLFBOSurfaceRenderTarget::destroy();
+		GLFBORenderTarget::destroy();
 		
 		if(mRenderBufferHandle!=0){
 			glDeleteRenderbuffers(1,&mRenderBufferHandle);
@@ -135,8 +140,12 @@ bool EAGLRenderTarget::destroyContext(){
 	return true;
 }
 
-bool EAGLRenderTarget::makeCurrent(){
+bool EAGLRenderTarget::activate(){
 	return [EAGLContext setCurrentContext:mContext];
+}
+
+bool EAGLRenderTarget::deactivate(){
+	return [EAGLContext setCurrentContext:nil];
 }
 
 bool EAGLRenderTarget::swap(){

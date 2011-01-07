@@ -41,7 +41,6 @@ public:
 	virtual bool deactivate()=0;
 	virtual bool activateAdditionalContext()=0;
 	virtual void deactivateAdditionalContext()=0;
-	virtual bool share(GLRenderTarget *target)=0;
 };
 
 }

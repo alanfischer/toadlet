@@ -25,14 +25,15 @@
 
 #include "NSGLRenderTarget.h"
 #include <toadlet/egg/Logger.h>
+#include <toadlet/egg/System.h>
 
 using namespace toadlet::egg;
 
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_NSGLRenderTarget(NSView *view,const Visual &visual){
-	return new NSGLRenderTarget(view,visual);
+TOADLET_C_API RenderTarget *new_NSGLRenderTarget(NSView *view,WindowRenderTargetFormat *format){
+	return new NSGLRenderTarget(view,format);
 }
 	
 NSGLRenderTarget::NSGLRenderTarget():
@@ -41,12 +42,12 @@ NSGLRenderTarget::NSGLRenderTarget():
 	mContext(nil)
 {}
 
-NSGLRenderTarget::NSGLRenderTarget(NSView *view,const Visual &visual,NSOpenGLPixelFormat *pixelFormat):GLRenderTarget(),
+NSGLRenderTarget::NSGLRenderTarget(NSView *view,WindowRenderTargetFormat *format,NSOpenGLPixelFormat *pixelFormat):GLRenderTarget(),
 	mView(nil),
 	mPixelFormat(nil),
 	mContext(nil)
 {
-	createContext(view,visual,pixelFormat);
+	createContext(view,format,pixelFormat);
 }
 
 NSGLRenderTarget::NSGLRenderTarget(NSOpenGLContext *context):GLRenderTarget(),
@@ -61,37 +62,71 @@ NSGLRenderTarget::~NSGLRenderTarget(){
 	destroyContext();
 }
 
-bool NSGLRenderTarget::createContext(NSView *view,const Visual &visual,NSOpenGLPixelFormat *pixelFormat){
+bool NSGLRenderTarget::createContext(NSView *view,WindowRenderTargetFormat *format,NSOpenGLPixelFormat *pixelFormat){
 	if(pixelFormat==nil){
 		NSOpenGLPixelFormatAttribute attrs[]={
 			NSOpenGLPFADoubleBuffer,
-			NSOpenGLPFADepthSize,visual.depthBits,
+			NSOpenGLPFADepthSize,format->visual.depthBits,
 			0
 		};
 
-		pixelFormat=[[NSOpenGLPixelFormat alloc] initWithAttributes:attrs];
+		mPixelFormat=[[NSOpenGLPixelFormat alloc] initWithAttributes:attrs];
 	}
 	else{
-		[pixelFormat retain];
+		mPixelFormat=pixelFormat;
+		[mPixelFormat retain];
 	}
 
-	mContext=[[NSOpenGLContext alloc] initWithFormat:pixelFormat shareContext:nil];
+	mContext=[[NSOpenGLContext alloc] initWithFormat:mPixelFormat shareContext:nil];
+	if(mContext=nil){
+		destroyContext();
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"Failed to create GL context");
+		return false;
+	}
 
 	mView=view;
-
-	[pixelFormat release];
-
+/*
+	int numThreads=format->threads<=1?0:format->threads-1;
+	mThreadContexts.resize(numThreads,nil);
+	mThreadIDs.resize(numThreads,0);
+	int i;
+	for(i=0;i<numThreads;++i){
+		NSOpenGLContext *context=[[NSOpenGLContext alloc] initWithFormat:mPixelFormat shareContext:mContext];
+		if(context==nil){
+			destroyContext();
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"Failed to create threaded GL context");
+			return false;
+		}
+		mThreadContexts[i]=context;
+	}
+*/
 	activate();
-	
-	return mContext!=nil;
+
+	return true;
 }
 
 bool NSGLRenderTarget::destroyContext(){
+	int i;
+	for(i=0;i<mThreadContexts.size();++i){
+		if(mThreadContexts[i]!=0){
+			[mThreadContexts[i] release];
+		}
+	}
+	mThreadContexts.clear();
+	mThreadIDs.clear();
+
 	if(mContext!=nil){
 		[mContext release];
 		mContext=nil;
 	}
-	
+
+	if(mPixelFormat!=nil){
+		[mPixelFormat release];
+		mPixelFormat=nil;
+	}
+
 	return true;
 }
 
@@ -114,9 +149,49 @@ bool NSGLRenderTarget::deactivate(){
 		[mContext setView:mView];
 	}
 
-	[mContext clearCurrentContext];
+	[NSOpenGLContext clearCurrentContext];
 	
 	return true;
+}
+
+bool NSGLRenderTarget::activateAdditionalContext(){
+	int threadID=System::threadID();
+	int i;
+	for(i=0;i<mThreadIDs.size();++i){
+		if(mThreadIDs[i]==threadID){
+			return false;
+		}
+	}
+	
+	for(i=0;i<mThreadIDs.size();++i){
+		if(mThreadIDs[i]==0){
+			break;
+		}
+	}
+	if(i==mThreadIDs.size()){
+		return false;
+	}
+	
+	[mThreadContexts[i] makeCurrentContext];
+	mThreadIDs[i]=threadID;
+
+	return true;
+}
+
+void NSGLRenderTarget::deactivateAdditionalContext(){
+	int threadID=System::threadID();
+	int i;
+	for(i=0;i<mThreadIDs.size();++i){
+		if(mThreadIDs[i]==threadID){
+			break;
+		}
+	}
+	if(i==mThreadIDs.size()){
+		return;
+	}
+	
+	[NSOpenGLContext clearCurrentContext];
+	mThreadIDs[i]=0;
 }
 
 bool NSGLRenderTarget::swap(){
