@@ -59,7 +59,7 @@ uint64 PosixSystem::mtime(){
 }
 
 int PosixSystem::threadID(){
-	return pthread_self();;
+	return (intptr_t)(int*)(pthread_self());
 }
 
 bool PosixSystem::absolutePath(const String &path){

@@ -25,6 +25,7 @@ set (RIBBIT_DECODER_SIDDECODER_SRC
 set (RIBBIT_HEADERS
 	Audio.h
 	AudioBuffer.h
+	AudioFormat.h
 	AudioFormatConversion.h
 	AudioPlayer.h
 	AudioStream.h

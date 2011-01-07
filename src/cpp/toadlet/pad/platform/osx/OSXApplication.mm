@@ -32,6 +32,7 @@
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/CapabilitySet.h>
+#include <toadlet/peeper/WindowRenderTargetFormat.h>
 #include <toadlet/tadpole/handler/platform/osx/OSXBundleArchive.h>
 #include <toadlet/pad/platform/osx/OSXApplication.h>
 #include <toadlet/pad/ApplicationListener.h>
@@ -56,9 +57,9 @@ using namespace toadlet::pad;
 #if defined(TOADLET_HAS_OPENGL)
 	extern "C" Renderer *new_GLRenderer();
 	#if defined(TOADLET_HAS_UIKIT)
-		extern "C" RenderTarget *new_EAGLRenderTarget(CAEAGLLayer *layer,const Visual &visual);
+		extern "C" RenderTarget *new_EAGLRenderTarget(CAEAGLLayer *layer,WindowRenderTargetFormat *format);
 	#else
-		extern "C" RenderTarget *new_NSGLRenderTarget(NSView *view,const Visual &visual);
+		extern "C" RenderTarget *new_NSGLRenderTarget(NSView *view,WindowRenderTargetFormat *format);
 	#endif
 #endif
 #if defined(TOADLET_HAS_OPENAL)
@@ -464,11 +465,13 @@ ApplicationListener *OSXApplication::getApplicationListener() const{
 }
 
 RenderTarget *OSXApplication::makeRenderTarget(){
+	WindowRenderTargetFormat::ptr format(new WindowRenderTargetFormat(mVisual,2,false,0));
+
 	#if defined(TOADLET_HAS_OPENGL)
 		#if defined(TOADLET_HAS_UIKIT)
-			return new_EAGLRenderTarget((CAEAGLLayer*)[(UIView*)mView layer],mVisual);
+			return new_EAGLRenderTarget((CAEAGLLayer*)[(UIView*)mView layer],format);
 		#else
-			return new_NSGLRenderTarget((NSView*)mView,mVisual);
+			return new_NSGLRenderTarget((NSView*)mView,format);
 	#endif
 	#else
 		return NULL;
@@ -664,12 +667,14 @@ void OSXApplication::render(Renderer *renderer){
 void OSXApplication::setDifferenceMouse(bool difference){
 	mDifferenceMouse=difference;
 	
-	if(difference){
-		CGDisplayHideCursor(kCGDirectMainDisplay);
-	}
-	else{
-		CGDisplayShowCursor(kCGDirectMainDisplay);
-	}
+	#if !defined(TOADLET_PLATFORM_IPHONE)
+		if(difference){
+			CGDisplayHideCursor(kCGDirectMainDisplay);
+		}
+		else{
+			CGDisplayShowCursor(kCGDirectMainDisplay);
+		}
+	#endif
 }
 
 void OSXApplication::setRendererOptions(int *options,int length){
@@ -683,9 +688,9 @@ void OSXApplication::setRendererOptions(int *options,int length){
 
 void OSXApplication::internal_mouseMoved(int x,int y){
 	if(mDifferenceMouse){
-		CGGetLastMouseDelta(&x,&y);
-		
 		#if !defined(TOADLET_PLATFORM_IPHONE)
+			CGGetLastMouseDelta(&x,&y);
+
 			NSPoint npoint=NSMakePoint(getWidth()/2,getHeight()/2);
 			npoint=[(ApplicationView*)mView convertPoint:npoint toView:nil];
 			npoint=[[(ApplicationView*)mView window] convertBaseToScreen:npoint];

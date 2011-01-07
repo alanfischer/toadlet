@@ -372,7 +372,7 @@ int ALAudio::readAudioData(tbyte *buffer,int bsize){
 	}
 
 	#if !defined(TOADLET_NATIVE_FORMAT)
-		if(mAudioStream->getBitsPerSample()==16){
+		if(mAudioStream->getAudioFormat()->bitsPerSample==16){
 			int j=0;
 			while(j<amount){
 				littleInt16InPlace((int16&)buffer[j]);

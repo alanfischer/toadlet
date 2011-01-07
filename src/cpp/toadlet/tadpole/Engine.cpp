@@ -136,7 +136,7 @@
 	#include <toadlet/tadpole/handler/SIDHandler.h>
 #endif
 #if defined(TOADLET_PLATFORM_OSX)
-	#include <toadlet/tadpole/handler/CoreAudioHandler.h>
+//	#include <toadlet/tadpole/handler/CoreAudioHandler.h>
 #endif
 
 #if !defined(TOADLET_FIXED_POINT)
@@ -261,7 +261,7 @@ Engine::Engine(bool backable):
 	#endif
 	#if defined(TOADLET_PLATFORM_OSX)
 		/// @todo: We need to fix the createStream function of AudioBufferManager so it will try the default handler
-		mAudioBufferManager->setDefaultHandler(CoreAudioHandler::ptr(new CoreAudioHandler(mAudioBufferManager)));
+//		mAudioBufferManager->setDefaultHandler(CoreAudioHandler::ptr(new CoreAudioHandler(mAudioBufferManager)));
 	#endif
 }
 

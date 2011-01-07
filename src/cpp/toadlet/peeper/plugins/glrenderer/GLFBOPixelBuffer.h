@@ -37,10 +37,8 @@ class GLFBOPixelBuffer:public GLPixelBuffer{
 public:
 	TOADLET_SHARED_POINTERS(GLFBOPixelBuffer);
 
-protected:
 	GLFBOPixelBuffer(GLFBORenderTarget *target);
 
-public:
 	virtual ~GLFBOPixelBuffer();
 
 	virtual PixelBuffer *getRootPixelBuffer(){return this;}

@@ -28,6 +28,7 @@
 #include "GLVertexFormat.h"
 #include <toadlet/peeper/CapabilitySet.h>
 #include <toadlet/egg/EndianConversion.h>
+#include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <string.h>
 
@@ -131,7 +132,13 @@ bool GLBuffer::create(int usage,int access,int pixelFormat,int width,int height,
 	mPixelFormat=pixelFormat;
 	mDataSize=ImageFormatConversion::getRowPitch(mPixelFormat,mWidth)*mHeight*mDepth;
 
-	mTarget=GL_PIXEL_UNPACK_BUFFER_ARB;
+	#if defined(TOADLET_HAS_GLEW)
+		mTarget=GL_PIXEL_UNPACK_BUFFER_ARB;
+	#else
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"PixelBuffers not supported");
+		return false;
+	#endif
 	createContext();
 
 	#if !defined(TOADLET_HAS_GLES)
@@ -171,9 +178,11 @@ void GLBuffer::destroy(){
 
 bool GLBuffer::createContext(){
 	if((mTarget==GL_ELEMENT_ARRAY_BUFFER && mRenderer->getCapabilitySet().hardwareIndexBuffers) ||
-		(mTarget==GL_ARRAY_BUFFER && mRenderer->getCapabilitySet().hardwareIndexBuffers) ||
-		mTarget==GL_PIXEL_UNPACK_BUFFER_ARB)
-	{
+		(mTarget==GL_ARRAY_BUFFER && mRenderer->getCapabilitySet().hardwareIndexBuffers)
+		#if defined(TOADLET_HAS_GLEW)
+			|| mTarget==GL_PIXEL_UNPACK_BUFFER_ARB
+		#endif
+	){
 		glGenBuffers(1,&mHandle);
 		glBindBuffer(mTarget,mHandle);
 		GLenum usage=getBufferUsage(mUsage,mAccess);

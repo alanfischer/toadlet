@@ -780,33 +780,34 @@ bool GLRenderer::copyFrameBufferToPixelBuffer(PixelBuffer *dst){
 }
 
 bool GLRenderer::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
-	GLPixelBuffer *gldst=(GLPixelBuffer*)dst->getRootPixelBuffer();
-	GLPixelBuffer *glsrc=(GLPixelBuffer*)src->getRootPixelBuffer();
+	#if defined(TOADLET_HAS_GLEW)
+		GLPixelBuffer *gldst=(GLPixelBuffer*)dst->getRootPixelBuffer();
+		GLPixelBuffer *glsrc=(GLPixelBuffer*)src->getRootPixelBuffer();
 
-	GLTextureMipPixelBuffer *srcTextureBuffer=glsrc->castToGLTextureMipPixelBuffer();
-	GLFBOPixelBuffer *srcFBOBuffer=glsrc->castToGLFBOPixelBuffer();
-	GLBuffer *srcPixelBuffer=glsrc->castToGLBuffer();
-	GLTextureMipPixelBuffer *dstTextureBuffer=gldst->castToGLTextureMipPixelBuffer();
-	GLFBOPixelBuffer *dstFBOBuffer=gldst->castToGLFBOPixelBuffer();
-	GLBuffer *dstPixelBuffer=gldst->castToGLBuffer();
+		GLTextureMipPixelBuffer *srcTextureBuffer=glsrc->castToGLTextureMipPixelBuffer();
+		GLBuffer *srcPixelBuffer=glsrc->castToGLBuffer();
+		GLTextureMipPixelBuffer *dstTextureBuffer=gldst->castToGLTextureMipPixelBuffer();
+		GLBuffer *dstPixelBuffer=gldst->castToGLBuffer();
 
-	if(srcTextureBuffer!=NULL && dstPixelBuffer!=NULL){
-		glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB,dstPixelBuffer->mHandle);
+		if(srcTextureBuffer!=NULL && dstPixelBuffer!=NULL){
+			glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB,dstPixelBuffer->mHandle);
 
-		GLTexture *srcTexture=srcTextureBuffer->mTexture;
-		srcTexture->load(srcTexture->mWidth,srcTexture->mHeight,srcTexture->mDepth,srcTextureBuffer->mLevel,NULL);
+			GLTexture *srcTexture=srcTextureBuffer->mTexture;
+			srcTexture->load(srcTexture->mWidth,srcTexture->mHeight,srcTexture->mDepth,srcTextureBuffer->mLevel,NULL);
 
-		glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB,0);
-	}
-	else if(srcPixelBuffer!=NULL && dstTextureBuffer!=NULL){
-		glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB,srcPixelBuffer->mHandle);
+			glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB,0);
+		}
+		else if(srcPixelBuffer!=NULL && dstTextureBuffer!=NULL){
+			glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB,srcPixelBuffer->mHandle);
 
-		GLTexture *dstTexture=dstTextureBuffer->mTexture;
-		dstTexture->load(dstTexture->mWidth,dstTexture->mHeight,dstTexture->mDepth,dstTextureBuffer->mLevel,NULL);
+			GLTexture *dstTexture=dstTextureBuffer->mTexture;
+			dstTexture->load(dstTexture->mWidth,dstTexture->mHeight,dstTexture->mDepth,dstTextureBuffer->mLevel,NULL);
 
-		glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB,0);
-	}
-	else{
+			glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB,0);
+		}
+		else
+	#endif
+	{
 		Error::unimplemented("copyPixelBuffer not implemented for these pixel buffer types");
 		return false;
 	}
@@ -1951,15 +1952,17 @@ GLuint GLRenderer::getGLFormat(int textureFormat){
 	else if((textureFormat&Texture::Format_BIT_RGBA)>0){
 		format=GL_RGBA;
 	}
-	else if((textureFormat&Texture::Format_BIT_DXT1)>0){
-		format=GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
-	}
-	else if((textureFormat&Texture::Format_BIT_DXT3)>0){
-		format=GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
-	}
-	else if((textureFormat&Texture::Format_BIT_DXT5)>0){
-		format=GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-	}
+	#if defined(TOADLET_HAS_GLEW)
+		else if((textureFormat&Texture::Format_BIT_DXT1)>0){
+			format=GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+		}
+		else if((textureFormat&Texture::Format_BIT_DXT3)>0){
+			format=GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+		}
+		else if((textureFormat&Texture::Format_BIT_DXT5)>0){
+			format=GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+		}
+	#endif
 
 	#if !defined(TOADLET_HAS_GLES) || defined(TOADLET_HAS_EAGL)
 		else if((textureFormat&Texture::Format_BIT_DEPTH)>0){

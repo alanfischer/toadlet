@@ -27,6 +27,7 @@
 #include <toadlet/egg/io/DataStream.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/egg/EndianConversion.h>
 #include <string.h> // memset
 
 #if !defined(BI_RGB)
@@ -92,14 +93,14 @@ Image *BMPHandler::loadImage(Stream *stream){
 	dataStream->read((tbyte*)&bmih,sizeof(bmih));
 	#if defined(TOADLET_BIG_ENDIAN)
 		littleUInt32InPlace(bmih.biSize);
-		littleUInt32InPlace(bmih.biWidth);
-		littleUInt32InPlace(bmih.biHeight);
+		littleInt32InPlace(bmih.biWidth);
+		littleInt32InPlace(bmih.biHeight);
 		littleUInt16InPlace(bmih.biPlanes);
 		littleUInt16InPlace(bmih.biBitCount);
 		littleUInt32InPlace(bmih.biCompression);
 		littleUInt32InPlace(bmih.biSizeImage);
-		littleUInt32InPlace(bmih.biXPelsPerMeter);
-		littleUInt32InPlace(bmih.biYPelsPerMeter);
+		littleInt32InPlace(bmih.biXPelsPerMeter);
+		littleInt32InPlace(bmih.biYPelsPerMeter);
 		littleUInt32InPlace(bmih.biClrUsed);
 		littleUInt32InPlace(bmih.biClrImportant);
 	#endif

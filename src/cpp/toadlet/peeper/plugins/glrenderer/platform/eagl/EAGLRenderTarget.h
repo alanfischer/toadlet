@@ -28,7 +28,7 @@
 
 #include "../../GLIncludes.h"
 #include "../../GLRenderTarget.h"
-#include "../../GLFBOSurfaceRenderTarget.h"
+#include "../../GLFBORenderTarget.h"
 #include <toadlet/peeper/Visual.h>
 #include <toadlet/egg/Logger.h>
 
@@ -40,7 +40,7 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API EAGLRenderTarget:public GLFBOSurfaceRenderTarget{
+class TOADLET_API EAGLRenderTarget:public GLFBORenderTarget{
 public:
 	EAGLRenderTarget();
 	EAGLRenderTarget(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat=nil);
@@ -56,7 +56,7 @@ public:
 	virtual bool swap();
 
 	virtual bool isPrimary() const{return true;}
-	virtual bool isValid() const{return mContext!=nil && GLFBOSurfaceRenderTarget::isValid();}
+	virtual bool isValid() const{return mContext!=nil && GLFBORenderTarget::isValid();}
 	virtual int getWidth() const;
 	virtual int getHeight() const;
 
@@ -64,7 +64,6 @@ protected:
 	CAEAGLLayer *mDrawable;
 	EAGLContext *mContext;
 	GLuint mRenderBufferHandle;
-	GLuint mDepthBuffer;GLuint mFrameBuffer;
 };
 
 }
