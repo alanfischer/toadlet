@@ -75,30 +75,30 @@ using namespace toadlet::tadpole::handler;
 	#pragma comment(lib,"toadlet_peeper_glrenderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_GLRenderer();
 	#if defined(TOADLET_PLATFORM_WINCE)
-		extern "C" RenderTarget *new_EGLWindowRenderTarget(void *nativeDisplay,void *nativeSurface,WindowRenderTargetFormat::ptr format);
+		extern "C" RenderTarget *new_EGLWindowRenderTarget(void *nativeDisplay,void *nativeSurface,WindowRenderTargetFormat *format);
 	#else
-		extern "C" RenderTarget *new_WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat::ptr format);
+		extern "C" RenderTarget *new_WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
 	#endif
 #endif
 #if defined(TOADLET_HAS_D3DM)
 	#pragma comment(lib,"toadlet_peeper_d3dmrenderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_D3DMRenderer();
-	extern "C" RenderTarget *new_D3DMWindowRenderTarget(HWND wnd,WindowRenderTargetFormat::ptr format);
+	extern "C" RenderTarget *new_D3DMWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
 #endif
 #if defined(TOADLET_HAS_D3D9)
 	#pragma comment(lib,"toadlet_peeper_d3d9renderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_D3D9Renderer();
-	extern "C" RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,WindowRenderTargetFormat::ptr format);
+	extern "C" RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
 #endif
 #if defined(TOADLET_HAS_D3D10)
 	#pragma comment(lib,"toadlet_peeper_d3d10renderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_D3D10Renderer();
-	extern "C" RenderTarget *new_D3D10WindowRenderTarget(HWND wnd,WindowRenderTargetFormat::ptr format);
+	extern "C" RenderTarget *new_D3D10WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
 #endif
 #if defined(TOADLET_HAS_D3D11)
 	#pragma comment(lib,"toadlet_peeper_d3d11renderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_D3D11Renderer();
-	extern "C" RenderTarget *new_D3D11WindowRenderTarget(HWND wnd,WindowRenderTargetFormat::ptr format);
+	extern "C" RenderTarget *new_D3D11WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
 #endif
 #if defined(TOADLET_PLATFORM_WIN32)
 	#pragma comment(lib,"toadlet_ribbit_mmplayer" TOADLET_LIBRARY_EXTENSION)
@@ -719,7 +719,11 @@ RenderTarget *Win32Application::makeRenderTarget(int rendererPlugin){
 	RenderTarget *target=NULL;
 	DWORD flags=D3DCREATE_MULTITHREADED;
 
-	WindowRenderTargetFormat::ptr format(new WindowRenderTargetFormat(mVisual,2,true,0));
+	WindowRenderTargetFormat::ptr format(new WindowRenderTargetFormat());
+	format->visual=mVisual;
+	format->flags=0;
+	format->debug=true;
+	format->threads=2;
 
 	if(rendererPlugin==RendererPlugin_OPENGL){
 		#if defined(TOADLET_HAS_OPENGL)
