@@ -78,7 +78,13 @@ bool D3D10WindowRenderTarget::activate(){
 
 void D3D10WindowRenderTarget::clear(int clearFlags,const Color &clearColor){
 	if(mRenderTargetView!=NULL && (clearFlags&Renderer::ClearFlag_COLOR)>0){
-		mD3DDevice->ClearRenderTargetView(mRenderTargetView,clearColor.getData());
+		#if defined(TOADLET_FIXED_POINT)
+			float d3dcolor[4];
+			toD3DColor(d3dcolor,clearColor);
+		#else
+			float *d3dcolor=clearColor.getData();
+		#endif
+		mD3DDevice->ClearRenderTargetView(mRenderTargetView,d3dcolor);
 	}
 	if(mDepthStencilView!=NULL){
 		UINT d3dclearFlags=0;

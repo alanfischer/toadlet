@@ -325,7 +325,13 @@ void D3D10Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Inde
 //	pViewMatrixEffectVariable->SetMatrix(viewMatrix);
 //	pProjectionMatrixEffectVariable->SetMatrix(projectionMatrix);
 	Matrix4x4 shaderMatrix=mProjectionMatrix*mViewMatrix*mModelMatrix;
-	effect->GetVariableByName("ShaderMatrix")->AsMatrix()->SetMatrix(shaderMatrix.data);
+	#if defined(TOADLET_FIXED_POINT)
+		float d3dmatrix[16];
+		toD3DMatrix(d3dmatrix,shaderMatrix);
+	#else
+		float *d3dmatrix=shaderMatrix.data;
+	#endif
+	effect->GetVariableByName("ShaderMatrix")->AsMatrix()->SetMatrix(d3dmatrix);
 	effect->GetVariableByName("diffuseTexture")->AsShaderResource()->SetResource(texture);
 
 	if(indexData->getIndexBuffer()!=NULL){
