@@ -1133,8 +1133,12 @@ D3DFORMAT D3D9Renderer::getD3DFORMAT(int format){
 			return D3DFMT_D32;
 		case Texture::Format_RGBA_DXT1:
 			return D3DFMT_DXT1;
+		case Texture::Format_RGBA_DXT2:
+			return D3DFMT_DXT2;
 		case Texture::Format_RGBA_DXT3:
 			return D3DFMT_DXT3;
+		case Texture::Format_RGBA_DXT4:
+			return D3DFMT_DXT4;
 		case Texture::Format_RGBA_DXT5:
 			return D3DFMT_DXT5;
 		default:

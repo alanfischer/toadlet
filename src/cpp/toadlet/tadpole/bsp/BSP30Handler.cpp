@@ -315,8 +315,9 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 			packer.insert(lmwidth,lmheight,((tbyte*)map->lighting)+face->lightofs,map->facedatas[i].lightmapTransform);
 		}
 
+		IndexData::ptr indexData;
 		if(mEngine->getRenderer()==NULL || mEngine->getRenderer()->getCapabilitySet().triangleFan){
-			map->facedatas[i].indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIFAN,NULL,face->firstedge,face->numedges));
+			indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIFAN,NULL,face->firstedge,face->numedges));
 		}
 		else{
 			int indexes=(face->numedges-2)*3;
@@ -328,8 +329,9 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 				iba.set((j-1)*3+2,face->firstedge+j+1);
 			}
 			iba.unlock();
-			map->facedatas[i].indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexes));
+			indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexes));
 		}
+		map->facedatas[i].indexData=indexData;
 
 		for(j=0;j<face->numedges;j++){
 			int faceedge=face->firstedge+j;

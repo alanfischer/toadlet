@@ -48,9 +48,9 @@ GLBuffer::GLBuffer(GLRenderer *renderer):
 	mSize(0),
 	mWidth(0),mHeight(0),mDepth(0),
 
-	mIndexFormat(IndexFormat_UINT8),
+	mIndexFormat((IndexFormat)0),
 	//mVertexFormat,
-	mPixelFormat(Texture::Format_RGBA_8),
+	mPixelFormat(0),
 	//mElementOffsets,
 
 	mHandle(0),

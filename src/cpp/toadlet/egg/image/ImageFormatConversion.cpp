@@ -39,12 +39,6 @@ bool ImageFormatConversion::convert(tbyte *src,int srcFormat,int srcRowPitch,int
 	if(height==0) height=1;
 	if(depth==0) depth=1;
 
-	if(ImageFormatConversion::isFormatCompressed(srcFormat) || ImageFormatConversion::isFormatCompressed(dstFormat)){
-		Error::unknown(Categories::TOADLET_EGG,
-			"cannot convert compressed format"
-		);
-	}
-
 	if(srcFormat==Format_L_8 && dstFormat==Format_LA_8){
 		for(k=0;k<depth;++k){
 			for(j=0;j<height;++j){
@@ -254,14 +248,27 @@ bool ImageFormatConversion::convert(tbyte *src,int srcFormat,int srcRowPitch,int
 			}
 		}
 	}
-	// Just copy it over & hope for the best
-	else{
-		int pixelSize=getPixelSize(srcFormat);
+	else if(srcFormat==dstFormat){
+		// See if dst pitches are multiples of the src, in which case just use the src pitch.
+		// (Can happen in compressed texture formats with D3D, since it will specify pitch in row-multiples of 4)
+		if(dstRowPitch/srcRowPitch>1 && dstRowPitch%srcRowPitch==0){
+			dstRowPitch=srcRowPitch;
+		}
+		if(dstSlicePitch/srcSlicePitch>1 && dstSlicePitch%srcSlicePitch==0){
+			dstSlicePitch=srcSlicePitch;
+		}
+
 		for(k=0;k<depth;++k){
 			for(j=0;j<height;++j){
-				memcpy(dst+k*dstSlicePitch+j*dstRowPitch,src+k*srcSlicePitch+j*srcRowPitch,width*pixelSize);
+				memcpy(dst+k*dstSlicePitch+j*dstRowPitch,src+k*srcSlicePitch+j*srcRowPitch,dstRowPitch);
 			}
 		}
+	}
+	else{
+		Error::unknown(Categories::TOADLET_EGG,
+			"no format conversion available"
+		);
+		return false;
 	}
 
 	return true;

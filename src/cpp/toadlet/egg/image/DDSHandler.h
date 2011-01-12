@@ -39,7 +39,7 @@ public:
 	DDSHandler();
 	virtual ~DDSHandler();
 
-	virtual bool loadImage(io::Stream *stream,Collection<Image*> &mipLevels);
+	virtual bool loadImage(io::Stream *stream,Collection<Image::ptr> &mipLevels);
 	virtual bool saveImage(Image *image,io::Stream *stream);
 };
 

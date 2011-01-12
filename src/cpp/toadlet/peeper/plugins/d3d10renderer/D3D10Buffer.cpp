@@ -41,7 +41,7 @@ D3D10Buffer::D3D10Buffer(D3D10Renderer *renderer):
 	mSize(0),
 	mDataSize(0),
 
-	mIndexFormat(IndexBuffer::IndexFormat_UINT8),
+	mIndexFormat((IndexFormat)0),
 	//mVertexFormat,
 	mVertexSize(0),
 
@@ -61,6 +61,14 @@ D3D10Buffer::~D3D10Buffer(){
 }
 
 bool D3D10Buffer::create(int usage,int access,IndexFormat indexFormat,int size){
+	destroy();
+
+	if((usage&Buffer::Usage_BIT_STATIC)>0 && (access&Buffer::Access_BIT_READ)>0){
+		Error::invalidParameters(Categories::TOADLET_PEEPER,
+			"Buffer can not be static and readable");
+		return false;
+	}
+
 	mUsage=usage;
 	mAccess=access;
 	mSize=size;
@@ -83,6 +91,12 @@ bool D3D10Buffer::create(int usage,int access,IndexFormat indexFormat,int size){
 
 bool D3D10Buffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int size){
 	destroy();
+
+	if((usage&Buffer::Usage_BIT_STATIC)>0 && (access&Buffer::Access_BIT_READ)>0){
+		Error::invalidParameters(Categories::TOADLET_PEEPER,
+			"Buffer can not be static and readable");
+		return false;
+	}
 
 	mUsage=usage;
 	mAccess=access;
@@ -126,8 +140,11 @@ void D3D10Buffer::destroy(){
 bool D3D10Buffer::createContext(){
 	D3D10_BUFFER_DESC desc={0};
 
-	desc.BindFlags=mBindFlags;
 	desc.ByteWidth=mDataSize;
+
+	if((mUsage&Usage_BIT_STAGING)==0){
+		desc.BindFlags=mBindFlags;
+	}
 
 	if((mUsage&Usage_BIT_STATIC)>0){
 		desc.Usage=D3D10_USAGE_IMMUTABLE;
@@ -142,7 +159,7 @@ bool D3D10Buffer::createContext(){
 		desc.Usage=D3D10_USAGE_DEFAULT;
 	}
 
-	if((mUsage&Usage_BIT_DYNAMIC)>0 || (mUsage&Usage_BIT_STREAM)>0){
+	if((mUsage&Usage_BIT_DYNAMIC)>0 || (mUsage&Usage_BIT_STREAM)>0 || (mUsage&Usage_BIT_STAGING)>0){
 		if((mAccess&Access_BIT_READ)>0){
 			desc.CPUAccessFlags|=D3D10_CPU_ACCESS_READ;
 		}
@@ -182,16 +199,21 @@ uint8 *D3D10Buffer::lock(int lockAccess){
 
 	if(mMapping){
 		D3D10_MAP mapType=(D3D10_MAP)0;
-		switch(mLockAccess){
-			case Access_BIT_READ:
-				mapType=D3D10_MAP_READ;
-			break;
-			case Access_BIT_WRITE:
-				mapType=D3D10_MAP_WRITE_DISCARD;
-			break;
-			case Access_READ_WRITE:
-				mapType=D3D10_MAP_READ_WRITE;
-			break;
+		if((mUsage&Usage_BIT_STAGING)>0){
+			mapType=D3D10_MAP_READ_WRITE;
+		}
+		else{
+			switch(mLockAccess){
+				case Access_BIT_READ:
+					mapType=D3D10_MAP_READ;
+				break;
+				case Access_BIT_WRITE:
+					mapType=D3D10_MAP_WRITE_DISCARD;
+				break;
+				case Access_READ_WRITE:
+					mapType=D3D10_MAP_READ_WRITE;
+				break;
+			}
 		}
 
 		UINT mapFlags=0;
@@ -229,7 +251,6 @@ uint8 *D3D10Buffer::lock(int lockAccess){
 		}
 	}
 
-
 	return mData;
 }
 
@@ -266,7 +287,7 @@ bool D3D10Buffer::unlock(){
 		if(mBuffer==NULL){
 			createContext();
 		}
-		else{
+		else if((mLockAccess&Access_BIT_WRITE)>0){
 			mRenderer->getD3D10Device()->UpdateSubresource(mBuffer,0,NULL,mData,0,0);
 		}
 
