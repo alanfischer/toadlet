@@ -233,7 +233,7 @@ bool WGLPBufferRenderTarget::createBuffer(){
 		return false;
 	}
 
-	if(share(primaryTarget)==false){
+	if(wglShareLists(((WGLRenderTarget*)primaryTarget)->getGLRC(),mGLRC)==false){
 		destroyBuffer();
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"sharing failed");

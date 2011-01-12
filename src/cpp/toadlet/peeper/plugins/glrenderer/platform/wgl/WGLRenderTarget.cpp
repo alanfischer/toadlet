@@ -42,10 +42,6 @@ bool WGLRenderTarget::deactivate(){
 	return wglMakeCurrent(NULL,NULL)==TRUE;
 }
 
-bool WGLRenderTarget::share(GLRenderTarget *target){
-	return wglShareLists(((WGLRenderTarget*)target)->getGLRC(),mGLRC)==TRUE;
-}
-
 bool WGLRenderTarget::wglIsExtensionSupported(const char *extension){
 	const size_t extlen=strlen(extension);
 	const char *supported=NULL;
