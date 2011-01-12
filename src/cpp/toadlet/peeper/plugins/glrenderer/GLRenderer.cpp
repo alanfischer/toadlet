@@ -1956,10 +1956,12 @@ GLuint GLRenderer::getGLFormat(int textureFormat){
 		else if((textureFormat&Texture::Format_BIT_DXT1)>0){
 			format=GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
 		}
-		else if((textureFormat&Texture::Format_BIT_DXT3)>0){
+		else if((textureFormat&Texture::Format_BIT_DXT2)>0 ||
+				(textureFormat&Texture::Format_BIT_DXT3)>0){
 			format=GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
 		}
-		else if((textureFormat&Texture::Format_BIT_DXT5)>0){
+		else if((textureFormat&Texture::Format_BIT_DXT4)>0 ||
+				(textureFormat&Texture::Format_BIT_DXT5)>0){
 			format=GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 		}
 	#endif

@@ -41,7 +41,7 @@ D3D9IndexBuffer::D3D9IndexBuffer(D3D9Renderer *renderer):
 	mUsage(0),
 	mAccess(0),
 	mSize(0),
-	mIndexFormat(IndexFormat_UINT8),
+	mIndexFormat((IndexFormat)0),
 	mDataSize(0),
 
 	mD3DFormat(D3DFMT_INDEX16),

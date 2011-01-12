@@ -143,7 +143,7 @@ DDSHandler::DDSHandler(){
 DDSHandler::~DDSHandler(){
 }
 
-bool DDSHandler::loadImage(Stream *stream,Collection<Image*> &mipLevels){
+bool DDSHandler::loadImage(Stream *stream,Collection<Image::ptr> &mipLevels){
 	if(stream==NULL){
 		Error::nullPointer(Categories::TOADLET_EGG,
 			"Stream is NULL");
@@ -159,7 +159,6 @@ bool DDSHandler::loadImage(Stream *stream,Collection<Image*> &mipLevels){
 		return false;
 	}
 
-	int i;
 	DDS_HEADER hdr={0};
 
 	dataStream->read((tbyte*)&hdr,sizeof(hdr));
@@ -197,6 +196,7 @@ bool DDSHandler::loadImage(Stream *stream,Collection<Image*> &mipLevels){
 		return false;
 	}
 
+	int i;
 	int width=hdr.dwWidth;
 	int height=hdr.dwHeight;
 	int depth=hdr.dwDepth;
@@ -211,46 +211,46 @@ bool DDSHandler::loadImage(Stream *stream,Collection<Image*> &mipLevels){
 	)){
 		int divSize=4;
 		int blockBytes=(hdr.ddspf.dwFourCC==D3DFMT_DXT1) ? 8 : 16;
-		int size=Math::maxVal(divSize,width)/divSize * Math::maxVal(divSize,height)/divSize * blockBytes;
-
-		if((hdr.dwHeaderFlags & DDSD_LINEARSIZE)>0 && size!=(int)hdr.dwPitchOrLinearSize){
-			Error::unknown(Categories::TOADLET_EGG,
-				"incorrect size");
-			return false;
-		}
 
 		int format=0;
 		switch(hdr.ddspf.dwFourCC){
 			case D3DFMT_DXT1:
 				format=Image::Format_RGBA_DXT1;
 			break;
+			case D3DFMT_DXT2:
+				format=Image::Format_RGBA_DXT2;
+			break;
 			case D3DFMT_DXT3:
 				format=Image::Format_RGBA_DXT3;
+			break;
+			case D3DFMT_DXT4:
+				format=Image::Format_RGBA_DXT4;
 			break;
 			case D3DFMT_DXT5:
 				format=Image::Format_RGBA_DXT5;
 			break;
 		}
 
-		Image *image=Image::createAndReallocate(Image::Dimension_D2,format,width,height,depth);
+	    for(i=0;i<mipCount;++i){
+			Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,format,width,height,depth));
+			int size=Math::maxVal(divSize,width)/divSize * Math::maxVal(divSize,height)/divSize * blockBytes;
 
-		TOADLET_ASSERT(image->getSlicePitch()==size);
+			if(i==0 && (hdr.dwHeaderFlags & DDSD_LINEARSIZE)>0 && size!=(int)hdr.dwPitchOrLinearSize){
+				Error::unknown(Categories::TOADLET_EGG,
+					"incorrect size");
+				return false;
+			}
 
-		stream->read(image->getData(),size);
-		
-/*
-		
-    for( unsigned int ix = 0; ix < mipMapCount; ++ix ) {
-      fread( data, 1, size, f );
-      glCompressedTexImage2D( GL_TEXTURE_2D, ix, li->internalFormat, x, y, 0, size, data );
-      gl->updateError();
-      x = (x+1)>>1;
-      y = (y+1)>>1;
-      size = max( li->divSize, x )/li->divSize * max( li->divSize, y )/li->divSize * li->blockBytes;
-    }
-*/
+			TOADLET_ASSERT(image->getSlicePitch()==size);
 
-		mipLevels[0]=image;
+			stream->read(image->getData(),size);
+
+			mipLevels[i]=image;
+
+			width=(width+1)>>1;
+			height=(height+1)>>1;
+			depth=(depth+1)>>1;
+		}
 	}
 	else if(PF_IS_INDEX8(hdr.ddspf)){
 		Logger::alert("Other pallette");

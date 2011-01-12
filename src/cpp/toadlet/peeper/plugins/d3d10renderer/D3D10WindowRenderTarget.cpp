@@ -82,7 +82,7 @@ void D3D10WindowRenderTarget::clear(int clearFlags,const Color &clearColor){
 			float d3dcolor[4];
 			toD3DColor(d3dcolor,clearColor);
 		#else
-			float *d3dcolor=clearColor.getData();
+			const float *d3dcolor=clearColor.getData();
 		#endif
 		mD3DDevice->ClearRenderTargetView(mRenderTargetView,d3dcolor);
 	}

@@ -143,25 +143,30 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 			}
 		}
 	}
+	if(specifiedMipLevels==0){
+		specifiedMipLevels=1;
+	}
 
 	GLint glinternalFormat=GLRenderer::getGLFormat(mFormat);
 	GLint glformat=GLRenderer::getGLFormat(mFormat);
-	GLint gltype=GLRenderer::getGLType(mFormat);
+	GLint gltype=ImageFormatConversion::isFormatCompressed(mFormat)==false?GLRenderer::getGLType(mFormat):0;
 
 	// Allocate texture memory
 	int level=0,width=mWidth,height=mHeight,depth=mDepth;
-	for(level=0;level<=specifiedMipLevels;++level,width/=2,height/=2,depth/=2){
+	for(level=0;level<specifiedMipLevels;++level,width/=2,height/=2,depth/=2){
 		int rowPitch=ImageFormatConversion::getRowPitch(mFormat,width);
  		int slicePitch=rowPitch*height;
 		TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(slicePitch);
 
 		tbyte *data=NULL;
-		if(mipDatas!=NULL && (level==0 || level<mMipLevels)){
+		if(mipDatas!=NULL && (level==0 || level<mipLevels)){
 			data=mipDatas[level];
 			int alignment=1,pitch=rowPitch;
 			while(pitch>0 && (pitch&1)==0){alignment<<=1;pitch>>=1;}
 			glPixelStorei(GL_PACK_ALIGNMENT,alignment<8?alignment:8);
 		}
+
+		TOADLET_ASSERT(data!=NULL);
 
 		if(ImageFormatConversion::isFormatCompressed(mFormat)==false){
 			switch(mTarget){
@@ -310,9 +315,10 @@ bool GLTexture::load(int width,int height,int depth,int mipLevel,tbyte *mipData)
 	int rowPitch=ImageFormatConversion::getRowPitch(format,width);
 	int slicePitch=rowPitch*height;
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(slicePitch);
-
 	GLint glformat=GLRenderer::getGLFormat(format);
-	GLint gltype=GLRenderer::getGLType(format);
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(glformat);
+	GLint gltype=ImageFormatConversion::isFormatCompressed(mFormat)==false?GLRenderer::getGLType(mFormat):0;
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(gltype);
 
 	int alignment=1,pitch=rowPitch;
 	while((pitch&1)==0){alignment<<=1;pitch>>=1;}
@@ -399,7 +405,7 @@ bool GLTexture::read(int width,int height,int depth,int mipLevel,tbyte *mipData)
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(slicePitch);
 	GLint glformat=GLRenderer::getGLFormat(format);
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(glformat);
-	GLint gltype=GLRenderer::getGLType(format);
+	GLint gltype=ImageFormatConversion::isFormatCompressed(mFormat)==false?GLRenderer::getGLType(mFormat):0;
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(gltype);
 
 	int alignment=1,pitch=rowPitch;

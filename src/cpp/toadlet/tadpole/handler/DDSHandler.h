@@ -41,10 +41,9 @@ public:
 	DDSHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 
 	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData){
-		egg::Collection<egg::image::Image*> mipLevels;
+		egg::Collection<egg::image::Image::ptr> mipLevels;
 		if(mHandler.loadImage(stream,mipLevels)){
-			egg::Logger::warning("TODO: Use all mip levels and such!");
-			return mTextureManager->createTexture(egg::image::Image::ptr(mipLevels[0]));
+			return mTextureManager->createTexture(mipLevels.begin(),peeper::Texture::Usage_BIT_STATIC,mipLevels.size());
 		}
 		else{
 			return NULL;

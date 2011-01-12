@@ -120,7 +120,41 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 	Logger::alert(Categories::TOADLET_PEEPER,
 		"created D3D10Renderer");
 
+	D3D10_RASTERIZER_DESC desc;
+	desc.FillMode=D3D10_FILL_SOLID;
+	desc.CullMode=D3D10_CULL_NONE;
+	desc.FrontCounterClockwise=TRUE;
+	desc.DepthBias=0;
+	desc.DepthBiasClamp=0;
+	desc.SlopeScaledDepthBias=0;
+	desc.DepthClipEnable=TRUE;
+	desc.ScissorEnable=FALSE;
+	desc.MultisampleEnable=FALSE;
+	desc.AntialiasedLineEnable=FALSE;
 
+	ID3D10RasterizerState *state=NULL;
+	mD3DDevice->CreateRasterizerState(&desc,&state);
+	mD3DDevice->RSSetState(state);
+
+	D3D10_DEPTH_STENCIL_DESC ddesc;
+	ddesc.DepthEnable=TRUE;
+	ddesc.DepthWriteMask=D3D10_DEPTH_WRITE_MASK_ALL;
+	ddesc.DepthFunc=D3D10_COMPARISON_LESS;
+	ddesc.StencilEnable=FALSE;
+	ddesc.StencilReadMask=D3D10_DEFAULT_STENCIL_READ_MASK;
+	ddesc.StencilWriteMask=D3D10_DEFAULT_STENCIL_WRITE_MASK;
+	ddesc.FrontFace.StencilFailOp=D3D10_STENCIL_OP_KEEP;
+	ddesc.FrontFace.StencilDepthFailOp=D3D10_STENCIL_OP_KEEP;
+	ddesc.FrontFace.StencilPassOp=D3D10_STENCIL_OP_KEEP;
+	ddesc.FrontFace.StencilFunc=D3D10_COMPARISON_ALWAYS;
+	ddesc.BackFace.StencilFailOp=D3D10_STENCIL_OP_KEEP;
+	ddesc.BackFace.StencilDepthFailOp=D3D10_STENCIL_OP_KEEP;
+	ddesc.BackFace.StencilPassOp=D3D10_STENCIL_OP_KEEP;
+	ddesc.BackFace.StencilFunc=D3D10_COMPARISON_ALWAYS;
+
+	ID3D10DepthStencilState *dstate=NULL;
+	mD3DDevice->CreateDepthStencilState(&ddesc,&dstate);
+	mD3DDevice->OMSetDepthStencilState(dstate,0);
 
 	char *effectstring=
 "float4x4 ShaderMatrix;\n"
@@ -169,6 +203,8 @@ void *create=GetProcAddress(library,"D3D10CreateEffectFromMemory");
 // Obtain the technique
 technique = effect->GetTechniqueByName( "Render" );
 technique->GetPassByIndex( 0 )->GetDesc( &passDesc);
+
+texture=NULL;
 
 	return true;
 }
@@ -506,7 +542,7 @@ void D3D10Renderer::setTextureStage(int stage,TextureStage *textureStage){
 	if(textureStage!=NULL && stage==0 && textureStage->texture!=NULL){
 		texture=((D3D10Texture*)(textureStage->texture->getRootTexture(0)))->mShaderResourceView;
 	}
-	else{
+	else if(stage==0){
 		texture=NULL;
 	}
 
@@ -696,23 +732,20 @@ void D3D10Renderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &
 }
 
 int D3D10Renderer::getClosestTextureFormat(int textureFormat){
-	if(textureFormat==Texture::Format_L_8){
-		return textureFormat;
-	}
-	else if(textureFormat==Texture::Format_LA_8){
-		return textureFormat;
-	}
-	else if(textureFormat==Texture::Format_RGBA_8){
-		return textureFormat;
-	}
-	else if(textureFormat==Texture::Format_RGB_F32){
-		return textureFormat;
-	}
-	else if(textureFormat==Texture::Format_RGBA_F32){
-		return textureFormat;
-	}
-	else{
-		return Texture::Format_RGBA_8;
+	switch(textureFormat){
+		case Texture::Format_L_8:
+		case Texture::Format_LA_8:
+		case Texture::Format_RGBA_8:
+		case Texture::Format_RGB_F32:
+		case Texture::Format_RGBA_F32:
+		case Texture::Format_RGBA_DXT1:
+		case Texture::Format_RGBA_DXT2:
+		case Texture::Format_RGBA_DXT3:
+		case Texture::Format_RGBA_DXT4:
+		case Texture::Format_RGBA_DXT5:
+			return textureFormat;
+		default:
+			return Texture::Format_RGBA_8;
 	}
 }
 
@@ -813,11 +846,13 @@ DXGI_FORMAT D3D10Renderer::getTextureDXGI_FORMAT(int format){
 		case Texture::Format_RGBA_F32:
 			return DXGI_FORMAT_R32G32B32A32_FLOAT;
 		case Texture::Format_RGBA_DXT1:
+		case Texture::Format_RGBA_DXT2:
 			return DXGI_FORMAT_BC1_UNORM;
 		case Texture::Format_RGBA_DXT3:
-			return DXGI_FORMAT_BC3_UNORM;
+		case Texture::Format_RGBA_DXT4:
+			return DXGI_FORMAT_BC2_UNORM;
 		case Texture::Format_RGBA_DXT5:
-			return DXGI_FORMAT_BC5_UNORM;
+			return DXGI_FORMAT_BC3_UNORM;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"D3D10Texture::getDXGI_FORMAT: Invalid type");

@@ -75,11 +75,11 @@ bool D3D9Texture::create(int usage,Dimension dimension,int format,int width,int 
 		return false;
 	}
 
-//	if(format!=mRenderer->getClosestTextureFormat(format)){
-//		Error::unknown(Categories::TOADLET_PEEPER,
-//			"D3D9Texture: Invalid texture format");
-//		return false;
-//	}
+	if(format!=mRenderer->getClosestTextureFormat(format)){
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"D3D9Texture: Invalid texture format");
+		return false;
+	}
 
 	mUsage=usage;
 	mDimension=dimension;
@@ -154,6 +154,7 @@ bool D3D9Texture::createContext(bool restore){
 	mInternalFormat=mRenderer->getClosestTextureFormat(mFormat);
 	mD3DFormat=D3D9Renderer::getD3DFORMAT(mInternalFormat);
 	if(!mRenderer->isD3DFORMATValid(mD3DFormat,mD3DUsage)){
+		Logger::alert("invalid format, using BGRA_8");
 		mInternalFormat=Format_BGRA_8;
 		mD3DFormat=D3DFMT_X8R8G8B8;
 	}

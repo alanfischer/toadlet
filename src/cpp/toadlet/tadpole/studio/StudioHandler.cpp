@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
+#include <toadlet/peeper/CapabilitySet.h>
 #include <toadlet/tadpole/studio/StudioHandler.h>
 
 using namespace toadlet::egg;
@@ -77,6 +78,7 @@ Resource::ptr StudioHandler::load(Stream::ptr stream,const ResourceHandlerData *
 void StudioHandler::buildBuffers(StudioModel *model){
 	int i,j,k,l;
 
+	IndexBufferAccessor iba;
 	int meshCount=0;
 	int vertexCount=0;
 	for(i=0;i<model->header->numbodyparts;++i){
@@ -123,7 +125,25 @@ void StudioHandler::buildBuffers(StudioModel *model){
 						primitive=IndexData::Primitive_TRIFAN;
 					}
 
-					IndexData::ptr indexData(new IndexData(primitive,NULL,vertexCount,l));
+					int numedges=l;
+					int firstedge=vertexCount;
+					IndexData::ptr indexData;
+					if(primitive==IndexData::Primitive_TRIFAN &&
+						(mEngine->getRenderer()==NULL || mEngine->getRenderer()->getCapabilitySet().triangleFan)){
+						indexData=IndexData::ptr(new IndexData(primitive,NULL,firstedge,numedges));
+					}
+					else{
+						int indexes=(numedges-2)*3;
+						IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,indexes);
+						iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
+						for(j=1;j<numedges-1;++j){
+							iba.set((j-1)*3+0,firstedge);
+							iba.set((j-1)*3+1,firstedge+j);
+							iba.set((j-1)*3+2,firstedge+j+1);
+						}
+						iba.unlock();
+						indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexes));
+					}
 					model->meshdatas[meshCount].indexDatas.add(indexData);
 
 					for(;l>0;l--,tricmds+=4){

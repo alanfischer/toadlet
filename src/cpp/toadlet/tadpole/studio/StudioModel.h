@@ -42,8 +42,7 @@ public:
 	StudioModel():
 		data(NULL),
 		header(NULL)
-	{
-	};
+	{}
 	
 	void destroy(){
 		if(data!=NULL){

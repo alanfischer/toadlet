@@ -662,7 +662,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 		VertexBuffer::ptr vertexBuffer;
 		if(bufferManager!=NULL){
 			if(mesh->vertexBoneAssignments.size()>0){
-				vertexBuffer=bufferManager->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,vertexFormat,count);
+				vertexBuffer=bufferManager->createVertexBuffer(Buffer::Usage_BIT_STAGING,Buffer::Access_READ_WRITE,vertexFormat,count);
 			}
 			else{
 				vertexBuffer=bufferManager->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,count);
