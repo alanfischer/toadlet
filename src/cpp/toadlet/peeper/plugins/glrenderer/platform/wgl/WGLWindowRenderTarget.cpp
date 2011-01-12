@@ -230,8 +230,6 @@ bool WGLWindowRenderTarget::destroyContext(){
 	return true;
 }
 
-/// @todo: Have this check the current ThreadID and store it, so we can do nothing if its called on the same thread
-/// multiple times, and add a deactivateAddtionalContext, which would unmake it current and remove that ThreadID
 bool WGLWindowRenderTarget::activateAdditionalContext(){
 	int threadID=System::threadID();
 	int i;
