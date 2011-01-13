@@ -117,6 +117,8 @@ void StudioHandler::buildBuffers(StudioModel *model){
 				short sskin=model->skin(smesh->skinref);
 				studiotexture *stexture=model->texture(sskin);
 
+				model->meshdatas[meshCount].vertexStart=vertexCount;
+
 				short *tricmds=(short*)(model->data+smesh->triindex);
 				while(l=*(tricmds++)){
 					IndexData::ptr indexData;
@@ -143,6 +145,7 @@ void StudioHandler::buildBuffers(StudioModel *model){
 							indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexes));
 						}
 					}
+
 					model->meshdatas[meshCount].indexDatas.add(indexData);
 
 					for(;l>0;l--,tricmds+=4){
