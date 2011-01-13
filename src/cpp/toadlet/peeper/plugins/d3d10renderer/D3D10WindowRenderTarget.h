@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_D3D10WINDOWRENDERTARGET_H
 
 #include "D3D10RenderTarget.h"
+#include "D3D10Texture.h"
 #include <toadlet/peeper/WindowRenderTargetFormat.h>
 
 namespace toadlet{
@@ -68,6 +69,7 @@ protected:
 	HINSTANCE mLibrary;
 	IDXGISwapChain *mSwapChain;
 	ID3D10Device *mD3DDevice;
+	D3D10Texture *mDepthTexture;
 	ID3D10RenderTargetView *mRenderTargetView;
 	ID3D10DepthStencilView *mDepthStencilView;
 	HWND mWindow;
