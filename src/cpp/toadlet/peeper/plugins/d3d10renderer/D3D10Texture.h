@@ -39,7 +39,9 @@ class D3D10Renderer;
 class TOADLET_API D3D10Texture:protected egg::BaseResource,public Texture{
 	TOADLET_BASERESOURCE_PASSTHROUGH(Texture);
 public:
-	D3D10Texture(D3D10Renderer *renderer);
+	// This takes a Device instead of a Renderer so we can use it
+	// in D3D10WindowRenderTarget before a Renderer is constructed.
+	D3D10Texture(ID3D10Device *device);
 
 	virtual ~D3D10Texture();
 
@@ -65,11 +67,13 @@ public:
 	virtual bool load(int width,int height,int depth,int mipLevel,byte *mipData);
 	virtual bool read(int width,int height,int depth,int mipLevel,byte *mipData);
 
+	ID3D10Resource *getD3D10Resource(){return mTexture;}
+
 protected:
 	bool createContext(int mipLevels,byte *mipDatas[]);
 	bool destroyContext();
 
-	D3D10Renderer *mRenderer;
+	ID3D10Device *mDevice;
 
 	int mUsage;
 	Dimension mDimension;

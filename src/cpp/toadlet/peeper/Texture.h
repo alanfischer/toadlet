@@ -42,8 +42,8 @@ public:
 	enum Usage{
 		Usage_NONE=			0,
 		Usage_BIT_STATIC=	1<<0,	// Data is never changed
-		Usage_BIT_STREAM=	1<<1,	// Data changes once per frame
-		Usage_BIT_DYNAMIC=	1<<2,	// Data changes frequently
+		Usage_BIT_STREAM=	1<<1,	// Data changes once per frame or less
+		Usage_BIT_DYNAMIC=	1<<2,	// Data changes multiple times per frame
 		Usage_BIT_STAGING=	1<<3,	// Data is only used for loading, and is lockable
 		Usage_BIT_NPOT_RESTRICTED=	1<<4,	// Texture is a size thats non-power-of-two, but restricted in usage
 		Usage_BIT_RENDERTARGET=		1<<5,	// Texture will have its surfaces used by a SurfaceRenderTarget
