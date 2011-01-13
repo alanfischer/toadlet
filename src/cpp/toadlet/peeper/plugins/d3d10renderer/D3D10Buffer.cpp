@@ -63,7 +63,7 @@ D3D10Buffer::~D3D10Buffer(){
 bool D3D10Buffer::create(int usage,int access,IndexFormat indexFormat,int size){
 	destroy();
 
-	if((usage&Buffer::Usage_BIT_STATIC)>0 && (access&Buffer::Access_BIT_READ)>0){
+	if((usage&(Usage_BIT_STATIC|Usage_BIT_STREAM))>0 && (access&Access_BIT_READ)>0){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
 			"Buffer can not be static and readable");
 		return false;
@@ -77,7 +77,7 @@ bool D3D10Buffer::create(int usage,int access,IndexFormat indexFormat,int size){
 
 	mBindFlags|=D3D10_BIND_INDEX_BUFFER;
 
-	mMapping=(mUsage&Buffer::Usage_BIT_STATIC)==0;
+	mMapping=(mUsage&(Usage_BIT_STATIC|Usage_BIT_STREAM))==0;
 	if(mMapping){
 		createContext();
 	}
@@ -92,9 +92,9 @@ bool D3D10Buffer::create(int usage,int access,IndexFormat indexFormat,int size){
 bool D3D10Buffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int size){
 	destroy();
 
-	if((usage&Buffer::Usage_BIT_STATIC)>0 && (access&Buffer::Access_BIT_READ)>0){
+	if((usage&(Usage_BIT_STATIC|Usage_BIT_STREAM))>0 && (access&Access_BIT_READ)>0){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
-			"Buffer can not be static and readable");
+			"Buffer can not be static or stream and readable");
 		return false;
 	}
 
@@ -107,7 +107,7 @@ bool D3D10Buffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int
 
 	mBindFlags|=D3D10_BIND_VERTEX_BUFFER;
 
-	mMapping=(mUsage&Buffer::Usage_BIT_STATIC)==0;
+	mMapping=(mUsage&(Usage_BIT_STATIC|Usage_BIT_STREAM))==0;
 	if(mMapping){
 		createContext();
 	}
@@ -149,17 +149,17 @@ bool D3D10Buffer::createContext(){
 	if((mUsage&Usage_BIT_STATIC)>0){
 		desc.Usage=D3D10_USAGE_IMMUTABLE;
 	}
-	else if((mUsage&Usage_BIT_DYNAMIC)>0 || (mUsage&Usage_BIT_STREAM)>0){
+	else if((mUsage&Usage_BIT_STREAM)>0){
+		desc.Usage=D3D10_USAGE_DEFAULT;
+	}
+	else if((mUsage&Usage_BIT_DYNAMIC)>0){
 		desc.Usage=D3D10_USAGE_DYNAMIC;
 	}
 	else if((mUsage&Usage_BIT_STAGING)>0){
 		desc.Usage=D3D10_USAGE_STAGING;
 	}
-	else{
-		desc.Usage=D3D10_USAGE_DEFAULT;
-	}
 
-	if((mUsage&Usage_BIT_DYNAMIC)>0 || (mUsage&Usage_BIT_STREAM)>0 || (mUsage&Usage_BIT_STAGING)>0){
+	if((mUsage&(Usage_BIT_DYNAMIC|Usage_BIT_STAGING))>0){
 		if((mAccess&Access_BIT_READ)>0){
 			desc.CPUAccessFlags|=D3D10_CPU_ACCESS_READ;
 		}
@@ -222,6 +222,12 @@ uint8 *D3D10Buffer::lock(int lockAccess){
 		TOADLET_CHECK_D3D10ERROR(result,"D3D10Buffer: Lock");
 	}
 	else{
+		if(mBuffer!=NULL && (mUsage&Usage_BIT_STATIC)>0){
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"re-locking a static buffer");
+			return NULL;
+		}
+
 		if(mData==NULL){
 			mData=new uint8[mDataSize];
 		}
