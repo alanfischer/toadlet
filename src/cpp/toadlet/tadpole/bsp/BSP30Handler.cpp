@@ -323,10 +323,10 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 			int indexes=(face->numedges-2)*3;
 			IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,indexes);
 			iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
-			for(j=1;j<face->numedges-1;++j){
-				iba.set((j-1)*3+0,face->firstedge);
-				iba.set((j-1)*3+1,face->firstedge+j);
-				iba.set((j-1)*3+2,face->firstedge+j+1);
+			for(int edge=1;edge<face->numedges-1;++edge){
+				iba.set((edge-1)*3+0,face->firstedge);
+				iba.set((edge-1)*3+1,face->firstedge+edge);
+				iba.set((edge-1)*3+2,face->firstedge+edge+1);
 			}
 			iba.unlock();
 			indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexes));

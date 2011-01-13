@@ -119,30 +119,29 @@ void StudioHandler::buildBuffers(StudioModel *model){
 
 				short *tricmds=(short*)(model->data+smesh->triindex);
 				while(l=*(tricmds++)){
-					IndexData::Primitive primitive=IndexData::Primitive_TRISTRIP;
-					if(l<0){
-						l=-l;
-						primitive=IndexData::Primitive_TRIFAN;
-					}
-
-					int numedges=l;
-					int firstedge=vertexCount;
 					IndexData::ptr indexData;
-					if(primitive==IndexData::Primitive_TRIFAN &&
-						(mEngine->getRenderer()==NULL || mEngine->getRenderer()->getCapabilitySet().triangleFan)){
-						indexData=IndexData::ptr(new IndexData(primitive,NULL,firstedge,numedges));
+					if(l>0){
+						indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,vertexCount,l));
 					}
 					else{
-						int indexes=(numedges-2)*3;
-						IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,indexes);
-						iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
-						for(j=1;j<numedges-1;++j){
-							iba.set((j-1)*3+0,firstedge);
-							iba.set((j-1)*3+1,firstedge+j);
-							iba.set((j-1)*3+2,firstedge+j+1);
+						l=-l;
+						int numedges=l;
+						int firstedge=vertexCount;
+						if(mEngine->getRenderer()==NULL || mEngine->getRenderer()->getCapabilitySet().triangleFan){
+							indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIFAN,NULL,firstedge,numedges));
 						}
-						iba.unlock();
-						indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexes));
+						else{
+							int indexes=(numedges-2)*3;
+							IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,indexes);
+							iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
+							for(int edge=1;edge<numedges-1;++edge){
+								iba.set((edge-1)*3+0,firstedge);
+								iba.set((edge-1)*3+1,firstedge+edge);
+								iba.set((edge-1)*3+2,firstedge+edge+1);
+							}
+							iba.unlock();
+							indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexes));
+						}
 					}
 					model->meshdatas[meshCount].indexDatas.add(indexData);
 
