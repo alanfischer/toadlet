@@ -224,7 +224,7 @@ bool D3D10Renderer::reset(){
 }
 
 Texture *D3D10Renderer::createTexture(){
-	return new D3D10Texture(this);
+	return new D3D10Texture(mD3DDevice);
 }
 
 PixelBufferRenderTarget *D3D10Renderer::createPixelBufferRenderTarget(){
@@ -853,6 +853,10 @@ DXGI_FORMAT D3D10Renderer::getTextureDXGI_FORMAT(int format){
 			return DXGI_FORMAT_BC2_UNORM;
 		case Texture::Format_RGBA_DXT5:
 			return DXGI_FORMAT_BC3_UNORM;
+		case Texture::Format_DEPTH_16:
+			return DXGI_FORMAT_D16_UNORM;
+		case Texture::Format_DEPTH_24:
+			return DXGI_FORMAT_D24_UNORM_S8_UINT;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"D3D10Texture::getDXGI_FORMAT: Invalid type");

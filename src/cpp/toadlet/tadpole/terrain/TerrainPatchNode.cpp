@@ -164,7 +164,7 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height,bo
 		if(mVertexBuffer!=NULL){
 			mVertexBuffer->destroy();
 		}
-		mVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,numVertexes);
+		mVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,vertexFormat,numVertexes);
 		mVertexData=VertexData::ptr(new VertexData(mVertexBuffer));
 	}
 	if(mIndexBuffer==NULL || mIndexBuffer->getSize()!=numIndexes){
@@ -243,7 +243,7 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height,bo
 			if(mWaterVertexBuffer!=NULL){
 				mWaterVertexBuffer->destroy();
 			}
-			mWaterVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,numVertexes);
+			mWaterVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,vertexFormat,numVertexes);
 			mWaterVertexData=VertexData::ptr(new VertexData(mWaterVertexBuffer));
 		}
 		if(mWaterIndexBuffer==NULL || mWaterIndexBuffer->getSize()!=numIndexes){

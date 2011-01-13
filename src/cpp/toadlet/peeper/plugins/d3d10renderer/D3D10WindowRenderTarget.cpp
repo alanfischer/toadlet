@@ -113,8 +113,6 @@ void D3D10WindowRenderTarget::reset(){
 		mDepthStencilView=NULL;
 	}
 
-//	fillPresentParameters(mPresentParameters);
-
 	mD3DDevice->OMGetRenderTargets(1,&mRenderTargetView,&mDepthStencilView);
 }
 
@@ -144,21 +142,6 @@ bool D3D10WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *f
 	desc.SampleDesc.Count=1;
 	desc.SampleDesc.Quality=0;
 	desc.Windowed=TRUE;
-
-//	void *symbol=GetProcAddress(mLibrary,TOADLET_D3D10_CREATE_DEVICE_NAME);
-//	if(symbol==NULL){
-//		Error::symbolNotFound(Categories::TOADLET_PEEPER,
-//			String("D3D10RenderWindow: Error finding ")+TOADLET_D3D10_CREATE_DEVICE_NAME);
-//		return NULL;
-//	}
-
-//	typedef HRESULT(WINAPI *D3D10CreateDevice)(IDXGIAdapter *pAdapter,D3D10_DRIVER_TYPE DriverType,HMODULE Software,UINT Flags,UINT SDKVersion,ID3D10Device **ppDevice);
-//	result=((D3D10CreateDevice)symbol)(NULL,D3D10_DRIVER_TYPE_HARDWARE,NULL,0,D3D10_SDK_VERSION,&mD3DDevice);
-//	if(FAILED(result) || mD3DDevice==NULL){
-//		Error::unknown(Categories::TOADLET_PEEPER,
-//			"D3D10RenderWindow: Error creating D3D10Device object");
-//		return false;
-//	}
 
 	void *symbol=GetProcAddress(mLibrary,TOADLET_D3D10_CREATE_DEVICE_AND_SWAP_CHAIN_NAME);
 	if(symbol==NULL){
@@ -194,14 +177,15 @@ bool D3D10WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *f
 //	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
 //		String("D3D Description:") + identifier.Description);
 
-//	fillPresentParameters(mPresentParameters);
-
 	ID3D10Texture2D *texture;
 	mSwapChain->GetBuffer(0,__uuidof(texture),(void**)&texture);
+	D3D10_TEXTURE2D_DESC textureDesc;
+	texture->GetDesc(&textureDesc);
 	mD3DDevice->CreateRenderTargetView(texture,NULL,&mRenderTargetView);
-//	mD3DDevice->CreateDepthStencilView(texture,NULL,&mDepthStencilView);
 
-//	mD3DDevice->OMGetRenderTargets(1,&mRenderTargetView,&mDepthStencilView);
+	mDepthTexture=new D3D10Texture(mD3DDevice);
+	mDepthTexture->create(Texture::Usage_BIT_RENDERTARGET,Texture::Dimension_D2,Texture::Format_DEPTH_16,textureDesc.Width,textureDesc.Height,0,1,NULL);
+	mD3DDevice->CreateDepthStencilView(mDepthTexture->getD3D10Resource(),NULL,&mDepthStencilView);
 
 	return true;
 }
@@ -217,6 +201,11 @@ bool D3D10WindowRenderTarget::destroyContext(){
 		mDepthStencilView=NULL;
 	}
 
+	if(mDepthTexture!=NULL){
+		delete mDepthTexture;
+		mDepthTexture=NULL;
+	}
+
 	if(mD3DDevice!=NULL){
 		mD3DDevice->Release();
 		mD3DDevice=NULL;
@@ -229,30 +218,6 @@ bool D3D10WindowRenderTarget::destroyContext(){
 
 	return true;
 }
-/*
-void D3D10WindowRenderTarget::fillPresentParameters(D3DPRESENT_PARAMETERS &presentParameters){
-	RECT rect={0};
-	GetClientRect(mWindow,&rect);
-	mWidth=rect.right-rect.left;
-	mHeight=rect.bottom-rect.top;
 
-	memset(&presentParameters,0,sizeof(presentParameters));
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		presentParameters.AutoDepthStencilFormat=D3DMFMT_D16;
-		presentParameters.EnableAutoDepthStencil=TRUE;
-		presentParameters.Windowed			=TRUE;
-		presentParameters.SwapEffect		=D3DMSWAPEFFECT_DISCARD;
-		presentParameters.BackBufferFormat	=D3DMFMT_UNKNOWN;
-	#else
-		presentParameters.AutoDepthStencilFormat=D3DFMT_D24S8;
-		presentParameters.EnableAutoDepthStencil=TRUE;
-		presentParameters.Windowed			=TRUE;
-		presentParameters.SwapEffect		=D3DSWAPEFFECT_DISCARD;
-		presentParameters.BackBufferWidth	=mWidth;
-		presentParameters.BackBufferHeight	=mHeight;
-		presentParameters.BackBufferFormat	=D3DFMT_X8R8G8B8;
-	#endif
-}
-*/
 }
 }

@@ -39,9 +39,8 @@ public:
 	enum Usage{
 		Usage_NONE=			0,
 		Usage_BIT_STATIC=	1<<0,	// Data is never changed
-		/// @todo: Remove STREAM and just use DYNAMIC.  It is only applicable in OpenGL
-		Usage_BIT_STREAM=	1<<1,	// Data changes once per frame
-		Usage_BIT_DYNAMIC=	1<<2,	// Data changes frequently
+		Usage_BIT_STREAM=	1<<1,	// Data changes once per frame or less
+		Usage_BIT_DYNAMIC=	1<<2,	// Data changes multiple times per frame
 		Usage_BIT_STAGING=	1<<3,	// Data is only used for loading, and is lockable
 	};
 
