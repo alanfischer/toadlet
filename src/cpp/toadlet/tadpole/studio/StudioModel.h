@@ -75,6 +75,7 @@ public:
 	studiobonecontroller *bonecontroller(int i){return &((studiobonecontroller*)(data+header->bonecontrollerindex))[i];}
 
 	struct meshdata{
+		int vertexStart;
 		egg::Collection<peeper::IndexData::ptr> indexDatas;
 	};
 
