@@ -144,7 +144,7 @@ Logger::alert(String("Opening resource:")+name);
 	}
 
 	tbyte *imageData=image->getData();
-	int imageStride=textureWidth*image->getPixelSize();
+	int imageStride=image->getRowPitch();
 	/// @todo: Figure out bitmapStride
 	int bitmapStride=imageStride;//((imageWidth*2+sizeof(DWORD)-1)>>2)<<2; // stride is in DWORDs
 

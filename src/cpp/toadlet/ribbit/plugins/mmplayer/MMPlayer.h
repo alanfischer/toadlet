@@ -50,7 +50,7 @@ public:
 	virtual ~MMPlayer();
 
 	bool create(int *options);
-	bool destroy();
+	void destroy();
 
 	AudioBuffer *createAudioBuffer();
 	Audio *createBufferedAudio();

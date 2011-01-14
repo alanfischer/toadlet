@@ -25,7 +25,7 @@
 
 #include "D3D10Renderer.h"
 #include "D3D10Texture.h"
-#include "D3D10Surface.h"
+#include "D3D10PixelBuffer.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 
@@ -35,8 +35,8 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-D3D10Texture::D3D10Texture(D3D10Renderer *renderer):BaseResource(),
-	mRenderer(NULL),
+D3D10Texture::D3D10Texture(ID3D10Device *device):BaseResource(),
+	mDevice(NULL),
 
 	mUsage(0),
 	mDimension(Dimension_UNKNOWN),
@@ -49,7 +49,7 @@ D3D10Texture::D3D10Texture(D3D10Renderer *renderer):BaseResource(),
 	mTexture(NULL),
 	mShaderResourceView(NULL)
 {
-	mRenderer=renderer;
+	mDevice=device;
 }
 
 D3D10Texture::~D3D10Texture(){
@@ -100,14 +100,20 @@ void D3D10Texture::destroy(){
 }
 
 bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
-	ID3D10Device *device=mRenderer->getD3D10Device();
+	ID3D10Device *device=mDevice;
 
-	D3D10_USAGE d3dUsage=D3D10_USAGE_DEFAULT;
+	D3D10_USAGE d3dUsage=(D3D10_USAGE)0;
 	if((mUsage&Usage_BIT_STATIC)>0){
 		d3dUsage=D3D10_USAGE_IMMUTABLE;
 	}
 	else if((mUsage&Usage_BIT_STREAM)>0){
+		d3dUsage=D3D10_USAGE_DEFAULT;
+	}
+	else if((mUsage&Usage_BIT_DYNAMIC)>0){
 		d3dUsage=D3D10_USAGE_DYNAMIC;
+	}
+	else if((mUsage&Usage_BIT_STAGING)>0){
+		d3dUsage=D3D10_USAGE_STAGING;
 	}
 
 	int cpuFlags=0;
@@ -119,10 +125,19 @@ bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
 //	}
 
 	int miscFlags=0;
-	int bindFlags=D3D10_BIND_SHADER_RESOURCE;
+	int bindFlags=0;
+
 	if((mUsage&(Usage_BIT_AUTOGEN_MIPMAPS|Usage_BIT_RENDERTARGET))==(Usage_BIT_AUTOGEN_MIPMAPS|Usage_BIT_RENDERTARGET)){
 		miscFlags|=D3D10_RESOURCE_MISC_GENERATE_MIPS;
 		bindFlags|=D3D10_BIND_RENDER_TARGET;
+	}
+
+	/// @todo: Why can't I have a depth & shader resource?
+	if((mFormat&Format_BIT_DEPTH)>0){
+		bindFlags|=D3D10_BIND_DEPTH_STENCIL;
+	}
+	else{
+		bindFlags|=D3D10_BIND_SHADER_RESOURCE;
 	}
 
 	DXGI_FORMAT dxgiFormat=D3D10Renderer::getTextureDXGI_FORMAT(mFormat);
@@ -135,7 +150,7 @@ bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
 		int i;
 		for(i=0;i<numMipDatas;++i){
 			sData[i].pSysMem=mipDatas[i];
-			sData[i].SysMemPitch=ImageFormatConversion::getPixelSize(mFormat)*hwidth;
+			sData[i].SysMemPitch=ImageFormatConversion::getRowPitch(mFormat,hwidth);
 			sData[i].SysMemSlicePitch=sData[i].SysMemPitch*hheight;
 
 			hwidth/=2;hheight/=2;hdepth/=2;
@@ -199,7 +214,7 @@ bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
 		}break;
 	}
 
-	if(SUCCEEDED(result)){
+	if(SUCCEEDED(result) && (mFormat&Format_BIT_DEPTH)==0){
 		result=device->CreateShaderResourceView(mTexture,NULL,&mShaderResourceView);
 	}
 
@@ -225,7 +240,7 @@ bool D3D10Texture::destroyContext(){
 	return SUCCEEDED(result);
 }
 
-Surface::ptr D3D10Texture::getMipSurface(int level,int cubeSide){
+PixelBuffer::ptr D3D10Texture::getMipPixelBuffer(int level,int cubeSide){
 	/// @todo: Check our cached list of SubTextures, and if the requested one isn't available, create it, and then return it.
 	return NULL;
 }
@@ -243,10 +258,10 @@ bool D3D10Texture::load(int width,int height,int depth,int mipLevel,byte *mipDat
 		return false;
 	}
 
-	ID3D10Device *device=mRenderer->getD3D10Device();
+	ID3D10Device *device=mDevice;
 
 	int format=mFormat;
-	int rowPitch=ImageFormatConversion::getPixelSize(format)*width;
+	int rowPitch=ImageFormatConversion::getRowPitch(format,width);
 	int slicePitch=rowPitch*height;
 	int subresource=D3D10CalcSubresource(mipLevel,0,0);
 	device->UpdateSubresource(mTexture,subresource,NULL,mipData,rowPitch,slicePitch);

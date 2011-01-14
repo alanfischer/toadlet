@@ -267,7 +267,7 @@ Resource::ptr Win32FontHandler::load(Stream::ptr stream,const ResourceHandlerDat
 	}
 	
 	tbyte *imageData=image->getData();
-	int imageStride=textureWidth*image->getPixelSize();
+	int imageStride=image->getRowPitch();
 	int bitmapStride=((textureWidth*2+sizeof(DWORD)-1)>>2)<<2; // stride is in DWORDs
 
 	// Flip the bitmap and copy it into the image

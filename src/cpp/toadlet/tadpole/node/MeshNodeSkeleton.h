@@ -120,6 +120,7 @@ public:
 
 	Material *getRenderMaterial() const{return mMaterial;}
 	Transform *getRenderTransform() const;
+	Bound *getRenderBound() const;
 	void render(peeper::Renderer *renderer) const;
 
 protected:

@@ -55,8 +55,8 @@ public:
 	Bound(Bound *bound):
 		mType(bound->mType),
 		mEpsilon(Math::fromMilli(1)),
-		mBox(bound->mBox),
-		mSphere(bound->mSphere)
+		mSphere(bound->mSphere),
+		mBox(bound->mBox)
 	{}
 
 	Bound(const AABox &box):
@@ -73,8 +73,8 @@ public:
 	
 	void reset(){
 		mType=Type_AABOX;
-		mBox.reset();
 		mSphere.reset();
+		mBox.reset();
 	}
 
 	void set(Bound *b){
@@ -85,8 +85,8 @@ public:
 
 	void setInfinite(){
 		mType=Type_INFINITE; 
-		mBox.reset();
 		mSphere.reset();
+		mBox.reset();
 	}
 
 	void set(const Sphere &s){
@@ -208,8 +208,13 @@ protected:
 		switch(mType){
 			case Type_AABOX:
 				Math::findBoundingSphere(mSphere,mBox);
+			break;
 			case Type_SPHERE:
 				Math::findBoundingBox(mBox,mSphere);
+			break;
+			case Type_INFINITE:
+				// Nothing
+			break;
 		}
 	}
 

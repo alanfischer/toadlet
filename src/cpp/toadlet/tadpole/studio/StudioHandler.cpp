@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
+#include <toadlet/peeper/CapabilitySet.h>
 #include <toadlet/tadpole/studio/StudioHandler.h>
 
 using namespace toadlet::egg;
@@ -77,6 +78,7 @@ Resource::ptr StudioHandler::load(Stream::ptr stream,const ResourceHandlerData *
 void StudioHandler::buildBuffers(StudioModel *model){
 	int i,j,k,l;
 
+	IndexBufferAccessor iba;
 	int meshCount=0;
 	int vertexCount=0;
 	for(i=0;i<model->header->numbodyparts;++i){
@@ -115,15 +117,35 @@ void StudioHandler::buildBuffers(StudioModel *model){
 				short sskin=model->skin(smesh->skinref);
 				studiotexture *stexture=model->texture(sskin);
 
+				model->meshdatas[meshCount].vertexStart=vertexCount;
+
 				short *tricmds=(short*)(model->data+smesh->triindex);
 				while(l=*(tricmds++)){
-					IndexData::Primitive primitive=IndexData::Primitive_TRISTRIP;
-					if(l<0){
+					IndexData::ptr indexData;
+					if(l>0){
+						indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,vertexCount,l));
+					}
+					else{
 						l=-l;
-						primitive=IndexData::Primitive_TRIFAN;
+						int numedges=l;
+						int firstedge=vertexCount;
+						if(mEngine->getRenderer()==NULL || mEngine->getRenderer()->getCapabilitySet().triangleFan){
+							indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIFAN,NULL,firstedge,numedges));
+						}
+						else{
+							int indexes=(numedges-2)*3;
+							IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,indexes);
+							iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
+							for(int edge=1;edge<numedges-1;++edge){
+								iba.set((edge-1)*3+0,firstedge);
+								iba.set((edge-1)*3+1,firstedge+edge);
+								iba.set((edge-1)*3+2,firstedge+edge+1);
+							}
+							iba.unlock();
+							indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexes));
+						}
 					}
 
-					IndexData::ptr indexData(new IndexData(primitive,NULL,vertexCount,l));
 					model->meshdatas[meshCount].indexDatas.add(indexData);
 
 					for(;l>0;l--,tricmds+=4){

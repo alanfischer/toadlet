@@ -34,8 +34,12 @@ WGLRenderTarget::WGLRenderTarget():GLRenderTarget(),
 	mDC(0)
 {}
 
-bool WGLRenderTarget::makeCurrent(){
+bool WGLRenderTarget::activate(){
 	return wglMakeCurrent(mDC,mGLRC)==TRUE;
+}
+
+bool WGLRenderTarget::deactivate(){
+	return wglMakeCurrent(NULL,NULL)==TRUE;
 }
 
 bool WGLRenderTarget::wglIsExtensionSupported(const char *extension){

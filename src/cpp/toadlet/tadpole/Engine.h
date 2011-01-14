@@ -56,7 +56,7 @@ namespace tadpole{
 
 class TOADLET_API Engine{
 public:
-	Engine();
+	Engine(bool backable=false);
 	virtual ~Engine();
 
 	void destroy();

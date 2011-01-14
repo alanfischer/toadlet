@@ -27,7 +27,6 @@
 #define TOADLET_TADPOLE_H
 
 #include <toadlet/tadpole/ArchiveManager.h>
-#include <toadlet/tadpole/AudioBufferData.h>
 #include <toadlet/tadpole/BoundingVolumeSensor.h>
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/Collision.h>

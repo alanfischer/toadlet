@@ -46,13 +46,15 @@ public:
 
 	// Startup/Shutdown
 	bool create(RenderTarget *target,int *options);
-	bool destroy();
+	void destroy();
 	RendererStatus getStatus();
 	bool reset();
+	bool activateAdditionalContext(){return true;} /// @todo: Check for threaded support
 
 	// Resource operations
 	Texture *createTexture();
-	SurfaceRenderTarget *createSurfaceRenderTarget();
+	PixelBufferRenderTarget *createPixelBufferRenderTarget();
+	PixelBuffer *createPixelBuffer();
 	VertexFormat *createVertexFormat();
 	VertexBuffer *createVertexBuffer();
 	IndexBuffer *createIndexBuffer();
@@ -75,7 +77,9 @@ public:
 	void beginScene();
 	void endScene();
 	void renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData);
-	bool copyToSurface(Surface *surface);
+	bool copyFrameBufferToPixelBuffer(PixelBuffer *dst);
+	bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src);
+	bool copySurface(IDirect3DSurface9 *dst,IDirect3DSurface9 *src);
 
 	// Render state operations
 	void setDefaultStates();

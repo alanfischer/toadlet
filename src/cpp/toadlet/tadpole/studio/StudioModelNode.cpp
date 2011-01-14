@@ -139,7 +139,7 @@ void StudioModelNode::setModel(StudioModel::ptr model){
 	mTransformedNorms.resize(MAXSTUDIOVERTS);
 	mTransformedChromes.resize(MAXSTUDIOVERTS);
 
-	mVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,model->vertexCount);
+	mVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,model->vertexCount);
 	mVertexData=VertexData::ptr(new VertexData(mVertexBuffer));
 
 	createSubModels();
@@ -388,11 +388,10 @@ void StudioModelNode::updateVertexes(StudioModel *model,int bodypartsIndex,int m
 		float s=1.0f/(float)stexture->width;
 		float t=1.0f/(float)stexture->height;
 
+		int vertexCount=mdata->vertexStart;
 		int indexDataCount=0;
 		short *tricmds=(short*)(model->data+smesh->triindex);
 		while(l=*(tricmds++)){
-			int vertexCount=mdata->indexDatas[indexDataCount++]->start;
-
 			if(l<0){
 				l=-l;
 			}
@@ -606,7 +605,7 @@ void StudioModelNode::createSkeletonBuffers(){
 		}
 	}
 
-	VertexBuffer::ptr skeletonVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION,mModel->header->numbones);
+	VertexBuffer::ptr skeletonVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION,mModel->header->numbones);
 	IndexBuffer::ptr skeletonIndexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,indexCount);
 
 	iba.lock(skeletonIndexBuffer);
@@ -626,7 +625,7 @@ void StudioModelNode::createSkeletonBuffers(){
 	mSkeletonVertexData=VertexData::ptr(new VertexData(mSkeletonVertexBuffer));
 	mSkeletonIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,skeletonIndexBuffer));
 
-	VertexBuffer::ptr hitBoxVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION,mModel->header->numhitboxes*8);
+	VertexBuffer::ptr hitBoxVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION,mModel->header->numhitboxes*8);
 
 	mHitBoxVertexBuffer=hitBoxVertexBuffer;
 	mHitBoxVertexData=VertexData::ptr(new VertexData(mHitBoxVertexBuffer));

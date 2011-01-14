@@ -26,6 +26,7 @@
 #include "WGLWindowRenderTarget.h"
 #include <toadlet/egg/image/ImageFormatConversion.h>
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/System.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::image;
@@ -33,30 +34,36 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_WGLWindowRenderTarget(HWND wnd,const Visual &visual){
-	return new WGLWindowRenderTarget(wnd,visual,0);
+TOADLET_C_API RenderTarget *new_WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format){
+	return new WGLWindowRenderTarget(wnd,format);
 }
 
 WGLWindowRenderTarget::WGLWindowRenderTarget():WGLRenderTarget(),
 	mWnd(NULL)
-	//mPFD
+	//mPFD,
+	//mThreadContexts,
+	//mThreadIDs
 {}
 
-WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,const Visual &visual,int pixelFormat):WGLRenderTarget(),
+WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format):WGLRenderTarget(),
 	mWnd(NULL)
-	//mPFD
+	//mPFD,
+	//mThreadContexts,
+	//mThreadIDs
 {
-	if(pixelFormat==0 && visual.multisamples>1){
+	int winPixelFormat=0;
+
+	if(format->visual.multisamples>1){
 		HWND tmpWnd=CreateWindow(TEXT("Static"),NULL,0,0,0,0,0,0,0,0,0);
-		bool result=createContext(tmpWnd,visual,pixelFormat);
+		bool result=createContext(tmpWnd,format,winPixelFormat);
 
 		PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB=NULL;
 		if(result && wglIsExtensionSupported("WGL_ARB_multisample") && (wglChoosePixelFormatARB=(PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB"))!=NULL){
-			int format=visual.pixelFormat;
-			int redBits=ImageFormatConversion::getRedBits(format);
-			int greenBits=ImageFormatConversion::getGreenBits(format);
-			int blueBits=ImageFormatConversion::getBlueBits(format);
-			int alphaBits=ImageFormatConversion::getAlphaBits(format);
+			int pixelFormat=format->visual.pixelFormat;
+			int redBits=ImageFormatConversion::getRedBits(pixelFormat);
+			int greenBits=ImageFormatConversion::getGreenBits(pixelFormat);
+			int blueBits=ImageFormatConversion::getBlueBits(pixelFormat);
+			int alphaBits=ImageFormatConversion::getAlphaBits(pixelFormat);
 			int colorBits=checkDefaultColorBits(redBits+blueBits+greenBits);
 
 			unsigned int numFormats;
@@ -67,17 +74,17 @@ WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,const Visual &visual,int p
 				WGL_ACCELERATION_ARB,	WGL_FULL_ACCELERATION_ARB,
 				WGL_COLOR_BITS_ARB,		colorBits,
 				WGL_ALPHA_BITS_ARB,		alphaBits,
-				WGL_DEPTH_BITS_ARB,		visual.depthBits,
-				WGL_STENCIL_BITS_ARB,	visual.stencilBits,
+				WGL_DEPTH_BITS_ARB,		format->visual.depthBits,
+				WGL_STENCIL_BITS_ARB,	format->visual.stencilBits,
 				WGL_DOUBLE_BUFFER_ARB,	GL_TRUE,
 				WGL_SAMPLE_BUFFERS_ARB,	GL_TRUE,
-				WGL_SAMPLES_ARB,		visual.multisamples,
+				WGL_SAMPLES_ARB,		format->visual.multisamples,
 				0,0};
 			const int sampleIndex=19;
 
 			BOOL valid=false;
 			do{
-				valid=wglChoosePixelFormatARB(mDC,iAttributes,fAttributes,1,&pixelFormat,&numFormats);
+				valid=wglChoosePixelFormatARB(mDC,iAttributes,fAttributes,1,&winPixelFormat,&numFormats);
 				iAttributes[sampleIndex]/=2;
 			}while(valid==false && iAttributes[sampleIndex]>1);
 		}
@@ -86,14 +93,14 @@ WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,const Visual &visual,int p
 		DestroyWindow(tmpWnd);
 	}
 
-	createContext(wnd,visual,pixelFormat);
+	createContext(wnd,format,winPixelFormat);
 }
 
 WGLWindowRenderTarget::~WGLWindowRenderTarget(){
 	destroyContext();
 }
 
-bool WGLWindowRenderTarget::createContext(HWND wnd,const Visual &visual,int pixelFormat){
+bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *format,int winPixelFormat){
 	BOOL result=0;
 
 	mWnd=wnd;
@@ -104,12 +111,12 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,const Visual &visual,int pixe
 		return false;
 	}
 
-	if(pixelFormat==0){
-		int format=visual.pixelFormat;
-		int redBits=ImageFormatConversion::getRedBits(format);
-		int greenBits=ImageFormatConversion::getGreenBits(format);
-		int blueBits=ImageFormatConversion::getBlueBits(format);
-		int alphaBits=ImageFormatConversion::getAlphaBits(format);
+	if(winPixelFormat==0){
+		int pixelFormat=format->visual.pixelFormat;
+		int redBits=ImageFormatConversion::getRedBits(pixelFormat);
+		int greenBits=ImageFormatConversion::getGreenBits(pixelFormat);
+		int blueBits=ImageFormatConversion::getBlueBits(pixelFormat);
+		int alphaBits=ImageFormatConversion::getAlphaBits(pixelFormat);
 		int colorBits=checkDefaultColorBits(redBits+blueBits+greenBits);
 
 		PIXELFORMATDESCRIPTOR pfd={0};
@@ -119,15 +126,15 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,const Visual &visual,int pixe
 		pfd.iPixelType=PFD_TYPE_RGBA;
 		pfd.cColorBits=colorBits;
 		pfd.cAlphaBits=alphaBits;
-		pfd.cDepthBits=visual.depthBits;
-		pfd.cStencilBits=visual.stencilBits;
+		pfd.cDepthBits=format->visual.depthBits;
+		pfd.cStencilBits=format->visual.stencilBits;
 		pfd.iLayerType=PFD_MAIN_PLANE;
 		mPFD=pfd;
 
-		pixelFormat=ChoosePixelFormat(mDC,&mPFD);
+		winPixelFormat=ChoosePixelFormat(mDC,&mPFD);
 	}
 
-	result=SetPixelFormat(mDC,pixelFormat,&mPFD);
+	result=SetPixelFormat(mDC,winPixelFormat,&mPFD);
 	if(result==0){
 		destroyContext();
 		Error::unknown(Categories::TOADLET_PEEPER,
@@ -156,7 +163,7 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,const Visual &visual,int pixe
 			(PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
 
 		if(wglSwapIntervalEXT!=NULL){
-			wglSwapIntervalEXT((int)visual.vsync);
+			wglSwapIntervalEXT((int)format->visual.vsync);
 		}
 	}
 
@@ -169,10 +176,41 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,const Visual &visual,int pixe
 		return false;
 	}
 
+	int numThreads=format->threads<=1?0:format->threads-1;
+	mThreadContexts.resize(numThreads,0);
+	mThreadIDs.resize(numThreads,0);
+	int i;
+	for(i=0;i<numThreads;++i){
+		HGLRC glrc=wglCreateContext(mDC);
+		if(glrc==0){
+			destroyContext();
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"Failed to create threaded GL rendering context");
+			return false;
+		}
+		mThreadContexts[i]=glrc;
+		result=wglShareLists(mGLRC,glrc);
+		if(result==FALSE){
+			destroyContext();
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"Failed to share threaded GL rendering context");
+			return false;
+		}
+	}
+
 	return true;
 }
 
 bool WGLWindowRenderTarget::destroyContext(){
+	int i;
+	for(i=0;i<mThreadContexts.size();++i){
+		if(mThreadContexts[i]!=0){
+			wglDeleteContext(mThreadContexts[i]);
+		}
+	}
+	mThreadContexts.clear();
+	mThreadIDs.clear();
+
 	if(mGLRC!=0){
 		wglMakeCurrent(NULL,NULL);
 		wglDeleteContext(mGLRC);
@@ -190,6 +228,47 @@ bool WGLWindowRenderTarget::destroyContext(){
 	}
 
 	return true;
+}
+
+bool WGLWindowRenderTarget::activateAdditionalContext(){
+	int threadID=System::threadID();
+	int i;
+	for(i=0;i<mThreadIDs.size();++i){
+		if(mThreadIDs[i]==threadID){
+			return false;
+		}
+	}
+
+	for(i=0;i<mThreadIDs.size();++i){
+		if(mThreadIDs[i]==0){
+			break;
+		}
+	}
+	if(i==mThreadIDs.size()){
+		return false;
+	}
+
+	BOOL result=wglMakeCurrent(mDC,mThreadContexts[i]);
+	if(result==TRUE){
+		mThreadIDs[i]=threadID;
+	}
+	return result==TRUE;
+}
+
+void WGLWindowRenderTarget::deactivateAdditionalContext(){
+	int threadID=System::threadID();
+	int i;
+	for(i=0;i<mThreadIDs.size();++i){
+		if(mThreadIDs[i]==threadID){
+			break;
+		}
+	}
+	if(i==mThreadIDs.size()){
+		return;
+	}
+
+	wglMakeCurrent(mDC,NULL);
+	mThreadIDs[i]=0;
 }
 
 bool WGLWindowRenderTarget::swap(){

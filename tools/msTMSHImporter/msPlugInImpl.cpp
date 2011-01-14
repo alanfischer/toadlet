@@ -228,9 +228,9 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 			}
 
 			for(j=0;j<iba.getSize();j+=3){
-				int i1=oldToNewMap[iba.get(j+0)];
-				int i2=oldToNewMap[iba.get(j+1)];
-				int i3=oldToNewMap[iba.get(j+2)];
+				int i1=oldToNewMap[(int)iba.get(j+0)];
+				int i2=oldToNewMap[(int)iba.get(j+1)];
+				int i3=oldToNewMap[(int)iba.get(j+2)];
 
 				msTriangle *triangle=msMesh_GetTriangleAt(msmesh,msMesh_AddTriangle(msmesh));
 				word inds[3]={i1,i2,i3};

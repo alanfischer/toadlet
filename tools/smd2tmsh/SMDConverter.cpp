@@ -286,7 +286,7 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 			const String &materialName=materialIndexLists.at(j).first;
 			const Collection<int> &indexList=materialIndexLists.at(j).second;
 
-			IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT_16,indexList.size());
+			IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,indexList.size());
 			{
 				IndexBufferAccessor iba(indexBuffer);
 

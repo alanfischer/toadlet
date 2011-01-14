@@ -272,10 +272,10 @@ Image::ptr TextureManager::createImage(Texture *texture){
 	return image;
 }
 
-SurfaceRenderTarget::ptr TextureManager::createSurfaceRenderTarget(){
+PixelBufferRenderTarget::ptr TextureManager::createPixelBufferRenderTarget(){
 	/// @todo: Make this use a BackableSufaceRenderTarget
 	if(mEngine->getRenderer()!=NULL){
-		SurfaceRenderTarget::ptr back(mEngine->getRenderer()->createSurfaceRenderTarget());
+		PixelBufferRenderTarget::ptr back(mEngine->getRenderer()->createPixelBufferRenderTarget());
 		if(back!=NULL){
 			back->create();
 		}
@@ -306,6 +306,8 @@ void TextureManager::contextDeactivate(peeper::Renderer *renderer){
 }
 
 void TextureManager::preContextReset(peeper::Renderer *renderer){
+	Logger::debug("TextureManager::preContextReset");
+
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
@@ -316,6 +318,8 @@ void TextureManager::preContextReset(peeper::Renderer *renderer){
 }
 
 void TextureManager::postContextReset(peeper::Renderer *renderer){
+	Logger::debug("TextureManager::postContextReset");
+
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);

@@ -23,27 +23,45 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_SURFACE_H
-#define TOADLET_PEEPER_SURFACE_H
+#ifndef TOADLET_TADPOLE_HANDLER_DDSHANDLER_H
+#define TOADLET_TADPOLE_HANDLER_DDSHANDLER_H
 
-#include <toadlet/peeper/Buffer.h>
+#include <toadlet/egg/image/DDSHandler.h>
+#include <toadlet/peeper/Texture.h>
+#include <toadlet/tadpole/ResourceHandler.h>
 
 namespace toadlet{
-namespace peeper{
+namespace tadpole{
+namespace handler{
 
-class TOADLET_API Surface:public Buffer{
+class TOADLET_API DDSHandler:public ResourceHandler{
 public:
-	TOADLET_SHARED_POINTERS(Surface);
+	TOADLET_SHARED_POINTERS(DDSHandler);
 
-	virtual ~Surface(){}
+	DDSHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 
-	virtual Surface *getRootSurface()=0;
+	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData){
+		egg::Collection<egg::image::Image::ptr> mipLevels;
+		if(mHandler.loadImage(stream,mipLevels)){
+			return mTextureManager->createTexture(mipLevels.begin(),peeper::Texture::Usage_BIT_STATIC,mipLevels.size());
+		}
+		else{
+			return NULL;
+		}
+	}
 
-	virtual int getWidth() const=0;
-	virtual int getHeight() const=0;
+	bool save(peeper::Texture::ptr resource,egg::io::Stream::ptr stream){
+		return mHandler.saveImage(mTextureManager->createImage(resource),stream);
+	}
+
+protected:
+	TextureManager *mTextureManager;
+	egg::image::DDSHandler mHandler;
 };
 
 }
 }
+}
 
 #endif
+

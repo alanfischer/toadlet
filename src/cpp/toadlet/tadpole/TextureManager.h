@@ -29,7 +29,7 @@
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/BackableTexture.h>
-#include <toadlet/peeper/SurfaceRenderTarget.h>
+#include <toadlet/peeper/PixelBufferRenderTarget.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -44,7 +44,7 @@ public:
 	peeper::Texture::ptr createTexture(egg::image::Image::ptr images[],int usage,int mipLevels);
 	peeper::Texture::ptr createTexture(int usage,peeper::Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels);
 	egg::image::Image::ptr createImage(peeper::Texture *texture);
-	peeper::SurfaceRenderTarget::ptr createSurfaceRenderTarget();
+	peeper::PixelBufferRenderTarget::ptr createPixelBufferRenderTarget();
 
 	peeper::Texture::ptr findTexture(const egg::String &name){return egg::shared_static_cast<peeper::Texture>(ResourceManager::find(name));}
 

@@ -23,59 +23,54 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "D3D9Surface.h"
+#include "GLTextureMipPixelBuffer.h"
+#include "GLTexture.h"
+#include "GLRenderer.h"
+
+using namespace toadlet::egg::image;
 
 namespace toadlet{
 namespace peeper{
 
-D3D9Surface::D3D9Surface(IDirect3DSurface9 *surface):
-	mSurface(NULL)
+GLTextureMipPixelBuffer::GLTextureMipPixelBuffer(GLTexture *texture,GLuint level,GLuint cubeSide):GLPixelBuffer(),
+	mTexture(NULL),
+	mLevel(0),
+	mCubeSide(0),
+	mDataSize(0),
+	mWidth(0),mHeight(0),mDepth(0)
 {
-	mSurface=surface;
+	mTexture=texture;
+	mLevel=level;
+	mCubeSide=cubeSide;
 
-	D3DSURFACE_DESC desc;
-	mSurface->GetDesc(&desc);
-	mWidth=desc.Width;
-	mHeight=desc.Height;
-}
-
-D3D9Surface::~D3D9Surface(){
-	destroy();
-}
-
-bool D3D9Surface::destroy(){
-	if(mSurface!=NULL){
-		mSurface->Release();
-		mSurface=NULL;
+	int l=level;
+	int w=texture->getWidth(),h=texture->getHeight(),d=texture->getDepth();
+	while(l>0){
+		w/=2; h/=2; d/=2;
+		l--;
 	}
+	mWidth=w;
+	mHeight=h;
+	mDepth=d;
 
-	return true;
+	mDataSize=ImageFormatConversion::getRowPitch(texture->getFormat(),mWidth)*mHeight*mDepth;
 }
 
-uint8 *D3D9Surface::lock(int lockAccess){
-	D3DLOCKED_RECT d3drect={0};
-
-	RECT rect={0};
-	rect.top=0;
-	rect.left=0;
-	rect.bottom=mHeight;
-	rect.right=mWidth;
-
-	DWORD d3dflags=0;
-	if(lockAccess==Access_BIT_READ){
-		d3dflags|=D3DLOCK_READONLY;
-	}
-
-	HRESULT result=mSurface->LockRect(&d3drect,&rect,d3dflags);
-	TOADLET_CHECK_D3D9ERROR(result,"D3D9Surface: LockRect");
-
-	return (uint8*)d3drect.pBits;
+int GLTextureMipPixelBuffer::getPixelFormat() const{
+	return mTexture->getFormat();
 }
 
-bool D3D9Surface::unlock(){
-	HRESULT result=mSurface->UnlockRect();
-	TOADLET_CHECK_D3D9ERROR(result,"D3D9Surface: UnlockRect");
-	return SUCCEEDED(result);
+GLuint GLTextureMipPixelBuffer::getHandle() const{
+	return mTexture->getHandle();
+}
+
+GLuint GLTextureMipPixelBuffer::getTarget() const{
+	#if !defined(TOADLET_HAS_GLES)
+		if(mTexture->getTarget()==GL_TEXTURE_CUBE_MAP){
+			return GLRenderer::GLCubeFaces[mCubeSide];
+		}
+	#endif
+	return mTexture->getTarget();
 }
 
 }

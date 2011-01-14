@@ -23,51 +23,36 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "GLFBORenderbufferSurface.h"
-#include "GLFBOSurfaceRenderTarget.h"
-#include "GLRenderer.h"
+#ifndef TOADLET_PEEPER_PIXELBUFFER_H
+#define TOADLET_PEEPER_PIXELBUFFER_H
+
+#include <toadlet/peeper/Buffer.h>
+#include <toadlet/egg/image/ImageDefinitions.h>
 
 namespace toadlet{
 namespace peeper{
 
-GLFBORenderbufferSurface::GLFBORenderbufferSurface(GLFBOSurfaceRenderTarget *target):GLSurface(),
-	mTarget(NULL),
-	mHandle(0),
-	mFormat(0),
-	mWidth(0),
-	mHeight(0)
-{
-	mTarget=target;
-}
+class TOADLET_API PixelBuffer:public Buffer{
+public:
+	TOADLET_SHARED_POINTERS(PixelBuffer);
 
-GLFBORenderbufferSurface::~GLFBORenderbufferSurface(){
-	destroy();
-}
+	virtual ~PixelBuffer(){}
 
-bool GLFBORenderbufferSurface::create(int format,int width,int height){
-	mFormat=format;
-	mWidth=width;
-	mHeight=height;
+	virtual PixelBuffer *getRootPixelBuffer()=0;
 
-	glGenRenderbuffers(1,&mHandle);
-	glBindRenderbuffer(GL_RENDERBUFFER,mHandle);
-	glRenderbufferStorage(GL_RENDERBUFFER,GLRenderer::getGLFormat(mFormat),mWidth,mHeight);
+	virtual bool create(int usage,int access,int pixelFormat,int width,int height,int depth)=0;
+	virtual void destroy()=0;
 
-	TOADLET_CHECK_GLERROR("GLFBORenderbufferSurface::create");
+	virtual void resetCreate()=0;
+	virtual void resetDestroy()=0;
 
-	return true;
-}
-
-bool GLFBORenderbufferSurface::destroy(){
-	if(mHandle!=0){
-		glDeleteRenderbuffers(1,&mHandle);
-		mHandle=0;
-
-		TOADLET_CHECK_GLERROR("GLFBORenderbufferSurface::destroy");
-	}
-
-	return true;
-}
+	virtual int getPixelFormat() const=0;
+	virtual int getWidth() const=0;
+	virtual int getHeight() const=0;
+	virtual int getDepth() const=0;
+};
 
 }
 }
+
+#endif

@@ -23,46 +23,32 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "GLTextureMipSurface.h"
-#include "GLTexture.h"
-#include "GLRenderer.h"
+#ifndef TOADLET_PEEPER_WINDOWRENDERTARGETFORMAT_H
+#define TOADLET_PEEPER_WINDOWRENDERTARGETFORMAT_H
+
+#include <toadlet/peeper/Visual.h>
 
 namespace toadlet{
 namespace peeper{
 
-GLTextureMipSurface::GLTextureMipSurface(GLTexture *texture,GLuint level,GLuint cubeSide):GLSurface(),
-	mTexture(NULL),
-	mLevel(0),
-	mCubeSide(0),
-	mWidth(0),
-	mHeight(0)
-{
-	mTexture=texture;
-	mLevel=level;
-	mCubeSide=cubeSide;
+class TOADLET_API WindowRenderTargetFormat{
+public:
+	TOADLET_SHARED_POINTERS(WindowRenderTargetFormat);
 
-	int l=level;
-	int w=texture->getWidth(),h=texture->getHeight();
-	while(l>0){
-		w/=2; h/=2;
-		l--;
+	WindowRenderTargetFormat(const Visual &visual,int threads,bool debug,int flags){
+		this->visual=visual;
+		this->threads=threads;
+		this->debug=debug;
+		this->flags=flags;
 	}
-	mWidth=w;
-	mHeight=h;
-}
 
-GLuint GLTextureMipSurface::getHandle() const{
-	return mTexture->getHandle();
-}
-
-GLuint GLTextureMipSurface::getTarget() const{
-	#if !defined(TOADLET_HAS_GLES)
-		if(mTexture->getTarget()==GL_TEXTURE_CUBE_MAP){
-			return GLRenderer::GLCubeFaces[mCubeSide];
-		}
-	#endif
-	return mTexture->getTarget();
-}
+	Visual visual;
+	int threads;
+	bool debug;
+	int flags;
+};
 
 }
 }
+
+#endif

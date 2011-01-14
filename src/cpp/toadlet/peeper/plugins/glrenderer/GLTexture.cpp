@@ -49,14 +49,12 @@ GLTexture::GLTexture(GLRenderer *renderer):BaseResource(),
 	mTarget(0),
 	//mMatrix,
 	mManuallyGenerateMipLevels(false)
-	//mSurfaces
+	//mBuffers
 {
 	mRenderer=renderer;
 }
 
 GLTexture::~GLTexture(){
-	mSurfaces.clear();
-
 	destroy();
 }
 
@@ -91,6 +89,8 @@ bool GLTexture::create(int usage,Dimension dimension,int format,int width,int he
 
 void GLTexture::destroy(){
 	destroyContext();
+
+	mBuffers.clear();
 }
 
 bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
@@ -143,62 +143,108 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 			}
 		}
 	}
+	if(specifiedMipLevels==0){
+		specifiedMipLevels=1;
+	}
 
 	GLint glinternalFormat=GLRenderer::getGLFormat(mFormat);
 	GLint glformat=GLRenderer::getGLFormat(mFormat);
-	GLint gltype=GLRenderer::getGLType(mFormat);
+	GLint gltype=ImageFormatConversion::isFormatCompressed(mFormat)==false?GLRenderer::getGLType(mFormat):0;
 
 	// Allocate texture memory
 	int level=0,width=mWidth,height=mHeight,depth=mDepth;
-	for(level=0;level<=specifiedMipLevels;++level,width/=2,height/=2,depth/=2){
-		int rowPitch=width*ImageFormatConversion::getPixelSize(mFormat);
+	for(level=0;level<specifiedMipLevels;++level,width/=2,height/=2,depth/=2){
+		int rowPitch=ImageFormatConversion::getRowPitch(mFormat,width);
  		int slicePitch=rowPitch*height;
 		TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(slicePitch);
 
 		tbyte *data=NULL;
-		if(mipDatas!=NULL && (level==0 || level<mMipLevels)){
+		if(mipDatas!=NULL && (level==0 || level<mipLevels)){
 			data=mipDatas[level];
 			int alignment=1,pitch=rowPitch;
 			while(pitch>0 && (pitch&1)==0){alignment<<=1;pitch>>=1;}
 			glPixelStorei(GL_PACK_ALIGNMENT,alignment<8?alignment:8);
 		}
 
-		switch(mTarget){
-			#if !defined(TOADLET_HAS_GLES)
-				case GL_TEXTURE_1D:
-					glTexImage1D(mTarget,level,glinternalFormat,width,0,glformat,gltype,data);
-				break;
-			#endif
-			case GL_TEXTURE_2D:
-				glTexImage2D(mTarget,level,glinternalFormat,width,height,0,glformat,gltype,data);
-			break;
-			#if !defined(TOADLET_HAS_GLES) || defined(TOADLET_HAS_GL_20)
-				case GL_TEXTURE_CUBE_MAP:{
-					glTexParameteri(mTarget,GL_TEXTURE_WRAP_S,GL_CLAMP);
-					glTexParameteri(mTarget,GL_TEXTURE_WRAP_T,GL_CLAMP);
-					glTexParameteri(mTarget,GL_TEXTURE_WRAP_R,GL_CLAMP);
-					glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-					glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-				
-					int i;
-					for(i=0;i<6;++i){
-						glTexImage2D(GLRenderer::GLCubeFaces[i],level,glinternalFormat,width,height,0,glformat,gltype,data+slicePitch*i);
-					}
-				}break;
-			#endif
-			#if !defined(TOADLET_HAS_GLES)
-				case GL_TEXTURE_3D:
-					glTexImage3D(mTarget,level,glinternalFormat,width,height,depth,0,glformat,gltype,data);
-				break;
-			#endif
-			#if !defined(TOADLET_HAS_GLES)
-				case GL_TEXTURE_RECTANGLE_ARB:
-					// Set up rectangle scale matrix
-					Math::setMatrix4x4FromScale(mMatrix,mWidth,mHeight,Math::ONE);
+		TOADLET_ASSERT(data!=NULL);
 
+		if(ImageFormatConversion::isFormatCompressed(mFormat)==false){
+			switch(mTarget){
+				#if !defined(TOADLET_HAS_GLES)
+					case GL_TEXTURE_1D:
+						glTexImage1D(mTarget,level,glinternalFormat,width,0,glformat,gltype,data);
+					break;
+				#endif
+				case GL_TEXTURE_2D:
 					glTexImage2D(mTarget,level,glinternalFormat,width,height,0,glformat,gltype,data);
 				break;
-			#endif
+				#if !defined(TOADLET_HAS_GLES) || defined(TOADLET_HAS_GL_20)
+					case GL_TEXTURE_CUBE_MAP:{
+						glTexParameteri(mTarget,GL_TEXTURE_WRAP_S,GL_CLAMP);
+						glTexParameteri(mTarget,GL_TEXTURE_WRAP_T,GL_CLAMP);
+						glTexParameteri(mTarget,GL_TEXTURE_WRAP_R,GL_CLAMP);
+						glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+						glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+					
+						int i;
+						for(i=0;i<6;++i){
+							glTexImage2D(GLRenderer::GLCubeFaces[i],level,glinternalFormat,width,height,0,glformat,gltype,data+slicePitch*i);
+						}
+					}break;
+				#endif
+				#if !defined(TOADLET_HAS_GLES)
+					case GL_TEXTURE_3D:
+						glTexImage3D(mTarget,level,glinternalFormat,width,height,depth,0,glformat,gltype,data);
+					break;
+				#endif
+				#if !defined(TOADLET_HAS_GLES)
+					case GL_TEXTURE_RECTANGLE_ARB:
+						// Set up rectangle scale matrix
+						Math::setMatrix4x4FromScale(mMatrix,mWidth,mHeight,Math::ONE);
+
+						glTexImage2D(mTarget,level,glinternalFormat,width,height,0,glformat,gltype,data);
+					break;
+				#endif
+			}
+		}
+		else{
+			switch(mTarget){
+				#if !defined(TOADLET_HAS_GLES)
+					case GL_TEXTURE_1D:
+						glCompressedTexImage1D(mTarget,level,glinternalFormat,width,0,slicePitch,data);
+					break;
+				#endif
+				case GL_TEXTURE_2D:
+					glCompressedTexImage2D(mTarget,level,glinternalFormat,width,height,0,slicePitch,data);
+				break;
+				#if !defined(TOADLET_HAS_GLES) || defined(TOADLET_HAS_GL_20)
+					case GL_TEXTURE_CUBE_MAP:{
+						glTexParameteri(mTarget,GL_TEXTURE_WRAP_S,GL_CLAMP);
+						glTexParameteri(mTarget,GL_TEXTURE_WRAP_T,GL_CLAMP);
+						glTexParameteri(mTarget,GL_TEXTURE_WRAP_R,GL_CLAMP);
+						glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+						glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+					
+						int i;
+						for(i=0;i<6;++i){
+							glCompressedTexImage2D(GLRenderer::GLCubeFaces[i],level,glinternalFormat,width,height,0,slicePitch,data+slicePitch*i);
+						}
+					}break;
+				#endif
+				#if !defined(TOADLET_HAS_GLES)
+					case GL_TEXTURE_3D:
+						glCompressedTexImage3D(mTarget,level,glinternalFormat,width,height,depth,0,slicePitch,data);
+					break;
+				#endif
+				#if !defined(TOADLET_HAS_GLES)
+					case GL_TEXTURE_RECTANGLE_ARB:
+						// Set up rectangle scale matrix
+						Math::setMatrix4x4FromScale(mMatrix,mWidth,mHeight,Math::ONE);
+
+						glCompressedTexImage2D(mTarget,level,glinternalFormat,width,height,0,slicePitch,data);
+					break;
+				#endif
+			}
 		}
 	}
 
@@ -212,6 +258,11 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 }
 
 bool GLTexture::destroyContext(){
+	int i;
+	for(i=0;i<mBuffers.size();++i){
+		mBuffers[i]->destroy();
+	}
+
 	if(mHandle!=0){
 		glDeleteTextures(1,&mHandle);
 		mHandle=0;
@@ -223,28 +274,26 @@ bool GLTexture::destroyContext(){
 	return true;
 }
 
-Surface::ptr GLTexture::getMipSurface(int level,int cubeSide){
+PixelBuffer::ptr GLTexture::getMipPixelBuffer(int level,int cubeSide){
 	if(mHandle==0){
 		return NULL;
 	}
 
 	int index=level;
-	#if !defined(TOADLET_HAS_GLES)
-		if(mTarget==GL_TEXTURE_CUBE_MAP){
-			index=level*6+cubeSide;
-		}
-	#endif
-
-	if(mSurfaces.size()<=index){
-		mSurfaces.resize(index+1);
+	if(mDimension==Dimension_CUBE){
+		index=level*6+cubeSide;
 	}
 
-	if(mSurfaces[index]==NULL){
-		Surface::ptr surface(new GLTextureMipSurface(const_cast<GLTexture*>(this),index,cubeSide));
-		mSurfaces[index]=surface;
+	if(mBuffers.size()<=index){
+		mBuffers.resize(index+1);
 	}
 
-	return mSurfaces[index];
+	if(mBuffers[index]==NULL){
+		PixelBuffer::ptr buffer(new GLTextureMipPixelBuffer(const_cast<GLTexture*>(this),index,cubeSide));
+		mBuffers[index]=buffer;
+	}
+
+	return mBuffers[index];
 }
 
 bool GLTexture::load(int width,int height,int depth,int mipLevel,tbyte *mipData){
@@ -263,39 +312,67 @@ bool GLTexture::load(int width,int height,int depth,int mipLevel,tbyte *mipData)
 	glBindTexture(mTarget,mHandle);
 
 	int format=mFormat;
-	int rowPitch=width*ImageFormatConversion::getPixelSize(format);
+	int rowPitch=ImageFormatConversion::getRowPitch(format,width);
 	int slicePitch=rowPitch*height;
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(slicePitch);
-	
 	GLint glformat=GLRenderer::getGLFormat(format);
-	GLint gltype=GLRenderer::getGLType(format);
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(glformat);
+	GLint gltype=ImageFormatConversion::isFormatCompressed(mFormat)==false?GLRenderer::getGLType(mFormat):0;
+	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(gltype);
 
 	int alignment=1,pitch=rowPitch;
 	while((pitch&1)==0){alignment<<=1;pitch>>=1;}
 	glPixelStorei(GL_PACK_ALIGNMENT,alignment<8?alignment:8);
 
-	switch(mTarget){
-		#if !defined(TOADLET_HAS_GLES)
-			case GL_TEXTURE_1D:
-				glTexSubImage1D(mTarget,mipLevel,0,width,glformat,gltype,mipData);
-			break;
-		#endif
-		case GL_TEXTURE_2D:
-			glTexSubImage2D(mTarget,mipLevel,0,0,width,height,glformat,gltype,mipData);
-		break;
-		#if !defined(TOADLET_HAS_GLES)
-			case GL_TEXTURE_3D:
-				glTexSubImage3D(mTarget,mipLevel,0,0,0,width,height,depth,glformat,gltype,mipData);
-			break;
-			case GL_TEXTURE_CUBE_MAP:
-				for(int i=0;i<6;++i){
-					glTexSubImage2D(GLRenderer::GLCubeFaces[i],mipLevel,0,0,width,height,glformat,gltype,mipData+slicePitch*i);
-				}
-			break;
-			case GL_TEXTURE_RECTANGLE_ARB:
+	if(ImageFormatConversion::isFormatCompressed(mFormat)){
+		switch(mTarget){
+			#if !defined(TOADLET_HAS_GLES)
+				case GL_TEXTURE_1D:
+					glTexSubImage1D(mTarget,mipLevel,0,width,glformat,gltype,mipData);
+				break;
+			#endif
+			case GL_TEXTURE_2D:
 				glTexSubImage2D(mTarget,mipLevel,0,0,width,height,glformat,gltype,mipData);
 			break;
-		#endif
+			#if !defined(TOADLET_HAS_GLES)
+				case GL_TEXTURE_3D:
+					glTexSubImage3D(mTarget,mipLevel,0,0,0,width,height,depth,glformat,gltype,mipData);
+				break;
+				case GL_TEXTURE_CUBE_MAP:
+					for(int i=0;i<6;++i){
+						glTexSubImage2D(GLRenderer::GLCubeFaces[i],mipLevel,0,0,width,height,glformat,gltype,mipData+slicePitch*i);
+					}
+				break;
+				case GL_TEXTURE_RECTANGLE_ARB:
+					glTexSubImage2D(mTarget,mipLevel,0,0,width,height,glformat,gltype,mipData);
+				break;
+			#endif
+		}
+	}
+	else{
+		switch(mTarget){
+			#if !defined(TOADLET_HAS_GLES)
+				case GL_TEXTURE_1D:
+					glCompressedTexSubImage1D(mTarget,mipLevel,0,width,glformat,slicePitch,mipData);
+				break;
+			#endif
+			case GL_TEXTURE_2D:
+				glCompressedTexSubImage2D(mTarget,mipLevel,0,0,width,height,glformat,slicePitch,mipData);
+			break;
+			#if !defined(TOADLET_HAS_GLES)
+				case GL_TEXTURE_3D:
+					glCompressedTexSubImage3D(mTarget,mipLevel,0,0,0,width,height,depth,glformat,slicePitch,mipData);
+				break;
+				case GL_TEXTURE_CUBE_MAP:
+					for(int i=0;i<6;++i){
+						glCompressedTexSubImage2D(GLRenderer::GLCubeFaces[i],mipLevel,0,0,width,height,glformat,slicePitch,mipData+slicePitch*i);
+					}
+				break;
+				case GL_TEXTURE_RECTANGLE_ARB:
+					glCompressedTexSubImage2D(mTarget,mipLevel,0,0,width,height,glformat,slicePitch,mipData);
+				break;
+			#endif
+		}
 	}
 
 	if(mManuallyGenerateMipLevels){
@@ -323,12 +400,12 @@ bool GLTexture::read(int width,int height,int depth,int mipLevel,tbyte *mipData)
 	glBindTexture(mTarget,mHandle);
 
 	int format=mFormat;
-	int rowPitch=width*ImageFormatConversion::getPixelSize(format);
+	int rowPitch=ImageFormatConversion::getRowPitch(format,width);
 	int slicePitch=rowPitch*height;
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(slicePitch);
 	GLint glformat=GLRenderer::getGLFormat(format);
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(glformat);
-	GLint gltype=GLRenderer::getGLType(format);
+	GLint gltype=ImageFormatConversion::isFormatCompressed(mFormat)==false?GLRenderer::getGLType(mFormat):0;
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(gltype);
 
 	int alignment=1,pitch=rowPitch;

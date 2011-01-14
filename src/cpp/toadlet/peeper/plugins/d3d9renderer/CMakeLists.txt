@@ -1,11 +1,12 @@
 # Source files for toadlet_peeper_d3d9renderer
 set (PEEPER_D3D9RENDERER_SRC
 	D3D9IndexBuffer.cpp
+	D3D9PixelBuffer.cpp
+	D3D9PixelBufferRenderTarget.cpp
 	D3D9Query.cpp
 	D3D9Renderer.cpp
 	D3D9Texture.cpp
-	D3D9Surface.cpp
-	D3D9SurfaceRenderTarget.cpp
+	D3D9TextureMipPixelBuffer.cpp
 	D3D9VertexBuffer.cpp
 	D3D9VertexFormat.cpp
 	D3D9WindowRenderTarget.cpp
@@ -16,16 +17,21 @@ set (PEEPER_D3D9RENDERER_SRC
 set (PEEPER_D3D9RENDERER_HEADERS
 	D3D9Includes.h
 	D3D9IndexBuffer.h
+	D3D9PixelBuffer.h
+	D3D9PixelBufferRenderTarget.h
 	D3D9Query.h
 	D3D9RenderTarget.h
 	D3D9Renderer.h
-	D3D9Surface.h
-	D3D9SurfaceRenderTarget.h
 	D3D9Texture.h
+	D3D9TextureMipPixelBuffer.h
 	D3D9VertexBuffer.h
 	D3D9VertexFormat.h
 	D3D9WindowRenderTarget.h
 )
+
+
+# Definitions
+add_definitions(-DTOADLET_SET_D3D9)
 
 
 # Dependencies - note that D3D9 has already been found

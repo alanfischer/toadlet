@@ -28,10 +28,12 @@
 #include "GLVertexFormat.h"
 #include <toadlet/peeper/CapabilitySet.h>
 #include <toadlet/egg/EndianConversion.h>
+#include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <string.h>
 
 using namespace toadlet::egg;
+using namespace toadlet::egg::image;
 
 namespace toadlet{
 namespace peeper{
@@ -42,11 +44,13 @@ GLBuffer::GLBuffer(GLRenderer *renderer):
 	mListener(NULL),
 	mUsage(0),
 	mAccess(0),
-	mSize(0),
 	mDataSize(0),
+	mSize(0),
+	mWidth(0),mHeight(0),mDepth(0),
 
-	mIndexFormat(IndexFormat_UINT8),
+	mIndexFormat((IndexFormat)0),
 	//mVertexFormat,
+	mPixelFormat(0),
 	//mElementOffsets,
 
 	mHandle(0),
@@ -117,6 +121,38 @@ bool GLBuffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int si
 	return true;
 }
 
+bool GLBuffer::create(int usage,int access,int pixelFormat,int width,int height,int depth){
+	destroy();
+
+	mUsage=usage;
+	mAccess=access;
+	mWidth=width;
+	mHeight=height;
+	mDepth=depth;
+	mPixelFormat=pixelFormat;
+	mDataSize=ImageFormatConversion::getRowPitch(mPixelFormat,mWidth)*mHeight*mDepth;
+
+	#if defined(TOADLET_HAS_GLEW)
+		mTarget=GL_PIXEL_UNPACK_BUFFER_ARB;
+	#else
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"PixelBuffers not supported");
+		return false;
+	#endif
+	createContext();
+
+	#if !defined(TOADLET_HAS_GLES)
+		mMapping=mRenderer->useMapping(this);
+	#else
+		mMapping=false;
+	#endif
+	if(mMapping==false){
+		mData=new uint8[mDataSize];
+	}
+
+	return true;
+}
+
 void GLBuffer::destroy(){
 	destroyContext();
 
@@ -131,20 +167,27 @@ void GLBuffer::destroy(){
 		if(mTarget==GL_ELEMENT_ARRAY_BUFFER){
 			mListener->bufferDestroyed((IndexBuffer*)this);
 		}
-		else{
+		else if(mTarget==GL_ARRAY_BUFFER){
 			mListener->bufferDestroyed((VertexBuffer*)this);
+		}
+		else{
+			mListener->bufferDestroyed((PixelBuffer*)this);
 		}
 	}
 }
 
 bool GLBuffer::createContext(){
 	if((mTarget==GL_ELEMENT_ARRAY_BUFFER && mRenderer->getCapabilitySet().hardwareIndexBuffers) ||
-		(mTarget==GL_ARRAY_BUFFER && mRenderer->getCapabilitySet().hardwareIndexBuffers))
-	{
+		(mTarget==GL_ARRAY_BUFFER && mRenderer->getCapabilitySet().hardwareIndexBuffers)
+		#if defined(TOADLET_HAS_GLEW)
+			|| mTarget==GL_PIXEL_UNPACK_BUFFER_ARB
+		#endif
+	){
 		glGenBuffers(1,&mHandle);
 		glBindBuffer(mTarget,mHandle);
 		GLenum usage=getBufferUsage(mUsage,mAccess);
 		glBufferData(mTarget,mDataSize,NULL,usage);
+		glBindBuffer(mTarget,0);
 
 		TOADLET_CHECK_GLERROR("GLBuffer::createContext");
 	}
@@ -191,13 +234,15 @@ uint8 *GLBuffer::lock(int lockAccess){
 	#endif
 
 	#if defined(TOADLET_BIG_ENDIAN)
-		// We do this even if its write only, since the unlocking will write it back, it would get messed up if we didn't swap in all situations
-		GLVertexFormat *vertexFormat=(GLVertexFormat*)mVertexFormat->getRootVertexFormat();
-		int i,j;
-		for(i=0;i<vertexFormat->mFormats.size();++i){
-			if(vertexFormat->mFormats[i]==VertexFormat::Format_COLOR_RGBA){
-				for(j=0;j<mSize;++j){
-					littleUInt32InPlace(*(uint32*)(mData+vertexFormat->mVertexSize*j+vertexFormat->mOffsets[i]));
+		if(mVertexFormat!=NULL){
+			// We do this even if its write only, since the unlocking will write it back, it would get messed up if we didn't swap in all situations
+			GLVertexFormat *vertexFormat=(GLVertexFormat*)mVertexFormat->getRootVertexFormat();
+			int i,j;
+			for(i=0;i<vertexFormat->mFormats.size();++i){
+				if(vertexFormat->mFormats[i]==VertexFormat::Format_COLOR_RGBA){
+					for(j=0;j<mSize;++j){
+						littleUInt32InPlace(*(uint32*)(mData+vertexFormat->mVertexSize*j+vertexFormat->mOffsets[i]));
+					}
 				}
 			}
 		}
@@ -210,13 +255,15 @@ uint8 *GLBuffer::lock(int lockAccess){
 
 bool GLBuffer::unlock(){
 	#if defined(TOADLET_BIG_ENDIAN)
-		// We do this even if its read only, since we have to do it in all situations for locking
-		GLVertexFormat *vertexFormat=(GLVertexFormat*)mVertexFormat->getRootVertexFormat();
-		int i,j;
-		for(i=0;i<vertexFormat->mFormats.size();++i){
-			if(vertexFormat->mFormats[i]==VertexFormat::Format_COLOR_RGBA){
-				for(j=0;j<mSize;++j){
-					littleUInt32InPlace(*(uint32*)(mData+vertexFormat->mVertexSize*j+vertexFormat->mOffsets[i]));
+		if(mVertexFormat!=NULL){
+			// We do this even if its read only, since we have to do it in all situations for locking
+			GLVertexFormat *vertexFormat=(GLVertexFormat*)mVertexFormat->getRootVertexFormat();
+			int i,j;
+			for(i=0;i<vertexFormat->mFormats.size();++i){
+				if(vertexFormat->mFormats[i]==VertexFormat::Format_COLOR_RGBA){
+					for(j=0;j<mSize;++j){
+						littleUInt32InPlace(*(uint32*)(mData+vertexFormat->mVertexSize*j+vertexFormat->mOffsets[i]));
+					}
 				}
 			}
 		}
@@ -226,6 +273,7 @@ bool GLBuffer::unlock(){
 		if(mMapping){
 			glBindBuffer(mTarget,mHandle);
 			glUnmapBuffer(mTarget);
+			glBindBuffer(mTarget,0);
 			mData=NULL;
 		}
 		else
@@ -233,6 +281,7 @@ bool GLBuffer::unlock(){
 	if(mLockAccess!=Access_BIT_READ && mHandle!=0){
 		glBindBuffer(mTarget,mHandle);
 		glBufferSubData(mTarget,0,mDataSize,mData);
+		glBindBuffer(mTarget,0);
 	}
 
 	TOADLET_CHECK_GLERROR("GLBuffer::unlock");

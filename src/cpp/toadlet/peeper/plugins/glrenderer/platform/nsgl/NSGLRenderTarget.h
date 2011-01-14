@@ -28,7 +28,7 @@
 
 #include "../../GLIncludes.h"
 #include "../../GLRenderTarget.h"
-#include <toadlet/peeper/Visual.h>
+#include <toadlet/peeper/WindowRenderTargetFormat.h>
 #include <toadlet/egg/Error.h>
 
 #import <Cocoa/Cocoa.h>
@@ -39,18 +39,21 @@ namespace peeper{
 class TOADLET_API NSGLRenderTarget:public GLRenderTarget{
 public:
 	NSGLRenderTarget();
-	NSGLRenderTarget(NSView *view,const Visual &visual,NSOpenGLPixelFormat *pixelFormat=nil);
+	NSGLRenderTarget(NSView *view,WindowRenderTargetFormat *format,NSOpenGLPixelFormat *pixelFormat=nil);
 	NSGLRenderTarget(NSOpenGLContext *context);
 	virtual ~NSGLRenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 	
-	virtual bool createContext(NSView *view,const Visual &visual,NSOpenGLPixelFormat *pixelFormat=nil);
+	virtual bool createContext(NSView *view,WindowRenderTargetFormat *format,NSOpenGLPixelFormat *pixelFormat=nil);
 	virtual bool destroyContext();
 
-	virtual bool makeCurrent();
+	virtual bool activate();
+	virtual bool deactivate();
 	virtual bool swap();
 	virtual void reset();
+	virtual bool activateAdditionalContext();
+	virtual void deactivateAdditionalContext();
 
 	virtual bool isPrimary() const{return true;}
 	virtual bool isValid() const{return mContext!=NULL;}
@@ -62,6 +65,8 @@ protected:
 	NSView *mView;
 	NSOpenGLPixelFormat *mPixelFormat;
 	NSOpenGLContext *mContext;
+	egg::Collection<NSOpenGLContext*> mThreadContexts;
+	egg::Collection<int> mThreadIDs;
 };
 
 }

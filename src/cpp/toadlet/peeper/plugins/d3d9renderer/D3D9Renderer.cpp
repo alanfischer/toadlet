@@ -26,7 +26,7 @@
 #include "D3D9Renderer.h"
 #include "D3D9Texture.h"
 #include "D3D9RenderTarget.h"
-#include "D3D9SurfaceRenderTarget.h"
+#include "D3D9PixelBufferRenderTarget.h"
 #include "D3D9VertexBuffer.h"
 #include "D3D9IndexBuffer.h"
 #include "D3D9VertexFormat.h"
@@ -80,7 +80,9 @@ D3D9Renderer::D3D9Renderer():
 	mD3DAdapterFormat(D3DFMT_UNKNOWN),
 	//mD3DCaps,
 	mPrimaryRenderTarget(NULL),
+	mD3DPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL),
+	mD3DRenderTarget(NULL),
 
 	mFaceCulling(FaceCulling_NONE),
 	mMirrorY(false)
@@ -148,7 +150,7 @@ bool D3D9Renderer::create(RenderTarget *target,int *options){
 	return true;
 }
 
-bool D3D9Renderer::destroy(){
+void D3D9Renderer::destroy(){
 	if(mD3D!=NULL){
 		mD3D=NULL;
 		mD3DDevice=NULL;
@@ -161,8 +163,6 @@ bool D3D9Renderer::destroy(){
 		Logger::alert(Categories::TOADLET_PEEPER,
 			"destroyed D3D9Renderer");
 	}
-
-	return true;
 }
 
 Renderer::RendererStatus D3D9Renderer::getStatus(){
@@ -192,8 +192,12 @@ Texture *D3D9Renderer::createTexture(){
 	return new D3D9Texture(this);
 }
 
-SurfaceRenderTarget *D3D9Renderer::createSurfaceRenderTarget(){
-	return new D3D9SurfaceRenderTarget(this);
+PixelBufferRenderTarget *D3D9Renderer::createPixelBufferRenderTarget(){
+	return new D3D9PixelBufferRenderTarget(this);
+}
+
+PixelBuffer *D3D9Renderer::createPixelBuffer(){
+	return new D3D9PixelBuffer(this,false);
 }
 
 VertexFormat *D3D9Renderer::createVertexFormat(){
@@ -226,23 +230,26 @@ Query *D3D9Renderer::createQuery(){
 }
 
 bool D3D9Renderer::setRenderTarget(RenderTarget *target){
-	if(target==NULL){
-		Error::nullPointer(Categories::TOADLET_PEEPER,
-			"RenderTarget is NULL");
-		return false;
+	D3D9RenderTarget *d3dtarget=NULL;
+	if(target!=NULL){
+		d3dtarget=(D3D9RenderTarget*)target->getRootRenderTarget();
+		if(d3dtarget==NULL){
+			Error::nullPointer(Categories::TOADLET_PEEPER,
+				"RenderTarget is not a D3D9RenderTarget");
+			return false;
+		}
 	}
 
-	D3D9RenderTarget *d3dtarget=(D3D9RenderTarget*)target->getRootRenderTarget();
-	if(d3dtarget==NULL){
-		Error::nullPointer(Categories::TOADLET_PEEPER,
-			"RenderTarget is not a D3D9RenderTarget");
-		return false;
+	if(mD3DRenderTarget!=NULL){
+		mD3DRenderTarget->deactivate();
 	}
 
 	mRenderTarget=target;
 	mD3DRenderTarget=d3dtarget;
 
-	mD3DRenderTarget->makeCurrent(mD3DDevice);
+	if(mD3DRenderTarget){
+		mD3DRenderTarget->activate();
+	}
 
 	return true;
 }
@@ -402,28 +409,57 @@ void D3D9Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Index
 	}
 }
 
-bool D3D9Renderer::copyToSurface(Surface *surface){
-	D3D9Surface *d3dsurface=(D3D9Surface*)surface->getRootSurface();
+bool D3D9Renderer::copyFrameBufferToPixelBuffer(PixelBuffer *dst){
+	D3D9PixelBuffer *d3dpixelBuffer=(D3D9PixelBuffer*)dst->getRootPixelBuffer();
 
-	IDirect3DSurface9 *currentSurface=NULL;
+	IDirect3DSurface9 *renderSurface=NULL;
 	#if defined(TOADLET_SET_D3DM)
-		mD3DDevice->GetRenderTarget(&currentSurface);
+		mD3DDevice->GetRenderTarget(&renderSurface);
 	#else
-		mD3DDevice->GetRenderTarget(0,&currentSurface);
+		mD3DDevice->GetRenderTarget(0,&renderSurface);
 	#endif
 
-	D3DSURFACE_DESC desc;
-	HRESULT result=currentSurface->GetDesc(&desc);
-	TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: GetDesc");
+	bool result=copySurface(d3dpixelBuffer->getSurface(),renderSurface);
+
+	renderSurface->Release();
+
+	return result;
+}
+
+bool D3D9Renderer::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
+	D3D9PixelBuffer *d3ddst=(D3D9PixelBuffer*)dst->getRootPixelBuffer();
+	D3D9PixelBuffer *d3dsrc=(D3D9PixelBuffer*)src->getRootPixelBuffer();
+
+	return copySurface(d3ddst->getSurface(),d3dsrc->getSurface());
+}
+
+bool D3D9Renderer::copySurface(IDirect3DSurface9 *dst,IDirect3DSurface9 *src){
+	if(src==NULL || dst==NULL){
+		Error::nullPointer(Categories::TOADLET_PEEPER,"invalid src or dst pointer");
+		return false;
+	}
+
+	D3DSURFACE_DESC dstdesc,srcdesc;
+	dst->GetDesc(&dstdesc);
+	src->GetDesc(&srcdesc);
 
 	RECT rect={0};
-	rect.right=desc.Width<d3dsurface->mWidth?desc.Width:d3dsurface->mWidth;
-	rect.bottom=desc.Height<d3dsurface->mHeight?desc.Height:d3dsurface->mHeight;
+	rect.right=dstdesc.Width<srcdesc.Width?dstdesc.Width:srcdesc.Width;
+	rect.bottom=dstdesc.Height<srcdesc.Height?dstdesc.Height:srcdesc.Height;
 
-	result=mD3DDevice->StretchRect(currentSurface,&rect,d3dsurface->mSurface,&rect,D3DTEXF_NONE);
-	TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: StretchRect");
-
-	currentSurface->Release();
+	HRESULT result=S_OK;
+	if(srcdesc.Pool==D3DPOOL_SYSTEMMEM && dstdesc.Pool==D3DPOOL_DEFAULT){
+		result=mD3DDevice->UpdateSurface(src,&rect,dst,NULL);
+		TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: UpdateSurface");
+	}
+	else if(srcdesc.Pool==D3DPOOL_DEFAULT && dstdesc.Pool==D3DPOOL_SYSTEMMEM){
+		result=mD3DDevice->GetRenderTargetData(src,dst);
+		TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: UpdateSurface");
+	}
+	else{
+		result=mD3DDevice->StretchRect(src,&rect,dst,&rect,D3DTEXF_NONE);
+		TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: UpdateSurface");
+	}
 
 	return true;
 }
@@ -1095,6 +1131,16 @@ D3DFORMAT D3D9Renderer::getD3DFORMAT(int format){
 			return D3DFMT_D24X8;
 		case Texture::Format_DEPTH_32:
 			return D3DFMT_D32;
+		case Texture::Format_RGBA_DXT1:
+			return D3DFMT_DXT1;
+		case Texture::Format_RGBA_DXT2:
+			return D3DFMT_DXT2;
+		case Texture::Format_RGBA_DXT3:
+			return D3DFMT_DXT3;
+		case Texture::Format_RGBA_DXT4:
+			return D3DFMT_DXT4;
+		case Texture::Format_RGBA_DXT5:
+			return D3DFMT_DXT5;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"invalid type");

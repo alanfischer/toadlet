@@ -27,7 +27,8 @@
 #define TOADLET_PEEPER_D3D10WINDOWRENDERTARGET_H
 
 #include "D3D10RenderTarget.h"
-#include <toadlet/peeper/Visual.h>
+#include "D3D10Texture.h"
+#include <toadlet/peeper/WindowRenderTargetFormat.h>
 
 namespace toadlet{
 namespace peeper{
@@ -35,20 +36,21 @@ namespace peeper{
 class TOADLET_API D3D10WindowRenderTarget:public D3D10RenderTarget{
 public:
 	D3D10WindowRenderTarget();
-	D3D10WindowRenderTarget(HWND wnd,const Visual &visual,bool debug);
+	D3D10WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
 	virtual ~D3D10WindowRenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return this;}
 	virtual bool isPrimary() const{return true;}
 	virtual bool isValid() const{return mD3DDevice!=NULL;}
 
-	virtual bool createContext(HWND wnd,const Visual &visual,bool debug);
+	virtual bool createContext(HWND wnd,WindowRenderTargetFormat *format);
 	virtual bool destroyContext();
 
 	virtual int getWidth() const{return mWidth;}
 	virtual int getHeight() const{return mHeight;}
 
-	virtual void makeCurrent(ID3D10Device *device);
+	virtual bool activate();
+	virtual bool deactivate(){return true;}
 
 	virtual void clear(int clearFlags,const Color &clearColor);
 
@@ -67,6 +69,7 @@ protected:
 	HINSTANCE mLibrary;
 	IDXGISwapChain *mSwapChain;
 	ID3D10Device *mD3DDevice;
+	D3D10Texture *mDepthTexture;
 	ID3D10RenderTargetView *mRenderTargetView;
 	ID3D10DepthStencilView *mDepthStencilView;
 	HWND mWindow;

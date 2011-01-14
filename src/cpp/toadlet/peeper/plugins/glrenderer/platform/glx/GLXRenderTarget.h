@@ -39,7 +39,8 @@ public:
 	GLXRenderTarget();
 	virtual ~GLXRenderTarget(){}
 
-	virtual bool makeCurrent();
+	virtual bool activate();
+	virtual bool deactivate();
 
 	inline Display *getDisplay() const{return mDisplay;}
 	inline GLXDrawable getGLXDrawable() const{return mDrawable;}
