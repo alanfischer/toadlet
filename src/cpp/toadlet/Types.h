@@ -121,37 +121,6 @@
 		typedef wchar_t wchar;
 	}
 	#define TOADLET_SIZEOF_WCHAR 32
-#elif defined(TOADLET_PLATFORM_NDS)
-	#define TOADLET_COMPILER_GCC 1
-	#include <sys/param.h>
-	#if defined(__BYTE_ORDER)
-		#if __BYTE_ORDER == __LITTLE_ENDIAN
-			#define TOADLET_LITTLE_ENDIAN 1
-		#elif __BYTE_ORDER == __BIG_ENDIAN
-			#define TOADLET_BIG_ENDIAN 1
-		#else
-			#error "Unknown byte order!"
-		#endif
-	#elif defined(BYTE_ORDER)
-		#if BYTE_ORDER == LITTLE_ENDIAN
-			#define TOADLET_LITTLE_ENDIAN 1
-		#elif BYTE_ORDER == BIG_ENDIAN
-			#define TOADLET_BIG_ENDIAN 1
-		#else
-			#error "Unknown byte order!"
-	#endif
-	#else
-		#error "Unknown byte order!"
-	#endif
-	#define TOADLET_NO_THREADS 1
-	#define TOADLET_NO_LIBRARIES 1
-	#define TOADLET_LITTLE_ENDIAN 1
-	#define TOADLET_C_API extern "C"
-	#define TOADLET_API
-	namespace toadlet{
-		typedef wchar_t wchar;
-	}
-	#define TOADLET_SIZEOF_WCHAR 32
 #else
 	#error "Unknown platform"
 #endif

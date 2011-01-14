@@ -59,6 +59,10 @@ public:
 		egg::String materialName;
 
 		egg::String name;
+
+		// If these are null, just use the Mesh ones
+		Transform::ptr transform;
+		Bound::ptr bound;
 	};
 
 	class TOADLET_API VertexBoneAssignment{

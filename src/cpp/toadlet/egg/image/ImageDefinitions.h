@@ -69,16 +69,22 @@ public:
 		Format_ALL_COLOR=			0xFFFF,
 
 		// These formats are stored sequentially in memory
-		Format_BIT_UINT_8=			1<<20,
-		Format_BIT_UINT_16=			1<<21,
-		Format_BIT_UINT_24=			1<<22,
-		Format_BIT_UINT_32=			1<<23,
-		Format_BIT_FLOAT_16=		1<<24,
-		Format_BIT_FLOAT_32=		1<<25,
+		Format_BIT_UINT_8=			1<<11,
+		Format_BIT_UINT_16=			1<<12,
+		Format_BIT_UINT_24=			1<<13,
+		Format_BIT_UINT_32=			1<<14,
+		Format_BIT_FLOAT_16=		1<<15,
+		Format_BIT_FLOAT_32=		1<<16,
 		// These formats are stored high to low byte in memory
-		Format_BIT_UINT_5_6_5=		1<<26,
-		Format_BIT_UINT_5_5_5_1=	1<<27,
-		Format_BIT_UINT_4_4_4_4=	1<<28,
+		Format_BIT_UINT_5_6_5=		1<<17,
+		Format_BIT_UINT_5_5_5_1=	1<<18,
+		Format_BIT_UINT_4_4_4_4=	1<<19,
+		// These formats are compressed
+		Format_BIT_DXT1=			1<<20,
+		Format_BIT_DXT2=			1<<21,
+		Format_BIT_DXT3=			1<<22,
+		Format_BIT_DXT4=			1<<23,
+		Format_BIT_DXT5=			1<<24,
 		Format_ALL_SIZE=			0xFFFF0000,
 
 		Format_L_8=					Format_BIT_L|Format_BIT_UINT_8,
@@ -106,6 +112,11 @@ public:
 		Format_BGRA_5_5_5_1=		Format_BIT_BGRA|Format_BIT_UINT_5_5_5_1,
 		Format_RGBA_4_4_4_4=		Format_BIT_RGBA|Format_BIT_UINT_4_4_4_4,
 		Format_BGRA_4_4_4_4=		Format_BIT_BGRA|Format_BIT_UINT_4_4_4_4,
+		Format_RGBA_DXT1=			Format_BIT_DXT1,
+		Format_RGBA_DXT2=			Format_BIT_DXT2,
+		Format_RGBA_DXT3=			Format_BIT_DXT3,
+		Format_RGBA_DXT4=			Format_BIT_DXT4,
+		Format_RGBA_DXT5=			Format_BIT_DXT5,
 	};
 };
 

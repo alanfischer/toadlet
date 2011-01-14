@@ -83,6 +83,18 @@ void BackableIndexBuffer::destroy(){
 	}
 }
 
+void BackableIndexBuffer::resetCreate(){
+	if(mBack!=NULL){
+		mBack->resetCreate();
+	}
+}
+
+void BackableIndexBuffer::resetDestroy(){
+	if(mBack!=NULL){
+		mBack->resetDestroy();
+	}
+}
+
 uint8 *BackableIndexBuffer::lock(int lockAccess){
 	if(mBack!=NULL){
 		return mBack->lock(lockAccess);

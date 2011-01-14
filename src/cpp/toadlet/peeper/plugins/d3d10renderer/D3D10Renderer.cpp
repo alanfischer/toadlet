@@ -26,7 +26,7 @@
 #include "D3D10Renderer.h"
 #include "D3D10Buffer.h"
 #include "D3D10RenderTarget.h"
-#include "D3D10SurfaceRenderTarget.h"
+#include "D3D10PixelBufferRenderTarget.h"
 #include "D3D10Texture.h"
 #include "D3D10VertexFormat.h"
 #include <toadlet/egg/MathConversion.h>
@@ -61,7 +61,9 @@ namespace peeper{
 D3D10Renderer::D3D10Renderer():
 	mD3DDevice(NULL),
 	mPrimaryRenderTarget(NULL),
-	mRenderTarget(NULL)
+	mD3DPrimaryRenderTarget(NULL),
+	mRenderTarget(NULL),
+	mD3DRenderTarget(NULL)
 
 	//mStatisticsSet,
 	//mCapabilitySet
@@ -101,8 +103,8 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 	mCapabilitySet.hardwareVertexBuffers=true;
 	mCapabilitySet.pointSprites=false;
 	mCapabilitySet.maxLights=0;
-	mCapabilitySet.maxTextureStages=0;
-	mCapabilitySet.maxTextureSize=0;
+	mCapabilitySet.maxTextureStages=16;
+	mCapabilitySet.maxTextureSize=8192;
 	mCapabilitySet.textureDot3=false;
 	mCapabilitySet.textureNonPowerOf2=true;
 	mCapabilitySet.textureNonPowerOf2Restricted=true;
@@ -118,7 +120,41 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 	Logger::alert(Categories::TOADLET_PEEPER,
 		"created D3D10Renderer");
 
+	D3D10_RASTERIZER_DESC desc;
+	desc.FillMode=D3D10_FILL_SOLID;
+	desc.CullMode=D3D10_CULL_NONE;
+	desc.FrontCounterClockwise=TRUE;
+	desc.DepthBias=0;
+	desc.DepthBiasClamp=0;
+	desc.SlopeScaledDepthBias=0;
+	desc.DepthClipEnable=TRUE;
+	desc.ScissorEnable=FALSE;
+	desc.MultisampleEnable=FALSE;
+	desc.AntialiasedLineEnable=FALSE;
 
+	ID3D10RasterizerState *state=NULL;
+	mD3DDevice->CreateRasterizerState(&desc,&state);
+	mD3DDevice->RSSetState(state);
+
+	D3D10_DEPTH_STENCIL_DESC ddesc;
+	ddesc.DepthEnable=TRUE;
+	ddesc.DepthWriteMask=D3D10_DEPTH_WRITE_MASK_ALL;
+	ddesc.DepthFunc=D3D10_COMPARISON_LESS;
+	ddesc.StencilEnable=FALSE;
+	ddesc.StencilReadMask=D3D10_DEFAULT_STENCIL_READ_MASK;
+	ddesc.StencilWriteMask=D3D10_DEFAULT_STENCIL_WRITE_MASK;
+	ddesc.FrontFace.StencilFailOp=D3D10_STENCIL_OP_KEEP;
+	ddesc.FrontFace.StencilDepthFailOp=D3D10_STENCIL_OP_KEEP;
+	ddesc.FrontFace.StencilPassOp=D3D10_STENCIL_OP_KEEP;
+	ddesc.FrontFace.StencilFunc=D3D10_COMPARISON_ALWAYS;
+	ddesc.BackFace.StencilFailOp=D3D10_STENCIL_OP_KEEP;
+	ddesc.BackFace.StencilDepthFailOp=D3D10_STENCIL_OP_KEEP;
+	ddesc.BackFace.StencilPassOp=D3D10_STENCIL_OP_KEEP;
+	ddesc.BackFace.StencilFunc=D3D10_COMPARISON_ALWAYS;
+
+	ID3D10DepthStencilState *dstate=NULL;
+	mD3DDevice->CreateDepthStencilState(&ddesc,&dstate);
+	mD3DDevice->OMSetDepthStencilState(dstate,0);
 
 	char *effectstring=
 "float4x4 ShaderMatrix;\n"
@@ -168,12 +204,12 @@ void *create=GetProcAddress(library,"D3D10CreateEffectFromMemory");
 technique = effect->GetTechniqueByName( "Render" );
 technique->GetPassByIndex( 0 )->GetDesc( &passDesc);
 
+texture=NULL;
+
 	return true;
 }
 
-bool D3D10Renderer::destroy(){
-	return true;
-}
+void D3D10Renderer::destroy(){}
 
 Renderer::RendererStatus D3D10Renderer::getStatus(){
 	return RendererStatus_OK;
@@ -188,11 +224,11 @@ bool D3D10Renderer::reset(){
 }
 
 Texture *D3D10Renderer::createTexture(){
-	return new D3D10Texture(this);
+	return new D3D10Texture(mD3DDevice);
 }
 
-SurfaceRenderTarget *D3D10Renderer::createSurfaceRenderTarget(){
-	return NULL;//new D3D10SurfaceRenderTarget(this);
+PixelBufferRenderTarget *D3D10Renderer::createPixelBufferRenderTarget(){
+	return NULL;//new D3D10PixelBufferRenderTarget(this);
 }
 
 VertexFormat *D3D10Renderer::createVertexFormat(){
@@ -220,23 +256,26 @@ Query *D3D10Renderer::createQuery(){
 }
 
 bool D3D10Renderer::setRenderTarget(RenderTarget *target){
-	if(target==NULL){
-		Error::nullPointer(Categories::TOADLET_PEEPER,
-			"RenderTarget is NULL");
-		return false;
+	D3D10RenderTarget *d3dtarget=NULL;
+	if(target!=NULL){
+		d3dtarget=(D3D10RenderTarget*)target->getRootRenderTarget();
+		if(d3dtarget==NULL){
+			Error::nullPointer(Categories::TOADLET_PEEPER,
+				"RenderTarget is not a D3D10RenderTarget");
+			return false;
+		}
 	}
 
-	D3D10RenderTarget *d3dtarget=(D3D10RenderTarget*)target->getRootRenderTarget();
-	if(d3dtarget==NULL){
-		Error::nullPointer(Categories::TOADLET_PEEPER,
-			"RenderTarget is not a D3D10RenderTarget");
-		return false;
+	if(mD3DRenderTarget!=NULL){
+		mD3DRenderTarget->deactivate();
 	}
 
 	mRenderTarget=target;
 	mD3DRenderTarget=d3dtarget;
 
-	mD3DRenderTarget->makeCurrent(mD3DDevice);
+	if(mD3DRenderTarget!=NULL){
+		mD3DRenderTarget->activate();
+	}
 
 	return true;
 }
@@ -289,6 +328,15 @@ void D3D10Renderer::beginScene(){
 }
 
 void D3D10Renderer::endScene(){
+	ID3D10Buffer *buffer=NULL;
+	UINT stride=0;
+	UINT offset=0;
+	mD3DDevice->IASetVertexBuffers(0,1,&buffer,&stride,&offset);
+
+	mD3DDevice->IASetIndexBuffer(NULL,(DXGI_FORMAT)0,0);
+
+	mD3DDevice->IASetInputLayout(NULL);
+
 	int i;
 	for(i=0;i<mCapabilitySet.maxTextureStages;++i){
 		setTextureStage(i,NULL);
@@ -322,8 +370,13 @@ void D3D10Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Inde
 //	pViewMatrixEffectVariable->SetMatrix(viewMatrix);
 //	pProjectionMatrixEffectVariable->SetMatrix(projectionMatrix);
 	Matrix4x4 shaderMatrix=mProjectionMatrix*mViewMatrix*mModelMatrix;
-	effect->GetVariableByName("ShaderMatrix")->AsMatrix()->SetMatrix(shaderMatrix.data);
-	effect->GetVariableByName("diffuseTexture")->AsShaderResource()->SetResource(texture);
+	#if defined(TOADLET_FIXED_POINT)
+		float d3dmatrix[16];
+		toD3DMatrix(d3dmatrix,shaderMatrix);
+	#else
+		float *d3dmatrix=shaderMatrix.data;
+	#endif
+	effect->GetVariableByName("ShaderMatrix")->AsMatrix()->SetMatrix(d3dmatrix);
 
 	if(indexData->getIndexBuffer()!=NULL){
 		D3D10Buffer *buffer=(D3D10Buffer*)(indexData->getIndexBuffer()->getRootIndexBuffer());
@@ -391,7 +444,7 @@ for( UINT p = 0; p < techDesc.Passes; ++p )
 */
 }
 
-bool D3D10Renderer::copyToSurface(Surface *surface){
+bool D3D10Renderer::copyFrameBufferToPixelBuffer(PixelBuffer *dst){
 /*	D3D9Surface *d3dsurface=(D3D9Surface*)surface->getRootSurface();
 
 	IDirect3DSurface9 *currentSurface=NULL;
@@ -416,6 +469,10 @@ bool D3D10Renderer::copyToSurface(Surface *surface){
 
 	return true;
 */
+return false;
+}
+
+bool D3D10Renderer::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
 return false;
 }
 
@@ -493,9 +550,10 @@ void D3D10Renderer::setTextureStage(int stage,TextureStage *textureStage){
 	if(textureStage!=NULL && stage==0 && textureStage->texture!=NULL){
 		texture=((D3D10Texture*)(textureStage->texture->getRootTexture(0)))->mShaderResourceView;
 	}
-	else{
+	else if(stage==0){
 		texture=NULL;
 	}
+effect->GetVariableByName("diffuseTexture")->AsShaderResource()->SetResource(texture);
 
 /*	HRESULT result=S_OK;
 
@@ -683,23 +741,20 @@ void D3D10Renderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &
 }
 
 int D3D10Renderer::getClosestTextureFormat(int textureFormat){
-	if(textureFormat==Texture::Format_L_8){
-		return textureFormat;
-	}
-	else if(textureFormat==Texture::Format_LA_8){
-		return textureFormat;
-	}
-	else if(textureFormat==Texture::Format_RGBA_8){
-		return textureFormat;
-	}
-	else if(textureFormat==Texture::Format_RGB_F32){
-		return textureFormat;
-	}
-	else if(textureFormat==Texture::Format_RGBA_F32){
-		return textureFormat;
-	}
-	else{
-		return Texture::Format_RGBA_8;
+	switch(textureFormat){
+		case Texture::Format_L_8:
+		case Texture::Format_LA_8:
+		case Texture::Format_RGBA_8:
+		case Texture::Format_RGB_F32:
+		case Texture::Format_RGBA_F32:
+		case Texture::Format_RGBA_DXT1:
+		case Texture::Format_RGBA_DXT2:
+		case Texture::Format_RGBA_DXT3:
+		case Texture::Format_RGBA_DXT4:
+		case Texture::Format_RGBA_DXT5:
+			return textureFormat;
+		default:
+			return Texture::Format_RGBA_8;
 	}
 }
 
@@ -799,6 +854,18 @@ DXGI_FORMAT D3D10Renderer::getTextureDXGI_FORMAT(int format){
 			return DXGI_FORMAT_R32G32B32_FLOAT;
 		case Texture::Format_RGBA_F32:
 			return DXGI_FORMAT_R32G32B32A32_FLOAT;
+		case Texture::Format_RGBA_DXT1:
+		case Texture::Format_RGBA_DXT2:
+			return DXGI_FORMAT_BC1_UNORM;
+		case Texture::Format_RGBA_DXT3:
+		case Texture::Format_RGBA_DXT4:
+			return DXGI_FORMAT_BC2_UNORM;
+		case Texture::Format_RGBA_DXT5:
+			return DXGI_FORMAT_BC3_UNORM;
+		case Texture::Format_DEPTH_16:
+			return DXGI_FORMAT_D16_UNORM;
+		case Texture::Format_DEPTH_24:
+			return DXGI_FORMAT_D24_UNORM_S8_UINT;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"D3D10Texture::getDXGI_FORMAT: Invalid type");

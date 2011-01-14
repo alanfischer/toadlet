@@ -48,6 +48,7 @@ public:
 
 		Material *getRenderMaterial() const{return material;}
 		Transform *getRenderTransform() const{return modelNode->getWorldTransform();}
+		Bound *getRenderBound() const{return modelNode->getRenderBound();}
 		void render(peeper::Renderer *renderer) const;
 
 		StudioModelNode *modelNode;
@@ -101,6 +102,7 @@ public:
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 	Material *getRenderMaterial() const{return mSkeletonMaterial;}
 	Transform *getRenderTransform() const{return getWorldTransform();}
+	Bound *getRenderBound() const{return getWorldBound();}
 	void render(peeper::Renderer *renderer) const;
 
 	static void setQuaternionFromEulerAngleStudio(Quaternion &r,const EulerAngle &euler);

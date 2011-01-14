@@ -23,47 +23,35 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_D3D9SURFACE_H
-#define TOADLET_PEEPER_D3D9SURFACE_H
+#ifndef TOADLET_PEEPER_PIXELBUFFERRENDERTARGET_H
+#define TOADLET_PEEPER_PIXELBUFFERRENDERTARGET_H
 
-#include "D3D9Includes.h"
-#include <toadlet/peeper/Surface.h>
+#include <toadlet/peeper/RenderTarget.h>
+#include <toadlet/peeper/PixelBuffer.h>
 
 namespace toadlet{
 namespace peeper{
 
-class D3D9Renderer;
-
-class TOADLET_API D3D9Surface:public Surface{
+class PixelBufferRenderTarget:public RenderTarget{
 public:
-	TOADLET_SHARED_POINTERS(D3D9Surface);
+	TOADLET_SHARED_POINTERS(PixelBufferRenderTarget);
 
-	D3D9Surface(IDirect3DSurface9 *surface);
-	virtual ~D3D9Surface();
+	enum Attachment{
+		Attachment_DEPTH_STENCIL,
+		Attachment_COLOR_0,
+		Attachment_COLOR_1,
+		Attachment_COLOR_2,
+		Attachment_COLOR_3,
+	};
 
-	virtual Surface *getRootSurface(){return this;}
+	virtual ~PixelBufferRenderTarget(){}
 
-	virtual bool destroy();
+	virtual bool create()=0;
+	virtual void destroy()=0;
 
-	/// @todo: Implement these, or somehow remove them from the Surface requirements
-	virtual int getUsage() const{return 0;}
-	virtual int getAccess() const{return 0;}
-	virtual int getDataSize() const{return 0;}
-
-	virtual int getWidth() const{return mWidth;}
-	virtual int getHeight() const{return mHeight;}
-
-	virtual uint8 *lock(int lockAccess);
-	virtual bool unlock();
-
-	inline IDirect3DSurface9 *getSurface() const{return mSurface;}
-
-protected:
-	IDirect3DSurface9 *mSurface;
-	int mWidth;
-	int mHeight;
-
-	friend D3D9Renderer;
+	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment)=0;
+	virtual bool remove(PixelBuffer::ptr buffer)=0;
+	virtual bool compile()=0;
 };
 
 }

@@ -426,8 +426,8 @@ void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue 
 
 Image::ptr Scene::renderToImage(Renderer *renderer,CameraNode *camera,int format,int width,int height){
 	Texture::ptr renderTexture=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET,Texture::Dimension_D2,format,width,height,0,1);
-	SurfaceRenderTarget::ptr renderTarget=mEngine->getTextureManager()->createSurfaceRenderTarget();
-	renderTarget->attach(renderTexture->getMipSurface(0,0),SurfaceRenderTarget::Attachment_COLOR_0);
+	PixelBufferRenderTarget::ptr renderTarget=mEngine->getTextureManager()->createPixelBufferRenderTarget();
+	renderTarget->attach(renderTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
 
 	RenderTarget *oldTarget=renderer->getRenderTarget();
 	renderer->setRenderTarget(renderTarget);

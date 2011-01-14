@@ -1,9 +1,9 @@
 # Standard setup
 cmake_minimum_required (VERSION 2.6)
-project (convextest CXX C)
+project (vlctoadlet CXX C)
 
 # Custom cmake scripts
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${convextest_SOURCE_DIR}/../../../cmake/Modules/")
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${vlctoadlet_SOURCE_DIR}/../../../cmake/Modules/")
 
 # Find toadlet
 find_package (toadlet REQUIRED)
@@ -16,15 +16,15 @@ set (LIBS ${TOADLET_EGG_LIB} ${TOADLET_PEEPER_LIB} ${TOADLET_RIBBIT_LIB} ${TOADL
 
 # Source files
 set (SRC
-	ConvexTest.cpp
+	VLCToadlet.cpp
 )
 
 # Headers
 set (H
-	ConvexTest.h
+	VLCToadlet.h
 )
 
 # Executable
-add_executable (convextest ${SRC} ${H})
-target_link_libraries (convextest ${LIBS})
-install (TARGETS convextest DESTINATION ${convextest_BINARY_DIR})
+add_executable (vlctoadlet ${SRC} ${H})
+target_link_libraries (vlctoadlet ${LIBS})
+install (TARGETS vlctoadlet DESTINATION ${vlctoadlet_BINARY_DIR})

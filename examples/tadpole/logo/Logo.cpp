@@ -6,7 +6,7 @@ class GravityFollower:public NodeListener,MotionDetectorListener{
 public:
 	GravityFollower(MotionDetector *detector,float offset){
 		mDetector=detector;
-	mDetector->setListener(this);
+		mDetector->setListener(this);
 		mOffset=offset;
 	}
 
@@ -73,7 +73,7 @@ Logo::~Logo(){
 }
 
 void Logo::create(){
-	Application::create();
+	Application::create(Application::RendererPlugin_D3D10);
 
 	scene=Scene::ptr(new Scene(mEngine));
 
@@ -82,7 +82,7 @@ void Logo::create(){
 	//MemoryStream::ptr in(new MemoryStream(lt_xmsh::data,lt_xmsh::length,lt_xmsh::length,false));
 	//Mesh::ptr mesh=shared_static_cast<Mesh>(getEngine()->getMeshManager()->findHandler("xmsh")->load(in,NULL));
 
-	meshNode=getEngine()->createNodeType(MeshNode::type(),scene);
+ 	meshNode=getEngine()->createNodeType(MeshNode::type(),scene);
 	meshNode->setMesh(mesh);
 	meshNode->getAnimationController()->start();
 	meshNode->getAnimationController()->setCycling(MeshNode::MeshAnimationController::Cycling_REFLECT);

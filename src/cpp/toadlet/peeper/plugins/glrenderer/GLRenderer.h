@@ -55,13 +55,15 @@ public:
 
 	// Startup/Shutdown
 	bool create(RenderTarget *target,int *options);
-	bool destroy();
+	void destroy();
 	RendererStatus getStatus(){return RendererStatus_OK;}
 	bool reset();
+	bool activateAdditionalContext();
 
 	// Resource operations
 	Texture *createTexture();
-	SurfaceRenderTarget *createSurfaceRenderTarget();
+	PixelBufferRenderTarget *createPixelBufferRenderTarget();
+	PixelBuffer *createPixelBuffer();
 	VertexFormat *createVertexFormat();
 	VertexBuffer *createVertexBuffer();
 	IndexBuffer *createIndexBuffer();
@@ -84,7 +86,8 @@ public:
 	void beginScene();
 	void endScene();
 	void renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData);
-	bool copyToSurface(Surface *surface);
+	bool copyFrameBufferToPixelBuffer(PixelBuffer *dst);
+	bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src);
 
 	// Render state operations
 	void setDefaultStates();

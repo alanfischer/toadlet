@@ -39,6 +39,8 @@
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/Light.h>
 #include <toadlet/peeper/LightEffect.h>
+#include <toadlet/peeper/PixelBuffer.h>
+#include <toadlet/peeper/PixelBufferRenderTarget.h>
 #include <toadlet/peeper/Program.h>
 #include <toadlet/peeper/Query.h>
 #include <toadlet/peeper/Renderer.h>
@@ -47,8 +49,6 @@
 #include <toadlet/peeper/SequenceTexture.h>
 #include <toadlet/peeper/Shader.h>
 #include <toadlet/peeper/StatisticsSet.h>
-#include <toadlet/peeper/Surface.h>
-#include <toadlet/peeper/SurfaceRenderTarget.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/peeper/TextureBlend.h>
 #include <toadlet/peeper/TextureStage.h>

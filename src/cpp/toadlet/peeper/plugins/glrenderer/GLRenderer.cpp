@@ -29,7 +29,7 @@
 #include "GLRenderTarget.h"
 #include "GLTexture.h"
 #if defined(TOADLET_HAS_GLFBOS)
-	#include "GLFBOSurfaceRenderTarget.h"
+	#include "GLFBORenderTarget.h"
 #endif
 #if defined(TOADLET_HAS_GLQUERY)
 	#include "GLQuery.h"
@@ -57,8 +57,8 @@ namespace toadlet{
 namespace peeper{
 
 #if defined(TOADLET_HAS_GLPBUFFERS)
-	extern bool GLPBufferSurfaceRenderTarget_available(GLRenderer *renderer);
-	extern SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer);
+	extern bool GLPBufferRenderTarget_available(GLRenderer *renderer);
+	extern PixelBufferRenderTarget *new_GLPBufferRenderTarget(GLRenderer *renderer);
 #endif
 
 TOADLET_C_API Renderer* new_GLRenderer(){
@@ -97,7 +97,9 @@ GLRenderer::GLRenderer():
 	mMultiTexture(false),
 
 	mPrimaryRenderTarget(NULL),
-	mRenderTarget(NULL)
+	mGLPrimaryRenderTarget(NULL),
+	mRenderTarget(NULL),
+	mGLRenderTarget(NULL)
 
 	#if defined(TOADLET_DEBUG)
 		,mBeginEndCounter(0)
@@ -231,12 +233,12 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 	mCapabilitySet.maxLights=maxLights;
 
 	#if defined(TOADLET_HAS_GLPBUFFERS)
-		mPBuffersAvailable=usePBuffers && GLPBufferSurfaceRenderTarget_available(this);
+		mPBuffersAvailable=usePBuffers && GLPBufferRenderTarget_available(this);
 	#else
 		mPBuffersAvailable=false;
 	#endif
 	#if defined(TOADLET_HAS_GLFBOS)
-		mFBOsAvailable=useFBOs && GLFBOSurfaceRenderTarget::available(this);
+		mFBOsAvailable=useFBOs && GLFBORenderTarget::available(this);
 	#else
 		mFBOsAvailable=false;
 	#endif
@@ -322,7 +324,7 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 	return true;
 }
 
-bool GLRenderer::destroy(){
+void GLRenderer::destroy(){
 	if(mPrimaryRenderTarget!=NULL){
 		mPrimaryRenderTarget=NULL;
 		mGLPrimaryRenderTarget=NULL;
@@ -334,8 +336,6 @@ bool GLRenderer::destroy(){
 		Logger::alert(Categories::TOADLET_PEEPER,
 			"destroyed GLRenderer");
 	}
-
-	return true;
 }
 
 bool GLRenderer::reset(){
@@ -348,25 +348,36 @@ bool GLRenderer::reset(){
 	return true;
 }
 
+bool GLRenderer::activateAdditionalContext(){
+	if(mGLPrimaryRenderTarget!=NULL){
+		return mGLPrimaryRenderTarget->activateAdditionalContext();
+	}
+	return false;
+}
+
 // Resource operations
 Texture *GLRenderer::createTexture(){
 	return new GLTexture(this);
 }
 
-SurfaceRenderTarget *GLRenderer::createSurfaceRenderTarget(){
+PixelBufferRenderTarget *GLRenderer::createPixelBufferRenderTarget(){
 	#if defined(TOADLET_HAS_GLFBOS)
 		if(mFBOsAvailable){
-			return new GLFBOSurfaceRenderTarget(this);
+			return new GLFBORenderTarget(this);
 		}
 	#endif
 	#if defined(TOADLET_HAS_GLPBUFFERS)
 		if(mPBuffersAvailable){
-			return new_GLPBufferSurfaceRenderTarget(this);
+			return new_GLPBufferRenderTarget(this);
 		}
 	#endif
 
-	Error::unimplemented("GLRenderer::createSurfaceRenderTarget is unavailable");
+	Error::unimplemented("GLRenderer::createPixelBufferRenderTarget is unavailable");
 	return NULL;
+}
+
+PixelBuffer *GLRenderer::createPixelBuffer(){
+	return new GLBuffer(this);
 }
 
 VertexFormat *GLRenderer::createVertexFormat(){
@@ -509,23 +520,26 @@ void GLRenderer::setProjectionMatrix(const Matrix4x4 &matrix){
 }
 
 bool GLRenderer::setRenderTarget(RenderTarget *target){
-	if(target==NULL){
-		Error::nullPointer(Categories::TOADLET_PEEPER,
-			"RenderTarget is NULL");
-		return false;
+	GLRenderTarget *gltarget=NULL;
+	if(target!=NULL){
+		gltarget=(GLRenderTarget*)target->getRootRenderTarget();
+		if(gltarget==NULL){
+			Error::nullPointer(Categories::TOADLET_PEEPER,
+				"RenderTarget is not a GLRenderTarget");
+			return false;
+		}
 	}
 
-	GLRenderTarget *gltarget=(GLRenderTarget*)target->getRootRenderTarget();
-	if(gltarget==NULL){
-		Error::nullPointer(Categories::TOADLET_PEEPER,
-			"RenderTarget is not a GLRenderTarget");
-		return false;
+	if(mGLRenderTarget!=NULL){
+		mGLRenderTarget->deactivate();
 	}
 
 	mRenderTarget=target;
 	mGLRenderTarget=gltarget;
 
-	mGLRenderTarget->makeCurrent();
+	if(mGLRenderTarget!=NULL){
+		mGLRenderTarget->activate();
+	}
 
 	TOADLET_CHECK_GLERROR("setRenderTarget");
 
@@ -729,20 +743,21 @@ void GLRenderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexDa
 	}
 }
 
-bool GLRenderer::copyToSurface(Surface *surface){
-	GLSurface *glsurface=(GLSurface*)surface->getRootSurface();
+bool GLRenderer::copyFrameBufferToPixelBuffer(PixelBuffer *dst){
+	GLPixelBuffer *glpixelBuffer=(GLPixelBuffer*)dst->getRootPixelBuffer();
 
-	GLTextureMipSurface *textureSurface=glsurface->castToGLTextureMipSurface();
-	GLFBORenderbufferSurface *renderbufferSurface=glsurface->castToGLFBORenderbufferSurface();
+	GLTextureMipPixelBuffer *textureBuffer=glpixelBuffer->castToGLTextureMipPixelBuffer();
+	GLFBOPixelBuffer *fboBuffer=glpixelBuffer->castToGLFBOPixelBuffer();
+	GLBuffer *pixelBuffer=glpixelBuffer->castToGLBuffer();
 	RenderTarget *renderTarget=mRenderTarget->getRootRenderTarget();
 
-	if(textureSurface!=NULL){
-		GLTexture *gltexture=textureSurface->getTexture();
+	if(textureBuffer!=NULL){
+		GLTexture *gltexture=textureBuffer->getTexture();
 
 		glBindTexture(gltexture->mTarget,gltexture->mHandle);
 		TOADLET_CHECK_GLERROR("glBindTexture");
 
-		glCopyTexSubImage2D(gltexture->mTarget,textureSurface->getLevel(),0,0,0,renderTarget->getHeight()-gltexture->mHeight,gltexture->mWidth,gltexture->mHeight);
+		glCopyTexSubImage2D(gltexture->mTarget,textureBuffer->getLevel(),0,0,0,renderTarget->getHeight()-gltexture->mHeight,gltexture->mWidth,gltexture->mHeight);
 		TOADLET_CHECK_GLERROR("glCopyTexSubImage2D");
 
 		Matrix4x4 matrix;
@@ -750,9 +765,50 @@ bool GLRenderer::copyToSurface(Surface *surface){
 		Math::setMatrix4x4FromTranslate(matrix,0,Math::ONE,0);
 		gltexture->setMatrix(matrix);
 	}
-	else if(renderbufferSurface!=NULL){
+	else if(fboBuffer!=NULL){
 		Error::unimplemented(Categories::TOADLET_PEEPER,
-			"GLRenderer::copyToSurface: unimplemented for GLFBORenderbufferSurface");
+			"GLRenderer::copyToSurface: unimplemented for fbo");
+		return false;
+	}
+	else if(pixelBuffer!=NULL){
+		Error::unimplemented(Categories::TOADLET_PEEPER,
+			"GLRenderer::copyToSurface: unimplemented for pbo");
+		return false;
+	}
+
+	return true;
+}
+
+bool GLRenderer::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
+	#if defined(TOADLET_HAS_GLEW)
+		GLPixelBuffer *gldst=(GLPixelBuffer*)dst->getRootPixelBuffer();
+		GLPixelBuffer *glsrc=(GLPixelBuffer*)src->getRootPixelBuffer();
+
+		GLTextureMipPixelBuffer *srcTextureBuffer=glsrc->castToGLTextureMipPixelBuffer();
+		GLBuffer *srcPixelBuffer=glsrc->castToGLBuffer();
+		GLTextureMipPixelBuffer *dstTextureBuffer=gldst->castToGLTextureMipPixelBuffer();
+		GLBuffer *dstPixelBuffer=gldst->castToGLBuffer();
+
+		if(srcTextureBuffer!=NULL && dstPixelBuffer!=NULL){
+			glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB,dstPixelBuffer->mHandle);
+
+			GLTexture *srcTexture=srcTextureBuffer->mTexture;
+			srcTexture->load(srcTexture->mWidth,srcTexture->mHeight,srcTexture->mDepth,srcTextureBuffer->mLevel,NULL);
+
+			glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB,0);
+		}
+		else if(srcPixelBuffer!=NULL && dstTextureBuffer!=NULL){
+			glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB,srcPixelBuffer->mHandle);
+
+			GLTexture *dstTexture=dstTextureBuffer->mTexture;
+			dstTexture->load(dstTexture->mWidth,dstTexture->mHeight,dstTexture->mDepth,dstTextureBuffer->mLevel,NULL);
+
+			glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB,0);
+		}
+		else
+	#endif
+	{
+		Error::unimplemented("copyPixelBuffer not implemented for these pixel buffer types");
 		return false;
 	}
 
@@ -1896,6 +1952,19 @@ GLuint GLRenderer::getGLFormat(int textureFormat){
 	else if((textureFormat&Texture::Format_BIT_RGBA)>0){
 		format=GL_RGBA;
 	}
+	#if defined(TOADLET_HAS_GLEW)
+		else if((textureFormat&Texture::Format_BIT_DXT1)>0){
+			format=GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+		}
+		else if((textureFormat&Texture::Format_BIT_DXT2)>0 ||
+				(textureFormat&Texture::Format_BIT_DXT3)>0){
+			format=GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+		}
+		else if((textureFormat&Texture::Format_BIT_DXT4)>0 ||
+				(textureFormat&Texture::Format_BIT_DXT5)>0){
+			format=GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+		}
+	#endif
 
 	#if !defined(TOADLET_HAS_GLES) || defined(TOADLET_HAS_EAGL)
 		else if((textureFormat&Texture::Format_BIT_DEPTH)>0){

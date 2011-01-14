@@ -86,6 +86,7 @@
 
 #include <toadlet/tadpole/handler/MMSHHandler.h>
 #include <toadlet/tadpole/handler/BMPHandler.h>
+#include <toadlet/tadpole/handler/DDSHandler.h>
 #include <toadlet/tadpole/handler/SPRHandler.h>
 #include <toadlet/tadpole/handler/TGAHandler.h>
 #include <toadlet/tadpole/handler/TPKGHandler.h>
@@ -135,7 +136,7 @@
 	#include <toadlet/tadpole/handler/SIDHandler.h>
 #endif
 #if defined(TOADLET_PLATFORM_OSX)
-	#include <toadlet/tadpole/handler/CoreAudioHandler.h>
+//	#include <toadlet/tadpole/handler/CoreAudioHandler.h>
 #endif
 
 #if !defined(TOADLET_FIXED_POINT)
@@ -153,17 +154,12 @@ using namespace toadlet::tadpole::mesh;
 namespace toadlet{
 namespace tadpole{
 
-Engine::Engine():
+Engine::Engine(bool backable):
 	//mDirectory,
 	//mScene,
 	mRenderer(NULL),
 	mAudioPlayer(NULL)
 {
-	bool backable=true;
-	#if defined(TOADLET_PLATFORM_IPHONE) || defined(TOADLET_PLATFORM_WINCE)
-		backable=false;
-	#endif
-	
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"creating Engine");
 
@@ -211,6 +207,7 @@ Engine::Engine():
 	#endif
 
 	// Texture handlers
+	mTextureManager->setHandler(DDSHandler::ptr(new DDSHandler(mTextureManager)),"dds");
 	#if defined(TOADLET_HAS_GDIPLUS)
 		mTextureManager->setDefaultHandler(Win32TextureHandler::ptr(new Win32TextureHandler(mTextureManager)));
 	#elif defined(TOADLET_PLATFORM_OSX)
@@ -264,7 +261,7 @@ Engine::Engine():
 	#endif
 	#if defined(TOADLET_PLATFORM_OSX)
 		/// @todo: We need to fix the createStream function of AudioBufferManager so it will try the default handler
-		mAudioBufferManager->setDefaultHandler(CoreAudioHandler::ptr(new CoreAudioHandler(mAudioBufferManager)));
+//		mAudioBufferManager->setDefaultHandler(CoreAudioHandler::ptr(new CoreAudioHandler(mAudioBufferManager)));
 	#endif
 }
 

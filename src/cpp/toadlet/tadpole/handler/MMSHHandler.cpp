@@ -123,7 +123,7 @@ Mesh::ptr MMSHHandler::loadMeshVersion3(DataStream::ptr stream){
 			VertexBuffer::ptr vertexBuffer;
 			if(mBufferManager!=NULL){
 				if(mesh->vertexBoneAssignments.size()>0){
-					vertexBuffer=mBufferManager->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,vertexFormat,numVertexes);
+					vertexBuffer=mBufferManager->createVertexBuffer(Buffer::Usage_BIT_STAGING,Buffer::Access_READ_WRITE,vertexFormat,numVertexes);
 				}
 				else{
 					vertexBuffer=mBufferManager->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,numVertexes);

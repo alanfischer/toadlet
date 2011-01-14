@@ -38,6 +38,7 @@ namespace tadpole{
 
 class Material;
 class Transform;
+class Bound;
 
 class Renderable{
 public:
@@ -45,6 +46,7 @@ public:
 
 	virtual Material *getRenderMaterial() const=0;
 	virtual Transform *getRenderTransform() const=0;
+	virtual Bound *getRenderBound() const=0;
 	virtual void render(peeper::Renderer *renderer) const=0;
 };
 	
@@ -56,6 +58,7 @@ public:
 	RenderableWorkaround(RenderableType *type):renderable(type){}
 	Material *getRenderMaterial() const{return renderable->getRenderMaterial();}
 	Transform *getRenderTransform() const{return renderable->getRenderTransform();}
+	Bound *getRenderBound() const{return renderable->getRenderBound();}
 	void render(peeper::Renderer *renderer) const{renderable->render(renderer);}
 };
 #define TOADLET_GIB_DEFINE(type) toadlet::tadpole::RenderableWorkaround<type> renderable;

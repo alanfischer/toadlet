@@ -127,22 +127,20 @@ bool IOSMotionDetector::shutdown(){
 	return true;
 }
 
-bool IOSMotionDetector::destroy(){
+void IOSMotionDetector::destroy(){
 	if(mState==State_DESTROYED){
-		return true;
+		return;
 	}
 
 	if(mState!=State_STOPPED){
 		Error::sequence(Categories::TOADLET_FLICK,
 			"destroy called out of sequence");
-		return false;
+		return;
 	}
 
 	mState=State_DESTROYED;
 
 	[mAccelerometerDelegate release];
-	
-	return true;
 }
 
 void IOSMotionDetector::setPollSleep(int ms){

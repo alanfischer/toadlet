@@ -83,7 +83,7 @@ void Viewer::start(MeshNode::ptr meshNode){
 	mCamera->setClearColor(Colors::ORANGE);
 	mScene->getRoot()->attach(mCamera);
 
-	mDistance=meshNode->getLocalBound().getSphere().radius*2;
+	mDistance=meshNode->getBound()->getSphere().radius*2;
 
 	mScene->setAmbientColor(Color(Math::QUARTER,Math::QUARTER,Math::QUARTER,Math::ONE));
 

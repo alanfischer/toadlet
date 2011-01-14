@@ -36,6 +36,64 @@
 namespace toadlet{
 namespace tadpole{
 
+/*
+Different state blocks:
+ RASTERIZER
+	D3D10_FILL_MODE FillMode;
+	D3D10_CULL_MODE CullMode;
+	BOOL            FrontCounterClockwise;
+	INT             DepthBias;
+	FLOAT           DepthBiasClamp;
+	FLOAT           SlopeScaledDepthBias;
+	BOOL            DepthClipEnable;
+	BOOL            ScissorEnable;
+	BOOL            MultisampleEnable;
+	BOOL            AntialiasedLineEnable;
+ DEPTH STENCIL
+	BOOL                       DepthEnable;
+	D3D10_DEPTH_WRITE_MASK     DepthWriteMask;
+	D3D10_COMPARISON_FUNC      DepthFunc;
+	BOOL                       StencilEnable;
+	UINT8                      StencilReadMask;
+	UINT8                      StencilWriteMask;
+	D3D10_DEPTH_STENCILOP_DESC FrontFace;
+	D3D10_DEPTH_STENCILOP_DESC BackFace;
+  BLEND
+	BOOL           AlphaToCoverageEnable;
+	BOOL           BlendEnable[8];
+	D3D10_BLEND    SrcBlend;
+	D3D10_BLEND    DestBlend;
+	D3D10_BLEND_OP BlendOp;
+	D3D10_BLEND    SrcBlendAlpha;
+	D3D10_BLEND    DestBlendAlpha;
+	D3D10_BLEND_OP BlendOpAlpha;
+	UINT8          RenderTargetWriteMask[8];
+*/
+
+/*
+	peeper::LightEffect mLightEffect;
+	bool mLighting;
+peeper::Renderer::FaceCulling mFaceCulling;
+peeper::Renderer::Fill mFill;
+	peeper::Renderer::Shading mShading;
+	peeper::Renderer::Fog mFog;
+	scalar mFogNearDistance,mFogFarDistance;
+	peeper::Color mFogColor;
+	peeper::Renderer::AlphaTest mAlphaTest;
+	scalar mAlphaTestCutoff;
+peeper::Blend mBlend;
+	bool mDepthSorted;
+bool mDepthWrite;
+peeper::Renderer::DepthTest mDepthTest;
+	bool mPointSprite;
+	scalar mPointSize;
+	bool mPointAttenuated;
+	scalar mPointConstant,mPointLinear,mPointQuadratic,mPointMinSize,mPointMaxSize;
+	int mLayer;
+	egg::Collection<peeper::TextureStage::ptr> mTextureStages;
+	bool mSaveLocally;
+*/
+
 class TOADLET_API Material:public egg::BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(Material);

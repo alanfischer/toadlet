@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "WGLPBufferSurfaceRenderTarget.h"
+#include "WGLPBufferRenderTarget.h"
 #include "../../GLRenderer.h"
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
@@ -34,15 +34,15 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-bool GLPBufferSurfaceRenderTarget_available(GLRenderer *renderer){
-	return WGLPBufferSurfaceRenderTarget::available(renderer);
+bool GLPBufferRenderTarget_available(GLRenderer *renderer){
+	return WGLPBufferRenderTarget::available(renderer);
 }
 
-SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer){
-	return new WGLPBufferSurfaceRenderTarget(renderer);
+PixelBufferRenderTarget *new_GLPBufferRenderTarget(GLRenderer *renderer){
+	return new WGLPBufferRenderTarget(renderer);
 }
 
-bool WGLPBufferSurfaceRenderTarget::available(GLRenderer *renderer){
+bool WGLPBufferRenderTarget::available(GLRenderer *renderer){
 	#if defined(TOADLET_HAS_GLEW)
 		return WGLEW_ARB_render_texture>0;
 	#else
@@ -50,7 +50,7 @@ bool WGLPBufferSurfaceRenderTarget::available(GLRenderer *renderer){
 	#endif
 }
 
-WGLPBufferSurfaceRenderTarget::WGLPBufferSurfaceRenderTarget(GLRenderer *renderer):WGLRenderTarget(),
+WGLPBufferRenderTarget::WGLPBufferRenderTarget(GLRenderer *renderer):WGLRenderTarget(),
 	mRenderer(NULL),
 	mCopy(false),
 	mTexture(NULL),
@@ -63,11 +63,11 @@ WGLPBufferSurfaceRenderTarget::WGLPBufferSurfaceRenderTarget(GLRenderer *rendere
 	mRenderer=renderer;
 }
 
-WGLPBufferSurfaceRenderTarget::~WGLPBufferSurfaceRenderTarget(){
+WGLPBufferRenderTarget::~WGLPBufferRenderTarget(){
 	destroy();
 }
 
-bool WGLPBufferSurfaceRenderTarget::create(){
+bool WGLPBufferRenderTarget::create(){
 	mCopy=true;
 	mWidth=0;
 	mHeight=0;
@@ -77,16 +77,14 @@ bool WGLPBufferSurfaceRenderTarget::create(){
 	return true;
 }
 
-bool WGLPBufferSurfaceRenderTarget::destroy(){
+void WGLPBufferRenderTarget::destroy(){
 	destroyBuffer();
-
-	return true;
 }
 
-bool WGLPBufferSurfaceRenderTarget::makeCurrent(){
+bool WGLPBufferRenderTarget::activate(){
 	unbind();
 
-	WGLRenderTarget::makeCurrent();
+	WGLRenderTarget::activate();
 
 	if(mInitialized==false){
 		mRenderer->setDefaultStates();
@@ -96,7 +94,7 @@ bool WGLPBufferSurfaceRenderTarget::makeCurrent(){
 	return true;
 }
 
-bool WGLPBufferSurfaceRenderTarget::swap(){
+bool WGLPBufferRenderTarget::swap(){
 	glFlush();
 
 	bind();
@@ -104,9 +102,9 @@ bool WGLPBufferSurfaceRenderTarget::swap(){
 	return true;
 }
 
-bool WGLPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
-	GLTextureMipSurface *gltextureSurface=((GLSurface*)surface->getRootSurface())->castToGLTextureMipSurface();
-	mTexture=gltextureSurface->getTexture();
+bool WGLPBufferRenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachment){
+	GLTextureMipPixelBuffer *texturebuffer=((GLPixelBuffer*)buffer->getRootPixelBuffer())->castToGLTextureMipPixelBuffer();
+	mTexture=texturebuffer->getTexture();
 
 	if((mTexture->getFormat()&Texture::Format_BIT_DEPTH)>0){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
@@ -119,7 +117,7 @@ bool WGLPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attac
 	return true;
 }
 
-bool WGLPBufferSurfaceRenderTarget::remove(Surface::ptr surface){
+bool WGLPBufferRenderTarget::remove(PixelBuffer::ptr buffer){
 	mTexture=NULL;
 
 	compile();
@@ -127,7 +125,7 @@ bool WGLPBufferSurfaceRenderTarget::remove(Surface::ptr surface){
 	return false;
 }
 
-bool WGLPBufferSurfaceRenderTarget::compile(){
+bool WGLPBufferRenderTarget::compile(){
 	if(mTexture!=NULL){
 		createBuffer();
 
@@ -143,16 +141,15 @@ bool WGLPBufferSurfaceRenderTarget::compile(){
 	return true;
 }
 
-bool WGLPBufferSurfaceRenderTarget::createBuffer(){
+bool WGLPBufferRenderTarget::createBuffer(){
 	destroyBuffer();
+
+	WGLRenderTarget *primaryTarget=(WGLRenderTarget*)mRenderer->getPrimaryRenderTarget();
 
 	int width=mTexture->getWidth();
 	int height=mTexture->getHeight();
 
-	HDC hdc=wglGetCurrentDC();
-	TOADLET_CHECK_WGLERROR("wglGetCurrentDC");
-	HGLRC context=wglGetCurrentContext();
-	TOADLET_CHECK_WGLERROR("wglGetCurrentContext");
+	HDC hdc=primaryTarget->getDC();
 
 	int bindType=WGL_BIND_TO_TEXTURE_RGB_ARB;
 	int pixelType=WGL_TYPE_RGBA_ARB;
@@ -236,10 +233,10 @@ bool WGLPBufferSurfaceRenderTarget::createBuffer(){
 		return false;
 	}
 
-	if(!wglShareLists(context,mGLRC)){
+	if(wglShareLists(((WGLRenderTarget*)primaryTarget)->getGLRC(),mGLRC)==false){
 		destroyBuffer();
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"wglShareLists() failed");
+			"sharing failed");
 		return false;
 	}
 
@@ -256,11 +253,11 @@ bool WGLPBufferSurfaceRenderTarget::createBuffer(){
 	return true;
 }
 
-bool WGLPBufferSurfaceRenderTarget::destroyBuffer(){
+bool WGLPBufferRenderTarget::destroyBuffer(){
 	unbind();
 
 	if(mGLRC==wglGetCurrentContext()){
-		((GLRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->makeCurrent();
+		((GLRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->activate();
 	}
 
 	if(mGLRC!=0){
@@ -279,7 +276,7 @@ bool WGLPBufferSurfaceRenderTarget::destroyBuffer(){
 	return true;
 }
 
-void WGLPBufferSurfaceRenderTarget::bind(){
+void WGLPBufferRenderTarget::bind(){
 	if(mBound==false){
 		mBound=true;
 		glBindTexture(mTexture->getTarget(),mTexture->getHandle());
@@ -295,7 +292,7 @@ void WGLPBufferSurfaceRenderTarget::bind(){
 	}
 }
 
-void WGLPBufferSurfaceRenderTarget::unbind(){
+void WGLPBufferRenderTarget::unbind(){
 	if(mBound==true){
 		mBound=false;
 		if(mCopy==false){

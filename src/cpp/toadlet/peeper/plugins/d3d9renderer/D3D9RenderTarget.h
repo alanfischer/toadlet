@@ -38,9 +38,9 @@ public:
 
 	virtual ~D3D9RenderTarget(){}
 
-	virtual bool makeCurrent(IDirect3DDevice9 *device)=0;
-
 	virtual void reset()=0;
+	virtual bool activate()=0;
+	virtual bool deactivate()=0;
 
 	virtual IDirect3DDevice9 *getDirect3DDevice9() const=0;
 	virtual IDirect3D9 *getDirect3D9() const=0;

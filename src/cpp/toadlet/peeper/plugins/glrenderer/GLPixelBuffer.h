@@ -23,56 +23,31 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_AGLPBUFFERRENDERTEXTUREPEER_H
-#define TOADLET_PEEPER_AGLPBUFFERRENDERTEXTUREPEER_H
+#ifndef TOADLET_PEEPER_GLPIXELBUFFER_H
+#define TOADLET_PEEPER_GLPIXELBUFFER_H
 
-#include "AGLRenderTargetPeer.h"
-#include "../../GLTexturePeer.h"
-#include <toadlet/peeper/RenderTexture.h>
+#include "GLIncludes.h"
+#include <toadlet/peeper/PixelBuffer.h>
 
 namespace toadlet{
 namespace peeper{
 
-class GLRenderer;
-	
-class AGLPBufferRenderTexturePeer:public AGLRenderTargetPeer,public GLTexturePeer{
+class GLTextureMipPixelBuffer;
+class GLFBOPixelBuffer;
+class GLBuffer;
+
+class GLPixelBuffer:public PixelBuffer{
 public:
-	static bool available(GLRenderer *renderer);
+	TOADLET_SHARED_POINTERS(GLPixelBuffer);
 
-	AGLPBufferRenderTexturePeer(GLRenderer *renderer,RenderTexture *texture);
+	virtual ~GLPixelBuffer(){}
 
-	virtual ~AGLPBufferRenderTexturePeer();
-
-	TexturePeer *castToTexturePeer(){return this;}
-	RenderTargetPeer *castToRenderTargetPeer(){return this;}
-
-	void makeCurrent();
-
-	void swap();
-
-	void createBuffer();
-
-	void destroyBuffer();
-
-	int getWidth() const;
-	int getHeight() const;
-
-	bool isValid() const;
-
-	inline AGLPbuffer getAGLPbuffer() const{return mPBuffer;}
-
-protected:
-	Renderer *mRenderer;
-	RenderTexture *mTexture;
-	int mScreen;
-	AGLPbuffer mPBuffer;
-//	AGLContext mParentContext;
-	int mWidth;
-	int mHeight;
+	virtual GLTextureMipPixelBuffer *castToGLTextureMipPixelBuffer()=0;
+	virtual GLFBOPixelBuffer *castToGLFBOPixelBuffer()=0;
+	virtual GLBuffer *castToGLBuffer()=0;
 };
 
 }
 }
 
 #endif
-

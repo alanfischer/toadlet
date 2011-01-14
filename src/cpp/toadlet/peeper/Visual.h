@@ -31,6 +31,7 @@
 namespace toadlet{
 namespace peeper{
 
+// This should be merged with the WindowRenderTargetFormat
 class Visual{
 public:
 	Visual():

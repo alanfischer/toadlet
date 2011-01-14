@@ -3,11 +3,11 @@ set (PEEPER_GLRENDERER_SRC
 	GLBuffer.cpp
 	GLRenderer.cpp
 	GLTexture.cpp
-	GLTextureMipSurface.cpp
+	GLTextureMipPixelBuffer.cpp
 	GLVertexFormat.cpp
 )
 if (NOT TOADLET_PLATFORM_WINCE)
-	set (PEEPER_GLRENDERER_SRC ${PEEPER_GLRENDERER_SRC} GLFBOSurfaceRenderTarget.cpp GLFBORenderbufferSurface.cpp)
+	set (PEEPER_GLRENDERER_SRC ${PEEPER_GLRENDERER_SRC} GLFBORenderTarget.cpp GLFBOPixelBuffer.cpp)
 endif (NOT TOADLET_PLATFORM_WINCE)
 if (NOT TOADLET_PLATFORM_WINCE AND NOT TOADLET_PLATFORM_IPHONE)
 	set (PEEPER_GLRENDERER_SRC ${PEEPER_GLRENDERER_SRC} GLQuery.cpp)
@@ -18,14 +18,14 @@ set (PEEPER_GLRENDERER_PLATFORM_EAGL_SRC
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_EGL_SRC
-	platform/egl/EGLPBufferSurfaceRenderTarget.cpp
+	platform/egl/EGLPBufferRenderTarget.cpp
 	platform/egl/EGLWindowRenderTarget.cpp
 	platform/egl/EGLRenderTarget.cpp
 	platform/egl/glesem/glesem.c
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_GLX_SRC
-	platform/glx/GLXPBufferSurfaceRenderTarget.cpp
+	platform/glx/GLXPBufferRenderTarget.cpp
 	platform/glx/GLXRenderTarget.cpp
 	platform/glx/GLXWindowRenderTarget.cpp
 )
@@ -35,7 +35,7 @@ set (PEEPER_GLRENDERER_PLATFORM_NSGL_SRC
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_WGL_SRC
-	platform/wgl/WGLPBufferSurfaceRenderTarget.cpp
+	platform/wgl/WGLPBufferRenderTarget.cpp
 	platform/wgl/WGLRenderTarget.cpp
 	platform/wgl/WGLWindowRenderTarget.cpp
 )
@@ -50,12 +50,12 @@ set (PEEPER_GLRENDERER_HEADERS
 	GLSLProgramPeer.h
 	GLSLShaderPeer.h
 	GLTexture.h
-	GLTextureMipSurface.h
-	GLSurface.h
+	GLTextureMipPixelBuffer.h
+	GLPixelBuffer.h
 	GLVertexFormat.h
 )
 if (NOT TOADLET_PLATFORM_WINCE)
-	set (PEEPER_GLRENDERER_HEADERS ${PEEPER_GLRENDERER_HEADERS} GLFBOSurfaceRenderTarget.h GLFBORenderbufferSurface.h)
+	set (PEEPER_GLRENDERER_HEADERS ${PEEPER_GLRENDERER_HEADERS} GLFBORenderTarget.h GLFBOPixelBuffer.h)
 endif (NOT TOADLET_PLATFORM_WINCE)
 if (NOT TOADLET_PLATFORM_WINCE AND NOT TOADLET_PLATFORM_IPHONE)
 	set (PEEPER_GLRENDERER_HEADERS ${PEEPER_GLRENDERER_HEADERS} GLQuery.h)
@@ -66,14 +66,14 @@ set (PEEPER_GLRENDERER_PLATFORM_EAGL_HEADERS
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_EGL_HEADERS
-	platform/egl/EGLPBufferSurfaceRenderTarget.h
+	platform/egl/EGLPBufferRenderTarget.h
 	platform/egl/EGLWindowRenderTarget.h
 	platform/egl/EGLRenderTarget.h
 	platform/egl/glesem/glesem.h
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_GLX_HEADERS
-	platform/glx/GLXPBufferSurfaceRenderTarget.h
+	platform/glx/GLXPBufferRenderTarget.h
 	platform/glx/GLXRenderTarget.h
 	platform/glx/GLXWindowRenderTarget.h
 )
@@ -83,7 +83,7 @@ set (PEEPER_GLRENDERER_PLATFORM_NSGL_HEADERS
 )
 
 set (PEEPER_GLRENDERER_PLATFORM_WGL_HEADERS
-	platform/wgl/WGLPBufferSurfaceRenderTarget.h
+	platform/wgl/WGLPBufferRenderTarget.h
 	platform/wgl/WGLRenderTarget.h
 	platform/wgl/WGLWindowRenderTarget.h
 )

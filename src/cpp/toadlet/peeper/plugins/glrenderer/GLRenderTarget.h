@@ -35,9 +35,12 @@ class GLRenderTarget:public RenderTarget{
 public:
 	virtual ~GLRenderTarget(){}
 
-	virtual bool makeCurrent()=0;
 	virtual bool swap()=0;
 	virtual void reset(){} // Mostly unused except for NSGLRenderTarget
+	virtual bool activate()=0;
+	virtual bool deactivate()=0;
+	virtual bool activateAdditionalContext()=0;
+	virtual void deactivateAdditionalContext()=0;
 };
 
 }

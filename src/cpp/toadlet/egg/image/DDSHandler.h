@@ -23,29 +23,29 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_GLSURFACE_H
-#define TOADLET_PEEPER_GLSURFACE_H
+#ifndef TOADLET_EGG_IMAGE_DDSHANDLER_H
+#define TOADLET_EGG_IMAGE_DDSHANDLER_H
 
-#include "GLIncludes.h"
-#include <toadlet/peeper/Surface.h>
+#include <toadlet/egg/image/Image.h>
+#include <toadlet/egg/io/Stream.h>
+#include <toadlet/egg/Collection.h>
 
 namespace toadlet{
-namespace peeper{
+namespace egg{
+namespace image{
 
-class GLTextureMipSurface;
-class GLFBORenderbufferSurface;
-
-class GLSurface:public Surface{
+class TOADLET_API DDSHandler{
 public:
-	TOADLET_SHARED_POINTERS(GLSurface);
+	DDSHandler();
+	virtual ~DDSHandler();
 
-	virtual ~GLSurface(){}
-
-	virtual GLTextureMipSurface *castToGLTextureMipSurface()=0;
-	virtual GLFBORenderbufferSurface *castToGLFBORenderbufferSurface()=0;
+	virtual bool loadImage(io::Stream *stream,Collection<Image::ptr> &mipLevels);
+	virtual bool saveImage(Image *image,io::Stream *stream);
 };
 
 }
 }
+}
 
 #endif
+

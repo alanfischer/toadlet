@@ -41,7 +41,7 @@ D3D9IndexBuffer::D3D9IndexBuffer(D3D9Renderer *renderer):
 	mUsage(0),
 	mAccess(0),
 	mSize(0),
-	mIndexFormat(IndexFormat_UINT8),
+	mIndexFormat((IndexFormat)0),
 	mDataSize(0),
 
 	mD3DFormat(D3DFMT_INDEX16),
@@ -100,22 +100,31 @@ void D3D9IndexBuffer::resetDestroy(){
 
 bool D3D9IndexBuffer::createContext(bool restore){
 	mD3DUsage=0;
-	mD3DPool=D3DPOOL_MANAGED;
 	if((mUsage&Usage_BIT_DYNAMIC)>0){
 		mD3DUsage|=D3DUSAGE_DYNAMIC;
-		#if !defined(TOADLET_SET_D3DM)
-			mD3DPool=D3DPOOL_DEFAULT;
-		#endif
 	}
-
 	if(mAccess==Access_BIT_WRITE){
 		mD3DUsage|=D3DUSAGE_WRITEONLY;
 	}
 
+	#if defined(TOADLET_SET_D3DM)
+		mD3DPool=D3DPOOL_MANAGED;
+	#else
+		if((mUsage&Usage_BIT_STAGING)>0){
+			mD3DPool=D3DPOOL_SYSTEMMEM;
+		}
+		else if((mUsage&Usage_BIT_DYNAMIC)>0){
+			mD3DPool=D3DPOOL_DEFAULT;
+		}
+		else{
+			mD3DPool=D3DPOOL_MANAGED;
+		}
+	#endif
+
 	HRESULT result=mRenderer->getDirect3DDevice9()->CreateIndexBuffer(mDataSize,mD3DUsage,mD3DFormat,mD3DPool,&mIndexBuffer TOADLET_SHAREDHANDLE);
 	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: CreateVertexBuffer");
 
-	if(restore){
+	if(restore && (mUsage&Usage_BIT_DYNAMIC)==0){
 		byte *data=lock(Access_BIT_WRITE);
 		memcpy(data,mBackingData,mDataSize);
 		unlock();
@@ -128,7 +137,7 @@ bool D3D9IndexBuffer::createContext(bool restore){
 }
 
 bool D3D9IndexBuffer::destroyContext(bool backup){
-	if(backup){
+	if(backup && (mUsage&Usage_BIT_DYNAMIC)==0){
 		mBackingData=new uint8[mDataSize];
 
 		TOADLET_TRY

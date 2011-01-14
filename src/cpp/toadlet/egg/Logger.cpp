@@ -154,6 +154,8 @@ void Logger::setStoreLogString(bool storeLogString){
 }
 
 void Logger::addLogString(const String &categoryName,Level level,const String &data){
+	if(categoryName.wc_str()==NULL || data.wc_str()==NULL) return; /// @todo: This apparently happens when a GLTexture is being destroyed after everything else.  Need to look into it.
+
 	Category *category=getCategory(categoryName);
 	lock();
 		if((category==NULL || category->reportingLevel>=level) && mReportingLevel>=level){
@@ -281,6 +283,8 @@ Logger::Category *Logger::addCategory(const String &categoryName){
 }
 
 Logger::Category *Logger::getCategory(const String &categoryName){
+	if(categoryName.wc_str()==NULL) return NULL; /// @todo: This apparently happens when a GLTexture is being destroyed after everything else.  Need to look into it.
+
 	Category *category=NULL;
 	lock();
 		CategoryNameCategoryMap::iterator it=mCategoryNameCategoryMap.find(categoryName);
