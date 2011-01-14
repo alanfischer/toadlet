@@ -24,6 +24,9 @@
  ********** Copyright header - do not remove **********/
 
 #include "GLXWindowRenderTarget.h"
+#include <toadlet/egg/Error.h>
+#include <toadlet/egg/Logger.h>
+#include <toadlet/egg/System.h>
 
 using namespace toadlet::egg;
 
@@ -32,10 +35,14 @@ namespace peeper{
 
 GLXWindowRenderTarget::GLXWindowRenderTarget():GLXRenderTarget(),
 	mVisualInfo(NULL)
+	//mThreadContexts,
+	//mThreadIDs
 {}
 
 GLXWindowRenderTarget::GLXWindowRenderTarget(GLXDrawable drawable,Display *display,XVisualInfo *visualInfo):GLXRenderTarget(),
 	mVisualInfo(NULL)
+	//mThreadContexts,
+	//mThreadIDs
 {
 	createContext(drawable,display,visualInfo);
 }
@@ -58,6 +65,23 @@ bool GLXWindowRenderTarget::createContext(GLXDrawable drawable,Display *display,
 
 	glXMakeCurrent(mDisplay,mDrawable,mContext);
 	
+	/// @todo: Have this accept a WindowRenderTargetFormat, so we can get thread count from there.
+	int threads=2;
+	int numThreads=threads<=1?0:threads-1;
+	mThreadContexts.resize(numThreads,0);
+	mThreadIDs.resize(numThreads,0);
+	int i;
+	for(i=0;i<numThreads;++i){
+		GLXContext context=glXCreateContext(mDisplay,mVisualInfo,mContext,True);
+		if(context==0){
+			destroyContext();
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"Failed to create threaded GL rendering context");
+			return false;
+		}
+		mThreadContexts[i]=context;
+	}
+
 	if(glXIsDirect(mDisplay,mContext)){
 		Logger::alert(Categories::TOADLET_PEEPER,
 			"Using Direct Rendering");
@@ -78,6 +102,48 @@ bool GLXWindowRenderTarget::destroyContext(){
 	}
 
 	return true;
+}
+
+bool GLXWindowRenderTarget::activateAdditionalContext(){
+	int threadID=System::threadID();
+	int i;
+	for(i=0;i<mThreadIDs.size();++i){
+		if(mThreadIDs[i]==threadID){
+			return false;
+		}
+	}
+	
+	for(i=0;i<mThreadIDs.size();++i){
+		if(mThreadIDs[i]==0){
+			break;
+		}
+	}
+	if(i==mThreadIDs.size()){
+		return false;
+	}
+
+	Bool result=glXMakeCurrent(mDisplay,mDrawable,mThreadContexts[i]);
+	if(result==True){
+		mThreadIDs[i]=threadID;
+	}
+	
+	return result==True;
+}
+
+void GLXWindowRenderTarget::deactivateAdditionalContext(){
+	int threadID=System::threadID();
+	int i;
+	for(i=0;i<mThreadIDs.size();++i){
+		if(mThreadIDs[i]==threadID){
+			break;
+		}
+	}
+	if(i==mThreadIDs.size()){
+		return;
+	}
+	
+	glXMakeCurrent(mDisplay,None,NULL);
+	mThreadIDs[i]=0;
 }
 
 bool GLXWindowRenderTarget::swap(){

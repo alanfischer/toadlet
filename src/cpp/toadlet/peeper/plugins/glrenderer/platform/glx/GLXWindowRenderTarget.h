@@ -42,7 +42,9 @@ public:
 
 	virtual bool createContext(GLXDrawable drawable,Display *display,XVisualInfo *visualInfo);
 	virtual bool destroyContext();
-
+	virtual bool activateAdditionalContext();
+	virtual void deactivateAdditionalContext();
+	
 	virtual bool swap();
 
 	virtual bool isPrimary() const{return true;}
@@ -52,6 +54,8 @@ public:
 
 protected:
 	XVisualInfo *mVisualInfo;
+        egg::Collection<GLXContext> mThreadContexts;
+        egg::Collection<int> mThreadIDs;
 };
 
 }

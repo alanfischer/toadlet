@@ -6,6 +6,22 @@
 	This example requires that you copy libvlc.dll, libvlccore.dll, lua, and the plugins directory to the vlctoadlet executable directory
 */
 
+class Spinner:public NodeListener{
+public:
+	Spinner(){
+	}
+
+	void nodeDestroyed(Node *node){}
+
+	void logicUpdate(Node *node,int dt){}
+
+	void frameUpdate(Node *node,int dt){
+		Vector3 axis(1,1,1);
+		Math::normalize(axis);
+		node->setRotate(axis,Math::fromMilli(node->getScene()->getTime()));
+	}
+};
+
 static void *lock(void *data, void **p_pixels){
 	VLCToadlet *self=(VLCToadlet*)data;
 	if(self->activated==false){
@@ -38,6 +54,8 @@ VLCToadlet::~VLCToadlet(){
 void VLCToadlet::create(){
 	Application::create();
 
+	String file="/home/siralanf/bigstuff_backup/ashleigh/Ashleigh mac/Movies/mvi_0811.avi";
+
 	scene=Scene::ptr(new Scene(mEngine));
 
 	int format=mRenderer->getClosestTextureFormat(Texture::Format_RGBA_8);
@@ -51,6 +69,7 @@ void VLCToadlet::create(){
 
 	meshNode=getEngine()->createNodeType(MeshNode::type(),scene);
 	meshNode->setMesh(mesh);
+	meshNode->addNodeListener(NodeListener::ptr(new Spinner()));
 	scene->getRoot()->attach(meshNode);
 
 	cameraNode=getEngine()->createNodeType(CameraNode::type(),scene);
@@ -59,7 +78,7 @@ void VLCToadlet::create(){
 	scene->getRoot()->attach(cameraNode);
 
 	vlc=libvlc_new(0,NULL);
-	media=libvlc_media_new_path(vlc,"C:\\Program Files\\Steam\\steamapps\\siralanf\\team fortress 2\\tf\\media\\pl_goldrush.mov");
+	media=libvlc_media_new_path(vlc,file);
 	mediaplayer=libvlc_media_player_new_from_media(media);
 	libvlc_media_release(media);
 

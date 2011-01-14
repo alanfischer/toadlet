@@ -67,11 +67,11 @@ namespace image{
 #define DDSCAPS2_CUBEMAP_NEGATIVEZ  0x00008000 
 #define DDSCAPS2_VOLUME             0x00200000 
 
-#define D3DFMT_DXT1     '1TXD'    //  DXT1 compression texture format 
-#define D3DFMT_DXT2     '2TXD'    //  DXT2 compression texture format 
-#define D3DFMT_DXT3     '3TXD'    //  DXT3 compression texture format 
-#define D3DFMT_DXT4     '4TXD'    //  DXT4 compression texture format 
-#define D3DFMT_DXT5     '5TXD'    //  DXT5 compression texture format 
+#define D3DFMT_DXT1                 827611204   // '1TXD'
+#define D3DFMT_DXT2                 844388420   // '2TXD'
+#define D3DFMT_DXT3                 861165636   // '3TXD'
+#define D3DFMT_DXT4                 877942852   // '4TXD'
+#define D3DFMT_DXT5                 894720068   // '5TXD'
 
 #define PF_IS_BGRA8(pf) \
   ((pf.dwFlags & DDPF_RGB) && \
@@ -283,9 +283,6 @@ bool DDSHandler::saveImage(Image *image,Stream *stream){
 /* or not at all. */
 
 
-THIS CODE WILL NOT ACTUALLY COMPILE -- it's a snippet from a 
-larger file. You can easily massage it into fitting into your 
-own code, I hope.
 
 
 #include <stdio.h>

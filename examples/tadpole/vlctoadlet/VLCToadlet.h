@@ -2,8 +2,10 @@
 #define VLCTOADLET_H
 
 #include <toadlet/toadlet.h>
-typedef toadlet::int64 int64_t;
-typedef toadlet::uint32 uint32_t;
+#ifdef TOADLET_PLATFORM_WIN32
+	typedef toadlet::int64 int64_t;
+	typedef toadlet::uint32 uint32_t;
+#endif
 #include <vlc/vlc.h>
 
 class VLCToadlet:public Application{

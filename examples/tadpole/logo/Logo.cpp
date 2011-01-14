@@ -73,7 +73,7 @@ Logo::~Logo(){
 }
 
 void Logo::create(){
-	Application::create(Application::RendererPlugin_D3D10);
+	Application::create();
 
 	scene=Scene::ptr(new Scene(mEngine));
 
