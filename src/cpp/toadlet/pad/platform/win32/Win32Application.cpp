@@ -719,7 +719,12 @@ RenderTarget *Win32Application::makeRenderTarget(int rendererPlugin){
 	RenderTarget *target=NULL;
 	DWORD flags=D3DCREATE_MULTITHREADED;
 
-	WindowRenderTargetFormat::ptr format(new WindowRenderTargetFormat(mVisual,2,true,0));
+	#if defined(TOADLET_DEBUG)
+		bool debug=true;
+	#else
+		bool debug=false;
+	#endif
+	WindowRenderTargetFormat::ptr format(new WindowRenderTargetFormat(mVisual,2,debug,0));
 
 	if(rendererPlugin==RendererPlugin_OPENGL){
 		#if defined(TOADLET_HAS_OPENGL)
