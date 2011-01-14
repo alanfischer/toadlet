@@ -50,7 +50,7 @@ public:
 	virtual int getHeight() const{return mHeight;}
 
 	virtual bool activate();
-	virtual bool deactivate(){return true;}
+	virtual bool deactivate();
 
 	virtual void clear(int clearFlags,const Color &clearColor);
 
@@ -63,11 +63,10 @@ public:
 	inline ID3D10RenderTargetView *getRenderTargetView() const{return mRenderTargetView;}
 
 protected:
-//	void fillPresentParameters(D3DPRESENT_PARAMETERS &presentParameters);
-
-//	D3DPRESENT_PARAMETERS mPresentParameters;
 	HINSTANCE mLibrary;
-	IDXGISwapChain *mSwapChain;
+	IDXGISwapChain *mDXGISwapChain;
+	IDXGIDevice *mDXGIDevice;
+	IDXGIAdapter *mDXGIAdapter;
 	ID3D10Device *mD3DDevice;
 	D3D10Texture *mDepthTexture;
 	ID3D10RenderTargetView *mRenderTargetView;
