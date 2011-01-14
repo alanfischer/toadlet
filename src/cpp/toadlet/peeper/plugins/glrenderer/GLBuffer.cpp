@@ -146,6 +146,7 @@ bool GLBuffer::create(int usage,int access,int pixelFormat,int width,int height,
 	#else
 		mMapping=false;
 	#endif
+
 	if(mMapping==false){
 		mData=new uint8[mDataSize];
 	}
@@ -249,7 +250,7 @@ uint8 *GLBuffer::lock(int lockAccess){
 	#endif
 
 	TOADLET_CHECK_GLERROR("GLBuffer::lock");
-
+	
 	return mData;
 }
 

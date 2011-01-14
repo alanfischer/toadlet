@@ -23,24 +23,24 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_GLXPBUFFERSURFACERENDERTARGET_H
-#define TOADLET_PEEPER_GLXPBUFFERSURFACERENDERTARGET_H
+#ifndef TOADLET_PEEPER_GLXPBUFFERRENDERTARGET_H
+#define TOADLET_PEEPER_GLXPBUFFERRENDERTARGET_H
 
 #include "GLXRenderTarget.h"
 #include "../../GLTexture.h"
-#include <toadlet/peeper/SurfaceRenderTarget.h>
+#include <toadlet/peeper/PixelBufferRenderTarget.h>
 
 namespace toadlet{
 namespace peeper{
 
 class GLRenderer;
 
-class GLXPBufferSurfaceRenderTarget:public GLXRenderTarget,public SurfaceRenderTarget{
+class GLXPBufferRenderTarget:public GLXRenderTarget,public PixelBufferRenderTarget{
 public:
 	static bool available(GLRenderer *renderer);
 
-	GLXPBufferSurfaceRenderTarget(GLRenderer *renderer);
-	virtual ~GLXPBufferSurfaceRenderTarget();
+	GLXPBufferRenderTarget(GLRenderer *renderer);
+	virtual ~GLXPBufferRenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
@@ -50,9 +50,11 @@ public:
 
 	virtual bool activate();
 	virtual bool swap();
+	virtual bool activateAdditionalContext(){return false;}
+	virtual void deactivateAdditionalContext(){}
 
-	virtual bool attach(Surface::ptr surface,Attachment attachment);
-	virtual bool remove(Surface::ptr surface);
+	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment);
+	virtual bool remove(PixelBuffer::ptr buffer);
 
 	virtual bool isPrimary() const{return false;}
 	virtual bool isValid() const{return mPBuffer!=0;}

@@ -25,7 +25,7 @@
 
 /// @todo: This needs to be run through and tested thoroughly, plus remove the SGIX stuff in favor of EXT
  
-#include "GLXPBufferSurfaceRenderTarget.h"
+#include "GLXPBufferRenderTarget.h"
 #include "../../GLRenderer.h"
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
@@ -36,15 +36,15 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-bool GLPBufferSurfaceRenderTarget_available(GLRenderer *renderer){
-	return GLXPBufferSurfaceRenderTarget::available(renderer);
+bool GLPBufferRenderTarget_available(GLRenderer *renderer){
+	return GLXPBufferRenderTarget::available(renderer);
 }
 
-SurfaceRenderTarget *new_GLPBufferSurfaceRenderTarget(GLRenderer *renderer){
-	return new GLXPBufferSurfaceRenderTarget(renderer);
+PixelBufferRenderTarget *new_GLPBufferRenderTarget(GLRenderer *renderer){
+	return new GLXPBufferRenderTarget(renderer);
 }
 
-bool GLXPBufferSurfaceRenderTarget::available(GLRenderer *renderer){
+bool GLXPBufferRenderTarget::available(GLRenderer *renderer){
 	#if defined(TOADLET_HAS_GLEW)
 		return GLXEW_SGIX_pbuffer>0;
 	#else
@@ -52,7 +52,7 @@ bool GLXPBufferSurfaceRenderTarget::available(GLRenderer *renderer){
 	#endif
 }
 
-GLXPBufferSurfaceRenderTarget::GLXPBufferSurfaceRenderTarget(GLRenderer *renderer):GLXRenderTarget(),
+GLXPBufferRenderTarget::GLXPBufferRenderTarget(GLRenderer *renderer):GLXRenderTarget(),
 	mRenderer(NULL),
 	mTexture(NULL),
 	mPBuffer(0),
@@ -64,11 +64,11 @@ GLXPBufferSurfaceRenderTarget::GLXPBufferSurfaceRenderTarget(GLRenderer *rendere
 	mRenderer=renderer;
 }
 
-GLXPBufferSurfaceRenderTarget::~GLXPBufferSurfaceRenderTarget(){
+GLXPBufferRenderTarget::~GLXPBufferRenderTarget(){
 	destroy();
 }
 
-bool GLXPBufferSurfaceRenderTarget::create(){
+bool GLXPBufferRenderTarget::create(){
 	mWidth=0;
 	mHeight=0;
 	mBound=false;
@@ -77,13 +77,11 @@ bool GLXPBufferSurfaceRenderTarget::create(){
 	return true;
 }
 
-bool GLXPBufferSurfaceRenderTarget::destroy(){
+void GLXPBufferRenderTarget::destroy(){
 	destroyBuffer();
-
-	return true;
 }
 
-bool GLXPBufferSurfaceRenderTarget::activate(){
+bool GLXPBufferRenderTarget::activate(){
 	unbind();
 
 	GLXRenderTarget::activate();
@@ -96,7 +94,7 @@ bool GLXPBufferSurfaceRenderTarget::activate(){
 	return true;
 }
 
-bool GLXPBufferSurfaceRenderTarget::swap(){
+bool GLXPBufferRenderTarget::swap(){
 	glFlush();
 
 	bind();
@@ -104,9 +102,9 @@ bool GLXPBufferSurfaceRenderTarget::swap(){
 	return true;
 }
 
-bool GLXPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
-	GLTextureMipSurface *gltextureSurface=((GLSurface*)surface->getRootSurface())->castToGLTextureMipSurface();
-	mTexture=gltextureSurface->getTexture();
+bool GLXPBufferRenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachment){
+	GLTextureMipPixelBuffer *gltextureBuffer=((GLPixelBuffer*)buffer->getRootPixelBuffer())->castToGLTextureMipPixelBuffer();
+	mTexture=gltextureBuffer->getTexture();
 
 	if((mTexture->getFormat()&Texture::Format_BIT_DEPTH)>0){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
@@ -119,7 +117,7 @@ bool GLXPBufferSurfaceRenderTarget::attach(Surface::ptr surface,Attachment attac
 	return true;
 }
 
-bool GLXPBufferSurfaceRenderTarget::remove(Surface::ptr surface){
+bool GLXPBufferRenderTarget::remove(PixelBuffer::ptr buffer){
 	mTexture=NULL;
 
 	compile();
@@ -127,7 +125,7 @@ bool GLXPBufferSurfaceRenderTarget::remove(Surface::ptr surface){
 	return false;
 }
 
-bool GLXPBufferSurfaceRenderTarget::compile(){
+bool GLXPBufferRenderTarget::compile(){
 	if(mTexture!=NULL){
 		createBuffer();
 
@@ -150,7 +148,7 @@ static int handleXError(Display *,XErrorEvent *){
 	return 0;
 }
 
-bool GLXPBufferSurfaceRenderTarget::createBuffer(){
+bool GLXPBufferRenderTarget::createBuffer(){
 	destroyBuffer();
 
 	int width=mTexture->getWidth();
@@ -267,10 +265,10 @@ mContext=glXCreateNewContext(mDisplay,fbConfig,GLX_RGBA_BIT,renderTarget->getGLX
 	return true;
 }
 
-bool GLXPBufferSurfaceRenderTarget::destroyBuffer(){
+bool GLXPBufferRenderTarget::destroyBuffer(){
 	if(mDisplay!=0){
 		if(mContext==glXGetCurrentContext()){
-			((GLRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->makeCurrent();
+			((GLRenderTarget*)mRenderer->getPrimaryRenderTarget()->getRootRenderTarget())->activate();
 		}
 
 		if(mContext!=0){
@@ -290,12 +288,12 @@ bool GLXPBufferSurfaceRenderTarget::destroyBuffer(){
 	return true;
 }
 
-void GLXPBufferSurfaceRenderTarget::bind(){
+void GLXPBufferRenderTarget::bind(){
 	glBindTexture(mTexture->getTarget(),mTexture->getHandle());
 	glCopyTexSubImage2D(mTexture->getTarget(),0,0,0,0,0,mWidth,mHeight);
 }
 
-void GLXPBufferSurfaceRenderTarget::unbind(){
+void GLXPBufferRenderTarget::unbind(){
 	// Nothing yet...
 }
 

@@ -166,8 +166,6 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 			glPixelStorei(GL_PACK_ALIGNMENT,alignment<8?alignment:8);
 		}
 
-		TOADLET_ASSERT(data!=NULL);
-
 		if(ImageFormatConversion::isFormatCompressed(mFormat)==false){
 			switch(mTarget){
 				#if !defined(TOADLET_HAS_GLES)
@@ -208,6 +206,8 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 			}
 		}
 		else{
+			TOADLET_ASSERT(data!=NULL);
+			
 			switch(mTarget){
 				#if !defined(TOADLET_HAS_GLES)
 					case GL_TEXTURE_1D:
@@ -323,8 +323,8 @@ bool GLTexture::load(int width,int height,int depth,int mipLevel,tbyte *mipData)
 	int alignment=1,pitch=rowPitch;
 	while((pitch&1)==0){alignment<<=1;pitch>>=1;}
 	glPixelStorei(GL_PACK_ALIGNMENT,alignment<8?alignment:8);
-
-	if(ImageFormatConversion::isFormatCompressed(mFormat)){
+	
+	if(ImageFormatConversion::isFormatCompressed(mFormat)==false){
 		switch(mTarget){
 			#if !defined(TOADLET_HAS_GLES)
 				case GL_TEXTURE_1D:
@@ -374,7 +374,7 @@ bool GLTexture::load(int width,int height,int depth,int mipLevel,tbyte *mipData)
 			#endif
 		}
 	}
-
+	
 	if(mManuallyGenerateMipLevels){
 		generateMipLevels();
 	}
