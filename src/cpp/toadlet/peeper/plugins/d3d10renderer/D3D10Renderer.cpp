@@ -103,8 +103,8 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 	mCapabilitySet.hardwareVertexBuffers=true;
 	mCapabilitySet.pointSprites=false;
 	mCapabilitySet.maxLights=0;
-	mCapabilitySet.maxTextureStages=0;
-	mCapabilitySet.maxTextureSize=0;
+	mCapabilitySet.maxTextureStages=16;
+	mCapabilitySet.maxTextureSize=8192;
 	mCapabilitySet.textureDot3=false;
 	mCapabilitySet.textureNonPowerOf2=true;
 	mCapabilitySet.textureNonPowerOf2Restricted=true;
@@ -328,6 +328,15 @@ void D3D10Renderer::beginScene(){
 }
 
 void D3D10Renderer::endScene(){
+	ID3D10Buffer *buffer=NULL;
+	UINT stride=0;
+	UINT offset=0;
+	mD3DDevice->IASetVertexBuffers(0,1,&buffer,&stride,&offset);
+
+	mD3DDevice->IASetIndexBuffer(NULL,(DXGI_FORMAT)0,0);
+
+	mD3DDevice->IASetInputLayout(NULL);
+
 	int i;
 	for(i=0;i<mCapabilitySet.maxTextureStages;++i){
 		setTextureStage(i,NULL);
@@ -368,7 +377,6 @@ void D3D10Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Inde
 		float *d3dmatrix=shaderMatrix.data;
 	#endif
 	effect->GetVariableByName("ShaderMatrix")->AsMatrix()->SetMatrix(d3dmatrix);
-	effect->GetVariableByName("diffuseTexture")->AsShaderResource()->SetResource(texture);
 
 	if(indexData->getIndexBuffer()!=NULL){
 		D3D10Buffer *buffer=(D3D10Buffer*)(indexData->getIndexBuffer()->getRootIndexBuffer());
@@ -545,6 +553,7 @@ void D3D10Renderer::setTextureStage(int stage,TextureStage *textureStage){
 	else if(stage==0){
 		texture=NULL;
 	}
+effect->GetVariableByName("diffuseTexture")->AsShaderResource()->SetResource(texture);
 
 /*	HRESULT result=S_OK;
 

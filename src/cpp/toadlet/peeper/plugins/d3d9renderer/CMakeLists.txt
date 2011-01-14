@@ -30,6 +30,10 @@ set (PEEPER_D3D9RENDERER_HEADERS
 )
 
 
+# Definitions
+add_definitions(-DTOADLET_SET_D3D9)
+
+
 # Dependencies - note that D3D9 has already been found
 include_directories (${D3D9_INCLUDE_PATH})
 set (PEEPER_D3D9RENDERER_LIBS ${D3D9_LIBRARIES})

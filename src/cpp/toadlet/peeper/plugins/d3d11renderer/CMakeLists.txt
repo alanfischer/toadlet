@@ -24,6 +24,10 @@ set (PEEPER_D3D11RENDERER_HEADERS
 )
 
 
+# Definitions
+add_definitions(-DTOADLET_SET_D3D11)
+
+
 # Dependencies - note that D3D11 has already been found
 include_directories (${D3D11_INCLUDE_PATH})
 set (PEEPER_D3D11RENDERER_LIBS ${D3D11_LIBRARIES})

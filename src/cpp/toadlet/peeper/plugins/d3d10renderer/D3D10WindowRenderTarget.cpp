@@ -44,7 +44,11 @@ namespace peeper{
 
 D3D10WindowRenderTarget::D3D10WindowRenderTarget():D3D10RenderTarget(),
 	mLibrary(0),
+	mDXGISwapChain(NULL),
+	mDXGIDevice(NULL),
+	mDXGIAdapter(NULL),
 	mD3DDevice(NULL),
+	mDepthTexture(NULL),
 	mRenderTargetView(NULL),
 	mDepthStencilView(NULL),
 	mWindow(0),
@@ -55,8 +59,11 @@ D3D10WindowRenderTarget::D3D10WindowRenderTarget():D3D10RenderTarget(),
 
 D3D10WindowRenderTarget::D3D10WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format):D3D10RenderTarget(),
 	mLibrary(0),
-	mSwapChain(NULL),
+	mDXGISwapChain(NULL),
+	mDXGIDevice(NULL),
+	mDXGIAdapter(NULL),
 	mD3DDevice(NULL),
+	mDepthTexture(NULL),
 	mRenderTargetView(NULL),
 	mDepthStencilView(NULL),
 	mWindow(0),
@@ -72,6 +79,13 @@ D3D10WindowRenderTarget::~D3D10WindowRenderTarget(){
 
 bool D3D10WindowRenderTarget::activate(){
 	mD3DDevice->OMSetRenderTargets(1,&mRenderTargetView,mDepthStencilView);
+
+	return true;
+}
+
+bool D3D10WindowRenderTarget::deactivate(){
+	ID3D10RenderTargetView *view=NULL;
+	mD3DDevice->OMSetRenderTargets(1,&view,NULL);
 
 	return true;
 }
@@ -99,7 +113,7 @@ void D3D10WindowRenderTarget::clear(int clearFlags,const Color &clearColor){
 }
 
 void D3D10WindowRenderTarget::swap(){
-	mSwapChain->Present(0,0);
+	mDXGISwapChain->Present(0,0);
 }
 
 void D3D10WindowRenderTarget::reset(){
@@ -161,24 +175,24 @@ bool D3D10WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *f
 	}
 
 	typedef HRESULT(WINAPI *D3D10CreateDeviceAndSwapChain)(IDXGIAdapter *pAdapter,D3D10_DRIVER_TYPE DriverType,HMODULE Software,UINT Flags,UINT SDKVersion,DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,IDXGISwapChain **ppSwapChain,ID3D10Device **ppDevice);
-	result=((D3D10CreateDeviceAndSwapChain)symbol)(NULL,D3D10_DRIVER_TYPE_HARDWARE,NULL,flags,D3D10_SDK_VERSION,&desc,&mSwapChain,&mD3DDevice);
+	result=((D3D10CreateDeviceAndSwapChain)symbol)(NULL,D3D10_DRIVER_TYPE_HARDWARE,NULL,flags,D3D10_SDK_VERSION,&desc,&mDXGISwapChain,&mD3DDevice);
 	if(FAILED(result) || mD3DDevice==NULL){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"D3D10RenderWindow: Error creating D3D10Device object");
 		return false;
 	}
 
+	mD3DDevice->QueryInterface(__uuidof(mDXGIDevice),(void**)&mDXGIDevice);
+	mDXGIDevice->GetAdapter(&mDXGIAdapter);
 
-//	UINT adaptor=D3DADAPTER_DEFAULT;
-//	D3DADAPTER_IDENTIFIER9 identifier={0};
-//	mD3D->GetAdapterIdentifier(adaptor,0,&identifier);
-//	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
-//		String("D3D Driver:") + identifier.Driver);
-//	Logger::log(Categories::TOADLET_PEEPER,Logger::Level_ALERT,
-//		String("D3D Description:") + identifier.Description);
+	DXGI_ADAPTER_DESC adapterDesc;
+	mDXGIAdapter->GetDesc(&adapterDesc);
+
+	Logger::alert(Categories::TOADLET_PEEPER,
+		String("D3D Description:") + adapterDesc.Description);
 
 	ID3D10Texture2D *texture;
-	mSwapChain->GetBuffer(0,__uuidof(texture),(void**)&texture);
+	mDXGISwapChain->GetBuffer(0,__uuidof(texture),(void**)&texture);
 	D3D10_TEXTURE2D_DESC textureDesc;
 	texture->GetDesc(&textureDesc);
 	mD3DDevice->CreateRenderTargetView(texture,NULL,&mRenderTargetView);
@@ -191,6 +205,8 @@ bool D3D10WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *f
 }
 
 bool D3D10WindowRenderTarget::destroyContext(){
+	deactivate();
+
 	if(mRenderTargetView!=NULL){
 		mRenderTargetView->Release();
 		mRenderTargetView=NULL;
@@ -209,6 +225,16 @@ bool D3D10WindowRenderTarget::destroyContext(){
 	if(mD3DDevice!=NULL){
 		mD3DDevice->Release();
 		mD3DDevice=NULL;
+	}
+
+	if(mDXGIDevice!=NULL){
+		mDXGIDevice->Release();
+		mDXGIDevice=NULL;
+	}
+
+	if(mDXGIAdapter!=NULL){
+		mDXGIAdapter->Release();
+		mDXGIAdapter=NULL;
 	}
 
 	if(mLibrary!=0){
