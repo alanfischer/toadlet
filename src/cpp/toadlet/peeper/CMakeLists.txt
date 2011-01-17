@@ -24,6 +24,7 @@ set (PEEPER_HEADERS
 	BackableBuffer.h
 	BackableVertexFormat.h
 	BackableTexture.h
+	BackableTextureMipPixelBuffer.h
 	Blend.h
 	Buffer.h
 	BufferDestroyedListener.h
