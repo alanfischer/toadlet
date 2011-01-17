@@ -66,6 +66,8 @@ D3D9Texture::~D3D9Texture(){
 }
 
 bool D3D9Texture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
+	destroy();
+
 	if((Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || (dimension!=Dimension_CUBE && Math::isPowerOf2(depth)==false)) &&
 		mRenderer->getCapabilitySet().textureNonPowerOf2==false &&
 		(mRenderer->getCapabilitySet().textureNonPowerOf2==false || (usage&Usage_BIT_NPOT_RESTRICTED)==0))
@@ -290,42 +292,12 @@ bool D3D9Texture::load(int width,int height,int depth,int mipLevel,byte *mipData
 	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
 		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
 
-		#if !defined(TOADLET_SET_D3DM)
-			if(mD3DPool==D3DPOOL_DEFAULT){
-				IDirect3DSurface9 *offscreenSurface=NULL;
-				result=mRenderer->getDirect3DDevice9()->CreateOffscreenPlainSurface(mWidth,mHeight,mD3DFormat,D3DPOOL_SYSTEMMEM,&offscreenSurface,NULL);
-				TOADLET_CHECK_D3D9ERROR(result,"CreateOffscreenPlainSurface");
-				if(SUCCEEDED(result)){
-					IDirect3DSurface9 *textureSurface=NULL;
-					result=texture->GetSurfaceLevel(mipLevel,&textureSurface);
-					TOADLET_CHECK_D3D9ERROR(result,"GetSurfaceLevel");
-					if(SUCCEEDED(result)){
-						D3DLOCKED_RECT rect={0};
-						HRESULT result=offscreenSurface->LockRect(&rect,NULL,D3DLOCK_READONLY);
-						TOADLET_CHECK_D3D9ERROR(result,"LockRect");
-						if(SUCCEEDED(result)){
-							ImageFormatConversion::convert(mipData,format,rowPitch,slicePitch,(uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,width,height,depth);
-							offscreenSurface->UnlockRect();
-						}
-
-						result=mRenderer->getDirect3DDevice9()->UpdateSurface(offscreenSurface,NULL,textureSurface,NULL);
-						TOADLET_CHECK_D3D9ERROR(result,"UpdateSurface");
-
-						textureSurface->Release();
-					}
-					offscreenSurface->Release();
-				}
-			}
-			else
-		#endif
-		{
-			D3DLOCKED_RECT rect={0};
-			result=texture->LockRect(mipLevel,&rect,NULL,0);
-			TOADLET_CHECK_D3D9ERROR(result,"LockRect");
-			if(SUCCEEDED(result)){
-				ImageFormatConversion::convert(mipData,format,rowPitch,slicePitch,(uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,width,height,depth);
-				texture->UnlockRect(mipLevel);
-			}
+		D3DLOCKED_RECT rect={0};
+		result=texture->LockRect(mipLevel,&rect,NULL,0);
+		TOADLET_CHECK_D3D9ERROR(result,"LockRect");
+		if(SUCCEEDED(result)){
+			ImageFormatConversion::convert(mipData,format,rowPitch,slicePitch,(uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,width,height,depth);
+			texture->UnlockRect(mipLevel);
 		}
 	}
 	#if !defined(TOADLET_SET_D3DM)
@@ -391,42 +363,12 @@ bool D3D9Texture::read(int width,int height,int depth,int mipLevel,byte *mipData
 	if(mDimension==Texture::Dimension_D1 || mDimension==Texture::Dimension_D2){
 		IDirect3DTexture9 *texture=(IDirect3DTexture9*)mTexture;
 
-		#if !defined(TOADLET_SET_D3DM)
-			if(mD3DPool==D3DPOOL_DEFAULT){
-				IDirect3DSurface9 *offscreenSurface=NULL;
-				result=mRenderer->getDirect3DDevice9()->CreateOffscreenPlainSurface(mWidth,mHeight,mD3DFormat,D3DPOOL_SYSTEMMEM,&offscreenSurface,NULL);
-				TOADLET_CHECK_D3D9ERROR(result,"CreateOffscreenPlainSurface");
-				if(SUCCEEDED(result)){
-					IDirect3DSurface9 *textureSurface=NULL;
-					result=texture->GetSurfaceLevel(mipLevel,&textureSurface);
-					TOADLET_CHECK_D3D9ERROR(result,"GetSurfaceLevel");
-					if(SUCCEEDED(result)){
-						result=mRenderer->getDirect3DDevice9()->GetRenderTargetData(textureSurface,offscreenSurface);
-						TOADLET_CHECK_D3D9ERROR(result,"GetRenderTargetData");
-						if(SUCCEEDED(result)){
-							D3DLOCKED_RECT rect={0};
-							HRESULT result=offscreenSurface->LockRect(&rect,NULL,D3DLOCK_READONLY);
-							TOADLET_CHECK_D3D9ERROR(result,"LockRect");
-							if(SUCCEEDED(result)){
-								ImageFormatConversion::convert((uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,mipData,format,rowPitch,slicePitch,width,height,depth);
-								offscreenSurface->UnlockRect();
-							}
-						}
-						textureSurface->Release();
-					}
-					offscreenSurface->Release();
-				}
-			}
-			else
-		#endif
-		{
-			D3DLOCKED_RECT rect={0};
-			result=texture->LockRect(mipLevel,&rect,NULL,D3DLOCK_READONLY);
-			TOADLET_CHECK_D3D9ERROR(result,"LockRect");
-			if(SUCCEEDED(result)){
-				ImageFormatConversion::convert((uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,mipData,format,rowPitch,slicePitch,width,height,depth);
-				texture->UnlockRect(mipLevel);
-			}
+		D3DLOCKED_RECT rect={0};
+		result=texture->LockRect(mipLevel,&rect,NULL,D3DLOCK_READONLY);
+		TOADLET_CHECK_D3D9ERROR(result,"LockRect");
+		if(SUCCEEDED(result)){
+			ImageFormatConversion::convert((uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,mipData,format,rowPitch,slicePitch,width,height,depth);
+			texture->UnlockRect(mipLevel);
 		}
 	}
 	#if !defined(TOADLET_SET_D3DM)

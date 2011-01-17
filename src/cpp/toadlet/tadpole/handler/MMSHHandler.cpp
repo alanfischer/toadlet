@@ -130,7 +130,7 @@ Mesh::ptr MMSHHandler::loadMeshVersion3(DataStream::ptr stream){
 				}
 			}
 			else{
-				vertexBuffer=VertexBuffer::ptr(new BackableVertexBuffer());
+				vertexBuffer=VertexBuffer::ptr(new BackableBuffer());
 				vertexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,numVertexes);
 			}
 
@@ -308,7 +308,15 @@ Mesh::ptr MMSHHandler::loadMeshVersion3(DataStream::ptr stream){
 					newNumIndexes+=(stripLengths[j]-2)*3;
 				}
 
-				IndexBuffer::ptr indexBuffer=mBufferManager->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,newNumIndexes);
+				IndexBuffer::ptr indexBuffer;
+				if(mBufferManager!=NULL){
+					indexBuffer=mBufferManager->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,newNumIndexes);
+				}
+				else{
+					indexBuffer=IndexBuffer::ptr(new BackableBuffer());
+					indexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,newNumIndexes);
+				}
+
 				{
 					uint16 *indexData=(uint16*)indexBuffer->lock(Buffer::Access_BIT_WRITE);
 					int ipo=0;

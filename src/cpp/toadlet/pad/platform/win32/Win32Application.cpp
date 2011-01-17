@@ -202,7 +202,7 @@ Win32Application::~Win32Application(){
 }
 
 void Win32Application::create(int renderer,int audioPlayer,int motionDetector){
-	mEngine=new Engine();
+	mEngine=new Engine(false);
 
 	mResourceArchive=Win32ResourceArchive::ptr(new Win32ResourceArchive(mEngine->getTextureManager()));
 	mResourceArchive->open(win32->mInstance);
@@ -726,7 +726,7 @@ RenderTarget *Win32Application::makeRenderTarget(int rendererPlugin){
 	#endif
 	WindowRenderTargetFormat::ptr format(new WindowRenderTargetFormat(mVisual,2,debug,0));
 
-	if(rendererPlugin==RendererPlugin_OPENGL){
+	if(rendererPlugin==RendererPlugin_GL){
 		#if defined(TOADLET_HAS_OPENGL)
 			#if defined(TOADLET_PLATFORM_WINCE)
 				target=new_EGLWindowRenderTarget(GetDC(win32->mWnd),win32->mWnd,format);
@@ -764,7 +764,7 @@ RenderTarget *Win32Application::makeRenderTarget(int rendererPlugin){
 
 Renderer *Win32Application::makeRenderer(int plugin){
 	Renderer *renderer=NULL;
-	if(plugin==RendererPlugin_OPENGL){
+	if(plugin==RendererPlugin_GL){
 		#if defined(TOADLET_HAS_OPENGL)
 			renderer=new_GLRenderer();
 		#endif
@@ -881,7 +881,7 @@ bool Win32Application::changeVideoMode(int width,int height,int colorBits){
 
 AudioPlayer *Win32Application::makeAudioPlayer(int plugin){
 	AudioPlayer *audioPlayer=NULL;
-	if(plugin==AudioPlayerPlugin_OPENAL){
+	if(plugin==AudioPlayerPlugin_AL){
 		#if defined(TOADLET_HAS_OPENAL)
 			audioPlayer=new_ALPlayer();
 		#endif

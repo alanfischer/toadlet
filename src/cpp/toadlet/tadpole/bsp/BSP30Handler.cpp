@@ -24,7 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
-#include <toadlet/peeper/CapabilitySet.h>
 #include <toadlet/tadpole/bsp/BSP30Handler.h>
 #include <toadlet/tadpole/handler/WADArchive.h>
 #include <toadlet/tadpole/PixelPacker.h>
@@ -316,7 +315,7 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 		}
 
 		IndexData::ptr indexData;
-		if(mEngine->getRenderer()==NULL || mEngine->getRenderer()->getCapabilitySet().triangleFan){
+		if(mEngine->getBufferManager()->useTriFan()){
 			indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIFAN,NULL,face->firstedge,face->numedges));
 		}
 		else{

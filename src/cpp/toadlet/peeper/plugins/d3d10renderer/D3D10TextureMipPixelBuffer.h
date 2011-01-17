@@ -23,53 +23,61 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_BACKABLEVERTEXBUFFER_H
-#define TOADLET_PEEPER_BACKABLEVERTEXBUFFER_H
+#ifndef TOADLET_PEEPER_D3D10TEXTUREMIPPIXELBUFFER_H
+#define TOADLET_PEEPER_D3D10TEXTUREMIPPIXELBUFFER_H
 
-#include <toadlet/peeper/VertexBuffer.h>
+#include "D3D10PixelBuffer.h"
+#include "D3D10Texture.h"
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API BackableVertexBuffer:public VertexBuffer{
+class D3D10Renderer;
+
+class TOADLET_API D3D10TextureMipPixelBuffer:public PixelBuffer{
 public:
-	TOADLET_SHARED_POINTERS(BackableVertexBuffer);
+	TOADLET_SHARED_POINTERS(D3D10TextureMipPixelBuffer);
 
-	BackableVertexBuffer();
-	virtual ~BackableVertexBuffer();
+	D3D10TextureMipPixelBuffer(D3D10Texture *texture,int level,int cubeSide);
+	D3D10TextureMipPixelBuffer(D3D10Renderer *renderer);
+	virtual ~D3D10TextureMipPixelBuffer();
 
-	virtual VertexBuffer *getRootVertexBuffer(){return mBack;}
+	virtual PixelBuffer *getRootPixelBuffer(){return this;}
 
 	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
-	virtual bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size);
+	virtual bool create(int usage,int access,int pixelFormat,int width,int height,int depth);
 	virtual void destroy();
 
-	virtual void resetCreate();
-	virtual void resetDestroy();
+	virtual void resetCreate(){}
+	virtual void resetDestroy(){}
 
-	virtual int getUsage() const{return mUsage;}
-	virtual int getAccess() const{return mAccess;}
+	virtual int getUsage() const{return 0;}
+	virtual int getAccess() const{return 0;}
 	virtual int getDataSize() const{return mDataSize;}
-	virtual VertexFormat::ptr getVertexFormat() const{return mVertexFormat;}
-	virtual int getSize() const{return mSize;}
+
+	virtual int getPixelFormat() const{return mPixelFormat;}
+	virtual int getWidth() const{return mWidth;}
+	virtual int getHeight() const{return mHeight;}
+	virtual int getDepth() const{return mDepth;}
 
 	virtual uint8 *lock(int lockAccess);
 	virtual bool unlock();
 
-	virtual void setBack(VertexBuffer::ptr back);
-	virtual VertexBuffer::ptr getBack(){return mBack;}
-	
 protected:
-	BufferDestroyedListener *mListener;
-	int mUsage;
-	int mAccess;
-	int mDataSize;
-	VertexFormat::ptr mVertexFormat;
-	int mSize;
+	D3D10Renderer *mRenderer;
 
-	uint8 *mData;
-	VertexBuffer::ptr mBack;
+	BufferDestroyedListener *mListener;
+	D3D10Texture *mTexture;
+	ID3D10Resource *mD3DTexture;
+	int mLevel;
+	int mCubeSide;
+	int mDataSize;
+	int mPixelFormat;
+	int mWidth,mHeight,mDepth;
+
+	friend class D3D10Renderer;
+	friend class D3D10Texture;
 };
 
 }

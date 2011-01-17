@@ -4,8 +4,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.in ${CMAKE_CURRENT_BINARY_
 
 # Source files for toadlet_peeper
 set (PEEPER_SRC
-	BackableIndexBuffer.cpp
-	BackableVertexBuffer.cpp
+	BackableBuffer.cpp
 	BackableVertexFormat.cpp
 	BackableTexture.cpp
 	IndexBufferAccessor.cpp
@@ -22,8 +21,7 @@ set (PEEPER_SRC
 
 # Headers
 set (PEEPER_HEADERS
-	BackableIndexBuffer.h
-	BackableVertexBuffer.h
+	BackableBuffer.h
 	BackableVertexFormat.h
 	BackableTexture.h
 	Blend.h

@@ -25,8 +25,8 @@
 
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/peeper/BackableIndexBuffer.h>
-#include <toadlet/peeper/BackableVertexBuffer.h>
+#include <toadlet/peeper/BackableBuffer.h>
+#include <toadlet/peeper/CapabilitySet.h>
 #include <string.h> //memcpy
 
 using namespace toadlet::egg;
@@ -104,13 +104,13 @@ VertexFormat::ptr BufferManager::createVertexFormat(){
 IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuffer::IndexFormat indexFormat,int size){
 	IndexBuffer::ptr indexBuffer;
 	if(mBackable || mEngine->getRenderer()==NULL){
-		BackableIndexBuffer::ptr backableIndexBuffer(new BackableIndexBuffer());
-		backableIndexBuffer->create(usage,access,indexFormat,size);
+		BackableBuffer::ptr backableBuffer(new BackableBuffer());
+		backableBuffer->create(usage,access,indexFormat,size);
 		if(mEngine->getRenderer()!=NULL){
 			IndexBuffer::ptr back(mEngine->getRenderer()->createIndexBuffer());
-			backableIndexBuffer->setBack(back);
+			backableBuffer->setBack(back);
 		}
-		indexBuffer=backableIndexBuffer;
+		indexBuffer=backableBuffer;
 	}
 	else{
 		indexBuffer=IndexBuffer::ptr(mEngine->getRenderer()->createIndexBuffer());
@@ -127,13 +127,13 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuff
 VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexFormat::ptr vertexFormat,int size){
 	VertexBuffer::ptr vertexBuffer;
 	if(mBackable || mEngine->getRenderer()==NULL){
-		BackableVertexBuffer::ptr backableVertexBuffer(new BackableVertexBuffer());
-		backableVertexBuffer->create(usage,access,vertexFormat,size);
+		BackableBuffer::ptr backableBuffer(new BackableBuffer());
+		backableBuffer->create(usage,access,vertexFormat,size);
 		if(mEngine->getRenderer()!=NULL){
 			VertexBuffer::ptr back(mEngine->getRenderer()->createVertexBuffer());
-			backableVertexBuffer->setBack(back);
+			backableBuffer->setBack(back);
 		}
-		vertexBuffer=backableVertexBuffer;
+		vertexBuffer=backableBuffer;
 	}
 	else{
 		vertexBuffer=VertexBuffer::ptr(mEngine->getRenderer()->createVertexBuffer());
@@ -228,14 +228,23 @@ void BufferManager::contextActivate(Renderer *renderer){
 		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
 		if(indexBuffer->getRootIndexBuffer()!=indexBuffer){
 			IndexBuffer::ptr back(renderer->createIndexBuffer());
-			shared_static_cast<BackableIndexBuffer>(indexBuffer)->setBack(back);
+			shared_static_cast<BackableBuffer>(indexBuffer)->setBack(back);
 		}
 	}
+
+	for(i=0;i<mVertexFormats.size();++i){
+		VertexFormat::ptr vertexFormat=mVertexFormats[i];
+		if(vertexFormat->getRootVertexFormat()!=vertexFormat){
+			VertexFormat::ptr back(renderer->createVertexFormat());
+			shared_static_cast<BackableVertexFormat>(vertexFormat)->setBack(back);
+		}
+	}
+
 	for(i=0;i<mVertexBuffers.size();++i){
 		VertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
 		if(vertexBuffer->getRootVertexBuffer()!=vertexBuffer){
 			VertexBuffer::ptr back(renderer->createVertexBuffer());
-			shared_static_cast<BackableVertexBuffer>(vertexBuffer)->setBack(back);
+			shared_static_cast<BackableBuffer>(vertexBuffer)->setBack(back);
 		}
 	}
 }
@@ -244,16 +253,24 @@ void BufferManager::contextDeactivate(Renderer *renderer){
 	Logger::debug("BufferManager::contextDeactivate");
 
 	int i;
-	for(i=0;i<mIndexBuffers.size();++i){
-		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
-		if(indexBuffer->getRootIndexBuffer()!=indexBuffer){
-			shared_static_cast<BackableIndexBuffer>(indexBuffer)->setBack(NULL);
+	for(i=0;i<mVertexFormats.size();++i){
+		VertexFormat::ptr vertexFormat=mVertexFormats[i];
+		if(vertexFormat->getRootVertexFormat()!=vertexFormat){
+			shared_static_cast<BackableVertexFormat>(vertexFormat)->setBack(NULL);
 		}
 	}
+
 	for(i=0;i<mVertexBuffers.size();++i){
 		VertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
 		if(vertexBuffer->getRootVertexBuffer()!=vertexBuffer){
-			shared_static_cast<BackableVertexBuffer>(vertexBuffer)->setBack(NULL);
+			shared_static_cast<BackableBuffer>(vertexBuffer)->setBack(VertexBuffer::ptr());
+		}
+	}
+
+	for(i=0;i<mIndexBuffers.size();++i){
+		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
+		if(indexBuffer->getRootIndexBuffer()!=indexBuffer){
+			shared_static_cast<BackableBuffer>(indexBuffer)->setBack(IndexBuffer::ptr());
 		}
 	}
 }
@@ -289,6 +306,10 @@ void BufferManager::postContextReset(Renderer *renderer){
 void BufferManager::bufferDestroyed(Buffer *buffer){
 	mIndexBuffers.remove(buffer);
 	mVertexBuffers.remove(buffer);
+}
+
+bool BufferManager::useTriFan(){
+	return !mBackable && mEngine->getRenderer()!=NULL && mEngine->getRenderer()->getCapabilitySet().triangleFan;
 }
 
 }

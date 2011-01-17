@@ -53,6 +53,8 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 	int format=image->getFormat();
 	int width=image->getWidth(),height=image->getHeight(),depth=image->getDepth();
 	int closestFormat=renderer==NULL?format:renderer->getClosestTextureFormat(format);
+/// @todo: REMOVEME
+closestFormat=Image::Format_RGBA_8;
 
 	// Check if the renderer supports npot textures
 	bool hasNonPowerOf2=renderer==NULL?false:renderer->getCapabilitySet().textureNonPowerOf2;
@@ -60,6 +62,11 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 	bool hasAutogen=renderer==NULL?false:renderer->getCapabilitySet().textureAutogenMipMaps;
 	// See if we want autogenerate, and only do so if we have a renderer
 	bool wantsAutogen=renderer==NULL?false:(usage&Texture::Usage_BIT_AUTOGEN_MIPMAPS)>0;
+//#error our d3d10 problem is really 2fold, and somewhat a d3d9 problem too
+//#error If the BackableTexture is loading the data, it doesn't have the ability to convert formats, and generate mipMaps like we do here.
+//#error  We really need to somehow tie the BackableTexture loading in with this conversion.
+//#error  Perhaps we can move the convert/mip functions out, and then when setting the backing texture, just grab the previous data from the back and run it through those functions
+if(mipLevels==0){mipLevels=1;}
 
 	Image::ptr finalImage=image;
 	if((hasAutogen==false || hasNonPowerOf2==false) && (Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || (dimension!=Image::Dimension_CUBE && Math::isPowerOf2(depth)==false))){
@@ -173,7 +180,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 	return texture;
 }
 
-Texture::ptr TextureManager::createTexture(Image::ptr images[],int usage,int mipLevels){
+Texture::ptr TextureManager::createTexture(Image::ptr images[],int mipLevels,int usage){
 	if(images==NULL || mipLevels==0){
 		Error::nullPointer("createTexture called without images or mipLevels");
 		return NULL;
@@ -185,6 +192,8 @@ Texture::ptr TextureManager::createTexture(Image::ptr images[],int usage,int mip
 	int format=images[0]->getFormat();
 	int width=images[0]->getWidth(),height=images[0]->getHeight(),depth=images[0]->getDepth();
 	int closestFormat=renderer==NULL?format:renderer->getClosestTextureFormat(format);
+/// @todo: REMOVEME
+closestFormat=Image::Format_RGBA_8;
 
 	egg::Collection<Image::ptr> mipImages;
 	egg::Collection<tbyte*> mipDatas;

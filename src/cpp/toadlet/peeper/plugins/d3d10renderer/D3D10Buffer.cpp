@@ -63,7 +63,7 @@ D3D10Buffer::~D3D10Buffer(){
 bool D3D10Buffer::create(int usage,int access,IndexFormat indexFormat,int size){
 	destroy();
 
-	if((usage&(Usage_BIT_STATIC|Usage_BIT_STREAM))>0 && (access&Access_BIT_READ)>0){
+	if((usage&(Usage_BIT_STATIC/*|Usage_BIT_STREAM*/))>0 && (access&Access_BIT_READ)>0){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
 			"Buffer can not be static and readable");
 		return false;
@@ -92,7 +92,7 @@ bool D3D10Buffer::create(int usage,int access,IndexFormat indexFormat,int size){
 bool D3D10Buffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int size){
 	destroy();
 
-	if((usage&(Usage_BIT_STATIC|Usage_BIT_STREAM))>0 && (access&Access_BIT_READ)>0){
+	if((usage&(Usage_BIT_STATIC/*|Usage_BIT_STREAM*/))>0 && (access&Access_BIT_READ)>0){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
 			"Buffer can not be static or stream and readable");
 		return false;
@@ -128,7 +128,7 @@ void D3D10Buffer::destroy(){
 	}
 	
 	if(mListener!=NULL){
-		if((mBindFlags&D3D10_BIND_INDEX_BUFFER)>0){
+		if(mIndexFormat!=(IndexFormat)0){
 			mListener->bufferDestroyed((IndexBuffer*)this);
 		}
 		else{
@@ -198,23 +198,7 @@ uint8 *D3D10Buffer::lock(int lockAccess){
 	mLockAccess=lockAccess;
 
 	if(mMapping){
-		D3D10_MAP mapType=(D3D10_MAP)0;
-		if((mUsage&Usage_BIT_STAGING)>0){
-			mapType=D3D10_MAP_READ_WRITE;
-		}
-		else{
-			switch(mLockAccess){
-				case Access_BIT_READ:
-					mapType=D3D10_MAP_READ;
-				break;
-				case Access_BIT_WRITE:
-					mapType=D3D10_MAP_WRITE_DISCARD;
-				break;
-				case Access_READ_WRITE:
-					mapType=D3D10_MAP_READ_WRITE;
-				break;
-			}
-		}
+		D3D10_MAP mapType=D3D10Renderer::getD3D10_MAP(mLockAccess,mUsage);
 
 		UINT mapFlags=0;
 
@@ -297,7 +281,7 @@ bool D3D10Buffer::unlock(){
 			mRenderer->getD3D10Device()->UpdateSubresource(mBuffer,0,NULL,mData,0,0);
 		}
 
-		if((mUsage&Usage_BIT_STATIC)>0){
+		if(mData!=NULL){
 			delete[] mData;
 			mData=NULL;
 		}
