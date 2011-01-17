@@ -202,7 +202,7 @@ peeper::Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager 
 		if(hdwidth>=2) hdwidth/=2; if(hdheight>=2) hdheight/=2;
 	}
 
-	Texture::ptr texture=textureManager->createTexture(images,0,4);
+	Texture::ptr texture=textureManager->createTexture(images,4);
 	if(texture!=NULL){
 		textureManager->manage(texture,miptex->name);
 	}

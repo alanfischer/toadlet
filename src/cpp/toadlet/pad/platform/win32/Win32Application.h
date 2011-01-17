@@ -42,7 +42,7 @@ public:
 	enum RendererPlugin{
 		RendererPlugin_NONE=-1,
 		RendererPlugin_ANY,
-		RendererPlugin_OPENGL,
+		RendererPlugin_GL,
 		RendererPlugin_D3DM,
 		RendererPlugin_D3D9,
 		RendererPlugin_D3D10,
@@ -53,7 +53,7 @@ public:
 	enum AudioPlayerPlugin{
 		AudioPlayerPlugin_NONE=-1,
 		AudioPlayerPlugin_ANY,
-		AudioPlayerPlugin_OPENAL,
+		AudioPlayerPlugin_AL,
 		AudioPlayerPlugin_MM,
 		AudioPlayerPlugin_MAX
 	};

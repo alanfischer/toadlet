@@ -25,8 +25,9 @@
 
 #include "D3D10Renderer.h"
 #include "D3D10Buffer.h"
-#include "D3D10RenderTarget.h"
+#include "D3D10TextureMipPixelBuffer.h"
 #include "D3D10PixelBufferRenderTarget.h"
+#include "D3D10RenderTarget.h"
 #include "D3D10Texture.h"
 #include "D3D10VertexFormat.h"
 #include <toadlet/egg/MathConversion.h>
@@ -224,11 +225,15 @@ bool D3D10Renderer::reset(){
 }
 
 Texture *D3D10Renderer::createTexture(){
-	return new D3D10Texture(mD3DDevice);
+	return new D3D10Texture(this);
 }
 
 PixelBufferRenderTarget *D3D10Renderer::createPixelBufferRenderTarget(){
-	return NULL;//new D3D10PixelBufferRenderTarget(this);
+	return NULL;
+}
+
+PixelBuffer *D3D10Renderer::createPixelBuffer(){
+	return new D3D10TextureMipPixelBuffer(this);
 }
 
 VertexFormat *D3D10Renderer::createVertexFormat(){
@@ -473,7 +478,20 @@ return false;
 }
 
 bool D3D10Renderer::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
-return false;
+	D3D10TextureMipPixelBuffer *d3dDst=(D3D10TextureMipPixelBuffer*)dst->getRootPixelBuffer();
+	D3D10TextureMipPixelBuffer *d3dSrc=(D3D10TextureMipPixelBuffer*)src->getRootPixelBuffer();
+
+	int dstSubRes=D3D10CalcSubresource(d3dDst->mLevel,0,0);
+	int srcSubRes=D3D10CalcSubresource(d3dSrc->mLevel,0,0);
+
+	mD3DDevice->CopySubresourceRegion(
+		d3dDst->mD3DTexture,dstSubRes,
+		0,0,0,
+		d3dSrc->mD3DTexture,srcSubRes,
+		NULL
+	);
+
+	return false;
 }
 
 void D3D10Renderer::setDefaultStates(){
@@ -699,36 +717,7 @@ void D3D10Renderer::setLightEnabled(int i,bool enable){
 
 void D3D10Renderer::setAmbientColor(const Color &ambient){
 }
-/*
-void D3D10Renderer::getPrimitiveTypeAndCount(D3DPRIMITIVETYPE &d3dpt,int &count,IndexData::Primitive prim,int numIndexes){
-	switch(prim){
-		case IndexData::Primitive_POINTS:
-			d3dpt=D3DPT_POINTLIST;
-			count=numIndexes;
-		break;
-		case IndexData::Primitive_LINES:
-			d3dpt=D3DPT_LINELIST;
-			count=numIndexes/2;
-		break;
-		case IndexData::Primitive_LINESTRIP:
-			d3dpt=D3DPT_LINESTRIP;
-			count=numIndexes-1;
-		break;
-		case IndexData::Primitive_TRIS:
-			d3dpt=D3DPT_TRIANGLELIST;
-			count=numIndexes/3;
-		break;
-		case IndexData::Primitive_TRISTRIP:
-			d3dpt=D3DPT_TRIANGLESTRIP;
-			count=numIndexes-2;
-		break;
-		case IndexData::Primitive_TRIFAN:
-			d3dpt=D3DPT_TRIANGLEFAN;
-			count=numIndexes-2;
-		break;
-	}
-}
-*/
+
 void D3D10Renderer::setMirrorY(bool mirrorY){
 /*	mMirrorY=mirrorY;
 
@@ -868,8 +857,30 @@ DXGI_FORMAT D3D10Renderer::getTextureDXGI_FORMAT(int format){
 			return DXGI_FORMAT_D24_UNORM_S8_UINT;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
-				"D3D10Texture::getDXGI_FORMAT: Invalid type");
+				"D3D10Renderer::getDXGI_FORMAT: Invalid type");
 			return DXGI_FORMAT_UNKNOWN;
+	}
+}
+
+D3D10_MAP D3D10Renderer::getD3D10_MAP(int access,int usage){
+	if((usage&Buffer::Usage_BIT_STAGING)>0){
+		return D3D10_MAP_READ_WRITE;
+	}
+
+	switch(access){
+		case Buffer::Access_BIT_READ:
+			return D3D10_MAP_READ;
+		break;
+		case Buffer::Access_BIT_WRITE:
+			return D3D10_MAP_WRITE_DISCARD;
+		break;
+		case Buffer::Access_READ_WRITE:
+			return D3D10_MAP_READ_WRITE;
+		break;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"D3D10Renderer::getD3D10_MAP: Invalid type");
+			return (D3D10_MAP)0;
 	}
 }
 

@@ -26,8 +26,7 @@
 #ifndef TOADLET_TADPOLE_BUFFERMANAGER_H
 #define TOADLET_TADPOLE_BUFFERMANAGER_H
 
-#include <toadlet/peeper/BackableIndexBuffer.h>
-#include <toadlet/peeper/BackableVertexBuffer.h>
+#include <toadlet/peeper/BackableBuffer.h>
 #include <toadlet/peeper/BackableVertexFormat.h>
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/tadpole/Types.h>
@@ -56,6 +55,8 @@ public:
 	virtual void postContextReset(peeper::Renderer *renderer);
 
 	virtual void bufferDestroyed(peeper::Buffer *buffer);
+
+	bool useTriFan();
 
 protected:
 	egg::Collection<peeper::VertexFormat::ptr> mVertexFormats;

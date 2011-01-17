@@ -49,12 +49,13 @@ VLCToadlet::VLCToadlet():Application(){
 }
 
 VLCToadlet::~VLCToadlet(){
+	scene=NULL;
 }
 
 void VLCToadlet::create(){
-	Application::create();
+	Application::create(RendererPlugin_GL);
 
-	String file="/home/siralanf/bigstuff_backup/ashleigh/Ashleigh mac/Movies/mvi_0811.avi";
+	String file="C:\\Users\\siralanf\\artoolkit\\lib\\SRC\\VideoWin32DirectShow\\_ext\\dsvl-0.0.8h\\media\\cube_right.avi";//"/home/siralanf/bigstuff_backup/ashleigh/Ashleigh mac/Movies/mvi_0811.avi";
 
 	scene=Scene::ptr(new Scene(mEngine));
 
@@ -62,7 +63,7 @@ void VLCToadlet::create(){
 	Texture::ptr texture=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET,Texture::Dimension_D2,format,128,128,1,1);
 	buffer=texture->getMipPixelBuffer(0,0);
 	backBuffer=PixelBuffer::ptr(mRenderer->createPixelBuffer());
-	backBuffer->create(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,texture->getFormat(),texture->getWidth(),texture->getHeight(),1);
+	backBuffer->create(Buffer::Usage_BIT_STAGING,Buffer::Access_BIT_WRITE,texture->getFormat(),texture->getWidth(),texture->getHeight(),1);
 
 	Mesh::ptr mesh=mEngine->getMeshManager()->createBox(AABox(-10,-10,-10,10,10,10));
 	mesh->subMeshes[0]->material->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(texture));
@@ -91,6 +92,10 @@ void VLCToadlet::destroy(){
 	libvlc_media_player_stop(mediaplayer);
 	libvlc_media_player_release(mediaplayer);
 	libvlc_release(vlc);
+
+	scene->destroy();
+	backBuffer->destroy();
+	buffer->destroy();
 
 	Application::destroy();
 }

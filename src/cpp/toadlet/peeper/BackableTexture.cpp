@@ -54,6 +54,8 @@ BackableTexture::~BackableTexture(){
 }
 
 bool BackableTexture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]){
+	destroy();
+
 	mUsage=usage;
 	mDimension=dimension;
 	mFormat=format;
@@ -76,11 +78,6 @@ bool BackableTexture::create(int usage,Dimension dimension,int format,int width,
 	if((usage&Usage_BIT_STAGING)==0){
 		// BackableTextures only store the first mipLevel, so if it's not a staging resource, then we need to autogen mipmaps
 		mUsage|=Usage_BIT_AUTOGEN_MIPMAPS;
-	}
-
-	if(mData!=NULL){
-		delete[] mData;
-		mData=NULL;
 	}
 
 	mData=new tbyte[mDataSize];
@@ -123,38 +120,30 @@ PixelBuffer::ptr BackableTexture::getMipPixelBuffer(int level,int cubeSide){
 
 bool BackableTexture::load(int width,int height,int depth,int mipLevel,tbyte *mipData){
 	if(mBack!=NULL){
-		return mBack->load(width,height,depth,mipLevel,mipData);
+		mBack->load(width,height,depth,mipLevel,mipData);
+	}
+
+	if(mipLevel==0){
+		ImageFormatConversion::convert(mipData,mFormat,mRowPitch,mSlicePitch,mData,mFormat,mRowPitch,mSlicePitch,width,height,depth);
+		return true;
 	}
 	else{
-		if(mipLevel==0){
-			ImageFormatConversion::convert(mipData,mFormat,mRowPitch,mSlicePitch,mData,mFormat,mRowPitch,mSlicePitch,width,height,depth);
-			return true;
-		}
-		else{
-			return false;
-		}
+		return false;
 	}
 }
 
 bool BackableTexture::read(int width,int height,int depth,int mipLevel,tbyte *mipData){
-	if(mBack!=NULL){
-		return mBack->read(width,height,depth,mipLevel,mipData);
+	if(mipLevel==0){
+		ImageFormatConversion::convert(mData,mFormat,mRowPitch,mSlicePitch,mipData,mFormat,mRowPitch,mSlicePitch,width,height,depth);
+		return true;
 	}
 	else{
-		if(mipLevel==0){
-			ImageFormatConversion::convert(mData,mFormat,mRowPitch,mSlicePitch,mipData,mFormat,mRowPitch,mSlicePitch,width,height,depth);
-			return true;
-		}
-		else{
-			return false;
-		}
+		return false;
 	}
 }
 
 void BackableTexture::setBack(Texture::ptr back){
 	if(back!=mBack && mBack!=NULL){
-		mData=new uint8[mDataSize];
-		mBack->read(mWidth,mHeight,mDepth,0,mData);
 		mBack->destroy();
 	}
 
@@ -162,15 +151,8 @@ void BackableTexture::setBack(Texture::ptr back){
 	
 	if(mBack!=NULL && mData!=NULL){
 		// Create texture on setting the back, otherwise D3D10 static textures will not load data in load
-		if(true){
-			tbyte *mipDatas[1]={mData};
-			mBack->create(mUsage,mDimension,mFormat,mWidth,mHeight,mDepth,0,mipDatas);
-		}
-		else{
-			mBack->load(mWidth,mHeight,mDepth,0,mData);
-		}
-		delete[] mData;
-		mData=NULL;
+		tbyte *mipDatas[1]={mData};
+		mBack->create(mUsage,mDimension,mFormat,mWidth,mHeight,mDepth,1,mipDatas);
 	}
 }
 

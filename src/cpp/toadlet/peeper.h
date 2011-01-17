@@ -26,9 +26,8 @@
 #ifndef TOADLET_PEEPER_H
 #define TOADLET_PEEPER_H
 
-#include <toadlet/peeper/BackableIndexBuffer.h>
+#include <toadlet/peeper/BackableBuffer.h>
 #include <toadlet/peeper/BackableTexture.h>
-#include <toadlet/peeper/BackableVertexBuffer.h>
 #include <toadlet/peeper/Blend.h>
 #include <toadlet/peeper/Buffer.h>
 #include <toadlet/peeper/CapabilitySet.h>

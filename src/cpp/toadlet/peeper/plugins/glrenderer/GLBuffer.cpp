@@ -330,6 +330,7 @@ GLenum GLBuffer::getBufferUsage(int usage,int access){
 			#endif
 		break;
 		case Usage_BIT_DYNAMIC:
+		case Usage_BIT_STAGING:
 			#if defined(TOADLET_HAS_GLES)
 				glusage=GL_DYNAMIC_DRAW;
 			#else

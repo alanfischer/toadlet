@@ -92,8 +92,8 @@ protected:
 	egg::Collection<PixelBuffer::ptr> mBuffers;
 	D3D9PixelBuffer::ptr mBackingBuffer;
 
-	friend D3D9Renderer;
-	friend D3D9TextureMipPixelBuffer;
+	friend class D3D9Renderer;
+	friend class D3D9TextureMipPixelBuffer;
 };
 
 }

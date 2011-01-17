@@ -27,6 +27,7 @@
 #define TOADLET_PAD_BASEAPPLICATION_H
 
 #include <toadlet/egg/Runnable.h>
+#include <toadlet/egg/Map.h>
 #include <toadlet/egg/String.h>
 #include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/peeper/Renderer.h>
@@ -41,6 +42,8 @@ namespace pad{
 
 class ApplicationListener;
 
+/// @todo: Move more common items to this, and have it be a base class, and not an interface.
+///  I can't think of any situations where it would be useful for BaseApplication to be an interface
 class TOADLET_API BaseApplication:public peeper::RenderTarget{
 public:
 	TOADLET_SHARED_POINTERS(BaseApplication);
@@ -50,13 +53,13 @@ public:
 		Key_TAB=8,
 		Key_SPACE=32,
 
-		Key_LEFT=1000,
+		Key_LEFT=1024,
 		Key_RIGHT,
 		Key_UP,
 		Key_DOWN,
 
 		// Keyboard keys
-		Key_ESC=2000,
+		Key_ESC=2048,
 		Key_PAUSE,
 		Key_SHIFT,
 		Key_CTRL,
@@ -66,44 +69,53 @@ public:
 		Key_DELETE,
 
 		// Cellphone keys
-		Key_SOFTLEFT=3000,
+		Key_SOFTLEFT=4096,
 		Key_SOFTRIGHT,
 		Key_ACTION,
 		Key_BACK,
 	};
 
-	static egg::String getKeyName(int key){
-		switch(key){
-			case(Key_ENTER):return		"enter";
-			case(Key_TAB):return		"tab";
-			case(Key_SPACE):return		"space";
+	static void mapKeyNames(egg::Map<int,egg::String> &keyToName,egg::Map<egg::String,int> &nameToKey){
+		egg::Map<int,egg::String> &map=keyToName;
 
-			case(Key_LEFT):return		"left";
-			case(Key_RIGHT):return		"right";
-			case(Key_UP):return			"up";
-			case(Key_DOWN):return		"down";
+		map.add(Key_ENTER,		"enter");
+		map.add(Key_TAB,		"tab");
+		map.add(Key_SPACE,		"space");
 
-			case(Key_ESC):return		"esc";
-			case(Key_PAUSE):return		"pause";
-			case(Key_SHIFT):return		"shift";
-			case(Key_CTRL):return		"ctrl";
-			case(Key_ALT):return		"alt";
-			case(Key_SPECIAL):return	"special";
-			case(Key_BACKSPACE):return	"backspace";
-			case(Key_DELETE):return		"delete";
+		map.add(Key_LEFT,		"left");
+		map.add(Key_RIGHT,		"right");
+		map.add(Key_UP,			"up");
+		map.add(Key_DOWN,		"down");
 
-			case(Key_SOFTLEFT):return	"softleft";
-			case(Key_SOFTRIGHT):return	"softright";
-			case(Key_ACTION):return		"action";
-			case(Key_BACK):return		"back";
-			default:
-				if(isalpha(key) || isdigit(key)){
-					return egg::String()+(char)key;
-				}
-				else{
-					return (char*)NULL;
-				}
+		map.add(Key_ESC,		"esc");
+		map.add(Key_PAUSE,		"pause");
+		map.add(Key_SHIFT,		"shift");
+		map.add(Key_CTRL,		"ctrl");
+		map.add(Key_ALT,		"alt");
+		map.add(Key_SPECIAL,	"special");
+		map.add(Key_BACKSPACE,	"backspace");
+		map.add(Key_DELETE,		"delete");
+
+		map.add(Key_SOFTLEFT,	"softleft");
+		map.add(Key_SOFTRIGHT,	"softright");
+		map.add(Key_ACTION,		"action");
+		map.add(Key_BACK,		"back");
+
+		int key;
+		for(key=0;key<256;++key){
+			if(isalpha(key) || isdigit(key)){
+				map.add(key,egg::String()+(char)key);
+			}
 		}
+
+		egg::Map<int,egg::String>::iterator it;
+		for(it=keyToName.begin();it!=keyToName.end();++it){
+			nameToKey.add(it->second,it->first);
+		}
+	}
+
+	BaseApplication(){
+		mapKeyNames(mKeyToName,mNameToKey);
 	}
 
 	virtual ~BaseApplication(){}
@@ -159,6 +171,13 @@ public:
 	virtual void mouseScrolled(int x,int y,int scroll)=0;
 	virtual void update(int dt)=0;
 	virtual void render(peeper::Renderer *renderer)=0;
+
+	virtual egg::String getKeyName(int key){egg::Map<int,egg::String>::iterator it=mKeyToName.find(key);return it!=mKeyToName.end()?it->second:(char*)NULL;}
+	virtual int getKeyValue(const egg::String &name){egg::Map<egg::String,int>::iterator it=mNameToKey.find(name);return it!=mNameToKey.end()?it->second:0;}
+
+protected:
+	egg::Map<egg::String,int> mNameToKey;
+	egg::Map<int,egg::String> mKeyToName;
 };
 
 }

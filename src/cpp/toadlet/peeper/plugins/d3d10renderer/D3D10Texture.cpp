@@ -25,7 +25,7 @@
 
 #include "D3D10Renderer.h"
 #include "D3D10Texture.h"
-#include "D3D10PixelBuffer.h"
+#include "D3D10TextureMipPixelBuffer.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 
@@ -36,6 +36,7 @@ namespace toadlet{
 namespace peeper{
 
 D3D10Texture::D3D10Texture(ID3D10Device *device):BaseResource(),
+	mRenderer(NULL),
 	mDevice(NULL),
 
 	mUsage(0),
@@ -48,8 +49,29 @@ D3D10Texture::D3D10Texture(ID3D10Device *device):BaseResource(),
 
 	mTexture(NULL),
 	mShaderResourceView(NULL)
+	//mBuffers
 {
 	mDevice=device;
+}
+
+D3D10Texture::D3D10Texture(D3D10Renderer *renderer):BaseResource(),
+	mRenderer(NULL),
+	mDevice(NULL),
+
+	mUsage(0),
+	mDimension(Dimension_UNKNOWN),
+	mFormat(0),
+	mWidth(0),
+	mHeight(0),
+	mDepth(0),
+	mMipLevels(0),
+
+	mTexture(NULL),
+	mShaderResourceView(NULL)
+	//mBuffers
+{
+	mRenderer=renderer;
+	mDevice=renderer->getD3D10Device();
 }
 
 D3D10Texture::~D3D10Texture(){
@@ -61,6 +83,12 @@ D3D10Texture::~D3D10Texture(){
 bool D3D10Texture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
 	destroy();
 
+	if(mRenderer!=NULL && format!=mRenderer->getClosestTextureFormat(format)){
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"D3D10Texture: Invalid texture format");
+		return false;
+	}
+
 	mUsage=usage;
 	mDimension=dimension;
 	mFormat=format;
@@ -70,13 +98,14 @@ bool D3D10Texture::create(int usage,Dimension dimension,int format,int width,int
 	mMipLevels=mipLevels;
 
 	if((mUsage&Usage_BIT_STATIC)>0){
-		if(mMipLevels!=0){
+/// @todo: Remove this Usage modification if no mips were specified.  I think I should just enforce that mips be specified when using a static resource instead.  So by removing this, it should error when not specifying mips.
+//		if(mipDatas!=NULL){
 			createContext(mipLevels,mipDatas);
-		}
-		else{
-			mUsage&=~Usage_BIT_STATIC;
-			mUsage|=Usage_BIT_DYNAMIC;
-		}
+//		}
+//		else{
+//			mUsage&=~Usage_BIT_STATIC;
+//			mUsage|=Usage_BIT_STREAM;
+//		}
 	}
 	
 	if((mUsage&Usage_BIT_STATIC)==0){
@@ -97,6 +126,8 @@ bool D3D10Texture::create(int usage,Dimension dimension,int format,int width,int
 
 void D3D10Texture::destroy(){
 	destroyContext();
+
+	mBuffers.clear();
 }
 
 bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
@@ -117,12 +148,9 @@ bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
 	}
 
 	int cpuFlags=0;
-//  Perhaps we need to add a flag to specify we want to read from a texture
-//	if((mUsage&Usage_BIT_STATIC)==0){
-//		if((mUsage&(Usage_BIT_DYNAMIC|Usage_BIT_STREAM))>0){
-//			cpuFlags|=D3D10_CPU_ACCESS_WRITE;
-//		}
-//	}
+	if((mUsage&Usage_BIT_STAGING)>0){
+		cpuFlags|=D3D10_CPU_ACCESS_READ|D3D10_CPU_ACCESS_WRITE;
+	}
 
 	int miscFlags=0;
 	int bindFlags=0;
@@ -138,6 +166,10 @@ bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
 	}
 	else{
 		bindFlags|=D3D10_BIND_SHADER_RESOURCE;
+	}
+
+	if((mUsage&Usage_BIT_STAGING)>0){
+		bindFlags=0;
 	}
 
 	DXGI_FORMAT dxgiFormat=D3D10Renderer::getTextureDXGI_FORMAT(mFormat);
@@ -189,7 +221,6 @@ bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
 			desc.MiscFlags=miscFlags;
 			desc.Format=dxgiFormat;
 			desc.ArraySize=1;
-
 			ID3D10Texture2D *texture=NULL;
 			result=device->CreateTexture2D(&desc,sData,&texture);
 			TOADLET_CHECK_D3D10ERROR(result,"CreateTexture2D");
@@ -214,7 +245,7 @@ bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
 		}break;
 	}
 
-	if(SUCCEEDED(result) && (mFormat&Format_BIT_DEPTH)==0){
+	if(SUCCEEDED(result) && (bindFlags&D3D10_BIND_SHADER_RESOURCE)>0){
 		result=device->CreateShaderResourceView(mTexture,NULL,&mShaderResourceView);
 	}
 
@@ -237,12 +268,34 @@ bool D3D10Texture::destroyContext(){
 		mTexture=NULL;
 	}
 
+	int i;
+	for(i=0;i<mBuffers.size();++i){
+		mBuffers[i]->destroy();
+	}
+
 	return SUCCEEDED(result);
 }
 
 PixelBuffer::ptr D3D10Texture::getMipPixelBuffer(int level,int cubeSide){
-	/// @todo: Check our cached list of SubTextures, and if the requested one isn't available, create it, and then return it.
-	return NULL;
+	if(mTexture==NULL){
+		return NULL;
+	}
+
+	int index=level;
+	if(mDimension==Dimension_CUBE){
+		index=level*6+cubeSide;
+	}
+
+	if(mBuffers.size()<=index){
+		mBuffers.resize(index+1);
+	}
+
+	if(mBuffers[index]==NULL){
+		PixelBuffer::ptr buffer(new D3D10TextureMipPixelBuffer(this,level,cubeSide));
+		mBuffers[index]=buffer;
+	}
+
+	return mBuffers[index];
 }
 
 bool D3D10Texture::load(int width,int height,int depth,int mipLevel,byte *mipData){
@@ -274,8 +327,52 @@ bool D3D10Texture::load(int width,int height,int depth,int mipLevel,byte *mipDat
 }
 
 bool D3D10Texture::read(int width,int height,int depth,int mipLevel,byte *mipData){
-	/// @todo: Lock the SubTexture and copy the data from there
-	return false;
+	int format=mFormat;
+	int rowPitch=ImageFormatConversion::getRowPitch(format,width);
+	int slicePitch=rowPitch*height;
+
+	int subresource=D3D10CalcSubresource(mipLevel,0,0);
+	D3D10_MAP mapType=D3D10_MAP_READ;
+	UINT mapFlags=0;
+
+	HRESULT result=S_OK;
+	switch(mDimension){
+		case Texture::Dimension_D1:{
+			tbyte *mappedTex=NULL;
+			ID3D10Texture1D *texture=(ID3D10Texture1D*)mTexture;
+			result=texture->Map(subresource,mapType,mapFlags,(void**)&mappedTex);
+			if(SUCCEEDED(result)){
+				ImageFormatConversion::convert(mappedTex,mFormat,rowPitch,slicePitch,mipData,format,rowPitch,slicePitch,width,height,depth);
+				texture->Unmap(subresource);
+			}
+		}break;
+		case Texture::Dimension_D2:{
+			D3D10_MAPPED_TEXTURE2D mappedTex;
+			ID3D10Texture2D *texture=(ID3D10Texture2D*)mTexture;
+			result=texture->Map(subresource,mapType,mapFlags,&mappedTex);
+			if(SUCCEEDED(result)){
+				ImageFormatConversion::convert((tbyte*)mappedTex.pData,mFormat,mappedTex.RowPitch,slicePitch,mipData,format,rowPitch,slicePitch,width,height,depth);
+				texture->Unmap(subresource);
+			}
+		}break;
+		case Texture::Dimension_D3:{
+			D3D10_MAPPED_TEXTURE3D mappedTex;
+			ID3D10Texture3D *texture=(ID3D10Texture3D*)mTexture;
+			result=texture->Map(subresource,mapType,mapFlags,&mappedTex);
+			if(SUCCEEDED(result)){
+				ImageFormatConversion::convert((tbyte*)mappedTex.pData,mFormat,mappedTex.RowPitch,mappedTex.DepthPitch,mipData,format,rowPitch,slicePitch,width,height,depth);
+				texture->Unmap(subresource);
+			}
+		}break;
+	}
+
+	if(FAILED(result)){
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"failed to read texture");
+		return false;
+	}
+
+	return true;
 }
 
 }

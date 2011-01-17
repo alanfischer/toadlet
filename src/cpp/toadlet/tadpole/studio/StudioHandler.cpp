@@ -24,7 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
-#include <toadlet/peeper/CapabilitySet.h>
 #include <toadlet/tadpole/studio/StudioHandler.h>
 
 using namespace toadlet::egg;
@@ -129,7 +128,7 @@ void StudioHandler::buildBuffers(StudioModel *model){
 						l=-l;
 						int numedges=l;
 						int firstedge=vertexCount;
-						if(mEngine->getRenderer()==NULL || mEngine->getRenderer()->getCapabilitySet().triangleFan){
+						if(mEngine->getBufferManager()->useTriFan()){
 							indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIFAN,NULL,firstedge,numedges));
 						}
 						else{

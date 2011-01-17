@@ -35,12 +35,12 @@ namespace toadlet{
 namespace peeper{
 
 class D3D10Renderer;
+class D3D10TextureMipPixelBuffer;
 
 class TOADLET_API D3D10Texture:protected egg::BaseResource,public Texture{
 	TOADLET_BASERESOURCE_PASSTHROUGH(Texture);
 public:
-	// This takes a Device instead of a Renderer so we can use it
-	// in D3D10WindowRenderTarget before a Renderer is constructed.
+	D3D10Texture(D3D10Renderer *renderer);
 	D3D10Texture(ID3D10Device *device);
 
 	virtual ~D3D10Texture();
@@ -73,6 +73,7 @@ protected:
 	bool createContext(int mipLevels,byte *mipDatas[]);
 	bool destroyContext();
 
+	D3D10Renderer *mRenderer;
 	ID3D10Device *mDevice;
 
 	int mUsage;
@@ -85,8 +86,10 @@ protected:
 
 	ID3D10Resource *mTexture;
 	ID3D10ShaderResourceView *mShaderResourceView;
+	egg::Collection<PixelBuffer::ptr> mBuffers;
 
-	friend D3D10Renderer;
+	friend class D3D10Renderer;
+	friend class D3D10TextureMipPixelBuffer;
 };
 
 }

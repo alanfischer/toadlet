@@ -669,7 +669,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 			}
 		}
 		else{
-			vertexBuffer=VertexBuffer::ptr(new BackableVertexBuffer());
+			vertexBuffer=VertexBuffer::ptr(new BackableBuffer());
 			vertexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,count);
 		}
 
@@ -799,7 +799,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 				indexBuffer=bufferManager->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,count);
 			}
 			else{
-				indexBuffer=IndexBuffer::ptr(new BackableIndexBuffer());
+				indexBuffer=IndexBuffer::ptr(new BackableBuffer());
 				indexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,count);
 			}
 
