@@ -156,9 +156,10 @@ namespace tadpole{
 
 Engine::Engine(bool backable):
 	//mDirectory,
-	//mScene,
 	mRenderer(NULL),
-	mAudioPlayer(NULL)
+	mAudioPlayer(NULL),
+
+	mContextListener(NULL)
 {
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"creating Engine");
@@ -497,6 +498,10 @@ void Engine::freeNode(Node *node){
 void Engine::contextReset(peeper::Renderer *renderer){
 	Logger::debug("Engine::contextReset");
 
+	if(mContextListener!=NULL){
+		mContextListener->preContextReset(renderer);
+	}
+
 	mBufferManager->preContextReset(renderer);
 	mTextureManager->preContextReset(renderer);
 
@@ -504,20 +509,40 @@ void Engine::contextReset(peeper::Renderer *renderer){
 
 	mBufferManager->postContextReset(renderer);
 	mTextureManager->postContextReset(renderer);
+
+	if(mContextListener!=NULL){
+		mContextListener->postContextReset(renderer);
+	}
 }
 
 void Engine::contextActivate(Renderer *renderer){
 	Logger::debug("Engine::contextActivate");
 
+	if(mContextListener!=NULL){
+		mContextListener->preContextActivate(renderer);
+	}
+
 	mBufferManager->contextActivate(renderer);
 	mTextureManager->contextActivate(renderer);
+
+	if(mContextListener!=NULL){
+		mContextListener->postContextActivate(renderer);
+	}
 }
 
 void Engine::contextDeactivate(Renderer *renderer){
 	Logger::debug("Engine::contextDeactivate");
 
+	if(mContextListener!=NULL){
+		mContextListener->preContextDeactivate(renderer);
+	}
+
 	mBufferManager->contextDeactivate(renderer);
 	mTextureManager->contextDeactivate(renderer);
+
+	if(mContextListener!=NULL){
+		mContextListener->postContextDeactivate(renderer);
+	}
 }
 
 }

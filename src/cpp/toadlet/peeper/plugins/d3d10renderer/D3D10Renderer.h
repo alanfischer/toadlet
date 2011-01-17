@@ -116,6 +116,8 @@ D3D10_PASS_DESC passDesc;
 	void setMirrorY(bool mirrorY);
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
 	int getClosestTextureFormat(int textureFormat);
+	void setStrictFormats(bool strict){mStrict=strict;}
+	bool getStrictFormats(){return mStrict;}
 
 	const StatisticsSet &getStatisticsSet(){return mStatisticsSet;}
 	const CapabilitySet &getCapabilitySet(){return mCapabilitySet;}
@@ -135,7 +137,7 @@ protected:
 	D3D10RenderTarget *mD3DPrimaryRenderTarget;
 	RenderTarget *mRenderTarget;
 	D3D10RenderTarget *mD3DRenderTarget;
-	bool mShutdown;
+	bool mStrict;
 
 	Matrix4x4 mModelMatrix;
 	Matrix4x4 mViewMatrix;

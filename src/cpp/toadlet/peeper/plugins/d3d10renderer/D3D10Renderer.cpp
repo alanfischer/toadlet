@@ -64,7 +64,8 @@ D3D10Renderer::D3D10Renderer():
 	mPrimaryRenderTarget(NULL),
 	mD3DPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL),
-	mD3DRenderTarget(NULL)
+	mD3DRenderTarget(NULL),
+	mStrict(false)
 
 	//mStatisticsSet,
 	//mCapabilitySet

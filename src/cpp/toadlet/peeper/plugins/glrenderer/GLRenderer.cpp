@@ -99,7 +99,8 @@ GLRenderer::GLRenderer():
 	mPrimaryRenderTarget(NULL),
 	mGLPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL),
-	mGLRenderTarget(NULL)
+	mGLRenderTarget(NULL),
+	mStrict(false)
 
 	#if defined(TOADLET_DEBUG)
 		,mBeginEndCounter(0)

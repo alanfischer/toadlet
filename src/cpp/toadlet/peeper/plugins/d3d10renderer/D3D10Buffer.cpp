@@ -134,6 +134,7 @@ void D3D10Buffer::destroy(){
 		else{
 			mListener->bufferDestroyed((VertexBuffer*)this);
 		}
+		mListener=NULL;
 	}
 }
 

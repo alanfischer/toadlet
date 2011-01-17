@@ -59,6 +59,18 @@ bool D3D9PixelBuffer::create(int usage,int access,int pixelFormat,int width,int 
 		return false;
 	}
 
+	int closestFormat=mRenderer->getClosestTextureFormat(pixelFormat);
+	if(pixelFormat!=closestFormat){
+		if(mRenderer->getStrictFormats()){
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"D3D9PixelBuffer: Invalid format");
+			return false;
+		}
+		else{
+			pixelFormat=closestFormat;
+		}
+	}
+
 	D3DFORMAT d3dformat=D3D9Renderer::getD3DFORMAT(pixelFormat);
 	HRESULT result=S_OK;
 	IDirect3DSurface9 *d3dsurface=NULL;
@@ -104,9 +116,12 @@ bool D3D9PixelBuffer::create(int usage,int access,int pixelFormat,int width,int 
 	mUsage=usage;
 	mAccess=access;
 	mPixelFormat=pixelFormat;
+
+	D3DSURFACE_DESC desc;
+	mSurface->GetDesc(&desc);
 	mDataSize=ImageFormatConversion::getRowPitch(pixelFormat,width)*height;
-	mWidth=width;
-	mHeight=height;
+	mWidth=desc.Width;
+	mHeight=desc.Height;
 	mDepth=1;
 
 	return true;
@@ -124,6 +139,7 @@ void D3D9PixelBuffer::destroy(){
 
 	if(mListener!=NULL){
 		mListener->bufferDestroyed(this);
+		mListener=NULL;
 	}
 }
 

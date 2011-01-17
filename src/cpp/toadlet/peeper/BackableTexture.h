@@ -78,6 +78,7 @@ protected:
 	int mDataSize;
 	tbyte *mData;
 	Texture::ptr mBack;
+	egg::Collection<PixelBuffer::ptr> mBuffers;
 };
 
 }

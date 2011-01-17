@@ -83,6 +83,7 @@ D3D9Renderer::D3D9Renderer():
 	mD3DPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL),
 	mD3DRenderTarget(NULL),
+	mStrict(false),
 
 	mFaceCulling(FaceCulling_NONE),
 	mMirrorY(false)

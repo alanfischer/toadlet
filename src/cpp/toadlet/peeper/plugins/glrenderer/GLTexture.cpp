@@ -68,10 +68,16 @@ bool GLTexture::create(int usage,Dimension dimension,int format,int width,int he
 		return false;
 	}
 
-	if(format!=mRenderer->getClosestTextureFormat(format)){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"GLTexture: Invalid texture format");
-		return false;
+	int closestFormat=mRenderer->getClosestTextureFormat(format);
+	if(format!=closestFormat){
+		if(mRenderer->getStrictFormats()){
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"GLTexture: Invalid format");
+			return false;
+		}
+		else{
+			format=closestFormat;
+		}
 	}
 
 	mUsage=usage;

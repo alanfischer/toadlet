@@ -89,6 +89,18 @@ bool D3D10TextureMipPixelBuffer::create(int usage,int access,int pixelFormat,int
 		return false;
 	}
 
+	int closestFormat=mRenderer->getClosestTextureFormat(pixelFormat);
+	if(pixelFormat!=closestFormat){
+		if(mRenderer->getStrictFormats()){
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"D3D10TextureMipPixelBuffer: Invalid format");
+			return false;
+		}
+		else{
+			pixelFormat=closestFormat;
+		}
+	}
+
 	mPixelFormat=pixelFormat;
 	mWidth=width;
 	mHeight=height;
@@ -126,6 +138,7 @@ void D3D10TextureMipPixelBuffer::destroy(){
 
 	if(mListener!=NULL){
 		mListener->bufferDestroyed(this);
+		mListener=NULL;
 	}
 }
 

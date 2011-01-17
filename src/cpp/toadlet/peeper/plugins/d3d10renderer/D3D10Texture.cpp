@@ -83,10 +83,16 @@ D3D10Texture::~D3D10Texture(){
 bool D3D10Texture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
 	destroy();
 
-	if(mRenderer!=NULL && format!=mRenderer->getClosestTextureFormat(format)){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"D3D10Texture: Invalid texture format");
-		return false;
+	int closestFormat=mRenderer->getClosestTextureFormat(format);
+	if(format!=closestFormat){
+		if(mRenderer->getStrictFormats()){
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"D3D10Texture: Invalid format");
+			return false;
+		}
+		else{
+			format=closestFormat;
+		}
 	}
 
 	mUsage=usage;

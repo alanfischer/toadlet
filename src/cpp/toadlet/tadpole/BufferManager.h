@@ -46,8 +46,10 @@ public:
 	virtual peeper::VertexFormat::ptr createVertexFormat();
 	virtual peeper::IndexBuffer::ptr createIndexBuffer(int usage,int access,peeper::IndexBuffer::IndexFormat indexFormat,int size);
 	virtual peeper::VertexBuffer::ptr createVertexBuffer(int usage,int access,peeper::VertexFormat::ptr vertexFormat,int size);
+	virtual peeper::PixelBuffer::ptr createPixelBuffer(int usage,int access,int pixelFormat,int width,int height,int depth);
 	virtual peeper::IndexBuffer::ptr cloneIndexBuffer(peeper::IndexBuffer::ptr oldIndexBuffer,int usage,int access,peeper::IndexBuffer::IndexFormat indexFormat,int size);
 	virtual peeper::VertexBuffer::ptr cloneVertexBuffer(peeper::VertexBuffer::ptr oldVertexBuffer,int usage,int access,peeper::VertexFormat::ptr vertexFormat,int size);
+	/// @todo: clonePixelBuffer
 
 	virtual void contextActivate(peeper::Renderer *renderer);
 	virtual void contextDeactivate(peeper::Renderer *renderer);
@@ -60,8 +62,9 @@ public:
 
 protected:
 	egg::Collection<peeper::VertexFormat::ptr> mVertexFormats;
-	egg::Collection<peeper::IndexBuffer::ptr> mIndexBuffers;
 	egg::Collection<peeper::VertexBuffer::ptr> mVertexBuffers;
+	egg::Collection<peeper::IndexBuffer::ptr> mIndexBuffers;
+	egg::Collection<peeper::PixelBuffer::ptr> mPixelBuffers;
 
 	Engine *mEngine;
 	bool mBackable;

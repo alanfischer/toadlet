@@ -174,6 +174,7 @@ void GLBuffer::destroy(){
 		else{
 			mListener->bufferDestroyed((PixelBuffer*)this);
 		}
+		mListener=NULL;
 	}
 }
 

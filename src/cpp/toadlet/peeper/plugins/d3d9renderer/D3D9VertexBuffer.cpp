@@ -61,6 +61,8 @@ D3D9VertexBuffer::~D3D9VertexBuffer(){
 }
 
 bool D3D9VertexBuffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int size){
+	destroy();
+
 	mUsage=usage;
 	mAccess=access;
 	mSize=size;

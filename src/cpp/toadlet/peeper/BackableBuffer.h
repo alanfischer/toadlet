@@ -28,11 +28,12 @@
 
 #include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/VertexBuffer.h>
+#include <toadlet/peeper/PixelBuffer.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API BackableBuffer:public IndexBuffer,public VertexBuffer{
+class TOADLET_API BackableBuffer:public IndexBuffer,public VertexBuffer,public PixelBuffer{
 public:
 	TOADLET_SHARED_POINTERS(BackableBuffer);
 
@@ -41,11 +42,13 @@ public:
 
 	virtual IndexBuffer *getRootIndexBuffer(){return (mIndexFormat!=(IndexFormat)0)?(IndexBuffer*)mBack.get():NULL;}
 	virtual VertexBuffer *getRootVertexBuffer(){return (mVertexFormat!=NULL)?(VertexBuffer*)mBack.get():NULL;}
+	virtual PixelBuffer *getRootPixelBuffer(){return (mPixelFormat!=0)?(PixelBuffer*)mBack.get():NULL;}
 
 	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
 	virtual bool create(int usage,int access,IndexFormat indexFormat,int size);
 	virtual bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size);
+	virtual bool create(int usage,int access,int pixelFormat,int width,int height,int depth);
 	virtual void destroy();
 
 	virtual void resetCreate();
@@ -55,15 +58,20 @@ public:
 	virtual int getAccess() const{return mAccess;}
 	virtual int getDataSize() const{return mDataSize;}
 	virtual int getSize() const{return mSize;}
+	virtual int getWidth() const{return mWidth;}
+	virtual int getHeight() const{return mHeight;}
+	virtual int getDepth() const{return mDepth;}
 
 	virtual IndexFormat getIndexFormat() const{return mIndexFormat;}
 	virtual VertexFormat::ptr getVertexFormat() const{return mVertexFormat;}
-
+	virtual int getPixelFormat() const{return mPixelFormat;}
+	
 	virtual uint8 *lock(int lockAccess);
 	virtual bool unlock();
 
 	virtual void setBack(IndexBuffer::ptr back);
 	virtual void setBack(VertexBuffer::ptr back);
+	virtual void setBack(PixelBuffer::ptr back);
 	virtual Buffer::ptr getBack(){return mBack;}
 
 protected:
@@ -76,7 +84,9 @@ protected:
 	int mDataSize;
 	IndexFormat mIndexFormat;
 	VertexFormat::ptr mVertexFormat;
+	int mPixelFormat;
 	int mSize;
+	int mWidth,mHeight,mDepth;
 
 	bool mHasData;
 	uint8 *mData;

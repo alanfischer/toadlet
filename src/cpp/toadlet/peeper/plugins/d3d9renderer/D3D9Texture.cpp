@@ -77,10 +77,16 @@ bool D3D9Texture::create(int usage,Dimension dimension,int format,int width,int 
 		return false;
 	}
 
-	if(format!=mRenderer->getClosestTextureFormat(format)){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"D3D9Texture: Invalid texture format");
-		return false;
+	int closestFormat=mRenderer->getClosestTextureFormat(format);
+	if(format!=closestFormat){
+		if(mRenderer->getStrictFormats()){
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"D3D9Texture: Invalid format");
+			return false;
+		}
+		else{
+			format=closestFormat;
+		}
 	}
 
 	mUsage=usage;
@@ -126,6 +132,17 @@ void D3D9Texture::resetDestroy(){
 bool D3D9Texture::createContext(bool restore){
 	IDirect3DDevice9 *device=mRenderer->getDirect3DDevice9();
 
+	/// @todo: Should we remove mInternalFormat and instead just change mFormat?
+	///  Seems somewhat pointless to already change mFormat in create (on non strict)
+	///  And then to change it again here.
+	mInternalFormat=mRenderer->getClosestTextureFormat(mFormat);
+	mD3DFormat=D3D9Renderer::getD3DFORMAT(mInternalFormat);
+	if(!mRenderer->isD3DFORMATValid(mD3DFormat,mD3DUsage)){
+		Logger::alert("invalid format, using BGRA_8");
+		mInternalFormat=Format_BGRA_8;
+		mD3DFormat=D3DFMT_X8R8G8B8;
+	}
+
 	mD3DUsage=
 		#if defined(TOADLET_SET_D3DM)
 			D3DUSAGE_LOCKABLE;
@@ -152,14 +169,6 @@ bool D3D9Texture::createContext(bool restore){
 			mD3DPool=D3DPOOL_MANAGED;
 		}
 	#endif
-
-	mInternalFormat=mRenderer->getClosestTextureFormat(mFormat);
-	mD3DFormat=D3D9Renderer::getD3DFORMAT(mInternalFormat);
-	if(!mRenderer->isD3DFORMATValid(mD3DFormat,mD3DUsage)){
-		Logger::alert("invalid format, using BGRA_8");
-		mInternalFormat=Format_BGRA_8;
-		mD3DFormat=D3DFMT_X8R8G8B8;
-	}
 
 	mManuallyGenerateMipLevels=(mUsage&Usage_BIT_AUTOGEN_MIPMAPS)>0;
 	#if !defined(TOADLET_SET_D3DM)
@@ -273,6 +282,11 @@ PixelBuffer::ptr D3D9Texture::getMipPixelBuffer(int level,int cubeSide){
 
 bool D3D9Texture::load(int width,int height,int depth,int mipLevel,byte *mipData){
 	if(mTexture==NULL){
+		return false;
+	}
+
+	if((mD3DUsage&D3DUSAGE_RENDERTARGET)>0){
+		// Can not load to a RenderTarget
 		return false;
 	}
 
