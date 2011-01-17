@@ -8,8 +8,7 @@
 
 class Spinner:public NodeListener{
 public:
-	Spinner(){
-	}
+	Spinner(){}
 
 	void nodeDestroyed(Node *node){}
 
@@ -45,6 +44,7 @@ static void unlock(void *data, void *id, void *const *p_pixels){
 static void display(void *data, void *id){}
 
 VLCToadlet::VLCToadlet():Application(){
+	plugin=false;
 	activated=false;
 }
 
@@ -53,7 +53,7 @@ VLCToadlet::~VLCToadlet(){
 }
 
 void VLCToadlet::create(){
-	Application::create(RendererPlugin_GL);
+	Application::create(RendererPlugin_D3D9);
 
 	String file="C:\\Users\\siralanf\\artoolkit\\lib\\SRC\\VideoWin32DirectShow\\_ext\\dsvl-0.0.8h\\media\\cube_right.avi";//"/home/siralanf/bigstuff_backup/ashleigh/Ashleigh mac/Movies/mvi_0811.avi";
 
@@ -62,8 +62,7 @@ void VLCToadlet::create(){
 	int format=mRenderer->getClosestTextureFormat(Texture::Format_RGBA_8);
 	Texture::ptr texture=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET,Texture::Dimension_D2,format,128,128,1,1);
 	buffer=texture->getMipPixelBuffer(0,0);
-	backBuffer=PixelBuffer::ptr(mRenderer->createPixelBuffer());
-	backBuffer->create(Buffer::Usage_BIT_STAGING,Buffer::Access_BIT_WRITE,texture->getFormat(),texture->getWidth(),texture->getHeight(),1);
+	backBuffer=mEngine->getBufferManager()->createPixelBuffer(Buffer::Usage_BIT_STAGING,Buffer::Access_BIT_WRITE,texture->getFormat(),texture->getWidth(),texture->getHeight(),1);
 
 	Mesh::ptr mesh=mEngine->getMeshManager()->createBox(AABox(-10,-10,-10,10,10,10));
 	mesh->subMeshes[0]->material->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(texture));
@@ -86,9 +85,13 @@ void VLCToadlet::create(){
 	libvlc_video_set_callbacks(mediaplayer, lock, unlock, display, this);
 	libvlc_video_set_format(mediaplayer,"RV32",128,128,128*4);
 	libvlc_media_player_play(mediaplayer);
+
+	mEngine->setContextListener(this);
 }
 
 void VLCToadlet::destroy(){
+	mEngine->setContextListener(NULL);
+
 	libvlc_media_player_stop(mediaplayer);
 	libvlc_media_player_release(mediaplayer);
 	libvlc_release(vlc);
@@ -121,6 +124,39 @@ void VLCToadlet::render(Renderer *renderer){
 
 void VLCToadlet::update(int dt){
 	scene->update(dt);
+}
+
+void VLCToadlet::keyPressed(int key){
+#if defined(TOADLET_PLATFORM_WIN32)
+	if(key==' '){
+		if(plugin){
+			changeRendererPlugin(RendererPlugin_GL);
+		}
+		else{
+			changeRendererPlugin(RendererPlugin_D3D9);
+		}
+		plugin=!plugin;
+	}
+#endif
+}
+
+/// @todo: I should just be able to use player_pause here, but that doesnt seem to stop the thread like I imagine.  I need to look into this vlc bug
+void VLCToadlet::preContextReset(Renderer *renderer){
+	libvlc_media_player_stop(mediaplayer);
+}
+
+void VLCToadlet::postContextReset(Renderer *renderer){
+	libvlc_media_player_play(mediaplayer);
+}
+
+void VLCToadlet::postContextActivate(Renderer *renderer){
+	activated=false;
+
+	libvlc_media_player_play(mediaplayer);
+}
+
+void VLCToadlet::preContextDeactivate(Renderer *renderer){
+	libvlc_media_player_stop(mediaplayer);
 }
 
 #if !defined(TOADLET_PLATFORM_OSX)

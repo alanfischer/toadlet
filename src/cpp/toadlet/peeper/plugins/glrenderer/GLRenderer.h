@@ -120,6 +120,8 @@ public:
 	void setMirrorY(bool mirrorY);
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
 	int getClosestTextureFormat(int textureFormat);
+	void setStrictFormats(bool strict){mStrict=strict;}
+	bool getStrictFormats(){return mStrict;}
 
 	const StatisticsSet &getStatisticsSet(){return mStatisticsSet;}
 	const CapabilitySet &getCapabilitySet(){return mCapabilitySet;}
@@ -196,6 +198,7 @@ protected:
 	GLRenderTarget *mGLPrimaryRenderTarget;
 	RenderTarget *mRenderTarget;
 	GLRenderTarget *mGLRenderTarget;
+	bool mStrict;
 
 	#if defined(TOADLET_DEBUG)
 		int mBeginEndCounter;

@@ -25,9 +25,11 @@
 
 #include <toadlet/peeper/BackableBuffer.h>
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/image/ImageFormatConversion.h>
 #include <string.h> // memcpy
 
 using namespace toadlet::egg;
+using namespace toadlet::egg::image;
 
 namespace toadlet{
 namespace peeper{
@@ -85,12 +87,32 @@ bool BackableBuffer::create(int usage,int access,VertexFormat::ptr vertexFormat,
 	return true;
 }
 
+bool BackableBuffer::create(int usage,int access,int pixelFormat,int width,int height,int depth){
+	destroy();
+
+	mUsage=usage;
+	mAccess=access;
+	mPixelFormat=pixelFormat;
+	mWidth=width;mHeight=height;mDepth=depth;
+	mDataSize=ImageFormatConversion::getRowPitch(mPixelFormat,mWidth)*mHeight*mDepth;
+
+	mHasData=false;
+	if(mData==NULL){
+		mData=new uint8[mDataSize];
+	}
+
+	return true;
+}
+
 void BackableBuffer::destroy(){
 	if(mBack!=NULL){
 		if(mIndexFormat!=(IndexFormat)0){
 			((IndexBuffer*)(mBack.get()))->destroy();
 		}
-		else{
+		else if(mVertexFormat!=NULL){
+			((VertexBuffer*)(mBack.get()))->destroy();
+		}
+		else if(mPixelFormat!=0){
 			((VertexBuffer*)(mBack.get()))->destroy();
 		}
 		mBack=NULL;
@@ -105,8 +127,11 @@ void BackableBuffer::destroy(){
 		if(mIndexFormat!=(IndexFormat)0){
 			mListener->bufferDestroyed((IndexBuffer*)this);
 		}
-		else{
+		else if(mVertexFormat!=NULL){
 			mListener->bufferDestroyed((VertexBuffer*)this);
+		}
+		else if(mPixelFormat!=0){
+			mListener->bufferDestroyed((PixelBuffer*)this);
 		}
 		mListener=NULL;
 	}
@@ -117,8 +142,11 @@ void BackableBuffer::resetCreate(){
 		if(mIndexFormat!=(IndexFormat)0){
 			((IndexBuffer*)(mBack.get()))->resetCreate();
 		}
-		else{
+		else if(mVertexFormat!=NULL){
 			((VertexBuffer*)(mBack.get()))->resetCreate();
+		}
+		else if(mPixelFormat!=0){
+			((PixelBuffer*)(mBack.get()))->resetCreate();
 		}
 	}
 }
@@ -128,8 +156,11 @@ void BackableBuffer::resetDestroy(){
 		if(mIndexFormat!=(IndexFormat)0){
 			((IndexBuffer*)(mBack.get()))->resetDestroy();
 		}
-		else{
+		else if(mVertexFormat!=NULL){
 			((VertexBuffer*)(mBack.get()))->resetDestroy();
+		}
+		else if(mPixelFormat!=0){
+			((PixelBuffer*)(mBack.get()))->resetCreate();
 		}
 	}
 }
@@ -144,9 +175,8 @@ bool BackableBuffer::unlock(){
 	if(mBack!=NULL){
 		writeBack();
 	}
-	else{
-		return true;
-	}
+
+	return true;
 }
 
 void BackableBuffer::setBack(IndexBuffer::ptr back){
@@ -168,7 +198,7 @@ void BackableBuffer::setBack(IndexBuffer::ptr back){
 
 void BackableBuffer::setBack(VertexBuffer::ptr back){
 	if(mBack.get()!=back.get() && mBack!=NULL){
-		((IndexBuffer*)(mBack.get()))->destroy();
+		((VertexBuffer*)(mBack.get()))->destroy();
 	}
 
 	mBack=back;
@@ -176,6 +206,23 @@ void BackableBuffer::setBack(VertexBuffer::ptr back){
 	if(back!=NULL){
 		// Create on setting the back, otherwise D3D10 static resources will not load data in load
 		back->create(mUsage,mAccess,mVertexFormat,mSize);
+
+		if(mHasData){
+			writeBack();
+		}
+	}
+}
+
+void BackableBuffer::setBack(PixelBuffer::ptr back){
+	if(mBack.get()!=back.get() && mBack!=NULL){
+		((PixelBuffer*)(mBack.get()))->destroy();
+	}
+
+	mBack=back;
+	
+	if(back!=NULL){
+		// Create on setting the back, otherwise D3D10 static resources will not load data in load
+		back->create(mUsage,mAccess,mPixelFormat,mWidth,mHeight,mDepth);
 
 		if(mHasData){
 			writeBack();

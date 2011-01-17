@@ -25,6 +25,7 @@
 
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/BackableTexture.h>
+#include <toadlet/peeper/BackableTextureMipPixelBuffer.h>
 #include <string.h>
 
 using namespace toadlet::egg;
@@ -90,6 +91,14 @@ bool BackableTexture::create(int usage,Dimension dimension,int format,int width,
 }
 
 void BackableTexture::destroy(){
+	int i;
+	for(i=0;i<mBuffers.size();++i){
+		if(mBuffers[i]!=NULL){
+			mBuffers[i]->destroy();
+		}
+	}
+	mBuffers.clear();
+
 	if(mBack!=NULL){
 		mBack->destroy();
 		mBack=NULL;
@@ -104,18 +113,46 @@ void BackableTexture::destroy(){
 void BackableTexture::resetCreate(){
 	if(mBack!=NULL){
 		mBack->resetCreate();
+
+		int i;
+		for(i=0;i<mBuffers.size();++i){
+			if(mBuffers[i]!=NULL){
+				mBuffers[i]->resetCreate();
+			}
+		}
 	}
 }
 
 void BackableTexture::resetDestroy(){
 	if(mBack!=NULL){
+		int i;
+		for(i=0;i<mBuffers.size();++i){
+			if(mBuffers[i]!=NULL){
+				mBuffers[i]->resetDestroy();
+			}
+		}
+
 		mBack->resetDestroy();
 	}
 }
 
 /// @todo: This should return a BackablePixelBuffer, which will be able to change surface pointers
 PixelBuffer::ptr BackableTexture::getMipPixelBuffer(int level,int cubeSide){
-	return mBack->getMipPixelBuffer(level,cubeSide);
+	int index=level;
+	if(mDimension==Dimension_CUBE){
+		index=level*6+cubeSide;
+	}
+
+	if(mBuffers.size()<=index){
+		mBuffers.resize(index+1);
+	}
+
+	if(mBuffers[index]==NULL){
+		PixelBuffer::ptr buffer(new BackableTextureMipPixelBuffer(this,level,cubeSide));
+		mBuffers[index]=buffer;
+	}
+
+	return mBuffers[index];
 }
 
 bool BackableTexture::load(int width,int height,int depth,int mipLevel,tbyte *mipData){
@@ -143,16 +180,31 @@ bool BackableTexture::read(int width,int height,int depth,int mipLevel,tbyte *mi
 }
 
 void BackableTexture::setBack(Texture::ptr back){
+	int i;
 	if(back!=mBack && mBack!=NULL){
+		for(i=0;i<mBuffers.size();++i){
+			if(mBuffers[i]!=NULL){
+				mBuffers[i]->resetDestroy();
+			}
+		}
+
 		mBack->destroy();
 	}
 
 	mBack=back;
 	
-	if(mBack!=NULL && mData!=NULL){
-		// Create texture on setting the back, otherwise D3D10 static textures will not load data in load
-		tbyte *mipDatas[1]={mData};
-		mBack->create(mUsage,mDimension,mFormat,mWidth,mHeight,mDepth,1,mipDatas);
+	if(mBack!=NULL){
+		if(mData!=NULL){
+			// Create texture on setting the back, otherwise D3D10 static textures will not load data in load
+			tbyte *mipDatas[1]={mData};
+			mBack->create(mUsage,mDimension,mFormat,mWidth,mHeight,mDepth,1,mipDatas);
+		}
+
+		for(i=0;i<mBuffers.size();++i){
+			if(mBuffers[i]!=NULL){
+				mBuffers[i]->resetCreate();
+			}
+		}
 	}
 }
 

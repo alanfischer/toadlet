@@ -202,7 +202,7 @@ Win32Application::~Win32Application(){
 }
 
 void Win32Application::create(int renderer,int audioPlayer,int motionDetector){
-	mEngine=new Engine(false);
+	mEngine=new Engine(true);
 
 	mResourceArchive=Win32ResourceArchive::ptr(new Win32ResourceArchive(mEngine->getTextureManager()));
 	mResourceArchive->open(win32->mInstance);
