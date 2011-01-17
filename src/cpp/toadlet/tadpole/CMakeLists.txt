@@ -113,6 +113,7 @@ set (TADPOLE_HEADERS
 	BufferManager.h
 	BoundingVolumeSensor.h
 	Collision.h
+	ContextListener.h
 	Engine.h
 	Font.h
 	FontData.h
