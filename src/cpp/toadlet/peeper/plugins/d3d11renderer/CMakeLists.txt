@@ -1,7 +1,6 @@
 # Source files for toadlet_peeper_d3d11renderer
 set (PEEPER_D3D11RENDERER_SRC
 	../d3d10renderer/D3D10Buffer.cpp
-	../d3d10renderer/D3D10PixelBuffer.cpp
 	../d3d10renderer/D3D10PixelBufferRenderTarget.cpp
 	../d3d10renderer/D3D10Renderer.cpp
 	../d3d10renderer/D3D10Texture.cpp

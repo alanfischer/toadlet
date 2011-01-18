@@ -48,8 +48,8 @@ namespace peeper{
 	#define D3D10Query					D3D11Query
 	#define D3D10Renderer				D3D11Renderer
 	#define D3D10RenderTarget			D3D11RenderTarget
-	#define D3D10Surface				D3D11Surface
-	#define D3D10SurfaceRenderTarget	D3D11SurfaceRenderTarget
+	#define D3D10TextureMipPixelBuffer	D3D11TextureMipPixelBuffer
+	#define D3D10PixelBufferRenderTarget D3D11PixelBufferRenderTarget
 	#define D3D10Texture				D3D11Texture
 	#define D3D10VertexFormat			D3D11VertexFormat
 	#define D3D10WindowRenderTarget		D3D11WindowRenderTarget

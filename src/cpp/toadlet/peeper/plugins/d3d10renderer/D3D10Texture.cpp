@@ -83,7 +83,7 @@ D3D10Texture::~D3D10Texture(){
 bool D3D10Texture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
 	destroy();
 
-	int closestFormat=mRenderer->getClosestTextureFormat(format);
+	int closestFormat=mRenderer!=NULL?mRenderer->getClosestTextureFormat(format):format;
 	if(format!=closestFormat){
 		if(mRenderer->getStrictFormats()){
 			Error::unknown(Categories::TOADLET_PEEPER,

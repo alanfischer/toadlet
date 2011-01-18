@@ -121,6 +121,7 @@ void StudioHandler::buildBuffers(StudioModel *model){
 				short *tricmds=(short*)(model->data+smesh->triindex);
 				while(l=*(tricmds++)){
 					IndexData::ptr indexData;
+					/// @todo: Pack all these indexes into 1 IndexBuffer to speed up rendering
 					if(l>0){
 						indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,vertexCount,l));
 					}

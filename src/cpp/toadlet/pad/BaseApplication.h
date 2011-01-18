@@ -120,7 +120,7 @@ public:
 
 	virtual ~BaseApplication(){}
 
-	virtual void create(int renderer,int audioPlayer,int motionDetector)=0;
+	virtual void create(egg::String renderer,egg::String audioPlayer,egg::String motionDetector)=0;
 	virtual void destroy()=0;
 
 	virtual void start()=0;

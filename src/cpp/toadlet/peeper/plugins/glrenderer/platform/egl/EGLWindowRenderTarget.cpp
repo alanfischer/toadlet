@@ -33,8 +33,12 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *nativeDisplay,void *nativeSurface,const Visual &visual){
-	return new EGLWindowRenderTarget(nativeDisplay,nativeSurface,visual);
+TOADLET_C_API RenderTarget *new_EGLWindowRenderTarget(void *window,const Visual &visual){
+	void *display=NULL;
+	#if defind(TOADLET_PLATFORM_WIN32)
+		display=GetDC((HWND)window);
+	#endif
+	return new EGLWindowRenderTarget(display,window,visual);
 }
 
 EGLWindowRenderTarget::EGLWindowRenderTarget():EGLRenderTarget(),
@@ -42,7 +46,7 @@ EGLWindowRenderTarget::EGLWindowRenderTarget():EGLRenderTarget(),
 	mPixmap(false)
 {}
 
-EGLWindowRenderTarget::EGLWindowRenderTarget(void *nativeDisplay,void *nativeSurface,const Visual &visual,bool pixmap):EGLRenderTarget(),
+EGLWindowRenderTarget::EGLWindowRenderTarget(void *display,void *window,const Visual &visual,bool pixmap):EGLRenderTarget(),
 	mConfig(0),
 	mPixmap(false)
 {
@@ -60,7 +64,7 @@ EGLWindowRenderTarget::EGLWindowRenderTarget(void *nativeDisplay,void *nativeSur
 		}
 	#endif
 
-	bool result=createContext(nativeDisplay,nativeSurface,visual,pixmap);
+	bool result=createContext(display,window,visual,pixmap);
 
 	#if defined(TOADLET_HAS_GLESEM)
 		if(result==false && !initialized){
@@ -74,7 +78,7 @@ EGLWindowRenderTarget::EGLWindowRenderTarget(void *nativeDisplay,void *nativeSur
 			}
 		}
 
-		result=createContext(nativeDisplay,nativeSurface,visual,pixmap);
+		result=createContext(window,visual,pixmap);
 	#endif
 }
 
@@ -82,15 +86,15 @@ EGLWindowRenderTarget::~EGLWindowRenderTarget(){
 	destroyContext();
 }
 
-bool EGLWindowRenderTarget::createContext(void *nativeDisplay,void *nativeSurface,const Visual &visual,bool pixmap){
+bool EGLWindowRenderTarget::createContext(void *display,void *window,const Visual &visual,bool pixmap){
 	if(mContext!=EGL_NO_CONTEXT){
 		return true;
 	}
-
-	// Seems like software egl doesn't want a nativeDisplay
+	
+	// Seems like software egl doesn't want a display
 	#if defined(TOADLET_HAS_GLESEM)
 		if(glesem_getAccelerated()==false){
-			nativeDisplay=0;
+			display=NULL;
 		}
 	#endif
 
@@ -99,7 +103,7 @@ bool EGLWindowRenderTarget::createContext(void *nativeDisplay,void *nativeSurfac
 	mPixmap=pixmap;
 
 	try{
-		mDisplay=eglGetDisplay((NativeDisplayType)nativeDisplay);
+		mDisplay=eglGetDisplay((NativeDisplayType)display);
 	}catch(...){mDisplay=EGL_NO_DISPLAY;}
 	if(mDisplay==EGL_NO_DISPLAY){
 		Error::unknown(Categories::TOADLET_PEEPER,
@@ -150,11 +154,11 @@ bool EGLWindowRenderTarget::createContext(void *nativeDisplay,void *nativeSurfac
 
 	try{
 		if(!pixmap){
-			mSurface=eglCreateWindowSurface(mDisplay,mConfig,nativeSurface,NULL);
+			mSurface=eglCreateWindowSurface(mDisplay,mConfig,window,NULL);
 			TOADLET_CHECK_EGLERROR("eglCreateWindowSurface");
 		}
 		else{
-			mSurface=eglCreatePixmapSurface(mDisplay,mConfig,nativeSurface,NULL);
+			mSurface=eglCreatePixmapSurface(mDisplay,mConfig,window,NULL);
 			TOADLET_CHECK_EGLERROR("eglCreatePixmapSurface");
 		}
 	}catch(...){mSurface=EGL_NO_SURFACE;}

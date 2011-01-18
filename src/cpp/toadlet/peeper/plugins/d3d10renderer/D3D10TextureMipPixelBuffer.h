@@ -26,7 +26,7 @@
 #ifndef TOADLET_PEEPER_D3D10TEXTUREMIPPIXELBUFFER_H
 #define TOADLET_PEEPER_D3D10TEXTUREMIPPIXELBUFFER_H
 
-#include "D3D10PixelBuffer.h"
+#include <toadlet/peeper/PixelBuffer.h>
 #include "D3D10Texture.h"
 
 namespace toadlet{
