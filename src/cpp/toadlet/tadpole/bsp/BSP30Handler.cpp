@@ -314,6 +314,7 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 			packer.insert(lmwidth,lmheight,((tbyte*)map->lighting)+face->lightofs,map->facedatas[i].lightmapTransform);
 		}
 
+		/// @todo: Pack all these indexes into 1 IndexBuffer to speed up rendering
 		IndexData::ptr indexData;
 		if(mEngine->getBufferManager()->useTriFan()){
 			indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIFAN,NULL,face->firstedge,face->numedges));

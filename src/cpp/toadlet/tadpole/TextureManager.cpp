@@ -53,7 +53,13 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 	int format=image->getFormat();
 	int width=image->getWidth(),height=image->getHeight(),depth=image->getDepth();
 	int closestFormat=renderer==NULL?format:renderer->getClosestTextureFormat(format);
-/// @todo: REMOVEME
+/// @todo: I need to remove this.  It is here so that all Textures get a unified format
+///  When you use a BackableTexture, if the new texture can't handle the old format, it
+///  will either error if strictFormats is on, or it my crash when loading the data into d3d10
+///  This could be solved by doing a conversion when the convertedFormat != format on the data before
+///  loading, but would require some allocations.  Perhaps the key is to put the conversion into
+///  BackableTexture, so when setting the back, it will create, then check the format to see if it needs to
+///  convert!  That should be pretty easy to, and keep all that possibly time consuming stuff in BackableTexture where it belongs.
 closestFormat=Image::Format_RGBA_8;
 
 	// Check if the renderer supports npot textures

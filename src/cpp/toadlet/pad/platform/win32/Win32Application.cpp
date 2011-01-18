@@ -27,7 +27,6 @@
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/CapabilitySet.h>
-#include <toadlet/peeper/WindowRenderTargetFormat.h>
 #include <toadlet/pad/platform/win32/Win32Application.h>
 #include <toadlet/pad/ApplicationListener.h>
 #include <windows.h>
@@ -75,30 +74,30 @@ using namespace toadlet::tadpole::handler;
 	#pragma comment(lib,"toadlet_peeper_glrenderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_GLRenderer();
 	#if defined(TOADLET_PLATFORM_WINCE)
-		extern "C" RenderTarget *new_EGLWindowRenderTarget(void *nativeDisplay,void *nativeSurface,WindowRenderTargetFormat *format);
+		extern "C" RenderTarget *new_EGLWindowRenderTarget(void *window,WindowRenderTargetFormat *format);
 	#else
-		extern "C" RenderTarget *new_WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
+		extern "C" RenderTarget *new_WGLWindowRenderTarget(void *window,WindowRenderTargetFormat *format);
 	#endif
 #endif
 #if defined(TOADLET_HAS_D3DM)
 	#pragma comment(lib,"toadlet_peeper_d3dmrenderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_D3DMRenderer();
-	extern "C" RenderTarget *new_D3DMWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
+	extern "C" RenderTarget *new_D3DMWindowRenderTarget(void *window,WindowRenderTargetFormat *format);
 #endif
 #if defined(TOADLET_HAS_D3D9)
 	#pragma comment(lib,"toadlet_peeper_d3d9renderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_D3D9Renderer();
-	extern "C" RenderTarget *new_D3D9WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
+	extern "C" RenderTarget *new_D3D9WindowRenderTarget(void *window,WindowRenderTargetFormat *format);
 #endif
 #if defined(TOADLET_HAS_D3D10)
 	#pragma comment(lib,"toadlet_peeper_d3d10renderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_D3D10Renderer();
-	extern "C" RenderTarget *new_D3D10WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
+	extern "C" RenderTarget *new_D3D10WindowRenderTarget(void *window,WindowRenderTargetFormat *format);
 #endif
 #if defined(TOADLET_HAS_D3D11)
 	#pragma comment(lib,"toadlet_peeper_d3d11renderer" TOADLET_LIBRARY_EXTENSION)
 	extern "C" Renderer *new_D3D11Renderer();
-	extern "C" RenderTarget *new_D3D11WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
+	extern "C" RenderTarget *new_D3D11WindowRenderTarget(void *window,WindowRenderTargetFormat *format);
 #endif
 #if defined(TOADLET_PLATFORM_WIN32)
 	#pragma comment(lib,"toadlet_ribbit_mmplayer" TOADLET_LIBRARY_EXTENSION)
@@ -152,12 +151,16 @@ Win32Application::Win32Application():
 	mEngine(NULL),
 	mRenderTarget(NULL),
 	mRenderer(NULL),
-	mRendererPlugin(RendererPlugin_NONE),
-	mChangeRendererPlugin(RendererPlugin_NONE),
-	mRendererOptions(NULL),
 	mAudioPlayer(NULL),
-	mAudioPlayerOptions(NULL),
 	mMotionDetector(NULL),
+
+	//mRendererPlugins,
+	//mCurrentRendererPlugin,
+	//mNewRendererPlugin,
+	mRendererOptions(0),
+	//mAudioPlayerPlugins,
+	mAudioPlayerOptions(0),
+	//mMotionDetctorPlugins,
 
 	mRun(false),
 	#if defined(TOADLET_PLATFORM_WINCE)
@@ -190,6 +193,41 @@ Win32Application::Win32Application():
 			Logger::error(Categories::TOADLET_PAD,"No resource of type CEUX with name HI_RES_AWARE, may not render on all devices");
 		}
 	#endif
+
+	#if defined(TOADLET_HAS_OPENGL)
+		mRendererPlugins.add("gl",RendererPlugin(
+			#if defined(TOADLET_PLATFORM_WINCE)
+				new_EGLWindowRenderTarget
+			#else
+				new_WGLWindowRenderTarget
+			#endif
+			,new_GLRenderer
+		));
+	#endif
+	#if defined(TOADLET_HAS_D3DM)
+		mRendererPlugins.add("d3dm",RendererPlugin(new_D3DMWindowRenderTarget,new_D3DMRenderer));
+	#endif
+	#if defined(TOADLET_HAS_D3D9)
+		mRendererPlugins.add("d3d9",RendererPlugin(new_D3D9WindowRenderTarget,new_D3D9Renderer));
+	#endif
+	#if defined(TOADLET_HAS_D3D10)
+		mRendererPlugins.add("d3d10",RendererPlugin(new_D3D10WindowRenderTarget,new_D3D10Renderer));
+	#endif
+	#if defined(TOADLET_HAS_D3D11)
+		mRendererPlugins.add("d3d11",RendererPlugin(new_D3D11WindowRenderTarget,new_D3D11Renderer));
+	#endif
+
+	#if defined(TOADLET_PLATFORM_WIN32)
+		mAudioPlayerPlugins.add("mm",AudioPlayerPlugin(new_MMPlayer));
+	#endif
+	#if defined(TOADLET_HAS_OPENAL)
+		mAudioPlayerPlugins.add("al",AudioPlayerPlugin(new_ALPlayer));
+	#endif
+
+	#if defined(TOADLET_PLATFORM_WINCE)
+		mMotionDetectorPlugins.add("htc",MotionDetectorPlugin(new_HTCMotionDetector));
+		mMotionDetectorPlugins.add("samsung",MotionDetectorPlugin(new_SamsungMotionDetector));
+	#endif
 }
 
 Win32Application::~Win32Application(){
@@ -201,8 +239,8 @@ Win32Application::~Win32Application(){
 	delete win32;
 }
 
-void Win32Application::create(int renderer,int audioPlayer,int motionDetector){
-	mEngine=new Engine(true);
+void Win32Application::create(String renderer,String audioPlayer,String motionDetector){
+	mEngine=new Engine(false);
 
 	mResourceArchive=Win32ResourceArchive::ptr(new Win32ResourceArchive(mEngine->getTextureManager()));
 	mResourceArchive->open(win32->mInstance);
@@ -227,20 +265,19 @@ void Win32Application::create(int renderer,int audioPlayer,int motionDetector){
 	}
 	Logger::alert(Categories::TOADLET_PAD,String("detected ")+numJoys+" joysticks");
 
-	if(renderer!=RendererPlugin_NONE){
-		changeRendererPlugin(renderer);
-	}
-	if(audioPlayer!=AudioPlayerPlugin_NONE){
-		createAudioPlayer(audioPlayer);
-	}
-	if(motionDetector!=MotionDetectorPlugin_NONE){
-		createMotionDetector(motionDetector);
-	}
 	createWindow();
 	activate();
 	
-	mRendererPlugin=mChangeRendererPlugin;
-	createContextAndRenderer(mRendererPlugin);
+	mNewRendererPlugin=mCurrentRendererPlugin=renderer;
+	if(renderer!=(char*)NULL){
+		createContextAndRenderer(renderer);
+	}
+	if(audioPlayer!=(char*)NULL){
+		createAudioPlayer(audioPlayer);
+	}
+	if(motionDetector!=(char*)NULL){
+		createMotionDetector(motionDetector);
+	}
 }
 
 void Win32Application::destroy(){
@@ -337,10 +374,10 @@ void Win32Application::stepEventLoop(){
 		memcpy(lastJoyInfo,joyInfo,sizeof(JOYINFOEX));
 	}
 
-	if(mChangeRendererPlugin!=mRendererPlugin){
+	if(mCurrentRendererPlugin!=mNewRendererPlugin){
 		destroyRendererAndContext();
-		mRendererPlugin=mChangeRendererPlugin;
-		createContextAndRenderer(mRendererPlugin);
+		mCurrentRendererPlugin=mNewRendererPlugin;
+		createContextAndRenderer(mCurrentRendererPlugin);
 	}
 }
 
@@ -683,8 +720,8 @@ void Win32Application::setDifferenceMouse(bool difference){
 	ShowCursor(!mDifferenceMouse);
 }
 
-void Win32Application::changeRendererPlugin(int rendererPlugin){
-	mChangeRendererPlugin=rendererPlugin;
+void Win32Application::changeRendererPlugin(const String &plugin){
+	mNewRendererPlugin=plugin;
 }
 
 void Win32Application::setRendererOptions(int *options,int length){
@@ -715,7 +752,7 @@ void Win32Application::setIcon(void *icon){
 void *Win32Application::getHINSTANCE() const{return win32->mInstance;}
 void *Win32Application::getHWND() const{return win32->mWnd;}
 
-RenderTarget *Win32Application::makeRenderTarget(int rendererPlugin){
+RenderTarget *Win32Application::makeRenderTarget(const String &plugin){
 	RenderTarget *target=NULL;
 	DWORD flags=D3DCREATE_MULTITHREADED;
 
@@ -726,34 +763,9 @@ RenderTarget *Win32Application::makeRenderTarget(int rendererPlugin){
 	#endif
 	WindowRenderTargetFormat::ptr format(new WindowRenderTargetFormat(mVisual,2,debug,0));
 
-	if(rendererPlugin==RendererPlugin_GL){
-		#if defined(TOADLET_HAS_OPENGL)
-			#if defined(TOADLET_PLATFORM_WINCE)
-				target=new_EGLWindowRenderTarget(GetDC(win32->mWnd),win32->mWnd,format);
-			#else
-				target=new_WGLWindowRenderTarget(win32->mWnd,format);
-			#endif
-		#endif
-	}
-	else if(rendererPlugin==RendererPlugin_D3DM){
-		#if defined(TOADLET_HAS_D3DM)
-			target=new_D3DMWindowRenderTarget(win32->mWnd,format);
-		#endif
-	}
-	else if(rendererPlugin==RendererPlugin_D3D9){
-		#if defined(TOADLET_HAS_D3D9)
-			target=new_D3D9WindowRenderTarget(win32->mWnd,format);
-		#endif
-	}
-	else if(rendererPlugin==RendererPlugin_D3D10){
-		#if defined(TOADLET_HAS_D3D10)
-			target=new_D3D10WindowRenderTarget(win32->mWnd,format);
-		#endif
-	}
-	else if(rendererPlugin==RendererPlugin_D3D11){
-		#if defined(TOADLET_HAS_D3D11)
-			target=new_D3D11WindowRenderTarget(win32->mWnd,format);
-		#endif
+	Map<String,RendererPlugin>::iterator it=mRendererPlugins.find(plugin);
+	if(it!=mRendererPlugins.end()){
+		target=it->second.createRenderTarget(win32->mWnd,format);
 	}
 	if(target!=NULL && target->isValid()==false){
 		delete target;
@@ -762,64 +774,40 @@ RenderTarget *Win32Application::makeRenderTarget(int rendererPlugin){
 	return target;
 }
 
-Renderer *Win32Application::makeRenderer(int plugin){
+Renderer *Win32Application::makeRenderer(const String &plugin){
 	Renderer *renderer=NULL;
-	if(plugin==RendererPlugin_GL){
-		#if defined(TOADLET_HAS_OPENGL)
-			renderer=new_GLRenderer();
-		#endif
-	}
-	else if(plugin==RendererPlugin_D3DM){
-		#if defined(TOADLET_HAS_D3DM)
-			renderer=new_D3DMRenderer();
-		#endif
-	}
-	else if(plugin==RendererPlugin_D3D9){
-		#if defined(TOADLET_HAS_D3D9)
-			renderer=new_D3D9Renderer();
-		#endif
-	}
-	else if(plugin==RendererPlugin_D3D10){
-		#if defined(TOADLET_HAS_D3D10)
-			renderer=new_D3D10Renderer();
-		#endif
-	}
-	else if(plugin==RendererPlugin_D3D11){
-		#if defined(TOADLET_HAS_D3D11)
-			renderer=new_D3D11Renderer();
-		#endif
+	Map<String,RendererPlugin>::iterator it=mRendererPlugins.find(plugin);
+	if(it!=mRendererPlugins.end()){
+		renderer=it->second.createRenderer();
 	}
 	return renderer;
 }
 
-bool Win32Application::createContextAndRenderer(int plugin){
-	if(plugin==RendererPlugin_NONE){
-		return false;
-	}
-
+bool Win32Application::createContextAndRenderer(const String &plugin){
 	Logger::debug(Categories::TOADLET_PAD,
 		"Win32Application: creating RenderTarget and Renderer");
 
+	String name=plugin;
+	if(plugin==(char*)NULL && mRendererPlugins.begin()!=mRendererPlugins.end()){
+		name=mRendererPlugins.begin()->first;
+	}
+
 	bool result=false;
-	int trying=plugin;
-	do{
-		mRenderTarget=makeRenderTarget(trying);
-		if(mRenderTarget!=NULL){
-			mRenderer=makeRenderer(trying);
-			TOADLET_TRY
-				result=mRenderer->create(this,mRendererOptions);
-			TOADLET_CATCH(const Exception &){result=false;}
-			if(result==false){
-				delete mRenderer;
-				mRenderer=NULL;
-			}
-		}
+	mRenderTarget=makeRenderTarget(name);
+	if(mRenderTarget!=NULL){
+		mRenderer=makeRenderer(name);
+		TOADLET_TRY
+			result=mRenderer->create(this,mRendererOptions);
+		TOADLET_CATCH(const Exception &){result=false;}
 		if(result==false){
-			delete mRenderTarget;
-			mRenderTarget=NULL;
+			delete mRenderer;
+			mRenderer=NULL;
 		}
-		trying++;
-	}while(mRenderer==NULL && plugin==RendererPlugin_ANY && trying!=RendererPlugin_MAX);
+	}
+	if(result==false){
+		delete mRenderTarget;
+		mRenderTarget=NULL;
+	}
 
 	if(result==false){
 		Logger::error(Categories::TOADLET_PAD,
@@ -879,44 +867,35 @@ bool Win32Application::changeVideoMode(int width,int height,int colorBits){
 	return result;
 }
 
-AudioPlayer *Win32Application::makeAudioPlayer(int plugin){
+AudioPlayer *Win32Application::makeAudioPlayer(const String &plugin){
 	AudioPlayer *audioPlayer=NULL;
-	if(plugin==AudioPlayerPlugin_AL){
-		#if defined(TOADLET_HAS_OPENAL)
-			audioPlayer=new_ALPlayer();
-		#endif
-	}
-	else if(plugin==AudioPlayerPlugin_MM){
-		#if defined(TOADLET_PLATFORM_WIN32)
-			audioPlayer=new_MMPlayer();
-		#endif
+	Map<String,AudioPlayerPlugin>::iterator it=mAudioPlayerPlugins.find(plugin);
+	if(it!=mAudioPlayerPlugins.end()){
+		audioPlayer=it->second.createAudioPlayer();
 	}
 	return audioPlayer;
 }
 
-bool Win32Application::createAudioPlayer(int plugin){
-	if(plugin==AudioPlayerPlugin_NONE){
-		return false;
-	}
-
+bool Win32Application::createAudioPlayer(const String &plugin){
 	Logger::debug(Categories::TOADLET_PAD,
 		"Win32Application: creating AudioPlayer");
 
+	String name=plugin;
+	if(plugin==(char*)NULL && mAudioPlayerPlugins.begin()!=mAudioPlayerPlugins.end()){
+		name=mAudioPlayerPlugins.begin()->first;
+	}
+
 	bool result=false;
-	int trying=plugin;
-	do{
-		mAudioPlayer=makeAudioPlayer(trying);
-		if(mAudioPlayer!=NULL){
-			TOADLET_TRY
-				result=mAudioPlayer->create(mAudioPlayerOptions);
-			TOADLET_CATCH(const Exception &){result=false;}
-			if(result==false){
-				delete mAudioPlayer;
-				mAudioPlayer=NULL;
-			}
+	mAudioPlayer=makeAudioPlayer(name);
+	if(mAudioPlayer!=NULL){
+		TOADLET_TRY
+			result=mAudioPlayer->create(mAudioPlayerOptions);
+		TOADLET_CATCH(const Exception &){result=false;}
+		if(result==false){
+			delete mAudioPlayer;
+			mAudioPlayer=NULL;
 		}
-		trying++;
-	}while(mAudioPlayer==NULL && plugin==AudioPlayerPlugin_ANY && trying!=AudioPlayerPlugin_MAX);
+	}
 
 	if(result==false){
 		Logger::error(Categories::TOADLET_PAD,
@@ -945,44 +924,35 @@ bool Win32Application::destroyAudioPlayer(){
 	return true;
 }
 
-MotionDetector *Win32Application::makeMotionDetector(int plugin){
+MotionDetector *Win32Application::makeMotionDetector(const String &plugin){
 	MotionDetector *motionDetector=NULL;
-	if(plugin==MotionDetectorPlugin_HTC){
-		#if defined(TOADLET_PLATFORM_WINCE)
-			motionDetector=new_HTCMotionDetector();
-		#endif
-	}
-	else if(plugin==MotionDetectorPlugin_SAMSUNG){
-		#if defined(TOADLET_PLATFORM_WINCE)
-			motionDetector=new_SamsungMotionDetector();
-		#endif
+	Map<String,MotionDetectorPlugin>::iterator it=mMotionDetectorPlugins.find(plugin);
+	if(it!=mMotionDetectorPlugins.end()){
+		motionDetector=it->second.createMotionDetector();
 	}
 	return motionDetector;
 }
 
-bool Win32Application::createMotionDetector(int plugin){
-	if(plugin==MotionDetectorPlugin_NONE){
-		return false;
-	}
-
+bool Win32Application::createMotionDetector(const String &plugin){
 	Logger::debug(Categories::TOADLET_PAD,
 		"Win32Application: creating MotionDetector");
 
+	String name=plugin;
+	if(plugin==(char*)NULL && mAudioPlayerPlugins.begin()!=mAudioPlayerPlugins.end()){
+		name=mAudioPlayerPlugins.begin()->first;
+	}
+
 	bool result=false;
-	int trying=plugin;
-	do{
-		mMotionDetector=makeMotionDetector(trying);
-		if(mMotionDetector!=NULL){
-			TOADLET_TRY
-				result=mMotionDetector->create();
-			TOADLET_CATCH(const Exception &){result=false;}
-			if(result==false){
-				delete mMotionDetector;
-				mMotionDetector=NULL;
-			}
+	mMotionDetector=makeMotionDetector(name);
+	if(mMotionDetector!=NULL){
+		TOADLET_TRY
+			result=mMotionDetector->create();
+		TOADLET_CATCH(const Exception &){result=false;}
+		if(result==false){
+			delete mMotionDetector;
+			mMotionDetector=NULL;
 		}
-		trying++;
-	}while(mMotionDetector==NULL && plugin==MotionDetectorPlugin_ANY && trying!=MotionDetectorPlugin_MAX);
+	}
 
 	if(result==false){
 		Logger::error(Categories::TOADLET_PAD,
