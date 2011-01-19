@@ -192,6 +192,11 @@ void ParentNode::frameUpdate(int dt,int scope){
 		child=mShadowChildren[i];
 
 		bool dependent=false;
+		// This may not be in logicUpdate, but it solves an issue where a deactivated Node would not get updated if 
+		//  it only had frameUpdate called on it before a render
+		if(mActivateChildren){
+			child->activate();
+		}
 		if(child->active() && (child->getScope()&scope)!=0){
 			Node *depends=child->getDependsUpon();
 			if(depends!=NULL && depends->mLastFrame!=mScene->getFrame()){
@@ -207,6 +212,9 @@ void ParentNode::frameUpdate(int dt,int scope){
 			mergeWorldBound(child,false);
 		}
 	}
+
+	// See the comment above on child->activate() in frameUpdate()
+	mActivateChildren=false;
 }
 
 void ParentNode::queueRenderables(CameraNode *camera,RenderQueue *queue){

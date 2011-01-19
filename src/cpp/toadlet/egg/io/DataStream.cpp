@@ -75,14 +75,15 @@ int8 DataStream::readInt8(){
 }
 
 int DataStream::readNullTerminatedString(String &s){
-	int amt=0;
+	int amt=0,total=0;
 	char string[1024];
 	int i=0;
 	while(true){
-		amt+=mStream->read((tbyte*)string+i,1);
+		amt=mStream->read((tbyte*)string+i,1);
 		if(amt==0 || string[i]==0){
 			break;
 		}
+		total+=amt;
 		i++;
 		if(i==1023){
 			string[i]=0;
@@ -93,6 +94,12 @@ int DataStream::readNullTerminatedString(String &s){
 	string[i]=0;
 	s+=string;
 	return amt;
+}
+
+String DataStream::readNullTerminatedString(){
+	String s;
+	readNullTerminatedString(s);
+	return s;
 }
 
 int DataStream::readBigUInt16(uint16 &i){
@@ -210,6 +217,12 @@ int DataStream::readBigInt16String(String &s){
 	return amt;
 }
 
+String DataStream::readBigInt16String(){
+	String s;
+	readBigInt16String(s);
+	return s;
+}
+
 int DataStream::readLittleUInt16(uint16 &i){
 	int amt=mStream->read((tbyte*)&i,sizeof(i));
 	littleUInt16InPlace(i);
@@ -323,6 +336,12 @@ int DataStream::readLittleInt16String(String &s){
 	s=string;
 	delete[] string;
 	return amt;
+}
+
+String DataStream::readLittleInt16String(){
+	String s;
+	readLittleInt16String(s);
+	return s;
 }
 
 int DataStream::writeBool(bool b){

@@ -232,8 +232,6 @@ void Node::logicUpdate(int dt,int scope){
 
 	logicUpdateListeners(dt);
 
-	// If we're updating the world transforms in Node, then we also need to keep the
-	// world bound merging updated in ParentNode.
 	updateWorldTransform();
 }
 
