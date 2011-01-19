@@ -37,18 +37,33 @@ class TOADLET_API NodeTransformInterpolator:public NodeInterpolator{
 public:
 	TOADLET_SHARED_POINTERS(NodeTransformInterpolator);
 
-	NodeTransformInterpolator(){
+	NodeTransformInterpolator():
+		mInterpolate(0),
+		mForceInterpolate(0)
+	{
+		mInterpolate=Node::TransformUpdate_BIT_TRANSLATE|Node::TransformUpdate_BIT_ROTATE|Node::TransformUpdate_BIT_SCALE;
+
 		mTransform=Transform::ptr(new Transform());
 		mLastTransform=Transform::ptr(new Transform());
 		mLerpedTransform=Transform::ptr(new Transform());
 	}
 
-	virtual void transformUpdated(Node *node){
-		mLastTransform->setTranslate(node->getTranslate());
-		mLastTransform->setRotate(node->getRotate());
-		mLastTransform->setScale(node->getScale());
-
-		mTransform->set(mLastTransform);
+	virtual void transformUpdated(Node *node,int tu){
+		if((~mForceInterpolate&tu&Node::TransformUpdate_BIT_TRANSLATE)>0){
+			const Vector3 &translate=node->getTranslate();
+			mLastTransform->setTranslate(translate);
+			mTransform->setTranslate(translate);
+		}
+		if((~mForceInterpolate&tu&Node::TransformUpdate_BIT_ROTATE)>0){
+			const Quaternion &rotate=node->getRotate();
+			mLastTransform->setRotate(rotate);
+			mTransform->setRotate(rotate);
+		}
+		if((~mForceInterpolate&tu&Node::TransformUpdate_BIT_SCALE)>0){
+			const Vector3 &scale=node->getScale();
+			mLastTransform->setScale(scale);
+			mTransform->setScale(scale);
+		}
 	}
 
 	virtual void logicUpdate(Node *node,int dt){
@@ -60,17 +75,46 @@ public:
 	}
 
 	virtual void interpolate(Node *node,scalar value){
-		Math::lerp(mTranslateLerp,mLastTransform->getTranslate(),mTransform->getTranslate(),value);
-		Math::slerp(mRotateLerp,mLastTransform->getRotate(),mTransform->getRotate(),value);
-		Math::lerp(mScaleLerp,mLastTransform->getScale(),mTransform->getScale(),value);
+		if((mInterpolate&Node::TransformUpdate_BIT_TRANSLATE)>0){
+			Math::lerp(mTranslateLerp,mLastTransform->getTranslate(),mTransform->getTranslate(),value);
+			mLerpedTransform->setTranslate(mTranslateLerp);
+		}
+		else{
+			mLerpedTransform->setTranslate(mLastTransform->getTranslate());
+		}
 
-		mLerpedTransform->set(mTranslateLerp,mRotateLerp,mScaleLerp);
-		node->setTransform(mLerpedTransform,Node::TransformUpdate_INTERPOLATOR);
+		if((mInterpolate&Node::TransformUpdate_BIT_ROTATE)>0){
+			Math::slerp(mRotateLerp,mLastTransform->getRotate(),mTransform->getRotate(),value);
+			mLerpedTransform->setRotate(mRotateLerp);
+		}
+		else{
+			mLerpedTransform->setRotate(mLastTransform->getRotate());
+		}
+
+		if((mInterpolate&Node::TransformUpdate_BIT_SCALE)>0){
+			Math::lerp(mScaleLerp,mLastTransform->getScale(),mTransform->getScale(),value);
+			mLerpedTransform->setScale(mScaleLerp);
+		}
+		else{
+			mLerpedTransform->setScale(mLastTransform->getScale());
+		}
+
+		node->setTransform(mLerpedTransform,Node::TransformUpdate_BIT_INTERPOLATOR);
 	}
+
+	void setBitsToInterpolate(int interpolate){mInterpolate=interpolate;}
+	int getBitsToInterpolate() const{return mInterpolate;}
+
+	// These will force interpolation, even when transform parameters are explicity set
+	void setBitsToForceInterpolate(int interpolate){mForceInterpolate=interpolate;}
+	int getBitsToForceInterpolate() const{return mForceInterpolate;}
 
 protected:
 	Transform::ptr mTransform;
 	Transform::ptr mLastTransform;
+
+	int mInterpolate;
+	int mForceInterpolate;
 
 	Vector3 mTranslateLerp;
 	Quaternion mRotateLerp;

@@ -184,47 +184,47 @@ void Node::parentDataChanged(void *parentData){
 
 void Node::setTranslate(const Vector3 &translate){
 	mTransform->setTranslate(translate);
-	transformUpdated(TransformUpdate_TRANSLATE);
+	transformUpdated(TransformUpdate_BIT_TRANSLATE);
 }
 
 void Node::setTranslate(scalar x,scalar y,scalar z){
 	mTransform->setTranslate(x,y,z);
-	transformUpdated(TransformUpdate_TRANSLATE);
+	transformUpdated(TransformUpdate_BIT_TRANSLATE);
 }
 
 void Node::setRotate(const Quaternion &rotate){
 	mTransform->setRotate(rotate);
-	transformUpdated(TransformUpdate_ROTATE);
+	transformUpdated(TransformUpdate_BIT_ROTATE);
 }
 
 void Node::setRotate(const Matrix3x3 &rotate){
 	mTransform->setRotate(rotate);
-	transformUpdated(TransformUpdate_ROTATE);
+	transformUpdated(TransformUpdate_BIT_ROTATE);
 }
 
 void Node::setRotate(const Vector3 &axis,scalar angle){
 	mTransform->setRotate(axis,angle);
-	transformUpdated(TransformUpdate_ROTATE);
+	transformUpdated(TransformUpdate_BIT_ROTATE);
 }
 
 void Node::setScale(const Vector3 &scale){
 	mTransform->setScale(scale);
-	transformUpdated(TransformUpdate_SCALE);
+	transformUpdated(TransformUpdate_BIT_SCALE);
 }
 
 void Node::setScale(scalar x,scalar y,scalar z){
 	mTransform->setScale(x,y,z);
-	transformUpdated(TransformUpdate_SCALE);
+	transformUpdated(TransformUpdate_BIT_SCALE);
 }
 
 void Node::setTransform(Transform *transform,int tu){
 	mTransform->set(transform);
-	transformUpdated(TransformUpdate_TRANSLATE|TransformUpdate_ROTATE|TransformUpdate_SCALE|tu);
+	transformUpdated(TransformUpdate_BIT_TRANSLATE|TransformUpdate_BIT_ROTATE|TransformUpdate_BIT_SCALE|tu);
 }
 
 void Node::setBound(Bound *bound){
 	mBound->set(bound);
-	transformUpdated(0);
+	transformUpdated(TransformUpdate_BIT_BOUND);
 }
 
 void Node::logicUpdate(int dt,int scope){
