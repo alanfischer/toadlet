@@ -48,7 +48,6 @@ namespace egg{
 #endif
 
 class TOADLET_API String{
-	class NullType{};
 public:
 	static const int npos=-1;
 

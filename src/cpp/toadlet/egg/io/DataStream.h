@@ -63,6 +63,7 @@ public:
 	int readInt8(int8 &i);
 
 	int readNullTerminatedString(String &s);
+	String readNullTerminatedString();
 
 	int readBigUInt16(uint16 &i);
 	uint16 readBigUInt16();
@@ -82,6 +83,7 @@ public:
 	double readBigDouble();
 
 	int readBigInt16String(String &s);
+	String readBigInt16String();
 
 	int readLittleUInt16(uint16 &i);
 	uint16 readLittleUInt16();
@@ -101,6 +103,7 @@ public:
 	double readLittleDouble();
 
 	int readLittleInt16String(String &s);
+	String readLittleInt16String();
 
 	int writeBool(bool b);
 	int writeUInt8(uint8 i);
