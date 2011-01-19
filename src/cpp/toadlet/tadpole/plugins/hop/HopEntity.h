@@ -103,6 +103,8 @@ public:
 	virtual hop::Shape::ptr getShape(int i) const{return mSolid->getShape(i);}
 	virtual int getNumShapes() const{return mSolid->getNumShapes();}
 
+	node::NodeTransformInterpolator::ptr getInterpolator(){return mInterpolator;}
+
 	// Shortcuts for a single shape
 	virtual void setShape(hop::Shape::ptr shape){if(mSolid->getNumShapes()>0){removeAllShapes();}addShape(shape);}
 	virtual hop::Shape::ptr getShape() const{return mSolid->getNumShapes()>0?mSolid->getShape(0):NULL;}

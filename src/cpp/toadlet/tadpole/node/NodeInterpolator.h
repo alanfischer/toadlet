@@ -38,7 +38,7 @@ public:
 
 	virtual ~NodeInterpolator(){}
 	
-	virtual void transformUpdated(Node *node)=0;
+	virtual void transformUpdated(Node *node,int tu)=0;
 	virtual void logicUpdate(Node *node,int dt)=0;
 	virtual void interpolate(Node *node,scalar value)=0;
 };

@@ -190,12 +190,14 @@ void HopEntity::setCollisionVolumesVisible(bool visible){
 void HopEntity::transformUpdated(int tu){
 	super::transformUpdated(tu);
 
-	// Only modify position on a translation change, and not from the interpolator
-	if((tu&TransformUpdate_TRANSLATE)>0 && (tu&TransformUpdate_INTERPOLATOR)==0){
-		mSolid->setPosition(mTransform->getTranslate());
+	if((tu&Node::TransformUpdate_BIT_INTERPOLATOR)==0){
+		// Only modify position on a translation change, and not from the interpolator
+		if((tu&Node::TransformUpdate_BIT_TRANSLATE)>0){
+			mSolid->setPosition(mTransform->getTranslate());
+		}
 
 		if(mInterpolator!=NULL){
-			mInterpolator->transformUpdated(this);
+			mInterpolator->transformUpdated(this,tu);
 		}
 	}
 }
@@ -216,7 +218,7 @@ void HopEntity::parentChanged(ParentNode *parent){
 void HopEntity::logicUpdate(int dt,int scope){
 	if(mSolid->active()){
 		mTransform->setTranslate(mSolid->getPosition());
-		transformUpdated(TransformUpdate_TRANSLATE|TransformUpdate_INTERPOLATOR);
+		transformUpdated(TransformUpdate_BIT_TRANSLATE|TransformUpdate_BIT_INTERPOLATOR);
 
 		if(mInterpolator!=NULL){
 			mInterpolator->logicUpdate(this,mScene->getLogicFrame());

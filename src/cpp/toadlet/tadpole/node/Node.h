@@ -77,10 +77,11 @@ public:
 	TOADLET_NODE(Node,Node);
 
 	enum TransformUpdate{
-		TransformUpdate_TRANSLATE=1<<0,
-		TransformUpdate_ROTATE=1<<1,
-		TransformUpdate_SCALE=1<<2,
-		TransformUpdate_INTERPOLATOR=1<<3,
+		TransformUpdate_BIT_TRANSLATE=1<<0,
+		TransformUpdate_BIT_ROTATE=1<<1,
+		TransformUpdate_BIT_SCALE=1<<2,
+		TransformUpdate_BIT_BOUND=1<<3,
+		TransformUpdate_BIT_INTERPOLATOR=1<<4,
 	};
 
 	Node();
