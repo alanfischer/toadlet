@@ -376,6 +376,11 @@ bool BSP30Node::senseBoundingVolumes(SensorResultsListener *listener,Bound *boun
 	Collection<int> &newIndexes=mLeafIndexes; 
 	newIndexes.clear();
 	const AABox &box=bound->getAABox();
+	Vector3 origin;
+	Math::sub(origin,box.maxs,box.mins);
+	Math::mul(origin,Math::HALF);
+	Math::add(origin,box.mins);
+
 	mMap->findBoundLeafs(newIndexes,mMap->nodes,0,box);
 
 	for(i=0;i<newIndexes.size();i++){
@@ -388,7 +393,7 @@ bool BSP30Node::senseBoundingVolumes(SensorResultsListener *listener,Bound *boun
 			if(data->counter!=mCounter && occupant->getWorldBound()->testIntersection(bound)){
 				data->counter=mCounter;
 				result|=true;
-				if(listener->resultFound(occupant)==false){
+				if(listener->resultFound(occupant,Math::lengthSquared(origin,occupant->getWorldTranslate()))==false){
 					return true;
 				}
 			}
@@ -402,7 +407,7 @@ bool BSP30Node::senseBoundingVolumes(SensorResultsListener *listener,Bound *boun
 		if(data->counter!=mCounter && occupant->getWorldBound()->testIntersection(bound)){
 			data->counter=mCounter;
 			result|=true;
-			if(listener->resultFound(occupant)==false){
+			if(listener->resultFound(occupant,Math::lengthSquared(origin,occupant->getWorldTranslate()))==false){
 				return true;
 			}
 		}
@@ -427,7 +432,7 @@ bool BSP30Node::sensePotentiallyVisible(SensorResultsListener *listener,const Ve
 	if(leaf==0 || mMap->nvisibility==0){
 		for(i=0;i<mChildren.size();++i){
 			result|=true;
-			if(listener->resultFound(mChildren[i])==false){
+			if(listener->resultFound(mChildren[i],Math::lengthSquared(point,mChildren[i]->getWorldTranslate()))==false){
 				return true;
 			}
 		}
@@ -443,7 +448,7 @@ bool BSP30Node::sensePotentiallyVisible(SensorResultsListener *listener,const Ve
 				if(data->counter!=mCounter){
 					data->counter=mCounter;
 					result|=true;
-					if(listener->resultFound(occupant)==false){
+					if(listener->resultFound(occupant,Math::lengthSquared(point,occupant->getWorldTranslate()))==false){
 						return true;
 					}
 				}
@@ -454,7 +459,7 @@ bool BSP30Node::sensePotentiallyVisible(SensorResultsListener *listener,const Ve
 		for(j=0;j<occupants.size();++j){
 			Node *occupant=occupants[j];
 			result|=true;
-			if(listener->resultFound(occupant)==false){
+			if(listener->resultFound(occupant,Math::lengthSquared(point,occupant->getWorldTranslate()))==false){
 				return true;
 			}
 		}

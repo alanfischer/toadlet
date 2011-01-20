@@ -23,27 +23,48 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_SENSORRESULTSLISTENER_H
-#define TOADLET_TADPOLE_SENSORRESULTSLISTENER_H
+#ifndef TOADLET_TADPOLE_SENSORRESULTS_H
+#define TOADLET_TADPOLE_SENSORRESULTS_H
 
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/SensorResultsListener.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
-	class Node;
-}
 
-class SensorResultsListener{
+class Scene;
+
+class TOADLET_API SensorResults:public SensorResultsListener{
 public:
-	virtual ~SensorResultsListener(){}
+	TOADLET_SHARED_POINTERS(SensorResults);
 
-	virtual void sensingBeginning()=0;
+	SensorResults();
+	virtual ~SensorResults();
 
-	// Return true to continue sensing
-	virtual bool resultFound(node::Node *result,scalar distance)=0;
+	void setMaxNumResults(int num);
+	int getMaxNumResults() const{return mMaxResults;}
 
-	virtual void sensingEnding()=0;
+	void setSortResultsByHandle(bool sort){mSortByHandle=sort;}
+	bool getSortResultsByHandle() const{return mSortByHandle;}
+
+	void setScope(int scope){mScope=scope;}
+	int getScope() const{return mScope;}
+
+	int getNumResults() const{return mResults.size();}
+	node::Node *getResult(int i){return mResults[i];}
+	node::Node *getNextResult(node::Node *result);
+
+	virtual void sensingBeginning();
+	
+	virtual bool resultFound(node::Node *result,scalar distance);
+
+	virtual void sensingEnding();
+	
+protected:
+	int mMaxResults;
+	bool mSortByHandle;
+	int mScope;
+	egg::Collection<node::Node*> mResults;
+	scalar mMaxDistance;
 };
 
 }

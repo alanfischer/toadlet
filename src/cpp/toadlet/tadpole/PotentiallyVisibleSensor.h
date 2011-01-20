@@ -26,26 +26,25 @@
 #ifndef TOADLET_TADPOLE_POTENTIALLYVISIBLESENSOR_H
 #define TOADLET_TADPOLE_POTENTIALLYVISIBLESENSOR_H
 
-#include <toadlet/tadpole/Types.h>
-#include <toadlet/tadpole/Scene.h>
-#include <toadlet/tadpole/SensorResultsListener.h>
+#include <toadlet/tadpole/Sensor.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class Scene;
-
-class TOADLET_API PotentiallyVisibleSensor{
+class TOADLET_API PotentiallyVisibleSensor:public Sensor{
 public:
 	TOADLET_SHARED_POINTERS(PotentiallyVisibleSensor);
 
 	PotentiallyVisibleSensor(Scene *scene);
 	virtual ~PotentiallyVisibleSensor();
 
-	virtual bool sensePotentiallyVisible(SensorResultsListener *results,const Vector3 &point);
+	virtual void setPoint(const Vector3 &point);
+
+	virtual bool sense(SensorResultsListener *results);
+	SensorResults::ptr sense(){return Sensor::sense();}
 
 protected:
-	Scene *mScene;
+	Vector3 mPoint;
 };
 
 }

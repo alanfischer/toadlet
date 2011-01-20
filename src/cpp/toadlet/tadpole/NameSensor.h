@@ -26,29 +26,28 @@
 #ifndef TOADLET_TADPOLE_NAMESENSOR_H
 #define TOADLET_TADPOLE_NAMESENSOR_H
 
-#include <toadlet/tadpole/Types.h>
-#include <toadlet/tadpole/Scene.h>
-#include <toadlet/tadpole/SensorResultsListener.h>
+#include <toadlet/tadpole/Sensor.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class Scene;
-
-/// @todo: perhaps these sensors should be nodes, so they can easily be attached to the scene and then their transforms will be relative, just like opal
-class TOADLET_API NameSensor{
+class TOADLET_API NameSensor:public Sensor{
 public:
 	TOADLET_SHARED_POINTERS(NameSensor);
 
 	NameSensor(Scene *scene);
 	virtual ~NameSensor();
 
-	virtual bool senseNames(SensorResultsListener *results,const egg::String &name);
+	void setName(const egg::String &name){mName=name;}
+	const egg::String &getName() const{return mName;}
+
+	virtual bool sense(SensorResultsListener *results);
+	SensorResults::ptr sense(){return Sensor::sense();}
 
 protected:
-	int senseNames(node::Node *node,SensorResultsListener *results,const egg::String &name);
+	int senseNames(node::Node *node,SensorResultsListener *results);
 
-	Scene *mScene;
+	egg::String mName;
 };
 
 }

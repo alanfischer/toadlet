@@ -213,8 +213,6 @@ protected:
 	int mLastLogicFrame;
 	int mLastFrame;
 
-	Vector3 cache_setRotate_vector;
-	
 	friend class ParentNode;
 };
 

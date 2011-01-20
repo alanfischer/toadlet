@@ -23,30 +23,27 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_SENSORRESULTSLISTENER_H
-#define TOADLET_TADPOLE_SENSORRESULTSLISTENER_H
-
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/Sensor.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
-	class Node;
+
+Sensor::Sensor(Scene *scene){
+	mScene=scene;
 }
 
-class SensorResultsListener{
-public:
-	virtual ~SensorResultsListener(){}
+Sensor::~Sensor(){
+}
 
-	virtual void sensingBeginning()=0;
+SensorResults::ptr Sensor::sense(){
+	if(mResults==NULL){
+		mResults=SensorResults::ptr(new SensorResults());
+	}
 
-	// Return true to continue sensing
-	virtual bool resultFound(node::Node *result,scalar distance)=0;
+	sense(mResults);
 
-	virtual void sensingEnding()=0;
-};
+	return mResults;
+}
 
 }
 }
-
-#endif

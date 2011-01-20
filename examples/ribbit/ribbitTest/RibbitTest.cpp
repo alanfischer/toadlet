@@ -11,10 +11,14 @@ RibbitTest::~RibbitTest(){
 void RibbitTest::create(){
 	Application::create();
 
-	MemoryStream::ptr stream(new MemoryStream(boing_wav::data,boing_wav::length,false));
+	AudioStream::ptr stream(new WaveDecoder());
+	if(stream->startStream(MemoryStream::ptr(new MemoryStream(boing_wav::data,boing_wav::length,boing_wav::length,false)))==false){
+		Error::unknown("unable to start stream");
+		return;
+	}
 
 	audioBuffer=AudioBuffer::ptr(getAudioPlayer()->createAudioBuffer());
-	audioBuffer->create(stream,"audio/x-wav");
+	audioBuffer->create(stream);
 
 	audio=Audio::ptr(getAudioPlayer()->createBufferedAudio());
 	audio->create(audioBuffer);
@@ -28,6 +32,12 @@ void RibbitTest::destroy(){
 	Application::destroy();
 }
 
+void RibbitTest::update(int dt){
+	if(audio->getPlaying()==false){
+		stop();
+	}
+}
+
 #if defined(TOADLET_PLATFORM_WINCE)
 int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,int nCmdShow){
 #else
@@ -35,7 +45,7 @@ int main(int argc,char **argv){
 #endif
 	RibbitTest app;
 	app.create();
-	app.start(true);
+	app.start();
 	app.destroy();
 	return 0;
 }

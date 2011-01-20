@@ -22,6 +22,8 @@ set (TADPOLE_SRC
 	RenderQueue.cpp
 	ResourceManager.cpp
 	Scene.cpp
+	Sensor.cpp
+	SensorResults.cpp
 	Track.cpp
 	TextureManager.cpp
 	Version.cpp
@@ -131,6 +133,8 @@ set (TADPOLE_HEADERS
 	ResourceHandlerData.h
 	ResourceManager.h
 	Scene.h
+	Sensor.h
+	SensorResults.h
 	SensorResultsListener.h
 	TextureManager.h
 	Traceable.h

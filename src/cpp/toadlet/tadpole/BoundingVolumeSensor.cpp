@@ -31,17 +31,18 @@ using namespace toadlet::tadpole::node;
 namespace toadlet{
 namespace tadpole{
 
-BoundingVolumeSensor::BoundingVolumeSensor(Scene *scene):
-	mScene(NULL)
-{
-	mScene=scene;
+BoundingVolumeSensor::BoundingVolumeSensor(Scene *scene):Sensor(scene){
+	mBound=Bound::ptr(new Bound());
 }
 
 BoundingVolumeSensor::~BoundingVolumeSensor(){
 }
 
-bool BoundingVolumeSensor::senseBoundingVolumes(SensorResultsListener *results,Bound *bound){
-	return mScene->getRoot()->senseBoundingVolumes(results,bound);
+bool BoundingVolumeSensor::sense(SensorResultsListener *results){
+	results->sensingBeginning();
+	bool result=mScene->getRoot()->senseBoundingVolumes(results,mBound);
+	results->sensingEnding();
+	return result;
 }
 
 }
