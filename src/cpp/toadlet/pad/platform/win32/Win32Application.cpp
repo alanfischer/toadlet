@@ -269,13 +269,13 @@ void Win32Application::create(String renderer,String audioPlayer,String motionDe
 	activate();
 	
 	mNewRendererPlugin=mCurrentRendererPlugin=renderer;
-	if(renderer!=(char*)NULL){
+	if(renderer!="null"){
 		createContextAndRenderer(renderer);
 	}
-	if(audioPlayer!=(char*)NULL){
+	if(audioPlayer!="null"){
 		createAudioPlayer(audioPlayer);
 	}
-	if(motionDetector!=(char*)NULL){
+	if(motionDetector!="null"){
 		createMotionDetector(motionDetector);
 	}
 }
@@ -942,8 +942,8 @@ bool Win32Application::createMotionDetector(const String &plugin){
 		"Win32Application: creating MotionDetector");
 
 	String name=plugin;
-	if(plugin==(char*)NULL && mAudioPlayerPlugins.begin()!=mAudioPlayerPlugins.end()){
-		name=mAudioPlayerPlugins.begin()->first;
+	if(plugin==(char*)NULL && mMotionDetectorPlugins.begin()!=mMotionDetectorPlugins.end()){
+		name=mMotionDetectorPlugins.begin()->first;
 	}
 
 	bool result=false;
@@ -963,7 +963,7 @@ bool Win32Application::createMotionDetector(const String &plugin){
 			"Error starting MotionDetector");
 		return false;
 	}
-	else if(mAudioPlayer==NULL){
+	else if(mMotionDetector==NULL){
 		Logger::error(Categories::TOADLET_PAD,
 			"Error creating MotionDetector");
 		return false;

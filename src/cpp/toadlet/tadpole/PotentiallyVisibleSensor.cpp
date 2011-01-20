@@ -31,17 +31,21 @@ using namespace toadlet::tadpole::node;
 namespace toadlet{
 namespace tadpole{
 
-PotentiallyVisibleSensor::PotentiallyVisibleSensor(Scene *scene):
-	mScene(NULL)
-{
-	mScene=scene;
+PotentiallyVisibleSensor::PotentiallyVisibleSensor(Scene *scene):Sensor(scene){
 }
 
 PotentiallyVisibleSensor::~PotentiallyVisibleSensor(){
 }
 
-bool PotentiallyVisibleSensor::sensePotentiallyVisible(SensorResultsListener *results,const Vector3 &point){
-	return mScene->getRoot()->sensePotentiallyVisible(results,point);
+void PotentiallyVisibleSensor::setPoint(const Vector3 &point){
+	mPoint.set(point);
+}
+
+bool PotentiallyVisibleSensor::sense(SensorResultsListener *results){
+	results->sensingBeginning();
+	bool result=mScene->getRoot()->sensePotentiallyVisible(results,mPoint);
+	results->sensingEnding();
+	return result;
 }
 
 }

@@ -26,27 +26,27 @@
 #ifndef TOADLET_TADPOLE_BOUNDINGVOLUMESENSOR_H
 #define TOADLET_TADPOLE_BOUNDINGVOLUMESENSOR_H
 
-#include <toadlet/tadpole/Types.h>
-#include <toadlet/tadpole/Scene.h>
-#include <toadlet/tadpole/SensorResultsListener.h>
+#include <toadlet/tadpole/Sensor.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class Scene;
-
-/// @todo: perhaps these sensors should be nodes, so they can easily be attached to the scene and then their transforms will be relative, just like opal
-class TOADLET_API BoundingVolumeSensor{
+class TOADLET_API BoundingVolumeSensor:public Sensor{
 public:
 	TOADLET_SHARED_POINTERS(BoundingVolumeSensor);
 
 	BoundingVolumeSensor(Scene *scene);
 	virtual ~BoundingVolumeSensor();
 
-	virtual bool senseBoundingVolumes(SensorResultsListener *results,Bound *bound);
+	void setBound(Bound::ptr bound){mBound->set(bound);}
+	void setSphere(const Sphere &sphere){mBound->set(sphere);}
+	void setBox(const AABox &box){mBound->set(box);}
+
+	virtual bool sense(SensorResultsListener *results);
+	SensorResults::ptr sense(){return Sensor::sense();}
 
 protected:
-	Scene *mScene;
+	Bound::ptr mBound;
 };
 
 }

@@ -23,27 +23,32 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_SENSORRESULTSLISTENER_H
-#define TOADLET_TADPOLE_SENSORRESULTSLISTENER_H
+#ifndef TOADLET_TADPOLE_SENSOR_H
+#define TOADLET_TADPOLE_SENSOR_H
 
 #include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/Scene.h>
+#include <toadlet/tadpole/SensorResults.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
-	class Node;
-}
 
-class SensorResultsListener{
+class Scene;
+
+/// @todo: perhaps sensors should be nodes, so they can easily be attached to the scene and then their transforms will be relative, just like opal
+class TOADLET_API Sensor{
 public:
-	virtual ~SensorResultsListener(){}
+	TOADLET_SHARED_POINTERS(Sensor);
 
-	virtual void sensingBeginning()=0;
+	Sensor(Scene *scene);
+	virtual ~Sensor();
+	
+	virtual bool sense(SensorResultsListener *results)=0;
+	virtual SensorResults::ptr sense();
 
-	// Return true to continue sensing
-	virtual bool resultFound(node::Node *result,scalar distance)=0;
-
-	virtual void sensingEnding()=0;
+protected:
+	Scene *mScene;
+	SensorResults::ptr mResults;
 };
 
 }

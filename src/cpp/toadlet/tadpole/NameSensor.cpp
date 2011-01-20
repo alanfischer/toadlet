@@ -32,24 +32,24 @@ using namespace toadlet::tadpole::node;
 namespace toadlet{
 namespace tadpole{
 
-NameSensor::NameSensor(Scene *scene):
-	mScene(NULL)
-{
+NameSensor::NameSensor(Scene *scene):Sensor(mScene){
 	mScene=scene;
 }
 
 NameSensor::~NameSensor(){
 }
 
-bool NameSensor::senseNames(SensorResultsListener *results,const String &name){
-	int result=senseNames(mScene->getRoot(),results,name);
+bool NameSensor::sense(SensorResultsListener *results){
+	results->sensingBeginning();
+	int result=senseNames(mScene->getRoot(),results);
+	results->sensingEnding();
 	return result!=0;
 }
 
-int NameSensor::senseNames(Node *node,SensorResultsListener *results,const String &name){
+int NameSensor::senseNames(Node *node,SensorResultsListener *results){
 	int result=0;
-	if(name.equals(node->getName())){
-		if(results->resultFound(node)){
+	if(mName.equals(node->getName())){
+		if(results->resultFound(node,0)){
 			result=1;
 		}
 		else{
@@ -61,7 +61,7 @@ int NameSensor::senseNames(Node *node,SensorResultsListener *results,const Strin
 	if(parent!=NULL){
 		int i;
 		for(i=0;i<parent->getNumChildren();++i){
-			int r=senseNames(parent->getChild(i),results,name);
+			int r=senseNames(parent->getChild(i),results);
 			if(r<0){
 				return -1;
 			}

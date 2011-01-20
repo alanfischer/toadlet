@@ -55,7 +55,7 @@ bool PartitionNode::senseBoundingVolumes(SensorResultsListener *listener,Bound *
 		Node *child=mChildren[i];
 		if(child->getWorldBound()->testIntersection(bound)){
 			result|=true;
-			if(listener->resultFound(child)==false){
+			if(listener->resultFound(child,Math::lengthSquared(bound->getSphere().origin,child->getWorldTranslate()))==false){
 				return true;
 			}
 		}
@@ -70,7 +70,7 @@ bool PartitionNode::sensePotentiallyVisible(SensorResultsListener *listener,cons
 	for(i=0;i<mChildren.size();++i){
 		Node *child=mChildren[i];
 		result|=true;
-		if(listener->resultFound(child)==false){
+		if(listener->resultFound(child,Math::lengthSquared(point,child->getWorldTranslate()))==false){
 			return true;
 		}
 	}

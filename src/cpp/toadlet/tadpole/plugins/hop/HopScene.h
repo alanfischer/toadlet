@@ -30,6 +30,7 @@
 #include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/Scene.h>
+#include <toadlet/tadpole/BoundingVolumeSensor.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -86,9 +87,41 @@ public:
 	hop::Collision cache_traceSegment_collision;
 
 protected:
+	class SolidSensorResults:public SensorResultsListener{
+	public:
+		TOADLET_SHARED_POINTERS(SolidSensorResults);
+
+		SolidSensorResults():
+			mSolids(NULL),
+			mMaxSolids(0),
+			mCounter(0)
+		{}
+			
+		void setSolids(hop::Solid *solids[],int maxSolids){
+			mSolids=solids;
+			mMaxSolids=maxSolids;
+		}
+
+		int getCount() const{return mCounter;}
+
+		void sensingBeginning(){mCounter=0;}
+
+		bool resultFound(node::Node *result,scalar distance);
+
+		void sensingEnding(){}
+
+	protected:
+		hop::Solid **mSolids;
+		int mMaxSolids;
+		int mCounter;
+	};
+
 	hop::Simulator *mSimulator;
 	Traceable *mTraceable;
 	hop::Solid::ptr mSolid;
+
+	BoundingVolumeSensor::ptr mVolumeSensor;
+	SolidSensorResults::ptr mSensorResults;
 
 	friend class HopEntity;
 };

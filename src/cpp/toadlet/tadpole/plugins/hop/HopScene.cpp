@@ -53,6 +53,9 @@ HopScene::HopScene(Engine *engine):Scene(engine),
 	mSolid->setInfiniteMass();
 
 	mEngine->registerNodeType(HopEntity::type());
+
+	mVolumeSensor=BoundingVolumeSensor::ptr(new BoundingVolumeSensor(this));
+	mSensorResults=SolidSensorResults::ptr(new SolidSensorResults());
 }
 
 HopScene::~HopScene(){
@@ -117,34 +120,11 @@ void HopScene::logicUpdate(int dt,int scope){
 	Scene::logicUpdate(dt,scope);
 }
 
-class SolidSensorResults:public SensorResultsListener{
-public:
-	SolidSensorResults(Solid *solids[],int maxSolids){
-		mSolids=solids;
-		mMaxSolids=maxSolids;
-		mCounter=0;
-	}
-
-	bool resultFound(Node *result){
-		HopEntity *entity=(HopEntity*)result->isEntity();
-		if(entity!=NULL && mCounter<mMaxSolids && entity->getNumShapes()>0){
-			mSolids[mCounter++]=entity->getSolid();
-		}
-		return true;
-	}
-
-	Solid **mSolids;
-	int mMaxSolids;
-	int mCounter;
-};
-
 int HopScene::findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids){
-	/// @todo: just clean this up a bit, maybe cache the SolidSensorResults as a ::ptr
-	SolidSensorResults results(solids,maxSolids);
-	Bound::ptr bound(new Bound());
-	bound->set(box);
-	mRoot->senseBoundingVolumes(&results,bound);
-	return results.mCounter;
+	mSensorResults->setSolids(solids,maxSolids);
+	mVolumeSensor->setBox(box);
+	mVolumeSensor->sense(mSensorResults);
+	return mSensorResults->getCount();
 }
 
 void HopScene::traceSegment(hop::Collision &result,const Segment &segment){
@@ -184,6 +164,14 @@ void HopScene::set(hop::Collision &r,const tadpole::Collision &c,HopEntity *coll
 	// Since the c.collider passed in could be any Node, not necessarily a HopEntity, we force a passing in of a Collider
 	if(collider!=NULL){r.collider=collider->getSolid();}
 	r.scope=c.scope;
+}
+
+bool HopScene::SolidSensorResults::resultFound(Node *result,scalar distance){
+	HopEntity *entity=(HopEntity*)result->isEntity();
+	if(entity!=NULL && mCounter<mMaxSolids && entity->getNumShapes()>0){
+		mSolids[mCounter++]=entity->getSolid();
+	}
+	return mCounter<mMaxSolids;
 }
 
 }
