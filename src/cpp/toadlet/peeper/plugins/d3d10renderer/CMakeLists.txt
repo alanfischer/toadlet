@@ -2,6 +2,7 @@
 set (PEEPER_D3D10RENDERER_SRC
 	D3D10Buffer.cpp
 	D3D10PixelBufferRenderTarget.cpp
+	D3D10Query.cpp
 	D3D10Renderer.cpp
 	D3D10Texture.cpp
 	D3D10TextureMipPixelbuffer.cpp
@@ -15,6 +16,7 @@ set (PEEPER_D3D10RENDERER_HEADERS
 	D3D10Buffer.h
 	D3D10Includes.h
 	D3D10PixelBufferRenderTarget.h
+	D3D10Query.h
 	D3D10RenderTarget.h
 	D3D10Renderer.h
 	D3D10Texture.h
