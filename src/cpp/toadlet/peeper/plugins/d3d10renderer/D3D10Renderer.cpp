@@ -27,6 +27,7 @@
 #include "D3D10Buffer.h"
 #include "D3D10TextureMipPixelBuffer.h"
 #include "D3D10PixelBufferRenderTarget.h"
+#include "D3D10Query.h"
 #include "D3D10RenderTarget.h"
 #include "D3D10Texture.h"
 #include "D3D10VertexFormat.h"
@@ -258,7 +259,7 @@ Shader *D3D10Renderer::createShader(){
 }
 
 Query *D3D10Renderer::createQuery(){
-	return NULL;
+	return new D3D10Query(this);
 }
 
 bool D3D10Renderer::setRenderTarget(RenderTarget *target){

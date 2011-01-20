@@ -23,21 +23,21 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_D3D9QUERY_H
-#define TOADLET_PEEPER_D3D9QUERY_H
+#ifndef TOADLET_PEEPER_D3D910UERY_H
+#define TOADLET_PEEPER_D3D910UERY_H
 
-#include "D3D9Includes.h"
+#include "D3D10Includes.h"
 #include <toadlet/peeper/Query.h>
 
 namespace toadlet{
 namespace peeper{
 
-class D3D9Renderer;
+class D3D10Renderer;
 
-class TOADLET_API D3D9Query:public Query{
+class TOADLET_API D3D10Query:public Query{
 public:
-	D3D9Query(D3D9Renderer *renderer);
-	virtual ~D3D9Query();
+	D3D10Query(D3D10Renderer *renderer);
+	virtual ~D3D10Query();
 
 	Query *getRootQuery(){return this;}
 
@@ -51,15 +51,15 @@ public:
 	virtual uint64 getResult();
 
 protected:
-	static D3DQUERYTYPE getD3DQUERYTYPE(QueryType queryType);
+	static D3D10_QUERY getD3D10_QUERY(QueryType queryType);
 
-	D3D9Renderer *mRenderer;
+	D3D10Renderer *mRenderer;
 
 	QueryType mQueryType;
 
-	IDirect3DQuery9 *mQuery;
+	ID3D10Query *mQuery;
 
-	friend class D3D9Renderer;
+	friend class D3D10Renderer;
 };
 
 }

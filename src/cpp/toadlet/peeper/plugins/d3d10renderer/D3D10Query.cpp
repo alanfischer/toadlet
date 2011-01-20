@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "D3D9Query.h"
-#include "D3D9Renderer.h"
+#include "D3D10Query.h"
+#include "D3D10Renderer.h"
 #include <toadlet/egg/Logger.h>
 
 using namespace toadlet::egg;
@@ -32,7 +32,7 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
-D3D9Query::D3D9Query(D3D9Renderer *renderer):
+D3D10Query::D3D10Query(D3D10Renderer *renderer):
 	mRenderer(NULL),
 
 	mQueryType(QueryType_UNKNOWN),
@@ -42,54 +42,57 @@ D3D9Query::D3D9Query(D3D9Renderer *renderer):
 	mRenderer=renderer;
 }
 
-D3D9Query::~D3D9Query(){
+D3D10Query::~D3D10Query(){
 	destroy();
 }
 
-bool D3D9Query::create(QueryType queryType){
+bool D3D10Query::create(QueryType queryType){
 	mQueryType=queryType;
-	D3DQUERYTYPE d3dQueryType=getD3DQUERYTYPE(mQueryType);
-
-	HRESULT result=mRenderer->getDirect3DDevice9()->CreateQuery(d3dQueryType,&mQuery);
-	TOADLET_CHECK_D3D9ERROR(result,"D3D9Query: CreateQuery");
+	
+	D3D10_QUERY_DESC desc;
+	desc.Query=getD3D10_QUERY(mQueryType);
+	desc.MiscFlags=0;
+	
+	HRESULT result=mRenderer->getD3D10Device()->CreateQuery(&desc,&mQuery);
+	TOADLET_CHECK_D3D10ERROR(result,"D3D10Query: CreateQuery");
 
 	return true;
 }
 
-void D3D9Query::destroy(){
+void D3D10Query::destroy(){
 	if(mQuery!=NULL){
 		mQuery->Release();
 		mQuery=NULL;
 	}
 }
 
-void D3D9Query::beginQuery(){
-	mQuery->Issue(D3DISSUE_BEGIN);
+void D3D10Query::beginQuery(){
+	mQuery->Begin();
 }
 
-void D3D9Query::endQuery(){
-	mQuery->Issue(D3DISSUE_END);
+void D3D10Query::endQuery(){
+	mQuery->End();
 }
 
-uint64 D3D9Query::getResult(){
-	DWORD data=0;
+uint64 D3D10Query::getResult(){
+	UINT64 data=0;
 	HRESULT result=S_FALSE;
 	while(result==S_FALSE){
-		result=mQuery->GetData(&data,sizeof(DWORD),D3DGETDATA_FLUSH);
+		result=mQuery->GetData(&data,sizeof(UINT64),0);
 	}
 	return data;
 }
 
-D3DQUERYTYPE D3D9Query::getD3DQUERYTYPE(QueryType queryType){
+D3D10_QUERY D3D10Query::getD3D10_QUERY(QueryType queryType){
 	switch(queryType){
 		case QueryType_FINISHED:
-			return D3DQUERYTYPE_EVENT;
+			return D3D10_QUERY_EVENT;
 		case QueryType_OCCLUSION:
-			return D3DQUERYTYPE_OCCLUSION;
+			return D3D10_QUERY_OCCLUSION;
 		default:
 			Logger::error(Categories::TOADLET_PEEPER,
-				"D3D9Query::getD3DQUERYTYPE: Invalid queryType");
-			return (D3DQUERYTYPE)0;
+				"D3D10Query::getD3D10_QUERY: Invalid queryType");
+			return (D3D10_QUERY)0;
 		break;
 	}
 }
