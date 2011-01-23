@@ -66,6 +66,8 @@ void SkeletonParentNode::frameUpdate(int dt){
 		mChildren[i]->setTranslate(bone->worldTranslate);
 		mChildren[i]->setRotate(bone->worldRotateMatrix);
 	}
+
+	super::frameUpdate(dt);
 }
 
 }

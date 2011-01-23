@@ -75,7 +75,7 @@ public:
 		unsigned int offsets[MIPLEVELS]; // four mip maps stored
 	};
 
-	static peeper::Texture::ptr createTexture(TextureManager *textureManager,wmiptex *miptex);
+	static peeper::Texture::ptr createTexture(TextureManager *textureManager,wmiptex *miptex,tbyte *pal=NULL);
 
 protected:
 	unsigned char mInBuffer[640*480*85/64]; // Maxlump

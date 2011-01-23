@@ -26,7 +26,7 @@
 #ifndef TOADLET_TADPOLE_NODE_PARTITIONNODE_H
 #define TOADLET_TADPOLE_NODE_PARTITIONNODE_H
 
-#include <toadlet/tadpole/SensorResultsListener.h>
+#include <toadlet/tadpole/sensor/SensorResultsListener.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 
 namespace toadlet{

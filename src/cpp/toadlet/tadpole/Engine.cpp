@@ -81,7 +81,6 @@
 #include <toadlet/tadpole/node/LightNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
 #include <toadlet/tadpole/node/ParticleNode.h>
-#include <toadlet/tadpole/node/SkeletonParentNode.h>
 #include <toadlet/tadpole/node/SpriteNode.h>
 
 #include <toadlet/tadpole/handler/MMSHHandler.h>
@@ -188,7 +187,6 @@ Engine::Engine(bool backable):
 	registerNodeType(Node::type());
 	registerNodeType(ParentNode::type());
 	registerNodeType(ParticleNode::type());
-	registerNodeType(SkeletonParentNode::type());
 	registerNodeType(SpriteNode::type());
 
 	// Plugin types, should be removed from here somehow

@@ -23,27 +23,58 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/Sensor.h>
+#include <toadlet/tadpole/sensor/NameSensor.h>
+#include <toadlet/tadpole/Scene.h>
+
+using namespace toadlet::egg;
+using namespace toadlet::tadpole::node;
 
 namespace toadlet{
 namespace tadpole{
+namespace sensor{
 
-Sensor::Sensor(Scene *scene){
+NameSensor::NameSensor(Scene *scene):Sensor(mScene){
 	mScene=scene;
 }
 
-Sensor::~Sensor(){
+NameSensor::~NameSensor(){
 }
 
-SensorResults::ptr Sensor::sense(){
-	if(mResults==NULL){
-		mResults=SensorResults::ptr(new SensorResults());
+bool NameSensor::sense(SensorResultsListener *results){
+	results->sensingBeginning();
+	int result=senseNames(mScene->getRoot(),results);
+	results->sensingEnding();
+	return result!=0;
+}
+
+int NameSensor::senseNames(Node *node,SensorResultsListener *results){
+	int result=0;
+	if(mName.equals(node->getName())){
+		if(results->resultFound(node,0)){
+			result=1;
+		}
+		else{
+			return -1;
+		}
 	}
 
-	sense(mResults);
+	ParentNode *parent=node->isParent();
+	if(parent!=NULL){
+		int i;
+		for(i=0;i<parent->getNumChildren();++i){
+			int r=senseNames(parent->getChild(i),results);
+			if(r<0){
+				return -1;
+			}
+			else if(r>0){
+				result=1;
+			}
+		}
+	}
 
-	return mResults;
+	return result;
 }
 
+}
 }
 }

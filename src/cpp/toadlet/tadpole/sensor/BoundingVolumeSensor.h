@@ -23,56 +23,35 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/NameSensor.h>
-#include <toadlet/tadpole/Scene.h>
+#ifndef TOADLET_TADPOLE_SENSOR_BOUNDINGVOLUMESENSOR_H
+#define TOADLET_TADPOLE_SENSOR_BOUNDINGVOLUMESENSOR_H
 
-using namespace toadlet::egg;
-using namespace toadlet::tadpole::node;
+#include <toadlet/tadpole/sensor/Sensor.h>
 
 namespace toadlet{
 namespace tadpole{
+namespace sensor{
 
-NameSensor::NameSensor(Scene *scene):Sensor(mScene){
-	mScene=scene;
-}
+class TOADLET_API BoundingVolumeSensor:public Sensor{
+public:
+	TOADLET_SHARED_POINTERS(BoundingVolumeSensor);
 
-NameSensor::~NameSensor(){
-}
+	BoundingVolumeSensor(Scene *scene);
+	virtual ~BoundingVolumeSensor();
 
-bool NameSensor::sense(SensorResultsListener *results){
-	results->sensingBeginning();
-	int result=senseNames(mScene->getRoot(),results);
-	results->sensingEnding();
-	return result!=0;
-}
+	void setBound(Bound::ptr bound){mBound->set(bound);}
+	void setSphere(const Sphere &sphere){mBound->set(sphere);}
+	void setBox(const AABox &box){mBound->set(box);}
 
-int NameSensor::senseNames(Node *node,SensorResultsListener *results){
-	int result=0;
-	if(mName.equals(node->getName())){
-		if(results->resultFound(node,0)){
-			result=1;
-		}
-		else{
-			return -1;
-		}
-	}
+	virtual bool sense(SensorResultsListener *results);
+	SensorResults::ptr sense(){return Sensor::sense();}
 
-	ParentNode *parent=node->isParent();
-	if(parent!=NULL){
-		int i;
-		for(i=0;i<parent->getNumChildren();++i){
-			int r=senseNames(parent->getChild(i),results);
-			if(r<0){
-				return -1;
-			}
-			else if(r>0){
-				result=1;
-			}
-		}
-	}
-
-	return result;
-}
+protected:
+	Bound::ptr mBound;
+};
 
 }
 }
+}
+
+#endif

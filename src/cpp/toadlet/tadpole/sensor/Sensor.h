@@ -23,27 +23,38 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/BoundingVolumeSensor.h>
-#include <toadlet/tadpole/Scene.h>
+#ifndef TOADLET_TADPOLE_SENSOR_SENSOR_H
+#define TOADLET_TADPOLE_SENSOR_SENSOR_H
 
-using namespace toadlet::tadpole::node;
+#include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/Scene.h>
+#include <toadlet/tadpole/sensor/SensorResults.h>
 
 namespace toadlet{
 namespace tadpole{
 
-BoundingVolumeSensor::BoundingVolumeSensor(Scene *scene):Sensor(scene){
-	mBound=Bound::ptr(new Bound());
+class Scene;
+
+namespace sensor{
+
+/// @todo: perhaps sensors should be nodes, so they can easily be attached to the scene and then their transforms will be relative, just like opal
+class TOADLET_API Sensor{
+public:
+	TOADLET_SHARED_POINTERS(Sensor);
+
+	Sensor(Scene *scene);
+	virtual ~Sensor();
+	
+	virtual bool sense(SensorResultsListener *results)=0;
+	virtual SensorResults::ptr sense();
+
+protected:
+	Scene *mScene;
+	SensorResults::ptr mResults;
+};
+
+}
+}
 }
 
-BoundingVolumeSensor::~BoundingVolumeSensor(){
-}
-
-bool BoundingVolumeSensor::sense(SensorResultsListener *results){
-	results->sensingBeginning();
-	bool result=mScene->getRoot()->senseBoundingVolumes(results,mBound);
-	results->sensingEnding();
-	return result;
-}
-
-}
-}
+#endif

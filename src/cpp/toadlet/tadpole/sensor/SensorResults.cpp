@@ -23,13 +23,14 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/SensorResults.h>
+#include <toadlet/tadpole/sensor/SensorResults.h>
 #include <toadlet/tadpole/node/Node.h>
 
 using namespace toadlet::tadpole::node;
 
 namespace toadlet{
 namespace tadpole{
+namespace sensor{
 
 SensorResults::SensorResults():
 	mMaxResults(-1),
@@ -130,4 +131,4 @@ void SensorResults::sensingEnding(){
 
 }
 }
-
+}

@@ -7,7 +7,6 @@ set (TADPOLE_SRC
 	ArchiveManager.cpp
 	AudioBufferManager.cpp
 	BufferManager.cpp
-	BoundingVolumeSensor.cpp
 	Engine.cpp
 	Font.cpp
 	FontManager.cpp
@@ -16,14 +15,10 @@ set (TADPOLE_SRC
 	MaterialManager.cpp
 	MathFormatter.cpp
 	MeshManager.cpp
-	NameSensor.cpp
 	Noise.cpp
-	PotentiallyVisibleSensor.cpp
 	RenderQueue.cpp
 	ResourceManager.cpp
 	Scene.cpp
-	Sensor.cpp
-	SensorResults.cpp
 	Track.cpp
 	TextureManager.cpp
 	Version.cpp
@@ -92,8 +87,15 @@ set (TADPOLE_NODE_SRC
 	node/ParentNode.cpp
 	node/ParticleNode.cpp
 	node/PartitionNode.cpp
-	node/SkeletonParentNode.cpp
 	node/SpriteNode.cpp
+)
+
+set (TADPOLE_SENSOR_SRC
+	sensor/BoundingVolumeSensor.cpp
+	sensor/NameSensor.cpp
+	sensor/PotentiallyVisibleSensor.cpp
+	sensor/Sensor.cpp
+	sensor/SensorResults.cpp
 )
 
 set (TADPOLE_STUDIO_SRC
@@ -113,7 +115,6 @@ set (TADPOLE_HEADERS
 	AudioBufferManager.h
 	Bound.h
 	BufferManager.h
-	BoundingVolumeSensor.h
 	Collision.h
 	ContextListener.h
 	Engine.h
@@ -125,17 +126,12 @@ set (TADPOLE_HEADERS
 	MaterialManager.h
 	MathFormatter.h
 	MeshManager.h
-	NameSensor.h
 	Noise.h
-	PotentiallyVisibleSensor.h
 	Renderable.h
 	ResourceHandler.h
 	ResourceHandlerData.h
 	ResourceManager.h
 	Scene.h
-	Sensor.h
-	SensorResults.h
-	SensorResultsListener.h
 	TextureManager.h
 	Traceable.h
 	Track.h
@@ -225,8 +221,16 @@ set (TADPOLE_NODE_HEADERS
 	node/ParentNode.h
 	node/ParticleNode.h
 	node/PartitionNode.h
-	node/SkeletonParentNode.h
 	node/SpriteNode.h
+)
+
+set (TADPOLE_SENSOR_HEADERS
+	sensor/BoundingVolumeSensor.h
+	sensor/NameSensor.h
+	sensor/PotentiallyVisibleSensor.h
+	sensor/Sensor.h
+	sensor/SensorResults.h
+	sensor/SensorResultsListener.h
 )
 
 set (TADPOLE_STUDIO_HEADERS
@@ -249,6 +253,7 @@ source_group ("Source Files\\\\animation" FILES ${TADPOLE_ANIMATION_SRC})
 source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_SRC})
 source_group ("Source Files\\\\mesh" FILES ${TADPOLE_MESH_SRC})
 source_group ("Source Files\\\\node" FILES ${TADPOLE_NODE_SRC})
+source_group ("Source Files\\\\sensor" FILES ${TADPOLE_SENSOR_SRC})
 source_group ("Source Files\\\\terrain" FILES ${TADPOLE_TERRAIN_SRC})
 
 
@@ -257,12 +262,13 @@ source_group ("Header Files\\\\animation" FILES ${TADPOLE_ANIMATION_HEADERS})
 source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_HEADERS})
 source_group ("Header Files\\\\mesh" FILES ${TADPOLE_MESH_HEADERS})
 source_group ("Header Files\\\\node" FILES ${TADPOLE_NODE_HEADERS})
+source_group ("Header Files\\\\sensor" FILES ${TADPOLE_SENSOR_HEADERS})
 source_group ("Header Files\\\\terrain" FILES ${TADPOLE_TERRAIN_HEADERS})
 
 
 # Source and headers
-set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MESH_SRC} ${TADPOLE_NODE_SRC} ${TADPOLE_TERRAIN_SRC})
-set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_MESH_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_TERRAIN_HEADERS})
+set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MESH_SRC} ${TADPOLE_NODE_SRC} ${TADPOLE_SENSOR_SRC} ${TADPOLE_TERRAIN_SRC})
+set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_MESH_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_SENSOR_HEADERS} ${TADPOLE_TERRAIN_HEADERS})
 
 
 if (NOT TOADLET_FIXED_POINT)
