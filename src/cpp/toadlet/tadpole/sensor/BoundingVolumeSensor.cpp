@@ -23,37 +23,29 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_NODE_SKELETONPARENTNODE_H
-#define TOADLET_TADPOLE_NODE_SKELETONPARENTNODE_H
+#include <toadlet/tadpole/sensor/BoundingVolumeSensor.h>
+#include <toadlet/tadpole/Scene.h>
 
-#include <toadlet/tadpole/node/ParentNode.h>
-#include <toadlet/tadpole/node/MeshNodeSkeleton.h>
+using namespace toadlet::tadpole::node;
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
+namespace sensor{
 
-class TOADLET_API SkeletonParentNode:public ParentNode{
-public:
-	TOADLET_NODE(SkeletonParentNode,ParentNode);
+BoundingVolumeSensor::BoundingVolumeSensor(Scene *scene):Sensor(scene){
+	mBound=Bound::ptr(new Bound());
+}
 
-	SkeletonParentNode();
+BoundingVolumeSensor::~BoundingVolumeSensor(){
+}
 
-	virtual void setSkeleton(MeshNodeSkeleton::ptr skeleton);
-
-	virtual bool attach(Node *node,int bone);
-	virtual bool remove(Node *node);
-
-	virtual void frameUpdate(int dt);
-
-protected:
-	MeshNodeSkeleton::ptr mSkeleton;
-
-	egg::Collection<int> mChildrenBones;
-};
+bool BoundingVolumeSensor::sense(SensorResultsListener *results){
+	results->sensingBeginning();
+	bool result=mScene->getRoot()->senseBoundingVolumes(results,mBound);
+	results->sensingEnding();
+	return result;
+}
 
 }
 }
 }
-
-#endif

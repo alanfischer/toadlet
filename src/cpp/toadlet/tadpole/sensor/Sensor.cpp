@@ -23,33 +23,29 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BOUNDINGVOLUMESENSOR_H
-#define TOADLET_TADPOLE_BOUNDINGVOLUMESENSOR_H
-
-#include <toadlet/tadpole/Sensor.h>
+#include <toadlet/tadpole/sensor/Sensor.h>
 
 namespace toadlet{
 namespace tadpole{
+namespace sensor{
 
-class TOADLET_API BoundingVolumeSensor:public Sensor{
-public:
-	TOADLET_SHARED_POINTERS(BoundingVolumeSensor);
+Sensor::Sensor(Scene *scene){
+	mScene=scene;
+}
 
-	BoundingVolumeSensor(Scene *scene);
-	virtual ~BoundingVolumeSensor();
+Sensor::~Sensor(){
+}
 
-	void setBound(Bound::ptr bound){mBound->set(bound);}
-	void setSphere(const Sphere &sphere){mBound->set(sphere);}
-	void setBox(const AABox &box){mBound->set(box);}
+SensorResults::ptr Sensor::sense(){
+	if(mResults==NULL){
+		mResults=SensorResults::ptr(new SensorResults());
+	}
 
-	virtual bool sense(SensorResultsListener *results);
-	SensorResults::ptr sense(){return Sensor::sense();}
+	sense(mResults);
 
-protected:
-	Bound::ptr mBound;
-};
+	return mResults;
+}
 
 }
 }
-
-#endif
+}

@@ -23,33 +23,32 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_NAMESENSOR_H
-#define TOADLET_TADPOLE_NAMESENSOR_H
+#ifndef TOADLET_TADPOLE_SENSOR_POTENTIALLYVISIBLESENSOR_H
+#define TOADLET_TADPOLE_SENSOR_POTENTIALLYVISIBLESENSOR_H
 
-#include <toadlet/tadpole/Sensor.h>
+#include <toadlet/tadpole/sensor/Sensor.h>
 
 namespace toadlet{
 namespace tadpole{
+namespace sensor{
 
-class TOADLET_API NameSensor:public Sensor{
+class TOADLET_API PotentiallyVisibleSensor:public Sensor{
 public:
-	TOADLET_SHARED_POINTERS(NameSensor);
+	TOADLET_SHARED_POINTERS(PotentiallyVisibleSensor);
 
-	NameSensor(Scene *scene);
-	virtual ~NameSensor();
+	PotentiallyVisibleSensor(Scene *scene);
+	virtual ~PotentiallyVisibleSensor();
 
-	void setName(const egg::String &name){mName=name;}
-	const egg::String &getName() const{return mName;}
+	virtual void setPoint(const Vector3 &point);
 
 	virtual bool sense(SensorResultsListener *results);
 	SensorResults::ptr sense(){return Sensor::sense();}
 
 protected:
-	int senseNames(node::Node *node,SensorResultsListener *results);
-
-	egg::String mName;
+	Vector3 mPoint;
 };
 
+}
 }
 }
 

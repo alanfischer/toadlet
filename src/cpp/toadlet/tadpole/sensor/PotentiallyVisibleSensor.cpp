@@ -23,35 +23,32 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_SENSOR_H
-#define TOADLET_TADPOLE_SENSOR_H
-
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/sensor/PotentiallyVisibleSensor.h>
 #include <toadlet/tadpole/Scene.h>
-#include <toadlet/tadpole/SensorResults.h>
+
+using namespace toadlet::tadpole::node;
 
 namespace toadlet{
 namespace tadpole{
+namespace sensor{
 
-class Scene;
+PotentiallyVisibleSensor::PotentiallyVisibleSensor(Scene *scene):Sensor(scene){
+}
 
-/// @todo: perhaps sensors should be nodes, so they can easily be attached to the scene and then their transforms will be relative, just like opal
-class TOADLET_API Sensor{
-public:
-	TOADLET_SHARED_POINTERS(Sensor);
+PotentiallyVisibleSensor::~PotentiallyVisibleSensor(){
+}
 
-	Sensor(Scene *scene);
-	virtual ~Sensor();
-	
-	virtual bool sense(SensorResultsListener *results)=0;
-	virtual SensorResults::ptr sense();
+void PotentiallyVisibleSensor::setPoint(const Vector3 &point){
+	mPoint.set(point);
+}
 
-protected:
-	Scene *mScene;
-	SensorResults::ptr mResults;
-};
+bool PotentiallyVisibleSensor::sense(SensorResultsListener *results){
+	results->sensingBeginning();
+	bool result=mScene->getRoot()->sensePotentiallyVisible(results,mPoint);
+	results->sensingEnding();
+	return result;
+}
 
 }
 }
-
-#endif
+}

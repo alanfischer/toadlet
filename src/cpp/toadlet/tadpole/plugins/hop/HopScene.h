@@ -30,7 +30,7 @@
 #include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/Scene.h>
-#include <toadlet/tadpole/BoundingVolumeSensor.h>
+#include <toadlet/tadpole/sensor/BoundingVolumeSensor.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -120,7 +120,7 @@ protected:
 	Traceable *mTraceable;
 	hop::Solid::ptr mSolid;
 
-	BoundingVolumeSensor::ptr mVolumeSensor;
+	sensor::BoundingVolumeSensor::ptr mVolumeSensor;
 	SolidSensorResults::ptr mSensorResults;
 
 	friend class HopEntity;

@@ -24,7 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/peeper/VertexFormat.h>
-#include <toadlet/tadpole/BoundingVolumeSensor.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/PixelPacker.h>
 #include <toadlet/tadpole/RenderQueue.h>

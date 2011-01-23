@@ -105,7 +105,7 @@ Collection<String>::ptr WADArchive::getEntries(){
 	return entries;
 }
 
-peeper::Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager *textureManager,wmiptex *miptex){
+peeper::Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager *textureManager,wmiptex *miptex,tbyte *pal){
 	int swidth=littleInt32(miptex->width),sheight=littleInt32(miptex->height);
 	int dwidth=swidth,dheight=sheight;
 	int size=swidth*sheight;
@@ -121,7 +121,9 @@ peeper::Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager 
 	}
 
 	int datasize=size + (size/4) + (size/16) + (size/64);
-	tbyte *pal=(tbyte*)miptex + littleInt32(miptex->offsets[0]) + datasize + 2;
+	if(pal==NULL){
+		pal=(tbyte*)miptex + littleInt32(miptex->offsets[0]) + datasize + 2;
+	}
 
 	int format=Texture::Format_RGB_8;
 	if(miptex->name[0]=='{'){
