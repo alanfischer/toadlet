@@ -331,6 +331,11 @@ if (MXML_FOUND)
 	set_property (TARGET libmxml_s PROPERTY IMPORTED_LOCATION ${MXML_LIBRARY})
 	set (TADPOLE_DEFS_S ${TADPOLE_DEFS_S} TOADLET_LIBMXML_NAME="${MXML_LIBRARY}")
 	set (TADPOLE_LIBS_S ${TADPOLE_LIBS_S} libmxml_s)
+
+	# Osx requires a specific link to mxml
+	if (TOADLET_PLATFORM_OSX)
+		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} STATIC_LIBRARY_FLAGS ${MXML_LIBRARY})	
+	endif (TOADLET_PLATFORM_OSX)
 endif (MXML_FOUND)
 
 # Platform specific files
