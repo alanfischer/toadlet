@@ -73,6 +73,7 @@ public:
 	studioanimvalue *animvalue(studioanim *anim,int i){return ((studioanimvalue*)((tbyte*)anim+anim->offset[i]));}
 	studiobbox *bbox(int i){return &((studiobbox*)(data+header->hitboxindex))[i];}
 	studiobonecontroller *bonecontroller(int i){return &((studiobonecontroller*)(data+header->bonecontrollerindex))[i];}
+	studioattachment *attachment(int i){return &((studioattachment*)(data+header->attachmentindex))[i];}
 
 	struct meshdata{
 		int vertexStart;

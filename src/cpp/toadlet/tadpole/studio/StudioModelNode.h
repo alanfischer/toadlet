@@ -28,6 +28,7 @@
 
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
+#include <toadlet/tadpole/Attachable.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/studio/StudioModel.h>
@@ -36,7 +37,7 @@ namespace toadlet{
 namespace tadpole{
 namespace studio{
 
-class TOADLET_API StudioModelNode:public node::Node,public Traceable,public Renderable{
+class TOADLET_API StudioModelNode:public node::Node,public Traceable,public Renderable,public Attachable{
 public:
 	TOADLET_NODE(StudioModelNode,Node);
 
@@ -67,6 +68,9 @@ public:
 
 	void destroy();
 
+	void logicUpdate(int dt,int scope);
+	void frameUpdate(int dt,int scope);
+
 	void setModel(const egg::String &name);
 	void setModel(StudioModel::ptr model);
 	StudioModel::ptr getModel() const{return mModel;}
@@ -86,6 +90,10 @@ public:
 	void setBlender(int blender,scalar v);
 	scalar getBlender(int blender) const{return mBlenderValues[blender];}
 
+	// If set, it overrides any sequences or controllers
+	void setLink(StudioModelNode::ptr link);
+	StudioModelNode::ptr getLink() const{return mLink;}
+
 	void setBodypart(int bodypart);
 	int getBodypart() const{return mBodypartIndex;}
 
@@ -95,22 +103,29 @@ public:
 	void setSkin(int skin);
 	int getSkin() const{return mSkinIndex;}
 
-	// Traceable interface
+	// Traceable
 	Bound *getBound() const{return super::getBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
+	// Renderable
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
 	Material *getRenderMaterial() const{return mSkeletonMaterial;}
 	Transform *getRenderTransform() const{return getWorldTransform();}
 	Bound *getRenderBound() const{return getWorldBound();}
 	void render(peeper::Renderer *renderer) const;
 
+	// Attachable
+	int getNumAttachments(){return mModel->header->numattachments;}
+	egg::String getAttachmentName(int index){return mModel->attachment(index)->name;}
+	int getAttachmentIndex(const egg::String &name);
+	bool getAttachmentTransform(Transform *result,int index);
+
 	static void setQuaternionFromEulerAngleStudio(Quaternion &r,const EulerAngle &euler);
 
 	peeper::VertexBufferAccessor vba;
 	peeper::IndexBufferAccessor iba;
 
-protected:
+//protected:
 	void updateSkeleton();
 	void findBoneTransforms(Vector3 *translates,Quaternion *rotates,StudioModel *model,studioseqdesc *sseqdesc,studioanim *sanim,float t);
 	void findBoneTranslate(Vector3 &r,int frame,float s,studiobone *sbone,studioanim *sanim);
@@ -130,11 +145,15 @@ protected:
 	int mSkinIndex;
 	int mSequenceIndex;
 	scalar mSequenceTime;
-	Vector3 mChromeForward,mChromeRight;
 	scalar mControllerValues[4],mAdjustedControllerValues[4];
 	scalar mBlenderValues[4],mAdjustedBlenderValues[4];
+	StudioModelNode::ptr mLink;
+	StudioModel::ptr mLinkModel;
+
+	Vector3 mChromeForward,mChromeRight;
 	egg::Collection<Vector3> mBoneTranslates;
 	egg::Collection<Quaternion> mBoneRotates;
+	egg::Collection<int16> mBoneLinks;
 	egg::Collection<Vector3> mTransformedVerts;
 	egg::Collection<Vector3> mTransformedNorms;
 	egg::Collection<Vector2> mTransformedChromes;

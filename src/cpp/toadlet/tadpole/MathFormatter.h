@@ -40,22 +40,22 @@ public:
 	static egg::String formatScalar(scalar s);
 	static scalar parseScalar(const char *string);
 
-	static egg::String formatVector2(const Vector2 &v,char *separator);
+	static egg::String formatVector2(const Vector2 &v,char *separator=",");
 	static Vector2 &parseVector2(Vector2 &r,const char *string);
 
-	static egg::String formatVector3(const Vector3 &v,char *separator);
+	static egg::String formatVector3(const Vector3 &v,char *separator=",");
 	static Vector3 &parseVector3(Vector3 &r,const char *string);
 
-	static egg::String formatVector4(const Vector4 &v,char *separator);
+	static egg::String formatVector4(const Vector4 &v,char *separator=",");
 	static Vector4 &parseVector4(Vector4 &r,const char *string);
 
-	static egg::String formatQuaternion(const Quaternion &q,char *separator);
+	static egg::String formatQuaternion(const Quaternion &q,char *separator=",");
 	static Quaternion &parseQuaternion(Quaternion &r,const char *string);
 
-	static egg::String formatColor(const peeper::Color &c,char *separator);
+	static egg::String formatColor(const peeper::Color &c,char *separator=",");
 	static peeper::Color &parseColor(peeper::Color &r,const char *string);
 
-	static egg::String formatByteColor(const peeper::Color &c,char *separator);
+	static egg::String formatByteColor(const peeper::Color &c,char *separator=",");
 	static peeper::Color &parseByteColor(peeper::Color &r,const char *string);
 };
 

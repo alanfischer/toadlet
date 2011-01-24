@@ -28,6 +28,7 @@
 
 #include <toadlet/egg/math/Vector3.h>
 #include <toadlet/egg/math/Matrix3x3.h>
+#include <toadlet/egg/math/Quaternion.h>
 #include <toadlet/egg/math/Plane.h>
 
 namespace toadlet{
@@ -201,6 +202,8 @@ public:
 	
 	void rotate(const Matrix3x3 &rotation);
 	void rotate(const Matrix3x3 &rotation,Vector3 tempBuffer[8]);
+	void rotate(const Quaternion &rotation);
+	void rotate(const Quaternion &rotation,Vector3 tempBuffer[8]);
 
 	inline bool equals(const AABox &box) const{
 		return (box.mins.equals(mins) && box.maxs.equals(maxs));
