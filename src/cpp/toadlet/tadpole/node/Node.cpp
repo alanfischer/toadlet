@@ -219,7 +219,7 @@ void Node::setScale(scalar x,scalar y,scalar z){
 
 void Node::setTransform(Transform *transform,int tu){
 	mTransform->set(transform);
-	transformUpdated(TransformUpdate_BIT_TRANSLATE|TransformUpdate_BIT_ROTATE|TransformUpdate_BIT_SCALE|tu);
+	transformUpdated(TransformUpdate_BIT_TRANSFORM|tu);
 }
 
 void Node::setBound(Bound *bound){

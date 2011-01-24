@@ -72,11 +72,15 @@ StudioModelNode::StudioModelNode():super(),
 	mSkinIndex(0),
 	mSequenceIndex(0),
 	mSequenceTime(0)
-	//mChromeForward,mChromeRight,
 	//mControllerValues[4],mAdjustedControllerValues[4],
 	//mBlenderValues[4],mAdjustedBlenderValues[4],
+	//mLink,
+	//mLinkModel,
+
+	//mChromeForward,mChromeRight,
 	//mBoneTranslates,
 	//mBoneRotates,
+	//mBoneLinks,
 	//mTransformedVerts,
 	//mTransformedNorms,
 	//mTransformedChromes,
@@ -114,10 +118,24 @@ void StudioModelNode::destroy(){
 	super::destroy();
 }
 
+void StudioModelNode::logicUpdate(int dt,int scope){
+	super::logicUpdate(dt,scope);
+
+	updateSkeleton();
+
+	activate();
+}
+
+void StudioModelNode::frameUpdate(int dt,int scope){
+	super::frameUpdate(dt,scope);
+
+	updateSkeleton();
+}
+
 void StudioModelNode::setModel(const String &name){
 	Stream::ptr stream=mEngine->openStream(name);
 	if(stream==NULL){
-		Error::unknown("Unable to find level");
+		Error::unknown("Unable to find model");
 		return;
 	}
 
@@ -134,6 +152,7 @@ void StudioModelNode::setModel(StudioModel::ptr model){
 
 	mBoneTranslates.resize(model->header->numbones);
 	mBoneRotates.resize(model->header->numbones);
+	mBoneLinks.resize(mModel->header->numbones,-1);
 
 	mTransformedVerts.resize(MAXSTUDIOVERTS);
 	mTransformedNorms.resize(MAXSTUDIOVERTS);
@@ -144,23 +163,31 @@ void StudioModelNode::setModel(StudioModel::ptr model){
 
 	createSubModels();
 
+	setLink(mLink);
+	setRenderSkeleton(mSkeletonMaterial!=NULL);
+
 	updateSkeleton();
 }
 
 void StudioModelNode::setRenderSkeleton(bool skeleton){
-	if(skeleton && mSkeletonMaterial==NULL){
-		mSkeletonMaterial=mEngine->getMaterialManager()->createMaterial();
-		mSkeletonMaterial->setDepthTest(Renderer::DepthTest_NONE);
-		mSkeletonMaterial->setDepthWrite(false);
-		mSkeletonMaterial->setPointParameters(true,8,false,0,0,0,0,0);
-
-		createSkeletonBuffers();
+	if(skeleton){
+		if(mSkeletonMaterial==NULL){
+			mSkeletonMaterial=mEngine->getMaterialManager()->createMaterial();
+			mSkeletonMaterial->setDepthTest(Renderer::DepthTest_NONE);
+			mSkeletonMaterial->setDepthWrite(false);
+			mSkeletonMaterial->setPointParameters(true,8,false,0,0,0,0,0);
+		}
+	}
+	else{
+		if(mSkeletonMaterial!=NULL){
+			mSkeletonMaterial->destroy();
+		}
 	}
 
-	if(!skeleton && mSkeletonMaterial!=NULL){
-		mSkeletonMaterial->destroy();
-
-		destroySkeletonBuffers();
+	// Always recreate the buffers, since we may have a different skeleton
+	destroySkeletonBuffers();
+	if(mSkeletonMaterial!=NULL){
+		createSkeletonBuffers();
 	}
 }
 
@@ -176,14 +203,10 @@ void StudioModelNode::setSequence(int sequence){
 	for(i=0;i<4;++i){
 		setBlender(i,mBlenderValues[i]);
 	}
-
-	updateSkeleton();
 }
 
 void StudioModelNode::setSequenceTime(scalar time){
 	mSequenceTime=time;
-
-	updateSkeleton();
 }
 
 void StudioModelNode::setController(int controller,scalar v){
@@ -241,6 +264,35 @@ void StudioModelNode::setBlender(int blender,scalar v){
 	mAdjustedBlenderValues[blender]=v;
 }
 
+void StudioModelNode::setLink(StudioModelNode::ptr link){
+	mLink=link;
+
+	setDependsUpon(mLink);
+
+	if(mLink==NULL){
+		return;
+	}
+
+	mLinkModel=mLink->mModel;
+
+	if(mModel==NULL || mLinkModel==NULL){
+		return;
+	}
+
+	mBoneLinks.clear();
+	mBoneLinks.resize(mModel->header->numbones,-1);
+
+	int i,j;
+	for(i=0;i<mModel->header->numbones;++i){
+		for(j=0;j<mLink->mModel->header->numbones;++j){
+			if(strcmp(mModel->bone(i)->name,mLink->mModel->bone(j)->name)==0){
+				mBoneLinks[i]=j;
+				break;
+			}
+		}
+	}
+}
+
 void StudioModelNode::setBodypart(int part){
 	mBodypartIndex=part;
 
@@ -296,6 +348,10 @@ void StudioModelNode::traceSegment(Collision &result,const Vector3 &position,con
 void StudioModelNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	super::queueRenderables(camera,queue);
 
+	if(mModel==NULL){
+		return;
+	}
+
 	Math::sub(mChromeForward,getWorldTranslate(),camera->getWorldTranslate());
 	Math::normalize(mChromeForward);
 	mChromeRight.set(camera->getRight());
@@ -326,6 +382,37 @@ void StudioModelNode::render(Renderer *renderer) const{
 	mSkeletonIndexData->primitive=IndexData::Primitive_LINES;
 
 	renderer->renderPrimitive(mHitBoxVertexData,mHitBoxIndexData);
+}
+
+int StudioModelNode::getAttachmentIndex(const String &name){
+	int i;
+	for(i=0;i<mModel->header->numattachments;++i){
+		if(name.equals(mModel->attachment(i)->name)){
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+bool StudioModelNode::getAttachmentTransform(Transform *result,int index){
+	if(index<0 || index>mModel->header->numattachments){
+		return false;
+	}
+
+	studioattachment *attachment=mModel->attachment(index);
+	Vector3 translate=mBoneTranslates[attachment->bone];
+	Quaternion rotate=mBoneRotates[attachment->bone];
+
+	Math::add(translate,attachment->org);
+	result->setTranslate(translate);
+
+	Quaternion attachmentRotate;
+	Math::setQuaternionFromAxes(attachmentRotate,attachment->vectors[0],attachment->vectors[1],attachment->vectors[2]); /// @todo: Would it work to use setQuaternionFromMatrix with the vector array as a matrix?
+	Math::postMul(rotate,attachmentRotate);
+	result->setRotate(rotate);
+
+	return true;
 }
 
 void StudioModelNode::setQuaternionFromEulerAngleStudio(Quaternion &r,const EulerAngle &euler){
@@ -432,9 +519,17 @@ void StudioModelNode::findChrome(Vector2 &chrome,const Vector3 &normal,const Vec
 void StudioModelNode::updateSkeleton(){
 	int i;
 
-	studioseqdesc *sseqdesc=mModel->seqdesc(mSequenceIndex);
+	if(mModel==NULL){
+		return;
+	}
 
-	mBound->set(sseqdesc->bbmin,sseqdesc->bbmax);
+	if(mLink!=NULL && mLinkModel!=mLink->mModel){
+		Logger::debug(Categories::TOADLET_TADPOLE,"relinking skeleton");
+
+		setLink(mLink);
+	}
+
+	studioseqdesc *sseqdesc=mModel->seqdesc(mSequenceIndex);
 
 	studioanim *sanim=mModel->anim(sseqdesc);
 	findBoneTransforms(mBoneTranslates,mBoneRotates,mModel,sseqdesc,sanim,mSequenceTime);
@@ -455,12 +550,27 @@ void StudioModelNode::updateSkeleton(){
 	}
 
 	for(i=0;i<mModel->header->numbones;++i){
+		int link=mBoneLinks[i];
+		if(link>=0){
+			mBoneTranslates[i].set(mLink->mBoneTranslates[link]);
+			mBoneRotates[i].set(mLink->mBoneRotates[link]);
+			continue;
+		}
+
 		studiobone *sbone=mModel->bone(i);
 		if(sbone->parent>=0){
 			Math::preMul(mBoneRotates[i],mBoneRotates[sbone->parent]);
 			Math::mul(mBoneTranslates[i],mBoneRotates[sbone->parent]);
 			Math::add(mBoneTranslates[i],mBoneTranslates[sbone->parent]);
 		}
+	}
+
+	if(mLink==NULL){
+		mBound->set(sseqdesc->bbmin,sseqdesc->bbmax);
+	}
+	else{
+		// Really, we should probably take the sequence bbox and transform it by each bone, and merge for a result, but this will probably work for most cases.
+		mBound->set(mLink->mBound);
 	}
 }
 
@@ -597,6 +707,10 @@ void StudioModelNode::createSubModels(){
 void StudioModelNode::createSkeletonBuffers(){
 	int i;
 
+	if(mModel==NULL){
+		return;
+	}
+
 	int indexCount=0;
 	for(i=0;i<mModel->header->numbones;++i){
 		studiobone *bone=mModel->bone(i);
@@ -629,7 +743,7 @@ void StudioModelNode::createSkeletonBuffers(){
 
 	mHitBoxVertexBuffer=hitBoxVertexBuffer;
 	mHitBoxVertexData=VertexData::ptr(new VertexData(mHitBoxVertexBuffer));
-	mHitBoxIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_POINTS,NULL,0,hitBoxVertexBuffer->getSize()));
+	mHitBoxIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,NULL,0,hitBoxVertexBuffer->getSize()));
 }
 
 void StudioModelNode::updateSkeletonBuffers(){

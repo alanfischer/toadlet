@@ -82,6 +82,8 @@ public:
 		TransformUpdate_BIT_SCALE=1<<2,
 		TransformUpdate_BIT_BOUND=1<<3,
 		TransformUpdate_BIT_INTERPOLATOR=1<<4,
+
+		TransformUpdate_BIT_TRANSFORM=TransformUpdate_BIT_TRANSLATE|TransformUpdate_BIT_ROTATE|TransformUpdate_BIT_SCALE,
 	};
 
 	Node();
@@ -135,6 +137,7 @@ public:
 	// Instead just an Animation that modifys a Transform would suffice.
 	// Though in the second case, we would still need some way of the Interpolators notifying that it was an interpolation change.
 	virtual void setTransform(Transform *transform,int tu);
+	inline Transform *getReadOnlyTransform() const{return mTransform;} // This needs to be read only somehow with the current setup
 	inline Transform *getWorldTransform() const{return mWorldTransform;}
 
 	virtual void setBound(Bound *bound);

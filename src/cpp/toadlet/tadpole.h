@@ -27,7 +27,6 @@
 #define TOADLET_TADPOLE_H
 
 #include <toadlet/tadpole/ArchiveManager.h>
-#include <toadlet/tadpole/BoundingVolumeSensor.h>
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/ContextListener.h>
@@ -42,15 +41,12 @@
 #include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/Noise.h>
 #include <toadlet/tadpole/PixelPacker.h>
-#include <toadlet/tadpole/PotentiallyVisibleSensor.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/RenderQueue.h>
 #include <toadlet/tadpole/ResourceHandler.h>
 #include <toadlet/tadpole/ResourceHandlerData.h>
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/Scene.h>
-#include <toadlet/tadpole/SensorResultsListener.h>
-#include <toadlet/tadpole/SensorResultsCollection.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/Track.h>
@@ -85,14 +81,25 @@
 #include <toadlet/tadpole/node/MeshNode.h>
 #include <toadlet/tadpole/node/MeshNodeSkeleton.h>
 #include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/node/NodeAttacher.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/ParticleNode.h>
 #include <toadlet/tadpole/node/PartitionNode.h>
-#include <toadlet/tadpole/node/SkeletonParentNode.h>
 #include <toadlet/tadpole/node/SpriteNode.h>
 #include <toadlet/tadpole/node/NodeListener.h>
 #include <toadlet/tadpole/node/NodeInterpolator.h>
 #include <toadlet/tadpole/node/NodeTransformInterpolator.h>
+
+#include <toadlet/tadpole/sensor/BoundingVolumeSensor.h>
+#include <toadlet/tadpole/sensor/NameSensor.h>
+#include <toadlet/tadpole/sensor/PotentiallyVisibleSensor.h>
+#include <toadlet/tadpole/sensor/Sensor.h>
+#include <toadlet/tadpole/sensor/SensorResults.h>
+#include <toadlet/tadpole/sensor/SensorResultsListener.h>
+
+#include <toadlet/tadpole/studio/StudioHandler.h>
+#include <toadlet/tadpole/studio/StudioModel.h>
+#include <toadlet/tadpole/studio/StudioModelNode.h>
 
 #include <toadlet/tadpole/terrain/TerrainNode.h>
 #include <toadlet/tadpole/terrain/TerrainPatchNode.h>
@@ -106,6 +113,8 @@ using namespace toadlet::tadpole::animation;
 using namespace toadlet::tadpole::bsp;
 using namespace toadlet::tadpole::mesh;
 using namespace toadlet::tadpole::node;
+using namespace toadlet::tadpole::sensor;
+using namespace toadlet::tadpole::studio;
 using namespace toadlet::tadpole::terrain;
 
 #endif

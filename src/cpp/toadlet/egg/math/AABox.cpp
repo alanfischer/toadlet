@@ -31,8 +31,12 @@ namespace egg{
 namespace math{
 
 void AABox::rotate(const Matrix3x3 &rotation){
-	int i;
 	Vector3 buffer[8];
+	rotate(rotation,buffer);
+}
+
+void AABox::rotate(const Matrix3x3 &rotation,Vector3 buffer[8]){
+	int i;
 	Vector3 temp;
 
 	getVertexes(buffer);
@@ -40,8 +44,8 @@ void AABox::rotate(const Matrix3x3 &rotation){
 	for(i=0;i<8;++i){
 		Math::mul(temp,rotation,buffer[i]);
 		if(i==0){
-			mins=temp;
-			maxs=temp;
+			mins.set(temp);
+			maxs.set(temp);
 		}
 		else{
 			if(mins.x>temp.x)
@@ -60,7 +64,12 @@ void AABox::rotate(const Matrix3x3 &rotation){
 	}
 }
 
-void AABox::rotate(const Matrix3x3 &rotation,Vector3 buffer[8]){
+void AABox::rotate(const Quaternion &rotation){
+	Vector3 buffer[8];
+	rotate(rotation,buffer);
+}
+
+void AABox::rotate(const Quaternion &rotation,Vector3 buffer[8]){
 	int i;
 	Vector3 temp;
 
@@ -69,8 +78,8 @@ void AABox::rotate(const Matrix3x3 &rotation,Vector3 buffer[8]){
 	for(i=0;i<8;++i){
 		Math::mul(temp,rotation,buffer[i]);
 		if(i==0){
-			mins=temp;
-			maxs=temp;
+			mins.set(temp);
+			maxs.set(temp);
 		}
 		else{
 			if(mins.x>temp.x)

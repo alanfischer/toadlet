@@ -111,6 +111,7 @@ set (TADPOLE_TERRAIN_SRC
 
 # Headers
 set (TADPOLE_HEADERS
+	Attachable.h
 	ArchiveManager.h
 	AudioBufferManager.h
 	Bound.h
@@ -217,6 +218,7 @@ set (TADPOLE_NODE_HEADERS
 	node/MeshNode.h
 	node/MeshNodeSkeleton.h
 	node/Node.h
+	node/NodeAttacher.h
 	node/NodeListener.h
 	node/ParentNode.h
 	node/ParticleNode.h
