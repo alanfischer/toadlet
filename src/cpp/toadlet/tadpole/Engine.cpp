@@ -177,6 +177,8 @@ Engine::Engine(bool backable):
 	#else
 		mIdealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
 	#endif
+	// Create initial BackableVertexFormats.  This doesn't need to be done, but without it, starting an application without a Renderer will crash.
+	updateVertexFormats();
 
 	registerNodeType(AnimationControllerNode::type());
 	registerNodeType(AudioNode::type());
