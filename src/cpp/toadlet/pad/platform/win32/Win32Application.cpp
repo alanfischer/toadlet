@@ -268,14 +268,40 @@ void Win32Application::create(String renderer,String audioPlayer,String motionDe
 	createWindow();
 	activate();
 	
+	/// @todo: Unify the plugin framework a bit so we dont have as much code duplication for this potion, and the creating of the plugin
 	mNewRendererPlugin=mCurrentRendererPlugin=renderer;
 	if(renderer!="null"){
-		createContextAndRenderer(renderer);
+		if(renderer!=(char*)NULL){
+			createContextAndRenderer(renderer);
+		}
+		else{
+			Map<String,RendererPlugin>::iterator it;
+			for(it=mRendererPlugins.begin();it!=mRendererPlugins.end();++it){
+				if(createContextAndRenderer(it->first)) break;
+			}
+		}
 	}
 	if(audioPlayer!="null"){
-		createAudioPlayer(audioPlayer);
+		if(audioPlayer!=(char*)NULL){
+			createAudioPlayer(audioPlayer);
+		}
+		else{
+			Map<String,AudioPlayerPlugin>::iterator it;
+			for(it=mAudioPlayerPlugins.begin();it!=mAudioPlayerPlugins.end();++it){
+				if(createAudioPlayer(it->first)) break;
+			}
+		}
 	}
 	if(motionDetector!="null"){
+		if(motionDetector!=(char*)NULL){
+			createMotionDetector(motionDetector);
+		}
+		else{
+			Map<String,MotionDetectorPlugin>::iterator it;
+			for(it=mMotionDetectorPlugins.begin();it!=mMotionDetectorPlugins.end();++it){
+				if(createMotionDetector(it->first)) break;
+			}
+		}
 		createMotionDetector(motionDetector);
 	}
 }
@@ -769,7 +795,9 @@ RenderTarget *Win32Application::makeRenderTarget(const String &plugin){
 
 	Map<String,RendererPlugin>::iterator it=mRendererPlugins.find(plugin);
 	if(it!=mRendererPlugins.end()){
-		target=it->second.createRenderTarget(win32->mWnd,format);
+		TOADLET_TRY
+			target=it->second.createRenderTarget(win32->mWnd,format);
+		TOADLET_CATCH(const Exception &){target=NULL;}
 	}
 	if(target!=NULL && target->isValid()==false){
 		delete target;
@@ -782,24 +810,21 @@ Renderer *Win32Application::makeRenderer(const String &plugin){
 	Renderer *renderer=NULL;
 	Map<String,RendererPlugin>::iterator it=mRendererPlugins.find(plugin);
 	if(it!=mRendererPlugins.end()){
-		renderer=it->second.createRenderer();
+		TOADLET_TRY
+			renderer=it->second.createRenderer();
+		TOADLET_CATCH(const Exception &){renderer=NULL;}
 	}
 	return renderer;
 }
 
 bool Win32Application::createContextAndRenderer(const String &plugin){
 	Logger::debug(Categories::TOADLET_PAD,
-		"Win32Application: creating RenderTarget and Renderer");
-
-	String name=plugin;
-	if(plugin==(char*)NULL && mRendererPlugins.begin()!=mRendererPlugins.end()){
-		name=mRendererPlugins.begin()->first;
-	}
+		"Win32Application: creating RenderTarget and Renderer:"+plugin);
 
 	bool result=false;
-	mRenderTarget=makeRenderTarget(name);
+	mRenderTarget=makeRenderTarget(plugin);
 	if(mRenderTarget!=NULL){
-		mRenderer=makeRenderer(name);
+		mRenderer=makeRenderer(plugin);
 		TOADLET_TRY
 			result=mRenderer->create(this,mRendererOptions);
 		TOADLET_CATCH(const Exception &){result=false;}
@@ -875,22 +900,19 @@ AudioPlayer *Win32Application::makeAudioPlayer(const String &plugin){
 	AudioPlayer *audioPlayer=NULL;
 	Map<String,AudioPlayerPlugin>::iterator it=mAudioPlayerPlugins.find(plugin);
 	if(it!=mAudioPlayerPlugins.end()){
-		audioPlayer=it->second.createAudioPlayer();
+		TOADLET_TRY
+			audioPlayer=it->second.createAudioPlayer();
+		TOADLET_CATCH(const Exception &){audioPlayer=NULL;}
 	}
 	return audioPlayer;
 }
 
 bool Win32Application::createAudioPlayer(const String &plugin){
 	Logger::debug(Categories::TOADLET_PAD,
-		"Win32Application: creating AudioPlayer");
-
-	String name=plugin;
-	if(plugin==(char*)NULL && mAudioPlayerPlugins.begin()!=mAudioPlayerPlugins.end()){
-		name=mAudioPlayerPlugins.begin()->first;
-	}
+		"Win32Application: creating AudioPlayer:"+plugin);
 
 	bool result=false;
-	mAudioPlayer=makeAudioPlayer(name);
+	mAudioPlayer=makeAudioPlayer(plugin);
 	if(mAudioPlayer!=NULL){
 		TOADLET_TRY
 			result=mAudioPlayer->create(mAudioPlayerOptions);
@@ -932,22 +954,19 @@ MotionDetector *Win32Application::makeMotionDetector(const String &plugin){
 	MotionDetector *motionDetector=NULL;
 	Map<String,MotionDetectorPlugin>::iterator it=mMotionDetectorPlugins.find(plugin);
 	if(it!=mMotionDetectorPlugins.end()){
-		motionDetector=it->second.createMotionDetector();
+		TOADLET_TRY
+			motionDetector=it->second.createMotionDetector();
+		TOADLET_CATCH(const Exception &){motionDetector=NULL;}
 	}
 	return motionDetector;
 }
 
 bool Win32Application::createMotionDetector(const String &plugin){
 	Logger::debug(Categories::TOADLET_PAD,
-		"Win32Application: creating MotionDetector");
-
-	String name=plugin;
-	if(plugin==(char*)NULL && mMotionDetectorPlugins.begin()!=mMotionDetectorPlugins.end()){
-		name=mMotionDetectorPlugins.begin()->first;
-	}
+		"Win32Application: creating MotionDetector:"+plugin);
 
 	bool result=false;
-	mMotionDetector=makeMotionDetector(name);
+	mMotionDetector=makeMotionDetector(plugin);
 	if(mMotionDetector!=NULL){
 		TOADLET_TRY
 			result=mMotionDetector->create();
