@@ -308,7 +308,7 @@ void OSXApplication::setWindow(void *window){
 	mWindow=window;
 }
 	
-void OSXApplication::create(int renderer,int audioPlayer,int motionDetector){
+void OSXApplication::create(String renderer,String audioPlayer,String motionDetector){
 	if(mWindow==nil){
 		Error::nullPointer("invalid window");
 		return;
@@ -320,13 +320,6 @@ void OSXApplication::create(int renderer,int audioPlayer,int motionDetector){
 	shared_static_cast<OSXBundleArchive>(mBundleArchive)->open([NSBundle mainBundle]);
 	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(mBundleArchive));
 
-	if(audioPlayer!=AudioPlayerPlugin_NONE){
-		createAudioPlayer();
-	}
-	if(motionDetector!=MotionDetectorPlugin_NONE){
-		createMotionDetector();
-	}
-	
 	#if defined(TOADLET_HAS_UIKIT)
 		mWidth=[(UIWindow*)mWindow bounds].size.width;
 		mHeight=[(UIWindow*)mWindow bounds].size.height;
@@ -355,8 +348,14 @@ void OSXApplication::create(int renderer,int audioPlayer,int motionDetector){
 	
 	activate();
 	
-	if(renderer!=RendererPlugin_NONE){
+	if(renderer!="null"){
 		createContextAndRenderer();
+	}
+	if(audioPlayer!="null"){
+		createAudioPlayer();
+	}
+	if(motionDetector!="null"){
+		createMotionDetector();
 	}
 }
 
@@ -497,13 +496,13 @@ bool OSXApplication::createContextAndRenderer(){
 				delete mRenderer;
 				mRenderer=NULL;
 				Error::unknown(Categories::TOADLET_PAD,
-					"Error starting Renderer");
+					"error starting Renderer");
 				return false;
 			}
 		}
 		else{
 			Error::unknown(Categories::TOADLET_PAD,
-				"Error creating Renderer");
+				"rrror creating Renderer");
 			return false;
 		}
 
@@ -514,7 +513,7 @@ bool OSXApplication::createContextAndRenderer(){
 	}
 	else{
 		Error::unknown(Categories::TOADLET_PAD,
-			"Error creating RenderTargetPeer");
+			"error creating RenderTarget");
 		return false;
 	}
 

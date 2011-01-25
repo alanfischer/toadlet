@@ -287,12 +287,10 @@
 					/sw/lib,
 					"~/lib",
 				);
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
-					"-lGLEW",
-					"-lmxml",
-					"-ltoadlet_ribbit_alplayer_sd",
 					"-ltoadlet_peeper_glrenderer_sd",
+					"-ltoadlet_ribbit_alplayer_sd",
 					"-ltoadlet_egg_sd",
 					"-ltoadlet_ribbit_sd",
 					"-ltoadlet_peeper_sd",

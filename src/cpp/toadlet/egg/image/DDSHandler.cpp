@@ -160,6 +160,7 @@ bool DDSHandler::loadImage(Stream *stream,Collection<Image::ptr> &mipLevels){
 	}
 
 	DDS_HEADER hdr={0};
+	int i;
 
 	dataStream->read((tbyte*)&hdr,sizeof(hdr));
 	#if defined(TOADLET_BIG_ENDIAN)
@@ -196,7 +197,6 @@ bool DDSHandler::loadImage(Stream *stream,Collection<Image::ptr> &mipLevels){
 		return false;
 	}
 
-	int i;
 	int width=hdr.dwWidth;
 	int height=hdr.dwHeight;
 	int depth=hdr.dwDepth;
