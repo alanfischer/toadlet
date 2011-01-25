@@ -357,7 +357,7 @@ bool X11Application::createWindow(){
 	x11->mVisualInfo=glXChooseVisual(x11->mDisplay,x11->mScrnum,attrib);
 	if(!x11->mVisualInfo){
 		Error::unknown(Categories::TOADLET_PAD,
-			"Couldn't get an RGB, Double-buffered visual");
+			"couldn't get an RGB, Double-buffered visual");
 		return false;
 	}
 
@@ -371,7 +371,7 @@ bool X11Application::createWindow(){
 	if(mFullscreen){
 		#if defined(TOADLET_PLATFORM_IRIX)
 			Error::unknown(Categories::TOADLET_PAD,
-				"Fullscreen mode not supported on IRIX");
+				"fullscreen mode not supported on IRIX");
 			return false;
 		#else
 			// Get the display modes list
@@ -423,7 +423,7 @@ bool X11Application::createWindow(){
 				}
 
 				Error::unknown(Categories::TOADLET_PAD,
-					"Fullscreen mode unavailable due to bad requested fullscreen size");
+					"fullscreen mode unavailable due to bad requested fullscreen size");
 				return false;
 			}
 			
@@ -639,13 +639,13 @@ bool X11Application::createContextAndRenderer(){
 				delete mRenderer;
 				mRenderer=NULL;
 				Error::unknown(Categories::TOADLET_PAD,
-					"Error starting Renderer");
+					"error starting Renderer");
 				return false;
 			}
 		}
 		else{
 			Error::unknown(Categories::TOADLET_PAD,
-				"Error creating Renderer");
+				"error creating Renderer");
 			return false;
 		}
 
@@ -656,7 +656,7 @@ bool X11Application::createContextAndRenderer(){
 	}
 	else{
 		Error::unknown(Categories::TOADLET_PAD,
-			"Error creating RenderTarget");
+			"error creating RenderTarget");
 		return false;
 	}
 

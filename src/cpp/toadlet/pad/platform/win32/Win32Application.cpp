@@ -455,13 +455,13 @@ bool Win32Application::createWindow(){
 
 	if(mWidth>screenWidth || mHeight>screenHeight){
 		Error::unknown(Categories::TOADLET_PAD,
-			"Size cannot be greater than screen size");
+			"size cannot be greater than screen size");
 		return false;
 	}
 
 	if(mPositionX>screenWidth || mPositionY>screenHeight){
 		Error::unknown(Categories::TOADLET_PAD,
-			"Position cannot be greater than screen size");
+			"position cannot be greater than screen size");
 		return false;
 	}
 
@@ -476,7 +476,7 @@ bool Win32Application::createWindow(){
 
 	if(!RegisterClass(&wndClass)){
 		Error::unknown(Categories::TOADLET_PAD,
-			"Failed to register window class");
+			"failed to register window class");
 		return false;
 	}
 
@@ -493,7 +493,7 @@ bool Win32Application::createWindow(){
 			win32->mClassName=String();
 
 			Error::unknown(Categories::TOADLET_PAD,
-				String("Fullscreen size not available:")+mWidth+","+mHeight+" bits:"+(redBits+greenBits+blueBits));
+				String("fullscreen size not available:")+mWidth+","+mHeight+" bits:"+(redBits+greenBits+blueBits));
 			return false;
 		}
 	}
@@ -538,7 +538,7 @@ bool Win32Application::createWindow(){
 		win32->mClassName=String();
 
 		Error::unknown(Categories::TOADLET_PAD,
-			"Window creation error");
+			"window creation error");
 		return false;
 	}
 
@@ -815,12 +815,12 @@ bool Win32Application::createContextAndRenderer(const String &plugin){
 
 	if(result==false){
 		Logger::error(Categories::TOADLET_PAD,
-			"Error starting Renderer");
+			"error starting Renderer");
 		return false;
 	}
 	else if(mRenderer==NULL){
 		Logger::error(Categories::TOADLET_PAD,
-			"Error creating Renderer");
+			"error creating Renderer");
 		return false;
 	}
 
@@ -903,12 +903,12 @@ bool Win32Application::createAudioPlayer(const String &plugin){
 
 	if(result==false){
 		Logger::error(Categories::TOADLET_PAD,
-			"Error starting AudioPlayer");
+			"error starting AudioPlayer");
 		return false;
 	}
 	else if(mAudioPlayer==NULL){
 		Logger::error(Categories::TOADLET_PAD,
-			"Error creating AudioPlayer");
+			"error creating AudioPlayer");
 		return false;
 	}
 
@@ -960,12 +960,12 @@ bool Win32Application::createMotionDetector(const String &plugin){
 
 	if(result==false){
 		Logger::error(Categories::TOADLET_PAD,
-			"Error starting MotionDetector");
+			"error starting MotionDetector");
 		return false;
 	}
 	else if(mMotionDetector==NULL){
 		Logger::error(Categories::TOADLET_PAD,
-			"Error creating MotionDetector");
+			"error creating MotionDetector");
 		return false;
 	}
 	return true;
