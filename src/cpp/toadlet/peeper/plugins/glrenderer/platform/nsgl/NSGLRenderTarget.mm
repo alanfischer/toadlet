@@ -78,7 +78,7 @@ bool NSGLRenderTarget::createContext(NSView *view,WindowRenderTargetFormat *form
 	}
 
 	mContext=[[NSOpenGLContext alloc] initWithFormat:mPixelFormat shareContext:nil];
-	if(mContext=nil){
+	if(mContext==nil){
 		destroyContext();
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"Failed to create GL context");
@@ -86,7 +86,7 @@ bool NSGLRenderTarget::createContext(NSView *view,WindowRenderTargetFormat *form
 	}
 
 	mView=view;
-/*
+
 	int numThreads=format->threads<=1?0:format->threads-1;
 	mThreadContexts.resize(numThreads,nil);
 	mThreadIDs.resize(numThreads,0);
@@ -101,7 +101,7 @@ bool NSGLRenderTarget::createContext(NSView *view,WindowRenderTargetFormat *form
 		}
 		mThreadContexts[i]=context;
 	}
-*/
+
 	activate();
 
 	return true;

@@ -168,7 +168,7 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 	
 		if(glewInitResult!=GLEW_OK){
 			Error::unknown(Categories::TOADLET_PEEPER,
-			   "glewInit failed");
+			   String("glewInit failed:")+glewGetErrorString(glewInitResult));
 			return false;
 		}
 
