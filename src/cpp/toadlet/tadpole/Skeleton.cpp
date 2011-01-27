@@ -23,37 +23,28 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_TEXTURESTAGEANIMATION_H
-#define TOADLET_TADPOLE_ANIMATION_TEXTURESTAGEANIMATION_H
-
-#include <toadlet/peeper/TextureStage.h>
-#include <toadlet/tadpole/animation/Animation.h>
+#include <toadlet/tadpole/Skeleton.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
 
-class TextureStageAnimation:public Animation{
-public:
-	TOADLET_SHARED_POINTERS(TextureStageAnimation);
+Skeleton::Skeleton():BaseResource(){
+}
 
-	TextureStageAnimation(){}
-	virtual ~TextureStageAnimation(){}
+Skeleton::~Skeleton(){
+	destroy();
+}
 
-	void setTarget(peeper::TextureStage::ptr target){mTarget=target;}
-	inline peeper::TextureStage::ptr getTarget() const{return mTarget;}
+void Skeleton::destroy(){
+	int i;
+	for(i=0;i<sequences.size();++i){
+		sequences[i]->release();
+	}
+	sequences.clear();
+}
 
-	void set(scalar value){if(mTarget!=NULL) mTarget->setTime(value);}
-
-	scalar getMin() const{return 0;}
-	scalar getMax() const{return mTarget!=NULL?mTarget->getLength():0;}
-
-protected:
-	peeper::TextureStage::ptr mTarget;
-};
+void Skeleton::compile(){
+}
 
 }
 }
-}
-
-#endif

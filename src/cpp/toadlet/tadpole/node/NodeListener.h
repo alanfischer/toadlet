@@ -41,8 +41,9 @@ public:
 	virtual ~NodeListener(){}
 
 	virtual void nodeDestroyed(Node *node)=0;
-	virtual void logicUpdate(Node *node,int dt)=0;
-	virtual void frameUpdate(Node *node,int dt)=0;
+	virtual void transformUpdated(Node *node,int tu)=0;
+	virtual void logicUpdated(Node *node,int dt)=0;
+	virtual void frameUpdated(Node *node,int dt)=0;
 };
 
 template<class Type>
@@ -51,8 +52,9 @@ public:
 	NodeDestroyedFunctor(Type *obj,void (Type::*func)(void)):mObject(obj),mFunction(func){}
 
 	virtual void nodeDestroyed(Node *node){(mObject->*mFunction)();}
-	virtual void logicUpdate(Node *node,int dt){}
-	virtual void frameUpdate(Node *node,int dt){}
+	virtual void transformUpdated(Node *node,int tu){}
+	virtual void logicUpdated(Node *node,int dt){}
+	virtual void frameUpdated(Node *node,int dt){}
 
 protected:
 	Type *mObject;
@@ -65,8 +67,9 @@ public:
 	NodeUpdateFunctor(Type *obj,void (Type::*logicFunc)(int),void (Type::*frameFunc)(int)):mObject(obj),mLogicFunction(logicFunc),mFrameFunction(frameFunc){}
 
 	virtual void nodeDestroyed(Node *node){}
-	virtual void logicUpdate(Node *node,int dt){(mObject->*mLogicFunction)(dt);}
-	virtual void frameUpdate(Node *node,int dt){(mObject->*mFrameFunction)(dt);}
+	virtual void transformUpdated(Node *node,int tu){}
+	virtual void logicUpdated(Node *node,int dt){(mObject->*mLogicFunction)(dt);}
+	virtual void frameUpdated(Node *node,int dt){(mObject->*mFrameFunction)(dt);}
 
 protected:
 	Type *mObject;

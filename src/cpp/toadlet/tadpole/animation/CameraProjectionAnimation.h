@@ -26,14 +26,14 @@
 #ifndef TOADLET_TADPOLE_ANIMATION_CAMERAPROJECTIONANIMATION_H
 #define TOADLET_TADPOLE_ANIMATION_CAMERAPROJECTIONANIMATION_H
 
-#include <toadlet/tadpole/animation/Animation.h>
+#include <toadlet/tadpole/animation/Animatable.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-class TOADLET_API CameraProjectionAnimation:public Animation{
+class TOADLET_API CameraProjectionAnimation:public Animatable{
 public:
 	TOADLET_SHARED_POINTERS(CameraProjectionAnimation);
 
@@ -43,7 +43,7 @@ public:
 	void setTarget(node::CameraNode::ptr target);
 	inline node::CameraNode::ptr getTarget() const{return mTarget;}
 
-	// HACK: Until we introduce a proper ProjectionKeyframe, this will have to do
+	// HACK: Until we introduce a proper ProjectionKeyFrame, this will have to do
 	void setStart(scalar left,scalar right,scalar bottom,scalar top,scalar neard,scalar fard);
 	void setEnd(scalar left,scalar right,scalar bottom,scalar top,scalar neard,scalar fard,scalar time);
 

@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_HANDLER_XANMHANDLER_H
 
 #include <toadlet/tadpole/ResourceHandler.h>
-#include <toadlet/tadpole/mesh/Sequence.h>
+#include <toadlet/tadpole/TransformSequence.h>
 
 typedef struct mxml_node_s mxml_node_t;
 
@@ -42,13 +42,13 @@ public:
 	XANMHandler();
 
 	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
-	bool save(mesh::Sequence::ptr resource,egg::io::Stream::ptr stream);
+	bool save(TransformSequence::ptr resource,egg::io::Stream::ptr stream);
 
 protected:
-	mesh::Sequence::ptr loadSequenceVersion1(mxml_node_t *root);
-	mesh::Sequence::ptr loadSequenceVersion2Up(mxml_node_t *root,int version);
-	bool saveSequenceVersion1(mxml_node_t *root,mesh::Sequence::ptr sequence);
-	bool saveSequenceVersion2Up(mxml_node_t *root,mesh::Sequence::ptr sequence,int version);
+	TransformSequence::ptr loadSequenceVersion1(mxml_node_t *root);
+	TransformSequence::ptr loadSequenceVersion2Up(mxml_node_t *root,int version);
+	bool saveSequenceVersion1(mxml_node_t *root,TransformSequence::ptr sequence);
+	bool saveSequenceVersion2Up(mxml_node_t *root,TransformSequence::ptr sequence,int version);
 };
 
 }

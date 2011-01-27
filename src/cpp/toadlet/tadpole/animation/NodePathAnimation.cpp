@@ -47,7 +47,7 @@ void NodePathAnimation::setTarget(Node::ptr target){
 	mTarget=target;
 }
 
-void NodePathAnimation::setTrack(Track::ptr track){
+void NodePathAnimation::setTrack(TransformTrack::ptr track){
 	mTrack=track;
 }
 
@@ -57,7 +57,7 @@ void NodePathAnimation::setLookAt(const Vector3 &lookAt){
 }
 
 void NodePathAnimation::set(scalar value){
-	const KeyFrame *f1=NULL,*f2=NULL;
+	const TransformKeyFrame *f1=NULL,*f2=NULL;
 	scalar t=mTrack->getKeyFramesAtTime(value,f1,f2,mHint);
 
 	Vector3 &translate=cache_set_translate.reset();

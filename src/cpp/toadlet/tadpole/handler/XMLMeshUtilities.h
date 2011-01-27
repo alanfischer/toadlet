@@ -30,7 +30,7 @@
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/MaterialManager.h>
 #include <toadlet/tadpole/TextureManager.h>
-#include <toadlet/tadpole/mesh/Mesh.h>
+#include <toadlet/tadpole/Mesh.h>
 #include <mxml.h>
 
 #define mxmlGetElementName(x) ((x->type==MXML_ELEMENT)?x->value.element.name:"")
@@ -56,14 +56,14 @@ public:
 	static Material::ptr loadMaterial(mxml_node_t *node,int version,MaterialManager *materialManager,TextureManager *textureManager);
 	static mxml_node_t *saveMaterial(Material::ptr material,int version);
 
-	static mesh::Mesh::ptr loadMesh(mxml_node_t *node,int version,BufferManager *bufferManager,MaterialManager *materialManager,TextureManager *textureManager);
-	static mxml_node_t *saveMesh(mesh::Mesh::ptr mesh,int version);
+	static Mesh::ptr loadMesh(mxml_node_t *node,int version,BufferManager *bufferManager,MaterialManager *materialManager,TextureManager *textureManager);
+	static mxml_node_t *saveMesh(Mesh::ptr mesh,int version);
 
-	static mesh::Skeleton::ptr loadSkeleton(mxml_node_t *node,int version);
-	static mxml_node_t *saveSkeleton(mesh::Skeleton::ptr skeleton,int version);
+	static Skeleton::ptr loadSkeleton(mxml_node_t *node,int version);
+	static mxml_node_t *saveSkeleton(Skeleton::ptr skeleton,int version);
 
-	static mesh::Sequence::ptr loadSequence(mxml_node_t *node,int version);
-	static mxml_node_t *saveSequence(mesh::Sequence::ptr sequence,int version);
+	static TransformSequence::ptr loadSequence(mxml_node_t *node,int version);
+	static mxml_node_t *saveSequence(TransformSequence::ptr sequence,int version);
 };
 
 }
