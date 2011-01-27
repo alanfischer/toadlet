@@ -25,6 +25,7 @@
 
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/LoggerListener.h>
+#include <toadlet/egg/Version.h>
 #if defined(TOADLET_PLATFORM_WIN32)
 	#include <windows.h>
 #else
@@ -162,7 +163,7 @@ void Logger::addLogString(const String &categoryName,Level level,const String &d
 			if(mLoggedMessage==false){
 				mLoggedMessage=true;
 
-				String line="Started toadlet::egg::Logger";
+				String line="creating "+Categories::TOADLET_EGG_LOGGER+":"+Version::STRING;
 				
 				int loggerLevel=Level_DISABLED;
 				unlock();

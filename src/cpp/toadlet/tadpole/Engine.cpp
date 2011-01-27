@@ -74,6 +74,7 @@
 #include <toadlet/tadpole/MaterialManager.h>
 #include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/TextureManager.h>
+#include <toadlet/tadpole/Version.h>
 
 #include <toadlet/tadpole/node/AudioNode.h>
 #include <toadlet/tadpole/node/LabelNode.h>
@@ -159,7 +160,7 @@ Engine::Engine(bool backable):
 	mContextListener(NULL)
 {
 	Logger::debug(Categories::TOADLET_TADPOLE,
-		"creating Engine");
+		String("creating ")+Categories::TOADLET_TADPOLE+".Engine:"+Version::STRING);
 
 	mArchiveManager=new ArchiveManager();
 	mTextureManager=new TextureManager(this,backable);

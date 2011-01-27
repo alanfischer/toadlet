@@ -282,8 +282,8 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "~/include";
-				LIBRARY_SEARCH_PATHS = "~/lib";
+				HEADER_SEARCH_PATHS = "~/toadlet-fixed/include";
+				LIBRARY_SEARCH_PATHS = "~/toadlet-fixed/lib";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"-ltoadlet_peeper_glrenderer_sd",
