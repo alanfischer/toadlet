@@ -63,10 +63,6 @@
 #include <toadlet/tadpole/animation/TextureMatrixAnimation.h>
 #include <toadlet/tadpole/animation/TextureStageAnimation.h>
 
-#include <toadlet/tadpole/bsp/BSP30Handler.h>
-#include <toadlet/tadpole/bsp/BSP30Map.h>
-#include <toadlet/tadpole/bsp/BSP30Node.h>
-
 #include <toadlet/tadpole/mesh/Mesh.h>
 #include <toadlet/tadpole/mesh/Sequence.h>
 #include <toadlet/tadpole/mesh/Skeleton.h>
@@ -97,10 +93,6 @@
 #include <toadlet/tadpole/sensor/SensorResults.h>
 #include <toadlet/tadpole/sensor/SensorResultsListener.h>
 
-#include <toadlet/tadpole/studio/StudioHandler.h>
-#include <toadlet/tadpole/studio/StudioModel.h>
-#include <toadlet/tadpole/studio/StudioModelNode.h>
-
 #include <toadlet/tadpole/terrain/TerrainNode.h>
 #include <toadlet/tadpole/terrain/TerrainPatchNode.h>
 
@@ -110,11 +102,22 @@
 using namespace toadlet;
 using namespace toadlet::tadpole;
 using namespace toadlet::tadpole::animation;
-using namespace toadlet::tadpole::bsp;
 using namespace toadlet::tadpole::mesh;
 using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::sensor;
-using namespace toadlet::tadpole::studio;
 using namespace toadlet::tadpole::terrain;
+
+#if !defined(TOADLET_FIXED_POINT)
+	#include <toadlet/tadpole/bsp/BSP30Handler.h>
+	#include <toadlet/tadpole/bsp/BSP30Map.h>
+	#include <toadlet/tadpole/bsp/BSP30Node.h>
+
+	#include <toadlet/tadpole/studio/StudioHandler.h>
+	#include <toadlet/tadpole/studio/StudioModel.h>
+	#include <toadlet/tadpole/studio/StudioModelNode.h>
+
+	using namespace toadlet::tadpole::bsp;
+	using namespace toadlet::tadpole::studio;
+#endif
 
 #endif
