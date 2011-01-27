@@ -341,7 +341,7 @@ public class Engine implements InputStreamFactory{
 			if(resource!=null){
 				Texture.Peer peer=resource.internal_getTexturePeer();
 				if(peer!=null){
-					// TODO: Modify Texture so it reads back the texture data and stores it internally?
+					/// @todo: Modify Texture so it reads back the texture data and stores it internally?
 					//  This would let us deactivate a context and reactivate it.
 					//  The Buffer already does this
 					resource.internal_setTexturePeer(null);
@@ -489,7 +489,7 @@ public class Engine implements InputStreamFactory{
 	public int getIdealFormatBit(){return mIdealFormatBit;}
 	public VertexFormats getVertexFormats(){return mVertexFormats;}
 
-	// TODO: Change these buffer lookups to use maps of some sort
+	/// @todo: Change these buffer lookups to use maps of some sort
 	public VertexBuffer checkoutVertexBuffer(VertexFormat format,int numVertexes){
 		int i;
 		for(i=0;i<mVertexBufferCheckins.size();++i){

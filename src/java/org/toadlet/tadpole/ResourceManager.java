@@ -59,7 +59,7 @@ public class ResourceManager{
 		mInputStreamFactory=inputStreamFactory;
 	}
 
-// TODO: Revisit the ResourceManager/PointerQueue implementation to make it compatible with Java & C#
+/// @todo: Revisit the ResourceManager/PointerQueue implementation to make it compatible with Java & C#
 #if 1
 	public Resource load(String name){
 		return load(false,name,name,null,null);
@@ -145,7 +145,7 @@ public class ResourceManager{
 
 	public Map<Resource,ResourceCache> getResourcePtrMap(){return mResourcePtrMap;}
 
-	// TODO: This class in Java & C++ should be replaced with something cleaner, perhaps using regex
+	/// @todo: This class in Java & C++ should be replaced with something cleaner, perhaps using regex
 	public static String cleanFilename(String name){return name;}
 
 	public void addHandler(ResourceHandler handler,String extension){
@@ -242,7 +242,7 @@ public class ResourceManager{
 				}
 			}
 			resCache=new ResourceCache(resource,name);
-// TODO
+/// @todo
 //			resCache.resource.setPointerQueue(this);
 			if(cache){
 				resCache.cachedResource=resource;
@@ -312,7 +312,7 @@ public class ResourceManager{
 		if(resCache!=null){
 			resCache.count--;
 			if(resCache.count<=0){
-// TODO
+/// @todo
 resourceUnloaded(resCache.cachedResource);
 				resCache.cachedResource=null;
 			}

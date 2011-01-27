@@ -33,7 +33,7 @@
 namespace toadlet{
 namespace peeper{
 
-// TODO: Make the D3D9SurfaceRenderTarget & the GLFBOSurfaceRenderTarget more strict about Surface sizes,
+/// @todo: Make the D3D9SurfaceRenderTarget & the GLFBOSurfaceRenderTarget more strict about Surface sizes,
 //  and smarter about destroying their temporary depth buffer when not needed
 class TOADLET_API D3D10SurfaceRenderTarget:public D3D10RenderTarget,public SurfaceRenderTarget{
 public:

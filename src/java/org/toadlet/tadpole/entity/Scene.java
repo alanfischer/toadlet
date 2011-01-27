@@ -398,7 +398,7 @@ public class Scene extends ParentEntity{
 			}
 		}
 		else if(entity.isLight()){
-			// TODO: Find the best light
+			/// @todo: Find the best light
 			mLight=(LightEntity)entity;
 		}
 		else{
