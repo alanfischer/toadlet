@@ -23,43 +23,25 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_SKELETONANIMATION_H
-#define TOADLET_TADPOLE_ANIMATION_SKELETONANIMATION_H
+#ifndef TOADLET_TADPOLE_ANIMATION_ANIMATABLE_H
+#define TOADLET_TADPOLE_ANIMATION_ANIMATABLE_H
 
-#include <toadlet/tadpole/animation/Animatable.h>
-#include <toadlet/tadpole/node/MeshNodeSkeleton.h>
+#include <toadlet/egg/WeakPointer.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-class Controller;
-
-class TOADLET_API SkeletonAnimation:public Animatable{
+class Animatable{
 public:
-	TOADLET_SHARED_POINTERS(SkeletonAnimation);
+	TOADLET_SHARED_POINTERS(Animatable);
 
-	SkeletonAnimation();
-	virtual ~SkeletonAnimation();
+	virtual ~Animatable(){}
 
-	void setTarget(node::MeshNodeSkeleton::ptr target);
-	inline node::MeshNodeSkeleton::ptr getTarget() const{return mTarget;}
-
-	void setSequenceIndex(int sequenceIndex);
-	inline int getSequenceIndex() const{return mSequenceIndex;}
-
-	void set(scalar value);
-
-	scalar getMin() const;
-	scalar getMax() const;
-
-	void attached(Controller *controller);
-	void removed(Controller *controller);
-
-protected:
-	Controller *mController;
-	node::MeshNodeSkeleton::ptr mTarget;
-	int mSequenceIndex;
+	virtual void set(scalar value)=0;
+	virtual scalar getMin() const=0;
+	virtual scalar getMax() const=0;
 };
 
 }

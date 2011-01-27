@@ -23,38 +23,33 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_ANIMATIONCONTROLLERFINISHEDLISTENER_H
-#define TOADLET_TADPOLE_ANIMATION_ANIMATIONCONTROLLERFINISHEDLISTENER_H
+#ifndef TOADLET_TADPOLE_TRANSFORMTRACK_H
+#define TOADLET_TADPOLE_TRANSFORMTRACK_H
 
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/egg/WeakPointer.h>
+#include <toadlet/egg/Collection.h>
+#include <toadlet/tadpole/TransformKeyFrame.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
 
-class AnimationController;
-
-class AnimationControllerFinishedListener{
+class TOADLET_API TransformTrack{
 public:
-	virtual ~AnimationControllerFinishedListener(){}
+	TOADLET_SHARED_POINTERS(TransformTrack);
 
-	virtual void controllerFinished(AnimationController *controller)=0;
+	TransformTrack();
+
+	scalar getKeyFramesAtTime(scalar time,const TransformKeyFrame *&f1,const TransformKeyFrame *&f2,int &trackHint) const;
+
+	void compile();
+
+	int index;
+	scalar length; // calculated by compile
+	egg::Collection<TransformKeyFrame> keyFrames;
 };
 
-template<class Type>
-class AnimationControllerFinishedFunctor:public AnimationControllerFinishedListener{
-public:
-	AnimationControllerFinishedFunctor(Type *obj,void (Type::*func)(void)):mObject(obj),mFunction(func){}
-
-	virtual void controllerFinished(AnimationController *controller){(mObject->*mFunction)();}
-
-protected:
-	Type *mObject;
-	void (Type::*mFunction)(void);
-};
-
-}
 }
 }
 
 #endif
+

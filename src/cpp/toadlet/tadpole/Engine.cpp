@@ -75,7 +75,6 @@
 #include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/TextureManager.h>
 
-#include <toadlet/tadpole/node/AnimationControllerNode.h>
 #include <toadlet/tadpole/node/AudioNode.h>
 #include <toadlet/tadpole/node/LabelNode.h>
 #include <toadlet/tadpole/node/LightNode.h>
@@ -148,7 +147,6 @@ using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::handler;
-using namespace toadlet::tadpole::mesh;
 
 namespace toadlet{
 namespace tadpole{
@@ -177,8 +175,9 @@ Engine::Engine(bool backable):
 	#else
 		mIdealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
 	#endif
+	// Create initial BackableVertexFormats.  This doesn't need to be done, but without it, starting an application without a Renderer will crash.
+	updateVertexFormats();
 
-	registerNodeType(AnimationControllerNode::type());
 	registerNodeType(AudioNode::type());
 	registerNodeType(CameraNode::type());
 	registerNodeType(LabelNode::type());

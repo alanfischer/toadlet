@@ -34,17 +34,11 @@ namespace pad{
 
 class TOADLET_API OSXApplication:public BaseApplication{
 public:
-	enum{
-		RendererPlugin_NONE=-1,
-		AudioPlayerPlugin_NONE=-1,
-		MotionDetectorPlugin_NONE=-1,
-	};
-
 	OSXApplication();
 	virtual ~OSXApplication();
 
 	virtual void setWindow(void *window);
-	virtual void create(int renderer=0,int audioPlayer=0,int motionDetector=0);
+	virtual void create(egg::String renderer=(char*)NULL,egg::String audioPlayer=(char*)NULL,egg::String motionDetector=(char*)NULL);
 	virtual void destroy();
 	
 	virtual void start();

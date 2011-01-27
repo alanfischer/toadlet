@@ -31,7 +31,6 @@
 using namespace toadlet;
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
-using namespace toadlet::tadpole::mesh;
 
 namespace toadlet{
 namespace tadpole{
@@ -112,10 +111,10 @@ String MeshNodeSkeleton::getBoneName(Bone *bone) const{
 
 int MeshNodeSkeleton::updateBoneTransformation(Bone *bone){
 	if(mSequence!=NULL){
-		Track *track=mSequence->tracks[bone->index];
+		TransformTrack *track=mSequence->tracks[bone->index];
 		scalar time=mSequenceTime;
 		if(track!=NULL){
-			const KeyFrame *f1=NULL,*f2=NULL;
+			const TransformKeyFrame *f1=NULL,*f2=NULL;
 			scalar t=track->getKeyFramesAtTime(time,f1,f2,mTrackHints[bone->index]);
 			if(f1==NULL || f2==NULL){
 				return bone->dontUpdateFlags;

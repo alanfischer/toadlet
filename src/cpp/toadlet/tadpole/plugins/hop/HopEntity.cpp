@@ -31,7 +31,6 @@ using namespace toadlet::egg;
 using namespace toadlet::hop;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole::node;
-using namespace toadlet::tadpole::mesh;
 
 namespace toadlet{
 namespace tadpole{
@@ -69,6 +68,7 @@ Node *HopEntity::create(Scene *scene){
 	}
 
 	mInterpolator=NodeTransformInterpolator::ptr(new NodeTransformInterpolator());
+	addNodeListener(mInterpolator);
 
 	return this;
 }
@@ -195,10 +195,6 @@ void HopEntity::transformUpdated(int tu){
 		if((tu&Node::TransformUpdate_BIT_TRANSLATE)>0){
 			mSolid->setPosition(mTransform->getTranslate());
 		}
-
-		if(mInterpolator!=NULL){
-			mInterpolator->transformUpdated(this,tu);
-		}
 	}
 }
 
@@ -221,7 +217,7 @@ void HopEntity::logicUpdate(int dt,int scope){
 		transformUpdated(TransformUpdate_BIT_TRANSLATE|TransformUpdate_BIT_INTERPOLATOR);
 
 		if(mInterpolator!=NULL){
-			mInterpolator->logicUpdate(this,mScene->getLogicFrame());
+			mInterpolator->logicUpdated(this,dt);
 		}
 	}
 
@@ -236,7 +232,7 @@ void HopEntity::logicUpdate(int dt,int scope){
 void HopEntity::frameUpdate(int dt,int scope){
 	if(mSolid->active()){
 		if(mInterpolator!=NULL){
-			mInterpolator->interpolate(this,mScene->getLogicFraction());
+			mInterpolator->frameUpdated(this,dt);
 		}
 	}
 

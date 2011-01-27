@@ -38,8 +38,6 @@
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/ArchiveManager.h>
 #include <toadlet/tadpole/AudioBufferManager.h>
-#include <toadlet/tadpole/Font.h>
-#include <toadlet/tadpole/FontData.h>
 #include <toadlet/tadpole/FontManager.h>
 #include <toadlet/tadpole/VertexFormats.h>
 #include <toadlet/tadpole/BufferManager.h>
@@ -48,7 +46,6 @@
 #include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/ContextListener.h>
-#include <toadlet/tadpole/mesh/Mesh.h>
 #include <toadlet/tadpole/node/Node.h>
 #include <toadlet/tadpole/handler/AudioBufferHandler.h>
 

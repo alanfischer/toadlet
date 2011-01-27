@@ -37,6 +37,8 @@ namespace toadlet{
 namespace tadpole{
 namespace studio{
 
+class StudioModelController;
+
 class TOADLET_API StudioModelNode:public node::Node,public Traceable,public Renderable,public Attachable{
 public:
 	TOADLET_NODE(StudioModelNode,Node);
@@ -75,24 +77,26 @@ public:
 	void setModel(StudioModel::ptr model);
 	StudioModel::ptr getModel() const{return mModel;}
 
-	void setRenderSkeleton(bool skeleton);
-	bool getRenderSkeleton() const{return mSkeletonMaterial!=NULL;}
-
 	void setSequence(int sequence);
 	int getSequence() const{return mSequenceIndex;}
 
 	void setSequenceTime(scalar time);
 	scalar getSequenceTime() const{return mSequenceTime;}
 
+	void setGaitSequence(int sequence);
+	int getGaitSequence() const{return mGaitSequenceIndex;}
+
+	void setGaitSequenceTime(scalar time);
+	scalar getGaitSequenceTime() const{return mGaitSequenceTime;}
+
+	void setRenderSkeleton(bool skeleton);
+	bool getRenderSkeleton() const{return mSkeletonMaterial!=NULL;}
+
 	void setController(int controller,scalar v);
 	scalar getController(int controller) const{return mControllerValues[controller];}
 
 	void setBlender(int blender,scalar v);
 	scalar getBlender(int blender) const{return mBlenderValues[blender];}
-
-	// If set, it overrides any sequences or controllers
-	void setLink(StudioModelNode::ptr link);
-	StudioModelNode::ptr getLink() const{return mLink;}
 
 	void setBodypart(int bodypart);
 	int getBodypart() const{return mBodypartIndex;}
@@ -102,6 +106,13 @@ public:
 
 	void setSkin(int skin);
 	int getSkin() const{return mSkinIndex;}
+
+	// If set, it overrides any sequences or controllers
+	void setLink(StudioModelNode::ptr link);
+	StudioModelNode::ptr getLink() const{return mLink;}
+
+	egg::SharedPointer<StudioModelController> getController();
+	egg::SharedPointer<StudioModelController> getGaitController();
 
 	// Traceable
 	Bound *getBound() const{return super::getBound();}
@@ -125,7 +136,7 @@ public:
 	peeper::VertexBufferAccessor vba;
 	peeper::IndexBufferAccessor iba;
 
-//protected:
+protected:
 	void updateSkeleton();
 	void findBoneTransforms(Vector3 *translates,Quaternion *rotates,StudioModel *model,studioseqdesc *sseqdesc,studioanim *sanim,float t);
 	void findBoneTranslate(Vector3 &r,int frame,float s,studiobone *sbone,studioanim *sanim);
@@ -145,10 +156,13 @@ public:
 	int mSkinIndex;
 	int mSequenceIndex;
 	scalar mSequenceTime;
+	int mGaitSequenceIndex;
+	scalar mGaitSequenceTime;
 	scalar mControllerValues[4],mAdjustedControllerValues[4];
 	scalar mBlenderValues[4],mAdjustedBlenderValues[4];
 	StudioModelNode::ptr mLink;
 	StudioModel::ptr mLinkModel;
+	egg::SharedPointer<StudioModelController> mController,mGaitController;
 
 	Vector3 mChromeForward,mChromeRight;
 	egg::Collection<Vector3> mBoneTranslates;

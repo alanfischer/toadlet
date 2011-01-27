@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/animation/AnimationController.h>
+#include <toadlet/tadpole/animation/Controller.h>
 #include <toadlet/tadpole/Engine.h>
 
 using namespace toadlet::egg;
@@ -32,7 +32,7 @@ namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-AnimationController::AnimationController():
+Controller::Controller():
 	mTime(0),
 	mMinValue(0),
 	mMaxValue(0),
@@ -46,13 +46,13 @@ AnimationController::AnimationController():
 	mOwnsFinishedListener(false)
 {}
 
-AnimationController::~AnimationController(){
+Controller::~Controller(){
 	if(mOwnsFinishedListener && mFinishedListener!=NULL){
 		delete mFinishedListener;
 	}
 }
 
-void AnimationController::setTime(int time,bool setagain){
+void Controller::setTime(int time,bool setagain){
 	mTime=time;
 
 	if(setagain){
@@ -60,20 +60,20 @@ void AnimationController::setTime(int time,bool setagain){
 	}
 }
 
-void AnimationController::setCycling(Cycling cycling){
+void Controller::setCycling(Cycling cycling){
 	mCycling=cycling;
 }
 
-void AnimationController::setInterpolation(Interpolation interpolation){
+void Controller::setInterpolation(Interpolation interpolation){
 	mInterpolation=interpolation;
 }
 
-void AnimationController::setTimeScale(scalar scale){
+void Controller::setTimeScale(scalar scale){
 	mTimeScale=scale;
 }
 
 /// @todo: this should go to a sharedptr, like the node listener
-void AnimationController::setAnimationControllerFinishedListener(AnimationControllerFinishedListener *listener,bool owns){
+void Controller::setControllerFinishedListener(ControllerFinishedListener *listener,bool owns){
 	if(mOwnsFinishedListener && mFinishedListener!=NULL){
 		delete mFinishedListener;
 	}
@@ -81,13 +81,13 @@ void AnimationController::setAnimationControllerFinishedListener(AnimationContro
 	mOwnsFinishedListener=owns;
 }
 
-void AnimationController::start(){
+void Controller::start(){
 	mRunning=true;
 
 	mTime=0;
 }
 
-void AnimationController::stop(){
+void Controller::stop(){
 	mRunning=false;
 
 	mTime=0;
@@ -95,7 +95,7 @@ void AnimationController::stop(){
 	set(0);
 }
 
-void AnimationController::update(int dt){
+void Controller::update(int dt){
 	if(mRunning==false){
 		return;
 	}
@@ -149,32 +149,32 @@ void AnimationController::update(int dt){
 	}
 }
 
-void AnimationController::set(scalar value){
+void Controller::set(scalar value){
 	if(mInterpolation==Interpolation_COS && mMaxValue!=0){
 		value=Math::mul(mMaxValue,Math::div(Math::ONE-Math::cos(Math::mul(Math::div(value,mMaxValue),Math::PI)),Math::TWO));
 	}
 
 	int i;
-	for(i=0;i<mAnimations.size();++i){
-		Animation *animation=mAnimations[i];
-		animation->set(value);
+	for(i=0;i<mAnimatables.size();++i){
+		Animatable *animatable=mAnimatables[i];
+		animatable->set(value);
 	}
 }
 
-void AnimationController::extentsChanged(){
+void Controller::extentsChanged(){
 	mMinValue=0;
 	mMaxValue=0;
 
 	int i;
-	for(i=0;i<mAnimations.size();++i){
-		Animation *animation=mAnimations[i];
+	for(i=0;i<mAnimatables.size();++i){
+		Animatable *animatable=mAnimatables[i];
 		
-		scalar minValue=animation->getMin();
+		scalar minValue=animatable->getMin();
 		if(mMinValue<minValue){
 			mMinValue=minValue;
 		}
 
-		scalar maxValue=animation->getMax();
+		scalar maxValue=animatable->getMax();
 		if(mMaxValue<maxValue){
 			mMaxValue=maxValue;
 		}
@@ -184,14 +184,14 @@ void AnimationController::extentsChanged(){
 	mMaxTime=Math::toMilli(mMaxValue);
 }
 
-void AnimationController::attach(Animation::ptr animation){
-	mAnimations.add(animation);
+void Controller::attach(Animatable::ptr animatable){
+	mAnimatables.add(animatable);
 
 	extentsChanged();
 }
 
-void AnimationController::remove(Animation::ptr animation){
-	mAnimations.remove(animation);
+void Controller::remove(Animatable::ptr animatable){
+	mAnimatables.remove(animatable);
 
 	extentsChanged();
 }

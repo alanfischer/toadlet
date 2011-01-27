@@ -60,7 +60,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 ///  loading, but would require some allocations.  Perhaps the key is to put the conversion into
 ///  BackableTexture, so when setting the back, it will create, then check the format to see if it needs to
 ///  convert!  That should be pretty easy to, and keep all that possibly time consuming stuff in BackableTexture where it belongs.
-closestFormat=Image::Format_RGBA_8;
+//closestFormat=Image::Format_RGBA_8;
 
 	// Check if the renderer supports npot textures
 	bool hasNonPowerOf2=renderer==NULL?false:renderer->getCapabilitySet().textureNonPowerOf2;
@@ -72,7 +72,7 @@ closestFormat=Image::Format_RGBA_8;
 //#error If the BackableTexture is loading the data, it doesn't have the ability to convert formats, and generate mipMaps like we do here.
 //#error  We really need to somehow tie the BackableTexture loading in with this conversion.
 //#error  Perhaps we can move the convert/mip functions out, and then when setting the backing texture, just grab the previous data from the back and run it through those functions
-if(mipLevels==0){mipLevels=1;}
+//if(mipLevels==0){mipLevels=1;}
 
 	Image::ptr finalImage=image;
 	if((hasAutogen==false || hasNonPowerOf2==false) && (Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || (dimension!=Image::Dimension_CUBE && Math::isPowerOf2(depth)==false))){
