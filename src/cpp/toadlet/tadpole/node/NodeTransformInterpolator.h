@@ -26,14 +26,14 @@
 #ifndef TOADLET_TADPOLE_NODE_NODETRANSLATIONINTERPOLATOR_H
 #define TOADLET_TADPOLE_NODE_NODETRANSLATIONINTERPOLATOR_H
 
-#include <toadlet/egg/Logger.h>
-#include <toadlet/tadpole/node/NodeInterpolator.h>
+#include <toadlet/tadpole/node/NodeListener.h>
+#include <toadlet/tadpole/Scene.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class TOADLET_API NodeTransformInterpolator:public NodeInterpolator{
+class TOADLET_API NodeTransformInterpolator:public NodeListener{
 public:
 	TOADLET_SHARED_POINTERS(NodeTransformInterpolator);
 
@@ -47,6 +47,8 @@ public:
 		mLastTransform=Transform::ptr(new Transform());
 		mLerpedTransform=Transform::ptr(new Transform());
 	}
+
+	virtual void nodeDestroyed(Node *node){}
 
 	virtual void transformUpdated(Node *node,int tu){
 		if((~mForceInterpolate&tu&Node::TransformUpdate_BIT_TRANSLATE)>0){
@@ -66,7 +68,7 @@ public:
 		}
 	}
 
-	virtual void logicUpdate(Node *node,int dt){
+	virtual void logicUpdated(Node *node,int dt){
 		mLastTransform->set(mTransform);
 
 		mTransform->setTranslate(node->getTranslate());
@@ -74,7 +76,9 @@ public:
 		mTransform->setScale(node->getScale());
 	}
 
-	virtual void interpolate(Node *node,scalar value){
+	virtual void frameUpdated(Node *node,int dt){
+		scalar value=node->getScene()->getLogicFraction();
+
 		if((mInterpolate&Node::TransformUpdate_BIT_TRANSLATE)>0){
 			Math::lerp(mTranslateLerp,mLastTransform->getTranslate(),mTransform->getTranslate(),value);
 			mLerpedTransform->setTranslate(mTranslateLerp);

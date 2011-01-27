@@ -29,7 +29,6 @@
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
-using namespace toadlet::tadpole::mesh;
 
 namespace toadlet{
 namespace tadpole{
@@ -39,7 +38,7 @@ XANMHandler::XANMHandler(){
 }
 
 Resource::ptr XANMHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
-	Sequence::ptr sequence=NULL;
+	TransformSequence::ptr sequence=NULL;
 
 	/// @todo: Replace the following when mxml implements custom load/save callbacks
 	char buffer[1025];
@@ -78,7 +77,7 @@ Resource::ptr XANMHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 	return sequence;
 }
 
-bool XANMHandler::save(Sequence::ptr sequence,Stream::ptr stream){
+bool XANMHandler::save(TransformSequence::ptr sequence,Stream::ptr stream){
 	mxml_node_t *root=mxmlNewElement(MXML_NO_PARENT,"XANM");
 
 	int version=XMLMeshUtilities::version;
@@ -106,8 +105,8 @@ bool XANMHandler::save(Sequence::ptr sequence,Stream::ptr stream){
 	return true;
 }
 
-Sequence::ptr XANMHandler::loadSequenceVersion1(mxml_node_t *root){
-	Sequence::ptr sequence=NULL;
+TransformSequence::ptr XANMHandler::loadSequenceVersion1(mxml_node_t *root){
+	TransformSequence::ptr sequence=NULL;
 
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
@@ -119,8 +118,8 @@ Sequence::ptr XANMHandler::loadSequenceVersion1(mxml_node_t *root){
 	return sequence;
 }
 
-Sequence::ptr XANMHandler::loadSequenceVersion2Up(mxml_node_t *root,int version){
-	Sequence::ptr sequence=NULL;
+TransformSequence::ptr XANMHandler::loadSequenceVersion2Up(mxml_node_t *root,int version){
+	TransformSequence::ptr sequence=NULL;
 
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
@@ -132,7 +131,7 @@ Sequence::ptr XANMHandler::loadSequenceVersion2Up(mxml_node_t *root,int version)
 	return sequence;
 }
 
-bool XANMHandler::saveSequenceVersion1(mxml_node_t *root,Sequence::ptr sequence){
+bool XANMHandler::saveSequenceVersion1(mxml_node_t *root,TransformSequence::ptr sequence){
 	if(sequence!=NULL){
 		mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,1);
 		mxmlSetElement(node,"AnimationData");
@@ -142,7 +141,7 @@ bool XANMHandler::saveSequenceVersion1(mxml_node_t *root,Sequence::ptr sequence)
 	return true;
 }
 
-bool XANMHandler::saveSequenceVersion2Up(mxml_node_t *root,Sequence::ptr sequence,int version){
+bool XANMHandler::saveSequenceVersion2Up(mxml_node_t *root,TransformSequence::ptr sequence,int version){
 	if(sequence!=NULL){
 		mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,version);
 		mxmlSetElement(node,"Sequence");

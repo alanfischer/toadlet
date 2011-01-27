@@ -23,54 +23,46 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_MESH_SKELETON_H
-#define TOADLET_TADPOLE_MESH_SKELETON_H
+#include <toadlet/tadpole/TransformSequence.h>
 
-#include <toadlet/egg/BaseResource.h>
-#include <toadlet/tadpole/mesh/Sequence.h>
+using namespace toadlet::egg;
 
 namespace toadlet{
 namespace tadpole{
-namespace mesh{
 
-class TOADLET_API Skeleton:public egg::BaseResource{
-public:
-	TOADLET_SHARED_POINTERS(Skeleton);
+TransformSequence::TransformSequence():
+	length(0),
+	hasScale(false)
+{
+}
 
-	class TOADLET_API Bone{
-	public:
-		TOADLET_SHARED_POINTERS(Bone);
+TransformSequence::~TransformSequence(){
+	destroy();
+}
 
-		Bone():
-			index(-1),
-			parentIndex(-1),
-			scale(Math::ONE,Math::ONE,Math::ONE){}
+void TransformSequence::destroy(){
+}
 
-		int index;
-		int parentIndex;
+void TransformSequence::compile(){
+	int i,j;
 
-		Vector3 translate;
-		Quaternion rotate;
-		Vector3 scale; /// @todo: Implement bone scaling
+	hasScale=false;
+	length=0;
+	for(i=0;i<tracks.size();++i){
+		TransformTrack *track=tracks[i];
 
-		Vector3 worldToBoneTranslate;
-		Quaternion worldToBoneRotate;
+		track->compile();
 
-		egg::String name;
-	};
+		if(length<track->length){
+			length=track->length;
+		}
 
-	Skeleton();
-	virtual ~Skeleton();
-
-	void destroy();
-	void compile();
-
-	egg::Collection<Bone::ptr> bones;
-	egg::Collection<Sequence::ptr> sequences;
-};
+		for(j=0;j<track->keyFrames.size();++j){
+			const Vector3 &scale=track->keyFrames[j].scale;
+			hasScale|=(scale.x!=Math::ONE || scale.y!=Math::ONE || scale.z!=Math::ONE);
+		}
+	}
+}
 
 }
 }
-}
-
-#endif

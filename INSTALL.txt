@@ -167,6 +167,10 @@ architectures as such:
 
    Valid options for architectures are: i386, ppc, x86_64, ppc64
 
+   If you encounter link issues with regards to the dependencies mxml or glew,
+use the included CMakeLists.txt files in cmake/Dependencies to build these projects using Xcode,
+again specifying all the architectures you wish to use.
+
 3.5.1 OSX Dependencies
    To build GLEW as a universal binary, you must edit glew/config/Makefile.darwin
 Change the CC and LD lines as follows:
