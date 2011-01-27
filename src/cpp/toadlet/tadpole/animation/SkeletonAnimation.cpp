@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/animation/SkeletonAnimation.h>
-#include <toadlet/tadpole/animation/AnimationController.h>
+#include <toadlet/tadpole/animation/Controller.h>
 #include <toadlet/tadpole/node/MeshNodeSkeleton.h>
 #include <toadlet/egg/Error.h>
 
@@ -75,7 +75,7 @@ scalar SkeletonAnimation::getMax() const{
 	}
 }
 
-void SkeletonAnimation::attached(AnimationController *controller){
+void SkeletonAnimation::attached(Controller *controller){
 	if(mController!=NULL){
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"cannot attach animation to more than one controller");
@@ -85,7 +85,7 @@ void SkeletonAnimation::attached(AnimationController *controller){
 	mController=controller;
 }
 
-void SkeletonAnimation::removed(AnimationController *controller){
+void SkeletonAnimation::removed(Controller *controller){
 	mController=NULL;
 }
 

@@ -32,7 +32,7 @@
 #include <toadlet/tadpole/ResourceHandler.h>
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/mesh/Mesh.h>
+#include <toadlet/tadpole/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -47,8 +47,8 @@ public:
 	egg::Resource::ptr load(egg::io::Stream::ptr in,const ResourceHandlerData *handlerData);
 
 protected:
-	mesh::Mesh::ptr loadMeshVersion3(egg::io::DataStream::ptr stream);
-	mesh::Mesh::ptr loadMeshVersion4Up(egg::io::DataStream::ptr stream,int version);
+	Mesh::ptr loadMeshVersion3(egg::io::DataStream::ptr stream);
+	Mesh::ptr loadMeshVersion4Up(egg::io::DataStream::ptr stream,int version);
 	bool saveMeshVersion4Up(egg::io::DataStream::ptr stream,int version);
 
 	// Blocks for the mmsh format

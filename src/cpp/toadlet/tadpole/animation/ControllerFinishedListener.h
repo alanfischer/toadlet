@@ -23,29 +23,34 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_MESH_SEQUENCE_H
-#define TOADLET_TADPOLE_MESH_SEQUENCE_H
+#ifndef TOADLET_TADPOLE_ANIMATION_CONTROLLERFINISHEDLISTENER_H
+#define TOADLET_TADPOLE_ANIMATION_CONTROLLERFINISHEDLISTENER_H
 
-#include <toadlet/egg/BaseResource.h>
-#include <toadlet/tadpole/Track.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace mesh{
+namespace animation{
 
-class TOADLET_API Sequence:public egg::BaseResource{
+class Controller;
+
+class ControllerFinishedListener{
 public:
-	TOADLET_SHARED_POINTERS(Sequence);
+	virtual ~ControllerFinishedListener(){}
 
-	Sequence();
-	virtual ~Sequence();
+	virtual void controllerFinished(Controller *controller)=0;
+};
 
-	void destroy();
-	void compile();
+template<class Type>
+class ControllerFinishedFunctor:public ControllerFinishedListener{
+public:
+	ControllerFinishedFunctor(Type *obj,void (Type::*func)(void)):mObject(obj),mFunction(func){}
 
-	egg::Collection<Track::ptr> tracks;
-	bool hasScale; // calculated by compile
-	scalar length; // calculated by compile
+	virtual void controllerFinished(Controller *controller){(mObject->*mFunction)();}
+
+protected:
+	Type *mObject;
+	void (Type::*mFunction)(void);
 };
 
 }

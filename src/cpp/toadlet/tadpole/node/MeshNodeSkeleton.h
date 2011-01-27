@@ -29,7 +29,7 @@
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/Renderable.h>
-#include <toadlet/tadpole/mesh/Skeleton.h>
+#include <toadlet/tadpole/Skeleton.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -100,7 +100,7 @@ public:
 		bool useMatrixTransforms;
 	};
 
-	MeshNodeSkeleton(MeshNode *node,mesh::Skeleton::ptr skeleton);
+	MeshNodeSkeleton(MeshNode *node,Skeleton::ptr skeleton);
 
 	void updateBones();
 	void updateBones(int sequenceIndex,scalar sequenceTime);
@@ -113,7 +113,7 @@ public:
 	egg::String getBoneName(int index) const;
 	egg::String getBoneName(Bone *bone) const;
 
-	inline mesh::Skeleton::ptr getSkeleton() const{return mSkeleton;}
+	inline Skeleton::ptr getSkeleton() const{return mSkeleton;}
 
 	void setRenderable(bool renderable);
 	void updateVertexData();
@@ -128,11 +128,11 @@ protected:
 	void updateBone(Bone *bone);
 
 	MeshNode *mNode;
-	mesh::Skeleton::ptr mSkeleton;
+	Skeleton::ptr mSkeleton;
 	egg::Collection<Bone::ptr> mBones;
 	int mLastUpdateFrame;
 
-	mesh::Sequence::ptr mSequence;
+	TransformSequence::ptr mSequence;
 	scalar mSequenceTime;
 	egg::Collection<int> mTrackHints;
 

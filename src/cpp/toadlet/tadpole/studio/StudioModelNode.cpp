@@ -28,6 +28,7 @@
 #include <toadlet/tadpole/RenderQueue.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/studio/StudioModelNode.h>
+#include <toadlet/tadpole/studio/StudioModelController.h>
 #include <toadlet/tadpole/studio/StudioHandler.h>
 #include <string.h> // memset
 
@@ -71,7 +72,9 @@ StudioModelNode::StudioModelNode():super(),
 	mModelIndex(0),
 	mSkinIndex(0),
 	mSequenceIndex(0),
-	mSequenceTime(0)
+	mSequenceTime(0),
+	mGaitSequenceIndex(0),
+	mGaitSequenceTime(0)
 	//mControllerValues[4],mAdjustedControllerValues[4],
 	//mBlenderValues[4],mAdjustedBlenderValues[4],
 	//mLink,
@@ -169,6 +172,36 @@ void StudioModelNode::setModel(StudioModel::ptr model){
 	updateSkeleton();
 }
 
+void StudioModelNode::setSequence(int sequence){
+	if(sequence<0 || sequence>=mModel->header->numseq){
+		sequence=0;
+	}
+
+	mSequenceIndex=sequence;
+
+	// Update Blender on sequence change
+	int i;
+	for(i=0;i<4;++i){
+		setBlender(i,mBlenderValues[i]);
+	}
+}
+
+void StudioModelNode::setSequenceTime(scalar time){
+	mSequenceTime=time;
+}
+
+void StudioModelNode::setGaitSequence(int sequence){
+	if(sequence<0 || sequence>=mModel->header->numseq){
+		sequence=0;
+	}
+
+	mGaitSequenceIndex=sequence;
+}
+
+void StudioModelNode::setGaitSequenceTime(scalar time){
+	mGaitSequenceTime=time;
+}
+
 void StudioModelNode::setRenderSkeleton(bool skeleton){
 	if(skeleton){
 		if(mSkeletonMaterial==NULL){
@@ -189,24 +222,6 @@ void StudioModelNode::setRenderSkeleton(bool skeleton){
 	if(mSkeletonMaterial!=NULL){
 		createSkeletonBuffers();
 	}
-}
-
-void StudioModelNode::setSequence(int sequence){
-	if(sequence<0 || sequence>=mModel->header->numseq){
-		sequence=0;
-	}
-
-	mSequenceIndex=sequence;
-
-	// Update Blender on sequence change
-	int i;
-	for(i=0;i<4;++i){
-		setBlender(i,mBlenderValues[i]);
-	}
-}
-
-void StudioModelNode::setSequenceTime(scalar time){
-	mSequenceTime=time;
 }
 
 void StudioModelNode::setController(int controller,scalar v){
@@ -264,6 +279,28 @@ void StudioModelNode::setBlender(int blender,scalar v){
 	mAdjustedBlenderValues[blender]=v;
 }
 
+void StudioModelNode::setBodypart(int part){
+	mBodypartIndex=part;
+
+	createSubModels();
+}
+
+void StudioModelNode::setBodypartModel(int model){
+	mModelIndex=model;
+
+	createSubModels();
+}
+
+void StudioModelNode::setSkin(int skin){
+	if(skin<0 || skin>=mModel->header->numskinfamilies){
+		skin=0;
+	}
+
+	mSkinIndex=skin;
+
+	createSubModels();
+}
+
 void StudioModelNode::setLink(StudioModelNode::ptr link){
 	mLink=link;
 
@@ -293,26 +330,20 @@ void StudioModelNode::setLink(StudioModelNode::ptr link){
 	}
 }
 
-void StudioModelNode::setBodypart(int part){
-	mBodypartIndex=part;
-
-	createSubModels();
-}
-
-void StudioModelNode::setBodypartModel(int model){
-	mModelIndex=model;
-
-	createSubModels();
-}
-
-void StudioModelNode::setSkin(int skin){
-	if(skin<0 || skin>=mModel->header->numskinfamilies){
-		skin=0;
+StudioModelController::ptr StudioModelNode::getController(){
+	if(mController==NULL){
+		mController=StudioModelController::ptr(new StudioModelController(this,false));
+		addController(mController);
 	}
+	return mController;
+}
 
-	mSkinIndex=skin;
-
-	createSubModels();
+StudioModelController::ptr StudioModelNode::getGaitController(){
+	if(mGaitController==NULL){
+		mGaitController=StudioModelController::ptr(new StudioModelController(this,true));
+		addController(mGaitController);
+	}
+	return mGaitController;
 }
 
 void StudioModelNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
@@ -528,16 +559,16 @@ void StudioModelNode::updateSkeleton(){
 		setLink(mLink);
 	}
 
-	studioseqdesc *sseqdesc=mModel->seqdesc(mSequenceIndex);
+	/// @todo: Move these to member variables?
+	static Collection<Vector3> boneTranslates(mModel->header->numbones);
+	static Collection<Quaternion> boneRotates(mModel->header->numbones);
 
+	studioseqdesc *sseqdesc=mModel->seqdesc(mSequenceIndex);
 	studioanim *sanim=mModel->anim(sseqdesc);
 	findBoneTransforms(mBoneTranslates,mBoneRotates,mModel,sseqdesc,sanim,mSequenceTime);
 
 	if(sseqdesc->numblends>1){
 		sanim+=mModel->header->numbones;
-
-		Collection<Vector3> boneTranslates(mModel->header->numbones);
-		Collection<Quaternion> boneRotates(mModel->header->numbones);
 
 		findBoneTransforms(boneTranslates,boneRotates,mModel,sseqdesc,sanim,mSequenceTime);
 
@@ -545,6 +576,19 @@ void StudioModelNode::updateSkeleton(){
 			Quaternion r;
 			Math::slerp(r,mBoneRotates[i],boneRotates[i],mAdjustedBlenderValues[0]);
 			mBoneRotates[i]=r;
+		}
+	}
+
+	if(mGaitSequenceIndex>0){
+		sseqdesc=mModel->seqdesc(mGaitSequenceIndex);
+		sanim=mModel->anim(sseqdesc);
+
+		findBoneTransforms(boneTranslates,boneRotates,mModel,sseqdesc,sanim,mGaitSequenceTime);
+
+		for(i=0;i<mModel->header->numbones;++i){
+			if(strcmp(mModel->bone(i)->name,"Bip01 Spine")==0) break;
+			mBoneTranslates[i].set(boneTranslates[i]);
+			mBoneRotates[i].set(boneRotates[i]);
 		}
 	}
 

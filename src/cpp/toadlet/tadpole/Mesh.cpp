@@ -25,14 +25,13 @@
 
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
-#include <toadlet/tadpole/mesh/Mesh.h>
+#include <toadlet/tadpole/Mesh.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
 
 namespace toadlet{
 namespace tadpole{
-namespace mesh{
 
 Sphere Mesh::Bound_AUTOCALCULATE(-2);
 
@@ -93,6 +92,5 @@ void Mesh::compile(){
 	}
 */}
 
-}
 }
 }

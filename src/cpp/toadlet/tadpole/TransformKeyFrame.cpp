@@ -23,33 +23,21 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_TRACK_H
-#define TOADLET_TADPOLE_TRACK_H
+#include <toadlet/tadpole/TransformKeyFrame.h>
+#include <toadlet/tadpole/node/Node.h>
+#include <toadlet/tadpole/node/ParentNode.h>
 
-#include <toadlet/egg/WeakPointer.h>
-#include <toadlet/egg/Collection.h>
-#include <toadlet/tadpole/KeyFrame.h>
+using namespace toadlet::tadpole::node;
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API Track{
-public:
-	TOADLET_SHARED_POINTERS(Track);
-
-	Track();
-
-	scalar getKeyFramesAtTime(scalar time,const KeyFrame *&f1,const KeyFrame *&f2,int &trackHint) const;
-
-	void compile();
-
-	int index;
-	scalar length; // calculated by compile
-	egg::Collection<KeyFrame> keyFrames;
-};
+TransformKeyFrame::TransformKeyFrame(scalar time1,const Vector3 &translate1,const Quaternion &rotate1,const Vector3 &scale1):
+	time(time1),
+	translate(translate1),
+	rotate(rotate1),
+	scale(scale1){}
 
 }
 }
-
-#endif
 

@@ -10,22 +10,25 @@ set (TADPOLE_SRC
 	Engine.cpp
 	Font.cpp
 	FontManager.cpp
-	KeyFrame.cpp
 	Material.cpp
 	MaterialManager.cpp
 	MathFormatter.cpp
+	Mesh.cpp
 	MeshManager.cpp
 	Noise.cpp
 	RenderQueue.cpp
 	ResourceManager.cpp
 	Scene.cpp
-	Track.cpp
+	Skeleton.cpp
+	TransformKeyFrame.cpp
+	TransformSequence.cpp
+	TransformTrack.cpp
 	TextureManager.cpp
 	Version.cpp
 )
 
 set (TADPOLE_ANIMATION_SRC
-	animation/AnimationController.cpp
+	animation/Controller.cpp
 	animation/CameraProjectionAnimation.cpp
 	animation/NodePathAnimation.cpp
 	animation/SkeletonAnimation.cpp
@@ -67,15 +70,8 @@ set (TADPOLE_HANDLER_PLATFORM_WIN32_GDIPLUS_SRC
 	handler/platform/win32/Win32TextureHandler.cpp
 )
 
-set (TADPOLE_MESH_SRC
-	mesh/Mesh.cpp
-	mesh/Sequence.cpp
-	mesh/Skeleton.cpp
-)
-
 set (TADPOLE_NODE_SRC
 	node/AnaglyphCameraNode.cpp
-	node/AnimationControllerNode.cpp
 	node/AudioNode.cpp
 	node/CameraNode.cpp
 	node/CameraAlignedNode.cpp
@@ -122,10 +118,10 @@ set (TADPOLE_HEADERS
 	Font.h
 	FontData.h
 	FontManager.h
-	KeyFrame.h
 	Material.h
 	MaterialManager.h
 	MathFormatter.h
+	Mesh.h
 	MeshManager.h
 	Noise.h
 	Renderable.h
@@ -133,10 +129,13 @@ set (TADPOLE_HEADERS
 	ResourceHandlerData.h
 	ResourceManager.h
 	Scene.h
+	Skeleton.h
 	TextureManager.h
 	Traceable.h
-	Track.h
 	Transform.h
+	TransformKeyFrame.h
+	TransformSequence.h
+	TransformTrack.h
 	Types.h
 	UpdateListener.h
 	VertexFormats.h
@@ -144,9 +143,9 @@ set (TADPOLE_HEADERS
 )
 
 set (TADPOLE_ANIMATION_HEADERS
-	animation/Animation.h
-	animation/AnimationController.h
-	animation/AnimationControllerFinishedListener.h
+	animation/Animatable.h
+	animation/Controller.h
+	animation/ControllerFinishedListener.h
 	animation/CameraProjectionAnimation.h
 	animation/NodePathAnimation.h
 	animation/SkeletonAnimation.h
@@ -201,15 +200,8 @@ set (TADPOLE_HANDLER_PLATFORM_WIN32_GDIPLUS_HEADERS
 	handler/platform/win32/Win32TextureHandler.h
 )
 
-set (TADPOLE_MESH_HEADERS
-	mesh/Mesh.h
-	mesh/Sequence.h
-	mesh/Skeleton.h
-)
-
 set (TADPOLE_NODE_HEADERS
 	node/AnaglyphCameraNode.h
-	node/AnimationControllerNode.h
 	node/AudioNode.h
 	node/CameraNode.h
 	node/CameraAlignedNode.h
@@ -269,8 +261,8 @@ source_group ("Header Files\\\\terrain" FILES ${TADPOLE_TERRAIN_HEADERS})
 
 
 # Source and headers
-set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MESH_SRC} ${TADPOLE_NODE_SRC} ${TADPOLE_SENSOR_SRC} ${TADPOLE_TERRAIN_SRC})
-set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_MESH_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_SENSOR_HEADERS} ${TADPOLE_TERRAIN_HEADERS})
+set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_NODE_SRC} ${TADPOLE_SENSOR_SRC} ${TADPOLE_TERRAIN_SRC})
+set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_SENSOR_HEADERS} ${TADPOLE_TERRAIN_HEADERS})
 
 
 if (NOT TOADLET_FIXED_POINT)

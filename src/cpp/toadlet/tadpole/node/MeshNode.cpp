@@ -35,7 +35,6 @@
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole::animation;
-using namespace toadlet::tadpole::mesh;
 
 namespace toadlet{
 namespace tadpole{
@@ -52,10 +51,9 @@ void MeshNode::SubMesh::render(Renderer *renderer) const{
 	renderer->renderPrimitive(vertexData,indexData);
 }
 
-MeshNode::MeshAnimationController::MeshAnimationController(MeshNode *node):AnimationController(),
-	mMeshNode(NULL),
-	//mAnimation,
-	mStartingFrame(0)
+MeshNode::MeshController::MeshController(MeshNode *node):Controller(),
+	mMeshNode(NULL)
+	//mAnimation
 {
 	mMeshNode=node;
 	mAnimation=SkeletonAnimation::ptr(new SkeletonAnimation());
@@ -63,44 +61,7 @@ MeshNode::MeshAnimationController::MeshAnimationController(MeshNode *node):Anima
 	attach(mAnimation);
 }
 
-void MeshNode::MeshAnimationController::setSequenceIndex(int index){
-	mAnimation->setSequenceIndex(index);
-}
-
-int MeshNode::MeshAnimationController::getSequenceIndex() const{
-	return mAnimation->getSequenceIndex();
-}
-
-void MeshNode::MeshAnimationController::start(){
-	if(isRunning()){
-		stop();
-	}
-
-	mMeshNode->setStayActive(true);
-
-	AnimationController::start();
-	if(mMeshNode->getScene()!=NULL){
-		mStartingFrame=mMeshNode->getScene()->getLogicFrame();
-	}
-}
-
-void MeshNode::MeshAnimationController::stop(){
-	if(isRunning()==false){
-		return;
-	}
-
-	mMeshNode->setStayActive(false);
-
-	AnimationController::stop();
-}	
-
-void MeshNode::MeshAnimationController::update(int dt){
-	if(mStartingFrame!=mMeshNode->getScene()->getLogicFrame()){
-		AnimationController::update(dt);
-	}
-}
-
-void MeshNode::MeshAnimationController::skeletonChanged(){
+void MeshNode::MeshController::skeletonChanged(){
 	mAnimation->setTarget(mMeshNode->getSkeleton());
 }
 
@@ -110,7 +71,7 @@ MeshNode::MeshNode():super()
 	//mSkeleton,
 	//mDynamicVertexData,
 
-	//mAnimationController
+	//mController
 {
 }
 
@@ -123,7 +84,7 @@ Node *MeshNode::create(Scene *scene){
 	mSkeleton=NULL;
 	mDynamicVertexData=NULL;
 
-	mAnimationController=NULL;
+	mController=NULL;
 
 	return this;
 }
@@ -131,9 +92,10 @@ Node *MeshNode::create(Scene *scene){
 void MeshNode::destroy(){
 	mSubMeshes.clear();
 
-	if(mAnimationController!=NULL){
-		mAnimationController->stop();
-		mAnimationController=NULL;
+	if(mController!=NULL){
+		mController->stop();
+		removeController(mController);
+		mController=NULL;
 	}
 
 	if(mDynamicVertexData!=NULL){
@@ -156,9 +118,10 @@ void MeshNode::setMesh(const String &name){
 void MeshNode::setMesh(Mesh::ptr mesh){
 	mSubMeshes.clear();
 
-	if(mAnimationController!=NULL){
-		mAnimationController->stop();
-		mAnimationController=NULL;
+	if(mController!=NULL){
+		mController->stop();
+		removeController(mController);
+		mController=NULL;
 	}
 
 	if(mDynamicVertexData!=NULL){
@@ -233,25 +196,22 @@ MeshNode::SubMesh *MeshNode::getSubMesh(const String &name){
 void MeshNode::setSkeleton(MeshNodeSkeleton::ptr skeleton){
 	mSkeleton=skeleton;
 
-	if(mAnimationController!=NULL){
-		mAnimationController->skeletonChanged();
+	if(mController!=NULL){
+		mController->skeletonChanged();
 	}
 }
 
-MeshNode::MeshAnimationController::ptr MeshNode::getAnimationController(){
-	if(mAnimationController==NULL){
-		mAnimationController=MeshAnimationController::ptr(new MeshAnimationController(this));
+MeshNode::MeshController::ptr MeshNode::getController(){
+	if(mController==NULL){
+		mController=MeshController::ptr(new MeshController(this));
+		addController(mController);
 	}
 
-	return mAnimationController;
+	return mController;
 }
 
 void MeshNode::frameUpdate(int dt,int scope){
 	super::frameUpdate(dt,scope);
-
-	if(mAnimationController!=NULL){
-		mAnimationController->update(dt);
-	}
 
 	if(mSkeleton!=NULL){
 		int lastUpdateFrame=mSkeleton->getLastUpdateFrame();

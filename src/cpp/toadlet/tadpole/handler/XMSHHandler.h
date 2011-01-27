@@ -29,7 +29,7 @@
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/MaterialManager.h>
 #include <toadlet/tadpole/TextureManager.h>
-#include <toadlet/tadpole/mesh/Mesh.h>
+#include <toadlet/tadpole/Mesh.h>
 
 typedef struct mxml_node_s mxml_node_t;
 
@@ -45,13 +45,13 @@ public:
 
 	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
 
-	bool save(mesh::Mesh::ptr resource,egg::io::Stream::ptr stream);
+	bool save(Mesh::ptr resource,egg::io::Stream::ptr stream);
 
 protected:
-	mesh::Mesh::ptr loadMeshVersion1(mxml_node_t *root);
-	mesh::Mesh::ptr loadMeshVersion2Up(mxml_node_t *root,int version);
-	bool saveMeshVersion1(mxml_node_t *root,mesh::Mesh::ptr mesh);
-	bool saveMeshVersion2Up(mxml_node_t *root,mesh::Mesh::ptr mesh,int version);
+	Mesh::ptr loadMeshVersion1(mxml_node_t *root);
+	Mesh::ptr loadMeshVersion2Up(mxml_node_t *root,int version);
+	bool saveMeshVersion1(mxml_node_t *root,Mesh::ptr mesh);
+	bool saveMeshVersion2Up(mxml_node_t *root,Mesh::ptr mesh,int version);
 
 	BufferManager *mBufferManager;
 	MaterialManager *mMaterialManager;

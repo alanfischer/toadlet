@@ -31,6 +31,7 @@
 #include <toadlet/tadpole/node/ParentNode.h>
 
 using namespace toadlet::egg;
+using namespace toadlet::tadpole::animation;
 
 namespace toadlet{
 namespace tadpole{
@@ -49,6 +50,7 @@ Node::Node():
 	mUniqueHandle(0),
 
 	//mNodeListeners,
+	//mControllers,
 
 	//mParent,
 	mParentData(NULL),
@@ -101,6 +103,7 @@ Node *Node::create(Scene *scene){
 	mUniqueHandle=mScene->nodeCreated(this);
 
 	mNodeListeners=NULL;
+	mControllers=NULL;
 
 	mParent=NULL;
 	mParentData=NULL;
@@ -146,6 +149,8 @@ void Node::destroy(){
 		mNodeListeners=NULL;
 	}
 
+	mControllers=NULL;
+
 	mScene->nodeDestroyed(this);
 
 	mEngine->freeNode(this);
@@ -166,6 +171,22 @@ void Node::removeNodeListener(NodeListener::ptr listener){
 		mNodeListeners->remove(listener);
 		if(mNodeListeners->size()==0){
 			mNodeListeners=NULL;
+		}
+	}
+}
+
+void Node::addController(Controller::ptr controller){
+	if(mControllers==NULL){
+		mControllers=Collection<Controller::ptr>::ptr(new egg::Collection<Controller::ptr>());
+	}
+	mControllers->add(controller);
+}
+
+void Node::removeController(Controller::ptr controller){
+	if(mControllers!=NULL){
+		mControllers->remove(controller);
+		if(mControllers->size()==0){
+			mControllers=NULL;
 		}
 	}
 }
@@ -271,7 +292,7 @@ void Node::deactivate(){
 }
 
 void Node::tryDeactivate(){
-	if(mDeactivateCount>=0 && mNodeListeners==NULL){
+	if(mDeactivateCount>=0 && mNodeListeners==NULL && mControllers==NULL){
 		mDeactivateCount++;
 		if(mDeactivateCount>4){
 			deactivate();
@@ -298,13 +319,24 @@ void Node::updateWorldTransform(){
 void Node::transformUpdated(int tu){
 	mTransformUpdatedFrame=mScene->getFrame();
 	activate();
+
+	transformUpdateListeners(tu);
+}
+
+void Node::transformUpdateListeners(int tu){
+	if(mNodeListeners!=NULL){
+		int i;
+		for(i=0;i<mNodeListeners->size();++i){
+			mNodeListeners->at(i)->transformUpdated(this,tu);
+		}
+	}
 }
 
 void Node::logicUpdateListeners(int dt){
 	if(mNodeListeners!=NULL){
 		int i;
 		for(i=0;i<mNodeListeners->size();++i){
-			mNodeListeners->at(i)->logicUpdate(this,dt);
+			mNodeListeners->at(i)->logicUpdated(this,dt);
 		}
 	}
 }
@@ -313,7 +345,14 @@ void Node::frameUpdateListeners(int dt){
 	if(mNodeListeners!=NULL){
 		int i;
 		for(i=0;i<mNodeListeners->size();++i){
-			mNodeListeners->at(i)->frameUpdate(this,dt);
+			mNodeListeners->at(i)->frameUpdated(this,dt);
+		}
+	}
+
+	if(mControllers!=NULL){
+		int i;
+		for(i=0;i<mControllers->size();++i){
+			mControllers->at(i)->update(dt);
 		}
 	}
 }

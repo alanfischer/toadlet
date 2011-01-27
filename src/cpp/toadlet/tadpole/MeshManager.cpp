@@ -29,7 +29,6 @@
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
 using namespace toadlet::peeper;
-using namespace toadlet::tadpole::mesh;
 
 namespace toadlet{
 namespace tadpole{

@@ -30,10 +30,10 @@
 #include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/peeper/TextureStage.h>
 #include <toadlet/tadpole/Collision.h>
-#include <toadlet/tadpole/UpdateListener.h>
+#include <toadlet/tadpole/Mesh.h>
 #include <toadlet/tadpole/RenderQueue.h>
+#include <toadlet/tadpole/UpdateListener.h>
 #include <toadlet/tadpole/node/PartitionNode.h>
-#include <toadlet/tadpole/mesh/Mesh.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -129,7 +129,7 @@ protected:
 	Material *mPreviousMaterial;
 	int mCountLastRendered;
 
-	mesh::Mesh::ptr mBoundMesh;
+	Mesh::ptr mBoundMesh;
 
 	peeper::Viewport cache_render_viewport;
 };
