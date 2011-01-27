@@ -39,7 +39,7 @@ public class MeshSkeleton implements Resource{
 
 		public Vector3 translate=new Vector3();
 		public Quaternion rotate=new Quaternion();
-		public Vector3 scale=new Vector3(Math.ONE,Math.ONE,Math.ONE); // TODO: Implement bone scaling
+		public Vector3 scale=new Vector3(Math.ONE,Math.ONE,Math.ONE); /// @todo: Implement bone scaling
 
 		public Vector3 worldToBoneTranslate=new Vector3();
 		public Quaternion worldToBoneRotate=new Quaternion();

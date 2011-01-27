@@ -81,14 +81,14 @@ public class RenderTexture extends Texture implements RenderTarget{
 	public boolean hasDepthBuffer(){return true;}
 
 	public void internal_setTexturePeer(Texture.Peer texturePeer){
-		// TODO
+		/// @todo
 	}
 
 	public RenderTarget.Peer internal_getRenderTargetPeer(){
-		// TODO
+		/// @todo
 		return null;
 	}
 	public void internal_setRenderTargetPeer(RenderTarget.Peer renderTargetPeer){
-		// TODO
+		/// @todo
 	}
 }

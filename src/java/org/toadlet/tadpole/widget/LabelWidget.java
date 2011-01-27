@@ -195,7 +195,7 @@ public class LabelWidget extends RenderableWidget{
 			VertexBuffer vertexBuffer=mEngine.loadVertexBuffer(new VertexBuffer(Buffer.UsageType.DYNAMIC,Buffer.AccessType.WRITE_ONLY,mEngine.getVertexFormats().POSITION_TEX_COORD,length*4));
 			// Any time our contents would be lost, should be followed up with a resize so they should get restored
 			// realistically I should be able to ensure this in Window somehow, but for now we'll just trust its the truth
-			// TODO: Why if I turn it off in BorderWidget does it not work?  Maybe i'm incorrect?
+			/// @todo: Why if I turn it off in BorderWidget does it not work?  Maybe i'm incorrect?
 			vertexBuffer.setRememberContents(false);
 			mVertexData=new VertexData(vertexBuffer);
 

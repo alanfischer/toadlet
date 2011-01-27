@@ -232,7 +232,7 @@ public class PeerEventSynchronizer{
 					}
 
 					// Package up and send pending event groups
-					mDataPacketOut.writeInt(frame-mFrameGroupSize+1); // TODO: extra, can be calculated & removed?
+					mDataPacketOut.writeInt(frame-mFrameGroupSize+1); /// @todo: extra, can be calculated & removed?
 					mDataPacketOut.writeByte(mFrameGroupSize);
 					for(j=0;j<mFrameGroupSize;++j){
 						events=mLocalEventGroups.get(frameAdvance-mFrameGroupSize+1+j);
@@ -252,7 +252,7 @@ public class PeerEventSynchronizer{
 							event.write(mDataPacketOut);
 						}
 					}
-					// TODO: Perhaps we could use a custom Stream class that allows the flexability we need to not reallocate bytes in toByteArray here
+					/// @todo: Perhaps we could use a custom Stream class that allows the flexability we need to not reallocate bytes in toByteArray here
 					byte[] packetOutBytes=mPacketOut.toByteArray();
 					amount=mConnection.send(packetOutBytes,0,packetOutBytes.length);
 

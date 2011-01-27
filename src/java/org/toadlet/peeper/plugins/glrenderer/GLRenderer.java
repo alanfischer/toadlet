@@ -657,7 +657,7 @@ public class GLRenderer implements Renderer{
 				break;
 			}
 
-			// TODO: Unify
+			/// @todo: Unify
 			GLBufferPeer indexBufferPeer=(GLBufferPeer)indexBuffer.internal_getBufferPeer();
 			if(indexBufferPeer==null){
 				if(mCapabilitySet.hardwareIndexBuffers){
@@ -729,7 +729,7 @@ public class GLRenderer implements Renderer{
 			}
 			#endif
 
-			// TODO: Change the texture loading to agree with this?
+			/// @todo: Change the texture loading to agree with this?
 			gl.glPixelStorei(GL_PACK_ALIGNMENT,1);
 			gl.glPixelStorei(GL_UNPACK_ALIGNMENT,1);
 		}
@@ -1673,7 +1673,7 @@ public class GLRenderer implements Renderer{
 			VertexBuffer vertexBuffer=vertexData.getVertexBuffer(i);
 			GLBufferPeer vertexBufferPeer=(GLBufferPeer)vertexBuffer.internal_getBufferPeer();
 
-			// TODO: Unify
+			/// @todo: Unify
 			java.nio.ByteBuffer basePointer=null;
 			if(vertexBufferPeer==null){
 				if(mCapabilitySet.hardwareVertexBuffers){

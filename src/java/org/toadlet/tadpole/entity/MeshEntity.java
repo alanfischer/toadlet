@@ -300,7 +300,7 @@ public class MeshEntity extends RenderableEntity{
 				// Basically, if you want to write any of it, you have to write it all.
 				// So we re-copy over all the data to start
 				// NOTE: Probably due to UT_WRITE_ONLY on creation, makes it mean if we lock it, we will rewrite all that data
-				// TODO: Research this more, and see if this is a known problem
+				/// @todo: Research this more, and see if this is a known problem
 				dvba.getData().put(svba.getData());
 				svba.getData().rewind();
 				dvba.getData().rewind();
@@ -312,7 +312,7 @@ public class MeshEntity extends RenderableEntity{
 				if(format.hasVertexElementOfType(VertexElement.Type.NORMAL)){
 					int normalElement=format.getVertexElementIndexOfType(VertexElement.Type.NORMAL);
 					for(i=0;i<srcVertexBuffer.getSize();++i){
-						MeshEntitySkeleton.Bone bone=mSkeleton.getBone(mMesh.vertexBoneAssignments[i][0].bone); // TODO: Implement all bones
+						MeshEntitySkeleton.Bone bone=mSkeleton.getBone(mMesh.vertexBoneAssignments[i][0].bone); /// @todo: Implement all bones
 
 						svba.get3(i,positionElement,vector);
 
@@ -330,7 +330,7 @@ public class MeshEntity extends RenderableEntity{
 				}
 				else{
 					for(i=0;i<srcVertexBuffer.getSize();++i){
-						MeshEntitySkeleton.Bone bone=mSkeleton.getBone(mMesh.vertexBoneAssignments[i][0].bone); // TODO: Implement all bones
+						MeshEntitySkeleton.Bone bone=mSkeleton.getBone(mMesh.vertexBoneAssignments[i][0].bone); /// @todo: Implement all bones
 
 						svba.get3(i,positionElement,vector);
 

@@ -31,7 +31,7 @@ import org.toadlet.egg.*;
 import org.toadlet.egg.Error;
 
 public final class VertexBufferAccessor{
-	// TODO: Move these to defines
+	/// @todo: Move these to defines
 	#if defined(TOADLET_FIXED_POINT)
 		protected static fixed toFixed(scalar s){return s;}
 		protected static float toFloat(scalar s){return org.toadlet.egg.mathfixed.Math.toFloat(s);}

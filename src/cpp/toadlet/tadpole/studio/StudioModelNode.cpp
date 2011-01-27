@@ -538,7 +538,7 @@ void StudioModelNode::findChrome(Vector2 &chrome,const Vector3 &normal,const Vec
 	Math::cross(chromeRight,temp,chromeUp);
 	Math::normalize(chromeRight);
 
-	// TODO: Rotate chrome vectors by bone transform
+	/// @todo: Rotate chrome vectors by bone transform
 
 	n=Math::dot(normal,chromeRight);
 	chrome.x=(n+1.0f)*32.0f;
