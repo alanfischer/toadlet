@@ -23,53 +23,25 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Error.h>
-#include <toadlet/tadpole/node/SkeletonParentNode.h>
+#ifndef TOADLET_TADPOLE_TRANSFORMKEYFRAME_H
+#define TOADLET_TADPOLE_TRANSFORMKEYFRAME_H
 
-using namespace toadlet::egg;
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
 
-TOADLET_NODE_IMPLEMENT(SkeletonParentNode,Categories::TOADLET_TADPOLE_NODE+".SkeletonParentNode");
+class TOADLET_API TransformKeyFrame{
+public:
+	TransformKeyFrame(scalar time1=0,const Vector3 &translate1=Math::ZERO_VECTOR3,const Quaternion &rotate1=Math::IDENTITY_QUATERNION,const Vector3 &scale1=Math::ONE_VECTOR3);
 
-SkeletonParentNode::SkeletonParentNode():super(){}
-
-void SkeletonParentNode::setSkeleton(MeshNodeSkeleton::ptr skeleton){
-	mSkeleton=skeleton;
-}
-
-bool SkeletonParentNode::attach(Node *node,int bone){
-	bool result=super::attach(node);
-	if(result){
-		mChildrenBones.add(bone);
-	}
-	return result;
-}
-
-bool SkeletonParentNode::remove(Node *node){
-	int i;
-	for(i=0;i<mChildren.size();++i){
-		if(mChildren[i]==node){
-			mChildrenBones.removeAt(i);
-			break;
-		}
-	}
-	return super::remove(node);
-}
-
-void SkeletonParentNode::frameUpdate(int dt){
-	int i;
-	for(i=0;i<mChildren.size();++i){
-		MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(mChildrenBones[i]);
-		mChildren[i]->setTranslate(bone->worldTranslate);
-		mChildren[i]->setRotate(bone->worldRotateMatrix);
-	}
-
-	super::frameUpdate(dt);
-}
+	scalar time;
+	Vector3 translate;
+	Quaternion rotate;
+	Vector3 scale;
+};
 
 }
 }
-}
+
+#endif

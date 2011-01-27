@@ -23,19 +23,19 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/Track.h>
+#include <toadlet/tadpole/TransformTrack.h>
 
 using namespace toadlet::egg;
 
 namespace toadlet{
 namespace tadpole{
 
-Track::Track():
+TransformTrack::TransformTrack():
 	index(0),
 	length(0)
 {}
 
-scalar Track::getKeyFramesAtTime(scalar time,const KeyFrame *&f1,const KeyFrame *&f2,int &trackHint) const{
+scalar TransformTrack::getKeyFramesAtTime(scalar time,const TransformKeyFrame *&f1,const TransformKeyFrame *&f2,int &trackHint) const{
 	int numKeyFrames=keyFrames.size();
 	if(numKeyFrames<2){
 		if(numKeyFrames==1){
@@ -94,7 +94,7 @@ scalar Track::getKeyFramesAtTime(scalar time,const KeyFrame *&f1,const KeyFrame 
 	return time;
 }
 
-void Track::compile(){
+void TransformTrack::compile(){
 	length=0;
 	int i;
 	for(i=0;i<keyFrames.size();++i){

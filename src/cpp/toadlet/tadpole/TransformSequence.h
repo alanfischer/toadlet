@@ -23,31 +23,30 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_ANIMATION_H
-#define TOADLET_TADPOLE_ANIMATION_ANIMATION_H
+#ifndef TOADLET_TADPOLE_TRANSFORMSEQUENCE_H
+#define TOADLET_TADPOLE_TRANSFORMSEQUENCE_H
 
-#include <toadlet/egg/WeakPointer.h>
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/egg/BaseResource.h>
+#include <toadlet/tadpole/TransformTrack.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace animation{
 
-class AnimationController;
-
-class Animation{
+class TOADLET_API TransformSequence:public egg::BaseResource{
 public:
-	TOADLET_SHARED_POINTERS(Animation);
+	TOADLET_SHARED_POINTERS(TransformSequence);
 
-	virtual ~Animation(){}
+	TransformSequence();
+	virtual ~TransformSequence();
 
-	virtual void set(scalar value)=0;
+	void destroy();
+	void compile();
 
-	virtual scalar getMin() const=0;
-	virtual scalar getMax() const=0;
+	egg::Collection<TransformTrack::ptr> tracks;
+	scalar length; // calculated by compile
+	bool hasScale; // calculated by compile
 };
 
-}
 }
 }
 

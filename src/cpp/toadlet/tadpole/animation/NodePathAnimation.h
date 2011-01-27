@@ -26,15 +26,15 @@
 #ifndef TOADLET_TADPOLE_ANIMATION_NODEPATHANIMATION_H
 #define TOADLET_TADPOLE_ANIMATION_NODEPATHANIMATION_H
 
-#include <toadlet/tadpole/Track.h>
-#include <toadlet/tadpole/animation/Animation.h>
+#include <toadlet/tadpole/TransformTrack.h>
+#include <toadlet/tadpole/animation/Animatable.h>
 #include <toadlet/tadpole/node/Node.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-class TOADLET_API NodePathAnimation:public Animation{
+class TOADLET_API NodePathAnimation:public Animatable{
 public:
 	TOADLET_SHARED_POINTERS(NodePathAnimation);
 
@@ -44,8 +44,8 @@ public:
 	void setTarget(node::Node::ptr target);
 	inline node::Node::ptr getTarget() const{return mTarget;}
 
-	void setTrack(Track::ptr track);
-	inline Track::ptr getTrack() const{return mTrack;}
+	void setTrack(TransformTrack::ptr track);
+	inline TransformTrack::ptr getTrack() const{return mTrack;}
 
 	void setLookAt(const Vector3 &lookAt);
 	inline const Vector3 &getLookAt() const{return mLookAt;}
@@ -57,7 +57,7 @@ public:
 
 protected:
 	node::Node::ptr mTarget;
-	Track::ptr mTrack;
+	TransformTrack::ptr mTrack;
 	bool mUseLookAt;
 	Vector3 mLookAt;
 	int mHint;

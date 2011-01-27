@@ -34,8 +34,8 @@
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/Bound.h>
 #include <toadlet/tadpole/Transform.h>
+#include <toadlet/tadpole/animation/Controller.h>
 #include <toadlet/tadpole/node/NodeListener.h>
-#include <toadlet/tadpole/node/NodeInterpolator.h>
 
 #ifndef TOADLET_NODE
 	#define TOADLET_NODE(Class,SuperClass) \
@@ -101,6 +101,10 @@ public:
 	virtual void addNodeListener(NodeListener::ptr listener);
 	virtual void removeNodeListener(NodeListener::ptr listener);
 	virtual void removeAllNodeListeners(){mNodeListeners=NULL;}
+
+	virtual void addController(animation::Controller::ptr controller);
+	virtual void removeController(animation::Controller::ptr controller);
+	virtual void removeAllControllers(){mControllers=NULL;}
 
 	virtual void parentChanged(ParentNode *parent);
 	ParentNode *getParent() const;
@@ -181,6 +185,7 @@ public:
 //	TOADLET_PROPERTY(egg::String,name,Node,getName,setName);
 
 protected:
+	virtual void transformUpdateListeners(int dt);
 	virtual void logicUpdateListeners(int dt);
 	virtual void frameUpdateListeners(int dt);
 
@@ -196,6 +201,7 @@ protected:
 
 	// Node items
 	egg::Collection<NodeListener::ptr>::ptr mNodeListeners;
+	egg::Collection<animation::Controller::ptr>::ptr mControllers;
 
 	Node::ptr mParent;
 	void *mParentData;

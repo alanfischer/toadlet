@@ -23,27 +23,51 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_NODE_NODEINTERPOLATOR_H
-#define TOADLET_TADPOLE_NODE_NODEINTERPOLATOR_H
+#ifndef TOADLET_TADPOLE_SKELETON_H
+#define TOADLET_TADPOLE_SKELETON_H
+
+#include <toadlet/egg/BaseResource.h>
+#include <toadlet/tadpole/TransformSequence.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
 
-/// This can be used to automatically interpolate different values of the node between logic frames
-/// Most probably translation & rotation between the physics simulator.
-class TOADLET_API NodeInterpolator{
+class TOADLET_API Skeleton:public egg::BaseResource{
 public:
-	TOADLET_SHARED_POINTERS(NodeInterpolator);
+	TOADLET_SHARED_POINTERS(Skeleton);
 
-	virtual ~NodeInterpolator(){}
-	
-	virtual void transformUpdated(Node *node,int tu)=0;
-	virtual void logicUpdate(Node *node,int dt)=0;
-	virtual void interpolate(Node *node,scalar value)=0;
+	class TOADLET_API Bone{
+	public:
+		TOADLET_SHARED_POINTERS(Bone);
+
+		Bone():
+			index(-1),
+			parentIndex(-1),
+			scale(Math::ONE,Math::ONE,Math::ONE){}
+
+		int index;
+		int parentIndex;
+
+		Vector3 translate;
+		Quaternion rotate;
+		Vector3 scale; /// @todo: Implement bone scaling
+
+		Vector3 worldToBoneTranslate;
+		Quaternion worldToBoneRotate;
+
+		egg::String name;
+	};
+
+	Skeleton();
+	virtual ~Skeleton();
+
+	void destroy();
+	void compile();
+
+	egg::Collection<Bone::ptr> bones;
+	egg::Collection<TransformSequence::ptr> sequences;
 };
 
-}
 }
 }
 
