@@ -30,7 +30,6 @@
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::io;
-using namespace toadlet::tadpole::mesh;
 
 namespace toadlet{
 namespace tadpole{
@@ -122,7 +121,7 @@ Mesh::ptr XMSHHandler::loadMeshVersion1(mxml_node_t *root){
 			mesh->skeleton=Skeleton::ptr(XMLMeshUtilities::loadSkeleton(block,1));
 		}
 		else if(strcmp(mxmlGetElementName(block),"AnimationData")==0){
-			mesh->skeleton->sequences.add(Sequence::ptr(XMLMeshUtilities::loadSequence(block,1)));
+			mesh->skeleton->sequences.add(TransformSequence::ptr(XMLMeshUtilities::loadSequence(block,1)));
 		}
 	}
 
@@ -141,7 +140,7 @@ Mesh::ptr XMSHHandler::loadMeshVersion2Up(mxml_node_t *root,int version){
 			mesh->skeleton=Skeleton::ptr(XMLMeshUtilities::loadSkeleton(block,version));
 		}
 		else if(strcmp(mxmlGetElementName(block),"Sequence")==0){
-			mesh->skeleton->sequences.add(Sequence::ptr(XMLMeshUtilities::loadSequence(block,version)));
+			mesh->skeleton->sequences.add(TransformSequence::ptr(XMLMeshUtilities::loadSequence(block,version)));
 		}
 	}
 
@@ -161,7 +160,7 @@ bool XMSHHandler::saveMeshVersion1(mxml_node_t *root,Mesh::ptr mesh){
 
 		int i;
 		for(i=0;i<mesh->skeleton->sequences.size();++i){
-			Sequence::ptr sequence=mesh->skeleton->sequences[i];
+			TransformSequence::ptr sequence=mesh->skeleton->sequences[i];
 			mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,1);
 			mxmlSetElement(node,"AnimationData");
 			mxmlAddChild(root,node);
@@ -184,7 +183,7 @@ bool XMSHHandler::saveMeshVersion2Up(mxml_node_t *root,Mesh::ptr mesh,int versio
 
 		int i;
 		for(i=0;i<mesh->skeleton->sequences.size();++i){
-			Sequence::ptr sequence=mesh->skeleton->sequences[i];
+			TransformSequence::ptr sequence=mesh->skeleton->sequences[i];
 			mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,version);
 			mxmlSetElement(node,"Sequence");
 			mxmlAddChild(root,node);

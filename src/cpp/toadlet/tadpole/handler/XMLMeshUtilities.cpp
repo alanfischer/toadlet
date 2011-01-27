@@ -38,7 +38,6 @@
 using namespace toadlet::egg;
 using namespace toadlet::egg::MathConversion;
 using namespace toadlet::peeper;
-using namespace toadlet::tadpole::mesh;
 
 namespace toadlet{
 namespace tadpole{
@@ -1138,8 +1137,8 @@ mxml_node_t *XMLMeshUtilities::saveSkeleton(Skeleton::ptr skeleton,int version){
 	return skeletonNode;
 }
 
-Sequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int version){
-	Sequence::ptr sequence(new Sequence());
+TransformSequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int version){
+	TransformSequence::ptr sequence(new TransformSequence());
 
 	const char *prop=NULL;
 	prop=mxmlElementGetAttr(node,"Name");
@@ -1159,7 +1158,7 @@ Sequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int version){
 			continue;
 		}
 
-		Track::ptr track(new Track());
+		TransformTrack::ptr track(new TransformTrack());
 		sequence->tracks.add(track);
 
 		if(version<=2){
@@ -1180,7 +1179,7 @@ Sequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int version){
 				continue;
 			}
 
-			KeyFrame keyFrame;
+			TransformKeyFrame keyFrame;
 			prop=mxmlElementGetAttr(keyFrameNode,"Time");
 			if(prop!=NULL){
 				keyFrame.time=parseScalar(prop);
@@ -1210,7 +1209,7 @@ Sequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int version){
 	return sequence;
 }
 
-mxml_node_t *XMLMeshUtilities::saveSequence(Sequence::ptr sequence,int version){
+mxml_node_t *XMLMeshUtilities::saveSequence(TransformSequence::ptr sequence,int version){
 	mxml_node_t *sequenceNode=NULL;
 	if(version<=2){
 		sequenceNode=mxmlNewElement(MXML_NO_PARENT,"AnimationData");
@@ -1227,7 +1226,7 @@ mxml_node_t *XMLMeshUtilities::saveSequence(Sequence::ptr sequence,int version){
 
 	int j;
 	for(j=0;j<sequence->tracks.size();++j){
-		Track::ptr track=sequence->tracks[j];
+		TransformTrack::ptr track=sequence->tracks[j];
 
 		mxml_node_t *trackNode=mxmlNewElement(sequenceNode,"Track");
 
@@ -1240,7 +1239,7 @@ mxml_node_t *XMLMeshUtilities::saveSequence(Sequence::ptr sequence,int version){
 
 		int k;
 		for(k=0;k<track->keyFrames.size();++k){
-			const KeyFrame keyFrame=track->keyFrames[k];
+			const TransformKeyFrame keyFrame=track->keyFrames[k];
 
 			mxml_node_t *keyFrameNode=mxmlNewElement(trackNode,"KeyFrame");
 

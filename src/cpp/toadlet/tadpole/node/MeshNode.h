@@ -28,10 +28,10 @@
 
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
+#include <toadlet/tadpole/Mesh.h>
 #include <toadlet/tadpole/Renderable.h>
-#include <toadlet/tadpole/animation/AnimationController.h>
+#include <toadlet/tadpole/animation/Controller.h>
 #include <toadlet/tadpole/animation/SkeletonAnimation.h>
-#include <toadlet/tadpole/mesh/Mesh.h>
 #include <toadlet/tadpole/node/MeshNodeSkeleton.h>
 #include <toadlet/tadpole/node/CameraAlignedNode.h>
 
@@ -39,12 +39,6 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-/// @todo: Maybe rework how the animation framework ties into non-parent nodes.
-//  It would be handy to have the MeshNode & SpriteNode be able to have their dedicated controllers without the support work of
-//   setting the Node to receive callbacks etc.
-//  Another nice feature would be the ability for Animations to be run by a Thread pool, so a central AnimationManager would take
-//   care of the updating.  But perhaps this would be better suited by having Nodes update their Animations as we do now, and then the
-//   whole scenegraph be updated by a ThreadPool, taking into account dependencies
 class TOADLET_API MeshNode:public CameraAlignedNode{
 public:
 	TOADLET_NODE(MeshNode,CameraAlignedNode);
@@ -53,7 +47,7 @@ public:
 	public:
 		TOADLET_SHARED_POINTERS(SubMesh);
 
-		SubMesh(MeshNode *meshNode,mesh::Mesh::SubMesh *meshSubMesh);
+		SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh);
 
 		Material *getRenderMaterial() const{return material;}
 		Transform *getRenderTransform() const{return worldTransform!=NULL?worldTransform:meshNode->getWorldTransform();}
@@ -64,26 +58,21 @@ public:
 		peeper::IndexData::ptr indexData;
 		peeper::VertexData::ptr vertexData;
 		MeshNode *meshNode;
-		mesh::Mesh::SubMesh *meshSubMesh;
+		Mesh::SubMesh *meshSubMesh;
 
 		Transform::ptr worldTransform;
 		Bound::ptr worldBound;
 	};
 
-	/// Specialization of the AnimationController that allows for easy access to playing single sequences.
-	class TOADLET_API MeshAnimationController:public animation::AnimationController{
+	/// Specialization of the Controller that allows for easy access to playing single sequences.
+	class TOADLET_API MeshController:public animation::Controller{
 	public:
-		TOADLET_SHARED_POINTERS(MeshAnimationController);
+		TOADLET_SHARED_POINTERS(MeshController);
 
-		MeshAnimationController(MeshNode *node);
+		MeshController(MeshNode *node);
 
-		void setSequenceIndex(int index);
-		int getSequenceIndex() const;
-
-		virtual void start();
-		virtual void stop();
-
-		virtual void update(int dt);
+		void setSequenceIndex(int index){mAnimation->setSequenceIndex(index);}
+		int getSequenceIndex() const{return mAnimation->getSequenceIndex();}
 
 		void skeletonChanged();
 
@@ -98,9 +87,9 @@ public:
 	virtual void destroy();
 
 	void setMesh(const egg::String &name);
-	void setMesh(mesh::Mesh::ptr mesh);
+	void setMesh(Mesh::ptr mesh);
 
-	inline const mesh::Mesh::ptr &getMesh() const{return mMesh;}
+	inline const Mesh::ptr &getMesh() const{return mMesh;}
 
 	inline int getNumSubMeshes() const{return mSubMeshes.size();}
 	SubMesh *getSubMesh(int i){return mSubMeshes[i];}
@@ -109,7 +98,7 @@ public:
 	inline MeshNodeSkeleton::ptr getSkeleton() const{return mSkeleton;}
 	void setSkeleton(MeshNodeSkeleton::ptr skeleton);
 
-	MeshAnimationController::ptr getAnimationController();
+	MeshController::ptr getController();
 
 	void frameUpdate(int dt,int scope);
 	void updateWorldTransform();
@@ -122,12 +111,12 @@ public:
 	void updateVertexBuffer();
 
 protected:
-	mesh::Mesh::ptr mMesh;
+	Mesh::ptr mMesh;
 	egg::Collection<SubMesh::ptr> mSubMeshes;
 	MeshNodeSkeleton::ptr mSkeleton;
 	peeper::VertexData::ptr mDynamicVertexData;
 
-	MeshAnimationController::ptr mAnimationController;
+	MeshController::ptr mController;
 
 	Vector3 cache_updateVertexBuffer_positionVector;
 	Vector3 cache_updateVertexBuffer_normalVector;

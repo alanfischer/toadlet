@@ -23,20 +23,23 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_ANIMATION_ANIMATIONCONTROLLER_H
-#define TOADLET_TADPOLE_ANIMATION_ANIMATIONCONTROLLER_H
+#ifndef TOADLET_TADPOLE_ANIMATION_CONTROLLER_H
+#define TOADLET_TADPOLE_ANIMATION_CONTROLLER_H
 
 #include <toadlet/egg/Collection.h>
-#include <toadlet/tadpole/animation/Animation.h>
-#include <toadlet/tadpole/animation/AnimationControllerFinishedListener.h>
+#include <toadlet/tadpole/animation/Animatable.h>
+#include <toadlet/tadpole/animation/ControllerFinishedListener.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace animation{
 
-class TOADLET_API AnimationController{
+/// @todo: A nice feature would be the ability for Controllers to be run by a Thread pool, so a central ControllerManager would take
+//   care of the updating.  But perhaps this would be better suited by having Nodes update their Animations as we do now, and then the
+//   whole scenegraph be updated by a ThreadPool, taking into account dependencies
+class TOADLET_API Controller{
 public:
-	TOADLET_SHARED_POINTERS(AnimationController);
+	TOADLET_SHARED_POINTERS(Controller);
 
 	enum Interpolation{
 		Interpolation_LINEAR,
@@ -49,8 +52,8 @@ public:
 		Cycling_REFLECT,
 	};
 
-	AnimationController();
-	virtual ~AnimationController();
+	Controller();
+	virtual ~Controller();
 
 	virtual void setTime(int time,bool setagain=true);
 	inline int getTime() const{return mTime;}
@@ -64,8 +67,8 @@ public:
 	virtual void setTimeScale(scalar scale);
 	inline scalar getTimeScale() const{return mTimeScale;}
 
-	virtual void setAnimationControllerFinishedListener(AnimationControllerFinishedListener *listener,bool owns);
-	inline AnimationControllerFinishedListener *getAnimationControllerFinishedListener() const{return mFinishedListener;}
+	virtual void setControllerFinishedListener(ControllerFinishedListener *listener,bool owns);
+	inline ControllerFinishedListener *getControllerFinishedListener() const{return mFinishedListener;}
 
 	virtual void setMinMaxValue(scalar minValue,scalar maxValue){mMinValue=minValue;mMaxValue=maxValue;}
 	inline scalar getMinValue() const{return mMinValue;}
@@ -81,11 +84,11 @@ public:
 
 	virtual void extentsChanged();
 
-	virtual void attach(Animation::ptr animation);
-	virtual void remove(Animation::ptr animation);
+	virtual void attach(Animatable::ptr animatable);
+	virtual void remove(Animatable::ptr animatable);
 
 protected:
-	egg::Collection<Animation::ptr> mAnimations;
+	egg::Collection<Animatable::ptr> mAnimatables;
 
 	int mTime;
 	scalar mMinValue;
@@ -96,7 +99,7 @@ protected:
 	Interpolation mInterpolation;
 	scalar mTimeScale;
 	bool mRunning;
-	AnimationControllerFinishedListener *mFinishedListener;
+	ControllerFinishedListener *mFinishedListener;
 	bool mOwnsFinishedListener;
 };
 

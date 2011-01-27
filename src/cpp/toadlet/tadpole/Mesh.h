@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_MESH_MESH_H
-#define TOADLET_TADPOLE_MESH_MESH_H
+#ifndef TOADLET_TADPOLE_MESH_H
+#define TOADLET_TADPOLE_MESH_H
 
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/egg/BaseResource.h>
@@ -33,11 +33,10 @@
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/Bound.h>
 #include <toadlet/tadpole/Transform.h>
-#include <toadlet/tadpole/mesh/Skeleton.h>
+#include <toadlet/tadpole/Skeleton.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace mesh{
 
 class TOADLET_API Mesh:public egg::BaseResource{
 public:
@@ -97,7 +96,6 @@ public:
 	egg::Collection<VertexBoneAssignmentList> vertexBoneAssignments;
 };
 
-}
 }
 }
 

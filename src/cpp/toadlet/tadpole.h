@@ -34,7 +34,6 @@
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/FontData.h>
 #include <toadlet/tadpole/FontManager.h>
-#include <toadlet/tadpole/KeyFrame.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/MaterialManager.h>
 #include <toadlet/tadpole/MathFormatter.h>
@@ -49,30 +48,24 @@
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/Traceable.h>
-#include <toadlet/tadpole/Track.h>
+#include <toadlet/tadpole/Transform.h>
+#include <toadlet/tadpole/TransformKeyFrame.h>
+#include <toadlet/tadpole/TransformTrack.h>
 #include <toadlet/tadpole/UpdateListener.h>
 #include <toadlet/tadpole/VertexFormats.h>
 
-#include <toadlet/tadpole/animation/Animation.h>
-#include <toadlet/tadpole/animation/AnimationController.h>
-#include <toadlet/tadpole/animation/AnimationControllerFinishedListener.h>
+#include <toadlet/tadpole/animation/Animatable.h>
+#include <toadlet/tadpole/animation/Controller.h>
+#include <toadlet/tadpole/animation/ControllerFinishedListener.h>
 #include <toadlet/tadpole/animation/CameraProjectionAnimation.h>
-#include <toadlet/tadpole/animation/MaterialColorAnimation.h>
 #include <toadlet/tadpole/animation/NodePathAnimation.h>
 #include <toadlet/tadpole/animation/SkeletonAnimation.h>
-#include <toadlet/tadpole/animation/TextureMatrixAnimation.h>
-#include <toadlet/tadpole/animation/TextureStageAnimation.h>
 
 #include <toadlet/tadpole/bsp/BSP30Handler.h>
 #include <toadlet/tadpole/bsp/BSP30Map.h>
 #include <toadlet/tadpole/bsp/BSP30Node.h>
 
-#include <toadlet/tadpole/mesh/Mesh.h>
-#include <toadlet/tadpole/mesh/Sequence.h>
-#include <toadlet/tadpole/mesh/Skeleton.h>
-
 #include <toadlet/tadpole/node/AnaglyphCameraNode.h>
-#include <toadlet/tadpole/node/AnimationControllerNode.h>
 #include <toadlet/tadpole/node/AudioNode.h>
 #include <toadlet/tadpole/node/CameraAlignedNode.h>
 #include <toadlet/tadpole/node/CameraNode.h>
@@ -87,7 +80,6 @@
 #include <toadlet/tadpole/node/PartitionNode.h>
 #include <toadlet/tadpole/node/SpriteNode.h>
 #include <toadlet/tadpole/node/NodeListener.h>
-#include <toadlet/tadpole/node/NodeInterpolator.h>
 #include <toadlet/tadpole/node/NodeTransformInterpolator.h>
 
 #include <toadlet/tadpole/sensor/BoundingVolumeSensor.h>
@@ -100,6 +92,7 @@
 #include <toadlet/tadpole/studio/StudioHandler.h>
 #include <toadlet/tadpole/studio/StudioModel.h>
 #include <toadlet/tadpole/studio/StudioModelNode.h>
+#include <toadlet/tadpole/studio/StudioModelController.h>
 
 #include <toadlet/tadpole/terrain/TerrainNode.h>
 #include <toadlet/tadpole/terrain/TerrainPatchNode.h>
@@ -111,7 +104,6 @@ using namespace toadlet;
 using namespace toadlet::tadpole;
 using namespace toadlet::tadpole::animation;
 using namespace toadlet::tadpole::bsp;
-using namespace toadlet::tadpole::mesh;
 using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::sensor;
 using namespace toadlet::tadpole::studio;
