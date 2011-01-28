@@ -51,6 +51,7 @@ elseif (UNIX)
 		option (TOADLET_PLATFORM_IPHONE "Build for the iPhone" OFF)
 	endif (APPLE)
 endif (WIN32)
+option (TOADLET_BUILD_DOXYGEN "Build doxygen documentation" OFF)
 
 
 # Android and Blackberry specifics
