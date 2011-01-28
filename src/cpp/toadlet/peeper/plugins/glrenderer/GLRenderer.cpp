@@ -42,7 +42,6 @@
 #include <toadlet/peeper/Program.h>
 #include <toadlet/peeper/Shader.h>
 #include <toadlet/peeper/Light.h>
-#include <toadlet/peeper/Version.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::image;
@@ -114,7 +113,7 @@ GLRenderer::~GLRenderer(){
 
 bool GLRenderer::create(RenderTarget *target,int *options){
 	Logger::alert(Categories::TOADLET_PEEPER,
-		"creating "+Categories::TOADLET_PEEPER+".GLRenderer:"+Version::STRING);
+		"creating "+Categories::TOADLET_PEEPER+".GLRenderer");
 
 	if(target==NULL){
 		Error::nullPointer(Categories::TOADLET_PEEPER,

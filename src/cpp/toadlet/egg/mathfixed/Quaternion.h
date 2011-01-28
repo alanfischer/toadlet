@@ -37,7 +37,7 @@ class TOADLET_API Quaternion{
 public:
 	fixed x,y,z,w;
 
-	inline Quaternion():x(0),y(0),z(0),w(1){}
+	inline Quaternion():x(0),y(0),z(0),w(Math::ONE){}
 
 	inline Quaternion(fixed x1,fixed y1,fixed z1,fixed w1):x(x1),y(y1),z(z1),w(w1){}
 
