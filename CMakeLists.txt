@@ -51,8 +51,14 @@ elseif (UNIX)
 		option (TOADLET_PLATFORM_IPHONE "Build for the iPhone" OFF)
 	endif (APPLE)
 endif (WIN32)
+
+
+# Doxygen options
 option (TOADLET_BUILD_DOXYGEN "Build doxygen documentation" OFF)
 set (TOADLET_DOXYGEN_INSTALL_PATH doc CACHE PATH "Custom install location for doxygen files")
+if (TOADLET_BUILD_DOXYGEN)
+	add_subdirectory (doxygen)
+if (TOADLET_BUILD_DOXYGEN)
 
 
 # Android and Blackberry specifics
