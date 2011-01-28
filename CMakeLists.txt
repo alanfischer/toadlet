@@ -52,6 +52,7 @@ elseif (UNIX)
 	endif (APPLE)
 endif (WIN32)
 option (TOADLET_BUILD_DOXYGEN "Build doxygen documentation" OFF)
+set (TOADLET_DOXYGEN_INSTALL_PATH doc CACHE PATH "Custom install location for doxygen files")
 
 
 # Android and Blackberry specifics
