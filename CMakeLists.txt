@@ -36,8 +36,7 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${toadlet_SOURCE_DIR}/cmake/Modules
 
 # Setup options
 if (WIN32)
-	set (TOADLET_PLATFORM_WIN32 ON)
-	# This is setup in the toolchain file until cmake has built-in support for wince
+	set (TOADLET_PLATFORM_WIN32 ON) # This is setup in the toolchain file until cmake has built-in support for wince
 	#option (TOADLET_PLATFORM_WINCE "Build for Windows CE devices" OFF)
 	option (TOADLET_PLATFORM_ANDROID "Build for Android devices" OFF)
 	option (TOADLET_PLATFORM_BLACKBERRY "Build for Blackberry devices" OFF)
@@ -54,11 +53,8 @@ endif (WIN32)
 
 
 # Doxygen options
-option (TOADLET_BUILD_DOXYGEN "Build doxygen documentation" OFF)
-set (TOADLET_DOXYGEN_INSTALL_PATH doc CACHE PATH "Custom install location for doxygen files")
-if (TOADLET_BUILD_DOXYGEN)
-	add_subdirectory (doxygen)
-if (TOADLET_BUILD_DOXYGEN)
+option (TOADLET_BUILD_DOXYGEN "Build doxygen documentation along with source files" OFF)
+option (TOADLET_BUILD_DOXYGEN_ONLY "Build ONLY the doxygen documentation" OFF)
 
 
 # Android and Blackberry specifics
@@ -85,8 +81,16 @@ elseif (TOADLET_PLATFORM_BLACKBERRY)
 endif (TOADLET_PLATFORM_ANDROID)
 
 
-# Add the source code subdirectories
-add_subdirectory (src)
+# Add the source code subdirectory
+if (NOT TOADLET_BUILD_DOXYGEN_ONLY)
+	add_subdirectory (src)
+endif (NOT TOADLET_BUILD_DOXYGEN_ONLY)
+
+
+# Add the doxygen subdirectory
+if (TOADLET_BUILD_DOXYGEN OR TOADLET_BUILD_DOXYGEN_ONLY)
+	add_subdirectory (doxygen)
+endif (TOADLET_BUILD_DOXYGEN OR TOADLET_BUILD_DOXYGEN_ONLY)
 
 
 # HACK: Directly alter the visual studio project files for WinCE
