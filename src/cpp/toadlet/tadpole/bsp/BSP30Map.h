@@ -27,6 +27,7 @@
 #define TOADLET_TADPOLE_BSP_BSP30MAP_H
 
 #include <toadlet/egg/BaseResource.h>
+#include <toadlet/egg/Logger.h>
 #include <toadlet/tadpole/bsp/BSP30Types.h>
 #include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/Material.h>
@@ -56,7 +57,7 @@ public:
 		visibility(NULL),	nvisibility(0),
 		textures(NULL),		ntextures(0),
 		lighting(NULL),		nlighting(0),
-		entities(NULL),	nentities(0)
+		entities(NULL),		nentities(0)
 	{
 		header.version=0;
 	};
@@ -79,7 +80,7 @@ public:
 		if(entities!=NULL){		free(entities);		nentities=0;}
 	}
 
-	int modelTrace(Collision &result,int model,const Vector3 &size,const Vector3 &start,const Vector3 &end){
+	int modelCollisionTrace(Collision &result,int model,const Vector3 &size,const Vector3 &start,const Vector3 &end){
 		int hullIndex=0;
 		if(header.version==Q1BSPVERSION){
 			if(size[0]<3){
@@ -117,15 +118,74 @@ public:
 
 		int contents=0;
 		if(hullIndex==0){
-			hullTrace(result,planes,leafs,nodes,sizeof(bnode),headNode,0,Math::ONE,start,end,0.03125);
+			hullTrace(result,planes,leafs,nodes,sizeof(bnode),headNode,0,Math::ONE,start,end,0.03125,(-1-CONTENTS_SOLID)<<1,NULL);
 			contents=leafs[findPointLeaf(planes,nodes,sizeof(bnode),headNode,start)].contents;
 		}
 		else{
-			hullTrace(result,planes,NULL,clipnodes,sizeof(bclipnode),headClipNode,0,Math::ONE,start,end,0.03125);
+			hullTrace(result,planes,NULL,clipnodes,sizeof(bclipnode),headClipNode,0,Math::ONE,start,end,0.03125,(-1-CONTENTS_SOLID)<<1,NULL);
 			contents=-1-findPointLeaf(planes,clipnodes,sizeof(bclipnode),headClipNode,start);
 		}
 
 		return contents;
+	}
+
+	bool modelLightTrace(peeper::Color &result,int model,const Vector3 &start,const Vector3 &end){
+		int headNode=models[model].headnode[0];
+		if(headNode<0 || headNode>=nnodes){
+			return false;
+		}
+
+		Collision collision;
+		int lastNode=-1;
+		hullTrace(collision,planes,leafs,nodes,sizeof(bnode),headNode,0,Math::ONE,start,end,0.03125,(-1-CONTENTS_SOLID)<<1,&lastNode);
+		if(lastNode>=0){
+			int mins[2],maxs[2];
+			bnode *node=nodes+lastNode;
+			bface *face=faces+node->firstface;
+			int i;
+			for(i=0;i<node->numfaces;++i,++face){
+				btexinfo *texinfo=texinfos+face->texinfo;
+				if((texinfo->flags&TEX_SPECIAL)!=0) continue;
+				if(face->lightofs==0) continue;
+				
+				findSurfaceExtents(face,mins,maxs);
+
+				int s=Math::dot(collision.point,(Vector3&)texinfo->vecs[0]) + texinfo->vecs[0][3];
+				int t=Math::dot(collision.point,(Vector3&)texinfo->vecs[1]) + texinfo->vecs[1][3];
+
+				if(s<mins[0] || t<mins[1]) continue;
+				if(s>maxs[0] || t>maxs[1]) continue;
+
+				int lmwidth=(ceil(maxs[0]/16.0) - floor(mins[0]/16.0)) + 1;
+				tbyte *lightdata=((tbyte*)lighting) + face->lightofs + (lmwidth*((t-mins[1])>>4) + ((s-mins[0])>>4))*3;
+				result.set(lightdata[0]/255.0,lightdata[1]/255.0,lightdata[2]/255.0,0);
+
+				return true;
+			}
+		}
+		return false;
+	}
+
+	void findSurfaceExtents(bface *face,int *mins,int *maxs){
+		float val;
+		int i,j,surfedge;
+		bvertex *v;
+
+		mins[0]=mins[1]=999999;
+		maxs[0]=maxs[1]=-999999;
+
+		btexinfo *texinfo=texinfos+face->texinfo;
+		for(i=0;i<face->numedges;i++){
+			surfedge=surfedges[face->firstedge+i];
+			v=&vertexes[surfedge<0?edges[-surfedge].v[1]:edges[surfedge].v[0]];
+
+			for(j=0;j<2;j++){
+				val=Math::dot((Vector3&)v->point,texinfo->vecs[j]) + texinfo->vecs[j][3];
+
+				if(val<mins[j])	mins[j]=val;
+				if(val>maxs[j])	maxs[j]=val;
+			}
+		}
 	}
 
 	static int findPointLeaf(bplane *planes,void *hull,int hullStride,int index,const Vector3 &point){
@@ -155,7 +215,7 @@ public:
 		return -1-index;
 	}
 
-	static bool hullTrace(Collision &result,bplane *planes,bleaf *leafs,void *hull,int hullStride,int index,scalar p1t,scalar p2t,const Vector3 &p1,const Vector3 &p2,scalar epsilon){
+	static bool hullTrace(Collision &result,bplane *planes,bleaf *leafs,void *hull,int hullStride,int index,scalar p1t,scalar p2t,const Vector3 &p1,const Vector3 &p2,scalar epsilon,int stopContentsBits,int *lastIndex){
 		bclipnode *node=NULL;
 		bplane *plane=NULL;
 		scalar t1=0,t2=0;
@@ -166,8 +226,9 @@ public:
 
 		if(index<0){
 			int contents=(leafs!=NULL)?(leafs[-1-index].contents):(index);
-			result.scope=(-1-contents)<<1;
-			if(contents==CONTENTS_SOLID){
+			int contentsBits=(-1-contents)<<1;
+			result.scope=contentsBits;
+			if((contentsBits&stopContentsBits)>0){
 				result.time=0;
 				result.point.set(p1);
 			}
@@ -188,17 +249,17 @@ public:
 
 #if 1
 		if(t1>=0 && t2>=0){
-			return hullTrace(result,planes,leafs,hull,hullStride,node->children[0],p1t,p2t,p1,p2,epsilon);
+			return hullTrace(result,planes,leafs,hull,hullStride,node->children[0],p1t,p2t,p1,p2,epsilon,stopContentsBits,lastIndex);
 		}
 		if(t1<0 && t2<0){
-			return hullTrace(result,planes,leafs,hull,hullStride,node->children[1],p1t,p2t,p1,p2,epsilon);
+			return hullTrace(result,planes,leafs,hull,hullStride,node->children[1],p1t,p2t,p1,p2,epsilon,stopContentsBits,lastIndex);
 		}
 #else
 		if(t1>=epsilon && t2>=epsilon){
-			return hullTrace(result,planes,leafs,hull,hullStride,node->children[0],p1t,p2t,p1,p2,epsilon);
+			return hullTrace(result,planes,leafs,hull,hullStride,node->children[0],p1t,p2t,p1,p2,epsilon,stopContentsBits,lastIndex);
 		}
 		if(t1<epsilon && t2<epsilon){
-			return hullTrace(result,planes,leafs,hull,hullStride,node->children[1],p1t,p2t,p1,p2,epsilon);
+			return hullTrace(result,planes,leafs,hull,hullStride,node->children[1],p1t,p2t,p1,p2,epsilon,stopContentsBits,lastIndex);
 		}
 #endif
 
@@ -217,13 +278,15 @@ public:
 
 		side=(t1<0);
 
-		if(!hullTrace(result,planes,leafs,hull,hullStride,node->children[side],p1t,midt,p1,mid,epsilon)){
+		if(!hullTrace(result,planes,leafs,hull,hullStride,node->children[side],p1t,midt,p1,mid,epsilon,stopContentsBits,lastIndex)){
 			return false;
 		}
 
-		int leaf=findPointLeaf(planes,hull,hullStride,node->children[side^1],mid);
-		if(((leafs!=NULL)?(leafs[leaf].contents):(-1-leaf))!=CONTENTS_SOLID){
-			return hullTrace(result,planes,leafs,hull,hullStride,node->children[side^1],midt,p2t,mid,p2,epsilon);
+		int leaf=findPointLeaf(planes,hull,hullStride,node->children[!side],mid);
+		int contents=((leafs!=NULL)?(leafs[leaf].contents):(-1-leaf));
+		int contentsBits=(-1-contents)<<1;
+		if((contentsBits&CONTENTS_SOLID)==0){
+			return hullTrace(result,planes,leafs,hull,hullStride,node->children[!side],midt,p2t,mid,p2,epsilon,stopContentsBits,lastIndex);
 		}
 
 		if(result.time==0){
@@ -238,10 +301,16 @@ public:
 			Math::neg(result.normal,plane->normal);
 		}
 
+		if(lastIndex!=NULL){
+			*lastIndex=index;
+		}
+
 		// Sometimes we have to walk backwards
 		while(true){
-			int leaf=findPointLeaf(planes,hull,hullStride,0,mid);
-			if(((leafs!=NULL)?(leafs[leaf].contents):(-1-leaf))!=CONTENTS_SOLID) break;
+			leaf=findPointLeaf(planes,hull,hullStride,0,mid);
+			contents=((leafs!=NULL)?(leafs[leaf].contents):(-1-leaf));
+			contentsBits=(-1-contents)<<1;
+			if((contentsBits&CONTENTS_SOLID)==0) break;
 
 			time-=epsilon*4;
 			if(time<0){

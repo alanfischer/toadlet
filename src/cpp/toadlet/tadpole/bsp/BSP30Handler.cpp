@@ -272,7 +272,7 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 	int width=0,height=0;
 	float iwidth=0,iheight=0;
 	float s=0,t=0;
-	Vector2 surfmins,surfmaxs;
+	int surfmins[2],surfmaxs[2];
 	float surfmids=0,surfmidt=0;
 	int lmwidth=0,lmheight=0;
 	float lmmids=0,lmmidt=0;
@@ -304,7 +304,7 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 		}
 
 		if((texinfo->flags&TEX_SPECIAL)==0){
-			findSurfaceExtents(map,face,surfmins,surfmaxs);
+			map->findSurfaceExtents(face,surfmins,surfmaxs);
 			surfmids=(surfmins[0]+surfmaxs[0])/2.0f;
 			surfmidt=(surfmins[1]+surfmaxs[1])/2.0f;
 			lmwidth=(ceil(surfmaxs[0]/16.0) - floor(surfmins[0]/16.0)) + 1;
@@ -393,28 +393,6 @@ void BSP30Handler::buildMaterials(BSP30Map *map){
 		material->setTextureStage(1,secondary);
 
 		map->materials[i]=material;
-	}
-}
-
-void BSP30Handler::findSurfaceExtents(BSP30Map *map,bface *face,Vector2 &mins,Vector2 &maxs){
-	float val;
-	int i,j,surfedge;
-	bvertex *v;
-
-	mins[0]=mins[1]=999999;
-	maxs[0]=maxs[1]=-999999;
-
-	btexinfo *texinfo=&map->texinfos[face->texinfo];
-	for(i=0;i<face->numedges;i++){
-		surfedge=map->surfedges[face->firstedge+i];
-		v=&map->vertexes[surfedge<0?map->edges[-surfedge].v[1]:map->edges[surfedge].v[0]];
-
-		for(j=0;j<2;j++){
-			val=Math::dot((Vector3)v->point,texinfo->vecs[j]) + texinfo->vecs[j][3];
-
-			if(val<mins[j])	mins[j]=val;
-			if(val>maxs[j])	maxs[j]=val;
-		}
 	}
 }
 

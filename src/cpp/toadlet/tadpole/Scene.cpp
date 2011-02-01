@@ -308,6 +308,7 @@ void Scene::render(Renderer *renderer,CameraNode *camera,Node *node){
 
 void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue *queue){
 	Matrix4x4 matrix;
+	Color ambient;
 
 	mCountLastRendered=0;
 
@@ -330,9 +331,9 @@ void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue 
 	renderer->setViewMatrix(camera->getViewMatrix());
 	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
 
-	renderer->setAmbientColor(mAmbientColor);
 	renderer->setFogParameters(mFog,mFogNearDistance,mFogFarDistance,mFogColor);
 
+	/// @todo: Search for multiple lights
 	if(queue->getLight()!=NULL){
 		renderer->setLight(0,queue->getLight()->internal_getLight());
 		renderer->setLightEnabled(0,true);
@@ -378,9 +379,17 @@ void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue 
 				if(transform!=NULL) transform->toMatrix(matrix);
 				else matrix.reset();
 
+				if(material!=NULL && material->getLightEffect().ambient.equals(Colors::BLACK)==false){
+					if(mRoot->findAmbientForPoint(ambient,transform->getTranslate())){
+						renderer->setAmbientColor(ambient);
+					}
+					else{
+						renderer->setAmbientColor(mAmbientColor);
+					}
+				}
+
 				renderer->setModelMatrix(matrix);
 				renderable->render(renderer);
-
 				mCountLastRendered++;
 			}
 
@@ -404,6 +413,15 @@ void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue 
 			if(transform!=NULL) transform->toMatrix(matrix);
 			else matrix.reset();
 
+			if(material!=NULL && material->getLightEffect().ambient.equals(Colors::BLACK)==false){
+				if(mRoot->findAmbientForPoint(ambient,transform->getTranslate())){
+					renderer->setAmbientColor(ambient);
+				}
+				else{
+					renderer->setAmbientColor(mAmbientColor);
+				}
+			}
+
 			renderer->setModelMatrix(matrix);
 			renderable->render(renderer);
 			mCountLastRendered++;
@@ -420,8 +438,6 @@ void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue 
 		// We could also use the true/false return of pre/postLayerRender, but it could be easy to forget to change that.
 		mPreviousMaterial=NULL;
 	}
-
-//Profile::getInstance()->collectionAllocations=0;
 }
 
 Image::ptr Scene::renderToImage(Renderer *renderer,CameraNode *camera,int format,int width,int height){
