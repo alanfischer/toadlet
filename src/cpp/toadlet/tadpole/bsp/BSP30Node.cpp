@@ -132,7 +132,7 @@ void BSP30ModelNode::traceSegment(Collision &result,const Vector3 &position,cons
 	result.time=Math::ONE;
 	localSegment.getEndPoint(result.point);
 	if(mMap!=NULL){
-		int contents=mMap->modelTrace(result,mModelIndex,size,localSegment.origin,result.point);
+		int contents=mMap->modelCollisionTrace(result,mModelIndex,size,localSegment.origin,result.point);
 		if(contents!=CONTENTS_EMPTY){
 			result.scope|=(-1-contents)<<1;
 		}
@@ -466,11 +466,22 @@ bool BSP30Node::sensePotentiallyVisible(SensorResultsListener *listener,const Ve
 	return true;
 }
 
+bool BSP30Node::findAmbientForPoint(Color &r,const Vector3 &point){
+	Vector3 end;
+	end.x=point.x;
+	end.y=point.y;
+	end.z=point.z-1024;
+	if(mMap!=NULL){
+		return mMap->modelLightTrace(r,0,point,end);
+	}
+	return false;
+}
+
 void BSP30Node::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	result.time=Math::ONE;
 	segment.getEndPoint(result.point);
 	if(mMap!=NULL){
-		int contents=mMap->modelTrace(result,0,size,segment.origin,result.point);
+		int contents=mMap->modelCollisionTrace(result,0,size,segment.origin,result.point);
 		if(contents!=CONTENTS_EMPTY) result.scope|=(-1-contents)<<1;
 	}
 }

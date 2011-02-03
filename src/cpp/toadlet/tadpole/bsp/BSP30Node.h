@@ -109,6 +109,7 @@ public:
 
 	bool senseBoundingVolumes(SensorResultsListener *listener,Bound *bound);
 	bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);
+	bool findAmbientForPoint(peeper::Color &r,const Vector3 &point);
 
 	// Traceable items
 	Bound *getBound() const{return super::getBound();}
