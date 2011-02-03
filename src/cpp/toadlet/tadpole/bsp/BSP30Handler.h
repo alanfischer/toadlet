@@ -51,7 +51,6 @@ protected:
 	void parseTextures(BSP30Map *map);
 	void buildBuffers(BSP30Map *map);
 	void buildMaterials(BSP30Map *map);
-	void findSurfaceExtents(BSP30Map *map,bface *face,Vector2 &mins,Vector2 &maxs);
 
 	Engine *mEngine;
 };

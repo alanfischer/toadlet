@@ -82,6 +82,9 @@ void Controller::setControllerFinishedListener(ControllerFinishedListener *liste
 }
 
 void Controller::start(){
+	// Update our extends whenever we start an animation
+	extentsChanged();
+
 	mRunning=true;
 
 	mTime=0;
