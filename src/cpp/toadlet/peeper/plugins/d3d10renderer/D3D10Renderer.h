@@ -54,7 +54,7 @@ D3D10_PASS_DESC passDesc;
 	void destroy();
 	RendererStatus getStatus();
 	bool reset();
-	bool activateAdditionalContext(){return true;} /// @todo: Check for threaded support
+	bool activateAdditionalContext();
 
 	// Resource operations
 	Texture *createTexture();

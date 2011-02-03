@@ -136,7 +136,6 @@ void BackableTexture::resetDestroy(){
 	}
 }
 
-/// @todo: This should return a BackablePixelBuffer, which will be able to change surface pointers
 PixelBuffer::ptr BackableTexture::getMipPixelBuffer(int level,int cubeSide){
 	int index=level;
 	if(mDimension==Dimension_CUBE){
