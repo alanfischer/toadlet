@@ -189,6 +189,12 @@ bool D3D9Renderer::reset(){
 	return true;
 }
 
+bool D3D9Renderer::activateAdditionalContext(){
+	D3DDEVICE_CREATION_PARAMETERS params={0};
+	mD3DDevice->GetCreationParameters(&params);
+	return (params.BehaviorFlags & D3DCREATE_MULTITHREADED)>0;
+}
+
 Texture *D3D9Renderer::createTexture(){
 	return new D3D9Texture(this);
 }

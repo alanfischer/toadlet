@@ -226,6 +226,10 @@ bool D3D10Renderer::reset(){
 	return true;
 }
 
+bool D3D10Renderer::activateAdditionalContext(){
+	return (mD3DDevice->GetCreationFlags() & D3D10_CREATE_DEVICE_SINGLETHREADED)==0;
+}
+
 Texture *D3D10Renderer::createTexture(){
 	return new D3D10Texture(this);
 }
