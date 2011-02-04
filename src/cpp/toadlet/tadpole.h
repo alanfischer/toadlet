@@ -30,6 +30,7 @@
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/ContextListener.h>
+#include <toadlet/tadpole/DetailTraceable.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/FontData.h>

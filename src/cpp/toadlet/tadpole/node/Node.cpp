@@ -39,7 +39,6 @@ namespace node{
 
 TOADLET_NODE_IMPLEMENT(Node,Categories::TOADLET_TADPOLE_NODE+".Node");
 
-
 Node::Node():
 	mPointerCounter(new PointerCounter(0)),
 	mManaged(false),

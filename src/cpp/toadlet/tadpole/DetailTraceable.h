@@ -23,54 +23,19 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_COLLISION_H
-#define TOADLET_TADPOLE_COLLISION_H
+#ifndef TOADLET_TADPOLE_DETAILTRACEABLE_H
+#define TOADLET_TADPOLE_DETAILTRACEABLE_H
 
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/Traceable.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
 
-class Node;
-
-}
-
-class Collision{
+// This is the same signature as a Traceable
+//  but a different interface to reinforce the fact that it's not to be used for physics tracing
+class DetailTraceable:public Traceable{
 public:
-	Collision():
-		time(Math::ONE),
-		//point,
-		//normal,
-		collider(NULL),
-		scope(0),
-		index(0)
-	{}
-
-	inline void set(const Collision &c){
-		time=c.time;
-		point.set(c.point);
-		normal.set(c.normal);
-		collider=c.collider;
-		scope=c.scope;
-		index=c.index;
-	}
-
-	inline void reset(){
-		time=Math::ONE;
-		point.set(Math::ZERO_VECTOR3);
-		normal.set(Math::ZERO_VECTOR3);
-		collider=NULL;
-		scope=0;
-		index=0;
-	}
-
-	scalar time;
-	Vector3 point; // This is the point at which the tracing node would stop
-	Vector3 normal;
-	node::Node *collider; // The node that blocked the trace
-	int scope; // The OR'd scope of the collision point
-	int index; // A sub index of which part of the node was hit
+	virtual ~DetailTraceable(){}
 };
 
 }

@@ -26,6 +26,7 @@
 #include <toadlet/hop/Simulator.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Extents.h>
 
 using namespace toadlet::egg;
 #if defined(TOADLET_FIXED_POINT)
@@ -1081,6 +1082,11 @@ void Simulator::capVector3(Vector3 &vector,scalar value) const{
 		vector.y=TOADLET_MIN_RR(value,vector.y);
 		vector.z=TOADLET_MAX_RR(-value,vector.z);
 		vector.z=TOADLET_MIN_RR(value,vector.z);
+
+		// This is to avoid invalid values that may arise in corner cases, or put in externally
+		vector.x=Extents::isReal(vector.x)?vector.x:0;
+		vector.y=Extents::isReal(vector.y)?vector.y:0;
+		vector.z=Extents::isReal(vector.z)?vector.z:0;
 	#endif
 }
 
