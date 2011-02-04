@@ -146,7 +146,7 @@ namespace Math{
 
 	inline fixed sqrt(fixed x){
 		fixed s=(x + ONE) >> 1;
-		for(int i=0;i<6;i++){
+		for(int i=0;i<8;i++){
 			s=(s + TOADLET_DIV_XX(x,s)) >> 1;
 		}
 		return s;
@@ -322,7 +322,7 @@ namespace Math{
 		return result;
 	}
 
-	// The predicision on this can be somewhat poor, so if speed isnt an issue, its suggested to convert to float and use math::Math::atan2
+	// The precision on this can be somewhat poor, so if speed isnt an issue, its suggested to convert to float and use math::Math::atan2
 	inline fixed atan2(fixed y,fixed x){
 		fixed absy=(y^(y>>31))-(y>>31)+1; // Add an epsilon to avoid div zero
 		fixed angle;

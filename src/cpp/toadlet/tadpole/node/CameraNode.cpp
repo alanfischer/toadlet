@@ -71,7 +71,7 @@ CameraNode::CameraNode():super(),
 Node *CameraNode::create(Scene *scene){
 	super::create(scene);
 
-	setProjectionFovX(Math::HALF_PI,Math::fromInt(1),Math::fromInt(1),Math::fromInt(1000));
+	setProjectionFovX(Math::HALF_PI,Math::ONE,Math::ONE,Math::fromInt(1000));
 	mViewportSet=false;
 	mViewport.reset();
 	mClearFlags=Renderer::ClearFlag_COLOR|Renderer::ClearFlag_DEPTH;

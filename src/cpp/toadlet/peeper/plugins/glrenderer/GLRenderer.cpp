@@ -113,7 +113,7 @@ GLRenderer::~GLRenderer(){
 
 bool GLRenderer::create(RenderTarget *target,int *options){
 	Logger::alert(Categories::TOADLET_PEEPER,
-		"creating GLRenderer");
+		"creating "+Categories::TOADLET_PEEPER+".GLRenderer");
 
 	if(target==NULL){
 		Error::nullPointer(Categories::TOADLET_PEEPER,

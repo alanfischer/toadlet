@@ -79,7 +79,7 @@ D3D10Renderer::~D3D10Renderer(){
 
 bool D3D10Renderer::create(RenderTarget *target,int *options){
 	Logger::alert(Categories::TOADLET_PEEPER,
-		"creating D3D10Renderer");
+		"creating "+Categories::TOADLET_PEEPER+".D3D10Renderer");
 
 	if(target==NULL){
 		Error::nullPointer(Categories::TOADLET_PEEPER,
@@ -224,6 +224,10 @@ bool D3D10Renderer::reset(){
 	setDefaultStates();
 
 	return true;
+}
+
+bool D3D10Renderer::activateAdditionalContext(){
+	return (mD3DDevice->GetCreationFlags() & D3D10_CREATE_DEVICE_SINGLETHREADED)==0;
 }
 
 Texture *D3D10Renderer::createTexture(){
