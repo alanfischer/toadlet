@@ -35,6 +35,7 @@ set (TADPOLE_ANIMATION_SRC
 )
 
 set (TADPOLE_BSP_SRC
+	bsp/BSP30Map.cpp
 	bsp/BSP30Node.cpp
 	bsp/BSP30Handler.cpp
 )
