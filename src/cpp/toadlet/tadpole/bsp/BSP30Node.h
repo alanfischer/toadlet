@@ -62,6 +62,8 @@ public:
 	BSP30ModelNode();
 	virtual ~BSP30ModelNode();
 
+	void *hasInterface(int type){return type==InterfaceType_TRACEABLE?(Traceable*)this:NULL;}
+
 	void setModel(BSP30Map::ptr map,const egg::String &name);
 	void setModel(BSP30Map::ptr map,int index);
 	int getModel() const{return mModelIndex;}
@@ -88,6 +90,8 @@ public:
 
 	BSP30Node();
 	virtual ~BSP30Node();
+
+	void *hasInterface(int type){return type==InterfaceType_TRACEABLE?(Traceable*)this:NULL;}
 
 	void setMap(const egg::String &name);
 	void setMap(BSP30Map::ptr map);

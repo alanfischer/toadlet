@@ -41,6 +41,7 @@ HopEntity::HopEntity():ParentNode(),
 	mSolid(new Solid()),
 	//mTraceableShape,
 	mTraceable(NULL),
+	//mTraceableNode,
 	//mInterpolator,
 	//mVolumeNode,
 	mNextThink(0)
@@ -55,6 +56,7 @@ Node *HopEntity::create(Scene *scene){
 
 	mTraceableShape=NULL;
 	mTraceable=NULL;
+	mTraceableNode=NULL;
 	mInterpolator=NULL;
 	mVolumeNode=NULL;
 	mNextThink=0;
@@ -133,6 +135,13 @@ void HopEntity::setNextThink(int think){
 		mNextThink=0;
 	}
 	setStayActive(mNextThink>0);
+}
+
+void HopEntity::findTraceableNode(Node *node){
+	mTraceableNode=mScene->findNodeByInterface(InterfaceType_TRACEABLE,node);
+	if(mTraceableNode!=NULL){
+		setTraceableShape((Traceable*)mTraceableNode->hasInterface(InterfaceType_TRACEABLE));
+	}
 }
 
 void HopEntity::setTraceableShape(Traceable *traceable){

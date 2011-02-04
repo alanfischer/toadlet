@@ -96,6 +96,10 @@ namespace Extents{
 			return isnan(v)>0;
 		#endif
 	}
+
+	inline bool isReal(double v){
+		return isInfinite(v)==false && isNAN(v)==false;
+	}
 }
 
 }

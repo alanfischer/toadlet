@@ -134,6 +134,30 @@ Node *Scene::findNodeByName(const String &name,Node *node){
 	}
 }
 
+Node *Scene::findNodeByInterface(int ni,Node *node){
+	if(node==NULL){
+		node=mRoot;
+	}
+
+	if(node->hasInterface(ni)!=NULL){
+		return node;
+	}
+	else{
+		ParentNode *parent=node->isParent();
+		if(parent!=NULL){
+			int i;
+			for(i=0;i<parent->getNumChildren();++i){
+				Node *found=findNodeByInterface(ni,parent->getChild(i));
+				if(found!=NULL){
+					return found;
+				}
+			}
+		}
+
+		return NULL;
+	}
+}
+
 void Scene::setRangeLogicDT(int minDT,int maxDT){
 	#if defined(TOADLET_DEBUG)
 		if(minDT<0 || maxDT<0){

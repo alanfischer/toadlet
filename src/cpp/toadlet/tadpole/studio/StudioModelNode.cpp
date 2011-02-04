@@ -105,6 +105,17 @@ StudioModelNode::StudioModelNode():super(),
 StudioModelNode::~StudioModelNode(){
 }
 
+void *StudioModelNode::hasInterface(int type){
+	switch(type){
+		case InterfaceType_ATTACHABLE:
+			return (Attachable*)this;
+		case InterfaceType_DETAILTRACEABLE:
+			return (DetailTraceable*)this;
+		default:
+			return NULL;
+	}
+}
+
 void StudioModelNode::destroy(){
 	if(mModel!=NULL){
 		mModel->release();
@@ -367,6 +378,7 @@ void StudioModelNode::traceSegment(Collision &result,const Vector3 &position,con
 			Math::mul(result.point,mBoneRotates[sbbox->bone],point);
 			Math::add(result.point,mBoneTranslates[sbbox->bone]);
 			Math::mul(result.normal,mBoneRotates[sbbox->bone],normal);
+			result.index=i;
 		}
 	}
 

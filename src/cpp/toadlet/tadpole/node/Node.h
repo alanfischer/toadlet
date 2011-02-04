@@ -86,6 +86,12 @@ public:
 		TransformUpdate_BIT_TRANSFORM=TransformUpdate_BIT_TRANSLATE|TransformUpdate_BIT_ROTATE|TransformUpdate_BIT_SCALE,
 	};
 
+	enum InterfaceType{
+		InterfaceType_ATTACHABLE,
+		InterfaceType_DETAILTRACEABLE,
+		InterfaceType_TRACEABLE,
+	};
+
 	Node();
 	virtual ~Node();
 	virtual Node *create(Scene *scene);
@@ -95,6 +101,7 @@ public:
 
 	virtual ParentNode *isParent(){return NULL;}
 	virtual Node *isEntity(){return NULL;}
+	virtual void *hasInterface(int type){return NULL;}
 
 	inline int getUniqueHandle() const{return mUniqueHandle;}
 
