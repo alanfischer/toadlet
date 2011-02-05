@@ -150,6 +150,7 @@ protected:
 	leafdata mGlobalLeafData;
 	uint8 *mMarkedFaces;
 	toadlet::egg::Collection<BSP30Map::facedata*> mVisibleMaterialFaces;
+	peeper::TextureStage::ptr mLightmapStage;
 
 	int mCounter;
 	egg::Collection<int> mLeafIndexes;

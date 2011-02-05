@@ -24,8 +24,10 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/bsp/BSP30Map.h>
+#include <string.h> // memset
 
 using namespace toadlet::egg;
+using namespace toadlet::egg::image;
 using namespace toadlet::peeper;
 
 namespace toadlet{
@@ -50,6 +52,8 @@ BSP30Map::BSP30Map():
 	entities(NULL),		nentities(0)
 {
 	header.version=0;
+
+	lightmapImage=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGB_8,LIGHTMAP_SIZE,LIGHTMAP_SIZE));
 };
 
 void BSP30Map::destroy(){
@@ -68,6 +72,12 @@ void BSP30Map::destroy(){
 	if(textures!=NULL){		free(textures);		ntextures=0;}
 	if(lighting!=NULL){		free(lighting);		nlighting=0;}
 	if(entities!=NULL){		free(entities);		nentities=0;}
+
+	int i;
+	for(i=0;i<lightmapTextures.size();++i){
+		lightmapTextures[i]->release();
+	}
+	lightmapTextures.clear();
 }
 
 int BSP30Map::modelCollisionTrace(Collision &result,int model,const Vector3 &size,const Vector3 &start,const Vector3 &end){
@@ -146,7 +156,7 @@ bool BSP30Map::modelLightTrace(Color &result,int model,const Vector3 &start,cons
 			if(s<mins[0] || t<mins[1]) continue;
 			if(s>maxs[0] || t>maxs[1]) continue;
 
-			int lmwidth=(ceil(maxs[0]/16.0) - floor(mins[0]/16.0)) + 1;
+			int lmwidth=((maxs[0]-mins[0])>>4)+1;
 			tbyte *lightdata=((tbyte*)lighting) + face->lightofs + (lmwidth*((t-mins[1])>>4) + ((s-mins[0])>>4))*3;
 			result.set(lightdata[0]/255.0,lightdata[1]/255.0,lightdata[2]/255.0,0);
 
@@ -156,10 +166,12 @@ bool BSP30Map::modelLightTrace(Color &result,int model,const Vector3 &start,cons
 	return false;
 }
 
-void BSP30Map::findSurfaceExtents(bface *face,int *mins,int *maxs){
+void BSP30Map::findSurfaceExtents(bface *face,int *smins,int *smaxs){
 	float val;
 	int i,j,surfedge;
 	bvertex *v;
+	float mins[2],maxs[2];
+	float bmin,bmax;
 
 	mins[0]=mins[1]=999999;
 	maxs[0]=maxs[1]=-999999;
@@ -176,6 +188,62 @@ void BSP30Map::findSurfaceExtents(bface *face,int *mins,int *maxs){
 			if(val>maxs[j])	maxs[j]=val;
 		}
 	}
+
+	for(i=0;i<2;i++){
+		bmin=Math::floor(mins[i]/16);
+		bmax=Math::ceil(maxs[i]/16);
+
+		smins[i]=bmin*16;
+		smaxs[i]=bmax*16;
+		if(smaxs[i]-smins[i]<16){
+			smaxs[i]=smins[i]+16;
+		}
+	}
+}
+
+void BSP30Map::initLightmap(){
+	memset(lightmapImage->getData(),0,lightmapImage->getSlicePitch());
+	memset(lightmapAllocated,0,sizeof(lightmapAllocated));
+}
+
+void BSP30Map::uploadLightmap(TextureManager *manager){
+	Texture::ptr texture=manager->createTexture(lightmapImage);
+	texture->retain();
+	lightmapTextures.add(texture);
+}
+
+/// @todo: Cleanup
+int BSP30Map::allocLightmap(int st[],int width,int height){
+	int i,j;
+	int best,best2;
+
+	best = LIGHTMAP_SIZE;
+
+	for (i=0 ; i<LIGHTMAP_SIZE-width ; i++)
+	{
+		best2 = 0;
+
+		for (j=0 ; j<width ; j++)
+		{
+			if (lightmapAllocated[i+j] >= best)
+				break;
+			if (lightmapAllocated[i+j] > best2)
+				best2 = lightmapAllocated[i+j];
+		}
+		if (j == width)
+		{	// this is a valid spot
+			st[0] = i;
+			st[1] = best = best2;
+		}
+	}
+
+	if (best + height > LIGHTMAP_SIZE)
+		return -1;
+
+	for (i=0 ; i<width ; i++)
+		lightmapAllocated[st[0] + i] = best + height;
+
+	return lightmapTextures.size();
 }
 
 int BSP30Map::findPointLeaf(bplane *planes,void *hull,int hullStride,int index,const Vector3 &point){

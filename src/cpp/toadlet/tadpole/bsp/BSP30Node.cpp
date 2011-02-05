@@ -186,6 +186,10 @@ void BSP30Node::setMap(BSP30Map::ptr map){
 		findBoundLeafs(indexes,node);
 		insertNodeLeafIndexes(indexes,node);
 	}
+
+	mLightmapStage=mEngine->getMaterialManager()->createTextureStage(NULL);
+	mLightmapStage->setTexCoordIndex(1);
+	mLightmapStage->setBlend(TextureBlend(TextureBlend::Operation_MODULATE,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
 }
 
 void BSP30Node::setSkyName(const String &skyName){
@@ -497,6 +501,8 @@ void BSP30Node::render(Renderer *renderer) const{
 		BSP30Map::facedata *face=mVisibleMaterialFaces[i];
 		while(face!=NULL){
 			if(face->visible){
+				mLightmapStage->setTexture(mMap->lightmapTextures[face->lightmapIndex]); /// @todo: Check to see if our lightmapIndex is the same as previous, and then not change
+				renderer->setTextureStage(1,mLightmapStage);
 				renderer->renderPrimitive(mMap->vertexData,face->indexData);
 			}
 			face=face->next;
