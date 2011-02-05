@@ -31,6 +31,7 @@
 #include <toadlet/tadpole/bsp/BSP30Types.h>
 #include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/Material.h>
+#include <toadlet/tadpole/TextureManager.h>
 #include <stdlib.h>
 
 namespace toadlet{
@@ -42,12 +43,18 @@ public:
 	TOADLET_BASERESOURCE_PASSTHROUGH(BaseResource);
 	TOADLET_SHARED_POINTERS(BSP30Map);
 
+	const static int LIGHTMAP_SIZE=256;
+
 	BSP30Map();	
 	void destroy();
 
 	int modelCollisionTrace(Collision &result,int model,const Vector3 &size,const Vector3 &start,const Vector3 &end);
 	bool modelLightTrace(peeper::Color &result,int model,const Vector3 &start,const Vector3 &end);
 	void findSurfaceExtents(bface *face,int *mins,int *maxs);
+
+	void initLightmap();
+	int allocLightmap(int st[],int width,int height);
+	void uploadLightmap(TextureManager *manager);
 
 	static int findPointLeaf(bplane *planes,void *hull,int hullStride,int index,const Vector3 &point);
 	static bool hullTrace(Collision &result,bplane *planes,bleaf *leafs,void *hull,int hullStride,int index,scalar p1t,scalar p2t,const Vector3 &p1,const Vector3 &p2,scalar epsilon,int stopContentsBits,int *lastIndex);
@@ -59,11 +66,11 @@ public:
 	}
 
 	struct facedata{
-		facedata():index(0),visible(true),next(NULL){}
+		facedata():index(0),lightmapIndex(0),visible(true),next(NULL){}
 
 		int index;
 		peeper::IndexData::ptr indexData;
-		Matrix4x4 lightmapTransform;
+		int lightmapIndex;
 		bool visible;
 		facedata *next;
 	};
@@ -92,7 +99,9 @@ public:
 	egg::Collection<Material::ptr> materials;
 	peeper::VertexData::ptr vertexData;
 	egg::Collection<facedata> facedatas;
-	peeper::Texture::ptr lightmap;
+	egg::image::Image::ptr lightmapImage;
+	egg::Collection<peeper::Texture::ptr> lightmapTextures;
+	int lightmapAllocated[LIGHTMAP_SIZE];
 };
 
 }
