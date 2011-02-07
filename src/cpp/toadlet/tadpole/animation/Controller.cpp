@@ -149,6 +149,9 @@ void Controller::update(int dt){
 				mFinishedListener->controllerFinished(this); // Must be last since it may delete this
 			}
 		}
+		else{
+			set(Math::fromMilli(mTime));
+		}
 	}
 }
 

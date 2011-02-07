@@ -63,7 +63,7 @@ Resource::ptr BSP30Handler::load(Stream::ptr stream,const ResourceHandlerData *h
 
 	Logger::debug(Categories::TOADLET_TADPOLE,"Reading map");
 
-	BSP30Map::ptr map(new BSP30Map());
+	BSP30Map::ptr map(new BSP30Map(mEngine));
 
 	stream->read((tbyte*)&map->header,sizeof(map->header));
 
@@ -296,7 +296,7 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 			lmheight=((surfmaxs[1]-surfmins[1])>>4)+1;
 
 			if((faced->lightmapIndex=map->allocLightmap(lightmapCoord,lmwidth,lmheight))<0){
-				map->uploadLightmap(mEngine->getTextureManager());
+				map->uploadLightmap();
 				map->initLightmap();
 				if((faced->lightmapIndex=map->allocLightmap(lightmapCoord,lmwidth,lmheight))<0){
 					Error::unknown("unable to allocate lightmap");
@@ -363,7 +363,7 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 	}
 	vba.unlock();
 
-	map->uploadLightmap(mEngine->getTextureManager());
+	map->uploadLightmap();
 
 	map->vertexData=VertexData::ptr(new VertexData(vertexBuffer));
 }

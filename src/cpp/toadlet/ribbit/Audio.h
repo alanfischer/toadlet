@@ -41,6 +41,9 @@ public:
 	virtual bool create(AudioStream::ptr stream)=0;
 	virtual void destroy()=0;
 
+	virtual AudioBuffer::ptr getAudioBuffer()=0;
+	virtual AudioStream::ptr getAudioStream()=0;
+
 	virtual bool play()=0;
 	virtual bool stop()=0;
 	virtual bool getPlaying() const=0;

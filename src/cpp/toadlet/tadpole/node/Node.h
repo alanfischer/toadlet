@@ -98,6 +98,8 @@ public:
 	inline bool created() const{return mCreated;}
 	virtual void destroy();
 	inline bool destroyed() const{return !mCreated;}
+	virtual Node *clone();
+	virtual Node *set(Node *node);
 
 	virtual ParentNode *isParent(){return NULL;}
 	virtual Node *isEntity(){return NULL;}
@@ -215,19 +217,18 @@ protected:
 	
 	Node::ptr mDependsUpon;
 
-	int mTransformUpdatedFrame;
-	Transform::ptr mTransform;
-	Bound::ptr mBound;
-	Transform::ptr mWorldTransform;
-	Bound::ptr mWorldBound;
-
-	int mScope;
-	egg::String mName;
-
 	bool mActive;
 	int mDeactivateCount;
 	int mLastLogicFrame;
 	int mLastFrame;
+	int mTransformUpdatedFrame;
+
+	Transform::ptr mTransform;
+	Bound::ptr mBound;
+	Transform::ptr mWorldTransform;
+	Bound::ptr mWorldBound;
+	int mScope;
+	egg::String mName;
 
 	friend class ParentNode;
 };

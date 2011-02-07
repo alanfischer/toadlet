@@ -56,6 +56,21 @@ void LightNode::destroy(){
 	super::destroy();
 }
 
+Node *LightNode::set(Node *node){
+	super::set(node);
+
+	LightNode *lightNode=(LightNode*)this;
+	setSpecularColor(lightNode->getSpecularColor());
+	setDiffuseColor(lightNode->getDiffuseColor());
+	setLinearAttenuation(lightNode->getLinearAttenuation());
+	setLightType(lightNode->getLightType());
+	setDirection(lightNode->getDirection());
+	setSpotCutoff(lightNode->getSpotCutoff());
+	setRadius(lightNode->getRadius());
+
+	return this;
+}
+
 void LightNode::queueRenderables(CameraNode *node,RenderQueue *queue){
 	queue->queueLight(this);
 }

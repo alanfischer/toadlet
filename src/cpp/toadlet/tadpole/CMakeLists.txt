@@ -148,6 +148,7 @@ set (TADPOLE_ANIMATION_HEADERS
 	animation/Controller.h
 	animation/ControllerFinishedListener.h
 	animation/CameraProjectionAnimation.h
+	animation/MaterialLightEffectAnimation.h
 	animation/NodePathAnimation.h
 	animation/SkeletonAnimation.h
 )

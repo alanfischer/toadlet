@@ -50,13 +50,8 @@ BSP30ModelNode::SubModel::SubModel(BSP30ModelNode *modelNode,BSP30Map *map){
 }
 
 void BSP30ModelNode::SubModel::render(peeper::Renderer *renderer) const{
-	BSP30Map::facedata *face=faces;
-	while(face!=NULL){
-		if(face->visible){
-			renderer->renderPrimitive(map->vertexData,face->indexData);
-		}
-		face=face->next;
-	}
+	map->renderFaces(renderer,faces);
+	renderer->setTextureStage(1,NULL);
 }
 
 TOADLET_NODE_IMPLEMENT(BSP30ModelNode,Categories::TOADLET_TADPOLE_BSP+".BSP30ModelNode");
@@ -66,7 +61,15 @@ BSP30ModelNode::BSP30ModelNode():Node(),
 	mModelIndex(-1)
 {}
 
-BSP30ModelNode::~BSP30ModelNode(){
+BSP30ModelNode::~BSP30ModelNode(){}
+
+Node *BSP30ModelNode::set(Node *node){
+	super::set(node);
+
+	BSP30ModelNode *modelNode=(BSP30ModelNode*)node;
+	setModel(modelNode->getMap(),modelNode->getModel());
+
+	return this;
 }
 
 void BSP30ModelNode::setModel(BSP30Map::ptr map,const String &name){
@@ -152,6 +155,16 @@ BSP30Node::BSP30Node():super(),
 
 BSP30Node::~BSP30Node(){}
 
+Node *BSP30Node::set(Node *node){
+	super::set(node);
+
+	BSP30Node *bspNode=(BSP30Node*)this;
+	setMap(bspNode->getMap());
+	setSkyName(bspNode->getSkyName());
+
+	return this;
+}
+
 void BSP30Node::setMap(const String &name){
 	Stream::ptr stream=mEngine->openStream(name);
 	if(stream==NULL){
@@ -186,10 +199,6 @@ void BSP30Node::setMap(BSP30Map::ptr map){
 		findBoundLeafs(indexes,node);
 		insertNodeLeafIndexes(indexes,node);
 	}
-
-	mLightmapStage=mEngine->getMaterialManager()->createTextureStage(NULL);
-	mLightmapStage->setTexCoordIndex(1);
-	mLightmapStage->setBlend(TextureBlend(TextureBlend::Operation_MODULATE,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
 }
 
 void BSP30Node::setSkyName(const String &skyName){
@@ -498,15 +507,7 @@ void BSP30Node::render(Renderer *renderer) const{
 	Material *previousMaterial=NULL;
 	for(i=0;i<mVisibleMaterialFaces.size();i++){
 		mMap->materials[i]->setupRenderer(renderer,previousMaterial);
-		BSP30Map::facedata *face=mVisibleMaterialFaces[i];
-		while(face!=NULL){
-			if(face->visible){
-				mLightmapStage->setTexture(mMap->lightmapTextures[face->lightmapIndex]); /// @todo: Check to see if our lightmapIndex is the same as previous, and then not change
-				renderer->setTextureStage(1,mLightmapStage);
-				renderer->renderPrimitive(mMap->vertexData,face->indexData);
-			}
-			face=face->next;
-		}
+		mMap->renderFaces(renderer,mVisibleMaterialFaces[i]);
 		previousMaterial=mMap->materials[i];
 	}
 

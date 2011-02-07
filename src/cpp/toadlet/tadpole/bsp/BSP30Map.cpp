@@ -34,7 +34,7 @@ namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-BSP30Map::BSP30Map():
+BSP30Map::BSP30Map(Engine *engine):
 	models(NULL),		nmodels(0),
 	vertexes(NULL),		nvertexes(0),
 	planes(NULL),		nplanes(0),
@@ -53,7 +53,13 @@ BSP30Map::BSP30Map():
 {
 	header.version=0;
 
+	this->engine=engine;
+
 	lightmapImage=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGB_8,LIGHTMAP_SIZE,LIGHTMAP_SIZE));
+
+	lightmapStage=engine->getMaterialManager()->createTextureStage(NULL);
+	lightmapStage->setTexCoordIndex(1);
+	lightmapStage->setBlend(TextureBlend(TextureBlend::Operation_MODULATE,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
 };
 
 void BSP30Map::destroy(){
@@ -206,42 +212,47 @@ void BSP30Map::initLightmap(){
 	memset(lightmapAllocated,0,sizeof(lightmapAllocated));
 }
 
-void BSP30Map::uploadLightmap(TextureManager *manager){
-	Texture::ptr texture=manager->createTexture(lightmapImage);
+void BSP30Map::uploadLightmap(){
+	Texture::ptr texture=engine->getTextureManager()->createTexture(lightmapImage);
 	texture->retain();
 	lightmapTextures.add(texture);
 }
 
-/// @todo: Cleanup
+void BSP30Map::renderFaces(Renderer *renderer,facedata *face){
+	while(face!=NULL){
+		if(face->visible){
+			lightmapStage->setTexture(lightmapTextures[face->lightmapIndex]); /// @todo: Check to see if our lightmapIndex is the same as previous, and then not change
+			renderer->setTextureStage(1,lightmapStage);
+			renderer->renderPrimitive(vertexData,face->indexData);
+		}
+		face=face->next;
+	}
+}
+
 int BSP30Map::allocLightmap(int st[],int width,int height){
 	int i,j;
-	int best,best2;
+	int best=LIGHTMAP_SIZE,best2=0;
 
-	best = LIGHTMAP_SIZE;
-
-	for (i=0 ; i<LIGHTMAP_SIZE-width ; i++)
-	{
-		best2 = 0;
-
-		for (j=0 ; j<width ; j++)
-		{
-			if (lightmapAllocated[i+j] >= best)
-				break;
-			if (lightmapAllocated[i+j] > best2)
-				best2 = lightmapAllocated[i+j];
+	for(i=0;i<LIGHTMAP_SIZE-width;++i){
+		best2=0;
+		for(j=0;j<width && lightmapAllocated[i+j]<best;++j){
+			if(lightmapAllocated[i+j]>best2){
+				best2=lightmapAllocated[i+j];
+			}
 		}
-		if (j == width)
-		{	// this is a valid spot
-			st[0] = i;
-			st[1] = best = best2;
+		if(j==width){
+			st[0]=i;
+			st[1]=best=best2;
 		}
 	}
 
-	if (best + height > LIGHTMAP_SIZE)
+	if(best+height>LIGHTMAP_SIZE){
 		return -1;
+	}
 
-	for (i=0 ; i<width ; i++)
-		lightmapAllocated[st[0] + i] = best + height;
+	for(i=0;i<width;i++){
+		lightmapAllocated[st[0]+i]=best+height;
+	}
 
 	return lightmapTextures.size();
 }

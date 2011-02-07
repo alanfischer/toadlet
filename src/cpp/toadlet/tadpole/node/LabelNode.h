@@ -39,12 +39,6 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-/// @todo: Look more into letting the nodes be used for 2D widget layouts.
-//  Originally we had the Sizeable interface for this, but it was removed
-//  in favor of eventually letting us set the LocalBound as a AABox, then
-//  the layout of a LabelNode or possibly size of a SpriteNode would be
-//  determined by the LocalBound, if it was externally set.
-
 class TOADLET_API LabelNode:public CameraAlignedNode,public Renderable{
 public:
 	TOADLET_NODE(LabelNode,CameraAlignedNode);
@@ -52,6 +46,7 @@ public:
 	LabelNode();
 	virtual Node *create(Scene *scene);
 	virtual void destroy();
+	virtual Node *set(Node *node);
 
 	void setFont(const Font::ptr &font);
 	Font::ptr getFont() const{return mFont;}

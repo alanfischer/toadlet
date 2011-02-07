@@ -58,11 +58,9 @@ TerrainPatchNode::TerrainPatchNode():Node(),
 
 	mTolerance(0),
 	mS1(0),mS2(0)
-{
-}
+{}
 
-TerrainPatchNode::~TerrainPatchNode(){
-}
+TerrainPatchNode::~TerrainPatchNode(){}
 
 Node *TerrainPatchNode::create(Scene *scene){
 	super::create(scene);
@@ -135,6 +133,13 @@ void TerrainPatchNode::destroy(){
 	}
 
 	super::destroy();
+}
+
+Node *TerrainPatchNode::set(Node *node){
+	super::set(node);
+
+	Error::unimplemented("TerrainPatchNode::set is unimplemented");
+	return NULL;
 }
 
 bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height,bool water){

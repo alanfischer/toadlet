@@ -41,6 +41,7 @@ public:
 	ParentNode();
 	virtual Node *create(Scene *scene);
 	virtual void destroy();
+	virtual Node *set(Node *node);
 
 	virtual ParentNode *isParent(){return this;}
 
