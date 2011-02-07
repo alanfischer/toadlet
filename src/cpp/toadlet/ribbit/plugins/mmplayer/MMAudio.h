@@ -38,36 +38,39 @@ public:
 	MMAudio(MMPlayer *player);
 	virtual ~MMAudio();
 
-	virtual bool create(AudioBuffer::ptr audioBuffer);
-	virtual bool create(AudioStream::ptr stream);
-	virtual void destroy();
+	bool create(AudioBuffer::ptr audioBuffer);
+	bool create(AudioStream::ptr stream);
+	void destroy();
 
-	virtual bool play(){mPosition=0;mPlaying=true;return true;}
-	virtual bool stop(){mPlaying=false;return false;}
-	virtual bool getPlaying() const{return mPlaying;}
-	virtual bool getFinished() const{return !mPlaying;}
+	AudioBuffer::ptr getAudioBuffer(){return mAudioBuffer;}
+	AudioStream::ptr getAudioStream(){return mAudioStream;}
 
-	virtual void setLooping(bool looping){mLooping=looping;}
-	virtual bool getLooping() const{return mLooping;}
+	bool play(){mPosition=0;mPlaying=true;return true;}
+	bool stop(){mPlaying=false;return false;}
+	bool getPlaying() const{return mPlaying;}
+	bool getFinished() const{return !mPlaying;}
 
-	virtual void setGain(scalar gain){mGain=gain;}
-	virtual void fadeToGain(scalar gain,int time){mGain=gain;}
-	virtual scalar getGain() const{return mGain;}
+	void setLooping(bool looping){mLooping=looping;}
+	bool getLooping() const{return mLooping;}
 
-	virtual void setPitch(scalar pitch){mPitch=pitch;}
-	virtual scalar getPitch() const{return mPitch;}
+	void setGain(scalar gain){mGain=gain;}
+	void fadeToGain(scalar gain,int time){mGain=gain;}
+	scalar getGain() const{return mGain;}
 
-	virtual void setGlobal(bool global){}
-	virtual bool getGlobal() const{return false;}
+	void setPitch(scalar pitch){mPitch=pitch;}
+	scalar getPitch() const{return mPitch;}
 
-	virtual void setRolloffFactor(scalar r){}
-	virtual scalar getRolloffFactor() const{return 0;}
+	void setGlobal(bool global){}
+	bool getGlobal() const{return false;}
 
-	virtual void setPosition(const Vector3 &position){}
-	virtual const Vector3 &getPosition() const{return Math::ZERO_VECTOR3;}
+	void setRolloffFactor(scalar r){}
+	scalar getRolloffFactor() const{return 0;}
 
-	virtual void setVelocity(const Vector3 &velocity){}
-	virtual const Vector3 &getVelocity() const{return Math::ZERO_VECTOR3;}
+	void setPosition(const Vector3 &position){}
+	const Vector3 &getPosition() const{return Math::ZERO_VECTOR3;}
+
+	void setVelocity(const Vector3 &velocity){}
+	const Vector3 &getVelocity() const{return Math::ZERO_VECTOR3;}
 
 protected:
 	int read(tbyte *data,int length);

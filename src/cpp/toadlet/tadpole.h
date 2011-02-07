@@ -58,6 +58,7 @@
 #include <toadlet/tadpole/animation/Controller.h>
 #include <toadlet/tadpole/animation/ControllerFinishedListener.h>
 #include <toadlet/tadpole/animation/CameraProjectionAnimation.h>
+#include <toadlet/tadpole/animation/MaterialLightEffectAnimation.h>
 #include <toadlet/tadpole/animation/NodePathAnimation.h>
 #include <toadlet/tadpole/animation/SkeletonAnimation.h>
 

@@ -45,6 +45,16 @@ CameraAlignedNode::CameraAlignedNode():super(),
 	setPerspective(true);
 }
 
+Node *CameraAlignedNode::set(Node *node){
+	super::set(node);
+
+	CameraAlignedNode *alignedNode=(CameraAlignedNode*)node;
+	setCameraAligned(alignedNode->getCameraAligned());
+	setPerspective(alignedNode->getPerspective());
+
+	return this;
+}
+
 void CameraAlignedNode::frameUpdate(int dt,int scope){
 	super::frameUpdate(dt,scope);
 

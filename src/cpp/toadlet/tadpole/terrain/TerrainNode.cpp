@@ -91,6 +91,13 @@ void TerrainNode::destroy(){
 	super::destroy();
 }
 
+Node *TerrainNode::set(Node *node){
+	super::set(node);
+
+	Error::unimplemented("TerrainNode::set is unimplemented");
+	return NULL;
+}
+
 void TerrainNode::setTarget(Node *target){
 	mTarget=target;
 

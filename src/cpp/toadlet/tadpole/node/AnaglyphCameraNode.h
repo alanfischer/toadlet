@@ -42,6 +42,7 @@ public:
 
 	Node *create(Scene *scene);
 	void destroy();
+	Node *set(Node *node);
 
 	void setSeparation(scalar separation){mSeparation=separation;}
 	scalar getSeparation() const{return mSeparation;}

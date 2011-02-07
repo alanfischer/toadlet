@@ -42,9 +42,10 @@ public:
 
 	TerrainNode();
 	virtual ~TerrainNode();
-
 	node::Node *create(Scene *scene);
 	void destroy();
+	node::Node *set(node::Node *node);
+	void *hasInterface(int type){return type==InterfaceType_TRACEABLE?(Traceable*)this:NULL;}
 
 	void setListener(TerrainNodeListener *listener){mListener=listener;}
 	TerrainNodeListener *getListener(){return mListener;}

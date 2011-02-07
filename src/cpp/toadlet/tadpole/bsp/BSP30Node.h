@@ -61,6 +61,7 @@ public:
 
 	BSP30ModelNode();
 	virtual ~BSP30ModelNode();
+	virtual Node *set(Node *node);
 
 	void *hasInterface(int type){return type==InterfaceType_TRACEABLE?(Traceable*)this:NULL;}
 
@@ -90,6 +91,7 @@ public:
 
 	BSP30Node();
 	virtual ~BSP30Node();
+	virtual Node *set(Node *node);
 
 	void *hasInterface(int type){return type==InterfaceType_TRACEABLE?(Traceable*)this:NULL;}
 

@@ -67,10 +67,10 @@ public:
 
 	StudioModelNode();
 	virtual ~StudioModelNode();
+	void destroy();
+	Node *set(Node *node);
 
 	void *hasInterface(int type);
-
-	void destroy();
 
 	void logicUpdate(int dt,int scope);
 	void frameUpdate(int dt,int scope);

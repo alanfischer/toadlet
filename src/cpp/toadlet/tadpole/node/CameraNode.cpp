@@ -121,6 +121,37 @@ void CameraNode::destroy(){
 	super::destroy();
 }
 
+Node *CameraNode::set(Node *node){
+	super::set(node);
+	
+	CameraNode *cameraNode=(CameraNode*)node;
+	switch(cameraNode->getProjectionType()){
+		case ProjectionType_FOVX:
+			setProjectionFovX(cameraNode->getFov(),cameraNode->getAspect(),cameraNode->getNearDist(),cameraNode->getFarDist());
+		break;
+		case ProjectionType_FOVY:
+			setProjectionFovY(cameraNode->getFov(),cameraNode->getAspect(),cameraNode->getNearDist(),cameraNode->getFarDist());
+		break;
+		case ProjectionType_ORTHO:
+			setProjectionOrtho(cameraNode->getLeftDist(),cameraNode->getRightDist(),cameraNode->getBottomDist(),cameraNode->getTopDist(),cameraNode->getNearDist(),cameraNode->getFarDist());
+		break;
+		case ProjectionType_FRUSTUM:
+			setProjectionFrustum(cameraNode->getLeftDist(),cameraNode->getRightDist(),cameraNode->getBottomDist(),cameraNode->getTopDist(),cameraNode->getNearDist(),cameraNode->getFarDist());
+		break;
+		case ProjectionType_MATRIX:
+			setProjectionMatrix(cameraNode->getProjectionMatrix());
+		break;
+	}
+	setAlignmentCalculationsUseOrigin(cameraNode->getAlignmentCalculationsUseOrigin());
+	setViewport(cameraNode->getViewport());
+	setClearFlags(cameraNode->getClearFlags());
+	setClearColor(cameraNode->getClearColor());
+	setSkipFirstClear(cameraNode->getSkipFirstClear());
+	setGamma(cameraNode->getGamma());
+
+	return this;
+}
+
 void CameraNode::setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,scalar farDist){
 	mProjectionType=ProjectionType_FOVX;
 	mFov=fovx;mAspect=aspect;

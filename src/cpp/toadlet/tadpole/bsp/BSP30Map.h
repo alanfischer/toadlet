@@ -30,6 +30,7 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/tadpole/bsp/BSP30Types.h>
 #include <toadlet/tadpole/Collision.h>
+#include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <stdlib.h>
@@ -44,8 +45,9 @@ public:
 	TOADLET_SHARED_POINTERS(BSP30Map);
 
 	const static int LIGHTMAP_SIZE=256;
+	struct facedata;
 
-	BSP30Map();	
+	BSP30Map(Engine *engine);	
 	void destroy();
 
 	int modelCollisionTrace(Collision &result,int model,const Vector3 &size,const Vector3 &start,const Vector3 &end);
@@ -54,7 +56,10 @@ public:
 
 	void initLightmap();
 	int allocLightmap(int st[],int width,int height);
-	void uploadLightmap(TextureManager *manager);
+	void uploadLightmap();
+
+	// This assumes the material has already been set, and just sets the lightmap
+	void renderFaces(peeper::Renderer *renderer,facedata *faces);
 
 	static int findPointLeaf(bplane *planes,void *hull,int hullStride,int index,const Vector3 &point);
 	static bool hullTrace(Collision &result,bplane *planes,bleaf *leafs,void *hull,int hullStride,int index,scalar p1t,scalar p2t,const Vector3 &p1,const Vector3 &p2,scalar epsilon,int stopContentsBits,int *lastIndex);
@@ -92,6 +97,7 @@ public:
 	void *lighting;				int nlighting;
 	char *entities;				int nentities;
 
+	Engine *engine;
 	bmiptexlump *miptexlump;
 	egg::Collection<egg::Collection<int> > parsedVisibility;
 	egg::Collection<egg::Map<egg::String,egg::String> > parsedEntities;
@@ -102,6 +108,7 @@ public:
 	egg::image::Image::ptr lightmapImage;
 	egg::Collection<peeper::Texture::ptr> lightmapTextures;
 	int lightmapAllocated[LIGHTMAP_SIZE];
+	peeper::TextureStage::ptr lightmapStage;
 };
 
 }
