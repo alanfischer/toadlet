@@ -38,11 +38,7 @@ void RibbitTest::update(int dt){
 	}
 }
 
-#if defined(TOADLET_PLATFORM_WINCE)
-int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,int nCmdShow){
-#else
-int main(int argc,char **argv){
-#endif
+int toadletMain(int argc,char **argv){
 	RibbitTest app;
 	app.create();
 	app.start();

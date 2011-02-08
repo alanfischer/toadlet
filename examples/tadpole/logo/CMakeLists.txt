@@ -9,13 +9,14 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${logo_SOURCE_DIR}/../../../cmake/M
 find_package (toadlet REQUIRED)
 
 # Includes
-include_directories (${CMAKE_CURRENT_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
+include_directories (${logo_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
 
 # Libraries
 set (LIBS ${TOADLET_EGG_LIB} ${TOADLET_PEEPER_LIB} ${TOADLET_RIBBIT_LIB} ${TOADLET_TADPOLE_LIB} ${TOADLET_PAD_LIB})
 
 # Source files
 set (SRC
+	../../main/toadletMain.cpp
 	Logo.cpp
 	lt_xmsh.cpp
 	lt_mmsh.cpp
