@@ -50,12 +50,11 @@ public:
 	virtual void addResourceArchive(egg::io::Archive::ptr archive);
 	virtual void removeResourceArchive(egg::io::Archive::ptr archive);
 
+	virtual egg::Resource::ptr get(int handle);
 	virtual egg::Resource::ptr get(const egg::String &name);
 	virtual egg::Resource::ptr find(const egg::String &name,ResourceHandlerData::ptr handlerData=ResourceHandlerData::ptr());
 	virtual egg::Resource::ptr manage(const egg::Resource::ptr &resource,const egg::String &name=(char*)NULL);
 	virtual void unmanage(egg::Resource *resource);
-
-	virtual egg::Resource::ptr getByHandle(int handle);
 
 	virtual void setHandler(ResourceHandler::ptr handler,const egg::String &extension);
 	virtual ResourceHandler::ptr getHandler(const egg::String &extension);

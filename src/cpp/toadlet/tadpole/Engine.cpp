@@ -169,6 +169,7 @@ Engine::Engine(bool backable):
 	mFontManager=new FontManager(this->getArchiveManager());
 	mMeshManager=new MeshManager(this);
 	mAudioBufferManager=new AudioBufferManager(this);
+	mNodeManager=new NodeManager(this);
 
 	// Make a guess at what the ideal format is.
 	#if defined(TOADLET_FIXED_POINT) && (defined(TOADLET_PLATFORM_WINCE) || defined(TOADLET_PLATFORM_IPHONE) || defined(TOADLET_PLATFORM_ANDROID))
@@ -247,7 +248,6 @@ Engine::Engine(bool backable):
 	#if defined(TOADLET_HAS_MXML)
 		mMeshManager->setHandler(XMSHHandler::ptr(new XMSHHandler(mBufferManager,mMaterialManager,mTextureManager)),"xmsh");
 	#endif
-
 	mMeshManager->setHandler(MMSHHandler::ptr(new MMSHHandler(this)),"mmsh");
 
 	// AudioBuffer handlers
@@ -266,6 +266,11 @@ Engine::Engine(bool backable):
 
 Engine::~Engine(){
 	destroy();
+
+	if(mNodeManager!=NULL){
+		delete mNodeManager;
+		mNodeManager=NULL;
+	}
 
 	if(mAudioBufferManager!=NULL){
 		delete mAudioBufferManager;
@@ -304,6 +309,7 @@ Engine::~Engine(){
 }
 
 void Engine::destroy(){
+	mNodeManager->destroy();
 	mAudioBufferManager->destroy();
 	mMeshManager->destroy();
 	mMaterialManager->destroy();

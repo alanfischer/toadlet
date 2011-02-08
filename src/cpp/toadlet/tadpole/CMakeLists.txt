@@ -15,6 +15,7 @@ set (TADPOLE_SRC
 	MathFormatter.cpp
 	Mesh.cpp
 	MeshManager.cpp
+	NodeManager.cpp
 	Noise.cpp
 	RenderQueue.cpp
 	ResourceManager.cpp
@@ -124,6 +125,7 @@ set (TADPOLE_HEADERS
 	MathFormatter.h
 	Mesh.h
 	MeshManager.h
+	NodeManager.h
 	Noise.h
 	Renderable.h
 	ResourceHandler.h
@@ -214,6 +216,7 @@ set (TADPOLE_NODE_HEADERS
 	node/Node.h
 	node/NodeAttacher.h
 	node/NodeListener.h
+	node/NodeResource.h
 	node/ParentNode.h
 	node/ParticleNode.h
 	node/PartitionNode.h
