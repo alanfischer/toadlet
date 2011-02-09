@@ -45,6 +45,7 @@ public:
 	SpriteNode();
 	virtual Node *create(Scene *scene);
 	virtual void destroy();
+	virtual Node *set(Node *node);
 
 	void setMaterial(const egg::String &name);
 	void setMaterial(Material::ptr material);

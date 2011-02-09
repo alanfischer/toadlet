@@ -39,7 +39,6 @@ namespace node{
 
 TOADLET_NODE_IMPLEMENT(Node,Categories::TOADLET_TADPOLE_NODE+".Node");
 
-
 Node::Node():
 	mPointerCounter(new PointerCounter(0)),
 	mManaged(false),
@@ -57,24 +56,18 @@ Node::Node():
 
 	//mDependsUpon,
 
-	mTransformUpdatedFrame(0),
-	//mTranslate,
-	//mRotate,
-	//mScale,
-	//mWorldTranslate,
-	//mWorldRotate,
-	//mWorldScale,
-	mScope(0),
-	//mName,
-	
 	mActive(false),
-	mDeactivateCount(0)
+	mDeactivateCount(0),
+	mLastLogicFrame(0),
+	mLastFrame(0),
+	mTransformUpdatedFrame(0),
 
-	//mLocalBound,
+	//mTransform,
+	//mBound,
+	//mWorldTransform,
 	//mWorldBound,
-
-	//mRenderTransform,
-	//mWorldRenderTransform
+	mScope(0)
+	//mName,
 {
 //	TOADLET_PROPERTY_INIT(translate);
 //	TOADLET_PROPERTY_INIT(rotate);
@@ -110,17 +103,16 @@ Node *Node::create(Scene *scene){
 
 	mDependsUpon=NULL;
 
-	mTransformUpdatedFrame=-1;
-	mTransform->reset();
-	mWorldTransform->reset();
-	mScope=-1;
-	mName="";
-
 	mActive=true;
 	mDeactivateCount=0;
+	mTransformUpdatedFrame=-1;
 
+	mTransform->reset();
 	mBound->reset();
+	mWorldTransform->reset();
 	mWorldBound->reset();
+	mScope=-1;
+	mName="";
 
 	return this;
 }
@@ -157,6 +149,21 @@ void Node::destroy(){
 	mEngine=NULL;
 	mScene=NULL;
 	mUniqueHandle=0;
+}
+
+Node *Node::clone(){
+	return mEngine->createNode(getType(),mScene)->set(this);
+}
+
+Node *Node::set(Node *node){
+	TOADLET_ASSERT(&getType()==&node->getType());
+
+	setTransform(node->mTransform,TransformUpdate_BIT_TRANSFORM);
+	setBound(node->mBound);
+	setScope(node->mScope);
+	setName(node->mName);
+
+	return node;
 }
 
 void Node::addNodeListener(NodeListener::ptr listener){

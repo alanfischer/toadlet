@@ -4,17 +4,18 @@
 
 class GravityFollower:public NodeListener,MotionDetectorListener{
 public:
-	GravityFollower(MotionDetector *detector,float offset){
+	GravityFollower(MotionDetector *detector){
 		mDetector=detector;
 		mDetector->setListener(this);
-		mOffset=offset;
 	}
 
 	void nodeDestroyed(Node *node){
 		mDetector->setListener(NULL);
 	}
 
-	void logicUpdate(Node *node,int dt){
+	void transformUpdated(Node *node,int tu){}
+
+	void logicUpdated(Node *node,int dt){
 		mLastTranslate.set(mTranslate);
 		mLastRotate.set(mRotate);
 
@@ -42,7 +43,7 @@ public:
 		mMotionMutex.unlock();
 	}
 	
-	void frameUpdate(Node *node,int dt){
+	void frameUpdated(Node *node,int dt){
 		Vector3 translate;
 		Math::lerp(translate,mLastTranslate,mTranslate,node->getScene()->getLogicFraction());
 		node->setTranslate(translate);
@@ -58,7 +59,6 @@ public:
 	}
 
 	MotionDetector *mDetector;
-	float mOffset;
 	Mutex mMotionMutex;
 	MotionDetector::MotionData mMotionData;
 	Vector3 mTranslate,mLastTranslate;
@@ -73,7 +73,7 @@ Logo::~Logo(){
 }
 
 void Logo::create(){
-	Application::create();
+	Application::create("gl");
 
 	scene=Scene::ptr(new Scene(mEngine));
 
@@ -84,8 +84,8 @@ void Logo::create(){
 
  	meshNode=getEngine()->createNodeType(MeshNode::type(),scene);
 	meshNode->setMesh(mesh);
-	meshNode->getAnimationController()->start();
-	meshNode->getAnimationController()->setCycling(MeshNode::MeshAnimationController::Cycling_REFLECT);
+	meshNode->getController()->start();
+	meshNode->getController()->setCycling(Controller::Cycling_REFLECT);
 	scene->getRoot()->attach(meshNode);
 
 	cameraNode=getEngine()->createNodeType(CameraNode::type(),scene);
@@ -95,7 +95,7 @@ void Logo::create(){
 
 	MotionDetector *motionDetector=getMotionDetector();
 	if(motionDetector!=NULL){
-		cameraNode->addNodeListener(NodeListener::ptr(new GravityFollower(motionDetector,Math::length(cameraNode->getTranslate()))));
+		cameraNode->addNodeListener(NodeListener::ptr(new GravityFollower(motionDetector)));
 		motionDetector->startup();
 	}
 }
@@ -123,19 +123,10 @@ void Logo::update(int dt){
 	scene->update(dt);
 }
 
-#if !defined(TOADLET_PLATFORM_OSX)
-#if defined(TOADLET_PLATFORM_WINCE)
-#include <windows.h>
-int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,int nCmdShow){
+int toadletMain(int argc,char **argv){
 	Logo app;
-	app.setFullscreen(true);
-#else
-int main(int argc,char **argv){
-	Logo app;
-#endif
 	app.create();
 	app.start();
 	app.destroy();
 	return 0;
 }
-#endif

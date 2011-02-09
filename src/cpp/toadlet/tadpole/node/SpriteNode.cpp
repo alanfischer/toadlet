@@ -78,6 +78,16 @@ void SpriteNode::destroy(){
 	super::destroy();
 }
 
+Node *SpriteNode::set(Node *node){
+	super::set(node);
+
+	SpriteNode *spriteNode=(SpriteNode*)node;
+	setMaterial(spriteNode->getMaterial());
+	setAlignment(spriteNode->getAlignment());
+
+	return this;
+}
+
 void SpriteNode::setMaterial(const egg::String &name){
 	setMaterial(mEngine->getMaterialManager()->findMaterial(name));
 }

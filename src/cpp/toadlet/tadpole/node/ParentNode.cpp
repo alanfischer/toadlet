@@ -67,6 +67,18 @@ void ParentNode::destroy(){
 	super::destroy();
 }
 
+Node *ParentNode::set(Node *node){
+	super::set(node);
+
+	ParentNode *parentNode=(ParentNode*)node;
+	int i;
+	for(i=0;i<parentNode->getNumChildren();++i){
+		attach(parentNode->getChild(i)->clone());
+	}
+
+	return this;
+}
+
 void ParentNode::destroyAllChildren(){
 	while(mChildren.size()>0){
 		mChildren[0]->destroy();

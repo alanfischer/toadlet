@@ -157,19 +157,10 @@ void VLCToadlet::preContextDeactivate(Renderer *renderer){
 	libvlc_media_player_stop(mediaplayer);
 }
 
-#if !defined(TOADLET_PLATFORM_OSX)
-#if defined(TOADLET_PLATFORM_WINCE)
-#include <windows.h>
-int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,int nCmdShow){
+int toadletMain(int argc,char **argv){
 	VLCToadlet app;
-	app.setFullscreen(true);
-#else
-int main(int argc,char **argv){
-	VLCToadlet app;
-#endif
 	app.create();
 	app.start();
 	app.destroy();
 	return 0;
 }
-#endif

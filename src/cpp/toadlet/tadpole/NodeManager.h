@@ -23,39 +23,32 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BSP_BSP30HANDLER_H
-#define TOADLET_TADPOLE_BSP_BSP30HANDLER_H
+#ifndef TOADLET_TADPOLE_NODEMANAGER_H
+#define TOADLET_TADPOLE_NODEMANAGER_H
 
-#include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/ResourceHandler.h>
-#include <toadlet/tadpole/bsp/BSP30Map.h>
+#include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/tadpole/node/NodeResource.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace bsp{
 
-class BSP30Handler:public ResourceHandler{
+class Engine;
+
+class TOADLET_API NodeManager:public ResourceManager{
 public:
-	TOADLET_SHARED_POINTERS(BSP30Handler);
+	NodeManager(Engine *engine);
 
-	BSP30Handler(Engine *engine);
-	virtual ~BSP30Handler();
+	node::NodeResource::ptr getNodeResource(int handle){return egg::shared_static_cast<node::NodeResource>(ResourceManager::get(handle));}
+	node::NodeResource::ptr findNodeResource(const egg::String &name){return egg::shared_static_cast<node::NodeResource>(ResourceManager::find(name));}
 
-	virtual egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
-
+	node::Node::ptr createNode(int handle){return createNode(getNodeResource(handle));}
+	node::Node::ptr createNode(const egg::String &name){return createNode(findNodeResource(name));}
+	node::Node::ptr createNode(node::NodeResource *resource);
+	
 protected:
-	void readLump(egg::io::Stream *stream,blump *lump,void **data,int size,int *count);
-	void parseVisibility(BSP30Map *map);
-	void parseEntities(BSP30Map *map);
-	void parseWADs(BSP30Map *map);
-	void parseTextures(BSP30Map *map);
-	void buildBuffers(BSP30Map *map);
-	void buildMaterials(BSP30Map *map);
-
 	Engine *mEngine;
 };
 
-}
 }
 }
 

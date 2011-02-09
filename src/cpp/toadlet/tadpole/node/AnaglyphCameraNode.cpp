@@ -83,6 +83,17 @@ void AnaglyphCameraNode::destroy(){
 	super::destroy();
 }
 
+Node *AnaglyphCameraNode::set(Node *node){
+	super::set(node);
+	
+	AnaglyphCameraNode *cameraNode=(AnaglyphCameraNode*)node;
+	setSeparation(cameraNode->getSeparation());
+	setLeftColor(cameraNode->getLeftColor());
+	setRightColor(cameraNode->getRightColor());
+	
+	return this;
+}
+
 void AnaglyphCameraNode::setLeftColor(const Color &color){
 	mLeftColor.set(color);
 	mLeftMaterial->setLightEffect(LightEffect(mLeftColor));

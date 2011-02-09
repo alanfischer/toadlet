@@ -64,6 +64,15 @@ void ResourceManager::removeResourceArchive(egg::io::Archive::ptr archive){
 	mResourceArchives.remove(archive);
 }
 
+Resource::ptr ResourceManager::get(int handle){
+	if(handle>=0 && handle<mResources.size()){
+		return mResources[handle];
+	}
+	else{
+		return NULL;
+	}
+}
+
 Resource::ptr ResourceManager::get(const String &name){
 	NameResourceMap::iterator it=mNameResourceMap.find(name);
 	if(it!=mNameResourceMap.end()){
@@ -153,15 +162,6 @@ void ResourceManager::unmanage(Resource *resource){
 	}
 
 	resource->destroy();
-}
-
-Resource::ptr ResourceManager::getByHandle(int handle){
-	if(handle>=0 && handle<mResources.size()){
-		return mResources[handle];
-	}
-	else{
-		return NULL;
-	}
 }
 
 void ResourceManager::setHandler(ResourceHandler::ptr handler,const String &extension){

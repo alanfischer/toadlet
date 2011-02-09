@@ -42,6 +42,7 @@ public:
 	TOADLET_NODE(CameraAlignedNode,Node);
 	
 	CameraAlignedNode();
+	virtual Node *set(Node *node);
 
 	virtual void setCameraAligned(bool aligned){mCameraAligned=aligned;}
 	inline bool getCameraAligned() const{return mCameraAligned;}

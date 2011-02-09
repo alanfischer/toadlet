@@ -82,6 +82,9 @@ void Controller::setControllerFinishedListener(ControllerFinishedListener *liste
 }
 
 void Controller::start(){
+	// Update our extends whenever we start an animation
+	extentsChanged();
+
 	mRunning=true;
 
 	mTime=0;
@@ -145,6 +148,9 @@ void Controller::update(int dt){
 				mRunning=false;
 				mFinishedListener->controllerFinished(this); // Must be last since it may delete this
 			}
+		}
+		else{
+			set(Math::fromMilli(mTime));
 		}
 	}
 }

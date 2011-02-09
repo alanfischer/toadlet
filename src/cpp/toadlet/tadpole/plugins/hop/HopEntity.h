@@ -96,6 +96,7 @@ public:
 
 	virtual void setNextThink(int think);
 
+	virtual void findTraceableNode(node::Node *node);
 	virtual void setTraceableShape(Traceable *traceable);
 	virtual void addShape(hop::Shape::ptr shape);
 	virtual void removeShape(hop::Shape *shape);
@@ -136,6 +137,7 @@ protected:
 	hop::Solid::ptr mSolid;
 	hop::Shape::ptr mTraceableShape;
 	Traceable *mTraceable;
+	node::Node::ptr mTraceableNode;
 	node::NodeTransformInterpolator::ptr mInterpolator;
 	node::ParentNode::ptr mVolumeNode;
 	int mNextThink;

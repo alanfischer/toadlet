@@ -77,9 +77,11 @@ public:
 
 	TerrainPatchNode();
 	~TerrainPatchNode();
-
 	node::Node *create(Scene *scene);
 	void destroy();
+	node::Node *set(node::Node *node);
+
+	void *hasInterface(int type){return type==InterfaceType_TRACEABLE?(Traceable*)this:NULL;}
 
 	bool setData(scalar *data,int rowPitch,int width,int height,bool water);
 	bool setMaterial(Material::ptr material);

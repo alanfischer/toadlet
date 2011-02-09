@@ -23,36 +23,29 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BSP_BSP30HANDLER_H
-#define TOADLET_TADPOLE_BSP_BSP30HANDLER_H
+#ifndef TOADLET_TADPOLE_NODE_NODERESOURCE_H
+#define TOADLET_TADPOLE_NODE_NODERESOURCE_H
 
-#include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/ResourceHandler.h>
-#include <toadlet/tadpole/bsp/BSP30Map.h>
+#include <toadlet/egg/BaseResource.h>
+#include <toadlet/tadpole/node/Node.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace bsp{
+namespace node{
 
-class BSP30Handler:public ResourceHandler{
+class TOADLET_API NodeResource:public egg::BaseResource{
 public:
-	TOADLET_SHARED_POINTERS(BSP30Handler);
+	TOADLET_SHARED_POINTERS(NodeResource);
 
-	BSP30Handler(Engine *engine);
-	virtual ~BSP30Handler();
-
-	virtual egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
+	NodeResource():egg::BaseResource(){}
+	virtual ~NodeResource(){}
+	
+	void setNode(Node::ptr node){mNode=node;}
+	Node::ptr getNode() const{return mNode;}
+	Node::ptr createNode() const{return mNode->clone();}
 
 protected:
-	void readLump(egg::io::Stream *stream,blump *lump,void **data,int size,int *count);
-	void parseVisibility(BSP30Map *map);
-	void parseEntities(BSP30Map *map);
-	void parseWADs(BSP30Map *map);
-	void parseTextures(BSP30Map *map);
-	void buildBuffers(BSP30Map *map);
-	void buildMaterials(BSP30Map *map);
-
-	Engine *mEngine;
+	Node::ptr mNode;
 };
 
 }

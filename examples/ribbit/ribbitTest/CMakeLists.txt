@@ -16,6 +16,7 @@ set (LIBS ${TOADLET_EGG_LIB} ${TOADLET_PEEPER_LIB} ${TOADLET_RIBBIT_LIB} ${TOADL
 
 # Source files
 set (SRC
+	../../main/toadletMain.cpp
 	RibbitTest.cpp
 	boing_wav.cpp
 )

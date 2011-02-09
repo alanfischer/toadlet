@@ -102,8 +102,7 @@ StudioModelNode::StudioModelNode():super(),
 	memset(mAdjustedControllerValues,0,sizeof(mAdjustedControllerValues));
 }
 
-StudioModelNode::~StudioModelNode(){
-}
+StudioModelNode::~StudioModelNode(){}
 
 void StudioModelNode::destroy(){
 	if(mModel!=NULL){
@@ -119,6 +118,40 @@ void StudioModelNode::destroy(){
 	}
 
 	super::destroy();
+}
+
+Node *StudioModelNode::set(Node *node){
+	super::set(node);
+
+	StudioModelNode *modelNode=(StudioModelNode*)node;
+
+	setModel(modelNode->getModel());
+	setSequence(modelNode->getSequence());
+	setSequenceTime(modelNode->getSequenceTime());
+	setGaitSequence(modelNode->getGaitSequence());
+	setGaitSequenceTime(modelNode->getGaitSequenceTime());
+	setRenderSkeleton(modelNode->getRenderSkeleton());
+	int i;
+	for(i=0;i<4;++i){
+		setController(i,modelNode->getController(i));
+		setBlender(i,modelNode->getBlender(i));
+	}
+	setBodypart(modelNode->getBodypart());
+	setBodypartModel(modelNode->getBodypartModel());
+	setSkin(modelNode->getSkin());
+
+	return this;
+}
+
+void *StudioModelNode::hasInterface(int type){
+	switch(type){
+		case InterfaceType_ATTACHABLE:
+			return (Attachable*)this;
+		case InterfaceType_DETAILTRACEABLE:
+			return (DetailTraceable*)this;
+		default:
+			return NULL;
+	}
 }
 
 void StudioModelNode::logicUpdate(int dt,int scope){
@@ -367,6 +400,7 @@ void StudioModelNode::traceSegment(Collision &result,const Vector3 &position,con
 			Math::mul(result.point,mBoneRotates[sbbox->bone],point);
 			Math::add(result.point,mBoneTranslates[sbbox->bone]);
 			Math::mul(result.normal,mBoneRotates[sbbox->bone],normal);
+			result.index=i;
 		}
 	}
 

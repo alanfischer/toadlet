@@ -50,13 +50,8 @@ BSP30ModelNode::SubModel::SubModel(BSP30ModelNode *modelNode,BSP30Map *map){
 }
 
 void BSP30ModelNode::SubModel::render(peeper::Renderer *renderer) const{
-	BSP30Map::facedata *face=faces;
-	while(face!=NULL){
-		if(face->visible){
-			renderer->renderPrimitive(map->vertexData,face->indexData);
-		}
-		face=face->next;
-	}
+	map->renderFaces(renderer,faces);
+	renderer->setTextureStage(1,NULL);
 }
 
 TOADLET_NODE_IMPLEMENT(BSP30ModelNode,Categories::TOADLET_TADPOLE_BSP+".BSP30ModelNode");
@@ -66,7 +61,15 @@ BSP30ModelNode::BSP30ModelNode():Node(),
 	mModelIndex(-1)
 {}
 
-BSP30ModelNode::~BSP30ModelNode(){
+BSP30ModelNode::~BSP30ModelNode(){}
+
+Node *BSP30ModelNode::set(Node *node){
+	super::set(node);
+
+	BSP30ModelNode *modelNode=(BSP30ModelNode*)node;
+	setModel(modelNode->getMap(),modelNode->getModel());
+
+	return this;
 }
 
 void BSP30ModelNode::setModel(BSP30Map::ptr map,const String &name){
@@ -132,7 +135,7 @@ void BSP30ModelNode::traceSegment(Collision &result,const Vector3 &position,cons
 	result.time=Math::ONE;
 	localSegment.getEndPoint(result.point);
 	if(mMap!=NULL){
-		int contents=mMap->modelTrace(result,mModelIndex,size,localSegment.origin,result.point);
+		int contents=mMap->modelCollisionTrace(result,mModelIndex,size,localSegment.origin,result.point);
 		if(contents!=CONTENTS_EMPTY){
 			result.scope|=(-1-contents)<<1;
 		}
@@ -151,6 +154,16 @@ BSP30Node::BSP30Node():super(),
 {}
 
 BSP30Node::~BSP30Node(){}
+
+Node *BSP30Node::set(Node *node){
+	super::set(node);
+
+	BSP30Node *bspNode=(BSP30Node*)this;
+	setMap(bspNode->getMap());
+	setSkyName(bspNode->getSkyName());
+
+	return this;
+}
 
 void BSP30Node::setMap(const String &name){
 	Stream::ptr stream=mEngine->openStream(name);
@@ -466,11 +479,22 @@ bool BSP30Node::sensePotentiallyVisible(SensorResultsListener *listener,const Ve
 	return true;
 }
 
+bool BSP30Node::findAmbientForPoint(Color &r,const Vector3 &point){
+	Vector3 end;
+	end.x=point.x;
+	end.y=point.y;
+	end.z=point.z-1024;
+	if(mMap!=NULL){
+		return mMap->modelLightTrace(r,0,point,end);
+	}
+	return false;
+}
+
 void BSP30Node::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	result.time=Math::ONE;
 	segment.getEndPoint(result.point);
 	if(mMap!=NULL){
-		int contents=mMap->modelTrace(result,0,size,segment.origin,result.point);
+		int contents=mMap->modelCollisionTrace(result,0,size,segment.origin,result.point);
 		if(contents!=CONTENTS_EMPTY) result.scope|=(-1-contents)<<1;
 	}
 }
@@ -483,13 +507,7 @@ void BSP30Node::render(Renderer *renderer) const{
 	Material *previousMaterial=NULL;
 	for(i=0;i<mVisibleMaterialFaces.size();i++){
 		mMap->materials[i]->setupRenderer(renderer,previousMaterial);
-		BSP30Map::facedata *face=mVisibleMaterialFaces[i];
-		while(face!=NULL){
-			if(face->visible){
-				renderer->renderPrimitive(mMap->vertexData,face->indexData);
-			}
-			face=face->next;
-		}
+		mMap->renderFaces(renderer,mVisibleMaterialFaces[i]);
 		previousMaterial=mMap->materials[i];
 	}
 

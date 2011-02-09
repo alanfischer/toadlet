@@ -26,7 +26,6 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/bsp/BSP30Handler.h>
 #include <toadlet/tadpole/handler/WADArchive.h>
-#include <toadlet/tadpole/PixelPacker.h>
 #include <stdlib.h>
 #include <string.h> // memset
 
@@ -64,7 +63,7 @@ Resource::ptr BSP30Handler::load(Stream::ptr stream,const ResourceHandlerData *h
 
 	Logger::debug(Categories::TOADLET_TADPOLE,"Reading map");
 
-	BSP30Map::ptr map(new BSP30Map());
+	BSP30Map::ptr map(new BSP30Map(mEngine));
 
 	stream->read((tbyte*)&map->header,sizeof(map->header));
 
@@ -259,25 +258,12 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 	vertexFormat->addElement(VertexFormat::Semantic_TEX_COORD,1,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_2);
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,map->nsurfedges);
 
-	/// @todo: Figure out maximum required size, or allow multiple images
-	Image::ptr lightmapImage(Image::createAndReallocate(Image::Dimension_D2,map->header.version==Q1BSPVERSION?Image::Format_L_8:Image::Format_RGB_8,1024,1024,0));
-	if(lightmapImage==NULL){
-		Error::insufficientMemory(Categories::TOADLET_TADPOLE_BSP,
-			"insufficient memory for lightmapImage");
-		return;
-	}
-
-	PixelPacker packer(lightmapImage->getData(),lightmapImage->getFormat(),lightmapImage->getWidth(),lightmapImage->getHeight());
-
 	int width=0,height=0;
 	float iwidth=0,iheight=0;
-	float s=0,t=0;
-	Vector2 surfmins,surfmaxs;
-	float surfmids=0,surfmidt=0;
+	float s=0,t=0,ls=0,lt=0;
+	int surfmins[2],surfmaxs[2];
 	int lmwidth=0,lmheight=0;
-	float lmmids=0,lmmidt=0;
-	float ilmwidth=0,ilmheight=0;
-	float ls=0,lt=0;
+	int lightmapCoord[2];
 
 	map->facedatas.resize(map->nfaces);
 	VertexBufferAccessor vba;
@@ -285,8 +271,9 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 	vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
 	for(i=0;i<map->nfaces;i++){
 		bface *face=&map->faces[i];
+		BSP30Map::facedata *faced=&map->facedatas[i];
 
-		map->facedatas[i].index=i;
+		faced->index=i;
 
 		// Find texture width & height for this face.
 		// We have to use the information from the actual BSP here, instead of the found texture,
@@ -304,17 +291,25 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 		}
 
 		if((texinfo->flags&TEX_SPECIAL)==0){
-			findSurfaceExtents(map,face,surfmins,surfmaxs);
-			surfmids=(surfmins[0]+surfmaxs[0])/2.0f;
-			surfmidt=(surfmins[1]+surfmaxs[1])/2.0f;
-			lmwidth=(ceil(surfmaxs[0]/16.0) - floor(surfmins[0]/16.0)) + 1;
-			lmheight=(ceil(surfmaxs[1]/16.0) - floor(surfmins[1]/16.0)) + 1;
-			lmmids=(float)lmwidth/2.0;
-			lmmidt=(float)lmheight/2.0;
-			ilmwidth=1.0/(float)lmwidth;
-			ilmheight=1.0/(float)lmheight;
+			map->findSurfaceExtents(face,surfmins,surfmaxs);
+			lmwidth=((surfmaxs[0]-surfmins[0])>>4)+1;
+			lmheight=((surfmaxs[1]-surfmins[1])>>4)+1;
 
-			packer.insert(lmwidth,lmheight,((tbyte*)map->lighting)+face->lightofs,map->facedatas[i].lightmapTransform);
+			if((faced->lightmapIndex=map->allocLightmap(lightmapCoord,lmwidth,lmheight))<0){
+				map->uploadLightmap();
+				map->initLightmap();
+				if((faced->lightmapIndex=map->allocLightmap(lightmapCoord,lmwidth,lmheight))<0){
+					Error::unknown("unable to allocate lightmap");
+					return;
+				}
+			}
+
+			tbyte *dst=map->lightmapImage->getData();
+			int pixelSize=map->lightmapImage->getPixelSize();
+			tbyte *src=(tbyte*)map->lighting + face->lightofs;
+			for(j=0;j<lmheight;++j){
+				memcpy(dst + ((lightmapCoord[1]+j)*BSP30Map::LIGHTMAP_SIZE + lightmapCoord[0])*pixelSize,src + lmwidth*j*pixelSize,lmwidth*pixelSize);
+			}
 		}
 
 		/// @todo: Pack all these indexes into 1 IndexBuffer to speed up rendering
@@ -334,7 +329,7 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 			iba.unlock();
 			indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexes));
 		}
-		map->facedatas[i].indexData=indexData;
+		faced->indexData=indexData;
 
 		for(j=0;j<face->numedges;j++){
 			int faceedge=face->firstedge+j;
@@ -356,20 +351,21 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 
 			// Calculate lightmap coordinates
 			if((texinfo->flags&TEX_SPECIAL)==0){
-				ls=(lmmids + (s-surfmids)/16.0);
-				lt=(lmmidt + (t-surfmidt)/16.0);
-				Vector3 lc(ls*ilmwidth,lt*ilmheight,Math::ONE);
-				Math::mulPoint3Fast(lc,map->facedatas[i].lightmapTransform);
-				vba.set2(faceedge,3,lc.x,lc.y);
+				ls=s-surfmins[0] + lightmapCoord[0]*16 + 8;
+				ls/=BSP30Map::LIGHTMAP_SIZE*16;
+
+				lt=t-surfmins[1] + lightmapCoord[1]*16 + 8;
+				lt/=BSP30Map::LIGHTMAP_SIZE*16;
+
+				vba.set2(faceedge,3,ls,lt);
 			}
 		}
 	}
 	vba.unlock();
 
-	map->vertexData=VertexData::ptr(new VertexData(vertexBuffer));
+	map->uploadLightmap();
 
-	map->lightmap=mEngine->getTextureManager()->createTexture(lightmapImage);
-	map->lightmap->retain();
+	map->vertexData=VertexData::ptr(new VertexData(vertexBuffer));
 }
 
 void BSP30Handler::buildMaterials(BSP30Map *map){
@@ -387,34 +383,7 @@ void BSP30Handler::buildMaterials(BSP30Map *map){
 		TextureStage::ptr primary=mEngine->getMaterialManager()->createTextureStage(map->parsedTextures[i]);
 		material->setTextureStage(0,primary);
 
-		TextureStage::ptr secondary=mEngine->getMaterialManager()->createTextureStage(map->lightmap);
-		secondary->setTexCoordIndex(1);
-		secondary->setBlend(TextureBlend(TextureBlend::Operation_MODULATE,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
-		material->setTextureStage(1,secondary);
-
 		map->materials[i]=material;
-	}
-}
-
-void BSP30Handler::findSurfaceExtents(BSP30Map *map,bface *face,Vector2 &mins,Vector2 &maxs){
-	float val;
-	int i,j,surfedge;
-	bvertex *v;
-
-	mins[0]=mins[1]=999999;
-	maxs[0]=maxs[1]=-999999;
-
-	btexinfo *texinfo=&map->texinfos[face->texinfo];
-	for(i=0;i<face->numedges;i++){
-		surfedge=map->surfedges[face->firstedge+i];
-		v=&map->vertexes[surfedge<0?map->edges[-surfedge].v[1]:map->edges[surfedge].v[0]];
-
-		for(j=0;j<2;j++){
-			val=Math::dot((Vector3)v->point,texinfo->vecs[j]) + texinfo->vecs[j][3];
-
-			if(val<mins[j])	mins[j]=val;
-			if(val>maxs[j])	maxs[j]=val;
-		}
 	}
 }
 

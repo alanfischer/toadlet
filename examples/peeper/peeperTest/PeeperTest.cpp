@@ -89,11 +89,7 @@ void PeeperTest::resized(int width,int height){
 	}
 }
 
-#if defined(TOADLET_PLATFORM_WINCE)
-int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPTSTR lpCmdLine,int nCmdShow){
-#else
-int main(int argc,char **argv){
-#endif
+int toadletMain(int argc,char **argv){
 	PeeperTest app;
 	app.create();
 	app.start(true);
