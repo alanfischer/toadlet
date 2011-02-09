@@ -96,6 +96,20 @@ void LabelNode::destroy(){
 	super::destroy();
 }
 
+Node *LabelNode::set(Node *node){
+	super::set(node);
+
+	LabelNode *labelNode=(LabelNode*)node;
+	setFont(labelNode->getFont());
+	setText(labelNode->getText());
+	setAlignment(labelNode->getAlignment());
+	setNormalized(labelNode->getNormalized());
+	setWordWrap(labelNode->getWordWrap());
+	setColor(labelNode->getColor());
+
+	return this;
+}
+
 void LabelNode::setFont(const Font::ptr &font){
 	if(mFont!=NULL){
 		mFont->release();

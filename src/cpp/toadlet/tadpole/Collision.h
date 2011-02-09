@@ -43,7 +43,8 @@ public:
 		//point,
 		//normal,
 		collider(NULL),
-		scope(0)
+		scope(0),
+		index(0)
 	{}
 
 	inline void set(const Collision &c){
@@ -52,6 +53,7 @@ public:
 		normal.set(c.normal);
 		collider=c.collider;
 		scope=c.scope;
+		index=c.index;
 	}
 
 	inline void reset(){
@@ -60,6 +62,7 @@ public:
 		normal.set(Math::ZERO_VECTOR3);
 		collider=NULL;
 		scope=0;
+		index=0;
 	}
 
 	scalar time;
@@ -67,6 +70,7 @@ public:
 	Vector3 normal;
 	node::Node *collider; // The node that blocked the trace
 	int scope; // The OR'd scope of the collision point
+	int index; // A sub index of which part of the node was hit
 };
 
 }

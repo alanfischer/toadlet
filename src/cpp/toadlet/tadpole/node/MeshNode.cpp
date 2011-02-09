@@ -72,8 +72,7 @@ MeshNode::MeshNode():super()
 	//mDynamicVertexData,
 
 	//mController
-{
-}
+{}
 
 Node *MeshNode::create(Scene *scene){
 	super::create(scene);
@@ -109,6 +108,15 @@ void MeshNode::destroy(){
 	}
 
 	super::destroy();
+}
+
+Node *MeshNode::set(Node *node){
+	super::set(node);
+
+	MeshNode *meshNode=(MeshNode*)node;
+	setMesh(meshNode->getMesh());
+
+	return this;
 }
 
 void MeshNode::setMesh(const String &name){

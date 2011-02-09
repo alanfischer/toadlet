@@ -23,39 +23,21 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_BSP_BSP30HANDLER_H
-#define TOADLET_TADPOLE_BSP_BSP30HANDLER_H
+#ifndef TOADLET_TADPOLE_DETAILTRACEABLE_H
+#define TOADLET_TADPOLE_DETAILTRACEABLE_H
 
-#include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/ResourceHandler.h>
-#include <toadlet/tadpole/bsp/BSP30Map.h>
+#include <toadlet/tadpole/Traceable.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace bsp{
 
-class BSP30Handler:public ResourceHandler{
+// This is the same signature as a Traceable
+//  but a different interface to reinforce the fact that it's not to be used for physics tracing
+class DetailTraceable:public Traceable{
 public:
-	TOADLET_SHARED_POINTERS(BSP30Handler);
-
-	BSP30Handler(Engine *engine);
-	virtual ~BSP30Handler();
-
-	virtual egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
-
-protected:
-	void readLump(egg::io::Stream *stream,blump *lump,void **data,int size,int *count);
-	void parseVisibility(BSP30Map *map);
-	void parseEntities(BSP30Map *map);
-	void parseWADs(BSP30Map *map);
-	void parseTextures(BSP30Map *map);
-	void buildBuffers(BSP30Map *map);
-	void buildMaterials(BSP30Map *map);
-
-	Engine *mEngine;
+	virtual ~DetailTraceable(){}
 };
 
-}
 }
 }
 

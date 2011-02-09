@@ -15,6 +15,7 @@ set (TADPOLE_SRC
 	MathFormatter.cpp
 	Mesh.cpp
 	MeshManager.cpp
+	NodeManager.cpp
 	Noise.cpp
 	RenderQueue.cpp
 	ResourceManager.cpp
@@ -35,6 +36,7 @@ set (TADPOLE_ANIMATION_SRC
 )
 
 set (TADPOLE_BSP_SRC
+	bsp/BSP30Map.cpp
 	bsp/BSP30Node.cpp
 	bsp/BSP30Handler.cpp
 )
@@ -123,6 +125,7 @@ set (TADPOLE_HEADERS
 	MathFormatter.h
 	Mesh.h
 	MeshManager.h
+	NodeManager.h
 	Noise.h
 	Renderable.h
 	ResourceHandler.h
@@ -147,6 +150,7 @@ set (TADPOLE_ANIMATION_HEADERS
 	animation/Controller.h
 	animation/ControllerFinishedListener.h
 	animation/CameraProjectionAnimation.h
+	animation/MaterialLightEffectAnimation.h
 	animation/NodePathAnimation.h
 	animation/SkeletonAnimation.h
 )
@@ -212,6 +216,7 @@ set (TADPOLE_NODE_HEADERS
 	node/Node.h
 	node/NodeAttacher.h
 	node/NodeListener.h
+	node/NodeResource.h
 	node/ParentNode.h
 	node/ParticleNode.h
 	node/PartitionNode.h

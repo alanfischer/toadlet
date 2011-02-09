@@ -83,8 +83,8 @@ public:
 	virtual void renderRenderables(peeper::Renderer *renderer,node::CameraNode *camera,RenderQueue *queue);
 
 	virtual node::Node *getNodeByHandle(int handle);
-	/// @todo: replace with just a sensor?
 	virtual node::Node *findNodeByName(const egg::String &name,node::Node *node=NULL);
+	virtual node::Node *findNodeByInterface(int ni,node::Node *node=NULL);
 	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits=-1,node::Node *ignore=NULL){result.time=Math::ONE;}
 
 	virtual void setAmbientColor(peeper::Color ambientColor){mAmbientColor.set(ambientColor);}

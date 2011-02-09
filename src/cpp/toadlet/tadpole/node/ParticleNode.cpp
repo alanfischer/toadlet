@@ -149,6 +149,13 @@ void ParticleNode::destroy(){
 	super::destroy();
 }
 
+Node *ParticleNode::set(Node *node){
+	super::set(node);
+
+	Error::unimplemented("ParticleNode::set is unimplemented");
+	return NULL;
+}
+
 bool ParticleNode::start(int particlesPerBeam,int numParticles,bool hasColor,const Vector3 points[],const scalar ages[],scalar defaultAge,bool visible){
 	if(particlesPerBeam>1 && (numParticles%particlesPerBeam)!=0){
 		Error::invalidParameters(Categories::TOADLET_TADPOLE,

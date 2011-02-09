@@ -61,6 +61,9 @@ public:
 
 	BSP30ModelNode();
 	virtual ~BSP30ModelNode();
+	virtual Node *set(Node *node);
+
+	void *hasInterface(int type){return type==InterfaceType_TRACEABLE?(Traceable*)this:NULL;}
 
 	void setModel(BSP30Map::ptr map,const egg::String &name);
 	void setModel(BSP30Map::ptr map,int index);
@@ -88,6 +91,9 @@ public:
 
 	BSP30Node();
 	virtual ~BSP30Node();
+	virtual Node *set(Node *node);
+
+	void *hasInterface(int type){return type==InterfaceType_TRACEABLE?(Traceable*)this:NULL;}
 
 	void setMap(const egg::String &name);
 	void setMap(BSP30Map::ptr map);
@@ -109,6 +115,7 @@ public:
 
 	bool senseBoundingVolumes(SensorResultsListener *listener,Bound *bound);
 	bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);
+	bool findAmbientForPoint(peeper::Color &r,const Vector3 &point);
 
 	// Traceable items
 	Bound *getBound() const{return super::getBound();}
@@ -145,6 +152,7 @@ protected:
 	leafdata mGlobalLeafData;
 	uint8 *mMarkedFaces;
 	toadlet::egg::Collection<BSP30Map::facedata*> mVisibleMaterialFaces;
+	peeper::TextureStage::ptr mLightmapStage;
 
 	int mCounter;
 	egg::Collection<int> mLeafIndexes;

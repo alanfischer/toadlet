@@ -44,6 +44,7 @@
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/MaterialManager.h>
 #include <toadlet/tadpole/MeshManager.h>
+#include <toadlet/tadpole/NodeManager.h>
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/ContextListener.h>
 #include <toadlet/tadpole/node/Node.h>
@@ -101,6 +102,7 @@ public:
 	inline MaterialManager *getMaterialManager() const{return  mMaterialManager;}
 	inline FontManager *getFontManager() const{return mFontManager;}
 	inline MeshManager *getMeshManager() const{return mMeshManager;}
+	inline NodeManager *getNodeManager() const{return mNodeManager;}
 	inline AudioBufferManager *getAudioBufferManager() const{return mAudioBufferManager;}
 
 protected:
@@ -122,6 +124,7 @@ protected:
 	FontManager *mFontManager;
 	MeshManager *mMeshManager;
 	AudioBufferManager *mAudioBufferManager;
+	NodeManager *mNodeManager;
 	
 	egg::TypeFactory<node::Node> mNodeFactory;
 };

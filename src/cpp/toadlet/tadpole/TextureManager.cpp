@@ -126,7 +126,8 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 
 	if(hasAutogen==false && wantsAutogen==true){
 		Logger::debug(Categories::TOADLET_TADPOLE,"simulating mipmap generation");
-		usage&=~Texture::Usage_BIT_AUTOGEN_MIPMAPS;
+// Lets leave this flag in here so it can be passed on in backable textures
+//		usage&=~Texture::Usage_BIT_AUTOGEN_MIPMAPS;
 
 		if(mipLevels==0){
 			int hwidth=width,hheight=height,hdepth=depth;

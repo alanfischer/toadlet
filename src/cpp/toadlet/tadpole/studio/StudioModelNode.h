@@ -30,7 +30,7 @@
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/Attachable.h>
 #include <toadlet/tadpole/Renderable.h>
-#include <toadlet/tadpole/Traceable.h>
+#include <toadlet/tadpole/DetailTraceable.h>
 #include <toadlet/tadpole/studio/StudioModel.h>
 
 namespace toadlet{
@@ -39,7 +39,7 @@ namespace studio{
 
 class StudioModelController;
 
-class TOADLET_API StudioModelNode:public node::Node,public Traceable,public Renderable,public Attachable{
+class TOADLET_API StudioModelNode:public node::Node,public DetailTraceable,public Renderable,public Attachable{
 public:
 	TOADLET_NODE(StudioModelNode,Node);
 
@@ -67,8 +67,10 @@ public:
 
 	StudioModelNode();
 	virtual ~StudioModelNode();
-
 	void destroy();
+	Node *set(Node *node);
+
+	void *hasInterface(int type);
 
 	void logicUpdate(int dt,int scope);
 	void frameUpdate(int dt,int scope);

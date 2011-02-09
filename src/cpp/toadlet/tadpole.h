@@ -30,6 +30,7 @@
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/ContextListener.h>
+#include <toadlet/tadpole/DetailTraceable.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/FontData.h>
@@ -39,7 +40,6 @@
 #include <toadlet/tadpole/MathFormatter.h>
 #include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/Noise.h>
-#include <toadlet/tadpole/PixelPacker.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/RenderQueue.h>
 #include <toadlet/tadpole/ResourceHandler.h>
@@ -58,6 +58,7 @@
 #include <toadlet/tadpole/animation/Controller.h>
 #include <toadlet/tadpole/animation/ControllerFinishedListener.h>
 #include <toadlet/tadpole/animation/CameraProjectionAnimation.h>
+#include <toadlet/tadpole/animation/MaterialLightEffectAnimation.h>
 #include <toadlet/tadpole/animation/NodePathAnimation.h>
 #include <toadlet/tadpole/animation/SkeletonAnimation.h>
 

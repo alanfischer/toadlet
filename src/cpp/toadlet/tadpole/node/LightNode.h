@@ -41,6 +41,7 @@ public:
 	LightNode();
 	virtual Node *create(Scene *scene);
 	virtual void destroy();
+	virtual Node *set(Node *node);
 
 	inline void setSpecularColor(const peeper::Color &specularColor){mLight->setSpecularColor(specularColor);}
 	inline const peeper::Color &getSpecularColor() const{return mLight->getSpecularColor();}

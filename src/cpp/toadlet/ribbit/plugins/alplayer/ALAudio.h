@@ -44,6 +44,9 @@ public:
 	bool create(AudioStream::ptr stream);
 	void destroy();
 
+	AudioBuffer::ptr getAudioBuffer(){return mAudioBuffer;}
+	AudioStream::ptr getAudioStream(){return mAudioStream;}
+
 	bool play();
 	bool stop();
 	bool getPlaying() const;

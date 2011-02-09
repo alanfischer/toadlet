@@ -53,6 +53,29 @@ void AudioNode::destroy(){
 	super::destroy();
 }
 
+Node *AudioNode::set(Node *node){
+	super::set(node);
+	
+	AudioNode *audioNode=(AudioNode*)node;
+	if(audioNode->getAudioStream()!=NULL){
+		Logger::warning("can't clone an AudioNode with an AudioStream");
+	}
+	if(audioNode->getAudioBuffer()!=NULL){
+		setAudioBuffer(audioNode->getAudioBuffer());
+	}
+	
+	setLooping(audioNode->getLooping());
+	setGain(audioNode->getGain());
+	setRolloffFactor(audioNode->getRolloffFactor());
+	setGlobal(audioNode->getGlobal());
+	setPitch(audioNode->getPitch());
+	if(audioNode->getPlaying()){
+		play();
+	}
+
+	return this;
+}
+
 bool AudioNode::setAudioBuffer(const String &name){
 	return setAudioBuffer(mEngine->getAudioBufferManager()->findAudioBuffer(name));
 }

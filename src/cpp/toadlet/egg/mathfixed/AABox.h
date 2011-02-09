@@ -161,7 +161,7 @@ public:
 		r.z=normal.z>=0?maxs.z:mins.z;
 	}
 
-	inline float findPVertexLength(const Plane &plane) const{
+	inline fixed findPVertexLength(const Plane &plane) const{
 		fixed x=plane.normal.x>=0?maxs.x:mins.x;
 		fixed y=plane.normal.y>=0?maxs.y:mins.y;
 		fixed z=plane.normal.z>=0?maxs.z:mins.z;
@@ -174,7 +174,7 @@ public:
 		r.z=normal.z>=0?mins.z:maxs.z;
 	}
 
-	inline float findNVertexLength(const Plane &plane) const{
+	inline fixed findNVertexLength(const Plane &plane) const{
 		fixed x=plane.normal.x>=0?mins.x:maxs.x;
 		fixed y=plane.normal.y>=0?mins.y:maxs.y;
 		fixed z=plane.normal.z>=0?mins.z:maxs.z;

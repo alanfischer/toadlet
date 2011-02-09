@@ -41,6 +41,7 @@ public:
 	AudioNode();
 	virtual Node *create(Scene *scene);
 	virtual void destroy();
+	virtual Node *set(Node *node);
 
 	bool setAudioBuffer(const egg::String &name);
 	bool setAudioBuffer(const ribbit::AudioBuffer::ptr &audioBuffer);
@@ -48,6 +49,9 @@ public:
 	bool setAudioStream(const egg::String &name);
 	bool setAudioStream(ribbit::AudioStream::ptr stream);
 
+	ribbit::AudioBuffer::ptr getAudioBuffer(){return mAudio->getAudioBuffer();}
+	ribbit::AudioStream::ptr getAudioStream(){return mAudio->getAudioStream();}
+	
 	inline bool play(){if(mAudio!=NULL){return mAudio->play();}else{return false;}}
 	inline bool stop(){if(mAudio!=NULL){return mAudio->stop();}else{return false;}}
 	inline bool getPlaying() const{if(mAudio!=NULL){return mAudio->getPlaying();}else{return false;}}

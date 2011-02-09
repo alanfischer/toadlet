@@ -23,11 +23,12 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/PartitionNode.h>
+#include <toadlet/tadpole/Scene.h>
 
 using namespace toadlet::egg;
+using namespace toadlet::peeper;
 
 namespace toadlet{
 namespace tadpole{
@@ -76,6 +77,10 @@ bool PartitionNode::sensePotentiallyVisible(SensorResultsListener *listener,cons
 	}
 	
 	return result;
+}
+
+bool PartitionNode::findAmbientForPoint(Color &r,const Vector3 &point){
+	return false;
 }
 
 }

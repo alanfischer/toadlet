@@ -99,7 +99,7 @@ D3D9Renderer::~D3D9Renderer(){
 
 bool D3D9Renderer::create(RenderTarget *target,int *options){
 	Logger::alert(Categories::TOADLET_PEEPER,
-		"creating D3D9Renderer");
+		"creating "+Categories::TOADLET_PEEPER+".D3D9Renderer");
 
 	if(target==NULL){
 		Error::nullPointer(Categories::TOADLET_PEEPER,
@@ -187,6 +187,12 @@ bool D3D9Renderer::reset(){
 	setDefaultStates();
 
 	return true;
+}
+
+bool D3D9Renderer::activateAdditionalContext(){
+	D3DDEVICE_CREATION_PARAMETERS params={0};
+	mD3DDevice->GetCreationParameters(&params);
+	return (params.BehaviorFlags & D3DCREATE_MULTITHREADED)>0;
 }
 
 Texture *D3D9Renderer::createTexture(){

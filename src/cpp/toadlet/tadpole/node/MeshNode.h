@@ -85,6 +85,7 @@ public:
 	MeshNode();
 	virtual Node *create(Scene *scene);
 	virtual void destroy();
+	virtual Node *set(Node *node);
 
 	void setMesh(const egg::String &name);
 	void setMesh(Mesh::ptr mesh);

@@ -71,6 +71,7 @@ public:
 	ParticleNode();
 	virtual Node *create(Scene *scene);
 	virtual void destroy();
+	virtual Node *set(Node *node);
 
 	Renderable *isRenderable(){return this;}
 

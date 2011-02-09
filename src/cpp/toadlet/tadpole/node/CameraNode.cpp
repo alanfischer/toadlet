@@ -71,7 +71,7 @@ CameraNode::CameraNode():super(),
 Node *CameraNode::create(Scene *scene){
 	super::create(scene);
 
-	setProjectionFovX(Math::HALF_PI,Math::fromInt(1),Math::fromInt(1),Math::fromInt(1000));
+	setProjectionFovX(Math::HALF_PI,Math::ONE,Math::ONE,Math::fromInt(1000));
 	mViewportSet=false;
 	mViewport.reset();
 	mClearFlags=Renderer::ClearFlag_COLOR|Renderer::ClearFlag_DEPTH;
@@ -119,6 +119,37 @@ void CameraNode::destroy(){
 	mOverlayIndexData->destroy();
 
 	super::destroy();
+}
+
+Node *CameraNode::set(Node *node){
+	super::set(node);
+	
+	CameraNode *cameraNode=(CameraNode*)node;
+	switch(cameraNode->getProjectionType()){
+		case ProjectionType_FOVX:
+			setProjectionFovX(cameraNode->getFov(),cameraNode->getAspect(),cameraNode->getNearDist(),cameraNode->getFarDist());
+		break;
+		case ProjectionType_FOVY:
+			setProjectionFovY(cameraNode->getFov(),cameraNode->getAspect(),cameraNode->getNearDist(),cameraNode->getFarDist());
+		break;
+		case ProjectionType_ORTHO:
+			setProjectionOrtho(cameraNode->getLeftDist(),cameraNode->getRightDist(),cameraNode->getBottomDist(),cameraNode->getTopDist(),cameraNode->getNearDist(),cameraNode->getFarDist());
+		break;
+		case ProjectionType_FRUSTUM:
+			setProjectionFrustum(cameraNode->getLeftDist(),cameraNode->getRightDist(),cameraNode->getBottomDist(),cameraNode->getTopDist(),cameraNode->getNearDist(),cameraNode->getFarDist());
+		break;
+		case ProjectionType_MATRIX:
+			setProjectionMatrix(cameraNode->getProjectionMatrix());
+		break;
+	}
+	setAlignmentCalculationsUseOrigin(cameraNode->getAlignmentCalculationsUseOrigin());
+	setViewport(cameraNode->getViewport());
+	setClearFlags(cameraNode->getClearFlags());
+	setClearColor(cameraNode->getClearColor());
+	setSkipFirstClear(cameraNode->getSkipFirstClear());
+	setGamma(cameraNode->getGamma());
+
+	return this;
 }
 
 void CameraNode::setProjectionFovX(scalar fovx,scalar aspect,scalar nearDist,scalar farDist){
@@ -428,6 +459,7 @@ void CameraNode::updateViewTransform(){
 
 void CameraNode::renderOverlayGamma(Renderer *renderer){
 	if(mGamma!=Math::ONE){
+		renderer->setAmbientColor(Colors::WHITE);
 		mGammaMaterial->setupRenderer(renderer);
 		renderer->setProjectionMatrix(mOverlayMatrix);
 		renderer->setViewMatrix(Math::IDENTITY_MATRIX4X4);
