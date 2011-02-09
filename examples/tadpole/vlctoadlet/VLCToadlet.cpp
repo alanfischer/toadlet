@@ -1,7 +1,5 @@
 #include "VLCToadlet.h"
 
-#pragma comment(lib,"c:\\program files\\videolan\\vlc\\sdk\\lib\\libvlc.lib")
-
 /*
 	This example requires that you copy libvlc.dll, libvlccore.dll, lua, and the plugins directory to the vlctoadlet executable directory
 */
@@ -53,7 +51,7 @@ VLCToadlet::~VLCToadlet(){
 }
 
 void VLCToadlet::create(){
-	Application::create(RendererPlugin_D3D9);
+	Application::create();
 
 	String file="C:\\Users\\siralanf\\artoolkit\\lib\\SRC\\VideoWin32DirectShow\\_ext\\dsvl-0.0.8h\\media\\cube_right.avi";//"/home/siralanf/bigstuff_backup/ashleigh/Ashleigh mac/Movies/mvi_0811.avi";
 
