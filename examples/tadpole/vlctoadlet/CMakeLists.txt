@@ -8,14 +8,21 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${vlctoadlet_SOURCE_DIR}/../../../c
 # Find toadlet
 find_package (toadlet REQUIRED)
 
+# Find VLC
+find_package (VLC REQUIRED)
+
+#find_library (APPKIT_LIBS AppKit)
+
 # Includes
-include_directories (${CMAKE_CURRENT_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
+include_directories (${vlctoadlet_SOURCE_DIR} ${TOADLET_INCLUDE_DIR} ${VLC_INCLUDE_DIR})
 
 # Libraries
-set (LIBS ${TOADLET_EGG_LIB_D} ${TOADLET_PEEPER_LIB_D} ${TOADLET_RIBBIT_LIB_D} ${TOADLET_TADPOLE_LIB_D} ${TOADLET_PAD_LIB_D} vlc vlccore)
+set (LIBS ${TOADLET_EGG_LIB_D} ${TOADLET_PEEPER_LIB_D} ${TOADLET_RIBBIT_LIB_D} ${TOADLET_TADPOLE_LIB_D} ${TOADLET_PAD_LIB_D} ${VLC_LIBRARY} ${VLCCORE_LIBRARY})
+# objc ${APPKIT_LIBS})
 
 # Source files
 set (SRC
+	../../main/toadletMain.cpp
 	VLCToadlet.cpp
 )
 
