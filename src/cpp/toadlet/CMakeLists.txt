@@ -97,5 +97,5 @@ install (FILES ${toadlet_BINARY_DIR}/src/cpp/toadlet/Config.h DESTINATION includ
 
 
 # Setup toadlet configure file
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Config.h.in ${CMAKE_CURRENT_BINARY_DIR}/Config.h)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/Config.h)
 

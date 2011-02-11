@@ -2,7 +2,7 @@
 
 #if defined(_M_IX86) && (_WIN32_WINNT <= 0x0500) && (_MSC_VER < 1400)
 	#ifdef CURRENT_THREAD_VIA_EXCEPTION
-		// TODO: The following is not a "good" implementation, 
+		/// @todo: The following is not a "good" implementation, 
 		// because the callstack is only valid in the "__except" block...
 		#define GET_CURRENT_CONTEXT(c, contextFlags) \
 			do { \

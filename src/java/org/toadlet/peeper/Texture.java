@@ -129,7 +129,7 @@ public class Texture implements Resource, ImageDefinitions{
 	public void setName(String name){mName=name;}
 	public String getName(){return mName;}
 
-	// TODO: This uses android Bitmaps until we can rework the Texture system & deal with data & format
+	/// @todo: This uses android Bitmaps until we can rework the Texture system & deal with data & format
 	public void setImage(android.graphics.Bitmap image){
 		if(mTexturePeer!=null){
 			Error.unknown(Categories.TOADLET_PEEPER,

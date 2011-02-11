@@ -15,7 +15,7 @@ elseif (TOADLET_PLATFORM_BLACKBERRY)
 endif (TOADLET_PLATFORM_ANDROID)
 
 # Configure and copy the Config and Types file
-configure_file (${JAVA_SRC_DIR}/Config.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/Config.h)
+configure_file (${JAVA_SRC_DIR}/Config.h.cmake ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/Config.h)
 configure_file (${JAVA_SRC_DIR}/Types.h ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/Types.h COPYONLY)
 
 # Special setup for java cmake compiling - MAKE THESE AN OVERRIDE FILE?
@@ -30,7 +30,7 @@ set (CMAKE_Java_CREATE_STATIC_LIBRARY
 # Building toadlet_egg
 
 # Configure
-configure_file (${JAVA_SRC_DIR}/egg/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/egg/Version.h)
+configure_file (${JAVA_SRC_DIR}/egg/Version.h.cmake ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/egg/Version.h)
 
 # Source files
 set (EGG_SRC
@@ -121,7 +121,7 @@ endif (TOADLET_JAVA_SPLIT_JARS)
 # Building toadlet_hop
 
 # Configure
-configure_file (${JAVA_SRC_DIR}/hop/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/hop/Version.h)
+configure_file (${JAVA_SRC_DIR}/hop/Version.h.cmake ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/hop/Version.h)
 configure_file (${JAVA_SRC_DIR}/hop/Types.h ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/hop/Types.h COPYONLY)
 
 # Source files
@@ -162,7 +162,7 @@ endif (TOADLET_JAVA_SPLIT_JARS)
 # Building toadlet_knot
 
 # Configure
-configure_file (${JAVA_SRC_DIR}/knot/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/knot/Version.h)
+configure_file (${JAVA_SRC_DIR}/knot/Version.h.cmake ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/knot/Version.h)
 
 # Source files
 set (KNOT_SRC
@@ -198,7 +198,7 @@ endif (TOADLET_JAVA_SPLIT_JARS)
 # Building toadlet_peeper
 
 # Configure
-configure_file (${JAVA_SRC_DIR}/peeper/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/peeper/Version.h)
+configure_file (${JAVA_SRC_DIR}/peeper/Version.h.cmake ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/peeper/Version.h)
 configure_file (${JAVA_SRC_DIR}/peeper/Types.h ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/peeper/Types.h COPYONLY)
 
 # Source files
@@ -289,7 +289,7 @@ endif (TOADLET_JAVA_SPLIT_JARS)
 # Building toadlet_tadpole
 
 # Configure and copy the types file
-configure_file (${JAVA_SRC_DIR}/tadpole/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/tadpole/Version.h)
+configure_file (${JAVA_SRC_DIR}/tadpole/Version.h.cmake ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/tadpole/Version.h)
 configure_file (${JAVA_SRC_DIR}/tadpole/Types.h ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/tadpole/Types.h COPYONLY)
 
 # Source files
@@ -426,7 +426,7 @@ endif (TOADLET_JAVA_SPLIT_JARS)
 # Building toadlet_pad
 
 # Configure
-configure_file (${JAVA_SRC_DIR}/pad/Version.h.in ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/pad/Version.h)
+configure_file (${JAVA_SRC_DIR}/pad/Version.h.cmake ${JAVA_GPP_DIR}/${JAVA_SRC_DIR}/pad/Version.h)
 
 # Source files
 set (PAD_SRC
