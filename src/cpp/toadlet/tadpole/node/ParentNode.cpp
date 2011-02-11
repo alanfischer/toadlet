@@ -73,7 +73,7 @@ Node *ParentNode::set(Node *node){
 	ParentNode *parentNode=(ParentNode*)node;
 	int i;
 	for(i=0;i<parentNode->getNumChildren();++i){
-		attach(parentNode->getChild(i)->clone());
+		attach(parentNode->getChild(i)->clone(mScene));
 	}
 
 	return this;

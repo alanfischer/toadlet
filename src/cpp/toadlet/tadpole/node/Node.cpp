@@ -91,9 +91,11 @@ Node *Node::create(Scene *scene){
 	}
 
 	mCreated=true;
-	mEngine=scene->getEngine();
-	mScene=scene;
-	mUniqueHandle=mScene->nodeCreated(this);
+	if(scene!=NULL){
+		mScene=scene;
+		mEngine=mScene->getEngine();
+		mUniqueHandle=mScene->nodeCreated(this);
+	}
 
 	mNodeListeners=NULL;
 	mControllers=NULL;
@@ -143,7 +145,9 @@ void Node::destroy(){
 
 	mControllers=NULL;
 
-	mScene->nodeDestroyed(this);
+	if(mScene!=NULL){
+		mScene->nodeDestroyed(this);
+	}
 
 	mEngine->freeNode(this);
 	mEngine=NULL;
@@ -151,12 +155,8 @@ void Node::destroy(){
 	mUniqueHandle=0;
 }
 
-Node *Node::clone(){
-	return mEngine->createNode(getType(),mScene)->set(this);
-}
-
 Node *Node::set(Node *node){
-	TOADLET_ASSERT(&getType()==&node->getType());
+	TOADLET_ASSERT(getType()==node->getType());
 
 	setTransform(node->mTransform,TransformUpdate_BIT_TRANSFORM);
 	setBound(node->mBound);
@@ -165,6 +165,8 @@ Node *Node::set(Node *node){
 
 	return node;
 }
+
+Node *Node::clone(Scene *scene){return mEngine->createNode(getType(),scene)->set(this);}
 
 void Node::addNodeListener(NodeListener::ptr listener){
 	if(mNodeListeners==NULL){

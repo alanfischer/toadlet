@@ -159,11 +159,12 @@ bool WGLPBufferRenderTarget::createBuffer(){
 	int redBits=ImageFormatConversion::getRedBits(format);
 	int greenBits=ImageFormatConversion::getGreenBits(format);
 	int blueBits=ImageFormatConversion::getBlueBits(format);
+	int alphaBits=ImageFormatConversion::getAlphaBits(format);
 	int depthBits=16;
 
 	int iAttributes[]={
 		WGL_COLOR_BITS_ARB,redBits+greenBits+blueBits,
-		WGL_ALPHA_BITS_ARB,0,
+		WGL_ALPHA_BITS_ARB,alphaBits,
 		WGL_STENCIL_BITS_ARB,0,
 		WGL_DEPTH_BITS_ARB,depthBits,
 		WGL_DRAW_TO_PBUFFER_ARB,GL_TRUE,

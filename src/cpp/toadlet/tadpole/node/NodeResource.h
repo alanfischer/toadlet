@@ -39,10 +39,11 @@ public:
 
 	NodeResource():egg::BaseResource(){}
 	virtual ~NodeResource(){}
+	void destroy(){mNode->destroy();}
 	
 	void setNode(Node::ptr node){mNode=node;}
 	Node::ptr getNode() const{return mNode;}
-	Node::ptr createNode() const{return mNode->clone();}
+	Node::ptr createNode(Scene *scene) const{return mNode->clone(scene);}
 
 protected:
 	Node::ptr mNode;

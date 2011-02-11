@@ -576,6 +576,8 @@ void GLRenderer::setViewport(const Viewport &viewport){
 void GLRenderer::clear(int clearFlags,const Color &clearColor){
 	int bufferBits=0;
 
+	TOADLET_CHECK_GLERROR("entering clear");
+
 	if((clearFlags & ClearFlag_COLOR)>0){
 		bufferBits|=GL_COLOR_BUFFER_BIT;
 		glClearColor(clearColor.r,clearColor.g,clearColor.b,clearColor.a);

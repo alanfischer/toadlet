@@ -80,10 +80,25 @@ void BSP30Map::destroy(){
 	if(entities!=NULL){		free(entities);		nentities=0;}
 
 	int i;
+	for(i=0;i<parsedTextures.size();++i){
+		parsedTextures[i]->release();
+	}
+	parsedTextures.clear();
+
+	for(i=0;i<materials.size();++i){
+		materials[i]->release();
+	}
+	materials.clear();
+
 	for(i=0;i<lightmapTextures.size();++i){
 		lightmapTextures[i]->release();
 	}
 	lightmapTextures.clear();
+
+	for(i=0;i<modelResources.size();++i){
+		modelResources[i]->release();
+	}
+	modelResources.clear();
 }
 
 int BSP30Map::modelCollisionTrace(Collision &result,int model,const Vector3 &size,const Vector3 &start,const Vector3 &end){

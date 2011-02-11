@@ -194,6 +194,12 @@ namespace Math{
 		return (i&(i-1))==0;
 	}
 
+	inline int intLog2(int i){
+		int result;
+		for(result=0;i>1;i>>=1,result++);
+		return result;
+	}
+
 	inline fixed degToRad(fixed d){
 		return TOADLET_DIV_XX(TOADLET_MUL_XX(d,PI),ONE_EIGHTY);
 	}

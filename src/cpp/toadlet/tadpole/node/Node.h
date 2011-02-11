@@ -41,8 +41,8 @@
 	#define TOADLET_NODE(Class,SuperClass) \
 		typedef SuperClass super; \
 		typedef toadlet::egg::Type<Class,toadlet::tadpole::node::Node> ThisType; \
-		static const ThisType &type(); \
-		virtual const toadlet::egg::BaseType<toadlet::tadpole::node::Node> &getType(){return Class::type();} \
+		static ThisType *type(); \
+		virtual toadlet::egg::BaseType<toadlet::tadpole::node::Node> *getType(){return Class::type();} \
 		TOADLET_INTRUSIVE_POINTERS(Class)
 #endif
 
@@ -50,14 +50,14 @@
 	#define TOADLET_NONINSTANCIABLENODE(Class,SuperClass) \
 		typedef SuperClass super; \
 		typedef toadlet::egg::NonInstantiableType<Class,toadlet::tadpole::node::Node> ThisType; \
-		static const ThisType &type(); \
-		virtual const toadlet::egg::BaseType<toadlet::tadpole::node::Node> &getType(){return Class::type();} \
+		static ThisType *type(); \
+		virtual toadlet::egg::BaseType<toadlet::tadpole::node::Node> *getType(){return Class::type();} \
 		TOADLET_INTRUSIVE_POINTERS(Class)
 #endif
 
 #ifndef TOADLET_NODE_IMPLEMENT
 	#define TOADLET_NODE_IMPLEMENT(Class,FullName) \
-		const Class::ThisType &Class::type(){static ThisType t(FullName);return t;}
+		Class::ThisType *Class::type(){static ThisType t(FullName);return &t;}
 #endif
 
 namespace toadlet{
@@ -94,12 +94,13 @@ public:
 
 	Node();
 	virtual ~Node();
+	inline Node *create(Engine *engine){mEngine=engine;return create((Scene*)NULL);}
 	virtual Node *create(Scene *scene);
 	inline bool created() const{return mCreated;}
 	virtual void destroy();
 	inline bool destroyed() const{return !mCreated;}
-	virtual Node *clone();
 	virtual Node *set(Node *node);
+	Node *clone(Scene *scene);
 
 	virtual ParentNode *isParent(){return NULL;}
 	virtual Node *isEntity(){return NULL;}

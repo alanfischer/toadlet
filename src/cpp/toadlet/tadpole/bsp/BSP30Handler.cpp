@@ -25,6 +25,7 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/bsp/BSP30Handler.h>
+#include <toadlet/tadpole/bsp/BSP30Node.h>
 #include <toadlet/tadpole/handler/WADArchive.h>
 #include <stdlib.h>
 #include <string.h> // memset
@@ -34,6 +35,7 @@ using namespace toadlet::egg::io;
 using namespace toadlet::egg::image;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole::handler;
+using namespace toadlet::tadpole::node;
 
 namespace toadlet{
 namespace tadpole{
@@ -91,6 +93,7 @@ Resource::ptr BSP30Handler::load(Stream::ptr stream,const ResourceHandlerData *h
 	parseTextures(map);
 	buildBuffers(map);
 	buildMaterials(map);
+	buildModels(map);
 
 	Logger::debug(Categories::TOADLET_TADPOLE,"Reading map finished");
 
@@ -384,6 +387,19 @@ void BSP30Handler::buildMaterials(BSP30Map *map){
 		material->setTextureStage(0,primary);
 
 		map->materials[i]=material;
+	}
+}
+
+void BSP30Handler::buildModels(BSP30Map::ptr map){
+	map->modelResources.resize(map->nmodels-1);
+	int i;
+	for(i=1;i<map->nmodels;++i){
+		BSP30ModelNode *modelNode=mEngine->createNodeType(BSP30ModelNode::type(),NULL);
+		modelNode->setModel(map,i);
+		NodeResource::ptr model(new NodeResource());
+		model->setNode(modelNode);
+		mEngine->getNodeManager()->manage(model,String("*")+i);
+		map->modelResources[i-1]=model;
 	}
 }
 
