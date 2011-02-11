@@ -72,7 +72,9 @@ Node *LightNode::set(Node *node){
 }
 
 void LightNode::queueRenderables(CameraNode *node,RenderQueue *queue){
-	queue->queueLight(this);
+	if(getEnabled()){
+		queue->queueLight(this);
+	}
 }
 
 }

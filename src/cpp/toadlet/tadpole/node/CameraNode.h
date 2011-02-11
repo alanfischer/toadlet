@@ -107,6 +107,9 @@ public:
 	inline const Vector3 &getForward() const{return mForward;}
 	inline const Vector3 &getRight() const{return mRight;}
 
+	inline int getNumClipPlanes() const{return 6;}
+	inline const Plane &getClipPlane(int i) const{return mClipPlanes[i];}
+
 	virtual void render(peeper::Renderer *renderer,Node *node=NULL);
 
 	virtual bool culled(Node *node) const;

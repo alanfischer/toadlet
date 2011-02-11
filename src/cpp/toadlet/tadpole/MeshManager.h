@@ -43,7 +43,7 @@ public:
 	Mesh::ptr findMesh(const egg::String &name){return egg::shared_static_cast<Mesh>(ResourceManager::find(name));}
 	egg::Resource::ptr manage(const egg::Resource::ptr &resource,const egg::String &name=(char*)NULL);
 
-	Mesh::ptr createBox(const AABox &box);
+	Mesh::ptr createBox(const AABox &box,Material::ptr material=Material::ptr());
 	Mesh::ptr createSkyBox(scalar size,bool unfolded,bool invert,Material::ptr bottom=Material::ptr(),Material::ptr top=Material::ptr(),Material::ptr left=Material::ptr(),Material::ptr right=Material::ptr(),Material::ptr back=Material::ptr(),Material::ptr front=Material::ptr());
 
 	int getSphereVertexCount(int numSegments,int numRings){return (numRings+1)*(numSegments+1);}

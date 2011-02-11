@@ -10,9 +10,11 @@ public:
 
 	void nodeDestroyed(Node *node){}
 
-	void logicUpdate(Node *node,int dt){}
+	void transformUpdated(Node *node,int tu){}
 
-	void frameUpdate(Node *node,int dt){
+	void logicUpdated(Node *node,int dt){}
+
+	void frameUpdated(Node *node,int dt){
 		Vector3 axis(1,1,1);
 		Math::normalize(axis);
 		node->setRotate(axis,Math::fromMilli(node->getScene()->getTime()));
@@ -53,7 +55,11 @@ VLCToadlet::~VLCToadlet(){
 void VLCToadlet::create(){
 	Application::create();
 
-	String file="C:\\Users\\siralanf\\artoolkit\\lib\\SRC\\VideoWin32DirectShow\\_ext\\dsvl-0.0.8h\\media\\cube_right.avi";//"/home/siralanf/bigstuff_backup/ashleigh/Ashleigh mac/Movies/mvi_0811.avi";
+#if defined(TOADLET_PLATFORM_WIN32)
+	String file="c:\\WINDOWS\\clock.avi";
+#else
+	#error need a media file
+#endif
 
 	scene=Scene::ptr(new Scene(mEngine));
 
@@ -128,10 +134,10 @@ void VLCToadlet::keyPressed(int key){
 #if defined(TOADLET_PLATFORM_WIN32)
 	if(key==' '){
 		if(plugin){
-			changeRendererPlugin(RendererPlugin_GL);
+			changeRendererPlugin("gl");
 		}
 		else{
-			changeRendererPlugin(RendererPlugin_D3D9);
+			changeRendererPlugin("d3d9");
 		}
 		plugin=!plugin;
 	}

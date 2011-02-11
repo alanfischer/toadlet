@@ -315,6 +315,8 @@ void Scene::render(Renderer *renderer,CameraNode *camera,Node *node){
 	camera->updateFramesPerSecond();
 
 	mRenderQueue->setCamera(camera);
+
+	mRenderQueue->startQueuing();
 	if(node!=NULL){
 		node->queueRenderables(camera,mRenderQueue);
 	}
@@ -326,6 +328,7 @@ void Scene::render(Renderer *renderer,CameraNode *camera,Node *node){
 
 		mRoot->queueRenderables(camera,mRenderQueue);
 	}
+	mRenderQueue->endQueuing();
 
 	renderRenderables(renderer,camera,mRenderQueue);
 }

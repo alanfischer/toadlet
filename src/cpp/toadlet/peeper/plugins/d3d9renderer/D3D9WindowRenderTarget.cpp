@@ -71,20 +71,23 @@ D3D9WindowRenderTarget::~D3D9WindowRenderTarget(){
 }
 
 bool D3D9WindowRenderTarget::activate(){
-	IDirect3DDevice9 *device=mD3DDevice;
-
 	#if defined(TOADLET_SET_D3DM)
-		HRESULT result=device->SetRenderTarget(mColorSurface,mDepthSurface);
+		HRESULT result=mD3DDevice->SetRenderTarget(mColorSurface,mDepthSurface);
 		TOADLET_CHECK_D3D9ERROR(result,"SetRenderTarget");
 	#else
-		HRESULT result=device->SetRenderTarget(0,mColorSurface);
+		HRESULT result=mD3DDevice->SetRenderTarget(0,mColorSurface);
 		TOADLET_CHECK_D3D9ERROR(result,"SetRenderTarget");
 
-		result=device->SetDepthStencilSurface(mDepthSurface);
+		result=mD3DDevice->SetDepthStencilSurface(mDepthSurface);
 		TOADLET_CHECK_D3D9ERROR(result,"SetDepthStencilSurface");
 	#endif
 
 	return true;
+}
+
+void D3D9WindowRenderTarget::swap(){
+	HRESULT result=mD3DDevice->Present(NULL,NULL,NULL,NULL);
+	TOADLET_CHECK_D3D9ERROR(result,"Present");
 }
 
 void D3D9WindowRenderTarget::reset(){

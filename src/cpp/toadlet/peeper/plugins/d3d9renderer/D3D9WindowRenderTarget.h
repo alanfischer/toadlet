@@ -51,6 +51,7 @@ public:
 	virtual bool activate();
 	virtual bool deactivate(){return true;}
 
+	virtual void swap();
 	virtual void reset();
 
 	inline IDirect3DDevice9 *getDirect3DDevice9() const{return mD3DDevice;}

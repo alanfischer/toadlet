@@ -531,7 +531,8 @@ bool GLRenderer::setRenderTarget(RenderTarget *target){
 		}
 	}
 
-	if(mGLRenderTarget!=NULL){
+	// We only want to deactivate if it's not our PrimaryRenderTarget for OpenGL, otherwise we would lose our context to issue further GL commands
+	if(mGLRenderTarget!=NULL && mGLRenderTarget!=mGLPrimaryRenderTarget){
 		mGLRenderTarget->deactivate();
 	}
 

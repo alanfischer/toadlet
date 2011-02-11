@@ -292,8 +292,7 @@ void D3D9Renderer::clear(int clearFlags,const Color &clearColor){
 }
 
 void D3D9Renderer::swap(){
-	HRESULT result=mD3DDevice->Present(NULL,NULL,NULL,NULL);
-	TOADLET_CHECK_D3D9ERROR(result,"swap");
+	mD3DRenderTarget->swap();
 }
 
 void D3D9Renderer::setModelMatrix(const Matrix4x4 &matrix){
