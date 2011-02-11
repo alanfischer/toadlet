@@ -159,6 +159,12 @@ namespace Math{
 		return (i&(i-1))==0;
 	}
 
+	inline int intLog2(int i){
+		int result;
+		for(result=0;i>1;i>>=1,result++);
+		return result;
+	}
+
 	inline real degToRad(real deg){
 		return (real)(deg*(real)(PI/ONE_EIGHTY));
 	}

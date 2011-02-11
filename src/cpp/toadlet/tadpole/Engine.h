@@ -72,16 +72,16 @@ public:
 	egg::io::Stream::ptr openStream(const egg::String &name){return mArchiveManager->openStream(name);}
 
 	// Node methods
-	void registerNodeType(const egg::BaseType<node::Node> &type);
-	node::Node *allocNode(const egg::BaseType<node::Node> &type);
+	void registerNodeType(egg::BaseType<node::Node> *type);
+	node::Node *allocNode(egg::BaseType<node::Node> *type);
 	node::Node *allocNode(const egg::String &fullName);
-	node::Node *createNode(const egg::BaseType<node::Node> &type,Scene *scene);
+	node::Node *createNode(egg::BaseType<node::Node> *type,Scene *scene);
 	node::Node *createNode(const egg::String &fullName,Scene *scene);
 	void destroyNode(node::Node *node);
 	void freeNode(node::Node *node);
 
-	template<typename Type> Type *allocNodeType(const egg::Type<Type,node::Node> &type){return (Type*)allocNode(type);}
-	template<typename Type> Type *createNodeType(const egg::Type<Type,node::Node> &type,Scene *scene){return (Type*)createNode(type,scene);}
+	template<typename Type> Type *allocNodeType(egg::Type<Type,node::Node> *type){return (Type*)allocNode(type);}
+	template<typename Type> Type *createNodeType(egg::Type<Type,node::Node> *type,Scene *scene){return (Type*)createNode(type,scene);}
 
 	// Context methods
 	void contextReset(peeper::Renderer *renderer);

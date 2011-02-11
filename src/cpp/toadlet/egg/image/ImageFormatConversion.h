@@ -92,12 +92,17 @@ public:
 			case Format_BGR_8:
 			case Format_BGRA_8:
 				return 8;
+			case Format_RGB_F32:
+			case Format_RGBA_F32:
 			case Format_BGR_F32:
 			case Format_BGRA_F32:
 				return 32;
+			case Format_RGB_5_6_5:
+			case Format_RGBA_5_5_5_1:
 			case Format_BGR_5_6_5:
 			case Format_BGRA_5_5_5_1:
 				return 5;
+			case Format_RGBA_4_4_4_4:
 			case Format_BGRA_4_4_4_4:
 				return 4;
 			default:

@@ -76,7 +76,10 @@ AudioStream::ptr AudioBufferManager::findAudioStream(const String &name){
 		filename+="."+extension;
 	}
 
-	ResourceHandler::ptr handler=findHandler(extension);
+	ResourceHandler::ptr handler=getHandler(extension);
+	if(handler==NULL){
+		handler=mDefaultHandler;
+	}
 	if(handler!=NULL){
 		Stream::ptr stream=mArchive->openStream(filename);
 		if(stream!=NULL){

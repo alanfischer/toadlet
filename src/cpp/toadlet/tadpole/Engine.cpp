@@ -140,6 +140,7 @@
 
 #if !defined(TOADLET_FIXED_POINT)
 	#include <toadlet/tadpole/bsp/BSP30Node.h>
+	#include <toadlet/tadpole/studio/StudioModelNode.h>
 #endif
 
 using namespace toadlet::egg;
@@ -189,12 +190,6 @@ Engine::Engine(bool backable):
 	registerNodeType(ParentNode::type());
 	registerNodeType(ParticleNode::type());
 	registerNodeType(SpriteNode::type());
-
-	// Plugin types, should be removed from here somehow
-	#if !defined(TOADLET_FIXED_POINT)
-		registerNodeType(bsp::BSP30Node::type());
-		registerNodeType(bsp::BSP30ModelNode::type());
-	#endif
 
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		"Engine: adding all handlers");
@@ -261,6 +256,13 @@ Engine::Engine(bool backable):
 	#if defined(TOADLET_PLATFORM_OSX)
 		/// @todo: We need to fix the createStream function of AudioBufferManager so it will try the default handler
 //		mAudioBufferManager->setDefaultHandler(CoreAudioHandler::ptr(new CoreAudioHandler(mAudioBufferManager)));
+	#endif
+
+	// Plugin types, should be removed from here somehow
+	#if !defined(TOADLET_FIXED_POINT)
+		registerNodeType(bsp::BSP30Node::type());
+		registerNodeType(bsp::BSP30ModelNode::type());
+		registerNodeType(studio::StudioModelNode::type());
 	#endif
 }
 
@@ -435,17 +437,17 @@ AudioPlayer *Engine::getAudioPlayer() const{
 	return mAudioPlayer;
 }
 
-void Engine::registerNodeType(const BaseType<Node> &type){
+void Engine::registerNodeType(BaseType<Node> *type){
 	mNodeFactory.registerType(type);
 }
 
 /// @todo: Use a pool for these entities
-Node *Engine::allocNode(const BaseType<Node> &type){
-	Logger::excess(Categories::TOADLET_TADPOLE,String("Allocating: ")+type.getFullName());
+Node *Engine::allocNode(BaseType<Node> *type){
+	Logger::excess(Categories::TOADLET_TADPOLE,String("Allocating: ")+type->getFullName());
 
 	Node *node=NULL;
 	TOADLET_TRY
-		node=type.newInstance();
+		node=type->newInstance();
 	TOADLET_CATCH(const Exception &){node=NULL;}
 	if(node!=NULL){
 		node->internal_setManaged(true);
@@ -466,10 +468,15 @@ Node *Engine::allocNode(const String &fullName){
 	return node;
 }
 
-Node *Engine::createNode(const BaseType<Node> &type,Scene *scene){
+Node *Engine::createNode(BaseType<Node> *type,Scene *scene){
 	Node *node=allocNode(type);
 	if(node!=NULL){
-		node->create(scene);
+		if(scene!=NULL){
+			node->create(scene);
+		}
+		else{
+			node->create(this);
+		}
 	}
 	return node;
 }

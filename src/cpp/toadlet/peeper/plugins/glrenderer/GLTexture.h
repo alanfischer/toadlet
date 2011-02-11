@@ -70,11 +70,12 @@ public:
 
 	inline void setMatrix(const Matrix4x4 &matrix){mMatrix.set(matrix);}
 
+	bool generateMipLevels();
+
 protected:
 	bool createContext(int mipLevels,tbyte *mipDatas[]);
 	bool destroyContext();
 
-	bool generateMipLevels();
 	GLuint getGLTarget();
 
 	GLRenderer *mRenderer;

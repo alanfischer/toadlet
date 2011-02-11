@@ -197,16 +197,6 @@ ResourceHandler::ptr ResourceManager::getHandler(const String &extension){
 	}
 }
 
-ResourceHandler::ptr ResourceManager::findHandler(const String &extension){
-	ExtensionHandlerMap::iterator it=mExtensionHandlerMap.find(extension);
-	if(it!=mExtensionHandlerMap.end()){
-		return it->second;
-	}
-	else{
-		return mDefaultHandler;
-	}
-}
-
 void ResourceManager::resourceFullyReleased(Resource *resource){
 	unmanage(resource);
 }
@@ -275,16 +265,18 @@ Resource::ptr ResourceManager::findFromFile(const String &name,const ResourceHan
 		filename+="."+extension;
 	}
 
-	if(extension!=(char*)NULL){
-		int i;
-		for(i=0;i<mResourceArchives.size();++i){
-			Resource::ptr resource=mResourceArchives[i]->openResource(filename);
-			if(resource!=NULL){
-				return resource;
-			}
+	for(i=0;i<mResourceArchives.size();++i){
+		Resource::ptr resource=mResourceArchives[i]->openResource(filename);
+		if(resource!=NULL){
+			return resource;
 		}
+	}
 
-		ResourceHandler *handler=findHandler(extension);
+	if(extension!=(char*)NULL){
+		ResourceHandler *handler=getHandler(extension);
+		if(handler==NULL){
+			handler=mDefaultHandler;
+		}
 		if(handler!=NULL){
 			Stream::ptr stream=mArchive->openStream(filename);
 			if(stream!=NULL){
@@ -301,14 +293,6 @@ Resource::ptr ResourceManager::findFromFile(const String &name,const ResourceHan
 		}
 	}
 	else{
-		int i;
-		for(i=0;i<mResourceArchives.size();++i){
-			Resource::ptr resource=mResourceArchives[i]->openResource(filename);
-			if(resource!=NULL){
-				return resource;
-			}
-		}
-
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"Extension not found on file");
 		return NULL;

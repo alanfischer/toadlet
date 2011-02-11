@@ -33,7 +33,6 @@
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/TextureManager.h>
-#include <stdlib.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -109,6 +108,7 @@ public:
 	egg::Collection<peeper::Texture::ptr> lightmapTextures;
 	int lightmapAllocated[LIGHTMAP_SIZE];
 	peeper::TextureStage::ptr lightmapStage;
+	egg::Collection<node::NodeResource::ptr> modelResources;
 };
 
 }

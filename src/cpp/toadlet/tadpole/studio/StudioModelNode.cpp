@@ -363,20 +363,20 @@ void StudioModelNode::setLink(StudioModelNode::ptr link){
 	}
 }
 
-StudioModelController::ptr StudioModelNode::getController(){
+StudioModelController *StudioModelNode::getController(){
 	if(mController==NULL){
 		mController=StudioModelController::ptr(new StudioModelController(this,false));
 		addController(mController);
 	}
-	return mController;
+	return (StudioModelController*)mController.get();
 }
 
-StudioModelController::ptr StudioModelNode::getGaitController(){
+StudioModelController *StudioModelNode::getGaitController(){
 	if(mGaitController==NULL){
 		mGaitController=StudioModelController::ptr(new StudioModelController(this,true));
 		addController(mGaitController);
 	}
-	return mGaitController;
+	return (StudioModelController*)mGaitController.get();
 }
 
 void StudioModelNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){

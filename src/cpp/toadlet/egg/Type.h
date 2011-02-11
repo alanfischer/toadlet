@@ -70,12 +70,12 @@ class TypeFactory{
 public:
 	TypeFactory(){}
 	
-	void registerType(const BaseType<Class> &type){
-		mTypes[type.getFullName()]=&type;
+	void registerType(BaseType<Class> *type){
+		mTypes[type->getFullName()]=type;
 	}
 	
-	void unregisterType(const BaseType<Class> &type){
-		mTypes.erase(&type);
+	void unregisterType(BaseType<Class> *type){
+		mTypes.erase(type);
 	}
 	
 	Class *newInstance(const String &fullName){

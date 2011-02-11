@@ -25,7 +25,6 @@
 
 #include <toadlet/peeper/VertexFormat.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/PixelPacker.h>
 #include <toadlet/tadpole/RenderQueue.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/bsp/BSP30Node.h>

@@ -113,8 +113,8 @@ public:
 	void setLink(StudioModelNode::ptr link);
 	StudioModelNode::ptr getLink() const{return mLink;}
 
-	egg::SharedPointer<StudioModelController> getController();
-	egg::SharedPointer<StudioModelController> getGaitController();
+	StudioModelController *getController();
+	StudioModelController *getGaitController();
 
 	// Traceable
 	Bound *getBound() const{return super::getBound();}
@@ -164,7 +164,7 @@ protected:
 	scalar mBlenderValues[4],mAdjustedBlenderValues[4];
 	StudioModelNode::ptr mLink;
 	StudioModel::ptr mLinkModel;
-	egg::SharedPointer<StudioModelController> mController,mGaitController;
+	animation::Controller::ptr mController,mGaitController;
 
 	Vector3 mChromeForward,mChromeRight;
 	egg::Collection<Vector3> mBoneTranslates;

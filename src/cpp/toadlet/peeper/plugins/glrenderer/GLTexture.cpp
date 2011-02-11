@@ -118,37 +118,35 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 		#else
 			mRenderer->gl_version>=14
 		#endif
+		&&
+		#if defined(TOADLET_HAS_GLEW) && defined(GL_EXT_framebuffer_object)
+			GLEW_EXT_framebuffer_object==false
+		#endif
 	){
 		glTexParameteri(mTarget,GL_GENERATE_MIPMAP,GL_TRUE);
 		mManuallyGenerateMipLevels=false;
 	}
 
-	// If we don't support partial miplevel specification, then calculate the amount of levels we'll need
-	int specifiedMipLevels=0;
-	if(mMipLevels>0){
-		/// @todo: Determine if GLES will let us do partial specifications anyway, and if so, enable that
-		#if !defined(TOADLET_HAS_GLES)
-			if(mRenderer->gl_version>=12){
-				glTexParameteri(mTarget,GL_TEXTURE_BASE_LEVEL,0);
-				glTexParameteri(mTarget,GL_TEXTURE_MAX_LEVEL,mMipLevels-1);
-				specifiedMipLevels=mMipLevels;
-			}
-			else
-		#endif
-		{
-			int hwidth=mWidth,hheight=mHeight,hdepth=mDepth;
-			while(hwidth>1 || hheight>1 || hdepth>1){
-				specifiedMipLevels++;
-				hwidth/=2;hheight/=2;hdepth/=2;
-				hwidth=hwidth>0?hwidth:1;hheight=hheight>0?hheight:1;hdepth=hdepth>0?hdepth:1;
-			}
+	int totalMipLevels=Math::intLog2(Math::maxVal(mWidth,Math::maxVal(mHeight,mDepth)));
+	int specifiedMipLevels=mipLevels>0?mipLevels:totalMipLevels;
 
-			if(specifiedMipLevels!=mMipLevels){
-				Logger::debug(Categories::TOADLET_PEEPER,
-					String("partial mipmap specification not supported.  calculated:")+specifiedMipLevels+" requested:"+mMipLevels);
-			}
+	// If we don't support partial miplevel specification, then calculate the amount of levels we'll need
+	#if !defined(TOADLET_HAS_GLES)
+		if(mRenderer->gl_version>=12){
+			glTexParameteri(mTarget,GL_TEXTURE_BASE_LEVEL,0);
+			glTexParameteri(mTarget,GL_TEXTURE_MAX_LEVEL,specifiedMipLevels-1);
 		}
+		else
+	#endif
+	/// @todo: Determine if GLES will let us do partial specifications anyway, and if so, enable that
+	if(totalMipLevels!=mMipLevels){
+		specifiedMipLevels=totalMipLevels;
+
+		Logger::debug(Categories::TOADLET_PEEPER,
+			String("partial mipmap specification not supported.  calculated:")+totalMipLevels+" requested:"+mMipLevels);
 	}
+
+	// Always need to specify at least 1 level
 	if(specifiedMipLevels==0){
 		specifiedMipLevels=1;
 	}
@@ -254,7 +252,7 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 		}
 	}
 
-	if(mipDatas!=NULL && mManuallyGenerateMipLevels){
+	if(mipDatas!=NULL){
 		generateMipLevels();
 	}
 
@@ -381,9 +379,7 @@ bool GLTexture::load(int width,int height,int depth,int mipLevel,tbyte *mipData)
 		}
 	}
 	
-	if(mManuallyGenerateMipLevels){
-		generateMipLevels();
-	}
+	generateMipLevels();
 
 	TOADLET_CHECK_GLERROR("GLTexture::load");
 
@@ -440,7 +436,7 @@ bool GLTexture::read(int width,int height,int depth,int mipLevel,tbyte *mipData)
 } 
 
 bool GLTexture::generateMipLevels(){
-	if(mHandle==0){
+	if(mHandle==0 || mManuallyGenerateMipLevels==false){
 		return false;
 	}
 

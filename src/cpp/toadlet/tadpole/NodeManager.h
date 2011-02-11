@@ -34,6 +34,13 @@ namespace tadpole{
 
 class Engine;
 
+class NodeHandler{
+public:
+	TOADLET_SHARED_POINTERS(NodeHandler);
+
+	virtual node::NodeResource *load(const egg::String &name,const ResourceHandlerData *handlerData)=0;
+};
+
 class TOADLET_API NodeManager:public ResourceManager{
 public:
 	NodeManager(Engine *engine);
@@ -41,12 +48,22 @@ public:
 	node::NodeResource::ptr getNodeResource(int handle){return egg::shared_static_cast<node::NodeResource>(ResourceManager::get(handle));}
 	node::NodeResource::ptr findNodeResource(const egg::String &name){return egg::shared_static_cast<node::NodeResource>(ResourceManager::find(name));}
 
-	node::Node::ptr createNode(int handle){return createNode(getNodeResource(handle));}
-	node::Node::ptr createNode(const egg::String &name){return createNode(findNodeResource(name));}
-	node::Node::ptr createNode(node::NodeResource *resource);
+	node::Node::ptr createNode(int handle,Scene *scene){return createNode(getNodeResource(handle),scene);}
+	node::Node::ptr createNode(const egg::String &name,Scene *scene){return createNode(findNodeResource(name),scene);}
+	node::Node::ptr createNode(node::NodeResource *resource,Scene *scene);
 	
+	void setNodeHandler(NodeHandler::ptr handler,const egg::String &extension);
+	NodeHandler::ptr getNodeHandler(const egg::String &extension);
+
 protected:
+	typedef egg::Map<egg::String,NodeHandler::ptr> ExtensionNodeHandlerMap;
+
+	egg::Resource::ptr findFromFile(const egg::String &name,const ResourceHandlerData *handlerData);
+	NodeHandler::ptr findNodeHandler(const egg::String &extension);
+
 	Engine *mEngine;
+
+	ExtensionNodeHandlerMap mExtensionNodeHandlerMap;
 };
 
 }

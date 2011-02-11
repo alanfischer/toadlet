@@ -117,6 +117,15 @@ bool GLFBORenderTarget::deactivate(){
 bool GLFBORenderTarget::swap(){
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 
+	int i;
+	for(i=0;i<mBuffers.size();++i){
+		GLPixelBuffer *glpixelBuffer=(GLPixelBuffer*)mBuffers[i]->getRootPixelBuffer();
+		GLTextureMipPixelBuffer *textureBuffer=glpixelBuffer->castToGLTextureMipPixelBuffer();
+		if(textureBuffer!=NULL){
+			textureBuffer->getTexture()->generateMipLevels();
+		}
+	}
+
 	TOADLET_CHECK_GLERROR("GLFBORenderTarget::swap");
 
 	return true;
