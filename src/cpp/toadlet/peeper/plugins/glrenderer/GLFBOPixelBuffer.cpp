@@ -50,6 +50,8 @@ GLFBOPixelBuffer::~GLFBOPixelBuffer(){
 }
 
 bool GLFBOPixelBuffer::create(int usage,int access,int pixelFormat,int width,int height,int depth){
+	TOADLET_CHECK_GLERROR("entering GLFBOPixelBuffer::create");
+
 	mUsage=usage;
 	mAccess=access;
 	mPixelFormat=pixelFormat;

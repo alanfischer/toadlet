@@ -44,7 +44,7 @@ Resource::ptr MeshManager::manage(const Resource::ptr &resource,const String &na
 	return mesh;
 }
 
-Mesh::ptr MeshManager::createBox(const AABox &box){
+Mesh::ptr MeshManager::createBox(const AABox &box,Material::ptr material){
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,24);
 	{
 		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
@@ -118,9 +118,12 @@ Mesh::ptr MeshManager::createBox(const AABox &box){
 
 	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
-	subMesh->material=mEngine->getMaterialManager()->createMaterial();
-	subMesh->material->retain();
-	subMesh->material->setLighting(true);
+	if(material==NULL){
+		material=mEngine->getMaterialManager()->createMaterial();
+		material->setLighting(true);
+	}
+	material->retain();
+	subMesh->material=material;
 
 	Mesh::ptr mesh(new Mesh());
 	mesh->subMeshes.resize(1);

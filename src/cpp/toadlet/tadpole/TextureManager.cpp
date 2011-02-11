@@ -44,6 +44,16 @@ TextureManager::TextureManager(Engine *engine,bool backable):ResourceManager(eng
 	mBackable=backable;
 }
 
+void TextureManager::destroy(){
+	ResourceManager::destroy();
+
+	int i;
+	for(i=0;i<mRenderTargets.size();++i){
+		mRenderTargets[i]->destroy();
+	}
+	mRenderTargets.clear();
+}
+
 Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLevels){
 	Logger::debug(Categories::TOADLET_TADPOLE,"TextureManager::createTexture");
 
@@ -289,12 +299,14 @@ Image::ptr TextureManager::createImage(Texture *texture){
 }
 
 PixelBufferRenderTarget::ptr TextureManager::createPixelBufferRenderTarget(){
-	/// @todo: Make this use a BackableSufaceRenderTarget
+	/// @todo: Make this use a BackablePixelBufferRenderTarget, which would also let us remove them from mRenderTargets as they are destroyed
 	if(mEngine->getRenderer()!=NULL){
 		PixelBufferRenderTarget::ptr back(mEngine->getRenderer()->createPixelBufferRenderTarget());
 		if(back!=NULL){
 			back->create();
 		}
+		mRenderTargets.add(back);
+
 		return back;
 	}
 	return NULL;

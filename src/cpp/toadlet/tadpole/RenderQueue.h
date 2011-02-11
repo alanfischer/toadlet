@@ -86,6 +86,8 @@ public:
 	virtual ~RenderQueue();
 
 	virtual void setCamera(node::CameraNode *camera){mCamera=camera;}
+	virtual void startQueuing();
+	virtual void endQueuing();
 	virtual void queueRenderable(Renderable *renderable);
 	virtual void queueLight(node::LightNode *light);
 	inline RenderLayer *getRenderLayer(int layer);

@@ -38,6 +38,7 @@ public:
 
 	virtual ~D3D9RenderTarget(){}
 
+	virtual void swap()=0;
 	virtual void reset()=0;
 	virtual bool activate()=0;
 	virtual bool deactivate()=0;

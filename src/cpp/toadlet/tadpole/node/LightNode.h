@@ -43,6 +43,9 @@ public:
 	virtual void destroy();
 	virtual Node *set(Node *node);
 
+	inline void setEnabled(bool enabled){mLight->setEnabled(enabled);}
+	inline bool getEnabled() const{return mLight->getEnabled();}
+
 	inline void setSpecularColor(const peeper::Color &specularColor){mLight->setSpecularColor(specularColor);}
 	inline const peeper::Color &getSpecularColor() const{return mLight->getSpecularColor();}
 

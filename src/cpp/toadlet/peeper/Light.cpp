@@ -33,6 +33,7 @@ namespace toadlet{
 namespace peeper{
 
 Light::Light():
+	enabled(true),
 	specularColor(Colors::BLACK),
 	diffuseColor(Colors::WHITE),
 	type(Type_DIRECTION),

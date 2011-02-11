@@ -76,7 +76,8 @@ bool GLFBORenderTarget::create(){
 }
 
 void GLFBORenderTarget::destroy(){
-	if(mRenderer==NULL || mRenderer->getRenderTarget()->getRootRenderTarget()==(GLRenderTarget*)this){
+	// Check Handle here so if we are destroyed multiple times, we won't attempt to reference the Renderer
+	if(mHandle!=0 && mRenderer!=NULL && mRenderer->getRenderTarget()->getRootRenderTarget()==(GLRenderTarget*)this){
 		glBindFramebuffer(GL_FRAMEBUFFER,0);
 	}
  
@@ -89,8 +90,6 @@ void GLFBORenderTarget::destroy(){
 		glDeleteFramebuffers(1,&mHandle);
 		mHandle=0;
 	}
-
-	mRenderer=NULL;
 
 	TOADLET_CHECK_GLERROR("GLFBORenderTarget::destroy");
 }
@@ -209,6 +208,8 @@ bool GLFBORenderTarget::remove(PixelBuffer::ptr buffer){
 
 /// @todo: Make it check to see if a pre-existing self-created depth buffer is compatible, and if not, destroy & recreate it
 bool GLFBORenderTarget::compile(){
+	TOADLET_CHECK_GLERROR("entering GLFBORenderTarget::compile");
+
 	PixelBuffer::ptr depth;
 	PixelBuffer::ptr color;
 

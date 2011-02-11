@@ -44,6 +44,9 @@ public:
 
 	Light();
 
+	inline void setEnabled(bool enabled1){enabled=enabled1;}
+	inline bool getEnabled() const{return enabled;}
+
 	inline void setSpecularColor(const Color &color){specularColor.set(color);}
 	inline const Color &getSpecularColor() const{return specularColor;}
 
@@ -68,6 +71,7 @@ public:
 	inline void setPosition(const Vector3 &position1){position.set(position1);}
 	inline const Vector3 &getPosition() const{return position;}
 
+	bool enabled;
 	Color specularColor;
 	Color diffuseColor;
 	Type type;

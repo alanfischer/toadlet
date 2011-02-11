@@ -40,6 +40,8 @@ class TOADLET_API TextureManager:public ResourceManager{
 public:
 	TextureManager(Engine *engine,bool backable);
 
+	void destroy();
+
 	peeper::Texture::ptr createTexture(egg::image::Image::ptr image,int usage=peeper::Texture::Usage_BIT_STATIC|peeper::Texture::Usage_BIT_AUTOGEN_MIPMAPS,int mipLevels=0);
 	peeper::Texture::ptr createTexture(egg::image::Image::ptr images[],int mipLevels,int usage=peeper::Texture::Usage_BIT_STATIC);
 	peeper::Texture::ptr createTexture(int usage,peeper::Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels);
@@ -48,16 +50,18 @@ public:
 
 	peeper::Texture::ptr findTexture(const egg::String &name){return egg::shared_static_cast<peeper::Texture>(ResourceManager::find(name));}
 
-	virtual void contextActivate(peeper::Renderer *renderer);
-	virtual void contextDeactivate(peeper::Renderer *renderer);
-	virtual void preContextReset(peeper::Renderer *renderer);
-	virtual void postContextReset(peeper::Renderer *renderer);
+	void contextActivate(peeper::Renderer *renderer);
+	void contextDeactivate(peeper::Renderer *renderer);
+	void preContextReset(peeper::Renderer *renderer);
+	void postContextReset(peeper::Renderer *renderer);
 
 	peeper::Renderer *getRenderer();
 
 	peeper::Texture::ptr createNormalization(int size);
 
 protected:
+	egg::Collection<peeper::PixelBufferRenderTarget::ptr> mRenderTargets;
+
 	Engine *mEngine;
 	bool mBackable;
 };

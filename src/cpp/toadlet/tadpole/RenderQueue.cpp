@@ -42,6 +42,13 @@ RenderQueue::~RenderQueue(){
 	}
 }
 
+void RenderQueue::startQueuing(){
+	mLight=NULL;
+}
+
+void RenderQueue::endQueuing(){
+}
+
 void RenderQueue::queueRenderable(Renderable *renderable){
 	Material *material=renderable->getRenderMaterial();
 	RenderLayer *layer=getRenderLayer((material==NULL)?0:material->getLayer());
