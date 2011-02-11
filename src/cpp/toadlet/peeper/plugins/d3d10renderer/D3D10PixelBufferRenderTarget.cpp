@@ -165,7 +165,7 @@ bool D3D9SurfaceRenderTarget::compile(){
 	return true;
 }
 
-// TODO: Make this do more than just clone depth.  Create color, and create varying depths
+/// @todo: Make this do more than just clone depth.  Create color, and create varying depths
 Surface::ptr D3D9SurfaceRenderTarget::createBufferSurface(int format,int width,int height){
 #if 1
 	IDirect3DDevice9 *device=mRenderer->getDirect3DDevice9();

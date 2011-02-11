@@ -484,7 +484,7 @@ public final class Simulator{
 				traceSolid(c,solid,path);
 
 				if(c.time>=0){
-					// TODO: Improve this Inside logic
+					/// @todo: Improve this Inside logic
 					if(c.time==0 && c.collider!=null && c.collider.mMass==Solid.INFINITE_MASS){
 						solid.mInside=true;
 					}
@@ -819,7 +819,7 @@ public final class Simulator{
 	}
 
 	public void capVector3(Vector3 vector,scalar value){
-		// TODO: Optimize this, perhaps using some bitwise &?
+		/// @todo: Optimize this, perhaps using some bitwise &?
 		if(vector.x>value){vector.x=value;}
 		if(vector.x<-value){vector.x=-value;}
 		if(vector.y>value){vector.y=value;}

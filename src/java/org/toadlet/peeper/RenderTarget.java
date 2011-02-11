@@ -39,7 +39,7 @@ public interface RenderTarget{
 		public int getHeight();
 	}
 
-	// TODO:add a destroy ()to RenderTarget so we can destroy() the Peer
+	/// @todo:add a destroy ()to RenderTarget so we can destroy() the Peer
 
 	public Texture castToTexture();
 

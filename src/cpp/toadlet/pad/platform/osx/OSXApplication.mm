@@ -94,7 +94,7 @@ using namespace toadlet::pad;
 - (void) update;
 @end
 
-
+//! An ApplicationView handles translating the objective c ui messages to and from the pad Application class
 @implementation ApplicationView
 
 #if defined(TOADLET_HAS_UIKIT)

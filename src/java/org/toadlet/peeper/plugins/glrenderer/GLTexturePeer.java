@@ -83,7 +83,7 @@ public class GLTexturePeer implements Texture.Peer{
 				java.nio.ByteBuffer data=java.nio.ByteBuffer.allocateDirect(width*height*pixelSize).order(java.nio.ByteOrder.nativeOrder());
 				image.copyPixelsToBuffer(data);
 				data.rewind();
-				// TODO: I believe this needs to go back in.  The textures we are currently
+				/// @todo: I believe this needs to go back in.  The textures we are currently
 				//  using seem to work without any swapping, so we'll just leave it out for speed.
 				/*if(image.getConfig()==android.graphics.Bitmap.Config.ARGB_4444){
 					java.nio.ShortBuffer shortData=data.asShortBuffer();

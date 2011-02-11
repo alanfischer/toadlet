@@ -34,7 +34,7 @@ import org.toadlet.tadpole.*;
 import org.toadlet.tadpole.entity.*;
 
 public class HopEntity extends ParentEntity implements CollisionListener{
-	// TODO: Rename this to fit with new enum standards when reworking client/server
+	/// @todo: Rename this to fit with new enum standards when reworking client/server
 	public static final int ENTITY_BITS_NONE=0;
 	public static final int ENTITY_BITS_ALL=0xFFFFFFFF;
 

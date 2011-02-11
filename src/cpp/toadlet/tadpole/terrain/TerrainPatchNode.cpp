@@ -935,7 +935,7 @@ void TerrainPatchNode::simplifyBlocks(const Vector3 &cameraTranslate){
 
 			// Is block interrior node?
 			if(mBlocks[blockNum].stride>1){
-				// TODO: Put back in optional blockIntersectsCamera test here if on single pipe machine
+				/// @todo: Put back in optional blockIntersectsCamera test here if on single pipe machine
 				bool shouldSubdivide=false;
 					
 				for(i=0;i<4;i++){

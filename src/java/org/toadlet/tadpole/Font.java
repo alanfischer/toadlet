@@ -237,7 +237,7 @@ public class Font implements Resource{
 	
 	protected float mPointWidth=0;
 	protected float mPointHeight=0;
-	protected int mHeight=0; // TODO: Perhaps somehow mHeight should be depreciated, and we force all the font loaders to actually have a consistant mPointHeight
+	protected int mHeight=0; /// @todo: Perhaps somehow mHeight should be depreciated, and we force all the font loaders to actually have a consistant mPointHeight
 	protected int mInnerSpace=0;
 	protected Texture mTexture=null;
 	protected Glyph[] mGlyphs=null;
