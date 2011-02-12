@@ -25,6 +25,7 @@
 
 #include <toadlet/tadpole/bsp/BSP30Map.h>
 #include <string.h> // memset
+#include <stdlib.h> // free
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::image;
