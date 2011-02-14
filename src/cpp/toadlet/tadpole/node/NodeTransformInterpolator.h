@@ -51,6 +51,8 @@ public:
 	virtual void nodeDestroyed(Node *node){}
 
 	virtual void transformUpdated(Node *node,int tu){
+		if((tu&Node::TransformUpdate_BIT_INTERPOLATOR)>0) return;
+
 		if((~mForceInterpolate&tu&Node::TransformUpdate_BIT_TRANSLATE)>0){
 			const Vector3 &translate=node->getTranslate();
 			mLastTransform->setTranslate(translate);

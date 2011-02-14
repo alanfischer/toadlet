@@ -37,7 +37,7 @@ class TOADLET_API NodeResource:public egg::BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(NodeResource);
 
-	NodeResource():egg::BaseResource(){}
+	NodeResource(Node::ptr node=NULL):egg::BaseResource(){setNode(node);}
 	virtual ~NodeResource(){}
 	void destroy(){mNode->destroy();}
 	
