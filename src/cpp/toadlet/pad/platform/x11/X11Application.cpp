@@ -110,17 +110,17 @@ X11Application::~X11Application(){
 	delete x11;
 }
 
-void X11Application::create(int renderer,int audioPlayer,int motionDetector){
+void X11Application::create(String renderer,String audioPlayer,String motionDetector){
 	mEngine=new Engine();
 
 	createWindow();
-	if(renderer!=RendererPlugin_NONE){
+	if(renderer!="null"){
 		createContextAndRenderer();
 	}
-	if(audioPlayer!=AudioPlayerPlugin_NONE){
+	if(audioPlayer!="null"){
 		createAudioPlayer();
 	}
-	if(motionDetector!=MotionDetectorPlugin_NONE){
+	if(motionDetector!="null"){
 		createMotionDetector();
 	}
 

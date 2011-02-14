@@ -58,7 +58,7 @@ void VLCToadlet::create(){
 #if defined(TOADLET_PLATFORM_WIN32)
 	String file="c:\\WINDOWS\\clock.avi";
 #else
-	#error need a media file
+	String file="/home/siralanf/crimp.avi";//#error need a media file
 #endif
 
 	scene=Scene::ptr(new Scene(mEngine));
