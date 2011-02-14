@@ -45,7 +45,7 @@ public:
 	X11Application();
 	virtual ~X11Application();
 
-	virtual void create(int renderer=0,int audioPlayer=0,int motionDetector=0);
+	virtual void create(egg::String renderer=(char*)NULL,egg::String audioPlayer=(char*)NULL,egg::String motionDetector=(char*)NULL);
 	virtual void destroy();
 
 	virtual void start();
