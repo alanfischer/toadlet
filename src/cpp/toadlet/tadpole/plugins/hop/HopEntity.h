@@ -96,8 +96,9 @@ public:
 
 	virtual void setNextThink(int think);
 
-	virtual void findTraceableNode(node::Node *node);
+	virtual bool findTraceableNode(node::Node *node);
 	virtual void setTraceableShape(Traceable *traceable);
+	virtual hop::Shape::ptr getTraceableShape() const{return mTraceableShape;}
 	virtual void addShape(hop::Shape::ptr shape);
 	virtual void removeShape(hop::Shape *shape);
 	virtual void removeAllShapes();
