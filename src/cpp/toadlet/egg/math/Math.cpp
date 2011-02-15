@@ -266,6 +266,35 @@ void Math::setMatrix4x4FromPerspectiveY(Matrix4x4 &r,real fovy,real aspect,real 
 	);
 }
 
+void Math::setMatrix4x4FromOrthoPlane(Matrix4x4 &r,const Plane &plane,const Vector3 &dir){
+	real nd=Math::dot(plane.normal,dir);
+
+	r.set(
+		dir.x*plane.normal.x - nd, dir.x*plane.normal.y, dir.x*plane.normal.z, -plane.distance*dir.x,
+		dir.y*plane.normal.x, dir.y*plane.normal.y - nd, dir.y*plane.normal.z, -plane.distance*dir.y,
+		dir.z*plane.normal.x, dir.z*plane.normal.y, dir.z*plane.normal.z - nd, -plane.distance*dir.z,
+		0,0,0,-nd
+	);
+}
+
+void Math::setMatrix4x4FromPerspectivePlane(Matrix4x4 &r,const Plane &plane,const Vector3 &eye){
+	Vector3 cacheEp;
+
+	cacheEp.set(eye.x-plane.normal.x*plane.distance,eye.y-plane.normal.y*plane.distance,eye.z-plane.normal.z*plane.distance);
+	real nd=Math::dot(plane.normal,cacheEp);
+
+	r.set(
+		nd - eye.x*plane.normal.x,-eye.x*plane.normal.y,-eye.x*plane.normal.z, 0,
+		-eye.y*plane.normal.x,nd - eye.y*plane.normal.y,-eye.y*plane.normal.z, 0,
+		-eye.z*plane.normal.x,-eye.z*plane.normal.y,nd - eye.z*plane.normal.z, 0,
+		-plane.normal.x,-plane.normal.y,-plane.normal.z,Math::dot(eye,plane.normal)
+	);
+
+	r.data[12] = -(r.data[0]*eye.x + r.data[4]*eye.y + r.data[8]*eye.z);
+	r.data[13] = -(r.data[1]*eye.x + r.data[5]*eye.y + r.data[9]*eye.z);
+	r.data[14]= -(r.data[2]*eye.x + r.data[6]*eye.y + r.data[10]*eye.z);
+}
+
 real Math::setAxisAngleFromQuaternion(Vector3 &axis,const Quaternion &q,real epsilon){
 	real angle=2.0*acos(q.w);
 
