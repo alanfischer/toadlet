@@ -1218,6 +1218,10 @@ namespace Math{
 
 	TOADLET_API void setMatrix4x4FromPerspectiveY(Matrix4x4 &r,fixed fovy,fixed aspect,fixed nearDist,fixed farDist);
 
+	TOADLET_API void setMatrix4x4FromOrthoPlane(Matrix4x4 &r,const Plane &plane,const Vector3 &dir);
+
+	TOADLET_API void setMatrix4x4FromPerspectivePlane(Matrix4x4 &r,const Plane &plane,const Vector3 &eye);
+
 	// Axis Angle operations
 	TOADLET_API fixed setAxisAngleFromQuaternion(Vector3 &axis,const Quaternion &q,fixed epsilon);
 

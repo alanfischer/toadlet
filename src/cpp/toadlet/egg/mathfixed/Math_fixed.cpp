@@ -265,6 +265,36 @@ void Math::setMatrix4x4FromPerspectiveY(Matrix4x4 &r,fixed fovy,fixed aspect,fix
 	);
 }
 
+
+void Math::setMatrix4x4FromOrthoPlane(Matrix4x4 &r,const Plane &plane,const Vector3 &dir){
+	fixed nd=Math::dot(plane.normal,dir);
+
+	r.set(
+		TOADLET_MUL_XX(dir.x,plane.normal.x) - nd, TOADLET_MUL_XX(dir.x,plane.normal.y), TOADLET_MUL_XX(dir.x,plane.normal.z), -TOADLET_MUL_XX(plane.distance,dir.x),
+		TOADLET_MUL_XX(dir.y,plane.normal.x), TOADLET_MUL_XX(dir.y,plane.normal.y) - nd, TOADLET_MUL_XX(dir.y,plane.normal.z), -TOADLET_MUL_XX(plane.distance,dir.y),
+		TOADLET_MUL_XX(dir.z,plane.normal.x), TOADLET_MUL_XX(dir.z,plane.normal.y), TOADLET_MUL_XX(dir.z,plane.normal.z) - nd, -TOADLET_MUL_XX(plane.distance,dir.z),
+		0,0,0,-nd
+	);
+}
+
+void Math::setMatrix4x4FromPerspectivePlane(Matrix4x4 &r,const Plane &plane,const Vector3 &eye){
+	Vector3 cacheEp;
+
+	cacheEp.set(eye.x-TOADLET_MUL_XX(plane.normal.x,plane.distance),eye.y-TOADLET_MUL_XX(plane.normal.y,plane.distance),eye.z-TOADLET_MUL_XX(plane.normal.z,plane.distance));
+	fixed nd=Math::dot(plane.normal,cacheEp);
+
+	r.set(
+		nd - TOADLET_MUL_XX(eye.x,plane.normal.x),-TOADLET_MUL_XX(eye.x,plane.normal.y),-TOADLET_MUL_XX(eye.x,plane.normal.z), 0,
+		-TOADLET_MUL_XX(eye.y,plane.normal.x),nd - TOADLET_MUL_XX(eye.y,plane.normal.y),-TOADLET_MUL_XX(eye.y,plane.normal.z), 0,
+		-TOADLET_MUL_XX(eye.z,plane.normal.x),-TOADLET_MUL_XX(eye.z,plane.normal.y),nd - TOADLET_MUL_XX(eye.z,plane.normal.z), 0,
+		-plane.normal.x,-plane.normal.y,-plane.normal.z,Math::dot(eye,plane.normal)
+	);
+
+	r.data[12] = -(TOADLET_MUL_XX(r.data[0],eye.x) + TOADLET_MUL_XX(r.data[4],eye.y) + TOADLET_MUL_XX(r.data[8],eye.z));
+	r.data[13] = -(TOADLET_MUL_XX(r.data[1],eye.x) + TOADLET_MUL_XX(r.data[5],eye.y) + TOADLET_MUL_XX(r.data[9],eye.z));
+	r.data[14]= -(TOADLET_MUL_XX(r.data[2],eye.x) + TOADLET_MUL_XX(r.data[6],eye.y) + TOADLET_MUL_XX(r.data[10],eye.z));
+}
+
 fixed Math::setAxisAngleFromQuaternion(Vector3 &axis,const Quaternion &q,fixed epsilon){
 	fixed angle=acos(q.w)<<1;
 
