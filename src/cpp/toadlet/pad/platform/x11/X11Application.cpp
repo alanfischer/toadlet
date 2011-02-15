@@ -728,17 +728,25 @@ bool X11Application::destroyMotionDetector(){
 
 void X11Application::internal_mouseMoved(int x,int y){
 	if(mSkipNextMove){
-		mLastXMouse=x;mLastYMouse=y;
+		mLastXMouse=x;
+		mLastYMouse=y;
 		mSkipNextMove=false;
 		return;
 	}
 
 	if(mDifferenceMouse){
-		int dx=x-mLastXMouse,dy=y-mLastYMouse;
-		mLastXMouse=x;mLastYMouse=y;
+		// We check to see if we are at the warp-point, instead of using SkipNextMove 
+		//  since it seems on X11 that user mouse-move commands can get processed before the skip, getting things confused
+		// We still use SkipNextMove when the DifferenceMouse is turned on to avoid the first jump
+		if(x==mWidth/2 && y==mHeight/2){
+			mLastXMouse=x;
+			mLastYMouse=y;
+			return;
+		}
 
-		XWarpPointer(x11->mDisplay,None,x11->mWindow,0,0,0,0,getWidth()/2,getHeight()/2);
-		mSkipNextMove=true;
+		int dx=x-mLastXMouse,dy=y-mLastYMouse;
+
+		XWarpPointer(x11->mDisplay,None,x11->mWindow,0,0,0,0,mWidth/2,mHeight/2);
 
 		x=dx;y=dy;
 	}

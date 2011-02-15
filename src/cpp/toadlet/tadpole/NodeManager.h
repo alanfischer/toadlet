@@ -47,6 +47,7 @@ public:
 
 	node::NodeResource::ptr getNodeResource(int handle){return egg::shared_static_cast<node::NodeResource>(ResourceManager::get(handle));}
 	node::NodeResource::ptr findNodeResource(const egg::String &name){return egg::shared_static_cast<node::NodeResource>(ResourceManager::find(name));}
+	node::NodeResource::ptr createNodeResource(node::Node *node,const egg::String &name=(char*)NULL);
 
 	node::Node::ptr createNode(int handle,Scene *scene){return createNode(getNodeResource(handle),scene);}
 	node::Node::ptr createNode(const egg::String &name,Scene *scene){return createNode(findNodeResource(name),scene);}

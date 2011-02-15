@@ -137,11 +137,12 @@ void HopEntity::setNextThink(int think){
 	setStayActive(mNextThink>0);
 }
 
-void HopEntity::findTraceableNode(Node *node){
+bool HopEntity::findTraceableNode(Node *node){
 	mTraceableNode=mScene->findNodeByInterface(InterfaceType_TRACEABLE,node);
 	if(mTraceableNode!=NULL){
 		setTraceableShape((Traceable*)mTraceableNode->hasInterface(InterfaceType_TRACEABLE));
 	}
+	return mTraceableNode!=NULL;
 }
 
 void HopEntity::setTraceableShape(Traceable *traceable){
@@ -224,10 +225,6 @@ void HopEntity::logicUpdate(int dt,int scope){
 	if(mSolid->active()){
 		mTransform->setTranslate(mSolid->getPosition());
 		transformUpdated(TransformUpdate_BIT_TRANSLATE|TransformUpdate_BIT_INTERPOLATOR);
-
-		if(mInterpolator!=NULL){
-			mInterpolator->logicUpdated(this,dt);
-		}
 	}
 
 	if(mNextThink<=mScene->getLogicTime()){
