@@ -31,6 +31,7 @@
 #include <toadlet/peeper/TextureStage.h>
 #include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/Mesh.h>
+#include <toadlet/tadpole/RenderListener.h>
 #include <toadlet/tadpole/RenderQueue.h>
 #include <toadlet/tadpole/UpdateListener.h>
 #include <toadlet/tadpole/node/PartitionNode.h>
@@ -68,6 +69,9 @@ public:
 	virtual void setUpdateListener(UpdateListener *updateListener){mUpdateListener=updateListener;}
 	virtual UpdateListener *getUpdateListener() const{return mUpdateListener;}
 
+	virtual void setRenderListener(RenderListener *renderListener){mRenderListener=renderListener;}
+	virtual RenderListener *getRenderListener() const{return mRenderListener;}
+
 	virtual void update(int dt);
 	virtual void preLogicUpdate(int dt){}
 	virtual void logicUpdate(int dt){logicUpdate(dt,-1);}
@@ -80,7 +84,8 @@ public:
 	virtual void queueDependent(node::Node *dependent);
 
 	virtual void render(peeper::Renderer *renderer,node::CameraNode *camera,node::Node *node);
-	virtual void renderRenderables(peeper::Renderer *renderer,node::CameraNode *camera,RenderQueue *queue);
+	virtual void queueRenderables(RenderQueue *queue,node::Node *node,node::CameraNode *camera);
+	virtual void renderRenderables(RenderQueue *queue,peeper::Renderer *renderer,node::CameraNode *camera);
 
 	virtual node::Node *getNodeByHandle(int handle);
 	virtual node::Node *findNodeByName(const egg::String &name,node::Node *node=NULL);
@@ -107,6 +112,8 @@ protected:
 	egg::Collection<node::Node*> mHandles;
 
 	UpdateListener *mUpdateListener;
+	RenderListener *mRenderListener;
+
 	int mExcessiveDT;
 	int mMinLogicDT;
 	int mMaxLogicDT;

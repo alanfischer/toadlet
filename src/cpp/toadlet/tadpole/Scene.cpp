@@ -41,6 +41,8 @@ namespace tadpole{
 
 Scene::Scene(Engine *engine):
 	mUpdateListener(NULL),
+	mRenderListener(NULL),
+
 	mExcessiveDT(0),
 	mMinLogicDT(0),
 	mMaxLogicDT(0),
@@ -312,28 +314,52 @@ void Scene::queueDependent(Node *dependent){
 }
 
 void Scene::render(Renderer *renderer,CameraNode *camera,Node *node){
+	if(mRenderListener!=NULL){
+		mRenderListener->preRender(renderer,camera,node);
+	}
+
 	camera->updateFramesPerSecond();
 
-	mRenderQueue->setCamera(camera);
+	queueRenderables(mRenderQueue,node,camera);
 
-	mRenderQueue->startQueuing();
+	renderRenderables(mRenderQueue,renderer,camera);
+
+	if(mRenderListener!=NULL){
+		mRenderListener->postRender(renderer,camera,node);
+	}
+}
+
+void Scene::queueRenderables(RenderQueue *queue,Node *node,CameraNode *camera){
+	if(mRenderListener!=NULL){
+		mRenderListener->preQueueRenderables(queue,node,camera);
+	}
+
+	queue->setCamera(camera);
+
+	queue->startQueuing();
 	if(node!=NULL){
-		node->queueRenderables(camera,mRenderQueue);
+		node->queueRenderables(camera,queue);
 	}
 	else{
 		// Reposition our background node & update it to update the world positions
 		mBackground->setTranslate(camera->getWorldTranslate());
 		mBackground->frameUpdate(0,-1);
-		mBackground->queueRenderables(camera,mRenderQueue);
+		mBackground->queueRenderables(camera,queue);
 
-		mRoot->queueRenderables(camera,mRenderQueue);
+		mRoot->queueRenderables(camera,queue);
 	}
-	mRenderQueue->endQueuing();
+	queue->endQueuing();
 
-	renderRenderables(renderer,camera,mRenderQueue);
+	if(mRenderListener!=NULL){
+		mRenderListener->postQueueRenderables(queue,node,camera);
+	}
 }
 
-void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue *queue){
+void Scene::renderRenderables(RenderQueue *queue,Renderer *renderer,CameraNode *camera){
+	if(mRenderListener!=NULL){
+		mRenderListener->preRenderRenderables(queue,renderer,camera);
+	}
+
 	Matrix4x4 matrix;
 	Color ambient;
 
@@ -464,6 +490,10 @@ void Scene::renderRenderables(Renderer *renderer,CameraNode *camera,RenderQueue 
 		// Reset previous material each time, to avoid pre/postLayerRender messing up what we though the state of things were
 		// We could also use the true/false return of pre/postLayerRender, but it could be easy to forget to change that.
 		mPreviousMaterial=NULL;
+	}
+
+	if(mRenderListener!=NULL){
+		mRenderListener->postRenderRenderables(queue,renderer,camera);
 	}
 }
 
