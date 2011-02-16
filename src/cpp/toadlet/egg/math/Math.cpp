@@ -266,7 +266,7 @@ void Math::setMatrix4x4FromPerspectiveY(Matrix4x4 &r,real fovy,real aspect,real 
 	);
 }
 
-void Math::setMatrix4x4FromOrthoPlane(Matrix4x4 &r,const Plane &plane,const Vector3 &dir){
+void Math::setMatrix4x4FromObliquePlane(Matrix4x4 &r,const Plane &plane,const Vector3 &dir){
 	real nd=Math::dot(plane.normal,dir);
 
 	r.set(
