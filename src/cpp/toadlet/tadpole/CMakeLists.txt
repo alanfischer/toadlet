@@ -128,6 +128,7 @@ set (TADPOLE_HEADERS
 	NodeManager.h
 	Noise.h
 	Renderable.h
+	RenderListener.h
 	ResourceHandler.h
 	ResourceHandlerData.h
 	ResourceManager.h

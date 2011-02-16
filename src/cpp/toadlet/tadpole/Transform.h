@@ -94,6 +94,11 @@ public:
 	void transformNormal(Vector3 &r){transformNormal(r,mScale,mRotate);}
 	void inverseTransform(Segment &r,const Segment &s){inverseTransform(r,s,mTranslate,mScale,mRotate);}
 	void inverseTransform(Segment &r){inverseTransform(r,mTranslate,mScale,mRotate);}
+	void transform(Quaternion &r,const Quaternion &q){Math::mul(r,mRotate,q);}
+	void transform(Quaternion &r){Math::preMul(r,mRotate);}
+	/// @todo: I should cache the inverseRotation and only recompute it when necessary
+	void inverseTransform(Quaternion &r,const Quaternion &q){Quaternion invRotate;Math::invert(invRotate,mRotate);Math::mul(r,invRotate,q);}
+	void inverseTransform(Quaternion &r){Quaternion invRotate;Math::invert(invRotate,mRotate);Math::preMul(r,invRotate);}
 
 	static void transform(Vector3 &r,const Vector3 &t,const Vector3 &translate,const Vector3 &scale,const Quaternion &rotate){
 		Math::mul(r,rotate,t);
