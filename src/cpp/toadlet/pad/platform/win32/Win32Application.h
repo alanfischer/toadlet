@@ -202,6 +202,7 @@ protected:
 	bool mActive;
 	bool mDestroyed;
 	bool mStopOnDeactivate;
+	bool mContextActive;
 
 	Win32Attributes *win32;
 };

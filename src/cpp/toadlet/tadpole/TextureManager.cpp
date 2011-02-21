@@ -136,8 +136,6 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 
 	if(hasAutogen==false && wantsAutogen==true){
 		Logger::debug(Categories::TOADLET_TADPOLE,"simulating mipmap generation");
-// Lets leave this flag in here so it can be passed on in backable textures
-//		usage&=~Texture::Usage_BIT_AUTOGEN_MIPMAPS;
 
 		if(mipLevels==0){
 			int hwidth=width,hheight=height,hdepth=depth;
@@ -210,7 +208,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr images[],int mipLevels,int
 	int width=images[0]->getWidth(),height=images[0]->getHeight(),depth=images[0]->getDepth();
 	int closestFormat=renderer==NULL?format:renderer->getClosestTextureFormat(format);
 /// @todo: REMOVEME
-closestFormat=Image::Format_RGBA_8;
+//closestFormat=Image::Format_RGBA_8;
 
 	egg::Collection<Image::ptr> mipImages;
 	egg::Collection<tbyte*> mipDatas;
