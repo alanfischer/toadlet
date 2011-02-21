@@ -33,7 +33,7 @@ namespace egg{
 
 class DefaultIntrusiveSemantics{
 public:
-	template<typename Type> static int addReference(Type *type){
+	template<typename Type> static int retainReference(Type *type){
 		return type->pointerCounter()->incSharedCount();
 	}
 
@@ -69,7 +69,7 @@ public:
 	inline IntrusivePointer(Type *pointer){
 		mPointer=pointer;
 		if(mPointer!=NULL){
-			PointerSemantics::addReference(mPointer);
+			PointerSemantics::retainReference(mPointer);
 		}
 	}
 
@@ -80,7 +80,7 @@ public:
 	template<typename Type2> inline IntrusivePointer(const IntrusivePointer<Type2,PointerSemantics> &pointer){
 		mPointer=const_cast<Type2*>(pointer.get());
 		if(mPointer!=NULL){
-			PointerSemantics::addReference(mPointer);
+			PointerSemantics::retainReference(mPointer);
 		}
 	}
 
@@ -88,14 +88,14 @@ public:
 	inline IntrusivePointer(const IntrusivePointer<Type,PointerSemantics> &pointer){
 		mPointer=const_cast<Type*>(pointer.get());
 		if(mPointer!=NULL){
-			PointerSemantics::addReference(mPointer);
+			PointerSemantics::retainReference(mPointer);
 		}
 	}
 
 	template<typename Type2> inline IntrusivePointer(const WeakPointer<Type2,PointerSemantics> &pointer){
 		mPointer=const_cast<Type2*>(pointer.get());
 		if(mPointer!=NULL){
-			PointerSemantics::addReference(mPointer);
+			PointerSemantics::retainReference(mPointer);
 		}
 	}
 
@@ -103,7 +103,7 @@ public:
 	inline IntrusivePointer(const WeakPointer<Type,PointerSemantics> &pointer){
 		mPointer=const_cast<Type*>(pointer.get());
 		if(mPointer!=NULL){
-			PointerSemantics::addReference(mPointer);
+			PointerSemantics::retainReference(mPointer);
 		}
 	}
 
@@ -126,7 +126,7 @@ public:
 
 		mPointer=const_cast<Type2*>(pointer.get());
 		if(mPointer!=NULL){
-			PointerSemantics::addReference(mPointer);
+			PointerSemantics::retainReference(mPointer);
 		}
 
 		return *this;
@@ -142,7 +142,7 @@ public:
 
 		mPointer=const_cast<Type*>(pointer.get());
 		if(mPointer!=NULL){
-			PointerSemantics::addReference(mPointer);
+			PointerSemantics::retainReference(mPointer);
 		}
 
 		return *this;
@@ -153,7 +153,7 @@ public:
 
 		mPointer=const_cast<Type2*>(pointer.get());
 		if(mPointer!=NULL){
-			PointerSemantics::addReference(mPointer);
+			PointerSemantics::retainReference(mPointer);
 		}
 
 		return *this;
@@ -165,7 +165,7 @@ public:
 
 		mPointer=const_cast<Type*>(pointer.get());
 		if(mPointer!=NULL){
-			PointerSemantics::addReference(mPointer);
+			PointerSemantics::retainReference(mPointer);
 		}
 
 		return *this;
@@ -236,7 +236,7 @@ template<typename Type,typename Type2,typename PointerSemantics> inline Intrusiv
 	IntrusivePointer<Type,PointerSemantics> p;
 	p.internal_setPointer(dynamic_cast<Type*>(const_cast<Type2*>(pointer.get())));
 	if(p.get()!=NULL){
-		PointerSemantics::addReference(p.get());
+		PointerSemantics::retainReference(p.get());
 	}
 
 	return p;
@@ -246,7 +246,7 @@ template<typename Type,typename Type2,typename PointerSemantics> inline Intrusiv
 	IntrusivePointer<Type,PointerSemantics> p;
 	p.internal_setPointer(dynamic_cast<Type*>(const_cast<Type2*>(pointer.get())));
 	if(p.get()!=NULL){
-		PointerSemantics::addReference(p.get());
+		PointerSemantics::retainReference(p.get());
 	}
 
 	return p;
@@ -256,7 +256,7 @@ template<typename Type,typename Type2,typename PointerSemantics> inline Intrusiv
 	IntrusivePointer<Type,PointerSemantics> p;
 	p.internal_setPointer((Type*)pointer.get());
 	if(p.get()!=NULL){
-		PointerSemantics::addReference(p.get());
+		PointerSemantics::retainReference(p.get());
 	}
 
 	return p;
@@ -266,7 +266,7 @@ template<typename Type,typename Type2,typename PointerSemantics> inline Intrusiv
 	IntrusivePointer<Type,PointerSemantics> p;
 	p.internal_setPointer((Type*)pointer.get());
 	if(p.get()!=NULL){
-		PointerSemantics::addReference(p.get());
+		PointerSemantics::retainReference(p.get());
 	}
 
 	return p;
