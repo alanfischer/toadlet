@@ -1211,22 +1211,7 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 					glMatrixMode(mMatrixMode);
 				}
 
-				const Matrix4x4 &matrix=textureStage->matrix;
-
-				if(calculation==TextureStage::Calculation_NORMAL){
-					#if defined(TOADLET_FIXED_POINT)
-						#if defined(TOADLET_HAS_GLES)
-							glLoadMatrixx(matrix.data);
-						#else
-							glLoadMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,matrix).data);
-						#endif
-					#else
-						glLoadMatrixf(matrix.data);
-					#endif
-				}
-				else{
-					glLoadIdentity();
-				}
+				glLoadIdentity();
 
 				if(identityTransform==false){
 					#if defined(TOADLET_FIXED_POINT)
@@ -1249,6 +1234,19 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 				#else
 					glMultMatrixf(gltexture->mMatrix.data);
 				#endif
+
+				const Matrix4x4 &matrix=textureStage->matrix;
+				if(calculation==TextureStage::Calculation_NORMAL){
+					#if defined(TOADLET_FIXED_POINT)
+						#if defined(TOADLET_HAS_GLES)
+							glMultMatrixx(matrix.data);
+						#else
+							glMultMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,matrix).data);
+						#endif
+					#else
+						glMultMatrixf(matrix.data);
+					#endif
+				}
 
 				#if !defined(TOADLET_HAS_GLES)
 					if(calculation>TextureStage::Calculation_NORMAL){

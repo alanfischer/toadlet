@@ -251,6 +251,87 @@ Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded,bool invert,Materi
 	return mesh;
 }
 
+Mesh::ptr MeshManager::createGrid(scalar width,scalar height,int numWidth,int numHeight,Material::ptr material){
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,getGridVertexCount(numWidth,numHeight));
+	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,getGridIndexCount(numWidth,numHeight));
+
+	Mesh::ptr mesh=createGrid(vertexBuffer,indexBuffer,width,height,numWidth,numHeight);
+	if(material==NULL){
+		material=mEngine->getMaterialManager()->createMaterial();
+		material->setLighting(true);
+	}
+	material->retain();
+	mesh->subMeshes[0]->material=material;
+
+	return mesh;
+}
+
+Mesh::ptr MeshManager::createGrid(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,scalar width,scalar height,int numWidth,int numHeight){
+	{
+		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
+		iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
+
+		int positionIndex=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_POSITION);
+		int normalIndex=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_NORMAL);
+		int texCoordIndex=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_TEX_COORD);
+
+	    int i=0,x,y;
+		for(y=0;y<numHeight-1;++y){
+			if(y%2==0){ // Even row
+				for(x=0;x<numWidth;++x){
+					iba.set(i++, x+(y*width)+width);
+					iba.set(i++, x+(y*width));
+				}
+				if(y!=height-2){ // Add degenerate if not last row
+					iba.set(i++, --x + (y*width));
+				}
+			}
+			else{ // Odd row
+				for(x=width-1;x>=0;--x){
+					iba.set(i++, x+(y*width)+width);
+					iba.set(i++, x+(y*width));
+				}
+				if(y!=height-2){ // Add degenerate if not last row
+					iba.set(i++, ++x + (y*width));
+				}
+			}
+
+			for(x=0;x<numWidth;++x){
+				if(positionIndex>=0){
+					vba.set3(y*numWidth+x,positionIndex,
+						Math::div(Math::mul(width,Math::fromInt(x)),Math::fromInt(numWidth))-width/2.0,
+						Math::div(Math::mul(height,Math::fromInt(y)),Math::fromInt(numHeight))-height/2.0,
+						0
+					);
+				}
+				if(normalIndex>=0){
+					vba.set3(y*numWidth+x,normalIndex,0,0,Math::ONE);
+				}
+				if(texCoordIndex>=0){
+					vba.set2(y*numWidth+x,texCoordIndex,
+						Math::div(Math::fromInt(x),Math::fromInt(numWidth)),
+						Math::div(Math::fromInt(y),Math::fromInt(numHeight))
+					);
+				}
+			}
+		}
+
+		iba.unlock();
+		vba.unlock();
+	}
+
+	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
+	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,indexBuffer));
+
+	Mesh::ptr mesh(new Mesh());
+	mesh->subMeshes.resize(1);
+	mesh->subMeshes[0]=subMesh;
+	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+	mesh->bound->set(AABox(-width/2,-height/2,0,width/2,height/2,0));
+
+	return mesh;
+}
+
 Mesh::ptr MeshManager::createSphere(const Sphere &sphere,int numSegments,int numRings,Material::ptr material){
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_NORMAL_TEX_COORD,getSphereVertexCount(numSegments,numRings));
 	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,getSphereIndexCount(numSegments,numRings));

@@ -46,6 +46,11 @@ public:
 	Mesh::ptr createBox(const AABox &box,Material::ptr material=Material::ptr());
 	Mesh::ptr createSkyBox(scalar size,bool unfolded,bool invert,Material::ptr bottom=Material::ptr(),Material::ptr top=Material::ptr(),Material::ptr left=Material::ptr(),Material::ptr right=Material::ptr(),Material::ptr back=Material::ptr(),Material::ptr front=Material::ptr());
 
+	int getGridVertexCount(int numWidth,int numHeight){return numWidth*numHeight;}
+	int getGridIndexCount(int numWidth,int numHeight){return (numWidth*2) * (numHeight-1) + (numHeight-2);}
+	Mesh::ptr createGrid(scalar width,scalar height,int numWidth,int numHeight,Material::ptr material=Material::ptr());
+	Mesh::ptr createGrid(peeper::VertexBuffer::ptr vertexBuffer,peeper::IndexBuffer::ptr indexBuffer,scalar width,scalar height,int numWidth,int numHeight);
+
 	int getSphereVertexCount(int numSegments,int numRings){return (numRings+1)*(numSegments+1);}
 	int getSphereIndexCount(int numSegments,int numRings){return 6*numRings*(numSegments+1);}
 	Mesh::ptr createSphere(const Sphere &sphere,int numSegments=16,int numRings=16,Material::ptr material=Material::ptr());
