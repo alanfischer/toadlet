@@ -175,6 +175,7 @@ Win32Application::Win32Application():
 	#else
 		mStopOnDeactivate(false),
 	#endif
+	mContextActive(false),
 	win32(NULL)
 {
 	win32=new Win32Attributes();
@@ -269,6 +270,7 @@ void Win32Application::create(String renderer,String audioPlayer,String motionDe
 	activate();
 	
 	/// @todo: Unify the plugin framework a bit so we dont have as much code duplication for this potion, and the creating of the plugin
+	mContextActive=true;
 	mNewRendererPlugin=mCurrentRendererPlugin=renderer;
 	if(renderer!="null"){
 		if(renderer!=(char*)NULL){
@@ -352,7 +354,9 @@ void Win32Application::runEventLoop(){
 					mEngine->contextReset(mRenderer);
 				}
 
-				render(mRenderer);
+				if(mWidth>0 && mHeight>0){
+					render(mRenderer);
+				}
 			}
 
 			if(mAudioPlayer!=NULL){
@@ -1010,12 +1014,27 @@ void Win32Application::internal_resize(int width,int height){
 
 	resized(width,height);
 
+	bool visible=(width>0 && height>0);
 	if(mActive && mRenderer!=NULL){
 		if(mRenderer->getCapabilitySet().resetOnResize){
-			mEngine->contextReset(mRenderer);
+			if(mContextActive==false && visible==true){
+				mEngine->contextDeactivate(mRenderer);
+				mContextActive=true;
+			}
+			else if(mContextActive==true && visible==false){
+				mEngine->contextDeactivate(mRenderer);
+				mContextActive=false;
+			}
+			else if(visible){
+				mEngine->contextReset(mRenderer);
+			}
 		}
+		
 		update(0);
-		render(mRenderer);
+
+		if(width>0 && height>0){
+			render(mRenderer);
+		}
 	}
 }
 
