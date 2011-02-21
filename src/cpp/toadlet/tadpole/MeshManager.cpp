@@ -302,20 +302,20 @@ Mesh::ptr MeshManager::createGrid(VertexBuffer::ptr vertexBuffer,IndexBuffer::pt
 		for(y=0;y<numHeight-1;++y){
 			if(y%2==0){ // Even row
 				for(x=0;x<numWidth;++x){
-					iba.set(ii++, x+(y*width)+width);
-					iba.set(ii++, x+(y*width));
+					iba.set(ii++, x+(y*numWidth)+numWidth);
+					iba.set(ii++, x+(y*numWidth ));
 				}
-				if(y!=height-2){ // Add degenerate if not last row
-					iba.set(ii++, --x + (y*width));
+				if(y!=numHeight-2){ // Add degenerate if not last row
+					iba.set(ii++, --x + (y*numWidth));
 				}
 			}
 			else{ // Odd row
-				for(x=width-1;x>=0;--x){
-					iba.set(ii++, x+(y*width)+width);
-					iba.set(ii++, x+(y*width));
+				for(x=numWidth-1;x>=0;--x){
+					iba.set(ii++, x+(y*numWidth)+numWidth);
+					iba.set(ii++, x+(y*numWidth));
 				}
-				if(y!=height-2){ // Add degenerate if not last row
-					iba.set(ii++, ++x + (y*width));
+				if(y!=numHeight-2){ // Add degenerate if not last row
+					iba.set(ii++, ++x + (y*numWidth));
 				}
 			}
 		}

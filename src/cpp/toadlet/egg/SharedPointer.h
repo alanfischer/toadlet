@@ -34,7 +34,7 @@ namespace egg{
 
 class DefaultSharedSemantics{
 public:
-	template<typename Type> static int addReference(PointerCounter *counter,Type *type){
+	template<typename Type> static int retainReference(PointerCounter *counter,Type *type){
 		return counter->incSharedCount();
 	}
 
@@ -76,7 +76,7 @@ public:
 		mPointer=const_cast<Type2*>(pointer.get());
 		mCount=pointer.internal_getCount();
 		if(mCount!=NULL){
-			PointerSemantics::addReference(mCount,mPointer);
+			PointerSemantics::retainReference(mCount,mPointer);
 		}
 	}
 
@@ -85,7 +85,7 @@ public:
 		mPointer=const_cast<Type*>(pointer.get());
 		mCount=pointer.internal_getCount();
 		if(mCount!=NULL){
-			PointerSemantics::addReference(mCount,mPointer);
+			PointerSemantics::retainReference(mCount,mPointer);
 		}
 	}
 
@@ -93,7 +93,7 @@ public:
 		mPointer=const_cast<Type2*>(pointer.get());
 		mCount=pointer.internal_getCount();
 		if(mCount!=NULL){
-			PointerSemantics::addReference(mCount,mPointer);
+			PointerSemantics::retainReference(mCount,mPointer);
 		}
 	}
 
@@ -102,7 +102,7 @@ public:
 		mPointer=const_cast<Type*>(pointer.get());
 		mCount=pointer.internal_getCount();
 		if(mCount!=NULL){
-			PointerSemantics::addReference(mCount,mPointer);
+			PointerSemantics::retainReference(mCount,mPointer);
 		}
 	}
 
@@ -126,7 +126,7 @@ public:
 		mPointer=const_cast<Type2*>(pointer.get());
 		mCount=pointer.internal_getCount();
 		if(mCount!=NULL){
-			PointerSemantics::addReference(mCount,mPointer);
+			PointerSemantics::retainReference(mCount,mPointer);
 		}
 
 		return *this;
@@ -143,7 +143,7 @@ public:
 		mPointer=const_cast<Type*>(pointer.get());
 		mCount=pointer.internal_getCount();
 		if(mCount!=NULL){
-			PointerSemantics::addReference(mCount,mPointer);
+			PointerSemantics::retainReference(mCount,mPointer);
 		}
 
 		return *this;
@@ -155,7 +155,7 @@ public:
 		mPointer=const_cast<Type2*>(pointer.get());
 		mCount=pointer.internal_getCount();
 		if(mCount!=NULL){
-			PointerSemantics::addReference(mCount,mPointer);
+			PointerSemantics::retainReference(mCount,mPointer);
 		}
 
 		return *this;
@@ -168,7 +168,7 @@ public:
 		mPointer=const_cast<Type*>(pointer.get());
 		mCount=pointer.internal_getCount();
 		if(mCount!=NULL){
-			PointerSemantics::addReference(mCount,mPointer);
+			PointerSemantics::retainReference(mCount,mPointer);
 		}
 
 		return *this;
@@ -262,7 +262,7 @@ template<typename Type,typename Type2,typename PointerSemantics> inline SharedPo
 		PointerCounter *count=pointer.internal_getCount();
 		p.internal_setCount(count);
 		if(count!=NULL){
-			PointerSemantics::addReference(count,p.get());
+			PointerSemantics::retainReference(count,p.get());
 		}
 	}
 
@@ -276,7 +276,7 @@ template<typename Type,typename Type2,typename PointerSemantics> inline SharedPo
 		PointerCounter *count=pointer.internal_getCount();
 		p.internal_setCount(count);
 		if(count!=NULL){
-			PointerSemantics::addReference(count,p.get());
+			PointerSemantics::retainReference(count,p.get());
 		}
 	}
 
@@ -290,7 +290,7 @@ template<typename Type,typename Type2,typename PointerSemantics> inline SharedPo
 		PointerCounter *count=pointer.internal_getCount();
 		p.internal_setCount(count);
 		if(count!=NULL){
-			PointerSemantics::addReference(count,p.get());
+			PointerSemantics::retainReference(count,p.get());
 		}
 	}
 
@@ -304,7 +304,7 @@ template<typename Type,typename Type2,typename PointerSemantics> inline SharedPo
 		PointerCounter *count=pointer.internal_getCount();
 		p.internal_setCount(count);
 		if(count!=NULL){
-			PointerSemantics::addReference(count,p.get());
+			PointerSemantics::retainReference(count,p.get());
 		}
 	}
 
