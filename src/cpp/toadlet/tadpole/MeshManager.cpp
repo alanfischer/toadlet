@@ -275,43 +275,47 @@ Mesh::ptr MeshManager::createGrid(VertexBuffer::ptr vertexBuffer,IndexBuffer::pt
 		int normalIndex=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_NORMAL);
 		int texCoordIndex=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_TEX_COORD);
 
-	    int i=0,x,y;
-		for(y=0;y<numHeight-1;++y){
-			if(y%2==0){ // Even row
-				for(x=0;x<numWidth;++x){
-					iba.set(i++, x+(y*width)+width);
-					iba.set(i++, x+(y*width));
-				}
-				if(y!=height-2){ // Add degenerate if not last row
-					iba.set(i++, --x + (y*width));
-				}
-			}
-			else{ // Odd row
-				for(x=width-1;x>=0;--x){
-					iba.set(i++, x+(y*width)+width);
-					iba.set(i++, x+(y*width));
-				}
-				if(y!=height-2){ // Add degenerate if not last row
-					iba.set(i++, ++x + (y*width));
-				}
-			}
-
+	    int x,y,ii=0,vi=0;
+		// Vertexes
+		for(y=0;y<numHeight;++y){
 			for(x=0;x<numWidth;++x){
 				if(positionIndex>=0){
-					vba.set3(y*numWidth+x,positionIndex,
+					vba.set3(vi,positionIndex,
 						Math::div(Math::mul(width,Math::fromInt(x)),Math::fromInt(numWidth))-width/2.0,
 						Math::div(Math::mul(height,Math::fromInt(y)),Math::fromInt(numHeight))-height/2.0,
 						0
 					);
 				}
 				if(normalIndex>=0){
-					vba.set3(y*numWidth+x,normalIndex,0,0,Math::ONE);
+					vba.set3(vi,normalIndex,0,0,Math::ONE);
 				}
 				if(texCoordIndex>=0){
-					vba.set2(y*numWidth+x,texCoordIndex,
+					vba.set2(vi,texCoordIndex,
 						Math::div(Math::fromInt(x),Math::fromInt(numWidth)),
 						Math::div(Math::fromInt(y),Math::fromInt(numHeight))
 					);
+				}
+				vi++;
+			}
+		}
+		// Indexes
+		for(y=0;y<numHeight-1;++y){
+			if(y%2==0){ // Even row
+				for(x=0;x<numWidth;++x){
+					iba.set(ii++, x+(y*width)+width);
+					iba.set(ii++, x+(y*width));
+				}
+				if(y!=height-2){ // Add degenerate if not last row
+					iba.set(ii++, --x + (y*width));
+				}
+			}
+			else{ // Odd row
+				for(x=width-1;x>=0;--x){
+					iba.set(ii++, x+(y*width)+width);
+					iba.set(ii++, x+(y*width));
+				}
+				if(y!=height-2){ // Add degenerate if not last row
+					iba.set(ii++, ++x + (y*width));
 				}
 			}
 		}
