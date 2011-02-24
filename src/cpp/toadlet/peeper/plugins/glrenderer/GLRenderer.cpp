@@ -829,10 +829,11 @@ void GLRenderer::setDefaultStates(){
 	setDepthTest(DepthTest_LEQUAL);
 	setDithering(false);
 	setFaceCulling(FaceCulling_BACK);
-	setFogParameters(Fog_NONE,0,Math::ONE,Colors::BLACK);
+	setFogState(FogState());
 	setLighting(false);
 	setShading(Shading_SMOOTH);
 	setNormalize(Normalize_RESCALE);
+	setPointState(PointState());
 	#if defined(TOADLET_HAS_GLES)
 		setTexturePerspective(true);
 	#else
@@ -955,27 +956,27 @@ void GLRenderer::setFaceCulling(const FaceCulling &faceCulling){
 	TOADLET_CHECK_GLERROR("setFaceCulling");
 }
 
-void GLRenderer::setFogParameters(const Fog &fog,scalar nearDistance,scalar farDistance,const Color &color){
-	if(fog==Fog_NONE){
+void GLRenderer::setFogState(const FogState &state){
+	if(state.type==FogState::FogType_NONE){
 		glDisable(GL_FOG);
 	}
 	else{
 		glEnable(GL_FOG);
-		glFogf(GL_FOG_MODE,getGLFogType(fog));
+		glFogf(GL_FOG_MODE,getGLFogType(state.type));
 		#if defined(TOADLET_FIXED_POINT)
 			#if defined(TOADLET_HAS_GLES)
-				glFogx(GL_FOG_START,nearDistance);
-				glFogx(GL_FOG_END,farDistance);
-				glFogxv(GL_FOG_COLOR,color.getData());
+				glFogx(GL_FOG_START,state.nearDistance);
+				glFogx(GL_FOG_END,state.farDistance);
+				glFogxv(GL_FOG_COLOR,state.color.getData());
 			#else
-				glFogf(GL_FOG_START,MathConversion::scalarToFloat(nearDistance));
-				glFogf(GL_FOG_END,MathConversion::scalarToFloat(farDistance));
-				glFogfv(GL_FOG_COLOR,colorArray(cacheArray,color));
+				glFogf(GL_FOG_START,MathConversion::scalarToFloat(state.nearDistance));
+				glFogf(GL_FOG_END,MathConversion::scalarToFloat(state.farDistance));
+				glFogfv(GL_FOG_COLOR,colorArray(cacheArray,state.color));
 			#endif
 		#else
-			glFogf(GL_FOG_START,nearDistance);
-			glFogf(GL_FOG_END,farDistance);
-			glFogfv(GL_FOG_COLOR,color.getData());
+			glFogf(GL_FOG_START,state.nearDistance);
+			glFogf(GL_FOG_END,state.farDistance);
+			glFogfv(GL_FOG_COLOR,state.color.getData());
 		#endif
 	}
 
@@ -1880,9 +1881,9 @@ GLenum GLRenderer::getGLBlendOperation(Blend::Operation blend){
 	}
 }
 
-GLint GLRenderer::getGLFogType(Fog type){
+GLint GLRenderer::getGLFogType(FogState::FogType type){
 	switch(type){
-		case Fog_LINEAR:
+		case FogState::FogType_LINEAR:
 			return GL_LINEAR;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,

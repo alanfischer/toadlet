@@ -40,6 +40,7 @@ class CapabilitySet;
 class IndexBuffer;
 class Light;
 class LightEffect;
+class FogState;
 class Program;
 class Query;
 class RenderTarget;
@@ -95,11 +96,6 @@ public:
 		AlphaTest_NOTEQUAL,
 		AlphaTest_GEQUAL,
 		AlphaTest_ALWAYS,
-	};
-
-	enum Fog{
-		Fog_NONE,
-		Fog_LINEAR,
 	};
 
 	enum Fill{
@@ -165,7 +161,7 @@ public:
 	virtual void setDepthWrite(bool depthWrite)=0;
 	virtual void setDithering(bool dithering)=0;
 	virtual void setFaceCulling(const FaceCulling &faceCulling)=0;
-	virtual void setFogParameters(const Fog &fog,scalar nearDistance,scalar farDistance,const Color &color)=0;
+	virtual void setFogState(const FogState &state)=0;
 	virtual void setLighting(bool lighting)=0;
 	virtual void setLightEffect(const LightEffect &lightEffect)=0;
 	virtual void setFill(const Fill &fill)=0;

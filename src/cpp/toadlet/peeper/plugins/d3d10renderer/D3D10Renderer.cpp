@@ -549,7 +549,7 @@ void D3D10Renderer::setDithering(bool dithering){
 void D3D10Renderer::setFaceCulling(const FaceCulling &culling){
 }
 
-void D3D10Renderer::setFogParameters(const Fog &fog,scalar nearDistance,scalar farDistance,const Color &color){
+void D3D10Renderer::setFogState(const FogState &state){
 }
 
 void D3D10Renderer::setFill(const Fill &fill){

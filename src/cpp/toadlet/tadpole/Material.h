@@ -28,6 +28,7 @@
 
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/egg/BaseResource.h>
+#include <toadlet/peeper/FogState.h>
 #include <toadlet/peeper/LightEffect.h>
 #include <toadlet/peeper/Blend.h>
 #include <toadlet/peeper/PointState.h>
@@ -69,30 +70,6 @@ Different state blocks:
 	D3D10_BLEND    DestBlendAlpha;
 	D3D10_BLEND_OP BlendOpAlpha;
 	UINT8          RenderTargetWriteMask[8];
-*/
-
-/*
-	peeper::LightEffect mLightEffect;
-	bool mLighting;
-peeper::Renderer::FaceCulling mFaceCulling;
-peeper::Renderer::Fill mFill;
-	peeper::Renderer::Shading mShading;
-	peeper::Renderer::Fog mFog;
-	scalar mFogNearDistance,mFogFarDistance;
-	peeper::Color mFogColor;
-	peeper::Renderer::AlphaTest mAlphaTest;
-	scalar mAlphaTestCutoff;
-peeper::Blend mBlend;
-	bool mDepthSorted;
-bool mDepthWrite;
-peeper::Renderer::DepthTest mDepthTest;
-	bool mPointSprite;
-	scalar mPointSize;
-	bool mPointAttenuated;
-	scalar mPointConstant,mPointLinear,mPointQuadratic,mPointMinSize,mPointMaxSize;
-	int mLayer;
-	egg::Collection<peeper::TextureStage::ptr> mTextureStages;
-	bool mSaveLocally;
 */
 
 class TOADLET_API Material:public egg::BaseResource{
@@ -139,13 +116,8 @@ public:
 	void setShading(const peeper::Renderer::Shading &shading){mStates|=State_SHADING;mShading=shading;}
 	inline const peeper::Renderer::Shading &getShading() const{return mShading;}
 
-	void setFogParameters(const peeper::Renderer::Fog &fog,scalar nearDistance,scalar farDistance,const peeper::Color &color){
-		mStates|=State_FOG;mFog=fog;mFogNearDistance=nearDistance;mFogFarDistance=farDistance;mFogColor.set(color);
-	}
-	inline const peeper::Renderer::Fog &getFog() const{return mFog;}
-	inline scalar getFogNearDistance() const{return mFogNearDistance;}
-	inline scalar getFogFarDistance() const{return mFogFarDistance;}
-	inline const peeper::Color &getFogColor() const{return mFogColor;}
+	void setFogState(const peeper::FogState &state){mStates|=State_FOG;mFogState.set(state);}
+	inline const peeper::FogState &getFogState() const{return mFogState;}
 
 	void setAlphaTest(peeper::Renderer::AlphaTest alphaTest,scalar cutoff){
 		mStates|=State_ALPHATEST;mAlphaTest=alphaTest;mAlphaTestCutoff=cutoff;
@@ -165,7 +137,7 @@ public:
 	void setDepthTest(peeper::Renderer::DepthTest depthTest){mStates|=State_DEPTHTEST;mDepthTest=depthTest;}
 	inline peeper::Renderer::DepthTest getDepthTest() const{return mDepthTest;}
 
-	void setPointState(const peeper::PointState &state){mPointState.set(state);}
+	void setPointState(const peeper::PointState &state){mStates|=State_POINT;mPointState.set(state);}
 	inline const peeper::PointState &getPointSprite() const{return mPointState;}
 
 	void setLayer(int layer){mLayer=layer;}
@@ -189,9 +161,7 @@ protected:
 	peeper::Renderer::FaceCulling mFaceCulling;
 	peeper::Renderer::Fill mFill;
 	peeper::Renderer::Shading mShading;
-	peeper::Renderer::Fog mFog;
-	scalar mFogNearDistance,mFogFarDistance;
-	peeper::Color mFogColor;
+	peeper::FogState mFogState;
 	peeper::Renderer::AlphaTest mAlphaTest;
 	scalar mAlphaTestCutoff;
 	peeper::Blend mBlend;

@@ -39,19 +39,13 @@ Material::Material():BaseResource(),
 	mFaceCulling(Renderer::FaceCulling_BACK),
 	mFill(Renderer::Fill_SOLID),
 	mShading(Renderer::Shading_SMOOTH),
-	mFog(Renderer::Fog_NONE),
-	mFogNearDistance(0),mFogFarDistance(0),
-	//mFogColor,
+	//mFogState,
 	mAlphaTest(Renderer::AlphaTest_NONE),
 	mAlphaTestCutoff(0),
 	mDepthSorted(false),
 	mDepthWrite(true),
 	mDepthTest(Renderer::DepthTest_LEQUAL),
-	mPointSprite(false),
-	mPointSize(0),
-	mPointAttenuated(false),
-	mPointConstant(0),mPointLinear(0),mPointQuadratic(0),mPointMinSize(0),mPointMaxSize(0),
-
+	//mPointState
 	mLayer(0),
 	mSaveLocally(false)
 {
@@ -80,10 +74,7 @@ Material::ptr Material::clone(){
 	material->mLightEffect.set(mLightEffect);
 	material->mLighting=mLighting;
 	material->mFaceCulling=mFaceCulling;
-	material->mFog=mFog;
-	material->mFogNearDistance=mFogNearDistance;
-	material->mFogFarDistance=mFogFarDistance;
-	material->mFogColor.set(mFogColor);
+	material->mFogState.set(mFogState);
 	material->mFill=mFill;
 	material->mShading=mShading;
 	material->mAlphaTest=mAlphaTest;
@@ -91,6 +82,7 @@ Material::ptr Material::clone(){
 	material->mBlend.set(mBlend);
 	material->mDepthWrite=mDepthWrite;
 	material->mDepthTest=mDepthTest;
+	material->mPointState.set(mPointState);
 
 	int i;
 	for(i=0;i<mTextureStages.size();++i){
@@ -141,7 +133,7 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 			renderer->setShading(mShading);
 		}
 		if((states&State_FOG)>0){
-			renderer->setFogParameters(mFog,mFogNearDistance,mFogFarDistance,mFogColor);
+			renderer->setFogState(mFogState);
 		}
 		if((states&State_LIGHTING)>0){
 			renderer->setLighting(mLighting);
@@ -150,7 +142,7 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 			renderer->setLightEffect(mLightEffect); // We set this even if lighting isnt enabled, since it includes color tracking
 		}
 		if((states&State_POINT)>0){
-			renderer->setPointParameters(mPointSprite,mPointSize,mPointAttenuated,mPointConstant,mPointLinear,mPointQuadratic,mPointMinSize,mPointMaxSize);
+			renderer->setPointState(mPointState);
 		}
 
 		int numTextureStages=mTextureStages.size();
@@ -187,7 +179,7 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 			renderer->setShading(mShading);
 		}
 		if((states&State_FOG)>0){
-			renderer->setFogParameters(mFog,mFogNearDistance,mFogFarDistance,mFogColor);
+			renderer->setFogState(mFogState);
 		}
 		if((states&State_LIGHTING)>0 && ((pstates&State_LIGHTING)==0 || previousMaterial->mLighting!=mLighting)){
 			renderer->setLighting(mLighting);
@@ -196,7 +188,7 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 			renderer->setLightEffect(mLightEffect);
 		}
 		if((states&State_POINT)>0){
-			renderer->setPointParameters(mPointSprite,mPointSize,mPointAttenuated,mPointConstant,mPointLinear,mPointQuadratic,mPointMinSize,mPointMaxSize);
+			renderer->setPointState(mPointState);
 		}
 
 		int numTextureStages=mTextureStages.size();

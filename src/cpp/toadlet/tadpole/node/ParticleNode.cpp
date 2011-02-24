@@ -28,6 +28,7 @@
 #include <toadlet/egg/Profile.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/RenderQueue.h>
+#include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/node/ParticleNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/CameraNode.h>
@@ -48,7 +49,8 @@ ParticleNode::ParticleNode():super(),
 
 	mParticleType(0),
 	mWorldSpace(false),
-	mManualUpdating(false)
+	mManualUpdating(false),
+	mVelocityAligned(false)
 
 	//mMaterial,
 	//mVertexData,
@@ -63,6 +65,7 @@ Node *ParticleNode::create(Scene *scene){
 	mParticleType=0;
 	mWorldSpace=false;
 	mManualUpdating=false;
+	mVelocityAligned=false;
 
 	return this;
 }
@@ -115,18 +118,9 @@ bool ParticleNode::setNumParticles(int numParticles,int particleType,const Vecto
 		for(i=0;i<numParticles;++i){
 			Particle &p=mParticles[i];
 			const Vector3 &position=positions[i];
-
 			p.x=position.x;
 			p.y=position.y;
 			p.z=position.z;
-			p.visible=true;
-		}
-	}
-	else{
-		for(i=0;i<numParticles;++i){
-			Particle &p=mParticles[i];
-
-			p.visible=true;
 		}
 	}
 
@@ -189,7 +183,9 @@ void ParticleNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 }
 
 void ParticleNode::render(Renderer *renderer) const{
-	renderer->renderPrimitive(mVertexData,mIndexData);
+	if(mVertexData!=NULL && mIndexData!=NULL){
+		renderer->renderPrimitive(mVertexData,mIndexData);
+	}
 }
 
 void ParticleNode::createVertexBuffer(){
@@ -230,9 +226,9 @@ void ParticleNode::createVertexBuffer(){
 			for(i=0;i<numParticles;++i){
 				ii=i*6;
 
-				iba.set(ii+0,i*4+0);
+				iba.set(ii+0,i*4+2);
 				iba.set(ii+1,i*4+1);
-				iba.set(ii+2,i*4+2);
+				iba.set(ii+2,i*4+0);
 				iba.set(ii+3,i*4+2);
 				iba.set(ii+4,i*4+3);
 				iba.set(ii+5,i*4+1);
@@ -245,26 +241,26 @@ void ParticleNode::createVertexBuffer(){
 				ii=i*indexesPerBeam;
 				vi=i*vertexesPerBeam;
 
-				iba.set(ii+0,vi+0);
+				iba.set(ii+0,vi+2);
 				iba.set(ii+1,vi+1);
-				iba.set(ii+2,vi+2);
+				iba.set(ii+2,vi+0);
 				iba.set(ii+3,vi+2);
 				iba.set(ii+4,vi+3);
 				iba.set(ii+5,vi+1);
 
 				for(j=0;j<mParticleType-1;++j){
-					iba.set(ii+j*6+6 ,vi+j*2+2);
+					iba.set(ii+j*6+6 ,vi+j*2+4);
 					iba.set(ii+j*6+7 ,vi+j*2+3);
-					iba.set(ii+j*6+8 ,vi+j*2+4);
+					iba.set(ii+j*6+8 ,vi+j*2+2);
 					iba.set(ii+j*6+9 ,vi+j*2+4);
 					iba.set(ii+j*6+10,vi+j*2+5);
 					iba.set(ii+j*6+11,vi+j*2+3);
 					
 				}
 
-				iba.set(ii+indexesPerBeam-6,vi+vertexesPerBeam-4);
+				iba.set(ii+indexesPerBeam-6,vi+vertexesPerBeam-2);
 				iba.set(ii+indexesPerBeam-5,vi+vertexesPerBeam-3);
-				iba.set(ii+indexesPerBeam-4,vi+vertexesPerBeam-2);
+				iba.set(ii+indexesPerBeam-4,vi+vertexesPerBeam-4);
 				iba.set(ii+indexesPerBeam-3,vi+vertexesPerBeam-2);
 				iba.set(ii+indexesPerBeam-2,vi+vertexesPerBeam-1);
 				iba.set(ii+indexesPerBeam-1,vi+vertexesPerBeam-3);
@@ -281,15 +277,18 @@ void ParticleNode::createVertexBuffer(){
 }
 
 void ParticleNode::updateVertexBuffer(CameraNode *camera){
-	int i=0,j=0;
+	if(mVertexData==NULL){
+		return;
+	}
 
+	int i=0,j=0;
 	Vector3 viewRight,viewUp,viewForward;
 	if(camera->getAlignmentCalculationsUseOrigin()){
 		Matrix4x4 lookAtCamera; Math::setMatrix4x4FromLookAt(lookAtCamera,camera->getWorldTranslate(),getWorldTranslate(),Math::Z_UNIT_VECTOR3,false);
-		Math::setAxisFromMatrix4x4(lookAtCamera,viewRight,viewUp,viewForward);
+		Math::setAxesFromMatrix4x4(lookAtCamera,viewRight,viewUp,viewForward);
 	}
 	else{
-		Math::setAxisFromMatrix4x4(camera->getViewMatrix(),viewRight,viewUp,viewForward);
+		Math::setAxesFromMatrix4x4(camera->getViewMatrix(),viewRight,viewUp,viewForward);
 	}
 
 	if(mWorldSpace==false){
@@ -298,6 +297,7 @@ void ParticleNode::updateVertexBuffer(CameraNode *camera){
 		mWorldTransform->inverseTransformNormal(viewForward);
 	}
 
+	scalar epsilon=mScene->getEpsilon();
 	Vector3 right,up,forward;
 	{
 		vba.lock(mVertexData->getVertexBuffer(0),Buffer::Access_BIT_WRITE);
@@ -316,8 +316,9 @@ void ParticleNode::updateVertexBuffer(CameraNode *camera){
 				const Particle &p=mParticles[i];
 				int vi=i*4;
 
-				if(p.ox!=0 || p.oy!=0 || p.oz!=0){
-					up.set(p.ox,p.oy,p.oz);
+				if(mVelocityAligned){
+					up.set(p.vx,p.vy,p.vz);
+					Math::normalizeCarefully(up,0);
 					if(mWorldSpace==false){
 						mWorldTransform->inverseTransformNormal(up);
 					}
@@ -357,14 +358,13 @@ void ParticleNode::updateVertexBuffer(CameraNode *camera){
 
 				right.x=p1.x-p.x; right.y=p1.y-p.y; right.z=p1.z-p.z;
 
-				Math::normalizeCarefully(right,mEpsilon);
+				Math::normalizeCarefully(right,epsilon);
 				Math::cross(up,viewForward,right);
-				if(Math::normalizeCarefully(up,mEpsilon)==false){
+				if(Math::normalizeCarefully(up,epsilon)==false){
 					up.set(Math::X_UNIT_VECTOR3);
 				}
-				Math::mul(up,scale);
-				Math::mul(right,scale);
-
+				Math::mul(up,p.scale);
+				Math::mul(right,p.scale);
 
 				vba.set3(vi+0,0,		p.x+up.x-right.x, p.y+up.y-right.y, p.z+up.z-right.z);
 				vba.setABGR(vi+0,1,		p.color);
@@ -392,57 +392,43 @@ void ParticleNode::updateVertexBuffer(CameraNode *camera){
 					right.x=ip1.x-ip.x; right.y=ip1.y-ip.y; right.z=ip1.z-ip.z;
 
 					Math::cross(up,viewForward,right);
-					if(Math::normalizeCarefully(up,mEpsilon)==false){
+					if(Math::normalizeCarefully(up,epsilon)==false){
 						up.set(Math::X_UNIT_VECTOR3);
 					}
-					Math::mul(up,scale);
+					Math::mul(up,p.scale);
 
 					vba.set3(ivi+0,0,		ip.x+up.x, ip.y+up.y, ip.z+up.z);
-					vba.setABGR(ivi+0,1,	color);
+					vba.setABGR(ivi+0,1,	p.color);
 					vba.set2(ivi+0,2,		Math::QUARTER,0);
 
 					vba.set3(ivi+1,0,		ip.x-up.x, ip.y-up.y, ip.z-up.z);
-					vba.setABGR(ivi+1,1,	color);
+					vba.setABGR(ivi+1,1,	p.color);
 					vba.set2(ivi+1,2,		Math::QUARTER,Math::ONE);
-				}
-
-
-				if(pn.visible==false){
-					color=0x00000000;
-					if(mHasScale) scale=0;
-				}
-				else if(mIndividualAttributes){
-					color=Color::lerp(pn.startColor,pn.endColor,pn.age);
-					if(mHasScale) scale=Math::lerp(pn.startScale,pn.endScale,pn.age);
-				}
-				else{
-					color=Color::lerp(startColor,endColor,pn.age);
-					if(mHasScale) scale=Math::lerp(startScale,endScale,pn.age);
 				}
 
 				// We re-use the up from the previous particle pair,
 				//  since we always use particle(n) and particle(n+1), on the final beam cap we
 				//  only need to calculate the right, and only if we drew middle particles
 				if(j>0){
-					Math::normalizeCarefully(right,mEpsilon);
-					Math::mul(right,scale);
+					Math::normalizeCarefully(right,epsilon);
+					Math::mul(right,p.scale);
 				}
 
 				vi=vi+vertexesPerBeam-4;
 				vba.set3(vi+0,0,		pn.x+up.x, pn.y+up.y, pn.z+up.z);
-				vba.setABGR(vi+0,1,		color);
+				vba.setABGR(vi+0,1,		p.color);
 				vba.set2(vi+0,2,		Math::THREE_QUARTERS,0);
 
 				vba.set3(vi+1,0,		pn.x-up.x, pn.y-up.y, pn.z-up.z);
-				vba.setABGR(vi+1,1,		color);
+				vba.setABGR(vi+1,1,		p.color);
 				vba.set2(vi+1,2,		Math::THREE_QUARTERS,Math::ONE);
 
 				vba.set3(vi+2,0,		pn.x+up.x+right.x, pn.y+up.y+right.y, pn.z+up.z+right.z);
-				vba.setABGR(vi+2,1,		color);
+				vba.setABGR(vi+2,1,		p.color);
 				vba.set2(vi+2,2,		Math::ONE,0);
 
 				vba.set3(vi+3,0,		pn.x-up.x+right.x, pn.y-up.y+right.y, pn.z-up.z+right.z);
-				vba.setABGR(vi+3,1,		color);
+				vba.setABGR(vi+3,1,		p.color);
 				vba.set2(vi+3,2,		Math::ONE,Math::ONE);
 			}
 		}

@@ -42,6 +42,12 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
+// ParticleNode will render a group of screen facing sprites specified by points.
+// There are 3 types of particles, POINTSPRITE,SPRITE,BEAM
+// POINTSPRITE - particles are rendered using a single point, and the Material used should set its PointState
+// SPRITE - particles are rendered using 4 points and oriented towards the camera
+// BEAM - particles are rendered as beams that take up 2 or more particles
+// The vx,vy,vz in the Particle class are only used for alignment, this class provides no simulation of particles.
 class TOADLET_API ParticleNode:public Node,public Renderable{
 public:
 	TOADLET_NODE(ParticleNode,Node);
@@ -57,14 +63,14 @@ public:
 	public:
 		Particle():
 		  x(0),y(0),z(0),
-		  ox(0),oy(0),oz(0),
-		  tx(0),ty(0),tw(Math::ONE),th(Math::ONE),
-		  size(Math::ONE),
+		  vx(0),vy(0),vz(0),
+		  s(0),t(0),s2(Math::ONE),t2(Math::ONE),
+		  scale(Math::ONE),
 		  color(0xFFFFFFFF)
 		{}
 
 		scalar x,y,z;
-		scalar ox,oy,oz; // orientation vector
+		scalar vx,vy,vz;
 		scalar s,t,s2,t2;
 		scalar scale;
 		uint32 color;
@@ -80,8 +86,11 @@ public:
 	inline int getParticleType() const{return mParticleType;}
 	inline Particle *getParticle(int i){return &mParticles[i];}
 
-	inline void setWorldSpace(bool worldSpace);
+	void setWorldSpace(bool worldSpace);
 	inline bool getWorldSpace() const{return mWorldSpace;}
+
+	inline void setVelocityAligned(bool aligned){mVelocityAligned=aligned;}
+	inline bool getVelocityAligned() const{return mVelocityAligned;}
 
 	inline void setManualUpdating(bool manual){mManualUpdating=manual;}
 	inline bool getManualUpdating() const{return mManualUpdating;}
@@ -89,7 +98,6 @@ public:
 	void setMaterial(Material::ptr material);
 	Material::ptr getMaterial() const{return mMaterial;}
 
-	void frameUpdate(int dt,int scope);
 	void queueRenderables(CameraNode *camera,RenderQueue *queue);
 
 	Material *getRenderMaterial() const{return mMaterial;}
@@ -114,6 +122,7 @@ protected:
 	int mParticleType;
 	bool mWorldSpace;
 	bool mManualUpdating;
+	bool mVelocityAligned;
 	Material::ptr mMaterial;
 	peeper::VertexData::ptr mVertexData;
 	peeper::IndexData::ptr mIndexData;

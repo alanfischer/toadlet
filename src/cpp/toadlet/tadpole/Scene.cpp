@@ -54,9 +54,7 @@ Scene::Scene(Engine *engine):
 	//mBackground,
 	//mRoot,
 	//mAmbientColor,
-	mFog(Renderer::Fog_NONE),
-	mFogNearDistance(0),mFogFarDistance(0),
-	//mFogColor,
+	//mFogState,
 
 	//mRenderQueue,
 	mPreviousMaterial(NULL),
@@ -384,7 +382,7 @@ void Scene::renderRenderables(RenderQueue *queue,Renderer *renderer,CameraNode *
 	renderer->setViewMatrix(camera->getViewMatrix());
 	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
 
-	renderer->setFogParameters(mFog,mFogNearDistance,mFogFarDistance,mFogColor);
+	renderer->setFogState(mFogState);
 
 	/// @todo: Search for multiple lights
 	if(queue->getLight()!=NULL){
@@ -448,7 +446,7 @@ void Scene::renderRenderables(RenderQueue *queue,Renderer *renderer,CameraNode *
 
 			/// @todo: Replace this specific state setting with a more generic Scene Default Material, that will be reset its specific states
 			if(material!=NULL && (material->getStates()&Material::State_FOG)>0){
-				renderer->setFogParameters(mFog,mFogNearDistance,mFogFarDistance,mFogColor);
+				renderer->setFogState(mFogState);
 			}
 		}
 		layer->materialSortedRenderables.clear();
@@ -480,7 +478,7 @@ void Scene::renderRenderables(RenderQueue *queue,Renderer *renderer,CameraNode *
 			mCountLastRendered++;
 
 			if(material!=NULL && (material->getStates()&Material::State_FOG)>0){
-				renderer->setFogParameters(mFog,mFogNearDistance,mFogFarDistance,mFogColor);
+				renderer->setFogState(mFogState);
 			}
 		}
 		layer->depthSortedRenderables.clear();
