@@ -564,7 +564,7 @@ void D3D10Renderer::setLightEffect(const LightEffect &lightEffect){
 void D3D10Renderer::setDepthBias(scalar constant,scalar slope){
 }
 
-void D3D10Renderer::setPointParameters(bool sprite,scalar size,bool attenuated,scalar constant,scalar linear,scalar quadratic,scalar minSize,scalar maxSize){
+void D3D10Renderer::setPointState(const PointState &state){
 }
 
 void D3D10Renderer::setTexturePerspective(bool texturePerspective){

@@ -45,6 +45,7 @@ class Query;
 class RenderTarget;
 class PixelBufferRenderTarget;
 class PixelBuffer;
+class PointState;
 class Shader;
 class StatisticsSet;
 class Texture;
@@ -173,7 +174,7 @@ public:
 	virtual void setNormalize(const Normalize &normalize)=0;
 	virtual void setDepthBias(scalar constant,scalar slope)=0;
 	virtual void setTexturePerspective(bool texturePerspective)=0;
-	virtual void setPointParameters(bool sprite,scalar size,bool attenuated,scalar constant,scalar linear,scalar quadratic,scalar minSize,scalar maxSize)=0;
+	virtual void setPointState(const PointState &state)=0;
 	virtual void setTextureStage(int stage,TextureStage *textureStage)=0;
 	virtual void setProgram(const Program *program)=0;
 	 // A workaround here, since OpenGL & Direct3D have different shadow comparison methods
