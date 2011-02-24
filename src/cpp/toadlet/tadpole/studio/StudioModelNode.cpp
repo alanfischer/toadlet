@@ -241,7 +241,7 @@ void StudioModelNode::setRenderSkeleton(bool skeleton){
 			mSkeletonMaterial=mEngine->getMaterialManager()->createMaterial();
 			mSkeletonMaterial->setDepthTest(Renderer::DepthTest_NONE);
 			mSkeletonMaterial->setDepthWrite(false);
-			mSkeletonMaterial->setPointParameters(true,8,false,0,0,0,0,0);
+			mSkeletonMaterial->setPointState(PointState(true,8,false,0,0,0,0,0));
 		}
 	}
 	else{

@@ -46,6 +46,7 @@ set (PEEPER_HEADERS
 	StatisticsSet.h
 	PixelBuffer.h
 	PixelBufferRenderTarget.h
+	PointState.h
 	Texture.h
 	TextureBlend.h
 	TextureStage.h

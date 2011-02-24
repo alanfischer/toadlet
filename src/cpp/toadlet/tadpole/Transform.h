@@ -90,8 +90,10 @@ public:
 	void transform(Vector3 &r){transform(r,mTranslate,mScale,mRotate);}
 	void inverseTransform(Vector3 &r,const Vector3 &t){inverseTransform(r,t,mTranslate,mScale,mRotate);}
 	void inverseTransform(Vector3 &r){inverseTransform(r,mTranslate,mScale,mRotate);}
-	void transformNormal(Vector3 &r,const Vector3 &n){transformNormal(r,n,mScale,mRotate);}
-	void transformNormal(Vector3 &r){transformNormal(r,mScale,mRotate);}
+	void transformNormal(Vector3 &r,const Vector3 &n){transformNormal(r,n,mRotate);}
+	void transformNormal(Vector3 &r){transformNormal(r,mRotate);}
+	void inverseTransformNormal(Vector3 &r,const Vector3 &n){inverseTransformNormal(r,n,mRotate);}
+	void inverseTransformNormal(Vector3 &r){inverseTransformNormal(r,mRotate);}
 	void inverseTransform(Segment &r,const Segment &s){inverseTransform(r,s,mTranslate,mScale,mRotate);}
 	void inverseTransform(Segment &r){inverseTransform(r,mTranslate,mScale,mRotate);}
 	void transform(Quaternion &r,const Quaternion &q){Math::mul(r,mRotate,q);}
@@ -126,16 +128,24 @@ public:
 		Math::mul(r,invrot);
 	}
 
-	static void transformNormal(Vector3 &r,const Vector3 &n,const Vector3 &scale,const Quaternion &rotate){
+	static void transformNormal(Vector3 &r,const Vector3 &n,const Quaternion &rotate){
 		Math::mul(r,rotate,n);
-		Math::div(r,scale);
 		Math::normalize(r);
 	}
 
-	static void transformNormal(Vector3 &r,const Vector3 &scale,const Quaternion &rotate){
+	static void transformNormal(Vector3 &r,const Quaternion &rotate){
 		Math::mul(r,rotate);
-		Math::div(r,scale);
 		Math::normalize(r);
+	}
+
+	static void inverseTransformNormal(Vector3 &r,const Vector3 &n,const Quaternion &rotate){
+		Quaternion invrot; Math::invert(invrot,rotate);
+		Math::mul(r,invrot,n);
+	}
+
+	static void inverseTransformNormal(Vector3 &r,const Quaternion &rotate){
+		Quaternion invrot; Math::invert(invrot,rotate);
+		Math::mul(r,invrot);
 	}
 
 	static void inverseTransform(Segment &r,const Segment &s,const Vector3 &translate,const Vector3 &scale,const Quaternion &rotate){

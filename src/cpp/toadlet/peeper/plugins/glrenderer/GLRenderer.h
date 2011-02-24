@@ -31,6 +31,7 @@
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/Blend.h>
 #include <toadlet/peeper/LightEffect.h>
+#include <toadlet/peeper/PointState.h>
 #include <toadlet/peeper/TextureStage.h>
 #include <toadlet/peeper/StatisticsSet.h>
 #include <toadlet/peeper/CapabilitySet.h>
@@ -106,7 +107,7 @@ public:
 	void setNormalize(const Normalize &normalize);
 	void setDepthBias(scalar constant,scalar slope);
 	void setTexturePerspective(bool texturePerspective);
-	void setPointParameters(bool sprite,scalar size,bool attenuated,scalar constant,scalar linear,scalar quadratic,scalar minSize,scalar maxSize);
+	void setPointState(const PointState &state);
 	void setTextureStage(int stage,TextureStage *textureStage);
 	void setProgram(const Program *program);
 	void setShadowComparisonMethod(bool enabled);

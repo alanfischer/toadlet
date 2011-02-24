@@ -102,7 +102,7 @@ D3D10_PASS_DESC passDesc;
 	void setNormalize(const Normalize &normalize);
 	void setDepthBias(scalar constant,scalar slope);
 	void setTexturePerspective(bool texturePerspective);
-	void setPointParameters(bool sprite,scalar size,bool attenuated,scalar constant,scalar linear,scalar quadratic,scalar minSize,scalar maxSize);
+	void setPointState(const PointState &state);
 	void setTextureStage(int stage,TextureStage *textureStage);
 	void setProgram(const Program *program);
 	void setShadowComparisonMethod(bool enabled);

@@ -37,6 +37,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/LightEffect.h>
 #include <toadlet/peeper/Light.h>
+#include <toadlet/peeper/PointState.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/Viewport.h>
 
@@ -700,24 +701,24 @@ void D3D9Renderer::setDepthBias(scalar constant,scalar slope){
 	mD3DDevice->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS,*(DWORD*)&fslope);
 }
 
-void D3D9Renderer::setPointParameters(bool sprite,scalar size,bool attenuated,scalar constant,scalar linear,scalar quadratic,scalar minSize,scalar maxSize){
+void D3D9Renderer::setPointState(const PointState &state){
 	HRESULT result=S_OK;
 
 	#if !defined(TOADLET_SET_D3DM)
 		// pointsize = size / sqrt(constant + linear*d + quadratic*d*d)
 		// if a&b = 0, then quadratic = 1/(C*C) where C = first component of projMatrix * 1/2 screen width
 		if(mCapabilitySet.pointSprites){
-			mD3DDevice->SetRenderState(D3DRS_POINTSPRITEENABLE,sprite);
-			mD3DDevice->SetRenderState(D3DRS_POINTSCALEENABLE,sprite);
+			mD3DDevice->SetRenderState(D3DRS_POINTSPRITEENABLE,state.sprite);
+			mD3DDevice->SetRenderState(D3DRS_POINTSCALEENABLE,state.sprite);
 		}
 
-		float fSize=MathConversion::scalarToFloat(size);
+		float fSize=MathConversion::scalarToFloat(state.size);
 		mD3DDevice->SetRenderState(D3DRS_POINTSIZE,*(DWORD*)(&fSize));
 		
-		if(attenuated){
-			float fConstant=MathConversion::scalarToFloat(constant);
-			float fLinear=MathConversion::scalarToFloat(linear);
-			float fQuadratic=MathConversion::scalarToFloat(quadratic);
+		if(state.attenuated){
+			float fConstant=MathConversion::scalarToFloat(state.constant);
+			float fLinear=MathConversion::scalarToFloat(state.linear);
+			float fQuadratic=MathConversion::scalarToFloat(state.quadratic);
 
 			mD3DDevice->SetRenderState(D3DRS_POINTSCALE_A,*(DWORD*)(&fConstant));
 			mD3DDevice->SetRenderState(D3DRS_POINTSCALE_A,*(DWORD*)(&fLinear));

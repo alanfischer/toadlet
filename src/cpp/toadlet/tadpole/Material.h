@@ -30,6 +30,7 @@
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/LightEffect.h>
 #include <toadlet/peeper/Blend.h>
+#include <toadlet/peeper/PointState.h>
 #include <toadlet/peeper/TextureStage.h>
 #include <toadlet/peeper/Renderer.h>
 
@@ -164,17 +165,8 @@ public:
 	void setDepthTest(peeper::Renderer::DepthTest depthTest){mStates|=State_DEPTHTEST;mDepthTest=depthTest;}
 	inline peeper::Renderer::DepthTest getDepthTest() const{return mDepthTest;}
 
-	void setPointParameters(bool sprite,scalar size,bool attenuated,scalar constant,scalar linear,scalar quadratic,scalar minSize,scalar maxSize){
-		mStates|=State_POINT;mPointSprite=sprite;mPointSize=size;mPointAttenuated=attenuated;mPointConstant=constant;mPointLinear=linear;mPointQuadratic=quadratic;mPointMinSize=minSize;mPointMaxSize=maxSize;
-	}
-	inline bool getPointSprite() const{return mPointSprite;}
-	inline scalar getPointSize() const{return mPointSize;}
-	inline bool getPointAttenuated() const{return mPointAttenuated;}
-	inline scalar getPointConstant() const{return mPointConstant;}
-	inline scalar getPointLinear() const{return mPointLinear;}
-	inline scalar getPointQuadratic() const{return mPointQuadratic;}
-	inline scalar getPointMinSize() const{return mPointMinSize;}
-	inline scalar getPointMaxSize() const{return mPointMaxSize;}
+	void setPointState(const peeper::PointState &state){mPointState.set(state);}
+	inline const peeper::PointState &getPointSprite() const{return mPointState;}
 
 	void setLayer(int layer){mLayer=layer;}
 	inline int getLayer() const{return mLayer;}
@@ -206,10 +198,7 @@ protected:
 	bool mDepthSorted;
 	bool mDepthWrite;
 	peeper::Renderer::DepthTest mDepthTest;
-	bool mPointSprite;
-	scalar mPointSize;
-	bool mPointAttenuated;
-	scalar mPointConstant,mPointLinear,mPointQuadratic,mPointMinSize,mPointMaxSize;
+	peeper::PointState mPointState;
 	int mLayer;
 	egg::Collection<peeper::TextureStage::ptr> mTextureStages;
 	bool mSaveLocally;
