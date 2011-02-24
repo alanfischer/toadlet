@@ -44,7 +44,7 @@ public:
 		maxSize(0)
 	{}
 
-		PointState(bool sprite1,scalar size1,bool attenuated1,scalar constant1,scalar linear1,scalar quadratic1,scalar minSize1,scalar maxSize1){
+	PointState(bool sprite1,scalar size1,bool attenuated1,scalar constant1,scalar linear1,scalar quadratic1,scalar minSize1,scalar maxSize1){
 		set(sprite1,size1,attenuated1,constant1,linear1,quadratic1,minSize1,maxSize1);
 	}
 

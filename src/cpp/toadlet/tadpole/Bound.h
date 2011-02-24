@@ -43,31 +43,26 @@ public:
 	};
 
 	Bound():
-		mType(Type_AABOX),
-		mEpsilon(Math::fromMilli(1))
+		mType(Type_AABOX)
 	{}
 
 	Bound(Type type):
-		mType(type),
-		mEpsilon(Math::fromMilli(1))
+		mType(type)
 	{}
 
 	Bound(Bound *bound):
 		mType(bound->mType),
-		mEpsilon(Math::fromMilli(1)),
 		mSphere(bound->mSphere),
 		mBox(bound->mBox)
 	{}
 
 	Bound(const AABox &box):
 		mType(Type_AABOX),
-		mEpsilon(Math::fromMilli(1)),
 		mBox(box)
 	{}
 
 	Bound(const Sphere &sphere):
 		mType(Type_SPHERE),
-		mEpsilon(Math::fromMilli(1)),
 		mSphere(sphere)
 	{}
 	
@@ -121,7 +116,7 @@ public:
 		update();
 	}
 
-	void merge(Bound *b){
+	void merge(Bound *b,scalar epsilon){
 		if(mType==Type_INFINITE || b->mType==Type_INFINITE){
 			mType=Type_INFINITE;
 		}
@@ -131,7 +126,7 @@ public:
 		else{
 			// Just switch to a sphere
 			mType=Type_SPHERE;
-			mSphere.merge(b->mSphere,mEpsilon);
+			mSphere.merge(b->mSphere,epsilon);
 		}
 		update();
 	}
@@ -219,7 +214,6 @@ protected:
 	}
 
 	Type mType;
-	scalar mEpsilon;
 	Sphere mSphere;
 	AABox mBox;
 };

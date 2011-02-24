@@ -72,6 +72,8 @@ public:
 	virtual void setRenderListener(RenderListener *renderListener){mRenderListener=renderListener;}
 	virtual RenderListener *getRenderListener() const{return mRenderListener;}
 
+	virtual scalar getEpsilon() const{return Math::fromMilli(1);}
+
 	virtual void update(int dt);
 	virtual void preLogicUpdate(int dt){}
 	virtual void logicUpdate(int dt){logicUpdate(dt,-1);}
@@ -93,7 +95,7 @@ public:
 	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits=-1,node::Node *ignore=NULL){result.time=Math::ONE;}
 
 	virtual void setAmbientColor(peeper::Color ambientColor){mAmbientColor.set(ambientColor);}
-	virtual void setFogParameters(const peeper::Renderer::Fog &fog,scalar nearDistance,scalar farDistance,const peeper::Color &color){mFog=fog;mFogNearDistance=nearDistance;mFogFarDistance=farDistance;mFogColor.set(color);}
+	virtual void setFogState(const peeper::FogState &state){mFogState.set(state);}
 
 	virtual egg::image::Image::ptr renderToImage(peeper::Renderer *renderer,node::CameraNode *camera,int format,int width,int height);
 
@@ -128,9 +130,7 @@ protected:
 	node::PartitionNode::ptr mRoot;
 
 	peeper::Color mAmbientColor;
-	peeper::Renderer::Fog mFog;
-	scalar mFogNearDistance,mFogFarDistance;
-	peeper::Color mFogColor;
+	peeper::FogState mFogState;
 
 	RenderQueue::ptr mRenderQueue;
 	Material *mPreviousMaterial;

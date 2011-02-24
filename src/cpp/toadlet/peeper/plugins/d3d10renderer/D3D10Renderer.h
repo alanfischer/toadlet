@@ -93,7 +93,7 @@ D3D10_PASS_DESC passDesc;
 	void setDepthWrite(bool depthWrite);
 	void setDithering(bool dithering);
 	void setFaceCulling(const FaceCulling &faceCulling);
-	void setFogParameters(const Fog &fog,scalar nearDistance,scalar farDistance,const Color &color);
+	void setFogState(const FogState &state);
 	void setLighting(bool lighting);
 	void setLightEffect(const LightEffect &lightEffect);
 	void setFill(const Fill &fill);

@@ -1,13 +1,9 @@
 #ifndef LOGO_H
 #define LOGO_H
 
-#include <toadlet/egg.h>
-#include <toadlet/flick.h>
-#include <toadlet/peeper.h>
-#include <toadlet/tadpole.h>
-#include <toadlet/pad.h>
+#include <toadlet/toadlet.h>
 
-class  Logo:public Application{
+class Logo:public Application{
 public:
 	Logo();
 	virtual ~Logo();

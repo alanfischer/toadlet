@@ -362,7 +362,7 @@ void TerrainNode::updateBound(){
 	int i;
 	for(i=0;i<mPatchGrid.size();++i){
 		if(i==0) mBound->set(mPatchGrid[i]->getWorldBound());
-		else mBound->merge(mPatchGrid[i]->getWorldBound());
+		else mBound->merge(mPatchGrid[i]->getWorldBound(),mScene->getEpsilon());
 	}
 }
 

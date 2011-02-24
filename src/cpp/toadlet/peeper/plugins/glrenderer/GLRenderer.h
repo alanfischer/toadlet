@@ -30,6 +30,7 @@
 #include "GLRenderTarget.h"
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/Blend.h>
+#include <toadlet/peeper/FogState.h>
 #include <toadlet/peeper/LightEffect.h>
 #include <toadlet/peeper/PointState.h>
 #include <toadlet/peeper/TextureStage.h>
@@ -98,7 +99,7 @@ public:
 	void setDepthWrite(bool depthWrite);
 	void setDithering(bool dithering);
 	void setFaceCulling(const FaceCulling &faceCulling);
-	void setFogParameters(const Fog &fog,scalar nearDistance,scalar farDistance,const Color &color);
+	void setFogState(const FogState &state);
 	void setLightEffect(const LightEffect &lightEffect);
 	void setFill(const Fill &fill);
 	void setLighting(bool lighting);
@@ -147,7 +148,7 @@ public:
 	static GLenum getGLDepthFunc(DepthTest alphaTest);
 	static GLenum getGLAlphaFunc(AlphaTest alphaTest);
 	static GLenum getGLBlendOperation(Blend::Operation blend);
-	static GLint getGLFogType(Fog type);
+	static GLint getGLFogType(FogState::FogType type);
 	static GLint getGLElementCount(int format);
 	static GLenum getGLDataType(int format);
 	static GLuint getGLFormat(int textureFormat);

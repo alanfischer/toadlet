@@ -31,6 +31,7 @@ set (PEEPER_HEADERS
 	CapabilitySet.h
 	Color.h
 	Colors.h
+	FogState.h
 	IndexBuffer.h
 	IndexBufferAccessor.h
 	IndexData.h

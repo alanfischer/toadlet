@@ -35,6 +35,7 @@
 #endif
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/egg/Error.h>
+#include <toadlet/peeper/FogState.h>
 #include <toadlet/peeper/LightEffect.h>
 #include <toadlet/peeper/Light.h>
 #include <toadlet/peeper/PointState.h>
@@ -478,11 +479,12 @@ void D3D9Renderer::setDefaultStates(){
 	setDepthTest(DepthTest_LEQUAL);
 	setDithering(false);
 	setFaceCulling(FaceCulling_BACK);
-	setFogParameters(Fog_NONE,0,1.0,Colors::BLACK);
+	setFogState(FogState());
 	setLighting(false);
 	setShading(Shading_SMOOTH);
 	setNormalize(Normalize_RESCALE);
 	setFill(Fill_SOLID);
+	setPointState(PointState());
 	#if defined(TOADLET_SET_D3DM)
 		setTexturePerspective(true);
 	#endif
@@ -627,16 +629,16 @@ void D3D9Renderer::setFaceCulling(const FaceCulling &culling){
 	mFaceCulling=culling;
 }
 
-void D3D9Renderer::setFogParameters(const Fog &fog,scalar nearDistance,scalar farDistance,const Color &color){
-	if(fog==Fog_NONE){
+void D3D9Renderer::setFogState(const FogState &state){
+	if(state.type==FogState::FogType_NONE){
 		mD3DDevice->SetRenderState(D3DRS_FOGENABLE,FALSE);
 	}
 	else{
-		float fNearDistance=scalarToFloat(nearDistance);
-		float fFarDistance=scalarToFloat(farDistance);
+		float fNearDistance=scalarToFloat(state.nearDistance);
+		float fFarDistance=scalarToFloat(state.farDistance);
 	
 		mD3DDevice->SetRenderState(D3DRS_FOGENABLE,TRUE);
-	    mD3DDevice->SetRenderState(D3DRS_FOGCOLOR,toD3DCOLOR(color));
+	    mD3DDevice->SetRenderState(D3DRS_FOGCOLOR,toD3DCOLOR(state.color));
         mD3DDevice->SetRenderState(D3DRS_FOGVERTEXMODE,D3DFOG_LINEAR);
 		mD3DDevice->SetRenderState(D3DRS_FOGSTART,*(DWORD*)(&fNearDistance));
 		mD3DDevice->SetRenderState(D3DRS_FOGEND,*(DWORD*)(&fFarDistance));
