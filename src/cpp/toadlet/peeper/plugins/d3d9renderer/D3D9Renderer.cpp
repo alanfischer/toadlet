@@ -711,7 +711,12 @@ void D3D9Renderer::setPointState(const PointState &state){
 		// if a&b = 0, then quadratic = 1/(C*C) where C = first component of projMatrix * 1/2 screen width
 		if(mCapabilitySet.pointSprites){
 			mD3DDevice->SetRenderState(D3DRS_POINTSPRITEENABLE,state.sprite);
-			mD3DDevice->SetRenderState(D3DRS_POINTSCALEENABLE,state.sprite);
+			mD3DDevice->SetRenderState(D3DRS_POINTSCALEENABLE,state.attenuated);
+
+			float fMinSize=MathConversion::scalarToFloat(state.minSize);
+			float fMaxSize=MathConversion::scalarToFloat(state.maxSize);
+			mD3DDevice->SetRenderState(D3DRS_POINTSIZE_MIN,*(DWORD*)(&fMinSize));
+			mD3DDevice->SetRenderState(D3DRS_POINTSIZE_MAX,*(DWORD*)(&fMaxSize));
 		}
 
 		float fSize=MathConversion::scalarToFloat(state.size);
