@@ -34,6 +34,11 @@ namespace node{
 
 class Node;
 
+/// @todo: This class should be changed into a NodeBehavior class.
+///  it would be able to listen to most methods in the Node, and either override them or compliment them.
+//   Then instead of extending classes, it would be easy to customize a node with Behaviors.
+//   This would also make it easier to customize Nodes in a scripting system.
+//   Also, a ParticleNode could get it's simulation by a Behavior.
 class NodeListener{
 public:
 	TOADLET_SHARED_POINTERS(NodeListener);

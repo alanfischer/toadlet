@@ -1152,27 +1152,27 @@ void GLRenderer::setPointState(const PointState &state){
 		else{
 			glTexEnvi(GL_POINT_SPRITE,GL_COORD_REPLACE,value);
 		}
+
+	    glPointParameterf(GL_POINT_SIZE_MIN,state.minSize);
+		glPointParameterf(GL_POINT_SIZE_MAX,state.maxSize);
 	}
 	
 	glPointSize(MathConversion::scalarToFloat(state.size));
 	
-	// Attenuation is unimplemented on android
-	#if !defined(TOADLET_PLATFORM_ANDROID)
-		if(state.attenuated){
-			#if defined(TOADLET_FIXED_POINT)
-				#if defined(TOADLET_HAS_GLES)
-					cacheArray[0]=state.constant; cacheArray[1]=state.linear; cacheArray[2]=state.quadratic;
-					glPointParameterxv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
-				#else
-					cacheArray[0]=MathConversion::scalarToFloat(state.constant); cacheArray[1]=MathConversion::scalarToFloat(state.linear); cacheArray[2]=MathConversion::scalarToFloat(state.quadratic);
-					glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
-				#endif
-			#else
+	if(state.attenuated){
+		#if defined(TOADLET_FIXED_POINT)
+			#if defined(TOADLET_HAS_GLES)
 				cacheArray[0]=state.constant; cacheArray[1]=state.linear; cacheArray[2]=state.quadratic;
+				glPointParameterxv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
+			#else
+				cacheArray[0]=MathConversion::scalarToFloat(state.constant); cacheArray[1]=MathConversion::scalarToFloat(state.linear); cacheArray[2]=MathConversion::scalarToFloat(state.quadratic);
 				glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
 			#endif
-		}
-	#endif
+		#else
+			cacheArray[0]=state.constant; cacheArray[1]=state.linear; cacheArray[2]=state.quadratic;
+			glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
+		#endif
+	}
 
 	TOADLET_CHECK_GLERROR("setPointParameters");
 }

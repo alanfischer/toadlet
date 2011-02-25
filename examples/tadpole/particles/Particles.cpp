@@ -32,7 +32,7 @@ void Particles::create(){
 	};
 
 	Material::ptr pointMaterial=mEngine->getMaterialManager()->findMaterial("sparkle.png");
-	pointMaterial->setPointState(PointState(true,0.01,false,1,1,1,1,1));
+	pointMaterial->setPointState(PointState(true,10,false,1,1,1,1,100));
 	pointMaterial->setBlend(Blend::Combination_ALPHA_ADDITIVE);
 	pointMaterial->setFaceCulling(Renderer::FaceCulling_NONE);
 	pointMaterial->setDepthWrite(false);
@@ -52,7 +52,6 @@ void Particles::create(){
 	spriteNode->setNumParticles(4,ParticleNode::ParticleType_SPRITE,pointPositions);
 	spriteNode->setMaterial(pointMaterial);
 	spriteNode->setTranslate(0,0,0);
-	spriteNode->setRotate(Vector3(0,0,1),Math::HALF_PI);
 	scene->getRoot()->attach(spriteNode);
 
  	beamNode=getEngine()->createNodeType(ParticleNode::type(),scene);
