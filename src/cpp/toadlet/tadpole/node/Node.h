@@ -89,7 +89,10 @@ public:
 	enum InterfaceType{
 		InterfaceType_ATTACHABLE,
 		InterfaceType_DETAILTRACEABLE,
+		InterfaceType_MATERIALABLE,
+		InterfaceType_RENDERABLE,
 		InterfaceType_TRACEABLE,
+		InterfaceType_VISIBLE,
 	};
 
 	Node();

@@ -65,7 +65,8 @@ void MeshNode::MeshController::skeletonChanged(){
 	mAnimation->setTarget(mMeshNode->getSkeleton());
 }
 
-MeshNode::MeshNode():super()
+MeshNode::MeshNode():super(),
+	mRendered(false)
 	//mMesh,
 	//mSubMeshes,
 	//mSkeleton,
@@ -78,6 +79,7 @@ Node *MeshNode::create(Scene *scene){
 	super::create(scene);
 	setCameraAligned(false);
 
+	mRendered=true;
 	mMesh=NULL;
 	mSubMeshes.clear();
 	mSkeleton=NULL;
@@ -117,6 +119,15 @@ Node *MeshNode::set(Node *node){
 	setMesh(meshNode->getMesh());
 
 	return this;
+}
+
+void *MeshNode::hasInterface(int type){
+	switch(type){
+		case InterfaceType_VISIBLE:
+			return (Visible*)this;
+		default:
+			return NULL;
+	}
 }
 
 void MeshNode::setMesh(const String &name){
@@ -186,6 +197,18 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 	}
 }
 
+void MeshNode::modifyMaterial(Material::ptr material){
+	int i;
+	for(i=0;i<mSubMeshes.size();++i){
+		SubMesh *sub=mSubMeshes[i];
+		if(sub->material->getManaged()){
+			sub->material=sub->material->clone();
+		}
+
+		sub->material->modifyWith(material);
+	}
+}
+
 MeshNode::SubMesh *MeshNode::getSubMesh(const String &name){
 	if(mMesh==NULL){
 		return NULL;
@@ -250,6 +273,10 @@ void MeshNode::updateWorldTransform(){
 
 void MeshNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	super::queueRenderables(camera,queue);
+
+	if(mRendered==false){
+		return;
+	}
 
 	int i;
 	for(i=0;i<mSubMeshes.size();++i){

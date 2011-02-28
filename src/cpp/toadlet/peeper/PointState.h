@@ -35,13 +35,13 @@ class PointState{
 public:
 	PointState():
 		sprite(false),
-		size(0),
+		size(Math::ONE),
 		attenuated(false),
 		constant(0),
 		linear(0),
 		quadratic(0),
-		minSize(0),
-		maxSize(0)
+		minSize(Math::ONE),
+		maxSize(Math::ONE)
 	{}
 
 	PointState(bool sprite1,scalar size1,bool attenuated1,scalar constant1,scalar linear1,scalar quadratic1,scalar minSize1,scalar maxSize1){

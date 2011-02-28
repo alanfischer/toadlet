@@ -142,6 +142,17 @@ Node *TerrainPatchNode::set(Node *node){
 	return NULL;
 }
 
+void *TerrainPatchNode::hasInterface(int type){
+	switch(type){
+		case InterfaceType_RENDERABLE:
+			return (Renderable*)this;
+		case InterfaceType_TRACEABLE:
+			return (Traceable*)this;
+		default:
+			return NULL;
+	}
+}
+
 bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height,bool water){
 	int sizeN=0;
 	for(sizeN=0;(1<<(sizeN+1))<=width;sizeN++);

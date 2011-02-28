@@ -32,24 +32,30 @@
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/Renderable.h>
+#include <toadlet/tadpole/Visible.h>
 #include <toadlet/tadpole/node/CameraAlignedNode.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class TOADLET_API SpriteNode:public CameraAlignedNode,public Renderable{
+class TOADLET_API SpriteNode:public CameraAlignedNode,public Renderable,public Visible{
 public:
 	TOADLET_NODE(SpriteNode,CameraAlignedNode);
 	
 	SpriteNode();
-	virtual Node *create(Scene *scene);
-	virtual void destroy();
-	virtual Node *set(Node *node);
+	Node *create(Scene *scene);
+	void destroy();
+	Node *set(Node *node);
 
-	void setMaterial(const egg::String &name);
+	void *hasInterface(int type);
+
 	void setMaterial(Material::ptr material);
 	Material::ptr getMaterial() const{return mMaterial;}
+
+	void modifyMaterial(Material::ptr material);
+	bool getRendered() const{return mRendered;}
+	void setRendered(bool rendered){mRendered=rendered;}
 
 	void setAlignment(int alignment);
 	int getAlignment() const{return mAlignment;}
@@ -68,8 +74,8 @@ protected:
 	void updateSprite();
 
 	int mAlignment;
-
 	Material::ptr mMaterial;
+	bool mRendered;
 	peeper::VertexData::ptr mVertexData;
 	peeper::IndexData::ptr mIndexData;
 };

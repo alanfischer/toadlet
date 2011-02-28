@@ -50,8 +50,8 @@ ParticleNode::ParticleNode():super(),
 	mParticleType(0),
 	mWorldSpace(false),
 	mManualUpdating(false),
-	mVelocityAligned(false)
-
+	mVelocityAligned(false),
+	mRendered(false)
 	//mMaterial,
 	//mVertexData,
 	//mIndexData,
@@ -66,6 +66,7 @@ Node *ParticleNode::create(Scene *scene){
 	mWorldSpace=false;
 	mManualUpdating=false;
 	mVelocityAligned=false;
+	mRendered=true;
 
 	return this;
 }
@@ -100,6 +101,17 @@ Node *ParticleNode::set(Node *node){
 	setMaterial(particleNode->getMaterial());
 
 	return NULL;
+}
+
+void *ParticleNode::hasInterface(int type){
+	switch(type){
+		case InterfaceType_RENDERABLE:
+			return (Renderable*)this;
+		case InterfaceType_VISIBLE:
+			return (Visible*)this;
+		default:
+			return NULL;
+	}
 }
 
 bool ParticleNode::setNumParticles(int numParticles,int particleType,const Vector3 positions[]){
@@ -167,9 +179,23 @@ void ParticleNode::setMaterial(Material::ptr material){
 		mMaterial->retain();
 	}
 }
-	
+
+void ParticleNode::modifyMaterial(Material::ptr material){
+	if(mMaterial!=NULL){
+		if(mMaterial->getManaged()){
+			mMaterial=mMaterial->clone();
+		}
+
+		mMaterial->modifyWith(material);
+	}
+}
+
 void ParticleNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	super::queueRenderables(camera,queue);
+
+	if(mRendered==false){
+		return;
+	}
 
 	if(mManualUpdating==false){
 		updateVertexBuffer(camera);

@@ -65,6 +65,7 @@ void StudioModelNode::SubModel::render(Renderer *renderer) const{
 }
 
 StudioModelNode::StudioModelNode():super(),
+	mRendered(false),
 	//mModel,
 	//mSubModels,
 
@@ -103,6 +104,14 @@ StudioModelNode::StudioModelNode():super(),
 }
 
 StudioModelNode::~StudioModelNode(){}
+
+Node *StudioModelNode::create(Scene *scene){
+	super::create(scene);
+
+	mRendered=true;
+
+	return this;
+}
 
 void StudioModelNode::destroy(){
 	if(mModel!=NULL){
@@ -149,6 +158,8 @@ void *StudioModelNode::hasInterface(int type){
 			return (Attachable*)this;
 		case InterfaceType_DETAILTRACEABLE:
 			return (DetailTraceable*)this;
+		case InterfaceType_VISIBLE:
+			return (Visible*)this;
 		default:
 			return NULL;
 	}
@@ -410,10 +421,22 @@ void StudioModelNode::traceSegment(Collision &result,const Vector3 &position,con
 	}
 }
 
+void StudioModelNode::modifyMaterial(Material::ptr material){
+	int i;
+	for(i=0;i<mSubModels.size();++i){
+		SubModel *sub=mSubModels[i];
+		if(sub->material->getManaged()){
+			sub->material=sub->material->clone();
+		}
+
+		sub->material->modifyWith(material);
+	}
+}
+
 void StudioModelNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	super::queueRenderables(camera,queue);
 
-	if(mModel==NULL){
+	if(mModel==NULL || mRendered==false){
 		return;
 	}
 

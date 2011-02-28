@@ -205,5 +205,42 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 	}
 }
 
+void Material::modifyWith(Material::ptr material){
+	int states=material->mStates;
+	if((states&State_ALPHATEST)>0){
+		setAlphaTest(material->mAlphaTest,material->mAlphaTestCutoff);
+	}
+	if((states&State_BLEND)>0){
+		setBlend(material->mBlend);
+	}
+	if((states&State_DEPTHTEST)>0){
+		setDepthTest(material->mDepthTest);
+	}
+	if((states&State_DEPTHWRITE)>0){
+		setDepthWrite(material->mDepthWrite);
+	}
+	if((states&State_FACECULLING)>0){
+		setFaceCulling(material->mFaceCulling);
+	}
+	if((states&State_FILL)>0){
+		setFill(material->mFill);
+	}
+	if((states&State_SHADING)>0){
+		setShading(material->mShading);
+	}
+	if((states&State_FOG)>0){
+		setFogState(material->mFogState);
+	}
+	if((states&State_LIGHTING)>0){
+		setLighting(material->mLighting);
+	}
+	if((states&State_LIGHTEFFECT)>0){
+		setLightEffect(material->mLightEffect);
+	}
+	if((states&State_POINT)>0){
+		setPointState(material->mPointState);
+	}
+}
+
 }
 }

@@ -151,6 +151,8 @@ public:
 	bool getSaveLocally() const{return mSaveLocally;}
 
 	int getStates(){return mStates;}
+	void modifyWith(Material::ptr material);
+	bool getManaged(){return getUniqueHandle()!=0;}
 
 	void setupRenderer(peeper::Renderer *renderer,Material *previousMaterial=NULL);
 	

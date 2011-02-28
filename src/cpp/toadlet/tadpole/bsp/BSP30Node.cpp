@@ -57,10 +57,20 @@ TOADLET_NODE_IMPLEMENT(BSP30ModelNode,Categories::TOADLET_TADPOLE_BSP+".BSP30Mod
 
 BSP30ModelNode::BSP30ModelNode():Node(),
 	//mMap,
-	mModelIndex(-1)
+	mModelIndex(0),
+	mRendered(false)
 {}
 
 BSP30ModelNode::~BSP30ModelNode(){}
+
+Node *BSP30ModelNode::create(Scene *scene){
+	super::create(scene);
+
+	mModelIndex=-1;
+	mRendered=true;
+
+	return this;
+}
 
 Node *BSP30ModelNode::set(Node *node){
 	super::set(node);
@@ -69,6 +79,17 @@ Node *BSP30ModelNode::set(Node *node){
 	setModel(modelNode->getMap(),modelNode->getModel());
 
 	return this;
+}
+
+void *BSP30ModelNode::hasInterface(int type){
+	switch(type){
+		case InterfaceType_TRACEABLE:
+			return (Traceable*)this;
+		case InterfaceType_VISIBLE:
+			return (Visible*)this;
+		default:
+			return NULL;
+	}
 }
 
 void BSP30ModelNode::setModel(BSP30Map::ptr map,const String &name){
@@ -116,14 +137,28 @@ void BSP30ModelNode::setModel(BSP30Map::ptr map,int index){
 	}
 }
 
+void BSP30ModelNode::modifyMaterial(Material::ptr material){
+	int i;
+	for(i=0;i<mSubModels.size();++i){
+		SubModel *sub=mSubModels[i];
+		if(sub->material->getManaged()){
+			sub->material=sub->material->clone();
+		}
+
+		sub->material->modifyWith(material);
+	}
+}
+
 void BSP30ModelNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	super::queueRenderables(camera,queue);
 
-	if(queue!=NULL){
-		int i;
-		for(i=0;i<mSubModels.size();++i){
-			queue->queueRenderable(mSubModels[i]);
-		}
+	if(mRendered==false){
+		return;
+	}
+
+	int i;
+	for(i=0;i<mSubModels.size();++i){
+		queue->queueRenderable(mSubModels[i]);
 	}
 }
 

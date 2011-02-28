@@ -42,8 +42,8 @@ TOADLET_NODE_IMPLEMENT(SpriteNode,Categories::TOADLET_TADPOLE_NODE+".SpriteNode"
 SpriteNode::SpriteNode():super(),
 	TOADLET_GIB_IMPLEMENT()
 
-	mAlignment(0)
-
+	mAlignment(0),
+	mRendered(false)
 	//mMaterial,
 	//mVertexData,
 	//mIndexData,
@@ -53,6 +53,7 @@ Node *SpriteNode::create(Scene *scene){
 	super::create(scene);
 
 	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
+	mRendered=true;
 
 	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,4));
 
@@ -88,8 +89,15 @@ Node *SpriteNode::set(Node *node){
 	return this;
 }
 
-void SpriteNode::setMaterial(const egg::String &name){
-	setMaterial(mEngine->getMaterialManager()->findMaterial(name));
+void *SpriteNode::hasInterface(int type){
+	switch(type){
+		case InterfaceType_RENDERABLE:
+			return (Renderable*)this;
+		case InterfaceType_VISIBLE:
+			return (Visible*)this;
+		default:
+			return NULL;
+	}
 }
 
 void SpriteNode::setMaterial(Material::ptr material){
@@ -97,25 +105,21 @@ void SpriteNode::setMaterial(Material::ptr material){
 		mMaterial->release();
 	}
 
-	// We clone the Material, so we can animate it freely
-	if(material!=NULL){
-		mMaterial=material->clone();
-	}
+	mMaterial=material;
 
 	if(mMaterial!=NULL){
 		mMaterial->retain();
-
-		mMaterial->setFaceCulling(Renderer::FaceCulling_NONE);
-
-		int i;
-		for(i=0;i<mMaterial->getNumTextureStages();++i){
-			mMaterial->getTextureStage(i)->setUAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
-			mMaterial->getTextureStage(i)->setVAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
-			mMaterial->getTextureStage(i)->setWAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
-		}
 	}
+}
 
-	updateSprite();
+void SpriteNode::modifyMaterial(Material::ptr material){
+	if(mMaterial!=NULL){
+		if(mMaterial->getManaged()){
+			mMaterial=mMaterial->clone();
+		}
+
+		mMaterial->modifyWith(material);
+	}
 }
 
 void SpriteNode::setAlignment(int alignment){
@@ -127,7 +131,7 @@ void SpriteNode::setAlignment(int alignment){
 void SpriteNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	super::queueRenderables(camera,queue);
 
-	if(mVertexData==NULL || mIndexData==NULL || mMaterial==NULL){
+	if(mVertexData==NULL || mIndexData==NULL || mMaterial==NULL || mRendered==false){
 		return;
 	}
 
