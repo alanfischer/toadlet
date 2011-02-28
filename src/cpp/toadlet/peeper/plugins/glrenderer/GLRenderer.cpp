@@ -1156,9 +1156,11 @@ void GLRenderer::setPointState(const PointState &state){
 	    glPointParameterf(GL_POINT_SIZE_MIN,state.minSize);
 		glPointParameterf(GL_POINT_SIZE_MAX,state.maxSize);
 	}
-	
-	glPointSize(MathConversion::scalarToFloat(state.size));
-	
+
+	if(state.size>0){
+		glPointSize(MathConversion::scalarToFloat(state.size));
+	}
+
 	if(state.attenuated){
 		#if defined(TOADLET_FIXED_POINT)
 			#if defined(TOADLET_HAS_GLES)
@@ -1174,7 +1176,7 @@ void GLRenderer::setPointState(const PointState &state){
 		#endif
 	}
 
-	TOADLET_CHECK_GLERROR("setPointParameters");
+	TOADLET_CHECK_GLERROR("setPointState");
 }
 
 void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){

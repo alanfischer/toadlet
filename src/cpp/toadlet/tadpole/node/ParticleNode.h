@@ -36,6 +36,7 @@
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/Renderable.h>
+#include <toadlet/tadpole/Visible.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 
 namespace toadlet{
@@ -48,7 +49,7 @@ namespace node{
 // SPRITE - particles are rendered using 4 points and oriented towards the camera
 // BEAM - particles are rendered as beams that take up 2 or more particles
 // The vx,vy,vz in the Particle class are only used for alignment, this class provides no simulation of particles.
-class TOADLET_API ParticleNode:public Node,public Renderable{
+class TOADLET_API ParticleNode:public Node,public Renderable,public Visible{
 public:
 	TOADLET_NODE(ParticleNode,Node);
 
@@ -81,6 +82,8 @@ public:
 	void destroy();
 	Node *set(Node *node);
 
+	void *hasInterface(int type);
+
 	bool setNumParticles(int numParticles,int particleType,const Vector3 positions[]=NULL);
 	inline int getNumParticles() const{return mParticles.size();}
 	inline int getParticleType() const{return mParticleType;}
@@ -98,6 +101,9 @@ public:
 	void setMaterial(Material::ptr material);
 	Material::ptr getMaterial() const{return mMaterial;}
 
+	void modifyMaterial(Material::ptr material);
+	bool getRendered() const{return mRendered;}
+	void setRendered(bool rendered){mRendered=rendered;}
 	void queueRenderables(CameraNode *camera,RenderQueue *queue);
 
 	Material *getRenderMaterial() const{return mMaterial;}
@@ -113,8 +119,6 @@ public:
 protected:
 	TOADLET_GIB_DEFINE(ParticleNode);
 
-	void updateWorldTransform(Node *node);
-
 	void createVertexBuffer();
 
 	egg::Collection<Particle> mParticles;
@@ -123,6 +127,7 @@ protected:
 	bool mWorldSpace;
 	bool mManualUpdating;
 	bool mVelocityAligned;
+	bool mRendered;
 	Material::ptr mMaterial;
 	peeper::VertexData::ptr mVertexData;
 	peeper::IndexData::ptr mIndexData;

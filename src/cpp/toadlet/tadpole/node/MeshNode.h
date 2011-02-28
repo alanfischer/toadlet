@@ -30,6 +30,7 @@
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/tadpole/Mesh.h>
 #include <toadlet/tadpole/Renderable.h>
+#include <toadlet/tadpole/Visible.h>
 #include <toadlet/tadpole/animation/Controller.h>
 #include <toadlet/tadpole/animation/SkeletonAnimation.h>
 #include <toadlet/tadpole/node/MeshNodeSkeleton.h>
@@ -39,7 +40,7 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class TOADLET_API MeshNode:public CameraAlignedNode{
+class TOADLET_API MeshNode:public CameraAlignedNode,public Visible{
 public:
 	TOADLET_NODE(MeshNode,CameraAlignedNode);
 
@@ -83,14 +84,19 @@ public:
 	};
 
 	MeshNode();
-	virtual Node *create(Scene *scene);
-	virtual void destroy();
-	virtual Node *set(Node *node);
+	Node *create(Scene *scene);
+	void destroy();
+	Node *set(Node *node);
+
+	void *hasInterface(int type);
 
 	void setMesh(const egg::String &name);
 	void setMesh(Mesh::ptr mesh);
+	const Mesh::ptr &getMesh() const{return mMesh;}
 
-	inline const Mesh::ptr &getMesh() const{return mMesh;}
+	void modifyMaterial(Material::ptr material);
+	bool getRendered() const{return mRendered;}
+	void setRendered(bool rendered){mRendered=rendered;}
 
 	inline int getNumSubMeshes() const{return mSubMeshes.size();}
 	SubMesh *getSubMesh(int i){return mSubMeshes[i];}
@@ -112,6 +118,7 @@ public:
 	void updateVertexBuffer();
 
 protected:
+	bool mRendered;
 	Mesh::ptr mMesh;
 	egg::Collection<SubMesh::ptr> mSubMeshes;
 	MeshNodeSkeleton::ptr mSkeleton;

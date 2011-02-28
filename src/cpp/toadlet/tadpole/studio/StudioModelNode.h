@@ -31,6 +31,7 @@
 #include <toadlet/tadpole/Attachable.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/DetailTraceable.h>
+#include <toadlet/tadpole/Visible.h>
 #include <toadlet/tadpole/studio/StudioModel.h>
 
 namespace toadlet{
@@ -39,7 +40,7 @@ namespace studio{
 
 class StudioModelController;
 
-class TOADLET_API StudioModelNode:public node::Node,public DetailTraceable,public Renderable,public Attachable{
+class TOADLET_API StudioModelNode:public node::Node,public DetailTraceable,public Renderable,public Attachable,public Visible{
 public:
 	TOADLET_NODE(StudioModelNode,Node);
 
@@ -67,6 +68,7 @@ public:
 
 	StudioModelNode();
 	virtual ~StudioModelNode();
+	Node *create(Scene *scene);
 	void destroy();
 	Node *set(Node *node);
 
@@ -120,8 +122,13 @@ public:
 	Bound *getBound() const{return super::getBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
-	// Renderable
+	// Visible
+	void modifyMaterial(Material::ptr material);
+	bool getRendered() const{return mRendered;}
+	void setRendered(bool rendered){mRendered=rendered;}
 	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
+
+	// Renderable
 	Material *getRenderMaterial() const{return mSkeletonMaterial;}
 	Transform *getRenderTransform() const{return getWorldTransform();}
 	Bound *getRenderBound() const{return getWorldBound();}
@@ -150,6 +157,7 @@ protected:
 	void updateSkeletonBuffers();
 	void destroySkeletonBuffers();
 
+	bool mRendered;
 	StudioModel::ptr mModel;
 	egg::Collection<SubModel::ptr> mSubModels;
 

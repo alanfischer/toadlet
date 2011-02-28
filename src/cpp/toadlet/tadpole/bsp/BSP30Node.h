@@ -30,6 +30,7 @@
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/Renderable.h>
+#include <toadlet/tadpole/Visible.h>
 #include <toadlet/tadpole/node/PartitionNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
 #include <toadlet/tadpole/bsp/BSP30Map.h>
@@ -38,7 +39,7 @@ namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class TOADLET_API BSP30ModelNode:public node::Node,public Traceable{
+class TOADLET_API BSP30ModelNode:public node::Node,public Traceable,public Visible{
 public:
 	TOADLET_NODE(BSP30ModelNode,Node);
 
@@ -61,14 +62,19 @@ public:
 
 	BSP30ModelNode();
 	virtual ~BSP30ModelNode();
+	Node *create(Scene *scene);
 	virtual Node *set(Node *node);
 
-	void *hasInterface(int type){return type==InterfaceType_TRACEABLE?(Traceable*)this:NULL;}
+	void *hasInterface(int type);
 
 	void setModel(BSP30Map::ptr map,const egg::String &name);
 	void setModel(BSP30Map::ptr map,int index);
 	int getModel() const{return mModelIndex;}
 	BSP30Map::ptr getMap(){return mMap;}
+
+	void modifyMaterial(Material::ptr material);
+	bool getRendered() const{return mRendered;}
+	void setRendered(bool rendered){mRendered=rendered;}
 
 	inline int getNumSubModels() const{return mSubModels.size();}
 	SubModel *getSubModel(int i){return mSubModels[i];}
@@ -83,6 +89,7 @@ protected:
 	BSP30Map::ptr mMap;
 	int mModelIndex;
 	egg::Collection<SubModel::ptr> mSubModels;
+	bool mRendered;
 };
 
 class TOADLET_API BSP30Node:public node::PartitionNode,public Traceable,public Renderable{
