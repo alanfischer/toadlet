@@ -23,86 +23,93 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/peeper/BackableVertexFormat.h>
-#include <toadlet/egg/Error.h>
+#include <toadlet/egg/Logger.h>
+#include <toadlet/peeper/BackablePixelBufferRenderTarget.h>
 
 using namespace toadlet::egg;
+using namespace toadlet::egg::image;
 
 namespace toadlet{
 namespace peeper{
 
-BackableVertexFormat::BackableVertexFormat():
-	mListener(NULL),
-	//mSemantics,
-	//mIndexes,
-	//mFormats,
-	//mOffsets,
-	mVertexSize(0)
-	
+BackablePixelBufferRenderTarget::BackablePixelBufferRenderTarget():
+	mListener(NULL)
+
 	//mBack
 {}
 
-BackableVertexFormat::~BackableVertexFormat(){
+BackablePixelBufferRenderTarget::~BackablePixelBufferRenderTarget(){
 	destroy();
 }
 
-bool BackableVertexFormat::create(){
-	bool result=true;
-	if(mBack!=NULL){
-		result=mBack->create();
-	}
+bool BackablePixelBufferRenderTarget::create(){
+	destroy();
 
-	return result;
+	if(mBack!=NULL){
+		return mBack->create();
+	}
+	else{
+		return true;
+	}
 }
 
-void BackableVertexFormat::destroy(){
+void BackablePixelBufferRenderTarget::destroy(){
 	if(mBack!=NULL){
 		mBack->destroy();
 		mBack=NULL;
 	}
-	
-	if(mListener!=NULL){
-		mListener->vertexFormatDestroyed(this);
-		mListener=NULL;
-	}
 }
 
-void BackableVertexFormat::addElement(int semantic,int index,int format){
-	mSemantics.add(semantic);
-	mIndexes.add(index);
-	mFormats.add(format);
-	mOffsets.add(mVertexSize);
-
-	mVertexSize+=getFormatSize(format);
+bool BackablePixelBufferRenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachment){
+	mBuffers.add(buffer);
+	mBufferAttachments.add(attachment);
 	
 	if(mBack!=NULL){
-		mBack->addElement(semantic,index,format);
+		return mBack->attach(buffer,attachment);
+	}
+	else{
+		return true;
 	}
 }
 
-int BackableVertexFormat::findSemantic(int semantic){
+bool BackablePixelBufferRenderTarget::remove(PixelBuffer::ptr buffer){
 	int i;
-	for(i=0;i<mSemantics.size();++i){
-		if(mSemantics[i]==semantic){
-			return i;
+	for(i=0;i<mBuffers.size();++i){
+		if(mBuffers[i]==buffer){
+			break;
 		}
 	}
-	return -1;
+	if(i==mBuffers.size()){
+		return false;
+	}
+
+	mBuffers.removeAt(i);
+	mBufferAttachments.removeAt(i);
+
+	if(mBack!=NULL){
+		return mBack->remove(buffer);
+	}
+	else{
+		return true;
+	}
 }
 
-void BackableVertexFormat::setBack(VertexFormat::ptr back){
+void BackablePixelBufferRenderTarget::setBack(PixelBufferRenderTarget::ptr back){
+	int i;
 	if(back!=mBack && mBack!=NULL){
 		mBack->destroy();
 	}
 
 	mBack=back;
 	
-	if(mBack!=NULL && mSemantics.size()>0){
+	if(mBack!=NULL){
 		mBack->create();
-		int i;
-		for(i=0;i<mSemantics.size();++i){
-			mBack->addElement(mSemantics[i],mIndexes[i],mFormats[i]);
+
+		for(i=0;i<mBuffers.size();++i){
+			mBack->attach(mBuffers[i],mBufferAttachments[i]);
 		}
+		
+		mBack->compile();
 	}
 }
 

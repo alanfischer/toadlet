@@ -26,7 +26,6 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/BackableTexture.h>
 #include <toadlet/peeper/BackableTextureMipPixelBuffer.h>
-#include <string.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::image;
@@ -47,8 +46,7 @@ BackableTexture::BackableTexture():BaseResource(),
 	mDataSize(0),
 	mData(NULL)
 	//mBack
-{
-}
+{}
 
 BackableTexture::~BackableTexture(){
 	destroy();

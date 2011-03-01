@@ -53,13 +53,13 @@ VLCToadlet::~VLCToadlet(){
 }
 
 void VLCToadlet::create(){
-	Application::create();
-
 #if defined(TOADLET_PLATFORM_WIN32)
-	String file="c:\\WINDOWS\\clock.avi";
-#else
-	String file="/home/siralanf/crimp.avi";//#error need a media file
+	setBackable(true);
 #endif
+
+	Application::create("gl");
+
+	String url="c:\\users\\siralanf\\brain_colin27T1.avi";//http://www.youtube.com/watch?v=J---aiyznGQ";
 
 	scene=Scene::ptr(new Scene(mEngine));
 
@@ -82,13 +82,17 @@ void VLCToadlet::create(){
 	scene->getRoot()->attach(cameraNode);
 
 	vlc=libvlc_new(0,NULL);
-	media=libvlc_media_new_path(vlc,file);
+	media=libvlc_media_new_location(vlc,url);
 	mediaplayer=libvlc_media_player_new_from_media(media);
 	libvlc_media_release(media);
 
 	libvlc_video_set_callbacks(mediaplayer, lock, unlock, display, this);
 	libvlc_video_set_format(mediaplayer,"RV32",128,128,128*4);
-	libvlc_media_player_play(mediaplayer);
+	int result=libvlc_media_player_play(mediaplayer);
+	if(result<0){
+		Error::unknown("unable to start media");
+		return;
+	}
 
 	mEngine->setContextListener(this);
 }

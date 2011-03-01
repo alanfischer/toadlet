@@ -35,6 +35,8 @@ namespace peeper{
 
 D3D9PixelBufferRenderTarget::D3D9PixelBufferRenderTarget(D3D9Renderer *renderer):D3D9RenderTarget(),
 	mRenderer(NULL),
+	
+	mListener(NULL),
 	mWidth(0),
 	mHeight(0),
 	mNeedsCompile(false)
@@ -61,6 +63,11 @@ void D3D9PixelBufferRenderTarget::destroy(){
 	if(mDepthBuffer!=NULL){
 		mDepthBuffer->destroy();
 		mDepthBuffer=NULL;
+	}
+
+	if(mListener!=NULL){
+		mListener->renderTargetDestroyed((PixelBufferRenderTarget*)this);
+		mListener=NULL;
 	}
 }
 

@@ -23,38 +23,19 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_PIXELBUFFERRENDERTARGET_H
-#define TOADLET_PEEPER_PIXELBUFFERRENDERTARGET_H
-
-#include <toadlet/peeper/RenderTarget.h>
-#include <toadlet/peeper/PixelBuffer.h>
-#include <toadlet/peeper/RenderTargetDestroyedListener.h>
+#ifndef TOADLET_PEEPER_RENDERTARGETDESTROYEDLISTENER_H
+#define TOADLET_PEEPER_RENDERTARGETDESTROYEDLISTENER_H
 
 namespace toadlet{
 namespace peeper{
 
-class PixelBufferRenderTarget:public RenderTarget{
+class RenderTarget;
+
+class RenderTargetDestroyedListener{
 public:
-	TOADLET_SHARED_POINTERS(PixelBufferRenderTarget);
+	virtual ~RenderTargetDestroyedListener(){}
 
-	enum Attachment{
-		Attachment_DEPTH_STENCIL,
-		Attachment_COLOR_0,
-		Attachment_COLOR_1,
-		Attachment_COLOR_2,
-		Attachment_COLOR_3,
-	};
-
-	virtual ~PixelBufferRenderTarget(){}
-
-	virtual void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener)=0;
-
-	virtual bool create()=0;
-	virtual void destroy()=0;
-
-	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment)=0;
-	virtual bool remove(PixelBuffer::ptr buffer)=0;
-	virtual bool compile()=0;
+	virtual void renderTargetDestroyed(RenderTarget *renderTarget)=0;
 };
 
 }

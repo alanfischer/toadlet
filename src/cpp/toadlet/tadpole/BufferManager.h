@@ -41,22 +41,22 @@ public:
 	BufferManager(Engine *engine,bool backable);
 	virtual ~BufferManager();
 
-	virtual void destroy();
+	void destroy();
 
-	virtual peeper::VertexFormat::ptr createVertexFormat();
-	virtual peeper::IndexBuffer::ptr createIndexBuffer(int usage,int access,peeper::IndexBuffer::IndexFormat indexFormat,int size);
-	virtual peeper::VertexBuffer::ptr createVertexBuffer(int usage,int access,peeper::VertexFormat::ptr vertexFormat,int size);
-	virtual peeper::PixelBuffer::ptr createPixelBuffer(int usage,int access,int pixelFormat,int width,int height,int depth);
-	virtual peeper::IndexBuffer::ptr cloneIndexBuffer(peeper::IndexBuffer::ptr oldIndexBuffer,int usage,int access,peeper::IndexBuffer::IndexFormat indexFormat,int size);
-	virtual peeper::VertexBuffer::ptr cloneVertexBuffer(peeper::VertexBuffer::ptr oldVertexBuffer,int usage,int access,peeper::VertexFormat::ptr vertexFormat,int size);
+	peeper::VertexFormat::ptr createVertexFormat();
+	peeper::IndexBuffer::ptr createIndexBuffer(int usage,int access,peeper::IndexBuffer::IndexFormat indexFormat,int size);
+	peeper::VertexBuffer::ptr createVertexBuffer(int usage,int access,peeper::VertexFormat::ptr vertexFormat,int size);
+	peeper::PixelBuffer::ptr createPixelBuffer(int usage,int access,int pixelFormat,int width,int height,int depth);
+	peeper::IndexBuffer::ptr cloneIndexBuffer(peeper::IndexBuffer::ptr oldIndexBuffer,int usage,int access,peeper::IndexBuffer::IndexFormat indexFormat,int size);
+	peeper::VertexBuffer::ptr cloneVertexBuffer(peeper::VertexBuffer::ptr oldVertexBuffer,int usage,int access,peeper::VertexFormat::ptr vertexFormat,int size);
 	/// @todo: clonePixelBuffer
 
-	virtual void contextActivate(peeper::Renderer *renderer);
-	virtual void contextDeactivate(peeper::Renderer *renderer);
-	virtual void preContextReset(peeper::Renderer *renderer);
-	virtual void postContextReset(peeper::Renderer *renderer);
+	void contextActivate(peeper::Renderer *renderer);
+	void contextDeactivate(peeper::Renderer *renderer);
+	void preContextReset(peeper::Renderer *renderer);
+	void postContextReset(peeper::Renderer *renderer);
 
-	virtual void bufferDestroyed(peeper::Buffer *buffer);
+	void bufferDestroyed(peeper::Buffer *buffer);
 
 	bool useTriFan();
 

@@ -39,8 +39,7 @@ VertexBufferAccessor::VertexBufferAccessor():
 	mFixedData(NULL),
 	mFloatData(NULL),
 	mColorData(NULL)
-{
-}
+{}
 
 VertexBufferAccessor::VertexBufferAccessor(VertexBuffer *vertexBuffer,int access):
 	mVertexBuffer(NULL),

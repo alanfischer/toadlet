@@ -41,6 +41,8 @@ public:
 
 	virtual RenderTarget *getRootRenderTarget(){return (D3D9RenderTarget*)this;}
 
+	virtual void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
+
 	virtual bool create();
 	virtual void destroy();
 
@@ -63,6 +65,8 @@ public:
 
 protected:
 	D3D9Renderer *mRenderer;
+
+	RenderTargetDestroyedListener *mListener;
 	int mWidth;
 	int mHeight;
 	bool mNeedsCompile;

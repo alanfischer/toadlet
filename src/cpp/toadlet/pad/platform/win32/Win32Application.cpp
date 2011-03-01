@@ -148,6 +148,7 @@ Win32Application::Win32Application():
 	mLastXMouse(0),mLastYMouse(0),
 	mSkipNextMove(false),
 
+	mBackable(false),
 	mEngine(NULL),
 	mRenderTarget(NULL),
 	mRenderer(NULL),
@@ -241,7 +242,7 @@ Win32Application::~Win32Application(){
 }
 
 void Win32Application::create(String renderer,String audioPlayer,String motionDetector){
-	mEngine=new Engine(false);
+	mEngine=new Engine(mBackable);
 
 	mResourceArchive=Win32ResourceArchive::ptr(new Win32ResourceArchive(mEngine->getTextureManager()));
 	mResourceArchive->open(win32->mInstance);
@@ -752,6 +753,15 @@ void Win32Application::setDifferenceMouse(bool difference){
 	mSkipNextMove=true;
 
 	ShowCursor(!mDifferenceMouse);
+}
+
+void Win32Application::setBackable(bool backable){
+	if(mEngine!=NULL){
+		Error::unknown(Categories::TOADLET_PAD,"can not change backable once engine is created");
+		return;
+	}
+
+	mBackable=backable;
 }
 
 void Win32Application::changeRendererPlugin(const String &plugin){

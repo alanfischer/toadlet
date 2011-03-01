@@ -44,6 +44,8 @@ public:
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
+	virtual void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
+
 	virtual bool create();
 	virtual void destroy();
 	virtual bool compile();
@@ -66,6 +68,7 @@ protected:
 	void unbind();
 
 	GLRenderer *mRenderer;
+	RenderTargetDestroyedListener *mListener;
 	bool mCopy;
 	bool mSeparateContext;
 	GLTexture *mTexture;
