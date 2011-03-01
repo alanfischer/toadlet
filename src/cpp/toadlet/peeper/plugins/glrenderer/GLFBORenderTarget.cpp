@@ -46,6 +46,7 @@ bool GLFBORenderTarget::available(GLRenderer *renderer){
 
 GLFBORenderTarget::GLFBORenderTarget(GLRenderer *renderer):GLRenderTarget(),
 	mRenderer(NULL),
+	mListener(NULL),
 	mWidth(0),
 	mHeight(0),
 	mHandle(0),
@@ -89,6 +90,11 @@ void GLFBORenderTarget::destroy(){
 	if(mHandle!=0){
 		glDeleteFramebuffers(1,&mHandle);
 		mHandle=0;
+	}
+
+	if(mListener!=NULL){
+		mListener->renderTargetDestroyed((PixelBufferRenderTarget*)this);
+		mListener=NULL;
 	}
 
 	TOADLET_CHECK_GLERROR("GLFBORenderTarget::destroy");

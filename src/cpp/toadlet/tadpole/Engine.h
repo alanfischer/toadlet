@@ -60,11 +60,11 @@ public:
 
 	void destroy();
 
-	void setRenderer(peeper::Renderer *renderer);
+	bool setRenderer(peeper::Renderer *renderer);
 	peeper::Renderer *getRenderer() const;
 	void updateVertexFormats();
 
-	void setAudioPlayer(ribbit::AudioPlayer *audioPlayer);
+	bool setAudioPlayer(ribbit::AudioPlayer *audioPlayer);
 	ribbit::AudioPlayer *getAudioPlayer() const;
 
 	void setDirectory(const egg::String &directory){mArchiveManager->setDirectory(directory);}
@@ -106,9 +106,12 @@ public:
 	inline AudioBufferManager *getAudioBufferManager() const{return mAudioBufferManager;}
 
 protected:
+	bool mBackable;
 	egg::String mDirectory;
 	peeper::Renderer *mRenderer;
+	peeper::Renderer *mLastRenderer;
 	ribbit::AudioPlayer *mAudioPlayer;
+	ribbit::AudioPlayer *mLastAudioPlayer;
 
 	ContextListener *mContextListener;
 

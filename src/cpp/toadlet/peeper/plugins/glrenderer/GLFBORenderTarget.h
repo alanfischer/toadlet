@@ -45,6 +45,8 @@ public:
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
+	virtual void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
+
 	virtual bool create();
 	virtual void destroy();
 
@@ -69,6 +71,7 @@ protected:
 	static const char *getFBOMessage(GLenum status);
 
 	GLRenderer *mRenderer;
+	RenderTargetDestroyedListener *mListener;
 	int mWidth;
 	int mHeight;
 	GLuint mHandle;

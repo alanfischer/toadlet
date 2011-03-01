@@ -54,6 +54,7 @@ bool GLXPBufferRenderTarget::available(GLRenderer *renderer){
 
 GLXPBufferRenderTarget::GLXPBufferRenderTarget(GLRenderer *renderer):GLXRenderTarget(),
 	mRenderer(NULL),
+	mListener(NULL),
 	mTexture(NULL),
 	mPBuffer(0),
 	mWidth(0),
@@ -79,6 +80,11 @@ bool GLXPBufferRenderTarget::create(){
 
 void GLXPBufferRenderTarget::destroy(){
 	destroyBuffer();
+
+	if(mListener!=NULL){
+		mListener->renderTargetDestroyed((PixelBufferRenderTarget*)this);
+		mListener=NULL;
+	}
 }
 
 bool GLXPBufferRenderTarget::activate(){

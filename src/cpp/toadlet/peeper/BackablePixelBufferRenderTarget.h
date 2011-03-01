@@ -23,65 +23,49 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_GLXPBUFFERRENDERTARGET_H
-#define TOADLET_PEEPER_GLXPBUFFERRENDERTARGET_H
+#ifndef TOADLET_PEEPER_BACKABLEPIXELBUFFERRENDERTARGET_H
+#define TOADLET_PEEPER_BACKABLEPIXELBUFFERRENDERTARGET_H
 
-#include "GLXRenderTarget.h"
-#include "../../GLTexture.h"
 #include <toadlet/peeper/PixelBufferRenderTarget.h>
 
 namespace toadlet{
 namespace peeper{
 
-class GLRenderer;
-
-class GLXPBufferRenderTarget:public GLXRenderTarget,public PixelBufferRenderTarget{
+class TOADLET_API BackablePixelBufferRenderTarget:public PixelBufferRenderTarget{
 public:
-	static bool available(GLRenderer *renderer);
+	TOADLET_SHARED_POINTERS(BackablePixelBufferRenderTarget);
 
-	GLXPBufferRenderTarget(GLRenderer *renderer);
-	virtual ~GLXPBufferRenderTarget();
+	BackablePixelBufferRenderTarget();
+	virtual ~BackablePixelBufferRenderTarget();
 
-	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
+	virtual RenderTarget *getRootRenderTarget(){return mBack!=NULL?mBack->getRootRenderTarget():NULL;}
 
 	virtual void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
 
+	virtual bool isPrimary() const{return mBack!=NULL?mBack->isPrimary():false;}
+	virtual bool isValid() const{return mBack!=NULL?mBack->isValid():false;}
+	virtual int getWidth() const{return mBack!=NULL?mBack->getWidth():0;}
+	virtual int getHeight() const{return mBack!=NULL?mBack->getHeight():0;}
+
 	virtual bool create();
 	virtual void destroy();
-	virtual bool compile();
-
-	virtual bool activate();
-	virtual bool swap();
-	virtual bool activateAdditionalContext(){return false;}
-	virtual void deactivateAdditionalContext(){}
 
 	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment);
 	virtual bool remove(PixelBuffer::ptr buffer);
+	virtual bool compile(){return mBack!=NULL?mBack->compile():false;}
 
-	virtual bool isPrimary() const{return false;}
-	virtual bool isValid() const{return mPBuffer!=0;}
-	virtual int getWidth() const{return mWidth;}
-	virtual int getHeight() const{return mHeight;}
-	inline GLXPbuffer getGLXPbuffer() const{return mPBuffer;}
-
+	virtual void setBack(PixelBufferRenderTarget::ptr back);
+	virtual PixelBufferRenderTarget::ptr getBack(){return mBack;}
+	
 protected:
-	bool createBuffer();
-	bool destroyBuffer();
-	void bind();
-	void unbind();
-
-	GLRenderer *mRenderer;
 	RenderTargetDestroyedListener *mListener;
-	GLTexture *mTexture;
-	GLXPbuffer mPBuffer;
-	int mWidth;
-	int mHeight;
-	bool mBound;
-	bool mInitialized;
+
+	PixelBufferRenderTarget::ptr mBack;
+	egg::Collection<PixelBuffer::ptr> mBuffers;
+	egg::Collection<Attachment> mBufferAttachments;
 };
 
 }
 }
 
 #endif
-

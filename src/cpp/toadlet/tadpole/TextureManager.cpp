@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/peeper/BackableTexture.h>
+#include <toadlet/peeper/BackablePixelBufferRenderTarget.h>
 #include <toadlet/peeper/CapabilitySet.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/Engine.h>
@@ -71,7 +72,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 ///  BackableTexture, so when setting the back, it will create, then check the format to see if it needs to
 ///  convert!  That should be pretty easy to, and keep all that possibly time consuming stuff in BackableTexture where it belongs.
 //closestFormat=Image::Format_RGBA_8;
-
+ 
 	// Check if the renderer supports npot textures
 	bool hasNonPowerOf2=renderer==NULL?false:renderer->getCapabilitySet().textureNonPowerOf2;
 	// Check if the renderer can autogenerate mipmaps
@@ -297,17 +298,28 @@ Image::ptr TextureManager::createImage(Texture *texture){
 }
 
 PixelBufferRenderTarget::ptr TextureManager::createPixelBufferRenderTarget(){
-	/// @todo: Make this use a BackablePixelBufferRenderTarget, which would also let us remove them from mRenderTargets as they are destroyed
-	if(mEngine->getRenderer()!=NULL){
-		PixelBufferRenderTarget::ptr back(mEngine->getRenderer()->createPixelBufferRenderTarget());
-		if(back!=NULL){
-			back->create();
+	PixelBufferRenderTarget::ptr renderTarget;
+	if(mBackable || mEngine->getRenderer()==NULL){
+		BackablePixelBufferRenderTarget::ptr backableRenderTarget(new BackablePixelBufferRenderTarget());
+		backableRenderTarget->create();
+		if(mEngine->getRenderer()!=NULL){
+			PixelBufferRenderTarget::ptr back(mEngine->getRenderer()->createPixelBufferRenderTarget());
+			backableRenderTarget->setBack(back);
 		}
-		mRenderTargets.add(back);
-
-		return back;
+		renderTarget=backableRenderTarget;
 	}
-	return NULL;
+	else{
+		renderTarget=PixelBufferRenderTarget::ptr(mEngine->getRenderer()->createPixelBufferRenderTarget());
+		if(renderTarget->create()==false){
+			return NULL;
+		}
+	}
+
+	mRenderTargets.add(renderTarget);
+
+	renderTarget->setRenderTargetDestroyedListener(this);
+
+	return renderTarget;
 }
 
 void TextureManager::contextActivate(peeper::Renderer *renderer){
@@ -319,6 +331,14 @@ void TextureManager::contextActivate(peeper::Renderer *renderer){
 			shared_static_cast<BackableTexture>(texture)->setBack(back);
 		}
 	}
+
+	for(i=0;i<mRenderTargets.size();++i){
+		PixelBufferRenderTarget::ptr renderTarget=mRenderTargets[i];
+		if(renderTarget!=NULL && renderTarget->getRootRenderTarget()!=renderTarget){
+			PixelBufferRenderTarget::ptr back(renderer->createPixelBufferRenderTarget());
+			shared_static_cast<BackablePixelBufferRenderTarget>(renderTarget)->setBack(back);
+		}
+	}
 }
 
 void TextureManager::contextDeactivate(peeper::Renderer *renderer){
@@ -327,6 +347,13 @@ void TextureManager::contextDeactivate(peeper::Renderer *renderer){
 		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
 		if(texture!=NULL && texture->getRootTexture(0)!=texture){
 			shared_static_cast<BackableTexture>(texture)->setBack(NULL);
+		}
+	}
+
+	for(i=0;i<mRenderTargets.size();++i){
+		PixelBufferRenderTarget::ptr renderTarget=mRenderTargets[i];
+		if(renderTarget!=NULL && renderTarget->getRootRenderTarget()!=renderTarget){
+			shared_static_cast<BackablePixelBufferRenderTarget>(renderTarget)->setBack(NULL);
 		}
 	}
 }
@@ -353,6 +380,10 @@ void TextureManager::postContextReset(peeper::Renderer *renderer){
 			texture->resetCreate();
 		}
 	}
+}
+
+void TextureManager::renderTargetDestroyed(RenderTarget *renderTarget){
+	mRenderTargets.remove(renderTarget);
 }
 
 Renderer *TextureManager::getRenderer(){return mEngine->getRenderer();}

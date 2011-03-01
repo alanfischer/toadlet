@@ -46,8 +46,7 @@ Light::Light():
 	#endif
 	//position,
 	direction(0,0,-Math::ONE)
-{
-}
+{}
 
 }
 }

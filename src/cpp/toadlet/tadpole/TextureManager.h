@@ -36,7 +36,7 @@ namespace tadpole{
 
 class Engine;
 
-class TOADLET_API TextureManager:public ResourceManager{
+class TOADLET_API TextureManager:public ResourceManager,public peeper::RenderTargetDestroyedListener{
 public:
 	TextureManager(Engine *engine,bool backable);
 
@@ -54,6 +54,8 @@ public:
 	void contextDeactivate(peeper::Renderer *renderer);
 	void preContextReset(peeper::Renderer *renderer);
 	void postContextReset(peeper::Renderer *renderer);
+
+	void renderTargetDestroyed(peeper::RenderTarget *renderTarget);
 
 	peeper::Renderer *getRenderer();
 

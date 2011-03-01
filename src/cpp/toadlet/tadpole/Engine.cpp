@@ -154,18 +154,23 @@ namespace toadlet{
 namespace tadpole{
 
 Engine::Engine(bool backable):
+	mBackable(false),
 	//mDirectory,
 	mRenderer(NULL),
+	mLastRenderer(NULL),
 	mAudioPlayer(NULL),
+	mLastAudioPlayer(NULL),
 
 	mContextListener(NULL)
 {
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		String("creating ")+Categories::TOADLET_TADPOLE+".Engine:"+Version::STRING);
 
+	mBackable=backable;
+
 	mArchiveManager=new ArchiveManager();
-	mTextureManager=new TextureManager(this,backable);
-	mBufferManager=new BufferManager(this,backable);
+	mTextureManager=new TextureManager(this,mBackable);
+	mBufferManager=new BufferManager(this,mBackable);
 	mMaterialManager=new MaterialManager(this);
 	mFontManager=new FontManager(this->getArchiveManager());
 	mMeshManager=new MeshManager(this);
@@ -321,8 +326,16 @@ void Engine::destroy(){
 	mArchiveManager->destroy();
 }
 
-void Engine::setRenderer(Renderer *renderer){
+bool Engine::setRenderer(Renderer *renderer){
 	if(renderer!=NULL){
+		if(mLastRenderer==NULL){
+			mLastRenderer=renderer;
+		}
+		else if(mBackable==false && mLastRenderer!=renderer){
+			Error::unknown(Categories::TOADLET_TADPOLE,"can not change Renderer in an unbacked engine");
+			return false;
+		}
+
 		const toadlet::peeper::CapabilitySet &capabilitySet=renderer->getCapabilitySet();
 		Logger::alert(Categories::TOADLET_TADPOLE,
 			"Renderer Capabilities:");
@@ -373,6 +386,8 @@ void Engine::setRenderer(Renderer *renderer){
 		mIdealVertexFormatBit=mRenderer->getCapabilitySet().idealVertexFormatBit;
 		updateVertexFormats();
 	}
+
+	return true;
 }
 
 Renderer *Engine::getRenderer() const{
@@ -429,8 +444,18 @@ void Engine::updateVertexFormats(){
 	mVertexFormats.POSITION_NORMAL_COLOR_TEX_COORD=format;
 }
 
-void Engine::setAudioPlayer(AudioPlayer *audioPlayer){
+bool Engine::setAudioPlayer(AudioPlayer *audioPlayer){
+	if(mLastAudioPlayer==NULL){
+		mLastAudioPlayer=audioPlayer;
+	}
+	else if(mBackable==false && mLastAudioPlayer!=audioPlayer){
+		Error::unknown(Categories::TOADLET_TADPOLE,"can not change AudioPlayer in an unbacked engine");
+		return false;
+	}
+
 	mAudioPlayer=audioPlayer;
+
+	return true;
 }
 
 AudioPlayer *Engine::getAudioPlayer() const{

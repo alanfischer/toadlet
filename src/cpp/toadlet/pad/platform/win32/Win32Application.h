@@ -109,6 +109,7 @@ public:
 	virtual void setStopOnDeactivate(bool stopOnDeactivate){mStopOnDeactivate=stopOnDeactivate;}
 	virtual bool getStopOnDeactivate(){return mStopOnDeactivate;}
 
+	void setBackable(bool backable);
 	void changeRendererPlugin(const egg::String &plugin);
 	void setRendererOptions(int *options,int length);
 	void setAudioPlayerOptions(int *options,int length);
@@ -153,6 +154,7 @@ protected:
 	int mLastXMouse,mLastYMouse;
 	bool mSkipNextMove;
 	
+	bool mBackable;
 	tadpole::Engine *mEngine;
 	peeper::RenderTarget *mRenderTarget;
 	peeper::Renderer *mRenderer;

@@ -46,8 +46,7 @@ BackableBuffer::BackableBuffer():
 	mHasData(false),
 	mData(NULL)
 	//mBack
-{
-}
+{}
 
 BackableBuffer::~BackableBuffer(){
 	destroy();

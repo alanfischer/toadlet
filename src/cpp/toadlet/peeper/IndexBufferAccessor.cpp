@@ -35,8 +35,7 @@ IndexBufferAccessor::IndexBufferAccessor():
 	mIndexBuffer(NULL),
 	mIndexFormat(IndexBuffer::IndexFormat_UINT8),
 	mData(NULL)
-{
-}
+{}
 
 IndexBufferAccessor::IndexBufferAccessor(IndexBuffer *indexBuffer,int access):
 	mIndexBuffer(NULL),
