@@ -45,12 +45,21 @@ TextureManager::TextureManager(Engine *engine,bool backable):ResourceManager(eng
 	mBackable=backable;
 }
 
+TextureManager::~TextureManager(){
+	int i;
+	for(i=0;i<mRenderTargets.size();++i){
+		mRenderTargets[i]->setVertexFormatDestroyedListener(NULL);
+	}
+}
+
 void TextureManager::destroy(){
 	ResourceManager::destroy();
 
 	int i;
 	for(i=0;i<mRenderTargets.size();++i){
-		mRenderTargets[i]->destroy();
+		PixelBufferRenderTarget::ptr renderTarget=mRenderTargets[i];
+		renderTarget->setRenderTargetDestroyedListener(NULL);
+		renderTarget->destroy();
 	}
 	mRenderTargets.clear();
 }

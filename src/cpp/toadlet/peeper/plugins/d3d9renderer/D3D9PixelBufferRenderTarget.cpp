@@ -35,13 +35,12 @@ namespace peeper{
 
 D3D9PixelBufferRenderTarget::D3D9PixelBufferRenderTarget(D3D9Renderer *renderer):D3D9RenderTarget(),
 	mRenderer(NULL),
-	
 	mListener(NULL),
 	mWidth(0),
 	mHeight(0),
 	mNeedsCompile(false)
-	//mSurfaces,
-	//mSurfaceAttachments,
+	//mBuffers,
+	//mBufferAttachments,
 	//mDepthBuffer
 {
 	mRenderer=renderer;
@@ -100,6 +99,7 @@ bool D3D9PixelBufferRenderTarget::activate(){
 		}
 		result=true;
 	#endif
+
 	return result;
 }
 
