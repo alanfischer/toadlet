@@ -6,7 +6,6 @@ using namespace toadlet::egg;
 using namespace toadlet::tadpole;
 using namespace toadlet::tadpole::animation;
 using namespace toadlet::tadpole::node;
-using namespace toadlet::tadpole::mesh;
 
 int main(int argc,char **argv){
 	String arg;
@@ -67,10 +66,10 @@ int main(int argc,char **argv){
 		if(argc>=3 && numSequences>0){
 			int sequence=atoi(argv[2]);
 			if(sequence>=0 && sequence<numSequences){
-				meshNode->getAnimationController()->setSequenceIndex(sequence);
-				meshNode->getAnimationController()->setCycling(AnimationController::Cycling_LOOP);
-				meshNode->getAnimationController()->setTimeScale(Math::ONE);
-				meshNode->getAnimationController()->start();
+				meshNode->getController()->setSequenceIndex(sequence);
+				meshNode->getController()->setCycling(Controller::Cycling_LOOP);
+				meshNode->getController()->setTimeScale(Math::ONE);
+				meshNode->getController()->start();
 			}
 			else{
 				std::cout << "Invalid sequence number:" << sequence << std::endl;

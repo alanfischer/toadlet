@@ -1,19 +1,6 @@
-#include <toadlet/egg/Collection.h>
-#include <toadlet/egg/String.h>
-#include <toadlet/egg/io/FileStream.h>
-#include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/handler/XMSHHandler.h>
-
-#include <iostream>
-
 #include "VertexLighter.h"
-
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::peeper;
-using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::handler;
-using namespace toadlet::tadpole::mesh;
+#include <toadlet/tadpole/handler/XMSHHandler.h>
+#include <iostream>
 
 int main(int argc,char **argv){
 	String arg;

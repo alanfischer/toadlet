@@ -1,20 +1,4 @@
 #include "SMDConverter.h"
-#include <toadlet/egg/MathConversion.h>
-#include <toadlet/egg/Logger.h>
-#include <toadlet/egg/Error.h>
-#include <toadlet/peeper/IndexBufferAccessor.h>
-#include <toadlet/peeper/VertexBufferAccessor.h>
-#include <toadlet/tadpole/node/MeshNodeSkeleton.h>
-#include <stdio.h>
-
-using namespace toadlet;
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::egg::MathConversion;
-using namespace toadlet::peeper;
-using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::mesh;
-using namespace toadlet::tadpole::node;
 
 class Vertex{
 public:
@@ -95,12 +79,12 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 			else if(s.startsWith("skeleton")){
 				block=Block_SKELETON;
 				if(reference==false && mSkeleton!=NULL){
-					mSequence=Sequence::ptr(new Sequence());
+					mSequence=TransformSequence::ptr(new TransformSequence());
 					mSequence->setName(resourceName);
 					mSkeleton->sequences.add(mSequence);
 
 					for(int i=0;i<mSkeleton->bones.size();++i){
-						mSequence->tracks.add(Track::ptr(new Track()));
+						mSequence->tracks.add(TransformTrack::ptr(new TransformTrack()));
 					}
 				}
 			}
@@ -168,16 +152,16 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 				if(mSkeleton!=NULL){
 					if(reference){
 						Skeleton::Bone::ptr bone=mSkeleton->bones.at(id);
-						bone->translate.set(floatToScalar(px),floatToScalar(py),floatToScalar(pz));
-						setQuaternionFromXYZ(bone->rotate,floatToScalar(rx),floatToScalar(ry),floatToScalar(rz));
+						bone->translate.set(MathConversion::floatToScalar(px),MathConversion::floatToScalar(py),MathConversion::floatToScalar(pz));
+						setQuaternionFromXYZ(bone->rotate,MathConversion::floatToScalar(rx),MathConversion::floatToScalar(ry),MathConversion::floatToScalar(rz));
 					}
 					else{
-						Track::ptr track=mSequence->tracks.at(id);
+						TransformTrack::ptr track=mSequence->tracks.at(id);
 
-						KeyFrame keyFrame;
+						TransformKeyFrame keyFrame;
 						keyFrame.time=Math::fromInt(time)/mFPS;
-						keyFrame.translate.set(floatToScalar(px),floatToScalar(py),floatToScalar(pz));
-						setQuaternionFromXYZ(keyFrame.rotate,floatToScalar(rx),floatToScalar(ry),floatToScalar(rz));
+						keyFrame.translate.set(MathConversion::floatToScalar(px),MathConversion::floatToScalar(py),MathConversion::floatToScalar(pz));
+						setQuaternionFromXYZ(keyFrame.rotate,MathConversion::floatToScalar(rx),MathConversion::floatToScalar(ry),MathConversion::floatToScalar(rz));
 
 						track->keyFrames.add(keyFrame);
 					}
@@ -202,9 +186,9 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 
 				Vertex v;
 				v.bone=bone;
-				v.position.set(floatToScalar(px),floatToScalar(py),floatToScalar(pz));
-				v.normal.set(floatToScalar(nx),floatToScalar(ny),floatToScalar(nz));
-				v.texCoord.set(floatToScalar(tu),floatToScalar(tv));
+				v.position.set(MathConversion::floatToScalar(px),MathConversion::floatToScalar(py),MathConversion::floatToScalar(pz));
+				v.normal.set(MathConversion::floatToScalar(nx),MathConversion::floatToScalar(ny),MathConversion::floatToScalar(nz));
+				v.texCoord.set(MathConversion::floatToScalar(tu),MathConversion::floatToScalar(tv));
 				triverts[vertindex-1]=v;
 
 				if(++vertindex>3){
