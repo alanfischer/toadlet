@@ -48,7 +48,7 @@ TextureManager::TextureManager(Engine *engine,bool backable):ResourceManager(eng
 TextureManager::~TextureManager(){
 	int i;
 	for(i=0;i<mRenderTargets.size();++i){
-		mRenderTargets[i]->setVertexFormatDestroyedListener(NULL);
+		mRenderTargets[i]->setRenderTargetDestroyedListener(NULL);
 	}
 }
 
