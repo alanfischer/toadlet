@@ -39,6 +39,7 @@ class Engine;
 class TOADLET_API TextureManager:public ResourceManager,public peeper::RenderTargetDestroyedListener{
 public:
 	TextureManager(Engine *engine,bool backable);
+	virtual ~TextureManager();
 
 	void destroy();
 
