@@ -445,12 +445,14 @@ void Engine::updateVertexFormats(){
 }
 
 bool Engine::setAudioPlayer(AudioPlayer *audioPlayer){
-	if(mLastAudioPlayer==NULL){
-		mLastAudioPlayer=audioPlayer;
-	}
-	else if(mBackable==false && mLastAudioPlayer!=audioPlayer){
-		Error::unknown(Categories::TOADLET_TADPOLE,"can not change AudioPlayer in an unbacked engine");
-		return false;
+	if(audioPlayer!=NULL){
+		if(mLastAudioPlayer==NULL){
+			mLastAudioPlayer=audioPlayer;
+		}
+		else if(mBackable==false && mLastAudioPlayer!=audioPlayer){
+			Error::unknown(Categories::TOADLET_TADPOLE,"can not change AudioPlayer in an unbacked engine");
+			return false;
+		}
 	}
 
 	mAudioPlayer=audioPlayer;
