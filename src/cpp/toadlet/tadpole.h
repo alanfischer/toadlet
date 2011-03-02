@@ -95,6 +95,7 @@
 using namespace toadlet;
 using namespace toadlet::tadpole;
 using namespace toadlet::tadpole::animation;
+using namespace toadlet::tadpole::handler;
 using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::sensor;
 using namespace toadlet::tadpole::terrain;

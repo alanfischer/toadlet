@@ -12,7 +12,6 @@ using namespace toadlet::egg::io;
 using namespace toadlet::egg::math;
 using namespace toadlet::tadpole;
 using namespace toadlet::tadpole::handler;
-using namespace toadlet::tadpole::mesh;
 
 int main(int argc,char **argv){
 	String arg;

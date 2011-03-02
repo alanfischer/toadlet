@@ -15,7 +15,6 @@ using namespace toadlet::egg::math;
 using namespace toadlet::egg::math::Math;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::mesh;
 
 const static float MAXIMUM_ACCEPTABLE_SCALE=100.0f;
 const static float MINIMUM_ACCEPTABLE_SCALE=0.01f;
@@ -309,7 +308,7 @@ bool MicroMeshConverter::convertMesh(Mesh *mesh,Stream *outStream,float meshScal
 
 			actcBeginInput(mTC);
 			const IndexBuffer::ptr &indexBuffer=sub->indexData->getIndexBuffer();
-			TOADLET_ASSERT(indexBuffer->getIndexFormat()==IndexBuffer::IndexFormat_UINT_16);
+			TOADLET_ASSERT(indexBuffer->getIndexFormat()==IndexBuffer::IndexFormat_UINT16);
 			IndexBufferAccessor iba(indexBuffer);
 			for(j=0;j<iba.getSize()/3;++j){
 				actcAddTriangle(mTC,iba.get(j*3+0),iba.get(j*3+1),iba.get(j*3+2));
@@ -450,7 +449,7 @@ bool MicroMeshConverter::convertMesh(Mesh *mesh,Stream *outStream,float meshScal
 		}
 
 		for(i=0;i<skeleton->sequences.size();++i){
-			Sequence::ptr sequence=skeleton->sequences[i];
+			TransformSequence::ptr sequence=skeleton->sequences[i];
 
 			out->writeUInt8((char)ANIMATION_BLOCK);
 
@@ -460,10 +459,10 @@ bool MicroMeshConverter::convertMesh(Mesh *mesh,Stream *outStream,float meshScal
 			Collection<Quaternion> rotates;
 
 			for(j=0;j<sequence->tracks.size();++j){
-				Track::ptr &track=sequence->tracks[j];
+				TransformTrack::ptr &track=sequence->tracks[j];
 
 				for(k=0;k<track->keyFrames.size();++k){
-					KeyFrame &keyFrame=track->keyFrames[k];
+					TransformKeyFrame &keyFrame=track->keyFrames[k];
 
 					translates.add(keyFrame.translate * scaleModifier);
 					rotates.add(keyFrame.rotate);
@@ -504,7 +503,7 @@ bool MicroMeshConverter::convertMesh(Mesh *mesh,Stream *outStream,float meshScal
 			out->writeUInt8(sequence->tracks.size());
 
 			for(j=0;j<sequence->tracks.size();++j){
-				Track::ptr track=sequence->tracks[j];
+				TransformTrack::ptr track=sequence->tracks[j];
 
 				out->writeUInt8(track->index);
 
@@ -515,7 +514,7 @@ bool MicroMeshConverter::convertMesh(Mesh *mesh,Stream *outStream,float meshScal
 				out->writeBigUInt16(track->keyFrames.size());
 
 				for(k=0;k<track->keyFrames.size();++k){
-					const KeyFrame &keyFrame=track->keyFrames[k];
+					const TransformKeyFrame &keyFrame=track->keyFrames[k];
 
 					out->writeBigInt32(mathfixed::Math::floatToFixed(keyFrame.time));
 

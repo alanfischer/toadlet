@@ -20,34 +20,27 @@
 #ifndef BACCONVERTER_H
 #define BACCONVERTER_H
 
-#include <toadlet/egg/Collection.h>
-#include <toadlet/egg/Map.h> // For Pair
-#include <toadlet/egg/math/Vector2.h>
-#include <toadlet/egg/math/Vector3.h>
-#include <toadlet/egg/math/Vector4.h>
-#include <toadlet/egg/io/Stream.h>
-#include <toadlet/tadpole/mesh/Mesh.h>
-#include <toadlet/tadpole/node/MeshNode.h>
+#include <toadlet/toadlet.h>
 
 class BACVertex{
 public:
 	BACVertex():normal(0,0,1){}
 
-	toadlet::egg::math::Vector3 position;
-	toadlet::egg::math::Vector3 normal;
+	Vector3 position;
+	Vector3 normal;
 	int id;
 	int bone;
 };
 
 class BACTexCoord{
 public:
-	toadlet::egg::math::Vector2 texture;
+	Vector2 texture;
 	int id;
 };
 
 class BACTriangle{
 public:
-	toadlet::egg::math::Vector3 normal();
+	Vector3 normal();
 
 	BACVertex *vertex[3];
 	BACTexCoord *texture[3];
@@ -69,33 +62,33 @@ public:
 
 class BACBone{
 public:
-	toadlet::egg::String name;
+	String name;
 	bool hasChild;
 	bool hasBrother;
-	toadlet::egg::math::Vector3 translate;
-	toadlet::egg::math::Vector3 rotate;
-	toadlet::egg::math::Vector3 handle;
-	toadlet::egg::Collection<int> vertexIndexes;
+	Vector3 translate;
+	Vector3 rotate;
+	Vector3 handle;
+	Collection<int> vertexIndexes;
 };
 
 class BACAnimationBone{
 public:
-	toadlet::egg::String name;
-	toadlet::egg::Collection<toadlet::egg::Pair<int,float> > translatex;
-	toadlet::egg::Collection<toadlet::egg::Pair<int,float> > translatey;
-	toadlet::egg::Collection<toadlet::egg::Pair<int,float> > translatez;
-	toadlet::egg::Collection<toadlet::egg::Pair<int,float> > scalex;
-	toadlet::egg::Collection<toadlet::egg::Pair<int,float> > scaley;
-	toadlet::egg::Collection<toadlet::egg::Pair<int,float> > scalez;
-	toadlet::egg::Collection<toadlet::egg::Pair<int,float> > rotatex;
-	toadlet::egg::Collection<toadlet::egg::Pair<int,float> > rotatey;
-	toadlet::egg::Collection<toadlet::egg::Pair<int,float> > rotatez;
-	toadlet::egg::Collection<toadlet::egg::Pair<int,float> > roll;
+	String name;
+	Collection<Pair<int,float> > translatex;
+	Collection<Pair<int,float> > translatey;
+	Collection<Pair<int,float> > translatez;
+	Collection<Pair<int,float> > scalex;
+	Collection<Pair<int,float> > scaley;
+	Collection<Pair<int,float> > scalez;
+	Collection<Pair<int,float> > rotatex;
+	Collection<Pair<int,float> > rotatey;
+	Collection<Pair<int,float> > rotatez;
+	Collection<Pair<int,float> > roll;
 };
 
 class BACMaterial{
 public:
-	toadlet::egg::String name;
+	String name;
 	int colorIndex;
 	int textureIndex;
 	bool doubleSided;
@@ -111,11 +104,11 @@ public:
 
 class BACConverter{
 public:
-	BACConverter(toadlet::tadpole::Engine *engine);
+	BACConverter(Engine *engine);
 	virtual ~BACConverter();
 
-	bool convertMesh(toadlet::tadpole::mesh::Mesh::ptr mesh,toadlet::egg::io::Stream *stream,bool submeshes=true,bool quads=true,float adjust=0,int version=6);
-	bool convertAnimation(toadlet::tadpole::mesh::Mesh::ptr mesh,toadlet::tadpole::mesh::Sequence *animation,toadlet::egg::io::Stream *stream,int version=4);
+	bool convertMesh(Mesh::ptr mesh,Stream *stream,bool submeshes=true,bool quads=true,float adjust=0,int version=6);
+	bool convertAnimation(Mesh::ptr mesh,TransformSequence *animation,Stream *stream,int version=4);
 
 	void setPositionEpsilon(float epsilon){mPositionEpsilon=epsilon;}
 	float getPositionEpsilon() const{return mPositionEpsilon;}
@@ -150,17 +143,17 @@ protected:
 		TRA_MAGIC=0x12345678,
 	};
 
-	bool extractMeshData(toadlet::tadpole::mesh::Mesh::ptr mesh,bool submeshes=true);
-	void buildBones(toadlet::tadpole::mesh::Mesh *mesh,toadlet::tadpole::node::MeshNodeSkeleton *nodeSkeleton,int bone);
+	bool extractMeshData(Mesh::ptr mesh,bool submeshes=true);
+	void buildBones(Mesh *mesh,MeshNodeSkeleton *nodeSkeleton,int bone);
 	void constructQuads();
 	void rewindTriangles();
 	void adjustVertexes(float amount);
-	void writeOutModelVersion6(toadlet::egg::io::Stream *stream);
-	void writeOutModelVersion5(toadlet::egg::io::Stream *stream);
+	void writeOutModelVersion6(Stream *stream);
+	void writeOutModelVersion5(Stream *stream);
 
-	void extractAnimationData(toadlet::tadpole::mesh::Mesh *mesh,toadlet::tadpole::mesh::Sequence *animation);
-	void writeOutAnimationVersion4(toadlet::egg::io::Stream *stream);
-	void writeOutAnimationVersion3(toadlet::egg::io::Stream *stream);
+	void extractAnimationData(Mesh *mesh,TransformSequence *animation);
+	void writeOutAnimationVersion4(Stream *stream);
+	void writeOutAnimationVersion3(Stream *stream);
 	void clean();
 	
 	float mPositionEpsilon;
@@ -172,17 +165,17 @@ protected:
 	bool mHasNormal;
 	bool mHasBone;
 
-	toadlet::tadpole::Engine *mEngine;
-	toadlet::egg::String mName;
-	toadlet::egg::Collection<BACVertex *> mVertices;
-	toadlet::egg::Collection<BACTexCoord *> mTexCoords;
-	toadlet::egg::Collection<BACTriangle *> mTriangles;
-	toadlet::egg::Collection<BACQuad *> mQuads;
-	toadlet::egg::Collection<toadlet::peeper::Color> mColors;
-	toadlet::egg::Collection<toadlet::egg::math::Vector2> mTextures;
-	toadlet::egg::Collection<BACMaterial *> mMaterials;
-	toadlet::egg::Collection<BACBone *> mBones;
-	toadlet::egg::Collection<BACAnimationBone *> mAnimationBones;
+	Engine *mEngine;
+	String mName;
+	Collection<BACVertex *> mVertices;
+	Collection<BACTexCoord *> mTexCoords;
+	Collection<BACTriangle *> mTriangles;
+	Collection<BACQuad *> mQuads;
+	Collection<Color> mColors;
+	Collection<Vector2> mTextures;
+	Collection<BACMaterial *> mMaterials;
+	Collection<BACBone *> mBones;
+	Collection<BACAnimationBone *> mAnimationBones;
 };
 
 #endif
