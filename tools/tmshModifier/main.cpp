@@ -1,17 +1,7 @@
-#include <toadlet/egg/String.h>
-#include <toadlet/egg/io/FileStream.h>
-#include <toadlet/tadpole/Engine.h>
+#include <toadlet/toadlet.h>
 #include <toadlet/tadpole/handler/XANMHandler.h>
 #include <toadlet/tadpole/handler/XMSHHandler.h>
-
 #include <iostream>
-
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::peeper;
-using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::handler;
-using namespace toadlet::tadpole::mesh;
 
 int main(int argc,char **argv){
 	String arg;
@@ -76,7 +66,7 @@ int main(int argc,char **argv){
 		}
 
 		for(i=0;i<skeleton->sequences.size();++i){
-			Sequence::ptr sequence=skeleton->sequences[i];
+			TransformSequence::ptr sequence=skeleton->sequences[i];
 
 			String name;
 			if(sequence->getName().length()>0){
@@ -115,7 +105,7 @@ int main(int argc,char **argv){
 				return 0;
 			}
 			XANMHandler::ptr handler(new XANMHandler());
-			Sequence::ptr sequence=shared_static_cast<Sequence>(handler->load(stream,NULL));
+			TransformSequence::ptr sequence=shared_static_cast<TransformSequence>(handler->load(stream,NULL));
 			skeleton->sequences.add(sequence);
 		}
 

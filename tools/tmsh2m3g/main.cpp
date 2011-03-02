@@ -1,18 +1,6 @@
-#include <toadlet/egg/String.h>
-#include <toadlet/egg/io/FileStream.h>
-#include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/MeshManager.h>
-
-#include <iostream>
-
 #include "M3GConverter.h"
 #include "../shared/MeshPreprocess.h"
-
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::egg::math;
-using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::mesh;
+#include <iostream>
 
 int main(int argc,char **argv){
 	String arg;

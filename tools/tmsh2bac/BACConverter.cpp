@@ -18,26 +18,9 @@
  ********** Copyright header - do not remove **********/
 
 #include "BACConverter.h"
-#include <toadlet/egg/Logger.h>
-#include <toadlet/egg/io/DataStream.h>
-#include <toadlet/egg/math/Math.h>
-#include <toadlet/peeper/IndexBuffer.h>
-#include <toadlet/peeper/VertexBuffer.h>
-#include <toadlet/peeper/Color.h>
-#include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/node/ParentNode.h>
 #include <iostream>
 #include <sstream>
 #include <string.h>
-
-using namespace toadlet;
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::egg::math;
-using namespace toadlet::peeper;
-using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::mesh;
-using namespace toadlet::tadpole::node;
 
 const int EXPORT_FPS=30;
 
@@ -1151,7 +1134,7 @@ void BACConverter::writeOutModelVersion5(Stream *tout){
 	delete out;
 }
 
-bool BACConverter::convertAnimation(Mesh::ptr mesh,Sequence *animation,Stream *out,int version){
+bool BACConverter::convertAnimation(Mesh::ptr mesh,TransformSequence *animation,Stream *out,int version){
 	extractAnimationData(mesh,animation);
 
 	if(version==4){
@@ -1166,13 +1149,13 @@ bool BACConverter::convertAnimation(Mesh::ptr mesh,Sequence *animation,Stream *o
 	return true;
 }
 
-void BACConverter::extractAnimationData(Mesh *mesh,Sequence *animation){
+void BACConverter::extractAnimationData(Mesh *mesh,TransformSequence *animation){
 	int i,j;
 
 	mTotalFrame=(animation->length*EXPORT_FPS)+1; // Must add 1 so we are above the max keyFrame.time*EXPORT_FPS
 
 	for(i=0;i<animation->tracks.size();++i){
-		Track *track=animation->tracks[i];
+		TransformTrack *track=animation->tracks[i];
 
 		int boneIndex=track->index;
 		Skeleton::Bone *meshbone=mesh->skeleton->bones[boneIndex];
@@ -1193,7 +1176,7 @@ void BACConverter::extractAnimationData(Mesh *mesh,Sequence *animation){
 			// And use that as '1' for the time values
 
 			for(j=0;j<track->keyFrames.size();++j){
-				const KeyFrame &keyFrame=track->keyFrames[j];
+				const TransformKeyFrame &keyFrame=track->keyFrames[j];
 
 				int frame=keyFrame.time*EXPORT_FPS;
 

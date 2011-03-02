@@ -20,8 +20,7 @@
 #ifndef M3GCONVERTER_H
 #define M3GCONVERTER_H
 
-#include <toadlet/tadpole/mesh/Mesh.h>
-#include <toadlet/egg/io/Stream.h>
+#include <toadlet/toadlet.h>
 
 #define USE_ACTC
 #define DONT_USE_NVTRISTRIP
@@ -44,10 +43,10 @@ public:
 	M3GConverter();
 	~M3GConverter();
 
-	bool convertMesh(toadlet::tadpole::mesh::Mesh *mesh,toadlet::egg::io::Stream *out,float scale,int forceBytes,bool invertYTexCoord,bool viewable,int animation);
+	bool convertMesh(Mesh *mesh,Stream *out,float scale,int forceBytes,bool invertYTexCoord,bool viewable,int animation);
 
 protected:
-	M3GObject3D *buildSceneGraph(toadlet::tadpole::mesh::Mesh *mesh,float scale,int forceBytes,bool invertYTexCoord,bool viewable,int animation);
+	M3GObject3D *buildSceneGraph(Mesh *mesh,float scale,int forceBytes,bool invertYTexCoord,bool viewable,int animation);
 
 #ifdef USE_ACTC
 	ACTCData *mTC;

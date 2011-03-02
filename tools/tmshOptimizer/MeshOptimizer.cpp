@@ -1,15 +1,6 @@
 #include "MeshOptimizer.h"
-
+#include <toadlet/toadlet.h>
 #include <iostream>
-
-using namespace toadlet;
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::egg::math;
-using namespace toadlet::egg::math::Math;
-using namespace toadlet::peeper;
-using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::mesh;
 
 MeshOptimizer::MeshOptimizer(){
 	mEpsilon=0.001f;
@@ -145,14 +136,14 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 					Vector3 position1,position2;
 					vba.get3(i,positionIndex,position1);
 					vba.get3(j,positionIndex,position2);
-					if(length(position1,position2)>mEpsilon) same=false;
+					if(Math::length(position1,position2)>mEpsilon) same=false;
 				}
 
 				if(normalIndex>=0){
 					Vector3 normal1,normal2;
 					vba.get3(i,normalIndex,normal1);
 					vba.get3(j,normalIndex,normal2);
-					if(length(normal1,normal2)>mEpsilon) same=false;
+					if(Math::length(normal1,normal2)>mEpsilon) same=false;
 				}
 
 				if(colorIndex>=0){
@@ -163,7 +154,7 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 					Vector2 texCoord1,texCoord2;
 					vba.get2(i,texCoordIndex,texCoord1);
 					vba.get2(j,texCoordIndex,texCoord2);
-					if(length(texCoord1,texCoord2)>mEpsilon) same=false;
+					if(Math::length(texCoord1,texCoord2)>mEpsilon) same=false;
 				}
 
 				if(mesh->vertexBoneAssignments.size()>0){
@@ -308,7 +299,7 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 	Skeleton::ptr skeleton=mesh->skeleton;
 	if(skeleton!=NULL){
 		for(i=0;i<skeleton->sequences.size();++i){
-			Sequence::ptr sequence=skeleton->sequences[i];
+			TransformSequence::ptr sequence=skeleton->sequences[i];
 			for(j=0;j<sequence->tracks.size();++j){
 				if(sequence->tracks[j]->keyFrames.size()==0){
 					sequence->tracks.removeAt(j);

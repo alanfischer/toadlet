@@ -18,28 +18,10 @@
  ********** Copyright header - do not remove **********/
 
 #include "M3GConverter.h"
-#include <toadlet/egg/EndianConversion.h>
-#include <toadlet/egg/Error.h>
-#include <toadlet/egg/Logger.h>
-#include <toadlet/egg/io/MemoryStream.h>
-#include <toadlet/egg/io/DataStream.h>
-#include <toadlet/peeper/IndexBufferAccessor.h>
-#include <toadlet/peeper/VertexBufferAccessor.h>
-#include <toadlet/tadpole/Material.h>
 #include "../shared/Adler32.h"
 #include "../shared/VertexCompression.h"
-
 #include <iostream>
 #include <sstream>
-
-using namespace toadlet;
-using namespace toadlet::egg;
-using namespace toadlet::egg::math;
-using namespace toadlet::egg::math::Math;
-using namespace toadlet::egg::io;
-using namespace toadlet::peeper;
-using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::mesh;
 
 class M3GProxy{
 public:
@@ -240,12 +222,12 @@ class M3GTransformable:public M3GObject3D{
 public:
 	M3GTransformable():M3GObject3D(){
 		hasComponentTransform=false;
-		translation=ZERO_VECTOR3;
-		scale=Vector3(1,1,1);
+		translation=Math::ZERO_VECTOR3;
+		scale=Math::ONE_VECTOR3;
 		orientationAngle=0;
-		orientationAxis=Z_UNIT_VECTOR3;
+		orientationAxis=Math::Z_UNIT_VECTOR3;
 		hasGeneralTransform=false;
-		transform=IDENTITY_MATRIX4X4;
+		transform=Math::IDENTITY_MATRIX4X4;
 	}
 
 	virtual void getData(DataStream *out){
@@ -633,7 +615,7 @@ public:
 		M3GObject3D::getData(out);
 		writeColorRGBA(out,defaultColor);
 		writeObjectIndex(out,positions);
-		writeVector3(out,positions!=NULL?positions->bias:ZERO_VECTOR3);
+		writeVector3(out,positions!=NULL?positions->bias:Math::ZERO_VECTOR3);
 		writeFloat(out,positions!=NULL?positions->scale:1.0f);
 		writeObjectIndex(out,normals);
 		writeObjectIndex(out,colors);
@@ -641,7 +623,7 @@ public:
 		int i;
 		for(i=0;i<texCoordArrays.size();++i){
 			writeObjectIndex(out,texCoordArrays[i]);
-			writeVector3(out,texCoordArrays[i]!=NULL?texCoordArrays[i]->bias:ZERO_VECTOR3);
+			writeVector3(out,texCoordArrays[i]!=NULL?texCoordArrays[i]->bias:Math::ZERO_VECTOR3);
 			writeFloat(out,texCoordArrays[i]!=NULL?texCoordArrays[i]->scale:1.0f);
 		}
 	}
@@ -1592,7 +1574,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 
 			// Setup bone transform
 			bone->hasComponentTransform=true;
-			bone->orientationAngle=setAxisAngleFromQuaternion(bone->orientationAxis,toadletBone->rotate,0.0001);
+			bone->orientationAngle=Math::setAxisAngleFromQuaternion(bone->orientationAxis,toadletBone->rotate,0.0001);
 			bone->translation=toadletBone->translate*scale;
 			bone->scale=toadletBone->scale;
 		}
@@ -1600,7 +1582,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 		skinnedMesh->userParameters.resize(toadletSkeleton->sequences.size());
 
 		for(i=0;i<toadletSkeleton->sequences.size();++i){
-			Sequence *sequence=toadletSkeleton->sequences[i];
+			TransformSequence *sequence=toadletSkeleton->sequences[i];
 
 			M3GAnimationController *animationController=new M3GAnimationController();
 			animationController->speed=1.0f;
@@ -1624,7 +1606,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 			skinnedMesh->userParameters[i].value.add(i+1);
 
 			for(j=0;j<sequence->tracks.size();++j){
-				Track *track=sequence->tracks[j];
+				TransformTrack *track=sequence->tracks[j];
 
 				M3GKeyframeSequence *translationSequence=new M3GKeyframeSequence();
 				translationSequence->repeatMode=M3GKeyframeSequence::CONSTANT;
@@ -1730,7 +1712,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 				}
 
 				for(k=0;k<track->keyFrames.size();++k){
-					const KeyFrame &keyFrame=track->keyFrames[k];
+					const TransformKeyFrame &keyFrame=track->keyFrames[k];
 
 					if(translationBytes==1){
 						translationSequence->byteKeyframes[k].time=(unsigned int)(keyFrame.time*1000);
@@ -1847,7 +1829,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 					(float*)&bias,(float*)&scale,255);
 
 				positions->bias=bias;
-				positions->scale=maxVal(maxVal(scale[0],scale[1]),scale[2]);
+				positions->scale=Math::maxVal(Math::maxVal(scale[0],scale[1]),scale[2]);
 
 				for(i=0;i<numVertexes;++i){
 					vba.get3(i,positionIndex,position);
@@ -1868,7 +1850,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 					(float*)&bias,(float*)&scale,65535);
 
 				positions->bias=bias;
-				positions->scale=maxVal(maxVal(scale[0],scale[1]),scale[2]);
+				positions->scale=Math::maxVal(Math::maxVal(scale[0],scale[1]),scale[2]);
 
 				for(i=0;i<numVertexes;++i){
 					vba.get3(i,positionIndex,position);
@@ -1956,7 +1938,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 					(float*)&bias,(float*)&scale,255);
 
 				texCoords->bias=bias;
-				texCoords->scale=maxVal(scale[0],scale[1]);
+				texCoords->scale=Math::maxVal(scale[0],scale[1]);
 
 				for(i=0;i<numVertexes;++i){
 					vba.get2(i,texCoordIndex,texCoord);
@@ -1979,7 +1961,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 					(float*)&bias,(float*)&scale,65535);
 
 				texCoords->bias=bias;
-				texCoords->scale=maxVal(scale[0],scale[1]);
+				texCoords->scale=Math::maxVal(scale[0],scale[1]);
 
 				for(i=0;i<numVertexes;++i){
 					vba.get2(i,texCoordIndex,texCoord);

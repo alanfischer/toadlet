@@ -17,17 +17,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/Collection.h>
-#include <toadlet/peeper/IndexBufferAccessor.h>
-#include <toadlet/peeper/VertexBufferAccessor.h>
-
 #include "MeshPreprocess.h"
-
-using namespace toadlet;
-using namespace toadlet::egg;
-using namespace toadlet::peeper;
-using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::mesh;
+#include <toadlet/toadlet.h>
 
 #define EPSILON 0.0001f
 
@@ -63,7 +54,7 @@ void MeshPreprocess::adjustTexCoords(Mesh *mesh,float texCoordAdjust){
 			IndexBuffer::ptr indexBuffer=indexData->getIndexBuffer();
 			IndexBufferAccessor iba(indexBuffer);
 
-			TOADLET_ASSERT(indexBuffer->getIndexFormat()==IndexBuffer::IndexFormat_UINT_16);
+			TOADLET_ASSERT(indexBuffer->getIndexFormat()==IndexBuffer::IndexFormat_UINT16);
 
 			int j;
 			for(j=0;j<indexBuffer->getSize()/3;++j){
@@ -130,7 +121,7 @@ void MeshPreprocess::adjustPositions(Mesh *mesh,float positionAdjust){
 			IndexBuffer::ptr indexBuffer=indexData->getIndexBuffer();
 			IndexBufferAccessor iba(indexBuffer);
 
-			TOADLET_ASSERT(indexBuffer->getIndexFormat()==IndexBuffer::IndexFormat_UINT_16);
+			TOADLET_ASSERT(indexBuffer->getIndexFormat()==IndexBuffer::IndexFormat_UINT16);
 
 			Vector3 pi0,pi1,pi2;
 			int j;

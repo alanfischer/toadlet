@@ -1,16 +1,6 @@
-#include <toadlet/egg/Collection.h>
-#include <toadlet/egg/String.h>
-#include <toadlet/egg/io/FileStream.h>
-#include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/mesh/Mesh.h>
+#include "SMDConverter.h"
 #include <toadlet/tadpole/handler/XMSHHandler.h>
 #include <iostream>
-#include "SMDConverter.h"
-
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::handler;
 
 int main(int argc,char **argv){
 	String arg;

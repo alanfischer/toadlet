@@ -20,31 +20,31 @@
 #ifndef VERTEXLIGHTER_H
 #define VERTEXLIGHTER_H
 
-#include <toadlet/tadpole/Engine.h>
+#include <toadlet/toadlet.h>
 
 class VertexLighter{
 public:
-	VertexLighter(toadlet::tadpole::Engine *engine);
+	VertexLighter(Engine *engine);
 	virtual ~VertexLighter();
 
-	void lightMesh(toadlet::tadpole::mesh::Mesh *mesh);
+	void lightMesh(Mesh *mesh);
 
-	void setLightDirection(const toadlet::tadpole::Vector3 &direction);
-	void setLightDiffuseColor(const toadlet::peeper::Color &diffuseColor);
-	void setLightAmbientColor(const toadlet::peeper::Color &ambientColor);
-	void setLightFalloffFactor(toadlet::scalar falloff);
+	void setLightDirection(const Vector3 &direction);
+	void setLightDiffuseColor(const Color &diffuseColor);
+	void setLightAmbientColor(const Color &ambientColor);
+	void setLightFalloffFactor(scalar falloff);
 	void setKeepNormals(bool keepNormals);
-	void setLightEdges(bool edges,toadlet::scalar edgeEpsilon);
+	void setLightEdges(bool edges,scalar edgeEpsilon);
 
 protected:
-	toadlet::tadpole::Engine *mEngine;
-	toadlet::tadpole::Vector3 mDirection;
-	toadlet::peeper::Color mDiffuseColor;
-	toadlet::peeper::Color mAmbientColor;
-	toadlet::scalar mFalloffFactor;
+	Engine *mEngine;
+	Vector3 mDirection;
+	Color mDiffuseColor;
+	Color mAmbientColor;
+	scalar mFalloffFactor;
 	bool mKeepNormals;
 	bool mLightEdges;
-	toadlet::scalar mEdgeEpsilon;
+	scalar mEdgeEpsilon;
 };
 
 #endif
