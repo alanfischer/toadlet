@@ -20,12 +20,12 @@
 #ifndef MESHPREPROCESSES_H
 #define MESHPREPROCESSES_H
 
-#include <toadlet/tadpole/mesh/Mesh.h>
+#include <toadlet/tadpole/Mesh.h>
 
 class MeshPreprocess{
 public:
-	static void adjustTexCoords(toadlet::tadpole::mesh::Mesh *mesh,float texCoordAdjust);
-	static void adjustPositions(toadlet::tadpole::mesh::Mesh *mesh,float positionAdjust);
+	static void adjustTexCoords(toadlet::tadpole::Mesh *mesh,float texCoordAdjust);
+	static void adjustPositions(toadlet::tadpole::Mesh *mesh,float positionAdjust);
 };
 
 #endif

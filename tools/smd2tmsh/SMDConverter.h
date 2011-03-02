@@ -1,12 +1,9 @@
 #ifndef SMDCONVERTER_H
 #define SMDCONVERTER_H
 
-#include <toadlet/egg/io/Stream.h>
-#include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/mesh/Mesh.h>
+#include <toadlet/toadlet.h>
 
 class Vertex;
-using toadlet::scalar;
 
 class SMDConverter{
 public:
@@ -19,9 +16,9 @@ public:
 
 	SMDConverter();
 
-	void load(toadlet::tadpole::Engine *engine,toadlet::egg::io::Stream *in,const toadlet::egg::String &fileName);
+	void load(Engine *engine,Stream *in,const String &fileName);
 
-	toadlet::tadpole::mesh::Mesh::ptr getMesh(){return mMesh;}
+	Mesh::ptr getMesh(){return mMesh;}
 
 	void setPositionEpsilon(scalar epsilon){mPositionEpsilon=epsilon;}
 	scalar getPositionEpsilon() const{return mPositionEpsilon;}
@@ -42,15 +39,15 @@ public:
 	bool getInvertFaces() const{return mInvertFaces;}
 
 protected:
-	toadlet::egg::String readLine(toadlet::egg::io::Stream *in);
-	void setQuaternionFromXYZ(toadlet::tadpole::Quaternion &r,scalar x,scalar y,scalar z);
+	String readLine(Stream *in);
+	void setQuaternionFromXYZ(Quaternion &r,scalar x,scalar y,scalar z);
 	bool vertsEqual(const Vertex &v1,const Vertex &v2);
 
-	toadlet::tadpole::Engine *mEngine;
+	Engine *mEngine;
 
-	toadlet::tadpole::mesh::Mesh::ptr mMesh;
-	toadlet::tadpole::mesh::Skeleton::ptr mSkeleton;
-	toadlet::tadpole::mesh::Sequence::ptr mSequence;
+	Mesh::ptr mMesh;
+	Skeleton::ptr mSkeleton;
+	TransformSequence::ptr mSequence;
 
 	scalar mPositionEpsilon;
 	scalar mNormalEpsilon;

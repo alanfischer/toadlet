@@ -18,13 +18,6 @@
  ********** Copyright header - do not remove **********/
 
 #include "VertexLighter.h"
-#include "string.h"
-
-using namespace toadlet;
-using namespace toadlet::egg;
-using namespace toadlet::peeper;
-using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::mesh;
 
 VertexLighter::VertexLighter(Engine *engine){
 	mEngine=engine;

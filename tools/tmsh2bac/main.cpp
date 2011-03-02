@@ -1,20 +1,6 @@
-#include <toadlet/egg/Collection.h>
-#include <toadlet/egg/String.h>
-#include <toadlet/egg/io/FileStream.h>
-#include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/TextureManager.h>
-#include <toadlet/tadpole/mesh/Mesh.h>
-
+#include "BACConverter.h"
 #include <iostream>
 #include <sstream>
-
-#include "BACConverter.h"
-
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::egg::math;
-using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::mesh;
 
 class TextureArchive:public Archive,public BaseResource{
 public:
