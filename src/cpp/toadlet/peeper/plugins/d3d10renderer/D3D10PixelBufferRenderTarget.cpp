@@ -22,9 +22,9 @@
  * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
  *
  ********** Copyright header - do not remove **********/
-#if 0
+
 #include "D3D10Renderer.h"
-#include "D3D10SurfaceRenderTarget.h"
+#include "D3D10PixelBufferRenderTarget.h"
 #include <toadlet/egg/Error.h>
 
 using namespace toadlet::egg;
@@ -33,8 +33,9 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-D3D10SurfaceRenderTarget::D3D10SurfaceRenderTarget(D3D10Renderer *renderer):D3D10RenderTarget(),
+D3D10PixelBufferRenderTarget::D3D10PixelBufferRenderTarget(D3D10Renderer *renderer):D3D10RenderTarget(),
 	mRenderer(NULL),
+	mListener(NULL),
 	mWidth(0),
 	mHeight(0),
 	mNeedsCompile(false)
@@ -43,121 +44,114 @@ D3D10SurfaceRenderTarget::D3D10SurfaceRenderTarget(D3D10Renderer *renderer):D3D1
 	//mOwnedSurfaces
 {
 	mRenderer=renderer;
+	mD3DDevice=mRenderer->getD3D10Device();
 }
 
-D3D10SurfaceRenderTarget::~D3D10SurfaceRenderTarget(){
+D3D10PixelBufferRenderTarget::~D3D10PixelBufferRenderTarget(){
 	destroy();
 }
 
-bool D3D10SurfaceRenderTarget::create(){
+bool D3D10PixelBufferRenderTarget::create(){
 	destroy();
 
 	mWidth=0;
 	mHeight=0;
 	mNeedsCompile=true;
 
+	D3D10RenderTarget::create();
+
 	return true;
 }
 
-bool D3D9SurfaceRenderTarget::destroy(){
-	int i;
-	for(i=0;i<mOwnedSurfaces.size();++i){
-		mOwnedSurfaces[i]->destroy();
+void D3D10PixelBufferRenderTarget::destroy(){
+	D3D10RenderTarget::destroy();
+
+	if(mDepthBuffer!=NULL){
+		mDepthBuffer->destroy();
+		mDepthBuffer=NULL;
 	}
-	mOwnedSurfaces.clear();
 
-	return true;
+	if(mListener!=NULL){
+		mListener->renderTargetDestroyed((PixelBufferRenderTarget*)this);
+		mListener=NULL;
+	}
 }
 
-bool D3D9SurfaceRenderTarget::makeCurrent(IDirect3DDevice9 *device){
+bool D3D10PixelBufferRenderTarget::activate(){
 	if(mNeedsCompile){
 		compile();
 	}
 
-	bool result=false;
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		if(mSurfaces.size()>=2 && mSurfaces[0]!=NULL && mSurfaces[1]!=NULL){
-			D3D9Surface *renderSurface=(D3D9Surface*)mSurfaces[0]->getRootSurface();
-			D3D9Surface *depthSurface=(D3D9Surface*)mSurfaces[1]->getRootSurface();
-			device->SetRenderTarget(renderSurface->getSurface(),depthSurface->getSurface());
-			result=true;
-		}
-	#else
-		int i;
-		for(i=0;i<mSurfaces.size();++i){
-			D3D9Surface *surface=(D3D9Surface*)mSurfaces[i]->getRootSurface();
-			Attachment attachment=mSurfaceAttachments[i];
-			if(attachment==Attachment_DEPTH_STENCIL){
-				device->SetDepthStencilSurface(surface->getSurface());
-			}
-			else{
-				device->SetRenderTarget(0,surface->getSurface());
-			}
-		}
-		result=true;
-	#endif
-	return result;
+	return D3D10RenderTarget::activate();
 }
 
-bool D3D9SurfaceRenderTarget::attach(Surface::ptr surface,Attachment attachment){
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		mSurfaces.resize(2);
-		mSurfaceAttachments.resize(2);
-		if(attachment==Attachment_DEPTH_STENCIL){
-			mSurfaces.setAt(1,surface);
-			mSurfaceAttachments.setAt(1,attachment);
-		}
-		else{
-			mSurfaces.setAt(0,surface);
-			mSurfaceAttachments.setAt(0,attachment);
-		}
-	#else
-		mSurfaces.add(surface);
-		mSurfaceAttachments.add(attachment);
-	#endif
+bool D3D10PixelBufferRenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachment){
+	mBuffers.add(buffer);
+	mBufferAttachments.add(attachment);
 
-	mWidth=surface->getWidth();
-	mHeight=surface->getHeight();
+	mWidth=buffer->getWidth();
+	mHeight=buffer->getHeight();
 	mNeedsCompile=true;
 
 	return true;
 }
 
-bool D3D9SurfaceRenderTarget::remove(Surface::ptr surface){
+bool D3D10PixelBufferRenderTarget::remove(PixelBuffer::ptr buffer){
 	int i;
-	for(i=0;i<mSurfaces.size();++i){
-		if(mSurfaces[i]==surface){
+	for(i=0;i<mBuffers.size();++i){
+		if(mBuffers[i]==buffer){
 			break;
 		}
 	}
-	if(i==mSurfaces.size()){
+	if(i==mBuffers.size()){
 		return false;
 	}
 
-	mSurfaces.remove(i);
-	mSurfaceAttachments.remove(i);
+	mBuffers.removeAt(i);
+	mBufferAttachments.removeAt(i);
 	mNeedsCompile=true;
 
 	return true;
 }
 
-bool D3D9SurfaceRenderTarget::compile(){
-	Surface::ptr depth;
-	Surface::ptr color;
+bool D3D10PixelBufferRenderTarget::compile(){
+	PixelBuffer::ptr depth;
+	PixelBuffer::ptr color;
 
 	int i;
-	for(i=0;i<mSurfaceAttachments.size();++i){
-		if(mSurfaceAttachments[i]==Attachment_DEPTH_STENCIL){
-			depth=mSurfaces[i];
+	for(i=0;i<mBufferAttachments.size();++i){
+		if(mBufferAttachments[i]==Attachment_DEPTH_STENCIL){
+			depth=mBuffers[i];
 		}
 		else{
-			color=mSurfaces[i];
+			color=mBuffers[i];
 		}
+	}
+
+	if(mDepthBuffer!=NULL){
+		remove(mDepthBuffer);
+		mDepthBuffer->destroy();
+		mDepthBuffer=NULL;
 	}
 
 	if(color!=NULL && depth==NULL){
 		// No Depth-Stencil surface, so add one
-		attach(createBufferSurface(Texture::Format_DEPTH_8,mWidth,mHeight),Attachment_DEPTH_STENCIL);
+		D3D10TextureMipPixelBuffer::ptr buffer(new D3D10TextureMipPixelBuffer(mRenderer));
+		if(buffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_NONE,Texture::Format_DEPTH_16,mWidth,mHeight,1)){
+			attach(buffer,Attachment_DEPTH_STENCIL);
+			mDepthBuffer=buffer;
+		}
+	}
+
+	mRenderTargetViews.clear();
+	for(i=0;i<mBufferAttachments.size();++i){
+		D3D10TextureMipPixelBuffer::ptr buffer=shared_static_cast<D3D10TextureMipPixelBuffer>(mBuffers[i]);
+		if(mBufferAttachments[i]==Attachment_DEPTH_STENCIL){
+			mDepthStencilView=buffer->getD3D10DepthStencilView();
+		}
+		else{
+			mRenderTargetViews.add(buffer->getD3D10RenderTargetView());
+		}
 	}
 
 	mNeedsCompile=false;
@@ -165,42 +159,5 @@ bool D3D9SurfaceRenderTarget::compile(){
 	return true;
 }
 
-/// @todo: Make this do more than just clone depth.  Create color, and create varying depths
-Surface::ptr D3D9SurfaceRenderTarget::createBufferSurface(int format,int width,int height){
-#if 1
-	IDirect3DDevice9 *device=mRenderer->getDirect3DDevice9();
-	IDirect3DSurface9 *deviceDepthSurface=NULL;
-	HRESULT result=device->GetDepthStencilSurface(&deviceDepthSurface);
-	if(FAILED(result)){
-		TOADLET_CHECK_D3D9ERROR(result,"GetDepthStencilSurface");
-		return NULL;
-	}
-
-	D3DSURFACE_DESC desc;
-	result=deviceDepthSurface->GetDesc(&desc);
-	deviceDepthSurface->Release();
-	if(FAILED(result)){
-		TOADLET_CHECK_D3D9ERROR(result,"GetDesc");
-		return NULL;
-	}
-
-	IDirect3DSurface9 *d3dsurface=NULL;
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		result=device->CreateDepthStencilSurface(width,height,desc.Format,desc.MultiSampleType,&d3dsurface TOADLET_SHAREDHANDLE);
-	#else
-		result=device->CreateDepthStencilSurface(width,height,desc.Format,desc.MultiSampleType,NULL,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
-	#endif
-	if(FAILED(result)){
-		TOADLET_CHECK_D3D9ERROR(result,"CreateDepthStencilSurface");
-		return NULL;
-	}
-#endif
-
-	D3D9Surface::ptr surface(new D3D9Surface(d3dsurface));
-	mOwnedSurfaces.add(surface);
-	return surface;
-}
-
 }
 }
-#endif

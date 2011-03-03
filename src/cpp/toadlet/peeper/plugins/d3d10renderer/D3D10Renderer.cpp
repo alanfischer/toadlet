@@ -235,7 +235,7 @@ Texture *D3D10Renderer::createTexture(){
 }
 
 PixelBufferRenderTarget *D3D10Renderer::createPixelBufferRenderTarget(){
-	return NULL;
+	return new D3D10PixelBufferRenderTarget(this);
 }
 
 PixelBuffer *D3D10Renderer::createPixelBuffer(){
@@ -748,6 +748,11 @@ int D3D10Renderer::getClosestTextureFormat(int textureFormat){
 		case Texture::Format_RGBA_DXT4:
 		case Texture::Format_RGBA_DXT5:
 			return textureFormat;
+		case Texture::Format_DEPTH_8:
+		case Texture::Format_DEPTH_16:
+			return Texture::Format_DEPTH_16;
+		case Texture::Format_DEPTH_24:
+			return Texture::Format_DEPTH_24;
 		default:
 			return Texture::Format_RGBA_8;
 	}
@@ -887,6 +892,21 @@ D3D10_MAP D3D10Renderer::getD3D10_MAP(int access,int usage){
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"D3D10Renderer::getD3D10_MAP: Invalid type");
 			return (D3D10_MAP)0;
+	}
+}
+
+D3D10_USAGE D3D10Renderer::getD3D10_USAGE(int usage){
+	if((usage&Buffer::Usage_BIT_STATIC)>0){
+		return D3D10_USAGE_IMMUTABLE;
+	}
+	else if((usage&Buffer::Usage_BIT_STREAM)>0){
+		return D3D10_USAGE_DEFAULT;
+	}
+	else if((usage&Buffer::Usage_BIT_DYNAMIC)>0){
+		return D3D10_USAGE_DYNAMIC;
+	}
+	else if((usage&Buffer::Usage_BIT_STAGING)>0){
+		return D3D10_USAGE_STAGING;
 	}
 }
 

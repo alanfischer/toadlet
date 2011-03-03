@@ -308,14 +308,16 @@ void ParticleNode::updateVertexBuffer(CameraNode *camera){
 	}
 
 	int i=0,j=0;
+	Matrix4x4 invViewMatrix;
 	Vector3 viewRight,viewUp,viewForward;
 	if(camera->getAlignmentCalculationsUseOrigin()){
 		Matrix4x4 lookAtCamera; Math::setMatrix4x4FromLookAt(lookAtCamera,camera->getWorldTranslate(),getWorldTranslate(),Math::Z_UNIT_VECTOR3,false);
-		Math::setAxesFromMatrix4x4(lookAtCamera,viewRight,viewUp,viewForward);
+		Math::invert(invViewMatrix,lookAtCamera);
 	}
 	else{
-		Math::setAxesFromMatrix4x4(camera->getViewMatrix(),viewRight,viewUp,viewForward);
+		Math::invert(invViewMatrix,camera->getViewMatrix());
 	}
+	Math::setAxesFromMatrix4x4(invViewMatrix,viewRight,viewUp,viewForward);
 
 	if(mWorldSpace==false){
 		mWorldTransform->inverseTransformNormal(viewRight);
