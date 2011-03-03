@@ -19,6 +19,8 @@
 
 #include "VertexLighter.h"
 
+#include <string.h>
+
 VertexLighter::VertexLighter(Engine *engine){
 	mEngine=engine;
 	mDirection=Vector3(0,0,Math::ONE);
