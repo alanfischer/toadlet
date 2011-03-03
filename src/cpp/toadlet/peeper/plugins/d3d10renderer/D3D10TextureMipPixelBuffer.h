@@ -64,12 +64,18 @@ public:
 	virtual uint8 *lock(int lockAccess);
 	virtual bool unlock();
 
-protected:
-	D3D10Renderer *mRenderer;
+	inline ID3D10RenderTargetView *getD3D10RenderTargetView() const{return mD3DRenderTargetView;}
+	inline ID3D10DepthStencilView *getD3D10DepthStencilView() const{return mD3DDepthStencilView;}
 
+protected:
+	bool createViews(Texture::Dimension dimension,int pixelFormat,int level);
+
+	D3D10Renderer *mRenderer;
 	BufferDestroyedListener *mListener;
 	D3D10Texture *mTexture;
 	ID3D10Resource *mD3DTexture;
+	ID3D10RenderTargetView *mD3DRenderTargetView;
+	ID3D10DepthStencilView *mD3DDepthStencilView;
 	int mLevel;
 	int mCubeSide;
 	int mDataSize;

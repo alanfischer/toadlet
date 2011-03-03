@@ -47,14 +47,12 @@ D3D10WindowRenderTarget::D3D10WindowRenderTarget():D3D10RenderTarget(),
 	mDXGISwapChain(NULL),
 	mDXGIDevice(NULL),
 	mDXGIAdapter(NULL),
-	mD3DDevice(NULL),
 	mDepthTexture(NULL),
-	mRenderTargetView(NULL),
-	mDepthStencilView(NULL),
 	mWindow(0),
 	mWidth(0),
 	mHeight(0)
 {
+	mRenderTargetViews.resize(1,NULL);
 }
 
 D3D10WindowRenderTarget::D3D10WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format):D3D10RenderTarget(),
@@ -62,14 +60,12 @@ D3D10WindowRenderTarget::D3D10WindowRenderTarget(HWND wnd,WindowRenderTargetForm
 	mDXGISwapChain(NULL),
 	mDXGIDevice(NULL),
 	mDXGIAdapter(NULL),
-	mD3DDevice(NULL),
 	mDepthTexture(NULL),
-	mRenderTargetView(NULL),
-	mDepthStencilView(NULL),
 	mWindow(0),
 	mWidth(0),
 	mHeight(0)
 {
+	mRenderTargetViews.resize(1,NULL);
 	createContext(wnd,format);
 }
 
@@ -77,57 +73,17 @@ D3D10WindowRenderTarget::~D3D10WindowRenderTarget(){
 	destroyContext();
 }
 
-bool D3D10WindowRenderTarget::activate(){
-	mD3DDevice->OMSetRenderTargets(1,&mRenderTargetView,mDepthStencilView);
-
-	return true;
-}
-
-bool D3D10WindowRenderTarget::deactivate(){
-	ID3D10RenderTargetView *view=NULL;
-	mD3DDevice->OMSetRenderTargets(1,&view,NULL);
-
-	return true;
-}
-
-void D3D10WindowRenderTarget::clear(int clearFlags,const Color &clearColor){
-	if(mRenderTargetView!=NULL && (clearFlags&Renderer::ClearFlag_COLOR)>0){
-		#if defined(TOADLET_FIXED_POINT)
-			float d3dcolor[4];
-			toD3DColor(d3dcolor,clearColor);
-		#else
-			const float *d3dcolor=clearColor.getData();
-		#endif
-		mD3DDevice->ClearRenderTargetView(mRenderTargetView,d3dcolor);
-	}
-	if(mDepthStencilView!=NULL){
-		UINT d3dclearFlags=0;
-		if(clearFlags&Renderer::ClearFlag_DEPTH){
-			d3dclearFlags|=D3D10_CLEAR_DEPTH;
-		}
-		if(clearFlags&Renderer::ClearFlag_STENCIL){
-			d3dclearFlags|=D3D10_CLEAR_STENCIL;
-		}
-		mD3DDevice->ClearDepthStencilView(mDepthStencilView,d3dclearFlags,1.0f,0);
-	}
-}
-
 void D3D10WindowRenderTarget::swap(){
 	mDXGISwapChain->Present(0,0);
 }
 
 void D3D10WindowRenderTarget::reset(){
-	if(mRenderTargetView!=NULL){
-		mRenderTargetView->Release();
-		mRenderTargetView=NULL;
+	if(mRenderTargetViews[0]!=NULL){
+		mRenderTargetViews[0]->Release();
+		mRenderTargetViews[0]=NULL;
 	}
 
-	if(mDepthStencilView!=NULL){
-		mDepthStencilView->Release();
-		mDepthStencilView=NULL;
-	}
-
-	mD3DDevice->OMGetRenderTargets(1,&mRenderTargetView,&mDepthStencilView);
+	mD3DDevice->OMGetRenderTargets(1,&mRenderTargetViews[0],NULL);
 }
 
 bool D3D10WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *format){
@@ -195,7 +151,7 @@ bool D3D10WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *f
 	mDXGISwapChain->GetBuffer(0,__uuidof(texture),(void**)&texture);
 	D3D10_TEXTURE2D_DESC textureDesc;
 	texture->GetDesc(&textureDesc);
-	mD3DDevice->CreateRenderTargetView(texture,NULL,&mRenderTargetView);
+	mD3DDevice->CreateRenderTargetView(texture,NULL,&mRenderTargetViews[0]);
 
 	mDepthTexture=new D3D10Texture(mD3DDevice);
 	mDepthTexture->create(Texture::Usage_BIT_RENDERTARGET,Texture::Dimension_D2,Texture::Format_DEPTH_16,textureDesc.Width,textureDesc.Height,0,1,NULL);
@@ -207,9 +163,9 @@ bool D3D10WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *f
 bool D3D10WindowRenderTarget::destroyContext(){
 	deactivate();
 
-	if(mRenderTargetView!=NULL){
-		mRenderTargetView->Release();
-		mRenderTargetView=NULL;
+	if(mRenderTargetViews[0]!=NULL){
+		mRenderTargetViews[0]->Release();
+		mRenderTargetViews[0]=NULL;
 	}
 
 	if(mDepthStencilView!=NULL){

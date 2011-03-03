@@ -22,35 +22,36 @@
  * along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
  *
  ********** Copyright header - do not remove **********/
-#if 0
-#ifndef TOADLET_PEEPER_D3D10SURFACERENDERTARGET_H
-#define TOADLET_PEEPER_D3D10SURFACERENDERTARGET_H
+
+#ifndef TOADLET_PEEPER_D3D10PIXELBUFFERRENDERTARGET_H
+#define TOADLET_PEEPER_D3D10PIXELBUFFERRENDERTARGET_H
 
 #include "D3D10RenderTarget.h"
-#include "D3D10Surface.h"
-#include <toadlet/peeper/SurfaceRenderTarget.h>
+#include "D3D10TextureMipPixelBuffer.h"
+#include <toadlet/peeper/PixelBufferRenderTarget.h>
 
 namespace toadlet{
 namespace peeper{
 
-/// @todo: Make the D3D9SurfaceRenderTarget & the GLFBOSurfaceRenderTarget more strict about Surface sizes,
-//  and smarter about destroying their temporary depth buffer when not needed
-class TOADLET_API D3D10SurfaceRenderTarget:public D3D10RenderTarget,public SurfaceRenderTarget{
+/// @todo: Make the D3D10PixelBufferRenderTarget & the GLFBOSurfaceRenderTarget more strict about Surface sizes
+class TOADLET_API D3D10PixelBufferRenderTarget:public D3D10RenderTarget,public PixelBufferRenderTarget{
 public:
-	D3D10SurfaceRenderTarget(D3D10Renderer *renderer);
-	virtual ~D3D10SurfaceRenderTarget();
+	D3D10PixelBufferRenderTarget(D3D10Renderer *renderer);
+	virtual ~D3D10PixelBufferRenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return (D3D10RenderTarget*)this;}
+
+	virtual void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
 
 	virtual bool create();
 	virtual void destroy();
 
-	virtual bool activate()=0;
-	virtual bool deactivate(){return false;}
+	virtual bool activate();
+	virtual void swap(){}
 	virtual void reset(){}
 
-	virtual bool attach(Surface::ptr surface,Attachment attachment);
-	virtual bool remove(Surface::ptr surface);
+	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment);
+	virtual bool remove(PixelBuffer::ptr buffer);
 	virtual bool compile();
 
 	virtual bool isPrimary() const{return false;}
@@ -58,22 +59,18 @@ public:
 	virtual int getWidth() const{return mWidth;}
 	virtual int getHeight() const{return mHeight;}
 
-	virtual ID3D10Device *getID3D10Device() const{return NULL;}
-
 protected:
-	Surface::ptr createBufferSurface(int format,int width,int height);
-
 	D3D10Renderer *mRenderer;
+	RenderTargetDestroyedListener *mListener;
 	int mWidth;
 	int mHeight;
 	bool mNeedsCompile;
-	egg::Collection<Surface::ptr> mSurfaces;
-	egg::Collection<Attachment> mSurfaceAttachments;
-	egg::Collection<D3D10Surface::ptr> mOwnedSurfaces;
+	egg::Collection<PixelBuffer::ptr> mBuffers;
+	egg::Collection<Attachment> mBufferAttachments;
+	PixelBuffer::ptr mDepthBuffer;
 };
 
 }
 }
 
-#endif
 #endif
