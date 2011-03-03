@@ -129,6 +129,7 @@ D3D10_PASS_DESC passDesc;
 	static DXGI_FORMAT getVertexDXGI_FORMAT(int format);
 	static DXGI_FORMAT getTextureDXGI_FORMAT(int textureFormat);
 	static D3D10_MAP getD3D10_MAP(int access,int usage);
+	static D3D10_USAGE getD3D10_USAGE(int usage);
 	static char *getSemanticName(int semantic);
 
 protected:

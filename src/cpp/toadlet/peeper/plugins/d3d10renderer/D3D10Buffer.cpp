@@ -63,7 +63,7 @@ D3D10Buffer::~D3D10Buffer(){
 bool D3D10Buffer::create(int usage,int access,IndexFormat indexFormat,int size){
 	destroy();
 
-	if((usage&(Usage_BIT_STATIC/*|Usage_BIT_STREAM*/))>0 && (access&Access_BIT_READ)>0){
+	if((usage&(Usage_BIT_STATIC))>0 && (access&Access_BIT_READ)>0){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
 			"Buffer can not be static and readable");
 		return false;
@@ -92,7 +92,7 @@ bool D3D10Buffer::create(int usage,int access,IndexFormat indexFormat,int size){
 bool D3D10Buffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int size){
 	destroy();
 
-	if((usage&(Usage_BIT_STATIC/*|Usage_BIT_STREAM*/))>0 && (access&Access_BIT_READ)>0){
+	if((usage&(Usage_BIT_STATIC))>0 && (access&Access_BIT_READ)>0){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
 			"Buffer can not be static or stream and readable");
 		return false;
@@ -147,18 +147,7 @@ bool D3D10Buffer::createContext(){
 		desc.BindFlags=mBindFlags;
 	}
 
-	if((mUsage&Usage_BIT_STATIC)>0){
-		desc.Usage=D3D10_USAGE_IMMUTABLE;
-	}
-	else if((mUsage&Usage_BIT_STREAM)>0){
-		desc.Usage=D3D10_USAGE_DEFAULT;
-	}
-	else if((mUsage&Usage_BIT_DYNAMIC)>0){
-		desc.Usage=D3D10_USAGE_DYNAMIC;
-	}
-	else if((mUsage&Usage_BIT_STAGING)>0){
-		desc.Usage=D3D10_USAGE_STAGING;
-	}
+	desc.Usage=D3D10Renderer::getD3D10_USAGE(mUsage);
 
 	if((mUsage&(Usage_BIT_DYNAMIC|Usage_BIT_STAGING))>0){
 		if((mAccess&Access_BIT_READ)>0){

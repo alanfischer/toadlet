@@ -139,19 +139,7 @@ void D3D10Texture::destroy(){
 bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
 	ID3D10Device *device=mDevice;
 
-	D3D10_USAGE d3dUsage=(D3D10_USAGE)0;
-	if((mUsage&Usage_BIT_STATIC)>0){
-		d3dUsage=D3D10_USAGE_IMMUTABLE;
-	}
-	else if((mUsage&Usage_BIT_STREAM)>0){
-		d3dUsage=D3D10_USAGE_DEFAULT;
-	}
-	else if((mUsage&Usage_BIT_DYNAMIC)>0){
-		d3dUsage=D3D10_USAGE_DYNAMIC;
-	}
-	else if((mUsage&Usage_BIT_STAGING)>0){
-		d3dUsage=D3D10_USAGE_STAGING;
-	}
+	D3D10_USAGE d3dUsage=D3D10Renderer::getD3D10_USAGE(mUsage);
 
 	int cpuFlags=0;
 	if((mUsage&Usage_BIT_STAGING)>0){
@@ -163,14 +151,19 @@ bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
 
 	if((mUsage&(Usage_BIT_AUTOGEN_MIPMAPS|Usage_BIT_RENDERTARGET))==(Usage_BIT_AUTOGEN_MIPMAPS|Usage_BIT_RENDERTARGET)){
 		miscFlags|=D3D10_RESOURCE_MISC_GENERATE_MIPS;
-		bindFlags|=D3D10_BIND_RENDER_TARGET;
+	}
+
+	if((mUsage&Usage_BIT_RENDERTARGET)>0){
+		if((mFormat&Format_BIT_DEPTH)>0){
+			bindFlags|=D3D10_BIND_DEPTH_STENCIL;
+		}
+		else{
+			bindFlags|=D3D10_BIND_RENDER_TARGET;
+		}
 	}
 
 	/// @todo: Why can't I have a depth & shader resource?
-	if((mFormat&Format_BIT_DEPTH)>0){
-		bindFlags|=D3D10_BIND_DEPTH_STENCIL;
-	}
-	else{
+	if((mFormat&Format_BIT_DEPTH)==0){
 		bindFlags|=D3D10_BIND_SHADER_RESOURCE;
 	}
 

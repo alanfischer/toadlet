@@ -49,28 +49,18 @@ public:
 	virtual int getWidth() const{return mWidth;}
 	virtual int getHeight() const{return mHeight;}
 
-	virtual bool activate();
-	virtual bool deactivate();
-
-	virtual void clear(int clearFlags,const Color &clearColor);
-
 	virtual void swap();
 
 	virtual void reset();
 
-	inline ID3D10Device *getD3D10Device() const{return mD3DDevice;}
-//	inline const D3DPRESENT_PARAMETERS &getPresentParameters() const{return mPresentParameters;}
-	inline ID3D10RenderTargetView *getRenderTargetView() const{return mRenderTargetView;}
+	inline ID3D10RenderTargetView *getRenderTargetView() const{return mRenderTargetViews[0];}
 
 protected:
 	HINSTANCE mLibrary;
 	IDXGISwapChain *mDXGISwapChain;
 	IDXGIDevice *mDXGIDevice;
 	IDXGIAdapter *mDXGIAdapter;
-	ID3D10Device *mD3DDevice;
 	D3D10Texture *mDepthTexture;
-	ID3D10RenderTargetView *mRenderTargetView;
-	ID3D10DepthStencilView *mDepthStencilView;
 	HWND mWindow;
 	int mWidth,mHeight;
 };

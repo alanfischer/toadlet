@@ -3,6 +3,7 @@ set (PEEPER_D3D11RENDERER_SRC
 	../d3d10renderer/D3D10Buffer.cpp
 	../d3d10renderer/D3D10PixelBufferRenderTarget.cpp
 	../d3d10renderer/D3D10Query.cpp
+	../d3d10renderer/D3D10RenderTarget.cpp
 	../d3d10renderer/D3D10Renderer.cpp
 	../d3d10renderer/D3D10Texture.cpp
 	../d3d10renderer/D3D10TextureMipPixelBuffer.cpp

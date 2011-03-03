@@ -34,17 +34,24 @@ namespace peeper{
 
 class TOADLET_API D3D10RenderTarget:public RenderTarget{
 public:
-	D3D10RenderTarget():RenderTarget(){}
-
+	D3D10RenderTarget();
 	virtual ~D3D10RenderTarget(){}
 
-	virtual void clear(int clearFlags,const Color &clearColor)=0;
-	virtual void swap()=0;
-	virtual void reset()=0;
-	virtual bool activate()=0;
-	virtual bool deactivate()=0;
+	virtual bool create();
+	virtual void destroy();
 
-	virtual ID3D10Device *getD3D10Device() const=0;
+	virtual void clear(int clearFlags,const Color &clearColor);
+	virtual void swap(){}
+	virtual void reset(){}
+	virtual bool activate();
+	virtual bool deactivate();
+
+	inline ID3D10Device *getD3D10Device() const{return mD3DDevice;}
+
+protected:
+	ID3D10Device *mD3DDevice;
+	egg::Collection<ID3D10RenderTargetView*> mRenderTargetViews;
+	ID3D10DepthStencilView *mDepthStencilView;
 };
 
 }
