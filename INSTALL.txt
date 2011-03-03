@@ -1,18 +1,27 @@
  ***   Installing Toadlet   ***
+ 
+Toadlet is built with the cmake build system. 
+It has a number of optional dependencies, all 
+of which are searched for or set using cmake. 
+Toadlet also has a number of different configuration 
+options available.
+
 
 Contents
 
 1. Dependencies
 2. Setup
-3. Build commands
-   3.1 General
-   3.2 Windows
-   3.3 WinCE
-   3.4 Posix
-   3.5 OSX
-   3.6 iPhoneOS
-   3.7 Android
-4. Doxygen
+3. Options
+4. Build commands
+   4.1 General
+   4.2 Windows
+   4.3 WinCE
+   4.4 Posix
+   4.5 OSX
+   4.6 iPhoneOS
+   4.7 Android
+   4.8 Blackberry
+5. Doxygen
 
 
 1. Dependencies
@@ -22,7 +31,7 @@ of the various toadlet libraries.
     Missing them will result in a build
 of toadlet that does not possess 
 certain capabilities.
-    Note that the Android build only 
+    Note that the Android build only c
 requires a functional jdk and an 
 up-to-date android-sdk.
 
@@ -30,21 +39,25 @@ toadlet_egg:
 * libpng
 * libjpeg
 * libgif
-* zlib
+* libzlib
+* libzzip
 
 toadlet-peeper:
-* OpenGL
+* GLEW and OpenGL
+* Direct3D Mobile (WinCE only)
 * Direct3D 9 (Windows only)
 * DirectX 10 (Windows only)
+* DirectX 11 (Windows only)
 
 toadlet-ribbit:
 * OpenAL
 * Ogg Vorbis
-* Audiere (Windows only)
+* Sidplay
 
 toadlet-tadpole:
 * Freetype
 * MiniXML
+* Gdiplus (Windows only)
 
 toadlet-pad:
 * X11 (posix only)
@@ -58,7 +71,7 @@ If you are unfamiliar with CMake, better
 read up on it first: http://www.cmake.org
 
     We recommend using out of source
-builds with Toadlet. Simply create a
+builds with toadlet. Simply create a
 subdirectory within the toadlet project
 (eg build.win when building for Windows)
 and enter that directory. You should
@@ -81,10 +94,40 @@ cmake commands that follow. (eg. Start->
 Programs->Visual Studio->Tools->Console 
 or something similar.)
     
+3. Options
 
-3. Build commands
+The following options may be set using cmake to control the build of toadlet. Many of these are platform specific, default options are listed first. 
 
-3.1 General
+TOADLET_PLATFORM_WINCE OFF/ON Enables WinCE build (Windows only) 
+
+TOADLET_PLATFORM_ANDROID OFF/ON Enables android build 
+
+TOADLET_PLATFORM_BLACKBERRY OFF/ON Enables blackberry build (Windows only) 
+
+TOADLET_PLATFORM_IPHONE OFF/ON Enables iOS build (OSX only) 
+
+TOADLET_BUILD_DOXYGEN OFF/ON Add Doxygen documentation to build 
+
+TOADLET_BUILD_DOXYGEN_ONLY OFF/ON Only build Doyxgen documentation 
+
+TOADLET_FIXED_POINT OFF/ON Switches to fixed point math in toadlet 
+
+TOADLET_SPLIT_JARS OFF/ON Splits the android/blackberry builds into separate jars for each library 
+
+TOADLET_USE_BLUETOOTH ON/OFF Enables Bluetooth support 
+
+TOADLET_DYNAMIC_MULTITHREAD_DYNAMIC ON/OFF Uses the /MD compile switch with dynamic libraries (Windows only) 
+
+TOADLET_STATIC_MULTITHREAD_DYNAMIC OFF/ON Uses the /MD compile switch with static libraries (Windows only) 
+
+TOADLET_RTTI ON/OFF Enable Run Time Type Information 
+
+TOADLET_EXCEPTIONS ON/OFF Enable Exception handling
+
+	
+4. Build commands
+
+4.1 General
     The minimum arguments to CMake for 
 toadlet are (where .. is the location of 
 the base of the toadlet project):
@@ -122,16 +165,15 @@ calling cmake. You can set this up by calling:
 Where BuildType can be either Debug or Release.
 
 
-3.2 Windows
+4.2 Windows
     On windows systems, toadlet usually needs to be told where to
 find the dependencies. Otherwise the setup is straightforward:
 
    cmake -DCMAKE_INSTALL_PREFIX=%HOME%\toadlet\win32 -DCMAKE_PREFIX_PATH="C:\Program Files" ..
 
-Note: RTTI May be enabled or disabled with -DTOADLET_RTTI=ON or OFF
-   
+Open up visual studio and do the rest.
  
-3.3 WinCE
+4.3 WinCE
     Toadlet also builds for WinCE using cmake toolchain files. 
 In addition, you have to do a 2 step process since cmake cannot 
 yet change the platform build type in Visual Studio 8 and up. 
@@ -145,15 +187,19 @@ ready to go. Otherwise the WinCE build is similar to the win32 build:
 
    cmake -DUPDATE_WINCE=ON ..
 
+Now the visual stuido project is setup for the proper platform build.
 
-3.4 Posix
+
+4.4 Posix
     On posix systems don't forget to set the build type, if you 
 are using makefiles. A typical command might look like:
 
    cmake -DCMAKE_INSTALL_PREFIX=$HOME/toadlet/posix -DCMAKE_BUILD_TYPE=Release ..
+   
+Now the standard 'make install' command will do the rest.
 
 
-3.5 OSX
+4.5 OSX
     Toadlet for OSX is easy to build using Xcode Projects. You only
 need to make sure you tell cmake to use the Xcode generator with
 the -G switch as follows:
@@ -171,7 +217,7 @@ architectures as such:
 use the included CMakeLists.txt files in cmake/Dependencies to build these projects using Xcode,
 again specifying all the architectures you wish to use.
 
-3.5.1 OSX Dependencies
+4.5.1 OSX Dependencies
    To build GLEW as a universal binary, you must edit glew/config/Makefile.darwin
 Change the CC and LD lines as follows:
 
@@ -184,10 +230,10 @@ Change the CC and LD lines as follows:
 
    The same valid architectures are as above 
 
-3.6 iPhoneOS
-    Toadlet is avaialble for the iPhoneOS platform using 
+4.6 iOS
+    Toadlet is avaialble for the iOS platform using 
 Toolchain files. Note that dependency checking will find
-the system osx libraries if the iPhone SDK ones are not 
+the system osx libraries if the iOS SDK ones are not 
 found. Make sure you setup your CMAKE_PREFIX_PATH to avoid this. 
 
     Much like with WinCE, cmake's generated Xcode build will be for
@@ -202,7 +248,7 @@ Then you call cmake again with UPDATE_IPHONE on.
 NOTE: Be sure you set your xcodeproject to use the same iPhoneOS SDK that cmake found!
 
 
-3.7 Android
+4.7 Android
     When building for android, you need to specify the 
 android.jar for the android sdk you wish to build against, 
 using ANDROID_JAR. 
@@ -221,17 +267,31 @@ so much nicer to use.
    cmake -G"NMake Makefiles" -DCMAKE_INSTALL_PREFIX=$HOME/toadlet/android -DTOADLET_PLATFORM_ANDROID=ON -DANDROID_JAR=$HOME/android/android.jar ..
 
 
-4. Doxygen
-    Toadlet source files can be documented in HTML using 
-Doxygen. To build the docs go into the doxygen/ subfolder
-and type: "doxygen Doxyfile"
+4.8 Blackberry
 
-    To view the results point your webbrowser at:
-doxygen/html/index.html
+    Blackberry builds are very similar to the android builds, 
+except you need to specify the location of your blackberry 
+JDE using BLACKBERRY_JDE_DIR. Again, we strongly recommend 
+using the nmake generators to run a command line build. 
 
-Note: You'll need the Doxygen tool installed, and
-we recommend the Graphviz package for the dot graph
-generator.
+   cmake -G"NMake Makefiles" -DCMAKE_INSTALL_PREFIX=$HOME/toadlet/blackberry -DTOADLET_PLATFORM_BLACKBERRY=ON -DBLACKBERRY_JDE_DIR=$HOME/blackberryJDE .. 
+
+5. Doxygen
+
+O  ptionally, you can build the toadlet Doxygen documentation 
+when creating your project. You can either add the doxygen build 
+with the TOADLET_BUILD_DOXYGEN flag: 
+
+   cmake -DTOADLET_BUILD_DOXYGEN=ON <rest of your cmake commands> .. 
+
+    Or, you can only build the doxygen files by themselves using 
+TOADLET_BUILD_DOXYGEN_ONLY. Useful if you don't want to rebuild 
+the whole library. 
+
+   cmake -DTOADLET_BUILD_DOXYGEN_ONLY=ON .. 
+
+   Note: You'll need the Doxygen tool installed, and we recommend 
+the Graphviz package for the dot graph generator.
 
 http://www.stack.nl/~dimitri/doxygen/
 http://www.graphviz.org
