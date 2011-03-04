@@ -252,11 +252,11 @@ void ParticleNode::createVertexBuffer(){
 			for(i=0;i<numParticles;++i){
 				ii=i*6;
 
-				iba.set(ii+0,i*4+2);
+				iba.set(ii+0,i*4+0);
 				iba.set(ii+1,i*4+1);
-				iba.set(ii+2,i*4+0);
-				iba.set(ii+3,i*4+2);
-				iba.set(ii+4,i*4+3);
+				iba.set(ii+2,i*4+2);
+				iba.set(ii+3,i*4+3);
+				iba.set(ii+4,i*4+2);
 				iba.set(ii+5,i*4+1);
 			}
 		}
@@ -267,29 +267,29 @@ void ParticleNode::createVertexBuffer(){
 				ii=i*indexesPerBeam;
 				vi=i*vertexesPerBeam;
 
-				iba.set(ii+0,vi+2);
+				iba.set(ii+0,vi+0);
 				iba.set(ii+1,vi+1);
-				iba.set(ii+2,vi+0);
-				iba.set(ii+3,vi+2);
-				iba.set(ii+4,vi+3);
+				iba.set(ii+2,vi+2);
+				iba.set(ii+3,vi+3);
+				iba.set(ii+4,vi+2);
 				iba.set(ii+5,vi+1);
 
 				for(j=0;j<mParticleType-1;++j){
-					iba.set(ii+j*6+6 ,vi+j*2+4);
+					iba.set(ii+j*6+6 ,vi+j*2+2);
 					iba.set(ii+j*6+7 ,vi+j*2+3);
-					iba.set(ii+j*6+8 ,vi+j*2+2);
-					iba.set(ii+j*6+9 ,vi+j*2+4);
-					iba.set(ii+j*6+10,vi+j*2+5);
+					iba.set(ii+j*6+8 ,vi+j*2+4);
+					iba.set(ii+j*6+9 ,vi+j*2+5);
+					iba.set(ii+j*6+10,vi+j*2+4);
 					iba.set(ii+j*6+11,vi+j*2+3);
 					
 				}
 
-				iba.set(ii+indexesPerBeam-6,vi+vertexesPerBeam-2);
+				iba.set(ii+indexesPerBeam-6,vi+vertexesPerBeam-4);
 				iba.set(ii+indexesPerBeam-5,vi+vertexesPerBeam-3);
-				iba.set(ii+indexesPerBeam-4,vi+vertexesPerBeam-4);
-				iba.set(ii+indexesPerBeam-3,vi+vertexesPerBeam-2);
-				iba.set(ii+indexesPerBeam-2,vi+vertexesPerBeam-1);
-				iba.set(ii+indexesPerBeam-1,vi+vertexesPerBeam-3);
+				iba.set(ii+indexesPerBeam-4,vi+vertexesPerBeam-2);
+				iba.set(ii+indexesPerBeam-3,vi+vertexesPerBeam-3);
+				iba.set(ii+indexesPerBeam-2,vi+vertexesPerBeam-2);
+				iba.set(ii+indexesPerBeam-1,vi+vertexesPerBeam-1);
 			}
 		}
 
