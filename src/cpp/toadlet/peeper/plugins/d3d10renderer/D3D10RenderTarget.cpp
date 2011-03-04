@@ -43,26 +43,29 @@ void D3D10RenderTarget::destroy(){
 }
 
 void D3D10RenderTarget::clear(int clearFlags,const Color &clearColor){
-	#if defined(TOADLET_FIXED_POINT)
-		float d3dcolor[4];
-		toD3DColor(d3dcolor,clearColor);
-	#else
-		const float *d3dcolor=clearColor.getData();
-	#endif
-	UINT d3dclearFlags=0;
-	if(clearFlags&Renderer::ClearFlag_DEPTH){
-		d3dclearFlags|=D3D10_CLEAR_DEPTH;
+	if(clearFlags&Renderer::ClearFlag_COLOR){
+		#if defined(TOADLET_FIXED_POINT)
+			float d3dcolor[4];
+			toD3DColor(d3dcolor,clearColor);
+		#else
+			const float *d3dcolor=clearColor.getData();
+		#endif
+		int i;
+		for(i=0;i<mRenderTargetViews.size();++i){
+			mD3DDevice->ClearRenderTargetView(mRenderTargetViews[i],d3dcolor);
+		}
 	}
-	if(clearFlags&Renderer::ClearFlag_STENCIL){
-		d3dclearFlags|=D3D10_CLEAR_STENCIL;
-	}
-
-	int i;
-	for(i=0;i<mRenderTargetViews.size();++i){
-		mD3DDevice->ClearRenderTargetView(mRenderTargetViews[i],d3dcolor);
-	}
-	if(mDepthStencilView!=NULL){
-		mD3DDevice->ClearDepthStencilView(mDepthStencilView,d3dclearFlags,1.0f,0);
+	if(clearFlags&(Renderer::ClearFlag_DEPTH|Renderer::ClearFlag_STENCIL)){
+		UINT d3dclearFlags=0;
+		if(clearFlags&Renderer::ClearFlag_DEPTH){
+			d3dclearFlags|=D3D10_CLEAR_DEPTH;
+		}
+		if(clearFlags&Renderer::ClearFlag_STENCIL){
+			d3dclearFlags|=D3D10_CLEAR_STENCIL;
+		}
+		if(mDepthStencilView!=NULL){
+			mD3DDevice->ClearDepthStencilView(mDepthStencilView,d3dclearFlags,1.0f,0);
+		}
 	}
 }
 

@@ -34,6 +34,7 @@ namespace toadlet{
 namespace peeper{
 
 GLFBOPixelBuffer::GLFBOPixelBuffer(GLFBORenderTarget *target):GLPixelBuffer(),
+	mListener(NULL),
 	mTarget(NULL),
 	mHandle(0),
 	mPixelFormat(0),
@@ -73,7 +74,13 @@ void GLFBOPixelBuffer::destroy(){
 		glDeleteRenderbuffers(1,&mHandle);
 		mHandle=0;
 
+		// Check this only if we had a handle, to eliminate errors at shutdown
 		TOADLET_CHECK_GLERROR("GLFBOPixelBuffer::destroy");
+	}
+
+	if(mListener!=NULL){
+		mListener->bufferDestroyed(this);
+		mListener=NULL;
 	}
 }
 

@@ -108,8 +108,6 @@ void BackablePixelBufferRenderTarget::setBack(PixelBufferRenderTarget::ptr back)
 		for(i=0;i<mBuffers.size();++i){
 			mBack->attach(mBuffers[i],mBufferAttachments[i]);
 		}
-		
-		mBack->compile();
 	}
 }
 

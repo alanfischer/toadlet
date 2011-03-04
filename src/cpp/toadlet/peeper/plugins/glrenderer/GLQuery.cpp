@@ -65,9 +65,10 @@ void GLQuery::destroy(){
 	if(mHandle!=0){
 		glDeleteQueries(1,&mHandle);
 		mHandle=0;
-	}
 
-	TOADLET_CHECK_GLERROR("GLQuery::destroy");
+		// Check this only if we had a handle, to eliminate errors at shutdown
+		TOADLET_CHECK_GLERROR("GLQuery::destroy");
+	}
 }
 
 void GLQuery::beginQuery(){

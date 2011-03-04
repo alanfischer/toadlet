@@ -52,7 +52,6 @@ public:
 
 	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment);
 	virtual bool remove(PixelBuffer::ptr buffer);
-	virtual bool compile(){return mBack!=NULL?mBack->compile():false;}
 
 	virtual void setBack(PixelBufferRenderTarget::ptr back);
 	virtual PixelBufferRenderTarget::ptr getBack(){return mBack;}
