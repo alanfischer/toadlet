@@ -908,6 +908,9 @@ D3D10_USAGE D3D10Renderer::getD3D10_USAGE(int usage){
 	else if((usage&Buffer::Usage_BIT_STAGING)>0){
 		return D3D10_USAGE_STAGING;
 	}
+	else{
+		return D3D10_USAGE_DEFAULT;
+	}
 }
 
 char *D3D10Renderer::getSemanticName(int semantic){

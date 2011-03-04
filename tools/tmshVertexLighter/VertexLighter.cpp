@@ -18,8 +18,7 @@
  ********** Copyright header - do not remove **********/
 
 #include "VertexLighter.h"
-
-#include <string.h>
+#include <string.h> // memset
 
 VertexLighter::VertexLighter(Engine *engine){
 	mEngine=engine;

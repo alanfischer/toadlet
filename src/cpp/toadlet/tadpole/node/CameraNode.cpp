@@ -103,7 +103,6 @@ Node *CameraNode::create(Scene *scene){
 	mGammaMaterial->setDepthTest(Renderer::DepthTest_NONE);
 	mGammaMaterial->setLighting(true);
 	mGammaMaterial->setLightEffect(LightEffect(Colors::BLACK));
-	mGammaMaterial->setBlend(Blend::Combination_COLOR_ADDITIVE);
 	mGammaMaterial->retain();
 
 	mFPSLastTime=0;
@@ -320,7 +319,14 @@ void CameraNode::setViewport(int x,int y,int width,int height){
 
 void CameraNode::setGamma(scalar gamma){
 	mGamma=gamma;
-	mGammaMaterial->setLightEffect(LightEffect(Color(gamma-Math::ONE,gamma-Math::ONE,gamma-Math::ONE,Math::ONE)));
+	if(gamma>=Math::ONE){
+		mGammaMaterial->setBlend(Blend::Combination_ALPHA_ADDITIVE);
+		mGammaMaterial->setLightEffect(LightEffect(Color(Math::ONE,Math::ONE,Math::ONE,gamma-Math::ONE)));
+	}
+	else{
+		mGammaMaterial->setBlend(Blend::Combination_ALPHA);
+		mGammaMaterial->setLightEffect(LightEffect(Color(0,0,0,Math::ONE-gamma)));
+	}
 }
 
 void CameraNode::projectionUpdated(){
