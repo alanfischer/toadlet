@@ -90,14 +90,15 @@ void GLFBORenderTarget::destroy(){
 	if(mHandle!=0){
 		glDeleteFramebuffers(1,&mHandle);
 		mHandle=0;
+
+		// Check this only if we had a handle, to eliminate errors at shutdown
+		TOADLET_CHECK_GLERROR("GLFBORenderTarget::destroy");
 	}
 
 	if(mListener!=NULL){
 		mListener->renderTargetDestroyed((PixelBufferRenderTarget*)this);
 		mListener=NULL;
 	}
-
-	TOADLET_CHECK_GLERROR("GLFBORenderTarget::destroy");
 }
 
 bool GLFBORenderTarget::activate(){

@@ -46,7 +46,7 @@ public:
 	virtual GLFBOPixelBuffer *castToGLFBOPixelBuffer(){return this;}
 	virtual GLBuffer *castToGLBuffer(){return NULL;}
 
-	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){}
+	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
 	virtual bool create(int usage,int access,int pixelFormat,int width,int height,int depth);
 	virtual void destroy();
@@ -70,6 +70,7 @@ public:
 	inline GLuint getHandle() const{return mHandle;}
 
 protected:
+	BufferDestroyedListener *mListener;
 	GLFBORenderTarget *mTarget;
 	GLuint mHandle;
 	int mPixelFormat;

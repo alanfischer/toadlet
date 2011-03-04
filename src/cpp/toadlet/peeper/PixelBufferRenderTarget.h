@@ -54,7 +54,6 @@ public:
 
 	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment)=0;
 	virtual bool remove(PixelBuffer::ptr buffer)=0;
-	virtual bool compile()=0;
 };
 
 }
