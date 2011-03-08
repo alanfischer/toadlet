@@ -35,19 +35,19 @@
 	#include <toadlet/egg/Exception.h>
 
 	#define TOADLET_MAKE_ERROR_FUNCTION(name,type) \
-		static void name(const String &description){name((char*)NULL,true,description);} \
-		static void name(const String &categoryName,const String &description){name(categoryName,true,description);} \
-		static void name(const String &categoryName,bool report,const String &description){ \
-			if(report){errorLog(categoryName,description);} \
-			throw toadlet::egg::Exception(type,description); \
+		static void name(const String &text){name((char*)NULL,true,text);} \
+		static void name(const String &categoryName,const String &text){name(categoryName,true,text);} \
+		static void name(const String &categoryName,bool report,const String &text){ \
+			if(report){errorLog(categoryName,text);} \
+			throw toadlet::egg::Exception(type,text); \
 		}
 #else
 	#define TOADLET_MAKE_ERROR_FUNCTION(name,type) \
-		static void name(const String &description){name((char*)NULL,true,description);} \
-		static void name(const String &categoryName,const String &description){name(categoryName,true,description);} \
-		static void name(const String &categoryName,bool report,const String &description){ \
-			if(report){errorLog(categoryName,description);} \
-			Error::getInstance()->setError(type,description); \
+		static void name(const String &text){name((char*)NULL,true,text);} \
+		static void name(const String &categoryName,const String &text){name(categoryName,true,text);} \
+		static void name(const String &categoryName,bool report,const String &text){ \
+			if(report){errorLog(categoryName,text);} \
+			Error::getInstance()->setError(type,text); \
 		}
 #endif
 
