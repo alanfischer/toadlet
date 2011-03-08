@@ -60,8 +60,8 @@ uint64 PosixSystem::mtime(){
 
 String PosixSystem::mtimeToString(uint64 time){
 	char timeString[128];
-	time/=1000;
-	struct tm *ts=gmtime(&time);
+	time_t tt=time/=1000;
+	struct tm *ts=gmtime(&tt);
 	strftime(timeString,sizeof(timeString),"%Y-%m-%d %H:%M:%S :",ts);
 	return timeString;
 }
