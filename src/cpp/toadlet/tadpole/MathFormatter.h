@@ -32,7 +32,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class MathFormatter{
+class TOADLET_API MathFormatter{
 public:
 	static egg::String formatInteger(int i);
 	static int parseInteger(const char *string);

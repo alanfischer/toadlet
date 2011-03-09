@@ -137,21 +137,14 @@ void HopEntity::setNextThink(int think){
 	setStayActive(mNextThink>0);
 }
 
-bool HopEntity::findTraceableNode(Node *node){
-	mTraceableNode=mScene->findNodeByInterface(InterfaceType_TRACEABLE,node);
-	if(mTraceableNode!=NULL){
-		setTraceableShape((Traceable*)mTraceableNode->hasInterface(InterfaceType_TRACEABLE));
-	}
-	return mTraceableNode!=NULL;
-}
-
-void HopEntity::setTraceableShape(Traceable *traceable){
+void HopEntity::setTraceableShape(Traceable *traceable,Node *traceableNode){
 	if(mTraceable!=NULL){
 		removeShape(mTraceableShape);
 		mTraceableShape=NULL;
 	}
 
 	mTraceable=traceable;
+	mTraceableNode=traceableNode;
 
 	if(mTraceable!=NULL){
 		mTraceableShape=Shape::ptr(new Shape(this));
