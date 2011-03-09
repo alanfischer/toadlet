@@ -28,9 +28,12 @@
 	#define WIN32_LEAN_AND_MEAN 1
 #endif
 #include <windows.h>
+#include <stdio.h>
 
 namespace toadlet{
 namespace egg{
+
+const uint64 Win32System::DELTA_EPOC_MICROSECONDS=TOADLET_MAKE_UINT64(11644473600000000);
 
 void Win32System::usleep(uint64 microseconds){
 	// Poorly implemented
@@ -49,7 +52,22 @@ uint64 Win32System::utime(){
 }
 
 uint64 Win32System::mtime(){
-	return GetTickCount();
+	FILETIME fileTime;
+	GetSystemTimeAsFileTime(&fileTime);
+	uint64 time=(*(uint64*)&fileTime);
+	time=(time/10-DELTA_EPOC_MICROSECONDS)/1000;
+	return time;
+}
+
+String Win32System::mtimeToString(uint64 time){
+	char timeString[128];
+	FILETIME fileTime;
+	SYSTEMTIME systemTime;
+	time=(time*1000+DELTA_EPOC_MICROSECONDS)*10;
+	fileTime=(*(FILETIME*)&time);
+	FileTimeToSystemTime(&fileTime,&systemTime);
+	sprintf(timeString,"%04d-%02d-%02d %02d:%02d:%02d :",systemTime.wYear,systemTime.wMonth,systemTime.wDay,systemTime.wHour,systemTime.wMinute,systemTime.wSecond);
+	return timeString;
 }
 
 int Win32System::threadID(){

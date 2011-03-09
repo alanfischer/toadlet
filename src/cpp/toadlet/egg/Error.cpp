@@ -91,8 +91,8 @@ const char *Error::getDescription(){
 	return mLastDescription;
 }
 
-void Error::errorLog(const String &categoryName,const String &description){
-	Logger::getInstance()->addLogString(categoryName,Logger::Level_ERROR,description);
+void Error::errorLog(const String &categoryName,const String &text){
+	Logger::getInstance()->addLogEntry(categoryName,Logger::Level_ERROR,text);
 }
 
 void Error::installHandler(){
@@ -104,15 +104,15 @@ void Error::uninstallHandler(){
 }
 
 void Error::startTrace(){
-	Logger::getInstance()->addLogString(Logger::Level_ERROR,"Backtrace starting");
+	Logger::getInstance()->addLogEntry(Logger::Level_ERROR,"Backtrace starting");
 }
 
 void Error::traceFrame(const char *description){
-	Logger::getInstance()->addLogString(Logger::Level_ERROR,description);
+	Logger::getInstance()->addLogEntry(Logger::Level_ERROR,description);
 }
 
 void Error::endTrace(){
-	Logger::getInstance()->addLogString(Logger::Level_ERROR,"Backtrace ended");
+	Logger::getInstance()->addLogEntry(Logger::Level_ERROR,"Backtrace ended");
 }
 
 }

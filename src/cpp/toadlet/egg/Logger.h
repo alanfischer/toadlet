@@ -34,12 +34,12 @@
 #endif
 
 #define TOADLET_MAKE_LOGGER_FUNCTION(name,level) \
-	static void name(const String &description){name((char*)NULL,description);} \
-	static void name(const String &categoryName,const String &description){ \
+	static void name(const String &text){name((char*)NULL,text);} \
+	static void name(const String &categoryName,const String &text){ \
 		Logger *instance=getInstance(); \
 		if(level>Level_MAX) ; \
 		else if(level<=instance->getMasterReportingLevel() && level<=instance->getCategoryReportingLevel(categoryName)){ \
-			instance->addLogString(categoryName,level,description); \
+			instance->addLogEntry(categoryName,level,text); \
 		} \
 	}
 
@@ -67,14 +67,28 @@ public:
 
 	class Category{
 	public:
-		Category(const String &name):
-			reportingLevel(Level_MAX)
-		{
+		Category(const String &name,Level reportingLevel=Level_MAX){
 			this->name=name;
+			this->reportingLevel=reportingLevel;
 		}
 
 		String name;
 		Level reportingLevel;
+	};
+
+	class Entry{
+	public:
+		Entry(Category *category=NULL,Level level=Level_MAX,uint64 time=0,const String &text=(char*)NULL){
+			this->category=category;
+			this->level=level;
+			this->time=time;
+			this->text=text;
+		}
+
+		Category *category;
+		Level level;
+		uint64 time;
+		String text;
 	};
 
 	static Logger *getInstance();
@@ -97,16 +111,17 @@ public:
 	void addLoggerListener(LoggerListener *listener);
 	void removeLoggerListener(LoggerListener *listener);
 
-	void setOutputLogString(bool outputLogString);
-	bool getOutputLogString() const{return mOutputLogString;}
+	void setOutputLogEntry(bool outputLogEntry);
+	bool getOutputLogEntry() const{return mOutputLogEntry;}
 
-	void setStoreLogString(bool storeLogString);
-	bool getStoreLogString() const{return mStoreLogString;}
+	void setStoreLogEntry(bool storeLogEntry);
+	bool getStoreLogEntry() const{return mStoreLogEntry;}
 
-	void addLogString(const String &categoryName,Level level,const String &string);
-	void addLogString(Level level,const String &string);
+	void addLogEntry(const String &categoryName,Level level,const String &text);
+	void addLogEntry(Level level,const String &text){addLogEntry((char*)NULL,level,text);}
 
-	String getLogString();
+	int getNumLogEntries();
+	Entry *getLogEntry(int i);
 
 private:
 	Logger();
@@ -117,7 +132,7 @@ private:
 	Category *addCategory(const String &categoryName);
 	Category *getCategory(const String &categoryName);
 
-	void addCompleteLogString(Category *category,Level level,const String &data);
+	void addCompleteLogEntry(Category *category,Level level,const String &text);
 
 	void lock();
 	void unlock();
@@ -125,12 +140,12 @@ private:
 	static Logger *mTheLogger;
 
 	egg::Collection<LoggerListener*> mLoggerListeners;
-	bool mOutputLogString;
-	bool mStoreLogString;
+	bool mOutputLogEntry;
+	bool mStoreLogEntry;
 	Level mReportingLevel;
 	bool mLoggedMessage;
+	egg::Collection<Entry*> mLogEntries;
 	CategoryNameCategoryMap mCategoryNameCategoryMap;
-	String mLogString;
 	#if !defined(TOADLET_NO_THREADS)
 		Mutex mMutex;
 	#endif

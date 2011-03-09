@@ -40,6 +40,8 @@ public:
 	static uint64 utime();
 	static uint64 mtime();
 
+	static String mtimeToString(uint64 time);
+	
 	static int threadID();
 
 	static bool absolutePath(const String &path);
