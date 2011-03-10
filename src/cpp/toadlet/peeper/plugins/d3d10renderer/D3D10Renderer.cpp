@@ -163,6 +163,9 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 "float4x4 ShaderMatrix;\n"
 "float4x4 textureMatrix;\n"
 "Texture2D diffuseTexture;\n"
+"float4 diffuseColor;\n"
+"float useTexture;\n"
+
 "SamplerState samLinear{\n"
     "Filter = MIN_MAG_MIP_LINEAR;\n"
     "AddressU = Wrap;\n"
@@ -177,14 +180,12 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 "VS_OUTPUT VS( float4 Pos : POSITION, float2 TexCoords : TEXCOORD){\n"
   "VS_OUTPUT Output = (VS_OUTPUT)0;\n"
   "Output.Pos = mul(Pos, ShaderMatrix);\n"
-//  "Output.TexCoords.x=TexCoords.x*0.5 + 0.5;\n"//(TexCoords.x + .25);\n"
-//  "Output.TexCoords.y=TexCoords.y*0.5 + 0.5;\n"//(TexCoords.y + .25);\n"
-	"Output.TexCoords=mul(TexCoords,textureMatrix);\n"
+  "Output.TexCoords=mul(TexCoords,textureMatrix);\n"
   "return Output;\n"
 "}\n"
 
 "float4 PS( VS_OUTPUT Input ) : SV_Target{\n"
-    "return diffuseTexture.Sample(samLinear,Input.TexCoords);\n"
+	"return diffuseTexture.Sample(samLinear,Input.TexCoords)*useTexture + diffuseColor*(1-useTexture);\n"
 "}\n"
 
 "technique10 Render{\n"
@@ -566,6 +567,7 @@ void D3D10Renderer::setLighting(bool lighting){
 }
 
 void D3D10Renderer::setLightEffect(const LightEffect &lightEffect){
+	effect->GetVariableByName("diffuseColor")->AsVector()->SetFloatVector((float*)lightEffect.diffuse.getData());
 }
 
 void D3D10Renderer::setDepthBias(scalar constant,scalar slope){
@@ -588,6 +590,7 @@ void D3D10Renderer::setTextureStage(int stage,TextureStage *textureStage){
 	}
 effect->GetVariableByName("diffuseTexture")->AsShaderResource()->SetResource(texture);
 effect->GetVariableByName("textureMatrix")->AsMatrix()->SetMatrix(textureMatrix);
+effect->GetVariableByName("useTexture")->AsScalar()->SetFloat(texture!=NULL);
 
 /*	HRESULT result=S_OK;
 
