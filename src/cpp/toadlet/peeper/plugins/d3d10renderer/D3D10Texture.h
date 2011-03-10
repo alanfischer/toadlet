@@ -69,6 +69,8 @@ public:
 
 	ID3D10Resource *getD3D10Resource(){return mTexture;}
 
+	bool generateMipLevels();
+
 protected:
 	bool createContext(int mipLevels,byte *mipDatas[]);
 	bool destroyContext();

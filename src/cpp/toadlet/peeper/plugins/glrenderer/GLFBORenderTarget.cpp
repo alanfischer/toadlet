@@ -125,11 +125,13 @@ bool GLFBORenderTarget::swap(){
 	glBindFramebuffer(GL_FRAMEBUFFER,0);
 
 	int i;
-	for(i=0;i<mBuffers.size();++i){
-		GLPixelBuffer *glpixelBuffer=(GLPixelBuffer*)mBuffers[i]->getRootPixelBuffer();
-		GLTextureMipPixelBuffer *textureBuffer=glpixelBuffer->castToGLTextureMipPixelBuffer();
-		if(textureBuffer!=NULL){
-			textureBuffer->getTexture()->generateMipLevels();
+	for(i=0;i<mBufferAttachments.size();++i){
+		if(mBufferAttachments[i]!=Attachment_DEPTH_STENCIL){
+			GLPixelBuffer *glpixelBuffer=(GLPixelBuffer*)mBuffers[i]->getRootPixelBuffer();
+			GLTextureMipPixelBuffer *textureBuffer=glpixelBuffer->castToGLTextureMipPixelBuffer();
+			if(textureBuffer!=NULL){
+				textureBuffer->getTexture()->generateMipLevels();
+			}
 		}
 	}
 

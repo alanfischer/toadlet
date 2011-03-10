@@ -47,7 +47,7 @@ public:
 	virtual void destroy();
 
 	virtual bool activate();
-	virtual void swap(){}
+	virtual void swap();
 	virtual void reset(){}
 
 	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment);

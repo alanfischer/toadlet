@@ -318,9 +318,7 @@ bool D3D10Texture::load(int width,int height,int depth,int mipLevel,byte *mipDat
 	int subresource=D3D10CalcSubresource(mipLevel,0,0);
 	device->UpdateSubresource(mTexture,subresource,NULL,mipData,rowPitch,slicePitch);
 
-	if((mUsage&(Usage_BIT_RENDERTARGET|Usage_BIT_AUTOGEN_MIPMAPS))==(Usage_BIT_RENDERTARGET|Usage_BIT_AUTOGEN_MIPMAPS)){
-		device->GenerateMips(mShaderResourceView);
-	}
+	generateMipLevels();
 
 	return true;
 }
@@ -371,6 +369,13 @@ bool D3D10Texture::read(int width,int height,int depth,int mipLevel,byte *mipDat
 		return false;
 	}
 
+	return true;
+}
+
+bool D3D10Texture::generateMipLevels(){
+	if((mUsage&(Usage_BIT_RENDERTARGET|Usage_BIT_AUTOGEN_MIPMAPS))==(Usage_BIT_RENDERTARGET|Usage_BIT_AUTOGEN_MIPMAPS)){
+		mDevice->GenerateMips(mShaderResourceView);
+	}
 	return true;
 }
 
