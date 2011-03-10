@@ -39,6 +39,8 @@ public:
 	static uint64 utime();
 	static uint64 mtime();
 
+	static String mtimeToString(uint64 time);
+
 	static int threadID();
 
 	static bool absolutePath(const String &path);
@@ -46,6 +48,8 @@ public:
 	#if !defined(TOADLET_PLATFORM_WINCE)
 		static String getEnv(const String &name);
 	#endif
+
+	static const uint64 DELTA_EPOC_MICROSECONDS;
 };
 
 }
