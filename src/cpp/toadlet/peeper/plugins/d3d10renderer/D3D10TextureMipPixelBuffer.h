@@ -64,6 +64,7 @@ public:
 	virtual uint8 *lock(int lockAccess);
 	virtual bool unlock();
 
+	inline D3D10Texture *getTexture() const{return mTexture;}
 	inline ID3D10RenderTargetView *getD3D10RenderTargetView() const{return mD3DRenderTargetView;}
 	inline ID3D10DepthStencilView *getD3D10DepthStencilView() const{return mD3DDepthStencilView;}
 

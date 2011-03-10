@@ -85,6 +85,16 @@ bool D3D10PixelBufferRenderTarget::activate(){
 	return D3D10RenderTarget::activate();
 }
 
+void D3D10PixelBufferRenderTarget::swap(){
+	int i;
+	for(i=0;i<mBufferAttachments.size();++i){
+		if(mBufferAttachments[i]!=Attachment_DEPTH_STENCIL){
+			D3D10TextureMipPixelBuffer::ptr buffer=shared_static_cast<D3D10TextureMipPixelBuffer>(mBuffers[i]);
+			buffer->getTexture()->generateMipLevels();
+		}
+	}
+}
+
 bool D3D10PixelBufferRenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachment){
 	mBuffers.add(buffer);
 	mBufferAttachments.add(attachment);

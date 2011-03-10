@@ -43,7 +43,6 @@ class D3D10Renderer:public Renderer{
 public:
 LPD3D10EFFECT effect;
 LPD3D10EFFECTTECHNIQUE technique;
-ID3D10ShaderResourceView *texture;
 D3D10_PASS_DESC passDesc;
 
 	D3D10Renderer();

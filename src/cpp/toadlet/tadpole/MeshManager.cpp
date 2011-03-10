@@ -267,6 +267,10 @@ Mesh::ptr MeshManager::createGrid(scalar width,scalar height,int numWidth,int nu
 }
 
 Mesh::ptr MeshManager::createGrid(VertexBuffer::ptr vertexBuffer,IndexBuffer::ptr indexBuffer,scalar width,scalar height,int numWidth,int numHeight){
+	if(numWidth<=1 || numHeight<=0){
+		return NULL;
+	}
+
 	{
 		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
 		iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
@@ -281,8 +285,8 @@ Mesh::ptr MeshManager::createGrid(VertexBuffer::ptr vertexBuffer,IndexBuffer::pt
 			for(x=0;x<numWidth;++x){
 				if(positionIndex>=0){
 					vba.set3(vi,positionIndex,
-						Math::div(Math::mul(width,Math::fromInt(x)),Math::fromInt(numWidth))-width/2.0,
-						Math::div(Math::mul(height,Math::fromInt(y)),Math::fromInt(numHeight))-height/2.0,
+						Math::div(Math::mul(width,Math::fromInt(x)),Math::fromInt(numWidth-1))-width/2.0,
+						Math::div(Math::mul(height,Math::fromInt(y)),Math::fromInt(numHeight-1))-height/2.0,
 						0
 					);
 				}
@@ -291,8 +295,8 @@ Mesh::ptr MeshManager::createGrid(VertexBuffer::ptr vertexBuffer,IndexBuffer::pt
 				}
 				if(texCoordIndex>=0){
 					vba.set2(vi,texCoordIndex,
-						Math::div(Math::fromInt(x),Math::fromInt(numWidth)),
-						Math::div(Math::fromInt(y),Math::fromInt(numHeight))
+						Math::div(Math::fromInt(x),Math::fromInt(numWidth-1)),
+						Math::div(Math::fromInt(y),Math::fromInt(numHeight-1))
 					);
 				}
 				vi++;

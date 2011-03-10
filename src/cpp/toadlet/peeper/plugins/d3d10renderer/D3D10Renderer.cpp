@@ -125,7 +125,7 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 
 	D3D10_RASTERIZER_DESC desc;
 	desc.FillMode=D3D10_FILL_SOLID;
-	desc.CullMode=D3D10_CULL_NONE;
+	desc.CullMode=D3D10_CULL_BACK;
 	desc.FrontCounterClockwise=TRUE;
 	desc.DepthBias=0;
 	desc.DepthBiasClamp=0;
@@ -161,6 +161,7 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 
 	char *effectstring=
 "float4x4 ShaderMatrix;\n"
+"float4x4 textureMatrix;\n"
 "Texture2D diffuseTexture;\n"
 "SamplerState samLinear{\n"
     "Filter = MIN_MAG_MIP_LINEAR;\n"
@@ -176,7 +177,9 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 "VS_OUTPUT VS( float4 Pos : POSITION, float2 TexCoords : TEXCOORD){\n"
   "VS_OUTPUT Output = (VS_OUTPUT)0;\n"
   "Output.Pos = mul(Pos, ShaderMatrix);\n"
-  "Output.TexCoords = TexCoords;\n"
+//  "Output.TexCoords.x=TexCoords.x*0.5 + 0.5;\n"//(TexCoords.x + .25);\n"
+//  "Output.TexCoords.y=TexCoords.y*0.5 + 0.5;\n"//(TexCoords.y + .25);\n"
+	"Output.TexCoords=mul(TexCoords,textureMatrix);\n"
   "return Output;\n"
 "}\n"
 
@@ -206,8 +209,6 @@ void *create=GetProcAddress(library,"D3D10CreateEffectFromMemory");
 // Obtain the technique
 technique = effect->GetTechniqueByName( "Render" );
 technique->GetPassByIndex( 0 )->GetDesc( &passDesc);
-
-texture=NULL;
 
 	return true;
 }
@@ -352,6 +353,12 @@ void D3D10Renderer::endScene(){
 	for(i=0;i<mCapabilitySet.maxTextureStages;++i){
 		setTextureStage(i,NULL);
 	}
+
+// Doing this temporarily to unbind any resources
+D3D10_TECHNIQUE_DESC techDesc;
+technique->GetDesc( &techDesc );
+for( UINT p = 0; p < techDesc.Passes; ++p )
+technique->GetPassByIndex(p)->Apply(0);
 }
 
 void D3D10Renderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData){
@@ -571,13 +578,16 @@ void D3D10Renderer::setTexturePerspective(bool texturePerspective){
 }
 
 void D3D10Renderer::setTextureStage(int stage,TextureStage *textureStage){
-	if(textureStage!=NULL && stage==0 && textureStage->texture!=NULL){
+	if(stage>0)return;
+
+	ID3D10ShaderResourceView *texture=NULL;
+	float *textureMatrix=(float*)Math::IDENTITY_MATRIX4X4.getData();
+	if(textureStage!=NULL && textureStage->texture!=NULL){
 		texture=((D3D10Texture*)(textureStage->texture->getRootTexture(0)))->mShaderResourceView;
-	}
-	else if(stage==0){
-		texture=NULL;
+		textureMatrix=textureStage->matrix.getData();
 	}
 effect->GetVariableByName("diffuseTexture")->AsShaderResource()->SetResource(texture);
+effect->GetVariableByName("textureMatrix")->AsMatrix()->SetMatrix(textureMatrix);
 
 /*	HRESULT result=S_OK;
 
