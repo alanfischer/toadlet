@@ -58,6 +58,14 @@ uint64 PosixSystem::mtime(){
 	return ((uint64)now.tv_sec)*1000+((uint64)(now.tv_usec))/1000;
 }
 
+String PosixSystem::mtimeToString(uint64 time){
+	char timeString[128];
+	time_t tt=time/=1000;
+	struct tm *ts=gmtime(&tt);
+	strftime(timeString,sizeof(timeString),"%Y-%m-%d %H:%M:%S :",ts);
+	return timeString;
+}
+
 int PosixSystem::threadID(){
 	return (intptr_t)(int*)(pthread_self());
 }
