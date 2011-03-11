@@ -25,7 +25,9 @@
 
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/LoggerListener.h>
+#include <toadlet/egg/System.h>
 #include <toadlet/egg/Version.h>
+	#include <time.h>
 #if defined(TOADLET_PLATFORM_WIN32)
 	#include <windows.h>
 #else
@@ -69,8 +71,8 @@ void Logger::destroy(){
 Logger::Logger(){
 	mLoggedMessage=false;
 	mReportingLevel=Level_MAX;
-	mOutputLogString=true;
-	mStoreLogString=false;
+	mOutputLogEntry=true;
+	mStoreLogEntry=false;
 
 	addCategory(Categories::TOADLET_EGG_LOGGER);
 	addCategory(Categories::TOADLET_EGG_NET);
@@ -91,12 +93,17 @@ Logger::~Logger(){
 		delete category;
 		mCategoryNameCategoryMap.erase(mCategoryNameCategoryMap.begin());
 	}
+
+	int i;
+	for(i=0;i<mLogEntries.size();++i){
+		delete mLogEntries[i];
+	}
 }
 
 void Logger::setMasterReportingLevel(Level level){
 	mReportingLevel=level;
 
-	addLogString(Categories::TOADLET_EGG_LOGGER,Level_DISABLED,String("Master Reporting Level is ")+level);
+	addLogEntry(Categories::TOADLET_EGG_LOGGER,Level_DISABLED,String("Master Reporting Level is ")+level);
 }
 
 void Logger::setCategoryReportingLevel(const String &categoryName,Level level){
@@ -142,21 +149,19 @@ void Logger::removeLoggerListener(LoggerListener *listener){
 	unlock();
 }
 
-void Logger::setOutputLogString(bool outputLogString){
+void Logger::setOutputLogEntry(bool outputLogEntry){
 	lock();
-		mOutputLogString=outputLogString;
+		mOutputLogEntry=outputLogEntry;
 	unlock();
 }
 
-void Logger::setStoreLogString(bool storeLogString){
+void Logger::setStoreLogEntry(bool storeLogEntry){
 	lock();
-		mStoreLogString=storeLogString;
+		mStoreLogEntry=storeLogEntry;
 	unlock();
 }
 
-void Logger::addLogString(const String &categoryName,Level level,const String &data){
-	if(categoryName.wc_str()==NULL || data.wc_str()==NULL) return; /// @todo: This apparently happens when a GLTexture is being destroyed after everything else.  Need to look into it.
-
+void Logger::addLogEntry(const String &categoryName,Level level,const String &text){
 	Category *category=getCategory(categoryName);
 	lock();
 		if((category==NULL || category->reportingLevel>=level) && mReportingLevel>=level){
@@ -170,48 +175,42 @@ void Logger::addLogString(const String &categoryName,Level level,const String &d
 					loggerLevel=getCategoryReportingLevel(Categories::TOADLET_EGG_LOGGER);
 				lock();
 				if(loggerLevel>Level_DISABLED){
-					addCompleteLogString(NULL,Level_DISABLED,line);
+					addCompleteLogEntry(NULL,Level_DISABLED,line);
 				}
 			}
 
-			addCompleteLogString(category,level,data);
+			addCompleteLogEntry(category,level,text);
 		}
 	unlock();
 }
 
-void Logger::addLogString(Level level,const String &string){
-	addLogString((char*)NULL,level,string);
-}
-
-String Logger::getLogString(){
-	String string;
-
+int Logger::getNumLogEntries(){
+	int size=0;
 	lock();
-		string=mLogString;
+		size=mLogEntries.size();
 	unlock();
-
-	return string;
+	return size;
 }
 
-void Logger::addCompleteLogString(Category *category,Level level,const String &data){
+Logger::Entry *Logger::getLogEntry(int i){
+	Entry *entry=NULL;
+	lock();
+		entry=mLogEntries[i];
+	unlock();
+	return entry;
+}
+
+void Logger::addCompleteLogEntry(Category *category,Level level,const String &text){
 	int i;
 
+	uint64 time=System::mtime();
+
 	for(i=mLoggerListeners.size()-1;i>=0;--i){
-		mLoggerListeners[i]->addLogString(category,level,data);
+		mLoggerListeners[i]->addLogEntry(category,level,time,text);
 	}
 
-	if(mOutputLogString || mStoreLogString){
-	    char timeString[128];
-	    #if defined(TOADLET_PLATFORM_WIN32)
-			SYSTEMTIME currentTime;
-			GetLocalTime(&currentTime);
-			sprintf(timeString,"%04d-%02d-%02d %02d:%02d:%02d :",currentTime.wYear,currentTime.wMonth,currentTime.wDay,currentTime.wHour,currentTime.wMinute,currentTime.wSecond);
-		#else
-			time_t currentTime;
-			time(&currentTime);
-			struct tm *ts=localtime(&currentTime);
-			strftime(timeString,sizeof(timeString),"%Y-%m-%d %H:%M:%S :",ts);
-		#endif
+	if(mOutputLogEntry){
+		String timeString=System::mtimeToString(time);
 
 		const char *levelString=NULL;
 		switch(level){
@@ -238,40 +237,32 @@ void Logger::addCompleteLogString(Category *category,Level level,const String &d
 			break;
 		}
 		
-		String line=String()+timeString+levelString+data+(char)10;
+		String line=String()+timeString+levelString+text+(char)10;
 
-		if(mOutputLogString){
-			#if defined(TOADLET_USE_OUTPUTDEBUGSTRING_LOGGING)
-				int len=line.length();
-				// If we go above a certain amount, windows apparently just starts ignoring messages
-				if(len>=8192){
-					OutputDebugString(TEXT("WARNING: Excessive string length, may be truncated and near future messages dropped\n"));
+		#if defined(TOADLET_USE_OUTPUTDEBUGSTRING_LOGGING)
+			int len=line.length();
+			// If we go above a certain amount, windows apparently just starts ignoring messages
+			if(len>=8192){
+				OutputDebugString(TEXT("WARNING: Excessive string length, may be truncated and near future messages dropped\n"));
+			}
+			int i=0;
+			while(i<len){
+				int newi=i+1023; // OutputDebugString truncates anything beyond 1023
+				if(newi>len){
+					newi=len;
 				}
-				int i=0;
-				while(i<len){
-					int newi=i+1023; // OutputDebugString truncates anything beyond 1023
-					if(newi>len){
-						newi=len;
-					}
-					OutputDebugString(line.substr(i,newi-i));
-					i=newi;
-				}
-			#endif
+				OutputDebugString(line.substr(i,newi-i));
+				i=newi;
+			}
+		#endif
 
-			#if defined(TOADLET_USE_STDERR_LOGGING)
-				fputs(line,stderr);
-			#endif
+		#if defined(TOADLET_USE_STDERR_LOGGING)
+			fputs(line,stderr);
+		#endif
+	}
 
-//			if(level==Level_ERROR){
-//				#if defined(TOADLET_PLATFORM_WIN32)
-//					MessageBox(NULL,data,TEXT("Logger::error"),MB_OK);
-//				#endif
-//			}
-		}
-
-		if(mStoreLogString){
-			mLogString+=line;
-		}
+	if(mStoreLogEntry){
+		mLogEntries.add(new Entry(category,level,time,text));
 	}
 }
 
