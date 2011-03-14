@@ -114,7 +114,7 @@ void *ParticleNode::hasInterface(int type){
 	}
 }
 
-bool ParticleNode::setNumParticles(int numParticles,int particleType,const Vector3 positions[]){
+bool ParticleNode::setNumParticles(int numParticles,int particleType,scalar scale,const Vector3 positions[]){
 	if(particleType>=ParticleType_BEAM && (numParticles%particleType)!=0){
 		Error::invalidParameters(Categories::TOADLET_TADPOLE,
 			"setNumParticles: Must specify a numParticles divisible by particleType");
@@ -134,6 +134,9 @@ bool ParticleNode::setNumParticles(int numParticles,int particleType,const Vecto
 			p.y=position.y;
 			p.z=position.z;
 		}
+	}
+	for(i=0;i<numParticles;++i){
+		mParticles[i].scale=scale;
 	}
 
 	createVertexBuffer();

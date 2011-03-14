@@ -84,7 +84,7 @@ public:
 
 	void *hasInterface(int type);
 
-	bool setNumParticles(int numParticles,int particleType,const Vector3 positions[]=NULL);
+	bool setNumParticles(int numParticles,int particleType,scalar scale=Math::ONE,const Vector3 positions[]=NULL);
 	inline int getNumParticles() const{return mParticles.size();}
 	inline int getParticleType() const{return mParticleType;}
 	inline Particle *getParticle(int i){return &mParticles[i];}
