@@ -728,8 +728,8 @@ void D3D9Renderer::setPointState(const PointState &state){
 			float fQuadratic=MathConversion::scalarToFloat(state.quadratic);
 
 			mD3DDevice->SetRenderState(D3DRS_POINTSCALE_A,*(DWORD*)(&fConstant));
-			mD3DDevice->SetRenderState(D3DRS_POINTSCALE_A,*(DWORD*)(&fLinear));
-			mD3DDevice->SetRenderState(D3DRS_POINTSCALE_A,*(DWORD*)(&fQuadratic));
+			mD3DDevice->SetRenderState(D3DRS_POINTSCALE_B,*(DWORD*)(&fLinear));
+			mD3DDevice->SetRenderState(D3DRS_POINTSCALE_C,*(DWORD*)(&fQuadratic));
 		}
 	#endif
 }

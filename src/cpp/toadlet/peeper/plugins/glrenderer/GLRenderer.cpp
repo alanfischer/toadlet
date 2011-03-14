@@ -549,6 +549,8 @@ bool GLRenderer::setRenderTarget(RenderTarget *target){
 }
 
 void GLRenderer::setViewport(const Viewport &viewport){
+	mViewport.set(viewport);
+
 	if(mRenderTarget!=NULL){
 		int rtwidth=mRenderTarget->getWidth();
 		int rtheight=mRenderTarget->getHeight();
@@ -569,6 +571,9 @@ void GLRenderer::setViewport(const Viewport &viewport){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"setViewport called without a valid render target");
 	}
+
+	// Update PointState, since it is dependent upon viewport size
+	setPointState(mPointState);
 
 	TOADLET_CHECK_GLERROR("setViewport");
 }
@@ -1129,6 +1134,8 @@ void GLRenderer::setTexturePerspective(bool texturePerspective){
 }
 
 void GLRenderer::setPointState(const PointState &state){
+	mPointState.set(state);
+
 	// pointsize = size / sqrt(constant + linear*d + quadratic*d*d)
 	// if a&b = 0, then quadratic = 1/(C*C) where C = first component of projMatrix * 1/2 screen width
 	if(mCapabilitySet.pointSprites){
@@ -1158,7 +1165,12 @@ void GLRenderer::setPointState(const PointState &state){
 	}
 
 	if(state.size>0){
-		glPointSize(MathConversion::scalarToFloat(state.size));
+		if(state.attenuated){
+			glPointSize(MathConversion::scalarToFloat(state.size) * mViewport.height);
+		}
+		else{
+			glPointSize(MathConversion::scalarToFloat(state.size));
+		}
 	}
 
 	if(state.attenuated){
@@ -1172,6 +1184,14 @@ void GLRenderer::setPointState(const PointState &state){
 			#endif
 		#else
 			cacheArray[0]=state.constant; cacheArray[1]=state.linear; cacheArray[2]=state.quadratic;
+			glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
+		#endif
+	}
+	else{
+		cacheArray[0]=Math::ONE; cacheArray[1]=0; cacheArray[2]=0;
+		#if defined(TOADLET_HAS_GLES)
+			glPointParameterxv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
+		#else
 			glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
 		#endif
 	}

@@ -63,7 +63,7 @@ public:
 	PointState &set(bool sprite1,scalar size1,bool attenuated1,scalar constant1,scalar linear1,scalar quadratic1,scalar minSize1,scalar maxSize1){
 		sprite=sprite1;
 		size=size1;
-		attenuated=false;
+		attenuated=attenuated1;
 		constant=constant1;
 		linear=linear1;
 		quadratic=quadratic1;

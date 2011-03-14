@@ -34,6 +34,7 @@
 #include <toadlet/peeper/LightEffect.h>
 #include <toadlet/peeper/PointState.h>
 #include <toadlet/peeper/TextureStage.h>
+#include <toadlet/peeper/Viewport.h>
 #include <toadlet/peeper/StatisticsSet.h>
 #include <toadlet/peeper/CapabilitySet.h>
 
@@ -171,6 +172,8 @@ protected:
 	bool mPBuffersAvailable;
 	bool mFBOsAvailable;
 
+	Viewport mViewport;
+	PointState mPointState;
 	bool mDepthWrite;
 	FaceCulling mFaceCulling;
 	bool mInTexGen;
