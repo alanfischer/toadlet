@@ -513,7 +513,7 @@ bool BSP30Node::sensePotentiallyVisible(SensorResultsListener *listener,const Ve
 	return true;
 }
 
-bool BSP30Node::findAmbientForPoint(Color &r,const Vector3 &point){
+bool BSP30Node::findAmbientForPoint(Vector4 &r,const Vector3 &point){
 	Vector3 end;
 	end.x=point.x;
 	end.y=point.y;

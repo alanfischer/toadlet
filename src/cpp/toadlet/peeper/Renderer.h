@@ -28,7 +28,6 @@
 
 #include <toadlet/egg/Collection.h>
 #include <toadlet/peeper/Types.h>
-#include <toadlet/peeper/Color.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
 
@@ -145,7 +144,7 @@ public:
 	virtual bool setRenderTarget(RenderTarget *target)=0;
 	virtual RenderTarget *getRenderTarget()=0;
 	virtual void setViewport(const Viewport &viewport)=0;
-	virtual void clear(int clearFlags,const Color &clearColor)=0;
+	virtual void clear(int clearFlags,const Vector4 &clearColor)=0;
 	virtual void swap()=0;
 	virtual void beginScene()=0;
 	virtual void endScene()=0;
@@ -175,7 +174,7 @@ public:
 	virtual void setLightEffect(const LightEffect &lightEffect)=0;
 	virtual void setLight(int i,Light *light)=0;
 	virtual void setLightEnabled(int i,bool enable)=0;
-	virtual void setAmbientColor(const Color &ambient)=0;
+	virtual void setAmbientColor(const Vector4 &ambient)=0;
 	 // A workaround here, since OpenGL & Direct3D have different shadow comparison methods
 	virtual void setShadowComparisonMethod(bool enabled)=0;
 

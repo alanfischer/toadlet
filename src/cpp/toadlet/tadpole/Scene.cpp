@@ -26,6 +26,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Profile.h>
+#include <toadlet/tadpole/Colors.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/node/CameraNode.h>
@@ -359,7 +360,7 @@ void Scene::renderRenderables(RenderQueue *queue,Renderer *renderer,CameraNode *
 	}
 
 	Matrix4x4 matrix;
-	Color ambient;
+	Vector4 ambient;
 
 	mCountLastRendered=0;
 

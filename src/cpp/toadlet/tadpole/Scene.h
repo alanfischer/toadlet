@@ -26,7 +26,6 @@
 #ifndef TOADLET_TADPOLE_SCENE_H
 #define TOADLET_TADPOLE_SCENE_H
 
-#include <toadlet/peeper/Color.h>
 #include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/peeper/TextureStage.h>
 #include <toadlet/tadpole/Collision.h>
@@ -94,7 +93,7 @@ public:
 	virtual node::Node *findNodeByInterface(int ni,node::Node *node=NULL);
 	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits=-1,node::Node *ignore=NULL){result.time=Math::ONE;}
 
-	virtual void setAmbientColor(peeper::Color ambientColor){mAmbientColor.set(ambientColor);}
+	virtual void setAmbientColor(const Vector4 &ambientColor){mAmbientColor.set(ambientColor);}
 	virtual void setFogState(const peeper::FogState &state){mFogState.set(state);}
 
 	virtual egg::image::Image::ptr renderToImage(peeper::Renderer *renderer,node::CameraNode *camera,int format,int width,int height);
@@ -129,7 +128,7 @@ protected:
 	node::PartitionNode::ptr mBackground;
 	node::PartitionNode::ptr mRoot;
 
-	peeper::Color mAmbientColor;
+	Vector4 mAmbientColor;
 	peeper::FogState mFogState;
 
 	RenderQueue::ptr mRenderQueue;

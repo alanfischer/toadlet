@@ -277,14 +277,14 @@ Mesh::ptr MMSHHandler::loadMeshVersion3(DataStream::ptr stream){
 
 						// MMSH stored color in ARGB, now an outdated format
 						color=stream->readBigUInt32();
-						lightEffect.ambient=Color::rgba(((color&0xFF000000)>>24)|((color&0x00FFFFFF)<<8));
+						lightEffect.ambient=Vector4(((color&0xFF000000)>>24)|((color&0x00FFFFFF)<<8));
 						color=stream->readBigUInt32();
-						lightEffect.diffuse=Color::rgba(((color&0xFF000000)>>24)|((color&0x00FFFFFF)<<8));
+						lightEffect.diffuse=Vector4(((color&0xFF000000)>>24)|((color&0x00FFFFFF)<<8));
 						color=stream->readBigUInt32();
-						lightEffect.specular=Color::rgba(((color&0xFF000000)>>24)|((color&0x00FFFFFF)<<8));
+						lightEffect.specular=Vector4(((color&0xFF000000)>>24)|((color&0x00FFFFFF)<<8));
 						lightEffect.shininess=MathConversion::fixedToScalar(stream->readBigInt32());
 						color=stream->readBigUInt32();
-						lightEffect.emissive=Color::rgba(((color&0xFF000000)>>24)|((color&0x00FFFFFF)<<8));
+						lightEffect.emissive=Vector4(((color&0xFF000000)>>24)|((color&0x00FFFFFF)<<8));
 
 						material->setLightEffect(lightEffect);
 					}

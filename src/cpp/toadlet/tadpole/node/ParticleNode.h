@@ -28,7 +28,6 @@
 
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/Random.h>
-#include <toadlet/peeper/Color.h>
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>

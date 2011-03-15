@@ -103,7 +103,7 @@ Node *CameraNode::create(Scene *scene){
 	mGammaMaterial=mEngine->getMaterialManager()->createMaterial();
 	mGammaMaterial->setDepthTest(Renderer::DepthTest_NONE);
 	mGammaMaterial->setLighting(true);
-	mGammaMaterial->setLightEffect(LightEffect(Colors::BLACK));
+	mGammaMaterial->setLightEffect(LightEffect(Math::ZERO_VECTOR4));
 	mGammaMaterial->retain();
 
 	mFPSLastTime=0;
@@ -328,11 +328,11 @@ void CameraNode::setGamma(scalar gamma){
 	mGamma=gamma;
 	if(gamma>=Math::ONE){
 		mGammaMaterial->setBlend(Blend::Combination_ALPHA_ADDITIVE);
-		mGammaMaterial->setLightEffect(LightEffect(Color(Math::ONE,Math::ONE,Math::ONE,gamma-Math::ONE)));
+		mGammaMaterial->setLightEffect(LightEffect(Vector4(Math::ONE,Math::ONE,Math::ONE,gamma-Math::ONE)));
 	}
 	else{
 		mGammaMaterial->setBlend(Blend::Combination_ALPHA);
-		mGammaMaterial->setLightEffect(LightEffect(Color(0,0,0,Math::ONE-gamma)));
+		mGammaMaterial->setLightEffect(LightEffect(Vector4(0,0,0,Math::ONE-gamma)));
 	}
 }
 
@@ -476,7 +476,7 @@ void CameraNode::updateViewTransform(){
 
 void CameraNode::renderOverlayGamma(Renderer *renderer){
 	if(mGamma!=Math::ONE){
-		renderer->setAmbientColor(Colors::WHITE);
+		renderer->setAmbientColor(Math::ONE_VECTOR4);
 		mGammaMaterial->setupRenderer(renderer);
 		renderer->setProjectionMatrix(mOverlayMatrix);
 		renderer->setViewMatrix(Math::IDENTITY_MATRIX4X4);

@@ -273,7 +273,7 @@ void D3D9Renderer::setViewport(const Viewport &viewport){
 	TOADLET_CHECK_D3D9ERROR(result,"setViewport");
 }
 
-void D3D9Renderer::clear(int clearFlags,const Color &clearColor){
+void D3D9Renderer::clear(int clearFlags,const Vector4 &clearColor){
 	int d3dclear=0;
 
 	if(clearFlags & ClearFlag_COLOR){
@@ -482,7 +482,7 @@ void D3D9Renderer::setDefaultStates(){
 	}
 
 	setLightEffect(LightEffect());
-	setAmbientColor(Colors::WHITE);
+	setAmbientColor(Math::ONE_VECTOR4);
 	// We leave the current lights enabled because the SceneManager does not re-set the lights between layers
 
 	// D3D specific states
@@ -942,7 +942,7 @@ void D3D9Renderer::setLightEnabled(int i,bool enable){
 	TOADLET_CHECK_D3D9ERROR(hr,"setLightEnabled");
 }
 
-void D3D9Renderer::setAmbientColor(const Color &ambient){
+void D3D9Renderer::setAmbientColor(const Vector4 &ambient){
 	HRESULT hr=mD3DDevice->SetRenderState(D3DRS_AMBIENT,toD3DCOLOR(ambient));
 	TOADLET_CHECK_D3D9ERROR(hr,"setAmbientColor");
 }

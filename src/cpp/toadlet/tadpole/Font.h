@@ -75,7 +75,7 @@ public:
 
 	void destroy();
 
-	bool updateVertexBufferForString(peeper::VertexBuffer::ptr vertexBuffer,const egg::String &string,const peeper::Color &color,int alignment,bool pixelSpace,bool flip);
+	bool updateVertexBufferForString(peeper::VertexBuffer::ptr vertexBuffer,const egg::String &string,const Vector4 &color,int alignment,bool pixelSpace,bool flip);
 
 	int getStringWidth(const egg::String &string) const{return getStringWidth(string,0,string.length());}
 	int getStringWidth(const egg::String &string,int start,int end) const;

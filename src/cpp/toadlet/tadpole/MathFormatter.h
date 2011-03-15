@@ -27,7 +27,6 @@
 #define TOADLET_TADPOLE_MATHFORMATTER_H
 
 #include <toadlet/tadpole/Types.h>
-#include <toadlet/peeper/Color.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -52,11 +51,8 @@ public:
 	static egg::String formatQuaternion(const Quaternion &q,char *separator=",");
 	static Quaternion &parseQuaternion(Quaternion &r,const char *string);
 
-	static egg::String formatColor(const peeper::Color &c,char *separator=",");
-	static peeper::Color &parseColor(peeper::Color &r,const char *string);
-
-	static egg::String formatByteColor(const peeper::Color &c,char *separator=",");
-	static peeper::Color &parseByteColor(peeper::Color &r,const char *string);
+	static egg::String formatByteColor(const Vector4 &c,char *separator=",");
+	static Vector4 &parseByteColor(Vector4 &r,const char *string);
 };
 
 }

@@ -84,7 +84,7 @@ public:
 	bool setRenderTarget(RenderTarget *target);
 	RenderTarget *getRenderTarget(){return mRenderTarget;}
 	void setViewport(const Viewport &viewport);
-	void clear(int clearFlags,const Color &clearColor);
+	void clear(int clearFlags,const Vector4 &clearColor);
 	void swap();
 	void beginScene();
 	void endScene();
@@ -115,7 +115,7 @@ public:
 	void setShadowComparisonMethod(bool enabled);
 	void setLight(int i,Light *light);
 	void setLightEnabled(int i,bool enable);
-	void setAmbientColor(const Color &ambient);
+	void setAmbientColor(const Vector4 &ambient);
 
 	// Misc operations
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
@@ -128,8 +128,8 @@ public:
 
 	bool useMapping(GLBuffer *buffer) const;
 
-	inline egg::mathfixed::fixed *colorArray(egg::mathfixed::fixed result[],const Color &src){result[0]=egg::MathConversion::scalarToFixed(src.r);result[1]=egg::MathConversion::scalarToFixed(src.g);result[2]=egg::MathConversion::scalarToFixed(src.b);result[3]=egg::MathConversion::scalarToFixed(src.a);return result;}
-	inline float *colorArray(float result[],const Color &src){result[0]=egg::MathConversion::scalarToFloat(src.r);result[1]=egg::MathConversion::scalarToFloat(src.g);result[2]=egg::MathConversion::scalarToFloat(src.b);result[3]=egg::MathConversion::scalarToFloat(src.a);return result;}
+	inline egg::mathfixed::fixed *colorArray(egg::mathfixed::fixed result[],const Vector4 &src){result[0]=egg::MathConversion::scalarToFixed(src.x);result[1]=egg::MathConversion::scalarToFixed(src.y);result[2]=egg::MathConversion::scalarToFixed(src.z);result[3]=egg::MathConversion::scalarToFixed(src.w);return result;}
+	inline float *colorArray(float result[],const Vector4 &src){result[0]=egg::MathConversion::scalarToFloat(src.x);result[1]=egg::MathConversion::scalarToFloat(src.y);result[2]=egg::MathConversion::scalarToFloat(src.z);result[3]=egg::MathConversion::scalarToFloat(src.w);return result;}
 	inline egg::mathfixed::fixed *lightDirArray(egg::mathfixed::fixed result[],const Vector3 &src){result[0]=egg::MathConversion::scalarToFixed(-src.x);result[1]=egg::MathConversion::scalarToFixed(-src.y);result[2]=egg::MathConversion::scalarToFixed(-src.z);result[3]=0;return result;}
 	inline float *lightDirArray(float result[],const Vector3 &src){result[0]=egg::MathConversion::scalarToFloat(-src.x);result[1]=egg::MathConversion::scalarToFloat(-src.y);result[2]=egg::MathConversion::scalarToFloat(-src.z);result[3]=0;return result;}
 	inline egg::mathfixed::fixed *lightPosArray(egg::mathfixed::fixed result[],const Vector3 &src){result[0]=egg::MathConversion::scalarToFixed(src.x);result[1]=egg::MathConversion::scalarToFixed(-src.y);result[2]=egg::MathConversion::scalarToFixed(-src.z);result[3]=egg::MathConversion::scalarToFixed(Math::ONE);return result;}

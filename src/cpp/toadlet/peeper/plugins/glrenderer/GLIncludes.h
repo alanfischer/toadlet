@@ -29,7 +29,6 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/peeper/Types.h>
-#include <toadlet/peeper/Color.h>
 
 #if defined(TOADLET_PLATFORM_WINCE)
 	#include "platform/egl/glesem/glesem.h"

@@ -76,7 +76,7 @@ D3D10_PASS_DESC passDesc;
 	bool setRenderTarget(RenderTarget *target);
 	RenderTarget *getRenderTarget(){return mRenderTarget;}
 	void setViewport(const Viewport &viewport);
-	void clear(int clearFlags,const Color &clearcolor);
+	void clear(int clearFlags,const Vector4 &clearcolor);
 	void swap();
 	void beginScene();
 	void endScene();
@@ -107,13 +107,13 @@ D3D10_PASS_DESC passDesc;
 	void setShadowComparisonMethod(bool enabled);
 	void setLight(int i,Light *light);
 	void setLightEnabled(int i,bool enable);
-	void setAmbientColor(const Color &ambient);
+	void setAmbientColor(const Vector4 &ambient);
 
 	// Misc operations
-	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
 	int getClosestTextureFormat(int textureFormat);
 	void setStrictFormats(bool strict){mStrict=strict;}
 	bool getStrictFormats(){return mStrict;}
+	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
 
 	const StatisticsSet &getStatisticsSet(){return mStatisticsSet;}
 	const CapabilitySet &getCapabilitySet(){return mCapabilitySet;}

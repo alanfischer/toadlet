@@ -79,7 +79,7 @@ bool PartitionNode::sensePotentiallyVisible(SensorResultsListener *listener,cons
 	return result;
 }
 
-bool PartitionNode::findAmbientForPoint(Color &r,const Vector3 &point){
+bool PartitionNode::findAmbientForPoint(Vector4 &r,const Vector3 &point){
 	return false;
 }
 

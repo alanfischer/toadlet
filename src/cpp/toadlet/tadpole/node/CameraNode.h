@@ -26,7 +26,6 @@
 #ifndef TOADLET_TADPOLE_NODE_CAMERANODE_H
 #define TOADLET_TADPOLE_NODE_CAMERANODE_H
 
-#include <toadlet/peeper/Color.h>
 #include <toadlet/peeper/Viewport.h>
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/tadpole/Material.h>
@@ -95,8 +94,8 @@ public:
 	virtual void setClearFlags(int clearFlags){mClearFlags=clearFlags;}
 	inline int getClearFlags() const{return mClearFlags;}
 
-	virtual void setClearColor(peeper::Color clearColor){mClearColor.set(clearColor);}
-	inline peeper::Color getClearColor() const{return mClearColor;}
+	virtual void setClearColor(const Vector4 &clearColor){mClearColor.set(clearColor);}
+	inline const Vector4 &getClearColor() const{return mClearColor;}
 
 	virtual void setSkipFirstClear(bool skip){mSkipFirstClear=skip;}
 	inline bool getSkipFirstClear() const{return mSkipFirstClear;}
@@ -137,7 +136,7 @@ protected:
 	bool mViewportSet;
 	peeper::Viewport mViewport;
 	int mClearFlags;
-	peeper::Color mClearColor;
+	Vector4 mClearColor;
 	bool mSkipFirstClear;
 	bool mAlignmentCalculationsUseOrigin;
 

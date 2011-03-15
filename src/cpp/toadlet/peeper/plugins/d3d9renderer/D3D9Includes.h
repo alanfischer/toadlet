@@ -27,7 +27,6 @@
 #define TOADLET_PEEPER_D3D9INCLUDES_H
 
 #include <toadlet/peeper/Types.h>
-#include <toadlet/peeper/Color.h>
 #include <toadlet/egg/Logger.h>
 #include <windows.h>
 #include <commctrl.h>
@@ -55,27 +54,27 @@ namespace peeper{
 #endif
 
 #if defined(TOADLET_SET_D3DM)
-	inline D3DMCOLOR toD3DCOLOR(const Color &c){
-		return D3DMCOLOR_RGBA(Math::toInt(c.r*255),Math::toInt(c.g*255),Math::toInt(c.b*255),Math::toInt(c.a*255));
+	inline D3DMCOLOR toD3DCOLOR(const Vector4 &c){
+		return D3DMCOLOR_RGBA(Math::toInt(c.x*255),Math::toInt(c.y*255),Math::toInt(c.z*255),Math::toInt(c.w*255));
 	}
 #else
-	inline D3DCOLOR toD3DCOLOR(const Color &c){
-			return D3DCOLOR_RGBA(Math::toInt(c.r*255),Math::toInt(c.g*255),Math::toInt(c.b*255),Math::toInt(c.a*255));
+	inline D3DCOLOR toD3DCOLOR(const Vector4 &c){
+			return D3DCOLOR_RGBA(Math::toInt(c.x*255),Math::toInt(c.y*255),Math::toInt(c.z*255),Math::toInt(c.w*255));
 	}
 #endif
 
 #if defined(TOADLET_SET_D3DM)
-	inline void toD3DCOLORVALUE(D3DMCOLORVALUE &r,const Color &c){
-		r.r=c.r; r.g=c.g; r.b=c.b; r.a=c.a;
+	inline void toD3DCOLORVALUE(D3DMCOLORVALUE &r,const Vector4 &c){
+		r.r=c.x; r.g=c.y; r.b=c.z; r.a=c.w;
 	}
 #else
 	#if defined(TOADLET_FIXED_POINT)
-		inline void toD3DCOLORVALUE(D3DCOLORVALUE &r,const Color &c){
-			r.r=Math::toFloat(c.r); r.g=Math::toFloat(c.g); r.b=Math::toFloat(c.b); r.a=Math::toFloat(c.a);
+		inline void toD3DCOLORVALUE(D3DCOLORVALUE &r,const Vector4 &c){
+			r.r=Math::toFloat(c.x); r.g=Math::toFloat(c.y); r.b=Math::toFloat(c.z); r.a=Math::toFloat(c.w);
 		}
 	#else
-		inline void toD3DCOLORVALUE(D3DCOLORVALUE &r,const Color &c){
-			r.r=c.r; r.g=c.g; r.b=c.b; r.a=c.a;
+		inline void toD3DCOLORVALUE(D3DCOLORVALUE &r,const Vector4 &c){
+			r.r=c.x; r.g=c.y; r.b=c.z; r.a=c.w;
 		}
 	#endif
 #endif

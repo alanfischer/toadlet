@@ -28,7 +28,6 @@
 #include <string.h>
 
 using namespace toadlet::egg;
-using namespace toadlet::peeper;
 
 namespace toadlet{
 namespace tadpole{
@@ -137,36 +136,16 @@ Quaternion &MathFormatter::parseQuaternion(Quaternion &r,const char *string){
 	return r;
 }
 
-String MathFormatter::formatColor(const Color &c,char *separator){
-	#if defined(TOADLET_FIXED_POINT)
-		return String()+Math::toFloat(c.r)+separator+Math::toFloat(c.g)+separator+Math::toFloat(c.b)+separator+Math::toFloat(c.a);
-	#else
-		return String()+c.r+separator+c.g+separator+c.b+separator+c.a;
-	#endif
-}
-
-Color &MathFormatter::parseColor(Color &r,const char *string){
-	const char *parse=strchr(string,',')!=NULL?"%f,%f,%f,%f":"%f %f %f %f";
-	float R=0,g=0,b=0,a=0;
-	sscanf(string,parse,&R,&g,&b,&a);
-	#if defined(TOADLET_FIXED_POINT)
-		r.r=Math::fromFloat(R);r.g=Math::fromFloat(g);r.b=Math::fromFloat(b);r.a=Math::fromFloat(a);
-	#else
-		r.r=R;r.g=g;r.b=b;r.a=a;
-	#endif
-	return r;
-}
-
-String MathFormatter::formatByteColor(const Color &c,char *separator){
-	int r=Math::toInt(c.r*255),g=Math::toInt(c.g*255),b=Math::toInt(c.b*255),a=Math::toInt(c.a*255);
+String MathFormatter::formatByteColor(const Vector4 &c,char *separator){
+	int r=Math::toInt(c.x*255),g=Math::toInt(c.y*255),b=Math::toInt(c.z*255),a=Math::toInt(c.w*255);
 	return String()+r+separator+g+separator+b+separator+a;
 }
 
-Color &MathFormatter::parseByteColor(Color &r,const char *string){
+Vector4 &MathFormatter::parseByteColor(Vector4 &r,const char *string){
 	const char *parse=strchr(string,',')!=NULL?"%d,%d,%d,%d":"%d %d %d %d";
 	int R=0,g=0,b=0,a=0;
 	sscanf(string,parse,&R,&g,&b,&a);
-	r.r=Math::fromInt(R)/255;r.g=Math::fromInt(g)/255;r.b=Math::fromInt(b)/255;r.a=Math::fromInt(a)/255;
+	r.x=Math::fromInt(R)/255;r.y=Math::fromInt(g)/255;r.z=Math::fromInt(b)/255;r.w=Math::fromInt(a)/255;
 	return r;
 }
 

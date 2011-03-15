@@ -51,10 +51,10 @@ public:
 		scalar t=Math::div(value,mEndTime);
 
 		peeper::LightEffect &le=cache_set_le;
-		peeper::Color::lerp(le.ambient,mStart.ambient,mEnd.ambient,t);
-		peeper::Color::lerp(le.diffuse,mStart.diffuse,mEnd.diffuse,t);
-		peeper::Color::lerp(le.specular,mStart.specular,mEnd.specular,t);
-		peeper::Color::lerp(le.emissive,mStart.emissive,mEnd.emissive,t);
+		Math::lerp(le.ambient,mStart.ambient,mEnd.ambient,t);
+		Math::lerp(le.diffuse,mStart.diffuse,mEnd.diffuse,t);
+		Math::lerp(le.specular,mStart.specular,mEnd.specular,t);
+		Math::lerp(le.emissive,mStart.emissive,mEnd.emissive,t);
 		mTarget->setLightEffect(le);
 	}
 

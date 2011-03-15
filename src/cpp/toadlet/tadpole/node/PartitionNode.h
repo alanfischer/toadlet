@@ -28,7 +28,6 @@
 
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/sensor/SensorResultsListener.h>
-#include <toadlet/peeper/Color.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -45,7 +44,7 @@ public:
 
 	virtual bool senseBoundingVolumes(SensorResultsListener *listener,Bound *bound);
 	virtual bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);
-	virtual bool findAmbientForPoint(peeper::Color &r,const Vector3 &point);
+	virtual bool findAmbientForPoint(Vector4 &r,const Vector3 &point);
 };
 
 }

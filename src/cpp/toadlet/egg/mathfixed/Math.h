@@ -45,6 +45,7 @@ namespace toadlet{
 namespace egg{
 namespace mathfixed{
 
+/// @todo: Create a Math_shared file that is used by both fixed and float Maths
 namespace Math{
 	const Vector2 ZERO_VECTOR2;
 	const Vector2 ONE_VECTOR2(ONE,ONE);
@@ -1605,6 +1606,88 @@ namespace Math{
 	TOADLET_API void findBoundingCapsule(Capsule &r,const AABox &box);
 
 	TOADLET_API void findFitCapsule(Capsule &r,const AABox &box);
+
+	// Color operations
+	inline uint32 swapColor(uint32 bytes){
+		return
+			((bytes&0xFF000000)>>24) |
+			((bytes&0x00FF0000)>>8 ) |
+			((bytes&0x0000FF00)<<8 ) |
+			((bytes&0x000000FF)<<24) ;
+	}
+
+	inline uint32 lerpColor(uint32 c1,uint32 c2,scalar t){
+		return
+			(((int)lerp((c1&0xFF000000)>>24,(c2&0xFF000000)>>24,t))<<24) |
+			(((int)lerp((c1&0x00FF0000)>>16,(c2&0x00FF0000)>>16,t))<<16) |
+			(((int)lerp((c1&0x0000FF00)>>8 ,(c2&0x0000FF00)>>8 ,t))<<8 ) |
+			(((int)lerp((c1&0x000000FF)    ,(c2&0x000000FF)    ,t))    ) ;
+	}
+
+	inline void setHSVA(Vector4 &rgba,const Vector4 &hsva){
+		scalar h=hsva.x,s=hsva.y,v=hsva.z;
+		scalar r=0,g=0,b=0;
+
+		scalar hi=Math::floor(h*6);
+		scalar f=(h*6)-hi;
+		scalar p=Math::mul(v,Math::ONE-s);
+		scalar q=Math::mul(v,Math::ONE-Math::mul(f,s));
+		scalar t=Math::mul(v,Math::ONE-Math::mul(Math::ONE-f,s));
+		switch(Math::toInt(hi)){
+			case(0):
+				r=v;g=t;b=p;
+			break;
+			case(1):
+				r=q;g=v;b=p;
+			break;
+			case(2):
+				r=p;g=v;b=t;
+			break;
+			case(3):
+				r=p;g=q;b=v;
+			break;
+			case(4):
+				r=t;g=p;b=v;
+			break;
+			case(5):
+				r=v;g=p;b=q;
+			break;
+		}
+
+		rgba.set(r,g,b,hsva.w);
+	}
+
+	inline void getHSVA(Vector4 &hsva,const Vector4 &rgba){
+		scalar r=rgba.x,g=rgba.y,b=rgba.z;
+		scalar h=0,s=0,v=0;
+
+		scalar mx=Math::maxVal(Math::maxVal(r,g),b);
+		scalar mn=Math::minVal(Math::minVal(r,g),b);
+
+		if(mx==mn){
+			h=0;
+		}
+		else if(mx==r){
+			h=Math::div(g-b,mx-mn)/6;
+		}
+		else if(mx==g){
+			h=Math::div(b-r,mx-mn)/6 + Math::THIRD;
+		}
+		else{
+			h=Math::div(r-g,mx-mn)/6 + Math::TWO_THIRDS;
+		}
+
+		if(mx==0){
+			s=0;
+		}
+		else{
+			s=Math::ONE-Math::div(mn,mx);
+		}
+
+		v=mx;
+
+		hsva.set(h,s,v,rgba.w);
+	}
 
 	// Intersection operations
 	TOADLET_API bool testInside(const Plane &plane,const Vector3 &point);

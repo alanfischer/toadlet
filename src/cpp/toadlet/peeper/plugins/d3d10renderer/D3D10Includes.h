@@ -27,7 +27,6 @@
 #define TOADLET_PEEPER_D3D10INCLUDES_H
 
 #include <toadlet/peeper/Types.h>
-#include <toadlet/peeper/Color.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
 #include <windows.h>

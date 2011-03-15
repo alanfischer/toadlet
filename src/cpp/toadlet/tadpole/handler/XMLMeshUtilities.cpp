@@ -170,6 +170,11 @@ String makeVector4(const Vector4 &v){
 	return String()+scalarToFloat(v.x)+','+scalarToFloat(v.y)+','+scalarToFloat(v.z)+','+scalarToFloat(v.w);
 }
 
+const char *makeVector4(char *buffer,const Vector4 &v){
+	sprintf(buffer,"%f,%f,%f,%f ",scalarToFloat(v.x),scalarToFloat(v.y),scalarToFloat(v.z),scalarToFloat(v.w));
+	return buffer;
+}
+
 Quaternion parseQuaternion(const char *string){
 	float x=0,y=0,z=0,w=0;
 	sscanf(string,"%f,%f,%f,%f",&x,&y,&z,&w);
@@ -178,21 +183,6 @@ Quaternion parseQuaternion(const char *string){
 
 String makeQuaternion(const Quaternion &q){
 	return String()+scalarToFloat(q.x)+','+scalarToFloat(q.y)+','+scalarToFloat(q.z)+','+scalarToFloat(q.w);
-}
-
-Color parseColor(const char *string){
-	float r=0,g=0,b=0,a=0;
-	sscanf(string,"%f,%f,%f,%f",&r,&g,&b,&a);
-	return Color(floatToScalar(r),floatToScalar(g),floatToScalar(b),floatToScalar(a));
-}
-
-String makeColor(const Color &c){
-	return String()+scalarToFloat(c.r)+','+scalarToFloat(c.g)+','+scalarToFloat(c.b)+','+scalarToFloat(c.a);
-}
-
-const char *makeColor(char *buffer,const Color &c){
-	sprintf(buffer,"%f,%f,%f,%f ",scalarToFloat(c.r),scalarToFloat(c.g),scalarToFloat(c.b),scalarToFloat(c.a));
-	return buffer;
 }
 
 Mesh::VertexBoneAssignmentList parseBoneAssignment(const String &string){
@@ -263,7 +253,7 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 		if(ambientNode!=NULL){
 			const char *data=mxmlGetOpaque(ambientNode->child);
 			if(data!=NULL){
-				le.ambient=parseColor(data);
+				le.ambient=parseVector4(data);
 			}
 		}
 
@@ -271,7 +261,7 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 		if(diffuseNode!=NULL){
 			const char *data=mxmlGetOpaque(diffuseNode->child);
 			if(data!=NULL){
-				le.diffuse=parseColor(data);
+				le.diffuse=parseVector4(data);
 			}
 		}
 
@@ -279,7 +269,7 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 		if(specularNode!=NULL){
 			const char *data=mxmlGetOpaque(specularNode->child);
 			if(data!=NULL){
-				le.specular=parseColor(data);
+				le.specular=parseVector4(data);
 			}
 		}
 
@@ -295,7 +285,7 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 		if(emissiveNode!=NULL){
 			const char *data=mxmlGetOpaque(emissiveNode->child);
 			if(data!=NULL){
-				le.emissive=parseColor(data);
+				le.emissive=parseVector4(data);
 			}
 		}
 
@@ -478,17 +468,17 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version){
 
 			mxml_node_t *ambientNode=mxmlNewElement(lightEffectNode,"Ambient");
 			{
-				mxmlNewOpaque(ambientNode,makeColor(lightEffect.ambient));
+				mxmlNewOpaque(ambientNode,makeVector4(lightEffect.ambient));
 			}
 
 			mxml_node_t *diffuseNode=mxmlNewElement(lightEffectNode,"Diffuse");
 			{
-				mxmlNewOpaque(diffuseNode,makeColor(lightEffect.diffuse));
+				mxmlNewOpaque(diffuseNode,makeVector4(lightEffect.diffuse));
 			}
 
 			mxml_node_t *specularNode=mxmlNewElement(lightEffectNode,"Specular");
 			{
-				mxmlNewOpaque(specularNode,makeColor(lightEffect.specular));
+				mxmlNewOpaque(specularNode,makeVector4(lightEffect.specular));
 			}
 
 			mxml_node_t *shininessNode=mxmlNewElement(lightEffectNode,"Shininess");
@@ -498,7 +488,7 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version){
 
 			mxml_node_t *emissiveNode=mxmlNewElement(lightEffectNode,"Emissive");
 			{
-				mxmlNewOpaque(emissiveNode,makeColor(lightEffect.emissive));
+				mxmlNewOpaque(emissiveNode,makeVector4(lightEffect.emissive));
 			}
 
 			mxml_node_t *trackColorNode=mxmlNewElement(lightEffectNode,"TrackColor");
@@ -736,7 +726,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 							vba.set2(l,ti,parseVector2(element));
 						}
 						else if(sematic==VertexFormat::Semantic_COLOR){
-							vba.setRGBA(l,ci,parseColor(element).getRGBA());
+ 							vba.setRGBA(l,ci,parseVector4(element).getRGBA());
 						}
 						else if(mesh->vertexBoneAssignments.size()>0){
 							mesh->vertexBoneAssignments[l]=parseBoneAssignment(element);
@@ -946,7 +936,7 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version){
 				vba.get2(i,ti,v2); strcat(line,makeVector2(buffer,v2));
 			}
 			if(ci>=0){
-				strcat(line,makeColor(buffer,Color::rgba(vba.getRGBA(i,ci))));
+				strcat(line,makeVector4(buffer,Vector4(vba.getRGBA(i,ci))));
 			}
 			if(mesh->vertexBoneAssignments.size()>0){
 				strcat(line,makeBoneAssignment(buffer,mesh->vertexBoneAssignments[i]));

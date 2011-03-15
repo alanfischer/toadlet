@@ -23,6 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/tadpole/Colors.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/node/AnaglyphCameraNode.h>
@@ -94,12 +95,12 @@ Node *AnaglyphCameraNode::set(Node *node){
 	return this;
 }
 
-void AnaglyphCameraNode::setLeftColor(const Color &color){
+void AnaglyphCameraNode::setLeftColor(const Vector4 &color){
 	mLeftColor.set(color);
 	mLeftMaterial->setLightEffect(LightEffect(mLeftColor));
 }
 
-void AnaglyphCameraNode::setRightColor(const Color &color){
+void AnaglyphCameraNode::setRightColor(const Vector4 &color){
 	mRightColor.set(color);
 	mRightMaterial->setLightEffect(LightEffect(mRightColor));
 }

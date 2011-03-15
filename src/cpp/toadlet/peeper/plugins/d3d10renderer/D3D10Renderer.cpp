@@ -305,7 +305,7 @@ void D3D10Renderer::setViewport(const Viewport &viewport){
 	mD3DDevice->RSSetViewports(1,&d3dviewport);
 }
 
-void D3D10Renderer::clear(int clearFlags,const Color &clearColor){
+void D3D10Renderer::clear(int clearFlags,const Vector4 &clearColor){
 	mD3DRenderTarget->clear(clearFlags,clearColor);
 }
 
@@ -736,7 +736,7 @@ void D3D10Renderer::setLight(int i,Light *light){
 void D3D10Renderer::setLightEnabled(int i,bool enable){
 }
 
-void D3D10Renderer::setAmbientColor(const Color &ambient){
+void D3D10Renderer::setAmbientColor(const Vector4 &ambient){
 }
 
 void D3D10Renderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){

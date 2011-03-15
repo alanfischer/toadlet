@@ -44,7 +44,7 @@ bool D3D10RenderTarget::create(){
 void D3D10RenderTarget::destroy(){
 }
 
-void D3D10RenderTarget::clear(int clearFlags,const Color &clearColor){
+void D3D10RenderTarget::clear(int clearFlags,const Vector4 &clearColor){
 	if(clearFlags&Renderer::ClearFlag_COLOR){
 		#if defined(TOADLET_FIXED_POINT)
 			float d3dcolor[4];

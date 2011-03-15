@@ -26,7 +26,7 @@
 #ifndef TOADLET_PEEPER_LIGHTEFFECT_H
 #define TOADLET_PEEPER_LIGHTEFFECT_H
 
-#include <toadlet/peeper/Colors.h>
+#include <toadlet/peeper/Types.h>
 
 namespace toadlet{
 namespace peeper{
@@ -34,11 +34,11 @@ namespace peeper{
 class LightEffect{
 public:
 	LightEffect():
-		ambient(Colors::WHITE),
-		diffuse(Colors::WHITE),
-		specular(Colors::WHITE),
+		ambient(Math::ONE_VECTOR4),
+		diffuse(Math::ONE_VECTOR4),
+		specular(Math::ONE_VECTOR4),
 		shininess(Math::ONE),
-		emissive(Colors::BLACK),
+		emissive(Math::ZERO_VECTOR4),
 		trackColor(false)
 	{}
 
@@ -46,27 +46,27 @@ public:
 		set(lightEffect);
 	}
 
-	LightEffect(const Color &color):
+	LightEffect(const Vector4 &color):
 		shininess(Math::ONE),
-		emissive(Colors::BLACK),
+		emissive(Math::ZERO_VECTOR4),
 		trackColor(false)
 	{
 		set(color);
 	}
 
-	LightEffect(const Color &ambient1,const Color &diffuse1,const Color &specular1,scalar shininess):
-		emissive(Colors::BLACK),
+	LightEffect(const Vector4 &ambient1,const Vector4&diffuse1,const Vector4 &specular1,scalar shininess):
+		emissive(Math::ZERO_VECTOR4),
 		trackColor(false)
 	{
 		set(ambient1,diffuse1,specular1,shininess);
 	}
 
 	LightEffect(bool trackColor1):
-		ambient(Colors::WHITE),
-		diffuse(Colors::WHITE),
-		specular(Colors::WHITE),
+		ambient(Math::ONE_VECTOR4),
+		diffuse(Math::ONE_VECTOR4),
+		specular(Math::ONE_VECTOR4),
 		shininess(Math::ONE),
-		emissive(Colors::BLACK),
+		emissive(Math::ZERO_VECTOR4),
 		trackColor(trackColor1)
 	{}
 
@@ -80,14 +80,14 @@ public:
 		return *this;
 	}
 
-	LightEffect &set(const Color &color){
+	LightEffect &set(const Vector4 &color){
 		ambient.set(color);
 		diffuse.set(color);
 		specular.set(color);
 		return *this;
 	}
 
-	LightEffect &set(const Color &ambient1,const Color &diffuse1,const Color &specular1,scalar shininess1){
+	LightEffect &set(const Vector4 &ambient1,const Vector4 &diffuse1,const Vector4 &specular1,scalar shininess1){
 		ambient.set(ambient1);
 		diffuse.set(diffuse1);
 		specular.set(specular1);
@@ -115,11 +115,11 @@ public:
 			trackColor!=lightEffect.trackColor;
 	}
 
-	Color ambient;
-	Color diffuse;
-	Color specular;
+	Vector4 ambient;
+	Vector4 diffuse;
+	Vector4 specular;
 	scalar shininess;
-	Color emissive;
+	Vector4 emissive;
 	bool trackColor;
 };
 

@@ -40,7 +40,7 @@ public:
 	virtual bool create();
 	virtual void destroy();
 
-	virtual void clear(int clearFlags,const Color &clearColor);
+	virtual void clear(int clearFlags,const Vector4 &clearColor);
 	virtual void swap(){}
 	virtual void reset(){}
 	virtual bool activate();

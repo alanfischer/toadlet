@@ -31,8 +31,6 @@
 #include <toadlet/peeper/Blend.h>
 #include <toadlet/peeper/Buffer.h>
 #include <toadlet/peeper/CapabilitySet.h>
-#include <toadlet/peeper/Color.h>
-#include <toadlet/peeper/Colors.h>
 #include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/peeper/IndexData.h>
@@ -56,7 +54,6 @@
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/VertexFormat.h>
 #include <toadlet/peeper/Viewport.h>
-#include <toadlet/peeper/Visual.h>
 
 using namespace toadlet;
 using namespace toadlet::peeper;
