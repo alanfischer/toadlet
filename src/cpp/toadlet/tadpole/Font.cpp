@@ -75,7 +75,7 @@ void Font::destroy(){
 	}
 }
 
-bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const String &string,const Color &color,int alignment,bool pixelSpace,bool flip){
+bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const String &string,const Vector4 &color,int alignment,bool pixelSpace,bool flip){
 	VertexFormat *format=vertexBuffer->getVertexFormat();
 
 	int positionIndex=format->findSemantic(VertexFormat::Semantic_POSITION);

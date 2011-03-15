@@ -24,7 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/peeper/VertexBufferAccessor.h>
-#include <stdlib.h>
 
 using namespace toadlet::egg;
 

@@ -545,14 +545,14 @@ void GLRenderer::setViewport(const Viewport &viewport){
 	TOADLET_CHECK_GLERROR("setViewport");
 }
 
-void GLRenderer::clear(int clearFlags,const Color &clearColor){
+void GLRenderer::clear(int clearFlags,const Vector4 &clearColor){
 	int bufferBits=0;
 
 	TOADLET_CHECK_GLERROR("entering clear");
 
 	if((clearFlags & ClearFlag_COLOR)>0){
 		bufferBits|=GL_COLOR_BUFFER_BIT;
-		glClearColor(clearColor.r,clearColor.g,clearColor.b,clearColor.a);
+		glClearColor(clearColor.x,clearColor.y,clearColor.z,clearColor.w);
 	}
 	if((clearFlags & ClearFlag_DEPTH)>0){
 		bufferBits|=GL_DEPTH_BUFFER_BIT;
@@ -819,7 +819,7 @@ void GLRenderer::setDefaultStates(){
 	}
 
 	setLightEffect(LightEffect());
-	setAmbientColor(Colors::WHITE);
+	setAmbientColor(Math::ONE_VECTOR4);
 	// We leave the current lights enabled because the Scene does not re-set the lights between layers
 
 	// GL specific states
@@ -1582,7 +1582,7 @@ void GLRenderer::setLight(int i,Light *light){
 		glLightfv(l,GL_SPECULAR,light->specularColor.getData());
 		glLightfv(l,GL_DIFFUSE,light->diffuseColor.getData());
 		// Ambient lighting works through the GL_LIGHT_MODEL_AMBIENT
-		glLightfv(l,GL_AMBIENT,Colors::BLACK.getData());
+		glLightfv(l,GL_AMBIENT,Math::ZERO_VECTOR4.getData());
 	#endif
 
 	TOADLET_CHECK_GLERROR("setLight");
@@ -1599,7 +1599,7 @@ void GLRenderer::setLightEnabled(int i,bool enable){
 	TOADLET_CHECK_GLERROR("setLightEnabled");
 }
 
-void GLRenderer::setAmbientColor(const Color &ambient){
+void GLRenderer::setAmbientColor(const Vector4 &ambient){
 	#if defined(TOADLET_FIXED_POINT)
 		#if defined(TOADLET_HAS_GLES)
 			glLightModelxv(GL_LIGHT_MODEL_AMBIENT,ambient.getData());

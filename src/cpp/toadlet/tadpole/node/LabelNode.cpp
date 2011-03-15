@@ -215,7 +215,7 @@ void LabelNode::updateLabel(){
 			indexBuffer->unlock();
 		}
 
-		mFont->updateVertexBufferForString(mVertexData->getVertexBuffer(0),text,Colors::WHITE,mAlignment,!mNormalized,true);
+		mFont->updateVertexBufferForString(mVertexData->getVertexBuffer(0),text,Math::ONE_VECTOR4,mAlignment,!mNormalized,true);
 		mIndexData->setCount(length*6);
 	}
 

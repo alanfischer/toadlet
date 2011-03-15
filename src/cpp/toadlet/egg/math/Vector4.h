@@ -47,6 +47,8 @@ public:
 
 	inline Vector4(const Vector3 &v,real w1):x(v.x),y(v.y),z(v.z),w(w1){}
 
+	explicit inline Vector4(uint32 rgba){setRGBA(rgba);}
+
 	inline Vector4 &set(const Vector4 &v){
 		x=v.x;
 		y=v.y;
@@ -81,6 +83,38 @@ public:
 		w=w1;
 
 		return *this;
+	}
+
+	inline Vector4 &setRGBA(uint32 rgba){
+		x=Math::fromInt((rgba&0xFF000000)>>24)/255;
+		y=Math::fromInt((rgba&0x00FF0000)>>16)/255;
+		z=Math::fromInt((rgba&0x0000FF00)>>8 )/255;
+		w=Math::fromInt((rgba&0x000000FF)>>0 )/255;
+
+		return *this;
+	}
+	
+	inline Vector4 &setABGR(uint32 abgr){
+		x=Math::fromInt((abgr&0x000000FF)>>0 )/255;
+		y=Math::fromInt((abgr&0x0000FF00)>>8 )/255;
+		z=Math::fromInt((abgr&0x00FF0000)>>16)/255;
+		w=Math::fromInt((abgr&0xFF000000)>>24)/255;
+
+		return *this;
+	}
+
+	inline uint32 getRGBA() const{
+		return ((uint32)Math::toInt(x*255))<<24 |
+			((uint32)Math::toInt(y*255))<<16 |
+			((uint32)Math::toInt(z*255))<<8  |
+			((uint32)Math::toInt(w*255))<<0;
+	}
+
+	inline uint32 getABGR() const{
+		return ((uint32)Math::toInt(x*255))<<0  |
+			((uint32)Math::toInt(y*255))<<8  |
+			((uint32)Math::toInt(z*255))<<16 |
+			((uint32)Math::toInt(w*255))<<24;
 	}
 
 	inline Vector4 &reset(){

@@ -151,7 +151,7 @@ int BSP30Map::modelCollisionTrace(Collision &result,int model,const Vector3 &siz
 	return contents;
 }
 
-bool BSP30Map::modelLightTrace(Color &result,int model,const Vector3 &start,const Vector3 &end){
+bool BSP30Map::modelLightTrace(Vector4 &result,int model,const Vector3 &start,const Vector3 &end){
 	int headNode=models[model].headnode[0];
 	if(headNode<0 || headNode>=nnodes){
 		return false;

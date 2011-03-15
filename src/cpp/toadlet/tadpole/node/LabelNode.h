@@ -63,8 +63,8 @@ public:
 	void setWordWrap(bool wordWrap);
 	bool getWordWrap() const{return mWordWrap;}
 
-	void setColor(const peeper::Color &color){mMaterial->setLightEffect(peeper::LightEffect(color));}
-	const peeper::Color &getColor(){return mMaterial->getLightEffect().diffuse;}
+	void setColor(const Vector4 &color){mMaterial->setLightEffect(peeper::LightEffect(color));}
+	const Vector4 &getColor(){return mMaterial->getLightEffect().diffuse;}
 
 	void queueRenderables(CameraNode *camera,RenderQueue *queue);
 	Material *getRenderMaterial() const{return mMaterial;}

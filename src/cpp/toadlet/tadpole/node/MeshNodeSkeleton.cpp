@@ -23,6 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/tadpole/Colors.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/node/MeshNodeSkeleton.h>
@@ -277,7 +278,7 @@ void MeshNodeSkeleton::setRenderable(bool renderable){
 		mMaterial->retain();
 		mMaterial->setLighting(true);
 		LightEffect lightEffect(Colors::GREEN);
-		lightEffect.emissive.set(Colors::GREEN);
+		lightEffect.emissive.set(lightEffect.ambient);
 		mMaterial->setLightEffect(lightEffect);
 		mMaterial->setDepthTest(Renderer::DepthTest_NONE);
 		mMaterial->setLayer(1);

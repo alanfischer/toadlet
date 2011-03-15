@@ -27,7 +27,6 @@
 #define TOADLET_PEEPER_FOGSTATE_H
 
 #include <toadlet/peeper/Types.h>
-#include <toadlet/peeper/Color.h>
 
 namespace toadlet{
 namespace peeper{
@@ -46,7 +45,7 @@ public:
 		//color
 	{}
 
-	FogState(FogType type1,scalar nearDistance1,scalar farDistance1,const Color &color1){
+	FogState(FogType type1,scalar nearDistance1,scalar farDistance1,const Vector4 &color1){
 		set(type1,nearDistance1,farDistance1,color1);
 	}
 
@@ -58,7 +57,7 @@ public:
 		return *this;
 	}
 
-	FogState &set(FogType type1,scalar nearDistance1,scalar farDistance1,const Color &color1){
+	FogState &set(FogType type1,scalar nearDistance1,scalar farDistance1,const Vector4 &color1){
 		type=type1;
 		nearDistance=nearDistance1;
 		farDistance=farDistance1;
@@ -69,7 +68,7 @@ public:
 	FogType type;
 	scalar nearDistance;
 	scalar farDistance;
-	Color color;
+	Vector4 color;
 };
 
 }

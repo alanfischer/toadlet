@@ -30,7 +30,6 @@
 #include <toadlet/egg/math/Math.h>
 #include <toadlet/egg/mathfixed/Math.h>
 #include <toadlet/peeper/VertexBuffer.h>
-#include <toadlet/peeper/Color.h>
 
 #if defined(TOADLET_FIXED_POINT)
 	#define TOADLET_TOFIXED(x) x
@@ -197,12 +196,8 @@ public:
 		}
 	}
 
-	inline void set(int i,int e,const Color &c){
-		mColorData[offset(i,e)]=c.getABGR();
-	}
-
 	inline void setRGBA(int i,int e,uint32 c){
-		mColorData[offset(i,e)]=Color::swap(c);
+		mColorData[offset(i,e)]=Math::swapColor(c);
 	}
 
 	inline void setABGR(int i,int e,uint32 c){
@@ -303,12 +298,8 @@ public:
 		}
 	}
 
-	inline void get(int i,int e,Color &c){
-		c.setABGR(mColorData[offset(i,e)]);
-	}
-
 	inline uint32 getRGBA(int i,int e){
-		return Color::swap(mColorData[offset(i,e)]);
+		return Math::swapColor(mColorData[offset(i,e)]);
 	}
 
 	inline uint32 getABGR(int i,int e){

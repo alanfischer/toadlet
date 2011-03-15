@@ -47,11 +47,11 @@ public:
 	void setSeparation(scalar separation){mSeparation=separation;}
 	scalar getSeparation() const{return mSeparation;}
 
-	void setLeftColor(const peeper::Color &color);
-	const peeper::Color &getLeftColor() const{return mLeftColor;}
+	void setLeftColor(const Vector4 &color);
+	const Vector4 &getLeftColor() const{return mLeftColor;}
 
-	void setRightColor(const peeper::Color &color);
-	const peeper::Color &getRightColor() const{return mRightColor;}
+	void setRightColor(const Vector4 &color);
+	const Vector4 &getRightColor() const{return mRightColor;}
 
 	virtual void render(peeper::Renderer *renderer,Node *node);
 
@@ -60,11 +60,11 @@ protected:
 
 	peeper::Texture::ptr mLeftTexture;
 	peeper::PixelBufferRenderTarget::ptr mLeftRenderTarget;
-	peeper::Color mLeftColor;
+	Vector4 mLeftColor;
 	Material::ptr mLeftMaterial;
 	peeper::Texture::ptr mRightTexture;
 	peeper::PixelBufferRenderTarget::ptr mRightRenderTarget;
-	peeper::Color mRightColor;
+	Vector4 mRightColor;
 	Material::ptr mRightMaterial;
 };
 

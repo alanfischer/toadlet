@@ -27,7 +27,8 @@
 #define TOADLET_PEEPER_LIGHT_H
 
 #include <toadlet/egg/WeakPointer.h>
-#include <toadlet/peeper/Colors.h>
+#include <toadlet/egg/Extents.h>
+#include <toadlet/peeper/Types.h>
 
 namespace toadlet{
 namespace peeper{
@@ -42,16 +43,30 @@ public:
 		Type_SPOT,
 	};
 
-	Light();
+	Light():
+		enabled(true),
+		specularColor(Math::ZERO_VECTOR4),
+		diffuseColor(Math::ONE_VECTOR4),
+		type(Type_DIRECTION),
+		linearAttenuation(0),
+		spotCutoff(0),
+		#if defined(TOADLET_FIXED_POINT)
+			radius(Math::sqrt(egg::Extents::MAX_FIXED>>1)),
+		#else
+			radius(Math::sqrt(egg::Extents::MAX_FLOAT)),
+		#endif
+		//position,
+		direction(0,0,-Math::ONE)
+	{}
 
 	inline void setEnabled(bool enabled1){enabled=enabled1;}
 	inline bool getEnabled() const{return enabled;}
 
-	inline void setSpecularColor(const Color &color){specularColor.set(color);}
-	inline const Color &getSpecularColor() const{return specularColor;}
+	inline void setSpecularColor(const Vector4 &color){specularColor.set(color);}
+	inline const Vector4 &getSpecularColor() const{return specularColor;}
 
-	inline void setDiffuseColor(const Color &color){diffuseColor.set(color);}
-	inline const Color &getDiffuseColor() const{return diffuseColor;}
+	inline void setDiffuseColor(const Vector4 &color){diffuseColor.set(color);}
+	inline const Vector4 &getDiffuseColor() const{return diffuseColor;}
 
 	inline void setType(Type type1){type=type1;}
 	inline Type getType() const{return type;}
@@ -72,8 +87,8 @@ public:
 	inline const Vector3 &getPosition() const{return position;}
 
 	bool enabled;
-	Color specularColor;
-	Color diffuseColor;
+	Vector4 specularColor;
+	Vector4 diffuseColor;
 	Type type;
 	scalar linearAttenuation;
 	scalar spotCutoff;
