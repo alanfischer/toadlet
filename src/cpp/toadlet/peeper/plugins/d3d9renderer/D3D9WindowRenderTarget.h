@@ -45,8 +45,8 @@ public:
 	virtual bool createContext(HWND wnd,WindowRenderTargetFormat *format);
 	virtual bool destroyContext();
 
-	virtual int getWidth() const{return mWidth;}
-	virtual int getHeight() const{return mHeight;}
+	virtual int getWidth() const{RECT r;GetWindowRect(mWindow,&r);return r.right-r.left;}
+	virtual int getHeight() const{RECT r;GetWindowRect(mWindow,&r);return r.bottom-r.top;}
 
 	virtual bool activate();
 	virtual bool deactivate(){return true;}
@@ -61,15 +61,15 @@ public:
 	inline IDirect3DSurface9 *getDepthSurface() const{return mDepthSurface;}
 
 protected:
-	void fillPresentParameters(D3DPRESENT_PARAMETERS &presentParameters);
+	int getClosestSamples(int samples);
 
-	Visual mVisual;
 	UINT mAdaptor;
 	#if defined(TOADLET_SET_D3DM)
 		D3DMDEVTYPE mDevType;
 	#else
 		D3DDEVTYPE mDevType;
 	#endif
+	int mSamples;
 	D3DPRESENT_PARAMETERS mPresentParameters;
 	HINSTANCE mLibrary;
 	IDirect3D9 *mD3D;
@@ -77,7 +77,6 @@ protected:
 	IDirect3DSurface9 *mColorSurface;
 	IDirect3DSurface9 *mDepthSurface;
 	HWND mWindow;
-	int mWidth,mHeight;
 };
 
 }

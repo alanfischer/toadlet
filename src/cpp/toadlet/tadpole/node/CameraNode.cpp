@@ -53,6 +53,7 @@ CameraNode::CameraNode():super(),
 
 	//mProjectionMatrix
 	mProjectionRotation(0),
+	mProjectionMirrorY(false),
 	//mFinalProjectionMatrix
 	//mViewMatrix,
 	//mForward,mRight,
@@ -217,6 +218,12 @@ void CameraNode::setProjectionRotation(scalar rotate){
 	projectionUpdated();
 }
 
+void CameraNode::setProjectionMirrorY(bool mirror){
+	mProjectionMirrorY=mirror;
+
+	projectionUpdated();
+}
+
 void CameraNode::setNearAndFarDist(scalar nearDist,scalar farDist){
 	mNearDist=nearDist;
 	mFarDist=farDist;
@@ -348,6 +355,10 @@ void CameraNode::projectionUpdated(){
 	matrix.reset();
 	Math::setMatrix4x4FromTranslate(matrix,-x,-y,0);
 	Math::postMul(mFinalProjectionMatrix,matrix);
+
+	matrix.reset();
+	Math::setMatrix4x4FromScale(matrix,Math::ONE,mProjectionMirrorY?-Math::ONE:Math::ONE,Math::ONE);
+	Math::preMul(mFinalProjectionMatrix,matrix);
 
 	updateViewTransform();
 }

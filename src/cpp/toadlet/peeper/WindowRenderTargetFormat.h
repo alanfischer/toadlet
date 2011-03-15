@@ -26,7 +26,7 @@
 #ifndef TOADLET_PEEPER_WINDOWRENDERTARGETFORMAT_H
 #define TOADLET_PEEPER_WINDOWRENDERTARGETFORMAT_H
 
-#include <toadlet/peeper/Visual.h>
+#include <toadlet/peeper/Types.h>
 
 namespace toadlet{
 namespace peeper{
@@ -35,14 +35,22 @@ class TOADLET_API WindowRenderTargetFormat{
 public:
 	TOADLET_SHARED_POINTERS(WindowRenderTargetFormat);
 
-	WindowRenderTargetFormat(const Visual &visual,int threads,bool debug,int flags){
-		this->visual=visual;
+	WindowRenderTargetFormat(int pixelFormat=0,int depthBits=0,int stencilBits=0,int multisamples=0,bool vsync=false,int threads=0,bool debug=false,int flags=0){
+		this->pixelFormat=pixelFormat;
+		this->depthBits=depthBits;
+		this->stencilBits=stencilBits;
+		this->multisamples=multisamples;
+		this->vsync=vsync;
 		this->threads=threads;
 		this->debug=debug;
 		this->flags=flags;
 	}
 
-	Visual visual;
+	int pixelFormat;
+	int depthBits;
+	int stencilBits;
+	int multisamples;
+	bool vsync;
 	int threads;
 	bool debug;
 	int flags;

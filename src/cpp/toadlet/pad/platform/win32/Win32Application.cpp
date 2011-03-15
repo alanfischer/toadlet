@@ -138,11 +138,7 @@ Win32Application::Win32Application():
 	mWidth(-1),
 	mHeight(-1),
 	mFullscreen(false),
-	#if defined(TOADLET_PLATFORM_WINCE)
-		mVisual(ImageDefinitions::Format_RGB_5_6_5,16,0),
-	#else
-		mVisual(ImageDefinitions::Format_RGBA_8,16,2),
-	#endif
+	//mFormat,
 	mApplicationListener(NULL),
 	mDifferenceMouse(false),
 	mLastXMouse(0),mLastYMouse(0),
@@ -194,6 +190,23 @@ Win32Application::Win32Application():
 		if(res==NULL){
 			Logger::error(Categories::TOADLET_PAD,"No resource of type CEUX with name HI_RES_AWARE, may not render on all devices");
 		}
+	#endif
+
+	mFormat=WindowRenderTargetFormat::ptr(new WindowRenderTargetFormat());
+	#if defined(TOADLET_PLATFORM_WINCE)
+		mFormat->pixelFormat=ImageDefinitions::Format_RGB_5_6_5;
+		mFormat->depthBits=16;
+		mFormat->multisamples=0;
+	#else
+		mFormat->pixelFormat=ImageDefinitions::Format_RGBA_8;
+		mFormat->depthBits=16;
+		mFormat->multisamples=2;
+	#endif
+	mFormat->threads=2;
+	#if defined(TOADLET_DEBUG)
+		mFormat->debug=true;
+	#else
+		mFormat->debug=false;
 	#endif
 
 	#if defined(TOADLET_HAS_OPENGL)
@@ -512,7 +525,7 @@ bool Win32Application::createWindow(){
 	}
 
 	if(mFullscreen){
-		int format=mVisual.pixelFormat;
+		int format=mFormat->pixelFormat;
 		int redBits=ImageFormatConversion::getRedBits(format);
 		int greenBits=ImageFormatConversion::getGreenBits(format);
 		int blueBits=ImageFormatConversion::getBlueBits(format);
@@ -648,12 +661,12 @@ bool Win32Application::getFullscreen() const{
 	return mFullscreen;
 }
 
-void Win32Application::setVisual(const Visual &visual){
-	mVisual=visual;
+void Win32Application::setWindowRenderTargetFormat(WindowRenderTargetFormat::ptr format){
+	mFormat=format;
 }
 
-const Visual &Win32Application::getVisual() const{
-	return mVisual;
+WindowRenderTargetFormat::ptr Win32Application::getWindowRenderTargetFormat() const{
+	return mFormat;
 }
 
 void Win32Application::setApplicationListener(ApplicationListener *listener){
@@ -800,17 +813,10 @@ RenderTarget *Win32Application::makeRenderTarget(const String &plugin){
 	RenderTarget *target=NULL;
 	DWORD flags=D3DCREATE_MULTITHREADED;
 
-	#if defined(TOADLET_DEBUG)
-		bool debug=true;
-	#else
-		bool debug=false;
-	#endif
-	WindowRenderTargetFormat::ptr format(new WindowRenderTargetFormat(mVisual,2,debug,0));
-
 	Map<String,RendererPlugin>::iterator it=mRendererPlugins.find(plugin);
 	if(it!=mRendererPlugins.end()){
 		TOADLET_TRY
-			target=it->second.createRenderTarget(win32->mWnd,format);
+			target=it->second.createRenderTarget(win32->mWnd,mFormat);
 		TOADLET_CATCH(const Exception &){target=NULL;}
 	}
 	if(target!=NULL && target->isValid()==false){

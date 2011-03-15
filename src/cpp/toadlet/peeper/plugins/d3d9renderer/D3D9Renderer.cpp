@@ -85,10 +85,7 @@ D3D9Renderer::D3D9Renderer():
 	mD3DPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL),
 	mD3DRenderTarget(NULL),
-	mStrict(false),
-
-	mFaceCulling(FaceCulling_NONE),
-	mMirrorY(false)
+	mStrict(false)
 
 	//mStatisticsSet,
 	//mCapabilitySet
@@ -314,17 +311,7 @@ void D3D9Renderer::setViewMatrix(const Matrix4x4 &matrix){
 void D3D9Renderer::setProjectionMatrix(const Matrix4x4 &matrix){
 	D3DMATRIX &d3dmatrix=cacheD3DMatrix;
 
-	if(mMirrorY){
-		cacheMatrix4x4.set(matrix);
-		cacheMatrix4x4.setAt(1,0,-cacheMatrix4x4.at(1,0));
-		cacheMatrix4x4.setAt(1,1,-cacheMatrix4x4.at(1,1));
-		cacheMatrix4x4.setAt(1,2,-cacheMatrix4x4.at(1,2));
-		cacheMatrix4x4.setAt(1,3,-cacheMatrix4x4.at(1,3));
-		toD3DMATRIX(d3dmatrix,cacheMatrix4x4);
-	}
-	else{
-		toD3DMATRIX(d3dmatrix,matrix);
-	}
+	toD3DMATRIX(d3dmatrix,matrix);
 
 	// Convert depth ranges from -1,1 to 0,1
 	//  Thanks to the OGRE project
@@ -619,14 +606,12 @@ void D3D9Renderer::setFaceCulling(const FaceCulling &culling){
 			mD3DDevice->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE);
 		break;
 		case FaceCulling_FRONT:
-			mD3DDevice->SetRenderState(D3DRS_CULLMODE,mMirrorY?D3DCULL_CW:D3DCULL_CCW);
+			mD3DDevice->SetRenderState(D3DRS_CULLMODE,D3DCULL_CCW);
 		break;
 		case FaceCulling_BACK:
-			mD3DDevice->SetRenderState(D3DRS_CULLMODE,mMirrorY?D3DCULL_CCW:D3DCULL_CW);
+			mD3DDevice->SetRenderState(D3DRS_CULLMODE,D3DCULL_CW);
 		break;
 	}
-
-	mFaceCulling=culling;
 }
 
 void D3D9Renderer::setFogState(const FogState &state){
@@ -1036,14 +1021,6 @@ void D3D9Renderer::getPrimitiveTypeAndCount(D3DPRIMITIVETYPE &d3dpt,int &count,I
 			count=numIndexes-2;
 		break;
 	}
-}
-
-void D3D9Renderer::setMirrorY(bool mirrorY){
-	mMirrorY=mirrorY;
-
-	FaceCulling faceCulling=mFaceCulling;
-	mFaceCulling=FaceCulling_NONE;
-	setFaceCulling(faceCulling);
 }
 
 void D3D9Renderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){

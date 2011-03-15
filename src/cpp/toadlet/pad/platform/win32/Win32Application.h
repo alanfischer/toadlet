@@ -36,8 +36,6 @@ namespace pad{
 
 struct Win32Attributes;
 
-/// @todo: We get a crash on WinCE when rotating the screen.  Not specifically a crash, but a hang 2 renders afterwords.  I'm wondering if not all resources are being destroyed when we redo the surface on rotation.
-
 class TOADLET_API Win32Application:public BaseApplication{
 public:
 	Win32Application();
@@ -72,8 +70,8 @@ public:
 	virtual void setFullscreen(bool fullscreen);
 	virtual bool getFullscreen() const;
 
-	virtual void setVisual(const peeper::Visual &visual);
-	virtual const peeper::Visual &getVisual() const;
+	virtual void setWindowRenderTargetFormat(const peeper::WindowRenderTargetFormat::ptr format);
+	virtual peeper::WindowRenderTargetFormat::ptr getWindowRenderTargetFormat() const;
 
 	virtual void setApplicationListener(ApplicationListener *listener);
 	virtual ApplicationListener *getApplicationListener() const;
@@ -148,7 +146,7 @@ protected:
 	int mPositionX,mPositionY;
 	int mWidth,mHeight;
 	bool mFullscreen;
-	peeper::Visual mVisual;
+	peeper::WindowRenderTargetFormat::ptr mFormat;
 	ApplicationListener *mApplicationListener;
 	bool mDifferenceMouse;
 	int mLastXMouse,mLastYMouse;

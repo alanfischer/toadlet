@@ -59,7 +59,6 @@ set (PEEPER_HEADERS
 	VertexData.h
 	VertexFormat.h
 	Viewport.h
-	Visual.h
 	Version.h
 )
 

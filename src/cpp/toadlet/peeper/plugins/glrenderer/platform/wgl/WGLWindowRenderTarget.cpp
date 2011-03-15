@@ -53,13 +53,13 @@ WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *
 {
 	int winPixelFormat=0;
 
-	if(format->visual.multisamples>1){
+	if(format->multisamples>1){
 		HWND tmpWnd=CreateWindow(TEXT("Static"),NULL,0,0,0,0,0,0,0,0,0);
 		bool result=createContext(tmpWnd,format,winPixelFormat);
 
 		PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB=NULL;
 		if(result && wglIsExtensionSupported("WGL_ARB_multisample") && (wglChoosePixelFormatARB=(PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB"))!=NULL){
-			int pixelFormat=format->visual.pixelFormat;
+			int pixelFormat=format->pixelFormat;
 			int redBits=ImageFormatConversion::getRedBits(pixelFormat);
 			int greenBits=ImageFormatConversion::getGreenBits(pixelFormat);
 			int blueBits=ImageFormatConversion::getBlueBits(pixelFormat);
@@ -74,11 +74,11 @@ WGLWindowRenderTarget::WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *
 				WGL_ACCELERATION_ARB,	WGL_FULL_ACCELERATION_ARB,
 				WGL_COLOR_BITS_ARB,		colorBits,
 				WGL_ALPHA_BITS_ARB,		alphaBits,
-				WGL_DEPTH_BITS_ARB,		format->visual.depthBits,
-				WGL_STENCIL_BITS_ARB,	format->visual.stencilBits,
+				WGL_DEPTH_BITS_ARB,		format->depthBits,
+				WGL_STENCIL_BITS_ARB,	format->stencilBits,
 				WGL_DOUBLE_BUFFER_ARB,	GL_TRUE,
 				WGL_SAMPLE_BUFFERS_ARB,	GL_TRUE,
-				WGL_SAMPLES_ARB,		format->visual.multisamples,
+				WGL_SAMPLES_ARB,		format->multisamples,
 				0,0};
 			const int sampleIndex=19;
 
@@ -112,7 +112,7 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *for
 	}
 
 	if(winPixelFormat==0){
-		int pixelFormat=format->visual.pixelFormat;
+		int pixelFormat=format->pixelFormat;
 		int redBits=ImageFormatConversion::getRedBits(pixelFormat);
 		int greenBits=ImageFormatConversion::getGreenBits(pixelFormat);
 		int blueBits=ImageFormatConversion::getBlueBits(pixelFormat);
@@ -126,8 +126,8 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *for
 		pfd.iPixelType=PFD_TYPE_RGBA;
 		pfd.cColorBits=colorBits;
 		pfd.cAlphaBits=alphaBits;
-		pfd.cDepthBits=format->visual.depthBits;
-		pfd.cStencilBits=format->visual.stencilBits;
+		pfd.cDepthBits=format->depthBits;
+		pfd.cStencilBits=format->stencilBits;
 		pfd.iLayerType=PFD_MAIN_PLANE;
 		mPFD=pfd;
 
@@ -163,7 +163,7 @@ bool WGLWindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *for
 			(PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
 
 		if(wglSwapIntervalEXT!=NULL){
-			wglSwapIntervalEXT((int)format->visual.vsync);
+			wglSwapIntervalEXT((int)format->vsync);
 		}
 	}
 
