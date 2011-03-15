@@ -105,14 +105,11 @@ D3D10_PASS_DESC passDesc;
 	void setTextureStage(int stage,TextureStage *textureStage);
 	void setProgram(const Program *program);
 	void setShadowComparisonMethod(bool enabled);
-
-	// Light operations
 	void setLight(int i,Light *light);
 	void setLightEnabled(int i,bool enable);
 	void setAmbientColor(const Color &ambient);
 
 	// Misc operations
-	void setMirrorY(bool mirrorY);
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
 	int getClosestTextureFormat(int textureFormat);
 	void setStrictFormats(bool strict){mStrict=strict;}

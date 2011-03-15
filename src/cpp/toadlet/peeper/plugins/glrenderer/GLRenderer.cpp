@@ -78,9 +78,7 @@ GLRenderer::GLRenderer():
 	mFBOsAvailable(false),
 
 	mDepthWrite(false),
-	mFaceCulling(FaceCulling_NONE),
 	mInTexGen(false),
-	mMirrorY(false),
 	mMaxTexCoordIndex(0),
 	//mTexCoordIndexes,
 	mLastMaxTexCoordIndex(0),
@@ -475,47 +473,16 @@ void GLRenderer::setProjectionMatrix(const Matrix4x4 &matrix){
 		glMatrixMode(mMatrixMode);
 	}
 
-	if(mMirrorY){
-		#if defined(TOADLET_FIXED_POINT)
-			#if defined(TOADLET_HAS_GLES)
-				cacheMatrix4x4.set(matrix);
-				cacheMatrix4x4.setAt(1,0,-cacheMatrix4x4.at(1,0));
-				cacheMatrix4x4.setAt(1,1,-cacheMatrix4x4.at(1,1));
-				cacheMatrix4x4.setAt(1,2,-cacheMatrix4x4.at(1,2));
-				cacheMatrix4x4.setAt(1,3,-cacheMatrix4x4.at(1,3));
-
-				glLoadMatrixx(cacheMatrix4x4.data);
-			#else
-				MathConversion::scalarToFloat(cacheMatrix4x4,matrix);
-				cacheMatrix4x4.setAt(1,0,-cacheMatrix4x4.at(1,0));
-				cacheMatrix4x4.setAt(1,1,-cacheMatrix4x4.at(1,1));
-				cacheMatrix4x4.setAt(1,2,-cacheMatrix4x4.at(1,2));
-				cacheMatrix4x4.setAt(1,3,-cacheMatrix4x4.at(1,3));
-
-				glLoadMatrixf(cacheMatrix4x4.data);
-			#endif
+	#if defined(TOADLET_FIXED_POINT)
+		#if defined(TOADLET_HAS_GLES)
+			glLoadMatrixx(matrix.data);
 		#else
-			cacheMatrix4x4.set(matrix);
-			cacheMatrix4x4.setAt(1,0,-cacheMatrix4x4.at(1,0));
-			cacheMatrix4x4.setAt(1,1,-cacheMatrix4x4.at(1,1));
-			cacheMatrix4x4.setAt(1,2,-cacheMatrix4x4.at(1,2));
-			cacheMatrix4x4.setAt(1,3,-cacheMatrix4x4.at(1,3));
-
+			MathConversion::scalarToFloat(cacheMatrix4x4,matrix);
 			glLoadMatrixf(cacheMatrix4x4.data);
 		#endif
-	}
-	else{
-		#if defined(TOADLET_FIXED_POINT)
-			#if defined(TOADLET_HAS_GLES)
-				glLoadMatrixx(matrix.data);
-			#else
-				MathConversion::scalarToFloat(cacheMatrix4x4,matrix);
-				glLoadMatrixf(cacheMatrix4x4.data);
-			#endif
-		#else
-			glLoadMatrixf(matrix.data);
-		#endif
-	}
+	#else
+		glLoadMatrixf(matrix.data);
+	#endif
 
 	TOADLET_CHECK_GLERROR("setProjectionMatrix");
 }
@@ -946,10 +913,10 @@ void GLRenderer::setFaceCulling(const FaceCulling &faceCulling){
 	else{
 		switch(faceCulling){
 			case FaceCulling_FRONT:
-				glCullFace(mMirrorY?GL_BACK:GL_FRONT);
+				glCullFace(GL_FRONT);
 			break;
 			case FaceCulling_BACK:
-				glCullFace(mMirrorY?GL_FRONT:GL_BACK);
+				glCullFace(GL_BACK);
 			break;
 			default:
 			break;
@@ -1644,15 +1611,6 @@ void GLRenderer::setAmbientColor(const Color &ambient){
 	#endif
 
 	TOADLET_CHECK_GLERROR("setAmbientColor");
-}
-
-// Misc operations
-void GLRenderer::setMirrorY(bool mirrorY){
-	mMirrorY=mirrorY;
-
-	FaceCulling faceCulling=mFaceCulling;
-	mFaceCulling=FaceCulling_NONE;
-	setFaceCulling(faceCulling);
 }
 
 void GLRenderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){

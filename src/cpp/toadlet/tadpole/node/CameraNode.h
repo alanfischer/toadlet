@@ -72,6 +72,7 @@ public:
 	inline const Matrix4x4 &getProjectionMatrix() const{return mFinalProjectionMatrix;}
 
 	virtual void setProjectionRotation(scalar rotate);
+	virtual void setProjectionMirrorY(bool mirror);
 	virtual void setNearAndFarDist(scalar nearDist,scalar farDist);
 
 	virtual void setAlignmentCalculationsUseOrigin(bool origin){mAlignmentCalculationsUseOrigin=origin;}
@@ -142,6 +143,7 @@ protected:
 
 	Matrix4x4 mProjectionMatrix;
 	scalar mProjectionRotation;
+	bool mProjectionMirrorY;
 	Matrix4x4 mFinalProjectionMatrix;
 	Matrix4x4 mViewMatrix;
 	Matrix4x4 mViewProjectionMatrix;

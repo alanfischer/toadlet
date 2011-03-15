@@ -509,6 +509,8 @@ bool D3D10Renderer::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
 }
 
 void D3D10Renderer::setDefaultStates(){
+	mD3DDevice->ClearState();
+
 /*	setAlphaTest(AlphaTest_NONE,0.5);
 	setBlend(Blend::Combination_DISABLED);
 	setDepthWrite(true);
@@ -736,14 +738,6 @@ void D3D10Renderer::setLightEnabled(int i,bool enable){
 
 void D3D10Renderer::setAmbientColor(const Color &ambient){
 }
-
-void D3D10Renderer::setMirrorY(bool mirrorY){
-/*	mMirrorY=mirrorY;
-
-	FaceCulling faceCulling=mFaceCulling;
-	mFaceCulling=FaceCulling_NONE;
-	setFaceCulling(faceCulling);
-*/}
 
 void D3D10Renderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){
 }

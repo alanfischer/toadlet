@@ -31,7 +31,7 @@
 #include <toadlet/egg/String.h>
 #include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/peeper/Renderer.h>
-#include <toadlet/peeper/Visual.h>
+#include <toadlet/peeper/WindowRenderTargetFormat.h>
 #include <toadlet/ribbit/AudioPlayer.h>
 #include <toadlet/flick/MotionDetector.h>
 #include <toadlet/tadpole/Engine.h>
@@ -149,8 +149,8 @@ public:
 	virtual void setFullscreen(bool fullscreen)=0;
 	virtual bool getFullscreen() const=0;
 
-	virtual void setVisual(const peeper::Visual &visual)=0;
-	virtual const peeper::Visual &getVisual() const=0;
+	virtual void setWindowRenderTargetFormat(const peeper::WindowRenderTargetFormat::ptr format)=0;
+	virtual peeper::WindowRenderTargetFormat::ptr getWindowRenderTargetFormat() const=0;
 
 	virtual void setApplicationListener(ApplicationListener *listener)=0;
 	virtual ApplicationListener *getApplicationListener() const=0;

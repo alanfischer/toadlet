@@ -42,26 +42,24 @@ namespace peeper{
 #endif
 
 D3D9WindowRenderTarget::D3D9WindowRenderTarget():D3D9RenderTarget(),
+	mSamples(0),
 	mLibrary(0),
 	mD3D(NULL),
 	mD3DDevice(NULL),
 	mColorSurface(NULL),
 	mDepthSurface(NULL),
-	mWindow(0),
-	mWidth(0),
-	mHeight(0)
+	mWindow(0)
 {
 }
 
 D3D9WindowRenderTarget::D3D9WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format):D3D9RenderTarget(),
+	mSamples(0),
 	mLibrary(0),
 	mD3D(NULL),
 	mD3DDevice(NULL),
 	mColorSurface(NULL),
 	mDepthSurface(NULL),
-	mWindow(0),
-	mWidth(0),
-	mHeight(0)
+	mWindow(0)
 {
 	createContext(wnd,format);
 }
@@ -101,7 +99,7 @@ void D3D9WindowRenderTarget::reset(){
 		mDepthSurface=NULL;
 	}
 
-	fillPresentParameters(mPresentParameters);
+	mPresentParameters.MultiSampleType=(D3DMULTISAMPLE_TYPE)getClosestSamples(mSamples);
 
 	HRESULT result=mD3DDevice->Reset(&mPresentParameters);
 	TOADLET_CHECK_D3D9ERROR(result,"Reset");
@@ -139,8 +137,6 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *fo
 			"D3D9RenderWindow: Error creating Direct3D object");
 		return false;
 	}
-
-	mVisual=format->visual;
 
 	mAdaptor=D3DADAPTER_DEFAULT;
 	D3DADAPTER_IDENTIFIER9 identifier={0};
@@ -196,9 +192,33 @@ bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *fo
 		flags|=D3DCREATE_MULTITHREADED;
 	}
 
+	mSamples=format->multisamples;
 	mWindow=wnd;
 
-	fillPresentParameters(mPresentParameters);
+	D3DPRESENT_PARAMETERS *presentParameters=&mPresentParameters;
+	memset(presentParameters,0,sizeof(D3DPRESENT_PARAMETERS));
+	#if defined(TOADLET_SET_D3DM)
+		presentParameters->AutoDepthStencilFormat=D3DMFMT_D16;
+		presentParameters->EnableAutoDepthStencil=TRUE;
+		presentParameters->Windowed			=TRUE;
+		presentParameters->SwapEffect		=D3DMSWAPEFFECT_DISCARD;
+		presentParameters->BackBufferFormat	=D3DMFMT_UNKNOWN;
+	#else
+		presentParameters->AutoDepthStencilFormat=D3DFMT_D24S8;
+		presentParameters->EnableAutoDepthStencil=TRUE;
+		presentParameters->Windowed			=TRUE;
+		presentParameters->SwapEffect		=D3DSWAPEFFECT_DISCARD;
+		presentParameters->BackBufferWidth	=getWidth();
+		presentParameters->BackBufferHeight	=getHeight();
+		presentParameters->BackBufferFormat	=D3DFMT_X8R8G8B8;
+		if(format->vsync){
+			presentParameters->PresentationInterval=D3DPRESENT_INTERVAL_DEFAULT;
+		}
+		else{
+			presentParameters->PresentationInterval=D3DPRESENT_INTERVAL_IMMEDIATE;
+		}
+		presentParameters->MultiSampleType=(D3DMULTISAMPLE_TYPE)getClosestSamples(mSamples);
+	#endif
 
 	result=mD3D->CreateDevice(mAdaptor,mDevType,wnd,flags,&mPresentParameters,&mD3DDevice);
 	if(FAILED(result)){
@@ -245,47 +265,16 @@ bool D3D9WindowRenderTarget::destroyContext(){
 	return true;
 }
 
-void D3D9WindowRenderTarget::fillPresentParameters(D3DPRESENT_PARAMETERS &presentParameters){
-	RECT rect={0};
-	GetClientRect(mWindow,&rect);
-	mWidth=rect.right-rect.left;
-	mHeight=rect.bottom-rect.top;
-
-	memset(&presentParameters,0,sizeof(presentParameters));
-	#if defined(TOADLET_SET_D3DM)
-		presentParameters.AutoDepthStencilFormat=D3DMFMT_D16;
-		presentParameters.EnableAutoDepthStencil=TRUE;
-		presentParameters.Windowed			=TRUE;
-		presentParameters.SwapEffect		=D3DMSWAPEFFECT_DISCARD;
-		presentParameters.BackBufferFormat	=D3DMFMT_UNKNOWN;
-	#else
-		presentParameters.AutoDepthStencilFormat=D3DFMT_D24S8;
-		presentParameters.EnableAutoDepthStencil=TRUE;
-		presentParameters.Windowed			=TRUE;
-		presentParameters.SwapEffect		=D3DSWAPEFFECT_DISCARD;
-		presentParameters.BackBufferWidth	=mWidth;
-		presentParameters.BackBufferHeight	=mHeight;
-		presentParameters.BackBufferFormat	=D3DFMT_X8R8G8B8;
-	#endif
-
+int D3D9WindowRenderTarget::getClosestSamples(int samples){
 	#if !defined(TOADLET_SET_D3DM)
-		if(mVisual.vsync){
-			mPresentParameters.PresentationInterval=D3DPRESENT_INTERVAL_DEFAULT;
-		}
-		else{
-			mPresentParameters.PresentationInterval=D3DPRESENT_INTERVAL_IMMEDIATE;
-		}
-
-		if(mVisual.multisamples>0){
-			int samples=mVisual.multisamples;
+		if(samples>0){
 			HRESULT result;
 			do{
 				result=mD3D->CheckDeviceMultiSampleType(mAdaptor,mDevType,mPresentParameters.BackBufferFormat,mPresentParameters.Windowed,(D3DMULTISAMPLE_TYPE)samples,NULL);
 			}while(FAILED(result) && --samples>0);
-			mPresentParameters.MultiSampleType=(D3DMULTISAMPLE_TYPE)samples;
 		}
 	#endif
-
+	return samples;
 }
 
 }

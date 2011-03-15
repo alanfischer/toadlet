@@ -113,14 +113,11 @@ public:
 	void setTextureStage(int stage,TextureStage *textureStage);
 	void setProgram(const Program *program);
 	void setShadowComparisonMethod(bool enabled);
-
-	// Light operations
 	void setLight(int i,Light *light);
 	void setLightEnabled(int i,bool enable);
 	void setAmbientColor(const Color &ambient);
 
 	// Misc operations
-	void setMirrorY(bool mirrorY);
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
 	int getClosestTextureFormat(int textureFormat);
 	void setStrictFormats(bool strict){mStrict=strict;}
@@ -175,9 +172,7 @@ protected:
 	Viewport mViewport;
 	PointState mPointState;
 	bool mDepthWrite;
-	FaceCulling mFaceCulling;
 	bool mInTexGen;
-	bool mMirrorY;
 	egg::Collection<GLTexture*> mLastTextures;
 	short mMaxTexCoordIndex;
 	egg::Collection<short> mTexCoordIndexes;

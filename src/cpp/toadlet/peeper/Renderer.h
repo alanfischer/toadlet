@@ -162,8 +162,6 @@ public:
 	virtual void setDithering(bool dithering)=0;
 	virtual void setFaceCulling(const FaceCulling &faceCulling)=0;
 	virtual void setFogState(const FogState &state)=0;
-	virtual void setLighting(bool lighting)=0;
-	virtual void setLightEffect(const LightEffect &lightEffect)=0;
 	virtual void setFill(const Fill &fill)=0;
 	virtual void setShading(const Shading &shading)=0;
 	virtual void setColorWrite(bool r,bool g,bool b,bool a)=0;
@@ -173,20 +171,19 @@ public:
 	virtual void setPointState(const PointState &state)=0;
 	virtual void setTextureStage(int stage,TextureStage *textureStage)=0;
 	virtual void setProgram(const Program *program)=0;
-	 // A workaround here, since OpenGL & Direct3D have different shadow comparison methods
-	virtual void setShadowComparisonMethod(bool enabled)=0;
-
-	// Light operations
+	virtual void setLighting(bool lighting)=0;
+	virtual void setLightEffect(const LightEffect &lightEffect)=0;
 	virtual void setLight(int i,Light *light)=0;
 	virtual void setLightEnabled(int i,bool enable)=0;
 	virtual void setAmbientColor(const Color &ambient)=0;
+	 // A workaround here, since OpenGL & Direct3D have different shadow comparison methods
+	virtual void setShadowComparisonMethod(bool enabled)=0;
 
 	// Misc operations
-	virtual void setMirrorY(bool mirrorY)=0;
-	virtual void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result)=0;
 	virtual int getClosestTextureFormat(int textureFormat)=0;
 	virtual void setStrictFormats(bool strict)=0;
 	virtual bool getStrictFormats()=0;
+	virtual void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result)=0;
 
 	virtual const StatisticsSet &getStatisticsSet()=0;
 	virtual const CapabilitySet &getCapabilitySet()=0;
