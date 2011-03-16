@@ -322,18 +322,7 @@ void D3D10Renderer::setViewMatrix(const Matrix4x4 &matrix){
 }
 
 void D3D10Renderer::setProjectionMatrix(const Matrix4x4 &matrix){
-/*
-	if(mMirrorY){
-		cacheMatrix4x4.set(matrix);
-		cacheMatrix4x4.setAt(1,0,-cacheMatrix4x4.at(1,0));
-		cacheMatrix4x4.setAt(1,1,-cacheMatrix4x4.at(1,1));
-		cacheMatrix4x4.setAt(1,2,-cacheMatrix4x4.at(1,2));
-		cacheMatrix4x4.setAt(1,3,-cacheMatrix4x4.at(1,3));
-		mProjectionMatrix.set(cacheMatrix4x4);
-	}
-	else{
-*/		mProjectionMatrix.set(matrix);
-//	}
+	mProjectionMatrix.set(matrix);
 }
 
 void D3D10Renderer::beginScene(){
@@ -509,8 +498,6 @@ bool D3D10Renderer::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
 }
 
 void D3D10Renderer::setDefaultStates(){
-	mD3DDevice->ClearState();
-
 /*	setAlphaTest(AlphaTest_NONE,0.5);
 	setBlend(Blend::Combination_DISABLED);
 	setDepthWrite(true);
