@@ -3,16 +3,19 @@
 
 #include "msPlugIn.h"
 #include "msLib.h"
-#include <toadlet/tadpole/mesh/Mesh.h>
+#include <toadlet/tadpole/Mesh.h>
+#include <toadlet/tadpole/handler/XMSHHandler.h>
+#include <toadlet/tadpole/handler/XANMHandler.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::mesh;
+using namespace toadlet::tadpole::handler;
 
 struct msModel;
-class cPlugIn : public cMsPlugIn
+class cPlugIn : public cMsPlugIn,public ProgressListener
 {
     char szTitle[64];
+	HWND hwndProgress;
 
 	class Frame{
 	public:
@@ -33,6 +36,7 @@ class cPlugIn : public cMsPlugIn
 	int exportMesh(msModel *pModel,const String &sname);
 	int exportAnimation(msModel *pModel,const String &sname);
 	void findEmptyBones(msModel *pModel,Collection<int> &emptyBones);
+	void progressUpdated(float amount);
 
 public:
 	cPlugIn ();

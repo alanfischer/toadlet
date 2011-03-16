@@ -81,17 +81,17 @@ Resource::ptr XMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 	return mesh;
 }
 
-bool XMSHHandler::save(Mesh::ptr mesh,Stream::ptr stream){
+bool XMSHHandler::save(Mesh::ptr mesh,Stream::ptr stream,ProgressListener *listener){
 	mxml_node_t *root=mxmlNewElement(MXML_NO_PARENT,"XMSH");
 
 	int version=XMLMeshUtilities::version;
 	mxmlElementSetAttr(root,"Version",XMLMeshUtilities::makeInt(version));
 
 	if(version==1){
-		saveMeshVersion1(root,mesh);
+		saveMeshVersion1(root,mesh,listener);
 	}
 	else if(version>=2){
-		saveMeshVersion2Up(root,mesh,version);
+		saveMeshVersion2Up(root,mesh,version,listener);
 	}
 	else{
 		mxmlRelease(root);
@@ -147,21 +147,21 @@ Mesh::ptr XMSHHandler::loadMeshVersion2Up(mxml_node_t *root,int version){
 	return mesh;
 }
 
-bool XMSHHandler::saveMeshVersion1(mxml_node_t *root,Mesh::ptr mesh){
+bool XMSHHandler::saveMeshVersion1(mxml_node_t *root,Mesh::ptr mesh,ProgressListener *listener){
 	if(mesh!=NULL){
-		mxml_node_t *node=XMLMeshUtilities::saveMesh(mesh,1);
+		mxml_node_t *node=XMLMeshUtilities::saveMesh(mesh,1,listener);
 		mxmlSetElement(node,"MeshData");
 		mxmlAddChild(root,node);
 	}
 	if(mesh!=NULL && mesh->skeleton!=NULL){
-		mxml_node_t *node=XMLMeshUtilities::saveSkeleton(mesh->skeleton,1);
+		mxml_node_t *node=XMLMeshUtilities::saveSkeleton(mesh->skeleton,1,listener);
 		mxmlSetElement(node,"SkeletonData");
 		mxmlAddChild(root,node);
 
 		int i;
 		for(i=0;i<mesh->skeleton->sequences.size();++i){
 			TransformSequence::ptr sequence=mesh->skeleton->sequences[i];
-			mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,1);
+			mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,1,listener);
 			mxmlSetElement(node,"AnimationData");
 			mxmlAddChild(root,node);
 		}
@@ -170,21 +170,21 @@ bool XMSHHandler::saveMeshVersion1(mxml_node_t *root,Mesh::ptr mesh){
 	return true;
 }
 
-bool XMSHHandler::saveMeshVersion2Up(mxml_node_t *root,Mesh::ptr mesh,int version){
+bool XMSHHandler::saveMeshVersion2Up(mxml_node_t *root,Mesh::ptr mesh,int version,ProgressListener *listener){
 	if(mesh!=NULL){
-		mxml_node_t *node=XMLMeshUtilities::saveMesh(mesh,version);
+		mxml_node_t *node=XMLMeshUtilities::saveMesh(mesh,version,listener);
 		mxmlSetElement(node,"Mesh");
 		mxmlAddChild(root,node);
 	}
 	if(mesh!=NULL && mesh->skeleton!=NULL){
-		mxml_node_t *node=XMLMeshUtilities::saveSkeleton(mesh->skeleton,version);
+		mxml_node_t *node=XMLMeshUtilities::saveSkeleton(mesh->skeleton,version,listener);
 		mxmlSetElement(node,"Skeleton");
 		mxmlAddChild(root,node);
 
 		int i;
 		for(i=0;i<mesh->skeleton->sequences.size();++i){
 			TransformSequence::ptr sequence=mesh->skeleton->sequences[i];
-			mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,version);
+			mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,version,listener);
 			mxmlSetElement(node,"Sequence");
 			mxmlAddChild(root,node);
 		}

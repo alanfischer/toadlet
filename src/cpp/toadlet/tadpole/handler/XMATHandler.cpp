@@ -77,14 +77,14 @@ Resource::ptr XMATHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 	return material;
 }
 
-bool XMATHandler::save(Material::ptr material,Stream::ptr stream){
+bool XMATHandler::save(Material::ptr material,Stream::ptr stream,ProgressListener *listener){
 	mxml_node_t *root=mxmlNewElement(MXML_NO_PARENT,"XMAT");
 
 	int version=XMLMeshUtilities::version;
 	mxmlElementSetAttr(root,"Version",XMLMeshUtilities::makeInt(version));
 
 	if(version==3){
-		saveMaterial(root,material,version);
+		saveMaterial(root,material,version,listener);
 	}
 	else{
 		mxmlRelease(root);
@@ -115,9 +115,9 @@ Material::ptr XMATHandler::loadMaterial(mxml_node_t *root,int version){
 	return material;
 }
 
-bool XMATHandler::saveMaterial(mxml_node_t *root,Material::ptr material,int version){
+bool XMATHandler::saveMaterial(mxml_node_t *root,Material::ptr material,int version,ProgressListener *listener){
 	if(material!=NULL){
-		mxml_node_t *node=XMLMeshUtilities::saveMaterial(material,version);
+		mxml_node_t *node=XMLMeshUtilities::saveMaterial(material,version,listener);
 		mxmlSetElement(node,"Material");
 		mxmlAddChild(root,node);
 	}

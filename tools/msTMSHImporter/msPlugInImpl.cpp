@@ -13,7 +13,6 @@ using namespace toadlet;
 using namespace toadlet::egg::io;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole::handler;
-using namespace toadlet::tadpole::mesh;
 
 enum {
     eMeshes         = 1,
@@ -277,7 +276,7 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 				msMaterial *msmat=msModel_GetMaterialAt(pModel,mati);
 				msMaterial_SetName(msmat,subMesh->materialName);
 
-				msMaterial_SetDiffuse(msmat,(scalar*)Colors::WHITE.getData());
+				msMaterial_SetDiffuse(msmat,(scalar*)Math::ONE_VECTOR4.getData());
 
 				if(flags & eMeshes){
 					msMesh_SetMaterialIndex(msmesh,mati);
@@ -397,7 +396,7 @@ cPlugIn::importAnimation(msModel *pModel,const String &name,int flags){
 	}
 
 	XANMHandler::ptr handler(new XANMHandler());
-	Sequence::ptr sequence=shared_static_cast<Sequence>(handler->load(stream,NULL));
+	TransformSequence::ptr sequence=shared_static_cast<TransformSequence>(handler->load(stream,NULL));
 	if(sequence==NULL){
 		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error loading file",MB_OK);
 		return -1;
@@ -412,7 +411,7 @@ cPlugIn::importAnimation(msModel *pModel,const String &name,int flags){
 
 	int i;
 	for(i=0;i<sequence->tracks.size();++i){
-		Track::ptr track=sequence->tracks[i];
+		TransformTrack::ptr track=sequence->tracks[i];
 
 		msBone *msbone=msModel_GetBoneAt(pModel,i);
 

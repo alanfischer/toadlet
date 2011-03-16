@@ -181,11 +181,11 @@ bool MicroMeshConverter::convertMesh(Mesh *mesh,Stream *outStream,float meshScal
 
 		if(outType&VT_COLOR){
 			for(i=0;i<vba.getSize();++i){
-				Color color;
+				Vector4 color;
 				color.setRGBA(vba.getRGBA(i,colorIndex));
-				unsigned char r=color.r*255;
-				unsigned char g=color.g*255;
-				unsigned char b=color.b*255;
+				unsigned char r=color.x*255;
+				unsigned char g=color.y*255;
+				unsigned char b=color.z*255;
 				out->writeUInt8(r);
 				out->writeUInt8(g);
 				out->writeUInt8(b);

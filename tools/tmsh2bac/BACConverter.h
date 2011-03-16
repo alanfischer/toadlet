@@ -171,7 +171,7 @@ protected:
 	Collection<BACTexCoord *> mTexCoords;
 	Collection<BACTriangle *> mTriangles;
 	Collection<BACQuad *> mQuads;
-	Collection<Color> mColors;
+	Collection<Vector4> mColors;
 	Collection<Vector2> mTextures;
 	Collection<BACMaterial *> mMaterials;
 	Collection<BACBone *> mBones;

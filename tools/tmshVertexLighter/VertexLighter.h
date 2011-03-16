@@ -30,8 +30,8 @@ public:
 	void lightMesh(Mesh *mesh);
 
 	void setLightDirection(const Vector3 &direction);
-	void setLightDiffuseColor(const Color &diffuseColor);
-	void setLightAmbientColor(const Color &ambientColor);
+	void setLightDiffuseColor(const Vector4 &diffuseColor);
+	void setLightAmbientColor(const Vector4 &ambientColor);
 	void setLightFalloffFactor(scalar falloff);
 	void setKeepNormals(bool keepNormals);
 	void setLightEdges(bool edges,scalar edgeEpsilon);
@@ -39,8 +39,8 @@ public:
 protected:
 	Engine *mEngine;
 	Vector3 mDirection;
-	Color mDiffuseColor;
-	Color mAmbientColor;
+	Vector4 mDiffuseColor;
+	Vector4 mAmbientColor;
 	scalar mFalloffFactor;
 	bool mKeepNormals;
 	bool mLightEdges;

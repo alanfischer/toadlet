@@ -3,11 +3,10 @@
 
 #include "msPlugIn.h"
 #include "msLib.h"
-#include <toadlet/tadpole/mesh/Mesh.h>
+#include <toadlet/tadpole/Mesh.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::mesh;
 
 struct msModel;
 class cPlugIn : public cMsPlugIn

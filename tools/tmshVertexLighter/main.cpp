@@ -8,8 +8,8 @@ int main(int argc,char **argv){
 	Collection<int> skip;
 	int i=0;
 	Vector3 direction=Vector3(0,0,1);
-	Color diffuse=Colors::WHITE;
-	Color ambient=Colors::BLACK;
+	Vector4 diffuse=Colors::WHITE;
+	Vector4 ambient=Colors::BLACK;
 	float falloff=1.0f;
 	bool keepNormals=false;
 	bool lightEdges=true;
@@ -55,9 +55,9 @@ int main(int argc,char **argv){
 						std::cout << "Bad parameters" << std::endl;
 						return -1;
 					}
-					diffuse.r=arg.substr(j+1,comma1-(j+1)).toFloat();
-					diffuse.g=arg.substr(comma1+1,comma2-(comma1+1)).toFloat();
-					diffuse.b=arg.substr(comma2+1,end-(comma2+1)).toFloat();
+					diffuse.x=arg.substr(j+1,comma1-(j+1)).toFloat();
+					diffuse.y=arg.substr(comma1+1,comma2-(comma1+1)).toFloat();
+					diffuse.z=arg.substr(comma2+1,end-(comma2+1)).toFloat();
 				}
                 if(arg.substr(j,1)=="a"){
 					int comma1=arg.find(',',j+1);
@@ -67,9 +67,9 @@ int main(int argc,char **argv){
 						std::cout << "Bad parameters" << std::endl;
 						return -1;
 					}
-					ambient.r=arg.substr(j+1,comma1-(j+1)).toFloat();
-					ambient.g=arg.substr(comma1+1,comma2-(comma1+1)).toFloat();
-					ambient.b=arg.substr(comma2+1,end-(comma2+1)).toFloat();
+					ambient.x=arg.substr(j+1,comma1-(j+1)).toFloat();
+					ambient.y=arg.substr(comma1+1,comma2-(comma1+1)).toFloat();
+					ambient.z=arg.substr(comma2+1,end-(comma2+1)).toFloat();
 				}
                 if(arg.substr(j,1)=="f"){
 					falloff=arg.substr(j+1,arg.length()-(j+1)).toFloat();

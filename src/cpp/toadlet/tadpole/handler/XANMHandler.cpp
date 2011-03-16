@@ -77,17 +77,17 @@ Resource::ptr XANMHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 	return sequence;
 }
 
-bool XANMHandler::save(TransformSequence::ptr sequence,Stream::ptr stream){
+bool XANMHandler::save(TransformSequence::ptr sequence,Stream::ptr stream,ProgressListener *listener){
 	mxml_node_t *root=mxmlNewElement(MXML_NO_PARENT,"XANM");
 
 	int version=XMLMeshUtilities::version;
 	mxmlElementSetAttr(root,"Version",XMLMeshUtilities::makeInt(version));
 
 	if(version==1){
-		saveSequenceVersion1(root,sequence);
+		saveSequenceVersion1(root,sequence,listener);
 	}
 	else if(version>=2){
-		saveSequenceVersion2Up(root,sequence,version);
+		saveSequenceVersion2Up(root,sequence,version,listener);
 	}
 	else{
 		mxmlRelease(root);
@@ -131,9 +131,9 @@ TransformSequence::ptr XANMHandler::loadSequenceVersion2Up(mxml_node_t *root,int
 	return sequence;
 }
 
-bool XANMHandler::saveSequenceVersion1(mxml_node_t *root,TransformSequence::ptr sequence){
+bool XANMHandler::saveSequenceVersion1(mxml_node_t *root,TransformSequence::ptr sequence,ProgressListener *listener){
 	if(sequence!=NULL){
-		mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,1);
+		mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,1,listener);
 		mxmlSetElement(node,"AnimationData");
 		mxmlAddChild(root,node);
 	}
@@ -141,9 +141,9 @@ bool XANMHandler::saveSequenceVersion1(mxml_node_t *root,TransformSequence::ptr 
 	return true;
 }
 
-bool XANMHandler::saveSequenceVersion2Up(mxml_node_t *root,TransformSequence::ptr sequence,int version){
+bool XANMHandler::saveSequenceVersion2Up(mxml_node_t *root,TransformSequence::ptr sequence,int version,ProgressListener *listener){
 	if(sequence!=NULL){
-		mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,version);
+		mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,version,listener);
 		mxmlSetElement(node,"Sequence");
 		mxmlAddChild(root,node);
 	}
