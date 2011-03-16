@@ -158,12 +158,17 @@ void Viewer::mouseReleased(int x,int y,int button){
 }
 
 void Viewer::resized(int width,int height){
+	scalar radius=mParent!=NULL?mParent->getWorldBound()->getSphere().radius:0;
+	scalar nearDistance=mDistance-radius;
+	scalar farDistance=mDistance+radius;
+	if(nearDistance<Math::ONE){nearDistance=Math::ONE;}
+	if(farDistance<nearDistance+Math::ONE){farDistance=nearDistance+Math::ONE;}
 	if(mCamera!=NULL && width!=0 && height!=0){
 		if(width>=height){
-			mCamera->setProjectionFovY(Math::degToRad(Math::fromInt(45)),Math::div(Math::fromInt(width),Math::fromInt(height)),Math::ONE,mDistance*2);
+			mCamera->setProjectionFovY(Math::degToRad(Math::fromInt(45)),Math::div(Math::fromInt(width),Math::fromInt(height)),nearDistance,farDistance);
 		}
 		else{
-			mCamera->setProjectionFovX(Math::degToRad(Math::fromInt(45)),Math::div(Math::fromInt(height),Math::fromInt(width)),Math::ONE,mDistance*2);
+			mCamera->setProjectionFovX(Math::degToRad(Math::fromInt(45)),Math::div(Math::fromInt(height),Math::fromInt(width)),nearDistance,farDistance);
 		}
 		mCamera->setViewport(Viewport(0,0,width,height));
 	}
@@ -178,4 +183,5 @@ void Viewer::updateCamera(){
 	Vector3 eye(Math::Y_UNIT_VECTOR3);
 	Math::mul(eye,-mDistance);
 	mCamera->setLookAt(eye,Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
+	resized(mWidth,mHeight);
 }

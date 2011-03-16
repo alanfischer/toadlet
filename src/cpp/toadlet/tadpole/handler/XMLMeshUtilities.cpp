@@ -234,7 +234,13 @@ const char *makeBoneAssignment(char *buffer,const Mesh::VertexBoneAssignmentList
 }
 
 Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,MaterialManager *materialManager,TextureManager *textureManager){
-	Material::ptr material=materialManager->createMaterial();
+	Material::ptr material=NULL;
+	if(materialManager!=NULL){
+		material=materialManager->createMaterial();
+	}
+	else{
+		material=Material::ptr(new Material());
+	}
 
 	const char *prop=mxmlElementGetAttr(node,"Name");
 	if(prop!=NULL){
