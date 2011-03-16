@@ -456,7 +456,7 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 	return material;
 }
 
-mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version){
+mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,ProgressListener *listener){
 	mxml_node_t *materialNode=mxmlNewElement(MXML_NO_PARENT,"Material");
 
 	mxmlElementSetAttr(materialNode,"Name",material->getName());
@@ -861,7 +861,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 	return mesh;
 }
 
-mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version){
+mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListener *listener){
 	mxml_node_t *meshNode=NULL;
 	if(version<=2){
 		meshNode=mxmlNewElement(MXML_NO_PARENT,"MeshData");
@@ -920,6 +920,8 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version){
 		String data;
 		int i;
 		for(i=0;i<vertexBuffer->getSize();++i){
+			listener->progressUpdated((float)i/(float)vertexBuffer->getSize());
+
 			line[0]=0;
 			buffer[0]=0;
 
@@ -994,7 +996,7 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version){
 
 			Material::ptr material=subMesh->material;
 			if(material!=NULL && material->getSaveLocally()){
-				mxmlAddChild(subMeshNode,saveMaterial(material,version));
+				mxmlAddChild(subMeshNode,saveMaterial(material,version,listener));
 			}
 			else{
 				String materialName;
@@ -1076,7 +1078,7 @@ Skeleton::ptr XMLMeshUtilities::loadSkeleton(mxml_node_t *node,int version){
 	return skeleton;
 }
 
-mxml_node_t *XMLMeshUtilities::saveSkeleton(Skeleton::ptr skeleton,int version){
+mxml_node_t *XMLMeshUtilities::saveSkeleton(Skeleton::ptr skeleton,int version,ProgressListener *listener){
 	mxml_node_t *skeletonNode=NULL;
 	if(version<=2){
 		skeletonNode=mxmlNewElement(MXML_NO_PARENT,"SkeletonData");
@@ -1087,6 +1089,7 @@ mxml_node_t *XMLMeshUtilities::saveSkeleton(Skeleton::ptr skeleton,int version){
 
 	int i;
 	for(i=0;i<skeleton->bones.size();++i){
+		listener->progressUpdated((float)i/(float)skeleton->bones.size());
 		Skeleton::Bone::ptr bone=skeleton->bones[i];
 
 		mxml_node_t *boneNode=mxmlNewElement(skeletonNode,"Bone");
@@ -1199,7 +1202,7 @@ TransformSequence::ptr XMLMeshUtilities::loadSequence(mxml_node_t *node,int vers
 	return sequence;
 }
 
-mxml_node_t *XMLMeshUtilities::saveSequence(TransformSequence::ptr sequence,int version){
+mxml_node_t *XMLMeshUtilities::saveSequence(TransformSequence::ptr sequence,int version,ProgressListener *listener){
 	mxml_node_t *sequenceNode=NULL;
 	if(version<=2){
 		sequenceNode=mxmlNewElement(MXML_NO_PARENT,"AnimationData");
@@ -1216,6 +1219,8 @@ mxml_node_t *XMLMeshUtilities::saveSequence(TransformSequence::ptr sequence,int 
 
 	int j;
 	for(j=0;j<sequence->tracks.size();++j){
+		listener->progressUpdated((float)j/(float)sequence->tracks.size());
+
 		TransformTrack::ptr track=sequence->tracks[j];
 
 		mxml_node_t *trackNode=mxmlNewElement(sequenceNode,"Track");

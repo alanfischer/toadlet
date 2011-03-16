@@ -69,7 +69,7 @@ Viewer::Viewer():Application(),
 {}
 
 void Viewer::create(){
-	Application::create();
+	Application::create("d3d9");
 
 	mScene=Scene::ptr(new Scene(mEngine));
 }
@@ -85,7 +85,7 @@ void Viewer::start(MeshNode::ptr meshNode){
 
 	mDistance=meshNode->getBound()->getSphere().radius*2;
 
-	mScene->setAmbientColor(Color(Math::QUARTER,Math::QUARTER,Math::QUARTER,Math::ONE));
+	mScene->setAmbientColor(Vector4(Math::QUARTER,Math::QUARTER,Math::QUARTER,Math::ONE));
 
 	mLight=mEngine->createNodeType(LightNode::type(),mScene);
 	mLight->setLightType(Light::Type_DIRECTION);
@@ -105,7 +105,7 @@ void Viewer::update(int dt){
 
 void Viewer::render(Renderer *renderer){
 	renderer->beginScene();
-		mScene->render(renderer,mCamera,NULL);
+		mCamera->render(renderer);
 	renderer->endScene();
 	renderer->swap();
 }

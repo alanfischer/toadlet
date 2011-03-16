@@ -33,6 +33,12 @@
 namespace toadlet{
 namespace tadpole{
 
+/// @todo: Just stuck this here, should be in its own file
+class ProgressListener{
+public:
+	virtual void progressUpdated(float amount)=0;
+};
+
 class ResourceHandler{
 public:
 	TOADLET_SHARED_POINTERS(ResourceHandler);

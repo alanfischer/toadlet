@@ -784,8 +784,8 @@ void BACConverter::writeOutModelVersion6(Stream *tout){
 	if(mColors.size()>0){
 		out << "  ( Colors" << std::endl;
 		for(i=0;i<mColors.size();++i){
-			const Color &color=mColors[i];
-			out << "    ( f3 " << color.r << " " << color.g << " " << color.b << " ) ; id: " << i << std::endl;
+			const Vector4 &color=mColors[i];
+			out << "    ( f3 " << color.x << " " << color.y << " " << color.z << " ) ; id: " << i << std::endl;
 		}
 		out << "  )" << std::endl;
 

@@ -45,13 +45,13 @@ public:
 
 	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
 
-	bool save(Mesh::ptr resource,egg::io::Stream::ptr stream);
+	bool save(Mesh::ptr resource,egg::io::Stream::ptr stream,ProgressListener *listener=NULL);
 
 protected:
 	Mesh::ptr loadMeshVersion1(mxml_node_t *root);
 	Mesh::ptr loadMeshVersion2Up(mxml_node_t *root,int version);
-	bool saveMeshVersion1(mxml_node_t *root,Mesh::ptr mesh);
-	bool saveMeshVersion2Up(mxml_node_t *root,Mesh::ptr mesh,int version);
+	bool saveMeshVersion1(mxml_node_t *root,Mesh::ptr mesh,ProgressListener *listener);
+	bool saveMeshVersion2Up(mxml_node_t *root,Mesh::ptr mesh,int version,ProgressListener *listener);
 
 	BufferManager *mBufferManager;
 	MaterialManager *mMaterialManager;

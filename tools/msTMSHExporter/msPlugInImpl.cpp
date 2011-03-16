@@ -1,18 +1,16 @@
 #include "stdafx.h"
+#include "commctrl.h"
 #include "msPlugInImpl.h"
 #include "../shared/msConversion.h"
+#pragma comment(lib,"comctl32.lib")
 
 #include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/MeshManager.h>
-#include <toadlet/tadpole/handler/XMSHHandler.h>
-#include <toadlet/tadpole/handler/XANMHandler.h>
 
 #pragma warning(disable:4996)
 
 using namespace toadlet::egg::io;
 using namespace toadlet::peeper;
-using namespace toadlet::tadpole::handler;
-using namespace toadlet::tadpole::mesh;
 
 BOOL APIENTRY DllMain( HANDLE hModule, 
                        DWORD  ul_reason_for_call, 
@@ -122,6 +120,17 @@ cPlugIn::Execute (msModel *pModel)
     if (!::GetSaveFileName (&ofn))
         return 0;
 
+	HINSTANCE hInstance=GetModuleHandle(0);
+    InitCommonControls(); 
+    hwndProgress=CreateWindowEx(WS_EX_CLIENTEDGE,PROGRESS_CLASS,
+        (LPTSTR) NULL, WS_VISIBLE,
+		CW_USEDEFAULT,CW_USEDEFAULT,240,40,
+        0,0,hInstance,NULL);
+    ShowWindow(hwndProgress,SW_SHOW);
+    UpdateWindow(hwndProgress);
+
+    SendMessage(hwndProgress,PBM_SETRANGE,0,MAKELPARAM(0,100));
+
 	int result=-1;
 	String name=szFile;
 	if(name.find(".xmsh")!=String::npos){
@@ -133,6 +142,8 @@ cPlugIn::Execute (msModel *pModel)
 	else{
         ::MessageBox (NULL, "Exporting model to unknown format!\nPlease choose .xmsh, or .xanm", "Toadlet Mesh Export", MB_OK | MB_ICONWARNING);
 	}
+
+	DestroyWindow(hwndProgress);
 
     // Don't forget to destroy the model
     msModel_Destroy(pModel);
@@ -214,7 +225,10 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 
 		materialIndexes[i]=msMesh_GetMaterialIndex(msmesh);
 
-		for(j=0;j<msMesh_GetTriangleCount(msmesh);++j){
+		int triangleCount=msMesh_GetTriangleCount(msmesh);
+		for(j=0;j<triangleCount;++j){
+			progressUpdated((float)j/(float)triangleCount);
+
 			msTriangle *triangle=msMesh_GetTriangleAt(msmesh,j);
 
 			word verts[3],norms[3];
@@ -271,7 +285,7 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 	vertexFormat->addElement(VertexFormat::Semantic_NORMAL,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3);
 	vertexFormat->addElement(VertexFormat::Semantic_TEX_COORD,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_2);
 
-	VertexBuffer::ptr vertexBuffer(new BackableVertexBuffer());
+	VertexBuffer::ptr vertexBuffer(new BackableBuffer());
 	vertexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,vertexFormat,vertexes.size());
 	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 
@@ -294,13 +308,16 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 		}
 	}
 
-    for(i=0;i<indexes.size();++i){
+	int indexCount=indexes.size();
+    for(i=0;i<indexCount;++i){
+		progressUpdated((float)i/(float)indexCount);
+
 		Mesh::SubMesh::ptr sub(new Mesh::SubMesh());
 		mesh->subMeshes.add(sub);
 
 		sub->name=meshNames[i];
 
-		IndexBuffer::ptr indexBuffer(new BackableIndexBuffer());
+		IndexBuffer::ptr indexBuffer(new BackableBuffer());
 		indexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,IndexBuffer::IndexFormat_UINT16,indexes[i].size());
 		sub->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,indexes[i].size()));
 
@@ -359,7 +376,7 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 	FileStream::ptr stream(new FileStream(name,FileStream::Open_WRITE_BINARY));
 	XMSHHandler::ptr handler(new XMSHHandler(NULL,NULL,NULL));
 
-	handler->save(mesh,stream);
+	handler->save(mesh,stream,this);
 
 	return 0;
 }
@@ -453,7 +470,7 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 	Collection<int> emptyBones;
 	findEmptyBones(pModel,emptyBones);
 
-	Sequence::ptr sequence(new Sequence());
+	TransformSequence::ptr sequence(new TransformSequence());
 
 	int s1=name.rfind('/');
 	if(s1==String::npos){s1=0;}
@@ -471,7 +488,10 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 	Skeleton::ptr skeleton=buildSkeleton(pModel,emptyBones);
 
 	int i,j,k;
-	for(i=0;i<msModel_GetBoneCount(pModel);++i){
+	int boneCount=msModel_GetBoneCount(pModel);
+	for(i=0;i<boneCount;++i){
+		progressUpdated((float)i/(float)boneCount);
+
 		int newi=i;
 		for(j=0;j<emptyBones.size();++j){
 			if(i==emptyBones[j]){
@@ -487,7 +507,7 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 
 		msBone *msbone=msModel_GetBoneAt(pModel,i);
 
-		Track::ptr track(new Track());
+		TransformTrack::ptr track(new TransformTrack());
 		sequence->tracks.add(track);
 
 		track->index=newi;
@@ -647,7 +667,7 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 
 		track->keyFrames.resize(frames.size());
 		for(j=0;j<frames.size();++j){
-			KeyFrame keyFrame;
+			TransformKeyFrame keyFrame;
 			keyFrame.translate=frames[j].translate;
 			keyFrame.rotate=frames[j].rotate;
 			keyFrame.time=frames[j].time/fps;
@@ -665,8 +685,12 @@ cPlugIn::exportAnimation(msModel *pModel,const String &name){
 	FileStream::ptr stream(new FileStream(name,FileStream::Open_WRITE_BINARY));
 	XANMHandler::ptr handler(new XANMHandler());
 
-	handler->save(sequence,stream);
+	handler->save(sequence,stream,this);
 
 	return 0;
 }
 
+void 
+cPlugIn::progressUpdated(float amount){
+	SendMessage(hwndProgress,PBM_SETPOS,amount*100,0); 
+}

@@ -98,8 +98,8 @@ void VertexLighter::lightMesh(Mesh *mesh){
 	}
 
 	for(i=0;i<mesh->subMeshes.size();++i){
-		Color ambient(Colors::BLACK);
-		Color diffuse(Colors::WHITE);
+		Vector4 ambient(Colors::BLACK);
+		Vector4 diffuse(Colors::WHITE);
 
 		Material::ptr material=mesh->subMeshes[i]->material;
 
@@ -130,24 +130,15 @@ void VertexLighter::lightMesh(Mesh *mesh){
 				#else
 					d=powf(d,mFalloffFactor);
 				#endif
-				Color color(
-					Math::mul(d,Math::mul(mDiffuseColor.r,diffuse.r))+mAmbientColor.r+ambient.r,
-					Math::mul(d,Math::mul(mDiffuseColor.g,diffuse.g))+mAmbientColor.g+ambient.g,
-					Math::mul(d,Math::mul(mDiffuseColor.b,diffuse.b))+mAmbientColor.b+ambient.b,
-					Math::ONE
-				);
-				if(color.r>Math::ONE){
-					color.r=Math::ONE;
-				}
-				if(color.g>Math::ONE){
-					color.g=Math::ONE;
-				}
-				if(color.b>Math::ONE){
-					color.b=Math::ONE;
-				}
-				if(color.a>Math::ONE){
-					color.a=Math::ONE;
-				}
+				Vector4 color;
+				Math::mul(color,mDiffuseColor,diffuse);
+				Math::mul(color,d);
+				Math::add(color,mAmbientColor);
+				Math::add(color,ambient);
+				if(color.x>Math::ONE) color.x=Math::ONE;
+				if(color.y>Math::ONE) color.y=Math::ONE;
+				if(color.z>Math::ONE) color.z=Math::ONE;
+				if(color.w>Math::ONE) color.w=Math::ONE;
 
 				if(mLightEdges==false){
 					Vector3 position; vba.get3(index,pi,position);
@@ -170,11 +161,11 @@ void VertexLighter::setLightDirection(const Vector3 &direction){
 	Math::normalize(mDirection);
 }
 
-void VertexLighter::setLightDiffuseColor(const Color &diffuseColor){
+void VertexLighter::setLightDiffuseColor(const Vector4 &diffuseColor){
 	mDiffuseColor=diffuseColor;
 }
 
-void VertexLighter::setLightAmbientColor(const Color &ambientColor){
+void VertexLighter::setLightAmbientColor(const Vector4 &ambientColor){
 	mAmbientColor=ambientColor;
 }
 

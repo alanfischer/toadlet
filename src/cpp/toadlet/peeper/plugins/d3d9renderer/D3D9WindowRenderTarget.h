@@ -45,8 +45,8 @@ public:
 	virtual bool createContext(HWND wnd,WindowRenderTargetFormat *format);
 	virtual bool destroyContext();
 
-	virtual int getWidth() const{RECT r;GetWindowRect(mWindow,&r);return r.right-r.left;}
-	virtual int getHeight() const{RECT r;GetWindowRect(mWindow,&r);return r.bottom-r.top;}
+	virtual int getWidth() const{RECT r;GetClientRect(mWindow,&r);return r.right-r.left;}
+	virtual int getHeight() const{RECT r;GetClientRect(mWindow,&r);return r.bottom-r.top;}
 
 	virtual bool activate();
 	virtual bool deactivate(){return true;}

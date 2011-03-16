@@ -54,16 +54,16 @@ public:
 	static egg::String makeInt(int i);
 
 	static Material::ptr loadMaterial(mxml_node_t *node,int version,MaterialManager *materialManager,TextureManager *textureManager);
-	static mxml_node_t *saveMaterial(Material::ptr material,int version);
+	static mxml_node_t *saveMaterial(Material::ptr material,int version,ProgressListener *listener);
 
 	static Mesh::ptr loadMesh(mxml_node_t *node,int version,BufferManager *bufferManager,MaterialManager *materialManager,TextureManager *textureManager);
-	static mxml_node_t *saveMesh(Mesh::ptr mesh,int version);
+	static mxml_node_t *saveMesh(Mesh::ptr mesh,int version,ProgressListener *listener);
 
 	static Skeleton::ptr loadSkeleton(mxml_node_t *node,int version);
-	static mxml_node_t *saveSkeleton(Skeleton::ptr skeleton,int version);
+	static mxml_node_t *saveSkeleton(Skeleton::ptr skeleton,int version,ProgressListener *listener);
 
 	static TransformSequence::ptr loadSequence(mxml_node_t *node,int version);
-	static mxml_node_t *saveSequence(TransformSequence::ptr sequence,int version);
+	static mxml_node_t *saveSequence(TransformSequence::ptr sequence,int version,ProgressListener *listener);
 };
 
 }

@@ -1492,8 +1492,8 @@ bool M3GConverter::convertMesh(Mesh *mesh,Stream *outStream,float scale,int forc
 	return result;
 }
 
-uint32 toM3GColor(const Color &color){
-	return ((int)(color.a*255.0f))<<24 | ((int)(color.r*255.0f))<<16 | ((int)(color.g*255.0f))<<8 | ((int)(color.b*255.0f));
+uint32 toM3GColor(const Vector4 &color){
+	return ((int)(color.x*255.0f))<<24 | ((int)(color.y*255.0f))<<16 | ((int)(color.z*255.0f))<<8 | ((int)(color.w*255.0f));
 }
 
 M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int forceBytes,bool invertYTexCoord,bool viewable,int activeAnimation){
@@ -1891,7 +1891,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 			colors->componentCount=3;
 			colors->componentSize=1;
 			colors->byteComponents.resize(numVertexes*3);
-			Color color;
+			Vector4 color;
 
 			for(i=0;i<numVertexes;++i){
 				int c=vba.getRGBA(i,colorIndex);
