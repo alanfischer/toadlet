@@ -53,7 +53,6 @@ public:
 protected:
 	void updateAttachment(Node *node){
 		mAttachable->getAttachmentTransform(mTransform,mIndex);
-//		mTransform->transform(mNode->getReadOnlyTransform(),mTransform);
 		node->setTransform(mTransform,0);
 	}
 

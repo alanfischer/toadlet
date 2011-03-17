@@ -86,15 +86,15 @@ void MeshNodeSkeleton::updateBones(int sequenceIndex,scalar sequenceTime){
 	updateBones();
 }
 
-MeshNodeSkeleton::Bone *MeshNodeSkeleton::getBone(const String &name) const{
+int MeshNodeSkeleton::getBoneIndex(const String &name) const{
 	int i;
 	for(i=0;i<mSkeleton->bones.size();++i){
 		if(mSkeleton->bones[i]->name.equals(name)){
-			return mBones[i];
+			return i;
 		}
 	}
 
-	return NULL;
+	return -1;
 }
 
 String MeshNodeSkeleton::getBoneName(int index) const{
@@ -104,10 +104,6 @@ String MeshNodeSkeleton::getBoneName(int index) const{
 	else{
 		return (char*)NULL;
 	}
-}
-
-String MeshNodeSkeleton::getBoneName(Bone *bone) const{
-	return mSkeleton->bones[bone->index]->name;
 }
 
 int MeshNodeSkeleton::updateBoneTransformation(Bone *bone){
@@ -327,6 +323,18 @@ Bound *MeshNodeSkeleton::getRenderBound() const{
 
 void MeshNodeSkeleton::render(Renderer *renderer) const{
 	renderer->renderPrimitive(mVertexData,mIndexData);
+}
+
+bool MeshNodeSkeleton::getAttachmentTransform(Transform *result,int index){
+	if(index>=0 && index<mBones.size()){
+		Bone *bone=mBones[index];
+		result->setTranslate(bone->worldTranslate);
+		result->setRotate(bone->worldRotate);
+		return true;
+	}
+	else{
+		return false;
+	}
 }
 
 }

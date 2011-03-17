@@ -26,7 +26,7 @@
 #ifndef TOADLET_TADPOLE_NODE_LIGHTNODE_H
 #define TOADLET_TADPOLE_NODE_LIGHTNODE_H
 
-#include <toadlet/peeper/Light.h>
+#include <toadlet/peeper/LightState.h>
 #include <toadlet/tadpole/node/Node.h>
 
 namespace toadlet{
@@ -40,39 +40,21 @@ public:
 
 	LightNode();
 	virtual Node *create(Scene *scene);
-	virtual void destroy();
 	virtual Node *set(Node *node);
 
-	inline void setEnabled(bool enabled){mLight->setEnabled(enabled);}
-	inline bool getEnabled() const{return mLight->getEnabled();}
+	inline void setEnabled(bool enabled){mEnabled=enabled;}
+	inline bool getEnabled() const{return mEnabled;}
 
-	inline void setSpecularColor(const Vector4 &specularColor){mLight->setSpecularColor(specularColor);}
-	inline const Vector4 &getSpecularColor() const{return mLight->getSpecularColor();}
+	inline void setLightState(const peeper::LightState &state){mLightState.set(state);}
+	inline const peeper::LightState &getLightState(){return mLightState;}
 
-	inline void setDiffuseColor(const Vector4 &diffuseColor){mLight->setDiffuseColor(diffuseColor);}
-	inline const Vector4 &getDiffuseColor() const{return mLight->getDiffuseColor();}
-
-	inline void setLinearAttenuation(scalar attenuation){mLight->setLinearAttenuation(attenuation);}
-	inline scalar getLinearAttenuation() const{return mLight->getLinearAttenuation();}
-
-	inline void setLightType(peeper::Light::Type type){mLight->setType(type);}
-	inline peeper::Light::Type getLightType() const{return mLight->getType();}
-
-	inline void setDirection(const Vector3 &direction){mLight->setDirection(direction);}
-	inline const Vector3 &getDirection() const{return mLight->getDirection();}
-
-	inline void setSpotCutoff(scalar cutoff){mLight->setSpotCutoff(cutoff);}
-	inline scalar getSpotCutoff() const{return mLight->getSpotCutoff();}
-
-	inline void setRadius(scalar radius){mLight->setRadius(radius);}
-	inline scalar getRadius() const{return mLight->getRadius();}
-
-	inline peeper::Light *internal_getLight(){return mLight;}
+	virtual void frameUpdate(int dt,int scope);
 
 	virtual void queueRenderables(CameraNode *camera,RenderQueue *queue);
 
 protected:
-	peeper::Light::ptr mLight;
+	bool mEnabled;
+	peeper::LightState mLightState;
 };
 
 }

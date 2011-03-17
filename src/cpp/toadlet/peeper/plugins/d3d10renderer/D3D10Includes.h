@@ -55,8 +55,8 @@ namespace peeper{
 #endif
 
 #if defined(TOADLET_FIXED_POINT)
-	inline void toD3DColor(float *r,const Color &c){
-		r[0]=Math::toFloat(c.r); r[1]=Math::toFloat(c.g); r[2]=Math::toFloat(c.b); r[3]=Math::toFloat(c.a);
+	inline void toD3DColor(float *r,const Vector4 &c){
+		r[0]=Math::toFloat(c.x); r[1]=Math::toFloat(c.y); r[2]=Math::toFloat(c.z); r[3]=Math::toFloat(c.w);
 	}
 
 	inline void toD3DMatrix(float *r,const Matrix4x4 &s){

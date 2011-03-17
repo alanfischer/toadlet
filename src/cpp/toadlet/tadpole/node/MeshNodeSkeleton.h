@@ -26,7 +26,7 @@
 #ifndef TOADLET_TADPOLE_NODE_MESHNODESKELETON_H
 #define TOADLET_TADPOLE_NODE_MESHNODESKELETON_H
 
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/tadpole/Attachable.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Skeleton.h>
@@ -37,7 +37,7 @@ namespace node{
 
 class MeshNode;
 
-class TOADLET_API MeshNodeSkeleton:public Renderable{
+class TOADLET_API MeshNodeSkeleton:public Renderable,public Attachable{
 public:
 	TOADLET_SHARED_POINTERS(MeshNodeSkeleton);
 
@@ -107,21 +107,31 @@ public:
 	inline int getLastUpdateFrame() const{return mLastUpdateFrame;}
 
 	inline int getNumBones() const{return mBones.size();}
-	inline Bone *getBone(int index) const{return mBones[index];}
-	Bone *getBone(const egg::String &name) const;
+	inline Bone *getBone(int index) const{return (index>=0 && index<mBones.size())?mBones[index]:NULL;}
+	inline Bone *getBone(const egg::String &name) const{return getBone(getBoneIndex(name));}
+
+	int getBoneIndex(const egg::String &name) const;
+	int getBoneIndex(Bone *bone) const{return bone->index;}
 
 	egg::String getBoneName(int index) const;
-	egg::String getBoneName(Bone *bone) const;
+	egg::String getBoneName(Bone *bone) const{return mSkeleton->bones[bone->index]->name;}
 
 	inline Skeleton::ptr getSkeleton() const{return mSkeleton;}
 
 	void setRenderable(bool renderable);
 	void updateVertexData();
 
+	// Renderable
 	Material *getRenderMaterial() const{return mMaterial;}
 	Transform *getRenderTransform() const;
 	Bound *getRenderBound() const;
 	void render(peeper::Renderer *renderer) const;
+
+	// Attachable
+	int getNumAttachments(){return mBones.size();}
+	egg::String getAttachmentName(int index){return getBoneName(index);}
+	int getAttachmentIndex(const egg::String &name){return getBoneIndex(name);}
+	bool getAttachmentTransform(Transform *result,int index);
 
 protected:
 	int updateBoneTransformation(Bone *bone);
