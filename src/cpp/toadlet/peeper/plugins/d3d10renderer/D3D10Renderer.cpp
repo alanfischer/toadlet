@@ -572,13 +572,25 @@ void D3D10Renderer::setTextureStage(int stage,TextureStage *textureStage){
 	if(stage>0)return;
 
 	ID3D10ShaderResourceView *texture=NULL;
-	float textureMatrix[16];
+	#if defined(TOADLET_FIXED_POINT)
+		float d3dmatrix[16];
+	#else
+		float *d3dmatrix=NULL;
+	#endif
 	if(textureStage!=NULL && textureStage->texture!=NULL){
 		texture=((D3D10Texture*)(textureStage->texture->getRootTexture(0)))->mShaderResourceView;
-		toD3DMatrix(textureMatrix,textureStage->matrix);
+		#if defined(TOADLET_FIXED_POINT)
+			toD3DMatrix(d3dmatrix,textureStage->matrix);
+		#else
+			d3dmatrix=textureStage->matrix.data;
+		#endif
 	}
 	else{
-		toD3DMatrix(textureMatrix,Math::IDENTITY_MATRIX4X4);
+		#if defined(TOADLET_FIXED_POINT)
+			toD3DMatrix(d3dmatrix,Math::IDENTITY_MATRIX4X4);
+		#else
+			d3dmatrix=Math::IDENTITY_MATRIX4X4.data;
+		#endif
 	}
 effect->GetVariableByName("diffuseTexture")->AsShaderResource()->SetResource(texture);
 effect->GetVariableByName("textureMatrix")->AsMatrix()->SetMatrix(textureMatrix);
