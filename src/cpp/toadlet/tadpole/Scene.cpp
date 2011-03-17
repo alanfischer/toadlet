@@ -387,7 +387,7 @@ void Scene::renderRenderables(RenderQueue *queue,Renderer *renderer,CameraNode *
 
 	/// @todo: Search for multiple lights
 	if(queue->getLight()!=NULL){
-		renderer->setLight(0,queue->getLight()->internal_getLight());
+		renderer->setLightState(0,queue->getLight()->getLightState());
 		renderer->setLightEnabled(0,true);
 	}
 	else{

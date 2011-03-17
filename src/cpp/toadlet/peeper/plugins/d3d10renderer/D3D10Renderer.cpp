@@ -34,7 +34,7 @@
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/LightEffect.h>
-#include <toadlet/peeper/Light.h>
+#include <toadlet/peeper/LightState.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/Viewport.h>
 
@@ -572,10 +572,13 @@ void D3D10Renderer::setTextureStage(int stage,TextureStage *textureStage){
 	if(stage>0)return;
 
 	ID3D10ShaderResourceView *texture=NULL;
-	float *textureMatrix=(float*)Math::IDENTITY_MATRIX4X4.getData();
+	float textureMatrix[16];
 	if(textureStage!=NULL && textureStage->texture!=NULL){
 		texture=((D3D10Texture*)(textureStage->texture->getRootTexture(0)))->mShaderResourceView;
-		textureMatrix=textureStage->matrix.getData();
+		toD3DMatrix(textureMatrix,textureStage->matrix);
+	}
+	else{
+		toD3DMatrix(textureMatrix,Math::IDENTITY_MATRIX4X4);
 	}
 effect->GetVariableByName("diffuseTexture")->AsShaderResource()->SetResource(texture);
 effect->GetVariableByName("textureMatrix")->AsMatrix()->SetMatrix(textureMatrix);
@@ -717,7 +720,7 @@ void D3D10Renderer::setNormalize(const Normalize &normalize){
 void D3D10Renderer::setShadowComparisonMethod(bool enabled){
 }
 
-void D3D10Renderer::setLight(int i,Light *light){
+void D3D10Renderer::setLightState(int i,const LightState &light){
 }
 
 void D3D10Renderer::setLightEnabled(int i,bool enable){

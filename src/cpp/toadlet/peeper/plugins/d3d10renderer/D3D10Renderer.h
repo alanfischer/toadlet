@@ -105,7 +105,7 @@ D3D10_PASS_DESC passDesc;
 	void setTextureStage(int stage,TextureStage *textureStage);
 	void setProgram(const Program *program);
 	void setShadowComparisonMethod(bool enabled);
-	void setLight(int i,Light *light);
+	void setLightState(int i,const LightState &light);
 	void setLightEnabled(int i,bool enable);
 	void setAmbientColor(const Vector4 &ambient);
 

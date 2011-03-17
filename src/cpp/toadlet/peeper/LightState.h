@@ -26,30 +26,30 @@
 #ifndef TOADLET_PEEPER_LIGHT_H
 #define TOADLET_PEEPER_LIGHT_H
 
-#include <toadlet/egg/WeakPointer.h>
 #include <toadlet/egg/Extents.h>
 #include <toadlet/peeper/Types.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API Light{
+class TOADLET_API LightState{
 public:
-	TOADLET_SHARED_POINTERS(Light);
-
 	enum Type{
-		Type_POSITION,
 		Type_DIRECTION,
+		Type_POINT,
 		Type_SPOT,
 	};
 
-	Light():
-		enabled(true),
+	LightState():
 		specularColor(Math::ZERO_VECTOR4),
 		diffuseColor(Math::ONE_VECTOR4),
 		type(Type_DIRECTION),
+		constantAttenuation(Math::ONE),
 		linearAttenuation(0),
-		spotCutoff(0),
+		quadraticAttenuation(0),
+		spotInnerRadius(0),
+		spotOuterRadius(Math::PI),
+		spotFalloff(Math::ONE),
 		#if defined(TOADLET_FIXED_POINT)
 			radius(Math::sqrt(egg::Extents::MAX_FIXED>>1)),
 		#else
@@ -59,39 +59,32 @@ public:
 		direction(0,0,-Math::ONE)
 	{}
 
-	inline void setEnabled(bool enabled1){enabled=enabled1;}
-	inline bool getEnabled() const{return enabled;}
+	LightState &set(const LightState &state){
+		specularColor.set(state.specularColor);
+		diffuseColor.set(state.diffuseColor);
+		type=state.type;
+		constantAttenuation=state.constantAttenuation;
+		linearAttenuation=state.linearAttenuation;
+		quadraticAttenuation=state.quadraticAttenuation;
+		spotInnerRadius=state.spotInnerRadius;
+		spotOuterRadius=state.spotOuterRadius;
+		spotFalloff=state.spotFalloff;
+		radius=state.radius;
+		position.set(state.position);
+		direction.set(state.direction);
 
-	inline void setSpecularColor(const Vector4 &color){specularColor.set(color);}
-	inline const Vector4 &getSpecularColor() const{return specularColor;}
+		return *this;
+	}
 
-	inline void setDiffuseColor(const Vector4 &color){diffuseColor.set(color);}
-	inline const Vector4 &getDiffuseColor() const{return diffuseColor;}
-
-	inline void setType(Type type1){type=type1;}
-	inline Type getType() const{return type;}
-
-	inline void setLinearAttenuation(scalar attenuation){linearAttenuation=attenuation;}
-	inline scalar getLinearAttenuation() const{return linearAttenuation;}
-
-	inline void setSpotCutoff(scalar cutoff){spotCutoff=cutoff;}
-	inline scalar getSpotCutoff() const{return spotCutoff;}
-
-	inline void setRadius(scalar radius1){radius=radius1;}
-	inline scalar getRadius() const{return radius;}
-
-	inline void setDirection(const Vector3 &direction1){direction.set(direction1);}
-	inline const Vector3 &getDirection() const{return direction;}
-
-	inline void setPosition(const Vector3 &position1){position.set(position1);}
-	inline const Vector3 &getPosition() const{return position;}
-
-	bool enabled;
 	Vector4 specularColor;
 	Vector4 diffuseColor;
 	Type type;
+	scalar constantAttenuation;
 	scalar linearAttenuation;
-	scalar spotCutoff;
+	scalar quadraticAttenuation;
+	scalar spotInnerRadius;
+	scalar spotOuterRadius;
+	scalar spotFalloff;
 	scalar radius;
 	Vector3 position;
 	Vector3 direction;

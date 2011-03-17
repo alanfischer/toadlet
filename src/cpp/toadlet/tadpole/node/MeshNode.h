@@ -40,7 +40,7 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class TOADLET_API MeshNode:public CameraAlignedNode,public Visible{
+class TOADLET_API MeshNode:public CameraAlignedNode,public Visible,public Attachable{
 public:
 	TOADLET_NODE(MeshNode,CameraAlignedNode);
 
@@ -116,6 +116,12 @@ public:
 
 	void createVertexBuffer();
 	void updateVertexBuffer();
+
+	// Attachable
+	int getNumAttachments(){return mSkeleton!=NULL?mSkeleton->getNumAttachments():0;}
+	egg::String getAttachmentName(int index){return mSkeleton!=NULL?mSkeleton->getAttachmentName(index):(char*)NULL;}
+	int getAttachmentIndex(const egg::String &name){return mSkeleton!=NULL?mSkeleton->getAttachmentIndex(name):0;}
+	bool getAttachmentTransform(Transform *result,int index){return mSkeleton!=NULL?mSkeleton->getAttachmentTransform(result,index):false;}
 
 protected:
 	bool mRendered;

@@ -159,10 +159,11 @@ void Viewer::mouseReleased(int x,int y,int button){
 
 void Viewer::resized(int width,int height){
 	scalar radius=mParent!=NULL?mParent->getWorldBound()->getSphere().radius:0;
+	scalar epsilon=0.001;
 	scalar nearDistance=mDistance-radius;
 	scalar farDistance=mDistance+radius;
-	if(nearDistance<Math::ONE){nearDistance=Math::ONE;}
-	if(farDistance<nearDistance+Math::ONE){farDistance=nearDistance+Math::ONE;}
+	if(nearDistance<epsilon){nearDistance=epsilon;}
+	if(farDistance<nearDistance+epsilon){farDistance=nearDistance+epsilon;}
 	if(mCamera!=NULL && width!=0 && height!=0){
 		if(width>=height){
 			mCamera->setProjectionFovY(Math::degToRad(Math::fromInt(45)),Math::div(Math::fromInt(width),Math::fromInt(height)),nearDistance,farDistance);

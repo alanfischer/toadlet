@@ -34,11 +34,12 @@
 #include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/peeper/IndexData.h>
-#include <toadlet/peeper/Light.h>
 #include <toadlet/peeper/LightEffect.h>
+#include <toadlet/peeper/LightState.h>
 #include <toadlet/peeper/PixelBuffer.h>
 #include <toadlet/peeper/PixelBufferRenderTarget.h>
 #include <toadlet/peeper/Program.h>
+#include <toadlet/peeper/PointState.h>
 #include <toadlet/peeper/Query.h>
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/RenderTarget.h>

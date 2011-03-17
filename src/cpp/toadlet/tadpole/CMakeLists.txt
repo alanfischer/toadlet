@@ -115,6 +115,7 @@ set (TADPOLE_HEADERS
 	Bound.h
 	BufferManager.h
 	Collision.h
+	Colors.h
 	ContextListener.h
 	Engine.h
 	Font.h

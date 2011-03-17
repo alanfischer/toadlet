@@ -10,7 +10,6 @@ set (PEEPER_SRC
 	BackableTexture.cpp
 	IndexBufferAccessor.cpp
 	IndexData.cpp
-	Light.cpp
 	SectionTexture.cpp
 	SequenceTexture.cpp
 	TextureStage.cpp
@@ -31,14 +30,12 @@ set (PEEPER_HEADERS
 	Buffer.h
 	BufferDestroyedListener.h
 	CapabilitySet.h
-	Color.h
-	Colors.h
 	FogState.h
 	IndexBuffer.h
 	IndexBufferAccessor.h
 	IndexData.h
-	Light.h
 	LightEffect.h
+	LightState.h
 	Program.h
 	Query.h
 	RenderTarget.h

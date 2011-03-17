@@ -145,6 +145,7 @@ public:
 	inline const Quaternion &getWorldRotate() const{return mWorldTransform->getRotate();}
 	inline const Vector3 &getWorldScale() const{return mWorldTransform->getScale();}
 
+	/// @todo: I should at least expose the getTransform() portion of this.  Clarify if a Transform is a State or a full Object.
 	// I suppose we could modify the Transform interface to just be virtual getters only
 	// Then the class Tranform would be a TranslateRotateScaleTransform
 	// Then we could have a getTransform() method in node since it couldn't be set

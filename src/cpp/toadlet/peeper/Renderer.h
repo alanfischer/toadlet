@@ -37,8 +37,8 @@ namespace peeper{
 class Blend;
 class CapabilitySet;
 class IndexBuffer;
-class Light;
 class LightEffect;
+class LightState;
 class FogState;
 class Program;
 class Query;
@@ -172,7 +172,7 @@ public:
 	virtual void setProgram(const Program *program)=0;
 	virtual void setLighting(bool lighting)=0;
 	virtual void setLightEffect(const LightEffect &lightEffect)=0;
-	virtual void setLight(int i,Light *light)=0;
+	virtual void setLightState(int i,const LightState &light)=0;
 	virtual void setLightEnabled(int i,bool enable)=0;
 	virtual void setAmbientColor(const Vector4 &ambient)=0;
 	 // A workaround here, since OpenGL & Direct3D have different shadow comparison methods

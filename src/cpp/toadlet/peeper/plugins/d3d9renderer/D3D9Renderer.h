@@ -102,7 +102,7 @@ public:
 	void setTextureStage(int stage,TextureStage *textureStage);
 	void setProgram(const Program *program);
 	void setShadowComparisonMethod(bool enabled);
-	void setLight(int i,Light *light);
+	void setLightState(int i,const LightState &state);
 	void setLightEnabled(int i,bool enable);
 	void setAmbientColor(const Vector4 &ambient);
 

@@ -37,42 +37,36 @@ namespace node{
 
 TOADLET_NODE_IMPLEMENT(LightNode,Categories::TOADLET_TADPOLE_NODE+".LightNode");
 
-LightNode::LightNode():super()
-	//mLight(NULL)
+LightNode::LightNode():super(),
+	mEnabled(true)
+	//mLightState
 {}
 
 Node *LightNode::create(Scene *scene){
 	super::create(scene);
 
-	mLight=Light::ptr(new Light());
 	mBound->setInfinite();
 
 	return this;
-}
-
-void LightNode::destroy(){
-	mLight=NULL;
-
-	super::destroy();
 }
 
 Node *LightNode::set(Node *node){
 	super::set(node);
 
 	LightNode *lightNode=(LightNode*)this;
-	setSpecularColor(lightNode->getSpecularColor());
-	setDiffuseColor(lightNode->getDiffuseColor());
-	setLinearAttenuation(lightNode->getLinearAttenuation());
-	setLightType(lightNode->getLightType());
-	setDirection(lightNode->getDirection());
-	setSpotCutoff(lightNode->getSpotCutoff());
-	setRadius(lightNode->getRadius());
+	setLightState(lightNode->getLightState());
 
 	return this;
 }
 
+void LightNode::frameUpdate(int dt,int scope){
+	super::frameUpdate(dt,scope);
+
+	mLightState.position.set(getWorldTranslate());
+}
+
 void LightNode::queueRenderables(CameraNode *node,RenderQueue *queue){
-	if(getEnabled()){
+	if(mEnabled){
 		queue->queueLight(this);
 	}
 }

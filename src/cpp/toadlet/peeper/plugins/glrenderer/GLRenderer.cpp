@@ -41,7 +41,6 @@
 #include <toadlet/peeper/Viewport.h>
 #include <toadlet/peeper/Program.h>
 #include <toadlet/peeper/Shader.h>
-#include <toadlet/peeper/Light.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::image;
@@ -1471,7 +1470,7 @@ void GLRenderer::setShadowComparisonMethod(bool enabled){
 	}
 }
 
-void GLRenderer::setLight(int i,Light *light){
+void GLRenderer::setLightState(int i,const LightState &state){
 	GLenum l=GL_LIGHT0+i;
 
 	if(mMatrixMode!=GL_MODELVIEW){
@@ -1486,80 +1485,44 @@ void GLRenderer::setLight(int i,Light *light){
 		glLoadMatrixf(mViewMatrix.data);
 	#endif
 
-	switch(light->getType()){
-		case Light::Type_DIRECTION:{
+	switch(state.type){
+		case LightState::Type_DIRECTION:{
 			#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
-				glLightxv(l,GL_POSITION,lightDirArray(cacheArray,light->direction));
-
-				glLightx(l,GL_CONSTANT_ATTENUATION,Math::ONE);
-				glLightx(l,GL_LINEAR_ATTENUATION,0);
-				glLightx(l,GL_QUADRATIC_ATTENUATION,0);
-
+				glLightxv(l,GL_POSITION,lightDirArray(cacheArray,state.direction));
 				glLightx(l,GL_SPOT_CUTOFF,Math::ONE*180);
 				glLightx(l,GL_SPOT_EXPONENT,0);
 
 			#else
-				glLightfv(l,GL_POSITION,lightDirArray(cacheArray,light->direction));
-
-				glLightf(l,GL_CONSTANT_ATTENUATION,Math::ONE);
-				glLightf(l,GL_LINEAR_ATTENUATION,0);
-				glLightf(l,GL_QUADRATIC_ATTENUATION,0);
-
-				glLightf(l,GL_SPOT_CUTOFF,MathConversion::scalarToFloat(Math::ONE)*180);
+				glLightfv(l,GL_POSITION,lightDirArray(cacheArray,state.direction));
+				glLightf(l,GL_SPOT_CUTOFF,180);
 				glLightf(l,GL_SPOT_EXPONENT,0);
 			#endif
-
 			break;
 		}
-		case Light::Type_POSITION:{
+		case LightState::Type_POINT:{
 			#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
-				glLightxv(l,GL_POSITION,lightPosArray(cacheArray,light->position));
-
-				glLightx(l,GL_CONSTANT_ATTENUATION,0);
-				glLightx(l,GL_LINEAR_ATTENUATION,light->linearAttenuation);
-				glLightx(l,GL_QUADRATIC_ATTENUATION,light->linearAttenuation);
-
+				glLightxv(l,GL_POSITION,lightPosArray(cacheArray,state.position));
 				glLightx(l,GL_SPOT_CUTOFF,Math::ONE*180);
 				glLightx(l,GL_SPOT_EXPONENT,0);
 			#else
-				glLightfv(l,GL_POSITION,lightPosArray(cacheArray,light->position));
-
-				glLightf(l,GL_CONSTANT_ATTENUATION,0);
-				glLightf(l,GL_LINEAR_ATTENUATION,MathConversion::scalarToFloat(light->linearAttenuation));
-				glLightf(l,GL_QUADRATIC_ATTENUATION,MathConversion::scalarToFloat(light->linearAttenuation));
-
-				glLightf(l,GL_SPOT_CUTOFF,MathConversion::scalarToFloat(Math::ONE)*180);
+				glLightfv(l,GL_POSITION,lightPosArray(cacheArray,state.position));
+				glLightf(l,GL_SPOT_CUTOFF,180);
 				glLightf(l,GL_SPOT_EXPONENT,0);
 			#endif
 			break;
 		}
-		case Light::Type_SPOT:{
+		case LightState::Type_SPOT:{
 			#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
-				glLightxv(l,GL_POSITION,lightPosArray(cacheArray,light->position));
-
-				glLightx(l,GL_CONSTANT_ATTENUATION,0);
-				glLightx(l,GL_LINEAR_ATTENUATION,light->linearAttenuation);
-				glLightx(l,GL_QUADRATIC_ATTENUATION,light->linearAttenuation);
+				glLightxv(l,GL_POSITION,lightPosArray(cacheArray,state.position));
+				glLightxv(l,GL_SPOT_DIRECTION,lightPosArray(cacheArray,state.direction));
+				glLightx(l,GL_SPOT_CUTOFF,Math::radToDeg(state.spotOuterRadius)/2));
+				glLightx(l,GL_SPOT_EXPONENT,state.spotExponent);
 			#else
-				glLightfv(l,GL_POSITION,lightPosArray(cacheArray,light->position));
-
-				glLightf(l,GL_CONSTANT_ATTENUATION,0);
-				glLightf(l,GL_LINEAR_ATTENUATION,MathConversion::scalarToFloat(light->linearAttenuation));
-				glLightf(l,GL_QUADRATIC_ATTENUATION,MathConversion::scalarToFloat(light->linearAttenuation));
+				glLightfv(l,GL_POSITION,lightPosArray(cacheArray,state.position));
+				glLightfv(l,GL_SPOT_DIRECTION,lightPosArray(cacheArray,state.direction));
+				glLightf(l,GL_SPOT_CUTOFF,MathConversion::scalarToFloat(Math::radToDeg(state.spotOuterRadius)/2.0));
+				glLightf(l,GL_SPOT_EXPONENT,MathConversion::scalarToFloat(state.spotFalloff));
 			#endif
-
-			#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
-				glLightxv(l,GL_SPOT_DIRECTION,lightPosArray(cacheArray,light->direction));
-
-				glLightx(l,GL_SPOT_CUTOFF,(Math::ONE-light->spotCutoff)*90);
-				glLightx(l,GL_SPOT_EXPONENT,Math::ONE*5);
-			#else
-				glLightfv(l,GL_SPOT_DIRECTION,lightPosArray(cacheArray,light->direction));
-
-				glLightf(l,GL_SPOT_CUTOFF,MathConversion::scalarToFloat(Math::ONE-light->spotCutoff)*90);
-				glLightf(l,GL_SPOT_EXPONENT,MathConversion::scalarToFloat(Math::ONE)*5);
-			#endif
-
 			break;
 		}
 	}
@@ -1568,19 +1531,31 @@ void GLRenderer::setLight(int i,Light *light){
 
 	#if defined(TOADLET_FIXED_POINT)
 		#if defined(TOADLET_HAS_GLES)
-			glLightxv(l,GL_SPECULAR,light->specularColor.getData());
-			glLightxv(l,GL_DIFFUSE,light->diffuseColor.getData());
+			glLightx(l,GL_CONSTANT_ATTENUATION,light.constantAttenuation);
+			glLightx(l,GL_LINEAR_ATTENUATION,light.linearAttenuation);
+			glLightx(l,GL_QUADRATIC_ATTENUATION,light.quadraticAttenuation);
+
+			glLightxv(l,GL_SPECULAR,light.specularColor.getData());
+			glLightxv(l,GL_DIFFUSE,light.diffuseColor.getData());
 			// Ambient lighting works through the GL_LIGHT_MODEL_AMBIENT
-			glLightxv(l,GL_AMBIENT,Colors::BLACK.getData());
+			glLightxv(l,GL_AMBIENT,Math::ZERO_VECTOR4.getData());
 		#else
-			glLightfv(l,GL_SPECULAR,colorArray(cacheArray,light->specularColor));
-			glLightfv(l,GL_DIFFUSE,colorArray(cacheArray,light->diffuseColor));
+			glLightf(l,GL_CONSTANT_ATTENUATION,MathConversion::scalarToFloat(state.constantAttenuation));
+			glLightf(l,GL_LINEAR_ATTENUATION,MathConversion::scalarToFloat(state.linearAttenuation));
+			glLightf(l,GL_QUADRATIC_ATTENUATION,MathConversion::scalarToFloat(state.quadraticAttenuation));
+
+			glLightfv(l,GL_SPECULAR,colorArray(cacheArray,state.specularColor));
+			glLightfv(l,GL_DIFFUSE,colorArray(cacheArray,state.diffuseColor));
 			// Ambient lighting works through the GL_LIGHT_MODEL_AMBIENT
-			glLightfv(l,GL_AMBIENT,colorArray(cacheArray,Colors::BLACK));
+			glLightfv(l,GL_AMBIENT,colorArray(cacheArray,Math::ZERO_VECTOR4));
 		#endif
 	#else
-		glLightfv(l,GL_SPECULAR,light->specularColor.getData());
-		glLightfv(l,GL_DIFFUSE,light->diffuseColor.getData());
+		glLightf(l,GL_CONSTANT_ATTENUATION,state.constantAttenuation);
+		glLightf(l,GL_LINEAR_ATTENUATION,state.linearAttenuation);
+		glLightf(l,GL_QUADRATIC_ATTENUATION,state.quadraticAttenuation);
+
+		glLightfv(l,GL_SPECULAR,state.specularColor.getData());
+		glLightfv(l,GL_DIFFUSE,state.diffuseColor.getData());
 		// Ambient lighting works through the GL_LIGHT_MODEL_AMBIENT
 		glLightfv(l,GL_AMBIENT,Math::ZERO_VECTOR4.getData());
 	#endif

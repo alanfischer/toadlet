@@ -37,7 +37,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/FogState.h>
 #include <toadlet/peeper/LightEffect.h>
-#include <toadlet/peeper/Light.h>
+#include <toadlet/peeper/LightState.h>
 #include <toadlet/peeper/PointState.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/Viewport.h>
@@ -900,38 +900,46 @@ void D3D9Renderer::setShadowComparisonMethod(bool enabled){
 	}
 }
 
-void D3D9Renderer::setLight(int i,Light *light){
+void D3D9Renderer::setLightState(int i,const LightState &light){
 	D3DLIGHT9 d3dlight;
 	ZeroMemory(&d3dlight,sizeof(D3DLIGHT9));
 
-	switch(light->getType()){
-		case Light::Type_DIRECTION:{
+	switch(light.type){
+		case LightState::Type_DIRECTION:{
 			d3dlight.Type=D3DLIGHT_DIRECTIONAL;
-			toD3DVECTOR(d3dlight.Direction,light->direction);
+			toD3DVECTOR(d3dlight.Direction,light.direction);
 			break;
 		}
-		case Light::Type_POSITION:{
+		case LightState::Type_POINT:{
 			d3dlight.Type=D3DLIGHT_POINT;
-			toD3DVECTOR(d3dlight.Position,light->position);
+			toD3DVECTOR(d3dlight.Position,light.position);
 			break;
 		}
-		case Light::Type_SPOT:{
+		case LightState::Type_SPOT:{
 			#if !defined(TOADLET_SET_D3DM)
 				d3dlight.Type=D3DLIGHT_SPOT;
-				toD3DVECTOR(d3dlight.Position,light->position);
+				toD3DVECTOR(d3dlight.Position,light.position);
+				toD3DVECTOR(d3dlight.Direction,light.direction);
+				d3dlight.Falloff=light.spotFalloff;
+				d3dlight.Phi=light.spotOuterRadius;
+				d3dlight.Theta=light.spotInnerRadius;
 			#endif
 			break;
 		}
 	}
 
-	toD3DCOLORVALUE(d3dlight.Diffuse,light->diffuseColor);
-	toD3DCOLORVALUE(d3dlight.Specular,light->specularColor);
+	toD3DCOLORVALUE(d3dlight.Diffuse,light.diffuseColor);
+	toD3DCOLORVALUE(d3dlight.Specular,light.specularColor);
 	#if !defined(TOADLET_SET_D3DM) && defined(TOADLET_FIXED_POINT)
-		d3dlight.Attenuation1=scalarToFloat(light->linearAttenuation);
-		d3dlight.Range=scalarToFloat(light->radius);
+		d3dlight.Attenuation0=scalarToFloat(light.constantAttenuation);
+		d3dlight.Attenuation1=scalarToFloat(light.linearAttenuation);
+		d3dlight.Attenuation2=scalarToFloat(light.quadraticAttenuation);
+		d3dlight.Range=scalarToFloat(light.radius);
 	#else
-		d3dlight.Attenuation1=light->linearAttenuation;
-		d3dlight.Range=light->radius;
+		d3dlight.Attenuation0=light.constantAttenuation;
+		d3dlight.Attenuation1=light.linearAttenuation;
+		d3dlight.Attenuation2=light.quadraticAttenuation;
+		d3dlight.Range=light.radius;
 	#endif
 
 	mD3DDevice->SetLight(i,&d3dlight TOADLET_D3DMFMT);
