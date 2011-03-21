@@ -26,7 +26,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/image/ImageFormatConversion.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/RenderQueue.h>
+#include <toadlet/tadpole/RenderableSet.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/node/LabelNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
@@ -148,17 +148,17 @@ void LabelNode::setWordWrap(bool wordWrap){
 	updateLabel();
 }
 
-void LabelNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
-	super::queueRenderables(camera,queue);
+void LabelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
+	super::gatherRenderables(camera,set);
 
 	if(mVertexData==NULL || mIndexData==NULL || mMaterial==NULL){
 		return;
 	}
 
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
-	queue->queueRenderable(&renderable);
+	set->queueRenderable(&renderable);
 #else
-	queue->queueRenderable(this);
+	set->queueRenderable(this);
 #endif
 }
 

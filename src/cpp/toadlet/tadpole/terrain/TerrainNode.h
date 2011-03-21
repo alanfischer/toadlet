@@ -90,7 +90,7 @@ public:
 	scalar toWorldXf(scalar x){return Math::mul(x,mPatchSize*mPatchScale.x);}
 	scalar toWorldYf(scalar y){return Math::mul(y,mPatchSize*mPatchScale.y);}
 
-	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
+	void gatherRenderables(node::CameraNode *camera,RenderableSet *set);
 
 	void logicUpdate(int dt,int scope);
 

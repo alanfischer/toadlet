@@ -50,7 +50,7 @@ public:
 
 	virtual void frameUpdate(int dt,int scope);
 
-	virtual void queueRenderables(CameraNode *camera,RenderQueue *queue);
+	virtual void gatherRenderables(CameraNode *camera,RenderableSet *set);
 
 protected:
 	bool mEnabled;

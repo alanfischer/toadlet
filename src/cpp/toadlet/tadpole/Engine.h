@@ -77,11 +77,15 @@ public:
 	node::Node *allocNode(const egg::String &fullName);
 	node::Node *createNode(egg::BaseType<node::Node> *type,Scene *scene);
 	node::Node *createNode(const egg::String &fullName,Scene *scene);
+	int internal_registerNode(node::Node *node);
+	void internal_deregisterNode(node::Node *node);
 	void destroyNode(node::Node *node);
 	void freeNode(node::Node *node);
 
 	template<typename Type> Type *allocNodeType(egg::Type<Type,node::Node> *type){return (Type*)allocNode(type);}
 	template<typename Type> Type *createNodeType(egg::Type<Type,node::Node> *type,Scene *scene){return (Type*)createNode(type,scene);}
+
+	inline node::Node *getNodeByHandle(int handle){return (handle>=0 && handle<mHandles.size())?mHandles[handle]:NULL;}
 
 	// Context methods
 	void contextReset(peeper::Renderer *renderer);
@@ -128,7 +132,9 @@ protected:
 	MeshManager *mMeshManager;
 	AudioBufferManager *mAudioBufferManager;
 	NodeManager *mNodeManager;
-	
+	egg::Collection<int> mFreeHandles;
+	egg::Collection<node::Node*> mHandles;
+
 	egg::TypeFactory<node::Node> mNodeFactory;
 };
 

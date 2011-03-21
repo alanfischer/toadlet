@@ -107,10 +107,15 @@ public:
 	inline const Vector3 &getForward() const{return mForward;}
 	inline const Vector3 &getRight() const{return mRight;}
 
+	const Matrix4x4 &calculateInverseProjectionMatrix(){Math::invert(mInverseProjectionMatrix,mProjectionMatrix);return mInverseProjectionMatrix;}
+	const Matrix4x4 &calculateInverseViewMatrix(){Math::invert(mInverseViewMatrix,mViewMatrix);return mInverseViewMatrix;}
+
 	inline int getNumClipPlanes() const{return 6;}
 	inline const Plane &getClipPlane(int i) const{return mClipPlanes[i];}
 
 	virtual void render(peeper::Renderer *renderer,Node *node=NULL);
+
+	virtual egg::image::Image::ptr renderToImage(peeper::Renderer *renderer,int format,int width,int height);
 
 	virtual bool culled(Node *node) const;
 	virtual bool culled(Bound *bound) const;
@@ -146,6 +151,8 @@ protected:
 	Matrix4x4 mFinalProjectionMatrix;
 	Matrix4x4 mViewMatrix;
 	Matrix4x4 mViewProjectionMatrix;
+	Matrix4x4 mInverseProjectionMatrix;
+	Matrix4x4 mInverseViewMatrix;
 	Plane mClipPlanes[6];
 	Vector3 mForward,mRight;
 

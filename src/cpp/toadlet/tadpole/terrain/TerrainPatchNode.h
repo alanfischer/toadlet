@@ -102,7 +102,7 @@ public:
 	void setScale1(float s1){mS1=s1;}
 	void setScale2(float s2){mS2=s2;}
 
-	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
+	void gatherRenderables(node::CameraNode *camera,RenderableSet *set);
 	void updateBlocks(node::CameraNode *camera);
 	void updateVertexes();
 	void updateIndexBuffers(node::CameraNode *camera);

@@ -680,10 +680,9 @@ void D3D9Renderer::setLightEffect(const LightEffect &lightEffect){
 }
 
 void D3D9Renderer::setDepthBias(scalar constant,scalar slope){
-	float fconstant=scalarToFloat(constant);
+	float fconstant=scalarToFloat(constant) * 1e6f; // This value is what the Wine project uses
 	float fslope=scalarToFloat(slope);
 
-	/// @todo: We may need to scale these values to be more in-tune with the OpenGL ones
 	mD3DDevice->SetRenderState(D3DRS_DEPTHBIAS,*(DWORD*)&fconstant);
 	mD3DDevice->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS,*(DWORD*)&fslope);
 }
@@ -748,7 +747,7 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 		TextureStage::Calculation calculation=textureStage->calculation;
 		Matrix4x4 &transform=cache_setTextureStage_transform;
 		bool identityTransform=(texture==NULL)?true:texture->getRootTransform(textureStage->textureTime,transform);
-		if(identityTransform==false){
+		if(calculation==TextureStage::Calculation_DISABLED && identityTransform==false){
 			calculation=TextureStage::Calculation_NORMAL;
 		}
 
@@ -767,6 +766,7 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 				else{
 					toD3DMATRIX(cacheD3DMatrix,textureStage->matrix);
 				}
+
 				#if defined(TOADLET_SET_D3DM) && defined(TOADLET_FIXED_POINT)
 					scalar t;
 				#else
@@ -780,10 +780,14 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 			else if(calculation==TextureStage::Calculation_OBJECTSPACE){
 				mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXCOORDINDEX,D3DTSS_TCI_PASSTHRU);
 				mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT4|D3DTTFF_PROJECTED);
+
+				toD3DMATRIX(cacheD3DMatrix,textureStage->matrix);
 			}
 			else if(calculation==TextureStage::Calculation_CAMERASPACE){
 				mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXCOORDINDEX,D3DTSS_TCI_CAMERASPACEPOSITION);
 				mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT4|D3DTTFF_PROJECTED);
+
+				toD3DMATRIX(cacheD3DMatrix,textureStage->matrix);
 			}
 
 			result=mD3DDevice->SetTransform((D3DTRANSFORMSTATETYPE)(D3DTS_TEXTURE0+stage),&cacheD3DMatrix TOADLET_D3DMFMT);
@@ -1038,7 +1042,7 @@ void D3D9Renderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &r
 	scalar yoff=Math::HALF+Math::div(Math::HALF,Math::fromInt(height));
 	result.set( Math::HALF, 0,           0,         xoff,
 				0,          -Math::HALF, 0,         yoff,
-				0,          0,           Math::ONE, 0,
+				0,          0,           float(1<<24)/*Math::ONE*/, -400000.0f/*0*/,
 				0,          0,           0,         Math::ONE);
 }
 
@@ -1127,7 +1131,7 @@ D3DFORMAT D3D9Renderer::getD3DFORMAT(int format){
 		case Texture::Format_DEPTH_16:
 			return D3DFMT_D16;
 		case Texture::Format_DEPTH_24:
-			return D3DFMT_D24X8;
+			return D3DFMT_D24S8;
 		case Texture::Format_DEPTH_32:
 			return D3DFMT_D32;
 		case Texture::Format_RGBA_DXT1:

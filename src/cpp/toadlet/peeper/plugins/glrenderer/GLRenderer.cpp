@@ -792,8 +792,6 @@ bool GLRenderer::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
 
 void GLRenderer::setDefaultStates(){
 	// General states
-	mInTexGen=false;
-
 	setAlphaTest(AlphaTest_NONE,Math::HALF);
 	setBlend(Blend::Combination_DISABLED);
 	setDepthWrite(true);
@@ -823,6 +821,15 @@ void GLRenderer::setDefaultStates(){
 
 	// GL specific states
 	{
+		#if !defined(TOADLET_HAS_GLES)
+			mInTexGen=false;
+
+			glDisable(GL_TEXTURE_GEN_S);
+			glDisable(GL_TEXTURE_GEN_T);
+			glDisable(GL_TEXTURE_GEN_R);
+			glDisable(GL_TEXTURE_GEN_Q);
+		#endif
+
 		// Move specular to separate color
 		#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_11)
 		if(gl_version>=11){
@@ -1071,8 +1078,6 @@ void GLRenderer::setNormalize(const Normalize &normalize){
 }
 
 void GLRenderer::setDepthBias(scalar constant,scalar slope){
-	/// @todo: We may need to scale these to be more in tune with the Direct3D ones
-
 	if(constant!=0 && slope!=0){
 		#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
 			glPolygonOffsetx(slope,constant);
@@ -1190,7 +1195,7 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 			TextureStage::Calculation calculation=textureStage->calculation;
 			Matrix4x4 &transform=cache_setTextureStage_transform;
 			bool identityTransform=texture->getRootTransform(textureStage->textureTime,transform);
-			if((gltexture->mUsage&(Texture::Usage_BIT_NPOT_RESTRICTED|Texture::Usage_BIT_RENDERTARGET))>0 || identityTransform==false){
+			if(calculation==TextureStage::Calculation_DISABLED && ((gltexture->mUsage&(Texture::Usage_BIT_NPOT_RESTRICTED|Texture::Usage_BIT_RENDERTARGET))>0 || identityTransform==false)){
 				calculation=TextureStage::Calculation_NORMAL;
 			}
 
@@ -1202,30 +1207,30 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 
 				glLoadIdentity();
 
-				if(identityTransform==false){
-					#if defined(TOADLET_FIXED_POINT)
-						#if defined(TOADLET_HAS_GLES)
-							glMultMatrixx(transform.data);
-						#else
-							glMultMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,transform).data);
-						#endif
-					#else
-						glMultMatrixf(transform.data);
-					#endif
-				}
-
-				#if defined(TOADLET_FIXED_POINT)
-					#if defined(TOADLET_HAS_GLES)
-						glMultMatrixx(gltexture->mMatrix.data);
-					#else
-						glMultMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,gltexture->mMatrix).data);
-					#endif
-				#else
-					glMultMatrixf(gltexture->mMatrix.data);
-				#endif
-
 				const Matrix4x4 &matrix=textureStage->matrix;
 				if(calculation==TextureStage::Calculation_NORMAL){
+					if(identityTransform==false){
+						#if defined(TOADLET_FIXED_POINT)
+							#if defined(TOADLET_HAS_GLES)
+								glMultMatrixx(transform.data);
+							#else
+								glMultMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,transform).data);
+							#endif
+						#else
+							glMultMatrixf(transform.data);
+						#endif
+					}
+
+					#if defined(TOADLET_FIXED_POINT)
+						#if defined(TOADLET_HAS_GLES)
+							glMultMatrixx(gltexture->mMatrix.data);
+						#else
+							glMultMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,gltexture->mMatrix).data);
+						#endif
+					#else
+						glMultMatrixf(gltexture->mMatrix.data);
+					#endif
+
 					#if defined(TOADLET_FIXED_POINT)
 						#if defined(TOADLET_HAS_GLES)
 							glMultMatrixx(matrix.data);
@@ -1236,9 +1241,8 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 						glMultMatrixf(matrix.data);
 					#endif
 				}
-
-				#if !defined(TOADLET_HAS_GLES)
-					if(calculation>TextureStage::Calculation_NORMAL){
+				else if(calculation>TextureStage::Calculation_NORMAL){
+					#if !defined(TOADLET_HAS_GLES)
 						if(mMatrixMode!=GL_MODELVIEW){
 							mMatrixMode=GL_MODELVIEW;
 							glMatrixMode(mMatrixMode);
@@ -1286,8 +1290,8 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 						glPopMatrix();
 
 						mInTexGen=true;
-					}
-				#endif
+					#endif
+				}
 			}
 			else{
 				if(mMatrixMode!=GL_TEXTURE){
@@ -1417,18 +1421,12 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 
 		#if !defined(TOADLET_HAS_GLES)
 			if(gl_version>=14){
-				if(texture!=NULL && (texture->getFormat()&Texture::Format_BIT_DEPTH)>0){
-					// Enable shadow comparison
-					glTexParameteri(textureTarget,GL_TEXTURE_COMPARE_MODE_ARB,GL_COMPARE_R_TO_TEXTURE);
-
-					// Shadow comparison should be true (ie not in shadow) if r<=texture
+				if(textureStage->shadowComparison!=TextureStage::ShadowComparison_DISABLED){
+					glTexParameteri(textureTarget,GL_DEPTH_TEXTURE_MODE_ARB,getGLDepthTextureMode(textureStage->shadowComparison));
 					glTexParameteri(textureTarget,GL_TEXTURE_COMPARE_FUNC_ARB,GL_LEQUAL);
-
-					// Shadow comparison should generate an INTENSITY result
-					glTexParameteri(textureTarget,GL_DEPTH_TEXTURE_MODE_ARB,GL_INTENSITY);
+					glTexParameteri(textureTarget,GL_TEXTURE_COMPARE_MODE_ARB,GL_COMPARE_R_TO_TEXTURE);
 				}
 				else{
-					// Only disable this TexParameter, the others are just parameters to this one
 					glTexParameteri(textureTarget,GL_TEXTURE_COMPARE_MODE_ARB,GL_NONE);
 				}
 			}
@@ -1892,7 +1890,7 @@ GLenum GLRenderer::getGLDataType(int format){
 	}
 }
 
-GLuint GLRenderer::getGLFormat(int textureFormat){
+GLuint GLRenderer::getGLFormat(int textureFormat,bool internal){
 	GLuint format=0;
 
 	if((textureFormat&Texture::Format_BIT_L)>0){
@@ -1926,14 +1924,14 @@ GLuint GLRenderer::getGLFormat(int textureFormat){
 
 	#if !defined(TOADLET_HAS_GLES) || defined(TOADLET_HAS_EAGL)
 		else if((textureFormat&Texture::Format_BIT_DEPTH)>0){
-			if((textureFormat&Texture::Format_BIT_UINT_16)>0){
+			if(internal && (textureFormat&Texture::Format_BIT_UINT_16)>0){
 				format=GL_DEPTH_COMPONENT16;
 			}
-			else if((textureFormat&Texture::Format_BIT_UINT_24)>0){
+			else if(internal && (textureFormat&Texture::Format_BIT_UINT_24)>0){
 				format=GL_DEPTH_COMPONENT24;
 			}
 			#if !defined(TOADLET_HAS_EAGL)
-				else if((textureFormat&Texture::Format_BIT_UINT_32)>0){
+				else if(internal && (textureFormat&Texture::Format_BIT_UINT_32)>0){
 					format=GL_DEPTH_COMPONENT32;
 				}
 				else{
@@ -1953,7 +1951,7 @@ GLuint GLRenderer::getGLFormat(int textureFormat){
 }
 
 GLuint GLRenderer::getGLType(int textureFormat){
-	if((textureFormat&Texture::Format_BIT_UINT_8)>0){
+	if((textureFormat&Texture::Format_BIT_UINT_8)>0 || (textureFormat&Texture::Format_BIT_UINT_16)>0 || (textureFormat&Texture::Format_BIT_UINT_24)>0 || (textureFormat&Texture::Format_BIT_UINT_32)>0){
 		return GL_UNSIGNED_BYTE;
 	}
 	else if((textureFormat&Texture::Format_BIT_FLOAT_32)>0){
@@ -2101,6 +2099,17 @@ GLuint GLRenderer::getGLTextureBlendOperation(TextureBlend::Operation operation)
 			return GL_DOT3_RGB;
 		case TextureBlend::Operation_ALPHABLEND:
 			return GL_INTERPOLATE;
+		default:
+			return 0;
+	}
+}
+
+GLuint GLRenderer::getGLDepthTextureMode(TextureStage::ShadowComparison comparison){
+	switch(comparison){
+		case TextureStage::ShadowComparison_L:
+			return GL_LUMINANCE;
+		case TextureStage::ShadowComparison_A:
+			return GL_INTENSITY;
 		default:
 			return 0;
 	}

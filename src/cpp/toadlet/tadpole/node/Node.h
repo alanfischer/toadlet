@@ -64,7 +64,7 @@ namespace toadlet{
 namespace tadpole{
 
 class Engine;
-class RenderQueue;
+class RenderableSet;
 class Scene;
 
 namespace node{
@@ -172,7 +172,7 @@ public:
 
 	virtual void logicUpdate(int dt,int scope);
 	virtual void frameUpdate(int dt,int scope);
-	virtual void queueRenderables(CameraNode *camera,RenderQueue *queue){}
+	virtual void gatherRenderables(CameraNode *camera,RenderableSet *set){}
 
 	virtual void setStayActive(bool active);
 	virtual void activate();

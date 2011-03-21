@@ -76,10 +76,6 @@ class TOADLET_API Material:public egg::BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(Material);
 
-	// Min/Max Layers
-	const static int MIN_LAYER=-63;
-	const static int MAX_LAYER=63;
-
 	enum States{
 		State_LIGHTING=		1<<0,
 		State_LIGHTEFFECT=	1<<1,
@@ -140,9 +136,6 @@ public:
 	void setPointState(const peeper::PointState &state){mStates|=State_POINT;mPointState.set(state);}
 	inline const peeper::PointState &getPointSprite() const{return mPointState;}
 
-	void setLayer(int layer){mLayer=layer;}
-	inline int getLayer() const{return mLayer;}
-
 	inline int getNumTextureStages() const{return mTextureStages.size();}
 	bool setTextureStage(int stage,const peeper::TextureStage::ptr &textureStage);
 	inline const peeper::TextureStage::ptr &getTextureStage(int stage) const{return mTextureStages[stage];}
@@ -171,7 +164,6 @@ protected:
 	bool mDepthWrite;
 	peeper::Renderer::DepthTest mDepthTest;
 	peeper::PointState mPointState;
-	int mLayer;
 	egg::Collection<peeper::TextureStage::ptr> mTextureStages;
 	bool mSaveLocally;
 };
@@ -192,18 +184,11 @@ class TOADLET_API Material:public egg::BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(Material);
 
-	// Min/Max Layers
-	const static int MIN_LAYER=-63;
-	const static int MAX_LAYER=63;
-
 	Material();
 	virtual ~Material();
 
 	void destroy();
 	Material::ptr clone();
-
-	void setLayer(int layer){mLayer=layer;}
-	inline int getLayer() const{return mLayer;}
 
 	void setSaveLocally(bool local){mSaveLocally=local;}
 	inline bool getSaveLocally() const{return mSaveLocally;}
@@ -214,7 +199,6 @@ public:
 	void removeRenderPass(RenderPass *pass);
 
 protected:
-	int mLayer;
 	bool mSaveLocally;
 	egg::Collection<RenderPass::ptr> mRenderPasses;
 };

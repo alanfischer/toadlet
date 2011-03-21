@@ -103,7 +103,7 @@ public:
 	void modifyMaterial(Material::ptr material);
 	bool getRendered() const{return mRendered;}
 	void setRendered(bool rendered){mRendered=rendered;}
-	void queueRenderables(CameraNode *camera,RenderQueue *queue);
+	void gatherRenderables(CameraNode *camera,RenderableSet *set);
 
 	Material *getRenderMaterial() const{return mMaterial;}
 	Transform *getRenderTransform() const{return mWorldSpace==false?getWorldTransform():NULL;}

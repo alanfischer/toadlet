@@ -151,8 +151,8 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 		specifiedMipLevels=1;
 	}
 
-	GLint glinternalFormat=GLRenderer::getGLFormat(mFormat);
-	GLint glformat=GLRenderer::getGLFormat(mFormat);
+	GLint glinternalFormat=GLRenderer::getGLFormat(mFormat,true);
+	GLint glformat=GLRenderer::getGLFormat(mFormat,false);
 	GLint gltype=ImageFormatConversion::isFormatCompressed(mFormat)==false?GLRenderer::getGLType(mFormat):0;
 
 	// Allocate texture memory
@@ -320,7 +320,7 @@ bool GLTexture::load(int width,int height,int depth,int mipLevel,tbyte *mipData)
 	int rowPitch=ImageFormatConversion::getRowPitch(format,width);
 	int slicePitch=rowPitch*height;
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(slicePitch);
-	GLint glformat=GLRenderer::getGLFormat(format);
+	GLint glformat=GLRenderer::getGLFormat(format,false);
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(glformat);
 	GLint gltype=ImageFormatConversion::isFormatCompressed(mFormat)==false?GLRenderer::getGLType(mFormat):0;
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(gltype);
@@ -406,7 +406,7 @@ bool GLTexture::read(int width,int height,int depth,int mipLevel,tbyte *mipData)
 	int rowPitch=ImageFormatConversion::getRowPitch(format,width);
 	int slicePitch=rowPitch*height;
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(slicePitch);
-	GLint glformat=GLRenderer::getGLFormat(format);
+	GLint glformat=GLRenderer::getGLFormat(format,false);
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(glformat);
 	GLint gltype=ImageFormatConversion::isFormatCompressed(mFormat)==false?GLRenderer::getGLType(mFormat):0;
 	TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(gltype);

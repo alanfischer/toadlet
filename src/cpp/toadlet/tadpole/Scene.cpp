@@ -32,7 +32,6 @@
 #include <toadlet/tadpole/node/CameraNode.h>
 
 using namespace toadlet::egg;
-using namespace toadlet::egg::image;
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 using namespace toadlet::tadpole::node;
@@ -50,16 +49,14 @@ Scene::Scene(Engine *engine):
 	mLogicTime(0),
 	mLogicFrame(0),
 	mAccumulatedDT(0),
-	mFrame(0),
+	mFrame(0)
 
 	//mBackground,
 	//mRoot,
 	//mAmbientColor,
 	//mFogState,
 
-	//mRenderQueue,
-	mPreviousMaterial(NULL),
-	mCountLastRendered(0)
+	//mSceneRenderer,
 
 	//mBoundMesh
 {
@@ -69,11 +66,10 @@ Scene::Scene(Engine *engine):
 	setRangeLogicDT(0,0);
 	setAmbientColor(Colors::GREY);
 
-	mHandles.resize(1); // Handle 0 is always NULL
 	mBackground=mEngine->createNodeType(PartitionNode::type(),this);
 	mRoot=mEngine->createNodeType(PartitionNode::type(),this);
 
-	mRenderQueue=RenderQueue::ptr(new RenderQueue());
+	mSceneRenderer=SceneRenderer::ptr(new SceneRenderer(this));
 
 	mBoundMesh=mEngine->getMeshManager()->createSphere(Sphere(Math::ONE),8,8);
 }
@@ -100,63 +96,6 @@ void Scene::setRoot(PartitionNode *root){
 	}
 
 	mRoot=root;
-}
-
-Node *Scene::getNodeByHandle(int handle){
-	if(handle>=0 && handle<mHandles.size()){
-		return mHandles[handle];
-	}
-	else{
-		return NULL;
-	}
-}
-
-Node *Scene::findNodeByName(const String &name,Node *node){
-	if(node==NULL){
-		node=mRoot;
-	}
-
-	if(name.equals(node->getName())){
-		return node;
-	}
-	else{
-		ParentNode *parent=node->isParent();
-		if(parent!=NULL){
-			int i;
-			for(i=0;i<parent->getNumChildren();++i){
-				Node *found=findNodeByName(name,parent->getChild(i));
-				if(found!=NULL){
-					return found;
-				}
-			}
-		}
-
-		return NULL;
-	}
-}
-
-Node *Scene::findNodeByInterface(int ni,Node *node){
-	if(node==NULL){
-		node=mRoot;
-	}
-
-	if(node->hasInterface(ni)!=NULL){
-		return node;
-	}
-	else{
-		ParentNode *parent=node->isParent();
-		if(parent!=NULL){
-			int i;
-			for(i=0;i<parent->getNumChildren();++i){
-				Node *found=findNodeByInterface(ni,parent->getChild(i));
-				if(found!=NULL){
-					return found;
-				}
-			}
-		}
-
-		return NULL;
-	}
 }
 
 void Scene::setRangeLogicDT(int minDT,int maxDT){
@@ -317,206 +256,19 @@ void Scene::render(Renderer *renderer,CameraNode *camera,Node *node){
 		mRenderListener->preRender(renderer,camera,node);
 	}
 
-	camera->updateFramesPerSecond();
+	if(node==NULL){
+		node=mRoot;
+	}
 
-	queueRenderables(mRenderQueue,node,camera);
+	// Reposition our background node & update it to update the world positions
+	mBackground->setTranslate(camera->getWorldTranslate());
+	mBackground->frameUpdate(0,-1);
 
-	renderRenderables(mRenderQueue,renderer,camera);
+	mSceneRenderer->renderScene(renderer,node,camera);
 
 	if(mRenderListener!=NULL){
 		mRenderListener->postRender(renderer,camera,node);
 	}
-}
-
-void Scene::queueRenderables(RenderQueue *queue,Node *node,CameraNode *camera){
-	if(mRenderListener!=NULL){
-		mRenderListener->preQueueRenderables(queue,node,camera);
-	}
-
-	queue->setCamera(camera);
-
-	queue->startQueuing();
-	if(node!=NULL){
-		node->queueRenderables(camera,queue);
-	}
-	else{
-		// Reposition our background node & update it to update the world positions
-		mBackground->setTranslate(camera->getWorldTranslate());
-		mBackground->frameUpdate(0,-1);
-		mBackground->queueRenderables(camera,queue);
-
-		mRoot->queueRenderables(camera,queue);
-	}
-	queue->endQueuing();
-
-	if(mRenderListener!=NULL){
-		mRenderListener->postQueueRenderables(queue,node,camera);
-	}
-}
-
-void Scene::renderRenderables(RenderQueue *queue,Renderer *renderer,CameraNode *camera){
-	if(mRenderListener!=NULL){
-		mRenderListener->preRenderRenderables(queue,renderer,camera);
-	}
-
-	Matrix4x4 matrix;
-	Vector4 ambient;
-
-	mCountLastRendered=0;
-
-	if(camera->getViewportSet()){
-		renderer->setViewport(camera->getViewport());
-	}
-	else{
-		RenderTarget *renderTarget=renderer->getRenderTarget();
-		renderer->setViewport(cache_render_viewport.set(0,0,renderTarget->getWidth(),renderTarget->getHeight()));
-	}
-
-	int clearFlags=camera->getClearFlags();
-	if(clearFlags>0 && !camera->getSkipFirstClear()){
-		renderer->setDepthWrite(true);
-		renderer->clear(clearFlags,camera->getClearColor());
-	}
-
-	renderer->setDefaultStates();
-	renderer->setProjectionMatrix(camera->getProjectionMatrix());
-	renderer->setViewMatrix(camera->getViewMatrix());
-	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
-
-	renderer->setFogState(mFogState);
-
-	/// @todo: Search for multiple lights
-	if(queue->getLight()!=NULL){
-		renderer->setLightState(0,queue->getLight()->getLightState());
-		renderer->setLightEnabled(0,true);
-	}
-	else{
-		renderer->setLightEnabled(0,false);
-	}
-
-	bool renderedLayer=false;
-	const egg::Collection<RenderQueue::RenderLayer*> &layers=queue->getRenderLayers();
-	int i,j,k;
-	for(i=0;i<layers.size();++i){
-		int layerNum=i+Material::MIN_LAYER;
-		RenderQueue::RenderLayer *layer=layers[i];
-		if(layer==NULL || (layer->depthSortedRenderables.size()==0 && layer->materialSortedRenderables.size()==0 && layer->forceRender==false)){
-			continue;
-		}
-
-		if(renderedLayer==true){
-			if(layer->clearLayer && (clearFlags&Renderer::ClearFlag_DEPTH)>0){
-				renderer->clear(Renderer::ClearFlag_DEPTH,Colors::BLACK);
-			}
-		}
-		else{
-			renderedLayer=true;
-		}
-
-		preLayerRender(renderer,camera,layerNum);
-
-		int numRenderables=layer->materialSortedRenderables.size();
-		for(j=0;j<numRenderables;++j){
-			Material *material=layer->materialSortedRenderables[j].material;
-			if(material!=NULL && mPreviousMaterial!=material){
-				material->setupRenderer(renderer,mPreviousMaterial);
-			}
-			mPreviousMaterial=material;
-
-			int numRenderables2=layer->materialSortedRenderables[j].renderables.size();
-			for(k=0;k<numRenderables2;++k){
-				Renderable *renderable=layer->materialSortedRenderables[j].renderables[k];
-				Transform *transform=renderable->getRenderTransform();
-
-				if(transform!=NULL) transform->toMatrix(matrix);
-				else matrix.reset();
-
-				if(material!=NULL && material->getLightEffect().ambient.equals(Colors::BLACK)==false){
-					if(mRoot->findAmbientForPoint(ambient,transform->getTranslate())){
-						renderer->setAmbientColor(ambient);
-					}
-					else{
-						renderer->setAmbientColor(mAmbientColor);
-					}
-				}
-
-				renderer->setModelMatrix(matrix);
-				renderable->render(renderer);
-				mCountLastRendered++;
-			}
-
-			/// @todo: Replace this specific state setting with a more generic Scene Default Material, that will be reset its specific states
-			if(material!=NULL && (material->getStates()&Material::State_FOG)>0){
-				renderer->setFogState(mFogState);
-			}
-		}
-		layer->materialSortedRenderables.clear();
-		numRenderables=layer->depthSortedRenderables.size();
-		for(j=0;j<numRenderables;++j){
-			Renderable *renderable=layer->depthSortedRenderables[j].renderable;
-			Material *material=renderable->getRenderMaterial();
-			Transform *transform=renderable->getRenderTransform();
-
-			if(material!=NULL && mPreviousMaterial!=material){
-				material->setupRenderer(renderer,mPreviousMaterial);
-			}
-			mPreviousMaterial=material;
-
-			if(transform!=NULL) transform->toMatrix(matrix);
-			else matrix.reset();
-
-			if(material!=NULL && material->getLightEffect().ambient.equals(Colors::BLACK)==false){
-				if(mRoot->findAmbientForPoint(ambient,transform->getTranslate())){
-					renderer->setAmbientColor(ambient);
-				}
-				else{
-					renderer->setAmbientColor(mAmbientColor);
-				}
-			}
-
-			renderer->setModelMatrix(matrix);
-			renderable->render(renderer);
-			mCountLastRendered++;
-
-			if(material!=NULL && (material->getStates()&Material::State_FOG)>0){
-				renderer->setFogState(mFogState);
-			}
-		}
-		layer->depthSortedRenderables.clear();
-
-		postLayerRender(renderer,camera,layerNum);
-
-		// Reset previous material each time, to avoid pre/postLayerRender messing up what we though the state of things were
-		// We could also use the true/false return of pre/postLayerRender, but it could be easy to forget to change that.
-		mPreviousMaterial=NULL;
-	}
-
-	if(mRenderListener!=NULL){
-		mRenderListener->postRenderRenderables(queue,renderer,camera);
-	}
-}
-
-Image::ptr Scene::renderToImage(Renderer *renderer,CameraNode *camera,int format,int width,int height){
-	Texture::ptr renderTexture=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET,Texture::Dimension_D2,format,width,height,0,1);
-	PixelBufferRenderTarget::ptr renderTarget=mEngine->getTextureManager()->createPixelBufferRenderTarget();
-	renderTarget->attach(renderTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
-
-	RenderTarget *oldTarget=renderer->getRenderTarget();
-	renderer->setRenderTarget(renderTarget);
-	Viewport oldView=camera->getViewport();
-	camera->setViewport(Viewport(0,0,width,height));
-	renderer->beginScene();
-		render(renderer,camera,NULL);
-	renderer->endScene();
-	renderer->setRenderTarget(oldTarget);
-	camera->setViewport(oldView);
-
-	Image::ptr image=mEngine->getTextureManager()->createImage(renderTexture);
-
-	renderTarget->destroy();
-	renderTexture->release();
-
-	return image;
 }
 
 int Scene::countActiveNodes(Node *node){
@@ -536,10 +288,6 @@ int Scene::countActiveNodes(Node *node){
 	}
 	
 	return count;
-}
-
-int Scene::countLastRendered(){
-	return mCountLastRendered;
 }
 
 void Scene::renderBoundingVolumes(Renderer *renderer,Node *node){
@@ -565,31 +313,6 @@ void Scene::renderBoundingVolumes(Renderer *renderer,Node *node){
 		for(i=0;i<numChildren;++i){
 			renderBoundingVolumes(renderer,parent->getChild(i));
 		}
-	}
-}
-
-int Scene::nodeCreated(Node *node){
-	int handle=-1;
-	int size=mFreeHandles.size();
-	if(size>0){
-		handle=mFreeHandles.at(size-1);
-		mFreeHandles.removeAt(size-1);
-	}
-	else{
-		handle=mHandles.size();
-		mHandles.resize(handle+1);
-	}
-
-	mHandles[handle]=node;
-
-	return handle;
-}
-
-void Scene::nodeDestroyed(Node *node){
-	int handle=node->getUniqueHandle();
-	if(handle>=0){
-		mHandles[handle]=NULL;
-		mFreeHandles.add(handle);
 	}
 }
 

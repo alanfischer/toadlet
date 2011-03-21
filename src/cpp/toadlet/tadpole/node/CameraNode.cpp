@@ -30,6 +30,7 @@
 #include <toadlet/tadpole/node/ParentNode.h>
 
 using namespace toadlet::egg;
+using namespace toadlet::egg::image;
 using namespace toadlet::peeper;
 
 namespace toadlet{
@@ -373,9 +374,34 @@ void CameraNode::updateWorldTransform(){
 }
 
 void CameraNode::render(Renderer *renderer,Node *node){
+	updateFramesPerSecond();
+
 	mScene->render(renderer,this,node);
 
 	renderOverlayGamma(renderer);
+}
+
+Image::ptr CameraNode::renderToImage(Renderer *renderer,int format,int width,int height){
+	Texture::ptr renderTexture=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET,Texture::Dimension_D2,format,width,height,0,1);
+	PixelBufferRenderTarget::ptr renderTarget=mEngine->getTextureManager()->createPixelBufferRenderTarget();
+	renderTarget->attach(renderTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
+
+	RenderTarget *oldTarget=renderer->getRenderTarget();
+	renderer->setRenderTarget(renderTarget);
+	Viewport oldView=getViewport();
+	setViewport(Viewport(0,0,width,height));
+	renderer->beginScene();
+		render(renderer);
+	renderer->endScene();
+	renderer->setRenderTarget(oldTarget);
+	setViewport(oldView);
+
+	Image::ptr image=mEngine->getTextureManager()->createImage(renderTexture);
+
+	renderTarget->destroy();
+	renderTexture->release();
+
+	return image;
 }
 
 bool CameraNode::culled(Node *node) const{

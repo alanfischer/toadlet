@@ -150,7 +150,12 @@ bool D3D9Texture::createContext(bool restore){
 			0;
 		#endif
 	if((mUsage&Usage_BIT_RENDERTARGET)>0){
-		mD3DUsage|=D3DUSAGE_RENDERTARGET;
+		if((mFormat&Format_BIT_DEPTH)>0){
+			mD3DUsage|=D3DUSAGE_DEPTHSTENCIL;
+		}
+		else{
+			mD3DUsage|=D3DUSAGE_RENDERTARGET;
+		}
 	}
 	if((mUsage&Usage_BIT_STREAM)>0){
 		mD3DUsage|=D3DUSAGE_DYNAMIC;

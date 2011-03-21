@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/RenderQueue.h>
+#include <toadlet/tadpole/RenderableSet.h>
 #include <toadlet/tadpole/node/LightNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 
@@ -65,9 +65,11 @@ void LightNode::frameUpdate(int dt,int scope){
 	mLightState.position.set(getWorldTranslate());
 }
 
-void LightNode::queueRenderables(CameraNode *node,RenderQueue *queue){
+void LightNode::gatherRenderables(CameraNode *node,RenderableSet *set){
+	super::gatherRenderables(node,set);
+
 	if(mEnabled){
-		queue->queueLight(this);
+		set->queueLight(this);
 	}
 }
 

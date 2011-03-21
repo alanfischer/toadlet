@@ -28,7 +28,7 @@
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/SpriteNode.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/RenderQueue.h>
+#include <toadlet/tadpole/RenderableSet.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
@@ -128,17 +128,17 @@ void SpriteNode::setAlignment(int alignment){
 	updateSprite();
 }
 
-void SpriteNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
-	super::queueRenderables(camera,queue);
+void SpriteNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
+	super::gatherRenderables(camera,set);
 
 	if(mVertexData==NULL || mIndexData==NULL || mMaterial==NULL || mRendered==false){
 		return;
 	}
 
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
-	queue->queueRenderable(&renderable);
+	set->queueRenderable(&renderable);
 #else
-	queue->queueRenderable(this);
+	set->queueRenderable(this);
 #endif
 }
 

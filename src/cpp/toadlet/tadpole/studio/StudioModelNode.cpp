@@ -25,7 +25,7 @@
 
 #include <toadlet/peeper/VertexFormat.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/RenderQueue.h>
+#include <toadlet/tadpole/RenderableSet.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/studio/StudioModelNode.h>
 #include <toadlet/tadpole/studio/StudioModelController.h>
@@ -433,8 +433,8 @@ void StudioModelNode::modifyMaterial(Material::ptr material){
 	}
 }
 
-void StudioModelNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
-	super::queueRenderables(camera,queue);
+void StudioModelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
+	super::gatherRenderables(camera,set);
 
 	if(mModel==NULL || mRendered==false){
 		return;
@@ -453,12 +453,12 @@ void StudioModelNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	}
 
 	for(i=0;i<mSubModels.size();++i){
-		queue->queueRenderable(mSubModels[i]);
+		set->queueRenderable(mSubModels[i]);
 	}
 
 	if(mSkeletonMaterial!=NULL){
 		updateSkeletonBuffers();
-		queue->queueRenderable(this);
+		set->queueRenderable(this);
 	}
 }
 
