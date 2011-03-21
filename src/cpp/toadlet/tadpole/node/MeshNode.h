@@ -109,7 +109,7 @@ public:
 
 	void frameUpdate(int dt,int scope);
 	void updateWorldTransform();
-	void queueRenderables(CameraNode *camera,RenderQueue *queue);
+	void gatherRenderables(CameraNode *camera,RenderableSet *set);
 
 	peeper::VertexBufferAccessor svba;
 	peeper::VertexBufferAccessor dvba;

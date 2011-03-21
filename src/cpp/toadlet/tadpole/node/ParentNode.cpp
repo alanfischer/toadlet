@@ -229,13 +229,13 @@ void ParentNode::frameUpdate(int dt,int scope){
 	mActivateChildren=false;
 }
 
-void ParentNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
+void ParentNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 	int numChildren=getNumChildren();
 	int i;
 	for(i=0;i<numChildren;++i){
 		Node *child=getChild(i);
 		if(camera->culled(child)==false){
-			child->queueRenderables(camera,queue);
+			child->gatherRenderables(camera,set);
 		}
 	}
 }

@@ -94,7 +94,10 @@ Node *Node::create(Scene *scene){
 	if(scene!=NULL){
 		mScene=scene;
 		mEngine=mScene->getEngine();
-		mUniqueHandle=mScene->nodeCreated(this);
+	}
+
+	if(mEngine!=NULL){
+		mUniqueHandle=mEngine->internal_registerNode(this);
 	}
 
 	mNodeListeners=NULL;
@@ -145,14 +148,14 @@ void Node::destroy(){
 
 	mControllers=NULL;
 
-	if(mScene!=NULL){
-		mScene->nodeDestroyed(this);
+	if(mEngine!=NULL){
+		mEngine->internal_deregisterNode(this);
+		mUniqueHandle=0;
 	}
 
 	mEngine->freeNode(this);
 	mEngine=NULL;
 	mScene=NULL;
-	mUniqueHandle=0;
 }
 
 Node *Node::set(Node *node){

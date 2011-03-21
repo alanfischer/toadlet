@@ -150,7 +150,7 @@ public:
 	static GLint getGLFogType(FogState::FogType type);
 	static GLint getGLElementCount(int format);
 	static GLenum getGLDataType(int format);
-	static GLuint getGLFormat(int textureFormat);
+	static GLuint getGLFormat(int textureFormat,bool internal);
 	static GLuint getGLType(int textureFormat);
 	static GLuint getGLIndexType(int indexFormat);
 	static GLuint getGLWrap(TextureStage::AddressMode addressMode,bool hasClampToEdge=true);
@@ -158,6 +158,7 @@ public:
 	static GLuint getGLMagFilter(TextureStage::Filter magFilter);
 	static GLuint getGLTextureBlendSource(TextureBlend::Source source);
 	static GLuint getGLTextureBlendOperation(TextureBlend::Operation operation);
+	static GLuint getGLDepthTextureMode(TextureStage::ShadowComparison comparison);
 	static float getGLTextureBlendScale(TextureBlend::Operation operation);
 	static GLuint GLClientStates[6];
 	static GLuint GLCubeFaces[6];

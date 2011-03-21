@@ -66,7 +66,7 @@ public:
 	void setColor(const Vector4 &color){mMaterial->setLightEffect(peeper::LightEffect(color));}
 	const Vector4 &getColor(){return mMaterial->getLightEffect().diffuse;}
 
-	void queueRenderables(CameraNode *camera,RenderQueue *queue);
+	void gatherRenderables(CameraNode *camera,RenderableSet *set);
 	Material *getRenderMaterial() const{return mMaterial;}
 	Transform *getRenderTransform() const{return getWorldTransform();}
 	Bound *getRenderBound() const{return getWorldBound();}

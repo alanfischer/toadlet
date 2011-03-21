@@ -177,6 +177,8 @@ Engine::Engine(bool backable):
 	mAudioBufferManager=new AudioBufferManager(this);
 	mNodeManager=new NodeManager(this);
 
+	mHandles.resize(1); // Handle 0 is always NULL
+
 	// Make a guess at what the ideal format is.
 	#if defined(TOADLET_FIXED_POINT) && (defined(TOADLET_PLATFORM_WINCE) || defined(TOADLET_PLATFORM_IPHONE) || defined(TOADLET_PLATFORM_ANDROID))
 		mIdealVertexFormatBit=VertexFormat::Format_BIT_FIXED_32;
@@ -514,6 +516,34 @@ Node *Engine::createNode(const String &fullName,Scene *scene){
 		node->create(scene);
 	}
 	return node;
+}
+
+int Engine::internal_registerNode(Node *node){
+	int handle=node->getUniqueHandle();
+
+	if(handle<=0){
+		int size=mFreeHandles.size();
+		if(size>0){
+			handle=mFreeHandles.at(size-1);
+			mFreeHandles.removeAt(size-1);
+		}
+		else{
+			handle=mHandles.size();
+			mHandles.resize(handle+1);
+		}
+		mHandles[handle]=node;
+	}
+
+	return handle;
+}
+
+void Engine::internal_deregisterNode(Node *node){
+	int handle=node->getUniqueHandle();
+
+	if(handle>0){
+		mHandles[handle]=NULL;
+		mFreeHandles.add(handle);
+	}
 }
 
 void Engine::destroyNode(Node *node){

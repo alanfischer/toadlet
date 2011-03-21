@@ -19,7 +19,7 @@
 
 #include <toadlet/egg/Extents.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/RenderQueue.h>
+#include <toadlet/tadpole/RenderableSet.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/terrain/TerrainPatchNode.h>
 
@@ -521,8 +521,8 @@ bool TerrainPatchNode::unstitchFromBottom(TerrainPatchNode *terrain){
 	return true;
 }
 
-void TerrainPatchNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
-	super::queueRenderables(camera,queue);
+void TerrainPatchNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
+	super::gatherRenderables(camera,set);
 
 	updateBlocks(camera);
 	updateVertexes();
@@ -530,9 +530,9 @@ void TerrainPatchNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 
 	if(mIndexData->getCount()>0){
 		#if defined(TOADLET_GCC_INHERITANCE_BUG)
-			queue->queueRenderable(&renderable);
+			set->queueRenderable(&renderable);
 		#else
-			queue->queueRenderable(this);
+			set->queueRenderable(this);
 		#endif
 	}
 
@@ -540,7 +540,7 @@ void TerrainPatchNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 		updateWaterIndexBuffers(camera);
 
 		if(mWaterIndexData->getCount()>0){
-			queue->queueRenderable(mWaterRenderable);
+			set->queueRenderable(mWaterRenderable);
 		}
 	}
 }

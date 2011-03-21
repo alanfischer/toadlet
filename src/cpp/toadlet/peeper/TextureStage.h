@@ -56,6 +56,13 @@ public:
 		Calculation_CAMERASPACE,
 	};
 
+	// GL only
+	enum ShadowComparison{
+		ShadowComparison_DISABLED, 
+		ShadowComparison_L,
+		ShadowComparison_A,
+	};
+
 	TextureStage();
 	TextureStage(const Texture::ptr &texture1);
 	virtual ~TextureStage();
@@ -73,6 +80,9 @@ public:
 
 	void setConstantColor(const Vector4 &color){constantColor.set(color);}
 	inline const Vector4 &getConstantColor() const{return constantColor;}
+
+	void setShadowComparison(ShadowComparison comparison){shadowComparison=comparison;}
+	inline ShadowComparison getShadowComparison() const{return shadowComparison;}
 
 	void setUAddressMode(AddressMode addressMode){uAddressMode=addressMode;}
 	inline AddressMode getUAddressMode() const{return uAddressMode;}
@@ -104,6 +114,7 @@ public:
 
 	TextureBlend blend;
 	Vector4 constantColor;
+	ShadowComparison shadowComparison;
 
 	AddressMode uAddressMode;
 	AddressMode vAddressMode;

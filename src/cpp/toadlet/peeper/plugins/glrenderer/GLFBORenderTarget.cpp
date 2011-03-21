@@ -157,11 +157,6 @@ bool GLFBORenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachment){
 		mHeight=textureBuffer->getHeight();
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER,getGLAttachment(attachment),target,handle,level);
-		/// @todo: Figure out EXACTLY when we need these and when we dont, I think we just need them if its ONLY a SHADOWMAP
-		#if !defined(TOADLET_HAS_GLES)
-			//glDrawBuffer(GL_NONE);
-			//glReadBuffer(GL_NONE);
-		#endif
 
 		Matrix4x4 matrix;
 		Math::setMatrix4x4FromScale(matrix,Math::ONE,-Math::ONE,Math::ONE);
@@ -247,16 +242,22 @@ bool GLFBORenderTarget::compile(){
 		mDepthBuffer=NULL;
 	}
 
+	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	if(color!=NULL && depth==NULL){
 		// No Depth-Stencil buffer, so add one
 		GLFBOPixelBuffer::ptr buffer(new GLFBOPixelBuffer(this));
-		if(buffer->create(Buffer::Usage_NONE,Buffer::Access_NONE,Texture::Format_DEPTH_16,mWidth,mHeight,1)){
+		if(buffer->create(Buffer::Usage_NONE,Buffer::Access_NONE,Texture::Format_DEPTH_24,mWidth,mHeight,1)){
 			attach(buffer,Attachment_DEPTH_STENCIL);
 			mDepthBuffer=buffer;
 		}
 	}
+	else if(color==NULL && depth!=NULL){
+		#if !defined(TOADLET_HAS_GLES)
+			glDrawBuffer(GL_NONE);
+			glReadBuffer(GL_NONE);
+		#endif
+	}
 
-	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if(status!=GL_FRAMEBUFFER_COMPLETE){
 		Logger::warning(Categories::TOADLET_PEEPER,getFBOMessage(status));

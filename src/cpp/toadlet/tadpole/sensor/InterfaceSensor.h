@@ -23,30 +23,35 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_VISIBLE_H
-#define TOADLET_TADPOLE_VISIBLE_H
+#ifndef TOADLET_TADPOLE_SENSOR_INTERFACESENSOR_H
+#define TOADLET_TADPOLE_SENSOR_INTERFACESENSOR_H
 
-#include <toadlet/tadpole/Material.h>
-#include <toadlet/tadpole/RenderableSet.h>
+#include <toadlet/tadpole/sensor/Sensor.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
+namespace sensor{
 
-class CameraNode;
-
-}
-
-class Visible{
+class TOADLET_API InterfaceSensor:public Sensor{
 public:
-	virtual ~Visible(){}
+	TOADLET_SHARED_POINTERS(InterfaceSensor);
 
-	virtual void modifyMaterial(Material::ptr material)=0;
-	virtual void gatherRenderables(node::CameraNode *camera,RenderableSet *set)=0;
-	virtual bool getRendered() const=0;
-	virtual void setRendered(bool visible)=0;
+	InterfaceSensor(Scene *scene);
+	virtual ~InterfaceSensor();
+
+	void setInterfaceID(int interfaceID){mInterfaceID=interfaceID;}
+	int getInterfaceID() const{return mInterfaceID;}
+
+	virtual bool sense(SensorResultsListener *results);
+	SensorResults::ptr sense(){return Sensor::sense();}
+
+protected:
+	int senseInterfaces(node::Node *node,SensorResultsListener *results);
+
+	int mInterfaceID;
 };
 
+}
 }
 }
 

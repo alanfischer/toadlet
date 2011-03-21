@@ -182,7 +182,7 @@ void TerrainNode::setTolerance(scalar tolerance){
 	}	
 }
 
-void TerrainNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
+void TerrainNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 	int i;
 	for(i=0;i<mPatchGrid.size();++i){
 		mPatchGrid[i]->updateBlocks(camera);
@@ -192,7 +192,7 @@ void TerrainNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 		mPatchGrid[i]->updateVertexes();
 	}
 
-	super::queueRenderables(camera,queue);
+	super::gatherRenderables(camera,set);
 }
 
 void TerrainNode::logicUpdate(int dt,int scope){

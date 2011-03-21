@@ -23,31 +23,58 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_VISIBLE_H
-#define TOADLET_TADPOLE_VISIBLE_H
+#include <toadlet/tadpole/sensor/InterfaceSensor.h>
+#include <toadlet/tadpole/Scene.h>
 
-#include <toadlet/tadpole/Material.h>
-#include <toadlet/tadpole/RenderableSet.h>
+using namespace toadlet::egg;
+using namespace toadlet::tadpole::node;
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
+namespace sensor{
 
-class CameraNode;
-
+InterfaceSensor::InterfaceSensor(Scene *scene):Sensor(mScene){
+	mScene=scene;
 }
 
-class Visible{
-public:
-	virtual ~Visible(){}
+InterfaceSensor::~InterfaceSensor(){
+}
 
-	virtual void modifyMaterial(Material::ptr material)=0;
-	virtual void gatherRenderables(node::CameraNode *camera,RenderableSet *set)=0;
-	virtual bool getRendered() const=0;
-	virtual void setRendered(bool visible)=0;
-};
+bool InterfaceSensor::sense(SensorResultsListener *results){
+	results->sensingBeginning();
+	int result=senseInterfaces(mScene->getRoot(),results);
+	results->sensingEnding();
+	return result!=0;
+}
+
+int InterfaceSensor::senseInterfaces(Node *node,SensorResultsListener *results){
+	int result=0;
+	if(node->hasInterface(mInterfaceID)){
+		if(results->resultFound(node,0)){
+			result=1;
+		}
+		else{
+			return -1;
+		}
+	}
+
+	ParentNode *parent=node->isParent();
+	if(parent!=NULL){
+		int i;
+		for(i=0;i<parent->getNumChildren();++i){
+			int r=senseInterfaces(parent->getChild(i),results);
+			if(r<0){
+				return -1;
+			}
+			else if(r>0){
+				result=1;
+			}
+		}
+	}
+
+	return result;
+}
 
 }
 }
-
-#endif
+}

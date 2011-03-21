@@ -31,7 +31,8 @@
 #include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/Mesh.h>
 #include <toadlet/tadpole/RenderListener.h>
-#include <toadlet/tadpole/RenderQueue.h>
+#include <toadlet/tadpole/RenderableSet.h>
+#include <toadlet/tadpole/SceneRenderer.h>
 #include <toadlet/tadpole/UpdateListener.h>
 #include <toadlet/tadpole/node/PartitionNode.h>
 
@@ -85,33 +86,18 @@ public:
 	virtual void queueDependent(node::Node *dependent);
 
 	virtual void render(peeper::Renderer *renderer,node::CameraNode *camera,node::Node *node);
-	virtual void queueRenderables(RenderQueue *queue,node::Node *node,node::CameraNode *camera);
-	virtual void renderRenderables(RenderQueue *queue,peeper::Renderer *renderer,node::CameraNode *camera);
 
-	virtual node::Node *getNodeByHandle(int handle);
-	virtual node::Node *findNodeByName(const egg::String &name,node::Node *node=NULL);
-	virtual node::Node *findNodeByInterface(int ni,node::Node *node=NULL);
 	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits=-1,node::Node *ignore=NULL){result.time=Math::ONE;}
 
-	virtual void setAmbientColor(const Vector4 &ambientColor){mAmbientColor.set(ambientColor);}
-	virtual void setFogState(const peeper::FogState &state){mFogState.set(state);}
-
-	virtual egg::image::Image::ptr renderToImage(peeper::Renderer *renderer,node::CameraNode *camera,int format,int width,int height);
+	void setAmbientColor(const Vector4 &ambientColor){mAmbientColor.set(ambientColor);}
+	inline const Vector4 &getAmbientColor() const{return mAmbientColor;}
+	void setFogState(const peeper::FogState &state){mFogState.set(state);}
+	inline const peeper::FogState &getFogState() const{return mFogState;}
 
 	int countActiveNodes(node::Node *node=NULL);
-	int countLastRendered();
 	void renderBoundingVolumes(peeper::Renderer *renderer,node::Node *node=NULL);
 
-	virtual int nodeCreated(node::Node *node);
-	virtual void nodeDestroyed(node::Node *node);
-
 protected:
-	virtual bool preLayerRender(peeper::Renderer *renderer,node::CameraNode *camera,int layer){return false;}
-	virtual bool postLayerRender(peeper::Renderer *renderer,node::CameraNode *camera,int layer){return false;}
-
-	egg::Collection<int> mFreeHandles;
-	egg::Collection<node::Node*> mHandles;
-
 	UpdateListener *mUpdateListener;
 	RenderListener *mRenderListener;
 
@@ -130,14 +116,9 @@ protected:
 
 	Vector4 mAmbientColor;
 	peeper::FogState mFogState;
-
-	RenderQueue::ptr mRenderQueue;
-	Material *mPreviousMaterial;
-	int mCountLastRendered;
+	SceneRenderer::ptr mSceneRenderer;
 
 	Mesh::ptr mBoundMesh;
-
-	peeper::Viewport cache_render_viewport;
 };
 
 }

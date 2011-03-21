@@ -23,81 +23,83 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_RENDERQUEUE_H
-#define TOADLET_TADPOLE_RENDERQUEUE_H
+#ifndef TOADLET_TADPOLE_RENDERABLESET_H
+#define TOADLET_TADPOLE_RENDERABLESET_H
 
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/node/LightNode.h>
+#include <toadlet/tadpole/node/PartitionNode.h>
 
 namespace toadlet{
 namespace tadpole{
 
-/// @todo: Cleaned up to obey coding standards
-/// @todo: Not reallocate memory in the collections
-/// @todo: Add a 'collection reallocated count' that we can check
-class TOADLET_API RenderQueue{
-public:
-	TOADLET_SHARED_POINTERS(RenderQueue);
+class Scene;
 
-	class DepthRenderable{
+class TOADLET_API RenderableSet{
+public:
+	TOADLET_SHARED_POINTERS(RenderableSet);
+
+	class RenderableQueueItem{
 	public:
-		DepthRenderable():
+		RenderableQueueItem():
 			renderable(NULL),
+			material(NULL),
+			//ambient,
 			depth(0){}
 	
-		DepthRenderable(Renderable *r,scalar d):
+		RenderableQueueItem(Renderable *r,Material *m,const Vector4 &a,scalar d):
 			renderable(r),
+			material(m),
+			ambient(a),
 			depth(d){}
 
 		Renderable *renderable;
+		Material *material;
+		Vector4 ambient;
 		scalar depth;
 	};
 
-	class MaterialRenderable{
+	class LightQueueItem{
 	public:
-		MaterialRenderable():
-			material(NULL){}
+		LightQueueItem():
+			light(NULL),
+			depth(0){}
 	
-		MaterialRenderable(Renderable *r,Material *m):
-			material(m)
-		{
-			renderables.add(r);
-		}
+		LightQueueItem(node::LightNode *l,scalar d):
+			light(l),
+			depth(d){}
 
-		Material *material;
-		egg::Collection<Renderable*> renderables;
+		node::LightNode *light;
+		scalar depth;
 	};
 
-	class RenderLayer{
-	public:
-		RenderLayer():
-			forceRender(false),
-			clearLayer(true){}
+	typedef egg::Collection<RenderableQueueItem> RenderableQueue;
+	typedef egg::Collection<LightQueueItem> LightQueue;
+	typedef egg::Map<Material*,int> MaterialToQueueIndexMap;
 
-		egg::Collection<DepthRenderable> depthSortedRenderables;
-		egg::Collection<MaterialRenderable> materialSortedRenderables;
-
-		bool forceRender;
-		bool clearLayer;
-	};
-	
-	RenderQueue();
-	virtual ~RenderQueue();
+	RenderableSet(Scene *scene);
+	virtual ~RenderableSet();
 
 	virtual void setCamera(node::CameraNode *camera){mCamera=camera;}
 	virtual void startQueuing();
 	virtual void endQueuing();
 	virtual void queueRenderable(Renderable *renderable);
 	virtual void queueLight(node::LightNode *light);
-	inline RenderLayer *getRenderLayer(int layer);
-	inline const egg::Collection<RenderLayer*> getRenderLayers(){return mRenderLayers;}
-	inline node::LightNode *getLight(){return mLight;}
+
+	inline const RenderableQueue &getDepthSortedQueue() const{return mRenderableQueues[0];}
+	inline const RenderableQueue &getRenderableQueue(int i) const{return mRenderableQueues[i];}
+	inline const MaterialToQueueIndexMap &getMaterialToQueueIndexMap() const{return mMaterialToQueueIndexMap;}
+	inline const LightQueue &getLightQueue(){return mLightQueue;}
 
 protected:
+	Scene *mScene;
+	node::PartitionNode *mRoot;
 	node::CameraNode::ptr mCamera;
-	egg::Collection<RenderLayer*> mRenderLayers;
-	node::LightNode::ptr mLight;
+	egg::Collection<RenderableQueue> mRenderableQueues;
+	int mRenderableQueueCount;
+	MaterialToQueueIndexMap mMaterialToQueueIndexMap;
+	LightQueue mLightQueue;
 };
 
 }

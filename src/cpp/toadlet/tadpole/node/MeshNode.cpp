@@ -271,8 +271,8 @@ void MeshNode::updateWorldTransform(){
 	}
 }
 
-void MeshNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
-	super::queueRenderables(camera,queue);
+void MeshNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
+	super::gatherRenderables(camera,set);
 
 	if(mRendered==false){
 		return;
@@ -283,16 +283,16 @@ void MeshNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 		SubMesh *subMesh=mSubMeshes[i];
 		if(subMesh->worldBound!=NULL){
 			if(camera->culled(subMesh->worldBound)==false){
-				queue->queueRenderable(subMesh);
+				set->queueRenderable(subMesh);
 			}
 		}
 		else{
-			queue->queueRenderable(subMesh);
+			set->queueRenderable(subMesh);
 		}
 	}
 
 	if(mSkeleton!=NULL && mSkeleton->getRenderMaterial()!=NULL){
-		queue->queueRenderable(mSkeleton);
+		set->queueRenderable(mSkeleton);
 	}
 }
 

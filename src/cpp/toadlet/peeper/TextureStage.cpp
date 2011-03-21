@@ -34,6 +34,8 @@ TextureStage::TextureStage():
 	textureTime(0),
 
 	//blend,
+	//constantColor,
+	shadowComparison(ShadowComparison_DISABLED),
 
 	uAddressMode(AddressMode_REPEAT),
 	vAddressMode(AddressMode_REPEAT),
@@ -56,6 +58,8 @@ TextureStage::TextureStage(const Texture::ptr &texture1):
 	textureTime(0),
 
 	//blend,
+	//constantColor,
+	shadowComparison(ShadowComparison_DISABLED),
 
 	uAddressMode(AddressMode_REPEAT),
 	vAddressMode(AddressMode_REPEAT),
@@ -93,6 +97,8 @@ TextureStage::ptr TextureStage::clone() const{
 	textureStage->textureName=textureName;
 
 	textureStage->blend.set(blend);
+	textureStage->constantColor.set(constantColor);
+	textureStage->shadowComparison=shadowComparison;
 
 	textureStage->uAddressMode=uAddressMode;
 	textureStage->vAddressMode=vAddressMode;

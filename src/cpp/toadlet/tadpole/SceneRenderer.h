@@ -23,28 +23,36 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_VISIBLE_H
-#define TOADLET_TADPOLE_VISIBLE_H
+#ifndef TOADLET_TADPOLE_SCENERENDERER_H
+#define TOADLET_TADPOLE_SCENERENDERER_H
 
-#include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/RenderableSet.h>
+#include <toadlet/tadpole/node/CameraNode.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
 
-class CameraNode;
-
-}
-
-class Visible{
+class TOADLET_API SceneRenderer{
 public:
-	virtual ~Visible(){}
+	TOADLET_SHARED_POINTERS(SceneRenderer);
 
-	virtual void modifyMaterial(Material::ptr material)=0;
-	virtual void gatherRenderables(node::CameraNode *camera,RenderableSet *set)=0;
-	virtual bool getRendered() const=0;
-	virtual void setRendered(bool visible)=0;
+	SceneRenderer(Scene *scene);
+	virtual ~SceneRenderer();
+
+	virtual void renderScene(peeper::Renderer *renderer,node::Node *node,node::CameraNode *camera);
+
+protected:
+	virtual void gatherRenderables(RenderableSet *set,node::Node *node,node::CameraNode *camera);
+	virtual void renderRenderables(RenderableSet *set,peeper::Renderer *renderer,node::CameraNode *camera);
+
+	void setupViewport(node::CameraNode *camera,peeper::Renderer *renderer);
+	void setupLights(const RenderableSet::LightQueue &lightQueue,peeper::Renderer *renderer);
+
+	Scene *mScene;
+	RenderableSet::ptr mRenderableSet;
+	Material *mPreviousMaterial;
+
+	peeper::Viewport cache_render_viewport;
 };
 
 }

@@ -79,7 +79,7 @@ public:
 	inline int getNumSubModels() const{return mSubModels.size();}
 	SubModel *getSubModel(int i){return mSubModels[i];}
 
-	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
+	void gatherRenderables(node::CameraNode *camera,RenderableSet *set);
 
 	// Traceable interface
 	Bound *getBound() const{return super::getBound();}
@@ -118,7 +118,7 @@ public:
 	void removeNodeLeafIndexes(const egg::Collection<int> &indexes,Node *node);
 
 	void mergeWorldBound(Node *child,bool justAttached);
-	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
+	void gatherRenderables(node::CameraNode *camera,RenderableSet *set);
 
 	bool senseBoundingVolumes(SensorResultsListener *listener,Bound *bound);
 	bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);

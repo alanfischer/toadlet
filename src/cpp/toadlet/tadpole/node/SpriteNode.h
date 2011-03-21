@@ -60,7 +60,7 @@ public:
 	void setAlignment(int alignment);
 	int getAlignment() const{return mAlignment;}
 
-	void queueRenderables(CameraNode *camera,RenderQueue *queue);
+	void gatherRenderables(CameraNode *camera,RenderableSet *set);
 	Material *getRenderMaterial() const{return mMaterial;}
 	Transform *getRenderTransform() const{return getWorldTransform();}
 	Bound *getRenderBound() const{return getWorldBound();}

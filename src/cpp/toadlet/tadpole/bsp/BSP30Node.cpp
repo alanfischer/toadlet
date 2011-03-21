@@ -25,7 +25,7 @@
 
 #include <toadlet/peeper/VertexFormat.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/RenderQueue.h>
+#include <toadlet/tadpole/RenderableSet.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/bsp/BSP30Node.h>
 #include <toadlet/tadpole/bsp/BSP30Handler.h>
@@ -149,8 +149,8 @@ void BSP30ModelNode::modifyMaterial(Material::ptr material){
 	}
 }
 
-void BSP30ModelNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
-	super::queueRenderables(camera,queue);
+void BSP30ModelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
+	super::gatherRenderables(camera,set);
 
 	if(mRendered==false){
 		return;
@@ -158,7 +158,7 @@ void BSP30ModelNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 
 	int i;
 	for(i=0;i<mSubModels.size();++i){
-		queue->queueRenderable(mSubModels[i]);
+		set->queueRenderable(mSubModels[i]);
 	}
 }
 
@@ -276,7 +276,6 @@ void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const S
 				}
 				material->setDepthWrite(false);
 				material->setLighting(false);
-				material->setLayer(-1);
 			}
 		}
 
@@ -341,15 +340,15 @@ void BSP30Node::mergeWorldBound(Node *child,bool justAttached){
 	}
 }
 
-void BSP30Node::queueRenderables(CameraNode *camera,RenderQueue *queue){
+void BSP30Node::gatherRenderables(CameraNode *camera,RenderableSet *set){
 	int i,j;
 
 	if(mMap==NULL){
-		super::queueRenderables(camera,queue);
+		super::gatherRenderables(camera,set);
 		return;
 	}
 
-	queue->queueRenderable(this);
+	set->queueRenderable(this);
 
 	// Queue up the visible faces and nodes
 	memset(mMarkedFaces,0,(mMap->nfaces+7)>>3);
@@ -371,7 +370,7 @@ void BSP30Node::queueRenderables(CameraNode *camera,RenderQueue *queue){
 		for(i=0;i<mChildren.size();++i){
 			Node *child=mChildren[i];
 			if(camera->culled(child)==false){
-				child->queueRenderables(camera,queue);
+				child->gatherRenderables(camera,set);
 			}
 		}
 	}
@@ -393,7 +392,7 @@ void BSP30Node::queueRenderables(CameraNode *camera,RenderQueue *queue){
 					if(data->counter!=mCounter){
 						data->counter=mCounter;
 						if(camera->culled(occupant)==false){
-							occupant->queueRenderables(camera,queue);
+							occupant->gatherRenderables(camera,set);
 						}
 					}
 				}
@@ -404,7 +403,7 @@ void BSP30Node::queueRenderables(CameraNode *camera,RenderQueue *queue){
 		for(j=0;j<occupants.size();++j){
 			Node *occupant=occupants[j];
 			if(camera->culled(occupant)==false){
-				occupant->queueRenderables(camera,queue);
+				occupant->gatherRenderables(camera,set);
 			}
 		}
 	}

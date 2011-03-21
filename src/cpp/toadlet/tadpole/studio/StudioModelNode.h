@@ -126,7 +126,7 @@ public:
 	void modifyMaterial(Material::ptr material);
 	bool getRendered() const{return mRendered;}
 	void setRendered(bool rendered){mRendered=rendered;}
-	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
+	void gatherRenderables(node::CameraNode *camera,RenderableSet *set);
 
 	// Renderable
 	Material *getRenderMaterial() const{return mSkeletonMaterial;}

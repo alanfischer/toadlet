@@ -17,9 +17,10 @@ set (TADPOLE_SRC
 	MeshManager.cpp
 	NodeManager.cpp
 	Noise.cpp
-	RenderQueue.cpp
+	RenderableSet.cpp
 	ResourceManager.cpp
 	Scene.cpp
+	SceneRenderer.cpp
 	Skeleton.cpp
 	TransformKeyFrame.cpp
 	TransformSequence.cpp
@@ -90,6 +91,7 @@ set (TADPOLE_NODE_SRC
 
 set (TADPOLE_SENSOR_SRC
 	sensor/BoundingVolumeSensor.cpp
+	sensor/InterfaceSensor.cpp
 	sensor/NameSensor.cpp
 	sensor/PotentiallyVisibleSensor.cpp
 	sensor/Sensor.cpp
@@ -133,7 +135,9 @@ set (TADPOLE_HEADERS
 	ResourceHandler.h
 	ResourceHandlerData.h
 	ResourceManager.h
+	RenderableSet.h
 	Scene.h
+	SceneRenderer.h
 	Skeleton.h
 	TextureManager.h
 	Traceable.h
@@ -227,6 +231,7 @@ set (TADPOLE_NODE_HEADERS
 
 set (TADPOLE_SENSOR_HEADERS
 	sensor/BoundingVolumeSensor.h
+	sensor/InterfaceSensor.h
 	sensor/NameSensor.h
 	sensor/PotentiallyVisibleSensor.h
 	sensor/Sensor.h

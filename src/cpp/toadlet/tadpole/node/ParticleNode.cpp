@@ -27,7 +27,7 @@
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Profile.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/RenderQueue.h>
+#include <toadlet/tadpole/RenderableSet.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/node/ParticleNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
@@ -193,8 +193,8 @@ void ParticleNode::modifyMaterial(Material::ptr material){
 	}
 }
 
-void ParticleNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
-	super::queueRenderables(camera,queue);
+void ParticleNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
+	super::gatherRenderables(camera,set);
 
 	if(mRendered==false){
 		return;
@@ -205,9 +205,9 @@ void ParticleNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
 	}
 
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
-	queue->queueRenderable(&renderable);
+	set->queueRenderable(&renderable);
 #else
-	queue->queueRenderable(this);
+	set->queueRenderable(this);
 #endif
 }
 

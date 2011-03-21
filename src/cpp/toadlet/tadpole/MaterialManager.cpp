@@ -82,6 +82,9 @@ TextureStage::ptr MaterialManager::createTextureStage(Texture::ptr texture,bool 
 		textureStage->setVAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
 		textureStage->setWAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
 	}
+	if(texture!=NULL && (texture->getFormat()&Texture::Format_BIT_DEPTH)>0){
+		textureStage->setShadowComparison(TextureStage::ShadowComparison_L);
+	}
 
 	return textureStage;
 }

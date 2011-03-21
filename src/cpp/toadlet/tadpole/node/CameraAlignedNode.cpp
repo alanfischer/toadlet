@@ -61,8 +61,8 @@ void CameraAlignedNode::frameUpdate(int dt,int scope){
 	if(mPerspective==false) mWorldBound->setInfinite();
 }
 
-void CameraAlignedNode::queueRenderables(CameraNode *camera,RenderQueue *queue){
-	super::queueRenderables(camera,queue);
+void CameraAlignedNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
+	super::gatherRenderables(camera,set);
 
 	if(mCameraAligned){
 		Quaternion alignRotate;
