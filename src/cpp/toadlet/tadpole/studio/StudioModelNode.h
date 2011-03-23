@@ -51,8 +51,8 @@ public:
 		SubModel(StudioModelNode *modelNode,int bodypartIndex,int modelIndex,int meshIndex,int skinIndex);
 
 		Material *getRenderMaterial() const{return material;}
-		Transform *getRenderTransform() const{return modelNode->getWorldTransform();}
-		Bound *getRenderBound() const{return modelNode->getRenderBound();}
+		const Transform &getRenderTransform() const{return modelNode->getWorldTransform();}
+		const Bound &getRenderBound() const{return modelNode->getRenderBound();}
 		void render(peeper::Renderer *renderer) const;
 
 		StudioModelNode *modelNode;
@@ -119,7 +119,7 @@ public:
 	StudioModelController *getGaitController();
 
 	// Traceable
-	Bound *getBound() const{return super::getBound();}
+	const Bound &getBound() const{return super::getBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 	// Visible
@@ -130,15 +130,15 @@ public:
 
 	// Renderable
 	Material *getRenderMaterial() const{return mSkeletonMaterial;}
-	Transform *getRenderTransform() const{return getWorldTransform();}
-	Bound *getRenderBound() const{return getWorldBound();}
+	const Transform &getRenderTransform() const{return getWorldTransform();}
+	const Bound &getRenderBound() const{return getWorldBound();}
 	void render(peeper::Renderer *renderer) const;
 
 	// Attachable
 	int getNumAttachments(){return mModel->header->numattachments;}
 	egg::String getAttachmentName(int index){return mModel->attachment(index)->name;}
 	int getAttachmentIndex(const egg::String &name);
-	bool getAttachmentTransform(Transform *result,int index);
+	bool getAttachmentTransform(Transform &result,int index);
 
 	static void setQuaternionFromEulerAngleStudio(Quaternion &r,const EulerAngle &euler);
 

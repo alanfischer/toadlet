@@ -312,23 +312,23 @@ void MeshNodeSkeleton::updateVertexData(){
 	vba.unlock();
 }
 
-Transform *MeshNodeSkeleton::getRenderTransform() const{
-	return mNode!=NULL?mNode->getWorldTransform():NULL;
+const Transform &MeshNodeSkeleton::getRenderTransform() const{
+	return mNode!=NULL?mNode->getWorldTransform():Node::identityTransform();
 }
 
-Bound *MeshNodeSkeleton::getRenderBound() const{
-	return mNode!=NULL?mNode->getWorldBound():NULL;
+const Bound &MeshNodeSkeleton::getRenderBound() const{
+	return mNode!=NULL?mNode->getWorldBound():Node::zeroBound();
 }
 
 void MeshNodeSkeleton::render(Renderer *renderer) const{
 	renderer->renderPrimitive(mVertexData,mIndexData);
 }
 
-bool MeshNodeSkeleton::getAttachmentTransform(Transform *result,int index){
+bool MeshNodeSkeleton::getAttachmentTransform(Transform &result,int index){
 	if(index>=0 && index<mBones.size()){
 		Bone *bone=mBones[index];
-		result->setTranslate(bone->worldTranslate);
-		result->setRotate(bone->worldRotate);
+		result.setTranslate(bone->worldTranslate);
+		result.setRotate(bone->worldRotate);
 		return true;
 	}
 	else{

@@ -394,9 +394,11 @@ void StudioModelNode::traceSegment(Collision &result,const Vector3 &position,con
 	Vector3 point,normal;
 	Segment localSegment,boxSegment;
 	Quaternion invrot;
+	Transform transform;
 	int i;
 
-	Transform::inverseTransform(localSegment,segment,position,mWorldTransform->getScale(),mWorldTransform->getRotate());
+	transform.set(position,mWorldTransform.getScale(),mWorldTransform.getRotate());
+	transform.inverseTransform(localSegment,segment);
 
 	result.time=Math::ONE;
 	for(i=0;i<mModel->header->numhitboxes;++i){
@@ -416,8 +418,8 @@ void StudioModelNode::traceSegment(Collision &result,const Vector3 &position,con
 	}
 
 	if(result.time<Math::ONE){
-		mWorldTransform->transformNormal(result.normal);
-		Transform::transform(result.point,position,mWorldTransform->getScale(),mWorldTransform->getRotate());
+		transform.transform(result.point);
+		transform.transformNormal(result.normal);
 	}
 }
 
@@ -483,7 +485,7 @@ int StudioModelNode::getAttachmentIndex(const String &name){
 	return -1;
 }
 
-bool StudioModelNode::getAttachmentTransform(Transform *result,int index){
+bool StudioModelNode::getAttachmentTransform(Transform &result,int index){
 	if(index<0 || index>mModel->header->numattachments){
 		return false;
 	}
@@ -493,12 +495,12 @@ bool StudioModelNode::getAttachmentTransform(Transform *result,int index){
 	Quaternion rotate=mBoneRotates[attachment->bone];
 
 	Math::add(translate,attachment->org);
-	result->setTranslate(translate);
+	result.setTranslate(translate);
 
 	Quaternion attachmentRotate;
 	Math::setQuaternionFromAxes(attachmentRotate,attachment->vectors[0],attachment->vectors[1],attachment->vectors[2]); /// @todo: Would it work to use setQuaternionFromMatrix with the vector array as a matrix?
 	Math::postMul(rotate,attachmentRotate);
-	result->setRotate(rotate);
+	result.setRotate(rotate);
 
 	return true;
 }
@@ -666,11 +668,11 @@ void StudioModelNode::updateSkeleton(){
 	}
 
 	if(mLink==NULL){
-		mBound->set(sseqdesc->bbmin,sseqdesc->bbmax);
+		mBound.set(sseqdesc->bbmin,sseqdesc->bbmax);
 	}
 	else{
 		// Really, we should probably take the sequence bbox and transform it by each bone, and merge for a result, but this will probably work for most cases.
-		mBound->set(mLink->mBound);
+		mBound.set(mLink->mBound);
 	}
 }
 

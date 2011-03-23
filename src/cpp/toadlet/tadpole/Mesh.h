@@ -48,7 +48,7 @@ public:
 	public:
 		TOADLET_SHARED_POINTERS(SubMesh);
 
-		SubMesh(){}
+		SubMesh():hasOwnTransform(false){}
 		virtual ~SubMesh(){}
 
 		peeper::VertexData::ptr vertexData;
@@ -59,9 +59,9 @@ public:
 
 		egg::String name;
 
-		// If these are null, just use the Mesh ones
-		Transform::ptr transform;
-		Bound::ptr bound;
+		bool hasOwnTransform;
+		Transform transform;
+		Bound bound;
 	};
 
 	class TOADLET_API VertexBoneAssignment{
@@ -86,8 +86,8 @@ public:
 	void destroy();
 	void compile();
 
-	Transform::ptr transform;
-	Bound::ptr bound;
+	Transform transform;
+	Bound bound;
 
 	egg::Collection<SubMesh::ptr> subMeshes;
 	peeper::VertexData::ptr staticVertexData;

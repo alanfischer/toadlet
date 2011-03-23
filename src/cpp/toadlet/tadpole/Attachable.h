@@ -39,7 +39,7 @@ public:
 	virtual int getNumAttachments()=0;
 	virtual egg::String getAttachmentName(int index)=0;
 	virtual int getAttachmentIndex(const egg::String &name)=0;
-	virtual bool getAttachmentTransform(Transform *result,int index)=0;
+	virtual bool getAttachmentTransform(Transform &result,int index)=0;
 };
 
 }

@@ -753,7 +753,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 
 		vba.unlock();
 
-		mesh->bound->set(bound);
+		mesh->bound.set(bound);
 		mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 	}
 

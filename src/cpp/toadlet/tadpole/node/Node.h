@@ -33,7 +33,7 @@
 #include <toadlet/egg/Type.h>
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/Bound.h>
-#include <toadlet/tadpole/Transform.h>
+#include <toadlet/tadpole/Transformable.h>
 #include <toadlet/tadpole/animation/Controller.h>
 #include <toadlet/tadpole/node/NodeListener.h>
 
@@ -72,9 +72,12 @@ namespace node{
 class CameraNode;
 class ParentNode;
 
-class TOADLET_API Node{
+class TOADLET_API Node:public Transformable{
 public:
 	TOADLET_NODE(Node,Node);
+
+	static const Transform &identityTransform(){static Transform transform;return transform;}
+	static const Bound &zeroBound(){static Bound bound;return bound;}
 
 	enum TransformUpdate{
 		TransformUpdate_BIT_TRANSLATE=1<<0,
@@ -92,6 +95,7 @@ public:
 		InterfaceType_MATERIALABLE,
 		InterfaceType_RENDERABLE,
 		InterfaceType_TRACEABLE,
+		InterfaceType_TRANSFORMABLE,
 		InterfaceType_VISIBLE,
 	};
 
@@ -107,7 +111,7 @@ public:
 
 	virtual ParentNode *isParent(){return NULL;}
 	virtual Node *isEntity(){return NULL;}
-	virtual void *hasInterface(int type){return NULL;}
+	virtual void *hasInterface(int type);
 
 	inline int getUniqueHandle() const{return mUniqueHandle;}
 
@@ -129,38 +133,29 @@ public:
 
 	virtual void setTranslate(const Vector3 &translate);
 	virtual void setTranslate(scalar x,scalar y,scalar z);
-	inline const Vector3 &getTranslate() const{return mTransform->getTranslate();}
+	inline const Vector3 &getTranslate() const{return mTransform.getTranslate();}
 
 	virtual void setRotate(const Quaternion &rotate);
 	virtual void setRotate(const Matrix3x3 &rotate);
 	virtual void setRotate(const Vector3 &axis,scalar angle);
-	inline const Quaternion &getRotate() const{return mTransform->getRotate();}
+	inline const Quaternion &getRotate() const{return mTransform.getRotate();}
 
 	virtual void setScale(const Vector3 &scale);
 	virtual void setScale(scalar x,scalar y,scalar z);
 	virtual void setScale(scalar s){setScale(s,s,s);}
-	inline const Vector3 &getScale() const{return mTransform->getScale();}
+	inline const Vector3 &getScale() const{return mTransform.getScale();}
 
-	inline const Vector3 &getWorldTranslate() const{return mWorldTransform->getTranslate();}
-	inline const Quaternion &getWorldRotate() const{return mWorldTransform->getRotate();}
-	inline const Vector3 &getWorldScale() const{return mWorldTransform->getScale();}
+	inline const Vector3 &getWorldTranslate() const{return mWorldTransform.getTranslate();}
+	inline const Quaternion &getWorldRotate() const{return mWorldTransform.getRotate();}
+	inline const Vector3 &getWorldScale() const{return mWorldTransform.getScale();}
 
-	/// @todo: I should at least expose the getTransform() portion of this.  Clarify if a Transform is a State or a full Object.
-	// I suppose we could modify the Transform interface to just be virtual getters only
-	// Then the class Tranform would be a TranslateRotateScaleTransform
-	// Then we could have a getTransform() method in node since it couldn't be set
-	// OR: We could add a listener in the Transform class that notifys the node that it was modified
-	// Then you can freely grab transforms and modify items in them without worry.
-	// That would also make it easier for Animations, since we wouldn't need a Node animation
-	// Instead just an Animation that modifys a Transform would suffice.
-	// Though in the second case, we would still need some way of the Interpolators notifying that it was an interpolation change.
-	virtual void setTransform(Transform *transform,int tu);
-	inline Transform *getReadOnlyTransform() const{return mTransform;} // This needs to be read only somehow with the current setup
-	inline Transform *getWorldTransform() const{return mWorldTransform;}
+	virtual void setTransform(const Transform &transform);
+	virtual const Transform &getTransform() const{return mTransform;}
+	inline const Transform &getWorldTransform() const{return mWorldTransform;}
 
-	virtual void setBound(Bound *bound);
-	inline Bound::ptr getBound() const{return mBound;}
-	inline Bound::ptr getWorldBound() const{return mWorldBound;}
+	virtual void setBound(const Bound &bound);
+	inline const Bound &getBound() const{return mBound;}
+	inline const Bound &getWorldBound() const{return mWorldBound;}
 
 	virtual void handleEvent(const egg::Event::ptr &event){}
 
@@ -228,10 +223,10 @@ protected:
 	int mLastFrame;
 	int mTransformUpdatedFrame;
 
-	Transform::ptr mTransform;
-	Bound::ptr mBound;
-	Transform::ptr mWorldTransform;
-	Bound::ptr mWorldBound;
+	Transform mTransform;
+	Bound mBound;
+	Transform mWorldTransform;
+	Bound mWorldBound;
 	int mScope;
 	egg::String mName;
 

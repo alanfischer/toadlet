@@ -42,10 +42,6 @@ public:
 		mForceInterpolate(0)
 	{
 		mInterpolate=Node::TransformUpdate_BIT_TRANSLATE|Node::TransformUpdate_BIT_ROTATE|Node::TransformUpdate_BIT_SCALE;
-
-		mTransform=Transform::ptr(new Transform());
-		mLastTransform=Transform::ptr(new Transform());
-		mLerpedTransform=Transform::ptr(new Transform());
 	}
 
 	virtual void nodeDestroyed(Node *node){}
@@ -55,57 +51,57 @@ public:
 
 		if((~mForceInterpolate&tu&Node::TransformUpdate_BIT_TRANSLATE)>0){
 			const Vector3 &translate=node->getTranslate();
-			mLastTransform->setTranslate(translate);
-			mTransform->setTranslate(translate);
+			mLastTransform.setTranslate(translate);
+			mTransform.setTranslate(translate);
 		}
 		if((~mForceInterpolate&tu&Node::TransformUpdate_BIT_ROTATE)>0){
 			const Quaternion &rotate=node->getRotate();
-			mLastTransform->setRotate(rotate);
-			mTransform->setRotate(rotate);
+			mLastTransform.setRotate(rotate);
+			mTransform.setRotate(rotate);
 		}
 		if((~mForceInterpolate&tu&Node::TransformUpdate_BIT_SCALE)>0){
 			const Vector3 &scale=node->getScale();
-			mLastTransform->setScale(scale);
-			mTransform->setScale(scale);
+			mLastTransform.setScale(scale);
+			mTransform.setScale(scale);
 		}
 	}
 
 	virtual void logicUpdated(Node *node,int dt){
-		mLastTransform->set(mTransform);
+		mLastTransform.set(mTransform);
 
-		mTransform->setTranslate(node->getTranslate());
-		mTransform->setRotate(node->getRotate());
-		mTransform->setScale(node->getScale());
+		mTransform.setTranslate(node->getTranslate());
+		mTransform.setRotate(node->getRotate());
+		mTransform.setScale(node->getScale());
 	}
 
 	virtual void frameUpdated(Node *node,int dt){
 		scalar value=node->getScene()->getLogicFraction();
 
 		if((mInterpolate&Node::TransformUpdate_BIT_TRANSLATE)>0){
-			Math::lerp(mTranslateLerp,mLastTransform->getTranslate(),mTransform->getTranslate(),value);
-			mLerpedTransform->setTranslate(mTranslateLerp);
+			Math::lerp(mTranslateLerp,mLastTransform.getTranslate(),mTransform.getTranslate(),value);
+			mLerpedTransform.setTranslate(mTranslateLerp);
 		}
 		else{
-			mLerpedTransform->setTranslate(mLastTransform->getTranslate());
+			mLerpedTransform.setTranslate(mLastTransform.getTranslate());
 		}
 
 		if((mInterpolate&Node::TransformUpdate_BIT_ROTATE)>0){
-			Math::slerp(mRotateLerp,mLastTransform->getRotate(),mTransform->getRotate(),value);
-			mLerpedTransform->setRotate(mRotateLerp);
+			Math::slerp(mRotateLerp,mLastTransform.getRotate(),mTransform.getRotate(),value);
+			mLerpedTransform.setRotate(mRotateLerp);
 		}
 		else{
-			mLerpedTransform->setRotate(mLastTransform->getRotate());
+			mLerpedTransform.setRotate(mLastTransform.getRotate());
 		}
 
 		if((mInterpolate&Node::TransformUpdate_BIT_SCALE)>0){
-			Math::lerp(mScaleLerp,mLastTransform->getScale(),mTransform->getScale(),value);
-			mLerpedTransform->setScale(mScaleLerp);
+			Math::lerp(mScaleLerp,mLastTransform.getScale(),mTransform.getScale(),value);
+			mLerpedTransform.setScale(mScaleLerp);
 		}
 		else{
-			mLerpedTransform->setScale(mLastTransform->getScale());
+			mLerpedTransform.setScale(mLastTransform.getScale());
 		}
 
-		node->setTransform(mLerpedTransform,Node::TransformUpdate_BIT_INTERPOLATOR);
+		node->setTransform(mLerpedTransform);
 	}
 
 	void setBitsToInterpolate(int interpolate){mInterpolate=interpolate;}
@@ -116,8 +112,8 @@ public:
 	int getBitsToForceInterpolate() const{return mForceInterpolate;}
 
 protected:
-	Transform::ptr mTransform;
-	Transform::ptr mLastTransform;
+	Transform mTransform;
+	Transform mLastTransform;
 
 	int mInterpolate;
 	int mForceInterpolate;
@@ -125,7 +121,7 @@ protected:
 	Vector3 mTranslateLerp;
 	Quaternion mRotateLerp;
 	Vector3 mScaleLerp;
-	Transform::ptr mLerpedTransform;
+	Transform mLerpedTransform;
 };
 
 }

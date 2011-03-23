@@ -33,7 +33,6 @@ namespace tadpole{
 namespace sensor{
 
 BoundingVolumeSensor::BoundingVolumeSensor(Scene *scene):Sensor(scene){
-	mBound=Bound::ptr(new Bound());
 }
 
 BoundingVolumeSensor::~BoundingVolumeSensor(){

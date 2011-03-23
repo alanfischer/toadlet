@@ -75,7 +75,8 @@ Node *TerrainPatchNode::create(Scene *scene){
 	mNumBlocksInQueue=0;
 	mNumUnprocessedBlocks=0;
 	mLastBlockUpdateFrame=0;
-	mEpsilon=0.03125/16; // Epsilon for tracing against planes
+	// Epsilon for tracing against planes
+	mEpsilon=0.03125/16;
 	// Epsilon for checking neighboring cells.  Must be decently large since we need to catch a plane 
 	//  that, offset via epsilon at a shallow angle, would be interested outside of the cell 
 	mCellEpsilon=0.03125*4;
@@ -251,7 +252,7 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height,bo
 
 	addBlockToBack(0);
 
-	mBound->set(mBlocks[0].mins,mBlocks[0].maxs);
+	mBound.set(mBlocks[0].mins,mBlocks[0].maxs);
 
 	// Water buffers
 	if(water){
@@ -551,7 +552,7 @@ void TerrainPatchNode::updateBlocks(CameraNode *camera){
 	}
 
 	Vector3 cameraTranslate;
-	mWorldTransform->inverseTransform(cameraTranslate,camera->getWorldTranslate());
+	mWorldTransform.inverseTransform(cameraTranslate,camera->getWorldTranslate());
 
 	resetBlocks();
 	simplifyBlocks(cameraTranslate);
@@ -575,8 +576,11 @@ void TerrainPatchNode::render(Renderer *renderer) const{
 
 void TerrainPatchNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	Segment localSegment;
-	scalar sizeAdjust=Math::div(size.z,mWorldTransform->getScale().z);
-	Transform::inverseTransform(localSegment,segment,position,mWorldTransform->getScale(),mWorldTransform->getRotate());
+	scalar sizeAdjust=Math::div(size.z,mWorldTransform.getScale().z);
+	Transform transform;
+
+	transform.set(position,mWorldTransform.getScale(),mWorldTransform.getRotate());
+	transform.inverseTransform(localSegment,segment);
 	localSegment.origin.z-=sizeAdjust;
 
 	result.time=Math::ONE;
@@ -595,8 +599,8 @@ void TerrainPatchNode::traceSegment(Collision &result,const Vector3 &position,co
 
 	result.point.z+=sizeAdjust;
 	if(result.time<Math::ONE){
-		mWorldTransform->transformNormal(result.normal);
-		Transform::transform(result.point,position,mWorldTransform->getScale(),mWorldTransform->getRotate());
+		transform.transform(result.point);
+		transform.transformNormal(result.normal);
 	}
 }
 
@@ -1130,8 +1134,8 @@ bool TerrainPatchNode::blockIntersectsCamera(const Block *block,CameraNode *came
 		box.maxs.z=0;
 	}
 
-	mWorldTransform->transform(box.mins);
-	mWorldTransform->transform(box.maxs);
+	mWorldTransform.transform(box.mins);
+	mWorldTransform.transform(box.maxs);
 
 	return camera->culled(box)==false;
 }

@@ -108,11 +108,11 @@ public:
 	void updateIndexBuffers(node::CameraNode *camera);
 	void updateWaterIndexBuffers(node::CameraNode *camera);
 	Material *getRenderMaterial() const{return mMaterial;}
-	Transform *getRenderTransform() const{return getWorldTransform();}
-	Bound *getRenderBound() const{return getWorldBound();}
+	const Transform &getRenderTransform() const{return getWorldTransform();}
+	const Bound &getRenderBound() const{return getWorldBound();}
 	void render(peeper::Renderer *renderer) const;
 
-	Bound *getBound() const{return super::getBound();}
+	const Bound &getBound() const{return super::getBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 	void traceLocalSegment(Collision &result,const Segment &segment,scalar epsilon,scalar cellEpsilon);
 	bool traceCell(Collision &result,int x,int y,const Segment &segment,scalar epsilon,scalar cellEpsilon);
@@ -132,8 +132,8 @@ protected:
 		WaterRenderable(TerrainPatchNode *terrain){mTerrain=terrain;}
 
 		Material *getRenderMaterial() const{return mTerrain->mWaterMaterial;}
-		Transform *getRenderTransform() const{return mTerrain->getWorldTransform();}
-		Bound *getRenderBound() const{return mTerrain->getRenderBound();}
+		const Transform &getRenderTransform() const{return mTerrain->getWorldTransform();}
+		const Bound &getRenderBound() const{return mTerrain->getRenderBound();}
 		void render(peeper::Renderer *renderer) const{renderer->renderPrimitive(mTerrain->mWaterVertexData,mTerrain->mWaterIndexData);}
 
 	protected:

@@ -241,7 +241,7 @@ void ParentNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 }
 
 void ParentNode::mergeWorldBound(Node *child,bool justAttached){
-	mWorldBound->merge(child->getWorldBound(),mScene->getEpsilon());
+	mWorldBound.merge(child->getWorldBound(),mScene->getEpsilon());
 }
 
 void ParentNode::activate(){

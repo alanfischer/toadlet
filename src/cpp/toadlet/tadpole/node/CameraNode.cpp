@@ -367,14 +367,16 @@ void CameraNode::projectionUpdated(){
 void CameraNode::updateWorldTransform(){
 	super::updateWorldTransform();
 
-	mWorldTransform->transformNormal(mForward,Math::NEG_Z_UNIT_VECTOR3);
-	mWorldTransform->transformNormal(mRight,Math::X_UNIT_VECTOR3);
+	Math::mul(mForward,mWorldTransform.getRotate(),Math::NEG_Z_UNIT_VECTOR3);
+	Math::mul(mRight,mWorldTransform.getRotate(),Math::NEG_Z_UNIT_VECTOR3);
 
 	updateViewTransform();
 }
 
 void CameraNode::render(Renderer *renderer,Node *node){
 	updateFramesPerSecond();
+
+	mVisibleCount=0;
 
 	mScene->render(renderer,this,node);
 
@@ -405,22 +407,19 @@ Image::ptr CameraNode::renderToImage(Renderer *renderer,int format,int width,int
 }
 
 bool CameraNode::culled(Node *node) const{
-	return (node->getScope()&getScope())==0 || culled(node->getWorldBound());
+	bool c=(node->getScope()&getScope())==0 || culled(node->getWorldBound());
+	if(c==false) mVisibleCount++;
+	return c;
 }
 
-bool CameraNode::culled(Bound *bound) const{
-	if(bound->getType()==Bound::Type_INFINITE){
-		return false;
-	}
-	else if(bound->getType()==Bound::Type_SPHERE){
-		return culled(bound->getSphere());
-	}
-	else if(bound->getType()==Bound::Type_AABOX){
-		return culled(bound->getAABox());
-	}
-	else{
-		Error::unimplemented("unknown bound type");
-		return false;
+bool CameraNode::culled(const Bound &bound) const{
+	switch(bound.getType()){
+		case Bound::Type_INFINITE:	return false;
+		case Bound::Type_SPHERE:	return culled(bound.getSphere());
+		case Bound::Type_AABOX:		return culled(bound.getAABox());
+		default:
+			Error::unimplemented("unknown bound type");
+			return false;
 	}
 }
 
@@ -462,9 +461,9 @@ void CameraNode::updateFramesPerSecond(){
 }
 
 void CameraNode::updateViewTransform(){
-	const Vector3 worldTranslate=mWorldTransform->getTranslate();
+	const Vector3 worldTranslate=mWorldTransform.getTranslate();
 	Matrix4x4 worldMatrix;
-	mWorldTransform->toMatrix(worldMatrix);
+	mWorldTransform.calculateMatrix(worldMatrix);
 	scalar wt00=worldMatrix.at(0,0),wt01=worldMatrix.at(0,1),wt02=worldMatrix.at(0,2);
 	scalar wt10=worldMatrix.at(1,0),wt11=worldMatrix.at(1,1),wt12=worldMatrix.at(1,2);
 	scalar wt20=worldMatrix.at(2,0),wt21=worldMatrix.at(2,1),wt22=worldMatrix.at(2,2);

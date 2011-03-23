@@ -45,7 +45,7 @@ LightNode::LightNode():super(),
 Node *LightNode::create(Scene *scene){
 	super::create(scene);
 
-	mBound->setInfinite();
+	mBound.setInfinite();
 
 	return this;
 }

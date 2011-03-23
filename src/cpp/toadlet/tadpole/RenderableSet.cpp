@@ -70,27 +70,20 @@ void RenderableSet::endQueuing(){
 
 void RenderableSet::queueRenderable(Renderable *renderable){
 	Material *material=renderable->getRenderMaterial();
-	Transform *transform=renderable->getRenderTransform();
+	const Transform &transform=renderable->getRenderTransform();
+	const Bound &bound=renderable->getRenderBound();
 
 	Vector4 ambient;
 	/// @todo: Add a flag to skip this, for shadow calculations
 	if(material!=NULL && material->getLightEffect().ambient.equals(Math::ZERO_VECTOR4)==false){
-		if(transform!=NULL && mRoot->findAmbientForPoint(ambient,transform->getTranslate())==false){
+		if(mRoot->findAmbientForPoint(ambient,transform.getTranslate())==false){
 			ambient.set(mScene->getAmbientColor());
 		}
 	}
 
 	if(material!=NULL && material->getDepthSorted()){
 		/// @todo: Real sorting algorithm, clean this up
-		scalar depth=0;
-		Bound *bound=renderable->getRenderBound();
-
-		if(bound!=NULL){
-			depth=Math::lengthSquared(bound->getSphere().origin,mCamera->getWorldTranslate());
-		}
-		else{
-			depth=Math::lengthSquared(mCamera->getWorldTranslate());
-		}
+		scalar depth=Math::lengthSquared(bound.getSphere().origin,mCamera->getWorldTranslate());
 
 		RenderableQueue &depthQueue=mRenderableQueues[0];
 		int numRenderables=depthQueue.size();

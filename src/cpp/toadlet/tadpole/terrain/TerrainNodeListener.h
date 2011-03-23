@@ -35,8 +35,8 @@ namespace terrain{
 class TerrainNodeListener{
 public:
 	virtual void terrainUpdated(int oldX,int oldY,int newX,int newY)=0;
-	virtual void terrainPatchCreated(int x,int y,Bound *bound)=0;
-	virtual void terrainPatchDestroyed(int x,int y,Bound *bound)=0;
+	virtual void terrainPatchCreated(int x,int y,const Bound &bound)=0;
+	virtual void terrainPatchDestroyed(int x,int y,const Bound &bound)=0;
 };
 
 }

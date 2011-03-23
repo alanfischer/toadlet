@@ -74,11 +74,6 @@ Node::Node():
 //	TOADLET_PROPERTY_INIT(scale);
 //	TOADLET_PROPERTY_INIT(scope);
 //	TOADLET_PROPERTY_INIT(name);
-
-	mTransform=Transform::ptr(new Transform());
-	mBound=Bound::ptr(new Bound());
-	mWorldTransform=Transform::ptr(new Transform());
-	mWorldBound=Bound::ptr(new Bound());
 }
 
 Node::~Node(){
@@ -112,10 +107,10 @@ Node *Node::create(Scene *scene){
 	mDeactivateCount=0;
 	mTransformUpdatedFrame=-1;
 
-	mTransform->reset();
-	mBound->reset();
-	mWorldTransform->reset();
-	mWorldBound->reset();
+	mTransform.reset();
+	mBound.reset();
+	mWorldTransform.reset();
+	mWorldBound.reset();
 	mScope=-1;
 	mName="";
 
@@ -161,7 +156,7 @@ void Node::destroy(){
 Node *Node::set(Node *node){
 	TOADLET_ASSERT(getType()==node->getType());
 
-	setTransform(node->mTransform,TransformUpdate_BIT_TRANSFORM);
+	setTransform(node->mTransform);
 	setBound(node->mBound);
 	setScope(node->mScope);
 	setName(node->mName);
@@ -170,6 +165,11 @@ Node *Node::set(Node *node){
 }
 
 Node *Node::clone(Scene *scene){return mEngine->createNode(getType(),scene)->set(this);}
+
+void *Node::hasInterface(int type){
+	if(type==InterfaceType_TRANSFORMABLE) return (Transformable*)this;
+	return NULL;
+}
 
 void Node::addNodeListener(NodeListener::ptr listener){
 	if(mNodeListeners==NULL){
@@ -216,47 +216,47 @@ void Node::parentDataChanged(void *parentData){
 }
 
 void Node::setTranslate(const Vector3 &translate){
-	mTransform->setTranslate(translate);
+	mTransform.setTranslate(translate);
 	transformUpdated(TransformUpdate_BIT_TRANSLATE);
 }
 
 void Node::setTranslate(scalar x,scalar y,scalar z){
-	mTransform->setTranslate(x,y,z);
+	mTransform.setTranslate(x,y,z);
 	transformUpdated(TransformUpdate_BIT_TRANSLATE);
 }
 
 void Node::setRotate(const Quaternion &rotate){
-	mTransform->setRotate(rotate);
+	mTransform.setRotate(rotate);
 	transformUpdated(TransformUpdate_BIT_ROTATE);
 }
 
 void Node::setRotate(const Matrix3x3 &rotate){
-	mTransform->setRotate(rotate);
+	mTransform.setRotate(rotate);
 	transformUpdated(TransformUpdate_BIT_ROTATE);
 }
 
 void Node::setRotate(const Vector3 &axis,scalar angle){
-	mTransform->setRotate(axis,angle);
+	mTransform.setRotate(axis,angle);
 	transformUpdated(TransformUpdate_BIT_ROTATE);
 }
 
 void Node::setScale(const Vector3 &scale){
-	mTransform->setScale(scale);
+	mTransform.setScale(scale);
 	transformUpdated(TransformUpdate_BIT_SCALE);
 }
 
 void Node::setScale(scalar x,scalar y,scalar z){
-	mTransform->setScale(x,y,z);
+	mTransform.setScale(x,y,z);
 	transformUpdated(TransformUpdate_BIT_SCALE);
 }
 
-void Node::setTransform(Transform *transform,int tu){
-	mTransform->set(transform);
-	transformUpdated(TransformUpdate_BIT_TRANSFORM|tu);
+void Node::setTransform(const Transform &transform){
+	mTransform.set(transform);
+	transformUpdated(TransformUpdate_BIT_TRANSFORM);
 }
 
-void Node::setBound(Bound *bound){
-	mBound->set(bound);
+void Node::setBound(const Bound &bound){
+	mBound.set(bound);
 	transformUpdated(TransformUpdate_BIT_BOUND);
 }
 
@@ -316,16 +316,16 @@ bool Node::getTransformUpdated(){return mScene->getFrame()==mTransformUpdatedFra
 
 void Node::updateWorldTransform(){
 	if(mParent==NULL){
-		mWorldTransform->set(mTransform);
+		mWorldTransform.set(mTransform);
 	}
 	else if(mTransformUpdatedFrame==-1){
-		mWorldTransform->set(mParent->mWorldTransform);
+		mWorldTransform.set(mParent->mWorldTransform);
 	}
 	else{
-		mWorldTransform->transform(mParent->mWorldTransform,mTransform);
+		mWorldTransform.setTransform(mParent->mWorldTransform,mTransform);
 	}
 
-	mWorldBound->transform(mBound,mWorldTransform);
+	mWorldBound.transform(mBound,mWorldTransform);
 }
 
 void Node::transformUpdated(int tu){

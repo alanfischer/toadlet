@@ -114,10 +114,7 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 		for(i=0;i<renderableQueue.size();++i){
 			const RenderableSet::RenderableQueueItem &item=renderableQueue[i];
 			Renderable *renderable=item.renderable;
-			Transform *transform=renderable->getRenderTransform();
-
-			if(transform!=NULL) transform->toMatrix(matrix);
-			else matrix.reset();
+			renderable->getRenderTransform().calculateMatrix(matrix);
 
 			renderer->setAmbientColor(item.ambient);
 			renderer->setModelMatrix(matrix);
@@ -135,15 +132,12 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 		const RenderableSet::RenderableQueueItem &item=renderableQueue[i];
 		Material *material=item.material;
 		Renderable *renderable=item.renderable;
-		Transform *transform=renderable->getRenderTransform();
+		renderable->getRenderTransform().calculateMatrix(matrix);
 
 		if(material!=NULL && mPreviousMaterial!=material){
 			material->setupRenderer(renderer,mPreviousMaterial);
 		}
 		mPreviousMaterial=material;
-
-		if(transform!=NULL) transform->toMatrix(matrix);
-		else matrix.reset();
 
 		renderer->setAmbientColor(item.ambient);
 		renderer->setModelMatrix(matrix);

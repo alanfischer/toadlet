@@ -94,7 +94,8 @@ public:
 
 	void logicUpdate(int dt,int scope);
 
-	Bound *getBound() const{return super::getBound();}
+	// Traceable
+	const Bound &getBound() const{return super::getBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 	void updateTarget();

@@ -49,14 +49,14 @@ void PartitionNode::destroy(){
 	super::destroy();
 }
 
-bool PartitionNode::senseBoundingVolumes(SensorResultsListener *listener,Bound *bound){
+bool PartitionNode::senseBoundingVolumes(SensorResultsListener *listener,const Bound &bound){
 	bool result=false;
 	int i;
 	for(i=0;i<mChildren.size();++i){
 		Node *child=mChildren[i];
-		if(child->getWorldBound()->testIntersection(bound)){
+		if(child->getWorldBound().testIntersection(bound)){
 			result|=true;
-			if(listener->resultFound(child,Math::lengthSquared(bound->getSphere().origin,child->getWorldTranslate()))==false){
+			if(listener->resultFound(child,Math::lengthSquared(bound.getSphere().origin,child->getWorldTranslate()))==false){
 				return true;
 			}
 		}

@@ -51,8 +51,8 @@ public:
 		SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh);
 
 		Material *getRenderMaterial() const{return material;}
-		Transform *getRenderTransform() const{return worldTransform!=NULL?worldTransform:meshNode->getWorldTransform();}
-		Bound *getRenderBound() const{return worldBound!=NULL?worldBound:meshNode->getWorldBound();}
+		const Transform &getRenderTransform() const{return hasOwnTransform?worldTransform:meshNode->getWorldTransform();}
+		const Bound &getRenderBound() const{return hasOwnTransform?worldBound:meshNode->getWorldBound();}
 		void render(peeper::Renderer *renderer) const;
 
 		Material::ptr material;
@@ -61,8 +61,9 @@ public:
 		MeshNode *meshNode;
 		Mesh::SubMesh *meshSubMesh;
 
-		Transform::ptr worldTransform;
-		Bound::ptr worldBound;
+		bool hasOwnTransform;
+		Transform worldTransform;
+		Bound worldBound;
 	};
 
 	/// Specialization of the Controller that allows for easy access to playing single sequences.
@@ -121,7 +122,7 @@ public:
 	int getNumAttachments(){return mSkeleton!=NULL?mSkeleton->getNumAttachments():0;}
 	egg::String getAttachmentName(int index){return mSkeleton!=NULL?mSkeleton->getAttachmentName(index):(char*)NULL;}
 	int getAttachmentIndex(const egg::String &name){return mSkeleton!=NULL?mSkeleton->getAttachmentIndex(name):0;}
-	bool getAttachmentTransform(Transform *result,int index){return mSkeleton!=NULL?mSkeleton->getAttachmentTransform(result,index):false;}
+	bool getAttachmentTransform(Transform &result,int index){return mSkeleton!=NULL?mSkeleton->getAttachmentTransform(result,index):false;}
 
 protected:
 	bool mRendered;
