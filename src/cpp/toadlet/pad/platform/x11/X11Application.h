@@ -74,11 +74,11 @@ public:
 	virtual void setFullscreen(bool fullscreen);
 	virtual bool getFullscreen() const;
 
-	virtual void setVisual(const peeper::Visual &visual);
-	virtual const peeper::Visual &getVisual() const;
+	virtual void setWindowRenderTargetFormat(peeper::WindowRenderTargetFormat::ptr format){mFormat=format;}
+	virtual peeper::WindowRenderTargetFormat::ptr getWindowRenderTargetFormat() const{return mFormat;}
 
-	virtual void setApplicationListener(ApplicationListener *listener);
-	virtual ApplicationListener *getApplicationListener() const;
+	virtual void setApplicationListener(ApplicationListener *listener){mListener=listener;}
+	virtual ApplicationListener *getApplicationListener() const{return mListener;}
 
 	virtual tadpole::Engine *getEngine() const{return mEngine;}
 	virtual peeper::Renderer *getRenderer() const{return mRenderer;}
@@ -136,8 +136,8 @@ protected:
 	int mPositionX,mPositionY;
 	int mWidth,mHeight;
 	bool mFullscreen;
-	peeper::Visual mVisual;
-	ApplicationListener *mApplicationListener;
+	peeper::WindowRenderTargetFormat::ptr mFormat;
+	ApplicationListener *mListener;
 	bool mDifferenceMouse;
 	int mLastXMouse,mLastYMouse;
 	bool mSkipNextMove;
