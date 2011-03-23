@@ -59,6 +59,7 @@ void RenderableSet::startQueuing(){
 		mRenderableQueues[i].clear();
 	}
 	mMaterialToQueueIndexMap.clear();
+	mLayerSortedQueueIndexes.clear();
 	mLightQueue.clear();
 
 	mRoot=mScene->getRoot();
@@ -106,6 +107,15 @@ void RenderableSet::queueRenderable(Renderable *renderable){
 			}
 			mRenderableQueueCount++;
 			mMaterialToQueueIndexMap[material]=queueIndex;
+			int layer=material!=NULL?material->getLayer():0;
+			int i;
+			for(i=0;i<mLayerSortedQueueIndexes.size();++i){
+				int index=mLayerSortedQueueIndexes[i];
+				const RenderableQueue &queue=mRenderableQueues[index];
+				int queueLayer=queue[0].material!=NULL?queue[0].material->getLayer():0;
+				if(layer<queueLayer) break;
+			}
+			mLayerSortedQueueIndexes.insert(i,queueIndex);
 		}
 		mRenderableQueues[queueIndex].add(RenderableQueueItem(renderable,material,ambient,0));
 	}

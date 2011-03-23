@@ -46,6 +46,7 @@ Material::Material():BaseResource(),
 	mDepthWrite(true),
 	mDepthTest(Renderer::DepthTest_LEQUAL),
 	//mPointState
+	mLayer(0),
 	mSaveLocally(false)
 {
 }
@@ -82,6 +83,7 @@ Material::ptr Material::clone(){
 	material->mDepthWrite=mDepthWrite;
 	material->mDepthTest=mDepthTest;
 	material->mPointState.set(mPointState);
+	material->mLayer=mLayer;
 
 	int i;
 	for(i=0;i<mTextureStages.size();++i){
