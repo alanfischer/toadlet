@@ -142,6 +142,7 @@ set (TADPOLE_HEADERS
 	TextureManager.h
 	Traceable.h
 	Transform.h
+	Transformable.h
 	TransformKeyFrame.h
 	TransformSequence.h
 	TransformTrack.h

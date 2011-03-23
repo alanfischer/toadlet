@@ -123,15 +123,15 @@ public:
 
 	// Renderable
 	Material *getRenderMaterial() const{return mMaterial;}
-	Transform *getRenderTransform() const;
-	Bound *getRenderBound() const;
+	const Transform &getRenderTransform() const;
+	const Bound &getRenderBound() const;
 	void render(peeper::Renderer *renderer) const;
 
 	// Attachable
 	int getNumAttachments(){return mBones.size();}
 	egg::String getAttachmentName(int index){return getBoneName(index);}
 	int getAttachmentIndex(const egg::String &name){return getBoneIndex(name);}
-	bool getAttachmentTransform(Transform *result,int index);
+	bool getAttachmentTransform(Transform &result,int index);
 
 protected:
 	int updateBoneTransformation(Bone *bone);

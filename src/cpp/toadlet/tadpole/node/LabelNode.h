@@ -68,8 +68,8 @@ public:
 
 	void gatherRenderables(CameraNode *camera,RenderableSet *set);
 	Material *getRenderMaterial() const{return mMaterial;}
-	Transform *getRenderTransform() const{return getWorldTransform();}
-	Bound *getRenderBound() const{return getWorldBound();}
+	const Transform &getRenderTransform() const{return getWorldTransform();}
+	const Bound &getRenderBound() const{return getWorldBound();}
 	void render(peeper::Renderer *renderer) const;
 
 	peeper::VertexBufferAccessor vba;

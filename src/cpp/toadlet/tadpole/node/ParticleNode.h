@@ -106,8 +106,8 @@ public:
 	void gatherRenderables(CameraNode *camera,RenderableSet *set);
 
 	Material *getRenderMaterial() const{return mMaterial;}
-	Transform *getRenderTransform() const{return mWorldSpace==false?getWorldTransform():NULL;}
-	Bound *getRenderBound() const{return getWorldBound();}
+	const Transform &getRenderTransform() const{return mWorldSpace==false?getWorldTransform():Node::identityTransform();}
+	const Bound &getRenderBound() const{return getWorldBound();}
 	void render(peeper::Renderer *renderer) const;
 
 	void updateVertexBuffer(CameraNode *camera);

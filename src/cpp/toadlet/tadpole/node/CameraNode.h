@@ -118,13 +118,14 @@ public:
 	virtual egg::image::Image::ptr renderToImage(peeper::Renderer *renderer,int format,int width,int height);
 
 	virtual bool culled(Node *node) const;
-	virtual bool culled(Bound *bound) const;
+	virtual bool culled(const Bound &bound) const;
 	/// @todo: These should probably be moved into the Math library, and passing in a list of planes
 	virtual bool culled(const Sphere &sphere) const;
 	virtual bool culled(const AABox &box) const;
 
 	virtual void updateFramesPerSecond();
 	inline scalar getFramesPerSecond() const{return mFPS;}
+	inline int getVisibleCount() const{return mVisibleCount;}
 
 	virtual void updateWorldTransform();
 
@@ -162,9 +163,11 @@ protected:
 	scalar mGamma;
 	Material::ptr mGammaMaterial;
 
-	int mFPSLastTime;
-	int mFPSFrameCount;
-	scalar mFPS;
+	mutable int mFPSLastTime;
+	mutable int mFPSFrameCount;
+	mutable scalar mFPS;
+
+	mutable int mVisibleCount;
 
 	Vector3 cache_culled_vertex;
 };

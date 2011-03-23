@@ -297,8 +297,8 @@ void Scene::renderBoundingVolumes(Renderer *renderer,Node *node){
 		return;
 	}
 
-	if(node->getWorldBound()->getSphere().radius>0){
-		const Sphere &sphere=node->getWorldBound()->getSphere();
+	if(node->getWorldBound().getSphere().radius>0){
+		const Sphere &sphere=node->getWorldBound().getSphere();
 		Matrix4x4 transform;
 		Math::setMatrix4x4FromTranslate(transform,sphere.origin);
 		Math::setMatrix4x4FromScale(transform,sphere.radius,sphere.radius,sphere.radius);

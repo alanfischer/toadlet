@@ -157,7 +157,7 @@ void ParticleNode::setWorldSpace(bool worldSpace){
 		for(i=0;i<mParticles.size();++i){
 			Particle &p=mParticles[i];
 			position.set(p.x,p.y,p.z);
-			mWorldTransform->transform(position);
+			mWorldTransform.transform(position);
 			p.x=position.x;p.y=position.y;p.z=position.z;
 		}
 	}
@@ -165,7 +165,7 @@ void ParticleNode::setWorldSpace(bool worldSpace){
 		for(i=0;i<mParticles.size();++i){
 			Particle &p=mParticles[i];
 			position.set(p.x,p.y,p.z);
-			mWorldTransform->inverseTransform(position);
+			mWorldTransform.inverseTransform(position);
 			p.x=position.x;p.y=position.y;p.z=position.z;
 		}
 	}
@@ -320,12 +320,15 @@ void ParticleNode::updateVertexBuffer(CameraNode *camera){
 	else{
 		Math::invert(invViewMatrix,camera->getViewMatrix());
 	}
+	Quaternion invRot;
+	Math::invert(invRot,mWorldTransform.getRotate());
+
 	Math::setAxesFromMatrix4x4(invViewMatrix,viewRight,viewUp,viewForward);
 
 	if(mWorldSpace==false){
-		mWorldTransform->inverseTransformNormal(viewRight);
-		mWorldTransform->inverseTransformNormal(viewUp);
-		mWorldTransform->inverseTransformNormal(viewForward);
+		Math::mul(viewRight,invRot);
+		Math::mul(viewUp,invRot);
+		Math::mul(viewForward,invRot);
 	}
 
 	scalar epsilon=mScene->getEpsilon();
@@ -351,7 +354,7 @@ void ParticleNode::updateVertexBuffer(CameraNode *camera){
 					up.set(p.vx,p.vy,p.vz);
 					Math::normalizeCarefully(up,0);
 					if(mWorldSpace==false){
-						mWorldTransform->inverseTransformNormal(up);
+						Math::mul(up,invRot);
 					}
 					Math::mul(up,p.scale);
 					Math::mul(right,viewRight,p.scale);

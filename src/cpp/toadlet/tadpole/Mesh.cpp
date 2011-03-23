@@ -36,8 +36,6 @@ namespace tadpole{
 Sphere Mesh::Bound_AUTOCALCULATE(-2);
 
 Mesh::Mesh():BaseResource(){
-	transform=Transform::ptr(new Transform());
-	bound=Bound::ptr(new Bound(Bound::Type_INFINITE));
 }
 
 Mesh::~Mesh(){

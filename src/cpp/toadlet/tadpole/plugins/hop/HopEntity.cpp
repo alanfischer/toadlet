@@ -69,8 +69,8 @@ Node *HopEntity::create(Scene *scene){
 		return this;
 	}
 
-	mInterpolator=NodeTransformInterpolator::ptr(new NodeTransformInterpolator());
-	addNodeListener(mInterpolator);
+//	mInterpolator=NodeTransformInterpolator::ptr(new NodeTransformInterpolator());
+//	addNodeListener(mInterpolator);
 
 	return this;
 }
@@ -155,8 +155,7 @@ void HopEntity::setTraceableShape(Traceable *traceable,Node *traceableNode){
 void HopEntity::addShape(hop::Shape::ptr shape){
 	mSolid->addShape(shape);
 
-	Bound::ptr bound(new Bound(mSolid->getLocalBound()));
-	setBound(bound);
+	setBound(Bound(mSolid->getLocalBound()));
 
 	updateCollisionVolumes();
 }
@@ -196,7 +195,7 @@ void HopEntity::transformUpdated(int tu){
 	if((tu&Node::TransformUpdate_BIT_INTERPOLATOR)==0){
 		// Only modify position on a translation change, and not from the interpolator
 		if((tu&Node::TransformUpdate_BIT_TRANSLATE)>0){
-			mSolid->setPosition(mTransform->getTranslate());
+			mSolid->setPosition(mTransform.getTranslate());
 		}
 	}
 }
@@ -216,7 +215,7 @@ void HopEntity::parentChanged(ParentNode *parent){
 
 void HopEntity::logicUpdate(int dt,int scope){
 	if(mSolid->active()){
-		mTransform->setTranslate(mSolid->getPosition());
+		mTransform.setTranslate(mSolid->getPosition());
 		transformUpdated(TransformUpdate_BIT_TRANSLATE|TransformUpdate_BIT_INTERPOLATOR);
 	}
 
@@ -230,9 +229,9 @@ void HopEntity::logicUpdate(int dt,int scope){
 
 void HopEntity::frameUpdate(int dt,int scope){
 	if(mSolid->active()){
-		if(mInterpolator!=NULL){
-			mInterpolator->frameUpdated(this,dt);
-		}
+//		if(mInterpolator!=NULL){
+//			mInterpolator->frameUpdated(this,dt);
+//		}
 	}
 
 	super::frameUpdate(dt,scope);
@@ -240,7 +239,7 @@ void HopEntity::frameUpdate(int dt,int scope){
 
 void HopEntity::getBound(AABox &result){
 	if(mTraceable!=NULL){
-		result.set(mTraceable->getBound()->getAABox());
+		result.set(mTraceable->getBound().getAABox());
 	}
 }
 

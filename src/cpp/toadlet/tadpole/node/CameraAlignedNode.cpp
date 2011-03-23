@@ -58,7 +58,7 @@ Node *CameraAlignedNode::set(Node *node){
 void CameraAlignedNode::frameUpdate(int dt,int scope){
 	super::frameUpdate(dt,scope);
 
-	if(mPerspective==false) mWorldBound->setInfinite();
+	if(mPerspective==false) mWorldBound.setInfinite();
 }
 
 void CameraAlignedNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
@@ -75,7 +75,7 @@ void CameraAlignedNode::gatherRenderables(CameraNode *camera,RenderableSet *set)
 		}
 		Math::invert(alignRotate);
 		Math::postMul(alignRotate,getRotate());
-		mWorldTransform->setRotate(alignRotate);
+		mWorldTransform.setRotate(alignRotate);
 	}
 
 	if(!mPerspective){
@@ -87,7 +87,7 @@ void CameraAlignedNode::gatherRenderables(CameraNode *camera,RenderableSet *set)
 		Math::mul(point,camera->getProjectionMatrix());
 
 		Math::mul(scale,getWorldScale(),point.w);
-		mWorldTransform->setScale(scale);
+		mWorldTransform.setScale(scale);
 	}
 }
 

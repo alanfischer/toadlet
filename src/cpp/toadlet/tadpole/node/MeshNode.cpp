@@ -42,7 +42,9 @@ namespace node{
 
 TOADLET_NODE_IMPLEMENT(MeshNode,Categories::TOADLET_TADPOLE_NODE+".MeshNode");
 
-MeshNode::SubMesh::SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh){
+MeshNode::SubMesh::SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh):
+	hasOwnTransform(false)
+{
 	this->meshNode=meshNode;
 	this->meshSubMesh=meshSubMesh;
 }
@@ -162,7 +164,7 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 	mMesh=mesh;
 	mMesh->retain();
 
-	setTransform(mMesh->transform,0);
+	setTransform(mMesh->transform);
 	setBound(mMesh->bound);
 
 	if(mMesh->skeleton!=NULL){
@@ -188,12 +190,7 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 			}
 		}
 
-		if(subMesh->meshSubMesh->transform!=NULL){
-			subMesh->worldTransform=Transform::ptr(new Transform());
-		}
-		if(subMesh->meshSubMesh->bound!=NULL){
-			subMesh->worldBound=Bound::ptr(new Bound());
-		}
+		subMesh->hasOwnTransform=subMesh->meshSubMesh->hasOwnTransform;
 	}
 }
 
@@ -258,15 +255,9 @@ void MeshNode::updateWorldTransform(){
 	int i;
 	for(i=0;i<mSubMeshes.size();++i){
 		SubMesh *subMesh=mSubMeshes[i];
-		if(subMesh->worldTransform!=NULL){
-			subMesh->worldTransform->transform(mWorldTransform,subMesh->worldTransform);
-
-			if(subMesh->worldBound!=NULL){
-				subMesh->worldBound->transform(subMesh->meshSubMesh->bound,subMesh->worldTransform);
-			}
-		}
-		else if(subMesh->worldBound!=NULL){
-			subMesh->worldBound->transform(subMesh->meshSubMesh->bound,mWorldTransform);
+		if(subMesh->hasOwnTransform){
+			subMesh->worldTransform.setTransform(mWorldTransform,subMesh->worldTransform);
+			subMesh->worldBound.transform(subMesh->meshSubMesh->bound,subMesh->worldTransform);
 		}
 	}
 }
@@ -281,12 +272,7 @@ void MeshNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 	int i;
 	for(i=0;i<mSubMeshes.size();++i){
 		SubMesh *subMesh=mSubMeshes[i];
-		if(subMesh->worldBound!=NULL){
-			if(camera->culled(subMesh->worldBound)==false){
-				set->queueRenderable(subMesh);
-			}
-		}
-		else{
+		if(subMesh->hasOwnTransform==false || camera->culled(subMesh->worldBound)==false){
 			set->queueRenderable(subMesh);
 		}
 	}

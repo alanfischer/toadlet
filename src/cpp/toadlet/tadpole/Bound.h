@@ -34,8 +34,6 @@ namespace tadpole{
 
 class TOADLET_API Bound{
 public:
-	TOADLET_SHARED_POINTERS(Bound);
-
 	enum Type{
 		Type_AABOX=			1<<0,
 		Type_SPHERE=		1<<1,
@@ -50,10 +48,10 @@ public:
 		mType(type)
 	{}
 
-	Bound(Bound *bound):
-		mType(bound->mType),
-		mSphere(bound->mSphere),
-		mBox(bound->mBox)
+	Bound(const Bound &bound):
+		mType(bound.mType),
+		mSphere(bound.mSphere),
+		mBox(bound.mBox)
 	{}
 
 	Bound(const AABox &box):
@@ -72,10 +70,10 @@ public:
 		mBox.reset();
 	}
 
-	void set(Bound *b){
-		mType=b->mType;
-		mSphere.set(b->mSphere);
-		mBox.set(b->mBox);
+	void set(const Bound &b){
+		mType=b.mType;
+		mSphere.set(b.mSphere);
+		mBox.set(b.mBox);
 	}
 
 	void setInfinite(){
@@ -116,30 +114,30 @@ public:
 		update();
 	}
 
-	void merge(Bound *b,scalar epsilon){
-		if(mType==Type_INFINITE || b->mType==Type_INFINITE){
+	void merge(const Bound &b,scalar epsilon){
+		if(mType==Type_INFINITE || b.mType==Type_INFINITE){
 			mType=Type_INFINITE;
 		}
-		else if(mType==Type_AABOX && b->mType==Type_AABOX){
-			mBox.merge(b->mBox);
+		else if(mType==Type_AABOX && b.mType==Type_AABOX){
+			mBox.merge(b.mBox);
 		}
 		else{
 			// Just switch to a sphere
 			mType=Type_SPHERE;
-			mSphere.merge(b->mSphere,epsilon);
+			mSphere.merge(b.mSphere,epsilon);
 		}
 		update();
 	}
 
-	bool testIntersection(Bound *b) const{
-		if(mType==Type_INFINITE || b->mType==Type_INFINITE){
+	bool testIntersection(const Bound &b) const{
+		if(mType==Type_INFINITE || b.mType==Type_INFINITE){
 			return true;
 		}
-		else if(mType==Type_AABOX && b->mType==Type_AABOX){
-			return testIntersection(b->mBox);
+		else if(mType==Type_AABOX && b.mType==Type_AABOX){
+			return testIntersection(b.mBox);
 		}
 		else{
-			return testIntersection(b->mSphere);
+			return testIntersection(b.mSphere);
 		}
 	}
 
@@ -176,23 +174,23 @@ public:
 	const Sphere &getSphere() const{return mSphere;}
 	const AABox &getAABox() const{return mBox;}
 
-	void transform(Bound *source,Transform *transform){
-		mType=source->mType;
+	void transform(const Bound &source,const Transform &transform){
+		mType=source.mType;
 
-		const Vector3 &translate=transform->getTranslate();
-		const Quaternion &rotate=transform->getRotate();
-		const Vector3 &scale=transform->getScale();
+		const Vector3 &translate=transform.getTranslate();
+		const Quaternion &rotate=transform.getRotate();
+		const Vector3 &scale=transform.getScale();
 
-		if(source->mType==Type_SPHERE){
-			Math::mul(mSphere.origin,scale,source->mSphere.radius);
+		if(source.mType==Type_SPHERE){
+			Math::mul(mSphere.origin,scale,source.mSphere.radius);
 			mSphere.radius=Math::maxVal(Math::maxVal(mSphere.origin.x,mSphere.origin.y),mSphere.origin.z);
-			Math::mul(mSphere.origin,rotate,source->mSphere.origin);
+			Math::mul(mSphere.origin,rotate,source.mSphere.origin);
 			Math::mul(mSphere.origin,scale);
 			Math::add(mSphere.origin,translate);
 		}
-		else if(source->mType==Type_AABOX){
-			Math::mul(mBox.mins,source->mBox.mins,scale);
-			Math::mul(mBox.maxs,source->mBox.maxs,scale);
+		else if(source.mType==Type_AABOX){
+			Math::mul(mBox.mins,source.mBox.mins,scale);
+			Math::mul(mBox.maxs,source.mBox.maxs,scale);
 			Math::add(mBox,translate);
 		}
 		update();

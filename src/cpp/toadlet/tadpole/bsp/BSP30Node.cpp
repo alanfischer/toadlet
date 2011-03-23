@@ -114,7 +114,7 @@ void BSP30ModelNode::setModel(BSP30Map::ptr map,int index){
 
 	bmodel *model=&mMap->models[mModelIndex];
 
-	mBound->set(model->mins,model->maxs);
+	mBound.set(model->mins,model->maxs);
 	int i,j;
 	for(i=0;i<model->numfaces;++i){
 		bface *face=&map->faces[model->firstface+i];
@@ -164,7 +164,10 @@ void BSP30ModelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 
 void BSP30ModelNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
 	Segment localSegment;
-	Transform::inverseTransform(localSegment,segment,position,mWorldTransform->getScale(),mWorldTransform->getRotate());
+	Transform transform;
+
+	transform.set(position,mWorldTransform.getScale(),mWorldTransform.getRotate());
+	transform.transform(localSegment,segment);
 
 	result.time=Math::ONE;
 	localSegment.getEndPoint(result.point);
@@ -176,8 +179,8 @@ void BSP30ModelNode::traceSegment(Collision &result,const Vector3 &position,cons
 	}
 
 	if(result.time<Math::ONE){
-		mWorldTransform->transformNormal(result.normal);
-		Transform::transform(result.point,position,mWorldTransform->getScale(),mWorldTransform->getRotate());
+		transform.transform(result.point);
+		transform.transformNormal(result.normal);
 	}
 }
 
@@ -409,7 +412,7 @@ void BSP30Node::gatherRenderables(CameraNode *camera,RenderableSet *set){
 	}
 }
 
-bool BSP30Node::senseBoundingVolumes(SensorResultsListener *listener,Bound *bound){
+bool BSP30Node::senseBoundingVolumes(SensorResultsListener *listener,const Bound &bound){
 	if(mMap==NULL){
 		return false;
 	}
@@ -419,7 +422,7 @@ bool BSP30Node::senseBoundingVolumes(SensorResultsListener *listener,Bound *boun
 	mCounter++;
 	Collection<int> &newIndexes=mLeafIndexes; 
 	newIndexes.clear();
-	const AABox &box=bound->getAABox();
+	const AABox &box=bound.getAABox();
 	Vector3 origin;
 	Math::sub(origin,box.maxs,box.mins);
 	Math::mul(origin,Math::HALF);
@@ -434,7 +437,7 @@ bool BSP30Node::senseBoundingVolumes(SensorResultsListener *listener,Bound *boun
 		for(j=0;j<occupants.size();++j){
 			Node *occupant=occupants[j];
 			childdata *data=(childdata*)occupant->getParentData();
-			if(data->counter!=mCounter && occupant->getWorldBound()->testIntersection(bound)){
+			if(data->counter!=mCounter && occupant->getWorldBound().testIntersection(bound)){
 				data->counter=mCounter;
 				result|=true;
 				if(listener->resultFound(occupant,Math::lengthSquared(origin,occupant->getWorldTranslate()))==false){
@@ -448,7 +451,7 @@ bool BSP30Node::senseBoundingVolumes(SensorResultsListener *listener,Bound *boun
 	for(j=0;j<occupants.size();++j){
 		Node *occupant=occupants[j];
 		childdata *data=(childdata*)occupant->getParentData();
-		if(data->counter!=mCounter && occupant->getWorldBound()->testIntersection(bound)){
+		if(data->counter!=mCounter && occupant->getWorldBound().testIntersection(bound)){
 			data->counter=mCounter;
 			result|=true;
 			if(listener->resultFound(occupant,Math::lengthSquared(origin,occupant->getWorldTranslate()))==false){
@@ -608,7 +611,7 @@ void BSP30Node::addLeafToVisible(bleaf *leaf,CameraNode *camera){
 }
 
 void BSP30Node::findBoundLeafs(egg::Collection<int> &leafs,Node *node){
-	const AABox &box=node->getWorldBound()->getAABox();
+	const AABox &box=node->getWorldBound().getAABox();
 	// If the radius is infinite or greater than our threshold, assume its global
 	scalar threshold=512;
 	if(box.maxs.x-box.mins.x>=threshold || box.maxs.y-box.mins.y>=threshold || box.maxs.z-box.mins.z>=threshold){
