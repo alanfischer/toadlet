@@ -46,6 +46,7 @@
 
 using namespace toadlet;
 using namespace toadlet::egg;
+using namespace toadlet::egg::image;
 using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 using namespace toadlet::tadpole;
@@ -80,8 +81,8 @@ X11Application::X11Application():
 	mWidth(-1),
 	mHeight(-1),
 	mFullscreen(false),
-	//mVisual(),
-	mApplicationListener(NULL),
+	//mFormat,
+	mListener(NULL),
 	mDifferenceMouse(false),
 	mLastXMouse(0),mLastYMouse(0),
 	mSkipNextMove(false),
@@ -100,6 +101,17 @@ X11Application::X11Application():
 {
 	x11=new X11Attributes();
 	memset(x11,0,sizeof(X11Attributes));
+
+	mFormat=WindowRenderTargetFormat::ptr(new WindowRenderTargetFormat());
+	mFormat->pixelFormat=ImageDefinitions::Format_RGBA_8;
+	mFormat->depthBits=16;
+	mFormat->multisamples=2;
+	mFormat->threads=2;
+	#if defined(TOADLET_DEBUG)
+		mFormat->debug=true;
+	#else
+		mFormat->debug=false;
+	#endif
 }
 
 X11Application::~X11Application(){
@@ -313,7 +325,7 @@ bool X11Application::createWindow(){
 		// Antialiasing should work with an nvidia card and nvidia glxvpenis
 		x11->mOriginalEnv.antialiasing = getenv("__GL_FSAA_MODE");
 		if(x11->mOriginalEnv.antialiasing==NULL){
-			if(mVisual.multisamples>1){
+			if(mFormat->multisamples>1){
 				setenv("__GL_FSAA_MODE","4",1);
 				Logger::alert(Categories::TOADLET_PAD,
 					"Antialiasing attempted with __GL_FSAA_MODE = 4");
@@ -326,7 +338,7 @@ bool X11Application::createWindow(){
 		// Setup vblank syncing for a smoother display
 		x11->mOriginalEnv.vblank = getenv("__GL_SYNC_TO_VBLANK");
 		if(x11->mOriginalEnv.vblank==NULL){
-			if(mVisual.vsync){
+			if(mFormat->vsync){
 				setenv("__GL_SYNC_TO_VBLANK","1",1);
 			}
 			else{
@@ -596,22 +608,6 @@ bool X11Application::getFullscreen() const{
 	return mFullscreen;
 }
 
-void X11Application::setVisual(const peeper::Visual &visual){
-	mVisual=visual;
-}
-
-const peeper::Visual &X11Application::getVisual() const{
-	return mVisual;
-}
-
-void X11Application::setApplicationListener(ApplicationListener *listener){
-	mApplicationListener=listener;
-}
-
-ApplicationListener *X11Application::getApplicationListener() const{
-	return mApplicationListener;
-}
-
 RenderTarget *X11Application::makeRenderTarget(){
 	#if defined(TOADLET_HAS_OPENGL)
 		return new GLXWindowRenderTarget(x11->mWindow,x11->mDisplay,x11->mVisualInfo);
@@ -775,68 +771,68 @@ void X11Application::configured(int x,int y,int width,int height){
 }
 
 void X11Application::resized(int width,int height){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->resized(width,height);
+	if(mListener!=NULL){
+		mListener->resized(width,height);
 	}
 }
 
 void X11Application::focusGained(){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->focusGained();
+	if(mListener!=NULL){
+		mListener->focusGained();
 	}
 }
 
 void X11Application::focusLost(){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->focusLost();
+	if(mListener!=NULL){
+		mListener->focusLost();
 	}
 }
 
 void X11Application::keyPressed(int key){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->keyPressed(key);
+	if(mListener!=NULL){
+		mListener->keyPressed(key);
 	}
 }
 
 void X11Application::keyReleased(int key){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->keyReleased(key);
+	if(mListener!=NULL){
+		mListener->keyReleased(key);
 	}
 }
 
 void X11Application::mousePressed(int x,int y,int button){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->mousePressed(x,y,button);
+	if(mListener!=NULL){
+		mListener->mousePressed(x,y,button);
 	}
 }
 
 void X11Application::mouseMoved(int x,int y){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->mouseMoved(x,y);
+	if(mListener!=NULL){
+		mListener->mouseMoved(x,y);
 	}
 }
 
 void X11Application::mouseReleased(int x,int y,int button){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->mouseReleased(x,y,button);
+	if(mListener!=NULL){
+		mListener->mouseReleased(x,y,button);
 	}
 }
 
 void X11Application::mouseScrolled(int x,int y,int scroll){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->mouseScrolled(x,y,scroll);
+	if(mListener!=NULL){
+		mListener->mouseScrolled(x,y,scroll);
 	}
 }
 
 void X11Application::update(int dt){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->update(dt);
+	if(mListener!=NULL){
+		mListener->update(dt);
 	}
 }
 
 void X11Application::render(Renderer *renderer){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->render(renderer);
+	if(mListener!=NULL){
+		mListener->render(renderer);
 	}
 }
 

@@ -139,7 +139,7 @@ Win32Application::Win32Application():
 	mHeight(-1),
 	mFullscreen(false),
 	//mFormat,
-	mApplicationListener(NULL),
+	mListener(NULL),
 	mDifferenceMouse(false),
 	mLastXMouse(0),mLastYMouse(0),
 	mSkipNextMove(false),
@@ -661,103 +661,87 @@ bool Win32Application::getFullscreen() const{
 	return mFullscreen;
 }
 
-void Win32Application::setWindowRenderTargetFormat(WindowRenderTargetFormat::ptr format){
-	mFormat=format;
-}
-
-WindowRenderTargetFormat::ptr Win32Application::getWindowRenderTargetFormat() const{
-	return mFormat;
-}
-
-void Win32Application::setApplicationListener(ApplicationListener *listener){
-	mApplicationListener=listener;
-}
-
-ApplicationListener *Win32Application::getApplicationListener() const{
-	return mApplicationListener;
-}
-
 void Win32Application::resized(int width,int height){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->resized(width,height);
+	if(mListener!=NULL){
+		mListener->resized(width,height);
 	}
 }
 
 void Win32Application::focusGained(){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->focusGained();
+	if(mListener!=NULL){
+		mListener->focusGained();
 	}
 }
 
 void Win32Application::focusLost(){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->focusLost();
+	if(mListener!=NULL){
+		mListener->focusLost();
 	}
 }
 
 void Win32Application::keyPressed(int key){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->keyPressed(key);
+	if(mListener!=NULL){
+		mListener->keyPressed(key);
 	}
 }
 
 void Win32Application::keyReleased(int key){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->keyReleased(key);
+	if(mListener!=NULL){
+		mListener->keyReleased(key);
 	}
 }
 
 void Win32Application::mousePressed(int x,int y,int button){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->mousePressed(x,y,button);
+	if(mListener!=NULL){
+		mListener->mousePressed(x,y,button);
 	}
 }
 
 void Win32Application::mouseMoved(int x,int y){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->mouseMoved(x,y);
+	if(mListener!=NULL){
+		mListener->mouseMoved(x,y);
 	}
 }
 
 void Win32Application::mouseReleased(int x,int y,int button){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->mouseReleased(x,y,button);
+	if(mListener!=NULL){
+		mListener->mouseReleased(x,y,button);
 	}
 }
 
 void Win32Application::mouseScrolled(int x,int y,int scroll){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->mouseScrolled(x,y,scroll);
+	if(mListener!=NULL){
+		mListener->mouseScrolled(x,y,scroll);
 	}
 }
 
 void Win32Application::joyPressed(int button){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->joyPressed(button);
+	if(mListener!=NULL){
+		mListener->joyPressed(button);
 	}
 }
 
 void Win32Application::joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->joyMoved(x,y,z,r,u,v);
+	if(mListener!=NULL){
+		mListener->joyMoved(x,y,z,r,u,v);
 	}
 }
 
 void Win32Application::joyReleased(int button){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->joyReleased(button);
+	if(mListener!=NULL){
+		mListener->joyReleased(button);
 	}
 }
 
 void Win32Application::update(int dt){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->update(dt);
+	if(mListener!=NULL){
+		mListener->update(dt);
 	}
 }
 
 void Win32Application::render(Renderer *renderer){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->render(renderer);
+	if(mListener!=NULL){
+		mListener->render(renderer);
 	}
 }
 
