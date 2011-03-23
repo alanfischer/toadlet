@@ -77,6 +77,7 @@ public:
 	typedef egg::Collection<RenderableQueueItem> RenderableQueue;
 	typedef egg::Collection<LightQueueItem> LightQueue;
 	typedef egg::Map<Material*,int> MaterialToQueueIndexMap;
+	typedef egg::Collection<int> IndexCollection;
 
 	RenderableSet(Scene *scene);
 	virtual ~RenderableSet();
@@ -90,6 +91,7 @@ public:
 	inline const RenderableQueue &getDepthSortedQueue() const{return mRenderableQueues[0];}
 	inline const RenderableQueue &getRenderableQueue(int i) const{return mRenderableQueues[i];}
 	inline const MaterialToQueueIndexMap &getMaterialToQueueIndexMap() const{return mMaterialToQueueIndexMap;}
+	inline const IndexCollection &getLayerSortedQueueIndexes() const{return mLayerSortedQueueIndexes;}
 	inline const LightQueue &getLightQueue(){return mLightQueue;}
 
 protected:
@@ -99,6 +101,7 @@ protected:
 	egg::Collection<RenderableQueue> mRenderableQueues;
 	int mRenderableQueueCount;
 	MaterialToQueueIndexMap mMaterialToQueueIndexMap;
+	IndexCollection mLayerSortedQueueIndexes;
 	LightQueue mLightQueue;
 };
 

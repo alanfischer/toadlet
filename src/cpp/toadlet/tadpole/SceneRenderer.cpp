@@ -63,6 +63,9 @@ void SceneRenderer::gatherRenderables(RenderableSet *set,Node *node,CameraNode *
 	set->setCamera(camera);
 
 	set->startQueuing();
+	if(node==mScene->getRoot()){
+		mScene->getBackground()->gatherRenderables(camera,set);
+	}
 	node->gatherRenderables(camera,set);
 	set->endQueuing();
 
@@ -73,7 +76,7 @@ void SceneRenderer::gatherRenderables(RenderableSet *set,Node *node,CameraNode *
 
 void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,CameraNode *camera){
 	Matrix4x4 matrix;
-	int i;
+	int i,j;
 
 	RenderListener *listener=mScene->getRenderListener();
 
@@ -100,17 +103,16 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 
 	setupLights(set->getLightQueue(),renderer);
 
-	const RenderableSet::MaterialToQueueIndexMap &materialQueueMap=set->getMaterialToQueueIndexMap();
-	RenderableSet::MaterialToQueueIndexMap::const_iterator it;
-	for(it=materialQueueMap.begin();it!=materialQueueMap.end();++it){
-		Material *material=it->first;
+	const RenderableSet::IndexCollection &sortedIndexes=set->getLayerSortedQueueIndexes();
+	for(j=0;j<sortedIndexes.size();++j){
+		const RenderableSet::RenderableQueue &renderableQueue=set->getRenderableQueue(sortedIndexes[j]);
+		Material *material=renderableQueue[0].material;
 
 		if(material!=NULL && mPreviousMaterial!=material){
 			material->setupRenderer(renderer,mPreviousMaterial);
 		}
 		mPreviousMaterial=material;
 
-		const RenderableSet::RenderableQueue &renderableQueue=set->getRenderableQueue(it->second);
 		for(i=0;i<renderableQueue.size();++i){
 			const RenderableSet::RenderableQueueItem &item=renderableQueue[i];
 			Renderable *renderable=item.renderable;

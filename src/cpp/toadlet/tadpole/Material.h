@@ -140,6 +140,9 @@ public:
 	bool setTextureStage(int stage,const peeper::TextureStage::ptr &textureStage);
 	inline const peeper::TextureStage::ptr &getTextureStage(int stage) const{return mTextureStages[stage];}
 
+	void setLayer(int layer){mLayer=layer;}
+	int getLayer() const{return mLayer;}
+
 	void setSaveLocally(bool local){mSaveLocally=local;}
 	bool getSaveLocally() const{return mSaveLocally;}
 
@@ -165,6 +168,7 @@ protected:
 	peeper::Renderer::DepthTest mDepthTest;
 	peeper::PointState mPointState;
 	egg::Collection<peeper::TextureStage::ptr> mTextureStages;
+	int mLayer;
 	bool mSaveLocally;
 };
 
