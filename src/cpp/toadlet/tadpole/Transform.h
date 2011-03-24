@@ -26,11 +26,13 @@
 #ifndef TOADLET_TADPOLE_TRANSFORM_H
 #define TOADLET_TADPOLE_TRANSFORM_H
 
+#include <toadlet/egg/io/DataStream.h>
 #include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
 namespace tadpole{
 
+/// @todo: Decide if this is a State style object, or a full Object
 class TOADLET_API Transform{
 public:
 	Transform():
@@ -154,6 +156,22 @@ public:
 		Math::mul(r.origin,invrot);
 		Math::mul(r.direction,invrot);
 		Math::div(r.direction,mScale);
+	}
+
+	int write(egg::io::DataStream *stream){
+		int amount=0;
+		amount+=stream->writeVector3(mTranslate);
+		amount+=stream->writeQuaternion(mRotate);
+		amount+=stream->writeVector3(mScale);
+		return amount;
+	}
+
+	int read(egg::io::DataStream *stream){
+		int amount=0;
+		amount+=stream->readVector3(mTranslate);
+		amount+=stream->readQuaternion(mRotate);
+		amount+=stream->readVector3(mScale);
+		return amount;
 	}
 
 protected:

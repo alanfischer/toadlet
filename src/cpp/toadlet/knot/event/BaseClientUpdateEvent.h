@@ -55,17 +55,17 @@ public:
 
 	virtual int read(egg::io::DataStream *stream){
 		int amount=0;
-		amount+=stream->readBigInt32(mClientFrameNumber);
-		amount+=stream->readBigInt32(mLastServerFrameNumber);
-		amount+=stream->readBigInt32(mDT);
+		mClientFrameNumber=stream->readBInt32();amount+=4;
+		mLastServerFrameNumber=stream->readBInt32();amount+=4;
+		mDT=stream->readBInt32();amount+=4;
 		return amount;
 	}
 
 	virtual int write(egg::io::DataStream *stream){
 		int amount=0;
-		amount+=stream->writeBigInt32(mClientFrameNumber);
-		amount+=stream->writeBigInt32(mLastServerFrameNumber);
-		amount+=stream->writeBigInt32(mDT);
+		amount+=stream->writeBInt32(mClientFrameNumber);
+		amount+=stream->writeBInt32(mLastServerFrameNumber);
+		amount+=stream->writeBInt32(mDT);
 		return amount;
 	}
 

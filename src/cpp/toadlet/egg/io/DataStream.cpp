@@ -44,28 +44,16 @@ DataStream::DataStream(Stream::ptr stream){
 DataStream::~DataStream(){
 }
 
-int DataStream::readBool(bool &b){
-	return mStream->read((tbyte*)&b,1);
-}
-
 bool DataStream::readBool(){
 	bool b=false;
 	mStream->read((tbyte*)&b,1);
 	return b;
 }
 
-int DataStream::readUInt8(uint8 &i){
-	return mStream->read((tbyte*)&i,sizeof(i));
-}
-
 uint8 DataStream::readUInt8(){
 	tbyte i=0;
 	mStream->read((tbyte*)&i,sizeof(i));
 	return i;
-}
-
-int DataStream::readInt8(int8 &i){
-	return mStream->read((tbyte*)&i,sizeof(i));
 }
 
 int8 DataStream::readInt8(){
@@ -102,112 +90,64 @@ String DataStream::readNullTerminatedString(){
 	return s;
 }
 
-int DataStream::readBigUInt16(uint16 &i){
-	int amt=mStream->read((tbyte*)&i,sizeof(i));
-	bigUInt16InPlace(i);
-	return amt;
-}
-
-uint16 DataStream::readBigUInt16(){
+uint16 DataStream::readBUInt16(){
 	uint16 i=0;
 	mStream->read((tbyte*)&i,sizeof(i));
 	bigUInt16InPlace(i);
 	return i;
 }
 
-int DataStream::readBigInt16(int16 &i){
-	int amt=mStream->read((tbyte*)&i,sizeof(i));
-	bigInt16InPlace(i);
-	return amt;
-}
-
-int16 DataStream::readBigInt16(){
+int16 DataStream::readBInt16(){
 	int16 i=0;
 	mStream->read((tbyte*)&i,sizeof(i));
 	bigInt16InPlace(i);
 	return i;
 }
 
-int DataStream::readBigUInt32(uint32 &i){
-	int amt=mStream->read((tbyte*)&i,sizeof(i));
-	bigUInt32InPlace(i);
-	return amt;
-}
-
-uint32 DataStream::readBigUInt32(){
+uint32 DataStream::readBUInt32(){
 	uint32 i=0;
 	mStream->read((tbyte*)&i,sizeof(i));
 	bigUInt32InPlace(i);
 	return i;
 }
 
-int DataStream::readBigInt32(int32 &i){
-	int amt=mStream->read((tbyte*)&i,sizeof(i));
-	bigInt32InPlace(i);
-	return amt;
-}
-
-int32 DataStream::readBigInt32(){
+int32 DataStream::readBInt32(){
 	int32 i=0;
 	mStream->read((tbyte*)&i,sizeof(i));
 	bigInt32InPlace(i);
 	return i;
 }
 
-int DataStream::readBigUInt64(uint64 &i){
-	int amt=mStream->read((tbyte*)&i,sizeof(i));
-	bigUInt64InPlace(i);
-	return amt;
-}
-
-uint64 DataStream::readBigUInt64(){
+uint64 DataStream::readBUInt64(){
 	uint64 i=0;
 	mStream->read((tbyte*)&i,sizeof(i));
 	bigUInt64InPlace(i);
 	return i;
 }
 
-int DataStream::readBigInt64(int64 &i){
-	int amt=mStream->read((tbyte*)&i,sizeof(i));
-	bigInt64InPlace(i);
-	return amt;
-}
-
-int64 DataStream::readBigInt64(){
+int64 DataStream::readBInt64(){
 	int64 i=0;
 	mStream->read((tbyte*)&i,sizeof(i));
 	bigInt64InPlace(i);
 	return i;
 }
 
-int DataStream::readBigFloat(float &f){
-	int amt=mStream->read((tbyte*)&f,sizeof(f));
-	bigFloatInPlace(f);
-	return amt;
-}
-
-float DataStream::readBigFloat(){
+float DataStream::readBFloat(){
 	float f=0;
 	mStream->read((tbyte*)&f,sizeof(f));
 	bigFloatInPlace(f);
 	return f;
 }
 
-int DataStream::readBigDouble(double &d){
-	int amt=mStream->read((tbyte*)&d,sizeof(d));
-	bigDoubleInPlace(d);
-	return amt;
-}
-
-double DataStream::readBigDouble(){
+double DataStream::readBDouble(){
 	double d=0;
 	mStream->read((tbyte*)&d,sizeof(d));
 	bigDoubleInPlace(d);
 	return d;
 }
 
-int DataStream::readBigInt16String(String &s){
-	int16 len=readBigInt16();
+int DataStream::readBInt16String(String &s){
+	int16 len=readBInt16();
 	int amt=2;
 	char *string=new char[len+1];
 	amt+=mStream->read((tbyte*)string,len);
@@ -217,118 +157,156 @@ int DataStream::readBigInt16String(String &s){
 	return amt;
 }
 
-String DataStream::readBigInt16String(){
+String DataStream::readBInt16String(){
 	String s;
-	readBigInt16String(s);
+	readBInt16String(s);
 	return s;
 }
 
-int DataStream::readLittleUInt16(uint16 &i){
-	int amt=mStream->read((tbyte*)&i,sizeof(i));
-	littleUInt16InPlace(i);
-	return amt;
-}
-
-uint16 DataStream::readLittleUInt16(){
+uint16 DataStream::readLUInt16(){
 	uint16 i=0;
 	mStream->read((tbyte*)&i,sizeof(i));
 	littleUInt16InPlace(i);
 	return i;
 }
 
-int DataStream::readLittleInt16(int16 &i){
-	int amt=mStream->read((tbyte*)&i,sizeof(i));
-	littleInt16InPlace(i);
-	return amt;
-}
-
-int16 DataStream::readLittleInt16(){
+int16 DataStream::readLInt16(){
 	int16 i=0;
 	mStream->read((tbyte*)&i,sizeof(i));
 	littleInt16InPlace(i);
 	return i;
 }
 
-int DataStream::readLittleUInt32(uint32 &i){
-	int amt=mStream->read((tbyte*)&i,sizeof(i));
-	littleUInt32InPlace(i);
-	return amt;
-}
-
-uint32 DataStream::readLittleUInt32(){
+uint32 DataStream::readLUInt32(){
 	uint32 i=0;
 	mStream->read((tbyte*)&i,sizeof(i));
 	littleUInt32InPlace(i);
 	return i;
 }
 
-int DataStream::readLittleInt32(int32 &i){
-	int amt=mStream->read((tbyte*)&i,sizeof(i));
-	littleInt32InPlace(i);
-	return amt;
-}
-
-int32 DataStream::readLittleInt32(){
+int32 DataStream::readLInt32(){
 	int32 i=0;
 	mStream->read((tbyte*)&i,sizeof(i));
 	littleInt32InPlace(i);
 	return i;
 }
 
-int DataStream::readLittleUInt64(uint64 &i){
-	int amt=mStream->read((tbyte*)&i,sizeof(i));
-	littleUInt64InPlace(i);
-	return amt;
-}
-
-uint64 DataStream::readLittleUInt64(){
+uint64 DataStream::readLUInt64(){
 	uint64 i=0;
 	mStream->read((tbyte*)&i,sizeof(i));
 	littleUInt64InPlace(i);
 	return i;
 }
 
-int DataStream::readLittleInt64(int64 &i){
-	int amt=mStream->read((tbyte*)&i,sizeof(i));
-	littleInt64InPlace(i);
-	return amt;
-}
-
-int64 DataStream::readLittleInt64(){
+int64 DataStream::readLInt64(){
 	int64 i=0;
 	mStream->read((tbyte*)&i,sizeof(i));
 	littleInt64InPlace(i);
 	return i;
 }
 
-int DataStream::readLittleFloat(float &f){
-	int amt=mStream->read((tbyte*)&f,sizeof(f));
-	littleFloatInPlace(f);
-	return amt;
-}
-
-float DataStream::readLittleFloat(){
+float DataStream::readLFloat(){
 	float f=0;
 	mStream->read((tbyte*)&f,sizeof(f));
 	littleFloatInPlace(f);
 	return f;
 }
 
-int DataStream::readLittleDouble(double &d){
-	int amt=mStream->read((tbyte*)&d,sizeof(d));
-	littleDoubleInPlace(d);
-	return amt;
-}
-
-double DataStream::readLittleDouble(){
+double DataStream::readLDouble(){
 	double d=0;
 	mStream->read((tbyte*)&d,sizeof(d));
 	littleDoubleInPlace(d);
 	return d;
 }
 
-int DataStream::readLittleInt16String(String &s){
-	int16 len=readLittleInt16();
+int DataStream::readLVector2(math::Vector2 &v){
+	v.x=readLFloat();
+	v.y=readLFloat();
+	return 4*2;
+}
+
+int DataStream::readLVector3(math::Vector3 &v){
+	v.x=readLFloat();
+	v.y=readLFloat();
+	v.z=readLFloat();
+	return 4*3;
+}
+
+int DataStream::readLVector4(math::Vector4 &v){
+	v.x=readLFloat();
+	v.y=readLFloat();
+	v.z=readLFloat();
+	v.w=readLFloat();
+	return 4*4;
+}
+
+int DataStream::readLQuaternion(math::Quaternion &q){
+	q.x=readLFloat();
+	q.y=readLFloat();
+	q.z=readLFloat();
+	q.w=readLFloat();
+	return 4*4;
+}
+
+int DataStream::readLAABox(math::AABox &a){
+	int amount=0;
+	amount+=readLVector3(a.mins);
+	amount+=readLVector3(a.maxs);
+	return amount;
+}
+
+int DataStream::readLSphere(math::Sphere &s){
+	int amount=0;
+	amount+=readLVector3(s.origin);
+	s.radius=readLFloat();amount+=4;
+	return amount;
+}
+
+int DataStream::readLVector2(mathfixed::Vector2 &v){
+	v.x=readLInt32();
+	v.y=readLInt32();
+	return 4*2;
+}
+
+int DataStream::readLVector3(mathfixed::Vector3 &v){
+	v.x=readLInt32();
+	v.y=readLInt32();
+	v.z=readLInt32();
+	return 4*3;
+}
+
+int DataStream::readLVector4(mathfixed::Vector4 &v){
+	v.x=readLInt32();
+	v.y=readLInt32();
+	v.z=readLInt32();
+	v.w=readLInt32();
+	return 4*4;
+}
+
+int DataStream::readLQuaternion(mathfixed::Quaternion &q){
+	q.x=readLInt32();
+	q.y=readLInt32();
+	q.z=readLInt32();
+	q.w=readLInt32();
+	return 4*4;
+}
+
+int DataStream::readLAABox(mathfixed::AABox &a){
+	int amount=0;
+	amount+=readLVector3(a.mins);
+	amount+=readLVector3(a.maxs);
+	return amount;
+}
+
+int DataStream::readLSphere(mathfixed::Sphere &s){
+	int amount=0;
+	amount+=readLVector3(s.origin);
+	s.radius=readLInt32();amount+=4;
+	return amount;
+}
+
+int DataStream::readLInt16String(String &s){
+	int16 len=readLInt16();
 	int amt=2;
 	char *string=new char[len+1];
 	amt+=mStream->read((tbyte*)string,len);
@@ -338,9 +316,9 @@ int DataStream::readLittleInt16String(String &s){
 	return amt;
 }
 
-String DataStream::readLittleInt16String(){
+String DataStream::readLInt16String(){
 	String s;
-	readLittleInt16String(s);
+	readLInt16String(s);
 	return s;
 }
 
@@ -360,106 +338,294 @@ int DataStream::writeNullTerminatedString(const String &s){
 	return mStream->write((tbyte*)s.c_str(),s.length()+1);
 }
 
-int DataStream::writeBigUInt16(uint16 i){
+int DataStream::writeBUInt16(uint16 i){
 	bigUInt16InPlace(i);
 	return mStream->write((tbyte*)&i,sizeof(i));
 }
 
-int DataStream::writeBigInt16(int16 i){
+int DataStream::writeBInt16(int16 i){
 	bigInt16InPlace(i);
 	return mStream->write((tbyte*)&i,sizeof(i));
 }
 
-int DataStream::writeBigUInt32(uint32 i){
+int DataStream::writeBUInt32(uint32 i){
 	bigUInt32InPlace(i);
 	return mStream->write((tbyte*)&i,sizeof(i));
 }
 
-int DataStream::writeBigInt32(int32 i){
+int DataStream::writeBInt32(int32 i){
 	bigInt32InPlace(i);
 	return mStream->write((tbyte*)&i,sizeof(i));
 }
 
-int DataStream::writeBigUInt64(uint64 i){
+int DataStream::writeBUInt64(uint64 i){
 	bigUInt64InPlace(i);
 	return mStream->write((tbyte*)&i,sizeof(i));
 }
 
-int DataStream::writeBigInt64(int64 i){
+int DataStream::writeBInt64(int64 i){
 	bigInt64InPlace(i);
 	return mStream->write((tbyte*)&i,sizeof(i));
 }
 
-int DataStream::writeBigFloat(float f){
+int DataStream::writeBFloat(float f){
 	bigFloatInPlace(f);
 	return mStream->write((tbyte*)&f,sizeof(f));
 }
 
-int DataStream::writeBigDouble(double d){
+int DataStream::writeBDouble(double d){
 	bigDoubleInPlace(d);
 	return mStream->write((tbyte*)&d,sizeof(d));
 }
 
-int DataStream::writeBigInt16String(const String &s){
+int DataStream::writeBVector2(const math::Vector2 &v){
+	int amount=0;
+	amount+=writeBFloat(v.x);
+	amount+=writeBFloat(v.y);
+	return amount;
+}
+
+int DataStream::writeBVector3(const math::Vector3 &v){
+	int amount=0;
+	amount+=writeBFloat(v.x);
+	amount+=writeBFloat(v.y);
+	amount+=writeBFloat(v.z);
+	return amount;
+}
+
+int DataStream::writeBVector4(const math::Vector4 &v){
+	int amount=0;
+	amount+=writeBFloat(v.x);
+	amount+=writeBFloat(v.y);
+	amount+=writeBFloat(v.z);
+	amount+=writeBFloat(v.w);
+	return amount;
+}
+
+int DataStream::writeBQuaternion(const math::Quaternion &q){
+	int amount=0;
+	amount+=writeBFloat(q.x);
+	amount+=writeBFloat(q.y);
+	amount+=writeBFloat(q.z);
+	amount+=writeBFloat(q.w);
+	return amount;
+}
+
+int DataStream::writeBAABox(const math::AABox &a){
+	int amount=0;
+	amount+=writeBVector3(a.mins);
+	amount+=writeBVector3(a.maxs);
+	return amount;
+}
+
+int DataStream::writeBSphere(const math::Sphere &s){
+	int amount=0;
+	amount+=writeBVector3(s.origin);
+	amount+=writeBFloat(s.radius);
+	return amount;
+}
+
+int DataStream::writeBVector2(const mathfixed::Vector2 &v){
+	int amount=0;
+	amount+=writeBInt32(v.x);
+	amount+=writeBInt32(v.y);
+	return amount;
+}
+
+int DataStream::writeBVector3(const mathfixed::Vector3 &v){
+	int amount=0;
+	amount+=writeBInt32(v.x);
+	amount+=writeBInt32(v.y);
+	amount+=writeBInt32(v.z);
+	return amount;
+}
+
+int DataStream::writeBVector4(const mathfixed::Vector4 &v){
+	int amount=0;
+	amount+=writeBInt32(v.x);
+	amount+=writeBInt32(v.y);
+	amount+=writeBInt32(v.z);
+	amount+=writeBInt32(v.w);
+	return amount;
+}
+
+int DataStream::writeBQuaternion(const mathfixed::Quaternion &q){
+	int amount=0;
+	amount+=writeBInt32(q.x);
+	amount+=writeBInt32(q.y);
+	amount+=writeBInt32(q.z);
+	amount+=writeBInt32(q.w);
+	return amount;
+}
+
+int DataStream::writeBAABox(const mathfixed::AABox &a){
+	int amount=0;
+	amount+=writeBVector3(a.mins);
+	amount+=writeBVector3(a.maxs);
+	return amount;
+}
+
+int DataStream::writeBSphere(const mathfixed::Sphere &s){
+	int amount=0;
+	amount+=writeBVector3(s.origin);
+	amount+=writeBInt32(s.radius);
+	return amount;
+}
+
+int DataStream::writeBInt16String(const String &s){
 	int len=s.length();
 	if(len>Extents::MAX_SHORT){
 		Error::unknown(Categories::TOADLET_EGG,
-			"DataStream::writeBigInt16String: String too large");
+			"DataStream::writeBInt16String: String too large");
 		return 0;
 	}
-	int amt=writeBigInt16(len);
+	int amt=writeBInt16(len);
 	amt+=mStream->write((tbyte*)s.c_str(),len);
 	return amt;
 }
 
-int DataStream::writeLittleUInt16(uint16 i){
+int DataStream::writeLUInt16(uint16 i){
 	littleUInt16InPlace(i);
 	return mStream->write((tbyte*)&i,sizeof(i));
 }
 
-int DataStream::writeLittleInt16(int16 i){
+int DataStream::writeLInt16(int16 i){
 	littleInt16InPlace(i);
 	return mStream->write((tbyte*)&i,sizeof(i));
 }
 
-int DataStream::writeLittleUInt32(uint32 i){
+int DataStream::writeLUInt32(uint32 i){
 	littleUInt32InPlace(i);
 	return mStream->write((tbyte*)&i,sizeof(i));
 }
 
-int DataStream::writeLittleInt32(int32 i){
+int DataStream::writeLInt32(int32 i){
 	littleInt32InPlace(i);
 	return mStream->write((tbyte*)&i,sizeof(i));
 }
 
-int DataStream::writeLittleUInt64(uint64 i){
+int DataStream::writeLUInt64(uint64 i){
 	littleUInt64InPlace(i);
 	return mStream->write((tbyte*)&i,sizeof(i));
 }
 
-int DataStream::writeLittleInt64(int64 i){
+int DataStream::writeLInt64(int64 i){
 	littleInt64InPlace(i);
 	return mStream->write((tbyte*)&i,sizeof(i));
 }
 
-int DataStream::writeLittleFloat(float f){
+int DataStream::writeLFloat(float f){
 	littleFloatInPlace(f);
 	return mStream->write((tbyte*)&f,sizeof(f));
 }
 
-int DataStream::writeLittleDouble(double d){
+int DataStream::writeLDouble(double d){
 	littleDoubleInPlace(d);
 	return mStream->write((tbyte*)&d,sizeof(d));
 }
 
-int DataStream::writeLittleInt16String(const String &s){
+int DataStream::writeLVector2(const math::Vector2 &v){
+	int amount=0;
+	amount+=writeLFloat(v.x);
+	amount+=writeLFloat(v.y);
+	return amount;
+}
+
+int DataStream::writeLVector3(const math::Vector3 &v){
+	int amount=0;
+	amount+=writeLFloat(v.x);
+	amount+=writeLFloat(v.y);
+	amount+=writeLFloat(v.z);
+	return amount;
+}
+
+int DataStream::writeLVector4(const math::Vector4 &v){
+	int amount=0;
+	amount+=writeLFloat(v.x);
+	amount+=writeLFloat(v.y);
+	amount+=writeLFloat(v.z);
+	amount+=writeLFloat(v.w);
+	return amount;
+}
+
+int DataStream::writeLQuaternion(const math::Quaternion &q){
+	int amount=0;
+	amount+=writeLFloat(q.x);
+	amount+=writeLFloat(q.y);
+	amount+=writeLFloat(q.z);
+	amount+=writeLFloat(q.w);
+	return amount;
+}
+
+int DataStream::writeLAABox(const math::AABox &a){
+	int amount=0;
+	amount+=writeLVector3(a.mins);
+	amount+=writeLVector3(a.maxs);
+	return amount;
+}
+
+int DataStream::writeLSphere(const math::Sphere &s){
+	int amount=0;
+	amount+=writeLVector3(s.origin);
+	amount+=writeLFloat(s.radius);
+	return amount;
+}
+
+int DataStream::writeLVector2(const mathfixed::Vector2 &v){
+	int amount=0;
+	amount+=writeLInt32(v.x);
+	amount+=writeLInt32(v.y);
+	return amount;
+}
+
+int DataStream::writeLVector3(const mathfixed::Vector3 &v){
+	int amount=0;
+	amount+=writeLInt32(v.x);
+	amount+=writeLInt32(v.y);
+	amount+=writeLInt32(v.z);
+	return amount;
+}
+
+int DataStream::writeLVector4(const mathfixed::Vector4 &v){
+	int amount=0;
+	amount+=writeLInt32(v.x);
+	amount+=writeLInt32(v.y);
+	amount+=writeLInt32(v.z);
+	amount+=writeLInt32(v.w);
+	return amount;
+}
+
+int DataStream::writeLQuaternion(const mathfixed::Quaternion &q){
+	int amount=0;
+	amount+=writeLInt32(q.x);
+	amount+=writeLInt32(q.y);
+	amount+=writeLInt32(q.z);
+	amount+=writeLInt32(q.w);
+	return amount;
+}
+
+int DataStream::writeLAABox(const mathfixed::AABox &a){
+	int amount=0;
+	amount+=writeLVector3(a.mins);
+	amount+=writeLVector3(a.maxs);
+	return amount;
+}
+
+int DataStream::writeLSphere(const mathfixed::Sphere &s){
+	int amount=0;
+	amount+=writeLVector3(s.origin);
+	amount+=writeLInt32(s.radius);
+	return amount;
+}
+
+int DataStream::writeLInt16String(const String &s){
 	int len=s.length();
 	if(len>Extents::MAX_SHORT){
 		Error::unknown(Categories::TOADLET_EGG,
-			"DataStream::writeLittleInt16String: String too large");
+			"DataStream::writeLInt16String: String too large");
 		return 0;
 	}
-	int amt=writeBigInt16(len);
+	int amt=writeLInt16(len);
 	amt+=mStream->write((tbyte*)s.c_str(),len);
 	return amt;
 }

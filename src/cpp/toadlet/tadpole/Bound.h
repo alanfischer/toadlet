@@ -26,6 +26,7 @@
 #ifndef TOADLET_TADPOLE_BOUND_H
 #define TOADLET_TADPOLE_BOUND_H
 
+#include <toadlet/egg/io/DataStream.h>
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/Transform.h>
 
@@ -194,6 +195,40 @@ public:
 			Math::add(mBox,translate);
 		}
 		update();
+	}
+
+	int write(egg::io::DataStream *stream){
+		int amount=0;
+		amount+=stream->writeUInt8(mType);
+		switch(mType){
+			case Type_AABOX:
+				amount+=stream->writeAABox(mBox);
+			break;
+			case Type_SPHERE:
+				amount+=stream->writeSphere(mSphere);
+			break;
+			case Type_INFINITE:
+				// Nothing
+			break;
+		}
+		return amount;
+	}
+
+	int read(egg::io::DataStream *stream){
+		int amount=0;
+		mType=(Type)stream->readUInt8();amount+=1;
+		switch(mType){
+			case Type_AABOX:
+				amount+=stream->readAABox(mBox);
+			break;
+			case Type_SPHERE:
+				amount+=stream->readSphere(mSphere);
+			break;
+			case Type_INFINITE:
+				// Nothing
+			break;
+		}
+		return amount;
 	}
 
 protected:

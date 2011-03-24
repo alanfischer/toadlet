@@ -356,7 +356,6 @@ int PeerPacketConnection::send(const tbyte *data,int length){
 int PeerPacketConnection::receive(tbyte *data,int length){
 	int index=mHalfWindowSize;
 
-//	if(mBlocking){
 	mMutex->lock();
 
 	if((mNewFrameBits&(0x1<<index))!=0 && mRemotePackets[index]->debugDeliverTime<=(int)System::mtime()){ // If the NewPacketBit for the current packet is on
@@ -464,15 +463,15 @@ String PeerPacketConnection::toBinaryString(int n){
 int PeerPacketConnection::buildConnectionPacket(DataStream *stream){
 	int size=0;
 
-	size+=stream->writeBigInt32(CONNECTION_FRAME);
+	size+=stream->writeBInt32(CONNECTION_FRAME);
 	size+=stream->write((tbyte*)CONNECTION_PACKET,CONNECTION_PACKET_LENGTH);
-	size+=stream->writeBigInt32(CONNECTION_VERSION);
+	size+=stream->writeBInt32(CONNECTION_VERSION);
 
 	return size; 
 }
 
 bool PeerPacketConnection::verifyConnectionPacket(DataStream *stream){
-	int header=stream->readBigInt32();
+	int header=stream->readBInt32();
 	if(header!=CONNECTION_FRAME){
 		return false;
 	}
@@ -483,7 +482,7 @@ bool PeerPacketConnection::verifyConnectionPacket(DataStream *stream){
 		return false;
 	}
 
-	int version=stream->readBigInt32();
+	int version=stream->readBInt32();
 	if(version!=CONNECTION_VERSION){
 		return false;
 	}
@@ -602,13 +601,13 @@ int PeerPacketConnection::sendPacketsToSocket(const toadlet::egg::Collection<Pee
 	PeerPacket *packet=packets[0];
 	int amount=0;
 
-	mDataOutPacket->writeBigInt32(packet->getFrame());
-	mDataOutPacket->writeBigInt32(packet->getFrameBits());
-	mDataOutPacket->writeBigInt32(packet->getFrameBitsReferenceFrame());
+	mDataOutPacket->writeBInt32(packet->getFrame());
+	mDataOutPacket->writeBInt32(packet->getFrameBits());
+	mDataOutPacket->writeBInt32(packet->getFrameBitsReferenceFrame());
 	mDataOutPacket->writeInt8(numPackets);
 	for(i=0;i<numPackets;++i){
 		packet=packets[i];
-		mDataOutPacket->writeBigInt16(packet->getDataLength());
+		mDataOutPacket->writeBInt16(packet->getDataLength());
 		if(mDataOutPacket->write(packet->getData(),packet->getDataLength())<packet->getDataLength()){
 			Error::unknown(Categories::TOADLET_KNOT,
 				"out packet buffer overflow");
@@ -644,15 +643,15 @@ int PeerPacketConnection::receivePacketsFromSocket(const toadlet::egg::Collectio
 	TOADLET_TRY
 		amount=mSocket->receive(mInPacket->getOriginalDataPointer(),mInPacket->length());
 		if(amount>0){
-			int frame=mDataInPacket->readBigInt32();
+			int frame=mDataInPacket->readBInt32();
 			if(frame>0){ // Is a data packet
-				int frameBits=mDataInPacket->readBigInt32();
-				int frameBitsReferenceFrame=mDataInPacket->readBigInt32();
+				int frameBits=mDataInPacket->readBInt32();
+				int frameBitsReferenceFrame=mDataInPacket->readBInt32();
 				numPackets=mDataInPacket->readInt8();
 				numPackets=maxNumPackets<numPackets?maxNumPackets:numPackets;
 
 				for(i=0;i<numPackets;++i){
-					int length=mDataInPacket->readBigInt16();
+					int length=mDataInPacket->readBInt16();
 
 					PeerPacket *packet=packets[i];
 					packet->setData(mInPacket->getCurrentDataPointer(),length);

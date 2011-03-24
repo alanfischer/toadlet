@@ -68,14 +68,14 @@ Image *TGAHandler::loadImage(Stream *stream){
 	int idLength=dataStream->readUInt8();
 	int colorMapType=dataStream->readUInt8();
 	int imageType=dataStream->readUInt8();
-	int colorMapStart=dataStream->readLittleUInt16();
-	int colorMapLength=dataStream->readLittleUInt16();
+	int colorMapStart=dataStream->readLUInt16();
+	int colorMapLength=dataStream->readLUInt16();
 	int colorMapBPP=dataStream->readUInt8();
 
-	int x=dataStream->readLittleUInt16();
-	int y=dataStream->readLittleUInt16();
-	int width=dataStream->readLittleUInt16();
-	int height=dataStream->readLittleUInt16();
+	int x=dataStream->readLUInt16();
+	int y=dataStream->readLUInt16();
+	int width=dataStream->readLUInt16();
+	int height=dataStream->readLUInt16();
 	int bpp=dataStream->readUInt8();
 	int descriptor=dataStream->readUInt8();
 
