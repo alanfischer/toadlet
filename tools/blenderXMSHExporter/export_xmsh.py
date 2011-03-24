@@ -67,25 +67,64 @@ def write(filename):
 				out.write('\t\t\t%f,%f,%f %f,%f,%f\n' % (vert.co.x,vert.co.y,vert.co.z,vert.no.x,vert.no.y,vert.no.z))
 			out.write('\t\t</Vertexes>\n')
 
-			# HACK: For now, we have one indexed submesh for the whole mesh.
-			# Ultimately, with blender it appears materials are assigned by faces. So we would need
-			# to loop through all of the faces that reference a material, and then form those faces into a submesh
-			# which we can then assign materials to.
-			out.write('\t\t<Submesh>\n')
-			
-			# compute the total number of indices
-			indicies=0
-			for face in mesh.faces:
-				indicies+=len(face.verts)
-			out.write('\t\t\t<Indexes Count=\"%d\">' % (indicies))
+			# Deal with materials, if present
+			if len(mesh.materials)==0:
+				# No materials are present, so dump all faces to the same submesh with an empty material
+				out.write('\t\t<SubMesh>\n')
+				indicies=0
+				for face in mesh.faces:
+					indicies+=len(face.verts)
+				out.write('\t\t\t<Indexes Count=\"%d\">' % (indicies))
+				for face in mesh.faces:
+					for vert in face.verts:
+						out.write('%d '% (vert.index))
+				out.write('</Indexes>\n')
+				out.write('\t\t\t<Material Name="">\n')
+				out.write('\t\t\t</Material>\n')
+				out.write('\t\t</SubMesh>\n')
+				
+			else:
+				# Generate list of face vertex indices by material
+				matFaceIndicies=[[] for i in range(len(mesh.materials))]
+				for face in mesh.faces:
+					for vert in face.verts:
+						matFaceIndicies[face.mat].append(vert.index)
 
-			# export all vertices from each face
-			for face in mesh.faces:
-				for vert in face.verts:
-					out.write('%d '% (vert.index))
-			out.write('</Indexes>\n')
-			out.write('\t\t</Submesh>\n')
+				# Write out one submesh per mesh material
+				for i in range(len(matFaceIndicies)):
+					submesh=matFaceIndicies[i]
+					out.write('\t\t<SubMesh>\n')
+					out.write('\t\t\t<Indexes Count=\"%d\">' % (len(submesh)))
+					for index in submesh:
+						out.write('%d ' % (index))
+					out.write('\t\t\t</Indexes>\n')
+
+					mat=mesh.materials[i]
+					if mat:
+						out.write('\t\t\t<Material Name=\"%s\">\n' % (mat.name))
+						
+						# TODO: Right now the mapping of blender material lightning effects to toadlet XMSH is unclear
+						out.write('\t\t\t\t<LightEffect>\n')
+						out.write('\t\t\t\t\t<Ambient>%f,%f,%f,%f</Ambient>\n' % (mat.getRGBCol()[0],mat.getRGBCol()[1],mat.getRGBCol()[2],mat.getAlpha()))
+						out.write('\t\t\t\t\t<Diffuse>%f,%f,%f,%f</Diffuse>\n' % (mat.getRGBCol()[0],mat.getRGBCol()[1],mat.getRGBCol()[2],mat.getAlpha()))
+						out.write('\t\t\t\t\t<Specular>%f,%f,%f,%f</Specular>\n' % (mat.getSpecCol()[0],mat.getSpecCol()[1],mat.getSpecCol()[2],mat.getAlpha()))
+						out.write('\t\t\t\t\t<Shininess>%f,%f,%f,%f</Shininess>\n' % (mat.getMirCol()[0],mat.getMirCol()[1],mat.getMirCol()[2],mat.getAlpha()))
+						out.write('\t\t\t\t\t<Emmissive>%f,%f,%f,%f</Emmissive>\n' % (mat.getEmit(),mat.getEmit(),mat.getEmit(),mat.getAlpha()))
+						out.write('\t\t\t\t</LightEffect>\n')
+
+						# TODO: Right now if a material is set to SHADELESS it is unlit, otherwise light affects it
+						if mat.getMode() & Blender.Material.Modes['SHADELESS']:
+							out.write('\t\t\t\t<Lighting>false</Lighting>\n')
+						else:
+							out.write('\t\t\t\t<Lighting>true</Lighting>\n')
+
+						# TODO: No idea with this one, how does blender cull?
+						out.write('\t\t\t\t<FaceCulling>back</FaceCulling>\n')
+						out.write('\t\t\t</Material>\n')
+					out.write('\t\t</SubMesh>\n')
+
 			out.write('\t</Mesh>\n')
+
 	out.write('</XMSH>\n')
 	out.close()
 
