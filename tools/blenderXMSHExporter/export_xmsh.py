@@ -6,14 +6,49 @@ Blender: 249
 Group: 'Export'
 Tooltip: 'Toadlet XMSH exporter'
 """
+
+__author__ = "Andrew Fischer"
+__url__ = ['http://code.google.com/p/toadlet','www.blender.org']
+__version__ = "1.0"
+
+__bpydoc__ = """\
+This script exports a toadlet XMSH file.
+
+Usage:
+
+Select the objects you wish to export and run this script fromt he "File->Export" menu.
+"""
+
+#********** Copyright header - do not remove **********
+#*
+#* The Toadlet Engine
+#*
+#* Copyright 2009, Lightning Toads Productions, LLC
+#*
+#* Author(s): Alan Fischer, Andrew Fischer
+#*
+#* This file is part of The Toadlet Engine.
+#*
+#* The Toadlet Engine is free software: you can redistribute it and/or modify
+#* it under the terms of the GNU Lesser General Public License as published by
+#* the Free Software Foundation, either version 3 of the License, or
+#* (at your option) any later version.
+#*
+#* The Toadlet Engine is distributed in the hope that it will be useful,
+#* but WITHOUT ANY WARRANTY; without even the implied warranty of
+#* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#* GNU Lesser General Public License for more details.
+#*
+#* You should have received a copy of the GNU Lesser General Public License
+#* along with The Toadlet Engine.  If not, see <http://www.gnu.org/licenses/>.
+#*
+#********** Copyright header - do not remove **********
+
 import Blender
 import bpy
 
 def write(filename):
-	if len(filename)<5 or filename[-5:-1]!='.xmsh':
-		filename = filename.join('.xmsh')
 	out = open(filename, "w")
-
 	out.write('<XMSH Version="3">\n')
 
 	scene = bpy.data.scenes.active
@@ -21,7 +56,7 @@ def write(filename):
 	objects = scene.objects.selected
 
 	for ob in objects:
-		if ob.type=='MESH': 
+		if ob.type=='Mesh': 
 			mesh = ob.getData(mesh=True)
 			out.write('\t<Mesh>\n')
 
@@ -40,12 +75,12 @@ def write(filename):
 			out.write('\t\t<Submesh>\n')
 			out.write('\t\t\t<Indexes Count=\"%d\">' % (len(mesh.verts)))
 			for vert in mesh.verts:
-				out.write('%f ' % (vert.index))
+				out.write('%d ' % (vert.index))
 			out.write('</Indexes>\n')
 			out.write('\t\t</Submesh>\n')
 			out.write('</Mesh>\n')
 	out.write('</XMSH>\n')
 	out.close()
 
-Blender.Window.FileSelector(write, "Export")
+Blender.Window.FileSelector(write, "Export toadlet XMSH", Blender.sys.makename(ext='.xmsh'))
 
