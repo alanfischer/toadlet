@@ -53,7 +53,7 @@ BSP30Handler::~BSP30Handler(){}
 
 Resource::ptr BSP30Handler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
 	DataStream::ptr dataStream(new DataStream(stream));
-	int version=dataStream->readLittleInt32();
+	int version=dataStream->readLInt32();
 	dataStream->reset();
 
 	// Q1 and HL do not have magic number, unlike Q2+ and HL2

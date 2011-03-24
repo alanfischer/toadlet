@@ -7,6 +7,7 @@ set (TADPOLE_SRC
 	ArchiveManager.cpp
 	AudioBufferManager.cpp
 	BufferManager.cpp
+	DecalShadowSceneRenderer.cpp
 	Engine.cpp
 	Font.cpp
 	FontManager.cpp
@@ -43,7 +44,7 @@ set (TADPOLE_BSP_SRC
 )
 
 set (TADPOLE_HANDLER_SRC
-	handler/MMSHHandler.cpp
+	handler/TMSHHandler.cpp
 	handler/WADArchive.cpp
 )
 
@@ -119,6 +120,7 @@ set (TADPOLE_HEADERS
 	Collision.h
 	Colors.h
 	ContextListener.h
+	DecalShadowSceneRenderer.h
 	Engine.h
 	Font.h
 	FontData.h
@@ -174,7 +176,7 @@ set (TADPOLE_HANDLER_HEADERS
 	handler/BMPHandler.h
 	handler/GIFHandler.h
 	handler/JPEGHandler.h
-	handler/MMSHHandler.h
+	handler/TMSHHandler.h
 	handler/PNGHandler.h
 	handler/SPRHandler.h
 	handler/TGAHandler.h

@@ -23,34 +23,25 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_KNOT_PINGEVENT_H
-#define TOADLET_KNOT_PINGEVENT_H
+#ifndef TOADLET_TADPOLE_DECALSHADOWSCENERENDERER_H
+#define TOADLET_TADPOLE_DECALSHADOWSCENERENDERER_H
 
-#include <toadlet/egg/Event.h>
+#include <toadlet/tadpole/SceneRenderer.h>
 
 namespace toadlet{
-namespace knot{
+namespace tadpole{
 
-class PingEvent:public egg::Event{
+class TOADLET_API DecalShadowSceneRenderer:public SceneRenderer{
 public:
-	TOADLET_SHARED_POINTERS(PingEvent);
+	TOADLET_SHARED_POINTERS(DecalShadowSceneRenderer);
 
-	PingEvent():egg::Event(Type_PING),mSendTime(0){}
+	DecalShadowSceneRenderer(Scene *scene);
+	virtual ~DecalShadowSceneRenderer();
 
-	int read(egg::io::DataStream *stream){
-		mSendTime=stream->readBInt64();
-		return 8;
-	}
-	
-	int write(egg::io::DataStream *stream){
-		return stream->writeBInt64(mSendTime);
-	}
-
-	void setSendTime(int64 sendTime){mSendTime=sendTime;}
-	int64 getSendTime() const{return mSendTime;}
-	
 protected:
-	int64 mSendTime;
+	virtual void renderRenderables(RenderableSet *set,peeper::Renderer *renderer,node::CameraNode *camera);
+
+	Material::ptr mShadowMaterial;
 };
 
 }

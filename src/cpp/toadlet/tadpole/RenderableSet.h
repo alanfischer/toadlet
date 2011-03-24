@@ -90,6 +90,7 @@ public:
 
 	inline const RenderableQueue &getDepthSortedQueue() const{return mRenderableQueues[0];}
 	inline const RenderableQueue &getRenderableQueue(int i) const{return mRenderableQueues[i];}
+	inline int getNumRenderableQueues() const{return mRenderableQueues.size();}
 	inline const MaterialToQueueIndexMap &getMaterialToQueueIndexMap() const{return mMaterialToQueueIndexMap;}
 	inline const IndexCollection &getLayerSortedQueueIndexes() const{return mLayerSortedQueueIndexes;}
 	inline const LightQueue &getLightQueue(){return mLightQueue;}

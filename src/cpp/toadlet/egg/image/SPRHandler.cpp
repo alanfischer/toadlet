@@ -105,8 +105,8 @@ bool SPRHandler::openFile(Stream *stream){
 
 	dsprite_t *sprite=new dsprite_t;
 
-	sprite->ident=dataStream->readLittleInt32();
-	sprite->version=dataStream->readLittleInt32();
+	sprite->ident=dataStream->readLInt32();
+	sprite->version=dataStream->readLInt32();
 	if(sprite->ident!=IDSPRITEHEADER || sprite->version!=SPRITE_VERSION){
 		delete sprite;
 		delete dataStream;
@@ -114,17 +114,17 @@ bool SPRHandler::openFile(Stream *stream){
 		return false;
 	}
 
-	sprite->type=dataStream->readLittleInt32();
-	sprite->texFormat=dataStream->readLittleInt32();
-	sprite->boundingradius=dataStream->readLittleFloat();
-	sprite->width=dataStream->readLittleInt32();
-	sprite->height=dataStream->readLittleInt32();
-	sprite->numframes=dataStream->readLittleInt32();
-	sprite->beamlength=dataStream->readLittleFloat();
-	sprite->synctype=(synctype_t)dataStream->readLittleInt32();
+	sprite->type=dataStream->readLInt32();
+	sprite->texFormat=dataStream->readLInt32();
+	sprite->boundingradius=dataStream->readLFloat();
+	sprite->width=dataStream->readLInt32();
+	sprite->height=dataStream->readLInt32();
+	sprite->numframes=dataStream->readLInt32();
+	sprite->beamlength=dataStream->readLFloat();
+	sprite->synctype=(synctype_t)dataStream->readLInt32();
 
 	short paletteSize=0;
-	paletteSize=dataStream->readLittleInt16();
+	paletteSize=dataStream->readLInt16();
 
 	tbyte *palette=new tbyte[paletteSize*3];
 	dataStream->read(palette,paletteSize*3);
@@ -163,12 +163,12 @@ Image *SPRHandler::getNextImage(){
 	Image *image=NULL;
 
 	if(mNextFrame<((dsprite_t*)mSprite)->numframes){
-		frameType.type=(spriteframetype_t)mDataStream->readLittleInt32();
+		frameType.type=(spriteframetype_t)mDataStream->readLInt32();
 		if(frameType.type==SPR_SINGLE){
-			frame.origin[0]=mDataStream->readLittleInt32();
-			frame.origin[1]=mDataStream->readLittleInt32();
-			frame.width=mDataStream->readLittleInt32();
-			frame.height=mDataStream->readLittleInt32();
+			frame.origin[0]=mDataStream->readLInt32();
+			frame.origin[1]=mDataStream->readLInt32();
+			frame.width=mDataStream->readLInt32();
+			frame.height=mDataStream->readLInt32();
 
 			image=Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGBA_8,frame.width,frame.height,1);
 			if(image==NULL){

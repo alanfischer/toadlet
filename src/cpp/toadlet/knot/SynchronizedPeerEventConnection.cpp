@@ -125,7 +125,7 @@ int SynchronizedPeerEventConnection::update(){
 	int frameAdvance=0;
 
 	while((amount=mConnection->receive(mPacketIn->getOriginalDataPointer(),mPacketIn->length()))>0){
-		int remoteFrame=mDataPacketIn->readBigInt32();
+		int remoteFrame=mDataPacketIn->readBInt32();
 		if(remoteFrame==0 || remoteFrame<mFrame || remoteFrame>mFrame+MAX_FRAME_DIFFERENCE){
 			Logger::warning(Categories::TOADLET_KNOT,
 				String("invalid frame:")+remoteFrame+" current frame:"+mFrame);
@@ -156,7 +156,7 @@ int SynchronizedPeerEventConnection::update(){
 			else{
 				events=EventGroup::ptr(new EventGroup());
 			}
-			int numEvents=mDataPacketIn->readBigInt16();
+			int numEvents=mDataPacketIn->readBInt16();
 			if((numEvents&CONTROL_EVENT_FLAG)==CONTROL_EVENT_FLAG){
 				numEvents=numEvents&~CONTROL_EVENT_FLAG;
 				int type=mDataPacketIn->readUInt8();
@@ -243,7 +243,7 @@ int SynchronizedPeerEventConnection::update(){
 			}
 
 			// Package up and send pending event groups
-			mDataPacketOut->writeBigInt32(frame-mFrameGroupSize+1); /// @todo: extra, can be calculated & removed?
+			mDataPacketOut->writeBInt32(frame-mFrameGroupSize+1); /// @todo: extra, can be calculated & removed?
 			mDataPacketOut->writeUInt8(mFrameGroupSize);
 			for(j=0;j<mFrameGroupSize;++j){
 				EventGroup::ptr events=mLocalEventGroups[frameAdvance-mFrameGroupSize+1+j];
@@ -251,7 +251,7 @@ int SynchronizedPeerEventConnection::update(){
 				if(events->hasFrameBufferInfo()){
 					numEvents|=CONTROL_EVENT_FLAG;
 				}
-				mDataPacketOut->writeBigInt16(numEvents);
+				mDataPacketOut->writeBInt16(numEvents);
 				if(events->hasFrameBufferInfo()){
 					mDataPacketOut->writeUInt8(CONTROL_EVENT_FRAMEBUFFER);
 					mDataPacketOut->writeUInt8(events->getFrameBuffer());

@@ -47,13 +47,13 @@ public:
 
 	virtual int read(egg::io::DataStream *stream){
 		int amount=0;
-		amount+=stream->readBigInt32(mID);
+		mID=stream->readBInt32();amount+=4;
 		return amount;
 	}
 
 	virtual int write(egg::io::DataStream *stream){
 		int amount=0;
-		amount+=stream->writeBigInt32(mID);
+		amount+=stream->writeBInt32(mID);
 		return amount;
 	}
 

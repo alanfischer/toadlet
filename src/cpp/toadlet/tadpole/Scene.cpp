@@ -29,6 +29,7 @@
 #include <toadlet/tadpole/Colors.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
+#include <toadlet/tadpole/SceneRenderer.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 
 using namespace toadlet::egg;

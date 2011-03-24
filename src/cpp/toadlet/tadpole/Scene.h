@@ -72,6 +72,9 @@ public:
 	virtual void setRenderListener(RenderListener *renderListener){mRenderListener=renderListener;}
 	virtual RenderListener *getRenderListener() const{return mRenderListener;}
 
+	virtual void setSceneRenderer(SceneRenderer::ptr sceneRenderer){mSceneRenderer=sceneRenderer;}
+	virtual SceneRenderer::ptr getSceneRenderer() const{return mSceneRenderer;}
+
 	virtual scalar getEpsilon() const{return Math::fromMilli(1);}
 
 	virtual void update(int dt);

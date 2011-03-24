@@ -43,19 +43,19 @@ void Particles::create(){
 	beamMaterial->setDepthWrite(false);
 
  	pointNode=getEngine()->createNodeType(ParticleNode::type(),scene);
-	pointNode->setNumParticles(4,ParticleNode::ParticleType_POINTSPRITE,pointPositions);
+	pointNode->setNumParticles(4,ParticleNode::ParticleType_POINTSPRITE,Math::ONE,pointPositions);
 	pointNode->setMaterial(pointMaterial);
 	pointNode->setTranslate(-40,0,0);
 	scene->getRoot()->attach(pointNode);
 
  	spriteNode=getEngine()->createNodeType(ParticleNode::type(),scene);
-	spriteNode->setNumParticles(4,ParticleNode::ParticleType_SPRITE,pointPositions);
+	spriteNode->setNumParticles(4,ParticleNode::ParticleType_SPRITE,Math::ONE,pointPositions);
 	spriteNode->setMaterial(pointMaterial);
 	spriteNode->setTranslate(0,0,0);
 	scene->getRoot()->attach(spriteNode);
 
  	beamNode=getEngine()->createNodeType(ParticleNode::type(),scene);
-	beamNode->setNumParticles(8,ParticleNode::ParticleType_BEAM,beamPositions);
+	beamNode->setNumParticles(8,ParticleNode::ParticleType_BEAM,Math::ONE,beamPositions);
 	beamNode->setMaterial(beamMaterial);
 	beamNode->setTranslate(40,0,0);
 	scene->getRoot()->attach(beamNode);

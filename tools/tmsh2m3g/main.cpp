@@ -95,7 +95,7 @@ int main(int argc,char **argv){
 	String m3gFileName=mshFileName.substr(0,loc)+String(".m3g");
 	FileStream::ptr stream(new FileStream(m3gFileName,FileStream::Open_WRITE_BINARY));
 
-	// Write to .mmsh format
+	// Write to .m3g format
 	M3GConverter converter;
 	bool result=converter.convertMesh(mesh,stream,scale,forceBytes,true,viewable,animation);
 

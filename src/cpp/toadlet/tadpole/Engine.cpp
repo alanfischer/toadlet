@@ -83,11 +83,11 @@
 #include <toadlet/tadpole/node/ParticleNode.h>
 #include <toadlet/tadpole/node/SpriteNode.h>
 
-#include <toadlet/tadpole/handler/MMSHHandler.h>
 #include <toadlet/tadpole/handler/BMPHandler.h>
 #include <toadlet/tadpole/handler/DDSHandler.h>
 #include <toadlet/tadpole/handler/SPRHandler.h>
 #include <toadlet/tadpole/handler/TGAHandler.h>
+#include <toadlet/tadpole/handler/TMSHHandler.h>
 #include <toadlet/tadpole/handler/TPKGHandler.h>
 #include <toadlet/tadpole/handler/WADHandler.h>
 #include <toadlet/tadpole/handler/WaveHandler.h>
@@ -250,7 +250,7 @@ Engine::Engine(bool backable):
 	#if defined(TOADLET_HAS_MXML)
 		mMeshManager->setHandler(XMSHHandler::ptr(new XMSHHandler(mBufferManager,mMaterialManager,mTextureManager)),"xmsh");
 	#endif
-	mMeshManager->setHandler(MMSHHandler::ptr(new MMSHHandler(this)),"mmsh");
+	mMeshManager->setHandler(TMSHHandler::ptr(new TMSHHandler(this)),"tmsh");
 
 	// AudioBuffer handlers
 	mAudioBufferManager->setHandler(WaveHandler::ptr(new WaveHandler(mAudioBufferManager)),"wav");

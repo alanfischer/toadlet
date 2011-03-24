@@ -38,36 +38,36 @@ public:
 	}
 
 	static void writeInt16(DataStream *out,int16 i){
-		out->writeLittleInt16(i);
+		out->writeLInt16(i);
 	}
 
 	static void writeUInt16(DataStream *out,uint16 i){
-		out->writeLittleUInt16(i);
+		out->writeLUInt16(i);
 	}
 
 	static void writeInt32(DataStream *out,int32 i){
-		out->writeLittleInt32(i);
+		out->writeLInt32(i);
 	}
 
 	static void writeUInt32(DataStream *out,uint32 i){
-		out->writeLittleUInt32(i);
+		out->writeLUInt32(i);
 	}
 
 	static void writeFloat(DataStream *out,float f){
-		out->writeLittleFloat(f);
+		out->writeLFloat(f);
 	}
 
 	static void writeVector3(DataStream *out,const Vector3 &v){
 		int i;
 		for(i=0;i<3;++i){
-			out->writeLittleFloat(v[i]);
+			out->writeLFloat(v[i]);
 		}
 	}
 
 	static void writeMatrix4x4(DataStream *out,const Matrix4x4 &m){
 		int i;
 		for(i=0;i<16;++i){
-			out->writeLittleFloat(m.data[i]);
+			out->writeLFloat(m.data[i]);
 		}
 	}
 
