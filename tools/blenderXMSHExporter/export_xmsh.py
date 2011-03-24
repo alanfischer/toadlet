@@ -14,6 +14,10 @@ __version__ = "1.0"
 __bpydoc__ = """\
 This script exports a toadlet XMSH file.
 
+Notes:
+
+Only sticky UV texture coordinates are supported. Per-face UVs will be ignored.
+
 Usage:
 
 Select the objects you wish to export and run this script fromt he "File->Export" menu.
@@ -61,10 +65,16 @@ def write(filename):
 
 			# Write out all vertexes in the mesh at once
 			out.write('\t\t<Vertexes Count=\"%d\" ' % (len(mesh.verts)))
-			# TODO: add TexCoord,Bone
-			out.write('Type=\"Position,Normal\">\n') 
+			# TODO: add Bones, and thus skeletons
+			out.write('Type=\"Position,Normal') 
+			if mesh.vertexUV:
+				out.write(',TexCoord')
+			out.write('\">\n')
 			for vert in mesh.verts:
-				out.write('\t\t\t%f,%f,%f %f,%f,%f\n' % (vert.co.x,vert.co.y,vert.co.z,vert.no.x,vert.no.y,vert.no.z))
+				out.write('\t\t\t%f,%f,%f %f,%f,%f' % (vert.co.x,vert.co.y,vert.co.z,vert.no.x,vert.no.y,vert.no.z))
+				if mesh.vertexUV:
+					out.write(' %f,%f' % (vert.uvco.x,vert.uvco.y))
+				out.write('\n')
 			out.write('\t\t</Vertexes>\n')
 
 			# Deal with materials, if present
