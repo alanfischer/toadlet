@@ -52,7 +52,6 @@ def write(filename):
 	out.write('<XMSH Version="3">\n')
 
 	scene = bpy.data.scenes.active
-	# TODO: loop over selected objects instead of just using the active one
 	objects = scene.objects.selected
 
 	for ob in objects:
@@ -73,12 +72,20 @@ def write(filename):
 			# to loop through all of the faces that reference a material, and then form those faces into a submesh
 			# which we can then assign materials to.
 			out.write('\t\t<Submesh>\n')
-			out.write('\t\t\t<Indexes Count=\"%d\">' % (len(mesh.verts)))
-			for vert in mesh.verts:
-				out.write('%d ' % (vert.index))
+			
+			# compute the total number of indices
+			indicies=0
+			for face in mesh.faces:
+				indicies+=len(face.verts)
+			out.write('\t\t\t<Indexes Count=\"%d\">' % (indicies))
+
+			# export all vertices from each face
+			for face in mesh.faces:
+				for vert in face.verts:
+					out.write('%d '% (vert.index))
 			out.write('</Indexes>\n')
 			out.write('\t\t</Submesh>\n')
-			out.write('</Mesh>\n')
+			out.write('\t</Mesh>\n')
 	out.write('</XMSH>\n')
 	out.close()
 
