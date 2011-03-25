@@ -35,10 +35,8 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-XMSHHandler::XMSHHandler(BufferManager *bufferManager,MaterialManager *materialManager,TextureManager *textureManager){
-	mBufferManager=bufferManager;
-	mMaterialManager=materialManager;
-	mTextureManager=textureManager;
+XMSHHandler::XMSHHandler(Engine *engine){
+	mEngine=engine;
 }
 
 Resource::ptr XMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
@@ -115,7 +113,7 @@ Mesh::ptr XMSHHandler::loadMeshVersion1(mxml_node_t *root){
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
 		if(strcmp(mxmlGetElementName(block),"MeshData")==0){
-			mesh=XMLMeshUtilities::loadMesh(block,1,mBufferManager,mMaterialManager,mTextureManager);
+			mesh=XMLMeshUtilities::loadMesh(block,1,mEngine!=NULL?mEngine->getBufferManager():NULL,mEngine!=NULL?mEngine->getMaterialManager():NULL,mEngine!=NULL?mEngine->getTextureManager():NULL);
 		}
 		else if(strcmp(mxmlGetElementName(block),"SkeletonData")==0){
 			mesh->skeleton=Skeleton::ptr(XMLMeshUtilities::loadSkeleton(block,1));
@@ -134,7 +132,7 @@ Mesh::ptr XMSHHandler::loadMeshVersion2Up(mxml_node_t *root,int version){
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
 		if(strcmp(mxmlGetElementName(block),"Mesh")==0){
-			mesh=XMLMeshUtilities::loadMesh(block,version,mBufferManager,mMaterialManager,mTextureManager);
+			mesh=XMLMeshUtilities::loadMesh(block,version,mEngine->getBufferManager(),mEngine->getMaterialManager(),mEngine->getTextureManager());
 		}
 		else if(strcmp(mxmlGetElementName(block),"Skeleton")==0){
 			mesh->skeleton=Skeleton::ptr(XMLMeshUtilities::loadSkeleton(block,version));

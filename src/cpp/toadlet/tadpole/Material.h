@@ -143,9 +143,6 @@ public:
 	void setLayer(int layer){mLayer=layer;}
 	int getLayer() const{return mLayer;}
 
-	void setSaveLocally(bool local){mSaveLocally=local;}
-	bool getSaveLocally() const{return mSaveLocally;}
-
 	int getStates(){return mStates;}
 	void modifyWith(Material::ptr material);
 	bool getManaged(){return getUniqueHandle()!=0;}
@@ -169,7 +166,6 @@ protected:
 	peeper::PointState mPointState;
 	egg::Collection<peeper::TextureStage::ptr> mTextureStages;
 	int mLayer;
-	bool mSaveLocally;
 };
 
 }
@@ -194,16 +190,12 @@ public:
 	void destroy();
 	Material::ptr clone();
 
-	void setSaveLocally(bool local){mSaveLocally=local;}
-	inline bool getSaveLocally() const{return mSaveLocally;}
-
 	inline void getNumRenderPasses(){return mRenderPasses.size();}
 	inline RenderPass::ptr getRenderPass(int i){return mRenderPasses[i];}
 	RenderPass::ptr addRenderPass();
 	void removeRenderPass(RenderPass *pass);
 
 protected:
-	bool mSaveLocally;
 	egg::Collection<RenderPass::ptr> mRenderPasses;
 };
 

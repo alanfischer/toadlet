@@ -243,12 +243,12 @@ Engine::Engine(bool backable):
 
 	// Material handlers
 	#if defined(TOADLET_HAS_MXML)
-		mMaterialManager->setHandler(XMATHandler::ptr(new XMATHandler(mMaterialManager,mTextureManager)),"xmat");
+		mMaterialManager->setHandler(XMATHandler::ptr(new XMATHandler(this)),"xmat");
 	#endif
 
 	// Mesh handlers
 	#if defined(TOADLET_HAS_MXML)
-		mMeshManager->setHandler(XMSHHandler::ptr(new XMSHHandler(mBufferManager,mMaterialManager,mTextureManager)),"xmsh");
+		mMeshManager->setHandler(XMSHHandler::ptr(new XMSHHandler(this)),"xmsh");
 	#endif
 	mMeshManager->setHandler(TMSHHandler::ptr(new TMSHHandler(this)),"tmsh");
 

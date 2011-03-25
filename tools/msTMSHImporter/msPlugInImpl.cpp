@@ -142,7 +142,7 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 		return -1;
 	}
 
-	XMSHHandler::ptr handler(new XMSHHandler(NULL,NULL,NULL));
+	XMSHHandler::ptr handler(new XMSHHandler(NULL));
 	Mesh::ptr mesh=shared_static_cast<Mesh>(handler->load(stream,NULL));
 	if(mesh==NULL){
 		::MessageBox(NULL,"Toadlet Mesh/Animation Import","Error loading file",MB_OK);
