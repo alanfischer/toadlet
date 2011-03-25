@@ -46,8 +46,7 @@ Material::Material():BaseResource(),
 	mDepthWrite(true),
 	mDepthTest(Renderer::DepthTest_LEQUAL),
 	//mPointState
-	mLayer(0),
-	mSaveLocally(false)
+	mLayer(0)
 {
 }
 

@@ -328,13 +328,12 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 			}
 		}
 
-		// TODO: Store the materials outside of the submesh, so I can reference materials multiple times
+		/// @todo: Store the materials outside of the submesh, so I can reference materials multiple times
 		int materialIndex=materialIndexes[i];
 		if(materialIndex>=0){
 			msMaterial *msmat=msModel_GetMaterialAt(pModel,materialIndex);
 
 			Material::ptr material(new Material());
-			material->setSaveLocally(true);
 
 			char name[256];
 			msMaterial_GetName(msmat,name,256);
@@ -374,7 +373,7 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 	}
 
 	FileStream::ptr stream(new FileStream(name,FileStream::Open_WRITE_BINARY));
-	XMSHHandler::ptr handler(new XMSHHandler(NULL,NULL,NULL));
+	XMSHHandler::ptr handler(new XMSHHandler(NULL));
 
 	handler->save(mesh,stream,this);
 
