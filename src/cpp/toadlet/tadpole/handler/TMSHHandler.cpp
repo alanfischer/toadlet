@@ -43,6 +43,8 @@ TMSHHandler::TMSHHandler(Engine *engine){
 }
 
 Resource::ptr TMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+	int i,j;
+
 	DataStream::ptr dataStream(new DataStream(stream));
 
 	int signature=dataStream->readUInt32();
@@ -60,10 +62,9 @@ Resource::ptr TMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 	}
 
 	Mesh::ptr mesh;
-/*	Skeleton::ptr skeleton;
 	Collection<Material::ptr> materials;
+/*	Skeleton::ptr skeleton;
 	Collection<TransformSequence::ptr> sequences;
-	int i,j;
 */	while(stream->position()<stream->length()){
 		int blockType=dataStream->readInt32();
 		int blockSize=dataStream->readInt32();
@@ -71,10 +72,10 @@ Resource::ptr TMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 			case Block_MESH:
 				mesh=readMesh(dataStream,blockSize);
 			break;
-/*			case Block_MATERIAL:
+			case Block_MATERIAL:
 				materials.add(readMaterial(dataStream,blockSize));
 			break;
-			case Block_SKELETON:
+/*			case Block_SKELETON:
 				skeleton=readSkeleton(dataStream,blockSize);
 			break;
 			case Block_SEQUENCE:
@@ -85,13 +86,27 @@ Resource::ptr TMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 			break;
 		}
 	}
+
+	j=0;
+	for(i=0;i<mesh->subMeshes.size();++i){
+		Mesh::SubMesh *subMesh=mesh->subMeshes[i];
+		if(subMesh->materialName.length()==0){
+			subMesh->material=materials[j++];
+			if(subMesh->material!=NULL){
+				subMesh->material->retain();
+			}
+		}
+	}
+
 /*
-	TODO: Link mesh to materials & skeleton to sequences & mesh to skeleton
+	TODO: Link skeleton to sequences & mesh to skeleton
 */
 	return mesh;
 }
 
-bool TMSHHandler::save(Mesh::ptr resource,Stream::ptr stream){
+bool TMSHHandler::save(Mesh::ptr mesh,Stream::ptr stream){
+	int i;
+
 	DataStream::ptr dataStream(new DataStream(stream));
 
 	dataStream->writeUInt32(SIGNATURE);
@@ -101,11 +116,22 @@ bool TMSHHandler::save(Mesh::ptr resource,Stream::ptr stream){
 	MemoryStream::ptr memoryStream(new MemoryStream());
 	DataStream::ptr dataMemoryStream(new DataStream(shared_static_cast<Stream>(memoryStream)));
 
-	writeMesh(dataMemoryStream,resource);
+	writeMesh(dataMemoryStream,mesh);
 	dataStream->writeInt32(Block_MESH);
 	dataStream->writeInt32(memoryStream->length());
 	dataStream->write(memoryStream->getOriginalDataPointer(),memoryStream->length());
 	memoryStream->reset();
+
+	for(i=0;i<mesh->subMeshes.size();++i){
+		Mesh::SubMesh *subMesh=mesh->subMeshes[i];
+		if(subMesh->materialName.length()==0){
+			writeMaterial(dataMemoryStream,subMesh->material);
+			dataStream->writeInt32(Block_MATERIAL);
+			dataStream->writeInt32(memoryStream->length());
+			dataStream->write(memoryStream->getOriginalDataPointer(),memoryStream->length());
+			memoryStream->reset();
+		}
+	}
 
 	return true;
 }
@@ -115,8 +141,8 @@ Mesh::ptr TMSHHandler::readMesh(DataStream *stream,int blockSize){
 
 	Mesh::ptr mesh(new Mesh());
 	
-	mesh->transform.read(stream);
-	mesh->bound.read(stream);
+	stream->read((tbyte*)&mesh->transform,sizeof(Transform));
+	stream->read((tbyte*)&mesh->bound,sizeof(Bound));
 	
 	mesh->subMeshes.resize(stream->readUInt32());
 	for(i=0;i<mesh->subMeshes.size();++i){
@@ -131,8 +157,8 @@ Mesh::ptr TMSHHandler::readMesh(DataStream *stream,int blockSize){
 		subMesh->name=stream->readNullTerminatedString();
 
 		subMesh->hasOwnTransform=stream->readBool();
-		subMesh->transform.read(stream);
-		subMesh->bound.read(stream);
+		stream->read((tbyte*)&subMesh->transform,sizeof(Transform));
+		stream->read((tbyte*)&subMesh->bound,sizeof(Bound));
 	}
 	mesh->staticVertexData=readVertexData(stream);
 
@@ -229,9 +255,9 @@ VertexFormat::ptr TMSHHandler::readVertexFormat(DataStream *stream){
 };
 
 
-bool TMSHHandler::writeMesh(DataStream *stream,Mesh::ptr mesh){
-	mesh->transform.write(stream);
-	mesh->bound.write(stream);
+void TMSHHandler::writeMesh(DataStream *stream,Mesh::ptr mesh){
+	stream->write((tbyte*)&mesh->transform,sizeof(Transform));
+	stream->write((tbyte*)&mesh->bound,sizeof(Bound));
 	
 	stream->writeUInt32(mesh->subMeshes.size());
 	int i;
@@ -246,8 +272,8 @@ bool TMSHHandler::writeMesh(DataStream *stream,Mesh::ptr mesh){
 		stream->writeNullTerminatedString(subMesh->name);
 
 		stream->writeBool(subMesh->hasOwnTransform);
-		subMesh->transform.write(stream);
-		subMesh->bound.write(stream);
+		stream->write((tbyte*)&subMesh->transform,sizeof(Transform));
+		stream->write((tbyte*)&subMesh->bound,sizeof(Bound));
 	}
 	writeVertexData(stream,mesh->staticVertexData);
 
@@ -259,8 +285,6 @@ bool TMSHHandler::writeMesh(DataStream *stream,Mesh::ptr mesh){
 		stream->writeUInt8(numAssignments);
 		stream->write((tbyte*)list.begin(),numAssignments*sizeof(Mesh::VertexBoneAssignment));
 	}
-
-	return true;
 }
 
 void TMSHHandler::writeIndexData(DataStream *stream,IndexData::ptr indexData){
@@ -333,6 +357,44 @@ void TMSHHandler::writeVertexFormat(DataStream *stream,VertexFormat::ptr vertexF
 		stream->writeUInt32(vertexFormat->getFormat(i));
 	}
 };
+
+/// @todo: Finish read/write all Material states
+Material::ptr TMSHHandler::readMaterial(egg::io::DataStream *stream,int blockSize){
+	if(stream->readBool()==false){
+		return NULL;
+	}
+
+	Material::ptr material=mEngine->getMaterialManager()->createMaterial();
+
+	material->setName(stream->readNullTerminatedString());
+
+	material->setLighting(stream->readBool());
+
+	LightEffect lightEffect;
+	stream->read((tbyte*)&lightEffect,sizeof(lightEffect));
+	material->setLightEffect(lightEffect);
+
+	material->setFaceCulling((Renderer::FaceCulling)stream->readInt32());
+
+	return material;
+}
+
+void TMSHHandler::writeMaterial(egg::io::DataStream *stream,Material::ptr material){
+	if(material==NULL){
+		stream->writeBool(false);
+		return;
+	}
+
+	stream->writeBool(true);
+
+	stream->writeNullTerminatedString(material->getName());
+
+	stream->writeBool(material->getLighting());
+
+	stream->write((tbyte*)&material->getLightEffect(),sizeof(LightEffect));
+
+	stream->writeInt32(material->getFaceCulling());
+}
 
 }
 }

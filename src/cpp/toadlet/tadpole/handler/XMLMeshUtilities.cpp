@@ -465,123 +465,125 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,ProgressListener *listener){
 	mxml_node_t *materialNode=mxmlNewElement(MXML_NO_PARENT,"Material");
 
+	if(material==NULL){
+		return materialNode;
+	}
+
 	mxmlElementSetAttr(materialNode,"Name",material->getName());
 
-	if(material->getSaveLocally()){
-		mxml_node_t *lightEffectNode=mxmlNewElement(materialNode,"LightEffect");
+	mxml_node_t *lightEffectNode=mxmlNewElement(materialNode,"LightEffect");
+	{
+		const LightEffect &lightEffect=material->getLightEffect();
+
+		mxml_node_t *ambientNode=mxmlNewElement(lightEffectNode,"Ambient");
 		{
-			const LightEffect &lightEffect=material->getLightEffect();
-
-			mxml_node_t *ambientNode=mxmlNewElement(lightEffectNode,"Ambient");
-			{
-				mxmlNewOpaque(ambientNode,makeVector4(lightEffect.ambient));
-			}
-
-			mxml_node_t *diffuseNode=mxmlNewElement(lightEffectNode,"Diffuse");
-			{
-				mxmlNewOpaque(diffuseNode,makeVector4(lightEffect.diffuse));
-			}
-
-			mxml_node_t *specularNode=mxmlNewElement(lightEffectNode,"Specular");
-			{
-				mxmlNewOpaque(specularNode,makeVector4(lightEffect.specular));
-			}
-
-			mxml_node_t *shininessNode=mxmlNewElement(lightEffectNode,"Shininess");
-			{
-				mxmlNewOpaque(shininessNode,makeScalar(lightEffect.shininess));
-			}
-
-			mxml_node_t *emissiveNode=mxmlNewElement(lightEffectNode,"Emissive");
-			{
-				mxmlNewOpaque(emissiveNode,makeVector4(lightEffect.emissive));
-			}
-
-			mxml_node_t *trackColorNode=mxmlNewElement(lightEffectNode,"TrackColor");
-			{
-				mxmlNewOpaque(trackColorNode,makeInt(lightEffect.trackColor));
-			}
+			mxmlNewOpaque(ambientNode,makeVector4(lightEffect.ambient));
 		}
 
-		mxml_node_t *lightingNode=NULL;
+		mxml_node_t *diffuseNode=mxmlNewElement(lightEffectNode,"Diffuse");
+		{
+			mxmlNewOpaque(diffuseNode,makeVector4(lightEffect.diffuse));
+		}
+
+		mxml_node_t *specularNode=mxmlNewElement(lightEffectNode,"Specular");
+		{
+			mxmlNewOpaque(specularNode,makeVector4(lightEffect.specular));
+		}
+
+		mxml_node_t *shininessNode=mxmlNewElement(lightEffectNode,"Shininess");
+		{
+			mxmlNewOpaque(shininessNode,makeScalar(lightEffect.shininess));
+		}
+
+		mxml_node_t *emissiveNode=mxmlNewElement(lightEffectNode,"Emissive");
+		{
+			mxmlNewOpaque(emissiveNode,makeVector4(lightEffect.emissive));
+		}
+
+		mxml_node_t *trackColorNode=mxmlNewElement(lightEffectNode,"TrackColor");
+		{
+			mxmlNewOpaque(trackColorNode,makeInt(lightEffect.trackColor));
+		}
+	}
+
+	mxml_node_t *lightingNode=NULL;
+	if(version<=2){
+		lightingNode=mxmlNewElement(materialNode,"LightingEnabled");
+	}
+	else{
+		lightingNode=mxmlNewElement(materialNode,"Lighting");
+	}
+	{
+		mxmlNewOpaque(lightingNode,makeBool(material->getLighting()));
+	}
+
+	mxml_node_t *faceCullingNode=mxmlNewElement(materialNode,"FaceCulling");
+	{
 		if(version<=2){
-			lightingNode=mxmlNewElement(materialNode,"LightingEnabled");
+			if(material->getFaceCulling()==Renderer::FaceCulling_BACK){
+				mxmlNewOpaque(faceCullingNode,"Back");
+			}
+			else if(material->getFaceCulling()==Renderer::FaceCulling_FRONT){
+				mxmlNewOpaque(faceCullingNode,"Front");
+			}
+			else if(material->getFaceCulling()==Renderer::FaceCulling_NONE){
+				mxmlNewOpaque(faceCullingNode,"None");
+			}
 		}
 		else{
-			lightingNode=mxmlNewElement(materialNode,"Lighting");
-		}
-		{
-			mxmlNewOpaque(lightingNode,makeBool(material->getLighting()));
-		}
-
-		mxml_node_t *faceCullingNode=mxmlNewElement(materialNode,"FaceCulling");
-		{
-			if(version<=2){
-				if(material->getFaceCulling()==Renderer::FaceCulling_BACK){
-					mxmlNewOpaque(faceCullingNode,"Back");
-				}
-				else if(material->getFaceCulling()==Renderer::FaceCulling_FRONT){
-					mxmlNewOpaque(faceCullingNode,"Front");
-				}
-				else if(material->getFaceCulling()==Renderer::FaceCulling_NONE){
-					mxmlNewOpaque(faceCullingNode,"None");
-				}
+			if(material->getFaceCulling()==Renderer::FaceCulling_BACK){
+				mxmlNewOpaque(faceCullingNode,"back");
 			}
-			else{
-				if(material->getFaceCulling()==Renderer::FaceCulling_BACK){
-					mxmlNewOpaque(faceCullingNode,"back");
-				}
-				else if(material->getFaceCulling()==Renderer::FaceCulling_FRONT){
-					mxmlNewOpaque(faceCullingNode,"front");
-				}
-				else if(material->getFaceCulling()==Renderer::FaceCulling_NONE){
-					mxmlNewOpaque(faceCullingNode,"none");
-				}
+			else if(material->getFaceCulling()==Renderer::FaceCulling_FRONT){
+				mxmlNewOpaque(faceCullingNode,"front");
+			}
+			else if(material->getFaceCulling()==Renderer::FaceCulling_NONE){
+				mxmlNewOpaque(faceCullingNode,"none");
 			}
 		}
+	}
 
-		int i;
-		for(i=0;i<material->getNumTextureStages();++i){
-			if(version<=2){
-				String name=material->getTextureStage(i)->getTextureName();
-				float amount=Math::ONE;
+	int i;
+	for(i=0;i<material->getNumTextureStages();++i){
+		if(version<=2){
+			String name=material->getTextureStage(i)->getTextureName();
+			float amount=Math::ONE;
 
-				if(name!=(char*)NULL){
-					mxml_node_t *mapNode=mxmlNewElement(materialNode,"Map");
-					{
-						mxmlElementSetAttr(mapNode,"Type",MAP_NAMES[i]);
-
-						mxml_node_t *fileNode=mxmlNewElement(mapNode,"File");
-						{
-							mxmlNewOpaque(fileNode,name);
-						}
-
-						mxml_node_t *amountNode=mxmlNewElement(mapNode,"Amount");
-						{
-							mxmlNewOpaque(amountNode,makeScalar(amount));
-						}
-					}
-				}
-			}
-			else{
-				mxml_node_t *textureStageNode=mxmlNewElement(materialNode,"TextureStage");
+			if(name!=(char*)NULL){
+				mxml_node_t *mapNode=mxmlNewElement(materialNode,"Map");
 				{
-					TextureStage *textureStage=material->getTextureStage(i);
+					mxmlElementSetAttr(mapNode,"Type",MAP_NAMES[i]);
 
-					mxml_node_t *textureNode=mxmlNewElement(textureStageNode,"Texture");
+					mxml_node_t *fileNode=mxmlNewElement(mapNode,"File");
 					{
-						Texture *texture=textureStage->getTexture();
-
-						String textureName;
-						if(texture!=NULL){
-							textureName=texture->getName();
-						}
-						else{
-							textureName=textureStage->getTextureName();
-						}
-
-						mxmlElementSetAttr(textureNode,"File",textureName);
+						mxmlNewOpaque(fileNode,name);
 					}
+
+					mxml_node_t *amountNode=mxmlNewElement(mapNode,"Amount");
+					{
+						mxmlNewOpaque(amountNode,makeScalar(amount));
+					}
+				}
+			}
+		}
+		else{
+			mxml_node_t *textureStageNode=mxmlNewElement(materialNode,"TextureStage");
+			{
+				TextureStage *textureStage=material->getTextureStage(i);
+
+				mxml_node_t *textureNode=mxmlNewElement(textureStageNode,"Texture");
+				{
+					Texture *texture=textureStage->getTexture();
+
+					String textureName;
+					if(texture!=NULL){
+						textureName=texture->getName();
+					}
+					else{
+						textureName=textureStage->getTextureName();
+					}
+
+					mxmlElementSetAttr(textureNode,"File",textureName);
 				}
 			}
 		}
@@ -855,23 +857,17 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 
 			prop=mxmlElementGetAttr(materialNode,"File");
 			if(prop!=NULL){
-				materialName=prop;
+				subMesh->materialName=prop;
 				if(materialManager!=NULL){
-					material=materialManager->findMaterial(materialName);
+					material=materialManager->findMaterial(subMesh->materialName);
 				}
 			}
 			else{
 				material=Material::ptr(loadMaterial(materialNode,version,materialManager,textureManager));
-				material->setSaveLocally(true);
 			}
 
 			subMesh->material=material;
-			if(material!=NULL){
-				subMesh->materialName=material->getName();
-			}
-			else{
-				subMesh->materialName=materialName;
-			}
+			subMesh->material->retain();
 		}
 
 		mesh->subMeshes.add(subMesh);
@@ -959,7 +955,9 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 		String data;
 		int i;
 		for(i=0;i<vertexBuffer->getSize();++i){
-			listener->progressUpdated((float)i/(float)vertexBuffer->getSize());
+			if(listener!=NULL){
+				listener->progressUpdated((float)i/(float)vertexBuffer->getSize());
+			}
 
 			line[0]=0;
 			buffer[0]=0;
@@ -1033,21 +1031,12 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 				mxmlNewOpaque(indexNode,line);
 			}
 
-			Material::ptr material=subMesh->material;
-			if(material!=NULL && material->getSaveLocally()){
-				mxmlAddChild(subMeshNode,saveMaterial(material,version,listener));
+			if(subMesh->materialName.length()==0){
+				mxmlAddChild(subMeshNode,saveMaterial(subMesh->material,version,listener));
 			}
 			else{
-				String materialName;
-				if(material!=NULL){
-					materialName=material->getName();
-				}
-				else{
-					materialName=subMesh->materialName;
-				}
-
 				mxml_node_t *materialNode=mxmlNewElement(subMeshNode,"Material");
-				mxmlElementSetAttr(materialNode,"File",materialName);
+				mxmlElementSetAttr(materialNode,"File",subMesh->materialName);
 			}
 
 			iba.unlock();
@@ -1128,7 +1117,9 @@ mxml_node_t *XMLMeshUtilities::saveSkeleton(Skeleton::ptr skeleton,int version,P
 
 	int i;
 	for(i=0;i<skeleton->bones.size();++i){
-		listener->progressUpdated((float)i/(float)skeleton->bones.size());
+		if(listener!=NULL){
+			listener->progressUpdated((float)i/(float)skeleton->bones.size());
+		}
 		Skeleton::Bone::ptr bone=skeleton->bones[i];
 
 		mxml_node_t *boneNode=mxmlNewElement(skeletonNode,"Bone");
@@ -1258,7 +1249,9 @@ mxml_node_t *XMLMeshUtilities::saveSequence(TransformSequence::ptr sequence,int 
 
 	int j;
 	for(j=0;j<sequence->tracks.size();++j){
-		listener->progressUpdated((float)j/(float)sequence->tracks.size());
+		if(listener!=NULL){
+			listener->progressUpdated((float)j/(float)sequence->tracks.size());
+		}
 
 		TransformTrack::ptr track=sequence->tracks[j];
 

@@ -45,7 +45,7 @@ public:
 	TMSHHandler(Engine *engine);
 
 	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
-	bool save(Mesh::ptr resource,egg::io::Stream::ptr stream);
+	bool save(Mesh::ptr mesh,egg::io::Stream::ptr stream);
 
 protected:
 	Mesh::ptr readMesh(egg::io::DataStream *stream,int blockSize);
@@ -54,12 +54,15 @@ protected:
 	peeper::VertexData::ptr readVertexData(egg::io::DataStream *stream);
 	peeper::VertexBuffer::ptr readVertexBuffer(egg::io::DataStream *stream);
 	peeper::VertexFormat::ptr readVertexFormat(egg::io::DataStream *stream);
-	bool writeMesh(egg::io::DataStream *stream,Mesh::ptr mesh);
+	void writeMesh(egg::io::DataStream *stream,Mesh::ptr mesh);
 	void writeIndexData(egg::io::DataStream *stream,peeper::IndexData::ptr indexData);
 	void writeIndexBuffer(egg::io::DataStream *stream,peeper::IndexBuffer::ptr buffer);
 	void writeVertexData(egg::io::DataStream *stream,peeper::VertexData::ptr vertexData);
 	void writeVertexBuffer(egg::io::DataStream *stream,peeper::VertexBuffer::ptr buffer);
 	void writeVertexFormat(egg::io::DataStream *stream,peeper::VertexFormat::ptr vertexFormat);
+
+	Material::ptr readMaterial(egg::io::DataStream *stream,int blockSize);
+	void writeMaterial(egg::io::DataStream *stream,Material::ptr material);
 
 	const static int VERSION=1;
 	const static int SIGNATURE='TMSH';
