@@ -83,7 +83,7 @@ void Viewer::start(MeshNode::ptr meshNode){
 	mCamera->setClearColor(Colors::ORANGE);
 	mScene->getRoot()->attach(mCamera);
 
-	mDistance=meshNode->getBound().getSphere().radius*2;
+	mDistance=Math::length(meshNode->getBound().getSphere().origin)+meshNode->getBound().getSphere().radius*2;
 
 	mScene->setAmbientColor(Vector4(Math::QUARTER,Math::QUARTER,Math::QUARTER,Math::ONE));
 
@@ -160,7 +160,7 @@ void Viewer::mouseReleased(int x,int y,int button){
 }
 
 void Viewer::resized(int width,int height){
-	scalar radius=mParent!=NULL?mParent->getWorldBound().getSphere().radius:0;
+	scalar radius=mParent!=NULL?Math::length(mParent->getWorldBound().getSphere().origin)+mParent->getWorldBound().getSphere().radius*2:0;
 	scalar epsilon=0.001;
 	scalar nearDistance=mDistance-radius;
 	scalar farDistance=mDistance+radius;
