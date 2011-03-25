@@ -26,9 +26,7 @@
 #ifndef TOADLET_TADPOLE_HANDLER_XMSHHANDLER_H
 #define TOADLET_TADPOLE_HANDLER_XMSHHANDLER_H
 
-#include <toadlet/tadpole/BufferManager.h>
-#include <toadlet/tadpole/MaterialManager.h>
-#include <toadlet/tadpole/TextureManager.h>
+#include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Mesh.h>
 
 typedef struct mxml_node_s mxml_node_t;
@@ -41,7 +39,7 @@ class TOADLET_API XMSHHandler:public ResourceHandler{
 public:
 	TOADLET_SHARED_POINTERS(XMSHHandler);
 
-	XMSHHandler(BufferManager *bufferManager,MaterialManager *materialManager,TextureManager *textureManager);
+	XMSHHandler(Engine *engine);
 
 	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
 
@@ -53,9 +51,7 @@ protected:
 	bool saveMeshVersion1(mxml_node_t *root,Mesh::ptr mesh,ProgressListener *listener);
 	bool saveMeshVersion2Up(mxml_node_t *root,Mesh::ptr mesh,int version,ProgressListener *listener);
 
-	BufferManager *mBufferManager;
-	MaterialManager *mMaterialManager;
-	TextureManager *mTextureManager;
+	Engine *mEngine;
 };
 
 }

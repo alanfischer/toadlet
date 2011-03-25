@@ -158,22 +158,6 @@ public:
 		Math::div(r.direction,mScale);
 	}
 
-	int write(egg::io::DataStream *stream){
-		int amount=0;
-		amount+=stream->writeVector3(mTranslate);
-		amount+=stream->writeQuaternion(mRotate);
-		amount+=stream->writeVector3(mScale);
-		return amount;
-	}
-
-	int read(egg::io::DataStream *stream){
-		int amount=0;
-		amount+=stream->readVector3(mTranslate);
-		amount+=stream->readQuaternion(mRotate);
-		amount+=stream->readVector3(mScale);
-		return amount;
-	}
-
 protected:
 	Vector3 mTranslate;
 	Vector3 mScale;
