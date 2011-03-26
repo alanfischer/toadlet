@@ -248,11 +248,11 @@ bool BMPHandler::saveImage(Image *image,Stream *stream){
 	bmfh.bfReserved2=0;
 	bmfh.bfOffBits=fhSize+ihSize;
 
-	dataStream->writeLittleUInt16(bmfh.bfType);
-	dataStream->writeLittleUInt32(bmfh.bfSize);
-	dataStream->writeLittleUInt16(bmfh.bfReserved1);
-	dataStream->writeLittleUInt16(bmfh.bfReserved2);
-	dataStream->writeLittleUInt32(bmfh.bfOffBits);
+	dataStream->writeLUInt16(bmfh.bfType);
+	dataStream->writeLUInt32(bmfh.bfSize);
+	dataStream->writeLUInt16(bmfh.bfReserved1);
+	dataStream->writeLUInt16(bmfh.bfReserved2);
+	dataStream->writeLUInt32(bmfh.bfOffBits);
 
 	bmih.biSize=ihSize;
 	bmih.biWidth=width;
@@ -272,17 +272,17 @@ bool BMPHandler::saveImage(Image *image,Stream *stream){
 	bmih.biClrImportant=0;
 
 	// Write info header
-	dataStream->writeLittleUInt32(bmih.biSize);
-	dataStream->writeLittleInt32(bmih.biWidth);
-	dataStream->writeLittleInt32(bmih.biHeight);
-	dataStream->writeLittleUInt16(bmih.biPlanes);
-	dataStream->writeLittleUInt16(bmih.biBitCount);
-	dataStream->writeLittleUInt32(bmih.biCompression);
-	dataStream->writeLittleUInt32(bmih.biSizeImage);
-	dataStream->writeLittleInt32(bmih.biXPelsPerMeter);
-	dataStream->writeLittleInt32(bmih.biYPelsPerMeter);
-	dataStream->writeLittleUInt32(bmih.biClrUsed);
-	dataStream->writeLittleUInt32(bmih.biClrImportant);
+	dataStream->writeLUInt32(bmih.biSize);
+	dataStream->writeLInt32(bmih.biWidth);
+	dataStream->writeLInt32(bmih.biHeight);
+	dataStream->writeLUInt16(bmih.biPlanes);
+	dataStream->writeLUInt16(bmih.biBitCount);
+	dataStream->writeLUInt32(bmih.biCompression);
+	dataStream->writeLUInt32(bmih.biSizeImage);
+	dataStream->writeLInt32(bmih.biXPelsPerMeter);
+	dataStream->writeLInt32(bmih.biYPelsPerMeter);
+	dataStream->writeLUInt32(bmih.biClrUsed);
+	dataStream->writeLUInt32(bmih.biClrImportant);
 
 	if(image->getFormat()==Image::Format_RGB_8){
 		int rowSize=(width*3) + (4-(width*3)%4)%4;

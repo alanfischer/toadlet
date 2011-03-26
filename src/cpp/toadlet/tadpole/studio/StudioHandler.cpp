@@ -49,7 +49,7 @@ Resource::ptr StudioHandler::load(Stream::ptr stream,const ResourceHandlerData *
 	}
 
 	DataStream::ptr dataStream(new DataStream(stream));
-	int id=dataStream->readLittleInt32();
+	int id=dataStream->readLInt32();
 	dataStream->reset();
 
 	if(id!=IDST && id!=IDSQ){

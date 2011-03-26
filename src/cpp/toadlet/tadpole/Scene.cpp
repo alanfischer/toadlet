@@ -29,6 +29,7 @@
 #include <toadlet/tadpole/Colors.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
+#include <toadlet/tadpole/SceneRenderer.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 
 using namespace toadlet::egg;
@@ -262,7 +263,7 @@ void Scene::render(Renderer *renderer,CameraNode *camera,Node *node){
 
 	// Reposition our background node & update it to update the world positions
 	mBackground->setTranslate(camera->getWorldTranslate());
-	mBackground->frameUpdate(0,-1);
+	mBackground->updateAllWorldTransforms();
 
 	mSceneRenderer->renderScene(renderer,node,camera);
 

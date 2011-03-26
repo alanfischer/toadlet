@@ -23,38 +23,27 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_HANDLER_XMSHHANDLER_H
-#define TOADLET_TADPOLE_HANDLER_XMSHHANDLER_H
+#ifndef TOADLET_TADPOLE_DECALSHADOWSCENERENDERER_H
+#define TOADLET_TADPOLE_DECALSHADOWSCENERENDERER_H
 
-#include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/Mesh.h>
-
-typedef struct mxml_node_s mxml_node_t;
+#include <toadlet/tadpole/SceneRenderer.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace handler{
 
-class TOADLET_API XMSHHandler:public ResourceHandler{
+class TOADLET_API DecalShadowSceneRenderer:public SceneRenderer{
 public:
-	TOADLET_SHARED_POINTERS(XMSHHandler);
+	TOADLET_SHARED_POINTERS(DecalShadowSceneRenderer);
 
-	XMSHHandler(Engine *engine);
-
-	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
-
-	bool save(Mesh::ptr resource,egg::io::Stream::ptr stream,ProgressListener *listener=NULL);
+	DecalShadowSceneRenderer(Scene *scene);
+	virtual ~DecalShadowSceneRenderer();
 
 protected:
-	Mesh::ptr loadMeshVersion1(mxml_node_t *root);
-	Mesh::ptr loadMeshVersion2Up(mxml_node_t *root,int version);
-	bool saveMeshVersion1(mxml_node_t *root,Mesh::ptr mesh,ProgressListener *listener);
-	bool saveMeshVersion2Up(mxml_node_t *root,Mesh::ptr mesh,int version,ProgressListener *listener);
+	virtual void renderRenderables(RenderableSet *set,peeper::Renderer *renderer,node::CameraNode *camera);
 
-	Engine *mEngine;
+	Material::ptr mShadowMaterial;
 };
 
-}
 }
 }
 

@@ -178,6 +178,7 @@ public:
 
 	virtual void updateWorldTransform();
 	virtual void transformUpdated(int tu);
+	virtual void updateAllWorldTransforms();
 
 	inline Engine *getEngine() const{return mEngine;}
 	inline Scene *getScene() const{return mScene;}

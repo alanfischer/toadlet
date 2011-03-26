@@ -26,11 +26,13 @@
 #ifndef TOADLET_TADPOLE_TRANSFORM_H
 #define TOADLET_TADPOLE_TRANSFORM_H
 
+#include <toadlet/egg/io/DataStream.h>
 #include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
 namespace tadpole{
 
+/// @todo: Decide if this is a State style object, or a full Object
 class TOADLET_API Transform{
 public:
 	Transform():

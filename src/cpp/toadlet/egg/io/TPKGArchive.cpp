@@ -70,8 +70,7 @@ bool TPKGArchive::open(Stream::ptr stream){
 		return false;
 	}
 
-	uint32 version=0;
-	mDataOffset+=mStream->readBigUInt32(version);
+	uint32 version=mStream->readBUInt32();mDataOffset+=4;
 	if(version!=1){
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"Not TPKG version 1");
@@ -79,19 +78,17 @@ bool TPKGArchive::open(Stream::ptr stream){
 		return false;
 	}
 
-	int32 numFiles=0;
-	mDataOffset+=mStream->readBigInt32(numFiles);
+	int32 numFiles=mStream->readBInt32();mDataOffset+=4;
 	int i;
 	for(i=0;i<numFiles;++i){
-		uint32 nameLength=0;
-		mDataOffset+=mStream->readBigUInt32(nameLength);
+		uint32 nameLength=mStream->readBUInt32();mDataOffset+=4;
 		tbyte *name=new tbyte[nameLength+1];
 		mDataOffset+=mStream->read(name,nameLength);
 		name[nameLength]=0;
 		
 		Index index;
-		mDataOffset+=mStream->readBigUInt32(index.position);
-		mDataOffset+=mStream->readBigUInt32(index.length);
+		index.position=mStream->readBUInt32();mDataOffset+=4;
+		index.length=mStream->readBUInt32();mDataOffset+=4;
 
 		mIndex[name]=index;
 		delete[] name;

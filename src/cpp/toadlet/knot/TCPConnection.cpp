@@ -231,7 +231,7 @@ void TCPConnection::close(){
 int TCPConnection::send(const tbyte *data,int length){
 	int amount=0;
 
-	mDataOutPacket->writeBigInt16(length);
+	mDataOutPacket->writeBInt16(length);
 	amount=mDataOutPacket->write(data,length);
 	if(amount>=length){
 		TOADLET_TRY
@@ -273,7 +273,7 @@ int TCPConnection::receive(tbyte *data,int length){
 					else{
 						packet=Packet::ptr(new Packet());
 					}
-					int packetLength=mDataInPacket->readBigInt16();
+					int packetLength=mDataInPacket->readBInt16();
 					mInPacket->reset();
 
 					amount=mSocket->receive(packet->data,packetLength<maxLength?packetLength:maxLength);
@@ -311,7 +311,7 @@ int TCPConnection::receive(tbyte *data,int length){
 			if(mSocket!=NULL && mSocket->pollRead(0)==true){
 				amount=mSocket->receive(mInPacket->getOriginalDataPointer(),2);
 				if(amount>0){
-					int packetLength=mDataInPacket->readBigInt16();
+					int packetLength=mDataInPacket->readBInt16();
 					mInPacket->reset();
 
 					amount=mSocket->receive(data,packetLength<length?packetLength:length);
@@ -349,15 +349,15 @@ void TCPConnection::debugSetPacketDelayTime(int minTime,int maxTime){
 int TCPConnection::buildConnectionPacket(DataStream *stream){
 	int size=0;
 
-	size+=stream->writeBigInt32(CONNECTION_FRAME);
+	size+=stream->writeBInt32(CONNECTION_FRAME);
 	size+=stream->write((tbyte*)CONNECTION_PACKET,CONNECTION_PACKET_LENGTH);
-	size+=stream->writeBigInt32(CONNECTION_VERSION);
+	size+=stream->writeBInt32(CONNECTION_VERSION);
 
 	return size; 
 }
 
 bool TCPConnection::verifyConnectionPacket(DataStream *stream){
-	int header=stream->readBigInt32();
+	int header=stream->readBInt32();
 	if(header!=CONNECTION_FRAME){
 		return false;
 	}
@@ -368,7 +368,7 @@ bool TCPConnection::verifyConnectionPacket(DataStream *stream){
 		return false;
 	}
 
-	int version=stream->readBigInt32();
+	int version=stream->readBInt32();
 	if(version!=CONNECTION_VERSION){
 		return false;
 	}

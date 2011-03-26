@@ -67,6 +67,8 @@ public:
 	virtual void deactivate();
 	virtual void tryDeactivate();
 
+	virtual void updateAllWorldTransforms();
+
 protected:
 	virtual void updateShadowChildren();
 

@@ -38,11 +38,12 @@ public:
 	PingEvent():egg::Event(Type_PING),mSendTime(0){}
 
 	int read(egg::io::DataStream *stream){
-		return stream->readBigInt64(mSendTime);
+		mSendTime=stream->readBInt64();
+		return 8;
 	}
 	
 	int write(egg::io::DataStream *stream){
-		return stream->writeBigInt64(mSendTime);
+		return stream->writeBInt64(mSendTime);
 	}
 
 	void setSendTime(int64 sendTime){mSendTime=sendTime;}

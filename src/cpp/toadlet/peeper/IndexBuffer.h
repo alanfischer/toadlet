@@ -35,7 +35,7 @@ class TOADLET_API IndexBuffer:public Buffer{
 public:
 	TOADLET_SHARED_POINTERS(IndexBuffer);
 
-	// Convinently equals size of index
+	// Conveniently equals size of index
 	enum IndexFormat{
 		IndexFormat_UINT8=1,
 		IndexFormat_UINT16=2,
