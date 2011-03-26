@@ -60,8 +60,8 @@ bool WADArchive::open(Stream::ptr stream){
 
 	mStream=DataStream::ptr(new DataStream(stream));
 	mStream->read((tbyte*)mHeader.identification,sizeof(mHeader.identification));
-	mHeader.numlumps=mStream->readLittleInt32();
-	mHeader.infotableofs=mStream->readLittleInt32();
+	mHeader.numlumps=mStream->readLInt32();
+	mHeader.infotableofs=mStream->readLInt32();
 
 	if (strncmp(mHeader.identification,"WAD2",4) &&
 		strncmp(mHeader.identification,"WAD3",4)){

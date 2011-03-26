@@ -73,9 +73,9 @@ public:
 	int read(DataStream *stream){
 		int payloadType=0;
 		int amt=0;
-		amt+=stream->readBigInt32(version);
-		amt+=stream->readBigInt64(randomSeed);
-		amt+=stream->readBigInt32(payloadType);
+		version=stream->readBInt32();amt+=4;
+		randomSeed=stream->readBInt64();amt+=4;
+		payloadType=stream->readBInt32();amt+=4;
 		if(payloadType!=0){
 			payload=factory->createEventType(payloadType);
 			amt+=payload->read(stream);
@@ -85,14 +85,14 @@ public:
 
 	int write(DataStream *stream){
 		int amt=0;
-		amt+=stream->writeBigInt32(version);
-		amt+=stream->writeBigInt64(randomSeed);
+		amt+=stream->writeBInt32(version);
+		amt+=stream->writeBInt64(randomSeed);
 		if(payload!=NULL){
-			amt+=stream->writeBigInt32(payload->getType());
+			amt+=stream->writeBInt32(payload->getType());
 			amt+=payload->write(stream);
 		}
 		else{
-			amt+=stream->writeBigInt32(0);
+			amt+=stream->writeBInt32(0);
 		}
 		return amt;
 	}

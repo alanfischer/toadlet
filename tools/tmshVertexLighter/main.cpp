@@ -157,7 +157,7 @@ int main(int argc,char **argv){
 		int index=mshFileName.rfind('.');
 		if(index!=String::npos) extension=mshFileName.substr(index+1,mshFileName.length()).toLower();
 		if(extension=="xmsh"){
-			XMSHHandler handler(NULL,NULL,NULL);
+			XMSHHandler handler(NULL);
 			handler.save(mesh,fout);
 		}
 		else{

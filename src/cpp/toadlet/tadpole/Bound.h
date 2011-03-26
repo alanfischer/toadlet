@@ -26,6 +26,7 @@
 #ifndef TOADLET_TADPOLE_BOUND_H
 #define TOADLET_TADPOLE_BOUND_H
 
+#include <toadlet/egg/io/DataStream.h>
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/Transform.h>
 

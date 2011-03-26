@@ -211,12 +211,12 @@ int SimpleEventConnection::sendEvent(Event::ptr event){
 	if(event->getType()==Event::Type_ROUTED){
 		eventType|=CONTROL_EVENT_FLAG;
 	}
-	mDataPacketOut->writeBigInt16(eventType);
+	mDataPacketOut->writeBInt16(eventType);
 	if(event->getType()==Event::Type_ROUTED){
 		RoutedEvent *routeEvent=(RoutedEvent*)event.get();
 		mDataPacketOut->writeUInt8(CONTROL_EVENT_ROUTE);
-		mDataPacketOut->writeBigInt32(routeEvent->getSourceID());
-		mDataPacketOut->writeBigInt32(routeEvent->getDestinationID());
+		mDataPacketOut->writeBInt32(routeEvent->getSourceID());
+		mDataPacketOut->writeBInt32(routeEvent->getDestinationID());
 	}
 	rootEvent->write(mDataPacketOut);
 
@@ -240,13 +240,13 @@ int SimpleEventConnection::receiveEvent(Event::ptr *event){
 	}
 	if(amount>0){
 		RoutedEvent::ptr routedEvent=NULL;
-		int eventType=mDataPacketIn->readBigInt16();
+		int eventType=mDataPacketIn->readBInt16();
 		if((eventType&CONTROL_EVENT_FLAG)==CONTROL_EVENT_FLAG){
 			eventType=eventType&~CONTROL_EVENT_FLAG;
 			int type=mDataPacketIn->readUInt8();
 			if(type==CONTROL_EVENT_ROUTE){
-				int sourceID=mDataPacketIn->readBigInt32();
-				int destinationID=mDataPacketIn->readBigInt32();
+				int sourceID=mDataPacketIn->readBInt32();
+				int destinationID=mDataPacketIn->readBInt32();
 				routedEvent=RoutedEvent::ptr(new RoutedEvent(NULL,sourceID,destinationID));
 			}
 		}

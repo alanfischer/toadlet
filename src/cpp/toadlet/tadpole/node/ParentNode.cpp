@@ -275,6 +275,15 @@ void ParentNode::tryDeactivate(){
 	}
 }
 
+void ParentNode::updateAllWorldTransforms(){
+	super::updateAllWorldTransforms();
+
+	int i;
+	for(i=0;i<mChildren.size();++i){
+		mChildren[i]->updateAllWorldTransforms();
+	}
+}
+
 void ParentNode::updateShadowChildren(){
 	mShadowChildrenDirty=false;
 

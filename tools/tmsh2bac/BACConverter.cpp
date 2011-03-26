@@ -928,7 +928,7 @@ void BACConverter::writeOutModelVersion5(Stream *tout){
 	DataStream *out=new DataStream(tout);
 
 	uint32 version=5;
-	out->writeLittleUInt32(version);
+	out->writeLUInt32(version);
 
 	uint32 bacAttr=0;
 	if(mHasNormal){
@@ -937,34 +937,34 @@ void BACConverter::writeOutModelVersion5(Stream *tout){
 	if(mHasBone){
 		bacAttr|=BAC_ATTR_VID;
 	}
-	out->writeLittleInt32(bacAttr);
+	out->writeLInt32(bacAttr);
 
 	tbyte dummy[8];
 	memset(dummy,0,sizeof(dummy));
 	out->write(dummy,sizeof(dummy));
 
-	out->writeLittleUInt32(mVertices.size());
+	out->writeLUInt32(mVertices.size());
 
 	int i;
 	for(i=0;i<mVertices.size();++i){
 		BACVertex *v=mVertices[i];
 
 		if(mHasBone){
-			out->writeLittleUInt32(v->id);
+			out->writeLUInt32(v->id);
 		}
 
-		out->writeLittleFloat(v->position.x);
-		out->writeLittleFloat(v->position.y);
-		out->writeLittleFloat(v->position.z);
+		out->writeLFloat(v->position.x);
+		out->writeLFloat(v->position.y);
+		out->writeLFloat(v->position.z);
 
 		if(mHasNormal){
-			out->writeLittleFloat(v->normal.x);
-			out->writeLittleFloat(v->normal.y);
-			out->writeLittleFloat(v->normal.z);
+			out->writeLFloat(v->normal.x);
+			out->writeLFloat(v->normal.y);
+			out->writeLFloat(v->normal.z);
 		}
 	}
 
-	out->writeLittleUInt16(mBones.size());
+	out->writeLUInt16(mBones.size());
 
 	for(i=0;i<mBones.size();++i){
 		BACBone *b=mBones[i];
@@ -984,27 +984,27 @@ void BACConverter::writeOutModelVersion5(Stream *tout){
 
 		out->write((tbyte*)b->name.c_str(),b->name.length()+1);
 
-		out->writeLittleFloat(b->translate.x);
-		out->writeLittleFloat(b->translate.y);
-		out->writeLittleFloat(b->translate.z);
+		out->writeLFloat(b->translate.x);
+		out->writeLFloat(b->translate.y);
+		out->writeLFloat(b->translate.z);
 
-		out->writeLittleFloat(b->rotate.x);
-		out->writeLittleFloat(b->rotate.y);
-		out->writeLittleFloat(b->rotate.z);
+		out->writeLFloat(b->rotate.x);
+		out->writeLFloat(b->rotate.y);
+		out->writeLFloat(b->rotate.z);
 
-		out->writeLittleFloat(b->handle.x);
-		out->writeLittleFloat(b->handle.y);
-		out->writeLittleFloat(b->handle.z);
+		out->writeLFloat(b->handle.x);
+		out->writeLFloat(b->handle.y);
+		out->writeLFloat(b->handle.z);
 
-		out->writeLittleUInt16(b->vertexIndexes.size());
+		out->writeLUInt16(b->vertexIndexes.size());
 
 		int j;
 		for(j=0;j<b->vertexIndexes.size();++j){
-			out->writeLittleUInt16(b->vertexIndexes[j]);
+			out->writeLUInt16(b->vertexIndexes[j]);
 		}
 	}
 
-	out->writeLittleUInt16(mTriangles.size() + mQuads.size());
+	out->writeLUInt16(mTriangles.size() + mQuads.size());
 
 	for(i=0;i<mTriangles.size();++i){
 		BACTriangle *t=mTriangles[i];
@@ -1025,47 +1025,47 @@ void BACConverter::writeOutModelVersion5(Stream *tout){
 			polyAttr|=POLY_ATTR_LIGHT;
 		}
 		polyAttr=~polyAttr;
-		out->writeLittleUInt32(polyAttr);
+		out->writeLUInt32(polyAttr);
 
-		out->writeLittleUInt16(t->vertex[0]->id);
+		out->writeLUInt16(t->vertex[0]->id);
 		if(t->textured){
-			out->writeLittleUInt16((uint16)t->texture[0]->texture.x * texture.x);
-			out->writeLittleUInt16((uint16)t->texture[0]->texture.y * texture.y);
+			out->writeLUInt16((uint16)t->texture[0]->texture.x * texture.x);
+			out->writeLUInt16((uint16)t->texture[0]->texture.y * texture.y);
 		}
 		else{
-			out->writeLittleUInt16(0);
-			out->writeLittleUInt16(0);
+			out->writeLUInt16(0);
+			out->writeLUInt16(0);
 		}
 
-		out->writeLittleUInt16(t->vertex[1]->id);
+		out->writeLUInt16(t->vertex[1]->id);
 		if(t->textured){
-			out->writeLittleUInt16((uint16)t->texture[1]->texture.x * texture.x);
-			out->writeLittleUInt16((uint16)t->texture[1]->texture.y * texture.y);
+			out->writeLUInt16((uint16)t->texture[1]->texture.x * texture.x);
+			out->writeLUInt16((uint16)t->texture[1]->texture.y * texture.y);
 		}
 		else{
-			out->writeLittleUInt16(0);
-			out->writeLittleUInt16(0);
+			out->writeLUInt16(0);
+			out->writeLUInt16(0);
 		}
 
-		out->writeLittleUInt16(t->vertex[2]->id);
+		out->writeLUInt16(t->vertex[2]->id);
 		if(t->textured){
-			out->writeLittleUInt16((uint16)t->texture[2]->texture.x * texture.x);
-			out->writeLittleUInt16((uint16)t->texture[2]->texture.y * texture.y);
+			out->writeLUInt16((uint16)t->texture[2]->texture.x * texture.x);
+			out->writeLUInt16((uint16)t->texture[2]->texture.y * texture.y);
 		}
 		else{
-			out->writeLittleUInt16(0);
-			out->writeLittleUInt16(0);
+			out->writeLUInt16(0);
+			out->writeLUInt16(0);
 		}
 
 		// For triangles, we just repeat the previous coordinate
-		out->writeLittleUInt16(t->vertex[2]->id);
+		out->writeLUInt16(t->vertex[2]->id);
 		if(t->textured){
-			out->writeLittleUInt16((uint16)t->texture[2]->texture.x * texture.x);
-			out->writeLittleUInt16((uint16)t->texture[2]->texture.y * texture.y);
+			out->writeLUInt16((uint16)t->texture[2]->texture.x * texture.x);
+			out->writeLUInt16((uint16)t->texture[2]->texture.y * texture.y);
 		}
 		else{
-			out->writeLittleUInt16(0);
-			out->writeLittleUInt16(0);
+			out->writeLUInt16(0);
+			out->writeLUInt16(0);
 		}
 	}
 
@@ -1088,46 +1088,46 @@ void BACConverter::writeOutModelVersion5(Stream *tout){
 			polyAttr|=POLY_ATTR_LIGHT;
 		}
 		polyAttr=~polyAttr;
-		out->writeLittleUInt32(polyAttr);
+		out->writeLUInt32(polyAttr);
 
-		out->writeLittleUInt16(q->vertex[0]->id);
+		out->writeLUInt16(q->vertex[0]->id);
 		if(q->textured){
-			out->writeLittleUInt16((uint16)q->texture[0]->texture.x * texture.x);
-			out->writeLittleUInt16((uint16)q->texture[0]->texture.y * texture.y);
+			out->writeLUInt16((uint16)q->texture[0]->texture.x * texture.x);
+			out->writeLUInt16((uint16)q->texture[0]->texture.y * texture.y);
 		}
 		else{
-			out->writeLittleUInt16(0);
-			out->writeLittleUInt16(0);
+			out->writeLUInt16(0);
+			out->writeLUInt16(0);
 		}
 
-		out->writeLittleUInt16(q->vertex[1]->id);
+		out->writeLUInt16(q->vertex[1]->id);
 		if(q->textured){
-			out->writeLittleUInt16((uint16)q->texture[1]->texture.x * texture.x);
-			out->writeLittleUInt16((uint16)q->texture[1]->texture.y * texture.y);
+			out->writeLUInt16((uint16)q->texture[1]->texture.x * texture.x);
+			out->writeLUInt16((uint16)q->texture[1]->texture.y * texture.y);
 		}
 		else{
-			out->writeLittleUInt16(0);
-			out->writeLittleUInt16(0);
+			out->writeLUInt16(0);
+			out->writeLUInt16(0);
 		}
 
-		out->writeLittleUInt16(q->vertex[2]->id);
+		out->writeLUInt16(q->vertex[2]->id);
 		if(q->textured){
-			out->writeLittleUInt16((uint16)q->texture[2]->texture.x * texture.x);
-			out->writeLittleUInt16((uint16)q->texture[2]->texture.y * texture.y);
+			out->writeLUInt16((uint16)q->texture[2]->texture.x * texture.x);
+			out->writeLUInt16((uint16)q->texture[2]->texture.y * texture.y);
 		}
 		else{
-			out->writeLittleUInt16(0);
-			out->writeLittleUInt16(0);
+			out->writeLUInt16(0);
+			out->writeLUInt16(0);
 		}
 
-		out->writeLittleUInt16(q->vertex[3]->id);
+		out->writeLUInt16(q->vertex[3]->id);
 		if(q->textured){
-			out->writeLittleUInt16((uint16)q->texture[3]->texture.x * texture.x);
-			out->writeLittleUInt16((uint16)q->texture[3]->texture.y * texture.y);
+			out->writeLUInt16((uint16)q->texture[3]->texture.x * texture.x);
+			out->writeLUInt16((uint16)q->texture[3]->texture.y * texture.y);
 		}
 		else{
-			out->writeLittleUInt16(0);
-			out->writeLittleUInt16(0);
+			out->writeLUInt16(0);
+			out->writeLUInt16(0);
 		}
 	}
 
@@ -1379,11 +1379,11 @@ void BACConverter::writeOutAnimationVersion4(Stream *tout){
 void BACConverter::writeOutAnimationVersion3(Stream *tout){
 	DataStream *out=new DataStream(tout);
 
-	out->writeLittleUInt32(TRA_MAGIC+3);
+	out->writeLUInt32(TRA_MAGIC+3);
 
-	out->writeLittleUInt16(mTotalFrame);
+	out->writeLUInt16(mTotalFrame);
 
-	out->writeLittleUInt16(mAnimationBones.size());
+	out->writeLUInt16(mAnimationBones.size());
 
 	int i;
 	for(i=0;i<mAnimationBones.size();++i){
@@ -1395,75 +1395,75 @@ void BACConverter::writeOutAnimationVersion3(Stream *tout){
 		memset(dummy,0,sizeof(dummy));
 		out->write(dummy,sizeof(dummy));
 
-		out->writeLittleUInt16(bone->translatex.size());
+		out->writeLUInt16(bone->translatex.size());
 
 		int j;
 		for(j=0;j<bone->translatex.size();++j){
-			out->writeLittleUInt16(bone->translatex[j].first);
-			out->writeLittleFloat(bone->translatex[j].second);
+			out->writeLUInt16(bone->translatex[j].first);
+			out->writeLFloat(bone->translatex[j].second);
 		}
 
-		out->writeLittleUInt16(bone->translatey.size());
+		out->writeLUInt16(bone->translatey.size());
 
 		for(j=0;j<bone->translatey.size();++j){
-			out->writeLittleUInt16(bone->translatey[j].first);
-			out->writeLittleFloat(bone->translatey[j].second);
+			out->writeLUInt16(bone->translatey[j].first);
+			out->writeLFloat(bone->translatey[j].second);
 		}
 
-		out->writeLittleUInt16(bone->translatez.size());
+		out->writeLUInt16(bone->translatez.size());
 
 		for(j=0;j<bone->translatez.size();++j){
-			out->writeLittleUInt16(bone->translatez[j].first);
-			out->writeLittleFloat(bone->translatez[j].second);
+			out->writeLUInt16(bone->translatez[j].first);
+			out->writeLFloat(bone->translatez[j].second);
 		}
 
-		out->writeLittleUInt16(bone->scalex.size());
+		out->writeLUInt16(bone->scalex.size());
 
 		for(j=0;j<bone->scalex.size();++j){
-			out->writeLittleUInt16(bone->scalex[j].first);
-			out->writeLittleFloat(bone->scalex[j].second);
+			out->writeLUInt16(bone->scalex[j].first);
+			out->writeLFloat(bone->scalex[j].second);
 		}
 
-		out->writeLittleUInt16(bone->scaley.size());
+		out->writeLUInt16(bone->scaley.size());
 
 		for(j=0;j<bone->scaley.size();++j){
-			out->writeLittleUInt16(bone->scaley[j].first);
-			out->writeLittleFloat(bone->scaley[j].second);
+			out->writeLUInt16(bone->scaley[j].first);
+			out->writeLFloat(bone->scaley[j].second);
 		}
 
-		out->writeLittleUInt16(bone->scalez.size());
+		out->writeLUInt16(bone->scalez.size());
 
 		for(j=0;j<bone->scalez.size();++j){
-			out->writeLittleUInt16(bone->scalez[j].first);
-			out->writeLittleFloat(bone->scalez[j].second);
+			out->writeLUInt16(bone->scalez[j].first);
+			out->writeLFloat(bone->scalez[j].second);
 		}
 
-		out->writeLittleUInt16(bone->rotatex.size());
+		out->writeLUInt16(bone->rotatex.size());
 
 		for(j=0;j<bone->rotatex.size();++j){
-			out->writeLittleUInt16(bone->rotatex[j].first);
-			out->writeLittleFloat(bone->rotatex[j].second);
+			out->writeLUInt16(bone->rotatex[j].first);
+			out->writeLFloat(bone->rotatex[j].second);
 		}
 
-		out->writeLittleUInt16(bone->rotatey.size());
+		out->writeLUInt16(bone->rotatey.size());
 
 		for(j=0;j<bone->rotatey.size();++j){
-			out->writeLittleUInt16(bone->rotatey[j].first);
-			out->writeLittleFloat(bone->rotatey[j].second);
+			out->writeLUInt16(bone->rotatey[j].first);
+			out->writeLFloat(bone->rotatey[j].second);
 		}
 
-		out->writeLittleUInt16(bone->rotatez.size());
+		out->writeLUInt16(bone->rotatez.size());
 
 		for(j=0;j<bone->rotatez.size();++j){
-			out->writeLittleUInt16(bone->rotatez[j].first);
-			out->writeLittleFloat(bone->rotatez[j].second);
+			out->writeLUInt16(bone->rotatez[j].first);
+			out->writeLFloat(bone->rotatez[j].second);
 		}
 
-		out->writeLittleUInt16(bone->roll.size());
+		out->writeLUInt16(bone->roll.size());
 
 		for(j=0;j<bone->roll.size();++j){
-			out->writeLittleUInt16(bone->roll[j].first);
-			out->writeLittleFloat(bone->roll[j].second);
+			out->writeLUInt16(bone->roll[j].first);
+			out->writeLFloat(bone->roll[j].second);
 		}
 	}
 

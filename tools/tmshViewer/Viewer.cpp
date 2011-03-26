@@ -83,15 +83,17 @@ void Viewer::start(MeshNode::ptr meshNode){
 	mCamera->setClearColor(Colors::ORANGE);
 	mScene->getRoot()->attach(mCamera);
 
-	mDistance=meshNode->getBound()->getSphere().radius*2;
+	mDistance=meshNode->getBound().getSphere().radius*2;
 
 	mScene->setAmbientColor(Vector4(Math::QUARTER,Math::QUARTER,Math::QUARTER,Math::ONE));
 
 	mLight=mEngine->createNodeType(LightNode::type(),mScene);
-	mLight->setLightType(Light::Type_DIRECTION);
-	mLight->setDirection(Math::Y_UNIT_VECTOR3);
-	mLight->setDiffuseColor(Colors::WHITE);
-	mLight->setSpecularColor(Colors::WHITE);
+	LightState state;
+	state.type=LightState::Type_DIRECTION;
+	state.direction.set(Math::Y_UNIT_VECTOR3);
+	state.diffuseColor.set(Math::ONE_VECTOR4);
+	state.specularColor.set(Math::ONE_VECTOR4);
+	mLight->setLightState(state);
 	mScene->getRoot()->attach(mLight);
 
 	updateCamera();
@@ -158,7 +160,7 @@ void Viewer::mouseReleased(int x,int y,int button){
 }
 
 void Viewer::resized(int width,int height){
-	scalar radius=mParent!=NULL?mParent->getWorldBound()->getSphere().radius:0;
+	scalar radius=mParent!=NULL?mParent->getWorldBound().getSphere().radius:0;
 	scalar epsilon=0.001;
 	scalar nearDistance=mDistance-radius;
 	scalar farDistance=mDistance+radius;

@@ -114,7 +114,7 @@ int main(int argc,char **argv){
 			std::cout << "Error opening " << (const char*)mshFileName << std::endl;
 			return 0;
 		}
-		XMSHHandler::ptr handler(new XMSHHandler(NULL,NULL,NULL));
+		XMSHHandler::ptr handler(new XMSHHandler(NULL));
 		handler->save(mesh,stream);
 	}
 
@@ -152,7 +152,7 @@ int main(int argc,char **argv){
 			std::cout << "Error opening " << (const char*)mshFileName << std::endl;
 			return 0;
 		}
-		XMSHHandler::ptr handler(new XMSHHandler(NULL,NULL,NULL));
+		XMSHHandler::ptr handler(new XMSHHandler(NULL));
 		handler->save(mesh,stream);
 	}
 

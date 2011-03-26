@@ -152,7 +152,7 @@ bool DDSHandler::loadImage(Stream *stream,Collection<Image::ptr> &mipLevels){
 
 	DataStream::ptr dataStream(new DataStream(stream));
 
-	uint32 magic=dataStream->readLittleUInt32();
+	uint32 magic=dataStream->readLUInt32();
 	if(magic!=DDS_MAGIC){
 		Error::unknown(Categories::TOADLET_EGG,
 			"bad magic number");
