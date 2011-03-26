@@ -263,7 +263,7 @@ void Scene::render(Renderer *renderer,CameraNode *camera,Node *node){
 
 	// Reposition our background node & update it to update the world positions
 	mBackground->setTranslate(camera->getWorldTranslate());
-	mBackground->frameUpdate(0,-1);
+	mBackground->updateAllWorldTransforms();
 
 	mSceneRenderer->renderScene(renderer,node,camera);
 

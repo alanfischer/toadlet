@@ -335,6 +335,10 @@ void Node::transformUpdated(int tu){
 	transformUpdateListeners(tu);
 }
 
+void Node::updateAllWorldTransforms(){
+	updateWorldTransform();
+}
+
 void Node::transformUpdateListeners(int tu){
 	if(mNodeListeners!=NULL){
 		int i;
