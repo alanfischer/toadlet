@@ -27,7 +27,6 @@
 #define TOADLET_TADPOLE_VISIBLE_H
 
 #include <toadlet/tadpole/Material.h>
-#include <toadlet/tadpole/RenderableSet.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -36,6 +35,8 @@ namespace node{
 class CameraNode;
 
 }
+
+class RenderableSet;
 
 class Visible{
 public:

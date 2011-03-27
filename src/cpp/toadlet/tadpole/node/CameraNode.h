@@ -30,6 +30,7 @@
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/node/ParentNode.h>
+#include <toadlet/tadpole/node/MeshNode.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -115,7 +116,8 @@ public:
 
 	virtual void render(peeper::Renderer *renderer,Node *node=NULL);
 
-	virtual egg::image::Image::ptr renderToImage(peeper::Renderer *renderer,int format,int width,int height);
+	egg::image::Image::ptr renderToImage(peeper::Renderer *renderer,int format,int width,int height);
+	Mesh::ptr renderToSkyBox(peeper::Renderer *renderer,int format,int size,scalar scale);
 
 	virtual bool culled(Node *node) const;
 	virtual bool culled(const Bound &bound) const;

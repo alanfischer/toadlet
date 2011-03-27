@@ -1133,6 +1133,29 @@ void GLRenderer::setPointState(const PointState &state){
 
 	    glPointParameterf(GL_POINT_SIZE_MIN,state.minSize);
 		glPointParameterf(GL_POINT_SIZE_MAX,state.maxSize);
+
+		if(state.attenuated){
+			#if defined(TOADLET_FIXED_POINT)
+				#if defined(TOADLET_HAS_GLES)
+					cacheArray[0]=state.constant; cacheArray[1]=state.linear; cacheArray[2]=state.quadratic;
+					glPointParameterxv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
+				#else
+					cacheArray[0]=MathConversion::scalarToFloat(state.constant); cacheArray[1]=MathConversion::scalarToFloat(state.linear); cacheArray[2]=MathConversion::scalarToFloat(state.quadratic);
+					glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
+				#endif
+			#else
+				cacheArray[0]=state.constant; cacheArray[1]=state.linear; cacheArray[2]=state.quadratic;
+				glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
+			#endif
+		}
+		else{
+			cacheArray[0]=Math::ONE; cacheArray[1]=0; cacheArray[2]=0;
+			#if defined(TOADLET_HAS_GLES)
+				glPointParameterxv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
+			#else
+				glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
+			#endif
+		}
 	}
 
 	if(state.size>0){
@@ -1142,29 +1165,6 @@ void GLRenderer::setPointState(const PointState &state){
 		else{
 			glPointSize(MathConversion::scalarToFloat(state.size));
 		}
-	}
-
-	if(state.attenuated){
-		#if defined(TOADLET_FIXED_POINT)
-			#if defined(TOADLET_HAS_GLES)
-				cacheArray[0]=state.constant; cacheArray[1]=state.linear; cacheArray[2]=state.quadratic;
-				glPointParameterxv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
-			#else
-				cacheArray[0]=MathConversion::scalarToFloat(state.constant); cacheArray[1]=MathConversion::scalarToFloat(state.linear); cacheArray[2]=MathConversion::scalarToFloat(state.quadratic);
-				glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
-			#endif
-		#else
-			cacheArray[0]=state.constant; cacheArray[1]=state.linear; cacheArray[2]=state.quadratic;
-			glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
-		#endif
-	}
-	else{
-		cacheArray[0]=Math::ONE; cacheArray[1]=0; cacheArray[2]=0;
-		#if defined(TOADLET_HAS_GLES)
-			glPointParameterxv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
-		#else
-			glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
-		#endif
 	}
 
 	TOADLET_CHECK_GLERROR("setPointState");

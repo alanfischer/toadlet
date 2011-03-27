@@ -183,6 +183,24 @@ void ParticleNode::setMaterial(Material::ptr material){
 	}
 }
 
+void ParticleNode::frameUpdate(int dt,int scope){
+	Sphere sphere;
+	Sphere point;
+	scalar epsilon=mScene->getEpsilon();
+	int i;
+	for(i=0;i<mParticles.size();++i){
+		Particle *p=&mParticles[i];
+		point.origin.set(p->x,p->y,p->z);
+		sphere.merge(point,epsilon);
+	}
+	if(mWorldSpace){
+		Math::sub(sphere,getWorldTranslate());
+	}
+	mBound.set(sphere);
+
+	super::frameUpdate(dt,scope);
+}
+
 void ParticleNode::modifyMaterial(Material::ptr material){
 	if(mMaterial!=NULL){
 		if(mMaterial->getManaged()){
@@ -311,24 +329,20 @@ void ParticleNode::updateVertexBuffer(CameraNode *camera){
 	}
 
 	int i=0,j=0;
-	Matrix4x4 invViewMatrix;
 	Vector3 viewRight,viewUp,viewForward;
-	if(camera->getAlignmentCalculationsUseOrigin()){
-		Matrix4x4 lookAtCamera; Math::setMatrix4x4FromLookAt(lookAtCamera,camera->getWorldTranslate(),getWorldTranslate(),Math::Z_UNIT_VECTOR3,false);
-		Math::invert(invViewMatrix,lookAtCamera);
-	}
-	else{
-		Math::invert(invViewMatrix,camera->getViewMatrix());
-	}
 	Quaternion invRot;
 	Math::invert(invRot,mWorldTransform.getRotate());
+	bool useOrigin=camera->getAlignmentCalculationsUseOrigin();
+	if(useOrigin==false){
+		Matrix4x4 invViewMatrix;
+		Math::invert(invViewMatrix,camera->getViewMatrix());
+		Math::setAxesFromMatrix4x4(invViewMatrix,viewRight,viewUp,viewForward);
 
-	Math::setAxesFromMatrix4x4(invViewMatrix,viewRight,viewUp,viewForward);
-
-	if(mWorldSpace==false){
-		Math::mul(viewRight,invRot);
-		Math::mul(viewUp,invRot);
-		Math::mul(viewForward,invRot);
+		if(mWorldSpace==false){
+			Math::mul(viewRight,invRot);
+			Math::mul(viewUp,invRot);
+			Math::mul(viewForward,invRot);
+		}
 	}
 
 	scalar epsilon=mScene->getEpsilon();
@@ -349,6 +363,15 @@ void ParticleNode::updateVertexBuffer(CameraNode *camera){
 			for(i=0;i<mParticles.size();++i){
 				const Particle &p=mParticles[i];
 				int vi=i*4;
+
+				if(useOrigin){
+					viewForward.set(p.x,p.y,p.z);
+ 					Math::sub(viewForward,camera->getWorldTranslate());
+					Math::normalizeCarefully(viewForward,0);
+					Math::cross(viewUp,camera->getRight(),viewForward);
+					Math::normalizeCarefully(viewUp,0);
+					Math::cross(viewRight,viewForward,viewUp);
+				}
 
 				if(mVelocityAligned){
 					up.set(p.vx,p.vy,p.vz);

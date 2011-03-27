@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
+#include <toadlet/peeper/CapabilitySet.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/node/CameraNode.h>
@@ -389,14 +390,17 @@ Image::ptr CameraNode::renderToImage(Renderer *renderer,int format,int width,int
 	renderTarget->attach(renderTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
 
 	RenderTarget *oldTarget=renderer->getRenderTarget();
+	Viewport oldViewport=getViewport();
+
 	renderer->setRenderTarget(renderTarget);
-	Viewport oldView=getViewport();
 	setViewport(Viewport(0,0,width,height));
+
 	renderer->beginScene();
 		render(renderer);
 	renderer->endScene();
+
+	setViewport(oldViewport);
 	renderer->setRenderTarget(oldTarget);
-	setViewport(oldView);
 
 	Image::ptr image=mEngine->getTextureManager()->createImage(renderTexture);
 
@@ -404,6 +408,69 @@ Image::ptr CameraNode::renderToImage(Renderer *renderer,int format,int width,int
 	renderTexture->release();
 
 	return image;
+}
+
+Mesh::ptr CameraNode::renderToSkyBox(Renderer *renderer,int format,int size,scalar scale){
+	bool rtt=renderer->getCapabilitySet().renderToTexture;
+	int flags=Texture::Usage_BIT_RENDERTARGET;
+	Texture::ptr skyboxTexture[6];
+	Material::ptr skyboxMaterial[6];
+	skyboxTexture[0]=mEngine->getTextureManager()->createTexture(flags,Texture::Dimension_D2,format,size,size,0,1);
+	skyboxTexture[1]=mEngine->getTextureManager()->createTexture(flags,Texture::Dimension_D2,format,size,size,0,1);
+	skyboxTexture[2]=mEngine->getTextureManager()->createTexture(flags,Texture::Dimension_D2,format,size,size,0,1);
+	skyboxTexture[3]=mEngine->getTextureManager()->createTexture(flags,Texture::Dimension_D2,format,size,size,0,1);
+	skyboxTexture[4]=mEngine->getTextureManager()->createTexture(flags,Texture::Dimension_D2,format,size,size,0,1);
+	skyboxTexture[5]=mEngine->getTextureManager()->createTexture(flags,Texture::Dimension_D2,format,size,size,0,1);
+	PixelBufferRenderTarget::ptr renderTarget=rtt?mEngine->getTextureManager()->createPixelBufferRenderTarget():NULL;
+
+	Vector3 forward[6],up[6];
+	forward[0]=Math::NEG_Z_UNIT_VECTOR3;	up[0]=Math::Y_UNIT_VECTOR3;
+	forward[1]=Math::Z_UNIT_VECTOR3;		up[1]=Math::Y_UNIT_VECTOR3;
+	forward[2]=Math::NEG_X_UNIT_VECTOR3;	up[2]=Math::Z_UNIT_VECTOR3;
+	forward[3]=Math::X_UNIT_VECTOR3;		up[3]=Math::Z_UNIT_VECTOR3;
+	forward[4]=Math::NEG_Y_UNIT_VECTOR3;	up[4]=Math::Z_UNIT_VECTOR3;
+	forward[5]=Math::Y_UNIT_VECTOR3;		up[5]=Math::Z_UNIT_VECTOR3;
+
+	RenderTarget *oldTarget=renderer->getRenderTarget();
+	Viewport oldViewport=getViewport();
+	Transform oldTransform=getTransform();
+	bool oldAlignment=getAlignmentCalculationsUseOrigin();
+	setAlignmentCalculationsUseOrigin(true);
+
+	int i;
+	for(i=0;i<6;++i){
+		if(rtt){
+			renderTarget->attach(skyboxTexture[i]->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
+			renderer->setRenderTarget(renderTarget);
+		}
+
+		setViewport(Viewport(0,0,skyboxTexture[i]->getWidth(),skyboxTexture[i]->getHeight()));
+		setLookDir(getTranslate(),forward[i],up[i]);
+		mScene->update(0);
+		renderer->beginScene();
+			render(renderer);
+		renderer->endScene();
+
+		if(rtt){
+			renderer->swap();
+			renderTarget->remove(skyboxTexture[i]->getMipPixelBuffer(0,0));
+			renderer->setRenderTarget(oldTarget);
+ 		}
+		else{ 
+			renderer->copyFrameBufferToPixelBuffer(skyboxTexture[i]->getMipPixelBuffer(0,0));
+		}
+
+		skyboxMaterial[i]=mEngine->getMaterialManager()->createMaterial();
+		skyboxMaterial[i]->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(skyboxTexture[i],true));
+		skyboxMaterial[i]->setDepthWrite(false);
+	}
+
+	setAlignmentCalculationsUseOrigin(oldAlignment);
+	setTransform(oldTransform);
+	setViewport(oldViewport);
+	renderer->setRenderTarget(oldTarget);
+
+	return getEngine()->getMeshManager()->createSkyBox(scale,false,true,skyboxMaterial[0],skyboxMaterial[1],skyboxMaterial[2],skyboxMaterial[3],skyboxMaterial[4],skyboxMaterial[5]);
 }
 
 bool CameraNode::culled(Node *node) const{
@@ -463,7 +530,7 @@ void CameraNode::updateFramesPerSecond(){
 void CameraNode::updateViewTransform(){
 	const Vector3 worldTranslate=mWorldTransform.getTranslate();
 	Matrix4x4 worldMatrix;
-	mWorldTransform.calculateMatrix(worldMatrix);
+	mWorldTransform.getMatrix(worldMatrix);
 	scalar wt00=worldMatrix.at(0,0),wt01=worldMatrix.at(0,1),wt02=worldMatrix.at(0,2);
 	scalar wt10=worldMatrix.at(1,0),wt11=worldMatrix.at(1,1),wt12=worldMatrix.at(1,2);
 	scalar wt20=worldMatrix.at(2,0),wt21=worldMatrix.at(2,1),wt22=worldMatrix.at(2,2);

@@ -1,0 +1,44 @@
+
+Overview
+
+A "Lifestyle" type application that lets you build and interact with a virtual planet. From solar system beginnings to a functional ecosystem with greenery and weather.
+
+
+TO DOs:
+
+Overall
+Add ambient random music - choose "spacey" chords, grab the notes, play them randomly w. random timings
+
+Planet Creation
+If you throw the planet into the sun, it burns up. This happens in slow motion, and the camera zooms in, so you get the see the planet go "poof". Then you are left staring at the sun. - IMPROVE WITH SPRITES!
+If you throw the planet off the screen, the camera follows it as it sails away. It also zooms in so you can see it slowly freeze solid. - MAKE THIS LOOK BETTER 
+Add the "Epoch Clock" that gives you and idea of how long you have in each "stage of the game"
+
+Planet Evolution
+Get the continental drift portion working. 
+
+
+Features:
+
+Planet is effectively a deformable mesh floating in space
+Ambient space enviroment with slick music and nifty sfx for events
+Alter the look and geometry of the planet by throwing natural events at it
+Drift moves continents and builds mountains
+Floods raise water levels and bring down mountains, smooth terrain, etc
+Comets cause craters and big damage
+Perhaps put a simple atmosphere around it: cloud sprites, or a semitransparent haze
+You can SAVE your planet to some binary format
+EMAIL or SMS or something send planets to a friend
+Add each others planets to your solar systems
+Updates could somehow be sent between apps automatically
+
+
+Ideas:
+
+I should have some sort of "timer" on the top, maybe just a bar that fills up.  This would indicate how far along the current stage is.  When the bar is full, it would automatically advance to the next stage.
+
+If we are going to have the planet freeze, or change color depending on distance, we need to get that in and see how it looks.
+Planet needs to change color immediately depending upon distance
+
+Should the camera automatically zoom in & out if you get your planet orbit nearing the 'edge' of the current visible orbit?
+
