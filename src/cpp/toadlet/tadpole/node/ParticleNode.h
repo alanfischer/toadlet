@@ -100,6 +100,8 @@ public:
 	void setMaterial(Material::ptr material);
 	Material::ptr getMaterial() const{return mMaterial;}
 
+	void frameUpdate(int dt,int scope);
+
 	void modifyMaterial(Material::ptr material);
 	bool getRendered() const{return mRendered;}
 	void setRendered(bool rendered){mRendered=rendered;}

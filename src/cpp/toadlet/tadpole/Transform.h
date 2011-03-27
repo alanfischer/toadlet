@@ -84,7 +84,14 @@ public:
 	void setRotate(const Matrix3x3 &r){Math::setQuaternionFromMatrix3x3(mRotate,r);}
 	void setRotate(const Vector3 &axis,scalar angle){Math::setQuaternionFromAxisAngle(mRotate,axis,angle);}
 
-	void calculateMatrix(Matrix4x4 &r) const{Math::setMatrix4x4FromTranslateRotateScale(r,mTranslate,mRotate,mScale);}
+	void getMatrix(Matrix4x4 &r) const{
+		Math::setMatrix4x4FromTranslateRotateScale(r,mTranslate,mRotate,mScale);
+	}
+	void setMatrix(const Matrix4x4 &m){
+		Math::setScaleFromMatrix4x4(mScale,m);
+		Math::setQuaternionFromMatrix4x4(mRotate,m);
+		Math::setTranslateFromMatrix4x4(mTranslate,m);
+	}
 
 	void transform(Vector3 &r,const Vector3 &t) const{
 		Math::mul(r,mRotate,t);

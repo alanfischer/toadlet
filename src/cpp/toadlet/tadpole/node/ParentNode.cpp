@@ -281,6 +281,7 @@ void ParentNode::updateAllWorldTransforms(){
 	int i;
 	for(i=0;i<mChildren.size();++i){
 		mChildren[i]->updateAllWorldTransforms();
+		mergeWorldBound(mChildren[i],false);
 	}
 }
 

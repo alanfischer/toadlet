@@ -596,6 +596,24 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 	Mesh::ptr mesh(new Mesh());
 	const char *prop=NULL;
 
+	mxml_node_t *transformNode=mxmlFindChild(node,"Transform");
+	if(transformNode!=NULL){
+		mxml_node_t *translateNode=mxmlFindChild(transformNode,"Translate");
+		if(translateNode!=NULL){
+			mesh->transform.setTranslate(parseVector3(mxmlGetOpaque(translateNode->child)));
+		}
+
+		mxml_node_t *rotateNode=mxmlFindChild(transformNode,"Rotate");
+		if(rotateNode!=NULL){
+			mesh->transform.setRotate(parseQuaternion(mxmlGetOpaque(rotateNode->child)));
+		}
+
+		mxml_node_t *scaleNode=mxmlFindChild(transformNode,"Scale");
+		if(scaleNode!=NULL){
+			mesh->transform.setScale(parseVector3(mxmlGetOpaque(scaleNode->child)));
+		}
+	}
+
 	mxml_node_t *vertexNode=mxmlFindChild(node,"Vertexes");
 	{
 		int count=0;
@@ -867,6 +885,24 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 	}
 	else{
 		meshNode=mxmlNewElement(MXML_NO_PARENT,"Mesh");
+	}
+
+	mxml_node_t *transformNode=mxmlNewElement(meshNode,"Transform");
+	{
+		mxml_node_t *translateNode=mxmlNewElement(transformNode,"Translate");
+		{
+			mxmlNewOpaque(translateNode,makeVector3(mesh->transform.getTranslate()));
+		}
+
+		mxml_node_t *rotateNode=mxmlNewElement(transformNode,"Rotate");
+		{
+			mxmlNewOpaque(rotateNode,makeQuaternion(mesh->transform.getRotate()));
+		}
+
+		mxml_node_t *scaleNode=mxmlNewElement(transformNode,"Scale");
+		{
+			mxmlNewOpaque(scaleNode,makeVector3(mesh->transform.getScale()));
+		}
 	}
 
 	const VertexData::ptr &vertexData=mesh->staticVertexData;

@@ -62,7 +62,7 @@ void DecalShadowSceneRenderer::renderRenderables(RenderableSet *set,Renderer *re
 			Math::setMatrix4x4FromObliquePlane(m,p,Vector3(0,0,-1));
 			
 			Matrix4x4 m2;
-			renderable->getRenderTransform().calculateMatrix(m2);
+			renderable->getRenderTransform().getMatrix(m2);
 			Math::postMul(m,m2);
 			
 			renderer->setModelMatrix(m);

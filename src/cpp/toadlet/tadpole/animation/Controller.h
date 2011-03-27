@@ -37,6 +37,7 @@ namespace animation{
 /// @todo: A nice feature would be the ability for Controllers to be run by a Thread pool, so a central ControllerManager would take
 //   care of the updating.  But perhaps this would be better suited by having Nodes update their Animations as we do now, and then the
 //   whole scenegraph be updated by a ThreadPool, taking into account dependencies
+/// @todo: Controllers should have a general ControllerListener that can be implemented by Node, so when they are destroyed, the node can listen and remove the controller
 class TOADLET_API Controller{
 public:
 	TOADLET_SHARED_POINTERS(Controller);
