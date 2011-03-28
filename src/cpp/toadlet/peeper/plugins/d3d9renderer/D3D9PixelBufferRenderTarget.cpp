@@ -103,6 +103,33 @@ bool D3D9PixelBufferRenderTarget::activate(){
 	return result;
 }
 
+bool D3D9PixelBufferRenderTarget::deactivate(){
+	IDirect3DDevice9 *device=mRenderer->getDirect3DDevice9();
+
+	bool result=false;
+	#if defined(TOADLET_SET_D3DM)
+		if(mBuffers.size()>=2 && mBuffers[0]!=NULL && mBuffers[1]!=NULL){
+			device->SetRenderTarget(NULL,NULL);
+			result=true;
+		}
+	#else
+		int i;
+		for(i=0;i<mBuffers.size();++i){
+			D3D9PixelBuffer *buffer=(D3D9PixelBuffer*)mBuffers[i]->getRootPixelBuffer();
+			Attachment attachment=mBufferAttachments[i];
+			if(attachment==Attachment_DEPTH_STENCIL){
+				device->SetDepthStencilSurface(NULL);
+			}
+			else if(attachment!=Attachment_COLOR_0){ // Can't assign NULL to COLOR_0
+				device->SetRenderTarget(attachment-Attachment_COLOR_0,NULL);
+			}
+		}
+		result=true;
+	#endif
+
+	return result;
+}
+
 bool D3D9PixelBufferRenderTarget::attach(PixelBuffer::ptr buffer,Attachment attachment){
 	#if defined(TOADLET_SET_D3DM)
 		mBuffers.resize(2);
@@ -165,12 +192,28 @@ bool D3D9PixelBufferRenderTarget::compile(){
 		mDepthBuffer=NULL;
 	}
 
+	if(mColorBuffer!=NULL){
+		remove(mColorBuffer);
+		mColorBuffer->destroy();
+		mColorBuffer=NULL;
+	}
+
 	if(color!=NULL && depth==NULL){
 		// No Depth-Stencil surface, so add one
 		D3D9PixelBuffer::ptr buffer(new D3D9PixelBuffer(mRenderer,true));
 		if(buffer->create(Buffer::Usage_NONE,Buffer::Access_NONE,Texture::Format_DEPTH_16,mWidth,mHeight,1)){
 			attach(buffer,Attachment_DEPTH_STENCIL);
 			mDepthBuffer=buffer;
+		}
+	}
+	else if(color==NULL && depth!=NULL){
+		// No Color surface, so add one
+		/// @todo: Is there a way to have D3D9 not care about the color buffer, if it isn't needed?
+		///  Without the below code we get an error if the size of the depth buffer is greater than the color buffer
+		D3D9PixelBuffer::ptr buffer(new D3D9PixelBuffer(mRenderer,true));
+		if(buffer->create(Buffer::Usage_NONE,Buffer::Access_NONE,Texture::Format_RGB_5_6_5,mWidth,mHeight,1)){
+			attach(buffer,Attachment_COLOR_0);
+			mColorBuffer=buffer;
 		}
 	}
 

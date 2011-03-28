@@ -276,15 +276,6 @@ void D3D9Renderer::setViewport(const Viewport &viewport){
 void D3D9Renderer::clear(int clearFlags,const Vector4 &clearColor){
 	int d3dclear=0;
 
-D3DVIEWPORT9 d3dviewport;
-mD3DDevice->GetViewport(&d3dviewport);
-Logger::alert(String("viewport:")+(int)d3dviewport.X+","+(int)d3dviewport.Y+","+(int)d3dviewport.Width+","+(int)d3dviewport.Height);
-IDirect3DSurface9 *renderSurface=NULL;
-mD3DDevice->GetRenderTarget(0,&renderSurface);
-D3DSURFACE_DESC d3dSurfaceDesc;
-renderSurface->GetDesc(&d3dSurfaceDesc);
-Logger::alert(String("surface:")+(int)d3dSurfaceDesc.Width+","+(int)d3dSurfaceDesc.Height);
-
 	if(clearFlags & ClearFlag_COLOR){
 		d3dclear|=D3DCLEAR_TARGET;
 	}

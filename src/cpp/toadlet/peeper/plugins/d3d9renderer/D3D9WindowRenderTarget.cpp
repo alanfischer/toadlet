@@ -83,6 +83,16 @@ bool D3D9WindowRenderTarget::activate(){
 	return true;
 }
 
+bool D3D9WindowRenderTarget::deactivate(){
+	#if !defined(TOADLET_SET_D3DM)
+		// Can't assign NULL to COLOR_0, so just NULL DEPTH_STENCIL
+		HRESULT result=mD3DDevice->SetDepthStencilSurface(NULL);
+		TOADLET_CHECK_D3D9ERROR(result,"SetDepthStencilSurface");
+	#endif
+
+	return true;
+}
+
 void D3D9WindowRenderTarget::swap(){
 	HRESULT result=mD3DDevice->Present(NULL,NULL,NULL,NULL);
 	TOADLET_CHECK_D3D9ERROR(result,"Present");

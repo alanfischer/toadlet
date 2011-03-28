@@ -88,17 +88,13 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 
 	mPreviousMaterial=NULL;
 
-Logger::alert("VIEWPORTING");
 	setupViewport(camera,renderer);
-Logger::alert("VIEWPORTED");
 
-Logger::alert("CLEARING");
 	int clearFlags=camera->getClearFlags();
 	if(clearFlags>0 && !camera->getSkipFirstClear()){
 		renderer->setDepthWrite(true);
 		renderer->clear(clearFlags,camera->getClearColor());
 	}
-Logger::alert("CLEARED");
 
 	renderer->setProjectionMatrix(camera->getProjectionMatrix());
 	renderer->setViewMatrix(camera->getViewMatrix());
