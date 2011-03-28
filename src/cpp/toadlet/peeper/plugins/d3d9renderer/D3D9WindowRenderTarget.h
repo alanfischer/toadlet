@@ -49,7 +49,7 @@ public:
 	virtual int getHeight() const{RECT r;GetClientRect(mWindow,&r);return r.bottom-r.top;}
 
 	virtual bool activate();
-	virtual bool deactivate(){return true;}
+	virtual bool deactivate();
 
 	virtual void swap();
 	virtual void reset();

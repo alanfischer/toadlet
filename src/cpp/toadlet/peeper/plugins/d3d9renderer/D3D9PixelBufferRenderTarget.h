@@ -47,7 +47,7 @@ public:
 	virtual void destroy();
 
 	virtual bool activate();
-	virtual bool deactivate(){return true;}
+	virtual bool deactivate();
 	virtual void swap(){}
 	virtual void reset(){}
 
@@ -72,7 +72,7 @@ protected:
 	bool mNeedsCompile;
 	egg::Collection<PixelBuffer::ptr> mBuffers;
 	egg::Collection<Attachment> mBufferAttachments;
-	PixelBuffer::ptr mDepthBuffer;
+	PixelBuffer::ptr mDepthBuffer,mColorBuffer;
 };
 
 }
