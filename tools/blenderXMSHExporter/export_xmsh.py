@@ -80,6 +80,8 @@ def write(filename):
 			# Deal with materials, if present
 			if len(mesh.materials)==0:
 				# No materials are present, so dump all faces to the same submesh with an empty material
+				# TODO: Would it be cleaner to create an empty material from the get-go, and assign all non-owned
+				# faces to that materail? Then only export out materials that actually have some faces?
 				out.write('\t\t<SubMesh>\n')
 				indicies=0
 				for face in mesh.faces:
@@ -107,7 +109,7 @@ def write(filename):
 					out.write('\t\t\t<Indexes Count=\"%d\">' % (len(submesh)))
 					for index in submesh:
 						out.write('%d ' % (index))
-					out.write('\t\t\t</Indexes>\n')
+					out.write('</Indexes>\n')
 
 					mat=mesh.materials[i]
 					if mat:
