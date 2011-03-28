@@ -28,7 +28,7 @@ int main(int argc,char **argv){
 			}
         }
 		else if(i!=argc-1){
-			std::cout << "Error unknown command: " << arg.c_str() << std::endl;
+			std::cout << "Error unknown command: " << (const char*)arg << std::endl;
 			return -1;
 		}
 	}
@@ -47,7 +47,7 @@ int main(int argc,char **argv){
 	// Load the mesh data
 	Mesh::ptr mesh=engine->getMeshManager()->findMesh(mshFileName);
 	if(mesh==NULL){
-		std::cout << "Error loading file: " << mshFileName << std::endl;
+		std::cout << "Error loading file: " << (const char*)mshFileName << std::endl;
 		return 0;
 	}
 
@@ -55,7 +55,7 @@ int main(int argc,char **argv){
 	std::cout << "Number of SubMeshes: " << mesh->subMeshes.size() << std::endl;
 	for(i=0;i<mesh->subMeshes.size();++i){
 		Mesh::SubMesh *subMesh=mesh->subMeshes[i];
-		std::cout << "SubMesh: " << i << " has Material: " << (subMesh->material!=NULL) << " materialName: " << subMesh->materialName << std::endl;
+		std::cout << "SubMesh: " << i << " has Material: " << (subMesh->material!=NULL) << " materialName: " << (const char*)subMesh->materialName << std::endl;
 	}
 
 	// Prepare the output file

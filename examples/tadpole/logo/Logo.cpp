@@ -77,6 +77,15 @@ void Logo::create(){
 
 	scene=Scene::ptr(new Scene(mEngine));
 
+	scene->setSceneRenderer(SceneRenderer::ptr(new DecalShadowSceneRenderer(scene)));
+
+	LightNode::ptr light=getEngine()->createNodeType(LightNode::type(),scene);
+	LightState state;
+	state.type=LightState::Type_DIRECTION;
+	state.direction=Vector3(0,0,-1);
+	light->setLightState(state);
+	scene->getRoot()->attach(light);
+
 //	MemoryStream::ptr in(new MemoryStream(lt_mmsh::data,lt_mmsh::length,lt_mmsh::length,false));
 //	Mesh::ptr mesh=shared_static_cast<Mesh>(getEngine()->getMeshManager()->getHandler("mmsh")->load(in,NULL));
 	MemoryStream::ptr in(new MemoryStream(lt_xmsh::data,lt_xmsh::length,lt_xmsh::length,false));
@@ -98,6 +107,12 @@ void Logo::create(){
 		cameraNode->addNodeListener(NodeListener::ptr(new GravityFollower(motionDetector)));
 		motionDetector->startup();
 	}
+}
+
+void Logo::destroy(){
+	scene->destroy();
+
+	Application::destroy();
 }
 
 void Logo::resized(int width,int height){

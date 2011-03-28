@@ -42,6 +42,9 @@ class TOADLET_API TMSHHandler:public ResourceHandler{
 public:
 	TOADLET_SHARED_POINTERS(TMSHHandler);
 
+	const static int VERSION=1;
+	const static int TMSH=1414353736; // "TMSH"
+
 	TMSHHandler(Engine *engine);
 
 	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
@@ -63,9 +66,6 @@ protected:
 
 	Material::ptr readMaterial(egg::io::DataStream *stream,int blockSize);
 	void writeMaterial(egg::io::DataStream *stream,Material::ptr material);
-
-	const static int VERSION=1;
-	const static int SIGNATURE='TMSH';
 
 	// Blocks for the tmsh format
 	enum Block{
