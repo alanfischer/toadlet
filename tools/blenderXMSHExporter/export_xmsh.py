@@ -109,7 +109,7 @@ def write(filename):
 					out.write('\t\t\t<Indexes Count=\"%d\">' % (len(submesh)))
 					for index in submesh:
 						out.write('%d ' % (index))
-					out.write('\t\t\t</Indexes>\n')
+					out.write('</Indexes>\n')
 
 					mat=mesh.materials[i]
 					if mat:
