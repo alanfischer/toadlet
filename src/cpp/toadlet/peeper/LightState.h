@@ -41,9 +41,9 @@ public:
 	};
 
 	LightState():
+		type(Type_DIRECTION),
 		specularColor(Math::ZERO_VECTOR4),
 		diffuseColor(Math::ONE_VECTOR4),
-		type(Type_DIRECTION),
 		constantAttenuation(Math::ONE),
 		linearAttenuation(0),
 		quadraticAttenuation(0),
@@ -60,9 +60,9 @@ public:
 	{}
 
 	LightState &set(const LightState &state){
+		type=state.type;
 		specularColor.set(state.specularColor);
 		diffuseColor.set(state.diffuseColor);
-		type=state.type;
 		constantAttenuation=state.constantAttenuation;
 		linearAttenuation=state.linearAttenuation;
 		quadraticAttenuation=state.quadraticAttenuation;
@@ -76,9 +76,9 @@ public:
 		return *this;
 	}
 
+	Type type;
 	Vector4 specularColor;
 	Vector4 diffuseColor;
-	Type type;
 	scalar constantAttenuation;
 	scalar linearAttenuation;
 	scalar quadraticAttenuation;

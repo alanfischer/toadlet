@@ -74,7 +74,7 @@ void SceneRenderer::gatherRenderables(RenderableSet *set,Node *node,CameraNode *
 	}
 }
 
-void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,CameraNode *camera){
+void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,CameraNode *camera,bool useMaterials){
 	Matrix4x4 matrix;
 	int i,j;
 
@@ -94,12 +94,14 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 		renderer->clear(clearFlags,camera->getClearColor());
 	}
 
-	renderer->setDefaultStates();
 	renderer->setProjectionMatrix(camera->getProjectionMatrix());
 	renderer->setViewMatrix(camera->getViewMatrix());
 	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
 
-	renderer->setFogState(mScene->getFogState());
+	if(useMaterials){
+		renderer->setDefaultStates();
+		renderer->setFogState(mScene->getFogState());
+	}
 
 	setupLights(set->getLightQueue(),renderer);
 
@@ -108,7 +110,7 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 		const RenderableSet::RenderableQueue &renderableQueue=set->getRenderableQueue(sortedIndexes[j]);
 		Material *material=renderableQueue[0].material;
 
-		if(material!=NULL && mPreviousMaterial!=material){
+		if(useMaterials && material!=NULL && mPreviousMaterial!=material){
 			material->setupRenderer(renderer,mPreviousMaterial);
 		}
 		mPreviousMaterial=material;
@@ -124,7 +126,7 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 		}
 
 		/// @todo: Replace this specific state setting with a more generic Scene Default Material, that will be reset its specific states
-		if(material!=NULL && (material->getStates()&Material::State_FOG)>0){
+		if(useMaterials && material!=NULL && (material->getStates()&Material::State_FOG)>0){
 			renderer->setFogState(mScene->getFogState());
 		}
 	}
@@ -136,7 +138,7 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 		Renderable *renderable=item.renderable;
 		renderable->getRenderTransform().getMatrix(matrix);
 
-		if(material!=NULL && mPreviousMaterial!=material){
+		if(useMaterials && material!=NULL && mPreviousMaterial!=material){
 			material->setupRenderer(renderer,mPreviousMaterial);
 		}
 		mPreviousMaterial=material;
@@ -146,7 +148,7 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 		renderable->render(renderer);
 
 		/// @todo: Replace this specific state setting with a more generic Scene Default Material, that will be reset its specific states
-		if(material!=NULL && (material->getStates()&Material::State_FOG)>0){
+		if(useMaterials && material!=NULL && (material->getStates()&Material::State_FOG)>0){
 			renderer->setFogState(mScene->getFogState());
 		}
 	}

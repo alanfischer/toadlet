@@ -23,36 +23,26 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_SCENERENDERER_H
-#define TOADLET_TADPOLE_SCENERENDERER_H
+#ifndef TOADLET_TADPOLE_SHADOWMAPPEDSCENERENDERER_H
+#define TOADLET_TADPOLE_SHADOWMAPPEDSCENERENDERER_H
 
-#include <toadlet/tadpole/RenderableSet.h>
-#include <toadlet/tadpole/node/CameraNode.h>
+#include <toadlet/peeper/PixelBufferRenderTarget.h>
+#include <toadlet/tadpole/SceneRenderer.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API SceneRenderer{
+class TOADLET_API ShadowMappedSceneRenderer:public SceneRenderer{
 public:
-	TOADLET_SHARED_POINTERS(SceneRenderer);
+	TOADLET_SHARED_POINTERS(ShadowMappedSceneRenderer);
 
-	SceneRenderer(Scene *scene);
-	virtual ~SceneRenderer();
-
-	virtual void renderScene(peeper::Renderer *renderer,node::Node *node,node::CameraNode *camera);
+	ShadowMappedSceneRenderer(Scene *scene);
+	virtual ~ShadowMappedSceneRenderer();
 
 protected:
-	virtual void gatherRenderables(RenderableSet *set,node::Node *node,node::CameraNode *camera);
-	virtual void renderRenderables(RenderableSet *set,peeper::Renderer *renderer,node::CameraNode *camera,bool useMaterials=true);
-
-	void setupViewport(node::CameraNode *camera,peeper::Renderer *renderer);
-	void setupLights(const RenderableSet::LightQueue &lightQueue,peeper::Renderer *renderer);
-
-	Scene *mScene;
-	RenderableSet::ptr mRenderableSet;
-	Material *mPreviousMaterial;
-
-	peeper::Viewport cache_render_viewport;
+	peeper::Texture::ptr mShadowTexture;
+	peeper::PixelBufferRenderTarget::ptr mShadowTarget;
+	node::CameraNode::ptr mLightCamera;
 };
 
 }

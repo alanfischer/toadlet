@@ -46,8 +46,19 @@ DecalShadowSceneRenderer::~DecalShadowSceneRenderer(){
 void DecalShadowSceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,CameraNode *camera){
 	SceneRenderer::renderRenderables(set,renderer,camera);
 	
+	LightNode *light=NULL;
+	if(set->getLightQueue().size()>0){
+		light=set->getLightQueue()[0].light;
+	}
+
+	if(light==NULL){
+		return;
+	}
+
+	const LightState &state=light->getLightState();
+
 	mShadowMaterial->setupRenderer(renderer,NULL);
-	
+
 	int i,j;
 	for(i=0;i<set->getNumRenderableQueues();++i){
 		const RenderableSet::RenderableQueue &queue=set->getRenderableQueue(i);
@@ -59,7 +70,12 @@ void DecalShadowSceneRenderer::renderRenderables(RenderableSet *set,Renderer *re
 			Plane p;
 			p.normal=Vector3(0,0,1);
 			p.distance=20;
-			Math::setMatrix4x4FromObliquePlane(m,p,Vector3(0,0,-1));
+			if(state.type==LightState::Type_DIRECTION){
+				Math::setMatrix4x4FromObliquePlane(m,p,state.direction);
+			}
+			else{
+				Math::setMatrix4x4FromPerspectivePlane(m,p,state.position);
+			}
 			
 			Matrix4x4 m2;
 			renderable->getRenderTransform().getMatrix(m2);

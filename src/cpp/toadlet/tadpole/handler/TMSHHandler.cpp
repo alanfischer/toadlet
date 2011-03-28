@@ -47,8 +47,8 @@ Resource::ptr TMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 
 	DataStream::ptr dataStream(new DataStream(stream));
 
-	int signature=dataStream->readUInt32();
-	if(signature!=SIGNATURE){
+	int id=dataStream->readUInt32();
+	if(id!=TMSH){
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"Not of TMSH format");
 		return NULL;
@@ -109,7 +109,7 @@ bool TMSHHandler::save(Mesh::ptr mesh,Stream::ptr stream){
 
 	DataStream::ptr dataStream(new DataStream(stream));
 
-	dataStream->writeUInt32(SIGNATURE);
+	dataStream->writeUInt32(TMSH);
 
 	dataStream->writeUInt32(VERSION);
 
