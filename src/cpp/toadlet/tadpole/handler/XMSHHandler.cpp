@@ -132,7 +132,7 @@ Mesh::ptr XMSHHandler::loadMeshVersion2Up(mxml_node_t *root,int version){
 	mxml_node_t *block=root->child;
 	while((block=block->next)!=NULL){
 		if(strcmp(mxmlGetElementName(block),"Mesh")==0){
-			mesh=XMLMeshUtilities::loadMesh(block,version,mEngine->getBufferManager(),mEngine->getMaterialManager(),mEngine->getTextureManager());
+			mesh=XMLMeshUtilities::loadMesh(block,version,mEngine!=NULL?mEngine->getBufferManager():NULL,mEngine!=NULL?mEngine->getMaterialManager():NULL,mEngine!=NULL?mEngine->getTextureManager():NULL);
 		}
 		else if(strcmp(mxmlGetElementName(block),"Skeleton")==0){
 			mesh->skeleton=Skeleton::ptr(XMLMeshUtilities::loadSkeleton(block,version));
