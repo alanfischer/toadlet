@@ -37,11 +37,14 @@ namespace tadpole{
 ShadowMappedSceneRenderer::ShadowMappedSceneRenderer(Scene *scene):
 	SceneRenderer(scene)
 {
-	mShadowTexture=scene->getEngine()->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET,Texture::Dimension_D2,Texture::Format_DEPTH_24,1024,1024,1,1);
-	mShadowTarget=scene->getEngine()->getTextureManager()->createPixelBufferRenderTarget();
-	mShadowTarget->attach(mShadowTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_DEPTH_STENCIL);
+	Engine *engine=scene->getEngine();
 
-	mLightCamera=scene->getEngine()->createNodeType(CameraNode::type(),scene);
+	mShadowTexture=engine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET,Texture::Dimension_D2,Texture::Format_DEPTH_24,1024,1024,1,1);
+	mShadowTarget=engine->getTextureManager()->createPixelBufferRenderTarget();
+	mShadowTarget->attach(mShadowTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_DEPTH_STENCIL);
+	mShadowStage=engine->getMaterialManager()->createTextureStage(mShadowTexture,true);
+
+	mLightCamera=engine->createNodeType(CameraNode::type(),scene);
 	mLightCamera->setProjectionFovX(Math::PI/4,1,30,60);
 	scene->getRoot()->attach(mLightCamera);
 }
@@ -49,11 +52,58 @@ ShadowMappedSceneRenderer::ShadowMappedSceneRenderer(Scene *scene):
 ShadowMappedSceneRenderer::~ShadowMappedSceneRenderer(){
 }
 
-#if 0
 void ShadowMappedSceneRenderer::renderScene(Renderer *renderer,Node *node,CameraNode *camera){
-//	renderer->set
-}
+	if(mLight==NULL){
+		SceneRenderer::renderScene(renderer,node,camera);
+		return;
+	}
 
+	mLightCamera->setTransform(mLight->getTransform());
+
+	gatherRenderables(mRenderableSet,node,mLightCamera);
+
+	RenderTarget *oldRenderTarget=renderer->getRenderTarget();
+
+	renderer->setRenderTarget(mShadowTarget);
+	renderer->beginScene();
+	{
+		renderer->setFaceCulling(Renderer::FaceCulling_FRONT);
+		renderer->setDepthBias(0,.1);
+
+		renderRenderables(mRenderableSet,renderer,mLightCamera,false);
+
+		renderer->setDepthBias(0,0);
+		renderer->setFaceCulling(Renderer::FaceCulling_BACK);
+	}
+	renderer->endScene();
+	renderer->swap();
+
+
+	gatherRenderables(mRenderableSet,node,camera);
+
+	renderer->setRenderTarget(oldRenderTarget);
+	renderer->beginScene();
+	{
+		Matrix4x4 biasMatrix;
+		renderer->getShadowBiasMatrix(mShadowTexture,biasMatrix);
+
+		// Calculate texture matrix for projection
+		// This matrix takes us from eye space to the light's clip space
+		Matrix4x4 textureMatrix=biasMatrix*
+			mLightCamera->getProjectionMatrix() *
+			mLightCamera->getViewMatrix() * camera->calculateInverseViewMatrix();
+		mShadowStage->setCalculation(TextureStage::Calculation_CAMERASPACE,textureMatrix);
+		renderer->setTextureStage(0,mShadowStage);
+
+		renderer->setShadowComparisonMethod(true);
+
+		renderRenderables(mRenderableSet,renderer,camera,false);
+
+		renderer->setShadowComparisonMethod(false);
+	}
+	renderer->endScene();
+}
+#if 0
 /*
 scene->DO_STATES=true;
 	light->setEnabled(false);
@@ -130,7 +180,6 @@ renderer->setDefaultStates();
 
 
 
-
 	mShadowMaterial->setupRenderer(renderer,NULL);
 
 	int i,j;
@@ -147,6 +196,7 @@ renderer->setDefaultStates();
 			if(state.type==LightState::Type_DIRECTION){
 				Math::setMatrix4x4FromObliquePlane(m,p,state.direction);
 			}
+
 			else{
 				Math::setMatrix4x4FromPerspectivePlane(m,p,state.position);
 			}
