@@ -1,5 +1,8 @@
 #include "stdafx.h"
+// CreatePlugIn has a different signature in the msLib, so redefine it
+#define CreatePlugIn MSCreatePlugIn
 #include "msPlugInImpl.h"
+#undef CreatePlugIn
 #include "../shared/msConversion.h"
 
 #include <toadlet/egg/io/FileStream.h>

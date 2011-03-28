@@ -1,6 +1,9 @@
 #include "stdafx.h"
-#include "commctrl.h"
+// CreatePlugIn has a different signature in the msLib, so redefine it
+#define CreatePlugIn MsCreatePlugIn
 #include "msPlugInImpl.h"
+#undef CreatePlugIn
+#include "commctrl.h"
 #include "../shared/msConversion.h"
 #pragma comment(lib,"comctl32.lib")
 
