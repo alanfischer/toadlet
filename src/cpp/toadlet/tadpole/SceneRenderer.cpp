@@ -50,7 +50,9 @@ SceneRenderer::~SceneRenderer(){
 
 void SceneRenderer::renderScene(Renderer *renderer,Node *node,CameraNode *camera){
 	gatherRenderables(mRenderableSet,node,camera);
+	renderer->beginScene();
 	renderRenderables(mRenderableSet,renderer,camera);
+	renderer->endScene();
 }
 
 void SceneRenderer::gatherRenderables(RenderableSet *set,Node *node,CameraNode *camera){
@@ -86,13 +88,17 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 
 	mPreviousMaterial=NULL;
 
+Logger::alert("VIEWPORTING");
 	setupViewport(camera,renderer);
+Logger::alert("VIEWPORTED");
 
+Logger::alert("CLEARING");
 	int clearFlags=camera->getClearFlags();
 	if(clearFlags>0 && !camera->getSkipFirstClear()){
 		renderer->setDepthWrite(true);
 		renderer->clear(clearFlags,camera->getClearColor());
 	}
+Logger::alert("CLEARED");
 
 	renderer->setProjectionMatrix(camera->getProjectionMatrix());
 	renderer->setViewMatrix(camera->getViewMatrix());

@@ -49,6 +49,7 @@
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/SceneRenderer.h>
+#include <toadlet/tadpole/ShadowMappedSceneRenderer.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/Transform.h>
