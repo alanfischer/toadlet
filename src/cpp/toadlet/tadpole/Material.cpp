@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/peeper/CapabilitySet.h>
+#include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/egg/Logger.h>
 
@@ -70,7 +70,7 @@ Material::ptr Material::clone(){
 	retain();
 
 	material->mStates=mStates;
-	material->mLightEffect.set(mLightEffect);
+	material->mMaterialState.set(mMaterialState);
 	material->mLighting=mLighting;
 	material->mFaceCulling=mFaceCulling;
 	material->mFogState.set(mFogState);
@@ -78,7 +78,7 @@ Material::ptr Material::clone(){
 	material->mShading=mShading;
 	material->mAlphaTest=mAlphaTest;
 	material->mAlphaTestCutoff=mAlphaTestCutoff;
-	material->mBlend.set(mBlend);
+	material->mBlendState.set(mBlendState);
 	material->mDepthWrite=mDepthWrite;
 	material->mDepthTest=mDepthTest;
 	material->mPointState.set(mPointState);
@@ -115,7 +115,7 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 			renderer->setAlphaTest(mAlphaTest,mAlphaTestCutoff);
 		}
 		if((states&State_BLEND)>0){
-			renderer->setBlend(mBlend);
+			renderer->setBlendState(mBlendState);
 		}
 		if((states&State_DEPTHTEST)>0){
 			renderer->setDepthTest(mDepthTest);
@@ -138,8 +138,8 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		if((states&State_LIGHTING)>0){
 			renderer->setLighting(mLighting);
 		}
-		if((states&State_LIGHTEFFECT)>0){
-			renderer->setLightEffect(mLightEffect); // We set this even if lighting isnt enabled, since it includes color tracking
+		if((states&State_MATERIAL)>0){
+			renderer->setMaterialState(mMaterialState); // We set this even if lighting isnt enabled, since it includes color tracking
 		}
 		if((states&State_POINT)>0){
 			renderer->setPointState(mPointState);
@@ -150,7 +150,7 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		for(i=0;i<numTextureStages;++i){
 			renderer->setTextureStage(i,mTextureStages[i]);
 		}
-		int maxTextureStages=renderer->getCapabilitySet().maxTextureStages;
+		int maxTextureStages=renderer->getCapabilityState().maxTextureStages;
 		for(;i<maxTextureStages;++i){
 			renderer->setTextureStage(i,NULL);
 		}
@@ -160,8 +160,8 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		if((states&State_ALPHATEST)>0 && ((pstates&State_ALPHATEST)==0 || previousMaterial->mAlphaTest!=mAlphaTest || previousMaterial->mAlphaTestCutoff!=mAlphaTestCutoff)){
 			renderer->setAlphaTest(mAlphaTest,mAlphaTestCutoff);
 		}
-		if((states&State_BLEND)>0 && ((pstates&State_BLEND)==0 || previousMaterial->mBlend!=mBlend)){
-			renderer->setBlend(mBlend);
+		if((states&State_BLEND)>0 && ((pstates&State_BLEND)==0 || previousMaterial->mBlendState!=mBlendState)){
+			renderer->setBlendState(mBlendState);
 		}
 		if((states&State_DEPTHTEST)>0 && ((pstates&State_DEPTHTEST)==0 || previousMaterial->mDepthTest!=mDepthTest)){
 			renderer->setDepthTest(mDepthTest);
@@ -184,8 +184,8 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		if((states&State_LIGHTING)>0 && ((pstates&State_LIGHTING)==0 || previousMaterial->mLighting!=mLighting)){
 			renderer->setLighting(mLighting);
 		}
-		if((states&State_LIGHTEFFECT)>0){
-			renderer->setLightEffect(mLightEffect);
+		if((states&State_MATERIAL)>0){
+			renderer->setMaterialState(mMaterialState);
 		}
 		if((states&State_POINT)>0){
 			renderer->setPointState(mPointState);
@@ -211,7 +211,7 @@ void Material::modifyWith(Material::ptr material){
 		setAlphaTest(material->mAlphaTest,material->mAlphaTestCutoff);
 	}
 	if((states&State_BLEND)>0){
-		setBlend(material->mBlend);
+		setBlendState(material->mBlendState);
 	}
 	if((states&State_DEPTHTEST)>0){
 		setDepthTest(material->mDepthTest);
@@ -234,8 +234,8 @@ void Material::modifyWith(Material::ptr material){
 	if((states&State_LIGHTING)>0){
 		setLighting(material->mLighting);
 	}
-	if((states&State_LIGHTEFFECT)>0){
-		setLightEffect(material->mLightEffect);
+	if((states&State_MATERIAL)>0){
+		setMaterialState(material->mMaterialState);
 	}
 	if((states&State_POINT)>0){
 		setPointState(material->mPointState);

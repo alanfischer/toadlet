@@ -25,7 +25,7 @@
 
 #include <toadlet/peeper/BackableTexture.h>
 #include <toadlet/peeper/BackablePixelBufferRenderTarget.h>
-#include <toadlet/peeper/CapabilitySet.h>
+#include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/tadpole/TextureManager.h>
 #include <toadlet/tadpole/Engine.h>
 
@@ -83,9 +83,9 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 //closestFormat=Image::Format_RGBA_8;
  
 	// Check if the renderer supports npot textures
-	bool hasNonPowerOf2=renderer==NULL?false:renderer->getCapabilitySet().textureNonPowerOf2;
+	bool hasNonPowerOf2=renderer==NULL?false:renderer->getCapabilityState().textureNonPowerOf2;
 	// Check if the renderer can autogenerate mipmaps
-	bool hasAutogen=renderer==NULL?false:renderer->getCapabilitySet().textureAutogenMipMaps;
+	bool hasAutogen=renderer==NULL?false:renderer->getCapabilityState().textureAutogenMipMaps;
 	// See if we want autogenerate, and only do so if we have a renderer
 	bool wantsAutogen=renderer==NULL?false:(usage&Texture::Usage_BIT_AUTOGEN_MIPMAPS)>0;
 //#error our d3d10 problem is really 2fold, and somewhat a d3d9 problem too

@@ -26,7 +26,7 @@
 #include "GLBuffer.h"
 #include "GLRenderer.h"
 #include "GLVertexFormat.h"
-#include <toadlet/peeper/CapabilitySet.h>
+#include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
@@ -76,7 +76,7 @@ bool GLBuffer::create(int usage,int access,IndexFormat indexFormat,int size){
 	createContext();
 
 	#if !defined(TOADLET_HAS_GLES)
-		mMapping=mRenderer->useMapping(this) && mRenderer->getCapabilitySet().hardwareIndexBuffers;
+		mMapping=mRenderer->useMapping(this) && mRenderer->getCapabilityState().hardwareIndexBuffers;
 	#else
 		mMapping=false;
 	#endif
@@ -100,7 +100,7 @@ bool GLBuffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int si
 	createContext();
 
 	#if !defined(TOADLET_HAS_GLES)
-		mMapping=mRenderer->useMapping(this) && mRenderer->getCapabilitySet().hardwareVertexBuffers;
+		mMapping=mRenderer->useMapping(this) && mRenderer->getCapabilityState().hardwareVertexBuffers;
 	#else
 		mMapping=false;
 	#endif
@@ -179,8 +179,8 @@ void GLBuffer::destroy(){
 }
 
 bool GLBuffer::createContext(){
-	if((mTarget==GL_ELEMENT_ARRAY_BUFFER && mRenderer->getCapabilitySet().hardwareIndexBuffers) ||
-		(mTarget==GL_ARRAY_BUFFER && mRenderer->getCapabilitySet().hardwareIndexBuffers)
+	if((mTarget==GL_ELEMENT_ARRAY_BUFFER && mRenderer->getCapabilityState().hardwareIndexBuffers) ||
+		(mTarget==GL_ARRAY_BUFFER && mRenderer->getCapabilityState().hardwareIndexBuffers)
 		#if defined(TOADLET_HAS_GLEW)
 			|| mTarget==GL_PIXEL_UNPACK_BUFFER_ARB
 		#endif
@@ -209,8 +209,6 @@ bool GLBuffer::destroyContext(){
 }
 
 uint8 *GLBuffer::lock(int lockAccess){
-	mRenderer->mStatisticsSet.bufferLockCount++;
-
 	mLockAccess=lockAccess;
 
 	#if !defined(TOADLET_HAS_GLES)

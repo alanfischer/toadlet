@@ -23,17 +23,17 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_LIGHTEFFECT_H
-#define TOADLET_PEEPER_LIGHTEFFECT_H
+#ifndef TOADLET_PEEPER_MATERIALSTATE_H
+#define TOADLET_PEEPER_MATERIALSTATE_H
 
 #include <toadlet/peeper/Types.h>
 
 namespace toadlet{
 namespace peeper{
 
-class LightEffect{
+class MaterialState{
 public:
-	LightEffect():
+	MaterialState():
 		ambient(Math::ONE_VECTOR4),
 		diffuse(Math::ONE_VECTOR4),
 		specular(Math::ONE_VECTOR4),
@@ -42,11 +42,11 @@ public:
 		trackColor(false)
 	{}
 
-	LightEffect(const LightEffect &lightEffect){
+	MaterialState(const MaterialState &lightEffect){
 		set(lightEffect);
 	}
 
-	LightEffect(const Vector4 &color):
+	MaterialState(const Vector4 &color):
 		shininess(Math::ONE),
 		emissive(Math::ZERO_VECTOR4),
 		trackColor(false)
@@ -54,14 +54,14 @@ public:
 		set(color);
 	}
 
-	LightEffect(const Vector4 &ambient1,const Vector4&diffuse1,const Vector4 &specular1,scalar shininess):
+	MaterialState(const Vector4 &ambient1,const Vector4&diffuse1,const Vector4 &specular1,scalar shininess):
 		emissive(Math::ZERO_VECTOR4),
 		trackColor(false)
 	{
 		set(ambient1,diffuse1,specular1,shininess);
 	}
 
-	LightEffect(bool trackColor1):
+	MaterialState(bool trackColor1):
 		ambient(Math::ONE_VECTOR4),
 		diffuse(Math::ONE_VECTOR4),
 		specular(Math::ONE_VECTOR4),
@@ -70,24 +70,24 @@ public:
 		trackColor(trackColor1)
 	{}
 
-	LightEffect &set(const LightEffect &lightEffect){
-		ambient.set(lightEffect.ambient);
-		diffuse.set(lightEffect.diffuse);
-		specular.set(lightEffect.specular);
-		shininess=lightEffect.shininess;
-		emissive.set(lightEffect.emissive);
-		trackColor=lightEffect.trackColor;
+	MaterialState &set(const MaterialState &state){
+		ambient.set(state.ambient);
+		diffuse.set(state.diffuse);
+		specular.set(state.specular);
+		shininess=state.shininess;
+		emissive.set(state.emissive);
+		trackColor=state.trackColor;
 		return *this;
 	}
 
-	LightEffect &set(const Vector4 &color){
+	MaterialState &set(const Vector4 &color){
 		ambient.set(color);
 		diffuse.set(color);
 		specular.set(color);
 		return *this;
 	}
 
-	LightEffect &set(const Vector4 &ambient1,const Vector4 &diffuse1,const Vector4 &specular1,scalar shininess1){
+	MaterialState &set(const Vector4 &ambient1,const Vector4 &diffuse1,const Vector4 &specular1,scalar shininess1){
 		ambient.set(ambient1);
 		diffuse.set(diffuse1);
 		specular.set(specular1);
@@ -95,24 +95,24 @@ public:
 		return *this;
 	}
 
-	bool operator==(const LightEffect &lightEffect) const{
+	bool operator==(const MaterialState &state) const{
 		return
-			ambient==lightEffect.ambient &&
-			diffuse==lightEffect.diffuse &&
-			specular==lightEffect.specular &&
-			shininess==lightEffect.shininess &&
-			emissive==lightEffect.emissive &&
-			trackColor==lightEffect.trackColor;
+			ambient==state.ambient &&
+			diffuse==state.diffuse &&
+			specular==state.specular &&
+			shininess==state.shininess &&
+			emissive==state.emissive &&
+			trackColor==state.trackColor;
 	}
 
-	bool operator!=(const LightEffect &lightEffect) const{
+	bool operator!=(const MaterialState &state) const{
 		return
-			ambient!=lightEffect.ambient ||
-			diffuse!=lightEffect.diffuse ||
-			specular!=lightEffect.specular ||
-			shininess!=lightEffect.shininess ||
-			emissive!=lightEffect.emissive ||
-			trackColor!=lightEffect.trackColor;
+			ambient!=state.ambient ||
+			diffuse!=state.diffuse ||
+			specular!=state.specular ||
+			shininess!=state.shininess ||
+			emissive!=state.emissive ||
+			trackColor!=state.trackColor;
 	}
 
 	Vector4 ambient;

@@ -183,8 +183,6 @@ bool D3D10Buffer::destroyContext(){
 }
 
 uint8 *D3D10Buffer::lock(int lockAccess){
-	mRenderer->mStatisticsSet.bufferLockCount++;
-
 	mLockAccess=lockAccess;
 
 	if(mMapping){

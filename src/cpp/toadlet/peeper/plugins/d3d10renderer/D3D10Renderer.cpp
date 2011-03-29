@@ -33,7 +33,7 @@
 #include "D3D10VertexFormat.h"
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/peeper/LightEffect.h>
+#include <toadlet/peeper/MaterialState.h>
 #include <toadlet/peeper/LightState.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/Viewport.h>
@@ -100,23 +100,24 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 	mRenderTarget=target;
 	mD3DRenderTarget=d3dtarget;
 
-	mCapabilitySet.resetOnResize=false;
-	mCapabilitySet.hardwareTextures=true;
-	mCapabilitySet.hardwareIndexBuffers=true;
-	mCapabilitySet.hardwareVertexBuffers=true;
-	mCapabilitySet.pointSprites=false;
-	mCapabilitySet.maxLights=0;
-	mCapabilitySet.maxTextureStages=16;
-	mCapabilitySet.maxTextureSize=8192;
-	mCapabilitySet.textureDot3=false;
-	mCapabilitySet.textureNonPowerOf2=true;
-	mCapabilitySet.textureNonPowerOf2Restricted=true;
-	mCapabilitySet.textureAutogenMipMaps=false;
-	mCapabilitySet.renderToTexture=true;
-	mCapabilitySet.renderToDepthTexture=true;
-	mCapabilitySet.renderToTextureNonPowerOf2Restricted=true;
-	mCapabilitySet.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
-	mCapabilitySet.triangleFan=false;
+	CapabilityState &caps=mCapabilityState;
+	caps.resetOnResize=false;
+	caps.hardwareTextures=true;
+	caps.hardwareIndexBuffers=true;
+	caps.hardwareVertexBuffers=true;
+	caps.pointSprites=false;
+	caps.maxLights=0;
+	caps.maxTextureStages=16;
+	caps.maxTextureSize=8192;
+	caps.textureDot3=false;
+	caps.textureNonPowerOf2=true;
+	caps.textureNonPowerOf2Restricted=true;
+	caps.textureAutogenMipMaps=false;
+	caps.renderToTexture=true;
+	caps.renderToDepthTexture=true;
+	caps.renderToTextureNonPowerOf2Restricted=true;
+	caps.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
+	caps.triangleFan=false;
 
 	setDefaultStates();
 
@@ -326,7 +327,6 @@ void D3D10Renderer::setProjectionMatrix(const Matrix4x4 &matrix){
 }
 
 void D3D10Renderer::beginScene(){
-	mStatisticsSet.reset();
 }
 
 void D3D10Renderer::endScene(){
@@ -340,7 +340,7 @@ void D3D10Renderer::endScene(){
 	mD3DDevice->IASetInputLayout(NULL);
 
 	int i;
-	for(i=0;i<mCapabilitySet.maxTextureStages;++i){
+	for(i=0;i<mCapabilityState.maxTextureStages;++i){
 		setTextureStage(i,NULL);
 	}
 
@@ -531,7 +531,7 @@ void D3D10Renderer::setDefaultStates(){
 void D3D10Renderer::setAlphaTest(const AlphaTest &alphaTest,scalar cutoff){
 }
 
-void D3D10Renderer::setBlend(const Blend &blend){
+void D3D10Renderer::setBlendState(const BlendState &state){
 }
 
 void D3D10Renderer::setDepthTest(const DepthTest &depthTest){
@@ -555,8 +555,8 @@ void D3D10Renderer::setFill(const Fill &fill){
 void D3D10Renderer::setLighting(bool lighting){
 }
 
-void D3D10Renderer::setLightEffect(const LightEffect &lightEffect){
-	effect->GetVariableByName("diffuseColor")->AsVector()->SetFloatVector((float*)lightEffect.diffuse.getData());
+void D3D10Renderer::setMaterialState(const MaterialState &state){
+	effect->GetVariableByName("diffuseColor")->AsVector()->SetFloatVector((float*)state.diffuse.getData());
 }
 
 void D3D10Renderer::setDepthBias(scalar constant,scalar slope){

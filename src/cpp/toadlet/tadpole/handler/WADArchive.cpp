@@ -27,7 +27,7 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/io/DataStream.h>
-#include <toadlet/peeper/CapabilitySet.h>
+#include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/tadpole/handler/WADArchive.h>
 #include <string.h>
 
@@ -109,7 +109,7 @@ peeper::Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager 
 	int swidth=littleInt32(miptex->width),sheight=littleInt32(miptex->height);
 	int dwidth=swidth,dheight=sheight;
 	int size=swidth*sheight;
-	bool hasNonPowerOf2=textureManager->getRenderer()==NULL?false:textureManager->getRenderer()->getCapabilitySet().textureNonPowerOf2;
+	bool hasNonPowerOf2=textureManager->getRenderer()==NULL?false:textureManager->getRenderer()->getCapabilityState().textureNonPowerOf2;
 
 	if(size<=0 || littleInt32(miptex->offsets[0])==0){
 		return NULL;

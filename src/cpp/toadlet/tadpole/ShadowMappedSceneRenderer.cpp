@@ -96,11 +96,7 @@ void ShadowMappedSceneRenderer::renderScene(Renderer *renderer,Node *node,Camera
 		mShadowStage->setCalculation(TextureStage::Calculation_CAMERASPACE,textureMatrix);
 		renderer->setTextureStage(0,mShadowStage);
 
-		renderer->setShadowComparisonMethod(true);
-
 		renderRenderables(mRenderableSet,renderer,camera,false);
-
-		renderer->setShadowComparisonMethod(false);
 	}
 	renderer->endScene();
 }

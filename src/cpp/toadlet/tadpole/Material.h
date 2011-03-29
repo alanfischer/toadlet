@@ -29,8 +29,8 @@
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/FogState.h>
-#include <toadlet/peeper/LightEffect.h>
-#include <toadlet/peeper/Blend.h>
+#include <toadlet/peeper/MaterialState.h>
+#include <toadlet/peeper/BlendState.h>
 #include <toadlet/peeper/PointState.h>
 #include <toadlet/peeper/TextureStage.h>
 #include <toadlet/peeper/Renderer.h>
@@ -38,47 +38,13 @@
 namespace toadlet{
 namespace tadpole{
 
-/*
-Different state blocks:
- RASTERIZER
-	D3D10_FILL_MODE FillMode;
-	D3D10_CULL_MODE CullMode;
-	BOOL            FrontCounterClockwise;
-	INT             DepthBias;
-	FLOAT           DepthBiasClamp;
-	FLOAT           SlopeScaledDepthBias;
-	BOOL            DepthClipEnable;
-	BOOL            ScissorEnable;
-	BOOL            MultisampleEnable;
-	BOOL            AntialiasedLineEnable;
- DEPTH STENCIL
-	BOOL                       DepthEnable;
-	D3D10_DEPTH_WRITE_MASK     DepthWriteMask;
-	D3D10_COMPARISON_FUNC      DepthFunc;
-	BOOL                       StencilEnable;
-	UINT8                      StencilReadMask;
-	UINT8                      StencilWriteMask;
-	D3D10_DEPTH_STENCILOP_DESC FrontFace;
-	D3D10_DEPTH_STENCILOP_DESC BackFace;
-  BLEND
-	BOOL           AlphaToCoverageEnable;
-	BOOL           BlendEnable[8];
-	D3D10_BLEND    SrcBlend;
-	D3D10_BLEND    DestBlend;
-	D3D10_BLEND_OP BlendOp;
-	D3D10_BLEND    SrcBlendAlpha;
-	D3D10_BLEND    DestBlendAlpha;
-	D3D10_BLEND_OP BlendOpAlpha;
-	UINT8          RenderTargetWriteMask[8];
-*/
-
 class TOADLET_API Material:public egg::BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(Material);
 
 	enum States{
 		State_LIGHTING=		1<<0,
-		State_LIGHTEFFECT=	1<<1,
+		State_MATERIAL=		1<<1,
 		State_FACECULLING=	1<<2,
 		State_FILL=			1<<3,
 		State_FOG=			1<<4,
@@ -100,8 +66,8 @@ public:
 	void setLighting(bool lighting){mStates|=State_LIGHTING;mLighting=lighting;}
 	inline bool getLighting() const{return mLighting;}
 
-	void setLightEffect(const peeper::LightEffect &lightEffect){mStates|=State_LIGHTEFFECT;mLightEffect.set(lightEffect);}
-	inline const peeper::LightEffect &getLightEffect() const{return mLightEffect;}
+	void setMaterialState(const peeper::MaterialState &state){mStates|=State_MATERIAL;mMaterialState.set(state);}
+	inline const peeper::MaterialState &getMaterialState() const{return mMaterialState;}
 
 	void setFaceCulling(const peeper::Renderer::FaceCulling &faceCulling){mStates|=State_FACECULLING;mFaceCulling=faceCulling;}
 	inline const peeper::Renderer::FaceCulling &getFaceCulling() const{return mFaceCulling;}
@@ -121,8 +87,8 @@ public:
 	inline const peeper::Renderer::AlphaTest &getAlphaTest() const{return mAlphaTest;}
 	inline scalar getAlphaTestCutoff() const{return mAlphaTestCutoff;}
 
-	void setBlend(const peeper::Blend &blend){mStates|=State_BLEND;mBlend=blend;}
-	inline const peeper::Blend &getBlend() const{return mBlend;}
+	void setBlendState(const peeper::BlendState &state){mStates|=State_BLEND;mBlendState.set(state);}
+	inline const peeper::BlendState &getBlendState() const{return mBlendState;}
 
 	void setDepthSorted(bool sorted){mStates|=State_DEPTHSORT;mDepthSorted=sorted;}
 	inline bool getDepthSorted() const{return mDepthSorted;}
@@ -151,7 +117,7 @@ public:
 	
 protected:
 	int mStates;
-	peeper::LightEffect mLightEffect;
+	peeper::MaterialState mMaterialState;
 	bool mLighting;
 	peeper::Renderer::FaceCulling mFaceCulling;
 	peeper::Renderer::Fill mFill;
@@ -159,7 +125,7 @@ protected:
 	peeper::FogState mFogState;
 	peeper::Renderer::AlphaTest mAlphaTest;
 	scalar mAlphaTestCutoff;
-	peeper::Blend mBlend;
+	peeper::BlendState mBlendState;
 	bool mDepthSorted;
 	bool mDepthWrite;
 	peeper::Renderer::DepthTest mDepthTest;

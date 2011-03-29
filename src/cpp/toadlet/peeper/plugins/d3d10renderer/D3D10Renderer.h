@@ -29,11 +29,10 @@
 #include "D3D10Includes.h"
 #include "D3D10RenderTarget.h"
 #include <toadlet/peeper/Renderer.h>
-#include <toadlet/peeper/Blend.h>
-#include <toadlet/peeper/LightEffect.h>
+#include <toadlet/peeper/BlendState.h>
+#include <toadlet/peeper/MaterialState.h>
 #include <toadlet/peeper/TextureStage.h>
-#include <toadlet/peeper/StatisticsSet.h>
-#include <toadlet/peeper/CapabilitySet.h>
+#include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/peeper/IndexData.h>
 
 namespace toadlet{
@@ -87,14 +86,14 @@ D3D10_PASS_DESC passDesc;
 	// Render state operations
 	void setDefaultStates();
 	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff);
-	void setBlend(const Blend &blend);
+	void setBlendState(const BlendState &state);
 	void setDepthTest(const DepthTest &depthTest);
 	void setDepthWrite(bool depthWrite);
 	void setDithering(bool dithering);
 	void setFaceCulling(const FaceCulling &faceCulling);
 	void setFogState(const FogState &state);
 	void setLighting(bool lighting);
-	void setLightEffect(const LightEffect &lightEffect);
+	void setMaterialState(const MaterialState &state);
 	void setFill(const Fill &fill);
 	void setShading(const Shading &shading);
 	void setColorWrite(bool r,bool b,bool g,bool a);
@@ -115,8 +114,7 @@ D3D10_PASS_DESC passDesc;
 	bool getStrictFormats(){return mStrict;}
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
 
-	const StatisticsSet &getStatisticsSet(){return mStatisticsSet;}
-	const CapabilitySet &getCapabilitySet(){return mCapabilitySet;}
+	const CapabilityState &getCapabilityState(){return mCapabilityState;}
 
 	inline ID3D10Device *getD3D10Device(){return mD3DDevice;}
 
@@ -140,8 +138,7 @@ protected:
 	Matrix4x4 mViewMatrix;
 	Matrix4x4 mProjectionMatrix;
 
-	StatisticsSet mStatisticsSet;
-	CapabilitySet mCapabilitySet;
+	CapabilityState mCapabilityState;
 
 	friend class D3D10Buffer;
 };

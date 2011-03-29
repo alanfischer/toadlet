@@ -26,7 +26,7 @@
 #ifndef TOADLET_TADPOLE_ANIMATION_MATERIALLIGHTEFFECTANIMATION_H
 #define TOADLET_TADPOLE_ANIMATION_MATERIALLIGHTEFFECTANIMATION_H
 
-#include <toadlet/peeper/LightEffect.h>
+#include <toadlet/peeper/MaterialState.h>
 #include <toadlet/tadpole/animation/Animatable.h>
 #include <toadlet/tadpole/Material.h>
 
@@ -38,7 +38,7 @@ class MaterialLightEffectAnimation:public Animatable{
 public:
 	TOADLET_SHARED_POINTERS(MaterialLightEffectAnimation);
 
-	MaterialLightEffectAnimation(Material::ptr target,const peeper::LightEffect &start,const peeper::LightEffect &end,scalar time){
+	MaterialLightEffectAnimation(Material::ptr target,const peeper::MaterialState &start,const peeper::MaterialState &end,scalar time){
 		mTarget=target;
 		mStart.set(start);
 		mEnd.set(end);
@@ -50,12 +50,12 @@ public:
 	void set(scalar value){
 		scalar t=Math::div(value,mEndTime);
 
-		peeper::LightEffect &le=cache_set_le;
-		Math::lerp(le.ambient,mStart.ambient,mEnd.ambient,t);
-		Math::lerp(le.diffuse,mStart.diffuse,mEnd.diffuse,t);
-		Math::lerp(le.specular,mStart.specular,mEnd.specular,t);
-		Math::lerp(le.emissive,mStart.emissive,mEnd.emissive,t);
-		mTarget->setLightEffect(le);
+		peeper::MaterialState state;
+		Math::lerp(state.ambient,mStart.ambient,mEnd.ambient,t);
+		Math::lerp(state.diffuse,mStart.diffuse,mEnd.diffuse,t);
+		Math::lerp(state.specular,mStart.specular,mEnd.specular,t);
+		Math::lerp(state.emissive,mStart.emissive,mEnd.emissive,t);
+		mTarget->setMaterialState(state);
 	}
 
 	scalar getMin() const{return 0;}
@@ -63,11 +63,9 @@ public:
 
 protected:
 	Material::ptr mTarget;
-	peeper::LightEffect mStart;
-	peeper::LightEffect mEnd;
+	peeper::MaterialState mStart;
+	peeper::MaterialState mEnd;
 	scalar mEndTime;
-
-	peeper::LightEffect cache_set_le;
 };
 
 }

@@ -29,15 +29,14 @@
 #include "GLIncludes.h"
 #include "GLRenderTarget.h"
 #include <toadlet/peeper/Renderer.h>
-#include <toadlet/peeper/Blend.h>
+#include <toadlet/peeper/BlendState.h>
 #include <toadlet/peeper/FogState.h>
-#include <toadlet/peeper/LightEffect.h>
+#include <toadlet/peeper/MaterialState.h>
 #include <toadlet/peeper/LightState.h>
 #include <toadlet/peeper/PointState.h>
 #include <toadlet/peeper/TextureStage.h>
 #include <toadlet/peeper/Viewport.h>
-#include <toadlet/peeper/StatisticsSet.h>
-#include <toadlet/peeper/CapabilitySet.h>
+#include <toadlet/peeper/CapabilityState.h>
 
 namespace toadlet{
 namespace peeper{
@@ -96,24 +95,22 @@ public:
 	// Render state operations
 	void setDefaultStates();
 	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff);
-	void setBlend(const Blend &blend);
+	void setBlendState(const BlendState &state);
 	void setDepthTest(const DepthTest &depthTest);
 	void setDepthWrite(bool depthWrite);
 	void setDithering(bool dithering);
 	void setFaceCulling(const FaceCulling &faceCulling);
 	void setFogState(const FogState &state);
-	void setLightEffect(const LightEffect &lightEffect);
+	void setMaterialState(const MaterialState &state);
 	void setFill(const Fill &fill);
 	void setLighting(bool lighting);
 	void setShading(const Shading &shading);
 	void setColorWrite(bool r,bool g,bool b,bool a);
 	void setNormalize(const Normalize &normalize);
 	void setDepthBias(scalar constant,scalar slope);
-	void setTexturePerspective(bool texturePerspective);
 	void setPointState(const PointState &state);
 	void setTextureStage(int stage,TextureStage *textureStage);
 	void setProgram(const Program *program);
-	void setShadowComparisonMethod(bool enabled);
 	void setLightEnabled(int i,bool enable);
 	void setLightState(int i,const LightState &state);
 	void setAmbientColor(const Vector4 &ambient);
@@ -124,8 +121,7 @@ public:
 	void setStrictFormats(bool strict){mStrict=strict;}
 	bool getStrictFormats(){return mStrict;}
 
-	const StatisticsSet &getStatisticsSet(){return mStatisticsSet;}
-	const CapabilitySet &getCapabilitySet(){return mCapabilitySet;}
+	const CapabilityState &getCapabilityState(){return mCapabilityState;}
 
 	bool useMapping(GLBuffer *buffer) const;
 
@@ -146,7 +142,7 @@ public:
 
 	static GLenum getGLDepthFunc(DepthTest alphaTest);
 	static GLenum getGLAlphaFunc(AlphaTest alphaTest);
-	static GLenum getGLBlendOperation(Blend::Operation blend);
+	static GLenum getGLBlendOperation(BlendState::Operation operation);
 	static GLint getGLFogType(FogState::FogType type);
 	static GLint getGLElementCount(int format);
 	static GLenum getGLDataType(int format);
@@ -164,6 +160,8 @@ public:
 	static GLuint GLCubeFaces[6];
 
 protected:
+	void setTexturePerspective(bool texturePerspective);
+
 	inline int setVertexData(const VertexData *vertexData,int lastTypeBits);
 
 	int mMatrixMode;
@@ -192,8 +190,7 @@ protected:
 		egg::math::Matrix4x4 mViewMatrix;
 	#endif
 
-	StatisticsSet mStatisticsSet;
-	CapabilitySet mCapabilitySet;
+	CapabilityState mCapabilityState;
 	bool mMultiTexture;
 
 	RenderTarget *mPrimaryRenderTarget;

@@ -23,15 +23,15 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_BLEND_H
-#define TOADLET_PEEPER_BLEND_H
+#ifndef TOADLET_PEEPER_BLENDSTATE_H
+#define TOADLET_PEEPER_BLENDSTATE_H
 
 #include <toadlet/peeper/Types.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API Blend{
+class TOADLET_API BlendState{
 public:
 	enum Operation{
 		Operation_ONE,
@@ -54,27 +54,27 @@ public:
 		Combination_ALPHA_ADDITIVE,
 	};
 
-	Blend():
+	BlendState():
 		source(Operation_ONE),
 		dest(Operation_ZERO)
 	{}
 
-	Blend(const Combination &blend){
-		set(blend);
+	BlendState(const Combination &state){
+		set(state);
 	}
 
-	Blend(const Operation &src,const Operation &dst){
+	BlendState(const Operation &src,const Operation &dst){
 		set(src,dst);
 	}
 
-	Blend &set(const Blend &blend){
-		source=blend.source;
-		dest=blend.dest;
+	BlendState &set(const BlendState &state){
+		source=state.source;
+		dest=state.dest;
 
 		return *this;
 	}
 
-	Blend &set(const Combination &blend){
+	BlendState &set(const Combination &blend){
 		switch(blend){
 			case Combination_COLOR:
 				source=Operation_ONE;
@@ -101,23 +101,23 @@ public:
 		return *this;
 	}
 
-	Blend &set(Operation src,Operation dst){
+	BlendState &set(Operation src,Operation dst){
 		source=src;
 		dest=dst;
 
 		return *this;
 	}
 
-	inline bool equals(const Blend &blend) const{
-		return (source==blend.source && dest==blend.dest);
+	inline bool equals(const BlendState &state) const{
+		return (source==state.source && dest==state.dest);
 	}
 
-	inline bool operator==(const Blend &blend) const{
-		return (source==blend.source && dest==blend.dest);
+	inline bool operator==(const BlendState &state) const{
+		return (source==state.source && dest==state.dest);
 	}
 
-	inline bool operator!=(const Blend &blend) const{
-		return !(source==blend.source && dest==blend.dest);
+	inline bool operator!=(const BlendState &state) const{
+		return !(source==state.source && dest==state.dest);
 	}
 
 	Operation source;

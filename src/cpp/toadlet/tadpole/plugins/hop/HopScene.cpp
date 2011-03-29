@@ -26,7 +26,7 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Profile.h>
-#include <toadlet/peeper/CapabilitySet.h> 
+#include <toadlet/peeper/CapabilityState.h> 
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/Scene.h>

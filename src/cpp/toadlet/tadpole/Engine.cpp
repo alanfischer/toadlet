@@ -68,7 +68,7 @@
 
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/peeper/CapabilitySet.h>
+#include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/MaterialManager.h>
@@ -338,41 +338,43 @@ bool Engine::setRenderer(Renderer *renderer){
 			return false;
 		}
 
-		const toadlet::peeper::CapabilitySet &capabilitySet=renderer->getCapabilitySet();
+		const toadlet::peeper::CapabilityState &caps=renderer->getCapabilityState();
 		Logger::alert(Categories::TOADLET_TADPOLE,
 			"Renderer Capabilities:");
 		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"maxLights:"+capabilitySet.maxLights);
+			String()+(char)9+"maxLights:"+caps.maxLights);
 		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"maxTextureStages:"+capabilitySet.maxTextureStages);
+			String()+(char)9+"maxTextureStages:"+caps.maxTextureStages);
 		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"maxTextureSize:"+capabilitySet.maxTextureSize);
+			String()+(char)9+"maxTextureSize:"+caps.maxTextureSize);
 		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"hardwareVertexBuffers:"+capabilitySet.hardwareVertexBuffers);
+			String()+(char)9+"hardwareVertexBuffers:"+caps.hardwareVertexBuffers);
 		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"hardwareIndexBuffers:"+capabilitySet.hardwareIndexBuffers);
+			String()+(char)9+"hardwareIndexBuffers:"+caps.hardwareIndexBuffers);
 		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"vertexShaders:"+capabilitySet.vertexShaders);
+			String()+(char)9+"vertexShaders:"+caps.vertexShaders);
 		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"maxVertexShaderLocalParameters:"+capabilitySet.maxVertexShaderLocalParameters);
+			String()+(char)9+"maxVertexShaderLocalParameters:"+caps.maxVertexShaderLocalParameters);
 		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"fragmentShaders:"+capabilitySet.fragmentShaders);
+			String()+(char)9+"fragmentShaders:"+caps.fragmentShaders);
 		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"maxFragmentShaderLocalParameters:"+capabilitySet.maxFragmentShaderLocalParameters);
+			String()+(char)9+"maxFragmentShaderLocalParameters:"+caps.maxFragmentShaderLocalParameters);
 		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"renderToTexture:"+capabilitySet.renderToTexture);
+			String()+(char)9+"renderToTexture:"+caps.renderToTexture);
 		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"renderToDepthTexture:"+capabilitySet.renderToDepthTexture);
+			String()+(char)9+"renderToDepthTexture:"+caps.renderToDepthTexture);
 		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"renderToTextureNonPowerOf2Restricted:"+capabilitySet.renderToTextureNonPowerOf2Restricted);
+			String()+(char)9+"renderToTextureNonPowerOf2Restricted:"+caps.renderToTextureNonPowerOf2Restricted);
 		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"textureDot3:"+capabilitySet.textureDot3);
+			String()+(char)9+"textureDot3:"+caps.textureDot3);
 		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"textureNonPowerOf2Restricted:"+capabilitySet.textureNonPowerOf2Restricted);
+			String()+(char)9+"textureNonPowerOf2Restricted:"+caps.textureNonPowerOf2Restricted);
 		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"textureNonPowerOf2:"+capabilitySet.textureNonPowerOf2);
+			String()+(char)9+"textureNonPowerOf2:"+caps.textureNonPowerOf2);
 		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"textureAutogenMipMaps:"+capabilitySet.textureAutogenMipMaps);
+			String()+(char)9+"textureAutogenMipMaps:"+caps.textureAutogenMipMaps);
+
+		mIdealVertexFormatBit=caps.idealVertexFormatBit;
 	}
 
 	if(renderer!=mRenderer && mRenderer!=NULL){
@@ -385,7 +387,6 @@ bool Engine::setRenderer(Renderer *renderer){
 	mRenderer=renderer;
 
 	if(mRenderer!=NULL){
-		mIdealVertexFormatBit=mRenderer->getCapabilitySet().idealVertexFormatBit;
 		updateVertexFormats();
 	}
 

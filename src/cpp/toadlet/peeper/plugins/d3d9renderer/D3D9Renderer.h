@@ -29,11 +29,10 @@
 #include "D3D9Includes.h"
 #include "D3D9RenderTarget.h"
 #include <toadlet/peeper/Renderer.h>
-#include <toadlet/peeper/Blend.h>
-#include <toadlet/peeper/LightEffect.h>
+#include <toadlet/peeper/BlendState.h>
+#include <toadlet/peeper/MaterialState.h>
 #include <toadlet/peeper/TextureStage.h>
-#include <toadlet/peeper/StatisticsSet.h>
-#include <toadlet/peeper/CapabilitySet.h>
+#include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/peeper/IndexData.h>
 
 namespace toadlet{
@@ -84,24 +83,22 @@ public:
 	// Render state operations
 	void setDefaultStates();
 	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff);
-	void setBlend(const Blend &blend);
+	void setBlendState(const BlendState &state);
 	void setDepthTest(const DepthTest &depthTest);
 	void setDepthWrite(bool depthWrite);
 	void setDithering(bool dithering);
 	void setFaceCulling(const FaceCulling &faceCulling);
 	void setFogState(const FogState &state);
 	void setLighting(bool lighting);
-	void setLightEffect(const LightEffect &lightEffect);
+	void setMaterialState(const MaterialState &state);
 	void setFill(const Fill &fill);
 	void setShading(const Shading &shading);
 	void setColorWrite(bool r,bool g,bool b,bool a);
 	void setNormalize(const Normalize &normalize);
 	void setDepthBias(scalar constant,scalar slope);
-	void setTexturePerspective(bool texturePerspective);
 	void setPointState(const PointState &state);
 	void setTextureStage(int stage,TextureStage *textureStage);
 	void setProgram(const Program *program);
-	void setShadowComparisonMethod(bool enabled);
 	void setLightState(int i,const LightState &state);
 	void setLightEnabled(int i,bool enable);
 	void setAmbientColor(const Vector4 &ambient);
@@ -112,8 +109,7 @@ public:
 	void setStrictFormats(bool strict){mStrict=strict;}
 	bool getStrictFormats(){return mStrict;}
 
-	const StatisticsSet &getStatisticsSet(){return mStatisticsSet;}
-	const CapabilitySet &getCapabilitySet(){return mCapabilitySet;}
+	const CapabilityState &getCapabilityState(){return mCapabilityState;}
 
 	inline IDirect3DDevice9 *getDirect3DDevice9(){return mD3DDevice;}
 	inline const D3DCAPS9 &getD3DCAPS9() const{return mD3DCaps;}
@@ -127,11 +123,13 @@ public:
 	static DWORD getD3DTADDRESS(TextureStage::AddressMode addressMode);
 	static DWORD getD3DTEXF(TextureStage::Filter filter);
 	static DWORD getD3DTA(TextureBlend::Source blend);
-	static D3DBLEND getD3DBLEND(Blend::Operation blend);
+	static D3DBLEND getD3DBLEND(BlendState::Operation operation);
 	static DWORD getFVF(VertexFormat *vertexFormat);
 
 protected:
-	static void setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D3DCAPS9 &caps,bool renderToTexture,bool renderToDepthTexture);
+	void setTexturePerspective(bool texturePerspective);
+
+	static void setCapabilityStateFromCaps(CapabilityState &caps,const D3DCAPS9 &d3dcaps,bool renderToTexture,bool renderToDepthTexture);
 	static void getPrimitiveTypeAndCount(D3DPRIMITIVETYPE &d3dpt,int &count,IndexData::Primitive prim,int numIndexes);
 
 	IDirect3D9 *mD3D;
@@ -146,8 +144,7 @@ protected:
 	D3D9RenderTarget *mD3DRenderTarget;
 	bool mStrict;
 
-	StatisticsSet mStatisticsSet;
-	CapabilitySet mCapabilitySet;
+	CapabilityState mCapabilityState;
 
 	Matrix4x4 cache_setTextureStage_transform;
 };

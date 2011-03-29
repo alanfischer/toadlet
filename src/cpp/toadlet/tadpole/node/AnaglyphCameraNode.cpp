@@ -59,16 +59,16 @@ Node *AnaglyphCameraNode::create(Scene *scene){
 	mLeftMaterial=mEngine->getMaterialManager()->createMaterial();
 	mLeftMaterial->setDepthTest(Renderer::DepthTest_NONE);
 	mLeftMaterial->setLighting(true);
-	mLeftMaterial->setLightEffect(LightEffect(Colors::RED));
+	mLeftMaterial->setMaterialState(MaterialState(Colors::RED));
 	mLeftMaterial->setTextureStage(0,TextureStage::ptr(new TextureStage(mLeftTexture)));
 	mLeftMaterial->retain();
 
 	mRightMaterial=mEngine->getMaterialManager()->createMaterial();
 	mRightMaterial->setDepthTest(Renderer::DepthTest_NONE);
 	mRightMaterial->setLighting(true);
-	mRightMaterial->setLightEffect(LightEffect(Colors::CYAN));
+	mRightMaterial->setMaterialState(MaterialState(Colors::CYAN));
 	mRightMaterial->setTextureStage(0,TextureStage::ptr(new TextureStage(mRightTexture)));
-	mRightMaterial->setBlend(Blend::Combination_COLOR_ADDITIVE);
+	mRightMaterial->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
 	mRightMaterial->retain();
 
 	return this;
@@ -97,12 +97,12 @@ Node *AnaglyphCameraNode::set(Node *node){
 
 void AnaglyphCameraNode::setLeftColor(const Vector4 &color){
 	mLeftColor.set(color);
-	mLeftMaterial->setLightEffect(LightEffect(mLeftColor));
+	mLeftMaterial->setMaterialState(MaterialState(mLeftColor));
 }
 
 void AnaglyphCameraNode::setRightColor(const Vector4 &color){
 	mRightColor.set(color);
-	mRightMaterial->setLightEffect(LightEffect(mRightColor));
+	mRightMaterial->setMaterialState(MaterialState(mRightColor));
 }
 
 void AnaglyphCameraNode::render(Renderer *renderer,Node *node){

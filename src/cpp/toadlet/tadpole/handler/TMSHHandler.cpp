@@ -25,7 +25,6 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/io/MemoryStream.h>
-#include <toadlet/peeper/CapabilitySet.h>
 #include <toadlet/tadpole/handler/TMSHHandler.h>
 
 using namespace toadlet::egg;
@@ -370,9 +369,9 @@ Material::ptr TMSHHandler::readMaterial(egg::io::DataStream *stream,int blockSiz
 
 	material->setLighting(stream->readBool());
 
-	LightEffect lightEffect;
-	stream->read((tbyte*)&lightEffect,sizeof(lightEffect));
-	material->setLightEffect(lightEffect);
+	MaterialState state;
+	stream->read((tbyte*)&state,sizeof(state));
+	material->setMaterialState(state);
 
 	material->setFaceCulling((Renderer::FaceCulling)stream->readInt32());
 
@@ -391,7 +390,7 @@ void TMSHHandler::writeMaterial(egg::io::DataStream *stream,Material::ptr materi
 
 	stream->writeBool(material->getLighting());
 
-	stream->write((tbyte*)&material->getLightEffect(),sizeof(LightEffect));
+	stream->write((tbyte*)&material->getMaterialState(),sizeof(MaterialState));
 
 	stream->writeInt32(material->getFaceCulling());
 }
