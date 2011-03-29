@@ -28,13 +28,13 @@
 
 #include <toadlet/peeper/BackableBuffer.h>
 #include <toadlet/peeper/BackableTexture.h>
-#include <toadlet/peeper/Blend.h>
+#include <toadlet/peeper/BlendState.h>
 #include <toadlet/peeper/Buffer.h>
-#include <toadlet/peeper/CapabilitySet.h>
+#include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/peeper/IndexData.h>
-#include <toadlet/peeper/LightEffect.h>
+#include <toadlet/peeper/MaterialState.h>
 #include <toadlet/peeper/LightState.h>
 #include <toadlet/peeper/PixelBuffer.h>
 #include <toadlet/peeper/PixelBufferRenderTarget.h>
@@ -46,7 +46,6 @@
 #include <toadlet/peeper/SectionTexture.h>
 #include <toadlet/peeper/SequenceTexture.h>
 #include <toadlet/peeper/Shader.h>
-#include <toadlet/peeper/StatisticsSet.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/peeper/TextureBlend.h>
 #include <toadlet/peeper/TextureStage.h>

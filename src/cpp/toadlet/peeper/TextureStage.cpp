@@ -44,6 +44,8 @@ TextureStage::TextureStage():
 	minFilter(Filter_NEAREST),
 	mipFilter(Filter_NONE),
 	magFilter(Filter_NEAREST),
+	
+	perspective(true),
 
 	texCoordIndex(0),
 
@@ -68,6 +70,8 @@ TextureStage::TextureStage(const Texture::ptr &texture1):
 	minFilter(Filter_NEAREST),
 	mipFilter(Filter_NONE),
 	magFilter(Filter_NEAREST),
+
+	perspective(true),
 
 	texCoordIndex(0),
 

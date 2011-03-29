@@ -34,11 +34,11 @@
 namespace toadlet{
 namespace peeper{
 
-class Blend;
-class CapabilitySet;
+class BlendState;
+class CapabilityState;
 class IndexBuffer;
-class LightEffect;
 class LightState;
+class MaterialState;
 class FogState;
 class Program;
 class Query;
@@ -47,7 +47,6 @@ class PixelBufferRenderTarget;
 class PixelBuffer;
 class PointState;
 class Shader;
-class StatisticsSet;
 class Texture;
 class TextureStage;
 class VertexBuffer;
@@ -155,7 +154,7 @@ public:
 	// Render state operations
 	virtual void setDefaultStates()=0;
 	virtual void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff)=0;
-	virtual void setBlend(const Blend &blend)=0;
+	virtual void setBlendState(const BlendState &state)=0;
 	virtual void setDepthTest(const DepthTest &depthTest)=0;
 	virtual void setDepthWrite(bool depthWrite)=0;
 	virtual void setDithering(bool dithering)=0;
@@ -166,26 +165,21 @@ public:
 	virtual void setColorWrite(bool r,bool g,bool b,bool a)=0;
 	virtual void setNormalize(const Normalize &normalize)=0;
 	virtual void setDepthBias(scalar constant,scalar slope)=0;
-	virtual void setTexturePerspective(bool texturePerspective)=0;
 	virtual void setPointState(const PointState &state)=0;
 	virtual void setTextureStage(int stage,TextureStage *textureStage)=0;
 	virtual void setProgram(const Program *program)=0;
 	virtual void setLighting(bool lighting)=0;
-	virtual void setLightEffect(const LightEffect &lightEffect)=0;
+	virtual void setMaterialState(const MaterialState &state)=0;
 	virtual void setLightState(int i,const LightState &light)=0;
 	virtual void setLightEnabled(int i,bool enable)=0;
 	virtual void setAmbientColor(const Vector4 &ambient)=0;
-	 // A workaround here, since OpenGL & Direct3D have different shadow comparison methods
-	virtual void setShadowComparisonMethod(bool enabled)=0;
 
 	// Misc operations
 	virtual int getClosestTextureFormat(int textureFormat)=0;
 	virtual void setStrictFormats(bool strict)=0;
 	virtual bool getStrictFormats()=0;
 	virtual void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result)=0;
-
-	virtual const StatisticsSet &getStatisticsSet()=0;
-	virtual const CapabilitySet &getCapabilitySet()=0;
+	virtual const CapabilityState &getCapabilityState()=0;
 };
 
 }

@@ -195,10 +195,12 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 	Logger::alert(Categories::TOADLET_PEEPER,
 		String("GL_EXTENSIONS:") + glGetString(GL_EXTENSIONS));
 
+	CapabilityState &caps=mCapabilityState;
+
 	#if defined(TOADLET_HAS_GLESEM)
-		mCapabilitySet.hardwareTextures=glesemAcceleratedResult>0;
+		caps.hardwareTextures=glesemAcceleratedResult>0;
 	#else
-		mCapabilitySet.hardwareTextures=true;
+		caps.hardwareTextures=true;
 	#endif
 
 	GLint maxTextureStages=0;
@@ -208,27 +210,27 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 	if(maxTextureStages<=0){
 		maxTextureStages=1;
 	}
-	mCapabilitySet.maxTextureStages=maxTextureStages;
+	caps.maxTextureStages=maxTextureStages;
 	mMultiTexture=maxTextureStages>1;
 
-	mLastTextures.resize(mCapabilitySet.maxTextureStages,NULL);
-	mLastTexTargets.resize(mCapabilitySet.maxTextureStages,0);
-	mTexCoordIndexes.resize(mCapabilitySet.maxTextureStages,-1);
-	mLastTexCoordIndexes.resize(mCapabilitySet.maxTextureStages,-1);
+	mLastTextures.resize(caps.maxTextureStages,NULL);
+	mLastTexTargets.resize(caps.maxTextureStages,0);
+	mTexCoordIndexes.resize(caps.maxTextureStages,-1);
+	mLastTexCoordIndexes.resize(caps.maxTextureStages,-1);
 
 	GLint maxTextureSize=0;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE,&maxTextureSize);
 	if(maxTextureSize<=0){
 		maxTextureSize=256;
 	}
-	mCapabilitySet.maxTextureSize=maxTextureSize;
+	caps.maxTextureSize=maxTextureSize;
 
 	GLint maxLights=0;
 	glGetIntegerv(GL_MAX_LIGHTS,&maxLights);
 	if(maxLights<=0){
 		maxLights=8;
 	}
-	mCapabilitySet.maxLights=maxLights;
+	caps.maxLights=maxLights;
 
 	#if defined(TOADLET_HAS_GLPBUFFERS)
 		mPBuffersAvailable=usePBuffers && GLPBufferRenderTarget_available(this);
@@ -241,57 +243,57 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 		mFBOsAvailable=false;
 	#endif
 
-	mCapabilitySet.renderToTexture=mPBuffersAvailable || mFBOsAvailable;
+	caps.renderToTexture=mPBuffersAvailable || mFBOsAvailable;
 
-	mCapabilitySet.renderToDepthTexture=mFBOsAvailable;
+	caps.renderToDepthTexture=mFBOsAvailable;
 
 	#if defined(TOADLET_HAS_GLEW)
-		mCapabilitySet.textureDot3=(GLEW_ARB_texture_env_dot3!=0);
+		caps.textureDot3=(GLEW_ARB_texture_env_dot3!=0);
 	#elif defined(TOADLET_HAS_GLES)
-		mCapabilitySet.textureDot3=(gl_version>=11);
+		caps.textureDot3=(gl_version>=11);
 	#endif
 
 	#if defined(TOADLET_HAS_GLES)
-		mCapabilitySet.textureAutogenMipMaps|=(gl_version>=11);
+		caps.textureAutogenMipMaps|=(gl_version>=11);
 	#elif defined(TOADLET_HAS_GLEW) && defined(GL_EXT_framebuffer_object)
-		mCapabilitySet.textureAutogenMipMaps|=(GLEW_EXT_framebuffer_object!=0);
+		caps.textureAutogenMipMaps|=(GLEW_EXT_framebuffer_object!=0);
 	#else
-		mCapabilitySet.textureAutogenMipMaps|=(gl_version>=14);
+		caps.textureAutogenMipMaps|=(gl_version>=14);
 	#endif
 
 	#if defined(TOADLET_HAS_GLEW)
 		// Usefully, GL_TEXTURE_RECTANGLE_ARB == GL_TEXTURE_RECTANGLE_EXT == GL_TEXTURE_RECTANGLE_NV
-		mCapabilitySet.textureNonPowerOf2Restricted=(GLEW_ARB_texture_rectangle!=0) || (GLEW_EXT_texture_rectangle!=0) || (GLEW_NV_texture_rectangle!=0);
-		mCapabilitySet.renderToTextureNonPowerOf2Restricted=mFBOsAvailable && mCapabilitySet.textureNonPowerOf2Restricted;
-		mCapabilitySet.textureNonPowerOf2=(GLEW_ARB_texture_non_power_of_two!=0);
+		caps.textureNonPowerOf2Restricted=(GLEW_ARB_texture_rectangle!=0) || (GLEW_EXT_texture_rectangle!=0) || (GLEW_NV_texture_rectangle!=0);
+		caps.renderToTextureNonPowerOf2Restricted=mFBOsAvailable && caps.textureNonPowerOf2Restricted;
+		caps.textureNonPowerOf2=(GLEW_ARB_texture_non_power_of_two!=0);
 	#endif
 
 	#if defined(TOADLET_HAS_GLEW)
-		mCapabilitySet.hardwareIndexBuffers=(mCapabilitySet.hardwareVertexBuffers=(useHardwareBuffers && GLEW_ARB_vertex_buffer_object));
+		caps.hardwareIndexBuffers=(caps.hardwareVertexBuffers=(useHardwareBuffers && GLEW_ARB_vertex_buffer_object));
 	#elif defined(TOADLET_HAS_GLES)
-		mCapabilitySet.hardwareIndexBuffers=(mCapabilitySet.hardwareVertexBuffers=(useHardwareBuffers && gl_version>=11));
+		caps.hardwareIndexBuffers=(caps.hardwareVertexBuffers=(useHardwareBuffers && gl_version>=11));
 	#endif
 
 	#if defined(TOADLET_HAS_GLEW)
-		mCapabilitySet.pointSprites=(GLEW_ARB_point_parameters!=0);
+		caps.pointSprites=(GLEW_ARB_point_parameters!=0);
 	#elif defined(TOADLET_HAS_GLES)
-		mCapabilitySet.pointSprites=(gl_version>=11);
+		caps.pointSprites=(gl_version>=11);
 	#endif
 
 	#if defined(TOADLET_HAS_GLEW)
-		mCapabilitySet.vertexShaders=(GLEW_ARB_vertex_program>0);
-		if(mCapabilitySet.vertexShaders) glGetProgramivARB(GL_VERTEX_PROGRAM_ARB,GL_MAX_PROGRAM_ENV_PARAMETERS_ARB,(GLint*)&mCapabilitySet.maxVertexShaderLocalParameters);
+		caps.vertexShaders=(GLEW_ARB_vertex_program>0);
+		if(caps.vertexShaders) glGetProgramivARB(GL_VERTEX_PROGRAM_ARB,GL_MAX_PROGRAM_ENV_PARAMETERS_ARB,(GLint*)&caps.maxVertexShaderLocalParameters);
 	#endif
 
 	#if defined(TOADLET_HAS_GLEW)
-		mCapabilitySet.fragmentShaders=(GLEW_ARB_fragment_program>0);
-		if(mCapabilitySet.fragmentShaders) glGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB,GL_MAX_PROGRAM_ENV_PARAMETERS_ARB,(GLint*)&mCapabilitySet.maxFragmentShaderLocalParameters);
+		caps.fragmentShaders=(GLEW_ARB_fragment_program>0);
+		if(caps.fragmentShaders) glGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB,GL_MAX_PROGRAM_ENV_PARAMETERS_ARB,(GLint*)&caps.maxFragmentShaderLocalParameters);
 	#endif
 
 	#if defined(TOADLET_HAS_GLES) && defined(TOADLET_FIXED_POINT)
-		mCapabilitySet.idealVertexFormatBit=VertexFormat::Format_BIT_FIXED_32;
+		caps.idealVertexFormatBit=VertexFormat::Format_BIT_FIXED_32;
 	#else
-		mCapabilitySet.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
+		caps.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
 	#endif
 
 	// OSX needs a notification to update the back buffer on a resize
@@ -299,16 +301,16 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 		mCapabilitySet.resetOnResize=true;
 	#endif
 
-	mCapabilitySet.triangleFan=true;
+	caps.triangleFan=true;
 	#if !defined(TOADLET_HAS_GLES)
-		mCapabilitySet.fill=true;
-		mCapabilitySet.cubeMap=true;
+		caps.fill=true;
+		caps.cubeMap=true;
 	#else
 		mCapabilitySet.texturePerspective=true;
 		#if TOADLET_HAS_GL_20
-			mCapabilitySet.cubeMap=true;
+			caps.cubeMap=true;
 		#else
-			mCapabilitySet.cubeMap=false;
+			caps.cubeMap=false;
 		#endif
 	#endif
 
@@ -592,8 +594,6 @@ void GLRenderer::beginScene(){
 		}
 	#endif
 
-	mStatisticsSet.reset();
-
 	TOADLET_CHECK_GLERROR("beginScene");
 }
 
@@ -611,15 +611,15 @@ void GLRenderer::endScene(){
 		mLastTypeBits=setVertexData(NULL,mLastTypeBits);
 		mLastVertexData=VertexData::wptr();
 	}
-	if(mCapabilitySet.hardwareVertexBuffers){
+	if(mCapabilityState.hardwareVertexBuffers){
 		glBindBuffer(GL_ARRAY_BUFFER,0);
 	}
-	if(mCapabilitySet.hardwareIndexBuffers){
+	if(mCapabilityState.hardwareIndexBuffers){
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 	}
 
 	int i;
-	for(i=0;i<mCapabilitySet.maxTextureStages;++i){
+	for(i=0;i<mCapabilityState.maxTextureStages;++i){
 		setTextureStage(i,NULL);
 	}
 
@@ -650,27 +650,21 @@ void GLRenderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexDa
 	switch(primitive){
 		case IndexData::Primitive_POINTS:
 			type=GL_POINTS;
-			mStatisticsSet.pointCount+=indexData->count;
 		break;
 		case IndexData::Primitive_LINES:
 			type=GL_LINES;
-			mStatisticsSet.lineCount+=indexData->count/2;
 		break;
 		case IndexData::Primitive_LINESTRIP:
 			type=GL_LINE_STRIP;
-			mStatisticsSet.lineCount+=indexData->count-1;
 		break;
 		case IndexData::Primitive_TRIS:
 			type=GL_TRIANGLES;
-			mStatisticsSet.triangleCount+=indexData->count/3;
 		break;
 		case IndexData::Primitive_TRISTRIP:
 			type=GL_TRIANGLE_STRIP;
-			mStatisticsSet.triangleCount+=indexData->count-2;
 		break;
 		case IndexData::Primitive_TRIFAN:
 			type=GL_TRIANGLE_FAN;
-			mStatisticsSet.triangleCount+=indexData->count-2;
 		break;
 	}
 
@@ -699,7 +693,7 @@ void GLRenderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexDa
 		GLenum indexType=getGLIndexType(indexBuffer->getIndexFormat());
 		GLBuffer *glindexBuffer=(GLBuffer*)indexBuffer->getRootIndexBuffer();
 		if(glindexBuffer->mHandle==0){
-			if(mCapabilitySet.hardwareIndexBuffers){
+			if(mCapabilityState.hardwareIndexBuffers){
 				glBindBuffer(glindexBuffer->mTarget,0);
 			}
 			glDrawElements(type,indexData->count,indexType,glindexBuffer->mData+indexData->start*glindexBuffer->mIndexFormat);
@@ -793,7 +787,7 @@ bool GLRenderer::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
 void GLRenderer::setDefaultStates(){
 	// General states
 	setAlphaTest(AlphaTest_NONE,Math::HALF);
-	setBlend(Blend::Combination_DISABLED);
+	setBlendState(BlendState::Combination_DISABLED);
 	setDepthWrite(true);
 	setDepthTest(DepthTest_LEQUAL);
 	setDithering(false);
@@ -810,12 +804,12 @@ void GLRenderer::setDefaultStates(){
 	#endif
 
 	int i;
-	for(i=0;i<mCapabilitySet.maxTextureStages;++i){
+	for(i=0;i<mCapabilityState.maxTextureStages;++i){
 		mLastTexTargets[i]=GL_TEXTURE_2D;
 		setTextureStage(i,NULL);
 	}
 
-	setLightEffect(LightEffect());
+	setMaterialState(MaterialState());
 	setAmbientColor(Math::ONE_VECTOR4);
 	// We leave the current lights enabled because the Scene does not re-set the lights between layers
 
@@ -866,19 +860,19 @@ void GLRenderer::setAlphaTest(const AlphaTest &alphaTest,scalar cutoff){
 	TOADLET_CHECK_GLERROR("setAlphaTest");
 }
 
-void GLRenderer::setBlend(const Blend &blend){
-	if(blend.equals(Blend::Combination_DISABLED)){
+void GLRenderer::setBlendState(const BlendState &state){
+	if(state.equals(BlendState::Combination_DISABLED)){
 		glDisable(GL_BLEND);
 	}
 	else{
-		int src=getGLBlendOperation(blend.source);
-		int dest=getGLBlendOperation(blend.dest);
+		int src=getGLBlendOperation(state.source);
+		int dest=getGLBlendOperation(state.dest);
 
 		glBlendFunc(src,dest);
 		glEnable(GL_BLEND);
 	}
 
-	TOADLET_CHECK_GLERROR("setBlend");
+	TOADLET_CHECK_GLERROR("setBlendState");
 }
 
 void GLRenderer::setDepthTest(const DepthTest &depthTest){
@@ -961,9 +955,9 @@ void GLRenderer::setFogState(const FogState &state){
 	TOADLET_CHECK_GLERROR("setFogParameters");
 }
 
-void GLRenderer::setLightEffect(const LightEffect &lightEffect){
+void GLRenderer::setMaterialState(const MaterialState &state){
 	// The GL_COLOR_MATERIAL command must come before the actual Material settings
-	if(lightEffect.trackColor){
+	if(state.trackColor){
 		#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_11)
 		if(gl_version>=11){
 			glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
@@ -977,27 +971,27 @@ void GLRenderer::setLightEffect(const LightEffect &lightEffect){
 
 	#if defined(TOADLET_FIXED_POINT)
 		#if defined(TOADLET_HAS_GLES)
-			glMaterialxv(GL_FRONT_AND_BACK,GL_AMBIENT,lightEffect.ambient.getData());
-			glMaterialxv(GL_FRONT_AND_BACK,GL_DIFFUSE,lightEffect.diffuse.getData());
-			glMaterialxv(GL_FRONT_AND_BACK,GL_SPECULAR,lightEffect.specular.getData());
-			glMaterialx(GL_FRONT_AND_BACK,GL_SHININESS,lightEffect.shininess);
-			glMaterialxv(GL_FRONT_AND_BACK,GL_EMISSION,lightEffect.emissive.getData());
+			glMaterialxv(GL_FRONT_AND_BACK,GL_AMBIENT,state.ambient.getData());
+			glMaterialxv(GL_FRONT_AND_BACK,GL_DIFFUSE,state.diffuse.getData());
+			glMaterialxv(GL_FRONT_AND_BACK,GL_SPECULAR,state.specular.getData());
+			glMaterialx(GL_FRONT_AND_BACK,GL_SHININESS,state.shininess);
+			glMaterialxv(GL_FRONT_AND_BACK,GL_EMISSION,state.emissive.getData());
 		#else
-			glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,colorArray(cacheArray,lightEffect.ambient));
-			glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,colorArray(cacheArray,lightEffect.diffuse));
-			glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,colorArray(cacheArray,lightEffect.specular));
-			glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS,MathConversion::scalarToFloat(lightEffect.shininess));
-			glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,colorArray(cacheArray,lightEffect.emissive));
+			glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,colorArray(cacheArray,state.ambient));
+			glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,colorArray(cacheArray,state.diffuse));
+			glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,colorArray(cacheArray,state.specular));
+			glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS,MathConversion::scalarToFloat(state.shininess));
+			glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,colorArray(cacheArray,state.emissive));
 		#endif
 	#else
-		glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,lightEffect.ambient.getData());
-		glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,lightEffect.diffuse.getData());
-		glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,lightEffect.specular.getData());
-		glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS,lightEffect.shininess);
-		glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,lightEffect.emissive.getData());
+		glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,state.ambient.getData());
+		glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,state.diffuse.getData());
+		glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,state.specular.getData());
+		glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS,state.shininess);
+		glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,state.emissive.getData());
 	#endif
 
-	TOADLET_CHECK_GLERROR("setLightEffect");
+	TOADLET_CHECK_GLERROR("setMaterialState");
 }
 
 void GLRenderer::setFill(const Fill &fill){
@@ -1093,23 +1087,12 @@ void GLRenderer::setDepthBias(scalar constant,scalar slope){
 	TOADLET_CHECK_GLERROR("setDepthBias");
 }
 
-void GLRenderer::setTexturePerspective(bool texturePerspective){
-	#if !defined(TOADLET_HAS_GLES)
-		Error::unimplemented(Categories::TOADLET_PEEPER,
-			"GLRenderer::setTexturePerspective: unimplemented");
-	#else
-		glHint(GL_PERSPECTIVE_CORRECTION_HINT,texturePerspective?GL_NICEST:GL_FASTEST);
-
-		TOADLET_CHECK_GLERROR("setTexturePerspective");
-	#endif
-}
-
 void GLRenderer::setPointState(const PointState &state){
 	mPointState.set(state);
 
 	// pointsize = size / sqrt(constant + linear*d + quadratic*d*d)
 	// if a&b = 0, then quadratic = 1/(C*C) where C = first component of projMatrix * 1/2 screen width
-	if(mCapabilitySet.pointSprites){
+	if(mCapabilityState.pointSprites){
 		int value;
 		if(state.sprite){
 			glEnable(GL_POINT_SPRITE);
@@ -1122,7 +1105,7 @@ void GLRenderer::setPointState(const PointState &state){
 
 		if(mMultiTexture){
 			int stage;
-			for(stage=0;stage<mCapabilitySet.maxTextureStages;++stage){
+			for(stage=0;stage<mCapabilityState.maxTextureStages;++stage){
 				glActiveTexture(GL_TEXTURE0+stage);
 				glTexEnvi(GL_POINT_SPRITE,GL_COORD_REPLACE,value);
 			}
@@ -1171,8 +1154,6 @@ void GLRenderer::setPointState(const PointState &state){
 }
 
 void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
-	mStatisticsSet.textureChangeCount++;
-
 	if(mMultiTexture){
 		glActiveTexture(GL_TEXTURE0+stage);
 	}
@@ -1432,6 +1413,10 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 			}
 		#endif
 
+		if(stage==0){
+			setTexturePerspective(textureStage->perspective);
+		}
+
 		mTexCoordIndexes[stage]=textureStage->texCoordIndex;
 
 		if(stage>=mMaxTexCoordIndex){
@@ -1457,15 +1442,6 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 }
 
 void GLRenderer::setProgram(const Program *program){
-}
-
-void GLRenderer::setShadowComparisonMethod(bool enabled){
-	if(enabled){
-		setAlphaTest(AlphaTest_GEQUAL,Math::HALF);
-	}
-	else{
-		setAlphaTest(AlphaTest_NONE,Math::HALF);
-	}
 }
 
 void GLRenderer::setLightState(int i,const LightState &state){
@@ -1608,6 +1584,13 @@ bool GLRenderer::useMapping(GLBuffer *buffer) const{
 	return buffer->mDataSize>(1024 * 32);
 }
 
+void GLRenderer::setTexturePerspective(bool texturePerspective){
+	#if defined(TOADLET_HAS_GLES)
+		glHint(GL_PERSPECTIVE_CORRECTION_HINT,texturePerspective?GL_NICEST:GL_FASTEST);
+		TOADLET_CHECK_GLERROR("setTexturePerspective");
+	#endif
+}
+
 int GLRenderer::setVertexData(const VertexData *vertexData,int lastSemanticBits){
 	int numVertexBuffers=0;
 	/// @todo: Move all the semantic bit calculation to GLVertexFormat
@@ -1628,7 +1611,7 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastSemanticBits)
 		int numElements=glvertexFormat->mSemantics.size();
 
 		if(glvertexBuffer->mHandle==0){
-			if(mCapabilitySet.hardwareVertexBuffers){
+			if(mCapabilityState.hardwareVertexBuffers){
 				glBindBuffer(glvertexBuffer->mTarget,0);
 			}
 		}
@@ -1805,27 +1788,27 @@ GLenum GLRenderer::getGLAlphaFunc(AlphaTest alphaTest){
 	}
 }
 
-GLenum GLRenderer::getGLBlendOperation(Blend::Operation blend){
-	switch(blend){
-		case Blend::Operation_ONE:
+GLenum GLRenderer::getGLBlendOperation(BlendState::Operation operation){
+	switch(operation){
+		case BlendState::Operation_ONE:
 			return GL_ONE;
-		case Blend::Operation_ZERO:
+		case BlendState::Operation_ZERO:
 			return GL_ZERO;
-		case Blend::Operation_DEST_COLOR:
+		case BlendState::Operation_DEST_COLOR:
 			return GL_DST_COLOR;
-		case Blend::Operation_SOURCE_COLOR:
+		case BlendState::Operation_SOURCE_COLOR:
 			return GL_SRC_COLOR;
-		case Blend::Operation_ONE_MINUS_DEST_COLOR:
+		case BlendState::Operation_ONE_MINUS_DEST_COLOR:
 			return GL_ONE_MINUS_DST_COLOR;
-		case Blend::Operation_ONE_MINUS_SOURCE_COLOR:
+		case BlendState::Operation_ONE_MINUS_SOURCE_COLOR:
 			return GL_ONE_MINUS_SRC_COLOR;
-		case Blend::Operation_DEST_ALPHA:
+		case BlendState::Operation_DEST_ALPHA:
 			return GL_ONE_MINUS_DST_ALPHA;
-		case Blend::Operation_SOURCE_ALPHA:
+		case BlendState::Operation_SOURCE_ALPHA:
 			return GL_SRC_ALPHA;
-		case Blend::Operation_ONE_MINUS_DEST_ALPHA:
+		case BlendState::Operation_ONE_MINUS_DEST_ALPHA:
 			return GL_ONE_MINUS_DST_ALPHA;
-		case Blend::Operation_ONE_MINUS_SOURCE_ALPHA:
+		case BlendState::Operation_ONE_MINUS_SOURCE_ALPHA:
 			return GL_ONE_MINUS_SRC_ALPHA;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,

@@ -67,7 +67,7 @@ Node *LabelNode::create(Scene *scene){
 	mMaterial->setFaceCulling(Renderer::FaceCulling_NONE);
 	mMaterial->setDepthWrite(false);
 	mMaterial->setLighting(true);
-	mMaterial->setLightEffect(LightEffect(true));
+	mMaterial->setMaterialState(MaterialState(true));
 
 	return this;
 }
@@ -223,10 +223,10 @@ void LabelNode::updateLabel(){
 	Texture::ptr texture=mFont->getTexture();
 	mMaterial->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(texture));
 	if(ImageFormatConversion::getAlphaBits(texture->getFormat())>0){
-		mMaterial->setBlend(Blend::Combination_ALPHA);
+		mMaterial->setBlendState(BlendState::Combination_ALPHA);
 	}
 	else{
-		mMaterial->setBlend(Blend::Combination_COLOR);
+		mMaterial->setBlendState(BlendState::Combination_COLOR);
 	}
 
 	// Update bound

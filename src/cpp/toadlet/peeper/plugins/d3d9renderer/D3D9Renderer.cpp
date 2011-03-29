@@ -36,7 +36,7 @@
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/FogState.h>
-#include <toadlet/peeper/LightEffect.h>
+#include <toadlet/peeper/MaterialState.h>
 #include <toadlet/peeper/LightState.h>
 #include <toadlet/peeper/PointState.h>
 #include <toadlet/peeper/VertexData.h>
@@ -140,7 +140,7 @@ bool D3D9Renderer::create(RenderTarget *target,int *options){
 	#else
 		isD3DFORMATValid(D3DFMT_D24S8,D3DUSAGE_DEPTHSTENCIL);
 	#endif
-	setCapabilitySetFromCaps(mCapabilitySet,mD3DCaps,SUCCEEDED(renderToTextureResult),SUCCEEDED(renderToDepthTextureResult));
+	setCapabilityStateFromCaps(mCapabilityState,mD3DCaps,SUCCEEDED(renderToTextureResult),SUCCEEDED(renderToDepthTextureResult));
 
 	setDefaultStates();
 
@@ -327,13 +327,11 @@ void D3D9Renderer::setProjectionMatrix(const Matrix4x4 &matrix){
 void D3D9Renderer::beginScene(){
 	HRESULT result=mD3DDevice->BeginScene();
 	TOADLET_CHECK_D3D9ERROR(result,"beginScene");
-
-	mStatisticsSet.reset();
 }
 
 void D3D9Renderer::endScene(){
 	int i;
-	for(i=0;i<mCapabilitySet.maxTextureStages;++i){
+	for(i=0;i<mCapabilityState.maxTextureStages;++i){
 		setTextureStage(i,NULL);
 	}
 
@@ -461,7 +459,7 @@ bool D3D9Renderer::copySurface(IDirect3DSurface9 *dst,IDirect3DSurface9 *src){
 
 void D3D9Renderer::setDefaultStates(){
 	setAlphaTest(AlphaTest_NONE,0.5);
-	setBlend(Blend::Combination_DISABLED);
+	setBlendState(BlendState::Combination_DISABLED);
 	setDepthWrite(true);
 	setDepthTest(DepthTest_LEQUAL);
 	setDithering(false);
@@ -477,11 +475,11 @@ void D3D9Renderer::setDefaultStates(){
 	#endif
 
 	int i;
-	for(i=0;i<mCapabilitySet.maxTextureStages;++i){
+	for(i=0;i<mCapabilityState.maxTextureStages;++i){
 		setTextureStage(i,NULL);
 	}
 
-	setLightEffect(LightEffect());
+	setMaterialState(MaterialState());
 	setAmbientColor(Math::ONE_VECTOR4);
 	// We leave the current lights enabled because the SceneManager does not re-set the lights between layers
 
@@ -532,14 +530,14 @@ void D3D9Renderer::setAlphaTest(const AlphaTest &alphaTest,scalar cutoff){
 	}
 }
 
-void D3D9Renderer::setBlend(const Blend &blend){
-	if(blend.equals(Blend::Combination_DISABLED)){
+void D3D9Renderer::setBlendState(const BlendState &state){
+	if(state.equals(BlendState::Combination_DISABLED)){
 		mD3DDevice->SetRenderState(D3DRS_SRCBLEND,D3DBLEND_ONE);
 		mD3DDevice->SetRenderState(D3DRS_DESTBLEND,D3DBLEND_ZERO);
 	}
 	else{
-		D3DBLEND src=getD3DBLEND(blend.source);
-		D3DBLEND dest=getD3DBLEND(blend.dest);
+		D3DBLEND src=getD3DBLEND(state.source);
+		D3DBLEND dest=getD3DBLEND(state.dest);
 
 		HRESULT hr;
 		hr=mD3DDevice->SetRenderState(D3DRS_SRCBLEND,src);
@@ -651,25 +649,25 @@ void D3D9Renderer::setLighting(bool lighting){
 	TOADLET_CHECK_D3D9ERROR(hr,"setLighting");
 }
 
-void D3D9Renderer::setLightEffect(const LightEffect &lightEffect){
+void D3D9Renderer::setMaterialState(const MaterialState &state){
 	D3DMATERIAL9 material;
 
-	toD3DCOLORVALUE(material.Ambient,lightEffect.ambient);
-	toD3DCOLORVALUE(material.Diffuse,lightEffect.diffuse);
-	toD3DCOLORVALUE(material.Specular,lightEffect.specular);
+	toD3DCOLORVALUE(material.Ambient,state.ambient);
+	toD3DCOLORVALUE(material.Diffuse,state.diffuse);
+	toD3DCOLORVALUE(material.Specular,state.specular);
 	#if !defined(TOADLET_SET_D3DM) && defined(TOADLET_FIXED_POINT)
-		material.Power=scalarToFloat(lightEffect.shininess);
+		material.Power=scalarToFloat(state.shininess);
 	#else
-		material.Power=lightEffect.shininess;
+		material.Power=state.shininess;
 	#endif
 	#if !defined(TOADLET_SET_D3DM)
-		toD3DCOLORVALUE(material.Emissive,lightEffect.emissive);
+		toD3DCOLORVALUE(material.Emissive,state.emissive);
 	#endif
 
 	mD3DDevice->SetMaterial(&material TOADLET_D3DMFMT);
 
-	mD3DDevice->SetRenderState(D3DRS_COLORVERTEX,lightEffect.trackColor);
-	if(lightEffect.trackColor){
+	mD3DDevice->SetRenderState(D3DRS_COLORVERTEX,state.trackColor);
+	if(state.trackColor){
 		mD3DDevice->SetRenderState(D3DRS_AMBIENTMATERIALSOURCE,D3DMCS_COLOR1);
 		mD3DDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE,D3DMCS_COLOR1);
 	}
@@ -693,7 +691,7 @@ void D3D9Renderer::setPointState(const PointState &state){
 	#if !defined(TOADLET_SET_D3DM)
 		// pointsize = size / sqrt(constant + linear*d + quadratic*d*d)
 		// if a&b = 0, then quadratic = 1/(C*C) where C = first component of projMatrix * 1/2 screen width
-		if(mCapabilitySet.pointSprites){
+		if(mCapabilityState.pointSprites){
 			mD3DDevice->SetRenderState(D3DRS_POINTSPRITEENABLE,state.sprite);
 			mD3DDevice->SetRenderState(D3DRS_POINTSCALEENABLE,state.attenuated);
 
@@ -844,6 +842,10 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 			mD3DDevice->SetSamplerState(stage,D3DSAMP_MIPFILTER,D3D9Renderer::getD3DTEXF(textureStage->mipFilter));
 			mD3DDevice->SetSamplerState(stage,D3DSAMP_MAGFILTER,D3D9Renderer::getD3DTEXF(textureStage->magFilter));
 		#endif
+
+		if(stage==0){
+			setTexturePerspective(textureStage->perspective);
+		}
 	}
 	else{
 		result=mD3DDevice->SetTexture(stage,NULL);
@@ -892,15 +894,6 @@ void D3D9Renderer::setNormalize(const Normalize &normalize){
 	}
 	else{
 		mD3DDevice->SetRenderState(D3DRS_NORMALIZENORMALS,FALSE);
-	}
-}
-
-void D3D9Renderer::setShadowComparisonMethod(bool enabled){
-	if(enabled){
-		mD3DDevice->SetRenderState(D3DRS_BLENDOP,D3DBLENDOP_MAX);
-	}
-	else{
-		mD3DDevice->SetRenderState(D3DRS_BLENDOP,D3DBLENDOP_ADD);
 	}
 }
 
@@ -959,50 +952,49 @@ void D3D9Renderer::setAmbientColor(const Vector4 &ambient){
 	TOADLET_CHECK_D3D9ERROR(hr,"setAmbientColor");
 }
 
-void D3D9Renderer::setCapabilitySetFromCaps(CapabilitySet &capabilitySet,const D3DCAPS9 &caps,bool renderToTexture,bool renderToDepthTexture){
-	capabilitySet.resetOnResize=true;
-	capabilitySet.hardwareTextures=true;
-	capabilitySet.hardwareIndexBuffers=true;
-	capabilitySet.hardwareVertexBuffers=true;
+void D3D9Renderer::setCapabilityStateFromCaps(CapabilityState &caps,const D3DCAPS9 &d3dcaps,bool renderToTexture,bool renderToDepthTexture){
+	caps.resetOnResize=true;
+	caps.hardwareTextures=true;
+	caps.hardwareIndexBuffers=true;
+	caps.hardwareVertexBuffers=true;
 	#if defined(TOADLET_SET_D3DM)
-		capabilitySet.pointSprites=false;
+		caps.pointSprites=false;
 	#else
-		capabilitySet.pointSprites=(caps.FVFCaps & D3DFVFCAPS_PSIZE)!=0 && caps.MaxPointSize>1.0f;
+		caps.pointSprites=(d3dcaps.FVFCaps & D3DFVFCAPS_PSIZE)!=0 && d3dcaps.MaxPointSize>1.0f;
 	#endif
-	capabilitySet.maxLights=caps.MaxActiveLights;
-	capabilitySet.maxTextureStages=caps.MaxTextureBlendStages;
-	capabilitySet.maxTextureSize=math::Math::minVal(caps.MaxTextureWidth,caps.MaxTextureHeight);
-	capabilitySet.textureDot3=(caps.TextureOpCaps & D3DTEXOPCAPS_DOTPRODUCT3)!=0;
-	capabilitySet.textureNonPowerOf2=(caps.TextureCaps & D3DPTEXTURECAPS_POW2)==0 && (caps.TextureCaps & D3DPTEXTURECAPS_SQUAREONLY)==0;
+	caps.maxLights=d3dcaps.MaxActiveLights;
+	caps.maxTextureStages=d3dcaps.MaxTextureBlendStages;
+	caps.maxTextureSize=math::Math::minVal(d3dcaps.MaxTextureWidth,d3dcaps.MaxTextureHeight);
+	caps.textureDot3=(d3dcaps.TextureOpCaps & D3DTEXOPCAPS_DOTPRODUCT3)!=0;
+	caps.textureNonPowerOf2=(d3dcaps.TextureCaps & D3DPTEXTURECAPS_POW2)==0 && (d3dcaps.TextureCaps & D3DPTEXTURECAPS_SQUAREONLY)==0;
 	#if defined(TOADLET_SET_D3DM)
-		capabilitySet.textureNonPowerOf2Restricted=false;
+		caps.textureNonPowerOf2Restricted=false;
 	#else
-		capabilitySet.textureNonPowerOf2Restricted=(caps.TextureCaps & D3DPTEXTURECAPS_NONPOW2CONDITIONAL)!=0;
+		caps.textureNonPowerOf2Restricted=(d3dcaps.TextureCaps & D3DPTEXTURECAPS_NONPOW2CONDITIONAL)!=0;
 	#endif
 	#if defined(TOADLET_SET_D3DM)
-		capabilitySet.textureAutogenMipMaps=false;
+		caps.textureAutogenMipMaps=false;
 	#else
-		capabilitySet.textureAutogenMipMaps=(caps.Caps2 & D3DCAPS2_CANAUTOGENMIPMAP)!=0;
+		caps.textureAutogenMipMaps=(d3dcaps.Caps2 & D3DCAPS2_CANAUTOGENMIPMAP)!=0;
 	#endif
-	capabilitySet.renderToTexture=renderToTexture;
-	capabilitySet.renderToDepthTexture=renderToDepthTexture;
-	capabilitySet.renderToTextureNonPowerOf2Restricted=capabilitySet.textureNonPowerOf2Restricted && capabilitySet.renderToTexture;
+	caps.renderToTexture=renderToTexture;
+	caps.renderToDepthTexture=renderToDepthTexture;
+	caps.renderToTextureNonPowerOf2Restricted=caps.textureNonPowerOf2Restricted && caps.renderToTexture;
 	#if defined(TOADLET_SET_D3DM) && defined(TOADLET_FIXED_POINT)
-		capabilitySet.idealVertexFormatBit=VertexFormat::Format_BIT_FIXED_32;
+		caps.idealVertexFormatBit=VertexFormat::Format_BIT_FIXED_32;
 	#else
-		capabilitySet.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
+		caps.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
 	#endif
-	capabilitySet.triangleFan=true;
-	capabilitySet.fill=true;
+	caps.triangleFan=true;
+	caps.fill=true;
 	#if !defined(TOADLET_SET_D3DM)
-		capabilitySet.texturePerspective=true;
-		capabilitySet.cubeMap=true;
+		caps.texturePerspective=true;
+		caps.cubeMap=true;
 	#endif
 
-	
 	#if defined(TOADLET_SET_D3DM)
 		Logger::alert(Categories::TOADLET_PEEPER,
-			String("D3DM has lockable textures:")+((caps.SurfaceCaps & D3DMSURFCAPS_LOCKTEXTURE)>0));
+			String("D3DM has lockable textures:")+((d3dcaps.SurfaceCaps & D3DMSURFCAPS_LOCKTEXTURE)>0));
 	#endif
 }
 
@@ -1200,27 +1192,27 @@ DWORD D3D9Renderer::getD3DTA(TextureBlend::Source blend){
 	}
 }
 
-D3DBLEND D3D9Renderer::getD3DBLEND(Blend::Operation blend){
-	switch(blend){
-		case Blend::Operation_ONE:
+D3DBLEND D3D9Renderer::getD3DBLEND(BlendState::Operation state){
+	switch(state){
+		case BlendState::Operation_ONE:
 			return D3DBLEND_ONE;
-		case Blend::Operation_ZERO:
+		case BlendState::Operation_ZERO:
 			return D3DBLEND_ZERO;
-		case Blend::Operation_DEST_COLOR:
+		case BlendState::Operation_DEST_COLOR:
 			return D3DBLEND_DESTCOLOR;
-		case Blend::Operation_SOURCE_COLOR:
+		case BlendState::Operation_SOURCE_COLOR:
 			return D3DBLEND_SRCCOLOR;
-		case Blend::Operation_ONE_MINUS_DEST_COLOR:
+		case BlendState::Operation_ONE_MINUS_DEST_COLOR:
 			return D3DBLEND_INVDESTCOLOR;
-		case Blend::Operation_ONE_MINUS_SOURCE_COLOR:
+		case BlendState::Operation_ONE_MINUS_SOURCE_COLOR:
 			return D3DBLEND_INVSRCCOLOR;
-		case Blend::Operation_DEST_ALPHA:
+		case BlendState::Operation_DEST_ALPHA:
 			return D3DBLEND_DESTALPHA;
-		case Blend::Operation_SOURCE_ALPHA:
+		case BlendState::Operation_SOURCE_ALPHA:
 			return D3DBLEND_SRCALPHA;
-		case Blend::Operation_ONE_MINUS_DEST_ALPHA:
+		case BlendState::Operation_ONE_MINUS_DEST_ALPHA:
 			return D3DBLEND_INVDESTALPHA;
-		case Blend::Operation_ONE_MINUS_SOURCE_ALPHA:
+		case BlendState::Operation_ONE_MINUS_SOURCE_ALPHA:
 			return D3DBLEND_INVSRCALPHA;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,

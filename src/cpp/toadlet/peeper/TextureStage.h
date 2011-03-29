@@ -98,6 +98,10 @@ public:
 	void setMagFilter(Filter magf){magFilter=magf;}
 	inline Filter getMagFilter() const{return magFilter;}
 
+	// Only supported on GLES1 & D3DM, and the first SamplerState affects all
+	void setPerspective(bool perspective1){perspective=perspective1;}
+	inline bool getPerspective() const{return perspective;}
+	
 	void setTexCoordIndex(int index){texCoordIndex=index;}
 	inline int getTexCoordIndex() const{return texCoordIndex;}
 
@@ -123,6 +127,8 @@ public:
 	Filter minFilter;
 	Filter mipFilter;
 	Filter magFilter;
+	
+	bool perspective;
 
 	int texCoordIndex;
 

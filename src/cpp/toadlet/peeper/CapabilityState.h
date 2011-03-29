@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_CAPABILITYSET_H
-#define TOADLET_PEEPER_CAPABILITYSET_H
+#ifndef TOADLET_PEEPER_CAPABILITYSTATE_H
+#define TOADLET_PEEPER_CAPABILITYSTATE_H
 
 #include <toadlet/peeper/Types.h>
 #include <toadlet/peeper/VertexFormat.h>
@@ -32,9 +32,9 @@
 namespace toadlet{
 namespace peeper{
 
-class CapabilitySet{
+class CapabilityState{
 public:
-	CapabilitySet():
+	CapabilityState():
 		resetOnResize(false),
 		hardwareTextures(false),
 		hardwareVertexBuffers(false),

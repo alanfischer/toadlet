@@ -251,59 +251,59 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 		materialManager->manage(material);
 	}
 
-	mxml_node_t *lightEffectNode=mxmlFindChild(node,"LightEffect");
-	if(lightEffectNode!=NULL){
-		LightEffect le;
+	mxml_node_t *materialStateNode=mxmlFindChild(node,"LightEffect");
+	if(materialStateNode!=NULL){
+		MaterialState state;
 
-		mxml_node_t *ambientNode=mxmlFindChild(lightEffectNode,"Ambient");
+		mxml_node_t *ambientNode=mxmlFindChild(materialStateNode,"Ambient");
 		if(ambientNode!=NULL){
 			const char *data=mxmlGetOpaque(ambientNode->child);
 			if(data!=NULL){
-				le.ambient=parseVector4(data);
+				state.ambient=parseVector4(data);
 			}
 		}
 
-		mxml_node_t *diffuseNode=mxmlFindChild(lightEffectNode,"Diffuse");
+		mxml_node_t *diffuseNode=mxmlFindChild(materialStateNode,"Diffuse");
 		if(diffuseNode!=NULL){
 			const char *data=mxmlGetOpaque(diffuseNode->child);
 			if(data!=NULL){
-				le.diffuse=parseVector4(data);
+				state.diffuse=parseVector4(data);
 			}
 		}
 
-		mxml_node_t *specularNode=mxmlFindChild(lightEffectNode,"Specular");
+		mxml_node_t *specularNode=mxmlFindChild(materialStateNode,"Specular");
 		if(specularNode!=NULL){
 			const char *data=mxmlGetOpaque(specularNode->child);
 			if(data!=NULL){
-				le.specular=parseVector4(data);
+				state.specular=parseVector4(data);
 			}
 		}
 
-		mxml_node_t *shininessNode=mxmlFindChild(lightEffectNode,"Shininess");
+		mxml_node_t *shininessNode=mxmlFindChild(materialStateNode,"Shininess");
 		if(shininessNode!=NULL){
 			const char *data=mxmlGetOpaque(shininessNode->child);
 			if(data!=NULL){
-				le.shininess=parseScalar(data);
+				state.shininess=parseScalar(data);
 			}
 		}
 
-		mxml_node_t *emissiveNode=mxmlFindChild(lightEffectNode,"Emissive");
+		mxml_node_t *emissiveNode=mxmlFindChild(materialStateNode,"Emissive");
 		if(emissiveNode!=NULL){
 			const char *data=mxmlGetOpaque(emissiveNode->child);
 			if(data!=NULL){
-				le.emissive=parseVector4(data);
+				state.emissive=parseVector4(data);
 			}
 		}
 
-		mxml_node_t *trackColorNode=mxmlFindChild(lightEffectNode,"TrackColor");
+		mxml_node_t *trackColorNode=mxmlFindChild(materialStateNode,"TrackColor");
 		if(trackColorNode!=NULL){
 			const char *data=mxmlGetOpaque(trackColorNode->child);
 			if(data!=NULL){
-				le.trackColor=parseInt(data)>0;
+				state.trackColor=parseInt(data)>0;
 			}
 		}
 
-		material->setLightEffect(le);
+		material->setMaterialState(state);
 	}
 
 	mxml_node_t *lightingNode=NULL;
@@ -471,38 +471,38 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,P
 
 	mxmlElementSetAttr(materialNode,"Name",material->getName());
 
-	mxml_node_t *lightEffectNode=mxmlNewElement(materialNode,"LightEffect");
+	mxml_node_t *materialStateNode=mxmlNewElement(materialNode,"LightEffect");
 	{
-		const LightEffect &lightEffect=material->getLightEffect();
+		const MaterialState &state=material->getMaterialState();
 
-		mxml_node_t *ambientNode=mxmlNewElement(lightEffectNode,"Ambient");
+		mxml_node_t *ambientNode=mxmlNewElement(materialStateNode,"Ambient");
 		{
-			mxmlNewOpaque(ambientNode,makeVector4(lightEffect.ambient));
+			mxmlNewOpaque(ambientNode,makeVector4(state.ambient));
 		}
 
-		mxml_node_t *diffuseNode=mxmlNewElement(lightEffectNode,"Diffuse");
+		mxml_node_t *diffuseNode=mxmlNewElement(materialStateNode,"Diffuse");
 		{
-			mxmlNewOpaque(diffuseNode,makeVector4(lightEffect.diffuse));
+			mxmlNewOpaque(diffuseNode,makeVector4(state.diffuse));
 		}
 
-		mxml_node_t *specularNode=mxmlNewElement(lightEffectNode,"Specular");
+		mxml_node_t *specularNode=mxmlNewElement(materialStateNode,"Specular");
 		{
-			mxmlNewOpaque(specularNode,makeVector4(lightEffect.specular));
+			mxmlNewOpaque(specularNode,makeVector4(state.specular));
 		}
 
-		mxml_node_t *shininessNode=mxmlNewElement(lightEffectNode,"Shininess");
+		mxml_node_t *shininessNode=mxmlNewElement(materialStateNode,"Shininess");
 		{
-			mxmlNewOpaque(shininessNode,makeScalar(lightEffect.shininess));
+			mxmlNewOpaque(shininessNode,makeScalar(state.shininess));
 		}
 
-		mxml_node_t *emissiveNode=mxmlNewElement(lightEffectNode,"Emissive");
+		mxml_node_t *emissiveNode=mxmlNewElement(materialStateNode,"Emissive");
 		{
-			mxmlNewOpaque(emissiveNode,makeVector4(lightEffect.emissive));
+			mxmlNewOpaque(emissiveNode,makeVector4(state.emissive));
 		}
 
-		mxml_node_t *trackColorNode=mxmlNewElement(lightEffectNode,"TrackColor");
+		mxml_node_t *trackColorNode=mxmlNewElement(materialStateNode,"TrackColor");
 		{
-			mxmlNewOpaque(trackColorNode,makeInt(lightEffect.trackColor));
+			mxmlNewOpaque(trackColorNode,makeInt(state.trackColor));
 		}
 	}
 

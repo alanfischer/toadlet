@@ -25,7 +25,7 @@
 
 #include "D3D9IndexBuffer.h"
 #include "D3D9Renderer.h"
-#include <toadlet/peeper/CapabilitySet.h>
+#include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 

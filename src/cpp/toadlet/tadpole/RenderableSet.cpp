@@ -76,7 +76,7 @@ void RenderableSet::queueRenderable(Renderable *renderable){
 
 	Vector4 ambient;
 	/// @todo: Add a flag to skip this, for shadow calculations
-	if(material!=NULL && material->getLightEffect().ambient.equals(Math::ZERO_VECTOR4)==false){
+	if(material!=NULL && material->getMaterialState().ambient.equals(Math::ZERO_VECTOR4)==false){
 		if(mRoot->findAmbientForPoint(ambient,transform.getTranslate())==false){
 			ambient.set(mScene->getAmbientColor());
 		}

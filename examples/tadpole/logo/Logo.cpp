@@ -128,9 +128,7 @@ void Logo::resized(int width,int height){
 }
 
 void Logo::render(Renderer *renderer){
-	renderer->beginScene();
-		cameraNode->render(renderer);
-	renderer->endScene();
+	cameraNode->render(renderer);
 	renderer->swap();
 }
 

@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Logger.h>
-#include <toadlet/peeper/CapabilitySet.h>
+#include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/SceneRenderer.h>
 #include <toadlet/tadpole/RenderListener.h>
@@ -172,7 +172,7 @@ void SceneRenderer::setupViewport(CameraNode *camera,Renderer *renderer){
 
 void SceneRenderer::setupLights(const RenderableSet::LightQueue &lightQueue,Renderer *renderer){
 	int i;
-	int maxLights=renderer->getCapabilitySet().maxLights;
+	int maxLights=renderer->getCapabilityState().maxLights;
 	for(i=0;i<maxLights;++i){
 		if(i<lightQueue.size()){
 			LightNode *light=lightQueue[i].light;

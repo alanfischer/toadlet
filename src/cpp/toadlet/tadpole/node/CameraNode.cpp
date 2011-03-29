@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
-#include <toadlet/peeper/CapabilitySet.h>
+#include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/node/CameraNode.h>
@@ -105,7 +105,7 @@ Node *CameraNode::create(Scene *scene){
 	mGammaMaterial=mEngine->getMaterialManager()->createMaterial();
 	mGammaMaterial->setDepthTest(Renderer::DepthTest_NONE);
 	mGammaMaterial->setLighting(true);
-	mGammaMaterial->setLightEffect(LightEffect(Math::ZERO_VECTOR4));
+	mGammaMaterial->setMaterialState(MaterialState(Math::ZERO_VECTOR4));
 	mGammaMaterial->retain();
 
 	mFPSLastTime=0;
@@ -329,12 +329,12 @@ void CameraNode::setViewport(int x,int y,int width,int height){
 void CameraNode::setGamma(scalar gamma){
 	mGamma=gamma;
 	if(gamma>=Math::ONE){
-		mGammaMaterial->setBlend(Blend::Combination_ALPHA_ADDITIVE);
-		mGammaMaterial->setLightEffect(LightEffect(Vector4(Math::ONE,Math::ONE,Math::ONE,gamma-Math::ONE)));
+		mGammaMaterial->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
+		mGammaMaterial->setMaterialState(MaterialState(Vector4(Math::ONE,Math::ONE,Math::ONE,gamma-Math::ONE)));
 	}
 	else{
-		mGammaMaterial->setBlend(Blend::Combination_ALPHA);
-		mGammaMaterial->setLightEffect(LightEffect(Vector4(0,0,0,Math::ONE-gamma)));
+		mGammaMaterial->setBlendState(BlendState::Combination_ALPHA);
+		mGammaMaterial->setMaterialState(MaterialState(Vector4(0,0,0,Math::ONE-gamma)));
 	}
 }
 
@@ -380,8 +380,8 @@ void CameraNode::render(Renderer *renderer,Node *node){
 	mVisibleCount=0;
 
 	mScene->render(renderer,this,node);
-
-	renderOverlayGamma(renderer);
+	/// @todo: Now that begin/endScene is in render, this no longer works... :(
+//	renderOverlayGamma(renderer);
 }
 
 Image::ptr CameraNode::renderToImage(Renderer *renderer,int format,int width,int height){
@@ -411,7 +411,7 @@ Image::ptr CameraNode::renderToImage(Renderer *renderer,int format,int width,int
 }
 
 Mesh::ptr CameraNode::renderToSkyBox(Renderer *renderer,int format,int size,scalar scale){
-	bool rtt=renderer->getCapabilitySet().renderToTexture;
+	bool rtt=renderer->getCapabilityState().renderToTexture;
 	int flags=Texture::Usage_BIT_RENDERTARGET;
 	Texture::ptr skyboxTexture[6];
 	Material::ptr skyboxMaterial[6];
