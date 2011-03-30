@@ -380,7 +380,7 @@ void BSP30Handler::buildMaterials(BSP30Map *map){
 		Material::ptr material=mEngine->getMaterialManager()->createMaterial();
 		material->retain();
 		material->setLighting(false);
-		material->setFaceCulling(FaceCulling_FRONT);
+		material->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
 
 		TextureStage::ptr primary=mEngine->getMaterialManager()->createTextureStage(map->parsedTextures[i]);
 		material->setTextureStage(0,primary);

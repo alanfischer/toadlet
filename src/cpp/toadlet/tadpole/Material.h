@@ -33,6 +33,7 @@
 #include <toadlet/peeper/BlendState.h>
 #include <toadlet/peeper/DepthState.h>
 #include <toadlet/peeper/PointState.h>
+#include <toadlet/peeper/RasterizerState.h>
 #include <toadlet/peeper/TextureStage.h>
 #include <toadlet/peeper/Renderer.h>
 
@@ -46,15 +47,14 @@ public:
 	enum States{
 		State_LIGHTING=		1<<0,
 		State_MATERIAL=		1<<1,
-		State_FACECULLING=	1<<2,
-		State_FILL=			1<<3,
-		State_FOG=			1<<4,
-		State_ALPHATEST=	1<<5,
-		State_BLEND=		1<<6,
-		State_DEPTHSORT=	1<<7,
-		State_DEPTH=		1<<8,
-		State_SHADING=		1<<9,
-		State_POINT=		1<<10,
+		State_RASTERIZER=	1<<2,
+		State_FOG=			1<<3,
+		State_ALPHATEST=	1<<4,
+		State_BLEND=		1<<5,
+		State_DEPTHSORT=	1<<6,
+		State_DEPTH=		1<<7,
+		State_SHADING=		1<<8,
+		State_POINT=		1<<9,
 	};
 	
 	Material();
@@ -68,12 +68,6 @@ public:
 
 	void setMaterialState(const peeper::MaterialState &state){mStates|=State_MATERIAL;mMaterialState.set(state);}
 	inline const peeper::MaterialState &getMaterialState() const{return mMaterialState;}
-
-	void setFaceCulling(const peeper::FaceCulling &faceCulling){mStates|=State_FACECULLING;mFaceCulling=faceCulling;}
-	inline const peeper::FaceCulling &getFaceCulling() const{return mFaceCulling;}
-
-	void setFill(const peeper::Fill &fill){mStates|=State_FILL;mFill=fill;}
-	inline const peeper::Fill &getFill() const{return mFill;}
 
 	void setShading(const peeper::Shading &shading){mStates|=State_SHADING;mShading=shading;}
 	inline const peeper::Shading &getShading() const{return mShading;}
@@ -99,6 +93,9 @@ public:
 	void setPointState(const peeper::PointState &state){mStates|=State_POINT;mPointState.set(state);}
 	inline const peeper::PointState &getPointSprite() const{return mPointState;}
 
+	void setRasterizerState(const peeper::RasterizerState &state){mStates|=State_RASTERIZER;mRasterizerState.set(state);}
+	inline const peeper::RasterizerState &getRasterizerState() const{return mRasterizerState;}
+
 	inline int getNumTextureStages() const{return mTextureStages.size();}
 	bool setTextureStage(int stage,const peeper::TextureStage::ptr &textureStage);
 	inline const peeper::TextureStage::ptr &getTextureStage(int stage) const{return mTextureStages[stage];}
@@ -116,8 +113,6 @@ protected:
 	int mStates;
 	peeper::MaterialState mMaterialState;
 	bool mLighting;
-	peeper::FaceCulling mFaceCulling;
-	peeper::Fill mFill;
 	peeper::Shading mShading;
 	peeper::FogState mFogState;
 	peeper::AlphaTest mAlphaTest;
@@ -126,6 +121,7 @@ protected:
 	bool mDepthSorted;
 	peeper::DepthState mDepthState;
 	peeper::PointState mPointState;
+	peeper::RasterizerState mRasterizerState;
 	egg::Collection<peeper::TextureStage::ptr> mTextureStages;
 	int mLayer;
 };

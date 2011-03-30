@@ -37,14 +37,14 @@ public:
 	D3D10RenderTarget();
 	virtual ~D3D10RenderTarget(){}
 
-	bool create();
-	void destroy();
+	virtual bool create();
+	virtual void destroy();
 
-	void clear(int clearFlags,const Vector4 &clearColor);
-	void swap(){}
-	void reset(){}
-	bool activate();
-	bool deactivate();
+	virtual void clear(int clearFlags,const Vector4 &clearColor);
+	virtual void swap(){}
+	virtual void reset(){}
+	virtual bool activate();
+	virtual bool deactivate();
 
 	inline ID3D10Device *getD3D10Device() const{return mD3DDevice;}
 

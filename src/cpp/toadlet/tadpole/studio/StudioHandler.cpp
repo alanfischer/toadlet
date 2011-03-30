@@ -183,7 +183,7 @@ void StudioHandler::buildMaterials(StudioModel *model){
 		Material::ptr material=mEngine->getMaterialManager()->createMaterial();
 		material->retain();
 		material->setLighting(true);
-		material->setFaceCulling(FaceCulling_FRONT);
+		material->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
 		if((stexture->flags&STUDIO_NF_FLATSHADE)>0){
 			material->setShading(Shading_FLAT);
 		}

@@ -46,12 +46,6 @@ enum ClearFlag{
 	ClearFlag_STENCIL=4,
 };
 
-enum FaceCulling{
-	FaceCulling_NONE,
-	FaceCulling_FRONT,
-	FaceCulling_BACK,
-};
-
 enum AlphaTest{
 	AlphaTest_NONE,
 	AlphaTest_LESS,
@@ -61,12 +55,6 @@ enum AlphaTest{
 	AlphaTest_NOTEQUAL,
 	AlphaTest_GEQUAL,
 	AlphaTest_ALWAYS,
-};
-
-enum Fill{
-	Fill_POINT,
-	Fill_LINE,
-	Fill_SOLID,
 };
 
 enum Shading{

@@ -49,17 +49,8 @@ Material::ptr MaterialManager::createMaterial(){
 
 	Renderer *renderer=mTextureManager->getRenderer();
 	material->setAlphaTest(AlphaTest_NONE,0);
-	material->setBlendState(BlendState::Combination_DISABLED);
-	material->setFaceCulling(FaceCulling_BACK);
 	material->setLighting(true);
-	material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,true));
 	material->setDepthSorted(false);
-	material->setMaterialState(MaterialState());
-	if(renderer!=NULL){
-		if(renderer->getCapabilityState().fill){
-			material->setFill(Fill_SOLID);
-		}
-	}
 
 	manage(material);
 	

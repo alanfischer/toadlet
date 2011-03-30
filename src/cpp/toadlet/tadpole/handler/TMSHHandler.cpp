@@ -373,7 +373,7 @@ Material::ptr TMSHHandler::readMaterial(egg::io::DataStream *stream,int blockSiz
 	stream->read((tbyte*)&state,sizeof(state));
 	material->setMaterialState(state);
 
-	material->setFaceCulling((FaceCulling)stream->readInt32());
+	material->setRasterizerState(RasterizerState((RasterizerState::CullType)stream->readInt32()));
 
 	return material;
 }
@@ -392,7 +392,7 @@ void TMSHHandler::writeMaterial(egg::io::DataStream *stream,Material::ptr materi
 
 	stream->write((tbyte*)&material->getMaterialState(),sizeof(MaterialState));
 
-	stream->writeInt32(material->getFaceCulling());
+	stream->writeInt32(material->getRasterizerState().cull);
 }
 
 }

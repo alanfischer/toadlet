@@ -36,8 +36,6 @@ namespace tadpole{
 Material::Material():BaseResource(),
 	mStates(0),
 	mLighting(false),
-	mFaceCulling(FaceCulling_BACK),
-	mFill(Fill_SOLID),
 	mShading(Shading_SMOOTH),
 	//mFogState,
 	mAlphaTest(AlphaTest_NONE),
@@ -45,7 +43,8 @@ Material::Material():BaseResource(),
 	//mBlendState,
 	mDepthSorted(false),
 	//mDepthState,
-	//mPointState
+	//mPointState,
+	//mRasterizerState
 	mLayer(0)
 {
 }
@@ -72,9 +71,7 @@ Material::ptr Material::clone(){
 	material->mStates=mStates;
 	material->mMaterialState.set(mMaterialState);
 	material->mLighting=mLighting;
-	material->mFaceCulling=mFaceCulling;
 	material->mFogState.set(mFogState);
-	material->mFill=mFill;
 	material->mShading=mShading;
 	material->mAlphaTest=mAlphaTest;
 	material->mAlphaTestCutoff=mAlphaTestCutoff;
@@ -82,6 +79,7 @@ Material::ptr Material::clone(){
 	material->mDepthSorted=mDepthSorted;
 	material->mDepthState.set(mDepthState);
 	material->mPointState.set(mPointState);
+	material->mRasterizerState.set(mRasterizerState);
 	material->mLayer=mLayer;
 
 	int i;
@@ -120,12 +118,6 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		if((states&State_DEPTH)>0){
 			renderer->setDepthState(mDepthState);
 		}
-		if((states&State_FACECULLING)>0){
-			renderer->setFaceCulling(mFaceCulling);
-		}
-		if((states&State_FILL)>0){
-			renderer->setFill(mFill);
-		}
 		if((states&State_SHADING)>0){
 			renderer->setShading(mShading);
 		}
@@ -140,6 +132,9 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		}
 		if((states&State_POINT)>0){
 			renderer->setPointState(mPointState);
+		}
+		if((states&State_RASTERIZER)>0){
+			renderer->setRasterizerState(mRasterizerState);
 		}
 
 		int numTextureStages=mTextureStages.size();
@@ -163,12 +158,6 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		if((states&State_DEPTH)>0 && ((pstates&State_DEPTH)==0 || previousMaterial->mDepthState!=mDepthState)){
 			renderer->setDepthState(mDepthState);
 		}
-		if((states&State_FACECULLING)>0 && ((pstates&State_FACECULLING)==0 || previousMaterial->mFaceCulling!=mFaceCulling)){
-			renderer->setFaceCulling(mFaceCulling);
-		}
-		if((states&State_FILL)>0 && ((pstates&State_FILL)==0 || previousMaterial->mFill!=mFill)){
-			renderer->setFill(mFill);
-		}
 		if((states&State_SHADING)>0 && ((pstates&State_SHADING)==0 || previousMaterial->mShading!=mShading)){
 			renderer->setShading(mShading);
 		}
@@ -183,6 +172,9 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		}
 		if((states&State_POINT)>0){
 			renderer->setPointState(mPointState);
+		}
+		if((states&State_RASTERIZER)>0){
+			renderer->setRasterizerState(mRasterizerState);
 		}
 
 		int numTextureStages=mTextureStages.size();
@@ -210,12 +202,6 @@ void Material::modifyWith(Material::ptr material){
 	if((states&State_DEPTH)>0){
 		setDepthState(material->mDepthState);
 	}
-	if((states&State_FACECULLING)>0){
-		setFaceCulling(material->mFaceCulling);
-	}
-	if((states&State_FILL)>0){
-		setFill(material->mFill);
-	}
 	if((states&State_SHADING)>0){
 		setShading(material->mShading);
 	}
@@ -230,6 +216,9 @@ void Material::modifyWith(Material::ptr material){
 	}
 	if((states&State_POINT)>0){
 		setPointState(material->mPointState);
+	}
+	if((states&State_RASTERIZER)>0){
+		setRasterizerState(material->mRasterizerState);
 	}
 }
 

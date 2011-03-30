@@ -327,24 +327,24 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 		if(data!=NULL){
 			if(version<=2){
 				if(strcmp(data,"Back")==0){
-					material->setFaceCulling(FaceCulling_BACK);
+					material->setRasterizerState(RasterizerState(RasterizerState::CullType_BACK));
 				}
 				else if(strcmp(data,"Front")==0){
-					material->setFaceCulling(FaceCulling_FRONT);
+					material->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
 				}
 				else if(strcmp(data,"None")==0){
-					material->setFaceCulling(FaceCulling_NONE);
+					material->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 				}
 			}
 			else{
 				if(strcmp(data,"back")==0){
-					material->setFaceCulling(FaceCulling_BACK);
+					material->setRasterizerState(RasterizerState(RasterizerState::CullType_BACK));
 				}
 				else if(strcmp(data,"front")==0){
-					material->setFaceCulling(FaceCulling_FRONT);
+					material->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
 				}
 				else if(strcmp(data,"none")==0){
-					material->setFaceCulling(FaceCulling_NONE);
+					material->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 				}
 			}
 		}
@@ -520,25 +520,29 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,P
 	mxml_node_t *faceCullingNode=mxmlNewElement(materialNode,"FaceCulling");
 	{
 		if(version<=2){
-			if(material->getFaceCulling()==FaceCulling_BACK){
-				mxmlNewOpaque(faceCullingNode,"Back");
-			}
-			else if(material->getFaceCulling()==FaceCulling_FRONT){
-				mxmlNewOpaque(faceCullingNode,"Front");
-			}
-			else if(material->getFaceCulling()==FaceCulling_NONE){
-				mxmlNewOpaque(faceCullingNode,"None");
+			switch(material->getRasterizerState().cull){
+				case RasterizerState::CullType_BACK:
+					mxmlNewOpaque(faceCullingNode,"Back");
+				break;
+				case RasterizerState::CullType_FRONT:
+					mxmlNewOpaque(faceCullingNode,"Front");
+				break;
+				case RasterizerState::CullType_NONE:
+					mxmlNewOpaque(faceCullingNode,"None");
+				break;
 			}
 		}
 		else{
-			if(material->getFaceCulling()==FaceCulling_BACK){
-				mxmlNewOpaque(faceCullingNode,"back");
-			}
-			else if(material->getFaceCulling()==FaceCulling_FRONT){
-				mxmlNewOpaque(faceCullingNode,"front");
-			}
-			else if(material->getFaceCulling()==FaceCulling_NONE){
-				mxmlNewOpaque(faceCullingNode,"none");
+			switch(material->getRasterizerState().cull){
+				case RasterizerState::CullType_BACK:
+					mxmlNewOpaque(faceCullingNode,"back");
+				break;
+				case RasterizerState::CullType_FRONT:
+					mxmlNewOpaque(faceCullingNode,"front");
+				break;
+				case RasterizerState::CullType_NONE:
+					mxmlNewOpaque(faceCullingNode,"none");
+				break;
 			}
 		}
 	}

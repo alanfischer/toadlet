@@ -65,24 +65,22 @@ void ShadowMappedSceneRenderer::renderScene(Renderer *renderer,Node *node,Camera
 	RenderTarget *oldRenderTarget=renderer->getRenderTarget();
 
 	renderer->setRenderTarget(mShadowTarget);
-	renderer->beginScene();
 	{
-		renderer->setFaceCulling(FaceCulling_FRONT);
-		renderer->setDepthBias(0,.1);
+		RasterizerState state;
+		state.cull=RasterizerState::CullType_FRONT;
+		state.depthBiasSlope=0.1;
+		renderer->setRasterizerState(state);
 
 		renderRenderables(mRenderableSet,renderer,mLightCamera,false);
 
-		renderer->setDepthBias(0,0);
-		renderer->setFaceCulling(FaceCulling_BACK);
+		renderer->setRasterizerState(state);
 	}
-	renderer->endScene();
 	renderer->swap();
 
 
 	gatherRenderables(mRenderableSet,node,camera);
 
 	renderer->setRenderTarget(oldRenderTarget);
-	renderer->beginScene();
 	{
 		Matrix4x4 biasMatrix;
 		renderer->getShadowBiasMatrix(mShadowTexture,biasMatrix);
@@ -98,7 +96,6 @@ void ShadowMappedSceneRenderer::renderScene(Renderer *renderer,Node *node,Camera
 
 		renderRenderables(mRenderableSet,renderer,camera,false);
 	}
-	renderer->endScene();
 }
 
 }
