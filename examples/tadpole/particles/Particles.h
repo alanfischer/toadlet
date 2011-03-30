@@ -9,6 +9,7 @@ public:
 	virtual ~Particles();
 
 	void create();
+	void destroy();
 	void resized(int width,int height);
 	void render(Renderer *renderer);
 	void update(int dt);

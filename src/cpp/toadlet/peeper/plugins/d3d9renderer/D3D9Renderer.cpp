@@ -461,14 +461,12 @@ void D3D9Renderer::setDefaultStates(){
 	setAlphaTest(AlphaTest_NONE,0.5);
 	setBlendState(BlendState::Combination_DISABLED);
 	setDepthState(DepthState());
-	setDithering(false);
-	setFaceCulling(FaceCulling_BACK);
 	setFogState(FogState());
 	setLighting(false);
 	setShading(Shading_SMOOTH);
 	setNormalize(Normalize_RESCALE);
-	setFill(Fill_SOLID);
 	setPointState(PointState());
+	setRasterizerState(RasterizerState());
 	#if defined(TOADLET_SET_D3DM)
 		setTexturePerspective(true);
 	#endif
@@ -594,25 +592,6 @@ void D3D9Renderer::setDepthState(const DepthState &state){
 	TOADLET_CHECK_D3D9ERROR(hr,"setDepthState");
 }
 
-void D3D9Renderer::setDithering(bool dithering){
-	HRESULT hr=mD3DDevice->SetRenderState(D3DRS_DITHERENABLE,dithering);
-	TOADLET_CHECK_D3D9ERROR(hr,"setDithering");
-}
-
-void D3D9Renderer::setFaceCulling(const FaceCulling &culling){
-	switch(culling){
-		case FaceCulling_NONE:
-			mD3DDevice->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE);
-		break;
-		case FaceCulling_FRONT:
-			mD3DDevice->SetRenderState(D3DRS_CULLMODE,D3DCULL_CCW);
-		break;
-		case FaceCulling_BACK:
-			mD3DDevice->SetRenderState(D3DRS_CULLMODE,D3DCULL_CW);
-		break;
-	}
-}
-
 void D3D9Renderer::setFogState(const FogState &state){
 	if(state.type==FogState::FogType_NONE){
 		mD3DDevice->SetRenderState(D3DRS_FOGENABLE,FALSE);
@@ -627,22 +606,6 @@ void D3D9Renderer::setFogState(const FogState &state){
 		mD3DDevice->SetRenderState(D3DRS_FOGSTART,*(DWORD*)(&fNearDistance));
 		mD3DDevice->SetRenderState(D3DRS_FOGEND,*(DWORD*)(&fFarDistance));
 	}
-}
-
-void D3D9Renderer::setFill(const Fill &fill){
-	DWORD d3dfill;
-	if(fill==Fill_POINT){
-		d3dfill=D3DFILL_POINT;
-	}
-	else if(fill==Fill_LINE){
-		d3dfill=D3DFILL_WIREFRAME;
-	}
-	else{
-		d3dfill=D3DFILL_SOLID;
-	}
-
-	HRESULT hr=mD3DDevice->SetRenderState(D3DRS_FILLMODE,d3dfill);
-	TOADLET_CHECK_D3D9ERROR(hr,"setFill");
 }
 
 void D3D9Renderer::setLighting(bool lighting){
@@ -678,14 +641,6 @@ void D3D9Renderer::setMaterialState(const MaterialState &state){
 	}
 }
 
-void D3D9Renderer::setDepthBias(scalar constant,scalar slope){
-	float fconstant=scalarToFloat(constant) * 1e6f; // This value is what the Wine project uses
-	float fslope=scalarToFloat(slope);
-
-	mD3DDevice->SetRenderState(D3DRS_DEPTHBIAS,*(DWORD*)&fconstant);
-	mD3DDevice->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS,*(DWORD*)&fslope);
-}
-
 void D3D9Renderer::setPointState(const PointState &state){
 	HRESULT result=S_OK;
 
@@ -715,6 +670,19 @@ void D3D9Renderer::setPointState(const PointState &state){
 			mD3DDevice->SetRenderState(D3DRS_POINTSCALE_C,*(DWORD*)(&fQuadratic));
 		}
 	#endif
+}
+
+void D3D9Renderer::setRasterizerState(const RasterizerState &state){
+	mD3DDevice->SetRenderState(D3DRS_CULLMODE,getD3DCULL(state.cull));
+
+	mD3DDevice->SetRenderState(D3DRS_FILLMODE,getD3DFILLMODE(state.fill));
+
+	float fconstant=scalarToFloat(state.depthBiasConstant) * 1e6f; // This value is what the Wine project uses
+	float fslope=scalarToFloat(state.depthBiasSlope);
+	mD3DDevice->SetRenderState(D3DRS_DEPTHBIAS,*(DWORD*)&fconstant);
+	mD3DDevice->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS,*(DWORD*)&fslope);
+
+	mD3DDevice->SetRenderState(D3DRS_DITHERENABLE,state.dither);
 }
 
 void D3D9Renderer::setTexturePerspective(bool texturePerspective){
@@ -1210,6 +1178,38 @@ D3DBLEND D3D9Renderer::getD3DBLEND(BlendState::Operation state){
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"invalid operation");
 			return D3DBLEND_ZERO;
+	}
+}
+
+D3DCULL D3D9Renderer::getD3DCULL(RasterizerState::CullType type){
+	switch(type){
+		case RasterizerState::CullType_NONE:
+			return D3DCULL_NONE;
+		case RasterizerState::CullType_BACK:
+			return D3DCULL_CW;
+		case RasterizerState::CullType_FRONT:
+			return D3DCULL_CCW;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"invalid cull type");
+			return D3DCULL_NONE;
+		break;
+	}
+}
+
+D3DFILLMODE D3D9Renderer::getD3DFILLMODE(RasterizerState::FillType type){
+	switch(type){
+		case RasterizerState::FillType_POINT:
+			return D3DFILL_POINT;
+		case RasterizerState::FillType_LINE:
+			return D3DFILL_WIREFRAME;
+		case RasterizerState::FillType_SOLID:
+			return D3DFILL_SOLID;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"invalid fill type");
+			return D3DFILL_POINT;
+		break;
 	}
 }
 

@@ -50,9 +50,7 @@ SceneRenderer::~SceneRenderer(){
 
 void SceneRenderer::renderScene(Renderer *renderer,Node *node,CameraNode *camera){
 	gatherRenderables(mRenderableSet,node,camera);
-	renderer->beginScene();
 	renderRenderables(mRenderableSet,renderer,camera);
-	renderer->endScene();
 }
 
 void SceneRenderer::gatherRenderables(RenderableSet *set,Node *node,CameraNode *camera){

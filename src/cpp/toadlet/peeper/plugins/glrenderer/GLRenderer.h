@@ -35,6 +35,7 @@
 #include <toadlet/peeper/MaterialState.h>
 #include <toadlet/peeper/LightState.h>
 #include <toadlet/peeper/PointState.h>
+#include <toadlet/peeper/RasterizerState.h>
 #include <toadlet/peeper/TextureStage.h>
 #include <toadlet/peeper/Viewport.h>
 #include <toadlet/peeper/CapabilityState.h>
@@ -98,16 +99,13 @@ public:
 	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff);
 	void setBlendState(const BlendState &state);
 	void setDepthState(const DepthState &state);
-	void setDithering(bool dithering);
-	void setFaceCulling(const FaceCulling &faceCulling);
 	void setFogState(const FogState &state);
 	void setMaterialState(const MaterialState &state);
-	void setFill(const Fill &fill);
 	void setLighting(bool lighting);
 	void setShading(const Shading &shading);
 	void setNormalize(const Normalize &normalize);
-	void setDepthBias(scalar constant,scalar slope);
 	void setPointState(const PointState &state);
+	void setRasterizerState(const RasterizerState &state);
 	void setTextureStage(int stage,TextureStage *textureStage);
 	void setProgram(const Program *program);
 	void setLightEnabled(int i,bool enable);
@@ -142,7 +140,9 @@ public:
 	static GLenum getGLDepthFunc(DepthState::DepthTest test);
 	static GLenum getGLAlphaFunc(AlphaTest test);
 	static GLenum getGLBlendOperation(BlendState::Operation operation);
-	static GLint getGLFogType(FogState::FogType type);
+	static GLenum getGLCullFace(RasterizerState::CullType type);
+	static GLenum getGLPolygonMode(RasterizerState::FillType type);
+	static GLenum getGLFogType(FogState::FogType type);
 	static GLint getGLElementCount(int format);
 	static GLenum getGLDataType(int format);
 	static GLuint getGLFormat(int textureFormat,bool internal);

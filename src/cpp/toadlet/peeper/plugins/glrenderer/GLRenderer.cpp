@@ -788,18 +788,12 @@ void GLRenderer::setDefaultStates(){
 	setAlphaTest(AlphaTest_NONE,Math::HALF);
 	setBlendState(BlendState::Combination_DISABLED);
 	setDepthState(DepthState());
-	setDithering(false);
-	setFaceCulling(FaceCulling_BACK);
 	setFogState(FogState());
 	setLighting(false);
 	setShading(Shading_SMOOTH);
 	setNormalize(Normalize_RESCALE);
 	setPointState(PointState());
-	#if defined(TOADLET_HAS_GLES)
-		setTexturePerspective(true);
-	#else
-		setFill(Fill_SOLID);
-	#endif
+	setRasterizerState(RasterizerState());
 
 	int i;
 	for(i=0;i<mCapabilityState.maxTextureStages;++i){
@@ -891,39 +885,6 @@ void GLRenderer::setDepthState(const DepthState &state){
 	TOADLET_CHECK_GLERROR("setDepthState");
 }
 
-void GLRenderer::setDithering(bool dithering){
-	if(dithering){
-		glEnable(GL_DITHER);
-	}
-	else{
-		glDisable(GL_DITHER);
-	}
-
-	TOADLET_CHECK_GLERROR("setDithering");
-}
-
-void GLRenderer::setFaceCulling(const FaceCulling &faceCulling){
-	if(faceCulling==FaceCulling_NONE){
-		glDisable(GL_CULL_FACE);
-	}
-	else{
-		switch(faceCulling){
-			case FaceCulling_FRONT:
-				glCullFace(GL_FRONT);
-			break;
-			case FaceCulling_BACK:
-				glCullFace(GL_BACK);
-			break;
-			default:
-			break;
-		}
-
-		glEnable(GL_CULL_FACE);
-	}
-
-	TOADLET_CHECK_GLERROR("setFaceCulling");
-}
-
 void GLRenderer::setFogState(const FogState &state){
 	if(state.type==FogState::FogType_NONE){
 		glDisable(GL_FOG);
@@ -990,25 +951,6 @@ void GLRenderer::setMaterialState(const MaterialState &state){
 	TOADLET_CHECK_GLERROR("setMaterialState");
 }
 
-void GLRenderer::setFill(const Fill &fill){
-	#if defined(TOADLET_HAS_GLES)
-		Error::unimplemented(Categories::TOADLET_PEEPER,
-			"GLRenderer::setFill: unimplemented");
-	#else
-		if(fill==Fill_POINT){
-			glPolygonMode(GL_FRONT_AND_BACK,GL_POINT);
-		}
-		else if(fill==Fill_LINE){
-			glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-		}
-		else{
-			glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-		}
-
-		TOADLET_CHECK_GLERROR("setFill");
-	#endif
-}
-
 void GLRenderer::setLighting(bool lighting){
 	if(lighting){
 		// 12/19/10
@@ -1059,22 +1001,6 @@ void GLRenderer::setNormalize(const Normalize &normalize){
 	}
 
 	TOADLET_CHECK_GLERROR("setNormalize");
-}
-
-void GLRenderer::setDepthBias(scalar constant,scalar slope){
-	if(constant!=0 && slope!=0){
-		#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
-			glPolygonOffsetx(slope,constant);
-		#else
-			glPolygonOffset(MathConversion::scalarToFloat(slope),MathConversion::scalarToFloat(constant));
-		#endif
-		glEnable(GL_POLYGON_OFFSET_FILL);
-	}
-	else{
-		glDisable(GL_POLYGON_OFFSET_FILL);
-	}
-
-	TOADLET_CHECK_GLERROR("setDepthBias");
 }
 
 void GLRenderer::setPointState(const PointState &state){
@@ -1141,6 +1067,41 @@ void GLRenderer::setPointState(const PointState &state){
 	}
 
 	TOADLET_CHECK_GLERROR("setPointState");
+}
+
+void GLRenderer::setRasterizerState(const RasterizerState &state){
+	if(state.cull==RasterizerState::CullType_NONE){
+		glDisable(GL_CULL_FACE);
+	}
+	else{
+		glCullFace(getGLCullFace(state.cull));
+		glEnable(GL_CULL_FACE);
+	}
+
+	#if !defined(TOADLET_HAS_GLES)
+		glPolygonMode(GL_FRONT_AND_BACK,getGLPolygonMode(state.fill));
+	#endif
+
+	if(state.depthBiasConstant==0 && state.depthBiasSlope==0){
+		glDisable(GL_POLYGON_OFFSET_FILL);
+	}
+	else{
+		#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
+			glPolygonOffsetx(state.depthBiasSlope,state.depthBiasConstant);
+		#else
+			glPolygonOffset(MathConversion::scalarToFloat(state.depthBiasSlope),MathConversion::scalarToFloat(state.depthBiasConstant));
+		#endif
+		glEnable(GL_POLYGON_OFFSET_FILL);
+	}
+
+	if(state.dither){
+		glEnable(GL_DITHER);
+	}
+	else{
+		glDisable(GL_DITHER);
+	}
+
+	TOADLET_CHECK_GLERROR("setRasterizerState");
 }
 
 void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
@@ -1807,7 +1768,41 @@ GLenum GLRenderer::getGLBlendOperation(BlendState::Operation operation){
 	}
 }
 
-GLint GLRenderer::getGLFogType(FogState::FogType type){
+GLenum GLRenderer::getGLCullFace(RasterizerState::CullType type){
+	switch(type){
+		case RasterizerState::CullType_FRONT:
+			return GL_FRONT;
+		break;
+		case RasterizerState::CullType_BACK:
+			return GL_BACK;
+		break;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"getGLCullFace: Invalid cull type");
+			return 0;
+	}
+}
+
+GLenum GLRenderer::getGLPolygonMode(RasterizerState::FillType type){
+	#if !defined(TOADLET_HAS_GLES)
+		switch(type){
+			case RasterizerState::FillType_POINT:
+				return GL_POINT;
+			case RasterizerState::FillType_LINE:
+				return GL_LINE;
+			case RasterizerState::FillType_SOLID:
+				return GL_FILL;
+			default:
+				Error::unknown(Categories::TOADLET_PEEPER,
+					"getGLCullFace: Invalid fill type");
+				return 0;
+		}
+	#else
+		return 0;
+	#endif
+}
+
+GLenum GLRenderer::getGLFogType(FogState::FogType type){
 	switch(type){
 		case FogState::FogType_LINEAR:
 			return GL_LINEAR;

@@ -7,7 +7,7 @@ Particles::~Particles(){
 }
 
 void Particles::create(){
-	Application::create();
+	Application::create("d3d10");
 
 	mEngine->setDirectory("../../data");
 
@@ -33,14 +33,14 @@ void Particles::create(){
 
 	Material::ptr pointMaterial=mEngine->getMaterialManager()->findMaterial("sparkle.png");
 	pointMaterial->setPointState(PointState(true,10,false,1,1,1,1,100));
-	pointMaterial->setBlend(Blend::Combination_ALPHA_ADDITIVE);
-	pointMaterial->setFaceCulling(Renderer::FaceCulling_NONE);
-	pointMaterial->setDepthWrite(false);
+	pointMaterial->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
+	pointMaterial->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+	pointMaterial->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 
 	Material::ptr beamMaterial=mEngine->getMaterialManager()->findMaterial("fancyGlow.png");
-	beamMaterial->setBlend(Blend::Combination_ALPHA_ADDITIVE);
-	beamMaterial->setFaceCulling(Renderer::FaceCulling_NONE);
-	beamMaterial->setDepthWrite(false);
+	beamMaterial->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
+	beamMaterial->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+	beamMaterial->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 
  	pointNode=getEngine()->createNodeType(ParticleNode::type(),scene);
 	pointNode->setNumParticles(4,ParticleNode::ParticleType_POINTSPRITE,Math::ONE,pointPositions);
@@ -66,6 +66,12 @@ void Particles::create(){
 	scene->getRoot()->attach(cameraNode);
 }
 
+void Particles::destroy(){
+	scene->destroy();
+
+	Application::destroy();
+}
+
 void Particles::resized(int width,int height){
 	if(cameraNode!=NULL && width>0 && height>0){
 		if(width>=height){
@@ -82,7 +88,7 @@ void Particles::render(Renderer *renderer){
 	renderer->beginScene();
 		cameraNode->render(renderer);
 	renderer->endScene();
-	renderer->swap();
+ 	renderer->swap();
 }
 
 void Particles::update(int dt){

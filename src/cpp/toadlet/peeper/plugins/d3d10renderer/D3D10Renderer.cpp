@@ -537,16 +537,7 @@ void D3D10Renderer::setBlendState(const BlendState &state){
 void D3D10Renderer::setDepthState(const DepthState &state){
 }
 
-void D3D10Renderer::setDithering(bool dithering){
-}
-
-void D3D10Renderer::setFaceCulling(const FaceCulling &culling){
-}
-
 void D3D10Renderer::setFogState(const FogState &state){
-}
-
-void D3D10Renderer::setFill(const Fill &fill){
 }
 
 void D3D10Renderer::setLighting(bool lighting){
@@ -556,10 +547,10 @@ void D3D10Renderer::setMaterialState(const MaterialState &state){
 	effect->GetVariableByName("diffuseColor")->AsVector()->SetFloatVector((float*)state.diffuse.getData());
 }
 
-void D3D10Renderer::setDepthBias(scalar constant,scalar slope){
+void D3D10Renderer::setPointState(const PointState &state){
 }
 
-void D3D10Renderer::setPointState(const PointState &state){
+void D3D10Renderer::setRasterizerState(const RasterizerState &state){
 }
 
 void D3D10Renderer::setTexturePerspective(bool texturePerspective){
@@ -703,9 +694,6 @@ void D3D10Renderer::setProgram(const Program *program){
 }
 
 void D3D10Renderer::setShading(const Shading &shading){
-}
-
-void D3D10Renderer::setColorWrite(bool r,bool g,bool b,bool a){
 }
 
 void D3D10Renderer::setNormalize(const Normalize &normalize){

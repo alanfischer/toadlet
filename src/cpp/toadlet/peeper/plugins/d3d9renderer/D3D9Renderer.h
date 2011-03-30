@@ -33,6 +33,7 @@
 #include <toadlet/peeper/DepthState.h>
 #include <toadlet/peeper/MaterialState.h>
 #include <toadlet/peeper/TextureStage.h>
+#include <toadlet/peeper/RasterizerState.h>
 #include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/peeper/IndexData.h>
 
@@ -86,17 +87,13 @@ public:
 	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff);
 	void setBlendState(const BlendState &state);
 	void setDepthState(const DepthState &state);
-	void setDithering(bool dithering);
-	void setFaceCulling(const FaceCulling &faceCulling);
 	void setFogState(const FogState &state);
 	void setLighting(bool lighting);
 	void setMaterialState(const MaterialState &state);
-	void setFill(const Fill &fill);
 	void setShading(const Shading &shading);
-	void setColorWrite(bool r,bool g,bool b,bool a);
 	void setNormalize(const Normalize &normalize);
-	void setDepthBias(scalar constant,scalar slope);
 	void setPointState(const PointState &state);
+	void setRasterizerState(const RasterizerState &state);
 	void setTextureStage(int stage,TextureStage *textureStage);
 	void setProgram(const Program *program);
 	void setLightState(int i,const LightState &state);
@@ -124,6 +121,8 @@ public:
 	static DWORD getD3DTEXF(TextureStage::Filter filter);
 	static DWORD getD3DTA(TextureBlend::Source blend);
 	static D3DBLEND getD3DBLEND(BlendState::Operation operation);
+	static D3DCULL getD3DCULL(RasterizerState::CullType type);
+	static D3DFILLMODE getD3DFILLMODE(RasterizerState::FillType type);
 	static DWORD getFVF(VertexFormat *vertexFormat);
 
 protected:

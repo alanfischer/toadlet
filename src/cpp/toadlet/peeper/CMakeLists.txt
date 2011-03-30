@@ -39,6 +39,7 @@ set (PEEPER_HEADERS
 	LightState.h
 	Program.h
 	Query.h
+	RasterizerState.h
 	RenderTarget.h
 	Renderer.h
 	SectionTexture.h
@@ -47,6 +48,7 @@ set (PEEPER_HEADERS
 	PixelBuffer.h
 	PixelBufferRenderTarget.h
 	PointState.h
+	RasterizerState.h
 	RenderStateSet.h
 	Texture.h
 	TextureBlend.h
