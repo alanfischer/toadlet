@@ -274,7 +274,7 @@ void MeshNodeSkeleton::setRenderable(bool renderable){
 		mMaterial->retain();
 		mMaterial->setLighting(true);
 		mMaterial->setMaterialState(MaterialState(Colors::GREEN));
-		mMaterial->setDepthTest(Renderer::DepthTest_NONE);
+		mMaterial->setDepthState(DepthState(DepthState::DepthTest_NONE,false));
 
 		IndexBuffer::ptr indexBuffer=engine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,(mBones.size()-1)*2);
 		IndexBufferAccessor iba;

@@ -30,6 +30,7 @@
 #include "GLRenderTarget.h"
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/BlendState.h>
+#include <toadlet/peeper/DepthState.h>
 #include <toadlet/peeper/FogState.h>
 #include <toadlet/peeper/MaterialState.h>
 #include <toadlet/peeper/LightState.h>
@@ -96,8 +97,7 @@ public:
 	void setDefaultStates();
 	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff);
 	void setBlendState(const BlendState &state);
-	void setDepthTest(const DepthTest &depthTest);
-	void setDepthWrite(bool depthWrite);
+	void setDepthState(const DepthState &state);
 	void setDithering(bool dithering);
 	void setFaceCulling(const FaceCulling &faceCulling);
 	void setFogState(const FogState &state);
@@ -105,7 +105,6 @@ public:
 	void setFill(const Fill &fill);
 	void setLighting(bool lighting);
 	void setShading(const Shading &shading);
-	void setColorWrite(bool r,bool g,bool b,bool a);
 	void setNormalize(const Normalize &normalize);
 	void setDepthBias(scalar constant,scalar slope);
 	void setPointState(const PointState &state);
@@ -140,8 +139,8 @@ public:
 		float cacheArray[4];
 	#endif
 
-	static GLenum getGLDepthFunc(DepthTest alphaTest);
-	static GLenum getGLAlphaFunc(AlphaTest alphaTest);
+	static GLenum getGLDepthFunc(DepthState::DepthTest test);
+	static GLenum getGLAlphaFunc(AlphaTest test);
 	static GLenum getGLBlendOperation(BlendState::Operation operation);
 	static GLint getGLFogType(FogState::FogType type);
 	static GLint getGLElementCount(int format);
@@ -170,8 +169,8 @@ protected:
 	bool mFBOsAvailable;
 
 	Viewport mViewport;
+	DepthState mDepthState;
 	PointState mPointState;
-	bool mDepthWrite;
 	bool mInTexGen;
 	egg::Collection<GLTexture*> mLastTextures;
 	short mMaxTexCoordIndex;

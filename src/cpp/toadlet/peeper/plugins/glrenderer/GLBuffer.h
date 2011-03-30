@@ -37,7 +37,6 @@ namespace peeper{
 
 class GLRenderer;
 
-// Currently this class inherits all possible types, but perhaps it should just inherit Buffer, and then there would exist subclasses for each type of Buffer
 class TOADLET_API GLBuffer:public IndexBuffer,public VertexBuffer,public GLPixelBuffer{
 public:
 	GLBuffer(GLRenderer *renderer);
@@ -47,34 +46,34 @@ public:
 	VertexBuffer *getRootVertexBuffer(){return this;}
 	PixelBuffer *getRootPixelBuffer(){return this;}
 
-	virtual GLTextureMipPixelBuffer *castToGLTextureMipPixelBuffer(){return NULL;}
-	virtual GLFBOPixelBuffer *castToGLFBOPixelBuffer(){return NULL;}
-	virtual GLBuffer *castToGLBuffer(){return this;}
+	GLTextureMipPixelBuffer *castToGLTextureMipPixelBuffer(){return NULL;}
+	GLFBOPixelBuffer *castToGLFBOPixelBuffer(){return NULL;}
+	GLBuffer *castToGLBuffer(){return this;}
 
-	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
+	void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
-	virtual bool create(int usage,int access,IndexFormat indexFormat,int size);
-	virtual bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size);
-	virtual bool create(int usage,int access,int pixelFormat,int width,int height,int depth);
-	virtual void destroy();
+	bool create(int usage,int access,IndexFormat indexFormat,int size);
+	bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size);
+	bool create(int usage,int access,int pixelFormat,int width,int height,int depth);
+	void destroy();
 
-	virtual void resetCreate(){}
-	virtual void resetDestroy(){}
+	void resetCreate(){}
+	void resetDestroy(){}
 
-	virtual int getUsage() const{return mUsage;}
-	virtual int getAccess() const{return mAccess;}
-	virtual int getDataSize() const{return mDataSize;}
-	virtual int getSize() const{return mSize;}
-	virtual int getWidth() const{return mWidth;}
-	virtual int getHeight() const{return mHeight;}
-	virtual int getDepth() const{return mDepth;}
+	int getUsage() const{return mUsage;}
+	int getAccess() const{return mAccess;}
+	int getDataSize() const{return mDataSize;}
+	int getSize() const{return mSize;}
+	int getWidth() const{return mWidth;}
+	int getHeight() const{return mHeight;}
+	int getDepth() const{return mDepth;}
 
-	virtual IndexFormat getIndexFormat() const{return mIndexFormat;}
-	virtual VertexFormat::ptr getVertexFormat() const{return mVertexFormat;}
-	virtual int getPixelFormat() const{return mPixelFormat;}
+	IndexFormat getIndexFormat() const{return mIndexFormat;}
+	VertexFormat::ptr getVertexFormat() const{return mVertexFormat;}
+	int getPixelFormat() const{return mPixelFormat;}
 
-	virtual uint8 *lock(int lockAccess);
-	virtual bool unlock();
+	uint8 *lock(int lockAccess);
+	bool unlock();
 
 protected:
 	bool createContext();

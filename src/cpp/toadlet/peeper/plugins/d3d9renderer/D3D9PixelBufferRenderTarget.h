@@ -39,29 +39,29 @@ public:
 	D3D9PixelBufferRenderTarget(D3D9Renderer *renderer);
 	virtual ~D3D9PixelBufferRenderTarget();
 
-	virtual RenderTarget *getRootRenderTarget(){return (D3D9RenderTarget*)this;}
+	RenderTarget *getRootRenderTarget(){return (D3D9RenderTarget*)this;}
 
-	virtual void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
+	void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
 
-	virtual bool create();
-	virtual void destroy();
+	bool create();
+	void destroy();
 
-	virtual bool activate();
-	virtual bool deactivate();
-	virtual void swap(){}
-	virtual void reset(){}
+	bool activate();
+	bool deactivate();
+	void swap(){}
+	void reset(){}
 
-	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment);
-	virtual bool remove(PixelBuffer::ptr buffer);
-	virtual bool compile();
+	bool attach(PixelBuffer::ptr buffer,Attachment attachment);
+	bool remove(PixelBuffer::ptr buffer);
+	bool compile();
 
-	virtual bool isPrimary() const{return false;}
-	virtual bool isValid() const{return true;}
-	virtual int getWidth() const{return mWidth;}
-	virtual int getHeight() const{return mHeight;}
+	bool isPrimary() const{return false;}
+	bool isValid() const{return true;}
+	int getWidth() const{return mWidth;}
+	int getHeight() const{return mHeight;}
 
-	virtual IDirect3D9 *getDirect3D9() const{return NULL;}
-	virtual IDirect3DDevice9 *getDirect3DDevice9() const{return NULL;}
+	IDirect3D9 *getDirect3D9() const{return NULL;}
+	IDirect3DDevice9 *getDirect3DDevice9() const{return NULL;}
 
 protected:
 	D3D9Renderer *mRenderer;

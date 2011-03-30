@@ -46,19 +46,19 @@ public:
 	EAGLRenderTarget(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat=nil);
 	virtual ~EAGLRenderTarget();
 
-	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
+	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
-	virtual bool createContext(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat=nil);
-	virtual bool destroyContext();
+	bool createContext(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat=nil);
+	bool destroyContext();
 
-	virtual bool activate();
-	virtual bool deactivate();
-	virtual bool swap();
+	bool activate();
+	bool deactivate();
+	bool swap();
 
-	virtual bool isPrimary() const{return true;}
-	virtual bool isValid() const{return mContext!=nil && GLFBORenderTarget::isValid();}
-	virtual int getWidth() const;
-	virtual int getHeight() const;
+	bool isPrimary() const{return true;}
+	bool isValid() const{return mContext!=nil && GLFBORenderTarget::isValid();}
+	int getWidth() const;
+	int getHeight() const;
 
 protected:
 	CAEAGLLayer *mDrawable;

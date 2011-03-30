@@ -39,19 +39,19 @@ public:
 	D3D10WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
 	virtual ~D3D10WindowRenderTarget();
 
-	virtual RenderTarget *getRootRenderTarget(){return this;}
-	virtual bool isPrimary() const{return true;}
-	virtual bool isValid() const{return mD3DDevice!=NULL;}
+	RenderTarget *getRootRenderTarget(){return this;}
+	bool isPrimary() const{return true;}
+	bool isValid() const{return mD3DDevice!=NULL;}
 
-	virtual bool createContext(HWND wnd,WindowRenderTargetFormat *format);
-	virtual bool destroyContext();
+	bool createContext(HWND wnd,WindowRenderTargetFormat *format);
+	bool destroyContext();
 
-	virtual int getWidth() const{return mWidth;}
-	virtual int getHeight() const{return mHeight;}
+	int getWidth() const{return mWidth;}
+	int getHeight() const{return mHeight;}
 
-	virtual void swap();
+	void swap();
 
-	virtual void reset();
+	void reset();
 
 	inline ID3D10RenderTargetView *getRenderTargetView() const{return mRenderTargetViews[0];}
 

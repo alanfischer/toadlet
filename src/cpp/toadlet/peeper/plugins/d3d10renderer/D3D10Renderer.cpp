@@ -534,10 +534,7 @@ void D3D10Renderer::setAlphaTest(const AlphaTest &alphaTest,scalar cutoff){
 void D3D10Renderer::setBlendState(const BlendState &state){
 }
 
-void D3D10Renderer::setDepthTest(const DepthTest &depthTest){
-}
-
-void D3D10Renderer::setDepthWrite(bool enable){
+void D3D10Renderer::setDepthState(const DepthState &state){
 }
 
 void D3D10Renderer::setDithering(bool dithering){

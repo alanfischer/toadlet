@@ -42,26 +42,26 @@ public:
 	GLXPBufferRenderTarget(GLRenderer *renderer);
 	virtual ~GLXPBufferRenderTarget();
 
-	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
+	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
-	virtual void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
+	void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
 
-	virtual bool create();
-	virtual void destroy();
-	virtual bool compile();
+	bool create();
+	void destroy();
+	bool compile();
 
-	virtual bool activate();
-	virtual bool swap();
-	virtual bool activateAdditionalContext(){return false;}
-	virtual void deactivateAdditionalContext(){}
+	bool activate();
+	bool swap();
+	bool activateAdditionalContext(){return false;}
+	void deactivateAdditionalContext(){}
 
-	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment);
-	virtual bool remove(PixelBuffer::ptr buffer);
+	bool attach(PixelBuffer::ptr buffer,Attachment attachment);
+	bool remove(PixelBuffer::ptr buffer);
 
-	virtual bool isPrimary() const{return false;}
-	virtual bool isValid() const{return mPBuffer!=0;}
-	virtual int getWidth() const{return mWidth;}
-	virtual int getHeight() const{return mHeight;}
+	bool isPrimary() const{return false;}
+	bool isValid() const{return mPBuffer!=0;}
+	int getWidth() const{return mWidth;}
+	int getHeight() const{return mHeight;}
 	inline GLXPbuffer getGLXPbuffer() const{return mPBuffer;}
 
 protected:

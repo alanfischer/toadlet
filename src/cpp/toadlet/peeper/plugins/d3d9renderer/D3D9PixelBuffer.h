@@ -41,27 +41,27 @@ public:
 	D3D9PixelBuffer(D3D9Renderer *renderer,bool renderTarget);
 	virtual ~D3D9PixelBuffer();
 
-	virtual PixelBuffer *getRootPixelBuffer(){return this;}
+	PixelBuffer *getRootPixelBuffer(){return this;}
 
-	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
+	void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
-	virtual bool create(int usage,int access,int pixelFormat,int width,int height,int depth);
-	virtual void destroy();
+	bool create(int usage,int access,int pixelFormat,int width,int height,int depth);
+	void destroy();
 
-	virtual void resetCreate();
-	virtual void resetDestroy();
+	void resetCreate();
+	void resetDestroy();
 
-	virtual int getUsage() const{return mUsage;}
-	virtual int getAccess() const{return mAccess;}
-	virtual int getDataSize() const{return mDataSize;}
+	int getUsage() const{return mUsage;}
+	int getAccess() const{return mAccess;}
+	int getDataSize() const{return mDataSize;}
 
-	virtual int getPixelFormat() const{return mPixelFormat;}
-	virtual int getWidth() const{return mWidth;}
-	virtual int getHeight() const{return mHeight;}
-	virtual int getDepth() const{return mDepth;}
+	int getPixelFormat() const{return mPixelFormat;}
+	int getWidth() const{return mWidth;}
+	int getHeight() const{return mHeight;}
+	int getDepth() const{return mDepth;}
 
-	virtual uint8 *lock(int lockAccess);
-	virtual bool unlock();
+	uint8 *lock(int lockAccess);
+	bool unlock();
 
 	inline IDirect3DSurface9 *getSurface() const{return mSurface;}
 	inline IDirect3DVolume9 *getVolume() const{return mVolume;}

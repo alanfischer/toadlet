@@ -36,15 +36,15 @@ namespace tadpole{
 Material::Material():BaseResource(),
 	mStates(0),
 	mLighting(false),
-	mFaceCulling(Renderer::FaceCulling_BACK),
-	mFill(Renderer::Fill_SOLID),
-	mShading(Renderer::Shading_SMOOTH),
+	mFaceCulling(FaceCulling_BACK),
+	mFill(Fill_SOLID),
+	mShading(Shading_SMOOTH),
 	//mFogState,
-	mAlphaTest(Renderer::AlphaTest_NONE),
+	mAlphaTest(AlphaTest_NONE),
 	mAlphaTestCutoff(0),
+	//mBlendState,
 	mDepthSorted(false),
-	mDepthWrite(true),
-	mDepthTest(Renderer::DepthTest_LEQUAL),
+	//mDepthState,
 	//mPointState
 	mLayer(0)
 {
@@ -79,8 +79,8 @@ Material::ptr Material::clone(){
 	material->mAlphaTest=mAlphaTest;
 	material->mAlphaTestCutoff=mAlphaTestCutoff;
 	material->mBlendState.set(mBlendState);
-	material->mDepthWrite=mDepthWrite;
-	material->mDepthTest=mDepthTest;
+	material->mDepthSorted=mDepthSorted;
+	material->mDepthState.set(mDepthState);
 	material->mPointState.set(mPointState);
 	material->mLayer=mLayer;
 
@@ -117,11 +117,8 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		if((states&State_BLEND)>0){
 			renderer->setBlendState(mBlendState);
 		}
-		if((states&State_DEPTHTEST)>0){
-			renderer->setDepthTest(mDepthTest);
-		}
-		if((states&State_DEPTHWRITE)>0){
-			renderer->setDepthWrite(mDepthWrite);
+		if((states&State_DEPTH)>0){
+			renderer->setDepthState(mDepthState);
 		}
 		if((states&State_FACECULLING)>0){
 			renderer->setFaceCulling(mFaceCulling);
@@ -163,11 +160,8 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		if((states&State_BLEND)>0 && ((pstates&State_BLEND)==0 || previousMaterial->mBlendState!=mBlendState)){
 			renderer->setBlendState(mBlendState);
 		}
-		if((states&State_DEPTHTEST)>0 && ((pstates&State_DEPTHTEST)==0 || previousMaterial->mDepthTest!=mDepthTest)){
-			renderer->setDepthTest(mDepthTest);
-		}
-		if((states&State_DEPTHWRITE)>0 && ((pstates&State_DEPTHWRITE)==0 || previousMaterial->mDepthWrite!=mDepthWrite)){
-			renderer->setDepthWrite(mDepthWrite);
+		if((states&State_DEPTH)>0 && ((pstates&State_DEPTH)==0 || previousMaterial->mDepthState!=mDepthState)){
+			renderer->setDepthState(mDepthState);
 		}
 		if((states&State_FACECULLING)>0 && ((pstates&State_FACECULLING)==0 || previousMaterial->mFaceCulling!=mFaceCulling)){
 			renderer->setFaceCulling(mFaceCulling);
@@ -213,11 +207,8 @@ void Material::modifyWith(Material::ptr material){
 	if((states&State_BLEND)>0){
 		setBlendState(material->mBlendState);
 	}
-	if((states&State_DEPTHTEST)>0){
-		setDepthTest(material->mDepthTest);
-	}
-	if((states&State_DEPTHWRITE)>0){
-		setDepthWrite(material->mDepthWrite);
+	if((states&State_DEPTH)>0){
+		setDepthState(material->mDepthState);
 	}
 	if((states&State_FACECULLING)>0){
 		setFaceCulling(material->mFaceCulling);

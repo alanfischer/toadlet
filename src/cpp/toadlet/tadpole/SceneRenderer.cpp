@@ -92,7 +92,7 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 
 	int clearFlags=camera->getClearFlags();
 	if(clearFlags>0 && !camera->getSkipFirstClear()){
-		renderer->setDepthWrite(true);
+		renderer->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,true));
 		renderer->clear(clearFlags,camera->getClearColor());
 	}
 

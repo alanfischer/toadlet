@@ -460,8 +460,7 @@ bool D3D9Renderer::copySurface(IDirect3DSurface9 *dst,IDirect3DSurface9 *src){
 void D3D9Renderer::setDefaultStates(){
 	setAlphaTest(AlphaTest_NONE,0.5);
 	setBlendState(BlendState::Combination_DISABLED);
-	setDepthWrite(true);
-	setDepthTest(DepthTest_LEQUAL);
+	setDepthState(DepthState());
 	setDithering(false);
 	setFaceCulling(FaceCulling_BACK);
 	setFogState(FogState());
@@ -545,52 +544,54 @@ void D3D9Renderer::setBlendState(const BlendState &state){
 		hr=mD3DDevice->SetRenderState(D3DRS_DESTBLEND,dest);
 		TOADLET_CHECK_D3D9ERROR(hr,"setBlendFunction");
 	}
+
+	mD3DDevice->SetRenderState(D3DRS_COLORWRITEENABLE,state.colorWrite); // D3DCOLORWRITEENABLE values match with BlendState::ColorWrite values
 }
 
-void D3D9Renderer::setDepthTest(const DepthTest &depthTest){
-	if(depthTest==DepthTest_NONE){
-		mD3DDevice->SetRenderState(D3DRS_ZENABLE,D3DZB_FALSE);
+void D3D9Renderer::setDepthState(const DepthState &state){
+	HRESULT hr=S_OK;
+
+	if(state.test==DepthState::DepthTest_NONE){
+		hr=mD3DDevice->SetRenderState(D3DRS_ZENABLE,D3DZB_FALSE);
 	}
 	else{
-		mD3DDevice->SetRenderState(D3DRS_ZENABLE,D3DZB_TRUE);
+		hr=mD3DDevice->SetRenderState(D3DRS_ZENABLE,D3DZB_TRUE);
 
 		DWORD func=0;
 
-		switch(depthTest){
-			case DepthTest_NEVER:
+		switch(state.test){
+			case DepthState::DepthTest_NEVER:
 				func=D3DCMP_NEVER;
 			break;
-			case DepthTest_LESS:
+			case DepthState::DepthTest_LESS:
 				func=D3DCMP_LESS;
 			break;
-			case DepthTest_EQUAL:
+			case DepthState::DepthTest_EQUAL:
 				func=D3DCMP_EQUAL;
 			break;
-			case DepthTest_LEQUAL:
+			case DepthState::DepthTest_LEQUAL:
 				func=D3DCMP_LESSEQUAL;
 			break;
-			case DepthTest_GREATER:
+			case DepthState::DepthTest_GREATER:
 				func=D3DCMP_GREATER;
 			break;
-			case DepthTest_NOTEQUAL:
+			case DepthState::DepthTest_NOTEQUAL:
 				func=D3DCMP_NOTEQUAL;
 			break;
-			case DepthTest_GEQUAL:
+			case DepthState::DepthTest_GEQUAL:
 				func=D3DCMP_GREATEREQUAL;
 			break;
-			case DepthTest_ALWAYS:
+			case DepthState::DepthTest_ALWAYS:
 				func=D3DCMP_ALWAYS;
 			break;
 		}
 
-		HRESULT hr=mD3DDevice->SetRenderState(D3DRS_ZFUNC,func);
-		TOADLET_CHECK_D3D9ERROR(hr,"setDepthTest");
+		hr=mD3DDevice->SetRenderState(D3DRS_ZFUNC,func);
+		TOADLET_CHECK_D3D9ERROR(hr,"setDepthState");
 	}
-}
 
-void D3D9Renderer::setDepthWrite(bool enable){
-	HRESULT hr=mD3DDevice->SetRenderState(D3DRS_ZWRITEENABLE,enable);
-	TOADLET_CHECK_D3D9ERROR(hr,"setDepthWrite");
+	hr=mD3DDevice->SetRenderState(D3DRS_ZWRITEENABLE,state.write);
+	TOADLET_CHECK_D3D9ERROR(hr,"setDepthState");
 }
 
 void D3D9Renderer::setDithering(bool dithering){
@@ -877,15 +878,6 @@ void D3D9Renderer::setShading(const Shading &shading){
 			mD3DDevice->SetRenderState(D3DRS_SHADEMODE,D3DSHADE_GOURAUD);
 		break;
 	}
-}
-
-void D3D9Renderer::setColorWrite(bool r,bool g,bool b,bool a){
-	mD3DDevice->SetRenderState(D3DRS_COLORWRITEENABLE,
-		(r?D3DCOLORWRITEENABLE_RED:0)	|
-		(g?D3DCOLORWRITEENABLE_GREEN:0)	|
-		(b?D3DCOLORWRITEENABLE_BLUE:0)	|
-		(a?D3DCOLORWRITEENABLE_ALPHA:0)
-	);
 }
 
 void D3D9Renderer::setNormalize(const Normalize &normalize){

@@ -30,6 +30,7 @@
 #include "D3D9RenderTarget.h"
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/BlendState.h>
+#include <toadlet/peeper/DepthState.h>
 #include <toadlet/peeper/MaterialState.h>
 #include <toadlet/peeper/TextureStage.h>
 #include <toadlet/peeper/CapabilityState.h>
@@ -84,8 +85,7 @@ public:
 	void setDefaultStates();
 	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff);
 	void setBlendState(const BlendState &state);
-	void setDepthTest(const DepthTest &depthTest);
-	void setDepthWrite(bool depthWrite);
+	void setDepthState(const DepthState &state);
 	void setDithering(bool dithering);
 	void setFaceCulling(const FaceCulling &faceCulling);
 	void setFogState(const FogState &state);

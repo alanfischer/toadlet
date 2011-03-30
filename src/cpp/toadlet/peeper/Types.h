@@ -40,6 +40,46 @@ namespace peeper{
 	using namespace toadlet::egg::math;
 #endif
 
+enum ClearFlag{
+	ClearFlag_COLOR=1,
+	ClearFlag_DEPTH=2,
+	ClearFlag_STENCIL=4,
+};
+
+enum FaceCulling{
+	FaceCulling_NONE,
+	FaceCulling_FRONT,
+	FaceCulling_BACK,
+};
+
+enum AlphaTest{
+	AlphaTest_NONE,
+	AlphaTest_LESS,
+	AlphaTest_EQUAL,
+	AlphaTest_LEQUAL,
+	AlphaTest_GREATER,
+	AlphaTest_NOTEQUAL,
+	AlphaTest_GEQUAL,
+	AlphaTest_ALWAYS,
+};
+
+enum Fill{
+	Fill_POINT,
+	Fill_LINE,
+	Fill_SOLID,
+};
+
+enum Shading{
+	Shading_FLAT,
+	Shading_SMOOTH,
+};
+
+enum Normalize{
+	Normalize_NONE,
+	Normalize_RESCALE,
+	Normalize_NORMALIZE,
+};
+
 }
 }
 

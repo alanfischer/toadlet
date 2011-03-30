@@ -43,27 +43,27 @@ public:
 	GLTexture(GLRenderer *renderer);
 	virtual ~GLTexture();
 
-	virtual Texture *getRootTexture(scalar time){return this;}
-	virtual bool getRootTransform(scalar time,Matrix4x4 &transform){return true;}
+	Texture *getRootTexture(scalar time){return this;}
+	bool getRootTransform(scalar time,Matrix4x4 &transform){return true;}
 
-	virtual bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]);
-	virtual void destroy();
+	bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]);
+	void destroy();
 
-	virtual void resetCreate(){}
-	virtual void resetDestroy(){}
+	void resetCreate(){}
+	void resetDestroy(){}
 
-	virtual int getUsage() const{return mUsage;}
-	virtual Dimension getDimension() const{return mDimension;}
-	virtual int getFormat() const{return mFormat;}
-	virtual int getWidth() const{return mWidth;}
-	virtual int getHeight() const{return mHeight;}
-	virtual int getDepth() const{return mDepth;}
-	virtual int getNumMipLevels() const{return mMipLevels;}
-	virtual scalar getLength() const{return 0;}
+	int getUsage() const{return mUsage;}
+	Dimension getDimension() const{return mDimension;}
+	int getFormat() const{return mFormat;}
+	int getWidth() const{return mWidth;}
+	int getHeight() const{return mHeight;}
+	int getDepth() const{return mDepth;}
+	int getNumMipLevels() const{return mMipLevels;}
+	scalar getLength() const{return 0;}
 
-	virtual PixelBuffer::ptr getMipPixelBuffer(int level,int cubeSide);
-	virtual bool load(int width,int height,int depth,int mipLevel,tbyte *mipData);
-	virtual bool read(int width,int height,int depth,int mipLevel,tbyte *mipData);
+	PixelBuffer::ptr getMipPixelBuffer(int level,int cubeSide);
+	bool load(int width,int height,int depth,int mipLevel,tbyte *mipData);
+	bool read(int width,int height,int depth,int mipLevel,tbyte *mipData);
 
 	inline GLuint getHandle() const{return mHandle;}
 	inline GLenum getTarget() const{return mTarget;}

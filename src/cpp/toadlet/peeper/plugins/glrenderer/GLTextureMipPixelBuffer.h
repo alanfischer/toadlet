@@ -47,27 +47,27 @@ public:
 
 	void setBufferDestroyedListener(BufferDestroyedListener *listener){}
 
-	virtual PixelBuffer *getRootPixelBuffer(){return this;}
+	PixelBuffer *getRootPixelBuffer(){return this;}
 
-	virtual GLTextureMipPixelBuffer *castToGLTextureMipPixelBuffer(){return this;}
-	virtual GLFBOPixelBuffer *castToGLFBOPixelBuffer(){return NULL;}
-	virtual GLBuffer *castToGLBuffer(){return NULL;}
+	GLTextureMipPixelBuffer *castToGLTextureMipPixelBuffer(){return this;}
+	GLFBOPixelBuffer *castToGLFBOPixelBuffer(){return NULL;}
+	GLBuffer *castToGLBuffer(){return NULL;}
 
-	virtual bool create(int usage,int access,int pixelFormat,int width,int height,int depth){return false;}
-	virtual void destroy(){}
+	bool create(int usage,int access,int pixelFormat,int width,int height,int depth){return false;}
+	void destroy(){}
 
-	virtual void resetCreate(){}
-	virtual void resetDestroy(){}
+	void resetCreate(){}
+	void resetDestroy(){}
 
 	/// @todo: implement
-	virtual int getUsage() const{return 0;}
-	virtual int getAccess() const{return 0;}
-	virtual int getDataSize() const{return mDataSize;}
+	int getUsage() const{return 0;}
+	int getAccess() const{return 0;}
+	int getDataSize() const{return mDataSize;}
 
-	virtual int getPixelFormat() const;
-	virtual int getWidth() const{return mWidth;}
-	virtual int getHeight() const{return mHeight;}
-	virtual int getDepth() const{return mDepth;}
+	int getPixelFormat() const;
+	int getWidth() const{return mWidth;}
+	int getHeight() const{return mHeight;}
+	int getDepth() const{return mDepth;}
 
 	inline GLTexture *getTexture() const{return mTexture;}
 	inline GLuint getLevel() const{return mLevel;}
@@ -76,8 +76,8 @@ public:
 	GLuint getTarget() const;
 
 	/// @todo: Implement these
-	virtual uint8 *lock(int access){return NULL;}
-	virtual bool unlock(){return false;}
+	uint8 *lock(int access){return NULL;}
+	bool unlock(){return false;}
 
 protected:
 	GLTexture *mTexture;

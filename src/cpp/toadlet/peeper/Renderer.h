@@ -36,6 +36,7 @@ namespace peeper{
 
 class BlendState;
 class CapabilityState;
+class DepthState;
 class IndexBuffer;
 class LightState;
 class MaterialState;
@@ -59,58 +60,6 @@ public:
 		RendererStatus_OK,
 		RendererStatus_UNAVAILABLE,
 		RendererStatus_NEEDSRESET,
-	};
-
-	enum ClearFlag{
-		ClearFlag_COLOR=1,
-		ClearFlag_DEPTH=2,
-		ClearFlag_STENCIL=4,
-	};
-
-	enum FaceCulling{
-		FaceCulling_NONE,
-		FaceCulling_FRONT,
-		FaceCulling_BACK,
-	};
-
-	enum DepthTest{
-		DepthTest_NONE,
-		DepthTest_NEVER,
-		DepthTest_LESS,
-		DepthTest_EQUAL,
-		DepthTest_LEQUAL,
-		DepthTest_GREATER,
-		DepthTest_NOTEQUAL,
-		DepthTest_GEQUAL,
-		DepthTest_ALWAYS,
-	};
-
-	enum AlphaTest{
-		AlphaTest_NONE,
-		AlphaTest_LESS,
-		AlphaTest_EQUAL,
-		AlphaTest_LEQUAL,
-		AlphaTest_GREATER,
-		AlphaTest_NOTEQUAL,
-		AlphaTest_GEQUAL,
-		AlphaTest_ALWAYS,
-	};
-
-	enum Fill{
-		Fill_POINT,
-		Fill_LINE,
-		Fill_SOLID,
-	};
-
-	enum Shading{
-		Shading_FLAT,
-		Shading_SMOOTH,
-	};
-
-	enum Normalize{
-		Normalize_NONE,
-		Normalize_RESCALE,
-		Normalize_NORMALIZE,
 	};
 
 	virtual ~Renderer(){}
@@ -155,14 +104,12 @@ public:
 	virtual void setDefaultStates()=0;
 	virtual void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff)=0;
 	virtual void setBlendState(const BlendState &state)=0;
-	virtual void setDepthTest(const DepthTest &depthTest)=0;
-	virtual void setDepthWrite(bool depthWrite)=0;
+	virtual void setDepthState(const DepthState &state)=0;
 	virtual void setDithering(bool dithering)=0;
 	virtual void setFaceCulling(const FaceCulling &faceCulling)=0;
 	virtual void setFogState(const FogState &state)=0;
 	virtual void setFill(const Fill &fill)=0;
 	virtual void setShading(const Shading &shading)=0;
-	virtual void setColorWrite(bool r,bool g,bool b,bool a)=0;
 	virtual void setNormalize(const Normalize &normalize)=0;
 	virtual void setDepthBias(scalar constant,scalar slope)=0;
 	virtual void setPointState(const PointState &state)=0;

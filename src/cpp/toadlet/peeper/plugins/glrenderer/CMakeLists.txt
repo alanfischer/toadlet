@@ -2,6 +2,7 @@
 set (PEEPER_GLRENDERER_SRC
 	GLBuffer.cpp
 	GLRenderer.cpp
+	GLRenderStateSet.cpp
 	GLTexture.cpp
 	GLTextureMipPixelBuffer.cpp
 	GLVertexFormat.cpp
@@ -52,6 +53,7 @@ set (PEEPER_GLRENDERER_HEADERS
 	GLTexture.h
 	GLTextureMipPixelBuffer.h
 	GLPixelBuffer.h
+	GLRenderStateSet.h
 	GLVertexFormat.h
 )
 if (NOT TOADLET_PLATFORM_WINCE)

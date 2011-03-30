@@ -76,7 +76,6 @@ GLRenderer::GLRenderer():
 	mPBuffersAvailable(false),
 	mFBOsAvailable(false),
 
-	mDepthWrite(false),
 	mInTexGen(false),
 	mMaxTexCoordIndex(0),
 	//mTexCoordIndexes,
@@ -562,7 +561,7 @@ void GLRenderer::clear(int clearFlags,const Vector4 &clearColor){
 		bufferBits|=GL_STENCIL_BUFFER_BIT;
 	}
 
-	if(mDepthWrite==false){
+	if(mDepthState.write==false){
 		glDepthMask(GL_TRUE);
 		glClear(bufferBits);
 		glDepthMask(GL_FALSE);
@@ -788,8 +787,7 @@ void GLRenderer::setDefaultStates(){
 	// General states
 	setAlphaTest(AlphaTest_NONE,Math::HALF);
 	setBlendState(BlendState::Combination_DISABLED);
-	setDepthWrite(true);
-	setDepthTest(DepthTest_LEQUAL);
+	setDepthState(DepthState());
 	setDithering(false);
 	setFaceCulling(FaceCulling_BACK);
 	setFogState(FogState());
@@ -872,27 +870,25 @@ void GLRenderer::setBlendState(const BlendState &state){
 		glEnable(GL_BLEND);
 	}
 
+	glColorMask((state.colorWrite&BlendState::ColorWrite_BIT_R)>0,(state.colorWrite&BlendState::ColorWrite_BIT_G)>0,(state.colorWrite&BlendState::ColorWrite_BIT_B)>0,(state.colorWrite&BlendState::ColorWrite_BIT_A)>0);
+
 	TOADLET_CHECK_GLERROR("setBlendState");
 }
 
-void GLRenderer::setDepthTest(const DepthTest &depthTest){
-	if(depthTest==DepthTest_NONE){
+void GLRenderer::setDepthState(const DepthState &state){
+	mDepthState.set(state);
+
+	if(state.test==DepthState::DepthTest_NONE){
 		glDisable(GL_DEPTH_TEST);
 	}
 	else{
-		glDepthFunc(getGLDepthFunc(depthTest));
+		glDepthFunc(getGLDepthFunc(state.test));
 		glEnable(GL_DEPTH_TEST);
 	}
 
-	TOADLET_CHECK_GLERROR("setDepthTest");
-}
+	glDepthMask(state.write?GL_TRUE:GL_FALSE);
 
-void GLRenderer::setDepthWrite(bool depthWrite){
-	glDepthMask(depthWrite?GL_TRUE:GL_FALSE);
-
-	mDepthWrite=depthWrite;
-
-	TOADLET_CHECK_GLERROR("setDepthWrite");
+	TOADLET_CHECK_GLERROR("setDepthState");
 }
 
 void GLRenderer::setDithering(bool dithering){
@@ -1044,12 +1040,6 @@ void GLRenderer::setShading(const Shading &shading){
 	}
 
 	TOADLET_CHECK_GLERROR("setShading");
-}
-
-void GLRenderer::setColorWrite(bool r,bool g,bool b,bool a){
-	glColorMask(r,g,b,a);
-
-	TOADLET_CHECK_GLERROR("setColorWrite");
 }
 
 void GLRenderer::setNormalize(const Normalize &normalize){
@@ -1740,23 +1730,23 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastSemanticBits)
 	return semanticBits;
 }
 
-GLenum GLRenderer::getGLDepthFunc(DepthTest depthTest){
-	switch(depthTest){
-		case DepthTest_NEVER:
+GLenum GLRenderer::getGLDepthFunc(DepthState::DepthTest test){
+	switch(test){
+		case DepthState::DepthTest_NEVER:
 			return GL_NEVER;
-		case DepthTest_LESS:
+		case DepthState::DepthTest_LESS:
 			return GL_LESS;
-		case DepthTest_EQUAL:
+		case DepthState::DepthTest_EQUAL:
 			return GL_EQUAL;
-		case DepthTest_LEQUAL:
+		case DepthState::DepthTest_LEQUAL:
 			return GL_LEQUAL;
-		case DepthTest_GREATER:
+		case DepthState::DepthTest_GREATER:
 			return GL_GREATER;
-		case DepthTest_NOTEQUAL:
+		case DepthState::DepthTest_NOTEQUAL:
 			return GL_NOTEQUAL;
-		case DepthTest_GEQUAL:
+		case DepthState::DepthTest_GEQUAL:
 			return GL_GEQUAL;
-		case DepthTest_ALWAYS:
+		case DepthState::DepthTest_ALWAYS:
 			return GL_ALWAYS;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
@@ -1765,8 +1755,8 @@ GLenum GLRenderer::getGLDepthFunc(DepthTest depthTest){
 	}
 }
 
-GLenum GLRenderer::getGLAlphaFunc(AlphaTest alphaTest){
-	switch(alphaTest){
+GLenum GLRenderer::getGLAlphaFunc(AlphaTest test){
+	switch(test){
 		case AlphaTest_LESS:
 			return GL_LESS;
 		case AlphaTest_EQUAL:

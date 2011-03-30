@@ -64,8 +64,8 @@ Node *LabelNode::create(Scene *scene){
 
 	mMaterial=getEngine()->getMaterialManager()->createMaterial();
 	mMaterial->retain();
-	mMaterial->setFaceCulling(Renderer::FaceCulling_NONE);
-	mMaterial->setDepthWrite(false);
+	mMaterial->setFaceCulling(FaceCulling_NONE);
+	mMaterial->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 	mMaterial->setLighting(true);
 	mMaterial->setMaterialState(MaterialState(true));
 

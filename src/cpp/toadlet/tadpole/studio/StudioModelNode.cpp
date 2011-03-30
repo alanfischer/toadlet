@@ -250,8 +250,7 @@ void StudioModelNode::setRenderSkeleton(bool skeleton){
 	if(skeleton){
 		if(mSkeletonMaterial==NULL){
 			mSkeletonMaterial=mEngine->getMaterialManager()->createMaterial();
-			mSkeletonMaterial->setDepthTest(Renderer::DepthTest_NONE);
-			mSkeletonMaterial->setDepthWrite(false);
+			mSkeletonMaterial->setDepthState(DepthState(DepthState::DepthTest_NONE,false));
 			mSkeletonMaterial->setPointState(PointState(true,8,false,0,0,0,0,0));
 		}
 	}

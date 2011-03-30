@@ -183,10 +183,9 @@ void StudioHandler::buildMaterials(StudioModel *model){
 		Material::ptr material=mEngine->getMaterialManager()->createMaterial();
 		material->retain();
 		material->setLighting(true);
-		material->setFaceCulling(Renderer::FaceCulling_FRONT);
-		material->setDepthWrite(true);
+		material->setFaceCulling(FaceCulling_FRONT);
 		if((stexture->flags&STUDIO_NF_FLATSHADE)>0){
-			material->setShading(Renderer::Shading_FLAT);
+			material->setShading(Shading_FLAT);
 		}
 
 		TextureStage::ptr primary=mEngine->getMaterialManager()->createTextureStage(model->textures[i]);

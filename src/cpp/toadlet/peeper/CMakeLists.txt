@@ -26,15 +26,16 @@ set (PEEPER_HEADERS
 	BackablePixelBufferRenderTarget.h
 	BackableTexture.h
 	BackableTextureMipPixelBuffer.h
-	Blend.h
+	BlendState.h
 	Buffer.h
 	BufferDestroyedListener.h
-	CapabilitySet.h
+	CapabilityState.h
+	DepthState.h
 	FogState.h
 	IndexBuffer.h
 	IndexBufferAccessor.h
 	IndexData.h
-	LightEffect.h
+	MaterialState.h
 	LightState.h
 	Program.h
 	Query.h
@@ -43,10 +44,10 @@ set (PEEPER_HEADERS
 	SectionTexture.h
 	SequenceTexture.h
 	Shader.h
-	StatisticsSet.h
 	PixelBuffer.h
 	PixelBufferRenderTarget.h
 	PointState.h
+	RenderStateSet.h
 	Texture.h
 	TextureBlend.h
 	TextureStage.h

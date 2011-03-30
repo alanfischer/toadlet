@@ -42,27 +42,27 @@ public:
 	WGLPBufferRenderTarget(GLRenderer *renderer);
 	virtual ~WGLPBufferRenderTarget();
 
-	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
+	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
-	virtual void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
+	void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
 
-	virtual bool create();
-	virtual void destroy();
-	virtual bool compile();
+	bool create();
+	void destroy();
+	bool compile();
 
-	virtual bool activate();
-	virtual bool deactivate(){return WGLRenderTarget::deactivate();}
-	virtual bool swap();
-	virtual bool activateAdditionalContext(){return false;}
-	virtual void deactivateAdditionalContext(){}
+	bool activate();
+	bool deactivate(){return WGLRenderTarget::deactivate();}
+	bool swap();
+	bool activateAdditionalContext(){return false;}
+	void deactivateAdditionalContext(){}
 
-	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment);
-	virtual bool remove(PixelBuffer::ptr buffer);
+	bool attach(PixelBuffer::ptr buffer,Attachment attachment);
+	bool remove(PixelBuffer::ptr buffer);
 
-	virtual bool isPrimary() const{return false;}
-	virtual bool isValid() const{return mGLRC!=NULL && mPBuffer!=NULL;}
-	virtual int getWidth() const{return mWidth;}
-	virtual int getHeight() const{return mHeight;}
+	bool isPrimary() const{return false;}
+	bool isValid() const{return mGLRC!=NULL && mPBuffer!=NULL;}
+	int getWidth() const{return mWidth;}
+	int getHeight() const{return mHeight;}
 	inline HPBUFFERARB getHPBUFFER() const{return mPBuffer;}
 
 protected:
