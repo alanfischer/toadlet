@@ -327,24 +327,24 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 		if(data!=NULL){
 			if(version<=2){
 				if(strcmp(data,"Back")==0){
-					material->setFaceCulling(Renderer::FaceCulling_BACK);
+					material->setFaceCulling(FaceCulling_BACK);
 				}
 				else if(strcmp(data,"Front")==0){
-					material->setFaceCulling(Renderer::FaceCulling_FRONT);
+					material->setFaceCulling(FaceCulling_FRONT);
 				}
 				else if(strcmp(data,"None")==0){
-					material->setFaceCulling(Renderer::FaceCulling_NONE);
+					material->setFaceCulling(FaceCulling_NONE);
 				}
 			}
 			else{
 				if(strcmp(data,"back")==0){
-					material->setFaceCulling(Renderer::FaceCulling_BACK);
+					material->setFaceCulling(FaceCulling_BACK);
 				}
 				else if(strcmp(data,"front")==0){
-					material->setFaceCulling(Renderer::FaceCulling_FRONT);
+					material->setFaceCulling(FaceCulling_FRONT);
 				}
 				else if(strcmp(data,"none")==0){
-					material->setFaceCulling(Renderer::FaceCulling_NONE);
+					material->setFaceCulling(FaceCulling_NONE);
 				}
 			}
 		}
@@ -520,24 +520,24 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,P
 	mxml_node_t *faceCullingNode=mxmlNewElement(materialNode,"FaceCulling");
 	{
 		if(version<=2){
-			if(material->getFaceCulling()==Renderer::FaceCulling_BACK){
+			if(material->getFaceCulling()==FaceCulling_BACK){
 				mxmlNewOpaque(faceCullingNode,"Back");
 			}
-			else if(material->getFaceCulling()==Renderer::FaceCulling_FRONT){
+			else if(material->getFaceCulling()==FaceCulling_FRONT){
 				mxmlNewOpaque(faceCullingNode,"Front");
 			}
-			else if(material->getFaceCulling()==Renderer::FaceCulling_NONE){
+			else if(material->getFaceCulling()==FaceCulling_NONE){
 				mxmlNewOpaque(faceCullingNode,"None");
 			}
 		}
 		else{
-			if(material->getFaceCulling()==Renderer::FaceCulling_BACK){
+			if(material->getFaceCulling()==FaceCulling_BACK){
 				mxmlNewOpaque(faceCullingNode,"back");
 			}
-			else if(material->getFaceCulling()==Renderer::FaceCulling_FRONT){
+			else if(material->getFaceCulling()==FaceCulling_FRONT){
 				mxmlNewOpaque(faceCullingNode,"front");
 			}
-			else if(material->getFaceCulling()==Renderer::FaceCulling_NONE){
+			else if(material->getFaceCulling()==FaceCulling_NONE){
 				mxmlNewOpaque(faceCullingNode,"none");
 			}
 		}

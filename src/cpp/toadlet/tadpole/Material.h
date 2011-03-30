@@ -31,6 +31,7 @@
 #include <toadlet/peeper/FogState.h>
 #include <toadlet/peeper/MaterialState.h>
 #include <toadlet/peeper/BlendState.h>
+#include <toadlet/peeper/DepthState.h>
 #include <toadlet/peeper/PointState.h>
 #include <toadlet/peeper/TextureStage.h>
 #include <toadlet/peeper/Renderer.h>
@@ -51,10 +52,9 @@ public:
 		State_ALPHATEST=	1<<5,
 		State_BLEND=		1<<6,
 		State_DEPTHSORT=	1<<7,
-		State_DEPTHWRITE=	1<<8,
-		State_DEPTHTEST=	1<<9,
-		State_SHADING=		1<<10,
-		State_POINT=		1<<11,
+		State_DEPTH=		1<<8,
+		State_SHADING=		1<<9,
+		State_POINT=		1<<10,
 	};
 	
 	Material();
@@ -69,22 +69,22 @@ public:
 	void setMaterialState(const peeper::MaterialState &state){mStates|=State_MATERIAL;mMaterialState.set(state);}
 	inline const peeper::MaterialState &getMaterialState() const{return mMaterialState;}
 
-	void setFaceCulling(const peeper::Renderer::FaceCulling &faceCulling){mStates|=State_FACECULLING;mFaceCulling=faceCulling;}
-	inline const peeper::Renderer::FaceCulling &getFaceCulling() const{return mFaceCulling;}
+	void setFaceCulling(const peeper::FaceCulling &faceCulling){mStates|=State_FACECULLING;mFaceCulling=faceCulling;}
+	inline const peeper::FaceCulling &getFaceCulling() const{return mFaceCulling;}
 
-	void setFill(const peeper::Renderer::Fill &fill){mStates|=State_FILL;mFill=fill;}
-	inline const peeper::Renderer::Fill &getFill() const{return mFill;}
+	void setFill(const peeper::Fill &fill){mStates|=State_FILL;mFill=fill;}
+	inline const peeper::Fill &getFill() const{return mFill;}
 
-	void setShading(const peeper::Renderer::Shading &shading){mStates|=State_SHADING;mShading=shading;}
-	inline const peeper::Renderer::Shading &getShading() const{return mShading;}
+	void setShading(const peeper::Shading &shading){mStates|=State_SHADING;mShading=shading;}
+	inline const peeper::Shading &getShading() const{return mShading;}
 
 	void setFogState(const peeper::FogState &state){mStates|=State_FOG;mFogState.set(state);}
 	inline const peeper::FogState &getFogState() const{return mFogState;}
 
-	void setAlphaTest(peeper::Renderer::AlphaTest alphaTest,scalar cutoff){
+	void setAlphaTest(peeper::AlphaTest alphaTest,scalar cutoff){
 		mStates|=State_ALPHATEST;mAlphaTest=alphaTest;mAlphaTestCutoff=cutoff;
 	}
-	inline const peeper::Renderer::AlphaTest &getAlphaTest() const{return mAlphaTest;}
+	inline const peeper::AlphaTest &getAlphaTest() const{return mAlphaTest;}
 	inline scalar getAlphaTestCutoff() const{return mAlphaTestCutoff;}
 
 	void setBlendState(const peeper::BlendState &state){mStates|=State_BLEND;mBlendState.set(state);}
@@ -93,11 +93,8 @@ public:
 	void setDepthSorted(bool sorted){mStates|=State_DEPTHSORT;mDepthSorted=sorted;}
 	inline bool getDepthSorted() const{return mDepthSorted;}
 
-	void setDepthWrite(bool depthWrite){mStates|=State_DEPTHWRITE;mDepthWrite=depthWrite;}
-	inline bool getDepthWrite() const{return mDepthWrite;}
-
-	void setDepthTest(peeper::Renderer::DepthTest depthTest){mStates|=State_DEPTHTEST;mDepthTest=depthTest;}
-	inline peeper::Renderer::DepthTest getDepthTest() const{return mDepthTest;}
+	void setDepthState(const peeper::DepthState &state){mStates|=State_DEPTH;mDepthState.set(state);}
+	inline const peeper::DepthState &getDepthState() const{return mDepthState;}
 
 	void setPointState(const peeper::PointState &state){mStates|=State_POINT;mPointState.set(state);}
 	inline const peeper::PointState &getPointSprite() const{return mPointState;}
@@ -119,16 +116,15 @@ protected:
 	int mStates;
 	peeper::MaterialState mMaterialState;
 	bool mLighting;
-	peeper::Renderer::FaceCulling mFaceCulling;
-	peeper::Renderer::Fill mFill;
-	peeper::Renderer::Shading mShading;
+	peeper::FaceCulling mFaceCulling;
+	peeper::Fill mFill;
+	peeper::Shading mShading;
 	peeper::FogState mFogState;
-	peeper::Renderer::AlphaTest mAlphaTest;
+	peeper::AlphaTest mAlphaTest;
 	scalar mAlphaTestCutoff;
 	peeper::BlendState mBlendState;
 	bool mDepthSorted;
-	bool mDepthWrite;
-	peeper::Renderer::DepthTest mDepthTest;
+	peeper::DepthState mDepthState;
 	peeper::PointState mPointState;
 	egg::Collection<peeper::TextureStage::ptr> mTextureStages;
 	int mLayer;

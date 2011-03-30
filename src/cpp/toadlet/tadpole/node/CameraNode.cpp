@@ -77,7 +77,7 @@ Node *CameraNode::create(Scene *scene){
 	setProjectionFovX(Math::HALF_PI,Math::ONE,Math::ONE,Math::fromInt(1000));
 	mViewportSet=false;
 	mViewport.reset();
-	mClearFlags=Renderer::ClearFlag_COLOR|Renderer::ClearFlag_DEPTH;
+	mClearFlags=ClearFlag_COLOR|ClearFlag_DEPTH;
 	mClearColor.reset();
 	mSkipFirstClear=false;
 
@@ -103,7 +103,7 @@ Node *CameraNode::create(Scene *scene){
 
 	mGamma=Math::ONE;
 	mGammaMaterial=mEngine->getMaterialManager()->createMaterial();
-	mGammaMaterial->setDepthTest(Renderer::DepthTest_NONE);
+	mGammaMaterial->setDepthState(DepthState(DepthState::DepthTest_NONE,false));
 	mGammaMaterial->setLighting(true);
 	mGammaMaterial->setMaterialState(MaterialState(Math::ZERO_VECTOR4));
 	mGammaMaterial->retain();
@@ -462,7 +462,7 @@ Mesh::ptr CameraNode::renderToSkyBox(Renderer *renderer,int format,int size,scal
 
 		skyboxMaterial[i]=mEngine->getMaterialManager()->createMaterial();
 		skyboxMaterial[i]->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(skyboxTexture[i],true));
-		skyboxMaterial[i]->setDepthWrite(false);
+		skyboxMaterial[i]->setDepthState(DepthState(DepthState::DepthTest_NONE,false));
 	}
 
 	setAlignmentCalculationsUseOrigin(oldAlignment);

@@ -40,15 +40,15 @@ public:
 
 	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
-	virtual bool createContext(void *display,void *window,const Visual &visual,bool pixmap=false);
-	virtual bool destroyContext();
+	bool createContext(void *display,void *window,const Visual &visual,bool pixmap=false);
+	bool destroyContext();
 	
-	virtual bool swap();
+	bool swap();
 
-	virtual bool isPrimary() const{return true;}
-	virtual bool isValid() const{return mContext!=NULL && mSurface!=NULL;}
-	virtual int getWidth() const;
-	virtual int getHeight() const;
+	bool isPrimary() const{return true;}
+	bool isValid() const{return mContext!=NULL && mSurface!=NULL;}
+	int getWidth() const;
+	int getHeight() const;
 
 protected:
 	EGLConfig mConfig;

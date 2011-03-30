@@ -38,19 +38,19 @@ public:
 	GLXWindowRenderTarget(GLXDrawable drawable,Display *display,XVisualInfo *visualInfo);
 	virtual ~GLXWindowRenderTarget();
 
-	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
+	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
-	virtual bool createContext(GLXDrawable drawable,Display *display,XVisualInfo *visualInfo);
-	virtual bool destroyContext();
-	virtual bool activateAdditionalContext();
-	virtual void deactivateAdditionalContext();
+	bool createContext(GLXDrawable drawable,Display *display,XVisualInfo *visualInfo);
+	bool destroyContext();
+	bool activateAdditionalContext();
+	void deactivateAdditionalContext();
 	
-	virtual bool swap();
+	bool swap();
 
-	virtual bool isPrimary() const{return true;}
-	virtual bool isValid() const{return mContext!=0;}
-	virtual int getWidth() const;
-	virtual int getHeight() const;
+	bool isPrimary() const{return true;}
+	bool isValid() const{return mContext!=0;}
+	int getWidth() const;
+	int getHeight() const;
 
 protected:
 	XVisualInfo *mVisualInfo;

@@ -39,25 +39,25 @@ public:
 	D3D10PixelBufferRenderTarget(D3D10Renderer *renderer);
 	virtual ~D3D10PixelBufferRenderTarget();
 
-	virtual RenderTarget *getRootRenderTarget(){return (D3D10RenderTarget*)this;}
+	RenderTarget *getRootRenderTarget(){return (D3D10RenderTarget*)this;}
 
-	virtual void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
+	void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
 
-	virtual bool create();
-	virtual void destroy();
+	bool create();
+	void destroy();
 
-	virtual bool activate();
-	virtual void swap();
-	virtual void reset(){}
+	bool activate();
+	void swap();
+	void reset(){}
 
-	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment);
-	virtual bool remove(PixelBuffer::ptr buffer);
-	virtual bool compile();
+	bool attach(PixelBuffer::ptr buffer,Attachment attachment);
+	bool remove(PixelBuffer::ptr buffer);
+	bool compile();
 
-	virtual bool isPrimary() const{return false;}
-	virtual bool isValid() const{return true;}
-	virtual int getWidth() const{return mWidth;}
-	virtual int getHeight() const{return mHeight;}
+	bool isPrimary() const{return false;}
+	bool isValid() const{return true;}
+	int getWidth() const{return mWidth;}
+	int getHeight() const{return mHeight;}
 
 protected:
 	D3D10Renderer *mRenderer;

@@ -43,22 +43,22 @@ public:
 	NSGLRenderTarget(NSOpenGLContext *context);
 	virtual ~NSGLRenderTarget();
 
-	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
+	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 	
-	virtual bool createContext(NSView *view,WindowRenderTargetFormat *format,NSOpenGLPixelFormat *pixelFormat=nil);
-	virtual bool destroyContext();
+	bool createContext(NSView *view,WindowRenderTargetFormat *format,NSOpenGLPixelFormat *pixelFormat=nil);
+	bool destroyContext();
 
-	virtual bool activate();
-	virtual bool deactivate();
-	virtual bool swap();
-	virtual void reset();
-	virtual bool activateAdditionalContext();
-	virtual void deactivateAdditionalContext();
+	bool activate();
+	bool deactivate();
+	bool swap();
+	void reset();
+	bool activateAdditionalContext();
+	void deactivateAdditionalContext();
 
-	virtual bool isPrimary() const{return true;}
-	virtual bool isValid() const{return mContext!=NULL;}
-	virtual int getHeight() const;
-	virtual int getWidth() const;
+	bool isPrimary() const{return true;}
+	bool isValid() const{return mContext!=NULL;}
+	int getHeight() const;
+	int getWidth() const;
 	inline NSOpenGLContext *getContext() const{return mContext;}
 
 protected:

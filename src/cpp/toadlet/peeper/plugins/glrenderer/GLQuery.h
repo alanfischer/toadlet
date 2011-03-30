@@ -41,14 +41,14 @@ public:
 
 	Query *getRootQuery(){return this;}
 
-	virtual bool create(QueryType type);
-	virtual void destroy();
+	bool create(QueryType type);
+	void destroy();
 
-	virtual void beginQuery();
-	virtual void endQuery();
-	virtual bool performQuery(){return false;}
+	void beginQuery();
+	void endQuery();
+	bool performQuery(){return false;}
 
-	virtual uint64 getResult();
+	uint64 getResult();
 
 protected:
 	GLRenderer *mRenderer;

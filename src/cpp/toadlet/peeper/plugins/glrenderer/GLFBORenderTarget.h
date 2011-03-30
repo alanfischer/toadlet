@@ -43,28 +43,28 @@ public:
 	GLFBORenderTarget(GLRenderer *renderer);
 	virtual ~GLFBORenderTarget();
 
-	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
+	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
-	virtual void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
+	void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
 
-	virtual bool create();
-	virtual void destroy();
+	bool create();
+	void destroy();
 
-	virtual bool swap();
-	virtual bool activate();
-	virtual bool deactivate();
-	virtual bool share(GLRenderTarget *target){return true;}
-	virtual bool activateAdditionalContext(){return false;}
-	virtual void deactivateAdditionalContext(){}
+	bool swap();
+	bool activate();
+	bool deactivate();
+	bool share(GLRenderTarget *target){return true;}
+	bool activateAdditionalContext(){return false;}
+	void deactivateAdditionalContext(){}
 
-	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment);
-	virtual bool remove(PixelBuffer::ptr buffer);
-	virtual bool compile();
+	bool attach(PixelBuffer::ptr buffer,Attachment attachment);
+	bool remove(PixelBuffer::ptr buffer);
+	bool compile();
 
-	virtual bool isPrimary() const{return false;}
-	virtual bool isValid() const{return mHandle!=0;}
-	virtual int getWidth() const{return mWidth;}
-	virtual int getHeight() const{return mHeight;}
+	bool isPrimary() const{return false;}
+	bool isValid() const{return mHandle!=0;}
+	int getWidth() const{return mWidth;}
+	int getHeight() const{return mHeight;}
 
 protected:
 	static GLenum getGLAttachment(Attachment attachment);

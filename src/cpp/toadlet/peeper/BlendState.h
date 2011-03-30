@@ -54,27 +54,37 @@ public:
 		Combination_ALPHA_ADDITIVE,
 	};
 
+	enum ColorWrite{
+		ColorWrite_BIT_R=1<<0,
+		ColorWrite_BIT_G=1<<1,
+		ColorWrite_BIT_B=1<<2,
+		ColorWrite_BIT_A=1<<3,
+		ColorWrite_ALL=0xF,
+	};
+
 	BlendState():
 		source(Operation_ONE),
-		dest(Operation_ZERO)
+		dest(Operation_ZERO),
+		colorWrite(ColorWrite_ALL)
 	{}
 
-	BlendState(const Combination &state){
-		set(state);
+	BlendState(const Combination &state,int colorWrite=ColorWrite_ALL){
+		set(state,colorWrite);
 	}
 
-	BlendState(const Operation &src,const Operation &dst){
-		set(src,dst);
+	BlendState(const Operation &source,const Operation &dest,int colorWrite=ColorWrite_ALL){
+		set(source,dest,colorWrite);
 	}
 
 	BlendState &set(const BlendState &state){
 		source=state.source;
 		dest=state.dest;
+		colorWrite=state.colorWrite;
 
 		return *this;
 	}
 
-	BlendState &set(const Combination &blend){
+	BlendState &set(const Combination &blend,int colorWrite=ColorWrite_ALL){
 		switch(blend){
 			case Combination_COLOR:
 				source=Operation_ONE;
@@ -97,31 +107,35 @@ public:
 				dest=Operation_ZERO;
 			break;
 		}
+		
+		this->colorWrite=colorWrite;
 
 		return *this;
 	}
 
-	BlendState &set(Operation src,Operation dst){
-		source=src;
-		dest=dst;
+	BlendState &set(Operation source,Operation dest,int colorWrite=ColorWrite_ALL){
+		this->source=source;
+		this->dest=dest;
+		this->colorWrite=colorWrite;
 
 		return *this;
 	}
 
 	inline bool equals(const BlendState &state) const{
-		return (source==state.source && dest==state.dest);
+		return (source==state.source && dest==state.dest && colorWrite==state.colorWrite);
 	}
 
 	inline bool operator==(const BlendState &state) const{
-		return (source==state.source && dest==state.dest);
+		return (source==state.source && dest==state.dest && colorWrite==state.colorWrite);
 	}
 
 	inline bool operator!=(const BlendState &state) const{
-		return !(source==state.source && dest==state.dest);
+		return !(source==state.source && dest==state.dest && colorWrite==state.colorWrite);
 	}
 
 	Operation source;
 	Operation dest;
+	int colorWrite;
 };
 
 }

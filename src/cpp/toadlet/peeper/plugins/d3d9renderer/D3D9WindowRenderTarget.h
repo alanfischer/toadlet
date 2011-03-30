@@ -38,21 +38,21 @@ public:
 	D3D9WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
 	virtual ~D3D9WindowRenderTarget();
 
-	virtual RenderTarget *getRootRenderTarget(){return this;}
-	virtual bool isPrimary() const{return true;}
-	virtual bool isValid() const{return mD3DDevice!=NULL;}
+	RenderTarget *getRootRenderTarget(){return this;}
+	bool isPrimary() const{return true;}
+	bool isValid() const{return mD3DDevice!=NULL;}
 
-	virtual bool createContext(HWND wnd,WindowRenderTargetFormat *format);
-	virtual bool destroyContext();
+	bool createContext(HWND wnd,WindowRenderTargetFormat *format);
+	bool destroyContext();
 
-	virtual int getWidth() const{RECT r;GetClientRect(mWindow,&r);return r.right-r.left;}
-	virtual int getHeight() const{RECT r;GetClientRect(mWindow,&r);return r.bottom-r.top;}
+	int getWidth() const{RECT r;GetClientRect(mWindow,&r);return r.right-r.left;}
+	int getHeight() const{RECT r;GetClientRect(mWindow,&r);return r.bottom-r.top;}
 
-	virtual bool activate();
-	virtual bool deactivate();
+	bool activate();
+	bool deactivate();
 
-	virtual void swap();
-	virtual void reset();
+	void swap();
+	void reset();
 
 	inline IDirect3DDevice9 *getDirect3DDevice9() const{return mD3DDevice;}
 	inline IDirect3D9 *getDirect3D9() const{return mD3D;}

@@ -277,7 +277,7 @@ void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const S
 					textureStage->setUAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
 					textureStage->setVAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
 				}
-				material->setDepthWrite(false);
+				material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 				material->setLighting(false);
 			}
 		}

@@ -41,31 +41,31 @@ public:
 
 	virtual ~GLFBOPixelBuffer();
 
-	virtual PixelBuffer *getRootPixelBuffer(){return this;}
-	virtual GLTextureMipPixelBuffer *castToGLTextureMipPixelBuffer(){return NULL;}
-	virtual GLFBOPixelBuffer *castToGLFBOPixelBuffer(){return this;}
-	virtual GLBuffer *castToGLBuffer(){return NULL;}
+	PixelBuffer *getRootPixelBuffer(){return this;}
+	GLTextureMipPixelBuffer *castToGLTextureMipPixelBuffer(){return NULL;}
+	GLFBOPixelBuffer *castToGLFBOPixelBuffer(){return this;}
+	GLBuffer *castToGLBuffer(){return NULL;}
 
-	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
+	void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
-	virtual bool create(int usage,int access,int pixelFormat,int width,int height,int depth);
-	virtual void destroy();
+	bool create(int usage,int access,int pixelFormat,int width,int height,int depth);
+	void destroy();
 
-	virtual void resetCreate(){}
-	virtual void resetDestroy(){}
+	void resetCreate(){}
+	void resetDestroy(){}
 
-	virtual int getUsage() const{return mUsage;}
-	virtual int getAccess() const{return mAccess;}
-	virtual int getDataSize() const{return mDataSize;}
+	int getUsage() const{return mUsage;}
+	int getAccess() const{return mAccess;}
+	int getDataSize() const{return mDataSize;}
 
-	virtual int getPixelFormat() const{return mPixelFormat;}
-	virtual int getWidth() const{return mWidth;}
-	virtual int getHeight() const{return mHeight;}
-	virtual int getDepth() const{return 1;}
+	int getPixelFormat() const{return mPixelFormat;}
+	int getWidth() const{return mWidth;}
+	int getHeight() const{return mHeight;}
+	int getDepth() const{return 1;}
 	
 	/// @todo: Can these be implemented
-	virtual uint8 *lock(int access){return NULL;}
-	virtual bool unlock(){return false;}
+	uint8 *lock(int access){return NULL;}
+	bool unlock(){return false;}
 
 	inline GLuint getHandle() const{return mHandle;}
 

@@ -48,17 +48,16 @@ Material::ptr MaterialManager::createMaterial(){
 	Material::ptr material(new Material());
 
 	Renderer *renderer=mTextureManager->getRenderer();
-	material->setAlphaTest(Renderer::AlphaTest_NONE,0);
+	material->setAlphaTest(AlphaTest_NONE,0);
 	material->setBlendState(BlendState::Combination_DISABLED);
-	material->setFaceCulling(Renderer::FaceCulling_BACK);
+	material->setFaceCulling(FaceCulling_BACK);
 	material->setLighting(true);
-	material->setDepthTest(Renderer::DepthTest_LESS);
-	material->setDepthWrite(true);
+	material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,true));
 	material->setDepthSorted(false);
 	material->setMaterialState(MaterialState());
 	if(renderer!=NULL){
 		if(renderer->getCapabilityState().fill){
-			material->setFill(Renderer::Fill_SOLID);
+			material->setFill(Fill_SOLID);
 		}
 	}
 

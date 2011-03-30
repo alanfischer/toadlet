@@ -67,13 +67,13 @@ void ShadowMappedSceneRenderer::renderScene(Renderer *renderer,Node *node,Camera
 	renderer->setRenderTarget(mShadowTarget);
 	renderer->beginScene();
 	{
-		renderer->setFaceCulling(Renderer::FaceCulling_FRONT);
+		renderer->setFaceCulling(FaceCulling_FRONT);
 		renderer->setDepthBias(0,.1);
 
 		renderRenderables(mRenderableSet,renderer,mLightCamera,false);
 
 		renderer->setDepthBias(0,0);
-		renderer->setFaceCulling(Renderer::FaceCulling_BACK);
+		renderer->setFaceCulling(FaceCulling_BACK);
 	}
 	renderer->endScene();
 	renderer->swap();

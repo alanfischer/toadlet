@@ -45,25 +45,25 @@ public:
 	IndexBuffer *getRootIndexBuffer(){return this;}
 	VertexBuffer *getRootVertexBuffer(){return this;}
 
-	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
+	void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
-	virtual bool create(int usage,int access,IndexFormat indexFormat,int size);
-	virtual bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size);
-	virtual void destroy();
+	bool create(int usage,int access,IndexFormat indexFormat,int size);
+	bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size);
+	void destroy();
 
-	virtual void resetCreate(){}
-	virtual void resetDestroy(){}
+	void resetCreate(){}
+	void resetDestroy(){}
 
-	virtual int getUsage() const{return mUsage;}
-	virtual int getAccess() const{return mAccess;}
-	virtual int getDataSize() const{return mDataSize;}
-	virtual int getSize() const{return mSize;}
+	int getUsage() const{return mUsage;}
+	int getAccess() const{return mAccess;}
+	int getDataSize() const{return mDataSize;}
+	int getSize() const{return mSize;}
 
-	virtual IndexFormat getIndexFormat() const{return mIndexFormat;}
-	virtual VertexFormat::ptr getVertexFormat() const{return mVertexFormat;}
+	IndexFormat getIndexFormat() const{return mIndexFormat;}
+	VertexFormat::ptr getVertexFormat() const{return mVertexFormat;}
 
-	virtual uint8 *lock(int lockAccess);
-	virtual bool unlock();
+	uint8 *lock(int lockAccess);
+	bool unlock();
 
 protected:
 	bool createContext();

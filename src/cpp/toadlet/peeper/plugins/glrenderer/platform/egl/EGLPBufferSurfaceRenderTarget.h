@@ -42,24 +42,24 @@ public:
 	EGLPBufferRenderTarget(GLRenderer *renderer);
 	virtual ~EGLPBufferRenderTarget();
 
-	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
+	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
-	virtual void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
+	void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
 
-	virtual bool create();
-	virtual void destroy();
-	virtual bool compile();
+	bool create();
+	void destroy();
+	bool compile();
 
-	virtual bool makeCurrent();
-	virtual bool swap();
+	bool makeCurrent();
+	bool swap();
 
-	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment);
-	virtual bool remove(PixelBuffer::ptr buffer);
+	bool attach(PixelBuffer::ptr buffer,Attachment attachment);
+	bool remove(PixelBuffer::ptr buffer);
 
-	virtual bool isPrimary() const{return false;}
-	virtual bool isValid() const{return mContext!=NULL && mSurface!=NULL;}
-	virtual int getWidth() const{return mWidth;}
-	virtual int getHeight() const{return mHeight;}
+	bool isPrimary() const{return false;}
+	bool isValid() const{return mContext!=NULL && mSurface!=NULL;}
+	int getWidth() const{return mWidth;}
+	int getHeight() const{return mHeight;}
 
 protected:
 	bool createBuffer();

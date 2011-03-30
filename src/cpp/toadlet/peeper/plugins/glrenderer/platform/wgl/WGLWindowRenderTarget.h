@@ -38,19 +38,19 @@ public:
 	WGLWindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format);
 	virtual ~WGLWindowRenderTarget();
 
-	virtual RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
+	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
-	virtual bool createContext(HWND wnd,WindowRenderTargetFormat *format,int winPixelFormat=0);
-	virtual bool destroyContext();
-	virtual bool activateAdditionalContext();
-	virtual void deactivateAdditionalContext();
+	bool createContext(HWND wnd,WindowRenderTargetFormat *format,int winPixelFormat=0);
+	bool destroyContext();
+	bool activateAdditionalContext();
+	void deactivateAdditionalContext();
 
-	virtual bool swap();
+	bool swap();
 
-	virtual bool isPrimary() const{return true;}
-	virtual bool isValid() const{return mGLRC!=0;}
-	virtual int getWidth() const;
-	virtual int getHeight() const;
+	bool isPrimary() const{return true;}
+	bool isValid() const{return mGLRC!=0;}
+	int getWidth() const;
+	int getHeight() const;
 
 protected:
 	int checkDefaultColorBits(int colorBits) const;

@@ -373,7 +373,7 @@ Material::ptr TMSHHandler::readMaterial(egg::io::DataStream *stream,int blockSiz
 	stream->read((tbyte*)&state,sizeof(state));
 	material->setMaterialState(state);
 
-	material->setFaceCulling((Renderer::FaceCulling)stream->readInt32());
+	material->setFaceCulling((FaceCulling)stream->readInt32());
 
 	return material;
 }

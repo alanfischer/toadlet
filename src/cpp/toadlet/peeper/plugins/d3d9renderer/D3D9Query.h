@@ -41,14 +41,14 @@ public:
 
 	Query *getRootQuery(){return this;}
 
-	virtual bool create(QueryType queryType);
-	virtual void destroy();
+	bool create(QueryType queryType);
+	void destroy();
 
-	virtual void beginQuery();
-	virtual void endQuery();
-	virtual bool performQuery(){return false;}
+	void beginQuery();
+	void endQuery();
+	bool performQuery(){return false;}
 
-	virtual uint64 getResult();
+	uint64 getResult();
 
 protected:
 	static D3DQUERYTYPE getD3DQUERYTYPE(QueryType queryType);
