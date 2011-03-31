@@ -462,8 +462,6 @@ void D3D9Renderer::setDefaultStates(){
 	setBlendState(BlendState::Combination_DISABLED);
 	setDepthState(DepthState());
 	setFogState(FogState());
-	setLighting(false);
-	setShading(Shading_SMOOTH);
 	setNormalize(Normalize_RESCALE);
 	setPointState(PointState());
 	setRasterizerState(RasterizerState());
@@ -608,13 +606,10 @@ void D3D9Renderer::setFogState(const FogState &state){
 	}
 }
 
-void D3D9Renderer::setLighting(bool lighting){
-	HRESULT hr=mD3DDevice->SetRenderState(D3DRS_LIGHTING,lighting);
-	TOADLET_CHECK_D3D9ERROR(hr,"setLighting");
-}
-
 void D3D9Renderer::setMaterialState(const MaterialState &state){
 	D3DMATERIAL9 material;
+
+	mD3DDevice->SetRenderState(D3DRS_LIGHTING,state.lighting);
 
 	toD3DCOLORVALUE(material.Ambient,state.ambient);
 	toD3DCOLORVALUE(material.Diffuse,state.diffuse);
@@ -639,6 +634,8 @@ void D3D9Renderer::setMaterialState(const MaterialState &state){
 		mD3DDevice->SetRenderState(D3DRS_AMBIENTMATERIALSOURCE,D3DMCS_MATERIAL);
 		mD3DDevice->SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE,D3DMCS_MATERIAL);
 	}
+
+	mD3DDevice->SetRenderState(D3DRS_SHADEMODE,getD3DSHADEMODE(state.shade));
 }
 
 void D3D9Renderer::setPointState(const PointState &state){
@@ -835,17 +832,6 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 }
 
 void D3D9Renderer::setProgram(const Program *program){
-}
-
-void D3D9Renderer::setShading(const Shading &shading){
-	switch(shading){
-		case Shading_FLAT:
-			mD3DDevice->SetRenderState(D3DRS_SHADEMODE,D3DSHADE_FLAT);
-		break;
-		case Shading_SMOOTH:
-			mD3DDevice->SetRenderState(D3DRS_SHADEMODE,D3DSHADE_GOURAUD);
-		break;
-	}
 }
 
 void D3D9Renderer::setNormalize(const Normalize &normalize){
@@ -1209,6 +1195,22 @@ D3DFILLMODE D3D9Renderer::getD3DFILLMODE(RasterizerState::FillType type){
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"invalid fill type");
 			return D3DFILL_POINT;
+		break;
+	}
+}
+
+D3DSHADEMODE D3D9Renderer::getD3DSHADEMODE(MaterialState::ShadeType type){
+	switch(type){
+		case MaterialState::ShadeType_FLAT:
+			return D3DSHADE_FLAT;
+		case MaterialState::ShadeType_GOURAUD:
+			return D3DSHADE_GOURAUD;
+		case MaterialState::ShadeType_PHONG:
+			return D3DSHADE_PHONG;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"invalid shade type");
+			return D3DSHADE_FLAT;
 		break;
 	}
 }

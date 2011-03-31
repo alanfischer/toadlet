@@ -120,7 +120,7 @@ Mesh::ptr MeshManager::createBox(const AABox &box,Material::ptr material){
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
 	if(material==NULL){
 		material=mEngine->getMaterialManager()->createMaterial();
-		material->setLighting(true);
+		material->setMaterialState(MaterialState(true));
 	}
 	material->retain();
 	subMesh->material=material;
@@ -258,7 +258,7 @@ Mesh::ptr MeshManager::createGrid(scalar width,scalar height,int numWidth,int nu
 	Mesh::ptr mesh=createGrid(vertexBuffer,indexBuffer,width,height,numWidth,numHeight);
 	if(material==NULL){
 		material=mEngine->getMaterialManager()->createMaterial();
-		material->setLighting(true);
+		material->setMaterialState(MaterialState(true));
 	}
 	material->retain();
 	mesh->subMeshes[0]->material=material;
@@ -347,7 +347,7 @@ Mesh::ptr MeshManager::createSphere(const Sphere &sphere,int numSegments,int num
 	Mesh::ptr mesh=createSphere(vertexBuffer,indexBuffer,sphere,numSegments,numRings);
 	if(material==NULL){
 		material=mEngine->getMaterialManager()->createMaterial();
-		material->setLighting(true);
+		material->setMaterialState(MaterialState(true));
 	}
 	material->retain();
 	mesh->subMeshes[0]->material=material;
@@ -435,7 +435,7 @@ Mesh::ptr MeshManager::createSkyDome(const Sphere &sphere,int numSegments,int nu
 	if(material==NULL){
 		material=mEngine->getMaterialManager()->createMaterial();
 		material->setDepthState(DepthState(DepthState::DepthTest_NONE,false));
-		material->setLighting(false);
+		material->setMaterialState(MaterialState(false));
 	}
 	material->retain();
 	mesh->subMeshes[0]->material=material;
@@ -530,7 +530,7 @@ Mesh::ptr MeshManager::createGeoSphere(const Sphere &sphere,int depth,bool icosa
 	Mesh::ptr mesh=createGeoSphere(vertexBuffer,indexBuffer,sphere,depth,icosahedron);
 	if(material==NULL){
 		material=mEngine->getMaterialManager()->createMaterial();
-		material->setLighting(true);
+		material->setMaterialState(MaterialState(true));
 	}
 	material->retain();
 	mesh->subMeshes[0]->material=material;
@@ -689,7 +689,7 @@ Mesh::ptr MeshManager::createTorus(scalar majorRadius,scalar minorRadius,int num
 	Mesh::ptr mesh=createTorus(vertexBuffer,majorRadius,minorRadius,numMajor,numMinor);
 	if(material==NULL){
 		material=mEngine->getMaterialManager()->createMaterial();
-		material->setLighting(true);
+		material->setMaterialState(MaterialState(true));
 	}
 	material->retain();
 	mesh->subMeshes[0]->material=material;

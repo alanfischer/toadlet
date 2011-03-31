@@ -786,14 +786,12 @@ bool GLRenderer::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
 void GLRenderer::setDefaultStates(){
 	// General states
 	setAlphaTest(AlphaTest_NONE,Math::HALF);
-	setBlendState(BlendState::Combination_DISABLED);
+	setBlendState(BlendState());
 	setDepthState(DepthState());
 	setFogState(FogState());
-	setLighting(false);
-	setShading(Shading_SMOOTH);
+	setRasterizerState(RasterizerState());
 	setNormalize(Normalize_RESCALE);
 	setPointState(PointState());
-	setRasterizerState(RasterizerState());
 
 	int i;
 	for(i=0;i<mCapabilityState.maxTextureStages;++i){
@@ -913,6 +911,21 @@ void GLRenderer::setFogState(const FogState &state){
 }
 
 void GLRenderer::setMaterialState(const MaterialState &state){
+	if(state.lighting){
+		// 12/19/10
+		// There appears to be a bug in at least:
+		// GL_VENDOR:NVIDIA Corporation
+		// GL_RENDERER:GeForce 9300M GS/PCI/SSE2
+		// GL_VERSION:2.1.2
+		// Where in some cases lighting is not properly enabled unless we disable it first
+		// Found it in WizardWars when rendering multiple labels and then using the camera gamma
+		glDisable(GL_LIGHTING);
+		glEnable(GL_LIGHTING);
+	}
+	else{
+		glDisable(GL_LIGHTING);
+	}
+
 	// The GL_COLOR_MATERIAL command must come before the actual Material settings
 	if(state.trackColor){
 		#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_11)
@@ -948,40 +961,9 @@ void GLRenderer::setMaterialState(const MaterialState &state){
 		glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,state.emissive.getData());
 	#endif
 
+	glShadeModel(getGLShadeModel(state.shade));
+
 	TOADLET_CHECK_GLERROR("setMaterialState");
-}
-
-void GLRenderer::setLighting(bool lighting){
-	if(lighting){
-		// 12/19/10
-		// There appears to be a bug in at least:
-		// GL_VENDOR:NVIDIA Corporation
-		// GL_RENDERER:GeForce 9300M GS/PCI/SSE2
-		// GL_VERSION:2.1.2
-		// Where in some cases lighting is not properly enabled unless we disable it first
-		// Found it in WizardWars when rendering multiple labels and then using the camera gamma
-		glDisable(GL_LIGHTING);
-
-		glEnable(GL_LIGHTING);
-	}
-	else{
-		glDisable(GL_LIGHTING);
-	}
-
-	TOADLET_CHECK_GLERROR("setLighting");
-}
-
-void GLRenderer::setShading(const Shading &shading){
-	switch(shading){
-		case Shading_FLAT:
-			glShadeModel(GL_FLAT);
-		break;
-		case Shading_SMOOTH:
-			glShadeModel(GL_SMOOTH);
-		break;
-	}
-
-	TOADLET_CHECK_GLERROR("setShading");
 }
 
 void GLRenderer::setNormalize(const Normalize &normalize){
@@ -1809,6 +1791,20 @@ GLenum GLRenderer::getGLFogType(FogState::FogType type){
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"getGLFogType: Invalid fog type");
+			return 0;
+	}
+}
+
+GLenum GLRenderer::getGLShadeModel(MaterialState::ShadeType type){
+	switch(type){
+		case MaterialState::ShadeType_FLAT:
+			return GL_FLAT;
+		case MaterialState::ShadeType_GOURAUD:
+		case MaterialState::ShadeType_PHONG:
+			return GL_SMOOTH;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"getGLShadeModel: Invalid shade type");
 			return 0;
 	}
 }

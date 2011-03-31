@@ -251,60 +251,7 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 		materialManager->manage(material);
 	}
 
-	mxml_node_t *materialStateNode=mxmlFindChild(node,"LightEffect");
-	if(materialStateNode!=NULL){
-		MaterialState state;
-
-		mxml_node_t *ambientNode=mxmlFindChild(materialStateNode,"Ambient");
-		if(ambientNode!=NULL){
-			const char *data=mxmlGetOpaque(ambientNode->child);
-			if(data!=NULL){
-				state.ambient=parseVector4(data);
-			}
-		}
-
-		mxml_node_t *diffuseNode=mxmlFindChild(materialStateNode,"Diffuse");
-		if(diffuseNode!=NULL){
-			const char *data=mxmlGetOpaque(diffuseNode->child);
-			if(data!=NULL){
-				state.diffuse=parseVector4(data);
-			}
-		}
-
-		mxml_node_t *specularNode=mxmlFindChild(materialStateNode,"Specular");
-		if(specularNode!=NULL){
-			const char *data=mxmlGetOpaque(specularNode->child);
-			if(data!=NULL){
-				state.specular=parseVector4(data);
-			}
-		}
-
-		mxml_node_t *shininessNode=mxmlFindChild(materialStateNode,"Shininess");
-		if(shininessNode!=NULL){
-			const char *data=mxmlGetOpaque(shininessNode->child);
-			if(data!=NULL){
-				state.shininess=parseScalar(data);
-			}
-		}
-
-		mxml_node_t *emissiveNode=mxmlFindChild(materialStateNode,"Emissive");
-		if(emissiveNode!=NULL){
-			const char *data=mxmlGetOpaque(emissiveNode->child);
-			if(data!=NULL){
-				state.emissive=parseVector4(data);
-			}
-		}
-
-		mxml_node_t *trackColorNode=mxmlFindChild(materialStateNode,"TrackColor");
-		if(trackColorNode!=NULL){
-			const char *data=mxmlGetOpaque(trackColorNode->child);
-			if(data!=NULL){
-				state.trackColor=parseInt(data)>0;
-			}
-		}
-
-		material->setMaterialState(state);
-	}
+	MaterialState materialState;
 
 	mxml_node_t *lightingNode=NULL;
 	if(version<=2){
@@ -316,10 +263,62 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 	if(lightingNode!=NULL){
 		const char *data=mxmlGetOpaque(lightingNode->child);
 		if(data!=NULL){
-			bool lighting=parseBool(data);
-			material->setLighting(lighting);
+			materialState.lighting=parseBool(data);
 		}
 	}
+
+	mxml_node_t *materialStateNode=mxmlFindChild(node,"LightEffect");
+	if(materialStateNode!=NULL){
+		mxml_node_t *ambientNode=mxmlFindChild(materialStateNode,"Ambient");
+		if(ambientNode!=NULL){
+			const char *data=mxmlGetOpaque(ambientNode->child);
+			if(data!=NULL){
+				materialState.ambient=parseVector4(data);
+			}
+		}
+
+		mxml_node_t *diffuseNode=mxmlFindChild(materialStateNode,"Diffuse");
+		if(diffuseNode!=NULL){
+			const char *data=mxmlGetOpaque(diffuseNode->child);
+			if(data!=NULL){
+				materialState.diffuse=parseVector4(data);
+			}
+		}
+
+		mxml_node_t *specularNode=mxmlFindChild(materialStateNode,"Specular");
+		if(specularNode!=NULL){
+			const char *data=mxmlGetOpaque(specularNode->child);
+			if(data!=NULL){
+				materialState.specular=parseVector4(data);
+			}
+		}
+
+		mxml_node_t *shininessNode=mxmlFindChild(materialStateNode,"Shininess");
+		if(shininessNode!=NULL){
+			const char *data=mxmlGetOpaque(shininessNode->child);
+			if(data!=NULL){
+				materialState.shininess=parseScalar(data);
+			}
+		}
+
+		mxml_node_t *emissiveNode=mxmlFindChild(materialStateNode,"Emissive");
+		if(emissiveNode!=NULL){
+			const char *data=mxmlGetOpaque(emissiveNode->child);
+			if(data!=NULL){
+				materialState.emissive=parseVector4(data);
+			}
+		}
+
+		mxml_node_t *trackColorNode=mxmlFindChild(materialStateNode,"TrackColor");
+		if(trackColorNode!=NULL){
+			const char *data=mxmlGetOpaque(trackColorNode->child);
+			if(data!=NULL){
+				materialState.trackColor=parseInt(data)>0;
+			}
+		}
+	}
+
+	material->setMaterialState(materialState);
 
 	mxml_node_t *faceCullingNode=mxmlFindChild(node,"FaceCulling");
 	if(faceCullingNode!=NULL){
@@ -514,7 +513,7 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,P
 		lightingNode=mxmlNewElement(materialNode,"Lighting");
 	}
 	{
-		mxmlNewOpaque(lightingNode,makeBool(material->getLighting()));
+		mxmlNewOpaque(lightingNode,makeBool(material->getMaterialState().lighting));
 	}
 
 	mxml_node_t *faceCullingNode=mxmlNewElement(materialNode,"FaceCulling");

@@ -66,8 +66,7 @@ Node *LabelNode::create(Scene *scene){
 	mMaterial->retain();
 	mMaterial->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 	mMaterial->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-	mMaterial->setLighting(true);
-	mMaterial->setMaterialState(MaterialState(true));
+	mMaterial->setMaterialState(MaterialState(true,true,MaterialState::ShadeType_FLAT));
 
 	return this;
 }

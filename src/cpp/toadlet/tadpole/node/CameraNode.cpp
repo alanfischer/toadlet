@@ -104,7 +104,6 @@ Node *CameraNode::create(Scene *scene){
 	mGamma=Math::ONE;
 	mGammaMaterial=mEngine->getMaterialManager()->createMaterial();
 	mGammaMaterial->setDepthState(DepthState(DepthState::DepthTest_NONE,false));
-	mGammaMaterial->setLighting(true);
 	mGammaMaterial->setMaterialState(MaterialState(Math::ZERO_VECTOR4));
 	mGammaMaterial->retain();
 

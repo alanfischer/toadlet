@@ -57,11 +57,6 @@ enum AlphaTest{
 	AlphaTest_ALWAYS,
 };
 
-enum Shading{
-	Shading_FLAT,
-	Shading_SMOOTH,
-};
-
 enum Normalize{
 	Normalize_NONE,
 	Normalize_RESCALE,

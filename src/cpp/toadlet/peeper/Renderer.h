@@ -103,21 +103,23 @@ public:
 
 	// Render state operations
 	virtual void setDefaultStates()=0;
-	virtual void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff)=0;
 	virtual void setBlendState(const BlendState &state)=0;
 	virtual void setDepthState(const DepthState &state)=0;
-	virtual void setFogState(const FogState &state)=0;
-	virtual void setShading(const Shading &shading)=0;
-	virtual void setNormalize(const Normalize &normalize)=0;
-	virtual void setPointState(const PointState &state)=0;
+	virtual void setRasterizerState(const RasterizerState &state)=0;
 	virtual void setTextureStage(int stage,TextureStage *textureStage)=0;
 	virtual void setProgram(const Program *program)=0;
-	virtual void setRasterizerState(const RasterizerState &state)=0;
-	virtual void setLighting(bool lighting)=0;
+
+	// What to do with these?
+	virtual void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff)=0;
+	virtual void setNormalize(const Normalize &normalize)=0;
+	virtual void setAmbientColor(const Vector4 &ambient)=0;
+
+	// Fixed states
+	virtual void setFogState(const FogState &state)=0;
+	virtual void setPointState(const PointState &state)=0;
 	virtual void setMaterialState(const MaterialState &state)=0;
 	virtual void setLightState(int i,const LightState &light)=0;
 	virtual void setLightEnabled(int i,bool enable)=0;
-	virtual void setAmbientColor(const Vector4 &ambient)=0;
 
 	// Misc operations
 	virtual int getClosestTextureFormat(int textureFormat)=0;
