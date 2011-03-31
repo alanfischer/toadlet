@@ -4,8 +4,6 @@ inline float scurve(float t){ return t*t*(3.0 - 2.0*t);}
 
 using namespace toadlet::tadpole::Math;
 
-/// @todo: Background appears to have some faces inverted when in Skybox mode
-
 class Planet:public ParentNode{
 public:
 	TOADLET_NODE(Planet,ParentNode);
@@ -22,8 +20,7 @@ public:
 
 		Mesh::ptr mesh=getEngine()->getMeshManager()->createSphere(Sphere(Math::ONE));
 		{
-			LightEffect lightEffect(Colors::BLUE);
-			mesh->subMeshes[0]->material->setLightEffect(lightEffect);
+			mesh->subMeshes[0]->material->setMaterialState(MaterialState(Colors::BLUE));
 		}
 		mMeshNode=getEngine()->createNodeType(MeshNode::type(),getScene());
 		mMeshNode->setMesh(mesh);
@@ -36,8 +33,8 @@ public:
 			TextureStage::ptr textureStage=getEngine()->getMaterialManager()->createTextureStage(mEngine->getTextureManager()->findTexture("spark"));
 			textureStage->setBlend(TextureBlend(TextureBlend::Operation_MODULATE,TextureBlend::Source_PRIMARY_COLOR,TextureBlend::Source_TEXTURE));
 			mesh->subMeshes[0]->material->setTextureStage(0,textureStage);
-			mesh->subMeshes[0]->material->setDepthWrite(false);
-			mesh->subMeshes[0]->material->setBlend(Blend::Combination_COLOR_ADDITIVE);
+			mesh->subMeshes[0]->material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+			mesh->subMeshes[0]->material->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
 		}
 		mSparkNode=getEngine()->createNodeType(MeshNode::type(),getScene());
 		mSparkNode->setMesh(mesh);
@@ -52,8 +49,8 @@ public:
 	scalar getSize() const{return mMeshNode->getScale().x;}
 	void setSize(scalar s){mMeshNode->setScale(s,s,s);}
 
-	void setColor(const Vector4 &color){mMeshNode->getSubMesh(0)->material->setLightEffect(LightEffect(color));}
-	const Vector4 &getColor() const{return mMeshNode->getSubMesh(0)->material->getLightEffect().diffuse;}
+	void setColor(const Vector4 &color){mMeshNode->getSubMesh(0)->material->setMaterialState(MaterialState(color));}
+	const Vector4 &getColor() const{return mMeshNode->getSubMesh(0)->material->getMaterialState().diffuse;}
 	
 	void frameUpdate(int dt,int scope){
 		super::frameUpdate(dt,scope);
@@ -103,7 +100,7 @@ public:
 		//mMeshNode,
 		//mMaterial,
 		//mStartColor,mEndColor,
-		//mLightEffect,
+		//mMaterialState,
 		mVisible(false),
 		mDestroy(false),
 		mEndDistance(0),
@@ -120,9 +117,9 @@ public:
 		Mesh::ptr mesh=getEngine()->getMeshManager()->createTorus(size,thickness,16,4);
 		{
 			mMaterial=mesh->subMeshes[0]->material;
-			mMaterial->setBlend(Blend::Combination_COLOR_ADDITIVE);
-			mMaterial->setLightEffect(LightEffect(Colors::BLACK,Colors::BLACK,Colors::BLACK,0));
-			mMaterial->setDepthWrite(false);
+			mMaterial->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
+			mMaterial->setMaterialState(MaterialState(Colors::BLACK,Colors::BLACK,Colors::BLACK,0));
+			mMaterial->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 			{
 				TextureStage::ptr textureStage=getEngine()->getMaterialManager()->createTextureStage(createDash(128,1));
 				Matrix4x4 scale;
@@ -140,7 +137,7 @@ public:
 		mMeshNode->setScale(distance,distance,distance);
 		mEndDistance=distance;
 
-		mLightEffect.set(mMaterial->getLightEffect());
+		mMaterialState.set(mMaterial->getMaterialState());
 		mStartColor=Colors::BLACK;
 		mEndColor=Colors::AZURE;
 		mVisible=true;
@@ -160,8 +157,8 @@ public:
 			mAlpha-=Math::fromMilli(dt*4);
 		}
 		mAlpha=Math::clamp(0,Math::ONE,mAlpha);
-		Math::lerp(mLightEffect.ambient,mStartColor,mEndColor,mAlpha);
-		mMaterial->setLightEffect(mLightEffect);
+		Math::lerp(mMaterialState.ambient,mStartColor,mEndColor,mAlpha);
+		mMaterial->setMaterialState(mMaterialState);
 
 		scalar distance=mPlanet->getTranslate().x+Math::mul(mEndDistance-mPlanet->getTranslate().x,Math::fromMilli(dt*4));
 		mPlanet->setTranslate(distance,0,0);
@@ -227,7 +224,7 @@ protected:
 	MeshNode::ptr mMeshNode;
 	Material::ptr mMaterial;
 	Vector4 mStartColor,mEndColor;
-	LightEffect mLightEffect;
+	MaterialState mMaterialState;
 	bool mVisible;
 	bool mDestroy;
 	scalar mEndDistance;
@@ -343,7 +340,6 @@ Mesh::ptr MyPlanet::createDisc(Engine *engine,scalar size){
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
 	subMesh->material=engine->getMaterialManager()->createMaterial();
 	subMesh->material->retain();
-	subMesh->material->setFaceCulling(Renderer::FaceCulling_BACK);
 	subMesh->material->setLighting(false);
 
 	Mesh::ptr mesh(new Mesh());
@@ -465,12 +461,12 @@ ParentNode::ptr MyPlanet::createSun(scalar size){
 		secondaryStage->setBlend(TextureBlend(TextureBlend::Operation_MODULATE,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
 		material->setTextureStage(1,secondaryStage);
 
-		LightEffect lightEffect(Colors::ORANGE);
-		lightEffect.emissive.set(Colors::ORANGE);
-		material->setLightEffect(lightEffect);
-		material->setBlend(Blend::Combination_COLOR_ADDITIVE);
+		MaterialState materialState(Colors::ORANGE);
+		materialState.emissive.set(Colors::ORANGE);
+		material->setMaterialState(materialState);
+		material->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
 		material->setLighting(true);
-		material->setDepthWrite(false);
+		material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 		flareNode->setMaterial(material);
 
 		scalar flareSize=Math::mul(size,Math::fromMilli(3200));
@@ -479,9 +475,9 @@ ParentNode::ptr MyPlanet::createSun(scalar size){
 
 		Mesh::ptr mesh=getEngine()->getMeshManager()->createSphere(Sphere(size));
 		{
-			LightEffect lightEffect(Colors::YELLOW);
-			lightEffect.emissive.set(Colors::YELLOW);
-			mesh->subMeshes[0]->material->setLightEffect(lightEffect);
+			MaterialState materialState(Colors::YELLOW);
+			materialState.emissive.set(Colors::YELLOW);
+			mesh->subMeshes[0]->material->setMaterialState(materialState);
 
 			TextureStage::ptr textureStage=getEngine()->getMaterialManager()->createTextureStage(mEngine->getTextureManager()->findTexture("sun1"));
 			textureStage->setBlend(TextureBlend(TextureBlend::Operation_MODULATE,TextureBlend::Source_PRIMARY_COLOR,TextureBlend::Source_TEXTURE));
@@ -523,12 +519,12 @@ void MyPlanet::create(){
 
 	Application::setBackable(false);
 
-	Application::create("d3d9");
+	Application::create("gl");
 
 	mScene=Scene::ptr(new Scene(mEngine));
 
 	mOverlay=mEngine->createNodeType(CameraNode::type(),mScene);
-	mOverlay->setClearFlags(Renderer::ClearFlag_DEPTH);
+	mOverlay->setClearFlags(ClearFlag_DEPTH);
 	mOverlay->setScope(1<<1);
 	mScene->getRoot()->attach(mOverlay);
 
@@ -558,7 +554,7 @@ void MyPlanet::create(){
 		skyBox->setMesh(skyBoxMesh);
 		background->destroy();
 		mScene->getBackground()->attach(skyBox);
-		mCamera->setClearFlags(Renderer::ClearFlag_DEPTH);
+		mCamera->setClearFlags(ClearFlag_DEPTH);
 	}
 
 	mPlanetDisk=mEngine->createNodeType(ParticleNode::type(),mScene);
@@ -566,12 +562,12 @@ void MyPlanet::create(){
 		mPlanetDisk->setNumParticles(300,ParticleNode::ParticleType_SPRITE,fromMilli(250));
 		{
 			Material::ptr material=mEngine->getMaterialManager()->createMaterial();
-			material->setFaceCulling(Renderer::FaceCulling_NONE);
-			material->setLightEffect(LightEffect(true));
+			material->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+			material->setMaterialState(true);
 			material->setLighting(true);
 			material->setTextureStage(0,getEngine()->getMaterialManager()->createTextureStage(createPoint(mEngine,64,64)));
-			material->setBlend(Blend::Combination_COLOR);
-			material->setDepthWrite(false);
+			material->setBlendState(BlendState::Combination_COLOR);
+			material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 			material->setLayer(1);
 			mPlanetDisk->setMaterial(material);
 		}
@@ -785,10 +781,10 @@ Node::ptr MyPlanet::createBackground(){
 	starTextureStage2->setCalculation(TextureStage::Calculation_NORMAL,scale);
 	starTextureStage2->setBlend(TextureBlend(TextureBlend::Operation_MODULATE,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
 	starMaterial->setTextureStage(1,starTextureStage2);
-	starMaterial->setDepthWrite(false);
-	starMaterial->setBlend(Blend::Combination_COLOR_ADDITIVE);
+	starMaterial->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+	starMaterial->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
 	starMaterial->setLighting(true);
-	starMaterial->setLightEffect(true);
+	starMaterial->setMaterialState(true);
 
 	ParticleNode::ptr stars=mEngine->createNodeType(ParticleNode::type(),mScene);
 	stars->setNumParticles(2000,ParticleNode::ParticleType_SPRITE,fromMilli(4000));
@@ -832,12 +828,12 @@ Node::ptr MyPlanet::createBackground(){
 			textureStage->setMagFilter(TextureStage::Filter_LINEAR);
 			textureStage->setBlend(TextureBlend(TextureBlend::Operation_MODULATE_4X,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
 			material->setTextureStage(0,textureStage);
-			material->setDepthWrite(false);
+			material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 			flare->setMaterial(material);
-			flare->getMaterial()->setBlend(Blend::Combination_ALPHA_ADDITIVE);
+			flare->getMaterial()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
 			Vector4 color;
 			Math::lerp(color,Colors::ORANGE,Colors::YELLOW,random.nextFloat());
-			flare->getMaterial()->setLightEffect(LightEffect(color));
+			flare->getMaterial()->setMaterialState(MaterialState(color));
 			flare->getMaterial()->setLighting(true);
 			flare->setScale(size*random.nextFloat(0.8,1.0),size*random.nextFloat(0.8,1.0),ONE);
 			flare->setTranslate(offset);
@@ -852,12 +848,12 @@ Node::ptr MyPlanet::createBackground(){
 			textureStage->setMagFilter(TextureStage::Filter_LINEAR);
 			textureStage->setBlend(TextureBlend(TextureBlend::Operation_MODULATE_4X,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
 			material->setTextureStage(0,textureStage);
-			material->setDepthWrite(false);
+			material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 			flare->setMaterial(material);
-			flare->getMaterial()->setBlend(Blend::Combination_ALPHA_ADDITIVE);
+			flare->getMaterial()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
 			Vector4 color;
 			Math::lerp(color,Colors::CYAN,Colors::VIOLET,random.nextFloat());
-			flare->getMaterial()->setLightEffect(LightEffect(color));
+			flare->getMaterial()->setMaterialState(MaterialState(color));
 			flare->getMaterial()->setLighting(true);
 			flare->setScale(size*random.nextFloat(1.0,1.2),size*random.nextFloat(1.0,1.2),ONE);
 			flare->setTranslate(offset);
@@ -1007,7 +1003,7 @@ void MyPlanet::burnupAnimation(){
 		burnupController->attach(sink);
 
 //		Material::ptr material=mPlanet->getMaterial();
-//		material->setBlend(Blend::Combination_ALPHA);
+//		material->setBlendState(BlendState::Combination_ALPHA);
 //		MaterialColorAnimation::ptr fade(new MaterialColorAnimation(material,Colors::TRANSPARENT_WHITE,Math::fromInt(3)));
 //		burnupController->attach(fade);
 
