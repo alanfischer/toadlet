@@ -91,7 +91,6 @@ D3D10_PASS_DESC passDesc;
 	void setFogState(const FogState &state);
 	void setLighting(bool lighting);
 	void setMaterialState(const MaterialState &state);
-	void setShading(const Shading &shading);
 	void setNormalize(const Normalize &normalize);
 	void setTexturePerspective(bool texturePerspective);
 	void setPointState(const PointState &state);

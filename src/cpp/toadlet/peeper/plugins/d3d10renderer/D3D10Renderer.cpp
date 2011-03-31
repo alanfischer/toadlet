@@ -506,7 +506,6 @@ void D3D10Renderer::setDefaultStates(){
 	setFaceCulling(FaceCulling_BACK);
 	setFogParameters(Fog_NONE,0,1.0,Colors::BLACK);
 	setLighting(false);
-	setShading(Shading_SMOOTH);
 	setNormalize(Normalize_RESCALE);
 	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
 		setTexturePerspective(true);
@@ -691,9 +690,6 @@ effect->GetVariableByName("useTexture")->AsScalar()->SetFloat(texture!=NULL);
 */}
 
 void D3D10Renderer::setProgram(const Program *program){
-}
-
-void D3D10Renderer::setShading(const Shading &shading){
 }
 
 void D3D10Renderer::setNormalize(const Normalize &normalize){

@@ -379,7 +379,7 @@ void BSP30Handler::buildMaterials(BSP30Map *map){
 	for(i=0;i<map->miptexlump->nummiptex;i++){
 		Material::ptr material=mEngine->getMaterialManager()->createMaterial();
 		material->retain();
-		material->setLighting(false);
+		material->setMaterialState(MaterialState(false,false,MaterialState::ShadeType_FLAT));
 		material->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
 
 		TextureStage::ptr primary=mEngine->getMaterialManager()->createTextureStage(map->parsedTextures[i]);

@@ -45,16 +45,14 @@ public:
 	TOADLET_SHARED_POINTERS(Material);
 
 	enum States{
-		State_LIGHTING=		1<<0,
-		State_MATERIAL=		1<<1,
-		State_RASTERIZER=	1<<2,
-		State_FOG=			1<<3,
-		State_ALPHATEST=	1<<4,
-		State_BLEND=		1<<5,
-		State_DEPTHSORT=	1<<6,
-		State_DEPTH=		1<<7,
-		State_SHADING=		1<<8,
-		State_POINT=		1<<9,
+		State_MATERIAL=		1<<0,
+		State_RASTERIZER=	1<<1,
+		State_FOG=			1<<2,
+		State_ALPHATEST=	1<<3,
+		State_BLEND=		1<<4,
+		State_DEPTHSORT=	1<<5,
+		State_DEPTH=		1<<6,
+		State_POINT=		1<<7,
 	};
 	
 	Material();
@@ -63,14 +61,8 @@ public:
 	void destroy();
 	Material::ptr clone();
 
-	void setLighting(bool lighting){mStates|=State_LIGHTING;mLighting=lighting;}
-	inline bool getLighting() const{return mLighting;}
-
 	void setMaterialState(const peeper::MaterialState &state){mStates|=State_MATERIAL;mMaterialState.set(state);}
 	inline const peeper::MaterialState &getMaterialState() const{return mMaterialState;}
-
-	void setShading(const peeper::Shading &shading){mStates|=State_SHADING;mShading=shading;}
-	inline const peeper::Shading &getShading() const{return mShading;}
 
 	void setFogState(const peeper::FogState &state){mStates|=State_FOG;mFogState.set(state);}
 	inline const peeper::FogState &getFogState() const{return mFogState;}
@@ -112,8 +104,6 @@ public:
 protected:
 	int mStates;
 	peeper::MaterialState mMaterialState;
-	bool mLighting;
-	peeper::Shading mShading;
 	peeper::FogState mFogState;
 	peeper::AlphaTest mAlphaTest;
 	scalar mAlphaTestCutoff;

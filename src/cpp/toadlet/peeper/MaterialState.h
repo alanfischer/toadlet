@@ -33,65 +33,91 @@ namespace peeper{
 
 class MaterialState{
 public:
+	enum ShadeType{
+		ShadeType_FLAT,
+		ShadeType_GOURAUD,
+		ShadeType_PHONG
+	};
+
 	MaterialState():
+		lighting(true),
 		ambient(Math::ONE_VECTOR4),
 		diffuse(Math::ONE_VECTOR4),
 		specular(Math::ONE_VECTOR4),
 		shininess(Math::ONE),
 		emissive(Math::ZERO_VECTOR4),
-		trackColor(false)
+		trackColor(false),
+		shade(ShadeType_GOURAUD)
 	{}
 
 	MaterialState(const MaterialState &lightEffect){
 		set(lightEffect);
 	}
 
-	MaterialState(const Vector4 &color):
-		shininess(Math::ONE),
-		emissive(Math::ZERO_VECTOR4),
-		trackColor(false)
-	{
-		set(color);
-	}
-
-	MaterialState(const Vector4 &ambient1,const Vector4&diffuse1,const Vector4 &specular1,scalar shininess):
-		emissive(Math::ZERO_VECTOR4),
-		trackColor(false)
-	{
-		set(ambient1,diffuse1,specular1,shininess);
-	}
-
-	MaterialState(bool trackColor1):
+	MaterialState(bool lighting1,bool trackColor1=false,ShadeType shade1=ShadeType_GOURAUD):
 		ambient(Math::ONE_VECTOR4),
 		diffuse(Math::ONE_VECTOR4),
 		specular(Math::ONE_VECTOR4),
 		shininess(Math::ONE),
+		emissive(Math::ZERO_VECTOR4)
+	{
+		set(lighting1,trackColor1,shade1);
+	}
+
+	MaterialState(const Vector4 &color):
+		lighting(true),
 		emissive(Math::ZERO_VECTOR4),
-		trackColor(trackColor1)
-	{}
+		trackColor(false),
+		shade(ShadeType_GOURAUD)
+	{
+		set(color);
+	}
+
+	MaterialState(const Vector4 &ambient1,const Vector4 &diffuse1,const Vector4 &specular1,scalar shininess):
+		lighting(true),
+		emissive(Math::ZERO_VECTOR4),
+		trackColor(false),
+		shade(ShadeType_GOURAUD)
+	{
+		set(ambient1,diffuse1,specular1,shininess);
+	}
 
 	MaterialState &set(const MaterialState &state){
+		lighting=state.lighting;
 		ambient.set(state.ambient);
 		diffuse.set(state.diffuse);
 		specular.set(state.specular);
 		shininess=state.shininess;
 		emissive.set(state.emissive);
 		trackColor=state.trackColor;
+		shade=state.shade;
+		return *this;
+	}
+
+	MaterialState &set(bool lighting1,bool trackColor1=false,ShadeType shade1=ShadeType_GOURAUD){
+		lighting=lighting1;
+		trackColor=trackColor1;
+		shade=shade1;
 		return *this;
 	}
 
 	MaterialState &set(const Vector4 &color){
+		lighting=true;
 		ambient.set(color);
 		diffuse.set(color);
 		specular.set(color);
+		shininess=Math::ONE;
+		trackColor=false;
 		return *this;
 	}
 
 	MaterialState &set(const Vector4 &ambient1,const Vector4 &diffuse1,const Vector4 &specular1,scalar shininess1){
+		lighting=true;
 		ambient.set(ambient1);
 		diffuse.set(diffuse1);
 		specular.set(specular1);
 		shininess=shininess1;
+		trackColor=false;
 		return *this;
 	}
 
@@ -102,7 +128,8 @@ public:
 			specular==state.specular &&
 			shininess==state.shininess &&
 			emissive==state.emissive &&
-			trackColor==state.trackColor;
+			trackColor==state.trackColor &&
+			shade==state.shade;
 	}
 
 	bool operator!=(const MaterialState &state) const{
@@ -112,15 +139,18 @@ public:
 			specular!=state.specular ||
 			shininess!=state.shininess ||
 			emissive!=state.emissive ||
-			trackColor!=state.trackColor;
+			trackColor!=state.trackColor ||
+			shade!=state.shade;
 	}
 
+	bool lighting;
 	Vector4 ambient;
 	Vector4 diffuse;
 	Vector4 specular;
 	scalar shininess;
 	Vector4 emissive;
 	bool trackColor;
+	ShadeType shade;
 };
 
 }

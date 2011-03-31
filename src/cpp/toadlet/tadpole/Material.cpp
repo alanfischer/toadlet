@@ -35,8 +35,6 @@ namespace tadpole{
 
 Material::Material():BaseResource(),
 	mStates(0),
-	mLighting(false),
-	mShading(Shading_SMOOTH),
 	//mFogState,
 	mAlphaTest(AlphaTest_NONE),
 	mAlphaTestCutoff(0),
@@ -70,9 +68,7 @@ Material::ptr Material::clone(){
 
 	material->mStates=mStates;
 	material->mMaterialState.set(mMaterialState);
-	material->mLighting=mLighting;
 	material->mFogState.set(mFogState);
-	material->mShading=mShading;
 	material->mAlphaTest=mAlphaTest;
 	material->mAlphaTestCutoff=mAlphaTestCutoff;
 	material->mBlendState.set(mBlendState);
@@ -118,17 +114,11 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		if((states&State_DEPTH)>0){
 			renderer->setDepthState(mDepthState);
 		}
-		if((states&State_SHADING)>0){
-			renderer->setShading(mShading);
-		}
 		if((states&State_FOG)>0){
 			renderer->setFogState(mFogState);
 		}
-		if((states&State_LIGHTING)>0){
-			renderer->setLighting(mLighting);
-		}
 		if((states&State_MATERIAL)>0){
-			renderer->setMaterialState(mMaterialState); // We set this even if lighting isnt enabled, since it includes color tracking
+			renderer->setMaterialState(mMaterialState);
 		}
 		if((states&State_POINT)>0){
 			renderer->setPointState(mPointState);
@@ -158,14 +148,8 @@ void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
 		if((states&State_DEPTH)>0 && ((pstates&State_DEPTH)==0 || previousMaterial->mDepthState!=mDepthState)){
 			renderer->setDepthState(mDepthState);
 		}
-		if((states&State_SHADING)>0 && ((pstates&State_SHADING)==0 || previousMaterial->mShading!=mShading)){
-			renderer->setShading(mShading);
-		}
 		if((states&State_FOG)>0){
 			renderer->setFogState(mFogState);
-		}
-		if((states&State_LIGHTING)>0 && ((pstates&State_LIGHTING)==0 || previousMaterial->mLighting!=mLighting)){
-			renderer->setLighting(mLighting);
 		}
 		if((states&State_MATERIAL)>0){
 			renderer->setMaterialState(mMaterialState);
@@ -202,14 +186,8 @@ void Material::modifyWith(Material::ptr material){
 	if((states&State_DEPTH)>0){
 		setDepthState(material->mDepthState);
 	}
-	if((states&State_SHADING)>0){
-		setShading(material->mShading);
-	}
 	if((states&State_FOG)>0){
 		setFogState(material->mFogState);
-	}
-	if((states&State_LIGHTING)>0){
-		setLighting(material->mLighting);
 	}
 	if((states&State_MATERIAL)>0){
 		setMaterialState(material->mMaterialState);

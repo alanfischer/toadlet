@@ -49,7 +49,7 @@ Material::ptr MaterialManager::createMaterial(){
 
 	Renderer *renderer=mTextureManager->getRenderer();
 	material->setAlphaTest(AlphaTest_NONE,0);
-	material->setLighting(true);
+	material->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 	material->setDepthSorted(false);
 
 	manage(material);

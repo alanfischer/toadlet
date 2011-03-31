@@ -90,7 +90,6 @@ public:
 	void setFogState(const FogState &state);
 	void setLighting(bool lighting);
 	void setMaterialState(const MaterialState &state);
-	void setShading(const Shading &shading);
 	void setNormalize(const Normalize &normalize);
 	void setPointState(const PointState &state);
 	void setRasterizerState(const RasterizerState &state);
@@ -123,6 +122,7 @@ public:
 	static D3DBLEND getD3DBLEND(BlendState::Operation operation);
 	static D3DCULL getD3DCULL(RasterizerState::CullType type);
 	static D3DFILLMODE getD3DFILLMODE(RasterizerState::FillType type);
+	static D3DSHADEMODE getD3DSHADEMODE(MaterialState::ShadeType type);
 	static DWORD getFVF(VertexFormat *vertexFormat);
 
 protected:

@@ -101,8 +101,6 @@ public:
 	void setDepthState(const DepthState &state);
 	void setFogState(const FogState &state);
 	void setMaterialState(const MaterialState &state);
-	void setLighting(bool lighting);
-	void setShading(const Shading &shading);
 	void setNormalize(const Normalize &normalize);
 	void setPointState(const PointState &state);
 	void setRasterizerState(const RasterizerState &state);
@@ -143,6 +141,7 @@ public:
 	static GLenum getGLCullFace(RasterizerState::CullType type);
 	static GLenum getGLPolygonMode(RasterizerState::FillType type);
 	static GLenum getGLFogType(FogState::FogType type);
+	static GLenum getGLShadeModel(MaterialState::ShadeType type);
 	static GLint getGLElementCount(int format);
 	static GLenum getGLDataType(int format);
 	static GLuint getGLFormat(int textureFormat,bool internal);

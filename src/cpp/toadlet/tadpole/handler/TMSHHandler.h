@@ -42,7 +42,7 @@ class TOADLET_API TMSHHandler:public ResourceHandler{
 public:
 	TOADLET_SHARED_POINTERS(TMSHHandler);
 
-	const static int VERSION=1;
+	const static int VERSION=2; /// @todo: Reset this to 1 at first public release
 	const static int TMSH=1414353736; // "TMSH"
 
 	TMSHHandler(Engine *engine);

@@ -272,7 +272,6 @@ void MeshNodeSkeleton::setRenderable(bool renderable){
 		int i;
 		mMaterial=engine->getMaterialManager()->createMaterial();
 		mMaterial->retain();
-		mMaterial->setLighting(true);
 		mMaterial->setMaterialState(MaterialState(Colors::GREEN));
 		mMaterial->setDepthState(DepthState(DepthState::DepthTest_NONE,false));
 

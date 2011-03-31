@@ -367,13 +367,13 @@ Material::ptr TMSHHandler::readMaterial(egg::io::DataStream *stream,int blockSiz
 
 	material->setName(stream->readNullTerminatedString());
 
-	material->setLighting(stream->readBool());
+	MaterialState materialState;
+	stream->read((tbyte*)&materialState,sizeof(materialState));
+	material->setMaterialState(materialState);
 
-	MaterialState state;
-	stream->read((tbyte*)&state,sizeof(state));
-	material->setMaterialState(state);
-
-	material->setRasterizerState(RasterizerState((RasterizerState::CullType)stream->readInt32()));
+	RasterizerState rasterizerState;
+	stream->read((tbyte*)&rasterizerState,sizeof(rasterizerState));
+	material->setRasterizerState(rasterizerState);
 
 	return material;
 }
@@ -388,11 +388,9 @@ void TMSHHandler::writeMaterial(egg::io::DataStream *stream,Material::ptr materi
 
 	stream->writeNullTerminatedString(material->getName());
 
-	stream->writeBool(material->getLighting());
-
 	stream->write((tbyte*)&material->getMaterialState(),sizeof(MaterialState));
 
-	stream->writeInt32(material->getRasterizerState().cull);
+	stream->write((tbyte*)&material->getRasterizerState(),sizeof(RasterizerState));
 }
 
 }

@@ -340,7 +340,7 @@ Mesh::ptr MyPlanet::createDisc(Engine *engine,scalar size){
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
 	subMesh->material=engine->getMaterialManager()->createMaterial();
 	subMesh->material->retain();
-	subMesh->material->setLighting(false);
+	subMesh->material->setMaterialState(MaterialState(false));
 
 	Mesh::ptr mesh(new Mesh());
 	mesh->subMeshes.resize(1);
@@ -465,7 +465,6 @@ ParentNode::ptr MyPlanet::createSun(scalar size){
 		materialState.emissive.set(Colors::ORANGE);
 		material->setMaterialState(materialState);
 		material->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
-		material->setLighting(true);
 		material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 		flareNode->setMaterial(material);
 
@@ -563,8 +562,7 @@ void MyPlanet::create(){
 		{
 			Material::ptr material=mEngine->getMaterialManager()->createMaterial();
 			material->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
-			material->setMaterialState(true);
-			material->setLighting(true);
+			material->setMaterialState(MaterialState(true,true));
 			material->setTextureStage(0,getEngine()->getMaterialManager()->createTextureStage(createPoint(mEngine,64,64)));
 			material->setBlendState(BlendState::Combination_COLOR);
 			material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
@@ -783,8 +781,7 @@ Node::ptr MyPlanet::createBackground(){
 	starMaterial->setTextureStage(1,starTextureStage2);
 	starMaterial->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 	starMaterial->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
-	starMaterial->setLighting(true);
-	starMaterial->setMaterialState(true);
+	starMaterial->setMaterialState(MaterialState(true,true));
 
 	ParticleNode::ptr stars=mEngine->createNodeType(ParticleNode::type(),mScene);
 	stars->setNumParticles(2000,ParticleNode::ParticleType_SPRITE,fromMilli(4000));
@@ -834,7 +831,6 @@ Node::ptr MyPlanet::createBackground(){
 			Vector4 color;
 			Math::lerp(color,Colors::ORANGE,Colors::YELLOW,random.nextFloat());
 			flare->getMaterial()->setMaterialState(MaterialState(color));
-			flare->getMaterial()->setLighting(true);
 			flare->setScale(size*random.nextFloat(0.8,1.0),size*random.nextFloat(0.8,1.0),ONE);
 			flare->setTranslate(offset);
 			node->attach(flare);
@@ -854,7 +850,6 @@ Node::ptr MyPlanet::createBackground(){
 			Vector4 color;
 			Math::lerp(color,Colors::CYAN,Colors::VIOLET,random.nextFloat());
 			flare->getMaterial()->setMaterialState(MaterialState(color));
-			flare->getMaterial()->setLighting(true);
 			flare->setScale(size*random.nextFloat(1.0,1.2),size*random.nextFloat(1.0,1.2),ONE);
 			flare->setTranslate(offset);
 			node->attach(flare);
