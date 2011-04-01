@@ -104,7 +104,6 @@ Stream::ptr Win32ResourceArchive::openStream(const String &name){
 }
 
 Resource::ptr Win32ResourceArchive::openResource(const String &name){
-Logger::alert(String("Opening resource:")+name);
 	if(mTextureManager==NULL){
 		return NULL;
 	}
