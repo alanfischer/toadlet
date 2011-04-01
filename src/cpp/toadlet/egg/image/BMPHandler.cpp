@@ -54,6 +54,8 @@ typedef struct{
 	uint32	biClrImportant;
 }BITMAPINFOHEADER;
 
+const static int SIZEOF_BITMAPINFOHEADER=40;
+
 typedef struct{
 	uint16	bfType;
 	uint32	bfSize;
@@ -61,6 +63,8 @@ typedef struct{
 	uint16	bfReserved2;
 	uint32	bfOffBits;
 }BITMAPFILEHEADER;
+
+const static int SIZEOF_BITMAPFILEHEADER=14;
 
 BMPHandler::BMPHandler(){
 }
@@ -81,7 +85,7 @@ Image *BMPHandler::loadImage(Stream *stream){
 
 	DataStream::ptr dataStream(new DataStream(stream));
 
-	dataStream->read((tbyte*)&bmfh,sizeof(bmfh));
+	dataStream->read((tbyte*)&bmfh,SIZEOF_BITMAPFILEHEADER);
 	#if defined(TOADLET_BIG_ENDIAN)
 		littleUInt16InPlace(bmfh.bfType);
 		littleUInt32InPlace(bmfh.bfSize);
@@ -90,7 +94,7 @@ Image *BMPHandler::loadImage(Stream *stream){
 		littleUInt32InPlace(bmfh.bfOffBits);
 	#endif
 
-	dataStream->read((tbyte*)&bmih,sizeof(bmih));
+	dataStream->read((tbyte*)&bmih,SIZEOF_BITMAPINFOHEADER);
 	#if defined(TOADLET_BIG_ENDIAN)
 		littleUInt32InPlace(bmih.biSize);
 		littleInt32InPlace(bmih.biWidth);

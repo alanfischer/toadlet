@@ -1117,6 +1117,10 @@ void GLRenderer::setRasterizerState(const RasterizerState &state){
 }
 
 void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
+	if(stage>=mCapabilityState.maxTextureStages){
+		return;
+	}
+
 	if(mMultiTexture){
 		glActiveTexture(GL_TEXTURE0+stage);
 	}
