@@ -26,6 +26,7 @@
 #include "D3D9Renderer.h"
 #include "D3D9Texture.h"
 #include "D3D9RenderTarget.h"
+#include "D3D9RenderStateSet.h"
 #include "D3D9PixelBufferRenderTarget.h"
 #include "D3D9VertexBuffer.h"
 #include "D3D9IndexBuffer.h"
@@ -233,6 +234,10 @@ Query *D3D9Renderer::createQuery(){
 		Error::unimplemented("D3D9Renderer::createQuery is unavailable");
 		return NULL;
 	#endif
+}
+
+RenderStateSet *D3D9Renderer::createRenderStateSet(){
+	return new D3D9RenderStateSet(this);
 }
 
 bool D3D9Renderer::setRenderTarget(RenderTarget *target){
@@ -482,12 +487,40 @@ void D3D9Renderer::setDefaultStates(){
 	{
 		mD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE,true);
 		mD3DDevice->SetRenderState(D3DRS_SPECULARENABLE,true);
-
-		#if !defined(TOADLET_SET_D3DM)
-			/// @todo: Move this to a render state
-			mD3DDevice->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS,true);
-		#endif
 	}
+}
+
+bool D3D9Renderer::setRenderStateSet(RenderStateSet *set){
+	D3D9RenderStateSet *d3dset=NULL;
+	if(set!=NULL){
+		d3dset=(D3D9RenderStateSet*)set->getRootRenderStateSet();
+		if(d3dset==NULL){
+			Error::nullPointer(Categories::TOADLET_PEEPER,
+				"RenderStateSet is not a D3D9RenderStateSet");
+			return false;
+		}
+	}
+
+	if(d3dset->mBlendState!=NULL){
+		setBlendState(*d3dset->mBlendState);
+	}
+	if(d3dset->mDepthState!=NULL){
+		setDepthState(*d3dset->mDepthState);
+	}
+	if(d3dset->mRasterizerState!=NULL){
+		setRasterizerState(*d3dset->mRasterizerState);
+	}
+	if(d3dset->mFogState!=NULL){
+		setFogState(*d3dset->mFogState);
+	}
+	if(d3dset->mPointState!=NULL){
+		setPointState(*d3dset->mPointState);
+	}
+	if(d3dset->mMaterialState!=NULL){
+		setMaterialState(*d3dset->mMaterialState);
+	}
+
+	return true;
 }
 
 void D3D9Renderer::setAlphaTest(const AlphaTest &alphaTest,scalar cutoff){
@@ -679,14 +712,11 @@ void D3D9Renderer::setRasterizerState(const RasterizerState &state){
 	mD3DDevice->SetRenderState(D3DRS_DEPTHBIAS,*(DWORD*)&fconstant);
 	mD3DDevice->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS,*(DWORD*)&fslope);
 
-	mD3DDevice->SetRenderState(D3DRS_DITHERENABLE,state.dither);
-}
-
-void D3D9Renderer::setTexturePerspective(bool texturePerspective){
-	#if defined(TOADLET_SET_D3DM)
-		HRESULT hr=mD3DDevice->SetRenderState(D3DMRS_TEXTUREPERSPECTIVE,texturePerspective);
-		TOADLET_CHECK_D3D9ERROR(hr,"setTexturePerspective");
+	#if !defined(TOADLET_SET_D3DM)
+		mD3DDevice->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS,state.multisample);
 	#endif
+
+	mD3DDevice->SetRenderState(D3DRS_DITHERENABLE,state.dither);
 }
 
 void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
@@ -810,7 +840,9 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 		#endif
 
 		if(stage==0){
-			setTexturePerspective(textureStage->perspective);
+			#if defined(TOADLET_SET_D3DM)
+				mD3DDevice->SetRenderState(D3DMRS_TEXTUREPERSPECTIVE,texturePerspective);
+			#endif
 		}
 	}
 	else{
@@ -829,9 +861,6 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 		result=mD3DDevice->SetTextureStageState(stage,D3DTSS_COLOROP,D3DTOP_DISABLE);
 		TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
 	}
-}
-
-void D3D9Renderer::setProgram(const Program *program){
 }
 
 void D3D9Renderer::setNormalize(const Normalize &normalize){

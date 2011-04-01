@@ -26,6 +26,7 @@
 #ifndef TOADLET_TADPOLE_MATERIALMANAGER_H
 #define TOADLET_TADPOLE_MATERIALMANAGER_H
 
+#include <toadlet/peeper/BackableRenderStateSet.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/TextureManager.h>
@@ -43,6 +44,10 @@ public:
 
 	Material::ptr findMaterial(const egg::String &name){return egg::shared_static_cast<Material>(ResourceManager::find(name));}
 
+	Material::ptr cloneMaterial(Material::ptr material,bool manage);
+
+	peeper::RenderStateSet::ptr createRenderStateSet();
+
 	peeper::TextureStage::ptr createTextureStage(peeper::Texture::ptr texture,bool clamped=false);
 
 	virtual egg::Resource::ptr unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData);
@@ -55,7 +60,7 @@ public:
 	inline peeper::TextureStage::Filter getDefaultMipFilter(){return mDefaultMipFilter;}
 
 protected:
-	TextureManager *mTextureManager;
+	Engine *mEngine;
 	peeper::TextureStage::Filter mDefaultMinFilter;
 	peeper::TextureStage::Filter mDefaultMagFilter;
 	peeper::TextureStage::Filter mDefaultMipFilter;

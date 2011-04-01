@@ -75,6 +75,7 @@ public:
 	Program *createProgram();
 	Shader *createShader();
 	Query *createQuery();
+	RenderStateSet *createRenderStateSet();
 
 	// Matrix operations
 	void setModelMatrix(const Matrix4x4 &matrix);
@@ -93,19 +94,13 @@ public:
 	void renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData);
 	bool copyFrameBufferToPixelBuffer(PixelBuffer *dst);
 	bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src);
-
-	// Render state operations
 	void setDefaultStates();
-	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff);
-	void setBlendState(const BlendState &state);
-	void setDepthState(const DepthState &state);
-	void setFogState(const FogState &state);
-	void setMaterialState(const MaterialState &state);
-	void setNormalize(const Normalize &normalize);
-	void setPointState(const PointState &state);
-	void setRasterizerState(const RasterizerState &state);
+	bool setRenderStateSet(RenderStateSet *set);
+
+	// Old fixed states
 	void setTextureStage(int stage,TextureStage *textureStage);
-	void setProgram(const Program *program);
+	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff);
+	void setNormalize(const Normalize &normalize);
 	void setLightEnabled(int i,bool enable);
 	void setLightState(int i,const LightState &state);
 	void setAmbientColor(const Vector4 &ambient);
@@ -115,8 +110,14 @@ public:
 	int getClosestTextureFormat(int textureFormat);
 	void setStrictFormats(bool strict){mStrict=strict;}
 	bool getStrictFormats(){return mStrict;}
-
 	const CapabilityState &getCapabilityState(){return mCapabilityState;}
+
+	void setBlendState(const BlendState &state);
+	void setDepthState(const DepthState &state);
+	void setRasterizerState(const RasterizerState &state);
+	void setFogState(const FogState &state);
+	void setPointState(const PointState &state);
+	void setMaterialState(const MaterialState &state);
 
 	bool useMapping(GLBuffer *buffer) const;
 
@@ -158,8 +159,6 @@ public:
 	static GLuint GLCubeFaces[6];
 
 protected:
-	void setTexturePerspective(bool texturePerspective);
-
 	inline int setVertexData(const VertexData *vertexData,int lastTypeBits);
 
 	int mMatrixMode;
@@ -170,7 +169,6 @@ protected:
 	Viewport mViewport;
 	DepthState mDepthState;
 	PointState mPointState;
-	bool mInTexGen;
 	egg::Collection<GLTexture*> mLastTextures;
 	short mMaxTexCoordIndex;
 	egg::Collection<short> mTexCoordIndexes;

@@ -142,7 +142,7 @@ void BSP30ModelNode::modifyMaterial(Material::ptr material){
 	for(i=0;i<mSubModels.size();++i){
 		SubModel *sub=mSubModels[i];
 		if(sub->material->getManaged()){
-			sub->material=sub->material->clone();
+			sub->material=mEngine->getMaterialManager()->cloneMaterial(sub->material,false);
 		}
 
 		sub->material->modifyWith(material);
@@ -540,11 +540,9 @@ void BSP30Node::render(Renderer *renderer) const{
 
 	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4); // Technically I dont need this anymore, since its a renderable.  But i'll keep it in case it ever gets changed again
 
-	Material *previousMaterial=NULL;
 	for(i=0;i<mVisibleMaterialFaces.size();i++){
-		mMap->materials[i]->setupRenderer(renderer,previousMaterial);
+		renderer->setRenderStateSet(mMap->materials[i]->getRenderStateSet());
 		mMap->renderFaces(renderer,mVisibleMaterialFaces[i]);
-		previousMaterial=mMap->materials[i];
 	}
 
 	renderer->setTextureStage(0,NULL);

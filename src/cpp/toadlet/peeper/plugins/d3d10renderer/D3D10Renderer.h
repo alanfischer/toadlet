@@ -30,8 +30,11 @@
 #include "D3D10RenderTarget.h"
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/BlendState.h>
+#include <toadlet/peeper/DepthState.h>
+#include <toadlet/peeper/RasterizerState.h>
 #include <toadlet/peeper/MaterialState.h>
 #include <toadlet/peeper/TextureStage.h>
+#include <toadlet/peeper/RenderStateSet.h>
 #include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/peeper/IndexData.h>
 
@@ -64,6 +67,7 @@ D3D10_PASS_DESC passDesc;
 	Program *createProgram();
 	Shader *createShader();
 	Query *createQuery();
+	RenderStateSet *createRenderStateSet();
 
 	// Matrix operations
 	void setModelMatrix(const Matrix4x4 &matrix);
@@ -82,25 +86,16 @@ D3D10_PASS_DESC passDesc;
 	void renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData);
 	bool copyFrameBufferToPixelBuffer(PixelBuffer *dst);
 	bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src);
-
-	// Render state operations
 	void setDefaultStates();
-	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff);
-	void setBlendState(const BlendState &state);
-	void setDepthState(const DepthState &state);
-	void setFogState(const FogState &state);
-	void setLighting(bool lighting);
-	void setMaterialState(const MaterialState &state);
-	void setNormalize(const Normalize &normalize);
-	void setTexturePerspective(bool texturePerspective);
-	void setPointState(const PointState &state);
-	void setRasterizerState(const RasterizerState &state);
+	bool setRenderStateSet(RenderStateSet *set);
+
+	// Old fixed states
+	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff){}
+	void setNormalize(const Normalize &normalize){}
+	void setAmbientColor(const Vector4 &ambient){}
 	void setTextureStage(int stage,TextureStage *textureStage);
-	void setProgram(const Program *program);
-	void setShadowComparisonMethod(bool enabled);
-	void setLightState(int i,const LightState &light);
-	void setLightEnabled(int i,bool enable);
-	void setAmbientColor(const Vector4 &ambient);
+	void setLightState(int i,const LightState &light){}
+	void setLightEnabled(int i,bool enable){}
 
 	// Misc operations
 	int getClosestTextureFormat(int textureFormat);
@@ -118,6 +113,13 @@ D3D10_PASS_DESC passDesc;
 	static DXGI_FORMAT getTextureDXGI_FORMAT(int textureFormat);
 	static D3D10_MAP getD3D10_MAP(int access,int usage);
 	static D3D10_USAGE getD3D10_USAGE(int usage);
+	static D3D10_BLEND getD3D10_BLEND(BlendState::Operation operation,bool alpha);
+	static D3D10_COMPARISON_FUNC getD3D10_COMPARISON_FUNC(DepthState::DepthTest test);
+	static D3D10_FILL_MODE getD3D10_FILL_MODE(RasterizerState::FillType type);
+	static D3D10_CULL_MODE getD3D10_CULL_MODE(RasterizerState::CullType type);
+	static void getD3D10_BLEND_DESC(D3D10_BLEND_DESC &desc,const BlendState &state);
+	static void getD3D10_DEPTH_STENCIL_DESC(D3D10_DEPTH_STENCIL_DESC &desc,const DepthState &state);
+	static void getD3D10_RASTERIZER_DESC(D3D10_RASTERIZER_DESC &desc,const RasterizerState &state);
 	static char *getSemanticName(int semantic);
 
 protected:
@@ -133,6 +135,8 @@ protected:
 	Matrix4x4 mProjectionMatrix;
 
 	CapabilityState mCapabilityState;
+
+	RenderStateSet::ptr mDefaultSet;
 
 	friend class D3D10Buffer;
 };

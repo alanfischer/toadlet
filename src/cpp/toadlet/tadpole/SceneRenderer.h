@@ -50,9 +50,6 @@ protected:
 
 	Scene *mScene;
 	RenderableSet::ptr mRenderableSet;
-	Material *mPreviousMaterial;
-
-	peeper::Viewport cache_render_viewport;
 };
 
 }

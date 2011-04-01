@@ -38,23 +38,41 @@ namespace toadlet{
 namespace tadpole{
 
 MaterialManager::MaterialManager(Engine *engine):ResourceManager(engine->getArchiveManager()){
-	mTextureManager=engine->getTextureManager();
+	mEngine=engine;
 	mDefaultMinFilter=TextureStage::Filter_LINEAR;
 	mDefaultMagFilter=TextureStage::Filter_LINEAR;
 	mDefaultMipFilter=TextureStage::Filter_LINEAR;
 }
 
 Material::ptr MaterialManager::createMaterial(){
-	Material::ptr material(new Material());
+	Material::ptr material(new Material(createRenderStateSet()));
 
-	Renderer *renderer=mTextureManager->getRenderer();
-	material->setAlphaTest(AlphaTest_NONE,0);
+	material->setBlendState(BlendState());
+	material->setDepthState(DepthState());
+	material->setRasterizerState(RasterizerState());
 	material->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
-	material->setDepthSorted(false);
 
 	manage(material);
-	
+
 	return material;
+}
+
+Material::ptr MaterialManager::cloneMaterial(Material::ptr material,bool managed){
+	Material::ptr clonedMaterial(new Material(createRenderStateSet()));
+
+	clonedMaterial->modifyWith(material);
+
+	if(managed){
+		manage(clonedMaterial);
+	}
+
+	return clonedMaterial;
+}
+
+RenderStateSet::ptr MaterialManager::createRenderStateSet(){
+	RenderStateSet::ptr renderStateSet(mEngine->getRenderer()->createRenderStateSet());
+
+	return renderStateSet;
 }
 
 TextureStage::ptr MaterialManager::createTextureStage(Texture::ptr texture,bool clamped){
@@ -80,7 +98,7 @@ TextureStage::ptr MaterialManager::createTextureStage(Texture::ptr texture,bool 
 }
 
 Resource::ptr MaterialManager::unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData){
-	Texture::ptr texture=mTextureManager->findTexture(name);
+	Texture::ptr texture=mEngine->getTextureManager()->findTexture(name);
 	if(texture!=NULL){
 		Material::ptr material=createMaterial();
 		material->setTextureStage(0,createTextureStage(texture));

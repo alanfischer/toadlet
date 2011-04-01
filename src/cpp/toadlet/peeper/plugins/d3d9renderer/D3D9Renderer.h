@@ -62,6 +62,7 @@ public:
 	Program *createProgram();
 	Shader *createShader();
 	Query *createQuery();
+	RenderStateSet *createRenderStateSet();
 
 	// Matrix operations
 	void setModelMatrix(const Matrix4x4 &matrix);
@@ -81,22 +82,15 @@ public:
 	bool copyFrameBufferToPixelBuffer(PixelBuffer *dst);
 	bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src);
 	bool copySurface(IDirect3DSurface9 *dst,IDirect3DSurface9 *src);
-
-	// Render state operations
 	void setDefaultStates();
-	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff);
-	void setBlendState(const BlendState &state);
-	void setDepthState(const DepthState &state);
-	void setFogState(const FogState &state);
-	void setLighting(bool lighting);
-	void setMaterialState(const MaterialState &state);
-	void setNormalize(const Normalize &normalize);
-	void setPointState(const PointState &state);
-	void setRasterizerState(const RasterizerState &state);
+	bool setRenderStateSet(RenderStateSet *set);
+
+	// Old fixed states
 	void setTextureStage(int stage,TextureStage *textureStage);
-	void setProgram(const Program *program);
-	void setLightState(int i,const LightState &state);
+	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff);
+	void setNormalize(const Normalize &normalize);
 	void setLightEnabled(int i,bool enable);
+	void setLightState(int i,const LightState &state);
 	void setAmbientColor(const Vector4 &ambient);
 
 	// Misc operations
@@ -104,8 +98,14 @@ public:
 	int getClosestTextureFormat(int textureFormat);
 	void setStrictFormats(bool strict){mStrict=strict;}
 	bool getStrictFormats(){return mStrict;}
-
 	const CapabilityState &getCapabilityState(){return mCapabilityState;}
+
+	void setBlendState(const BlendState &state);
+	void setDepthState(const DepthState &state);
+	void setRasterizerState(const RasterizerState &state);
+	void setFogState(const FogState &state);
+	void setPointState(const PointState &state);
+	void setMaterialState(const MaterialState &state);
 
 	inline IDirect3DDevice9 *getDirect3DDevice9(){return mD3DDevice;}
 	inline const D3DCAPS9 &getD3DCAPS9() const{return mD3DCaps;}
@@ -126,8 +126,6 @@ public:
 	static DWORD getFVF(VertexFormat *vertexFormat);
 
 protected:
-	void setTexturePerspective(bool texturePerspective);
-
 	static void setCapabilityStateFromCaps(CapabilityState &caps,const D3DCAPS9 &d3dcaps,bool renderToTexture,bool renderToDepthTexture);
 	static void getPrimitiveTypeAndCount(D3DPRIMITIVETYPE &d3dpt,int &count,IndexData::Primitive prim,int numIndexes);
 

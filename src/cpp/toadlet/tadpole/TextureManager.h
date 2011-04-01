@@ -26,10 +26,10 @@
 #ifndef TOADLET_TADPOLE_TEXTUREMANAGER_H
 #define TOADLET_TADPOLE_TEXTUREMANAGER_H
 
-#include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/BackableTexture.h>
 #include <toadlet/peeper/PixelBufferRenderTarget.h>
+#include <toadlet/tadpole/ResourceManager.h>
 
 namespace toadlet{
 namespace tadpole{

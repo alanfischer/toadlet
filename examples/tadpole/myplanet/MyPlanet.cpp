@@ -50,7 +50,7 @@ public:
 	void setSize(scalar s){mMeshNode->setScale(s,s,s);}
 
 	void setColor(const Vector4 &color){mMeshNode->getSubMesh(0)->material->setMaterialState(MaterialState(color));}
-	const Vector4 &getColor() const{return mMeshNode->getSubMesh(0)->material->getMaterialState().diffuse;}
+	Vector4 getColor() const{MaterialState state;mMeshNode->getSubMesh(0)->material->getMaterialState(state);return state.diffuse;}
 	
 	void frameUpdate(int dt,int scope){
 		super::frameUpdate(dt,scope);
@@ -137,7 +137,7 @@ public:
 		mMeshNode->setScale(distance,distance,distance);
 		mEndDistance=distance;
 
-		mMaterialState.set(mMaterial->getMaterialState());
+		mMaterial->getMaterialState(mMaterialState);
 		mStartColor=Colors::BLACK;
 		mEndColor=Colors::AZURE;
 		mVisible=true;
@@ -518,7 +518,7 @@ void MyPlanet::create(){
 
 	Application::setBackable(false);
 
-	Application::create("gl");
+	Application::create("d3d10");
 
 	mScene=Scene::ptr(new Scene(mEngine));
 
@@ -541,12 +541,12 @@ void MyPlanet::create(){
 
 	mCamera=mEngine->createNodeType(CameraNode::type(),mScene);
 	mCamera->setScope(1<<0);
-	mCamera->setNearAndFarDist(Math::fromInt(1),Math::fromInt(200));
+	mCamera->setNearAndFarDist(Math::fromInt(1),Math::fromInt(1024));
 	mCameraOrbit->attach(mCamera);
 
 	Node::ptr background=createBackground();
 	mScene->getBackground()->attach(background);
-	bool backgroundToSkybox=true;
+	bool backgroundToSkybox=false;//true;
 	if(backgroundToSkybox){
 		Mesh::ptr skyBoxMesh=mCamera->renderToSkyBox(mRenderer,Image::Format_RGB_5_6_5,2048,fromInt(10));
 		MeshNode::ptr skyBox=mEngine->createNodeType(MeshNode::type(),mScene);

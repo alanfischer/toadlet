@@ -62,9 +62,9 @@ public:
 		return *this;
 	}
 
-	DepthState &set(DepthTest test,bool write){
-		this->test=test;
-		this->write=write;
+	DepthState &set(DepthTest test1,bool write1){
+		test=test1;
+		write=write1;
 
 		return *this;
 	}

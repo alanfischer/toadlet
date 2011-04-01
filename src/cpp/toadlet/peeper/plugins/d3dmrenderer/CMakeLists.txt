@@ -15,6 +15,7 @@ set (PEEPER_D3DMRENDERER_SRC
 set (PEEPER_D3DMRENDERER_HEADERS
 	../d3d9renderer/D3D9Includes.h
 	../d3d9renderer/D3D9IndexBuffer.h
+	../d3d9renderer/D3D9RenderStateSet.h
 	../d3d9renderer/D3D9RenderTarget.h
 	../d3d9renderer/D3D9Renderer.h
 	../d3d9renderer/D3D9Surface.h

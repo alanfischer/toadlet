@@ -26,6 +26,7 @@ set (PEEPER_HEADERS
 	BackablePixelBufferRenderTarget.h
 	BackableTexture.h
 	BackableTextureMipPixelBuffer.h
+	BackableRenderStateSet.h
 	BlendState.h
 	Buffer.h
 	BufferDestroyedListener.h

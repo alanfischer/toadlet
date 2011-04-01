@@ -50,14 +50,16 @@ public:
 		fill(FillType_SOLID),
 		depthBiasConstant(0),
 		depthBiasSlope(0),
+		multisample(false),
 		dither(false)
 	{}
 
-	RasterizerState(CullType cull1,FillType fill1=FillType_SOLID,scalar depthBiasConstant1=0,scalar depthBiasSlope1=0,bool dither1=false):
+	RasterizerState(CullType cull1,FillType fill1=FillType_SOLID,scalar depthBiasConstant1=0,scalar depthBiasSlope1=0,bool multisample1=false,bool dither1=false):
 		cull(cull1),
 		fill(fill1),
 		depthBiasConstant(depthBiasConstant1),
 		depthBiasSlope(depthBiasSlope1),
+		multisample(multisample1),
 		dither(dither1)
 	{}
 
@@ -66,17 +68,19 @@ public:
 		fill=state.fill;
 		depthBiasConstant=state.depthBiasConstant;
 		depthBiasSlope=state.depthBiasSlope;
+		multisample=state.multisample;
 		dither=state.dither;
 
 		return *this;
 	}
 
-	RasterizerState &set(CullType cull,FillType fill=FillType_SOLID,scalar depthBiasConstant=0,scalar depthBiasSlope=0,bool dither=false){
-		this->cull=cull;
-		this->fill=fill;
-		this->depthBiasConstant=depthBiasConstant;
-		this->depthBiasSlope=depthBiasSlope;
-		this->dither=dither;
+	RasterizerState &set(CullType cull1,FillType fill1=FillType_SOLID,scalar depthBiasConstant1=0,scalar depthBiasSlope1=0,bool multisample1=false,bool dither1=false){
+		cull=cull1;
+		fill=fill1;
+		depthBiasConstant=depthBiasConstant1;
+		depthBiasSlope=depthBiasSlope1;
+		multisample=multisample1;
+		dither=dither1;
 
 		return *this;
 	}
@@ -85,6 +89,7 @@ public:
 	FillType fill;
 	scalar depthBiasConstant;
 	scalar depthBiasSlope;
+	bool multisample;
 	bool dither;
 };
 

@@ -28,6 +28,7 @@
 #include "D3D10TextureMipPixelBuffer.h"
 #include "D3D10PixelBufferRenderTarget.h"
 #include "D3D10Query.h"
+#include "D3D10RenderStateSet.h"
 #include "D3D10RenderTarget.h"
 #include "D3D10Texture.h"
 #include "D3D10VertexFormat.h"
@@ -119,46 +120,14 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 	caps.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
 	caps.triangleFan=false;
 
-	setDefaultStates();
-
 	Logger::alert(Categories::TOADLET_PEEPER,
 		"created D3D10Renderer");
 
-	D3D10_RASTERIZER_DESC desc;
-	desc.FillMode=D3D10_FILL_SOLID;
-	desc.CullMode=D3D10_CULL_BACK;
-	desc.FrontCounterClockwise=TRUE;
-	desc.DepthBias=0;
-	desc.DepthBiasClamp=0;
-	desc.SlopeScaledDepthBias=0;
-	desc.DepthClipEnable=TRUE;
-	desc.ScissorEnable=FALSE;
-	desc.MultisampleEnable=FALSE;
-	desc.AntialiasedLineEnable=FALSE;
-
-	ID3D10RasterizerState *state=NULL;
-	mD3DDevice->CreateRasterizerState(&desc,&state);
-	mD3DDevice->RSSetState(state);
-
-	D3D10_DEPTH_STENCIL_DESC ddesc;
-	ddesc.DepthEnable=TRUE;
-	ddesc.DepthWriteMask=D3D10_DEPTH_WRITE_MASK_ALL;
-	ddesc.DepthFunc=D3D10_COMPARISON_LESS;
-	ddesc.StencilEnable=FALSE;
-	ddesc.StencilReadMask=D3D10_DEFAULT_STENCIL_READ_MASK;
-	ddesc.StencilWriteMask=D3D10_DEFAULT_STENCIL_WRITE_MASK;
-	ddesc.FrontFace.StencilFailOp=D3D10_STENCIL_OP_KEEP;
-	ddesc.FrontFace.StencilDepthFailOp=D3D10_STENCIL_OP_KEEP;
-	ddesc.FrontFace.StencilPassOp=D3D10_STENCIL_OP_KEEP;
-	ddesc.FrontFace.StencilFunc=D3D10_COMPARISON_ALWAYS;
-	ddesc.BackFace.StencilFailOp=D3D10_STENCIL_OP_KEEP;
-	ddesc.BackFace.StencilDepthFailOp=D3D10_STENCIL_OP_KEEP;
-	ddesc.BackFace.StencilPassOp=D3D10_STENCIL_OP_KEEP;
-	ddesc.BackFace.StencilFunc=D3D10_COMPARISON_ALWAYS;
-
-	ID3D10DepthStencilState *dstate=NULL;
-	mD3DDevice->CreateDepthStencilState(&ddesc,&dstate);
-	mD3DDevice->OMSetDepthStencilState(dstate,0);
+	mDefaultSet=RenderStateSet::ptr(new D3D10RenderStateSet(this));
+	mDefaultSet->setBlendState(BlendState());
+	mDefaultSet->setDepthState(DepthState());
+	mDefaultSet->setRasterizerState(RasterizerState());
+	setRenderStateSet(mDefaultSet);
 
 	char *effectstring=
 "float4x4 ShaderMatrix;\n"
@@ -215,7 +184,9 @@ technique->GetPassByIndex( 0 )->GetDesc( &passDesc);
 	return true;
 }
 
-void D3D10Renderer::destroy(){}
+void D3D10Renderer::destroy(){
+	mDefaultSet->destroy();
+}
 
 Renderer::RendererStatus D3D10Renderer::getStatus(){
 	return RendererStatus_OK;
@@ -267,6 +238,10 @@ Shader *D3D10Renderer::createShader(){
 
 Query *D3D10Renderer::createQuery(){
 	return new D3D10Query(this);
+}
+
+RenderStateSet *D3D10Renderer::createRenderStateSet(){
+	return new D3D10RenderStateSet(this);
 }
 
 bool D3D10Renderer::setRenderTarget(RenderTarget *target){
@@ -498,61 +473,35 @@ bool D3D10Renderer::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
 }
 
 void D3D10Renderer::setDefaultStates(){
-/*	setAlphaTest(AlphaTest_NONE,0.5);
-	setBlend(Blend::Combination_DISABLED);
-	setDepthWrite(true);
-	setDepthTest(DepthTest_LEQUAL);
-	setDithering(false);
-	setFaceCulling(FaceCulling_BACK);
-	setFogParameters(Fog_NONE,0,1.0,Colors::BLACK);
-	setLighting(false);
-	setNormalize(Normalize_RESCALE);
-	#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-		setTexturePerspective(true);
-	#endif
+	setRenderStateSet(mDefaultSet);
+}
 
-	int i;
-	for(i=0;i<mCapabilitySet.maxTextureStages;++i){
-		setTextureStage(i,NULL);
+//void D3D10Renderer::setMaterialState(const MaterialState &state){
+//	effect->GetVariableByName("diffuseColor")->AsVector()->SetFloatVector((float*)state.diffuse.getData());
+//}
+
+bool D3D10Renderer::setRenderStateSet(RenderStateSet *set){
+	D3D10RenderStateSet *d3dset=NULL;
+	if(set!=NULL){
+		d3dset=(D3D10RenderStateSet*)set->getRootRenderStateSet();
+		if(d3dset==NULL){
+			Error::nullPointer(Categories::TOADLET_PEEPER,
+				"RenderStateSet is not a D3D10RenderStateSet");
+			return false;
+		}
 	}
 
-	setLightEffect(LightEffect());
-	setAmbientColor(Colors::WHITE);
-	// We leave the current lights enabled because the SceneManager does not re-set the lights between layers
-
-	// D3D specific states
-	{
-		mD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE,true);
-		mD3DDevice->SetRenderState(D3DRS_SPECULARENABLE,true);
+	if(d3dset->mD3DBlendState!=NULL){
+		mD3DDevice->OMSetBlendState(d3dset->mD3DBlendState,NULL,-1);
 	}
-*/}
+	if(d3dset->mD3DDepthStencilState!=NULL){
+		mD3DDevice->OMSetDepthStencilState(d3dset->mD3DDepthStencilState,-1);
+	}
+	if(d3dset->mD3DRasterizerState!=NULL){
+		mD3DDevice->RSSetState(d3dset->mD3DRasterizerState);
+	}
 
-void D3D10Renderer::setAlphaTest(const AlphaTest &alphaTest,scalar cutoff){
-}
-
-void D3D10Renderer::setBlendState(const BlendState &state){
-}
-
-void D3D10Renderer::setDepthState(const DepthState &state){
-}
-
-void D3D10Renderer::setFogState(const FogState &state){
-}
-
-void D3D10Renderer::setLighting(bool lighting){
-}
-
-void D3D10Renderer::setMaterialState(const MaterialState &state){
-	effect->GetVariableByName("diffuseColor")->AsVector()->SetFloatVector((float*)state.diffuse.getData());
-}
-
-void D3D10Renderer::setPointState(const PointState &state){
-}
-
-void D3D10Renderer::setRasterizerState(const RasterizerState &state){
-}
-
-void D3D10Renderer::setTexturePerspective(bool texturePerspective){
+	return true;
 }
 
 void D3D10Renderer::setTextureStage(int stage,TextureStage *textureStage){
@@ -688,24 +637,6 @@ effect->GetVariableByName("useTexture")->AsScalar()->SetFloat(texture!=NULL);
 		TOADLET_CHECK_D3D9ERROR(result,"disableTextureStage");
 	}
 */}
-
-void D3D10Renderer::setProgram(const Program *program){
-}
-
-void D3D10Renderer::setNormalize(const Normalize &normalize){
-}
-
-void D3D10Renderer::setShadowComparisonMethod(bool enabled){
-}
-
-void D3D10Renderer::setLightState(int i,const LightState &light){
-}
-
-void D3D10Renderer::setLightEnabled(int i,bool enable){
-}
-
-void D3D10Renderer::setAmbientColor(const Vector4 &ambient){
-}
 
 void D3D10Renderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){
 }
@@ -886,6 +817,116 @@ D3D10_USAGE D3D10Renderer::getD3D10_USAGE(int usage){
 	else{
 		return D3D10_USAGE_DEFAULT;
 	}
+}
+
+D3D10_BLEND D3D10Renderer::getD3D10_BLEND(BlendState::Operation operation,bool alpha){
+	switch(operation){
+		case BlendState::Operation_ONE:
+			return D3D10_BLEND_ONE;
+		case BlendState::Operation_ZERO:
+			return D3D10_BLEND_ZERO;
+		case BlendState::Operation_DEST_ALPHA:
+			return D3D10_BLEND_DEST_ALPHA;
+		case BlendState::Operation_SOURCE_ALPHA:
+			return D3D10_BLEND_SRC_ALPHA;
+		case BlendState::Operation_ONE_MINUS_DEST_ALPHA:
+			return D3D10_BLEND_INV_DEST_ALPHA;
+		case BlendState::Operation_ONE_MINUS_SOURCE_ALPHA:
+			return D3D10_BLEND_INV_SRC_ALPHA;
+	}
+	if(alpha==false){
+		switch(operation){
+			case BlendState::Operation_DEST_COLOR:
+				return D3D10_BLEND_DEST_COLOR;
+			case BlendState::Operation_SOURCE_COLOR:
+				return D3D10_BLEND_SRC_COLOR;
+			case BlendState::Operation_ONE_MINUS_DEST_COLOR:
+				return D3D10_BLEND_INV_DEST_COLOR;
+			case BlendState::Operation_ONE_MINUS_SOURCE_COLOR:
+				return D3D10_BLEND_INV_SRC_COLOR;
+		}
+	}
+	return D3D10_BLEND_ZERO;
+}
+
+D3D10_COMPARISON_FUNC D3D10Renderer::getD3D10_COMPARISON_FUNC(DepthState::DepthTest test){
+	switch(test){
+		case DepthState::DepthTest_NEVER:
+			return D3D10_COMPARISON_NEVER;
+		case DepthState::DepthTest_LESS:
+			return D3D10_COMPARISON_LESS;
+		case DepthState::DepthTest_EQUAL:
+			return D3D10_COMPARISON_EQUAL;
+		case DepthState::DepthTest_LEQUAL:
+			return D3D10_COMPARISON_LESS_EQUAL;
+		case DepthState::DepthTest_GREATER:
+			return D3D10_COMPARISON_GREATER;
+		case DepthState::DepthTest_NOTEQUAL:
+			return D3D10_COMPARISON_NOT_EQUAL;
+		case DepthState::DepthTest_GEQUAL:
+			return D3D10_COMPARISON_GREATER_EQUAL;
+		case DepthState::DepthTest_ALWAYS:
+			return D3D10_COMPARISON_ALWAYS;
+		default:
+			return D3D10_COMPARISON_ALWAYS;
+	}
+}
+
+D3D10_FILL_MODE D3D10Renderer::getD3D10_FILL_MODE(RasterizerState::FillType type){
+	switch(type){
+		case RasterizerState::FillType_POINT:
+		case RasterizerState::FillType_LINE:
+			return D3D10_FILL_WIREFRAME;
+		case RasterizerState::FillType_SOLID:
+		default:
+			return D3D10_FILL_SOLID;
+	}
+}
+
+D3D10_CULL_MODE D3D10Renderer::getD3D10_CULL_MODE(RasterizerState::CullType type){
+	switch(type){
+		case RasterizerState::CullType_NONE:
+			return D3D10_CULL_NONE;
+		case RasterizerState::CullType_FRONT:
+			return D3D10_CULL_FRONT;
+		case RasterizerState::CullType_BACK:
+			return D3D10_CULL_BACK;
+		default:
+			return D3D10_CULL_NONE;
+	}
+}
+
+void D3D10Renderer::getD3D10_BLEND_DESC(D3D10_BLEND_DESC &desc,const BlendState &state){
+	memset(&desc,0,sizeof(desc));
+
+	desc.BlendEnable[0]=!(state.source==BlendState::Operation_ONE && state.dest==BlendState::Operation_ZERO);
+	desc.SrcBlend=getD3D10_BLEND(state.source,false);
+	desc.DestBlend=getD3D10_BLEND(state.dest,false);
+	desc.BlendOp=D3D10_BLEND_OP_ADD;
+	desc.SrcBlendAlpha=getD3D10_BLEND(state.source,true);
+	desc.DestBlendAlpha=getD3D10_BLEND(state.dest,true);
+	desc.BlendOpAlpha=D3D10_BLEND_OP_ADD;
+	desc.RenderTargetWriteMask[0]=state.colorWrite; // BlendState::ColorWrite bits match D3D10_COLOR_WRITE_ENABLE
+}
+
+void D3D10Renderer::getD3D10_DEPTH_STENCIL_DESC(D3D10_DEPTH_STENCIL_DESC &desc,const DepthState &state){
+	memset(&desc,0,sizeof(desc));
+
+	desc.DepthEnable=(state.test!=DepthState::DepthTest_NONE);
+	desc.DepthWriteMask=(state.write?D3D10_DEPTH_WRITE_MASK_ALL:D3D10_DEPTH_WRITE_MASK_ZERO);
+    desc.DepthFunc=getD3D10_COMPARISON_FUNC(state.test);
+}
+
+void D3D10Renderer::getD3D10_RASTERIZER_DESC(D3D10_RASTERIZER_DESC &desc,const RasterizerState &state){
+	memset(&desc,0,sizeof(desc));
+
+	desc.FillMode=getD3D10_FILL_MODE(state.fill);
+	desc.CullMode=getD3D10_CULL_MODE(state.cull);
+	desc.FrontCounterClockwise=TRUE;
+	desc.DepthBias=state.depthBiasConstant;
+	desc.SlopeScaledDepthBias=state.depthBiasSlope;
+    desc.DepthClipEnable=TRUE;
+    desc.MultisampleEnable=state.multisample;
 }
 
 char *D3D10Renderer::getSemanticName(int semantic){

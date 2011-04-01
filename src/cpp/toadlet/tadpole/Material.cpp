@@ -23,9 +23,9 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/tadpole/Material.h>
-#include <toadlet/egg/Logger.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::peeper;
@@ -33,11 +33,8 @@ using namespace toadlet::peeper;
 namespace toadlet{
 namespace tadpole{
 
-Material::Material():BaseResource(),
-	mStates(0),
+Material::Material(RenderStateSet::ptr renderStateSet):BaseResource(),
 	//mFogState,
-	mAlphaTest(AlphaTest_NONE),
-	mAlphaTestCutoff(0),
 	//mBlendState,
 	mDepthSorted(false),
 	//mDepthState,
@@ -45,6 +42,7 @@ Material::Material():BaseResource(),
 	//mRasterizerState
 	mLayer(0)
 {
+	mRenderStateSet=renderStateSet;
 }
 
 Material::~Material(){
@@ -57,35 +55,6 @@ void Material::destroy(){
 		mTextureStages[i]->destroy();
 	}
 	mTextureStages.clear();
-}
-
-Material::ptr Material::clone(){
-	Material::ptr material(new Material());
-
-	// Here we retain & release ourselves to handle the case
-	//  Of an unused material being cloned, so the unused original will get cleaned up
-	retain();
-
-	material->mStates=mStates;
-	material->mMaterialState.set(mMaterialState);
-	material->mFogState.set(mFogState);
-	material->mAlphaTest=mAlphaTest;
-	material->mAlphaTestCutoff=mAlphaTestCutoff;
-	material->mBlendState.set(mBlendState);
-	material->mDepthSorted=mDepthSorted;
-	material->mDepthState.set(mDepthState);
-	material->mPointState.set(mPointState);
-	material->mRasterizerState.set(mRasterizerState);
-	material->mLayer=mLayer;
-
-	int i;
-	for(i=0;i<mTextureStages.size();++i){
-		material->setTextureStage(i,mTextureStages[i]->clone());
-	}
-
-	release();
-
-	return material;
 }
 
 bool Material::setTextureStage(int stage,const TextureStage::ptr &textureStage){
@@ -102,102 +71,27 @@ bool Material::setTextureStage(int stage,const TextureStage::ptr &textureStage){
 	return true;
 }
 
-void Material::setupRenderer(Renderer *renderer,Material *previousMaterial){
-	int states=mStates;
-	if(previousMaterial==NULL){
-		if((states&State_ALPHATEST)>0){
-			renderer->setAlphaTest(mAlphaTest,mAlphaTestCutoff);
-		}
-		if((states&State_BLEND)>0){
-			renderer->setBlendState(mBlendState);
-		}
-		if((states&State_DEPTH)>0){
-			renderer->setDepthState(mDepthState);
-		}
-		if((states&State_FOG)>0){
-			renderer->setFogState(mFogState);
-		}
-		if((states&State_MATERIAL)>0){
-			renderer->setMaterialState(mMaterialState);
-		}
-		if((states&State_POINT)>0){
-			renderer->setPointState(mPointState);
-		}
-		if((states&State_RASTERIZER)>0){
-			renderer->setRasterizerState(mRasterizerState);
-		}
+void Material::modifyWith(Material *material){
+	RenderStateSet::ptr src=material->getRenderStateSet();
+	RenderStateSet::ptr dst=getRenderStateSet();
 
-		int numTextureStages=mTextureStages.size();
-		int i;
-		for(i=0;i<numTextureStages;++i){
-			renderer->setTextureStage(i,mTextureStages[i]);
-		}
-		int maxTextureStages=renderer->getCapabilityState().maxTextureStages;
-		for(;i<maxTextureStages;++i){
-			renderer->setTextureStage(i,NULL);
-		}
-	}
-	else{
-		int pstates=previousMaterial->mStates;
-		if((states&State_ALPHATEST)>0 && ((pstates&State_ALPHATEST)==0 || previousMaterial->mAlphaTest!=mAlphaTest || previousMaterial->mAlphaTestCutoff!=mAlphaTestCutoff)){
-			renderer->setAlphaTest(mAlphaTest,mAlphaTestCutoff);
-		}
-		if((states&State_BLEND)>0 && ((pstates&State_BLEND)==0 || previousMaterial->mBlendState!=mBlendState)){
-			renderer->setBlendState(mBlendState);
-		}
-		if((states&State_DEPTH)>0 && ((pstates&State_DEPTH)==0 || previousMaterial->mDepthState!=mDepthState)){
-			renderer->setDepthState(mDepthState);
-		}
-		if((states&State_FOG)>0){
-			renderer->setFogState(mFogState);
-		}
-		if((states&State_MATERIAL)>0){
-			renderer->setMaterialState(mMaterialState);
-		}
-		if((states&State_POINT)>0){
-			renderer->setPointState(mPointState);
-		}
-		if((states&State_RASTERIZER)>0){
-			renderer->setRasterizerState(mRasterizerState);
-		}
+	BlendState blendState;
+	if(src->getBlendState(blendState)) dst->setBlendState(blendState);
 
-		int numTextureStages=mTextureStages.size();
-		int numPreviousTextureStages=previousMaterial->mTextureStages.size();
-		int i;
-		for(i=0;i<numTextureStages;++i){
-			if(i>=numPreviousTextureStages || previousMaterial->mTextureStages[i]!=mTextureStages[i]){
-				renderer->setTextureStage(i,mTextureStages[i]);
-			}
-		}
-		for(;i<numPreviousTextureStages;++i){
-			renderer->setTextureStage(i,NULL);
-		}
-	}
-}
+	DepthState depthState;
+	if(src->getDepthState(depthState)) dst->setDepthState(depthState);
 
-void Material::modifyWith(Material::ptr material){
-	int states=material->mStates;
-	if((states&State_ALPHATEST)>0){
-		setAlphaTest(material->mAlphaTest,material->mAlphaTestCutoff);
-	}
-	if((states&State_BLEND)>0){
-		setBlendState(material->mBlendState);
-	}
-	if((states&State_DEPTH)>0){
-		setDepthState(material->mDepthState);
-	}
-	if((states&State_FOG)>0){
-		setFogState(material->mFogState);
-	}
-	if((states&State_MATERIAL)>0){
-		setMaterialState(material->mMaterialState);
-	}
-	if((states&State_POINT)>0){
-		setPointState(material->mPointState);
-	}
-	if((states&State_RASTERIZER)>0){
-		setRasterizerState(material->mRasterizerState);
-	}
+	RasterizerState rasterizerState;
+	if(src->getRasterizerState(rasterizerState)) dst->setRasterizerState(rasterizerState);
+
+	FogState fogState;
+	if(src->getFogState(fogState)) dst->setFogState(fogState);
+
+	PointState pointState;
+	if(src->getPointState(pointState)) dst->setPointState(pointState);
+
+	MaterialState materialState;
+	if(src->getMaterialState(materialState)) dst->setMaterialState(materialState);
 }
 
 }

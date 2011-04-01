@@ -568,7 +568,7 @@ void CameraNode::updateViewTransform(){
 void CameraNode::renderOverlayGamma(Renderer *renderer){
 	if(mGamma!=Math::ONE){
 		renderer->setAmbientColor(Math::ONE_VECTOR4);
-		mGammaMaterial->setupRenderer(renderer);
+		renderer->setRenderStateSet(mGammaMaterial->getRenderStateSet());
 		renderer->setProjectionMatrix(mOverlayMatrix);
 		renderer->setViewMatrix(Math::IDENTITY_MATRIX4X4);
 		renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);

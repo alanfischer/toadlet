@@ -2,7 +2,6 @@
 set (PEEPER_GLRENDERER_SRC
 	GLBuffer.cpp
 	GLRenderer.cpp
-	GLRenderStateSet.cpp
 	GLTexture.cpp
 	GLTextureMipPixelBuffer.cpp
 	GLVertexFormat.cpp
@@ -47,6 +46,7 @@ set (PEEPER_GLRENDERER_HEADERS
 	GLBuffer.h
 	GLIncludes.h
 	GLRenderer.h
+	GLRenderStateSet.h
 	GLRenderTarget.h
 	GLSLProgramPeer.h
 	GLSLShaderPeer.h
