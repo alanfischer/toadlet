@@ -51,6 +51,7 @@ set (PEEPER_HEADERS
 	PointState.h
 	RasterizerState.h
 	RenderStateSet.h
+	RenderStateSetDestroyedListener.h
 	Texture.h
 	TextureBlend.h
 	TextureStage.h

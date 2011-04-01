@@ -27,7 +27,6 @@
 #define TOADLET_PEEPER_D3D10RENDERSTATESET_H
 
 #include "D3D10Includes.h"
-#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/RenderStateSet.h>
 
 namespace toadlet{
@@ -35,10 +34,10 @@ namespace peeper{
 
 class D3D10Renderer;
 
-class TOADLET_API D3D10RenderStateSet:public egg::BaseResource,public RenderStateSet{
-	TOADLET_BASERESOURCE_PASSTHROUGH(RenderStateSet);
+class TOADLET_API D3D10RenderStateSet:public RenderStateSet{
 public:
-	D3D10RenderStateSet(D3D10Renderer *renderer):egg::BaseResource(),
+	D3D10RenderStateSet(D3D10Renderer *renderer):
+		mListener(NULL),
 		mBlendState(NULL),
 		mD3DBlendState(NULL),
 		mDepthState(NULL),
@@ -49,9 +48,15 @@ public:
 		mRenderer=renderer;
 		mDevice=mRenderer->getD3D10Device();
 	}
-	virtual ~D3D10RenderStateSet(){}
+	virtual ~D3D10RenderStateSet(){
+		destroy();
+	}
 
 	RenderStateSet *getRootRenderStateSet(){return this;}
+
+	void setRenderStateSetDestroyedListener(RenderStateSetDestroyedListener *listener){mListener=listener;}
+
+	bool create(){return true;}
 
 	void destroy(){
 		if(mBlendState!=NULL){
@@ -77,6 +82,11 @@ public:
 		if(mD3DRasterizerState!=NULL){
 			mD3DRasterizerState->Release();
 			mD3DRasterizerState=NULL;
+		}
+
+		if(mListener!=NULL){
+			mListener->renderStateSetDestroyed(this);
+			mListener=NULL;
 		}
 	}
 
@@ -117,6 +127,7 @@ protected:
 	D3D10Renderer *mRenderer;
 	ID3D10Device *mDevice;
 
+	RenderStateSetDestroyedListener *mListener;
 	BlendState *mBlendState;
 	ID3D10BlendState *mD3DBlendState;
 	DepthState *mDepthState;

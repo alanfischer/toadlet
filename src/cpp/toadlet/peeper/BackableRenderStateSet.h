@@ -26,18 +26,17 @@
 #ifndef TOADLET_PEEPER_BACKABLERENDERSTATESET_H
 #define TOADLET_PEEPER_BACKABLERENDERSTATESET_H
 
-#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/RenderStateSet.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API BackableRenderStateSet:public egg::BaseResource,public RenderStateSet{
-	TOADLET_BASERESOURCE_PASSTHROUGH(BaseResource);
+class TOADLET_API BackableRenderStateSet:public RenderStateSet{
 public:
 	TOADLET_SHARED_POINTERS(BackableRenderStateSet);
 
-	BackableRenderStateSet():egg::BaseResource(),
+	BackableRenderStateSet():
+		mListener(NULL),
 		mBlendState(NULL),
 		mDepthState(NULL),
 		mRasterizerState(NULL),
@@ -48,6 +47,14 @@ public:
 	virtual ~BackableRenderStateSet(){}
 
 	virtual RenderStateSet *getRootRenderStateSet(){return mBack;}
+
+	virtual void setRenderStateSetDestroyedListener(RenderStateSetDestroyedListener *listener){mListener=listener;}
+
+	virtual bool create(){
+		destroy();
+
+		return true;
+	}
 
 	virtual void destroy(){
 		if(mBack!=NULL){
@@ -78,6 +85,11 @@ public:
 		if(mMaterialState!=NULL){
 			delete mMaterialState;
 			mMaterialState=NULL;
+		}
+
+		if(mListener!=NULL){
+			mListener->renderStateSetDestroyed(this);
+			mListener=NULL;
 		}
 	}
 
@@ -136,6 +148,7 @@ public:
 	virtual RenderStateSet::ptr getBack(){return mBack;}
 
 protected:
+	RenderStateSetDestroyedListener *mListener;
 	BlendState *mBlendState;
 	DepthState *mDepthState;
 	RasterizerState *mRasterizerState;

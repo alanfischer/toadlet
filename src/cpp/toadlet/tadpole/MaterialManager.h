@@ -36,9 +36,11 @@ namespace tadpole{
 
 class Engine;
 
-class TOADLET_API MaterialManager:public ResourceManager{
+class TOADLET_API MaterialManager:public ResourceManager,public peeper::RenderStateSetDestroyedListener{
 public:
-	MaterialManager(Engine *engine);
+	MaterialManager(Engine *engine,bool backable);
+
+	void destroy();
 
 	Material::ptr createMaterial();
 
@@ -50,7 +52,12 @@ public:
 
 	peeper::TextureStage::ptr createTextureStage(peeper::Texture::ptr texture,bool clamped=false);
 
-	virtual egg::Resource::ptr unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData);
+	void contextActivate(peeper::Renderer *renderer);
+	void contextDeactivate(peeper::Renderer *renderer);
+
+	void renderStateSetDestroyed(peeper::RenderStateSet *renderStateSet);
+
+	egg::Resource::ptr unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData);
 
 	void setDefaultMinFilter(peeper::TextureStage::Filter filter){mDefaultMinFilter=filter;}
 	inline peeper::TextureStage::Filter getDefaultMinFilter(){return mDefaultMinFilter;}
@@ -60,10 +67,14 @@ public:
 	inline peeper::TextureStage::Filter getDefaultMipFilter(){return mDefaultMipFilter;}
 
 protected:
-	Engine *mEngine;
+	Engine *mEngine;\
+	bool mBackable;
+
 	peeper::TextureStage::Filter mDefaultMinFilter;
 	peeper::TextureStage::Filter mDefaultMagFilter;
 	peeper::TextureStage::Filter mDefaultMipFilter;
+
+	egg::Collection<peeper::RenderStateSet::ptr> mRenderStateSets;
 };
 
 }
