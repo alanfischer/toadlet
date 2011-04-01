@@ -27,7 +27,6 @@
 #define TOADLET_PEEPER_GLRENDERSTATESET_H
 
 #include "GLIncludes.h"
-#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/RenderStateSet.h>
 
 namespace toadlet{
@@ -35,10 +34,10 @@ namespace peeper{
 
 class GLRenderer;
 
-class TOADLET_API GLRenderStateSet:public egg::BaseResource,public RenderStateSet{
-	TOADLET_BASERESOURCE_PASSTHROUGH(RenderStateSet);
+class TOADLET_API GLRenderStateSet:public RenderStateSet{
 public:
-	GLRenderStateSet(GLRenderer *renderer):egg::BaseResource(),
+	GLRenderStateSet(GLRenderer *renderer):
+		mListener(NULL),
 		mBlendState(NULL),
 		mDepthState(NULL),
 		mRasterizerState(NULL),
@@ -46,9 +45,15 @@ public:
 		mPointState(NULL),
 		mMaterialState(NULL)
 	{}
-	virtual ~GLRenderStateSet(){}
+	virtual ~GLRenderStateSet(){
+		destroy();
+	}
 
 	RenderStateSet *getRootRenderStateSet(){return this;}
+
+	void setRenderStateSetDestroyedListener(RenderStateSetDestroyedListener *listener){mListener=listener;}
+
+	bool create(){return true;}
 
 	void destroy(){
 		if(mBlendState!=NULL){
@@ -75,6 +80,11 @@ public:
 			delete mMaterialState;
 			mMaterialState=NULL;
 		}
+
+		if(mListener!=NULL){
+			mListener->renderStateSetDestroyed(this);
+			mListener=NULL;
+		}
 	}
 
 	void setBlendState(const BlendState &state){if(mBlendState==NULL){mBlendState=new BlendState(state);}else{mBlendState->set(state);}}
@@ -96,6 +106,7 @@ public:
 	bool getMaterialState(MaterialState &state) const{if(mMaterialState==NULL){return false;}else{state.set(*mMaterialState);return true;}}
 	
 protected:
+	RenderStateSetDestroyedListener *mListener;
 	BlendState *mBlendState;
 	DepthState *mDepthState;
 	RasterizerState *mRasterizerState;

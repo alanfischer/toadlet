@@ -25,6 +25,7 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/peeper/BackableRenderStateSet.h>
 #include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/tadpole/Engine.h>
@@ -37,11 +38,28 @@ using namespace toadlet::peeper;
 namespace toadlet{
 namespace tadpole{
 
-MaterialManager::MaterialManager(Engine *engine):ResourceManager(engine->getArchiveManager()){
+MaterialManager::MaterialManager(Engine *engine,bool backable):ResourceManager(engine->getArchiveManager()),
+	mEngine(NULL),
+	mBackable(false)
+{
 	mEngine=engine;
+	mBackable=backable;
+
 	mDefaultMinFilter=TextureStage::Filter_LINEAR;
 	mDefaultMagFilter=TextureStage::Filter_LINEAR;
 	mDefaultMipFilter=TextureStage::Filter_LINEAR;
+}
+
+void MaterialManager::destroy(){
+	ResourceManager::destroy();
+
+	int i;
+	for(i=0;i<mRenderStateSets.size();++i){
+		RenderStateSet::ptr set=mRenderStateSets[i];
+		set->setRenderStateSetDestroyedListener(NULL);
+		set->destroy();
+	}
+	mRenderStateSets.clear();
 }
 
 Material::ptr MaterialManager::createMaterial(){
@@ -70,7 +88,30 @@ Material::ptr MaterialManager::cloneMaterial(Material::ptr material,bool managed
 }
 
 RenderStateSet::ptr MaterialManager::createRenderStateSet(){
-	RenderStateSet::ptr renderStateSet(mEngine->getRenderer()->createRenderStateSet());
+	RenderStateSet::ptr renderStateSet;
+
+	if(mBackable || mEngine->getRenderer()==NULL){
+		Logger::debug(Categories::TOADLET_TADPOLE,"creating BackableRenderStateSet");
+
+		BackableRenderStateSet::ptr backableRenderStateSet(new BackableRenderStateSet());
+		backableRenderStateSet->create();
+		if(mEngine->getRenderer()!=NULL){
+			RenderStateSet::ptr back(mEngine->getRenderer()->createRenderStateSet());
+			backableRenderStateSet->setBack(back);
+		}
+		renderStateSet=backableRenderStateSet;
+	}
+	else{
+		Logger::debug(Categories::TOADLET_TADPOLE,"creating RenderStateSet");
+
+		renderStateSet=RenderStateSet::ptr(mEngine->getRenderer()->createRenderStateSet());
+		if(renderStateSet->create()==false){
+			return NULL;
+		}
+	}
+
+	renderStateSet->setRenderStateSetDestroyedListener(this);
+	mRenderStateSets.add(renderStateSet);
 
 	return renderStateSet;
 }
@@ -95,6 +136,31 @@ TextureStage::ptr MaterialManager::createTextureStage(Texture::ptr texture,bool 
 	}
 
 	return textureStage;
+}
+
+void MaterialManager::contextActivate(Renderer *renderer){
+	int i;
+	for(i=0;i<mRenderStateSets.size();++i){
+		RenderStateSet::ptr set=mRenderStateSets[i];
+		if(set!=NULL && set->getRootRenderStateSet()!=set){
+			RenderStateSet::ptr back(renderer->createRenderStateSet());
+			shared_static_cast<BackableRenderStateSet>(set)->setBack(back);
+		}
+	}
+}
+
+void MaterialManager::contextDeactivate(Renderer *renderer){
+	int i;
+	for(i=0;i<mRenderStateSets.size();++i){
+		RenderStateSet::ptr set=mRenderStateSets[i];
+		if(set!=NULL && set->getRootRenderStateSet()!=set){
+			shared_static_cast<BackableRenderStateSet>(set)->setBack(NULL);
+		}
+	}
+}
+
+void MaterialManager::renderStateSetDestroyed(RenderStateSet *renderStateSet){
+	mRenderStateSets.remove(renderStateSet);
 }
 
 Resource::ptr MaterialManager::unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData){

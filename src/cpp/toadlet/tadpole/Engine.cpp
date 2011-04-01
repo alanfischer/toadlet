@@ -171,7 +171,7 @@ Engine::Engine(bool backable):
 	mArchiveManager=new ArchiveManager();
 	mTextureManager=new TextureManager(this,mBackable);
 	mBufferManager=new BufferManager(this,mBackable);
-	mMaterialManager=new MaterialManager(this);
+	mMaterialManager=new MaterialManager(this,mBackable);
 	mFontManager=new FontManager(this->getArchiveManager());
 	mMeshManager=new MeshManager(this);
 	mAudioBufferManager=new AudioBufferManager(this);
@@ -593,6 +593,7 @@ void Engine::contextActivate(Renderer *renderer){
 
 	mBufferManager->contextActivate(renderer);
 	mTextureManager->contextActivate(renderer);
+	mMaterialManager->contextActivate(renderer);
 
 	if(mContextListener!=NULL){
 		mContextListener->postContextActivate(renderer);
@@ -608,6 +609,7 @@ void Engine::contextDeactivate(Renderer *renderer){
 
 	mBufferManager->contextDeactivate(renderer);
 	mTextureManager->contextDeactivate(renderer);
+	mMaterialManager->contextDeactivate(renderer);
 
 	if(mContextListener!=NULL){
 		mContextListener->postContextDeactivate(renderer);

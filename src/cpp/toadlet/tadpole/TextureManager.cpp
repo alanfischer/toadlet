@@ -183,7 +183,7 @@ Texture::ptr TextureManager::createTexture(Image::ptr image,int usage,int mipLev
 
 		BackableTexture::ptr backableTexture(new BackableTexture());
 		backableTexture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas);
-		if(mEngine->getRenderer()!=NULL){
+		if(renderer!=NULL){
 			Texture::ptr back(renderer->createTexture());
 			backableTexture->setBack(back);
 		}
@@ -253,6 +253,8 @@ Texture::ptr TextureManager::createTexture(Image::ptr images[],int mipLevels,int
 
 	Texture::ptr texture;
 	if(mBackable || mEngine->getRenderer()==NULL){
+		Logger::debug(Categories::TOADLET_TADPOLE,"creating BackableTexture");
+
 		BackableTexture::ptr backableTexture(new BackableTexture());
 		backableTexture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas);
 		if(mEngine->getRenderer()!=NULL){
@@ -262,6 +264,8 @@ Texture::ptr TextureManager::createTexture(Image::ptr images[],int mipLevels,int
 		texture=backableTexture;
 	}
 	else{
+		Logger::debug(Categories::TOADLET_TADPOLE,"creating Texture");
+
 		texture=Texture::ptr(mEngine->getRenderer()->createTexture());
 		if(texture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas)==false){
 			return NULL;
@@ -276,6 +280,8 @@ Texture::ptr TextureManager::createTexture(Image::ptr images[],int mipLevels,int
 Texture::ptr TextureManager::createTexture(int usage,Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels){
 	Texture::ptr texture;
 	if(mBackable || mEngine->getRenderer()==NULL){
+		Logger::debug(Categories::TOADLET_TADPOLE,"creating BackableTexture");
+
 		BackableTexture::ptr backableTexture(new BackableTexture());
 		backableTexture->create(usage,dimension,format,width,height,depth,mipLevels,NULL);
 		if(mEngine->getRenderer()!=NULL){
@@ -285,6 +291,8 @@ Texture::ptr TextureManager::createTexture(int usage,Texture::Dimension dimensio
 		texture=backableTexture;
 	}
 	else{
+		Logger::debug(Categories::TOADLET_TADPOLE,"creating Texture");
+
 		texture=Texture::ptr(mEngine->getRenderer()->createTexture());
 		if(texture->create(usage,dimension,format,width,height,depth,mipLevels,NULL)==false){
 			return NULL;
@@ -331,7 +339,7 @@ PixelBufferRenderTarget::ptr TextureManager::createPixelBufferRenderTarget(){
 	return renderTarget;
 }
 
-void TextureManager::contextActivate(peeper::Renderer *renderer){
+void TextureManager::contextActivate(Renderer *renderer){
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
@@ -350,7 +358,7 @@ void TextureManager::contextActivate(peeper::Renderer *renderer){
 	}
 }
 
-void TextureManager::contextDeactivate(peeper::Renderer *renderer){
+void TextureManager::contextDeactivate(Renderer *renderer){
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);

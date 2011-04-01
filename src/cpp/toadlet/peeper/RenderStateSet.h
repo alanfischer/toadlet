@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_RENDERSTATESET_H
 
 #include <toadlet/egg/Resource.h>
+#include <toadlet/peeper/RenderStateSetDestroyedListener.h>
 #include <toadlet/peeper/BlendState.h>
 #include <toadlet/peeper/DepthState.h>
 #include <toadlet/peeper/RasterizerState.h>
@@ -37,13 +38,18 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API RenderStateSet:public egg::Resource{
+class TOADLET_API RenderStateSet{
 public:
 	TOADLET_SHARED_POINTERS(RenderStateSet);
 
 	virtual ~RenderStateSet(){}
 
 	virtual RenderStateSet *getRootRenderStateSet()=0;
+
+	virtual void setRenderStateSetDestroyedListener(RenderStateSetDestroyedListener *listener)=0;
+
+	virtual bool create()=0;
+	virtual void destroy()=0;
 
 	virtual void setBlendState(const BlendState &state)=0;
 	virtual bool getBlendState(BlendState &state) const=0;
