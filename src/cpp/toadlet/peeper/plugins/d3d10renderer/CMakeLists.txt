@@ -18,6 +18,7 @@ set (PEEPER_D3D10RENDERER_HEADERS
 	D3D10Includes.h
 	D3D10PixelBufferRenderTarget.h
 	D3D10Query.h
+	D3D10RenderStateSet.h
 	D3D10RenderTarget.h
 	D3D10Renderer.h
 	D3D10Texture.h

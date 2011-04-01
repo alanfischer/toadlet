@@ -388,9 +388,13 @@ void TMSHHandler::writeMaterial(egg::io::DataStream *stream,Material::ptr materi
 
 	stream->writeNullTerminatedString(material->getName());
 
-	stream->write((tbyte*)&material->getMaterialState(),sizeof(MaterialState));
+	MaterialState materialState;
+	material->getMaterialState(materialState);
+	stream->write((tbyte*)&materialState,sizeof(MaterialState));
 
-	stream->write((tbyte*)&material->getRasterizerState(),sizeof(RasterizerState));
+	RasterizerState rasterizerState;
+	material->getRasterizerState(rasterizerState);
+	stream->write((tbyte*)&rasterizerState,sizeof(RasterizerState));
 }
 
 }

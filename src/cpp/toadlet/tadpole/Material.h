@@ -28,14 +28,10 @@
 
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/egg/BaseResource.h>
-#include <toadlet/peeper/FogState.h>
-#include <toadlet/peeper/MaterialState.h>
-#include <toadlet/peeper/BlendState.h>
-#include <toadlet/peeper/DepthState.h>
-#include <toadlet/peeper/PointState.h>
-#include <toadlet/peeper/RasterizerState.h>
+#include <toadlet/peeper/RenderStateSet.h>
 #include <toadlet/peeper/TextureStage.h>
-#include <toadlet/peeper/Renderer.h>
+#include <toadlet/peeper/IndexData.h>
+#include <toadlet/peeper/VertexData.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -44,75 +40,48 @@ class TOADLET_API Material:public egg::BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(Material);
 
-	enum States{
-		State_MATERIAL=		1<<0,
-		State_RASTERIZER=	1<<1,
-		State_FOG=			1<<2,
-		State_ALPHATEST=	1<<3,
-		State_BLEND=		1<<4,
-		State_DEPTHSORT=	1<<5,
-		State_DEPTH=		1<<6,
-		State_POINT=		1<<7,
-	};
-	
-	Material();
+	Material(peeper::RenderStateSet::ptr renderStateSet);
 	virtual ~Material();
 
 	void destroy();
-	Material::ptr clone();
 
-	void setMaterialState(const peeper::MaterialState &state){mStates|=State_MATERIAL;mMaterialState.set(state);}
-	inline const peeper::MaterialState &getMaterialState() const{return mMaterialState;}
+	virtual void setBlendState(const peeper::BlendState &state){mRenderStateSet->setBlendState(state);}
+	virtual bool getBlendState(peeper::BlendState &state) const{return mRenderStateSet->getBlendState(state);}
 
-	void setFogState(const peeper::FogState &state){mStates|=State_FOG;mFogState.set(state);}
-	inline const peeper::FogState &getFogState() const{return mFogState;}
+	virtual void setDepthState(const peeper::DepthState &state){mRenderStateSet->setDepthState(state);}
+	virtual bool getDepthState(peeper::DepthState &state) const{return mRenderStateSet->getDepthState(state);}
 
-	void setAlphaTest(peeper::AlphaTest alphaTest,scalar cutoff){
-		mStates|=State_ALPHATEST;mAlphaTest=alphaTest;mAlphaTestCutoff=cutoff;
-	}
-	inline const peeper::AlphaTest &getAlphaTest() const{return mAlphaTest;}
-	inline scalar getAlphaTestCutoff() const{return mAlphaTestCutoff;}
+	virtual void setRasterizerState(const peeper::RasterizerState &state){mRenderStateSet->setRasterizerState(state);}
+	virtual bool getRasterizerState(peeper::RasterizerState &state) const{return mRenderStateSet->getRasterizerState(state);}
 
-	void setBlendState(const peeper::BlendState &state){mStates|=State_BLEND;mBlendState.set(state);}
-	inline const peeper::BlendState &getBlendState() const{return mBlendState;}
+	virtual void setFogState(const peeper::FogState &state){mRenderStateSet->setFogState(state);}
+	virtual bool getFogState(peeper::FogState &state) const{return mRenderStateSet->getFogState(state);}
 
-	void setDepthSorted(bool sorted){mStates|=State_DEPTHSORT;mDepthSorted=sorted;}
-	inline bool getDepthSorted() const{return mDepthSorted;}
+	virtual void setPointState(const peeper::PointState &state){mRenderStateSet->setPointState(state);}
+	virtual bool getPointState(peeper::PointState &state) const{return mRenderStateSet->getPointState(state);}
 
-	void setDepthState(const peeper::DepthState &state){mStates|=State_DEPTH;mDepthState.set(state);}
-	inline const peeper::DepthState &getDepthState() const{return mDepthState;}
-
-	void setPointState(const peeper::PointState &state){mStates|=State_POINT;mPointState.set(state);}
-	inline const peeper::PointState &getPointSprite() const{return mPointState;}
-
-	void setRasterizerState(const peeper::RasterizerState &state){mStates|=State_RASTERIZER;mRasterizerState.set(state);}
-	inline const peeper::RasterizerState &getRasterizerState() const{return mRasterizerState;}
+	virtual void setMaterialState(const peeper::MaterialState &state){mRenderStateSet->setMaterialState(state);}
+	virtual bool getMaterialState(peeper::MaterialState &state) const{return mRenderStateSet->getMaterialState(state);}
 
 	inline int getNumTextureStages() const{return mTextureStages.size();}
 	bool setTextureStage(int stage,const peeper::TextureStage::ptr &textureStage);
 	inline const peeper::TextureStage::ptr &getTextureStage(int stage) const{return mTextureStages[stage];}
 
+	void setDepthSorted(bool sorted){mDepthSorted=sorted;}
+	inline bool getDepthSorted() const{return mDepthSorted;}
+
 	void setLayer(int layer){mLayer=layer;}
 	int getLayer() const{return mLayer;}
 
-	int getStates(){return mStates;}
-	void modifyWith(Material::ptr material);
+	void modifyWith(Material *material);
 	bool getManaged(){return getUniqueHandle()!=0;}
 
-	void setupRenderer(peeper::Renderer *renderer,Material *previousMaterial=NULL);
+	inline peeper::RenderStateSet::ptr getRenderStateSet(){return mRenderStateSet;}
 	
 protected:
-	int mStates;
-	peeper::MaterialState mMaterialState;
-	peeper::FogState mFogState;
-	peeper::AlphaTest mAlphaTest;
-	scalar mAlphaTestCutoff;
-	peeper::BlendState mBlendState;
-	bool mDepthSorted;
-	peeper::DepthState mDepthState;
-	peeper::PointState mPointState;
-	peeper::RasterizerState mRasterizerState;
+	peeper::RenderStateSet::ptr mRenderStateSet;
 	egg::Collection<peeper::TextureStage::ptr> mTextureStages;
+	bool mDepthSorted;
 	int mLayer;
 };
 

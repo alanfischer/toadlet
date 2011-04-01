@@ -427,7 +427,7 @@ void StudioModelNode::modifyMaterial(Material::ptr material){
 	for(i=0;i<mSubModels.size();++i){
 		SubModel *sub=mSubModels[i];
 		if(sub->material->getManaged()){
-			sub->material=sub->material->clone();
+			sub->material=mEngine->getMaterialManager()->cloneMaterial(sub->material,false);
 		}
 
 		sub->material->modifyWith(material);

@@ -47,6 +47,9 @@ ShadowMappedSceneRenderer::ShadowMappedSceneRenderer(Scene *scene):
 	mLightCamera=engine->createNodeType(CameraNode::type(),scene);
 	mLightCamera->setProjectionFovX(Math::PI/4,1,30,60);
 	scene->getRoot()->attach(mLightCamera);
+
+	mShadowStates=engine->getMaterialManager()->createRenderStateSet();
+	mShadowStates->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT,RasterizerState::FillType_SOLID,0,0.1));
 }
 
 ShadowMappedSceneRenderer::~ShadowMappedSceneRenderer(){
@@ -66,14 +69,9 @@ void ShadowMappedSceneRenderer::renderScene(Renderer *renderer,Node *node,Camera
 
 	renderer->setRenderTarget(mShadowTarget);
 	{
-		RasterizerState state;
-		state.cull=RasterizerState::CullType_FRONT;
-		state.depthBiasSlope=0.1;
-		renderer->setRasterizerState(state);
+		renderer->setRenderStateSet(mShadowStates);
 
 		renderRenderables(mRenderableSet,renderer,mLightCamera,false);
-
-		renderer->setRasterizerState(state);
 	}
 	renderer->swap();
 

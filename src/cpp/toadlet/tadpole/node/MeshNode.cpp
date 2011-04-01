@@ -199,7 +199,7 @@ void MeshNode::modifyMaterial(Material::ptr material){
 	for(i=0;i<mSubMeshes.size();++i){
 		SubMesh *sub=mSubMeshes[i];
 		if(sub->material->getManaged()){
-			sub->material=sub->material->clone();
+			sub->material=mEngine->getMaterialManager()->cloneMaterial(sub->material,false);
 		}
 
 		sub->material->modifyWith(material);

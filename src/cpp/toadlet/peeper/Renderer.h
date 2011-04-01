@@ -48,6 +48,7 @@ class PixelBufferRenderTarget;
 class PixelBuffer;
 class PointState;
 class RasterizerState;
+class RenderStateSet;
 class Shader;
 class Texture;
 class TextureStage;
@@ -82,6 +83,7 @@ public:
 	virtual Program *createProgram()=0;
 	virtual Shader *createShader()=0;
 	virtual Query *createQuery()=0;
+	virtual RenderStateSet *createRenderStateSet()=0;
 
 	// Matrix operations
 	virtual void setModelMatrix(const Matrix4x4 &matrix)=0;
@@ -100,24 +102,14 @@ public:
 	virtual void renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData)=0;
 	virtual bool copyFrameBufferToPixelBuffer(PixelBuffer *dst)=0;
 	virtual bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src)=0;
-
-	// Render state operations
 	virtual void setDefaultStates()=0;
-	virtual void setBlendState(const BlendState &state)=0;
-	virtual void setDepthState(const DepthState &state)=0;
-	virtual void setRasterizerState(const RasterizerState &state)=0;
-	virtual void setTextureStage(int stage,TextureStage *textureStage)=0;
-	virtual void setProgram(const Program *program)=0;
+	virtual bool setRenderStateSet(RenderStateSet *set)=0;
 
-	// What to do with these?
+	// Old fixed states
 	virtual void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff)=0;
 	virtual void setNormalize(const Normalize &normalize)=0;
 	virtual void setAmbientColor(const Vector4 &ambient)=0;
-
-	// Fixed states
-	virtual void setFogState(const FogState &state)=0;
-	virtual void setPointState(const PointState &state)=0;
-	virtual void setMaterialState(const MaterialState &state)=0;
+	virtual void setTextureStage(int stage,TextureStage *textureStage)=0;
 	virtual void setLightState(int i,const LightState &light)=0;
 	virtual void setLightEnabled(int i,bool enable)=0;
 

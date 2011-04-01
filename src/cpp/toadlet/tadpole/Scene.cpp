@@ -293,7 +293,7 @@ int Scene::countActiveNodes(Node *node){
 
 void Scene::renderBoundingVolumes(Renderer *renderer,Node *node){
 	if(node==NULL){
-		mBoundMesh->subMeshes[0]->material->setupRenderer(renderer,NULL);
+		renderer->setRenderStateSet(mBoundMesh->subMeshes[0]->material->getRenderStateSet());
 		renderBoundingVolumes(renderer,mRoot);
 		return;
 	}

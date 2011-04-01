@@ -38,9 +38,8 @@ namespace toadlet{
 namespace tadpole{
 
 SceneRenderer::SceneRenderer(Scene *scene):
-	mScene(scene),
-	//mRenderableSet,
-	mPreviousMaterial(NULL)
+	mScene(scene)
+	//mRenderableSet
 {
 	mRenderableSet=RenderableSet::ptr(new RenderableSet(scene));
 }
@@ -84,13 +83,11 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 		listener->preRenderRenderables(set,renderer,camera);
 	}
 
-	mPreviousMaterial=NULL;
-
 	setupViewport(camera,renderer);
 
 	int clearFlags=camera->getClearFlags();
 	if(clearFlags>0 && !camera->getSkipFirstClear()){
-		renderer->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,true));
+//		renderer->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,true));
 		renderer->clear(clearFlags,camera->getClearColor());
 	}
 
@@ -100,7 +97,7 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 
 	if(useMaterials){
 		renderer->setDefaultStates();
-		renderer->setFogState(mScene->getFogState());
+//		renderer->setFogState(mScene->getFogState());
 	}
 
 	setupLights(set->getLightQueue(),renderer);
@@ -110,10 +107,11 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 		const RenderableSet::RenderableQueue &renderableQueue=set->getRenderableQueue(sortedIndexes[j]);
 		Material *material=renderableQueue[0].material;
 
-		if(useMaterials && material!=NULL && mPreviousMaterial!=material){
-			material->setupRenderer(renderer,mPreviousMaterial);
+		if(useMaterials && material!=NULL){
+			renderer->setRenderStateSet(material->getRenderStateSet());
+for(int i=0;i<8;++i){renderer->setTextureStage(i,NULL);}
+for(int i=0;i<material->getNumTextureStages();++i){renderer->setTextureStage(i,material->getTextureStage(i));}
 		}
-		mPreviousMaterial=material;
 
 		for(i=0;i<renderableQueue.size();++i){
 			const RenderableSet::RenderableQueueItem &item=renderableQueue[i];
@@ -126,9 +124,9 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 		}
 
 		/// @todo: Replace this specific state setting with a more generic Scene Default Material, that will be reset its specific states
-		if(useMaterials && material!=NULL && (material->getStates()&Material::State_FOG)>0){
-			renderer->setFogState(mScene->getFogState());
-		}
+//		if(useMaterials && material!=NULL && (material->getStates()&Material::State_FOG)>0){
+//			renderer->setFogState(mScene->getFogState());
+//		}
 	}
 
 	const RenderableSet::RenderableQueue &renderableQueue=set->getDepthSortedQueue();
@@ -138,19 +136,20 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 		Renderable *renderable=item.renderable;
 		renderable->getRenderTransform().getMatrix(matrix);
 
-		if(useMaterials && material!=NULL && mPreviousMaterial!=material){
-			material->setupRenderer(renderer,mPreviousMaterial);
+		if(useMaterials && material!=NULL){
+			renderer->setRenderStateSet(material->getRenderStateSet());
+for(int i=0;i<8;++i){renderer->setTextureStage(i,NULL);}
+for(int i=0;i<material->getNumTextureStages();++i){renderer->setTextureStage(i,material->getTextureStage(i));}
 		}
-		mPreviousMaterial=material;
 
 		renderer->setAmbientColor(item.ambient);
 		renderer->setModelMatrix(matrix);
 		renderable->render(renderer);
 
 		/// @todo: Replace this specific state setting with a more generic Scene Default Material, that will be reset its specific states
-		if(useMaterials && material!=NULL && (material->getStates()&Material::State_FOG)>0){
-			renderer->setFogState(mScene->getFogState());
-		}
+//		if(useMaterials && material!=NULL && (material->getStates()&Material::State_FOG)>0){
+//			renderer->setFogState(mScene->getFogState());
+//		}
 	}
 
 	if(listener!=NULL){
@@ -164,7 +163,7 @@ void SceneRenderer::setupViewport(CameraNode *camera,Renderer *renderer){
 	}
 	else{
 		RenderTarget *renderTarget=renderer->getRenderTarget();
-		renderer->setViewport(cache_render_viewport.set(0,0,renderTarget->getWidth(),renderTarget->getHeight()));
+		renderer->setViewport(Viewport(0,0,renderTarget->getWidth(),renderTarget->getHeight()));
 	}
 }
 

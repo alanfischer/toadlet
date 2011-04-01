@@ -204,7 +204,7 @@ void ParticleNode::frameUpdate(int dt,int scope){
 void ParticleNode::modifyMaterial(Material::ptr material){
 	if(mMaterial!=NULL){
 		if(mMaterial->getManaged()){
-			mMaterial=mMaterial->clone();
+			mMaterial=mEngine->getMaterialManager()->cloneMaterial(mMaterial,false);
 		}
 
 		mMaterial->modifyWith(material);

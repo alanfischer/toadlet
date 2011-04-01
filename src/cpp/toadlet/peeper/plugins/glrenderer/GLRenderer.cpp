@@ -27,6 +27,7 @@
 #include "GLVertexFormat.h"
 #include "GLRenderer.h"
 #include "GLRenderTarget.h"
+#include "GLRenderStateSet.h"
 #include "GLTexture.h"
 #if defined(TOADLET_HAS_GLFBOS)
 	#include "GLFBORenderTarget.h"
@@ -76,7 +77,6 @@ GLRenderer::GLRenderer():
 	mPBuffersAvailable(false),
 	mFBOsAvailable(false),
 
-	mInTexGen(false),
 	mMaxTexCoordIndex(0),
 	//mTexCoordIndexes,
 	mLastMaxTexCoordIndex(0),
@@ -408,6 +408,10 @@ Query *GLRenderer::createQuery(){
 		Error::unimplemented("GLRenderer::createQuery is unavailable");
 		return NULL;
 	#endif
+}
+
+RenderStateSet *GLRenderer::createRenderStateSet(){
+	return new GLRenderStateSet(this);
 }
 
 // Matrix operations
@@ -789,9 +793,11 @@ void GLRenderer::setDefaultStates(){
 	setBlendState(BlendState());
 	setDepthState(DepthState());
 	setFogState(FogState());
-	setRasterizerState(RasterizerState());
 	setNormalize(Normalize_RESCALE);
 	setPointState(PointState());
+	setRasterizerState(RasterizerState());
+	setMaterialState(MaterialState());
+	setAmbientColor(Math::ONE_VECTOR4);
 
 	int i;
 	for(i=0;i<mCapabilityState.maxTextureStages;++i){
@@ -799,21 +805,8 @@ void GLRenderer::setDefaultStates(){
 		setTextureStage(i,NULL);
 	}
 
-	setMaterialState(MaterialState());
-	setAmbientColor(Math::ONE_VECTOR4);
-	// We leave the current lights enabled because the Scene does not re-set the lights between layers
-
 	// GL specific states
 	{
-		#if !defined(TOADLET_HAS_GLES)
-			mInTexGen=false;
-
-			glDisable(GL_TEXTURE_GEN_S);
-			glDisable(GL_TEXTURE_GEN_T);
-			glDisable(GL_TEXTURE_GEN_R);
-			glDisable(GL_TEXTURE_GEN_Q);
-		#endif
-
 		// Move specular to separate color
 		#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_11)
 		if(gl_version>=11){
@@ -823,12 +816,42 @@ void GLRenderer::setDefaultStates(){
 
 		glPixelStorei(GL_PACK_ALIGNMENT,1);
 		glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-		
-		/// @todo: Move this to a render state
-		glEnable(GL_MULTISAMPLE);
 	}
 
 	TOADLET_CHECK_GLERROR("setDefaultStates");
+}
+
+bool GLRenderer::setRenderStateSet(RenderStateSet *set){
+	GLRenderStateSet *glset=NULL;
+	if(set!=NULL){
+		glset=(GLRenderStateSet*)set->getRootRenderStateSet();
+		if(glset==NULL){
+			Error::nullPointer(Categories::TOADLET_PEEPER,
+				"RenderStateSet is not a GLRenderStateSet");
+			return false;
+		}
+	}
+
+	if(glset->mBlendState!=NULL){
+		setBlendState(*glset->mBlendState);
+	}
+	if(glset->mDepthState!=NULL){
+		setDepthState(*glset->mDepthState);
+	}
+	if(glset->mRasterizerState!=NULL){
+		setRasterizerState(*glset->mRasterizerState);
+	}
+	if(glset->mFogState!=NULL){
+		setFogState(*glset->mFogState);
+	}
+	if(glset->mPointState!=NULL){
+		setPointState(*glset->mPointState);
+	}
+	if(glset->mMaterialState!=NULL){
+		setMaterialState(*glset->mMaterialState);
+	}
+
+	return true;
 }
 
 void GLRenderer::setAlphaTest(const AlphaTest &alphaTest,scalar cutoff){
@@ -1076,6 +1099,13 @@ void GLRenderer::setRasterizerState(const RasterizerState &state){
 		glEnable(GL_POLYGON_OFFSET_FILL);
 	}
 
+	if(state.multisample){
+		glEnable(GL_MULTISAMPLE);
+	}
+	else{
+		glDisable(GL_MULTISAMPLE);
+	}
+
 	if(state.dither){
 		glEnable(GL_DITHER);
 	}
@@ -1202,8 +1232,6 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 						glEnable(GL_TEXTURE_GEN_Q);
 
 						glPopMatrix();
-
-						mInTexGen=true;
 					#endif
 				}
 			}
@@ -1216,9 +1244,7 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 			}
 
 			#if !defined(TOADLET_HAS_GLES)
-				if(mInTexGen && calculation<=TextureStage::Calculation_NORMAL){
-					mInTexGen=false;
-
+				if(calculation<=TextureStage::Calculation_NORMAL){
 					glDisable(GL_TEXTURE_GEN_S);
 					glDisable(GL_TEXTURE_GEN_T);
 					glDisable(GL_TEXTURE_GEN_R);
@@ -1347,7 +1373,9 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 		#endif
 
 		if(stage==0){
-			setTexturePerspective(textureStage->perspective);
+			#if defined(TOADLET_HAS_GLES)
+				glHint(GL_PERSPECTIVE_CORRECTION_HINT,textureStage->perspective?GL_NICEST:GL_FASTEST);
+			#endif
 		}
 
 		mTexCoordIndexes[stage]=textureStage->texCoordIndex;
@@ -1372,9 +1400,6 @@ void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
 	}
 
 	TOADLET_CHECK_GLERROR("setTextureStage");
-}
-
-void GLRenderer::setProgram(const Program *program){
 }
 
 void GLRenderer::setLightState(int i,const LightState &state){
@@ -1515,13 +1540,6 @@ int GLRenderer::getClosestTextureFormat(int textureFormat){
 // Thanks to Ogre3D for this threshold
 bool GLRenderer::useMapping(GLBuffer *buffer) const{
 	return buffer->mDataSize>(1024 * 32);
-}
-
-void GLRenderer::setTexturePerspective(bool texturePerspective){
-	#if defined(TOADLET_HAS_GLES)
-		glHint(GL_PERSPECTIVE_CORRECTION_HINT,texturePerspective?GL_NICEST:GL_FASTEST);
-		TOADLET_CHECK_GLERROR("setTexturePerspective");
-	#endif
 }
 
 int GLRenderer::setVertexData(const VertexData *vertexData,int lastSemanticBits){

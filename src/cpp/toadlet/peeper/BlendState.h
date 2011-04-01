@@ -113,10 +113,10 @@ public:
 		return *this;
 	}
 
-	BlendState &set(Operation source,Operation dest,int colorWrite=ColorWrite_ALL){
-		this->source=source;
-		this->dest=dest;
-		this->colorWrite=colorWrite;
+	BlendState &set(Operation source1,Operation dest1,int colorWrite1=ColorWrite_ALL){
+		source=source1;
+		dest=dest1;
+		colorWrite=colorWrite1;
 
 		return *this;
 	}
