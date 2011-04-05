@@ -98,11 +98,8 @@ D3D10_PASS_DESC passDesc;
 	void setLightEnabled(int i,bool enable){}
 
 	// Misc operations
-	int getClosestTextureFormat(int textureFormat);
-	void setStrictFormats(bool strict){mStrict=strict;}
-	bool getStrictFormats(){return mStrict;}
+	int getCloseTextureFormat(int textureFormat,int usage);
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
-
 	const CapabilityState &getCapabilityState(){return mCapabilityState;}
 
 	inline ID3D10Device *getD3D10Device(){return mD3DDevice;}
@@ -128,7 +125,6 @@ protected:
 	D3D10RenderTarget *mD3DPrimaryRenderTarget;
 	RenderTarget *mRenderTarget;
 	D3D10RenderTarget *mD3DRenderTarget;
-	bool mStrict;
 
 	Matrix4x4 mModelMatrix;
 	Matrix4x4 mViewMatrix;

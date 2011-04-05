@@ -77,7 +77,7 @@ protected:
 
 	MMPlayer *mPlayer;
 	AudioStream::ptr mAudioStream;
-	MMAudioBuffer::ptr mAudioBuffer;
+	AudioBuffer::ptr mAudioBuffer;
 	bool mPlaying;
 	bool mLooping;
 	scalar mGain;

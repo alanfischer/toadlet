@@ -72,8 +72,8 @@ bool Material::setTextureStage(int stage,const TextureStage::ptr &textureStage){
 }
 
 void Material::modifyWith(Material *material){
-	RenderStateSet::ptr src=material->getRenderStateSet();
-	RenderStateSet::ptr dst=getRenderStateSet();
+	RenderStateSet::ptr src=material->mRenderStateSet;
+	RenderStateSet::ptr dst=mRenderStateSet;
 
 	BlendState blendState;
 	if(src->getBlendState(blendState)) dst->setBlendState(blendState);
@@ -92,6 +92,24 @@ void Material::modifyWith(Material *material){
 
 	MaterialState materialState;
 	if(src->getMaterialState(materialState)) dst->setMaterialState(materialState);
+
+	int i;
+	for(i=0;i<material->getNumTextureStages();++i){
+		setTextureStage(i,material->getTextureStage(i)->clone());
+	}
+}
+
+/// @todo: Optimize this so we're not resetting a ton of texture states
+void Material::setupRenderer(Renderer *renderer){
+	renderer->setRenderStateSet(mRenderStateSet);
+
+	int i;
+	for(i=0;i<getNumTextureStages();++i){
+		renderer->setTextureStage(i,getTextureStage(i));
+	}
+	for(;i<renderer->getCapabilityState().maxTextureStages;++i){
+		renderer->setTextureStage(i,NULL);
+	}
 }
 
 }

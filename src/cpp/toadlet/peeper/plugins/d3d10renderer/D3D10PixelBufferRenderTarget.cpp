@@ -89,7 +89,7 @@ void D3D10PixelBufferRenderTarget::swap(){
 	int i;
 	for(i=0;i<mBufferAttachments.size();++i){
 		if(mBufferAttachments[i]!=Attachment_DEPTH_STENCIL){
-			D3D10TextureMipPixelBuffer::ptr buffer=shared_static_cast<D3D10TextureMipPixelBuffer>(mBuffers[i]);
+			D3D10TextureMipPixelBuffer *buffer=(D3D10TextureMipPixelBuffer*)(mBuffers[i]->getRootPixelBuffer());
 			buffer->getTexture()->generateMipLevels();
 		}
 	}
@@ -155,7 +155,7 @@ bool D3D10PixelBufferRenderTarget::compile(){
 
 	mRenderTargetViews.clear();
 	for(i=0;i<mBufferAttachments.size();++i){
-		D3D10TextureMipPixelBuffer::ptr buffer=shared_static_cast<D3D10TextureMipPixelBuffer>(mBuffers[i]);
+		D3D10TextureMipPixelBuffer *buffer=(D3D10TextureMipPixelBuffer*)(mBuffers[i]->getRootPixelBuffer());
 		if(mBufferAttachments[i]==Attachment_DEPTH_STENCIL){
 			mDepthStencilView=buffer->getD3D10DepthStencilView();
 		}

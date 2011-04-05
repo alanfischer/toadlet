@@ -74,12 +74,10 @@ void RenderableSet::queueRenderable(Renderable *renderable){
 	const Transform &transform=renderable->getRenderTransform();
 	const Bound &bound=renderable->getRenderBound();
 
-	Vector4 ambient;
 	/// @todo: Add a flag to skip this, for shadow calculations
-	if(material!=NULL){
-		if(mRoot->findAmbientForPoint(ambient,transform.getTranslate())==false){
-			ambient.set(mScene->getAmbientColor());
-		}
+	Vector4 ambient;
+	if(mRoot->findAmbientForPoint(ambient,transform.getTranslate())==false){
+		ambient.set(mScene->getAmbientColor());
 	}
 
 	if(material!=NULL && material->getDepthSorted()){

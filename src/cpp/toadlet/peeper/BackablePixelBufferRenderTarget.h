@@ -39,6 +39,7 @@ public:
 	virtual ~BackablePixelBufferRenderTarget();
 
 	virtual RenderTarget *getRootRenderTarget(){return mBack!=NULL?mBack->getRootRenderTarget():NULL;}
+	virtual PixelBufferRenderTarget *getRootPixelBufferRenderTarget(){return mBack!=NULL?mBack->getRootPixelBufferRenderTarget():NULL;}
 
 	virtual void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
 

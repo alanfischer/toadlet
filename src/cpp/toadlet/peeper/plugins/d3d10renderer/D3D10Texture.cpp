@@ -83,17 +83,7 @@ D3D10Texture::~D3D10Texture(){
 bool D3D10Texture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
 	destroy();
 
-	int closestFormat=mRenderer!=NULL?mRenderer->getClosestTextureFormat(format):format;
-	if(format!=closestFormat){
-		if(mRenderer->getStrictFormats()){
-			Error::unknown(Categories::TOADLET_PEEPER,
-				"D3D10Texture: Invalid format");
-			return false;
-		}
-		else{
-			format=closestFormat;
-		}
-	}
+	width=width>0?width:1;height=height>0?height:1;depth=depth>0?depth:1;
 
 	mUsage=usage;
 	mDimension=dimension;
@@ -103,31 +93,26 @@ bool D3D10Texture::create(int usage,Dimension dimension,int format,int width,int
 	mDepth=depth;
 	mMipLevels=mipLevels;
 
+	bool result=false;
 	if((mUsage&Usage_BIT_STATIC)>0){
-/// @todo: Remove this Usage modification if no mips were specified.  I think I should just enforce that mips be specified when using a static resource instead.  So by removing this, it should error when not specifying mips.
-//		if(mipDatas!=NULL){
-			createContext(mipLevels,mipDatas);
-//		}
-//		else{
-//			mUsage&=~Usage_BIT_STATIC;
-//			mUsage|=Usage_BIT_STREAM;
-//		}
+		result=createContext(mipLevels,mipDatas);
 	}
-	
-	if((mUsage&Usage_BIT_STATIC)==0){
-		createContext(0,NULL);
+	else{
+		result=createContext(0,NULL);
 
-		int specifiedMipLevels=mMipLevels>0?mMipLevels:1;
-		if(mipDatas!=NULL){
+		if(result && mipDatas!=NULL){
+			int specifiedMipLevels=mMipLevels>0?mMipLevels:1;
 			int level;
 			for(level=0;level<specifiedMipLevels;++level){
-				load(width,height,depth,level,mipDatas[level]);
+				if(mipDatas[level]!=NULL){
+					load(width,height,depth,level,mipDatas[level]);
+				}
 				width/=2;height/=2;depth/=2;
 			}
 		}
 	}
 
-	return true;
+	return result;
 }
 
 void D3D10Texture::destroy(){
@@ -220,6 +205,7 @@ bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
 			desc.MiscFlags=miscFlags;
 			desc.Format=dxgiFormat;
 			desc.ArraySize=1;
+
 			ID3D10Texture2D *texture=NULL;
 			result=device->CreateTexture2D(&desc,sData,&texture);
 			TOADLET_CHECK_D3D10ERROR(result,"CreateTexture2D");
@@ -252,7 +238,12 @@ bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
 		delete sData;
 	}
 
-	return SUCCEEDED(result);
+	if(FAILED(result)){
+		Error::unknown("error in createContext");
+		return false;
+	}
+
+	return true;
 }
 
 bool D3D10Texture::destroyContext(){

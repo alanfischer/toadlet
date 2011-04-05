@@ -106,10 +106,8 @@ public:
 	void setAmbientColor(const Vector4 &ambient);
 
 	// Misc operations
+	int getCloseTextureFormat(int textureFormat,int usage);
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
-	int getClosestTextureFormat(int textureFormat);
-	void setStrictFormats(bool strict){mStrict=strict;}
-	bool getStrictFormats(){return mStrict;}
 	const CapabilityState &getCapabilityState(){return mCapabilityState;}
 
 	void setBlendState(const BlendState &state);
@@ -193,7 +191,6 @@ protected:
 	GLRenderTarget *mGLPrimaryRenderTarget;
 	RenderTarget *mRenderTarget;
 	GLRenderTarget *mGLRenderTarget;
-	bool mStrict;
 
 	#if defined(TOADLET_DEBUG)
 		int mBeginEndCounter;

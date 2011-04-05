@@ -95,8 +95,7 @@ GLRenderer::GLRenderer():
 	mPrimaryRenderTarget(NULL),
 	mGLPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL),
-	mGLRenderTarget(NULL),
-	mStrict(false)
+	mGLRenderTarget(NULL)
 
 	#if defined(TOADLET_DEBUG)
 		,mBeginEndCounter(0)
@@ -1531,14 +1530,17 @@ void GLRenderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &res
 				0,          0,          0,          Math::ONE);
 }
 
-int GLRenderer::getClosestTextureFormat(int textureFormat){
-	if(textureFormat==Texture::Format_BGR_8){
-		textureFormat=Texture::Format_RGB_8;
+int GLRenderer::getCloseTextureFormat(int textureFormat,int usage){
+	switch(textureFormat){
+		case Texture::Format_R_8:
+		case Texture::Format_RG_8:
+		case Texture::Format_BGR_8:
+			return Texture::Format_RGB_8;
+		case Texture::Format_BGRA_8:
+			return Texture::Format_RGBA_8;
+		default:
+			return textureFormat;
 	}
-	if(textureFormat==Texture::Format_BGRA_8){
-		textureFormat=Texture::Format_RGBA_8;
-	}
-	return textureFormat;
 }
 
 // Thanks to Ogre3D for this threshold
@@ -1877,63 +1879,55 @@ GLenum GLRenderer::getGLDataType(int format){
 }
 
 GLuint GLRenderer::getGLFormat(int textureFormat,bool internal){
-	GLuint format=0;
-
 	if((textureFormat&Texture::Format_BIT_L)>0){
-		format=GL_LUMINANCE;
+		return GL_LUMINANCE;
 	}
 	else if((textureFormat&Texture::Format_BIT_A)>0){
-		format=GL_ALPHA;
+		return GL_ALPHA;
 	}
 	else if((textureFormat&Texture::Format_BIT_LA)>0){
-		format=GL_LUMINANCE_ALPHA;
+		return GL_LUMINANCE_ALPHA;
 	}
 	else if((textureFormat&Texture::Format_BIT_RGB)>0){
-		format=GL_RGB;
+		return GL_RGB;
 	}
 	else if((textureFormat&Texture::Format_BIT_RGBA)>0){
-		format=GL_RGBA;
+		return GL_RGBA;
 	}
 	#if defined(TOADLET_HAS_GLEW)
 		else if((textureFormat&Texture::Format_BIT_DXT1)>0){
-			format=GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+			return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
 		}
 		else if((textureFormat&Texture::Format_BIT_DXT2)>0 ||
 				(textureFormat&Texture::Format_BIT_DXT3)>0){
-			format=GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+			return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
 		}
 		else if((textureFormat&Texture::Format_BIT_DXT4)>0 ||
 				(textureFormat&Texture::Format_BIT_DXT5)>0){
-			format=GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+			return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 		}
 	#endif
 
 	#if !defined(TOADLET_HAS_GLES) || defined(TOADLET_HAS_EAGL)
 		else if((textureFormat&Texture::Format_BIT_DEPTH)>0){
 			if(internal && (textureFormat&Texture::Format_BIT_UINT_16)>0){
-				format=GL_DEPTH_COMPONENT16;
+				return GL_DEPTH_COMPONENT16;
 			}
 			else if(internal && (textureFormat&Texture::Format_BIT_UINT_24)>0){
-				format=GL_DEPTH_COMPONENT24;
+				return GL_DEPTH_COMPONENT24;
 			}
 			#if !defined(TOADLET_HAS_EAGL)
 				else if(internal && (textureFormat&Texture::Format_BIT_UINT_32)>0){
-					format=GL_DEPTH_COMPONENT32;
+					return GL_DEPTH_COMPONENT32;
 				}
 				else{
-					format=GL_DEPTH_COMPONENT;
+					return GL_DEPTH_COMPONENT;
 				}
 			#endif
 		}
 	#endif
 
-	if(format==0){
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"getGLFormat: Invalid format");
-		return 0;
-	}
-
-	return format;
+	return 0;
 }
 
 GLuint GLRenderer::getGLType(int textureFormat){
@@ -1953,8 +1947,6 @@ GLuint GLRenderer::getGLType(int textureFormat){
 		return GL_UNSIGNED_SHORT_4_4_4_4;
 	}
 	else{
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"getGLType: Invalid type");
 		return 0;
 	}
 }

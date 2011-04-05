@@ -85,8 +85,7 @@ D3D9Renderer::D3D9Renderer():
 	mPrimaryRenderTarget(NULL),
 	mD3DPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL),
-	mD3DRenderTarget(NULL),
-	mStrict(false)
+	mD3DRenderTarget(NULL)
 
 	//mStatisticsSet,
 	//mCapabilitySet
@@ -1013,16 +1012,30 @@ void D3D9Renderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &r
 				0,          0,           0,         Math::ONE);
 }
 
-int D3D9Renderer::getClosestTextureFormat(int format){
+int D3D9Renderer::getCloseTextureFormat(int format,int usage){
+	int closeFormat=getCloseTextureFormat(format);
+	DWORD d3dusage=getD3DUSAGE(closeFormat,usage);
+	D3DFORMAT d3dformat=getD3DFORMAT(closeFormat);
+	if(isD3DFORMATValid(d3dformat,d3dusage)==false){
+		return Texture::Format_BGRA_8;
+	}
+	else{
+		return closeFormat;
+	}
+}
+
+int D3D9Renderer::getCloseTextureFormat(int format){
 	switch(format){
 		#if defined(TOADLET_SET_D3DM)
 			case Texture::Format_L_8:
-				return Texture::Format_BGR_8;
+				else return Texture::Format_BGR_8;
 			case Texture::Format_A_8:
 			case Texture::Format_LA_8:
-				return Texture::Format_BGRA_8;
+				else return return Texture::Format_BGRA_8;
 		#else
 			case Texture::Format_L_8:
+			case Texture::Format_R_8:
+			case Texture::Format_RG_8:
 				return Texture::Format_BGR_8;
 			case Texture::Format_A_8:
 			case Texture::Format_LA_8:
@@ -1112,10 +1125,47 @@ D3DFORMAT D3D9Renderer::getD3DFORMAT(int format){
 		case Texture::Format_RGBA_DXT5:
 			return D3DFMT_DXT5;
 		default:
-			Error::unknown(Categories::TOADLET_PEEPER,
-				"invalid type");
 			return D3DFMT_UNKNOWN;
 	}
+}
+
+DWORD D3D9Renderer::getD3DUSAGE(int textureFormat,int usage){
+	DWORD d3dusage=
+		#if defined(TOADLET_SET_D3DM)
+			D3DUSAGE_LOCKABLE;
+		#else
+			0;
+		#endif
+	if((usage&Texture::Usage_BIT_RENDERTARGET)>0){
+		if((textureFormat&Texture::Format_BIT_DEPTH)>0){
+			d3dusage|=D3DUSAGE_DEPTHSTENCIL;
+		}
+		else{
+			d3dusage|=D3DUSAGE_RENDERTARGET;
+		}
+	}
+	if((usage&Texture::Usage_BIT_STREAM)>0){
+		d3dusage|=D3DUSAGE_DYNAMIC;
+	}
+	return d3dusage;
+}
+
+D3DPOOL D3D9Renderer::getD3DPOOL(int usage){
+	D3DPOOL d3dpool;
+	#if defined(TOADLET_SET_D3DM)
+		d3dpool=D3DPOOL_MANAGED;
+	#else
+		if((usage&Buffer::Usage_BIT_STAGING)>0){
+			d3dpool=D3DPOOL_SYSTEMMEM;
+		}
+		else if((usage&(Buffer::Usage_BIT_DYNAMIC|Texture::Usage_BIT_RENDERTARGET))>0){
+			d3dpool=D3DPOOL_DEFAULT;
+		}
+		else{
+			d3dpool=D3DPOOL_MANAGED;
+		}
+	#endif
+	return d3dpool;
 }
 
 DWORD D3D9Renderer::getD3DTADDRESS(TextureStage::AddressMode addressMode){

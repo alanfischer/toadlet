@@ -45,10 +45,25 @@ public:
 		Usage_BIT_STREAM=	1<<1,	// Data changes once per frame or less
 		Usage_BIT_DYNAMIC=	1<<2,	// Data changes multiple times per frame
 		Usage_BIT_STAGING=	1<<3,	// Data is only used for loading, and is lockable
+
 		Usage_BIT_NPOT_RESTRICTED=	1<<4,	// Texture is a size thats non-power-of-two, but restricted in usage
 		Usage_BIT_RENDERTARGET=		1<<5,	// Texture will have its surfaces used by a SurfaceRenderTarget
 		Usage_BIT_AUTOGEN_MIPMAPS=	1<<6,	// Texture autogenerates its mipmap levels
 	};
+
+	// Requested Format: Format initially requested by user
+	// Texture Format: Format chosen by texture based on whatever the renderer can do
+	// Can the format of the texture change depending on the renderer?  Yes, you dont always have the format you want, it is converted to the Texture Format when accessed by the user.
+	// When you specify a Requested Format, you should be able to specify how Strict you want it to be.
+	// If its fully strict (both size & semantic) then only exact formats will match.  Makes it hard to switch between renderer.
+	// However you can easily spectify just semantic strict and it should work as expected.
+	// The BackableTexture remembers the Requested Semantic and Format, and uses that to choose Formats for Back Textures.
+
+	// X Remove StrictFormats
+	// X D3D9Texture no longer internally uses a different format, it just has a smarter Texture Format selector based on Usage that querys the Device
+	// In a way, StrictFormat behavior is always enabled.  If a Texture is created of a format that isn't available, it Errors.
+	// BackableTexture implements format conversion, and we move MipMap generation to the FormatConversion area also.
+	// Then BackableTexture can use the MipMap generation when creating Backs, and TextureManager will use the same MipMap generation.
 
 	virtual ~Texture(){}
 

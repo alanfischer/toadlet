@@ -83,7 +83,7 @@ bool ImageFormatConversion::convert(tbyte *src,int srcFormat,int srcRowPitch,int
 			}
 		}
 	}
-	else if(srcFormat==Format_L_8 && (dstFormat==Format_RGBA_8 || dstFormat==Format_BGRA_8)){
+	else if((srcFormat==Format_L_8 || srcFormat==Format_R_8) && (dstFormat==Format_RGBA_8 || dstFormat==Format_BGRA_8)){
 		for(k=0;k<depth;++k){
 			for(j=0;j<height;++j){
 				for(i=0;i<width;++i){
@@ -105,7 +105,7 @@ bool ImageFormatConversion::convert(tbyte *src,int srcFormat,int srcRowPitch,int
 			}
 		}
 	}
-	else if(srcFormat==Format_L_8 && (dstFormat==Format_RGB_8 || dstFormat==Format_BGR_8)){
+	else if((srcFormat==Format_L_8 || srcFormat==Format_R_8) && (dstFormat==Format_RGB_8 || dstFormat==Format_BGR_8)){
 		for(k=0;k<depth;++k){
 			for(j=0;j<height;++j){
 				for(i=0;i<width;++i){
@@ -118,7 +118,7 @@ bool ImageFormatConversion::convert(tbyte *src,int srcFormat,int srcRowPitch,int
 			}
 		}
 	}
-	else if((srcFormat==Format_RGB_8 || srcFormat==Format_BGR_8) && dstFormat==Format_L_8){
+	else if((srcFormat==Format_RGB_8 || srcFormat==Format_BGR_8) && (dstFormat==Format_L_8 || dstFormat==Format_R_8)){
 		for(k=0;k<depth;++k){
 			for(j=0;j<height;++j){
 				for(i=0;i<width;++i){

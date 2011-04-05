@@ -40,6 +40,7 @@ public:
 	virtual ~D3D10PixelBufferRenderTarget();
 
 	RenderTarget *getRootRenderTarget(){return (D3D10RenderTarget*)this;}
+	PixelBufferRenderTarget *getRootPixelBufferRenderTarget(){return this;}
 
 	void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
 

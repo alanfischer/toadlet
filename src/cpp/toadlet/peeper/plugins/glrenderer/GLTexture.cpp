@@ -59,6 +59,10 @@ GLTexture::~GLTexture(){
 }
 
 bool GLTexture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]){
+	destroy();
+
+	width=width>0?width:1;height=height>0?height:1;depth=depth>0?depth:1;
+
 	if((Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || (dimension!=Dimension_CUBE && Math::isPowerOf2(depth)==false)) &&
 		mRenderer->getCapabilityState().textureNonPowerOf2==false &&
 		(mRenderer->getCapabilityState().textureNonPowerOf2Restricted==false || (usage&Usage_BIT_NPOT_RESTRICTED)==0))
@@ -66,18 +70,6 @@ bool GLTexture::create(int usage,Dimension dimension,int format,int width,int he
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"GLTexture: Cannot load a non power of 2 texture");
 		return false;
-	}
-
-	int closestFormat=mRenderer->getClosestTextureFormat(format);
-	if(format!=closestFormat){
-		if(mRenderer->getStrictFormats()){
-			Error::unknown(Categories::TOADLET_PEEPER,
-				"GLTexture: Invalid format");
-			return false;
-		}
-		else{
-			format=closestFormat;
-		}
 	}
 
 	mUsage=usage;
@@ -88,9 +80,9 @@ bool GLTexture::create(int usage,Dimension dimension,int format,int width,int he
 	mDepth=depth;
 	mMipLevels=mipLevels;
 
-	createContext(mipLevels,mipDatas);
+	bool result=createContext(mipLevels,mipDatas);
 
-	return true;
+	return result;
 }
 
 void GLTexture::destroy(){
@@ -154,6 +146,10 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 	GLint glinternalFormat=GLRenderer::getGLFormat(mFormat,true);
 	GLint glformat=GLRenderer::getGLFormat(mFormat,false);
 	GLint gltype=ImageFormatConversion::isFormatCompressed(mFormat)==false?GLRenderer::getGLType(mFormat):0;
+
+	if(glinternalFormat==0 || glformat==0){
+		return false;
+	}
 
 	// Allocate texture memory
 	int level=0,width=mWidth,height=mHeight,depth=mDepth;
@@ -257,8 +253,13 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 	}
 
 	TOADLET_CHECK_GLERROR("GLTexture::createContext");
-	
-	return mHandle!=0;
+
+	if(mHandle==0){
+		Error::unknown("error in createContext");
+		return false;
+	}
+
+	return true;
 }
 
 bool GLTexture::destroyContext(){

@@ -108,9 +108,7 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 		Material *material=renderableQueue[0].material;
 
 		if(useMaterials && material!=NULL){
-			renderer->setRenderStateSet(material->getRenderStateSet());
-for(int i=0;i<8;++i){renderer->setTextureStage(i,NULL);}
-for(int i=0;i<material->getNumTextureStages();++i){renderer->setTextureStage(i,material->getTextureStage(i));}
+			material->setupRenderer(renderer);
 		}
 
 		for(i=0;i<renderableQueue.size();++i){
@@ -137,9 +135,7 @@ for(int i=0;i<material->getNumTextureStages();++i){renderer->setTextureStage(i,m
 		renderable->getRenderTransform().getMatrix(matrix);
 
 		if(useMaterials && material!=NULL){
-			renderer->setRenderStateSet(material->getRenderStateSet());
-for(int i=0;i<8;++i){renderer->setTextureStage(i,NULL);}
-for(int i=0;i<material->getNumTextureStages();++i){renderer->setTextureStage(i,material->getTextureStage(i));}
+			material->setupRenderer(renderer);
 		}
 
 		renderer->setAmbientColor(item.ambient);

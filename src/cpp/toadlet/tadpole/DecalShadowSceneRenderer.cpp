@@ -57,7 +57,7 @@ void DecalShadowSceneRenderer::renderRenderables(RenderableSet *set,Renderer *re
 
 	const LightState &state=light->getLightState();
 
-	renderer->setRenderStateSet(mShadowMaterial->getRenderStateSet());
+	mShadowMaterial->setupRenderer(renderer);
 
 	int i,j;
 	for(i=0;i<set->getNumRenderableQueues();++i){

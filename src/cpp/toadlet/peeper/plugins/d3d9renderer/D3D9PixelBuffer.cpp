@@ -59,17 +59,7 @@ bool D3D9PixelBuffer::create(int usage,int access,int pixelFormat,int width,int 
 		return false;
 	}
 
-	int closestFormat=mRenderer->getClosestTextureFormat(pixelFormat);
-	if(pixelFormat!=closestFormat){
-		if(mRenderer->getStrictFormats()){
-			Error::unknown(Categories::TOADLET_PEEPER,
-				"D3D9PixelBuffer: Invalid format");
-			return false;
-		}
-		else{
-			pixelFormat=closestFormat;
-		}
-	}
+	pixelFormat=mRenderer->getCloseTextureFormat(pixelFormat);
 
 	D3DFORMAT d3dformat=D3D9Renderer::getD3DFORMAT(pixelFormat);
 	HRESULT result=S_OK;

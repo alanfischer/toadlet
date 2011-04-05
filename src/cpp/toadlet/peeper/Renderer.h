@@ -64,6 +64,10 @@ public:
 		RendererStatus_NEEDSRESET,
 	};
 
+	enum FormatMatch{
+		FormatMatch_BIT_EXACT=1<<0,
+	};
+
 	virtual ~Renderer(){}
 
 	// Creation/Destruction
@@ -114,9 +118,7 @@ public:
 	virtual void setLightEnabled(int i,bool enable)=0;
 
 	// Misc operations
-	virtual int getClosestTextureFormat(int textureFormat)=0;
-	virtual void setStrictFormats(bool strict)=0;
-	virtual bool getStrictFormats()=0;
+	virtual int getCloseTextureFormat(int format,int usage)=0;
 	virtual void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result)=0;
 	virtual const CapabilityState &getCapabilityState()=0;
 };

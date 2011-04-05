@@ -61,7 +61,7 @@ bool MMAudio::create(AudioBuffer::ptr audioBuffer){
 	mPlayer->internal_audioCreate(this);
 
 	mAudioStream=NULL;
-	mAudioBuffer=shared_static_cast<MMAudioBuffer>(audioBuffer);
+	mAudioBuffer=audioBuffer;
 
 	return true;
 }
@@ -122,11 +122,12 @@ int MMAudio::read(tbyte *data,int length){
 		}
 	}
 	else if(mAudioBuffer!=NULL){
-		amount=Math::minVal(length,mAudioBuffer->mLength-mPosition);
-		memcpy(data,mAudioBuffer->mData+mPosition,amount);
+		MMAudioBuffer *mmaudioBuffer=(MMAudioBuffer*)mAudioBuffer->getRootAudioBuffer();
+		amount=Math::minVal(length,mmaudioBuffer->mLength-mPosition);
+		memcpy(data,mmaudioBuffer->mData+mPosition,amount);
 		mPosition+=amount;
 
-		if(mPosition>=mAudioBuffer->mLength){
+		if(mPosition>=mmaudioBuffer->mLength){
 			if(mLooping){
 				mPosition=0;
 			}

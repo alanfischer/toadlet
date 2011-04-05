@@ -32,6 +32,7 @@
 #include <toadlet/peeper/TextureStage.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
+#include <toadlet/peeper/Renderer.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -76,7 +77,7 @@ public:
 	void modifyWith(Material *material);
 	bool getManaged(){return getUniqueHandle()!=0;}
 
-	inline peeper::RenderStateSet::ptr getRenderStateSet(){return mRenderStateSet;}
+	void setupRenderer(peeper::Renderer *renderer);
 	
 protected:
 	peeper::RenderStateSet::ptr mRenderStateSet;

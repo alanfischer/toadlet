@@ -146,6 +146,93 @@ double DataStream::readBDouble(){
 	return d;
 }
 
+
+int DataStream::readBVector2(math::Vector2 &v){
+	v.x=readBFloat();
+	v.y=readBFloat();
+	return 4*2;
+}
+
+int DataStream::readBVector3(math::Vector3 &v){
+	v.x=readBFloat();
+	v.y=readBFloat();
+	v.z=readBFloat();
+	return 4*3;
+}
+
+int DataStream::readBVector4(math::Vector4 &v){
+	v.x=readBFloat();
+	v.y=readBFloat();
+	v.z=readBFloat();
+	v.w=readBFloat();
+	return 4*4;
+}
+
+int DataStream::readBQuaternion(math::Quaternion &q){
+	q.x=readBFloat();
+	q.y=readBFloat();
+	q.z=readBFloat();
+	q.w=readBFloat();
+	return 4*4;
+}
+
+int DataStream::readBAABox(math::AABox &a){
+	int amount=0;
+	amount+=readBVector3(a.mins);
+	amount+=readBVector3(a.maxs);
+	return amount;
+}
+
+int DataStream::readBSphere(math::Sphere &s){
+	int amount=0;
+	amount+=readBVector3(s.origin);
+	s.radius=readBFloat();amount+=4;
+	return amount;
+}
+
+int DataStream::readBVector2(mathfixed::Vector2 &v){
+	v.x=readBInt32();
+	v.y=readBInt32();
+	return 4*2;
+}
+
+int DataStream::readBVector3(mathfixed::Vector3 &v){
+	v.x=readBInt32();
+	v.y=readBInt32();
+	v.z=readBInt32();
+	return 4*3;
+}
+
+int DataStream::readBVector4(mathfixed::Vector4 &v){
+	v.x=readBInt32();
+	v.y=readBInt32();
+	v.z=readBInt32();
+	v.w=readBInt32();
+	return 4*4;
+}
+
+int DataStream::readBQuaternion(mathfixed::Quaternion &q){
+	q.x=readBInt32();
+	q.y=readBInt32();
+	q.z=readBInt32();
+	q.w=readBInt32();
+	return 4*4;
+}
+
+int DataStream::readBAABox(mathfixed::AABox &a){
+	int amount=0;
+	amount+=readBVector3(a.mins);
+	amount+=readBVector3(a.maxs);
+	return amount;
+}
+
+int DataStream::readBSphere(mathfixed::Sphere &s){
+	int amount=0;
+	amount+=readBVector3(s.origin);
+	s.radius=readBInt32();amount+=4;
+	return amount;
+}
+
 int DataStream::readBInt16String(String &s){
 	int16 len=readBInt16();
 	int amt=2;
