@@ -92,7 +92,7 @@ namespace peeper{
 #if defined(TOADLET_DEBUG)
 	#define TOADLET_CHECK_D3D10ERROR(result,function) \
 		if(FAILED(result)) \
-			toadlet::egg::Error::unknown(toadlet::egg::Categories::TOADLET_PEEPER, \
+			toadlet::egg::Logger::warning(toadlet::egg::Categories::TOADLET_PEEPER, \
 			toadlet::egg::String("D3D10 Error in ") + function + ": error=" + (int)result); \
 
 #else

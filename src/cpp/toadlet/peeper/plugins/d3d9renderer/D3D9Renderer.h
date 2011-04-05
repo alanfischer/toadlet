@@ -95,9 +95,8 @@ public:
 
 	// Misc operations
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
-	int getClosestTextureFormat(int textureFormat);
-	void setStrictFormats(bool strict){mStrict=strict;}
-	bool getStrictFormats(){return mStrict;}
+	int getCloseTextureFormat(int format,int usage);
+	int getCloseTextureFormat(int format);
 	const CapabilityState &getCapabilityState(){return mCapabilityState;}
 
 	void setBlendState(const BlendState &state);
@@ -116,6 +115,8 @@ public:
 
 	static DWORD getD3DTOP(TextureBlend::Operation operation,TextureBlend::Source alphaSource);
 	static D3DFORMAT getD3DFORMAT(int textureFormat);
+	static DWORD getD3DUSAGE(int textureFormat,int usage);
+	static D3DPOOL getD3DPOOL(int usage);
 	static DWORD getD3DTADDRESS(TextureStage::AddressMode addressMode);
 	static DWORD getD3DTEXF(TextureStage::Filter filter);
 	static DWORD getD3DTA(TextureBlend::Source blend);
@@ -139,7 +140,6 @@ protected:
 	D3D9RenderTarget *mD3DPrimaryRenderTarget;
 	RenderTarget *mRenderTarget;
 	D3D9RenderTarget *mD3DRenderTarget;
-	bool mStrict;
 
 	CapabilityState mCapabilityState;
 

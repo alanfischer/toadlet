@@ -105,11 +105,13 @@ Collection<String>::ptr WADArchive::getEntries(){
 	return entries;
 }
 
-peeper::Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager *textureManager,wmiptex *miptex,tbyte *pal){
+Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager *textureManager,wmiptex *miptex,tbyte *pal){
 	int swidth=littleInt32(miptex->width),sheight=littleInt32(miptex->height);
 	int dwidth=swidth,dheight=sheight;
 	int size=swidth*sheight;
-	bool hasNonPowerOf2=textureManager->getRenderer()==NULL?false:textureManager->getRenderer()->getCapabilityState().textureNonPowerOf2;
+	/// @todo: Once the TextureManager w/ BackableTexture convertCreate is finished,
+	///  remove this pow2 checking and conversion, and just send the raw data to the TextureManager and let it convert
+	bool hasNonPowerOf2=true;//textureManager->getRenderer()==NULL?false:textureManager->getRenderer()->getCapabilityState().textureNonPowerOf2;
 
 	if(size<=0 || littleInt32(miptex->offsets[0])==0){
 		return NULL;
@@ -204,7 +206,7 @@ peeper::Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager 
 		if(hdwidth>=2) hdwidth/=2; if(hdheight>=2) hdheight/=2;
 	}
 
-	Texture::ptr texture=textureManager->createTexture(images,4);
+	Texture::ptr texture=textureManager->createTexture(4,images);
 	if(texture!=NULL){
 		textureManager->manage(texture,miptex->name);
 	}

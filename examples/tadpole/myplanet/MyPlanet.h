@@ -20,6 +20,8 @@ public:
 	void mouseMoved(int x,int y);
 	void mouseReleased(int x,int y,int button);
 
+void keyPressed(int k){if(k=='g'){changeRendererPlugin("gl");}else if(k=='9'){changeRendererPlugin("d3d9");}else if(k=='0'){changeRendererPlugin("d3d10");}}
+
 	void backgroundAnimation();
 	void startAnimation();
 	void burnupAnimation();

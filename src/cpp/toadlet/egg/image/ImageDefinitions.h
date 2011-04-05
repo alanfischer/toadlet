@@ -55,17 +55,20 @@ public:
 		CubeSide_MAX=6,
 	};
 
+	/// @todo: Clean up this Format and merge it with the VertexFormat
 	enum Format{
 		Format_UNKNOWN=				0,
 
 		Format_BIT_L=				1<<0,
 		Format_BIT_A=				1<<1,
 		Format_BIT_LA=				1<<2,
-		Format_BIT_RGB=				1<<3,
-		Format_BIT_BGR=				1<<4,
-		Format_BIT_RGBA=			1<<5,
-		Format_BIT_BGRA=			1<<6,
-		Format_BIT_DEPTH=			1<<10,
+		Format_BIT_R=				1<<3,
+		Format_BIT_RG=				1<<4,
+		Format_BIT_RGB=				1<<5,
+		Format_BIT_BGR=				1<<6,
+		Format_BIT_RGBA=			1<<7,
+		Format_BIT_BGRA=			1<<8,
+		Format_BIT_DEPTH=			1<<9,
 		Format_ALL_COLOR=			0xFFFF,
 
 		// These formats are stored sequentially in memory
@@ -88,8 +91,10 @@ public:
 		Format_ALL_SIZE=			0xFFFF0000,
 
 		Format_L_8=					Format_BIT_L|Format_BIT_UINT_8,
+		Format_R_8=					Format_BIT_R|Format_BIT_UINT_8,
 		Format_A_8=					Format_BIT_A|Format_BIT_UINT_8,
 		Format_LA_8=				Format_BIT_LA|Format_BIT_UINT_8,
+		Format_RG_8=				Format_BIT_RG|Format_BIT_UINT_8,
 		Format_RGB_8=				Format_BIT_RGB|Format_BIT_UINT_8,
 		Format_BGR_8=				Format_BIT_BGR|Format_BIT_UINT_8,
 		Format_RGBA_8=				Format_BIT_RGBA|Format_BIT_UINT_8,

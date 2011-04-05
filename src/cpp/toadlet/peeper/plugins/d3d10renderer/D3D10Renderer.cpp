@@ -66,8 +66,7 @@ D3D10Renderer::D3D10Renderer():
 	mPrimaryRenderTarget(NULL),
 	mD3DPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL),
-	mD3DRenderTarget(NULL),
-	mStrict(false)
+	mD3DRenderTarget(NULL)
 
 	//mStatisticsSet,
 	//mCapabilitySet
@@ -123,12 +122,6 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 	Logger::alert(Categories::TOADLET_PEEPER,
 		"created D3D10Renderer");
 
-	mDefaultSet=RenderStateSet::ptr(new D3D10RenderStateSet(this));
-	mDefaultSet->setBlendState(BlendState());
-	mDefaultSet->setDepthState(DepthState());
-	mDefaultSet->setRasterizerState(RasterizerState());
-	setRenderStateSet(mDefaultSet);
-
 	char *effectstring=
 "float4x4 ShaderMatrix;\n"
 "float4x4 textureMatrix;\n"
@@ -156,6 +149,7 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 
 "float4 PS( VS_OUTPUT Input ) : SV_Target{\n"
 	"return diffuseTexture.Sample(samLinear,Input.TexCoords)*useTexture + diffuseColor*(1-useTexture);\n"
+//	"return diffuseTexture.Sample(samLinear,Input.TexCoords) * diffuseColor;\n"
 "}\n"
 
 "technique10 Render{\n"
@@ -180,6 +174,13 @@ void *create=GetProcAddress(library,"D3D10CreateEffectFromMemory");
 // Obtain the technique
 technique = effect->GetTechniqueByName( "Render" );
 technique->GetPassByIndex( 0 )->GetDesc( &passDesc);
+
+
+	mDefaultSet=RenderStateSet::ptr(new D3D10RenderStateSet(this));
+	mDefaultSet->setBlendState(BlendState());
+	mDefaultSet->setDepthState(DepthState());
+	mDefaultSet->setRasterizerState(RasterizerState());
+	setRenderStateSet(mDefaultSet);
 
 	return true;
 }
@@ -476,10 +477,6 @@ void D3D10Renderer::setDefaultStates(){
 	setRenderStateSet(mDefaultSet);
 }
 
-//void D3D10Renderer::setMaterialState(const MaterialState &state){
-//	effect->GetVariableByName("diffuseColor")->AsVector()->SetFloatVector((float*)state.diffuse.getData());
-//}
-
 bool D3D10Renderer::setRenderStateSet(RenderStateSet *set){
 	D3D10RenderStateSet *d3dset=NULL;
 	if(set!=NULL){
@@ -500,6 +497,10 @@ bool D3D10Renderer::setRenderStateSet(RenderStateSet *set){
 	if(d3dset->mD3DRasterizerState!=NULL){
 		mD3DDevice->RSSetState(d3dset->mD3DRasterizerState);
 	}
+
+if(d3dset->mMaterialState!=NULL){
+effect->GetVariableByName("diffuseColor")->AsVector()->SetFloatVector((float*)d3dset->mMaterialState->diffuse.getData());
+}
 
 	return true;
 }
@@ -641,10 +642,12 @@ effect->GetVariableByName("useTexture")->AsScalar()->SetFloat(texture!=NULL);
 void D3D10Renderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){
 }
 
-int D3D10Renderer::getClosestTextureFormat(int textureFormat){
+int D3D10Renderer::getCloseTextureFormat(int textureFormat,int usage){
+
 	switch(textureFormat){
-		case Texture::Format_L_8:
-		case Texture::Format_LA_8:
+		case Texture::Format_R_8:
+		case Texture::Format_RG_8:
+			return textureFormat;
 		case Texture::Format_RGBA_8:
 		case Texture::Format_RGB_F32:
 		case Texture::Format_RGBA_F32:
@@ -773,8 +776,6 @@ DXGI_FORMAT D3D10Renderer::getTextureDXGI_FORMAT(int format){
 		case Texture::Format_DEPTH_24:
 			return DXGI_FORMAT_D24_UNORM_S8_UINT;
 		default:
-			Error::unknown(Categories::TOADLET_PEEPER,
-				"D3D10Renderer::getDXGI_FORMAT: Invalid type");
 			return DXGI_FORMAT_UNKNOWN;
 	}
 }

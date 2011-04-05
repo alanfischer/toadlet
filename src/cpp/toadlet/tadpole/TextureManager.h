@@ -43,9 +43,10 @@ public:
 
 	void destroy();
 
-	peeper::Texture::ptr createTexture(egg::image::Image::ptr image,int usage=peeper::Texture::Usage_BIT_STATIC|peeper::Texture::Usage_BIT_AUTOGEN_MIPMAPS,int mipLevels=0);
-	peeper::Texture::ptr createTexture(egg::image::Image::ptr images[],int mipLevels,int usage=peeper::Texture::Usage_BIT_STATIC);
-	peeper::Texture::ptr createTexture(int usage,peeper::Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels);
+	/// @todo: We need a TextureFormat class, which has a PixelFormat, plus usage, dimension, width, height, depth, pitch, and mipLevels
+	peeper::Texture::ptr createTexture(egg::image::Image::ptr image);
+	peeper::Texture::ptr createTexture(int mipLevels,egg::image::Image::ptr mipImages[]);
+	peeper::Texture::ptr createTexture(int usage,peeper::Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]=NULL);
 	egg::image::Image::ptr createImage(peeper::Texture *texture);
 	peeper::PixelBufferRenderTarget::ptr createPixelBufferRenderTarget();
 
@@ -57,8 +58,6 @@ public:
 	void postContextReset(peeper::Renderer *renderer);
 
 	void renderTargetDestroyed(peeper::RenderTarget *renderTarget);
-
-	peeper::Renderer *getRenderer();
 
 	peeper::Texture::ptr createNormalization(int size);
 

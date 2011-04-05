@@ -47,7 +47,6 @@ D3D9Texture::D3D9Texture(D3D9Renderer *renderer):BaseResource(),
 	mDepth(0),
 	mMipLevels(0),
 
-	mInternalFormat(0),
 	mD3DFormat(D3DFMT_X8R8G8B8),
 	mD3DUsage(0),
 	mD3DPool(D3DPOOL_MANAGED),
@@ -68,6 +67,8 @@ D3D9Texture::~D3D9Texture(){
 bool D3D9Texture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
 	destroy();
 
+	width=width>0?width:1;height=height>0?height:1;depth=depth>0?depth:1;
+
 	if((Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || (dimension!=Dimension_CUBE && Math::isPowerOf2(depth)==false)) &&
 		mRenderer->getCapabilityState().textureNonPowerOf2==false &&
 		(mRenderer->getCapabilityState().textureNonPowerOf2Restricted==false || (usage&Usage_BIT_NPOT_RESTRICTED)==0))
@@ -75,18 +76,6 @@ bool D3D9Texture::create(int usage,Dimension dimension,int format,int width,int 
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"D3D9Texture: Cannot load a non power of 2 texture");
 		return false;
-	}
-
-	int closestFormat=mRenderer->getClosestTextureFormat(format);
-	if(format!=closestFormat){
-		if(mRenderer->getStrictFormats()){
-			Error::unknown(Categories::TOADLET_PEEPER,
-				"D3D9Texture: Invalid format");
-			return false;
-		}
-		else{
-			format=closestFormat;
-		}
 	}
 
 	mUsage=usage;
@@ -97,10 +86,10 @@ bool D3D9Texture::create(int usage,Dimension dimension,int format,int width,int 
 	mDepth=depth;
 	mMipLevels=mipLevels;
 
-	createContext(false);
+	bool result=createContext(false);
 
-	int specifiedMipLevels=mMipLevels>0?mMipLevels:1;
-	if(mipDatas!=NULL){
+	if(result && mipDatas!=NULL){
+		int specifiedMipLevels=mMipLevels>0?mMipLevels:1;
 		int level;
 		for(level=0;level<specifiedMipLevels;++level){
 			load(width,height,depth,level,mipDatas[level]);
@@ -108,7 +97,7 @@ bool D3D9Texture::create(int usage,Dimension dimension,int format,int width,int 
 		}
 	}
 
-	return mTexture!=NULL;
+	return result;
 }
 
 void D3D9Texture::destroy(){
@@ -132,49 +121,9 @@ void D3D9Texture::resetDestroy(){
 bool D3D9Texture::createContext(bool restore){
 	IDirect3DDevice9 *device=mRenderer->getDirect3DDevice9();
 
-	/// @todo: Should we remove mInternalFormat and instead just change mFormat?
-	///  Seems somewhat pointless to already change mFormat in create (on non strict)
-	///  And then to change it again here.
-	mInternalFormat=mRenderer->getClosestTextureFormat(mFormat);
-	mD3DFormat=D3D9Renderer::getD3DFORMAT(mInternalFormat);
-	if(!mRenderer->isD3DFORMATValid(mD3DFormat,mD3DUsage)){
-		Logger::alert("invalid format, using BGRA_8");
-		mInternalFormat=Format_BGRA_8;
-		mD3DFormat=D3DFMT_X8R8G8B8;
-	}
-
-	mD3DUsage=
-		#if defined(TOADLET_SET_D3DM)
-			D3DUSAGE_LOCKABLE;
-		#else
-			0;
-		#endif
-	if((mUsage&Usage_BIT_RENDERTARGET)>0){
-		if((mFormat&Format_BIT_DEPTH)>0){
-			mD3DUsage|=D3DUSAGE_DEPTHSTENCIL;
-		}
-		else{
-			mD3DUsage|=D3DUSAGE_RENDERTARGET;
-		}
-	}
-	if((mUsage&Usage_BIT_STREAM)>0){
-		mD3DUsage|=D3DUSAGE_DYNAMIC;
-	}
-
-	#if defined(TOADLET_SET_D3DM)
-		mD3DPool=D3DPOOL_MANAGED;
-	#else
-		if((mUsage&Usage_BIT_STAGING)>0){
-			mD3DPool=D3DPOOL_SYSTEMMEM;
-		}
-		else if((mUsage&Usage_BIT_RENDERTARGET)>0){
-			mD3DPool=D3DPOOL_DEFAULT;
-		}
-		else{
-			mD3DPool=D3DPOOL_MANAGED;
-		}
-	#endif
-
+	mD3DUsage=mRenderer->getD3DUSAGE(mFormat,mUsage);
+	mD3DPool=mRenderer->getD3DPOOL(mUsage);
+	mD3DFormat=mRenderer->getD3DFORMAT(mFormat);
 	mManuallyGenerateMipLevels=(mUsage&Usage_BIT_AUTOGEN_MIPMAPS)>0;
 	#if !defined(TOADLET_SET_D3DM)
 		if(mManuallyGenerateMipLevels && mRenderer->isD3DFORMATValid(mD3DFormat,D3DUSAGE_AUTOGENMIPMAP)){
@@ -223,7 +172,12 @@ bool D3D9Texture::createContext(bool restore){
 
 	TOADLET_CHECK_D3D9ERROR(result,"CreateTexture");
 
-	return SUCCEEDED(result);
+	if(FAILED(result)){
+		Error::unknown("error in createContext");
+		return false;
+	}
+
+	return true;
 }
 
 bool D3D9Texture::destroyContext(bool backup){
@@ -315,7 +269,7 @@ bool D3D9Texture::load(int width,int height,int depth,int mipLevel,byte *mipData
 		result=texture->LockRect(mipLevel,&rect,NULL,0);
 		TOADLET_CHECK_D3D9ERROR(result,"LockRect");
 		if(SUCCEEDED(result)){
-			ImageFormatConversion::convert(mipData,format,rowPitch,slicePitch,(uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,width,height,depth);
+			ImageFormatConversion::convert(mipData,format,rowPitch,slicePitch,(uint8*)rect.pBits,mFormat,rect.Pitch,rect.Pitch*height,width,height,depth);
 			texture->UnlockRect(mipLevel);
 		}
 	}
@@ -327,7 +281,7 @@ bool D3D9Texture::load(int width,int height,int depth,int mipLevel,byte *mipData
 			result=texture->LockBox(mipLevel,&box,NULL,0);
 			TOADLET_CHECK_D3D9ERROR(result,"LockBox");
 			if(SUCCEEDED(result)){
-				ImageFormatConversion::convert(mipData,format,rowPitch,slicePitch,(uint8*)box.pBits,mInternalFormat,box.RowPitch,box.SlicePitch,width,height,depth);
+				ImageFormatConversion::convert(mipData,format,rowPitch,slicePitch,(uint8*)box.pBits,mFormat,box.RowPitch,box.SlicePitch,width,height,depth);
 				texture->UnlockBox(mipLevel);
 			}
 		}
@@ -340,7 +294,7 @@ bool D3D9Texture::load(int width,int height,int depth,int mipLevel,byte *mipData
 				result=texture->LockRect((D3DCUBEMAP_FACES)i,mipLevel,&rect,NULL,0);
 				TOADLET_CHECK_D3D9ERROR(result,"LockRect");
 				if(SUCCEEDED(result)){
-					ImageFormatConversion::convert((mipData+slicePitch*i),format,rowPitch,slicePitch,(uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,width,height,1);
+					ImageFormatConversion::convert((mipData+slicePitch*i),format,rowPitch,slicePitch,(uint8*)rect.pBits,mFormat,rect.Pitch,rect.Pitch*height,width,height,1);
 					texture->UnlockRect((D3DCUBEMAP_FACES)i,mipLevel);
 				}
 			}
@@ -386,7 +340,7 @@ bool D3D9Texture::read(int width,int height,int depth,int mipLevel,byte *mipData
 		result=texture->LockRect(mipLevel,&rect,NULL,D3DLOCK_READONLY);
 		TOADLET_CHECK_D3D9ERROR(result,"LockRect");
 		if(SUCCEEDED(result)){
-			ImageFormatConversion::convert((uint8*)rect.pBits,mInternalFormat,rect.Pitch,rect.Pitch*height,mipData,format,rowPitch,slicePitch,width,height,depth);
+			ImageFormatConversion::convert((uint8*)rect.pBits,mFormat,rect.Pitch,rect.Pitch*height,mipData,format,rowPitch,slicePitch,width,height,depth);
 			texture->UnlockRect(mipLevel);
 		}
 	}
@@ -402,7 +356,7 @@ bool D3D9Texture::read(int width,int height,int depth,int mipLevel,byte *mipData
 			result=texture->LockBox(mipLevel,&box,NULL,D3DLOCK_READONLY);
 			TOADLET_CHECK_D3D9ERROR(result,"LockBox");
 			if(SUCCEEDED(result)){
-				ImageFormatConversion::convert((uint8*)box.pBits,mInternalFormat,box.RowPitch,box.SlicePitch,mipData,format,rowPitch,slicePitch,width,height,depth);
+				ImageFormatConversion::convert((uint8*)box.pBits,mFormat,box.RowPitch,box.SlicePitch,mipData,format,rowPitch,slicePitch,width,height,depth);
 				texture->UnlockBox(mipLevel);
 			}
 		}

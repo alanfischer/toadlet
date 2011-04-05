@@ -137,9 +137,9 @@ void AnaglyphCameraNode::render(Renderer *renderer,Node *node){
 	renderer->setProjectionMatrix(mOverlayMatrix);
 	renderer->setViewMatrix(Math::IDENTITY_MATRIX4X4);
 	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
-	renderer->setRenderStateSet(mLeftMaterial->getRenderStateSet());
+	mLeftMaterial->setupRenderer(renderer);
 	renderer->renderPrimitive(mOverlayVertexData,mOverlayIndexData);
-	renderer->setRenderStateSet(mRightMaterial->getRenderStateSet());
+	mRightMaterial->setupRenderer(renderer);
 	renderer->renderPrimitive(mOverlayVertexData,mOverlayIndexData);
 
 	renderOverlayGamma(renderer);

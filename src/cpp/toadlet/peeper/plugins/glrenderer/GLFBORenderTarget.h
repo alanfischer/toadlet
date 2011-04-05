@@ -44,6 +44,7 @@ public:
 	virtual ~GLFBORenderTarget();
 
 	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
+	PixelBufferRenderTarget *getRootPixelBufferRenderTarget(){return this;}
 
 	void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener){mListener=listener;}
 

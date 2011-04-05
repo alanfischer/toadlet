@@ -76,19 +76,19 @@ public:
 	float readBFloat();
 	double readBDouble();
 
-	int readBVector2(const math::Vector2 &v);
-	int readBVector3(const math::Vector3 &v);
-	int readBVector4(const math::Vector4 &v);
-	int readBQuaternion(const math::Quaternion &q);
-	int readBAABox(const math::AABox &a);
-	int readBSphere(const math::Sphere &s);
+	int readBVector2(math::Vector2 &v);
+	int readBVector3(math::Vector3 &v);
+	int readBVector4(math::Vector4 &v);
+	int readBQuaternion(math::Quaternion &q);
+	int readBAABox(math::AABox &a);
+	int readBSphere(math::Sphere &s);
 
-	int readBVector2(const mathfixed::Vector2 &v);
-	int readBVector3(const mathfixed::Vector3 &v);
-	int readBVector4(const mathfixed::Vector4 &v);
-	int readBQuaternion(const mathfixed::Quaternion &q);
-	int readBAABox(const mathfixed::AABox &a);
-	int readBSphere(const mathfixed::Sphere &s);
+	int readBVector2(mathfixed::Vector2 &v);
+	int readBVector3(mathfixed::Vector3 &v);
+	int readBVector4(mathfixed::Vector4 &v);
+	int readBQuaternion(mathfixed::Quaternion &q);
+	int readBAABox(mathfixed::AABox &a);
+	int readBSphere(mathfixed::Sphere &s);
 
 	int readBInt16String(String &s);
 	String readBInt16String();

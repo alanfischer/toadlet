@@ -83,7 +83,6 @@ protected:
 	int mDepth;
 	int mMipLevels;
 
-	int mInternalFormat;
 	D3DFORMAT mD3DFormat;
 	DWORD mD3DUsage;
 	D3DPOOL mD3DPool;

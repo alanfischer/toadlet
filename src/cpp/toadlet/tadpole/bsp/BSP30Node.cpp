@@ -541,7 +541,7 @@ void BSP30Node::render(Renderer *renderer) const{
 	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4); // Technically I dont need this anymore, since its a renderable.  But i'll keep it in case it ever gets changed again
 
 	for(i=0;i<mVisibleMaterialFaces.size();i++){
-		renderer->setRenderStateSet(mMap->materials[i]->getRenderStateSet());
+		mMap->materials[i]->setupRenderer(renderer);
 		mMap->renderFaces(renderer,mVisibleMaterialFaces[i]);
 	}
 

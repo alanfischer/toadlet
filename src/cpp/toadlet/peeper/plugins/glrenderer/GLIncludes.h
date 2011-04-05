@@ -261,7 +261,7 @@
 		{ int error=glGetError(); \
 		if(error!=GL_NO_ERROR) \
 			toadlet::egg::Logger::warning(toadlet::egg::Categories::TOADLET_PEEPER, \
-				toadlet::egg::String("GL Error in ") + function + ": error=" + error); }
+			toadlet::egg::String("GL Error in ") + function + ": error=" + error); }
 #else
 	#define TOADLET_CHECK_GLERROR(function)
 #endif
@@ -271,7 +271,7 @@
 		{ int error=eglGetError(); \
 		if(error!=EGL_SUCCESS) \
 			toadlet::egg::Logger::warning(toadlet::egg::Categories::TOADLET_PEEPER, \
-				toadlet::egg::String("EGL Error in ") + function + ": error=" + error); }
+			toadlet::egg::String("EGL Error in ") + function + ": error=" + error); }
 #else
 	#define TOADLET_CHECK_EGLERROR(function)
 #endif
@@ -281,7 +281,7 @@
 		{ int error=GetLastError(); \
 		if(error!=0) \
 			toadlet::egg::Logger::warning(toadlet::egg::Categories::TOADLET_PEEPER, \
-				toadlet::egg::String("WGL Error in ") + function + ": error=" + error); }
+			toadlet::egg::String("WGL Error in ") + function + ": error=" + error); }
 #else
 	#define TOADLET_CHECK_WGLERROR(function)
 #endif

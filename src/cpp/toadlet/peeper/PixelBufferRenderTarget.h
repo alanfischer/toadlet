@@ -47,6 +47,8 @@ public:
 
 	virtual ~PixelBufferRenderTarget(){}
 
+	virtual PixelBufferRenderTarget *getRootPixelBufferRenderTarget()=0;
+
 	virtual void setRenderTargetDestroyedListener(RenderTargetDestroyedListener *listener)=0;
 
 	virtual bool create()=0;

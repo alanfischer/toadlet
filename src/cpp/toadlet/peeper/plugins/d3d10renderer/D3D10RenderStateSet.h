@@ -43,7 +43,8 @@ public:
 		mDepthState(NULL),
 		mD3DDepthStencilState(NULL),
 		mRasterizerState(NULL),
-		mD3DRasterizerState(NULL)
+		mD3DRasterizerState(NULL),
+		mMaterialState(NULL)
 	{
 		mRenderer=renderer;
 		mDevice=mRenderer->getD3D10Device();
@@ -84,6 +85,11 @@ public:
 			mD3DRasterizerState=NULL;
 		}
 
+		if(mMaterialState!=NULL){
+			delete mMaterialState;
+			mMaterialState=NULL;
+		}
+
 		if(mListener!=NULL){
 			mListener->renderStateSetDestroyed(this);
 			mListener=NULL;
@@ -120,8 +126,8 @@ public:
 	void setPointState(const PointState &state){}
 	bool getPointState(PointState &state) const{return false;}
 
-	void setMaterialState(const MaterialState &state){}
-	bool getMaterialState(MaterialState &state) const{return false;}
+	void setMaterialState(const MaterialState &state){if(mMaterialState==NULL){mMaterialState=new MaterialState(state);}else{mMaterialState->set(state);}}
+	bool getMaterialState(MaterialState &state) const{if(mMaterialState==NULL){return false;}else{state.set(*mMaterialState);return true;}}
 
 protected:
 	D3D10Renderer *mRenderer;
@@ -135,6 +141,8 @@ protected:
 	RasterizerState *mRasterizerState;
 	ID3D10RasterizerState *mD3DRasterizerState;
 	
+	MaterialState *mMaterialState;
+
 	friend class D3D10Renderer;
 };
 

@@ -516,7 +516,7 @@ ParentNode::ptr MyPlanet::createSun(scalar size){
 void MyPlanet::create(){
 	int i;
 
-	Application::setBackable(false);
+	Application::setBackable(true);
 
 	Application::create("d3d10");
 
@@ -546,7 +546,7 @@ void MyPlanet::create(){
 
 	Node::ptr background=createBackground();
 	mScene->getBackground()->attach(background);
-	bool backgroundToSkybox=false;//true;
+	bool backgroundToSkybox=true;
 	if(backgroundToSkybox){
 		Mesh::ptr skyBoxMesh=mCamera->renderToSkyBox(mRenderer,Image::Format_RGB_5_6_5,2048,fromInt(10));
 		MeshNode::ptr skyBox=mEngine->createNodeType(MeshNode::type(),mScene);

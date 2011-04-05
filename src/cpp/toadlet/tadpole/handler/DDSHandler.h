@@ -43,7 +43,7 @@ public:
 	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData){
 		egg::Collection<egg::image::Image::ptr> mipLevels;
 		if(mHandler.loadImage(stream,mipLevels)){
-			return mTextureManager->createTexture(mipLevels.begin(),mipLevels.size());
+			return mTextureManager->createTexture(mipLevels.size(),mipLevels.begin());
 		}
 		else{
 			return NULL;
