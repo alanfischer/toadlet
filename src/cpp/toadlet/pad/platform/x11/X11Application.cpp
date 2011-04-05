@@ -25,7 +25,7 @@
 
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/System.h>
-#include <toadlet/peeper/CapabilitySet.h>
+#include <toadlet/peeper/CapabilityState.h>
 #if defined(TOADLET_HAS_OPENGL)
 	#include <toadlet/peeper/plugins/glrenderer/GLRenderer.h>
 	#include <toadlet/peeper/plugins/glrenderer/platform/glx/GLXWindowRenderTarget.h>
@@ -761,7 +761,7 @@ void X11Application::configured(int x,int y,int width,int height){
 		resized(width,height);
 
 		if(mActive && mRenderer!=NULL){
-			if(mRenderer->getCapabilitySet().resetOnResize){
+			if(mRenderer->getCapabilityState().resetOnResize){
 				mEngine->contextReset(mRenderer);
 			}
 			update(0);
