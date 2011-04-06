@@ -106,20 +106,11 @@ Collection<String>::ptr WADArchive::getEntries(){
 }
 
 Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager *textureManager,wmiptex *miptex,tbyte *pal){
-	int swidth=littleInt32(miptex->width),sheight=littleInt32(miptex->height);
-	int dwidth=swidth,dheight=sheight;
-	int size=swidth*sheight;
-	/// @todo: Once the TextureManager w/ BackableTexture convertCreate is finished,
-	///  remove this pow2 checking and conversion, and just send the raw data to the TextureManager and let it convert
-	bool hasNonPowerOf2=true;//textureManager->getRenderer()==NULL?false:textureManager->getRenderer()->getCapabilityState().textureNonPowerOf2;
+	int width=littleInt32(miptex->width),height=littleInt32(miptex->height);
+	int size=width*height;
 
 	if(size<=0 || littleInt32(miptex->offsets[0])==0){
 		return NULL;
-	}
-
-	if(hasNonPowerOf2==false && (Math::isPowerOf2(swidth)==false || Math::isPowerOf2(sheight)==false)){
-		dwidth=Math::nextPowerOf2(swidth)>>1;
-		dheight=Math::nextPowerOf2(sheight)>>1;
 	}
 
 	int datasize=size + (size/4) + (size/16) + (size/64);
@@ -133,11 +124,10 @@ Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager *texture
 	}
 
 	Image::ptr images[4];
-	int hswidth=swidth,hsheight=sheight;
-	int hdwidth=dwidth,hdheight=dheight;
+	int hwidth=width,hheight=height;
 	int mipLevel;
 	for(mipLevel=0;mipLevel<4;++mipLevel){
-		images[mipLevel]=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,format,dwidth,dheight));
+		images[mipLevel]=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,format,width,height));
 		if(images[mipLevel]==NULL){
 			return NULL;
 		}
@@ -145,65 +135,32 @@ Texture::ptr WADArchive::createTexture(toadlet::tadpole::TextureManager *texture
 		tbyte *src=(tbyte*)miptex + littleInt32(miptex->offsets[mipLevel]);
 		tbyte *data=images[mipLevel]->getData();
 
-		if(hswidth==hdwidth && hsheight==hdheight){
-			int j=0,k=0,j3=0,k3=0;
-			if(format==Texture::Format_RGB_8){
-				for(j=0;j<hswidth*hsheight;j++){
-					k=*(src+j);
+		int j=0,k=0,j3=0,k3=0;
+		if(format==Texture::Format_RGB_8){
+			for(j=0;j<hwidth*hheight;j++){
+				k=*(src+j);
 
-					j3=j*3;
-					k3=k*3;
-					*(data+j3+0)=*(pal+k3+0);
-					*(data+j3+1)=*(pal+k3+1);
-					*(data+j3+2)=*(pal+k3+2);
-				}
-			}
-			else{
-				for(j=0;j<hswidth*hsheight;j++){
-					k=*(src+j);
-
-					j3=j*4;
-					k3=k*3;
-					*(data+j3+0)=*(pal+k3+0);
-					*(data+j3+1)=*(pal+k3+1);
-					*(data+j3+2)=*(pal+k3+2);
-					*(data+j3+3)=(*(data+j3+0)==0 && *(data+j3+1)==0 && *(data+j3+2)==255)?0:255;
-				}
+				j3=j*3;
+				k3=k*3;
+				*(data+j3+0)=*(pal+k3+0);
+				*(data+j3+1)=*(pal+k3+1);
+				*(data+j3+2)=*(pal+k3+2);
 			}
 		}
 		else{
-			int i=0,j=0,k=0,j3=0,k3=0;
-			if(format==Texture::Format_RGB_8){
-				for(j=0;j<hdheight;j++){
-					for(i=0;i<hdwidth;i++){
-						k=*(src+((j*hsheight/hdheight)*hswidth+(i*hswidth/hdwidth)));
+			for(j=0;j<hwidth*hheight;j++){
+				k=*(src+j);
 
-						j3=((j*hdwidth)+i)*3;
-						k3=k*3;
-						*(data+j3+0)=*(pal+k3+0);
-						*(data+j3+1)=*(pal+k3+1);
-						*(data+j3+2)=*(pal+k3+2);
-					}
-				}
-			}
-			else{
-				for(j=0;j<hdheight;j++){
-					for(i=0;i<hdwidth;i++){
-						k=*(src+((j*hsheight/hdheight)*hswidth+(i*hswidth/hdwidth)));
-
-						j3=((j*hdwidth)+i)*4;
-						k3=k*3;
-						*(data+j3+0)=*(pal+k3+0);
-						*(data+j3+1)=*(pal+k3+1);
-						*(data+j3+2)=*(pal+k3+2);
-						*(data+j3+3)=(*(data+j3+0)==0 && *(data+j3+1)==0 && *(data+j3+2)==255)?0:255;
-					}
-				}
+				j3=j*4;
+				k3=k*3;
+				*(data+j3+0)=*(pal+k3+0);
+				*(data+j3+1)=*(pal+k3+1);
+				*(data+j3+2)=*(pal+k3+2);
+				*(data+j3+3)=(*(data+j3+0)==0 && *(data+j3+1)==0 && *(data+j3+2)==255)?0:255;
 			}
 		}
 
-		if(hswidth>=2) hswidth/=2; if(hsheight>=2) hsheight/=2;
-		if(hdwidth>=2) hdwidth/=2; if(hdheight>=2) hdheight/=2;
+		if(hwidth>=2) hwidth/=2; if(hheight>=2) hheight/=2;
 	}
 
 	Texture::ptr texture=textureManager->createTexture(4,images);

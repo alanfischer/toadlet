@@ -469,9 +469,6 @@ void D3D9Renderer::setDefaultStates(){
 	setNormalize(Normalize_RESCALE);
 	setPointState(PointState());
 	setRasterizerState(RasterizerState());
-	#if defined(TOADLET_SET_D3DM)
-		setTexturePerspective(true);
-	#endif
 
 	int i;
 	for(i=0;i<mCapabilityState.maxTextureStages;++i){
@@ -480,13 +477,10 @@ void D3D9Renderer::setDefaultStates(){
 
 	setMaterialState(MaterialState());
 	setAmbientColor(Math::ONE_VECTOR4);
-	// We leave the current lights enabled because the SceneManager does not re-set the lights between layers
 
 	// D3D specific states
-	{
-		mD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE,true);
-		mD3DDevice->SetRenderState(D3DRS_SPECULARENABLE,true);
-	}
+	mD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE,true);
+	mD3DDevice->SetRenderState(D3DRS_SPECULARENABLE,true);
 }
 
 bool D3D9Renderer::setRenderStateSet(RenderStateSet *set){

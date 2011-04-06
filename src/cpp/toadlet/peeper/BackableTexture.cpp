@@ -27,6 +27,7 @@
 #include <toadlet/peeper/BackableTexture.h>
 #include <toadlet/peeper/BackableTextureMipPixelBuffer.h>
 #include <toadlet/peeper/CapabilityState.h>
+#include <string.h>
 
 using namespace toadlet::egg;
 using namespace toadlet::egg::image;
@@ -243,34 +244,102 @@ bool BackableTexture::convertRead(Texture::ptr texture,int format,int width,int 
 }
 
 bool BackableTexture::convertCreate(Texture::ptr texture,Renderer *renderer,int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]){
-	int closeFormat=renderer->getCloseTextureFormat(format,usage);
+	int newFormat=renderer->getCloseTextureFormat(format,usage);
 	bool hasNPOT=renderer->getCapabilityState().textureNonPowerOf2;
 	bool wantsNPOT=(Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || (dimension!=Image::Dimension_CUBE && Math::isPowerOf2(depth)==false));
+	bool needsNPOT=wantsNPOT & !hasNPOT;
 	bool hasAutogen=renderer->getCapabilityState().textureAutogenMipMaps;
 	bool wantsAutogen=(usage&Texture::Usage_BIT_AUTOGEN_MIPMAPS)>0;
+	bool needsAutogen=wantsAutogen & !hasAutogen;
+	bool needsConvert=(newFormat!=format);
 
 	bool result=false;
 	if(mipDatas==NULL){
-		result=texture->create(usage,dimension,closeFormat,width,height,depth,mipLevels,NULL);
+		result=texture->create(usage,dimension,newFormat,width,height,depth,mipLevels,NULL);
 	}
 	else{
-		int pitch=ImageFormatConversion::getRowPitch(format,width);
-		int closePitch=ImageFormatConversion::getRowPitch(closeFormat,width);
-		tbyte *closeData=new tbyte[closePitch * height];
-		ImageFormatConversion::convert(mipDatas[0],format,pitch,pitch*height,closeData,closeFormat,closePitch,closePitch*height,width,height,depth);
+		int totalMipLevels=Math::intLog2(Math::maxVal(width,Math::maxVal(height,depth)));
+		int specifiedMipLevels=mipLevels>0?mipLevels:totalMipLevels;
+		int i;
 
-/// Till we get this finished
-usage|=Usage_BIT_AUTOGEN_MIPMAPS;
-//		if((hasAutogen==false && wantsAutogen==true) || (hasNPOT==false && wantsNPOT==true)){
-//		}
+		if(!needsNPOT && !needsAutogen && !needsConvert){
+			result=texture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas);
+		}
+		else{
+			tbyte **newMipDatas=new tbyte*[specifiedMipLevels];
 
-		result=texture->create(usage,dimension,closeFormat,width,height,depth,0,&closeData);
-		delete[] closeData;
+			int newWidth=Math::nextPowerOf2(width),newHeight=Math::nextPowerOf2(height),newDepth=Math::nextPowerOf2(depth);
+			int newMipWidth=newWidth,newMipHeight=newHeight,newMipDepth=newDepth;
+			int mipWidth=width,mipHeight=height,mipDepth=depth;
+
+			for(i=0;i<specifiedMipLevels;++i){
+				int newPitch=ImageFormatConversion::getRowPitch(newFormat,newMipWidth);
+				newMipDatas[i]=new tbyte[newPitch*newMipHeight*newMipDepth];
+
+				if((mipLevels==0 && i==0) || i<mipLevels){
+					convertAndScale(mipDatas[i],format,mipWidth,mipHeight,mipDepth,newMipDatas[i],newFormat,newMipWidth,newMipHeight,newMipDepth);
+				}
+				else{
+					convertAndScale(mipDatas[0],format,width,height,depth,newMipDatas[i],newFormat,newMipWidth,newMipHeight,newMipDepth);
+				}
+
+				mipWidth=mipWidth>1?mipWidth/2:1;mipHeight=mipHeight>1?mipHeight/2:1;mipDepth=mipDepth>1?mipDepth/2:1;
+				newMipWidth=newMipWidth>1?newMipWidth/2:1;newMipHeight=newMipHeight>1?newMipHeight/2:1;newMipDepth=newMipDepth>1?newMipDepth/2:1;
+			}
+
+			usage&=~Usage_BIT_AUTOGEN_MIPMAPS;
+
+			result=texture->create(usage,dimension,newFormat,newWidth,newHeight,newDepth,specifiedMipLevels,newMipDatas);
+
+			for(i=0;i<specifiedMipLevels;++i){
+				delete[] newMipDatas[i];
+			}
+			delete[] newMipDatas;
+		}
 	}
 
 	return result;
 }
-/*(
+
+void BackableTexture::convertAndScale(tbyte *src,int srcFormat,int srcWidth,int srcHeight,int srcDepth,tbyte *dst,int dstFormat,int dstWidth,int dstHeight,int dstDepth){
+	int srcPitch=ImageFormatConversion::getRowPitch(srcFormat,srcWidth);
+
+	if(srcWidth==dstWidth && srcHeight==dstHeight && srcDepth==dstDepth){
+		int dstPitch=ImageFormatConversion::getRowPitch(dstFormat,dstWidth);
+
+		ImageFormatConversion::convert(src,srcFormat,srcPitch,srcPitch*srcHeight,dst,dstFormat,dstPitch,dstPitch*dstHeight,srcWidth,srcHeight,srcDepth);
+	}
+	else{
+		int srcPitch=ImageFormatConversion::getRowPitch(srcFormat,srcWidth);
+		int srcPitch2=ImageFormatConversion::getRowPitch(dstFormat,srcWidth);
+
+		/// @todo: Merge these methods so we can do the conversion & scaling in 1 pass, and not this unoptimal mess we have now
+		Image::ptr converted(Image::createAndReallocate(Image::Dimension_D2,dstFormat,srcWidth,srcHeight,srcDepth));
+
+		ImageFormatConversion::convert(src,srcFormat,srcPitch,srcPitch*srcHeight,converted->getData(),dstFormat,srcPitch2,srcPitch2*srcHeight,srcWidth,srcHeight,srcDepth);
+
+		Image::ptr scaled(Image::createAndReallocate(Image::Dimension_D2,dstFormat,dstWidth,dstHeight,dstDepth));
+		
+		Pixel<uint8> pixel;
+		int x,y,z;
+		for(z=0;z<dstDepth;++z){
+			for(y=0;y<dstHeight;++y){
+				for(x=0;x<dstWidth;++x){
+					converted->getPixel(pixel,x*srcWidth/dstWidth,y*srcHeight/dstHeight,z*srcDepth/dstDepth);
+					scaled->setPixel(pixel,x,y,z);
+				}
+			}
+		}
+
+		memcpy(dst,scaled->getData(),ImageFormatConversion::getRowPitch(dstFormat,dstWidth)*dstHeight*dstDepth);
+	}
+}
+/*
+	int pitch=ImageFormatConversion::getRowPitch(format,width);
+	int closePitch=ImageFormatConversion::getRowPitch(closeFormat,width);
+	tbyte *closeData=new tbyte[closePitch * height];
+	ImageFormatConversion::convert(mipDatas[0],format,pitch,pitch*height,closeData,closeFormat,closePitch,closePitch*height,width,height,depth);
+
 	Image::ptr image;
 	if((hasAutogen==false || hasNonPowerOf2==false) && (Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || (dimension!=Image::Dimension_CUBE && Math::isPowerOf2(depth)==false))){
 		Logger::debug(Categories::TOADLET_TADPOLE,"making image power of 2");

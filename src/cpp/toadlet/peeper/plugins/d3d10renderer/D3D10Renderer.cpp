@@ -643,11 +643,9 @@ void D3D10Renderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &
 }
 
 int D3D10Renderer::getCloseTextureFormat(int textureFormat,int usage){
-
 	switch(textureFormat){
 		case Texture::Format_R_8:
 		case Texture::Format_RG_8:
-			return textureFormat;
 		case Texture::Format_RGBA_8:
 		case Texture::Format_RGB_F32:
 		case Texture::Format_RGBA_F32:
