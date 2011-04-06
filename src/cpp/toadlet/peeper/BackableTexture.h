@@ -71,6 +71,8 @@ public:
 	static bool convertCreate(Texture::ptr texture,Renderer *renderer,int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]);
 
 protected:
+	static void convertAndScale(tbyte *src,int srcFormat,int srcWidth,int srcHeight,int srcDepth,tbyte *dst,int dstFormat,int dstWidth,int dstHeight,int dstDepth);
+
 	int mUsage;
 	Dimension mDimension;
 	int mFormat;

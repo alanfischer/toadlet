@@ -27,8 +27,8 @@
 #define TOADLET_PEEPER_D3D10INCLUDES_H
 
 #include <toadlet/peeper/Types.h>
-#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Logger.h>
 #include <windows.h>
 #include <commctrl.h>
 #if defined(TOADLET_SET_D3D10)
@@ -92,7 +92,7 @@ namespace peeper{
 #if defined(TOADLET_DEBUG)
 	#define TOADLET_CHECK_D3D10ERROR(result,function) \
 		if(FAILED(result)) \
-			toadlet::egg::Logger::warning(toadlet::egg::Categories::TOADLET_PEEPER, \
+			toadlet::egg::Error::unknown(toadlet::egg::Categories::TOADLET_PEEPER, \
 			toadlet::egg::String("D3D10 Error in ") + function + ": error=" + (int)result); \
 
 #else
