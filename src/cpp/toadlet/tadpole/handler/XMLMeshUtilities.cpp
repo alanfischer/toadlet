@@ -1091,23 +1091,48 @@ Skeleton::ptr XMLMeshUtilities::loadSkeleton(mxml_node_t *node,int version){
 		skeleton->bones[bone->index]=bone;
 	}
 
-	// Reorder Bones
-	Skeleton::ptr ordered(new Skeleton());
 	int i,j;
-	while(skeleton->bones.size()>0){
-		int wantParent=-1;
-		for(j=skeleton->bones.size()-1;j>=0;--j){
+	for(i=0;i<skeleton->bones.size();++i){
+		if(skeleton->bones[i]->parentIndex>i) break;
+	}
+	if(i<skeleton->bones.size()){
+		// Reorder Bones
+		Skeleton::ptr ordered(new Skeleton());
+		// Pull all root bones
+		for(i=0;i<skeleton->bones.size();++i){
+			if(skeleton->bones[i]->parentIndex==-1){
+				ordered->bones.add(skeleton->bones[i]);
+				skeleton->bones.removeAt(i);
+				i--;
+			}
+		}
+		// Pull all bones that depend on a bone in the ordered bones
+		for(j=0;j<ordered->bones.size();++j){
+			Skeleton::Bone::ptr bone=ordered->bones[j];
 			for(i=0;i<skeleton->bones.size();++i){
-				if(skeleton->bones[i]->parentIndex==wantParent){
-					wantParent=skeleton->bones[i]->index;
+				if(skeleton->bones[i]->parentIndex==bone->index){
 					ordered->bones.add(skeleton->bones[i]);
 					skeleton->bones.removeAt(i);
 					i--;
 				}
 			}
 		}
+		// Reindex the ordered bones
+		Collection<int> newParentIndexes(ordered->bones.size(),-1);
+		for(j=0;j<ordered->bones.size();++j){
+			int oldIndex=ordered->bones[j]->index;
+			ordered->bones[j]->index=j;
+			for(i=0;i<ordered->bones.size();++i){
+				if(ordered->bones[i]->parentIndex==oldIndex){
+					newParentIndexes[i]=j;
+				}
+			}
+		}
+		for(j=0;j<ordered->bones.size();++j){
+			ordered->bones[j]->parentIndex=newParentIndexes[j];
+		}
+		skeleton=ordered;
 	}
-	skeleton=ordered;
 
 	skeleton->compile();
 
