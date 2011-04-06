@@ -805,17 +805,11 @@ void GLRenderer::setDefaultStates(){
 	}
 
 	// GL specific states
-	{
-		// Move specular to separate color
-		#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_11)
-		if(gl_version>=11){
-			glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL,GL_SEPARATE_SPECULAR_COLOR);
-		}
-		#endif
-
-		glPixelStorei(GL_PACK_ALIGNMENT,1);
-		glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+	#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_11)
+	if(gl_version>=11){
+		glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL,GL_SEPARATE_SPECULAR_COLOR);
 	}
+	#endif
 
 	TOADLET_CHECK_GLERROR("setDefaultStates");
 }

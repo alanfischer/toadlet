@@ -178,7 +178,7 @@ def write(filename):
 				# The XMSH format requires the root bone coordinates in worldspace; make sure we are getting this.
 				boneMat=bone.matrix['ARMATURESPACE']
 				out.write('\t\t\t<Translate>%f,%f,%f</Translate>\n' % (boneMat.translationPart().x, boneMat.translationPart().y, boneMat.translationPart().z))
-				out.write('\t\t\t<Rotate>%f,%f,%f</Rotate>\n' % (boneMat.toEuler().x, boneMat.toEuler().y, boneMat.toEuler().z))
+				out.write('\t\t\t<Rotate>%f,%f,%f,%f</Rotate>\n' % (boneMat.toQuat().x, boneMat.toQuat().y, boneMat.toQuat().z, boneMat.toQuat().w))
 				out.write('\t\t\t<Scale>%f,%f,%f</Scale>\n' % (boneMat.scalePart().x, boneMat.scalePart().y, boneMat.scalePart().z))
 
 				# TODO: apparently these are depreciated. Double check to be sure.
@@ -187,7 +187,7 @@ def write(filename):
 			
 				out.write('\t\t</Bone>\n')
 
-			out.write('\t<Skeleton>\n')
+			out.write('\t</Skeleton>\n')
 
 	out.write('</XMSH>\n')
 	out.close()
