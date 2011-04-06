@@ -176,7 +176,15 @@ def write(filename):
 				# boneMat=bone.matrix['BONESPACE'] <- This gives a 3x3 of rotations only. Not sure of it's value yet...
 				# Hints on blender bone matricies here: http://www.devmaster.net/forums/showthread.php?t=15178
 				# The XMSH format requires the root bone coordinates in worldspace; make sure we are getting this.
-				boneMat=bone.matrix['ARMATURESPACE']
+
+				# XMSH skeletons require each bone matrix to be in the space of its parent.
+				# Try out the transform suggestion above to achieve this:
+				if bone.parent:
+					parentMat=bone.parent.matrix['ARMATURESPACE']
+					boneMat=bone.matrix['ARMATURESPACE']*parentMat.invert()
+				else:
+					worldMat=ob.matrixWorld
+					boneMat=bone.matrix['ARMATURESPACE']*worldMat
 				out.write('\t\t\t<Translate>%f,%f,%f</Translate>\n' % (boneMat.translationPart().x, boneMat.translationPart().y, boneMat.translationPart().z))
 				out.write('\t\t\t<Rotate>%f,%f,%f,%f</Rotate>\n' % (boneMat.toQuat().x, boneMat.toQuat().y, boneMat.toQuat().z, boneMat.toQuat().w))
 				out.write('\t\t\t<Scale>%f,%f,%f</Scale>\n' % (boneMat.scalePart().x, boneMat.scalePart().y, boneMat.scalePart().z))
