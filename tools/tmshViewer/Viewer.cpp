@@ -166,8 +166,8 @@ void Viewer::mouseReleased(int x,int y,int button){
 void Viewer::resized(int width,int height){
 	scalar radius=mParent!=NULL?Math::length(mParent->getWorldBound().getSphere().origin)+mParent->getWorldBound().getSphere().radius*2:0;
 	scalar epsilon=0.001;
-	scalar nearDistance=mDistance-radius;
-	scalar farDistance=mDistance+radius;
+	scalar nearDistance=mDistance-2*radius;
+	scalar farDistance=mDistance+2*radius;
 	if(nearDistance<epsilon){nearDistance=epsilon;}
 	if(farDistance<nearDistance+epsilon){farDistance=nearDistance+epsilon;}
 	if(mCamera!=NULL && width!=0 && height!=0){
