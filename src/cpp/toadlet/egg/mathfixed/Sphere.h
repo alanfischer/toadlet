@@ -100,16 +100,16 @@ public:
 
 	void merge(const Sphere &sphere,fixed epsilon);
 
-	inline bool equaxls(const Sphere &sphere) const{
+	inline bool equals(const Sphere &sphere) const{
 		return (sphere.origin.equals(origin) && sphere.radius==radius);
 	}
 
 	inline bool operator==(const Sphere &sphere) const{
-		return (sphere.origin==origin && sphere.radius==radius);
+		return equals(sphere);
 	}
 
 	inline bool operator!=(const Sphere &sphere) const{
-		return (sphere.origin!=origin || sphere.radius!=radius);
+		return !equals(sphere);
 	}
 
 	inline Sphere operator+(const Vector3 &vec) const{

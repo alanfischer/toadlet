@@ -85,11 +85,11 @@ public:
 	}
 
 	inline bool operator==(const Vector3 &v) const{
-		return (v.x==x && v.y==y && v.z==z);
+		return equals(v);
 	}
 
 	inline bool operator!=(const Vector3 &v) const{
-		return (v.x!=x || v.y!=y || v.z!=z);
+		return !equals(v);
 	}
 
 	inline Vector3 operator+(const Vector3 &v) const{

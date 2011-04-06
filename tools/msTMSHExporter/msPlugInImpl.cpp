@@ -350,17 +350,16 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 				material->setTextureStage(0,diffuseStage);
 			}
 
-			//material->setOpacity(msMaterial_GetTransparency(msmat));
-
-			LightEffect le;
-			msMaterial_GetAmbient(msmat,le.ambient.getData());
-			msMaterial_GetDiffuse(msmat,le.diffuse.getData());
-			msMaterial_GetSpecular(msmat,le.specular.getData());
-			msMaterial_GetEmissive(msmat,le.emissive.getData());
-			le.shininess=msMaterial_GetShininess(msmat);
-			material->setLightEffect(le);
-
-			material->setLighting(true);
+			MaterialState materialState;
+			{
+				msMaterial_GetAmbient(msmat,materialState.ambient.getData());
+				msMaterial_GetDiffuse(msmat,materialState.diffuse.getData());
+				msMaterial_GetSpecular(msmat,materialState.specular.getData());
+				msMaterial_GetEmissive(msmat,materialState.emissive.getData());
+				materialState.shininess=msMaterial_GetShininess(msmat);
+				materialState.lighting=true;
+			}
+			material->setMaterialState(materialState);
 
 			sub->material=material;
 		}
@@ -435,34 +434,9 @@ cPlugIn::buildSkeleton(msModel *pModel,const Collection<int> &emptyBones){
 		msVec3 rotation;
 		msBone_GetRotation(msbone,rotation);
 		convertMSVec3ToQuaternion(rotation,bone->rotate,bone->parentIndex==-1);
-
-		Vector3 wtbtranslation(bone->translate);
-		Quaternion wtbrotation(bone->rotate);
-		Skeleton::Bone::ptr parentBone=bone;
-		while(parentBone!=NULL){
-			if(parentBone->parentIndex==-1){
-				parentBone=NULL;
-			}
-			else{
-				parentBone=skeleton->bones[parentBone->parentIndex];
-				Matrix3x3 rotate;
-				Math::setMatrix3x3FromQuaternion(rotate,parentBone->rotate);
-				Math::mul(wtbtranslation,rotate);
-				Math::add(wtbtranslation,parentBone->translate);
-				Math::preMul(wtbrotation,parentBone->rotate);
-			}
-		}
-
-		Math::neg(wtbtranslation);
-		Math::invert(wtbrotation);
-
-		Matrix3x3 rotate;
-		Math::setMatrix3x3FromQuaternion(rotate,wtbrotation);
-		Math::mul(wtbtranslation,rotate);
-
-		bone->worldToBoneTranslate.set(wtbtranslation);
-		bone->worldToBoneRotate.set(wtbrotation);
 	}
+
+	skeleton->compile();
 
 	return skeleton;
 }

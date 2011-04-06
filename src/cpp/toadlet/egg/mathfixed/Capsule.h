@@ -137,11 +137,11 @@ public:
 	}
 
 	inline bool operator==(const Capsule &capsule) const{
-		return (capsule.origin==origin && capsule.direction==direction && capsule.radius==radius);
+		return equals(capsule);
 	}
 
 	inline bool operator!=(const Capsule &capsule) const{
-		return (capsule.origin!=origin || capsule.direction!=direction || capsule.radius!=radius);
+		return !equals(capsule);
 	}
 
 	inline Capsule operator+(const Vector3 &vec) const{

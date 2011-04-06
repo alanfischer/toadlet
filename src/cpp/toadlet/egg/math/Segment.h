@@ -162,11 +162,11 @@ public:
 	}
 
 	inline bool operator==(const Segment &segment) const{
-		return (segment.origin==origin && segment.direction==direction);
+		return equals(segment);
 	}
 
 	inline bool operator!=(const Segment &segment) const{
-		return (segment.origin!=origin && segment.direction!=direction);
+		return !equals(segment);
 	}
 
 	Vector3 origin;

@@ -13,6 +13,7 @@ public:
 	Viewer();
 
 	void create();
+	void destroy();
 	void start(toadlet::tadpole::node::MeshNode::ptr meshNode);
 
 	void update(int dt);

@@ -24,35 +24,7 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 				Material::ptr material1=subMesh1->material;
 				Material::ptr material2=subMesh2->material;
 
-				bool same=false;
-				if(material1!=NULL && material2!=NULL){
-					same=true;
-					if(material1->getLightEffect()!=material2->getLightEffect()){
-						same=false;
-					}
-					if(material1->getLighting()!=material2->getLighting()){
-						same=false;
-					}
-					if(material1->getFaceCulling()!=material2->getFaceCulling()){
-						same=false;
-					}
-					if(material1->getNumTextureStages()!=material2->getNumTextureStages()){
-						same=false;
-					}
-					else{
-						int k;
-						for(k=0;k<material1->getNumTextureStages();++k){
-							TextureStage::ptr textureStage1=material1->getTextureStage(k);
-							TextureStage::ptr textureStage2=material2->getTextureStage(k);
-							if(textureStage1->getTextureName()!=textureStage2->getTextureName()){
-								same=false;
-								break;
-							}
-						}
-					}
-				}
-
-				if(same){
+				if(material1!=NULL && material2!=NULL && material1->equals(material2)){
 					IndexBuffer::ptr ib1=subMesh1->indexData->getIndexBuffer();
 					IndexBuffer::ptr ib2=subMesh2->indexData->getIndexBuffer();
 					IndexBuffer::ptr cib=engine->getBufferManager()->cloneIndexBuffer(ib1,ib1->getUsage(),ib1->getAccess(),ib1->getIndexFormat(),ib1->getSize()+ib2->getSize());

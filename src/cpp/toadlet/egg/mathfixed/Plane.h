@@ -93,11 +93,11 @@ public:
 	}
 
 	inline bool operator==(const Plane &plane) const{
-		return (plane.normal==normal && plane.distance==distance);
+		return equals(plane);
 	}
 
 	inline bool operator!=(const Plane &plane) const{
-		return (plane.normal!=normal || plane.distance!=distance);
+		return !equals(plane);
 	}
 
 	Vector3 normal;

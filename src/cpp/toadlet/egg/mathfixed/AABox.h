@@ -207,11 +207,11 @@ public:
 	}
 
 	inline bool operator==(const AABox &box) const{
-		return (box.mins==mins && box.maxs==maxs);
+		return equals(box);
 	}
 
 	inline bool operator!=(const AABox &box) const{
-		return (box.mins!=mins || box.maxs!=maxs);
+		return !equals(box);
 	}
 
 	inline AABox operator+(const Vector3 &vec) const{

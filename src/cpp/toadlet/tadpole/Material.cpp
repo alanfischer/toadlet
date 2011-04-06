@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Logger.h>
+#include <toadlet/peeper/BackableRenderStateSet.h>
 #include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/tadpole/Material.h>
 
@@ -42,6 +43,10 @@ Material::Material(RenderStateSet::ptr renderStateSet):BaseResource(),
 	//mRasterizerState
 	mLayer(0)
 {
+	if(renderStateSet==NULL){
+		renderStateSet=RenderStateSet::ptr(new BackableRenderStateSet());
+	}
+
 	mRenderStateSet=renderStateSet;
 }
 
@@ -97,6 +102,44 @@ void Material::modifyWith(Material *material){
 	for(i=0;i<material->getNumTextureStages();++i){
 		setTextureStage(i,material->getTextureStage(i)->clone());
 	}
+}
+
+bool Material::equals(Material *material){
+	RenderStateSet::ptr src=material->mRenderStateSet;
+	RenderStateSet::ptr dst=mRenderStateSet;
+
+	BlendState srcBlendState,dstBlendState;
+	src->getBlendState(srcBlendState);dst->getBlendState(dstBlendState);
+	if(srcBlendState!=dstBlendState) return false;
+
+	DepthState srcDepthState,dstDepthState;
+	src->getDepthState(srcDepthState);dst->getDepthState(dstDepthState);
+	if(srcDepthState!=dstDepthState) return false;
+
+	RasterizerState srcRasterizerState,dstRasterizerState;
+	src->getRasterizerState(srcRasterizerState);dst->getRasterizerState(dstRasterizerState);
+	if(srcRasterizerState!=dstRasterizerState) return false;
+
+	FogState srcFogState,dstFogState;
+	src->getFogState(srcFogState);dst->getFogState(dstFogState);
+	if(srcFogState!=dstFogState) return false;
+
+	PointState srcPointState,dstPointState;
+	src->getPointState(srcPointState);dst->getPointState(dstPointState);
+	if(srcPointState!=dstPointState) return false;
+
+	MaterialState srcMaterialState,dstMaterialState;
+	src->getMaterialState(srcMaterialState);dst->getMaterialState(dstMaterialState);
+	if(srcMaterialState!=dstMaterialState) return false;
+
+	if(material->getNumTextureStages()!=getNumTextureStages()) return false;
+
+	int i;
+	for(i=0;i<getNumTextureStages();++i){
+		if(getTextureStage(i)->getTextureName()!=material->getTextureStage(i)->getTextureName()) return false;
+	}
+
+	return true;
 }
 
 /// @todo: Optimize this so we're not resetting a ton of texture states

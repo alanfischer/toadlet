@@ -67,6 +67,9 @@ protected:
 	Material::ptr readMaterial(egg::io::DataStream *stream,int blockSize);
 	void writeMaterial(egg::io::DataStream *stream,Material::ptr material);
 
+	Skeleton::ptr readSkeleton(egg::io::DataStream *stream,int blockSize);
+	void writeSkeleton(egg::io::DataStream *stream,Skeleton::ptr skeleton);
+
 	// Blocks for the tmsh format
 	enum Block{
 		Block_MESH=		1,

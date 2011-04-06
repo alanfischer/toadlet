@@ -75,11 +75,11 @@ public:
 	}
 
 	inline bool operator==(const Quaternion &q) const{
-		return (q.x==x && q.y==y && q.z==z && q.w==w);
+		return equals(q);
 	}
 
 	inline bool operator!=(const Quaternion &q) const{
-		return (q.x!=x || q.y!=y || q.z!=z || q.w!=w);
+		return !equals(q);
 	}
 
 	Quaternion operator*(const Quaternion &q2) const;

@@ -126,11 +126,11 @@ public:
 	}
 
 	inline bool operator==(const BlendState &state) const{
-		return (source==state.source && dest==state.dest && colorWrite==state.colorWrite);
+		return equals(state);
 	}
 
 	inline bool operator!=(const BlendState &state) const{
-		return !(source==state.source && dest==state.dest && colorWrite==state.colorWrite);
+		return !equals(state);
 	}
 
 	Operation source;

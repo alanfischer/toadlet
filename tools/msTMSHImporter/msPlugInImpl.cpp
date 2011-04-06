@@ -253,20 +253,21 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 				}
 				msMaterial_SetName(msmat,materialName);
 
-				const LightEffect &le=material->getLightEffect();
-				float opacity=1.0f;//material->getOpacity();
+				MaterialState materialState;
+				if(material->getMaterialState(materialState)){
+					msMaterial_SetAmbient(msmat,(float*)materialState.ambient.getData());
+					msMaterial_SetDiffuse(msmat,(float*)materialState.diffuse.getData());
+					msMaterial_SetSpecular(msmat,(float*)materialState.specular.getData());
+					msMaterial_SetEmissive(msmat,(float*)materialState.emissive.getData());
+					msMaterial_SetShininess(msmat,materialState.shininess);
+					msMaterial_SetTransparency(msmat,1.0);
+				}
 
 				String textureName;
 				if(material->getNumTextureStages()>0){
 					textureName=material->getTextureStage(0)->getTextureName();
 				}
 
-				msMaterial_SetAmbient(msmat,(float*)le.ambient.getData());
-				msMaterial_SetDiffuse(msmat,(float*)le.diffuse.getData());
-				msMaterial_SetSpecular(msmat,(float*)le.specular.getData());
-				msMaterial_SetEmissive(msmat,(float*)le.emissive.getData());
-				msMaterial_SetShininess(msmat,le.shininess);
-				msMaterial_SetTransparency(msmat,opacity);
 				msMaterial_SetDiffuseTexture(msmat,textureName);
 				//msMaterial_SetAlphaTexture(msmat,szAlphaTexture);
 

@@ -44,6 +44,37 @@ void Skeleton::destroy(){
 }
 
 void Skeleton::compile(){
+	int i;
+	for(i=0;i<bones.size();++i){
+		Bone *bone=bones[i];
+
+		Vector3 wtbtranslation(bone->translate);
+		Quaternion wtbrotation(bone->rotate);
+		Bone *parentBone=bone;
+		while(parentBone!=NULL){
+			if(parentBone->parentIndex==-1){
+				parentBone=NULL;
+			}
+			else{
+				parentBone=bones[parentBone->parentIndex];
+				Matrix3x3 rotate;
+				Math::setMatrix3x3FromQuaternion(rotate,parentBone->rotate);
+				Math::mul(wtbtranslation,rotate);
+				Math::add(wtbtranslation,parentBone->translate);
+				Math::preMul(wtbrotation,parentBone->rotate);
+			}
+		}
+
+		Math::neg(wtbtranslation);
+		Math::invert(wtbrotation);
+
+		Matrix3x3 rotate;
+		Math::setMatrix3x3FromQuaternion(rotate,wtbrotation);
+		Math::mul(wtbtranslation,rotate);
+
+		bone->worldToBoneTranslate.set(wtbtranslation);
+		bone->worldToBoneRotate.set(wtbrotation);
+	}
 }
 
 }

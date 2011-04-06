@@ -62,8 +62,8 @@ Resource::ptr TMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 
 	Mesh::ptr mesh;
 	Collection<Material::ptr> materials;
-/*	Skeleton::ptr skeleton;
-	Collection<TransformSequence::ptr> sequences;
+	Skeleton::ptr skeleton;
+/*	Collection<TransformSequence::ptr> sequences;
 */	while(stream->position()<stream->length()){
 		int blockType=dataStream->readInt32();
 		int blockSize=dataStream->readInt32();
@@ -74,10 +74,10 @@ Resource::ptr TMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 			case Block_MATERIAL:
 				materials.add(readMaterial(dataStream,blockSize));
 			break;
-/*			case Block_SKELETON:
+			case Block_SKELETON:
 				skeleton=readSkeleton(dataStream,blockSize);
 			break;
-			case Block_SEQUENCE:
+/*			case Block_SEQUENCE:
 				sequences.add(readSequence(dataStream,blockSize));
 			break;
 */			default:
@@ -97,8 +97,13 @@ Resource::ptr TMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 		}
 	}
 
+	mesh->skeleton=skeleton;
+	if(mesh->skeleton!=NULL){
+		skeleton->retain();
+	}
+
 /*
-	TODO: Link skeleton to sequences & mesh to skeleton
+	TODO: Link skeleton to sequences
 */
 	return mesh;
 }
@@ -130,6 +135,14 @@ bool TMSHHandler::save(Mesh::ptr mesh,Stream::ptr stream){
 			dataStream->write(memoryStream->getOriginalDataPointer(),memoryStream->length());
 			memoryStream->reset();
 		}
+	}
+
+	if(mesh->skeleton!=NULL){
+		writeSkeleton(dataMemoryStream,mesh->skeleton);
+		dataStream->writeInt32(Block_SKELETON);
+		dataStream->writeInt32(memoryStream->length());
+		dataStream->write(memoryStream->getOriginalDataPointer(),memoryStream->length());
+		memoryStream->reset();
 	}
 
 	return true;
@@ -358,7 +371,7 @@ void TMSHHandler::writeVertexFormat(DataStream *stream,VertexFormat::ptr vertexF
 };
 
 /// @todo: Finish read/write all Material states
-Material::ptr TMSHHandler::readMaterial(egg::io::DataStream *stream,int blockSize){
+Material::ptr TMSHHandler::readMaterial(DataStream *stream,int blockSize){
 	if(stream->readBool()==false){
 		return NULL;
 	}
@@ -378,7 +391,7 @@ Material::ptr TMSHHandler::readMaterial(egg::io::DataStream *stream,int blockSiz
 	return material;
 }
 
-void TMSHHandler::writeMaterial(egg::io::DataStream *stream,Material::ptr material){
+void TMSHHandler::writeMaterial(DataStream *stream,Material::ptr material){
 	if(material==NULL){
 		stream->writeBool(false);
 		return;
@@ -395,6 +408,54 @@ void TMSHHandler::writeMaterial(egg::io::DataStream *stream,Material::ptr materi
 	RasterizerState rasterizerState;
 	material->getRasterizerState(rasterizerState);
 	stream->write((tbyte*)&rasterizerState,sizeof(RasterizerState));
+}
+
+Skeleton::ptr TMSHHandler::readSkeleton(DataStream *stream,int blockSize){
+	Skeleton::ptr skeleton(new Skeleton());
+
+	skeleton->bones.resize(stream->readInt32());
+
+	int i;
+	for(i=0;i<skeleton->bones.size();++i){
+		Skeleton::Bone::ptr bone(new Skeleton::Bone());
+
+		bone->index=stream->readInt32();
+		bone->parentIndex=stream->readInt32();
+
+		stream->readVector3(bone->translate);
+		stream->readQuaternion(bone->rotate);
+		stream->readVector3(bone->scale);
+
+		stream->readVector3(bone->worldToBoneTranslate);
+		stream->readQuaternion(bone->worldToBoneRotate);
+
+		stream->readNullTerminatedString(bone->name);
+
+		skeleton->bones[i]=bone;
+	}
+
+	return skeleton;
+}
+
+void TMSHHandler::writeSkeleton(DataStream *stream,Skeleton::ptr skeleton){
+	stream->writeInt32(skeleton->bones.size());
+
+	int i;
+	for(i=0;i<skeleton->bones.size();++i){
+		Skeleton::Bone *bone=skeleton->bones[i];
+
+		stream->writeInt32(bone->index);
+		stream->writeInt32(bone->parentIndex);
+
+		stream->writeVector3(bone->translate);
+		stream->writeQuaternion(bone->rotate);
+		stream->writeVector3(bone->scale);
+
+		stream->writeVector3(bone->worldToBoneTranslate);
+		stream->writeQuaternion(bone->worldToBoneRotate);
+
+		stream->writeNullTerminatedString(bone->name);
+	}
 }
 
 }

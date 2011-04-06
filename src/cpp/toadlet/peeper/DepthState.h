@@ -74,11 +74,11 @@ public:
 	}
 
 	inline bool operator==(const DepthState &state) const{
-		return (test==state.test && write==state.write);
+		return equals(state);
 	}
 
 	inline bool operator!=(const DepthState &state) const{
-		return !(test==state.test && write==state.write);
+		return !equals(state);
 	}
 
 	DepthTest test;
