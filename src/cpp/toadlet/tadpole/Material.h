@@ -41,7 +41,7 @@ class TOADLET_API Material:public egg::BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(Material);
 
-	Material(peeper::RenderStateSet::ptr renderStateSet=NULL);
+	Material(peeper::RenderStateSet::ptr renderStateSet=peeper::RenderStateSet::ptr());
 	virtual ~Material();
 
 	void destroy();
