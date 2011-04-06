@@ -134,11 +134,11 @@ public:
 	}
 
 	inline bool operator==(const Vector4 &v) const{
-		return (v.x==x && v.y==y && v.z==z && v.w==w);
+		return equals(v);
 	}
 
 	inline bool operator!=(const Vector4 &v) const{
-		return (v.x!=x || v.y!=y || v.z!=z || v.w!=w);
+		return !equals(v);
 	}
 
 	inline Vector4 operator+(const Vector4 &v) const{

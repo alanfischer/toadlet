@@ -65,6 +65,18 @@ public:
 		return *this;
 	}
 
+	inline bool equals(const FogState &state) const{
+		return (type==state.type && nearDistance==state.nearDistance && farDistance==state.farDistance && color.equals(state.color));
+	}
+
+	inline bool operator==(const FogState &state) const{
+		return equals(state);
+	}
+
+	inline bool operator!=(const FogState &state) const{
+		return !equals(state);
+	}
+
 	FogType type;
 	scalar nearDistance;
 	scalar farDistance;

@@ -105,11 +105,11 @@ public:
 	}
 
 	inline bool operator==(const Sphere &sphere) const{
-		return (sphere.origin==origin && sphere.radius==radius);
+		return equals(sphere);
 	}
 
 	inline bool operator!=(const Sphere &sphere) const{
-		return (sphere.origin!=origin || sphere.radius!=radius);
+		return !equals(sphere);
 	}
 
 	inline Sphere operator+(const Vector3 &vec) const{

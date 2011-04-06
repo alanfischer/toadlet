@@ -53,6 +53,10 @@ Resource::ptr XMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 
 	mxml_node_t *root=mxmlLoadString(NULL,string,MXML_OPAQUE_CALLBACK);
 
+	if(root==NULL){
+		return NULL;
+	}
+
 	if(strcmp(mxmlGetElementName(root),"XMSH")==0){
 		int version=0;
 		const char *versionProp=mxmlElementGetAttr(root,"Version");

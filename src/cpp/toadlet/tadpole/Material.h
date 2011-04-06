@@ -41,7 +41,7 @@ class TOADLET_API Material:public egg::BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(Material);
 
-	Material(peeper::RenderStateSet::ptr renderStateSet);
+	Material(peeper::RenderStateSet::ptr renderStateSet=NULL);
 	virtual ~Material();
 
 	void destroy();
@@ -76,6 +76,8 @@ public:
 
 	void modifyWith(Material *material);
 	bool getManaged(){return getUniqueHandle()!=0;}
+
+	bool equals(Material *material);
 
 	void setupRenderer(peeper::Renderer *renderer);
 	

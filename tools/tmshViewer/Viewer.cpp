@@ -74,6 +74,10 @@ void Viewer::create(){
 	mScene=Scene::ptr(new Scene(mEngine));
 }
 
+void Viewer::destroy(){
+	mScene->destroy();
+}
+
 void Viewer::start(MeshNode::ptr meshNode){
 	mParent=mEngine->createNodeType(ParentNode::type(),mScene);
 	mScene->getRoot()->attach(mParent);

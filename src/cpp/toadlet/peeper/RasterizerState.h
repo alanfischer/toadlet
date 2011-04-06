@@ -85,6 +85,20 @@ public:
 		return *this;
 	}
 
+	inline bool equals(const RasterizerState &state) const{
+		return (cull==state.cull && fill==state.fill && 
+			depthBiasConstant==state.depthBiasConstant && depthBiasSlope==state.depthBiasSlope &&
+			multisample==state.multisample && dither==state.dither);
+	}
+
+	inline bool operator==(const RasterizerState &state) const{
+		return equals(state);
+	}
+
+	inline bool operator!=(const RasterizerState &state) const{
+		return !equals(state);
+	}
+
 	CullType cull;
 	FillType fill;
 	scalar depthBiasConstant;

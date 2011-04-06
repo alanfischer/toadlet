@@ -234,7 +234,13 @@ const char *makeBoneAssignment(char *buffer,const Mesh::VertexBoneAssignmentList
 }
 
 Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,MaterialManager *materialManager,TextureManager *textureManager){
-	Material::ptr material=(materialManager!=NULL)?materialManager->createMaterial():Material::ptr(new Material(RenderStateSet::ptr(new BackableRenderStateSet())));
+	Material::ptr material;
+	if(materialManager!=NULL){
+		material=materialManager->createMaterial();
+	}
+	else{
+		material=Material::ptr(new Material());
+	}
 
 	const char *prop=mxmlElementGetAttr(node,"Name");
 	if(prop!=NULL){
@@ -1079,18 +1085,29 @@ Skeleton::ptr XMLMeshUtilities::loadSkeleton(mxml_node_t *node,int version){
 			bone->scale=parseVector3(mxmlGetOpaque(scaleNode->child));
 		}
 
-		mxml_node_t *worldToBoneTranslateNode=mxmlFindChild(boneNode,"WorldToBoneTranslate");
-		if(worldToBoneTranslateNode!=NULL){
-			bone->worldToBoneTranslate=parseVector3(mxmlGetOpaque(worldToBoneTranslateNode->child));
+		if(skeleton->bones.size()<=bone->index){
+			skeleton->bones.resize(bone->index+1);
 		}
-
-		mxml_node_t *worldToBoneRotateNode=mxmlFindChild(boneNode,"WorldToBoneRotate");
-		if(worldToBoneRotateNode!=NULL){
-			bone->worldToBoneRotate=parseQuaternion(mxmlGetOpaque(worldToBoneRotateNode->child));
-		}
-
-		skeleton->bones.add(bone);
+		skeleton->bones[bone->index]=bone;
 	}
+
+	// Reorder Bones
+	Skeleton::ptr ordered(new Skeleton());
+	int i,j;
+	while(skeleton->bones.size()>0){
+		int wantParent=-1;
+		for(j=skeleton->bones.size()-1;j>=0;--j){
+			for(i=0;i<skeleton->bones.size();++i){
+				if(skeleton->bones[i]->parentIndex==wantParent){
+					wantParent=skeleton->bones[i]->index;
+					ordered->bones.add(skeleton->bones[i]);
+					skeleton->bones.removeAt(i);
+					i--;
+				}
+			}
+		}
+	}
+	skeleton=ordered;
 
 	skeleton->compile();
 
@@ -1134,16 +1151,6 @@ mxml_node_t *XMLMeshUtilities::saveSkeleton(Skeleton::ptr skeleton,int version,P
 			mxml_node_t *scaleNode=mxmlNewElement(boneNode,"Scale");
 			{
 				mxmlNewOpaque(scaleNode,makeVector3(bone->scale));
-			}
-
-			mxml_node_t *worldToBoneTranslateNode=mxmlNewElement(boneNode,"WorldToBoneTranslate");
-			{
-				mxmlNewOpaque(worldToBoneTranslateNode,makeVector3(bone->worldToBoneTranslate));
-			}
-
-			mxml_node_t *worldToBoneRotateNode=mxmlNewElement(boneNode,"WorldToBoneRotate");
-			{
-				mxmlNewOpaque(worldToBoneRotateNode,makeQuaternion(bone->worldToBoneRotate));
 			}
 		}
 	}

@@ -72,6 +72,20 @@ public:
 		return *this;
 	}
 
+	inline bool equals(const PointState &state) const{
+		return (sprite==state.sprite && size==state.size && attenuated==state.attenuated &&
+			constant==state.constant && linear==state.linear && quadratic==state.quadratic &&
+			minSize==state.minSize && maxSize==state.maxSize);
+	}
+
+	inline bool operator==(const PointState &state) const{
+		return equals(state);
+	}
+
+	inline bool operator!=(const PointState &state) const{
+		return !equals(state);
+	}
+
 	bool sprite;
 	scalar size;
 	bool attenuated;

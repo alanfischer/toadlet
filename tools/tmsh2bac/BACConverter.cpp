@@ -308,14 +308,15 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 					m->name=material->getName();
 				}
 
-				if(material->getFaceCulling()==Renderer::FaceCulling_NONE){
-					m->doubleSided=true;
-				}
-				else{
-					m->doubleSided=false;
+				RasterizerState rasterizerState;
+				if(material->getRasterizerState(rasterizerState)){
+					m->doubleSided=(rasterizerState.cull==RasterizerState::CullType_NONE);
 				}
 
-				m->lighting=material->getLighting();
+				MaterialState materialState;
+				if(material->getMaterialState(materialState)){
+					m->lighting=materialState.lighting;
+				}
 
 				Texture *texture=material->getNumTextureStages()==0?NULL:material->getTextureStage(0)->getTexture();
 				String name=material->getNumTextureStages()==0?(char*)NULL:material->getTextureStage(0)->getTextureName();
@@ -333,7 +334,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 					m->colorIndex=-1;
 				}
 				else{
-					mColors.add(material->getLightEffect().diffuse);
+					mColors.add(materialState.diffuse);
 					m->textureIndex=-1;
 					m->colorIndex=mColors.size()-1;
 				}

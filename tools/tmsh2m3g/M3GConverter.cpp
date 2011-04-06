@@ -2099,24 +2099,26 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 
 		Material::ptr material=sub->material;
 		if(material!=NULL){
-			M3GPolygonMode *polygonMode=new M3GPolygonMode();
+			RasterizerState rasterizerState;
+			MaterialState materialState;
 
-			if(material->getFaceCulling()==Renderer::FaceCulling_NONE){
-				polygonMode->culling=M3GPolygonMode::CULL_NONE;
+			if(material->getRasterizerState(rasterizerState)){
+				M3GPolygonMode *polygonMode=new M3GPolygonMode();
+
+				if(rasterizerState.cull==RasterizerState::CullType_NONE) polygonMode->culling=M3GPolygonMode::CULL_NONE;
+
+				appearance->polygonMode=polygonMode;
 			}
 
-			appearance->polygonMode=polygonMode;
-
-			if(material->getLighting()){
+			if(material->getMaterialState(materialState) && materialState.lighting){
 				M3GMaterial *m3gMaterial=new M3GMaterial();
 
-				const LightEffect &le=material->getLightEffect();
-				m3gMaterial->ambientColor=toM3GColor(le.ambient);
-				m3gMaterial->diffuseColor=toM3GColor(le.diffuse);
-				m3gMaterial->emissiveColor=toM3GColor(le.emissive);
-				m3gMaterial->specularColor=toM3GColor(le.specular);
-				m3gMaterial->shininess=le.shininess;
-				m3gMaterial->vertexColorTrackingEnabled=le.trackColor;
+				m3gMaterial->ambientColor=toM3GColor(materialState.ambient);
+				m3gMaterial->diffuseColor=toM3GColor(materialState.diffuse);
+				m3gMaterial->emissiveColor=toM3GColor(materialState.emissive);
+				m3gMaterial->specularColor=toM3GColor(materialState.specular);
+				m3gMaterial->shininess=materialState.shininess;
+				m3gMaterial->vertexColorTrackingEnabled=materialState.trackColor;
 
 				appearance->material=m3gMaterial;
 			}

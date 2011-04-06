@@ -103,15 +103,16 @@ void VertexLighter::lightMesh(Mesh *mesh){
 
 		Material::ptr material=mesh->subMeshes[i]->material;
 
-		LightEffect le=material->getLightEffect();
-		le.trackColor=true;
-		material->setLightEffect(le);
-		material->setLighting(false);
-		if(le.diffuse!=Colors::BLACK){
-			diffuse=le.diffuse;
+		MaterialState materialState;
+		material->getMaterialState(materialState);
+		materialState.lighting=false;
+		materialState.trackColor=true;
+		material->setMaterialState(materialState);
+		if(materialState.diffuse!=Colors::BLACK){
+			diffuse=materialState.diffuse;
 		}
-		if(le.ambient!=Colors::BLACK){
-			ambient=le.ambient;
+		if(materialState.ambient!=Colors::BLACK){
+			ambient=materialState.ambient;
 		}
 
 		IndexBuffer::ptr indexBuffer(mesh->subMeshes[i]->indexData->getIndexBuffer());

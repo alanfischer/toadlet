@@ -71,11 +71,11 @@ public:
 	}
 
 	inline bool operator==(const Vector2 &v) const{
-		return (v.x==x && v.y==y);
+		return equals(v);
 	}
 
 	inline bool operator!=(const Vector2 &v) const{
-		return (v.x!=x || v.y!=y);
+		return !equals(v);
 	}
 
 	inline Vector2 operator+(const Vector2 &v) const{

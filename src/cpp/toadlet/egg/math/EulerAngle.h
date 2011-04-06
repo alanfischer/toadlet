@@ -69,11 +69,11 @@ public:
 	}
 
 	inline bool operator==(const EulerAngle &angle) const{
-		return (angle.x==x && angle.y==y && angle.z==z);
+		return equals(angle);
 	}
 
 	inline bool operator!=(const EulerAngle &angle) const{
-		return (angle.x!=x || angle.y!=y || angle.z!=z);
+		return !equals(angle);
 	}
 
 	inline real &operator[](int i){
