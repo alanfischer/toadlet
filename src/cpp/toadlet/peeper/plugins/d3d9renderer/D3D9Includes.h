@@ -27,6 +27,7 @@
 #define TOADLET_PEEPER_D3D9INCLUDES_H
 
 #include <toadlet/peeper/Types.h>
+#include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <windows.h>
 #include <commctrl.h>
@@ -410,7 +411,7 @@ namespace peeper{
 #if defined(TOADLET_DEBUG)
 	#define TOADLET_CHECK_D3D9ERROR(result,function) \
 		if(FAILED(result)) \
-			toadlet::egg::Logger::warning(toadlet::egg::Categories::TOADLET_PEEPER, \
+			toadlet::egg::Error::unknown(toadlet::egg::Categories::TOADLET_PEEPER, \
 			toadlet::egg::String("D3D9 Error in ") + function + ": error=" + (int)result); \
 
 #else

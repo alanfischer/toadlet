@@ -91,9 +91,9 @@ Resource::ptr ResourceManager::find(const egg::String &name,ResourceHandlerData:
 				String("Finding ")+name);
 		}
 
-		TOADLET_TRY
+//		TOADLET_TRY
 			resource=findFromFile(name,handlerData);
-		TOADLET_CATCH(const Exception &){resource=NULL;}
+//		TOADLET_CATCH(const Exception &){resource=NULL;}
 		if(resource!=NULL){
 			resource->setName(name);
 			manage(resource);

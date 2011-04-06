@@ -26,6 +26,7 @@
 #ifndef TOADLET_PEEPER_GLINCLUDES_H
 #define TOADLET_PEEPER_GLINCLUDES_H
 
+#include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/peeper/Types.h>
@@ -260,7 +261,7 @@
 	#define TOADLET_CHECK_GLERROR(function) \
 		{ int error=glGetError(); \
 		if(error!=GL_NO_ERROR) \
-			toadlet::egg::Logger::warning(toadlet::egg::Categories::TOADLET_PEEPER, \
+			toadlet::egg::Error::unknown(toadlet::egg::Categories::TOADLET_PEEPER, \
 			toadlet::egg::String("GL Error in ") + function + ": error=" + error); }
 #else
 	#define TOADLET_CHECK_GLERROR(function)
@@ -270,7 +271,7 @@
 	#define TOADLET_CHECK_EGLERROR(function) \
 		{ int error=eglGetError(); \
 		if(error!=EGL_SUCCESS) \
-			toadlet::egg::Logger::warning(toadlet::egg::Categories::TOADLET_PEEPER, \
+			toadlet::egg::Error::unknown(toadlet::egg::Categories::TOADLET_PEEPER, \
 			toadlet::egg::String("EGL Error in ") + function + ": error=" + error); }
 #else
 	#define TOADLET_CHECK_EGLERROR(function)
@@ -280,7 +281,7 @@
 	#define TOADLET_CHECK_WGLERROR(function) \
 		{ int error=GetLastError(); \
 		if(error!=0) \
-			toadlet::egg::Logger::warning(toadlet::egg::Categories::TOADLET_PEEPER, \
+			toadlet::egg::Error::unknown(toadlet::egg::Categories::TOADLET_PEEPER, \
 			toadlet::egg::String("WGL Error in ") + function + ": error=" + error); }
 #else
 	#define TOADLET_CHECK_WGLERROR(function)
