@@ -180,11 +180,12 @@ def write(filename):
 				# XMSH skeletons require each bone matrix to be in the space of its parent.
 				# Try out the transform suggestion above to achieve this:
 				if bone.parent:
-					parentMat=bone.parent.matrix['ARMATURESPACE']
-					boneMat=bone.matrix['ARMATURESPACE']*parentMat.invert()
+					parentMat=bone.parent.matrix['ARMATURESPACE'].copy()
+					parentMat.invert()
 				else:
-					worldMat=ob.matrixWorld
-					boneMat=bone.matrix['ARMATURESPACE']*worldMat
+					parentMat=ob.matrixWorld
+				boneMat=bone.matrix['ARMATURESPACE']*parentMat
+
 				out.write('\t\t\t<Translate>%f,%f,%f</Translate>\n' % (boneMat.translationPart().x, boneMat.translationPart().y, boneMat.translationPart().z))
 				out.write('\t\t\t<Rotate>%f,%f,%f,%f</Rotate>\n' % (boneMat.toQuat().x, boneMat.toQuat().y, boneMat.toQuat().z, boneMat.toQuat().w))
 				out.write('\t\t\t<Scale>%f,%f,%f</Scale>\n' % (boneMat.scalePart().x, boneMat.scalePart().y, boneMat.scalePart().z))
