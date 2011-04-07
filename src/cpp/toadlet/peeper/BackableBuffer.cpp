@@ -23,9 +23,10 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/peeper/BackableBuffer.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/image/ImageFormatConversion.h>
+#include <toadlet/peeper/BackableBuffer.h>
+#include <toadlet/peeper/Renderer.h>
 #include <string.h> // memcpy
 
 using namespace toadlet::egg;
@@ -41,6 +42,7 @@ BackableBuffer::BackableBuffer():
 	mDataSize(0),
 	mIndexFormat((IndexFormat)0),
 	//mVertexFormat,
+	mPixelFormat(0),
 	mSize(0),
 
 	mHasData(false),
@@ -212,7 +214,7 @@ void BackableBuffer::setBack(VertexBuffer::ptr back){
 	}
 }
 
-void BackableBuffer::setBack(PixelBuffer::ptr back){
+void BackableBuffer::setBack(PixelBuffer::ptr back,Renderer *renderer){
 	if(mBack.get()!=back.get() && mBack!=NULL){
 		((PixelBuffer*)(mBack.get()))->destroy();
 	}
@@ -220,8 +222,9 @@ void BackableBuffer::setBack(PixelBuffer::ptr back){
 	mBack=back;
 	
 	if(back!=NULL){
-		// Create on setting the back, otherwise D3D10 static resources will not load data in load
-		back->create(mUsage,mAccess,mPixelFormat,mWidth,mHeight,mDepth);
+		int newPixelFormat=renderer->getCloseTextureFormat(mPixelFormat,mUsage);
+
+		back->create(mUsage,mAccess,newPixelFormat,mWidth,mHeight,mDepth);
 
 		if(mHasData){
 			writeBack();
@@ -243,7 +246,14 @@ void BackableBuffer::writeBack(){
 	TOADLET_TRY
 		tbyte *data=mBack->lock(Access_BIT_WRITE);
 		if(data!=NULL){
-			memcpy(data,mData,mDataSize);
+			if(mPixelFormat!=0 && mPixelFormat!=((PixelBuffer*)(mBack.get()))->getPixelFormat()){
+				int backFormat=((PixelBuffer*)(mBack.get()))->getPixelFormat();
+				int srcPitch=ImageFormatConversion::getRowPitch(mPixelFormat,mWidth),dstPitch=ImageFormatConversion::getRowPitch(backFormat,mWidth);
+				ImageFormatConversion::convert(mData,mPixelFormat,srcPitch,srcPitch*mHeight,data,backFormat,dstPitch,dstPitch*mHeight,mWidth,mHeight,mDepth);
+			}
+			else{
+				memcpy(data,mData,mDataSize);
+			}
 			mBack->unlock();
 		}
 	TOADLET_CATCH(const Exception &){}

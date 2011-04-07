@@ -329,7 +329,7 @@ bool GLTexture::load(int width,int height,int depth,int mipLevel,tbyte *mipData)
 	int alignment=1,pitch=rowPitch;
 	while((pitch&1)==0){alignment<<=1;pitch>>=1;}
 	glPixelStorei(GL_PACK_ALIGNMENT,alignment<8?alignment:8);
-	
+
 	if(ImageFormatConversion::isFormatCompressed(mFormat)==false){
 		switch(mTarget){
 			#if !defined(TOADLET_HAS_GLES)

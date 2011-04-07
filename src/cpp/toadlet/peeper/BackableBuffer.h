@@ -33,6 +33,8 @@
 namespace toadlet{
 namespace peeper{
 
+class Renderer;
+
 class TOADLET_API BackableBuffer:public IndexBuffer,public VertexBuffer,public PixelBuffer{
 public:
 	TOADLET_SHARED_POINTERS(BackableBuffer);
@@ -71,7 +73,7 @@ public:
 
 	virtual void setBack(IndexBuffer::ptr back);
 	virtual void setBack(VertexBuffer::ptr back);
-	virtual void setBack(PixelBuffer::ptr back);
+	virtual void setBack(PixelBuffer::ptr back,Renderer *renderer);
 	virtual Buffer::ptr getBack(){return mBack;}
 
 protected:

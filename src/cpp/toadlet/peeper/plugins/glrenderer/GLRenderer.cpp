@@ -1889,7 +1889,12 @@ GLuint GLRenderer::getGLFormat(int textureFormat,bool internal){
 		return GL_LUMINANCE_ALPHA;
 	}
 	else if((textureFormat&Texture::Format_BIT_BGR)>0){
-		return GL_BGR;
+		if(internal==false){
+			return GL_BGR;
+		}
+		else{
+			return GL_RGB;
+		}
 	}
 	else if((textureFormat&Texture::Format_BIT_BGRA)>0){
 		if(internal==false){
@@ -1900,12 +1905,7 @@ GLuint GLRenderer::getGLFormat(int textureFormat,bool internal){
 		}
 	}
 	else if((textureFormat&Texture::Format_BIT_RGB)>0){
-		if(internal==false){
-			return GL_BGR;
-		}
-		else{
-			return GL_RGB;
-		}
+		return GL_RGB;
 	}
 	else if((textureFormat&Texture::Format_BIT_RGBA)>0){
 		return GL_RGBA;

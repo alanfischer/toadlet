@@ -68,6 +68,10 @@ public:
 
 	virtual void setMaterialState(const MaterialState &state)=0;
 	virtual bool getMaterialState(MaterialState &state) const=0;
+
+//	virtual int getNumSamplerStates() const=0;
+//	virtual void setSamplerState(int i,const SamplerState &state)=0;
+//	virtual bool getSamplerState(int i,SamplerState &state) const=0;
 };
 
 }
