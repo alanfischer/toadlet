@@ -54,17 +54,16 @@ VLCToadlet::~VLCToadlet(){
 
 void VLCToadlet::create(){
 #if defined(TOADLET_PLATFORM_WIN32)
-	setBackable(true);
+	setBackable(false);
 #endif
 
-	Application::create("gl");
+	Application::create("d3d9");
 
-	String url="c:\\users\\siralanf\\brain_colin27T1.avi";//http://www.youtube.com/watch?v=J---aiyznGQ";
+	String url="../../data/video.3gp";
 
 	scene=Scene::ptr(new Scene(mEngine));
 
-	int format=mRenderer->getClosestTextureFormat(Texture::Format_RGBA_8);
-	Texture::ptr texture=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET,Texture::Dimension_D2,format,128,128,1,1);
+	Texture::ptr texture=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET,Texture::Dimension_D2,Texture::Format_BGRA_8,128,128,1,1);
 	buffer=texture->getMipPixelBuffer(0,0);
 	backBuffer=mEngine->getBufferManager()->createPixelBuffer(Buffer::Usage_BIT_STAGING,Buffer::Access_BIT_WRITE,texture->getFormat(),texture->getWidth(),texture->getHeight(),1);
 
@@ -82,7 +81,7 @@ void VLCToadlet::create(){
 	scene->getRoot()->attach(cameraNode);
 
 	vlc=libvlc_new(0,NULL);
-	media=libvlc_media_new_location(vlc,url);
+	media=libvlc_media_new_path(vlc,url);
 	mediaplayer=libvlc_media_player_new_from_media(media);
 	libvlc_media_release(media);
 
