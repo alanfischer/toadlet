@@ -16,11 +16,12 @@ This script exports a toadlet XMSH file.
 
 Notes:
 
-Only selected objects will be exported.
-Only sticky UV texture coordinates are supported; per-face UVs will be ignored.
-Faces without a material will be assigned a dummy one.
-No operations or transformations are performed by this script, objects are exported exactly as is.
-Bones with idential names are not supported, and will result in badly exported skeletons
+* Only selected armatures and meshes will be exported.
+* Only triangle meshes are supported, convert any quads before exporting.
+* Only sticky UV texture coordinates are supported; per-face UVs will be ignored.
+* Faces without a material will be assigned a dummy one.
+* No operations or transformations are performed by this script, objects are exported exactly as is.
+* Bones with idential names are not supported, and will result in badly exported skeletons
 
 Usage:
 
@@ -87,6 +88,10 @@ def write(filename):
 			mesh = ob.getData(mesh=True)
 			if len(mesh.verts)==0:
 				continue;
+
+			# Transform the mesh coordinates into worldspace, as suggested by the blender documentation:
+			# http://www.blender.org/documentation/249PythonDoc/NMesh.NMesh-class.html#transform
+			mesh.transform(ob.matrix,True)
 
 			# Write out all vertexes in the mesh at once
 			out.write('\t<Mesh>\n')
@@ -164,6 +169,11 @@ def write(filename):
 					out.write('\t\t\t</Material>\n')
 
 				out.write('\t\t</SubMesh>\n')
+
+
+			# undo our transforms, to avoid screwing with blender
+			tmpmat=ob.matrix.copy()
+			mesh.transform(tmpmat.invert(),True)
 
 			out.write('\t</Mesh>\n')
 
