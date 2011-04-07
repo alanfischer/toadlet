@@ -77,6 +77,7 @@ protected:
 	ID3D10Resource *mD3DTexture;
 	ID3D10RenderTargetView *mD3DRenderTargetView;
 	ID3D10DepthStencilView *mD3DDepthStencilView;
+	Texture::ptr mBufferTexture;
 	int mLevel;
 	int mCubeSide;
 	int mDataSize;

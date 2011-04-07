@@ -52,11 +52,11 @@ D3D10TextureMipPixelBuffer::D3D10TextureMipPixelBuffer(D3D10Texture *texture,int
 	mD3DTexture=mTexture->mTexture;
 	mLevel=level;
 	mCubeSide=cubeSide;
-	mPixelFormat=mTexture->mFormat;
+	mPixelFormat=texture->mFormat;
 
 	/// @todo: Unify this with the GLTextureMipPixelBuffer creation
 	int l=level;
-	int w=texture->getWidth(),h=texture->getHeight(),d=texture->getDepth();
+	int w=mTexture->getWidth(),h=mTexture->getHeight(),d=mTexture->getDepth();
 	while(l>0){
 		w/=2; h/=2; d/=2;
 		l--;
@@ -69,7 +69,7 @@ D3D10TextureMipPixelBuffer::D3D10TextureMipPixelBuffer(D3D10Texture *texture,int
 		createViews(mTexture->mDimension,mTexture->mFormat,level);
 	}
 
-	mDataSize=ImageFormatConversion::getRowPitch(texture->getFormat(),mWidth)*mHeight*mDepth;
+	mDataSize=ImageFormatConversion::getRowPitch(mTexture->getFormat(),mWidth)*mHeight*mDepth;
 }
 
 D3D10TextureMipPixelBuffer::D3D10TextureMipPixelBuffer(D3D10Renderer *renderer):
@@ -98,10 +98,10 @@ bool D3D10TextureMipPixelBuffer::create(int usage,int access,int pixelFormat,int
 		return false;
 	}
 
-	Texture::ptr texture(mRenderer->createTexture());
-	mTexture=shared_static_cast<D3D10Texture>(texture);
+	mBufferTexture=Texture::ptr(mRenderer->createTexture());
+	mTexture=shared_static_cast<D3D10Texture>(mBufferTexture);
 	mTexture->retain();
-	mTexture->create(Texture::Usage_BIT_RENDERTARGET,Texture::Dimension_D2,pixelFormat,width,height,depth,1,NULL);
+	mTexture->create(usage|Texture::Usage_BIT_RENDERTARGET,Texture::Dimension_D2,pixelFormat,width,height,depth,1,NULL);
 	mD3DTexture=mTexture->mTexture;
 	mLevel=0;
 	mCubeSide=0;
@@ -110,7 +110,9 @@ bool D3D10TextureMipPixelBuffer::create(int usage,int access,int pixelFormat,int
 	mHeight=height;
 	mDepth=depth;
 
-	createViews(Texture::Dimension_D2,pixelFormat,0);
+	if((mTexture->getUsage()&Usage_BIT_STAGING)==0){
+		createViews(Texture::Dimension_D2,pixelFormat,0);
+	}
 
 	return true;
 }
@@ -134,7 +136,7 @@ uint8 *D3D10TextureMipPixelBuffer::lock(int lockAccess){
 	tbyte *data=NULL;
 
 	HRESULT result=S_OK;
-	switch(mTexture->getDimension()){
+ 	switch(mTexture->getDimension()){
 		case Texture::Dimension_D1:{
 			tbyte *mappedTex=NULL;
 			ID3D10Texture1D *texture=(ID3D10Texture1D*)mD3DTexture;
