@@ -104,7 +104,9 @@ def write(filename):
 				if len(mBoneIndicies)>0:
 					bonePairs=mesh.getVertexInfluences(vert.index)
 					for bone in bonePairs:
-						out.write(' %d,%f' % (mBoneIndicies[bone[0]],bone[1]))
+						if bone[0] in mBoneIndicies:
+							# Only write out the bone if it is present in the exported armatures
+							out.write(' %d,%f' % (mBoneIndicies[bone[0]],bone[1]))
 				out.write('\n')
 			out.write('\t\t</Vertexes>\n')
 
@@ -150,7 +152,17 @@ def write(filename):
 
 					# TODO: No idea with this one; how does blender determine culling?
 					out.write('\t\t\t\t<FaceCulling>back</FaceCulling>\n')
+
+					# Export all texture images associated with this material
+					for mtex in mat.textures:
+						if mtex and mtex.tex:
+							out.write('\t\t\t\t<TextureStage>\n')
+							if mtex.tex.image and mtex.tex.image.filename:
+								out.write('\t\t\t\t\t<Texture File=\"%s\"/>\n' % (mtex.tex.image.filename))
+							out.write('\t\t\t\t</TextureStage>\n')
+
 					out.write('\t\t\t</Material>\n')
+
 				out.write('\t\t</SubMesh>\n')
 
 			out.write('\t</Mesh>\n')
