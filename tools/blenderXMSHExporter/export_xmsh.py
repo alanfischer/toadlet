@@ -72,7 +72,6 @@ def write(filename):
 	for ob in objects:
 		if ob.type=='Armature':
 			armature = ob.getData()
-
 			for name in armature.bones.keys():
 				if name in mBoneIndicies:
 					# TODO: Actually warn the user with a popup or something useful
@@ -91,7 +90,8 @@ def write(filename):
 
 			# Transform the mesh coordinates into worldspace, as suggested by the blender documentation:
 			# http://www.blender.org/documentation/249PythonDoc/NMesh.NMesh-class.html#transform
-			mesh.transform(ob.matrix,True)
+			obMatrix=ob.matrix.copy()
+			mesh.transform(obMatrix,True)
 
 			# Write out all vertexes in the mesh at once
 			out.write('\t<Mesh>\n')
@@ -108,10 +108,15 @@ def write(filename):
 					out.write(' %f,%f' % (vert.uvco.x,vert.uvco.y))
 				if len(mBoneIndicies)>0:
 					bonePairs=mesh.getVertexInfluences(vert.index)
+					out.write(' ')
+					first=True
 					for bone in bonePairs:
+						# Only write out the bone if it is present in one of the exported armatures
 						if bone[0] in mBoneIndicies:
-							# Only write out the bone if it is present in the exported armatures
-							out.write(' %d,%f' % (mBoneIndicies[bone[0]],bone[1]))
+							if not first:
+								out.write(',')
+							out.write('%d,%f' % (mBoneIndicies[bone[0]],bone[1]))
+							first=False
 				out.write('\n')
 			out.write('\t\t</Vertexes>\n')
 
@@ -170,10 +175,8 @@ def write(filename):
 
 				out.write('\t\t</SubMesh>\n')
 
-
 			# undo our transforms, to avoid screwing with blender
-			tmpmat=ob.matrix.copy()
-			mesh.transform(tmpmat.invert(),True)
+			mesh.transform(obMatrix.invert(),True)
 
 			out.write('\t</Mesh>\n')
 
