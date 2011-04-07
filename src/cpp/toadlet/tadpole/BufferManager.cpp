@@ -164,7 +164,7 @@ PixelBuffer::ptr BufferManager::createPixelBuffer(int usage,int access,int pixel
 		backableBuffer->create(usage,access,pixelFormat,width,height,depth);
 		if(mEngine->getRenderer()!=NULL){
 			PixelBuffer::ptr back(mEngine->getRenderer()->createPixelBuffer());
-			backableBuffer->setBack(back);
+			backableBuffer->setBack(back,mEngine->getRenderer());
 		}
 		pixelBuffer=backableBuffer;
 	}
@@ -285,7 +285,7 @@ void BufferManager::contextActivate(Renderer *renderer){
 		PixelBuffer::ptr pixelBuffer=mPixelBuffers[i];
 		if(pixelBuffer->getRootPixelBuffer()!=pixelBuffer){
 			PixelBuffer::ptr back(renderer->createPixelBuffer());
-			shared_static_cast<BackableBuffer>(pixelBuffer)->setBack(back);
+			shared_static_cast<BackableBuffer>(pixelBuffer)->setBack(back,renderer);
 		}
 	}
 }
@@ -297,7 +297,7 @@ void BufferManager::contextDeactivate(Renderer *renderer){
 	for(i=0;i<mPixelBuffers.size();++i){
 		PixelBuffer::ptr pixelBuffer=mPixelBuffers[i];
 		if(pixelBuffer->getRootPixelBuffer()!=pixelBuffer){
-			shared_static_cast<BackableBuffer>(pixelBuffer)->setBack(PixelBuffer::ptr());
+			shared_static_cast<BackableBuffer>(pixelBuffer)->setBack(PixelBuffer::ptr(),NULL);
 		}
 	}
 
