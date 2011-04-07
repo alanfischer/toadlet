@@ -1525,13 +1525,19 @@ void GLRenderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &res
 }
 
 int GLRenderer::getCloseTextureFormat(int textureFormat,int usage){
+	if(gl_version<12){
+		switch(textureFormat){
+			case Texture::Format_BGR_8:
+				return Texture::Format_RGB_8;
+			case Texture::Format_BGRA_8:
+				return Texture::Format_RGBA_8;
+		}
+	}
+
 	switch(textureFormat){
 		case Texture::Format_R_8:
 		case Texture::Format_RG_8:
-		case Texture::Format_BGR_8:
 			return Texture::Format_RGB_8;
-		case Texture::Format_BGRA_8:
-			return Texture::Format_RGBA_8;
 		default:
 			return textureFormat;
 	}
@@ -1882,8 +1888,24 @@ GLuint GLRenderer::getGLFormat(int textureFormat,bool internal){
 	else if((textureFormat&Texture::Format_BIT_LA)>0){
 		return GL_LUMINANCE_ALPHA;
 	}
+	else if((textureFormat&Texture::Format_BIT_BGR)>0){
+		return GL_BGR;
+	}
+	else if((textureFormat&Texture::Format_BIT_BGRA)>0){
+		if(internal==false){
+			return GL_BGRA;
+		}
+		else{
+			return GL_RGBA;
+		}
+	}
 	else if((textureFormat&Texture::Format_BIT_RGB)>0){
-		return GL_RGB;
+		if(internal==false){
+			return GL_BGR;
+		}
+		else{
+			return GL_RGB;
+		}
 	}
 	else if((textureFormat&Texture::Format_BIT_RGBA)>0){
 		return GL_RGBA;
