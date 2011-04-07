@@ -1152,7 +1152,7 @@ D3DPOOL D3D9Renderer::getD3DPOOL(int usage){
 		if((usage&Buffer::Usage_BIT_STAGING)>0){
 			d3dpool=D3DPOOL_SYSTEMMEM;
 		}
-		else if((usage&(Buffer::Usage_BIT_DYNAMIC|Texture::Usage_BIT_RENDERTARGET))>0){
+		else if((usage&(Buffer::Usage_BIT_STREAM|Buffer::Usage_BIT_DYNAMIC|Texture::Usage_BIT_RENDERTARGET))>0){
 			d3dpool=D3DPOOL_DEFAULT;
 		}
 		else{
