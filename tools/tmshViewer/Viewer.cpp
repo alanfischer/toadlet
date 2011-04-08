@@ -69,7 +69,7 @@ Viewer::Viewer():Application(),
 {}
 
 void Viewer::create(){
-	Application::create("d3d9");
+	Application::create();
 
 	mScene=Scene::ptr(new Scene(mEngine));
 }

@@ -243,7 +243,7 @@ void MeshNode::frameUpdate(int dt,int scope){
 
 	if(mSkeleton!=NULL){
 		int lastUpdateFrame=mSkeleton->getLastUpdateFrame();
-		if(lastUpdateFrame==-1 || lastUpdateFrame==mScene->getFrame()){
+		if(lastUpdateFrame==-1 || lastUpdateFrame==mScene->getFrame() || mScene->getResetFrame()){
 			updateVertexBuffer();
 		}
 	}
@@ -314,10 +314,8 @@ void MeshNode::updateVertexBuffer(){
 			svba.lock(srcVertexBuffer,Buffer::Access_BIT_READ);
 			dvba.lock(dstVertexBuffer,Buffer::Access_BIT_WRITE);
 
-			// It appears that hardware buffers in opengl don't store their previous data if you want to write to them.
-			// Basically, if you want to write any of it, you have to write it all.
-			// So we re-copy over all the data to start
-			// NOTE: Probably due to UT_WRITE_ONLY on creation, makes it mean if we lock it, we will rewrite all that data
+
+			// Recopy all data, so we get texcoords and color information copied over correctly
 			memcpy(dvba.getData(),svba.getData(),srcVertexBuffer->getDataSize());
 
 			Vector3 positionInitial,positionResult,normalInitial,normalResult,temp;

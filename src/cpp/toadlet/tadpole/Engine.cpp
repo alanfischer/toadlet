@@ -159,9 +159,9 @@ Engine::Engine(bool backable):
 	mRenderer(NULL),
 	mLastRenderer(NULL),
 	mAudioPlayer(NULL),
-	mLastAudioPlayer(NULL),
+	mLastAudioPlayer(NULL)
 
-	mContextListener(NULL)
+	//mContextListeners
 {
 	Logger::debug(Categories::TOADLET_TADPOLE,
 		String("creating ")+Categories::TOADLET_TADPOLE+".Engine:"+Version::STRING);
@@ -567,8 +567,9 @@ void Engine::freeNode(Node *node){
 void Engine::contextReset(peeper::Renderer *renderer){
 	Logger::debug("Engine::contextReset");
 
-	if(mContextListener!=NULL){
-		mContextListener->preContextReset(renderer);
+	int i;
+	for(i=0;i<mContextListeners.size();++i){
+		mContextListeners[i]->preContextReset(renderer);
 	}
 
 	mBufferManager->preContextReset(renderer);
@@ -579,40 +580,42 @@ void Engine::contextReset(peeper::Renderer *renderer){
 	mBufferManager->postContextReset(renderer);
 	mTextureManager->postContextReset(renderer);
 
-	if(mContextListener!=NULL){
-		mContextListener->postContextReset(renderer);
+	for(i=0;i<mContextListeners.size();++i){
+		mContextListeners[i]->postContextReset(renderer);
 	}
 }
 
 void Engine::contextActivate(Renderer *renderer){
 	Logger::debug("Engine::contextActivate");
 
-	if(mContextListener!=NULL){
-		mContextListener->preContextActivate(renderer);
+	int i;
+	for(i=0;i<mContextListeners.size();++i){
+		mContextListeners[i]->preContextActivate(renderer);
 	}
 
 	mBufferManager->contextActivate(renderer);
 	mTextureManager->contextActivate(renderer);
 	mMaterialManager->contextActivate(renderer);
 
-	if(mContextListener!=NULL){
-		mContextListener->postContextActivate(renderer);
+	for(i=0;i<mContextListeners.size();++i){
+		mContextListeners[i]->postContextActivate(renderer);
 	}
 }
 
 void Engine::contextDeactivate(Renderer *renderer){
 	Logger::debug("Engine::contextDeactivate");
 
-	if(mContextListener!=NULL){
-		mContextListener->preContextDeactivate(renderer);
+	int i;
+	for(i=0;i<mContextListeners.size();++i){
+		mContextListeners[i]->preContextDeactivate(renderer);
 	}
 
 	mBufferManager->contextDeactivate(renderer);
 	mTextureManager->contextDeactivate(renderer);
 	mMaterialManager->contextDeactivate(renderer);
 
-	if(mContextListener!=NULL){
-		mContextListener->postContextDeactivate(renderer);
+	for(i=0;i<mContextListeners.size();++i){
+		mContextListeners[i]->postContextDeactivate(renderer);
 	}
 }
 
