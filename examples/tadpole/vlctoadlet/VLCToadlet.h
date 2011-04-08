@@ -31,8 +31,8 @@ public:
 	Scene::ptr scene;
 	CameraNode::ptr cameraNode;
 	MeshNode::ptr meshNode;
+	Texture::ptr texture;
 	PixelBuffer::ptr backBuffer;
-	PixelBuffer::ptr buffer;
 
 	libvlc_instance_t *vlc;
 	libvlc_media_t *media;

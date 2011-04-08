@@ -36,9 +36,15 @@ static void *lock(void *data, void **p_pixels){
 static void unlock(void *data, void *id, void *const *p_pixels){
 	VLCToadlet *self=(VLCToadlet*)data;
 
-	self->backBuffer->unlock();
-
-	self->getRenderer()->copyPixelBuffer(self->buffer,self->backBuffer);
+	// If the formats match we can just do a hardware copy, otherwise we will do manual conversion
+	if(self->backBuffer->getPixelFormat()==Texture::Format_BGRA_8){
+		self->backBuffer->unlock();
+		self->getRenderer()->copyPixelBuffer(self->texture->getMipPixelBuffer(0,0),self->backBuffer);
+	}
+	else{
+		self->getEngine()->getTextureManager()->textureLoad(self->texture,Texture::Format_RGBA_8,self->backBuffer->getWidth(),self->backBuffer->getHeight(),self->backBuffer->getDepth(),0,(tbyte*)*p_pixels);
+		self->backBuffer->unlock();
+	}
 }
 
 static void display(void *data, void *id){}
@@ -59,12 +65,12 @@ void VLCToadlet::create(){
 
 	Application::create("d3d9");
 
-	String url="../../data/video.3gp";
+	String url="../../data/test.3gp";
 
 	scene=Scene::ptr(new Scene(mEngine));
 
-	Texture::ptr texture=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET,Texture::Dimension_D2,Texture::Format_BGRA_8,128,128,1,1);
-	buffer=texture->getMipPixelBuffer(0,0);
+	int format=mRenderer->getCloseTextureFormat(Texture::Format_BGRA_8,Texture::Usage_BIT_STREAM);
+	texture=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_STREAM,Texture::Dimension_D2,format,128,128,1,1);
 	backBuffer=mEngine->getBufferManager()->createPixelBuffer(Buffer::Usage_BIT_STAGING,Buffer::Access_BIT_WRITE,texture->getFormat(),texture->getWidth(),texture->getHeight(),1);
 
 	Mesh::ptr mesh=mEngine->getMeshManager()->createBox(AABox(-10,-10,-10,10,10,10));
@@ -104,8 +110,8 @@ void VLCToadlet::destroy(){
 	libvlc_release(vlc);
 
 	scene->destroy();
+	texture->destroy();
 	backBuffer->destroy();
-	buffer->destroy();
 
 	Application::destroy();
 }
