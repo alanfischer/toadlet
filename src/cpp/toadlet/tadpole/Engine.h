@@ -92,8 +92,8 @@ public:
 	void contextActivate(peeper::Renderer *renderer);
 	void contextDeactivate(peeper::Renderer *renderer);
 
-	void setContextListener(ContextListener *listener){mContextListener=listener;}
-	ContextListener *getContextListener() const{return mContextListener;}
+	void addContextListener(ContextListener *listener){mContextListeners.add(listener);}
+	void removeContextListener(ContextListener *listener){mContextListeners.remove(listener);}
 
 	int getIdealVertexFormatBit() const{return mIdealVertexFormatBit;}
 	const VertexFormats &getVertexFormats() const{return mVertexFormats;}
@@ -117,7 +117,7 @@ protected:
 	ribbit::AudioPlayer *mAudioPlayer;
 	ribbit::AudioPlayer *mLastAudioPlayer;
 
-	ContextListener *mContextListener;
+	egg::Collection<ContextListener*> mContextListeners;
 
 	int mIdealVertexFormatBit;
 	VertexFormats mVertexFormats;

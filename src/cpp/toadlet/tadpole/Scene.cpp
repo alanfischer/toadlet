@@ -50,7 +50,8 @@ Scene::Scene(Engine *engine):
 	mLogicTime(0),
 	mLogicFrame(0),
 	mAccumulatedDT(0),
-	mFrame(0)
+	mFrame(0),
+	mResetFrame(false)
 
 	//mBackground,
 	//mRoot,
@@ -62,6 +63,7 @@ Scene::Scene(Engine *engine):
 	//mBoundMesh
 {
 	mEngine=engine;
+	mEngine->addContextListener(this);
 
 	setExcessiveDT(5000);
 	setRangeLogicDT(0,0);
@@ -88,6 +90,11 @@ void Scene::destroy(){
 	if(mRoot!=NULL){
 		mRoot->destroy();
 		mRoot=NULL;
+	}
+
+	if(mEngine!=NULL){
+		mEngine->removeContextListener(this);
+		mEngine=NULL;
 	}
 }
 
@@ -315,6 +322,13 @@ void Scene::renderBoundingVolumes(Renderer *renderer,Node *node){
 			renderBoundingVolumes(renderer,parent->getChild(i));
 		}
 	}
+}
+
+void Scene::postContextActivate(Renderer *renderer){
+	mResetFrame=true;
+	mRoot->activate();
+	mRoot->frameUpdate(0,-1);
+	mResetFrame=false;
 }
 
 }

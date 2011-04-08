@@ -80,6 +80,68 @@ Resource::ptr XMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 
 	mxmlRelease(root);
 
+	// Clean up skeleton
+	int i,j;
+	for(i=0;i<mesh->skeleton->bones.size();++i){
+		if(mesh->skeleton->bones[i]->parentIndex>i) break;
+	}
+	if(i<mesh->skeleton->bones.size()){
+		// Reorder Bones
+		Skeleton::ptr unordered=mesh->skeleton;
+		Skeleton::ptr ordered(new Skeleton());
+		// Pull all root bones
+		for(i=0;i<unordered->bones.size();++i){
+			if(unordered->bones[i]->parentIndex==-1){
+				ordered->bones.add(unordered->bones[i]);
+				unordered->bones.removeAt(i);
+				i--;
+			}
+		}
+		// Pull all bones that depend on a bone in the ordered bones
+		for(j=0;j<ordered->bones.size();++j){
+			Skeleton::Bone::ptr bone=ordered->bones[j];
+			for(i=0;i<unordered->bones.size();++i){
+				if(unordered->bones[i]->parentIndex==bone->index){
+					ordered->bones.add(unordered->bones[i]);
+					unordered->bones.removeAt(i);
+					i--;
+				}
+			}
+		}
+
+		// Reassign the vertexBoneAssignments
+		Collection<int> oldIndexes(ordered->bones.size(),-1);
+		for(i=0;i<ordered->bones.size();++i){
+			oldIndexes[ordered->bones[i]->index]=i;
+		}
+		for(i=0;i<mesh->vertexBoneAssignments.size();++i){
+			Mesh::VertexBoneAssignmentList &vbalist=mesh->vertexBoneAssignments[i];
+			for(j=0;j<vbalist.size();++j){
+				vbalist[j].bone=oldIndexes[vbalist[j].bone];
+			}
+		}
+
+		// Reindex the ordered bones
+		Collection<int> newParentIndexes(ordered->bones.size(),-1);
+		for(j=0;j<ordered->bones.size();++j){
+			int oldIndex=ordered->bones[j]->index;
+			ordered->bones[j]->index=j;
+			for(i=0;i<ordered->bones.size();++i){
+				if(ordered->bones[i]->parentIndex==oldIndex){
+					newParentIndexes[i]=j;
+				}
+			}
+		}
+		for(j=0;j<ordered->bones.size();++j){
+			ordered->bones[j]->parentIndex=newParentIndexes[j];
+		}
+
+		ordered->compile();
+
+		mesh->skeleton=ordered;
+	}
+
+
 	return mesh;
 }
 

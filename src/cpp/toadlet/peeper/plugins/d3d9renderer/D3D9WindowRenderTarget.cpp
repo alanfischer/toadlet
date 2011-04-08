@@ -110,6 +110,10 @@ void D3D9WindowRenderTarget::reset(){
 	}
 
 	mPresentParameters.MultiSampleType=(D3DMULTISAMPLE_TYPE)getClosestSamples(mSamples);
+	#if !defined(TOADLET_SET_D3DM)
+		mPresentParameters.BackBufferWidth	=getWidth();
+		mPresentParameters.BackBufferHeight	=getHeight();
+	#endif
 
 	HRESULT result=mD3DDevice->Reset(&mPresentParameters);
 	TOADLET_CHECK_D3D9ERROR(result,"Reset");

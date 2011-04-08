@@ -29,6 +29,7 @@
 #include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/peeper/TextureStage.h>
 #include <toadlet/tadpole/Collision.h>
+#include <toadlet/tadpole/ContextListener.h>
 #include <toadlet/tadpole/Mesh.h>
 #include <toadlet/tadpole/RenderListener.h>
 #include <toadlet/tadpole/RenderableSet.h>
@@ -39,7 +40,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API Scene{
+class TOADLET_API Scene:public ContextListener{
 public:
 	TOADLET_SHARED_POINTERS(Scene);
 
@@ -65,6 +66,7 @@ public:
 	virtual scalar getLogicFraction() const{return (mMinLogicDT==0 || mMinLogicDT!=mMaxLogicDT)?0:Math::div(Math::fromInt(mAccumulatedDT),Math::fromInt(mMinLogicDT));}
 	virtual int getTime() const{return mLogicTime+mAccumulatedDT;}
 	virtual int getFrame() const{return mFrame;}
+	virtual bool getResetFrame(){return mResetFrame;}
 
 	virtual void setUpdateListener(UpdateListener *updateListener){mUpdateListener=updateListener;}
 	virtual UpdateListener *getUpdateListener() const{return mUpdateListener;}
@@ -100,6 +102,13 @@ public:
 	int countActiveNodes(node::Node *node=NULL);
 	void renderBoundingVolumes(peeper::Renderer *renderer,node::Node *node=NULL);
 
+	virtual void preContextReset(peeper::Renderer *renderer){}
+	virtual void postContextReset(peeper::Renderer *renderer){postContextActivate(renderer);}
+	virtual void preContextActivate(peeper::Renderer *renderer){}
+	virtual void postContextActivate(peeper::Renderer *renderer);
+	virtual void preContextDeactivate(peeper::Renderer *renderer){}
+	virtual void postContextDeactivate(peeper::Renderer *renderer){}
+
 protected:
 	UpdateListener *mUpdateListener;
 	RenderListener *mRenderListener;
@@ -112,6 +121,7 @@ protected:
 	int mAccumulatedDT;
 	int mFrame;
 	egg::Collection<node::Node::ptr> mDependents;
+	bool mResetFrame;
 
 	Engine *mEngine;
 	node::PartitionNode::ptr mBackground;
