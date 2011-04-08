@@ -132,9 +132,6 @@ protected:
 	peeper::VertexData::ptr mDynamicVertexData;
 
 	MeshController::ptr mController;
-
-	Vector3 cache_updateVertexBuffer_positionVector;
-	Vector3 cache_updateVertexBuffer_normalVector;
 };
 
 }

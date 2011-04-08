@@ -52,6 +52,8 @@ public:
 
 	peeper::Texture::ptr findTexture(const egg::String &name){return egg::shared_static_cast<peeper::Texture>(ResourceManager::find(name));}
 
+	bool textureLoad(peeper::Texture::ptr texture,int pixelFormat,int width,int height,int depth,int mipLevel,tbyte *mipData);
+
 	void contextActivate(peeper::Renderer *renderer);
 	void contextDeactivate(peeper::Renderer *renderer);
 	void preContextReset(peeper::Renderer *renderer);

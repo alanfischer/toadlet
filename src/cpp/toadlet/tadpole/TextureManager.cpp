@@ -159,6 +159,23 @@ PixelBufferRenderTarget::ptr TextureManager::createPixelBufferRenderTarget(){
 	return renderTarget;
 }
 
+bool TextureManager::textureLoad(Texture::ptr texture,int pixelFormat,int width,int height,int depth,int mipLevel,tbyte *mipData){
+	bool result=false;
+	int textureFormat=texture->getFormat();
+	if(pixelFormat==textureFormat){
+		result=texture->load(width,height,depth,mipLevel,mipData);
+	}
+	else{
+		int srcPitch=ImageFormatConversion::getRowPitch(pixelFormat,width);
+		int dstPitch=ImageFormatConversion::getRowPitch(textureFormat,width);
+		tbyte *newData=new tbyte[dstPitch*height*depth];
+		ImageFormatConversion::convert(mipData,pixelFormat,srcPitch,srcPitch*height,newData,textureFormat,dstPitch,dstPitch*height,width,height,depth);
+		result=texture->load(width,height,depth,mipLevel,newData);
+		delete[] newData;
+	}
+	return result;
+}
+
 void TextureManager::contextActivate(Renderer *renderer){
 	int i;
 	for(i=0;i<mResources.size();++i){

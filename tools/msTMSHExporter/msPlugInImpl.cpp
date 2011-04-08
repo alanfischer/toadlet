@@ -73,10 +73,16 @@ public:
 	Vector3 position;
 	Vector3 normal;
 	Vector2 texCoord;
-	int bone;
+	Mesh::VertexBoneAssignmentList bones;
 
 	bool operator==(const Vertex &v) const{
-		return v.position==position && v.normal==normal && v.texCoord==texCoord && v.bone==bone;
+		if(bones.size()!=v.bones.size()) return false;
+
+		for(int i=0;i<bones.size();++i){
+			if(bones[i].bone==v.bones[i].bone || bones[i].weight!=v.bones[i].weight) return false;
+		}
+
+		return v.position==position && v.normal==normal && v.texCoord==texCoord;
 	}
 };
 
@@ -264,7 +270,7 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 				convertMSVec3ToVector3(vert,v.position,true);
 				v.texCoord=Vector2(tex[0],1.0f-tex[1]);
 				convertMSVec3ToVector3(norm,v.normal,true);
-				v.bone=bone;
+				v.bones.add(Mesh::VertexBoneAssignment(bone,1));
 
 				int l;
 				for(l=0;l<vertexes.size();++l){
@@ -303,10 +309,7 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 			vba.set3(i,1,vertexes[i].normal);
 			vba.set2(i,2,vertexes[i].texCoord);
 			if(bones){
-				Mesh::VertexBoneAssignment assignment;
-				assignment.bone=vertexes[i].bone;
-				assignment.weight=1.0f;
-				mesh->vertexBoneAssignments[i].add(assignment);
+				mesh->vertexBoneAssignments[i]=vertexes[i].bones;
 			}
 		}
 	}
