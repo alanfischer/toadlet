@@ -172,13 +172,12 @@ def write(filename):
 				out.write(' Name=\"%s\"' % (bone.name))
 				out.write('>\n')
 
-				# TODO:
-				# boneMat=bone.matrix['BONESPACE'] <- This gives a 3x3 of rotations only. Not sure of it's value yet...
-				# Hints on blender bone matricies here: http://www.devmaster.net/forums/showthread.php?t=15178
-				# The XMSH format requires the root bone coordinates in worldspace; make sure we are getting this.
-
+				# TODO: boneMat=bone.matrix['BONESPACE'] <- This gives a 3x3 of rotations only. Does it have any value in this export?
+				# Hints on blender bone matricies:
+				#	http://www.devmaster.net/forums/showthread.php?t=15178
+				#	http://www.blender.org/development/release-logs/blender-240/how-armatures-work/
 				# XMSH skeletons require each bone matrix to be in the space of its parent.
-				# Try out the transform suggestion above to achieve this:
+				# Try out the transforms suggested in the above links to achieve this:
 				if bone.parent:
 					parentMat=bone.parent.matrix['ARMATURESPACE'].copy()
 					parentMat.invert()
