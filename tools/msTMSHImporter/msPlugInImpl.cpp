@@ -137,7 +137,7 @@ cPlugIn::Execute (msModel *pModel)
 
 int
 cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
-    int i,j;
+    int i,j,k;
 
 	FileStream::ptr stream(new FileStream(name,FileStream::Open_READ_BINARY));
 	if(stream->closed()){
@@ -196,7 +196,9 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 			int texCoordIndex=vertexFormat->findSemantic(VertexFormat::Semantic_TEX_COORD);
 			VertexBufferAccessor vba(vertexBuffer);
 			for(j=0;j<vertexesToAdd.size();++j){
-				msVertex *vertex=msMesh_GetVertexAt(msmesh,msMesh_AddVertex(msmesh));
+				int vid=msMesh_AddVertex(msmesh);
+				msVertex *vertex=msMesh_GetVertexAt(msmesh,vid);
+				msVertexEx *vertexEx=msMesh_GetVertexExAt(msmesh,vid);
 				int v=vertexesToAdd[j];
 
 				if(positionIndex>=0){
@@ -222,9 +224,19 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 				}
 
 				if(bones){
-					const Mesh::VertexBoneAssignmentList &assignment=mesh->vertexBoneAssignments[v];
-					if(assignment.size()>0){
-						msVertex_SetBoneIndex(vertex,assignment[0].bone);
+					const Mesh::VertexBoneAssignmentList &vbal=mesh->vertexBoneAssignments[v];
+					int vbalsize=vbal.size();
+					if(vbalsize==1){
+						msVertex_SetBoneIndex(vertex,vbal[0].bone);
+					}
+					else if(vbalsize>1){
+						msVertex_SetBoneIndex(vertex,vbal[0].bone);
+						for(k=1;k<vbalsize;++k){
+							msVertexEx_SetBoneIndices(vertexEx,k-1,vbal[k].bone);
+						}
+						for(k=0;k<vbalsize;++k){
+							msVertexEx_SetBoneWeights(vertexEx,k,vbal[k].weight*100);
+						}
 					}
 				}
 			}

@@ -320,42 +320,55 @@ void MeshNode::updateVertexBuffer(){
 			// NOTE: Probably due to UT_WRITE_ONLY on creation, makes it mean if we lock it, we will rewrite all that data
 			memcpy(dvba.getData(),svba.getData(),srcVertexBuffer->getDataSize());
 
-			Vector3 &positionVector=cache_updateVertexBuffer_positionVector.reset();
-			Vector3 &normalVector=cache_updateVertexBuffer_normalVector.reset();
-
-			int i;
+			Vector3 positionInitial,positionResult,normalInitial,normalResult,temp;
+			int i,j;
 			if(normalIndex>=0){
 				for(i=0;i<srcVertexBuffer->getSize();++i){
-					svba.get3(i,positionIndex,positionVector);
-					svba.get3(i,normalIndex,normalVector);
+					svba.get3(i,positionIndex,positionInitial);
+					svba.get3(i,normalIndex,normalInitial);
 
+					positionResult.reset();normalResult.reset();
 					const Mesh::VertexBoneAssignmentList &vba=mMesh->vertexBoneAssignments[i];
-					if(vba.size()>0){
-						MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(mMesh->vertexBoneAssignments[i][0].bone); /// @todo: Implement all bones
+					for(j=0;j<vba.size();++j){
+						MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(vba[j].bone);
 
-						Math::mul(positionVector,bone->boneSpaceRotate);
-						Math::add(positionVector,bone->boneSpaceTranslate);
+						Math::mul(temp,bone->boneSpaceRotate,positionInitial);
+						Math::add(temp,bone->boneSpaceTranslate);
+						Math::mul(temp,vba[j].weight);
+						Math::add(positionResult,temp);
 
-						Math::mul(normalVector,bone->boneSpaceRotate);
+						Math::mul(temp,bone->boneSpaceRotate,normalInitial);
+						Math::mul(temp,vba[j].weight);
+						Math::add(normalResult,temp);
 					}
-				
-					dvba.set3(i,positionIndex,positionVector);
-					dvba.set3(i,normalIndex,normalVector);
+					if(j==0){
+						positionResult.set(positionInitial);
+						normalResult.set(normalInitial);
+					}
+
+					dvba.set3(i,positionIndex,positionResult);
+					dvba.set3(i,normalIndex,normalResult);
 				}
 			}
 			else{
 				for(i=0;i<srcVertexBuffer->getSize();++i){
-					svba.get3(i,positionIndex,positionVector);
+					svba.get3(i,positionIndex,positionInitial);
 
+					positionResult.reset();
 					const Mesh::VertexBoneAssignmentList &vba=mMesh->vertexBoneAssignments[i];
-					if(vba.size()>0){
-						MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(mMesh->vertexBoneAssignments[i][0].bone); /// @todo: Implement all bones
+					for(j=0;j<vba.size();++j){
+						MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(vba[j].bone);
 
-						Math::mul(positionVector,bone->boneSpaceRotate);
-						Math::add(positionVector,bone->boneSpaceTranslate);
+						Math::mul(temp,bone->boneSpaceRotate,positionInitial);
+						Math::add(temp,bone->boneSpaceTranslate);
+						Math::mul(temp,vba[j].weight);
+						Math::add(positionResult,temp);
+					}
+					if(j==0){
+						positionResult.set(positionInitial);
 					}
 
-					dvba.set3(i,positionIndex,positionVector);
+					dvba.set3(i,positionIndex,positionResult);
 				}
 			}
 
