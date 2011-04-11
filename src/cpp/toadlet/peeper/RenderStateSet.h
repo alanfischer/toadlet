@@ -34,6 +34,8 @@
 #include <toadlet/peeper/FogState.h>
 #include <toadlet/peeper/PointState.h>
 #include <toadlet/peeper/MaterialState.h>
+#include <toadlet/peeper/SamplerState.h>
+#include <toadlet/peeper/TextureState.h>
 
 namespace toadlet{
 namespace peeper{
@@ -69,9 +71,13 @@ public:
 	virtual void setMaterialState(const MaterialState &state)=0;
 	virtual bool getMaterialState(MaterialState &state) const=0;
 
-//	virtual int getNumSamplerStates() const=0;
-//	virtual void setSamplerState(int i,const SamplerState &state)=0;
-//	virtual bool getSamplerState(int i,SamplerState &state) const=0;
+	virtual void setSamplerState(int i,const SamplerState &state)=0;
+	virtual bool getSamplerState(int i,SamplerState &state) const=0;
+	virtual int getNumSamplerStates() const=0;
+
+	virtual void setTextureState(int i,const TextureState &state)=0;
+	virtual bool getTextureState(int i,TextureState &state) const=0;
+	virtual int getNumTextureStates() const=0;
 };
 
 }

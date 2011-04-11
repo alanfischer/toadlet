@@ -51,24 +51,9 @@ public:
 		Usage_BIT_AUTOGEN_MIPMAPS=	1<<6,	// Texture autogenerates its mipmap levels
 	};
 
-	// Requested Format: Format initially requested by user
-	// Texture Format: Format chosen by texture based on whatever the renderer can do
-	// Can the format of the texture change depending on the renderer?  Yes, you dont always have the format you want, it is converted to the Texture Format when accessed by the user.
-	// When you specify a Requested Format, you should be able to specify how Strict you want it to be.
-	// If its fully strict (both size & semantic) then only exact formats will match.  Makes it hard to switch between renderer.
-	// However you can easily spectify just semantic strict and it should work as expected.
-	// The BackableTexture remembers the Requested Semantic and Format, and uses that to choose Formats for Back Textures.
-
-	// X Remove StrictFormats
-	// X D3D9Texture no longer internally uses a different format, it just has a smarter Texture Format selector based on Usage that querys the Device
-	// In a way, StrictFormat behavior is always enabled.  If a Texture is created of a format that isn't available, it Errors.
-	// BackableTexture implements format conversion, and we move MipMap generation to the FormatConversion area also.
-	// Then BackableTexture can use the MipMap generation when creating Backs, and TextureManager will use the same MipMap generation.
-
 	virtual ~Texture(){}
 
-	virtual Texture *getRootTexture(scalar time)=0;
-	virtual bool getRootTransform(scalar time,Matrix4x4 &transform)=0;
+	virtual Texture *getRootTexture()=0;
 
 	virtual bool create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[])=0;
 	virtual void destroy()=0;

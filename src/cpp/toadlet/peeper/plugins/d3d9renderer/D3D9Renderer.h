@@ -31,8 +31,10 @@
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/BlendState.h>
 #include <toadlet/peeper/DepthState.h>
+#include <toadlet/peeper/FogState.h>
 #include <toadlet/peeper/MaterialState.h>
-#include <toadlet/peeper/TextureStage.h>
+#include <toadlet/peeper/SamplerState.h>
+#include <toadlet/peeper/TextureState.h>
 #include <toadlet/peeper/RasterizerState.h>
 #include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/peeper/IndexData.h>
@@ -84,9 +86,9 @@ public:
 	bool copySurface(IDirect3DSurface9 *dst,IDirect3DSurface9 *src);
 	void setDefaultStates();
 	bool setRenderStateSet(RenderStateSet *set);
+	void setTexture(int i,Texture *texture);
 
 	// Old fixed states
-	void setTextureStage(int stage,TextureStage *textureStage);
 	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff);
 	void setNormalize(const Normalize &normalize);
 	void setLightEnabled(int i,bool enable);
@@ -99,12 +101,15 @@ public:
 	int getCloseTextureFormat(int format);
 	const CapabilityState &getCapabilityState(){return mCapabilityState;}
 
+	/// @todo: Move these all to pointers once we have things working
 	void setBlendState(const BlendState &state);
 	void setDepthState(const DepthState &state);
 	void setRasterizerState(const RasterizerState &state);
 	void setFogState(const FogState &state);
 	void setPointState(const PointState &state);
 	void setMaterialState(const MaterialState &state);
+	void setSamplerState(int i,SamplerState *state);
+	void setTextureState(int i,TextureState *state);
 
 	inline IDirect3DDevice9 *getDirect3DDevice9(){return mD3DDevice;}
 	inline const D3DCAPS9 &getD3DCAPS9() const{return mD3DCaps;}
@@ -113,17 +118,18 @@ public:
 	Matrix4x4 cacheMatrix4x4;
 	D3DMATRIX cacheD3DMatrix;
 
-	static DWORD getD3DTOP(TextureBlend::Operation operation,TextureBlend::Source alphaSource);
+	static DWORD getD3DTOP(TextureState::Operation operation,TextureState::Source alphaSource);
 	static D3DFORMAT getD3DFORMAT(int textureFormat);
 	static DWORD getD3DUSAGE(int textureFormat,int usage);
 	static D3DPOOL getD3DPOOL(int usage);
-	static DWORD getD3DTADDRESS(TextureStage::AddressMode addressMode);
-	static DWORD getD3DTEXF(TextureStage::Filter filter);
-	static DWORD getD3DTA(TextureBlend::Source blend);
+	static DWORD getD3DTADDRESS(SamplerState::AddressType addressMode);
+	static DWORD getD3DTEXF(SamplerState::FilterType filter);
+	static DWORD getD3DTA(TextureState::Source blend);
 	static D3DBLEND getD3DBLEND(BlendState::Operation operation);
 	static D3DCULL getD3DCULL(RasterizerState::CullType type);
 	static D3DFILLMODE getD3DFILLMODE(RasterizerState::FillType type);
 	static D3DSHADEMODE getD3DSHADEMODE(MaterialState::ShadeType type);
+	static D3DFOGMODE getD3DFOGMODE(FogState::FogType type);
 	static DWORD getFVF(VertexFormat *vertexFormat);
 
 protected:
@@ -142,8 +148,6 @@ protected:
 	D3D9RenderTarget *mD3DRenderTarget;
 
 	CapabilityState mCapabilityState;
-
-	Matrix4x4 cache_setTextureStage_transform;
 };
 
 }

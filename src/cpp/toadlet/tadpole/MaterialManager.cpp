@@ -44,10 +44,6 @@ MaterialManager::MaterialManager(Engine *engine,bool backable):ResourceManager(e
 {
 	mEngine=engine;
 	mBackable=backable;
-
-	mDefaultMinFilter=TextureStage::Filter_LINEAR;
-	mDefaultMagFilter=TextureStage::Filter_LINEAR;
-	mDefaultMipFilter=TextureStage::Filter_LINEAR;
 }
 
 void MaterialManager::destroy(){
@@ -62,13 +58,33 @@ void MaterialManager::destroy(){
 	mRenderStateSets.clear();
 }
 
-Material::ptr MaterialManager::createMaterial(){
+Material::ptr MaterialManager::createMaterial(Texture::ptr texture,bool clamped){
 	Material::ptr material(new Material(createRenderStateSet()));
 
 	material->setBlendState(BlendState());
 	material->setDepthState(DepthState());
 	material->setRasterizerState(RasterizerState());
 	material->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+
+	if(texture!=NULL){
+		material->setTexture(0,texture);
+		SamplerState samplerState(mDefaultSamplerState);
+		if(texture->getNumMipLevels()==1){
+			samplerState.mipFilter=SamplerState::FilterType_NONE;
+		}
+		if(clamped || texture->getDimension()==Texture::Dimension_CUBE){
+			samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+			samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+			samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+		}
+		material->setSamplerState(0,samplerState);
+
+		TextureState textureState;
+		if((texture->getFormat()&Texture::Format_BIT_DEPTH)>0){
+			textureState.shadowResult=TextureState::ShadowResult_L;
+		}
+		material->setTextureState(0,textureState);
+	}
 
 	manage(material);
 
@@ -116,28 +132,6 @@ RenderStateSet::ptr MaterialManager::createRenderStateSet(){
 	return renderStateSet;
 }
 
-TextureStage::ptr MaterialManager::createTextureStage(Texture::ptr texture,bool clamped){
-	TextureStage::ptr textureStage(new TextureStage(texture));
-	textureStage->setMinFilter(mDefaultMinFilter);
-	textureStage->setMagFilter(mDefaultMagFilter);
-	if(texture!=NULL && texture->getNumMipLevels()!=1){ // Only enable mipmap filtering if we have 0 for autogen, or > 1 mipmap levels
-		textureStage->setMipFilter(mDefaultMipFilter);
-	}
-	else{
-		textureStage->setMipFilter(TextureStage::Filter_NONE);
-	}
-	if(clamped || (texture!=NULL && texture->getDimension()==Texture::Dimension_CUBE)){
-		textureStage->setUAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
-		textureStage->setVAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
-		textureStage->setWAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
-	}
-	if(texture!=NULL && (texture->getFormat()&Texture::Format_BIT_DEPTH)>0){
-		textureStage->setShadowComparison(TextureStage::ShadowComparison_L);
-	}
-
-	return textureStage;
-}
-
 void MaterialManager::contextActivate(Renderer *renderer){
 	int i;
 	for(i=0;i<mRenderStateSets.size();++i){
@@ -166,9 +160,7 @@ void MaterialManager::renderStateSetDestroyed(RenderStateSet *renderStateSet){
 Resource::ptr MaterialManager::unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData){
 	Texture::ptr texture=mEngine->getTextureManager()->findTexture(name);
 	if(texture!=NULL){
-		Material::ptr material=createMaterial();
-		material->setTextureStage(0,createTextureStage(texture));
-		return material;
+		return createMaterial(texture);
 	}
 	else{
 		return ResourceManager::unableToFindHandler(name,handlerData);

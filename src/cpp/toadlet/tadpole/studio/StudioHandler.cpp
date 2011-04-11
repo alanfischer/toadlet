@@ -184,9 +184,7 @@ void StudioHandler::buildMaterials(StudioModel *model){
 		material->retain();
 		material->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
 		material->setMaterialState(MaterialState(true,false,(stexture->flags&STUDIO_NF_FLATSHADE)>0?MaterialState::ShadeType_FLAT:MaterialState::ShadeType_GOURAUD));
-
-		TextureStage::ptr primary=mEngine->getMaterialManager()->createTextureStage(model->textures[i]);
-		material->setTextureStage(0,primary);
+		material->setTexture(0,model->textures[i]);
 
 		model->materials[i]=material;
 	}

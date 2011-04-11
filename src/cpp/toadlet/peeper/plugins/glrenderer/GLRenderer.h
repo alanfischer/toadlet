@@ -36,7 +36,8 @@
 #include <toadlet/peeper/LightState.h>
 #include <toadlet/peeper/PointState.h>
 #include <toadlet/peeper/RasterizerState.h>
-#include <toadlet/peeper/TextureStage.h>
+#include <toadlet/peeper/SamplerState.h>
+#include <toadlet/peeper/TextureState.h>
 #include <toadlet/peeper/Viewport.h>
 #include <toadlet/peeper/CapabilityState.h>
 
@@ -96,9 +97,9 @@ public:
 	bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src);
 	void setDefaultStates();
 	bool setRenderStateSet(RenderStateSet *set);
+	void setTexture(int i,Texture *texture);
 
 	// Old fixed states
-	void setTextureStage(int stage,TextureStage *textureStage);
 	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff);
 	void setNormalize(const Normalize &normalize);
 	void setLightEnabled(int i,bool enable);
@@ -110,12 +111,17 @@ public:
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
 	const CapabilityState &getCapabilityState(){return mCapabilityState;}
 
+	/// @todo: Move these all to pointers once we have things working
 	void setBlendState(const BlendState &state);
 	void setDepthState(const DepthState &state);
 	void setRasterizerState(const RasterizerState &state);
 	void setFogState(const FogState &state);
 	void setPointState(const PointState &state);
 	void setMaterialState(const MaterialState &state);
+	void setSamplerState(int i,SamplerState *state);
+	void setTextureState(int i,TextureState *state);
+	void setSamplerStatePostTexture(int i,SamplerState *state);
+	void setTextureStatePostTexture(int i,TextureState *state);
 
 	bool useMapping(GLBuffer *buffer) const;
 
@@ -146,13 +152,13 @@ public:
 	static GLuint getGLFormat(int textureFormat,bool internal);
 	static GLuint getGLType(int textureFormat);
 	static GLuint getGLIndexType(int indexFormat);
-	static GLuint getGLWrap(TextureStage::AddressMode addressMode,bool hasClampToEdge=true);
-	static GLuint getGLMinFilter(TextureStage::Filter minFilter,TextureStage::Filter mipFilter);
-	static GLuint getGLMagFilter(TextureStage::Filter magFilter);
-	static GLuint getGLTextureBlendSource(TextureBlend::Source source);
-	static GLuint getGLTextureBlendOperation(TextureBlend::Operation operation);
-	static GLuint getGLDepthTextureMode(TextureStage::ShadowComparison comparison);
-	static float getGLTextureBlendScale(TextureBlend::Operation operation);
+	static GLuint getGLWrap(SamplerState::AddressType address,bool hasClampToEdge=true);
+	static GLuint getGLMinFilter(SamplerState::FilterType minFilter,SamplerState::FilterType mipFilter);
+	static GLuint getGLMagFilter(SamplerState::FilterType magFilter);
+	static GLuint getGLTextureBlendSource(TextureState::Source source);
+	static GLuint getGLTextureBlendOperation(TextureState::Operation operation);
+	static float getGLTextureBlendScale(TextureState::Operation operation);
+	static GLuint getGLDepthTextureMode(TextureState::ShadowResult shadow);
 	static GLuint GLClientStates[6];
 	static GLuint GLCubeFaces[6];
 
@@ -168,6 +174,8 @@ protected:
 	DepthState mDepthState;
 	PointState mPointState;
 	egg::Collection<GLTexture*> mLastTextures;
+	egg::Collection<SamplerState*> mLastSamplerStates;
+	egg::Collection<TextureState*> mLastTextureStates;
 	short mMaxTexCoordIndex;
 	egg::Collection<short> mTexCoordIndexes;
 	short mLastMaxTexCoordIndex;
@@ -186,6 +194,7 @@ protected:
 
 	CapabilityState mCapabilityState;
 	bool mMultiTexture;
+	bool mHasClampToEdge;
 
 	RenderTarget *mPrimaryRenderTarget;
 	GLRenderTarget *mGLPrimaryRenderTarget;
@@ -195,8 +204,6 @@ protected:
 	#if defined(TOADLET_DEBUG)
 		int mBeginEndCounter;
 	#endif
-
-	Matrix4x4 cache_setTextureStage_transform;
 
 	friend class GLBuffer;
 };
