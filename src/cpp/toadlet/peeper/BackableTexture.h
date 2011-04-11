@@ -41,8 +41,7 @@ public:
 	BackableTexture();
 	virtual ~BackableTexture();
 
-	virtual Texture *getRootTexture(scalar time){return mBack!=NULL?mBack->getRootTexture(time):NULL;}
-	virtual bool getRootTransform(scalar time,Matrix4x4 &transform){return mBack!=NULL?mBack->getRootTransform(time,transform):true;}
+	virtual Texture *getRootTexture(){return mBack!=NULL?mBack->getRootTexture():NULL;}
 
 	virtual bool create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]);
 	virtual void destroy();

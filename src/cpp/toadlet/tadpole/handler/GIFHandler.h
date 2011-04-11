@@ -27,7 +27,6 @@
 #define TOADLET_TADPOLE_HANDLER_GIFHANDLER_H
 
 #include <toadlet/egg/image/GIFHandler.h>
-#include <toadlet/peeper/SequenceTexture.h>
 #include <toadlet/tadpole/ResourceHandler.h>
 
 namespace toadlet{
@@ -53,12 +52,14 @@ public:
 			return mTextureManager->createTexture(egg::image::Image::ptr(images[0]));
 		}
 		else{
-			peeper::SequenceTexture::ptr sequence(new peeper::SequenceTexture(peeper::Texture::Dimension_D2,images.size()));
-			int i;
-			for(i=0;i<images.size();++i){
-				sequence->setTexture(i,mTextureManager->createTexture(egg::image::Image::ptr(images[i])),Math::fromMilli(delays[i]));
-			}
-			return egg::shared_static_cast<peeper::Texture>(sequence);
+/// @todo: Revive this somehow, probably as a 3d texture
+//			peeper::SequenceTexture::ptr sequence(new peeper::SequenceTexture(peeper::Texture::Dimension_D2,images.size()));
+//			int i;
+//			for(i=0;i<images.size();++i){
+//				sequence->setTexture(i,mTextureManager->createTexture(egg::image::Image::ptr(images[i])),Math::fromMilli(delays[i]));
+//			}
+//			return egg::shared_static_cast<peeper::Texture>(sequence);
+return NULL;
 		}
 	}
 

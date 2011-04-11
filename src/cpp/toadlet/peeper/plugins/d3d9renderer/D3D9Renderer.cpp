@@ -291,7 +291,8 @@ void D3D9Renderer::clear(int clearFlags,const Vector4 &clearColor){
 	}
 
 	D3DCOLOR color=toD3DCOLOR(clearColor);
-	mD3DDevice->Clear(0,NULL,d3dclear,color,1.0f,0);
+	HRESULT result=mD3DDevice->Clear(0,NULL,d3dclear,color,1.0f,0);
+	TOADLET_CHECK_D3D9ERROR(result,"clear");
 }
 
 void D3D9Renderer::swap(){
@@ -336,7 +337,7 @@ void D3D9Renderer::beginScene(){
 void D3D9Renderer::endScene(){
 	int i;
 	for(i=0;i<mCapabilityState.maxTextureStages;++i){
-		setTextureStage(i,NULL);
+		setTexture(i,NULL);
 	}
 
 	HRESULT result=mD3DDevice->EndScene();
@@ -472,7 +473,9 @@ void D3D9Renderer::setDefaultStates(){
 
 	int i;
 	for(i=0;i<mCapabilityState.maxTextureStages;++i){
-		setTextureStage(i,NULL);
+		setSamplerState(i,NULL);
+		setTextureState(i,NULL);
+		setTexture(i,NULL);
 	}
 
 	setMaterialState(MaterialState());
@@ -511,6 +514,13 @@ bool D3D9Renderer::setRenderStateSet(RenderStateSet *set){
 	}
 	if(d3dset->mMaterialState!=NULL){
 		setMaterialState(*d3dset->mMaterialState);
+	}
+	int i;
+	for(i=0;i<d3dset->mSamplerStates.size();++i){
+		setSamplerState(i,d3dset->mSamplerStates[i]);
+	}
+	for(i=0;i<d3dset->mTextureStates.size();++i){
+		setTextureState(i,d3dset->mTextureStates[i]);
 	}
 
 	return true;
@@ -617,7 +627,7 @@ void D3D9Renderer::setDepthState(const DepthState &state){
 }
 
 void D3D9Renderer::setFogState(const FogState &state){
-	if(state.type==FogState::FogType_NONE){
+	if(state.fog==FogState::FogType_NONE){
 		mD3DDevice->SetRenderState(D3DRS_FOGENABLE,FALSE);
 	}
 	else{
@@ -626,7 +636,8 @@ void D3D9Renderer::setFogState(const FogState &state){
 	
 		mD3DDevice->SetRenderState(D3DRS_FOGENABLE,TRUE);
 	    mD3DDevice->SetRenderState(D3DRS_FOGCOLOR,toD3DCOLOR(state.color));
-        mD3DDevice->SetRenderState(D3DRS_FOGVERTEXMODE,D3DFOG_LINEAR);
+        mD3DDevice->SetRenderState(D3DRS_FOGVERTEXMODE,getD3DFOGMODE(state.fog));
+        mD3DDevice->SetRenderState(D3DRS_FOGDENSITY,state.density);
 		mD3DDevice->SetRenderState(D3DRS_FOGSTART,*(DWORD*)(&fNearDistance));
 		mD3DDevice->SetRenderState(D3DRS_FOGEND,*(DWORD*)(&fFarDistance));
 	}
@@ -712,47 +723,70 @@ void D3D9Renderer::setRasterizerState(const RasterizerState &state){
 	mD3DDevice->SetRenderState(D3DRS_DITHERENABLE,state.dither);
 }
 
-void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
-	HRESULT result=S_OK;
+void D3D9Renderer::setSamplerState(int i,SamplerState *state){
+	if(state!=NULL){
+		#if defined(TOADLET_SET_D3DM)
+			mD3DDevice->SetTextureStageState(i,D3DMTSS_ADDRESSU,D3D9Renderer::getD3DTADDRESS(state->uAddress));
+			mD3DDevice->SetTextureStageState(i,D3DMTSS_ADDRESSV,D3D9Renderer::getD3DTADDRESS(state->vAddress));
+			mD3DDevice->SetTextureStageState(i,D3DMTSS_ADDRESSW,D3D9Renderer::getD3DTADDRESS(state->wAddress));
 
-	if(textureStage!=NULL){
-		Texture *texture=textureStage->texture;
-		D3D9Texture *d3dtexture=texture!=NULL?(D3D9Texture*)texture->getRootTexture(textureStage->textureTime):NULL;
-		if(d3dtexture!=NULL){
-			result=mD3DDevice->SetTexture(stage,d3dtexture->mTexture);
-			TOADLET_CHECK_D3D9ERROR(result,"SetTexture");
+			mD3DDevice->SetTextureStageState(i,D3DMTSS_MINFILTER,D3D9Renderer::getD3DTEXF(state->minFilter));
+			mD3DDevice->SetTextureStageState(i,D3DMTSS_MIPFILTER,D3D9Renderer::getD3DTEXF(state->mipFilter));
+			mD3DDevice->SetTextureStageState(i,D3DMTSS_MAGFILTER,D3D9Renderer::getD3DTEXF(state->magFilter));
+		#else
+			mD3DDevice->SetSamplerState(i,D3DSAMP_ADDRESSU,D3D9Renderer::getD3DTADDRESS(state->uAddress));
+			mD3DDevice->SetSamplerState(i,D3DSAMP_ADDRESSV,D3D9Renderer::getD3DTADDRESS(state->vAddress));
+			mD3DDevice->SetSamplerState(i,D3DSAMP_ADDRESSW,D3D9Renderer::getD3DTADDRESS(state->wAddress));
+
+			mD3DDevice->SetSamplerState(i,D3DSAMP_MINFILTER,D3D9Renderer::getD3DTEXF(state->minFilter));
+			mD3DDevice->SetSamplerState(i,D3DSAMP_MIPFILTER,D3D9Renderer::getD3DTEXF(state->mipFilter));
+			mD3DDevice->SetSamplerState(i,D3DSAMP_MAGFILTER,D3D9Renderer::getD3DTEXF(state->magFilter));
+		#endif
+
+		if(i==0){
+			#if defined(TOADLET_SET_D3DM)
+				mD3DDevice->SetRenderState(D3DMRS_TEXTUREPERSPECTIVE,state->perspective);
+			#endif
+		}
+	}
+}
+
+void D3D9Renderer::setTextureState(int i,TextureState *state){
+	if(state!=NULL){
+		// Setup texture blending
+		if(state->colorOperation!=TextureState::Operation_UNSPECIFIED){
+			mD3DDevice->SetTextureStageState(i,D3DTSS_COLOROP,getD3DTOP(state->colorOperation,state->colorSource3));
+			if(state->colorSource1!=TextureState::Source_UNSPECIFIED && state->colorSource2!=TextureState::Source_UNSPECIFIED){
+				mD3DDevice->SetTextureStageState(i,D3DTSS_COLORARG1,getD3DTA(state->colorSource1));
+				mD3DDevice->SetTextureStageState(i,D3DTSS_COLORARG2,getD3DTA(state->colorSource2));
+			}
 		}
 		else{
-			result=mD3DDevice->SetTexture(stage,NULL);
-			TOADLET_CHECK_D3D9ERROR(result,"SetTexture");
+			mD3DDevice->SetTextureStageState(i,D3DTSS_COLOROP,D3DTOP_MODULATE);
+		}
+		if(state->alphaOperation!=TextureState::Operation_UNSPECIFIED){
+			mD3DDevice->SetTextureStageState(i,D3DTSS_ALPHAOP,getD3DTOP(state->alphaOperation,state->alphaSource3));
+			if(state->alphaSource1!=TextureState::Source_UNSPECIFIED && state->alphaSource2!=TextureState::Source_UNSPECIFIED){
+				mD3DDevice->SetTextureStageState(i,D3DTSS_ALPHAARG1,getD3DTA(state->alphaSource1));
+				mD3DDevice->SetTextureStageState(i,D3DTSS_ALPHAARG2,getD3DTA(state->alphaSource2));
+			}
+		}
+		else{
+			mD3DDevice->SetTextureStageState(i,D3DTSS_ALPHAOP,D3DTOP_MODULATE);
 		}
 
-		result=mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXCOORDINDEX,textureStage->texCoordIndex);
-		TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
+		mD3DDevice->SetTextureStageState(i,D3DTSS_CONSTANT,toD3DCOLOR(state->constantColor));
 
-		/// @todo: Only if we're not using shaders
-		TextureStage::Calculation calculation=textureStage->calculation;
-		Matrix4x4 &transform=cache_setTextureStage_transform;
-		bool identityTransform=(texture==NULL)?true:texture->getRootTransform(textureStage->textureTime,transform);
-		if(calculation==TextureStage::Calculation_DISABLED && identityTransform==false){
-			calculation=TextureStage::Calculation_NORMAL;
-		}
-
-		if(calculation!=TextureStage::Calculation_DISABLED){
-			if(calculation==TextureStage::Calculation_NORMAL){
+		// Setup calculations
+		TextureState::CalculationType calculation=state->calculation;
+		if(calculation!=TextureState::CalculationType_DISABLED){
+			if(calculation==TextureState::CalculationType_NORMAL){
 				/// @todo: Get this working with 3D Texture coordinates.  Doesnt seem to currently
 				//  I have tried just switching to D3DTTFF_COUNT3, but nothing changed, I'm pretty sure it has
 				//  something to do with the setup of the cacheD3DMatrix below
-				result=mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT2);
-				TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
+				mD3DDevice->SetTextureStageState(i,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT2);
 
-				if(identityTransform==false){
-					Math::postMul(transform,textureStage->matrix);
-					toD3DMATRIX(cacheD3DMatrix,transform);
-				}
-				else{
-					toD3DMATRIX(cacheD3DMatrix,textureStage->matrix);
-				}
+				toD3DMATRIX(cacheD3DMatrix,state->matrix);
 
 				#if defined(TOADLET_SET_D3DM) && defined(TOADLET_FIXED_POINT)
 					scalar t;
@@ -764,96 +798,49 @@ void D3D9Renderer::setTextureStage(int stage,TextureStage *textureStage){
 				t=cacheD3DMatrix._33; cacheD3DMatrix._33=cacheD3DMatrix._43; cacheD3DMatrix._43=t;
 				t=cacheD3DMatrix._34; cacheD3DMatrix._34=cacheD3DMatrix._44; cacheD3DMatrix._44=t;
 			}
-			else if(calculation==TextureStage::Calculation_OBJECTSPACE){
-				mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXCOORDINDEX,D3DTSS_TCI_PASSTHRU);
-				mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT4|D3DTTFF_PROJECTED);
+			else if(calculation==TextureState::CalculationType_OBJECTSPACE){
+				mD3DDevice->SetTextureStageState(i,D3DTSS_TEXCOORDINDEX,D3DTSS_TCI_PASSTHRU);
+				mD3DDevice->SetTextureStageState(i,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT4|D3DTTFF_PROJECTED);
 
-				toD3DMATRIX(cacheD3DMatrix,textureStage->matrix);
+				toD3DMATRIX(cacheD3DMatrix,state->matrix);
 			}
-			else if(calculation==TextureStage::Calculation_CAMERASPACE){
-				mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXCOORDINDEX,D3DTSS_TCI_CAMERASPACEPOSITION);
-				mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT4|D3DTTFF_PROJECTED);
+			else if(calculation==TextureState::CalculationType_CAMERASPACE){
+				mD3DDevice->SetTextureStageState(i,D3DTSS_TEXCOORDINDEX,D3DTSS_TCI_CAMERASPACEPOSITION);
+				mD3DDevice->SetTextureStageState(i,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT4|D3DTTFF_PROJECTED);
 
-				toD3DMATRIX(cacheD3DMatrix,textureStage->matrix);
+				toD3DMATRIX(cacheD3DMatrix,state->matrix);
 			}
 
-			result=mD3DDevice->SetTransform((D3DTRANSFORMSTATETYPE)(D3DTS_TEXTURE0+stage),&cacheD3DMatrix TOADLET_D3DMFMT);
-			TOADLET_CHECK_D3D9ERROR(result,"SetTransform");
+			mD3DDevice->SetTransform((D3DTRANSFORMSTATETYPE)(D3DTS_TEXTURE0+i),&cacheD3DMatrix TOADLET_D3DMFMT);
 		}
 		else{
-			mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_DISABLE);
+			mD3DDevice->SetTextureStageState(i,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_DISABLE);
 		}
 
-		const TextureBlend &blend=textureStage->blend;
-
-		result=mD3DDevice->SetTextureStageState(stage,D3DTSS_CONSTANT,toD3DCOLOR(textureStage->constantColor));
-		TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
-
-		if(blend.colorOperation!=TextureBlend::Operation_UNSPECIFIED){
-			result=mD3DDevice->SetTextureStageState(stage,D3DTSS_COLOROP,getD3DTOP(blend.colorOperation,blend.colorSource3));
-			TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
-			if(blend.colorSource1!=TextureBlend::Source_UNSPECIFIED && blend.colorSource2!=TextureBlend::Source_UNSPECIFIED){
-				mD3DDevice->SetTextureStageState(stage,D3DTSS_COLORARG1,getD3DTA(blend.colorSource1));
-				mD3DDevice->SetTextureStageState(stage,D3DTSS_COLORARG2,getD3DTA(blend.colorSource2));
-			}
-		}
-		else{
-			result=mD3DDevice->SetTextureStageState(stage,D3DTSS_COLOROP,D3DTOP_MODULATE);
-			TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
-		}
-		if(blend.alphaOperation!=TextureBlend::Operation_UNSPECIFIED){
-			result=mD3DDevice->SetTextureStageState(stage,D3DTSS_ALPHAOP,getD3DTOP(blend.alphaOperation,blend.alphaSource3));
-			TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
-			if(blend.alphaSource1!=TextureBlend::Source_UNSPECIFIED && blend.alphaSource2!=TextureBlend::Source_UNSPECIFIED){
-				mD3DDevice->SetTextureStageState(stage,D3DTSS_ALPHAARG1,getD3DTA(blend.alphaSource1));
-				mD3DDevice->SetTextureStageState(stage,D3DTSS_ALPHAARG2,getD3DTA(blend.alphaSource2));
-			}
-		}
-		else{
-			result=mD3DDevice->SetTextureStageState(stage,D3DTSS_ALPHAOP,D3DTOP_MODULATE);
-			TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
-		}
-
-		#if defined(TOADLET_SET_D3DM)
-			mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSU,D3D9Renderer::getD3DTADDRESS(textureStage->uAddressMode));
-			mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSV,D3D9Renderer::getD3DTADDRESS(textureStage->vAddressMode));
-			mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSW,D3D9Renderer::getD3DTADDRESS(textureStage->wAddressMode));
-
-			mD3DDevice->SetTextureStageState(stage,D3DMTSS_MINFILTER,D3D9Renderer::getD3DTEXF(textureStage->minFilter));
-			mD3DDevice->SetTextureStageState(stage,D3DMTSS_MIPFILTER,D3D9Renderer::getD3DTEXF(textureStage->mipFilter));
-			mD3DDevice->SetTextureStageState(stage,D3DMTSS_MAGFILTER,D3D9Renderer::getD3DTEXF(textureStage->magFilter));
-		#else
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSU,D3D9Renderer::getD3DTADDRESS(textureStage->uAddressMode));
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSV,D3D9Renderer::getD3DTADDRESS(textureStage->vAddressMode));
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSW,D3D9Renderer::getD3DTADDRESS(textureStage->wAddressMode));
-
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_MINFILTER,D3D9Renderer::getD3DTEXF(textureStage->minFilter));
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_MIPFILTER,D3D9Renderer::getD3DTEXF(textureStage->mipFilter));
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_MAGFILTER,D3D9Renderer::getD3DTEXF(textureStage->magFilter));
-		#endif
-
-		if(stage==0){
-			#if defined(TOADLET_SET_D3DM)
-				mD3DDevice->SetRenderState(D3DMRS_TEXTUREPERSPECTIVE,texturePerspective);
-			#endif
-		}
+		mD3DDevice->SetTextureStageState(i,D3DTSS_TEXCOORDINDEX,state->texCoordIndex);
 	}
 	else{
-		result=mD3DDevice->SetTexture(stage,NULL);
-		TOADLET_CHECK_D3D9ERROR(result,"SetTexture");
+		mD3DDevice->SetTextureStageState(i,D3DTSS_COLOROP,D3DTOP_DISABLE);
 
-		result=mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXCOORDINDEX,0);
-		TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
+		mD3DDevice->SetTextureStageState(i,D3DTSS_CONSTANT,0);
 
-		result=mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_DISABLE);
-		TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
+		mD3DDevice->SetTextureStageState(i,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_DISABLE);
 
-		result=mD3DDevice->SetTextureStageState(stage,D3DTSS_CONSTANT,0);
-		TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
-
-		result=mD3DDevice->SetTextureStageState(stage,D3DTSS_COLOROP,D3DTOP_DISABLE);
-		TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
+		mD3DDevice->SetTextureStageState(i,D3DTSS_TEXCOORDINDEX,0);
 	}
+}
+
+void D3D9Renderer::setTexture(int i,Texture *texture){
+	HRESULT result=S_OK;
+
+	D3D9Texture *d3dtexture=texture!=NULL?(D3D9Texture*)texture->getRootTexture():NULL;
+	if(d3dtexture!=NULL){
+		result=mD3DDevice->SetTexture(i,d3dtexture->mTexture);
+	}
+	else{
+		result=mD3DDevice->SetTexture(i,NULL);
+	}
+	TOADLET_CHECK_D3D9ERROR(result,"SetTexture");
 }
 
 void D3D9Renderer::setNormalize(const Normalize &normalize){
@@ -1054,25 +1041,25 @@ bool D3D9Renderer::isD3DFORMATValid(D3DFORMAT textureFormat,DWORD usage){
 	return SUCCEEDED(mD3D->CheckDeviceFormat(mD3DAdapter,mD3DDevType,mD3DAdapterFormat,usage,D3DRTYPE_TEXTURE,textureFormat));
 }
 
-DWORD D3D9Renderer::getD3DTOP(TextureBlend::Operation operation,TextureBlend::Source alphaSource){
+DWORD D3D9Renderer::getD3DTOP(TextureState::Operation operation,TextureState::Source alphaSource){
 	switch(operation){
-		case TextureBlend::Operation_REPLACE:
+		case TextureState::Operation_REPLACE:
 			return D3DTOP_SELECTARG1;
-		case TextureBlend::Operation_MODULATE:
+		case TextureState::Operation_MODULATE:
 			return D3DTOP_MODULATE;
-		case TextureBlend::Operation_MODULATE_2X:
+		case TextureState::Operation_MODULATE_2X:
 			return D3DTOP_MODULATE2X;
-		case TextureBlend::Operation_MODULATE_4X:
+		case TextureState::Operation_MODULATE_4X:
 			return D3DTOP_MODULATE4X;
-		case TextureBlend::Operation_ADD:
+		case TextureState::Operation_ADD:
 			return D3DTOP_ADD;
-		case TextureBlend::Operation_DOTPRODUCT:
+		case TextureState::Operation_DOTPRODUCT:
 			return D3DTOP_DOTPRODUCT3;
-		case TextureBlend::Operation_ALPHABLEND:
-			if(alphaSource==TextureBlend::Source_PREVIOUS){
+		case TextureState::Operation_ALPHABLEND:
+			if(alphaSource==TextureState::Source_PREVIOUS){
 				return D3DTOP_BLENDCURRENTALPHA;
 			}
-			else if(alphaSource==TextureBlend::Source_TEXTURE){
+			else if(alphaSource==TextureState::Source_TEXTURE){
 				return D3DTOP_BLENDTEXTUREALPHA;
 			}
 		default:
@@ -1162,47 +1149,47 @@ D3DPOOL D3D9Renderer::getD3DPOOL(int usage){
 	return d3dpool;
 }
 
-DWORD D3D9Renderer::getD3DTADDRESS(TextureStage::AddressMode addressMode){
-	switch(addressMode){
-		case TextureStage::AddressMode_REPEAT:
+DWORD D3D9Renderer::getD3DTADDRESS(SamplerState::AddressType address){
+	switch(address){
+		case SamplerState::AddressType_REPEAT:
 			return D3DTADDRESS_WRAP;
-		case TextureStage::AddressMode_CLAMP_TO_EDGE:
+		case SamplerState::AddressType_CLAMP_TO_EDGE:
 			return D3DTADDRESS_CLAMP;
-		case TextureStage::AddressMode_CLAMP_TO_BORDER:
+		case SamplerState::AddressType_CLAMP_TO_BORDER:
 			return D3DTADDRESS_BORDER;
-		case TextureStage::AddressMode_MIRRORED_REPEAT:
+		case SamplerState::AddressType_MIRRORED_REPEAT:
 			return D3DTADDRESS_MIRROR;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
-				"invalid address mode");
+				"invalid address");
 			return D3DTADDRESS_WRAP;
 	}
 }
 
-DWORD D3D9Renderer::getD3DTEXF(TextureStage::Filter filter){
+DWORD D3D9Renderer::getD3DTEXF(SamplerState::FilterType filter){
 	switch(filter){
-		case TextureStage::Filter_NONE:
+		case SamplerState::FilterType_NONE:
 			return D3DTEXF_NONE;
-		case TextureStage::Filter_NEAREST:
+		case SamplerState::FilterType_NEAREST:
 			return D3DTEXF_POINT;
-		case TextureStage::Filter_LINEAR:
+		case SamplerState::FilterType_LINEAR:
 			return D3DTEXF_LINEAR;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
-				"invalid filter mode");
+				"invalid filter");
 			return D3DTEXF_NONE;
 	}
 }
 
-DWORD D3D9Renderer::getD3DTA(TextureBlend::Source blend){
+DWORD D3D9Renderer::getD3DTA(TextureState::Source blend){
 	switch(blend){
-		case TextureBlend::Source_PREVIOUS:
+		case TextureState::Source_PREVIOUS:
 			return D3DTA_CURRENT;
-		case TextureBlend::Source_TEXTURE:
+		case TextureState::Source_TEXTURE:
 			return D3DTA_TEXTURE;
-		case TextureBlend::Source_PRIMARY_COLOR:
+		case TextureState::Source_PRIMARY_COLOR:
 			return D3DTA_DIFFUSE;
-		case TextureBlend::Source_CONSTANT_COLOR:
+		case TextureState::Source_CONSTANT_COLOR:
 			return D3DTA_CONSTANT;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
@@ -1284,6 +1271,24 @@ D3DSHADEMODE D3D9Renderer::getD3DSHADEMODE(MaterialState::ShadeType type){
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"invalid shade type");
 			return D3DSHADE_FLAT;
+		break;
+	}
+}
+
+D3DFOGMODE D3D9Renderer::getD3DFOGMODE(FogState::FogType type){
+	switch(type){
+		case FogState::FogType_NONE:
+			return D3DFOG_NONE;
+		case FogState::FogType_LINEAR:
+			return D3DFOG_LINEAR;
+		case FogState::FogType_EXP:
+			return D3DFOG_EXP;
+		case FogState::FogType_EXP2:
+			return D3DFOG_EXP2;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"invalid fog type");
+			return D3DFOG_NONE;
 		break;
 	}
 }

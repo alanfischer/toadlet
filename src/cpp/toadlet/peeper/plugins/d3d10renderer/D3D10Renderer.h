@@ -32,8 +32,7 @@
 #include <toadlet/peeper/BlendState.h>
 #include <toadlet/peeper/DepthState.h>
 #include <toadlet/peeper/RasterizerState.h>
-#include <toadlet/peeper/MaterialState.h>
-#include <toadlet/peeper/TextureStage.h>
+#include <toadlet/peeper/SamplerState.h>
 #include <toadlet/peeper/RenderStateSet.h>
 #include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/peeper/IndexData.h>
@@ -88,12 +87,12 @@ D3D10_PASS_DESC passDesc;
 	bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src);
 	void setDefaultStates();
 	bool setRenderStateSet(RenderStateSet *set);
+	void setTexture(int stage,Texture *texture);
 
 	// Old fixed states
 	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff){}
 	void setNormalize(const Normalize &normalize){}
 	void setAmbientColor(const Vector4 &ambient){}
-	void setTextureStage(int stage,TextureStage *textureStage);
 	void setLightState(int i,const LightState &light){}
 	void setLightEnabled(int i,bool enable){}
 
@@ -117,6 +116,7 @@ D3D10_PASS_DESC passDesc;
 	static void getD3D10_BLEND_DESC(D3D10_BLEND_DESC &desc,const BlendState &state);
 	static void getD3D10_DEPTH_STENCIL_DESC(D3D10_DEPTH_STENCIL_DESC &desc,const DepthState &state);
 	static void getD3D10_RASTERIZER_DESC(D3D10_RASTERIZER_DESC &desc,const RasterizerState &state);
+	static void getD3D10_SAMPLER_DESC(D3D10_SAMPLER_DESC &desc,const SamplerState &state);
 	static char *getSemanticName(int semantic);
 
 protected:

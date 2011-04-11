@@ -81,6 +81,16 @@ public:
 			mMaterialState=NULL;
 		}
 
+		int i;
+		for(i=0;i<mSamplerStates.size();++i){
+			delete mSamplerStates[i];
+		}
+		mSamplerStates.clear();
+		for(i=0;i<mTextureStates.size();++i){
+			delete mTextureStates[i];
+		}
+		mTextureStates.clear();
+
 		if(mListener!=NULL){
 			mListener->renderStateSetDestroyed(this);
 			mListener=NULL;
@@ -104,7 +114,31 @@ public:
 
 	void setMaterialState(const MaterialState &state){if(mMaterialState==NULL){mMaterialState=new MaterialState(state);}else{mMaterialState->set(state);}}
 	bool getMaterialState(MaterialState &state) const{if(mMaterialState==NULL){return false;}else{state.set(*mMaterialState);return true;}}
-	
+
+	int getNumSamplerStates() const{return mSamplerStates.size();}
+	void setSamplerState(int i,const SamplerState &state){
+		if(mSamplerStates.size()<=i){
+			mSamplerStates.resize(i+1);
+			mSamplerStates[i]=new SamplerState(state);
+		}
+		else{
+			mSamplerStates[i]->set(state);
+		}
+	}
+	bool getSamplerState(int i,SamplerState &state) const{if(mSamplerStates.size()<=i || mSamplerStates[i]==NULL){return false;}else{state.set(*mSamplerStates[i]);return true;}}
+
+	int getNumTextureStates() const{return mTextureStates.size();}
+	void setTextureState(int i,const TextureState &state){
+		if(mTextureStates.size()<=i){
+			mTextureStates.resize(i+1);
+			mTextureStates[i]=new TextureState(state);
+		}
+		else{
+			mTextureStates[i]->set(state);
+		}
+	}
+	bool getTextureState(int i,TextureState &state) const{if(mTextureStates.size()<=i || mTextureStates[i]==NULL){return false;}else{state.set(*mTextureStates[i]);return true;}}
+
 protected:
 	RenderStateSetDestroyedListener *mListener;
 	BlendState *mBlendState;
@@ -113,6 +147,8 @@ protected:
 	FogState *mFogState;
 	PointState *mPointState;
 	MaterialState *mMaterialState;
+	egg::Collection<SamplerState*> mSamplerStates;
+	egg::Collection<TextureState*> mTextureStates;
 	
 	friend class GLRenderer;
 };

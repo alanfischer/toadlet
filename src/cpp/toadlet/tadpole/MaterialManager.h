@@ -42,15 +42,13 @@ public:
 
 	void destroy();
 
-	Material::ptr createMaterial();
+	Material::ptr createMaterial(peeper::Texture::ptr texture=peeper::Texture::ptr(),bool clamped=false);
 
 	Material::ptr findMaterial(const egg::String &name){return egg::shared_static_cast<Material>(ResourceManager::find(name));}
 
 	Material::ptr cloneMaterial(Material::ptr material,bool manage);
 
 	peeper::RenderStateSet::ptr createRenderStateSet();
-
-	peeper::TextureStage::ptr createTextureStage(peeper::Texture::ptr texture,bool clamped=false);
 
 	void contextActivate(peeper::Renderer *renderer);
 	void contextDeactivate(peeper::Renderer *renderer);
@@ -59,22 +57,16 @@ public:
 
 	egg::Resource::ptr unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData);
 
-	void setDefaultMinFilter(peeper::TextureStage::Filter filter){mDefaultMinFilter=filter;}
-	inline peeper::TextureStage::Filter getDefaultMinFilter(){return mDefaultMinFilter;}
-	void setDefaultMagFilter(peeper::TextureStage::Filter filter){mDefaultMagFilter=filter;}
-	inline peeper::TextureStage::Filter getDefaultMagFilter(){return mDefaultMagFilter;}
-	void setDefaultMipFilter(peeper::TextureStage::Filter filter){mDefaultMipFilter=filter;}
-	inline peeper::TextureStage::Filter getDefaultMipFilter(){return mDefaultMipFilter;}
+	void setDefaultSamplerState(const peeper::SamplerState &samplerState){mDefaultSamplerState.set(samplerState);}
+	const peeper::SamplerState &getDefaultSamplerState(){return mDefaultSamplerState;}
 
 protected:
-	Engine *mEngine;\
+	Engine *mEngine;
 	bool mBackable;
 
-	peeper::TextureStage::Filter mDefaultMinFilter;
-	peeper::TextureStage::Filter mDefaultMagFilter;
-	peeper::TextureStage::Filter mDefaultMipFilter;
-
 	egg::Collection<peeper::RenderStateSet::ptr> mRenderStateSets;
+
+	peeper::SamplerState mDefaultSamplerState;
 };
 
 }

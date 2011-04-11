@@ -246,7 +246,7 @@ bool GLFBORenderTarget::compile(){
 	if(color!=NULL && depth==NULL){
 		// No Depth-Stencil buffer, so add one
 		GLFBOPixelBuffer::ptr buffer(new GLFBOPixelBuffer(this));
-		if(buffer->create(Buffer::Usage_NONE,Buffer::Access_NONE,Texture::Format_DEPTH_24,mWidth,mHeight,1)){
+		if(buffer->create(Buffer::Usage_BIT_STREAM,Buffer::Access_NONE,Texture::Format_DEPTH_24,mWidth,mHeight,1)){
 			attach(buffer,Attachment_DEPTH_STENCIL);
 			mDepthBuffer=buffer;
 		}

@@ -26,7 +26,6 @@
 #include <toadlet/egg/Collection.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
-#include <toadlet/peeper/SequenceTexture.h>
 #include <toadlet/tadpole/handler/platform/win32/Win32TextureHandler.h>
 #include <toadlet/tadpole/handler/platform/win32/StreamIStream.h>
 
@@ -212,12 +211,13 @@ Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData
 			texture=mTextureManager->createTexture(image::Image::ptr(images[0]));
 		}
  		else{
-			SequenceTexture::ptr sequence(new SequenceTexture(Texture::Dimension_D2,images.size()));
-			int i;
-			for(i=0;i<images.size();++i){
-				sequence->setTexture(i,mTextureManager->createTexture(image::Image::ptr(images[i])),Math::fromMilli(delayMilliseconds[i]));
-			}
-			texture=shared_static_cast<Texture>(sequence);
+/// @todo: revive this somehow, probably as a 3d texture
+//			SequenceTexture::ptr sequence(new SequenceTexture(Texture::Dimension_D2,images.size()));
+//			int i;
+//			for(i=0;i<images.size();++i){
+//				sequence->setTexture(i,mTextureManager->createTexture(image::Image::ptr(images[i])),Math::fromMilli(delayMilliseconds[i]));
+//			}
+//			texture=shared_static_cast<Texture>(sequence);
 		}
 	#endif
 

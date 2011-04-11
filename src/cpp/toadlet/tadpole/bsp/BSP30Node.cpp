@@ -50,7 +50,7 @@ BSP30ModelNode::SubModel::SubModel(BSP30ModelNode *modelNode,BSP30Map *map){
 
 void BSP30ModelNode::SubModel::render(peeper::Renderer *renderer) const{
 	map->renderFaces(renderer,faces);
-	renderer->setTextureStage(1,NULL);
+	renderer->setTexture(1,NULL);
 }
 
 TOADLET_NODE_IMPLEMENT(BSP30ModelNode,Categories::TOADLET_TADPOLE_BSP+".BSP30ModelNode");
@@ -272,13 +272,12 @@ void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const S
 		for(i=0;i<mesh->subMeshes.size();++i){
 			Material *material=mesh->subMeshes[i]->material;
 			if(material!=NULL){
-				TextureStage::ptr textureStage=material->getTextureStage(0);
-				if(textureStage!=NULL){
-					textureStage->setUAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
-					textureStage->setVAddressMode(TextureStage::AddressMode_CLAMP_TO_EDGE);
-				}
 				material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 				material->setMaterialState(MaterialState(false,false,MaterialState::ShadeType_FLAT));
+				SamplerState samplerState;
+				samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+				samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+				material->setSamplerState(0,samplerState);
 			}
 		}
 
@@ -545,8 +544,8 @@ void BSP30Node::render(Renderer *renderer) const{
 		mMap->renderFaces(renderer,mVisibleMaterialFaces[i]);
 	}
 
-	renderer->setTextureStage(0,NULL);
-	renderer->setTextureStage(1,NULL);
+	renderer->setTexture(0,NULL);
+	renderer->setTexture(1,NULL);
 }
 
 void BSP30Node::childTransformUpdated(Node *child){
