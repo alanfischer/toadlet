@@ -30,7 +30,6 @@
 #include "GLTextureMipPixelBuffer.h"
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/Texture.h>
-#include <toadlet/peeper/TextureStage.h>
 
 namespace toadlet{
 namespace peeper{
@@ -43,8 +42,7 @@ public:
 	GLTexture(GLRenderer *renderer);
 	virtual ~GLTexture();
 
-	Texture *getRootTexture(scalar time){return this;}
-	bool getRootTransform(scalar time,Matrix4x4 &transform){return true;}
+	Texture *getRootTexture(){return this;}
 
 	bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]);
 	void destroy();

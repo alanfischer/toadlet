@@ -29,7 +29,6 @@
 #include "D3D10Includes.h"
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/Texture.h>
-#include <toadlet/peeper/TextureBlend.h>
 
 namespace toadlet{
 namespace peeper{
@@ -45,8 +44,7 @@ public:
 
 	virtual ~D3D10Texture();
 
-	Texture *getRootTexture(scalar time){return this;}
-	bool getRootTransform(scalar time,Matrix4x4 &transform){return true;}
+	Texture *getRootTexture(){return this;}
 
 	bool create(int usageFlags,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]);
 	void destroy();

@@ -91,6 +91,7 @@ GLRenderer::GLRenderer():
 	//mStatisticsSet,
 	//mCapabilitySet,
 	mMultiTexture(false),
+	mHasClampToEdge(false),
 
 	mPrimaryRenderTarget(NULL),
 	mGLPrimaryRenderTarget(NULL),
@@ -210,8 +211,16 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 	}
 	caps.maxTextureStages=maxTextureStages;
 	mMultiTexture=maxTextureStages>1;
+	mHasClampToEdge=
+		#if defined(TOADLET_HAS_GLES)
+			true;
+		#else
+			gl_version>=12;
+		#endif
 
 	mLastTextures.resize(caps.maxTextureStages,NULL);
+	mLastSamplerStates.resize(caps.maxTextureStages,NULL);
+	mLastTextureStates.resize(caps.maxTextureStages,NULL);
 	mLastTexTargets.resize(caps.maxTextureStages,0);
 	mTexCoordIndexes.resize(caps.maxTextureStages,-1);
 	mLastTexCoordIndexes.resize(caps.maxTextureStages,-1);
@@ -622,7 +631,9 @@ void GLRenderer::endScene(){
 
 	int i;
 	for(i=0;i<mCapabilityState.maxTextureStages;++i){
-		setTextureStage(i,NULL);
+		setSamplerState(i,NULL);
+		setTextureState(i,NULL);
+		setTexture(i,NULL);
 	}
 
 	TOADLET_CHECK_GLERROR("endScene");
@@ -800,8 +811,9 @@ void GLRenderer::setDefaultStates(){
 
 	int i;
 	for(i=0;i<mCapabilityState.maxTextureStages;++i){
-		mLastTexTargets[i]=GL_TEXTURE_2D;
-		setTextureStage(i,NULL);
+		mLastTexTargets[i]=0;
+		mLastSamplerStates[i]=NULL;
+		mLastTextureStates[i]=NULL;
 	}
 
 	// GL specific states
@@ -842,6 +854,13 @@ bool GLRenderer::setRenderStateSet(RenderStateSet *set){
 	}
 	if(glset->mMaterialState!=NULL){
 		setMaterialState(*glset->mMaterialState);
+	}
+	int i;
+	for(i=0;i<glset->mSamplerStates.size();++i){
+		setSamplerState(i,glset->mSamplerStates[i]);
+	}
+	for(i=0;i<glset->mTextureStates.size();++i){
+		setTextureState(i,glset->mTextureStates[i]);
 	}
 
 	return true;
@@ -900,25 +919,28 @@ void GLRenderer::setDepthState(const DepthState &state){
 }
 
 void GLRenderer::setFogState(const FogState &state){
-	if(state.type==FogState::FogType_NONE){
+	if(state.fog==FogState::FogType_NONE){
 		glDisable(GL_FOG);
 	}
 	else{
 		glEnable(GL_FOG);
-		glFogf(GL_FOG_MODE,getGLFogType(state.type));
+		glFogf(GL_FOG_MODE,getGLFogType(state.fog));
 		#if defined(TOADLET_FIXED_POINT)
 			#if defined(TOADLET_HAS_GLES)
 				glFogx(GL_FOG_START,state.nearDistance);
 				glFogx(GL_FOG_END,state.farDistance);
+				glFogx(GL_FOG_DENSITY,state.density);
 				glFogxv(GL_FOG_COLOR,state.color.getData());
 			#else
 				glFogf(GL_FOG_START,MathConversion::scalarToFloat(state.nearDistance));
 				glFogf(GL_FOG_END,MathConversion::scalarToFloat(state.farDistance));
+				glFogf(GL_FOG_DENSITY,MathConversion::scalarToFloat(state.density));
 				glFogfv(GL_FOG_COLOR,colorArray(cacheArray,state.color));
 			#endif
 		#else
 			glFogf(GL_FOG_START,state.nearDistance);
 			glFogf(GL_FOG_END,state.farDistance);
+			glFogf(GL_FOG_DENSITY,state.density);
 			glFogfv(GL_FOG_COLOR,state.color.getData());
 		#endif
 	}
@@ -980,6 +1002,325 @@ void GLRenderer::setMaterialState(const MaterialState &state){
 	glShadeModel(getGLShadeModel(state.shade));
 
 	TOADLET_CHECK_GLERROR("setMaterialState");
+}
+
+void GLRenderer::setSamplerState(int i,SamplerState *state){
+	if(i>=mCapabilityState.maxTextureStages){
+		return;
+	}
+
+	mLastSamplerStates[i]=state;
+}
+
+void GLRenderer::setTextureState(int i,TextureState *state){
+	if(i>=mCapabilityState.maxTextureStages){
+		return;
+	}
+
+	mLastTextureStates[i]=state;
+}
+
+void GLRenderer::setSamplerStatePostTexture(int i,SamplerState *state){
+	if(i>=mCapabilityState.maxTextureStages){
+		return;
+	}
+	else if(mMultiTexture){
+		glActiveTexture(GL_TEXTURE0+i);
+	}
+
+	GLTexture *texture=mLastTextures[i];
+	GLuint textureTarget=texture!=NULL?texture->mTarget:0;
+
+	if(state!=NULL){
+		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_S,getGLWrap(state->uAddress,mHasClampToEdge));
+		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_T,getGLWrap(state->vAddress,mHasClampToEdge));
+		#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_12)
+		if(gl_version>=12){
+			glTexParameteri(textureTarget,GL_TEXTURE_WRAP_R,getGLWrap(state->wAddress,mHasClampToEdge));
+		}
+		#endif
+
+		glTexParameteri(textureTarget,GL_TEXTURE_MIN_FILTER,getGLMinFilter(state->minFilter,state->mipFilter));
+		glTexParameteri(textureTarget,GL_TEXTURE_MAG_FILTER,getGLMagFilter(state->magFilter));
+
+		/// @todo: Determine if this should be used and override the settings in the GLTexture itself?
+		/*
+		#if !defined(TOADLET_HAS_GLES)
+			if(gl_version>=12){
+				glTexParameteri(textureTarget,GL_TEXTURE_BASE_LEVEL,state->minLOD);
+				glTexParameteri(textureTarget,GL_TEXTURE_MAX_LEVEL,state->maxLOD);
+			}
+		#endif
+		*/
+
+		if(i==0){
+			#if defined(TOADLET_HAS_GLES)
+				glHint(GL_PERSPECTIVE_CORRECTION_HINT,state->perspective?GL_NICEST:GL_FASTEST);
+			#endif
+		}
+	}
+
+	TOADLET_CHECK_GLERROR("setSamplerState");
+}
+
+void GLRenderer::setTextureStatePostTexture(int i,TextureState *state){
+	if(i>=mCapabilityState.maxTextureStages){
+		return;
+	}
+	else if(mMultiTexture){
+		glActiveTexture(GL_TEXTURE0+i);
+	}
+
+	GLTexture *texture=mLastTextures[i];
+	GLuint textureTarget=texture!=NULL?texture->mTarget:0;
+
+	if(state!=NULL){
+		// Setup texture blending
+		bool specifyColor=(state->colorOperation!=TextureState::Operation_UNSPECIFIED);
+		bool specifyAlpha=(state->alphaOperation!=TextureState::Operation_UNSPECIFIED);
+		bool specifyColorSource=!(state->colorSource1==TextureState::Source_UNSPECIFIED && state->colorSource2==TextureState::Source_UNSPECIFIED);
+		bool specifyAlphaSource=!(state->alphaSource1==TextureState::Source_UNSPECIFIED && state->alphaSource2==TextureState::Source_UNSPECIFIED);
+
+		if(!specifyColorSource && !specifyAlphaSource){
+			if(specifyColor==false){
+				glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
+			}
+			else{
+				glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,getGLTextureBlendOperation(state->colorOperation));
+			}
+		}
+		else{
+			glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_COMBINE);
+			if(state->colorOperation==TextureState::Operation_DOTPRODUCT && state->alphaOperation==TextureState::Operation_DOTPRODUCT){
+				glTexEnvi(GL_TEXTURE_ENV,GL_COMBINE_RGB,GL_DOT3_RGBA);
+			}
+			else{
+				if(specifyColor){
+					glTexEnvi(GL_TEXTURE_ENV,GL_COMBINE_RGB,getGLTextureBlendOperation(state->colorOperation));
+				}
+				if(specifyAlpha){
+					if(state->alphaOperation==TextureState::Operation_DOTPRODUCT){
+						Error::unknown(Categories::TOADLET_PEEPER,"can not use Operation_DOTPRODUCT in only alpha channel");
+					}
+					else{
+						glTexEnvi(GL_TEXTURE_ENV,GL_COMBINE_ALPHA,getGLTextureBlendOperation(state->alphaOperation));
+					}
+				}
+			}
+
+			#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
+				glTexEnvxv(GL_TEXTURE_ENV,GL_TEXTURE_ENV_COLOR,state->constantColor.getData());
+			#else
+				glTexEnvfv(GL_TEXTURE_ENV,GL_TEXTURE_ENV_COLOR,colorArray(cacheArray,state->constantColor));
+			#endif
+
+			if(specifyColor){
+				if(state->colorSource1!=TextureState::Source_UNSPECIFIED){
+					glTexEnvi(GL_TEXTURE_ENV,GL_SRC0_RGB,getGLTextureBlendSource(state->colorSource1));
+				}
+				if(state->colorSource2!=TextureState::Source_UNSPECIFIED){
+					glTexEnvi(GL_TEXTURE_ENV,GL_SRC1_RGB,getGLTextureBlendSource(state->colorSource2));
+				}
+				if(state->colorSource3!=TextureState::Source_UNSPECIFIED){
+					glTexEnvi(GL_TEXTURE_ENV,GL_SRC2_RGB,getGLTextureBlendSource(state->colorSource3));
+				}
+				// No need to specify GL_OPERANDs for ALPHABLEND, since RGB defaults are COLOR,COLOR,ALPHA
+			}
+			if(specifyAlpha){
+				if(state->alphaSource1!=TextureState::Source_UNSPECIFIED){
+					glTexEnvi(GL_TEXTURE_ENV,GL_SRC0_ALPHA,getGLTextureBlendSource(state->alphaSource1));
+				}
+				if(state->alphaSource2!=TextureState::Source_UNSPECIFIED){
+					glTexEnvi(GL_TEXTURE_ENV,GL_SRC1_ALPHA,getGLTextureBlendSource(state->alphaSource2));
+				}
+				if(state->alphaSource3!=TextureState::Source_UNSPECIFIED){
+					glTexEnvi(GL_TEXTURE_ENV,GL_SRC2_ALPHA,getGLTextureBlendSource(state->alphaSource3));
+				}
+				// No need to specify GL_OPERANDs for ALPHABLEND, since ALPHA defaults are ALPHA,ALPHA,ALPHA
+			}
+		}
+		if(specifyColor){
+			glTexEnvf(GL_TEXTURE_ENV,GL_RGB_SCALE,getGLTextureBlendScale(state->colorOperation));
+		}
+		if(specifyAlpha){
+			glTexEnvf(GL_TEXTURE_ENV,GL_ALPHA_SCALE,getGLTextureBlendScale(state->alphaOperation));
+		}
+
+		mTexCoordIndexes[i]=state->texCoordIndex;
+
+		if(i>=mMaxTexCoordIndex){
+			mMaxTexCoordIndex=i+1;
+		}
+
+		// Setup calculations
+		TextureState::CalculationType calculation=state->calculation;
+		if(calculation==TextureState::CalculationType_DISABLED && ((texture->mUsage&(Texture::Usage_BIT_NPOT_RESTRICTED|Texture::Usage_BIT_RENDERTARGET))>0)){
+			calculation=TextureState::CalculationType_NORMAL;
+		}
+
+		if(calculation!=TextureState::CalculationType_DISABLED){
+			if(mMatrixMode!=GL_TEXTURE){
+				mMatrixMode=GL_TEXTURE;
+				glMatrixMode(mMatrixMode);
+			}
+
+			glLoadIdentity();
+
+			const Matrix4x4 &matrix=state->matrix;
+			if(calculation==TextureState::CalculationType_NORMAL){
+				#if defined(TOADLET_FIXED_POINT)
+					#if defined(TOADLET_HAS_GLES)
+						glMultMatrixx(texture->mMatrix.data);
+					#else
+						glMultMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,texture->mMatrix).data);
+					#endif
+				#else
+					glMultMatrixf(texture->mMatrix.data);
+				#endif
+
+				#if defined(TOADLET_FIXED_POINT)
+					#if defined(TOADLET_HAS_GLES)
+						glMultMatrixx(matrix.data);
+					#else
+						glMultMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,matrix).data);
+					#endif
+				#else
+					glMultMatrixf(matrix.data);
+				#endif
+			}
+			else if(calculation>TextureState::CalculationType_NORMAL){
+				#if !defined(TOADLET_HAS_GLES)
+					if(mMatrixMode!=GL_MODELVIEW){
+						mMatrixMode=GL_MODELVIEW;
+						glMatrixMode(mMatrixMode);
+					}
+
+					glPushMatrix();
+					glLoadIdentity();
+
+					GLint gltg=0;
+					GLint glpl=0;
+					switch(calculation){
+						case TextureState::CalculationType_OBJECTSPACE:
+							gltg=GL_OBJECT_LINEAR;
+							glpl=GL_OBJECT_PLANE;
+						break;
+						case TextureState::CalculationType_CAMERASPACE:
+							gltg=GL_EYE_LINEAR;
+							glpl=GL_EYE_PLANE;
+						break;
+						default:
+						break;
+					}
+
+					// Set up texgen
+					glTexGeni(GL_S,GL_TEXTURE_GEN_MODE,gltg);
+					cacheArray[0]=matrix.at(0,0);cacheArray[1]=matrix.at(0,1);cacheArray[2]=matrix.at(0,2);cacheArray[3]=matrix.at(0,3);
+					glTexGenfv(GL_S,glpl,cacheArray);
+					glEnable(GL_TEXTURE_GEN_S);
+
+					glTexGeni(GL_T,GL_TEXTURE_GEN_MODE,gltg);
+					cacheArray[0]=matrix.at(1,0);cacheArray[1]=matrix.at(1,1);cacheArray[2]=matrix.at(1,2);cacheArray[3]=matrix.at(1,3);
+					glTexGenfv(GL_T,glpl,cacheArray);
+					glEnable(GL_TEXTURE_GEN_T);
+
+					glTexGeni(GL_R,GL_TEXTURE_GEN_MODE,gltg);
+					cacheArray[0]=matrix.at(2,0);cacheArray[1]=matrix.at(2,1);cacheArray[2]=matrix.at(2,2);cacheArray[3]=matrix.at(2,3);
+					glTexGenfv(GL_R,glpl,cacheArray);
+					glEnable(GL_TEXTURE_GEN_R);
+
+					glTexGeni(GL_Q,GL_TEXTURE_GEN_MODE,gltg);
+					cacheArray[0]=matrix.at(3,0);cacheArray[1]=matrix.at(3,1);cacheArray[2]=matrix.at(3,2);cacheArray[3]=matrix.at(3,3);
+					glTexGenfv(GL_Q,glpl,cacheArray);
+					glEnable(GL_TEXTURE_GEN_Q);
+
+					glPopMatrix();
+				#endif
+			}
+		}
+		else{
+			if(mMatrixMode!=GL_TEXTURE){
+				mMatrixMode=GL_TEXTURE;
+				glMatrixMode(mMatrixMode);
+			}
+			glLoadIdentity();
+		}
+
+		#if !defined(TOADLET_HAS_GLES)
+			if(calculation<=TextureState::CalculationType_NORMAL){
+				glDisable(GL_TEXTURE_GEN_S);
+				glDisable(GL_TEXTURE_GEN_T);
+				glDisable(GL_TEXTURE_GEN_R);
+				glDisable(GL_TEXTURE_GEN_Q);
+			}
+		#endif
+
+		// Setup shadow result
+		#if !defined(TOADLET_HAS_GLES)
+			if(gl_version>=14){
+				if(state->shadowResult!=TextureState::ShadowResult_DISABLED){
+					glTexParameteri(textureTarget,GL_DEPTH_TEXTURE_MODE_ARB,getGLDepthTextureMode(state->shadowResult));
+					glTexParameteri(textureTarget,GL_TEXTURE_COMPARE_FUNC_ARB,GL_LEQUAL);
+					glTexParameteri(textureTarget,GL_TEXTURE_COMPARE_MODE_ARB,GL_COMPARE_R_TO_TEXTURE);
+				}
+				else{
+					glTexParameteri(textureTarget,GL_TEXTURE_COMPARE_MODE_ARB,GL_NONE);
+				}
+			}
+		#endif
+	}
+	else{
+		while(mMaxTexCoordIndex>0 && mLastTexTargets[mMaxTexCoordIndex-1]==0){
+			mMaxTexCoordIndex--;
+		}
+	}
+
+	TOADLET_CHECK_GLERROR("setTextureState");
+}
+
+void GLRenderer::setTexture(int i,Texture *texture){
+	if(i>=mCapabilityState.maxTextureStages){
+		return;
+	}
+	else if(mMultiTexture){
+		glActiveTexture(GL_TEXTURE0+i);
+	}
+
+	GLuint textureTarget=0;
+	GLTexture *gltexture=texture!=NULL?(GLTexture*)texture->getRootTexture():NULL;
+	if(gltexture!=NULL){
+		textureTarget=gltexture->mTarget;
+
+		if(mLastTextures[i]!=gltexture){
+			glBindTexture(textureTarget,gltexture->mHandle);
+			mLastTextures[i]=gltexture;
+		}
+
+		if(mLastTexTargets[i]!=textureTarget){
+				if(mLastTexTargets[i]!=0){
+				glDisable(mLastTexTargets[i]);
+			}
+			if(textureTarget!=0){
+				glEnable(textureTarget);
+			}
+			mLastTexTargets[i]=textureTarget;
+		}
+
+		setSamplerStatePostTexture(i,mLastSamplerStates[i]);
+		setTextureStatePostTexture(i,mLastTextureStates[i]);
+	}
+	else{
+		if(mLastTextures[i]!=NULL){
+			mLastTextures[i]=NULL;
+		}
+
+		if(mLastTexTargets[i]!=0){
+			glDisable(mLastTexTargets[i]);
+			mLastTexTargets[i]=0;
+		}
+	}
+
+	TOADLET_CHECK_GLERROR("setTexture");
 }
 
 void GLRenderer::setNormalize(const Normalize &normalize){
@@ -1107,296 +1448,6 @@ void GLRenderer::setRasterizerState(const RasterizerState &state){
 	}
 
 	TOADLET_CHECK_GLERROR("setRasterizerState");
-}
-
-void GLRenderer::setTextureStage(int stage,TextureStage *textureStage){
-	if(stage>=mCapabilityState.maxTextureStages){
-		return;
-	}
-
-	if(mMultiTexture){
-		glActiveTexture(GL_TEXTURE0+stage);
-	}
-	else if(stage>0){
-		return;
-	}
-
-	if(textureStage!=NULL){
-		Texture *texture=textureStage->texture;
-		GLuint textureTarget=0;
-		GLTexture *gltexture=texture!=NULL?(GLTexture*)texture->getRootTexture(textureStage->textureTime):NULL;
-		if(gltexture!=NULL){
-			textureTarget=gltexture->mTarget;
-
-			if(mLastTextures[stage]!=gltexture){
-				glBindTexture(textureTarget,gltexture->mHandle);
-				mLastTextures[stage]=gltexture;
-			}
-
-			TextureStage::Calculation calculation=textureStage->calculation;
-			Matrix4x4 &transform=cache_setTextureStage_transform;
-			bool identityTransform=texture->getRootTransform(textureStage->textureTime,transform);
-			if(calculation==TextureStage::Calculation_DISABLED && ((gltexture->mUsage&(Texture::Usage_BIT_NPOT_RESTRICTED|Texture::Usage_BIT_RENDERTARGET))>0 || identityTransform==false)){
-				calculation=TextureStage::Calculation_NORMAL;
-			}
-
-			if(calculation!=TextureStage::Calculation_DISABLED){
-				if(mMatrixMode!=GL_TEXTURE){
-					mMatrixMode=GL_TEXTURE;
-					glMatrixMode(mMatrixMode);
-				}
-
-				glLoadIdentity();
-
-				const Matrix4x4 &matrix=textureStage->matrix;
-				if(calculation==TextureStage::Calculation_NORMAL){
-					if(identityTransform==false){
-						#if defined(TOADLET_FIXED_POINT)
-							#if defined(TOADLET_HAS_GLES)
-								glMultMatrixx(transform.data);
-							#else
-								glMultMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,transform).data);
-							#endif
-						#else
-							glMultMatrixf(transform.data);
-						#endif
-					}
-
-					#if defined(TOADLET_FIXED_POINT)
-						#if defined(TOADLET_HAS_GLES)
-							glMultMatrixx(gltexture->mMatrix.data);
-						#else
-							glMultMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,gltexture->mMatrix).data);
-						#endif
-					#else
-						glMultMatrixf(gltexture->mMatrix.data);
-					#endif
-
-					#if defined(TOADLET_FIXED_POINT)
-						#if defined(TOADLET_HAS_GLES)
-							glMultMatrixx(matrix.data);
-						#else
-							glMultMatrixf(MathConversion::scalarToFloat(cacheMatrix4x4,matrix).data);
-						#endif
-					#else
-						glMultMatrixf(matrix.data);
-					#endif
-				}
-				else if(calculation>TextureStage::Calculation_NORMAL){
-					#if !defined(TOADLET_HAS_GLES)
-						if(mMatrixMode!=GL_MODELVIEW){
-							mMatrixMode=GL_MODELVIEW;
-							glMatrixMode(mMatrixMode);
-						}
-
-						glPushMatrix();
-						glLoadIdentity();
-
-						GLint gltg=0;
-						GLint glpl=0;
-						switch(calculation){
-							case TextureStage::Calculation_OBJECTSPACE:
-								gltg=GL_OBJECT_LINEAR;
-								glpl=GL_OBJECT_PLANE;
-							break;
-							case TextureStage::Calculation_CAMERASPACE:
-								gltg=GL_EYE_LINEAR;
-								glpl=GL_EYE_PLANE;
-							break;
-							default:
-							break;
-						}
-
-						// Set up texgen
-						glTexGeni(GL_S,GL_TEXTURE_GEN_MODE,gltg);
-						cacheArray[0]=matrix.at(0,0);cacheArray[1]=matrix.at(0,1);cacheArray[2]=matrix.at(0,2);cacheArray[3]=matrix.at(0,3);
-						glTexGenfv(GL_S,glpl,cacheArray);
-						glEnable(GL_TEXTURE_GEN_S);
-
-						glTexGeni(GL_T,GL_TEXTURE_GEN_MODE,gltg);
-						cacheArray[0]=matrix.at(1,0);cacheArray[1]=matrix.at(1,1);cacheArray[2]=matrix.at(1,2);cacheArray[3]=matrix.at(1,3);
-						glTexGenfv(GL_T,glpl,cacheArray);
-						glEnable(GL_TEXTURE_GEN_T);
-
-						glTexGeni(GL_R,GL_TEXTURE_GEN_MODE,gltg);
-						cacheArray[0]=matrix.at(2,0);cacheArray[1]=matrix.at(2,1);cacheArray[2]=matrix.at(2,2);cacheArray[3]=matrix.at(2,3);
-						glTexGenfv(GL_R,glpl,cacheArray);
-						glEnable(GL_TEXTURE_GEN_R);
-
-						glTexGeni(GL_Q,GL_TEXTURE_GEN_MODE,gltg);
-						cacheArray[0]=matrix.at(3,0);cacheArray[1]=matrix.at(3,1);cacheArray[2]=matrix.at(3,2);cacheArray[3]=matrix.at(3,3);
-						glTexGenfv(GL_Q,glpl,cacheArray);
-						glEnable(GL_TEXTURE_GEN_Q);
-
-						glPopMatrix();
-					#endif
-				}
-			}
-			else{
-				if(mMatrixMode!=GL_TEXTURE){
-					mMatrixMode=GL_TEXTURE;
-					glMatrixMode(mMatrixMode);
-				}
-				glLoadIdentity();
-			}
-
-			#if !defined(TOADLET_HAS_GLES)
-				if(calculation<=TextureStage::Calculation_NORMAL){
-					glDisable(GL_TEXTURE_GEN_S);
-					glDisable(GL_TEXTURE_GEN_T);
-					glDisable(GL_TEXTURE_GEN_R);
-					glDisable(GL_TEXTURE_GEN_Q);
-				}
-			#endif
-		}
-		else{
-			textureTarget=GL_TEXTURE_2D;
-			if(mLastTextures[stage]!=gltexture){
-				glBindTexture(textureTarget,0);
-				mLastTextures[stage]=gltexture;
-			}
-		}
-
-		if(mLastTexTargets[stage]!=textureTarget){
-			if(mLastTexTargets[stage]!=0){
-				glDisable(mLastTexTargets[stage]);
-			}
-			if(textureTarget!=0){
-				glEnable(textureTarget);
-			}
-			mLastTexTargets[stage]=textureTarget;
-		}
-
-		// Setup combiners
-		const TextureBlend &blend=textureStage->blend;
-		bool specifyColor=(blend.colorOperation!=TextureBlend::Operation_UNSPECIFIED);
-		bool specifyAlpha=(blend.alphaOperation!=TextureBlend::Operation_UNSPECIFIED);
-		bool specifyColorSource=!(blend.colorSource1==TextureBlend::Source_UNSPECIFIED && blend.colorSource2==TextureBlend::Source_UNSPECIFIED);
-		bool specifyAlphaSource=!(blend.alphaSource1==TextureBlend::Source_UNSPECIFIED && blend.alphaSource2==TextureBlend::Source_UNSPECIFIED);
-
-		if(!specifyColorSource && !specifyAlphaSource){
-			if(specifyColor==false){
-				glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
-			}
-			else{
-				glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,getGLTextureBlendOperation(blend.colorOperation));
-			}
-		}
-		else{
-			glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_COMBINE);
-			if(blend.colorOperation==TextureBlend::Operation_DOTPRODUCT && blend.alphaOperation==TextureBlend::Operation_DOTPRODUCT){
-				glTexEnvi(GL_TEXTURE_ENV,GL_COMBINE_RGB,GL_DOT3_RGBA);
-			}
-			else{
-				if(specifyColor){
-					glTexEnvi(GL_TEXTURE_ENV,GL_COMBINE_RGB,getGLTextureBlendOperation(blend.colorOperation));
-				}
-				if(specifyAlpha){
-					if(blend.alphaOperation==TextureBlend::Operation_DOTPRODUCT){
-						Error::unknown(Categories::TOADLET_PEEPER,"can not use Operation_DOTPRODUCT in only alpha channel");
-					}
-					else{
-						glTexEnvi(GL_TEXTURE_ENV,GL_COMBINE_ALPHA,getGLTextureBlendOperation(blend.alphaOperation));
-					}
-				}
-			}
-
-			#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
-				glTexEnvxv(GL_TEXTURE_ENV,GL_TEXTURE_ENV_COLOR,textureStage->constantColor.getData());
-			#else
-				glTexEnvfv(GL_TEXTURE_ENV,GL_TEXTURE_ENV_COLOR,colorArray(cacheArray,textureStage->constantColor));
-			#endif
-
-			if(specifyColor){
-				if(blend.colorSource1!=TextureBlend::Source_UNSPECIFIED){
-					glTexEnvi(GL_TEXTURE_ENV,GL_SRC0_RGB,getGLTextureBlendSource(blend.colorSource1));
-				}
-				if(blend.colorSource2!=TextureBlend::Source_UNSPECIFIED){
-					glTexEnvi(GL_TEXTURE_ENV,GL_SRC1_RGB,getGLTextureBlendSource(blend.colorSource2));
-				}
-				if(blend.colorSource3!=TextureBlend::Source_UNSPECIFIED){
-					glTexEnvi(GL_TEXTURE_ENV,GL_SRC2_RGB,getGLTextureBlendSource(blend.colorSource3));
-				}
-				// No need to specify GL_OPERANDs for ALPHABLEND, since RGB defaults are COLOR,COLOR,ALPHA
-			}
-			if(specifyAlpha){
-				if(blend.alphaSource1!=TextureBlend::Source_UNSPECIFIED){
-					glTexEnvi(GL_TEXTURE_ENV,GL_SRC0_ALPHA,getGLTextureBlendSource(blend.alphaSource1));
-				}
-				if(blend.alphaSource2!=TextureBlend::Source_UNSPECIFIED){
-					glTexEnvi(GL_TEXTURE_ENV,GL_SRC1_ALPHA,getGLTextureBlendSource(blend.alphaSource2));
-				}
-				if(blend.alphaSource3!=TextureBlend::Source_UNSPECIFIED){
-					glTexEnvi(GL_TEXTURE_ENV,GL_SRC2_ALPHA,getGLTextureBlendSource(blend.alphaSource3));
-				}
-				// No need to specify GL_OPERANDs for ALPHABLEND, since ALPHA defaults are ALPHA,ALPHA,ALPHA
-			}
-		}
-		if(specifyColor){
-			glTexEnvf(GL_TEXTURE_ENV,GL_RGB_SCALE,getGLTextureBlendScale(blend.colorOperation));
-		}
-		if(specifyAlpha){
-			glTexEnvf(GL_TEXTURE_ENV,GL_ALPHA_SCALE,getGLTextureBlendScale(blend.alphaOperation));
-		}
-
-		bool hasClampToEdge=
-			#if defined(TOADLET_HAS_GLES)
-				true;
-			#else
-				gl_version>=12;
-			#endif
-		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_S,getGLWrap(textureStage->uAddressMode,hasClampToEdge));
-		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_T,getGLWrap(textureStage->vAddressMode,hasClampToEdge));
-		#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_12)
-		if(gl_version>=12){
-			glTexParameteri(textureTarget,GL_TEXTURE_WRAP_R,getGLWrap(textureStage->wAddressMode,hasClampToEdge));
-		}
-		#endif
-
-		glTexParameteri(textureTarget,GL_TEXTURE_MIN_FILTER,getGLMinFilter(textureStage->minFilter,textureStage->mipFilter));
-		glTexParameteri(textureTarget,GL_TEXTURE_MAG_FILTER,getGLMagFilter(textureStage->magFilter));
-
-		#if !defined(TOADLET_HAS_GLES)
-			if(gl_version>=14){
-				if(textureStage->shadowComparison!=TextureStage::ShadowComparison_DISABLED){
-					glTexParameteri(textureTarget,GL_DEPTH_TEXTURE_MODE_ARB,getGLDepthTextureMode(textureStage->shadowComparison));
-					glTexParameteri(textureTarget,GL_TEXTURE_COMPARE_FUNC_ARB,GL_LEQUAL);
-					glTexParameteri(textureTarget,GL_TEXTURE_COMPARE_MODE_ARB,GL_COMPARE_R_TO_TEXTURE);
-				}
-				else{
-					glTexParameteri(textureTarget,GL_TEXTURE_COMPARE_MODE_ARB,GL_NONE);
-				}
-			}
-		#endif
-
-		if(stage==0){
-			#if defined(TOADLET_HAS_GLES)
-				glHint(GL_PERSPECTIVE_CORRECTION_HINT,textureStage->perspective?GL_NICEST:GL_FASTEST);
-			#endif
-		}
-
-		mTexCoordIndexes[stage]=textureStage->texCoordIndex;
-
-		if(stage>=mMaxTexCoordIndex){
-			mMaxTexCoordIndex=stage+1;
-		}
-	}
-	else{
-		if(mLastTextures[stage]!=NULL){
-			mLastTextures[stage]=NULL;
-		}
-
-		if(mLastTexTargets[stage]!=0){
-			glDisable(mLastTexTargets[stage]);
-			mLastTexTargets[stage]=0;
-		}
-
-		while(mMaxTexCoordIndex>0 && mLastTexTargets[mMaxTexCoordIndex-1]==0){
-			mMaxTexCoordIndex--;
-		}
-	}
-
-	TOADLET_CHECK_GLERROR("setTextureStage");
 }
 
 void GLRenderer::setLightState(int i,const LightState &state){
@@ -1812,6 +1863,10 @@ GLenum GLRenderer::getGLFogType(FogState::FogType type){
 	switch(type){
 		case FogState::FogType_LINEAR:
 			return GL_LINEAR;
+		case FogState::FogType_EXP:
+			return GL_EXP;
+		case FogState::FogType_EXP2:
+			return GL_EXP2;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"getGLFogType: Invalid fog type");
@@ -1988,55 +2043,55 @@ GLuint GLRenderer::getGLIndexType(int indexFormat){
 	}
 }
 
-GLuint GLRenderer::getGLWrap(TextureStage::AddressMode addressMode,bool hasClampToEdge){
-	switch(addressMode){
-		case TextureStage::AddressMode_REPEAT:
+GLuint GLRenderer::getGLWrap(SamplerState::AddressType address,bool hasClampToEdge){
+	switch(address){
+		case SamplerState::AddressType_REPEAT:
 			return GL_REPEAT;
 		#if !defined(TOADLET_HAS_GLES)
-			case TextureStage::AddressMode_CLAMP_TO_BORDER:
+			case SamplerState::AddressType_CLAMP_TO_BORDER:
 				return GL_CLAMP_TO_BORDER;
-			case TextureStage::AddressMode_MIRRORED_REPEAT:
+			case SamplerState::AddressType_MIRRORED_REPEAT:
 				return GL_MIRRORED_REPEAT;
-			case TextureStage::AddressMode_CLAMP_TO_EDGE:
+			case SamplerState::AddressType_CLAMP_TO_EDGE:
 				return hasClampToEdge?GL_CLAMP_TO_EDGE:GL_CLAMP;
 		#else
-			case TextureStage::AddressMode_CLAMP_TO_EDGE:
+			case SamplerState::AddressType_CLAMP_TO_EDGE:
 				return GL_CLAMP_TO_EDGE;
 		#endif
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
-				"getGLWrap: Invalid address mode");
+				"getGLWrap: Invalid address");
 			return 0;
 	}
 }
 
-GLuint GLRenderer::getGLMinFilter(TextureStage::Filter minFilter,TextureStage::Filter mipFilter){
+GLuint GLRenderer::getGLMinFilter(SamplerState::FilterType minFilter,SamplerState::FilterType mipFilter){
 	switch(mipFilter){
-		case TextureStage::Filter_NONE:
+		case SamplerState::FilterType_NONE:
 			switch(minFilter){
-				case TextureStage::Filter_NEAREST:
+				case SamplerState::FilterType_NEAREST:
 					return GL_NEAREST;
-				case TextureStage::Filter_LINEAR:
+				case SamplerState::FilterType_LINEAR:
 					return GL_LINEAR;
 				default:
 				break;
 			}
 		break;
-		case TextureStage::Filter_NEAREST:
+		case SamplerState::FilterType_NEAREST:
 			switch(minFilter){
-				case TextureStage::Filter_NEAREST:
+				case SamplerState::FilterType_NEAREST:
 					return GL_NEAREST_MIPMAP_NEAREST;
-				case TextureStage::Filter_LINEAR:
+				case SamplerState::FilterType_LINEAR:
 					return GL_NEAREST_MIPMAP_LINEAR;
 				default:
 				break;
 			}
 		break;
-		case TextureStage::Filter_LINEAR:
+		case SamplerState::FilterType_LINEAR:
 			switch(minFilter){
-				case TextureStage::Filter_NEAREST:
+				case SamplerState::FilterType_NEAREST:
 					return GL_LINEAR_MIPMAP_NEAREST;
-				case TextureStage::Filter_LINEAR:
+				case SamplerState::FilterType_LINEAR:
 					return GL_LINEAR_MIPMAP_LINEAR;
 				default:
 				break;
@@ -2049,11 +2104,11 @@ GLuint GLRenderer::getGLMinFilter(TextureStage::Filter minFilter,TextureStage::F
 	return 0;
 }
 
-GLuint GLRenderer::getGLMagFilter(TextureStage::Filter magFilter){
+GLuint GLRenderer::getGLMagFilter(SamplerState::FilterType magFilter){
 	switch(magFilter){
-		case TextureStage::Filter_NEAREST:
+		case SamplerState::FilterType_NEAREST:
 			return GL_NEAREST;
-		case TextureStage::Filter_LINEAR:
+		case SamplerState::FilterType_LINEAR:
 			return GL_LINEAR;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
@@ -2062,15 +2117,15 @@ GLuint GLRenderer::getGLMagFilter(TextureStage::Filter magFilter){
 	}
 }
 
-GLuint GLRenderer::getGLTextureBlendSource(TextureBlend::Source source){
+GLuint GLRenderer::getGLTextureBlendSource(TextureState::Source source){
 	switch(source){
-		case TextureBlend::Source_PREVIOUS:
+		case TextureState::Source_PREVIOUS:
 			return GL_PREVIOUS;
-		case TextureBlend::Source_TEXTURE:
+		case TextureState::Source_TEXTURE:
 			return GL_TEXTURE;
-		case TextureBlend::Source_PRIMARY_COLOR:
+		case TextureState::Source_PRIMARY_COLOR:
 			return GL_PRIMARY_COLOR;
-		case TextureBlend::Source_CONSTANT_COLOR:
+		case TextureState::Source_CONSTANT_COLOR:
 			return GL_CONSTANT;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
@@ -2079,46 +2134,46 @@ GLuint GLRenderer::getGLTextureBlendSource(TextureBlend::Source source){
 	}
 }
 
-GLuint GLRenderer::getGLTextureBlendOperation(TextureBlend::Operation operation){
+GLuint GLRenderer::getGLTextureBlendOperation(TextureState::Operation operation){
 	switch(operation){
-		case TextureBlend::Operation_REPLACE:
+		case TextureState::Operation_REPLACE:
 			return GL_REPLACE;
-		case TextureBlend::Operation_MODULATE:
-		case TextureBlend::Operation_MODULATE_2X:
-		case TextureBlend::Operation_MODULATE_4X:
+		case TextureState::Operation_MODULATE:
+		case TextureState::Operation_MODULATE_2X:
+		case TextureState::Operation_MODULATE_4X:
 			return GL_MODULATE;
-		case TextureBlend::Operation_ADD:
+		case TextureState::Operation_ADD:
 			return GL_ADD;
-		case TextureBlend::Operation_DOTPRODUCT:
+		case TextureState::Operation_DOTPRODUCT:
 			return GL_DOT3_RGB;
-		case TextureBlend::Operation_ALPHABLEND:
+		case TextureState::Operation_ALPHABLEND:
 			return GL_INTERPOLATE;
 		default:
 			return 0;
 	}
 }
 
-GLuint GLRenderer::getGLDepthTextureMode(TextureStage::ShadowComparison comparison){
-	switch(comparison){
-		case TextureStage::ShadowComparison_L:
-			return GL_LUMINANCE;
-		case TextureStage::ShadowComparison_A:
-			return GL_INTENSITY;
-		default:
-			return 0;
-	}
-}
-
-float GLRenderer::getGLTextureBlendScale(TextureBlend::Operation operation){
+float GLRenderer::getGLTextureBlendScale(TextureState::Operation operation){
 	switch(operation){
-		case TextureBlend::Operation_MODULATE:
+		case TextureState::Operation_MODULATE:
 			return 1.0f;
-		case TextureBlend::Operation_MODULATE_2X:
+		case TextureState::Operation_MODULATE_2X:
 			return 2.0f;
-		case TextureBlend::Operation_MODULATE_4X:
+		case TextureState::Operation_MODULATE_4X:
 			return 4.0f;
 		default:
 			return 1.0f;
+	}
+}
+
+GLuint GLRenderer::getGLDepthTextureMode(TextureState::ShadowResult shadow){
+	switch(shadow){
+		case TextureState::ShadowResult_L:
+			return GL_LUMINANCE;
+		case TextureState::ShadowResult_A:
+			return GL_INTENSITY;
+		default:
+			return 0;
 	}
 }
 

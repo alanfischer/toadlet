@@ -129,6 +129,26 @@ public:
 	void setMaterialState(const MaterialState &state){if(mMaterialState==NULL){mMaterialState=new MaterialState(state);}else{mMaterialState->set(state);}}
 	bool getMaterialState(MaterialState &state) const{if(mMaterialState==NULL){return false;}else{state.set(*mMaterialState);return true;}}
 
+	int getNumSamplerStates() const{return mSamplerStates.size();}
+	void setSamplerState(int i,const SamplerState &state){
+		if(mSamplerStates.size()<=i){
+			mSamplerStates.resize(i+1);
+			mSamplerStates[i]=new SamplerState(state);
+			mD3DSamplerStates.resize(i+1,NULL);
+		}
+		else{
+			mSamplerStates[i]->set(state);
+		}
+		if(mD3DSamplerStates[i]!=NULL){mD3DSamplerStates[i]->Release();}
+		D3D10_SAMPLER_DESC desc; mRenderer->getD3D10_SAMPLER_DESC(desc,state);
+		mDevice->CreateSamplerState(&desc,&mD3DSamplerStates[i]);
+	}
+	bool getSamplerState(int i,SamplerState &state) const{if(mSamplerStates.size()<=i || mSamplerStates[i]==NULL){return false;}else{state.set(*mSamplerStates[i]);return true;}}
+
+	int getNumTextureStates() const{return 0;}
+	void setTextureState(int i,const TextureState &state){}
+	bool getTextureState(int i,TextureState &state) const{return false;}
+
 protected:
 	D3D10Renderer *mRenderer;
 	ID3D10Device *mDevice;
@@ -140,7 +160,9 @@ protected:
 	ID3D10DepthStencilState *mD3DDepthStencilState;
 	RasterizerState *mRasterizerState;
 	ID3D10RasterizerState *mD3DRasterizerState;
-	
+	egg::Collection<SamplerState*> mSamplerStates;
+	egg::Collection<ID3D10SamplerState*> mD3DSamplerStates;
+
 	MaterialState *mMaterialState;
 
 	friend class D3D10Renderer;

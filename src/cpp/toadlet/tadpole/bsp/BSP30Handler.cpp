@@ -382,8 +382,14 @@ void BSP30Handler::buildMaterials(BSP30Map *map){
 		material->setMaterialState(MaterialState(false,false,MaterialState::ShadeType_FLAT));
 		material->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
 
-		TextureStage::ptr primary=mEngine->getMaterialManager()->createTextureStage(map->parsedTextures[i]);
-		material->setTextureStage(0,primary);
+		material->setTexture(0,map->parsedTextures[i]);
+
+		TextureState lightmapState;
+		lightmapState.texCoordIndex=1;
+		lightmapState.colorOperation=TextureState::Operation_MODULATE;
+		lightmapState.colorSource1=TextureState::Source_PREVIOUS;
+		lightmapState.colorSource2=TextureState::Source_TEXTURE;
+		material->setTextureState(1,lightmapState);
 
 		map->materials[i]=material;
 	}

@@ -107,7 +107,6 @@ public:
 	egg::image::Image::ptr lightmapImage;
 	egg::Collection<peeper::Texture::ptr> lightmapTextures;
 	int lightmapAllocated[LIGHTMAP_SIZE];
-	peeper::TextureStage::ptr lightmapStage;
 	egg::Collection<node::NodeResource::ptr> modelResources;
 };
 

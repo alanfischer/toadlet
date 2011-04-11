@@ -36,29 +36,34 @@ public:
 	enum FogType{
 		FogType_NONE,
 		FogType_LINEAR,
+		FogType_EXP,
+		FogType_EXP2,
 	};
 
 	FogState():
-		type(FogType_NONE),
+		fog(FogType_NONE),
+		density(Math::ONE),
 		nearDistance(0),
-		farDistance(0)
+		farDistance(Math::ONE)
 		//color
 	{}
 
-	FogState(FogType type1,scalar nearDistance1,scalar farDistance1,const Vector4 &color1){
-		set(type1,nearDistance1,farDistance1,color1);
+	FogState(FogType type1,scalar density1,scalar nearDistance1,scalar farDistance1,const Vector4 &color1){
+		set(type1,density1,nearDistance1,farDistance1,color1);
 	}
 
 	FogState &set(const FogState &state){
-		type=state.type;
+		fog=state.fog;
+		density=state.density;
 		nearDistance=state.nearDistance;
 		farDistance=state.farDistance;
 		color.set(state.color);
 		return *this;
 	}
 
-	FogState &set(FogType type1,scalar nearDistance1,scalar farDistance1,const Vector4 &color1){
-		type=type1;
+	FogState &set(FogType fog1,scalar density1,scalar nearDistance1,scalar farDistance1,const Vector4 &color1){
+		fog=fog1;
+		density=density1;
 		nearDistance=nearDistance1;
 		farDistance=farDistance1;
 		color.set(color1);
@@ -66,7 +71,7 @@ public:
 	}
 
 	inline bool equals(const FogState &state) const{
-		return (type==state.type && nearDistance==state.nearDistance && farDistance==state.farDistance && color.equals(state.color));
+		return (fog==state.fog && density==state.density && nearDistance==state.nearDistance && farDistance==state.farDistance && color.equals(state.color));
 	}
 
 	inline bool operator==(const FogState &state) const{
@@ -77,7 +82,8 @@ public:
 		return !equals(state);
 	}
 
-	FogType type;
+	FogType fog;
+	scalar density;
 	scalar nearDistance;
 	scalar farDistance;
 	Vector4 color;

@@ -51,7 +51,6 @@ class RasterizerState;
 class RenderStateSet;
 class Shader;
 class Texture;
-class TextureStage;
 class VertexBuffer;
 class VertexFormat;
 class Viewport;
@@ -108,12 +107,12 @@ public:
 	virtual bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src)=0;
 	virtual void setDefaultStates()=0;
 	virtual bool setRenderStateSet(RenderStateSet *set)=0;
+	virtual void setTexture(int i,Texture *texture)=0;
 
 	// Old fixed states
 	virtual void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff)=0;
 	virtual void setNormalize(const Normalize &normalize)=0;
 	virtual void setAmbientColor(const Vector4 &ambient)=0;
-	virtual void setTextureStage(int stage,TextureStage *textureStage)=0;
 	virtual void setLightState(int i,const LightState &light)=0;
 	virtual void setLightEnabled(int i,bool enable)=0;
 

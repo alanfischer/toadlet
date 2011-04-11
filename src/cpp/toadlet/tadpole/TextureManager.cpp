@@ -180,7 +180,7 @@ void TextureManager::contextActivate(Renderer *renderer){
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
-		if(texture!=NULL && texture->getRootTexture(0)!=texture){
+		if(texture!=NULL && texture->getRootTexture()!=texture){
 			Texture::ptr back(renderer->createTexture());
 			shared_static_cast<BackableTexture>(texture)->setBack(back,renderer);
 		}
@@ -199,7 +199,7 @@ void TextureManager::contextDeactivate(Renderer *renderer){
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
-		if(texture!=NULL && texture->getRootTexture(0)!=texture){
+		if(texture!=NULL && texture->getRootTexture()!=texture){
 			shared_static_cast<BackableTexture>(texture)->setBack(NULL,NULL);
 		}
 	}

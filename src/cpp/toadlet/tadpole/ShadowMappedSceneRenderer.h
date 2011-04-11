@@ -47,8 +47,7 @@ public:
 protected:
 	peeper::Texture::ptr mShadowTexture;
 	peeper::PixelBufferRenderTarget::ptr mShadowTarget;
-	peeper::TextureStage::ptr mShadowStage;
-	peeper::RenderStateSet::ptr mShadowStates;
+	peeper::RenderStateSet::ptr mShadowStates,mLightStates;
 	node::CameraNode::ptr mLightCamera;
 	node::LightNode::ptr mLight;
 };
