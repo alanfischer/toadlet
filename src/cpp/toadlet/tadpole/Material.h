@@ -29,7 +29,6 @@
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/RenderStateSet.h>
-#include <toadlet/peeper/TextureStage.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/Renderer.h>
@@ -46,27 +45,37 @@ public:
 
 	void destroy();
 
-	virtual void setBlendState(const peeper::BlendState &state){mRenderStateSet->setBlendState(state);}
-	virtual bool getBlendState(peeper::BlendState &state) const{return mRenderStateSet->getBlendState(state);}
+	void setBlendState(const peeper::BlendState &state){mRenderStateSet->setBlendState(state);}
+	bool getBlendState(peeper::BlendState &state) const{return mRenderStateSet->getBlendState(state);}
 
-	virtual void setDepthState(const peeper::DepthState &state){mRenderStateSet->setDepthState(state);}
-	virtual bool getDepthState(peeper::DepthState &state) const{return mRenderStateSet->getDepthState(state);}
+	void setDepthState(const peeper::DepthState &state){mRenderStateSet->setDepthState(state);}
+	bool getDepthState(peeper::DepthState &state) const{return mRenderStateSet->getDepthState(state);}
 
-	virtual void setRasterizerState(const peeper::RasterizerState &state){mRenderStateSet->setRasterizerState(state);}
-	virtual bool getRasterizerState(peeper::RasterizerState &state) const{return mRenderStateSet->getRasterizerState(state);}
+	void setRasterizerState(const peeper::RasterizerState &state){mRenderStateSet->setRasterizerState(state);}
+	bool getRasterizerState(peeper::RasterizerState &state) const{return mRenderStateSet->getRasterizerState(state);}
 
-	virtual void setFogState(const peeper::FogState &state){mRenderStateSet->setFogState(state);}
-	virtual bool getFogState(peeper::FogState &state) const{return mRenderStateSet->getFogState(state);}
+	void setFogState(const peeper::FogState &state){mRenderStateSet->setFogState(state);}
+	bool getFogState(peeper::FogState &state) const{return mRenderStateSet->getFogState(state);}
 
-	virtual void setPointState(const peeper::PointState &state){mRenderStateSet->setPointState(state);}
-	virtual bool getPointState(peeper::PointState &state) const{return mRenderStateSet->getPointState(state);}
+	void setPointState(const peeper::PointState &state){mRenderStateSet->setPointState(state);}
+	bool getPointState(peeper::PointState &state) const{return mRenderStateSet->getPointState(state);}
 
-	virtual void setMaterialState(const peeper::MaterialState &state){mRenderStateSet->setMaterialState(state);}
-	virtual bool getMaterialState(peeper::MaterialState &state) const{return mRenderStateSet->getMaterialState(state);}
+	void setMaterialState(const peeper::MaterialState &state){mRenderStateSet->setMaterialState(state);}
+	bool getMaterialState(peeper::MaterialState &state) const{return mRenderStateSet->getMaterialState(state);}
 
-	inline int getNumTextureStages() const{return mTextureStages.size();}
-	bool setTextureStage(int stage,const peeper::TextureStage::ptr &textureStage);
-	inline const peeper::TextureStage::ptr &getTextureStage(int stage) const{return mTextureStages[stage];}
+	int getNumSamplerStates() const{return mRenderStateSet->getNumSamplerStates();}
+	void setSamplerState(int i,const peeper::SamplerState &state){return mRenderStateSet->setSamplerState(i,state);}
+	bool getSamplerState(int i,peeper::SamplerState &state) const{return mRenderStateSet->getSamplerState(i,state);}
+
+	int getNumTextureStates() const{return mRenderStateSet->getNumTextureStates();}
+	void setTextureState(int i,const peeper::TextureState &state){return mRenderStateSet->setTextureState(i,state);}
+	bool getTextureState(int i,peeper::TextureState &state) const{return mRenderStateSet->getTextureState(i,state);}
+
+	int getNumTextures() const{return mTextures.size();}
+	void setTexture(int i,peeper::Texture::ptr texture);
+	peeper::Texture::ptr getTexture(int i) const{return i<mTextures.size()?mTextures[i]:NULL;}
+	void setTextureName(int i,const egg::String &name){if(i<mTextureNames.size()){mTextureNames.resize(i+1);}mTextureNames[i]=name;}
+	egg::String getTextureName(int i) const{return i<mTextureNames.size()?mTextureNames[i]:(char*)NULL;}
 
 	void setDepthSorted(bool sorted){mDepthSorted=sorted;}
 	inline bool getDepthSorted() const{return mDepthSorted;}
@@ -77,13 +86,12 @@ public:
 	void modifyWith(Material *material);
 	bool getManaged(){return getUniqueHandle()!=0;}
 
-	bool equals(Material *material);
-
 	void setupRenderer(peeper::Renderer *renderer);
 	
 protected:
 	peeper::RenderStateSet::ptr mRenderStateSet;
-	egg::Collection<peeper::TextureStage::ptr> mTextureStages;
+	egg::Collection<peeper::Texture::ptr> mTextures;
+	egg::Collection<egg::String> mTextureNames;
 	bool mDepthSorted;
 	int mLayer;
 };

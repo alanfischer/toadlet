@@ -27,7 +27,6 @@
 #define TOADLET_TADPOLE_SCENE_H
 
 #include <toadlet/peeper/RenderTarget.h>
-#include <toadlet/peeper/TextureStage.h>
 #include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/ContextListener.h>
 #include <toadlet/tadpole/Mesh.h>

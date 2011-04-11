@@ -59,14 +59,14 @@ Node *AnaglyphCameraNode::create(Scene *scene){
 	mLeftMaterial=mEngine->getMaterialManager()->createMaterial();
 	mLeftMaterial->setDepthState(DepthState(DepthState::DepthTest_NONE,false));
 	mLeftMaterial->setMaterialState(MaterialState(Colors::RED));
-	mLeftMaterial->setTextureStage(0,TextureStage::ptr(new TextureStage(mLeftTexture)));
+	mLeftMaterial->setTexture(0,mLeftTexture);
 	mLeftMaterial->retain();
 
 	mRightMaterial=mEngine->getMaterialManager()->createMaterial();
 	mRightMaterial->setDepthState(DepthState(DepthState::DepthTest_NONE,false));
 	mRightMaterial->setMaterialState(MaterialState(Colors::CYAN));
-	mRightMaterial->setTextureStage(0,TextureStage::ptr(new TextureStage(mRightTexture)));
 	mRightMaterial->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
+	mRightMaterial->setTexture(0,mRightTexture);
 	mRightMaterial->retain();
 
 	return this;

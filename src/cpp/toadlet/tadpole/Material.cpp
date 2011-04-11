@@ -55,25 +55,26 @@ Material::~Material(){
 }
 
 void Material::destroy(){
+	mRenderStateSet->destroy();
+
 	int i;
-	for(i=0;i<mTextureStages.size();++i){
-		mTextureStages[i]->destroy();
+	for(i=0;i<mTextures.size();++i){
+		mTextures[i]->release();
 	}
-	mTextureStages.clear();
+	mTextures.clear();
 }
 
-bool Material::setTextureStage(int stage,const TextureStage::ptr &textureStage){
-	if(mTextureStages.size()<=stage){
-		mTextureStages.resize(stage+1);
+void Material::setTexture(int i,Texture::ptr texture){
+	if(i>=mTextures.size()){
+		mTextures.resize(i+1);
 	}
-
-	if(mTextureStages[stage]!=NULL){
-		mTextureStages[stage]->destroy();
+	if(mTextures[i]!=NULL){
+		mTextures[i]->release();
 	}
-
-	mTextureStages[stage]=textureStage;
-
-	return true;
+	mTextures[i]=texture;
+	if(mTextures[i]!=NULL){
+		mTextures[i]->retain();
+	}
 }
 
 void Material::modifyWith(Material *material){
@@ -99,47 +100,18 @@ void Material::modifyWith(Material *material){
 	if(src->getMaterialState(materialState)) dst->setMaterialState(materialState);
 
 	int i;
-	for(i=0;i<material->getNumTextureStages();++i){
-		setTextureStage(i,material->getTextureStage(i)->clone());
+	for(i=0;i<src->getNumSamplerStates();++i){
+		SamplerState samplerState;
+		if(src->getSamplerState(i,samplerState)) dst->setSamplerState(i,samplerState);
 	}
-}
-
-bool Material::equals(Material *material){
-	RenderStateSet::ptr src=material->mRenderStateSet;
-	RenderStateSet::ptr dst=mRenderStateSet;
-
-	BlendState srcBlendState,dstBlendState;
-	src->getBlendState(srcBlendState);dst->getBlendState(dstBlendState);
-	if(srcBlendState!=dstBlendState) return false;
-
-	DepthState srcDepthState,dstDepthState;
-	src->getDepthState(srcDepthState);dst->getDepthState(dstDepthState);
-	if(srcDepthState!=dstDepthState) return false;
-
-	RasterizerState srcRasterizerState,dstRasterizerState;
-	src->getRasterizerState(srcRasterizerState);dst->getRasterizerState(dstRasterizerState);
-	if(srcRasterizerState!=dstRasterizerState) return false;
-
-	FogState srcFogState,dstFogState;
-	src->getFogState(srcFogState);dst->getFogState(dstFogState);
-	if(srcFogState!=dstFogState) return false;
-
-	PointState srcPointState,dstPointState;
-	src->getPointState(srcPointState);dst->getPointState(dstPointState);
-	if(srcPointState!=dstPointState) return false;
-
-	MaterialState srcMaterialState,dstMaterialState;
-	src->getMaterialState(srcMaterialState);dst->getMaterialState(dstMaterialState);
-	if(srcMaterialState!=dstMaterialState) return false;
-
-	if(material->getNumTextureStages()!=getNumTextureStages()) return false;
-
-	int i;
-	for(i=0;i<getNumTextureStages();++i){
-		if(getTextureStage(i)->getTextureName()!=material->getTextureStage(i)->getTextureName()) return false;
+	for(i=0;i<src->getNumTextureStates();++i){
+		TextureState textureState;
+		if(src->getTextureState(i,textureState)) dst->setTextureState(i,textureState);
 	}
-
-	return true;
+	for(i=0;i<material->getNumTextures();++i){
+		setTexture(i,material->getTexture(i));
+		setTextureName(i,material->getTextureName(i));
+	}
 }
 
 /// @todo: Optimize this so we're not resetting a ton of texture states
@@ -147,11 +119,11 @@ void Material::setupRenderer(Renderer *renderer){
 	renderer->setRenderStateSet(mRenderStateSet);
 
 	int i;
-	for(i=0;i<getNumTextureStages();++i){
-		renderer->setTextureStage(i,getTextureStage(i));
+	for(i=0;i<getNumTextures();++i){
+		renderer->setTexture(i,getTexture(i));
 	}
 	for(;i<renderer->getCapabilityState().maxTextureStages;++i){
-		renderer->setTextureStage(i,NULL);
+		renderer->setTexture(i,NULL);
 	}
 }
 

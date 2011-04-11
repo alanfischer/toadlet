@@ -143,13 +143,13 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 "VS_OUTPUT VS( float4 Pos : POSITION, float2 TexCoords : TEXCOORD){\n"
   "VS_OUTPUT Output = (VS_OUTPUT)0;\n"
   "Output.Pos = mul(Pos, ShaderMatrix);\n"
-  "Output.TexCoords=mul(TexCoords,textureMatrix);\n"
+  "Output.TexCoords=TexCoords;\n"//mul(TexCoords,textureMatrix);\n"
   "return Output;\n"
 "}\n"
 
 "float4 PS( VS_OUTPUT Input ) : SV_Target{\n"
-	"return diffuseTexture.Sample(samLinear,Input.TexCoords)*useTexture + diffuseColor*(1-useTexture);\n"
-//	"return diffuseTexture.Sample(samLinear,Input.TexCoords) * diffuseColor;\n"
+//	"return diffuseTexture.Sample(samLinear,Input.TexCoords)*useTexture + diffuseColor*(1-useTexture);\n"
+	"return diffuseTexture.Sample(samLinear,Input.TexCoords);\n"
 "}\n"
 
 "technique10 Render{\n"
@@ -317,7 +317,7 @@ void D3D10Renderer::endScene(){
 
 	int i;
 	for(i=0;i<mCapabilityState.maxTextureStages;++i){
-		setTextureStage(i,NULL);
+		setTexture(i,NULL);
 	}
 
 // Doing this temporarily to unbind any resources
@@ -498,6 +498,10 @@ bool D3D10Renderer::setRenderStateSet(RenderStateSet *set){
 		mD3DDevice->RSSetState(d3dset->mD3DRasterizerState);
 	}
 
+//	mD3DDevice->VSSetSamplers(0,d3dset->mD3DSamplerStates.size(),d3dset->mD3DSamplerStates.begin());
+//	mD3DDevice->PSSetSamplers(0,d3dset->mD3DSamplerStates.size(),d3dset->mD3DSamplerStates.begin());
+//	mD3DDevice->GSSetSamplers(0,d3dset->mD3DSamplerStates.size(),d3dset->mD3DSamplerStates.begin());
+
 if(d3dset->mMaterialState!=NULL){
 effect->GetVariableByName("diffuseColor")->AsVector()->SetFloatVector((float*)d3dset->mMaterialState->diffuse.getData());
 }
@@ -505,139 +509,19 @@ effect->GetVariableByName("diffuseColor")->AsVector()->SetFloatVector((float*)d3
 	return true;
 }
 
-void D3D10Renderer::setTextureStage(int stage,TextureStage *textureStage){
-	if(stage>0)return;
+void D3D10Renderer::setTexture(int i,Texture *texture){
+	if(i>0)return;
 
-	ID3D10ShaderResourceView *texture=NULL;
+	ID3D10ShaderResourceView *textureView=NULL;
 	Matrix4x4 textureMatrix;
-	if(textureStage!=NULL && textureStage->texture!=NULL){
-		texture=((D3D10Texture*)(textureStage->texture->getRootTexture(0)))->mShaderResourceView;
-		textureMatrix.set(textureStage->matrix);
+	if(texture){
+		textureView=((D3D10Texture*)(texture->getRootTexture()))->mShaderResourceView;
+//		textureMatrix.set(textureStage->matrix);
 	}
-effect->GetVariableByName("diffuseTexture")->AsShaderResource()->SetResource(texture);
-effect->GetVariableByName("textureMatrix")->AsMatrix()->SetMatrix(textureMatrix.data);
+effect->GetVariableByName("diffuseTexture")->AsShaderResource()->SetResource(textureView);
+//effect->GetVariableByName("textureMatrix")->AsMatrix()->SetMatrix(textureMatrix.data);
 effect->GetVariableByName("useTexture")->AsScalar()->SetFloat(texture!=NULL);
-
-/*	HRESULT result=S_OK;
-
-	if(textureStage!=NULL){
-		Texture *texture=textureStage->texture;
-		if(texture!=NULL){
-			D3D9Texture *d3dtexture=(D3D9Texture*)texture->getRootTexture(textureStage->frame);
-			result=mD3DDevice->SetTexture(stage,d3dtexture->mTexture);
-			TOADLET_CHECK_D3D9ERROR(result,"SetTexture");
-		}
-		else{
-			result=mD3DDevice->SetTexture(stage,NULL);
-			TOADLET_CHECK_D3D9ERROR(result,"SetTexture");
-		}
-
-		result=mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXCOORDINDEX,textureStage->texCoordIndex);
-		TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
-
-		/// @todo: Only if we're not using shaders
-		TextureStage::Calculation calculation=textureStage->calculation;
-		if(calculation!=TextureStage::Calculation_DISABLED){
-			if(calculation==TextureStage::Calculation_NORMAL){
-				/// @todo: Get this working with 3D Texture coordinates.  Doesnt seem to currently
-				//  I have tried just switching to D3DTTFF_COUNT3, but nothing changed, I'm pretty sure it has
-				//  something to do with the setup of the cacheD3DMatrix below
-				result=mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT2);
-				TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
-
-				toD3DMATRIX(cacheD3DMatrix,textureStage->matrix);
-				#if defined(TOADLET_HAS_DIRECT3DMOBILE) && defined(TOADLET_FIXED_POINT)
-					scalar t;
-				#else
-					float t;
-				#endif
-				t=cacheD3DMatrix._31; cacheD3DMatrix._31=cacheD3DMatrix._41; cacheD3DMatrix._41=t;
-				t=cacheD3DMatrix._32; cacheD3DMatrix._32=cacheD3DMatrix._42; cacheD3DMatrix._42=t;
-				t=cacheD3DMatrix._33; cacheD3DMatrix._33=cacheD3DMatrix._43; cacheD3DMatrix._43=t;
-				t=cacheD3DMatrix._34; cacheD3DMatrix._34=cacheD3DMatrix._44; cacheD3DMatrix._44=t;
-			}
-			else if(calculation==TextureStage::Calculation_OBJECTSPACE){
-				mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXCOORDINDEX,D3DTSS_TCI_PASSTHRU);
-				mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT4|D3DTTFF_PROJECTED);
-			}
-			else if(calculation==TextureStage::Calculation_CAMERASPACE){
-				mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXCOORDINDEX,D3DTSS_TCI_CAMERASPACEPOSITION);
-				mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_COUNT4|D3DTTFF_PROJECTED);
-			}
-
-			result=mD3DDevice->SetTransform((D3DTRANSFORMSTATETYPE)(D3DTS_TEXTURE0+stage),&cacheD3DMatrix TOADLET_D3DMFMT);
-			TOADLET_CHECK_D3D9ERROR(result,"SetTransform");
-		}
-		else{
-			mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXTURETRANSFORMFLAGS,D3DTTFF_DISABLE);
-		}
-
-		const TextureBlend &blend=textureStage->blend;
-		if(blend.operation!=TextureBlend::Operation_UNSPECIFIED){
-			DWORD mode=0;
-			switch(blend.operation){
-				case TextureBlend::Operation_REPLACE:
-					mode=D3DTOP_DISABLE;
-				break;
-				case TextureBlend::Operation_MODULATE:
-					mode=D3DTOP_MODULATE;
-				break;
-				case TextureBlend::Operation_MODULATE_2X:
-					mode=D3DTOP_MODULATE2X;
-				break;
-				case TextureBlend::Operation_MODULATE_4X:
-					mode=D3DTOP_MODULATE4X;
-				break;
-				case TextureBlend::Operation_ADD:
-					mode=D3DTOP_ADD;
-				break;
-				case TextureBlend::Operation_DOTPRODUCT:
-					mode=D3DTOP_DOTPRODUCT3;
-				break;
-			}
-
-			result=mD3DDevice->SetTextureStageState(stage,D3DTSS_COLOROP,mode);
-			TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
-			result=mD3DDevice->SetTextureStageState(stage,D3DTSS_ALPHAOP,mode);
-			TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
-			if(blend.source1!=TextureBlend::Source_UNSPECIFIED && blend.source2!=TextureBlend::Source_UNSPECIFIED){
-				mD3DDevice->SetTextureStageState(stage,D3DTSS_COLORARG1,getD3DTextureBlendSource(blend.source1));
-				mD3DDevice->SetTextureStageState(stage,D3DTSS_COLORARG2,getD3DTextureBlendSource(blend.source2));
-			}
-		}
-		else{
-			result=mD3DDevice->SetTextureStageState(stage,D3DTSS_COLOROP,D3DTOP_MODULATE);
-			TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
-			result=mD3DDevice->SetTextureStageState(stage,D3DTSS_ALPHAOP,D3DTOP_MODULATE);
-			TOADLET_CHECK_D3D9ERROR(result,"SetTextureStageState");
-		}
-
-		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-			mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSU,D3D9Texture::getD3DTADDRESS(textureStage->uAddressMode));
-			mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSV,D3D9Texture::getD3DTADDRESS(textureStage->vAddressMode));
-			mD3DDevice->SetTextureStageState(stage,D3DMTSS_ADDRESSW,D3D9Texture::getD3DTADDRESS(textureStage->wAddressMode));
-
-			mD3DDevice->SetTextureStageState(stage,D3DMTSS_MINFILTER,D3D9Texture::getD3DTEXF(textureStage->minFilter));
-			mD3DDevice->SetTextureStageState(stage,D3DMTSS_MIPFILTER,D3D9Texture::getD3DTEXF(textureStage->mipFilter));
-			mD3DDevice->SetTextureStageState(stage,D3DMTSS_MAGFILTER,D3D9Texture::getD3DTEXF(textureStage->magFilter));
-		#else
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSU,D3D9Texture::getD3DTADDRESS(textureStage->uAddressMode));
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSV,D3D9Texture::getD3DTADDRESS(textureStage->vAddressMode));
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_ADDRESSW,D3D9Texture::getD3DTADDRESS(textureStage->wAddressMode));
-
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_MINFILTER,D3D9Texture::getD3DTEXF(textureStage->minFilter));
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_MIPFILTER,D3D9Texture::getD3DTEXF(textureStage->mipFilter));
-			mD3DDevice->SetSamplerState(stage,D3DSAMP_MAGFILTER,D3D9Texture::getD3DTEXF(textureStage->magFilter));
-		#endif
-	}
-	else{
-		result=mD3DDevice->SetTexture(stage,NULL);
-		TOADLET_CHECK_D3D9ERROR(result,"disableTextureStage");
-
-		result=mD3DDevice->SetTextureStageState(stage,D3DTSS_TEXCOORDINDEX,0);
-		TOADLET_CHECK_D3D9ERROR(result,"disableTextureStage");
-	}
-*/}
+}
 
 void D3D10Renderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){
 }
@@ -926,6 +810,19 @@ void D3D10Renderer::getD3D10_RASTERIZER_DESC(D3D10_RASTERIZER_DESC &desc,const R
 	desc.SlopeScaledDepthBias=state.depthBiasSlope;
     desc.DepthClipEnable=TRUE;
     desc.MultisampleEnable=state.multisample;
+}
+
+void D3D10Renderer::getD3D10_SAMPLER_DESC(D3D10_SAMPLER_DESC &desc,const SamplerState &state){
+	memset(&desc,0,sizeof(desc));
+
+	/// @todo: Implement this
+//	desc.Filter=
+//	desc.AddressU=
+//	desc.AddressV=
+//	desc.AddressW=
+//	desc.BorderColor=
+//	desc.MinLOD=
+//	desc.MaxLOD=
 }
 
 char *D3D10Renderer::getSemanticName(int semantic){

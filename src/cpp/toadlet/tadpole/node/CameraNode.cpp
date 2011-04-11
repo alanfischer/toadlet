@@ -459,8 +459,7 @@ Mesh::ptr CameraNode::renderToSkyBox(Renderer *renderer,int format,int size,scal
 			renderer->copyFrameBufferToPixelBuffer(skyboxTexture[i]->getMipPixelBuffer(0,0));
 		}
 
-		skyboxMaterial[i]=mEngine->getMaterialManager()->createMaterial();
-		skyboxMaterial[i]->setTextureStage(0,mEngine->getMaterialManager()->createTextureStage(skyboxTexture[i],true));
+		skyboxMaterial[i]=mEngine->getMaterialManager()->createMaterial(skyboxTexture[i],true);
 		skyboxMaterial[i]->setDepthState(DepthState(DepthState::DepthTest_NONE,false));
 	}
 
@@ -468,6 +467,10 @@ Mesh::ptr CameraNode::renderToSkyBox(Renderer *renderer,int format,int size,scal
 	setTransform(oldTransform);
 	setViewport(oldViewport);
 	renderer->setRenderTarget(oldTarget);
+
+	if(renderTarget!=NULL){
+		renderTarget->destroy();
+	}
 
 	return getEngine()->getMeshManager()->createSkyBox(scale,false,true,skyboxMaterial[0],skyboxMaterial[1],skyboxMaterial[2],skyboxMaterial[3],skyboxMaterial[4],skyboxMaterial[5]);
 }

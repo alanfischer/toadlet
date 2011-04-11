@@ -86,6 +86,15 @@ public:
 			delete mMaterialState;
 			mMaterialState=NULL;
 		}
+		int i;
+		for(i=0;i<mSamplerStates.size();++i){
+			delete mSamplerStates[i];
+		}
+		mSamplerStates.clear();
+		for(i=0;i<mTextureStates.size();++i){
+			delete mTextureStates[i];
+		}
+		mTextureStates.clear();
 
 		if(mListener!=NULL){
 			mListener->renderStateSetDestroyed(this);
@@ -129,6 +138,32 @@ public:
 	}
 	virtual bool getMaterialState(MaterialState &state) const{if(mMaterialState==NULL){return false;}else{state.set(*mMaterialState);return true;}}
 
+	virtual int getNumSamplerStates() const{return mSamplerStates.size();}
+	virtual void setSamplerState(int i,const SamplerState &state){
+		if(mSamplerStates.size()<=i){
+			mSamplerStates.resize(i+1);
+			mSamplerStates[i]=new SamplerState(state);
+		}
+		else{
+			mSamplerStates[i]->set(state);
+		}
+		if(mBack!=NULL){mBack->setSamplerState(i,state);}
+	}
+	virtual bool getSamplerState(int i,SamplerState &state) const{if(mSamplerStates.size()<=i || mSamplerStates[i]==NULL){return false;}else{state.set(*mSamplerStates[i]);return true;}}
+
+	virtual int getNumTextureStates() const{return mTextureStates.size();}
+	virtual void setTextureState(int i,const TextureState &state){
+		if(mTextureStates.size()<=i){
+			mTextureStates.resize(i+1);
+			mTextureStates[i]=new TextureState(state);
+		}
+		else{
+			mTextureStates[i]->set(state);
+		}
+		if(mBack!=NULL){mBack->setTextureState(i,state);}
+	}
+	virtual bool getTextureState(int i,TextureState &state) const{if(mTextureStates.size()<=i || mTextureStates[i]==NULL){return false;}else{state.set(*mTextureStates[i]);return true;}}
+
 	virtual void setBack(RenderStateSet::ptr back){
 		if(back!=mBack && mBack!=NULL){
 			mBack->destroy();
@@ -143,6 +178,13 @@ public:
 			if(mFogState!=NULL){mBack->setFogState(*mFogState);}
 			if(mPointState!=NULL){mBack->setPointState(*mPointState);}
 			if(mMaterialState!=NULL){mBack->setMaterialState(*mMaterialState);}
+			int i;
+			for(i=0;i<mSamplerStates.size();++i){
+				if(mSamplerStates[i]!=NULL){mBack->setSamplerState(i,*mSamplerStates[i]);}
+			}
+			for(i=0;i<mTextureStates.size();++i){
+				if(mTextureStates[i]!=NULL){mBack->setTextureState(i,*mTextureStates[i]);}
+			}
 		}
 	}
 	virtual RenderStateSet::ptr getBack(){return mBack;}
@@ -155,6 +197,8 @@ protected:
 	FogState *mFogState;
 	PointState *mPointState;
 	MaterialState *mMaterialState;
+	egg::Collection<SamplerState*> mSamplerStates;
+	egg::Collection<TextureState*> mTextureStates;
 
 	RenderStateSet::ptr mBack;
 };

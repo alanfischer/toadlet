@@ -57,10 +57,6 @@ BSP30Map::BSP30Map(Engine *engine):
 	this->engine=engine;
 
 	lightmapImage=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGB_8,LIGHTMAP_SIZE,LIGHTMAP_SIZE));
-
-	lightmapStage=engine->getMaterialManager()->createTextureStage(NULL);
-	lightmapStage->setTexCoordIndex(1);
-	lightmapStage->setBlend(TextureBlend(TextureBlend::Operation_MODULATE,TextureBlend::Source_PREVIOUS,TextureBlend::Source_TEXTURE));
 };
 
 void BSP30Map::destroy(){
@@ -237,8 +233,7 @@ void BSP30Map::uploadLightmap(){
 void BSP30Map::renderFaces(Renderer *renderer,facedata *face){
 	while(face!=NULL){
 		if(face->visible){
-			lightmapStage->setTexture(lightmapTextures[face->lightmapIndex]); /// @todo: Check to see if our lightmapIndex is the same as previous, and then not change
-			renderer->setTextureStage(1,lightmapStage);
+			renderer->setTexture(1,lightmapTextures[face->lightmapIndex]); /// @todo: Check to see if our lightmapIndex is the same as previous, and then not change
 			renderer->renderPrimitive(vertexData,face->indexData);
 		}
 		face=face->next;
