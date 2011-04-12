@@ -72,10 +72,12 @@ public:
 	bool getTextureState(int i,peeper::TextureState &state) const{return mRenderStateSet->getTextureState(i,state);}
 
 	int getNumTextures() const{return mTextures.size();}
+	void setTexture(peeper::Texture::ptr texture){setTexture(0,texture);}
 	void setTexture(int i,peeper::Texture::ptr texture);
-	peeper::Texture::ptr getTexture(int i) const{return i<mTextures.size()?mTextures[i]:NULL;}
+	peeper::Texture::ptr getTexture(int i=0) const{return i<mTextures.size()?mTextures[i]:NULL;}
+	void setTextureName(const egg::String &name){setTextureName(0,name);}
 	void setTextureName(int i,const egg::String &name){if(i<mTextureNames.size()){mTextureNames.resize(i+1);}mTextureNames[i]=name;}
-	egg::String getTextureName(int i) const{return i<mTextureNames.size()?mTextureNames[i]:(char*)NULL;}
+	egg::String getTextureName(int i=0) const{return i<mTextureNames.size()?mTextureNames[i]:(char*)NULL;}
 
 	void setDepthSorted(bool sorted){mDepthSorted=sorted;}
 	inline bool getDepthSorted() const{return mDepthSorted;}

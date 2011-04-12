@@ -348,9 +348,7 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 			char texture[1024];
 			msMaterial_GetDiffuseTexture(msmat,texture,1024);
 			if(strlen(texture)>0){
-				TextureStage::ptr diffuseStage(new TextureStage());
-				diffuseStage->setTextureName(texture);
-				material->setTextureStage(0,diffuseStage);
+				material->setTextureName(texture);
 			}
 
 			MaterialState materialState;
