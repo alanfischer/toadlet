@@ -16,11 +16,12 @@ This script exports a toadlet XMSH file.
 
 Notes:
 
-Only selected objects will be exported.
-Only sticky UV texture coordinates are supported; per-face UVs will be ignored.
-Faces without a material will be assigned a dummy one.
-No operations or transformations are performed by this script, objects are exported exactly as is.
-Bones with idential names are not supported, and will result in badly exported skeletons
+* Only selected armatures and meshes will be exported.
+* Only triangle meshes are supported, convert any quads before exporting.
+* Only sticky UV texture coordinates are supported; per-face UVs will be ignored.
+* Faces without a material will be assigned a dummy one.
+* No operations or transformations are performed by this script, objects are exported exactly as is.
+* Bones with idential names are not supported, and will result in badly exported skeletons
 
 Usage:
 
@@ -71,7 +72,6 @@ def write(filename):
 	for ob in objects:
 		if ob.type=='Armature':
 			armature = ob.getData()
-
 			for name in armature.bones.keys():
 				if name in mBoneIndicies:
 					# TODO: Actually warn the user with a popup or something useful
@@ -88,6 +88,11 @@ def write(filename):
 			if len(mesh.verts)==0:
 				continue;
 
+			# Transform the mesh coordinates into worldspace, as suggested by the blender documentation:
+			# http://www.blender.org/documentation/249PythonDoc/NMesh.NMesh-class.html#transform
+			obMatrix=ob.matrix.copy()
+			mesh.transform(obMatrix,True)
+
 			# Write out all vertexes in the mesh at once
 			out.write('\t<Mesh>\n')
 			out.write('\t\t<Vertexes Count=\"%d\" ' % (len(mesh.verts)))
@@ -103,8 +108,15 @@ def write(filename):
 					out.write(' %f,%f' % (vert.uvco.x,vert.uvco.y))
 				if len(mBoneIndicies)>0:
 					bonePairs=mesh.getVertexInfluences(vert.index)
+					out.write(' ')
+					first=True
 					for bone in bonePairs:
-						out.write(' %d,%f' % (mBoneIndicies[bone[0]],bone[1]))
+						# Only write out the bone if it is present in one of the exported armatures
+						if bone[0] in mBoneIndicies:
+							if not first:
+								out.write(',')
+							out.write('%d,%f' % (mBoneIndicies[bone[0]],bone[1]))
+							first=False
 				out.write('\n')
 			out.write('\t\t</Vertexes>\n')
 
@@ -150,8 +162,21 @@ def write(filename):
 
 					# TODO: No idea with this one; how does blender determine culling?
 					out.write('\t\t\t\t<FaceCulling>back</FaceCulling>\n')
+
+					# Export all texture images associated with this material
+					for mtex in mat.textures:
+						if mtex and mtex.tex:
+							out.write('\t\t\t\t<TextureStage>\n')
+							if mtex.tex.image and mtex.tex.image.filename:
+								out.write('\t\t\t\t\t<Texture File=\"%s\"/>\n' % (mtex.tex.image.filename))
+							out.write('\t\t\t\t</TextureStage>\n')
+
 					out.write('\t\t\t</Material>\n')
+
 				out.write('\t\t</SubMesh>\n')
+
+			# undo our transforms, to avoid screwing with blender
+			mesh.transform(obMatrix.invert(),True)
 
 			out.write('\t</Mesh>\n')
 
