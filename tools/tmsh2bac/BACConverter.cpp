@@ -318,9 +318,9 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 					m->lighting=materialState.lighting;
 				}
 
-				Texture *texture=material->getNumTextureStages()==0?NULL:material->getTextureStage(0)->getTexture();
-				String name=material->getNumTextureStages()==0?(char*)NULL:material->getTextureStage(0)->getTextureName();
-				if(name.length()>0){
+				Texture *texture=material->getTexture();
+				String name=material->getTextureName();
+				if(texture!=NULL || name.length()>0){
 					int width=256,height=256;
 					if(texture!=NULL){
 						width=texture->getWidth();

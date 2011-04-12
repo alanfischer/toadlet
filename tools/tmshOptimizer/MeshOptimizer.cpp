@@ -24,7 +24,24 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 				Material::ptr material1=subMesh1->material;
 				Material::ptr material2=subMesh2->material;
 
-				if(material1!=NULL && material2!=NULL && material1->equals(material2)){
+				if(material1!=NULL && material2!=NULL){
+					{
+						// Just check a couple states here
+						BlendState blendState1,blendState2;
+						material1->getBlendState(blendState1);material2->getBlendState(blendState2);
+						if(blendState1!=blendState2) continue;
+
+						RasterizerState rasterizerState1,rasterizerState2;
+						material1->getRasterizerState(rasterizerState1);material2->getRasterizerState(rasterizerState2);
+						if(rasterizerState1!=rasterizerState2) continue;
+
+						MaterialState materialState1,materialState2;
+						material1->getMaterialState(materialState1);material2->getMaterialState(materialState2);
+						if(materialState1!=materialState2) continue;
+
+						if(material1->getTexture()!=material2->getTexture() || material1->getTextureName()!=material2->getTextureName()) continue;
+					}
+
 					IndexBuffer::ptr ib1=subMesh1->indexData->getIndexBuffer();
 					IndexBuffer::ptr ib2=subMesh2->indexData->getIndexBuffer();
 					IndexBuffer::ptr cib=engine->getBufferManager()->cloneIndexBuffer(ib1,ib1->getUsage(),ib1->getAccess(),ib1->getIndexFormat(),ib1->getSize()+ib2->getSize());
@@ -65,7 +82,7 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 			Mesh::SubMesh::ptr subMesh=mesh->subMeshes[i];
 
 			Material::ptr material=subMesh->material;
-			if(material!=NULL && material->getNumTextureStages()>0){
+			if(material!=NULL && material->getNumTextures()>0){
 				IndexBufferAccessor iba(subMesh->indexData->getIndexBuffer());
 				for(j=0;j<iba.getSize();++j){
 					vertHasTex[iba.get(j)]=true;

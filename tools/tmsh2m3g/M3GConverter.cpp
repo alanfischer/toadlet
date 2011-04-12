@@ -2125,7 +2125,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 
 			// ID 0 of the userParameters on an appearance specifies if it should have a texture or not on it
 			appearance->userParameters.resize(1);
-			if(material->getNumTextureStages()>0){
+			if(material->getNumTextures()>0){
 				appearance->userParameters[0].id=0;
 				appearance->userParameters[0].value.add(1);
 			}
