@@ -28,6 +28,8 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/pad/BaseApplication.h>
+#include <ctype.h> // isalpha
+#include <string.h> // memcpy
 
 using namespace toadlet;
 using namespace toadlet::egg;
@@ -117,7 +119,7 @@ void BaseApplication::create(String renderer,String audioPlayer,String motionDet
 	/// @todo: Unify the plugin framework a bit so we dont have as much code duplication for this potion, and the creating of the plugin
 	mNewRendererPlugin=mCurrentRendererPlugin=renderer;
 	if(renderer!="null"){
-		if(renderer!=(char*)NULL){
+		if(renderer!=(char*)NULL || mRendererPlugins.size()==0){
 			createContextAndRenderer(renderer);
 		}
 		else{
@@ -128,7 +130,7 @@ void BaseApplication::create(String renderer,String audioPlayer,String motionDet
 		}
 	}
 	if(audioPlayer!="null"){
-		if(audioPlayer!=(char*)NULL){
+		if(audioPlayer!=(char*)NULL || mAudioPlayerPlugins.size()==0){
 			createAudioPlayer(audioPlayer);
 		}
 		else{
@@ -139,7 +141,7 @@ void BaseApplication::create(String renderer,String audioPlayer,String motionDet
 		}
 	}
 	if(motionDetector!="null"){
-		if(motionDetector!=(char*)NULL){
+		if(motionDetector!=(char*)NULL || mMotionDetectorPlugins.size()==0){
 			createMotionDetector(motionDetector);
 		}
 		else{
@@ -148,8 +150,9 @@ void BaseApplication::create(String renderer,String audioPlayer,String motionDet
 				if(createMotionDetector(it->first)) break;
 			}
 		}
-		createMotionDetector(motionDetector);
 	}
+
+	activate();
 }
 
 void BaseApplication::destroy(){

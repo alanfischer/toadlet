@@ -43,8 +43,6 @@ namespace pad{
 
 class ApplicationListener;
 
-/// @todo: Move more common items to this, and have it be a base class, and not an interface.
-///  I can't think of any situations where it would be useful for BaseApplication to be an interface
 class TOADLET_API BaseApplication:public peeper::RenderTarget{
 public:
 	TOADLET_SHARED_POINTERS(BaseApplication);
@@ -195,19 +193,18 @@ protected:
 		flick::MotionDetector *(*createMotionDetector)();
 	};
 
-	peeper::RenderTarget *makeRenderTarget(const egg::String &plugin);
-	peeper::Renderer *makeRenderer(const egg::String &plugin);
-	bool createContextAndRenderer(const egg::String &plugin);
-	bool destroyRendererAndContext();
-	bool changeVideoMode(int width,int height,int colorBits);
+	virtual peeper::RenderTarget *makeRenderTarget(const egg::String &plugin);
+	virtual peeper::Renderer *makeRenderer(const egg::String &plugin);
+	virtual bool createContextAndRenderer(const egg::String &plugin);
+	virtual bool destroyRendererAndContext();
 
-	ribbit::AudioPlayer *makeAudioPlayer(const egg::String &plugin);
-	bool createAudioPlayer(const egg::String &plugin);
-	bool destroyAudioPlayer();
+	virtual ribbit::AudioPlayer *makeAudioPlayer(const egg::String &plugin);
+	virtual bool createAudioPlayer(const egg::String &plugin);
+	virtual bool destroyAudioPlayer();
 
-	flick::MotionDetector *makeMotionDetector(const egg::String &plugin);
-	bool createMotionDetector(const egg::String &plugin);
-	bool destroyMotionDetector();
+	virtual flick::MotionDetector *makeMotionDetector(const egg::String &plugin);
+	virtual bool createMotionDetector(const egg::String &plugin);
+	virtual bool destroyMotionDetector();
 
 	egg::Map<egg::String,RendererPlugin> mRendererPlugins;
 	egg::String mCurrentRendererPlugin;
