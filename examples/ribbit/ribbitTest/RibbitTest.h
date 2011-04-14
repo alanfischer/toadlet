@@ -2,7 +2,7 @@
 #define RIBBITTEST_H
 
 #include <toadlet/egg/io/MemoryStream.h>
-#include <toadlet/ribbit/decoders/WaveDecoder.h>
+#include <toadlet/ribbit/decoder/WaveDecoder.h>
 #include <toadlet/pad/Application.h>
 
 using namespace toadlet::egg;

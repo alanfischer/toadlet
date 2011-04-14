@@ -514,9 +514,7 @@ ParentNode::ptr MyPlanet::createSun(scalar size){
 void MyPlanet::create(){
 	int i;
 
-	Application::setBackable(true);
-
-	Application::create("d3d9");
+	Application::create();
 
 	mScene=Scene::ptr(new Scene(mEngine));
 
