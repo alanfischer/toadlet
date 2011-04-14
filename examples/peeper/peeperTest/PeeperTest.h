@@ -1,9 +1,8 @@
 #ifndef PEEPERTEST_H
 #define PEEPERTEST_H
 
-#include <toadlet/peeper/Renderer.h>
-#include <toadlet/peeper/CapabilitySet.h>
-#include <toadlet/pad/Application.h>
+#include <toadlet/peeper.h>
+#include <toadlet/pad.h>
 
 using namespace toadlet::peeper;
 using namespace toadlet::pad;
@@ -22,13 +21,15 @@ public:
 protected:
 	VertexData::ptr triVertexData;
 	IndexData::ptr triIndexData;
+	RenderStateSet::ptr triRenderStateSet;
 
 	VertexData::ptr quadVertexData;
 	IndexData::ptr quadIndexData;
+	RenderStateSet::ptr quadRenderStateSet;
 
-	toadlet::peeper::Matrix4x4 projectionMatrix;
-	toadlet::peeper::Matrix4x4 viewMatrix;
-	toadlet::peeper::Matrix4x4 modelMatrix;
+	Matrix4x4 projectionMatrix;
+	Matrix4x4 viewMatrix;
+	Matrix4x4 modelMatrix;
 };
 
 #endif
