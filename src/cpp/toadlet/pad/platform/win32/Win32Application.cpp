@@ -241,7 +241,6 @@ void Win32Application::create(String renderer,String audioPlayer,String motionDe
 	Logger::alert(Categories::TOADLET_PAD,String("detected ")+numJoys+" joysticks");
 
 	createWindow();
-	activate();
 	
 	BaseApplication::create(renderer,audioPlayer,motionDetector);
 
