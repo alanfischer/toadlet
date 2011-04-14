@@ -35,7 +35,8 @@
 #include <toadlet/ribbit/AudioPlayer.h>
 #include <toadlet/flick/MotionDetector.h>
 #include <toadlet/tadpole/Engine.h>
-#include <cctype>
+#include <toadlet/pad/ApplicationListener.h>
+//#include <cctype>
 
 namespace toadlet{
 namespace pad{
@@ -75,53 +76,13 @@ public:
 		Key_BACK,
 	};
 
-	static void mapKeyNames(egg::Map<int,egg::String> &keyToName,egg::Map<egg::String,int> &nameToKey){
-		egg::Map<int,egg::String> &map=keyToName;
+	static void mapKeyNames(egg::Map<int,egg::String> &keyToName,egg::Map<egg::String,int> &nameToKey);
 
-		map.add(Key_ENTER,		"enter");
-		map.add(Key_TAB,		"tab");
-		map.add(Key_SPACE,		"space");
-
-		map.add(Key_LEFT,		"left");
-		map.add(Key_RIGHT,		"right");
-		map.add(Key_UP,			"up");
-		map.add(Key_DOWN,		"down");
-
-		map.add(Key_ESC,		"esc");
-		map.add(Key_PAUSE,		"pause");
-		map.add(Key_SHIFT,		"shift");
-		map.add(Key_CTRL,		"ctrl");
-		map.add(Key_ALT,		"alt");
-		map.add(Key_SPECIAL,	"special");
-		map.add(Key_BACKSPACE,	"backspace");
-		map.add(Key_DELETE,		"delete");
-
-		map.add(Key_SOFTLEFT,	"softleft");
-		map.add(Key_SOFTRIGHT,	"softright");
-		map.add(Key_ACTION,		"action");
-		map.add(Key_BACK,		"back");
-
-		int key;
-		for(key=0;key<256;++key){
-			if(isalpha(key) || isdigit(key)){
-				map.add(key,egg::String()+(char)key);
-			}
-		}
-
-		egg::Map<int,egg::String>::iterator it;
-		for(it=keyToName.begin();it!=keyToName.end();++it){
-			nameToKey.add(it->second,it->first);
-		}
-	}
-
-	BaseApplication(){
-		mapKeyNames(mKeyToName,mNameToKey);
-	}
-
+	BaseApplication();
 	virtual ~BaseApplication(){}
 
-	virtual void create(egg::String renderer,egg::String audioPlayer,egg::String motionDetector)=0;
-	virtual void destroy()=0;
+	virtual void create(egg::String renderer,egg::String audioPlayer,egg::String motionDetector);
+	virtual void destroy();
 
 	virtual void start()=0;
 	virtual void runEventLoop()=0;
@@ -149,35 +110,126 @@ public:
 	virtual void setFullscreen(bool fullscreen)=0;
 	virtual bool getFullscreen() const=0;
 
-	virtual void setWindowRenderTargetFormat(const peeper::WindowRenderTargetFormat::ptr format)=0;
-	virtual peeper::WindowRenderTargetFormat::ptr getWindowRenderTargetFormat() const=0;
+	virtual void setStopOnDeactivate(bool stopOnDeactivate)=0;
+	virtual bool getStopOnDeactivate() const=0;
 
-	virtual void setApplicationListener(ApplicationListener *listener)=0;
-	virtual ApplicationListener *getApplicationListener() const=0;
+	virtual void setDifferenceMouse(bool difference)=0;
+	virtual bool getDifferenceMouse() const=0;
 
-	virtual tadpole::Engine *getEngine() const=0;
-	virtual peeper::Renderer *getRenderer() const=0;
-	virtual ribbit::AudioPlayer *getAudioPlayer() const=0;
-	virtual flick::MotionDetector *getMotionDetector() const=0;
+	virtual peeper::RenderTarget *getRootRenderTarget(){return mRenderTarget;}
+	virtual bool isPrimary() const{return mRenderTarget->isPrimary();}
+	virtual bool isValid() const{return mRenderTarget->isValid();}
 
-	virtual void resized(int width,int height)=0;
-	virtual void focusGained()=0;
-	virtual void focusLost()=0;
-	virtual void keyPressed(int key)=0;
-	virtual void keyReleased(int key)=0;
-	virtual void mousePressed(int x,int y,int button)=0;
-	virtual void mouseMoved(int x,int y)=0;
-	virtual void mouseReleased(int x,int y,int button)=0;
-	virtual void mouseScrolled(int x,int y,int scroll)=0;
-	virtual void update(int dt)=0;
-	virtual void render(peeper::Renderer *renderer)=0;
+	virtual void setWindowRenderTargetFormat(const peeper::WindowRenderTargetFormat::ptr format){mFormat=format;}
+	virtual peeper::WindowRenderTargetFormat::ptr getWindowRenderTargetFormat() const{return mFormat;}
+
+	virtual void setApplicationListener(ApplicationListener *listener){mListener=listener;}
+	virtual ApplicationListener *getApplicationListener() const{return mListener;}
+
+	virtual void changeRendererPlugin(const egg::String &plugin)=0;
+	virtual void setRendererOptions(int *options,int length);
+	virtual void setAudioPlayerOptions(int *options,int length);
+
+	virtual void resized(int width,int height)		{if(mListener!=NULL){mListener->resized(width,height);}}
+	virtual void focusGained()						{if(mListener!=NULL){mListener->focusGained();}}
+	virtual void focusLost()						{if(mListener!=NULL){mListener->focusLost();}}
+	virtual void keyPressed(int key)				{if(mListener!=NULL){mListener->keyPressed(key);}}
+	virtual void keyReleased(int key)				{if(mListener!=NULL){mListener->keyReleased(key);}}
+	virtual void mousePressed(int x,int y,int button){if(mListener!=NULL){mListener->mousePressed(x,y,button);}}
+	virtual void mouseMoved(int x,int y)			{if(mListener!=NULL){mListener->mouseMoved(x,y);}}
+	virtual void mouseReleased(int x,int y,int button){if(mListener!=NULL){mListener->mouseReleased(x,y,button);}}
+	virtual void mouseScrolled(int x,int y,int scroll){if(mListener!=NULL){mListener->mouseScrolled(x,y,scroll);}}
+	virtual void joyPressed(int button)				{if(mListener!=NULL){mListener->joyPressed(button);}}
+	virtual void joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v){if(mListener!=NULL){mListener->joyMoved(x,y,z,r,u,v);}}
+	virtual void joyReleased(int button)			{if(mListener!=NULL){mListener->joyReleased(button);}}
+	virtual void update(int dt)						{if(mListener!=NULL){mListener->update(dt);}}
+	virtual void render(peeper::Renderer *renderer)	{if(mListener!=NULL){mListener->render(renderer);}}
+
+	virtual tadpole::Engine *getEngine() const{return mEngine;}
+	virtual peeper::Renderer *getRenderer() const{return mRenderer;}
+	virtual ribbit::AudioPlayer *getAudioPlayer() const{return mAudioPlayer;}
+	virtual flick::MotionDetector *getMotionDetector() const{return mMotionDetector;}
 
 	virtual egg::String getKeyName(int key){egg::Map<int,egg::String>::iterator it=mKeyToName.find(key);return it!=mKeyToName.end()?it->second:(char*)NULL;}
 	virtual int getKeyValue(const egg::String &name){egg::Map<egg::String,int>::iterator it=mNameToKey.find(name);return it!=mNameToKey.end()?it->second:0;}
 
+	virtual void setBackable(bool backable){
+		if(mEngine!=NULL){
+			egg::Error::unknown(egg::Categories::TOADLET_PAD,"can not change backable once engine is created");
+			return;
+		}
+
+		mBackable=backable;
+	}
+	virtual bool getBackable() const{return mBackable;}
+
+	virtual void *getWindowHandle()=0;
+
 protected:
+	class RendererPlugin{
+	public:
+		RendererPlugin(
+			peeper::RenderTarget *(*renderTarget)(void *,peeper::WindowRenderTargetFormat *)=NULL,
+			peeper::Renderer *(*renderer)()=NULL
+		):createRenderTarget(renderTarget),createRenderer(renderer){}
+
+		peeper::RenderTarget *(*createRenderTarget)(void *,peeper::WindowRenderTargetFormat *);
+		peeper::Renderer *(*createRenderer)();
+	};
+
+	class AudioPlayerPlugin{
+	public:
+		AudioPlayerPlugin(
+			ribbit::AudioPlayer *(*audioPlayer)()=NULL
+		):createAudioPlayer(audioPlayer){}
+
+		ribbit::AudioPlayer *(*createAudioPlayer)();
+	};
+
+	class MotionDetectorPlugin{
+	public:
+		MotionDetectorPlugin(
+			flick::MotionDetector *(*motionDetector)()=NULL
+		):createMotionDetector(motionDetector){}
+
+		flick::MotionDetector *(*createMotionDetector)();
+	};
+
+	peeper::RenderTarget *makeRenderTarget(const egg::String &plugin);
+	peeper::Renderer *makeRenderer(const egg::String &plugin);
+	bool createContextAndRenderer(const egg::String &plugin);
+	bool destroyRendererAndContext();
+	bool changeVideoMode(int width,int height,int colorBits);
+
+	ribbit::AudioPlayer *makeAudioPlayer(const egg::String &plugin);
+	bool createAudioPlayer(const egg::String &plugin);
+	bool destroyAudioPlayer();
+
+	flick::MotionDetector *makeMotionDetector(const egg::String &plugin);
+	bool createMotionDetector(const egg::String &plugin);
+	bool destroyMotionDetector();
+
+	egg::Map<egg::String,RendererPlugin> mRendererPlugins;
+	egg::String mCurrentRendererPlugin;
+	egg::String mNewRendererPlugin;
+	int *mRendererOptions;
+	egg::Map<egg::String,AudioPlayerPlugin> mAudioPlayerPlugins;
+	int *mAudioPlayerOptions;
+	egg::Map<egg::String,MotionDetectorPlugin> mMotionDetectorPlugins;
+
 	egg::Map<egg::String,int> mNameToKey;
 	egg::Map<int,egg::String> mKeyToName;
+
+	bool mBackable;
+	peeper::WindowRenderTargetFormat::ptr mFormat;
+	ApplicationListener *mListener;
+	bool mDifferenceMouse;
+
+	tadpole::Engine *mEngine;
+	peeper::RenderTarget *mRenderTarget;
+	peeper::Renderer *mRenderer;
+	ribbit::AudioPlayer *mAudioPlayer;
+	flick::MotionDetector *mMotionDetector;
 };
 
 }
