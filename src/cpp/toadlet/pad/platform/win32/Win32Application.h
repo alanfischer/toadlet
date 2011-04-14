@@ -26,7 +26,6 @@
 #ifndef TOADLET_PAD_WIN32APPLICATION_H
 #define TOADLET_PAD_WIN32APPLICATION_H
 
-#include <toadlet/egg/Thread.h>
 #include <toadlet/tadpole/handler/platform/win32/Win32ResourceArchive.h>
 #include <toadlet/pad/BaseApplication.h>
 
@@ -49,6 +48,8 @@ public:
 	virtual void stop();
 	virtual bool isRunning() const{return mRun;}
 
+	virtual void setAutoActivate(bool activate){mAutoActivate=activate;}
+	virtual bool getAutoActivate() const{return mAutoActivate;}
 	virtual void activate();
 	virtual void deactivate();
 	virtual bool active() const{return mActive;}

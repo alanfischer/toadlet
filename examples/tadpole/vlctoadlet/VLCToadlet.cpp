@@ -62,9 +62,7 @@ VLCToadlet::~VLCToadlet(){
 }
 
 void VLCToadlet::create(){
-#if defined(TOADLET_PLATFORM_WIN32)
 	setBackable(true);
-#endif
 
 	Application::create();
 
