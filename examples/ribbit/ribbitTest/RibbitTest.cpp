@@ -1,7 +1,6 @@
 #include "RibbitTest.h"
 #include "boing_wav.h"
 
-// To keep this example as simple as possible, it does not require any other data files, instead getting its data from lt_xmsh
 RibbitTest::RibbitTest():Application(){
 }
 

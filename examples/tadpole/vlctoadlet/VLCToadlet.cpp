@@ -104,11 +104,11 @@ void VLCToadlet::create(){
 		return;
 	}
 
-	mEngine->setContextListener(this);
+	mEngine->addContextListener(this);
 }
 
 void VLCToadlet::destroy(){
-	mEngine->setContextListener(NULL);
+	mEngine->removeContextListener(this);
 
 	libvlc_media_player_stop(mediaplayer);
 	libvlc_media_player_release(mediaplayer);
