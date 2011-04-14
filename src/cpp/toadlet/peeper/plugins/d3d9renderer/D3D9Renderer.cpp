@@ -450,13 +450,16 @@ bool D3D9Renderer::copySurface(IDirect3DSurface9 *dst,IDirect3DSurface9 *src){
 		result=mD3DDevice->UpdateSurface(src,&rect,dst,NULL);
 		TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: UpdateSurface");
 	}
-	else if(srcdesc.Pool==D3DPOOL_DEFAULT && dstdesc.Pool==D3DPOOL_SYSTEMMEM){
+	else if((srcdesc.Pool==D3DPOOL_DEFAULT && srcdesc.Usage==D3DUSAGE_RENDERTARGET) && dstdesc.Pool==D3DPOOL_SYSTEMMEM){
 		result=mD3DDevice->GetRenderTargetData(src,dst);
 		TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: GetRenderTargetData");
 	}
-	else{
+	else if((srcdesc.Pool==D3DPOOL_SYSTEMMEM && dstdesc.Pool==D3DPOOL_SYSTEMMEM) || (srcdesc.Pool!=D3DPOOL_SYSTEMMEM && dstdesc.Pool!=D3DPOOL_SYSTEMMEM)){
 		result=mD3DDevice->StretchRect(src,&rect,dst,&rect,D3DTEXF_NONE);
 		TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: StretchRect");
+	}
+	else{
+		return false;
 	}
 
 	return true;
