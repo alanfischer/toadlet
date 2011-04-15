@@ -98,6 +98,7 @@ protected:
 	bool mDestroyed;
 	void *mWindow;
 	void *mView;
+	void *mPool;
 };
 
 }

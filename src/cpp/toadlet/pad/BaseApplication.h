@@ -206,6 +206,10 @@ protected:
 	virtual bool createMotionDetector(const egg::String &plugin);
 	virtual bool destroyMotionDetector();
 
+	bool mBackable;
+	peeper::WindowRenderTargetFormat::ptr mFormat;
+	ApplicationListener *mListener;
+
 	egg::Map<egg::String,RendererPlugin> mRendererPlugins;
 	egg::String mCurrentRendererPlugin;
 	egg::String mNewRendererPlugin;
@@ -216,11 +220,6 @@ protected:
 
 	egg::Map<egg::String,int> mNameToKey;
 	egg::Map<int,egg::String> mKeyToName;
-
-	bool mBackable;
-	peeper::WindowRenderTargetFormat::ptr mFormat;
-	ApplicationListener *mListener;
-	bool mDifferenceMouse;
 
 	tadpole::Engine *mEngine;
 	peeper::RenderTarget *mRenderTarget;

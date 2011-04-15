@@ -3,7 +3,7 @@
 inline float scurve(float t){ return t*t*(3.0 - 2.0*t);}
 
 using namespace toadlet::tadpole::Math;
-
+                                                                                                                                                                                                                                                                                                                                        
 class Planet:public ParentNode{
 public:
 	TOADLET_NODE(Planet,ParentNode);
@@ -624,7 +624,6 @@ void MyPlanet::update(int dt){
 	int i;
 
 	scalar fdt=fromMilli(dt);
-	scalar ftime=fromMilli(mScene->getTime());
 
 	if(mMode==Mode_CREATE_PLANET){
 		if(mOrbit!=NULL && mOrbit->getDistance()<=Math::fromMilli(1000)){

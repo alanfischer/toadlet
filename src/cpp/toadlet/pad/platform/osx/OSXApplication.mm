@@ -71,7 +71,7 @@ using namespace toadlet::pad;
 #if defined(TOADLET_HAS_UIKIT)
 	UIView
 #else
-	NSView
+	NSView<NSWindowDelegate>
 #endif
 {
 @private
@@ -258,6 +258,10 @@ rect{
 	
 	mApplication->keyReleased(mApplication->translateKey(character));
 }
+
+- (void) windowWillClose:(NSNotification*)notification{
+	mApplication->stop();
+}
 #endif
 
 @end
@@ -279,7 +283,8 @@ OSXApplication::OSXApplication():
 	mActive(false),
 	mDestroyed(false),
 	mWindow(nil),
-	mView(nil)
+	mView(nil),
+	mPool(nil)
 {
 	#if defined(TOADLET_HAS_OPENGL)
 		#if defined(TOADLET_HAS_UIKIT)
@@ -314,12 +319,23 @@ OSXApplication::~OSXApplication(){
 
 void OSXApplication::setWindow(void *window){
 	mWindow=window;
+	[(NSWindow*)mWindow retain];
 }
-	
+
 void OSXApplication::create(String renderer,String audioPlayer,String motionDetector){
 	if(mWindow==nil){
-		Error::nullPointer("invalid window");
-		return;
+		// This programatic Window creation isn't spectacular, but it's enough to run examples.
+		NSApplicationLoad();
+
+		if(mWidth==-1 && mHeight==-1){
+			NSRect rect=[[NSScreen mainScreen] frame];
+			mWidth=rect.size.width;
+			mHeight=rect.size.height;
+		}
+		mPool=[[NSAutoreleasePool alloc] init];
+		mWindow=[[NSWindow alloc] initWithContentRect:NSMakeRect(mPositionX,mPositionY,mWidth,mHeight)
+			styleMask:NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask
+			backing:NSBackingStoreBuffered defer:FALSE];
 	}
 
 	#if defined(TOADLET_HAS_UIKIT)
@@ -343,6 +359,7 @@ void OSXApplication::create(String renderer,String audioPlayer,String motionDete
 		[(UIWindow*)mWindow addSubview:(ApplicationView*)mView];
 		// No need to call the initial resized on iphone
 	#else
+		[(NSWindow*)mWindow setDelegate:(ApplicationView*)mView];
 		[(NSWindow*)mWindow setContentView:(ApplicationView*)mView];
 		// Need to call the initial resized on osx
 		[(ApplicationView*)mView windowResized:nil];
@@ -357,11 +374,19 @@ void OSXApplication::create(String renderer,String audioPlayer,String motionDete
 
 void OSXApplication::destroy(){
 	BaseApplication::destroy();
+	
+	if(mPool!=NULL){
+		[(NSAutoreleasePool*)mPool release];
+	}
 }
 	
 void OSXApplication::start(){
 	mRun=true;
 	resized([(ApplicationView*)mView bounds].size.width,[(ApplicationView*)mView bounds].size.height);
+
+    [NSApplication sharedApplication];
+	[(NSWindow*)mWindow makeKeyAndOrderFront:nil];
+	[NSApp run];
 }
 
 void OSXApplication::stop(){

@@ -82,22 +82,23 @@ void BaseApplication::mapKeyNames(Map<int,String> &keyToName,Map<String,int> &na
 }
 
 BaseApplication::BaseApplication():
+	mBackable(false),
 	//mFormat,
 	mListener(NULL),
-	mBackable(false),
-	mEngine(NULL),
-	mRenderTarget(NULL),
-	mRenderer(NULL),
-	mAudioPlayer(NULL),
-	mMotionDetector(NULL),
 
 	//mRendererPlugins,
 	//mCurrentRendererPlugin,
 	//mNewRendererPlugin,
 	mRendererOptions(0),
 	//mAudioPlayerPlugins,
-	mAudioPlayerOptions(0)
-	//mMotionDetctorPlugins
+	mAudioPlayerOptions(0),
+	//mMotionDetctorPlugins,
+
+	mEngine(NULL),
+	mRenderTarget(NULL),
+	mRenderer(NULL),
+	mAudioPlayer(NULL),
+	mMotionDetector(NULL)
 {
 	mapKeyNames(mKeyToName,mNameToKey);
 	
