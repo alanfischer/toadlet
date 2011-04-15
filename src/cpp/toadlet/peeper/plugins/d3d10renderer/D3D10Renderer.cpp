@@ -70,8 +70,7 @@ D3D10Renderer::D3D10Renderer():
 
 	//mStatisticsSet,
 	//mCapabilitySet
-{
-}
+{}
 
 D3D10Renderer::~D3D10Renderer(){
 	destroy();
@@ -122,19 +121,21 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 	Logger::alert(Categories::TOADLET_PEEPER,
 		"created D3D10Renderer");
 
+samp=NULL;
 	char *effectstring=
 "float4x4 ShaderMatrix;\n"
 "float4x4 textureMatrix;\n"
 "Texture2D diffuseTexture;\n"
 "float4 diffuseColor;\n"
 "float useTexture;\n"
-
+"SamplerState samps[1];\n"
+/*
 "SamplerState samLinear{\n"
     "Filter = MIN_MAG_MIP_LINEAR;\n"
     "AddressU = Wrap;\n"
     "AddressV = Wrap;\n"
 "};\n"
-
+*/
 "struct VS_OUTPUT{\n"
     "float4 Pos : SV_POSITION;\n"
     "float2 TexCoords : TEXCOORD0;\n"
@@ -149,7 +150,7 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 
 "float4 PS( VS_OUTPUT Input ) : SV_Target{\n"
 //	"return diffuseTexture.Sample(samLinear,Input.TexCoords)*useTexture + diffuseColor*(1-useTexture);\n"
-	"return diffuseTexture.Sample(samLinear,Input.TexCoords);\n"
+	"return diffuseTexture.Sample(samps[0],Input.TexCoords);\n"
 "}\n"
 
 "technique10 Render{\n"
@@ -375,6 +376,10 @@ technique->GetDesc( &techDesc );
 for( UINT p = 0; p < techDesc.Passes; ++p )
 {
 	technique->GetPassByIndex( p )->Apply(0);
+mD3DDevice->VSSetSamplers(0,1,&samp);
+mD3DDevice->PSSetSamplers(0,1,&samp);
+mD3DDevice->GSSetSamplers(0,1,&samp);
+
 	if(indexData->getIndexBuffer()){
 		mD3DDevice->DrawIndexed(indexData->count,indexData->start,0);
 	}
@@ -498,9 +503,10 @@ bool D3D10Renderer::setRenderStateSet(RenderStateSet *set){
 		mD3DDevice->RSSetState(d3dset->mD3DRasterizerState);
 	}
 
-//	mD3DDevice->VSSetSamplers(0,d3dset->mD3DSamplerStates.size(),d3dset->mD3DSamplerStates.begin());
-//	mD3DDevice->PSSetSamplers(0,d3dset->mD3DSamplerStates.size(),d3dset->mD3DSamplerStates.begin());
-//	mD3DDevice->GSSetSamplers(0,d3dset->mD3DSamplerStates.size(),d3dset->mD3DSamplerStates.begin());
+if(d3dset->mD3DSamplerStates.size()>0)samp=d3dset->mD3DSamplerStates[0];
+	mD3DDevice->VSSetSamplers(0,d3dset->mD3DSamplerStates.size(),d3dset->mD3DSamplerStates.begin());
+	mD3DDevice->PSSetSamplers(0,d3dset->mD3DSamplerStates.size(),d3dset->mD3DSamplerStates.begin());
+	mD3DDevice->GSSetSamplers(0,d3dset->mD3DSamplerStates.size(),d3dset->mD3DSamplerStates.begin());
 
 if(d3dset->mMaterialState!=NULL){
 effect->GetVariableByName("diffuseColor")->AsVector()->SetFloatVector((float*)d3dset->mMaterialState->diffuse.getData());
@@ -524,6 +530,7 @@ effect->GetVariableByName("useTexture")->AsScalar()->SetFloat(texture!=NULL);
 }
 
 void D3D10Renderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){
+	result.reset();
 }
 
 int D3D10Renderer::getCloseTextureFormat(int textureFormat,int usage){
@@ -779,6 +786,84 @@ D3D10_CULL_MODE D3D10Renderer::getD3D10_CULL_MODE(RasterizerState::CullType type
 	}
 }
 
+D3D10_FILTER D3D10Renderer::getD3D10_FILTER(SamplerState::FilterType minFilter,SamplerState::FilterType magFilter,SamplerState::FilterType mipFilter){
+	switch(minFilter){
+		case SamplerState::FilterType_NONE:
+		case SamplerState::FilterType_NEAREST:
+			switch(magFilter){
+				case SamplerState::FilterType_NONE:
+				case SamplerState::FilterType_NEAREST:
+					switch(mipFilter){
+						case SamplerState::FilterType_NONE:
+						case SamplerState::FilterType_NEAREST:
+							return D3D10_FILTER_MIN_MAG_MIP_POINT;
+						case SamplerState::FilterType_LINEAR:
+							return D3D10_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+						default:
+						break;
+					}
+				case SamplerState::FilterType_LINEAR:
+					switch(mipFilter){
+						case SamplerState::FilterType_NONE:
+						case SamplerState::FilterType_NEAREST:
+							return D3D10_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT;
+						case SamplerState::FilterType_LINEAR:
+							return D3D10_FILTER_MIN_POINT_MAG_MIP_LINEAR;
+						default:
+						break;
+					}
+				default:
+				break;
+			}
+		break;
+		case SamplerState::FilterType_LINEAR:
+			switch(magFilter){
+				case SamplerState::FilterType_NONE:
+				case SamplerState::FilterType_NEAREST:
+					switch(mipFilter){
+						case SamplerState::FilterType_NONE:
+						case SamplerState::FilterType_NEAREST:
+							return D3D10_FILTER_MIN_LINEAR_MAG_MIP_POINT;
+						case SamplerState::FilterType_LINEAR:
+							return D3D10_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+						default:
+						break;
+					}
+				case SamplerState::FilterType_LINEAR:
+					switch(mipFilter){
+						case SamplerState::FilterType_NONE:
+						case SamplerState::FilterType_NEAREST:
+							return D3D10_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+						case SamplerState::FilterType_LINEAR:
+							return D3D10_FILTER_MIN_MAG_MIP_LINEAR;
+						default:
+						break;
+					}
+				default:
+				break;
+			}
+		default:
+		break;
+	}
+
+	return D3D10_FILTER_MIN_MAG_MIP_POINT;
+}
+
+D3D10_TEXTURE_ADDRESS_MODE D3D10Renderer::getD3D10_TEXTURE_ADDRESS_MODE(SamplerState::AddressType type){
+	switch(type){
+		case SamplerState::AddressType_REPEAT:
+			return D3D10_TEXTURE_ADDRESS_WRAP;
+		case SamplerState::AddressType_CLAMP_TO_EDGE:
+			return D3D10_TEXTURE_ADDRESS_CLAMP;
+		case SamplerState::AddressType_CLAMP_TO_BORDER:
+			return D3D10_TEXTURE_ADDRESS_BORDER;
+		case SamplerState::AddressType_MIRRORED_REPEAT:
+			return D3D10_TEXTURE_ADDRESS_MIRROR;
+		default:
+			return D3D10_TEXTURE_ADDRESS_WRAP;
+	}
+}
+
 void D3D10Renderer::getD3D10_BLEND_DESC(D3D10_BLEND_DESC &desc,const BlendState &state){
 	memset(&desc,0,sizeof(desc));
 
@@ -815,14 +900,13 @@ void D3D10Renderer::getD3D10_RASTERIZER_DESC(D3D10_RASTERIZER_DESC &desc,const R
 void D3D10Renderer::getD3D10_SAMPLER_DESC(D3D10_SAMPLER_DESC &desc,const SamplerState &state){
 	memset(&desc,0,sizeof(desc));
 
-	/// @todo: Implement this
-//	desc.Filter=
-//	desc.AddressU=
-//	desc.AddressV=
-//	desc.AddressW=
-//	desc.BorderColor=
-//	desc.MinLOD=
-//	desc.MaxLOD=
+	desc.Filter=getD3D10_FILTER(state.minFilter,state.magFilter,state.mipFilter);
+	desc.AddressU=getD3D10_TEXTURE_ADDRESS_MODE(state.uAddress);
+	desc.AddressV=getD3D10_TEXTURE_ADDRESS_MODE(state.vAddress);
+	desc.AddressW=getD3D10_TEXTURE_ADDRESS_MODE(state.wAddress);
+	toD3DColor(desc.BorderColor,state.borderColor);
+	desc.MinLOD=state.minLOD;
+	desc.MaxLOD=state.maxLOD;
 }
 
 char *D3D10Renderer::getSemanticName(int semantic){
