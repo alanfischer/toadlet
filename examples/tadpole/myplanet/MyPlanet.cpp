@@ -516,7 +516,7 @@ void MyPlanet::create(){
 
 //	setBackable(false);
 
-	Application::create("gl");
+	Application::create("d3d9");
 
 	mScene=Scene::ptr(new Scene(mEngine));
 
