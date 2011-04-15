@@ -375,7 +375,7 @@ void OSXApplication::create(String renderer,String audioPlayer,String motionDete
 void OSXApplication::destroy(){
 	BaseApplication::destroy();
 	
-	if(mPool!=NULL){
+	if(mPool!=nil){
 		[(NSAutoreleasePool*)mPool release];
 	}
 }
@@ -384,9 +384,11 @@ void OSXApplication::start(){
 	mRun=true;
 	resized([(ApplicationView*)mView bounds].size.width,[(ApplicationView*)mView bounds].size.height);
 
-    [NSApplication sharedApplication];
-	[(NSWindow*)mWindow makeKeyAndOrderFront:nil];
-	[NSApp run];
+	if(mPool!=nil){
+		[NSApplication sharedApplication];
+		[(NSWindow*)mWindow makeKeyAndOrderFront:nil];
+		[NSApp run];
+	}
 }
 
 void OSXApplication::stop(){
