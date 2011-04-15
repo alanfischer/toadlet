@@ -43,12 +43,12 @@ namespace peeper{
 class TOADLET_API EAGLRenderTarget:public GLFBORenderTarget{
 public:
 	EAGLRenderTarget();
-	EAGLRenderTarget(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat=nil);
+	EAGLRenderTarget(CAEAGLLayer *drawable,WindowRenderTargetFormat *format,NSString *colorFormat=nil);
 	virtual ~EAGLRenderTarget();
 
 	RenderTarget *getRootRenderTarget(){return (GLRenderTarget*)this;}
 
-	bool createContext(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat=nil);
+	bool createContext(CAEAGLLayer *drawable,WindowRenderTargetFormat *format,NSString *colorFormat=nil);
 	bool destroyContext();
 
 	bool activate();

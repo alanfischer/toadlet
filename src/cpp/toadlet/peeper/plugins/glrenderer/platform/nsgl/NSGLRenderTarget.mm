@@ -32,8 +32,8 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_NSGLRenderTarget(NSView *view,WindowRenderTargetFormat *format){
-	return new NSGLRenderTarget(view,format);
+TOADLET_C_API RenderTarget *new_NSGLRenderTarget(void *view,WindowRenderTargetFormat *format){
+	return new NSGLRenderTarget((NSView*)view,format);
 }
 	
 NSGLRenderTarget::NSGLRenderTarget():
@@ -66,7 +66,7 @@ bool NSGLRenderTarget::createContext(NSView *view,WindowRenderTargetFormat *form
 	if(pixelFormat==nil){
 		NSOpenGLPixelFormatAttribute attrs[]={
 			NSOpenGLPFADoubleBuffer,
-			NSOpenGLPFADepthSize,format->visual.depthBits,
+			NSOpenGLPFADepthSize,format->depthBits,
 			0
 		};
 
