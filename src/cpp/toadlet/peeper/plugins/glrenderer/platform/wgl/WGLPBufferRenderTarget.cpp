@@ -150,7 +150,7 @@ bool WGLPBufferRenderTarget::compile(){
 bool WGLPBufferRenderTarget::createBuffer(){
 	destroyBuffer();
 
-	WGLRenderTarget *primaryTarget=(WGLRenderTarget*)mRenderer->getPrimaryRenderTarget();
+	WGLRenderTarget *primaryTarget=(WGLRenderTarget*)(mRenderer->getPrimaryRenderTarget()->getRootRenderTarget());
 
 	int width=mTexture->getWidth();
 	int height=mTexture->getHeight();

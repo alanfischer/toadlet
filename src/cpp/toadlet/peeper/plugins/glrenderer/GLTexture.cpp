@@ -450,6 +450,7 @@ bool GLTexture::generateMipLevels(){
 		glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 		glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 		glGenerateMipmap(mTarget);
+		glDisable(mTarget);
 		glBindTexture(mTarget,0);
 
 		TOADLET_CHECK_GLERROR("GLTexture::generateMipLevels");
