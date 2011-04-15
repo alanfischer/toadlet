@@ -811,7 +811,10 @@ void GLRenderer::setDefaultStates(){
 
 	int i;
 	for(i=0;i<mCapabilityState.maxTextureStages;++i){
-		mLastTexTargets[i]=0;
+		if(mLastTexTargets[i]!=0){
+			glDisable(mLastTexTargets[i]);
+			mLastTexTargets[i]=0;
+		}
 		mLastSamplerStates[i]=NULL;
 		mLastTextureStates[i]=NULL;
 	}
@@ -1035,9 +1038,9 @@ void GLRenderer::setSamplerStatePostTexture(int i,SamplerState *state){
 		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_S,getGLWrap(state->uAddress,mHasClampToEdge));
 		glTexParameteri(textureTarget,GL_TEXTURE_WRAP_T,getGLWrap(state->vAddress,mHasClampToEdge));
 		#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_12)
-		if(gl_version>=12){
-			glTexParameteri(textureTarget,GL_TEXTURE_WRAP_R,getGLWrap(state->wAddress,mHasClampToEdge));
-		}
+			if(gl_version>=12){
+				glTexParameteri(textureTarget,GL_TEXTURE_WRAP_R,getGLWrap(state->wAddress,mHasClampToEdge));
+			}
 		#endif
 
 		glTexParameteri(textureTarget,GL_TEXTURE_MIN_FILTER,getGLMinFilter(state->minFilter,state->mipFilter));
@@ -1297,13 +1300,14 @@ void GLRenderer::setTexture(int i,Texture *texture){
 		}
 
 		if(mLastTexTargets[i]!=textureTarget){
-				if(mLastTexTargets[i]!=0){
+			if(mLastTexTargets[i]!=0){
 				glDisable(mLastTexTargets[i]);
 			}
-			if(textureTarget!=0){
-				glEnable(textureTarget);
-			}
 			mLastTexTargets[i]=textureTarget;
+		}
+		// Always re-enable the texture, since it can get glDisabled in mipmap generation
+		if(textureTarget!=0){
+			glEnable(textureTarget);
 		}
 
 		setSamplerStatePostTexture(i,mLastSamplerStates[i]);

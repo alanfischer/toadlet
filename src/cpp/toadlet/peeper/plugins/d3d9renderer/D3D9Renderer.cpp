@@ -729,21 +729,25 @@ void D3D9Renderer::setRasterizerState(const RasterizerState &state){
 void D3D9Renderer::setSamplerState(int i,SamplerState *state){
 	if(state!=NULL){
 		#if defined(TOADLET_SET_D3DM)
-			mD3DDevice->SetTextureStageState(i,D3DMTSS_ADDRESSU,D3D9Renderer::getD3DTADDRESS(state->uAddress));
-			mD3DDevice->SetTextureStageState(i,D3DMTSS_ADDRESSV,D3D9Renderer::getD3DTADDRESS(state->vAddress));
-			mD3DDevice->SetTextureStageState(i,D3DMTSS_ADDRESSW,D3D9Renderer::getD3DTADDRESS(state->wAddress));
+			mD3DDevice->SetTextureStageState(i,D3DMTSS_ADDRESSU,getD3DTADDRESS(state->uAddress));
+			mD3DDevice->SetTextureStageState(i,D3DMTSS_ADDRESSV,getD3DTADDRESS(state->vAddress));
+			mD3DDevice->SetTextureStageState(i,D3DMTSS_ADDRESSW,getD3DTADDRESS(state->wAddress));
 
-			mD3DDevice->SetTextureStageState(i,D3DMTSS_MINFILTER,D3D9Renderer::getD3DTEXF(state->minFilter));
-			mD3DDevice->SetTextureStageState(i,D3DMTSS_MIPFILTER,D3D9Renderer::getD3DTEXF(state->mipFilter));
-			mD3DDevice->SetTextureStageState(i,D3DMTSS_MAGFILTER,D3D9Renderer::getD3DTEXF(state->magFilter));
+			mD3DDevice->SetTextureStageState(i,D3DMTSS_MINFILTER,getD3DTEXF(state->minFilter));
+			mD3DDevice->SetTextureStageState(i,D3DMTSS_MIPFILTER,getD3DTEXF(state->mipFilter));
+			mD3DDevice->SetTextureStageState(i,D3DMTSS_MAGFILTER,getD3DTEXF(state->magFilter));
 		#else
-			mD3DDevice->SetSamplerState(i,D3DSAMP_ADDRESSU,D3D9Renderer::getD3DTADDRESS(state->uAddress));
-			mD3DDevice->SetSamplerState(i,D3DSAMP_ADDRESSV,D3D9Renderer::getD3DTADDRESS(state->vAddress));
-			mD3DDevice->SetSamplerState(i,D3DSAMP_ADDRESSW,D3D9Renderer::getD3DTADDRESS(state->wAddress));
+			mD3DDevice->SetSamplerState(i,D3DSAMP_ADDRESSU,getD3DTADDRESS(state->uAddress));
+			mD3DDevice->SetSamplerState(i,D3DSAMP_ADDRESSV,getD3DTADDRESS(state->vAddress));
+			mD3DDevice->SetSamplerState(i,D3DSAMP_ADDRESSW,getD3DTADDRESS(state->wAddress));
 
-			mD3DDevice->SetSamplerState(i,D3DSAMP_MINFILTER,D3D9Renderer::getD3DTEXF(state->minFilter));
-			mD3DDevice->SetSamplerState(i,D3DSAMP_MIPFILTER,D3D9Renderer::getD3DTEXF(state->mipFilter));
-			mD3DDevice->SetSamplerState(i,D3DSAMP_MAGFILTER,D3D9Renderer::getD3DTEXF(state->magFilter));
+			mD3DDevice->SetSamplerState(i,D3DSAMP_MINFILTER,getD3DTEXF(state->minFilter));
+			mD3DDevice->SetSamplerState(i,D3DSAMP_MIPFILTER,getD3DTEXF(state->mipFilter));
+			mD3DDevice->SetSamplerState(i,D3DSAMP_MAGFILTER,getD3DTEXF(state->magFilter));
+
+			mD3DDevice->SetSamplerState(i,D3DSAMP_BORDERCOLOR,toD3DCOLOR(state->borderColor));
+
+			mD3DDevice->SetSamplerState(i,D3DSAMP_MAXMIPLEVEL,state->maxLOD);
 		#endif
 
 		if(i==0){

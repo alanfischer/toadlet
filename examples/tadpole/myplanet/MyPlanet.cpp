@@ -514,7 +514,9 @@ ParentNode::ptr MyPlanet::createSun(scalar size){
 void MyPlanet::create(){
 	int i;
 
-	Application::create();
+//	setBackable(false);
+
+	Application::create("gl");
 
 	mScene=Scene::ptr(new Scene(mEngine));
 
@@ -808,7 +810,7 @@ Node::ptr MyPlanet::createBackground(){
 	stars->setMaterial(starMaterial);
 	node->attach(stars);
 
-	for(i=0;i<16;++i){
+	for(i=0;i<32;++i){
 		Vector3 offset(random.nextFloat(-1,1),random.nextFloat(-1,1),random.nextFloat(-1,1));
 		Math::normalize(offset);
 		Math::mul(offset,random.nextFloat(60,190));
