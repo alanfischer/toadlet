@@ -45,6 +45,7 @@ public:
 LPD3D10EFFECT effect;
 LPD3D10EFFECTTECHNIQUE technique;
 D3D10_PASS_DESC passDesc;
+ID3D10SamplerState *samp;
 
 	D3D10Renderer();
 	virtual ~D3D10Renderer();
@@ -113,6 +114,8 @@ D3D10_PASS_DESC passDesc;
 	static D3D10_COMPARISON_FUNC getD3D10_COMPARISON_FUNC(DepthState::DepthTest test);
 	static D3D10_FILL_MODE getD3D10_FILL_MODE(RasterizerState::FillType type);
 	static D3D10_CULL_MODE getD3D10_CULL_MODE(RasterizerState::CullType type);
+	static D3D10_FILTER getD3D10_FILTER(SamplerState::FilterType minFilter,SamplerState::FilterType magFilter,SamplerState::FilterType mipFilter);
+	static D3D10_TEXTURE_ADDRESS_MODE getD3D10_TEXTURE_ADDRESS_MODE(SamplerState::AddressType type);
 	static void getD3D10_BLEND_DESC(D3D10_BLEND_DESC &desc,const BlendState &state);
 	static void getD3D10_DEPTH_STENCIL_DESC(D3D10_DEPTH_STENCIL_DESC &desc,const DepthState &state);
 	static void getD3D10_RASTERIZER_DESC(D3D10_RASTERIZER_DESC &desc,const RasterizerState &state);
