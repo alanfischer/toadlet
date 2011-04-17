@@ -29,6 +29,9 @@
 #include <toadlet/egg/Extents.h>
 #include <toadlet/peeper/IndexBuffer.h>
 
+#define TOADLET_CHECK_READ() TOADLET_ASSERT(mIndexBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_READ);
+#define TOADLET_CHECK_WRITE() TOADLET_ASSERT(mIndexBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_WRITE);
+
 namespace toadlet{
 namespace peeper{
 
@@ -47,6 +50,7 @@ public:
 	inline uint8 *getData(){return mData;}
 
 	inline void set(int i,uint32 x){
+		TOADLET_CHECK_WRITE();
 		TOADLET_ASSERT(i>=0 && i<=getSize()); // "index out of bounds"
 		if(mIndexFormat==IndexBuffer::IndexFormat_UINT8){
 			TOADLET_ASSERT(x<egg::Extents::MAX_UINT8); // "out of datatype range"
@@ -63,6 +67,7 @@ public:
 	}
 
 	inline uint32 get(int i){
+		TOADLET_CHECK_WRITE();
 		TOADLET_ASSERT(i>=0 && i<=getSize()); // "index out of bounds"
 		if(mIndexFormat==IndexBuffer::IndexFormat_UINT8){
 			return ((uint8*)mData)[i];
@@ -80,6 +85,9 @@ protected:
 	IndexBuffer::IndexFormat mIndexFormat;
 	uint8 *mData;
 };
+
+#undef TOADLET_CHECK_READ
+#undef TOADLET_CHECK_WRITE
 
 }
 }
