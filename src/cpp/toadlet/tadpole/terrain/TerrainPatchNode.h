@@ -110,7 +110,7 @@ public:
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
-	void render(peeper::Renderer *renderer) const;
+	void render(peeper::Renderer *renderer) const{renderer->renderPrimitive(mVertexData,mIndexData);}
 
 	const Bound &getBound() const{return super::getBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);

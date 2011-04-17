@@ -43,6 +43,9 @@
 	#define TOADLET_FROMFLOAT(x) x
 #endif
 
+#define TOADLET_CHECK_READ() TOADLET_ASSERT(mVertexBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_READ);
+#define TOADLET_CHECK_WRITE() TOADLET_ASSERT(mVertexBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_WRITE);
+
 namespace toadlet{
 namespace peeper{
 
@@ -61,6 +64,7 @@ public:
 	inline uint8 *getData(){return mData;}
 
 	inline void set(int i,int e,scalar x){
+		TOADLET_CHECK_WRITE();
 		i=offset(i,e);
 		if(mNativeFixed){
 			mFixedData[i]=TOADLET_TOFIXED(x);
@@ -71,6 +75,7 @@ public:
 	}
 
 	inline void set2(int i,int e,scalar x,scalar y){
+		TOADLET_CHECK_WRITE();
 		i=offset(i,e);
 		if(mNativeFixed){
 			mFixedData[i]=TOADLET_TOFIXED(x);
@@ -83,6 +88,7 @@ public:
 	}
 
 	inline void set3(int i,int e,scalar x,scalar y,scalar z){
+		TOADLET_CHECK_WRITE();
 		i=offset(i,e);
 		if(mNativeFixed){
 			mFixedData[i]=TOADLET_TOFIXED(x);
@@ -97,6 +103,7 @@ public:
 	}
 
 	inline void set4(int i,int e,scalar x,scalar y,scalar z,scalar w){
+		TOADLET_CHECK_WRITE();
 		i=offset(i,e);
 		if(mNativeFixed){
 			mFixedData[i]=TOADLET_TOFIXED(x);
@@ -113,6 +120,7 @@ public:
 	}
 
 	inline void set2(int i,int e,scalar x[]){
+		TOADLET_CHECK_WRITE();
 		i=offset(i,e);
 		if(mNativeFixed){
 			mFixedData[i]=TOADLET_TOFIXED(x[0]);
@@ -125,6 +133,7 @@ public:
 	}
 
 	inline void set3(int i,int e,scalar x[]){
+		TOADLET_CHECK_WRITE();
 		i=offset(i,e);
 		if(mNativeFixed){
 			mFixedData[i]=TOADLET_TOFIXED(x[0]);
@@ -139,6 +148,7 @@ public:
 	}
 
 	inline void set4(int i,int e,scalar x[]){
+		TOADLET_CHECK_WRITE();
 		i=offset(i,e);
 		if(mNativeFixed){
 			mFixedData[i]=TOADLET_TOFIXED(x[0]);
@@ -155,6 +165,7 @@ public:
 	}
 
 	inline void set2(int i,int e,const Vector2 &v){
+		TOADLET_CHECK_WRITE();
 		i=offset(i,e);
 		if(mNativeFixed){
 			mFixedData[i]=TOADLET_TOFIXED(v.x);
@@ -167,6 +178,7 @@ public:
 	}
 
 	inline void set3(int i,int e,const Vector3 &v){
+		TOADLET_CHECK_WRITE();
 		i=offset(i,e);
 		if(mNativeFixed){
 			mFixedData[i]=TOADLET_TOFIXED(v.x);
@@ -181,6 +193,7 @@ public:
 	}
 
 	inline void set4(int i,int e,const Vector4 &v){
+		TOADLET_CHECK_WRITE();
 		i=offset(i,e);
 		if(mNativeFixed){
 			mFixedData[i]=TOADLET_TOFIXED(v.x);
@@ -197,14 +210,17 @@ public:
 	}
 
 	inline void setRGBA(int i,int e,uint32 c){
+		TOADLET_CHECK_WRITE();
 		mColorData[offset(i,e)]=Math::swapColor(c);
 	}
 
 	inline void setABGR(int i,int e,uint32 c){
+		TOADLET_CHECK_WRITE();
 		mColorData[offset(i,e)]=c;
 	}
 
 	inline scalar get(int i,int e){
+		TOADLET_CHECK_READ();
 		i=offset(i,e);
 		if(mNativeFixed){
 			return TOADLET_FROMFIXED(mFixedData[i]);
@@ -215,6 +231,7 @@ public:
 	}
 
 	inline void get2(int i,int e,scalar x[]){
+		TOADLET_CHECK_READ();
 		i=offset(i,e);
 		if(mNativeFixed){
 			x[0]=TOADLET_FROMFIXED(mFixedData[i]);
@@ -227,6 +244,7 @@ public:
 	}
 
 	inline void get3(int i,int e,scalar x[]){
+		TOADLET_CHECK_READ();
 		i=offset(i,e);
 		if(mNativeFixed){
 			x[0]=TOADLET_FROMFIXED(mFixedData[i]);
@@ -241,6 +259,7 @@ public:
 	}
 
 	inline void get4(int i,int e,scalar x[]){
+		TOADLET_CHECK_READ();
 		i=offset(i,e);
 		if(mNativeFixed){
 			x[0]=TOADLET_FROMFIXED(mFixedData[i]);
@@ -257,6 +276,7 @@ public:
 	}
 
 	inline void get2(int i,int e,Vector2 &v){
+		TOADLET_CHECK_READ();
 		i=offset(i,e);
 		if(mNativeFixed){
 			v.x=TOADLET_FROMFIXED(mFixedData[i]);
@@ -269,6 +289,7 @@ public:
 	}
 
 	inline void get3(int i,int e,Vector3 &v){
+		TOADLET_CHECK_READ();
 		i=offset(i,e);
 		if(mNativeFixed){
 			v.x=TOADLET_FROMFIXED(mFixedData[i]);
@@ -283,6 +304,7 @@ public:
 	}
 
 	inline void get4(int i,int e,Vector4 &v){
+		TOADLET_CHECK_READ();
 		i=offset(i,e);
 		if(mNativeFixed){
 			v.x=TOADLET_FROMFIXED(mFixedData[i]);
@@ -299,10 +321,12 @@ public:
 	}
 
 	inline uint32 getRGBA(int i,int e){
+		TOADLET_CHECK_READ();
 		return Math::swapColor(mColorData[offset(i,e)]);
 	}
 
 	inline uint32 getABGR(int i,int e){
+		TOADLET_CHECK_READ();
 		return mColorData[offset(i,e)];
 	}
 
@@ -322,6 +346,9 @@ protected:
 	float *mFloatData;
 	uint32 *mColorData;
 };
+
+#undef TOADLET_CHECK_READ
+#undef TOADLET_CHECK_WRITE
 
 }
 }

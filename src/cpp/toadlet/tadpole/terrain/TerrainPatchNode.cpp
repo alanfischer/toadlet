@@ -181,7 +181,7 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height,bo
 		if(mVertexBuffer!=NULL){
 			mVertexBuffer->destroy();
 		}
-		mVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,vertexFormat,numVertexes);
+		mVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_READ_WRITE,vertexFormat,numVertexes);
 		mVertexData=VertexData::ptr(new VertexData(mVertexBuffer));
 	}
 	if(mIndexBuffer==NULL || mIndexBuffer->getSize()!=numIndexes){
@@ -235,25 +235,6 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height,bo
 	}
 	vba.unlock();
 
-	// Build blocks
-	mNumBlocks=1<<(2*sizeN);
-	mNumBlocks=(int)((mNumBlocks-1)/3) + 1;
-
-	mBlocks.resize(mNumBlocks);
-	mBlockQueueSize=mNumBlocks;
-	mBlockQueue.resize(mBlockQueueSize);
-
-	mNumBlocksInQueue=0;
-	mBlockQueueStart=0;
-	mBlockQueueEnd=0;
-
-	mInitialStride=1<<(sizeN-1);
-	initBlocks(&mBlocks[0],0,0,0,mInitialStride,true);
-
-	addBlockToBack(0);
-
-	mBound.set(mBlocks[0].mins,mBlocks[0].maxs);
-
 	// Water buffers
 	if(water){
 		if(mWaterVertexBuffer==NULL || mWaterVertexBuffer->getSize()!=numVertexes){
@@ -288,6 +269,25 @@ bool TerrainPatchNode::setData(scalar *data,int rowPitch,int width,int height,bo
 
 		mWaterRenderable=WaterRenderable::ptr(new WaterRenderable(this));
 	}
+
+	// Build blocks
+	mNumBlocks=1<<(2*sizeN);
+	mNumBlocks=(int)((mNumBlocks-1)/3) + 1;
+
+	mBlocks.resize(mNumBlocks);
+	mBlockQueueSize=mNumBlocks;
+	mBlockQueue.resize(mBlockQueueSize);
+
+	mNumBlocksInQueue=0;
+	mBlockQueueStart=0;
+	mBlockQueueEnd=0;
+
+	mInitialStride=1<<(sizeN-1);
+	initBlocks(&mBlocks[0],0,0,0,mInitialStride,true);
+
+	addBlockToBack(0);
+
+	mBound.set(mBlocks[0].mins,mBlocks[0].maxs);
 
 	return true;
 }
@@ -568,10 +568,6 @@ void TerrainPatchNode::updateIndexBuffers(CameraNode *camera){
 void TerrainPatchNode::updateWaterIndexBuffers(CameraNode *camera){
 	int indexCount=gatherBlocks(mWaterIndexBuffer,camera,true);
 	mWaterIndexData->setCount(indexCount);
-}
-
-void TerrainPatchNode::render(Renderer *renderer) const{
-	renderer->renderPrimitive(mVertexData,mIndexData);
 }
 
 void TerrainPatchNode::traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size){
