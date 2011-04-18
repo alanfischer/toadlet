@@ -93,7 +93,7 @@ bool Win32TextureHandler::valid(){
 }
 
 Resource::ptr Win32TextureHandler::load(Stream::ptr in,const ResourceHandlerData *handlerData){
-	Logger::debug("Win32TextureHandler.load");
+	Logger::debug(Categories::TOADLET_TADPOLE,"Win32TextureHandler::load");
 
 	Texture::ptr texture=NULL;
 

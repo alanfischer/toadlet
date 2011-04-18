@@ -1076,6 +1076,7 @@ void GLRenderer::setTextureStatePostTexture(int i,TextureState *state){
 
 	GLTexture *texture=mLastTextures[i];
 	GLuint textureTarget=texture!=NULL?texture->mTarget:0;
+	int texCoordIndex=0;
 
 	if(state!=NULL){
 		// Setup texture blending
@@ -1149,11 +1150,8 @@ void GLRenderer::setTextureStatePostTexture(int i,TextureState *state){
 			glTexEnvf(GL_TEXTURE_ENV,GL_ALPHA_SCALE,getGLTextureBlendScale(state->alphaOperation));
 		}
 
-		mTexCoordIndexes[i]=state->texCoordIndex;
-
-		if(i>=mMaxTexCoordIndex){
-			mMaxTexCoordIndex=i+1;
-		}
+		// Setup TexCoordIndex
+		texCoordIndex==state->texCoordIndex;
 
 		// Setup calculations
 		TextureState::CalculationType calculation=state->calculation;
@@ -1272,10 +1270,14 @@ void GLRenderer::setTextureStatePostTexture(int i,TextureState *state){
 			}
 		#endif
 	}
-	else{
-		while(mMaxTexCoordIndex>0 && mLastTexTargets[mMaxTexCoordIndex-1]==0){
-			mMaxTexCoordIndex--;
-		}
+
+	// Setup current TexCoordIndex and compact if necessary
+	mTexCoordIndexes[i]=texCoordIndex;
+	if(i>=mMaxTexCoordIndex){
+		mMaxTexCoordIndex=i+1;
+	}
+	while(mMaxTexCoordIndex>0 && mLastTexTargets[mMaxTexCoordIndex-1]==0){
+		mMaxTexCoordIndex--;
 	}
 
 	TOADLET_CHECK_GLERROR("setTextureState");
