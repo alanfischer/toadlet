@@ -74,6 +74,13 @@ void Material::setTexture(int i,Texture::ptr texture){
 	mTextures[i]=texture;
 	if(mTextures[i]!=NULL){
 		mTextures[i]->retain();
+
+		// Always add a default SamplerState and TextureState if non exists
+		SamplerState samplerState;
+		if(mRenderStateSet->getSamplerState(i,samplerState)==false) mRenderStateSet->setSamplerState(i,samplerState);
+
+		TextureState textureState;
+		if(mRenderStateSet->getTextureState(i,textureState)==false) mRenderStateSet->setTextureState(i,textureState);
 	}
 }
 

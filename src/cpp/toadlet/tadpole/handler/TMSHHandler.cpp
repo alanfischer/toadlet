@@ -370,8 +370,9 @@ void TMSHHandler::writeVertexFormat(DataStream *stream,VertexFormat::ptr vertexF
 	}
 };
 
-/// @todo: Finish read/write all Material states
 Material::ptr TMSHHandler::readMaterial(DataStream *stream,int blockSize){
+	int i;
+
 	if(stream->readBool()==false){
 		return NULL;
 	}
@@ -380,18 +381,57 @@ Material::ptr TMSHHandler::readMaterial(DataStream *stream,int blockSize){
 
 	material->setName(stream->readNullTerminatedString());
 
-	MaterialState materialState;
-	stream->read((tbyte*)&materialState,sizeof(materialState));
-	material->setMaterialState(materialState);
+	BlendState blendState;
+	stream->read((tbyte*)&blendState,sizeof(blendState));
+	material->setBlendState(blendState);
+
+	DepthState depthState;
+	stream->read((tbyte*)&depthState,sizeof(depthState));
+	material->setDepthState(depthState);
 
 	RasterizerState rasterizerState;
 	stream->read((tbyte*)&rasterizerState,sizeof(rasterizerState));
 	material->setRasterizerState(rasterizerState);
 
+	FogState fogState;
+	stream->read((tbyte*)&fogState,sizeof(fogState));
+	material->setFogState(fogState);
+
+	PointState pointState;
+	stream->read((tbyte*)&pointState,sizeof(pointState));
+	material->setPointState(pointState);
+
+	MaterialState materialState;
+	stream->read((tbyte*)&materialState,sizeof(materialState));
+	material->setMaterialState(materialState);
+
+	int numSamplerStates=stream->readInt32();
+	for(i=0;i<numSamplerStates;++i){
+		SamplerState samplerState;
+		stream->read((tbyte*)&samplerState,sizeof(samplerState));
+		material->setSamplerState(i,samplerState);
+	}
+
+	int numTextureStates=stream->readInt32();
+	for(i=0;i<numTextureStates;++i){
+		TextureState textureState;
+		stream->read((tbyte*)&textureState,sizeof(textureState));
+		material->setTextureState(i,textureState);
+	}
+
+	int numTextures=stream->readInt32();
+	for(i=0;i<numTextures;++i){
+		String textureName=stream->readNullTerminatedString();
+		material->setTexture(i,mEngine->getTextureManager()->findTexture(textureName));
+		material->setTextureName(i,textureName);
+	}
+
 	return material;
 }
 
 void TMSHHandler::writeMaterial(DataStream *stream,Material::ptr material){
+	int i;
+
 	if(material==NULL){
 		stream->writeBool(false);
 		return;
@@ -401,13 +441,49 @@ void TMSHHandler::writeMaterial(DataStream *stream,Material::ptr material){
 
 	stream->writeNullTerminatedString(material->getName());
 
-	MaterialState materialState;
-	material->getMaterialState(materialState);
-	stream->write((tbyte*)&materialState,sizeof(MaterialState));
+	BlendState blendState;
+	material->getBlendState(blendState);
+	stream->write((tbyte*)&blendState,sizeof(blendState));
+
+	DepthState depthState;
+	material->getDepthState(depthState);
+	stream->write((tbyte*)&depthState,sizeof(depthState));
 
 	RasterizerState rasterizerState;
 	material->getRasterizerState(rasterizerState);
-	stream->write((tbyte*)&rasterizerState,sizeof(RasterizerState));
+	stream->write((tbyte*)&rasterizerState,sizeof(rasterizerState));
+
+	FogState fogState;
+	material->getFogState(fogState);
+	stream->write((tbyte*)&fogState,sizeof(fogState));
+
+	PointState pointState;
+	material->getPointState(pointState);
+	stream->write((tbyte*)&pointState,sizeof(pointState));
+
+	MaterialState materialState;
+	material->getMaterialState(materialState);
+	stream->write((tbyte*)&materialState,sizeof(materialState));
+
+	stream->writeInt32(material->getNumSamplerStates());
+	for(i=0;i<material->getNumSamplerStates();++i){
+		SamplerState samplerState;
+		material->getSamplerState(i,samplerState);
+		stream->write((tbyte*)&samplerState,sizeof(samplerState));
+	}
+
+	stream->writeInt32(material->getNumTextureStates());
+	for(i=0;i<material->getNumTextureStates();++i){
+		TextureState textureState;
+		material->getTextureState(i,textureState);
+		stream->write((tbyte*)&textureState,sizeof(textureState));
+	}
+
+	stream->writeInt32(material->getNumTextures());
+	for(i=0;i<material->getNumTextures();++i){
+		Texture::ptr texture=material->getTexture(i);
+		stream->writeNullTerminatedString(texture!=NULL?texture->getName():material->getTextureName(i));
+	}
 }
 
 Skeleton::ptr TMSHHandler::readSkeleton(DataStream *stream,int blockSize){
