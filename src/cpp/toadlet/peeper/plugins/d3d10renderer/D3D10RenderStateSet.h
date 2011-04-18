@@ -132,7 +132,7 @@ public:
 	int getNumSamplerStates() const{return mSamplerStates.size();}
 	void setSamplerState(int i,const SamplerState &state){
 		if(mSamplerStates.size()<=i){
-			mSamplerStates.resize(i+1);
+			mSamplerStates.resize(i+1,NULL);
 			mSamplerStates[i]=new SamplerState(state);
 			mD3DSamplerStates.resize(i+1,NULL);
 		}

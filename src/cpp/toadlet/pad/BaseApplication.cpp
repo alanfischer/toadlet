@@ -26,7 +26,6 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Logger.h>
-#include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/pad/BaseApplication.h>
 #include <ctype.h> // isalpha
 #include <string.h> // memcpy
@@ -115,6 +114,8 @@ BaseApplication::BaseApplication():
 }
 
 void BaseApplication::create(String renderer,String audioPlayer,String motionDetector){
+	int i;
+
 	mEngine=new Engine(mBackable);
 
 	/// @todo: Unify the plugin framework a bit so we dont have as much code duplication for this potion, and the creating of the plugin
@@ -124,9 +125,8 @@ void BaseApplication::create(String renderer,String audioPlayer,String motionDet
 			createContextAndRenderer(renderer);
 		}
 		else{
-			Map<String,RendererPlugin>::iterator it;
-			for(it=mRendererPlugins.begin();it!=mRendererPlugins.end();++it){
-				if(createContextAndRenderer(it->first)) break;
+			for(i=0;i<mRendererPreferences.size();++i){
+				if(createContextAndRenderer(mRendererPreferences[i])) break;
 			}
 		}
 	}
@@ -135,9 +135,8 @@ void BaseApplication::create(String renderer,String audioPlayer,String motionDet
 			createAudioPlayer(audioPlayer);
 		}
 		else{
-			Map<String,AudioPlayerPlugin>::iterator it;
-			for(it=mAudioPlayerPlugins.begin();it!=mAudioPlayerPlugins.end();++it){
-				if(createAudioPlayer(it->first)) break;
+			for(i=0;i<mAudioPlayerPreferences.size();++i){
+				if(createAudioPlayer(mAudioPlayerPreferences[i])) break;
 			}
 		}
 	}
@@ -146,9 +145,8 @@ void BaseApplication::create(String renderer,String audioPlayer,String motionDet
 			createMotionDetector(motionDetector);
 		}
 		else{
-			Map<String,MotionDetectorPlugin>::iterator it;
-			for(it=mMotionDetectorPlugins.begin();it!=mMotionDetectorPlugins.end();++it){
-				if(createMotionDetector(it->first)) break;
+			for(i=0;i<mMotionDetectorPreferences.size();++i){
+				if(createMotionDetector(mMotionDetectorPreferences[i])) break;
 			}
 		}
 	}

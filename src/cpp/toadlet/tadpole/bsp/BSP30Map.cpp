@@ -233,7 +233,7 @@ void BSP30Map::uploadLightmap(){
 void BSP30Map::renderFaces(Renderer *renderer,facedata *face){
 	while(face!=NULL){
 		if(face->visible){
-			renderer->setTexture(1,lightmapTextures[face->lightmapIndex]); /// @todo: Check to see if our lightmapIndex is the same as previous, and then not change
+ 			renderer->setTexture(1,lightmapTextures[face->lightmapIndex]); /// @todo: Check to see if our lightmapIndex is the same as previous, and then not change
 			renderer->renderPrimitive(vertexData,face->indexData);
 		}
 		face=face->next;
