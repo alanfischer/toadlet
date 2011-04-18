@@ -62,9 +62,7 @@ VLCToadlet::~VLCToadlet(){
 }
 
 void VLCToadlet::create(){
-#if defined(TOADLET_PLATFORM_WIN32)
 	setBackable(true);
-#endif
 
 	Application::create();
 
@@ -104,11 +102,11 @@ void VLCToadlet::create(){
 		return;
 	}
 
-	mEngine->setContextListener(this);
+	mEngine->addContextListener(this);
 }
 
 void VLCToadlet::destroy(){
-	mEngine->setContextListener(NULL);
+	mEngine->removeContextListener(this);
 
 	libvlc_media_player_stop(mediaplayer);
 	libvlc_media_player_release(mediaplayer);

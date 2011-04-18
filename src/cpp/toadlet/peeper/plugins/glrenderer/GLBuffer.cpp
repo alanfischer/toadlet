@@ -231,7 +231,13 @@ uint8 *GLBuffer::lock(int lockAccess){
 			glBindBuffer(mTarget,mHandle);
 			mData=(uint8*)glMapBuffer(mTarget,gllock);
 		}
+		else
 	#endif
+	{
+		if(mData==NULL){
+			mData=new uint8[mDataSize];
+		}
+	}
 
 	#if defined(TOADLET_BIG_ENDIAN)
 		if(mVertexFormat!=NULL){
@@ -278,10 +284,18 @@ bool GLBuffer::unlock(){
 		}
 		else
 	#endif
-	if(mLockAccess!=Access_BIT_READ && mHandle!=0){
-		glBindBuffer(mTarget,mHandle);
-		glBufferSubData(mTarget,0,mDataSize,mData);
-		glBindBuffer(mTarget,0);
+	{
+		if(mLockAccess!=Access_BIT_READ && mHandle!=0){
+			glBindBuffer(mTarget,mHandle);
+			glBufferSubData(mTarget,0,mDataSize,mData);
+			glBindBuffer(mTarget,0);
+		}
+
+		// Only delete our data if we have no desire to read it
+		if((mAccess&Access_BIT_READ)==0 && mData!=NULL){
+			delete[] mData;
+			mData=NULL;
+		}
 	}
 
 	TOADLET_CHECK_GLERROR("GLBuffer::unlock");

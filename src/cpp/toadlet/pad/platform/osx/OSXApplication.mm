@@ -31,11 +31,9 @@
  
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/peeper/CapabilitySet.h>
-#include <toadlet/peeper/WindowRenderTargetFormat.h>
+#include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/tadpole/handler/platform/osx/OSXBundleArchive.h>
 #include <toadlet/pad/platform/osx/OSXApplication.h>
-#include <toadlet/pad/ApplicationListener.h>
 
 #import <QuartzCore/QuartzCore.h>
 #if defined(TOADLET_HAS_UIKIT)
@@ -57,16 +55,15 @@ using namespace toadlet::pad;
 #if defined(TOADLET_HAS_OPENGL)
 	extern "C" Renderer *new_GLRenderer();
 	#if defined(TOADLET_HAS_UIKIT)
-		extern "C" RenderTarget *new_EAGLRenderTarget(CAEAGLLayer *layer,WindowRenderTargetFormat *format);
+		extern "C" RenderTarget *new_EAGLRenderTarget(void *layer,WindowRenderTargetFormat *format);
 	#else
-		extern "C" RenderTarget *new_NSGLRenderTarget(NSView *view,WindowRenderTargetFormat *format);
+		extern "C" RenderTarget *new_NSGLRenderTarget(void *view,WindowRenderTargetFormat *format);
 	#endif
 #endif
 #if defined(TOADLET_HAS_OPENAL)
 	extern "C" AudioPlayer *new_ALPlayer();
 #endif
 #if defined(TOADLET_PLATFORM_IPHONE)
-	#pragma comment(lib,"toadlet_flick_iphonemotiondetector" TOADLET_LIBRARY_EXTENSION)
 	extern "C" MotionDetector *new_IPhoneMotionDetector();
 #endif
 
@@ -74,7 +71,7 @@ using namespace toadlet::pad;
 #if defined(TOADLET_HAS_UIKIT)
 	UIView
 #else
-	NSView
+	NSView<NSWindowDelegate>
 #endif
 {
 @private
@@ -169,7 +166,7 @@ rect{
 	mApplication->resized(width,height);
 
 	if(mApplication->active() && mApplication->getRenderer()!=NULL){
-		if(mApplication->getRenderer()->getCapabilitySet().resetOnResize){
+		if(mApplication->getRenderer()->getCapabilityState().resetOnResize){
 			mApplication->getEngine()->contextReset(mApplication->getRenderer());
 		}
 		mApplication->update(0);
@@ -261,6 +258,10 @@ rect{
 	
 	mApplication->keyReleased(mApplication->translateKey(character));
 }
+
+- (void) windowWillClose:(NSNotification*)notification{
+	mApplication->stop();
+}
 #endif
 
 @end
@@ -275,23 +276,35 @@ OSXApplication::OSXApplication():
 	mWidth(-1),
 	mHeight(-1),
 	mFullscreen(false),
-	//mVisual(),
-	mApplicationListener(NULL),
 	mDifferenceMouse(false),
-
-	mEngine(NULL),
-	mRenderer(NULL),
-	mRendererOptions(NULL),
-	mAudioPlayer(NULL),
-	mMotionDetector(NULL),
 
 	mRun(false),
 	mAutoActivate(false),
 	mActive(false),
 	mDestroyed(false),
 	mWindow(nil),
-	mView(nil)
+	mView(nil),
+	mPool(nil)
 {
+	#if defined(TOADLET_HAS_OPENGL)
+		#if defined(TOADLET_HAS_UIKIT)
+			mRendererPlugins.add("gl",RendererPlugin(new_EAGLRenderTarget,new_GLRenderer));
+		#else
+			mRendererPlugins.add("gl",RendererPlugin(new_NSGLRenderTarget,new_GLRenderer));
+		#endif
+	#endif
+	
+	#if defined(TOADLET_HAS_OPENAL)
+		mAudioPlayerPlugins.add("al",AudioPlayerPlugin(new_ALPlayer));
+	#endif
+	
+	#if defined(TOADLET_PLATFORM_IPHONE)
+		mMotionDetectorPlugins.add("ios",MotionDetectorPlugin(new_IPhoneMotionDetector));
+	#endif
+
+	// Fade in buffers over 100 ms, reduces popping
+	int options[]={1,100,0};
+	setAudioPlayerOptions(options,3);
 }
 
 OSXApplication::~OSXApplication(){
@@ -306,19 +319,24 @@ OSXApplication::~OSXApplication(){
 
 void OSXApplication::setWindow(void *window){
 	mWindow=window;
+	[(NSWindow*)mWindow retain];
 }
-	
+
 void OSXApplication::create(String renderer,String audioPlayer,String motionDetector){
 	if(mWindow==nil){
-		Error::nullPointer("invalid window");
-		return;
+		// This programatic Window creation isn't spectacular, but it's enough to run examples.
+		NSApplicationLoad();
+
+		if(mWidth==-1 && mHeight==-1){
+			NSRect rect=[[NSScreen mainScreen] frame];
+			mWidth=rect.size.width;
+			mHeight=rect.size.height;
+		}
+		mPool=[[NSAutoreleasePool alloc] init];
+		mWindow=[[NSWindow alloc] initWithContentRect:NSMakeRect(mPositionX,mPositionY,mWidth,mHeight)
+			styleMask:NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask
+			backing:NSBackingStoreBuffered defer:FALSE];
 	}
-
-	mEngine=new Engine();
-
-	mBundleArchive=OSXBundleArchive::ptr(new OSXBundleArchive());
-	shared_static_cast<OSXBundleArchive>(mBundleArchive)->open([NSBundle mainBundle]);
-	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(mBundleArchive));
 
 	#if defined(TOADLET_HAS_UIKIT)
 		mWidth=[(UIWindow*)mWindow bounds].size.width;
@@ -341,44 +359,36 @@ void OSXApplication::create(String renderer,String audioPlayer,String motionDete
 		[(UIWindow*)mWindow addSubview:(ApplicationView*)mView];
 		// No need to call the initial resized on iphone
 	#else
+		[(NSWindow*)mWindow setDelegate:(ApplicationView*)mView];
 		[(NSWindow*)mWindow setContentView:(ApplicationView*)mView];
 		// Need to call the initial resized on osx
 		[(ApplicationView*)mView windowResized:nil];
 	#endif
 	
-	activate();
-	
-	if(renderer!="null"){
-		createContextAndRenderer();
-	}
-	if(audioPlayer!="null"){
-		createAudioPlayer();
-	}
-	if(motionDetector!="null"){
-		createMotionDetector();
-	}
+	BaseApplication::create(renderer,audioPlayer,motionDetector);
+
+	mBundleArchive=OSXBundleArchive::ptr(new OSXBundleArchive());
+	shared_static_cast<OSXBundleArchive>(mBundleArchive)->open([NSBundle mainBundle]);
+	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(mBundleArchive));
 }
 
 void OSXApplication::destroy(){
-	if(mEngine!=NULL){
-		mEngine->destroy();
-	}
-
-	deactivate();
-
-	destroyRendererAndContext();
-	destroyAudioPlayer();
-	destroyMotionDetector();
-
-	if(mEngine!=NULL){
-		delete mEngine;
-		mEngine=NULL;
+	BaseApplication::destroy();
+	
+	if(mPool!=nil){
+		[(NSAutoreleasePool*)mPool release];
 	}
 }
 	
 void OSXApplication::start(){
 	mRun=true;
 	resized([(ApplicationView*)mView bounds].size.width,[(ApplicationView*)mView bounds].size.height);
+
+	if(mPool!=nil){
+		[NSApplication sharedApplication];
+		[(NSWindow*)mWindow makeKeyAndOrderFront:nil];
+		[NSApp run];
+	}
 }
 
 void OSXApplication::stop(){
@@ -447,222 +457,6 @@ bool OSXApplication::getFullscreen() const{
 	return mFullscreen;
 }
 
-void OSXApplication::setVisual(const peeper::Visual &visual){
-	mVisual=visual;
-}
-
-const peeper::Visual &OSXApplication::getVisual() const{
-	return mVisual;
-}
-
-void OSXApplication::setApplicationListener(ApplicationListener *listener){
-	mApplicationListener=listener;
-}
-
-ApplicationListener *OSXApplication::getApplicationListener() const{
-	return mApplicationListener;
-}
-
-RenderTarget *OSXApplication::makeRenderTarget(){
-	WindowRenderTargetFormat::ptr format(new WindowRenderTargetFormat(mVisual,2,false,0));
-
-	#if defined(TOADLET_HAS_OPENGL)
-		#if defined(TOADLET_HAS_UIKIT)
-			return new_EAGLRenderTarget((CAEAGLLayer*)[(UIView*)mView layer],format);
-		#else
-			return new_NSGLRenderTarget((NSView*)mView,format);
-	#endif
-	#else
-		return NULL;
-	#endif
-}
-
-Renderer *OSXApplication::makeRenderer(){
-	#if defined(TOADLET_HAS_OPENGL)
-		return new_GLRenderer();
-	#else
-		return NULL;
-	#endif
-}
-
-bool OSXApplication::createContextAndRenderer(){
-	RenderTarget *renderTarget=makeRenderTarget();
-	if(renderTarget!=NULL){
-		mRenderTarget=renderTarget;
-
-		mRenderer=makeRenderer();
-		if(mRenderer!=NULL){
-			if(mRenderer->create(this,mRendererOptions)==false){
-				delete mRenderer;
-				mRenderer=NULL;
-				Error::unknown(Categories::TOADLET_PAD,
-					"error starting Renderer");
-				return false;
-			}
-		}
-		else{
-			Error::unknown(Categories::TOADLET_PAD,
-				"rrror creating Renderer");
-			return false;
-		}
-
-		if(mRenderer==NULL){
-			delete mRenderTarget;
-			mRenderTarget=NULL;
-		}
-	}
-	else{
-		Error::unknown(Categories::TOADLET_PAD,
-			"error creating RenderTarget");
-		return false;
-	}
-
-	if(mRenderer!=NULL){
-		mEngine->setRenderer(mRenderer);
-	}
-
-	return mRenderer!=NULL;
-}
-
-bool OSXApplication::destroyRendererAndContext(){
-	if(mRenderer!=NULL){
-		mEngine->setRenderer(NULL);
-
-		mRenderer->destroy();
-		delete mRenderer;
-		mRenderer=NULL;
-	}
-
-	if(mRenderTarget!=NULL){
-		delete mRenderTarget;
-		mRenderTarget=NULL;
-	}
-
-	return true;
-}
-
-bool OSXApplication::createAudioPlayer(){
-	#if defined(TOADLET_HAS_OPENAL)
-		mAudioPlayer=new_ALPlayer();
-		// Fade in buffers over 100 ms, reduces popping
-		int options[]={1,100,0};
-		bool result=false;
-		TOADLET_TRY
-			result=mAudioPlayer->create(options);
-		TOADLET_CATCH(const Exception &){result=false;}
-		if(result==false){
-			delete mAudioPlayer;
-			mAudioPlayer=NULL;
-		}
-	#endif
-	if(mAudioPlayer!=NULL){
-		mEngine->setAudioPlayer(mAudioPlayer);
-	}
-	return true;
-}
-	
-bool OSXApplication::destroyAudioPlayer(){
-	if(mAudioPlayer!=NULL){
-		mEngine->setAudioPlayer(NULL);
-		mAudioPlayer->destroy();
-		delete mAudioPlayer;
-		mAudioPlayer=NULL;
-	}
-	return true;
-}
-
-bool OSXApplication::createMotionDetector(){
-	#if defined(TOADLET_PLATFORM_IPHONE)
-		if(mMotionDetector==NULL){
-			mMotionDetector=new_IPhoneMotionDetector();
-			bool result=false;
-			TOADLET_TRY
-				result=mMotionDetector->create();
-			TOADLET_CATCH(const Exception &){result=false;}
-			if(result==false){
-				delete mMotionDetector;
-				mMotionDetector=NULL;
-			}
-		}	
-	#endif
-	return true;
-}
-
-bool OSXApplication::destroyMotionDetector(){
-	if(mMotionDetector!=NULL){
-		mMotionDetector->destroy();
-		delete mMotionDetector;
-		mMotionDetector=NULL;
-	}
-	return true;
-}
-
-void OSXApplication::resized(int width,int height){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->resized(width,height);
-	}
-}
-
-void OSXApplication::focusGained(){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->focusGained();
-	}
-}
-
-void OSXApplication::focusLost(){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->focusLost();
-	}
-}
-
-void OSXApplication::keyPressed(int key){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->keyPressed(key);
-	}
-}
-
-void OSXApplication::keyReleased(int key){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->keyReleased(key);
-	}
-}
-
-void OSXApplication::mousePressed(int x,int y,int button){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->mousePressed(x,y,button);
-	}
-}
-	
-void OSXApplication::mouseMoved(int x,int y){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->mouseMoved(x,y);
-	}
-}
-
-void OSXApplication::mouseReleased(int x,int y,int button){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->mouseReleased(x,y,button);
-	}
-}
-
-void OSXApplication::mouseScrolled(int x,int y,int scroll){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->mouseScrolled(x,y,scroll);
-	}
-}
-
-void OSXApplication::update(int dt){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->update(dt);
-	}
-}
-
-void OSXApplication::render(Renderer *renderer){
-	if(mApplicationListener!=NULL){
-		mApplicationListener->render(renderer);
-	}
-}
-
 void OSXApplication::setDifferenceMouse(bool difference){
 	mDifferenceMouse=difference;
 	
@@ -674,15 +468,6 @@ void OSXApplication::setDifferenceMouse(bool difference){
 			CGDisplayShowCursor(kCGDirectMainDisplay);
 		}
 	#endif
-}
-
-void OSXApplication::setRendererOptions(int *options,int length){
-	if(mRendererOptions!=NULL){
-		delete[] mRendererOptions;
-	}
-
-	mRendererOptions=new int[length];
-	memcpy(mRendererOptions,options,length*sizeof(int));
 }
 
 void OSXApplication::internal_mouseMoved(int x,int y){
@@ -700,6 +485,14 @@ void OSXApplication::internal_mouseMoved(int x,int y){
 	}
 
 	mouseMoved(x,y);
+}
+
+void *OSXApplication::getWindowHandle(){
+	#if defined(TOADLET_HAS_UIKIT)
+		return (CAEAGLLayer*)[(UIView*)mView layer];
+	#else
+		return (NSView*)mView;
+	#endif
 }
 
 int OSXApplication::translateKey(int key){

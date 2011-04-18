@@ -36,8 +36,8 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
-TOADLET_C_API RenderTarget *new_EAGLRenderTarget(CAEAGLLayer *layer,const Visual &visual){
-	return (GLRenderTarget*)(new EAGLRenderTarget(layer,visual));
+TOADLET_C_API RenderTarget *new_EAGLRenderTarget(void *layer,WindowRenderTargetFormat *format){
+	return (GLRenderTarget*)(new EAGLRenderTarget((CEAGLLayer*)layer,format));
 }
 
 EAGLRenderTarget::EAGLRenderTarget():GLFBORenderTarget(NULL),
@@ -47,19 +47,19 @@ EAGLRenderTarget::EAGLRenderTarget():GLFBORenderTarget(NULL),
 {
 }
 
-EAGLRenderTarget::EAGLRenderTarget(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat):GLFBORenderTarget(NULL),
+EAGLRenderTarget::EAGLRenderTarget(CAEAGLLayer *drawable,WindowRenderTarget *format,NSString *colorFormat):GLFBORenderTarget(NULL),
 	mDrawable(nil),
 	mContext(nil),
 	mRenderBufferHandle(0)
 {
-	createContext(drawable,visual,colorFormat);
+	createContext(drawable,format,colorFormat);
 }
 
 EAGLRenderTarget::~EAGLRenderTarget(){
 	destroyContext();
 }
 
-bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,const Visual &visual,NSString *colorFormat){
+bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,WindowRenderTargetFormat *format,NSString *colorFormat){
 	mDrawable=drawable;
 
 	mDrawable.drawableProperties=[NSDictionary dictionaryWithObjectsAndKeys:
@@ -100,7 +100,7 @@ bool EAGLRenderTarget::createContext(CAEAGLLayer *drawable,const Visual &visual,
 	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_RENDERBUFFER,mRenderBufferHandle);
 
-	if(visual.depthBits!=0){
+	if(format->depthBits!=0){
 		// No Depth-Stencil buffer, so add one
 		GLFBOPixelBuffer::ptr buffer(new GLFBOPixelBuffer(this));
 		if(buffer->create(Buffer::Usage_NONE,Buffer::Access_NONE,Texture::Format_DEPTH_16,width,height,1)){

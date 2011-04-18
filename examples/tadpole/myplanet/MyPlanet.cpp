@@ -3,7 +3,7 @@
 inline float scurve(float t){ return t*t*(3.0 - 2.0*t);}
 
 using namespace toadlet::tadpole::Math;
-
+                                                                                                                                                                                                                                                                                                                                        
 class Planet:public ParentNode{
 public:
 	TOADLET_NODE(Planet,ParentNode);
@@ -514,9 +514,7 @@ ParentNode::ptr MyPlanet::createSun(scalar size){
 void MyPlanet::create(){
 	int i;
 
-	Application::setBackable(true);
-
-	Application::create("d3d9");
+	Application::create();
 
 	mScene=Scene::ptr(new Scene(mEngine));
 
@@ -624,7 +622,6 @@ void MyPlanet::update(int dt){
 	int i;
 
 	scalar fdt=fromMilli(dt);
-	scalar ftime=fromMilli(mScene->getTime());
 
 	if(mMode==Mode_CREATE_PLANET){
 		if(mOrbit!=NULL && mOrbit->getDistance()<=Math::fromMilli(1000)){
@@ -810,7 +807,7 @@ Node::ptr MyPlanet::createBackground(){
 	stars->setMaterial(starMaterial);
 	node->attach(stars);
 
-	for(i=0;i<16;++i){
+	for(i=0;i<32;++i){
 		Vector3 offset(random.nextFloat(-1,1),random.nextFloat(-1,1),random.nextFloat(-1,1));
 		Math::normalize(offset);
 		Math::mul(offset,random.nextFloat(60,190));

@@ -67,71 +67,29 @@ public:
 	virtual void setFullscreen(bool fullscreen);
 	virtual bool getFullscreen() const;
 
-	virtual void setVisual(const peeper::Visual &visual);
-	virtual const peeper::Visual &getVisual() const;
-
-	virtual void setApplicationListener(ApplicationListener *listener);
-	virtual ApplicationListener *getApplicationListener() const;
-
-	virtual tadpole::Engine *getEngine() const{return mEngine;}
-	virtual peeper::Renderer *getRenderer() const{return mRenderer;}
-	virtual ribbit::AudioPlayer *getAudioPlayer() const{return mAudioPlayer;}
-	virtual flick::MotionDetector *getMotionDetector() const{return mMotionDetector;}
-
-	virtual peeper::RenderTarget *getRootRenderTarget(){return mRenderTarget;}
-	virtual bool isPrimary() const{return mRenderTarget->isPrimary();}
-	virtual bool isValid() const{return mRenderTarget->isValid();}
-
-	virtual void resized(int width,int height);
-	virtual void focusGained();
-	virtual void focusLost();
-	virtual void keyPressed(int key);
-	virtual void keyReleased(int key);
-	virtual void mousePressed(int x,int y,int button);
-	virtual void mouseMoved(int x,int y);
-	virtual void mouseReleased(int x,int y,int button);
-	virtual void mouseScrolled(int x,int y,int scroll);
-	virtual void update(int dt);
-	virtual void render(peeper::Renderer *renderer);
+	virtual void setStopOnDeactivate(bool stop){}
+	virtual bool getStopOnDeactivate() const{return false;}
 
 	virtual void setDifferenceMouse(bool difference);
 	virtual bool getDifferenceMouse() const{return mDifferenceMouse;}
 
-	void setRendererOptions(int *options,int length);
-
 	static int translateKey(int key);
 
+	virtual void changeRendererPlugin(const egg::String &plugin){}
+
+	virtual void *getWindowHandle();
 	inline void *getWindow() const{return mWindow;}
 	inline void *getView() const{return mView;}
-	
+
 	void internal_mouseMoved(int x,int y);
 	
 protected:
-	peeper::RenderTarget *makeRenderTarget();
-	peeper::Renderer *makeRenderer();
-	bool createContextAndRenderer();
-	bool destroyRendererAndContext();
-
-	bool createAudioPlayer();
-	bool destroyAudioPlayer();
-
-	bool createMotionDetector();
-	bool destroyMotionDetector();
-
 	egg::String mTitle;
 	int mPositionX,mPositionY;
 	int mWidth,mHeight;
 	bool mFullscreen;
-	peeper::Visual mVisual;
-	ApplicationListener *mApplicationListener;
 	bool mDifferenceMouse;
 
-	tadpole::Engine *mEngine;
-	peeper::RenderTarget *mRenderTarget;
-	peeper::Renderer *mRenderer;
-	int *mRendererOptions;
-	ribbit::AudioPlayer *mAudioPlayer;
-	flick::MotionDetector *mMotionDetector;
 	egg::io::Archive::ptr mBundleArchive;
 	
 	bool mRun;
@@ -140,6 +98,7 @@ protected:
 	bool mDestroyed;
 	void *mWindow;
 	void *mView;
+	void *mPool;
 };
 
 }

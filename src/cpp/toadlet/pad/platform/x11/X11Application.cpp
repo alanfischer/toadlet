@@ -51,6 +51,10 @@ using namespace toadlet::peeper;
 using namespace toadlet::ribbit;
 using namespace toadlet::tadpole;
 
+#if defined(TOADLET_HAS_OPENAL)
+	extern "C" AudioPlayer *new_ALPlayer();
+#endif
+
 namespace toadlet{
 namespace pad{
 
@@ -81,17 +85,9 @@ X11Application::X11Application():
 	mWidth(-1),
 	mHeight(-1),
 	mFullscreen(false),
-	//mFormat,
-	mListener(NULL),
 	mDifferenceMouse(false),
 	mLastXMouse(0),mLastYMouse(0),
 	mSkipNextMove(false),
-
-	mEngine(NULL),
-	mRenderer(NULL),
-	mRendererOptions(NULL),
-	mAudioPlayer(NULL),
-	mMotionDetector(NULL),
 
 	mRun(false),
 	mAutoActivate(false),
@@ -102,15 +98,8 @@ X11Application::X11Application():
 	x11=new X11Attributes();
 	memset(x11,0,sizeof(X11Attributes));
 
-	mFormat=WindowRenderTargetFormat::ptr(new WindowRenderTargetFormat());
-	mFormat->pixelFormat=ImageDefinitions::Format_RGBA_8;
-	mFormat->depthBits=16;
-	mFormat->multisamples=2;
-	mFormat->threads=2;
-	#if defined(TOADLET_DEBUG)
-		mFormat->debug=true;
-	#else
-		mFormat->debug=false;
+	#if defined(TOADLET_HAS_OPENAL)
+		mAudioPlayerPlugins.add("al",AudioPlayerPlugin(new_ALPlayer));
 	#endif
 }
 
@@ -123,20 +112,9 @@ X11Application::~X11Application(){
 }
 
 void X11Application::create(String renderer,String audioPlayer,String motionDetector){
-	mEngine=new Engine();
-
 	createWindow();
-	if(renderer!="null"){
-		createContextAndRenderer();
-	}
-	if(audioPlayer!="null"){
-		createAudioPlayer();
-	}
-	if(motionDetector!="null"){
-		createMotionDetector();
-	}
 
-	activate();
+	BaseApplication::create(renderer,audioPlayer,motionDetector);
 }
 
 void X11Application::destroy(){
@@ -146,21 +124,7 @@ void X11Application::destroy(){
 
 	mDestroyed=true;
 
-	if(mEngine!=NULL){
-		mEngine->destroy();
-	}
-
-	deactivate();
-	
-	destroyRendererAndContext();
-	destroyAudioPlayer();
-	destroyMotionDetector();
-	destroyWindow();
-
-	if(mEngine!=NULL){
-		delete mEngine;
-		mEngine=NULL;
-	}
+	BaseApplication::destroy();
 }
 
 void X11Application::start(){
@@ -624,7 +588,7 @@ Renderer *X11Application::makeRenderer(){
 	#endif
 }
 
-bool X11Application::createContextAndRenderer(){
+bool X11Application::createContextAndRenderer(const String &plugin){
 	RenderTarget *renderTarget=makeRenderTarget();
 	if(renderTarget!=NULL){
 		mRenderTarget=renderTarget;
@@ -681,47 +645,6 @@ bool X11Application::destroyRendererAndContext(){
 	return true;
 }
 
-bool X11Application::createAudioPlayer(){
-	#if defined(TOADLET_HAS_OPENAL)
-		mAudioPlayer=new ALPlayer();
-		bool result=false;
-		TOADLET_TRY
-			result=mAudioPlayer->create(NULL);
-		TOADLET_CATCH(const Exception &){result=false;}
-		if(result=false){
-			delete mAudioPlayer;
-			mAudioPlayer=NULL;
-		}
-	#endif
-	if(mAudioPlayer!=NULL){
-		mEngine->setAudioPlayer(mAudioPlayer);
-	}
-	return true;
-}
-
-bool X11Application::destroyAudioPlayer(){
-	if(mAudioPlayer!=NULL){
-		mEngine->setAudioPlayer(NULL);
-		mAudioPlayer->destroy();
-		delete mAudioPlayer;
-		mAudioPlayer=NULL;
-	}
-	return true;
-}
-
-bool X11Application::createMotionDetector(){
-	return false;
-}
-
-bool X11Application::destroyMotionDetector(){
-	if(mMotionDetector!=NULL){
-		mMotionDetector->destroy();
-		delete mMotionDetector;
-		mMotionDetector=NULL;
-	}
-	return true;
-}
-
 void X11Application::internal_mouseMoved(int x,int y){
 	if(mSkipNextMove){
 		mLastXMouse=x;
@@ -770,72 +693,6 @@ void X11Application::configured(int x,int y,int width,int height){
 	}
 }
 
-void X11Application::resized(int width,int height){
-	if(mListener!=NULL){
-		mListener->resized(width,height);
-	}
-}
-
-void X11Application::focusGained(){
-	if(mListener!=NULL){
-		mListener->focusGained();
-	}
-}
-
-void X11Application::focusLost(){
-	if(mListener!=NULL){
-		mListener->focusLost();
-	}
-}
-
-void X11Application::keyPressed(int key){
-	if(mListener!=NULL){
-		mListener->keyPressed(key);
-	}
-}
-
-void X11Application::keyReleased(int key){
-	if(mListener!=NULL){
-		mListener->keyReleased(key);
-	}
-}
-
-void X11Application::mousePressed(int x,int y,int button){
-	if(mListener!=NULL){
-		mListener->mousePressed(x,y,button);
-	}
-}
-
-void X11Application::mouseMoved(int x,int y){
-	if(mListener!=NULL){
-		mListener->mouseMoved(x,y);
-	}
-}
-
-void X11Application::mouseReleased(int x,int y,int button){
-	if(mListener!=NULL){
-		mListener->mouseReleased(x,y,button);
-	}
-}
-
-void X11Application::mouseScrolled(int x,int y,int scroll){
-	if(mListener!=NULL){
-		mListener->mouseScrolled(x,y,scroll);
-	}
-}
-
-void X11Application::update(int dt){
-	if(mListener!=NULL){
-		mListener->update(dt);
-	}
-}
-
-void X11Application::render(Renderer *renderer){
-	if(mListener!=NULL){
-		mListener->render(renderer);
-	}
-}
-
 void X11Application::setDifferenceMouse(bool difference){
 	mDifferenceMouse=difference;
 	mSkipNextMove=true;
@@ -846,15 +703,6 @@ void X11Application::setDifferenceMouse(bool difference){
 	else{
 		XUndefineCursor(x11->mDisplay,x11->mWindow);
 	}
-}
-
-void X11Application::setRendererOptions(int *options,int length){
-	if(mRendererOptions!=NULL){
-		delete[] mRendererOptions;
-	}
-
-	mRendererOptions=new int[length];
-	memcpy(mRendererOptions,options,length*sizeof(int));
 }
 
 void *X11Application::getDisplay() const{return x11->mDisplay;}

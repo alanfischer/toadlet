@@ -187,7 +187,7 @@ void SpriteNode::updateSprite(){
 		vba.unlock();
 	}
 
-	Vector3 origin(x,y,0);
+	Vector3 origin((2*x+width)/2,(2*y+height)/2,0);
 	scalar radius=Math::sqrt(Math::square(width/2) + Math::square(height/2));
 	mBound.set(origin,radius);
 }
