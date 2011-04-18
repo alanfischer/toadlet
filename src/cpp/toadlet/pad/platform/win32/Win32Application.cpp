@@ -28,7 +28,6 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/pad/platform/win32/Win32Application.h>
-#include <toadlet/pad/ApplicationListener.h>
 #include <windows.h>
 #pragma comment(lib,"winmm.lib")
 #if defined(TOADLET_PLATFORM_WINCE)
@@ -138,26 +137,9 @@ Win32Application::Win32Application():
 	mWidth(-1),
 	mHeight(-1),
 	mFullscreen(false),
-	//mFormat,
-	mListener(NULL),
 	mDifferenceMouse(false),
 	mLastXMouse(0),mLastYMouse(0),
 	mSkipNextMove(false),
-
-	mBackable(false),
-	mEngine(NULL),
-	mRenderTarget(NULL),
-	mRenderer(NULL),
-	mAudioPlayer(NULL),
-	mMotionDetector(NULL),
-
-	//mRendererPlugins,
-	//mCurrentRendererPlugin,
-	//mNewRendererPlugin,
-	mRendererOptions(0),
-	//mAudioPlayerPlugins,
-	mAudioPlayerOptions(0),
-	//mMotionDetctorPlugins,
 
 	mRun(false),
 	#if defined(TOADLET_PLATFORM_WINCE)
@@ -192,23 +174,6 @@ Win32Application::Win32Application():
 		}
 	#endif
 
-	mFormat=WindowRenderTargetFormat::ptr(new WindowRenderTargetFormat());
-	#if defined(TOADLET_PLATFORM_WINCE)
-		mFormat->pixelFormat=ImageDefinitions::Format_RGB_5_6_5;
-		mFormat->depthBits=16;
-		mFormat->multisamples=0;
-	#else
-		mFormat->pixelFormat=ImageDefinitions::Format_RGBA_8;
-		mFormat->depthBits=16;
-		mFormat->multisamples=2;
-	#endif
-	mFormat->threads=2;
-	#if defined(TOADLET_DEBUG)
-		mFormat->debug=true;
-	#else
-		mFormat->debug=false;
-	#endif
-
 	#if defined(TOADLET_HAS_OPENGL)
 		mRendererPlugins.add("gl",RendererPlugin(
 			#if defined(TOADLET_PLATFORM_WINCE)
@@ -231,18 +196,27 @@ Win32Application::Win32Application():
 	#if defined(TOADLET_HAS_D3D11)
 		mRendererPlugins.add("d3d11",RendererPlugin(new_D3D11WindowRenderTarget,new_D3D11Renderer));
 	#endif
+	mRendererPreferences.add("gl");
+	mRendererPreferences.add("d3d9");
+	mRendererPreferences.add("d3dm");
+	mRendererPreferences.add("d3d10");
+	mRendererPreferences.add("d3d11");
 
-	#if defined(TOADLET_PLATFORM_WIN32)
-		mAudioPlayerPlugins.add("mm",AudioPlayerPlugin(new_MMPlayer));
-	#endif
 	#if defined(TOADLET_HAS_OPENAL)
 		mAudioPlayerPlugins.add("al",AudioPlayerPlugin(new_ALPlayer));
 	#endif
+	#if defined(TOADLET_PLATFORM_WIN32)
+		mAudioPlayerPlugins.add("mm",AudioPlayerPlugin(new_MMPlayer));
+	#endif
+	mAudioPlayerPreferences.add("al");
+	mAudioPlayerPreferences.add("mm");
 
 	#if defined(TOADLET_PLATFORM_WINCE)
 		mMotionDetectorPlugins.add("htc",MotionDetectorPlugin(new_HTCMotionDetector));
 		mMotionDetectorPlugins.add("samsung",MotionDetectorPlugin(new_SamsungMotionDetector));
 	#endif
+	mMotionDetectorPreferences.add("htc");
+	mMotionDetectorPreferences.add("samsung");
 }
 
 Win32Application::~Win32Application(){
@@ -255,12 +229,7 @@ Win32Application::~Win32Application(){
 }
 
 void Win32Application::create(String renderer,String audioPlayer,String motionDetector){
-	mEngine=new Engine(mBackable);
-
-	mResourceArchive=Win32ResourceArchive::ptr(new Win32ResourceArchive(mEngine->getTextureManager()));
-	mResourceArchive->open(win32->mInstance);
-	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(mResourceArchive));
-	mEngine->getTextureManager()->addResourceArchive(mResourceArchive);
+	mContextActive=true;
 
 	/// @todo: The Joystick/Keyboard/Mouse input should be moved to an input abstraction class useabout outside of pad or at least the Application class
 	win32->mJoyInfo.dwSize=sizeof(JOYINFOEX);
@@ -281,45 +250,13 @@ void Win32Application::create(String renderer,String audioPlayer,String motionDe
 	Logger::alert(Categories::TOADLET_PAD,String("detected ")+numJoys+" joysticks");
 
 	createWindow();
-	activate();
 	
-	/// @todo: Unify the plugin framework a bit so we dont have as much code duplication for this potion, and the creating of the plugin
-	mContextActive=true;
-	mNewRendererPlugin=mCurrentRendererPlugin=renderer;
-	if(renderer!="null"){
-		if(renderer!=(char*)NULL){
-			createContextAndRenderer(renderer);
-		}
-		else{
-			Map<String,RendererPlugin>::iterator it;
-			for(it=mRendererPlugins.begin();it!=mRendererPlugins.end();++it){
-				if(createContextAndRenderer(it->first)) break;
-			}
-		}
-	}
-	if(audioPlayer!="null"){
-		if(audioPlayer!=(char*)NULL){
-			createAudioPlayer(audioPlayer);
-		}
-		else{
-			Map<String,AudioPlayerPlugin>::iterator it;
-			for(it=mAudioPlayerPlugins.begin();it!=mAudioPlayerPlugins.end();++it){
-				if(createAudioPlayer(it->first)) break;
-			}
-		}
-	}
-	if(motionDetector!="null"){
-		if(motionDetector!=(char*)NULL){
-			createMotionDetector(motionDetector);
-		}
-		else{
-			Map<String,MotionDetectorPlugin>::iterator it;
-			for(it=mMotionDetectorPlugins.begin();it!=mMotionDetectorPlugins.end();++it){
-				if(createMotionDetector(it->first)) break;
-			}
-		}
-		createMotionDetector(motionDetector);
-	}
+	BaseApplication::create(renderer,audioPlayer,motionDetector);
+
+	mResourceArchive=Win32ResourceArchive::ptr(new Win32ResourceArchive(mEngine->getTextureManager()));
+	mResourceArchive->open(win32->mInstance);
+	mEngine->getArchiveManager()->manage(shared_static_cast<Archive>(mResourceArchive));
+	mEngine->getTextureManager()->addResourceArchive(mResourceArchive);
 }
 
 void Win32Application::destroy(){
@@ -329,21 +266,9 @@ void Win32Application::destroy(){
 
 	mDestroyed=true;
 
-	if(mEngine!=NULL){
-		mEngine->destroy();
-	}
+	BaseApplication::destroy();
 
-	deactivate();
-	
-	destroyRendererAndContext();
-	destroyAudioPlayer();
-	destroyMotionDetector();
 	destroyWindow();
-
-	if(mEngine!=NULL){
-		delete mEngine;
-		mEngine=NULL;
-	}
 }
 
 void Win32Application::start(){
@@ -661,126 +586,11 @@ bool Win32Application::getFullscreen() const{
 	return mFullscreen;
 }
 
-void Win32Application::resized(int width,int height){
-	if(mListener!=NULL){
-		mListener->resized(width,height);
-	}
-}
-
-void Win32Application::focusGained(){
-	if(mListener!=NULL){
-		mListener->focusGained();
-	}
-}
-
-void Win32Application::focusLost(){
-	if(mListener!=NULL){
-		mListener->focusLost();
-	}
-}
-
-void Win32Application::keyPressed(int key){
-	if(mListener!=NULL){
-		mListener->keyPressed(key);
-	}
-}
-
-void Win32Application::keyReleased(int key){
-	if(mListener!=NULL){
-		mListener->keyReleased(key);
-	}
-}
-
-void Win32Application::mousePressed(int x,int y,int button){
-	if(mListener!=NULL){
-		mListener->mousePressed(x,y,button);
-	}
-}
-
-void Win32Application::mouseMoved(int x,int y){
-	if(mListener!=NULL){
-		mListener->mouseMoved(x,y);
-	}
-}
-
-void Win32Application::mouseReleased(int x,int y,int button){
-	if(mListener!=NULL){
-		mListener->mouseReleased(x,y,button);
-	}
-}
-
-void Win32Application::mouseScrolled(int x,int y,int scroll){
-	if(mListener!=NULL){
-		mListener->mouseScrolled(x,y,scroll);
-	}
-}
-
-void Win32Application::joyPressed(int button){
-	if(mListener!=NULL){
-		mListener->joyPressed(button);
-	}
-}
-
-void Win32Application::joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v){
-	if(mListener!=NULL){
-		mListener->joyMoved(x,y,z,r,u,v);
-	}
-}
-
-void Win32Application::joyReleased(int button){
-	if(mListener!=NULL){
-		mListener->joyReleased(button);
-	}
-}
-
-void Win32Application::update(int dt){
-	if(mListener!=NULL){
-		mListener->update(dt);
-	}
-}
-
-void Win32Application::render(Renderer *renderer){
-	if(mListener!=NULL){
-		mListener->render(renderer);
-	}
-}
-
 void Win32Application::setDifferenceMouse(bool difference){
 	mDifferenceMouse=difference;
 	mSkipNextMove=true;
 
 	ShowCursor(!mDifferenceMouse);
-}
-
-void Win32Application::setBackable(bool backable){
-	if(mEngine!=NULL){
-		Error::unknown(Categories::TOADLET_PAD,"can not change backable once engine is created");
-		return;
-	}
-
-	mBackable=backable;
-}
-
-void Win32Application::changeRendererPlugin(const String &plugin){
-	mNewRendererPlugin=plugin;
-}
-
-void Win32Application::setRendererOptions(int *options,int length){
-	if(mRendererOptions!=NULL){
-		delete[] mRendererOptions;
-	}
-
-	mRendererOptions=new int[length];
-	memcpy(mRendererOptions,options,length*sizeof(int));
-}
-
-void Win32Application::setAudioPlayerOptions(int *options,int length){
-	if(mAudioPlayerOptions!=NULL){
-		delete[] mAudioPlayerOptions;
-	}
-
-	mAudioPlayerOptions=new int[length];
-	memcpy(mAudioPlayerOptions,options,length*sizeof(int));
 }
 
 void Win32Application::setIcon(void *icon){
@@ -792,93 +602,6 @@ void Win32Application::setIcon(void *icon){
 
 void *Win32Application::getHINSTANCE() const{return win32->mInstance;}
 void *Win32Application::getHWND() const{return win32->mWnd;}
-
-RenderTarget *Win32Application::makeRenderTarget(const String &plugin){
-	RenderTarget *target=NULL;
-	DWORD flags=D3DCREATE_MULTITHREADED;
-
-	Map<String,RendererPlugin>::iterator it=mRendererPlugins.find(plugin);
-	if(it!=mRendererPlugins.end()){
-		TOADLET_TRY
-			target=it->second.createRenderTarget(win32->mWnd,mFormat);
-		TOADLET_CATCH(const Exception &){target=NULL;}
-	}
-	if(target!=NULL && target->isValid()==false){
-		delete target;
-		target=NULL;
-	}
-	return target;
-}
-
-Renderer *Win32Application::makeRenderer(const String &plugin){
-	Renderer *renderer=NULL;
-	Map<String,RendererPlugin>::iterator it=mRendererPlugins.find(plugin);
-	if(it!=mRendererPlugins.end()){
-		TOADLET_TRY
-			renderer=it->second.createRenderer();
-		TOADLET_CATCH(const Exception &){renderer=NULL;}
-	}
-	return renderer;
-}
-
-bool Win32Application::createContextAndRenderer(const String &plugin){
-	Logger::debug(Categories::TOADLET_PAD,
-		"Win32Application: creating RenderTarget and Renderer:"+plugin);
-
-	bool result=false;
-	mRenderTarget=makeRenderTarget(plugin);
-	if(mRenderTarget!=NULL){
-		mRenderer=makeRenderer(plugin);
-		TOADLET_TRY
-			result=mRenderer->create(this,mRendererOptions);
-		TOADLET_CATCH(const Exception &){result=false;}
-		if(result==false){
-			delete mRenderer;
-			mRenderer=NULL;
-		}
-	}
-	if(result==false){
-		delete mRenderTarget;
-		mRenderTarget=NULL;
-	}
-
-	if(result==false){
-		Logger::error(Categories::TOADLET_PAD,
-			"error starting Renderer");
-		return false;
-	}
-	else if(mRenderer==NULL){
-		Logger::error(Categories::TOADLET_PAD,
-			"error creating Renderer");
-		return false;
-	}
-
-	if(mRenderer!=NULL){
-		mRenderer->setRenderTarget(this);
-		mEngine->setRenderer(mRenderer);
-	}
-
-	return mRenderer!=NULL;
-}
-
-bool Win32Application::destroyRendererAndContext(){
-	Logger::debug(Categories::TOADLET_PAD,
-		"Win32Application: destroying context and renderer");
-
-	if(mRenderer!=NULL){
-		mEngine->setRenderer(NULL);
-		mRenderer->destroy();
-		delete mRenderer;
-		mRenderer=NULL;
-	}
-
-	if(mRenderTarget!=NULL){
-		delete mRenderTarget;
-		mRenderTarget=NULL;
-	}
-
-	return true;
-}
 
 bool Win32Application::changeVideoMode(int width,int height,int colorBits){
 	bool result=false;
@@ -898,109 +621,6 @@ bool Win32Application::changeVideoMode(int width,int height,int colorBits){
 	#endif
 
 	return result;
-}
-
-AudioPlayer *Win32Application::makeAudioPlayer(const String &plugin){
-	AudioPlayer *audioPlayer=NULL;
-	Map<String,AudioPlayerPlugin>::iterator it=mAudioPlayerPlugins.find(plugin);
-	if(it!=mAudioPlayerPlugins.end()){
-		TOADLET_TRY
-			audioPlayer=it->second.createAudioPlayer();
-		TOADLET_CATCH(const Exception &){audioPlayer=NULL;}
-	}
-	return audioPlayer;
-}
-
-bool Win32Application::createAudioPlayer(const String &plugin){
-	Logger::debug(Categories::TOADLET_PAD,
-		"Win32Application: creating AudioPlayer:"+plugin);
-
-	bool result=false;
-	mAudioPlayer=makeAudioPlayer(plugin);
-	if(mAudioPlayer!=NULL){
-		TOADLET_TRY
-			result=mAudioPlayer->create(mAudioPlayerOptions);
-		TOADLET_CATCH(const Exception &){result=false;}
-		if(result==false){
-			delete mAudioPlayer;
-			mAudioPlayer=NULL;
-		}
-	}
-
-	if(result==false){
-		Logger::error(Categories::TOADLET_PAD,
-			"error starting AudioPlayer");
-		return false;
-	}
-	else if(mAudioPlayer==NULL){
-		Logger::error(Categories::TOADLET_PAD,
-			"error creating AudioPlayer");
-		return false;
-	}
-
-	if(mAudioPlayer!=NULL){
-		mEngine->setAudioPlayer(mAudioPlayer);
-	}
-	return true;
-}
-
-bool Win32Application::destroyAudioPlayer(){
-	if(mAudioPlayer!=NULL){
-		mEngine->setAudioPlayer(NULL);
-		mAudioPlayer->destroy();
-		delete mAudioPlayer;
-		mAudioPlayer=NULL;
-	}
-	return true;
-}
-
-MotionDetector *Win32Application::makeMotionDetector(const String &plugin){
-	MotionDetector *motionDetector=NULL;
-	Map<String,MotionDetectorPlugin>::iterator it=mMotionDetectorPlugins.find(plugin);
-	if(it!=mMotionDetectorPlugins.end()){
-		TOADLET_TRY
-			motionDetector=it->second.createMotionDetector();
-		TOADLET_CATCH(const Exception &){motionDetector=NULL;}
-	}
-	return motionDetector;
-}
-
-bool Win32Application::createMotionDetector(const String &plugin){
-	Logger::debug(Categories::TOADLET_PAD,
-		"Win32Application: creating MotionDetector:"+plugin);
-
-	bool result=false;
-	mMotionDetector=makeMotionDetector(plugin);
-	if(mMotionDetector!=NULL){
-		TOADLET_TRY
-			result=mMotionDetector->create();
-		TOADLET_CATCH(const Exception &){result=false;}
-		if(result==false){
-			delete mMotionDetector;
-			mMotionDetector=NULL;
-		}
-	}
-
-	if(result==false){
-		Logger::error(Categories::TOADLET_PAD,
-			"error starting MotionDetector");
-		return false;
-	}
-	else if(mMotionDetector==NULL){
-		Logger::error(Categories::TOADLET_PAD,
-			"error creating MotionDetector");
-		return false;
-	}
-	return true;
-}
-
-bool Win32Application::destroyMotionDetector(){
-	if(mMotionDetector!=NULL){
-		mMotionDetector->destroy();
-		delete mMotionDetector;
-		mMotionDetector=NULL;
-	}
-	return true;
 }
 
 void Win32Application::internal_resize(int width,int height){

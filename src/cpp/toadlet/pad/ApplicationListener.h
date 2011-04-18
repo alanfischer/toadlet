@@ -26,9 +26,13 @@
 #ifndef TOADLET_PAD_APPLICATIONLISTENER_H
 #define TOADLET_PAD_APPLICATIONLISTENER_H
 
-#include <toadlet/pad/BaseApplication.h>
-
 namespace toadlet{
+namespace peeper{
+
+class Renderer;
+
+}
+
 namespace pad{
 
 class ApplicationListener{

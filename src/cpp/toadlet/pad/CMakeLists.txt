@@ -4,6 +4,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.cmake ${CMAKE_CURRENT_BINA
 
 # Source files for toadlet_pad
 set (PAD_SRC
+	BaseApplication.cpp
 	Version.cpp
 )
 

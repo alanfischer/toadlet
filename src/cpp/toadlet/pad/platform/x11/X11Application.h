@@ -36,12 +36,6 @@ struct X11Attributes;
 
 class X11Application:public BaseApplication{
 public:
-	enum{
-		RendererPlugin_NONE=-1,
-		AudioPlayerPlugin_NONE=-1,
-		MotionDetectorPlugin_NONE=-1,
-	};
-
 	X11Application();
 	virtual ~X11Application();
 
@@ -74,38 +68,15 @@ public:
 	virtual void setFullscreen(bool fullscreen);
 	virtual bool getFullscreen() const;
 
-	virtual void setWindowRenderTargetFormat(peeper::WindowRenderTargetFormat::ptr format){mFormat=format;}
-	virtual peeper::WindowRenderTargetFormat::ptr getWindowRenderTargetFormat() const{return mFormat;}
+	virtual void setStopOnDeactivate(bool stop){}
+	virtual bool getStopOnDeactivate() const{return false;}
 
-	virtual void setApplicationListener(ApplicationListener *listener){mListener=listener;}
-	virtual ApplicationListener *getApplicationListener() const{return mListener;}
+	virtual void setDifferenceMouse(bool difference);
+	virtual bool getDifferenceMouse() const{return mDifferenceMouse;}
 
-	virtual tadpole::Engine *getEngine() const{return mEngine;}
-	virtual peeper::Renderer *getRenderer() const{return mRenderer;}
-	virtual ribbit::AudioPlayer *getAudioPlayer() const{return mAudioPlayer;}
-	virtual flick::MotionDetector *getMotionDetector() const{return mMotionDetector;}
+	virtual void changeRendererPlugin(const egg::String &plugin){}
 
-	virtual peeper::RenderTarget *getRootRenderTarget(){return mRenderTarget;}
-	virtual bool isPrimary() const{return mRenderTarget->isPrimary();}
-	virtual bool isValid() const{return mRenderTarget->isValid();}
-
-	virtual void resized(int width,int height);
-	virtual void focusGained();
-	virtual void focusLost();
-	virtual void keyPressed(int key);
-	virtual void keyReleased(int key);
-	virtual void mousePressed(int x,int y,int button);
-	virtual void mouseMoved(int x,int y);
-	virtual void mouseReleased(int x,int y,int button);
-	virtual void mouseScrolled(int x,int y,int scroll);
-	virtual void update(int dt);
-	virtual void render(peeper::Renderer *renderer);
-
-	void setDifferenceMouse(bool difference);
-	bool getDifferenceMouse() const{return mDifferenceMouse;}
-
-	void setRendererOptions(int *options,int length);
-
+	virtual void *getWindowHandle(){return getWindow();}
 	void *getDisplay() const;
 	void *getWindow() const;
 	void *getVisualInfo() const;
@@ -115,20 +86,15 @@ public:
 protected:
 	bool createWindow();
 	void destroyWindow();
-	peeper::RenderTarget *makeRenderTarget();
-	peeper::Renderer *makeRenderer();
-	bool createContextAndRenderer();
-	bool destroyRendererAndContext();
 	void originalResolution();
 	void originalEnv();
-
-	bool createAudioPlayer();
-	bool destroyAudioPlayer();
-	
-	bool createMotionDetector();
-	bool destroyMotionDetector();
-
 	void configured(int x,int y,int width,int height);
+
+	// Keeping our custom versions of these until we can unify the GLXRenderTargetWindow's constructor
+	peeper::RenderTarget *makeRenderTarget();
+	peeper::Renderer *makeRenderer();
+	bool createContextAndRenderer(const egg::String &plugin);
+	bool destroyRendererAndContext();
 
 	static int translateKey(int key);
 
@@ -136,18 +102,9 @@ protected:
 	int mPositionX,mPositionY;
 	int mWidth,mHeight;
 	bool mFullscreen;
-	peeper::WindowRenderTargetFormat::ptr mFormat;
-	ApplicationListener *mListener;
 	bool mDifferenceMouse;
 	int mLastXMouse,mLastYMouse;
 	bool mSkipNextMove;
-
-	tadpole::Engine *mEngine;
-	peeper::RenderTarget *mRenderTarget;
-	peeper::Renderer *mRenderer;
-	int *mRendererOptions;
-	ribbit::AudioPlayer *mAudioPlayer;
-	flick::MotionDetector *mMotionDetector;
 
 	bool mRun;
 	bool mAutoActivate;

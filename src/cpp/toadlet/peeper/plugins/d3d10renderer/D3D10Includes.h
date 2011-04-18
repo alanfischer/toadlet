@@ -77,6 +77,8 @@ namespace peeper{
 		r[14]=Math::toFloat(s.at(3,2));
 		r[15]=Math::toFloat(s.at(3,3));
 	}
+#else
+	inline void toD3DColor(float *r,const Vector4 &c){*(Vector4*)r=c;}
 #endif
 
 #if !defined(TOADLET_SET_D3D10)
