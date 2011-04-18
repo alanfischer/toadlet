@@ -377,12 +377,12 @@ void BSP30Handler::buildMaterials(BSP30Map *map){
 	map->materials.resize(map->miptexlump->nummiptex);
 	int i;
 	for(i=0;i<map->miptexlump->nummiptex;i++){
-		Material::ptr material=mEngine->getMaterialManager()->createMaterial();
+		Material::ptr material=mEngine->getMaterialManager()->createMaterial(map->parsedTextures[i]);
 		material->retain();
 		material->setMaterialState(MaterialState(false,false,MaterialState::ShadeType_FLAT));
 		material->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
 
-		material->setTexture(0,map->parsedTextures[i]);
+		material->setSamplerState(1,SamplerState());
 
 		TextureState lightmapState;
 		lightmapState.texCoordIndex=1;

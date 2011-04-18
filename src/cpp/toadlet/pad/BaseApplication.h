@@ -211,12 +211,15 @@ protected:
 	ApplicationListener *mListener;
 
 	egg::Map<egg::String,RendererPlugin> mRendererPlugins;
+	egg::Collection<egg::String> mRendererPreferences;
 	egg::String mCurrentRendererPlugin;
 	egg::String mNewRendererPlugin;
 	int *mRendererOptions;
 	egg::Map<egg::String,AudioPlayerPlugin> mAudioPlayerPlugins;
+	egg::Collection<egg::String> mAudioPlayerPreferences;
 	int *mAudioPlayerOptions;
 	egg::Map<egg::String,MotionDetectorPlugin> mMotionDetectorPlugins;
+	egg::Collection<egg::String> mMotionDetectorPreferences;
 
 	egg::Map<egg::String,int> mNameToKey;
 	egg::Map<int,egg::String> mKeyToName;

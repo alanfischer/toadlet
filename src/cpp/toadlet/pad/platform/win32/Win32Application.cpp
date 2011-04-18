@@ -196,18 +196,27 @@ Win32Application::Win32Application():
 	#if defined(TOADLET_HAS_D3D11)
 		mRendererPlugins.add("d3d11",RendererPlugin(new_D3D11WindowRenderTarget,new_D3D11Renderer));
 	#endif
+	mRendererPreferences.add("gl");
+	mRendererPreferences.add("d3d9");
+	mRendererPreferences.add("d3dm");
+	mRendererPreferences.add("d3d10");
+	mRendererPreferences.add("d3d11");
 
-	#if defined(TOADLET_PLATFORM_WIN32)
-		mAudioPlayerPlugins.add("mm",AudioPlayerPlugin(new_MMPlayer));
-	#endif
 	#if defined(TOADLET_HAS_OPENAL)
 		mAudioPlayerPlugins.add("al",AudioPlayerPlugin(new_ALPlayer));
 	#endif
+	#if defined(TOADLET_PLATFORM_WIN32)
+		mAudioPlayerPlugins.add("mm",AudioPlayerPlugin(new_MMPlayer));
+	#endif
+	mAudioPlayerPreferences.add("al");
+	mAudioPlayerPreferences.add("mm");
 
 	#if defined(TOADLET_PLATFORM_WINCE)
 		mMotionDetectorPlugins.add("htc",MotionDetectorPlugin(new_HTCMotionDetector));
 		mMotionDetectorPlugins.add("samsung",MotionDetectorPlugin(new_SamsungMotionDetector));
 	#endif
+	mMotionDetectorPreferences.add("htc");
+	mMotionDetectorPreferences.add("samsung");
 }
 
 Win32Application::~Win32Application(){
