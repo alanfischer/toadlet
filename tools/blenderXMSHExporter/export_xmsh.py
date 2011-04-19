@@ -59,6 +59,7 @@ import bpy
 def write(filename):
 	# Exporter specific variables
 	mBoneIndicies={}
+	mVertUVs={}
 	mBoneCounter=0
 
 	out = open(filename, "w")
@@ -93,19 +94,32 @@ def write(filename):
 			obMatrix=ob.matrix.copy()
 			mesh.transform(obMatrix,True)
 
+			# Generate a list of face vertex indices by material; adding a dummy material if none exists
+			# Also pack the vertex tex coords into the mVertUVs dictionary
+			# HACK: Currently the vertex tex UV coords are simply overwritten with whatever face is found last
+			xmshMaterials=mesh.materials
+			if len(xmshMaterials)==0:
+				xmshMaterials.append(Blender.Material.New(''))
+			matFaceIndicies=[[] for i in range(len(xmshMaterials))]
+			for face in mesh.faces:
+				for i in range(len(face.verts)):
+					matFaceIndicies[face.mat].append(face.verts[i].index)
+					if mesh.faceUV:
+						mVertUVs[face.verts[i].index]=face.uv[i]
+
 			# Write out all vertexes in the mesh at once
 			out.write('\t<Mesh>\n')
 			out.write('\t\t<Vertexes Count=\"%d\" ' % (len(mesh.verts)))
 			out.write('Type=\"Position,Normal') 
-			if mesh.vertexUV:
+			if mesh.faceUV:
 				out.write(',TexCoord')
 			if len(mBoneIndicies)>0:
 				out.write(',Bone')
 			out.write('\">\n')
 			for vert in mesh.verts:
 				out.write('\t\t\t%f,%f,%f %f,%f,%f' % (vert.co.x,vert.co.y,vert.co.z,vert.no.x,vert.no.y,vert.no.z))
-				if mesh.vertexUV:
-					out.write(' %f,%f' % (vert.uvco.x,vert.uvco.y))
+				if vert.index in mVertUVs:
+					out.write(' %f,%f' % (mVertUVs[vert.index].x, mVertUVs[vert.index].y))
 				if len(mBoneIndicies)>0:
 					bonePairs=mesh.getVertexInfluences(vert.index)
 					out.write(' ')
@@ -119,15 +133,6 @@ def write(filename):
 							first=False
 				out.write('\n')
 			out.write('\t\t</Vertexes>\n')
-
-			# Generate a list of face vertex indices by material; adding a dummy material if none exists
-			xmshMaterials=mesh.materials
-			if len(xmshMaterials)==0:
-				xmshMaterials.append(Blender.Material.New(''))
-			matFaceIndicies=[[] for i in range(len(xmshMaterials))]
-			for face in mesh.faces:
-				for vert in face.verts:
-					matFaceIndicies[face.mat].append(vert.index)
 
 			# Write out one submesh per mesh material
 			for i in range(len(matFaceIndicies)):
