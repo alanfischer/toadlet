@@ -165,9 +165,6 @@ def write(filename):
 						# No UVs mean no worrying about new vertices
 						xmshMatFaceIndicies[face.mat].append(vert.index)
 
-			print 'old num verts=',len(mesh.verts)
-			print 'new num verts=',len(xmshVerts)
-
 			# Write out all vertexes in the mesh at once
 			out.write('\t<Mesh>\n')
 			out.write('\t\t<Vertexes Count=\"%d\" ' % (len(xmshVerts)))
