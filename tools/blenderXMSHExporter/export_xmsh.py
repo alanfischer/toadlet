@@ -18,7 +18,6 @@ Notes:
 
 * Only selected armatures and meshes will be exported.
 * Only triangle meshes are supported, convert any quads before exporting.
-* Only sticky UV texture coordinates are supported; per-face UVs will be ignored.
 * Faces without a material will be assigned a dummy one.
 * No operations or transformations are performed by this script, objects are exported exactly as is.
 * Bones with idential names are not supported, and will result in badly exported skeletons
@@ -53,13 +52,24 @@ Select the objects you wish to export and run this script from the "File->Export
 #*
 #********** Copyright header - do not remove **********
 
+
 import Blender
 import bpy
 
+
+class XMSHVertex:	
+	# A list of 2-element lists
+	bones[]
+
+	def __init__(self,mvert):
+		self.index=mvert.index
+		self.co=mvert.co
+		self.no=mvert.no
+		
+	
 def write(filename):
 	# Exporter specific variables
 	mBoneIndicies={}
-	mVertUVs={}
 	mBoneCounter=0
 
 	out = open(filename, "w")
@@ -94,18 +104,66 @@ def write(filename):
 			obMatrix=ob.matrix.copy()
 			mesh.transform(obMatrix,True)
 
+			# Create our initial xmshVerts from the existing mesh verts
+			xmshVerts=[]
+			xmshNewVertIndex=len(mesh.verts)
+			for vert in mesh.verts:
+				xmshVert=XMSHVertex(vert)
+
+				# Assign bones if a skeleton is present
+				if len(mBoneIndicies)>0:
+					bonePairs=mesh.getVertexInfluences(vert.index)
+					for bone in bonePairs:
+						# Only store the bone if it is present in one of the exported armatures
+						if bone[0] in mBoneIndicies:
+							xmshVert.bones.append([mBoneIndicies[bone[0]],bone[1]])
+
+				# Add the new xmshVert
+				xmshVerts.append(xmshVert)
+
+	
 			# Generate a list of face vertex indices by material; adding a dummy material if none exists
-			# Also pack the vertex tex coords into the mVertUVs dictionary
-			# HACK: Currently the vertex tex UV coords are simply overwritten with whatever face is found last
 			xmshMaterials=mesh.materials
 			if len(xmshMaterials)==0:
 				xmshMaterials.append(Blender.Material.New(''))
-			matFaceIndicies=[[] for i in range(len(xmshMaterials))]
+			xmshMatFaceIndicies=[[] for i in range(len(xmshMaterials))]
+
+			# Loop through all mesh faces and fill up our vertex texture coordinates and our matFaceIndicies arrays
+			# XMSH does not handle multiple UV coords per vertex
+			# Instead, we create additional verticies to handle this case, and write out
+			# additional mesh vertices and face indices to handle them.
+			# This dictionary helps track which vertices require new coords
+			xmshVertUVs={} 
 			for face in mesh.faces:
 				for i in range(len(face.verts)):
-					matFaceIndicies[face.mat].append(face.verts[i].index)
+					vert=face.verts[i];
 					if mesh.faceUV:
-						mVertUVs[face.verts[i].index]=face.uv[i]
+						# The presence of FaceUVs means check for a new vertex requirement
+						if vert.index in mVertUVs and (mVertUVs[vert.index].x!=face.uv[i].x or mVertUVs[vert.index].x!=face.uv[i].y):
+							# Found a vertex with multiple UV coords
+							# Create a new vertex, give it these UV coords, and bump it's index
+							xmshVert=XMSHVertex(xmshVerts[vert.index])
+							xmshVert.bones=list(xmshVerts[vert.index].bones)
+							xmshVert.uv=face.uv[i]
+							xmshVert.index=len(xmshVerts)
+
+							# This new vertex goes into our materialFaceIndex 
+							xmshMatFaceIndicies[face.mat].append(xmshVert.index)
+							
+							# Store 
+							xmshVerts.append(xmshVert)
+						else:
+							# Just a new vertex
+							# Assign it's UV coords to an existing xmshVert
+							xmshVerts[vert.index].uv=face.uv[i]
+
+							# Store the UVs and continue
+							mVertUVs[vert.index]=face.uv[i]
+							xmshMatFaceIndicies[face.mat].append(vert.index)
+					else:
+						# No UVs mean no worrying about new vertices
+						xmshMatFaceIndicies[face.mat].append(vert.index)
+
 
 			# Write out all vertexes in the mesh at once
 			out.write('\t<Mesh>\n')
@@ -116,27 +174,22 @@ def write(filename):
 			if len(mBoneIndicies)>0:
 				out.write(',Bone')
 			out.write('\">\n')
-			for vert in mesh.verts:
+			for vert in xmshVerts:
 				out.write('\t\t\t%f,%f,%f %f,%f,%f' % (vert.co.x,vert.co.y,vert.co.z,vert.no.x,vert.no.y,vert.no.z))
-				if vert.index in mVertUVs:
-					out.write(' %f,%f' % (mVertUVs[vert.index].x, mVertUVs[vert.index].y))
-				if len(mBoneIndicies)>0:
-					bonePairs=mesh.getVertexInfluences(vert.index)
-					out.write(' ')
-					first=True
-					for bone in bonePairs:
-						# Only write out the bone if it is present in one of the exported armatures
-						if bone[0] in mBoneIndicies:
-							if not first:
-								out.write(',')
-							out.write('%d,%f' % (mBoneIndicies[bone[0]],bone[1]))
-							first=False
+				if vert.uv:
+					out.write(' %f,%f' % (vert.uv.x, vert.uv.y))
+				first=True
+				for bone in vert.bones:
+					if not first:
+						out.write(',')
+					out.write('%d,%f' % (bone[0], bone[1]))
+					first=False
 				out.write('\n')
 			out.write('\t\t</Vertexes>\n')
 
 			# Write out one submesh per mesh material
-			for i in range(len(matFaceIndicies)):
-				submesh=matFaceIndicies[i]
+			for i in range(len(xmshMatFaceIndicies)):
+				submesh=xmshMatFaceIndicies[i]
 				if len(submesh)==0:
 					continue
 
