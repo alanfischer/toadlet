@@ -60,8 +60,8 @@ import bpy
 class XMSHVertex:	
 	def __init__(self,index,co,no):
 		self.index=index
-		self.co=co.copy()
-		self.no=no.copy()
+		self.co=co
+		self.no=no
 
 		# A list of 2-element lists
 		self.bones=[]
@@ -104,7 +104,7 @@ def write(filename):
 			obMatrix=ob.matrix.copy()
 			mesh.transform(obMatrix,True)
 
-			# Create our initial xmshVerts from the existing mesh verts
+			# Create our initial xmshVerts by referencing the existing mesh verts
 			xmshVerts=[]
 			for vert in mesh.verts:
 				xmshv=XMSHVertex(vert.index,vert.co,vert.no)
@@ -121,7 +121,7 @@ def write(filename):
 				xmshVerts.append(xmshv)
 
 	
-			# Generate a list of face vertex indices by material; adding a dummy material if none exists
+			# Create a list of materials and face vertex indices by material; adding a dummy material if none exists
 			xmshMaterials=mesh.materials
 			if len(xmshMaterials)==0:
 				xmshMaterials.append(Blender.Material.New(''))
@@ -131,20 +131,20 @@ def write(filename):
 			# XMSH does not handle multiple UV coords per vertex
 			# Instead, we create additional verticies to handle this case, and write out
 			# additional mesh vertices and face indices to handle them.
-			# This dictionary helps track which vertices require new coords
+			# The xmshVertUVs dictionary helps us tell which vertices are duplicates
 			xmshVertUVs={} 
 			for face in mesh.faces:
 				for i in range(len(face.verts)):
 					vert=face.verts[i];
 					if mesh.faceUV:
-						# The presence of FaceUVs means check for a new vertex requirement
+						# FaceUVs means check for a new vertex requirement
 						if vert.index in xmshVertUVs and (
 							xmshVertUVs[vert.index].x!=face.uv[i].x or xmshVertUVs[vert.index].y!=face.uv[i].y):
 
 							# Found a vertex with multiple UV coords
 							# Create a new vertex, give it these UV coords, and bump it's index
 							xmshv=XMSHVertex(vert.index,vert.co,vert.no)
-							xmshv.bones=list(xmshVerts[vert.index].bones)
+							xmshv.bones=xmshVerts[vert.index].bones
 							xmshv.uv=face.uv[i]
 							xmshv.index=len(xmshVerts)
 
@@ -158,14 +158,14 @@ def write(filename):
 							# Assign it's UV coords to an existing xmshVert
 							xmshVerts[vert.index].uv=face.uv[i]
 
-							# Store the UVs and continue
+							# Store the UVs for this vertex index and continue
 							xmshVertUVs[vert.index]=face.uv[i]
 							xmshMatFaceIndicies[face.mat].append(vert.index)
 					else:
 						# No UVs mean no worrying about new vertices
 						xmshMatFaceIndicies[face.mat].append(vert.index)
 
-			# Write out all vertexes in the mesh at once
+			# Write out all xmsh vertexes at once
 			out.write('\t<Mesh>\n')
 			out.write('\t\t<Vertexes Count=\"%d\" ' % (len(xmshVerts)))
 			out.write('Type=\"Position,Normal') 
