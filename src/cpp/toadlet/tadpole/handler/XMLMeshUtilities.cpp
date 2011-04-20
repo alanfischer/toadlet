@@ -185,6 +185,10 @@ String makeQuaternion(const Quaternion &q){
 	return String()+scalarToFloat(q.x)+','+scalarToFloat(q.y)+','+scalarToFloat(q.z)+','+scalarToFloat(q.w);
 }
 
+String parseString(const char *string){
+	return String(string).trimLeft().trimRight();
+}
+
 Mesh::VertexBoneAssignmentList parseBoneAssignment(const String &string){
 	int i=0;
 	int c=0;
@@ -326,6 +330,23 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 				}
 			}
 		}
+
+		mxml_node_t *shadeNode=mxmlFindChild(node,"Shade");
+		if(shadeNode!=NULL){
+			const char *data=mxmlGetOpaque(shadeNode->child);
+			if(data!=NULL){
+				String dataString=parseString(data).toLower();
+				if(dataString=="flat"){
+					materialState.shade=MaterialState::ShadeType_FLAT;
+				}
+				else if(dataString=="gouraud"){
+					materialState.shade=MaterialState::ShadeType_GOURAUD;
+				}
+				else if(dataString=="phong"){
+					materialState.shade=MaterialState::ShadeType_PHONG;
+				}
+			}
+		}
 	}
 	material->setMaterialState(materialState);
 
@@ -335,27 +356,15 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 		if(faceCullingNode!=NULL){
 			const char *data=mxmlGetOpaque(faceCullingNode->child);
 			if(data!=NULL){
-				if(version<=2){
-					if(strcmp(data,"Back")==0){
-						rasterizerState.set(RasterizerState::CullType_BACK);
-					}
-					else if(strcmp(data,"Front")==0){
-						rasterizerState.set(RasterizerState::CullType_FRONT);
-					}
-					else if(strcmp(data,"None")==0){
-						rasterizerState.set(RasterizerState::CullType_NONE);
-					}
+				String dataString=parseString(data).toLower();
+				if(dataString=="back"){
+					rasterizerState.set(RasterizerState::CullType_BACK);
 				}
-				else{
-					if(strcmp(data,"back")==0){
-						rasterizerState.set(RasterizerState::CullType_BACK);
-					}
-					else if(strcmp(data,"front")==0){
-						rasterizerState.set(RasterizerState::CullType_FRONT);
-					}
-					else if(strcmp(data,"none")==0){
-						rasterizerState.set(RasterizerState::CullType_NONE);
-					}
+				else if(dataString=="front"){
+					rasterizerState.set(RasterizerState::CullType_FRONT);
+				}
+				else if(dataString=="none"){
+					rasterizerState.set(RasterizerState::CullType_NONE);
 				}
 			}
 		}
@@ -501,6 +510,21 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,P
 			mxml_node_t *trackColorNode=mxmlNewElement(materialStateNode,"TrackColor");
 			{
 				mxmlNewOpaque(trackColorNode,makeInt(materialState.trackColor));
+			}
+		}
+
+		mxml_node_t *shadeNode=mxmlNewElement(materialNode,"Shade");
+		{
+			switch(materialState.shade){
+				case MaterialState::ShadeType_FLAT:
+					mxmlNewOpaque(shadeNode,"flat");
+				break;
+				case MaterialState::ShadeType_GOURAUD:
+					mxmlNewOpaque(shadeNode,"gouraud");
+				break;
+				case MaterialState::ShadeType_PHONG:
+					mxmlNewOpaque(shadeNode,"phong");
+				break;
 			}
 		}
 	}

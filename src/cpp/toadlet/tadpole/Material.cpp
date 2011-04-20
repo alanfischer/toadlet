@@ -59,7 +59,9 @@ void Material::destroy(){
 
 	int i;
 	for(i=0;i<mTextures.size();++i){
-		mTextures[i]->release();
+		if(mTextures[i]!=NULL){
+			mTextures[i]->release();
+		}
 	}
 	mTextures.clear();
 }

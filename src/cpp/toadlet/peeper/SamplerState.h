@@ -61,7 +61,7 @@ public:
 		//borderColor,
 
 		minLOD(0),
-		maxLOD(egg::Extents::MAX_INT),
+		maxLOD(1000),
 
 		perspective(true)
 	{}
