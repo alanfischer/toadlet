@@ -64,6 +64,7 @@ public:
 		bool hasOwnTransform;
 		Transform worldTransform;
 		Bound worldBound;
+		int scope;
 	};
 
 	/// Specialization of the Controller that allows for easy access to playing single sequences.

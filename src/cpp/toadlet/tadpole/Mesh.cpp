@@ -33,8 +33,6 @@ using namespace toadlet::peeper;
 namespace toadlet{
 namespace tadpole{
 
-Sphere Mesh::Bound_AUTOCALCULATE(-2);
-
 Mesh::Mesh():BaseResource(){
 }
 
@@ -66,29 +64,7 @@ void Mesh::destroy(){
 }
 
 void Mesh::compile(){
-	/// @todo: We cant always read the VB here if it wasnt created with the proper bits.  So this needs to be rethought
-/*	if(bound.equals(Bound_AUTOCALCULATE)){
-		scalar ls=0;
-		VertexBufferAccessor vba;
-		Vector3 temp;
-		int i,j;
-		for(i=0;i<staticVertexData->getNumVertexBuffers();++i){
-			vba.lock(staticVertexData->getVertexBuffer(0),Buffer::Access_BIT_READ);
-
-			for(j=0;j<vba.getSize();++j){
-				vba.get3(j,0,temp);
-				ls=Math::lengthSquared(temp);
-				if(ls>bound.radius){
-					bound.radius=ls;
-				}
-			}
-
-			vba.unlock();
-		}
-
-		bound.radius=Math::sqrt(bound.radius);
-	}
-*/}
+}
 
 }
 }

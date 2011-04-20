@@ -23,11 +23,13 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Logger.h>
 #include <toadlet/tadpole/DecalShadowSceneRenderer.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
 
 using namespace toadlet;
+using namespace toadlet::egg;
 using namespace toadlet::peeper;
 using namespace toadlet::tadpole::node;
 
@@ -43,9 +45,11 @@ DecalShadowSceneRenderer::DecalShadowSceneRenderer(Scene *scene):
 DecalShadowSceneRenderer::~DecalShadowSceneRenderer(){
 }
 
-void DecalShadowSceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,CameraNode *camera){
-	SceneRenderer::renderRenderables(set,renderer,camera);
-	
+void DecalShadowSceneRenderer::renderScene(Renderer *renderer,Node *node,CameraNode *camera){
+	gatherRenderables(mRenderableSet,node,camera);
+	renderRenderables(mRenderableSet,renderer,camera);
+
+	RenderableSet *set=mRenderableSet;
 	LightNode *light=NULL;
 	if(set->getLightQueue().size()>0){
 		light=set->getLightQueue()[0].light;
