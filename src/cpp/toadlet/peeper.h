@@ -43,12 +43,8 @@
 #include <toadlet/peeper/Query.h>
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/RenderTarget.h>
-#include <toadlet/peeper/SectionTexture.h>
-#include <toadlet/peeper/SequenceTexture.h>
 #include <toadlet/peeper/Shader.h>
 #include <toadlet/peeper/Texture.h>
-#include <toadlet/peeper/TextureBlend.h>
-#include <toadlet/peeper/TextureStage.h>
 #include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/peeper/VertexData.h>
