@@ -38,9 +38,9 @@ public:
 	DecalShadowSceneRenderer(Scene *scene);
 	virtual ~DecalShadowSceneRenderer();
 
-protected:
-	virtual void renderRenderables(RenderableSet *set,peeper::Renderer *renderer,node::CameraNode *camera);
+	void renderScene(peeper::Renderer *renderer,node::Node *node,node::CameraNode *camera);
 
+protected:
 	Material::ptr mShadowMaterial;
 };
 

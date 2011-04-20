@@ -74,7 +74,8 @@ Scene::Scene(Engine *engine):
 
 	mSceneRenderer=SceneRenderer::ptr(new SceneRenderer(this));
 
-	mBoundMesh=mEngine->getMeshManager()->createSphere(Sphere(Math::ONE),8,8);
+	mSphereMesh=mEngine->getMeshManager()->createSphere(Sphere(Math::ONE),8,8);
+	mAABoxMesh=mEngine->getMeshManager()->createBox(AABox(-Math::ONE,-Math::ONE,-Math::ONE,Math::ONE,Math::ONE,Math::ONE));
 }
 
 Scene::~Scene(){
@@ -300,18 +301,29 @@ int Scene::countActiveNodes(Node *node){
 
 void Scene::renderBoundingVolumes(Renderer *renderer,Node *node){
 	if(node==NULL){
-		mBoundMesh->subMeshes[0]->material->setupRenderer(renderer);
+		mSphereMesh->subMeshes[0]->material->setupRenderer(renderer);
 		renderBoundingVolumes(renderer,mRoot);
 		return;
 	}
 
-	if(node->getWorldBound().getSphere().radius>0){
-		const Sphere &sphere=node->getWorldBound().getSphere();
-		Matrix4x4 transform;
-		Math::setMatrix4x4FromTranslate(transform,sphere.origin);
-		Math::setMatrix4x4FromScale(transform,sphere.radius,sphere.radius,sphere.radius);
-		renderer->setModelMatrix(transform);
-		renderer->renderPrimitive(mBoundMesh->staticVertexData,mBoundMesh->subMeshes[0]->indexData);
+	Matrix4x4 transform;
+	const Bound &bound=node->getWorldBound();
+	switch(bound.getType()){
+		case Bound::Type_SPHERE:{
+			const Sphere &sphere=bound.getSphere();
+			Math::setMatrix4x4FromTranslate(transform,sphere.origin);
+			Math::setMatrix4x4FromScale(transform,sphere.radius,sphere.radius,sphere.radius);
+			renderer->setModelMatrix(transform);
+			renderer->renderPrimitive(mSphereMesh->staticVertexData,mSphereMesh->subMeshes[0]->indexData);
+		}break;
+		case Bound::Type_AABOX:{
+			const AABox &box=bound.getAABox();
+			Vector3 origin=(box.maxs - box.mins)/2 + box.mins;
+			Math::setMatrix4x4FromTranslate(transform,origin);
+			Math::setMatrix4x4FromScale(transform,origin.x-box.mins.x,origin.y-box.mins.y,origin.z-box.mins.z);
+			renderer->setModelMatrix(transform);
+			renderer->renderPrimitive(mAABoxMesh->staticVertexData,mAABoxMesh->subMeshes[0]->indexData);
+		}break;
 	}
 
 	ParentNode *parent=node->isParent();
