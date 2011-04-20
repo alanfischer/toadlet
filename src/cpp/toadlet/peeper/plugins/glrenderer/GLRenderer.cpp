@@ -1151,7 +1151,7 @@ void GLRenderer::setTextureStatePostTexture(int i,TextureState *state){
 		}
 
 		// Setup TexCoordIndex
-		texCoordIndex==state->texCoordIndex;
+		texCoordIndex=state->texCoordIndex;
 
 		// Setup calculations
 		TextureState::CalculationType calculation=state->calculation;

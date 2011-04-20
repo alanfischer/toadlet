@@ -142,8 +142,9 @@ Resource::ptr ResourceManager::manage(const Resource::ptr &resource,const String
 
 void ResourceManager::unmanage(Resource *resource){
 	if(mResources.contains(resource)==false){
-		Logger::alert(Categories::TOADLET_TADPOLE,
-			"Error unmanaging resource, check inheritance heiarchy");
+		Error::unknown(Categories::TOADLET_TADPOLE,
+			"Error unmanaging resource, check that resource is managed, or check inheritance heiarchy");
+		return;
 	}
 	else{
 		int handle=resource->getUniqueHandle();
