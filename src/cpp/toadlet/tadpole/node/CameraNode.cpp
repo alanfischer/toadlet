@@ -379,8 +379,7 @@ void CameraNode::render(Renderer *renderer,Node *node){
 	mVisibleCount=0;
 
 	mScene->render(renderer,this,node);
-	/// @todo: Now that begin/endScene is in render, this no longer works... :(
-//	renderOverlayGamma(renderer);
+	renderOverlayGamma(renderer);
 }
 
 Image::ptr CameraNode::renderToImage(Renderer *renderer,int format,int width,int height){
