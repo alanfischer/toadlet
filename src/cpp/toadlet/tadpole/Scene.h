@@ -130,7 +130,7 @@ protected:
 	peeper::FogState mFogState;
 	SceneRenderer::ptr mSceneRenderer;
 
-	Mesh::ptr mBoundMesh;
+	Mesh::ptr mSphereMesh,mAABoxMesh;
 };
 
 }
