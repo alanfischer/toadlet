@@ -44,6 +44,7 @@ Font::Font(float pointSize,int innerSpace,Texture::ptr texture,const wchar *char
 	mPointSize=pointSize;
 	mInnerSpace=innerSpace;
 	mTexture=texture;
+	mTexture->retain();
 
 	mGlyphs.resize(Extents::MAX_UNSIGNED_CHAR,NULL);
 	int i;
