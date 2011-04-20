@@ -70,6 +70,9 @@ protected:
 	Skeleton::ptr readSkeleton(egg::io::DataStream *stream,int blockSize);
 	void writeSkeleton(egg::io::DataStream *stream,Skeleton::ptr skeleton);
 
+	TransformSequence::ptr readSequence(egg::io::DataStream *stream,int blockSize);
+	void writeSequence(egg::io::DataStream *stream,TransformSequence::ptr sequence);
+
 	// Blocks for the tmsh format
 	enum Block{
 		Block_MESH=		1,

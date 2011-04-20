@@ -63,8 +63,8 @@ Resource::ptr TMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 	Mesh::ptr mesh;
 	Collection<Material::ptr> materials;
 	Skeleton::ptr skeleton;
-/*	Collection<TransformSequence::ptr> sequences;
-*/	while(stream->position()<stream->length()){
+	Collection<TransformSequence::ptr> sequences;
+	while(stream->position()<stream->length()){
 		int blockType=dataStream->readInt32();
 		int blockSize=dataStream->readInt32();
 		switch(blockType){
@@ -77,10 +77,10 @@ Resource::ptr TMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 			case Block_SKELETON:
 				skeleton=readSkeleton(dataStream,blockSize);
 			break;
-/*			case Block_SEQUENCE:
+			case Block_SEQUENCE:
 				sequences.add(readSequence(dataStream,blockSize));
 			break;
-*/			default:
+			default:
 				stream->seek(stream->position()+blockSize);
 			break;
 		}
@@ -97,14 +97,17 @@ Resource::ptr TMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 		}
 	}
 
+	if(skeleton!=NULL){
+		for(i=0;i<sequences.size();++i){
+			skeleton->sequences.add(sequences[i]);
+		}
+	}
+
 	mesh->skeleton=skeleton;
 	if(mesh->skeleton!=NULL){
 		skeleton->retain();
 	}
 
-/*
-	TODO: Link skeleton to sequences
-*/
 	return mesh;
 }
 
@@ -143,6 +146,15 @@ bool TMSHHandler::save(Mesh::ptr mesh,Stream::ptr stream){
 		dataStream->writeInt32(memoryStream->length());
 		dataStream->write(memoryStream->getOriginalDataPointer(),memoryStream->length());
 		memoryStream->reset();
+
+		for(i=0;i<mesh->skeleton->sequences.size();++i){
+			TransformSequence::ptr sequence=mesh->skeleton->sequences[i];
+			writeSequence(dataMemoryStream,sequence);
+			dataStream->writeInt32(Block_SEQUENCE);
+			dataStream->writeInt32(memoryStream->length());
+			dataStream->write(memoryStream->getOriginalDataPointer(),memoryStream->length());
+			memoryStream->reset();
+		}
 	}
 
 	return true;
@@ -532,6 +544,60 @@ void TMSHHandler::writeSkeleton(DataStream *stream,Skeleton::ptr skeleton){
 
 		stream->writeNullTerminatedString(bone->name);
 	}
+}
+
+TransformSequence::ptr TMSHHandler::readSequence(egg::io::DataStream *stream,int blockSize){
+	TransformSequence::ptr sequence(new TransformSequence());
+
+	sequence->tracks.resize(stream->readInt32());
+
+	int i,j;
+	for(i=0;i<sequence->tracks.size();++i){
+		TransformTrack::ptr track(new TransformTrack());
+		sequence->tracks[i]=track;
+
+		track->index=stream->readInt32();
+		track->length=stream->readFloat();
+		track->keyFrames.resize(stream->readInt32());
+
+		for(j=0;j<track->keyFrames.size();++j){
+			TransformKeyFrame frame;
+			frame.time=stream->readFloat();
+			stream->readVector3(frame.translate);
+			stream->readQuaternion(frame.rotate);
+			stream->readVector3(frame.scale);
+			track->keyFrames[j]=frame;
+		}
+	}
+
+	sequence->length=stream->readFloat();
+	sequence->hasScale=stream->readBool();
+
+	return sequence;
+}
+
+void TMSHHandler::writeSequence(egg::io::DataStream *stream,TransformSequence::ptr sequence){
+	stream->writeInt32(sequence->tracks.size());
+
+	int i,j;
+	for(i=0;i<sequence->tracks.size();++i){
+		TransformTrack *track=sequence->tracks[i];
+
+		stream->writeInt32(track->index);
+		stream->writeFloat(track->length);
+		stream->writeInt32(track->keyFrames.size());
+
+		for(j=0;j<track->keyFrames.size();++j){
+			const TransformKeyFrame &frame=track->keyFrames[j];
+			stream->writeFloat(frame.time);
+			stream->writeVector3(frame.translate);
+			stream->writeQuaternion(frame.rotate);
+			stream->writeVector3(frame.scale);
+		}
+	}
+
+	stream->writeFloat(sequence->length);
+	stream->writeBool(sequence->hasScale);
 }
 
 }
