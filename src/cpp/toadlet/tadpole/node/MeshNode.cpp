@@ -43,7 +43,8 @@ namespace node{
 TOADLET_NODE_IMPLEMENT(MeshNode,Categories::TOADLET_TADPOLE_NODE+".MeshNode");
 
 MeshNode::SubMesh::SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh):
-	hasOwnTransform(false)
+	hasOwnTransform(false),
+	scope(-1)
 {
 	this->meshNode=meshNode;
 	this->meshSubMesh=meshSubMesh;
@@ -213,7 +214,8 @@ MeshNode::SubMesh *MeshNode::getSubMesh(const String &name){
 
 	int i;
 	for(i=0;i<mMesh->subMeshes.size();++i){
-		if(mMesh->subMeshes[i]->name.equals(name)){
+		Mesh::SubMesh *subMesh=mMesh->subMeshes[i];
+		if(subMesh->name.equals(name)){
 			return mSubMeshes[i];
 		}
 	}
@@ -272,7 +274,7 @@ void MeshNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 	int i;
 	for(i=0;i<mSubMeshes.size();++i){
 		SubMesh *subMesh=mSubMeshes[i];
-		if(subMesh->hasOwnTransform==false || camera->culled(subMesh->worldBound)==false){
+		if((subMesh->scope&camera->getScope())>0 && (subMesh->hasOwnTransform==false || camera->culled(subMesh->worldBound)==false)){
 			set->queueRenderable(subMesh);
 		}
 	}
