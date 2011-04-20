@@ -19,7 +19,6 @@ Notes:
 * Only selected armatures and meshes will be exported.
 * Only triangle meshes are supported, convert any quads before exporting.
 * Faces without a material will be assigned a dummy one.
-* No operations or transformations are performed by this script, objects are exported exactly as is.
 * Bones with idential names are not supported, and will result in badly exported skeletons
 
 Usage:
@@ -194,7 +193,7 @@ def export(filename):
 						# No UVs mean no worrying about new vertices
 						xmshMatFaceIndicies[face.mat].append(vert.index)
 
-			# Write out all xmsh vertexes at once
+			# Write out all xmsh verticies at once
 			out.write('\t<Mesh>\n')
 			out.write('\t\t<Vertexes Count=\"%d\" ' % (len(xmshVerts)))
 			out.write('Type=\"Position,Normal') 
@@ -286,12 +285,10 @@ def export(filename):
 				out.write(' Name=\"%s\"' % (bone.name))
 				out.write('>\n')
 
-				# TODO: boneMat=bone.matrix['BONESPACE'] <- This gives a 3x3 of rotations only. Does it have any value in this export?
+				# XMSH skeletons require each bone matrix to be in the space of its parent.
 				# Hints on blender bone matricies:
 				#	http://www.devmaster.net/forums/showthread.php?t=15178
 				#	http://www.blender.org/development/release-logs/blender-240/how-armatures-work/
-				# XMSH skeletons require each bone matrix to be in the space of its parent.
-				# Try out the transforms suggested in the above links to achieve this:
 				if bone.parent:
 					parentMat=bone.parent.matrix['ARMATURESPACE'].copy()
 					parentMat.invert()
@@ -314,7 +311,7 @@ def export(filename):
 	out.write('</XMSH>\n')
 	out.close()
 
-	# Call the mesh optimizer
+	# Call the mesh optimizer if requested
 	if tmshoptimizer and runOptimizer==1:
 		if not Blender.Draw.PupBlock("Export Done",["Begin Optimization?"]):
 			return
