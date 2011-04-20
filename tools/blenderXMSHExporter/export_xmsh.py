@@ -55,6 +55,7 @@ Select the objects you wish to export and run this script from the "File->Export
 
 import Blender
 import bpy
+import os,sys,subprocess
 
 
 class XMSHVertex:	
@@ -67,16 +68,44 @@ class XMSHVertex:
 		self.bones=[]
 		
 	
-def write(filename):
+def export(filename):
 	# Exporter specific variables
 	mBoneIndicies={}
 	mBoneCounter=0
 
+	# Try to find the tmshoptimizer executable
+	tmshoptimizer=None
+	path=os.environ['PATH']
+	paths=path.split(os.pathsep)
+	if sys.platform=='win32':
+		exe="tmshoptimizer.exe"
+	else:
+		exe="tmshoptimizer"
+	if os.path.isfile(os.path.join(os.curdir,exe)):
+		tmshoptimizer=os.path.join(os.curdir,exe)
+	else:
+		for p in paths:
+			f=os.path.join(p,exe)
+			if os.path.isfile(f):
+				tmshoptimizer=f
+				break
+
+	# If available, give the user the option to optimize the xmsh
+	if tmshoptimizer:
+		runOptimizer=Blender.Draw.Create(1)
+		options=[]
+		options.append(("Optimize XMSH",runOptimizer,"If tmshOptimizer is present, optimize the output xmsh"))
+		if not Blender.Draw.PupBlock("Toadlet XMSH Exporter", options):
+			return
+
+	# Write out the xmsh file
 	out = open(filename, "w")
 	out.write('<XMSH Version="3">\n')
 
 	scene = bpy.data.scenes.active
 	objects = scene.objects.selected
+
+	Blender.Window.WaitCursor(1)
 
 	# The XMSH format references bones by index, not by name as blender does.
 	# Find all armatures to create a name,index dictionary for all bones.
@@ -176,11 +205,13 @@ def write(filename):
 			out.write('\">\n')
 			for vert in xmshVerts:
 				out.write('\t\t\t%f,%f,%f %f,%f,%f' % (vert.co.x,vert.co.y,vert.co.z,vert.no.x,vert.no.y,vert.no.z))
-				if vert.uv:
+				if mesh.faceUV:
 					out.write(' %f,%f' % (vert.uv.x, vert.uv.y))
 				first=True
 				for bone in vert.bones:
-					if not first:
+					if first:
+						out.write(' ')
+					else:
 						out.write(',')
 					out.write('%d,%f' % (bone[0], bone[1]))
 					first=False
@@ -283,5 +314,17 @@ def write(filename):
 	out.write('</XMSH>\n')
 	out.close()
 
-Blender.Window.FileSelector(write, "Export toadlet XMSH", Blender.sys.makename(ext='.xmsh'))
+	# Call the mesh optimizer
+	if tmshoptimizer and runOptimizer==1:
+		if not Blender.Draw.PupBlock("Export Done",["Begin Optimization?"]):
+			return
+		args=[tmshoptimizer,filename]
+		text=subprocess.Popen(args,stdout=subprocess.PIPE).communicate()[0]
+		texts=text.split("\n")
+		if not Blender.Draw.PupBlock("Optimizer Done",texts):
+			return
+
+	Blender.Window.WaitCursor(0)
+
+Blender.Window.FileSelector(export, "Export toadlet XMSH", Blender.sys.makename(ext='.xmsh'))
 
