@@ -150,7 +150,7 @@ void StudioHandler::buildBuffers(StudioModel *model){
 
 					for(;l>0;l--,tricmds+=4){
 						// Setting these manually, they dont appear to be set in the mdl
-						if((stexture->flags&STUDIO_NF_CHROME)>0){
+						if((stexture->flags&STUDIO_NF_CHROME)!=0){
 							model->bone(snormbone[tricmds[1]])->flags|=STUDIO_HAS_CHROME;
 						}
 
@@ -183,7 +183,7 @@ void StudioHandler::buildMaterials(StudioModel *model){
 		Material::ptr material=mEngine->getMaterialManager()->createMaterial();
 		material->retain();
 		material->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
-		material->setMaterialState(MaterialState(true,false,(stexture->flags&STUDIO_NF_FLATSHADE)>0?MaterialState::ShadeType_FLAT:MaterialState::ShadeType_GOURAUD));
+		material->setMaterialState(MaterialState(true,false,(stexture->flags&STUDIO_NF_FLATSHADE)!=0?MaterialState::ShadeType_FLAT:MaterialState::ShadeType_GOURAUD));
 		material->setTexture(0,model->textures[i]);
 
 		model->materials[i]=material;

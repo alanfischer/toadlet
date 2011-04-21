@@ -560,16 +560,21 @@ void GLRenderer::setViewport(const Viewport &viewport){
 void GLRenderer::clear(int clearFlags,const Vector4 &clearColor){
 	int bufferBits=0;
 
+GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
+if(status!=GL_FRAMEBUFFER_COMPLETE){
+	Error::unknown(Categories::TOADLET_PEEPER,GLFBORenderTarget::getFBOMessage(status));
+}
+
 	TOADLET_CHECK_GLERROR("entering clear");
 
-	if((clearFlags & ClearFlag_COLOR)>0){
+	if((clearFlags & ClearFlag_COLOR)!=0){
 		bufferBits|=GL_COLOR_BUFFER_BIT;
 		glClearColor(clearColor.x,clearColor.y,clearColor.z,clearColor.w);
 	}
-	if((clearFlags & ClearFlag_DEPTH)>0){
+	if((clearFlags & ClearFlag_DEPTH)!=0){
 		bufferBits|=GL_DEPTH_BUFFER_BIT;
 	}
-	if((clearFlags & ClearFlag_STENCIL)>0){
+	if((clearFlags & ClearFlag_STENCIL)!=0){
 		bufferBits|=GL_STENCIL_BUFFER_BIT;
 	}
 

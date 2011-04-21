@@ -199,9 +199,6 @@ public:
 		if(vec.z>maxs.z)maxs.z=vec.z;
 	}
 
-	void rotate(const Matrix3x3 &rotation);
-	void rotate(const Matrix3x3 &rotation,Vector3 tempBuffer[8]);
-
 	inline bool equals(const AABox &box) const{
 		return (box.mins.equals(mins) && box.maxs.equals(maxs));
 	}

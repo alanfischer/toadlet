@@ -669,7 +669,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 		}
 	}
 
-	if((scope&Scope_REPORT_COLLISIONS)>0){
+	if((scope&Scope_REPORT_COLLISIONS)!=0){
 		reportCollisions();
 	}
 

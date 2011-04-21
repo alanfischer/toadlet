@@ -230,7 +230,7 @@ bool D3D10Texture::createContext(int mipLevels,byte *mipDatas[]){
 		}break;
 	}
 
-	if(SUCCEEDED(result) && (bindFlags&D3D10_BIND_SHADER_RESOURCE)>0){
+	if(SUCCEEDED(result) && (bindFlags&D3D10_BIND_SHADER_RESOURCE)!=0){
 		result=device->CreateShaderResourceView(mTexture,NULL,&mShaderResourceView);
 	}
 

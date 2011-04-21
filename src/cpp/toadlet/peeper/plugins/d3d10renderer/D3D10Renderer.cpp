@@ -144,7 +144,7 @@ samp=NULL;
 "VS_OUTPUT VS( float4 Pos : POSITION, float2 TexCoords : TEXCOORD){\n"
   "VS_OUTPUT Output = (VS_OUTPUT)0;\n"
   "Output.Pos = mul(Pos, ShaderMatrix);\n"
-  "Output.TexCoords=TexCoords;\n"//mul(TexCoords,textureMatrix);\n"
+  "Output.TexCoords=mul(TexCoords,textureMatrix);\n"
   "return Output;\n"
 "}\n"
 
@@ -503,10 +503,13 @@ bool D3D10Renderer::setRenderStateSet(RenderStateSet *set){
 		mD3DDevice->RSSetState(d3dset->mD3DRasterizerState);
 	}
 
+// These need to be moved/cleaned
 if(d3dset->mD3DSamplerStates.size()>0)samp=d3dset->mD3DSamplerStates[0];
 	mD3DDevice->VSSetSamplers(0,d3dset->mD3DSamplerStates.size(),d3dset->mD3DSamplerStates.begin());
 	mD3DDevice->PSSetSamplers(0,d3dset->mD3DSamplerStates.size(),d3dset->mD3DSamplerStates.begin());
 	mD3DDevice->GSSetSamplers(0,d3dset->mD3DSamplerStates.size(),d3dset->mD3DSamplerStates.begin());
+
+if(d3dset->mTextureStates.size()>0)effect->GetVariableByName("textureMatrix")->AsMatrix()->SetMatrix(d3dset->mTextureStates[0]->matrix.getData());
 
 if(d3dset->mMaterialState!=NULL){
 effect->GetVariableByName("diffuseColor")->AsVector()->SetFloatVector((float*)d3dset->mMaterialState->diffuse.getData());
@@ -522,10 +525,8 @@ void D3D10Renderer::setTexture(int i,Texture *texture){
 	Matrix4x4 textureMatrix;
 	if(texture){
 		textureView=((D3D10Texture*)(texture->getRootTexture()))->mShaderResourceView;
-//		textureMatrix.set(textureStage->matrix);
 	}
 effect->GetVariableByName("diffuseTexture")->AsShaderResource()->SetResource(textureView);
-//effect->GetVariableByName("textureMatrix")->AsMatrix()->SetMatrix(textureMatrix.data);
 effect->GetVariableByName("useTexture")->AsScalar()->SetFloat(texture!=NULL);
 }
 
