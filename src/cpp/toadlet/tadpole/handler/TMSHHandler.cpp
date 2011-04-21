@@ -517,6 +517,8 @@ Skeleton::ptr TMSHHandler::readSkeleton(DataStream *stream,int blockSize){
 		stream->readVector3(bone->worldToBoneTranslate);
 		stream->readQuaternion(bone->worldToBoneRotate);
 
+		stream->readAABox(bone->bound);
+
 		stream->readNullTerminatedString(bone->name);
 
 		skeleton->bones[i]=bone;
@@ -541,6 +543,8 @@ void TMSHHandler::writeSkeleton(DataStream *stream,Skeleton::ptr skeleton){
 
 		stream->writeVector3(bone->worldToBoneTranslate);
 		stream->writeQuaternion(bone->worldToBoneRotate);
+
+		stream->writeAABox(bone->bound);
 
 		stream->writeNullTerminatedString(bone->name);
 	}
