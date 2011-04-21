@@ -64,6 +64,35 @@ void Mesh::destroy(){
 }
 
 void Mesh::compile(){
+	compileBoneBounds();
+}
+
+void Mesh::compileBoneBounds(){
+	if(skeleton!=NULL){
+		VertexBufferAccessor vba(staticVertexData->getVertexBuffer(0),Buffer::Access_BIT_READ);
+
+		Collection<bool> touched(vertexBoneAssignments.size(),false);
+
+		Vector3 v;
+		int i,j;
+		for(i=0;i<vertexBoneAssignments.size();++i){
+			const VertexBoneAssignmentList &vbal=vertexBoneAssignments[i];
+			for(j=0;j<vbal.size();++j){
+				Skeleton::Bone *bone=skeleton->bones[vbal[j].bone];
+				vba.get3(i,0,v);
+				Math::sub(v,bone->worldToBoneTranslate);
+				if(touched[i]==false){
+					touched[i]=true;
+					bone->bound.set(v,v);
+				}
+				else{
+					bone->bound.merge(v);
+				}
+			}
+		}
+
+		vba.unlock();
+	}
 }
 
 }

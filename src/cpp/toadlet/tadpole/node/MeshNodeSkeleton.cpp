@@ -45,6 +45,7 @@ MeshNodeSkeleton::MeshNodeSkeleton(MeshNode* node,Skeleton::ptr skeleton):
 	//mSequence,
 	mSequenceTime(0)
 {
+	mEngine=node->getEngine();
 	mNode=node;
 	mSkeleton=skeleton;
 
@@ -59,14 +60,30 @@ MeshNodeSkeleton::MeshNodeSkeleton(MeshNode* node,Skeleton::ptr skeleton):
 	updateBones();
 }
 
+void MeshNodeSkeleton::destroy(){
+	if(mSkeletonMaterial!=NULL){
+		mSkeletonMaterial->release();
+		mSkeletonMaterial=NULL;
+
+		destroySkeletonBuffers();
+	}
+}
+
 void MeshNodeSkeleton::updateBones(){
 	int i;
 	for(i=0;i<mBones.size();++i){
 		updateBone(mBones[i]);
+
+		if(i==0){
+			mBound.set(mBones[i]->worldBound);
+		}
+		else{
+			mBound.merge(mBones[i]->worldBound);
+		}
 	}
 
-	if(mVertexData!=NULL){
-		updateVertexData();
+	if(mSkeletonMaterial!=NULL){
+		updateSkeletonBuffers();
 	}
 
 	if(mNode!=NULL){
@@ -264,49 +281,93 @@ void MeshNodeSkeleton::updateBone(Bone *bone){
 		Math::mul(quaternion,bone->worldRotate,sbone->worldToBoneRotate);
 		Math::setMatrix3x3FromQuaternion(bone->boneSpaceRotate,quaternion);
 	}
+
+	Math::mul(bone->worldBound,bone->worldRotateMatrix,sbone->bound);
+	Math::add(bone->worldBound,bone->worldTranslate);
 }
 
-void MeshNodeSkeleton::setRenderable(bool renderable){
-	if(renderable){
-		Engine *engine=mNode->getEngine();
-		int i;
-		mMaterial=engine->getMaterialManager()->createMaterial();
-		mMaterial->retain();
-		mMaterial->setMaterialState(MaterialState(Colors::GREEN));
-		mMaterial->setDepthState(DepthState(DepthState::DepthTest_NONE,false));
-
-		IndexBuffer::ptr indexBuffer=engine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,(mBones.size()-1)*2);
-		IndexBufferAccessor iba;
-		{
-			iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
-			for(i=1;i<mBones.size();++i){
-				iba.set((i-1)*2+0,mSkeleton->bones[i]->parentIndex<0?0:mSkeleton->bones[i]->parentIndex);
-				iba.set((i-1)*2+1,i);
-			}
-			iba.unlock();
+void MeshNodeSkeleton::setRenderSkeleton(bool skeleton){
+	if(skeleton){
+		if(mSkeletonMaterial==NULL){
+			mSkeletonMaterial=mEngine->getMaterialManager()->createMaterial();
+			mSkeletonMaterial->setDepthState(DepthState(DepthState::DepthTest_NONE,false));
+			mSkeletonMaterial->setPointState(PointState(true,8,false,0,0,0,0,0));
 		}
-		mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,indexBuffer));
-
-		VertexBuffer::ptr vertexBuffer=engine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,engine->getVertexFormats().POSITION,mBones.size());
-		mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
-
-		updateVertexData();
 	}
 	else{
-		mMaterial=NULL;
-		mIndexData=NULL;
-		mVertexData=NULL;
+		if(mSkeletonMaterial!=NULL){
+			mSkeletonMaterial->destroy();
+		}
+	}
+
+	// Always recreate the buffers, since we may have a different skeleton
+	destroySkeletonBuffers();
+	if(mSkeletonMaterial!=NULL){
+		createSkeletonBuffers();
 	}
 }
 
-void MeshNodeSkeleton::updateVertexData(){
-	VertexBufferAccessor vba;
-	vba.lock(mVertexData->getVertexBuffer(0),Buffer::Access_BIT_WRITE);
+void MeshNodeSkeleton::createSkeletonBuffers(){
 	int i;
+
+	IndexBuffer::ptr skeletonIndexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,(mBones.size()-1)*2);
+	IndexBufferAccessor iba;
+	{
+		iba.lock(skeletonIndexBuffer,Buffer::Access_BIT_WRITE);
+		for(i=1;i<mBones.size();++i){
+			iba.set((i-1)*2+0,mSkeleton->bones[i]->parentIndex<0?0:mSkeleton->bones[i]->parentIndex);
+			iba.set((i-1)*2+1,i);
+		}
+		iba.unlock();
+	}
+
+	mSkeletonIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,skeletonIndexBuffer));
+	mSkeletonVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION,mBones.size());
+	mSkeletonVertexData=VertexData::ptr(new VertexData(mSkeletonVertexBuffer));
+
+	mHitBoxVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION,mBones.size()*8);
+	mHitBoxVertexData=VertexData::ptr(new VertexData(mHitBoxVertexBuffer));
+	mHitBoxIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,NULL,0,mHitBoxVertexBuffer->getSize()));
+
+	updateSkeletonBuffers();
+}
+
+void MeshNodeSkeleton::updateSkeletonBuffers(){
+	VertexBufferAccessor vba;
+	vba.lock(mSkeletonVertexBuffer,Buffer::Access_BIT_WRITE);
+	int i,j;
 	for(i=0;i<mBones.size();++i){
 		vba.set3(i,0,mBones[i]->worldTranslate);
 	}
 	vba.unlock();
+
+	vba.lock(mHitBoxVertexBuffer);
+	Vector3 verts[8];
+	for(i=0;i<mBones.size();++i){
+		mBones[i]->worldBound.getVertexes(verts);
+		for(j=0;j<8;++j){
+			vba.set3(i*8+j,0,verts[j]);
+		}
+	}
+	vba.unlock();
+}
+
+void MeshNodeSkeleton::destroySkeletonBuffers(){
+	if(mSkeletonVertexData!=NULL){
+		mSkeletonVertexData->destroy();
+		mSkeletonIndexData->destroy();
+		mSkeletonVertexBuffer=NULL;
+		mSkeletonVertexData=NULL;
+		mSkeletonIndexData=NULL;
+	}
+
+	if(mHitBoxVertexData!=NULL){
+		mHitBoxVertexData->destroy();
+		mHitBoxIndexData->destroy();
+		mHitBoxVertexBuffer=NULL;
+		mHitBoxVertexData=NULL;
+		mHitBoxIndexData=NULL;
+	}
 }
 
 const Transform &MeshNodeSkeleton::getRenderTransform() const{
@@ -318,7 +379,13 @@ const Bound &MeshNodeSkeleton::getRenderBound() const{
 }
 
 void MeshNodeSkeleton::render(Renderer *renderer) const{
-	renderer->renderPrimitive(mVertexData,mIndexData);
+	renderer->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
+
+	mSkeletonIndexData->primitive=IndexData::Primitive_POINTS;
+	renderer->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
+	mSkeletonIndexData->primitive=IndexData::Primitive_LINES;
+
+	renderer->renderPrimitive(mHitBoxVertexData,mHitBoxIndexData);
 }
 
 bool MeshNodeSkeleton::getAttachmentTransform(Transform &result,int index){

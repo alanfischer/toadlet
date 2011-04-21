@@ -112,6 +112,11 @@ void MeshNode::destroy(){
 		mMesh=NULL;
 	}
 
+	if(mSkeleton!=NULL){
+		mSkeleton->destroy();
+		mSkeleton=NULL;
+	}
+
 	super::destroy();
 }
 
@@ -154,6 +159,11 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 	if(mMesh!=NULL){
 		mMesh->release();
 		mMesh=NULL;
+	}
+
+	if(mSkeleton!=NULL){
+		mSkeleton->destroy();
+		mSkeleton=NULL;
 	}
 
 	if(mesh==NULL){
@@ -252,6 +262,10 @@ void MeshNode::frameUpdate(int dt,int scope){
 }
 
 void MeshNode::updateWorldTransform(){
+	if(mSkeleton!=NULL){
+		mBound.set(mSkeleton->getBound());
+	}
+
 	super::updateWorldTransform();
 
 	int i;

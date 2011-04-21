@@ -143,6 +143,8 @@ Resource::ptr XMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 		}
 	}
 
+	mesh->compileBoneBounds();
+
 	return mesh;
 }
 
