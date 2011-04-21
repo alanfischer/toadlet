@@ -204,7 +204,7 @@ bool DDSHandler::loadImage(Stream *stream,Collection<Image::ptr> &mipLevels){
 
 	mipLevels.resize(mipCount);
 
-	if((hdr.ddspf.dwFlags&DDPF_FOURCC)>0 && (
+	if((hdr.ddspf.dwFlags&DDPF_FOURCC)!=0 && (
 		hdr.ddspf.dwFourCC==D3DFMT_DXT1 ||
 		hdr.ddspf.dwFourCC==D3DFMT_DXT3 ||
 		hdr.ddspf.dwFourCC==D3DFMT_DXT5
@@ -235,7 +235,7 @@ bool DDSHandler::loadImage(Stream *stream,Collection<Image::ptr> &mipLevels){
 			Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,format,width,height,depth));
 			int size=Math::maxVal(divSize,width)/divSize * Math::maxVal(divSize,height)/divSize * blockBytes;
 
-			if(i==0 && (hdr.dwHeaderFlags & DDSD_LINEARSIZE)>0 && size!=(int)hdr.dwPitchOrLinearSize){
+			if(i==0 && (hdr.dwHeaderFlags & DDSD_LINEARSIZE)!=0 && size!=(int)hdr.dwPitchOrLinearSize){
 				Error::unknown(Categories::TOADLET_EGG,
 					"incorrect size");
 				return false;

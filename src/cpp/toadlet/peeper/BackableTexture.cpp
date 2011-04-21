@@ -200,8 +200,7 @@ void BackableTexture::setBack(Texture::ptr back,Renderer *renderer){
 	mBack=back;
 	
 	if(mBack!=NULL){
-		// Create texture on setting the back, otherwise D3D10 static textures will not load data in load
-		convertCreate(mBack,renderer,mUsage,mDimension,mFormat,mWidth,mHeight,mDepth,1,(mData!=NULL?&mData:NULL));
+		convertCreate(mBack,renderer,mUsage,mDimension,mFormat,mWidth,mHeight,mDepth,(mUsage&Usage_BIT_AUTOGEN_MIPMAPS)!=0?0:1,(mData!=NULL?&mData:NULL));
 
 		for(i=0;i<mBuffers.size();++i){
 			if(mBuffers[i]!=NULL){
@@ -259,20 +258,32 @@ bool BackableTexture::convertCreate(Texture::ptr texture,Renderer *renderer,int 
 	}
 	else{
 		int totalMipLevels=Math::intLog2(Math::maxVal(width,Math::maxVal(height,depth)));
-		int specifiedMipLevels=mipLevels>0?mipLevels:totalMipLevels;
-		int i;
+		int specifiedMipLevels=0;
+		int allocatedMipLevels=0;
+		if(needsAutogen || mipLevels>0){
+			if(mipLevels>0){
+				specifiedMipLevels=mipLevels;
+			}
+			else{
+				specifiedMipLevels=totalMipLevels;
+			}
+			allocatedMipLevels=specifiedMipLevels;
+		}
+		else{
+			allocatedMipLevels=1;
+		}
 
+		int i;
 		if(!needsNPOT && !needsAutogen && !needsConvert){
 			result=texture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas);
 		}
 		else{
-			tbyte **newMipDatas=new tbyte*[specifiedMipLevels];
-
+			tbyte **newMipDatas=new tbyte*[allocatedMipLevels];
 			int newWidth=Math::nextPowerOf2(width),newHeight=Math::nextPowerOf2(height),newDepth=Math::nextPowerOf2(depth);
 			int newMipWidth=newWidth,newMipHeight=newHeight,newMipDepth=newDepth;
 			int mipWidth=width,mipHeight=height,mipDepth=depth;
 
-			for(i=0;i<specifiedMipLevels;++i){
+			for(i=0;i<allocatedMipLevels;++i){
 				int newPitch=ImageFormatConversion::getRowPitch(newFormat,newMipWidth);
 				newMipDatas[i]=new tbyte[newPitch*newMipHeight*newMipDepth];
 
@@ -287,7 +298,9 @@ bool BackableTexture::convertCreate(Texture::ptr texture,Renderer *renderer,int 
 				newMipWidth=newMipWidth>1?newMipWidth/2:1;newMipHeight=newMipHeight>1?newMipHeight/2:1;newMipDepth=newMipDepth>1?newMipDepth/2:1;
 			}
 
-			usage&=~Usage_BIT_AUTOGEN_MIPMAPS;
+			if(needsAutogen){
+				usage&=~Usage_BIT_AUTOGEN_MIPMAPS;
+			}
 
 			result=texture->create(usage,dimension,newFormat,newWidth,newHeight,newDepth,specifiedMipLevels,newMipDatas);
 

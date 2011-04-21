@@ -86,7 +86,7 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 	setupViewport(camera,renderer);
 
 	int clearFlags=camera->getClearFlags();
-	if(clearFlags>0 && !camera->getSkipFirstClear()){
+	if(clearFlags!=0 && !camera->getSkipFirstClear()){
 		renderer->clear(clearFlags,camera->getClearColor());
 	}
 
@@ -121,7 +121,7 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 		}
 
 		/// @todo: Replace this specific state setting with a more generic Scene Default Material, that will be reset its specific states
-//		if(useMaterials && material!=NULL && (material->getStates()&Material::State_FOG)>0){
+//		if(useMaterials && material!=NULL && (material->getStates()&Material::State_FOG)!=0){
 //			renderer->setFogState(mScene->getFogState());
 //		}
 	}
@@ -142,7 +142,7 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 		renderable->render(renderer);
 
 		/// @todo: Replace this specific state setting with a more generic Scene Default Material, that will be reset its specific states
-//		if(useMaterials && material!=NULL && (material->getStates()&Material::State_FOG)>0){
+//		if(useMaterials && material!=NULL && (material->getStates()&Material::State_FOG)!=0){
 //			renderer->setFogState(mScene->getFogState());
 //		}
 	}

@@ -145,9 +145,17 @@ public:
 	}
 	bool getSamplerState(int i,SamplerState &state) const{if(mSamplerStates.size()<=i || mSamplerStates[i]==NULL){return false;}else{state.set(*mSamplerStates[i]);return true;}}
 
-	int getNumTextureStates() const{return 0;}
-	void setTextureState(int i,const TextureState &state){}
-	bool getTextureState(int i,TextureState &state) const{return false;}
+	int getNumTextureStates() const{return mTextureStates.size();}
+	void setTextureState(int i,const TextureState &state){
+		if(mTextureStates.size()<=i){
+			mTextureStates.resize(i+1,NULL);
+			mTextureStates[i]=new TextureState(state);
+		}
+		else{
+			mTextureStates[i]->set(state);
+		}
+	}
+	bool getTextureState(int i,TextureState &state) const{if(mTextureStates.size()<=i || mTextureStates[i]==NULL){return false;}else{state.set(*mTextureStates[i]);return true;}}
 
 protected:
 	D3D10Renderer *mRenderer;
@@ -163,6 +171,7 @@ protected:
 	egg::Collection<SamplerState*> mSamplerStates;
 	egg::Collection<ID3D10SamplerState*> mD3DSamplerStates;
 
+	egg::Collection<TextureState*> mTextureStates;
 	MaterialState *mMaterialState;
 
 	friend class D3D10Renderer;

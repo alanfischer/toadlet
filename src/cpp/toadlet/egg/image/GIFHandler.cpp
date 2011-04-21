@@ -284,7 +284,7 @@ int GIFHandler::getNextImage(GifFileType *gifFile,Image *&image,int &frameDelay)
 						frameDelay=10;
 					}
 			
-					if((flag&GIF_TRANSPARENT)>0){
+					if((flag&GIF_TRANSPARENT)!=0){
 						transparent=pExtension[3];
 					}
 					else{

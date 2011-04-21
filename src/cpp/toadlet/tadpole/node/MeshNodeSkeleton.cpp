@@ -142,7 +142,7 @@ void MeshNodeSkeleton::updateBone(Bone *bone){
 		updateFlags=bone->controller->updateBoneTransform(bone);
 	}
 
-	bone->useMatrixTransforms=((updateFlags&BoneSpaceUpdate_FLAG_MATRIX)>0);
+	bone->useMatrixTransforms=((updateFlags&BoneSpaceUpdate_FLAG_MATRIX)!=0);
 
 	Bone *parent=NULL;
 	int parentIndex=sbone->parentIndex;

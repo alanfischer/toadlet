@@ -47,7 +47,6 @@ set (EGG_IO_ZZIP_SRC
 )
 
 set (EGG_MATH_SRC
-	math/AABox.cpp
 	math/Capsule.cpp
 	math/Math.cpp
 	math/Matrix3x3.cpp
@@ -58,7 +57,6 @@ set (EGG_MATH_SRC
 )
 
 set (EGG_MATHFIXED_SRC
-	mathfixed/AABox_fixed.cpp
 	mathfixed/Capsule_fixed.cpp
 	mathfixed/Math_fixed.cpp
 	mathfixed/Matrix3x3_fixed.cpp

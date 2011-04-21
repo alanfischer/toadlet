@@ -55,10 +55,10 @@ public:
 	virtual void close();
 	virtual bool closed(){return mFile==NULL;}
 
-	virtual bool readable(){return (mOpen&Open_BIT_READ)>0;}
+	virtual bool readable(){return (mOpen&Open_BIT_READ)!=0;}
 	virtual int read(tbyte *buffer,int length);
 
-	virtual bool writeable(){return (mOpen&Open_BIT_WRITE)>0;}
+	virtual bool writeable(){return (mOpen&Open_BIT_WRITE)!=0;}
 	virtual int write(const tbyte *buffer,int length);
 
 	virtual bool reset();

@@ -550,7 +550,7 @@ void StudioModelNode::updateVertexes(StudioModel *model,int bodypartsIndex,int m
 
 	for(i=0;i<smodel->numnorms;++i){
 		Math::mul(norms[i],boneRotates[snormbone[i]],snorms[i]);
-		if((model->bone(snormbone[i])->flags&STUDIO_HAS_CHROME)>0){
+		if((model->bone(snormbone[i])->flags&STUDIO_HAS_CHROME)!=0){
 			findChrome(chromes[i],norms[i],mChromeForward,mChromeRight);
 		}
 	}
@@ -573,7 +573,7 @@ void StudioModelNode::updateVertexes(StudioModel *model,int bodypartsIndex,int m
 			for(;l>0;l--,tricmds+=4){
 				vba.set3(vertexCount,0,verts[tricmds[0]]);
 				vba.set3(vertexCount,1,norms[tricmds[1]]);
-				if((stexture->flags&STUDIO_NF_CHROME)>0){
+				if((stexture->flags&STUDIO_NF_CHROME)!=0){
 					vba.set2(vertexCount,2,chromes[tricmds[1]]);
 				}
 				else{

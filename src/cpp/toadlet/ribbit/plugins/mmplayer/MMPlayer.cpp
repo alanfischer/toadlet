@@ -149,7 +149,7 @@ void MMPlayer::destroy(){
 		int i;
 	    for(i=0;i<mNumBuffers;++i){
 			WAVEHDR *header=&mBuffers[i];
-			if((header->dwFlags&WHDR_PREPARED)>0 || (header->dwFlags&WHDR_DONE)>0){
+			if((header->dwFlags&WHDR_PREPARED)!=0 || (header->dwFlags&WHDR_DONE)!=0){
 				waveOutUnprepareHeader(mDevice,header,sizeof(WAVEHDR));
 			}
 		}
@@ -190,7 +190,7 @@ void MMPlayer::update(int dt){
 	int i;
 	for(i=0;i<mNumBuffers;++i){
 		WAVEHDR *header=&mBuffers[i];
-		if((header->dwFlags&WHDR_DONE)>0){
+		if((header->dwFlags&WHDR_DONE)!=0){
 			MMRESULT result=waveOutUnprepareHeader(mDevice,header,sizeof(WAVEHDR));
 			if(result!=MMSYSERR_NOERROR){
 				Logger::warning(Categories::TOADLET_RIBBIT,"waveOutUnprepareHeader error");
