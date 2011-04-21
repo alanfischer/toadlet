@@ -71,7 +71,7 @@ void Mesh::compileBoneBounds(){
 	if(skeleton!=NULL){
 		VertexBufferAccessor vba(staticVertexData->getVertexBuffer(0),Buffer::Access_BIT_READ);
 
-		Collection<bool> touched(vertexBoneAssignments.size(),false);
+		Collection<bool> touched(skeleton->bones.size(),false);
 
 		Vector3 v;
 		int i,j;
@@ -80,9 +80,10 @@ void Mesh::compileBoneBounds(){
 			for(j=0;j<vbal.size();++j){
 				Skeleton::Bone *bone=skeleton->bones[vbal[j].bone];
 				vba.get3(i,0,v);
-				Math::sub(v,bone->worldToBoneTranslate);
-				if(touched[i]==false){
-					touched[i]=true;
+				Math::mul(v,bone->worldToBoneRotate);
+				Math::add(v,bone->worldToBoneTranslate);
+				if(touched[vbal[j].bone]==false){
+					touched[vbal[j].bone]=true;
 					bone->bound.set(v,v);
 				}
 				else{
