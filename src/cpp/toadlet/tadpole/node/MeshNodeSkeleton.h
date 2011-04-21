@@ -33,6 +33,9 @@
 
 namespace toadlet{
 namespace tadpole{
+
+class Engine;
+
 namespace node{
 
 class MeshNode;
@@ -89,6 +92,7 @@ public:
 		Vector3 worldTranslate;
 		Quaternion worldRotate;
 		Matrix3x3 worldRotateMatrix;
+		AABox worldBound;
 
 		Vector3 boneSpaceTranslate;
 		Matrix3x3 boneSpaceRotate;
@@ -101,6 +105,7 @@ public:
 	};
 
 	MeshNodeSkeleton(MeshNode *node,Skeleton::ptr skeleton);
+	void destroy();
 
 	void updateBones();
 	void updateBones(int sequenceIndex,scalar sequenceTime);
@@ -116,13 +121,15 @@ public:
 	egg::String getBoneName(int index) const;
 	egg::String getBoneName(Bone *bone) const{return mSkeleton->bones[bone->index]->name;}
 
+	const AABox &getBound(){return mBound;}
+
 	inline Skeleton::ptr getSkeleton() const{return mSkeleton;}
 
-	void setRenderable(bool renderable);
-	void updateVertexData();
+	void setRenderSkeleton(bool skeleton);
+	bool getRenderSkeleton() const{return mSkeletonMaterial!=NULL;}
 
 	// Renderable
-	Material *getRenderMaterial() const{return mMaterial;}
+	Material *getRenderMaterial() const{return mSkeletonMaterial;}
 	const Transform &getRenderTransform() const;
 	const Bound &getRenderBound() const;
 	void render(peeper::Renderer *renderer) const;
@@ -134,12 +141,18 @@ public:
 	bool getAttachmentTransform(Transform &result,int index);
 
 protected:
+	void createSkeletonBuffers();
+	void updateSkeletonBuffers();
+	void destroySkeletonBuffers();
+
 	int updateBoneTransformation(Bone *bone);
 	void updateBone(Bone *bone);
 
+	Engine *mEngine;
 	MeshNode *mNode;
 	Skeleton::ptr mSkeleton;
 	egg::Collection<Bone::ptr> mBones;
+	AABox mBound;
 	int mLastUpdateFrame;
 
 	TransformSequence::ptr mSequence;
@@ -147,9 +160,13 @@ protected:
 	egg::Collection<int> mTrackHints;
 
 	// For rendering the skeleton outline
-	Material::ptr mMaterial;
-	peeper::IndexData::ptr mIndexData;
-	peeper::VertexData::ptr mVertexData;
+	Material::ptr mSkeletonMaterial;
+	peeper::VertexBuffer::ptr mSkeletonVertexBuffer;
+	peeper::IndexData::ptr mSkeletonIndexData;
+	peeper::VertexData::ptr mSkeletonVertexData;
+	peeper::VertexBuffer::ptr mHitBoxVertexBuffer;
+	peeper::VertexData::ptr mHitBoxVertexData;
+	peeper::IndexData::ptr mHitBoxIndexData;
 
 	Vector3 cache_updateBone_vector;
 	Quaternion cache_updateBone_quaternion;

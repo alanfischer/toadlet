@@ -58,7 +58,7 @@ int main(int argc,char **argv){
 	if(mesh->skeleton!=NULL){
 		std::cout << "Has skeleton" << std::endl;
 
-		meshNode->getSkeleton()->setRenderable(true);
+		meshNode->getSkeleton()->setRenderSkeleton(true);
 
 		int numSequences=mesh->skeleton->sequences.size();
 		std::cout << "Number of sequences:" << numSequences << std::endl;

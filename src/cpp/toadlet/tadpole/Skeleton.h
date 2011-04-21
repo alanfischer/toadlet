@@ -55,6 +55,8 @@ public:
 		Vector3 worldToBoneTranslate;
 		Quaternion worldToBoneRotate;
 
+		AABox bound;
+
 		egg::String name;
 	};
 

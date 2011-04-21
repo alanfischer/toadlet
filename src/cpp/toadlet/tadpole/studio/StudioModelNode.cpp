@@ -650,29 +650,35 @@ void StudioModelNode::updateSkeleton(){
 		}
 	}
 
+	AABox bound;
 	for(i=0;i<mModel->header->numbones;++i){
+		studiobone *sbone=mModel->bone(i);
 		int link=mBoneLinks[i];
 		if(link>=0){
 			mBoneTranslates[i].set(mLink->mBoneTranslates[link]);
 			mBoneRotates[i].set(mLink->mBoneRotates[link]);
-			continue;
+		}
+		else{
+			if(sbone->parent>=0){
+				Math::preMul(mBoneRotates[i],mBoneRotates[sbone->parent]);
+				Math::mul(mBoneTranslates[i],mBoneRotates[sbone->parent]);
+				Math::add(mBoneTranslates[i],mBoneTranslates[sbone->parent]);
+			}
 		}
 
-		studiobone *sbone=mModel->bone(i);
-		if(sbone->parent>=0){
-			Math::preMul(mBoneRotates[i],mBoneRotates[sbone->parent]);
-			Math::mul(mBoneTranslates[i],mBoneRotates[sbone->parent]);
-			Math::add(mBoneTranslates[i],mBoneTranslates[sbone->parent]);
+		studiobbox *sbox=mModel->bbox(i);
+		AABox box(sbox->bbmin,sbox->bbmax);
+		Math::mul(box,mBoneRotates[i]);
+		Math::add(box,mBoneTranslates[i]);
+		if(i==0){
+			bound.set(box);
+		}
+		else{
+			bound.merge(box);
 		}
 	}
 
-	if(mLink==NULL){
-		mBound.set(sseqdesc->bbmin,sseqdesc->bbmax);
-	}
-	else{
-		// Really, we should probably take the sequence bbox and transform it by each bone, and merge for a result, but this will probably work for most cases.
-		mBound.set(mLink->mBound);
-	}
+	mBound.set(bound);
 }
 
 void StudioModelNode::findBoneTransforms(Vector3 *translates,Quaternion *rotates,StudioModel *model,studioseqdesc *sseqdesc,studioanim *sanim,float t){
@@ -840,26 +846,21 @@ void StudioModelNode::createSkeletonBuffers(){
 	mSkeletonVertexData=VertexData::ptr(new VertexData(mSkeletonVertexBuffer));
 	mSkeletonIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,skeletonIndexBuffer));
 
-	VertexBuffer::ptr hitBoxVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION,mModel->header->numhitboxes*8);
-
-	mHitBoxVertexBuffer=hitBoxVertexBuffer;
+	mHitBoxVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION,mModel->header->numhitboxes*8);
 	mHitBoxVertexData=VertexData::ptr(new VertexData(mHitBoxVertexBuffer));
-	mHitBoxIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,NULL,0,hitBoxVertexBuffer->getSize()));
+	mHitBoxIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,NULL,0,mHitBoxVertexBuffer->getSize()));
 }
 
 void StudioModelNode::updateSkeletonBuffers(){
 	int i,j;
 
 	vba.lock(mSkeletonVertexBuffer);
-
 	for(i=0;i<mModel->header->numbones;++i){
 		vba.set3(i,0,mBoneTranslates[i]);
 	}
-
 	vba.unlock();
 
 	vba.lock(mHitBoxVertexBuffer);
-
 	Vector3 verts[8];
 	for(i=0;i<mModel->header->numhitboxes;++i){
 		studiobbox *sbbox=mModel->bbox(i);
@@ -871,7 +872,6 @@ void StudioModelNode::updateSkeletonBuffers(){
 			vba.set3(i*8+j,0,verts[j]);
 		}
 	}
-
 	vba.unlock();
 }
 

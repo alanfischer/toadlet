@@ -1563,6 +1563,16 @@ namespace Math{
 		rotateAABox(r,rotation,b,buffer);
 	}
 
+	inline void mul(AABox &r,const Quaternion &rotation){
+		Vector3 buffer[8];
+		rotateAABox(r,rotation,r,buffer);
+	}
+
+	inline void mul(AABox &r,const Matrix3x3 &rotation){
+		Vector3 buffer[8];
+		rotateAABox(r,rotation,r,buffer);
+	}
+
 	TOADLET_API void findBoundingBox(AABox &r,const Sphere &sphere);
 
 	TOADLET_API void findBoundingBox(AABox &r,const Capsule &capsule);

@@ -83,12 +83,13 @@ public:
 
 	void destroy();
 	void compile();
+	void compileBoneBounds();
 
 	Transform transform;
 	Bound bound;
 
 	egg::Collection<SubMesh::ptr> subMeshes;
-	peeper::VertexData::ptr staticVertexData;
+	peeper::VertexData::ptr staticVertexData; /// @todo: Change this to a VertexBuffer and let the SubMeshes have VertexDatas
 
 	Skeleton::ptr skeleton; // Must be retained when assigned
 	egg::Collection<VertexBoneAssignmentList> vertexBoneAssignments;
