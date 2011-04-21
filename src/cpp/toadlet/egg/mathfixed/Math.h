@@ -1541,6 +1541,45 @@ namespace Math{
 		b.maxs.z-=p.z;
 	}
 
+	template<class Rotation>
+	inline void rotateAABox(AABox &r,const Rotation &rotation,const AABox &b,Vector3 buffer[8]){
+		int i;
+		Vector3 temp;
+		b.getVertexes(buffer);
+
+		for(i=0;i<8;++i){
+			Math::mul(temp,rotation,buffer[i]);
+			if(i==0){
+				r.mins.set(temp);
+				r.maxs.set(temp);
+			}
+			else{
+				if(r.mins.x>temp.x)
+					r.mins.x=temp.x;
+				if(r.mins.y>temp.y)
+					r.mins.y=temp.y;
+				if(r.mins.z>temp.z)
+					r.mins.z=temp.z;
+				if(r.maxs.x<temp.x)
+					r.maxs.x=temp.x;
+				if(r.maxs.y<temp.y)
+					r.maxs.y=temp.y;
+				if(r.maxs.z<temp.z)
+					r.maxs.z=temp.z;
+			}
+		}
+	}
+
+	inline void mul(AABox &r,const Quaternion &rotation,const AABox &b){
+		Vector3 buffer[8];
+		rotateAABox(r,rotation,b,buffer);
+	}
+
+	inline void mul(AABox &r,const Matrix3x3 &rotation,const AABox &b){
+		Vector3 buffer[8];
+		rotateAABox(r,rotation,b,buffer);
+	}
+
 	TOADLET_API void findBoundingBox(AABox &r,const Sphere &sphere);
 
 	TOADLET_API void findBoundingBox(AABox &r,const Capsule &capsule);

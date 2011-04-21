@@ -190,8 +190,7 @@ public:
 			Math::add(mSphere.origin,translate);
 		}
 		else if(source.mType==Type_AABOX){
-			mBox.set(source.mBox);
-			mBox.rotate(rotate);
+			Math::mul(mBox,rotate,source.mBox);
 			Math::mul(mBox.mins,scale);
 			Math::mul(mBox.maxs,scale);
 			Math::add(mBox,translate);
