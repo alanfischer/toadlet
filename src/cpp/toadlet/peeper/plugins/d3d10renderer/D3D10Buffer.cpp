@@ -43,7 +43,6 @@ D3D10Buffer::D3D10Buffer(D3D10Renderer *renderer):
 
 	mIndexFormat((IndexFormat)0),
 	//mVertexFormat,
-	mVertexSize(0),
 
 	mBindFlags(0),
 	mBuffer(NULL),
@@ -102,8 +101,7 @@ bool D3D10Buffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int
 	mAccess=access;
 	mSize=size;
 	mVertexFormat=vertexFormat;
-	mVertexSize=mVertexFormat->getVertexSize();
-	mDataSize=mVertexSize*mSize;
+	mDataSize=mVertexFormat->getVertexSize()*mSize;
 
 	mBindFlags|=D3D10_BIND_VERTEX_BUFFER;
 
@@ -209,12 +207,13 @@ uint8 *D3D10Buffer::lock(int lockAccess){
 	if(mData!=NULL){
 		int i,j;
 		if(mVertexFormat!=NULL){
+			int vertexSize=mVertexFormat->getVertexSize();
 			for(i=0;i<mVertexFormat->getNumElements();++i){
 				if(mVertexFormat->getFormat(i)==VertexFormat::Format_COLOR_RGBA){
 					byte *data=mData+mVertexFormat->getOffset(i);
 					for(j=0;j<mSize;++j){
-						uint32 &color=*(uint32*)(data+mVertexSize);
-						color=(color&0xFF000000)|((color&0x000000FF)<<16)|(color&0x0000FF00)|((color&0x00FF0000)>>16);
+						uint32 &color=*(uint32*)(data+vertexSize*j);
+						color=Math::argbToRGBA(color);
 					}
 				}
 			}
@@ -237,12 +236,13 @@ bool D3D10Buffer::unlock(){
 	if(mData!=NULL){
 		int i,j;
 		if(mVertexFormat!=NULL){
+			int vertexSize=mVertexFormat->getVertexSize();
 			for(i=0;i<mVertexFormat->getNumElements();++i){
 				if(mVertexFormat->getFormat(i)==VertexFormat::Format_COLOR_RGBA){
 					byte *data=mData+mVertexFormat->getOffset(i);
 					for(j=0;j<mSize;++j){
-						uint32 &color=*(uint32*)(data+mVertexSize);
-						color=(color&0xFF000000)|((color&0x000000FF)<<16)|(color&0x0000FF00)|((color&0x00FF0000)>>16);
+						uint32 &color=*(uint32*)(data+vertexSize*j);
+						color=Math::rgbaToARGB(color);
 					}
 				}
 			}

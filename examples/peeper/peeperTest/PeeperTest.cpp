@@ -20,11 +20,11 @@ void PeeperTest::create(){
 	{
 		vba.lock(triVertexBuffer);
 		vba.set3(0,0,0,Math::ONE,0);
-		vba.setABGR(0,1,0x000000FF);
+		vba.setARGB(0,1,0x000000FF);
 		vba.set3(1,0,-Math::ONE,-Math::ONE,0);
-		vba.setABGR(1,1,0x0000FF00);
+		vba.setARGB(1,1,0x0000FF00);
 		vba.set3(2,0,Math::ONE,-Math::ONE,0);
-		vba.setABGR(2,1,0x00FF0000);
+		vba.setARGB(2,1,0x00FF0000);
 		vba.unlock();
 	}
 	triVertexData=VertexData::ptr(new VertexData(triVertexBuffer));

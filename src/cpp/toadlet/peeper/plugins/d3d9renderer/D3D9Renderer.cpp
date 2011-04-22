@@ -375,9 +375,9 @@ void D3D9Renderer::renderPrimitive(const VertexData::ptr &vertexData,const Index
 			numVertexes=d3dvertexBuffer->mSize;
 		}
 		#if defined(TOADLET_SET_D3DM)
-			result=mD3DDevice->SetStreamSource(i,d3dvertexBuffer->mVertexBuffer,d3dvertexBuffer->mVertexSize);
+			result=mD3DDevice->SetStreamSource(i,d3dvertexBuffer->mVertexBuffer,d3dvertexFormat->mVertexSize);
 		#else
-			result=mD3DDevice->SetStreamSource(i,d3dvertexBuffer->mVertexBuffer,0,d3dvertexBuffer->mVertexSize);
+			result=mD3DDevice->SetStreamSource(i,d3dvertexBuffer->mVertexBuffer,0,d3dvertexFormat->mVertexSize);
 		#endif
 		TOADLET_CHECK_D3D9ERROR(result,"D3D9Renderer: SetStreamSource");
 		#if !defined(TOADLET_SET_D3DM)
