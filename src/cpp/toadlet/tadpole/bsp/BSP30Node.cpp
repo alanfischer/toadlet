@@ -167,7 +167,7 @@ void BSP30ModelNode::traceSegment(Collision &result,const Vector3 &position,cons
 	Transform transform;
 
 	transform.set(position,mWorldTransform.getScale(),mWorldTransform.getRotate());
-	transform.transform(localSegment,segment);
+	transform.inverseTransform(localSegment,segment);
 
 	result.time=Math::ONE;
 	localSegment.getEndPoint(result.point);
