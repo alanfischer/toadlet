@@ -89,7 +89,7 @@ bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const Stri
 		return false;
 	}
 
-	uint32 abgr=color.getABGR();
+	uint32 rgba=color.getRGBA();
 
 	int maxLength=vertexBuffer->getSize()/4;
 	int length=string.length();
@@ -206,10 +206,10 @@ bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const Stri
 			y+=Math::toInt(g->advancey);
 
 			if(colorIndex>=0){
-				vba.setABGR(i4+0,colorIndex,abgr);
-				vba.setABGR(i4+1,colorIndex,abgr);
-				vba.setABGR(i4+2,colorIndex,abgr);
-				vba.setABGR(i4+3,colorIndex,abgr);
+				vba.setRGBA(i4+0,colorIndex,rgba);
+				vba.setRGBA(i4+1,colorIndex,rgba);
+				vba.setRGBA(i4+2,colorIndex,rgba);
+				vba.setRGBA(i4+3,colorIndex,rgba);
 			}
 		}
 		else{

@@ -72,7 +72,6 @@ protected:
 	int mAccess;
 	int mSize;
 	VertexFormat::ptr mVertexFormat;
-	short mVertexSize;
 	int mDataSize;
 
 	DWORD mD3DUsage;

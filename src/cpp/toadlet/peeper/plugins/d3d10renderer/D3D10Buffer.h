@@ -79,7 +79,6 @@ protected:
 
 	IndexFormat mIndexFormat;
 	VertexFormat::ptr mVertexFormat;
-	short mVertexSize;
 
 	int mBindFlags;
 	ID3D10Buffer *mBuffer;

@@ -43,7 +43,6 @@ D3D9VertexBuffer::D3D9VertexBuffer(D3D9Renderer *renderer):
 	mAccess(0),
 	mSize(0),
 	//mVertexFormat,
-	mVertexSize(0),
 	mDataSize(0),
 
 	mD3DUsage(0),
@@ -67,8 +66,7 @@ bool D3D9VertexBuffer::create(int usage,int access,VertexFormat::ptr vertexForma
 	mAccess=access;
 	mSize=size;
 	mVertexFormat=vertexFormat;
-	mVertexSize=mVertexFormat->getVertexSize();
-	mDataSize=mVertexSize*mSize;
+	mDataSize=mVertexFormat->getVertexSize()*mSize;
 
 	D3D9VertexFormat *d3dvertexFormat=(D3D9VertexFormat*)mVertexFormat->getRootVertexFormat();
 	if(d3dvertexFormat->getContextCreated()==false){
@@ -185,12 +183,13 @@ uint8 *D3D9VertexBuffer::lock(int lockAccess){
 	if(mData!=NULL){
 		int i,j;
 		if(mVertexFormat!=NULL){
+			int vertexSize=mVertexFormat->getVertexSize();
 			for(i=0;i<mVertexFormat->getNumElements();++i){
 				if(mVertexFormat->getFormat(i)==VertexFormat::Format_COLOR_RGBA){
 					byte *data=mData+mVertexFormat->getOffset(i);
 					for(j=0;j<mSize;++j){
-						uint32 &color=*(uint32*)(data+mVertexSize);
-						color=(color&0xFF000000)|((color&0x000000FF)<<16)|(color&0x0000FF00)|((color&0x00FF0000)>>16);
+						uint32 &color=*(uint32*)(data+vertexSize*j);
+						color=Math::argbToRGBA(color);
 					}
 				}
 			}
@@ -209,12 +208,13 @@ bool D3D9VertexBuffer::unlock(){
 	if(mData!=NULL){
 		int i,j;
 		if(mVertexFormat!=NULL){
+			int vertexSize=mVertexFormat->getVertexSize();
 			for(i=0;i<mVertexFormat->getNumElements();++i){
 				if(mVertexFormat->getFormat(i)==VertexFormat::Format_COLOR_RGBA){
 					byte *data=mData+mVertexFormat->getOffset(i);
 					for(j=0;j<mSize;++j){
-						uint32 &color=*(uint32*)(data+mVertexSize);
-						color=(color&0xFF000000)|((color&0x000000FF)<<16)|(color&0x0000FF00)|((color&0x00FF0000)>>16);
+						uint32 &color=*(uint32*)(data+vertexSize*j);
+						color=Math::rgbaToARGB(color);
 					}
 				}
 			}

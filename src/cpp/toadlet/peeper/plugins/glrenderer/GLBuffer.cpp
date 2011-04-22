@@ -239,15 +239,16 @@ uint8 *GLBuffer::lock(int lockAccess){
 		}
 	}
 
-	#if defined(TOADLET_BIG_ENDIAN)
+	#if defined(TOADLET_LITTLE_ENDIAN)
 		if(mVertexFormat!=NULL){
 			// We do this even if its write only, since the unlocking will write it back, it would get messed up if we didn't swap in all situations
-			GLVertexFormat *vertexFormat=(GLVertexFormat*)mVertexFormat->getRootVertexFormat();
+			int vertexSize=mVertexFormat->getVertexSize();
 			int i,j;
-			for(i=0;i<vertexFormat->mFormats.size();++i){
-				if(vertexFormat->mFormats[i]==VertexFormat::Format_COLOR_RGBA){
+			for(i=0;i<mVertexFormat->getNumElements();++i){
+				if(mVertexFormat->getFormat(i)==VertexFormat::Format_COLOR_RGBA){
+					byte *data=mData+mVertexFormat->getOffset(i);
 					for(j=0;j<mSize;++j){
-						littleUInt32InPlace(*(uint32*)(mData+vertexFormat->mVertexSize*j+vertexFormat->mOffsets[i]));
+						swap4(*(uint32*)(data+vertexSize*j));
 					}
 				}
 			}
@@ -260,15 +261,16 @@ uint8 *GLBuffer::lock(int lockAccess){
 }
 
 bool GLBuffer::unlock(){
-	#if defined(TOADLET_BIG_ENDIAN)
+	#if defined(TOADLET_LITTLE_ENDIAN)
 		if(mVertexFormat!=NULL){
 			// We do this even if its read only, since we have to do it in all situations for locking
-			GLVertexFormat *vertexFormat=(GLVertexFormat*)mVertexFormat->getRootVertexFormat();
+			int vertexSize=mVertexFormat->getVertexSize();
 			int i,j;
-			for(i=0;i<vertexFormat->mFormats.size();++i){
-				if(vertexFormat->mFormats[i]==VertexFormat::Format_COLOR_RGBA){
+			for(i=0;i<mVertexFormat->getNumElements();++i){
+				if(mVertexFormat->getFormat(i)==VertexFormat::Format_COLOR_RGBA){
+					byte *data=mData+mVertexFormat->getOffset(i);
 					for(j=0;j<mSize;++j){
-						littleUInt32InPlace(*(uint32*)(mData+vertexFormat->mVertexSize*j+vertexFormat->mOffsets[i]));
+						swap4(*(uint32*)(data+vertexSize*j));
 					}
 				}
 			}

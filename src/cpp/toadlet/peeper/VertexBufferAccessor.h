@@ -211,12 +211,12 @@ public:
 
 	inline void setRGBA(int i,int e,uint32 c){
 		TOADLET_CHECK_WRITE();
-		mColorData[offset(i,e)]=Math::swapColor(c);
+		mColorData[offset(i,e)]=c;
 	}
 
-	inline void setABGR(int i,int e,uint32 c){
+	inline void setARGB(int i,int e,uint32 c){
 		TOADLET_CHECK_WRITE();
-		mColorData[offset(i,e)]=c;
+		mColorData[offset(i,e)]=Math::argbToRGBA(c);
 	}
 
 	inline scalar get(int i,int e){
@@ -322,12 +322,12 @@ public:
 
 	inline uint32 getRGBA(int i,int e){
 		TOADLET_CHECK_READ();
-		return Math::swapColor(mColorData[offset(i,e)]);
+		return mColorData[offset(i,e)];
 	}
 
-	inline uint32 getABGR(int i,int e){
+	inline uint32 getARGB(int i,int e){
 		TOADLET_CHECK_READ();
-		return mColorData[offset(i,e)];
+		return Math::rgbaToARGB(mColorData[offset(i,e)]);
 	}
 
 protected:

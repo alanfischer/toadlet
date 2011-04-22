@@ -354,9 +354,9 @@ void ParticleNode::updateVertexBuffer(CameraNode *camera){
 			for(i=0;i<mParticles.size();++i){
 				const Particle &p=mParticles[i];
 
-				vba.set3(i+0,0,	p.x,p.y,p.z);
-				vba.setABGR(i+0,1,	p.color);
-				vba.set2(i+0,2,	p.s,p.y);
+				vba.set3(i+0,0,		p.x,p.y,p.z);
+				vba.setRGBA(i+0,1,	p.color);
+				vba.set2(i+0,2,		p.s,p.y);
 			}
 		}
 		else if(mParticleType==ParticleType_SPRITE){
@@ -388,19 +388,19 @@ void ParticleNode::updateVertexBuffer(CameraNode *camera){
 				}
 
 				vba.set3(vi+0,0,	p.x+up.x-right.x, p.y+up.y-right.y, p.z+up.z-right.z);
-				vba.setABGR(vi+0,1,	p.color);
+				vba.setRGBA(vi+0,1,	p.color);
 				vba.set2(vi+0,2,	p.s,p.t);
 
 				vba.set3(vi+1,0,	p.x-up.x-right.x, p.y-up.y-right.y, p.z-up.z-right.z);
-				vba.setABGR(vi+1,1,	p.color);
+				vba.setRGBA(vi+1,1,	p.color);
 				vba.set2(vi+1,2,	p.s,p.t2);
 
 				vba.set3(vi+2,0,	p.x+up.x+right.x, p.y+up.y+right.y, p.z+up.z+right.z);
-				vba.setABGR(vi+2,1,	p.color);
+				vba.setRGBA(vi+2,1,	p.color);
 				vba.set2(vi+2,2,	p.s2,p.t);
 
 				vba.set3(vi+3,0,	p.x-up.x+right.x, p.y-up.y+right.y, p.z-up.z+right.z);
-				vba.setABGR(vi+3,1,	p.color);
+				vba.setRGBA(vi+3,1,	p.color);
 				vba.set2(vi+3,2,	p.s2,p.t2);
 			}
 		}
@@ -424,19 +424,19 @@ void ParticleNode::updateVertexBuffer(CameraNode *camera){
 				Math::mul(right,p.scale);
 
 				vba.set3(vi+0,0,		p.x+up.x-right.x, p.y+up.y-right.y, p.z+up.z-right.z);
-				vba.setABGR(vi+0,1,		p.color);
+				vba.setRGBA(vi+0,1,		p.color);
 				vba.set2(vi+0,2,		0,0);
 
 				vba.set3(vi+1,0,		p.x-up.x-right.x, p.y-up.y-right.y, p.z-up.z-right.z);
-				vba.setABGR(vi+1,1,		p.color);
+				vba.setRGBA(vi+1,1,		p.color);
 				vba.set2(vi+1,2,		0,Math::ONE);
 
 				vba.set3(vi+2,0,		p.x+up.x, p.y+up.y, p.z+up.z);
-				vba.setABGR(vi+2,1,		p.color);
+				vba.setRGBA(vi+2,1,		p.color);
 				vba.set2(vi+2,2,		Math::QUARTER,0);
 
 				vba.set3(vi+3,0,		p.x-up.x, p.y-up.y, p.z-up.z);
-				vba.setABGR(vi+3,1,		p.color);
+				vba.setRGBA(vi+3,1,		p.color);
 				vba.set2(vi+3,2,		Math::QUARTER,Math::ONE);
 
 
@@ -455,11 +455,11 @@ void ParticleNode::updateVertexBuffer(CameraNode *camera){
 					Math::mul(up,p.scale);
 
 					vba.set3(ivi+0,0,		ip.x+up.x, ip.y+up.y, ip.z+up.z);
-					vba.setABGR(ivi+0,1,	p.color);
+					vba.setRGBA(ivi+0,1,	p.color);
 					vba.set2(ivi+0,2,		Math::QUARTER,0);
 
 					vba.set3(ivi+1,0,		ip.x-up.x, ip.y-up.y, ip.z-up.z);
-					vba.setABGR(ivi+1,1,	p.color);
+					vba.setRGBA(ivi+1,1,	p.color);
 					vba.set2(ivi+1,2,		Math::QUARTER,Math::ONE);
 				}
 
@@ -473,19 +473,19 @@ void ParticleNode::updateVertexBuffer(CameraNode *camera){
 
 				vi=vi+vertexesPerBeam-4;
 				vba.set3(vi+0,0,		pn.x+up.x, pn.y+up.y, pn.z+up.z);
-				vba.setABGR(vi+0,1,		p.color);
+				vba.setRGBA(vi+0,1,		p.color);
 				vba.set2(vi+0,2,		Math::THREE_QUARTERS,0);
 
 				vba.set3(vi+1,0,		pn.x-up.x, pn.y-up.y, pn.z-up.z);
-				vba.setABGR(vi+1,1,		p.color);
+				vba.setRGBA(vi+1,1,		p.color);
 				vba.set2(vi+1,2,		Math::THREE_QUARTERS,Math::ONE);
 
 				vba.set3(vi+2,0,		pn.x+up.x+right.x, pn.y+up.y+right.y, pn.z+up.z+right.z);
-				vba.setABGR(vi+2,1,		p.color);
+				vba.setRGBA(vi+2,1,		p.color);
 				vba.set2(vi+2,2,		Math::ONE,0);
 
 				vba.set3(vi+3,0,		pn.x-up.x+right.x, pn.y-up.y+right.y, pn.z-up.z+right.z);
-				vba.setABGR(vi+3,1,		p.color);
+				vba.setRGBA(vi+3,1,		p.color);
 				vba.set2(vi+3,2,		Math::ONE,Math::ONE);
 			}
 		}

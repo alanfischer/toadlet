@@ -94,11 +94,11 @@ public:
 		return *this;
 	}
 	
-	inline Vector4 &setABGR(uint32 abgr){
-		x=Math::fromInt((abgr&0x000000FF)>>0 )/255;
-		y=Math::fromInt((abgr&0x0000FF00)>>8 )/255;
-		z=Math::fromInt((abgr&0x00FF0000)>>16)/255;
-		w=Math::fromInt((abgr&0xFF000000)>>24)/255;
+	inline Vector4 &setARGB(uint32 argb){
+		x=Math::fromInt((argb&0x00FF0000)>>16)/255;
+		y=Math::fromInt((argb&0x0000FF00)>>8 )/255;
+		z=Math::fromInt((argb&0x000000FF)>>0 )/255;
+		w=Math::fromInt((argb&0xFF000000)>>24)/255;
 
 		return *this;
 	}
@@ -110,10 +110,10 @@ public:
 			((uint32)Math::toInt(w*255))<<0;
 	}
 
-	inline uint32 getABGR() const{
-		return ((uint32)Math::toInt(x*255))<<0  |
+	inline uint32 getARGB() const{
+		return ((uint32)Math::toInt(x*255))<<16  |
 			((uint32)Math::toInt(y*255))<<8  |
-			((uint32)Math::toInt(z*255))<<16 |
+			((uint32)Math::toInt(z*255))<<0  |
 			((uint32)Math::toInt(w*255))<<24;
 	}
 
