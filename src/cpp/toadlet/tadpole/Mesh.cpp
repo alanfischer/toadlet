@@ -41,13 +41,13 @@ Mesh::~Mesh(){
 }
 
 void Mesh::destroy(){
-	if(staticVertexData!=NULL){
-		staticVertexData->destroy();
+	if(mStaticVertexData!=NULL){
+		mStaticVertexData->destroy();
 	}
 
 	int i;
-	for(i=0;i<subMeshes.size();++i){
-		SubMesh *subMesh=subMeshes[i];
+	for(i=0;i<mSubMeshes.size();++i){
+		SubMesh *subMesh=mSubMeshes[i];
 		if(subMesh->indexData!=NULL){
 			subMesh->indexData->destroy();
 		}
@@ -55,11 +55,11 @@ void Mesh::destroy(){
 			subMesh->material->release();
 		}
 	}
-	subMeshes.clear();
+	mSubMeshes.clear();
 
-	if(skeleton!=NULL){
-		skeleton->release();
-		skeleton=NULL;
+	if(mSkeleton!=NULL){
+		mSkeleton->release();
+		mSkeleton=NULL;
 	}
 }
 
@@ -68,17 +68,17 @@ void Mesh::compile(){
 }
 
 void Mesh::compileBoneBounds(){
-	if(skeleton!=NULL){
-		VertexBufferAccessor vba(staticVertexData->getVertexBuffer(0),Buffer::Access_BIT_READ);
+	if(mSkeleton!=NULL){
+		VertexBufferAccessor vba(mStaticVertexData->getVertexBuffer(0),Buffer::Access_BIT_READ);
 
-		Collection<bool> touched(skeleton->bones.size(),false);
+		Collection<bool> touched(mSkeleton->bones.size(),false);
 
 		Vector3 v;
 		int i,j;
-		for(i=0;i<vertexBoneAssignments.size();++i){
-			const VertexBoneAssignmentList &vbal=vertexBoneAssignments[i];
+		for(i=0;i<mVertexBoneAssignments.size();++i){
+			const VertexBoneAssignmentList &vbal=mVertexBoneAssignments[i];
 			for(j=0;j<vbal.size();++j){
-				Skeleton::Bone *bone=skeleton->bones[vbal[j].bone];
+				Skeleton::Bone *bone=mSkeleton->bones[vbal[j].bone];
 				vba.get3(i,0,v);
 				Math::mul(v,bone->worldToBoneRotate);
 				Math::add(v,bone->worldToBoneTranslate);
@@ -93,6 +93,26 @@ void Mesh::compileBoneBounds(){
 		}
 
 		vba.unlock();
+	}
+}
+
+void Mesh::setStaticVertexData(VertexData::ptr vertexData){
+	if(mStaticVertexData!=NULL){
+		mStaticVertexData->destroy();
+	}
+
+	mStaticVertexData=vertexData;
+}
+
+void Mesh::setSkeleton(Skeleton::ptr skeleton){
+	if(mSkeleton!=NULL){
+		mSkeleton->release();
+	}
+
+	mSkeleton=skeleton;
+
+	if(mSkeleton!=NULL){
+		mSkeleton->retain();
 	}
 }
 

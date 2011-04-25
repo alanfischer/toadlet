@@ -1501,31 +1501,32 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 
 	M3GMesh *mesh=NULL;
 
-	VertexBuffer::ptr vertexBuffer=toadletMesh->staticVertexData->getVertexBuffer(0);
+	VertexBuffer::ptr vertexBuffer=toadletMesh->getStaticVertexData()->getVertexBuffer(0);
 	Collection<int> reorder;
 	reorder.resize(vertexBuffer->getSize());
 	for(i=0;i<reorder.size();++i){
 		reorder[i]=i;
 	}
 
-	if(toadletMesh->skeleton!=NULL && toadletMesh->vertexBoneAssignments.size()>0){
-		Skeleton::ptr toadletSkeleton=toadletMesh->skeleton;
+	if(toadletMesh->getSkeleton()!=NULL && toadletMesh->getVertexBoneAssignments()>0){
+		Skeleton::ptr toadletSkeleton=toadletMesh->getSkeleton();
+		const Collection<Mesh::VertexBoneAssignmentList> &vbas=toadletMesh->getVertexBoneAssignments();
 
 		Collection<Collection<int> > boneverts;
 		boneverts.resize(toadletSkeleton->bones.size());
 
 		// Here we calculate a vertexBuffer reordering so that bones can reference their vertexes sequentially
 		int count=0;
-		for(j=0;j<toadletMesh->vertexBoneAssignments.size();++j){
-			const Mesh::VertexBoneAssignmentList &assignments=toadletMesh->vertexBoneAssignments[j];
+		for(j=0;j<vbas.size();++j){
+			const Mesh::VertexBoneAssignmentList &assignments=vbas[j];
 			if(assignments.size()==0){
 				reorder[j]=count;
 				count++;
 			}
 		}
 		for(i=0;i<toadletSkeleton->bones.size();++i){
-			for(j=0;j<toadletMesh->vertexBoneAssignments.size();++j){
-				const Mesh::VertexBoneAssignmentList &assignments=toadletMesh->vertexBoneAssignments[j];
+			for(j=0;j<vbas.size();++j){
+				const Mesh::VertexBoneAssignmentList &assignments=vbas[j];
 				if(assignments.size()>0 && assignments[0].bone==i){
 					boneverts[i].add(count);
 					reorder[j]=count;
@@ -1795,7 +1796,7 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 
 	M3GVertexBuffer *vertexes=new M3GVertexBuffer();
 	{
-		VertexBuffer::ptr vertexBuffer=toadletMesh->staticVertexData->getVertexBuffer(0);
+		VertexBuffer::ptr vertexBuffer=toadletMesh->getStaticVertexData()->getVertexBuffer(0);
 		VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
 		int positionIndex=vertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
 		int positionOffset=positionIndex>=0?vertexFormat->getOffset(positionIndex):0;
@@ -1980,10 +1981,10 @@ M3GObject3D *M3GConverter::buildSceneGraph(Mesh *toadletMesh,float scale,int for
 	}
 	mesh->vertexBuffer=vertexes;
 
-	mesh->submeshes.resize(toadletMesh->subMeshes.size());
+	mesh->submeshes.resize(toadletMesh->getNumSubMeshes());
 
-	for(i=0;i<toadletMesh->subMeshes.size();++i){
-		Mesh::SubMesh *sub=toadletMesh->subMeshes[i];
+	for(i=0;i<toadletMesh->getNumSubMeshes();++i){
+		Mesh::SubMesh *sub=toadletMesh->getSubMesh(i);
 		
 		IndexBuffer::ptr indexBuffer=sub->indexData->getIndexBuffer();
 		int numIndexes=indexBuffer->getSize();

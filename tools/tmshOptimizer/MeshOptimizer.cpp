@@ -14,11 +14,11 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 
 	// Remove duplicate sub meshes
 	int combinedSubmeshes=0;
-	for(i=0;i<mesh->subMeshes.size();++i){
-		Mesh::SubMesh::ptr subMesh1=mesh->subMeshes[i];
+	for(i=0;i<mesh->getNumSubMeshes();++i){
+		Mesh::SubMesh::ptr subMesh1=mesh->getSubMesh(i);
 
-		for(j=i+1;j<mesh->subMeshes.size();++j){
-			Mesh::SubMesh::ptr subMesh2=mesh->subMeshes[j];
+		for(j=i+1;j<mesh->getNumSubMeshes();++j){
+			Mesh::SubMesh::ptr subMesh2=mesh->getSubMesh(j);
 
 			{ // If we could have more than 1 material per submesh, we would check that they both have 1 material here
 				Material::ptr material1=subMesh1->material;
@@ -56,7 +56,7 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 
 					subMesh1->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,cib,0,cib->getSize()));
 
-					mesh->subMeshes.removeAt(j);
+					mesh->removeSubMesh(subMesh2);
 
 					combinedSubmeshes++;
 
@@ -68,7 +68,7 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 	}
 
 	// Zero out unused texture coodinates
-	VertexBuffer::ptr vertexBuffer=mesh->staticVertexData->getVertexBuffer(0);
+	VertexBuffer::ptr vertexBuffer=mesh->getStaticVertexData()->getVertexBuffer(0);
 	VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
 	int positionIndex=vertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
 	int normalIndex=vertexFormat->findSemantic(VertexFormat::Semantic_NORMAL);
@@ -78,8 +78,8 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 		Collection<uint8> vertHasTex;
 		vertHasTex.resize(vertexBuffer->getSize(),0);
 
-		for(i=0;i<mesh->subMeshes.size();++i){
-			Mesh::SubMesh::ptr subMesh=mesh->subMeshes[i];
+		for(i=0;i<mesh->getNumSubMeshes();++i){
+			Mesh::SubMesh::ptr subMesh=mesh->getSubMesh(i);
 
 			Material::ptr material=subMesh->material;
 			if(material!=NULL && material->getNumTextures()>0){
@@ -146,9 +146,10 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 					if(Math::length(texCoord1,texCoord2)>mEpsilon) same=false;
 				}
 
-				if(mesh->vertexBoneAssignments.size()>0){
-					const Mesh::VertexBoneAssignmentList &a1=mesh->vertexBoneAssignments[i];
-					const Mesh::VertexBoneAssignmentList &a2=mesh->vertexBoneAssignments[j];
+				const Collection<Mesh::VertexBoneAssignmentList> vbas=mesh->getVertexBoneAssignments();
+				if(vbas.size()>0){
+					const Mesh::VertexBoneAssignmentList &a1=vbas[i];
+					const Mesh::VertexBoneAssignmentList &a2=vbas[j];
 					if(a1.size()!=a2.size()){
 						same=false;
 					}
@@ -170,8 +171,8 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 		}
 	}
 
-	for(i=0;i<mesh->subMeshes.size();++i){
-		Mesh::SubMesh::ptr subMesh=mesh->subMeshes[i];
+	for(i=0;i<mesh->getNumSubMeshes();++i){
+		Mesh::SubMesh::ptr subMesh=mesh->getSubMesh(i);
 
 		IndexBufferAccessor iba(subMesh->indexData->getIndexBuffer());
 		for(j=0;j<iba.getSize();++j){
@@ -181,9 +182,9 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 
 	// Remove degenerate triangles
 	int degenerateTris=0;
-	Collection<int> newIndexBufferSizes(mesh->subMeshes.size());
-	for(i=0;i<mesh->subMeshes.size();++i){
-		Mesh::SubMesh::ptr subMesh=mesh->subMeshes[i];
+	Collection<int> newIndexBufferSizes(mesh->getNumSubMeshes());
+	for(i=0;i<mesh->getNumSubMeshes();++i){
+		Mesh::SubMesh::ptr subMesh=mesh->getSubMesh(i);
 		IndexBufferAccessor iba(subMesh->indexData->getIndexBuffer());
 		newIndexBufferSizes[i]=iba.getSize();
 
@@ -205,8 +206,8 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 	Collection<uint8> vertUsed;
 	vertUsed.resize(vertexBuffer->getSize(),0);
 
-	for(i=0;i<mesh->subMeshes.size();++i){
-		Mesh::SubMesh::ptr subMesh=mesh->subMeshes[i];
+	for(i=0;i<mesh->getNumSubMeshes();++i){
+		Mesh::SubMesh::ptr subMesh=mesh->getSubMesh(i);
 
 		IndexBufferAccessor iba(subMesh->indexData->getIndexBuffer());
 		for(j=0;j<iba.getSize();++j){
@@ -223,8 +224,8 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 
 	VertexBuffer::ptr newVertexBuffer=engine->getBufferManager()->cloneVertexBuffer(vertexBuffer,vertexBuffer->getUsage(),vertexBuffer->getAccess(),vertexBuffer->getVertexFormat(),vertexBuffer->getSize()-unusedCount);
 	Collection<Mesh::VertexBoneAssignmentList> nvertexBoneAssignments;
-	if(mesh->vertexBoneAssignments.size()>0){
-		nvertexBoneAssignments.resize(mesh->vertexBoneAssignments.size()-unusedCount);
+	if(mesh->getVertexBoneAssignments().size()>0){
+		nvertexBoneAssignments.resize(mesh->getVertexBoneAssignments().size()-unusedCount);
 	}
 
 	unusedCount=0;
@@ -260,18 +261,18 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 					nvba.set2(i-unusedCount,texCoordIndex,texCoord);
 				}
 
-				if(mesh->vertexBoneAssignments.size()>0){
-					nvertexBoneAssignments[i-unusedCount]=mesh->vertexBoneAssignments[i];
+				if(mesh->getVertexBoneAssignments()>0){
+					nvertexBoneAssignments[i-unusedCount]=mesh->getVertexBoneAssignments()[i];
 				}
 			}
 		}
 	}
 
-	mesh->staticVertexData=VertexData::ptr(new VertexData(newVertexBuffer));
-	mesh->vertexBoneAssignments=nvertexBoneAssignments;
+	mesh->setStaticVertexData(VertexData::ptr(new VertexData(newVertexBuffer)));
+	mesh->setVertexBoneAssignments(nvertexBoneAssignments);
 
-	for(i=0;i<mesh->subMeshes.size();++i){
-		Mesh::SubMesh::ptr subMesh=mesh->subMeshes[i];
+	for(i=0;i<mesh->getNumSubMeshes();++i){
+		Mesh::SubMesh::ptr subMesh=mesh->getSubMesh(i);
 		IndexBuffer::ptr indexBuffer=subMesh->indexData->getIndexBuffer();
 		IndexBuffer::ptr newIndexBuffer=engine->getBufferManager()->createIndexBuffer(indexBuffer->getUsage(),indexBuffer->getAccess(),indexBuffer->getIndexFormat(),newIndexBufferSizes[i]);
 
@@ -285,7 +286,7 @@ bool MeshOptimizer::optimizeMesh(Mesh *mesh,Engine *engine){
 	}
 
 	// Remove empty tracks
-	Skeleton::ptr skeleton=mesh->skeleton;
+	Skeleton::ptr skeleton=mesh->getSkeleton();
 	if(skeleton!=NULL){
 		for(i=0;i<skeleton->sequences.size();++i){
 			TransformSequence::ptr sequence=skeleton->sequences[i];

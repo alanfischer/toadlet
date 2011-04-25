@@ -55,12 +55,12 @@ int main(int argc,char **argv){
 	MeshNode::ptr meshNode=engine->createNodeType(MeshNode::type(),viewer->getScene());
 	meshNode->setMesh(mesh);
 
-	if(mesh->skeleton!=NULL){
+	if(mesh->getSkeleton()!=NULL){
 		std::cout << "Has skeleton" << std::endl;
 
 		meshNode->getSkeleton()->setRenderSkeleton(true);
 
-		int numSequences=mesh->skeleton->sequences.size();
+		int numSequences=mesh->getSkeleton()->sequences.size();
 		std::cout << "Number of sequences:" << numSequences << std::endl;
 
 		if(argc>=3 && numSequences>0){

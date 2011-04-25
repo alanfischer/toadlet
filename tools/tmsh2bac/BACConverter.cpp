@@ -120,10 +120,11 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 		mName=mName.substr(0,loc);
 	}
 
-	VertexBuffer *vertexBuffer=mesh->staticVertexData->getVertexBuffer(0);
+	VertexBuffer *vertexBuffer=mesh->getStaticVertexData()->getVertexBuffer(0);
 	VertexFormat *vertexFormat=vertexBuffer->getVertexFormat();
+	const Collection<Mesh::VertexBoneAssignmentList> &vbas=mesh->getVertexBoneAssignments();
 	mHasNormal=vertexFormat->findSemantic(VertexFormat::Semantic_NORMAL)>=0;
-	mHasBone=mesh->vertexBoneAssignments.size()>0;
+	mHasBone=vbas.size()>0;
 
 	// Collect vertices and texture coordinates
 	int positionIndex=vertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
@@ -140,7 +141,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 		}
 		// FYI: The .bac format does not support vertex colors
 		if(mHasBone){
-			Mesh::VertexBoneAssignmentList &boneAssignments=mesh->vertexBoneAssignments[i];
+			const Mesh::VertexBoneAssignmentList &boneAssignments=vbas[i];
 			if(boneAssignments.size()>0){
 				v->bone=boneAssignments[0].bone;
 			}
@@ -249,8 +250,8 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 
 	// Iterate through submeshes
 	int k,l,m;
-	for(i=0;i<mesh->subMeshes.size();++i){
-		Mesh::SubMesh *subMesh=mesh->subMeshes[i];
+	for(i=0;i<mesh->getNumSubMeshes();++i){
+		Mesh::SubMesh *subMesh=mesh->getSubMesh(i);
 
 		// Extract triangles
 		IndexBuffer *indexBuffer=subMesh->indexData->getIndexBuffer();
@@ -353,7 +354,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 
 	Logger::alert(String("Number of mTriangles: ")+mTriangles.size()+" triangles");
 
-	if(mesh->skeleton==NULL){
+	if(mesh->getSkeleton()==NULL){
 		BACBone *bone=new BACBone();
 		bone->name=mName;
 		bone->translate=Vector3(0,0,0);
@@ -368,7 +369,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 		mBones.add(bone);
 	}
 	else{
-		MeshNodeSkeleton::ptr skeleton(new MeshNodeSkeleton(NULL,mesh->skeleton));
+		MeshNodeSkeleton::ptr skeleton(new MeshNodeSkeleton(NULL,mesh->getSkeleton()));
 		buildBones(mesh,skeleton,0);
 	}
 
@@ -376,7 +377,7 @@ bool BACConverter::extractMeshData(Mesh::ptr mesh,bool useSubmeshes){
 }
 
 void BACConverter::buildBones(Mesh *mesh,MeshNodeSkeleton *nodeSkeleton,int bone){
-	Skeleton *skeleton=mesh->skeleton;
+	Skeleton *skeleton=mesh->getSkeleton();
 	Skeleton::Bone *meshBone=skeleton->bones[bone];
 	int i;
 
@@ -1159,7 +1160,7 @@ void BACConverter::extractAnimationData(Mesh *mesh,TransformSequence *animation)
 		TransformTrack *track=animation->tracks[i];
 
 		int boneIndex=track->index;
-		Skeleton::Bone *meshbone=mesh->skeleton->bones[boneIndex];
+		Skeleton::Bone *meshbone=mesh->getSkeleton()->bones[boneIndex];
 
 		if(track->keyFrames.size()>0){
 			BACAnimationBone *bacbone=new BACAnimationBone();

@@ -560,10 +560,10 @@ void GLRenderer::setViewport(const Viewport &viewport){
 void GLRenderer::clear(int clearFlags,const Vector4 &clearColor){
 	int bufferBits=0;
 
-GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
-if(status!=GL_FRAMEBUFFER_COMPLETE){
-	Error::unknown(Categories::TOADLET_PEEPER,GLFBORenderTarget::getFBOMessage(status));
-}
+//\GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
+//if(status!=GL_FRAMEBUFFER_COMPLETE){
+//	Error::unknown(Categories::TOADLET_PEEPER,GLFBORenderTarget::getFBOMessage(status));
+//}
 
 	TOADLET_CHECK_GLERROR("entering clear");
 

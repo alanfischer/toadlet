@@ -301,7 +301,7 @@ int Scene::countActiveNodes(Node *node){
 
 void Scene::renderBoundingVolumes(Renderer *renderer,Node *node){
 	if(node==NULL){
-		mSphereMesh->subMeshes[0]->material->setupRenderer(renderer);
+		mSphereMesh->getSubMesh(0)->material->setupRenderer(renderer);
 		renderBoundingVolumes(renderer,mRoot);
 		return;
 	}
@@ -314,7 +314,7 @@ void Scene::renderBoundingVolumes(Renderer *renderer,Node *node){
 			Math::setMatrix4x4FromTranslate(transform,sphere.origin);
 			Math::setMatrix4x4FromScale(transform,sphere.radius,sphere.radius,sphere.radius);
 			renderer->setModelMatrix(transform);
-			renderer->renderPrimitive(mSphereMesh->staticVertexData,mSphereMesh->subMeshes[0]->indexData);
+			renderer->renderPrimitive(mSphereMesh->getStaticVertexData(),mSphereMesh->getSubMesh(0)->indexData);
 		}break;
 		case Bound::Type_AABOX:{
 			const AABox &box=bound.getAABox();
@@ -322,7 +322,7 @@ void Scene::renderBoundingVolumes(Renderer *renderer,Node *node){
 			Math::setMatrix4x4FromTranslate(transform,origin);
 			Math::setMatrix4x4FromScale(transform,origin.x-box.mins.x,origin.y-box.mins.y,origin.z-box.mins.z);
 			renderer->setModelMatrix(transform);
-			renderer->renderPrimitive(mAABoxMesh->staticVertexData,mAABoxMesh->subMeshes[0]->indexData);
+			renderer->renderPrimitive(mAABoxMesh->getStaticVertexData(),mAABoxMesh->getSubMesh(0)->indexData);
 		}break;
 	}
 

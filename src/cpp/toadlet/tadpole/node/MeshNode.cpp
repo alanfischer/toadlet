@@ -48,6 +48,9 @@ MeshNode::SubMesh::SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh):
 {
 	this->meshNode=meshNode;
 	this->meshSubMesh=meshSubMesh;
+	this->material=meshSubMesh->material;
+	this->indexData=meshSubMesh->indexData;
+	this->vertexData=meshSubMesh->vertexData;
 }
 
 void MeshNode::SubMesh::render(Renderer *renderer) const{
@@ -175,29 +178,25 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 	mMesh=mesh;
 	mMesh->retain();
 
-	setTransform(mMesh->transform);
-	setBound(mMesh->bound);
+	setTransform(mMesh->getTransform());
+	setBound(mMesh->getBound());
 
-	if(mMesh->skeleton!=NULL){
-		mSkeleton=MeshNodeSkeleton::ptr(new MeshNodeSkeleton(this,mMesh->skeleton));
-
+	if(mMesh->getSkeleton()!=NULL){
+		mSkeleton=MeshNodeSkeleton::ptr(new MeshNodeSkeleton(this,mMesh->getSkeleton()));
 		createVertexBuffer();
 	}
 
-	mSubMeshes.resize(mMesh->subMeshes.size());
+	mSubMeshes.resize(mMesh->getNumSubMeshes());
 	int i;
-	for(i=0;i<mMesh->subMeshes.size();++i){
-		SubMesh::ptr subMesh(new SubMesh(this,mMesh->subMeshes[i]));
+	for(i=0;i<mSubMeshes.size();++i){
+		SubMesh::ptr subMesh(new SubMesh(this,mMesh->getSubMesh(i)));
 		mSubMeshes[i]=subMesh;
-		subMesh->material=mMesh->subMeshes[i]->material;
-		subMesh->indexData=mMesh->subMeshes[i]->indexData;
-		subMesh->vertexData=mMesh->subMeshes[i]->vertexData;
 		if(subMesh->vertexData==NULL){
 			if(mDynamicVertexData!=NULL){
 				subMesh->vertexData=mDynamicVertexData;
 			}
 			else{
-				subMesh->vertexData=mMesh->staticVertexData;
+				subMesh->vertexData=mMesh->getStaticVertexData();
 			}
 		}
 
@@ -223,9 +222,8 @@ MeshNode::SubMesh *MeshNode::getSubMesh(const String &name){
 	}
 
 	int i;
-	for(i=0;i<mMesh->subMeshes.size();++i){
-		Mesh::SubMesh *subMesh=mMesh->subMeshes[i];
-		if(subMesh->name.equals(name)){
+	for(i=0;i<mSubMeshes.size();++i){
+		if(mSubMeshes[i]->meshSubMesh->name.equals(name)){
 			return mSubMeshes[i];
 		}
 	}
@@ -301,7 +299,7 @@ void MeshNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 void MeshNode::createVertexBuffer(){
 	if(mDynamicVertexData==NULL){
 		if(mSkeleton!=NULL){
-			VertexBuffer::ptr srcVertexBuffer=mMesh->staticVertexData->getVertexBuffer(0);
+			VertexBuffer::ptr srcVertexBuffer=mMesh->getStaticVertexData()->getVertexBuffer(0);
 			VertexFormat::ptr vertexFormat=srcVertexBuffer->getVertexFormat();
 			int numVertexes=srcVertexBuffer->getSize();
 			VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,vertexFormat,numVertexes);
@@ -319,12 +317,14 @@ void MeshNode::createVertexBuffer(){
 
 void MeshNode::updateVertexBuffer(){
 	if(mDynamicVertexData!=NULL){
-		VertexBuffer::ptr srcVertexBuffer=mMesh->staticVertexData->getVertexBuffer(0);
+		VertexBuffer::ptr srcVertexBuffer=mMesh->getStaticVertexData()->getVertexBuffer(0);
 		VertexBuffer::ptr dstVertexBuffer=mDynamicVertexData->getVertexBuffer(0);
 
 		VertexFormat *format=srcVertexBuffer->getVertexFormat();
 		int positionIndex=format->findSemantic(VertexFormat::Semantic_POSITION);
 		int normalIndex=format->findSemantic(VertexFormat::Semantic_NORMAL);
+
+		const Collection<Mesh::VertexBoneAssignmentList> &vbas=mMesh->getVertexBoneAssignments();
 
 		{
 			svba.lock(srcVertexBuffer,Buffer::Access_BIT_READ);
@@ -342,7 +342,7 @@ void MeshNode::updateVertexBuffer(){
 					svba.get3(i,normalIndex,normalInitial);
 
 					positionResult.reset();normalResult.reset();
-					const Mesh::VertexBoneAssignmentList &vba=mMesh->vertexBoneAssignments[i];
+					const Mesh::VertexBoneAssignmentList &vba=vbas[i];
 					for(j=0;j<vba.size();++j){
 						MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(vba[j].bone);
 
@@ -369,7 +369,7 @@ void MeshNode::updateVertexBuffer(){
 					svba.get3(i,positionIndex,positionInitial);
 
 					positionResult.reset();
-					const Mesh::VertexBoneAssignmentList &vba=mMesh->vertexBoneAssignments[i];
+					const Mesh::VertexBoneAssignmentList &vba=vbas[i];
 					for(j=0;j<vba.size();++j){
 						MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(vba[j].bone);
 

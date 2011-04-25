@@ -296,10 +296,12 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 
 	VertexBuffer::ptr vertexBuffer(new BackableBuffer());
 	vertexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,vertexFormat,vertexes.size());
-	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+	mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
+
+	Collection<Mesh::VertexBoneAssignmentList> vbas;
 
 	if(bones){
-		mesh->vertexBoneAssignments.resize(vertexes.size());
+		vbas.resize(vertexes.size());
 	}
 
 	{
@@ -309,17 +311,19 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 			vba.set3(i,1,vertexes[i].normal);
 			vba.set2(i,2,vertexes[i].texCoord);
 			if(bones){
-				mesh->vertexBoneAssignments[i]=vertexes[i].bones;
+				vbas[i]=vertexes[i].bones;
 			}
 		}
 	}
+
+	mesh->setVertexBoneAssignments(vbas);
 
 	int indexCount=indexes.size();
     for(i=0;i<indexCount;++i){
 		progressUpdated((float)i/(float)indexCount);
 
 		Mesh::SubMesh::ptr sub(new Mesh::SubMesh());
-		mesh->subMeshes.add(sub);
+		mesh->addSubMesh(sub);
 
 		sub->name=meshNames[i];
 
@@ -372,7 +376,7 @@ cPlugIn::exportMesh(msModel *pModel,const String &name){
 	}
 
 	if(bones){
-		mesh->skeleton=buildSkeleton(pModel,emptyBones);
+		mesh->setSkeleton(buildSkeleton(pModel,emptyBones));
 	}
 
 	FileStream::ptr stream(new FileStream(name,FileStream::Open_WRITE_BINARY));

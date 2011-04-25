@@ -87,8 +87,8 @@ Resource::ptr TMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 	}
 
 	j=0;
-	for(i=0;i<mesh->subMeshes.size();++i){
-		Mesh::SubMesh *subMesh=mesh->subMeshes[i];
+	for(i=0;i<mesh->getNumSubMeshes();++i){
+		Mesh::SubMesh *subMesh=mesh->getSubMesh(i);
 		if(subMesh->materialName.length()==0){
 			subMesh->material=materials[j++];
 			if(subMesh->material!=NULL){
@@ -103,10 +103,7 @@ Resource::ptr TMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 		}
 	}
 
-	mesh->skeleton=skeleton;
-	if(mesh->skeleton!=NULL){
-		skeleton->retain();
-	}
+	mesh->setSkeleton(skeleton);
 
 	return mesh;
 }
@@ -129,8 +126,8 @@ bool TMSHHandler::save(Mesh::ptr mesh,Stream::ptr stream){
 	dataStream->write(memoryStream->getOriginalDataPointer(),memoryStream->length());
 	memoryStream->reset();
 
-	for(i=0;i<mesh->subMeshes.size();++i){
-		Mesh::SubMesh *subMesh=mesh->subMeshes[i];
+	for(i=0;i<mesh->getNumSubMeshes();++i){
+		Mesh::SubMesh *subMesh=mesh->getSubMesh(i);
 		if(subMesh->materialName.length()==0){
 			writeMaterial(dataMemoryStream,subMesh->material);
 			dataStream->writeInt32(Block_MATERIAL);
@@ -140,15 +137,16 @@ bool TMSHHandler::save(Mesh::ptr mesh,Stream::ptr stream){
 		}
 	}
 
-	if(mesh->skeleton!=NULL){
-		writeSkeleton(dataMemoryStream,mesh->skeleton);
+	if(mesh->getSkeleton()!=NULL){
+		Skeleton::ptr skeleton=mesh->getSkeleton();
+		writeSkeleton(dataMemoryStream,skeleton);
 		dataStream->writeInt32(Block_SKELETON);
 		dataStream->writeInt32(memoryStream->length());
 		dataStream->write(memoryStream->getOriginalDataPointer(),memoryStream->length());
 		memoryStream->reset();
 
-		for(i=0;i<mesh->skeleton->sequences.size();++i){
-			TransformSequence::ptr sequence=mesh->skeleton->sequences[i];
+		for(i=0;i<skeleton->sequences.size();++i){
+			TransformSequence::ptr sequence=skeleton->sequences[i];
 			writeSequence(dataMemoryStream,sequence);
 			dataStream->writeInt32(Block_SEQUENCE);
 			dataStream->writeInt32(memoryStream->length());
@@ -165,13 +163,17 @@ Mesh::ptr TMSHHandler::readMesh(DataStream *stream,int blockSize){
 
 	Mesh::ptr mesh(new Mesh());
 	
-	stream->read((tbyte*)&mesh->transform,sizeof(Transform));
-	stream->read((tbyte*)&mesh->bound,sizeof(Bound));
-	
-	mesh->subMeshes.resize(stream->readUInt32());
-	for(i=0;i<mesh->subMeshes.size();++i){
+	Transform transform;
+	stream->read((tbyte*)&transform,sizeof(Transform));
+	mesh->setTransform(transform);
+
+	Bound bound;
+	stream->read((tbyte*)&bound,sizeof(Bound));
+	mesh->setBound(bound);
+
+	int numSubMeshes=stream->readUInt32();
+	for(i=0;i<numSubMeshes;++i){
 		Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
-		mesh->subMeshes[i]=subMesh;
 	
 		subMesh->vertexData=readVertexData(stream);
 		subMesh->indexData=readIndexData(stream);
@@ -183,17 +185,21 @@ Mesh::ptr TMSHHandler::readMesh(DataStream *stream,int blockSize){
 		subMesh->hasOwnTransform=stream->readBool();
 		stream->read((tbyte*)&subMesh->transform,sizeof(Transform));
 		stream->read((tbyte*)&subMesh->bound,sizeof(Bound));
-	}
-	mesh->staticVertexData=readVertexData(stream);
 
-	mesh->vertexBoneAssignments.resize(stream->readUInt32());
-	for(i=0;i<mesh->vertexBoneAssignments.size();++i){
-		Mesh::VertexBoneAssignmentList &list=mesh->vertexBoneAssignments[i];
+		mesh->addSubMesh(subMesh);
+	}
+	mesh->setStaticVertexData(readVertexData(stream));
+
+	Collection<Mesh::VertexBoneAssignmentList> vbas;
+	vbas.resize(stream->readUInt32());
+	for(i=0;i<vbas.size();++i){
+		Mesh::VertexBoneAssignmentList &list=vbas[i];
 		
 		int numAssignments=stream->readUInt8();
 		list.resize(numAssignments);
 		stream->read((tbyte*)list.begin(),numAssignments*sizeof(Mesh::VertexBoneAssignment));
 	}
+	mesh->setVertexBoneAssignments(vbas);
 
 	return mesh;
 }
@@ -280,13 +286,13 @@ VertexFormat::ptr TMSHHandler::readVertexFormat(DataStream *stream){
 
 
 void TMSHHandler::writeMesh(DataStream *stream,Mesh::ptr mesh){
-	stream->write((tbyte*)&mesh->transform,sizeof(Transform));
-	stream->write((tbyte*)&mesh->bound,sizeof(Bound));
+	stream->write((tbyte*)&mesh->getTransform(),sizeof(Transform));
+	stream->write((tbyte*)&mesh->getBound(),sizeof(Bound));
 	
-	stream->writeUInt32(mesh->subMeshes.size());
+	stream->writeUInt32(mesh->getNumSubMeshes());
 	int i;
-	for(i=0;i<mesh->subMeshes.size();++i){
-		Mesh::SubMesh::ptr subMesh=mesh->subMeshes[i];
+	for(i=0;i<mesh->getNumSubMeshes();++i){
+		Mesh::SubMesh::ptr subMesh=mesh->getSubMesh(i);
 
 		writeVertexData(stream,subMesh->vertexData);
 		writeIndexData(stream,subMesh->indexData);
@@ -299,12 +305,12 @@ void TMSHHandler::writeMesh(DataStream *stream,Mesh::ptr mesh){
 		stream->write((tbyte*)&subMesh->transform,sizeof(Transform));
 		stream->write((tbyte*)&subMesh->bound,sizeof(Bound));
 	}
-	writeVertexData(stream,mesh->staticVertexData);
+	writeVertexData(stream,mesh->getStaticVertexData());
 
-	stream->writeUInt32(mesh->vertexBoneAssignments.size());
-	for(i=0;i<mesh->vertexBoneAssignments.size();++i){
-		Mesh::VertexBoneAssignmentList &list=mesh->vertexBoneAssignments[i];
-		
+	const Collection<Mesh::VertexBoneAssignmentList> &vbas=mesh->getVertexBoneAssignments();
+	stream->writeUInt32(vbas.size());
+	for(i=0;i<vbas.size();++i){
+		const Mesh::VertexBoneAssignmentList &list=vbas[i];
 		int numAssignments=list.size();
 		stream->writeUInt8(numAssignments);
 		stream->write((tbyte*)list.begin(),numAssignments*sizeof(Mesh::VertexBoneAssignment));

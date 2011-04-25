@@ -119,7 +119,7 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 
 				if(mSkeleton==NULL){
 					mSkeleton=Skeleton::ptr(new Skeleton());
-					mMesh->skeleton=mSkeleton;
+					mMesh->setSkeleton(mSkeleton);
 					reference=true;
 				}
 
@@ -220,7 +220,7 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 		}
 		else{
 			mSkeleton=NULL;
-			mMesh->skeleton=NULL;
+			mMesh->setSkeleton(NULL);
 		}
 
 		Collection<Vertex> verts;
@@ -255,15 +255,16 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 				vba.set2(i,2,v.texCoord);
 			}
 		}
-		mMesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+		mMesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
 
 		if(mSkeleton!=NULL){
-			mMesh->vertexBoneAssignments.resize(verts.size());
+			Collection<Mesh::VertexBoneAssignmentList> vbas(verts.size());
 			for(i=0;i<verts.size();++i){
 				Mesh::VertexBoneAssignmentList list;
 				list.add(Mesh::VertexBoneAssignment(verts[i].bone,Math::ONE));
-				mMesh->vertexBoneAssignments.setAt(i,list);
+				vbas.setAt(i,list);
 			}
+			mMesh->setVertexBoneAssignments(vbas);
 		}
 
 		for(j=0;j<materialIndexLists.size();++j){
@@ -290,7 +291,7 @@ void SMDConverter::load(Engine *engine,Stream *in,const String &fileName){
 				}
 			}
 			Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
-			mMesh->subMeshes.add(subMesh);
+			mMesh->addSubMesh(subMesh);
 
 			subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
 			subMesh->materialName=materialName;
