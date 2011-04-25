@@ -163,7 +163,11 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 			data=mipDatas[level];
 			int alignment=1,pitch=rowPitch;
 			while(pitch>0 && (pitch&1)==0){alignment<<=1;pitch>>=1;}
-			glPixelStorei(GL_PACK_ALIGNMENT,alignment<8?alignment:8);
+			glPixelStorei(GL_UNPACK_ALIGNMENT,alignment<8?alignment:8);
+		}
+		else{
+			// Skip specifying a level if no data available, otherwise if GL_GENERATE_MIPMAP is true, we destroy the generate mipmaps
+			continue;
 		}
 
 		if(ImageFormatConversion::isFormatCompressed(mFormat)==false){
@@ -328,7 +332,7 @@ bool GLTexture::load(int width,int height,int depth,int mipLevel,tbyte *mipData)
 
 	int alignment=1,pitch=rowPitch;
 	while((pitch&1)==0){alignment<<=1;pitch>>=1;}
-	glPixelStorei(GL_PACK_ALIGNMENT,alignment<8?alignment:8);
+	glPixelStorei(GL_UNPACK_ALIGNMENT,alignment<8?alignment:8);
 
 	if(ImageFormatConversion::isFormatCompressed(mFormat)==false){
 		switch(mTarget){
@@ -414,7 +418,7 @@ bool GLTexture::read(int width,int height,int depth,int mipLevel,tbyte *mipData)
 
 	int alignment=1,pitch=rowPitch;
 	while((pitch&1)==0){alignment<<=1;pitch>>=1;}
-	glPixelStorei(GL_UNPACK_ALIGNMENT,alignment<8?alignment:8);
+	glPixelStorei(GL_PACK_ALIGNMENT,alignment<8?alignment:8);
 
 	#if !defined(TOADLET_HAS_GLES)
 		if(mTarget!=GL_TEXTURE_CUBE_MAP){

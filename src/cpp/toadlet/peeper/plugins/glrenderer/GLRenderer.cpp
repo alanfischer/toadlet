@@ -1164,14 +1164,13 @@ void GLRenderer::setTextureStatePostTexture(int i,TextureState *state){
 			calculation=TextureState::CalculationType_NORMAL;
 		}
 
+		if(mMatrixMode!=GL_TEXTURE){
+			mMatrixMode=GL_TEXTURE;
+			glMatrixMode(mMatrixMode);
+		}
+		glLoadIdentity();
+
 		if(calculation!=TextureState::CalculationType_DISABLED){
-			if(mMatrixMode!=GL_TEXTURE){
-				mMatrixMode=GL_TEXTURE;
-				glMatrixMode(mMatrixMode);
-			}
-
-			glLoadIdentity();
-
 			const Matrix4x4 &matrix=state->matrix;
 			if(calculation==TextureState::CalculationType_NORMAL){
 				#if defined(TOADLET_FIXED_POINT)
@@ -1243,13 +1242,6 @@ void GLRenderer::setTextureStatePostTexture(int i,TextureState *state){
 					glPopMatrix();
 				#endif
 			}
-		}
-		else{
-			if(mMatrixMode!=GL_TEXTURE){
-				mMatrixMode=GL_TEXTURE;
-				glMatrixMode(mMatrixMode);
-			}
-			glLoadIdentity();
 		}
 
 		#if !defined(TOADLET_HAS_GLES)
