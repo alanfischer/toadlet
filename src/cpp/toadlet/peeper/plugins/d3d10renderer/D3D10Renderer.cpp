@@ -509,7 +509,13 @@ if(d3dset->mD3DSamplerStates.size()>0)samp=d3dset->mD3DSamplerStates[0];
 	mD3DDevice->PSSetSamplers(0,d3dset->mD3DSamplerStates.size(),d3dset->mD3DSamplerStates.begin());
 	mD3DDevice->GSSetSamplers(0,d3dset->mD3DSamplerStates.size(),d3dset->mD3DSamplerStates.begin());
 
-if(d3dset->mTextureStates.size()>0)effect->GetVariableByName("textureMatrix")->AsMatrix()->SetMatrix(d3dset->mTextureStates[0]->matrix.getData());
+#if defined(TOADLET_FIXED_POINT)
+	float d3dmatrix[16];
+	toD3DMatrix(d3dmatrix,d3dset->mTextureStates[0]->matrix);
+#else
+	float *d3dmatrix=d3dset->mTextureStates[0]->matrix.data;
+#endif
+if(d3dset->mTextureStates.size()>0)effect->GetVariableByName("textureMatrix")->AsMatrix()->SetMatrix(d3dmatrix);
 
 if(d3dset->mMaterialState!=NULL){
 effect->GetVariableByName("diffuseColor")->AsVector()->SetFloatVector((float*)d3dset->mMaterialState->diffuse.getData());

@@ -1647,12 +1647,20 @@ namespace Math{
 	TOADLET_API void findFitCapsule(Capsule &r,const AABox &box);
 
 	// Color operations
-	inline uint32 swapColor(uint32 bytes){
+	inline uint32 rgbaToARGB(uint32 c){
 		return
-			((bytes&0xFF000000)>>24) |
-			((bytes&0x00FF0000)>>8 ) |
-			((bytes&0x0000FF00)<<8 ) |
-			((bytes&0x000000FF)<<24) ;
+			((c&0xFF000000)>>8 ) |
+			((c&0x00FF0000)>>8 ) |
+			((c&0x0000FF00)>>8 ) |
+			((c&0x000000FF)<<24) ;
+	}
+
+	inline uint32 argbToRGBA(uint32 c){
+		return
+			((c&0xFF000000)>>24) |
+			((c&0x00FF0000)<<8 ) |
+			((c&0x0000FF00)<<8 ) |
+			((c&0x000000FF)<<8 ) ;
 	}
 
 	inline uint32 lerpColor(uint32 c1,uint32 c2,scalar t){
