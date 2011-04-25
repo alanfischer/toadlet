@@ -52,9 +52,9 @@ int main(int argc,char **argv){
 	}
 
 	// Output mesh information
-	std::cout << "Number of SubMeshes: " << mesh->subMeshes.size() << std::endl;
-	for(i=0;i<mesh->subMeshes.size();++i){
-		Mesh::SubMesh *subMesh=mesh->subMeshes[i];
+	std::cout << "Number of SubMeshes: " << mesh->getNumSubMeshes() << std::endl;
+	for(i=0;i<mesh->getNumSubMeshes();++i){
+		Mesh::SubMesh *subMesh=mesh->getSubMesh(i);
 		std::cout << "SubMesh: " << i << " has Material: " << (subMesh->material!=NULL) << " materialName: " << (const char*)subMesh->materialName << std::endl;
 	}
 

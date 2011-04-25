@@ -246,7 +246,7 @@ uint8 *GLBuffer::lock(int lockAccess){
 			int i,j;
 			for(i=0;i<mVertexFormat->getNumElements();++i){
 				if(mVertexFormat->getFormat(i)==VertexFormat::Format_COLOR_RGBA){
-					byte *data=mData+mVertexFormat->getOffset(i);
+					tbyte *data=mData+mVertexFormat->getOffset(i);
 					for(j=0;j<mSize;++j){
 						swap4(*(uint32*)(data+vertexSize*j));
 					}
@@ -268,7 +268,7 @@ bool GLBuffer::unlock(){
 			int i,j;
 			for(i=0;i<mVertexFormat->getNumElements();++i){
 				if(mVertexFormat->getFormat(i)==VertexFormat::Format_COLOR_RGBA){
-					byte *data=mData+mVertexFormat->getOffset(i);
+					tbyte *data=mData+mVertexFormat->getOffset(i);
 					for(j=0;j<mSize;++j){
 						swap4(*(uint32*)(data+vertexSize*j));
 					}

@@ -125,10 +125,9 @@ Mesh::ptr MeshManager::createBox(const AABox &box,Material::ptr material){
 	subMesh->material=material;
 
 	Mesh::ptr mesh(new Mesh());
-	mesh->subMeshes.resize(1);
-	mesh->subMeshes[0]=subMesh;
-	mesh->bound.set(box);
-	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+	mesh->addSubMesh(subMesh);
+	mesh->setBound(Bound(box));
+	mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
 
 	return mesh;
 }
@@ -210,40 +209,40 @@ Mesh::ptr MeshManager::createSkyBox(scalar size,bool unfolded,bool invert,Materi
 	}
 
 	Mesh::ptr mesh(new Mesh());
-	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
-	mesh->bound.set(AABox(-size,-size,-size,size,size,size));
+	mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
+	mesh->setBound(Bound(AABox(-size,-size,-size,size,size,size)));
 
 	if(unfolded){
-		mesh->subMeshes.add(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
-		mesh->subMeshes[0]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
+		mesh->addSubMesh(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
+		mesh->getSubMesh(0)->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
 	}
 	else{
-		mesh->subMeshes.add(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
-		mesh->subMeshes[0]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,6));
-		mesh->subMeshes.add(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
-		mesh->subMeshes[1]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,6,6));
-		mesh->subMeshes.add(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
-		mesh->subMeshes[2]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,12,6));
-		mesh->subMeshes.add(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
-		mesh->subMeshes[3]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,18,6));
-		mesh->subMeshes.add(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
-		mesh->subMeshes[4]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,24,6));
-		mesh->subMeshes.add(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
-		mesh->subMeshes[5]->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,30,6));
+		mesh->addSubMesh(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
+		mesh->getSubMesh(0)->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,0,6));
+		mesh->addSubMesh(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
+		mesh->getSubMesh(1)->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,6,6));
+		mesh->addSubMesh(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
+		mesh->getSubMesh(2)->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,12,6));
+		mesh->addSubMesh(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
+		mesh->getSubMesh(3)->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,18,6));
+		mesh->addSubMesh(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
+		mesh->getSubMesh(4)->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,24,6));
+		mesh->addSubMesh(Mesh::SubMesh::ptr(new Mesh::SubMesh()));
+		mesh->getSubMesh(5)->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer,30,6));
 	}
 
-	mesh->subMeshes[0]->material=bottom;
+	mesh->getSubMesh(0)->material=bottom;
 	bottom->retain();
 	if(unfolded==false){
-		mesh->subMeshes[1]->material=top;
+		mesh->getSubMesh(1)->material=top;
 		top->retain();
-		mesh->subMeshes[2]->material=left;
+		mesh->getSubMesh(2)->material=left;
 		left->retain();
-		mesh->subMeshes[3]->material=right;
+		mesh->getSubMesh(3)->material=right;
 		right->retain();
-		mesh->subMeshes[4]->material=back;
+		mesh->getSubMesh(4)->material=back;
 		back->retain();
-		mesh->subMeshes[5]->material=front;
+		mesh->getSubMesh(5)->material=front;
 		front->retain();
 	}
 
@@ -260,7 +259,7 @@ Mesh::ptr MeshManager::createGrid(scalar width,scalar height,int numWidth,int nu
 		material->setMaterialState(MaterialState(true));
 	}
 	material->retain();
-	mesh->subMeshes[0]->material=material;
+	mesh->getSubMesh(0)->material=material;
 
 	return mesh;
 }
@@ -331,10 +330,9 @@ Mesh::ptr MeshManager::createGrid(VertexBuffer::ptr vertexBuffer,IndexBuffer::pt
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,indexBuffer));
 
 	Mesh::ptr mesh(new Mesh());
-	mesh->subMeshes.resize(1);
-	mesh->subMeshes[0]=subMesh;
-	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
-	mesh->bound.set(AABox(-width/2,-height/2,0,width/2,height/2,0));
+	mesh->addSubMesh(subMesh);
+	mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
+	mesh->setBound(Bound(AABox(-width/2,-height/2,0,width/2,height/2,0)));
 
 	return mesh;
 }
@@ -349,7 +347,7 @@ Mesh::ptr MeshManager::createSphere(const Sphere &sphere,int numSegments,int num
 		material->setMaterialState(MaterialState(true));
 	}
 	material->retain();
-	mesh->subMeshes[0]->material=material;
+	mesh->getSubMesh(0)->material=material;
 
 	return mesh;
 }
@@ -418,10 +416,9 @@ Mesh::ptr MeshManager::createSphere(VertexBuffer::ptr vertexBuffer,IndexBuffer::
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
 
 	Mesh::ptr mesh(new Mesh());
-	mesh->subMeshes.resize(1);
-	mesh->subMeshes[0]=subMesh;
-	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
-	mesh->bound.set(sphere);
+	mesh->addSubMesh(subMesh);
+	mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
+	mesh->setBound(Bound(sphere));
 
 	return mesh;
 }
@@ -437,7 +434,7 @@ Mesh::ptr MeshManager::createSkyDome(const Sphere &sphere,int numSegments,int nu
 		material->setMaterialState(MaterialState(false));
 	}
 	material->retain();
-	mesh->subMeshes[0]->material=material;
+	mesh->getSubMesh(0)->material=material;
 
 	return mesh;
 }
@@ -514,10 +511,9 @@ Mesh::ptr MeshManager::createSkyDome(VertexBuffer::ptr vertexBuffer,IndexBuffer:
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
 
 	Mesh::ptr mesh(new Mesh());
-	mesh->subMeshes.resize(1);
-	mesh->subMeshes[0]=subMesh;
-	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
-	mesh->bound.set(sphere);
+	mesh->addSubMesh(subMesh);
+	mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
+	mesh->setBound(Bound(sphere));
 
 	return mesh;
 }
@@ -532,7 +528,7 @@ Mesh::ptr MeshManager::createGeoSphere(const Sphere &sphere,int depth,bool icosa
 		material->setMaterialState(MaterialState(true));
 	}
 	material->retain();
-	mesh->subMeshes[0]->material=material;
+	mesh->getSubMesh(0)->material=material;
 
 	return mesh;
 }
@@ -674,10 +670,9 @@ Mesh::ptr MeshManager::createGeoSphere(VertexBuffer::ptr vertexBuffer,IndexBuffe
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
 
 	Mesh::ptr mesh(new Mesh());
-	mesh->subMeshes.resize(1);
-	mesh->subMeshes[0]=subMesh;
-	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
-	mesh->bound.set(sphere);
+	mesh->addSubMesh(subMesh);
+	mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
+	mesh->setBound(Bound(sphere));
 
 	return mesh;
 }
@@ -691,7 +686,7 @@ Mesh::ptr MeshManager::createTorus(scalar majorRadius,scalar minorRadius,int num
 		material->setMaterialState(MaterialState(true));
 	}
 	material->retain();
-	mesh->subMeshes[0]->material=material;
+	mesh->getSubMesh(0)->material=material;
 
 	return mesh;
 }
@@ -740,10 +735,9 @@ Mesh::ptr MeshManager::createTorus(VertexBuffer::ptr vertexBuffer,scalar majorRa
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,vertexBuffer->getSize()));
 
 	Mesh::ptr mesh(new Mesh());
-	mesh->subMeshes.resize(1);
-	mesh->subMeshes[0]=subMesh;
-	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
-	mesh->bound.set(majorRadius);
+	mesh->addSubMesh(subMesh);
+	mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
+	mesh->setBound(Bound(Sphere(majorRadius)));
 
 	return mesh;
 }

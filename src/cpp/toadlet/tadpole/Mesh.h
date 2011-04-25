@@ -82,17 +82,38 @@ public:
 	virtual ~Mesh();
 
 	void destroy();
+
 	void compile();
 	void compileBoneBounds();
 
-	Transform transform;
-	Bound bound;
+	void setTransform(const Transform &transform){mTransform.set(transform);}
+	const Transform &getTransform() const{return mTransform;}
 
-	egg::Collection<SubMesh::ptr> subMeshes;
-	peeper::VertexData::ptr staticVertexData; /// @todo: Change this to a VertexBuffer and let the SubMeshes have VertexDatas
+	void setBound(const Bound &bound){mBound.set(bound);}
+	const Bound &getBound() const{return mBound;}
 
-	Skeleton::ptr skeleton; // Must be retained when assigned
-	egg::Collection<VertexBoneAssignmentList> vertexBoneAssignments;
+	void addSubMesh(SubMesh::ptr subMesh){mSubMeshes.add(subMesh);}
+	void removeSubMesh(SubMesh::ptr subMesh){mSubMeshes.remove(subMesh);}
+	int getNumSubMeshes() const{return mSubMeshes.size();}
+	SubMesh::ptr getSubMesh(int i){return mSubMeshes[i];}
+	SubMesh::ptr getSubMesh(const egg::String &name);
+
+	void setStaticVertexData(peeper::VertexData::ptr vertexData);
+	peeper::VertexData::ptr getStaticVertexData(){return mStaticVertexData;}
+
+	void setSkeleton(Skeleton::ptr skeleton);
+	Skeleton::ptr getSkeleton() const{return mSkeleton;}
+
+	void setVertexBoneAssignments(const egg::Collection<VertexBoneAssignmentList> &assignments){mVertexBoneAssignments=assignments;}
+	const egg::Collection<VertexBoneAssignmentList> &getVertexBoneAssignments() const{return mVertexBoneAssignments;}
+
+protected:
+	Transform mTransform;
+	Bound mBound;
+	egg::Collection<SubMesh::ptr> mSubMeshes;
+	peeper::VertexData::ptr mStaticVertexData;
+	Skeleton::ptr mSkeleton;
+	egg::Collection<VertexBoneAssignmentList> mVertexBoneAssignments;
 };
 
 }

@@ -35,7 +35,7 @@ template <typename T> void addNoDuplicates(Collection<T> &collection,const T &t)
 }
 
 void MeshPreprocess::adjustTexCoords(Mesh *mesh,float texCoordAdjust){
-	VertexData::ptr vertexData=mesh->staticVertexData;
+	VertexData::ptr vertexData=mesh->getStaticVertexData();
 	VertexBuffer::ptr vertexBuffer=vertexData->getVertexBuffer(0);
 	VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
 	int texCoordIndex=vertexFormat->findSemantic(VertexFormat::Semantic_TEX_COORD);
@@ -48,8 +48,8 @@ void MeshPreprocess::adjustTexCoords(Mesh *mesh,float texCoordAdjust){
 		texCoordFriends.resize(vertexBuffer->getSize());
 
 		int i;
-		for(i=0;i<mesh->subMeshes.size();++i){
-			Mesh::SubMesh::ptr sub=mesh->subMeshes[i];
+		for(i=0;i<mesh->getNumSubMeshes();++i){
+			Mesh::SubMesh::ptr sub=mesh->getSubMesh(i);
 			IndexData::ptr indexData=sub->indexData;
 			IndexBuffer::ptr indexBuffer=indexData->getIndexBuffer();
 			IndexBufferAccessor iba(indexBuffer);
@@ -107,7 +107,7 @@ void MeshPreprocess::adjustTexCoords(Mesh *mesh,float texCoordAdjust){
 }
 
 void MeshPreprocess::adjustPositions(Mesh *mesh,float positionAdjust){
-	VertexData::ptr vertexData=mesh->staticVertexData;
+	VertexData::ptr vertexData=mesh->getStaticVertexData();
 	VertexBuffer::ptr vertexBuffer=vertexData->getVertexBuffer(0);
 	VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
 	int positionIndex=vertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
@@ -115,8 +115,8 @@ void MeshPreprocess::adjustPositions(Mesh *mesh,float positionAdjust){
 	VertexBufferAccessor vba(vertexBuffer);
 	if(positionAdjust!=0){
 		int i;
-		for(i=0;i<mesh->subMeshes.size();++i){
-			Mesh::SubMesh::ptr sub=mesh->subMeshes[i];
+		for(i=0;i<mesh->getNumSubMeshes();++i){
+			Mesh::SubMesh::ptr sub=mesh->getSubMesh(i);
 			IndexData::ptr indexData=sub->indexData;
 			IndexBuffer::ptr indexBuffer=indexData->getIndexBuffer();
 			IndexBufferAccessor iba(indexBuffer);

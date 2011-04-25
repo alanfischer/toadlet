@@ -80,15 +80,17 @@ Resource::ptr XMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 
 	mxmlRelease(root);
 
-	if(mesh->skeleton!=NULL){
+	if(mesh->getSkeleton()!=NULL){
+		Skeleton::ptr skeleton=mesh->getSkeleton();
+
 		// Clean up skeleton
 		int i,j;
-		for(i=0;i<mesh->skeleton->bones.size();++i){
-			if(mesh->skeleton->bones[i]->parentIndex>i) break;
+		for(i=0;i<skeleton->bones.size();++i){
+			if(skeleton->bones[i]->parentIndex>i) break;
 		}
-		if(i<mesh->skeleton->bones.size()){
+		if(i<skeleton->bones.size()){
 			// Reorder Bones
-			Skeleton::ptr unordered=mesh->skeleton;
+			Skeleton::ptr unordered=skeleton;
 			Skeleton::ptr ordered(new Skeleton());
 			// Pull all root bones
 			for(i=0;i<unordered->bones.size();++i){
@@ -115,12 +117,14 @@ Resource::ptr XMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 			for(i=0;i<ordered->bones.size();++i){
 				oldIndexes[ordered->bones[i]->index]=i;
 			}
-			for(i=0;i<mesh->vertexBoneAssignments.size();++i){
-				Mesh::VertexBoneAssignmentList &vbalist=mesh->vertexBoneAssignments[i];
+			Collection<Mesh::VertexBoneAssignmentList> vbas=mesh->getVertexBoneAssignments();
+			for(i=0;i<vbas.size();++i){
+				Mesh::VertexBoneAssignmentList &vbalist=vbas[i];
 				for(j=0;j<vbalist.size();++j){
 					vbalist[j].bone=oldIndexes[vbalist[j].bone];
 				}
 			}
+			mesh->setVertexBoneAssignments(vbas);
 
 			// Reindex the ordered bones
 			Collection<int> newParentIndexes(ordered->bones.size(),-1);
@@ -139,7 +143,7 @@ Resource::ptr XMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 
 			ordered->compile();
 
-			mesh->skeleton=ordered;
+			mesh->setSkeleton(ordered);
 		}
 	}
 
@@ -185,10 +189,10 @@ Mesh::ptr XMSHHandler::loadMeshVersion1(mxml_node_t *root){
 			mesh=XMLMeshUtilities::loadMesh(block,1,mEngine!=NULL?mEngine->getBufferManager():NULL,mEngine!=NULL?mEngine->getMaterialManager():NULL,mEngine!=NULL?mEngine->getTextureManager():NULL);
 		}
 		else if(strcmp(mxmlGetElementName(block),"SkeletonData")==0){
-			mesh->skeleton=Skeleton::ptr(XMLMeshUtilities::loadSkeleton(block,1));
+			mesh->setSkeleton(Skeleton::ptr(XMLMeshUtilities::loadSkeleton(block,1)));
 		}
 		else if(strcmp(mxmlGetElementName(block),"AnimationData")==0){
-			mesh->skeleton->sequences.add(TransformSequence::ptr(XMLMeshUtilities::loadSequence(block,1)));
+			mesh->getSkeleton()->sequences.add(TransformSequence::ptr(XMLMeshUtilities::loadSequence(block,1)));
 		}
 	}
 
@@ -204,10 +208,10 @@ Mesh::ptr XMSHHandler::loadMeshVersion2Up(mxml_node_t *root,int version){
 			mesh=XMLMeshUtilities::loadMesh(block,version,mEngine!=NULL?mEngine->getBufferManager():NULL,mEngine!=NULL?mEngine->getMaterialManager():NULL,mEngine!=NULL?mEngine->getTextureManager():NULL);
 		}
 		else if(strcmp(mxmlGetElementName(block),"Skeleton")==0){
-			mesh->skeleton=Skeleton::ptr(XMLMeshUtilities::loadSkeleton(block,version));
+			mesh->setSkeleton(Skeleton::ptr(XMLMeshUtilities::loadSkeleton(block,version)));
 		}
 		else if(strcmp(mxmlGetElementName(block),"Sequence")==0){
-			mesh->skeleton->sequences.add(TransformSequence::ptr(XMLMeshUtilities::loadSequence(block,version)));
+			mesh->getSkeleton()->sequences.add(TransformSequence::ptr(XMLMeshUtilities::loadSequence(block,version)));
 		}
 	}
 
@@ -220,14 +224,15 @@ bool XMSHHandler::saveMeshVersion1(mxml_node_t *root,Mesh::ptr mesh,ProgressList
 		mxmlSetElement(node,"MeshData");
 		mxmlAddChild(root,node);
 	}
-	if(mesh!=NULL && mesh->skeleton!=NULL){
-		mxml_node_t *node=XMLMeshUtilities::saveSkeleton(mesh->skeleton,1,listener);
+	if(mesh!=NULL && mesh->getSkeleton()!=NULL){
+		Skeleton::ptr skeleton=mesh->getSkeleton();
+		mxml_node_t *node=XMLMeshUtilities::saveSkeleton(skeleton,1,listener);
 		mxmlSetElement(node,"SkeletonData");
 		mxmlAddChild(root,node);
 
 		int i;
-		for(i=0;i<mesh->skeleton->sequences.size();++i){
-			TransformSequence::ptr sequence=mesh->skeleton->sequences[i];
+		for(i=0;i<skeleton->sequences.size();++i){
+			TransformSequence::ptr sequence=skeleton->sequences[i];
 			mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,1,listener);
 			mxmlSetElement(node,"AnimationData");
 			mxmlAddChild(root,node);
@@ -243,14 +248,15 @@ bool XMSHHandler::saveMeshVersion2Up(mxml_node_t *root,Mesh::ptr mesh,int versio
 		mxmlSetElement(node,"Mesh");
 		mxmlAddChild(root,node);
 	}
-	if(mesh!=NULL && mesh->skeleton!=NULL){
-		mxml_node_t *node=XMLMeshUtilities::saveSkeleton(mesh->skeleton,version,listener);
+	if(mesh!=NULL && mesh->getSkeleton()!=NULL){
+		Skeleton::ptr skeleton=mesh->getSkeleton();
+		mxml_node_t *node=XMLMeshUtilities::saveSkeleton(skeleton,version,listener);
 		mxmlSetElement(node,"Skeleton");
 		mxmlAddChild(root,node);
 
 		int i;
-		for(i=0;i<mesh->skeleton->sequences.size();++i){
-			TransformSequence::ptr sequence=mesh->skeleton->sequences[i];
+		for(i=0;i<skeleton->sequences.size();++i){
+			TransformSequence::ptr sequence=skeleton->sequences[i];
 			mxml_node_t *node=XMLMeshUtilities::saveSequence(sequence,version,listener);
 			mxmlSetElement(node,"Sequence");
 			mxmlAddChild(root,node);

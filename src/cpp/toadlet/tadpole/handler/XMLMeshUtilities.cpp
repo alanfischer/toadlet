@@ -577,20 +577,23 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 
 	mxml_node_t *transformNode=mxmlFindChild(node,"Transform");
 	if(transformNode!=NULL){
+		Transform transform;
 		mxml_node_t *translateNode=mxmlFindChild(transformNode,"Translate");
 		if(translateNode!=NULL){
-			mesh->transform.setTranslate(parseVector3(mxmlGetOpaque(translateNode->child)));
+			transform.setTranslate(parseVector3(mxmlGetOpaque(translateNode->child)));
 		}
 
 		mxml_node_t *rotateNode=mxmlFindChild(transformNode,"Rotate");
 		if(rotateNode!=NULL){
-			mesh->transform.setRotate(parseQuaternion(mxmlGetOpaque(rotateNode->child)));
+			transform.setRotate(parseQuaternion(mxmlGetOpaque(rotateNode->child)));
 		}
 
 		mxml_node_t *scaleNode=mxmlFindChild(transformNode,"Scale");
 		if(scaleNode!=NULL){
-			mesh->transform.setScale(parseVector3(mxmlGetOpaque(scaleNode->child)));
+			transform.setScale(parseVector3(mxmlGetOpaque(scaleNode->child)));
 		}
+
+		mesh->setTransform(transform);
 	}
 
 	mxml_node_t *vertexNode=mxmlFindChild(node,"Vertexes");
@@ -603,6 +606,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 		else{
 			vertexFormat=VertexFormat::ptr(new BackableVertexFormat());
 		}
+		Collection<Mesh::VertexBoneAssignmentList> vbas;
 
 		prop=mxmlElementGetAttr(vertexNode,"Count");
 		if(prop!=NULL){
@@ -637,7 +641,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 					vertexFormat->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_COLOR_RGBA);
 				}
 				else if(t=="Bone"){
-					mesh->vertexBoneAssignments.resize(count);
+					vbas.resize(count);
 				}
 				else{
 					Error::unknown(Categories::TOADLET_TADPOLE,
@@ -655,7 +659,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 
 		VertexBuffer::ptr vertexBuffer;
 		if(bufferManager!=NULL){
-			if(mesh->vertexBoneAssignments.size()>0){
+			if(vbas.size()>0){
 				vertexBuffer=bufferManager->createVertexBuffer(Buffer::Usage_BIT_STAGING,Buffer::Access_READ_WRITE,vertexFormat,count);
 			}
 			else{
@@ -730,8 +734,8 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 						else if(sematic==VertexFormat::Semantic_COLOR){
  							vba.setRGBA(l,ci,parseVector4(element).getRGBA());
 						}
-						else if(mesh->vertexBoneAssignments.size()>0){
-							mesh->vertexBoneAssignments[l]=parseBoneAssignment(element);
+						else if(vbas.size()>0){
+							vbas[l]=parseBoneAssignment(element);
 						}
 
 						j=space;
@@ -752,8 +756,10 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 
 		vba.unlock();
 
-		mesh->bound.set(bound);
-		mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+		mesh->setVertexBoneAssignments(vbas);
+
+		mesh->setBound(bound);
+		mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
 	}
 
 	mxml_node_t *subMeshNode=node->child;
@@ -849,7 +855,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 			subMesh->material->retain();
 		}
 
-		mesh->subMeshes.add(subMesh);
+		mesh->addSubMesh(subMesh);
 	}
 
 	mesh->compile();
@@ -862,23 +868,25 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 
 	mxml_node_t *transformNode=mxmlNewElement(meshNode,"Transform");
 	{
+		const Transform &transform=mesh->getTransform();
+
 		mxml_node_t *translateNode=mxmlNewElement(transformNode,"Translate");
 		{
-			mxmlNewOpaque(translateNode,makeVector3(mesh->transform.getTranslate()));
+			mxmlNewOpaque(translateNode,makeVector3(transform.getTranslate()));
 		}
 
 		mxml_node_t *rotateNode=mxmlNewElement(transformNode,"Rotate");
 		{
-			mxmlNewOpaque(rotateNode,makeQuaternion(mesh->transform.getRotate()));
+			mxmlNewOpaque(rotateNode,makeQuaternion(transform.getRotate()));
 		}
 
 		mxml_node_t *scaleNode=mxmlNewElement(transformNode,"Scale");
 		{
-			mxmlNewOpaque(scaleNode,makeVector3(mesh->transform.getScale()));
+			mxmlNewOpaque(scaleNode,makeVector3(transform.getScale()));
 		}
 	}
 
-	const VertexData::ptr &vertexData=mesh->staticVertexData;
+	const VertexData::ptr &vertexData=mesh->getStaticVertexData();
 	if(vertexData==NULL){
 		return meshNode;
 	}
@@ -896,6 +904,8 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 		int ti=vertexFormat->findSemantic(VertexFormat::Semantic_TEX_COORD);
 		int ci=vertexFormat->findSemantic(VertexFormat::Semantic_COLOR);
 
+		const Collection<Mesh::VertexBoneAssignmentList> &vbas=mesh->getVertexBoneAssignments();
+
 		if(pi>=0){
 			type+="Position,";
 		}
@@ -908,7 +918,7 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 		if(ci>=0){
 			type+="Color,";
 		}
-		if(mesh->vertexBoneAssignments.size()>0){
+		if(vbas.size()>0){
 			type+="Bone,";
 		}
 
@@ -950,8 +960,8 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 			if(ci>=0){
 				strcat(line,makeVector4(buffer,Vector4(vba.getRGBA(i,ci))));
 			}
-			if(mesh->vertexBoneAssignments.size()>0){
-				strcat(line,makeBoneAssignment(buffer,mesh->vertexBoneAssignments[i]));
+			if(vbas.size()>0){
+				strcat(line,makeBoneAssignment(buffer,vbas[i]));
 			}
 
 			strcat(line,LF);
@@ -966,8 +976,8 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 	}
 
 	int i;
-	for(i=0;i<mesh->subMeshes.size();++i){
-		Mesh::SubMesh::ptr subMesh=mesh->subMeshes[i];
+	for(i=0;i<mesh->getNumSubMeshes();++i){
+		Mesh::SubMesh::ptr subMesh=mesh->getSubMesh(i);
 
 		mxml_node_t *subMeshNode=mxmlNewElement(meshNode,"SubMesh");
 		{

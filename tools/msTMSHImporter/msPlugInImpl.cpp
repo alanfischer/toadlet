@@ -156,10 +156,10 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 		flags&=~eBones;
 	}
 
-    for(i=0;i<mesh->subMeshes.size();++i){
-		Mesh::SubMesh::ptr subMesh=mesh->subMeshes[i];
+    for(i=0;i<mesh->getNumSubMeshes();++i){
+		Mesh::SubMesh::ptr subMesh=mesh->getSubMesh(i);
 		msMesh *msmesh=NULL;
-		bool bones=(flags & eBones) && (mesh->vertexBoneAssignments.size()>0);
+		bool bones=(flags & eBones) && (mesh->getVertexBoneAssignments()>0);
 
 		if(flags & eMeshes){
 			msmesh=msModel_GetMeshAt(pModel,msModel_AddMesh(pModel));
@@ -189,7 +189,7 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 			msVec3 norm;
 			msVec2 tex;
 
-			VertexBuffer::ptr vertexBuffer=mesh->staticVertexData->getVertexBuffer(0);
+			VertexBuffer::ptr vertexBuffer=mesh->getStaticVertexData()->getVertexBuffer(0);
 			VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
 			int positionIndex=vertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
 			int normalIndex=vertexFormat->findSemantic(VertexFormat::Semantic_NORMAL);
@@ -224,7 +224,7 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 				}
 
 				if(bones){
-					const Mesh::VertexBoneAssignmentList &vbal=mesh->vertexBoneAssignments[v];
+					const Mesh::VertexBoneAssignmentList &vbal=mesh->getVertexBoneAssignments()[v];
 					int vbalsize=vbal.size();
 					if(vbalsize==1){
 						msVertex_SetBoneIndex(vertex,vbal[0].bone);
@@ -298,8 +298,8 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
 		}
 	}
 
-	if((flags & eBones) && mesh->skeleton!=NULL){
-		Skeleton::ptr skeleton=mesh->skeleton;
+	if((flags & eBones) && mesh->getSkeleton()!=NULL){
+		Skeleton::ptr skeleton=mesh->getSkeleton();
 		
 		msVec3 position;
 		msVec3 rotation;

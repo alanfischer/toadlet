@@ -59,7 +59,7 @@ int main(int argc,char **argv){
 	}
 
 	if(extract){
-		Skeleton::ptr skeleton=mesh->skeleton;
+		Skeleton::ptr skeleton=mesh->getSkeleton();
 		if(skeleton==NULL){
 			std::cout << "Error, Mesh does not contain a skeleton" << std::endl;
 			return 0;
@@ -89,7 +89,7 @@ int main(int argc,char **argv){
 	}
 
 	if(insert){
-		Skeleton::ptr skeleton=mesh->skeleton;
+		Skeleton::ptr skeleton=mesh->getSkeleton();
 		if(skeleton==NULL){
 			std::cout << "Error, Mesh does not contain a skeleton" << std::endl;
 			return 0;
@@ -121,7 +121,7 @@ int main(int argc,char **argv){
 	if(scale!=1.0f){
 		int i,j,k;
 
-		VertexBuffer::ptr vertexBuffer=mesh->staticVertexData->getVertexBuffer(0);
+		VertexBuffer::ptr vertexBuffer=mesh->getStaticVertexData()->getVertexBuffer(0);
 		{
 			VertexBufferAccessor vba(vertexBuffer);
 			for(i=0;i<vba.getSize();++i){
@@ -132,7 +132,7 @@ int main(int argc,char **argv){
 			}
 		}
 
-		Skeleton::ptr skeleton=mesh->skeleton;
+		Skeleton::ptr skeleton=mesh->getSkeleton();
 		if(skeleton!=NULL){
 			for(i=0;i<skeleton->bones.size();++i){
 				skeleton->bones[i]->translate*=scale;

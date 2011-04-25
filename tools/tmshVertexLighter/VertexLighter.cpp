@@ -37,11 +37,11 @@ VertexLighter::~VertexLighter(){
 void VertexLighter::lightMesh(Mesh *mesh){
 	int i;
 
-	if(mesh->staticVertexData->getNumVertexBuffers()==0){
+	if(mesh->getStaticVertexData()->getNumVertexBuffers()==0){
 		return;
 	}
 
-	VertexBuffer::ptr vertexBuffer=mesh->staticVertexData->getVertexBuffer(0);
+	VertexBuffer::ptr vertexBuffer=mesh->getStaticVertexData()->getVertexBuffer(0);
 	VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
 	if(vertexFormat->findSemantic(VertexFormat::Semantic_NORMAL)<0){
 		return; // Cannot be lit
@@ -58,7 +58,7 @@ void VertexLighter::lightMesh(Mesh *mesh){
 	}
 
 	VertexBuffer::ptr newVertexBuffer=mEngine->getBufferManager()->cloneVertexBuffer(vertexBuffer,Buffer::Usage_BIT_STATIC,Buffer::Access_READ_WRITE,newVertexFormat,vertexBuffer->getSize());
-	mesh->staticVertexData=VertexData::ptr(new VertexData(newVertexBuffer));
+	mesh->setStaticVertexData(VertexData::ptr(new VertexData(newVertexBuffer)));
 
 	int pi=newVertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
 	int ni=newVertexFormat->findSemantic(VertexFormat::Semantic_NORMAL);
@@ -97,11 +97,13 @@ void VertexLighter::lightMesh(Mesh *mesh){
 		}
 	}
 
-	for(i=0;i<mesh->subMeshes.size();++i){
+	for(i=0;i<mesh->getNumSubMeshes();++i){
+		Mesh::SubMesh::ptr subMesh=mesh->getSubMesh(i);
+
 		Vector4 ambient(Colors::BLACK);
 		Vector4 diffuse(Colors::WHITE);
 
-		Material::ptr material=mesh->subMeshes[i]->material;
+		Material::ptr material=subMesh->material;
 
 		MaterialState materialState;
 		material->getMaterialState(materialState);
@@ -115,7 +117,7 @@ void VertexLighter::lightMesh(Mesh *mesh){
 			ambient=materialState.ambient;
 		}
 
-		IndexBuffer::ptr indexBuffer(mesh->subMeshes[i]->indexData->getIndexBuffer());
+		IndexBuffer::ptr indexBuffer(subMesh->indexData->getIndexBuffer());
 		IndexBufferAccessor iba(indexBuffer);
 
 		int j;

@@ -128,7 +128,7 @@ int main(int argc,char **argv){
 		lighter.lightMesh(mesh);
 
 		// Relight specified submeshes to full brightness
-		VertexBuffer::ptr vertexBuffer=mesh->staticVertexData->getVertexBuffer(0);
+		VertexBuffer::ptr vertexBuffer=mesh->getStaticVertexData()->getVertexBuffer(0);
 		VertexBufferAccessor vba(vertexBuffer);
 
 		int ci=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_COLOR);
@@ -136,8 +136,8 @@ int main(int argc,char **argv){
 
 		int j;
 		for(j=0;j<skip.size();++j){
-			if(skip[j]>=0 && skip[j]<mesh->subMeshes.size()){
-				Mesh::SubMesh::ptr sub=mesh->subMeshes[skip[j]];
+			if(skip[j]>=0 && skip[j]<mesh->getNumSubMeshes()){
+				Mesh::SubMesh::ptr sub=mesh->getSubMesh(skip[j]);
 				IndexBuffer::ptr indexBuffer=sub->indexData->getIndexBuffer();
 				IndexBufferAccessor iba(indexBuffer);
 

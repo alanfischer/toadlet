@@ -269,8 +269,8 @@ void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const S
 	if(down!=NULL || up!=NULL || front!=NULL || back!=NULL || right!=NULL || left!=NULL){
 		Mesh::ptr mesh=mEngine->getMeshManager()->createSkyBox(1024,false,false,down,up,front,back,right,left);
 		int i;
-		for(i=0;i<mesh->subMeshes.size();++i){
-			Material *material=mesh->subMeshes[i]->material;
+		for(i=0;i<mesh->getNumSubMeshes();++i){
+			Material *material=mesh->getSubMesh(i)->material;
 			if(material!=NULL){
 				material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 				material->setMaterialState(MaterialState(false,false,MaterialState::ShadeType_FLAT));
