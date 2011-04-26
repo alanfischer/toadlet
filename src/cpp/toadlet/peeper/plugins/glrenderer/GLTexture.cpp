@@ -103,7 +103,8 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 	glTexParameteri(mTarget,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 	glTexParameteri(mTarget,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
 
-	mManuallyGenerateMipLevels=(mUsage&Usage_BIT_AUTOGEN_MIPMAPS)>0;
+	bool onlyFirstLevel=false;
+	mManuallyGenerateMipLevels=(mUsage&Usage_BIT_AUTOGEN_MIPMAPS)!=0;
 	if(mManuallyGenerateMipLevels &&
 		#if defined(TOADLET_HAS_GLES)
 			mRenderer->gl_version>=11
@@ -117,6 +118,10 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 	){
 		glTexParameteri(mTarget,GL_GENERATE_MIPMAP,GL_TRUE);
 		mManuallyGenerateMipLevels=false;
+		// RenderTargets need all levels specified
+		if((mUsage&Usage_BIT_RENDERTARGET)==0){
+			onlyFirstLevel=true;
+		}
 	}
 
 	int totalMipLevels=Math::intLog2(Math::maxVal(mWidth,Math::maxVal(mHeight,mDepth)));
@@ -166,8 +171,7 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 			glPixelStorei(GL_UNPACK_ALIGNMENT,alignment<8?alignment:8);
 		}
 		else{
-			// Skip specifying a level if no data available, otherwise if GL_GENERATE_MIPMAP is true, we destroy the generate mipmaps
-			continue;
+			if(level>0 && onlyFirstLevel) break;
 		}
 
 		if(ImageFormatConversion::isFormatCompressed(mFormat)==false){
