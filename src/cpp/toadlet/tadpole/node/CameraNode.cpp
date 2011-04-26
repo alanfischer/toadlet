@@ -551,7 +551,7 @@ void CameraNode::updateViewTransform(){
 	mViewMatrix.setAt(2,3,-(Math::mul(wt02,worldTranslate.x) + Math::mul(wt12,worldTranslate.y) + Math::mul(wt22,worldTranslate.z)));
 
 	// Update frustum planes
-	Math::mul(mViewProjectionMatrix,mFinalProjectionMatrix,mViewMatrix);
+ 	Math::mul(mViewProjectionMatrix,mFinalProjectionMatrix,mViewMatrix);
 	scalar *vpt=mViewProjectionMatrix.data;
 	// Right clipping plane.
 	Math::normalize(mClipPlanes[0].set(vpt[3]-vpt[0], vpt[7]-vpt[4], vpt[11]-vpt[8], vpt[15]-vpt[12]));
