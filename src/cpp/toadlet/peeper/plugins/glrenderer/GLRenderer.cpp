@@ -560,11 +560,6 @@ void GLRenderer::setViewport(const Viewport &viewport){
 void GLRenderer::clear(int clearFlags,const Vector4 &clearColor){
 	int bufferBits=0;
 
-//\GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
-//if(status!=GL_FRAMEBUFFER_COMPLETE){
-//	Error::unknown(Categories::TOADLET_PEEPER,GLFBORenderTarget::getFBOMessage(status));
-//}
-
 	TOADLET_CHECK_GLERROR("entering clear");
 
 	if((clearFlags & ClearFlag_COLOR)!=0){
@@ -1372,8 +1367,18 @@ void GLRenderer::setPointState(const PointState &state){
 			glTexEnvi(GL_POINT_SPRITE,GL_COORD_REPLACE,value);
 		}
 
-	    glPointParameterf(GL_POINT_SIZE_MIN,state.minSize);
-		glPointParameterf(GL_POINT_SIZE_MAX,state.maxSize);
+		#if defined(TOADLET_FIXED_POINT)
+			#if defined(TOADLET_HAS_GLES)
+				glPointParameterx(GL_POINT_SIZE_MIN,state.minSize);
+				glPointParameterx(GL_POINT_SIZE_MAX,state.maxSize);
+			#else
+				glPointParameterf(GL_POINT_SIZE_MIN,MathConversion::scalarToFloat(state.minSize));
+				glPointParameterf(GL_POINT_SIZE_MAX,MathConversion::scalarToFloat(state.maxSize));
+			#endif
+		#else
+			glPointParameterf(GL_POINT_SIZE_MIN,state.minSize);
+			glPointParameterf(GL_POINT_SIZE_MAX,state.maxSize);
+		#endif
 
 		if(state.attenuated){
 			#if defined(TOADLET_FIXED_POINT)
@@ -1449,6 +1454,8 @@ void GLRenderer::setRasterizerState(const RasterizerState &state){
 	else{
 		glDisable(GL_DITHER);
 	}
+
+	glLineWidth(MathConversion::scalarToFloat(state.lineSize));
 
 	TOADLET_CHECK_GLERROR("setRasterizerState");
 }

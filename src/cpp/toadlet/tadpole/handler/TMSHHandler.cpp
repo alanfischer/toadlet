@@ -89,7 +89,7 @@ Resource::ptr TMSHHandler::load(Stream::ptr stream,const ResourceHandlerData *ha
 	j=0;
 	for(i=0;i<mesh->getNumSubMeshes();++i){
 		Mesh::SubMesh *subMesh=mesh->getSubMesh(i);
-		if(subMesh->materialName.length()==0){
+		if(subMesh->materialName.length()==0 && j<materials.size()){
 			subMesh->material=materials[j++];
 			if(subMesh->material!=NULL){
 				subMesh->material->retain();

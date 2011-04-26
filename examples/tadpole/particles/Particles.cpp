@@ -7,32 +7,34 @@ Particles::~Particles(){
 }
 
 void Particles::create(){
-	Application::create("d3d10");
+	Application::create();
 
 	mEngine->setDirectory("../../../data");
 
 	scene=Scene::ptr(new Scene(mEngine));
 
+	scalar ten=Math::ONE*10;
+
 	Vector3 pointPositions[]={
-		Vector3(-10,-10,0),
-		Vector3(10,-10,0),
-		Vector3(10,10,10),
-		Vector3(-10,10,10),
+		Vector3(-ten,-ten,0),
+		Vector3(ten,-ten,0),
+		Vector3(ten,ten,ten),
+		Vector3(-ten,ten,ten),
 	};
 
 	Vector3 beamPositions[]={
-		Vector3(-10,-10,0),
-		Vector3(10,-10,0),
-		Vector3(10,-10,0),
-		Vector3(10,10,10),
-		Vector3(10,10,10),
-		Vector3(-10,10,10),
-		Vector3(-10,10,10),
-		Vector3(-10,-10,0),
+		Vector3(-ten,-ten,0),
+		Vector3(ten,-ten,0),
+		Vector3(ten,-ten,0),
+		Vector3(ten,ten,ten),
+		Vector3(ten,ten,ten),
+		Vector3(-ten,ten,ten),
+		Vector3(-ten,ten,ten),
+		Vector3(-ten,-ten,0),
 	};
 
 	Material::ptr pointMaterial=mEngine->getMaterialManager()->findMaterial("sparkle.png");
-	pointMaterial->setPointState(PointState(true,10,false,1,1,1,1,100));
+	pointMaterial->setPointState(PointState(true,ten,false,Math::ONE,Math::ONE,Math::ONE,Math::ONE,Math::fromInt(100)));
 	pointMaterial->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
 	pointMaterial->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 	pointMaterial->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
@@ -45,7 +47,7 @@ void Particles::create(){
  	pointNode=getEngine()->createNodeType(ParticleNode::type(),scene);
 	pointNode->setNumParticles(4,ParticleNode::ParticleType_POINTSPRITE,Math::ONE,pointPositions);
 	pointNode->setMaterial(pointMaterial);
-	pointNode->setTranslate(-40,0,0);
+	pointNode->setTranslate(-Math::fromInt(40),0,0);
 	scene->getRoot()->attach(pointNode);
 
  	spriteNode=getEngine()->createNodeType(ParticleNode::type(),scene);
@@ -57,7 +59,7 @@ void Particles::create(){
  	beamNode=getEngine()->createNodeType(ParticleNode::type(),scene);
 	beamNode->setNumParticles(8,ParticleNode::ParticleType_BEAM,Math::ONE,beamPositions);
 	beamNode->setMaterial(beamMaterial);
-	beamNode->setTranslate(40,0,0);
+	beamNode->setTranslate(Math::fromInt(40),0,0);
 	scene->getRoot()->attach(beamNode);
 
 	cameraNode=getEngine()->createNodeType(CameraNode::type(),scene);
@@ -93,23 +95,24 @@ void Particles::render(Renderer *renderer){
 
 void Particles::update(int dt){
 	scalar fdt=Math::fromMilli(dt);
+	scalar edge=Math::fromInt(60);
 
 	int i,j;
 	for(i=0;i<simulatedParticles.size();++i){
 		ParticleNode *particles=simulatedParticles[i];
 		for(j=0;j<particles->getNumParticles();++j){
 			ParticleNode::Particle *p=particles->getParticle(j);
-			p->vz-=9.8*fdt;
+			p->vz-=Math::mul(Math::fromFloat(9.8),fdt);
 
 			p->x+=p->vx*fdt;
 			p->y+=p->vy*fdt;
 			p->z+=p->vz*fdt;
 
-			if(p->x<-60){p->x=-60;p->vx*=-1;}
-			if(p->x>60){p->x=60;p->vx*=-1;}
-			if(p->y<-60){p->y=-60;p->vy*=-1;}
-			if(p->y>60){p->y=60;p->vy*=-1;}
-			if(p->z<-20){p->z=-20;p->vz*=-1;}
+			if(p->x<-edge){p->x=-edge;p->vx*=-1;}
+			if(p->x>edge){p->x=edge;p->vx*=-1;}
+			if(p->y<-edge){p->y=-edge;p->vy*=-1;}
+			if(p->y>edge){p->y=edge;p->vy*=-1;}
+			if(p->z<-edge){p->z=-edge;p->vz*=-1;}
 		}
 	}
 
@@ -133,12 +136,13 @@ void Particles::keyPressed(int key){
 }
 
 void Particles::addSimulatedParticles(ParticleNode::ptr particles){
+	scalar v=Math::fromInt(4);
 	int i;
 	for(i=0;i<particles->getNumParticles();++i){
 		ParticleNode::Particle *p=particles->getParticle(i);
-		p->vx=random.nextFloat(-4,4);
-		p->vy=random.nextFloat(-4,4);
-		p->vz=random.nextFloat(-4,4);
+		p->vx=random.nextFloat(-v,v);
+		p->vy=random.nextFloat(-v,v);
+		p->vz=random.nextFloat(-v,v);
 	}
 
 	simulatedParticles.add(particles);
