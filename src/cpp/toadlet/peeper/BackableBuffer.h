@@ -57,7 +57,7 @@ public:
 	virtual void resetDestroy();
 
 	virtual int getUsage() const{return mUsage;}
-	virtual int getAccess() const{return mAccess;}
+	virtual int getAccess() const{return mBack==NULL?Access_READ_WRITE:mAccess;}
 	virtual int getDataSize() const{return mDataSize;}
 	virtual int getSize() const{return mSize;}
 	virtual int getWidth() const{return mWidth;}
