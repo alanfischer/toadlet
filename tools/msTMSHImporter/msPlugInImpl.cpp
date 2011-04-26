@@ -159,7 +159,7 @@ cPlugIn::importMesh(msModel *pModel,const String &name,int flags){
     for(i=0;i<mesh->getNumSubMeshes();++i){
 		Mesh::SubMesh::ptr subMesh=mesh->getSubMesh(i);
 		msMesh *msmesh=NULL;
-		bool bones=(flags & eBones) && (mesh->getVertexBoneAssignments()>0);
+		bool bones=(flags & eBones) && (mesh->getVertexBoneAssignments().size()>0);
 
 		if(flags & eMeshes){
 			msmesh=msModel_GetMeshAt(pModel,msModel_AddMesh(pModel));
