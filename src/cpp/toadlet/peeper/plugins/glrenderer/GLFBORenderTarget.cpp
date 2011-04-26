@@ -258,6 +258,8 @@ bool GLFBORenderTarget::compile(){
 		#endif
 	}
 
+	// Rebind it since attach will unbind it
+	glBindFramebuffer(GL_FRAMEBUFFER,mHandle);
 	GLenum status=glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if(status!=GL_FRAMEBUFFER_COMPLETE){
 		Logger::warning(Categories::TOADLET_PEEPER,getFBOMessage(status));
