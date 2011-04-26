@@ -51,16 +51,18 @@ public:
 		depthBiasConstant(0),
 		depthBiasSlope(0),
 		multisample(false),
-		dither(false)
+		dither(false),
+		lineSize(Math::ONE)
 	{}
 
-	RasterizerState(CullType cull1,FillType fill1=FillType_SOLID,scalar depthBiasConstant1=0,scalar depthBiasSlope1=0,bool multisample1=false,bool dither1=false):
+	RasterizerState(CullType cull1,FillType fill1=FillType_SOLID,scalar depthBiasConstant1=0,scalar depthBiasSlope1=0,bool multisample1=false,bool dither1=false,scalar lineSize1=Math::ONE):
 		cull(cull1),
 		fill(fill1),
 		depthBiasConstant(depthBiasConstant1),
 		depthBiasSlope(depthBiasSlope1),
 		multisample(multisample1),
-		dither(dither1)
+		dither(dither1),
+		lineSize(lineSize1)
 	{}
 
 	RasterizerState &set(const RasterizerState &state){
@@ -70,17 +72,19 @@ public:
 		depthBiasSlope=state.depthBiasSlope;
 		multisample=state.multisample;
 		dither=state.dither;
+		lineSize=state.lineSize;
 
 		return *this;
 	}
 
-	RasterizerState &set(CullType cull1,FillType fill1=FillType_SOLID,scalar depthBiasConstant1=0,scalar depthBiasSlope1=0,bool multisample1=false,bool dither1=false){
+	RasterizerState &set(CullType cull1,FillType fill1=FillType_SOLID,scalar depthBiasConstant1=0,scalar depthBiasSlope1=0,bool multisample1=false,bool dither1=false,scalar lineSize1=Math::ONE){
 		cull=cull1;
 		fill=fill1;
 		depthBiasConstant=depthBiasConstant1;
 		depthBiasSlope=depthBiasSlope1;
 		multisample=multisample1;
 		dither=dither1;
+		lineSize=lineSize1;
 
 		return *this;
 	}
@@ -88,7 +92,7 @@ public:
 	inline bool equals(const RasterizerState &state) const{
 		return (cull==state.cull && fill==state.fill && 
 			depthBiasConstant==state.depthBiasConstant && depthBiasSlope==state.depthBiasSlope &&
-			multisample==state.multisample && dither==state.dither);
+			multisample==state.multisample && dither==state.dither && lineSize==state.lineSize);
 	}
 
 	inline bool operator==(const RasterizerState &state) const{
@@ -105,6 +109,7 @@ public:
 	scalar depthBiasSlope;
 	bool multisample;
 	bool dither;
+	scalar lineSize;
 };
 
 }
