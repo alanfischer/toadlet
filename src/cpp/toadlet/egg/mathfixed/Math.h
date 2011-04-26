@@ -1175,18 +1175,19 @@ namespace Math{
 		r.data[0+3*4]=translate.x;
 		r.data[1+3*4]=translate.y;
 		r.data[2+3*4]=translate.z;
-		r.data[0+0*4]=TOADLET_MUL_XX(rotate.data[0+0*3],scale.x);
-		r.data[1+0*4]=TOADLET_MUL_XX(rotate.data[1+0*3],scale.x);
-		r.data[2+0*4]=TOADLET_MUL_XX(rotate.data[2+0*3],scale.x);
-		r.data[0+1*4]=TOADLET_MUL_XX(rotate.data[0+1*3],scale.y);
-		r.data[1+1*4]=TOADLET_MUL_XX(rotate.data[1+1*3],scale.y);
-		r.data[2+1*4]=TOADLET_MUL_XX(rotate.data[2+1*3],scale.y);
-		r.data[0+2*4]=TOADLET_MUL_XX(rotate.data[0+2*3],scale.z);
-		r.data[1+2*4]=TOADLET_MUL_XX(rotate.data[1+2*3],scale.z);
-		r.data[2+2*4]=TOADLET_MUL_XX(rotate.data[2+2*3],scale.z);
+		r.data[0+0*4]=TOADLET_MUL_XX(rotate.data[0+0*4],scale.x);
+		r.data[1+0*4]=TOADLET_MUL_XX(rotate.data[1+0*4],scale.x);
+		r.data[2+0*4]=TOADLET_MUL_XX(rotate.data[2+0*4],scale.x);
+		r.data[0+1*4]=TOADLET_MUL_XX(rotate.data[0+1*4],scale.y);
+		r.data[1+1*4]=TOADLET_MUL_XX(rotate.data[1+1*4],scale.y);
+		r.data[2+1*4]=TOADLET_MUL_XX(rotate.data[2+1*4],scale.y);
+		r.data[0+2*4]=TOADLET_MUL_XX(rotate.data[0+2*4],scale.z);
+		r.data[1+2*4]=TOADLET_MUL_XX(rotate.data[1+2*4],scale.z);
+		r.data[2+2*4]=TOADLET_MUL_XX(rotate.data[2+2*4],scale.z);
 	}
 
 	inline void setMatrix4x4FromTranslateRotateScale(Matrix4x4 &r,const Vector3 &translate,const Quaternion &rotate,const Vector3 &scale){
+		setMatrix4x4FromQuaternion(r,rotate);
 		r.data[0+3*4]=translate.x;
 		r.data[1+3*4]=translate.y;
 		r.data[2+3*4]=translate.z;
