@@ -291,7 +291,7 @@ void MeshNodeSkeleton::setRenderSkeleton(bool skeleton){
 		if(mSkeletonMaterial==NULL){
 			mSkeletonMaterial=mEngine->getMaterialManager()->createMaterial();
 			mSkeletonMaterial->setDepthState(DepthState(DepthState::DepthTest_NONE,false));
-			mSkeletonMaterial->setPointState(PointState(true,8,false,0,0,0,0,0));
+			mSkeletonMaterial->setPointState(PointState(true,Math::fromInt(8),false,0,0,0,0,0));
 		}
 	}
 	else{

@@ -1395,10 +1395,11 @@ void GLRenderer::setPointState(const PointState &state){
 			#endif
 		}
 		else{
-			cacheArray[0]=Math::ONE; cacheArray[1]=0; cacheArray[2]=0;
-			#if defined(TOADLET_HAS_GLES)
+			#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
+				cacheArray[0]=Math::ONE; cacheArray[1]=0; cacheArray[2]=0;
 				glPointParameterxv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
 			#else
+				cacheArray[0]=1.0f; cacheArray[1]=0; cacheArray[2]=0;
 				glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION,cacheArray);
 			#endif
 		}

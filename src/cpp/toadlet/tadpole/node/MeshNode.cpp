@@ -330,7 +330,6 @@ void MeshNode::updateVertexBuffer(){
 			svba.lock(srcVertexBuffer,Buffer::Access_BIT_READ);
 			dvba.lock(dstVertexBuffer,Buffer::Access_BIT_WRITE);
 
-
 			// Recopy all data, so we get texcoords and color information copied over correctly
 			memcpy(dvba.getData(),svba.getData(),srcVertexBuffer->getDataSize());
 
