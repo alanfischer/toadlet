@@ -25,6 +25,8 @@
 
 #include <toadlet/tadpole/Skeleton.h>
 
+using namespace toadlet::egg;
+
 namespace toadlet{
 namespace tadpole{
 
