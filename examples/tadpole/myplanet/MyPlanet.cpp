@@ -2,8 +2,6 @@
 
 inline float scurve(float t){ return t*t*(3.0 - 2.0*t);}
 
-using namespace toadlet::tadpole::Math;
-                                                                                                                                                                                                                                                                                                                                        
 class Planet:public ParentNode{
 public:
 	TOADLET_NODE(Planet,ParentNode);
@@ -24,7 +22,7 @@ public:
 		}
 		mMeshNode=getEngine()->createNodeType(MeshNode::type(),getScene());
 		mMeshNode->setMesh(mesh);
-		Matrix3x3 rotate; setMatrix3x3FromX(rotate,HALF_PI);
+		Matrix3x3 rotate; Math::setMatrix3x3FromX(rotate,Math::HALF_PI);
 		mMeshNode->setRotate(rotate);
 		attach(mMeshNode);
 
@@ -63,12 +61,12 @@ public:
 			material->getTextureState(0,textureState);
 			{
 				textureState.calculation=TextureState::CalculationType_NORMAL;
-				setMatrix4x4FromTranslate(textureState.matrix,0,-value/2,0);
-				setMatrix4x4FromScale(textureState.matrix,4,0.5,1);
+				Math::setMatrix4x4FromTranslate(textureState.matrix,0,-value/2,0);
+				Math::setMatrix4x4FromScale(textureState.matrix,Math::fromInt(4),Math::HALF,Math::ONE);
 			}
 			material->setTextureState(0,textureState);
 
-			scalar maxSize=0.4;
+			scalar maxSize=Math::fromMilli(400);
 			if(mFadeOutSparkTime>0){
 				scalar value=Math::fromMilli(getScene()->getTime()-mFadeOutSparkTime);
 				scalar size=Math::lerp(maxSize,0,value);
@@ -128,7 +126,7 @@ public:
 			mMaterial->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 			TextureState textureState;
 			textureState.calculation=TextureState::CalculationType_NORMAL;
-			Math::setMatrix4x4FromScale(textureState.matrix,32,1,1);
+			Math::setMatrix4x4FromScale(textureState.matrix,Math::fromInt(32),Math::ONE,Math::ONE);
 			mMaterial->setTextureState(0,textureState);
 			mesh->getSubMesh(0)->material=mMaterial;
 		}
@@ -211,7 +209,7 @@ public:
 		mEndDistance=distance;
 		/// @todo: Perhaps a more sensical mapping instead of just straight HSV
 		Vector4 color;
-		Math::setHSVA(color,Vector4(Math::clamp(0,Math::ONE,(distance-Math::ONE)/Math::fromInt(12)),Math::ONE,Math::ONE,Math::ONE));
+		Math::setHSVA(color,Vector4(Math::clamp(0,Math::ONE,Math::div(distance-Math::ONE,Math::fromInt(12))),Math::ONE,Math::ONE,Math::ONE));
 		mPlanet->setColor(color);
 	}
 	scalar getDistance() const{return mPlanet->getTranslate().x;}
@@ -254,30 +252,30 @@ public:
 
 		sunMaterial->getTextureState(0,textureState);
 		textureState.calculation=TextureState::CalculationType_NORMAL;
-		setMatrix4x4FromTranslate(textureState.matrix,value/32,Math::sin(value/8),0);
+		Math::setMatrix4x4FromTranslate(textureState.matrix,value/32,Math::sin(value/8),0);
 		sunMaterial->setTextureState(0,textureState);
 
 		sunMaterial->getTextureState(1,textureState);
 		textureState.calculation=TextureState::CalculationType_NORMAL;
-		setMatrix4x4FromTranslate(textureState.matrix,Math::cos(-value/12),Math::cos(-value/8),0);
+		Math::setMatrix4x4FromTranslate(textureState.matrix,Math::cos(-value/12),Math::cos(-value/8),0);
 		sunMaterial->setTextureState(1,textureState);
 
 		flareMaterial->getTextureState(0,textureState);
 		textureState.calculation=TextureState::CalculationType_NORMAL;
-		setMatrix4x4FromZ(textureState.matrix,Math::sin(value/2));
-		scalar s=mul(Math::sin(value*2),fromMilli(100))+fromMilli(1100);
-		setMatrix4x4FromScale(scale,s,s,0);
-		postMul(textureState.matrix,scale);
-		setMatrix4x4AsTextureRotation(textureState.matrix);
+		Math::setMatrix4x4FromZ(textureState.matrix,Math::sin(value/2));
+		scalar s=Math::mul(Math::sin(value*2),Math::fromMilli(100))+Math::fromMilli(1100);
+		Math::setMatrix4x4FromScale(scale,s,s,0);
+		Math::postMul(textureState.matrix,scale);
+		Math::setMatrix4x4AsTextureRotation(textureState.matrix);
 		flareMaterial->setTextureState(0,textureState);
 
 		flareMaterial->getTextureState(1,textureState);
 		textureState.calculation=TextureState::CalculationType_NORMAL;
-		setMatrix4x4FromZ(textureState.matrix,-Math::sin(value/2));
-		s=mul(Math::sin(value*2),-fromMilli(100))+fromMilli(1100);
-		setMatrix4x4FromScale(scale,s,s,0);
-		postMul(textureState.matrix,scale);
-		setMatrix4x4AsTextureRotation(textureState.matrix);
+		Math::setMatrix4x4FromZ(textureState.matrix,-Math::sin(value/2));
+		s=Math::mul(Math::sin(value*2),-Math::fromMilli(100))+Math::fromMilli(1100);
+		Math::setMatrix4x4FromScale(scale,s,s,0);
+		Math::postMul(textureState.matrix,scale);
+		Math::setMatrix4x4AsTextureRotation(textureState.matrix);
 		flareMaterial->setTextureState(1,textureState);
 	}
 
@@ -384,7 +382,8 @@ Texture::ptr MyPlanet::createNebula(Engine *engine,int width,int height,int scal
 			float n2=(noise.noise2((float)x/(4*(float)width),(float)y/(4*(float)height))*0.5 + 0.5);
 			float v=n*n2*falloff;
 			v=pow(v,2);
-			v=v*(1.0-Math::length(Vector2(x-width/2,y-height/2))/(width/2));
+			float dx=x-width/2,dy=y-height/2;
+			v=v*(1.0-sqrt(dx*dx + dy*dy)/(width/2));
 			if(v<0 || x==0 || y==0 || x==width-1 || y==height-1) v=0;
 			if(v>1) v=1;
 
@@ -407,7 +406,8 @@ Texture::ptr MyPlanet::createFlare(Engine *engine,int width,int height,int scale
 			float n=(noise.perlin2((float)x/(float)width,(float)y/(float)height)*0.5 + 0.5);
 			float v=n*falloff;
 			v=pow(v,2);
-			v=v*(1.0-Math::length(Vector2(x-width/2,y-height/2))/(width/2));
+			float dx=x-width/2,dy=y-height/2;
+			v=v*(1.0-sqrt(dx*dx + dy*dy)/(width/2));
 			if(v<0 || x==0 || y==0 || x==width-1 || y==height-1) v=0;
 			if(v>1) v=1;
 
@@ -426,7 +426,8 @@ Texture::ptr MyPlanet::createPoint(Engine *engine,int width,int height){
 	for(y=0;y<height;y++){
 		for(x=0;x<width;x++){
 			float v=1.0;
-			v=v*(1.0-Math::length(Vector2(x-width/2,y-height/2))/(width/2));
+			float dx=x-width/2,dy=y-height/2;
+			v=v*(1.0-sqrt(dx*dx + dy*dy)/(width/2));
 			if(v<0) v=0;
 			if(v>1) v=1;
 			v=scurve(scurve(pow(v,1.25f)));
@@ -472,7 +473,7 @@ ParentNode::ptr MyPlanet::createSun(scalar size){
 		material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 
 		scalar flareSize=Math::mul(size,Math::fromMilli(3200));
-		flareNode->setScale(flareSize,flareSize,ONE);
+		flareNode->setScale(flareSize,flareSize,Math::ONE);
 		sun->attach(flareNode);
 
 		Mesh::ptr mesh=getEngine()->getMeshManager()->createSphere(Sphere(size));
@@ -490,7 +491,7 @@ ParentNode::ptr MyPlanet::createSun(scalar size){
 		}
 		MeshNode::ptr meshNode=mEngine->createNodeType(MeshNode::type(),mScene);
 		meshNode->setMesh(mesh);
-		Matrix3x3 rotate; setMatrix3x3FromX(rotate,HALF_PI);
+		Matrix3x3 rotate; Math::setMatrix3x3FromX(rotate,Math::HALF_PI);
 		meshNode->setRotate(rotate);
 		sun->attach(meshNode);
 
@@ -498,7 +499,7 @@ ParentNode::ptr MyPlanet::createSun(scalar size){
 		LightState lightState;
 		lightState.type=LightState::Type_POINT;
 		lightState.diffuseColor.set(Math::ONE_VECTOR4);
-		lightState.linearAttenuation=fromMilli(10);
+		lightState.linearAttenuation=Math::fromMilli(10);
 		light->setLightState(lightState);
 		sun->attach(light);
 
@@ -543,7 +544,7 @@ void MyPlanet::create(){
 	mScene->getBackground()->attach(background);
 	bool backgroundToSkybox=true;
 	if(backgroundToSkybox){
-		Mesh::ptr skyBoxMesh=mCamera->renderToSkyBox(mRenderer,Image::Format_RGB_5_6_5,2048,fromInt(10));
+		Mesh::ptr skyBoxMesh=mCamera->renderToSkyBox(mRenderer,Image::Format_RGB_5_6_5,2048,Math::fromInt(10));
 		MeshNode::ptr skyBox=mEngine->createNodeType(MeshNode::type(),mScene);
 		skyBox->setMesh(skyBoxMesh);
 		background->destroy();
@@ -553,7 +554,7 @@ void MyPlanet::create(){
 
 	mPlanetDisk=mEngine->createNodeType(ParticleNode::type(),mScene);
 	{
-		mPlanetDisk->setNumParticles(300,ParticleNode::ParticleType_SPRITE,fromMilli(250));
+		mPlanetDisk->setNumParticles(300,ParticleNode::ParticleType_SPRITE,Math::fromMilli(250));
 		{
 			Material::ptr material=mEngine->getMaterialManager()->createMaterial(createPoint(mEngine,64,64));
 			material->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
@@ -567,15 +568,15 @@ void MyPlanet::create(){
 	for(i=0;i<mPlanetDisk->getNumParticles();++i){
 		ParticleNode::Particle *p=mPlanetDisk->getParticle(i);
 		p->color=Colors::CYAN.getRGBA();
-		scalar d=mRandom.nextScalar(fromMilli(4000),fromMilli(5000));
-		scalar a=mRandom.nextScalar(0,TWO_PI);
-		p->x=mul(Math::sin(a),d);
-		p->y=mul(Math::cos(a),d);
+		scalar d=mRandom.nextScalar(Math::fromMilli(4000),Math::fromMilli(5000));
+		scalar a=mRandom.nextScalar(0,Math::TWO_PI);
+		p->x=Math::mul(Math::sin(a),d);
+		p->y=Math::mul(Math::cos(a),d);
 		p->z=0;
 		a+=Math::HALF_PI;
-		scalar s=mRandom.nextFloat(2.5,4);
-		p->vx=mul(Math::sin(a),s);
-		p->vy=mul(Math::cos(a),s);
+		scalar s=mRandom.nextScalar(Math::fromMilli(2500),Math::fromInt(4));
+		p->vx=Math::mul(Math::sin(a),s);
+		p->vy=Math::mul(Math::cos(a),s);
 		p->vz=0;
 	}
 	mSun->attach(mPlanetDisk);
@@ -593,17 +594,17 @@ void MyPlanet::destroy(){
 void MyPlanet::resized(int width,int height){
 	if(mCamera!=NULL && width>0 && height>0){
 		if(width>=height){
-			mCamera->setProjectionFovY(degToRad(fromInt(60)),Math::div(fromInt(width),fromInt(height)),mCamera->getNearDist(),mCamera->getFarDist());
+			mCamera->setProjectionFovY(Math::degToRad(Math::fromInt(60)),Math::div(Math::fromInt(width),Math::fromInt(height)),mCamera->getNearDist(),mCamera->getFarDist());
 		}
 		else{
-			mCamera->setProjectionFovX(degToRad(fromInt(60)),Math::div(fromInt(height),fromInt(width)),mCamera->getNearDist(),mCamera->getFarDist());
+			mCamera->setProjectionFovX(Math::degToRad(Math::fromInt(60)),Math::div(Math::fromInt(height),Math::fromInt(width)),mCamera->getNearDist(),mCamera->getFarDist());
 		}
 		mCamera->setViewport(Viewport(0,0,width,height));
 	}
 
 	// Create overlay
 	if(mOverlay!=NULL && width>0 && height>0){
-		mOverlay->setProjectionOrtho(0,fromInt(width),fromInt(height),0,0,ONE);
+		mOverlay->setProjectionOrtho(0,Math::fromInt(width),Math::fromInt(height),0,0,Math::ONE);
 		mOverlay->setViewport(Viewport(0,0,width,height));
 
 		mOverlay->destroyAllChildren();
@@ -620,7 +621,7 @@ void MyPlanet::render(Renderer *renderer){
 void MyPlanet::update(int dt){
 	int i;
 
-	scalar fdt=fromMilli(dt);
+	scalar fdt=Math::fromMilli(dt);
 
 	if(mMode==Mode_CREATE_PLANET){
 		if(mOrbit!=NULL && mOrbit->getDistance()<=Math::fromMilli(1000)){
@@ -646,10 +647,10 @@ void MyPlanet::update(int dt){
 			Vector3 planetOrigin=mPlanet->getWorldTranslate();
 			Vector3 pullPointGravity(planetOrigin.x-p->x,planetOrigin.y-p->y,planetOrigin.z-p->z);
 			scalar l=Math::length(pullPointGravity);
-			if(l<1.5){
-				p->vx=(p->vx*(1-fdt))+pullPointGravity.x*fdt*4;
-				p->vy=(p->vy*(1-fdt))+pullPointGravity.y*fdt*4;
-				p->vz=(p->vz*(1-fdt))+pullPointGravity.z*fdt*4;
+			if(l<Math::fromMilli(1500)){
+				p->vx=Math::mul(p->vx,(Math::ONE-fdt))+Math::mul(pullPointGravity.x,fdt)*4;
+				p->vy=Math::mul(p->vy,(Math::ONE-fdt))+Math::mul(pullPointGravity.y,fdt)*4;
+				p->vz=Math::mul(p->vz,(Math::ONE-fdt))+Math::mul(pullPointGravity.z,fdt)*4;
 
 				pulled=true;
 			}
@@ -663,9 +664,9 @@ void MyPlanet::update(int dt){
 			else{
 				Math::div(gravity,l);
 
-				p->vx+=gravity.x*fdt;
-				p->vy+=gravity.y*fdt;
-				p->vz+=gravity.z*fdt;
+				p->vx+=Math::mul(gravity.x,fdt);
+				p->vy+=Math::mul(gravity.y,fdt);
+				p->vz+=Math::mul(gravity.z,fdt);
 			}
 		}
 
@@ -673,11 +674,11 @@ void MyPlanet::update(int dt){
 			Vector3 planetOrigin=mPlanet->getWorldTranslate();
 			Vector3 pullPointGravity(planetOrigin.x-p->x,planetOrigin.y-p->y,planetOrigin.z-p->z);
 			scalar l=Math::length(pullPointGravity);
-			if(l<mPlanet->getSize() || l<0.25){
+			if(l<mPlanet->getSize() || l<Math::fromMilli(250)){
 				p->scale=0;
 
 				scalar size=mPlanet->getSize();
-				size+=0.001;
+				size+=Math::fromMilli(1);
 				mPlanet->setSize(size);
 			}
 		}
@@ -690,9 +691,9 @@ void MyPlanet::update(int dt){
 		}
 
 		// Update position
-		p->x+=p->vx*fdt;
-		p->y+=p->vy*fdt;
-		p->z+=p->vz*fdt;
+		p->x+=Math::mul(p->vx,fdt);
+		p->y+=Math::mul(p->vy,fdt);
+		p->z+=Math::mul(p->vz,fdt);
 	}
 
 	mScene->update(dt);
@@ -703,13 +704,13 @@ void MyPlanet::mousePressed(int x,int y,int button){
 		if(mOrbit==NULL){
 			Vector3 result;
 			getSolarSystemPoint(result,x,y,0);
-			scalar distance=Math::clamp(2,6,Math::length(result));
+			scalar distance=Math::clamp(Math::fromInt(2),Math::fromInt(6),Math::length(result));
 			Math::normalize(result);
 			scalar angle=Math::atan2(result.y,result.x);
 
 			mPlanet=mEngine->createNodeType(Planet::type(),mScene);
 			mPlanet->setSize(0);
-			mOrbit=(Orbit*)mEngine->allocNodeType(Orbit::type())->create(mScene,mPlanet,Math::ONE,0.0125,distance);
+			mOrbit=(Orbit*)mEngine->allocNodeType(Orbit::type())->create(mScene,mPlanet,Math::ONE,Math::fromMilli(12),distance);
 			mOrbit->setRotate(Vector3(0,0,Math::ONE),angle);
 			mSun->attach(mOrbit);
 
@@ -718,7 +719,7 @@ void MyPlanet::mousePressed(int x,int y,int button){
 		else{
 			Vector3 result;
 			getSolarSystemPoint(result,x,y,0);
-			scalar distance=Math::clamp(0,12,Math::length(result));
+			scalar distance=Math::clamp(0,Math::fromInt(12),Math::length(result));
 			mOrbit->setDistance(distance);
 			mOrbit->setVisible(true);
 		}
@@ -733,7 +734,7 @@ void MyPlanet::mouseMoved(int x,int y){
 		if(mOrbit!=NULL && mOrbit->getVisible()){
 			Vector3 result;
 			getSolarSystemPoint(result,x,y,0);
-			scalar distance=Math::clamp(0,12,Math::length(result));
+			scalar distance=Math::clamp(0,Math::fromInt(12),Math::length(result));
 			mOrbit->setDistance(distance);
 		}
 	}
@@ -772,7 +773,7 @@ Node::ptr MyPlanet::createBackground(){
 	{
 		TextureState textureState(TextureState::Operation_MODULATE,TextureState::Source_PREVIOUS,TextureState::Source_TEXTURE);
 		textureState.calculation=TextureState::CalculationType_NORMAL;
-		Math::setMatrix4x4FromScale(textureState.matrix,0.7,0.7,0.7);
+		Math::setMatrix4x4FromScale(textureState.matrix,Math::fromMilli(700),Math::fromMilli(700),Math::fromMilli(700));
 		starMaterial->setTextureState(1,textureState);
 	}
 	starMaterial->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
@@ -780,25 +781,25 @@ Node::ptr MyPlanet::createBackground(){
 	starMaterial->setMaterialState(MaterialState(true,true));
 
 	ParticleNode::ptr stars=mEngine->createNodeType(ParticleNode::type(),mScene);
-	stars->setNumParticles(2000,ParticleNode::ParticleType_SPRITE,fromMilli(4000));
+	stars->setNumParticles(2000,ParticleNode::ParticleType_SPRITE,Math::ONE);
 	int i;
 	for(i=0;i<stars->getNumParticles();++i){
 		ParticleNode::Particle *p=stars->getParticle(i);
 		Vector4 color;
 		float s=scurve(scurve(scurve(random.nextFloat())));
 		if(s<0.5){
-			Math::lerp(color,Colors::WHITE,Colors::BLUE,s*2);
+			Math::lerp(color,Colors::WHITE,Colors::BLUE,Math::fromFloat(s)*2);
 		}
 		else{
-			Math::lerp(color,Colors::RED,Colors::WHITE,s*2-1);
+			Math::lerp(color,Colors::RED,Colors::WHITE,Math::fromFloat(s)*2-Math::ONE);
 		}
-		color.x=color.x*1.5 + 0.3;
-		color.y=color.y*1.5 + 0.3;
-		color.z=color.z*1.5 + 0.3;
+		color.x=color.x*1.5 + Math::fromMilli(300);
+		color.y=color.y*1.5 + Math::fromMilli(300);
+		color.z=color.z*1.5 + Math::fromMilli(300);
 		p->color=color.getRGBA();
-		Vector3 offset(random.nextFloat(-1,1),random.nextFloat(-1,1),random.nextFloat(-1,1));
+		Vector3 offset(random.nextScalar(-Math::ONE,Math::ONE),random.nextScalar(-Math::ONE,Math::ONE),random.nextScalar(-Math::ONE,Math::ONE));
 		Math::normalize(offset);
-		Math::mul(offset,random.nextFloat(150,600));
+		Math::mul(offset,random.nextScalar(Math::fromInt(25),Math::fromInt(150)));
 		p->x=offset.x;
 		p->y=offset.y;
 		p->z=offset.z;
@@ -823,7 +824,7 @@ Node::ptr MyPlanet::createBackground(){
 			Math::lerp(color,Colors::ORANGE,Colors::YELLOW,random.nextFloat());
 			material->setMaterialState(MaterialState(color));
 			flare->setMaterial(material);
-			flare->setScale(Math::mul(size,random.nextScalar(Math::fromMilli(800),Math::ONE)),Math::mul(size,random.nextScalar(Math::fromMilli(800),Math::ONE)),ONE);
+			flare->setScale(Math::mul(size,random.nextScalar(Math::fromMilli(800),Math::ONE)),Math::mul(size,random.nextScalar(Math::fromMilli(800),Math::ONE)),Math::ONE);
 			flare->setTranslate(offset);
 			node->attach(flare);
 		}
@@ -838,7 +839,7 @@ Node::ptr MyPlanet::createBackground(){
 			Vector4 color;
 			Math::lerp(color,Colors::CYAN,Colors::VIOLET,random.nextFloat());
 			flare->getMaterial()->setMaterialState(MaterialState(color));
-			flare->setScale(size*random.nextFloat(1.0,1.2),size*random.nextFloat(1.0,1.2),ONE);
+			flare->setScale(size*random.nextFloat(1.0,1.2),size*random.nextFloat(1.0,1.2),Math::ONE);
 			flare->setTranslate(offset);
 			node->attach(flare);
 		}
@@ -856,16 +857,16 @@ void MyPlanet::backgroundAnimation(){
 			Quaternion rotate;Matrix3x3 matrix;
 
 			Math::setMatrix3x3FromZ(matrix,0); Math::setQuaternionFromMatrix3x3(rotate,matrix);
-			track->keyFrames.add(TransformKeyFrame(fromInt(0),Math::ZERO_VECTOR3,rotate));
+			track->keyFrames.add(TransformKeyFrame(Math::fromInt(0),Math::ZERO_VECTOR3,rotate));
 
-			Math::setMatrix3x3FromZ(matrix,degToRad(120)); Math::setQuaternionFromMatrix3x3(rotate,matrix);
-			track->keyFrames.add(TransformKeyFrame(fromInt(8),Math::ZERO_VECTOR3,rotate));
+			Math::setMatrix3x3FromZ(matrix,Math::degToRad(Math::fromInt(120))); Math::setQuaternionFromMatrix3x3(rotate,matrix);
+			track->keyFrames.add(TransformKeyFrame(Math::fromInt(8),Math::ZERO_VECTOR3,rotate));
 
-			Math::setMatrix3x3FromZ(matrix,degToRad(240)); Math::setQuaternionFromMatrix3x3(rotate,matrix);
-			track->keyFrames.add(TransformKeyFrame(fromInt(16),Math::ZERO_VECTOR3,rotate));
+			Math::setMatrix3x3FromZ(matrix,Math::degToRad(Math::fromInt(240))); Math::setQuaternionFromMatrix3x3(rotate,matrix);
+			track->keyFrames.add(TransformKeyFrame(Math::fromInt(16),Math::ZERO_VECTOR3,rotate));
 
-			Math::setMatrix3x3FromZ(matrix,degToRad(360)); Math::setQuaternionFromMatrix3x3(rotate,matrix);
-			track->keyFrames.add(TransformKeyFrame(fromInt(24),Math::ZERO_VECTOR3,rotate));
+			Math::setMatrix3x3FromZ(matrix,Math::degToRad(Math::fromInt(360))); Math::setQuaternionFromMatrix3x3(rotate,matrix);
+			track->keyFrames.add(TransformKeyFrame(Math::fromInt(24),Math::ZERO_VECTOR3,rotate));
 
 			track->compile();
 			orbitAnimation->setTrack(track);
@@ -886,16 +887,16 @@ void MyPlanet::startAnimation(){
 			Quaternion rotate;Matrix3x3 matrix;
 
 			Math::setMatrix3x3FromZ(matrix,0); Math::setQuaternionFromMatrix3x3(rotate,matrix);
-			track->keyFrames.add(TransformKeyFrame(fromInt(0),Math::ZERO_VECTOR3,rotate));
+			track->keyFrames.add(TransformKeyFrame(Math::fromInt(0),Math::ZERO_VECTOR3,rotate));
 
-			Math::setMatrix3x3FromZ(matrix,degToRad(-120)); Math::setQuaternionFromMatrix3x3(rotate,matrix);
-			track->keyFrames.add(TransformKeyFrame(fromInt(12),Math::ZERO_VECTOR3,rotate));
+			Math::setMatrix3x3FromZ(matrix,Math::degToRad(-120)); Math::setQuaternionFromMatrix3x3(rotate,matrix);
+			track->keyFrames.add(TransformKeyFrame(Math::fromInt(12),Math::ZERO_VECTOR3,rotate));
 
-			Math::setMatrix3x3FromZ(matrix,degToRad(-240)); Math::setQuaternionFromMatrix3x3(rotate,matrix);
-			track->keyFrames.add(TransformKeyFrame(fromInt(24),Math::ZERO_VECTOR3,rotate));
+			Math::setMatrix3x3FromZ(matrix,Math::degToRad(-240)); Math::setQuaternionFromMatrix3x3(rotate,matrix);
+			track->keyFrames.add(TransformKeyFrame(Math::fromInt(24),Math::ZERO_VECTOR3,rotate));
 
-			Math::setMatrix3x3FromZ(matrix,degToRad(-360)); Math::setQuaternionFromMatrix3x3(rotate,matrix);
-			track->keyFrames.add(TransformKeyFrame(fromInt(36),Math::ZERO_VECTOR3,rotate));
+			Math::setMatrix3x3FromZ(matrix,Math::degToRad(-360)); Math::setQuaternionFromMatrix3x3(rotate,matrix);
+			track->keyFrames.add(TransformKeyFrame(Math::fromInt(36),Math::ZERO_VECTOR3,rotate));
 
 			track->compile();
 			orbitAnimation->setTrack(track);
@@ -912,11 +913,11 @@ void MyPlanet::startAnimation(){
 		{
 			TransformTrack::ptr track(new TransformTrack());
 
-			mCamera->setLookAt(Vector3(0,fromInt(150),fromInt(100)),ZERO_VECTOR3,Z_UNIT_VECTOR3);
-			track->keyFrames.add(TransformKeyFrame(fromInt(0),mCamera->getTranslate(),mCamera->getRotate(),mCamera->getScale()));
+			mCamera->setLookAt(Vector3(0,Math::fromInt(150),Math::fromInt(100)),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
+			track->keyFrames.add(TransformKeyFrame(Math::fromInt(0),mCamera->getTranslate(),mCamera->getRotate(),mCamera->getScale()));
 
-			mCamera->setLookAt(Vector3(fromMilli(-500),fromMilli(10000),fromMilli(5000)),ZERO_VECTOR3,Z_UNIT_VECTOR3);
-			track->keyFrames.add(TransformKeyFrame(fromInt(12),mCamera->getTranslate(),mCamera->getRotate(),mCamera->getScale()));
+			mCamera->setLookAt(Vector3(Math::fromMilli(-500),Math::fromMilli(10000),Math::fromMilli(5000)),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
+			track->keyFrames.add(TransformKeyFrame(Math::fromInt(12),mCamera->getTranslate(),mCamera->getRotate(),mCamera->getScale()));
 
 			track->compile();
 			path->setTrack(track);
@@ -953,15 +954,15 @@ void MyPlanet::burnupAnimation(){
 			TransformTrack::ptr track(new TransformTrack());
 			Quaternion rotate;
 
-			track->keyFrames.add(TransformKeyFrame(fromInt(0),mCamera->getTranslate(),mCamera->getRotate(),mCamera->getScale()));
+			track->keyFrames.add(TransformKeyFrame(Math::fromInt(0),mCamera->getTranslate(),mCamera->getRotate(),mCamera->getScale()));
 
 			Vector3 point(planetOrigin);
 			Math::invert(rotate,mCameraOrbit->getRotate());
 			Math::mul(point,rotate);
 			point.z=Math::fromMilli(500);
 			Math::mul(point,Math::fromMilli(3000));
-			mCamera->setLookAt(point,ZERO_VECTOR3,Z_UNIT_VECTOR3);
-			track->keyFrames.add(TransformKeyFrame(fromInt(2),mCamera->getTranslate(),mCamera->getRotate(),mCamera->getScale()));
+			mCamera->setLookAt(point,Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
+			track->keyFrames.add(TransformKeyFrame(Math::fromInt(2),mCamera->getTranslate(),mCamera->getRotate(),mCamera->getScale()));
 
 			track->compile();
 			path->setTrack(track);
@@ -973,12 +974,12 @@ void MyPlanet::burnupAnimation(){
 		NodePathAnimation::ptr sink(new NodePathAnimation(mPlanet));
 		{
 			TransformTrack::ptr track(new TransformTrack());
-			track->keyFrames.add(TransformKeyFrame(fromInt(0),planetOrigin));
+			track->keyFrames.add(TransformKeyFrame(Math::fromInt(0),planetOrigin));
 
 			Vector3 origin=planetOrigin;
 			Math::normalize(origin);
 			Math::mul(origin,Math::fromMilli(1000)-mPlanet->getSize());
-			track->keyFrames.add(TransformKeyFrame(fromInt(4),origin));
+			track->keyFrames.add(TransformKeyFrame(Math::fromInt(4),origin));
 
 			track->compile();
 			sink->setTrack(track);
@@ -1021,12 +1022,12 @@ void MyPlanet::focusPlanet(){
 		{
 			TransformTrack::ptr track(new TransformTrack());
 
-			track->keyFrames.add(TransformKeyFrame(fromInt(0),mCamera->getTranslate(),mCamera->getRotate(),mCamera->getScale()));
+			track->keyFrames.add(TransformKeyFrame(Math::fromInt(0),mCamera->getTranslate(),mCamera->getRotate(),mCamera->getScale()));
 
 			Vector3 eye;
 			Math::add(eye,Math::X_UNIT_VECTOR3,Math::Z_UNIT_VECTOR3);
 			mCamera->setLookAt(eye,Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
-			track->keyFrames.add(TransformKeyFrame(fromInt(3),mCamera->getTranslate(),mCamera->getRotate(),mCamera->getScale()));
+			track->keyFrames.add(TransformKeyFrame(Math::fromInt(3),mCamera->getTranslate(),mCamera->getRotate(),mCamera->getScale()));
 
 			track->compile();
 			path->setTrack(track);
