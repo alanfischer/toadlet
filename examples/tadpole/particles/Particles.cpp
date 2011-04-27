@@ -104,9 +104,9 @@ void Particles::update(int dt){
 			ParticleNode::Particle *p=particles->getParticle(j);
 			p->vz-=Math::mul(Math::fromFloat(9.8),fdt);
 
-			p->x+=p->vx*fdt;
-			p->y+=p->vy*fdt;
-			p->z+=p->vz*fdt;
+			p->x+=Math::mul(p->vx,fdt);
+			p->y+=Math::mul(p->vy,fdt);
+			p->z+=Math::mul(p->vz,fdt);
 
 			if(p->x<-edge){p->x=-edge;p->vx*=-1;}
 			if(p->x>edge){p->x=edge;p->vx*=-1;}
@@ -140,9 +140,9 @@ void Particles::addSimulatedParticles(ParticleNode::ptr particles){
 	int i;
 	for(i=0;i<particles->getNumParticles();++i){
 		ParticleNode::Particle *p=particles->getParticle(i);
-		p->vx=random.nextFloat(-v,v);
-		p->vy=random.nextFloat(-v,v);
-		p->vz=random.nextFloat(-v,v);
+		p->vx=random.nextScalar(-v,v);
+		p->vy=random.nextScalar(-v,v);
+		p->vz=random.nextScalar(-v,v);
 	}
 
 	simulatedParticles.add(particles);
