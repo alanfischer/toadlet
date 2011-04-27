@@ -18,8 +18,6 @@ set (LIBS ${TOADLET_EGG_LIB} ${TOADLET_PEEPER_LIB} ${TOADLET_RIBBIT_LIB} ${TOADL
 set (SRC
 	../../main/toadletMain.cpp
 	Logo.cpp
-	lt_xmsh.cpp
-	lt_mmsh.cpp
 )
 
 # Headers

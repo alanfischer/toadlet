@@ -72,8 +72,8 @@ void DecalShadowSceneRenderer::renderScene(Renderer *renderer,Node *node,CameraN
 
 			Matrix4x4 m;
 			Plane p;
-			p.normal=Vector3(0,0,1);
-			p.distance=20;
+			p.normal=Math::Z_UNIT_VECTOR3;
+			p.distance=Math::fromInt(20);
 			if(state.type==LightState::Type_DIRECTION){
 				Math::setMatrix4x4FromObliquePlane(m,p,state.direction);
 			}

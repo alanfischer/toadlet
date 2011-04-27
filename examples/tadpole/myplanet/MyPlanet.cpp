@@ -20,7 +20,7 @@ public:
 
 		Mesh::ptr mesh=getEngine()->getMeshManager()->createSphere(Sphere(Math::ONE));
 		{
-			mesh->subMeshes[0]->material->setMaterialState(MaterialState(Colors::BLUE));
+			mesh->getSubMesh(0)->material->setMaterialState(MaterialState(Colors::BLUE));
 		}
 		mMeshNode=getEngine()->createNodeType(MeshNode::type(),getScene());
 		mMeshNode->setMesh(mesh);
@@ -35,7 +35,7 @@ public:
 			material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 			material->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
 			material->setMaterialState(MaterialState(true,true));
-			mesh->subMeshes[0]->material=material;
+			mesh->getSubMesh(0)->material=material;
 		}
 		mSparkNode=getEngine()->createNodeType(MeshNode::type(),getScene());
 		mSparkNode->setMesh(mesh);
@@ -130,7 +130,7 @@ public:
 			textureState.calculation=TextureState::CalculationType_NORMAL;
 			Math::setMatrix4x4FromScale(textureState.matrix,32,1,1);
 			mMaterial->setTextureState(0,textureState);
-			mesh->subMeshes[0]->material=mMaterial;
+			mesh->getSubMesh(0)->material=mMaterial;
 		}
 
 		mMeshNode=getEngine()->createNodeType(MeshNode::type(),getScene());
@@ -348,9 +348,8 @@ Mesh::ptr MyPlanet::createDisc(Engine *engine,scalar size){
 	subMesh->material->setMaterialState(MaterialState(false));
 
 	Mesh::ptr mesh(new Mesh());
-	mesh->subMeshes.resize(1);
-	mesh->subMeshes[0]=subMesh;
-	mesh->staticVertexData=VertexData::ptr(new VertexData(vertexBuffer));
+	mesh->addSubMesh(subMesh);
+	mesh->setStaticVertexData(VertexData::ptr(new VertexData(vertexBuffer)));
 
 	return mesh;
 }
@@ -478,7 +477,7 @@ ParentNode::ptr MyPlanet::createSun(scalar size){
 
 		Mesh::ptr mesh=getEngine()->getMeshManager()->createSphere(Sphere(size));
 		{
-			Material::ptr material=mesh->subMeshes[0]->material;
+			Material::ptr material=mesh->getSubMesh(0)->material;
 			MaterialState materialState(Colors::YELLOW);
 			materialState.emissive.set(Colors::YELLOW);
 			material->setMaterialState(materialState);
@@ -808,11 +807,11 @@ Node::ptr MyPlanet::createBackground(){
 	node->attach(stars);
 
 	for(i=0;i<32;++i){
-		Vector3 offset(random.nextFloat(-1,1),random.nextFloat(-1,1),random.nextFloat(-1,1));
+		Vector3 offset(random.nextScalar(-Math::ONE,Math::ONE),random.nextScalar(-Math::ONE,Math::ONE),random.nextScalar(-Math::ONE,Math::ONE));
 		Math::normalize(offset);
-		Math::mul(offset,random.nextFloat(60,190));
+		Math::mul(offset,random.nextScalar(Math::fromInt(60),Math::fromInt(190)));
 
-		float size=random.nextFloat(5,50);
+		scalar size=random.nextScalar(Math::fromInt(5),Math::fromInt(50));
 
 		{
 			SpriteNode::ptr flare=mEngine->createNodeType(SpriteNode::type(),mScene);
@@ -824,7 +823,7 @@ Node::ptr MyPlanet::createBackground(){
 			Math::lerp(color,Colors::ORANGE,Colors::YELLOW,random.nextFloat());
 			material->setMaterialState(MaterialState(color));
 			flare->setMaterial(material);
-			flare->setScale(size*random.nextFloat(0.8,1.0),size*random.nextFloat(0.8,1.0),ONE);
+			flare->setScale(Math::mul(size,random.nextScalar(Math::fromMilli(800),Math::ONE)),Math::mul(size,random.nextScalar(Math::fromMilli(800),Math::ONE)),ONE);
 			flare->setTranslate(offset);
 			node->attach(flare);
 		}
