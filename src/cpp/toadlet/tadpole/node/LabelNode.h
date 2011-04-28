@@ -63,6 +63,9 @@ public:
 	void setWordWrap(bool wordWrap);
 	bool getWordWrap() const{return mWordWrap;}
 
+	void setWidth(scalar width){mWidth=width;}
+	inline scalar getWidth() const{return mWidth;}
+
 	void gatherRenderables(CameraNode *camera,RenderableSet *set);
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
@@ -76,6 +79,7 @@ protected:
 
 	void updateLabel();
 
+	/// @todo: Word wrapping and width need to be fixed so it makes sense.  Right now wordWrap only works in font space, not local space
 	static egg::String wordWrap(Font::ptr font,float width,const egg::String &text);
 
 	Font::ptr mFont;
@@ -83,6 +87,7 @@ protected:
 	int mAlignment;
 	bool mNormalized;
 	bool mWordWrap;
+	scalar mWidth;
 
 	Material::ptr mMaterial;
 	peeper::VertexData::ptr mVertexData;
