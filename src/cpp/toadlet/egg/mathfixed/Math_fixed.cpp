@@ -292,7 +292,7 @@ void Math::setMatrix4x4FromPerspectivePlane(Matrix4x4 &r,const Plane &plane,cons
 
 	r.data[12] = -(TOADLET_MUL_XX(r.data[0],eye.x) + TOADLET_MUL_XX(r.data[4],eye.y) + TOADLET_MUL_XX(r.data[8],eye.z));
 	r.data[13] = -(TOADLET_MUL_XX(r.data[1],eye.x) + TOADLET_MUL_XX(r.data[5],eye.y) + TOADLET_MUL_XX(r.data[9],eye.z));
-	r.data[14]= -(TOADLET_MUL_XX(r.data[2],eye.x) + TOADLET_MUL_XX(r.data[6],eye.y) + TOADLET_MUL_XX(r.data[10],eye.z));
+	r.data[14] = -(TOADLET_MUL_XX(r.data[2],eye.x) + TOADLET_MUL_XX(r.data[6],eye.y) + TOADLET_MUL_XX(r.data[10],eye.z));
 }
 
 fixed Math::setAxisAngleFromQuaternion(Vector3 &axis,const Quaternion &q,fixed epsilon){

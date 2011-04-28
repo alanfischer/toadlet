@@ -63,6 +63,7 @@ void LightNode::frameUpdate(int dt,int scope){
 	super::frameUpdate(dt,scope);
 
 	mLightState.position.set(getWorldTranslate());
+	Math::mul(mLightState.direction,getWorldRotate(),mDirection);
 }
 
 void LightNode::gatherRenderables(CameraNode *node,RenderableSet *set){

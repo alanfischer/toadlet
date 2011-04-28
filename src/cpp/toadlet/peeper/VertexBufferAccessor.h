@@ -43,8 +43,14 @@
 	#define TOADLET_FROMFLOAT(x) x
 #endif
 
-#define TOADLET_CHECK_READ() TOADLET_ASSERT(mVertexBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_READ);
-#define TOADLET_CHECK_WRITE() TOADLET_ASSERT(mVertexBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_WRITE);
+// Check for the correct access bits or if it's a backable buffer
+#define TOADLET_CHECK_READ() TOADLET_ASSERT( \
+	(mVertexBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_READ)!=0 || \
+	(mVertexBuffer->getRootVertexBuffer()!=mVertexBuffer));
+
+#define TOADLET_CHECK_WRITE() TOADLET_ASSERT( \
+	(mVertexBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_WRITE)!=0 || \
+	(mVertexBuffer->getRootVertexBuffer()!=mVertexBuffer));
 
 namespace toadlet{
 namespace peeper{

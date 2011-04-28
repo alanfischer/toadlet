@@ -292,7 +292,7 @@ void Math::setMatrix4x4FromPerspectivePlane(Matrix4x4 &r,const Plane &plane,cons
 
 	r.data[12] = -(r.data[0]*eye.x + r.data[4]*eye.y + r.data[8]*eye.z);
 	r.data[13] = -(r.data[1]*eye.x + r.data[5]*eye.y + r.data[9]*eye.z);
-	r.data[14]= -(r.data[2]*eye.x + r.data[6]*eye.y + r.data[10]*eye.z);
+	r.data[14] = -(r.data[2]*eye.x + r.data[6]*eye.y + r.data[10]*eye.z);
 }
 
 real Math::setAxisAngleFromQuaternion(Vector3 &axis,const Quaternion &q,real epsilon){

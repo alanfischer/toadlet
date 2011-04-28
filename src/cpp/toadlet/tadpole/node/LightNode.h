@@ -45,7 +45,7 @@ public:
 	inline void setEnabled(bool enabled){mEnabled=enabled;}
 	inline bool getEnabled() const{return mEnabled;}
 
-	inline void setLightState(const peeper::LightState &state){mLightState.set(state);}
+	inline void setLightState(const peeper::LightState &state){mDirection.set(state.direction);mLightState.set(state);}
 	inline const peeper::LightState &getLightState(){return mLightState;}
 
 	virtual void frameUpdate(int dt,int scope);
@@ -54,6 +54,7 @@ public:
 
 protected:
 	bool mEnabled;
+	Vector3 mDirection;
 	peeper::LightState mLightState;
 };
 
