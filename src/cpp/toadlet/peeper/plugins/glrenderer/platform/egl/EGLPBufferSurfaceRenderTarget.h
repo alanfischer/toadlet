@@ -51,6 +51,9 @@ public:
 	void destroy();
 	bool compile();
 
+	void resetCreate(){}
+	void resetDestroy(){}
+
 	bool makeCurrent();
 	bool swap();
 

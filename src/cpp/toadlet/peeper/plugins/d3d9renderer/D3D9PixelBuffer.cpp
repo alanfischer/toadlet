@@ -54,70 +54,105 @@ D3D9PixelBuffer::~D3D9PixelBuffer(){
 }
 
 bool D3D9PixelBuffer::create(int usage,int access,int pixelFormat,int width,int height,int depth){
-	if(depth!=1){
-		Error::invalidParameters(Categories::TOADLET_PEEPER,"D3D9PixelBuffer may only be created with a depth of 1");
-		return false;
-	}
-
 	pixelFormat=mRenderer->getCloseTextureFormat(pixelFormat);
-
-	D3DFORMAT d3dformat=D3D9Renderer::getD3DFORMAT(pixelFormat);
-	HRESULT result=S_OK;
-	IDirect3DSurface9 *d3dsurface=NULL;
-	if(mRenderTarget){
-		if((pixelFormat&Texture::Format_BIT_DEPTH)>0){
-			#if defined(TOADLET_SET_D3DM)
-				result=mRenderer->getDirect3DDevice9()->CreateDepthStencilSurface(width,height,d3dformat,D3DMULTISAMPLE_NONE,&d3dsurface TOADLET_SHAREDHANDLE);
-			#else
-				result=mRenderer->getDirect3DDevice9()->CreateDepthStencilSurface(width,height,d3dformat,D3DMULTISAMPLE_NONE,NULL,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
-			#endif
-			if(FAILED(result)){
-				TOADLET_CHECK_D3D9ERROR(result,"CreateDepthStencilSurface");
-				return NULL;
-			}
-		}
-		else{
-			#if defined(TOADLET_SET_D3DM)
-				result=mRenderer->getDirect3DDevice9()->CreateRenderTarget(width,height,d3dformat,D3DMULTISAMPLE_NONE,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
-			#else
-				result=mRenderer->getDirect3DDevice9()->CreateRenderTarget(width,height,d3dformat,D3DMULTISAMPLE_NONE,NULL,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
-			#endif
-			if(FAILED(result)){
-				TOADLET_CHECK_D3D9ERROR(result,"CreateRenderTarget");
-				return NULL;
-			}
-		}
-	}
-	else{
-		#if !defined(TOADLET_SET_D3DM)
-			result=mRenderer->getDirect3DDevice9()->CreateOffscreenPlainSurface(width,height,d3dformat,D3DPOOL_SYSTEMMEM,&d3dsurface TOADLET_SHAREDHANDLE);
-			if(FAILED(result)){
-				TOADLET_CHECK_D3D9ERROR(result,"CreateDepthStencilSurface");
-				return NULL;
-			}
-		#else
-			Error::unimplemented(Categories::TOADLET_PEEPER,"can not create an offscreen buffer");
-			return NULL;
-		#endif
-	}
-
-	mSurface=d3dsurface;
 
 	mUsage=usage;
 	mAccess=access;
 	mPixelFormat=pixelFormat;
 
-	D3DSURFACE_DESC desc;
-	mSurface->GetDesc(&desc);
 	mDataSize=ImageFormatConversion::getRowPitch(pixelFormat,width)*height;
-	mWidth=desc.Width;
-	mHeight=desc.Height;
-	mDepth=1;
+	mWidth=width;
+	mHeight=height;
+	mDepth=depth;
+
+	createContext(false);
 
 	return true;
 }
 
 void D3D9PixelBuffer::destroy(){
+	destroyContext(false);
+
+	if(mListener!=NULL){
+		mListener->bufferDestroyed(this);
+		mListener=NULL;
+	}
+}
+
+void D3D9PixelBuffer::resetCreate(){
+	if(needsReset()){
+		createContext(true);
+	}
+}
+
+void D3D9PixelBuffer::resetDestroy(){
+	if(needsReset()){
+		destroyContext(true);
+	}
+}
+
+bool D3D9PixelBuffer::createContext(bool restore){
+	if(mDepth!=1){
+		Error::invalidParameters(Categories::TOADLET_PEEPER,"D3D9PixelBuffer may only be created with a depth of 1");
+		return false;
+	}
+
+	D3DFORMAT d3dformat=D3D9Renderer::getD3DFORMAT(mPixelFormat);
+	HRESULT result=S_OK;
+	IDirect3DSurface9 *d3dsurface=NULL;
+	if(mRenderTarget){
+		mD3DPool=D3DPOOL_DEFAULT;
+
+		if((mPixelFormat&Texture::Format_BIT_DEPTH)>0){
+			#if defined(TOADLET_SET_D3DM)
+				result=mRenderer->getDirect3DDevice9()->CreateDepthStencilSurface(mWidth,mHeight,d3dformat,D3DMULTISAMPLE_NONE,&d3dsurface TOADLET_SHAREDHANDLE);
+			#else
+				result=mRenderer->getDirect3DDevice9()->CreateDepthStencilSurface(mWidth,mHeight,d3dformat,D3DMULTISAMPLE_NONE,NULL,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
+			#endif
+			if(FAILED(result)){
+				TOADLET_CHECK_D3D9ERROR(result,"CreateDepthStencilSurface");
+				return false;
+			}
+		}
+		else{
+			#if defined(TOADLET_SET_D3DM)
+				result=mRenderer->getDirect3DDevice9()->CreateRenderTarget(mWidth,mHeight,d3dformat,D3DMULTISAMPLE_NONE,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
+			#else
+				result=mRenderer->getDirect3DDevice9()->CreateRenderTarget(mWidth,mHeight,d3dformat,D3DMULTISAMPLE_NONE,NULL,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
+			#endif
+			if(FAILED(result)){
+				TOADLET_CHECK_D3D9ERROR(result,"CreateRenderTarget");
+				return false;
+			}
+		}
+	}
+	else{
+		mD3DPool=D3DPOOL_SYSTEMMEM;
+
+		#if !defined(TOADLET_SET_D3DM)
+			result=mRenderer->getDirect3DDevice9()->CreateOffscreenPlainSurface(mWidth,mHeight,d3dformat,mD3DPool,&d3dsurface TOADLET_SHAREDHANDLE);
+			if(FAILED(result)){
+				TOADLET_CHECK_D3D9ERROR(result,"CreateDepthStencilSurface");
+				return false;
+			}
+		#else
+			Error::unimplemented(Categories::TOADLET_PEEPER,"can not create an offscreen buffer");
+			return false;
+		#endif
+	}
+
+	mSurface=d3dsurface;
+
+	/// @todo: Is this necessary?
+	D3DSURFACE_DESC desc;
+	mSurface->GetDesc(&desc);
+	mWidth=desc.Width;
+	mHeight=desc.Height;
+
+	return true;
+}
+
+bool D3D9PixelBuffer::destroyContext(bool backup){
 	if(mSurface!=NULL){
 		mSurface->Release();
 		mSurface=NULL;
@@ -127,18 +162,7 @@ void D3D9PixelBuffer::destroy(){
 		mVolume=NULL;
 	}
 
-	if(mListener!=NULL){
-		mListener->bufferDestroyed(this);
-		mListener=NULL;
-	}
-}
-
-void D3D9PixelBuffer::resetCreate(){
-	/// @todo: Add createContext and destroyContext items here
-}
-
-void D3D9PixelBuffer::resetDestroy(){
-	/// @todo: Add createContext and destroyContext items here
+	return true;
 }
 
 uint8 *D3D9PixelBuffer::lock(int lockAccess){
@@ -175,6 +199,14 @@ bool D3D9PixelBuffer::unlock(){
 		TOADLET_CHECK_D3D9ERROR(result,"D3D9PixelBuffer: UnlockBox");
 	}
 	return SUCCEEDED(result);
+}
+
+bool D3D9PixelBuffer::needsReset(){
+	#if defined(TOADLET_SET_D3DM)
+		return false;
+	#else
+		return mD3DPool==D3DPOOL_DEFAULT;
+	#endif
 }
 
 }

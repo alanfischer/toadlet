@@ -70,6 +70,24 @@ void D3D9PixelBufferRenderTarget::destroy(){
 	}
 }
 
+void D3D9PixelBufferRenderTarget::resetCreate(){
+	if(mDepthBuffer!=NULL){
+		mDepthBuffer->resetCreate();
+	}
+	if(mColorBuffer!=NULL){
+		mColorBuffer->resetCreate();
+	}
+}
+
+void D3D9PixelBufferRenderTarget::resetDestroy(){
+	if(mDepthBuffer!=NULL){
+		mDepthBuffer->resetDestroy();
+	}
+	if(mColorBuffer!=NULL){
+		mColorBuffer->resetDestroy();
+	}
+}
+
 bool D3D9PixelBufferRenderTarget::activate(){
 	if(mNeedsCompile){
 		compile();

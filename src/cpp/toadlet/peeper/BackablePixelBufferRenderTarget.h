@@ -51,6 +51,9 @@ public:
 	virtual bool create();
 	virtual void destroy();
 
+	virtual void resetCreate(){if(mBack!=NULL){mBack->resetCreate();}}
+	virtual void resetDestroy(){if(mBack!=NULL){mBack->resetDestroy();}}
+
 	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment);
 	virtual bool remove(PixelBuffer::ptr buffer);
 

@@ -51,6 +51,9 @@ public:
 	void destroy();
 	bool compile();
 
+	void resetCreate(){}
+	void resetDestroy(){}
+
 	bool activate();
 	bool deactivate(){return WGLRenderTarget::deactivate();}
 	bool swap();

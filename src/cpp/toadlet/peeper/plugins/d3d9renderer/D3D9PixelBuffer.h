@@ -63,10 +63,15 @@ public:
 	uint8 *lock(int lockAccess);
 	bool unlock();
 
+	bool needsReset();
+
 	inline IDirect3DSurface9 *getSurface() const{return mSurface;}
 	inline IDirect3DVolume9 *getVolume() const{return mVolume;}
 
 protected:
+	bool createContext(bool restore);
+	bool destroyContext(bool backup);
+
 	D3D9Renderer *mRenderer;
 
 	BufferDestroyedListener *mListener;
@@ -78,6 +83,7 @@ protected:
 	int mDataSize;
 	int mPixelFormat;
 	int mWidth,mHeight,mDepth;
+	D3DPOOL mD3DPool;
 
 	friend D3D9Renderer;
 };
