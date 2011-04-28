@@ -48,7 +48,8 @@ LabelNode::LabelNode():super(),
 	//mText,
 	mAlignment(0),
 	mNormalized(false),
-	mWordWrap(false)
+	mWordWrap(false),
+	mWidth(0)
 
 	//mMaterial,
 	//mVertexData,
@@ -175,12 +176,12 @@ void LabelNode::updateLabel(){
 	// Update word wrap
 	String text;
 	if(mWordWrap){
-		if(mNormalized){
-			text=wordWrap(mFont,mFont->getPointSize(),mText);
-		}
-		else{
-			text=wordWrap(mFont,Math::ONE,mText);
-		}
+//		if(mNormalized){
+//			text=wordWrap(mFont,mFont->getPointSize(),mText);
+//		}
+//		else{
+			text=wordWrap(mFont,mWidth,mText);
+//		}
 	}
 	else{
 		text=mText;
