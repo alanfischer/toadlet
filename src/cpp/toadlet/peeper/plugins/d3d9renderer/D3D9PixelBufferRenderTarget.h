@@ -47,6 +47,9 @@ public:
 	bool create();
 	void destroy();
 
+	void resetCreate();
+	void resetDestroy();
+
 	bool activate();
 	bool deactivate();
 	void swap(){}

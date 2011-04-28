@@ -54,6 +54,9 @@ public:
 	virtual bool create()=0;
 	virtual void destroy()=0;
 
+	virtual void resetCreate()=0;
+	virtual void resetDestroy()=0;
+
 	virtual bool attach(PixelBuffer::ptr buffer,Attachment attachment)=0;
 	virtual bool remove(PixelBuffer::ptr buffer)=0;
 };

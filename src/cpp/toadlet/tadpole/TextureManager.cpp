@@ -222,6 +222,13 @@ void TextureManager::preContextReset(peeper::Renderer *renderer){
 			texture->resetDestroy();
 		}
 	}
+
+	for(i=0;i<mRenderTargets.size();++i){
+		PixelBufferRenderTarget::ptr renderTarget=mRenderTargets[i];
+		if(renderTarget!=NULL){
+			renderTarget->resetDestroy();
+		}
+	}
 }
 
 void TextureManager::postContextReset(peeper::Renderer *renderer){
@@ -232,6 +239,13 @@ void TextureManager::postContextReset(peeper::Renderer *renderer){
 		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
 		if(texture!=NULL){
 			texture->resetCreate();
+		}
+	}
+
+	for(i=0;i<mRenderTargets.size();++i){
+		PixelBufferRenderTarget::ptr renderTarget=mRenderTargets[i];
+		if(renderTarget!=NULL){
+			renderTarget->resetCreate();
 		}
 	}
 }
