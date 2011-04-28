@@ -29,8 +29,14 @@
 #include <toadlet/egg/Extents.h>
 #include <toadlet/peeper/IndexBuffer.h>
 
-#define TOADLET_CHECK_READ() TOADLET_ASSERT(mIndexBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_READ);
-#define TOADLET_CHECK_WRITE() TOADLET_ASSERT(mIndexBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_WRITE);
+// Check for the correct access bits or if it's a backable buffer
+#define TOADLET_CHECK_READ() TOADLET_ASSERT( \
+	(mIndexBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_READ)!=0 || \
+	(mIndexBuffer->getRootIndexBuffer()!=mIndexBuffer));
+
+#define TOADLET_CHECK_WRITE() TOADLET_ASSERT( \
+	(mIndexBuffer->getAccess()&toadlet::peeper::Buffer::Access_BIT_WRITE)!=0 || \
+	(mIndexBuffer->getRootIndexBuffer()!=mIndexBuffer));
 
 namespace toadlet{
 namespace peeper{
