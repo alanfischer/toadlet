@@ -721,6 +721,7 @@ void D3D9Renderer::setRasterizerState(const RasterizerState &state){
 
 	#if !defined(TOADLET_SET_D3DM)
 		mD3DDevice->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS,state.multisample);
+		mD3DDevice->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE,state.multisample);
 	#endif
 
 	mD3DDevice->SetRenderState(D3DRS_DITHERENABLE,state.dither);
