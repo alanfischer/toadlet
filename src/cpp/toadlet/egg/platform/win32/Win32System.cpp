@@ -74,6 +74,12 @@ int Win32System::threadID(){
 	return GetCurrentThreadId();
 }
 
+//bool Win32System::getCPUCapabilities(CPUCapabilities &capabilities){
+//	__cpuid(
+
+//	return true;
+//}
+
 bool Win32System::absolutePath(const String &path){
 	int length=path.length();
 	return	(length>3 && path.at(1)==':' && (path.at(2)=='\\' || path.at(2)=='/')) ||

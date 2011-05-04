@@ -32,7 +32,7 @@ namespace toadlet{
 namespace egg{
 namespace math{
 
-class TOADLET_API Sphere{
+class TOADLET_API TOADLET_ALIGNED Sphere{
 public:
 	inline Sphere():radius(0){}
 
@@ -50,7 +50,7 @@ public:
 		return *this;
 	}
 
-	inline Sphere &set(Vector3 origin1,real radius1){
+	inline Sphere &set(const Vector3 &origin1,real radius1){
 		origin.x=origin1.x;
 		origin.y=origin1.y;
 		origin.z=origin1.z;

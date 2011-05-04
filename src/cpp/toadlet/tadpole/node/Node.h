@@ -99,6 +99,8 @@ public:
 		InterfaceType_VISIBLE,
 	};
 
+	TOADLET_ALIGNED_NEW();
+
 	Node();
 	virtual ~Node();
 	inline Node *create(Engine *engine){mEngine=engine;return create((Scene*)NULL);}

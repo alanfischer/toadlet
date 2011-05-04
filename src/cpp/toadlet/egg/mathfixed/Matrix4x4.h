@@ -32,7 +32,7 @@ namespace toadlet{
 namespace egg{
 namespace mathfixed{
 
-class TOADLET_API Matrix4x4{
+class TOADLET_API TOADLET_ALIGNED Matrix4x4{
 public:
 	class RowAccessor{
 	public:

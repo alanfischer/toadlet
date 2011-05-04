@@ -1053,6 +1053,72 @@ void MyPlanet::createLand(){
 int toadletMain(int argc,char **argv){
 	MyPlanet app;
 	app.create();
+
+static int COUNT = 10000000;
+
+	Matrix4x4 m1,m2,r;
+	Vector4 v;
+	int i;
+
+	uint64 t0=System::utime();
+
+	m1.set(Math::IDENTITY_MATRIX4X4);
+	m2.set(Math::IDENTITY_MATRIX4X4);
+	for(i=0;i<COUNT;++i){
+		Math::mulMatrix4x4Traditional(r,m1,m2);
+		m1.data[15]=r.data[0];
+	}
+
+	uint64 t1=System::utime();
+
+	m1.set(Math::IDENTITY_MATRIX4X4);
+	m2.set(Math::IDENTITY_MATRIX4X4);
+	for(i=0;i<COUNT;++i){
+		Math::mulMatrix4x4SSE(r,m1,m2);
+		m1.data[15]=r.data[0];
+	}
+
+	uint64 t2=System::utime();
+
+	m1.set(Math::IDENTITY_MATRIX4X4);
+	m2.set(Math::IDENTITY_MATRIX4X4);
+	for(i=0;i<COUNT;++i){
+		Math::mul(r,m1,m2);
+		m1.data[15]=r.data[0];
+	}
+
+	uint64 t3=System::utime();
+
+	Logger::alert(String("TIME:")+(t1-t0)+":"+(t2-t1)+":"+(t3-t2));
+
+	t0=System::utime();
+
+	m1.set(Math::IDENTITY_MATRIX4X4);
+	v.set(1,0,0,0);
+	for(i=0;i<COUNT;++i){
+		Math::mulVector4Matrix4x4Traditional(v,m1);
+	}
+
+	t1=System::utime();
+
+	m1.set(Math::IDENTITY_MATRIX4X4);
+	v.set(1,0,0,0);
+	for(i=0;i<COUNT;++i){
+		Math::mulVector4Matrix4x4SSE(v,m1);
+	}
+
+	t2=System::utime();
+
+	m1.set(Math::IDENTITY_MATRIX4X4);
+	v.set(1,0,0,0);
+	for(i=0;i<COUNT;++i){
+		Math::mul(v,m1);
+	}
+
+	t3=System::utime();
+
+	Logger::alert(String("TIME:")+(t1-t0)+":"+(t2-t1)+":"+(t3-t2));
+
 	app.start();
 	app.destroy();
 	return 1;

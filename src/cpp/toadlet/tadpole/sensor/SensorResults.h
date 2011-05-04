@@ -26,6 +26,7 @@
 #ifndef TOADLET_TADPOLE_SENSOR_SENSORRESULTS_H
 #define TOADLET_TADPOLE_SENSOR_SENSORRESULTS_H
 
+#include <toadlet/egg/Collection.h>
 #include <toadlet/tadpole/sensor/SensorResultsListener.h>
 
 namespace toadlet{

@@ -26,6 +26,7 @@
 #ifndef TOADLET_PEEPER_VERTEXDATA_H
 #define TOADLET_PEEPER_VERTEXDATA_H
 
+#include <toadlet/egg/Collection.h>
 #include <toadlet/peeper/VertexBuffer.h>
 
 namespace toadlet{

@@ -93,6 +93,10 @@ protected:
 	Map<String,const BaseType<Class>*> mTypes;
 };
 
+#define TOADLET_ALIGNED_NEW \
+	inline void *operator new(size_t size){return TOADLET_ALIGNED_MALLOC(size,16);} \
+	inline void operator delete(void *pointer){TOADLET_ALIGNED_FREE(pointer);}
+
 }
 }
 

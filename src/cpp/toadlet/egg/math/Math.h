@@ -39,7 +39,6 @@
 #include <toadlet/egg/math/Sphere.h>
 #include <toadlet/egg/math/AABox.h>
 #include <toadlet/egg/math/Capsule.h>
-#include <toadlet/egg/math/ConvexSolid.h>
 
 namespace toadlet{
 namespace egg{
@@ -75,6 +74,8 @@ namespace Math{
 	const Quaternion IDENTITY_QUATERNION;
 	const EulerAngle IDENTITY_EULERANGLE;
 	const AABox ZERO_AABOX;
+
+	void init();
 
 	// Vector2 operations
 	inline void neg(Vector2 &r,const Vector2 &v){
@@ -622,55 +623,11 @@ namespace Math{
 	TOADLET_API bool setEulerAngleXYZFromQuaternion(EulerAngle &r,const Quaternion &q,real epsilon);
 
 	// Matrix3x3 basic operations
-	inline void mul(Matrix3x3 &r,const Matrix3x3 &m1,const Matrix3x3 &m2){
-		r.data[0+0*3]=m1.data[0+0*3] * m2.data[0+0*3] + m1.data[0+1*3] * m2.data[1+0*3] + m1.data[0+2*3] * m2.data[2+0*3];
-		r.data[0+1*3]=m1.data[0+0*3] * m2.data[0+1*3] + m1.data[0+1*3] * m2.data[1+1*3] + m1.data[0+2*3] * m2.data[2+1*3];
-		r.data[0+2*3]=m1.data[0+0*3] * m2.data[0+2*3] + m1.data[0+1*3] * m2.data[1+2*3] + m1.data[0+2*3] * m2.data[2+2*3];
+	TOADLET_API void mul(Matrix3x3 &r,const Matrix3x3 &m1,const Matrix3x3 &m2);
 
-		r.data[1+0*3]=m1.data[1+0*3] * m2.data[0+0*3] + m1.data[1+1*3] * m2.data[1+0*3] + m1.data[1+2*3] * m2.data[2+0*3];
-		r.data[1+1*3]=m1.data[1+0*3] * m2.data[0+1*3] + m1.data[1+1*3] * m2.data[1+1*3] + m1.data[1+2*3] * m2.data[2+1*3];
-		r.data[1+2*3]=m1.data[1+0*3] * m2.data[0+2*3] + m1.data[1+1*3] * m2.data[1+2*3] + m1.data[1+2*3] * m2.data[2+2*3];
+	TOADLET_API void postMul(Matrix3x3 &m1,const Matrix3x3 &m2);
 
-		r.data[2+0*3]=m1.data[2+0*3] * m2.data[0+0*3] + m1.data[2+1*3] * m2.data[1+0*3] + m1.data[2+2*3] * m2.data[2+0*3];
-		r.data[2+1*3]=m1.data[2+0*3] * m2.data[0+1*3] + m1.data[2+1*3] * m2.data[1+1*3] + m1.data[2+2*3] * m2.data[2+1*3];
-		r.data[2+2*3]=m1.data[2+0*3] * m2.data[0+2*3] + m1.data[2+1*3] * m2.data[1+2*3] + m1.data[2+2*3] * m2.data[2+2*3];
-	}
-
-	inline void postMul(Matrix3x3 &m1,const Matrix3x3 &m2){
-		real d00=m1.data[0+0*3] * m2.data[0+0*3] + m1.data[0+1*3] * m2.data[1+0*3] + m1.data[0+2*3] * m2.data[2+0*3];
-		real d01=m1.data[0+0*3] * m2.data[0+1*3] + m1.data[0+1*3] * m2.data[1+1*3] + m1.data[0+2*3] * m2.data[2+1*3];
-		real d02=m1.data[0+0*3] * m2.data[0+2*3] + m1.data[0+1*3] * m2.data[1+2*3] + m1.data[0+2*3] * m2.data[2+2*3];
-
-		real d10=m1.data[1+0*3] * m2.data[0+0*3] + m1.data[1+1*3] * m2.data[1+0*3] + m1.data[1+2*3] * m2.data[2+0*3];
-		real d11=m1.data[1+0*3] * m2.data[0+1*3] + m1.data[1+1*3] * m2.data[1+1*3] + m1.data[1+2*3] * m2.data[2+1*3];
-		real d12=m1.data[1+0*3] * m2.data[0+2*3] + m1.data[1+1*3] * m2.data[1+2*3] + m1.data[1+2*3] * m2.data[2+2*3];
-
-		real d20=m1.data[2+0*3] * m2.data[0+0*3] + m1.data[2+1*3] * m2.data[1+0*3] + m1.data[2+2*3] * m2.data[2+0*3];
-		real d21=m1.data[2+0*3] * m2.data[0+1*3] + m1.data[2+1*3] * m2.data[1+1*3] + m1.data[2+2*3] * m2.data[2+1*3];
-		real d22=m1.data[2+0*3] * m2.data[0+2*3] + m1.data[2+1*3] * m2.data[1+2*3] + m1.data[2+2*3] * m2.data[2+2*3];
-
-		m1.data[0+0*3]=d00; m1.data[0+1*3]=d01; m1.data[0+2*3]=d02;
-		m1.data[1+0*3]=d10; m1.data[1+1*3]=d11; m1.data[1+2*3]=d12;
-		m1.data[2+0*3]=d20; m1.data[2+1*3]=d21; m1.data[2+2*3]=d22;
-	}
-
-	inline void preMul(Matrix3x3 &m2,const Matrix3x3 &m1){
-		real d00=m1.data[0+0*3] * m2.data[0+0*3] + m1.data[0+1*3] * m2.data[1+0*3] + m1.data[0+2*3] * m2.data[2+0*3];
-		real d01=m1.data[0+0*3] * m2.data[0+1*3] + m1.data[0+1*3] * m2.data[1+1*3] + m1.data[0+2*3] * m2.data[2+1*3];
-		real d02=m1.data[0+0*3] * m2.data[0+2*3] + m1.data[0+1*3] * m2.data[1+2*3] + m1.data[0+2*3] * m2.data[2+2*3];
-
-		real d10=m1.data[1+0*3] * m2.data[0+0*3] + m1.data[1+1*3] * m2.data[1+0*3] + m1.data[1+2*3] * m2.data[2+0*3];
-		real d11=m1.data[1+0*3] * m2.data[0+1*3] + m1.data[1+1*3] * m2.data[1+1*3] + m1.data[1+2*3] * m2.data[2+1*3];
-		real d12=m1.data[1+0*3] * m2.data[0+2*3] + m1.data[1+1*3] * m2.data[1+2*3] + m1.data[1+2*3] * m2.data[2+2*3];
-
-		real d20=m1.data[2+0*3] * m2.data[0+0*3] + m1.data[2+1*3] * m2.data[1+0*3] + m1.data[2+2*3] * m2.data[2+0*3];
-		real d21=m1.data[2+0*3] * m2.data[0+1*3] + m1.data[2+1*3] * m2.data[1+1*3] + m1.data[2+2*3] * m2.data[2+1*3];
-		real d22=m1.data[2+0*3] * m2.data[0+2*3] + m1.data[2+1*3] * m2.data[1+2*3] + m1.data[2+2*3] * m2.data[2+2*3];
-
-		m2.data[0+0*3]=d00; m2.data[0+1*3]=d01; m2.data[0+2*3]=d02;
-		m2.data[1+0*3]=d10; m2.data[1+1*3]=d11; m2.data[1+2*3]=d12;
-		m2.data[2+0*3]=d20; m2.data[2+1*3]=d21; m2.data[2+2*3]=d22;
-	}
+	TOADLET_API void preMul(Matrix3x3 &m2,const Matrix3x3 &m1);
 
 	inline void mul(Vector3 &r,const Matrix3x3 &m,const Vector3 &v){
 		r.x=m.data[0+0*3]*v.x + m.data[0+1*3]*v.y + m.data[0+2*3]*v.z;
@@ -691,102 +648,28 @@ namespace Math{
 
 	TOADLET_API real determinant(const Matrix3x3 &m);
 
-	TOADLET_API bool invert(Matrix3x3 &r,const Matrix3x3 m);
+	TOADLET_API bool invert(Matrix3x3 &r,const Matrix3x3 &m);
 
 	// Matrix4x4 basic operations
-	inline void mul(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2){
-		r.data[0+0*4]=(m1.data[0+0*4]*m2.data[0+0*4]) + (m1.data[0+1*4]*m2.data[1+0*4]) + (m1.data[0+2*4]*m2.data[2+0*4]) + (m1.data[0+3*4]*m2.data[3+0*4]);
-		r.data[0+1*4]=(m1.data[0+0*4]*m2.data[0+1*4]) + (m1.data[0+1*4]*m2.data[1+1*4]) + (m1.data[0+2*4]*m2.data[2+1*4]) + (m1.data[0+3*4]*m2.data[3+1*4]);
-		r.data[0+2*4]=(m1.data[0+0*4]*m2.data[0+2*4]) + (m1.data[0+1*4]*m2.data[1+2*4]) + (m1.data[0+2*4]*m2.data[2+2*4]) + (m1.data[0+3*4]*m2.data[3+2*4]);
-		r.data[0+3*4]=(m1.data[0+0*4]*m2.data[0+3*4]) + (m1.data[0+1*4]*m2.data[1+3*4]) + (m1.data[0+2*4]*m2.data[2+3*4]) + (m1.data[0+3*4]*m2.data[3+3*4]);
+	TOADLET_API void mul(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2);
+	TOADLET_API void mulMatrix4x4Traditional(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2);
+	TOADLET_API void mulMatrix4x4SSE(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2);
 
-		r.data[1+0*4]=(m1.data[1+0*4]*m2.data[0+0*4]) + (m1.data[1+1*4]*m2.data[1+0*4]) + (m1.data[1+2*4]*m2.data[2+0*4]) + (m1.data[1+3*4]*m2.data[3+0*4]);
-		r.data[1+1*4]=(m1.data[1+0*4]*m2.data[0+1*4]) + (m1.data[1+1*4]*m2.data[1+1*4]) + (m1.data[1+2*4]*m2.data[2+1*4]) + (m1.data[1+3*4]*m2.data[3+1*4]);
-		r.data[1+2*4]=(m1.data[1+0*4]*m2.data[0+2*4]) + (m1.data[1+1*4]*m2.data[1+2*4]) + (m1.data[1+2*4]*m2.data[2+2*4]) + (m1.data[1+3*4]*m2.data[3+2*4]);
-		r.data[1+3*4]=(m1.data[1+0*4]*m2.data[0+3*4]) + (m1.data[1+1*4]*m2.data[1+3*4]) + (m1.data[1+2*4]*m2.data[2+3*4]) + (m1.data[1+3*4]*m2.data[3+3*4]);
+	TOADLET_API void postMul(Matrix4x4 &m1,const Matrix4x4 &m2);
+	TOADLET_API void postMulMatrix4x4Traditional(Matrix4x4 &m1,const Matrix4x4 &m2);
+	TOADLET_API void postMulMatrix4x4SSE(Matrix4x4 &m1,const Matrix4x4 &m2);
 
-		r.data[2+0*4]=(m1.data[2+0*4]*m2.data[0+0*4]) + (m1.data[2+1*4]*m2.data[1+0*4]) + (m1.data[2+2*4]*m2.data[2+0*4]) + (m1.data[2+3*4]*m2.data[3+0*4]);
-		r.data[2+1*4]=(m1.data[2+0*4]*m2.data[0+1*4]) + (m1.data[2+1*4]*m2.data[1+1*4]) + (m1.data[2+2*4]*m2.data[2+1*4]) + (m1.data[2+3*4]*m2.data[3+1*4]);
-		r.data[2+2*4]=(m1.data[2+0*4]*m2.data[0+2*4]) + (m1.data[2+1*4]*m2.data[1+2*4]) + (m1.data[2+2*4]*m2.data[2+2*4]) + (m1.data[2+3*4]*m2.data[3+2*4]);
-		r.data[2+3*4]=(m1.data[2+0*4]*m2.data[0+3*4]) + (m1.data[2+1*4]*m2.data[1+3*4]) + (m1.data[2+2*4]*m2.data[2+3*4]) + (m1.data[2+3*4]*m2.data[3+3*4]);
+	TOADLET_API void preMul(Matrix4x4 &m2,const Matrix4x4 &m1);
+	TOADLET_API void preMulMatrix4x4Traditional(Matrix4x4 &m2,const Matrix4x4 &m1);
+	TOADLET_API void preMulMatrix4x4SSE(Matrix4x4 &m2,const Matrix4x4 &m1);
 
-		r.data[3+0*4]=(m1.data[3+0*4]*m2.data[0+0*4]) + (m1.data[3+1*4]*m2.data[1+0*4]) + (m1.data[3+2*4]*m2.data[2+0*4]) + (m1.data[3+3*4]*m2.data[3+0*4]);
-		r.data[3+1*4]=(m1.data[3+0*4]*m2.data[0+1*4]) + (m1.data[3+1*4]*m2.data[1+1*4]) + (m1.data[3+2*4]*m2.data[2+1*4]) + (m1.data[3+3*4]*m2.data[3+1*4]);
-		r.data[3+2*4]=(m1.data[3+0*4]*m2.data[0+2*4]) + (m1.data[3+1*4]*m2.data[1+2*4]) + (m1.data[3+2*4]*m2.data[2+2*4]) + (m1.data[3+3*4]*m2.data[3+2*4]);
-		r.data[3+3*4]=(m1.data[3+0*4]*m2.data[0+3*4]) + (m1.data[3+1*4]*m2.data[1+3*4]) + (m1.data[3+2*4]*m2.data[2+3*4]) + (m1.data[3+3*4]*m2.data[3+3*4]);
-	}
+	TOADLET_API void mul(Vector4 &r,const Matrix4x4 &m,const Vector4 &v);
+	TOADLET_API void mulVector4Matrix4x4Vector4Traditional(Vector4 &r,const Matrix4x4 &m,const Vector4 &v);
+	TOADLET_API void mulVector4Matrix4x4Vector4SSE(Vector4 &r,const Matrix4x4 &m,const Vector4 &v);
 
-	inline void postMul(Matrix4x4 &m1,const Matrix4x4 &m2){
-		real d00=(m1.data[0+0*4]*m2.data[0+0*4]) + (m1.data[0+1*4]*m2.data[1+0*4]) + (m1.data[0+2*4]*m2.data[2+0*4]) + (m1.data[0+3*4]*m2.data[3+0*4]);
-		real d01=(m1.data[0+0*4]*m2.data[0+1*4]) + (m1.data[0+1*4]*m2.data[1+1*4]) + (m1.data[0+2*4]*m2.data[2+1*4]) + (m1.data[0+3*4]*m2.data[3+1*4]);
-		real d02=(m1.data[0+0*4]*m2.data[0+2*4]) + (m1.data[0+1*4]*m2.data[1+2*4]) + (m1.data[0+2*4]*m2.data[2+2*4]) + (m1.data[0+3*4]*m2.data[3+2*4]);
-		real d03=(m1.data[0+0*4]*m2.data[0+3*4]) + (m1.data[0+1*4]*m2.data[1+3*4]) + (m1.data[0+2*4]*m2.data[2+3*4]) + (m1.data[0+3*4]*m2.data[3+3*4]);
-
-		real d10=(m1.data[1+0*4]*m2.data[0+0*4]) + (m1.data[1+1*4]*m2.data[1+0*4]) + (m1.data[1+2*4]*m2.data[2+0*4]) + (m1.data[1+3*4]*m2.data[3+0*4]);
-		real d11=(m1.data[1+0*4]*m2.data[0+1*4]) + (m1.data[1+1*4]*m2.data[1+1*4]) + (m1.data[1+2*4]*m2.data[2+1*4]) + (m1.data[1+3*4]*m2.data[3+1*4]);
-		real d12=(m1.data[1+0*4]*m2.data[0+2*4]) + (m1.data[1+1*4]*m2.data[1+2*4]) + (m1.data[1+2*4]*m2.data[2+2*4]) + (m1.data[1+3*4]*m2.data[3+2*4]);
-		real d13=(m1.data[1+0*4]*m2.data[0+3*4]) + (m1.data[1+1*4]*m2.data[1+3*4]) + (m1.data[1+2*4]*m2.data[2+3*4]) + (m1.data[1+3*4]*m2.data[3+3*4]);
-
-		real d20=(m1.data[2+0*4]*m2.data[0+0*4]) + (m1.data[2+1*4]*m2.data[1+0*4]) + (m1.data[2+2*4]*m2.data[2+0*4]) + (m1.data[2+3*4]*m2.data[3+0*4]);
-		real d21=(m1.data[2+0*4]*m2.data[0+1*4]) + (m1.data[2+1*4]*m2.data[1+1*4]) + (m1.data[2+2*4]*m2.data[2+1*4]) + (m1.data[2+3*4]*m2.data[3+1*4]);
-		real d22=(m1.data[2+0*4]*m2.data[0+2*4]) + (m1.data[2+1*4]*m2.data[1+2*4]) + (m1.data[2+2*4]*m2.data[2+2*4]) + (m1.data[2+3*4]*m2.data[3+2*4]);
-		real d23=(m1.data[2+0*4]*m2.data[0+3*4]) + (m1.data[2+1*4]*m2.data[1+3*4]) + (m1.data[2+2*4]*m2.data[2+3*4]) + (m1.data[2+3*4]*m2.data[3+3*4]);
-
-		real d30=(m1.data[3+0*4]*m2.data[0+0*4]) + (m1.data[3+1*4]*m2.data[1+0*4]) + (m1.data[3+2*4]*m2.data[2+0*4]) + (m1.data[3+3*4]*m2.data[3+0*4]);
-		real d31=(m1.data[3+0*4]*m2.data[0+1*4]) + (m1.data[3+1*4]*m2.data[1+1*4]) + (m1.data[3+2*4]*m2.data[2+1*4]) + (m1.data[3+3*4]*m2.data[3+1*4]);
-		real d32=(m1.data[3+0*4]*m2.data[0+2*4]) + (m1.data[3+1*4]*m2.data[1+2*4]) + (m1.data[3+2*4]*m2.data[2+2*4]) + (m1.data[3+3*4]*m2.data[3+2*4]);
-		real d33=(m1.data[3+0*4]*m2.data[0+3*4]) + (m1.data[3+1*4]*m2.data[1+3*4]) + (m1.data[3+2*4]*m2.data[2+3*4]) + (m1.data[3+3*4]*m2.data[3+3*4]);
-
-		m1.data[0+0*4]=d00; m1.data[0+1*4]=d01; m1.data[0+2*4]=d02; m1.data[0+3*4]=d03;
-		m1.data[1+0*4]=d10; m1.data[1+1*4]=d11; m1.data[1+2*4]=d12; m1.data[1+3*4]=d13;
-		m1.data[2+0*4]=d20; m1.data[2+1*4]=d21; m1.data[2+2*4]=d22; m1.data[2+3*4]=d23;
-		m1.data[3+0*4]=d30; m1.data[3+1*4]=d31; m1.data[3+2*4]=d32; m1.data[3+3*4]=d33;
-	}
-
-	inline void preMul(Matrix4x4 &m2,const Matrix4x4 &m1){
-		real d00=(m1.data[0+0*4]*m2.data[0+0*4]) + (m1.data[0+1*4]*m2.data[1+0*4]) + (m1.data[0+2*4]*m2.data[2+0*4]) + (m1.data[0+3*4]*m2.data[3+0*4]);
-		real d01=(m1.data[0+0*4]*m2.data[0+1*4]) + (m1.data[0+1*4]*m2.data[1+1*4]) + (m1.data[0+2*4]*m2.data[2+1*4]) + (m1.data[0+3*4]*m2.data[3+1*4]);
-		real d02=(m1.data[0+0*4]*m2.data[0+2*4]) + (m1.data[0+1*4]*m2.data[1+2*4]) + (m1.data[0+2*4]*m2.data[2+2*4]) + (m1.data[0+3*4]*m2.data[3+2*4]);
-		real d03=(m1.data[0+0*4]*m2.data[0+3*4]) + (m1.data[0+1*4]*m2.data[1+3*4]) + (m1.data[0+2*4]*m2.data[2+3*4]) + (m1.data[0+3*4]*m2.data[3+3*4]);
-
-		real d10=(m1.data[1+0*4]*m2.data[0+0*4]) + (m1.data[1+1*4]*m2.data[1+0*4]) + (m1.data[1+2*4]*m2.data[2+0*4]) + (m1.data[1+3*4]*m2.data[3+0*4]);
-		real d11=(m1.data[1+0*4]*m2.data[0+1*4]) + (m1.data[1+1*4]*m2.data[1+1*4]) + (m1.data[1+2*4]*m2.data[2+1*4]) + (m1.data[1+3*4]*m2.data[3+1*4]);
-		real d12=(m1.data[1+0*4]*m2.data[0+2*4]) + (m1.data[1+1*4]*m2.data[1+2*4]) + (m1.data[1+2*4]*m2.data[2+2*4]) + (m1.data[1+3*4]*m2.data[3+2*4]);
-		real d13=(m1.data[1+0*4]*m2.data[0+3*4]) + (m1.data[1+1*4]*m2.data[1+3*4]) + (m1.data[1+2*4]*m2.data[2+3*4]) + (m1.data[1+3*4]*m2.data[3+3*4]);
-
-		real d20=(m1.data[2+0*4]*m2.data[0+0*4]) + (m1.data[2+1*4]*m2.data[1+0*4]) + (m1.data[2+2*4]*m2.data[2+0*4]) + (m1.data[2+3*4]*m2.data[3+0*4]);
-		real d21=(m1.data[2+0*4]*m2.data[0+1*4]) + (m1.data[2+1*4]*m2.data[1+1*4]) + (m1.data[2+2*4]*m2.data[2+1*4]) + (m1.data[2+3*4]*m2.data[3+1*4]);
-		real d22=(m1.data[2+0*4]*m2.data[0+2*4]) + (m1.data[2+1*4]*m2.data[1+2*4]) + (m1.data[2+2*4]*m2.data[2+2*4]) + (m1.data[2+3*4]*m2.data[3+2*4]);
-		real d23=(m1.data[2+0*4]*m2.data[0+3*4]) + (m1.data[2+1*4]*m2.data[1+3*4]) + (m1.data[2+2*4]*m2.data[2+3*4]) + (m1.data[2+3*4]*m2.data[3+3*4]);
-
-		real d30=(m1.data[3+0*4]*m2.data[0+0*4]) + (m1.data[3+1*4]*m2.data[1+0*4]) + (m1.data[3+2*4]*m2.data[2+0*4]) + (m1.data[3+3*4]*m2.data[3+0*4]);
-		real d31=(m1.data[3+0*4]*m2.data[0+1*4]) + (m1.data[3+1*4]*m2.data[1+1*4]) + (m1.data[3+2*4]*m2.data[2+1*4]) + (m1.data[3+3*4]*m2.data[3+1*4]);
-		real d32=(m1.data[3+0*4]*m2.data[0+2*4]) + (m1.data[3+1*4]*m2.data[1+2*4]) + (m1.data[3+2*4]*m2.data[2+2*4]) + (m1.data[3+3*4]*m2.data[3+2*4]);
-		real d33=(m1.data[3+0*4]*m2.data[0+3*4]) + (m1.data[3+1*4]*m2.data[1+3*4]) + (m1.data[3+2*4]*m2.data[2+3*4]) + (m1.data[3+3*4]*m2.data[3+3*4]);
-
-		m2.data[0+0*4]=d00; m2.data[0+1*4]=d01; m2.data[0+2*4]=d02; m2.data[0+3*4]=d03;
-		m2.data[1+0*4]=d10; m2.data[1+1*4]=d11; m2.data[1+2*4]=d12; m2.data[1+3*4]=d13;
-		m2.data[2+0*4]=d20; m2.data[2+1*4]=d21; m2.data[2+2*4]=d22; m2.data[2+3*4]=d23;
-		m2.data[3+0*4]=d30; m2.data[3+1*4]=d31; m2.data[3+2*4]=d32; m2.data[3+3*4]=d33;
-	}
-
-	inline void mul(Vector4 &r,const Matrix4x4 &m,const Vector4 &v){
-		r.x=(m.data[0+0*4]*v.x) + (m.data[0+1*4]*v.y) + (m.data[0+2*4]*v.z) + (m.data[0+3*4]*v.w);
-		r.y=(m.data[1+0*4]*v.x) + (m.data[1+1*4]*v.y) + (m.data[1+2*4]*v.z) + (m.data[1+3*4]*v.w);
-		r.z=(m.data[2+0*4]*v.x) + (m.data[2+1*4]*v.y) + (m.data[2+2*4]*v.z) + (m.data[2+3*4]*v.w);
-		r.w=(m.data[3+0*4]*v.x) + (m.data[3+1*4]*v.y) + (m.data[3+2*4]*v.z) + (m.data[3+3*4]*v.w);
-	}
-
-	inline void mul(Vector4 &r,const Matrix4x4 &m){
-		real tx=(m.data[0+0*4]*r.x) + (m.data[0+1*4]*r.y) + (m.data[0+2*4]*r.z) + (m.data[0+3*4]*r.w);
-		real ty=(m.data[1+0*4]*r.x) + (m.data[1+1*4]*r.y) + (m.data[1+2*4]*r.z) + (m.data[1+3*4]*r.w);
-		real tz=(m.data[2+0*4]*r.x) + (m.data[2+1*4]*r.y) + (m.data[2+2*4]*r.z) + (m.data[2+3*4]*r.w);
-		real tw=(m.data[3+0*4]*r.x) + (m.data[3+1*4]*r.y) + (m.data[3+2*4]*r.z) + (m.data[3+3*4]*r.w);
-		r.x=tx;
-		r.y=ty;
-		r.z=tz;
-		r.w=tw;
-	}
+	TOADLET_API void mul(Vector4 &r,const Matrix4x4 &m);
+	TOADLET_API void mulVector4Matrix4x4Traditional(Vector4 &r,const Matrix4x4 &m);
+	TOADLET_API void mulVector4Matrix4x4SSE(Vector4 &r,const Matrix4x4 &m);
 
 	inline void mul(Vector3 &r,const Matrix4x4 &m,const Vector3 &v){
 		r.x=(m.data[0+0*4]*v.x) + (m.data[0+1*4]*v.y) + (m.data[0+2*4]*v.z);

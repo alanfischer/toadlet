@@ -33,7 +33,7 @@ namespace toadlet{
 namespace egg{
 namespace math{
 
-class TOADLET_API Vector4{
+class TOADLET_API TOADLET_ALIGNED Vector4{
 public:
 	real x,y,z,w;
 

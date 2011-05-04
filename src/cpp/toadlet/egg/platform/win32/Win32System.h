@@ -43,6 +43,8 @@ public:
 
 	static int threadID();
 
+//	static bool getCPUCapabilities(CPUCapabilities &capabilities);
+
 	static bool absolutePath(const String &path);
 
 	#if !defined(TOADLET_PLATFORM_WINCE)
