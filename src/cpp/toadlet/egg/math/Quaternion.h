@@ -33,7 +33,7 @@ namespace toadlet{
 namespace egg{
 namespace math{
 
-class TOADLET_API Quaternion{
+class TOADLET_API TOADLET_ALIGNED Quaternion{
 public:
 	real x,y,z,w;
 

@@ -86,6 +86,10 @@
 		}
 	#endif
 	#define TOADLET_SIZEOF_WCHAR 16
+	#define TOADLET_ALIGNOF(Type) __alignof(Type)
+	#define TOADLET_ALIGN(a) __declspec(align(a))
+	#define TOADLET_ALIGNED_MALLOC(size,a) _aligned_malloc(size,a)
+	#define TOADLET_ALIGNED_FREE(pointer) _aligned_free(pointer)
 #elif defined(TOADLET_PLATFORM_POSIX)
 	#define TOADLET_COMPILER_GCC 1
 	#include <sys/param.h>
@@ -114,6 +118,7 @@
 	#else
 		#define TOADLET_API
 	#endif
+	namespace toadlet{template<typename T> struct alignment_trick{char c; T member;};}
 	#if defined(TOADLET_PLATFORM_IPHONE)
 		#define TOADLET_GCC_INHERITANCE_BUG
 	#endif
@@ -121,6 +126,10 @@
 		typedef wchar_t wchar;
 	}
 	#define TOADLET_SIZEOF_WCHAR 32
+	#define TOADLET_ALIGNOF(Type) offsetof(alignment_trick<Type>,member)
+	#define TOADLET_ALIGN(a) __attribute__((aligned(a)))
+	#define TOADLET_ALIGNED_MALLOC(size,a) memalign(size,a)
+	#define TOADLET_ALIGNED_FREE(pointer) free(pointer)
 #else
 	#error "Unknown platform"
 #endif
@@ -128,6 +137,9 @@
 #if !defined(NULL)
 	#define NULL 0
 #endif
+
+#define TOADLET_ALIGNED TOADLET_ALIGN(16)
+#define TOADLET_IS_ALIGNED(x) ((((int)x)&0xF)==0)
 
 #define TOADLET_QUOTE_(x) #x
 #define TOADLET_QUOTE(x) TOADLET_QUOTE_(x)

@@ -26,6 +26,7 @@
 #ifndef TOADLET_PEEPER_BACKABLEVERTEXFORMAT_H
 #define TOADLET_PEEPER_BACKABLEVERTEXFORMAT_H
 
+#include <toadlet/egg/Collection.h>
 #include <toadlet/peeper/VertexFormat.h>
 
 namespace toadlet{

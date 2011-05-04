@@ -28,7 +28,9 @@
 
 #include <toadlet/Types.h>
 #include <toadlet/egg/math/Math.h>
+#include <toadlet/egg/math/ConvexSolid.h>
 #include <toadlet/egg/mathfixed/Math.h>
+#include <toadlet/egg/mathfixed/ConvexSolid.h>
 
 namespace toadlet{
 namespace hop{

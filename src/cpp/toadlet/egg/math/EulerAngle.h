@@ -32,7 +32,7 @@ namespace toadlet{
 namespace egg{
 namespace math{
 
-class TOADLET_API EulerAngle{
+class TOADLET_API TOADLET_ALIGNED EulerAngle{
 public:
 	real x,y,z;
 

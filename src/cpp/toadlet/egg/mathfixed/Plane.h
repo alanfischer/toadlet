@@ -32,7 +32,7 @@ namespace toadlet{
 namespace egg{
 namespace mathfixed{
 
-class TOADLET_API Plane{
+class TOADLET_API TOADLET_ALIGNED Plane{
 public:
 	inline Plane():distance(0){}
 

@@ -26,9 +26,170 @@
 #include <toadlet/egg/math/Math.h>
 #include <toadlet/egg/Logger.h>
 
+#include <xmmintrin.h> // SSE
+
 namespace toadlet{
 namespace egg{
 namespace math{
+
+void Math::mul(Matrix3x3 &r,const Matrix3x3 &m1,const Matrix3x3 &m2){
+	r.data[0+0*3]=m1.data[0+0*3] * m2.data[0+0*3] + m1.data[0+1*3] * m2.data[1+0*3] + m1.data[0+2*3] * m2.data[2+0*3];
+	r.data[0+1*3]=m1.data[0+0*3] * m2.data[0+1*3] + m1.data[0+1*3] * m2.data[1+1*3] + m1.data[0+2*3] * m2.data[2+1*3];
+	r.data[0+2*3]=m1.data[0+0*3] * m2.data[0+2*3] + m1.data[0+1*3] * m2.data[1+2*3] + m1.data[0+2*3] * m2.data[2+2*3];
+
+	r.data[1+0*3]=m1.data[1+0*3] * m2.data[0+0*3] + m1.data[1+1*3] * m2.data[1+0*3] + m1.data[1+2*3] * m2.data[2+0*3];
+	r.data[1+1*3]=m1.data[1+0*3] * m2.data[0+1*3] + m1.data[1+1*3] * m2.data[1+1*3] + m1.data[1+2*3] * m2.data[2+1*3];
+	r.data[1+2*3]=m1.data[1+0*3] * m2.data[0+2*3] + m1.data[1+1*3] * m2.data[1+2*3] + m1.data[1+2*3] * m2.data[2+2*3];
+
+	r.data[2+0*3]=m1.data[2+0*3] * m2.data[0+0*3] + m1.data[2+1*3] * m2.data[1+0*3] + m1.data[2+2*3] * m2.data[2+0*3];
+	r.data[2+1*3]=m1.data[2+0*3] * m2.data[0+1*3] + m1.data[2+1*3] * m2.data[1+1*3] + m1.data[2+2*3] * m2.data[2+1*3];
+	r.data[2+2*3]=m1.data[2+0*3] * m2.data[0+2*3] + m1.data[2+1*3] * m2.data[1+2*3] + m1.data[2+2*3] * m2.data[2+2*3];
+}
+
+void Math::postMul(Matrix3x3 &m1,const Matrix3x3 &m2){
+	real d00=m1.data[0+0*3] * m2.data[0+0*3] + m1.data[0+1*3] * m2.data[1+0*3] + m1.data[0+2*3] * m2.data[2+0*3];
+	real d01=m1.data[0+0*3] * m2.data[0+1*3] + m1.data[0+1*3] * m2.data[1+1*3] + m1.data[0+2*3] * m2.data[2+1*3];
+	real d02=m1.data[0+0*3] * m2.data[0+2*3] + m1.data[0+1*3] * m2.data[1+2*3] + m1.data[0+2*3] * m2.data[2+2*3];
+
+	real d10=m1.data[1+0*3] * m2.data[0+0*3] + m1.data[1+1*3] * m2.data[1+0*3] + m1.data[1+2*3] * m2.data[2+0*3];
+	real d11=m1.data[1+0*3] * m2.data[0+1*3] + m1.data[1+1*3] * m2.data[1+1*3] + m1.data[1+2*3] * m2.data[2+1*3];
+	real d12=m1.data[1+0*3] * m2.data[0+2*3] + m1.data[1+1*3] * m2.data[1+2*3] + m1.data[1+2*3] * m2.data[2+2*3];
+
+	real d20=m1.data[2+0*3] * m2.data[0+0*3] + m1.data[2+1*3] * m2.data[1+0*3] + m1.data[2+2*3] * m2.data[2+0*3];
+	real d21=m1.data[2+0*3] * m2.data[0+1*3] + m1.data[2+1*3] * m2.data[1+1*3] + m1.data[2+2*3] * m2.data[2+1*3];
+	real d22=m1.data[2+0*3] * m2.data[0+2*3] + m1.data[2+1*3] * m2.data[1+2*3] + m1.data[2+2*3] * m2.data[2+2*3];
+
+	m1.data[0+0*3]=d00; m1.data[0+1*3]=d01; m1.data[0+2*3]=d02;
+	m1.data[1+0*3]=d10; m1.data[1+1*3]=d11; m1.data[1+2*3]=d12;
+	m1.data[2+0*3]=d20; m1.data[2+1*3]=d21; m1.data[2+2*3]=d22;
+}
+
+void Math::preMul(Matrix3x3 &m2,const Matrix3x3 &m1){
+	real d00=m1.data[0+0*3] * m2.data[0+0*3] + m1.data[0+1*3] * m2.data[1+0*3] + m1.data[0+2*3] * m2.data[2+0*3];
+	real d01=m1.data[0+0*3] * m2.data[0+1*3] + m1.data[0+1*3] * m2.data[1+1*3] + m1.data[0+2*3] * m2.data[2+1*3];
+	real d02=m1.data[0+0*3] * m2.data[0+2*3] + m1.data[0+1*3] * m2.data[1+2*3] + m1.data[0+2*3] * m2.data[2+2*3];
+
+	real d10=m1.data[1+0*3] * m2.data[0+0*3] + m1.data[1+1*3] * m2.data[1+0*3] + m1.data[1+2*3] * m2.data[2+0*3];
+	real d11=m1.data[1+0*3] * m2.data[0+1*3] + m1.data[1+1*3] * m2.data[1+1*3] + m1.data[1+2*3] * m2.data[2+1*3];
+	real d12=m1.data[1+0*3] * m2.data[0+2*3] + m1.data[1+1*3] * m2.data[1+2*3] + m1.data[1+2*3] * m2.data[2+2*3];
+
+	real d20=m1.data[2+0*3] * m2.data[0+0*3] + m1.data[2+1*3] * m2.data[1+0*3] + m1.data[2+2*3] * m2.data[2+0*3];
+	real d21=m1.data[2+0*3] * m2.data[0+1*3] + m1.data[2+1*3] * m2.data[1+1*3] + m1.data[2+2*3] * m2.data[2+1*3];
+	real d22=m1.data[2+0*3] * m2.data[0+2*3] + m1.data[2+1*3] * m2.data[1+2*3] + m1.data[2+2*3] * m2.data[2+2*3];
+
+	m2.data[0+0*3]=d00; m2.data[0+1*3]=d01; m2.data[0+2*3]=d02;
+	m2.data[1+0*3]=d10; m2.data[1+1*3]=d11; m2.data[1+2*3]=d12;
+	m2.data[2+0*3]=d20; m2.data[2+1*3]=d21; m2.data[2+2*3]=d22;
+}
+
+void(*mulMatrix4x4)(Matrix4x4 &,const Matrix4x4 &,const Matrix4x4 &);
+void Math::mul(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2){(*mulMatrix4x4)(r,m1,m2);}
+
+void(*postMulMatrix4x4)(Matrix4x4 &,const Matrix4x4 &);
+void Math::postMul(Matrix4x4 &m1,const Matrix4x4 &m2){postMulMatrix4x4(m1,m2);}
+
+void(*preMulMatrix4x4)(Matrix4x4 &,const Matrix4x4 &);
+void Math::preMul(Matrix4x4 &m2,const Matrix4x4 &m1){preMulMatrix4x4(m2,m1);}
+
+void(*mulVector4Matrix4x4Vector4)(Vector4 &,const Matrix4x4 &,const Vector4 &);
+void Math::mul(Vector4 &r,const Matrix4x4 &m,const Vector4 &v){mulVector4Matrix4x4Vector4(r,m,v);}
+
+void(*mulVector4Matrix4x4)(Vector4 &,const Matrix4x4 &);
+void Math::mul(Vector4 &r,const Matrix4x4 &m){mulVector4Matrix4x4(r,m);}
+
+void Math::mulMatrix4x4Traditional(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2){
+	r.data[0+0*4]=(m1.data[0+0*4]*m2.data[0+0*4]) + (m1.data[0+1*4]*m2.data[1+0*4]) + (m1.data[0+2*4]*m2.data[2+0*4]) + (m1.data[0+3*4]*m2.data[3+0*4]);
+	r.data[0+1*4]=(m1.data[0+0*4]*m2.data[0+1*4]) + (m1.data[0+1*4]*m2.data[1+1*4]) + (m1.data[0+2*4]*m2.data[2+1*4]) + (m1.data[0+3*4]*m2.data[3+1*4]);
+	r.data[0+2*4]=(m1.data[0+0*4]*m2.data[0+2*4]) + (m1.data[0+1*4]*m2.data[1+2*4]) + (m1.data[0+2*4]*m2.data[2+2*4]) + (m1.data[0+3*4]*m2.data[3+2*4]);
+	r.data[0+3*4]=(m1.data[0+0*4]*m2.data[0+3*4]) + (m1.data[0+1*4]*m2.data[1+3*4]) + (m1.data[0+2*4]*m2.data[2+3*4]) + (m1.data[0+3*4]*m2.data[3+3*4]);
+
+	r.data[1+0*4]=(m1.data[1+0*4]*m2.data[0+0*4]) + (m1.data[1+1*4]*m2.data[1+0*4]) + (m1.data[1+2*4]*m2.data[2+0*4]) + (m1.data[1+3*4]*m2.data[3+0*4]);
+	r.data[1+1*4]=(m1.data[1+0*4]*m2.data[0+1*4]) + (m1.data[1+1*4]*m2.data[1+1*4]) + (m1.data[1+2*4]*m2.data[2+1*4]) + (m1.data[1+3*4]*m2.data[3+1*4]);
+	r.data[1+2*4]=(m1.data[1+0*4]*m2.data[0+2*4]) + (m1.data[1+1*4]*m2.data[1+2*4]) + (m1.data[1+2*4]*m2.data[2+2*4]) + (m1.data[1+3*4]*m2.data[3+2*4]);
+	r.data[1+3*4]=(m1.data[1+0*4]*m2.data[0+3*4]) + (m1.data[1+1*4]*m2.data[1+3*4]) + (m1.data[1+2*4]*m2.data[2+3*4]) + (m1.data[1+3*4]*m2.data[3+3*4]);
+
+	r.data[2+0*4]=(m1.data[2+0*4]*m2.data[0+0*4]) + (m1.data[2+1*4]*m2.data[1+0*4]) + (m1.data[2+2*4]*m2.data[2+0*4]) + (m1.data[2+3*4]*m2.data[3+0*4]);
+	r.data[2+1*4]=(m1.data[2+0*4]*m2.data[0+1*4]) + (m1.data[2+1*4]*m2.data[1+1*4]) + (m1.data[2+2*4]*m2.data[2+1*4]) + (m1.data[2+3*4]*m2.data[3+1*4]);
+	r.data[2+2*4]=(m1.data[2+0*4]*m2.data[0+2*4]) + (m1.data[2+1*4]*m2.data[1+2*4]) + (m1.data[2+2*4]*m2.data[2+2*4]) + (m1.data[2+3*4]*m2.data[3+2*4]);
+	r.data[2+3*4]=(m1.data[2+0*4]*m2.data[0+3*4]) + (m1.data[2+1*4]*m2.data[1+3*4]) + (m1.data[2+2*4]*m2.data[2+3*4]) + (m1.data[2+3*4]*m2.data[3+3*4]);
+
+	r.data[3+0*4]=(m1.data[3+0*4]*m2.data[0+0*4]) + (m1.data[3+1*4]*m2.data[1+0*4]) + (m1.data[3+2*4]*m2.data[2+0*4]) + (m1.data[3+3*4]*m2.data[3+0*4]);
+	r.data[3+1*4]=(m1.data[3+0*4]*m2.data[0+1*4]) + (m1.data[3+1*4]*m2.data[1+1*4]) + (m1.data[3+2*4]*m2.data[2+1*4]) + (m1.data[3+3*4]*m2.data[3+1*4]);
+	r.data[3+2*4]=(m1.data[3+0*4]*m2.data[0+2*4]) + (m1.data[3+1*4]*m2.data[1+2*4]) + (m1.data[3+2*4]*m2.data[2+2*4]) + (m1.data[3+3*4]*m2.data[3+2*4]);
+	r.data[3+3*4]=(m1.data[3+0*4]*m2.data[0+3*4]) + (m1.data[3+1*4]*m2.data[1+3*4]) + (m1.data[3+2*4]*m2.data[2+3*4]) + (m1.data[3+3*4]*m2.data[3+3*4]);
+}
+
+void Math::postMulMatrix4x4Traditional(Matrix4x4 &m1,const Matrix4x4 &m2){
+	real d00=(m1.data[0+0*4]*m2.data[0+0*4]) + (m1.data[0+1*4]*m2.data[1+0*4]) + (m1.data[0+2*4]*m2.data[2+0*4]) + (m1.data[0+3*4]*m2.data[3+0*4]);
+	real d01=(m1.data[0+0*4]*m2.data[0+1*4]) + (m1.data[0+1*4]*m2.data[1+1*4]) + (m1.data[0+2*4]*m2.data[2+1*4]) + (m1.data[0+3*4]*m2.data[3+1*4]);
+	real d02=(m1.data[0+0*4]*m2.data[0+2*4]) + (m1.data[0+1*4]*m2.data[1+2*4]) + (m1.data[0+2*4]*m2.data[2+2*4]) + (m1.data[0+3*4]*m2.data[3+2*4]);
+	real d03=(m1.data[0+0*4]*m2.data[0+3*4]) + (m1.data[0+1*4]*m2.data[1+3*4]) + (m1.data[0+2*4]*m2.data[2+3*4]) + (m1.data[0+3*4]*m2.data[3+3*4]);
+
+	real d10=(m1.data[1+0*4]*m2.data[0+0*4]) + (m1.data[1+1*4]*m2.data[1+0*4]) + (m1.data[1+2*4]*m2.data[2+0*4]) + (m1.data[1+3*4]*m2.data[3+0*4]);
+	real d11=(m1.data[1+0*4]*m2.data[0+1*4]) + (m1.data[1+1*4]*m2.data[1+1*4]) + (m1.data[1+2*4]*m2.data[2+1*4]) + (m1.data[1+3*4]*m2.data[3+1*4]);
+	real d12=(m1.data[1+0*4]*m2.data[0+2*4]) + (m1.data[1+1*4]*m2.data[1+2*4]) + (m1.data[1+2*4]*m2.data[2+2*4]) + (m1.data[1+3*4]*m2.data[3+2*4]);
+	real d13=(m1.data[1+0*4]*m2.data[0+3*4]) + (m1.data[1+1*4]*m2.data[1+3*4]) + (m1.data[1+2*4]*m2.data[2+3*4]) + (m1.data[1+3*4]*m2.data[3+3*4]);
+
+	real d20=(m1.data[2+0*4]*m2.data[0+0*4]) + (m1.data[2+1*4]*m2.data[1+0*4]) + (m1.data[2+2*4]*m2.data[2+0*4]) + (m1.data[2+3*4]*m2.data[3+0*4]);
+	real d21=(m1.data[2+0*4]*m2.data[0+1*4]) + (m1.data[2+1*4]*m2.data[1+1*4]) + (m1.data[2+2*4]*m2.data[2+1*4]) + (m1.data[2+3*4]*m2.data[3+1*4]);
+	real d22=(m1.data[2+0*4]*m2.data[0+2*4]) + (m1.data[2+1*4]*m2.data[1+2*4]) + (m1.data[2+2*4]*m2.data[2+2*4]) + (m1.data[2+3*4]*m2.data[3+2*4]);
+	real d23=(m1.data[2+0*4]*m2.data[0+3*4]) + (m1.data[2+1*4]*m2.data[1+3*4]) + (m1.data[2+2*4]*m2.data[2+3*4]) + (m1.data[2+3*4]*m2.data[3+3*4]);
+
+	real d30=(m1.data[3+0*4]*m2.data[0+0*4]) + (m1.data[3+1*4]*m2.data[1+0*4]) + (m1.data[3+2*4]*m2.data[2+0*4]) + (m1.data[3+3*4]*m2.data[3+0*4]);
+	real d31=(m1.data[3+0*4]*m2.data[0+1*4]) + (m1.data[3+1*4]*m2.data[1+1*4]) + (m1.data[3+2*4]*m2.data[2+1*4]) + (m1.data[3+3*4]*m2.data[3+1*4]);
+	real d32=(m1.data[3+0*4]*m2.data[0+2*4]) + (m1.data[3+1*4]*m2.data[1+2*4]) + (m1.data[3+2*4]*m2.data[2+2*4]) + (m1.data[3+3*4]*m2.data[3+2*4]);
+	real d33=(m1.data[3+0*4]*m2.data[0+3*4]) + (m1.data[3+1*4]*m2.data[1+3*4]) + (m1.data[3+2*4]*m2.data[2+3*4]) + (m1.data[3+3*4]*m2.data[3+3*4]);
+
+	m1.data[0+0*4]=d00; m1.data[0+1*4]=d01; m1.data[0+2*4]=d02; m1.data[0+3*4]=d03;
+	m1.data[1+0*4]=d10; m1.data[1+1*4]=d11; m1.data[1+2*4]=d12; m1.data[1+3*4]=d13;
+	m1.data[2+0*4]=d20; m1.data[2+1*4]=d21; m1.data[2+2*4]=d22; m1.data[2+3*4]=d23;
+	m1.data[3+0*4]=d30; m1.data[3+1*4]=d31; m1.data[3+2*4]=d32; m1.data[3+3*4]=d33;
+}
+
+void Math::preMulMatrix4x4Traditional(Matrix4x4 &m2,const Matrix4x4 &m1){
+	real d00=(m1.data[0+0*4]*m2.data[0+0*4]) + (m1.data[0+1*4]*m2.data[1+0*4]) + (m1.data[0+2*4]*m2.data[2+0*4]) + (m1.data[0+3*4]*m2.data[3+0*4]);
+	real d01=(m1.data[0+0*4]*m2.data[0+1*4]) + (m1.data[0+1*4]*m2.data[1+1*4]) + (m1.data[0+2*4]*m2.data[2+1*4]) + (m1.data[0+3*4]*m2.data[3+1*4]);
+	real d02=(m1.data[0+0*4]*m2.data[0+2*4]) + (m1.data[0+1*4]*m2.data[1+2*4]) + (m1.data[0+2*4]*m2.data[2+2*4]) + (m1.data[0+3*4]*m2.data[3+2*4]);
+	real d03=(m1.data[0+0*4]*m2.data[0+3*4]) + (m1.data[0+1*4]*m2.data[1+3*4]) + (m1.data[0+2*4]*m2.data[2+3*4]) + (m1.data[0+3*4]*m2.data[3+3*4]);
+
+	real d10=(m1.data[1+0*4]*m2.data[0+0*4]) + (m1.data[1+1*4]*m2.data[1+0*4]) + (m1.data[1+2*4]*m2.data[2+0*4]) + (m1.data[1+3*4]*m2.data[3+0*4]);
+	real d11=(m1.data[1+0*4]*m2.data[0+1*4]) + (m1.data[1+1*4]*m2.data[1+1*4]) + (m1.data[1+2*4]*m2.data[2+1*4]) + (m1.data[1+3*4]*m2.data[3+1*4]);
+	real d12=(m1.data[1+0*4]*m2.data[0+2*4]) + (m1.data[1+1*4]*m2.data[1+2*4]) + (m1.data[1+2*4]*m2.data[2+2*4]) + (m1.data[1+3*4]*m2.data[3+2*4]);
+	real d13=(m1.data[1+0*4]*m2.data[0+3*4]) + (m1.data[1+1*4]*m2.data[1+3*4]) + (m1.data[1+2*4]*m2.data[2+3*4]) + (m1.data[1+3*4]*m2.data[3+3*4]);
+
+	real d20=(m1.data[2+0*4]*m2.data[0+0*4]) + (m1.data[2+1*4]*m2.data[1+0*4]) + (m1.data[2+2*4]*m2.data[2+0*4]) + (m1.data[2+3*4]*m2.data[3+0*4]);
+	real d21=(m1.data[2+0*4]*m2.data[0+1*4]) + (m1.data[2+1*4]*m2.data[1+1*4]) + (m1.data[2+2*4]*m2.data[2+1*4]) + (m1.data[2+3*4]*m2.data[3+1*4]);
+	real d22=(m1.data[2+0*4]*m2.data[0+2*4]) + (m1.data[2+1*4]*m2.data[1+2*4]) + (m1.data[2+2*4]*m2.data[2+2*4]) + (m1.data[2+3*4]*m2.data[3+2*4]);
+	real d23=(m1.data[2+0*4]*m2.data[0+3*4]) + (m1.data[2+1*4]*m2.data[1+3*4]) + (m1.data[2+2*4]*m2.data[2+3*4]) + (m1.data[2+3*4]*m2.data[3+3*4]);
+
+	real d30=(m1.data[3+0*4]*m2.data[0+0*4]) + (m1.data[3+1*4]*m2.data[1+0*4]) + (m1.data[3+2*4]*m2.data[2+0*4]) + (m1.data[3+3*4]*m2.data[3+0*4]);
+	real d31=(m1.data[3+0*4]*m2.data[0+1*4]) + (m1.data[3+1*4]*m2.data[1+1*4]) + (m1.data[3+2*4]*m2.data[2+1*4]) + (m1.data[3+3*4]*m2.data[3+1*4]);
+	real d32=(m1.data[3+0*4]*m2.data[0+2*4]) + (m1.data[3+1*4]*m2.data[1+2*4]) + (m1.data[3+2*4]*m2.data[2+2*4]) + (m1.data[3+3*4]*m2.data[3+2*4]);
+	real d33=(m1.data[3+0*4]*m2.data[0+3*4]) + (m1.data[3+1*4]*m2.data[1+3*4]) + (m1.data[3+2*4]*m2.data[2+3*4]) + (m1.data[3+3*4]*m2.data[3+3*4]);
+
+	m2.data[0+0*4]=d00; m2.data[0+1*4]=d01; m2.data[0+2*4]=d02; m2.data[0+3*4]=d03;
+	m2.data[1+0*4]=d10; m2.data[1+1*4]=d11; m2.data[1+2*4]=d12; m2.data[1+3*4]=d13;
+	m2.data[2+0*4]=d20; m2.data[2+1*4]=d21; m2.data[2+2*4]=d22; m2.data[2+3*4]=d23;
+	m2.data[3+0*4]=d30; m2.data[3+1*4]=d31; m2.data[3+2*4]=d32; m2.data[3+3*4]=d33;
+}
+
+void Math::mulVector4Matrix4x4Vector4Traditional(Vector4 &r,const Matrix4x4 &m,const Vector4 &v){
+	r.x=(m.data[0+0*4]*v.x) + (m.data[0+1*4]*v.y) + (m.data[0+2*4]*v.z) + (m.data[0+3*4]*v.w);
+	r.y=(m.data[1+0*4]*v.x) + (m.data[1+1*4]*v.y) + (m.data[1+2*4]*v.z) + (m.data[1+3*4]*v.w);
+	r.z=(m.data[2+0*4]*v.x) + (m.data[2+1*4]*v.y) + (m.data[2+2*4]*v.z) + (m.data[2+3*4]*v.w);
+	r.w=(m.data[3+0*4]*v.x) + (m.data[3+1*4]*v.y) + (m.data[3+2*4]*v.z) + (m.data[3+3*4]*v.w);
+}
+
+void Math::mulVector4Matrix4x4Traditional(Vector4 &r,const Matrix4x4 &m){
+	real tx=(m.data[0+0*4]*r.x) + (m.data[0+1*4]*r.y) + (m.data[0+2*4]*r.z) + (m.data[0+3*4]*r.w);
+	real ty=(m.data[1+0*4]*r.x) + (m.data[1+1*4]*r.y) + (m.data[1+2*4]*r.z) + (m.data[1+3*4]*r.w);
+	real tz=(m.data[2+0*4]*r.x) + (m.data[2+1*4]*r.y) + (m.data[2+2*4]*r.z) + (m.data[2+3*4]*r.w);
+	real tw=(m.data[3+0*4]*r.x) + (m.data[3+1*4]*r.y) + (m.data[3+2*4]*r.z) + (m.data[3+3*4]*r.w);
+	r.x=tx;
+	r.y=ty;
+	r.z=tz;
+	r.w=tw;
+}
 
 bool Math::setEulerAngleXYZFromMatrix3x3(EulerAngle &r,const Matrix3x3 &m,real epsilon){
 	if(m.at(1,0)>1-epsilon){ // North Pole singularity
@@ -89,7 +250,7 @@ real Math::determinant(const Matrix3x3 &m){
 		 m.data[0+2*3]*m.data[1+0*3]*m.data[2+1*3] + m.data[0+2*3]*m.data[2+0*3]*m.data[1+1*3];
 }
 
-bool Math::invert(Matrix3x3 &r,const Matrix3x3 m){
+bool Math::invert(Matrix3x3 &r,const Matrix3x3 &m){
 	real det=1.0/determinant(m);
 	if(det==0.0){
 		return false;
@@ -1005,6 +1166,218 @@ real Math::findIntersection(const Segment &segment,const AABox &box,Vector3 &poi
 	}
 	
 	return time;
+}
+
+// SSE operations
+void Math::mulMatrix4x4SSE(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2){
+	TOADLET_ASSERT(TOADLET_IS_ALIGNED(r.data) && TOADLET_IS_ALIGNED(m1.data) && TOADLET_IS_ALIGNED(m2.data));
+
+	__m128 mm1[4],mtl,mrl;
+	mm1[0]=_mm_load_ps(m1.data+0);
+	mm1[1]=_mm_load_ps(m1.data+4);
+	mm1[2]=_mm_load_ps(m1.data+8);
+	mm1[3]=_mm_load_ps(m1.data+12);
+
+	mtl=_mm_set1_ps(m2.data[0]);
+	mrl=_mm_mul_ps(mm1[0],mtl);
+	mtl=_mm_set1_ps(m2.data[1]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[1],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[2]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[2],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[3]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[3],mtl),mrl);
+	_mm_store_ps(r.data+0,mrl);
+
+	mtl=_mm_set1_ps(m2.data[4]);
+	mrl=_mm_mul_ps(mm1[0],mtl);
+	mtl=_mm_set1_ps(m2.data[5]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[1],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[6]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[2],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[7]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[3],mtl),mrl);
+	_mm_store_ps(r.data+4,mrl);
+
+	mtl=_mm_set1_ps(m2.data[8]);
+	mrl=_mm_mul_ps(mm1[0],mtl);
+	mtl=_mm_set1_ps(m2.data[9]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[1],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[10]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[2],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[11]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[3],mtl),mrl);
+	_mm_store_ps(r.data+8,mrl);
+
+	mtl=_mm_set1_ps(m2.data[12]);
+	mrl=_mm_mul_ps(mm1[0],mtl);
+	mtl=_mm_set1_ps(m2.data[13]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[1],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[14]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[2],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[15]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[3],mtl),mrl);
+	_mm_store_ps(r.data+12,mrl);
+}
+
+void Math::postMulMatrix4x4SSE(Matrix4x4 &m1,const Matrix4x4 &m2){
+	TOADLET_ASSERT(TOADLET_IS_ALIGNED(m1.data) && TOADLET_IS_ALIGNED(m2.data));
+
+	__m128 mm1[4],mtl,mrl;
+	mm1[0]=_mm_load_ps(m1.data+0);
+	mm1[1]=_mm_load_ps(m1.data+4);
+	mm1[2]=_mm_load_ps(m1.data+8);
+	mm1[3]=_mm_load_ps(m1.data+12);
+
+	mtl=_mm_set1_ps(m2.data[0]);
+	mrl=_mm_mul_ps(mm1[0],mtl);
+	mtl=_mm_set1_ps(m2.data[1]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[1],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[2]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[2],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[3]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[3],mtl),mrl);
+	_mm_store_ps(m1.data+0,mrl);
+
+	mtl=_mm_set1_ps(m2.data[4]);
+	mrl=_mm_mul_ps(mm1[0],mtl);
+	mtl=_mm_set1_ps(m2.data[5]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[1],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[6]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[2],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[7]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[3],mtl),mrl);
+	_mm_store_ps(m1.data+4,mrl);
+
+	mtl=_mm_set1_ps(m2.data[8]);
+	mrl=_mm_mul_ps(mm1[0],mtl);
+	mtl=_mm_set1_ps(m2.data[9]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[1],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[10]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[2],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[11]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[3],mtl),mrl);
+	_mm_store_ps(m1.data+8,mrl);
+
+	mtl=_mm_set1_ps(m2.data[12]);
+	mrl=_mm_mul_ps(mm1[0],mtl);
+	mtl=_mm_set1_ps(m2.data[13]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[1],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[14]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[2],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[15]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[3],mtl),mrl);
+	_mm_store_ps(m1.data+12,mrl);
+}
+
+void Math::preMulMatrix4x4SSE(Matrix4x4 &m2,const Matrix4x4 &m1){
+	TOADLET_ASSERT(TOADLET_IS_ALIGNED(m2.data) && TOADLET_IS_ALIGNED(m1.data));
+
+	__m128 mm1[4],mtl,mrl;
+	mm1[0]=_mm_load_ps(m1.data+0);
+	mm1[1]=_mm_load_ps(m1.data+4);
+	mm1[2]=_mm_load_ps(m1.data+8);
+	mm1[3]=_mm_load_ps(m1.data+12);
+
+	mtl=_mm_set1_ps(m2.data[0]);
+	mrl=_mm_mul_ps(mm1[0],mtl);
+	mtl=_mm_set1_ps(m2.data[1]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[1],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[2]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[2],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[3]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[3],mtl),mrl);
+	_mm_store_ps(m2.data+0,mrl);
+
+	mtl=_mm_set1_ps(m2.data[4]);
+	mrl=_mm_mul_ps(mm1[0],mtl);
+	mtl=_mm_set1_ps(m2.data[5]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[1],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[6]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[2],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[7]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[3],mtl),mrl);
+	_mm_store_ps(m2.data+4,mrl);
+
+	mtl=_mm_set1_ps(m2.data[8]);
+	mrl=_mm_mul_ps(mm1[0],mtl);
+	mtl=_mm_set1_ps(m2.data[9]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[1],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[10]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[2],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[11]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[3],mtl),mrl);
+	_mm_store_ps(m2.data+8,mrl);
+
+	mtl=_mm_set1_ps(m2.data[12]);
+	mrl=_mm_mul_ps(mm1[0],mtl);
+	mtl=_mm_set1_ps(m2.data[13]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[1],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[14]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[2],mtl),mrl);
+	mtl=_mm_set1_ps(m2.data[15]);
+	mrl=_mm_add_ps(_mm_mul_ps(mm1[3],mtl),mrl);
+	_mm_store_ps(m2.data+12,mrl);
+}
+
+void Math::mulVector4Matrix4x4Vector4SSE(Vector4 &r,const Matrix4x4 &m,const Vector4 &v){
+	TOADLET_ASSERT(TOADLET_IS_ALIGNED(r.data) && TOADLET_IS_ALIGNED(m.data) && TOADLET_IS_ALIGNED(v));
+
+	__m128 mml,mtl,mrl;
+
+	mml=_mm_load_ps(m.data+0);
+	mtl=_mm_set1_ps(v.x);
+	mrl=_mm_mul_ps(mml,mtl);
+	mml=_mm_load_ps(m.data+4);
+	mtl=_mm_set1_ps(v.y);
+	mrl=_mm_add_ps(_mm_mul_ps(mml,mtl),mrl);
+	mml=_mm_load_ps(m.data+8);
+	mtl=_mm_set1_ps(v.z);
+	mrl=_mm_add_ps(_mm_mul_ps(mml,mtl),mrl);
+	mml=_mm_load_ps(m.data+12);
+	mtl=_mm_set1_ps(v.w);
+	mrl=_mm_add_ps(_mm_mul_ps(mml,mtl),mrl);
+	_mm_store_ps((float*)&r,mrl);
+}
+
+void Math::mulVector4Matrix4x4SSE(Vector4 &r,const Matrix4x4 &m){
+	TOADLET_ASSERT(TOADLET_IS_ALIGNED(r.data) && TOADLET_IS_ALIGNED(m.data));
+
+	__m128 mml,mtl,mrl;
+
+	mml=_mm_load_ps(m.data+0);
+	mtl=_mm_set1_ps(r.x);
+	mrl=_mm_mul_ps(mml,mtl);
+	mml=_mm_load_ps(m.data+4);
+	mtl=_mm_set1_ps(r.y);
+	mrl=_mm_add_ps(_mm_mul_ps(mml,mtl),mrl);
+	mml=_mm_load_ps(m.data+8);
+	mtl=_mm_set1_ps(r.z);
+	mrl=_mm_add_ps(_mm_mul_ps(mml,mtl),mrl);
+	mml=_mm_load_ps(m.data+12);
+	mtl=_mm_set1_ps(r.w);
+	mrl=_mm_add_ps(_mm_mul_ps(mml,mtl),mrl);
+	_mm_store_ps((float*)&r,mrl);
+}
+
+class MathInitializer{
+public:
+	MathInitializer(){
+		Math::init();
+	}
+
+	virtual void reference(){}
+};
+
+static MathInitializer mathInitializer;
+
+void Math::init(){
+	mathInitializer.reference();
+
+	mulMatrix4x4=mulMatrix4x4SSE;
+	preMulMatrix4x4=preMulMatrix4x4SSE;
+	postMulMatrix4x4=postMulMatrix4x4SSE;
+	mulVector4Matrix4x4Vector4=mulVector4Matrix4x4Vector4SSE;
+	mulVector4Matrix4x4=mulVector4Matrix4x4SSE;
 }
 
 }
