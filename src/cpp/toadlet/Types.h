@@ -139,7 +139,7 @@
 #endif
 
 #define TOADLET_ALIGNED TOADLET_ALIGN(16)
-#define TOADLET_IS_ALIGNED(x) ((((int)x)&0xF)==0)
+#define TOADLET_IS_ALIGNED(x) ((((int)&x)&0xF)==0)
 
 #define TOADLET_QUOTE_(x) #x
 #define TOADLET_QUOTE(x) TOADLET_QUOTE_(x)
