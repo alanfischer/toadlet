@@ -29,6 +29,7 @@
 #endif
 #include <windows.h>
 #include <stdio.h>
+#include <intrin.h> // __cpuid()
 
 namespace toadlet{
 namespace egg{
@@ -74,11 +75,20 @@ int Win32System::threadID(){
 	return GetCurrentThreadId();
 }
 
-//bool Win32System::getCPUCapabilities(CPUCapabilities &capabilities){
-//	__cpuid(
+bool Win32System::getSystemCaps(SystemCaps &caps){
+	int result[4];
+	int infoType = 1;
+	// Thanks to Tyler Streeter for the following
+	__cpuid(result,infoType);
+	if		(result[2]&(1<<20))	caps.sseVersion=4; // SSE4.2
+	else if	(result[2]&(1<<19)) caps.sseVersion=4; // SSE4.1
+	else if	(result[2]&(1<<0))	caps.sseVersion=3; // SSE3
+	else if	(result[3]&(1<<26)) caps.sseVersion=2; // SSE2
+	else if	(result[3]&(1<<25)) caps.sseVersion=1; // SSE
+	else caps.sseVersion=0;
 
-//	return true;
-//}
+	return true;
+}
 
 bool Win32System::absolutePath(const String &path){
 	int length=path.length();

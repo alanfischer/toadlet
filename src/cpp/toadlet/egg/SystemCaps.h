@@ -23,36 +23,28 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_WIN32SYSTEM_H
-#define TOADLET_EGG_WIN32SYSTEM_H
-
-#include <toadlet/egg/String.h>
-#include <toadlet/egg/SystemCaps.h>
+#ifndef TOADLET_EGG_SYSTEMCAPS_H
+#define TOADLET_EGG_SYSTEMCAPS_H
 
 namespace toadlet{
 namespace egg{
 
-class TOADLET_API Win32System{
+class SystemCaps{
 public:
-	static void usleep(uint64 microseconds);
-	static void msleep(uint64 milliseconds);
+	SystemCaps():
+		sseVersion(0),
+		neonVersion(0)
+	{}
 
-	static uint64 utime();
-	static uint64 mtime();
+	SystemCaps &set(const SystemCaps &caps){
+		sseVersion=caps.sseVersion;
+		neonVersion=caps.neonVersion;
 
-	static String mtimeToString(uint64 time);
+		return *this;
+	}
 
-	static int threadID();
-
-	static bool getSystemCaps(SystemCaps &caps);
-
-	static bool absolutePath(const String &path);
-
-	#if !defined(TOADLET_PLATFORM_WINCE)
-		static String getEnv(const String &name);
-	#endif
-
-	static const uint64 DELTA_EPOC_MICROSECONDS;
+	int sseVersion;
+	int neonVersion;
 };
 
 }

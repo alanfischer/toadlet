@@ -28,6 +28,7 @@
 
 #include <toadlet/Types.h>
 #include <toadlet/egg/String.h>
+#include <toadlet/egg/SystemCaps.h>
 
 namespace toadlet{
 namespace egg{
@@ -43,6 +44,8 @@ public:
 	static String mtimeToString(uint64 time);
 	
 	static int threadID();
+
+	static bool getSystemCaps(SystemCaps &caps);
 
 	static bool absolutePath(const String &path);
 

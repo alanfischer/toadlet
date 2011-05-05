@@ -1168,7 +1168,8 @@ real Math::findIntersection(const Segment &segment,const AABox &box,Vector3 &poi
 	return time;
 }
 
-// SSE operations
+#if defined(TOADLET_HAS_SSE)
+
 void Math::mulMatrix4x4SSE(Matrix4x4 &r,const Matrix4x4 &m1,const Matrix4x4 &m2){
 	TOADLET_ASSERT(TOADLET_IS_ALIGNED(r) && TOADLET_IS_ALIGNED(m1) && TOADLET_IS_ALIGNED(m2));
 
@@ -1359,6 +1360,8 @@ void Math::mulVector4Matrix4x4SSE(Vector4 &r,const Matrix4x4 &m){
 	_mm_store_ps((float*)&r,mrl);
 }
 
+#endif
+
 class MathInitializer{
 public:
 	MathInitializer(){
@@ -1373,85 +1376,95 @@ static MathInitializer mathInitializer;
 void Math::init(int init){
 	mathInitializer.reference();
 
-	if(init==Init_AUTO_SSE){
-		// Time different paths to choose most optimal
-		static int count=1000;
-		Matrix4x4 m,r;
-		Vector4 v;
-		int i;
+	SystemCaps caps;
+	System::getSystemCaps(caps);
 
-		uint64 t0=System::utime();
+	Logger::alert(String("Detected SSE version:")+caps.sseVersion);
 
-		r.set(Math::IDENTITY_MATRIX4X4);
-		m.set(Math::IDENTITY_MATRIX4X4);
-		for(i=0;i<count;++i){
-			Math::preMulMatrix4x4Traditional(r,m);
+	#if defined(TOADLET_HAS_SSE)
+		if(init==Init_AUTO_SSE && caps.sseVersion>0){
+			// Time different paths to choose most optimal
+			static int count=1000;
+			Matrix4x4 m,r;
+			Vector4 v;
+			int i;
+
+			uint64 t0=System::utime();
+
+			r.set(Math::IDENTITY_MATRIX4X4);
+			m.set(Math::IDENTITY_MATRIX4X4);
+			for(i=0;i<count;++i){
+				Math::preMulMatrix4x4Traditional(r,m);
+			}
+
+			uint64 t1=System::utime();
+
+			r.set(Math::IDENTITY_MATRIX4X4);
+			m.set(Math::IDENTITY_MATRIX4X4);
+			for(i=0;i<count;++i){
+				Math::preMulMatrix4x4SSE(r,m);
+			}
+
+			uint64 t2=System::utime();
+
+			m.set(Math::IDENTITY_MATRIX4X4);
+			v.set(Math::X_UNIT_VECTOR4);
+			for(i=0;i<count;++i){
+				Math::mulVector4Matrix4x4Traditional(v,m);
+			}
+
+			uint64 t3=System::utime();
+
+			m.set(Math::IDENTITY_MATRIX4X4);
+			v.set(Math::X_UNIT_VECTOR4);
+			for(i=0;i<count;++i){
+				Math::mulVector4Matrix4x4SSE(v,m);
+			}
+
+			uint64 t4=System::utime();
+
+			Logger::alert(String("Timings - MatrixTraditional:")+(t1-t0)+" MatrixSSE:"+(t2-t1)+" TraditionalSSE:"+(t3-t2)+" VectorSSE:"+(t4-t3));
+
+			if(t1-t0 < t2-t1){
+				Logger::excess(Categories::TOADLET_EGG,"using Traditional Matrix4x4 math");
+
+				mulMatrix4x4=mulMatrix4x4Traditional;
+				preMulMatrix4x4=preMulMatrix4x4Traditional;
+				postMulMatrix4x4=postMulMatrix4x4Traditional;
+			}
+			else{
+				Logger::excess(Categories::TOADLET_EGG,"using SSE Matrix4x4 math");
+
+				mulMatrix4x4=mulMatrix4x4SSE;
+				preMulMatrix4x4=preMulMatrix4x4SSE;
+				postMulMatrix4x4=postMulMatrix4x4SSE;
+			}
+
+			if(t3-t2 < t4-t3){
+				Logger::excess(Categories::TOADLET_EGG,"using Traditional Vector4 math");
+
+				mulVector4Matrix4x4Vector4=mulVector4Matrix4x4Vector4Traditional;
+				mulVector4Matrix4x4=mulVector4Matrix4x4Traditional;
+			}
+			else{
+				Logger::excess(Categories::TOADLET_EGG,"using SSE Vector4 math");
+
+				mulVector4Matrix4x4Vector4=mulVector4Matrix4x4Vector4SSE;
+				mulVector4Matrix4x4=mulVector4Matrix4x4SSE;
+			}
 		}
-
-		uint64 t1=System::utime();
-
-		r.set(Math::IDENTITY_MATRIX4X4);
-		m.set(Math::IDENTITY_MATRIX4X4);
-		for(i=0;i<count;++i){
-			Math::preMulMatrix4x4SSE(r,m);
-		}
-
-		uint64 t2=System::utime();
-
-		m.set(Math::IDENTITY_MATRIX4X4);
-		v.set(Math::X_UNIT_VECTOR4);
-		for(i=0;i<count;++i){
-			Math::mulVector4Matrix4x4Traditional(v,m);
-		}
-
-		uint64 t3=System::utime();
-
-		m.set(Math::IDENTITY_MATRIX4X4);
-		v.set(Math::X_UNIT_VECTOR4);
-		for(i=0;i<count;++i){
-			Math::mulVector4Matrix4x4SSE(v,m);
-		}
-
-		uint64 t4=System::utime();
-
-		if(t1-t0 < t2-t1){
-			Logger::excess(Categories::TOADLET_EGG,"using Traditional Matrix4x4 math");
-
-			mulMatrix4x4=mulMatrix4x4Traditional;
-			preMulMatrix4x4=preMulMatrix4x4Traditional;
-			postMulMatrix4x4=postMulMatrix4x4Traditional;
-		}
-		else{
-			Logger::excess(Categories::TOADLET_EGG,"using SSE Matrix4x4 math");
+		else if(init==Init_FORCE_SSE && caps.sseVersion>0){
+			Logger::excess(Categories::TOADLET_EGG,"forcing SSE math");
 
 			mulMatrix4x4=mulMatrix4x4SSE;
 			preMulMatrix4x4=preMulMatrix4x4SSE;
 			postMulMatrix4x4=postMulMatrix4x4SSE;
-		}
-
-		if(t3-t2 < t4-t3){
-			Logger::excess(Categories::TOADLET_EGG,"using Traditional Vector4 math");
-
-			mulVector4Matrix4x4Vector4=mulVector4Matrix4x4Vector4Traditional;
-			mulVector4Matrix4x4=mulVector4Matrix4x4Traditional;
-		}
-		else{
-			Logger::excess(Categories::TOADLET_EGG,"using SSE Vector4 math");
-
 			mulVector4Matrix4x4Vector4=mulVector4Matrix4x4Vector4SSE;
 			mulVector4Matrix4x4=mulVector4Matrix4x4SSE;
 		}
-	}
-	else if(init==Init_FORCE_SSE){
-		Logger::excess(Categories::TOADLET_EGG,"forcing SSE math");
-
-		mulMatrix4x4=mulMatrix4x4SSE;
-		preMulMatrix4x4=preMulMatrix4x4SSE;
-		postMulMatrix4x4=postMulMatrix4x4SSE;
-		mulVector4Matrix4x4Vector4=mulVector4Matrix4x4Vector4SSE;
-		mulVector4Matrix4x4=mulVector4Matrix4x4SSE;
-	}
-	else{
+		else
+	#endif
+	{
 		Logger::excess(Categories::TOADLET_EGG,"forcing Traditional math");
 
 		mulMatrix4x4=mulMatrix4x4Traditional;
