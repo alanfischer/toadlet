@@ -345,12 +345,24 @@ void MeshNode::updateVertexBuffer(){
 					for(j=0;j<vba.size();++j){
 						MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(vba[j].bone);
 
-						Math::mul(temp,bone->boneSpaceRotate,positionInitial);
-						Math::add(temp,bone->boneSpaceTranslate);
+						/// @todo: Move these ifs out to separate loops
+						if(bone->useMatrixTransforms){
+							Math::mulPoint3Full(temp,bone->boneSpaceMatrix,positionInitial);
+						}
+						else{
+							Math::mul(temp,bone->boneSpaceRotate,positionInitial);
+							Math::add(temp,bone->boneSpaceTranslate);
+						}
 						Math::mul(temp,vba[j].weight);
 						Math::add(positionResult,temp);
 
-						Math::mul(temp,bone->boneSpaceRotate,normalInitial);
+						/// @todo: Move these ifs out to separate loops
+						if(bone->useMatrixTransforms){
+							Math::mul(temp,bone->boneSpaceMatrix,normalInitial);
+						}
+						else{
+							Math::mul(temp,bone->boneSpaceRotate,normalInitial);
+						}
 						Math::mul(temp,vba[j].weight);
 						Math::add(normalResult,temp);
 					}
@@ -372,8 +384,13 @@ void MeshNode::updateVertexBuffer(){
 					for(j=0;j<vba.size();++j){
 						MeshNodeSkeleton::Bone *bone=mSkeleton->getBone(vba[j].bone);
 
-						Math::mul(temp,bone->boneSpaceRotate,positionInitial);
-						Math::add(temp,bone->boneSpaceTranslate);
+						if(bone->useMatrixTransforms){
+							Math::mulPoint3Full(temp,bone->boneSpaceMatrix,positionInitial);
+						}
+						else{
+							Math::mul(temp,bone->boneSpaceRotate,positionInitial);
+							Math::add(temp,bone->boneSpaceTranslate);
+						}
 						Math::mul(temp,vba[j].weight);
 						Math::add(positionResult,temp);
 					}

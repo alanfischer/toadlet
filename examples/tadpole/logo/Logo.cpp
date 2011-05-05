@@ -87,6 +87,7 @@ void Logo::create(){
 
  	meshNode=getEngine()->createNodeType(MeshNode::type(),scene);
 	meshNode->setMesh("lt.xmsh");
+	meshNode->getSkeleton()->setRenderSkeleton(true);
 	meshNode->getController()->start();
 	meshNode->getController()->setCycling(Controller::Cycling_REFLECT);
 	scene->getRoot()->attach(meshNode);

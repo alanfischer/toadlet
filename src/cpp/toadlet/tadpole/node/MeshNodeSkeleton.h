@@ -59,9 +59,11 @@ public:
 		virtual int updateBoneTransform(Bone *bone)=0;
 	};
 
-	class TOADLET_API Bone{
+	class TOADLET_API TOADLET_ALIGNED Bone{
 	public:
 		TOADLET_SHARED_POINTERS(Bone);
+
+		TOADLET_ALIGNED_NEW();
 
 		Bone(int index):
 			index(0),
@@ -91,11 +93,12 @@ public:
 
 		Vector3 worldTranslate;
 		Quaternion worldRotate;
-		Matrix3x3 worldRotateMatrix;
+		Matrix4x4 worldMatrix;
 		AABox worldBound;
 
 		Vector3 boneSpaceTranslate;
-		Matrix3x3 boneSpaceRotate;
+		Quaternion boneSpaceRotate;
+		Matrix4x4 boneSpaceMatrix;
 
 		BoneController *controller;
 

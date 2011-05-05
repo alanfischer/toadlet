@@ -1427,14 +1427,15 @@ namespace Math{
 		b.maxs.z-=p.z;
 	}
 
-	template<class Rotation>
-	inline void rotateAABox(AABox &r,const Rotation &rotation,const AABox &b,Vector3 buffer[8]){
+
+	template<class Transform>
+	inline void transformAABox(AABox &r,const Transform &transform,const AABox &b,Vector3 buffer[8]){
 		int i;
 		Vector3 temp;
 		b.getVertexes(buffer);
 
 		for(i=0;i<8;++i){
-			Math::mul(temp,rotation,buffer[i]);
+			Math::mul(temp,transform,buffer[i]);
 			if(i==0){
 				r.mins.set(temp);
 				r.maxs.set(temp);
@@ -1456,14 +1457,34 @@ namespace Math{
 		}
 	}
 
-	inline void mul(AABox &r,const Quaternion &rotation,const AABox &b){
+	inline void mul(AABox &r,const Quaternion &q,const AABox &b){
 		Vector3 buffer[8];
-		rotateAABox(r,rotation,b,buffer);
+		transformAABox(r,q,b,buffer);
 	}
 
-	inline void mul(AABox &r,const Matrix3x3 &rotation,const AABox &b){
+	inline void mul(AABox &r,const Quaternion &q){
 		Vector3 buffer[8];
-		rotateAABox(r,rotation,b,buffer);
+		transformAABox(r,q,r,buffer);
+	}
+
+	inline void mul(AABox &r,const Matrix3x3 &m,const AABox &b){
+		Vector3 buffer[8];
+		transformAABox(r,m,b,buffer);
+	}
+
+	inline void mul(AABox &r,const Matrix3x3 &m){
+		Vector3 buffer[8];
+		transformAABox(r,m,r,buffer);
+	}
+
+	inline void mul(AABox &r,const Matrix4x4 &m,const AABox &b){
+		Vector3 buffer[8];
+		transformAABox(r,m,b,buffer);
+	}
+
+	inline void mul(AABox &r,const Matrix4x4 &m){
+		Vector3 buffer[8];
+		transformAABox(r,m,r,buffer);
 	}
 
 	TOADLET_API void findBoundingBox(AABox &r,const Sphere &sphere);
