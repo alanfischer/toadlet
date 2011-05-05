@@ -140,7 +140,7 @@ int MeshNodeSkeleton::updateBoneTransformation(Bone *bone){
 				Math::lerp(bone->localRotate,f1->rotate,f2->rotate,t);
 				Math::normalizeCarefully(bone->localRotate,0);
 			}
-			return BoneSpaceUpdate_FLAG_TRANSLATE|BoneSpaceUpdate_FLAG_ROTATE;
+			return BoneSpaceUpdate_FLAG_MATRIX|BoneSpaceUpdate_FLAG_TRANSLATE|BoneSpaceUpdate_FLAG_ROTATE;
 		}
 	}
 
@@ -183,75 +183,34 @@ void MeshNodeSkeleton::updateBone(Bone *bone){
 		}
 
 		if(bone->useMatrixTransforms){
-			if(parent==NULL){
-				Math::setMatrix3x3FromQuaternion(bone->worldRotateMatrix,bone->localRotate);
-
-				bone->worldTranslate.set(bone->localTranslate);
-			}
-			else{
-				Math::setMatrix3x3FromQuaternion(bone->worldRotateMatrix,bone->localRotate);
-				Math::preMul(bone->worldRotateMatrix,parent->worldRotateMatrix);
-
-				Math::mul(vector,parent->worldRotateMatrix,bone->localTranslate);
-				Math::add(bone->worldTranslate,parent->worldTranslate,vector);
+			Math::setMatrix4x4FromQuaternion(bone->worldMatrix,bone->localRotate);
+			Math::setMatrix4x4FromTranslate(bone->worldMatrix,bone->localTranslate);
+			if(parent!=NULL){
+				Math::preMul(bone->worldMatrix,parent->worldMatrix);
 			}
 		}
 		else{
 			if(parent==NULL){
 				bone->worldRotate.set(bone->localRotate);
-				Math::setMatrix3x3FromQuaternion(bone->worldRotateMatrix,bone->worldRotate);
-
 				bone->worldTranslate.set(bone->localTranslate);
 			}
 			else{
 				Math::mul(bone->worldRotate,parent->worldRotate,bone->localRotate);
-				Math::setMatrix3x3FromQuaternion(bone->worldRotateMatrix,bone->worldRotate);
-
-				Math::mul(vector,parent->worldRotateMatrix,bone->localTranslate);
+				Math::mul(vector,parent->worldRotate,bone->localTranslate);
 				Math::add(bone->worldTranslate,parent->worldTranslate,vector);
 			}
 		}
 	}
 	else{
 		if(bone->useMatrixTransforms){
-			if(parent==NULL){
-				if((updateFlags&BoneSpaceUpdate_FLAG_ROTATE)==0){
-					Math::setMatrix3x3FromQuaternion(bone->worldRotateMatrix,sbone->rotate);
-				}
-				else{
-					if((updateFlags&BoneSpaceUpdate_FLAG_MATRIX)==0){
-						Math::setMatrix3x3FromQuaternion(bone->worldRotateMatrix,bone->worldRotate);
-					}
-				}
-
-				if((updateFlags&BoneSpaceUpdate_FLAG_TRANSLATE)==0){
-					bone->worldTranslate.set(sbone->translate);
-				}
-			}
-			else{
-				if((updateFlags&BoneSpaceUpdate_FLAG_ROTATE)==0){
-					Math::setMatrix3x3FromQuaternion(bone->worldRotateMatrix,sbone->rotate);
-					Math::preMul(bone->worldRotateMatrix,parent->worldRotateMatrix);
-				}
-				else{
-					if((updateFlags&BoneSpaceUpdate_FLAG_MATRIX)==0){
-						Math::setMatrix3x3FromQuaternion(bone->worldRotateMatrix,bone->worldRotate);
-					}
-				}
-
-				if((updateFlags&BoneSpaceUpdate_FLAG_TRANSLATE)==0){
-					Math::mul(vector,parent->worldRotateMatrix,sbone->translate);
-					Math::add(bone->worldTranslate,parent->worldTranslate,vector);
-				}
-			}
+			Math::setMatrix4x4FromQuaternion(bone->worldMatrix,sbone->rotate);
+			Math::setMatrix4x4FromTranslate(bone->worldMatrix,sbone->translate);
 		}
 		else{
 			if(parent==NULL){
 				if((updateFlags&BoneSpaceUpdate_FLAG_ROTATE)==0){
 					bone->worldRotate.set(sbone->rotate);
 				}
-				Math::setMatrix3x3FromQuaternion(bone->worldRotateMatrix,bone->worldRotate);
-
 				if((updateFlags&BoneSpaceUpdate_FLAG_TRANSLATE)==0){
 					bone->worldTranslate.set(sbone->translate);
 				}
@@ -260,30 +219,32 @@ void MeshNodeSkeleton::updateBone(Bone *bone){
 				if((updateFlags&BoneSpaceUpdate_FLAG_ROTATE)==0){
 					Math::mul(bone->worldRotate,parent->worldRotate,sbone->rotate);
 				}
-				Math::setMatrix3x3FromQuaternion(bone->worldRotateMatrix,bone->worldRotate);
-
 				if((updateFlags&BoneSpaceUpdate_FLAG_TRANSLATE)==0){
-					Math::mul(vector,parent->worldRotateMatrix,sbone->translate);
+					Math::mul(vector,parent->worldRotate,sbone->translate);
 					Math::add(bone->worldTranslate,parent->worldTranslate,vector);
 				}
 			}
 		}
 	}
 
-	Math::mul(vector,bone->worldRotateMatrix,sbone->worldToBoneTranslate);
-	Math::add(bone->boneSpaceTranslate,bone->worldTranslate,vector);
-
 	if(bone->useMatrixTransforms){
-		Math::setMatrix3x3FromQuaternion(bone->boneSpaceRotate,sbone->worldToBoneRotate);
-		Math::preMul(bone->boneSpaceRotate,bone->worldRotateMatrix);
+		Math::setMatrix4x4FromQuaternion(bone->boneSpaceMatrix,sbone->worldToBoneRotate);
+		Math::preMul(bone->boneSpaceMatrix,bone->worldMatrix);
+
+		Math::mulPoint3Fast(vector,bone->worldMatrix,sbone->worldToBoneTranslate);
+		Math::setMatrix4x4FromTranslate(bone->boneSpaceMatrix,vector);
+
+		Math::mul(bone->worldBound,bone->boneSpaceMatrix,sbone->bound);
 	}
 	else{
-		Math::mul(quaternion,bone->worldRotate,sbone->worldToBoneRotate);
-		Math::setMatrix3x3FromQuaternion(bone->boneSpaceRotate,quaternion);
-	}
+		Math::mul(bone->boneSpaceRotate,bone->worldRotate,sbone->worldToBoneRotate);
 
-	Math::mul(bone->worldBound,bone->worldRotateMatrix,sbone->bound);
-	Math::add(bone->worldBound,bone->worldTranslate);
+		Math::mul(vector,bone->worldRotate,sbone->worldToBoneTranslate);
+		Math::add(bone->boneSpaceTranslate,bone->worldTranslate,vector);
+
+		Math::mul(bone->worldBound,bone->worldRotate,sbone->bound);
+		Math::add(bone->worldBound,bone->worldTranslate);
+	}
 }
 
 void MeshNodeSkeleton::setRenderSkeleton(bool skeleton){
@@ -333,11 +294,18 @@ void MeshNodeSkeleton::createSkeletonBuffers(){
 }
 
 void MeshNodeSkeleton::updateSkeletonBuffers(){
+	Vector3 v;
 	VertexBufferAccessor vba;
 	vba.lock(mSkeletonVertexBuffer,Buffer::Access_BIT_WRITE);
 	int i,j;
 	for(i=0;i<mBones.size();++i){
-		vba.set3(i,0,mBones[i]->worldTranslate);
+		if(mBones[i]->useMatrixTransforms){
+			Math::setTranslateFromMatrix4x4(v,mBones[i]->worldMatrix);
+			vba.set3(i,0,v);
+		}
+		else{
+			vba.set3(i,0,mBones[i]->worldTranslate);
+		}
 	}
 	vba.unlock();
 
