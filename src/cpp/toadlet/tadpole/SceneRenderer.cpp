@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Logger.h>
-#include <toadlet/peeper/CapabilityState.h>
+#include <toadlet/peeper/RendererCaps.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/SceneRenderer.h>
 #include <toadlet/tadpole/RenderListener.h>
@@ -163,8 +163,12 @@ void SceneRenderer::setupViewport(CameraNode *camera,Renderer *renderer){
 }
 
 void SceneRenderer::setupLights(const RenderableSet::LightQueue &lightQueue,Renderer *renderer){
+	/// @todo: Have the SceneRenderer get notified about Renderer changes so we can cache this
+	RendererCaps caps;
+	renderer->getRendererCaps(caps);
+
 	int i;
-	int maxLights=renderer->getCapabilityState().maxLights;
+	int maxLights=caps.maxLights;
 	for(i=0;i<maxLights;++i){
 		if(i<lightQueue.size()){
 			LightNode *light=lightQueue[i].light;

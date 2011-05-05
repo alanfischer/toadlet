@@ -36,7 +36,7 @@
 #include <toadlet/peeper/SamplerState.h>
 #include <toadlet/peeper/TextureState.h>
 #include <toadlet/peeper/RasterizerState.h>
-#include <toadlet/peeper/CapabilityState.h>
+#include <toadlet/peeper/RendererCaps.h>
 #include <toadlet/peeper/IndexData.h>
 
 namespace toadlet{
@@ -99,7 +99,8 @@ public:
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
 	int getCloseTextureFormat(int format,int usage);
 	int getCloseTextureFormat(int format);
-	const CapabilityState &getCapabilityState(){return mCapabilityState;}
+	bool getRendererCaps(RendererCaps &caps){caps.set(mCaps);return true;}
+	const RendererCaps &getCaps() const{return mCaps;}
 
 	/// @todo: Move these all to pointers once we have things working
 	void setBlendState(const BlendState &state);
@@ -133,7 +134,7 @@ public:
 	static DWORD getFVF(VertexFormat *vertexFormat);
 
 protected:
-	static void setCapabilityStateFromCaps(CapabilityState &caps,const D3DCAPS9 &d3dcaps,bool renderToTexture,bool renderToDepthTexture);
+	static void setCapsFromD3DCAPS9(RendererCaps &caps,const D3DCAPS9 &d3dcaps,bool renderToTexture,bool renderToDepthTexture);
 	static void getPrimitiveTypeAndCount(D3DPRIMITIVETYPE &d3dpt,int &count,IndexData::Primitive prim,int numIndexes);
 
 	IDirect3D9 *mD3D;
@@ -147,7 +148,7 @@ protected:
 	RenderTarget *mRenderTarget;
 	D3D9RenderTarget *mD3DRenderTarget;
 
-	CapabilityState mCapabilityState;
+	RendererCaps mCaps;
 };
 
 }

@@ -140,7 +140,7 @@ bool D3D9Renderer::create(RenderTarget *target,int *options){
 	#else
 		isD3DFORMATValid(D3DFMT_D24S8,D3DUSAGE_DEPTHSTENCIL);
 	#endif
-	setCapabilityStateFromCaps(mCapabilityState,mD3DCaps,SUCCEEDED(renderToTextureResult),SUCCEEDED(renderToDepthTextureResult));
+	setCapsFromD3DCAPS9(mCaps,mD3DCaps,SUCCEEDED(renderToTextureResult),SUCCEEDED(renderToDepthTextureResult));
 
 	setDefaultStates();
 
@@ -336,7 +336,7 @@ void D3D9Renderer::beginScene(){
 
 void D3D9Renderer::endScene(){
 	int i;
-	for(i=0;i<mCapabilityState.maxTextureStages;++i){
+	for(i=0;i<mCaps.maxTextureStages;++i){
 		setTexture(i,NULL);
 	}
 
@@ -475,7 +475,7 @@ void D3D9Renderer::setDefaultStates(){
 	setRasterizerState(RasterizerState());
 
 	int i;
-	for(i=0;i<mCapabilityState.maxTextureStages;++i){
+	for(i=0;i<mCaps.maxTextureStages;++i){
 		setSamplerState(i,NULL);
 		setTextureState(i,NULL);
 		setTexture(i,NULL);
@@ -684,7 +684,7 @@ void D3D9Renderer::setPointState(const PointState &state){
 	#if !defined(TOADLET_SET_D3DM)
 		// pointsize = size / sqrt(constant + linear*d + quadratic*d*d)
 		// if a&b = 0, then quadratic = 1/(C*C) where C = first component of projMatrix * 1/2 screen width
-		if(mCapabilityState.pointSprites){
+		if(mCaps.pointSprites){
 			mD3DDevice->SetRenderState(D3DRS_POINTSPRITEENABLE,state.sprite);
 			mD3DDevice->SetRenderState(D3DRS_POINTSCALEENABLE,state.attenuated);
 
@@ -915,7 +915,7 @@ void D3D9Renderer::setAmbientColor(const Vector4 &ambient){
 	TOADLET_CHECK_D3D9ERROR(hr,"setAmbientColor");
 }
 
-void D3D9Renderer::setCapabilityStateFromCaps(CapabilityState &caps,const D3DCAPS9 &d3dcaps,bool renderToTexture,bool renderToDepthTexture){
+void D3D9Renderer::setCapsFromD3DCAPS9(RendererCaps &caps,const D3DCAPS9 &d3dcaps,bool renderToTexture,bool renderToDepthTexture){
 	caps.resetOnResize=true;
 	caps.hardwareTextures=true;
 	caps.hardwareIndexBuffers=true;

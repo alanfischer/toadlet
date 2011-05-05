@@ -26,7 +26,6 @@
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/peeper/BackableBuffer.h>
-#include <toadlet/peeper/CapabilityState.h>
 #include <string.h> //memcpy
 
 using namespace toadlet::egg;
@@ -366,7 +365,7 @@ void BufferManager::bufferDestroyed(Buffer *buffer){
 }
 
 bool BufferManager::useTriFan(){
-	return !mBackable && mEngine->getRenderer()!=NULL && mEngine->getRenderer()->getCapabilityState().triangleFan;
+	return !mBackable && mEngine->getRendererCaps().triangleFan;
 }
 
 }

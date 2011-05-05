@@ -27,7 +27,6 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/io/DataStream.h>
-#include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/tadpole/handler/WADArchive.h>
 #include <string.h>
 

@@ -27,7 +27,6 @@ set (PEEPER_HEADERS
 	BlendState.h
 	Buffer.h
 	BufferDestroyedListener.h
-	CapabilityState.h
 	DepthState.h
 	FogState.h
 	IndexBuffer.h
@@ -40,6 +39,7 @@ set (PEEPER_HEADERS
 	RasterizerState.h
 	RenderTarget.h
 	Renderer.h
+	RendererCaps.h
 	SamplerState.h
 	Shader.h
 	PixelBuffer.h

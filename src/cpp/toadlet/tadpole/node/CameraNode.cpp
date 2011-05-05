@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
-#include <toadlet/peeper/CapabilityState.h>
+#include <toadlet/peeper/RendererCaps.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/node/CameraNode.h>
@@ -409,7 +409,7 @@ Image::ptr CameraNode::renderToImage(Renderer *renderer,int format,int width,int
 }
 
 Mesh::ptr CameraNode::renderToSkyBox(Renderer *renderer,int format,int size,scalar scale){
-	bool rtt=renderer->getCapabilityState().renderToTexture;
+	bool rtt=mEngine->getRendererCaps().renderToTexture;
 	int flags=Texture::Usage_BIT_RENDERTARGET;
 	Texture::ptr skyboxTexture[6];
 	Material::ptr skyboxMaterial[6];

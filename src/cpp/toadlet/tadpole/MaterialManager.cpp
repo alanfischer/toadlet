@@ -26,7 +26,6 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/BackableRenderStateSet.h>
-#include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/MaterialManager.h>

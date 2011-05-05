@@ -70,8 +70,8 @@ bool D3D9Texture::create(int usage,Dimension dimension,int format,int width,int 
 	width=width>0?width:1;height=height>0?height:1;depth=depth>0?depth:1;
 
 	if((Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || (dimension!=Dimension_CUBE && Math::isPowerOf2(depth)==false)) &&
-		mRenderer->getCapabilityState().textureNonPowerOf2==false &&
-		(mRenderer->getCapabilityState().textureNonPowerOf2Restricted==false || (usage&Usage_BIT_NPOT_RESTRICTED)==0))
+		mRenderer->getCaps().textureNonPowerOf2==false &&
+		(mRenderer->getCaps().textureNonPowerOf2Restricted==false || (usage&Usage_BIT_NPOT_RESTRICTED)==0))
 	{
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"D3D9Texture: Cannot load a non power of 2 texture");

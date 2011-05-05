@@ -26,7 +26,7 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/BackableTexture.h>
 #include <toadlet/peeper/BackableTextureMipPixelBuffer.h>
-#include <toadlet/peeper/CapabilityState.h>
+#include <toadlet/peeper/RendererCaps.h>
 #include <string.h>
 
 using namespace toadlet::egg;
@@ -243,11 +243,13 @@ bool BackableTexture::convertRead(Texture::ptr texture,int format,int width,int 
 }
 
 bool BackableTexture::convertCreate(Texture::ptr texture,Renderer *renderer,int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]){
+	RendererCaps caps;
+	renderer->getRendererCaps(caps);
 	int newFormat=renderer->getCloseTextureFormat(format,usage);
-	bool hasNPOT=renderer->getCapabilityState().textureNonPowerOf2;
+	bool hasNPOT=caps.textureNonPowerOf2;
 	bool wantsNPOT=(Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || (dimension!=Image::Dimension_CUBE && Math::isPowerOf2(depth)==false));
 	bool needsNPOT=wantsNPOT & !hasNPOT;
-	bool hasAutogen=renderer->getCapabilityState().textureAutogenMipMaps;
+	bool hasAutogen=caps.textureAutogenMipMaps;
 	bool wantsAutogen=(usage&Texture::Usage_BIT_AUTOGEN_MIPMAPS)>0;
 	bool needsAutogen=wantsAutogen & !hasAutogen;
 	bool needsConvert=(newFormat!=format);

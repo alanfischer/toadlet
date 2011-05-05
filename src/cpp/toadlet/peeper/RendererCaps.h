@@ -23,8 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_CAPABILITYSTATE_H
-#define TOADLET_PEEPER_CAPABILITYSTATE_H
+#ifndef TOADLET_PEEPER_RENDERERCAPS_H
+#define TOADLET_PEEPER_RENDERERCAPS_H
 
 #include <toadlet/peeper/Types.h>
 #include <toadlet/peeper/VertexFormat.h>
@@ -32,9 +32,9 @@
 namespace toadlet{
 namespace peeper{
 
-class CapabilityState{
+class RendererCaps{
 public:
-	CapabilityState():
+	RendererCaps():
 		resetOnResize(false),
 		hardwareTextures(false),
 		hardwareVertexBuffers(false),
@@ -59,6 +59,35 @@ public:
 		texturePerspective(false),
 		cubeMap(false)
 	{}
+
+	RendererCaps &set(const RendererCaps &caps){
+		resetOnResize=caps.resetOnResize;
+		hardwareTextures=caps.hardwareTextures;
+		hardwareVertexBuffers=caps.hardwareVertexBuffers;
+		hardwareIndexBuffers=caps.hardwareIndexBuffers;
+		maxLights=caps.maxLights;
+		maxTextureStages=caps.maxTextureStages;
+		maxTextureSize=caps.maxTextureSize;
+		pointSprites=caps.pointSprites;
+		vertexShaders=caps.vertexShaders;
+		maxVertexShaderLocalParameters=caps.maxVertexShaderLocalParameters;
+		fragmentShaders=caps.fragmentShaders;
+		maxFragmentShaderLocalParameters=caps.maxFragmentShaderLocalParameters;
+		renderToTexture=caps.renderToTexture;
+		renderToDepthTexture=caps.renderToDepthTexture;
+		renderToTextureNonPowerOf2Restricted=caps.renderToTextureNonPowerOf2Restricted;
+		textureDot3=caps.textureDot3;
+		textureNonPowerOf2Restricted=caps.textureNonPowerOf2Restricted;
+		textureNonPowerOf2=caps.textureNonPowerOf2;
+		textureAutogenMipMaps=caps.textureAutogenMipMaps;
+		idealVertexFormatBit=caps.idealVertexFormatBit;
+		triangleFan=caps.triangleFan;
+		fill=caps.fill;
+		texturePerspective=caps.texturePerspective;
+		cubeMap=caps.cubeMap;
+
+		return *this;
+	}
 
 	bool resetOnResize;
 	bool hardwareTextures;
