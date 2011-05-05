@@ -75,7 +75,13 @@ namespace Math{
 	const EulerAngle IDENTITY_EULERANGLE;
 	const AABox ZERO_AABOX;
 
-	void init();
+	enum{
+		Init_AUTO_SSE=0,
+		Init_FORCE_SSE=1,
+		Init_NO_SSE=2,
+	};
+
+	void init(int init=Init_AUTO_SSE);
 
 	// Vector2 operations
 	inline void neg(Vector2 &r,const Vector2 &v){
