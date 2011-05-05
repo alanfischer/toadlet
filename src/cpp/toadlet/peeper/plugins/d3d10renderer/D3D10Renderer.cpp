@@ -99,24 +99,26 @@ bool D3D10Renderer::create(RenderTarget *target,int *options){
 	mRenderTarget=target;
 	mD3DRenderTarget=d3dtarget;
 
-	CapabilityState &caps=mCapabilityState;
-	caps.resetOnResize=false;
-	caps.hardwareTextures=true;
-	caps.hardwareIndexBuffers=true;
-	caps.hardwareVertexBuffers=true;
-	caps.pointSprites=false;
-	caps.maxLights=0;
-	caps.maxTextureStages=16;
-	caps.maxTextureSize=8192;
-	caps.textureDot3=false;
-	caps.textureNonPowerOf2=true;
-	caps.textureNonPowerOf2Restricted=true;
-	caps.textureAutogenMipMaps=false;
-	caps.renderToTexture=true;
-	caps.renderToDepthTexture=true;
-	caps.renderToTextureNonPowerOf2Restricted=true;
-	caps.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
-	caps.triangleFan=false;
+	RendererCaps &caps=mCaps;
+	{
+		caps.resetOnResize=false;
+		caps.hardwareTextures=true;
+		caps.hardwareIndexBuffers=true;
+		caps.hardwareVertexBuffers=true;
+		caps.pointSprites=false;
+		caps.maxLights=0;
+		caps.maxTextureStages=16;
+		caps.maxTextureSize=8192;
+		caps.textureDot3=false;
+		caps.textureNonPowerOf2=true;
+		caps.textureNonPowerOf2Restricted=true;
+		caps.textureAutogenMipMaps=false;
+		caps.renderToTexture=true;
+		caps.renderToDepthTexture=true;
+		caps.renderToTextureNonPowerOf2Restricted=true;
+		caps.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
+		caps.triangleFan=false;
+	}
 
 	Logger::alert(Categories::TOADLET_PEEPER,
 		"created D3D10Renderer");
@@ -317,7 +319,7 @@ void D3D10Renderer::endScene(){
 	mD3DDevice->IASetInputLayout(NULL);
 
 	int i;
-	for(i=0;i<mCapabilityState.maxTextureStages;++i){
+	for(i=0;i<mCaps.maxTextureStages;++i){
 		setTexture(i,NULL);
 	}
 

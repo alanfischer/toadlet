@@ -35,7 +35,6 @@ namespace toadlet{
 namespace peeper{
 
 class BlendState;
-class CapabilityState;
 class DepthState;
 class IndexBuffer;
 class LightState;
@@ -48,6 +47,7 @@ class PixelBufferRenderTarget;
 class PixelBuffer;
 class PointState;
 class RasterizerState;
+class RendererCaps;
 class RenderStateSet;
 class Shader;
 class Texture;
@@ -119,7 +119,7 @@ public:
 	// Misc operations
 	virtual int getCloseTextureFormat(int format,int usage)=0;
 	virtual void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result)=0;
-	virtual const CapabilityState &getCapabilityState()=0;
+	virtual bool getRendererCaps(RendererCaps &caps)=0;
 };
 
 }

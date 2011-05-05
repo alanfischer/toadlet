@@ -33,6 +33,7 @@
 #include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/peeper/Shader.h>
 #include <toadlet/peeper/Program.h>
+#include <toadlet/peeper/RendererCaps.h>
 #include <toadlet/ribbit/AudioPlayer.h>
 #include <toadlet/ribbit/AudioBuffer.h>
 #include <toadlet/tadpole/Types.h>
@@ -97,6 +98,7 @@ public:
 
 	int getIdealVertexFormatBit() const{return mIdealVertexFormatBit;}
 	const VertexFormats &getVertexFormats() const{return mVertexFormats;}
+	const peeper::RendererCaps &getRendererCaps() const{return mRendererCaps;}
 
 	inline ArchiveManager *getArchiveManager() const{return mArchiveManager;}
 	inline TextureManager *getTextureManager() const{return mTextureManager;}
@@ -121,6 +123,7 @@ protected:
 
 	int mIdealVertexFormatBit;
 	VertexFormats mVertexFormats;
+	peeper::RendererCaps mRendererCaps;
 
 	ArchiveManager *mArchiveManager;
 	TextureManager *mTextureManager;

@@ -26,7 +26,6 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Logger.h>
-#include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/pad/platform/win32/Win32Application.h>
 #include <windows.h>
 #pragma comment(lib,"winmm.lib")
@@ -636,7 +635,7 @@ void Win32Application::internal_resize(int width,int height){
 
 	bool visible=(width>0 && height>0);
 	if(mActive && mRenderer!=NULL){
-		if(mRenderer->getCapabilityState().resetOnResize){
+		if(mEngine->getRendererCaps().resetOnResize){
 			if(mContextActive==false && visible==true){
 				mEngine->contextDeactivate(mRenderer);
 				mContextActive=true;

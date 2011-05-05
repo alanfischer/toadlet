@@ -31,7 +31,6 @@
  
 #include <toadlet/egg/System.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/tadpole/handler/platform/osx/OSXBundleArchive.h>
 #include <toadlet/pad/platform/osx/OSXApplication.h>
 
@@ -166,7 +165,7 @@ rect{
 	mApplication->resized(width,height);
 
 	if(mApplication->active() && mApplication->getRenderer()!=NULL){
-		if(mApplication->getRenderer()->getCapabilityState().resetOnResize){
+		if(mApplication->getEngine()->getRendererCaps().resetOnResize){
 			mApplication->getEngine()->contextReset(mApplication->getRenderer());
 		}
 		mApplication->update(0);

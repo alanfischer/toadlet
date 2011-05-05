@@ -39,7 +39,7 @@
 #include <toadlet/peeper/SamplerState.h>
 #include <toadlet/peeper/TextureState.h>
 #include <toadlet/peeper/Viewport.h>
-#include <toadlet/peeper/CapabilityState.h>
+#include <toadlet/peeper/RendererCaps.h>
 
 namespace toadlet{
 namespace peeper{
@@ -109,7 +109,8 @@ public:
 	// Misc operations
 	int getCloseTextureFormat(int textureFormat,int usage);
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
-	const CapabilityState &getCapabilityState(){return mCapabilityState;}
+	bool getRendererCaps(RendererCaps &caps){caps.set(mCaps);return true;}
+	const RendererCaps &getCaps() const{return mCaps;}
 
 	/// @todo: Move these all to pointers once we have things working
 	void setBlendState(const BlendState &state);
@@ -192,7 +193,7 @@ protected:
 		egg::math::Matrix4x4 mViewMatrix;
 	#endif
 
-	CapabilityState mCapabilityState;
+	RendererCaps mCaps;
 	bool mMultiTexture;
 	bool mHasClampToEdge;
 

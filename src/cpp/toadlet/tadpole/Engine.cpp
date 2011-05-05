@@ -68,7 +68,7 @@
 
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/peeper/CapabilityState.h>
+#include <toadlet/peeper/RendererCaps.h>
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/MaterialManager.h>
@@ -338,41 +338,44 @@ bool Engine::setRenderer(Renderer *renderer){
 			return false;
 		}
 
-		const toadlet::peeper::CapabilityState &caps=renderer->getCapabilityState();
-		Logger::alert(Categories::TOADLET_TADPOLE,
-			"Renderer Capabilities:");
-		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"maxLights:"+caps.maxLights);
-		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"maxTextureStages:"+caps.maxTextureStages);
-		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"maxTextureSize:"+caps.maxTextureSize);
-		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"hardwareVertexBuffers:"+caps.hardwareVertexBuffers);
-		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"hardwareIndexBuffers:"+caps.hardwareIndexBuffers);
-		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"vertexShaders:"+caps.vertexShaders);
-		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"maxVertexShaderLocalParameters:"+caps.maxVertexShaderLocalParameters);
-		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"fragmentShaders:"+caps.fragmentShaders);
-		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"maxFragmentShaderLocalParameters:"+caps.maxFragmentShaderLocalParameters);
-		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"renderToTexture:"+caps.renderToTexture);
-		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"renderToDepthTexture:"+caps.renderToDepthTexture);
-		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"renderToTextureNonPowerOf2Restricted:"+caps.renderToTextureNonPowerOf2Restricted);
-		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"textureDot3:"+caps.textureDot3);
-		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"textureNonPowerOf2Restricted:"+caps.textureNonPowerOf2Restricted);
-		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"textureNonPowerOf2:"+caps.textureNonPowerOf2);
-		Logger::alert(Categories::TOADLET_TADPOLE,
-			String()+(char)9+"textureAutogenMipMaps:"+caps.textureAutogenMipMaps);
+		renderer->getRendererCaps(mRendererCaps);
+		const RendererCaps &caps=mRendererCaps;
+		{
+			Logger::alert(Categories::TOADLET_TADPOLE,
+				"Renderer Capabilities:");
+			Logger::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"maxLights:"+caps.maxLights);
+			Logger::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"maxTextureStages:"+caps.maxTextureStages);
+			Logger::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"maxTextureSize:"+caps.maxTextureSize);
+			Logger::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"hardwareVertexBuffers:"+caps.hardwareVertexBuffers);
+			Logger::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"hardwareIndexBuffers:"+caps.hardwareIndexBuffers);
+			Logger::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"vertexShaders:"+caps.vertexShaders);
+			Logger::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"maxVertexShaderLocalParameters:"+caps.maxVertexShaderLocalParameters);
+			Logger::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"fragmentShaders:"+caps.fragmentShaders);
+			Logger::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"maxFragmentShaderLocalParameters:"+caps.maxFragmentShaderLocalParameters);
+			Logger::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"renderToTexture:"+caps.renderToTexture);
+			Logger::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"renderToDepthTexture:"+caps.renderToDepthTexture);
+			Logger::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"renderToTextureNonPowerOf2Restricted:"+caps.renderToTextureNonPowerOf2Restricted);
+			Logger::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"textureDot3:"+caps.textureDot3);
+			Logger::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"textureNonPowerOf2Restricted:"+caps.textureNonPowerOf2Restricted);
+			Logger::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"textureNonPowerOf2:"+caps.textureNonPowerOf2);
+			Logger::alert(Categories::TOADLET_TADPOLE,
+				String()+(char)9+"textureAutogenMipMaps:"+caps.textureAutogenMipMaps);
+		}
 
 		mIdealVertexFormatBit=caps.idealVertexFormatBit;
 	}

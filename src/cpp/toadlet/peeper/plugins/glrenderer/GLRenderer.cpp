@@ -194,132 +194,133 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 	Logger::alert(Categories::TOADLET_PEEPER,
 		String("GL_EXTENSIONS:") + glGetString(GL_EXTENSIONS));
 
-	CapabilityState &caps=mCapabilityState;
-
-	#if defined(TOADLET_HAS_GLESEM)
-		caps.hardwareTextures=glesemAcceleratedResult>0;
-	#else
-		caps.hardwareTextures=true;
-	#endif
-
-	GLint maxTextureStages=0;
-	if(gl_version>10){ // 1.0 doesn't support multitexturing
-		glGetIntegerv(GL_MAX_TEXTURE_UNITS,&maxTextureStages);
-	}
-	if(maxTextureStages<=0){
-		maxTextureStages=1;
-	}
-	caps.maxTextureStages=maxTextureStages;
-	mMultiTexture=maxTextureStages>1;
-	mHasClampToEdge=
-		#if defined(TOADLET_HAS_GLES)
-			true;
+	RendererCaps &caps=mCaps;
+	{
+		#if defined(TOADLET_HAS_GLESEM)
+			caps.hardwareTextures=glesemAcceleratedResult>0;
 		#else
-			gl_version>=12;
+			caps.hardwareTextures=true;
 		#endif
 
-	mLastTextures.resize(caps.maxTextureStages,NULL);
-	mLastSamplerStates.resize(caps.maxTextureStages,NULL);
-	mLastTextureStates.resize(caps.maxTextureStages,NULL);
-	mLastTexTargets.resize(caps.maxTextureStages,0);
-	mTexCoordIndexes.resize(caps.maxTextureStages,-1);
-	mLastTexCoordIndexes.resize(caps.maxTextureStages,-1);
+		GLint maxTextureStages=0;
+		if(gl_version>10){ // 1.0 doesn't support multitexturing
+			glGetIntegerv(GL_MAX_TEXTURE_UNITS,&maxTextureStages);
+		}
+		if(maxTextureStages<=0){
+			maxTextureStages=1;
+		}
+		caps.maxTextureStages=maxTextureStages;
+		mMultiTexture=maxTextureStages>1;
+		mHasClampToEdge=
+			#if defined(TOADLET_HAS_GLES)
+				true;
+			#else
+				gl_version>=12;
+			#endif
 
-	GLint maxTextureSize=0;
-	glGetIntegerv(GL_MAX_TEXTURE_SIZE,&maxTextureSize);
-	if(maxTextureSize<=0){
-		maxTextureSize=256;
-	}
-	caps.maxTextureSize=maxTextureSize;
+		mLastTextures.resize(caps.maxTextureStages,NULL);
+		mLastSamplerStates.resize(caps.maxTextureStages,NULL);
+		mLastTextureStates.resize(caps.maxTextureStages,NULL);
+		mLastTexTargets.resize(caps.maxTextureStages,0);
+		mTexCoordIndexes.resize(caps.maxTextureStages,-1);
+		mLastTexCoordIndexes.resize(caps.maxTextureStages,-1);
 
-	GLint maxLights=0;
-	glGetIntegerv(GL_MAX_LIGHTS,&maxLights);
-	if(maxLights<=0){
-		maxLights=8;
-	}
-	caps.maxLights=maxLights;
+		GLint maxTextureSize=0;
+		glGetIntegerv(GL_MAX_TEXTURE_SIZE,&maxTextureSize);
+		if(maxTextureSize<=0){
+			maxTextureSize=256;
+		}
+		caps.maxTextureSize=maxTextureSize;
 
-	#if defined(TOADLET_HAS_GLPBUFFERS)
-		mPBuffersAvailable=usePBuffers && GLPBufferRenderTarget_available(this);
-	#else
-		mPBuffersAvailable=false;
-	#endif
-	#if defined(TOADLET_HAS_GLFBOS)
-		mFBOsAvailable=useFBOs && GLFBORenderTarget::available(this);
-	#else
-		mFBOsAvailable=false;
-	#endif
+		GLint maxLights=0;
+		glGetIntegerv(GL_MAX_LIGHTS,&maxLights);
+		if(maxLights<=0){
+			maxLights=8;
+		}
+		caps.maxLights=maxLights;
 
-	caps.renderToTexture=mPBuffersAvailable || mFBOsAvailable;
+		#if defined(TOADLET_HAS_GLPBUFFERS)
+			mPBuffersAvailable=usePBuffers && GLPBufferRenderTarget_available(this);
+		#else
+			mPBuffersAvailable=false;
+		#endif
+		#if defined(TOADLET_HAS_GLFBOS)
+			mFBOsAvailable=useFBOs && GLFBORenderTarget::available(this);
+		#else
+			mFBOsAvailable=false;
+		#endif
 
-	caps.renderToDepthTexture=mFBOsAvailable;
+		caps.renderToTexture=mPBuffersAvailable || mFBOsAvailable;
 
-	#if defined(TOADLET_HAS_GLEW)
-		caps.textureDot3=(GLEW_ARB_texture_env_dot3!=0);
-	#elif defined(TOADLET_HAS_GLES)
-		caps.textureDot3=(gl_version>=11);
-	#endif
+		caps.renderToDepthTexture=mFBOsAvailable;
 
-	#if defined(TOADLET_HAS_GLES)
-		caps.textureAutogenMipMaps|=(gl_version>=11);
-	#elif defined(TOADLET_HAS_GLEW) && defined(GL_EXT_framebuffer_object)
-		caps.textureAutogenMipMaps|=(GLEW_EXT_framebuffer_object!=0);
-	#else
-		caps.textureAutogenMipMaps|=(gl_version>=14);
-	#endif
+		#if defined(TOADLET_HAS_GLEW)
+			caps.textureDot3=(GLEW_ARB_texture_env_dot3!=0);
+		#elif defined(TOADLET_HAS_GLES)
+			caps.textureDot3=(gl_version>=11);
+		#endif
 
-	#if defined(TOADLET_HAS_GLEW)
-		// Usefully, GL_TEXTURE_RECTANGLE_ARB == GL_TEXTURE_RECTANGLE_EXT == GL_TEXTURE_RECTANGLE_NV
-		caps.textureNonPowerOf2Restricted=(GLEW_ARB_texture_rectangle!=0) || (GLEW_EXT_texture_rectangle!=0) || (GLEW_NV_texture_rectangle!=0);
-		caps.renderToTextureNonPowerOf2Restricted=mFBOsAvailable && caps.textureNonPowerOf2Restricted;
-		caps.textureNonPowerOf2=(GLEW_ARB_texture_non_power_of_two!=0);
-	#endif
+		#if defined(TOADLET_HAS_GLES)
+			caps.textureAutogenMipMaps|=(gl_version>=11);
+		#elif defined(TOADLET_HAS_GLEW) && defined(GL_EXT_framebuffer_object)
+			caps.textureAutogenMipMaps|=(GLEW_EXT_framebuffer_object!=0);
+		#else
+			caps.textureAutogenMipMaps|=(gl_version>=14);
+		#endif
 
-	#if defined(TOADLET_HAS_GLEW)
-		caps.hardwareIndexBuffers=(caps.hardwareVertexBuffers=(useHardwareBuffers && GLEW_ARB_vertex_buffer_object));
-	#elif defined(TOADLET_HAS_GLES)
-		caps.hardwareIndexBuffers=(caps.hardwareVertexBuffers=(useHardwareBuffers && gl_version>=11));
-	#endif
+		#if defined(TOADLET_HAS_GLEW)
+			// Usefully, GL_TEXTURE_RECTANGLE_ARB == GL_TEXTURE_RECTANGLE_EXT == GL_TEXTURE_RECTANGLE_NV
+			caps.textureNonPowerOf2Restricted=(GLEW_ARB_texture_rectangle!=0) || (GLEW_EXT_texture_rectangle!=0) || (GLEW_NV_texture_rectangle!=0);
+			caps.renderToTextureNonPowerOf2Restricted=mFBOsAvailable && caps.textureNonPowerOf2Restricted;
+			caps.textureNonPowerOf2=(GLEW_ARB_texture_non_power_of_two!=0);
+		#endif
 
-	#if defined(TOADLET_HAS_GLEW)
-		caps.pointSprites=(GLEW_ARB_point_parameters!=0);
-	#elif defined(TOADLET_HAS_GLES)
-		caps.pointSprites=(gl_version>=11);
-	#endif
+		#if defined(TOADLET_HAS_GLEW)
+			caps.hardwareIndexBuffers=(caps.hardwareVertexBuffers=(useHardwareBuffers && GLEW_ARB_vertex_buffer_object));
+		#elif defined(TOADLET_HAS_GLES)
+			caps.hardwareIndexBuffers=(caps.hardwareVertexBuffers=(useHardwareBuffers && gl_version>=11));
+		#endif
 
-	#if defined(TOADLET_HAS_GLEW)
-		caps.vertexShaders=(GLEW_ARB_vertex_program>0);
-		if(caps.vertexShaders) glGetProgramivARB(GL_VERTEX_PROGRAM_ARB,GL_MAX_PROGRAM_ENV_PARAMETERS_ARB,(GLint*)&caps.maxVertexShaderLocalParameters);
-	#endif
+		#if defined(TOADLET_HAS_GLEW)
+			caps.pointSprites=(GLEW_ARB_point_parameters!=0);
+		#elif defined(TOADLET_HAS_GLES)
+			caps.pointSprites=(gl_version>=11);
+		#endif
 
-	#if defined(TOADLET_HAS_GLEW)
-		caps.fragmentShaders=(GLEW_ARB_fragment_program>0);
-		if(caps.fragmentShaders) glGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB,GL_MAX_PROGRAM_ENV_PARAMETERS_ARB,(GLint*)&caps.maxFragmentShaderLocalParameters);
-	#endif
+		#if defined(TOADLET_HAS_GLEW)
+			caps.vertexShaders=(GLEW_ARB_vertex_program>0);
+			if(caps.vertexShaders) glGetProgramivARB(GL_VERTEX_PROGRAM_ARB,GL_MAX_PROGRAM_ENV_PARAMETERS_ARB,(GLint*)&caps.maxVertexShaderLocalParameters);
+		#endif
 
-	#if defined(TOADLET_HAS_GLES) && defined(TOADLET_FIXED_POINT)
-		caps.idealVertexFormatBit=VertexFormat::Format_BIT_FIXED_32;
-	#else
-		caps.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
-	#endif
+		#if defined(TOADLET_HAS_GLEW)
+			caps.fragmentShaders=(GLEW_ARB_fragment_program>0);
+			if(caps.fragmentShaders) glGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB,GL_MAX_PROGRAM_ENV_PARAMETERS_ARB,(GLint*)&caps.maxFragmentShaderLocalParameters);
+		#endif
 
-	// OSX needs a notification to update the back buffer on a resize
-	#if defined(TOADLET_PLATFORM_OSX) && !defined(TOADLET_PLATFORM_EAGL)
-		mCapabilityState.resetOnResize=true;
-	#endif
+		#if defined(TOADLET_HAS_GLES) && defined(TOADLET_FIXED_POINT)
+			caps.idealVertexFormatBit=VertexFormat::Format_BIT_FIXED_32;
+		#else
+			caps.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
+		#endif
 
-	caps.triangleFan=true;
-	#if !defined(TOADLET_HAS_GLES)
-		caps.fill=true;
-		caps.cubeMap=true;
-	#else
-		mCapabilitySet.texturePerspective=true;
-		#if TOADLET_HAS_GL_20
+		// OSX needs a notification to update the back buffer on a resize
+		#if defined(TOADLET_PLATFORM_OSX) && !defined(TOADLET_PLATFORM_EAGL)
+			mCapabilityState.resetOnResize=true;
+		#endif
+
+		caps.triangleFan=true;
+		#if !defined(TOADLET_HAS_GLES)
+			caps.fill=true;
 			caps.cubeMap=true;
 		#else
-			caps.cubeMap=false;
+			mCapabilitySet.texturePerspective=true;
+			#if TOADLET_HAS_GL_20
+				caps.cubeMap=true;
+			#else
+				caps.cubeMap=false;
+			#endif
 		#endif
-	#endif
+	}
 
 	setDefaultStates();
 
@@ -622,15 +623,15 @@ void GLRenderer::endScene(){
 		mLastTypeBits=setVertexData(NULL,mLastTypeBits);
 		mLastVertexData=VertexData::wptr();
 	}
-	if(mCapabilityState.hardwareVertexBuffers){
+	if(mCaps.hardwareVertexBuffers){
 		glBindBuffer(GL_ARRAY_BUFFER,0);
 	}
-	if(mCapabilityState.hardwareIndexBuffers){
+	if(mCaps.hardwareIndexBuffers){
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 	}
 
 	int i;
-	for(i=0;i<mCapabilityState.maxTextureStages;++i){
+	for(i=0;i<mCaps.maxTextureStages;++i){
 		setSamplerState(i,NULL);
 		setTextureState(i,NULL);
 		setTexture(i,NULL);
@@ -706,7 +707,7 @@ void GLRenderer::renderPrimitive(const VertexData::ptr &vertexData,const IndexDa
 		GLenum indexType=getGLIndexType(indexBuffer->getIndexFormat());
 		GLBuffer *glindexBuffer=(GLBuffer*)indexBuffer->getRootIndexBuffer();
 		if(glindexBuffer->mHandle==0){
-			if(mCapabilityState.hardwareIndexBuffers){
+			if(mCaps.hardwareIndexBuffers){
 				glBindBuffer(glindexBuffer->mTarget,0);
 			}
 			glDrawElements(type,indexData->count,indexType,glindexBuffer->mData+indexData->start*glindexBuffer->mIndexFormat);
@@ -810,7 +811,7 @@ void GLRenderer::setDefaultStates(){
 	setAmbientColor(Math::ONE_VECTOR4);
 
 	int i;
-	for(i=0;i<mCapabilityState.maxTextureStages;++i){
+	for(i=0;i<mCaps.maxTextureStages;++i){
 		setSamplerState(i,NULL);
 		setTextureState(i,NULL);
 		setTexture(i,NULL);
@@ -1005,7 +1006,7 @@ void GLRenderer::setMaterialState(const MaterialState &state){
 }
 
 void GLRenderer::setSamplerState(int i,SamplerState *state){
-	if(i>=mCapabilityState.maxTextureStages){
+	if(i>=mCaps.maxTextureStages){
 		return;
 	}
 
@@ -1013,7 +1014,7 @@ void GLRenderer::setSamplerState(int i,SamplerState *state){
 }
 
 void GLRenderer::setTextureState(int i,TextureState *state){
-	if(i>=mCapabilityState.maxTextureStages){
+	if(i>=mCaps.maxTextureStages){
 		return;
 	}
 
@@ -1021,7 +1022,7 @@ void GLRenderer::setTextureState(int i,TextureState *state){
 }
 
 void GLRenderer::setSamplerStatePostTexture(int i,SamplerState *state){
-	if(i>=mCapabilityState.maxTextureStages){
+	if(i>=mCaps.maxTextureStages){
 		return;
 	}
 	else if(mMultiTexture){
@@ -1064,7 +1065,7 @@ void GLRenderer::setSamplerStatePostTexture(int i,SamplerState *state){
 }
 
 void GLRenderer::setTextureStatePostTexture(int i,TextureState *state){
-	if(i>=mCapabilityState.maxTextureStages){
+	if(i>=mCaps.maxTextureStages){
 		return;
 	}
 	else if(mMultiTexture){
@@ -1277,7 +1278,7 @@ void GLRenderer::setTextureStatePostTexture(int i,TextureState *state){
 }
 
 void GLRenderer::setTexture(int i,Texture *texture){
-	if(i>=mCapabilityState.maxTextureStages){
+	if(i>=mCaps.maxTextureStages){
 		return;
 	}
 	else if(mMultiTexture){
@@ -1346,7 +1347,7 @@ void GLRenderer::setPointState(const PointState &state){
 
 	// pointsize = size / sqrt(constant + linear*d + quadratic*d*d)
 	// if a&b = 0, then quadratic = 1/(C*C) where C = first component of projMatrix * 1/2 screen width
-	if(mCapabilityState.pointSprites){
+	if(mCaps.pointSprites){
 		int value;
 		if(state.sprite){
 			glEnable(GL_POINT_SPRITE);
@@ -1359,7 +1360,7 @@ void GLRenderer::setPointState(const PointState &state){
 
 		if(mMultiTexture){
 			int stage;
-			for(stage=0;stage<mCapabilityState.maxTextureStages;++stage){
+			for(stage=0;stage<mCaps.maxTextureStages;++stage){
 				glActiveTexture(GL_TEXTURE0+stage);
 				glTexEnvi(GL_POINT_SPRITE,GL_COORD_REPLACE,value);
 			}
@@ -1631,7 +1632,7 @@ int GLRenderer::setVertexData(const VertexData *vertexData,int lastSemanticBits)
 		int numElements=glvertexFormat->mSemantics.size();
 
 		if(glvertexBuffer->mHandle==0){
-			if(mCapabilityState.hardwareVertexBuffers){
+			if(mCaps.hardwareVertexBuffers){
 				glBindBuffer(glvertexBuffer->mTarget,0);
 			}
 		}

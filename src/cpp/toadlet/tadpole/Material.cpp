@@ -25,7 +25,7 @@
 
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/BackableRenderStateSet.h>
-#include <toadlet/peeper/CapabilityState.h>
+#include <toadlet/peeper/RendererCaps.h>
 #include <toadlet/tadpole/Material.h>
 
 using namespace toadlet::egg;
@@ -125,15 +125,18 @@ void Material::modifyWith(Material *material){
 	}
 }
 
-/// @todo: Optimize this so we're not resetting a ton of texture states
+/// @todo: Optimize this so we're not resetting a ton of texture states, and not requesting the caps
 void Material::setupRenderer(Renderer *renderer){
 	renderer->setRenderStateSet(mRenderStateSet);
+
+	RendererCaps caps;
+	renderer->getRendererCaps(caps);
 
 	int i;
 	for(i=0;i<getNumTextures();++i){
 		renderer->setTexture(i,getTexture(i));
 	}
-	for(;i<renderer->getCapabilityState().maxTextureStages;++i){
+	for(;i<caps.maxTextureStages;++i){
 		renderer->setTexture(i,NULL);
 	}
 }

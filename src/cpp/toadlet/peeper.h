@@ -30,7 +30,6 @@
 #include <toadlet/peeper/BackableTexture.h>
 #include <toadlet/peeper/BlendState.h>
 #include <toadlet/peeper/Buffer.h>
-#include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/peeper/IndexData.h>
@@ -42,6 +41,7 @@
 #include <toadlet/peeper/PointState.h>
 #include <toadlet/peeper/Query.h>
 #include <toadlet/peeper/Renderer.h>
+#include <toadlet/peeper/RendererCaps.h>
 #include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/peeper/Shader.h>
 #include <toadlet/peeper/Texture.h>

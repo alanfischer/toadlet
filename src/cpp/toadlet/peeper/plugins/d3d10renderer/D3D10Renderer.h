@@ -33,8 +33,8 @@
 #include <toadlet/peeper/DepthState.h>
 #include <toadlet/peeper/RasterizerState.h>
 #include <toadlet/peeper/SamplerState.h>
+#include <toadlet/peeper/RendererCaps.h>
 #include <toadlet/peeper/RenderStateSet.h>
-#include <toadlet/peeper/CapabilityState.h>
 #include <toadlet/peeper/IndexData.h>
 
 namespace toadlet{
@@ -100,7 +100,7 @@ ID3D10SamplerState *samp;
 	// Misc operations
 	int getCloseTextureFormat(int textureFormat,int usage);
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
-	const CapabilityState &getCapabilityState(){return mCapabilityState;}
+	bool getRendererCaps(RendererCaps &caps){caps.set(mCaps);return true;}
 
 	inline ID3D10Device *getD3D10Device(){return mD3DDevice;}
 
@@ -133,7 +133,7 @@ protected:
 	Matrix4x4 mViewMatrix;
 	Matrix4x4 mProjectionMatrix;
 
-	CapabilityState mCapabilityState;
+	RendererCaps mCaps;
 
 	RenderStateSet::ptr mDefaultSet;
 
