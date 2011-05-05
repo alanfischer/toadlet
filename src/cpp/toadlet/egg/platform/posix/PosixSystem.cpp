@@ -30,6 +30,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <stdlib.h>
+#include <sys/sysctl.h> // sysctlbyname()
 
 namespace toadlet{
 namespace egg{
@@ -68,6 +69,23 @@ String PosixSystem::mtimeToString(uint64 time){
 
 int PosixSystem::threadID(){
 	return (intptr_t)(int*)(pthread_self());
+}
+
+bool PosixSystem::getSystemCaps(SystemCaps &caps){
+	int result[4];
+	int infoType = 1;
+	// Thanks to Tyler Streeter for the following
+	int yes=0;
+	size_t s=sizeof(yes);
+	caps.sseVersion=0;
+	sysctlbyname("hw.optional.sse",&yes,&s,NULL,0);		if(yes) caps.sseVersion=1;
+	sysctlbyname("hw.optional.sse2",&yes,&s,NULL,0);	if(yes) caps.sseVersion=2;
+	sysctlbyname("hw.optional.sse3",&yes,&s, NULL,0);	if(yes) caps.sseVersion=3;
+	sysctlbyname("hw.optional.supplementalsse3",&yes,&s,NULL,0); if(yes) caps.sseVersion=3;
+	sysctlbyname("hw.optional.sse4_1",&yes,&s,NULL,0);	if(yes) caps.sseVersion=4;
+	sysctlbyname("hw.optional.sse4_2",&yes,&s,NULL,0);	if(yes) caps.sseVersion=4;
+
+	return true;
 }
 
 bool PosixSystem::absolutePath(const String &path){
