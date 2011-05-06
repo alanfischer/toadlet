@@ -31,9 +31,14 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <sys/sysctl.h> // sysctlbyname()
+#include <signal.h>
+#include <setjmp.h>
 
 namespace toadlet{
 namespace egg{
+
+static sigjmp_buf jmpbuf;
+static volatile sig_atomic_t doJump=0;
 
 void PosixSystem::usleep(uint64 microseconds){
 	::usleep(microseconds);
@@ -72,18 +77,9 @@ int PosixSystem::threadID(){
 }
 
 bool PosixSystem::getSystemCaps(SystemCaps &caps){
-	int result[4];
-	int infoType = 1;
-	// Thanks to Tyler Streeter for the following
-	int yes=0;
-	size_t s=sizeof(yes);
-	caps.sseVersion=0;
-	sysctlbyname("hw.optional.sse",&yes,&s,NULL,0);		if(yes) caps.sseVersion=1;
-	sysctlbyname("hw.optional.sse2",&yes,&s,NULL,0);	if(yes) caps.sseVersion=2;
-	sysctlbyname("hw.optional.sse3",&yes,&s, NULL,0);	if(yes) caps.sseVersion=3;
-	sysctlbyname("hw.optional.supplementalsse3",&yes,&s,NULL,0); if(yes) caps.sseVersion=3;
-	sysctlbyname("hw.optional.sse4_1",&yes,&s,NULL,0);	if(yes) caps.sseVersion=4;
-	sysctlbyname("hw.optional.sse4_2",&yes,&s,NULL,0);	if(yes) caps.sseVersion=4;
+	testSSE(caps);
+
+	testNEON(caps);
 
 	return true;
 }
@@ -95,6 +91,50 @@ bool PosixSystem::absolutePath(const String &path){
 
 String PosixSystem::getEnv(const String &name){
 	return getenv(name);
+}
+
+void PosixSystem::testSSE(SystemCaps &caps){
+	// Thanks to Tyler Streeter for the following
+	int result[4];
+	int infoType = 1;
+	int yes=0;
+	size_t s=sizeof(yes);
+	caps.sseVersion=0;
+	sysctlbyname("hw.optional.sse",&yes,&s,NULL,0);		if(yes) caps.sseVersion=1;
+	sysctlbyname("hw.optional.sse2",&yes,&s,NULL,0);	if(yes) caps.sseVersion=2;
+	sysctlbyname("hw.optional.sse3",&yes,&s, NULL,0);	if(yes) caps.sseVersion=3;
+	sysctlbyname("hw.optional.supplementalsse3",&yes,&s,NULL,0); if(yes) caps.sseVersion=3;
+	sysctlbyname("hw.optional.sse4_1",&yes,&s,NULL,0);	if(yes) caps.sseVersion=4;
+	sysctlbyname("hw.optional.sse4_2",&yes,&s,NULL,0);	if(yes) caps.sseVersion=4;
+}
+
+void PosixSystem::testNEON(SystemCaps &caps){
+	caps.neonVersion=0;
+    static void (*lastSignal)(int);
+    lastSignal=signal(SIGILL,signalHandler);
+    if(sigsetjmp(jmpbuf,1)){
+        signal(SIGILL,lastSignal);
+        return;
+    }
+    doJump=1;
+	asm(
+		"vadd.i16 q0,q0,q0\n\t"
+		"bx lr"
+	);
+    x264_cpu_neon_test();
+    doJump=0;
+    signal(SIGILL,lastSignal);
+	caps.neonVersion=1;
+}
+
+void PosixSystem::signalHandler(int s){
+    if(!doJump){
+        signal(s,SIG_DFL);
+        raise(s);
+    }
+
+    doJump=0;
+    siglongjmp(jmpbuf,1);
 }
 
 }
