@@ -134,6 +134,9 @@
 	#if defined(__SSE__)
 		#define TOADLET_HAS_SSE 1
 	#endif
+	#if defined(__ARM_NEON__)
+		#define TOADLET_HAS_NEON 1
+	#endif
 #else
 	#error "Unknown platform"
 #endif

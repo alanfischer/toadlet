@@ -50,6 +50,11 @@ public:
 	static bool absolutePath(const String &path);
 
 	static String getEnv(const String &name);
+	
+protected:
+	static void testSSE(SystemCaps &caps);
+	static void testNEON(SystemCaps &caps);
+	static void signalHandler(int s);
 };
 
 }
