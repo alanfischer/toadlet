@@ -115,7 +115,7 @@ bool D3D9IndexBuffer::createContext(bool restore){
 	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: CreateVertexBuffer");
 
 	if(restore && (mUsage&Usage_BIT_DYNAMIC)==0){
-		byte *data=lock(Access_BIT_WRITE);
+		tbyte *data=lock(Access_BIT_WRITE);
 		memcpy(data,mBackingData,mDataSize);
 		unlock();
 
@@ -131,7 +131,7 @@ bool D3D9IndexBuffer::destroyContext(bool backup){
 		mBackingData=new uint8[mDataSize];
 
 		TOADLET_TRY
-			byte *data=lock(Access_BIT_READ);
+			tbyte *data=lock(Access_BIT_READ);
 			if(data!=NULL){
 				memcpy(mBackingData,data,mDataSize);
 				unlock();

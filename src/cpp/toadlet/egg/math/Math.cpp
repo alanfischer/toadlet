@@ -1376,6 +1376,8 @@ static MathInitializer mathInitializer;
 void Math::init(int init){
 	mathInitializer.reference();
 
+	Logger::alert("Detecting SSE or NEON");
+
 	SystemCaps caps;
 	System::getSystemCaps(caps);
 
@@ -1423,7 +1425,7 @@ void Math::init(int init){
 
 			uint64 t4=System::utime();
 
-			Logger::alert(String("Timings - MatrixTraditional:")+(t1-t0)+" MatrixSSE:"+(t2-t1)+" TraditionalSSE:"+(t3-t2)+" VectorSSE:"+(t4-t3));
+			Logger::alert(String("Timings - MatrixTraditional:")+(t1-t0)+" MatrixSSE:"+(t2-t1)+" VectorTraditional:"+(t3-t2)+" VectorSSE:"+(t4-t3));
 
 			if(t1-t0 < t2-t1){
 				Logger::excess(Categories::TOADLET_EGG,"using Traditional Matrix4x4 math");

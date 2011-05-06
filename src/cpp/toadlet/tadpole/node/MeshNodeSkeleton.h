@@ -63,7 +63,7 @@ public:
 	public:
 		TOADLET_SHARED_POINTERS(Bone);
 
-		TOADLET_ALIGNED_NEW();
+		TOADLET_ALIGNED_NEW;
 
 		Bone(int index):
 			index(0),

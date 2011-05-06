@@ -76,7 +76,6 @@ void String::internal_String(const char *text){
 
 		return;
 	}
-
 	mLength=strlen(text);
 	mData=new stringchar[mLength+1];
 	stringchar *dest=mData;
@@ -319,10 +318,6 @@ const char *String::c_str() const{
 		while((*dest++=*source++)!=0);
 	}
 	return mNarrowData;
-}
-
-const stringchar *String::internal_wc_str() const{
-	return mData;
 }
 
 String String::toLower() const{
