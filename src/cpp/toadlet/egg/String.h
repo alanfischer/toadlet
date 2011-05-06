@@ -118,7 +118,7 @@ public:
 	const char *c_str() const;
 	inline operator const char *() const{return c_str();}
 
-	const stringchar *internal_wc_str() const;
+	const stringchar *internal_wc_str() const{return mData;}
 	inline const wchar *wc_str() const{return (const wchar*)internal_wc_str();}
 	inline operator const wchar *() const{return wc_str();}
 

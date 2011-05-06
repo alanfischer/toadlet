@@ -99,7 +99,7 @@ public:
 		InterfaceType_VISIBLE,
 	};
 
-	TOADLET_ALIGNED_NEW();
+	TOADLET_ALIGNED_NEW;
 
 	Node();
 	virtual ~Node();

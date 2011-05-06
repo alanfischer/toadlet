@@ -129,7 +129,7 @@
 	namespace toadlet{template<typename T> struct alignment_trick{char c; T member;};}
 	#define TOADLET_ALIGNOF(Type) offsetof(alignment_trick<Type>,member)
 	#define TOADLET_ALIGN(a) __attribute__((aligned(a)))
-	#define TOADLET_ALIGNED_MALLOC(size,a) memalign(size,a)
+	#define TOADLET_ALIGNED_MALLOC(size,a) memalign(a,size)
 	#define TOADLET_ALIGNED_FREE(pointer) free(pointer)
 	#if defined(__SSE__)
 		#define TOADLET_HAS_SSE 1
@@ -146,7 +146,7 @@
 #endif
 
 #define TOADLET_ALIGNED TOADLET_ALIGN(16)
-#define TOADLET_IS_ALIGNED(x) ((((int)&x)&0xF)==0)
+#define TOADLET_IS_ALIGNED(x) ((((uint64)&x)&0xF)==0)
 
 #define TOADLET_QUOTE_(x) #x
 #define TOADLET_QUOTE(x) TOADLET_QUOTE_(x)
@@ -232,12 +232,13 @@ typedef unsigned int uint32;
 }
 
 #include <malloc.h>
+#include <new>
 
-#define TOADLET_ALIGNED_NEW \
-	inline void *operator new(size_t size){return TOADLET_ALIGNED_MALLOC(size,16);} \
-	inline void operator delete(void *pointer){TOADLET_ALIGNED_FREE(pointer);} \
-	inline void *operator new[](size_t size){return TOADLET_ALIGNED_MALLOC(size,16);} \
-	inline void operator delete[](void *pointer){TOADLET_ALIGNED_FREE(pointer);}
+#define TOADLET_ALIGNED_NEW
+	inline void *operator new(size_t size) throw(std::bad_alloc){return TOADLET_ALIGNED_MALLOC(size,16);} \
+	inline void operator delete(void *pointer) throw(){TOADLET_ALIGNED_FREE(pointer);} \
+	inline void *operator new[](size_t size) throw(std::bad_alloc){return TOADLET_ALIGNED_MALLOC(size,16);} \
+	inline void operator delete[](void *pointer) throw(){TOADLET_ALIGNED_FREE(pointer);}
 
 #endif
 

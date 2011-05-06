@@ -74,17 +74,17 @@ Logger::Logger(){
 	mOutputLogEntry=true;
 	mStoreLogEntry=false;
 
-	addCategory(Categories::TOADLET_EGG_LOGGER);
-	addCategory(Categories::TOADLET_EGG_NET);
-	setCategoryReportingLevel(Categories::TOADLET_EGG_NET,Logger::Level_DISABLED); // Don't log socket errors
-	addCategory(Categories::TOADLET_EGG);
-	addCategory(Categories::TOADLET_FLICK);
-	addCategory(Categories::TOADLET_HOP);
-	addCategory(Categories::TOADLET_KNOT);
-	addCategory(Categories::TOADLET_PEEPER);
-	addCategory(Categories::TOADLET_RIBBIT);
-	addCategory(Categories::TOADLET_TADPOLE);
-	addCategory(Categories::TOADLET_PAD);
+	addCategory("toadlet.egg.Logger");//Categories::TOADLET_EGG_LOGGER);
+	addCategory("toadlet.egg.net");//Categories::TOADLET_EGG_NET);
+	setCategoryReportingLevel("toadlet.egg.net"/*Categories::TOADLET_EGG_NET*/,Logger::Level_DISABLED); // Don't log socket errors
+	addCategory("toadlet.egg");//Categories::TOADLET_EGG);
+	addCategory("toadlet.flick");//Categories::TOADLET_FLICK);
+	addCategory("toadlet.hop");//Categories::TOADLET_HOP);
+	addCategory("toadlet.knot");//Categories::TOADLET_KNOT);
+	addCategory("toadlet.peeper");//Categories::TOADLET_PEEPER);
+	addCategory("toadlet.ribbit");//Categories::TOADLET_RIBBIT);
+	addCategory("toadlet.tadpole");//Categories::TOADLET_TADPOLE);
+	addCategory("toadlet.pad");//Categories::TOADLET_PAD);
 }
 
 Logger::~Logger(){
