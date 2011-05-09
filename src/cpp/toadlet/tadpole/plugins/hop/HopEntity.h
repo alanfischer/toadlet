@@ -126,7 +126,7 @@ public:
 	// TraceCallback callbacks
 	virtual void getBound(AABox &result);
 	virtual void traceSegment(hop::Collision &result,const Vector3 &position,const Segment &segment);
-	virtual void traceSolid(hop::Collision &result,const Vector3 &position,const Segment &segment,const hop::Solid *solid);
+	virtual void traceSolid(hop::Collision &result,const hop::Solid *solid,const Vector3 &position,const Segment &segment);
 
 	// CollisionListener callbacks
 	virtual void collision(const hop::Collision &c);

@@ -127,8 +127,8 @@ int HopScene::findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids){
 	return mSensorResults->getCount();
 }
 
-void HopScene::traceSegment(hop::Collision &result,const Segment &segment){
-	if(mTraceable!=NULL){
+void HopScene::traceSegment(hop::Collision &result,const Segment &segment,int collideWithBits){
+	if(mTraceable!=NULL && (collideWithBits&mSolid->getCollisionBits())!=0){
 		tadpole::Collision collision;
 		mTraceable->traceSegment(collision,Math::ZERO_VECTOR3,segment,Math::ZERO_VECTOR3);
 		set(result,collision,NULL);
@@ -136,9 +136,9 @@ void HopScene::traceSegment(hop::Collision &result,const Segment &segment){
 	}
 }
 
-void HopScene::traceSolid(hop::Collision &result,const Segment &segment,const hop::Solid *solid){
+void HopScene::traceSolid(hop::Collision &result,const hop::Solid *solid,const Segment &segment,int collideWithBits){
 	// Only trace shapes that aren't a callback
-	if(mTraceable!=NULL && (solid->getShapeTypes()&Shape::Type_CALLBACK)==0){
+	if(mTraceable!=NULL && (collideWithBits&mSolid->getCollisionBits())!=0 && (solid->getShapeTypes()&Shape::Type_CALLBACK)==0){
 		tadpole::Collision collision;
 		const AABox &bound=solid->getLocalBound();
 		Vector3 size;

@@ -1373,18 +1373,25 @@ public:
 
 static MathInitializer mathInitializer;
 
-void Math::init(int init){
+void Math::init(){
 	mathInitializer.reference();
 
-	Logger::alert("Detecting SSE or NEON");
+	mulMatrix4x4=mulMatrix4x4Traditional;
+	preMulMatrix4x4=preMulMatrix4x4Traditional;
+	postMulMatrix4x4=postMulMatrix4x4Traditional;
+	mulVector4Matrix4x4Vector4=mulVector4Matrix4x4Vector4Traditional;
+	mulVector4Matrix4x4=mulVector4Matrix4x4Traditional;
+}
 
+void Math::optimize(int o){
 	SystemCaps caps;
 	System::getSystemCaps(caps);
 
 	Logger::alert(String("Detected SSE version:")+caps.sseVersion);
+	Logger::alert(String("Detected NEON version:")+caps.neonVersion);
 
 	#if defined(TOADLET_HAS_SSE)
-		if(init==Init_AUTO_SSE && caps.sseVersion>0){
+		if(o==Optimize_AUTO && caps.sseVersion>0){
 			// Time different paths to choose most optimal
 			static int count=1000;
 			Matrix4x4 m,r;
@@ -1455,7 +1462,7 @@ void Math::init(int init){
 				mulVector4Matrix4x4=mulVector4Matrix4x4SSE;
 			}
 		}
-		else if(init==Init_FORCE_SSE && caps.sseVersion>0){
+		else if(o==Optimize_FORCE && caps.sseVersion>0){
 			Logger::excess(Categories::TOADLET_EGG,"forcing SSE math");
 
 			mulMatrix4x4=mulMatrix4x4SSE;
@@ -1469,11 +1476,7 @@ void Math::init(int init){
 	{
 		Logger::excess(Categories::TOADLET_EGG,"forcing Traditional math");
 
-		mulMatrix4x4=mulMatrix4x4Traditional;
-		preMulMatrix4x4=preMulMatrix4x4Traditional;
-		postMulMatrix4x4=postMulMatrix4x4Traditional;
-		mulVector4Matrix4x4Vector4=mulVector4Matrix4x4Vector4Traditional;
-		mulVector4Matrix4x4=mulVector4Matrix4x4Traditional;
+		init();
 	}
 }
 

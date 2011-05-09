@@ -7,7 +7,7 @@ namespace toadlet{
 namespace tadpole{
 namespace studio{
 
-typedef Vector3 vec3_t;
+typedef float vec3_t[3];
 typedef void *cache_user_t;
 
 static const int IDST=1414743113; // "IDST"

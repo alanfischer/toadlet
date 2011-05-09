@@ -251,7 +251,7 @@ void HopEntity::traceSegment(hop::Collision &result,const Vector3 &position,cons
 	}
 }
 
-void HopEntity::traceSolid(hop::Collision &result,const Vector3 &position,const Segment &segment,const hop::Solid *solid){
+void HopEntity::traceSolid(hop::Collision &result,const hop::Solid *solid,const Vector3 &position,const Segment &segment){
 	if(mTraceable!=NULL){
 		tadpole::Collision collision;
 		const AABox &bound=solid->getLocalBound();

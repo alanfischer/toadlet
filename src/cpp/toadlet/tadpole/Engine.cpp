@@ -179,6 +179,8 @@ Engine::Engine(bool backable):
 
 	mHandles.resize(1); // Handle 0 is always NULL
 
+	Math::optimize();
+
 	// Make a guess at what the ideal format is.
 	#if defined(TOADLET_FIXED_POINT) && (defined(TOADLET_PLATFORM_WINCE) || defined(TOADLET_PLATFORM_IPHONE) || defined(TOADLET_PLATFORM_ANDROID))
 		mIdealVertexFormatBit=VertexFormat::Format_BIT_FIXED_32;

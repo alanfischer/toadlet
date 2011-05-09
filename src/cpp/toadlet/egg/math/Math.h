@@ -76,12 +76,13 @@ namespace Math{
 	const AABox ZERO_AABOX;
 
 	enum{
-		Init_AUTO_SSE=0,
-		Init_FORCE_SSE=1,
-		Init_NO_SSE=2,
+		Optimize_AUTO=0,
+		Optimize_FORCE=1,
+		Optimize_NO=2,
 	};
 
-	void init(int init=Init_AUTO_SSE);
+	TOADLET_API void init();
+	TOADLET_API void optimize(int o=Optimize_AUTO);
 
 	// Vector2 operations
 	inline void neg(Vector2 &r,const Vector2 &v){
