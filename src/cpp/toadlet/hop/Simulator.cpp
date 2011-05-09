@@ -705,9 +705,17 @@ void Simulator::reportCollisions(){
 }
 
 int Simulator::findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids) const{
+	AABox expandedBox(box);
+	expandedBox.mins.x-=mEpsilon;
+	expandedBox.mins.y-=mEpsilon;
+	expandedBox.mins.z-=mEpsilon;
+	expandedBox.maxs.x+=mEpsilon;
+	expandedBox.maxs.y+=mEpsilon;
+	expandedBox.maxs.z+=mEpsilon;
+
 	int amount=-1;
 	if(mManager!=NULL){
-		amount=mManager->findSolidsInAABox(box,solids,maxSolids);
+		amount=mManager->findSolidsInAABox(expandedBox,solids,maxSolids);
 	}
 
 	if(amount==-1){
@@ -716,7 +724,7 @@ int Simulator::findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids)
 		int i=0;
 		for(i=0;i<mSolids.size();++i){
 			s=mSolids[i];
-			if(testIntersection(box,s->mWorldBound)){
+			if(testIntersection(expandedBox,s->mWorldBound)){
 				if(amount<maxSolids){
 					solids[amount]=s;
 				}
@@ -1014,7 +1022,7 @@ void Simulator::testSolid(Collision &result,Solid *solid1,const Segment &segment
 				isegment.origin.set(solid2->mPosition);
 				Math::mul(isegment.direction,segment.direction,-Math::ONE);
 
-				shape1->mCallback->traceSolid(collision,segment.origin,isegment,solid2);
+				shape1->mCallback->traceSolid(collision,solid2,segment.origin,isegment);
 
 				// This will do most of the inverting, but the point still needs to be recalculated,
 				//  since invert is mainly used for swapping reference solid
@@ -1031,7 +1039,7 @@ void Simulator::testSolid(Collision &result,Solid *solid1,const Segment &segment
 				modifyScope=true;
 			}
 			else if(shape1->mType!=Shape::Type_CALLBACK && shape2->mType==Shape::Type_CALLBACK){
-				shape2->mCallback->traceSolid(collision,solid2->mPosition,segment,solid1);
+				shape2->mCallback->traceSolid(collision,solid1,solid2->mPosition,segment);
 				modifyScope=true;
 			}
 
@@ -1169,7 +1177,7 @@ void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment 
 
 	if(mManager!=NULL){
 		collision.time=ONE;
-		mManager->traceSegment(collision,segment);
+		mManager->traceSegment(collision,segment,collideWithBits);
 		int scope=result.scope;
 		if(collision.time<ONE){
 			if(collision.time<result.time){
@@ -1226,7 +1234,7 @@ void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,con
 
 	if(mManager!=NULL){
 		collision.time=ONE;
-		mManager->traceSolid(collision,segment,solid);
+		mManager->traceSolid(collision,solid,segment,collideWithBits);
 		int scope=result.scope;
 		if(collision.time<ONE){
 			if(collision.time<result.time){

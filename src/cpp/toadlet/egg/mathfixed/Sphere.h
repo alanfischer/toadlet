@@ -32,7 +32,7 @@ namespace toadlet{
 namespace egg{
 namespace mathfixed{
 
-class TOADLET_API TOADLET_ALIGNED Sphere{
+class TOADLET_API Sphere{
 public:
 	inline Sphere():radius(0){}
 

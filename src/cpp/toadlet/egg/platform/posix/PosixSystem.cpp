@@ -43,6 +43,10 @@ static volatile sig_atomic_t doJump=0;
 	__asm__ __volatile__ ("cpuid": \
 	"=a" (r[0]), "=b" (r[1]), "=c" (r[2]), "=d" (r[3]): "a" (infoType));
 
+#define TOADLET_CPUID(func,ax,bx,cx,dx) \
+	__asm__ __volatile__ ("cpuid": \
+	"=a" (ax), "=b" (bx), "=c" (cx), "=d" (dx) : "a" (func));
+
 void PosixSystem::usleep(uint64 microseconds){
 	::usleep(microseconds);
 }
@@ -98,6 +102,7 @@ String PosixSystem::getEnv(const String &name){
 
 void PosixSystem::testSSE(SystemCaps &caps){
 	#if !defined(TOADLET_PLATFORM_OSX)
+	#if defined(TOADLET_PLATFORM_OSX)
 		int result[4];
 		int infoType=1;
 		TOADLET_CPUID(result,infoType);

@@ -55,6 +55,7 @@
 	#pragma warning(disable:4250) // inherits via dominance
 	#pragma warning(disable:4251) // base class not declared with the __declspec(dllexport) keyword
 	#pragma warning(disable:4275) // exported class derived from a class that was not exported.
+	#pragma warning(disable:4290) // C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
 	#pragma warning(1:4296) // expression is always true/false
 	#pragma warning(1:4668) // a symbol that was not defined was used with a preprocessor directive. The symbol will evaluate to false.
 	#pragma warning(1:4287 4289 4302)
