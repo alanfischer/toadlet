@@ -131,12 +131,12 @@ void HopScene::traceSegment(hop::Collision &result,const Segment &segment,int co
 	if(mTraceable!=NULL && (collideWithBits&mSolid->getCollisionBits())!=0){
 		tadpole::Collision collision;
 		mTraceable->traceSegment(collision,Math::ZERO_VECTOR3,segment,Math::ZERO_VECTOR3);
-		set(result,collision,NULL);
+		set(result,collision,NULL,NULL);
 		result.collider=mSolid;
 	}
 }
 
-void HopScene::traceSolid(hop::Collision &result,const hop::Solid *solid,const Segment &segment,int collideWithBits){
+void HopScene::traceSolid(hop::Collision &result,hop::Solid *solid,const Segment &segment,int collideWithBits){
 	// Only trace shapes that aren't a callback
 	if(mTraceable!=NULL && (collideWithBits&mSolid->getCollisionBits())!=0 && (solid->getShapeTypes()&Shape::Type_CALLBACK)==0){
 		tadpole::Collision collision;
@@ -144,7 +144,7 @@ void HopScene::traceSolid(hop::Collision &result,const hop::Solid *solid,const S
 		Vector3 size;
 		Math::sub(size,bound.maxs,bound.mins);
 		mTraceable->traceSegment(collision,Math::ZERO_VECTOR3,segment,size);
-		set(result,collision,NULL);
+		set(result,collision,NULL,solid);
 		result.collider=mSolid;
 	}
 }
@@ -157,12 +157,13 @@ void HopScene::set(tadpole::Collision &r,const hop::Collision &c){
 	r.scope=c.scope;
 }
 
-void HopScene::set(hop::Collision &r,const tadpole::Collision &c,HopEntity *collider){
+void HopScene::set(hop::Collision &r,const tadpole::Collision &c,Solid *collider,Solid *collidee){
 	r.time=c.time;
 	r.point.set(c.point);
 	r.normal.set(c.normal);
 	// Since the c.collider passed in could be any Node, not necessarily a HopEntity, we force a passing in of a Collider
-	if(collider!=NULL){r.collider=collider->getSolid();}
+	if(collider!=NULL){r.collider=collider;}
+	if(collidee!=NULL){r.collidee=collidee;}
 	r.scope=c.scope;
 }
 

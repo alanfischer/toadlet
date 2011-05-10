@@ -73,7 +73,7 @@ public:
 	virtual void setTraceable(Traceable *traceable){mTraceable=traceable;}
 	virtual int findSolidsInAABox(const AABox &box,hop::Solid *solids[],int maxSolids);
 	virtual void traceSegment(hop::Collision &result,const Segment &segment,int collideWithBits);
-	virtual void traceSolid(hop::Collision &result,const hop::Solid *solid,const Segment &segment,int collideWithBits);
+	virtual void traceSolid(hop::Collision &result,hop::Solid *solid,const Segment &segment,int collideWithBits);
 	virtual void preUpdate(int dt,scalar fdt){}
 	virtual void postUpdate(int dt,scalar fdt){}
 	virtual void preUpdate(hop::Solid *solid,int dt,scalar fdt){}
@@ -82,7 +82,7 @@ public:
 	virtual void postUpdate(hop::Solid *solid,int dt,scalar fdt){}
 
 	static void set(tadpole::Collision &r,const hop::Collision &c);
-	static void set(hop::Collision &r,const tadpole::Collision &c,HopEntity *collider);
+	static void set(hop::Collision &r,const tadpole::Collision &c,hop::Solid *collider,hop::Solid *collidee);
 
 	hop::Collision cache_traceSegment_collision;
 
