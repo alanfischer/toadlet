@@ -116,7 +116,6 @@ bool ParentNode::attach(Node *node){
 	activate();
 
 	node->frameUpdate(0,-1);
-	mergeWorldBound(node,true);
 
 	return true;
 }
@@ -180,10 +179,6 @@ void ParentNode::logicUpdate(int dt,int scope){
 				mChildrenActive=true;
 			}
 		}
-
-		if(dependent==false){
-			mergeWorldBound(child,false);
-		}
 	}
 
 	mActivateChildren=false;
@@ -218,10 +213,6 @@ void ParentNode::frameUpdate(int dt,int scope){
 			else{
 				child->frameUpdate(dt,scope);
 			}
-		}
-
-		if(dependent==false){
-			mergeWorldBound(child,false);
 		}
 	}
 
@@ -281,7 +272,6 @@ void ParentNode::updateAllWorldTransforms(){
 	int i;
 	for(i=0;i<mChildren.size();++i){
 		mChildren[i]->updateAllWorldTransforms();
-		mergeWorldBound(mChildren[i],false);
 	}
 }
 

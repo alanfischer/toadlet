@@ -225,7 +225,6 @@ void Scene::logicUpdate(int dt,int scope){
 		for(int i=0;i<dependents.size();++i){
 			Node *dependent=dependents[i];
 			dependent->logicUpdate(dt,scope);
-			dependent->getParent()->mergeWorldBound(dependents[i],false);
 		}
 		/// @todo: This isnt the best check, since we could have an equal amount of dependents added and removed in a frame, and thats not circular
 		if(dependents.size()==mDependents.size()){
@@ -246,7 +245,6 @@ void Scene::frameUpdate(int dt,int scope){
 		for(int i=0;i<dependents.size();++i){
 			Node *dependent=dependents[i];
 			dependent->frameUpdate(dt,scope);
-			dependent->getParent()->mergeWorldBound(dependents[i],false);
 		}
 		/// @todo: This isnt the best check, since we could have an equal amount of dependents added and removed in a frame, and thats not circular
 		if(dependents.size()==mDependents.size()){

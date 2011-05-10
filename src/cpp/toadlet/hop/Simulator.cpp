@@ -450,6 +450,7 @@ void Simulator::update(int dt,int scope,Solid *solid){
 			}
 
 			path.setStartEnd(oldPosition,newPosition);
+
 			traceSolidWithCurrentSpacials(c,solid,path,solid->mCollideWithBits);
 			if(c.time<ONE){
 				// Calculate offset vector, and then resulting position

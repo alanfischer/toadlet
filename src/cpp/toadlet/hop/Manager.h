@@ -38,7 +38,7 @@ public:
 
 	virtual int findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids)=0;
 	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits)=0;
-	virtual void traceSolid(Collision &result,const Solid *solid,const Segment &segment,int collideWithBits)=0;
+	virtual void traceSolid(Collision &result,Solid *solid,const Segment &segment,int collideWithBits)=0;
 	virtual void preUpdate(int dt,scalar fdt)=0;
 	virtual void postUpdate(int dt,scalar fdt)=0;
 	virtual void preUpdate(Solid *solid,int dt,scalar fdt)=0;

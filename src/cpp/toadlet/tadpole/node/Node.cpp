@@ -326,6 +326,10 @@ void Node::updateWorldTransform(){
 	}
 
 	mWorldBound.transform(mBound,mWorldTransform);
+
+	if(mParent!=NULL){
+		((ParentNode*)mParent.get())->mergeWorldBound(this,false);
+	}
 }
 
 void Node::transformUpdated(int tu){

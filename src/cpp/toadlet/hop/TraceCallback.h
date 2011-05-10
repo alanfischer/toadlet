@@ -39,7 +39,7 @@ public:
 
 	virtual void getBound(AABox &result)=0;
 	virtual void traceSegment(Collision &result,const Vector3 &position,const Segment &segment)=0;
-	virtual void traceSolid(Collision &result,const Solid *solid,const Vector3 &position,const Segment &segment)=0;
+	virtual void traceSolid(Collision &result,Solid *solid,const Vector3 &position,const Segment &segment)=0;
 };
 
 }
