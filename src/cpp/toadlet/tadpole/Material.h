@@ -47,21 +47,27 @@ public:
 
 	void setBlendState(const peeper::BlendState &state){mRenderStateSet->setBlendState(state);}
 	bool getBlendState(peeper::BlendState &state) const{return mRenderStateSet->getBlendState(state);}
+	bool hasBlendState() const{peeper::BlendState state;return mRenderStateSet->getBlendState(state);}
 
 	void setDepthState(const peeper::DepthState &state){mRenderStateSet->setDepthState(state);}
 	bool getDepthState(peeper::DepthState &state) const{return mRenderStateSet->getDepthState(state);}
+	bool hasDepthState() const{peeper::DepthState state;return mRenderStateSet->getDepthState(state);}
 
 	void setRasterizerState(const peeper::RasterizerState &state){mRenderStateSet->setRasterizerState(state);}
 	bool getRasterizerState(peeper::RasterizerState &state) const{return mRenderStateSet->getRasterizerState(state);}
+	bool hasRasterizerState() const{peeper::RasterizerState state;return mRenderStateSet->getRasterizerState(state);}
 
 	void setFogState(const peeper::FogState &state){mRenderStateSet->setFogState(state);}
 	bool getFogState(peeper::FogState &state) const{return mRenderStateSet->getFogState(state);}
+	bool hasFogState() const{peeper::FogState state;return mRenderStateSet->getFogState(state);}
 
 	void setPointState(const peeper::PointState &state){mRenderStateSet->setPointState(state);}
 	bool getPointState(peeper::PointState &state) const{return mRenderStateSet->getPointState(state);}
+	bool hasPointState() const{peeper::PointState state;return mRenderStateSet->getPointState(state);}
 
 	void setMaterialState(const peeper::MaterialState &state){mRenderStateSet->setMaterialState(state);}
 	bool getMaterialState(peeper::MaterialState &state) const{return mRenderStateSet->getMaterialState(state);}
+	bool hasMaterialState() const{peeper::MaterialState state;return mRenderStateSet->getMaterialState(state);}
 
 	int getNumSamplerStates() const{return mRenderStateSet->getNumSamplerStates();}
 	void setSamplerState(int i,const peeper::SamplerState &state){return mRenderStateSet->setSamplerState(i,state);}
