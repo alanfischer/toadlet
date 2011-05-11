@@ -57,6 +57,7 @@ Simulator::Simulator():
 	mQuarterEpsilon(0),
 
 	mSnapToGrid(false),
+	mAverageNormals(false),
 	mMaxPositionComponent(0),
 	mMaxVelocityComponent(0),
 	mMaxForceComponent(0),
@@ -111,52 +112,12 @@ Simulator::~Simulator(){
 	}
 #endif
 
-void Simulator::setIntegrator(Integrator integrator){
-	mIntegrator=integrator;
-}
-
-void Simulator::setSnapToGrid(bool snap){
-	mSnapToGrid=snap;
-}
-
-void Simulator::setMaxPositionComponent(scalar maxPositionComponent){
-	mMaxPositionComponent=maxPositionComponent;
-}
-
-void Simulator::setMaxVelocityComponent(scalar maxVelocityComponent){
-	mMaxVelocityComponent=maxVelocityComponent;
-}
-
-void Simulator::setMaxForceComponent(scalar maxForceComponent){
-	mMaxForceComponent=maxForceComponent;
-}
-
-void Simulator::setFluidVelocity(const Vector3 &fluidVelocity){
-	mFluidVelocity=fluidVelocity;
-}
-
 void Simulator::setGravity(const Vector3 &gravity){
 	mGravity.set(gravity);
 	int i;
 	for(i=0;i<mSolids.size();++i){
 		mSolids[i]->activate();
 	}
-}
-
-void Simulator::setManager(Manager *manager){
-	mManager=manager;
-}
-
-void Simulator::setMicroCollisionThreshold(scalar threshold){
-	mMicroCollisionThreshold=threshold;
-}
-
-void Simulator::setDeactivateSpeed(scalar speed){
-	mDeactivateSpeed=speed;
-}
-
-void Simulator::setDeactivateCount(int count){
-	mDeactivateCount=count;
 }
 
 void Simulator::addSolid(Solid::ptr solid){
@@ -1164,7 +1125,7 @@ void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment 
 				if(collision.time<result.time){
 					result.set(collision);
 				}
-				else if(result.time==collision.time){
+				else if(mAverageNormals && result.time==collision.time){
 					add(result.normal,collision.normal);
 					bool b=normalizeCarefully(result.normal,mEpsilon);
 					if(b==false){
@@ -1184,7 +1145,7 @@ void Simulator::traceSegmentWithCurrentSpacials(Collision &result,const Segment 
 			if(collision.time<result.time){
 				result.set(collision);
 			}
-			else if(result.time==collision.time){
+			else if(mAverageNormals && result.time==collision.time){
 				add(result.normal,collision.normal);
 				bool b=normalizeCarefully(result.normal,mEpsilon);
 				if(b==false){
@@ -1221,7 +1182,7 @@ void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,con
 				if(collision.time<result.time){
 					result.set(collision);
 				}
-				else if(result.time==collision.time){
+				else if(mAverageNormals && result.time==collision.time){
 					add(result.normal,collision.normal);
 					bool b=normalizeCarefully(result.normal,mEpsilon);
 					if(b==false){
@@ -1241,7 +1202,7 @@ void Simulator::traceSolidWithCurrentSpacials(Collision &result,Solid *solid,con
 			if(collision.time<result.time){
 				result.set(collision);
 			}
-			else if(result.time==collision.time){
+			else if(mAverageNormals && result.time==collision.time){
 				add(result.normal,collision.normal);
 				bool b=normalizeCarefully(result.normal,mEpsilon);
 				if(b==false){

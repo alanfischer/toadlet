@@ -60,35 +60,38 @@ public:
 		scalar getEpsilon() const{return mEpsilon;}
 	#endif
 
-	void setIntegrator(Integrator integrator);
+	void setIntegrator(Integrator integrator){mIntegrator=integrator;}
 	Integrator getIntegrator() const{return mIntegrator;}
 
-	void setSnapToGrid(bool snap);
+	void setSnapToGrid(bool snap){mSnapToGrid=snap;}
 	bool getSnapToGrid() const{return mSnapToGrid;}
 
-	void setMaxPositionComponent(scalar maxPositionComponent);
+	void setAverageNormals(bool average){mAverageNormals=average;}
+	bool getAverageNormals() const{return mAverageNormals;}
+
+	void setMaxPositionComponent(scalar maxPositionComponent){mMaxPositionComponent=maxPositionComponent;}
 	scalar getMaxPositionComponent() const{return mMaxPositionComponent;}
 
-	void setMaxVelocityComponent(scalar maxVelocityComponent);
+	void setMaxVelocityComponent(scalar maxVelocityComponent){mMaxVelocityComponent=maxVelocityComponent;}
 	scalar getMaxVelocityComponent() const{return mMaxVelocityComponent;}
 
-	void setMaxForceComponent(scalar maxForceComponent);
+	void setMaxForceComponent(scalar maxForceComponent){mMaxForceComponent=maxForceComponent;}
 	scalar getMaxForceComponent() const{return mMaxForceComponent;}
 
-	void setFluidVelocity(const Vector3 &fluidVelocity);
+	void setFluidVelocity(const Vector3 &fluidVelocity){mFluidVelocity.set(fluidVelocity);}
 	const Vector3 &getFluidVelocity() const{return mFluidVelocity;}
 
 	void setGravity(const Vector3 &gravity);
 	const Vector3 &getGravity() const{return mGravity;}
 
-	void setManager(Manager *manager);
+	void setManager(Manager *manager){mManager=manager;}
 	Manager *getManager() const{return mManager;}
 
-	void setMicroCollisionThreshold(scalar threshold);
+	void setMicroCollisionThreshold(scalar threshold){mMicroCollisionThreshold=threshold;}
 	scalar getMicroCollisionThreshold() const{return mMicroCollisionThreshold;}
 
-	void setDeactivateSpeed(scalar speed);
-	void setDeactivateCount(int count);
+	void setDeactivateSpeed(scalar speed){mDeactivateSpeed=speed;}
+	void setDeactivateCount(int count){mDeactivateCount=count;}
 
 	void addSolid(Solid::ptr solid);
 	void removeSolid(Solid *solid);
@@ -147,6 +150,7 @@ protected:
 	scalar mQuarterEpsilon;
 
 	bool mSnapToGrid;
+	bool mAverageNormals;
 	scalar mMaxPositionComponent;
 	scalar mMaxVelocityComponent;
 	scalar mMaxForceComponent;
