@@ -108,13 +108,13 @@ public:
 	void transformNormal(Vector3 &r,const Vector3 &n) const{
 		Math::mul(r,mRotate,n);
 		Math::div(r,mScale);
-		Math::normalize(r);
+		Math::normalizeCarefully(r,0);
 	}
 
 	void transformNormal(Vector3 &r) const{
 		Math::mul(r,mRotate);
 		Math::div(r,mScale);
-		Math::normalize(r);
+		Math::normalizeCarefully(r,0);
 	}
 
 	void inverseTransform(Vector3 &r,const Vector3 &v) const{
