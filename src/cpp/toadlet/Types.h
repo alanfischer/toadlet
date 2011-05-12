@@ -97,6 +97,7 @@
 	#define TOADLET_COMPILER_GCC 1
 	#include <sys/param.h>
 	#include <stdlib.h>
+	#include <malloc.h>
 	#include <new>
 	#if defined(__BYTE_ORDER)
 		#if __BYTE_ORDER == __LITTLE_ENDIAN
