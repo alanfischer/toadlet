@@ -36,7 +36,8 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${toadlet_SOURCE_DIR}/cmake/Modules
 
 # Setup options
 if (WIN32)
-	set (TOADLET_PLATFORM_WIN32 ON) # This is setup in the toolchain file until cmake has built-in support for wince
+	set (TOADLET_PLATFORM_WIN32 ON)
+	# This is setup in the toolchain file until cmake has built-in support for wince
 	#option (TOADLET_PLATFORM_WINCE "Build for Windows CE devices" OFF)
 	option (TOADLET_PLATFORM_ANDROID "Build for Android devices" OFF)
 	option (TOADLET_PLATFORM_BLACKBERRY "Build for Blackberry devices" OFF)
