@@ -127,9 +127,9 @@
 	#endif
 	namespace toadlet{
 		typedef wchar_t wchar;
+		template<typename T> struct alignment_trick{char c; T member;};
 	}
 	#define TOADLET_SIZEOF_WCHAR 32
-	namespace toadlet{template<typename T> struct alignment_trick{char c; T member;};}
 	#define TOADLET_ALIGNOF(Type) offsetof(alignment_trick<Type>,member)
 	#define TOADLET_ALIGN(a) __attribute__((aligned(a)))
 	inline void *toadlet_malloc(int size,int a){void *r=NULL;posix_memalign(&r,a,size);return r;}

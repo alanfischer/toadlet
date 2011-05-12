@@ -719,19 +719,22 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 						}
 
 						String element=line.substr(j,space);
-						int sematic=vertexFormat->getSemantic(c);
-						if(sematic==VertexFormat::Semantic_POSITION){
+						int semantic=-1;
+						if(c<vertexFormat->getNumElements()){
+							semantic=vertexFormat->getSemantic(c);
+						}
+						if(semantic==VertexFormat::Semantic_POSITION){
 							Vector3 position=parseVector3(element);
 							bound.merge(position);
 							vba.set3(l,pi,position);
 						}
-						else if(sematic==VertexFormat::Semantic_NORMAL){
+						else if(semantic==VertexFormat::Semantic_NORMAL){
 							vba.set3(l,ni,parseVector3(element));
 						}
-						else if(sematic==VertexFormat::Semantic_TEX_COORD){
+						else if(semantic==VertexFormat::Semantic_TEX_COORD){
 							vba.set2(l,ti,parseVector2(element));
 						}
-						else if(sematic==VertexFormat::Semantic_COLOR){
+						else if(semantic==VertexFormat::Semantic_COLOR){
  							vba.setRGBA(l,ci,parseVector4(element).getRGBA());
 						}
 						else if(vbas.size()>0){
