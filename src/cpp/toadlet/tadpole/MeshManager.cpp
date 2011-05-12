@@ -430,7 +430,7 @@ Mesh::ptr MeshManager::createSkyDome(const Sphere &sphere,int numSegments,int nu
 	Mesh::ptr mesh=createSkyDome(vertexBuffer,indexBuffer,sphere,numSegments,numRings,fade);
 	if(material==NULL){
 		material=mEngine->getMaterialManager()->createMaterial();
-		material->setDepthState(DepthState(DepthState::DepthTest_NONE,false));
+		material->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 		material->setMaterialState(MaterialState(false));
 	}
 	material->retain();

@@ -103,7 +103,7 @@ Node *CameraNode::create(Scene *scene){
 
 	mGamma=Math::ONE;
 	mGammaMaterial=mEngine->getMaterialManager()->createMaterial();
-	mGammaMaterial->setDepthState(DepthState(DepthState::DepthTest_NONE,false));
+	mGammaMaterial->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 	mGammaMaterial->setMaterialState(MaterialState(Math::ZERO_VECTOR4));
 	mGammaMaterial->retain();
 
@@ -459,7 +459,7 @@ Mesh::ptr CameraNode::renderToSkyBox(Renderer *renderer,int format,int size,scal
 		}
 
 		skyboxMaterial[i]=mEngine->getMaterialManager()->createMaterial(skyboxTexture[i],true);
-		skyboxMaterial[i]->setDepthState(DepthState(DepthState::DepthTest_NONE,false));
+		skyboxMaterial[i]->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 	}
 
 	setAlignmentCalculationsUseOrigin(oldAlignment);

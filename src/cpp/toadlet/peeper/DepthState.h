@@ -34,7 +34,6 @@ namespace peeper{
 class TOADLET_API DepthState{
 public:
 	enum DepthTest{
-		DepthTest_NONE,
 		DepthTest_NEVER,
 		DepthTest_LESS,
 		DepthTest_EQUAL,

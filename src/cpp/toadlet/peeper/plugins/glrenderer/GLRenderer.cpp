@@ -886,7 +886,7 @@ void GLRenderer::setBlendState(const BlendState &state){
 void GLRenderer::setDepthState(const DepthState &state){
 	mDepthState.set(state);
 
-	if(state.test==DepthState::DepthTest_NONE){
+	if(state.test==DepthState::DepthTest_NEVER){
 		glDisable(GL_DEPTH_TEST);
 	}
 	else{
