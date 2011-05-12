@@ -100,7 +100,6 @@ public:
 	void setTexture(int i,Texture *texture);
 
 	// Old fixed states
-	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff);
 	void setNormalize(const Normalize &normalize);
 	void setLightEnabled(int i,bool enable);
 	void setLightState(int i,const LightState &state);
@@ -142,7 +141,7 @@ public:
 	#endif
 
 	static GLenum getGLDepthFunc(DepthState::DepthTest test);
-	static GLenum getGLAlphaFunc(AlphaTest test);
+	static GLenum getGLAlphaFunc(MaterialState::AlphaTest test);
 	static GLenum getGLBlendOperation(BlendState::Operation operation);
 	static GLenum getGLCullFace(RasterizerState::CullType type);
 	static GLenum getGLPolygonMode(RasterizerState::FillType type);

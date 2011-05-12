@@ -466,7 +466,6 @@ bool D3D9Renderer::copySurface(IDirect3DSurface9 *dst,IDirect3DSurface9 *src){
 }
 
 void D3D9Renderer::setDefaultStates(){
-	setAlphaTest(AlphaTest_NONE,0.5);
 	setBlendState(BlendState::Combination_DISABLED);
 	setDepthState(DepthState());
 	setFogState(FogState());
@@ -529,41 +528,6 @@ bool D3D9Renderer::setRenderStateSet(RenderStateSet *set){
 	return true;
 }
 
-void D3D9Renderer::setAlphaTest(const AlphaTest &alphaTest,scalar cutoff){
-	if(alphaTest==AlphaTest_NONE){
-		mD3DDevice->SetRenderState(D3DRS_ALPHATESTENABLE,false);
-	}
-	else{
-		mD3DDevice->SetRenderState(D3DRS_ALPHATESTENABLE,true);
-
-		mD3DDevice->SetRenderState(D3DRS_ALPHAREF,Math::toInt(cutoff*255));
-
-		switch(alphaTest){
-			case AlphaTest_LESS:
-				mD3DDevice->SetRenderState(D3DRS_ALPHAFUNC,D3DCMP_LESS);
-			break;
-			case AlphaTest_EQUAL:
-				mD3DDevice->SetRenderState(D3DRS_ALPHAFUNC,D3DCMP_EQUAL);
-			break;
-			case AlphaTest_LEQUAL:
-				mD3DDevice->SetRenderState(D3DRS_ALPHAFUNC,D3DCMP_LESSEQUAL);
-			break;
-			case AlphaTest_GREATER:
-				mD3DDevice->SetRenderState(D3DRS_ALPHAFUNC,D3DCMP_GREATER);
-			break;
-			case AlphaTest_NOTEQUAL:
-				mD3DDevice->SetRenderState(D3DRS_ALPHAFUNC,D3DCMP_NOTEQUAL);
-			break;
-			case AlphaTest_GEQUAL:
-				mD3DDevice->SetRenderState(D3DRS_ALPHAFUNC,D3DCMP_GREATEREQUAL);
-			break;
-			case AlphaTest_ALWAYS:
-				mD3DDevice->SetRenderState(D3DRS_ALPHAFUNC,D3DCMP_ALWAYS);
-			break;
-		}
-	}
-}
-
 void D3D9Renderer::setBlendState(const BlendState &state){
 	if(state.equals(BlendState::Combination_DISABLED)){
 		mD3DDevice->SetRenderState(D3DRS_SRCBLEND,D3DBLEND_ONE);
@@ -587,42 +551,11 @@ void D3D9Renderer::setDepthState(const DepthState &state){
 	HRESULT hr=S_OK;
 
 	if(state.test==DepthState::DepthTest_NONE){
-		hr=mD3DDevice->SetRenderState(D3DRS_ZENABLE,D3DZB_FALSE);
+		mD3DDevice->SetRenderState(D3DRS_ZENABLE,D3DZB_FALSE);
 	}
 	else{
-		hr=mD3DDevice->SetRenderState(D3DRS_ZENABLE,D3DZB_TRUE);
-
-		DWORD func=0;
-
-		switch(state.test){
-			case DepthState::DepthTest_NEVER:
-				func=D3DCMP_NEVER;
-			break;
-			case DepthState::DepthTest_LESS:
-				func=D3DCMP_LESS;
-			break;
-			case DepthState::DepthTest_EQUAL:
-				func=D3DCMP_EQUAL;
-			break;
-			case DepthState::DepthTest_LEQUAL:
-				func=D3DCMP_LESSEQUAL;
-			break;
-			case DepthState::DepthTest_GREATER:
-				func=D3DCMP_GREATER;
-			break;
-			case DepthState::DepthTest_NOTEQUAL:
-				func=D3DCMP_NOTEQUAL;
-			break;
-			case DepthState::DepthTest_GEQUAL:
-				func=D3DCMP_GREATEREQUAL;
-			break;
-			case DepthState::DepthTest_ALWAYS:
-				func=D3DCMP_ALWAYS;
-			break;
-		}
-
-		hr=mD3DDevice->SetRenderState(D3DRS_ZFUNC,func);
-		TOADLET_CHECK_D3D9ERROR(hr,"setDepthState");
+		mD3DDevice->SetRenderState(D3DRS_ZENABLE,D3DZB_TRUE);
+		mD3DDevice->SetRenderState(D3DRS_ZFUNC,getD3DCMPFUNC(state.test));
 	}
 
 	hr=mD3DDevice->SetRenderState(D3DRS_ZWRITEENABLE,state.write);
@@ -676,6 +609,15 @@ void D3D9Renderer::setMaterialState(const MaterialState &state){
 	}
 
 	mD3DDevice->SetRenderState(D3DRS_SHADEMODE,getD3DSHADEMODE(state.shade));
+
+	if(state.alphaTest==MaterialState::AlphaTest_NEVER){
+		mD3DDevice->SetRenderState(D3DRS_ALPHATESTENABLE,false);
+	}
+	else{
+		mD3DDevice->SetRenderState(D3DRS_ALPHATESTENABLE,true);
+		mD3DDevice->SetRenderState(D3DRS_ALPHAREF,Math::toInt(state.alphaCutoff*255));
+		mD3DDevice->SetRenderState(D3DRS_ALPHAFUNC,getD3DCMPFUNC(state.alphaTest));
+	}
 }
 
 void D3D9Renderer::setPointState(const PointState &state){
@@ -1297,6 +1239,58 @@ D3DFOGMODE D3D9Renderer::getD3DFOGMODE(FogState::FogType type){
 			Error::unknown(Categories::TOADLET_PEEPER,
 				"invalid fog type");
 			return D3DFOG_NONE;
+		break;
+	}
+}
+
+D3DCMPFUNC D3D9Renderer::getD3DCMPFUNC(MaterialState::AlphaTest type){
+	switch(type){
+		case MaterialState::AlphaTest_NEVER:
+			return D3DCMP_NEVER;
+		case MaterialState::AlphaTest_LESS:
+			return D3DCMP_LESS;
+		case MaterialState::AlphaTest_EQUAL:
+			return D3DCMP_EQUAL;
+		case MaterialState::AlphaTest_LEQUAL:
+			return D3DCMP_LESSEQUAL;
+		case MaterialState::AlphaTest_GREATER:
+			return D3DCMP_GREATER;
+		case MaterialState::AlphaTest_NOTEQUAL:
+			return D3DCMP_NOTEQUAL;
+		case MaterialState::AlphaTest_GEQUAL:
+			return D3DCMP_GREATEREQUAL;
+		case MaterialState::AlphaTest_ALWAYS:
+			return D3DCMP_ALWAYS;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"invalid alpha test");
+			return D3DCMP_NEVER;
+		break;
+	}
+}
+
+D3DCMPFUNC D3D9Renderer::getD3DCMPFUNC(DepthState::DepthTest type){
+	switch(type){
+		case DepthState::DepthTest_NEVER:
+			return D3DCMP_NEVER;
+		case DepthState::DepthTest_LESS:
+			return D3DCMP_LESS;
+		case DepthState::DepthTest_EQUAL:
+			return D3DCMP_EQUAL;
+		case DepthState::DepthTest_LEQUAL:
+			return D3DCMP_LESSEQUAL;
+		case DepthState::DepthTest_GREATER:
+			return D3DCMP_GREATER;
+		case DepthState::DepthTest_NOTEQUAL:
+			return D3DCMP_NOTEQUAL;
+		case DepthState::DepthTest_GEQUAL:
+			return D3DCMP_GREATEREQUAL;
+		case DepthState::DepthTest_ALWAYS:
+			return D3DCMP_ALWAYS;
+		default:
+			Error::unknown(Categories::TOADLET_PEEPER,
+				"invalid depth test");
+			return D3DCMP_NEVER;
 		break;
 	}
 }

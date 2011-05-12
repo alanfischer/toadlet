@@ -39,6 +39,17 @@ public:
 		ShadeType_PHONG
 	};
 
+	enum AlphaTest{
+		AlphaTest_NEVER,
+		AlphaTest_LESS,
+		AlphaTest_EQUAL,
+		AlphaTest_LEQUAL,
+		AlphaTest_GREATER,
+		AlphaTest_NOTEQUAL,
+		AlphaTest_GEQUAL,
+		AlphaTest_ALWAYS,
+	};
+
 	MaterialState():
 		lighting(true),
 		ambient(Math::ONE_VECTOR4),
@@ -47,7 +58,9 @@ public:
 		shininess(Math::ONE),
 		emissive(Math::ZERO_VECTOR4),
 		trackColor(false),
-		shade(ShadeType_GOURAUD)
+		shade(ShadeType_GOURAUD),
+		alphaTest(AlphaTest_NEVER),
+		alphaCutoff(Math::HALF)
 	{}
 
 	MaterialState(const MaterialState &lightEffect){
@@ -59,7 +72,9 @@ public:
 		diffuse(Math::ONE_VECTOR4),
 		specular(Math::ONE_VECTOR4),
 		shininess(Math::ONE),
-		emissive(Math::ZERO_VECTOR4)
+		emissive(Math::ZERO_VECTOR4),
+		alphaTest(AlphaTest_NEVER),
+		alphaCutoff(Math::HALF)
 	{
 		set(lighting1,trackColor1,shade1);
 	}
@@ -68,7 +83,9 @@ public:
 		lighting(true),
 		emissive(Math::ZERO_VECTOR4),
 		trackColor(false),
-		shade(ShadeType_GOURAUD)
+		shade(ShadeType_GOURAUD),
+		alphaTest(AlphaTest_NEVER),
+		alphaCutoff(Math::HALF)
 	{
 		set(color);
 	}
@@ -77,9 +94,24 @@ public:
 		lighting(true),
 		emissive(Math::ZERO_VECTOR4),
 		trackColor(false),
-		shade(ShadeType_GOURAUD)
+		shade(ShadeType_GOURAUD),
+		alphaTest(AlphaTest_NEVER),
+		alphaCutoff(Math::HALF)
 	{
 		set(ambient1,diffuse1,specular1,shininess);
+	}
+
+	MaterialState(AlphaTest alphaTest1,scalar alphaCutoff1=Math::HALF):
+		lighting(false),
+		trackColor(false),
+		shade(ShadeType_GOURAUD),
+		ambient(Math::ONE_VECTOR4),
+		diffuse(Math::ONE_VECTOR4),
+		specular(Math::ONE_VECTOR4),
+		shininess(Math::ONE),
+		emissive(Math::ZERO_VECTOR4)
+	{
+		set(alphaTest1,alphaCutoff1);
 	}
 
 	MaterialState &set(const MaterialState &state){
@@ -91,6 +123,8 @@ public:
 		emissive.set(state.emissive);
 		trackColor=state.trackColor;
 		shade=state.shade;
+		alphaTest=state.alphaTest;
+		alphaCutoff=state.alphaCutoff;
 		return *this;
 	}
 
@@ -121,6 +155,12 @@ public:
 		return *this;
 	}
 
+	MaterialState &set(AlphaTest alphaTest1,scalar alphaCutoff1=Math::HALF){
+		alphaTest=alphaTest1;
+		alphaCutoff=alphaCutoff1;
+		return *this;
+	}
+
 	bool operator==(const MaterialState &state) const{
 		return
 			ambient==state.ambient &&
@@ -129,7 +169,9 @@ public:
 			shininess==state.shininess &&
 			emissive==state.emissive &&
 			trackColor==state.trackColor &&
-			shade==state.shade;
+			shade==state.shade &&
+			alphaTest==state.alphaTest &&
+			alphaCutoff==state.alphaCutoff;
 	}
 
 	bool operator!=(const MaterialState &state) const{
@@ -140,7 +182,9 @@ public:
 			shininess!=state.shininess ||
 			emissive!=state.emissive ||
 			trackColor!=state.trackColor ||
-			shade!=state.shade;
+			shade!=state.shade ||
+			alphaTest!=state.alphaTest ||
+			alphaCutoff!=state.alphaCutoff;
 	}
 
 	bool lighting;
@@ -151,6 +195,8 @@ public:
 	Vector4 emissive;
 	bool trackColor;
 	ShadeType shade;
+	AlphaTest alphaTest;
+	scalar alphaCutoff;
 };
 
 }

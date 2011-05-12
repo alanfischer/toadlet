@@ -101,6 +101,9 @@ public:
 	virtual void setSkipFirstClear(bool skip){mSkipFirstClear=skip;}
 	inline bool getSkipFirstClear() const{return mSkipFirstClear;}
 
+	virtual void setDefaultStateSet(peeper::RenderStateSet::ptr stateSet){mDefaultStateSet=stateSet;}
+	inline peeper::RenderStateSet::ptr getDefaultStateSet() const{return mDefaultStateSet;}
+
 	virtual void setGamma(scalar gamma);
 	virtual scalar getGamma() const{return mGamma;}
 
@@ -147,6 +150,7 @@ protected:
 	Vector4 mClearColor;
 	bool mSkipFirstClear;
 	bool mAlignmentCalculationsUseOrigin;
+	peeper::RenderStateSet::ptr mDefaultStateSet;
 
 	Matrix4x4 mProjectionMatrix;
 	scalar mProjectionRotation;

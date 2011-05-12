@@ -96,15 +96,23 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 
 	if(useMaterials){
 		renderer->setDefaultStates();
-//		renderer->setFogState(mScene->getFogState());
+		if(camera->getDefaultStateSet()!=NULL){
+			renderer->setRenderStateSet(camera->getDefaultStateSet());
+		}
 	}
 
 	setupLights(set->getLightQueue(),renderer);
 
+	bool renderedDepthSorted=false;
 	const RenderableSet::IndexCollection &sortedIndexes=set->getLayerSortedQueueIndexes();
 	for(j=0;j<sortedIndexes.size();++j){
 		const RenderableSet::RenderableQueue &renderableQueue=set->getRenderableQueue(sortedIndexes[j]);
 		Material *material=renderableQueue[0].material;
+
+		if(renderedDepthSorted==false && material->getLayer()!=0){
+			renderedDepthSorted=true;
+			renderDepthSortedRenderables(set,renderer,camera,useMaterials);
+		}
 
 		if(useMaterials && material!=NULL){
 			material->setupRenderer(renderer);
@@ -120,12 +128,25 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 			renderable->render(renderer);
 		}
 
-		/// @todo: Replace this specific state setting with a more generic Scene Default Material, that will be reset its specific states
-//		if(useMaterials && material!=NULL && (material->getStates()&Material::State_FOG)!=0){
-//			renderer->setFogState(mScene->getFogState());
-//		}
+		if(useMaterials && material!=NULL){
+			if(camera->getDefaultStateSet()!=NULL){
+				renderer->setRenderStateSet(camera->getDefaultStateSet());
+			}
+		}
 	}
 
+	if(renderedDepthSorted==false){
+		renderDepthSortedRenderables(set,renderer,camera,useMaterials);
+	}
+
+	if(listener!=NULL){
+		listener->postRenderRenderables(set,renderer,camera);
+	}
+}
+
+void SceneRenderer::renderDepthSortedRenderables(RenderableSet *set,Renderer *renderer,CameraNode *camera,bool useMaterials){
+	Matrix4x4 matrix;
+	int i;
 	const RenderableSet::RenderableQueue &renderableQueue=set->getDepthSortedQueue();
 	for(i=0;i<renderableQueue.size();++i){
 		const RenderableSet::RenderableQueueItem &item=renderableQueue[i];
@@ -141,14 +162,11 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 		renderer->setModelMatrix(matrix);
 		renderable->render(renderer);
 
-		/// @todo: Replace this specific state setting with a more generic Scene Default Material, that will be reset its specific states
-//		if(useMaterials && material!=NULL && (material->getStates()&Material::State_FOG)!=0){
-//			renderer->setFogState(mScene->getFogState());
-//		}
-	}
-
-	if(listener!=NULL){
-		listener->postRenderRenderables(set,renderer,camera);
+		if(useMaterials && material!=NULL){
+			if(camera->getDefaultStateSet()!=NULL){
+				renderer->setRenderStateSet(camera->getDefaultStateSet());
+			}
+		}
 	}
 }
 

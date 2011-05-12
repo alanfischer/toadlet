@@ -47,17 +47,6 @@ enum ClearFlag{
 	ClearFlag_STENCIL=4,
 };
 
-enum AlphaTest{
-	AlphaTest_NONE,
-	AlphaTest_LESS,
-	AlphaTest_EQUAL,
-	AlphaTest_LEQUAL,
-	AlphaTest_GREATER,
-	AlphaTest_NOTEQUAL,
-	AlphaTest_GEQUAL,
-	AlphaTest_ALWAYS,
-};
-
 enum Normalize{
 	Normalize_NONE,
 	Normalize_RESCALE,

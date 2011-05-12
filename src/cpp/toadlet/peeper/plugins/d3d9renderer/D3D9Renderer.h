@@ -89,7 +89,6 @@ public:
 	void setTexture(int i,Texture *texture);
 
 	// Old fixed states
-	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff);
 	void setNormalize(const Normalize &normalize);
 	void setLightEnabled(int i,bool enable);
 	void setLightState(int i,const LightState &state);
@@ -131,6 +130,8 @@ public:
 	static D3DFILLMODE getD3DFILLMODE(RasterizerState::FillType type);
 	static D3DSHADEMODE getD3DSHADEMODE(MaterialState::ShadeType type);
 	static D3DFOGMODE getD3DFOGMODE(FogState::FogType type);
+	static D3DCMPFUNC getD3DCMPFUNC(MaterialState::AlphaTest type);
+	static D3DCMPFUNC getD3DCMPFUNC(DepthState::DepthTest type);
 	static DWORD getFVF(VertexFormat *vertexFormat);
 
 protected:
