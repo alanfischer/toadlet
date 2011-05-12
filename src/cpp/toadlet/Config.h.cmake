@@ -39,6 +39,7 @@
 #cmakedefine TOADLET_FIXED_POINT
 #cmakedefine TOADLET_RTTI
 #cmakedefine TOADLET_EXCEPTIONS
+#cmakedefine TOADLET_HAS_SSE
 
 // Optional packages
 #cmakedefine TOADLET_HAS_GIF

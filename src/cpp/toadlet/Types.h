@@ -91,7 +91,6 @@
 	#define TOADLET_ALIGN(a) __declspec(align(a))
 	#define TOADLET_ALIGNED_MALLOC(size,a) _aligned_malloc(size,a)
 	#define TOADLET_ALIGNED_FREE(pointer) _aligned_free(pointer)
-	#define TOADLET_HAS_SSE 1
 #elif defined(TOADLET_PLATFORM_POSIX)
 	#define TOADLET_COMPILER_GCC 1
 	#include <sys/param.h>
@@ -132,9 +131,6 @@
 	#define TOADLET_ALIGN(a) __attribute__((aligned(a)))
 	#define TOADLET_ALIGNED_MALLOC(size,a) memalign(a,size)
 	#define TOADLET_ALIGNED_FREE(pointer) free(pointer)
-	#if defined(__SSE__)
-		#define TOADLET_HAS_SSE 1
-	#endif
 	#if defined(__ARM_NEON__)
 		#define TOADLET_HAS_NEON 1
 	#endif
