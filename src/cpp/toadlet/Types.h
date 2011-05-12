@@ -68,6 +68,7 @@
 	#if(_MSC_VER>=1300)
 		#define _CRT_SECURE_NO_WARNINGS 1
 	#endif
+	#include <new>
 	#define TOADLET_LITTLE_ENDIAN 1
 	#define TOADLET_C_API extern "C" __declspec(dllexport)
 	#if defined(TOADLET_BUILD_DYNAMIC)
@@ -95,6 +96,8 @@
 #elif defined(TOADLET_PLATFORM_POSIX)
 	#define TOADLET_COMPILER_GCC 1
 	#include <sys/param.h>
+	#include <stdlib.h>
+	#include <new>
 	#if defined(__BYTE_ORDER)
 		#if __BYTE_ORDER == __LITTLE_ENDIAN
 			#define TOADLET_LITTLE_ENDIAN 1
@@ -130,8 +133,6 @@
 	namespace toadlet{template<typename T> struct alignment_trick{char c; T member;};}
 	#define TOADLET_ALIGNOF(Type) offsetof(alignment_trick<Type>,member)
 	#define TOADLET_ALIGN(a) __attribute__((aligned(a)))
-	#include <new>
-	#include <stdlib.h>
 	#if !defined(TOADLET_PLATFORM_OSX)
 		#define TOADLET_ALIGNED_MALLOC(size,a) memalign(a,size)
 	#else
@@ -183,6 +184,12 @@
 	TOADLET_VERSION_ITOW(major) L"." TOADLET_VERSION_ITOW(minor) L"." TOADLET_VERSION_ITOW(micro) TOADLET_VERSION_FIXEDWSTRING
 
 template<typename Type> inline void TOADLET_IGNORE_UNUSED_VARIABLE_WARNING(Type t){}
+
+#define TOADLET_ALIGNED_NEW
+	inline void *operator new(size_t size) throw(std::bad_alloc){return TOADLET_ALIGNED_MALLOC(size,16);} \
+	inline void operator delete(void *pointer) throw(){TOADLET_ALIGNED_FREE(pointer);} \
+	inline void *operator new[](size_t size) throw(std::bad_alloc){return TOADLET_ALIGNED_MALLOC(size,16);} \
+	inline void operator delete[](void *pointer) throw(){TOADLET_ALIGNED_FREE(pointer);}
 
 namespace toadlet{
 
@@ -239,12 +246,6 @@ typedef unsigned int uint32;
 #endif
 
 }
-
-#define TOADLET_ALIGNED_NEW
-	inline void *operator new(size_t size) throw(std::bad_alloc){return TOADLET_ALIGNED_MALLOC(size,16);} \
-	inline void operator delete(void *pointer) throw(){TOADLET_ALIGNED_FREE(pointer);} \
-	inline void *operator new[](size_t size) throw(std::bad_alloc){return TOADLET_ALIGNED_MALLOC(size,16);} \
-	inline void operator delete[](void *pointer) throw(){TOADLET_ALIGNED_FREE(pointer);}
 
 #endif
 
