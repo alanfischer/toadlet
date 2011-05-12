@@ -129,7 +129,14 @@
 	namespace toadlet{template<typename T> struct alignment_trick{char c; T member;};}
 	#define TOADLET_ALIGNOF(Type) offsetof(alignment_trick<Type>,member)
 	#define TOADLET_ALIGN(a) __attribute__((aligned(a)))
-	#define TOADLET_ALIGNED_MALLOC(size,a) memalign(a,size)
+	#include <new>
+	#include <stdlib.h>
+	#if !defined(TOADLET_PLATFORM_OSX)
+		#define TOADLET_ALIGNED_MALLOC(size,a) memalign(a,size)
+	#else
+		// Already 16 byte aligned
+		#define TOADLET_ALIGNED_MALLOC(size,a) malloc(size)
+	#endif
 	#define TOADLET_ALIGNED_FREE(pointer) free(pointer)
 	#if defined(__ARM_NEON__)
 		#define TOADLET_HAS_NEON 1
