@@ -36,10 +36,18 @@
 namespace toadlet{
 namespace egg{
 
-// The ebx register is used by PIC to store the GOT on i386 systems, so we simply won't touch it here
-#define TOADLET_CPUID(r,infoType) \
-	__asm__ __volatile__ ("cpuid": \
-	"=a" (r[0]), "=c" (r[2]), "=d" (r[3]): "a" (infoType));
+// The ebx register is used by PIC to store the GOT on i386 systems
+#if defined (__i386__) && defined(__PIC__)
+	#define TOADLET_CPUID(r,infoType) \
+		__asm__ __volatile__ ("xchg{l}\t{%%}ebx, %1\n\t" \
+		"cpuid\n\t" \
+		"xchg{l}\t{%%}ebx, %1\n\t": \
+		"=a" (r[0]), "=r" (r[1]), "=c" (r[2]), "=d" (r[3]): "a" (infoType));
+#else
+	#define TOADLET_CPUID(r,infoType) \
+		__asm__ __volatile__ ("cpuid": \
+		"=a" (r[0]), "=b" (r[1]), "=c" (r[2]), "=d" (r[3]): "a" (infoType));
+#endif
 
 static sigjmp_buf jmpbuf;
 static volatile sig_atomic_t doJump=0;
