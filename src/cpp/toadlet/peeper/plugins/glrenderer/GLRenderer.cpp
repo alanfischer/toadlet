@@ -305,7 +305,7 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 
 		// OSX needs a notification to update the back buffer on a resize
 		#if defined(TOADLET_PLATFORM_OSX) && !defined(TOADLET_PLATFORM_EAGL)
-			mCapabilityState.resetOnResize=true;
+			mCaps.resetOnResize=true;
 		#endif
 
 		caps.triangleFan=true;

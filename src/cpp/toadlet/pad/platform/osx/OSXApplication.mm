@@ -291,14 +291,17 @@ OSXApplication::OSXApplication():
 		#else
 			mRendererPlugins.add("gl",RendererPlugin(new_NSGLRenderTarget,new_GLRenderer));
 		#endif
+		mRendererPreferences.add("gl");
 	#endif
 	
 	#if defined(TOADLET_HAS_OPENAL)
 		mAudioPlayerPlugins.add("al",AudioPlayerPlugin(new_ALPlayer));
+		mAudioPlayerPreferences.add("al");
 	#endif
 	
 	#if defined(TOADLET_PLATFORM_IPHONE)
 		mMotionDetectorPlugins.add("ios",MotionDetectorPlugin(new_IPhoneMotionDetector));
+		mMotionDetectorPreferences.add("ios");
 	#endif
 
 	// Fade in buffers over 100 ms, reduces popping
@@ -363,7 +366,7 @@ void OSXApplication::create(String renderer,String audioPlayer,String motionDete
 		// Need to call the initial resized on osx
 		[(ApplicationView*)mView windowResized:nil];
 	#endif
-	
+
 	BaseApplication::create(renderer,audioPlayer,motionDetector);
 
 	mBundleArchive=OSXBundleArchive::ptr(new OSXBundleArchive());
