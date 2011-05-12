@@ -161,7 +161,7 @@ public:
 		return *this;
 	}
 
-	bool operator==(const MaterialState &state) const{
+	inline bool equals(const MaterialState &state) const{
 		return
 			ambient==state.ambient &&
 			diffuse==state.diffuse &&
@@ -174,17 +174,12 @@ public:
 			alphaCutoff==state.alphaCutoff;
 	}
 
-	bool operator!=(const MaterialState &state) const{
-		return
-			ambient!=state.ambient ||
-			diffuse!=state.diffuse ||
-			specular!=state.specular ||
-			shininess!=state.shininess ||
-			emissive!=state.emissive ||
-			trackColor!=state.trackColor ||
-			shade!=state.shade ||
-			alphaTest!=state.alphaTest ||
-			alphaCutoff!=state.alphaCutoff;
+	inline bool operator==(const MaterialState &state) const{
+		return equals(state);
+	}
+
+	inline bool operator!=(const MaterialState &state) const{
+		return !equals(state);
 	}
 
 	bool lighting;
