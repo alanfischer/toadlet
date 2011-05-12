@@ -124,8 +124,16 @@ if (TOADLET_PLATFORM_POSIX)
 	# Set IOS/OSX Platform options
 	if (TOADLET_PLATFORM_IPHONE OR TOADLET_PLATFORM_OSX)
 		# iPhone/osx builds require hidden visibility in their libraries
-		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS "-fvisibility-inlines-hidden")
+		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -fvisibility-inlines-hidden")
 	endif (TOADLET_PLATFORM_IPHONE OR TOADLET_PLATFORM_OSX)
+
+	# Append the compile flags to the properties
+	if (DYNAMIC_LIB_FLAGS)
+		set (DYNAMIC_LIB_PROPS ${DYNAMIC_LIB_PROPS} COMPILE_FLAGS ${DYNAMIC_LIB_FLAGS})
+	endif (DYNAMIC_LIB_FLAGS)
+	if (STATIC_LIB_FLAGS)
+		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS ${STATIC_LIB_FLAGS})
+	endif (STATIC_LIB_FLAGS)
 endif (TOADLET_PLATFORM_POSIX)
 
 
