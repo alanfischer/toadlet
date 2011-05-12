@@ -97,7 +97,6 @@
 	#define TOADLET_COMPILER_GCC 1
 	#include <sys/param.h>
 	#include <stdlib.h>
-	#include <malloc.h>
 	#include <new>
 	#if defined(__BYTE_ORDER)
 		#if __BYTE_ORDER == __LITTLE_ENDIAN
@@ -134,12 +133,8 @@
 	namespace toadlet{template<typename T> struct alignment_trick{char c; T member;};}
 	#define TOADLET_ALIGNOF(Type) offsetof(alignment_trick<Type>,member)
 	#define TOADLET_ALIGN(a) __attribute__((aligned(a)))
-	#if !defined(TOADLET_PLATFORM_OSX)
-		#define TOADLET_ALIGNED_MALLOC(size,a) memalign(a,size)
-	#else
-		// Already 16 byte aligned
-		#define TOADLET_ALIGNED_MALLOC(size,a) malloc(size)
-	#endif
+	inline void *toadlet_malloc(int size,int a){void *r=NULL;posix_memalign(&r,a,size);return r;}
+	#define TOADLET_ALIGNED_MALLOC(size,a) toadlet_malloc(size,a);
 	#define TOADLET_ALIGNED_FREE(pointer) free(pointer)
 	#if defined(__SSE__)
 	

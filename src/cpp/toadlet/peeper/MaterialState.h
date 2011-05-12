@@ -52,13 +52,13 @@ public:
 
 	MaterialState():
 		lighting(true),
+		trackColor(false),
+		shade(ShadeType_GOURAUD),
 		ambient(Math::ONE_VECTOR4),
 		diffuse(Math::ONE_VECTOR4),
 		specular(Math::ONE_VECTOR4),
 		shininess(Math::ONE),
 		emissive(Math::ZERO_VECTOR4),
-		trackColor(false),
-		shade(ShadeType_GOURAUD),
 		alphaTest(AlphaTest_NEVER),
 		alphaCutoff(Math::HALF)
 	{}
@@ -81,9 +81,9 @@ public:
 
 	MaterialState(const Vector4 &color):
 		lighting(true),
-		emissive(Math::ZERO_VECTOR4),
 		trackColor(false),
 		shade(ShadeType_GOURAUD),
+		emissive(Math::ZERO_VECTOR4),
 		alphaTest(AlphaTest_NEVER),
 		alphaCutoff(Math::HALF)
 	{
@@ -92,9 +92,9 @@ public:
 
 	MaterialState(const Vector4 &ambient1,const Vector4 &diffuse1,const Vector4 &specular1,scalar shininess):
 		lighting(true),
-		emissive(Math::ZERO_VECTOR4),
 		trackColor(false),
 		shade(ShadeType_GOURAUD),
+		emissive(Math::ZERO_VECTOR4),
 		alphaTest(AlphaTest_NEVER),
 		alphaCutoff(Math::HALF)
 	{
@@ -183,13 +183,13 @@ public:
 	}
 
 	bool lighting;
+	bool trackColor;
+	ShadeType shade;
 	Vector4 ambient;
 	Vector4 diffuse;
 	Vector4 specular;
 	scalar shininess;
 	Vector4 emissive;
-	bool trackColor;
-	ShadeType shade;
 	AlphaTest alphaTest;
 	scalar alphaCutoff;
 };
