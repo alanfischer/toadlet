@@ -36,13 +36,10 @@
 namespace toadlet{
 namespace egg{
 
-// -fPIC uses the ebx register on i386, so we use a PIC compliant version of cpuid here
+// The ebx register is used by PIC to store the GOT on i386 systems, so we simply won't touch it here
 #define TOADLET_CPUID(r,infoType) \
-	__asm__ __volatile__ ("pushl %%ebx	\n\t" /* save %ebx */ \
-				"cpuid		\n\t" \
-				"movl %%ebx, %1	\n\t" /* save what cpuid just put in %ebx */ \
-				"popl %%ebx	\n\t" /* restore the old %ebx */ \
-				: "=a"(r[0]), "=r"(r[1]), "=c"(r[2]), "=d"(r[3]) : "a"(infoType) : "cc");
+	__asm__ __volatile__ ("cpuid": \
+	"=a" (r[0]), "=c" (r[2]), "=d" (r[3]): "a" (infoType));
 
 static sigjmp_buf jmpbuf;
 static volatile sig_atomic_t doJump=0;

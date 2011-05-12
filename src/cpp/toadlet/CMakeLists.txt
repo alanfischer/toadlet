@@ -76,6 +76,15 @@ if (TOADLET_PLATFORM_WIN32)
 		message ("Exceptions disabled")
 	endif (TOADLET_EXCEPTIONS)
 
+	# Check for SSE2 support
+	include (CheckCXXCompilerFlag)
+	CHECK_CXX_COMPILER_FLAG ("-msse2" TOADLET_HAS_SSE)
+	if (TOADLET_HAS_SSE)
+		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} /arch:SSE2")
+		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} /arch:SSE2")
+		message ("SSE2 support enabled")
+	endif (TOADLET_HAS_SSE)
+
 	# Append the compile flags to the properties
 	# TODO: Also clean this up once issue 0006493 is resolved
 	if (DYNAMIC_LIB_FLAGS)
@@ -101,11 +110,23 @@ if (TOADLET_PLATFORM_WIN32)
 endif (TOADLET_PLATFORM_WIN32)
 
 
-# Set IOS/OSX Platform options
-if (TOADLET_PLATFORM_IPHONE OR TOADLET_PLATFORM_OSX)
-	# iPhone/osx builds require hidden visibility in their libraries
-	set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS "-fvisibility-inlines-hidden")
-endif (TOADLET_PLATFORM_IPHONE OR TOADLET_PLATFORM_OSX)
+# Set Posix Platform options
+if (TOADLET_PLATFORM_POSIX)
+	# Check for SSE2 support
+	include (CheckCXXCompilerFlag)
+	CHECK_CXX_COMPILER_FLAG ("-msse2" TOADLET_HAS_SSE)
+	if (TOADLET_HAS_SSE)
+		set (DYNAMIC_LIB_FLAGS "${DYNAMIC_LIB_FLAGS} -msse2")
+		set (STATIC_LIB_FLAGS "${STATIC_LIB_FLAGS} -msse2")
+		message ("SSE2 support enabled")
+	endif (TOADLET_HAS_SSE)
+
+	# Set IOS/OSX Platform options
+	if (TOADLET_PLATFORM_IPHONE OR TOADLET_PLATFORM_OSX)
+		# iPhone/osx builds require hidden visibility in their libraries
+		set (STATIC_LIB_PROPS ${STATIC_LIB_PROPS} COMPILE_FLAGS "-fvisibility-inlines-hidden")
+	endif (TOADLET_PLATFORM_IPHONE OR TOADLET_PLATFORM_OSX)
+endif (TOADLET_PLATFORM_POSIX)
 
 
 # Add the individual toadlet libraries
