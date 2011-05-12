@@ -95,8 +95,6 @@ public:
 
 	void setAmbientColor(const Vector4 &ambientColor){mAmbientColor.set(ambientColor);}
 	inline const Vector4 &getAmbientColor() const{return mAmbientColor;}
-	void setFogState(const peeper::FogState &state){mFogState.set(state);}
-	inline const peeper::FogState &getFogState() const{return mFogState;}
 
 	int countActiveNodes(node::Node *node=NULL);
 	void renderBoundingVolumes(peeper::Renderer *renderer,node::Node *node=NULL);
@@ -127,7 +125,6 @@ protected:
 	node::PartitionNode::ptr mRoot;
 
 	Vector4 mAmbientColor;
-	peeper::FogState mFogState;
 	SceneRenderer::ptr mSceneRenderer;
 
 	Mesh::ptr mSphereMesh,mAABoxMesh;

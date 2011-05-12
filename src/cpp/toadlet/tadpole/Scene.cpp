@@ -56,7 +56,6 @@ Scene::Scene(Engine *engine):
 	//mBackground,
 	//mRoot,
 	//mAmbientColor,
-	//mFogState,
 
 	//mSceneRenderer,
 

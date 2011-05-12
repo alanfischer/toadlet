@@ -270,7 +270,7 @@ void MeshNode::updateWorldTransform(){
 	for(i=0;i<mSubMeshes.size();++i){
 		SubMesh *subMesh=mSubMeshes[i];
 		if(subMesh->hasOwnTransform){
-			subMesh->worldTransform.setTransform(mWorldTransform,subMesh->worldTransform);
+			subMesh->worldTransform.setTransform(mWorldTransform,subMesh->meshSubMesh->transform);
 			subMesh->worldBound.transform(subMesh->meshSubMesh->bound,subMesh->worldTransform);
 		}
 	}

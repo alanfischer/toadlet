@@ -91,7 +91,6 @@ ID3D10SamplerState *samp;
 	void setTexture(int stage,Texture *texture);
 
 	// Old fixed states
-	void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff){}
 	void setNormalize(const Normalize &normalize){}
 	void setAmbientColor(const Vector4 &ambient){}
 	void setLightState(int i,const LightState &light){}

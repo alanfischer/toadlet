@@ -110,7 +110,6 @@ public:
 	virtual void setTexture(int i,Texture *texture)=0;
 
 	// Old fixed states
-	virtual void setAlphaTest(const AlphaTest &alphaTest,scalar cutoff)=0;
 	virtual void setNormalize(const Normalize &normalize)=0;
 	virtual void setAmbientColor(const Vector4 &ambient)=0;
 	virtual void setLightState(int i,const LightState &light)=0;

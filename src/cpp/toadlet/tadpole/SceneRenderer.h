@@ -44,6 +44,7 @@ public:
 protected:
 	virtual void gatherRenderables(RenderableSet *set,node::Node *node,node::CameraNode *camera);
 	virtual void renderRenderables(RenderableSet *set,peeper::Renderer *renderer,node::CameraNode *camera,bool useMaterials=true);
+	virtual void renderDepthSortedRenderables(RenderableSet *set,peeper::Renderer *renderer,node::CameraNode *camera,bool useMaterials);
 
 	void setupViewport(node::CameraNode *camera,peeper::Renderer *renderer);
 	void setupLights(const RenderableSet::LightQueue &lightQueue,peeper::Renderer *renderer);

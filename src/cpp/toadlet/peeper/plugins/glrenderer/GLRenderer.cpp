@@ -800,7 +800,6 @@ bool GLRenderer::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
 
 void GLRenderer::setDefaultStates(){
 	// General states
-	setAlphaTest(AlphaTest_NONE,Math::HALF);
 	setBlendState(BlendState());
 	setDepthState(DepthState());
 	setFogState(FogState());
@@ -865,25 +864,6 @@ bool GLRenderer::setRenderStateSet(RenderStateSet *set){
 	}
 
 	return true;
-}
-
-void GLRenderer::setAlphaTest(const AlphaTest &alphaTest,scalar cutoff){
-	if(alphaTest==AlphaTest_NONE){
-		glDisable(GL_ALPHA_TEST);
-	}
-	else{
-		GLenum func=getGLAlphaFunc(alphaTest);
-
-		#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
-			glAlphaFuncx(func,cutoff);
-		#else
-			glAlphaFunc(func,MathConversion::scalarToFloat(cutoff));
-		#endif
-
-		glEnable(GL_ALPHA_TEST);
-	}
-
-	TOADLET_CHECK_GLERROR("setAlphaTest");
 }
 
 void GLRenderer::setBlendState(const BlendState &state){
@@ -1001,6 +981,19 @@ void GLRenderer::setMaterialState(const MaterialState &state){
 	#endif
 
 	glShadeModel(getGLShadeModel(state.shade));
+
+	if(state.alphaTest==MaterialState::AlphaTest_NEVER){
+		glDisable(GL_ALPHA_TEST);
+	}
+	else{
+		GLenum func=getGLAlphaFunc(state.alphaTest);
+		#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
+			glAlphaFuncx(func,state.alphaCutoff);
+		#else
+			glAlphaFunc(func,MathConversion::scalarToFloat(state.alphaCutoff));
+		#endif
+		glEnable(GL_ALPHA_TEST);
+	}
 
 	TOADLET_CHECK_GLERROR("setMaterialState");
 }
@@ -1786,21 +1779,23 @@ GLenum GLRenderer::getGLDepthFunc(DepthState::DepthTest test){
 	}
 }
 
-GLenum GLRenderer::getGLAlphaFunc(AlphaTest test){
+GLenum GLRenderer::getGLAlphaFunc(MaterialState::AlphaTest test){
 	switch(test){
-		case AlphaTest_LESS:
+		case MaterialState::AlphaTest_NEVER:
+			return GL_NEVER;
+		case MaterialState::AlphaTest_LESS:
 			return GL_LESS;
-		case AlphaTest_EQUAL:
+		case MaterialState::AlphaTest_EQUAL:
 			return GL_EQUAL;
-		case AlphaTest_LEQUAL:
+		case MaterialState::AlphaTest_LEQUAL:
 			return GL_LEQUAL;
-		case AlphaTest_GREATER:
+		case MaterialState::AlphaTest_GREATER:
 			return GL_GREATER;
-		case AlphaTest_NOTEQUAL:
+		case MaterialState::AlphaTest_NOTEQUAL:
 			return GL_NOTEQUAL;
-		case AlphaTest_GEQUAL:
+		case MaterialState::AlphaTest_GEQUAL:
 			return GL_GEQUAL;
-		case AlphaTest_ALWAYS:
+		case MaterialState::AlphaTest_ALWAYS:
 			return GL_ALWAYS;
 		default:
 			Error::unknown(Categories::TOADLET_PEEPER,
