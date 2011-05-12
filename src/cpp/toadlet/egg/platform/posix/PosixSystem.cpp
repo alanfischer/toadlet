@@ -30,20 +30,21 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <stdlib.h>
-#include <sys/sysctl.h> // sysctlbyname()
 #include <signal.h>
 #include <setjmp.h>
 
 namespace toadlet{
 namespace egg{
 
-static sigjmp_buf jmpbuf;
-static volatile sig_atomic_t doJump=0;
 #define TOADLET_CPUID(r,infoType) \
 	__asm__ __volatile__ ("cpuid": \
 	"=a" (r[0]), "=c" (r[2]), "=d" (r[3]): "a" (infoType));
+
+	// This asm doesn't compile on some machines, and we don't use r[1] anyway
 	//"=a" (r[0]), "=b" (r[1]), "=c" (r[2]), "=d" (r[3]): "a" (infoType));
 
+static sigjmp_buf jmpbuf;
+static volatile sig_atomic_t doJump=0;
 
 void PosixSystem::usleep(uint64 microseconds){
 	::usleep(microseconds);
@@ -99,15 +100,17 @@ String PosixSystem::getEnv(const String &name){
 }
 
 void PosixSystem::testSSE(SystemCaps &caps){
-	int result[4];
-	int infoType=1;
-	TOADLET_CPUID(result,infoType);
-	if	(result[2]&(1<<20))	caps.sseVersion=4; // SSE4.2
-	else if	(result[2]&(1<<19))	caps.sseVersion=4; // SSE4.1
-	else if	(result[2]&(1<<0))	caps.sseVersion=3; // SSE3
-	else if	(result[3]&(1<<26))	caps.sseVersion=2; // SSE2
-	else if	(result[3]&(1<<25))	caps.sseVersion=1; // SSE
-	else caps.sseVersion=0;
+	#if defined(TOADLET_HAS_SSE)
+		int result[4];
+		int infoType=1;
+		TOADLET_CPUID(result,infoType);
+		if	(result[2]&(1<<20))	caps.sseVersion=4; // SSE4.2
+		else if	(result[2]&(1<<19))	caps.sseVersion=4; // SSE4.1
+		else if	(result[2]&(1<<0))	caps.sseVersion=3; // SSE3
+		else if	(result[3]&(1<<26))	caps.sseVersion=2; // SSE2
+		else if	(result[3]&(1<<25))	caps.sseVersion=1; // SSE
+		else caps.sseVersion=0;
+	#endif
 }
 
 void PosixSystem::testNEON(SystemCaps &caps){
