@@ -41,11 +41,9 @@ static sigjmp_buf jmpbuf;
 static volatile sig_atomic_t doJump=0;
 #define TOADLET_CPUID(r,infoType) \
 	__asm__ __volatile__ ("cpuid": \
-	"=a" (r[0]), "=b" (r[1]), "=c" (r[2]), "=d" (r[3]): "a" (infoType));
+	"=a" (r[0]), "=c" (r[2]), "=d" (r[3]): "a" (infoType));
+	//"=a" (r[0]), "=b" (r[1]), "=c" (r[2]), "=d" (r[3]): "a" (infoType));
 
-#define TOADLET_CPUID(func,ax,bx,cx,dx) \
-	__asm__ __volatile__ ("cpuid": \
-	"=a" (ax), "=b" (bx), "=c" (cx), "=d" (dx) : "a" (func));
 
 void PosixSystem::usleep(uint64 microseconds){
 	::usleep(microseconds);
@@ -101,29 +99,15 @@ String PosixSystem::getEnv(const String &name){
 }
 
 void PosixSystem::testSSE(SystemCaps &caps){
-	#if !defined(TOADLET_PLATFORM_OSX)
-	#if defined(TOADLET_PLATFORM_OSX)
-		int result[4];
-		int infoType=1;
-		TOADLET_CPUID(result,infoType);
-		if	(result[2]&(1<<20))	caps.sseVersion=4; // SSE4.2
-		else if	(result[2]&(1<<19))	caps.sseVersion=4; // SSE4.1
-		else if	(result[2]&(1<<0))	caps.sseVersion=3; // SSE3
-		else if	(result[3]&(1<<26))	caps.sseVersion=2; // SSE2
-		else if	(result[3]&(1<<25))	caps.sseVersion=1; // SSE
-		else caps.sseVersion=0;
-	#else
-		// Thanks to Tyler Streeter for the following
-		int yes=0;
-		size_t s=sizeof(yes);
-		caps.sseVersion=0;
-		sysctlbyname("hw.optional.sse",&yes,&s,NULL,0);		if(yes) caps.sseVersion=1;
-		sysctlbyname("hw.optional.sse2",&yes,&s,NULL,0);	if(yes) caps.sseVersion=2;
-		sysctlbyname("hw.optional.sse3",&yes,&s, NULL,0);	if(yes) caps.sseVersion=3;
-		sysctlbyname("hw.optional.supplementalsse3",&yes,&s,NULL,0); if(yes) caps.sseVersion=3;
-		sysctlbyname("hw.optional.sse4_1",&yes,&s,NULL,0);	if(yes) caps.sseVersion=4;
-		sysctlbyname("hw.optional.sse4_2",&yes,&s,NULL,0);	if(yes) caps.sseVersion=4;
-	#endif
+	int result[4];
+	int infoType=1;
+	TOADLET_CPUID(result,infoType);
+	if	(result[2]&(1<<20))	caps.sseVersion=4; // SSE4.2
+	else if	(result[2]&(1<<19))	caps.sseVersion=4; // SSE4.1
+	else if	(result[2]&(1<<0))	caps.sseVersion=3; // SSE3
+	else if	(result[3]&(1<<26))	caps.sseVersion=2; // SSE2
+	else if	(result[3]&(1<<25))	caps.sseVersion=1; // SSE
+	else caps.sseVersion=0;
 }
 
 void PosixSystem::testNEON(SystemCaps &caps){
