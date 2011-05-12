@@ -170,8 +170,7 @@ void MeshNodeSkeleton::updateBone(Bone *bone){
 		bone->useMatrixTransforms|=parent->useMatrixTransforms;
 	}
 
-	Vector3 &vector=cache_updateBone_vector.reset();
-	Quaternion &quaternion=cache_updateBone_quaternion.reset();
+	Vector3 vector;
 
 	if((updateFlags&BoneSpaceUpdate_FLAG_WORLD)==0){
 		if((updateFlags&BoneSpaceUpdate_FLAG_ROTATE)==0){

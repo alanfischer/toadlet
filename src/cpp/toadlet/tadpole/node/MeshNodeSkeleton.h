@@ -170,9 +170,6 @@ protected:
 	peeper::VertexBuffer::ptr mHitBoxVertexBuffer;
 	peeper::VertexData::ptr mHitBoxVertexData;
 	peeper::IndexData::ptr mHitBoxIndexData;
-
-	Vector3 cache_updateBone_vector;
-	Quaternion cache_updateBone_quaternion;
 };
 
 }
