@@ -278,7 +278,7 @@ using the nmake generators to run a command line build.
 
 5. Doxygen
 
-O  ptionally, you can build the toadlet Doxygen documentation 
+    Optionally, you can build the toadlet Doxygen documentation 
 when creating your project. You can either add the doxygen build 
 with the TOADLET_BUILD_DOXYGEN flag: 
 
