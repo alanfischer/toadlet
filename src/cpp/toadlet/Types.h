@@ -130,9 +130,17 @@
 	namespace toadlet{template<typename T> struct alignment_trick{char c; T member;};}
 	#define TOADLET_ALIGNOF(Type) offsetof(alignment_trick<Type>,member)
 	#define TOADLET_ALIGN(a) __attribute__((aligned(a)))
-	#define TOADLET_ALIGNED_MALLOC(size,a) memalign(a,size)
+	#include <new>
+	#include <stdlib.h>
+	#if !defined(TOADLET_PLATFORM_OSX)
+		#define TOADLET_ALIGNED_MALLOC(size,a) memalign(a,size)
+	#else
+		// Already 16 byte aligned
+		#define TOADLET_ALIGNED_MALLOC(size,a) malloc(size)
+	#endif
 	#define TOADLET_ALIGNED_FREE(pointer) free(pointer)
 	#if defined(__SSE__)
+	
 		#define TOADLET_HAS_SSE 1
 	#endif
 	#if defined(__ARM_NEON__)
@@ -231,9 +239,6 @@ typedef unsigned int uint32;
 #endif
 
 }
-
-#include <malloc.h>
-#include <new>
 
 #define TOADLET_ALIGNED_NEW
 	inline void *operator new(size_t size) throw(std::bad_alloc){return TOADLET_ALIGNED_MALLOC(size,16);} \

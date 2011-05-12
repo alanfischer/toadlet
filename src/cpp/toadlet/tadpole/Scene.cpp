@@ -321,6 +321,8 @@ void Scene::renderBoundingVolumes(Renderer *renderer,Node *node){
 			renderer->setModelMatrix(transform);
 			renderer->renderPrimitive(mAABoxMesh->getStaticVertexData(),mAABoxMesh->getSubMesh(0)->indexData);
 		}break;
+		default:
+		break;
 	}
 
 	ParentNode *parent=node->isParent();
