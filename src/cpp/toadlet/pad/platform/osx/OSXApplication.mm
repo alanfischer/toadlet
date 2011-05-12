@@ -214,6 +214,7 @@ rect{
 	mApplication->mouseReleased(location.x,location.y,0);
 }
 #else
+/// @todo: There is a problem where (it seems) if the application is launched without a NIB file, you have to double click to get any click events to register.
 - (void) mouseDown:(NSEvent*)event{
 	mApplication->mousePressed(
 		[event locationInWindow].x,
