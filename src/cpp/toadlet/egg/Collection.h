@@ -267,8 +267,6 @@ public:
 			}
 			delete[] mData;
 			mData=data;
-
-			Profile::getInstance()->collectionAllocations++;
 		}
 		mCapacity=s;
 	}

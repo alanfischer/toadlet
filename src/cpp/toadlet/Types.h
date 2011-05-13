@@ -30,6 +30,7 @@
 
 #if !defined(TOADLET_DEBUG) && (defined(DEBUG) || defined(_DEBUG))
 	#define TOADLET_DEBUG 1
+	#define TOADLET_PROFILE 1
 #endif
 
 // Set platform specific defines
@@ -141,7 +142,6 @@
 	#endif
 	#define TOADLET_ALIGNED_FREE(pointer) free(pointer)
 	#if defined(__SSE__)
-	
 		#define TOADLET_HAS_SSE 1
 	#endif
 	#if defined(__ARM_NEON__)
