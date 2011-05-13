@@ -30,6 +30,7 @@
 
 #if !defined(TOADLET_DEBUG) && (defined(DEBUG) || defined(_DEBUG))
 	#define TOADLET_DEBUG 1
+	#define TOADLET_PROFILE 1
 #endif
 
 // Set platform specific defines
