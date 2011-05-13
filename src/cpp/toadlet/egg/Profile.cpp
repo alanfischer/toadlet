@@ -38,6 +38,7 @@ public:
 	Map<String,Profile::Timing::ptr> timings;
 	Collection<Profile::Timing::ptr> timingStack;
 	Collection<Map<String,Profile::Timing::ptr> > timingHistory;
+	Map<String,String> timingNames;
 };
 
 Profile *Profile::getInstance(){
@@ -47,9 +48,7 @@ Profile *Profile::getInstance(){
 	return mTheProfile;
 }
 
-Profile::Profile():
-	collectionAllocations(0)
-{
+Profile::Profile(){
 	mData=new ProfileData();
 }
 
@@ -66,6 +65,10 @@ void Profile::beginSection(const String &name){
 	else{
 		timing=Timing::ptr(new Timing(name));
 		mData->timings[name]=timing;
+
+		if(mData->timingNames.find(name)==mData->timingNames.end()){
+			mData->timingNames[name]=name;
+		}
 	}
 
 	timing->depth++;
@@ -123,6 +126,7 @@ void Profile::clearTimings(){
 	mData->timings.clear();
 	mData->timingStack.clear();
 	mData->timingHistory.clear();
+	mData->timingNames.clear();
 }
 
 int Profile::getTimingAverage(const String &name) const{
@@ -133,8 +137,8 @@ int Profile::getTimingAverage(const String &name) const{
 		Map<String,Timing::ptr>::const_iterator it=item.find(name);
 		if(it!=item.end()){
 			time+=it->second->total;
-			count++;
 		}
+		count++;
 	}
 
 	if(count==0){
@@ -143,6 +147,14 @@ int Profile::getTimingAverage(const String &name) const{
 	else{
 		return time/count;
 	}
+}
+
+int Profile::getNumTimings() const{
+	return mData->timingNames.size();
+}
+
+String Profile::getTimingName(int i) const{
+	return mData->timingNames[i].first;
 }
 
 Profile *Profile::mTheProfile;
