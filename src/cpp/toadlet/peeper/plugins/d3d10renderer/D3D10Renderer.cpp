@@ -891,7 +891,7 @@ void D3D10Renderer::getD3D10_BLEND_DESC(D3D10_BLEND_DESC &desc,const BlendState 
 void D3D10Renderer::getD3D10_DEPTH_STENCIL_DESC(D3D10_DEPTH_STENCIL_DESC &desc,const DepthState &state){
 	memset(&desc,0,sizeof(desc));
 
-	desc.DepthEnable=(state.test!=DepthState::DepthTest_NONE);
+	desc.DepthEnable=(state.test!=DepthState::DepthTest_NEVER);
 	desc.DepthWriteMask=(state.write?D3D10_DEPTH_WRITE_MASK_ALL:D3D10_DEPTH_WRITE_MASK_ZERO);
     desc.DepthFunc=getD3D10_COMPARISON_FUNC(state.test);
 }
