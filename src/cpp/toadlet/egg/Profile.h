@@ -46,8 +46,8 @@ public:
 	void clearTimings();
 
 	int getTimingAverage(const String &name) const;
-
-	int collectionAllocations;
+	int getNumTimings() const;
+	String getTimingName(int i) const;
 
 	class Timing{
 	public:
@@ -97,12 +97,14 @@ protected:
 	#define TOADLET_PROFILE_BEGINSECTION(x) toadlet::egg::Profile::getInstance()->beginSection(#x)
 	#define TOADLET_PROFILE_ENDSECTION(x) toadlet::egg::Profile::getInstance()->endSection(#x)
 	#define TOADLET_PROFILE_SCOPE(x) toadlet::egg::ScopeProfile PROFILE##x(#x)
+	#define TOADLET_PROFILE_AUTOSCOPE() toadlet::egg::ScopeProfile PROFILE##__LINE__(__FUNCTION__)
 	#define TOADLET_PROFILE_ADDTIMINGS() toadlet::egg::Profile::getInstance()->addTimings()
 	#define TOADLET_PROFILE_CLEARTIMINGS() toadlet::egg::Profile::getInstance()->clearTimings()
 #else
 	#define TOADLET_PROFILE_BEGINSECTION(x)
 	#define TOADLET_PROFILE_ENDSECTION(x)
 	#define TOADLET_PROFILE_SCOPE(x)
+	#define TOADLET_PROFILE_AUTOSCOPE()
 	#define TOADLET_PROFILE_ADDTIMINGS()
 	#define TOADLET_PROFILE_CLEARTIMINGS()
 #endif
