@@ -67,7 +67,6 @@ public:
 	};
 
 	StudioModelNode();
-	virtual ~StudioModelNode();
 	Node *create(Scene *scene);
 	void destroy();
 	Node *set(Node *node);
@@ -141,9 +140,6 @@ public:
 	bool getAttachmentTransform(Transform &result,int index);
 
 	static void setQuaternionFromEulerAngleStudio(Quaternion &r,const EulerAngle &euler);
-
-	peeper::VertexBufferAccessor vba;
-	peeper::IndexBufferAccessor iba;
 
 protected:
 	void updateSkeleton();

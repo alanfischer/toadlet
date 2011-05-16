@@ -54,13 +54,17 @@ Node *SpriteNode::create(Scene *scene){
 
 	setAlignment(Font::Alignment_BIT_HCENTER|Font::Alignment_BIT_VCENTER);
 	mRendered=true;
-
 	mIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,4));
 
 	return this;
 }
 
 void SpriteNode::destroy(){
+	if(mMaterial!=NULL){
+		mMaterial->release();
+		mMaterial=NULL;
+	}
+
 	if(mVertexData!=NULL){
 		mVertexData->destroy();
 		mVertexData=NULL;
@@ -69,11 +73,6 @@ void SpriteNode::destroy(){
 	if(mIndexData!=NULL){
 		mIndexData->destroy();
 		mIndexData=NULL;
-	}
-	
-	if(mMaterial!=NULL){
-		mMaterial->release();
-		mMaterial=NULL;
 	}
 
 	super::destroy();
@@ -164,13 +163,12 @@ void SpriteNode::updateSprite(){
 
 	if(mVertexData!=NULL){
 		mVertexData->destroy();
-		mVertexData=NULL;
 	}
 
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION_TEX_COORD,4);
 	mVertexData=VertexData::ptr(new VertexData(vertexBuffer));
 	{
-		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
+		VertexBufferAccessor vba(vertexBuffer,Buffer::Access_BIT_WRITE);
 
 		vba.set3(0,0, x,y,0);
 		vba.set2(0,1, 0,0);

@@ -26,11 +26,8 @@
 #ifndef TOADLET_TADPOLE_NODE_SPRITENODE_H
 #define TOADLET_TADPOLE_NODE_SPRITENODE_H
 
-#include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/peeper/IndexData.h>
-#include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/peeper/VertexData.h>
-#include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Visible.h>
 #include <toadlet/tadpole/node/CameraAlignedNode.h>
@@ -65,8 +62,6 @@ public:
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
 	void render(peeper::Renderer *renderer) const;
-
-	peeper::VertexBufferAccessor vba;
 
 protected:
 	TOADLET_GIB_DEFINE(SpriteNode);

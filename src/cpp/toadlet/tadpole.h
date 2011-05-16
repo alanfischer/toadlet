@@ -109,6 +109,9 @@ using namespace toadlet::tadpole::terrain;
 	#include <toadlet/tadpole/bsp/BSP30Map.h>
 	#include <toadlet/tadpole/bsp/BSP30Node.h>
 
+	#include <toadlet/tadpole/studio/SpriteHandler.h>
+	#include <toadlet/tadpole/studio/SpriteModel.h>
+	#include <toadlet/tadpole/studio/SpriteModelNode.h>
 	#include <toadlet/tadpole/studio/StudioHandler.h>
 	#include <toadlet/tadpole/studio/StudioModel.h>
 	#include <toadlet/tadpole/studio/StudioModelNode.h>
