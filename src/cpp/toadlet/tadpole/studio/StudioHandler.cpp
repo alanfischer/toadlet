@@ -190,23 +190,24 @@ void StudioHandler::buildMaterials(StudioModel *model){
 	}
 }
 
-Texture::ptr StudioHandler::createTexture(studiotexture *ptexture,tbyte *data,tbyte *pal){
-	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGB_8,ptexture->width,ptexture->height));
+Texture::ptr StudioHandler::createTexture(studiotexture *t,tbyte *data,tbyte *pal){
+	Image::ptr image(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGB_8,t->width,t->height));
 	tbyte *imageData=image->getData();
 
 	int i,j;
-	for(j=0;j<ptexture->height;++j){
-		for(i=0;i<ptexture->width;++i){
-			tbyte *c=pal+data[j*ptexture->width+i]*3;
+	for(j=0;j<t->height;++j){
+		for(i=0;i<t->width;++i){
+			tbyte *d=imageData+(j*t->width+i)*3;
+			tbyte *c=pal+data[j*t->width+i]*3;
 				
-			imageData[(j*ptexture->width+i)*3+0]=c[0];
-			imageData[(j*ptexture->width+i)*3+1]=c[1];
-			imageData[(j*ptexture->width+i)*3+2]=c[2];
+			d[0]=c[0];
+			d[1]=c[1];
+			d[2]=c[2];
 		}
 	}
-	
+
 	Texture::ptr texture=mEngine->getTextureManager()->createTexture(image);
-	texture->setName(ptexture->name);
+	texture->setName(t->name);
 	return texture;
 }
 

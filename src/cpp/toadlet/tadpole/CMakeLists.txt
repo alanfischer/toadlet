@@ -101,6 +101,8 @@ set (TADPOLE_SENSOR_SRC
 )
 
 set (TADPOLE_STUDIO_SRC
+	studio/SpriteHandler.cpp
+	studio/SpriteModelNode.cpp
 	studio/StudioHandler.cpp
 	studio/StudioModelNode.cpp
 )
@@ -245,6 +247,10 @@ set (TADPOLE_SENSOR_HEADERS
 )
 
 set (TADPOLE_STUDIO_HEADERS
+	studio/SpriteHandler.h
+	studio/SpriteModel.h
+	studio/SpriteModelNode.h
+	studio/SpriteTypes.h
 	studio/StudioHandler.h
 	studio/StudioModel.h
 	studio/StudioModelNode.h

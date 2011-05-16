@@ -21,7 +21,6 @@ set (EGG_IMAGE_SRC
 	image/ImageFormatConversion.cpp
 	image/BMPHandler.cpp
 	image/DDSHandler.cpp
-	image/SPRHandler.cpp
 	image/TGAHandler.cpp
 )
 set (EGG_IMAGE_GIF_SRC
@@ -146,7 +145,6 @@ set (EGG_IMAGE_HEADERS
 	image/ImageFormatConversion.h
 	image/BMPHandler.h
 	image/DDSHandler.h
-	image/SPRHandler.h
 	image/TGAHandler.h
 )
 set (EGG_IMAGE_GIF_HEADERS

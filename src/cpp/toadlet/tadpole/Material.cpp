@@ -123,6 +123,8 @@ void Material::modifyWith(Material *material){
 		setTexture(i,material->getTexture(i));
 		setTextureName(i,material->getTextureName(i));
 	}
+
+	setDepthSorted(material->getDepthSorted());
 }
 
 /// @todo: Optimize this so we're not resetting a ton of texture states, and not requesting the caps

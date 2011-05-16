@@ -103,8 +103,6 @@ StudioModelNode::StudioModelNode():super(),
 	memset(mAdjustedControllerValues,0,sizeof(mAdjustedControllerValues));
 }
 
-StudioModelNode::~StudioModelNode(){}
-
 Node *StudioModelNode::create(Scene *scene){
 	super::create(scene);
 
@@ -195,7 +193,15 @@ void StudioModelNode::setModel(const String &name){
 void StudioModelNode::setModel(StudioModel::ptr model){
 	mSubModels.clear();
 
+	if(mModel!=NULL){
+		mModel->release();
+	}
+
 	mModel=model;
+
+	if(mModel!=NULL){
+		mModel->retain();
+	}
 
 	mBoneTranslates.resize(model->header->numbones);
 	mBoneRotates.resize(model->header->numbones);
@@ -555,7 +561,7 @@ void StudioModelNode::updateVertexes(StudioModel *model,int bodypartsIndex,int m
 		}
 	}
 
-	vba.lock(mVertexBuffer);
+	VertexBufferAccessor vba(mVertexBuffer);
 
 	for(i=0;i<smodel->nummesh;++i){
 		studiomesh *smesh=model->mesh(smodel,i);
@@ -829,7 +835,7 @@ void StudioModelNode::createSkeletonBuffers(){
 	VertexBuffer::ptr skeletonVertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_BIT_WRITE,mEngine->getVertexFormats().POSITION,mModel->header->numbones);
 	IndexBuffer::ptr skeletonIndexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,indexCount);
 
-	iba.lock(skeletonIndexBuffer);
+	IndexBufferAccessor iba(skeletonIndexBuffer);
 
 	indexCount=0;
 	for(i=0;i<mModel->header->numbones;++i){
@@ -854,7 +860,7 @@ void StudioModelNode::createSkeletonBuffers(){
 void StudioModelNode::updateSkeletonBuffers(){
 	int i,j;
 
-	vba.lock(mSkeletonVertexBuffer);
+	VertexBufferAccessor vba(mSkeletonVertexBuffer);
 	for(i=0;i<mModel->header->numbones;++i){
 		vba.set3(i,0,mBoneTranslates[i]);
 	}

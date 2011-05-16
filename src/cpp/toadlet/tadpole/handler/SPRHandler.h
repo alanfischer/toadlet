@@ -26,9 +26,9 @@
 #ifndef TOADLET_TADPOLE_HANDLER_SPRHANDLER_H
 #define TOADLET_TADPOLE_HANDLER_SPRHANDLER_H
 
-#include <toadlet/egg/image/SPRHandler.h>
 #include <toadlet/tadpole/ResourceHandler.h>
 #include <toadlet/tadpole/TextureManager.h>
+#include <toadlet/tadpole/studio/SpriteHandler.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -38,40 +38,21 @@ class TOADLET_API SPRHandler:public ResourceHandler{
 public:
 	TOADLET_SHARED_POINTERS(SPRHandler);
 
-	SPRHandler(TextureManager *textureManager){mTextureManager=textureManager;}
+	SPRHandler(Engine *engine):mHandler(engine){}
 
 	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData){
-		egg::Collection<egg::image::Image*> images;
-		egg::Collection<int> delays;
+		studio::SpriteModel::ptr sprite=egg::shared_static_cast<studio::SpriteModel>(mHandler.load(stream,NULL));
 
-		mHandler.loadAnimatedImage(stream,images,delays);
-
-		if(images.size()==0){
-			return NULL;
-		}
-		else if(images.size()==1){
-			return mTextureManager->createTexture(egg::image::Image::ptr(images[0]));
+		if(sprite!=NULL && sprite->textures.size()>0){
+			return sprite->textures[0];
 		}
 		else{
-/// @todo: revive this somehow, probably as a 3d texture
-//			peeper::SequenceTexture::ptr sequence(new peeper::SequenceTexture(peeper::Texture::Dimension_D2,images.size()));
-//			int i;
-//			for(i=0;i<images.size();++i){
-//				/// @todo: Add in timing information
-//				sequence->setTexture(i,mTextureManager->createTexture(egg::image::Image::ptr(images[i])),Math::fromMilli(delays[i]));
-//			}
-//			return egg::shared_static_cast<peeper::Texture>(sequence);
-return NULL;
+			return NULL;
 		}
-	}
-
-	bool save(peeper::Texture::ptr resource,egg::io::Stream::ptr stream){
-		return mHandler.saveImage(mTextureManager->createImage(resource),stream);
 	}
 
 protected:
-	TextureManager *mTextureManager;
-	egg::image::SPRHandler mHandler;
+	studio::SpriteHandler mHandler;
 };
 
 }

@@ -56,6 +56,11 @@ public:
 			textures[i]->release();
 		}
 		textures.clear();
+
+		for(i=0;i<materials.size();++i){
+			materials[i]->release();
+		}
+		materials.clear();
 	}
 
 	studiobodyparts *bodyparts(int i){return &((studiobodyparts*)(data+header->bodypartindex))[i];}
