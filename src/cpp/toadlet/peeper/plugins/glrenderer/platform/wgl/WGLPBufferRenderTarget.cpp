@@ -93,7 +93,7 @@ bool WGLPBufferRenderTarget::activate(){
 	WGLRenderTarget::activate();
 
 	if(mInitialized==false){
-		mRenderer->setDefaultStates();
+		mRenderer->setDefaultState();
 		mInitialized=true;
 	}
 

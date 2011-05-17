@@ -48,7 +48,7 @@ class PixelBuffer;
 class PointState;
 class RasterizerState;
 class RendererCaps;
-class RenderStateSet;
+class RenderState;
 class Shader;
 class Texture;
 class VertexBuffer;
@@ -86,7 +86,7 @@ public:
 	virtual Program *createProgram()=0;
 	virtual Shader *createShader()=0;
 	virtual Query *createQuery()=0;
-	virtual RenderStateSet *createRenderStateSet()=0;
+	virtual RenderState *createRenderState()=0;
 
 	// Matrix operations
 	virtual void setModelMatrix(const Matrix4x4 &matrix)=0;
@@ -105,8 +105,8 @@ public:
 	virtual void renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData)=0;
 	virtual bool copyFrameBufferToPixelBuffer(PixelBuffer *dst)=0;
 	virtual bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src)=0;
-	virtual void setDefaultStates()=0;
-	virtual bool setRenderStateSet(RenderStateSet *set)=0;
+	virtual void setDefaultState()=0;
+	virtual bool setRenderState(RenderState *renderState)=0;
 	virtual void setTexture(int i,Texture *texture)=0;
 
 	// Old fixed states

@@ -172,6 +172,7 @@ public:
 	virtual void gatherRenderables(CameraNode *camera,RenderableSet *set){}
 
 	virtual void setStayActive(bool active);
+	inline bool getStayActive() const{return mDeactivateCount<0;}
 	virtual void activate();
 	virtual void deactivate();
 	virtual void tryDeactivate();

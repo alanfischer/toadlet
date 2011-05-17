@@ -23,19 +23,19 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_RENDERSTATESETDESTROYEDLISTENER_H
-#define TOADLET_PEEPER_RENDERSTATESETDESTROYEDLISTENER_H
+#ifndef TOADLET_PEEPER_RENDERSTATEDESTROYEDLISTENER_H
+#define TOADLET_PEEPER_RENDERSTATEDESTROYEDLISTENER_H
 
 namespace toadlet{
 namespace peeper{
 
-class RenderStateSet;
+class RenderState;
 
-class RenderStateSetDestroyedListener{
+class RenderStateDestroyedListener{
 public:
-	virtual ~RenderStateSetDestroyedListener(){}
+	virtual ~RenderStateDestroyedListener(){}
 
-	virtual void renderStateSetDestroyed(RenderStateSet *renderStateSet)=0;
+	virtual void renderStateDestroyed(RenderState *renderState)=0;
 };
 
 }

@@ -23,11 +23,11 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_RENDERSTATESET_H
-#define TOADLET_PEEPER_RENDERSTATESET_H
+#ifndef TOADLET_PEEPER_RENDERSTATE_H
+#define TOADLET_PEEPER_RENDERSTATE_H
 
 #include <toadlet/egg/Resource.h>
-#include <toadlet/peeper/RenderStateSetDestroyedListener.h>
+#include <toadlet/peeper/RenderStateDestroyedListener.h>
 #include <toadlet/peeper/BlendState.h>
 #include <toadlet/peeper/DepthState.h>
 #include <toadlet/peeper/RasterizerState.h>
@@ -40,15 +40,15 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API RenderStateSet{
+class TOADLET_API RenderState{
 public:
-	TOADLET_SHARED_POINTERS(RenderStateSet);
+	TOADLET_SHARED_POINTERS(RenderState);
 
-	virtual ~RenderStateSet(){}
+	virtual ~RenderState(){}
 
-	virtual RenderStateSet *getRootRenderStateSet()=0;
+	virtual RenderState *getRootRenderState()=0;
 
-	virtual void setRenderStateSetDestroyedListener(RenderStateSetDestroyedListener *listener)=0;
+	virtual void setRenderStateDestroyedListener(RenderStateDestroyedListener *listener)=0;
 
 	virtual bool create()=0;
 	virtual void destroy()=0;

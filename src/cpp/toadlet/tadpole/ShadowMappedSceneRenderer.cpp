@@ -47,10 +47,10 @@ ShadowMappedSceneRenderer::ShadowMappedSceneRenderer(Scene *scene):
 	mLightCamera->setProjectionFovX(Math::PI/4,1,30,60);
 	scene->getRoot()->attach(mLightCamera);
 
-	mShadowStates=engine->getMaterialManager()->createRenderStateSet();
-	mShadowStates->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT,RasterizerState::FillType_SOLID,0,0.1));
+	mShadowState=engine->getMaterialManager()->createRenderState();
+	mShadowState->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT,RasterizerState::FillType_SOLID,0,0.1));
 
-	mLightStates=engine->getMaterialManager()->createRenderStateSet();
+	mLightState=engine->getMaterialManager()->createRenderState();
 }
 
 ShadowMappedSceneRenderer::~ShadowMappedSceneRenderer(){
@@ -70,7 +70,7 @@ void ShadowMappedSceneRenderer::renderScene(Renderer *renderer,Node *node,Camera
 
 	renderer->setRenderTarget(mShadowTarget);
 	{
-		renderer->setRenderStateSet(mShadowStates);
+		renderer->setRenderState(mShadowState);
 
 		renderRenderables(mRenderableSet,renderer,mLightCamera,false);
 	}
@@ -93,8 +93,8 @@ void ShadowMappedSceneRenderer::renderScene(Renderer *renderer,Node *node,Camera
 		TextureState lightTextureState;
 		lightTextureState.calculation=TextureState::CalculationType_CAMERASPACE;
 		lightTextureState.matrix.set(textureMatrix);
-		mLightStates->setTextureState(0,lightTextureState);
-		renderer->setRenderStateSet(mLightStates);
+		mLightState->setTextureState(0,lightTextureState);
+		renderer->setRenderState(mLightState);
 		renderer->setTexture(0,mShadowTexture);
 
 		renderRenderables(mRenderableSet,renderer,camera,false);

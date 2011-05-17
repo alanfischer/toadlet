@@ -95,9 +95,9 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
 
 	if(useMaterials){
-		renderer->setDefaultStates();
-		if(camera->getDefaultStateSet()!=NULL){
-			renderer->setRenderStateSet(camera->getDefaultStateSet());
+		renderer->setDefaultState();
+		if(camera->getDefaultState()!=NULL){
+			renderer->setRenderState(camera->getDefaultState());
 		}
 	}
 
@@ -129,8 +129,8 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 		}
 
 		if(useMaterials){
-			if(camera->getDefaultStateSet()!=NULL){
-				renderer->setRenderStateSet(camera->getDefaultStateSet());
+			if(camera->getDefaultState()!=NULL){
+				renderer->setRenderState(camera->getDefaultState());
 			}
 		}
 	}
@@ -163,8 +163,8 @@ void SceneRenderer::renderDepthSortedRenderables(RenderableSet *set,Renderer *re
 		renderable->render(renderer);
 
 		if(useMaterials){
-			if(camera->getDefaultStateSet()!=NULL){
-				renderer->setRenderStateSet(camera->getDefaultStateSet());
+			if(camera->getDefaultState()!=NULL){
+				renderer->setRenderState(camera->getDefaultState());
 			}
 		}
 	}

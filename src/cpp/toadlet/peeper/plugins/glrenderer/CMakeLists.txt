@@ -46,14 +46,13 @@ set (PEEPER_GLRENDERER_HEADERS
 	GLBuffer.h
 	GLIncludes.h
 	GLRenderer.h
-	GLRenderStateSet.h
+	GLRenderState.h
 	GLRenderTarget.h
 	GLSLProgramPeer.h
 	GLSLShaderPeer.h
 	GLTexture.h
 	GLTextureMipPixelBuffer.h
 	GLPixelBuffer.h
-	GLRenderStateSet.h
 	GLVertexFormat.h
 )
 if (NOT TOADLET_PLATFORM_WINCE)
