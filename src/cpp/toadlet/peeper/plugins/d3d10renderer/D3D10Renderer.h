@@ -34,7 +34,7 @@
 #include <toadlet/peeper/RasterizerState.h>
 #include <toadlet/peeper/SamplerState.h>
 #include <toadlet/peeper/RendererCaps.h>
-#include <toadlet/peeper/RenderStateSet.h>
+#include <toadlet/peeper/RenderState.h>
 #include <toadlet/peeper/IndexData.h>
 
 namespace toadlet{
@@ -67,7 +67,7 @@ ID3D10SamplerState *samp;
 	Program *createProgram();
 	Shader *createShader();
 	Query *createQuery();
-	RenderStateSet *createRenderStateSet();
+	RenderState *createRenderState();
 
 	// Matrix operations
 	void setModelMatrix(const Matrix4x4 &matrix);
@@ -86,8 +86,8 @@ ID3D10SamplerState *samp;
 	void renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData);
 	bool copyFrameBufferToPixelBuffer(PixelBuffer *dst);
 	bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src);
-	void setDefaultStates();
-	bool setRenderStateSet(RenderStateSet *set);
+	void setDefaultState();
+	bool setRenderState(RenderState *renderState);
 	void setTexture(int stage,Texture *texture);
 
 	// Old fixed states
@@ -134,7 +134,7 @@ protected:
 
 	RendererCaps mCaps;
 
-	RenderStateSet::ptr mDefaultSet;
+	RenderState::ptr mDefaultState;
 
 	friend class D3D10Buffer;
 };

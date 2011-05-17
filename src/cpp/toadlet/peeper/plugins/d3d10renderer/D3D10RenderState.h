@@ -23,20 +23,20 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_D3D10RENDERSTATESET_H
-#define TOADLET_PEEPER_D3D10RENDERSTATESET_H
+#ifndef TOADLET_PEEPER_D3D10RENDERSTATE_H
+#define TOADLET_PEEPER_D3D10RENDERSTATE_H
 
 #include "D3D10Includes.h"
-#include <toadlet/peeper/RenderStateSet.h>
+#include <toadlet/peeper/RenderState.h>
 
 namespace toadlet{
 namespace peeper{
 
 class D3D10Renderer;
 
-class TOADLET_API D3D10RenderStateSet:public RenderStateSet{
+class TOADLET_API D3D10RenderState:public RenderState{
 public:
-	D3D10RenderStateSet(D3D10Renderer *renderer):
+	D3D10RenderState(D3D10Renderer *renderer):
 		mListener(NULL),
 		mBlendState(NULL),
 		mD3DBlendState(NULL),
@@ -49,13 +49,13 @@ public:
 		mRenderer=renderer;
 		mDevice=mRenderer->getD3D10Device();
 	}
-	virtual ~D3D10RenderStateSet(){
+	virtual ~D3D10RenderState(){
 		destroy();
 	}
 
-	RenderStateSet *getRootRenderStateSet(){return this;}
+	RenderState *getRootRenderState(){return this;}
 
-	void setRenderStateSetDestroyedListener(RenderStateSetDestroyedListener *listener){mListener=listener;}
+	void setRenderStateDestroyedListener(RenderStateDestroyedListener *listener){mListener=listener;}
 
 	bool create(){return true;}
 
@@ -91,7 +91,7 @@ public:
 		}
 
 		if(mListener!=NULL){
-			mListener->renderStateSetDestroyed(this);
+			mListener->renderStateDestroyed(this);
 			mListener=NULL;
 		}
 	}
@@ -161,7 +161,7 @@ protected:
 	D3D10Renderer *mRenderer;
 	ID3D10Device *mDevice;
 
-	RenderStateSetDestroyedListener *mListener;
+	RenderStateDestroyedListener *mListener;
 	BlendState *mBlendState;
 	ID3D10BlendState *mD3DBlendState;
 	DepthState *mDepthState;

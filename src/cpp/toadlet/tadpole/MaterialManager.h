@@ -26,7 +26,7 @@
 #ifndef TOADLET_TADPOLE_MATERIALMANAGER_H
 #define TOADLET_TADPOLE_MATERIALMANAGER_H
 
-#include <toadlet/peeper/BackableRenderStateSet.h>
+#include <toadlet/peeper/BackableRenderState.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/ResourceManager.h>
 #include <toadlet/tadpole/TextureManager.h>
@@ -36,7 +36,7 @@ namespace tadpole{
 
 class Engine;
 
-class TOADLET_API MaterialManager:public ResourceManager,public peeper::RenderStateSetDestroyedListener{
+class TOADLET_API MaterialManager:public ResourceManager,public peeper::RenderStateDestroyedListener{
 public:
 	MaterialManager(Engine *engine,bool backable);
 
@@ -48,12 +48,12 @@ public:
 
 	Material::ptr cloneMaterial(Material::ptr material,bool manage,Material::ptr sharedSource=Material::ptr());
 
-	peeper::RenderStateSet::ptr createRenderStateSet();
+	peeper::RenderState::ptr createRenderState();
 
 	void contextActivate(peeper::Renderer *renderer);
 	void contextDeactivate(peeper::Renderer *renderer);
 
-	void renderStateSetDestroyed(peeper::RenderStateSet *renderStateSet);
+	void renderStateDestroyed(peeper::RenderState *renderState);
 
 	egg::Resource::ptr unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData);
 
@@ -64,7 +64,7 @@ protected:
 	Engine *mEngine;
 	bool mBackable;
 
-	egg::Collection<peeper::RenderStateSet::ptr> mRenderStateSets;
+	egg::Collection<peeper::RenderState::ptr> mRenderStates;
 
 	peeper::SamplerState mDefaultSamplerState;
 };
