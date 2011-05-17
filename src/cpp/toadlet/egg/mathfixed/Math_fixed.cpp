@@ -25,6 +25,7 @@
 
 #include <toadlet/egg/mathfixed/Math.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/egg/System.h>
 
 namespace toadlet{
 namespace egg{
@@ -1131,6 +1132,36 @@ fixed Math::findIntersection(const Segment &segment,const AABox &box,Vector3 &po
 	}
 
 	return time;
+}
+
+class MathInitializer{
+public:
+	MathInitializer(){
+		Math::init();
+	}
+
+	virtual void reference(){}
+};
+
+static MathInitializer mathInitializer;
+
+void Math::init(){
+	mathInitializer.reference();
+
+	// Assign default implementations
+}
+
+void Math::optimize(int o){
+	SystemCaps caps;
+	System::getSystemCaps(caps);
+
+	Logger::alert(String("Detected SSE version:")+caps.sseVersion);
+	Logger::alert(String("Detected NEON version:")+caps.neonVersion);
+	{
+		Logger::excess(Categories::TOADLET_EGG,"forcing Traditional math");
+
+		init();
+	}
 }
 
 }

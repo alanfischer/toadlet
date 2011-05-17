@@ -94,6 +94,8 @@ public:
 	void modifyWith(Material *material);
 	bool getManaged(){return getUniqueHandle()!=0;}
 
+	peeper::RenderStateSet::ptr getRenderStateSet() const{return mRenderStateSet;}
+
 	void setupRenderer(peeper::Renderer *renderer);
 	
 protected:
