@@ -57,32 +57,45 @@ void MaterialManager::destroy(){
 	mRenderStateSets.clear();
 }
 
-Material::ptr MaterialManager::createMaterial(Texture::ptr texture,bool clamped){
-	Material::ptr material(new Material(createRenderStateSet()));
+Material::ptr MaterialManager::createMaterial(Texture::ptr texture,bool clamped,Material::ptr sharedSource){
+	RenderStateSet::ptr renderStates;
+	if(sharedSource==NULL){
+		renderStates=createRenderStateSet();
+	}
+	else{
+		renderStates=sharedSource->getRenderStateSet();
+	}
 
-	material->setBlendState(BlendState());
-	material->setDepthState(DepthState());
-	material->setRasterizerState(RasterizerState());
-	material->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+	Material::ptr material(new Material(renderStates));
+
+	if(sharedSource==NULL){
+		material->setBlendState(BlendState());
+		material->setDepthState(DepthState());
+		material->setRasterizerState(RasterizerState());
+		material->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+	}
 
 	if(texture!=NULL){
 		material->setTexture(0,texture);
-		SamplerState samplerState(mDefaultSamplerState);
-		if(texture->getNumMipLevels()==1){
-			samplerState.mipFilter=SamplerState::FilterType_NONE;
-		}
-		if(clamped || texture->getDimension()==Texture::Dimension_CUBE){
-			samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-			samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-			samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-		}
-		material->setSamplerState(0,samplerState);
 
-		TextureState textureState;
-		if((texture->getFormat()&Texture::Format_BIT_DEPTH)>0){
-			textureState.shadowResult=TextureState::ShadowResult_L;
+		if(sharedSource==NULL){
+			SamplerState samplerState(mDefaultSamplerState);
+			if(texture->getNumMipLevels()==1){
+				samplerState.mipFilter=SamplerState::FilterType_NONE;
+			}
+			if(clamped || texture->getDimension()==Texture::Dimension_CUBE){
+				samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+				samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+				samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+			}
+			material->setSamplerState(0,samplerState);
+
+			TextureState textureState;
+			if((texture->getFormat()&Texture::Format_BIT_DEPTH)>0){
+				textureState.shadowResult=TextureState::ShadowResult_L;
+			}
+			material->setTextureState(0,textureState);
 		}
-		material->setTextureState(0,textureState);
 	}
 
 	manage(material);
@@ -90,10 +103,27 @@ Material::ptr MaterialManager::createMaterial(Texture::ptr texture,bool clamped)
 	return material;
 }
 
-Material::ptr MaterialManager::cloneMaterial(Material::ptr material,bool managed){
-	Material::ptr clonedMaterial(new Material(createRenderStateSet()));
+Material::ptr MaterialManager::cloneMaterial(Material::ptr material,bool managed,Material::ptr sharedSource){
+	RenderStateSet::ptr renderStates;
+	if(sharedSource==NULL){
+		renderStates=createRenderStateSet();
+	}
+	else{
+		renderStates=sharedSource->getRenderStateSet();
+	}
 
-	clonedMaterial->modifyWith(material);
+	Material::ptr clonedMaterial(new Material(renderStates));
+
+	if(sharedSource==NULL){
+		clonedMaterial->modifyWith(material);
+	}
+	else{
+		int i;
+		for(i=0;i<material->getNumTextures();++i){
+			clonedMaterial->setTexture(i,material->getTexture(i));
+			clonedMaterial->setTextureName(i,material->getTextureName(i));
+		}
+	}
 
 	if(managed){
 		manage(clonedMaterial);

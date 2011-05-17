@@ -76,6 +76,15 @@ namespace Math{
 	const EulerAngle IDENTITY_EULERANGLE;
 	const AABox ZERO_AABOX;
 
+	enum{
+		Optimize_AUTO=0,
+		Optimize_FORCE=1,
+		Optimize_NO=2,
+	};
+
+	TOADLET_API void init();
+	TOADLET_API void optimize(int o=Optimize_AUTO);
+
 	// Vector2 operations
 	inline void neg(Vector2 &r,const Vector2 &v){
 		r.x=-v.x;

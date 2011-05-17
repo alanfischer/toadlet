@@ -42,11 +42,11 @@ public:
 
 	void destroy();
 
-	Material::ptr createMaterial(peeper::Texture::ptr texture=peeper::Texture::ptr(),bool clamped=false);
+	Material::ptr createMaterial(peeper::Texture::ptr texture=peeper::Texture::ptr(),bool clamped=false,Material::ptr shareSource=Material::ptr());
 
 	Material::ptr findMaterial(const egg::String &name){return egg::shared_static_cast<Material>(ResourceManager::find(name));}
 
-	Material::ptr cloneMaterial(Material::ptr material,bool manage);
+	Material::ptr cloneMaterial(Material::ptr material,bool manage,Material::ptr sharedSource=Material::ptr());
 
 	peeper::RenderStateSet::ptr createRenderStateSet();
 
