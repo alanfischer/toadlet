@@ -91,7 +91,6 @@ public:
 	void setLayer(int layer){mLayer=layer;}
 	int getLayer() const{return mLayer;}
 
-	void modifyWith(Material *material);
 	bool getManaged(){return getUniqueHandle()!=0;}
 
 	peeper::RenderState::ptr getRenderState() const{return mRenderState;}

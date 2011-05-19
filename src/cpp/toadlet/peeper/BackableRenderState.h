@@ -174,7 +174,7 @@ public:
 		if(mBack!=NULL){
 			if(mBlendState!=NULL){mBack->setBlendState(*mBlendState);}
 			if(mDepthState!=NULL){mBack->setDepthState(*mDepthState);}
-			if(mRasterizerState!=NULL){mBack->getRasterizerState(*mRasterizerState);}
+			if(mRasterizerState!=NULL){mBack->setRasterizerState(*mRasterizerState);}
 			if(mFogState!=NULL){mBack->setFogState(*mFogState);}
 			if(mPointState!=NULL){mBack->setPointState(*mPointState);}
 			if(mMaterialState!=NULL){mBack->setMaterialState(*mMaterialState);}
