@@ -60,7 +60,7 @@ TCPConnection::TCPConnection(egg::net::Socket::ptr socket):
 	mDebugPacketDelayMinTime(0),
 	mDebugPacketDelayMaxTime(0)
 {
-	int maxSize=4096*16;
+	int maxSize=4096*16*4;
 	mOutPacket=MemoryStream::ptr(new MemoryStream(new uint8[maxSize],maxSize,0,true));
 	mDataOutPacket=DataStream::ptr(new DataStream(Stream::ptr(mOutPacket)));
 	mInPacket=MemoryStream::ptr(new MemoryStream(new uint8[maxSize],maxSize,maxSize,true));

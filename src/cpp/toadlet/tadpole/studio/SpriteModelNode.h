@@ -52,6 +52,9 @@ public:
 	void setModel(SpriteModel::ptr model);
 	SpriteModel::ptr getModel() const{return mModel;}
 
+	void setFrame(int frame){mFrame=frame;}
+	int getFrame() const{return mFrame;}
+
 	// Visible
 	void modifyMaterial(Material::ptr material);
 	bool getRendered() const{return mRendered;}
