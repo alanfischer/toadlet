@@ -50,14 +50,16 @@ public:
 	void setMaterial(Material::ptr material);
 	Material::ptr getMaterial() const{return mMaterial;}
 
-	void modifyMaterial(Material::ptr material);
-	bool getRendered() const{return mRendered;}
-	void setRendered(bool rendered){mRendered=rendered;}
-
 	void setAlignment(int alignment);
 	int getAlignment() const{return mAlignment;}
 
+	// Visible
+	bool getRendered() const{return mRendered;}
+	void setRendered(bool rendered){mRendered=rendered;}
+	peeper::RenderState::ptr getSharedRenderState();
 	void gatherRenderables(CameraNode *camera,RenderableSet *set);
+
+	// Renderable
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}

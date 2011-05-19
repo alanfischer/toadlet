@@ -161,17 +161,18 @@ void SpriteModelNode::setModel(SpriteModel::ptr model){
 	}
 }
 
-/// @todo: The cloning of Materials with sharedSources needs to be cleaned up a bit so its more intuitive
-void SpriteModelNode::modifyMaterial(Material::ptr material){
+RenderState::ptr SpriteModelNode::getSharedRenderState(){
+	Material::ptr sharedMaterial;
 	int i;
 	for(i=0;i<mMaterials.size();++i){
 		if(mMaterials[i]->getManaged()){
-			mMaterials[i]=mEngine->getMaterialManager()->cloneMaterial(mMaterials[i],false,i>0?mMaterials[0]:NULL);
+			mMaterials[i]=mEngine->getMaterialManager()->cloneMaterial(mMaterials[i],false,sharedMaterial);
 		}
 		if(i==0){
-			mMaterials[i]->modifyWith(material);
+			sharedMaterial=mMaterials[i];
 		}
 	}
+	return sharedMaterial->getRenderState();
 }
 
 void SpriteModelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){

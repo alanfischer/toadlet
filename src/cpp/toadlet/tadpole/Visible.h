@@ -42,10 +42,10 @@ class Visible{
 public:
 	virtual ~Visible(){}
 
-	virtual void modifyMaterial(Material::ptr material)=0;
-	virtual void gatherRenderables(node::CameraNode *camera,RenderableSet *set)=0;
 	virtual bool getRendered() const=0;
 	virtual void setRendered(bool visible)=0;
+	virtual peeper::RenderState::ptr getSharedRenderState()=0;
+	virtual void gatherRenderables(node::CameraNode *camera,RenderableSet *set)=0;
 };
 
 }

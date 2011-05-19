@@ -56,9 +56,9 @@ public:
 	int getFrame() const{return mFrame;}
 
 	// Visible
-	void modifyMaterial(Material::ptr material);
 	bool getRendered() const{return mRendered;}
 	void setRendered(bool rendered){mRendered=rendered;}
+	peeper::RenderState::ptr getSharedRenderState();
 	void gatherRenderables(node::CameraNode *camera,RenderableSet *set);
 
 	// Renderable
