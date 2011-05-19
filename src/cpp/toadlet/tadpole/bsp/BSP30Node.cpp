@@ -137,16 +137,19 @@ void BSP30ModelNode::setModel(BSP30Map::ptr map,int index){
 	}
 }
 
-void BSP30ModelNode::modifyMaterial(Material::ptr material){
+RenderState::ptr BSP30ModelNode::getSharedRenderState(){
+	Material::ptr sharedMaterial;
 	int i;
 	for(i=0;i<mSubModels.size();++i){
 		SubModel *sub=mSubModels[i];
 		if(sub->material->getManaged()){
-			sub->material=mEngine->getMaterialManager()->cloneMaterial(sub->material,false);
+			sub->material=mEngine->getMaterialManager()->cloneMaterial(sub->material,false,sharedMaterial);
 		}
-
-		sub->material->modifyWith(material);
+		if(i==0){
+			sharedMaterial=sub->material;
+		}
 	}
+	return sharedMaterial->getRenderState();
 }
 
 void BSP30ModelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){

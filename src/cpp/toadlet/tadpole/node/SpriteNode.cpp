@@ -111,20 +111,19 @@ void SpriteNode::setMaterial(Material::ptr material){
 	}
 }
 
-void SpriteNode::modifyMaterial(Material::ptr material){
-	if(mMaterial!=NULL){
-		if(mMaterial->getManaged()){
-			mMaterial=mEngine->getMaterialManager()->cloneMaterial(mMaterial,false);
-		}
-
-		mMaterial->modifyWith(material);
-	}
-}
-
 void SpriteNode::setAlignment(int alignment){
 	mAlignment=alignment;
 
 	updateSprite();
+}
+
+RenderState::ptr SpriteNode::getSharedRenderState(){
+	if(mMaterial!=NULL){
+		if(mMaterial->getManaged()){
+			mMaterial=mEngine->getMaterialManager()->cloneMaterial(mMaterial,false);
+		}
+	}
+	return mMaterial->getRenderState();
 }
 
 void SpriteNode::gatherRenderables(CameraNode *camera,RenderableSet *set){

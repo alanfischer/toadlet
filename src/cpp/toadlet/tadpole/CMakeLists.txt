@@ -156,6 +156,7 @@ set (TADPOLE_HEADERS
 	UpdateListener.h
 	VertexFormats.h
 	Version.h
+	Visible.h
 )
 
 set (TADPOLE_ANIMATION_HEADERS

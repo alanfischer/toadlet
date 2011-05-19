@@ -428,16 +428,19 @@ void StudioModelNode::traceSegment(Collision &result,const Vector3 &position,con
 	}
 }
 
-void StudioModelNode::modifyMaterial(Material::ptr material){
+RenderState::ptr StudioModelNode::getSharedRenderState(){
+	Material::ptr sharedMaterial;
 	int i;
 	for(i=0;i<mSubModels.size();++i){
 		SubModel *sub=mSubModels[i];
 		if(sub->material->getManaged()){
-			sub->material=mEngine->getMaterialManager()->cloneMaterial(sub->material,false);
+			sub->material=mEngine->getMaterialManager()->cloneMaterial(sub->material,false,sharedMaterial);
 		}
-
-		sub->material->modifyWith(material);
+		if(i==0){
+			sharedMaterial=sub->material;
+		}
 	}
+	return sharedMaterial->getRenderState();
 }
 
 void StudioModelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){

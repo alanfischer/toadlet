@@ -122,9 +122,9 @@ public:
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
 
 	// Visible
-	void modifyMaterial(Material::ptr material);
 	bool getRendered() const{return mRendered;}
 	void setRendered(bool rendered){mRendered=rendered;}
+	peeper::RenderState::ptr getSharedRenderState();
 	void gatherRenderables(node::CameraNode *camera,RenderableSet *set);
 
 	// Renderable
