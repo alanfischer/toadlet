@@ -105,7 +105,6 @@ Node *LabelNode::set(Node *node){
 	setAlignment(labelNode->getAlignment());
 	setNormalized(labelNode->getNormalized());
 	setWordWrap(labelNode->getWordWrap());
-	mMaterial->modifyWith(labelNode->getRenderMaterial());
 
 	return this;
 }

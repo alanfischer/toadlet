@@ -115,14 +115,13 @@ Material::ptr MaterialManager::cloneMaterial(Material::ptr material,bool managed
 	Material::ptr clonedMaterial(new Material(renderState));
 
 	if(sharedSource==NULL){
-		clonedMaterial->modifyWith(material);
+		modifyRenderState(clonedMaterial->getRenderState(),material->getRenderState());
 	}
-	else{
-		int i;
-		for(i=0;i<material->getNumTextures();++i){
-			clonedMaterial->setTexture(i,material->getTexture(i));
-			clonedMaterial->setTextureName(i,material->getTextureName(i));
-		}
+
+	int i;
+	for(i=0;i<material->getNumTextures();++i){
+		clonedMaterial->setTexture(i,material->getTexture(i));
+		clonedMaterial->setTextureName(i,material->getTextureName(i));
 	}
 
 	if(managed){
@@ -159,6 +158,36 @@ RenderState::ptr MaterialManager::createRenderState(){
 	mRenderStates.add(renderState);
 
 	return renderState;
+}
+
+void MaterialManager::modifyRenderState(RenderState::ptr dst,RenderState::ptr src){
+	BlendState blendState;
+	if(src->getBlendState(blendState)) dst->setBlendState(blendState);
+
+	DepthState depthState;
+	if(src->getDepthState(depthState)) dst->setDepthState(depthState);
+
+	RasterizerState rasterizerState;
+	if(src->getRasterizerState(rasterizerState)) dst->setRasterizerState(rasterizerState);
+
+	FogState fogState;
+	if(src->getFogState(fogState)) dst->setFogState(fogState);
+
+	PointState pointState;
+	if(src->getPointState(pointState)) dst->setPointState(pointState);
+
+	MaterialState materialState;
+	if(src->getMaterialState(materialState)) dst->setMaterialState(materialState);
+
+	int i;
+	for(i=0;i<src->getNumSamplerStates();++i){
+		SamplerState samplerState;
+		if(src->getSamplerState(i,samplerState)) dst->setSamplerState(i,samplerState);
+	}
+	for(i=0;i<src->getNumTextureStates();++i){
+		TextureState textureState;
+		if(src->getTextureState(i,textureState)) dst->setTextureState(i,textureState);
+	}
 }
 
 void MaterialManager::contextActivate(Renderer *renderer){

@@ -50,6 +50,8 @@ public:
 
 	peeper::RenderState::ptr createRenderState();
 
+	void modifyRenderState(peeper::RenderState::ptr dst,peeper::RenderState::ptr src);
+
 	void contextActivate(peeper::Renderer *renderer);
 	void contextDeactivate(peeper::Renderer *renderer);
 

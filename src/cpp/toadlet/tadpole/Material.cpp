@@ -88,45 +88,6 @@ void Material::setTexture(int i,Texture::ptr texture){
 	}
 }
 
-void Material::modifyWith(Material *material){
-	RenderState::ptr src=material->mRenderState;
-	RenderState::ptr dst=mRenderState;
-
-	BlendState blendState;
-	if(src->getBlendState(blendState)) dst->setBlendState(blendState);
-
-	DepthState depthState;
-	if(src->getDepthState(depthState)) dst->setDepthState(depthState);
-
-	RasterizerState rasterizerState;
-	if(src->getRasterizerState(rasterizerState)) dst->setRasterizerState(rasterizerState);
-
-	FogState fogState;
-	if(src->getFogState(fogState)) dst->setFogState(fogState);
-
-	PointState pointState;
-	if(src->getPointState(pointState)) dst->setPointState(pointState);
-
-	MaterialState materialState;
-	if(src->getMaterialState(materialState)) dst->setMaterialState(materialState);
-
-	int i;
-	for(i=0;i<src->getNumSamplerStates();++i){
-		SamplerState samplerState;
-		if(src->getSamplerState(i,samplerState)) dst->setSamplerState(i,samplerState);
-	}
-	for(i=0;i<src->getNumTextureStates();++i){
-		TextureState textureState;
-		if(src->getTextureState(i,textureState)) dst->setTextureState(i,textureState);
-	}
-	for(i=0;i<material->getNumTextures();++i){
-		setTexture(i,material->getTexture(i));
-		setTextureName(i,material->getTextureName(i));
-	}
-
-	setDepthSorted(material->getDepthSorted());
-}
-
 /// @todo: Optimize this so we're not resetting a ton of texture states, and not requesting the caps
 void Material::setupRenderer(Renderer *renderer){
 	renderer->setRenderState(mRenderState);
