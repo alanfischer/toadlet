@@ -167,6 +167,7 @@ RenderState::ptr SpriteModelNode::getSharedRenderState(){
 	for(i=0;i<mMaterials.size();++i){
 		if(mMaterials[i]->getManaged()){
 			mMaterials[i]=mEngine->getMaterialManager()->cloneMaterial(mMaterials[i],false,sharedMaterial);
+			mMaterials[i]->setSort(Material::SortType_AUTO);
 		}
 		if(i==0){
 			sharedMaterial=mMaterials[i];
