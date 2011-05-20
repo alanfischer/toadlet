@@ -37,7 +37,7 @@ namespace tadpole{
 Material::Material(RenderState::ptr renderState):BaseResource(),
 	//mFogState,
 	//mBlendState,
-	mDepthSorted(false),
+	mSort(SortType_MATERIAL),
 	//mDepthState,
 	//mPointState,
 	//mRasterizerState
@@ -85,6 +85,19 @@ void Material::setTexture(int i,Texture::ptr texture){
 
 		TextureState textureState;
 		if(mRenderState->getTextureState(i,textureState)==false) mRenderState->setTextureState(i,textureState);
+	}
+}
+
+bool Material::isDepthSorted() const{
+	switch(mSort){
+		case SortType_DEPTH:
+			return true;
+		case SortType_MATERIAL:
+			return false;
+		default:{
+			DepthState depth;
+			return mRenderState->getDepthState(depth) && depth.write==false;
+		}
 	}
 }
 

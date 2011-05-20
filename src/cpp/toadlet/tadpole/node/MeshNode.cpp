@@ -271,6 +271,7 @@ RenderState::ptr MeshNode::getSharedRenderState(){
 		SubMesh *sub=mSubMeshes[i];
 		if(sub->material->getManaged()){
 			sub->material=mEngine->getMaterialManager()->cloneMaterial(sub->material,false,sharedMaterial);
+			sub->material->setSort(Material::SortType_AUTO);
 		}
 		if(i==0){
 			sharedMaterial=sub->material;

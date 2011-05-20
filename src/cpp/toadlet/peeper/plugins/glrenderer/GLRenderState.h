@@ -119,6 +119,8 @@ public:
 	void setSamplerState(int i,const SamplerState &state){
 		if(mSamplerStates.size()<=i){
 			mSamplerStates.resize(i+1,NULL);
+		}
+		if(mSamplerStates[i]==NULL){
 			mSamplerStates[i]=new SamplerState(state);
 		}
 		else{
@@ -131,6 +133,8 @@ public:
 	void setTextureState(int i,const TextureState &state){
 		if(mTextureStates.size()<=i){
 			mTextureStates.resize(i+1,NULL);
+		}
+		if(mTextureStates[i]==NULL){
 			mTextureStates[i]=new TextureState(state);
 		}
 		else{

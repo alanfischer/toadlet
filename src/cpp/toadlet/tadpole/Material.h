@@ -40,6 +40,12 @@ class TOADLET_API Material:public egg::BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(Material);
 
+	enum SortType{
+		SortType_AUTO,
+		SortType_MATERIAL,
+		SortType_DEPTH,
+	};
+
 	Material(peeper::RenderState::ptr renderState=peeper::RenderState::ptr());
 	virtual ~Material();
 
@@ -85,8 +91,9 @@ public:
 	void setTextureName(int i,const egg::String &name){if(i>=mTextureNames.size()){mTextureNames.resize(i+1);}mTextureNames[i]=name;}
 	egg::String getTextureName(int i=0) const{return i<mTextureNames.size()?mTextureNames[i]:(char*)NULL;}
 
-	void setDepthSorted(bool sorted){mDepthSorted=sorted;}
-	inline bool getDepthSorted() const{return mDepthSorted;}
+	void setSort(SortType sort){mSort=sort;}
+	inline SortType getSort() const{return mSort;}
+	bool isDepthSorted() const;
 
 	void setLayer(int layer){mLayer=layer;}
 	int getLayer() const{return mLayer;}
@@ -101,7 +108,7 @@ protected:
 	peeper::RenderState::ptr mRenderState;
 	egg::Collection<peeper::Texture::ptr> mTextures;
 	egg::Collection<egg::String> mTextureNames;
-	bool mDepthSorted;
+	SortType mSort;
 	int mLayer;
 };
 
