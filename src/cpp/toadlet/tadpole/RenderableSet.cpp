@@ -80,7 +80,7 @@ void RenderableSet::queueRenderable(Renderable *renderable){
 		ambient.set(mScene->getAmbientColor());
 	}
 
-	if(material!=NULL && material->getDepthSorted()){
+	if(material!=NULL && material->isDepthSorted()){
 		/// @todo: Real sorting algorithm, clean this up
 		scalar depth=Math::lengthSquared(bound.getSphere().origin,mCamera->getWorldTranslate());
 

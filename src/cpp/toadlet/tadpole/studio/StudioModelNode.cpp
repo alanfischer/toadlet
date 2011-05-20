@@ -435,6 +435,7 @@ RenderState::ptr StudioModelNode::getSharedRenderState(){
 		SubModel *sub=mSubModels[i];
 		if(sub->material->getManaged()){
 			sub->material=mEngine->getMaterialManager()->cloneMaterial(sub->material,false,sharedMaterial);
+			sub->material->setSort(Material::SortType_AUTO);
 		}
 		if(i==0){
 			sharedMaterial=sub->material;

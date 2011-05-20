@@ -121,6 +121,7 @@ RenderState::ptr SpriteNode::getSharedRenderState(){
 	if(mMaterial!=NULL){
 		if(mMaterial->getManaged()){
 			mMaterial=mEngine->getMaterialManager()->cloneMaterial(mMaterial,false);
+			mMaterial->setSort(Material::SortType_AUTO);
 		}
 	}
 	return mMaterial->getRenderState();
