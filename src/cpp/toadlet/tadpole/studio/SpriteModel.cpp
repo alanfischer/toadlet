@@ -23,23 +23,23 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_STUDIO_STUDIOMODEL_H
-#define TOADLET_TADPOLE_STUDIO_STUDIOMODEL_H
+#ifndef TOADLET_TADPOLE_STUDIO_SPRITEMODEL_H
+#define TOADLET_TADPOLE_STUDIO_SPRITEMODEL_H
 
 #include <toadlet/egg/BaseResource.h>
-#include <toadlet/tadpole/studio/StudioTypes.h>
+#include <toadlet/tadpole/studio/SpriteTypes.h>
 #include <toadlet/tadpole/Material.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace studio{
 
-class TOADLET_API StudioModel:public egg::BaseResource{
+class TOADLET_API SpriteModel:public egg::BaseResource{
 public:
 	TOADLET_BASERESOURCE_PASSTHROUGH(BaseResource);
-	TOADLET_SHARED_POINTERS(StudioModel);
+	TOADLET_SHARED_POINTERS(SpriteModel);
 
-	StudioModel():
+	SpriteModel():
 		data(NULL),
 		header(NULL)
 	{}
@@ -56,11 +56,6 @@ public:
 			textures[i]->release();
 		}
 		textures.clear();
-
-		for(i=0;i<materials.size();++i){
-			materials[i]->release();
-		}
-		materials.clear();
 	}
 
 	studiobodyparts *bodyparts(int i){return &((studiobodyparts*)(data+header->bodypartindex))[i];}

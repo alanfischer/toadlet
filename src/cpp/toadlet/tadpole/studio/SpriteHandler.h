@@ -23,22 +23,37 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_RENDERSTATESETDESTROYEDLISTENER_H
-#define TOADLET_PEEPER_RENDERSTATESETDESTROYEDLISTENER_H
+#ifndef TOADLET_TADPOLE_STUDIO_SPRITEHANDLER_H
+#define TOADLET_TADPOLE_STUDIO_SPRITEHANDLER_H
+
+#include <toadlet/tadpole/Engine.h>
+#include <toadlet/tadpole/ResourceHandler.h>
+#include <toadlet/tadpole/studio/SpriteModel.h>
 
 namespace toadlet{
-namespace peeper{
+namespace tadpole{
+namespace studio{
 
-class RenderStateSet;
-
-class RenderStateSetDestroyedListener{
+class TOADLET_API SpriteHandler:public ResourceHandler{
 public:
-	virtual ~RenderStateSetDestroyedListener(){}
+	TOADLET_SHARED_POINTERS(SpriteHandler);
 
-	virtual void renderStateSetDestroyed(RenderStateSet *renderStateSet)=0;
+	SpriteHandler(Engine *engine);
+	virtual ~SpriteHandler();
+
+	virtual egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
+
+protected:
+	void buildTextures(SpriteModel *model);
+	void buildMaterials(SpriteModel *model);
+	peeper::Texture::ptr createTexture(spriteframe *frame,tbyte *data,tbyte *pal);
+
+	Engine *mEngine;
 };
 
 }
 }
+}
 
 #endif
+

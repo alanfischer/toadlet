@@ -201,14 +201,13 @@ void ParticleNode::frameUpdate(int dt,int scope){
 	super::frameUpdate(dt,scope);
 }
 
-void ParticleNode::modifyMaterial(Material::ptr material){
+RenderState::ptr ParticleNode::getSharedRenderState(){
 	if(mMaterial!=NULL){
 		if(mMaterial->getManaged()){
 			mMaterial=mEngine->getMaterialManager()->cloneMaterial(mMaterial,false);
 		}
-
-		mMaterial->modifyWith(material);
 	}
+	return mMaterial->getRenderState();
 }
 
 void ParticleNode::gatherRenderables(CameraNode *camera,RenderableSet *set){

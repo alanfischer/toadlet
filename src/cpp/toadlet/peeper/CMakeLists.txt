@@ -23,7 +23,7 @@ set (PEEPER_HEADERS
 	BackablePixelBufferRenderTarget.h
 	BackableTexture.h
 	BackableTextureMipPixelBuffer.h
-	BackableRenderStateSet.h
+	BackableRenderState.h
 	BlendState.h
 	Buffer.h
 	BufferDestroyedListener.h
@@ -46,8 +46,8 @@ set (PEEPER_HEADERS
 	PixelBufferRenderTarget.h
 	PointState.h
 	RasterizerState.h
-	RenderStateSet.h
-	RenderStateSetDestroyedListener.h
+	RenderState.h
+	RenderStateDestroyedListener.h
 	Texture.h
 	TextureState.h
 	Types.h

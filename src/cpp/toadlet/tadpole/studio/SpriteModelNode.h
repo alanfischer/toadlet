@@ -23,44 +23,46 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_NODE_SPRITENODE_H
-#define TOADLET_TADPOLE_NODE_SPRITENODE_H
+#ifndef TOADLET_TADPOLE_STUDIO_SPRITEMODELNODE_H
+#define TOADLET_TADPOLE_STUDIO_SPRITEMODELNODE_H
 
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Visible.h>
 #include <toadlet/tadpole/node/CameraAlignedNode.h>
+#include <toadlet/tadpole/studio/SpriteModel.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
+namespace studio{
 
-class TOADLET_API SpriteNode:public CameraAlignedNode,public Renderable,public Visible{
+class TOADLET_API SpriteModelNode:public node::CameraAlignedNode,public Renderable,public Visible{
 public:
-	TOADLET_NODE(SpriteNode,CameraAlignedNode);
-	
-	SpriteNode();
+	TOADLET_NODE(SpriteModelNode,CameraAlignedNode);
+
+	SpriteModelNode();
 	Node *create(Scene *scene);
 	void destroy();
 	Node *set(Node *node);
 
 	void *hasInterface(int type);
 
-	void setMaterial(Material::ptr material);
-	Material::ptr getMaterial() const{return mMaterial;}
+	void setModel(const egg::String &name);
+	void setModel(SpriteModel::ptr model);
+	SpriteModel::ptr getModel() const{return mModel;}
 
-	void setAlignment(int alignment);
-	int getAlignment() const{return mAlignment;}
+	void setFrame(int frame){mFrame=frame;}
+	int getFrame() const{return mFrame;}
 
 	// Visible
 	bool getRendered() const{return mRendered;}
 	void setRendered(bool rendered){mRendered=rendered;}
 	peeper::RenderState::ptr getSharedRenderState();
-	void gatherRenderables(CameraNode *camera,RenderableSet *set);
+	void gatherRenderables(node::CameraNode *camera,RenderableSet *set);
 
 	// Renderable
-	Material *getRenderMaterial() const{return mMaterial;}
+	Material *getRenderMaterial() const{return mFrame<mMaterials.size()?mMaterials[mFrame]:NULL;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
 	void render(peeper::Renderer *renderer) const;
@@ -68,11 +70,14 @@ public:
 protected:
 	TOADLET_GIB_DEFINE(SpriteNode);
 
-	void updateSprite();
+	void createBuffers();
+	void updateBuffers();
+	void destroyBuffers();
 
-	int mAlignment;
-	Material::ptr mMaterial;
+	SpriteModel::ptr mModel;
 	bool mRendered;
+	int mFrame;
+	egg::Collection<Material::ptr> mMaterials;
 	peeper::VertexData::ptr mVertexData;
 	peeper::IndexData::ptr mIndexData;
 };
@@ -82,4 +87,3 @@ protected:
 }
 
 #endif
-

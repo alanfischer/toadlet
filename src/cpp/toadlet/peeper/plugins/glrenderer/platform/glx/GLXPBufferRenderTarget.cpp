@@ -93,7 +93,7 @@ bool GLXPBufferRenderTarget::activate(){
 	GLXRenderTarget::activate();
 
 	if(mInitialized==false){
-		mRenderer->setDefaultStates();
+		mRenderer->setDefaultState();
 		mInitialized=true;
 	}
 

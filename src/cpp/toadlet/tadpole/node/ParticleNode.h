@@ -102,11 +102,13 @@ public:
 
 	void frameUpdate(int dt,int scope);
 
-	void modifyMaterial(Material::ptr material);
+	// Visible
 	bool getRendered() const{return mRendered;}
 	void setRendered(bool rendered){mRendered=rendered;}
+	peeper::RenderState::ptr getSharedRenderState();
 	void gatherRenderables(CameraNode *camera,RenderableSet *set);
 
+	// Renderable
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Transform &getRenderTransform() const{return mWorldSpace==false?getWorldTransform():Node::identityTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}

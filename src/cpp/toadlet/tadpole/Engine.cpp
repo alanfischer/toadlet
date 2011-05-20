@@ -85,7 +85,6 @@
 
 #include <toadlet/tadpole/handler/BMPHandler.h>
 #include <toadlet/tadpole/handler/DDSHandler.h>
-#include <toadlet/tadpole/handler/SPRHandler.h>
 #include <toadlet/tadpole/handler/TGAHandler.h>
 #include <toadlet/tadpole/handler/TMSHHandler.h>
 #include <toadlet/tadpole/handler/TPKGHandler.h>
@@ -139,8 +138,10 @@
 #endif
 
 #if !defined(TOADLET_FIXED_POINT)
+	#include <toadlet/tadpole/handler/SPRHandler.h>
 	#include <toadlet/tadpole/bsp/BSP30Node.h>
 	#include <toadlet/tadpole/studio/StudioModelNode.h>
+	#include <toadlet/tadpole/studio/SpriteModelNode.h>
 #endif
 
 using namespace toadlet::egg;
@@ -231,7 +232,6 @@ Engine::Engine(bool backable):
 			mTextureManager->setHandler(PNGHandler::ptr(new PNGHandler(mTextureManager)),"png");
 		#endif
 	#endif
-	mTextureManager->setHandler(SPRHandler::ptr(new SPRHandler(mTextureManager)),"spr");
 	mTextureManager->setHandler(TGAHandler::ptr(new TGAHandler(mTextureManager)),"tga");
 
 	// Font handlers, try for freetype first, since it currently looks best.  This can be changed back once the others look as nice
@@ -269,9 +269,12 @@ Engine::Engine(bool backable):
 
 	// Plugin types, should be removed from here somehow
 	#if !defined(TOADLET_FIXED_POINT)
+		mTextureManager->setHandler(SPRHandler::ptr(new SPRHandler(this)),"spr");
+
 		registerNodeType(bsp::BSP30Node::type());
 		registerNodeType(bsp::BSP30ModelNode::type());
 		registerNodeType(studio::StudioModelNode::type());
+		registerNodeType(studio::SpriteModelNode::type());
 	#endif
 }
 

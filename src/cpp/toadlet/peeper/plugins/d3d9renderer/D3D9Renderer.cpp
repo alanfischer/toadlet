@@ -26,7 +26,7 @@
 #include "D3D9Renderer.h"
 #include "D3D9Texture.h"
 #include "D3D9RenderTarget.h"
-#include "D3D9RenderStateSet.h"
+#include "D3D9RenderState.h"
 #include "D3D9PixelBufferRenderTarget.h"
 #include "D3D9VertexBuffer.h"
 #include "D3D9IndexBuffer.h"
@@ -86,9 +86,6 @@ D3D9Renderer::D3D9Renderer():
 	mD3DPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL),
 	mD3DRenderTarget(NULL)
-
-	//mStatisticsSet,
-	//mCapabilitySet
 {
 }
 
@@ -142,7 +139,7 @@ bool D3D9Renderer::create(RenderTarget *target,int *options){
 	#endif
 	setCapsFromD3DCAPS9(mCaps,mD3DCaps,SUCCEEDED(renderToTextureResult),SUCCEEDED(renderToDepthTextureResult));
 
-	setDefaultStates();
+	setDefaultState();
 
 	Logger::alert(Categories::TOADLET_PEEPER,
 		"created D3D9Renderer");
@@ -183,7 +180,7 @@ Renderer::RendererStatus D3D9Renderer::getStatus(){
 bool D3D9Renderer::reset(){
 	mD3DPrimaryRenderTarget->reset();
 
-	setDefaultStates();
+	setDefaultState();
 
 	return true;
 }
@@ -235,8 +232,8 @@ Query *D3D9Renderer::createQuery(){
 	#endif
 }
 
-RenderStateSet *D3D9Renderer::createRenderStateSet(){
-	return new D3D9RenderStateSet(this);
+RenderState *D3D9Renderer::createRenderState(){
+	return new D3D9RenderState(this);
 }
 
 bool D3D9Renderer::setRenderTarget(RenderTarget *target){
@@ -465,7 +462,7 @@ bool D3D9Renderer::copySurface(IDirect3DSurface9 *dst,IDirect3DSurface9 *src){
 	return true;
 }
 
-void D3D9Renderer::setDefaultStates(){
+void D3D9Renderer::setDefaultState(){
 	setBlendState(BlendState::Combination_DISABLED);
 	setDepthState(DepthState());
 	setFogState(FogState());
@@ -488,41 +485,41 @@ void D3D9Renderer::setDefaultStates(){
 	mD3DDevice->SetRenderState(D3DRS_SPECULARENABLE,true);
 }
 
-bool D3D9Renderer::setRenderStateSet(RenderStateSet *set){
-	D3D9RenderStateSet *d3dset=NULL;
-	if(set!=NULL){
-		d3dset=(D3D9RenderStateSet*)set->getRootRenderStateSet();
-		if(d3dset==NULL){
+bool D3D9Renderer::setRenderState(RenderState *renderState){
+	D3D9RenderState *d3drenderState=NULL;
+	if(renderState!=NULL){
+		d3drenderState=(D3D9RenderState*)renderState->getRootRenderState();
+		if(d3drenderState==NULL){
 			Error::nullPointer(Categories::TOADLET_PEEPER,
-				"RenderStateSet is not a D3D9RenderStateSet");
+				"RenderState is not a D3D9RenderState");
 			return false;
 		}
 	}
 
-	if(d3dset->mBlendState!=NULL){
-		setBlendState(*d3dset->mBlendState);
+	if(d3drenderState->mBlendState!=NULL){
+		setBlendState(*d3drenderState->mBlendState);
 	}
-	if(d3dset->mDepthState!=NULL){
-		setDepthState(*d3dset->mDepthState);
+	if(d3drenderState->mDepthState!=NULL){
+		setDepthState(*d3drenderState->mDepthState);
 	}
-	if(d3dset->mRasterizerState!=NULL){
-		setRasterizerState(*d3dset->mRasterizerState);
+	if(d3drenderState->mRasterizerState!=NULL){
+		setRasterizerState(*d3drenderState->mRasterizerState);
 	}
-	if(d3dset->mFogState!=NULL){
-		setFogState(*d3dset->mFogState);
+	if(d3drenderState->mFogState!=NULL){
+		setFogState(*d3drenderState->mFogState);
 	}
-	if(d3dset->mPointState!=NULL){
-		setPointState(*d3dset->mPointState);
+	if(d3drenderState->mPointState!=NULL){
+		setPointState(*d3drenderState->mPointState);
 	}
-	if(d3dset->mMaterialState!=NULL){
-		setMaterialState(*d3dset->mMaterialState);
+	if(d3drenderState->mMaterialState!=NULL){
+		setMaterialState(*d3drenderState->mMaterialState);
 	}
 	int i;
-	for(i=0;i<d3dset->mSamplerStates.size();++i){
-		setSamplerState(i,d3dset->mSamplerStates[i]);
+	for(i=0;i<d3drenderState->mSamplerStates.size();++i){
+		setSamplerState(i,d3drenderState->mSamplerStates[i]);
 	}
-	for(i=0;i<d3dset->mTextureStates.size();++i){
-		setTextureState(i,d3dset->mTextureStates[i]);
+	for(i=0;i<d3drenderState->mTextureStates.size();++i){
+		setTextureState(i,d3drenderState->mTextureStates[i]);
 	}
 
 	return true;
@@ -550,7 +547,7 @@ void D3D9Renderer::setBlendState(const BlendState &state){
 void D3D9Renderer::setDepthState(const DepthState &state){
 	HRESULT hr=S_OK;
 
-	if(state.test==DepthState::DepthTest_NONE){
+	if(state.test==DepthState::DepthTest_NEVER){
 		mD3DDevice->SetRenderState(D3DRS_ZENABLE,D3DZB_FALSE);
 	}
 	else{

@@ -96,10 +96,6 @@ public:
 	void setMesh(Mesh::ptr mesh);
 	const Mesh::ptr &getMesh() const{return mMesh;}
 
-	void modifyMaterial(Material::ptr material);
-	bool getRendered() const{return mRendered;}
-	void setRendered(bool rendered){mRendered=rendered;}
-
 	inline int getNumSubMeshes() const{return mSubMeshes.size();}
 	SubMesh *getSubMesh(int i){return mSubMeshes[i];}
 	SubMesh *getSubMesh(const egg::String &name);
@@ -111,19 +107,24 @@ public:
 
 	void frameUpdate(int dt,int scope);
 	void updateWorldTransform();
+
+	// Visible
+	bool getRendered() const{return mRendered;}
+	void setRendered(bool rendered){mRendered=rendered;}
+	peeper::RenderState::ptr getSharedRenderState();
 	void gatherRenderables(CameraNode *camera,RenderableSet *set);
-
-	peeper::VertexBufferAccessor svba;
-	peeper::VertexBufferAccessor dvba;
-
-	void createVertexBuffer();
-	void updateVertexBuffer();
 
 	// Attachable
 	int getNumAttachments(){return mSkeleton!=NULL?mSkeleton->getNumAttachments():0;}
 	egg::String getAttachmentName(int index){return mSkeleton!=NULL?mSkeleton->getAttachmentName(index):(char*)NULL;}
 	int getAttachmentIndex(const egg::String &name){return mSkeleton!=NULL?mSkeleton->getAttachmentIndex(name):0;}
 	bool getAttachmentTransform(Transform &result,int index){return mSkeleton!=NULL?mSkeleton->getAttachmentTransform(result,index):false;}
+
+	peeper::VertexBufferAccessor svba;
+	peeper::VertexBufferAccessor dvba;
+
+	void createVertexBuffer();
+	void updateVertexBuffer();
 
 protected:
 	bool mRendered;

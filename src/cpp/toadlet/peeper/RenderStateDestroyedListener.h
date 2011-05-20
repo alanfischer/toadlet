@@ -23,39 +23,21 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_EGG_IMAGE_SPRHANDLER_H
-#define TOADLET_EGG_IMAGE_SPRHANDLER_H
-
-#include <toadlet/egg/image/Image.h>
-#include <toadlet/egg/io/DataStream.h>
-#include <toadlet/egg/Collection.h>
+#ifndef TOADLET_PEEPER_RENDERSTATEDESTROYEDLISTENER_H
+#define TOADLET_PEEPER_RENDERSTATEDESTROYEDLISTENER_H
 
 namespace toadlet{
-namespace egg{
-namespace image{
+namespace peeper{
 
-class TOADLET_API SPRHandler{
+class RenderState;
+
+class RenderStateDestroyedListener{
 public:
-	SPRHandler();
-	virtual ~SPRHandler();
+	virtual ~RenderStateDestroyedListener(){}
 
-	virtual Image *loadImage(io::Stream *in);
-	virtual bool saveImage(Image *image,io::Stream *out);
-
-	virtual bool loadAnimatedImage(io::Stream *in,Collection<Image*> &images,Collection<int> &frameDelays);
-
-protected:
-	virtual bool openFile(io::Stream *in);
-	virtual void closeFile();
-	virtual Image *getNextImage();
-
-	io::DataStream::ptr mDataStream;
-	void *mSprite;
-	unsigned char *mPalette;
-	int mNextFrame;
+	virtual void renderStateDestroyed(RenderState *renderState)=0;
 };
 
-}
 }
 }
 

@@ -64,7 +64,7 @@ public:
 	Program *createProgram();
 	Shader *createShader();
 	Query *createQuery();
-	RenderStateSet *createRenderStateSet();
+	RenderState *createRenderState();
 
 	// Matrix operations
 	void setModelMatrix(const Matrix4x4 &matrix);
@@ -84,8 +84,8 @@ public:
 	bool copyFrameBufferToPixelBuffer(PixelBuffer *dst);
 	bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src);
 	bool copySurface(IDirect3DSurface9 *dst,IDirect3DSurface9 *src);
-	void setDefaultStates();
-	bool setRenderStateSet(RenderStateSet *set);
+	void setDefaultState();
+	bool setRenderState(RenderState *renderState);
 	void setTexture(int i,Texture *texture);
 
 	// Old fixed states

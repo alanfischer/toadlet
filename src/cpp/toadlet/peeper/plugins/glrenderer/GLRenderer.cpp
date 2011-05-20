@@ -27,7 +27,7 @@
 #include "GLVertexFormat.h"
 #include "GLRenderer.h"
 #include "GLRenderTarget.h"
-#include "GLRenderStateSet.h"
+#include "GLRenderState.h"
 #include "GLTexture.h"
 #if defined(TOADLET_HAS_GLFBOS)
 	#include "GLFBORenderTarget.h"
@@ -88,8 +88,6 @@ GLRenderer::GLRenderer():
 	//mModelMatrix,
 	//mViewMatrix,
 
-	//mStatisticsSet,
-	//mCapabilitySet,
 	mMultiTexture(false),
 	mHasClampToEdge(false),
 
@@ -313,7 +311,7 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 			caps.fill=true;
 			caps.cubeMap=true;
 		#else
-			mCapabilitySet.texturePerspective=true;
+			caps.texturePerspective=true;
 			#if TOADLET_HAS_GL_20
 				caps.cubeMap=true;
 			#else
@@ -322,7 +320,7 @@ bool GLRenderer::create(RenderTarget *target,int *options){
 		#endif
 	}
 
-	setDefaultStates();
+	setDefaultState();
 
 	TOADLET_CHECK_GLERROR("create");
 
@@ -351,7 +349,7 @@ bool GLRenderer::reset(){
 		mGLPrimaryRenderTarget->reset();
 	}
 
-	setDefaultStates();
+	setDefaultState();
 
 	return true;
 }
@@ -419,8 +417,8 @@ Query *GLRenderer::createQuery(){
 	#endif
 }
 
-RenderStateSet *GLRenderer::createRenderStateSet(){
-	return new GLRenderStateSet(this);
+RenderState *GLRenderer::createRenderState(){
+	return new GLRenderState(this);
 }
 
 // Matrix operations
@@ -798,7 +796,7 @@ bool GLRenderer::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
 	return true;
 }
 
-void GLRenderer::setDefaultStates(){
+void GLRenderer::setDefaultState(){
 	// General states
 	setBlendState(BlendState());
 	setDepthState(DepthState());
@@ -823,44 +821,44 @@ void GLRenderer::setDefaultStates(){
 	}
 	#endif
 
-	TOADLET_CHECK_GLERROR("setDefaultStates");
+	TOADLET_CHECK_GLERROR("setDefaultState");
 }
 
-bool GLRenderer::setRenderStateSet(RenderStateSet *set){
-	GLRenderStateSet *glset=NULL;
-	if(set!=NULL){
-		glset=(GLRenderStateSet*)set->getRootRenderStateSet();
-		if(glset==NULL){
+bool GLRenderer::setRenderState(RenderState *renderState){
+	GLRenderState *glrenderState=NULL;
+	if(renderState!=NULL){
+		glrenderState=(GLRenderState*)renderState->getRootRenderState();
+		if(glrenderState==NULL){
 			Error::nullPointer(Categories::TOADLET_PEEPER,
-				"RenderStateSet is not a GLRenderStateSet");
+				"RenderState is not a GLRenderState");
 			return false;
 		}
 	}
 
-	if(glset->mBlendState!=NULL){
-		setBlendState(*glset->mBlendState);
+	if(glrenderState->mBlendState!=NULL){
+		setBlendState(*glrenderState->mBlendState);
 	}
-	if(glset->mDepthState!=NULL){
-		setDepthState(*glset->mDepthState);
+	if(glrenderState->mDepthState!=NULL){
+		setDepthState(*glrenderState->mDepthState);
 	}
-	if(glset->mRasterizerState!=NULL){
-		setRasterizerState(*glset->mRasterizerState);
+	if(glrenderState->mRasterizerState!=NULL){
+		setRasterizerState(*glrenderState->mRasterizerState);
 	}
-	if(glset->mFogState!=NULL){
-		setFogState(*glset->mFogState);
+	if(glrenderState->mFogState!=NULL){
+		setFogState(*glrenderState->mFogState);
 	}
-	if(glset->mPointState!=NULL){
-		setPointState(*glset->mPointState);
+	if(glrenderState->mPointState!=NULL){
+		setPointState(*glrenderState->mPointState);
 	}
-	if(glset->mMaterialState!=NULL){
-		setMaterialState(*glset->mMaterialState);
+	if(glrenderState->mMaterialState!=NULL){
+		setMaterialState(*glrenderState->mMaterialState);
 	}
 	int i;
-	for(i=0;i<glset->mSamplerStates.size();++i){
-		setSamplerState(i,glset->mSamplerStates[i]);
+	for(i=0;i<glrenderState->mSamplerStates.size();++i){
+		setSamplerState(i,glrenderState->mSamplerStates[i]);
 	}
-	for(i=0;i<glset->mTextureStates.size();++i){
-		setTextureState(i,glset->mTextureStates[i]);
+	for(i=0;i<glrenderState->mTextureStates.size();++i){
+		setTextureState(i,glrenderState->mTextureStates[i]);
 	}
 
 	return true;

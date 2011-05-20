@@ -219,7 +219,7 @@ void HopEntity::logicUpdate(int dt,int scope){
 		transformUpdated(TransformUpdate_BIT_TRANSLATE|TransformUpdate_BIT_INTERPOLATOR);
 	}
 
-	if(mNextThink<=mScene->getLogicTime()){
+	if(mNextThink>0 && mNextThink<=mScene->getLogicTime()){
 		setNextThink(0);
 		think();
 	}
