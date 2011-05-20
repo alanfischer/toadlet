@@ -76,7 +76,7 @@ public:
 	Program *createProgram();
 	Shader *createShader();
 	Query *createQuery();
-	RenderStateSet *createRenderStateSet();
+	RenderState *createRenderState();
 
 	// Matrix operations
 	void setModelMatrix(const Matrix4x4 &matrix);
@@ -95,8 +95,8 @@ public:
 	void renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData);
 	bool copyFrameBufferToPixelBuffer(PixelBuffer *dst);
 	bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src);
-	void setDefaultStates();
-	bool setRenderStateSet(RenderStateSet *set);
+	void setDefaultState();
+	bool setRenderState(RenderState *renderState);
 	void setTexture(int i,Texture *texture);
 
 	// Old fixed states

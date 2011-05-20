@@ -20,7 +20,7 @@ set (PEEPER_D3D9RENDERER_HEADERS
 	D3D9PixelBuffer.h
 	D3D9PixelBufferRenderTarget.h
 	D3D9Query.h
-	D3D9RenderStateSet.h
+	D3D9RenderState.h
 	D3D9RenderTarget.h
 	D3D9Renderer.h
 	D3D9Texture.h

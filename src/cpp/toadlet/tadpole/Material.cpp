@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Logger.h>
-#include <toadlet/peeper/BackableRenderStateSet.h>
+#include <toadlet/peeper/BackableRenderState.h>
 #include <toadlet/peeper/RendererCaps.h>
 #include <toadlet/tadpole/Material.h>
 
@@ -34,7 +34,7 @@ using namespace toadlet::peeper;
 namespace toadlet{
 namespace tadpole{
 
-Material::Material(RenderStateSet::ptr renderStateSet):BaseResource(),
+Material::Material(RenderState::ptr renderState):BaseResource(),
 	//mFogState,
 	//mBlendState,
 	mDepthSorted(false),
@@ -43,11 +43,11 @@ Material::Material(RenderStateSet::ptr renderStateSet):BaseResource(),
 	//mRasterizerState
 	mLayer(0)
 {
-	if(renderStateSet==NULL){
-		renderStateSet=RenderStateSet::ptr(new BackableRenderStateSet());
+	if(renderState==NULL){
+		renderState=RenderState::ptr(new BackableRenderState());
 	}
 
-	mRenderStateSet=renderStateSet;
+	mRenderState=renderState;
 }
 
 Material::~Material(){
@@ -55,7 +55,7 @@ Material::~Material(){
 }
 
 void Material::destroy(){
-	mRenderStateSet->destroy();
+	mRenderState->destroy();
 
 	int i;
 	for(i=0;i<mTextures.size();++i){
@@ -81,53 +81,16 @@ void Material::setTexture(int i,Texture::ptr texture){
 	// Always add a default SamplerState and TextureState if non exists
 	{
 		SamplerState samplerState;
-		if(mRenderStateSet->getSamplerState(i,samplerState)==false) mRenderStateSet->setSamplerState(i,samplerState);
+		if(mRenderState->getSamplerState(i,samplerState)==false) mRenderState->setSamplerState(i,samplerState);
 
 		TextureState textureState;
-		if(mRenderStateSet->getTextureState(i,textureState)==false) mRenderStateSet->setTextureState(i,textureState);
-	}
-}
-
-void Material::modifyWith(Material *material){
-	RenderStateSet::ptr src=material->mRenderStateSet;
-	RenderStateSet::ptr dst=mRenderStateSet;
-
-	BlendState blendState;
-	if(src->getBlendState(blendState)) dst->setBlendState(blendState);
-
-	DepthState depthState;
-	if(src->getDepthState(depthState)) dst->setDepthState(depthState);
-
-	RasterizerState rasterizerState;
-	if(src->getRasterizerState(rasterizerState)) dst->setRasterizerState(rasterizerState);
-
-	FogState fogState;
-	if(src->getFogState(fogState)) dst->setFogState(fogState);
-
-	PointState pointState;
-	if(src->getPointState(pointState)) dst->setPointState(pointState);
-
-	MaterialState materialState;
-	if(src->getMaterialState(materialState)) dst->setMaterialState(materialState);
-
-	int i;
-	for(i=0;i<src->getNumSamplerStates();++i){
-		SamplerState samplerState;
-		if(src->getSamplerState(i,samplerState)) dst->setSamplerState(i,samplerState);
-	}
-	for(i=0;i<src->getNumTextureStates();++i){
-		TextureState textureState;
-		if(src->getTextureState(i,textureState)) dst->setTextureState(i,textureState);
-	}
-	for(i=0;i<material->getNumTextures();++i){
-		setTexture(i,material->getTexture(i));
-		setTextureName(i,material->getTextureName(i));
+		if(mRenderState->getTextureState(i,textureState)==false) mRenderState->setTextureState(i,textureState);
 	}
 }
 
 /// @todo: Optimize this so we're not resetting a ton of texture states, and not requesting the caps
 void Material::setupRenderer(Renderer *renderer){
-	renderer->setRenderStateSet(mRenderStateSet);
+	renderer->setRenderState(mRenderState);
 
 	RendererCaps caps;
 	renderer->getRendererCaps(caps);

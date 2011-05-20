@@ -95,9 +95,9 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
 
 	if(useMaterials){
-		renderer->setDefaultStates();
-		if(camera->getDefaultStateSet()!=NULL){
-			renderer->setRenderStateSet(camera->getDefaultStateSet());
+		renderer->setDefaultState();
+		if(camera->getDefaultState()!=NULL){
+			renderer->setRenderState(camera->getDefaultState());
 		}
 	}
 
@@ -109,7 +109,7 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 		const RenderableSet::RenderableQueue &renderableQueue=set->getRenderableQueue(sortedIndexes[j]);
 		Material *material=renderableQueue[0].material;
 
-		if(renderedDepthSorted==false && (material==NULL || material->getLayer()!=0)){
+		if(renderedDepthSorted==false && (material!=NULL && material->getLayer()!=0)){
 			renderedDepthSorted=true;
 			renderDepthSortedRenderables(set,renderer,camera,useMaterials);
 		}
@@ -128,9 +128,9 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 			renderable->render(renderer);
 		}
 
-		if(useMaterials && material!=NULL){
-			if(camera->getDefaultStateSet()!=NULL){
-				renderer->setRenderStateSet(camera->getDefaultStateSet());
+		if(useMaterials){
+			if(camera->getDefaultState()!=NULL){
+				renderer->setRenderState(camera->getDefaultState());
 			}
 		}
 	}
@@ -162,9 +162,9 @@ void SceneRenderer::renderDepthSortedRenderables(RenderableSet *set,Renderer *re
 		renderer->setModelMatrix(matrix);
 		renderable->render(renderer);
 
-		if(useMaterials && material!=NULL){
-			if(camera->getDefaultStateSet()!=NULL){
-				renderer->setRenderStateSet(camera->getDefaultStateSet());
+		if(useMaterials){
+			if(camera->getDefaultState()!=NULL){
+				renderer->setRenderState(camera->getDefaultState());
 			}
 		}
 	}

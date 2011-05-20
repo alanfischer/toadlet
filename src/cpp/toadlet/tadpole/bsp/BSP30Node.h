@@ -72,13 +72,13 @@ public:
 	int getModel() const{return mModelIndex;}
 	BSP30Map::ptr getMap(){return mMap;}
 
-	void modifyMaterial(Material::ptr material);
-	bool getRendered() const{return mRendered;}
-	void setRendered(bool rendered){mRendered=rendered;}
-
 	inline int getNumSubModels() const{return mSubModels.size();}
 	SubModel *getSubModel(int i){return mSubModels[i];}
 
+	// Visible
+	bool getRendered() const{return mRendered;}
+	void setRendered(bool rendered){mRendered=rendered;}
+	peeper::RenderState::ptr getSharedRenderState();
 	void gatherRenderables(node::CameraNode *camera,RenderableSet *set);
 
 	// Traceable interface

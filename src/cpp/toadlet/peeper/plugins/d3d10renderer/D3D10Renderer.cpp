@@ -28,7 +28,7 @@
 #include "D3D10TextureMipPixelBuffer.h"
 #include "D3D10PixelBufferRenderTarget.h"
 #include "D3D10Query.h"
-#include "D3D10RenderStateSet.h"
+#include "D3D10RenderState.h"
 #include "D3D10RenderTarget.h"
 #include "D3D10Texture.h"
 #include "D3D10VertexFormat.h"
@@ -67,9 +67,6 @@ D3D10Renderer::D3D10Renderer():
 	mD3DPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL),
 	mD3DRenderTarget(NULL)
-
-	//mStatisticsSet,
-	//mCapabilitySet
 {}
 
 D3D10Renderer::~D3D10Renderer(){
@@ -179,17 +176,17 @@ technique = effect->GetTechniqueByName( "Render" );
 technique->GetPassByIndex( 0 )->GetDesc( &passDesc);
 
 
-	mDefaultSet=RenderStateSet::ptr(new D3D10RenderStateSet(this));
-	mDefaultSet->setBlendState(BlendState());
-	mDefaultSet->setDepthState(DepthState());
-	mDefaultSet->setRasterizerState(RasterizerState());
-	setRenderStateSet(mDefaultSet);
+	mDefaultState=RenderState::ptr(new D3D10RenderState(this));
+	mDefaultState->setBlendState(BlendState());
+	mDefaultState->setDepthState(DepthState());
+	mDefaultState->setRasterizerState(RasterizerState());
+	setRenderState(mDefaultState);
 
 	return true;
 }
 
 void D3D10Renderer::destroy(){
-	mDefaultSet->destroy();
+	mDefaultState->destroy();
 }
 
 Renderer::RendererStatus D3D10Renderer::getStatus(){
@@ -199,7 +196,7 @@ Renderer::RendererStatus D3D10Renderer::getStatus(){
 bool D3D10Renderer::reset(){
 	// No device reset necessary
 
-	setDefaultStates();
+	setDefaultState();
 
 	return true;
 }
@@ -244,8 +241,8 @@ Query *D3D10Renderer::createQuery(){
 	return new D3D10Query(this);
 }
 
-RenderStateSet *D3D10Renderer::createRenderStateSet(){
-	return new D3D10RenderStateSet(this);
+RenderState *D3D10Renderer::createRenderState(){
+	return new D3D10RenderState(this);
 }
 
 bool D3D10Renderer::setRenderTarget(RenderTarget *target){
@@ -480,49 +477,49 @@ bool D3D10Renderer::copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src){
 	return false;
 }
 
-void D3D10Renderer::setDefaultStates(){
-	setRenderStateSet(mDefaultSet);
+void D3D10Renderer::setDefaultState(){
+	setRenderState(mDefaultState);
 }
 
-bool D3D10Renderer::setRenderStateSet(RenderStateSet *set){
-	D3D10RenderStateSet *d3dset=NULL;
-	if(set!=NULL){
-		d3dset=(D3D10RenderStateSet*)set->getRootRenderStateSet();
-		if(d3dset==NULL){
+bool D3D10Renderer::setRenderState(RenderState *renderState){
+	D3D10RenderState *d3drenderState=NULL;
+	if(renderState!=NULL){
+		d3drenderState=(D3D10RenderState*)renderState->getRootRenderState();
+		if(d3drenderState==NULL){
 			Error::nullPointer(Categories::TOADLET_PEEPER,
-				"RenderStateSet is not a D3D10RenderStateSet");
+				"RenderState is not a D3D10RenderState");
 			return false;
 		}
 	}
 
-	if(d3dset->mD3DBlendState!=NULL){
-		mD3DDevice->OMSetBlendState(d3dset->mD3DBlendState,NULL,-1);
+	if(d3drenderState->mD3DBlendState!=NULL){
+		mD3DDevice->OMSetBlendState(d3drenderState->mD3DBlendState,NULL,-1);
 	}
-	if(d3dset->mD3DDepthStencilState!=NULL){
-		mD3DDevice->OMSetDepthStencilState(d3dset->mD3DDepthStencilState,-1);
+	if(d3drenderState->mD3DDepthStencilState!=NULL){
+		mD3DDevice->OMSetDepthStencilState(d3drenderState->mD3DDepthStencilState,-1);
 	}
-	if(d3dset->mD3DRasterizerState!=NULL){
-		mD3DDevice->RSSetState(d3dset->mD3DRasterizerState);
+	if(d3drenderState->mD3DRasterizerState!=NULL){
+		mD3DDevice->RSSetState(d3drenderState->mD3DRasterizerState);
 	}
 
 // These need to be moved/cleaned
-if(d3dset->mD3DSamplerStates.size()>0)samp=d3dset->mD3DSamplerStates[0];
-	mD3DDevice->VSSetSamplers(0,d3dset->mD3DSamplerStates.size(),d3dset->mD3DSamplerStates.begin());
-	mD3DDevice->PSSetSamplers(0,d3dset->mD3DSamplerStates.size(),d3dset->mD3DSamplerStates.begin());
-	mD3DDevice->GSSetSamplers(0,d3dset->mD3DSamplerStates.size(),d3dset->mD3DSamplerStates.begin());
+if(d3drenderState->mD3DSamplerStates.size()>0)samp=d3drenderState->mD3DSamplerStates[0];
+	mD3DDevice->VSSetSamplers(0,d3drenderState->mD3DSamplerStates.size(),d3drenderState->mD3DSamplerStates.begin());
+	mD3DDevice->PSSetSamplers(0,d3drenderState->mD3DSamplerStates.size(),d3drenderState->mD3DSamplerStates.begin());
+	mD3DDevice->GSSetSamplers(0,d3drenderState->mD3DSamplerStates.size(),d3drenderState->mD3DSamplerStates.begin());
 
-if(d3dset->mTextureStates.size()>0 && d3dset->mTextureStates[0]!=NULL){
+if(d3drenderState->mTextureStates.size()>0 && d3drenderState->mTextureStates[0]!=NULL){
 #if defined(TOADLET_FIXED_POINT)
 	float d3dmatrix[16];
-	toD3DMatrix(d3dmatrix,d3dset->mTextureStates[0]->matrix);
+	toD3DMatrix(d3dmatrix,d3drenderState->mTextureStates[0]->matrix);
 #else
-	float *d3dmatrix=d3dset->mTextureStates[0]->matrix.data;
+	float *d3dmatrix=d3drenderState->mTextureStates[0]->matrix.data;
 #endif
-if(d3dset->mTextureStates.size()>0)effect->GetVariableByName("textureMatrix")->AsMatrix()->SetMatrix(d3dmatrix);
+if(d3drenderState->mTextureStates.size()>0)effect->GetVariableByName("textureMatrix")->AsMatrix()->SetMatrix(d3dmatrix);
 }
 
-if(d3dset->mMaterialState!=NULL){
-effect->GetVariableByName("diffuseColor")->AsVector()->SetFloatVector((float*)d3dset->mMaterialState->diffuse.getData());
+if(d3drenderState->mMaterialState!=NULL){
+effect->GetVariableByName("diffuseColor")->AsVector()->SetFloatVector((float*)d3drenderState->mMaterialState->diffuse.getData());
 }
 
 	return true;
@@ -891,7 +888,7 @@ void D3D10Renderer::getD3D10_BLEND_DESC(D3D10_BLEND_DESC &desc,const BlendState 
 void D3D10Renderer::getD3D10_DEPTH_STENCIL_DESC(D3D10_DEPTH_STENCIL_DESC &desc,const DepthState &state){
 	memset(&desc,0,sizeof(desc));
 
-	desc.DepthEnable=(state.test!=DepthState::DepthTest_NONE);
+	desc.DepthEnable=(state.test!=DepthState::DepthTest_NEVER);
 	desc.DepthWriteMask=(state.write?D3D10_DEPTH_WRITE_MASK_ALL:D3D10_DEPTH_WRITE_MASK_ZERO);
     desc.DepthFunc=getD3D10_COMPARISON_FUNC(state.test);
 }

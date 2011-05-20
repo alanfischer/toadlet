@@ -23,19 +23,19 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_BACKABLERENDERSTATESET_H
-#define TOADLET_PEEPER_BACKABLERENDERSTATESET_H
+#ifndef TOADLET_PEEPER_BACKABLERENDERSTATE_H
+#define TOADLET_PEEPER_BACKABLERENDERSTATE_H
 
-#include <toadlet/peeper/RenderStateSet.h>
+#include <toadlet/peeper/RenderState.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API BackableRenderStateSet:public RenderStateSet{
+class TOADLET_API BackableRenderState:public RenderState{
 public:
-	TOADLET_SHARED_POINTERS(BackableRenderStateSet);
+	TOADLET_SHARED_POINTERS(BackableRenderState);
 
-	BackableRenderStateSet():
+	BackableRenderState():
 		mListener(NULL),
 		mBlendState(NULL),
 		mDepthState(NULL),
@@ -44,11 +44,11 @@ public:
 		mPointState(NULL),
 		mMaterialState(NULL)
 	{}
-	virtual ~BackableRenderStateSet(){}
+	virtual ~BackableRenderState(){}
 
-	virtual RenderStateSet *getRootRenderStateSet(){return mBack;}
+	virtual RenderState *getRootRenderState(){return mBack;}
 
-	virtual void setRenderStateSetDestroyedListener(RenderStateSetDestroyedListener *listener){mListener=listener;}
+	virtual void setRenderStateDestroyedListener(RenderStateDestroyedListener *listener){mListener=listener;}
 
 	virtual bool create(){
 		destroy();
@@ -97,7 +97,7 @@ public:
 		mTextureStates.clear();
 
 		if(mListener!=NULL){
-			mListener->renderStateSetDestroyed(this);
+			mListener->renderStateDestroyed(this);
 			mListener=NULL;
 		}
 	}
@@ -164,7 +164,7 @@ public:
 	}
 	virtual bool getTextureState(int i,TextureState &state) const{if(mTextureStates.size()<=i || mTextureStates[i]==NULL){return false;}else{state.set(*mTextureStates[i]);return true;}}
 
-	virtual void setBack(RenderStateSet::ptr back){
+	virtual void setBack(RenderState::ptr back){
 		if(back!=mBack && mBack!=NULL){
 			mBack->destroy();
 		}
@@ -174,7 +174,7 @@ public:
 		if(mBack!=NULL){
 			if(mBlendState!=NULL){mBack->setBlendState(*mBlendState);}
 			if(mDepthState!=NULL){mBack->setDepthState(*mDepthState);}
-			if(mRasterizerState!=NULL){mBack->getRasterizerState(*mRasterizerState);}
+			if(mRasterizerState!=NULL){mBack->setRasterizerState(*mRasterizerState);}
 			if(mFogState!=NULL){mBack->setFogState(*mFogState);}
 			if(mPointState!=NULL){mBack->setPointState(*mPointState);}
 			if(mMaterialState!=NULL){mBack->setMaterialState(*mMaterialState);}
@@ -187,10 +187,10 @@ public:
 			}
 		}
 	}
-	virtual RenderStateSet::ptr getBack(){return mBack;}
+	virtual RenderState::ptr getBack(){return mBack;}
 
 protected:
-	RenderStateSetDestroyedListener *mListener;
+	RenderStateDestroyedListener *mListener;
 	BlendState *mBlendState;
 	DepthState *mDepthState;
 	RasterizerState *mRasterizerState;
@@ -200,7 +200,7 @@ protected:
 	egg::Collection<SamplerState*> mSamplerStates;
 	egg::Collection<TextureState*> mTextureStates;
 
-	RenderStateSet::ptr mBack;
+	RenderState::ptr mBack;
 };
 
 }

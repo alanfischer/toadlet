@@ -23,20 +23,20 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_D3D9RENDERSTATESET_H
-#define TOADLET_PEEPER_D3D9RENDERSTATESET_H
+#ifndef TOADLET_PEEPER_D3D9RENDERSTATE_H
+#define TOADLET_PEEPER_D3D9RENDERSTATE_H
 
 #include "D3D9Includes.h"
-#include <toadlet/peeper/RenderStateSet.h>
+#include <toadlet/peeper/RenderState.h>
 
 namespace toadlet{
 namespace peeper{
 
 class D3D9Renderer;
 
-class TOADLET_API D3D9RenderStateSet:public RenderStateSet{
+class TOADLET_API D3D9RenderState:public RenderState{
 public:
-	D3D9RenderStateSet(D3D9Renderer *renderer):
+	D3D9RenderState(D3D9Renderer *renderer):
 		mListener(NULL),
 		mBlendState(NULL),
 		mDepthState(NULL),
@@ -45,13 +45,13 @@ public:
 		mPointState(NULL),
 		mMaterialState(NULL)
 	{}
-	virtual ~D3D9RenderStateSet(){
+	virtual ~D3D9RenderState(){
 		destroy();
 	}
 
-	RenderStateSet *getRootRenderStateSet(){return this;}
+	RenderState *getRootRenderState(){return this;}
 
-	void setRenderStateSetDestroyedListener(RenderStateSetDestroyedListener *listener){mListener=listener;}
+	void setRenderStateDestroyedListener(RenderStateDestroyedListener *listener){mListener=listener;}
 
 	bool create(){return true;}
 
@@ -92,7 +92,7 @@ public:
 		mTextureStates.clear();
 
 		if(mListener!=NULL){
-			mListener->renderStateSetDestroyed(this);
+			mListener->renderStateDestroyed(this);
 			mListener=NULL;
 		}
 	}
@@ -140,7 +140,7 @@ public:
 	bool getTextureState(int i,TextureState &state) const{if(mTextureStates.size()<=i || mTextureStates[i]==NULL){return false;}else{state.set(*mTextureStates[i]);return true;}}
 
 protected:
-	RenderStateSetDestroyedListener *mListener;
+	RenderStateDestroyedListener *mListener;
 	BlendState *mBlendState;
 	DepthState *mDepthState;
 	RasterizerState *mRasterizerState;

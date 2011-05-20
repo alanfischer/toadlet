@@ -91,7 +91,7 @@ bool EGLPBufferRenderTarget::makeCurrent(){
 	EGLRenderTarget::makeCurrent();
 
 	if(mInitialized==false){
-		mRenderer->setDefaultStates();
+		mRenderer->setDefaultState();
 		mInitialized=true;
 	}
 

@@ -204,18 +204,6 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 	}
 }
 
-void MeshNode::modifyMaterial(Material::ptr material){
-	int i;
-	for(i=0;i<mSubMeshes.size();++i){
-		SubMesh *sub=mSubMeshes[i];
-		if(sub->material->getManaged()){
-			sub->material=mEngine->getMaterialManager()->cloneMaterial(sub->material,false);
-		}
-
-		sub->material->modifyWith(material);
-	}
-}
-
 MeshNode::SubMesh *MeshNode::getSubMesh(const String &name){
 	if(mMesh==NULL){
 		return NULL;
@@ -274,6 +262,21 @@ void MeshNode::updateWorldTransform(){
 			subMesh->worldBound.transform(subMesh->meshSubMesh->bound,subMesh->worldTransform);
 		}
 	}
+}
+
+RenderState::ptr MeshNode::getSharedRenderState(){
+	Material::ptr sharedMaterial;
+	int i;
+	for(i=0;i<mSubMeshes.size();++i){
+		SubMesh *sub=mSubMeshes[i];
+		if(sub->material->getManaged()){
+			sub->material=mEngine->getMaterialManager()->cloneMaterial(sub->material,false,sharedMaterial);
+		}
+		if(i==0){
+			sharedMaterial=sub->material;
+		}
+	}
+	return sharedMaterial->getRenderState();
 }
 
 void MeshNode::gatherRenderables(CameraNode *camera,RenderableSet *set){

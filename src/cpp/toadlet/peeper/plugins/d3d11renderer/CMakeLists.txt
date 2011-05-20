@@ -19,6 +19,7 @@ set (PEEPER_D3D11RENDERER_HEADERS
 	../d3d10renderer/D3D10PixelBufferRenderTarget.h
 	../d3d10renderer/D3D10Query.h
 	../d3d10renderer/D3D10RenderTarget.h
+	../d3d10renderer/D3D10RenderState.h
 	../d3d10renderer/D3D10Renderer.h
 	../d3d10renderer/D3D10Texture.h
 	../d3d10renderer/D3D10TextureMipPixelBuffer.h
