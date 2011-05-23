@@ -40,6 +40,12 @@ namespace tadpole{
 ///  It's localBound is by default set to the localBound of the hop::Solid
 class TOADLET_API HopEntity:public node::ParentNode,public hop::TraceCallback,public hop::CollisionListener{
 public:
+	enum TriggerType{
+		TriggerType_TOGGLE,
+		TriggerType_ON,
+		TriggerType_OFF,
+	};
+
 	TOADLET_NODE(HopEntity,node::ParentNode);
 
 	HopEntity();
@@ -112,6 +118,7 @@ public:
 
 	virtual void touch(const tadpole::Collision &c){}
 	virtual void think(){}
+	virtual void trigger(TriggerType type=TriggerType_TOGGLE,HopEntity *triggerer=NULL){if(mTriggerTarget!=NULL){mTriggerTarget->trigger(type,triggerer!=NULL?triggerer:this);}}
 
 	inline hop::Solid::ptr getSolid() const{return mSolid;}
 
@@ -141,6 +148,7 @@ protected:
 	node::NodeTransformInterpolator::ptr mInterpolator;
 	node::ParentNode::ptr mVolumeNode;
 	int mNextThink;
+	HopEntity::wptr mTriggerTarget;
 
 	HopScene *mHopScene;
 

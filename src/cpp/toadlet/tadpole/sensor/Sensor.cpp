@@ -25,6 +25,8 @@
 
 #include <toadlet/tadpole/sensor/Sensor.h>
 
+using namespace toadlet::tadpole::node;
+
 namespace toadlet{
 namespace tadpole{
 namespace sensor{
@@ -44,6 +46,41 @@ SensorResults::ptr Sensor::sense(){
 	sense(mResults);
 
 	return mResults;
+}
+
+bool Sensor::sense(SensorResultsListener *results){
+	results->sensingBeginning();
+	int result=senseNodes(mScene->getRoot(),results);
+	results->sensingEnding();
+	return result!=0;
+}
+
+int Sensor::senseNodes(Node *node,SensorResultsListener *results){
+	int result=0;
+	if(senseNode(node)){
+		if(results->resultFound(node,0)){
+			result=1;
+		}
+		else{
+			return -1;
+		}
+	}
+
+	ParentNode *parent=node->isParent();
+	if(parent!=NULL){
+		int i;
+		for(i=0;i<parent->getNumChildren();++i){
+			int r=senseNodes(parent->getChild(i),results);
+			if(r<0){
+				return -1;
+			}
+			else if(r>0){
+				result=1;
+			}
+		}
+	}
+
+	return result;
 }
 
 }

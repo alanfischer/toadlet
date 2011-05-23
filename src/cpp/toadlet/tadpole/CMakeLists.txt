@@ -98,6 +98,7 @@ set (TADPOLE_SENSOR_SRC
 	sensor/PotentiallyVisibleSensor.cpp
 	sensor/Sensor.cpp
 	sensor/SensorResults.cpp
+	sensor/TypeSensor.cpp
 )
 
 set (TADPOLE_STUDIO_SRC
@@ -245,6 +246,7 @@ set (TADPOLE_SENSOR_HEADERS
 	sensor/Sensor.h
 	sensor/SensorResults.h
 	sensor/SensorResultsListener.h
+	sensor/TypeSensor.h
 )
 
 set (TADPOLE_STUDIO_HEADERS

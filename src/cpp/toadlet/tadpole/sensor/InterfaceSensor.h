@@ -37,16 +37,12 @@ public:
 	TOADLET_SHARED_POINTERS(InterfaceSensor);
 
 	InterfaceSensor(Scene *scene);
-	virtual ~InterfaceSensor();
 
 	void setInterfaceID(int interfaceID){mInterfaceID=interfaceID;}
 	int getInterfaceID() const{return mInterfaceID;}
 
-	virtual bool sense(SensorResultsListener *results);
-	SensorResults::ptr sense(){return Sensor::sense();}
-
 protected:
-	int senseInterfaces(node::Node *node,SensorResultsListener *results);
+	bool senseNode(node::Node *node);
 
 	int mInterfaceID;
 };

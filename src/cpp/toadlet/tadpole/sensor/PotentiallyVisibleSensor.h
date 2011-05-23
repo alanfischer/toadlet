@@ -37,9 +37,9 @@ public:
 	TOADLET_SHARED_POINTERS(PotentiallyVisibleSensor);
 
 	PotentiallyVisibleSensor(Scene *scene);
-	virtual ~PotentiallyVisibleSensor();
 
-	virtual void setPoint(const Vector3 &point);
+	void setPoint(const Vector3 &point){mPoint.set(point);}
+	const Vector3 &getPoint() const{return mPoint;}
 
 	virtual bool sense(SensorResultsListener *results);
 	SensorResults::ptr sense(){return Sensor::sense();}

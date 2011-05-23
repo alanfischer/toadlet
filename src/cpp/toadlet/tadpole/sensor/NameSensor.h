@@ -37,16 +37,12 @@ public:
 	TOADLET_SHARED_POINTERS(NameSensor);
 
 	NameSensor(Scene *scene);
-	virtual ~NameSensor();
 
 	void setName(const egg::String &name){mName=name;}
 	const egg::String &getName() const{return mName;}
 
-	virtual bool sense(SensorResultsListener *results);
-	SensorResults::ptr sense(){return Sensor::sense();}
-
 protected:
-	int senseNames(node::Node *node,SensorResultsListener *results);
+	bool senseNode(node::Node *node);
 
 	egg::String mName;
 };

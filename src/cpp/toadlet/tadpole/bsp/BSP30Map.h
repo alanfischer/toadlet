@@ -79,6 +79,12 @@ public:
 		facedata *next;
 	};
 
+	struct keyvalue{
+		keyvalue(const egg::String &k=(char*)NULL,const egg::String &v=(char*)NULL):key(k),value(v){}
+
+		egg::String key,value;
+	};
+
 	bheader header;
 	bmodel *models;				int nmodels;
 	bvertex *vertexes;			int nvertexes;
@@ -99,7 +105,7 @@ public:
 	Engine *engine;
 	bmiptexlump *miptexlump;
 	egg::Collection<egg::Collection<int> > parsedVisibility;
-	egg::Collection<egg::Map<egg::String,egg::String> > parsedEntities;
+	egg::Collection<egg::Collection<keyvalue> > parsedEntities;
 	egg::Collection<peeper::Texture::ptr> parsedTextures;
 	egg::Collection<Material::ptr> materials;
 	peeper::VertexData::ptr vertexData;
