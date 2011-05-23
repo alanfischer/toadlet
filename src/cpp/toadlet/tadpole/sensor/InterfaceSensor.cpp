@@ -33,46 +33,11 @@ namespace toadlet{
 namespace tadpole{
 namespace sensor{
 
-InterfaceSensor::InterfaceSensor(Scene *scene):Sensor(mScene){
-	mScene=scene;
+InterfaceSensor::InterfaceSensor(Scene *scene):Sensor(scene){
 }
 
-InterfaceSensor::~InterfaceSensor(){
-}
-
-bool InterfaceSensor::sense(SensorResultsListener *results){
-	results->sensingBeginning();
-	int result=senseInterfaces(mScene->getRoot(),results);
-	results->sensingEnding();
-	return result!=0;
-}
-
-int InterfaceSensor::senseInterfaces(Node *node,SensorResultsListener *results){
-	int result=0;
-	if(node->hasInterface(mInterfaceID)){
-		if(results->resultFound(node,0)){
-			result=1;
-		}
-		else{
-			return -1;
-		}
-	}
-
-	ParentNode *parent=node->isParent();
-	if(parent!=NULL){
-		int i;
-		for(i=0;i<parent->getNumChildren();++i){
-			int r=senseInterfaces(parent->getChild(i),results);
-			if(r<0){
-				return -1;
-			}
-			else if(r>0){
-				result=1;
-			}
-		}
-	}
-
-	return result;
+bool InterfaceSensor::senseNode(Node *node){
+	return node->hasInterface(mInterfaceID);
 }
 
 }

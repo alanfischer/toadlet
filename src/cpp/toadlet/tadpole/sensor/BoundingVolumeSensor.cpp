@@ -35,9 +35,6 @@ namespace sensor{
 BoundingVolumeSensor::BoundingVolumeSensor(Scene *scene):Sensor(scene){
 }
 
-BoundingVolumeSensor::~BoundingVolumeSensor(){
-}
-
 bool BoundingVolumeSensor::sense(SensorResultsListener *results){
 	results->sensingBeginning();
 	bool result=mScene->getRoot()->senseBoundingVolumes(results,mBound);

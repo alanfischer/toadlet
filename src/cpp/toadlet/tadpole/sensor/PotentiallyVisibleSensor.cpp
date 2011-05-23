@@ -35,13 +35,6 @@ namespace sensor{
 PotentiallyVisibleSensor::PotentiallyVisibleSensor(Scene *scene):Sensor(scene){
 }
 
-PotentiallyVisibleSensor::~PotentiallyVisibleSensor(){
-}
-
-void PotentiallyVisibleSensor::setPoint(const Vector3 &point){
-	mPoint.set(point);
-}
-
 bool PotentiallyVisibleSensor::sense(SensorResultsListener *results){
 	results->sensingBeginning();
 	bool result=mScene->getRoot()->sensePotentiallyVisible(results,mPoint);

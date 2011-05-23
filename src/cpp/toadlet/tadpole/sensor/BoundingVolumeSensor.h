@@ -37,7 +37,6 @@ public:
 	TOADLET_SHARED_POINTERS(BoundingVolumeSensor);
 
 	BoundingVolumeSensor(Scene *scene);
-	virtual ~BoundingVolumeSensor();
 
 	void setBound(const Bound &bound){mBound.set(bound);}
 	void setSphere(const Sphere &sphere){mBound.set(sphere);}

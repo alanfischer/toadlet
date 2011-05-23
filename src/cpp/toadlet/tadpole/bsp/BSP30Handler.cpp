@@ -184,7 +184,7 @@ void BSP30Handler::parseEntities(BSP30Map *map){
 	Logger::debug(Categories::TOADLET_TADPOLE,"Parsing entities");
 
 	char *data=map->entities;
-	Map<String,String> keyValues;
+	Collection<BSP30Map::keyvalue> keyValues;
 
 	while(*data!=0){
 		if(*data=='{'){
@@ -204,7 +204,7 @@ void BSP30Handler::parseEntities(BSP30Map *map){
 			while(*data!='\"') data++;
 			*data=0;
 
-			keyValues[key]=value;
+			keyValues.add(BSP30Map::keyvalue(key,value));
 		}
 		data++;
 	}
@@ -213,15 +213,21 @@ void BSP30Handler::parseEntities(BSP30Map *map){
 void BSP30Handler::parseWADs(BSP30Map *map){
 	Logger::debug(Categories::TOADLET_TADPOLE,"Parsing WADs");
 
-	if(map->parsedEntities.size()>0 && map->parsedEntities[0]["classname"].equals("worldspawn")){
-		String wad=map->parsedEntities[0]["wad"];
-		int start=0,end=0;
-		while((end=wad.find(".wad",end+1))!=-1){
-			start=Math::maxVal(wad.rfind('\\',end)+1,wad.rfind(';',end)+1);
-			String file=wad.substr(start,(end-start)+4);
-			Archive::ptr archive=mEngine->getArchiveManager()->findArchive(file);
-			if(archive!=NULL){
-				mEngine->getTextureManager()->addResourceArchive(archive);
+	if(map->parsedEntities.size()>0){
+		const Collection<BSP30Map::keyvalue> &keyvalues=map->parsedEntities[0];
+		int i;
+		for(i=0;i<keyvalues.size();++i){
+			if(keyvalues[i].key=="wad"){
+				const String &wad=keyvalues[i].value;
+				int start=0,end=0;
+				while((end=wad.find(".wad",end+1))!=-1){
+					start=Math::maxVal(wad.rfind('\\',end)+1,wad.rfind(';',end)+1);
+					String file=wad.substr(start,(end-start)+4);
+					Archive::ptr archive=mEngine->getArchiveManager()->findArchive(file);
+					if(archive!=NULL){
+						mEngine->getTextureManager()->addResourceArchive(archive);
+					}
+				}
 			}
 		}
 	}

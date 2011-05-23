@@ -23,37 +23,32 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_SENSOR_SENSOR_H
-#define TOADLET_TADPOLE_SENSOR_SENSOR_H
+#ifndef TOADLET_TADPOLE_SENSOR_TYPESENSOR_H
+#define TOADLET_TADPOLE_SENSOR_TYPESENSOR_H
 
-#include <toadlet/tadpole/Types.h>
-#include <toadlet/tadpole/Scene.h>
-#include <toadlet/tadpole/sensor/SensorResults.h>
+#include <toadlet/tadpole/sensor/Sensor.h>
 
 namespace toadlet{
 namespace tadpole{
-
-class Scene;
-
 namespace sensor{
 
-/// @todo: perhaps sensors should be nodes, so they can easily be attached to the scene and then their transforms will be relative, just like opal
-class TOADLET_API Sensor{
+class TOADLET_API TypeSensor:public Sensor{
 public:
-	TOADLET_SHARED_POINTERS(Sensor);
+	TOADLET_SHARED_POINTERS(TypeSensor);
 
-	Sensor(Scene *scene);
-	virtual ~Sensor();
-	
-	virtual SensorResults::ptr sense();
-	virtual bool sense(SensorResultsListener *results);
+	TypeSensor(Scene *scene);
+
+	void setType(egg::BaseType<node::Node> *type){mType=type;}
+	egg::BaseType<node::Node> *getType() const{return mType;}
+
+	void setTypeName(const egg::String &typeName){mTypeName=typeName;}
+	const egg::String &getTypeName() const{return mTypeName;}
 
 protected:
-	virtual int senseNodes(node::Node *node,SensorResultsListener *results);
-	virtual bool senseNode(node::Node *node){return false;}
+	bool senseNode(node::Node *node);
 
-	Scene *mScene;
-	SensorResults::ptr mResults;
+	egg::BaseType<node::Node> *mType;
+	egg::String mTypeName;
 };
 
 }

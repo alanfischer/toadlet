@@ -33,46 +33,11 @@ namespace toadlet{
 namespace tadpole{
 namespace sensor{
 
-NameSensor::NameSensor(Scene *scene):Sensor(mScene){
-	mScene=scene;
+NameSensor::NameSensor(Scene *scene):Sensor(scene){
 }
 
-NameSensor::~NameSensor(){
-}
-
-bool NameSensor::sense(SensorResultsListener *results){
-	results->sensingBeginning();
-	int result=senseNames(mScene->getRoot(),results);
-	results->sensingEnding();
-	return result!=0;
-}
-
-int NameSensor::senseNames(Node *node,SensorResultsListener *results){
-	int result=0;
-	if(mName.equals(node->getName())){
-		if(results->resultFound(node,0)){
-			result=1;
-		}
-		else{
-			return -1;
-		}
-	}
-
-	ParentNode *parent=node->isParent();
-	if(parent!=NULL){
-		int i;
-		for(i=0;i<parent->getNumChildren();++i){
-			int r=senseNames(parent->getChild(i),results);
-			if(r<0){
-				return -1;
-			}
-			else if(r>0){
-				result=1;
-			}
-		}
-	}
-
-	return result;
+bool NameSensor::senseNode(Node *node){
+	return mName.length()>0 && mName.equals(node->getName());
 }
 
 }

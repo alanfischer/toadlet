@@ -45,6 +45,7 @@ HopEntity::HopEntity():ParentNode(),
 	//mInterpolator,
 	//mVolumeNode,
 	mNextThink(0)
+	//mTriggerTarget
 {}
 
 Node *HopEntity::create(Scene *scene){
@@ -60,6 +61,7 @@ Node *HopEntity::create(Scene *scene){
 	mInterpolator=NULL;
 	mVolumeNode=NULL;
 	mNextThink=0;
+	mTriggerTarget=HopEntity::ptr();
 
 	/// @todo: I need to remove the mScene casting here, its pretty dirty
 	mHopScene=(HopScene*)(mScene);
