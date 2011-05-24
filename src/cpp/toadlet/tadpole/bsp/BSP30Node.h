@@ -111,6 +111,9 @@ public:
 	void setSkyTextures(const egg::String &skyDown,const egg::String &skyUp,const egg::String &skyWest,const egg::String &skyEast,const egg::String &skySouth,const egg::String &skyNorth);
 	node::MeshNode *getSkyNode() const{return mSkyNode;}
 
+	void setLightIntensity(int style,uint8 intensity){mLightIntensity[style]=intensity;}
+	uint8 getLightIntensity(int style){return mLightIntensity[style];}
+
 	// Node items
 	void nodeAttached(Node *node);
 	void nodeRemoved(Node *node);
@@ -142,6 +145,7 @@ protected:
 	BSP30Map::ptr mMap;
 	egg::String mSkyName;
 	node::MeshNode::ptr mSkyNode;
+	uint8 mLightIntensity[256];
 
 	class childdata{
 	public:

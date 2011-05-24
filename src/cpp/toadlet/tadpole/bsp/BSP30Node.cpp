@@ -160,6 +160,10 @@ void BSP30ModelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 	}
 
 	int i;
+	bmodel *model=&mMap->models[mModelIndex];
+	for(i=0;i<model->numfaces;++i){
+		mMap->updateFaceLights(model->firstface+i);
+	}
 	for(i=0;i<mSubModels.size();++i){
 		set->queueRenderable(mSubModels[i]);
 	}
@@ -191,7 +195,12 @@ TOADLET_NODE_IMPLEMENT(BSP30Node,Categories::TOADLET_TADPOLE_NODE+".BSP30Node");
 
 BSP30Node::BSP30Node():super(),
 	mCounter(1)
-{}
+{
+	int i;
+	for(i=0;i<256;++i){
+		mLightIntensity[i]=255;
+	}
+}
 
 BSP30Node::~BSP30Node(){}
 
@@ -370,6 +379,7 @@ void BSP30Node::gatherRenderables(CameraNode *camera,RenderableSet *set){
 			btexinfo *texinfo=&mMap->texinfos[face->texinfo];
 			facedata->next=mVisibleMaterialFaces[texinfo->miptex];
 			mVisibleMaterialFaces[texinfo->miptex]=facedata;
+			mMap->updateFaceLights(faceIndex);
 		}
 
 		for(i=0;i<mChildren.size();++i){
@@ -411,6 +421,13 @@ void BSP30Node::gatherRenderables(CameraNode *camera,RenderableSet *set){
 				occupant->gatherRenderables(camera,set);
 			}
 		}
+	}
+
+	/// @todo: Either update all the touched lightmaps once we're done, or lock only sections of them
+	for(i=0;i<mMap->lightmapTextures.size();++i){
+//		if(mMap->lightmapCounter[i]==mScene->getFrame()){
+			mMap->lightmapTextures[i]->load(BSP30Map::LIGHTMAP_SIZE,BSP30Map::LIGHTMAP_SIZE,1,0,mMap->lightmapImages[i]->getData());
+//		}
 	}
 }
 
@@ -604,6 +621,7 @@ void BSP30Node::addLeafToVisible(bleaf *leaf,CameraNode *camera){
 					BSP30Map::facedata *facedata=&mMap->facedatas[faceIndex];
 					facedata->next=mVisibleMaterialFaces[texinfo->miptex];
 					mVisibleMaterialFaces[texinfo->miptex]=facedata;
+					mMap->updateFaceLights(faceIndex);
 				}
 			}
 		}

@@ -54,8 +54,9 @@ public:
 	void findSurfaceExtents(bface *face,int *mins,int *maxs);
 
 	void initLightmap();
-	int allocLightmap(int st[],int width,int height);
+	int allocLightmap(int st[],int size[]);
 	void uploadLightmap();
+	void updateFaceLights(int faceIndex);
 
 	// This assumes the material has already been set, and just sets the lightmap
 	void renderFaces(peeper::Renderer *renderer,facedata *faces);
@@ -75,6 +76,8 @@ public:
 		int index;
 		peeper::IndexData::ptr indexData;
 		int lightmapIndex;
+		int lightmapSize[2];
+		int lightmapCoord[2];
 		bool visible;
 		facedata *next;
 	};
@@ -112,6 +115,7 @@ public:
 	egg::Collection<facedata> facedatas;
 	egg::image::Image::ptr lightmapImage;
 	egg::Collection<peeper::Texture::ptr> lightmapTextures;
+egg::Collection<egg::image::Image::ptr> lightmapImages; /// @todo: Just modify portions of the texture
 	int lightmapAllocated[LIGHTMAP_SIZE];
 	egg::Collection<node::NodeResource::ptr> modelResources;
 };

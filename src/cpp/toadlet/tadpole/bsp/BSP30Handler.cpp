@@ -271,8 +271,6 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 	float iwidth=0,iheight=0;
 	float s=0,t=0,ls=0,lt=0;
 	int surfmins[2],surfmaxs[2];
-	int lmwidth=0,lmheight=0;
-	int lightmapCoord[2];
 
 	map->facedatas.resize(map->nfaces);
 	VertexBufferAccessor vba;
@@ -301,13 +299,13 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 
 		if((texinfo->flags&TEX_SPECIAL)==0){
 			map->findSurfaceExtents(face,surfmins,surfmaxs);
-			lmwidth=((surfmaxs[0]-surfmins[0])>>4)+1;
-			lmheight=((surfmaxs[1]-surfmins[1])>>4)+1;
+			faced->lightmapSize[0]=((surfmaxs[0]-surfmins[0])>>4)+1;
+			faced->lightmapSize[1]=((surfmaxs[1]-surfmins[1])>>4)+1;
 
-			if((faced->lightmapIndex=map->allocLightmap(lightmapCoord,lmwidth,lmheight))<0){
+			if((faced->lightmapIndex=map->allocLightmap(faced->lightmapCoord,faced->lightmapSize))<0){
 				map->uploadLightmap();
 				map->initLightmap();
-				if((faced->lightmapIndex=map->allocLightmap(lightmapCoord,lmwidth,lmheight))<0){
+				if((faced->lightmapIndex=map->allocLightmap(faced->lightmapCoord,faced->lightmapSize))<0){
 					Error::unknown("unable to allocate lightmap");
 					return;
 				}
@@ -316,17 +314,17 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 			tbyte *dst=map->lightmapImage->getData();
 			int pixelSize=map->lightmapImage->getPixelSize();
 			tbyte *src=(tbyte*)map->lighting + face->lightofs;
-			for(j=0;j<lmheight;++j){
-				memcpy(dst + ((lightmapCoord[1]+j)*BSP30Map::LIGHTMAP_SIZE + lightmapCoord[0])*pixelSize,src + lmwidth*j*pixelSize,lmwidth*pixelSize);
+			for(j=0;j<faced->lightmapSize[1];++j){
+				memcpy(dst + ((faced->lightmapCoord[1]+j)*BSP30Map::LIGHTMAP_SIZE + faced->lightmapCoord[0])*pixelSize,src + faced->lightmapSize[0]*j*pixelSize,faced->lightmapSize[0]*pixelSize);
 			}
 		}
 
-		/// @todo: Pack all these indexes into 1 IndexBuffer to speed up rendering
 		IndexData::ptr indexData;
 		if(mEngine->getBufferManager()->useTriFan()){
 			indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIFAN,NULL,face->firstedge,face->numedges));
 		}
 		else{
+			/// @todo: Pack all these indexes into 1 IndexBuffer to speed up rendering
 			int indexes=(face->numedges-2)*3;
 			IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,indexes);
 			iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
@@ -360,10 +358,10 @@ void BSP30Handler::buildBuffers(BSP30Map *map){
 
 			// Calculate lightmap coordinates
 			if((texinfo->flags&TEX_SPECIAL)==0){
-				ls=s-surfmins[0] + lightmapCoord[0]*16 + 8;
+				ls=s-surfmins[0] + faced->lightmapCoord[0]*16 + 8;
 				ls/=BSP30Map::LIGHTMAP_SIZE*16;
 
-				lt=t-surfmins[1] + lightmapCoord[1]*16 + 8;
+				lt=t-surfmins[1] + faced->lightmapCoord[1]*16 + 8;
 				lt/=BSP30Map::LIGHTMAP_SIZE*16;
 
 				vba.set2(faceedge,3,ls,lt);

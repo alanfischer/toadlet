@@ -225,9 +225,52 @@ void BSP30Map::initLightmap(){
 }
 
 void BSP30Map::uploadLightmap(){
-	Texture::ptr texture=engine->getTextureManager()->createTexture(lightmapImage);
+	tbyte *lightmapData=lightmapImage->getData();
+	Texture::ptr texture=engine->getTextureManager()->createTexture(
+		Texture::Usage_BIT_DYNAMIC|Texture::Usage_BIT_AUTOGEN_MIPMAPS,
+		lightmapImage->getDimension(),lightmapImage->getFormat(),lightmapImage->getWidth(),lightmapImage->getHeight(),1,
+		0,&lightmapData
+	);
+
 	texture->retain();
 	lightmapTextures.add(texture);
+
+lightmapImages.add(Image::ptr(lightmapImage->clone()));
+}
+
+void BSP30Map::updateFaceLights(int faceIndex){
+	bface *face=&faces[faceIndex];
+	BSP30Map::facedata *faced=&facedatas[faceIndex];
+
+	if(face->styles[1]==255){return;}
+
+	int i,j,k;
+	int numStyles;
+	for(numStyles=0;numStyles<MAX_LIGHTMAPS && face->styles[numStyles]!=255;++numStyles);
+
+	int pixelSize=3;
+	int size=faced->lightmapSize[0]*faced->lightmapSize[1]*pixelSize;
+
+	uint8 *dst=lightmapImages[faced->lightmapIndex]->getData();
+	for(i=0;i<numStyles;++i){
+		uint8 *src=(tbyte*)lighting + face->lightofs + size*i;
+		for(j=0;j<faced->lightmapSize[1];++j){
+			uint8 *d=dst + ((faced->lightmapCoord[1]+j)*BSP30Map::LIGHTMAP_SIZE + faced->lightmapCoord[0])*pixelSize;
+			uint8 *s=src + faced->lightmapSize[0]*j*pixelSize;
+			if(i==0){
+				memcpy(d,s,faced->lightmapSize[0]*pixelSize);
+			}
+			else{
+				for(k=0;k<faced->lightmapSize[0];++k){
+					/// @todo: Optimize this so we dont need so many ifs, cant think it through right now with a screaming baby
+					int d0=d[0]+s[0];if(d0>255)d0=255;d[0]=d0;
+					int d1=d[1]+s[1];if(d1>255)d1=255;d[1]=d1;
+					int d2=d[2]+s[2];if(d2>255)d2=255;d[2]=d2;
+					d+=3,s+=3;
+				}
+			}
+		}
+	}
 }
 
 void BSP30Map::renderFaces(Renderer *renderer,facedata *face){
@@ -240,29 +283,29 @@ void BSP30Map::renderFaces(Renderer *renderer,facedata *face){
 	}
 }
 
-int BSP30Map::allocLightmap(int st[],int width,int height){
+int BSP30Map::allocLightmap(int st[],int size[]){
 	int i,j;
 	int best=LIGHTMAP_SIZE,best2=0;
 
-	for(i=0;i<LIGHTMAP_SIZE-width;++i){
+	for(i=0;i<LIGHTMAP_SIZE-size[0];++i){
 		best2=0;
-		for(j=0;j<width && lightmapAllocated[i+j]<best;++j){
+		for(j=0;j<size[0] && lightmapAllocated[i+j]<best;++j){
 			if(lightmapAllocated[i+j]>best2){
 				best2=lightmapAllocated[i+j];
 			}
 		}
-		if(j==width){
+		if(j==size[0]){
 			st[0]=i;
 			st[1]=best=best2;
 		}
 	}
 
-	if(best+height>LIGHTMAP_SIZE){
+	if(best+size[1]>LIGHTMAP_SIZE){
 		return -1;
 	}
 
-	for(i=0;i<width;i++){
-		lightmapAllocated[st[0]+i]=best+height;
+	for(i=0;i<size[0];i++){
+		lightmapAllocated[st[0]+i]=best+size[1];
 	}
 
 	return lightmapTextures.size();
