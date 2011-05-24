@@ -57,6 +57,7 @@ BSP30Map::BSP30Map(Engine *engine):
 	this->engine=engine;
 
 	lightmapImage=Image::ptr(Image::createAndReallocate(Image::Dimension_D2,Image::Format_RGB_8,LIGHTMAP_SIZE,LIGHTMAP_SIZE));
+	memset(styleIntensities,255,sizeof(styleIntensities));
 };
 
 void BSP30Map::destroy(){
@@ -91,6 +92,7 @@ void BSP30Map::destroy(){
 		lightmapTextures[i]->release();
 	}
 	lightmapTextures.clear();
+	lightmapDirties.clear();
 
 	for(i=0;i<modelResources.size();++i){
 		modelResources[i]->release();
@@ -227,13 +229,14 @@ void BSP30Map::initLightmap(){
 void BSP30Map::uploadLightmap(){
 	tbyte *lightmapData=lightmapImage->getData();
 	Texture::ptr texture=engine->getTextureManager()->createTexture(
-		Texture::Usage_BIT_DYNAMIC|Texture::Usage_BIT_AUTOGEN_MIPMAPS,
+		Texture::Usage_BIT_STREAM|Texture::Usage_BIT_AUTOGEN_MIPMAPS,
 		lightmapImage->getDimension(),lightmapImage->getFormat(),lightmapImage->getWidth(),lightmapImage->getHeight(),1,
 		0,&lightmapData
 	);
 
 	texture->retain();
 	lightmapTextures.add(texture);
+	lightmapDirties.add(false);
 
 lightmapImages.add(Image::ptr(lightmapImage->clone()));
 }
@@ -242,11 +245,19 @@ void BSP30Map::updateFaceLights(int faceIndex){
 	bface *face=&faces[faceIndex];
 	BSP30Map::facedata *faced=&facedatas[faceIndex];
 
-	if(face->styles[1]==255){return;}
+	if(face->styles[1]==255) return;
 
 	int i,j,k;
 	int numStyles;
-	for(numStyles=0;numStyles<MAX_LIGHTMAPS && face->styles[numStyles]!=255;++numStyles);
+	int intensities[MAX_LIGHTMAPS];
+	bool skipRecalculation=true;
+	for(numStyles=0;numStyles<MAX_LIGHTMAPS && face->styles[numStyles]!=255;++numStyles){
+		skipRecalculation&=(styleIntensities[face->styles[numStyles]]==faced->lastStyleIntensities[numStyles]);
+		faced->lastStyleIntensities[numStyles]=styleIntensities[face->styles[numStyles]];
+		intensities[numStyles]=styleIntensities[face->styles[numStyles]];
+	}
+
+	if(skipRecalculation) return;
 
 	int pixelSize=3;
 	int size=faced->lightmapSize[0]*faced->lightmapSize[1]*pixelSize;
@@ -263,20 +274,26 @@ void BSP30Map::updateFaceLights(int faceIndex){
 			else{
 				for(k=0;k<faced->lightmapSize[0];++k){
 					/// @todo: Optimize this so we dont need so many ifs, cant think it through right now with a screaming baby
-					int d0=d[0]+s[0];if(d0>255)d0=255;d[0]=d0;
-					int d1=d[1]+s[1];if(d1>255)d1=255;d[1]=d1;
-					int d2=d[2]+s[2];if(d2>255)d2=255;d[2]=d2;
+					int d0=d[0]+(((int)s[0]*intensities[i])>>8);if(d0>255)d0=255;d[0]=d0;
+					int d1=d[1]+(((int)s[1]*intensities[i])>>8);if(d1>255)d1=255;d[1]=d1;
+					int d2=d[2]+(((int)s[2]*intensities[i])>>8);if(d2>255)d2=255;d[2]=d2;
 					d+=3,s+=3;
 				}
 			}
 		}
 	}
+
+	lightmapDirties[faced->lightmapIndex]=true;
 }
 
 void BSP30Map::renderFaces(Renderer *renderer,facedata *face){
+	int lastLightmapIndex=-1;
 	while(face!=NULL){
 		if(face->visible){
- 			renderer->setTexture(1,lightmapTextures[face->lightmapIndex]); /// @todo: Check to see if our lightmapIndex is the same as previous, and then not change
+			if(lastLightmapIndex!=face->lightmapIndex){
+				lastLightmapIndex=face->lightmapIndex;
+				renderer->setTexture(1,lightmapTextures[face->lightmapIndex]);
+			}
 			renderer->renderPrimitive(vertexData,face->indexData);
 		}
 		face=face->next;

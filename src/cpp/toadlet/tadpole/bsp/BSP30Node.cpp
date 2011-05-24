@@ -196,10 +196,6 @@ TOADLET_NODE_IMPLEMENT(BSP30Node,Categories::TOADLET_TADPOLE_NODE+".BSP30Node");
 BSP30Node::BSP30Node():super(),
 	mCounter(1)
 {
-	int i;
-	for(i=0;i<256;++i){
-		mLightIntensity[i]=255;
-	}
 }
 
 BSP30Node::~BSP30Node(){}
@@ -423,11 +419,12 @@ void BSP30Node::gatherRenderables(CameraNode *camera,RenderableSet *set){
 		}
 	}
 
-	/// @todo: Either update all the touched lightmaps once we're done, or lock only sections of them
 	for(i=0;i<mMap->lightmapTextures.size();++i){
-//		if(mMap->lightmapCounter[i]==mScene->getFrame()){
+		if(mMap->lightmapDirties[i]){
+			Logger::excess(Categories::TOADLET_TADPOLE_BSP,String("reloading lightmap:")+i);
+			mMap->lightmapDirties[i]=false;
 			mMap->lightmapTextures[i]->load(BSP30Map::LIGHTMAP_SIZE,BSP30Map::LIGHTMAP_SIZE,1,0,mMap->lightmapImages[i]->getData());
-//		}
+		}
 	}
 }
 

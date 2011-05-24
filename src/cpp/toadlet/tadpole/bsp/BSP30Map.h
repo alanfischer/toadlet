@@ -71,13 +71,14 @@ public:
 	}
 
 	struct facedata{
-		facedata():index(0),lightmapIndex(0),visible(true),next(NULL){}
+		facedata():index(0),lightmapIndex(0),visible(true),next(NULL){memset(lastStyleIntensities,0,sizeof(lastStyleIntensities));}
 
 		int index;
 		peeper::IndexData::ptr indexData;
 		int lightmapIndex;
 		int lightmapSize[2];
 		int lightmapCoord[2];
+		uint8 lastStyleIntensities[MAX_LIGHTMAPS];
 		bool visible;
 		facedata *next;
 	};
@@ -115,8 +116,10 @@ public:
 	egg::Collection<facedata> facedatas;
 	egg::image::Image::ptr lightmapImage;
 	egg::Collection<peeper::Texture::ptr> lightmapTextures;
+	egg::Collection<bool> lightmapDirties;
 egg::Collection<egg::image::Image::ptr> lightmapImages; /// @todo: Just modify portions of the texture
 	int lightmapAllocated[LIGHTMAP_SIZE];
+	uint8 styleIntensities[256];
 	egg::Collection<node::NodeResource::ptr> modelResources;
 };
 
