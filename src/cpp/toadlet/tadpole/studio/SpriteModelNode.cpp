@@ -44,7 +44,7 @@ TOADLET_NODE_IMPLEMENT(SpriteModelNode,Categories::TOADLET_TADPOLE_STUDIO+".Spri
 SpriteModelNode::SpriteModelNode():super(),
 	//mModel,
 	mRendered(false),
-	mFrame(0)
+	mSequenceTime(0)
 	//mMaterial,
 	//mVertexData,
 	//mIndexData
