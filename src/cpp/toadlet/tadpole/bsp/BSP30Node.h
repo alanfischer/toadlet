@@ -111,8 +111,8 @@ public:
 	void setSkyTextures(const egg::String &skyDown,const egg::String &skyUp,const egg::String &skyWest,const egg::String &skyEast,const egg::String &skySouth,const egg::String &skyNorth);
 	node::MeshNode *getSkyNode() const{return mSkyNode;}
 
-	void setStyleIntensity(int style,uint8 intensity){mMap->styleIntensities[style]=intensity;}
-	uint8 getStyleIntensity(int style){return mMap->styleIntensities[style];}
+	void setStyleIntensity(int style,scalar intensity){mMap->styleIntensities[style]=255*intensity;}
+	scalar getStyleIntensity(int style){return (float)mMap->styleIntensities[style]/255.0;}
 
 	// Node items
 	void nodeAttached(Node *node);

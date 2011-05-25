@@ -37,7 +37,7 @@ InterfaceSensor::InterfaceSensor(Scene *scene):Sensor(scene){
 }
 
 bool InterfaceSensor::senseNode(Node *node){
-	return node->hasInterface(mInterfaceID);
+	return node->hasInterface(mInterfaceID)!=NULL;
 }
 
 }

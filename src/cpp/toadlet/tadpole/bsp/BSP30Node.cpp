@@ -423,7 +423,7 @@ void BSP30Node::gatherRenderables(CameraNode *camera,RenderableSet *set){
 		if(mMap->lightmapDirties[i]){
 			Logger::excess(Categories::TOADLET_TADPOLE_BSP,String("reloading lightmap:")+i);
 			mMap->lightmapDirties[i]=false;
-			mMap->lightmapTextures[i]->load(BSP30Map::LIGHTMAP_SIZE,BSP30Map::LIGHTMAP_SIZE,1,0,mMap->lightmapImages[i]->getData());
+			mEngine->getTextureManager()->textureLoad(mMap->lightmapTextures[i],Texture::Format_RGB_8,BSP30Map::LIGHTMAP_SIZE,BSP30Map::LIGHTMAP_SIZE,1,0,mMap->lightmapImages[i]->getData());
 		}
 	}
 }

@@ -52,8 +52,8 @@ public:
 	void setModel(SpriteModel::ptr model);
 	SpriteModel::ptr getModel() const{return mModel;}
 
-	void setFrame(int frame){mFrame=frame;}
-	int getFrame() const{return mFrame;}
+	void setSequenceTime(scalar time){mSequenceTime=time;}
+	scalar getSequenceTime() const{return mSequenceTime;}
 
 	// Visible
 	bool getRendered() const{return mRendered;}
@@ -62,7 +62,7 @@ public:
 	void gatherRenderables(node::CameraNode *camera,RenderableSet *set);
 
 	// Renderable
-	Material *getRenderMaterial() const{return mFrame<mMaterials.size()?mMaterials[mFrame]:NULL;}
+	Material *getRenderMaterial() const{return mSequenceTime<mMaterials.size()?mMaterials[Math::toInt(mSequenceTime)]:NULL;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
 	void render(peeper::Renderer *renderer) const;
@@ -76,7 +76,7 @@ protected:
 
 	SpriteModel::ptr mModel;
 	bool mRendered;
-	int mFrame;
+	scalar mSequenceTime;
 	egg::Collection<Material::ptr> mMaterials;
 	peeper::VertexData::ptr mVertexData;
 	peeper::IndexData::ptr mIndexData;
