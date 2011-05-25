@@ -25,7 +25,7 @@ struct spritehdr{
 	int height;
 	int numframes;
 	float beamlength;
-	synctype synctype;
+	synctype sync;
 };
 
 static const int SPRITE_VP_PARALLEL_UPRIGHT=	0;
