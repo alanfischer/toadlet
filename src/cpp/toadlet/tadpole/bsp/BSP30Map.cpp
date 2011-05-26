@@ -24,7 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/bsp/BSP30Map.h>
-#include <string.h> // memset
 #include <stdlib.h> // free
 
 using namespace toadlet::egg;
