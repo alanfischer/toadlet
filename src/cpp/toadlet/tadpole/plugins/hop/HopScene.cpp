@@ -102,22 +102,36 @@ void HopScene::testEntity(Collision &result,HopEntity *entity1,const Segment &se
 	set(result,collision);
 }
 
-void HopScene::logicUpdate(int dt,int scope){
-	TOADLET_PROFILE_BEGINSECTION(Simulator::update);
-	mSimulator->update(dt,scope);
-	TOADLET_PROFILE_ENDSECTION(Simulator::update);
+void HopScene::logicUpdate(int dt,int scope,HopEntity *entity){
+	if(entity!=NULL){
+		entity->preSimulate();
+		TOADLET_PROFILE_BEGINSECTION(Simulator::update);
+		mSimulator->update(dt,scope);
+		TOADLET_PROFILE_ENDSECTION(Simulator::update);
+		entity->postSimulate();
 
-	// Reactivate any nodes that might have been deactivated
-	int i;
-	for(i=mSimulator->getNumSolids()-1;i>=0;--i){
-		Solid *solid=mSimulator->getSolid(i);
-		HopEntity *entity=(HopEntity*)(solid->getUserData());
-		if(entity->active()==false && solid->active()==true){
-			entity->activate();
-		}
+		entity->logicUpdate(dt,scope);
 	}
+	else{
+		int i;
+		for(i=mSimulator->getNumSolids()-1;i>=0;--i){
+			Solid *solid=mSimulator->getSolid(i);
+			HopEntity *entity=(HopEntity*)(solid->getUserData());
+			entity->preSimulate();
+		}
 
-	Scene::logicUpdate(dt,scope);
+		TOADLET_PROFILE_BEGINSECTION(Simulator::update);
+		mSimulator->update(dt,scope);
+		TOADLET_PROFILE_ENDSECTION(Simulator::update);
+
+		for(i=mSimulator->getNumSolids()-1;i>=0;--i){
+			Solid *solid=mSimulator->getSolid(i);
+			HopEntity *entity=(HopEntity*)(solid->getUserData());
+			entity->postSimulate();
+		}
+
+		Scene::logicUpdate(dt,scope);
+	}
 }
 
 int HopScene::findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids){

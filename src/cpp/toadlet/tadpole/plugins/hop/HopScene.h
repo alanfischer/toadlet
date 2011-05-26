@@ -63,7 +63,8 @@ public:
 	#endif
 
 	virtual void logicUpdate(int dt){Scene::logicUpdate(dt);}
-	virtual void logicUpdate(int dt,int scope);
+	virtual void logicUpdate(int dt,int scope){logicUpdate(dt,scope,NULL);}
+	virtual void logicUpdate(int dt,int scope,HopEntity *entity);
 
 	virtual hop::Solid::ptr getSolid(){return mSolid;}
 
