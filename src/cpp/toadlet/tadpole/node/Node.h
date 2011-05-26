@@ -28,7 +28,6 @@
 
 #include <toadlet/egg/Event.h>
 #include <toadlet/egg/IntrusivePointer.h>
-//#include <toadlet/egg/Property.h>
 #include <toadlet/egg/WeakPointer.h>
 #include <toadlet/egg/Type.h>
 #include <toadlet/tadpole/Types.h>
@@ -78,16 +77,6 @@ public:
 
 	static const Transform &identityTransform(){static Transform transform;return transform;}
 	static const Bound &zeroBound(){static Bound bound;return bound;}
-
-	enum TransformUpdate{
-		TransformUpdate_BIT_TRANSLATE=1<<0,
-		TransformUpdate_BIT_ROTATE=1<<1,
-		TransformUpdate_BIT_SCALE=1<<2,
-		TransformUpdate_BIT_BOUND=1<<3,
-		TransformUpdate_BIT_INTERPOLATOR=1<<4,
-
-		TransformUpdate_BIT_TRANSFORM=TransformUpdate_BIT_TRANSLATE|TransformUpdate_BIT_ROTATE|TransformUpdate_BIT_SCALE,
-	};
 
 	enum InterfaceType{
 		InterfaceType_ATTACHABLE,
@@ -180,8 +169,8 @@ public:
 	bool getTransformUpdated();
 
 	virtual void updateWorldTransform();
-	virtual void transformUpdated(int tu);
 	virtual void updateAllWorldTransforms();
+	virtual void spacialUpdated();
 
 	inline Engine *getEngine() const{return mEngine;}
 	inline Scene *getScene() const{return mScene;}
@@ -190,15 +179,7 @@ public:
 	inline void internal_setManaged(bool managed){mManaged=managed;}
 	inline bool internal_getManaged() const{return mManaged;}
 
-//	TOADLET_PROPERTY(Vector3,translate,Node,getTranslate,setTranslate);
-//	TOADLET_PROPERTY(Quaternion,rotate,Node,getRotate,setRotate);
-//	TOADLET_PROPERTY(Vector3,scale,Node,getScale,setScale);
-
-//	TOADLET_PROPERTY(int,scope,Node,getScope,setScope);
-//	TOADLET_PROPERTY(egg::String,name,Node,getName,setName);
-
 protected:
-	virtual void transformUpdateListeners(int dt);
 	virtual void logicUpdateListeners(int dt);
 	virtual void frameUpdateListeners(int dt);
 

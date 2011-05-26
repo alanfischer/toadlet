@@ -81,7 +81,6 @@
 #include <toadlet/tadpole/node/PartitionNode.h>
 #include <toadlet/tadpole/node/SpriteNode.h>
 #include <toadlet/tadpole/node/NodeListener.h>
-#include <toadlet/tadpole/node/NodeTransformInterpolator.h>
 
 #include <toadlet/tadpole/sensor/BoundingVolumeSensor.h>
 #include <toadlet/tadpole/sensor/NameSensor.h>

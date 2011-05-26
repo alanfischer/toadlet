@@ -49,6 +49,7 @@ public:
 	int getNumTimings() const;
 	String getTimingName(int i) const;
 
+	/// @todo: Name should not be allocated as part of timing1
 	class Timing{
 	public:
 		TOADLET_SHARED_POINTERS(Timing);

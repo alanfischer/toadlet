@@ -46,7 +46,6 @@ public:
 	virtual ~NodeListener(){}
 
 	virtual void nodeDestroyed(Node *node)=0;
-	virtual void transformUpdated(Node *node,int tu)=0;
 	virtual void logicUpdated(Node *node,int dt)=0;
 	virtual void frameUpdated(Node *node,int dt)=0;
 };

@@ -217,47 +217,47 @@ void Node::parentDataChanged(void *parentData){
 
 void Node::setTranslate(const Vector3 &translate){
 	mTransform.setTranslate(translate);
-	transformUpdated(TransformUpdate_BIT_TRANSLATE);
+	spacialUpdated();
 }
 
 void Node::setTranslate(scalar x,scalar y,scalar z){
 	mTransform.setTranslate(x,y,z);
-	transformUpdated(TransformUpdate_BIT_TRANSLATE);
+	spacialUpdated();
 }
 
 void Node::setRotate(const Quaternion &rotate){
 	mTransform.setRotate(rotate);
-	transformUpdated(TransformUpdate_BIT_ROTATE);
+	spacialUpdated();
 }
 
 void Node::setRotate(const Matrix3x3 &rotate){
 	mTransform.setRotate(rotate);
-	transformUpdated(TransformUpdate_BIT_ROTATE);
+	spacialUpdated();
 }
 
 void Node::setRotate(const Vector3 &axis,scalar angle){
 	mTransform.setRotate(axis,angle);
-	transformUpdated(TransformUpdate_BIT_ROTATE);
+	spacialUpdated();
 }
 
 void Node::setScale(const Vector3 &scale){
 	mTransform.setScale(scale);
-	transformUpdated(TransformUpdate_BIT_SCALE);
+	spacialUpdated();
 }
 
 void Node::setScale(scalar x,scalar y,scalar z){
 	mTransform.setScale(x,y,z);
-	transformUpdated(TransformUpdate_BIT_SCALE);
+	spacialUpdated();
 }
 
 void Node::setTransform(const Transform &transform){
 	mTransform.set(transform);
-	transformUpdated(TransformUpdate_BIT_TRANSFORM);
+	spacialUpdated();
 }
 
 void Node::setBound(const Bound &bound){
 	mBound.set(bound);
-	transformUpdated(TransformUpdate_BIT_BOUND);
+	spacialUpdated();
 }
 
 void Node::logicUpdate(int dt,int scope){
@@ -332,24 +332,13 @@ void Node::updateWorldTransform(){
 	}
 }
 
-void Node::transformUpdated(int tu){
+void Node::spacialUpdated(){
 	mTransformUpdatedFrame=mScene->getFrame();
 	activate();
-
-	transformUpdateListeners(tu);
 }
 
 void Node::updateAllWorldTransforms(){
 	updateWorldTransform();
-}
-
-void Node::transformUpdateListeners(int tu){
-	if(mNodeListeners!=NULL){
-		int i;
-		for(i=0;i<mNodeListeners->size();++i){
-			mNodeListeners->at(i)->transformUpdated(this,tu);
-		}
-	}
 }
 
 void Node::logicUpdateListeners(int dt){
