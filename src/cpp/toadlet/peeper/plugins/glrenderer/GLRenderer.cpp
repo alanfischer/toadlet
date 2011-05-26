@@ -1580,7 +1580,10 @@ void GLRenderer::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &res
 }
 
 int GLRenderer::getCloseTextureFormat(int textureFormat,int usage){
-	if(gl_version<12){
+	#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_12)
+		if(gl_version<12)
+	#endif
+	{
 		switch(textureFormat){
 			case Texture::Format_BGR_8:
 				return Texture::Format_RGB_8;
@@ -1949,22 +1952,24 @@ GLuint GLRenderer::getGLFormat(int textureFormat,bool internal){
 	else if((textureFormat&Texture::Format_BIT_LA)>0){
 		return GL_LUMINANCE_ALPHA;
 	}
-	else if((textureFormat&Texture::Format_BIT_BGR)>0){
-		if(internal==false){
-			return GL_BGR;
+	#if !defined(TOADLET_HAS_GLES) && defined(TOADLET_HAS_GL_12)
+		else if((textureFormat&Texture::Format_BIT_BGR)>0){
+			if(internal==false){
+				return GL_BGR;
+			}
+			else{
+				return GL_RGB;
+			}
 		}
-		else{
-			return GL_RGB;
+		else if((textureFormat&Texture::Format_BIT_BGRA)>0){
+			if(internal==false){
+				return GL_BGRA;
+			}
+			else{
+				return GL_RGBA;
+			}
 		}
-	}
-	else if((textureFormat&Texture::Format_BIT_BGRA)>0){
-		if(internal==false){
-			return GL_BGRA;
-		}
-		else{
-			return GL_RGBA;
-		}
-	}
+	#endif
 	else if((textureFormat&Texture::Format_BIT_RGB)>0){
 		return GL_RGB;
 	}
@@ -2176,8 +2181,10 @@ GLuint GLRenderer::getGLDepthTextureMode(TextureState::ShadowResult shadow){
 	switch(shadow){
 		case TextureState::ShadowResult_L:
 			return GL_LUMINANCE;
-		case TextureState::ShadowResult_A:
-			return GL_INTENSITY;
+		#if !defined(TOADLET_HAS_GLES)
+			case TextureState::ShadowResult_A:
+				return GL_INTENSITY;
+		#endif
 		default:
 			return 0;
 	}
