@@ -286,10 +286,8 @@ int Scene::countActiveNodes(Node *node){
 
 	ParentNode *parent=node->isParent();
 	if(parent!=NULL){
-		int numChildren=parent->getNumChildren();
-		int i;
-		for(i=0;i<numChildren;++i){
-			count+=countActiveNodes(parent->getChild(i));
+		for(node=parent->getFirstChild();node!=NULL;node=node->getNext()){
+			count+=countActiveNodes(node);
 		}
 	}
 	
@@ -327,10 +325,8 @@ void Scene::renderBoundingVolumes(Renderer *renderer,Node *node){
 
 	ParentNode *parent=node->isParent();
 	if(parent!=NULL){
-		int numChildren=parent->getNumChildren();
-		int i;
-		for(i=0;i<numChildren;++i){
-			renderBoundingVolumes(renderer,parent->getChild(i));
+		for(node=parent->getFirstChild();node!=NULL;node=node->getNext()){
+			renderBoundingVolumes(renderer,node);
 		}
 	}
 }

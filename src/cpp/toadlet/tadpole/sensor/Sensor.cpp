@@ -68,9 +68,9 @@ int Sensor::senseNodes(Node *node,SensorResultsListener *results){
 
 	ParentNode *parent=node->isParent();
 	if(parent!=NULL){
-		int i;
-		for(i=0;i<parent->getNumChildren();++i){
-			int r=senseNodes(parent->getChild(i),results);
+		Node::ptr child;
+		for(child=parent->getFirstChild();child!=NULL;child=child->getNext()){
+			int r=senseNodes(child,results);
 			if(r<0){
 				return -1;
 			}

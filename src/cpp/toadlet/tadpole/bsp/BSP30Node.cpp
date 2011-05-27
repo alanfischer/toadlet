@@ -224,10 +224,9 @@ void BSP30Node::setMap(const String &name){
 }
 
 void BSP30Node::setMap(BSP30Map::ptr map){
-	int i;
+	Node *node;
 
-	for(i=0;i<mChildren.size();++i){
-		Node *node=mChildren[i];
+	for(node=getFirstChild();node!=NULL;node=node->getNext()){
 		Collection<int> &indexes=((childdata*)node->getParentData())->leafs;
 		removeNodeLeafIndexes(indexes,node);
 	}
@@ -238,8 +237,7 @@ void BSP30Node::setMap(BSP30Map::ptr map){
 	mMarkedFaces=new uint8[(mMap->nfaces+7)>>3]; // Allocate enough markedfaces for 1 bit for each face
 	mVisibleMaterialFaces.resize(map->miptexlump->nummiptex);
 
-	for(i=0;i<mChildren.size();++i){
-		Node *node=mChildren[i];
+	for(node=getFirstChild();node!=NULL;node=node->getNext()){
 		Collection<int> &indexes=((childdata*)node->getParentData())->leafs;
 		findBoundLeafs(indexes,node);
 		insertNodeLeafIndexes(indexes,node);
@@ -378,10 +376,10 @@ void BSP30Node::gatherRenderables(CameraNode *camera,RenderableSet *set){
 			mMap->updateFaceLights(faceIndex);
 		}
 
-		for(i=0;i<mChildren.size();++i){
-			Node *child=mChildren[i];
-			if(camera->culled(child)==false){
-				child->gatherRenderables(camera,set);
+		Node *node;
+		for(node=getFirstChild();node!=NULL;node=node->getNext()){
+			if(camera->culled(node)==false){
+				node->gatherRenderables(camera,set);
 			}
 		}
 	}
@@ -485,6 +483,7 @@ bool BSP30Node::sensePotentiallyVisible(SensorResultsListener *listener,const Ve
 	}
 
 	bool result=false;
+	Node *node;
 	int i,j;
 	mCounter++;
 
@@ -493,9 +492,9 @@ bool BSP30Node::sensePotentiallyVisible(SensorResultsListener *listener,const Ve
 	memset(&mVisibleMaterialFaces[0],0,sizeof(BSP30Map::facedata*)*mVisibleMaterialFaces.size());
 	int leaf=mMap->findPointLeaf(mMap->planes,mMap->nodes,sizeof(bnode),0,point);
 	if(leaf==0 || mMap->nvisibility==0){
-		for(i=0;i<mChildren.size();++i){
+		for(node=getFirstChild();node!=NULL;node=node->getNext()){
 			result|=true;
-			if(listener->resultFound(mChildren[i],Math::lengthSquared(point,mChildren[i]->getWorldTranslate()))==false){
+			if(listener->resultFound(node,Math::lengthSquared(point,node->getWorldTranslate()))==false){
 				return true;
 			}
 		}

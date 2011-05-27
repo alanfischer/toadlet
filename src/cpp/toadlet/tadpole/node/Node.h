@@ -114,10 +114,14 @@ public:
 	virtual void removeController(animation::Controller::ptr controller);
 	virtual void removeAllControllers(){mControllers=NULL;}
 
-	virtual void parentChanged(ParentNode *parent);
-	ParentNode *getParent() const;
-	virtual void parentDataChanged(void *parentData);
+	ParentNode *getParent() const{return (ParentNode*)(mParent.get());}
 	void *getParentData() const{return mParentData;}
+	virtual void parentChanged(ParentNode *parent){mParent=(Node*)parent;}
+	virtual void parentDataChanged(void *parentData){mParentData=parentData;}
+	Node *getPrevious() const{return mPrevious;}
+	virtual void previousChanged(Node *previous){mPrevious=previous;}
+	Node *getNext() const{return mNext;}
+	virtual void nextChanged(Node *next){mNext=next;}
 
 	virtual void setDependsUpon(Node *node){mDependsUpon=node;}
 	inline Node *getDependsUpon() const{return mDependsUpon;}
@@ -197,7 +201,7 @@ protected:
 	egg::Collection<NodeListener::ptr>::ptr mNodeListeners;
 	egg::Collection<animation::Controller::ptr>::ptr mControllers;
 
-	Node::ptr mParent;
+	Node::ptr mParent,mPrevious,mNext;
 	void *mParentData;
 	
 	Node::ptr mDependsUpon;
