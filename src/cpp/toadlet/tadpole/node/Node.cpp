@@ -203,18 +203,6 @@ void Node::removeController(Controller::ptr controller){
 	}
 }
 
-void Node::parentChanged(ParentNode *parent){
-	mParent=(Node*)parent;
-}
-
-ParentNode *Node::getParent() const{
-	return (ParentNode*)mParent.get();
-}
-
-void Node::parentDataChanged(void *parentData){
-	mParentData=parentData;
-}
-
 void Node::setTranslate(const Vector3 &translate){
 	mTransform.setTranslate(translate);
 	spacialUpdated();
