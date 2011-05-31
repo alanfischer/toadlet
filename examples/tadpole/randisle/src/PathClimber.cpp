@@ -37,8 +37,11 @@ Node *PathClimber::create(Scene *scene){
 	setCoefficientOfRestitution(0);
 
 	mPlayerMeshNode=mEngine->createNodeType(MeshNode::type(),mScene);
-	if(Resources::instance->squirrel!=NULL){
-		mPlayerMeshNode->setMesh(Resources::instance->squirrel);
+	if(Resources::instance->creature!=NULL){
+		mPlayerMeshNode->setMesh(Resources::instance->creature);
+		mPlayerMeshNode->getController()->setCycling(Controller::Cycling_LOOP);
+		mPlayerMeshNode->getController()->setSequenceIndex(1);
+		mPlayerMeshNode->getController()->start();
 	}
 	attach(mPlayerMeshNode);
 

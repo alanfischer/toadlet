@@ -26,15 +26,7 @@ Squirrel::~Squirrel(){
 void Squirrel::create(const String &directory){
 	Logger::debug("Squirrel::create");
 
-	Error::getInstance()->installHandler();
-
-	#if 0
-		setFullscreen(true);
-	#else
-		setSize(640,480);
-	#endif
-
-	Application::create("gl");
+	Application::create();
 
 	mEngine->setDirectory(directory);
 
@@ -348,7 +340,7 @@ void Squirrel::logicUpdate(int dt){
 		Math::mul(position,mPlayer->getIdealRotation(),Math::Y_UNIT_VECTOR3);
 		Math::mul(position,-TREE_CAMERA_DISTANCE);
 		Math::add(position,mPlayer->getMounted()->getWorldTranslate());
-position.z+=mPlayer->getMounted()->getBound().getAABox().maxs.z/2;
+		position.z+=mPlayer->getMounted()->getBound().getAABox().maxs.z/2;
 
 		mFollower->logicUpdated(position,dt);
 	}

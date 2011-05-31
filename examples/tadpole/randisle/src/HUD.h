@@ -24,7 +24,7 @@ public:
 protected:
 	IntrusivePointer<PathClimber> mPlayer;
 	CameraNode::ptr mCamera;
-	AudioNode::ptr mBarkSound;
+	AudioNode::ptr mDogSound;
 	AudioNode::ptr mSharkSound;
 	egg::Random mRandom;
 

@@ -15,9 +15,9 @@ HUD::HUD():super(),
 Node *HUD::create(Scene *scene){
 	super::create(scene);
 
-	mBarkSound=mEngine->createNodeType(AudioNode::type(),mScene);
-	mBarkSound->setAudioBuffer(Resources::instance->bark);
-	mScene->getRoot()->attach(mBarkSound);
+	mDogSound=mEngine->createNodeType(AudioNode::type(),mScene);
+	mDogSound->setAudioBuffer(Resources::instance->dog);
+	mScene->getRoot()->attach(mDogSound);
 	mSharkSound=mEngine->createNodeType(AudioNode::type(),mScene);
 	mSharkSound->setAudioBuffer(Resources::instance->shark);
 	mScene->getRoot()->attach(mSharkSound);
@@ -87,14 +87,14 @@ void HUD::frameUpdate(int dt,int scope){
 			Math::setMatrix4x4FromTranslate(temp,0,-Math::mul(Math::HALF,amount),0);
 			Math::postMul(matrix,temp);
 			textureState.matrix.set(matrix);
-			mFadeSprite->getMaterial()->setTextureState(1,textureState);
+			mFadeSprite->getMaterial()->setTextureState(0,textureState);
 
 			if(chompamount>=Math::HALF){
 				dangerColor.w=Math::clamp(0,Math::ONE,(Math::ONE-chompamount*2)+Math::ONE);
 			}
 		}
 
-		materialState.ambient=dangerColor;
+		materialState.set(dangerColor);
 		mFadeSprite->getMaterial()->setMaterialState(materialState);
 		if(dangerColor.w>0){
 			mFadeSprite->setScope(-1);
@@ -126,12 +126,12 @@ void HUD::logicUpdate(int dt,int scope){
 		if(mChompTime>0){
 			scalar chompamount=Math::fromMilli(mScene->getTime()-mChompTime);
 			if(chompamount>=Math::HALF && mPlayer->getHealth()>0){
-				mBarkSound->stop();
+				mDogSound->stop();
 				mSharkSound->stop();
 
-				mBarkSound->setAudioBuffer(Resources::instance->crunch);
-				mBarkSound->setGain(Math::ONE);
-				mBarkSound->play();
+				mDogSound->setAudioBuffer(Resources::instance->crunch);
+				mDogSound->setGain(Math::ONE);
+				mDogSound->play();
 
 				mPlayer->setHealth(0);
 				mPlayer->setSpeed(0);
@@ -143,12 +143,12 @@ void HUD::logicUpdate(int dt,int scope){
 			mChompTime=mScene->getTime();
 		}
 		else if(danger>0){
-			mBarkSound->setGain(Math::mul(danger,Math::ONE-mWaterAmount)*4);
+			mDogSound->setGain(Math::mul(danger,Math::ONE-mWaterAmount)*4);
 			mSharkSound->setGain(Math::mul(Math::ONE,mWaterAmount)*4); // use Math::mul(danger,mWaterAmount) when the shark sound is constant volume
 
-			if(mBarkSound->getPlaying()==false && mNextBarkTime<mScene->getLogicTime()){
+			if(mDogSound->getPlaying()==false && mNextBarkTime<mScene->getLogicTime()){
 				mNextBarkTime=mScene->getLogicTime()+mRandom.nextInt(500,1500);
-				mBarkSound->play();
+				mDogSound->play();
 			}
 			if(mSharkSound->getPlaying()==false){
 				mSharkSound->play();
@@ -156,8 +156,8 @@ void HUD::logicUpdate(int dt,int scope){
 		}
 		else if(mNextBarkTime>0){
 			mNextBarkTime=0;
-			mBarkSound->setGain(0);
-			mBarkSound->stop();
+			mDogSound->setGain(0);
+			mDogSound->stop();
 			mSharkSound->setGain(0);
 			mSharkSound->stop();
 		}

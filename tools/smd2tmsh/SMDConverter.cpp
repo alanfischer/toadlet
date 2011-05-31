@@ -14,7 +14,7 @@ class Triangle{
 public:
 	Triangle(){}
 
-	Triangle(String m,Vertex v1,Vertex v2,Vertex v3){
+	Triangle(String m,const Vertex &v1,const Vertex &v2,const Vertex &v3){
 		material=m;
 		verts[0]=v1;
 		verts[1]=v2;

@@ -69,6 +69,7 @@ void Material::destroy(){
 void Material::setTexture(int i,Texture::ptr texture){
 	if(i>=mTextures.size()){
 		mTextures.resize(i+1);
+		mTextureNames.resize(i+1);
 	}
 	if(mTextures[i]!=NULL){
 		mTextures[i]->release();
@@ -86,6 +87,14 @@ void Material::setTexture(int i,Texture::ptr texture){
 		TextureState textureState;
 		if(mRenderState->getTextureState(i,textureState)==false) mRenderState->setTextureState(i,textureState);
 	}
+}
+
+void Material::setTextureName(int i,const String &name){
+	if(i>=mTextures.size()){
+		mTextures.resize(i+1);
+		mTextureNames.resize(i+1);
+	}
+	mTextureNames[i]=name;
 }
 
 bool Material::isDepthSorted() const{
