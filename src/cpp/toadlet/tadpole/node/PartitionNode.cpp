@@ -51,12 +51,11 @@ void PartitionNode::destroy(){
 
 bool PartitionNode::senseBoundingVolumes(SensorResultsListener *listener,const Bound &bound){
 	bool result=false;
-	int i;
-	for(i=0;i<mChildren.size();++i){
-		Node *child=mChildren[i];
-		if(child->getWorldBound().testIntersection(bound)){
+	Node::ptr node;
+	for(node=getFirstChild();node!=NULL;node=node->getNext()){
+		if(node->getWorldBound().testIntersection(bound)){
 			result|=true;
-			if(listener->resultFound(child,Math::lengthSquared(bound.getSphere().origin,child->getWorldTranslate()))==false){
+			if(listener->resultFound(node,Math::lengthSquared(bound.getSphere().origin,node->getWorldTranslate()))==false){
 				return true;
 			}
 		}
@@ -67,11 +66,10 @@ bool PartitionNode::senseBoundingVolumes(SensorResultsListener *listener,const B
 
 bool PartitionNode::sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point){
 	bool result=false;
-	int i;
-	for(i=0;i<mChildren.size();++i){
-		Node *child=mChildren[i];
+	Node::ptr node;
+	for(node=getFirstChild();node!=NULL;node=node->getNext()){
 		result|=true;
-		if(listener->resultFound(child,Math::lengthSquared(point,child->getWorldTranslate()))==false){
+		if(listener->resultFound(node,Math::lengthSquared(point,node->getWorldTranslate()))==false){
 			return true;
 		}
 	}

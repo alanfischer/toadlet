@@ -30,7 +30,6 @@
 #include <toadlet/tadpole/Traceable.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
-#include <toadlet/tadpole/node/NodeTransformInterpolator.h>
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
 
 namespace toadlet{
@@ -65,7 +64,8 @@ public:
 	virtual void setInfiniteMass();
 	virtual bool hasInfiniteMass() const{return mSolid->hasInfiniteMass();}
 
-	virtual void setPosition(const Vector3 &position){mSolid->setPosition(position);}
+	virtual void setPosition(const Vector3 &position);
+	virtual void setPositionDirect(const Vector3 &position);
 	virtual const Vector3 &getPosition(){return mSolid->getPosition();}
 
 	virtual void setVelocity(const Vector3 &velocity);
@@ -110,8 +110,6 @@ public:
 	virtual hop::Shape::ptr getShape(int i) const{return mSolid->getShape(i);}
 	virtual int getNumShapes() const{return mSolid->getNumShapes();}
 
-	node::NodeTransformInterpolator::ptr getInterpolator(){return mInterpolator;}
-
 	// Shortcuts for a single shape
 	virtual void setShape(hop::Shape::ptr shape){if(mSolid->getNumShapes()>0){removeAllShapes();}addShape(shape);}
 	virtual hop::Shape::ptr getShape() const{return mSolid->getNumShapes()>0?mSolid->getShape(0):NULL;}
@@ -124,8 +122,11 @@ public:
 
 	virtual void setCollisionVolumesVisible(bool visible);
 
+	void preSimulate();
+	void postSimulate();
+
 	// Node callbacks
-	virtual void transformUpdated(int tu);
+	virtual void spacialUpdated();
 	virtual void parentChanged(node::ParentNode *parent);
 	virtual void logicUpdate(int dt,int scope);
 	virtual void frameUpdate(int dt,int scope);
@@ -142,10 +143,11 @@ protected:
 	virtual void updateCollisionVolumes();
 
 	hop::Solid::ptr mSolid;
+	Vector3 mOldPosition,mNewPosition,mCurrentPosition;
+	bool mSkipNextPreSimulate;
 	hop::Shape::ptr mTraceableShape;
 	Traceable *mTraceable;
 	node::Node::ptr mTraceableNode;
-	node::NodeTransformInterpolator::ptr mInterpolator;
 	node::ParentNode::ptr mVolumeNode;
 	int mNextThink;
 	HopEntity::wptr mTriggerTarget;
