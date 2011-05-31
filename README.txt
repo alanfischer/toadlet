@@ -7,4 +7,4 @@ interest.
 For more information about toadlet, check 
 the website: 
 
-  http://www.lightningtoads.com/toadlet
+  http://code.google.com/p/toadlet
