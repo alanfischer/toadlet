@@ -53,14 +53,13 @@ public:
 			water->retain();
 		}
 
-		squirrel=engine->getMeshManager()->findMesh("squirrel.xmsh");
-		if(squirrel!=NULL){
+		creature=engine->getMeshManager()->findMesh("frog.xmsh");
+		if(creature!=NULL){
 			Transform transform;
 			transform.setTranslate(0,0,-3.5);
-			transform.setScale(0.1,0.1,0.1);
-			transform.setRotate(Math::Z_UNIT_VECTOR3,-Math::HALF_PI);
-			squirrel->setTransform(transform);
-			squirrel->retain();
+			transform.setRotate(Math::Z_UNIT_VECTOR3,Math::PI);
+			creature->setTransform(transform);
+			creature->retain();
 		}
 		
 		shadow=engine->getMeshManager()->createBox(AABox(-4,-4,0,4,4,0));
@@ -95,7 +94,7 @@ public:
 			treeBranchHighlighted->retain();
 		}
 
- 		bark=engine->getAudioBufferManager()->findAudioBuffer("deepbark.wav");
+ 		dog=engine->getAudioBufferManager()->findAudioBuffer("dog.wav");
 		shark=engine->getAudioBufferManager()->findAudioBuffer("shark.wav");
 		rustle=engine->getAudioBufferManager()->findAudioBuffer("rustle.wav");
 		crunch=engine->getAudioBufferManager()->findAudioBuffer("crunch.wav");
@@ -109,7 +108,7 @@ public:
 		}
 
 		// HUD
-		hudFade=engine->getMaterialManager()->createMaterial(engine->getTextureManager()->createTexture(createPoint(128,128)));
+		hudFade=engine->getMaterialManager()->createMaterial(engine->getTextureManager()->createTexture(createPoint(128,128)),true);
 		hudFade->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 		hudFade->setBlendState(BlendState::Combination_ALPHA);
 		hudFade->setMaterialState(MaterialState(Colors::TRANSPARENT_RED));
@@ -138,7 +137,7 @@ public:
 			hudWooden->retain();
 		}
 
-		hudSystem=engine->getFontManager()->findFont("pf_tempesta_seven.ttf",100);
+		hudSystem=engine->getFontManager()->getDefaultFont();
 		if(hudSystem!=NULL){
 			hudSystem->retain();
 		}
@@ -154,13 +153,13 @@ public:
 	Vector4 skyColor,fadeColor;
 	Material::ptr grass;
 	Material::ptr water;
-	Mesh::ptr squirrel;
+	Mesh::ptr creature;
 	Mesh::ptr shadow;
 	Material::ptr treeBranch;
 	Material::ptr treeLeaf;
 	Material::ptr treeBranchHighlighted;
 	Material::ptr acorn;
-	AudioBuffer::ptr bark;
+	AudioBuffer::ptr dog;
 	AudioBuffer::ptr shark;
 	AudioBuffer::ptr rustle;
 	AudioBuffer::ptr crunch;

@@ -88,7 +88,7 @@ public:
 	void setTexture(int i,peeper::Texture::ptr texture);
 	peeper::Texture::ptr getTexture(int i=0) const{return i<mTextures.size()?mTextures[i]:NULL;}
 	void setTextureName(const egg::String &name){setTextureName(0,name);}
-	void setTextureName(int i,const egg::String &name){if(i>=mTextureNames.size()){mTextureNames.resize(i+1);}mTextureNames[i]=name;}
+	void setTextureName(int i,const egg::String &name);
 	egg::String getTextureName(int i=0) const{return i<mTextureNames.size()?mTextureNames[i]:(char*)NULL;}
 
 	void setSort(SortType sort){mSort=sort;}
