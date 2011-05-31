@@ -41,11 +41,9 @@ if (WIN32)
 	#option (TOADLET_PLATFORM_WINCE "Build for Windows CE devices" OFF)
 	option (TOADLET_PLATFORM_ANDROID "Build for Android devices" OFF)
 	option (TOADLET_PLATFORM_BLACKBERRY "Build for Blackberry devices" OFF)
-	option (TOADLET_FIXED_POINT "Use a fixed point build of toadlet" OFF)
 elseif (UNIX)
 	set (TOADLET_PLATFORM_POSIX ON)
 	option (TOADLET_PLATFORM_ANDROID "Build for Android devices" OFF)
-	option (TOADLET_FIXED_POINT "Use a fixed point build of toadlet" OFF)
 	if (APPLE) 
 		set (TOADLET_PLATFORM_OSX ON)
 		option (TOADLET_PLATFORM_IPHONE "Build for the iPhone" OFF)
@@ -67,6 +65,9 @@ if (TOADLET_PLATFORM_ANDROID)
 		message ("Using android.jar located at: ${ANDROID_JAR}")
 	endif (NOT ANDROID_JAR)
 
+	# Android uses fixed point by default 
+	option (TOADLET_FIXED_POINT "Use a fixed point build of toadlet" ON)
+
 	# Add the gpp executable for java file preprocessing
 	add_subdirectory (gpp)
 elseif (TOADLET_PLATFORM_BLACKBERRY)
@@ -77,8 +78,14 @@ elseif (TOADLET_PLATFORM_BLACKBERRY)
 		message ("Using BLACKBERRY_JDE_DIR at: ${BLACKBERRY_JDE_DIR}")
 	endif (NOT BLACKBERRY_JDE_DIR)
 
+	# Android uses fixed point by default 
+	option (TOADLET_FIXED_POINT "Use a fixed point build of toadlet" ON)
+
 	# Add the gpp executable for java file preprocessing
 	add_subdirectory (gpp)
+else (TOADLET_PLATFORM_ANDROID)
+	# All Other platforms default to using floating point math
+	option (TOADLET_FIXED_POINT "Use a fixed point build of toadlet" OFF)
 endif (TOADLET_PLATFORM_ANDROID)
 
 
