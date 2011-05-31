@@ -1,0 +1,8 @@
+Perhaps changing the path you use should be a separate button, independent of the L R
+that just swaps paths every time
+so you could use L R to get into a good position and see what is up
+but you always hit the same thing to swap paths
+since sometimes it doesn't change when you would expect using L R
+and sometimes you don't want to change you just want a different view
+gimme a change path key, and more squirrel top-end speed, and I'd love to try it out more
+so maybe on the phone, tilt L/R would just rotate, but pressing a button on the bottom center would be the branch button, to change which branch your headed for
