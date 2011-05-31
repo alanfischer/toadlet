@@ -1,6 +1,6 @@
 # Standard setup
 cmake_minimum_required (VERSION 2.8)
-project (toadlet CXX C)
+project (toadlet CXX C Java)
 
 
 # Version Settings for cpp libraries
@@ -41,11 +41,9 @@ if (WIN32)
 	#option (TOADLET_PLATFORM_WINCE "Build for Windows CE devices" OFF)
 	option (TOADLET_PLATFORM_ANDROID "Build for Android devices" OFF)
 	option (TOADLET_PLATFORM_BLACKBERRY "Build for Blackberry devices" OFF)
-	option (TOADLET_FIXED_POINT "Use a fixed point build of toadlet" OFF)
 elseif (UNIX)
 	set (TOADLET_PLATFORM_POSIX ON)
 	option (TOADLET_PLATFORM_ANDROID "Build for Android devices" OFF)
-	option (TOADLET_FIXED_POINT "Use a fixed point build of toadlet" OFF)
 	if (APPLE) 
 		set (TOADLET_PLATFORM_OSX ON)
 		option (TOADLET_PLATFORM_IPHONE "Build for the iPhone" OFF)
@@ -64,8 +62,11 @@ if (TOADLET_PLATFORM_ANDROID)
 	if (NOT ANDROID_JAR)
 		message (FATAL_ERROR "Required variable ANDROID_JAR not set as path/to/android.jar, please set ANDROID_JAR and rerun!")
 	else (NOT ANDROID_JAR)
-		message ("Using android.jar located at: ${ANDROID_JAR}")
+		message ("Using android.jar file: ${ANDROID_JAR}")
 	endif (NOT ANDROID_JAR)
+
+	# Android uses fixed point by default 
+	option (TOADLET_FIXED_POINT "Use a fixed point build of toadlet" ON)
 
 	# Add the gpp executable for java file preprocessing
 	add_subdirectory (gpp)
@@ -74,11 +75,17 @@ elseif (TOADLET_PLATFORM_BLACKBERRY)
 	if (NOT BLACKBERRY_JDE_DIR)
 		message (FATAL_ERROR "Required variable BLACKBERRY_JDE_DIR not set as path/to/blackberryJDE, please set BLACKBERRY_JDE_DIR and rerun!")
 	else (NOT BLACKBERRY_JDE_DIR)
-		message ("Using BLACKBERRY_JDE_DIR at: ${BLACKBERRY_JDE_DIR}")
+		message ("Using BLACKBERRY_JDE_DIR directory: ${BLACKBERRY_JDE_DIR}")
 	endif (NOT BLACKBERRY_JDE_DIR)
+
+	# Android uses fixed point by default 
+	option (TOADLET_FIXED_POINT "Use a fixed point build of toadlet" ON)
 
 	# Add the gpp executable for java file preprocessing
 	add_subdirectory (gpp)
+else (TOADLET_PLATFORM_ANDROID)
+	# All Other platforms default to using floating point math
+	option (TOADLET_FIXED_POINT "Use a fixed point build of toadlet" OFF)
 endif (TOADLET_PLATFORM_ANDROID)
 
 

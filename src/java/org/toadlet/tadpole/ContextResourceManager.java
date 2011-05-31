@@ -49,6 +49,8 @@ public class ContextResourceManager<PeerType> extends ResourceManager{
 	}
 
 	public void resourceUnloaded(Resource resource){
+		// Prevent the java compiler from complaining about casts we know to be safe
+		@SuppressWarnings (value="unchecked")
 		PeerType peer=(PeerType)(mResourceSemantics.getResourcePeer(resource));
 		if(peer!=null){
 			mResourcePeersToUnload.add(peer);
