@@ -62,7 +62,7 @@ if (TOADLET_PLATFORM_ANDROID)
 	if (NOT ANDROID_JAR)
 		message (FATAL_ERROR "Required variable ANDROID_JAR not set as path/to/android.jar, please set ANDROID_JAR and rerun!")
 	else (NOT ANDROID_JAR)
-		message ("Using android.jar located at: ${ANDROID_JAR}")
+		message ("Using android.jar file: ${ANDROID_JAR}")
 	endif (NOT ANDROID_JAR)
 
 	# Android uses fixed point by default 
@@ -75,7 +75,7 @@ elseif (TOADLET_PLATFORM_BLACKBERRY)
 	if (NOT BLACKBERRY_JDE_DIR)
 		message (FATAL_ERROR "Required variable BLACKBERRY_JDE_DIR not set as path/to/blackberryJDE, please set BLACKBERRY_JDE_DIR and rerun!")
 	else (NOT BLACKBERRY_JDE_DIR)
-		message ("Using BLACKBERRY_JDE_DIR at: ${BLACKBERRY_JDE_DIR}")
+		message ("Using BLACKBERRY_JDE_DIR directory: ${BLACKBERRY_JDE_DIR}")
 	endif (NOT BLACKBERRY_JDE_DIR)
 
 	# Android uses fixed point by default 
