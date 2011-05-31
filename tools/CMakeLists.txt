@@ -23,6 +23,7 @@ find_package (toadlet REQUIRED)
 
 
 # Add the tool subdirectories
+add_subdirectory (blenderXMSHExporter)
 add_subdirectory (msTMSHExporter)
 add_subdirectory (msTMSHImporter)
 add_subdirectory (smd2tmsh)
