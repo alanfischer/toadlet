@@ -26,6 +26,8 @@
 #include "OggVorbisDecoder.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
+#include <vorbis/codec.h>
+#include <vorbis/vorbisfile.h>
 #include <string.h> // memcpy
 
 #if defined(TOADLET_PLATFORM_WIN32)
@@ -51,11 +53,13 @@ OggVorbisDecoder::OggVorbisDecoder():
 	mVorbisInfo(NULL),
 	mDataLength(0)
 {
+	mVorbisFile=new OggVorbis_File();
 	mFormat=AudioFormat::ptr(new AudioFormat());
 }
 
 OggVorbisDecoder::~OggVorbisDecoder(){
 	stopStream();
+	delete mVorbisFile;
 }
 
 size_t OggVorbisDecoder::read_func(void *ptr,size_t size,size_t nmemb, void *datasource){
@@ -122,7 +126,7 @@ bool OggVorbisDecoder::startStream(egg::io::Stream::ptr stream){
 	callbacks.tell_func=tell_func;
 
 	int result;
-	result=ov_open_callbacks(mStream,&mVorbisFile,NULL,0,callbacks);
+	result=ov_open_callbacks(mStream,mVorbisFile,NULL,0,callbacks);
 
 	if(result!=0){
 		Error::unknown(Categories::TOADLET_RIBBIT,
@@ -130,7 +134,7 @@ bool OggVorbisDecoder::startStream(egg::io::Stream::ptr stream){
 		return false;
 	}
 
-	mVorbisInfo=ov_info(&mVorbisFile,-1);
+	mVorbisInfo=ov_info(mVorbisFile,-1);
 	if(mVorbisInfo==NULL){
 		Error::unknown(Categories::TOADLET_RIBBIT,
 			"OggVorbisDecoder: ov_info failed");
@@ -156,7 +160,7 @@ int OggVorbisDecoder::read(tbyte *buffer,int length){
 	while(count>0){
 		//If we have no data in buffer, copy over
 		if(mDataLength==0){
-			mDataLength=ov_read(&mVorbisFile,mDataBuffer,OGGPACKETSIZE,0,2,1,&sec);
+			mDataLength=ov_read(mVorbisFile,mDataBuffer,OGGPACKETSIZE,0,2,1,&sec);
 		}
 
 		tempLength=mDataLength;
@@ -182,7 +186,7 @@ int OggVorbisDecoder::read(tbyte *buffer,int length){
 
 bool OggVorbisDecoder::stopStream(){
 	if(mVorbisInfo!=NULL){
-		ov_clear(&mVorbisFile);
+		ov_clear(mVorbisFile);
 		mVorbisInfo=NULL;
 	}
 
@@ -200,15 +204,15 @@ bool OggVorbisDecoder::reset(){
 }
 
 int OggVorbisDecoder::length(){
-	return ov_raw_total(&mVorbisFile,-1);
+	return ov_raw_total(mVorbisFile,-1);
 }
 
 int OggVorbisDecoder::position(){
-	return ov_raw_tell(&mVorbisFile);
+	return ov_raw_tell(mVorbisFile);
 }
 
 bool OggVorbisDecoder::seek(int offs){
-	return ov_raw_seek(&mVorbisFile,offs)>=0;
+	return ov_raw_seek(mVorbisFile,offs)>=0;
 }
 
 }

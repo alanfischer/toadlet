@@ -53,8 +53,8 @@ public:
 	virtual bool remove(Node *node);
 	virtual void nodeRemoved(Node *node){}
 
-	inline int getNumChildren() const{return mChildren.size();}
-	inline Node *getChild(int i) const{return mChildren[i];}
+	inline Node *getFirstChild() const{return mFirstChild;}
+	inline Node *getLastChild() const{return mLastChild;}
 
 	virtual void handleEvent(const egg::Event::ptr &event);
 
@@ -70,14 +70,9 @@ public:
 	virtual void updateAllWorldTransforms();
 
 protected:
-	virtual void updateShadowChildren();
-
-	egg::Collection<Node::ptr> mChildren;
+	Node::ptr mFirstChild,mLastChild;
 	bool mChildrenActive;
 	bool mActivateChildren;
-
-	bool mShadowChildrenDirty;
-	egg::Collection<Node::ptr> mShadowChildren;
 };
 
 }

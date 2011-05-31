@@ -38,31 +38,21 @@ TOADLET_NODE_IMPLEMENT(ParentNode,Categories::TOADLET_TADPOLE_NODE+".ParentNode"
 
 ParentNode::ParentNode():super(),
 	mChildrenActive(false),
-	mActivateChildren(false),
-
-	mShadowChildrenDirty(false)
+	mActivateChildren(false)
 {
 }
 
 Node *ParentNode::create(Scene *scene){
 	super::create(scene);
 
-	mChildren.clear();
 	mChildrenActive=false;
 	mActivateChildren=true;
-
-	mShadowChildren.clear();
-	mShadowChildrenDirty=false;
 
 	return this;
 }
 
 void ParentNode::destroy(){
-	while(mChildren.size()>0){
-		mChildren[0]->destroy();
-	}
-
-	mShadowChildren.clear();
+	destroyAllChildren();
 
 	super::destroy();
 }
@@ -71,26 +61,25 @@ Node *ParentNode::set(Node *node){
 	super::set(node);
 
 	ParentNode *parentNode=(ParentNode*)node;
-	int i;
-	for(i=0;i<parentNode->getNumChildren();++i){
-		attach(parentNode->getChild(i)->clone(mScene));
+	for(node=parentNode->getFirstChild();node!=NULL;node=node->getNext()){
+		attach(node->clone(mScene));
 	}
 
 	return this;
 }
 
 void ParentNode::destroyAllChildren(){
-	while(mChildren.size()>0){
-		mChildren[0]->destroy();
+	while(mFirstChild!=NULL){
+		mFirstChild->destroy();
 	}
 }
 
 void ParentNode::removeAllNodeListeners(){
 	super::removeAllNodeListeners();
 
-	int i;
-	for(i=mChildren.size()-1;i>=0;--i){
-		mChildren[i]->removeAllNodeListeners();
+	Node::ptr node;
+	for(node=getFirstChild();node!=NULL;node=node->getNext()){
+		node->removeAllNodeListeners();
 	}
 }
 
@@ -106,12 +95,19 @@ bool ParentNode::attach(Node *node){
 		parent->remove(node);
 	}
 
-	mChildren.add(node);
+	Node *previous=mLastChild;
+	node->previousChanged(previous);
+	if(previous!=NULL){
+		previous->nextChanged(node);
+	}
+	else{
+		mFirstChild=node;
+	}
+	mLastChild=node;
 
+	node->nextChanged(NULL);
 	node->parentChanged(this);
 	nodeAttached(node);
-
-	mShadowChildrenDirty=true;
 
 	activate();
 
@@ -122,17 +118,28 @@ bool ParentNode::attach(Node *node){
 
 bool ParentNode::remove(Node *node){
 	Node::ptr reference(node); // To make sure that the object is not deleted until we can call parentChanged
-	int i;
-	for(i=mChildren.size()-1;i>=0;--i){
-		if(mChildren[i]==node)break;
-	}
-	if(i>=0){
-		mChildren.removeAt(i);
+	if(node->getParent()==this){
+		Node *previous=node->getPrevious();
+		Node *next=node->getNext();
+		if(previous!=NULL){
+			previous->nextChanged(next);
+		}
+		if(next!=NULL){
+			next->previousChanged(previous);
+		}
+
+		if(mFirstChild==node){
+			mFirstChild=next;
+		}
+		if(mLastChild==node){
+			mLastChild=previous;
+		}
 
 		node->parentChanged(NULL);
-		nodeRemoved(node);
+		node->previousChanged(NULL);
+		// Leave node->next so traversals can continue
 
-		mShadowChildrenDirty=true;
+		nodeRemoved(node);
 
 		activate();
 
@@ -144,10 +151,9 @@ bool ParentNode::remove(Node *node){
 }
 
 void ParentNode::handleEvent(const Event::ptr &event){
-	int numChildren=mChildren.size();
-	int i;
-	for(i=0;i<numChildren;++i){
-		mChildren[i]->handleEvent(event);
+	Node::ptr node;
+	for(node=getFirstChild();node!=NULL;node=node->getNext()){
+		node->handleEvent(event);
 	}
 }
 
@@ -155,26 +161,21 @@ void ParentNode::logicUpdate(int dt,int scope){
 	super::logicUpdate(dt,scope);
 
 	mChildrenActive=false;
-	if(mShadowChildrenDirty){
-		updateShadowChildren();
-	}
 
-	int numChildren=mShadowChildren.size();
-	Node *child=NULL;
-	int i;
-	for(i=0;i<numChildren;++i){
-		child=mShadowChildren[i];
+	Node::ptr node,next;
+	for(node=getFirstChild();node!=NULL;node=next){
+		next=node->getNext();
 		if(mActivateChildren){
-			child->activate();
+			node->activate();
 		}
-		if(child->active() && (child->getScope()&scope)!=0){
-			Node *depends=child->getDependsUpon();
+		if(node->active() && (node->getScope()&scope)!=0){
+			Node *depends=node->getDependsUpon();
 			if(depends!=NULL && depends->mLastLogicFrame!=mScene->getLogicFrame()){
-				mScene->queueDependent(child);
+				mScene->queueDependent(node);
 			}
 			else{
-				child->logicUpdate(dt,scope);
-				child->tryDeactivate();
+				node->logicUpdate(dt,scope);
+				node->tryDeactivate();
 				mChildrenActive=true;
 			}
 		}
@@ -186,31 +187,23 @@ void ParentNode::logicUpdate(int dt,int scope){
 void ParentNode::frameUpdate(int dt,int scope){
 	super::frameUpdate(dt,scope);
 
-	if(mShadowChildrenDirty){
-		updateShadowChildren();
-	}
-
-	int numChildren=mShadowChildren.size();
-
-	Node *child=NULL;
-	int i;
-	for(i=0;i<numChildren;++i){
-		child=mShadowChildren[i];
-
+	Node::ptr node,next;
+	for(node=getFirstChild();node!=NULL;node=next){
+		next=node->getNext();
 		bool dependent=false;
 		// This may not be in logicUpdate, but it solves an issue where a deactivated Node would not get updated if 
 		//  it only had frameUpdate called on it before a render
 		if(mActivateChildren){
-			child->activate();
+			node->activate();
 		}
-		if(child->active() && (child->getScope()&scope)!=0){
-			Node *depends=child->getDependsUpon();
+		if(node->active() && (node->getScope()&scope)!=0){
+			Node *depends=node->getDependsUpon();
 			if(depends!=NULL && depends->mLastFrame!=mScene->getFrame()){
-				mScene->queueDependent(child);
+				mScene->queueDependent(node);
 				dependent=true;
 			}
 			else{
-				child->frameUpdate(dt,scope);
+				node->frameUpdate(dt,scope);
 			}
 		}
 	}
@@ -220,12 +213,10 @@ void ParentNode::frameUpdate(int dt,int scope){
 }
 
 void ParentNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
-	int numChildren=getNumChildren();
-	int i;
-	for(i=0;i<numChildren;++i){
-		Node *child=getChild(i);
-		if(camera->culled(child)==false){
-			child->gatherRenderables(camera,set);
+	Node *node;
+	for(node=getFirstChild();node!=NULL;node=node->getNext()){
+		if(camera->culled(node)==false){
+			node->gatherRenderables(camera,set);
 		}
 	}
 }
@@ -245,9 +236,9 @@ void ParentNode::deactivate(){
 	}
 
 	super::deactivate();
-	int i;
-	for(i=0;i<mChildren.size();++i){
-		mChildren[i]->deactivate();
+	Node::ptr node;
+	for(node=getFirstChild();node!=NULL;node=node->getNext()){
+		node->deactivate();
 	}
 }
 
@@ -268,19 +259,9 @@ void ParentNode::tryDeactivate(){
 void ParentNode::updateAllWorldTransforms(){
 	super::updateAllWorldTransforms();
 
-	int i;
-	for(i=0;i<mChildren.size();++i){
-		mChildren[i]->updateAllWorldTransforms();
-	}
-}
-
-void ParentNode::updateShadowChildren(){
-	mShadowChildrenDirty=false;
-
-	mShadowChildren.resize(mChildren.size());
-	int i;
-	for(i=mChildren.size()-1;i>=0;--i){
-		mShadowChildren[i]=mChildren[i];
+	Node *node;
+	for(node=getFirstChild();node!=NULL;node=node->getNext()){
+		node->updateAllWorldTransforms();
 	}
 }
 

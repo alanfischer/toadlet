@@ -30,6 +30,9 @@
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 
+struct OggVorbis_File;
+struct vorbis_info;
+
 namespace toadlet{
 namespace ribbit{
 namespace decoder{
@@ -66,7 +69,7 @@ private:
 	static int close_func(void *datasource);
 	static long tell_func(void *datasource);
 
-	OggVorbis_File mVorbisFile;
+	OggVorbis_File *mVorbisFile;
 	vorbis_info *mVorbisInfo;
 	char mDataBuffer[OGGPACKETSIZE];
 	int mDataLength;

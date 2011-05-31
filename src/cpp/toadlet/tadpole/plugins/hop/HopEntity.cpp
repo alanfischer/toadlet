@@ -39,10 +39,11 @@ TOADLET_NODE_IMPLEMENT(HopEntity,Categories::TOADLET_TADPOLE+".HopEntity");
 
 HopEntity::HopEntity():ParentNode(),
 	mSolid(new Solid()),
+	//mOldPosition,mNewPosition,mCurrentPosition,
+	mSkipNextPreSimulate(false),
 	//mTraceableShape,
 	mTraceable(NULL),
 	//mTraceableNode,
-	//mInterpolator,
 	//mVolumeNode,
 	mNextThink(0)
 	//mTriggerTarget
@@ -58,7 +59,6 @@ Node *HopEntity::create(Scene *scene){
 	mTraceableShape=NULL;
 	mTraceable=NULL;
 	mTraceableNode=NULL;
-	mInterpolator=NULL;
 	mVolumeNode=NULL;
 	mNextThink=0;
 	mTriggerTarget=HopEntity::ptr();
@@ -70,9 +70,6 @@ Node *HopEntity::create(Scene *scene){
 			"Invalid scene");
 		return this;
 	}
-
-//	mInterpolator=NodeTransformInterpolator::ptr(new NodeTransformInterpolator());
-//	addNodeListener(mInterpolator);
 
 	return this;
 }
@@ -91,6 +88,16 @@ void HopEntity::setMass(scalar mass){
 
 void HopEntity::setInfiniteMass(){
 	mSolid->setInfiniteMass();
+}
+
+void HopEntity::setPosition(const Vector3 &position){
+	mSolid->setPosition(position);
+	mSkipNextPreSimulate=true;
+}
+
+void HopEntity::setPositionDirect(const Vector3 &position){
+	mSolid->setPositionDirect(position);
+	mSkipNextPreSimulate=true;
 }
 
 void HopEntity::setVelocity(const Vector3 &velocity){
@@ -191,14 +198,36 @@ void HopEntity::setCollisionVolumesVisible(bool visible){
 	updateCollisionVolumes();
 }
 
-void HopEntity::transformUpdated(int tu){
-	super::transformUpdated(tu);
+// Update solids with new node positions if moved
+// We dont just check active nodes, because then the solids would never deactivate, so the nodes would never deactivate
+void HopEntity::preSimulate(){
+	if(mSkipNextPreSimulate){
+		mSkipNextPreSimulate=false;
+		return;
+	}
 
-	if((tu&Node::TransformUpdate_BIT_INTERPOLATOR)==0){
-		// Only modify position on a translation change, and not from the interpolator
-		if((tu&Node::TransformUpdate_BIT_TRANSLATE)>0){
-			mSolid->setPosition(mTransform.getTranslate());
-		}
+	if(active()==true && mNewPosition.equals(mSolid->getPosition())==false){
+		mSolid->setPosition(mNewPosition);
+	}
+}
+
+// Update nodes with new solid positions if active
+void HopEntity::postSimulate(){
+	if(mSolid->active()==true){
+		activate();
+		mOldPosition.set(mNewPosition);
+		mNewPosition.set(mSolid->getPosition());
+	}
+}
+
+void HopEntity::spacialUpdated(){
+	super::spacialUpdated();
+
+	const Vector3 &translate=mTransform.getTranslate();
+	if(mCurrentPosition.equals(translate)==false){
+		mOldPosition.set(translate);
+		mNewPosition.set(translate);
+		mCurrentPosition.set(translate);
 	}
 }
 
@@ -216,11 +245,6 @@ void HopEntity::parentChanged(ParentNode *parent){
 }
 
 void HopEntity::logicUpdate(int dt,int scope){
-	if(mSolid->active()){
-		mTransform.setTranslate(mSolid->getPosition());
-		transformUpdated(TransformUpdate_BIT_TRANSLATE|TransformUpdate_BIT_INTERPOLATOR);
-	}
-
 	if(mNextThink>0 && mNextThink<=mScene->getLogicTime()){
 		setNextThink(0);
 		think();
@@ -231,9 +255,8 @@ void HopEntity::logicUpdate(int dt,int scope){
 
 void HopEntity::frameUpdate(int dt,int scope){
 	if(mSolid->active()){
-//		if(mInterpolator!=NULL){
-//			mInterpolator->frameUpdated(this,dt);
-//		}
+		Math::lerp(mCurrentPosition,mOldPosition,mNewPosition,mScene->getLogicFraction());
+		setTranslate(mCurrentPosition);
 	}
 
 	super::frameUpdate(dt,scope);
