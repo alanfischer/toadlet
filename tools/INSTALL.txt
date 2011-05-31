@@ -12,6 +12,7 @@ Contents
 
 * A build of toadlet
 * The Milkshape3D SDK (Windows only, if you wish to build the mesh importer & exporter)
+* Blender 3D and access to it's scripts/ folder
 
 
 2. Setup

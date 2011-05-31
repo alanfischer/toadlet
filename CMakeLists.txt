@@ -1,6 +1,6 @@
 # Standard setup
 cmake_minimum_required (VERSION 2.8)
-project (toadlet CXX C)
+project (toadlet CXX C Java)
 
 
 # Version Settings for cpp libraries
