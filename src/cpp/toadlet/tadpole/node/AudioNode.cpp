@@ -85,7 +85,9 @@ bool AudioNode::setAudioBuffer(const AudioBuffer::ptr &audioBuffer){
 		mAudio->destroy();
 	}
 
-	mAudio=Audio::ptr(mEngine->getAudioPlayer()->createBufferedAudio());
+	if(mEngine->getAudioPlayer()!=NULL){
+		mAudio=Audio::ptr(mEngine->getAudioPlayer()->createBufferedAudio());
+	}
 	if(mAudio!=NULL){
 		mAudio->create(audioBuffer);
 		return true;
