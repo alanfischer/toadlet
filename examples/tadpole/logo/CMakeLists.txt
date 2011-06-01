@@ -12,7 +12,7 @@ find_package (toadlet REQUIRED)
 include_directories (${logo_SOURCE_DIR} ${TOADLET_INCLUDE_DIR})
 
 # Libraries
-set (LIBS ${TOADLET_EGG_LIB} ${TOADLET_PEEPER_LIB} ${TOADLET_RIBBIT_LIB} ${TOADLET_TADPOLE_LIB} ${TOADLET_PAD_LIB})
+set (LIBS ${TOADLET_EGG_LIB_S} ${TOADLET_PEEPER_LIB_S} ${TOADLET_RIBBIT_LIB_S} ${TOADLET_TADPOLE_LIB_S} ${TOADLET_PAD_LIB_S})
 
 # Source files
 set (SRC
@@ -26,6 +26,6 @@ set (H
 )
 
 # Executable
-add_executable (logo ${SRC} ${H})
+add_executable (logo MACOSX_BUNDLE ${SRC} ${H})
 target_link_libraries (logo ${LIBS})
 install (TARGETS logo DESTINATION ${logo_BINARY_DIR})
