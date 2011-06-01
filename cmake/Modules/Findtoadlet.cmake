@@ -25,6 +25,8 @@
 #  TOADLET_TADPOLE_LIB
 #  TOADLET_TADPOLE_HOP_LIB
 #  TOADLET_PAD_LIB
+# 
+# NOTE: If release libraries are not found, they will be set to the debug libraries. The reverse is NOT true.
 
 set (TOADLET_FOUND "NO")
 
