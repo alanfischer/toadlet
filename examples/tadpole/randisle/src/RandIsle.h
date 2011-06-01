@@ -1,5 +1,5 @@
-#ifndef SQUIRREL_H
-#define SQUIRREL_H
+#ifndef RANDISLE_H
+#define RANDISLE_H
 
 #include <toadlet/toadlet.h>
 #include "PathSystem.h"
@@ -11,7 +11,7 @@
 
 class HUD;
 
-class Squirrel:public Application,public TerrainNodeDataSource,public UpdateListener,public TerrainNodeListener,public PathClimberListener{
+class RandIsle:public Application,public TerrainNodeDataSource,public UpdateListener,public TerrainNodeListener,public PathClimberListener{
 public:
 	enum{
 		Scope_BIT_TREE=			1<<1,
@@ -24,8 +24,8 @@ public:
 		Scope_HUD=				Scope_BIT_HUD,
 	};
 
-	Squirrel();
-	virtual ~Squirrel();
+	RandIsle();
+	virtual ~RandIsle();
 
 	void create(const String &directory);
 	void destroy();

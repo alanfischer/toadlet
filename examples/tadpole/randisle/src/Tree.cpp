@@ -1,5 +1,5 @@
 #include "Tree.h"
-#include "Squirrel.h"
+#include "RandIsle.h"
 #include "Acorn.h"
 #include "Resources.h"
 
@@ -42,7 +42,7 @@ Tree::Tree():super(),
 Node *Tree::create(Scene *scene,int seed,ParentNode *parent,const Vector3 &translate){
 	super::create(scene);
 
-	setScope(Squirrel::Scope_TREE);
+	setScope(RandIsle::Scope_TREE);
 
 	setTranslate(translate);
 

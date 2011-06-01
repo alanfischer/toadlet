@@ -1,7 +1,7 @@
 #ifndef HUD_H
 #define HUD_H
 
-#include "Squirrel.h"
+#include "RandIsle.h"
 
 class HUD:public CameraNode{
 public:

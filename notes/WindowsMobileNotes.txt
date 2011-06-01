@@ -1,6 +1,0 @@
-It appears the GLES on an HTC TouchPro2 will initialize properly, but fail to render anything unless the hi res awareness is set in the .rc file:
-	HI_RES_AWARE CEUX 
-	BEGIN
-		0x0001
-	END
-
