@@ -53,11 +53,7 @@ source_group ("Header Files\\\\decoder" FILES ${RIBBIT_DECODER_WAVEDECODER_HEADE
 set (RIBBIT_SRC ${RIBBIT_SRC} ${RIBBIT_DECODER_WAVEDECODER_SRC})
 set (RIBBIT_HEADERS ${RIBBIT_HEADERS} ${RIBBIT_DECODER_WAVEDECODER_HEADERS})
 
-# OSX has an issue with linking ppc/i386 versions of oggvorbis currently
-if (NOT TOADLET_PLATFORM_OSX)
-	find_package (OggVorbis)
-endif (NOT TOADLET_PLATFORM_OSX)
-
+find_package (OggVorbis)
 if (OGGVORBIS_FOUND)
 	set (TOADLET_HAS_OGGVORBIS ON PARENT_SCOPE)
 		
