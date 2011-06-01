@@ -72,7 +72,7 @@ Logo::~Logo(){
 void Logo::create(){
 	Application::create();
 
-	mEngine->setDirectory("/Users/siralanf/toadlet/examples/data");
+	mEngine->setDirectory("../../../data");
 
 	scene=Scene::ptr(new Scene(mEngine));
 
