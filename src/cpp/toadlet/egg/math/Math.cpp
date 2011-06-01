@@ -26,7 +26,9 @@
 #include <toadlet/egg/math/Math.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/System.h>
-#include <xmmintrin.h> // SSE
+#if defined(TOADLET_HAS_SSE)
+	#include <xmmintrin.h> // SSE
+#endif
 
 namespace toadlet{
 namespace egg{

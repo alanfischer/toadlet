@@ -24,11 +24,9 @@
  ********** Copyright header - do not remove **********/
 
 #include "EAGLRenderTarget.h"
+#include "../../GLTexture.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/Texture.h>
-
-#include "../../GLTexture.h"
-
 #import <QuartzCore/QuartzCore.h>
 
 using namespace toadlet::egg;
@@ -37,7 +35,7 @@ namespace toadlet{
 namespace peeper{
 
 TOADLET_C_API RenderTarget *new_EAGLRenderTarget(void *layer,WindowRenderTargetFormat *format){
-	return (GLRenderTarget*)(new EAGLRenderTarget((CEAGLLayer*)layer,format));
+	return (GLRenderTarget*)(new EAGLRenderTarget((CAEAGLLayer*)layer,format));
 }
 
 EAGLRenderTarget::EAGLRenderTarget():GLFBORenderTarget(NULL),
@@ -47,7 +45,7 @@ EAGLRenderTarget::EAGLRenderTarget():GLFBORenderTarget(NULL),
 {
 }
 
-EAGLRenderTarget::EAGLRenderTarget(CAEAGLLayer *drawable,WindowRenderTarget *format,NSString *colorFormat):GLFBORenderTarget(NULL),
+EAGLRenderTarget::EAGLRenderTarget(CAEAGLLayer *drawable,WindowRenderTargetFormat *format,NSString *colorFormat):GLFBORenderTarget(NULL),
 	mDrawable(nil),
 	mContext(nil),
 	mRenderBufferHandle(0)

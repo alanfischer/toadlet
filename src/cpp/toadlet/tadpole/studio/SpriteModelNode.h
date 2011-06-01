@@ -68,7 +68,7 @@ public:
 	void render(peeper::Renderer *renderer) const;
 
 protected:
-	TOADLET_GIB_DEFINE(SpriteNode);
+	TOADLET_GIB_DEFINE(SpriteModelNode);
 
 	void createBuffers();
 	void updateBuffers();
