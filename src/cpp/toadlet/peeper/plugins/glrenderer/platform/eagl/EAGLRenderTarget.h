@@ -29,8 +29,7 @@
 #include "../../GLIncludes.h"
 #include "../../GLRenderTarget.h"
 #include "../../GLFBORenderTarget.h"
-#include <toadlet/peeper/Visual.h>
-#include <toadlet/egg/Logger.h>
+#include <toadlet/peeper/WindowRenderTargetFormat.h>
 
 #import <OpenGLES/EAGL.h>
 #import <OpenGLES/EAGLDrawable.h>

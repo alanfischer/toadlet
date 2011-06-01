@@ -42,6 +42,8 @@ namespace studio{
 TOADLET_NODE_IMPLEMENT(SpriteModelNode,Categories::TOADLET_TADPOLE_STUDIO+".SpriteModelNode");
 
 SpriteModelNode::SpriteModelNode():super(),
+	TOADLET_GIB_IMPLEMENT()
+
 	//mModel,
 	mRendered(false),
 	mSequenceTime(0)

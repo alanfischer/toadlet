@@ -57,8 +57,8 @@ public:
 	RenderableType *renderable;
 	RenderableWorkaround(RenderableType *type):renderable(type){}
 	Material *getRenderMaterial() const{return renderable->getRenderMaterial();}
-	Transform *getRenderTransform() const{return renderable->getRenderTransform();}
-	Bound *getRenderBound() const{return renderable->getRenderBound();}
+	const Transform &getRenderTransform() const{return renderable->getRenderTransform();}
+	const Bound &getRenderBound() const{return renderable->getRenderBound();}
 	void render(peeper::Renderer *renderer) const{renderable->render(renderer);}
 };
 #define TOADLET_GIB_DEFINE(type) toadlet::tadpole::RenderableWorkaround<type> renderable;

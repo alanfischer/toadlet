@@ -111,9 +111,8 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 		#else
 			mRenderer->gl_version>=14
 		#endif
-		&&
 		#if defined(TOADLET_HAS_GLEW) && defined(GL_EXT_framebuffer_object)
-			GLEW_EXT_framebuffer_object==false
+			&& GLEW_EXT_framebuffer_object==false
 		#endif
 	){
 		glTexParameteri(mTarget,GL_GENERATE_MIPMAP,GL_TRUE);
