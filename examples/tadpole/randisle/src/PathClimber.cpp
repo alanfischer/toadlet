@@ -39,9 +39,7 @@ Node *PathClimber::create(Scene *scene){
 	mPlayerMeshNode=mEngine->createNodeType(MeshNode::type(),mScene);
 	if(Resources::instance->creature!=NULL){
 		mPlayerMeshNode->setMesh(Resources::instance->creature);
-		mPlayerMeshNode->getController()->setCycling(Controller::Cycling_LOOP);
 		mPlayerMeshNode->getController()->setSequenceIndex(1);
-		mPlayerMeshNode->getController()->start();
 	}
 	attach(mPlayerMeshNode);
 
@@ -61,6 +59,16 @@ Node *PathClimber::create(Scene *scene){
 }
 
 void PathClimber::logicUpdate(int dt,int scope){
+	if(Math::square(getVelocity().x)+Math::square(getVelocity().y)<0.05){
+		mPlayerMeshNode->getController()->setCycling(Controller::Cycling_NONE);
+	}
+	else{
+		mPlayerMeshNode->getController()->setCycling(Controller::Cycling_LOOP);
+		if(mPlayerMeshNode->getController()->isRunning()==false){
+			mPlayerMeshNode->getController()->start();
+		}
+	}
+
 	if(mPath==NULL){
 		Quaternion rotate;
 		Vector3 right,forward,up;
@@ -126,7 +134,7 @@ void PathClimber::logicUpdate(int dt,int scope){
 					mPathDirection=direction;
 
 					// I believe there is a case where we could use the extraTime, and end up passing our next destination
-					// I would like this code to be closer to Squirrel::updatePredictedPath, ideally a function in PathClimber which Squirrel would then use
+					// I would like this code to be closer to RandIsle::updatePredictedPath, ideally a function in PathClimber which Squirrel would then use
 					mPathTime=mPath->getNeighborTime(mPreviousPath)+direction*extraTime;
 
 					mPassedNeighbor=findPassedNeighbor(mPath,mPathDirection,mPathTime);
@@ -158,10 +166,10 @@ void PathClimber::logicUpdate(int dt,int scope){
 	int i;
 	for(i=0;i<results->getNumResults();++i){
 		Node *node=results->getResult(i);
-		if(node->getScope()==Squirrel::Scope_TREE){
+		if(node->getScope()==RandIsle::Scope_TREE){
 			ParentNode *tree=(ParentNode*)node;
 			for(node=tree->getFirstChild();node!=NULL;node=node->getNext()){
-				if(node->getScope()==Squirrel::Scope_ACORN && getWorldBound().testIntersection(node->getWorldBound())){
+				if(node->getScope()==RandIsle::Scope_ACORN && getWorldBound().testIntersection(node->getWorldBound())){
 					((Acorn*)node)->fade();
 				}
 			}

@@ -1,7 +1,7 @@
 #ifndef ACORN_H
 #define ACORN_H
 
-#include "Squirrel.h"
+#include "RandIsle.h"
 #include "Resources.h"
 
 class Acorn:public ParentNode{
@@ -15,7 +15,7 @@ public:
 	Node *create(Scene *scene){
 		super::create(scene);
 
-		setScope(Squirrel::Scope_ACORN);
+		setScope(RandIsle::Scope_ACORN);
 
 		SpriteNode::ptr sprite=mEngine->createNodeType(SpriteNode::type(),mScene);
 		sprite->setMaterial(Resources::instance->acorn);

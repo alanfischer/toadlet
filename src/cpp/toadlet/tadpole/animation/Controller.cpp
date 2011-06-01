@@ -121,9 +121,11 @@ void Controller::update(int dt){
 			else if(mCycling==Cycling_REFLECT){
 				mTimeScale*=-1;
 			}
-			else if(mFinishedListener!=NULL){
+			else{
 				mRunning=false;
-				mFinishedListener->controllerFinished(this); // Must be last since it may delete this
+				if(mFinishedListener!=NULL){
+					mFinishedListener->controllerFinished(this); // Must be last since it may delete this
+				}
 			}
 		}
 		else{
@@ -144,9 +146,11 @@ void Controller::update(int dt){
 			else if(mCycling==Cycling_REFLECT){
 				mTimeScale*=-1;
 			}
-			else if(mFinishedListener!=NULL){
+			else{
 				mRunning=false;
-				mFinishedListener->controllerFinished(this); // Must be last since it may delete this
+				if(mFinishedListener!=NULL){
+					mFinishedListener->controllerFinished(this); // Must be last since it may delete this
+				}
 			}
 		}
 		else{

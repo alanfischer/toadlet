@@ -22,7 +22,7 @@ set (SRC
 	src/PathClimber.cpp
 	src/Resources.cpp
 	src/Sky.cpp
-	src/Squirrel.cpp
+	src/RandIsle.cpp
 	src/Tree.cpp
 )
 
@@ -38,7 +38,7 @@ set (H
 	src/Resources.h
 	src/Sky.h
 	src/SmoothFollower.h
-	src/Squirrel.h
+	src/RandIsle.h
 	src/Tree.h
 )
 

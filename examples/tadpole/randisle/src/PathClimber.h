@@ -1,7 +1,7 @@
 #ifndef PATHCLIMBER_H
 #define PATHCLIMBER_H
 
-#include "Squirrel.h"
+#include "RandIsle.h"
 
 class PathClimber:public HopEntity{
 public:

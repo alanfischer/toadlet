@@ -1,4 +1,4 @@
-#include "Squirrel.h"
+#include "RandIsle.h"
 #include "PathClimber.h"
 #include "Tree.h"
 #include "HUD.h"
@@ -10,7 +10,7 @@
 
 static const scalar epsilon=0.001f;
 
-Squirrel::Squirrel():Application(),
+RandIsle::RandIsle():Application(),
 	mMouseButtons(0),
 	mXJoy(0),mYJoy(0),
 
@@ -20,11 +20,11 @@ Squirrel::Squirrel():Application(),
 	mPatchScale.set(16,16,64);
 }
 
-Squirrel::~Squirrel(){
+RandIsle::~RandIsle(){
 }
 
-void Squirrel::create(const String &directory){
-	Logger::debug("Squirrel::create");
+void RandIsle::create(const String &directory){
+	Logger::debug("RandIsle::create");
 
 	Application::create();
 
@@ -106,11 +106,11 @@ void Squirrel::create(const String &directory){
 	while(updatePopulatePatches());
 	mPlayer->setSpeed(40);
 
-	Logger::debug("Squirrel::create finished");
+	Logger::debug("RandIsle::create finished");
 }
 
-void Squirrel::destroy(){
-	Logger::debug("Squirrel::destroy");
+void RandIsle::destroy(){
+	Logger::debug("RandIsle::destroy");
 
 	mScene->destroy();
 
@@ -129,10 +129,10 @@ void Squirrel::destroy(){
 
 	Application::destroy();
 
-	Logger::debug("Squirrel::destroy finished");
+	Logger::debug("RandIsle::destroy finished");
 }
 
-void Squirrel::resized(int width,int height){
+void RandIsle::resized(int width,int height){
 	if(mCamera!=NULL && width>0 && height>0){
 		if(width>=height){
 			scalar ratio=Math::div(Math::fromInt(width),Math::fromInt(height));
@@ -157,7 +157,7 @@ void Squirrel::resized(int width,int height){
 	}
 }
 
-void Squirrel::render(Renderer *renderer){
+void RandIsle::render(Renderer *renderer){
 	renderer->beginScene();
 		/// @todo: This shouldn't be necessary, but depending on the sky to set the contents of the backbuffer doesn't appear to work
 		renderer->clear(ClearFlag_DEPTH|ClearFlag_COLOR,mCamera->getClearColor());
@@ -272,11 +272,11 @@ renderable=mPlayer->getShadowMeshNode()->getSubMesh(0);
 	renderer->swap();
 }
 
-void Squirrel::update(int dt){
+void RandIsle::update(int dt){
 	mScene->update(dt);
 }
 
-void Squirrel::logicUpdate(int dt){
+void RandIsle::logicUpdate(int dt){
 	// Find graph
 	if(mPlayer->getPath()==NULL){
 		// TODO: Use sensor
@@ -369,7 +369,7 @@ void Squirrel::logicUpdate(int dt){
 	setTitle(String("FPS:")+mCamera->getFramesPerSecond()+" VISIBLE:"+mCamera->getVisibleCount()+" ACTIVE:"+mScene->countActiveNodes());
 }
 
-void Squirrel::frameUpdate(int dt){
+void RandIsle::frameUpdate(int dt){
 	Vector3 right,forward,up;
 	Math::setAxesFromQuaternion(mPlayer->getRotate(),right,forward,up);
 #if 0
@@ -425,7 +425,7 @@ void Squirrel::frameUpdate(int dt){
 	}
 }
 
-void Squirrel::updateDanger(int dt){
+void RandIsle::updateDanger(int dt){
 	int dangerDelayTime=0;
 	int dangerTime=5000;
 
@@ -450,7 +450,7 @@ void Squirrel::updateDanger(int dt){
 	mPlayer->setDanger(danger);
 }
 
-void Squirrel::updatePredictedPath(){
+void RandIsle::updatePredictedPath(){
 	if(mPlayer->getPath()!=NULL && mPathSequence.size()>0){
 		// Update predicted path
 		PathSystem::Path *path=mPlayer->getPath();
@@ -515,7 +515,7 @@ void Squirrel::updatePredictedPath(){
 	}
 }
 
-void Squirrel::keyPressed(int key){
+void RandIsle::keyPressed(int key){
 	if(key==Key_ESC){
 		stop();
 	}
@@ -531,7 +531,7 @@ void Squirrel::keyPressed(int key){
 			Resources::instance->treeBranch->setFill(Renderer::Fill_SOLID);
 			Resources::instance->treeLeaf->setFill(Renderer::Fill_SOLID);
 
-			Resources::instance->squirrel->subMeshes[0]->material->setFill(Renderer::Fill_SOLID);
+			Resources::instance->RandIsle->subMeshes[0]->material->setFill(Renderer::Fill_SOLID);
 
 			mSky->getSkyMaterial()->setFill(Renderer::Fill_SOLID);
 		}
@@ -542,7 +542,7 @@ void Squirrel::keyPressed(int key){
 			Resources::instance->treeBranch->setFill(Renderer::Fill_LINE);
 			Resources::instance->treeLeaf->setFill(Renderer::Fill_LINE);
 
-			Resources::instance->squirrel->subMeshes[0]->material->setFill(Renderer::Fill_LINE);
+			Resources::instance->RandIsle->subMeshes[0]->material->setFill(Renderer::Fill_LINE);
 
 			mSky->getSkyMaterial()->setFill(Renderer::Fill_LINE);
 		}
@@ -550,22 +550,22 @@ void Squirrel::keyPressed(int key){
 */
 }
 
-void Squirrel::keyReleased(int key){
+void RandIsle::keyReleased(int key){
 }
 
-void Squirrel::mousePressed(int x,int y,int button){
+void RandIsle::mousePressed(int x,int y,int button){
 	mMouseButtons|=1<<button;
 
 	setDifferenceMouse(true);
 }
 
-void Squirrel::mouseReleased(int x,int y,int button){
+void RandIsle::mouseReleased(int x,int y,int button){
 	mMouseButtons&=~(1<<button);
 
 	setDifferenceMouse(false);
 }
 
-void Squirrel::mouseMoved(int x,int y){
+void RandIsle::mouseMoved(int x,int y){
 	scalar xamount=(float)x/(float)getWidth();
 	scalar yamount=(float)y/(float)getHeight();
 
@@ -574,19 +574,19 @@ void Squirrel::mouseMoved(int x,int y){
 	}
 }
 
-void Squirrel::joyPressed(int button){
+void RandIsle::joyPressed(int button){
 	playerJump();
 }
 
-void Squirrel::joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v){
+void RandIsle::joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v){
 	mXJoy=x;
 	mYJoy=y;
 }
 
-void Squirrel::joyReleased(int button){
+void RandIsle::joyReleased(int button){
 }
 
-void Squirrel::playerJump(){
+void RandIsle::playerJump(){
 	if(mPlayer->getPath()==NULL){
 		Segment segment;
 		segment.setStartDir(mPlayer->getPosition(),Vector3(0,0,-5));
@@ -602,7 +602,7 @@ void Squirrel::playerJump(){
 	}
 }
 
-void Squirrel::playerMove(scalar dr,scalar ds){
+void RandIsle::playerMove(scalar dr,scalar ds){
 	Matrix3x3 drm;
 	Math::setMatrix3x3FromZ(drm,dr);
 	Quaternion q;
@@ -618,7 +618,7 @@ void Squirrel::playerMove(scalar dr,scalar ds){
 	mPlayer->setSpeed(speed);
 }
 
-float Squirrel::findPathSequence(Collection<int> &sequence,PathClimber *player,PathSystem::Path *path,int direction,scalar time){
+float RandIsle::findPathSequence(Collection<int> &sequence,PathClimber *player,PathSystem::Path *path,int direction,scalar time){
 	Vector3 right,forward,up;
 	Math::setAxesFromQuaternion(player->getIdealRotation(),right,forward,up);
 	forward.z+=0.25;
@@ -628,7 +628,7 @@ float Squirrel::findPathSequence(Collection<int> &sequence,PathClimber *player,P
 	return result;
 }
 
-float Squirrel::findPathSequence(Collection<int> &sequence,PathClimber *player,const Vector3 &forward,PathSystem::Path *previous,PathSystem::Path *path,int direction,scalar time,bool first){
+float RandIsle::findPathSequence(Collection<int> &sequence,PathClimber *player,const Vector3 &forward,PathSystem::Path *previous,PathSystem::Path *path,int direction,scalar time,bool first){
 	if(path==NULL){
 		return 0;
 	}
@@ -665,7 +665,7 @@ float Squirrel::findPathSequence(Collection<int> &sequence,PathClimber *player,c
 	return closestd;
 }
 
-void Squirrel::wiggleLeaves(Tree *tree,const Sphere &bound){
+void RandIsle::wiggleLeaves(Tree *tree,const Sphere &bound){
 	Sphere localBound;
 	Math::sub(localBound,bound,tree->getWorldTranslate());
 	localBound.radius=20.0f;
@@ -676,17 +676,17 @@ void Squirrel::wiggleLeaves(Tree *tree,const Sphere &bound){
 	}
 }
 
-void Squirrel::pathMounted(PathClimber *climber){
+void RandIsle::pathMounted(PathClimber *climber){
 //	((Tree*)climber->getGraph())->setHighlight(true);
 	mFollowNode->removeNodeListener(mFollower);
 }
 
-void Squirrel::pathDismounted(PathClimber *climber){
+void RandIsle::pathDismounted(PathClimber *climber){
 	mFollowNode->addNodeListener(mFollower);
 //	((Tree*)climber->getGraph())->setHighlight(false);
 }
 
-int Squirrel::atJunction(PathClimber *climber,PathSystem::Path *current,PathSystem::Path *next){
+int RandIsle::atJunction(PathClimber *climber,PathSystem::Path *current,PathSystem::Path *next){
 	findPathSequence(mPathSequence,mPlayer,mPlayer->getPath(),mPlayer->getPathDirection(),mPlayer->getPathTime());
 
 	if(mPathSequence.size()>0 && current->getNeighbor(mPathSequence[0])==next){
@@ -708,7 +708,7 @@ int Squirrel::atJunction(PathClimber *climber,PathSystem::Path *current,PathSyst
 	}
 }
 
-bool Squirrel::updatePopulatePatches(){
+bool RandIsle::updatePopulatePatches(){
 	int i;
 	for(i=0;i<mPopulatePatches.size();i++){
 		PopulatePatch *patch=&mPopulatePatches[i];
@@ -756,11 +756,11 @@ bool Squirrel::updatePopulatePatches(){
 	return mPopulatePatches.size()>0;
 }
 
-void Squirrel::terrainPatchCreated(int px,int py,const Bound &bound){
+void RandIsle::terrainPatchCreated(int px,int py,const Bound &bound){
 	mPopulatePatches.add(PopulatePatch(px,py,px-mTerrain->getTerrainX(),py-mTerrain->getTerrainY(),bound));
 }
 
-void Squirrel::terrainPatchDestroyed(int px,int py,const Bound &bound){
+void RandIsle::terrainPatchDestroyed(int px,int py,const Bound &bound){
 	// TODO: Use bounding volume sensor
 	Node::ptr node;
 	for(node=mScene->getRoot()->getFirstChild();node!=NULL;node=node->getNext()){
@@ -770,7 +770,7 @@ void Squirrel::terrainPatchDestroyed(int px,int py,const Bound &bound){
 	}
 }
 
-bool Squirrel::getPatchData(scalar *data,int px,int py){
+bool RandIsle::getPatchData(scalar *data,int px,int py){
 	int size=getPatchSize();
 	for(int x=0;x<size;++x){
 		for(int y=0;y<size;++y){
@@ -783,7 +783,7 @@ bool Squirrel::getPatchData(scalar *data,int px,int py){
 	return true;
 }
 
-scalar Squirrel::terrainValue(float tx,float ty){
+scalar RandIsle::terrainValue(float tx,float ty){
 	float path=pathValue(ty);
 	float value=mPatchNoise.perlin2(tx/2,ty/2);
 	float fade=Math::abs(tx-path)*1.5f;
@@ -792,12 +792,12 @@ scalar Squirrel::terrainValue(float tx,float ty){
 	return value;
 }
 
-scalar Squirrel::pathValue(float ty){
+scalar RandIsle::pathValue(float ty){
 	return mPatchNoise.perlin1(ty/4);
 }
 
 int toadletMain(int argc,char **argv){
-	Squirrel app;
+	RandIsle app;
 	String directory;
 	String lookFor="/grass.png";
 	const char *paths[]={"../../res","../res","res",".",NULL};
