@@ -1,7 +1,7 @@
 message ("Make sure you checked the setup of this toolchain file=${CMAKE_TOOLCHAIN_FILE}!")
 
 # Standard settings
-set (TOADLET_PLATFORM_WINCE ON CACHE BOOL "Enable the WindowsCE platform")
+set (TOADLET_PLATFORM_WINCE ON CACHE BOOL "Enable the WindowsCE platform" FORCE)
 set (CMAKE_SYSTEM_NAME WinCE)
 
 # Force a manual updating of the visual studio project files for the platform SDK

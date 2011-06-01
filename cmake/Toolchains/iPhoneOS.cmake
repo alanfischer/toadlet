@@ -1,7 +1,7 @@
 message ("Setting up iPhoneOS toolchain")
 
 # Standard settings
-set (TOADLET_PLATFORM_IPHONE ON CACHE BOOL "Enable the iPhone platform")
+set (TOADLET_PLATFORM_IPHONE ON CACHE BOOL "Enable the iPhone platform" FORCE)
 set (CMAKE_SYSTEM_NAME iPhoneOS)
 
 # Skip the platform compiler checks for cross compiling since they're a headache
