@@ -322,23 +322,32 @@ OSXApplication::~OSXApplication(){
 
 void OSXApplication::setWindow(void *window){
 	mWindow=window;
-	[(NSWindow*)mWindow retain];
+	[(NSObject*)mWindow retain];
 }
 
 void OSXApplication::create(String renderer,String audioPlayer,String motionDetector){
 	if(mWindow==nil){
 		// This programatic Window creation isn't spectacular, but it's enough to run examples.
-		NSApplicationLoad();
-
-		if(mWidth==-1 && mHeight==-1){
-			NSRect rect=[[NSScreen mainScreen] frame];
-			mWidth=rect.size.width;
-			mHeight=rect.size.height;
-		}
 		mPool=[[NSAutoreleasePool alloc] init];
-		mWindow=[[NSWindow alloc] initWithContentRect:NSMakeRect(mPositionX,mPositionY,mWidth,mHeight)
-			styleMask:NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask
-			backing:NSBackingStoreBuffered defer:FALSE];
+		#if defined(TOADLET_HAS_UIKIT)
+			[UIApplication sharedApplication];
+			if(mWidth==-1 && mHeight==-1){
+				CGRect rect=[[UIScreen mainScreen] applicationFrame];
+				mWidth=rect.size.width;
+				mHeight=rect.size.height;
+			}
+			mPool=[[NSAutoreleasePool alloc] init];
+		#else
+			NSApplicationLoad();
+			if(mWidth==-1 && mHeight==-1){
+				NSRect rect=[[NSScreen mainScreen] frame];
+				mWidth=rect.size.width;
+				mHeight=rect.size.height;
+			}
+			mWindow=[[NSWindow alloc] initWithContentRect:NSMakeRect(mPositionX,mPositionY,mWidth,mHeight)
+				styleMask:NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask
+				backing:NSBackingStoreBuffered defer:FALSE];
+		#endif
 	}
 
 	#if defined(TOADLET_HAS_UIKIT)
@@ -388,9 +397,13 @@ void OSXApplication::start(){
 	resized([(ApplicationView*)mView bounds].size.width,[(ApplicationView*)mView bounds].size.height);
 
 	if(mPool!=nil){
-		[NSApplication sharedApplication];
-		[(NSWindow*)mWindow makeKeyAndOrderFront:nil];
-		[NSApp run];
+		#if !defined(TOADLET_HAS_UIKIT)
+			[(NSWindow*)mWindow makeKeyAndOrderFront:nil];
+			[[NSApplication sharedApplication] run];
+		#else
+			[(UIWindow*)mWindow makeKeyAndVisible];
+			[[UIApplication sharedApplication] run];
+		#endif
 	}
 }
 
