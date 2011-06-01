@@ -34,11 +34,9 @@ set (TOADLET_BUILD_VERSION_PAD_MICRO 0)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${toadlet_SOURCE_DIR}/cmake/Modules/")
 
 
-# Setup options
+# Platform options
 if (WIN32)
 	set (TOADLET_PLATFORM_WIN32 ON)
-	# This is setup in the toolchain file until cmake has built-in support for wince
-	#option (TOADLET_PLATFORM_WINCE "Build for Windows CE devices" OFF)
 	option (TOADLET_PLATFORM_ANDROID "Build for Android devices" OFF)
 	option (TOADLET_PLATFORM_BLACKBERRY "Build for Blackberry devices" OFF)
 elseif (UNIX)
@@ -46,7 +44,6 @@ elseif (UNIX)
 	option (TOADLET_PLATFORM_ANDROID "Build for Android devices" OFF)
 	if (APPLE) 
 		set (TOADLET_PLATFORM_OSX ON)
-		option (TOADLET_PLATFORM_IPHONE "Build for the iPhone" OFF)
 	endif (APPLE)
 endif (WIN32)
 
@@ -56,7 +53,7 @@ option (TOADLET_BUILD_DOXYGEN "Build doxygen documentation along with source fil
 option (TOADLET_BUILD_DOXYGEN_ONLY "Build ONLY the doxygen documentation" OFF)
 
 
-# Android and Blackberry specifics
+# Android and Blackberry specific options
 if (TOADLET_PLATFORM_ANDROID)
 	# We require the android.jar
 	if (NOT ANDROID_JAR)
@@ -153,55 +150,4 @@ if (UPDATE_WINCE)
 	endforeach(VCPROJFILE)
 	message (SEND_ERROR "Done! \nThis isn't really an error; just letting you know the WinCE build files are updated. \nYes it's a hack, yes it will go away once CMake supports WinCE by default. But believe me it's more straightforward than patching the source.")
 endif (UPDATE_WINCE)
-
-
-# HACK: Directly alter the cmake install scripts for iPhoneOS
-# This should no longer be necessary once CMake supports iPhoneOS properly
-if (UPDATE_IPHONE)
-	message ("Manually updating the cmake install scripts to use BUILD_TYPE-iphoneos")
-	set (PROJS 
-		"${CMAKE_BINARY_DIR}/cmake_install.cmake"
-		"${CMAKE_BINARY_DIR}/src/cmake_install.cmake"
-		"${CMAKE_BINARY_DIR}/src/cpp/cmake_install.cmake"
-		"${CMAKE_BINARY_DIR}/src/cpp/toadlet/cmake_install.cmake"
-		"${CMAKE_BINARY_DIR}/src/cpp/toadlet/egg/cmake_install.cmake"
-		"${CMAKE_BINARY_DIR}/src/cpp/toadlet/flick/cmake_install.cmake"
-		"${CMAKE_BINARY_DIR}/src/cpp/toadlet/flick/plugins/iphonemotiondetector/cmake_install.cmake"
-		"${CMAKE_BINARY_DIR}/src/cpp/toadlet/hop/cmake_install.cmake"
-		"${CMAKE_BINARY_DIR}/src/cpp/toadlet/knot/cmake_install.cmake"
-		"${CMAKE_BINARY_DIR}/src/cpp/toadlet/pad/cmake_install.cmake"
-		"${CMAKE_BINARY_DIR}/src/cpp/toadlet/peeper/cmake_install.cmake"
-		"${CMAKE_BINARY_DIR}/src/cpp/toadlet/peeper/plugins/glrenderer/cmake_install.cmake"
-		"${CMAKE_BINARY_DIR}/src/cpp/toadlet/ribbit/cmake_install.cmake"
-		"${CMAKE_BINARY_DIR}/src/cpp/toadlet/ribbit/plugins/alplayer/cmake_install.cmake"
-		"${CMAKE_BINARY_DIR}/src/cpp/toadlet/tadpole/cmake_install.cmake"
-		"${CMAKE_BINARY_DIR}/src/cpp/toadlet/tadpole/plugins/hop/cmake_install.cmake"
-	)
-	foreach (INSTPROJFILE ${PROJS})
-		if (EXISTS "${INSTPROJFILE}")
-			file (STRINGS ${INSTPROJFILE} INSTPROJ NEWLINE_CONSUME)
-			set (INSTPROJFILENEW "${INSTPROJFILE}")
-			file (WRITE ${INSTPROJFILENEW} "")
-			if ("${CMAKE_SYSTEM_NAME}" STREQUAL "iPhoneSimulator")
-				foreach (LINE ${INSTPROJ})
-					string (REPLACE "/Debug/" "/Debug-iphonesimulator/" OUTLINE "${LINE}")
-					string (REPLACE "/Release/" "/Release-iphonesimulator/" OUTLINE "${OUTLINE}")
-					string (REPLACE "/MinSizeRel/" "/MinSizeRel-iphonesimulator/" OUTLINE "${OUTLINE}")
-					string (REPLACE "/RelWithDebInfo/" "/RelWithDebInfo-iphonesimulator/" OUTLINE "${OUTLINE}")
-					file (APPEND ${INSTPROJFILENEW} "${OUTLINE}")
-				endforeach (LINE)
-			else ("${CMAKE_SYSTEM_NAME}" STREQUAL "iPhoneSimulator")
-				foreach (LINE ${INSTPROJ})
-					string (REPLACE "/Debug/" "/Debug-iphoneos/" OUTLINE "${LINE}")
-					string (REPLACE "/Release/" "/Release-iphoneos/" OUTLINE "${OUTLINE}")
-					string (REPLACE "/MinSizeRel/" "/MinSizeRel-iphoneos/" OUTLINE "${OUTLINE}")
-					string (REPLACE "/RelWithDebInfo/" "/RelWithDebInfo-iphoneos/" OUTLINE "${OUTLINE}")
-					file (APPEND ${INSTPROJFILENEW} "${OUTLINE}")
-				endforeach (LINE)
-			endif ("${CMAKE_SYSTEM_NAME}" STREQUAL "iPhoneSimulator")
-		endif (EXISTS "${INSTPROJFILE}")
-	endforeach(INSTPROJFILE)
-	message (SEND_ERROR "Done! \nThis isn't really an error; just letting you know the cmake_install.cmake files are updated. \nYes it's a hack, yes it will go away once CMake supports iphoneos by default. But believe me it's more straightforward than patching the source.")
-endif (UPDATE_IPHONE)
-
 
