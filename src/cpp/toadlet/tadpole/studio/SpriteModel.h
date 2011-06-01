@@ -68,7 +68,6 @@ public:
 		tbyte *p=data+sizeof(spritehdr)+2+paletteSize*3;
 		int j;
 		for(j=0;j<i;++j){
-			spriteframetype *t=(spriteframetype*)p;
 			spriteframe *f=(spriteframe*)(p+sizeof(spriteframetype));
 			p+=sizeof(spriteframetype)+sizeof(spriteframe)+f->width*f->height;
 		}
