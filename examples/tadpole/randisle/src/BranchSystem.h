@@ -12,7 +12,7 @@ public:
 	public:
 		TOADLET_SHARED_POINTERS(Branch);
 	
-		Branch():scale(0),life(0),length(0),buildTime(0),barkTime(0),speed(0){}
+		Branch():life(0),length(0),speed(0),scale(0),visibilityAmount(0),buildTime(0),barkTime(0){}
 
 		virtual ~Branch(){}
 
