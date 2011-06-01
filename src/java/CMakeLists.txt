@@ -12,6 +12,7 @@ if (TOADLET_PLATFORM_ANDROID)
 	include_directories(${ANDROID_JAR})
 elseif (TOADLET_PLATFORM_BLACKBERRY)
 	include_directories(${BLACKBERRY_JDE_DIR}/lib/net_rim_api.jar)
+	message (WARNING "Toadlet for blackberry currently only supports the egg, hop and knot libraries.")
 endif (TOADLET_PLATFORM_ANDROID)
 
 # Configure and copy the Config and Types file
@@ -278,11 +279,14 @@ endforeach (SRCFILE)
 
 #  Jar library for peeper and it's plugins
 if (TOADLET_JAVA_SPLIT_JARS)
-	add_library (toadlet_peeper STATIC ${PEEPER_SRC_GPP} ${PEEPER_GLRENDERER_SRC_GPP})
-	set_target_properties (toadlet_peeper PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_peeper.dir/gpp\"")
-	set_target_properties (toadlet_peeper PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-	add_dependencies (toadlet_peeper toadlet_egg)
-	install (TARGETS toadlet_peeper DESTINATION lib)
+	# TODO: Peeper is currently unavailable for blackberry
+	if (NOT TOADLET_PLATFORM_BLACKBERRY)
+		add_library (toadlet_peeper STATIC ${PEEPER_SRC_GPP} ${PEEPER_GLRENDERER_SRC_GPP})
+		set_target_properties (toadlet_peeper PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_peeper.dir/gpp\"")
+		set_target_properties (toadlet_peeper PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+		add_dependencies (toadlet_peeper toadlet_egg)
+		install (TARGETS toadlet_peeper DESTINATION lib)
+	endif (NOT TOADLET_PLATFORM_BLACKBERRY)
 endif (TOADLET_JAVA_SPLIT_JARS)
 
 
@@ -380,11 +384,14 @@ endforeach (SRCFILE)
 
 #  Jar library
 if (TOADLET_JAVA_SPLIT_JARS)
-	add_library (toadlet_tadpole STATIC ${TADPOLE_SRC_GPP})
-	set_target_properties (toadlet_tadpole PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_tadpole.dir/gpp\"")
-	set_target_properties (toadlet_tadpole PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-	add_dependencies (toadlet_tadpole toadlet_egg toadlet_peeper)
-	install (TARGETS toadlet_tadpole DESTINATION lib)
+	# TODO: Tadpole is currently unavailable for blackberry
+	if (NOT TOADLET_PLATFORM_BLACKBERRY)
+		add_library (toadlet_tadpole STATIC ${TADPOLE_SRC_GPP})
+		set_target_properties (toadlet_tadpole PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_tadpole.dir/gpp\"")
+		set_target_properties (toadlet_tadpole PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+		add_dependencies (toadlet_tadpole toadlet_egg toadlet_peeper)
+		install (TARGETS toadlet_tadpole DESTINATION lib)
+	endif (NOT TOADLET_PLATFORM_BLACKBERRY)
 endif (TOADLET_JAVA_SPLIT_JARS)
 
 
@@ -415,11 +422,14 @@ endforeach (SRCFILE)
 
 #  Jar library
 if (TOADLET_JAVA_SPLIT_JARS)
-	add_library (toadlet_tadpole_hop STATIC ${TADPOLE_HOP_SRC_GPP})
-	set_target_properties (toadlet_tadpole_hop PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_tadpole_hop.dir/gpp\"")
-	set_target_properties (toadlet_tadpole_hop PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-	add_dependencies (toadlet_tadpole_hop toadlet_egg toadlet_hop toadlet_tadpole)
-	install (TARGETS toadlet_tadpole_hop DESTINATION lib)
+	# TODO: Tadpole is currently unavailable for blackberry
+	if (NOT TOADLET_PLATFORM_BLACKBERRY)
+		add_library (toadlet_tadpole_hop STATIC ${TADPOLE_HOP_SRC_GPP})
+		set_target_properties (toadlet_tadpole_hop PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_tadpole_hop.dir/gpp\"")
+		set_target_properties (toadlet_tadpole_hop PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+		add_dependencies (toadlet_tadpole_hop toadlet_egg toadlet_hop toadlet_tadpole)
+		install (TARGETS toadlet_tadpole_hop DESTINATION lib)
+	endif (NOT TOADLET_PLATFORM_BLACKBERRY)
 endif (TOADLET_JAVA_SPLIT_JARS)
 
 
@@ -450,25 +460,38 @@ endforeach (SRCFILE)
 
 #  Jar library
 if (TOADLET_JAVA_SPLIT_JARS)
-	add_library (toadlet_pad STATIC ${PAD_SRC_GPP})
-	set_target_properties (toadlet_pad PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_pad.dir/gpp\"")
-	set_target_properties (toadlet_pad PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-	add_dependencies (toadlet_pad toadlet_egg toadlet_peeper toadlet_tadpole)
-	install (TARGETS toadlet_pad DESTINATION lib)
+	# TODO: Pad is currently unavailable for blackberry
+	if (NOT TOADLET_PLATFORM_BLACKBERRY)
+		add_library (toadlet_pad STATIC ${PAD_SRC_GPP})
+		set_target_properties (toadlet_pad PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet_pad.dir/gpp\"")
+		set_target_properties (toadlet_pad PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
+		add_dependencies (toadlet_pad toadlet_egg toadlet_peeper toadlet_tadpole)
+		install (TARGETS toadlet_pad DESTINATION lib)
+	endif (NOT TOADLET_PLATFORM_BLACKBERRY)
 endif (TOADLET_JAVA_SPLIT_JARS)
 
 
 # Generate the all encompassing toadlet jar
 if (NOT TOADLET_JAVA_SPLIT_JARS)
-	add_library (toadlet ${EGG_SRC_GPP} ${HOP_SRC_GPP} ${KNOT_SRC_GPP} ${PEEPER_SRC_GPP} ${PEEPER_GLRENDERER_SRC_GPP} ${TADPOLE_SRC_GPP} ${TADPOLE_HOP_SRC_GPP} ${PAD_SRC_GPP})
+	# TODO: Peeper Tadpole and Pad are currently unavailable for blackberry
+	if (TOADLET_PLATFORM_BLACKBERRY)
+		add_library (toadlet ${EGG_SRC_GPP} ${HOP_SRC_GPP} ${KNOT_SRC_GPP})
+	else (TOADLET_PLATFORM_BLACKBERRY)
+		add_library (toadlet ${EGG_SRC_GPP} ${HOP_SRC_GPP} ${KNOT_SRC_GPP} ${PEEPER_SRC_GPP} ${PEEPER_GLRENDERER_SRC_GPP} ${TADPOLE_SRC_GPP} ${TADPOLE_HOP_SRC_GPP} ${PAD_SRC_GPP})
+	endif (TOADLET_PLATFORM_BLACKBERRY)
+	
 	set_target_properties (toadlet PROPERTIES COMPILE_FLAGS "-d \"${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/toadlet.dir/gpp\"")
 	set_target_properties (toadlet PROPERTIES COMPILE_DEFINITIONS_DEBUG TOADLET_DEBUG)
-	if(TOADLET_PLATFORM_BLACKBERRY)
+	
+	if (TOADLET_PLATFORM_BLACKBERRY)
 		# The blackberry jar requires preverification, so we have to do that manually with the RIM tools
-		install (CODE "execute_process(COMMAND ${BLACKBERRY_JDE_DIR}/bin/preverify.exe -classpath ${BLACKBERRY_JDE_DIR}/lib/net_rim_api.jar -d ${CMAKE_CURRENT_BINARY_DIR}/output ${CMAKE_CURRENT_BINARY_DIR}/toadlet.jar)")
+		# We also have to really alter the pathing here to get the preverify command to run; thanks CMake.
+		set (PREVERIFY_COMMAND "\"${BLACKBERRY_JDE_DIR}/bin/preverify.exe\" -classpath \"${BLACKBERRY_JDE_DIR}/lib/net_rim_api.jar\" -d \"${CMAKE_CURRENT_BINARY_DIR}/output\" \"${CMAKE_CURRENT_BINARY_DIR}/toadlet.jar\"")
+		string (REPLACE "\\" "/" PREVERIFY_COMMAND ${PREVERIFY_COMMAND})
+		install (CODE "execute_process(COMMAND ${PREVERIFY_COMMAND})")
 		install (FILES ${CMAKE_CURRENT_BINARY_DIR}/output/toadlet.jar DESTINATION lib)
-	elseif(TOADLET_PLATFORM_ANDROID)
+	else (TOADLET_PLATFORM_ANDROID)
 		install (TARGETS toadlet DESTINATION lib)
-	endif(TOADLET_PLATFORM_BLACKBERRY)
+	endif (TOADLET_PLATFORM_BLACKBERRY)
 endif (NOT TOADLET_JAVA_SPLIT_JARS)
 
