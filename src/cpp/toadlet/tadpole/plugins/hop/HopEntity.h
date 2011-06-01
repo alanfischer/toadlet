@@ -125,6 +125,9 @@ public:
 	void preSimulate();
 	void postSimulate();
 
+	void updatePosition(const Vector3 &position);
+	void lerpPosition(scalar fraction);
+
 	// Node callbacks
 	virtual void spacialUpdated();
 	virtual void parentChanged(node::ParentNode *parent);
