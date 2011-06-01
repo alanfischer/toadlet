@@ -215,9 +215,18 @@ void HopEntity::preSimulate(){
 void HopEntity::postSimulate(){
 	if(mSolid->active()==true){
 		activate();
-		mOldPosition.set(mNewPosition);
-		mNewPosition.set(mSolid->getPosition());
+		updatePosition(mSolid->getPosition());
 	}
+}
+
+void HopEntity::updatePosition(const Vector3 &position){
+	mOldPosition.set(mNewPosition);
+	mNewPosition.set(position);
+}
+
+void HopEntity::lerpPosition(scalar fraction){
+	Math::lerp(mCurrentPosition,mOldPosition,mNewPosition,mScene->getLogicFraction());
+	setTranslate(mCurrentPosition);
 }
 
 void HopEntity::spacialUpdated(){
@@ -255,8 +264,7 @@ void HopEntity::logicUpdate(int dt,int scope){
 
 void HopEntity::frameUpdate(int dt,int scope){
 	if(mSolid->active()){
-		Math::lerp(mCurrentPosition,mOldPosition,mNewPosition,mScene->getLogicFraction());
-		setTranslate(mCurrentPosition);
+		lerpPosition(mScene->getLogicFraction());
 	}
 
 	super::frameUpdate(dt,scope);
