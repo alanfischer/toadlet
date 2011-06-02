@@ -112,7 +112,7 @@ void Profile::outputTimings(ProfileNode *node,int depth){
 		spaces+="\t";
 	}
 
-	if(node!=mRoot){
+	if(node->getTotal()>0){
 		Logger::alert(Categories::TOADLET_EGG_PROFILE,spaces+node->getName()+":"+node->getTotal());
 	}
 
