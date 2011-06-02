@@ -109,7 +109,9 @@ bool ParentNode::attach(Node *node){
 	node->parentChanged(this);
 	nodeAttached(node);
 
-	activate();
+	if(active()==false){
+		activate();
+	}
 
 	node->frameUpdate(0,-1);
 
@@ -141,7 +143,9 @@ bool ParentNode::remove(Node *node){
 
 		nodeRemoved(node);
 
-		activate();
+		if(active()==false){
+			activate();
+		}
 
 		return true;
 	}
