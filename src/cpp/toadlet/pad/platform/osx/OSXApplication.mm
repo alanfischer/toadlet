@@ -63,7 +63,7 @@ using namespace toadlet::pad;
 	extern "C" AudioPlayer *new_ALPlayer();
 #endif
 #if defined(TOADLET_PLATFORM_IPHONE)
-	extern "C" MotionDetector *new_IPhoneMotionDetector();
+	extern "C" MotionDetector *new_IOSMotionDetector();
 #endif
 
 @interface ApplicationView:
@@ -301,7 +301,7 @@ OSXApplication::OSXApplication():
 	#endif
 	
 	#if defined(TOADLET_PLATFORM_IPHONE)
-		mMotionDetectorPlugins.add("ios",MotionDetectorPlugin(new_IPhoneMotionDetector));
+		mMotionDetectorPlugins.add("ios",MotionDetectorPlugin(new_IOSMotionDetector));
 		mMotionDetectorPreferences.add("ios");
 	#endif
 

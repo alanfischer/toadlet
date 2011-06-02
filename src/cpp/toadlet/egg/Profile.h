@@ -36,50 +36,55 @@ class ProfileData;
 
 class TOADLET_API Profile{
 public:
-	static const int STACK_MAX_DEPTH=20;
+	class ProfileNode{
+	public:
+		TOADLET_SHARED_POINTERS(ProfileNode);
+
+		ProfileNode(const char *name);
+
+		ProfileNode *getChild(const char *name);
+		void start();
+		void stop();
+		void clear();
+
+		inline const char *getName() const{return mName;}
+		inline uint64 getTotal() const{return mTotal;}
+		inline ProfileNode *getParent() const{return mParent;}
+		inline ProfileNode *getFirstChild() const{return mFirstChild;}
+		inline ProfileNode *getNext() const{return mNext;}
+
+	protected:
+		const char *mName;
+		uint64 mCurrent,mTotal;
+		ProfileNode *mParent;
+		ProfileNode::ptr mFirstChild,mNext;
+	};
 
 	static Profile *getInstance();
 
-	void beginSection(const String &name);
-	void endSection(const String &name);
-	void addTimings();
-	void clearTimings();
+	void beginSection(const char *name);
+	void endSection(const char *name);
 
-	int getTimingAverage(const String &name) const;
-	int getNumTimings() const;
-	String getTimingName(int i) const;
-
-	/// @todo: Name should not be allocated as part of timing1
-	class Timing{
-	public:
-		TOADLET_SHARED_POINTERS(Timing);
-
-		Timing(const String &name):
-			total(0),
-			current(0),
-			depth(0)
-		{
-			this->name=name;
-		}
-
-		String name;
-		uint64 total;
-		uint64 current;
-		int depth;
-	};
+	ProfileNode *getRoot(){return mRoot;}
+	void outputTimings(){outputTimings(mRoot,0);}
+	void clearTimings(){clearTimings(mRoot);}
 
 protected:
 	Profile();
 	~Profile();
 
+	void outputTimings(ProfileNode *node,int depth);
+	void clearTimings(ProfileNode *node);
+
 	static Profile *mTheProfile;
 
-	ProfileData *mData;
+	ProfileNode::ptr mRoot;
+	ProfileNode *mCurrent;
 };
 
 class TOADLET_API ScopeProfile{
 public:
-	ScopeProfile(const String &name):mName(name){
+	ScopeProfile(const char *name):mName(name){
 		Profile::getInstance()->beginSection(mName);
 	}
 	
@@ -88,7 +93,7 @@ public:
 	}
 
 protected:
-	String mName;
+	const char *mName;
 };
 
 }
@@ -99,14 +104,12 @@ protected:
 	#define TOADLET_PROFILE_ENDSECTION(x) toadlet::egg::Profile::getInstance()->endSection(#x)
 	#define TOADLET_PROFILE_SCOPE(x) toadlet::egg::ScopeProfile PROFILE##x(#x)
 	#define TOADLET_PROFILE_AUTOSCOPE() toadlet::egg::ScopeProfile PROFILE##__LINE__(__FUNCTION__)
-	#define TOADLET_PROFILE_ADDTIMINGS() toadlet::egg::Profile::getInstance()->addTimings()
 	#define TOADLET_PROFILE_CLEARTIMINGS() toadlet::egg::Profile::getInstance()->clearTimings()
 #else
 	#define TOADLET_PROFILE_BEGINSECTION(x)
 	#define TOADLET_PROFILE_ENDSECTION(x)
 	#define TOADLET_PROFILE_SCOPE(x)
 	#define TOADLET_PROFILE_AUTOSCOPE()
-	#define TOADLET_PROFILE_ADDTIMINGS()
 	#define TOADLET_PROFILE_CLEARTIMINGS()
 #endif
 
