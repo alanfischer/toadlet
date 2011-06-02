@@ -27,19 +27,52 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/System.h>
-#include <toadlet/egg/Map.h>
-#include <toadlet/egg/Collection.h>
+#include <string.h>
 
 namespace toadlet{
 namespace egg{
 
-class ProfileData{
-public:
-	Map<String,Profile::Timing::ptr> timings;
-	Collection<Profile::Timing::ptr> timingStack;
-	Collection<Map<String,Profile::Timing::ptr> > timingHistory;
-	Map<String,String> timingNames;
-};
+Profile::ProfileNode::ProfileNode(const char *name):
+	mName(name),
+	mCurrent(0),mTotal(0)
+{}
+
+Profile::ProfileNode *Profile::ProfileNode::getChild(const char *name){
+	ProfileNode *node=NULL,*last=NULL;
+	for(node=mFirstChild;node!=NULL;node=node->mNext){
+		if(strcmp(node->mName,name)==0){
+			break;
+		}
+		last=node;
+	}
+
+	if(node==NULL){
+		if(mFirstChild==NULL){
+			node=new ProfileNode(name);
+			mFirstChild=ProfileNode::ptr(node);
+		}
+		else{
+			node=new ProfileNode(name);
+			last->mNext=ProfileNode::ptr(node);
+		}
+	}
+	node->mParent=this;
+	return node;
+}
+
+void Profile::ProfileNode::start(){
+	mCurrent=System::utime();
+}
+
+void Profile::ProfileNode::stop(){
+	uint64 time=System::utime();
+	mTotal+=time-mCurrent;
+}
+
+void Profile::ProfileNode::clear(){
+	mCurrent=0;
+	mTotal=0;
+}
 
 Profile *Profile::getInstance(){
 	if(mTheProfile==NULL){
@@ -49,112 +82,52 @@ Profile *Profile::getInstance(){
 }
 
 Profile::Profile(){
-	mData=new ProfileData();
+	mRoot=ProfileNode::ptr(new ProfileNode(NULL));
+	mCurrent=mRoot;
 }
 
 Profile::~Profile(){
-	delete mData;
 }
 
-void Profile::beginSection(const String &name){
-	Timing::ptr timing;
-	Map<String,Timing::ptr>::iterator it=mData->timings.find(name);
-	if(it!=mData->timings.end()){
-		timing=it->second;
-	}
-	else{
-		timing=Timing::ptr(new Timing(name));
-		mData->timings[name]=timing;
+void Profile::beginSection(const char *name){
+	TOADLET_ASSERT(mCurrent!=NULL);
 
-		if(mData->timingNames.find(name)==mData->timingNames.end()){
-			mData->timingNames[name]=name;
-		}
-	}
+	mCurrent=mCurrent->getChild(name);
+	mCurrent->start();
 
-	timing->depth++;
-	if(timing->depth==1){
-		timing->current=System::utime();
-	}
-	else if(timing->depth>STACK_MAX_DEPTH){
-		Error::unknown(Categories::TOADLET_EGG,
-			"timing stack depth > STACK_MAX_DEPTH");
-		return;
-	}
-
-	mData->timingStack.add(timing);
+	TOADLET_ASSERT(mCurrent!=NULL);
 }
 
-void Profile::endSection(const String &name){
-	uint64 time=System::utime();
+void Profile::endSection(const char *name){
+	TOADLET_ASSERT(mCurrent!=NULL && strcmp(mCurrent->getName(),name)==0);
 
-	if(mData->timingStack.size()==0){
-		Error::unknown(Categories::TOADLET_EGG,
-			"empty timing stack");
+	mCurrent->stop();
+	mCurrent=mCurrent->getParent();
+
+	TOADLET_ASSERT(mCurrent!=NULL);
+}
+
+void Profile::outputTimings(ProfileNode *node,int depth){
+	String spaces;
+	for(int i=0;i<depth;++i){
+		spaces+="\t";
 	}
 
-	Timing::ptr timing=mData->timingStack.back();
-	mData->timingStack.removeAt(mData->timingStack.size()-1);
-
-	if(timing->name.equals(name)==false){
-		Error::unknown(Categories::TOADLET_EGG,
-			"mismatched begin/endSection");
-		return;
+	if(node->getTotal()>0){
+		Logger::alert(Categories::TOADLET_EGG_PROFILE,spaces+node->getName()+":"+node->getTotal());
 	}
 
-	timing->depth--;
-	if(timing->depth==0){
-		timing->total+=(time-timing->current);
-	}
-	else if(timing->depth<0){
-		Error::unknown(Categories::TOADLET_EGG,
-			"timing stack depth < 0");
-		return;
+	for(node=node->getFirstChild();node!=NULL;node=node->getNext()){
+		outputTimings(node,depth+1);
 	}
 }
 
-void Profile::addTimings(){
-	if(mData->timingStack.size()!=0){
-		Error::unknown(Categories::TOADLET_EGG,
-			"non empty timing stack");
+void Profile::clearTimings(ProfileNode *node){
+	node->clear();
+
+	for(node=node->getFirstChild();node!=NULL;node=node->getNext()){
+		clearTimings(node);
 	}
-
-	mData->timingHistory.add(mData->timings);
-	mData->timings.clear();
-}
-
-void Profile::clearTimings(){
-	mData->timings.clear();
-	mData->timingStack.clear();
-	mData->timingHistory.clear();
-	mData->timingNames.clear();
-}
-
-int Profile::getTimingAverage(const String &name) const{
-	uint64 time=0,count=0;
-	int i;
-	for(i=mData->timingHistory.size()-1;i>=0;--i){
-		const Map<String,Timing::ptr> &item=mData->timingHistory.at(i);
-		Map<String,Timing::ptr>::const_iterator it=item.find(name);
-		if(it!=item.end()){
-			time+=it->second->total;
-		}
-		count++;
-	}
-
-	if(count==0){
-		return -1;
-	}
-	else{
-		return time/count;
-	}
-}
-
-int Profile::getNumTimings() const{
-	return mData->timingNames.size();
-}
-
-String Profile::getTimingName(int i) const{
-	return mData->timingNames[i].first;
 }
 
 Profile *Profile::mTheProfile;
