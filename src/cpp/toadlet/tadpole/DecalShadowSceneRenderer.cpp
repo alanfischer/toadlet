@@ -40,6 +40,7 @@ DecalShadowSceneRenderer::DecalShadowSceneRenderer(Scene *scene):
 	SceneRenderer(scene)
 {
 	mShadowMaterial=mScene->getEngine()->getMaterialManager()->createMaterial();
+	mPlane.set(Math::Z_UNIT_VECTOR3,0);
 }
 
 DecalShadowSceneRenderer::~DecalShadowSceneRenderer(){
@@ -71,14 +72,11 @@ void DecalShadowSceneRenderer::renderScene(Renderer *renderer,Node *node,CameraN
 			Renderable *renderable=item.renderable;
 
 			Matrix4x4 m;
-			Plane p;
-			p.normal=Math::Z_UNIT_VECTOR3;
-			p.distance=-Math::fromInt(20);
 			if(state.type==LightState::Type_DIRECTION){
-				Math::setMatrix4x4FromObliquePlane(m,p,state.direction);
+				Math::setMatrix4x4FromObliquePlane(m,mPlane,state.direction);
 			}
 			else{
-				Math::setMatrix4x4FromPerspectivePlane(m,p,state.position);
+				Math::setMatrix4x4FromPerspectivePlane(m,mPlane,state.position);
 			}
 			
 			Matrix4x4 m2;

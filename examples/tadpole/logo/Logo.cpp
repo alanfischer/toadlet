@@ -77,6 +77,7 @@ void Logo::create(){
 	scene=Scene::ptr(new Scene(mEngine));
 
 	DecalShadowSceneRenderer::ptr sceneRenderer(new DecalShadowSceneRenderer(scene));
+	sceneRenderer->setPlane(Plane(Math::Z_UNIT_VECTOR3,-30));
 	scene->setSceneRenderer(sceneRenderer);
 
 	LightNode::ptr light=getEngine()->createNodeType(LightNode::type(),scene);
