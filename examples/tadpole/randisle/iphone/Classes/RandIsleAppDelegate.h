@@ -1,18 +1,10 @@
-//
-//  ShovelStuffAppDelegate.h
-//  ShovelStuff
-//
-//  Created by Alan Fischer on 7/10/09.
-//  Copyright __MyCompanyName__ 2009. All rights reserved.
-//
-
 #import <UIKit/UIKit.h>
 
-class Logo;
+class RandIsle;
 
-@interface LogoAppDelegate : NSObject <UIApplicationDelegate> {
-    UIWindow *window;
-	Logo *logo;
+@interface RandIsleAppDelegate : NSObject <UIApplicationDelegate> {
+	UIWindow *window;
+	RandIsle *app;
 }
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
