@@ -76,7 +76,8 @@ void Logo::create(){
 
 	scene=Scene::ptr(new Scene(mEngine));
 
-	scene->setSceneRenderer(SceneRenderer::ptr(new DecalShadowSceneRenderer(scene)));
+	DecalShadowSceneRenderer::ptr sceneRenderer(new DecalShadowSceneRenderer(scene));
+	scene->setSceneRenderer(sceneRenderer);
 
 	LightNode::ptr light=getEngine()->createNodeType(LightNode::type(),scene);
 	LightState state;
@@ -87,7 +88,6 @@ void Logo::create(){
 
  	meshNode=getEngine()->createNodeType(MeshNode::type(),scene);
 	meshNode->setMesh("lt.xmsh");
-	meshNode->getSkeleton()->setRenderSkeleton(true);
 	meshNode->getController()->start();
 	meshNode->getController()->setCycling(Controller::Cycling_REFLECT);
 	scene->getRoot()->attach(meshNode);
@@ -97,11 +97,14 @@ void Logo::create(){
 	cameraNode->setClearColor(Colors::BLUE);
 	scene->getRoot()->attach(cameraNode);
 
+// Only looks good if running on device, in simulator its always a top down view
+#if 0
 	MotionDetector *motionDetector=getMotionDetector();
 	if(motionDetector!=NULL){
 		cameraNode->addNodeListener(NodeListener::ptr(new GravityFollower(motionDetector)));
 		motionDetector->startup();
 	}
+#endif
 }
 
 void Logo::destroy(){
