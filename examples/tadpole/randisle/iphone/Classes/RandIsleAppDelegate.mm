@@ -1,28 +1,20 @@
-//
-//  LogoAppDelegate.m
-//  Logo 
-//
-//  Created by Alan Fischer on 7/10/09.
-//  Copyright __MyCompanyName__ 2009. All rights reserved.
-//
+#import "RandIsleAppDelegate.h"
+#include "RandIsle.h"
 
-#import "LogoAppDelegate.h"
-#include "Logo.h"
-
-@implementation LogoAppDelegate
+@implementation RandIsleAppDelegate
 
 @synthesize window;
 
 - (void) startApplication:(id) mainWindow{
-	if(logo!=NULL){
+	if(app!=NULL){
 		return;
 	}
 
-	logo=new Logo();
+	app=new RandIsle();
 	
-	logo->setWindow(mainWindow);
-	logo->create();
-	logo->start();
+	app->setWindow(mainWindow);
+	app->create("");
+	app->start();
 }
 
 - (void)applicationDidFinishLaunching:(UIApplication *)application {    
@@ -33,8 +25,8 @@
 
 
 - (void)dealloc {
-	logo->destroy();
-	delete logo;
+	app->destroy();
+	delete app;
     [window release];
     [super dealloc];
 }

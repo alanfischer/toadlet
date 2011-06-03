@@ -135,7 +135,7 @@ bool GLTexture::createContext(int mipLevels,tbyte *mipDatas[]){
 		else
 	#endif
 	/// @todo: Determine if GLES will let us do partial specifications anyway, and if so, enable that
-	if(totalMipLevels!=mMipLevels){
+	if(totalMipLevels!=mMipLevels && mMipLevels>0){
 		specifiedMipLevels=totalMipLevels;
 
 		Logger::debug(Categories::TOADLET_PEEPER,
