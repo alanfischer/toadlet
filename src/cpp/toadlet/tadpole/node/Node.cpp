@@ -280,7 +280,7 @@ void Node::activate(){
 	}
 	if(mActive==false){
 		mActive=true;
-		if(mParent!=NULL){
+		if(mParent!=NULL && mParent->active()==false){
 			mParent->activate();
 		}
 	}
