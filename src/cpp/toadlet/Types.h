@@ -92,7 +92,7 @@
 	#define TOADLET_ALIGNOF(Type) __alignof(Type)
 	#define TOADLET_ALIGN(a) __declspec(align(a))
 	#if defined(TOADLET_PLATFORM_WINCE)
-		#define TOADLET_ALIGNED_MALLOC(size,a) malloc(size,a)
+		#define TOADLET_ALIGNED_MALLOC(size,a) malloc(size)
 		#define TOADLET_ALIGNED_FREE(pointer) free(pointer)
 	#else
 		#define TOADLET_ALIGNED_MALLOC(size,a) _aligned_malloc(size,a)
