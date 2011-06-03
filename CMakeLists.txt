@@ -34,6 +34,12 @@ set (TOADLET_BUILD_VERSION_PAD_MICRO 0)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${toadlet_SOURCE_DIR}/cmake/Modules/")
 
 
+# TODO: Right now WinCE is being blocked due to the uncertain future of Toadlet and Windows Phone 7. 
+if (TOADLET_PLATFORM_WINCE)
+	message (FATAL_ERROR "WindowsCE builds are currently disabled given the uncertain future of native code on Windows Phone 7. You may comment out this error to attempt the build anyway. Your mileage may vary.")
+endif (TOADLET_PLATFORM_WINCE)
+
+
 # Platform options
 if (WIN32)
 	set (TOADLET_PLATFORM_WIN32 ON)
