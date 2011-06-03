@@ -20,8 +20,9 @@
 
 	logo=new Logo();
 	
-	((Application*)logo)->create(mainWindow);
-	logo->start(false);
+	logo->setWindow(mainWindow);
+	logo->create();
+	logo->start();
 }
 
 - (void)applicationDidFinishLaunching:(UIApplication *)application {    
