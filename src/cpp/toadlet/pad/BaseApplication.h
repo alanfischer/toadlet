@@ -32,8 +32,8 @@
 #include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/peeper/Renderer.h>
 #include <toadlet/peeper/WindowRenderTargetFormat.h>
-#include <toadlet/ribbit/AudioPlayer.h>
-#include <toadlet/flick/MotionDetector.h>
+#include <toadlet/ribbit/AudioDevice.h>
+#include <toadlet/flick/MotionDevice.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/pad/ApplicationListener.h>
 //#include <cctype>
@@ -79,7 +79,7 @@ public:
 	BaseApplication();
 	virtual ~BaseApplication(){}
 
-	virtual void create(egg::String renderer,egg::String audioPlayer,egg::String motionDetector);
+	virtual void create(egg::String renderer,egg::String audioDevice,egg::String motionDevice);
 	virtual void destroy();
 
 	virtual void start()=0;
@@ -126,7 +126,7 @@ public:
 
 	virtual void changeRendererPlugin(const egg::String &plugin)=0;
 	virtual void setRendererOptions(int *options,int length);
-	virtual void setAudioPlayerOptions(int *options,int length);
+	virtual void setAudioDeviceOptions(int *options,int length);
 
 	virtual void resized(int width,int height)		{if(mListener!=NULL){mListener->resized(width,height);}}
 	virtual void focusGained()						{if(mListener!=NULL){mListener->focusGained();}}
@@ -145,8 +145,8 @@ public:
 
 	virtual tadpole::Engine *getEngine() const{return mEngine;}
 	virtual peeper::Renderer *getRenderer() const{return mRenderer;}
-	virtual ribbit::AudioPlayer *getAudioPlayer() const{return mAudioPlayer;}
-	virtual flick::MotionDetector *getMotionDetector() const{return mMotionDetector;}
+	virtual ribbit::AudioDevice *getAudioDevice() const{return mAudioDevice;}
+	virtual flick::MotionDevice *getMotionDevice() const{return mMotionDevice;}
 
 	virtual egg::String getKeyName(int key){egg::Map<int,egg::String>::iterator it=mKeyToName.find(key);return it!=mKeyToName.end()?it->second:(char*)NULL;}
 	virtual int getKeyValue(const egg::String &name){egg::Map<egg::String,int>::iterator it=mNameToKey.find(name);return it!=mNameToKey.end()?it->second:0;}
@@ -175,22 +175,22 @@ protected:
 		peeper::Renderer *(*createRenderer)();
 	};
 
-	class AudioPlayerPlugin{
+	class AudioDevicePlugin{
 	public:
-		AudioPlayerPlugin(
-			ribbit::AudioPlayer *(*audioPlayer)()=NULL
-		):createAudioPlayer(audioPlayer){}
+		AudioDevicePlugin(
+			ribbit::AudioDevice *(*audioDevice)()=NULL
+		):createAudioDevice(audioDevice){}
 
-		ribbit::AudioPlayer *(*createAudioPlayer)();
+		ribbit::AudioDevice *(*createAudioDevice)();
 	};
 
-	class MotionDetectorPlugin{
+	class MotionDevicePlugin{
 	public:
-		MotionDetectorPlugin(
-			flick::MotionDetector *(*motionDetector)()=NULL
-		):createMotionDetector(motionDetector){}
+		MotionDevicePlugin(
+			flick::MotionDevice *(*motionDevice)()=NULL
+		):createMotionDevice(motionDevice){}
 
-		flick::MotionDetector *(*createMotionDetector)();
+		flick::MotionDevice *(*createMotionDevice)();
 	};
 
 	virtual peeper::RenderTarget *makeRenderTarget(const egg::String &plugin);
@@ -198,13 +198,13 @@ protected:
 	virtual bool createContextAndRenderer(const egg::String &plugin);
 	virtual bool destroyRendererAndContext();
 
-	virtual ribbit::AudioPlayer *makeAudioPlayer(const egg::String &plugin);
-	virtual bool createAudioPlayer(const egg::String &plugin);
-	virtual bool destroyAudioPlayer();
+	virtual ribbit::AudioDevice *makeAudioDevice(const egg::String &plugin);
+	virtual bool createAudioDevice(const egg::String &plugin);
+	virtual bool destroyAudioDevice();
 
-	virtual flick::MotionDetector *makeMotionDetector(const egg::String &plugin);
-	virtual bool createMotionDetector(const egg::String &plugin);
-	virtual bool destroyMotionDetector();
+	virtual flick::MotionDevice *makeMotionDevice(const egg::String &plugin);
+	virtual bool createMotionDevice(const egg::String &plugin);
+	virtual bool destroyMotionDevice();
 
 	bool mBackable;
 	peeper::WindowRenderTargetFormat::ptr mFormat;
@@ -215,11 +215,11 @@ protected:
 	egg::String mCurrentRendererPlugin;
 	egg::String mNewRendererPlugin;
 	int *mRendererOptions;
-	egg::Map<egg::String,AudioPlayerPlugin> mAudioPlayerPlugins;
-	egg::Collection<egg::String> mAudioPlayerPreferences;
-	int *mAudioPlayerOptions;
-	egg::Map<egg::String,MotionDetectorPlugin> mMotionDetectorPlugins;
-	egg::Collection<egg::String> mMotionDetectorPreferences;
+	egg::Map<egg::String,AudioDevicePlugin> mAudioDevicePlugins;
+	egg::Collection<egg::String> mAudioDevicePreferences;
+	int *mAudioDeviceOptions;
+	egg::Map<egg::String,MotionDevicePlugin> mMotionDevicePlugins;
+	egg::Collection<egg::String> mMotionDevicePreferences;
 
 	egg::Map<egg::String,int> mNameToKey;
 	egg::Map<int,egg::String> mKeyToName;
@@ -227,8 +227,8 @@ protected:
 	tadpole::Engine *mEngine;
 	peeper::RenderTarget *mRenderTarget;
 	peeper::Renderer *mRenderer;
-	ribbit::AudioPlayer *mAudioPlayer;
-	flick::MotionDetector *mMotionDetector;
+	ribbit::AudioDevice *mAudioDevice;
+	flick::MotionDevice *mMotionDevice;
 };
 
 }

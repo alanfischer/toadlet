@@ -27,7 +27,7 @@ set (RIBBIT_HEADERS
 	AudioBuffer.h
 	AudioFormat.h
 	AudioFormatConversion.h
-	AudioPlayer.h
+	AudioDevice.h
 	AudioStream.h
 	CapabilitySet.h
 	Types.h
@@ -150,16 +150,16 @@ if (NOT TOADLET_PLATFORM_WINCE AND TOADLET_PLATFORM_WIN32 OR TOADLET_PLATFORM_PO
 		find_package (OpenAL)
 		if (OPENAL_FOUND)
 			set (TOADLET_HAS_OPENAL ON PARENT_SCOPE)
-			add_subdirectory (plugins/alplayer)
+			add_subdirectory (plugins/alaudiodevice)
 		else (OPENAL_FOUND)
-			message ("OpenAL was not found. The ribbit alplayer will not be built")
+			message ("OpenAL was not found. The ribbit alaudiodevice will not be built")
 		endif (OPENAL_FOUND)
 	else (TOADLET_PLATFORM_OSX)
 		set (TOADLET_HAS_OPENAL ON PARENT_SCOPE)
-		add_subdirectory (plugins/alplayer)
+		add_subdirectory (plugins/alaudiodevice)
 	endif (TOADLET_PLATFORM_OSX)
 endif (NOT TOADLET_PLATFORM_WINCE AND TOADLET_PLATFORM_WIN32 OR TOADLET_PLATFORM_POSIX OR TOADLET_PLATFORM_IPHONE)
 if (TOADLET_PLATFORM_WINCE OR TOADLET_PLATFORM_WIN32)
-	add_subdirectory (plugins/mmplayer)
+	add_subdirectory (plugins/mmaudiodevice)
 endif (TOADLET_PLATFORM_WINCE OR TOADLET_PLATFORM_WIN32)
 

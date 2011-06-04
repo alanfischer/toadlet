@@ -16,10 +16,10 @@ void RibbitTest::create(){
 		return;
 	}
 
-	audioBuffer=AudioBuffer::ptr(getAudioPlayer()->createAudioBuffer());
+	audioBuffer=AudioBuffer::ptr(getAudioDevice()->createAudioBuffer());
 	audioBuffer->create(stream);
 
-	audio=Audio::ptr(getAudioPlayer()->createBufferedAudio());
+	audio=Audio::ptr(getAudioDevice()->createBufferedAudio());
 	audio->create(audioBuffer);
 	audio->play();
 }

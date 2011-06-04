@@ -34,7 +34,7 @@
 #include <toadlet/peeper/Shader.h>
 #include <toadlet/peeper/Program.h>
 #include <toadlet/peeper/RendererCaps.h>
-#include <toadlet/ribbit/AudioPlayer.h>
+#include <toadlet/ribbit/AudioDevice.h>
 #include <toadlet/ribbit/AudioBuffer.h>
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/ArchiveManager.h>
@@ -65,8 +65,8 @@ public:
 	peeper::Renderer *getRenderer() const;
 	void updateVertexFormats();
 
-	bool setAudioPlayer(ribbit::AudioPlayer *audioPlayer);
-	ribbit::AudioPlayer *getAudioPlayer() const;
+	bool setAudioDevice(ribbit::AudioDevice *audioDevice);
+	ribbit::AudioDevice *getAudioDevice() const;
 
 	void setDirectory(const egg::String &directory){mArchiveManager->setDirectory(directory);}
 	const egg::String &getDirectory() const{return mArchiveManager->getDirectory();}
@@ -116,8 +116,8 @@ protected:
 	egg::String mDirectory;
 	peeper::Renderer *mRenderer;
 	peeper::Renderer *mLastRenderer;
-	ribbit::AudioPlayer *mAudioPlayer;
-	ribbit::AudioPlayer *mLastAudioPlayer;
+	ribbit::AudioDevice *mAudioDevice;
+	ribbit::AudioDevice *mLastAudioDevice;
 
 	egg::Collection<ContextListener*> mContextListeners;
 

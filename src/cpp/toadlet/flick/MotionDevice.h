@@ -23,31 +23,63 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_AUDIOBUFFERMANAGER_H
-#define TOADLET_TADPOLE_AUDIOBUFFERMANAGER_H
+#ifndef TOADLET_FLICK_MOTIONDEVICE_H
+#define TOADLET_FLICK_MOTIONDEVICE_H
 
-#include <toadlet/tadpole/ResourceManager.h>
-#include <toadlet/ribbit/AudioDevice.h>
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/flick/Types.h>
 
 namespace toadlet{
-namespace tadpole{
+namespace flick{
 
-class Engine;
+class MotionDeviceListener;
 
-class TOADLET_API AudioBufferManager:public ResourceManager{
+class MotionDevice{
 public:
-	AudioBufferManager(Engine *engine);
+	enum State{
+		State_DESTROYED=0,
+		State_STOPPED=1,
+		State_RUNNING=2,
+	};
 
-	ribbit::AudioBuffer::ptr createAudioBuffer(ribbit::AudioStream::ptr stream);
+	class MotionData{
+	public:
+		MotionData():
+			time(0){}
 
-	ribbit::AudioStream::ptr findAudioStream(const egg::String &name);
-	ribbit::AudioBuffer::ptr findAudioBuffer(const egg::String &name){return egg::shared_static_cast<ribbit::AudioBuffer>(ResourceManager::find(name));}
+		void set(const MotionData &data){
+			time=data.time;
+			acceleration.set(data.acceleration);
+			velocity.set(data.velocity);
+			velocityFiltered.set(data.velocityFiltered);
+		}
 
-	ribbit::AudioDevice *getAudioDevice();
+		uint64 time;
+		Vector3 acceleration;
+		Vector3 velocity;
+		Vector3 velocityFiltered;
+	};
 
-protected:
-	Engine *mEngine;
+	virtual ~MotionDevice(){}
+
+	virtual bool available()=0;
+
+	virtual bool create()=0;
+
+	virtual bool startup()=0;
+
+	virtual bool shutdown()=0;
+
+	virtual void destroy()=0;
+
+	virtual void setPollSleep(int ms)=0; // Milliseconds to sleep between polls
+
+	virtual void setFilterAlpha(scalar alpha)=0;
+
+	virtual void setNativeOrientation(bool native)=0;
+
+	virtual void setListener(MotionDeviceListener *listener)=0;
+
+	virtual State getState()=0;
 };
 
 }

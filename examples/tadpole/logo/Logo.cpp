@@ -1,17 +1,15 @@
 #include "Logo.h"
 
-class GravityFollower:public NodeListener,MotionDetectorListener{
+class GravityFollower:public NodeListener,MotionDeviceListener{
 public:
-	GravityFollower(MotionDetector *detector){
-		mDetector=detector;
-		mDetector->setListener(this);
+	GravityFollower(MotionDevice *device){
+		mDevice=device;
+		mDevice->setListener(this);
 	}
 
 	void nodeDestroyed(Node *node){
-		mDetector->setListener(NULL);
+		mDevice->setListener(NULL);
 	}
-
-	void transformUpdated(Node *node,int tu){}
 
 	void logicUpdated(Node *node,int dt){
 		mLastTranslate.set(mTranslate);
@@ -50,15 +48,15 @@ public:
 		node->setRotate(rotate);
 	}
 
-	void motionDetected(const MotionDetector::MotionData &motionData){
+	void motionDetected(const MotionDevice::MotionData &motionData){
 		mMotionMutex.lock();
 		mMotionData.set(motionData);
 		mMotionMutex.unlock();
 	}
 
-	MotionDetector *mDetector;
+	MotionDevice *mDevice;
 	Mutex mMotionMutex;
-	MotionDetector::MotionData mMotionData;
+	MotionDevice::MotionData mMotionData;
 	Vector3 mTranslate,mLastTranslate;
 	Quaternion mRotate,mLastRotate;
 };
@@ -100,10 +98,10 @@ void Logo::create(){
 
 // Only looks good if running on device, in simulator its always a top down view
 #if 0
-	MotionDetector *motionDetector=getMotionDetector();
-	if(motionDetector!=NULL){
-		cameraNode->addNodeListener(NodeListener::ptr(new GravityFollower(motionDetector)));
-		motionDetector->startup();
+	MotionDevice *motionDevice=getMotionDevice();
+	if(motionDevice!=NULL){
+		cameraNode->addNodeListener(NodeListener::ptr(new GravityFollower(motionDevice)));
+		motionDevice->startup();
 	}
 #endif
 }

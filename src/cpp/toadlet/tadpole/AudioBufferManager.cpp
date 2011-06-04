@@ -44,10 +44,10 @@ AudioBufferManager::AudioBufferManager(Engine *engine):ResourceManager(engine->g
 AudioBuffer::ptr AudioBufferManager::createAudioBuffer(AudioStream::ptr stream){
 	Logger::debug(Categories::TOADLET_TADPOLE,"AudioBufferManager::createAudioBuffer");
 
-	AudioPlayer *audioPlayer=getAudioPlayer();
+	AudioDevice *audioDevice=getAudioDevice();
 
-	if(audioPlayer==NULL){
-		Error::nullPointer("createAudioBuffer called without a valid AudioPlayer");
+	if(audioDevice==NULL){
+		Error::nullPointer("createAudioBuffer called without a valid AudioDevice");
 		return NULL;
 	}
 	
@@ -56,7 +56,7 @@ AudioBuffer::ptr AudioBufferManager::createAudioBuffer(AudioStream::ptr stream){
 		return NULL;
 	}
 	
-	AudioBuffer::ptr audioBuffer=AudioBuffer::ptr(audioPlayer->createAudioBuffer());
+	AudioBuffer::ptr audioBuffer=AudioBuffer::ptr(audioDevice->createAudioBuffer());
 	if(audioBuffer->create(stream)==false){
 		audioBuffer=NULL;
 	}
@@ -98,7 +98,7 @@ AudioStream::ptr AudioBufferManager::findAudioStream(const String &name){
 	}
 }
 
-AudioPlayer *AudioBufferManager::getAudioPlayer(){return mEngine->getAudioPlayer();}
+AudioDevice *AudioBufferManager::getAudioDevice(){return mEngine->getAudioDevice();}
 
 }
 }
