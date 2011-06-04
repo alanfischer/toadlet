@@ -39,7 +39,7 @@ public:
 	X11Application();
 	virtual ~X11Application();
 
-	virtual void create(egg::String renderer=(char*)NULL,egg::String audioPlayer=(char*)NULL,egg::String motionDetector=(char*)NULL);
+	virtual void create(egg::String renderer=(char*)NULL,egg::String audioDevice=(char*)NULL,egg::String motionDevice=(char*)NULL);
 	virtual void destroy();
 
 	virtual void start();

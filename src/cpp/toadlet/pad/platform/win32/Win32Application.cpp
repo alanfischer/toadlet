@@ -98,18 +98,18 @@ using namespace toadlet::tadpole::handler;
 	extern "C" RenderTarget *new_D3D11WindowRenderTarget(void *window,WindowRenderTargetFormat *format);
 #endif
 #if defined(TOADLET_PLATFORM_WIN32)
-	#pragma comment(lib,"toadlet_ribbit_mmplayer" TOADLET_LIBRARY_EXTENSION)
-	extern "C" AudioPlayer *new_MMPlayer();
+	#pragma comment(lib,"toadlet_ribbit_mmaudiodevice" TOADLET_LIBRARY_EXTENSION)
+	extern "C" AudioDevice *new_MMAudioDevice();
 #endif
 #if defined(TOADLET_HAS_OPENAL)
-	#pragma comment(lib,"toadlet_ribbit_alplayer" TOADLET_LIBRARY_EXTENSION)
-	extern "C" AudioPlayer *new_ALPlayer();
+	#pragma comment(lib,"toadlet_ribbit_alaudiodevice" TOADLET_LIBRARY_EXTENSION)
+	extern "C" AudioDevice *new_ALAudioDevice();
 #endif
 #if defined(TOADLET_PLATFORM_WINCE)
-	#pragma comment(lib,"toadlet_flick_htcmotiondetector" TOADLET_LIBRARY_EXTENSION)
-	extern "C" MotionDetector *new_HTCMotionDetector();
-	#pragma comment(lib,"toadlet_flick_samsungmotiondetector" TOADLET_LIBRARY_EXTENSION)
-	extern "C" MotionDetector *new_SamsungMotionDetector();
+	#pragma comment(lib,"toadlet_flick_htcmotiondevice" TOADLET_LIBRARY_EXTENSION)
+	extern "C" MotionDevice *new_HTCMotionDevice();
+	#pragma comment(lib,"toadlet_flick_samsungmotiondevice" TOADLET_LIBRARY_EXTENSION)
+	extern "C" MotionDevice *new_SamsungMotionDevice();
 #endif
 
 namespace toadlet{
@@ -202,32 +202,32 @@ Win32Application::Win32Application():
 	mRendererPreferences.add("d3d11");
 
 	#if defined(TOADLET_HAS_OPENAL)
-		mAudioPlayerPlugins.add("al",AudioPlayerPlugin(new_ALPlayer));
+		mAudioDevicePlugins.add("al",AudioDevicePlugin(new_ALAudioDevice));
 	#endif
 	#if defined(TOADLET_PLATFORM_WIN32)
-		mAudioPlayerPlugins.add("mm",AudioPlayerPlugin(new_MMPlayer));
+		mAudioDevicePlugins.add("mm",AudioDevicePlugin(new_MMAudioDevice));
 	#endif
-	mAudioPlayerPreferences.add("al");
-	mAudioPlayerPreferences.add("mm");
+	mAudioDevicePreferences.add("al");
+	mAudioDevicePreferences.add("mm");
 
 	#if defined(TOADLET_PLATFORM_WINCE)
-		mMotionDetectorPlugins.add("htc",MotionDetectorPlugin(new_HTCMotionDetector));
-		mMotionDetectorPlugins.add("samsung",MotionDetectorPlugin(new_SamsungMotionDetector));
+		mMotionDevicePlugins.add("htc",MotionDevicePlugin(new_HTCMotionDevice));
+		mMotionDevicePlugins.add("samsung",MotionDevicePlugin(new_SamsungMotionDevice));
 	#endif
-	mMotionDetectorPreferences.add("htc");
-	mMotionDetectorPreferences.add("samsung");
+	mMotionDevicePreferences.add("htc");
+	mMotionDevicePreferences.add("samsung");
 }
 
 Win32Application::~Win32Application(){
 	destroy();
 
 	delete[] mRendererOptions;
-	delete[] mAudioPlayerOptions;
+	delete[] mAudioDeviceOptions;
 
 	delete win32;
 }
 
-void Win32Application::create(String renderer,String audioPlayer,String motionDetector){
+void Win32Application::create(String renderer,String audioDevice,String motionDevice){
 	mContextActive=true;
 
 	/// @todo: The Joystick/Keyboard/Mouse input should be moved to an input abstraction class useabout outside of pad or at least the Application class
@@ -250,7 +250,7 @@ void Win32Application::create(String renderer,String audioPlayer,String motionDe
 
 	createWindow();
 	
-	BaseApplication::create(renderer,audioPlayer,motionDetector);
+	BaseApplication::create(renderer,audioDevice,motionDevice);
 
 	mResourceArchive=Win32ResourceArchive::ptr(new Win32ResourceArchive(mEngine->getTextureManager()));
 	mResourceArchive->open(win32->mInstance);
@@ -297,8 +297,8 @@ void Win32Application::runEventLoop(){
 				}
 			}
 
-			if(mAudioPlayer!=NULL){
-				mAudioPlayer->update(dt);
+			if(mAudioDevice!=NULL){
+				mAudioDevice->update(dt);
 			}
 
 			lastTime=currentTime;

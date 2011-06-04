@@ -23,13 +23,42 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_H
-#define TOADLET_FLICK_H
+#ifndef TOADLET_RIBBIT_ALAUDIOBUFFER_H
+#define TOADLET_RIBBIT_ALAUDIOBUFFER_H
 
-#include <toadlet/flick/FilteredMotionDevice.h>
-#include <toadlet/flick/MotionDevice.h>
+#include "ALIncludes.h"
+#include <toadlet/egg/BaseResource.h>
+#include <toadlet/ribbit/AudioBuffer.h>
 
-using namespace toadlet;
-using namespace toadlet::flick;
+namespace toadlet{
+namespace ribbit{
+
+class ALAudioDevice;
+
+class TOADLET_API ALAudioBuffer:protected egg::BaseResource,public AudioBuffer{
+	TOADLET_BASERESOURCE_PASSTHROUGH(AudioBuffer);
+public:
+	ALAudioBuffer(ALAudioDevice *device);
+	virtual ~ALAudioBuffer();
+
+	AudioBuffer *getRootAudioBuffer(){return this;}
+
+	bool create(AudioStream::ptr stream);
+	void destroy();
+
+	inline ALuint getHandle() const{return mHandle;}
+
+protected:
+	ALAudioDevice *mDevice;
+	ALuint mHandle;
+	tbyte *mStaticData;
+	int mLengthTime;
+
+	friend class ALAudioDevice;
+	friend class ALAudio;
+};
+
+}
+}
 
 #endif

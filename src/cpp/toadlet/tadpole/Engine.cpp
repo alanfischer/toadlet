@@ -159,8 +159,8 @@ Engine::Engine(bool backable):
 	//mDirectory,
 	mRenderer(NULL),
 	mLastRenderer(NULL),
-	mAudioPlayer(NULL),
-	mLastAudioPlayer(NULL)
+	mAudioDevice(NULL),
+	mLastAudioDevice(NULL)
 
 	//mContextListeners
 {
@@ -455,24 +455,24 @@ void Engine::updateVertexFormats(){
 	mVertexFormats.POSITION_NORMAL_COLOR_TEX_COORD=format;
 }
 
-bool Engine::setAudioPlayer(AudioPlayer *audioPlayer){
-	if(audioPlayer!=NULL){
-		if(mLastAudioPlayer==NULL){
-			mLastAudioPlayer=audioPlayer;
+bool Engine::setAudioDevice(AudioDevice *audioDevice){
+	if(audioDevice!=NULL){
+		if(mLastAudioDevice==NULL){
+			mLastAudioDevice=audioDevice;
 		}
-		else if(mBackable==false && mLastAudioPlayer!=audioPlayer){
-			Error::unknown(Categories::TOADLET_TADPOLE,"can not change AudioPlayer in an unbacked engine");
+		else if(mBackable==false && mLastAudioDevice!=audioDevice){
+			Error::unknown(Categories::TOADLET_TADPOLE,"can not change AudioDevice in an unbacked engine");
 			return false;
 		}
 	}
 
-	mAudioPlayer=audioPlayer;
+	mAudioDevice=audioDevice;
 
 	return true;
 }
 
-AudioPlayer *Engine::getAudioPlayer() const{
-	return mAudioPlayer;
+AudioDevice *Engine::getAudioDevice() const{
+	return mAudioDevice;
 }
 
 void Engine::registerNodeType(BaseType<Node> *type){

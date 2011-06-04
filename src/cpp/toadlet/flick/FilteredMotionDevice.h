@@ -23,13 +23,35 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_FLICK_H
-#define TOADLET_FLICK_H
+#ifndef TOADLET_FLICK_FILTEREDMOTIONDEVICE_H
+#define TOADLET_FLICK_FILTEREDMOTIONDEVICE_H
 
-#include <toadlet/flick/FilteredMotionDevice.h>
 #include <toadlet/flick/MotionDevice.h>
+#include <toadlet/flick/MotionDeviceListener.h>
 
-using namespace toadlet;
-using namespace toadlet::flick;
+namespace toadlet{
+namespace flick{
+
+class TOADLET_API FilteredMotionDevice:public MotionDevice{
+public:
+	FilteredMotionDevice();
+	virtual ~FilteredMotionDevice();
+
+	virtual void setFilterAlpha(scalar alpha);
+
+protected:
+	virtual bool updateAcceleration(int time,scalar x,scalar y,scalar z);
+
+	scalar mAlpha;
+	MotionData mMotionData;
+
+	Vector3 cache_updateAcceleration_lastAcceleration;
+	Vector3 cache_updateAcceleration_lastVelocity;
+	Vector3 cache_updateAcceleration_lastVelocityFiltered;
+	Vector3 cache_updateAcceleration_vector;
+};
+
+}
+}
 
 #endif

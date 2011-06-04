@@ -30,7 +30,7 @@
 	#include <toadlet/peeper/plugins/glrenderer/platform/glx/GLXWindowRenderTarget.h>
 #endif
 #if defined(TOADLET_HAS_OPENAL)
-	#include <toadlet/ribbit/plugins/alplayer/ALPlayer.h>
+	#include <toadlet/ribbit/plugins/alaudiodevice/ALAudioDevice.h>
 #endif
 #include <toadlet/pad/platform/x11/X11Application.h>
 #include <toadlet/pad/ApplicationListener.h>
@@ -51,7 +51,7 @@ using namespace toadlet::ribbit;
 using namespace toadlet::tadpole;
 
 #if defined(TOADLET_HAS_OPENAL)
-	extern "C" AudioPlayer *new_ALPlayer();
+	extern "C" AudioDevice *new_ALAudioDevice();
 #endif
 
 namespace toadlet{
@@ -98,7 +98,7 @@ X11Application::X11Application():
 	memset(x11,0,sizeof(X11Attributes));
 
 	#if defined(TOADLET_HAS_OPENAL)
-		mAudioPlayerPlugins.add("al",AudioPlayerPlugin(new_ALPlayer));
+		mAudioDevicePlugins.add("al",AudioDevicePlugin(new_ALAudioDevice));
 	#endif
 }
 
@@ -110,10 +110,10 @@ X11Application::~X11Application(){
 	delete x11;
 }
 
-void X11Application::create(String renderer,String audioPlayer,String motionDetector){
+void X11Application::create(String renderer,String audioDevice,String motionDevice){
 	createWindow();
 
-	BaseApplication::create(renderer,audioPlayer,motionDetector);
+	BaseApplication::create(renderer,audioDevice,motionDevice);
 }
 
 void X11Application::destroy(){
@@ -143,8 +143,8 @@ void X11Application::runEventLoop(){
 		if(mRenderer!=NULL){
 			render(mRenderer);
 		}
-		if(mAudioPlayer!=NULL){
-			mAudioPlayer->update(dt);
+		if(mAudioDevice!=NULL){
+			mAudioDevice->update(dt);
 		}
 		lastTime=currentTime;
 

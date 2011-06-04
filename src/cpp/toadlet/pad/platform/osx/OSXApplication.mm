@@ -60,10 +60,10 @@ using namespace toadlet::pad;
 	#endif
 #endif
 #if defined(TOADLET_HAS_OPENAL)
-	extern "C" AudioPlayer *new_ALPlayer();
+	extern "C" AudioDevice *new_ALAudioDevice();
 #endif
 #if defined(TOADLET_PLATFORM_IPHONE)
-	extern "C" MotionDetector *new_IOSMotionDetector();
+	extern "C" MotionDevice *new_IOSMotionDevice();
 #endif
 
 @interface ApplicationView:
@@ -147,8 +147,8 @@ rect{
 		if(mApplication->getRenderer()!=NULL){
 			mApplication->render(mApplication->getRenderer());
 		}
-		if(mApplication->getAudioPlayer()!=NULL){
-			mApplication->getAudioPlayer()->update(dt);
+		if(mApplication->getAudioDevice()!=NULL){
+			mApplication->getAudioDevice()->update(dt);
 		}
 	}
 	mLastTime=currentTime;
@@ -296,18 +296,18 @@ OSXApplication::OSXApplication():
 	#endif
 	
 	#if defined(TOADLET_HAS_OPENAL)
-		mAudioPlayerPlugins.add("al",AudioPlayerPlugin(new_ALPlayer));
-		mAudioPlayerPreferences.add("al");
+		mAudioDevicePlugins.add("al",AudioDevicePlugin(new_ALAudioDevice));
+		mAudioDevicePreferences.add("al");
 	#endif
 	
 	#if defined(TOADLET_PLATFORM_IPHONE)
-		mMotionDetectorPlugins.add("ios",MotionDetectorPlugin(new_IOSMotionDetector));
-		mMotionDetectorPreferences.add("ios");
+		mMotionDevicePlugins.add("ios",MotionDevicePlugin(new_IOSMotionDevice));
+		mMotionDevicePreferences.add("ios");
 	#endif
 
 	// Fade in buffers over 100 ms, reduces popping
 	int options[]={1,100,0};
-	setAudioPlayerOptions(options,3);
+	setAudioDeviceOptions(options,3);
 }
 
 OSXApplication::~OSXApplication(){
@@ -325,7 +325,7 @@ void OSXApplication::setWindow(void *window){
 	[(NSObject*)mWindow retain];
 }
 
-void OSXApplication::create(String renderer,String audioPlayer,String motionDetector){
+void OSXApplication::create(String renderer,String audioDevice,String motionDevice){
 	if(mWindow==nil){
 		// This programatic Window creation isn't spectacular, but it's enough to run examples.
 		mPool=[[NSAutoreleasePool alloc] init];
@@ -377,7 +377,7 @@ void OSXApplication::create(String renderer,String audioPlayer,String motionDete
 		[(ApplicationView*)mView windowResized:nil];
 	#endif
 
-	BaseApplication::create(renderer,audioPlayer,motionDetector);
+	BaseApplication::create(renderer,audioDevice,motionDevice);
 
 	mBundleArchive=OSXBundleArchive::ptr(new OSXBundleArchive());
 	shared_static_cast<OSXBundleArchive>(mBundleArchive)->open([NSBundle mainBundle]);

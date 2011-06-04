@@ -89,15 +89,15 @@ BaseApplication::BaseApplication():
 	//mCurrentRendererPlugin,
 	//mNewRendererPlugin,
 	mRendererOptions(0),
-	//mAudioPlayerPlugins,
-	mAudioPlayerOptions(0),
+	//mAudioDevicePlugins,
+	mAudioDeviceOptions(0),
 	//mMotionDetctorPlugins,
 
 	mEngine(NULL),
 	mRenderTarget(NULL),
 	mRenderer(NULL),
-	mAudioPlayer(NULL),
-	mMotionDetector(NULL)
+	mAudioDevice(NULL),
+	mMotionDevice(NULL)
 {
 	mapKeyNames(mKeyToName,mNameToKey);
 	
@@ -113,7 +113,7 @@ BaseApplication::BaseApplication():
 	#endif
 }
 
-void BaseApplication::create(String renderer,String audioPlayer,String motionDetector){
+void BaseApplication::create(String renderer,String audioDevice,String motionDevice){
 	int i;
 
 	mEngine=new Engine(mBackable);
@@ -130,23 +130,23 @@ void BaseApplication::create(String renderer,String audioPlayer,String motionDet
 			}
 		}
 	}
-	if(audioPlayer!="null"){
-		if(audioPlayer!=(char*)NULL || mAudioPlayerPlugins.size()==0){
-			createAudioPlayer(audioPlayer);
+	if(audioDevice!="null"){
+		if(audioDevice!=(char*)NULL || mAudioDevicePlugins.size()==0){
+			createAudioDevice(audioDevice);
 		}
 		else{
-			for(i=0;i<mAudioPlayerPreferences.size();++i){
-				if(createAudioPlayer(mAudioPlayerPreferences[i])) break;
+			for(i=0;i<mAudioDevicePreferences.size();++i){
+				if(createAudioDevice(mAudioDevicePreferences[i])) break;
 			}
 		}
 	}
-	if(motionDetector!="null"){
-		if(motionDetector!=(char*)NULL || mMotionDetectorPlugins.size()==0){
-			createMotionDetector(motionDetector);
+	if(motionDevice!="null"){
+		if(motionDevice!=(char*)NULL || mMotionDevicePlugins.size()==0){
+			createMotionDevice(motionDevice);
 		}
 		else{
-			for(i=0;i<mMotionDetectorPreferences.size();++i){
-				if(createMotionDetector(mMotionDetectorPreferences[i])) break;
+			for(i=0;i<mMotionDevicePreferences.size();++i){
+				if(createMotionDevice(mMotionDevicePreferences[i])) break;
 			}
 		}
 	}
@@ -162,8 +162,8 @@ void BaseApplication::destroy(){
 	deactivate();
 
 	destroyRendererAndContext();
-	destroyAudioPlayer();
-	destroyMotionDetector();
+	destroyAudioDevice();
+	destroyMotionDevice();
 
 	if(mEngine!=NULL){
 		delete mEngine;
@@ -180,13 +180,13 @@ void BaseApplication::setRendererOptions(int *options,int length){
 	memcpy(mRendererOptions,options,length*sizeof(int));
 }
 
-void BaseApplication::setAudioPlayerOptions(int *options,int length){
-	if(mAudioPlayerOptions!=NULL){
-		delete[] mAudioPlayerOptions;
+void BaseApplication::setAudioDeviceOptions(int *options,int length){
+	if(mAudioDeviceOptions!=NULL){
+		delete[] mAudioDeviceOptions;
 	}
 
-	mAudioPlayerOptions=new int[length];
-	memcpy(mAudioPlayerOptions,options,length*sizeof(int));
+	mAudioDeviceOptions=new int[length];
+	memcpy(mAudioDeviceOptions,options,length*sizeof(int));
 }
 
 RenderTarget *BaseApplication::makeRenderTarget(const String &plugin){
@@ -275,105 +275,105 @@ bool BaseApplication::destroyRendererAndContext(){
 	return true;
 }
 
-AudioPlayer *BaseApplication::makeAudioPlayer(const String &plugin){
-	AudioPlayer *audioPlayer=NULL;
-	Map<String,AudioPlayerPlugin>::iterator it=mAudioPlayerPlugins.find(plugin);
-	if(it!=mAudioPlayerPlugins.end()){
+AudioDevice *BaseApplication::makeAudioDevice(const String &plugin){
+	AudioDevice *audioDevice=NULL;
+	Map<String,AudioDevicePlugin>::iterator it=mAudioDevicePlugins.find(plugin);
+	if(it!=mAudioDevicePlugins.end()){
 		TOADLET_TRY
-			audioPlayer=it->second.createAudioPlayer();
-		TOADLET_CATCH(const Exception &){audioPlayer=NULL;}
+			audioDevice=it->second.createAudioDevice();
+		TOADLET_CATCH(const Exception &){audioDevice=NULL;}
 	}
-	return audioPlayer;
+	return audioDevice;
 }
 
-bool BaseApplication::createAudioPlayer(const String &plugin){
+bool BaseApplication::createAudioDevice(const String &plugin){
 	Logger::debug(Categories::TOADLET_PAD,
-		"BaseApplication: creating AudioPlayer:"+plugin);
+		"BaseApplication: creating AudioDevice:"+plugin);
 
 	bool result=false;
-	mAudioPlayer=makeAudioPlayer(plugin);
-	if(mAudioPlayer!=NULL){
+	mAudioDevice=makeAudioDevice(plugin);
+	if(mAudioDevice!=NULL){
 		TOADLET_TRY
-			result=mAudioPlayer->create(mAudioPlayerOptions);
+			result=mAudioDevice->create(mAudioDeviceOptions);
 		TOADLET_CATCH(const Exception &){result=false;}
 		if(result==false){
-			delete mAudioPlayer;
-			mAudioPlayer=NULL;
+			delete mAudioDevice;
+			mAudioDevice=NULL;
 		}
 	}
 
 	if(result==false){
 		Logger::error(Categories::TOADLET_PAD,
-			"error starting AudioPlayer");
+			"error starting AudioDevice");
 		return false;
 	}
-	else if(mAudioPlayer==NULL){
+	else if(mAudioDevice==NULL){
 		Logger::error(Categories::TOADLET_PAD,
-			"error creating AudioPlayer");
+			"error creating AudioDevice");
 		return false;
 	}
 
-	if(mAudioPlayer!=NULL){
-		mEngine->setAudioPlayer(mAudioPlayer);
+	if(mAudioDevice!=NULL){
+		mEngine->setAudioDevice(mAudioDevice);
 	}
 	return true;
 }
 
-bool BaseApplication::destroyAudioPlayer(){
-	if(mAudioPlayer!=NULL){
-		mEngine->setAudioPlayer(NULL);
-		mAudioPlayer->destroy();
-		delete mAudioPlayer;
-		mAudioPlayer=NULL;
+bool BaseApplication::destroyAudioDevice(){
+	if(mAudioDevice!=NULL){
+		mEngine->setAudioDevice(NULL);
+		mAudioDevice->destroy();
+		delete mAudioDevice;
+		mAudioDevice=NULL;
 	}
 	return true;
 }
 
-MotionDetector *BaseApplication::makeMotionDetector(const String &plugin){
-	MotionDetector *motionDetector=NULL;
-	Map<String,MotionDetectorPlugin>::iterator it=mMotionDetectorPlugins.find(plugin);
-	if(it!=mMotionDetectorPlugins.end()){
+MotionDevice *BaseApplication::makeMotionDevice(const String &plugin){
+	MotionDevice *motionDevice=NULL;
+	Map<String,MotionDevicePlugin>::iterator it=mMotionDevicePlugins.find(plugin);
+	if(it!=mMotionDevicePlugins.end()){
 		TOADLET_TRY
-			motionDetector=it->second.createMotionDetector();
-		TOADLET_CATCH(const Exception &){motionDetector=NULL;}
+			motionDevice=it->second.createMotionDevice();
+		TOADLET_CATCH(const Exception &){motionDevice=NULL;}
 	}
-	return motionDetector;
+	return motionDevice;
 }
 
-bool BaseApplication::createMotionDetector(const String &plugin){
+bool BaseApplication::createMotionDevice(const String &plugin){
 	Logger::debug(Categories::TOADLET_PAD,
-		"BaseApplication: creating MotionDetector:"+plugin);
+		"BaseApplication: creating MotionDevice:"+plugin);
 
 	bool result=false;
-	mMotionDetector=makeMotionDetector(plugin);
-	if(mMotionDetector!=NULL){
+	mMotionDevice=makeMotionDevice(plugin);
+	if(mMotionDevice!=NULL){
 		TOADLET_TRY
-			result=mMotionDetector->create();
+			result=mMotionDevice->create();
 		TOADLET_CATCH(const Exception &){result=false;}
 		if(result==false){
-			delete mMotionDetector;
-			mMotionDetector=NULL;
+			delete mMotionDevice;
+			mMotionDevice=NULL;
 		}
 	}
 
 	if(result==false){
 		Logger::error(Categories::TOADLET_PAD,
-			"error starting MotionDetector");
+			"error starting MotionDevice");
 		return false;
 	}
-	else if(mMotionDetector==NULL){
+	else if(mMotionDevice==NULL){
 		Logger::error(Categories::TOADLET_PAD,
-			"error creating MotionDetector");
+			"error creating MotionDevice");
 		return false;
 	}
 	return true;
 }
 
-bool BaseApplication::destroyMotionDetector(){
-	if(mMotionDetector!=NULL){
-		mMotionDetector->destroy();
-		delete mMotionDetector;
-		mMotionDetector=NULL;
+bool BaseApplication::destroyMotionDevice(){
+	if(mMotionDevice!=NULL){
+		mMotionDevice->destroy();
+		delete mMotionDevice;
+		mMotionDevice=NULL;
 	}
 	return true;
 }

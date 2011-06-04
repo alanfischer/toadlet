@@ -39,7 +39,7 @@ public:
 	Win32Application();
 	virtual ~Win32Application();
 
-	virtual void create(egg::String renderer=(char*)NULL,egg::String audioPlayer=(char*)NULL,egg::String motionDetector=(char*)NULL);
+	virtual void create(egg::String renderer=(char*)NULL,egg::String audioPlayer=(char*)NULL,egg::String motionDevice=(char*)NULL);
 	virtual void destroy();
 
 	virtual void start();

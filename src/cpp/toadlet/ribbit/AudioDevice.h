@@ -23,16 +23,43 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_RIBBIT_H
-#define TOADLET_RIBBIT_H
+#ifndef TOADLET_RIBBIT_AUDIODEVICE_H
+#define TOADLET_RIBBIT_AUDIODEVICE_H
 
 #include <toadlet/ribbit/Audio.h>
 #include <toadlet/ribbit/AudioBuffer.h>
-#include <toadlet/ribbit/AudioDevice.h>
-#include <toadlet/ribbit/AudioStream.h>
-#include <toadlet/ribbit/CapabilitySet.h>
 
-using namespace toadlet;
-using namespace toadlet::ribbit;
+namespace toadlet{
+namespace ribbit{
+
+class CapabilitySet;
+
+class AudioDevice{
+public:
+	virtual ~AudioDevice(){}
+
+	virtual bool create(int *options)=0;
+	virtual void destroy()=0;
+
+	virtual AudioBuffer *createAudioBuffer()=0;
+	virtual Audio *createBufferedAudio()=0;
+	virtual Audio *createStreamingAudio()=0;
+
+	virtual void setListenerTranslate(const ribbit::Vector3 &translate)=0; // Prefix with ribbit for vc6 compatability
+	virtual void setListenerRotate(const ribbit::Matrix3x3 &rotate)=0; // Prefix with ribbit for vc6 compatability
+	virtual void setListenerVelocity(const ribbit::Vector3 &velocity)=0; // Prefix with ribbit for vc6 compatability
+	virtual void setListenerGain(scalar gain)=0;
+
+	virtual void update(int dt)=0;
+
+	virtual void suspend()=0;
+	virtual void resume()=0;
+
+	virtual const CapabilitySet &getCapabilitySet()=0;
+};
+
+}
+}
 
 #endif
+

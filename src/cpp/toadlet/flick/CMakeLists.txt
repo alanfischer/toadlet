@@ -4,16 +4,16 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Version.h.cmake ${CMAKE_CURRENT_BINA
 
 # Source files for toadlet_flick
 set (FLICK_SRC
-	FilteredMotionDetector.cpp
+	FilteredMotionDevice.cpp
 	Version.cpp
 )
 
 
 # Header files for flick
 set (FLICK_HEADERS
-	FilteredMotionDetector.h
-	MotionDetector.h
-	MotionDetectorListener.h
+	FilteredMotionDevice.h
+	MotionDevice.h
+	MotionDeviceListener.h
 	Types.h
 	Version.h
 )
@@ -37,9 +37,9 @@ install (TARGETS toadlet_flick_s DESTINATION lib)
 
 # Platform specific modules
 if (TOADLET_PLATFORM_WINCE)
-	add_subdirectory (plugins/htcmotiondetector)
-	add_subdirectory (plugins/samsungmotiondetector)
+	add_subdirectory (plugins/htcmotiondevice)
+	add_subdirectory (plugins/samsungmotiondevice)
 elseif (TOADLET_PLATFORM_IPHONE)
-	add_subdirectory (plugins/iosmotiondetector)
+	add_subdirectory (plugins/iosmotiondevice)
 endif (TOADLET_PLATFORM_WINCE)
 
