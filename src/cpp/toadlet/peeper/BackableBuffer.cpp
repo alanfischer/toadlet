@@ -26,7 +26,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/image/ImageFormatConversion.h>
 #include <toadlet/peeper/BackableBuffer.h>
-#include <toadlet/peeper/Renderer.h>
+#include <toadlet/peeper/RenderDevice.h>
 #include <string.h> // memcpy
 
 using namespace toadlet::egg;
@@ -214,7 +214,7 @@ void BackableBuffer::setBack(VertexBuffer::ptr back){
 	}
 }
 
-void BackableBuffer::setBack(PixelBuffer::ptr back,Renderer *renderer){
+void BackableBuffer::setBack(PixelBuffer::ptr back,RenderDevice *renderDevice){
 	if(mBack.get()!=back.get() && mBack!=NULL){
 		((PixelBuffer*)(mBack.get()))->destroy();
 	}
@@ -222,7 +222,7 @@ void BackableBuffer::setBack(PixelBuffer::ptr back,Renderer *renderer){
 	mBack=back;
 	
 	if(back!=NULL){
-		int newPixelFormat=renderer->getCloseTextureFormat(mPixelFormat,mUsage);
+		int newPixelFormat=renderDevice->getCloseTextureFormat(mPixelFormat,mUsage);
 
 		back->create(mUsage,mAccess,newPixelFormat,mWidth,mHeight,mDepth);
 

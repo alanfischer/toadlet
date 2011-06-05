@@ -70,7 +70,7 @@ public:
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
-	void render(peeper::Renderer *renderer) const;
+	void render(peeper::RenderDevice *renderDevice) const;
 
 	peeper::VertexBufferAccessor vba;
 

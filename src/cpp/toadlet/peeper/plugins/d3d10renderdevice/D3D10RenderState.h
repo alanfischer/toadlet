@@ -32,11 +32,11 @@
 namespace toadlet{
 namespace peeper{
 
-class D3D10Renderer;
+class D3D10RenderDevice;
 
 class TOADLET_API D3D10RenderState:public RenderState{
 public:
-	D3D10RenderState(D3D10Renderer *renderer):
+	D3D10RenderState(D3D10RenderDevice *renderDevice):
 		mListener(NULL),
 		mBlendState(NULL),
 		mD3DBlendState(NULL),
@@ -46,8 +46,8 @@ public:
 		mD3DRasterizerState(NULL),
 		mMaterialState(NULL)
 	{
-		mRenderer=renderer;
-		mDevice=mRenderer->getD3D10Device();
+		mDevice=renderDevice;
+		mD3DDevice=mDevice->getD3D10Device();
 	}
 	virtual ~D3D10RenderState(){
 		destroy();
@@ -99,24 +99,24 @@ public:
 	void setBlendState(const BlendState &state){
 		if(mBlendState==NULL){mBlendState=new BlendState(state);}else{mBlendState->set(state);}
 		if(mD3DBlendState!=NULL){mD3DBlendState->Release();}
-		D3D10_BLEND_DESC desc; mRenderer->getD3D10_BLEND_DESC(desc,state);
-		mDevice->CreateBlendState(&desc,&mD3DBlendState);
+		D3D10_BLEND_DESC desc; mDevice->getD3D10_BLEND_DESC(desc,state);
+		mD3DDevice->CreateBlendState(&desc,&mD3DBlendState);
 	}
 	bool getBlendState(BlendState &state) const{if(mBlendState==NULL){return false;}else{state.set(*mBlendState);return true;}}
 
 	void setDepthState(const DepthState &state){
 		if(mDepthState==NULL){mDepthState=new DepthState(state);}else{mDepthState->set(state);}
 		if(mD3DDepthStencilState!=NULL){mD3DDepthStencilState->Release();}
-		D3D10_DEPTH_STENCIL_DESC desc; mRenderer->getD3D10_DEPTH_STENCIL_DESC(desc,state);
-		mDevice->CreateDepthStencilState(&desc,&mD3DDepthStencilState);
+		D3D10_DEPTH_STENCIL_DESC desc; mDevice->getD3D10_DEPTH_STENCIL_DESC(desc,state);
+		mD3DDevice->CreateDepthStencilState(&desc,&mD3DDepthStencilState);
 	}
 	bool getDepthState(DepthState &state) const{if(mDepthState==NULL){return false;}else{state.set(*mDepthState);return true;}}
 
 	void setRasterizerState(const RasterizerState &state){
 		if(mRasterizerState==NULL){mRasterizerState=new RasterizerState(state);}else{mRasterizerState->set(state);}
 		if(mD3DRasterizerState!=NULL){mD3DRasterizerState->Release();}
-		D3D10_RASTERIZER_DESC desc; mRenderer->getD3D10_RASTERIZER_DESC(desc,state);
-		mDevice->CreateRasterizerState(&desc,&mD3DRasterizerState);
+		D3D10_RASTERIZER_DESC desc; mDevice->getD3D10_RASTERIZER_DESC(desc,state);
+		mD3DDevice->CreateRasterizerState(&desc,&mD3DRasterizerState);
 	}
 	bool getRasterizerState(RasterizerState &state) const{if(mRasterizerState==NULL){return false;}else{state.set(*mRasterizerState);return true;}}
 
@@ -142,8 +142,8 @@ public:
 			mSamplerStates[i]->set(state);
 		}
 		if(mD3DSamplerStates[i]!=NULL){mD3DSamplerStates[i]->Release();}
-		D3D10_SAMPLER_DESC desc; mRenderer->getD3D10_SAMPLER_DESC(desc,state);
-		mDevice->CreateSamplerState(&desc,&mD3DSamplerStates[i]);
+		D3D10_SAMPLER_DESC desc; mDevice->getD3D10_SAMPLER_DESC(desc,state);
+		mD3DDevice->CreateSamplerState(&desc,&mD3DSamplerStates[i]);
 	}
 	bool getSamplerState(int i,SamplerState &state) const{if(mSamplerStates.size()<=i || mSamplerStates[i]==NULL){return false;}else{state.set(*mSamplerStates[i]);return true;}}
 
@@ -162,8 +162,8 @@ public:
 	bool getTextureState(int i,TextureState &state) const{if(mTextureStates.size()<=i || mTextureStates[i]==NULL){return false;}else{state.set(*mTextureStates[i]);return true;}}
 
 protected:
-	D3D10Renderer *mRenderer;
-	ID3D10Device *mDevice;
+	D3D10RenderDevice *mDevice;
+	ID3D10Device *mD3DDevice;
 
 	RenderStateDestroyedListener *mListener;
 	BlendState *mBlendState;
@@ -178,7 +178,7 @@ protected:
 	egg::Collection<TextureState*> mTextureStates;
 	MaterialState *mMaterialState;
 
-	friend class D3D10Renderer;
+	friend class D3D10RenderDevice;
 };
 
 }

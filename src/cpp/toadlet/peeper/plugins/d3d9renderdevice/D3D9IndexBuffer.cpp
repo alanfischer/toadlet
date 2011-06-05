@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include "D3D9IndexBuffer.h"
-#include "D3D9Renderer.h"
+#include "D3D9RenderDevice.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 
@@ -33,8 +33,8 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
-D3D9IndexBuffer::D3D9IndexBuffer(D3D9Renderer *renderer):
-	mRenderer(NULL),
+D3D9IndexBuffer::D3D9IndexBuffer(D3D9RenderDevice *renderDevice):
+	mDevice(NULL),
 
 	mListener(NULL),
 	mUsage(0),
@@ -51,7 +51,7 @@ D3D9IndexBuffer::D3D9IndexBuffer(D3D9Renderer *renderer):
 	mData(NULL),
 	mBackingData(NULL)
 {
-	mRenderer=renderer;
+	mDevice=renderDevice;
 }
 
 D3D9IndexBuffer::~D3D9IndexBuffer(){
@@ -109,9 +109,9 @@ bool D3D9IndexBuffer::createContext(bool restore){
 		mD3DUsage|=D3DUSAGE_WRITEONLY;
 	}
 
-	mD3DPool=mRenderer->getD3DPOOL(mUsage);
+	mD3DPool=mDevice->getD3DPOOL(mUsage);
 
-	HRESULT result=mRenderer->getDirect3DDevice9()->CreateIndexBuffer(mDataSize,mD3DUsage,mD3DFormat,mD3DPool,&mIndexBuffer TOADLET_SHAREDHANDLE);
+	HRESULT result=mDevice->getDirect3DDevice9()->CreateIndexBuffer(mDataSize,mD3DUsage,mD3DFormat,mD3DPool,&mIndexBuffer TOADLET_SHAREDHANDLE);
 	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: CreateVertexBuffer");
 
 	if(restore && (mUsage&Usage_BIT_DYNAMIC)==0){

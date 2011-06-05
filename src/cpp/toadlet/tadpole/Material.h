@@ -31,7 +31,7 @@
 #include <toadlet/peeper/RenderState.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
-#include <toadlet/peeper/Renderer.h>
+#include <toadlet/peeper/RenderDevice.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -102,7 +102,7 @@ public:
 
 	peeper::RenderState::ptr getRenderState() const{return mRenderState;}
 
-	void setupRenderer(peeper::Renderer *renderer);
+	void setupRenderDevice(peeper::RenderDevice *renderDevice);
 	
 protected:
 	peeper::RenderState::ptr mRenderState;

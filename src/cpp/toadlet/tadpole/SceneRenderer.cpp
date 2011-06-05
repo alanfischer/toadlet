@@ -24,7 +24,8 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Logger.h>
-#include <toadlet/peeper/RendererCaps.h>
+#include <toadlet/peeper/RenderCaps.h>
+#include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/SceneRenderer.h>
 #include <toadlet/tadpole/RenderListener.h>
@@ -47,9 +48,9 @@ SceneRenderer::SceneRenderer(Scene *scene):
 SceneRenderer::~SceneRenderer(){
 }
 
-void SceneRenderer::renderScene(Renderer *renderer,Node *node,CameraNode *camera){
+void SceneRenderer::renderScene(RenderDevice *renderDevice,Node *node,CameraNode *camera){
 	gatherRenderables(mRenderableSet,node,camera);
-	renderRenderables(mRenderableSet,renderer,camera);
+	renderRenderables(mRenderableSet,renderDevice,camera);
 }
 
 void SceneRenderer::gatherRenderables(RenderableSet *set,Node *node,CameraNode *camera){
@@ -73,35 +74,35 @@ void SceneRenderer::gatherRenderables(RenderableSet *set,Node *node,CameraNode *
 	}
 }
 
-void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,CameraNode *camera,bool useMaterials){
+void SceneRenderer::renderRenderables(RenderableSet *set,RenderDevice *renderDevice,CameraNode *camera,bool useMaterials){
 	Matrix4x4 matrix;
 	int i,j;
 
 	RenderListener *listener=mScene->getRenderListener();
 
 	if(listener!=NULL){
-		listener->preRenderRenderables(set,renderer,camera);
+		listener->preRenderRenderables(set,renderDevice,camera);
 	}
 
-	setupViewport(camera,renderer);
+	setupViewport(camera,renderDevice);
 
 	int clearFlags=camera->getClearFlags();
 	if(clearFlags!=0 && !camera->getSkipFirstClear()){
-		renderer->clear(clearFlags,camera->getClearColor());
+		renderDevice->clear(clearFlags,camera->getClearColor());
 	}
 
-	renderer->setProjectionMatrix(camera->getProjectionMatrix());
-	renderer->setViewMatrix(camera->getViewMatrix());
-	renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
+	renderDevice->setProjectionMatrix(camera->getProjectionMatrix());
+	renderDevice->setViewMatrix(camera->getViewMatrix());
+	renderDevice->setModelMatrix(Math::IDENTITY_MATRIX4X4);
 
 	if(useMaterials){
-		renderer->setDefaultState();
+		renderDevice->setDefaultState();
 		if(camera->getDefaultState()!=NULL){
-			renderer->setRenderState(camera->getDefaultState());
+			renderDevice->setRenderState(camera->getDefaultState());
 		}
 	}
 
-	setupLights(set->getLightQueue(),renderer);
+	setupLights(set->getLightQueue(),renderDevice);
 
 	bool renderedDepthSorted=false;
 	const RenderableSet::IndexCollection &sortedIndexes=set->getLayerSortedQueueIndexes();
@@ -111,11 +112,11 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 
 		if(renderedDepthSorted==false && (material!=NULL && material->getLayer()!=0)){
 			renderedDepthSorted=true;
-			renderDepthSortedRenderables(set,renderer,camera,useMaterials);
+			renderDepthSortedRenderables(set,renderDevice,camera,useMaterials);
 		}
 
 		if(useMaterials && material!=NULL){
-			material->setupRenderer(renderer);
+			material->setupRenderDevice(renderDevice);
 		}
 
 		for(i=0;i<renderableQueue.size();++i){
@@ -123,28 +124,28 @@ void SceneRenderer::renderRenderables(RenderableSet *set,Renderer *renderer,Came
 			Renderable *renderable=item.renderable;
 			renderable->getRenderTransform().getMatrix(matrix);
 
-			renderer->setAmbientColor(item.ambient);
-			renderer->setModelMatrix(matrix);
-			renderable->render(renderer);
+			renderDevice->setAmbientColor(item.ambient);
+			renderDevice->setModelMatrix(matrix);
+			renderable->render(renderDevice);
 		}
 
 		if(useMaterials){
 			if(camera->getDefaultState()!=NULL){
-				renderer->setRenderState(camera->getDefaultState());
+				renderDevice->setRenderState(camera->getDefaultState());
 			}
 		}
 	}
 
 	if(renderedDepthSorted==false){
-		renderDepthSortedRenderables(set,renderer,camera,useMaterials);
+		renderDepthSortedRenderables(set,renderDevice,camera,useMaterials);
 	}
 
 	if(listener!=NULL){
-		listener->postRenderRenderables(set,renderer,camera);
+		listener->postRenderRenderables(set,renderDevice,camera);
 	}
 }
 
-void SceneRenderer::renderDepthSortedRenderables(RenderableSet *set,Renderer *renderer,CameraNode *camera,bool useMaterials){
+void SceneRenderer::renderDepthSortedRenderables(RenderableSet *set,RenderDevice *renderDevice,CameraNode *camera,bool useMaterials){
 	Matrix4x4 matrix;
 	int i;
 	const RenderableSet::RenderableQueue &renderableQueue=set->getDepthSortedQueue();
@@ -155,46 +156,42 @@ void SceneRenderer::renderDepthSortedRenderables(RenderableSet *set,Renderer *re
 		renderable->getRenderTransform().getMatrix(matrix);
 
 		if(useMaterials && material!=NULL){
-			material->setupRenderer(renderer);
+			material->setupRenderDevice(renderDevice);
 		}
 
-		renderer->setAmbientColor(item.ambient);
-		renderer->setModelMatrix(matrix);
-		renderable->render(renderer);
+		renderDevice->setAmbientColor(item.ambient);
+		renderDevice->setModelMatrix(matrix);
+		renderable->render(renderDevice);
 
 		if(useMaterials){
 			if(camera->getDefaultState()!=NULL){
-				renderer->setRenderState(camera->getDefaultState());
+				renderDevice->setRenderState(camera->getDefaultState());
 			}
 		}
 	}
 }
 
-void SceneRenderer::setupViewport(CameraNode *camera,Renderer *renderer){
+void SceneRenderer::setupViewport(CameraNode *camera,RenderDevice *renderDevice){
 	if(camera->getViewportSet()){
-		renderer->setViewport(camera->getViewport());
+		renderDevice->setViewport(camera->getViewport());
 	}
 	else{
-		RenderTarget *renderTarget=renderer->getRenderTarget();
-		renderer->setViewport(Viewport(0,0,renderTarget->getWidth(),renderTarget->getHeight()));
+		RenderTarget *renderTarget=renderDevice->getRenderTarget();
+		renderDevice->setViewport(Viewport(0,0,renderTarget->getWidth(),renderTarget->getHeight()));
 	}
 }
 
-void SceneRenderer::setupLights(const RenderableSet::LightQueue &lightQueue,Renderer *renderer){
-	/// @todo: Have the SceneRenderer get notified about Renderer changes so we can cache this
-	RendererCaps caps;
-	renderer->getRendererCaps(caps);
-
+void SceneRenderer::setupLights(const RenderableSet::LightQueue &lightQueue,RenderDevice *renderDevice){
 	int i;
-	int maxLights=caps.maxLights;
+	int maxLights=mScene->getEngine()->getRenderCaps().maxLights;
 	for(i=0;i<maxLights;++i){
 		if(i<lightQueue.size()){
 			LightNode *light=lightQueue[i].light;
-			renderer->setLightState(i,light->getLightState());
-			renderer->setLightEnabled(i,light->getEnabled());
+			renderDevice->setLightState(i,light->getLightState());
+			renderDevice->setLightEnabled(i,light->getEnabled());
 		}
 		else{
-			renderer->setLightEnabled(i,false);
+			renderDevice->setLightEnabled(i,false);
 		}
 	}
 }

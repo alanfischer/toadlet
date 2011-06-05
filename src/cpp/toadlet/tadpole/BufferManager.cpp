@@ -91,17 +91,17 @@ void BufferManager::destroy(){
 
 VertexFormat::ptr BufferManager::createVertexFormat(){
 	VertexFormat::ptr vertexFormat;
-	if(mBackable || mEngine->getRenderer()==NULL){
+	if(mBackable || mEngine->getRenderDevice()==NULL){
 		BackableVertexFormat::ptr backableVertexFormat(new BackableVertexFormat());
 		backableVertexFormat->create();
-		if(mEngine->getRenderer()!=NULL){
-			VertexFormat::ptr back(mEngine->getRenderer()->createVertexFormat());
+		if(mEngine->getRenderDevice()!=NULL){
+			VertexFormat::ptr back(mEngine->getRenderDevice()->createVertexFormat());
 			backableVertexFormat->setBack(back);
 		}
 		vertexFormat=backableVertexFormat;
 	}
 	else{
-		vertexFormat=VertexFormat::ptr(mEngine->getRenderer()->createVertexFormat());
+		vertexFormat=VertexFormat::ptr(mEngine->getRenderDevice()->createVertexFormat());
 		vertexFormat->create();
 	}
 
@@ -112,17 +112,17 @@ VertexFormat::ptr BufferManager::createVertexFormat(){
 
 IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuffer::IndexFormat indexFormat,int size){
 	IndexBuffer::ptr indexBuffer;
-	if(mBackable || mEngine->getRenderer()==NULL){
+	if(mBackable || mEngine->getRenderDevice()==NULL){
 		BackableBuffer::ptr backableBuffer(new BackableBuffer());
 		backableBuffer->create(usage,access,indexFormat,size);
-		if(mEngine->getRenderer()!=NULL){
-			IndexBuffer::ptr back(mEngine->getRenderer()->createIndexBuffer());
+		if(mEngine->getRenderDevice()!=NULL){
+			IndexBuffer::ptr back(mEngine->getRenderDevice()->createIndexBuffer());
 			backableBuffer->setBack(back);
 		}
 		indexBuffer=backableBuffer;
 	}
 	else{
-		indexBuffer=IndexBuffer::ptr(mEngine->getRenderer()->createIndexBuffer());
+		indexBuffer=IndexBuffer::ptr(mEngine->getRenderDevice()->createIndexBuffer());
 		indexBuffer->create(usage,access,indexFormat,size);
 	}
 
@@ -135,17 +135,17 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuff
 
 VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexFormat::ptr vertexFormat,int size){
 	VertexBuffer::ptr vertexBuffer;
-	if(mBackable || mEngine->getRenderer()==NULL){
+	if(mBackable || mEngine->getRenderDevice()==NULL){
 		BackableBuffer::ptr backableBuffer(new BackableBuffer());
 		backableBuffer->create(usage,access,vertexFormat,size);
-		if(mEngine->getRenderer()!=NULL){
-			VertexBuffer::ptr back(mEngine->getRenderer()->createVertexBuffer());
+		if(mEngine->getRenderDevice()!=NULL){
+			VertexBuffer::ptr back(mEngine->getRenderDevice()->createVertexBuffer());
 			backableBuffer->setBack(back);
 		}
 		vertexBuffer=backableBuffer;
 	}
 	else{
-		vertexBuffer=VertexBuffer::ptr(mEngine->getRenderer()->createVertexBuffer());
+		vertexBuffer=VertexBuffer::ptr(mEngine->getRenderDevice()->createVertexBuffer());
 		vertexBuffer->create(usage,access,vertexFormat,size);
 	}
 
@@ -158,17 +158,17 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexF
 
 PixelBuffer::ptr BufferManager::createPixelBuffer(int usage,int access,int pixelFormat,int width,int height,int depth){
 	PixelBuffer::ptr pixelBuffer;
-	if(mBackable || mEngine->getRenderer()==NULL){
+	if(mBackable || mEngine->getRenderDevice()==NULL){
 		BackableBuffer::ptr backableBuffer(new BackableBuffer());
 		backableBuffer->create(usage,access,pixelFormat,width,height,depth);
-		if(mEngine->getRenderer()!=NULL){
-			PixelBuffer::ptr back(mEngine->getRenderer()->createPixelBuffer());
-			backableBuffer->setBack(back,mEngine->getRenderer());
+		if(mEngine->getRenderDevice()!=NULL){
+			PixelBuffer::ptr back(mEngine->getRenderDevice()->createPixelBuffer());
+			backableBuffer->setBack(back,mEngine->getRenderDevice());
 		}
 		pixelBuffer=backableBuffer;
 	}
 	else{
-		pixelBuffer=PixelBuffer::ptr(mEngine->getRenderer()->createPixelBuffer());
+		pixelBuffer=PixelBuffer::ptr(mEngine->getRenderDevice()->createPixelBuffer());
 		pixelBuffer->create(usage,access,pixelFormat,width,height,depth);
 	}
 
@@ -252,14 +252,14 @@ VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBu
 	return vertexBuffer;
 }
 
-void BufferManager::contextActivate(Renderer *renderer){
+void BufferManager::contextActivate(RenderDevice *renderDevice){
 	Logger::debug("BufferManager::contextActivate");
 
 	int i;
 	for(i=0;i<mVertexFormats.size();++i){
 		VertexFormat::ptr vertexFormat=mVertexFormats[i];
 		if(vertexFormat->getRootVertexFormat()!=vertexFormat){
-			VertexFormat::ptr back(renderer->createVertexFormat());
+			VertexFormat::ptr back(renderDevice->createVertexFormat());
 			shared_static_cast<BackableVertexFormat>(vertexFormat)->setBack(back);
 		}
 	}
@@ -267,7 +267,7 @@ void BufferManager::contextActivate(Renderer *renderer){
 	for(i=0;i<mIndexBuffers.size();++i){
 		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
 		if(indexBuffer->getRootIndexBuffer()!=indexBuffer){
-			IndexBuffer::ptr back(renderer->createIndexBuffer());
+			IndexBuffer::ptr back(renderDevice->createIndexBuffer());
 			shared_static_cast<BackableBuffer>(indexBuffer)->setBack(back);
 		}
 	}
@@ -275,7 +275,7 @@ void BufferManager::contextActivate(Renderer *renderer){
 	for(i=0;i<mVertexBuffers.size();++i){
 		VertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
 		if(vertexBuffer->getRootVertexBuffer()!=vertexBuffer){
-			VertexBuffer::ptr back(renderer->createVertexBuffer());
+			VertexBuffer::ptr back(renderDevice->createVertexBuffer());
 			shared_static_cast<BackableBuffer>(vertexBuffer)->setBack(back);
 		}
 	}
@@ -283,13 +283,13 @@ void BufferManager::contextActivate(Renderer *renderer){
 	for(i=0;i<mPixelBuffers.size();++i){
 		PixelBuffer::ptr pixelBuffer=mPixelBuffers[i];
 		if(pixelBuffer->getRootPixelBuffer()!=pixelBuffer){
-			PixelBuffer::ptr back(renderer->createPixelBuffer());
-			shared_static_cast<BackableBuffer>(pixelBuffer)->setBack(back,renderer);
+			PixelBuffer::ptr back(renderDevice->createPixelBuffer());
+			shared_static_cast<BackableBuffer>(pixelBuffer)->setBack(back,renderDevice);
 		}
 	}
 }
 
-void BufferManager::contextDeactivate(Renderer *renderer){
+void BufferManager::contextDeactivate(RenderDevice *renderDevice){
 	Logger::debug("BufferManager::contextDeactivate");
 
 	int i;
@@ -322,7 +322,7 @@ void BufferManager::contextDeactivate(Renderer *renderer){
 	}
 }
 
-void BufferManager::preContextReset(Renderer *renderer){
+void BufferManager::preContextReset(RenderDevice *renderDevice){
 	Logger::debug("BufferManager::preContextReset");
 
 	int i;
@@ -340,7 +340,7 @@ void BufferManager::preContextReset(Renderer *renderer){
 	}
 }
 
-void BufferManager::postContextReset(Renderer *renderer){
+void BufferManager::postContextReset(RenderDevice *renderDevice){
 	Logger::debug("BufferManager::postContextReset");
 
 	int i;
@@ -365,7 +365,7 @@ void BufferManager::bufferDestroyed(Buffer *buffer){
 }
 
 bool BufferManager::useTriFan(){
-	return !mBackable && mEngine->getRendererCaps().triangleFan;
+	return !mBackable && mEngine->getRenderCaps().triangleFan;
 }
 
 }

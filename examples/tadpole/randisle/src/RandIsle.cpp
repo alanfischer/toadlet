@@ -157,56 +157,56 @@ void RandIsle::resized(int width,int height){
 	}
 }
 
-void RandIsle::render(Renderer *renderer){
-	renderer->beginScene();
+void RandIsle::render(RenderDevice *renderDevice){
+	renderDevice->beginScene();
 		/// @todo: This shouldn't be necessary, but depending on the sky to set the contents of the backbuffer doesn't appear to work
-		renderer->clear(ClearFlag_DEPTH|ClearFlag_COLOR,mCamera->getClearColor());
+		renderDevice->clear(ClearFlag_DEPTH|ClearFlag_COLOR,mCamera->getClearColor());
 #if 1
-		mCamera->render(renderer);
+		mCamera->render(renderDevice);
 
 /*		if(mPlayer->getPath()!=NULL){
-			mPredictedMaterial->setupRenderer(renderer);
-			renderer->setViewMatrix(mCamera->getViewMatrix());
-			renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
-			renderer->renderPrimitive(mPredictedVertexData,mPredictedIndexData);
+			mPredictedMaterial->setupRenderDevice(renderDevice);
+			renderDevice->setViewMatrix(mCamera->getViewMatrix());
+			renderDevice->setModelMatrix(Math::IDENTITY_MATRIX4X4);
+			renderDevice->renderPrimitive(mPredictedVertexData,mPredictedIndexData);
 		}
 */
-		mHUD->render(renderer);
+		mHUD->render(renderDevice);
 #else
 mCamera->updateFramesPerSecond();
 
 mScene->getBackground()->setTranslate(mCamera->getWorldTranslate());
 mScene->getBackground()->frameUpdate(0,-1);
 
-renderer->setViewport(mCamera->getViewport());
-renderer->setDefaultStates();
+renderDevice->setViewport(mCamera->getViewport());
+renderDevice->setDefaultStates();
 
-renderer->setProjectionMatrix(mCamera->getProjectionTransform());
-renderer->setViewMatrix(mCamera->getViewTransform());
+renderDevice->setProjectionMatrix(mCamera->getProjectionTransform());
+renderDevice->setViewMatrix(mCamera->getViewTransform());
 Renderable *renderable=mSky->getSkyDome()->getSubMesh(0);
-	renderable->getRenderMaterial()->setupRenderer(renderer);
-	renderer->setModelMatrix(renderable->getRenderTransform());
-	renderable->render(renderer);
+	renderable->getRenderMaterial()->setupRenderDevice(renderDevice);
+	renderDevice->setModelMatrix(renderable->getRenderTransform());
+	renderable->render(renderDevice);
 renderable=mSky->getSun();
-	renderable->getRenderMaterial()->setupRenderer(renderer);
-	renderer->setModelMatrix(renderable->getRenderTransform());
-	renderable->render(renderer);
+	renderable->getRenderMaterial()->setupRenderDevice(renderDevice);
+	renderDevice->setModelMatrix(renderable->getRenderTransform());
+	renderable->render(renderDevice);
 
 Renderable *lastRenderable=renderable;
 
-renderer->setModelMatrix(Math::IDENTITY_MATRIX4X4);
-renderer->setAmbientColor(Colors::GREY);
-renderer->setLight(0,mSky->getLight()->internal_getLight());
-renderer->setLightEnabled(0,true);
+renderDevice->setModelMatrix(Math::IDENTITY_MATRIX4X4);
+renderDevice->setAmbientColor(Colors::GREY);
+renderDevice->setLight(0,mSky->getLight()->internal_getLight());
+renderDevice->setLightEnabled(0,true);
 
 for(int i=0;i<mScene->getRoot()->getNumChildren();++i){
 	Node *child=mScene->getRoot()->getChild(i);
 	if(child->getScope()==Scope_TREE && mCamera->culled(child)==false){
 		Tree *tree=(Tree*)child;
 		renderable=tree->getLowMeshNode()->getSubMesh(0);
-			renderable->getRenderMaterial()->setupRenderer(renderer,lastRenderable->getRenderMaterial());
-			renderer->setModelMatrix(renderable->getRenderTransform());
-			renderable->render(renderer);
+			renderable->getRenderMaterial()->setupRenderDevice(renderDevice,lastRenderable->getRenderMaterial());
+			renderDevice->setModelMatrix(renderable->getRenderTransform());
+			renderable->render(renderDevice);
 			lastRenderable=renderable;
 	}
 }
@@ -215,23 +215,23 @@ for(int i=0;i<mScene->getRoot()->getNumChildren();++i){
 	if(child->getScope()==Scope_TREE && mCamera->culled(child)==false){
 		Tree *tree=(Tree*)child;
 		renderable=tree->getLowMeshNode()->getSubMesh(1);
-			renderable->getRenderMaterial()->setupRenderer(renderer,lastRenderable->getRenderMaterial());
-			renderer->setModelMatrix(renderable->getRenderTransform());
-			renderable->render(renderer);
+			renderable->getRenderMaterial()->setupRenderDevice(renderDevice,lastRenderable->getRenderMaterial());
+			renderDevice->setModelMatrix(renderable->getRenderTransform());
+			renderable->render(renderDevice);
 			lastRenderable=renderable;
 	}
 }
 
 if(mPlayer->getPlayerMeshNode()->getMesh()!=NULL){
 renderable=mPlayer->getPlayerMeshNode()->getSubMesh(0);
-	renderable->getRenderMaterial()->setupRenderer(renderer,lastRenderable->getRenderMaterial());
-	renderer->setModelMatrix(renderable->getRenderTransform());
-	renderable->render(renderer);
+	renderable->getRenderMaterial()->setupRenderDevice(renderDevice,lastRenderable->getRenderMaterial());
+	renderDevice->setModelMatrix(renderable->getRenderTransform());
+	renderable->render(renderDevice);
 	lastRenderable=renderable;
 }
 
-renderer->setFogParameters(Renderer::Fog_LINEAR,mCamera->getFarDist()*7/8,mCamera->getFarDist(),Colors::GREY);
-renderer->setLightEnabled(0,false);
+renderDevice->setFogParameters(renderDevice::Fog_LINEAR,mCamera->getFarDist()*7/8,mCamera->getFarDist(),Colors::GREY);
+renderDevice->setLightEnabled(0,false);
 
 for(int x=-1;x<=1;++x){for(int y=-1;y<=1;++y){
 TerrainPatchNode *terrain=mTerrain->patchAt(x+mTerrain->getTerrainX(),y+mTerrain->getTerrainY());
@@ -242,9 +242,9 @@ TerrainPatchNode *terrain=mTerrain->patchAt(x+mTerrain->getTerrainX(),y+mTerrain
 		terrain->updateWaterIndexBuffers(mCamera);
 
 		renderable=terrain;
-		renderable->getRenderMaterial()->setupRenderer(renderer,lastRenderable->getRenderMaterial());
-		renderer->setModelMatrix(renderable->getRenderTransform());
-		renderable->render(renderer);
+		renderable->getRenderMaterial()->setupRenderDevice(renderDevice,lastRenderable->getRenderMaterial());
+		renderDevice->setModelMatrix(renderable->getRenderTransform());
+		renderable->render(renderDevice);
 		lastRenderable=renderable;
 	}
 }}
@@ -252,24 +252,24 @@ for(int x=-1;x<=1;++x){for(int y=-1;y<=1;++y){
 TerrainPatchNode *terrain=mTerrain->patchAt(x+mTerrain->getTerrainX(),y+mTerrain->getTerrainY());
 	if(mCamera->culled(terrain)==false){
 		renderable=terrain->internal_getWaterRenderable();
-			renderable->getRenderMaterial()->setupRenderer(renderer,lastRenderable->getRenderMaterial());
-			renderer->setModelMatrix(renderable->getRenderTransform());
-			renderable->render(renderer);
+			renderable->getRenderMaterial()->setupRenderDevice(renderDevice,lastRenderable->getRenderMaterial());
+			renderDevice->setModelMatrix(renderable->getRenderTransform());
+			renderable->render(renderDevice);
 			lastRenderable=renderable;
 	}
 }}
 
-renderer->setLightEnabled(0,false);
-renderer->setFogParameters(Renderer::Fog_NONE,0,0,Colors::BLACK);
+renderDevice->setLightEnabled(0,false);
+renderDevice->setFogParameters(RenderDevice::Fog_NONE,0,0,Colors::BLACK);
 
 renderable=mPlayer->getShadowMeshNode()->getSubMesh(0);
-	renderable->getRenderMaterial()->setupRenderer(renderer);
-	renderer->setModelMatrix(renderable->getRenderTransform());
-	renderable->render(renderer);
+	renderable->getRenderMaterial()->setupRenderDevice(renderDevice);
+	renderDevice->setModelMatrix(renderable->getRenderTransform());
+	renderable->render(renderDevice);
 
 #endif
-	renderer->endScene();
-	renderer->swap();
+	renderDevice->endScene();
+	renderDevice->swap();
 }
 
 void RandIsle::update(int dt){
@@ -522,32 +522,6 @@ void RandIsle::keyPressed(int key){
 	else if(key==' '){
 		playerJump();
 	}
-/*
-	else if(key=='f'){
-		if(Resources::instance->grass->getFill()==Renderer::Fill_LINE){
-			Resources::instance->grass->setFill(Renderer::Fill_SOLID);
-			Resources::instance->water->setFill(Renderer::Fill_SOLID);
-			
-			Resources::instance->treeBranch->setFill(Renderer::Fill_SOLID);
-			Resources::instance->treeLeaf->setFill(Renderer::Fill_SOLID);
-
-			Resources::instance->RandIsle->subMeshes[0]->material->setFill(Renderer::Fill_SOLID);
-
-			mSky->getSkyMaterial()->setFill(Renderer::Fill_SOLID);
-		}
-		else{
-			Resources::instance->grass->setFill(Renderer::Fill_LINE);
-			Resources::instance->water->setFill(Renderer::Fill_LINE);
-
-			Resources::instance->treeBranch->setFill(Renderer::Fill_LINE);
-			Resources::instance->treeLeaf->setFill(Renderer::Fill_LINE);
-
-			Resources::instance->RandIsle->subMeshes[0]->material->setFill(Renderer::Fill_LINE);
-
-			mSky->getSkyMaterial()->setFill(Renderer::Fill_LINE);
-		}
-	}
-*/
 }
 
 void RandIsle::keyReleased(int key){

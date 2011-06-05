@@ -32,11 +32,11 @@
 namespace toadlet{
 namespace peeper{
 
-class D3D9Renderer;
+class D3D9RenderDevice;
 
 class TOADLET_API D3D9VertexFormat:public VertexFormat{
 public:
-	D3D9VertexFormat(D3D9Renderer *renderer);
+	D3D9VertexFormat(D3D9RenderDevice *renderDevice);
 	virtual ~D3D9VertexFormat();
 
 	VertexFormat *getRootVertexFormat(){return this;}
@@ -70,7 +70,7 @@ protected:
 	bool createContext();
 	bool destroyContext();
 
-	D3D9Renderer *mRenderer;
+	D3D9RenderDevice *mDevice;
 
 	VertexFormatDestroyedListener *mListener;
 	egg::Collection<int> mSemantics;
@@ -86,7 +86,7 @@ protected:
 		IDirect3DVertexDeclaration9 *mDeclaration;
 	#endif
 
-	friend class D3D9Renderer;
+	friend class D3D9RenderDevice;
 	friend class D3D9VertexBuffer;
 };
 

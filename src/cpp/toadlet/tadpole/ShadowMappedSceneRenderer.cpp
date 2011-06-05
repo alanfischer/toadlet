@@ -56,9 +56,9 @@ ShadowMappedSceneRenderer::ShadowMappedSceneRenderer(Scene *scene):
 ShadowMappedSceneRenderer::~ShadowMappedSceneRenderer(){
 }
 
-void ShadowMappedSceneRenderer::renderScene(Renderer *renderer,Node *node,CameraNode *camera){
+void ShadowMappedSceneRenderer::renderScene(RenderDevice *renderDevice,Node *node,CameraNode *camera){
 	if(mLight==NULL){
-		SceneRenderer::renderScene(renderer,node,camera);
+		SceneRenderer::renderScene(renderDevice,node,camera);
 		return;
 	}
 
@@ -66,25 +66,25 @@ void ShadowMappedSceneRenderer::renderScene(Renderer *renderer,Node *node,Camera
 
 	gatherRenderables(mRenderableSet,node,mLightCamera);
 
-	RenderTarget *oldRenderTarget=renderer->getRenderTarget();
+	RenderTarget *oldRenderTarget=renderDevice->getRenderTarget();
 
-	renderer->setRenderTarget(mShadowTarget);
+	renderDevice->setRenderTarget(mShadowTarget);
 	{
-		renderer->setRenderState(mShadowState);
+		renderDevice->setRenderState(mShadowState);
 
-		renderRenderables(mRenderableSet,renderer,mLightCamera,false);
+		renderRenderables(mRenderableSet,renderDevice,mLightCamera,false);
 	}
-	renderer->swap();
+	renderDevice->swap();
 
 
 	gatherRenderables(mRenderableSet,node,camera);
 
-	renderer->setRenderTarget(oldRenderTarget);
+	renderDevice->setRenderTarget(oldRenderTarget);
 	{
 		// Calculate texture matrix for projection
 		// This matrix takes us from eye space to the light's clip space
 		Matrix4x4 biasMatrix;
-		renderer->getShadowBiasMatrix(mShadowTexture,biasMatrix);
+		renderDevice->getShadowBiasMatrix(mShadowTexture,biasMatrix);
 		Matrix4x4 textureMatrix;
 		Math::mul(textureMatrix,biasMatrix,mLightCamera->getProjectionMatrix());
 		Math::postMul(textureMatrix,mLightCamera->getViewMatrix());
@@ -94,10 +94,10 @@ void ShadowMappedSceneRenderer::renderScene(Renderer *renderer,Node *node,Camera
 		lightTextureState.calculation=TextureState::CalculationType_CAMERASPACE;
 		lightTextureState.matrix.set(textureMatrix);
 		mLightState->setTextureState(0,lightTextureState);
-		renderer->setRenderState(mLightState);
-		renderer->setTexture(0,mShadowTexture);
+		renderDevice->setRenderState(mLightState);
+		renderDevice->setTexture(0,mShadowTexture);
 
-		renderRenderables(mRenderableSet,renderer,camera,false);
+		renderRenderables(mRenderableSet,renderDevice,camera,false);
 	}
 }
 

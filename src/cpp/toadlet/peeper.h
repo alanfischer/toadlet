@@ -40,8 +40,8 @@
 #include <toadlet/peeper/Program.h>
 #include <toadlet/peeper/PointState.h>
 #include <toadlet/peeper/Query.h>
-#include <toadlet/peeper/Renderer.h>
-#include <toadlet/peeper/RendererCaps.h>
+#include <toadlet/peeper/RenderDevice.h>
+#include <toadlet/peeper/RenderCaps.h>
 #include <toadlet/peeper/RenderTarget.h>
 #include <toadlet/peeper/Shader.h>
 #include <toadlet/peeper/Texture.h>

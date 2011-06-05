@@ -30,7 +30,7 @@
 #include <toadlet/egg/Map.h>
 #include <toadlet/egg/String.h>
 #include <toadlet/peeper/RenderTarget.h>
-#include <toadlet/peeper/Renderer.h>
+#include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/peeper/WindowRenderTargetFormat.h>
 #include <toadlet/ribbit/AudioDevice.h>
 #include <toadlet/flick/MotionDevice.h>
@@ -79,7 +79,7 @@ public:
 	BaseApplication();
 	virtual ~BaseApplication(){}
 
-	virtual void create(egg::String renderer,egg::String audioDevice,egg::String motionDevice);
+	virtual void create(egg::String renderDevice,egg::String audioDevice,egg::String motionDevice);
 	virtual void destroy();
 
 	virtual void start()=0;
@@ -124,8 +124,8 @@ public:
 	virtual void setApplicationListener(ApplicationListener *listener){mListener=listener;}
 	virtual ApplicationListener *getApplicationListener() const{return mListener;}
 
-	virtual void changeRendererPlugin(const egg::String &plugin)=0;
-	virtual void setRendererOptions(int *options,int length);
+	virtual void changeRenderDevicePlugin(const egg::String &plugin)=0;
+	virtual void setRenderDeviceOptions(int *options,int length);
 	virtual void setAudioDeviceOptions(int *options,int length);
 
 	virtual void resized(int width,int height)		{if(mListener!=NULL){mListener->resized(width,height);}}
@@ -141,10 +141,10 @@ public:
 	virtual void joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v){if(mListener!=NULL){mListener->joyMoved(x,y,z,r,u,v);}}
 	virtual void joyReleased(int button)			{if(mListener!=NULL){mListener->joyReleased(button);}}
 	virtual void update(int dt)						{if(mListener!=NULL){mListener->update(dt);}}
-	virtual void render(peeper::Renderer *renderer)	{if(mListener!=NULL){mListener->render(renderer);}}
+	virtual void render(peeper::RenderDevice *renderDevice)	{if(mListener!=NULL){mListener->render(renderDevice);}}
 
 	virtual tadpole::Engine *getEngine() const{return mEngine;}
-	virtual peeper::Renderer *getRenderer() const{return mRenderer;}
+	virtual peeper::RenderDevice *getRenderDevice() const{return mRenderDevice;}
 	virtual ribbit::AudioDevice *getAudioDevice() const{return mAudioDevice;}
 	virtual flick::MotionDevice *getMotionDevice() const{return mMotionDevice;}
 
@@ -164,15 +164,15 @@ public:
 	virtual void *getWindowHandle()=0;
 
 protected:
-	class RendererPlugin{
+	class RenderDevicePlugin{
 	public:
-		RendererPlugin(
+		RenderDevicePlugin(
 			peeper::RenderTarget *(*renderTarget)(void *,peeper::WindowRenderTargetFormat *)=NULL,
-			peeper::Renderer *(*renderer)()=NULL
-		):createRenderTarget(renderTarget),createRenderer(renderer){}
+			peeper::RenderDevice *(*renderDevice)()=NULL
+		):createRenderTarget(renderTarget),createRenderDevice(renderDevice){}
 
 		peeper::RenderTarget *(*createRenderTarget)(void *,peeper::WindowRenderTargetFormat *);
-		peeper::Renderer *(*createRenderer)();
+		peeper::RenderDevice *(*createRenderDevice)();
 	};
 
 	class AudioDevicePlugin{
@@ -194,9 +194,9 @@ protected:
 	};
 
 	virtual peeper::RenderTarget *makeRenderTarget(const egg::String &plugin);
-	virtual peeper::Renderer *makeRenderer(const egg::String &plugin);
-	virtual bool createContextAndRenderer(const egg::String &plugin);
-	virtual bool destroyRendererAndContext();
+	virtual peeper::RenderDevice *makeRenderDevice(const egg::String &plugin);
+	virtual bool createContextAndRenderDevice(const egg::String &plugin);
+	virtual bool destroyRenderDeviceAndContext();
 
 	virtual ribbit::AudioDevice *makeAudioDevice(const egg::String &plugin);
 	virtual bool createAudioDevice(const egg::String &plugin);
@@ -210,11 +210,11 @@ protected:
 	peeper::WindowRenderTargetFormat::ptr mFormat;
 	ApplicationListener *mListener;
 
-	egg::Map<egg::String,RendererPlugin> mRendererPlugins;
-	egg::Collection<egg::String> mRendererPreferences;
-	egg::String mCurrentRendererPlugin;
-	egg::String mNewRendererPlugin;
-	int *mRendererOptions;
+	egg::Map<egg::String,RenderDevicePlugin> mRenderDevicePlugins;
+	egg::Collection<egg::String> mRenderDevicePreferences;
+	egg::String mCurrentRenderDevicePlugin;
+	egg::String mNewRenderDevicePlugin;
+	int *mRenderDeviceOptions;
 	egg::Map<egg::String,AudioDevicePlugin> mAudioDevicePlugins;
 	egg::Collection<egg::String> mAudioDevicePreferences;
 	int *mAudioDeviceOptions;
@@ -226,7 +226,7 @@ protected:
 
 	tadpole::Engine *mEngine;
 	peeper::RenderTarget *mRenderTarget;
-	peeper::Renderer *mRenderer;
+	peeper::RenderDevice *mRenderDevice;
 	ribbit::AudioDevice *mAudioDevice;
 	flick::MotionDevice *mMotionDevice;
 };

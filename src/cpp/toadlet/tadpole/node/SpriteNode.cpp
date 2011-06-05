@@ -141,8 +141,8 @@ void SpriteNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 #endif
 }
 
-void SpriteNode::render(Renderer *renderer) const{
-	renderer->renderPrimitive(mVertexData,mIndexData);
+void SpriteNode::render(RenderDevice *renderDevice) const{
+	renderDevice->renderPrimitive(mVertexData,mIndexData);
 }
 
 void SpriteNode::updateSprite(){

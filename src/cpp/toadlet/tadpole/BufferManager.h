@@ -28,7 +28,7 @@
 
 #include <toadlet/peeper/BackableBuffer.h>
 #include <toadlet/peeper/BackableVertexFormat.h>
-#include <toadlet/peeper/Renderer.h>
+#include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
@@ -51,10 +51,10 @@ public:
 	peeper::VertexBuffer::ptr cloneVertexBuffer(peeper::VertexBuffer::ptr oldVertexBuffer,int usage,int access,peeper::VertexFormat::ptr vertexFormat,int size);
 	/// @todo: clonePixelBuffer
 
-	void contextActivate(peeper::Renderer *renderer);
-	void contextDeactivate(peeper::Renderer *renderer);
-	void preContextReset(peeper::Renderer *renderer);
-	void postContextReset(peeper::Renderer *renderer);
+	void contextActivate(peeper::RenderDevice *renderDevice);
+	void contextDeactivate(peeper::RenderDevice *renderDevice);
+	void preContextReset(peeper::RenderDevice *renderDevice);
+	void postContextReset(peeper::RenderDevice *renderDevice);
 
 	void bufferDestroyed(peeper::Buffer *buffer);
 

@@ -52,7 +52,7 @@ using namespace toadlet::tadpole::handler;
 using namespace toadlet::pad;
 
 #if defined(TOADLET_HAS_OPENGL)
-	extern "C" Renderer *new_GLRenderer();
+	extern "C" RenderDevice *new_GLRenderDevice();
 	#if defined(TOADLET_HAS_UIKIT)
 		extern "C" RenderTarget *new_EAGLRenderTarget(void *layer,WindowRenderTargetFormat *format);
 	#else
@@ -144,8 +144,8 @@ rect{
 	int dt=currentTime-mLastTime;
 	if(mApplication->active()){
 		mApplication->update(dt);
-		if(mApplication->getRenderer()!=NULL){
-			mApplication->render(mApplication->getRenderer());
+		if(mApplication->getRenderDevice()!=NULL){
+			mApplication->render(mApplication->getRenderDevice());
 		}
 		if(mApplication->getAudioDevice()!=NULL){
 			mApplication->getAudioDevice()->update(dt);
@@ -164,12 +164,12 @@ rect{
 
 	mApplication->resized(width,height);
 
-	if(mApplication->active() && mApplication->getRenderer()!=NULL){
-		if(mApplication->getEngine()->getRendererCaps().resetOnResize){
-			mApplication->getEngine()->contextReset(mApplication->getRenderer());
+	if(mApplication->active() && mApplication->getRenderDevice()!=NULL){
+		if(mApplication->getEngine()->getRenderDeviceCaps().resetOnResize){
+			mApplication->getEngine()->contextReset(mApplication->getRenderDevice());
 		}
 		mApplication->update(0);
-		mApplication->render(mApplication->getRenderer());
+		mApplication->render(mApplication->getRenderDevice());
 	}
 }
 
@@ -288,11 +288,11 @@ OSXApplication::OSXApplication():
 {
 	#if defined(TOADLET_HAS_OPENGL)
 		#if defined(TOADLET_HAS_UIKIT)
-			mRendererPlugins.add("gl",RendererPlugin(new_EAGLRenderTarget,new_GLRenderer));
+			mRenderDevicePlugins.add("gl",RenderDevicePlugin(new_EAGLRenderTarget,new_GLRenderDevice));
 		#else
-			mRendererPlugins.add("gl",RendererPlugin(new_NSGLRenderTarget,new_GLRenderer));
+			mRenderDevicePlugins.add("gl",RenderDevicePlugin(new_NSGLRenderTarget,new_GLRenderDevice));
 		#endif
-		mRendererPreferences.add("gl");
+		mRenderDevicePreferences.add("gl");
 	#endif
 	
 	#if defined(TOADLET_HAS_OPENAL)
@@ -313,7 +313,7 @@ OSXApplication::OSXApplication():
 OSXApplication::~OSXApplication(){
 	destroy();
 
-	delete[] mRendererOptions;
+	delete[] mRenderDeviceOptions;
 
 	if(mView!=nil){
 		[(ApplicationView*)mView release];
@@ -325,7 +325,7 @@ void OSXApplication::setWindow(void *window){
 	[(NSObject*)mWindow retain];
 }
 
-void OSXApplication::create(String renderer,String audioDevice,String motionDevice){
+void OSXApplication::create(String renderDevice,String audioDevice,String motionDevice){
 	if(mWindow==nil){
 		// This programatic Window creation isn't spectacular, but it's enough to run examples.
 		mPool=[[NSAutoreleasePool alloc] init];
@@ -377,7 +377,7 @@ void OSXApplication::create(String renderer,String audioDevice,String motionDevi
 		[(ApplicationView*)mView windowResized:nil];
 	#endif
 
-	BaseApplication::create(renderer,audioDevice,motionDevice);
+	BaseApplication::create(renderDevice,audioDevice,motionDevice);
 
 	mBundleArchive=OSXBundleArchive::ptr(new OSXBundleArchive());
 	shared_static_cast<OSXBundleArchive>(mBundleArchive)->open([NSBundle mainBundle]);

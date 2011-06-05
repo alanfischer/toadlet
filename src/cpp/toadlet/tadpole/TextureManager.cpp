@@ -96,23 +96,23 @@ Texture::ptr TextureManager::createTexture(int mipLevels,Image::ptr mipImages[])
 Texture::ptr TextureManager::createTexture(int usage,Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]){
 	Logger::debug(Categories::TOADLET_TADPOLE,"TextureManager::createTexture");
 
-	Renderer *renderer=mEngine->getRenderer();
+	RenderDevice *renderDevice=mEngine->getRenderDevice();
 	Texture::ptr texture;
-	if(mBackable || renderer==NULL){
+	if(mBackable || renderDevice==NULL){
 		Logger::debug(Categories::TOADLET_TADPOLE,"creating BackableTexture");
 
 		BackableTexture::ptr backableTexture(new BackableTexture());
 		backableTexture->create(usage,dimension,format,width,height,depth,mipLevels,mipDatas);
-		if(renderer!=NULL){
-			backableTexture->setBack(Texture::ptr(renderer->createTexture()),renderer);
+		if(renderDevice!=NULL){
+			backableTexture->setBack(Texture::ptr(renderDevice->createTexture()),renderDevice);
 		}
 		texture=backableTexture;
 	}
 	else{
 		Logger::debug(Categories::TOADLET_TADPOLE,"creating Texture");
 
-		texture=Texture::ptr(renderer->createTexture());
-		if(BackableTexture::convertCreate(texture,renderer,usage,dimension,format,width,height,depth,mipLevels,mipDatas)==false){
+		texture=Texture::ptr(renderDevice->createTexture());
+		if(BackableTexture::convertCreate(texture,renderDevice,usage,dimension,format,width,height,depth,mipLevels,mipDatas)==false){
 			return NULL;
 		}
 	}
@@ -136,17 +136,17 @@ PixelBufferRenderTarget::ptr TextureManager::createPixelBufferRenderTarget(){
 	Logger::debug(Categories::TOADLET_TADPOLE,"TextureManager::createPixelBufferRenderTarget");
 
 	PixelBufferRenderTarget::ptr renderTarget;
-	if(mBackable || mEngine->getRenderer()==NULL){
+	if(mBackable || mEngine->getRenderDevice()==NULL){
 		BackablePixelBufferRenderTarget::ptr backableRenderTarget(new BackablePixelBufferRenderTarget());
 		backableRenderTarget->create();
-		if(mEngine->getRenderer()!=NULL){
-			PixelBufferRenderTarget::ptr back(mEngine->getRenderer()->createPixelBufferRenderTarget());
+		if(mEngine->getRenderDevice()!=NULL){
+			PixelBufferRenderTarget::ptr back(mEngine->getRenderDevice()->createPixelBufferRenderTarget());
 			backableRenderTarget->setBack(back);
 		}
 		renderTarget=backableRenderTarget;
 	}
 	else{
-		renderTarget=PixelBufferRenderTarget::ptr(mEngine->getRenderer()->createPixelBufferRenderTarget());
+		renderTarget=PixelBufferRenderTarget::ptr(mEngine->getRenderDevice()->createPixelBufferRenderTarget());
 		if(renderTarget->create()==false){
 			return NULL;
 		}
@@ -176,26 +176,26 @@ bool TextureManager::textureLoad(Texture::ptr texture,int pixelFormat,int width,
 	return result;
 }
 
-void TextureManager::contextActivate(Renderer *renderer){
+void TextureManager::contextActivate(RenderDevice *renderDevice){
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
 		if(texture!=NULL && texture->getRootTexture()!=texture){
-			Texture::ptr back(renderer->createTexture());
-			shared_static_cast<BackableTexture>(texture)->setBack(back,renderer);
+			Texture::ptr back(renderDevice->createTexture());
+			shared_static_cast<BackableTexture>(texture)->setBack(back,renderDevice);
 		}
 	}
 
 	for(i=0;i<mRenderTargets.size();++i){
 		PixelBufferRenderTarget::ptr renderTarget=mRenderTargets[i];
 		if(renderTarget!=NULL && renderTarget->getRootRenderTarget()!=renderTarget){
-			PixelBufferRenderTarget::ptr back(renderer->createPixelBufferRenderTarget());
+			PixelBufferRenderTarget::ptr back(renderDevice->createPixelBufferRenderTarget());
 			shared_static_cast<BackablePixelBufferRenderTarget>(renderTarget)->setBack(back);
 		}
 	}
 }
 
-void TextureManager::contextDeactivate(Renderer *renderer){
+void TextureManager::contextDeactivate(RenderDevice *renderDevice){
 	int i;
 	for(i=0;i<mResources.size();++i){
 		Texture::ptr texture=shared_static_cast<Texture>(mResources[i]);
@@ -212,7 +212,7 @@ void TextureManager::contextDeactivate(Renderer *renderer){
 	}
 }
 
-void TextureManager::preContextReset(peeper::Renderer *renderer){
+void TextureManager::preContextReset(peeper::RenderDevice *renderDevice){
 	Logger::debug("TextureManager::preContextReset");
 
 	int i;
@@ -231,7 +231,7 @@ void TextureManager::preContextReset(peeper::Renderer *renderer){
 	}
 }
 
-void TextureManager::postContextReset(peeper::Renderer *renderer){
+void TextureManager::postContextReset(peeper::RenderDevice *renderDevice){
 	Logger::debug("TextureManager::postContextReset");
 
 	int i;

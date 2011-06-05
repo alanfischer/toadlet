@@ -53,7 +53,7 @@ public:
 		Material *getRenderMaterial() const{return material;}
 		const Transform &getRenderTransform() const{return hasOwnTransform?worldTransform:meshNode->getWorldTransform();}
 		const Bound &getRenderBound() const{return hasOwnTransform?worldBound:meshNode->getWorldBound();}
-		void render(peeper::Renderer *renderer) const;
+		void render(peeper::RenderDevice *renderDevice) const;
 
 		Material::ptr material;
 		peeper::IndexData::ptr indexData;

@@ -29,7 +29,7 @@
 namespace toadlet{
 namespace peeper{
 
-class Renderer;
+class RenderDevice;
 
 }
 
@@ -37,13 +37,13 @@ namespace tadpole{
 
 class ContextListener{
 public:
-	virtual void preContextReset(peeper::Renderer *renderer)=0;
-	virtual void postContextReset(peeper::Renderer *renderer)=0;
+	virtual void preContextReset(peeper::RenderDevice *renderDevice)=0;
+	virtual void postContextReset(peeper::RenderDevice *renderDevice)=0;
 	
-	virtual void preContextActivate(peeper::Renderer *renderer)=0;
-	virtual void postContextActivate(peeper::Renderer *renderer)=0;
-	virtual void preContextDeactivate(peeper::Renderer *renderer)=0;
-	virtual void postContextDeactivate(peeper::Renderer *renderer)=0;
+	virtual void preContextActivate(peeper::RenderDevice *renderDevice)=0;
+	virtual void postContextActivate(peeper::RenderDevice *renderDevice)=0;
+	virtual void preContextDeactivate(peeper::RenderDevice *renderDevice)=0;
+	virtual void postContextDeactivate(peeper::RenderDevice *renderDevice)=0;
 };
 
 }

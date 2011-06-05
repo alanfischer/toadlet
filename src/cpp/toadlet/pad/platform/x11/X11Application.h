@@ -39,7 +39,7 @@ public:
 	X11Application();
 	virtual ~X11Application();
 
-	virtual void create(egg::String renderer=(char*)NULL,egg::String audioDevice=(char*)NULL,egg::String motionDevice=(char*)NULL);
+	virtual void create(egg::String renderDevice=(char*)NULL,egg::String audioDevice=(char*)NULL,egg::String motionDevice=(char*)NULL);
 	virtual void destroy();
 
 	virtual void start();
@@ -74,7 +74,7 @@ public:
 	virtual void setDifferenceMouse(bool difference);
 	virtual bool getDifferenceMouse() const{return mDifferenceMouse;}
 
-	virtual void changeRendererPlugin(const egg::String &plugin){}
+	virtual void changeRenderDevicePlugin(const egg::String &plugin){}
 
 	virtual void *getWindowHandle(){return getWindow();}
 	void *getDisplay() const;
@@ -92,9 +92,9 @@ protected:
 
 	// Keeping our custom versions of these until we can unify the GLXRenderTargetWindow's constructor
 	peeper::RenderTarget *makeRenderTarget();
-	peeper::Renderer *makeRenderer();
-	bool createContextAndRenderer(const egg::String &plugin);
-	bool destroyRendererAndContext();
+	peeper::RenderDevice *makeRenderDevice();
+	bool createContextAndRenderDevice(const egg::String &plugin);
+	bool destroyRenderDeviceAndContext();
 
 	static int translateKey(int key);
 

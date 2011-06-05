@@ -42,7 +42,7 @@ public:
 	void setLight(node::LightNode *light){mLight=light;}
 	node::LightNode *getLight() const{return mLight;}
 
-	void renderScene(peeper::Renderer *renderer,node::Node *node,node::CameraNode *camera);
+	void renderScene(peeper::RenderDevice *renderDevice,node::Node *node,node::CameraNode *camera);
 
 protected:
 	peeper::Texture::ptr mShadowTexture;

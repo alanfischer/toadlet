@@ -29,7 +29,7 @@
 namespace toadlet{
 namespace peeper{
 
-class Renderer;
+class RenderDevice;
 
 }
 
@@ -52,7 +52,7 @@ public:
 	virtual void joyMoved(scalar x,scalar y,scalar z,scalar r,scalar u,scalar v)=0;
 	virtual void joyReleased(int button)=0;
 	virtual void update(int dt)=0;
-	virtual void render(peeper::Renderer *renderer)=0;
+	virtual void render(peeper::RenderDevice *renderDevice)=0;
 };
 
 }

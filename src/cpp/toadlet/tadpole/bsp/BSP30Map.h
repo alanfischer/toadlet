@@ -61,7 +61,7 @@ public:
 	void updateFaceLights(int faceIndex);
 
 	// This assumes the material has already been set, and just sets the lightmap
-	void renderFaces(peeper::Renderer *renderer,facedata *faces);
+	void renderFaces(peeper::RenderDevice *renderDevice,facedata *faces);
 
 	static int findPointLeaf(bplane *planes,void *hull,int hullStride,int index,const Vector3 &point);
 	static bool hullTrace(Collision &result,bplane *planes,bleaf *leafs,void *hull,int hullStride,int index,scalar p1t,scalar p2t,const Vector3 &p1,const Vector3 &p2,scalar epsilon,int stopContentsBits,int *lastIndex);

@@ -31,7 +31,7 @@
 namespace toadlet{
 namespace peeper{
 
-class Renderer;
+class RenderDevice;
 
 }
 namespace tadpole{
@@ -47,7 +47,7 @@ public:
 	virtual Material *getRenderMaterial() const=0;
 	virtual const Transform &getRenderTransform() const=0;
 	virtual const Bound &getRenderBound() const=0;
-	virtual void render(peeper::Renderer *renderer) const=0;
+	virtual void render(peeper::RenderDevice *renderDevice) const=0;
 };
 	
 #if defined(TOADLET_GCC_INHERITANCE_BUG)
@@ -59,7 +59,7 @@ public:
 	Material *getRenderMaterial() const{return renderable->getRenderMaterial();}
 	const Transform &getRenderTransform() const{return renderable->getRenderTransform();}
 	const Bound &getRenderBound() const{return renderable->getRenderBound();}
-	void render(peeper::Renderer *renderer) const{renderable->render(renderer);}
+	void render(peeper::RenderDevice *renderDevice) const{renderable->render(renderDevice);}
 };
 #define TOADLET_GIB_DEFINE(type) toadlet::tadpole::RenderableWorkaround<type> renderable;
 #define TOADLET_GIB_IMPLEMENT() renderable(this),

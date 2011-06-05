@@ -45,7 +45,7 @@ namespace peeper{
 #if !defined(TOADLET_SET_D3D10)
 	#define D3D10Buffer					D3D11Buffer
 	#define D3D10Query					D3D11Query
-	#define D3D10Renderer				D3D11Renderer
+	#define D3D10RenderDevice			D3D11RenderDevice
 	#define D3D10RenderTarget			D3D11RenderTarget
 	#define D3D10TextureMipPixelBuffer	D3D11TextureMipPixelBuffer
 	#define D3D10PixelBufferRenderTarget D3D11PixelBufferRenderTarget

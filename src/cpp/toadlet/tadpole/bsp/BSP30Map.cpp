@@ -285,15 +285,15 @@ void BSP30Map::updateFaceLights(int faceIndex){
 	lightmapDirties[faced->lightmapIndex]=true;
 }
 
-void BSP30Map::renderFaces(Renderer *renderer,facedata *face){
+void BSP30Map::renderFaces(RenderDevice *renderDevice,facedata *face){
 	int lastLightmapIndex=-1;
 	while(face!=NULL){
 		if(face->visible){
 			if(lastLightmapIndex!=face->lightmapIndex){
 				lastLightmapIndex=face->lightmapIndex;
-				renderer->setTexture(1,lightmapTextures[face->lightmapIndex]);
+				renderDevice->setTexture(1,lightmapTextures[face->lightmapIndex]);
 			}
-			renderer->renderPrimitive(vertexData,face->indexData);
+			renderDevice->renderPrimitive(vertexData,face->indexData);
 		}
 		face=face->next;
 	}

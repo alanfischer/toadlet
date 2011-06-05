@@ -135,7 +135,7 @@ public:
 	Material *getRenderMaterial() const{return mSkeletonMaterial;}
 	const Transform &getRenderTransform() const;
 	const Bound &getRenderBound() const;
-	void render(peeper::Renderer *renderer) const;
+	void render(peeper::RenderDevice *renderDevice) const;
 
 	// Attachable
 	int getNumAttachments(){return mBones.size();}

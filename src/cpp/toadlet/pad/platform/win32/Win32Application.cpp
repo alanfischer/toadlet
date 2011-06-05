@@ -34,7 +34,7 @@
 	#pragma comment(lib,"aygshell.lib")
 #endif
 
-#include <toadlet/peeper/plugins/glrenderer/GLRenderTarget.h>
+#include <toadlet/peeper/plugins/glrenderdevice/GLRenderTarget.h>
 
 #ifndef WM_MOUSEWHEEL
 	#define WM_MOUSEWHEEL 0x020A
@@ -69,8 +69,8 @@ using namespace toadlet::tadpole;
 using namespace toadlet::tadpole::handler;
 
 #if defined(TOADLET_HAS_OPENGL)
-	#pragma comment(lib,"toadlet_peeper_glrenderer" TOADLET_LIBRARY_EXTENSION)
-	extern "C" Renderer *new_GLRenderer();
+	#pragma comment(lib,"toadlet_peeper_glrenderdevice" TOADLET_LIBRARY_EXTENSION)
+	extern "C" RenderDevice *new_GLRenderDevice();
 	#if defined(TOADLET_PLATFORM_WINCE)
 		extern "C" RenderTarget *new_EGLWindowRenderTarget(void *window,WindowRenderTargetFormat *format);
 	#else
@@ -78,23 +78,23 @@ using namespace toadlet::tadpole::handler;
 	#endif
 #endif
 #if defined(TOADLET_HAS_D3DM)
-	#pragma comment(lib,"toadlet_peeper_d3dmrenderer" TOADLET_LIBRARY_EXTENSION)
-	extern "C" Renderer *new_D3DMRenderer();
+	#pragma comment(lib,"toadlet_peeper_d3dmrenderdevice" TOADLET_LIBRARY_EXTENSION)
+	extern "C" RenderDevice *new_D3DMRenderDevice();
 	extern "C" RenderTarget *new_D3DMWindowRenderTarget(void *window,WindowRenderTargetFormat *format);
 #endif
 #if defined(TOADLET_HAS_D3D9)
-	#pragma comment(lib,"toadlet_peeper_d3d9renderer" TOADLET_LIBRARY_EXTENSION)
-	extern "C" Renderer *new_D3D9Renderer();
+	#pragma comment(lib,"toadlet_peeper_d3d9renderdevice" TOADLET_LIBRARY_EXTENSION)
+	extern "C" RenderDevice *new_D3D9RenderDevice();
 	extern "C" RenderTarget *new_D3D9WindowRenderTarget(void *window,WindowRenderTargetFormat *format);
 #endif
 #if defined(TOADLET_HAS_D3D10)
-	#pragma comment(lib,"toadlet_peeper_d3d10renderer" TOADLET_LIBRARY_EXTENSION)
-	extern "C" Renderer *new_D3D10Renderer();
+	#pragma comment(lib,"toadlet_peeper_d3d10renderdevice" TOADLET_LIBRARY_EXTENSION)
+	extern "C" RenderDevice *new_D3D10RenderDevice();
 	extern "C" RenderTarget *new_D3D10WindowRenderTarget(void *window,WindowRenderTargetFormat *format);
 #endif
 #if defined(TOADLET_HAS_D3D11)
-	#pragma comment(lib,"toadlet_peeper_d3d11renderer" TOADLET_LIBRARY_EXTENSION)
-	extern "C" Renderer *new_D3D11Renderer();
+	#pragma comment(lib,"toadlet_peeper_d3d11renderdevice" TOADLET_LIBRARY_EXTENSION)
+	extern "C" RenderDevice *new_D3D11RenderDevice();
 	extern "C" RenderTarget *new_D3D11WindowRenderTarget(void *window,WindowRenderTargetFormat *format);
 #endif
 #if defined(TOADLET_PLATFORM_WIN32)
@@ -174,32 +174,32 @@ Win32Application::Win32Application():
 	#endif
 
 	#if defined(TOADLET_HAS_OPENGL)
-		mRendererPlugins.add("gl",RendererPlugin(
+		mRenderDevicePlugins.add("gl",RenderDevicePlugin(
 			#if defined(TOADLET_PLATFORM_WINCE)
 				new_EGLWindowRenderTarget
 			#else
 				new_WGLWindowRenderTarget
 			#endif
-			,new_GLRenderer
+			,new_GLRenderDevice
 		));
 	#endif
 	#if defined(TOADLET_HAS_D3DM)
-		mRendererPlugins.add("d3dm",RendererPlugin(new_D3DMWindowRenderTarget,new_D3DMRenderer));
+		mRenderDevicePlugins.add("d3dm",RenderDevicePlugin(new_D3DMWindowRenderTarget,new_D3DMRenderDevice));
 	#endif
 	#if defined(TOADLET_HAS_D3D9)
-		mRendererPlugins.add("d3d9",RendererPlugin(new_D3D9WindowRenderTarget,new_D3D9Renderer));
+		mRenderDevicePlugins.add("d3d9",RenderDevicePlugin(new_D3D9WindowRenderTarget,new_D3D9RenderDevice));
 	#endif
 	#if defined(TOADLET_HAS_D3D10)
-		mRendererPlugins.add("d3d10",RendererPlugin(new_D3D10WindowRenderTarget,new_D3D10Renderer));
+		mRenderDevicePlugins.add("d3d10",RenderDevicePlugin(new_D3D10WindowRenderTarget,new_D3D10RenderDevice));
 	#endif
 	#if defined(TOADLET_HAS_D3D11)
-		mRendererPlugins.add("d3d11",RendererPlugin(new_D3D11WindowRenderTarget,new_D3D11Renderer));
+		mRenderDevicePlugins.add("d3d11",RenderDevicePlugin(new_D3D11WindowRenderTarget,new_D3D11RenderDevice));
 	#endif
-	mRendererPreferences.add("gl");
-	mRendererPreferences.add("d3d9");
-	mRendererPreferences.add("d3dm");
-	mRendererPreferences.add("d3d10");
-	mRendererPreferences.add("d3d11");
+	mRenderDevicePreferences.add("gl");
+	mRenderDevicePreferences.add("d3d9");
+	mRenderDevicePreferences.add("d3dm");
+	mRenderDevicePreferences.add("d3d10");
+	mRenderDevicePreferences.add("d3d11");
 
 	#if defined(TOADLET_HAS_OPENAL)
 		mAudioDevicePlugins.add("al",AudioDevicePlugin(new_ALAudioDevice));
@@ -221,13 +221,13 @@ Win32Application::Win32Application():
 Win32Application::~Win32Application(){
 	destroy();
 
-	delete[] mRendererOptions;
+	delete[] mRenderDeviceOptions;
 	delete[] mAudioDeviceOptions;
 
 	delete win32;
 }
 
-void Win32Application::create(String renderer,String audioDevice,String motionDevice){
+void Win32Application::create(String renderDevice,String audioDevice,String motionDevice){
 	mContextActive=true;
 
 	/// @todo: The Joystick/Keyboard/Mouse input should be moved to an input abstraction class useabout outside of pad or at least the Application class
@@ -250,7 +250,7 @@ void Win32Application::create(String renderer,String audioDevice,String motionDe
 
 	createWindow();
 	
-	BaseApplication::create(renderer,audioDevice,motionDevice);
+	BaseApplication::create(renderDevice,audioDevice,motionDevice);
 
 	mResourceArchive=Win32ResourceArchive::ptr(new Win32ResourceArchive(mEngine->getTextureManager()));
 	mResourceArchive->open(win32->mInstance);
@@ -287,13 +287,13 @@ void Win32Application::runEventLoop(){
 
 			update(dt);
 
-			if(mRenderer!=NULL){
-				if(mRenderer->getStatus()==Renderer::RendererStatus_NEEDSRESET){
-					mEngine->contextReset(mRenderer);
+			if(mRenderDevice!=NULL){
+				if(mRenderDevice->getStatus()==RenderDevice::DeviceStatus_NEEDSRESET){
+					mEngine->contextReset(mRenderDevice);
 				}
 
 				if(mWidth>0 && mHeight>0){
-					render(mRenderer);
+					render(mRenderDevice);
 				}
 			}
 
@@ -346,10 +346,10 @@ void Win32Application::stepEventLoop(){
 		memcpy(lastJoyInfo,joyInfo,sizeof(JOYINFOEX));
 	}
 
-	if(mCurrentRendererPlugin!=mNewRendererPlugin){
-		destroyRendererAndContext();
-		mCurrentRendererPlugin=mNewRendererPlugin;
-		createContextAndRenderer(mCurrentRendererPlugin);
+	if(mCurrentRenderDevicePlugin!=mNewRenderDevicePlugin){
+		destroyRenderDeviceAndContext();
+		mCurrentRenderDevicePlugin=mNewRenderDevicePlugin;
+		createContextAndRenderDevice(mCurrentRenderDevicePlugin);
 	}
 }
 
@@ -634,25 +634,25 @@ void Win32Application::internal_resize(int width,int height){
 	resized(width,height);
 
 	bool visible=(width>0 && height>0);
-	if(mActive && mRenderer!=NULL){
-		if(mEngine->getRendererCaps().resetOnResize){
+	if(mActive && mRenderDevice!=NULL){
+		if(mEngine->getRenderCaps().resetOnResize){
 			if(mContextActive==false && visible==true){
-				mEngine->contextDeactivate(mRenderer);
+				mEngine->contextDeactivate(mRenderDevice);
 				mContextActive=true;
 			}
 			else if(mContextActive==true && visible==false){
-				mEngine->contextDeactivate(mRenderer);
+				mEngine->contextDeactivate(mRenderDevice);
 				mContextActive=false;
 			}
 			else if(visible){
-				mEngine->contextReset(mRenderer);
+				mEngine->contextReset(mRenderDevice);
 			}
 		}
 		
 		update(0);
 
 		if(width>0 && height>0){
-			render(mRenderer);
+			render(mRenderDevice);
 		}
 	}
 }

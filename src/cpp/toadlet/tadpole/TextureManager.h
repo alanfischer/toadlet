@@ -26,7 +26,7 @@
 #ifndef TOADLET_TADPOLE_TEXTUREMANAGER_H
 #define TOADLET_TADPOLE_TEXTUREMANAGER_H
 
-#include <toadlet/peeper/Renderer.h>
+#include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/peeper/BackableTexture.h>
 #include <toadlet/peeper/PixelBufferRenderTarget.h>
 #include <toadlet/tadpole/ResourceManager.h>
@@ -54,10 +54,10 @@ public:
 
 	bool textureLoad(peeper::Texture::ptr texture,int pixelFormat,int width,int height,int depth,int mipLevel,tbyte *mipData);
 
-	void contextActivate(peeper::Renderer *renderer);
-	void contextDeactivate(peeper::Renderer *renderer);
-	void preContextReset(peeper::Renderer *renderer);
-	void postContextReset(peeper::Renderer *renderer);
+	void contextActivate(peeper::RenderDevice *renderDevice);
+	void contextDeactivate(peeper::RenderDevice *renderDevice);
+	void preContextReset(peeper::RenderDevice *renderDevice);
+	void postContextReset(peeper::RenderDevice *renderDevice);
 
 	void renderTargetDestroyed(peeper::RenderTarget *renderTarget);
 

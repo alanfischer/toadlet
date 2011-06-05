@@ -28,7 +28,7 @@
 
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/Texture.h>
-#include <toadlet/peeper/Renderer.h>
+#include <toadlet/peeper/RenderDevice.h>
 
 namespace toadlet{
 namespace peeper{
@@ -62,12 +62,12 @@ public:
 	virtual bool load(int width,int height,int depth,int mipLevel,tbyte *mipData);
 	virtual bool read(int width,int height,int depth,int mipLevel,tbyte *mipData);
 
-	virtual void setBack(Texture::ptr back,Renderer *renderer);
+	virtual void setBack(Texture::ptr back,RenderDevice *renderDevice);
 	virtual Texture::ptr getBack(){return mBack;}
 
 	static bool convertLoad(Texture::ptr texture,int format,int width,int height,int depth,int mipLevel,tbyte *mipData);
 	static bool convertRead(Texture::ptr texture,int format,int width,int height,int depth,int mipLevel,tbyte *mipData);
-	static bool convertCreate(Texture::ptr texture,Renderer *renderer,int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]);
+	static bool convertCreate(Texture::ptr texture,RenderDevice *renderDevice,int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]);
 
 protected:
 	static void convertAndScale(tbyte *src,int srcFormat,int srcWidth,int srcHeight,int srcDepth,tbyte *dst,int dstFormat,int dstWidth,int dstHeight,int dstDepth);

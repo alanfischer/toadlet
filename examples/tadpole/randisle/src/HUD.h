@@ -17,7 +17,7 @@ public:
 
 	void setProjectionOrtho(scalar leftDist,scalar rightDist,scalar bottomDist,scalar topDist,scalar nearDist,scalar farDist);
 
-	void render(Renderer *renderer){super::render(renderer,this);}
+	void render(RenderDevice *renderDevice){super::render(renderDevice,this);}
 
 	void updateAcornCount(int count);
 

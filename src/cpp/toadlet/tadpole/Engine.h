@@ -27,13 +27,13 @@
 #define TOADLET_TADPOLE_ENGINE_H
 
 #include <toadlet/egg/Categories.h>
-#include <toadlet/peeper/Renderer.h>
+#include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/peeper/Shader.h>
 #include <toadlet/peeper/Program.h>
-#include <toadlet/peeper/RendererCaps.h>
+#include <toadlet/peeper/RenderCaps.h>
 #include <toadlet/ribbit/AudioDevice.h>
 #include <toadlet/ribbit/AudioBuffer.h>
 #include <toadlet/tadpole/Types.h>
@@ -61,8 +61,8 @@ public:
 
 	void destroy();
 
-	bool setRenderer(peeper::Renderer *renderer);
-	peeper::Renderer *getRenderer() const;
+	bool setRenderDevice(peeper::RenderDevice *renderDevice);
+	peeper::RenderDevice *getRenderDevice() const;
 	void updateVertexFormats();
 
 	bool setAudioDevice(ribbit::AudioDevice *audioDevice);
@@ -89,16 +89,16 @@ public:
 	inline node::Node *getNodeByHandle(int handle){return (handle>=0 && handle<mHandles.size())?mHandles[handle]:NULL;}
 
 	// Context methods
-	void contextReset(peeper::Renderer *renderer);
-	void contextActivate(peeper::Renderer *renderer);
-	void contextDeactivate(peeper::Renderer *renderer);
+	void contextReset(peeper::RenderDevice *renderDevice);
+	void contextActivate(peeper::RenderDevice *renderDevice);
+	void contextDeactivate(peeper::RenderDevice *renderDevice);
 
 	void addContextListener(ContextListener *listener){mContextListeners.add(listener);}
 	void removeContextListener(ContextListener *listener){mContextListeners.remove(listener);}
 
 	int getIdealVertexFormatBit() const{return mIdealVertexFormatBit;}
 	const VertexFormats &getVertexFormats() const{return mVertexFormats;}
-	const peeper::RendererCaps &getRendererCaps() const{return mRendererCaps;}
+	const peeper::RenderCaps &getRenderCaps() const{return mRenderCaps;}
 
 	inline ArchiveManager *getArchiveManager() const{return mArchiveManager;}
 	inline TextureManager *getTextureManager() const{return mTextureManager;}
@@ -114,8 +114,8 @@ public:
 protected:
 	bool mBackable;
 	egg::String mDirectory;
-	peeper::Renderer *mRenderer;
-	peeper::Renderer *mLastRenderer;
+	peeper::RenderDevice *mRenderDevice;
+	peeper::RenderDevice *mLastRenderDevice;
 	ribbit::AudioDevice *mAudioDevice;
 	ribbit::AudioDevice *mLastAudioDevice;
 
@@ -123,7 +123,7 @@ protected:
 
 	int mIdealVertexFormatBit;
 	VertexFormats mVertexFormats;
-	peeper::RendererCaps mRendererCaps;
+	peeper::RenderCaps mRenderCaps;
 
 	ArchiveManager *mArchiveManager;
 	TextureManager *mTextureManager;

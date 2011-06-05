@@ -26,8 +26,8 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/System.h>
 #if defined(TOADLET_HAS_OPENGL)
-	#include <toadlet/peeper/plugins/glrenderer/GLRenderer.h>
-	#include <toadlet/peeper/plugins/glrenderer/platform/glx/GLXWindowRenderTarget.h>
+	#include <toadlet/peeper/plugins/glrenderdevice/GLRenderDevice.h>
+	#include <toadlet/peeper/plugins/glrenderdevice/platform/glx/GLXWindowRenderTarget.h>
 #endif
 #if defined(TOADLET_HAS_OPENAL)
 	#include <toadlet/ribbit/plugins/alaudiodevice/ALAudioDevice.h>
@@ -105,15 +105,15 @@ X11Application::X11Application():
 X11Application::~X11Application(){
 	destroy();
 
-	delete[] mRendererOptions;
+	delete[] mRenderDeviceOptions;
 
 	delete x11;
 }
 
-void X11Application::create(String renderer,String audioDevice,String motionDevice){
+void X11Application::create(String renderDevice,String audioDevice,String motionDevice){
 	createWindow();
 
-	BaseApplication::create(renderer,audioDevice,motionDevice);
+	BaseApplication::create(renderDevice,audioDevice,motionDevice);
 }
 
 void X11Application::destroy(){
@@ -140,8 +140,8 @@ void X11Application::runEventLoop(){
 		uint64 currentTime=System::mtime();
 		int dt=currentTime-lastTime;
 		update(dt);
-		if(mRenderer!=NULL){
-			render(mRenderer);
+		if(mRenderDevice!=NULL){
+			render(mRenderDevice);
 		}
 		if(mAudioDevice!=NULL){
 			mAudioDevice->update(dt);
@@ -579,36 +579,36 @@ RenderTarget *X11Application::makeRenderTarget(){
 	#endif
 }
 
-Renderer *X11Application::makeRenderer(){
+RenderDevice *X11Application::makeRenderDevice(){
 	#if defined(TOADLET_HAS_OPENGL)
-		return new GLRenderer();
+		return new GLRenderDevice();
 	#else
 		return NULL;
 	#endif
 }
 
-bool X11Application::createContextAndRenderer(const String &plugin){
+bool X11Application::createContextAndRenderDevice(const String &plugin){
 	RenderTarget *renderTarget=makeRenderTarget();
 	if(renderTarget!=NULL){
 		mRenderTarget=renderTarget;
 
-		mRenderer=makeRenderer();
-		if(mRenderer!=NULL){
-			if(mRenderer->create(this,mRendererOptions)==false){
-				delete mRenderer;
-				mRenderer=NULL;
+		mRenderDevice=makeRenderDevice();
+		if(mRenderDevice!=NULL){
+			if(mRenderDevice->create(this,mRenderDeviceOptions)==false){
+				delete mRenderDevice;
+				mRenderDevice=NULL;
 				Error::unknown(Categories::TOADLET_PAD,
-					"error starting Renderer");
+					"error starting RenderDevice");
 				return false;
 			}
 		}
 		else{
 			Error::unknown(Categories::TOADLET_PAD,
-				"error creating Renderer");
+				"error creating RenderDevice");
 			return false;
 		}
 
-		if(mRenderer==NULL){
+		if(mRenderDevice==NULL){
 			delete mRenderTarget;
 			mRenderTarget=NULL;
 		}
@@ -619,21 +619,21 @@ bool X11Application::createContextAndRenderer(const String &plugin){
 		return false;
 	}
 
-	if(mRenderer!=NULL){
-		mRenderer->setRenderTarget(this);
-		mEngine->setRenderer(mRenderer);
+	if(mRenderDevice!=NULL){
+		mRenderDevice->setRenderTarget(this);
+		mEngine->setRenderDevice(mRenderDevice);
 	}
 
-	return mRenderer!=NULL;
+	return mRenderDevice!=NULL;
 }
 
-bool X11Application::destroyRendererAndContext(){
-	if(mRenderer!=NULL){
-		mEngine->setRenderer(NULL);
+bool X11Application::destroyRenderDeviceAndContext(){
+	if(mRenderDevice!=NULL){
+		mEngine->setRenderDevice(NULL);
 
-		mRenderer->destroy();
-		delete mRenderer;
-		mRenderer=NULL;
+		mRenderDevice->destroy();
+		delete mRenderDevice;
+		mRenderDevice=NULL;
 	}
 
 	if(mRenderTarget!=NULL){
@@ -682,12 +682,12 @@ void X11Application::configured(int x,int y,int width,int height){
 
 		resized(width,height);
 
-		if(mActive && mRenderer!=NULL){
-			if(mEngine->getRendererCaps().resetOnResize){
-				mEngine->contextReset(mRenderer);
+		if(mActive && mRenderDevice!=NULL){
+			if(mEngine->getRenderCaps().resetOnResize){
+				mEngine->contextReset(mRenderDevice);
 			}
 			update(0);
-			render(mRenderer);
+			render(mRenderDevice);
 		}
 	}
 }

@@ -38,7 +38,7 @@ public:
 	virtual ~OSXApplication();
 
 	virtual void setWindow(void *window);
-	virtual void create(egg::String renderer=(char*)NULL,egg::String audioDevice=(char*)NULL,egg::String motionDevice=(char*)NULL);
+	virtual void create(egg::String renderDevice=(char*)NULL,egg::String audioDevice=(char*)NULL,egg::String motionDevice=(char*)NULL);
 	virtual void destroy();
 	
 	virtual void start();
@@ -75,7 +75,7 @@ public:
 
 	static int translateKey(int key);
 
-	virtual void changeRendererPlugin(const egg::String &plugin){}
+	virtual void changeRenderDevicePlugin(const egg::String &plugin){}
 
 	virtual void *getWindowHandle();
 	inline void *getWindow() const{return mWindow;}

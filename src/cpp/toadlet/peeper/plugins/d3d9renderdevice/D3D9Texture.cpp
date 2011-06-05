@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "D3D9Renderer.h"
+#include "D3D9RenderDevice.h"
 #include "D3D9Texture.h"
 #include "D3D9TextureMipPixelBuffer.h"
 #include <toadlet/egg/Error.h>
@@ -36,8 +36,8 @@ namespace toadlet{
 namespace peeper{
 
 /// @todo: Add a dynamic usage flag, and also use D3DLOCK_DISCARD when using that
-D3D9Texture::D3D9Texture(D3D9Renderer *renderer):BaseResource(),
-	mRenderer(NULL),
+D3D9Texture::D3D9Texture(D3D9RenderDevice *renderDevice):BaseResource(),
+	mDevice(NULL),
 
 	mUsage(0),
 	mDimension(Dimension_UNKNOWN),
@@ -55,7 +55,7 @@ D3D9Texture::D3D9Texture(D3D9Renderer *renderer):BaseResource(),
 	//mBuffers
 	//mBackingBuffer
 {
-	mRenderer=renderer;
+	mDevice=renderDevice;
 }
 
 D3D9Texture::~D3D9Texture(){
@@ -70,8 +70,8 @@ bool D3D9Texture::create(int usage,Dimension dimension,int format,int width,int 
 	width=width>0?width:1;height=height>0?height:1;depth=depth>0?depth:1;
 
 	if((Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || (dimension!=Dimension_CUBE && Math::isPowerOf2(depth)==false)) &&
-		mRenderer->getCaps().textureNonPowerOf2==false &&
-		(mRenderer->getCaps().textureNonPowerOf2Restricted==false || (usage&Usage_BIT_NPOT_RESTRICTED)==0))
+		mDevice->getCaps().textureNonPowerOf2==false &&
+		(mDevice->getCaps().textureNonPowerOf2Restricted==false || (usage&Usage_BIT_NPOT_RESTRICTED)==0))
 	{
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"D3D9Texture: Cannot load a non power of 2 texture");
@@ -119,14 +119,14 @@ void D3D9Texture::resetDestroy(){
 }
 
 bool D3D9Texture::createContext(bool restore){
-	IDirect3DDevice9 *device=mRenderer->getDirect3DDevice9();
+	IDirect3DDevice9 *device=mDevice->getDirect3DDevice9();
 
-	mD3DUsage=mRenderer->getD3DUSAGE(mFormat,mUsage);
-	mD3DPool=mRenderer->getD3DPOOL(mUsage);
-	mD3DFormat=mRenderer->getD3DFORMAT(mFormat);
+	mD3DUsage=mDevice->getD3DUSAGE(mFormat,mUsage);
+	mD3DPool=mDevice->getD3DPOOL(mUsage);
+	mD3DFormat=mDevice->getD3DFORMAT(mFormat);
 	mManuallyGenerateMipLevels=(mUsage&Usage_BIT_AUTOGEN_MIPMAPS)>0;
 	#if !defined(TOADLET_SET_D3DM)
-		if(mManuallyGenerateMipLevels && mRenderer->isD3DFORMATValid(mD3DFormat,D3DUSAGE_AUTOGENMIPMAP)){
+		if(mManuallyGenerateMipLevels && mDevice->isD3DFORMATValid(mD3DFormat,D3DUSAGE_AUTOGENMIPMAP)){
 			mD3DUsage|=D3DUSAGE_AUTOGENMIPMAP;
 			mManuallyGenerateMipLevels=false;
 		}
@@ -157,7 +157,7 @@ bool D3D9Texture::createContext(bool restore){
 	if(mBackingBuffer!=NULL){
 		IDirect3DSurface9 *surface=NULL;
 		((IDirect3DTexture9*)mTexture)->GetSurfaceLevel(0,&surface);
-		mRenderer->copySurface(surface,mBackingBuffer->getSurface());
+		mDevice->copySurface(surface,mBackingBuffer->getSurface());
 		surface->Release();
 		mBackingBuffer->destroy();
 		mBackingBuffer=NULL;
@@ -194,11 +194,11 @@ bool D3D9Texture::destroyContext(bool backup){
 	}
 
 	if(backup && (mUsage&Usage_BIT_DYNAMIC)==0){
-		D3D9PixelBuffer::ptr buffer((D3D9PixelBuffer*)(mRenderer->createPixelBuffer()));
+		D3D9PixelBuffer::ptr buffer((D3D9PixelBuffer*)(mDevice->createPixelBuffer()));
 		if(buffer->create(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_READ_WRITE,mFormat,mWidth,mHeight,mDepth)){
 			IDirect3DSurface9 *surface=NULL;
 			((IDirect3DTexture9*)mTexture)->GetSurfaceLevel(0,&surface);
-			mRenderer->copySurface(buffer->getSurface(),surface);
+			mDevice->copySurface(buffer->getSurface(),surface);
 			surface->Release();
 			mBackingBuffer=buffer;
 		}

@@ -161,8 +161,8 @@ void LabelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 #endif
 }
 
-void LabelNode::render(Renderer *renderer) const{
-	renderer->renderPrimitive(mVertexData,mIndexData);
+void LabelNode::render(RenderDevice *renderDevice) const{
+	renderDevice->renderPrimitive(mVertexData,mIndexData);
 }
 
 void LabelNode::updateLabel(){

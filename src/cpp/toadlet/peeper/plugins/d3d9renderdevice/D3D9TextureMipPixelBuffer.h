@@ -32,7 +32,7 @@
 namespace toadlet{
 namespace peeper{
 
-class D3D9Renderer;
+class D3D9RenderDevice;
 
 class TOADLET_API D3D9TextureMipPixelBuffer:public D3D9PixelBuffer{
 public:

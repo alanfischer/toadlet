@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include "D3D9TextureMipPixelBuffer.h"
-#include "D3D9Renderer.h"
+#include "D3D9RenderDevice.h"
 #include <toadlet/egg/Error.h>
 
 using namespace toadlet::egg;
@@ -33,7 +33,7 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-D3D9TextureMipPixelBuffer::D3D9TextureMipPixelBuffer(D3D9Texture *texture,int level,int cubeSide):D3D9PixelBuffer(texture->mRenderer,false),
+D3D9TextureMipPixelBuffer::D3D9TextureMipPixelBuffer(D3D9Texture *texture,int level,int cubeSide):D3D9PixelBuffer(texture->mDevice,false),
 	mTexture(NULL),
 	mLevel(0),
 	mCubeSide(0)

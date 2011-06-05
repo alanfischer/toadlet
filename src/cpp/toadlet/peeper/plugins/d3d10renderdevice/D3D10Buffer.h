@@ -34,12 +34,12 @@
 namespace toadlet{
 namespace peeper{
 
-class D3D10Renderer;
+class D3D10RenderDevice;
 
 // Currently this class inherits all possible types, but perhaps it should just inherit Buffer, and then there would exist subclasses for each type of Buffer
 class TOADLET_API D3D10Buffer:public IndexBuffer,public VertexBuffer{
 public:
-	D3D10Buffer(D3D10Renderer *renderer);
+	D3D10Buffer(D3D10RenderDevice *renderDevice);
 	virtual ~D3D10Buffer();
 
 	IndexBuffer *getRootIndexBuffer(){return this;}
@@ -69,7 +69,7 @@ protected:
 	bool createContext();
 	bool destroyContext();
 
-	D3D10Renderer *mRenderer;
+	D3D10RenderDevice *mDevice;
 
 	BufferDestroyedListener *mListener;
 	int mUsage;
@@ -87,7 +87,7 @@ protected:
 	bool mBacking;
 	uint8 *mData;
 
-	friend D3D10Renderer;
+	friend D3D10RenderDevice;
 };
 
 }

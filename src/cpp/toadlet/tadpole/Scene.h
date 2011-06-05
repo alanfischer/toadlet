@@ -89,7 +89,7 @@ public:
 	virtual void postFrameUpdate(int dt){}
 	virtual void queueDependent(node::Node *dependent);
 
-	virtual void render(peeper::Renderer *renderer,node::CameraNode *camera,node::Node *node);
+	virtual void render(peeper::RenderDevice *renderDevice,node::CameraNode *camera,node::Node *node);
 
 	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits=-1,node::Node *ignore=NULL){result.time=Math::ONE;}
 
@@ -97,14 +97,14 @@ public:
 	inline const Vector4 &getAmbientColor() const{return mAmbientColor;}
 
 	int countActiveNodes(node::Node *node=NULL);
-	void renderBoundingVolumes(peeper::Renderer *renderer,node::Node *node=NULL);
+	void renderBoundingVolumes(peeper::RenderDevice *renderDevice,node::Node *node=NULL);
 
-	virtual void preContextReset(peeper::Renderer *renderer){}
-	virtual void postContextReset(peeper::Renderer *renderer){postContextActivate(renderer);}
-	virtual void preContextActivate(peeper::Renderer *renderer){}
-	virtual void postContextActivate(peeper::Renderer *renderer);
-	virtual void preContextDeactivate(peeper::Renderer *renderer){}
-	virtual void postContextDeactivate(peeper::Renderer *renderer){}
+	virtual void preContextReset(peeper::RenderDevice *renderDevice){}
+	virtual void postContextReset(peeper::RenderDevice *renderDevice){postContextActivate(renderDevice);}
+	virtual void preContextActivate(peeper::RenderDevice *renderDevice){}
+	virtual void postContextActivate(peeper::RenderDevice *renderDevice);
+	virtual void preContextDeactivate(peeper::RenderDevice *renderDevice){}
+	virtual void postContextDeactivate(peeper::RenderDevice *renderDevice){}
 
 protected:
 	UpdateListener *mUpdateListener;

@@ -46,7 +46,7 @@ public:
 		Semantic_COLOR=				4,
 		Semantic_TEX_COORD=			5,
 
-		/// @todo: Remove this, its only GLRenderer specific
+		/// @todo: Remove this, its only GLRenderDevice specific
 		Semantic_MASK_NON_TEX_COORD=	0x1F,
 	};
 

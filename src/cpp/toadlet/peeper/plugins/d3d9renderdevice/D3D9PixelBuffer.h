@@ -32,13 +32,13 @@
 namespace toadlet{
 namespace peeper{
 
-class D3D9Renderer;
+class D3D9RenderDevice;
 
 class TOADLET_API D3D9PixelBuffer:public PixelBuffer{
 public:
 	TOADLET_SHARED_POINTERS(D3D9PixelBuffer);
 
-	D3D9PixelBuffer(D3D9Renderer *renderer,bool renderTarget);
+	D3D9PixelBuffer(D3D9RenderDevice *renderDevice,bool renderTarget);
 	virtual ~D3D9PixelBuffer();
 
 	PixelBuffer *getRootPixelBuffer(){return this;}
@@ -72,7 +72,7 @@ protected:
 	bool createContext(bool restore);
 	bool destroyContext(bool backup);
 
-	D3D9Renderer *mRenderer;
+	D3D9RenderDevice *mDevice;
 
 	BufferDestroyedListener *mListener;
 	bool mRenderTarget;
@@ -85,7 +85,7 @@ protected:
 	int mWidth,mHeight,mDepth;
 	D3DPOOL mD3DPool;
 
-	friend D3D9Renderer;
+	friend D3D9RenderDevice;
 };
 
 }

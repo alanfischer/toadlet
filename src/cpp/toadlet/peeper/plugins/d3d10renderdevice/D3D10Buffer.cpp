@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include "D3D10Buffer.h"
-#include "D3D10Renderer.h"
+#include "D3D10RenderDevice.h"
 #include <toadlet/egg/Logger.h>
 
 using namespace toadlet::egg;
@@ -32,8 +32,8 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
-D3D10Buffer::D3D10Buffer(D3D10Renderer *renderer):
-	mRenderer(NULL),
+D3D10Buffer::D3D10Buffer(D3D10RenderDevice *renderDevice):
+	mDevice(NULL),
 
 	mListener(NULL),
 	mUsage(0),
@@ -52,7 +52,7 @@ D3D10Buffer::D3D10Buffer(D3D10Renderer *renderer):
 	mBacking(false),
 	mData(NULL)
 {
-	mRenderer=renderer;
+	mDevice=renderDevice;
 }
 
 D3D10Buffer::~D3D10Buffer(){
@@ -145,7 +145,7 @@ bool D3D10Buffer::createContext(){
 		desc.BindFlags=mBindFlags;
 	}
 
-	desc.Usage=D3D10Renderer::getD3D10_USAGE(mUsage);
+	desc.Usage=D3D10RenderDevice::getD3D10_USAGE(mUsage);
 
 	if((mUsage&(Usage_BIT_DYNAMIC|Usage_BIT_STAGING))>0){
 		if((mAccess&Access_BIT_READ)>0){
@@ -158,12 +158,12 @@ bool D3D10Buffer::createContext(){
 
 	HRESULT result=S_OK;
 	if(mMapping){
-		result=mRenderer->getD3D10Device()->CreateBuffer(&desc,NULL,&mBuffer);
+		result=mDevice->getD3D10Device()->CreateBuffer(&desc,NULL,&mBuffer);
 	}
 	else{
 		D3D10_SUBRESOURCE_DATA data={0};
 		data.pSysMem=mData;
-		result=mRenderer->getD3D10Device()->CreateBuffer(&desc,&data,&mBuffer);
+		result=mDevice->getD3D10Device()->CreateBuffer(&desc,&data,&mBuffer);
 	}
 	TOADLET_CHECK_D3D10ERROR(result,"D3D10Buffer: CreateBuffer");
 
@@ -184,7 +184,7 @@ uint8 *D3D10Buffer::lock(int lockAccess){
 	mLockAccess=lockAccess;
 
 	if(mMapping){
-		D3D10_MAP mapType=D3D10Renderer::getD3D10_MAP(mLockAccess,mUsage);
+		D3D10_MAP mapType=D3D10RenderDevice::getD3D10_MAP(mLockAccess,mUsage);
 
 		UINT mapFlags=0;
 
@@ -266,7 +266,7 @@ bool D3D10Buffer::unlock(){
 			createContext();
 		}
 		else if((mLockAccess&Access_BIT_WRITE)>0){
-			mRenderer->getD3D10Device()->UpdateSubresource(mBuffer,0,NULL,mData,0,0);
+			mDevice->getD3D10Device()->UpdateSubresource(mBuffer,0,NULL,mData,0,0);
 		}
 
 		// Only delete our data if we have no desire to read it

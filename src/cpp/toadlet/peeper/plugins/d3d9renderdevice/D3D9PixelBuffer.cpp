@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include "D3D9PixelBuffer.h"
-#include "D3D9Renderer.h"
+#include "D3D9RenderDevice.h"
 #include <toadlet/egg/Error.h>
 
 using namespace toadlet::egg;
@@ -33,8 +33,8 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-D3D9PixelBuffer::D3D9PixelBuffer(D3D9Renderer *renderer,bool renderTarget):
-	mRenderer(NULL),
+D3D9PixelBuffer::D3D9PixelBuffer(D3D9RenderDevice *renderDevice,bool renderTarget):
+	mDevice(NULL),
 
 	mListener(NULL),
 	mRenderTarget(false),
@@ -45,7 +45,7 @@ D3D9PixelBuffer::D3D9PixelBuffer(D3D9Renderer *renderer,bool renderTarget):
 	mDataSize(0),
 	mWidth(0),mHeight(0),mDepth(0)
 {
-	mRenderer=renderer;
+	mDevice=renderDevice;
 	mRenderTarget=renderTarget;
 }
 
@@ -54,7 +54,7 @@ D3D9PixelBuffer::~D3D9PixelBuffer(){
 }
 
 bool D3D9PixelBuffer::create(int usage,int access,int pixelFormat,int width,int height,int depth){
-	pixelFormat=mRenderer->getCloseTextureFormat(pixelFormat);
+	pixelFormat=mDevice->getCloseTextureFormat(pixelFormat);
 
 	mUsage=usage;
 	mAccess=access;
@@ -97,7 +97,7 @@ bool D3D9PixelBuffer::createContext(bool restore){
 		return false;
 	}
 
-	D3DFORMAT d3dformat=D3D9Renderer::getD3DFORMAT(mPixelFormat);
+	D3DFORMAT d3dformat=D3D9RenderDevice::getD3DFORMAT(mPixelFormat);
 	HRESULT result=S_OK;
 	IDirect3DSurface9 *d3dsurface=NULL;
 	if(mRenderTarget){
@@ -105,9 +105,9 @@ bool D3D9PixelBuffer::createContext(bool restore){
 
 		if((mPixelFormat&Texture::Format_BIT_DEPTH)>0){
 			#if defined(TOADLET_SET_D3DM)
-				result=mRenderer->getDirect3DDevice9()->CreateDepthStencilSurface(mWidth,mHeight,d3dformat,D3DMULTISAMPLE_NONE,&d3dsurface TOADLET_SHAREDHANDLE);
+				result=mDevice->getDirect3DDevice9()->CreateDepthStencilSurface(mWidth,mHeight,d3dformat,D3DMULTISAMPLE_NONE,&d3dsurface TOADLET_SHAREDHANDLE);
 			#else
-				result=mRenderer->getDirect3DDevice9()->CreateDepthStencilSurface(mWidth,mHeight,d3dformat,D3DMULTISAMPLE_NONE,NULL,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
+				result=mDevice->getDirect3DDevice9()->CreateDepthStencilSurface(mWidth,mHeight,d3dformat,D3DMULTISAMPLE_NONE,NULL,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
 			#endif
 			if(FAILED(result)){
 				TOADLET_CHECK_D3D9ERROR(result,"CreateDepthStencilSurface");
@@ -116,9 +116,9 @@ bool D3D9PixelBuffer::createContext(bool restore){
 		}
 		else{
 			#if defined(TOADLET_SET_D3DM)
-				result=mRenderer->getDirect3DDevice9()->CreateRenderTarget(mWidth,mHeight,d3dformat,D3DMULTISAMPLE_NONE,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
+				result=mDevice->getDirect3DDevice9()->CreateRenderTarget(mWidth,mHeight,d3dformat,D3DMULTISAMPLE_NONE,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
 			#else
-				result=mRenderer->getDirect3DDevice9()->CreateRenderTarget(mWidth,mHeight,d3dformat,D3DMULTISAMPLE_NONE,NULL,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
+				result=mDevice->getDirect3DDevice9()->CreateRenderTarget(mWidth,mHeight,d3dformat,D3DMULTISAMPLE_NONE,NULL,FALSE,&d3dsurface TOADLET_SHAREDHANDLE);
 			#endif
 			if(FAILED(result)){
 				TOADLET_CHECK_D3D9ERROR(result,"CreateRenderTarget");
@@ -130,7 +130,7 @@ bool D3D9PixelBuffer::createContext(bool restore){
 		mD3DPool=D3DPOOL_SYSTEMMEM;
 
 		#if !defined(TOADLET_SET_D3DM)
-			result=mRenderer->getDirect3DDevice9()->CreateOffscreenPlainSurface(mWidth,mHeight,d3dformat,mD3DPool,&d3dsurface TOADLET_SHAREDHANDLE);
+			result=mDevice->getDirect3DDevice9()->CreateOffscreenPlainSurface(mWidth,mHeight,d3dformat,mD3DPool,&d3dsurface TOADLET_SHAREDHANDLE);
 			if(FAILED(result)){
 				TOADLET_CHECK_D3D9ERROR(result,"CreateDepthStencilSurface");
 				return false;

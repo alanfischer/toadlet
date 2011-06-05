@@ -85,17 +85,17 @@ BaseApplication::BaseApplication():
 	//mFormat,
 	mListener(NULL),
 
-	//mRendererPlugins,
-	//mCurrentRendererPlugin,
-	//mNewRendererPlugin,
-	mRendererOptions(0),
+	//mRenderDevicePlugins,
+	//mCurrentRenderDevicePlugin,
+	//mNewRenderDevicePlugin,
+	mRenderDeviceOptions(0),
 	//mAudioDevicePlugins,
 	mAudioDeviceOptions(0),
 	//mMotionDetctorPlugins,
 
 	mEngine(NULL),
 	mRenderTarget(NULL),
-	mRenderer(NULL),
+	mRenderDevice(NULL),
 	mAudioDevice(NULL),
 	mMotionDevice(NULL)
 {
@@ -113,20 +113,20 @@ BaseApplication::BaseApplication():
 	#endif
 }
 
-void BaseApplication::create(String renderer,String audioDevice,String motionDevice){
+void BaseApplication::create(String renderDevice,String audioDevice,String motionDevice){
 	int i;
 
 	mEngine=new Engine(mBackable);
 
 	/// @todo: Unify the plugin framework a bit so we dont have as much code duplication for this potion, and the creating of the plugin
-	mNewRendererPlugin=mCurrentRendererPlugin=renderer;
-	if(renderer!="null"){
-		if(renderer!=(char*)NULL || mRendererPlugins.size()==0){
-			createContextAndRenderer(renderer);
+	mNewRenderDevicePlugin=mCurrentRenderDevicePlugin=renderDevice;
+	if(renderDevice!="null"){
+		if(renderDevice!=(char*)NULL || mRenderDevicePlugins.size()==0){
+			createContextAndRenderDevice(renderDevice);
 		}
 		else{
-			for(i=0;i<mRendererPreferences.size();++i){
-				if(createContextAndRenderer(mRendererPreferences[i])) break;
+			for(i=0;i<mRenderDevicePreferences.size();++i){
+				if(createContextAndRenderDevice(mRenderDevicePreferences[i])) break;
 			}
 		}
 	}
@@ -161,7 +161,7 @@ void BaseApplication::destroy(){
 
 	deactivate();
 
-	destroyRendererAndContext();
+	destroyRenderDeviceAndContext();
 	destroyAudioDevice();
 	destroyMotionDevice();
 
@@ -171,13 +171,13 @@ void BaseApplication::destroy(){
 	}
 }
 
-void BaseApplication::setRendererOptions(int *options,int length){
-	if(mRendererOptions!=NULL){
-		delete[] mRendererOptions;
+void BaseApplication::setRenderDeviceOptions(int *options,int length){
+	if(mRenderDeviceOptions!=NULL){
+		delete[] mRenderDeviceOptions;
 	}
 
-	mRendererOptions=new int[length];
-	memcpy(mRendererOptions,options,length*sizeof(int));
+	mRenderDeviceOptions=new int[length];
+	memcpy(mRenderDeviceOptions,options,length*sizeof(int));
 }
 
 void BaseApplication::setAudioDeviceOptions(int *options,int length){
@@ -192,8 +192,8 @@ void BaseApplication::setAudioDeviceOptions(int *options,int length){
 RenderTarget *BaseApplication::makeRenderTarget(const String &plugin){
 	RenderTarget *target=NULL;
 
-	Map<String,RendererPlugin>::iterator it=mRendererPlugins.find(plugin);
-	if(it!=mRendererPlugins.end()){
+	Map<String,RenderDevicePlugin>::iterator it=mRenderDevicePlugins.find(plugin);
+	if(it!=mRenderDevicePlugins.end()){
 		TOADLET_TRY
 			target=it->second.createRenderTarget(getWindowHandle(),mFormat);
 		TOADLET_CATCH(const Exception &){target=NULL;}
@@ -205,31 +205,31 @@ RenderTarget *BaseApplication::makeRenderTarget(const String &plugin){
 	return target;
 }
 
-Renderer *BaseApplication::makeRenderer(const String &plugin){
-	Renderer *renderer=NULL;
-	Map<String,RendererPlugin>::iterator it=mRendererPlugins.find(plugin);
-	if(it!=mRendererPlugins.end()){
+RenderDevice *BaseApplication::makeRenderDevice(const String &plugin){
+	RenderDevice *renderDevice=NULL;
+	Map<String,RenderDevicePlugin>::iterator it=mRenderDevicePlugins.find(plugin);
+	if(it!=mRenderDevicePlugins.end()){
 		TOADLET_TRY
-			renderer=it->second.createRenderer();
-		TOADLET_CATCH(const Exception &){renderer=NULL;}
+			renderDevice=it->second.createRenderDevice();
+		TOADLET_CATCH(const Exception &){renderDevice=NULL;}
 	}
-	return renderer;
+	return renderDevice;
 }
 
-bool BaseApplication::createContextAndRenderer(const String &plugin){
+bool BaseApplication::createContextAndRenderDevice(const String &plugin){
 	Logger::debug(Categories::TOADLET_PAD,
-		"BaseApplication: creating RenderTarget and Renderer:"+plugin);
+		"BaseApplication: creating RenderTarget and RenderDevice:"+plugin);
 
 	bool result=false;
 	mRenderTarget=makeRenderTarget(plugin);
 	if(mRenderTarget!=NULL){
-		mRenderer=makeRenderer(plugin);
+		mRenderDevice=makeRenderDevice(plugin);
 		TOADLET_TRY
-			result=mRenderer->create(this,mRendererOptions);
+			result=mRenderDevice->create(this,mRenderDeviceOptions);
 		TOADLET_CATCH(const Exception &){result=false;}
 		if(result==false){
-			delete mRenderer;
-			mRenderer=NULL;
+			delete mRenderDevice;
+			mRenderDevice=NULL;
 		}
 	}
 	if(result==false){
@@ -239,32 +239,32 @@ bool BaseApplication::createContextAndRenderer(const String &plugin){
 
 	if(result==false){
 		Logger::error(Categories::TOADLET_PAD,
-			"error starting Renderer");
+			"error starting RenderDevice");
 		return false;
 	}
-	else if(mRenderer==NULL){
+	else if(mRenderDevice==NULL){
 		Logger::error(Categories::TOADLET_PAD,
-			"error creating Renderer");
+			"error creating RenderDevice");
 		return false;
 	}
 
-	if(mRenderer!=NULL){
-		mRenderer->setRenderTarget(this);
-		mEngine->setRenderer(mRenderer);
+	if(mRenderDevice!=NULL){
+		mRenderDevice->setRenderTarget(this);
+		mEngine->setRenderDevice(mRenderDevice);
 	}
 
-	return mRenderer!=NULL;
+	return mRenderDevice!=NULL;
 }
 
-bool BaseApplication::destroyRendererAndContext(){
+bool BaseApplication::destroyRenderDeviceAndContext(){
 	Logger::debug(Categories::TOADLET_PAD,
-		"BaseApplication: destroying context and renderer");
+		"BaseApplication: destroying context and renderDevice");
 
-	if(mRenderer!=NULL){
-		mEngine->setRenderer(NULL);
-		mRenderer->destroy();
-		delete mRenderer;
-		mRenderer=NULL;
+	if(mRenderDevice!=NULL){
+		mEngine->setRenderDevice(NULL);
+		mRenderDevice->destroy();
+		delete mRenderDevice;
+		mRenderDevice=NULL;
 	}
 
 	if(mRenderTarget!=NULL){

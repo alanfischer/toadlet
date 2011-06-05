@@ -38,7 +38,7 @@ public:
 	DecalShadowSceneRenderer(Scene *scene);
 	virtual ~DecalShadowSceneRenderer();
 
-	void renderScene(peeper::Renderer *renderer,node::Node *node,node::CameraNode *camera);
+	void renderScene(peeper::RenderDevice *renderDevice,node::Node *node,node::CameraNode *camera);
 	void setPlane(const Plane &p){mPlane.set(p);}
 
 protected:

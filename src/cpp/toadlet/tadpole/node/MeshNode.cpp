@@ -53,8 +53,8 @@ MeshNode::SubMesh::SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh):
 	this->vertexData=meshSubMesh->vertexData;
 }
 
-void MeshNode::SubMesh::render(Renderer *renderer) const{
-	renderer->renderPrimitive(vertexData,indexData);
+void MeshNode::SubMesh::render(RenderDevice *renderDevice) const{
+	renderDevice->renderPrimitive(vertexData,indexData);
 }
 
 MeshNode::MeshController::MeshController(MeshNode *node):Controller(),

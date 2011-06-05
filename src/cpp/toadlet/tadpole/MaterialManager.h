@@ -52,8 +52,8 @@ public:
 
 	void modifyRenderState(peeper::RenderState::ptr dst,peeper::RenderState::ptr src);
 
-	void contextActivate(peeper::Renderer *renderer);
-	void contextDeactivate(peeper::Renderer *renderer);
+	void contextActivate(peeper::RenderDevice *renderDevice);
+	void contextDeactivate(peeper::RenderDevice *renderDevice);
 
 	void renderStateDestroyed(peeper::RenderState *renderState);
 

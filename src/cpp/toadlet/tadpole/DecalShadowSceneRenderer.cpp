@@ -46,9 +46,9 @@ DecalShadowSceneRenderer::DecalShadowSceneRenderer(Scene *scene):
 DecalShadowSceneRenderer::~DecalShadowSceneRenderer(){
 }
 
-void DecalShadowSceneRenderer::renderScene(Renderer *renderer,Node *node,CameraNode *camera){
+void DecalShadowSceneRenderer::renderScene(RenderDevice *renderDevice,Node *node,CameraNode *camera){
 	gatherRenderables(mRenderableSet,node,camera);
-	renderRenderables(mRenderableSet,renderer,camera);
+	renderRenderables(mRenderableSet,renderDevice,camera);
 
 	RenderableSet *set=mRenderableSet;
 	LightNode *light=NULL;
@@ -62,7 +62,7 @@ void DecalShadowSceneRenderer::renderScene(Renderer *renderer,Node *node,CameraN
 
 	const LightState &state=light->getLightState();
 
-	mShadowMaterial->setupRenderer(renderer);
+	mShadowMaterial->setupRenderDevice(renderDevice);
 
 	int i,j;
 	for(i=0;i<set->getNumRenderableQueues();++i){
@@ -83,8 +83,8 @@ void DecalShadowSceneRenderer::renderScene(Renderer *renderer,Node *node,CameraN
 			renderable->getRenderTransform().getMatrix(m2);
 			Math::postMul(m,m2);
 			
-			renderer->setModelMatrix(m);
-			renderable->render(renderer);
+			renderDevice->setModelMatrix(m);
+			renderable->render(renderDevice);
 		}
 	}
 }

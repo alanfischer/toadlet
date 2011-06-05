@@ -33,7 +33,7 @@
 namespace toadlet{
 namespace peeper{
 
-class Renderer;
+class RenderDevice;
 
 class TOADLET_API BackableBuffer:public IndexBuffer,public VertexBuffer,public PixelBuffer{
 public:
@@ -73,7 +73,7 @@ public:
 
 	virtual void setBack(IndexBuffer::ptr back);
 	virtual void setBack(VertexBuffer::ptr back);
-	virtual void setBack(PixelBuffer::ptr back,Renderer *renderer);
+	virtual void setBack(PixelBuffer::ptr back,RenderDevice *renderDevice);
 	virtual Buffer::ptr getBack(){return mBack;}
 
 protected:
