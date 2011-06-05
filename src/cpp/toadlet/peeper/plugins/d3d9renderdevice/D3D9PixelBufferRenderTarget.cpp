@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "D3D9Renderer.h"
+#include "D3D9RenderDevice.h"
 #include "D3D9PixelBufferRenderTarget.h"
 #include <toadlet/egg/Error.h>
 
@@ -33,8 +33,8 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-D3D9PixelBufferRenderTarget::D3D9PixelBufferRenderTarget(D3D9Renderer *renderer):D3D9RenderTarget(),
-	mRenderer(NULL),
+D3D9PixelBufferRenderTarget::D3D9PixelBufferRenderTarget(D3D9RenderDevice *renderDevice):D3D9RenderTarget(),
+	mDevice(NULL),
 	mListener(NULL),
 	mWidth(0),
 	mHeight(0),
@@ -43,7 +43,7 @@ D3D9PixelBufferRenderTarget::D3D9PixelBufferRenderTarget(D3D9Renderer *renderer)
 	//mBufferAttachments,
 	//mDepthBuffer
 {
-	mRenderer=renderer;
+	mDevice=renderDevice;
 }
 
 D3D9PixelBufferRenderTarget::~D3D9PixelBufferRenderTarget(){
@@ -93,7 +93,7 @@ bool D3D9PixelBufferRenderTarget::activate(){
 		compile();
 	}
 
-	IDirect3DDevice9 *device=mRenderer->getDirect3DDevice9();
+	IDirect3DDevice9 *device=mDevice->getDirect3DDevice9();
 
 	bool result=false;
 	#if defined(TOADLET_SET_D3DM)
@@ -122,7 +122,7 @@ bool D3D9PixelBufferRenderTarget::activate(){
 }
 
 bool D3D9PixelBufferRenderTarget::deactivate(){
-	IDirect3DDevice9 *device=mRenderer->getDirect3DDevice9();
+	IDirect3DDevice9 *device=mDevice->getDirect3DDevice9();
 
 	bool result=false;
 	#if defined(TOADLET_SET_D3DM)
@@ -218,7 +218,7 @@ bool D3D9PixelBufferRenderTarget::compile(){
 
 	if(color!=NULL && depth==NULL){
 		// No Depth-Stencil surface, so add one
-		D3D9PixelBuffer::ptr buffer(new D3D9PixelBuffer(mRenderer,true));
+		D3D9PixelBuffer::ptr buffer(new D3D9PixelBuffer(mDevice,true));
 		if(buffer->create(Buffer::Usage_BIT_STREAM,Buffer::Access_NONE,Texture::Format_DEPTH_16,mWidth,mHeight,1)){
 			attach(buffer,Attachment_DEPTH_STENCIL);
 			mDepthBuffer=buffer;
@@ -228,7 +228,7 @@ bool D3D9PixelBufferRenderTarget::compile(){
 		// No Color surface, so add one
 		/// @todo: Is there a way to have D3D9 not care about the color buffer, if it isn't needed?
 		///  Without the below code we get an error if the size of the depth buffer is greater than the color buffer
-		D3D9PixelBuffer::ptr buffer(new D3D9PixelBuffer(mRenderer,true));
+		D3D9PixelBuffer::ptr buffer(new D3D9PixelBuffer(mDevice,true));
 		if(buffer->create(Buffer::Usage_BIT_STREAM,Buffer::Access_NONE,Texture::Format_RGB_5_6_5,mWidth,mHeight,1)){
 			attach(buffer,Attachment_COLOR_0);
 			mColorBuffer=buffer;

@@ -110,7 +110,7 @@ public:
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
-	void render(peeper::Renderer *renderer) const{renderer->renderPrimitive(mVertexData,mIndexData);}
+	void render(peeper::RenderDevice *renderDevice) const{renderDevice->renderPrimitive(mVertexData,mIndexData);}
 
 	const Bound &getBound() const{return super::getBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
@@ -134,7 +134,7 @@ protected:
 		Material *getRenderMaterial() const{return mTerrain->mWaterMaterial;}
 		const Transform &getRenderTransform() const{return mTerrain->getWorldTransform();}
 		const Bound &getRenderBound() const{return mTerrain->getRenderBound();}
-		void render(peeper::Renderer *renderer) const{renderer->renderPrimitive(mTerrain->mWaterVertexData,mTerrain->mWaterIndexData);}
+		void render(peeper::RenderDevice *renderDevice) const{renderDevice->renderPrimitive(mTerrain->mWaterVertexData,mTerrain->mWaterIndexData);}
 
 	protected:
 		TerrainPatchNode *mTerrain;

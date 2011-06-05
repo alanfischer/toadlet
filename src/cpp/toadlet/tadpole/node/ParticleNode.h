@@ -32,7 +32,7 @@
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/peeper/VertexData.h>
-#include <toadlet/peeper/Renderer.h>
+#include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Visible.h>
@@ -112,7 +112,7 @@ public:
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Transform &getRenderTransform() const{return mWorldSpace==false?getWorldTransform():Node::identityTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
-	void render(peeper::Renderer *renderer) const;
+	void render(peeper::RenderDevice *renderDevice) const;
 
 	void updateVertexBuffer(CameraNode *camera);
 

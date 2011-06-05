@@ -32,11 +32,11 @@
 namespace toadlet{
 namespace peeper{
 
-class D3D9Renderer;
+class D3D9RenderDevice;
 
 class TOADLET_API D3D9RenderState:public RenderState{
 public:
-	D3D9RenderState(D3D9Renderer *renderer):
+	D3D9RenderState(D3D9RenderDevice *renderDevice):
 		mListener(NULL),
 		mBlendState(NULL),
 		mDepthState(NULL),
@@ -154,7 +154,7 @@ protected:
 	egg::Collection<SamplerState*> mSamplerStates;
 	egg::Collection<TextureState*> mTextureStates;
 	
-	friend class D3D9Renderer;
+	friend class D3D9RenderDevice;
 };
 
 }

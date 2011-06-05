@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include "D3D10RenderTarget.h"
-#include "D3D10Renderer.h"
+#include "D3D10RenderDevice.h"
 
 using namespace toadlet::egg;
 

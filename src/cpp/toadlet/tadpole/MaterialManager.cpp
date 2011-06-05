@@ -134,13 +134,13 @@ Material::ptr MaterialManager::cloneMaterial(Material::ptr material,bool managed
 RenderState::ptr MaterialManager::createRenderState(){
 	RenderState::ptr renderState;
 
-	if(mBackable || mEngine->getRenderer()==NULL){
+	if(mBackable || mEngine->getRenderDevice()==NULL){
 		Logger::debug(Categories::TOADLET_TADPOLE,"creating BackableRenderState");
 
 		BackableRenderState::ptr backableRenderState(new BackableRenderState());
 		backableRenderState->create();
-		if(mEngine->getRenderer()!=NULL){
-			RenderState::ptr back(mEngine->getRenderer()->createRenderState());
+		if(mEngine->getRenderDevice()!=NULL){
+			RenderState::ptr back(mEngine->getRenderDevice()->createRenderState());
 			backableRenderState->setBack(back);
 		}
 		renderState=backableRenderState;
@@ -148,7 +148,7 @@ RenderState::ptr MaterialManager::createRenderState(){
 	else{
 		Logger::debug(Categories::TOADLET_TADPOLE,"creating RenderState");
 
-		renderState=RenderState::ptr(mEngine->getRenderer()->createRenderState());
+		renderState=RenderState::ptr(mEngine->getRenderDevice()->createRenderState());
 		if(renderState->create()==false){
 			return NULL;
 		}
@@ -190,18 +190,18 @@ void MaterialManager::modifyRenderState(RenderState::ptr dst,RenderState::ptr sr
 	}
 }
 
-void MaterialManager::contextActivate(Renderer *renderer){
+void MaterialManager::contextActivate(RenderDevice *renderDevice){
 	int i;
 	for(i=0;i<mRenderStates.size();++i){
 		RenderState::ptr renderState=mRenderStates[i];
 		if(renderState!=NULL && renderState->getRootRenderState()!=renderState){
-			RenderState::ptr back(renderer->createRenderState());
+			RenderState::ptr back(renderDevice->createRenderState());
 			shared_static_cast<BackableRenderState>(renderState)->setBack(back);
 		}
 	}
 }
 
-void MaterialManager::contextDeactivate(Renderer *renderer){
+void MaterialManager::contextDeactivate(RenderDevice *renderDevice){
 	int i;
 	for(i=0;i<mRenderStates.size();++i){
 		RenderState::ptr renderState=mRenderStates[i];

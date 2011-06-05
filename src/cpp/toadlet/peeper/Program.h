@@ -40,7 +40,7 @@ public:
 	TOADLET_SHARED_POINTERS(Program);
 
 	Program();
-	Program(Renderer *renderer);
+	Program(RenderDevice *renderDevice);
 
 	virtual ~Program();
 

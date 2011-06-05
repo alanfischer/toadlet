@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include "D3D9VertexFormat.h"
-#include "D3D9Renderer.h"
+#include "D3D9RenderDevice.h"
 #include <toadlet/egg/Error.h>
 
 using namespace toadlet::egg;
@@ -32,8 +32,8 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
-D3D9VertexFormat::D3D9VertexFormat(D3D9Renderer *renderer):
-	mRenderer(NULL),
+D3D9VertexFormat::D3D9VertexFormat(D3D9RenderDevice *renderDevice):
+	mDevice(NULL),
 
 	mListener(NULL),
 	//mSemantics,
@@ -49,7 +49,7 @@ D3D9VertexFormat::D3D9VertexFormat(D3D9Renderer *renderer):
 		mDeclaration(NULL)
 	#endif
 {
-	mRenderer=renderer;
+	mDevice=renderDevice;
 }
 
 D3D9VertexFormat::~D3D9VertexFormat(){
@@ -74,7 +74,7 @@ void D3D9VertexFormat::destroy(){
 }
 
 bool D3D9VertexFormat::createContext(){
-	mFVF=D3D9Renderer::getFVF(this);
+	mFVF=D3D9RenderDevice::getFVF(this);
 
 	HRESULT result=S_OK;
 	#if !defined(TOADLET_SET_D3DM)
@@ -90,7 +90,7 @@ bool D3D9VertexFormat::createContext(){
 		elements[mSemantics.size()]=element;
 		mElements=elements;
 
-		result=mRenderer->getDirect3DDevice9()->CreateVertexDeclaration(mElements,&mDeclaration);
+		result=mDevice->getDirect3DDevice9()->CreateVertexDeclaration(mElements,&mDeclaration);
 		TOADLET_CHECK_D3D9ERROR(result,"CreateVertexDeclaration");
 	#endif
 

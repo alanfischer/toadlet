@@ -25,7 +25,7 @@
 
 #include "D3D9VertexBuffer.h"
 #include "D3D9VertexFormat.h"
-#include "D3D9Renderer.h"
+#include "D3D9RenderDevice.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 
@@ -34,8 +34,8 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
-D3D9VertexBuffer::D3D9VertexBuffer(D3D9Renderer *renderer):
-	mRenderer(NULL),
+D3D9VertexBuffer::D3D9VertexBuffer(D3D9RenderDevice *renderDevice):
+	mDevice(NULL),
 
 	mListener(NULL),
 	mUsage(0),
@@ -51,7 +51,7 @@ D3D9VertexBuffer::D3D9VertexBuffer(D3D9Renderer *renderer):
 	mData(NULL),
 	mBackingData(NULL)
 {
-	mRenderer=renderer;
+	mDevice=renderDevice;
 }
 
 D3D9VertexBuffer::~D3D9VertexBuffer(){
@@ -111,10 +111,10 @@ bool D3D9VertexBuffer::createContext(bool restore){
 		mD3DUsage|=D3DUSAGE_WRITEONLY;
 	}
 
-	mD3DPool=mRenderer->getD3DPOOL(mUsage);
+	mD3DPool=mDevice->getD3DPOOL(mUsage);
 
 	D3D9VertexFormat *d3dvertexFormat=(D3D9VertexFormat*)mVertexFormat->getRootVertexFormat();
-	HRESULT result=mRenderer->getDirect3DDevice9()->CreateVertexBuffer(mDataSize,mD3DUsage,d3dvertexFormat->getFVF(),mD3DPool,&mVertexBuffer TOADLET_SHAREDHANDLE);
+	HRESULT result=mDevice->getDirect3DDevice9()->CreateVertexBuffer(mDataSize,mD3DUsage,d3dvertexFormat->getFVF(),mD3DPool,&mVertexBuffer TOADLET_SHAREDHANDLE);
 	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: CreateVertexBuffer");
 
 	if(restore && (mUsage&Usage_BIT_DYNAMIC)==0){

@@ -854,7 +854,7 @@ void D3D9RenderDevice::setAmbientColor(const Vector4 &ambient){
 	TOADLET_CHECK_D3D9ERROR(hr,"setAmbientColor");
 }
 
-void D3D9RenderDevice::setCapsFromD3DCAPS9(RenderDeviceCaps &caps,const D3DCAPS9 &d3dcaps,bool renderToTexture,bool renderToDepthTexture){
+void D3D9RenderDevice::setCapsFromD3DCAPS9(RenderCaps &caps,const D3DCAPS9 &d3dcaps,bool renderToTexture,bool renderToDepthTexture){
 	caps.resetOnResize=true;
 	caps.hardwareTextures=true;
 	caps.hardwareIndexBuffers=true;

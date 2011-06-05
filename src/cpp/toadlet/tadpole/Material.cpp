@@ -25,7 +25,7 @@
 
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/BackableRenderState.h>
-#include <toadlet/peeper/RendererCaps.h>
+#include <toadlet/peeper/RenderCaps.h>
 #include <toadlet/tadpole/Material.h>
 
 using namespace toadlet::egg;
@@ -111,18 +111,18 @@ bool Material::isDepthSorted() const{
 }
 
 /// @todo: Optimize this so we're not resetting a ton of texture states, and not requesting the caps
-void Material::setupRenderer(Renderer *renderer){
-	renderer->setRenderState(mRenderState);
+void Material::setupRenderDevice(RenderDevice *renderDevice){
+	renderDevice->setRenderState(mRenderState);
 
-	RendererCaps caps;
-	renderer->getRendererCaps(caps);
+	RenderCaps caps;
+	renderDevice->getRenderCaps(caps);
 
 	int i;
 	for(i=0;i<getNumTextures();++i){
-		renderer->setTexture(i,getTexture(i));
+		renderDevice->setTexture(i,getTexture(i));
 	}
 	for(;i<caps.maxTextureStages;++i){
-		renderer->setTexture(i,NULL);
+		renderDevice->setTexture(i,NULL);
 	}
 }
 

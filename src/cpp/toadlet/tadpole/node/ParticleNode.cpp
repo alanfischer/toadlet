@@ -229,9 +229,9 @@ void ParticleNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 #endif
 }
 
-void ParticleNode::render(Renderer *renderer) const{
+void ParticleNode::render(RenderDevice *renderDevice) const{
 	if(mVertexData!=NULL && mIndexData!=NULL){
-		renderer->renderPrimitive(mVertexData,mIndexData);
+		renderDevice->renderPrimitive(mVertexData,mIndexData);
 	}
 }
 

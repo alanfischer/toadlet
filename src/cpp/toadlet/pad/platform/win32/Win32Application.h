@@ -39,7 +39,7 @@ public:
 	Win32Application();
 	virtual ~Win32Application();
 
-	virtual void create(egg::String renderer=(char*)NULL,egg::String audioPlayer=(char*)NULL,egg::String motionDevice=(char*)NULL);
+	virtual void create(egg::String renderDevice=(char*)NULL,egg::String audioPlayer=(char*)NULL,egg::String motionDevice=(char*)NULL);
 	virtual void destroy();
 
 	virtual void start();
@@ -77,7 +77,7 @@ public:
 	tadpole::handler::Win32ResourceArchive::ptr getResourceArchive() const{return mResourceArchive;}
 
 	virtual void *getWindowHandle(){return getHWND();}
-	void changeRendererPlugin(const egg::String &plugin){mNewRendererPlugin=plugin;}
+	void changeRenderDevicePlugin(const egg::String &plugin){mNewRenderDevicePlugin=plugin;}
 	void setIcon(void *icon);
 	void *getHINSTANCE() const;
 	void *getHWND() const;

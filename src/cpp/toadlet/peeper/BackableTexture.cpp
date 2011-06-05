@@ -26,7 +26,7 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/BackableTexture.h>
 #include <toadlet/peeper/BackableTextureMipPixelBuffer.h>
-#include <toadlet/peeper/RendererCaps.h>
+#include <toadlet/peeper/RenderCaps.h>
 #include <string.h>
 
 using namespace toadlet::egg;
@@ -185,7 +185,7 @@ bool BackableTexture::read(int width,int height,int depth,int mipLevel,tbyte *mi
 	return result;
 }
 
-void BackableTexture::setBack(Texture::ptr back,Renderer *renderer){
+void BackableTexture::setBack(Texture::ptr back,RenderDevice *renderDevice){
 	int i;
 	if(back!=mBack && mBack!=NULL){
 		for(i=0;i<mBuffers.size();++i){
@@ -200,7 +200,7 @@ void BackableTexture::setBack(Texture::ptr back,Renderer *renderer){
 	mBack=back;
 	
 	if(mBack!=NULL){
-		convertCreate(mBack,renderer,mUsage,mDimension,mFormat,mWidth,mHeight,mDepth,(mUsage&Usage_BIT_AUTOGEN_MIPMAPS)!=0?0:1,(mData!=NULL?&mData:NULL));
+		convertCreate(mBack,renderDevice,mUsage,mDimension,mFormat,mWidth,mHeight,mDepth,(mUsage&Usage_BIT_AUTOGEN_MIPMAPS)!=0?0:1,(mData!=NULL?&mData:NULL));
 
 		for(i=0;i<mBuffers.size();++i){
 			if(mBuffers[i]!=NULL){
@@ -242,10 +242,10 @@ bool BackableTexture::convertRead(Texture::ptr texture,int format,int width,int 
 	}
 }
 
-bool BackableTexture::convertCreate(Texture::ptr texture,Renderer *renderer,int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]){
-	RendererCaps caps;
-	renderer->getRendererCaps(caps);
-	int newFormat=renderer->getCloseTextureFormat(format,usage);
+bool BackableTexture::convertCreate(Texture::ptr texture,RenderDevice *renderDevice,int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]){
+	RenderCaps caps;
+	renderDevice->getRenderCaps(caps);
+	int newFormat=renderDevice->getCloseTextureFormat(format,usage);
 	bool hasNPOT=caps.textureNonPowerOf2;
 	bool wantsNPOT=(Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || (dimension!=Image::Dimension_CUBE && Math::isPowerOf2(depth)==false));
 	bool needsNPOT=wantsNPOT & !hasNPOT;

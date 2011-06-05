@@ -32,11 +32,11 @@
 namespace toadlet{
 namespace peeper{
 
-class D3D10Renderer;
+class D3D10RenderDevice;
 
 class TOADLET_API D3D10Query:public Query{
 public:
-	D3D10Query(D3D10Renderer *renderer);
+	D3D10Query(D3D10RenderDevice *renderDevice);
 	virtual ~D3D10Query();
 
 	Query *getRootQuery(){return this;}
@@ -53,13 +53,11 @@ public:
 protected:
 	static D3D10_QUERY getD3D10_QUERY(QueryType queryType);
 
-	D3D10Renderer *mRenderer;
-
+	D3D10RenderDevice *mDevice;
 	QueryType mQueryType;
-
 	ID3D10Query *mQuery;
 
-	friend class D3D10Renderer;
+	friend class D3D10RenderDevice;
 };
 
 }

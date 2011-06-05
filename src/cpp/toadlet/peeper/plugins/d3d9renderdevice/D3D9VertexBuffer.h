@@ -33,11 +33,11 @@
 namespace toadlet{
 namespace peeper{
 
-class D3D9Renderer;
+class D3D9RenderDevice;
 
 class TOADLET_API D3D9VertexBuffer:public VertexBuffer{
 public:
-	D3D9VertexBuffer(D3D9Renderer *renderer);
+	D3D9VertexBuffer(D3D9RenderDevice *renderDevice);
 	virtual ~D3D9VertexBuffer();
 
 	VertexBuffer *getRootVertexBuffer(){return this;}
@@ -65,7 +65,7 @@ protected:
 	bool createContext(bool restore);
 	bool destroyContext(bool backup);
 
-	D3D9Renderer *mRenderer;
+	D3D9RenderDevice *mDevice;
 
 	BufferDestroyedListener *mListener;
 	int mUsage;
@@ -81,7 +81,7 @@ protected:
 	uint8 *mData;
 	uint8 *mBackingData;
 
-	friend D3D9Renderer;
+	friend D3D9RenderDevice;
 };
 
 }

@@ -53,7 +53,7 @@ public:
 	void setRightColor(const Vector4 &color);
 	const Vector4 &getRightColor() const{return mRightColor;}
 
-	virtual void render(peeper::Renderer *renderer,Node *node);
+	virtual void render(peeper::RenderDevice *renderDevice,Node *node);
 
 protected:
 	scalar mSeparation;

@@ -65,7 +65,7 @@ public:
 	Material *getRenderMaterial() const{return mSequenceTime<mMaterials.size()?mMaterials[Math::toInt(mSequenceTime)]:NULL;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
-	void render(peeper::Renderer *renderer) const;
+	void render(peeper::RenderDevice *renderDevice) const;
 
 protected:
 	TOADLET_GIB_DEFINE(SpriteModelNode);

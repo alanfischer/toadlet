@@ -68,7 +68,7 @@
 
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
-#include <toadlet/peeper/RendererCaps.h>
+#include <toadlet/peeper/RenderCaps.h>
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/MaterialManager.h>
@@ -157,8 +157,8 @@ namespace tadpole{
 Engine::Engine(bool backable):
 	mBackable(false),
 	//mDirectory,
-	mRenderer(NULL),
-	mLastRenderer(NULL),
+	mRenderDevice(NULL),
+	mLastRenderDevice(NULL),
 	mAudioDevice(NULL),
 	mLastAudioDevice(NULL)
 
@@ -188,7 +188,7 @@ Engine::Engine(bool backable):
 	#else
 		mIdealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
 	#endif
-	// Create initial BackableVertexFormats.  This doesn't need to be done, but without it, starting an application without a Renderer will crash.
+	// Create initial BackableVertexFormats.  This doesn't need to be done, but without it, starting an application without a RenderDevice will crash.
 	updateVertexFormats();
 
 	registerNodeType(AudioNode::type());
@@ -333,21 +333,21 @@ void Engine::destroy(){
 	mArchiveManager->destroy();
 }
 
-bool Engine::setRenderer(Renderer *renderer){
-	if(renderer!=NULL){
-		if(mLastRenderer==NULL){
-			mLastRenderer=renderer;
+bool Engine::setRenderDevice(RenderDevice *renderDevice){
+	if(renderDevice!=NULL){
+		if(mLastRenderDevice==NULL){
+			mLastRenderDevice=renderDevice;
 		}
-		else if(mBackable==false && mLastRenderer!=renderer){
-			Error::unknown(Categories::TOADLET_TADPOLE,"can not change Renderer in an unbacked engine");
+		else if(mBackable==false && mLastRenderDevice!=renderDevice){
+			Error::unknown(Categories::TOADLET_TADPOLE,"can not change RenderDevice in an unbacked engine");
 			return false;
 		}
 
-		renderer->getRendererCaps(mRendererCaps);
-		const RendererCaps &caps=mRendererCaps;
+		renderDevice->getRenderCaps(mRenderCaps);
+		const RenderCaps &caps=mRenderCaps;
 		{
 			Logger::alert(Categories::TOADLET_TADPOLE,
-				"Renderer Capabilities:");
+				"RenderDevice Capabilities:");
 			Logger::alert(Categories::TOADLET_TADPOLE,
 				String()+(char)9+"maxLights:"+caps.maxLights);
 			Logger::alert(Categories::TOADLET_TADPOLE,
@@ -385,24 +385,24 @@ bool Engine::setRenderer(Renderer *renderer){
 		mIdealVertexFormatBit=caps.idealVertexFormatBit;
 	}
 
-	if(renderer!=mRenderer && mRenderer!=NULL){
-		contextDeactivate(mRenderer);
+	if(renderDevice!=mRenderDevice && mRenderDevice!=NULL){
+		contextDeactivate(mRenderDevice);
 	}
-	if(renderer!=mRenderer && renderer!=NULL){
-		contextActivate(renderer);
+	if(renderDevice!=mRenderDevice && renderDevice!=NULL){
+		contextActivate(renderDevice);
 	}
 
-	mRenderer=renderer;
+	mRenderDevice=renderDevice;
 
-	if(mRenderer!=NULL){
+	if(mRenderDevice!=NULL){
 		updateVertexFormats();
 	}
 
 	return true;
 }
 
-Renderer *Engine::getRenderer() const{
-	return mRenderer;
+RenderDevice *Engine::getRenderDevice() const{
+	return mRenderDevice;
 }
 
 void Engine::updateVertexFormats(){
@@ -572,58 +572,58 @@ void Engine::freeNode(Node *node){
 }
 
 // Context methods
-void Engine::contextReset(peeper::Renderer *renderer){
+void Engine::contextReset(peeper::RenderDevice *renderDevice){
 	Logger::debug("Engine::contextReset");
 
 	int i;
 	for(i=0;i<mContextListeners.size();++i){
-		mContextListeners[i]->preContextReset(renderer);
+		mContextListeners[i]->preContextReset(renderDevice);
 	}
 
-	mBufferManager->preContextReset(renderer);
-	mTextureManager->preContextReset(renderer);
+	mBufferManager->preContextReset(renderDevice);
+	mTextureManager->preContextReset(renderDevice);
 
-	renderer->reset();
+	renderDevice->reset();
 
-	mBufferManager->postContextReset(renderer);
-	mTextureManager->postContextReset(renderer);
+	mBufferManager->postContextReset(renderDevice);
+	mTextureManager->postContextReset(renderDevice);
 
 	for(i=0;i<mContextListeners.size();++i){
-		mContextListeners[i]->postContextReset(renderer);
+		mContextListeners[i]->postContextReset(renderDevice);
 	}
 }
 
-void Engine::contextActivate(Renderer *renderer){
+void Engine::contextActivate(RenderDevice *renderDevice){
 	Logger::debug("Engine::contextActivate");
 
 	int i;
 	for(i=0;i<mContextListeners.size();++i){
-		mContextListeners[i]->preContextActivate(renderer);
+		mContextListeners[i]->preContextActivate(renderDevice);
 	}
 
-	mBufferManager->contextActivate(renderer);
-	mTextureManager->contextActivate(renderer);
-	mMaterialManager->contextActivate(renderer);
+	mBufferManager->contextActivate(renderDevice);
+	mTextureManager->contextActivate(renderDevice);
+	mMaterialManager->contextActivate(renderDevice);
 
 	for(i=0;i<mContextListeners.size();++i){
-		mContextListeners[i]->postContextActivate(renderer);
+		mContextListeners[i]->postContextActivate(renderDevice);
 	}
 }
 
-void Engine::contextDeactivate(Renderer *renderer){
+void Engine::contextDeactivate(RenderDevice *renderDevice){
 	Logger::debug("Engine::contextDeactivate");
 
 	int i;
 	for(i=0;i<mContextListeners.size();++i){
-		mContextListeners[i]->preContextDeactivate(renderer);
+		mContextListeners[i]->preContextDeactivate(renderDevice);
 	}
 
-	mBufferManager->contextDeactivate(renderer);
-	mTextureManager->contextDeactivate(renderer);
-	mMaterialManager->contextDeactivate(renderer);
+	mBufferManager->contextDeactivate(renderDevice);
+	mTextureManager->contextDeactivate(renderDevice);
+	mMaterialManager->contextDeactivate(renderDevice);
 
 	for(i=0;i<mContextListeners.size();++i){
-		mContextListeners[i]->postContextDeactivate(renderer);
+		mContextListeners[i]->postContextDeactivate(renderDevice);
 	}
 }
 

@@ -28,7 +28,7 @@
 
 #include <toadlet/egg/Resource.h>
 #include <toadlet/egg/String.h>
-#include <toadlet/peeper/Renderer.h>
+#include <toadlet/peeper/RenderDevice.h>
 
 namespace toadlet{
 namespace peeper{
@@ -51,7 +51,7 @@ public:
 	};
 
 	Shader(Type shaderType,Language language);
-	Shader(Renderer *renderer,Type shaderType,Language language);
+	Shader(RenderDevice *renderDevice,Type shaderType,Language language);
 
 	virtual ~Shader();
 

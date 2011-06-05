@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "D3D10Renderer.h"
+#include "D3D10RenderDevice.h"
 #include "D3D10PixelBufferRenderTarget.h"
 #include <toadlet/egg/Error.h>
 
@@ -33,8 +33,8 @@ using namespace toadlet::egg::image;
 namespace toadlet{
 namespace peeper{
 
-D3D10PixelBufferRenderTarget::D3D10PixelBufferRenderTarget(D3D10Renderer *renderer):D3D10RenderTarget(),
-	mRenderer(NULL),
+D3D10PixelBufferRenderTarget::D3D10PixelBufferRenderTarget(D3D10RenderDevice *renderDevice):D3D10RenderTarget(),
+	mDevice(NULL),
 	mListener(NULL),
 	mWidth(0),
 	mHeight(0),
@@ -43,8 +43,8 @@ D3D10PixelBufferRenderTarget::D3D10PixelBufferRenderTarget(D3D10Renderer *render
 	//mSurfaceAttachments,
 	//mOwnedSurfaces
 {
-	mRenderer=renderer;
-	mD3DDevice=mRenderer->getD3D10Device();
+	mDevice=renderDevice;
+	mD3DDevice=mDevice->getD3D10Device();
 }
 
 D3D10PixelBufferRenderTarget::~D3D10PixelBufferRenderTarget(){
@@ -146,7 +146,7 @@ bool D3D10PixelBufferRenderTarget::compile(){
 
 	if(color!=NULL && depth==NULL){
 		// No Depth-Stencil surface, so add one
-		D3D10TextureMipPixelBuffer::ptr buffer(new D3D10TextureMipPixelBuffer(mRenderer));
+		D3D10TextureMipPixelBuffer::ptr buffer(new D3D10TextureMipPixelBuffer(mDevice));
 		if(buffer->create(Buffer::Usage_BIT_STREAM,Buffer::Access_NONE,Texture::Format_DEPTH_16,mWidth,mHeight,1)){
 			attach(buffer,Attachment_DEPTH_STENCIL);
 			mDepthBuffer=buffer;

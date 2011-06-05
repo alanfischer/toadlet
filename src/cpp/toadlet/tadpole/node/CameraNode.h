@@ -27,7 +27,7 @@
 #define TOADLET_TADPOLE_NODE_CAMERANODE_H
 
 #include <toadlet/peeper/Viewport.h>
-#include <toadlet/peeper/Renderer.h>
+#include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
@@ -117,10 +117,10 @@ public:
 	inline int getNumClipPlanes() const{return 6;}
 	inline const Plane &getClipPlane(int i) const{return mClipPlanes[i];}
 
-	virtual void render(peeper::Renderer *renderer,Node *node=NULL);
+	virtual void render(peeper::RenderDevice *renderDevice,Node *node=NULL);
 
-	egg::image::Image::ptr renderToImage(peeper::Renderer *renderer,int format,int width,int height);
-	Mesh::ptr renderToSkyBox(peeper::Renderer *renderer,int format,int size,scalar scale);
+	egg::image::Image::ptr renderToImage(peeper::RenderDevice *renderDevice,int format,int width,int height);
+	Mesh::ptr renderToSkyBox(peeper::RenderDevice *renderDevice,int format,int size,scalar scale);
 
 	virtual bool culled(Node *node) const;
 	virtual bool culled(const Bound &bound) const;
@@ -137,7 +137,7 @@ public:
 protected:
 	virtual void projectionUpdated();
 	virtual void updateViewTransform();
-	virtual void renderOverlayGamma(peeper::Renderer *renderer);
+	virtual void renderOverlayGamma(peeper::RenderDevice *renderDevice);
 
 	ProjectionType mProjectionType;
 	scalar mFov,mAspect;

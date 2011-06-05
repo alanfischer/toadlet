@@ -52,7 +52,7 @@ public:
 		Material *getRenderMaterial() const{return material;}
 		const Transform &getRenderTransform() const{return modelNode->getWorldTransform();}
 		const Bound &getRenderBound() const{return modelNode->getWorldBound();}
-		void render(peeper::Renderer *renderer) const;
+		void render(peeper::RenderDevice *renderDevice) const;
 
 		BSP30ModelNode *modelNode;
 		BSP30Map *map;
@@ -135,7 +135,7 @@ public:
 	Material *getRenderMaterial() const{return NULL;}
 	const Transform &getRenderTransform() const{return mWorldTransform;}
 	const Bound &getRenderBound() const{return mWorldBound;}
-	void render(peeper::Renderer *renderer) const;
+	void render(peeper::RenderDevice *renderDevice) const;
 
 protected:
 	void childTransformUpdated(Node *child);

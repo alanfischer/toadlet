@@ -399,7 +399,7 @@ namespace peeper{
 
 	#define D3D9Buffer					D3DMBuffer
 	#define D3D9Query					D3DMQuery
-	#define D3D9Renderer				D3DMRenderer
+	#define D3D9RenderDevice			D3DMRenderDevWice
 	#define D3D9RenderTarget			D3DMRenderTarget
 	#define D3D9Surface					D3DMSurface
 	#define D3D9SurfaceRenderTarget		D3DMSurfaceRenderTarget

@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include "D3D10Query.h"
-#include "D3D10Renderer.h"
+#include "D3D10RenderDevice.h"
 #include <toadlet/egg/Logger.h>
 
 using namespace toadlet::egg;
@@ -32,14 +32,12 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
-D3D10Query::D3D10Query(D3D10Renderer *renderer):
-	mRenderer(NULL),
-
+D3D10Query::D3D10Query(D3D10RenderDevice *renderDevice):
+	mDevice(NULL),
 	mQueryType(QueryType_UNKNOWN),
-
 	mQuery(NULL)
 {
-	mRenderer=renderer;
+	mDevice=renderDevice;
 }
 
 D3D10Query::~D3D10Query(){
@@ -53,7 +51,7 @@ bool D3D10Query::create(QueryType queryType){
 	desc.Query=getD3D10_QUERY(mQueryType);
 	desc.MiscFlags=0;
 	
-	HRESULT result=mRenderer->getD3D10Device()->CreateQuery(&desc,&mQuery);
+	HRESULT result=mDevice->getD3D10Device()->CreateQuery(&desc,&mQuery);
 	TOADLET_CHECK_D3D10ERROR(result,"D3D10Query: CreateQuery");
 
 	return true;

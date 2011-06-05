@@ -345,14 +345,14 @@ const Bound &MeshNodeSkeleton::getRenderBound() const{
 	return mNode!=NULL?mNode->getWorldBound():Node::zeroBound();
 }
 
-void MeshNodeSkeleton::render(Renderer *renderer) const{
-	renderer->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
+void MeshNodeSkeleton::render(RenderDevice *renderDevice) const{
+	renderDevice->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
 
 	mSkeletonIndexData->primitive=IndexData::Primitive_POINTS;
-	renderer->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
+	renderDevice->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
 	mSkeletonIndexData->primitive=IndexData::Primitive_LINES;
 
-	renderer->renderPrimitive(mHitBoxVertexData,mHitBoxIndexData);
+	renderDevice->renderPrimitive(mHitBoxVertexData,mHitBoxIndexData);
 }
 
 bool MeshNodeSkeleton::getAttachmentTransform(Transform &result,int index){

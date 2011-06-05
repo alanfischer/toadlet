@@ -34,13 +34,13 @@
 namespace toadlet{
 namespace peeper{
 
-class D3D9Renderer;
+class D3D9RenderDevice;
 class D3D9TextureMipPixelBuffer;
 
 class TOADLET_API D3D9Texture:protected egg::BaseResource,public Texture{
 	TOADLET_BASERESOURCE_PASSTHROUGH(Texture);
 public:
-	D3D9Texture(D3D9Renderer *renderer);
+	D3D9Texture(D3D9RenderDevice *renderDevice);
 
 	virtual ~D3D9Texture();
 
@@ -71,7 +71,7 @@ protected:
 	bool createContext(bool restore);
 	bool destroyContext(bool backup);
 
-	D3D9Renderer *mRenderer;
+	D3D9RenderDevice *mDevice;
 
 	int mUsage;
 	Dimension mDimension;
@@ -89,7 +89,7 @@ protected:
 	egg::Collection<PixelBuffer::ptr> mBuffers;
 	D3D9PixelBuffer::ptr mBackingBuffer;
 
-	friend class D3D9Renderer;
+	friend class D3D9RenderDevice;
 	friend class D3D9TextureMipPixelBuffer;
 };
 

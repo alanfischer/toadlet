@@ -30,7 +30,7 @@ public:
 	void create(const String &directory);
 	void destroy();
 	void resized(int width,int height);
-	void render(Renderer *renderer);
+	void render(RenderDevice *renderDevice);
 	void update(int dt);
 	void preLogicUpdate(int dt){}
 	void logicUpdate(int dt);
