@@ -152,6 +152,22 @@ RenderState::ptr BSP30ModelNode::getSharedRenderState(){
 	return sharedMaterial->getRenderState();
 }
 
+void BSP30ModelNode::showPlanarFaces(int plane){
+	int i;
+	for(i=0;i<mSubModels.size();++i){
+		BSP30Map::facedata *face=mSubModels[i]->faces;
+		while(face!=NULL){
+			if(mMap->planes[mMap->faces[face->index].planenum].type!=plane){
+				face->visible=false;
+			}
+			else{
+				face->visible=true;
+			}
+			face=face->next;
+		}
+	}
+}
+
 void BSP30ModelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 	super::gatherRenderables(camera,set);
 
