@@ -48,8 +48,6 @@ set (PEEPER_GLRENDERDEVICE_HEADERS
 	GLRenderDevice.h
 	GLRenderState.h
 	GLRenderTarget.h
-	GLSLProgramPeer.h
-	GLSLShaderPeer.h
 	GLTexture.h
 	GLTextureMipPixelBuffer.h
 	GLPixelBuffer.h

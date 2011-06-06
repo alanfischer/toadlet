@@ -32,7 +32,6 @@
 #include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/peeper/Shader.h>
-#include <toadlet/peeper/Program.h>
 #include <toadlet/peeper/RenderCaps.h>
 #include <toadlet/ribbit/AudioDevice.h>
 #include <toadlet/ribbit/AudioBuffer.h>

@@ -37,7 +37,6 @@
 #include <toadlet/peeper/LightState.h>
 #include <toadlet/peeper/PixelBuffer.h>
 #include <toadlet/peeper/PixelBufferRenderTarget.h>
-#include <toadlet/peeper/Program.h>
 #include <toadlet/peeper/PointState.h>
 #include <toadlet/peeper/Query.h>
 #include <toadlet/peeper/RenderDevice.h>
