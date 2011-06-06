@@ -75,6 +75,8 @@ public:
 	inline int getNumSubModels() const{return mSubModels.size();}
 	SubModel *getSubModel(int i){return mSubModels[i];}
 
+	void showPlanarFaces(int plane);
+
 	// Visible
 	bool getRendered() const{return mRendered;}
 	void setRendered(bool rendered){mRendered=rendered;}
