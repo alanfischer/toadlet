@@ -165,7 +165,7 @@ rect{
 	mApplication->resized(width,height);
 
 	if(mApplication->active() && mApplication->getRenderDevice()!=NULL){
-		if(mApplication->getEngine()->getRenderDeviceCaps().resetOnResize){
+		if(mApplication->getEngine()->getRenderCaps().resetOnResize){
 			mApplication->getEngine()->contextReset(mApplication->getRenderDevice());
 		}
 		mApplication->update(0);
