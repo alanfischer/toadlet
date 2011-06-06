@@ -33,16 +33,14 @@
 namespace toadlet{
 namespace peeper{
 
-class ShaderPeer{
-};
-
 class Shader:public egg::Resource{
 public:
 	TOADLET_SHARED_POINTERS(Shader);
 
-	enum Type{
-		Type_VERTEX,
-		Type_FRAGMENT,
+	enum ShaderType{
+		ShaderType_GEOMETRY,
+		ShaderType_VERTEX,
+		ShaderType_FRAGMENT,
 	};
 
 	enum Language{
@@ -50,27 +48,16 @@ public:
 		Language_GLSL,
 	};
 
-	Shader(Type shaderType,Language language);
-	Shader(RenderDevice *renderDevice,Type shaderType,Language language);
+	Shader(RenderDevice *renderDevice,ShaderType shaderType,Language language);
+	virtual ~Shader(){}
 
-	virtual ~Shader();
 
-	Type getType() const{return mType;}
-	Language getLanguage() const{return mLanguage;}
+	virtual Shader *getRootShader()=0;
 
-	virtual void addCode(const egg::String &string);
+	virtual void create(ShaderType shaderType)=0;
+	virtual void destroy()=0;
 
-	virtual void internal_setShaderPeer(ShaderPeer *shaderPeer,bool own);
-	inline ShaderPeer *internal_getShaderPeer() const{return mShaderPeer;}
-	inline bool internal_ownsShaderPeer() const{return mOwnsShaderPeer;}
-
-protected:
-	Type mType;
-	Language mLanguage;
-	egg::String mCode;
-
-	ShaderPeer *mShaderPeer;
-	bool mOwnsShaderPeer;
+	virtual ShaderType getShaderType() const=0;
 };
 
 }

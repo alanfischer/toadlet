@@ -34,7 +34,6 @@ set (PEEPER_HEADERS
 	IndexData.h
 	MaterialState.h
 	LightState.h
-	Program.h
 	Query.h
 	RasterizerState.h
 	RenderTarget.h
