@@ -321,7 +321,9 @@ void Node::updateWorldTransform(){
 }
 
 void Node::spacialUpdated(){
-	mTransformUpdatedFrame=mScene->getFrame();
+	if(mScene!=NULL){
+		mTransformUpdatedFrame=mScene->getFrame();
+	}
 	activate();
 }
 
