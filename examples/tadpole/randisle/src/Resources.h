@@ -26,7 +26,7 @@ public:
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
 				grass->setTextureState(0,textureState);
 			}
-			grass->setLayer(-1);
+//			grass->setLayer(-1);
 			grass->retain();
 		}
 
