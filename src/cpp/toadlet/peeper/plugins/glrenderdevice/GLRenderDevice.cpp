@@ -29,6 +29,7 @@
 #include "GLRenderTarget.h"
 #include "GLRenderState.h"
 #include "GLTexture.h"
+#include "GLSLShader.h"
 #if defined(TOADLET_HAS_GLFBOS)
 	#include "GLFBORenderTarget.h"
 #endif
@@ -92,7 +93,10 @@ GLRenderDevice::GLRenderDevice():
 	mPrimaryRenderTarget(NULL),
 	mGLPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL),
-	mGLRenderTarget(NULL)
+	mGLRenderTarget(NULL),
+
+	mGeometryShader(NULL),mVertexShader(NULL),mFragmentShader(NULL)
+	//mGLSLProgramMap;
 
 	#if defined(TOADLET_DEBUG)
 		,mBeginEndCounter(0)
@@ -402,8 +406,7 @@ Program *GLRenderDevice::createProgram(){
 }
 
 Shader *GLRenderDevice::createShader(){
-	Error::unimplemented("GLRenderDevice::createShader is unavailable");
-	return NULL;
+	return new GLSLShader(this);
 }
 
 Query *GLRenderDevice::createQuery(){

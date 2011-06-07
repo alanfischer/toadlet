@@ -2,6 +2,8 @@
 set (PEEPER_GLRENDERDEVICE_SRC
 	GLBuffer.cpp
 	GLRenderDevice.cpp
+	GLSLShader.cpp
+	GLSLProgram.cpp
 	GLTexture.cpp
 	GLTextureMipPixelBuffer.cpp
 	GLVertexFormat.cpp
@@ -48,6 +50,8 @@ set (PEEPER_GLRENDERDEVICE_HEADERS
 	GLRenderDevice.h
 	GLRenderState.h
 	GLRenderTarget.h
+	GLSLShader.h
+	GLSLProgram.h
 	GLTexture.h
 	GLTextureMipPixelBuffer.h
 	GLPixelBuffer.h

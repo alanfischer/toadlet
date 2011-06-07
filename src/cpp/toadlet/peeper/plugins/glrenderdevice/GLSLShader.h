@@ -23,33 +23,47 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_SHADER_H
-#define TOADLET_PEEPER_SHADER_H
+#ifndef TOADLET_PEEPER_GLSLSHADER_H
+#define TOADLET_PEEPER_GLSLSHADER_H
 
-#include <toadlet/egg/Resource.h>
-#include <toadlet/egg/String.h>
+#include "GLRenderDevice.h"
+#include <toadlet/egg/BaseResource.h>
+#include <toadlet/peeper/Shader.h>
 
 namespace toadlet{
 namespace peeper{
 
-class Shader:public egg::Resource{
+class GLSLProgram;
+
+class GLSLShader:protected egg::BaseResource,public Shader{
+	TOADLET_BASERESOURCE_PASSTHROUGH(Shader);
 public:
-	TOADLET_SHARED_POINTERS(Shader);
+	TOADLET_SHARED_POINTERS(GLSLShader);
 
-	enum ShaderType{
-		ShaderType_GEOMETRY,
-		ShaderType_VERTEX,
-		ShaderType_FRAGMENT,
-	};
+	GLSLShader(GLRenderDevice *renderDevice);
+	virtual ~GLSLShader();
+	
+	Shader *getRootShader(){return this;}
 
-	virtual ~Shader(){}
+	bool create(ShaderType shaderType,const egg::String &code);
+	void destroy();
 
-	virtual Shader *getRootShader()=0;
+	ShaderType getShaderType() const{return mShaderType;}
 
-	virtual bool create(ShaderType shaderType,const egg::String &code)=0;
-	virtual void destroy()=0;
+protected:
+	bool createContext();
+	bool destroyContext();
 
-	virtual ShaderType getShaderType() const=0;
+	GLRenderDevice *mDevice;
+
+	ShaderType mShaderType;
+	egg::String mCode;
+
+	GLuint mHandle;
+	GLenum mTarget;
+	
+	friend class GLRenderDevice;
+	friend class GLSLProgram;
 };
 
 }
