@@ -23,36 +23,68 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_SHADER_H
-#define TOADLET_PEEPER_SHADER_H
+#include "GLSLProgram.h"
 
-#include <toadlet/egg/Resource.h>
-#include <toadlet/egg/String.h>
+using namespace toadlet::egg;
 
 namespace toadlet{
 namespace peeper{
 
-class Shader:public egg::Resource{
-public:
-	TOADLET_SHARED_POINTERS(Shader);
+GLSLProgram::GLSLProgram(GLRenderDevice *renderDevice):
+	mDevice(NULL),
 
-	enum ShaderType{
-		ShaderType_GEOMETRY,
-		ShaderType_VERTEX,
-		ShaderType_FRAGMENT,
-	};
+	mHandle(0)
+{
+	mDevice=renderDevice;
+}
 
-	virtual ~Shader(){}
+GLSLProgram::~GLSLProgram(){
+	destroy();
+}
 
-	virtual Shader *getRootShader()=0;
+bool GLSLProgram::create(){
+	destroy();
 
-	virtual bool create(ShaderType shaderType,const egg::String &code)=0;
-	virtual void destroy()=0;
+	return createContext();
+}
 
-	virtual ShaderType getShaderType() const=0;
-};
+void GLSLProgram::destroy(){
+	destroyContext();
+}
+
+bool GLSLProgram::attachShader(Shader::ptr shader){
+	GLSLShader *glshader=(GLSLShader*)shader->getRootShader();
+
+	glAttachShader(mHandle,glshader->mHandle);
+
+	return true;
+}
+
+bool GLSLProgram::removeShader(Shader::ptr shader){
+	GLSLShader *glshader=(GLSLShader*)shader->getRootShader();
+
+	glDetachShader(mHandle,glshader->mHandle);
+
+	return true;
+}
+
+bool GLSLProgram::createContext(){
+	mHandle=glCreateProgram();
+	
+	return true;
+}
+
+bool GLSLProgram::destroyContext(){
+	if(mHandle!=0){
+		glDeleteProgram(mHandle);
+		mHandle=0;
+
+		// Check this only if we had a handle, to eliminate errors at shutdown
+		TOADLET_CHECK_GLERROR("GLSLProgram::destroy");
+	}
+	
+	return true;
+}
 
 }
 }
-
-#endif

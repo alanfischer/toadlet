@@ -45,6 +45,8 @@ namespace toadlet{
 namespace peeper{
 
 class GLBuffer;
+class GLSLShader;
+class GLSLProgram;
 class GLTexture;
 
 class TOADLET_API GLRenderDevice:public RenderDevice{
@@ -200,6 +202,9 @@ protected:
 	GLRenderTarget *mGLPrimaryRenderTarget;
 	RenderTarget *mRenderTarget;
 	GLRenderTarget *mGLRenderTarget;
+
+	GLSLShader *mGeometryShader,*mVertexShader,*mFragmentShader;
+	egg::Map<uint64,GLSLProgram*> mGLSLProgramMap;
 
 	#if defined(TOADLET_DEBUG)
 		int mBeginEndCounter;
