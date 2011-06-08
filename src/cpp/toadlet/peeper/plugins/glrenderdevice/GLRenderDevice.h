@@ -28,6 +28,7 @@
 
 #include "GLIncludes.h"
 #include "GLRenderTarget.h"
+#include "GLSLProgram.h"
 #include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/peeper/BlendState.h>
 #include <toadlet/peeper/DepthState.h>
@@ -46,7 +47,6 @@ namespace peeper{
 
 class GLBuffer;
 class GLSLShader;
-class GLSLProgram;
 class GLTexture;
 
 class TOADLET_API GLRenderDevice:public RenderDevice{
@@ -75,7 +75,6 @@ public:
 	VertexFormat *createVertexFormat();
 	VertexBuffer *createVertexBuffer();
 	IndexBuffer *createIndexBuffer();
-	Program *createProgram();
 	Shader *createShader();
 	Query *createQuery();
 	RenderState *createRenderState();
@@ -99,6 +98,7 @@ public:
 	bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src);
 	void setDefaultState();
 	bool setRenderState(RenderState *renderState);
+	bool setShader(Shader::ShaderType type,Shader *shader);
 	void setTexture(int i,Texture *texture);
 
 	// Old fixed states
@@ -203,8 +203,9 @@ protected:
 	RenderTarget *mRenderTarget;
 	GLRenderTarget *mGLRenderTarget;
 
-	GLSLShader *mGeometryShader,*mVertexShader,*mFragmentShader;
-	egg::Map<uint64,GLSLProgram*> mGLSLProgramMap;
+	Shader *mVertexShader,*mFragmentShader,*mGeometryShader;
+	egg::Map<uint64,GLSLProgram::ptr> mGLSLProgramMap;
+	bool mRebindGLSLProgram;
 
 	#if defined(TOADLET_DEBUG)
 		int mBeginEndCounter;

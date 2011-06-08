@@ -22,6 +22,7 @@ set (TADPOLE_SRC
 	ResourceManager.cpp
 	Scene.cpp
 	SceneRenderer.cpp
+	ShaderManager.cpp
 	ShadowMappedSceneRenderer.cpp
 	Skeleton.cpp
 	TransformKeyFrame.cpp
@@ -144,6 +145,7 @@ set (TADPOLE_HEADERS
 	RenderableSet.h
 	Scene.h
 	SceneRenderer.h
+	ShaderManager.h
 	ShadowMappedSceneRenderer.h
 	Skeleton.h
 	TextureManager.h

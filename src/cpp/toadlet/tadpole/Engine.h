@@ -28,13 +28,10 @@
 
 #include <toadlet/egg/Categories.h>
 #include <toadlet/peeper/RenderDevice.h>
-#include <toadlet/peeper/Texture.h>
 #include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/VertexBuffer.h>
-#include <toadlet/peeper/Shader.h>
 #include <toadlet/peeper/RenderCaps.h>
 #include <toadlet/ribbit/AudioDevice.h>
-#include <toadlet/ribbit/AudioBuffer.h>
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/tadpole/ArchiveManager.h>
 #include <toadlet/tadpole/AudioBufferManager.h>
@@ -45,7 +42,7 @@
 #include <toadlet/tadpole/MaterialManager.h>
 #include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/NodeManager.h>
-#include <toadlet/tadpole/ResourceManager.h>
+#include <toadlet/tadpole/ShaderManager.h>
 #include <toadlet/tadpole/ContextListener.h>
 #include <toadlet/tadpole/node/Node.h>
 #include <toadlet/tadpole/handler/AudioBufferHandler.h>
@@ -102,8 +99,7 @@ public:
 	inline ArchiveManager *getArchiveManager() const{return mArchiveManager;}
 	inline TextureManager *getTextureManager() const{return mTextureManager;}
 	inline BufferManager *getBufferManager() const{return mBufferManager;}
-	inline ResourceManager *getShaderManager() const{return mShaderManager;}
-	inline ResourceManager *getProgramManager() const{return mProgramManager;}
+	inline ShaderManager *getShaderManager() const{return mShaderManager;}
 	inline MaterialManager *getMaterialManager() const{return  mMaterialManager;}
 	inline FontManager *getFontManager() const{return mFontManager;}
 	inline MeshManager *getMeshManager() const{return mMeshManager;}
@@ -127,8 +123,7 @@ protected:
 	ArchiveManager *mArchiveManager;
 	TextureManager *mTextureManager;
 	BufferManager *mBufferManager;
-	ResourceManager *mShaderManager;
-	ResourceManager *mProgramManager;
+	ShaderManager *mShaderManager;
 	MaterialManager *mMaterialManager;
 	FontManager *mFontManager;
 	MeshManager *mMeshManager;

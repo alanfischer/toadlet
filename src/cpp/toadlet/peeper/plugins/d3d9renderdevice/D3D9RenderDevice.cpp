@@ -215,10 +215,6 @@ IndexBuffer *D3D9RenderDevice::createIndexBuffer(){
 	return new D3D9IndexBuffer(this);
 }
 
-Program *D3D9RenderDevice::createProgram(){
-	return NULL;
-}
-
 Shader *D3D9RenderDevice::createShader(){
 	return NULL;
 }

@@ -229,10 +229,6 @@ IndexBuffer *D3D10RenderDevice::createIndexBuffer(){
 	return new D3D10Buffer(this);
 }
 
-Program *D3D10RenderDevice::createProgram(){
-	return NULL;
-}
-
 Shader *D3D10RenderDevice::createShader(){
 	return NULL;
 }

@@ -37,9 +37,9 @@ public:
 	TOADLET_SHARED_POINTERS(Shader);
 
 	enum ShaderType{
-		ShaderType_GEOMETRY,
 		ShaderType_VERTEX,
 		ShaderType_FRAGMENT,
+		ShaderType_GEOMETRY,
 	};
 
 	virtual ~Shader(){}

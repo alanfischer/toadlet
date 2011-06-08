@@ -62,14 +62,14 @@ void GLSLShader::destroy(){
 bool GLSLShader::createContext(){
 	// Create context data
 	switch(mShaderType){
-		case ShaderType_GEOMETRY:
-			mTarget=GL_GEOMETRY_SHADER_EXT;
-		break;
 		case ShaderType_VERTEX:
 			mTarget=GL_VERTEX_SHADER;
 		break;
 		case ShaderType_FRAGMENT:
 			mTarget=GL_FRAGMENT_SHADER;
+		break;
+		case ShaderType_GEOMETRY:
+			mTarget=GL_GEOMETRY_SHADER_EXT;
 		break;
 	}
 	

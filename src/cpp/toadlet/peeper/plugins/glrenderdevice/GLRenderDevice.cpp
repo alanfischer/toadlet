@@ -95,8 +95,9 @@ GLRenderDevice::GLRenderDevice():
 	mRenderTarget(NULL),
 	mGLRenderTarget(NULL),
 
-	mGeometryShader(NULL),mVertexShader(NULL),mFragmentShader(NULL)
-	//mGLSLProgramMap;
+	mGeometryShader(NULL),mVertexShader(NULL),mFragmentShader(NULL),
+	//mGLSLProgramMap,
+	mRebindGLSLProgram(false)
 
 	#if defined(TOADLET_DEBUG)
 		,mBeginEndCounter(0)
@@ -400,13 +401,13 @@ IndexBuffer *GLRenderDevice::createIndexBuffer(){
 	return new GLBuffer(this);
 }
 
-Program *GLRenderDevice::createProgram(){
-	Error::unimplemented("GLRenderDevice::createProgram is unavailable");
-	return NULL;
-}
-
 Shader *GLRenderDevice::createShader(){
-	return new GLSLShader(this);
+	#if defined(TOADLET_HAS_GLSL)
+		return new GLSLShader(this);
+	#else
+		Error::unimplemented("GLRenderDevice::createShader is unavailable");
+		return NULL;
+	#endif
 }
 
 Query *GLRenderDevice::createQuery(){
@@ -636,6 +637,10 @@ void GLRenderDevice::endScene(){
 		setTexture(i,NULL);
 	}
 
+	mVertexShader=NULL;
+	mFragmentShader=NULL;
+	mGeometryShader=NULL;
+
 	TOADLET_CHECK_GLERROR("endScene");
 }
 
@@ -681,24 +686,70 @@ void GLRenderDevice::renderPrimitive(const VertexData::ptr &vertexData,const Ind
 		break;
 	}
 
-	bool rebind=false;
-	if(mLastVertexData.get()!=vertexData.get() || mMaxTexCoordIndex!=mLastMaxTexCoordIndex){
-		rebind=true;
-	}
-	else{
-		// See if we need to rebind it due to the texCoordIndex portions of the TextureStages changing
-		int i;
-		for(i=0;i<mMaxTexCoordIndex;++i){
-			if(mLastTexCoordIndexes[i]!=mTexCoordIndexes[i]){
-				rebind=true;
-				break;
+	if(mRebindGLSLProgram){
+		mRebindGLSLProgram=false;
+
+		uint64 hash=0;
+		if(mVertexShader!=NULL){
+			hash|=(uint64)mVertexShader->getUniqueHandle();
+		}
+		if(mFragmentShader!=NULL){
+			hash|=((uint64)mFragmentShader->getUniqueHandle()<<16);
+		}
+		if(mGeometryShader!=NULL){
+			hash|=((uint64)mGeometryShader->getUniqueHandle()<<32);
+		}
+
+		GLSLProgram::ptr program;
+		Map<uint64,GLSLProgram::ptr>::iterator it=mGLSLProgramMap.find(hash);
+		if(it==mGLSLProgramMap.end()){
+			if(hash!=0){
+				program=GLSLProgram::ptr(new GLSLProgram(this));
+				program->create();
+				if(mVertexShader!=NULL){
+					program->attachShader(mVertexShader);
+				}
+				if(mFragmentShader!=NULL){
+					program->attachShader(mFragmentShader);
+				}
+				if(mGeometryShader!=NULL){
+					program->attachShader(mGeometryShader);
+				}
+				mGLSLProgramMap.add(hash,program);
 			}
 		}
+		else{
+			program=it->second;
+		}
+
+		if(program!=NULL){
+			program->activate();
+		}
+		else{
+			glUseProgram(0);
+		}
 	}
-	if(rebind){
-		mLastMaxTexCoordIndex=mMaxTexCoordIndex;
-		mLastTypeBits=setVertexData(vertexData,mLastTypeBits);
-		mLastVertexData=vertexData;
+
+	{
+		bool rebindTexCoords=false;
+		if(mLastVertexData.get()!=vertexData.get() || mMaxTexCoordIndex!=mLastMaxTexCoordIndex){
+			rebindTexCoords=true;
+		}
+		else{
+			// See if we need to rebind it due to the texCoordIndex portions of the TextureStages changing
+			int i;
+			for(i=0;i<mMaxTexCoordIndex;++i){
+				if(mLastTexCoordIndexes[i]!=mTexCoordIndexes[i]){
+					rebindTexCoords=true;
+					break;
+				}
+			}
+		}
+		if(rebindTexCoords){
+			mLastMaxTexCoordIndex=mMaxTexCoordIndex;
+			mLastTypeBits=setVertexData(vertexData,mLastTypeBits);
+			mLastVertexData=vertexData;
+		}
 	}
 
 	IndexBuffer *indexBuffer=indexData->indexBuffer;
@@ -861,6 +912,26 @@ bool GLRenderDevice::setRenderState(RenderState *renderState){
 	for(i=0;i<glrenderState->mTextureStates.size();++i){
 		setTextureState(i,glrenderState->mTextureStates[i]);
 	}
+
+	return true;
+}
+
+/// @todo: To support non-GLSL shaders, we could simple have setShader call GLShader::activate()
+///  And then GLSLShader::activate would call back into the device with setGLSLShader and then have this code
+bool GLRenderDevice::setShader(Shader::ShaderType type,Shader *shader){
+	switch(type){
+		case Shader::ShaderType_VERTEX:
+			mVertexShader=shader;
+		break;
+		case Shader::ShaderType_FRAGMENT:
+			mFragmentShader=shader;
+		break;
+		case Shader::ShaderType_GEOMETRY:
+			mGeometryShader=shader;
+		break;
+	}
+
+	mRebindGLSLProgram=true;
 
 	return true;
 }
