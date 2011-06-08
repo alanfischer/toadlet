@@ -255,6 +255,7 @@
 #endif
 #if defined(TOADLET_HAS_GLEW)
 	#define TOADLET_HAS_GLQUERY
+	#define TOADLET_HAS_GLSL
 #endif
 
 #if defined(TOADLET_DEBUG)

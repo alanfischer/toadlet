@@ -26,7 +26,6 @@
 #ifndef TOADLET_PEEPER_GLSLPROGRAM_H
 #define TOADLET_PEEPER_GLSLPROGRAM_H
 
-#include "GLRenderDevice.h"
 #include "GLSLShader.h"
 
 namespace toadlet{
@@ -42,8 +41,10 @@ public:
 	bool create();
 	void destroy();
 
-	bool attachShader(Shader::ptr shader);
-	bool removeShader(Shader::ptr shader);
+	bool attachShader(Shader *shader);
+	bool removeShader(Shader *shader);
+
+	bool activate();
 
 protected:
 	bool createContext();
@@ -52,6 +53,7 @@ protected:
 	GLRenderDevice *mDevice;
 
 	GLuint mHandle;
+	bool mNeedsLink;
 	
 	friend class GLRenderDevice;
 };

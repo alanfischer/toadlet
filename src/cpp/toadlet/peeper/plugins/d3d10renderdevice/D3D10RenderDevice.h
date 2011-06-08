@@ -64,7 +64,6 @@ ID3D10SamplerState *samp;
 	VertexFormat *createVertexFormat();
 	VertexBuffer *createVertexBuffer();
 	IndexBuffer *createIndexBuffer();
-	Program *createProgram();
 	Shader *createShader();
 	Query *createQuery();
 	RenderState *createRenderState();
@@ -88,6 +87,7 @@ ID3D10SamplerState *samp;
 	bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src);
 	void setDefaultState();
 	bool setRenderState(RenderState *renderState);
+	bool setShader(Shader::ShaderType type,Shader *shader){return false;}
 	void setTexture(int stage,Texture *texture);
 
 	// Old fixed states

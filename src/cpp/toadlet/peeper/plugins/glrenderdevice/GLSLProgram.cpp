@@ -33,7 +33,8 @@ namespace peeper{
 GLSLProgram::GLSLProgram(GLRenderDevice *renderDevice):
 	mDevice(NULL),
 
-	mHandle(0)
+	mHandle(0),
+	mNeedsLink(false)
 {
 	mDevice=renderDevice;
 }
@@ -52,18 +53,39 @@ void GLSLProgram::destroy(){
 	destroyContext();
 }
 
-bool GLSLProgram::attachShader(Shader::ptr shader){
+bool GLSLProgram::attachShader(Shader *shader){
 	GLSLShader *glshader=(GLSLShader*)shader->getRootShader();
 
 	glAttachShader(mHandle,glshader->mHandle);
 
+	mNeedsLink=true;
+
 	return true;
 }
 
-bool GLSLProgram::removeShader(Shader::ptr shader){
+bool GLSLProgram::removeShader(Shader *shader){
 	GLSLShader *glshader=(GLSLShader*)shader->getRootShader();
 
 	glDetachShader(mHandle,glshader->mHandle);
+
+	mNeedsLink=true;
+
+	return true;
+}
+
+bool GLSLProgram::activate(){
+	if(mNeedsLink){
+		glLinkProgram(mHandle);
+
+		GLint status=0;
+		glGetProgramiv(mHandle,GL_LINK_STATUS,&status);
+		if(status==GL_FALSE){
+			Error::unknown("error linking program");
+			return false;
+		}
+	}
+
+	glUseProgram(mHandle);
 
 	return true;
 }

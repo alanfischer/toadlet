@@ -30,6 +30,7 @@
 #include <toadlet/peeper/Types.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
+#include <toadlet/peeper/Shader.h>
 
 namespace toadlet{
 namespace peeper{
@@ -40,7 +41,6 @@ class IndexBuffer;
 class LightState;
 class MaterialState;
 class FogState;
-class Program;
 class Query;
 class RenderTarget;
 class PixelBufferRenderTarget;
@@ -49,7 +49,6 @@ class PointState;
 class RasterizerState;
 class RenderCaps;
 class RenderState;
-class Shader;
 class Texture;
 class VertexBuffer;
 class VertexFormat;
@@ -80,7 +79,6 @@ public:
 	virtual VertexFormat *createVertexFormat()=0;
 	virtual VertexBuffer *createVertexBuffer()=0;
 	virtual IndexBuffer *createIndexBuffer()=0;
-	virtual Program *createProgram()=0;
 	virtual Shader *createShader()=0;
 	virtual Query *createQuery()=0;
 	virtual RenderState *createRenderState()=0;
@@ -104,6 +102,7 @@ public:
 	virtual bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src)=0;
 	virtual void setDefaultState()=0;
 	virtual bool setRenderState(RenderState *renderState)=0;
+	virtual bool setShader(Shader::ShaderType type,Shader *shader)=0;
 	virtual void setTexture(int i,Texture *texture)=0;
 
 	// Old fixed states

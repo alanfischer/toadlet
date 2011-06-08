@@ -23,48 +23,29 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_GLSLSHADER_H
-#define TOADLET_PEEPER_GLSLSHADER_H
+#ifndef TOADLET_TADPOLE_SHADERMANAGER_H
+#define TOADLET_TADPOLE_SHADERMANAGER_H
 
-#include "GLIncludes.h"
-#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/Shader.h>
+#include <toadlet/tadpole/ResourceManager.h>
 
 namespace toadlet{
-namespace peeper{
+namespace tadpole{
 
-class GLRenderDevice;
-class GLSLProgram;
+class Engine;
 
-class GLSLShader:protected egg::BaseResource,public Shader{
-	TOADLET_BASERESOURCE_PASSTHROUGH(Shader);
+class TOADLET_API ShaderManager:public ResourceManager{
 public:
-	TOADLET_SHARED_POINTERS(GLSLShader);
+	ShaderManager(Engine *engine,bool backable);
 
-	GLSLShader(GLRenderDevice *renderDevice);
-	virtual ~GLSLShader();
-	
-	Shader *getRootShader(){return this;}
+	peeper::Shader::ptr createShader(peeper::Shader::ShaderType type,const egg::String &code);
 
-	bool create(ShaderType shaderType,const egg::String &code);
-	void destroy();
-
-	ShaderType getShaderType() const{return mShaderType;}
+//	void contextActivate(peeper::RenderDevice *renderDevice);
+//	void contextDeactivate(peeper::RenderDevice *renderDevice);
 
 protected:
-	bool createContext();
-	bool destroyContext();
-
-	GLRenderDevice *mDevice;
-
-	ShaderType mShaderType;
-	egg::String mCode;
-
-	GLuint mHandle;
-	GLenum mTarget;
-	
-	friend class GLRenderDevice;
-	friend class GLSLProgram;
+	Engine *mEngine;
+	bool mBackable;
 };
 
 }

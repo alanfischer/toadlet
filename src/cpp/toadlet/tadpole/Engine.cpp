@@ -172,12 +172,13 @@ Engine::Engine(bool backable):
 	mArchiveManager=new ArchiveManager();
 	mTextureManager=new TextureManager(this,mBackable);
 	mBufferManager=new BufferManager(this,mBackable);
+	mShaderManager=new ShaderManager(this,mBackable);
 	mMaterialManager=new MaterialManager(this,mBackable);
 	mFontManager=new FontManager(this->getArchiveManager());
 	mMeshManager=new MeshManager(this);
 	mAudioBufferManager=new AudioBufferManager(this);
 	mNodeManager=new NodeManager(this);
-
+	
 	mHandles.resize(1); // Handle 0 is always NULL
 
 	Math::optimize();
@@ -294,6 +295,11 @@ Engine::~Engine(){
 	if(mMeshManager!=NULL){
 		delete mMeshManager;
 		mMeshManager=NULL;
+	}
+
+	if(mShaderManager!=NULL){
+		delete mShaderManager;
+		mShaderManager=NULL;
 	}
 
 	if(mMaterialManager!=NULL){
