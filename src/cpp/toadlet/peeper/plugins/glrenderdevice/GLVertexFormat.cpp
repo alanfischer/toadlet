@@ -25,6 +25,7 @@
 
 #include "GLVertexFormat.h"
 #include "GLRenderDevice.h"
+#include <toadlet/peeper/BackableVertexFormat.h>
 
 using namespace toadlet::egg;
 
@@ -72,8 +73,18 @@ void GLVertexFormat::destroy(){
 
 bool GLVertexFormat::addElement(int semantic,const String &name,int index,int format){
 	int offset=mVertexSize;
-	mSemantics.add(semantic);
-	mNames.add(name);
+	if(semantic==Semantic_UNKNOWN){
+		mSemantics.add(BackableVertexFormat::getSemanticFromName(name));
+	}
+	else{
+		mSemantics.add(semantic);
+	}
+	if(name==(char*)NULL){
+		mNames.add(BackableVertexFormat::getNameFromSemantic(semantic));
+	}
+	else{
+		mNames.add(name);
+	}
 	mIndexes.add(index);
 	mFormats.add(format);
 	mOffsets.add(offset);

@@ -9,13 +9,15 @@ PeeperTest::~PeeperTest(){
 void PeeperTest::create(){
 	Application::create();
 
-	int typeBit=getRenderer()->getCapabilityState().idealVertexFormatBit;
+	RenderCaps caps;
+	getRenderDevice()->getRenderCaps(caps);
+	int typeBit=caps.idealVertexFormatBit;
 	VertexBufferAccessor vba;
 
-	VertexFormat::ptr triVertexFormat=VertexFormat::ptr(getRenderer()->createVertexFormat());
+	VertexFormat::ptr triVertexFormat=VertexFormat::ptr(getRenderDevice()->createVertexFormat());
 	triVertexFormat->addElement(VertexFormat::Semantic_POSITION,0,typeBit|VertexFormat::Format_BIT_COUNT_3);
 	triVertexFormat->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_COLOR_RGBA);
-	VertexBuffer::ptr triVertexBuffer=VertexBuffer::ptr(getRenderer()->createVertexBuffer());
+	VertexBuffer::ptr triVertexBuffer=VertexBuffer::ptr(getRenderDevice()->createVertexBuffer());
 	triVertexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,triVertexFormat,3);
 	{
 		vba.lock(triVertexBuffer);
@@ -29,12 +31,12 @@ void PeeperTest::create(){
 	}
 	triVertexData=VertexData::ptr(new VertexData(triVertexBuffer));
 	triIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,3));
-	triRenderStateSet=RenderStateSet::ptr(getRenderer()->createRenderStateSet());
-	triRenderStateSet->setMaterialState(MaterialState(false,true));
+	triRenderState=RenderState::ptr(getRenderDevice()->createRenderState());
+	triRenderState->setMaterialState(MaterialState(false,true));
 
-	VertexFormat::ptr quadVertexFormat=VertexFormat::ptr(getRenderer()->createVertexFormat());
+	VertexFormat::ptr quadVertexFormat=VertexFormat::ptr(getRenderDevice()->createVertexFormat());
 	quadVertexFormat->addElement(VertexFormat::Semantic_POSITION,0,typeBit|VertexFormat::Format_BIT_COUNT_3);
-	VertexBuffer::ptr quadVertexBuffer=VertexBuffer::ptr(getRenderer()->createVertexBuffer());
+	VertexBuffer::ptr quadVertexBuffer=VertexBuffer::ptr(getRenderDevice()->createVertexBuffer());
 	quadVertexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,quadVertexFormat,4);
 	{
 		vba.lock(quadVertexBuffer);
@@ -46,43 +48,43 @@ void PeeperTest::create(){
 	}
 	quadVertexData=VertexData::ptr(new VertexData(quadVertexBuffer));
 	quadIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,4));
-	quadRenderStateSet=RenderStateSet::ptr(getRenderer()->createRenderStateSet());
-	quadRenderStateSet->setMaterialState(MaterialState(Math::ONE_VECTOR4));
+	quadRenderState=RenderState::ptr(getRenderDevice()->createRenderState());
+	quadRenderState->setMaterialState(MaterialState(Math::ONE_VECTOR4));
 }
 
 void PeeperTest::destroy(){
-	triRenderStateSet->destroy();
+	triRenderState->destroy();
 	triVertexData->destroy();
 	triIndexData->destroy();
 
-	quadRenderStateSet->destroy();
+	quadRenderState->destroy();
 	quadVertexData->destroy();
 	quadIndexData->destroy();
 
 	Application::destroy();
 }
 
-void PeeperTest::render(Renderer *renderer){
-	renderer->setViewport(Viewport(0,0,getWidth(),getHeight()));
+void PeeperTest::render(RenderDevice *device){
+	device->setViewport(Viewport(0,0,getWidth(),getHeight()));
 
-	renderer->clear(ClearFlag_COLOR|ClearFlag_DEPTH,Math::ZERO_VECTOR4);
-	renderer->beginScene();
-		renderer->setProjectionMatrix(projectionMatrix);
-		renderer->setViewMatrix(viewMatrix);
+	device->clear(ClearFlag_COLOR|ClearFlag_DEPTH,Math::ZERO_VECTOR4);
+	device->beginScene();
+		device->setProjectionMatrix(projectionMatrix);
+		device->setViewMatrix(viewMatrix);
 
 		Math::setMatrix4x4FromTranslate(modelMatrix,Vector3(-Math::fromMilli(1500),0,-Math::fromInt(6)));
-		renderer->setModelMatrix(modelMatrix);
-		renderer->setRenderStateSet(triRenderStateSet);
-		renderer->renderPrimitive(triVertexData,triIndexData);
+		device->setModelMatrix(modelMatrix);
+		device->setRenderState(triRenderState);
+		device->renderPrimitive(triVertexData,triIndexData);
 
 		Math::setMatrix4x4FromTranslate(modelMatrix,Vector3(Math::fromMilli(1500),0,-Math::fromInt(6)));
-		renderer->setModelMatrix(modelMatrix);
-		renderer->setAmbientColor(Vector4(0,0,Math::ONE,Math::ONE));
-		renderer->setRenderStateSet(quadRenderStateSet);
-		renderer->renderPrimitive(quadVertexData,quadIndexData);
-	renderer->endScene();
+		device->setModelMatrix(modelMatrix);
+		device->setAmbientColor(Vector4(0,0,Math::ONE,Math::ONE));
+		device->setRenderState(quadRenderState);
+		device->renderPrimitive(quadVertexData,quadIndexData);
+	device->endScene();
 
-	renderer->swap();
+	device->swap();
 }
 
 void PeeperTest::resized(int width,int height){

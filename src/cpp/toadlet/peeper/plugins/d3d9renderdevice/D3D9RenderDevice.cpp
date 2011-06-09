@@ -1323,7 +1323,7 @@ DWORD D3D9RenderDevice::getFVF(VertexFormat *vertexFormat){
 				fvf|=D3DFVF_SPECULAR;
 			}
 		}
-		else if(semantic==VertexFormat::Semantic_TEX_COORD){
+		else if(semantic==VertexFormat::Semantic_TEXCOORD){
 			if((format&VertexFormat::Format_BIT_COUNT_1)>0){
 				fvf|=D3DFVF_TEXCOORDSIZE1(texCoordCount);
 			}

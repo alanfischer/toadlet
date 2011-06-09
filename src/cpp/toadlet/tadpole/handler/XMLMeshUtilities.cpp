@@ -635,7 +635,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 					vertexFormat->addElement(VertexFormat::Semantic_NORMAL,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3);
 				}
 				else if(t=="TexCoord"){
-					vertexFormat->addElement(VertexFormat::Semantic_TEX_COORD,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_2);
+					vertexFormat->addElement(VertexFormat::Semantic_TEXCOORD,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_2);
 				}
 				else if(t=="Color"){
 					vertexFormat->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_COLOR_RGBA);
@@ -673,7 +673,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 
 		int pi=vertexFormat->findElement(VertexFormat::Semantic_POSITION);
 		int ni=vertexFormat->findElement(VertexFormat::Semantic_NORMAL);
-		int ti=vertexFormat->findElement(VertexFormat::Semantic_TEX_COORD);
+		int ti=vertexFormat->findElement(VertexFormat::Semantic_TEXCOORD);
 		int ci=vertexFormat->findElement(VertexFormat::Semantic_COLOR);
 
 		AABox bound;
@@ -731,7 +731,7 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 						else if(semantic==VertexFormat::Semantic_NORMAL){
 							vba.set3(l,ni,parseVector3(element));
 						}
-						else if(semantic==VertexFormat::Semantic_TEX_COORD){
+						else if(semantic==VertexFormat::Semantic_TEXCOORD){
 							vba.set2(l,ti,parseVector2(element));
 						}
 						else if(semantic==VertexFormat::Semantic_COLOR){
@@ -904,7 +904,7 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 		String type;
 		int pi=vertexFormat->findElement(VertexFormat::Semantic_POSITION);
 		int ni=vertexFormat->findElement(VertexFormat::Semantic_NORMAL);
-		int ti=vertexFormat->findElement(VertexFormat::Semantic_TEX_COORD);
+		int ti=vertexFormat->findElement(VertexFormat::Semantic_TEXCOORD);
 		int ci=vertexFormat->findElement(VertexFormat::Semantic_COLOR);
 
 		const Collection<Mesh::VertexBoneAssignmentList> &vbas=mesh->getVertexBoneAssignments();

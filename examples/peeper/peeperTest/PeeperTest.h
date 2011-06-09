@@ -15,17 +15,17 @@ public:
 	void create();
 	void destroy();
 
-	void render(Renderer *renderer);
+	void render(RenderDevice *device);
 	void resized(int width,int height);
 
 protected:
 	VertexData::ptr triVertexData;
 	IndexData::ptr triIndexData;
-	RenderStateSet::ptr triRenderStateSet;
+	RenderState::ptr triRenderState;
 
 	VertexData::ptr quadVertexData;
 	IndexData::ptr quadIndexData;
-	RenderStateSet::ptr quadRenderStateSet;
+	RenderState::ptr quadRenderState;
 
 	Matrix4x4 projectionMatrix;
 	Matrix4x4 viewMatrix;

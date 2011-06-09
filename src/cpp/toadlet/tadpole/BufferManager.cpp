@@ -213,7 +213,7 @@ VertexBuffer::ptr BufferManager::cloneVertexBuffer(VertexBuffer::ptr oldVertexBu
 
 	#if defined(TOADLET_DEBUG)
 		for(i=0;i<vertexFormat->getNumElements();++i){
-			int oldElementIndex=oldVertexFormat->findSemantic(vertexFormat->getSemantic(i));
+			int oldElementIndex=oldVertexFormat->findElement(vertexFormat->findElement(i));
 			if(oldElementIndex>=0){
 				int dstElementSize=VertexFormat::getFormatSize(vertexFormat->getFormat(i));
 				int srcElementSize=VertexFormat::getFormatSize(oldVertexFormat->getFormat(oldElementIndex));

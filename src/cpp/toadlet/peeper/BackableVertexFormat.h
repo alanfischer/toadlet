@@ -62,6 +62,9 @@ public:
 	virtual void setBack(VertexFormat::ptr back);
 	virtual VertexFormat::ptr getBack(){return mBack;}
 	
+	static int getSemanticFromName(const egg::String &name);
+	static egg::String getNameFromSemantic(int semantic);
+
 protected:
 	VertexFormatDestroyedListener *mListener;
 	egg::Collection<int> mSemantics;

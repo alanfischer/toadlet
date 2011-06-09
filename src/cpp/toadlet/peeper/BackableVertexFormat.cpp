@@ -69,8 +69,18 @@ void BackableVertexFormat::destroy(){
 }
 
 bool BackableVertexFormat::addElement(int semantic,const String &name,int index,int format){
-	mSemantics.add(semantic);
-	mNames.add(name);
+	if(semantic==Semantic_UNKNOWN){
+		mSemantics.add(BackableVertexFormat::getSemanticFromName(name));
+	}
+	else{
+		mSemantics.add(semantic);
+	}
+	if(name==(char*)NULL){
+		mNames.add(BackableVertexFormat::getNameFromSemantic(semantic));
+	}
+	else{
+		mNames.add(name);
+	}
 	mIndexes.add(index);
 	mFormats.add(format);
 	mOffsets.add(mVertexSize);
@@ -117,6 +127,42 @@ void BackableVertexFormat::setBack(VertexFormat::ptr back){
 		for(i=0;i<mSemantics.size();++i){
 			mBack->addElement(mSemantics[i],mIndexes[i],mFormats[i]);
 		}
+	}
+}
+
+int BackableVertexFormat::getSemanticFromName(const String &name){
+	if(name.equals("POSITION"))
+		return Semantic_POSITION;
+	if(name.equals("BLEND_WEIGHTS"))
+		return Semantic_BLEND_WEIGHTS;
+	if(name.equals("BLEND_INDICES"))
+		return Semantic_BLEND_INDICES;
+	if(name.equals("NORMAL"))
+		return Semantic_NORMAL;
+	if(name.equals("COLOR"))
+		return Semantic_COLOR;
+	if(name.equals("TEXCOORD"))
+		return Semantic_TEXCOORD;
+	else
+		return Semantic_UNKNOWN;
+}
+
+String BackableVertexFormat::getNameFromSemantic(int semantic){
+	switch(semantic){
+		case Semantic_POSITION:
+			return "POSITION";
+		case Semantic_BLEND_WEIGHTS:
+			return "BLEND_WEIGHTS";
+		case Semantic_BLEND_INDICES:
+			return "BLEND_INDICES";
+		case Semantic_NORMAL:
+			return "NORMAL";
+		case Semantic_COLOR:
+			return "COLOR";
+		case Semantic_TEXCOORD:
+			return "TEXCOORD";
+		default:
+			return (char*)NULL;
 	}
 }
 

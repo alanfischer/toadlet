@@ -80,7 +80,7 @@ bool Font::updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const Stri
 	VertexFormat *format=vertexBuffer->getVertexFormat();
 
 	int positionIndex=format->findElement(VertexFormat::Semantic_POSITION);
-	int texCoordIndex=format->findElement(VertexFormat::Semantic_TEX_COORD);
+	int texCoordIndex=format->findElement(VertexFormat::Semantic_TEXCOORD);
 	int colorIndex=format->findElement(VertexFormat::Semantic_COLOR);
 
 	if(positionIndex<0 || texCoordIndex<0){
