@@ -325,8 +325,8 @@ void MeshNode::updateVertexBuffer(){
 		VertexBuffer::ptr dstVertexBuffer=mDynamicVertexData->getVertexBuffer(0);
 
 		VertexFormat *format=srcVertexBuffer->getVertexFormat();
-		int positionIndex=format->findSemantic(VertexFormat::Semantic_POSITION);
-		int normalIndex=format->findSemantic(VertexFormat::Semantic_NORMAL);
+		int positionIndex=format->findElement(VertexFormat::Semantic_POSITION);
+		int normalIndex=format->findElement(VertexFormat::Semantic_NORMAL);
 
 		const Collection<Mesh::VertexBoneAssignmentList> &vbas=mMesh->getVertexBoneAssignments();
 

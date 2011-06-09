@@ -66,7 +66,7 @@ Logo::Logo():Application(){
 
 Logo::~Logo(){
 }
-
+Shader::ptr vs,fs,gs;
 void Logo::create(){
 	Application::create();
 
@@ -95,6 +95,29 @@ void Logo::create(){
 	cameraNode->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
 	cameraNode->setClearColor(Colors::BLUE);
 	scene->getRoot()->attach(cameraNode);
+
+	const char *vc=
+		"void main(){" \
+		" gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;" \
+		"}";
+	vs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,vc);
+	const char *fc=
+		"void main(){" \
+		" gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);" \
+		"}";
+	fs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,fc);
+	const char *gc=
+		"#version 150\n" \
+		"layout(triangles) in;\n" \
+		"layout(line_strip, max_vertices = 3) out\n;" \
+		"void main(){\n" \
+		" for(int i=0;i<gl_in.length();i++){\n" \
+		"  gl_Position=gl_in[(i+1)%gl_in.length()].gl_Position;\n" \
+		"  EmitVertex();\n" \
+		" }\n" \
+		" EndPrimitive();\n" \
+		"}";
+	gs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_GEOMETRY,gc);
 
 // Only looks good if running on device, in simulator its always a top down view
 #if 0
@@ -126,6 +149,9 @@ void Logo::resized(int width,int height){
 
 void Logo::render(RenderDevice *renderDevice){
 	renderDevice->beginScene();
+renderDevice->setShader(Shader::ShaderType_VERTEX,vs);
+renderDevice->setShader(Shader::ShaderType_FRAGMENT,fs);
+renderDevice->setShader(Shader::ShaderType_GEOMETRY,gs);
 		cameraNode->render(renderDevice);
 	renderDevice->endScene();
 	renderDevice->swap();

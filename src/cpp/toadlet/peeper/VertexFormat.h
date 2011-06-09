@@ -26,6 +26,7 @@
 #ifndef TOADLET_PEEPER_VERTEXFORMAT_H
 #define TOADLET_PEEPER_VERTEXFORMAT_H
 
+#include <toadlet/egg/String.h>
 #include <toadlet/peeper/Types.h>
 #include <toadlet/peeper/VertexFormatDestroyedListener.h>
 
@@ -45,9 +46,6 @@ public:
 		Semantic_NORMAL=			3,
 		Semantic_COLOR=				4,
 		Semantic_TEX_COORD=			5,
-
-		/// @todo: Remove this, its only GLRenderDevice specific
-		Semantic_MASK_NON_TEX_COORD=	0x1F,
 	};
 
 	enum Format{
@@ -115,14 +113,17 @@ public:
 	virtual bool create()=0;
 	virtual void destroy()=0;
 
-	virtual void addElement(int semantic,int index,int format)=0;
+	virtual bool addElement(int semantic,int index,int format)=0;
+	virtual bool addElement(const egg::String &name,int index,int format)=0;
 	virtual int getNumElements() const=0;
 	virtual int getSemantic(int i) const=0;
+	virtual egg::String getName(int i) const=0;
 	virtual int getIndex(int i) const=0;
 	virtual int getFormat(int i) const=0;
 	virtual int getOffset(int i) const=0;
 	virtual int getVertexSize() const=0;
-	virtual int findSemantic(int semantic)=0;
+	virtual int findElement(int semantic)=0;
+	virtual int findElement(const egg::String &name)=0;
 };
 
 }

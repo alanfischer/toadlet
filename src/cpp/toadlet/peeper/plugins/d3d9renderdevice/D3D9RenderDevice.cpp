@@ -373,15 +373,12 @@ void D3D9RenderDevice::renderPrimitive(const VertexData::ptr &vertexData,const I
 			result=mD3DDevice->SetStreamSource(i,d3dvertexBuffer->mVertexBuffer,0,d3dvertexFormat->mVertexSize);
 		#endif
 		TOADLET_CHECK_D3D9ERROR(result,"D3D9RenderDevice: SetStreamSource");
-		#if !defined(TOADLET_SET_D3DM)
-		/// @todo: check if not using a vp
-			//if(mLastProgram==NULL){
-			//	result=mD3DDevice->SetFVF(d3dvertexFormat->getFVF());
-			//}
-			//else{
-				mD3DDevice->SetVertexDeclaration(d3dvertexFormat->getDeclaration());
-			//}
+		#if defined(TOADLET_SET_D3DM)
+			result=mD3DDevice->SetFVF(d3dvertexFormat->getFVF());
 			TOADLET_CHECK_D3D9ERROR(result,"D3D9RenderDevice: SetFVF");
+		#else
+			result=mD3DDevice->SetVertexDeclaration(d3dvertexFormat->getDeclaration());
+			TOADLET_CHECK_D3D9ERROR(result,"D3D9RenderDevice: SetVertexDeclaration");
 		#endif
 	}
 

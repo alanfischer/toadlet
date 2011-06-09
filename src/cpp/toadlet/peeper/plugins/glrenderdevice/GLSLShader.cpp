@@ -83,7 +83,16 @@ bool GLSLShader::createContext(){
 	GLint status=0;
 	glGetShaderiv(mHandle,GL_COMPILE_STATUS,&status);
 	if(status==GL_FALSE){
-		Error::unknown(Categories::TOADLET_PEEPER,"invalid glsl code");
+		String logString;
+		GLint length=0;
+		glGetShaderiv(mHandle,GL_INFO_LOG_LENGTH,&length);
+		if(length>0){
+			char *log=new char[length];
+			glGetShaderInfoLog(mHandle,length,NULL,log);
+			logString=log;
+			delete log;
+		}
+		Error::unknown(Categories::TOADLET_PEEPER,"glsl compile error:"+logString);
 		return false;
 	}
 	

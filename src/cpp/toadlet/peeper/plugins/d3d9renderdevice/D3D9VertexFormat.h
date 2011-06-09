@@ -43,16 +43,20 @@ public:
 
 	void setVertexFormatDestroyedListener(VertexFormatDestroyedListener *listener){mListener=listener;}
 
-	void addElement(int semantic,int index,int format);
+	bool addElement(int semantic,int index,int format){return addElement(semantic,(char*)NULL,index,format);}
+	bool addElement(const egg::String &name,int index,int format){return addElement(Semantic_UNKNOWN,name,index,format);}
+	bool addElement(int semantic,const egg::String &name,int index,int format);
 	bool create();
 	void destroy();
 
 	int getNumElements() const{return mSemantics.size();}
 	int getSemantic(int i) const{return mSemantics[i];}
+	egg::String getName(int i) const{return mNames[i];}
 	int getIndex(int i) const{return mIndexes[i];}
 	int getFormat(int i) const{return mFormats[i];}
 	int getOffset(int i) const{return mOffsets[i];}
-	int findSemantic(int semantic);
+	int findElement(int semantic);
+	int findElement(const egg::String &name);
 	int getVertexSize() const{return mVertexSize;}
 
 	inline bool getContextCreated(){return mContextCreated;}
@@ -74,6 +78,7 @@ protected:
 
 	VertexFormatDestroyedListener *mListener;
 	egg::Collection<int> mSemantics;
+	egg::Collection<egg::String> mNames;
 	egg::Collection<int> mIndexes;
 	egg::Collection<int> mFormats;
 	egg::Collection<int> mOffsets;

@@ -34,6 +34,7 @@ namespace peeper{
 BackableVertexFormat::BackableVertexFormat():
 	mListener(NULL),
 	//mSemantics,
+	//mNames,
 	//mIndexes,
 	//mFormats,
 	//mOffsets,
@@ -67,8 +68,9 @@ void BackableVertexFormat::destroy(){
 	}
 }
 
-void BackableVertexFormat::addElement(int semantic,int index,int format){
+bool BackableVertexFormat::addElement(int semantic,const String &name,int index,int format){
 	mSemantics.add(semantic);
+	mNames.add(name);
 	mIndexes.add(index);
 	mFormats.add(format);
 	mOffsets.add(mVertexSize);
@@ -78,12 +80,24 @@ void BackableVertexFormat::addElement(int semantic,int index,int format){
 	if(mBack!=NULL){
 		mBack->addElement(semantic,index,format);
 	}
+
+	return true;
 }
 
-int BackableVertexFormat::findSemantic(int semantic){
+int BackableVertexFormat::findElement(int semantic){
 	int i;
 	for(i=0;i<mSemantics.size();++i){
 		if(mSemantics[i]==semantic){
+			return i;
+		}
+	}
+	return -1;
+}
+
+int BackableVertexFormat::findElement(const String &name){
+	int i;
+	for(i=0;i<mNames.size();++i){
+		if(mNames[i]==name){
 			return i;
 		}
 	}

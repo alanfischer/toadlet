@@ -1738,16 +1738,6 @@ int GLRenderDevice::setVertexData(const VertexData *vertexData,int lastSemanticB
 							vertexSize,
 							glvertexBuffer->mElementOffsets[j]);
 					}
-					// This is no longer implemented, we would have to rework the semanticBits
-					//#if defined(TOADLET_HAS_GLEW)
-					//	else if(GLEW_EXT_secondary_color){
-	 				//		glSecondaryColorPointerEXT(
-					//			glvertexFormat->mGLElementCounts[j],
-					//			glvertexFormat->mGLDataTypes[j],
-					//			vertexSize,
-					//			glvertexBuffer->mElementOffsets[j]);
-					//	}
-					//#endif
 				break;
 				case VertexFormat::Semantic_TEX_COORD:
 					for(k=0;k<mMaxTexCoordIndex;++k){
@@ -1773,7 +1763,7 @@ int GLRenderDevice::setVertexData(const VertexData *vertexData,int lastSemanticB
 		// Go through all the non-texture VertexFormat types, check to see if the enabling state between now and last were different.
 		//  If so check to see if the state needs to be enabled or disabled.
 		int state=0;
-		int sb=(semanticBits&VertexFormat::Semantic_MASK_NON_TEX_COORD),lsb=(lastSemanticBits&VertexFormat::Semantic_MASK_NON_TEX_COORD);
+		int sb=(semanticBits&GLVertexFormat::Semantic_MASK_NON_TEX_COORD),lsb=(lastSemanticBits&GLVertexFormat::Semantic_MASK_NON_TEX_COORD);
 		while(sb>0 || lsb>0){
 			if((sb&1)!=(lsb&1)){
 				if((sb&1)>(lsb&1)){
@@ -1815,12 +1805,6 @@ int GLRenderDevice::setVertexData(const VertexData *vertexData,int lastSemanticB
 	if((semanticBits&(1<<VertexFormat::Semantic_COLOR))==0){
 		glColor4f(1.0f,1.0f,1.0f,1.0f);
 	}
-	// No longer implemented, see the SPECULAR stuff above
-	//#if defined(TOADLET_HAS_GLEW)
-	//	if((semanticBits&(1<<VertexFormat::Semantic_COLOR_SPECULAR))==0 && GLEW_EXT_secondary_color){
-	//		glSecondaryColor3fEXT(1.0f,1.0f,1.0f);
-	//	}
-	//#endif
 
 	TOADLET_CHECK_GLERROR("setVertexData");
 

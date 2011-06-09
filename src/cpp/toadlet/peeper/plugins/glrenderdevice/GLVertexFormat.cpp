@@ -26,6 +26,8 @@
 #include "GLVertexFormat.h"
 #include "GLRenderDevice.h"
 
+using namespace toadlet::egg;
+
 namespace toadlet{
 namespace peeper{
 
@@ -34,6 +36,7 @@ GLVertexFormat::GLVertexFormat(GLRenderDevice *renderDevice):
 
 	mListener(NULL),
 	//mSemantics,
+	//mNames,
 	//mIndexes,
 	//mFormats,
 	//mOffsets,
@@ -55,6 +58,7 @@ bool GLVertexFormat::create(){
 
 void GLVertexFormat::destroy(){
 	mSemantics.clear();
+	mNames.clear();
 	mIndexes.clear();
 	mFormats.clear();
 	mOffsets.clear();
@@ -66,9 +70,10 @@ void GLVertexFormat::destroy(){
 	}
 }
 
-void GLVertexFormat::addElement(int semantic,int index,int format){
+bool GLVertexFormat::addElement(int semantic,const String &name,int index,int format){
 	int offset=mVertexSize;
 	mSemantics.add(semantic);
+	mNames.add(name);
 	mIndexes.add(index);
 	mFormats.add(format);
 	mOffsets.add(offset);
@@ -77,14 +82,28 @@ void GLVertexFormat::addElement(int semantic,int index,int format){
 
 	mGLDataTypes.add(GLRenderDevice::getGLDataType(format));
 	mGLElementCounts.add(GLRenderDevice::getGLElementCount(format));
+
+	return true;
 }
 
-int GLVertexFormat::findSemantic(int semantic){
+int GLVertexFormat::findElement(int semantic){
 	TOADLET_ASSERT(mGLDataTypes.size()==mSemantics.size());
 
 	int i;
 	for(i=0;i<mSemantics.size();++i){
 		if(mSemantics[i]==semantic){
+			return i;
+		}
+	}
+	return -1;
+}
+
+int GLVertexFormat::findElement(const String &name){
+	TOADLET_ASSERT(mGLDataTypes.size()==mNames.size());
+
+	int i;
+	for(i=0;i<mNames.size();++i){
+		if(mNames[i].equals(name)){
 			return i;
 		}
 	}

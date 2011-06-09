@@ -37,6 +37,7 @@ D3D9VertexFormat::D3D9VertexFormat(D3D9RenderDevice *renderDevice):
 
 	mListener(NULL),
 	//mSemantics,
+	//mNames,
 	//mIndexes,
 	//mFormats,
 	//mOffsets,
@@ -64,6 +65,7 @@ void D3D9VertexFormat::destroy(){
 	destroyContext();
 
 	mSemantics.clear();
+	mNames.clear();
 	mIndexes.clear();
 	mFormats.clear();
 	mOffsets.clear();
@@ -119,9 +121,10 @@ bool D3D9VertexFormat::destroyContext(){
 	return true;
 }
 
-void D3D9VertexFormat::addElement(int semantic,int index,int format){
+bool D3D9VertexFormat::addElement(int semantic,const String &name,int index,int format){
 	int offset=mVertexSize;
 	mSemantics.add(semantic);
+	mNames.add(name);
 	mIndexes.add(index);
 	mFormats.add(format);
 	mOffsets.add(offset);
@@ -129,14 +132,28 @@ void D3D9VertexFormat::addElement(int semantic,int index,int format){
 	mVertexSize+=getFormatSize(format);
 
 	destroyContext();
+
+	return true;
 }
 
-int D3D9VertexFormat::findSemantic(int semantic){
-	TOADLET_ASSERT(mFVF!=0);
+int D3D9VertexFormat::findElement(int semantic){
+	TOADLET_ASSERT(mElements.size()!=0);
 
 	int i;
 	for(i=0;i<mSemantics.size();++i){
 		if(mSemantics[i]==semantic){
+			return i;
+		}
+	}
+	return -1;
+}
+
+int D3D9VertexFormat::findElement(const egg::String &name){
+	TOADLET_ASSERT(mElements.size()!=0);
+
+	int i;
+	for(i=0;i<mNames.size();++i){
+		if(mNames[i].equals(name)){
 			return i;
 		}
 	}
