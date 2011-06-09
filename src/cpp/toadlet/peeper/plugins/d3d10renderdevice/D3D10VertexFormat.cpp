@@ -59,6 +59,7 @@ void D3D10VertexFormat::destroy(){
 	destroyContext();
 
 	mSemantics.clear();
+	mNames.clear();
 	mIndexes.clear();
 	mFormats.clear();
 	mOffsets.clear();
@@ -86,27 +87,41 @@ bool D3D10VertexFormat::destroyContext(){
 	return true;
 }
 
-void D3D10VertexFormat::addElement(int semantic,int index,int format){
+bool D3D10VertexFormat::addElement(int semantic,const String &name,int index,int format){
 	int offset=mVertexSize;
 	mSemantics.add(semantic);
+	mNames.add(name);
 	mIndexes.add(index);
 	mFormats.add(format);
 	mOffsets.add(offset);
 
 	mVertexSize+=getFormatSize(format);
 
+	const char *d3dsemantic=semantic!=Semantic_UNKNOWN?D3D10RenderDevice::getSemanticName(semantic):name;
 	D3D10_INPUT_ELEMENT_DESC element={
-		D3D10RenderDevice::getSemanticName(semantic),index,D3D10RenderDevice::getVertexDXGI_FORMAT(format),0,offset,D3D10_INPUT_PER_VERTEX_DATA,0
+		d3dsemantic,index,D3D10RenderDevice::getVertexDXGI_FORMAT(format),0,offset,D3D10_INPUT_PER_VERTEX_DATA,0
 	};
 	mElements.add(element);
 
 	destroyContext();
+
+	return true;
 }
 
-int D3D10VertexFormat::findSemantic(int semantic){
+int D3D10VertexFormat::findElement(int semantic){
 	int i;
 	for(i=0;i<mSemantics.size();++i){
 		if(mSemantics[i]==semantic){
+			return i;
+		}
+	}
+	return -1;
+}
+
+int D3D10VertexFormat::findElement(const String &name){
+	int i;
+	for(i=0;i<mNames.size();++i){
+		if(mNames[i].equals(name)){
 			return i;
 		}
 	}

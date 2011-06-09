@@ -82,7 +82,7 @@ void VertexBufferAccessor::lock(VertexBuffer *vertexBuffer,int access){
 	else{
 		mFloatData=(float*)mData;
 	}
-	if(vertexFormat->findSemantic(VertexFormat::Semantic_COLOR)){
+	if(vertexFormat->findElement(VertexFormat::Semantic_COLOR)>0){
 		mColorData=(uint32*)mData;
 	}
 }

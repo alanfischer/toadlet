@@ -273,9 +273,9 @@ Mesh::ptr MeshManager::createGrid(VertexBuffer::ptr vertexBuffer,IndexBuffer::pt
 		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
 		iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
 
-		int positionIndex=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_POSITION);
-		int normalIndex=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_NORMAL);
-		int texCoordIndex=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_TEX_COORD);
+		int positionIndex=vertexBuffer->getVertexFormat()->findElement(VertexFormat::Semantic_POSITION);
+		int normalIndex=vertexBuffer->getVertexFormat()->findElement(VertexFormat::Semantic_NORMAL);
+		int texCoordIndex=vertexBuffer->getVertexFormat()->findElement(VertexFormat::Semantic_TEX_COORD);
 
 	    int x,y,ii=0,vi=0;
 		// Vertexes
@@ -358,9 +358,9 @@ Mesh::ptr MeshManager::createSphere(VertexBuffer::ptr vertexBuffer,IndexBuffer::
 		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
 		iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
 
-		int positionIndex=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_POSITION);
-		int normalIndex=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_NORMAL);
-		int texCoordIndex=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_TEX_COORD);
+		int positionIndex=vertexBuffer->getVertexFormat()->findElement(VertexFormat::Semantic_POSITION);
+		int normalIndex=vertexBuffer->getVertexFormat()->findElement(VertexFormat::Semantic_NORMAL);
+		int texCoordIndex=vertexBuffer->getVertexFormat()->findElement(VertexFormat::Semantic_TEX_COORD);
 
 		scalar deltaRingAngle=Math::div(Math::PI,Math::fromInt(numRings));
 		scalar deltaSegAngle=Math::div(Math::TWO_PI,Math::fromInt(numSegments));
@@ -444,9 +444,9 @@ Mesh::ptr MeshManager::createSkyDome(VertexBuffer::ptr vertexBuffer,IndexBuffer:
 		vba.lock(vertexBuffer,Buffer::Access_BIT_WRITE);
 		iba.lock(indexBuffer,Buffer::Access_BIT_WRITE);
 
-		int positionIndex=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_POSITION);
-		int normalIndex=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_NORMAL);
-		int texCoordIndex=vertexBuffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_TEX_COORD);
+		int positionIndex=vertexBuffer->getVertexFormat()->findElement(VertexFormat::Semantic_POSITION);
+		int normalIndex=vertexBuffer->getVertexFormat()->findElement(VertexFormat::Semantic_NORMAL);
+		int texCoordIndex=vertexBuffer->getVertexFormat()->findElement(VertexFormat::Semantic_TEX_COORD);
 
 		scalar deltaRingAngle=Math::div(Math::HALF_PI,Math::fromInt(numRings));
 		scalar deltaSegAngle=Math::div(Math::TWO_PI,Math::fromInt(numSegments));

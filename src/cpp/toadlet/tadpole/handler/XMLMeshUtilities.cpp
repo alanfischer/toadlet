@@ -671,10 +671,10 @@ Mesh::ptr XMLMeshUtilities::loadMesh(mxml_node_t *node,int version,BufferManager
 			vertexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,vertexFormat,count);
 		}
 
-		int pi=vertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
-		int ni=vertexFormat->findSemantic(VertexFormat::Semantic_NORMAL);
-		int ti=vertexFormat->findSemantic(VertexFormat::Semantic_TEX_COORD);
-		int ci=vertexFormat->findSemantic(VertexFormat::Semantic_COLOR);
+		int pi=vertexFormat->findElement(VertexFormat::Semantic_POSITION);
+		int ni=vertexFormat->findElement(VertexFormat::Semantic_NORMAL);
+		int ti=vertexFormat->findElement(VertexFormat::Semantic_TEX_COORD);
+		int ci=vertexFormat->findElement(VertexFormat::Semantic_COLOR);
 
 		AABox bound;
 
@@ -902,10 +902,10 @@ mxml_node_t *XMLMeshUtilities::saveMesh(Mesh::ptr mesh,int version,ProgressListe
 
 		VertexFormat::ptr vertexFormat=vertexBuffer->getVertexFormat();
 		String type;
-		int pi=vertexFormat->findSemantic(VertexFormat::Semantic_POSITION);
-		int ni=vertexFormat->findSemantic(VertexFormat::Semantic_NORMAL);
-		int ti=vertexFormat->findSemantic(VertexFormat::Semantic_TEX_COORD);
-		int ci=vertexFormat->findSemantic(VertexFormat::Semantic_COLOR);
+		int pi=vertexFormat->findElement(VertexFormat::Semantic_POSITION);
+		int ni=vertexFormat->findElement(VertexFormat::Semantic_NORMAL);
+		int ti=vertexFormat->findElement(VertexFormat::Semantic_TEX_COORD);
+		int ci=vertexFormat->findElement(VertexFormat::Semantic_COLOR);
 
 		const Collection<Mesh::VertexBoneAssignmentList> &vbas=mesh->getVertexBoneAssignments();
 
