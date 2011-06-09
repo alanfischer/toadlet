@@ -45,7 +45,7 @@ public:
 		Semantic_BLEND_INDICES=		2,
 		Semantic_NORMAL=			3,
 		Semantic_COLOR=				4,
-		Semantic_TEX_COORD=			5,
+		Semantic_TEXCOORD=			5,
 	};
 
 	enum Format{

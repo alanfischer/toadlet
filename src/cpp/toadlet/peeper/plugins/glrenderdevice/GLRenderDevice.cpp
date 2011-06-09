@@ -1739,10 +1739,10 @@ int GLRenderDevice::setVertexData(const VertexData *vertexData,int lastSemanticB
 							glvertexBuffer->mElementOffsets[j]);
 					}
 				break;
-				case VertexFormat::Semantic_TEX_COORD:
+				case VertexFormat::Semantic_TEXCOORD:
 					for(k=0;k<mMaxTexCoordIndex;++k){
 						if(mTexCoordIndexes[k]==index){
-							semanticBits|=(1<<(k+VertexFormat::Semantic_TEX_COORD));
+							semanticBits|=(1<<(k+VertexFormat::Semantic_TEXCOORD));
 							if(mMultiTexture){
 								glClientActiveTexture(GL_TEXTURE0+k);
 							}
@@ -1780,8 +1780,8 @@ int GLRenderDevice::setVertexData(const VertexData *vertexData,int lastSemanticB
 
 		// Go through all used texture stages, and see if the enabling state betwen now and last were different.
 		//  If so check to see if the state needs to be enabled or disabled.
-		sb=semanticBits>>VertexFormat::Semantic_TEX_COORD;
-		lsb=lastSemanticBits>>VertexFormat::Semantic_TEX_COORD;
+		sb=semanticBits>>VertexFormat::Semantic_TEXCOORD;
+		lsb=lastSemanticBits>>VertexFormat::Semantic_TEXCOORD;
 		int stci; // Shifted Tex Coord Indexes
 		for(i=0;((sb|lsb)>>i)>0;++i){
 			stci=(1<<i);

@@ -119,7 +119,6 @@ ID3D10SamplerState *samp;
 	static void getD3D10_DEPTH_STENCIL_DESC(D3D10_DEPTH_STENCIL_DESC &desc,const DepthState &state);
 	static void getD3D10_RASTERIZER_DESC(D3D10_RASTERIZER_DESC &desc,const RasterizerState &state);
 	static void getD3D10_SAMPLER_DESC(D3D10_SAMPLER_DESC &desc,const SamplerState &state);
-	static char *getSemanticName(int semantic);
 
 protected:
 	ID3D10Device *mD3DDevice;

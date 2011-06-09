@@ -26,6 +26,7 @@
 #include "D3D9VertexFormat.h"
 #include "D3D9RenderDevice.h"
 #include <toadlet/egg/Error.h>
+#include <toadlet/peeper/BackableVertexFormat.h>
 
 using namespace toadlet::egg;
 
@@ -123,8 +124,18 @@ bool D3D9VertexFormat::destroyContext(){
 
 bool D3D9VertexFormat::addElement(int semantic,const String &name,int index,int format){
 	int offset=mVertexSize;
-	mSemantics.add(semantic);
-	mNames.add(name);
+	if(semantic==Semantic_UNKNOWN){
+		mSemantics.add(BackableVertexFormat::getSemanticFromName(name));
+	}
+	else{
+		mSemantics.add(semantic);
+	}
+	if(name==(char*)NULL){
+		mNames.add(BackableVertexFormat::getNameFromSemantic(semantic));
+	}
+	else{
+		mNames.add(name);
+	}
 	mIndexes.add(index);
 	mFormats.add(format);
 	mOffsets.add(offset);
@@ -137,7 +148,7 @@ bool D3D9VertexFormat::addElement(int semantic,const String &name,int index,int 
 }
 
 int D3D9VertexFormat::findElement(int semantic){
-	TOADLET_ASSERT(mElements.size()!=0);
+	TOADLET_ASSERT(mSemantics.size()!=0);
 
 	int i;
 	for(i=0;i<mSemantics.size();++i){
@@ -149,7 +160,7 @@ int D3D9VertexFormat::findElement(int semantic){
 }
 
 int D3D9VertexFormat::findElement(const egg::String &name){
-	TOADLET_ASSERT(mElements.size()!=0);
+	TOADLET_ASSERT(mNames.size()!=0);
 
 	int i;
 	for(i=0;i<mNames.size();++i){
@@ -200,7 +211,7 @@ int D3D9VertexFormat::findElement(const egg::String &name){
 				return D3DDECLUSAGE_NORMAL;
 			case Semantic_COLOR:
 				return D3DDECLUSAGE_COLOR;
-			case Semantic_TEX_COORD:
+			case Semantic_TEXCOORD:
 				return D3DDECLUSAGE_TEXCOORD;
 			default:
 				Error::unknown("unknown D3DDECLUSAGE");

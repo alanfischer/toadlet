@@ -913,18 +913,5 @@ void D3D10RenderDevice::getD3D10_SAMPLER_DESC(D3D10_SAMPLER_DESC &desc,const Sam
 	desc.MaxLOD=state.maxLOD;
 }
 
-char *D3D10RenderDevice::getSemanticName(int semantic){
-	switch(semantic){
-		case VertexFormat::Semantic_POSITION:
-			return "POSITION";
-		case VertexFormat::Semantic_NORMAL:
-			return "NORMAL";
-		case VertexFormat::Semantic_TEX_COORD:
-			return "TEXCOORD";
-		default:
-			return "UNKNOWN";
-	}
-}
-
 }
 }

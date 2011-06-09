@@ -25,7 +25,7 @@
 
 #include "D3D10VertexFormat.h"
 #include "D3D10RenderDevice.h"
-#include <toadlet/egg/Error.h>
+#include <toadlet/peeper/BackableVertexFormat.h>
 
 using namespace toadlet::egg;
 
@@ -89,17 +89,26 @@ bool D3D10VertexFormat::destroyContext(){
 
 bool D3D10VertexFormat::addElement(int semantic,const String &name,int index,int format){
 	int offset=mVertexSize;
-	mSemantics.add(semantic);
-	mNames.add(name);
+	if(semantic==Semantic_UNKNOWN){
+		mSemantics.add(BackableVertexFormat::getSemanticFromName(name));
+	}
+	else{
+		mSemantics.add(semantic);
+	}
+	if(name==(char*)NULL){
+		mNames.add(BackableVertexFormat::getNameFromSemantic(semantic));
+	}
+	else{
+		mNames.add(name);
+	}
 	mIndexes.add(index);
 	mFormats.add(format);
 	mOffsets.add(offset);
 
 	mVertexSize+=getFormatSize(format);
 
-	const char *d3dsemantic=semantic!=Semantic_UNKNOWN?D3D10RenderDevice::getSemanticName(semantic):name;
 	D3D10_INPUT_ELEMENT_DESC element={
-		d3dsemantic,index,D3D10RenderDevice::getVertexDXGI_FORMAT(format),0,offset,D3D10_INPUT_PER_VERTEX_DATA,0
+		mNames[mNames.size()-1],index,D3D10RenderDevice::getVertexDXGI_FORMAT(format),0,offset,D3D10_INPUT_PER_VERTEX_DATA,0
 	};
 	mElements.add(element);
 
