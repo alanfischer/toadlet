@@ -81,7 +81,7 @@ GLRenderDevice::GLRenderDevice():
 	mLastMaxTexCoordIndex(0),
 	//mLastTexTargets,
 	//mLastVertexData,
-	mLastTypeBits(0),
+	mLastSemanticBits(0),mLastTexCoordSemanticBits(0),
 	//mLastTexCoordIndexes,
 
 	//mModelMatrix,
@@ -620,7 +620,7 @@ void GLRenderDevice::endScene(){
 	#endif
 
 	if(mLastVertexData!=NULL){
-		mLastTypeBits=setVertexData(NULL,mLastTypeBits);
+		setVertexData(NULL);
 		mLastVertexData=VertexData::wptr();
 	}
 	if(mCaps.hardwareVertexBuffers){
@@ -747,7 +747,7 @@ void GLRenderDevice::renderPrimitive(const VertexData::ptr &vertexData,const Ind
 		}
 		if(rebindTexCoords){
 			mLastMaxTexCoordIndex=mMaxTexCoordIndex;
-			mLastTypeBits=setVertexData(vertexData,mLastTypeBits);
+			setVertexData(vertexData);
 			mLastVertexData=vertexData;
 		}
 	}
@@ -1678,12 +1678,18 @@ bool GLRenderDevice::useMapping(GLBuffer *buffer) const{
 	return buffer->mDataSize>(1024 * 32);
 }
 
-int GLRenderDevice::setVertexData(const VertexData *vertexData,int lastSemanticBits){
+void GLRenderDevice::setVertexData(const VertexData *vertexData){
+	if(mVertexShader==NULL){
+		return setFixedVertexData(vertexData);
+	}
+	else{
+		return setShaderVertexData(vertexData);
+	}
+}
+
+void GLRenderDevice::setFixedVertexData(const VertexData *vertexData){
 	int numVertexBuffers=0;
-	/// @todo: Move all the semantic bit calculation to GLVertexFormat
-	// Semantic bits are a bitfield covering all the non-texture element semantics,
-	//  bitwise ORed with which texture stages are enabled.
-	int semanticBits=0;
+	int semanticBits=0,lastSemanticBits=mLastSemanticBits,texCoordSemanticBits=0,lastTexCoordSemanticBits=mLastTexCoordSemanticBits;
 
 	if(vertexData!=NULL){
 		numVertexBuffers=vertexData->vertexBuffers.size();
@@ -1696,6 +1702,7 @@ int GLRenderDevice::setVertexData(const VertexData *vertexData,int lastSemanticB
 		GLVertexFormat *glvertexFormat=(GLVertexFormat*)(glvertexBuffer->mVertexFormat->getRootVertexFormat());
 		GLsizei vertexSize=glvertexFormat->mVertexSize;
 		int numElements=glvertexFormat->mSemantics.size();
+		semanticBits|=(glvertexFormat->mSemanticBits&~(1<<VertexFormat::Semantic_TEXCOORD));
 
 		if(glvertexBuffer->mHandle==0){
 			if(mCaps.hardwareVertexBuffers){
@@ -1715,7 +1722,6 @@ int GLRenderDevice::setVertexData(const VertexData *vertexData,int lastSemanticB
 
 			switch(semantic){
 				case VertexFormat::Semantic_POSITION:
-					semanticBits|=(1<<semantic);
 					glVertexPointer(
 						glvertexFormat->mGLElementCounts[j],
 						glvertexFormat->mGLDataTypes[j],
@@ -1723,7 +1729,6 @@ int GLRenderDevice::setVertexData(const VertexData *vertexData,int lastSemanticB
 						glvertexBuffer->mElementOffsets[j]);
 				break;
 				case VertexFormat::Semantic_NORMAL:
-					semanticBits|=(1<<semantic);
 					glNormalPointer(
 						glvertexFormat->mGLDataTypes[j],
 						vertexSize,
@@ -1731,7 +1736,6 @@ int GLRenderDevice::setVertexData(const VertexData *vertexData,int lastSemanticB
 				break;
 				case VertexFormat::Semantic_COLOR:
 					if(index==0){
-						semanticBits|=(1<<semantic);
 						glColorPointer(
 							glvertexFormat->mGLElementCounts[j],
 							glvertexFormat->mGLDataTypes[j],
@@ -1742,7 +1746,7 @@ int GLRenderDevice::setVertexData(const VertexData *vertexData,int lastSemanticB
 				case VertexFormat::Semantic_TEXCOORD:
 					for(k=0;k<mMaxTexCoordIndex;++k){
 						if(mTexCoordIndexes[k]==index){
-							semanticBits|=(1<<(k+VertexFormat::Semantic_TEXCOORD));
+							texCoordSemanticBits|=(1<<k);
 							if(mMultiTexture){
 								glClientActiveTexture(GL_TEXTURE0+k);
 							}
@@ -1763,7 +1767,7 @@ int GLRenderDevice::setVertexData(const VertexData *vertexData,int lastSemanticB
 		// Go through all the non-texture VertexFormat types, check to see if the enabling state between now and last were different.
 		//  If so check to see if the state needs to be enabled or disabled.
 		int state=0;
-		int sb=(semanticBits&GLVertexFormat::Semantic_MASK_NON_TEX_COORD),lsb=(lastSemanticBits&GLVertexFormat::Semantic_MASK_NON_TEX_COORD);
+		int sb=semanticBits,lsb=lastSemanticBits;
 		while(sb>0 || lsb>0){
 			if((sb&1)!=(lsb&1)){
 				if((sb&1)>(lsb&1)){
@@ -1777,11 +1781,12 @@ int GLRenderDevice::setVertexData(const VertexData *vertexData,int lastSemanticB
 			lsb>>=1;
 			state++;
 		}
+	}
 
+	if(texCoordSemanticBits!=lastTexCoordSemanticBits){
 		// Go through all used texture stages, and see if the enabling state betwen now and last were different.
 		//  If so check to see if the state needs to be enabled or disabled.
-		sb=semanticBits>>VertexFormat::Semantic_TEXCOORD;
-		lsb=lastSemanticBits>>VertexFormat::Semantic_TEXCOORD;
+		int sb=texCoordSemanticBits,lsb=lastTexCoordSemanticBits;
 		int stci; // Shifted Tex Coord Indexes
 		for(i=0;((sb|lsb)>>i)>0;++i){
 			stci=(1<<i);
@@ -1806,9 +1811,12 @@ int GLRenderDevice::setVertexData(const VertexData *vertexData,int lastSemanticB
 		glColor4f(1.0f,1.0f,1.0f,1.0f);
 	}
 
-	TOADLET_CHECK_GLERROR("setVertexData");
+	mLastSemanticBits=semanticBits;mLastTexCoordSemanticBits=texCoordSemanticBits;
 
-	return semanticBits;
+	TOADLET_CHECK_GLERROR("setFixedVertexData");
+}
+
+void GLRenderDevice::setShaderVertexData(const VertexData *vertexData){
 }
 
 GLenum GLRenderDevice::getGLDepthFunc(DepthState::DepthTest test){

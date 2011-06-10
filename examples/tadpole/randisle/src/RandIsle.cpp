@@ -26,7 +26,7 @@ RandIsle::~RandIsle(){
 void RandIsle::create(const String &directory){
 	Logger::debug("RandIsle::create");
 
-	Application::create();
+	Application::create("gl");
 
 	mEngine->setDirectory(directory);
 

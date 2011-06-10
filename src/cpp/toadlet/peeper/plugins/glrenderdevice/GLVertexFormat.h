@@ -36,8 +36,6 @@ class GLRenderDevice;
 
 class TOADLET_API GLVertexFormat:public VertexFormat{
 public:
-	const static int Semantic_MASK_NON_TEX_COORD=0x1F;
-
 	GLVertexFormat(GLRenderDevice *renderDevice);
 	virtual ~GLVertexFormat();
 
@@ -74,6 +72,7 @@ protected:
 
 	egg::Collection<GLenum> mGLDataTypes;
 	egg::Collection<GLuint> mGLElementCounts;
+	uint32 mSemanticBits;
 
 	friend class GLRenderDevice;
 	friend class GLBuffer;

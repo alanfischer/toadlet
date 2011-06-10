@@ -165,7 +165,9 @@ public:
 	static GLuint GLCubeFaces[6];
 
 protected:
-	inline int setVertexData(const VertexData *vertexData,int lastTypeBits);
+	void setVertexData(const VertexData *vertexData);
+	void setFixedVertexData(const VertexData *vertexData);
+	void setShaderVertexData(const VertexData *vertexData);
 
 	int mMatrixMode;
 
@@ -183,7 +185,7 @@ protected:
 	short mLastMaxTexCoordIndex;
 	egg::Collection<GLenum> mLastTexTargets;
 	VertexData::wptr mLastVertexData;
-	int mLastTypeBits;
+	int mLastSemanticBits,mLastTexCoordSemanticBits;
 	egg::Collection<short> mLastTexCoordIndexes;
 
 	#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)

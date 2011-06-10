@@ -41,10 +41,11 @@ GLVertexFormat::GLVertexFormat(GLRenderDevice *renderDevice):
 	//mIndexes,
 	//mFormats,
 	//mOffsets,
-	mVertexSize(0)
+	mVertexSize(0),
 
 	//mGLDataTypes,
 	//mGLElementCount,
+	mSemanticBits(0)
 {
 	mDevice=renderDevice;
 }
@@ -93,6 +94,7 @@ bool GLVertexFormat::addElement(int semantic,const String &name,int index,int fo
 
 	mGLDataTypes.add(GLRenderDevice::getGLDataType(format));
 	mGLElementCounts.add(GLRenderDevice::getGLElementCount(format));
+	mSemanticBits|=1<<semantic;
 
 	return true;
 }

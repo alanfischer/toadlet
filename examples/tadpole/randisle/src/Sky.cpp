@@ -13,7 +13,7 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 	VertexFormat::ptr vertexFormat=mEngine->getBufferManager()->createVertexFormat();
 	vertexFormat->addElement(VertexFormat::Semantic_POSITION,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3);
 	vertexFormat->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_COLOR_RGBA);
-	vertexFormat->addElement(VertexFormat::Semantic_TEX_COORD,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_2);
+	vertexFormat->addElement(VertexFormat::Semantic_TEXCOORD,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_2);
 
  	int numSegments=16,numRings=16;
 	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_READ_WRITE,vertexFormat,mEngine->getMeshManager()->getSkyDomeVertexCount(numSegments,numRings));
@@ -138,8 +138,8 @@ void Sky::updateLightDirection(const Vector3 &lightDir){
 
 	VertexBuffer *buffer=mSkyDome->getMesh()->getStaticVertexData()->getVertexBuffer(0);
 	VertexBufferAccessor vba(buffer,Buffer::Access_READ_WRITE);
-	int ip=buffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_POSITION);
-	int ic=buffer->getVertexFormat()->findSemantic(VertexFormat::Semantic_COLOR);
+	int ip=buffer->getVertexFormat()->findElement(VertexFormat::Semantic_POSITION);
+	int ic=buffer->getVertexFormat()->findElement(VertexFormat::Semantic_COLOR);
 	Vector3 pos,dir;
 	int i;
 	for(i=0;i<vba.getSize();++i){
