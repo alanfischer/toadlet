@@ -33,6 +33,7 @@ namespace toadlet{
 namespace peeper{
 
 class D3D10RenderDevice;
+class D3D10Shader;
 
 class TOADLET_API D3D10VertexFormat:public VertexFormat{
 public:
@@ -59,12 +60,7 @@ public:
 	int findElement(const egg::String &name);
 	int getVertexSize() const{return mVertexSize;}
 
-	inline ID3D10InputLayout *getLayout(){if(mLayout==NULL){createContext();}return mLayout;}
-
 protected:
-	bool createContext();
-	bool destroyContext();
-
 	D3D10RenderDevice *mDevice;
 
 	VertexFormatDestroyedListener *mListener;
@@ -75,10 +71,11 @@ protected:
 	egg::Collection<int> mOffsets;
 	int mVertexSize;
 
+	int mUniqueHandle;
 	egg::Collection<D3D10_INPUT_ELEMENT_DESC> mElements;
-	ID3D10InputLayout *mLayout;
 
 	friend class D3D10RenderDevice;
+	friend class D3D10Shader;
 };
 
 }

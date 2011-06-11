@@ -79,7 +79,7 @@ public:
 	void swap();
 	void beginScene();
 	void endScene();
-	void renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData);
+	void renderPrimitive(VertexData *vertexData,IndexData *indexData);
 	bool copyFrameBufferToPixelBuffer(PixelBuffer *dst);
 	bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src);
 	bool copySurface(IDirect3DSurface9 *dst,IDirect3DSurface9 *src);

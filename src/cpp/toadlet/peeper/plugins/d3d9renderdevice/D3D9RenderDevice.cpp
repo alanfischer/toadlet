@@ -337,7 +337,7 @@ void D3D9RenderDevice::endScene(){
 	TOADLET_CHECK_D3D9ERROR(result,"endScene");
 }
 
-void D3D9RenderDevice::renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData){
+void D3D9RenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexData){
 	if(vertexData==NULL || indexData==NULL){
 		Error::nullPointer(Categories::TOADLET_PEEPER,
 			"VertexData or IndexData is NULL");

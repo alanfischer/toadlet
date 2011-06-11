@@ -51,8 +51,6 @@ public:
 	virtual void setRenderStateDestroyedListener(RenderStateDestroyedListener *listener){mListener=listener;}
 
 	virtual bool create(){
-		destroy();
-
 		return true;
 	}
 

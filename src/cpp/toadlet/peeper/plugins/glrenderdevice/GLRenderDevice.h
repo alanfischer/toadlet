@@ -93,7 +93,7 @@ public:
 	void swap();
 	void beginScene();
 	void endScene();
-	void renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData);
+	void renderPrimitive(VertexData *vertexData,IndexData *indexData);
 	bool copyFrameBufferToPixelBuffer(PixelBuffer *dst);
 	bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src);
 	void setDefaultState();
@@ -184,7 +184,7 @@ protected:
 	egg::Collection<short> mTexCoordIndexes;
 	short mLastMaxTexCoordIndex;
 	egg::Collection<GLenum> mLastTexTargets;
-	VertexData::wptr mLastVertexData;
+	egg::Collection<VertexBuffer*> mLastVertexBuffers;
 	int mLastSemanticBits,mLastTexCoordSemanticBits;
 	egg::Collection<short> mLastTexCoordIndexes;
 

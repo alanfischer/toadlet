@@ -52,8 +52,6 @@ D3D10PixelBufferRenderTarget::~D3D10PixelBufferRenderTarget(){
 }
 
 bool D3D10PixelBufferRenderTarget::create(){
-	destroy();
-
 	mWidth=0;
 	mHeight=0;
 	mNeedsCompile=true;

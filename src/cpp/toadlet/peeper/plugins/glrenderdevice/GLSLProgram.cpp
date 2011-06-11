@@ -44,8 +44,6 @@ GLSLProgram::~GLSLProgram(){
 }
 
 bool GLSLProgram::create(){
-	destroy();
-
 	return createContext();
 }
 

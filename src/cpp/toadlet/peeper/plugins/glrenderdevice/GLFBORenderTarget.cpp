@@ -63,8 +63,6 @@ GLFBORenderTarget::~GLFBORenderTarget(){
 }
 
 bool GLFBORenderTarget::create(){
-	destroy();
-
 	mWidth=0;
 	mHeight=0;
 	mNeedsCompile=true;

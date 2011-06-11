@@ -81,8 +81,6 @@ D3D10Texture::~D3D10Texture(){
 }
 
 bool D3D10Texture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
-	destroy();
-
 	width=width>0?width:1;height=height>0?height:1;depth=depth>0?depth:1;
 
 	mUsage=usage;
