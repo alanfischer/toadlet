@@ -65,8 +65,6 @@ D3D9Texture::~D3D9Texture(){
 }
 
 bool D3D9Texture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,byte *mipDatas[]){
-	destroy();
-
 	width=width>0?width:1;height=height>0?height:1;depth=depth>0?depth:1;
 
 	if((Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || (dimension!=Dimension_CUBE && Math::isPowerOf2(depth)==false)) &&

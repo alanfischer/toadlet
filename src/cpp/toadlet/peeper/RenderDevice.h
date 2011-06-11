@@ -51,6 +51,7 @@ class RenderCaps;
 class RenderState;
 class Texture;
 class VertexBuffer;
+class VertexLayout;
 class VertexFormat;
 class Viewport;
 
@@ -97,7 +98,7 @@ public:
 	virtual void swap()=0;
 	virtual void beginScene()=0;
 	virtual void endScene()=0;
-	virtual void renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData)=0;
+	virtual void renderPrimitive(VertexData *vertexData,IndexData *indexData)=0;
 	virtual bool copyFrameBufferToPixelBuffer(PixelBuffer *dst)=0;
 	virtual bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src)=0;
 	virtual void setDefaultState()=0;

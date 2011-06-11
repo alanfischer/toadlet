@@ -43,8 +43,6 @@ BackablePixelBufferRenderTarget::~BackablePixelBufferRenderTarget(){
 }
 
 bool BackablePixelBufferRenderTarget::create(){
-	destroy();
-
 	if(mBack!=NULL){
 		return mBack->create();
 	}

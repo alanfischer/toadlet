@@ -40,13 +40,12 @@
 namespace toadlet{
 namespace peeper{
 
+class D3D10Buffer;
+class D3D10Shader;
+class D3D10VertexFormat;
+
 class D3D10RenderDevice:public RenderDevice{
 public:
-LPD3D10EFFECT effect;
-LPD3D10EFFECTTECHNIQUE technique;
-D3D10_PASS_DESC passDesc;
-ID3D10SamplerState *samp;
-
 	D3D10RenderDevice();
 	virtual ~D3D10RenderDevice();
 
@@ -82,12 +81,12 @@ ID3D10SamplerState *samp;
 	void swap();
 	void beginScene();
 	void endScene();
-	void renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData);
+	void renderPrimitive(VertexData *vertexData,IndexData *indexData);
 	bool copyFrameBufferToPixelBuffer(PixelBuffer *dst);
 	bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src);
 	void setDefaultState();
 	bool setRenderState(RenderState *renderState);
-	bool setShader(Shader::ShaderType type,Shader *shader){return false;}
+	bool setShader(Shader::ShaderType type,Shader *shader);
 	void setTexture(int stage,Texture *texture);
 
 	// Old fixed states
@@ -121,11 +120,20 @@ ID3D10SamplerState *samp;
 	static void getD3D10_SAMPLER_DESC(D3D10_SAMPLER_DESC &desc,const SamplerState &state);
 
 protected:
+	void vertexFormatCreated(D3D10VertexFormat *format);
+	void vertexFormatDestroyed(D3D10VertexFormat *format);
+	void shaderCreated(D3D10Shader *shader);
+	void shaderDestroyed(D3D10Shader *shader);
+
 	ID3D10Device *mD3DDevice;
 	RenderTarget *mPrimaryRenderTarget;
 	D3D10RenderTarget *mD3DPrimaryRenderTarget;
 	RenderTarget *mRenderTarget;
 	D3D10RenderTarget *mD3DRenderTarget;
+
+	D3D10Shader *mD3DVertexShader,*mD3DFragmentShader,*mD3DGeometryShader;
+	egg::Collection<D3D10Shader*> mVertexShaders;
+	egg::Collection<D3D10VertexFormat*> mVertexFormats;
 
 	Matrix4x4 mModelMatrix;
 	Matrix4x4 mViewMatrix;
@@ -136,6 +144,8 @@ protected:
 	RenderState::ptr mDefaultState;
 
 	friend class D3D10Buffer;
+	friend class D3D10Shader;
+	friend class D3D10VertexFormat;
 };
 
 }

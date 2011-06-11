@@ -60,8 +60,6 @@ D3D10Buffer::~D3D10Buffer(){
 }
 
 bool D3D10Buffer::create(int usage,int access,IndexFormat indexFormat,int size){
-	destroy();
-
 	if((usage&Usage_BIT_STATIC)>0 && (access&Access_BIT_READ)>0){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
 			"Buffer can not be static and readable");
@@ -89,8 +87,6 @@ bool D3D10Buffer::create(int usage,int access,IndexFormat indexFormat,int size){
 }
 
 bool D3D10Buffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int size){
-	destroy();
-
 	if((usage&Usage_BIT_STATIC)>0 && (access&Access_BIT_READ)>0){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
 			"Buffer can not be static and readable");

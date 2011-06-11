@@ -27,6 +27,8 @@
 #include "D3D10RenderDevice.h"
 #include <toadlet/peeper/BackableVertexFormat.h>
 
+#include "D3D10Shader.h"
+
 using namespace toadlet::egg;
 
 namespace toadlet{
@@ -41,8 +43,8 @@ D3D10VertexFormat::D3D10VertexFormat(D3D10RenderDevice *renderDevice):
 	//mOffsets,
 	mVertexSize(0),
 
-	//mElements,
-	mLayout(NULL)
+	mUniqueHandle(0)
+	//mElements
 {
 	mDevice=renderDevice;
 }
@@ -52,12 +54,14 @@ D3D10VertexFormat::~D3D10VertexFormat(){
 }
 
 bool D3D10VertexFormat::create(){
+	if(mDevice!=NULL){
+		mDevice->vertexFormatCreated(this);
+	}
+
 	return true;
 }
 
 void D3D10VertexFormat::destroy(){
-	destroyContext();
-
 	mSemantics.clear();
 	mNames.clear();
 	mIndexes.clear();
@@ -68,23 +72,10 @@ void D3D10VertexFormat::destroy(){
 	if(mListener!=NULL){
 		mListener->vertexFormatDestroyed(this);
 	}
-}
 
-bool D3D10VertexFormat::createContext(){
-	HRESULT result=mDevice->getD3D10Device()->CreateInputLayout(
-		mElements,mElements.size(),mDevice->passDesc.pIAInputSignature,mDevice->passDesc.IAInputSignatureSize,&mLayout
-	);
-
-	return SUCCEEDED(result);
-}
-
-bool D3D10VertexFormat::destroyContext(){
-	if(mLayout!=NULL){
-		mLayout->Release();
-		mLayout=NULL;
+	if(mDevice!=NULL){
+		mDevice->vertexFormatDestroyed(this);
 	}
-	
-	return true;
 }
 
 bool D3D10VertexFormat::addElement(int semantic,const String &name,int index,int format){
@@ -108,11 +99,15 @@ bool D3D10VertexFormat::addElement(int semantic,const String &name,int index,int
 	mVertexSize+=getFormatSize(format);
 
 	D3D10_INPUT_ELEMENT_DESC element={
-		mNames[mNames.size()-1],index,D3D10RenderDevice::getVertexDXGI_FORMAT(format),0,offset,D3D10_INPUT_PER_VERTEX_DATA,0
+		NULL,index,D3D10RenderDevice::getVertexDXGI_FORMAT(format),0,offset,D3D10_INPUT_PER_VERTEX_DATA,0
 	};
 	mElements.add(element);
 
-	destroyContext();
+	// Reassign char pointers because the vector realllocates memory
+	int i;
+	for(i=0;i<mElements.size();++i){
+		mElements[i].SemanticName=mNames[i];
+	}
 
 	return true;
 }

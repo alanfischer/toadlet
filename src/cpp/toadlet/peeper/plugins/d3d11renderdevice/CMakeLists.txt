@@ -5,6 +5,7 @@ set (PEEPER_D3D11RENDERDEVICE_SRC
 	../d3d10renderdevice/D3D10Query.cpp
 	../d3d10renderdevice/D3D10RenderTarget.cpp
 	../d3d10renderdevice/D3D10RenderDevice.cpp
+	../d3d10renderdevice/D3D10Shader.cpp
 	../d3d10renderdevice/D3D10Texture.cpp
 	../d3d10renderdevice/D3D10TextureMipPixelBuffer.cpp
 	../d3d10renderdevice/D3D10VertexFormat.cpp
@@ -21,6 +22,7 @@ set (PEEPER_D3D11RENDERDEVICE_HEADERS
 	../d3d10renderdevice/D3D10RenderTarget.h
 	../d3d10renderdevice/D3D10RenderState.h
 	../d3d10renderdevice/D3D10RenderDevice.h
+	../d3d10renderdevice/D3D10Shader.h
 	../d3d10renderdevice/D3D10Texture.h
 	../d3d10renderdevice/D3D10TextureMipPixelBuffer.h
 	../d3d10renderdevice/D3D10VertexFormat.h

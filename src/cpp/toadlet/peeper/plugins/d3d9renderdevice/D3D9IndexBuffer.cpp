@@ -59,8 +59,6 @@ D3D9IndexBuffer::~D3D9IndexBuffer(){
 }
 
 bool D3D9IndexBuffer::create(int usage,int access,IndexFormat indexFormat,int size){
-	destroy();
-
 	mUsage=usage;
 	mAccess=access;
 	mSize=size;

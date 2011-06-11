@@ -55,8 +55,6 @@ BackableTexture::~BackableTexture(){
 }
 
 bool BackableTexture::create(int usage,Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]){
-	destroy();
-
 	mUsage=usage;
 	mDimension=dimension;
 	mFormat=format;

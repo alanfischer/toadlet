@@ -80,7 +80,7 @@ GLRenderDevice::GLRenderDevice():
 	//mTexCoordIndexes,
 	mLastMaxTexCoordIndex(0),
 	//mLastTexTargets,
-	//mLastVertexData,
+	//mLastVertexBuffers,
 	mLastSemanticBits(0),mLastTexCoordSemanticBits(0),
 	//mLastTexCoordIndexes,
 
@@ -619,10 +619,8 @@ void GLRenderDevice::endScene(){
 		}
 	#endif
 
-	if(mLastVertexData!=NULL){
-		setVertexData(NULL);
-		mLastVertexData=VertexData::wptr();
-	}
+	setVertexData(NULL);
+
 	if(mCaps.hardwareVertexBuffers){
 		glBindBuffer(GL_ARRAY_BUFFER,0);
 	}
@@ -644,7 +642,8 @@ void GLRenderDevice::endScene(){
 	TOADLET_CHECK_GLERROR("endScene");
 }
 
-void GLRenderDevice::renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData){
+void GLRenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexData){
+	int i;
 	#if defined(TOADLET_DEBUG)
 		if(mBeginEndCounter!=1){
 			Error::unknown(Categories::TOADLET_PEEPER,
@@ -732,13 +731,21 @@ void GLRenderDevice::renderPrimitive(const VertexData::ptr &vertexData,const Ind
 
 	{
 		bool rebindTexCoords=false;
-		if(mLastVertexData.get()!=vertexData.get() || mMaxTexCoordIndex!=mLastMaxTexCoordIndex){
+		if(mLastVertexBuffers.size()!=vertexData->vertexBuffers.size() || mMaxTexCoordIndex!=mLastMaxTexCoordIndex){
 			rebindTexCoords=true;
 		}
-		else{
-			// See if we need to rebind it due to the texCoordIndex portions of the TextureStages changing
-			int i;
-			for(i=0;i<mMaxTexCoordIndex;++i){
+		if(rebindTexCoords==false){
+			// Rebind if the vertexBuffers have changed
+			for(i=mLastVertexBuffers.size()-1;i>=0;--i){
+				if(mLastVertexBuffers[i]!=vertexData->vertexBuffers[i]){
+					rebindTexCoords=true;
+					break;
+				}
+			}
+		}
+		if(rebindTexCoords==false){
+			// Rebind if the texCoordIndex portions of the TextureStages have changed
+			for(i=mMaxTexCoordIndex-1;i>=0;--i){
 				if(mLastTexCoordIndexes[i]!=mTexCoordIndexes[i]){
 					rebindTexCoords=true;
 					break;
@@ -748,7 +755,10 @@ void GLRenderDevice::renderPrimitive(const VertexData::ptr &vertexData,const Ind
 		if(rebindTexCoords){
 			mLastMaxTexCoordIndex=mMaxTexCoordIndex;
 			setVertexData(vertexData);
-			mLastVertexData=vertexData;
+			mLastVertexBuffers.resize(vertexData->vertexBuffers.size());
+			for(i=0;i<mLastVertexBuffers.size();++i){
+				mLastVertexBuffers[i]=vertexData->vertexBuffers[i];
+			}
 		}
 	}
 

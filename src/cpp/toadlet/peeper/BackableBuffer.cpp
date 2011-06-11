@@ -55,8 +55,6 @@ BackableBuffer::~BackableBuffer(){
 }
 
 bool BackableBuffer::create(int usage,int access,IndexFormat indexFormat,int size){
-	destroy();
-
 	mUsage=usage;
 	mAccess=access;
 	mIndexFormat=indexFormat;
@@ -72,8 +70,6 @@ bool BackableBuffer::create(int usage,int access,IndexFormat indexFormat,int siz
 }
 
 bool BackableBuffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int size){
-	destroy();
-
 	mUsage=usage;
 	mAccess=access;
 	mVertexFormat=vertexFormat;
@@ -89,8 +85,6 @@ bool BackableBuffer::create(int usage,int access,VertexFormat::ptr vertexFormat,
 }
 
 bool BackableBuffer::create(int usage,int access,int pixelFormat,int width,int height,int depth){
-	destroy();
-
 	mUsage=usage;
 	mAccess=access;
 	mPixelFormat=pixelFormat;

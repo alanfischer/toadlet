@@ -30,6 +30,7 @@
 #include "D3D10Query.h"
 #include "D3D10RenderState.h"
 #include "D3D10RenderTarget.h"
+#include "D3D10Shader.h"
 #include "D3D10Texture.h"
 #include "D3D10VertexFormat.h"
 #include <toadlet/egg/MathConversion.h>
@@ -66,7 +67,9 @@ D3D10RenderDevice::D3D10RenderDevice():
 	mPrimaryRenderTarget(NULL),
 	mD3DPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL),
-	mD3DRenderTarget(NULL)
+	mD3DRenderTarget(NULL),
+
+	mD3DVertexShader(NULL),mD3DFragmentShader(NULL),mD3DGeometryShader(NULL)
 {}
 
 D3D10RenderDevice::~D3D10RenderDevice(){
@@ -119,62 +122,6 @@ bool D3D10RenderDevice::create(RenderTarget *target,int *options){
 
 	Logger::alert(Categories::TOADLET_PEEPER,
 		"created D3D10RenderDevice");
-
-samp=NULL;
-	char *effectstring=
-"float4x4 ShaderMatrix;\n"
-"float4x4 textureMatrix;\n"
-"Texture2D diffuseTexture;\n"
-"float4 diffuseColor;\n"
-"float useTexture;\n"
-"SamplerState samps[1];\n"
-/*
-"SamplerState samLinear{\n"
-    "Filter = MIN_MAG_MIP_LINEAR;\n"
-    "AddressU = Wrap;\n"
-    "AddressV = Wrap;\n"
-"};\n"
-*/
-"struct VS_OUTPUT{\n"
-    "float4 Pos : SV_POSITION;\n"
-    "float2 TexCoords : TEXCOORD0;\n"
-"};\n"
-
-"VS_OUTPUT VS( float4 Pos : POSITION, float2 TexCoords : TEXCOORD){\n"
-  "VS_OUTPUT Output = (VS_OUTPUT)0;\n"
-  "Output.Pos = mul(Pos, ShaderMatrix);\n"
-  "Output.TexCoords=mul(TexCoords,textureMatrix);\n"
-  "return Output;\n"
-"}\n"
-
-"float4 PS( VS_OUTPUT Input ) : SV_Target{\n"
-//	"return diffuseTexture.Sample(samLinear,Input.TexCoords)*useTexture + diffuseColor*(1-useTexture);\n"
-	"return diffuseTexture.Sample(samps[0],Input.TexCoords);\n"
-"}\n"
-
-"technique10 Render{\n"
-    "pass P0{\n"
-        "SetVertexShader( CompileShader( vs_4_0, VS() ) );\n"
-        "SetGeometryShader( NULL );\n"
-        "SetPixelShader( CompileShader( ps_4_0, PS() ) );\n"
-    "}\n"
-"}\n";
-
-HMODULE library=LoadLibrary(TOADLET_D3D10_DLL_NAME);
-
-ID3D10Blob *compiledEffect=NULL;
-typedef HRESULT(WINAPI *D3D10CompileEffectFromMemory)(void *pData,SIZE_T DataLength,LPCSTR pSrcFileName,const D3D10_SHADER_MACRO *pDefines,ID3D10Include *pInclude,UINT HLSLFlags,UINT FXFlags,ID3D10Blob **ppCompiledEffect,ID3D10Blob **ppErrors);
-void *compile=GetProcAddress(library,"D3D10CompileEffectFromMemory");
-((D3D10CompileEffectFromMemory)compile)(effectstring,strlen(effectstring),0,0,0,0,0,&compiledEffect,0);
-
-typedef HRESULT(WINAPI *D3D10CreateEffectFromMemory)(void *pData,SIZE_T DataLength,UINT FXFlags,ID3D10Device *pDevice,ID3D10EffectPool *pEffectPool,ID3D10Effect **ppEffect);
-void *create=GetProcAddress(library,"D3D10CreateEffectFromMemory");
-((D3D10CreateEffectFromMemory)create)(compiledEffect->GetBufferPointer(),compiledEffect->GetBufferSize(),0,mD3DDevice,NULL,&effect);
-
-// Obtain the technique
-technique = effect->GetTechniqueByName( "Render" );
-technique->GetPassByIndex( 0 )->GetDesc( &passDesc);
-
 
 	mDefaultState=RenderState::ptr(new D3D10RenderState(this));
 	mDefaultState->setBlendState(BlendState());
@@ -230,7 +177,7 @@ IndexBuffer *D3D10RenderDevice::createIndexBuffer(){
 }
 
 Shader *D3D10RenderDevice::createShader(){
-	return NULL;
+	return new D3D10Shader(this);
 }
 
 Query *D3D10RenderDevice::createQuery(){
@@ -261,6 +208,36 @@ bool D3D10RenderDevice::setRenderTarget(RenderTarget *target){
 
 	if(mD3DRenderTarget!=NULL){
 		mD3DRenderTarget->activate();
+	}
+
+	return true;
+}
+
+bool D3D10RenderDevice::setShader(Shader::ShaderType type,Shader *shader){
+	D3D10Shader *d3dShader=NULL;
+	if(shader!=NULL){
+		d3dShader=(D3D10Shader*)shader->getRootShader();
+	}
+
+	switch(type){
+		case Shader::ShaderType_VERTEX:
+			mD3DVertexShader=d3dShader;
+			if(d3dShader!=NULL){
+				mD3DDevice->VSSetShader((ID3D10VertexShader*)d3dShader->mShader);
+			}
+		break;
+		case Shader::ShaderType_FRAGMENT:
+			mD3DFragmentShader=d3dShader;
+			if(d3dShader!=NULL){
+				mD3DDevice->PSSetShader((ID3D10PixelShader*)d3dShader->mShader);
+			}
+		break;
+		case Shader::ShaderType_GEOMETRY:
+			mD3DGeometryShader=d3dShader;
+			if(d3dShader!=NULL){
+				mD3DDevice->GSSetShader((ID3D10GeometryShader*)d3dShader->mShader);
+			}
+		break;
 	}
 
 	return true;
@@ -315,15 +292,9 @@ void D3D10RenderDevice::endScene(){
 	for(i=0;i<mCaps.maxTextureStages;++i){
 		setTexture(i,NULL);
 	}
-
-// Doing this temporarily to unbind any resources
-D3D10_TECHNIQUE_DESC techDesc;
-technique->GetDesc( &techDesc );
-for( UINT p = 0; p < techDesc.Passes; ++p )
-technique->GetPassByIndex(p)->Apply(0);
 }
 
-void D3D10RenderDevice::renderPrimitive(const VertexData::ptr &vertexData,const IndexData::ptr &indexData){
+void D3D10RenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexData){
 	if(vertexData==NULL || indexData==NULL){
 		Error::nullPointer(Categories::TOADLET_PEEPER,
 			"VertexData or IndexData is NULL");
@@ -336,44 +307,57 @@ void D3D10RenderDevice::renderPrimitive(const VertexData::ptr &vertexData,const 
 		return;
 	}
 
+static ID3D10ShaderReflection *reflection=NULL;
+static D3D10_SHADER_VARIABLE_DESC shaderVerDesc;
+static ID3D10Buffer *cbuffer=NULL;
+if(cbuffer==NULL){
+/*D3D10ReflectShader(mVertexShader->mShader->mBytecode->GetBufferPointer(),mVertexShader->mShader->mBytecode->GetBufferLength(),&reflection);
+D3D10_SHADER_DESC desc;
+reflection->GetDesc(&desc);
+ID3D10ShaderReflectionConstantBuffer *buffer=mpIShaderReflection->GetConstantBufferByIndex(0);
+ID3D10ShaderReflectionVariable *varRef=buffer->GetVariableByIndex(0);
+varRef->GetDesc(&shaderVerDesc);
+*/
+D3D10_BUFFER_DESC cbufferDesc;
+cbufferDesc.ByteWidth=sizeof(Matrix4x4);
+cbufferDesc.Usage=D3D10_USAGE_DYNAMIC;
+cbufferDesc.CPUAccessFlags=D3D10_CPU_ACCESS_WRITE;
+cbufferDesc.MiscFlags=0;
+cbufferDesc.BindFlags=D3D10_BIND_CONSTANT_BUFFER;
+mD3DDevice->CreateBuffer(&cbufferDesc,NULL,&cbuffer);
+}
+
+Matrix4x4 shaderMatrix;
+Math::transpose(shaderMatrix,mProjectionMatrix*mViewMatrix*mModelMatrix);
+tbyte *data=NULL;
+cbuffer->Map(D3D10_MAP_WRITE_DISCARD,0,(void**)&data);
+memcpy(data,shaderMatrix.getData(),sizeof(Matrix4x4));
+cbuffer->Unmap();
+mD3DDevice->VSSetConstantBuffers(0,1,&cbuffer);
+
+	D3D10VertexFormat *d3dVertexFormat=(D3D10VertexFormat*)vertexData->getVertexFormat()->getRootVertexFormat();
+
+	// Set input layout
+	ID3D10InputLayout *id3dLayout=NULL;
+	if(mD3DVertexShader!=NULL){
+		id3dLayout=mD3DVertexShader->findInputLayout(d3dVertexFormat);
+	}
+	mD3DDevice->IASetInputLayout(id3dLayout);
+
 	// Set vertex buffer
-	D3D10Buffer *vertexBuffer=(D3D10Buffer*)vertexData->getVertexBuffer(0)->getRootVertexBuffer();
-	D3D10VertexFormat *vertexFormat=(D3D10VertexFormat*)vertexBuffer->mVertexFormat->getRootVertexFormat();
+	D3D10Buffer *d3dVertexBuffer=(D3D10Buffer*)vertexData->getVertexBuffer(0)->getRootVertexBuffer();
+	d3dVertexFormat=(D3D10VertexFormat*)d3dVertexBuffer->mVertexFormat->getRootVertexFormat();
 
-	mD3DDevice->IASetInputLayout(vertexFormat->getLayout());
-
-	UINT stride=vertexBuffer->mVertexFormat->getVertexSize();
+	UINT stride=d3dVertexBuffer->mVertexFormat->getVertexSize();
 	UINT offset=0;
-	mD3DDevice->IASetVertexBuffers(0,1,&vertexBuffer->mBuffer,&stride,&offset);
-
-//	pWorldMatrixEffectVariable->SetMatrix(w);
-//	pViewMatrixEffectVariable->SetMatrix(viewMatrix);
-//	pProjectionMatrixEffectVariable->SetMatrix(projectionMatrix);
-	Matrix4x4 shaderMatrix=mProjectionMatrix*mViewMatrix*mModelMatrix;
-	#if defined(TOADLET_FIXED_POINT)
-		float d3dmatrix[16];
-		toD3DMatrix(d3dmatrix,shaderMatrix);
-	#else
-		float *d3dmatrix=shaderMatrix.data;
-	#endif
-	effect->GetVariableByName("ShaderMatrix")->AsMatrix()->SetMatrix(d3dmatrix);
+	mD3DDevice->IASetVertexBuffers(0,1,&d3dVertexBuffer->mBuffer,&stride,&offset);
 
 	if(indexData->getIndexBuffer()!=NULL){
-		D3D10Buffer *buffer=(D3D10Buffer*)(indexData->getIndexBuffer()->getRootIndexBuffer());
-		mD3DDevice->IASetIndexBuffer(buffer->mBuffer,getIndexDXGI_FORMAT(buffer->getIndexFormat()),0);
+		D3D10Buffer *d3dIndexBuffer=(D3D10Buffer*)(indexData->getIndexBuffer()->getRootIndexBuffer());
+		mD3DDevice->IASetIndexBuffer(d3dIndexBuffer->mBuffer,getIndexDXGI_FORMAT(d3dIndexBuffer->getIndexFormat()),0);
 	}
 
 	mD3DDevice->IASetPrimitiveTopology(getD3D10_PRIMITIVE_TOPOLOGY(indexData->primitive));
-
-
-D3D10_TECHNIQUE_DESC techDesc;
-technique->GetDesc( &techDesc );
-for( UINT p = 0; p < techDesc.Passes; ++p )
-{
-	technique->GetPassByIndex( p )->Apply(0);
-mD3DDevice->VSSetSamplers(0,1,&samp);
-mD3DDevice->PSSetSamplers(0,1,&samp);
-mD3DDevice->GSSetSamplers(0,1,&samp);
 
 	if(indexData->getIndexBuffer()){
 		mD3DDevice->DrawIndexed(indexData->count,indexData->start,0);
@@ -381,51 +365,6 @@ mD3DDevice->GSSetSamplers(0,1,&samp);
 	else{
 		mD3DDevice->Draw(indexData->count,indexData->start);
 	}
-}
-
-
-//	mD3DDevice->Draw(numVertices,0);
-
-/*
-	HRESULT result;
-	D3DPRIMITIVETYPE d3dpt;
-	int count;
-	getPrimitiveTypeAndCount(d3dpt,count,indexData->primitive,indexData->count);
-
-	int i;
-	int numVertexes=0;
-	int numVertexBuffers=vertexData->vertexBuffers.size();
-	for(i=0;i<numVertexBuffers;++i){
-		D3D9VertexBuffer *d3dvertexBuffer=(D3D9VertexBuffer*)vertexData->vertexBuffers[i]->getRootVertexBuffer();
-		if(numVertexes==0){
-			numVertexes=d3dvertexBuffer->mSize;
-		}
-		#if defined(TOADLET_HAS_DIRECT3DMOBILE)
-			result=mD3DDevice->SetStreamSource(i,d3dvertexBuffer->mVertexBuffer,d3dvertexBuffer->mVertexSize);
-		#else
-			result=mD3DDevice->SetStreamSource(i,d3dvertexBuffer->mVertexBuffer,0,d3dvertexBuffer->mVertexSize);
-		#endif
-		TOADLET_CHECK_D3D9ERROR(result,"D3D10RenderDevice: SetStreamSource");
-		#if !defined(TOADLET_HAS_DIRECT3DMOBILE)
-			result=mD3DDevice->SetFVF(d3dvertexBuffer->mFVF);
-			TOADLET_CHECK_D3D9ERROR(result,"D3D10RenderDevice: SetFVF");
-		#endif
-	}
-
-	IndexBuffer *indexBuffer=indexData->indexBuffer;
-	if(indexBuffer!=NULL){
-		D3D9IndexBuffer *d3dindexBuffer=(D3D9IndexBuffer*)indexBuffer->getRootIndexBuffer();
-		result=mD3DDevice->SetIndices(d3dindexBuffer->mIndexBuffer);
-		TOADLET_CHECK_D3D9ERROR(result,"D3D10RenderDevice: SetIndices");
-
-		result=mD3DDevice->DrawIndexedPrimitive(d3dpt,0,0,numVertexes,indexData->start,count);
-		TOADLET_CHECK_D3D9ERROR(result,"D3D10RenderDevice: DrawIndexedPrimitive");
-	}
-	else{
-		result=mD3DDevice->DrawPrimitive(d3dpt,indexData->start,count);
-		TOADLET_CHECK_D3D9ERROR(result,"D3D10RenderDevice: DrawPrimitive");
-	}
-*/
 }
 
 bool D3D10RenderDevice::copyFrameBufferToPixelBuffer(PixelBuffer *dst){
@@ -499,6 +438,7 @@ bool D3D10RenderDevice::setRenderState(RenderState *renderState){
 	}
 
 // These need to be moved/cleaned
+/*
 if(d3drenderState->mD3DSamplerStates.size()>0)samp=d3drenderState->mD3DSamplerStates[0];
 	mD3DDevice->VSSetSamplers(0,d3drenderState->mD3DSamplerStates.size(),d3drenderState->mD3DSamplerStates.begin());
 	mD3DDevice->PSSetSamplers(0,d3drenderState->mD3DSamplerStates.size(),d3drenderState->mD3DSamplerStates.begin());
@@ -517,7 +457,7 @@ if(d3drenderState->mTextureStates.size()>0)effect->GetVariableByName("textureMat
 if(d3drenderState->mMaterialState!=NULL){
 effect->GetVariableByName("diffuseColor")->AsVector()->SetFloatVector((float*)d3drenderState->mMaterialState->diffuse.getData());
 }
-
+*/
 	return true;
 }
 
@@ -529,8 +469,8 @@ void D3D10RenderDevice::setTexture(int i,Texture *texture){
 	if(texture){
 		textureView=((D3D10Texture*)(texture->getRootTexture()))->mShaderResourceView;
 	}
-effect->GetVariableByName("diffuseTexture")->AsShaderResource()->SetResource(textureView);
-effect->GetVariableByName("useTexture")->AsScalar()->SetFloat(texture!=NULL);
+//effect->GetVariableByName("diffuseTexture")->AsShaderResource()->SetResource(textureView);
+//effect->GetVariableByName("useTexture")->AsScalar()->SetFloat(texture!=NULL);
 }
 
 void D3D10RenderDevice::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){
@@ -911,6 +851,48 @@ void D3D10RenderDevice::getD3D10_SAMPLER_DESC(D3D10_SAMPLER_DESC &desc,const Sam
 	toD3DColor(desc.BorderColor,state.borderColor);
 	desc.MinLOD=state.minLOD;
 	desc.MaxLOD=state.maxLOD;
+}
+
+void D3D10RenderDevice::vertexFormatCreated(D3D10VertexFormat *format){
+	int handle=mVertexFormats.size();
+	format->mUniqueHandle=handle;
+	mVertexFormats.resize(handle+1);
+	mVertexFormats[handle]=format;
+}
+
+void D3D10RenderDevice::vertexFormatDestroyed(D3D10VertexFormat *format){
+	int handle=format->mUniqueHandle;
+	if(handle==-1){
+		return;
+	}
+
+	int i;
+	for(i=mVertexShaders.size()-1;i>=0;--i){
+		D3D10Shader *shader=mVertexShaders[i];
+		if(handle<shader->mLayouts.size()){
+			ID3D10InputLayout *layout=shader->mLayouts[handle];
+			if(layout!=NULL){
+				layout->Release();
+			}
+			shader->mLayouts.removeAt(handle);
+		}
+	}
+	for(i=handle;i<mVertexFormats.size();++i){
+		mVertexFormats[i]->mUniqueHandle--;
+	}
+	mVertexFormats.removeAt(handle);
+}
+
+void D3D10RenderDevice::shaderCreated(D3D10Shader *shader){
+	if(shader->mShaderType==Shader::ShaderType_VERTEX){
+		mVertexShaders.add(shader);
+	}
+}
+
+void D3D10RenderDevice::shaderDestroyed(D3D10Shader *shader){
+	if(shader->mShaderType==Shader::ShaderType_VERTEX){
+		mVertexShaders.remove(shader);
+	}
 }
 
 }
