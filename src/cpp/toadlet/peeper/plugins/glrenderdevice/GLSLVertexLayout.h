@@ -23,47 +23,32 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_GLSLPROGRAM_H
-#define TOADLET_PEEPER_GLSLPROGRAM_H
+#ifndef TOADLET_PEEPER_GLSLVERTEXLAYOUT_H
+#define TOADLET_PEEPER_GLSLVERTEXLAYOUT_H
 
-#include "GLSLShader.h"
+#include "GLIncludes.h"
+#include "GLVertexFormat.h"
+#include "GLSLProgram.h"
 
 namespace toadlet{
 namespace peeper{
 
-class GLSLVertexLayout;
-class GLVertexFormat;
+class GLRenderDevice;
 
-class GLSLProgram{
+class TOADLET_API GLSLVertexLayout{
 public:
-	TOADLET_SHARED_POINTERS(GLSLProgram);
+	GLSLVertexLayout(GLRenderDevice *renderDevice);
+	virtual ~GLSLVertexLayout();
 
-	GLSLProgram(GLRenderDevice *renderDevice);
-	virtual ~GLSLProgram();
-	
-	bool create();
+	bool create(GLVertexFormat *vertexFormat,GLSLProgram *program);
 	void destroy();
 
-	bool attachShader(Shader *shader);
-	bool removeShader(Shader *shader);
-
-	bool activate();
-
-	GLSLVertexLayout *findVertexLayout(GLVertexFormat *vertexFormat);
-
 protected:
-	bool createContext();
-	bool destroyContext();
-
 	GLRenderDevice *mDevice;
 
-	GLuint mHandle;
-	bool mNeedsLink;
-	
-	egg::Collection<GLSLVertexLayout*> mLayouts;
+	egg::Collection<int> mSemanticIndexes;
 
 	friend class GLRenderDevice;
-	friend class GLSLVertexLayout;
 };
 
 }

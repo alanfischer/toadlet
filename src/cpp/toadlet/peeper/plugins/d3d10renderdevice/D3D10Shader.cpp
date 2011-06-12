@@ -70,6 +70,15 @@ void D3D10Shader::destroy(){
 	if(mDevice!=NULL){
 		mDevice->shaderDestroyed(this);
 	}
+
+	int i;
+	for(i=0;i<mLayouts.size();++i){
+		if(mLayouts[i]!=NULL){
+			mLayouts[i]->Release();
+			mLayouts[i]=NULL;
+		}
+	}
+	mLayouts.clear();
 }
 
 bool D3D10Shader::createContext(){
@@ -83,12 +92,15 @@ bool D3D10Shader::createContext(){
 	else if(mShaderType==ShaderType_FRAGMENT){
 		profile="ps_4_0";
 	}
+	else if(mShaderType==ShaderType_GEOMETRY){
+		profile="gs_4_0";
+	}
 	
 	HRESULT result=E_FAIL;
 	#if defined(TOADLET_SET_D3D10)
 		result=D3D10CompileShader(mCode,mCode.length(),NULL,NULL,NULL,function,profile,0,&mBytecode,&mLog);
 	#endif
-	if(result==E_FAIL){
+	if(FAILED(result)){
 		Error::unknown(Categories::TOADLET_PEEPER,(LPCSTR)mLog->GetBufferPointer());
 		return false;
 	}
