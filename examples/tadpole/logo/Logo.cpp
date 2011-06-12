@@ -68,7 +68,7 @@ Logo::~Logo(){
 }
 Shader::ptr vs,fs,gs;
 void Logo::create(){
-	Application::create();
+	Application::create("gl");
 
 	mEngine->setDirectory("../../../data");
 
@@ -96,16 +96,15 @@ void Logo::create(){
 	cameraNode->setClearColor(Colors::BLUE);
 	scene->getRoot()->attach(cameraNode);
 
+#if 1
 	const char *vc=
 		"void main(){" \
 		" gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;" \
 		"}";
-	vs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,vc);
 	const char *fc=
 		"void main(){" \
 		" gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);" \
 		"}";
-	fs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,fc);
 	const char *gc=
 		"#version 150\n" \
 		"layout(triangles) in;\n" \
@@ -117,7 +116,40 @@ void Logo::create(){
 		" }\n" \
 		" EndPrimitive();\n" \
 		"}";
-	gs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_GEOMETRY,gc);
+#else
+	const char *vc=
+		"struct VIN{\n" \
+			"float4 position : POSITION;\n" \
+		"};\n" \
+		"struct VOUT{\n" \
+			"float4 position : SV_POSITION;\n" \
+		"};\n" \
+		"float4x4 ModelViewProjectionMatrix;\n" \
+		"VOUT main(VIN vin){\n" \
+		"	VOUT vout;\n" \
+		"	vout.position=mul(vin.position,ModelViewProjectionMatrix);\n" \
+		"	return vout;\n" \
+		"}";
+	const char *fc=
+		"struct PIN{\n" \
+			"float4 Position : SV_POSITION;\n" \
+		"};\n" \
+		"float4 main(PIN pin): SV_TARGET{" \
+		"	return float4(1.0,0.0,0.0,1.0);\n" \
+		"}";
+	const char *gc=
+		"struct GIN{\n" \
+			"float4 position : POSITION;\n" \
+		"};\n" \
+		"[maxvertexcount(4)]\n" \
+		"void main(GIN point[1],inout TriangleStream<PS_INPUT> triStream){" \
+			"PS_INPUT v;" \
+			"triStream.Append(v);" \
+		"}";
+#endif
+vs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,vc);
+fs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,fc);
+gs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_GEOMETRY,gc);
 
 // Only looks good if running on device, in simulator its always a top down view
 #if 0
@@ -151,7 +183,7 @@ void Logo::render(RenderDevice *renderDevice){
 	renderDevice->beginScene();
 renderDevice->setShader(Shader::ShaderType_VERTEX,vs);
 renderDevice->setShader(Shader::ShaderType_FRAGMENT,fs);
-renderDevice->setShader(Shader::ShaderType_GEOMETRY,gs);
+//renderDevice->setShader(Shader::ShaderType_GEOMETRY,gs);
 		cameraNode->render(renderDevice);
 	renderDevice->endScene();
 	renderDevice->swap();

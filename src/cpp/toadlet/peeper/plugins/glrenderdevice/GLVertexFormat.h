@@ -70,12 +70,14 @@ protected:
 	egg::Collection<int> mOffsets;
 	int mVertexSize;
 
+	int mUniqueHandle;
 	egg::Collection<GLenum> mGLDataTypes;
 	egg::Collection<GLuint> mGLElementCounts;
 	uint32 mSemanticBits;
 
 	friend class GLRenderDevice;
 	friend class GLBuffer;
+	friend class GLSLProgram;
 };
 
 }

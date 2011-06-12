@@ -161,13 +161,19 @@ public:
 	static GLuint getGLTextureBlendOperation(TextureState::Operation operation);
 	static float getGLTextureBlendScale(TextureState::Operation operation);
 	static GLuint getGLDepthTextureMode(TextureState::ShadowResult shadow);
-	static GLuint GLClientStates[6];
+	static int getFixedAttribFromSemantic(int semantic,int index);
+	static GLuint getClientStateFromSemantic(int semantic,int index);
 	static GLuint GLCubeFaces[6];
 
 protected:
 	void setVertexData(const VertexData *vertexData);
 	void setFixedVertexData(const VertexData *vertexData);
 	void setShaderVertexData(const VertexData *vertexData);
+
+	void vertexFormatCreated(GLVertexFormat *format);
+	void vertexFormatDestroyed(GLVertexFormat *format);
+	void programCreated(GLSLProgram *program);
+	void programDestroyed(GLSLProgram *program);
 
 	int mMatrixMode;
 
@@ -185,8 +191,9 @@ protected:
 	short mLastMaxTexCoordIndex;
 	egg::Collection<GLenum> mLastTexTargets;
 	egg::Collection<VertexBuffer*> mLastVertexBuffers;
-	int mLastSemanticBits,mLastTexCoordSemanticBits;
+	int mLastFixedSemanticBits,mLastFixedTexCoordSemanticBits;
 	egg::Collection<short> mLastTexCoordIndexes;
+	int mLastShaderSemanticBits;
 
 	#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
 		egg::mathfixed::Matrix4x4 mModelMatrix;
@@ -205,15 +212,21 @@ protected:
 	RenderTarget *mRenderTarget;
 	GLRenderTarget *mGLRenderTarget;
 
+	/// @todo: Merge the GLSLProgramMap and mPrograms together
 	Shader *mVertexShader,*mFragmentShader,*mGeometryShader;
 	egg::Map<uint64,GLSLProgram::ptr> mGLSLProgramMap;
 	bool mRebindGLSLProgram;
+	GLSLProgram *mLastProgram;
+	egg::Collection<GLSLProgram*> mPrograms;
+	egg::Collection<GLVertexFormat*> mVertexFormats;
 
 	#if defined(TOADLET_DEBUG)
 		int mBeginEndCounter;
 	#endif
 
 	friend class GLBuffer;
+	friend class GLVertexFormat;
+	friend class GLSLProgram;
 };
 
 }

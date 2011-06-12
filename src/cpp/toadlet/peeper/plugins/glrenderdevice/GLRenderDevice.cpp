@@ -30,6 +30,7 @@
 #include "GLRenderState.h"
 #include "GLTexture.h"
 #include "GLSLShader.h"
+#include "GLSLVertexLayout.h"
 #if defined(TOADLET_HAS_GLFBOS)
 	#include "GLFBORenderTarget.h"
 #endif
@@ -81,8 +82,9 @@ GLRenderDevice::GLRenderDevice():
 	mLastMaxTexCoordIndex(0),
 	//mLastTexTargets,
 	//mLastVertexBuffers,
-	mLastSemanticBits(0),mLastTexCoordSemanticBits(0),
+	mLastFixedSemanticBits(0),mLastFixedTexCoordSemanticBits(0),
 	//mLastTexCoordIndexes,
+	mLastShaderSemanticBits(0),
 
 	//mModelMatrix,
 	//mViewMatrix,
@@ -97,7 +99,8 @@ GLRenderDevice::GLRenderDevice():
 
 	mGeometryShader(NULL),mVertexShader(NULL),mFragmentShader(NULL),
 	//mGLSLProgramMap,
-	mRebindGLSLProgram(false)
+	mRebindGLSLProgram(false),
+	mLastProgram(NULL)
 
 	#if defined(TOADLET_DEBUG)
 		,mBeginEndCounter(0)
@@ -638,6 +641,7 @@ void GLRenderDevice::endScene(){
 	mVertexShader=NULL;
 	mFragmentShader=NULL;
 	mGeometryShader=NULL;
+	mLastProgram=NULL;
 
 	TOADLET_CHECK_GLERROR("endScene");
 }
@@ -722,9 +726,11 @@ void GLRenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexData
 		}
 
 		if(program!=NULL){
+			mLastProgram=program;
 			program->activate();
 		}
 		else{
+			mLastProgram=NULL;
 			glUseProgram(0);
 		}
 	}
@@ -755,10 +761,6 @@ void GLRenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexData
 		if(rebindTexCoords){
 			mLastMaxTexCoordIndex=mMaxTexCoordIndex;
 			setVertexData(vertexData);
-			mLastVertexBuffers.resize(vertexData->vertexBuffers.size());
-			for(i=0;i<mLastVertexBuffers.size();++i){
-				mLastVertexBuffers[i]=vertexData->vertexBuffers[i];
-			}
 		}
 	}
 
@@ -1689,17 +1691,34 @@ bool GLRenderDevice::useMapping(GLBuffer *buffer) const{
 }
 
 void GLRenderDevice::setVertexData(const VertexData *vertexData){
-	if(mVertexShader==NULL){
-		return setFixedVertexData(vertexData);
+	if(mLastProgram==NULL){
+		if(mLastShaderSemanticBits!=0){
+			setShaderVertexData(NULL);
+		}
+		setFixedVertexData(vertexData);
 	}
 	else{
-		return setShaderVertexData(vertexData);
+		if(mLastFixedSemanticBits!=0){
+			setFixedVertexData(NULL);
+		}
+		setShaderVertexData(vertexData);
+	}
+
+	if(vertexData!=NULL){
+		mLastVertexBuffers.resize(vertexData->vertexBuffers.size());
+		int i;
+		for(i=0;i<mLastVertexBuffers.size();++i){
+			mLastVertexBuffers[i]=vertexData->vertexBuffers[i];
+		}
+	}
+	else{
+		mLastVertexBuffers.clear();
 	}
 }
 
 void GLRenderDevice::setFixedVertexData(const VertexData *vertexData){
 	int numVertexBuffers=0;
-	int semanticBits=0,lastSemanticBits=mLastSemanticBits,texCoordSemanticBits=0,lastTexCoordSemanticBits=mLastTexCoordSemanticBits;
+	int semanticBits=0,lastSemanticBits=mLastFixedSemanticBits,texCoordSemanticBits=0,lastTexCoordSemanticBits=mLastFixedTexCoordSemanticBits;
 
 	if(vertexData!=NULL){
 		numVertexBuffers=vertexData->vertexBuffers.size();
@@ -1726,9 +1745,6 @@ void GLRenderDevice::setFixedVertexData(const VertexData *vertexData){
 		for(j=0;j<numElements;++j){
 			int semantic=glvertexFormat->mSemantics[j];
 			int index=glvertexFormat->mIndexes[j];
-
-			/// @todo: Only use the semanticBits like this if we're not in a shader.
-			/// Otherwise we will be using the attribute indexes
 
 			switch(semantic){
 				case VertexFormat::Semantic_POSITION:
@@ -1781,10 +1797,10 @@ void GLRenderDevice::setFixedVertexData(const VertexData *vertexData){
 		while(sb>0 || lsb>0){
 			if((sb&1)!=(lsb&1)){
 				if((sb&1)>(lsb&1)){
-					glEnableClientState(GLClientStates[state]);
+					glEnableClientState(getClientStateFromSemantic(state,0));
 				}
 				else{
-					glDisableClientState(GLClientStates[state]);
+					glDisableClientState(getClientStateFromSemantic(state,0));
 				}
 			}
 			sb>>=1;
@@ -1821,12 +1837,77 @@ void GLRenderDevice::setFixedVertexData(const VertexData *vertexData){
 		glColor4f(1.0f,1.0f,1.0f,1.0f);
 	}
 
-	mLastSemanticBits=semanticBits;mLastTexCoordSemanticBits=texCoordSemanticBits;
+	mLastFixedSemanticBits=semanticBits;mLastFixedTexCoordSemanticBits=texCoordSemanticBits;
 
 	TOADLET_CHECK_GLERROR("setFixedVertexData");
 }
 
 void GLRenderDevice::setShaderVertexData(const VertexData *vertexData){
+	int numVertexBuffers=0;
+	int semanticBits=0,lastSemanticBits=mLastShaderSemanticBits;
+
+	if(vertexData!=NULL){
+		numVertexBuffers=vertexData->vertexBuffers.size();
+	}
+
+	int i,j;
+	for(i=0;i<numVertexBuffers;++i){
+		GLBuffer *glvertexBuffer=(GLBuffer*)vertexData->vertexBuffers[i]->getRootVertexBuffer();
+
+		GLVertexFormat *glvertexFormat=(GLVertexFormat*)(glvertexBuffer->mVertexFormat->getRootVertexFormat());
+		GLsizei vertexSize=glvertexFormat->mVertexSize;
+		int numElements=glvertexFormat->mSemantics.size();
+
+		GLSLVertexLayout *gllayout=mLastProgram->findVertexLayout(glvertexFormat);
+
+		if(glvertexBuffer->mHandle==0){
+			glBindBuffer(glvertexBuffer->mTarget,0);
+		}
+		else{
+			glBindBuffer(glvertexBuffer->mTarget,glvertexBuffer->mHandle);
+		}
+
+		for(j=0;j<numElements;++j){
+			int semantic=glvertexFormat->mSemantics[j];
+			int index=glvertexFormat->mIndexes[j];
+
+			int semanticIndex=gllayout->mSemanticIndexes[j];
+
+			semanticBits|=(1<<semanticIndex);
+			bool normalized=(semantic==VertexFormat::Semantic_COLOR);
+			glVertexAttribPointer(
+				semanticIndex,
+				glvertexFormat->mGLElementCounts[j],
+				glvertexFormat->mGLDataTypes[j],
+				normalized,
+				vertexSize,
+				glvertexBuffer->mElementOffsets[j]);
+		}
+	}
+
+	if(semanticBits!=lastSemanticBits){
+		// Go through all the VertexFormat types, check to see if the enabling state between now and last were different.
+		//  If so check to see if the state needs to be enabled or disabled.
+		int semanticIndex=0;
+		int sb=semanticBits,lsb=lastSemanticBits;
+		while(sb>0 || lsb>0){
+			if((sb&1)!=(lsb&1)){
+				if((sb&1)>(lsb&1)){
+					glEnableVertexAttribArray(semanticIndex);
+				}
+				else{
+					glDisableVertexAttribArray(semanticIndex);
+				}
+			}
+			sb>>=1;
+			lsb>>=1;
+			semanticIndex++;
+		}
+	}
+
+	mLastShaderSemanticBits=semanticBits;
+
+	TOADLET_CHECK_GLERROR("setShaderVertexData");
 }
 
 GLenum GLRenderDevice::getGLDepthFunc(DepthState::DepthTest test){
@@ -2264,17 +2345,46 @@ GLuint GLRenderDevice::getGLDepthTextureMode(TextureState::ShadowResult shadow){
 	}
 }
 
-GLuint GLRenderDevice::GLClientStates[6]={
-	GL_VERTEX_ARRAY,
-	0, /// @todo: Blend Weights
-	0, /// @todo: Blend Indices
-	GL_NORMAL_ARRAY,
-	GL_COLOR_ARRAY,
-	#if defined(TOADLET_HAS_GLEW)
-		GL_SECONDARY_COLOR_ARRAY,
-	#else
-		0,
-	#endif
+int GLRenderDevice::getFixedAttribFromSemantic(int semantic,int index){
+	switch(semantic){
+		case VertexFormat::Semantic_POSITION:
+			return 0;
+		case VertexFormat::Semantic_NORMAL:
+			return 3;
+		case VertexFormat::Semantic_COLOR:
+			switch(index){
+				case 0:
+					return 4;
+				case 1:
+					return 5;
+				default:
+					return -1;
+			}
+		case VertexFormat::Semantic_TEXCOORD:
+			return 6+index;
+		default:
+			return -1;
+	}
+}
+
+GLuint GLRenderDevice::getClientStateFromSemantic(int semantic,int index){
+	switch(semantic){
+		case VertexFormat::Semantic_POSITION:
+			return GL_VERTEX_ARRAY;
+		case VertexFormat::Semantic_NORMAL:
+			return GL_NORMAL_ARRAY;
+		case VertexFormat::Semantic_COLOR:
+			switch(index){
+				case 0:
+					return GL_COLOR_ARRAY;
+				case 1:
+					return GL_SECONDARY_COLOR_ARRAY;
+				default:
+					return 0;
+			}
+		default:
+			return 0;
+	}
 };
 
 #if !defined(TOADLET_HAS_GLES)
@@ -2287,6 +2397,44 @@ GLuint GLRenderDevice::GLClientStates[6]={
 		GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
 	};
 #endif
+
+void GLRenderDevice::vertexFormatCreated(GLVertexFormat *format){
+	int handle=mVertexFormats.size();
+	format->mUniqueHandle=handle;
+	mVertexFormats.resize(handle+1);
+	mVertexFormats[handle]=format;
+}
+
+void GLRenderDevice::vertexFormatDestroyed(GLVertexFormat *format){
+	int handle=format->mUniqueHandle;
+	if(handle==-1){
+		return;
+	}
+
+	int i;
+	for(i=mPrograms.size()-1;i>=0;--i){
+		GLSLProgram *program=mPrograms[i];
+		if(handle<program->mLayouts.size()){
+			GLSLVertexLayout *layout=program->mLayouts[handle];
+			if(layout!=NULL){
+				layout->destroy();
+			}
+			program->mLayouts.removeAt(handle);
+		}
+	}
+	for(i=handle;i<mVertexFormats.size();++i){
+		mVertexFormats[i]->mUniqueHandle--;
+	}
+	mVertexFormats.removeAt(handle);
+}
+
+void GLRenderDevice::programCreated(GLSLProgram *program){
+	mPrograms.add(program);
+}
+
+void GLRenderDevice::programDestroyed(GLSLProgram *program){
+	mPrograms.remove(program);
+}
 
 }
 }

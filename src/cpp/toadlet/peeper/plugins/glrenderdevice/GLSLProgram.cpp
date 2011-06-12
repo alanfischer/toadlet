@@ -24,6 +24,9 @@
  ********** Copyright header - do not remove **********/
 
 #include "GLSLProgram.h"
+#include "GLVertexFormat.h"
+#include "GLSLVertexLayout.h"
+#include "GLRenderDevice.h"
 
 using namespace toadlet::egg;
 
@@ -44,11 +47,30 @@ GLSLProgram::~GLSLProgram(){
 }
 
 bool GLSLProgram::create(){
-	return createContext();
+	bool result=createContext();
+
+	if(mDevice!=NULL){
+		mDevice->programCreated(this);
+	}
+
+	return result;
 }
 
 void GLSLProgram::destroy(){
 	destroyContext();
+
+	if(mDevice!=NULL){
+		mDevice->programDestroyed(this);
+	}
+
+	int i;
+	for(i=0;i<mLayouts.size();++i){
+		if(mLayouts[i]!=NULL){
+			mLayouts[i]->destroy();
+			mLayouts[i]=NULL;
+		}
+	}
+	mLayouts.clear();
 }
 
 bool GLSLProgram::attachShader(Shader *shader){
@@ -86,6 +108,21 @@ bool GLSLProgram::activate(){
 	glUseProgram(mHandle);
 
 	return true;
+}
+
+GLSLVertexLayout *GLSLProgram::findVertexLayout(GLVertexFormat *vertexFormat){
+	int handle=vertexFormat->mUniqueHandle;
+	GLSLVertexLayout *layout=NULL;
+	if(handle<mLayouts.size()){
+		layout=mLayouts[handle];
+	}
+	else{
+		layout=new GLSLVertexLayout(mDevice);
+		layout->create(vertexFormat,this);
+		mLayouts.resize(handle+1,NULL);
+		mLayouts[handle]=layout;
+	}
+	return layout;
 }
 
 bool GLSLProgram::createContext(){

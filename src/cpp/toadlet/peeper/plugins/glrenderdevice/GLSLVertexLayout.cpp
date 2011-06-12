@@ -23,50 +23,38 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_GLSLPROGRAM_H
-#define TOADLET_PEEPER_GLSLPROGRAM_H
-
-#include "GLSLShader.h"
+#include "GLSLVertexLayout.h"
+#include "GLRenderDevice.h"
 
 namespace toadlet{
 namespace peeper{
 
-class GLSLVertexLayout;
-class GLVertexFormat;
+GLSLVertexLayout::GLSLVertexLayout(GLRenderDevice *renderDevice){
+	mDevice=renderDevice;
+}
 
-class GLSLProgram{
-public:
-	TOADLET_SHARED_POINTERS(GLSLProgram);
+GLSLVertexLayout::~GLSLVertexLayout(){
+	destroy();
+}
 
-	GLSLProgram(GLRenderDevice *renderDevice);
-	virtual ~GLSLProgram();
-	
-	bool create();
-	void destroy();
+bool GLSLVertexLayout::create(GLVertexFormat *vertexFormat,GLSLProgram *program){
+	mSemanticIndexes.resize(vertexFormat->getNumElements());
 
-	bool attachShader(Shader *shader);
-	bool removeShader(Shader *shader);
+	int i;
+	for(i=0;i<vertexFormat->getNumElements();++i){
+		int location=glGetAttribLocation(program->mHandle,vertexFormat->getName(i));
+		if(location==-1){
+			location=GLRenderDevice::getFixedAttribFromSemantic(vertexFormat->getSemantic(i),vertexFormat->getIndex(i));
+		}
+		mSemanticIndexes[i]=location;
+	}
 
-	bool activate();
+	return true;
+}
 
-	GLSLVertexLayout *findVertexLayout(GLVertexFormat *vertexFormat);
-
-protected:
-	bool createContext();
-	bool destroyContext();
-
-	GLRenderDevice *mDevice;
-
-	GLuint mHandle;
-	bool mNeedsLink;
-	
-	egg::Collection<GLSLVertexLayout*> mLayouts;
-
-	friend class GLRenderDevice;
-	friend class GLSLVertexLayout;
-};
+void GLSLVertexLayout::destroy(){
+	mSemanticIndexes.clear();
+}
 
 }
 }
-
-#endif

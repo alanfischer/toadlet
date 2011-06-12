@@ -43,6 +43,7 @@ GLVertexFormat::GLVertexFormat(GLRenderDevice *renderDevice):
 	//mOffsets,
 	mVertexSize(0),
 
+	mUniqueHandle(0),
 	//mGLDataTypes,
 	//mGLElementCount,
 	mSemanticBits(0)
@@ -55,6 +56,10 @@ GLVertexFormat::~GLVertexFormat(){
 }
 
 bool GLVertexFormat::create(){
+	if(mDevice!=NULL){
+		mDevice->vertexFormatCreated(this);
+	}
+
 	return true;
 }
 
@@ -69,6 +74,10 @@ void GLVertexFormat::destroy(){
 
 	if(mListener!=NULL){
 		mListener->vertexFormatDestroyed(this);
+	}
+
+	if(mDevice!=NULL){
+		mDevice->vertexFormatDestroyed(this);
 	}
 }
 
