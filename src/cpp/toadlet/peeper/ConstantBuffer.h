@@ -23,33 +23,36 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_SHADER_H
-#define TOADLET_PEEPER_SHADER_H
+#ifndef TOADLET_PEEPER_CONSTANTBUFFER_H
+#define TOADLET_PEEPER_CONSTANTBUFFER_H
 
-#include <toadlet/egg/Resource.h>
-#include <toadlet/egg/String.h>
+#include <toadlet/peeper/Buffer.h>
 
 namespace toadlet{
 namespace peeper{
 
-class Shader:public egg::Resource{
+class TOADLET_API ConstantBuffer:public Buffer{
 public:
-	TOADLET_SHARED_POINTERS(Shader);
+	TOADLET_SHARED_POINTERS(ConstantBuffer);
 
-	enum ShaderType{
-		ShaderType_VERTEX,
-		ShaderType_FRAGMENT,
-		ShaderType_GEOMETRY,
+	enum ConstantFormat{
+		ConstantFormat_BOOL=1,
+		ConstantFormat_INT,
+		ConstantFormat_FLOAT,
 	};
-
-	virtual ~Shader(){}
-
-	virtual Shader *getRootShader()=0;
-
-	virtual bool create(ShaderType shaderType,const egg::String &code)=0;
-	virtual void destroy()=0;
 	
-	virtual ShaderType getShaderType() const=0;
+	virtual ~ConstantBuffer(){}
+
+	virtual ConstantBuffer *getRootConstantBuffer()=0;
+
+	virtual bool create(int usage,int access,ConstantFormat format,int size)=0;
+	virtual void destroy()=0;
+
+	virtual void resetCreate()=0;
+	virtual void resetDestroy()=0;
+
+	virtual ConstantFormat getConstantFormat() const=0;
+	virtual int getSize() const=0;
 };
 
 }

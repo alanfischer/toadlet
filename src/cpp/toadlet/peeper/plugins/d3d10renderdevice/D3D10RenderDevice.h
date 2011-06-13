@@ -63,14 +63,10 @@ public:
 	VertexFormat *createVertexFormat();
 	VertexBuffer *createVertexBuffer();
 	IndexBuffer *createIndexBuffer();
+	ConstantBuffer *createConstantBuffer();
 	Shader *createShader();
 	Query *createQuery();
 	RenderState *createRenderState();
-
-	// Matrix operations
-	void setModelMatrix(const Matrix4x4 &matrix);
-	void setViewMatrix(const Matrix4x4 &matrix);
-	void setProjectionMatrix(const Matrix4x4 &matrix);
 
 	// Rendering operations
 	RenderTarget *getPrimaryRenderTarget(){return mPrimaryRenderTarget;}
@@ -87,9 +83,13 @@ public:
 	void setDefaultState();
 	bool setRenderState(RenderState *renderState);
 	bool setShader(Shader::ShaderType type,Shader *shader);
+	bool setConstantBuffer(Shader::ShaderType type,ConstantBuffer *buffer);
 	void setTexture(int stage,Texture *texture);
 
 	// Old fixed states
+	void setModelMatrix(const Matrix4x4 &matrix){}
+	void setViewMatrix(const Matrix4x4 &matrix){}
+	void setProjectionMatrix(const Matrix4x4 &matrix){}
 	void setNormalize(const Normalize &normalize){}
 	void setAmbientColor(const Vector4 &ambient){}
 	void setLightState(int i,const LightState &light){}
@@ -134,10 +134,6 @@ protected:
 	D3D10Shader *mD3DVertexShader,*mD3DFragmentShader,*mD3DGeometryShader;
 	egg::Collection<D3D10Shader*> mVertexShaders;
 	egg::Collection<D3D10VertexFormat*> mVertexFormats;
-
-	Matrix4x4 mModelMatrix;
-	Matrix4x4 mViewMatrix;
-	Matrix4x4 mProjectionMatrix;
 
 	RenderCaps mCaps;
 

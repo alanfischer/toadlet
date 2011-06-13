@@ -29,6 +29,7 @@
 #include "D3D10Includes.h"
 #include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/VertexBuffer.h>
+#include <toadlet/peeper/ConstantBuffer.h>
 #include <toadlet/egg/Collection.h>
 
 namespace toadlet{
@@ -37,18 +38,20 @@ namespace peeper{
 class D3D10RenderDevice;
 
 // Currently this class inherits all possible types, but perhaps it should just inherit Buffer, and then there would exist subclasses for each type of Buffer
-class TOADLET_API D3D10Buffer:public IndexBuffer,public VertexBuffer{
+class TOADLET_API D3D10Buffer:public IndexBuffer,public VertexBuffer,public ConstantBuffer{
 public:
 	D3D10Buffer(D3D10RenderDevice *renderDevice);
 	virtual ~D3D10Buffer();
 
 	IndexBuffer *getRootIndexBuffer(){return this;}
 	VertexBuffer *getRootVertexBuffer(){return this;}
+	ConstantBuffer *getRootConstantBuffer(){return this;}
 
 	void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
 	bool create(int usage,int access,IndexFormat indexFormat,int size);
 	bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size);
+	bool create(int usage,int access,ConstantFormat constantFormat,int size);
 	void destroy();
 
 	void resetCreate(){}
@@ -61,6 +64,7 @@ public:
 
 	IndexFormat getIndexFormat() const{return mIndexFormat;}
 	VertexFormat::ptr getVertexFormat() const{return mVertexFormat;}
+	ConstantFormat getConstantFormat() const{return mConstantFormat;}
 
 	uint8 *lock(int lockAccess);
 	bool unlock();
@@ -79,6 +83,7 @@ protected:
 
 	IndexFormat mIndexFormat;
 	VertexFormat::ptr mVertexFormat;
+	ConstantFormat mConstantFormat;
 
 	int mBindFlags;
 	ID3D10Buffer *mBuffer;
