@@ -85,7 +85,7 @@ public:
 	bool copySurface(IDirect3DSurface9 *dst,IDirect3DSurface9 *src);
 	void setDefaultState();
 	bool setRenderState(RenderState *renderState);
-	bool setShader(Shader::ShaderType type,Shader *shader){return false;}
+	bool setShader(Shader::ShaderType type,Shader *shader);
 	void setTexture(int i,Texture *texture);
 
 	// Old fixed states

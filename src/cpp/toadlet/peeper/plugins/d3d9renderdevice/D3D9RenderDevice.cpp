@@ -33,6 +33,7 @@
 #include "D3D9VertexFormat.h"
 #if !defined(TOADLET_SET_D3DM)
 	#include "D3D9Query.h"
+	#include "D3D9Shader.h"
 #endif
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/egg/Error.h>
@@ -216,7 +217,7 @@ IndexBuffer *D3D9RenderDevice::createIndexBuffer(){
 }
 
 Shader *D3D9RenderDevice::createShader(){
-	return NULL;
+	return new D3D9Shader(this);
 }
 
 Query *D3D9RenderDevice::createQuery(){
@@ -291,24 +292,24 @@ void D3D9RenderDevice::clear(int clearFlags,const Vector4 &clearColor){
 void D3D9RenderDevice::swap(){
 	mD3DRenderTarget->swap();
 }
-
+Matrix4x4 mm,vm,pm;
 void D3D9RenderDevice::setModelMatrix(const Matrix4x4 &matrix){
 	toD3DMATRIX(cacheD3DMatrix,matrix);
-
+mm=matrix;
 	HRESULT result=mD3DDevice->SetTransform(D3DTS_WORLD,&cacheD3DMatrix TOADLET_D3DMFMT);
 	TOADLET_CHECK_D3D9ERROR(result,"setModelMatrix");
 }
 
 void D3D9RenderDevice::setViewMatrix(const Matrix4x4 &matrix){
 	toD3DMATRIX(cacheD3DMatrix,matrix);
-
+vm=matrix;
 	HRESULT result=mD3DDevice->SetTransform(D3DTS_VIEW,&cacheD3DMatrix TOADLET_D3DMFMT);
 	TOADLET_CHECK_D3D9ERROR(result,"setViewMatrix");
 }
 
 void D3D9RenderDevice::setProjectionMatrix(const Matrix4x4 &matrix){
 	D3DMATRIX &d3dmatrix=cacheD3DMatrix;
-
+pm=matrix;
 	toD3DMATRIX(d3dmatrix,matrix);
 
 	// Convert depth ranges from -1,1 to 0,1
@@ -349,6 +350,10 @@ void D3D9RenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexDa
 			"D3D9RenderDevice does not support multiple streams yet");
 		return;
 	}
+
+Matrix4x4 shaderMatrix;
+Math::transpose(shaderMatrix,pm*vm*mm);
+mD3DDevice->SetVertexShaderConstantF(0,shaderMatrix.getData(),4);
 
 	HRESULT result;
 	D3DPRIMITIVETYPE d3dpt;
@@ -516,6 +521,26 @@ bool D3D9RenderDevice::setRenderState(RenderState *renderState){
 	}
 
 	return true;
+}
+
+bool D3D9RenderDevice::setShader(Shader::ShaderType type,Shader *shader){
+	D3D9Shader *d3d9shader=(D3D9Shader*)shader->getRootShader();
+	IUnknown *id3d9shader=NULL;
+	if(shader!=NULL){
+		id3d9shader=d3d9shader->mShader;
+	}
+
+	HRESULT result=E_FAIL;
+	switch(type){
+		case Shader::ShaderType_VERTEX:
+			mD3DDevice->SetVertexShader((IDirect3DVertexShader9*)id3d9shader);
+		break;
+		case Shader::ShaderType_FRAGMENT:
+			mD3DDevice->SetPixelShader((IDirect3DPixelShader9*)id3d9shader);
+		break;
+	}
+
+	return SUCCEEDED(result);
 }
 
 void D3D9RenderDevice::setBlendState(const BlendState &state){
