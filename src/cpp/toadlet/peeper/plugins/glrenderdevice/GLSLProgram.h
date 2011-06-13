@@ -1,4 +1,4 @@
-/********** Copyright header - do not remove **********
+	/********** Copyright header - do not remove **********
  *
  * The Toadlet Engine
  *
@@ -27,11 +27,11 @@
 #define TOADLET_PEEPER_GLSLPROGRAM_H
 
 #include "GLSLShader.h"
+#include "GLSLVertexLayout.h"
 
 namespace toadlet{
 namespace peeper{
 
-class GLSLVertexLayout;
 class GLVertexFormat;
 
 class GLSLProgram{
@@ -59,8 +59,9 @@ protected:
 
 	GLuint mHandle;
 	bool mNeedsLink;
+	egg::Collection<GLSLShader*> mShaders;
 	
-	egg::Collection<GLSLVertexLayout*> mLayouts;
+	egg::Collection<GLSLVertexLayout::ptr> mLayouts;
 
 	friend class GLRenderDevice;
 	friend class GLSLVertexLayout;

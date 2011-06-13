@@ -172,6 +172,8 @@ protected:
 
 	void vertexFormatCreated(GLVertexFormat *format);
 	void vertexFormatDestroyed(GLVertexFormat *format);
+	void shaderCreated(GLSLShader *shader);
+	void shaderDestroyed(GLSLShader *shader);
 	void programCreated(GLSLProgram *program);
 	void programDestroyed(GLSLProgram *program);
 
@@ -226,6 +228,7 @@ protected:
 
 	friend class GLBuffer;
 	friend class GLVertexFormat;
+	friend class GLSLShader;
 	friend class GLSLProgram;
 };
 

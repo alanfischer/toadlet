@@ -2428,6 +2428,30 @@ void GLRenderDevice::vertexFormatDestroyed(GLVertexFormat *format){
 	mVertexFormats.removeAt(handle);
 }
 
+void GLRenderDevice::shaderCreated(GLSLShader *shader){
+}
+
+void GLRenderDevice::shaderDestroyed(GLSLShader *shader){
+	int i,j;
+	for(i=0;i<mPrograms.size();++i){
+		GLSLProgram *program=mPrograms[i];
+		for(j=0;j<program->mShaders.size();++j){
+			if(program->mShaders[j]==shader){
+				program->destroy();
+				mPrograms.remove(program);
+
+				Map<uint64,GLSLProgram::ptr>::iterator it;
+				for(it=mGLSLProgramMap.begin();it!=mGLSLProgramMap.end();++it){
+					if(it->second==program){
+						mGLSLProgramMap.erase(it);
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+
 void GLRenderDevice::programCreated(GLSLProgram *program){
 	mPrograms.add(program);
 }
