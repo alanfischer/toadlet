@@ -28,15 +28,17 @@
 
 #include "GLIncludes.h"
 #include "GLVertexFormat.h"
-#include "GLSLProgram.h"
 
 namespace toadlet{
 namespace peeper{
 
 class GLRenderDevice;
+class GLSLProgram;
 
 class TOADLET_API GLSLVertexLayout{
 public:
+	TOADLET_SHARED_POINTERS(GLSLVertexLayout);
+
 	GLSLVertexLayout(GLRenderDevice *renderDevice);
 	virtual ~GLSLVertexLayout();
 

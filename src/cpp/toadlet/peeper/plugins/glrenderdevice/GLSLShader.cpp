@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include "GLSLShader.h"
+#include "GLRenderDevice.h"
 
 using namespace toadlet::egg;
 
@@ -52,11 +53,21 @@ bool GLSLShader::create(ShaderType shaderType,const String &code){
 	mShaderType=shaderType;
 	mCode=code;
 
-	return createContext();
+	bool result=createContext();
+
+	if(mDevice!=NULL){
+		mDevice->shaderCreated(this);
+	}
+
+	return result;
 }
 
 void GLSLShader::destroy(){
 	destroyContext();
+
+	if(mDevice!=NULL){
+		mDevice->shaderDestroyed(this);
+	}
 }
 
 bool GLSLShader::createContext(){

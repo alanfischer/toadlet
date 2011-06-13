@@ -38,6 +38,7 @@ GLSLProgram::GLSLProgram(GLRenderDevice *renderDevice):
 
 	mHandle(0),
 	mNeedsLink(false)
+	//mShaders
 {
 	mDevice=renderDevice;
 }
@@ -59,6 +60,8 @@ bool GLSLProgram::create(){
 void GLSLProgram::destroy(){
 	destroyContext();
 
+	mShaders.clear();
+
 	if(mDevice!=NULL){
 		mDevice->programDestroyed(this);
 	}
@@ -78,6 +81,8 @@ bool GLSLProgram::attachShader(Shader *shader){
 
 	glAttachShader(mHandle,glshader->mHandle);
 
+	mShaders.add(glshader);
+
 	mNeedsLink=true;
 
 	return true;
@@ -87,6 +92,8 @@ bool GLSLProgram::removeShader(Shader *shader){
 	GLSLShader *glshader=(GLSLShader*)shader->getRootShader();
 
 	glDetachShader(mHandle,glshader->mHandle);
+
+	mShaders.remove(glshader);
 
 	mNeedsLink=true;
 
@@ -112,12 +119,12 @@ bool GLSLProgram::activate(){
 
 GLSLVertexLayout *GLSLProgram::findVertexLayout(GLVertexFormat *vertexFormat){
 	int handle=vertexFormat->mUniqueHandle;
-	GLSLVertexLayout *layout=NULL;
+	GLSLVertexLayout::ptr layout;
 	if(handle<mLayouts.size()){
 		layout=mLayouts[handle];
 	}
 	else{
-		layout=new GLSLVertexLayout(mDevice);
+		layout=GLSLVertexLayout::ptr(new GLSLVertexLayout(mDevice));
 		layout->create(vertexFormat,this);
 		mLayouts.resize(handle+1,NULL);
 		mLayouts[handle]=layout;
