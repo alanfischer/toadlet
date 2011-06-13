@@ -332,6 +332,7 @@ void Engine::destroy(){
 	mNodeManager->destroy();
 	mAudioBufferManager->destroy();
 	mMeshManager->destroy();
+	mShaderManager->destroy();
 	mMaterialManager->destroy();
 	mFontManager->destroy();
 	mBufferManager->destroy();

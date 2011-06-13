@@ -1,5 +1,7 @@
 #include "Logo.h"
 
+#include <toadlet/peeper/ConstantBuffer.h>
+
 class GravityFollower:public NodeListener,MotionDeviceListener{
 public:
 	GravityFollower(MotionDevice *device){
@@ -67,8 +69,9 @@ Logo::Logo():Application(){
 Logo::~Logo(){
 }
 Shader::ptr vs,fs,gs;
+ConstantBuffer::ptr cb;
 void Logo::create(){
-	Application::create("gl");
+	Application::create("d3d10");
 
 	mEngine->setDirectory("../../../data");
 
@@ -96,7 +99,7 @@ void Logo::create(){
 	cameraNode->setClearColor(Colors::BLUE);
 	scene->getRoot()->attach(cameraNode);
 
-#if 1
+#if 0
 	const char *vc=
 		"varying vec4 color;\n" \
 		"void main(){\n" \
@@ -157,6 +160,8 @@ void Logo::create(){
 vs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,vc);
 fs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,fc);
 //gs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_GEOMETRY,gc);
+cb=ConstantBuffer::ptr(getEngine()->getRenderDevice()->createConstantBuffer());
+cb->create(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,ConstantBuffer::ConstantFormat_FLOAT,16);
 
 // Only looks good if running on device, in simulator its always a top down view
 #if 0
@@ -187,10 +192,21 @@ void Logo::resized(int width,int height){
 }
 
 void Logo::render(RenderDevice *renderDevice){
+#if 1
+Matrix4x4 shaderMatrix;
+Math::transpose(shaderMatrix,cameraNode->getProjectionMatrix()*cameraNode->getViewMatrix());
+tbyte *data=cb->lock(Buffer::Access_BIT_WRITE);
+memcpy(data,shaderMatrix.getData(),sizeof(shaderMatrix));
+cb->unlock();
+#endif
+
+
 	renderDevice->beginScene();
 renderDevice->setShader(Shader::ShaderType_VERTEX,vs);
 renderDevice->setShader(Shader::ShaderType_FRAGMENT,fs);
 //renderDevice->setShader(Shader::ShaderType_GEOMETRY,gs);
+
+renderDevice->setConstantBuffer(Shader::ShaderType_VERTEX,cb);
 		cameraNode->render(renderDevice);
 	renderDevice->endScene();
 	renderDevice->swap();

@@ -43,6 +43,7 @@ D3D10Buffer::D3D10Buffer(D3D10RenderDevice *renderDevice):
 
 	mIndexFormat((IndexFormat)0),
 	//mVertexFormat,
+	mConstantFormat((ConstantFormat)0),
 
 	mBindFlags(0),
 	mBuffer(NULL),
@@ -100,6 +101,43 @@ bool D3D10Buffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int
 	mDataSize=mVertexFormat->getVertexSize()*mSize;
 
 	mBindFlags|=D3D10_BIND_VERTEX_BUFFER;
+
+	mMapping=(mUsage&(Usage_BIT_STATIC|Usage_BIT_STREAM))==0;
+	if(mMapping){
+		createContext();
+	}
+	else{
+		mData=new uint8[mDataSize];
+		mBacking=true;
+	}
+
+	return true;
+}
+
+bool D3D10Buffer::create(int usage,int access,ConstantFormat constantFormat,int size){
+	if((usage&Usage_BIT_STATIC)>0 && (access&Access_BIT_READ)>0){
+		Error::invalidParameters(Categories::TOADLET_PEEPER,
+			"Buffer can not be static and readable");
+		return false;
+	}
+
+	mUsage=usage;
+	mAccess=access;
+	mSize=size;
+	mConstantFormat=constantFormat;
+	int elementSize=0;
+	switch(constantFormat){
+		case ConstantFormat_BOOL:
+			elementSize=1;
+		break;
+		case ConstantFormat_INT:
+		case ConstantFormat_FLOAT:
+			elementSize=4;
+		break;
+	}
+	mDataSize=elementSize*mSize;
+
+	mBindFlags|=D3D10_BIND_CONSTANT_BUFFER;
 
 	mMapping=(mUsage&(Usage_BIT_STATIC|Usage_BIT_STREAM))==0;
 	if(mMapping){

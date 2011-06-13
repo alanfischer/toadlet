@@ -36,16 +36,17 @@ namespace toadlet{
 namespace peeper{
 
 class BlendState;
+class ConstantBuffer;
 class DepthState;
+class FogState;
 class IndexBuffer;
 class LightState;
 class MaterialState;
-class FogState;
-class Query;
-class RenderTarget;
 class PixelBufferRenderTarget;
 class PixelBuffer;
 class PointState;
+class Query;
+class RenderTarget;
 class RasterizerState;
 class RenderCaps;
 class RenderState;
@@ -80,14 +81,10 @@ public:
 	virtual VertexFormat *createVertexFormat()=0;
 	virtual VertexBuffer *createVertexBuffer()=0;
 	virtual IndexBuffer *createIndexBuffer()=0;
+	virtual ConstantBuffer *createConstantBuffer()=0;
 	virtual Shader *createShader()=0;
 	virtual Query *createQuery()=0;
 	virtual RenderState *createRenderState()=0;
-
-	// Matrix operations
-	virtual void setModelMatrix(const Matrix4x4 &matrix)=0;
-	virtual void setViewMatrix(const Matrix4x4 &matrix)=0;
-	virtual void setProjectionMatrix(const Matrix4x4 &matrix)=0;
 
 	// Rendering operations
 	virtual RenderTarget *getPrimaryRenderTarget()=0;
@@ -104,9 +101,13 @@ public:
 	virtual void setDefaultState()=0;
 	virtual bool setRenderState(RenderState *renderState)=0;
 	virtual bool setShader(Shader::ShaderType type,Shader *shader)=0;
+	virtual bool setConstantBuffer(Shader::ShaderType type,ConstantBuffer *buffer)=0;
 	virtual void setTexture(int i,Texture *texture)=0;
 
 	// Old fixed states
+	virtual void setModelMatrix(const Matrix4x4 &matrix)=0;
+	virtual void setViewMatrix(const Matrix4x4 &matrix)=0;
+	virtual void setProjectionMatrix(const Matrix4x4 &matrix)=0;
 	virtual void setNormalize(const Normalize &normalize)=0;
 	virtual void setAmbientColor(const Vector4 &ambient)=0;
 	virtual void setLightState(int i,const LightState &light)=0;

@@ -176,6 +176,10 @@ IndexBuffer *D3D10RenderDevice::createIndexBuffer(){
 	return new D3D10Buffer(this);
 }
 
+ConstantBuffer *D3D10RenderDevice::createConstantBuffer(){
+	return new D3D10Buffer(this);
+}
+
 Shader *D3D10RenderDevice::createShader(){
 	return new D3D10Shader(this);
 }
@@ -243,6 +247,31 @@ bool D3D10RenderDevice::setShader(Shader::ShaderType type,Shader *shader){
 	return true;
 }
 
+bool D3D10RenderDevice::setConstantBuffer(Shader::ShaderType type,ConstantBuffer *buffer){
+	D3D10Buffer *d3dBuffer=NULL;
+	if(buffer!=NULL){
+		d3dBuffer=(D3D10Buffer*)buffer->getRootConstantBuffer();
+	}
+
+	if(d3dBuffer==NULL){
+		return true;
+	}
+
+	switch(type){
+		case Shader::ShaderType_VERTEX:
+			mD3DDevice->VSSetConstantBuffers(0,1,&d3dBuffer->mBuffer);
+		break;
+		case Shader::ShaderType_FRAGMENT:
+			mD3DDevice->PSSetConstantBuffers(0,1,&d3dBuffer->mBuffer);
+		break;
+		case Shader::ShaderType_GEOMETRY:
+			mD3DDevice->GSSetConstantBuffers(0,1,&d3dBuffer->mBuffer);
+		break;
+	}
+
+	return true;
+}
+
 void D3D10RenderDevice::setViewport(const Viewport &viewport){
 	D3D10_VIEWPORT d3dviewport;
 	d3dviewport.TopLeftX=viewport.x;
@@ -261,18 +290,6 @@ void D3D10RenderDevice::clear(int clearFlags,const Vector4 &clearColor){
 
 void D3D10RenderDevice::swap(){
 	mD3DRenderTarget->swap();
-}
-
-void D3D10RenderDevice::setModelMatrix(const Matrix4x4 &matrix){
-	mModelMatrix.set(matrix);
-}
-
-void D3D10RenderDevice::setViewMatrix(const Matrix4x4 &matrix){
-	mViewMatrix.set(matrix);
-}
-
-void D3D10RenderDevice::setProjectionMatrix(const Matrix4x4 &matrix){
-	mProjectionMatrix.set(matrix);
 }
 
 void D3D10RenderDevice::beginScene(){
@@ -306,34 +323,6 @@ void D3D10RenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexD
 			"D3D10RenderDevice does not support multiple streams yet");
 		return;
 	}
-
-static ID3D10ShaderReflection *reflection=NULL;
-static D3D10_SHADER_VARIABLE_DESC shaderVerDesc;
-static ID3D10Buffer *cbuffer=NULL;
-if(cbuffer==NULL){
-/*D3D10ReflectShader(mVertexShader->mShader->mBytecode->GetBufferPointer(),mVertexShader->mShader->mBytecode->GetBufferLength(),&reflection);
-D3D10_SHADER_DESC desc;
-reflection->GetDesc(&desc);
-ID3D10ShaderReflectionConstantBuffer *buffer=mpIShaderReflection->GetConstantBufferByIndex(0);
-ID3D10ShaderReflectionVariable *varRef=buffer->GetVariableByIndex(0);
-varRef->GetDesc(&shaderVerDesc);
-*/
-D3D10_BUFFER_DESC cbufferDesc;
-cbufferDesc.ByteWidth=sizeof(Matrix4x4);
-cbufferDesc.Usage=D3D10_USAGE_DYNAMIC;
-cbufferDesc.CPUAccessFlags=D3D10_CPU_ACCESS_WRITE;
-cbufferDesc.MiscFlags=0;
-cbufferDesc.BindFlags=D3D10_BIND_CONSTANT_BUFFER;
-mD3DDevice->CreateBuffer(&cbufferDesc,NULL,&cbuffer);
-}
-
-Matrix4x4 shaderMatrix;
-Math::transpose(shaderMatrix,mProjectionMatrix*mViewMatrix*mModelMatrix);
-tbyte *data=NULL;
-cbuffer->Map(D3D10_MAP_WRITE_DISCARD,0,(void**)&data);
-memcpy(data,shaderMatrix.getData(),sizeof(Matrix4x4));
-cbuffer->Unmap();
-mD3DDevice->VSSetConstantBuffers(0,1,&cbuffer);
 
 	D3D10VertexFormat *d3dVertexFormat=(D3D10VertexFormat*)vertexData->getVertexFormat()->getRootVertexFormat();
 
