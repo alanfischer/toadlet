@@ -98,12 +98,15 @@ void Logo::create(){
 
 #if 1
 	const char *vc=
-		"void main(){" \
-		" gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;" \
+		"varying vec4 color;\n" \
+		"void main(){\n" \
+		" gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n" \
+		" color = vec4(gl_Normal.x,gl_Normal.y,gl_Normal.z,1.0);\n" \
 		"}";
 	const char *fc=
-		"void main(){" \
-		" gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);" \
+		"varying vec4 color;\n" \
+		"void main(){\n" \
+		" gl_FragColor = color;\n" \
 		"}";
 	const char *gc=
 		"#version 150\n" \
@@ -120,22 +123,26 @@ void Logo::create(){
 	const char *vc=
 		"struct VIN{\n" \
 			"float4 position : POSITION;\n" \
+			"float3 normal : NORMAL;\n" \
 		"};\n" \
 		"struct VOUT{\n" \
 			"float4 position : SV_POSITION;\n" \
+			"float4 color : COLOR;\n" \
 		"};\n" \
 		"float4x4 ModelViewProjectionMatrix;\n" \
 		"VOUT main(VIN vin){\n" \
 		"	VOUT vout;\n" \
 		"	vout.position=mul(vin.position,ModelViewProjectionMatrix);\n" \
+		"	vout.color=float4(vin.normal.x,vin.normal.y,vin.normal.z,1.0);\n" \
 		"	return vout;\n" \
 		"}";
 	const char *fc=
 		"struct PIN{\n" \
-			"float4 Position : SV_POSITION;\n" \
+			"float4 position : SV_POSITION;\n" \
+			"float4 color: COLOR;\n" \
 		"};\n" \
 		"float4 main(PIN pin): SV_TARGET{" \
-		"	return float4(1.0,0.0,0.0,1.0);\n" \
+		"	return pin.color;\n" \
 		"}";
 	const char *gc=
 		"struct GIN{\n" \
@@ -149,7 +156,7 @@ void Logo::create(){
 #endif
 vs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,vc);
 fs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,fc);
-gs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_GEOMETRY,gc);
+//gs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_GEOMETRY,gc);
 
 // Only looks good if running on device, in simulator its always a top down view
 #if 0

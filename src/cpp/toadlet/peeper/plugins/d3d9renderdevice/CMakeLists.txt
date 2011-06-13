@@ -5,6 +5,7 @@ set (PEEPER_D3D9RENDERDEVICE_SRC
 	D3D9PixelBufferRenderTarget.cpp
 	D3D9Query.cpp
 	D3D9RenderDevice.cpp
+	D3D9Shader.cpp
 	D3D9Texture.cpp
 	D3D9TextureMipPixelBuffer.cpp
 	D3D9VertexBuffer.cpp

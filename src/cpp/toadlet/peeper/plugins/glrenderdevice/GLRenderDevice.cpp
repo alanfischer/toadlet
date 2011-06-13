@@ -2350,18 +2350,18 @@ int GLRenderDevice::getFixedAttribFromSemantic(int semantic,int index){
 		case VertexFormat::Semantic_POSITION:
 			return 0;
 		case VertexFormat::Semantic_NORMAL:
-			return 3;
+			return 2;
 		case VertexFormat::Semantic_COLOR:
 			switch(index){
 				case 0:
-					return 4;
+					return 3;
 				case 1:
-					return 5;
+					return 4;
 				default:
 					return -1;
 			}
 		case VertexFormat::Semantic_TEXCOORD:
-			return 6+index;
+			return 5+index;
 		default:
 			return -1;
 	}
