@@ -34,24 +34,17 @@ namespace peeper{
 class TOADLET_API ConstantBuffer:public Buffer{
 public:
 	TOADLET_SHARED_POINTERS(ConstantBuffer);
-
-	enum ConstantFormat{
-		ConstantFormat_BOOL=1,
-		ConstantFormat_INT,
-		ConstantFormat_FLOAT,
-	};
 	
 	virtual ~ConstantBuffer(){}
 
 	virtual ConstantBuffer *getRootConstantBuffer()=0;
 
-	virtual bool create(int usage,int access,ConstantFormat format,int size)=0;
+	virtual bool create(int usage,int access,int size)=0;
 	virtual void destroy()=0;
 
 	virtual void resetCreate()=0;
 	virtual void resetDestroy()=0;
 
-	virtual ConstantFormat getConstantFormat() const=0;
 	virtual int getSize() const=0;
 };
 

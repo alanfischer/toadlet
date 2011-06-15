@@ -36,9 +36,6 @@ class RenderCaps{
 public:
 	RenderCaps():
 		resetOnResize(false),
-		hardwareTextures(false),
-		hardwareVertexBuffers(false),
-		hardwareIndexBuffers(false),
 		maxLights(0),
 		maxTextureStages(0),
 		maxTextureSize(0),
@@ -62,9 +59,6 @@ public:
 
 	RenderCaps &set(const RenderCaps &caps){
 		resetOnResize=caps.resetOnResize;
-		hardwareTextures=caps.hardwareTextures;
-		hardwareVertexBuffers=caps.hardwareVertexBuffers;
-		hardwareIndexBuffers=caps.hardwareIndexBuffers;
 		maxLights=caps.maxLights;
 		maxTextureStages=caps.maxTextureStages;
 		maxTextureSize=caps.maxTextureSize;
@@ -90,9 +84,6 @@ public:
 	}
 
 	bool resetOnResize;
-	bool hardwareTextures;
-	bool hardwareVertexBuffers;
-	bool hardwareIndexBuffers;
 	int maxLights;
 	int maxTextureStages;
 	int maxTextureSize;

@@ -258,6 +258,21 @@
 	#define TOADLET_HAS_GLSL
 #endif
 
+#if defined(GL_ARB_vertex_buffer_object)
+	#define TOADLET_HAS_GLVBOS
+	#define TOADLET_HAS_GLIBOS
+#endif
+#if defined(GL_ARB_pixel_buffer_object)
+	#define TOADLET_HAS_GLPBOS
+#endif
+#if defined(GL_ARB_uniform_buffer_object)
+	#define TOADLET_HAS_GLUBOS
+#endif
+#if defined(TOADLET_HAS_GLES)
+	#define TOADLET_HAS_GLVBOS
+	#define TOADLET_HAS_GLIBOS
+#endif
+
 #if defined(TOADLET_DEBUG)
 	#define TOADLET_CHECK_GLERROR(function) \
 		{ int error=glGetError(); \

@@ -71,14 +71,13 @@ bool GLBuffer::create(int usage,int access,IndexFormat indexFormat,int size){
 	mIndexFormat=indexFormat;
 	mDataSize=mIndexFormat*mSize;
 
-	mTarget=GL_ELEMENT_ARRAY_BUFFER;
+	// Even if not supported in hardware, we simulate them
+	#if defined(TOADLET_HAS_GLIBOS)
+		mTarget=GL_ELEMENT_ARRAY_BUFFER;
+	#endif
 	createContext();
 
-	#if !defined(TOADLET_HAS_GLES)
-		mMapping=mDevice->useMapping(this) && mDevice->getCaps().hardwareIndexBuffers;
-	#else
-		mMapping=false;
-	#endif
+	mMapping=mDevice->hardwareMappingSupported(this);
 	if(mMapping==false){
 		mData=new uint8[mDataSize];
 	}
@@ -93,14 +92,13 @@ bool GLBuffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int si
 	mVertexFormat=vertexFormat;
 	mDataSize=mVertexFormat->getVertexSize()*mSize;
 	
-	mTarget=GL_ARRAY_BUFFER;
+	// Even if not supported in hardware, we simulate them
+	#if defined(TOADLET_HAS_GLVBOS)
+		mTarget=GL_ARRAY_BUFFER;
+	#endif
 	createContext();
 
-	#if !defined(TOADLET_HAS_GLES)
-		mMapping=mDevice->useMapping(this) && mDevice->getCaps().hardwareVertexBuffers;
-	#else
-		mMapping=false;
-	#endif
+	mMapping=mDevice->hardwareMappingSupported(this);
 	if(mMapping==false){
 		mData=new uint8[mDataSize];
 	}
@@ -129,8 +127,8 @@ bool GLBuffer::create(int usage,int access,int pixelFormat,int width,int height,
 	mPixelFormat=pixelFormat;
 	mDataSize=ImageFormatConversion::getRowPitch(mPixelFormat,mWidth)*mHeight*mDepth;
 
-	#if defined(TOADLET_HAS_GLEW)
-		mTarget=GL_PIXEL_UNPACK_BUFFER_ARB;
+	#if defined(TOADLET_HAS_GLPBOS)
+		mTarget=GL_PIXEL_UNPACK_BUFFER;
 	#else
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"PixelBuffers not supported");
@@ -138,12 +136,32 @@ bool GLBuffer::create(int usage,int access,int pixelFormat,int width,int height,
 	#endif
 	createContext();
 
-	#if !defined(TOADLET_HAS_GLES)
-		mMapping=mDevice->useMapping(this);
-	#else
-		mMapping=false;
-	#endif
+	mMapping=mDevice->hardwareMappingSupported(this);
+	if(mMapping==false){
+		mData=new uint8[mDataSize];
+	}
 
+	return true;
+}
+
+bool GLBuffer::create(int usage,int access,int size){
+	destroy();
+
+	mUsage=usage;
+	mAccess=access;
+	mSize=size;
+	mDataSize=mSize;
+
+	#if defined(TOADLET_HAS_GLUBOS)
+		mTarget=GL_UNIFORM_BUFFER;
+	#else
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"ConstantBuffers not supported");
+		return false;
+	#endif
+	createContext();
+
+	mMapping=mDevice->hardwareMappingSupported(this);
 	if(mMapping==false){
 		mData=new uint8[mDataSize];
 	}
@@ -162,26 +180,25 @@ void GLBuffer::destroy(){
 	mElementOffsets.clear();
 
 	if(mListener!=NULL){
-		if(mTarget==GL_ELEMENT_ARRAY_BUFFER){
+		if(mIndexFormat>0){
 			mListener->bufferDestroyed((IndexBuffer*)this);
 		}
-		else if(mTarget==GL_ARRAY_BUFFER){
+		else if(mVertexFormat!=NULL){
 			mListener->bufferDestroyed((VertexBuffer*)this);
 		}
-		else{
+		else if(mPixelFormat>0){
 			mListener->bufferDestroyed((PixelBuffer*)this);
+		}
+		else{
+			mListener->bufferDestroyed((ConstantBuffer*)this);
 		}
 		mListener=NULL;
 	}
 }
 
 bool GLBuffer::createContext(){
-	if((mTarget==GL_ELEMENT_ARRAY_BUFFER && mDevice->getCaps().hardwareIndexBuffers) ||
-		(mTarget==GL_ARRAY_BUFFER && mDevice->getCaps().hardwareIndexBuffers)
-		#if defined(TOADLET_HAS_GLEW)
-			|| mTarget==GL_PIXEL_UNPACK_BUFFER_ARB
-		#endif
-	){
+	bool result=true;
+	if(mDevice->hardwareBuffersSupported(this)){
 		glGenBuffers(1,&mHandle);
 		glBindBuffer(mTarget,mHandle);
 		GLenum usage=getBufferUsage(mUsage,mAccess);
@@ -189,9 +206,10 @@ bool GLBuffer::createContext(){
 		glBindBuffer(mTarget,0);
 
 		TOADLET_CHECK_GLERROR("GLBuffer::createContext");
+		result=mHandle!=0;
 	}
 
-	return mHandle!=0;
+	return result;
 }
 
 bool GLBuffer::destroyContext(){

@@ -74,8 +74,8 @@ TOADLET_C_API RenderDevice* new_GLRenderDevice(){
 GLRenderDevice::GLRenderDevice():
 	mMatrixMode(-1),
 
-	mPBuffersAvailable(false),
-	mFBOsAvailable(false),
+	mPBuffers(false),mFBOs(false),
+	mVBOs(false),mIBOs(false),mPBOs(false),mUBOs(false),
 
 	mMaxTexCoordIndex(0),
 	//mTexCoordIndexes,
@@ -200,12 +200,6 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 
 	RenderCaps &caps=mCaps;
 	{
-		#if defined(TOADLET_HAS_GLESEM)
-			caps.hardwareTextures=glesemAcceleratedResult>0;
-		#else
-			caps.hardwareTextures=true;
-		#endif
-
 		GLint maxTextureStages=0;
 		if(gl_version>10){ // 1.0 doesn't support multitexturing
 			glGetIntegerv(GL_MAX_TEXTURE_UNITS,&maxTextureStages);
@@ -229,6 +223,47 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 		mTexCoordIndexes.resize(caps.maxTextureStages,-1);
 		mLastTexCoordIndexes.resize(caps.maxTextureStages,-1);
 
+		#if defined(TOADLET_HAS_GLPBUFFERS)
+			mPBuffers=usePBuffers && GLPBufferRenderTarget_available(this);
+		#else
+			mPBuffers=false;
+		#endif
+		#if defined(TOADLET_HAS_GLFBOS)
+			mFBOs=useFBOs && GLFBORenderTarget::available(this);
+		#else
+			mFBOs=false;
+		#endif
+
+		#if defined(GL_ARB_vertex_buffer_object)
+			mVBOs=mIBOs=(GLEW_ARB_vertex_buffer_object>0);
+		#endif
+		#if defined(GL_ARB_pixel_buffer_object)
+			mPBOs=(GLEW_ARB_pixel_buffer_object>0);
+		#endif
+		#if defined(GL_ARB_uniform_buffer_object)
+			mUBOs=(GLEW_ARB_uniform_buffer_object>0);
+		#endif
+		#if defined(TOADLET_HAS_GLES)
+			mVBOs=mIBOs=(gl_version>=11);
+			mPBOs=false;
+			mUBOs=false;
+		#endif
+		mVBOs&=useHardwareBuffers;
+		mIBOs&=useHardwareBuffers;
+		mPBOs&=useHardwareBuffers;
+		mUBOs&=useHardwareBuffers;
+		#if defined(TOADLET_HAS_GLEW)
+			mNPOTR=(GLEW_ARB_texture_rectangle!=0) || (GLEW_EXT_texture_rectangle!=0) || (GLEW_NV_texture_rectangle!=0);
+			mNPOT=(GLEW_ARB_texture_non_power_of_two!=0);
+		#else
+			mNPOTR=false;
+			mNPOT=false;
+		#endif
+
+		caps.textureNonPowerOf2Restricted=mNPOTR;
+		caps.renderToTextureNonPowerOf2Restricted=mFBOs && mNPOTR;
+		caps.textureNonPowerOf2=mNPOT;
+
 		GLint maxTextureSize=0;
 		glGetIntegerv(GL_MAX_TEXTURE_SIZE,&maxTextureSize);
 		if(maxTextureSize<=0){
@@ -243,20 +278,9 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 		}
 		caps.maxLights=maxLights;
 
-		#if defined(TOADLET_HAS_GLPBUFFERS)
-			mPBuffersAvailable=usePBuffers && GLPBufferRenderTarget_available(this);
-		#else
-			mPBuffersAvailable=false;
-		#endif
-		#if defined(TOADLET_HAS_GLFBOS)
-			mFBOsAvailable=useFBOs && GLFBORenderTarget::available(this);
-		#else
-			mFBOsAvailable=false;
-		#endif
+		caps.renderToTexture=mPBuffers || mFBOs;
 
-		caps.renderToTexture=mPBuffersAvailable || mFBOsAvailable;
-
-		caps.renderToDepthTexture=mFBOsAvailable;
+		caps.renderToDepthTexture=mFBOs;
 
 		#if defined(TOADLET_HAS_GLEW)
 			caps.textureDot3=(GLEW_ARB_texture_env_dot3!=0);
@@ -270,19 +294,6 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 			caps.textureAutogenMipMaps|=(GLEW_EXT_framebuffer_object!=0);
 		#else
 			caps.textureAutogenMipMaps|=(gl_version>=14);
-		#endif
-
-		#if defined(TOADLET_HAS_GLEW)
-			// Usefully, GL_TEXTURE_RECTANGLE_ARB == GL_TEXTURE_RECTANGLE_EXT == GL_TEXTURE_RECTANGLE_NV
-			caps.textureNonPowerOf2Restricted=(GLEW_ARB_texture_rectangle!=0) || (GLEW_EXT_texture_rectangle!=0) || (GLEW_NV_texture_rectangle!=0);
-			caps.renderToTextureNonPowerOf2Restricted=mFBOsAvailable && caps.textureNonPowerOf2Restricted;
-			caps.textureNonPowerOf2=(GLEW_ARB_texture_non_power_of_two!=0);
-		#endif
-
-		#if defined(TOADLET_HAS_GLEW)
-			caps.hardwareIndexBuffers=(caps.hardwareVertexBuffers=(useHardwareBuffers && GLEW_ARB_vertex_buffer_object));
-		#elif defined(TOADLET_HAS_GLES)
-			caps.hardwareIndexBuffers=(caps.hardwareVertexBuffers=(useHardwareBuffers && gl_version>=11));
 		#endif
 
 		#if defined(TOADLET_HAS_GLEW)
@@ -374,12 +385,12 @@ Texture *GLRenderDevice::createTexture(){
 
 PixelBufferRenderTarget *GLRenderDevice::createPixelBufferRenderTarget(){
 	#if defined(TOADLET_HAS_GLFBOS)
-		if(mFBOsAvailable){
+		if(mFBOs){
 			return new GLFBORenderTarget(this);
 		}
 	#endif
 	#if defined(TOADLET_HAS_GLPBUFFERS)
-		if(mPBuffersAvailable){
+		if(mPBuffers){
 			return new_GLPBufferRenderTarget(this);
 		}
 	#endif
@@ -624,12 +635,26 @@ void GLRenderDevice::endScene(){
 
 	setVertexData(NULL);
 
-	if(mCaps.hardwareVertexBuffers){
-		glBindBuffer(GL_ARRAY_BUFFER,0);
-	}
-	if(mCaps.hardwareIndexBuffers){
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
-	}
+	#if defined(TOADLET_HAS_GLIBOS)
+		if(mIBOs){
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+		}
+	#endif
+	#if defined(TOADLET_HAS_GLVBOS)
+		if(mVBOs){
+			glBindBuffer(GL_ARRAY_BUFFER,0);
+		}
+	#endif
+	#if defined(TOADLET_HAS_GLPBOS)
+		if(mPBOs){
+			glBindBuffer(GL_PIXEL_UNPACK_BUFFER,0);
+		}
+	#endif
+	#if defined(TOADLET_HAS_GLUBOS)
+		if(mUBOs){
+			glBindBuffer(GL_UNIFORM_BUFFER,0);
+		}
+	#endif
 
 	int i;
 	for(i=0;i<mCaps.maxTextureStages;++i){
@@ -768,8 +793,9 @@ void GLRenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexData
 	if(indexBuffer!=NULL){
 		GLenum indexType=getGLIndexType(indexBuffer->getIndexFormat());
 		GLBuffer *glindexBuffer=(GLBuffer*)indexBuffer->getRootIndexBuffer();
+
 		if(glindexBuffer->mHandle==0){
-			if(mCaps.hardwareIndexBuffers){
+			if(mIBOs){
 				glBindBuffer(glindexBuffer->mTarget,0);
 			}
 			glDrawElements(type,indexData->count,indexType,glindexBuffer->mData+indexData->start*glindexBuffer->mIndexFormat);
@@ -1685,9 +1711,36 @@ int GLRenderDevice::getCloseTextureFormat(int textureFormat,int usage){
 	}
 }
 
-// Thanks to Ogre3D for this threshold
-bool GLRenderDevice::useMapping(GLBuffer *buffer) const{
-	return buffer->mDataSize>(1024 * 32);
+bool GLRenderDevice::hardwareBuffersSupported(GLBuffer *buffer) const{
+	if(buffer->mVertexFormat!=NULL){
+		return mVBOs;
+	}
+	else if(buffer->mIndexFormat>0){
+		return mIBOs;
+	}
+	else if(buffer->mPixelFormat>0){
+		return mPBOs;
+	}
+	else{
+		return mUBOs;
+	}
+}
+
+bool GLRenderDevice::hardwareMappingSupported(GLBuffer *buffer) const{
+	#if defined(TOADLET_HAS_GLES)
+		return false;
+	#endif
+
+	// Thanks to Ogre3D for this threshold
+	if(buffer->mVertexFormat!=NULL){
+		return buffer->mDataSize>(1024 * 32) && mVBOs;
+	}
+	else if(buffer->mIndexFormat>0){
+		return buffer->mDataSize>(1024 * 32) && mIBOs;
+	}
+	else{
+		return false;
+	}
 }
 
 void GLRenderDevice::setVertexData(const VertexData *vertexData){
@@ -1733,8 +1786,8 @@ void GLRenderDevice::setFixedVertexData(const VertexData *vertexData){
 		int numElements=glvertexFormat->mSemantics.size();
 		semanticBits|=(glvertexFormat->mSemanticBits&~(1<<VertexFormat::Semantic_TEXCOORD));
 
-		if(glvertexBuffer->mHandle==0){
-			if(mCaps.hardwareVertexBuffers){
+		if(glvertexBuffer->mHandle!=0){
+			if(mVBOs){
 				glBindBuffer(glvertexBuffer->mTarget,0);
 			}
 		}
@@ -1860,8 +1913,10 @@ void GLRenderDevice::setShaderVertexData(const VertexData *vertexData){
 
 		GLSLVertexLayout *gllayout=mLastProgram->findVertexLayout(glvertexFormat);
 
-		if(glvertexBuffer->mHandle==0){
-			glBindBuffer(glvertexBuffer->mTarget,0);
+		if(glvertexBuffer->mHandle!=0){
+			if(mVBOs){
+				glBindBuffer(glvertexBuffer->mTarget,0);
+			}
 		}
 		else{
 			glBindBuffer(glvertexBuffer->mTarget,glvertexBuffer->mHandle);

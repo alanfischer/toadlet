@@ -30,6 +30,7 @@
 #include "GLPixelBuffer.h"
 #include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/VertexBuffer.h>
+#include <toadlet/peeper/ConstantBuffer.h>
 #include <toadlet/egg/Collection.h>
 
 namespace toadlet{
@@ -37,7 +38,7 @@ namespace peeper{
 
 class GLRenderDevice;
 
-class TOADLET_API GLBuffer:public IndexBuffer,public VertexBuffer,public GLPixelBuffer{
+class TOADLET_API GLBuffer:public IndexBuffer,public VertexBuffer,public GLPixelBuffer,public ConstantBuffer{
 public:
 	GLBuffer(GLRenderDevice *renderDevice);
 	virtual ~GLBuffer();
@@ -45,6 +46,7 @@ public:
 	IndexBuffer *getRootIndexBuffer(){return this;}
 	VertexBuffer *getRootVertexBuffer(){return this;}
 	PixelBuffer *getRootPixelBuffer(){return this;}
+	ConstantBuffer *getRootConstantBuffer(){return this;}
 
 	GLTextureMipPixelBuffer *castToGLTextureMipPixelBuffer(){return NULL;}
 	GLFBOPixelBuffer *castToGLFBOPixelBuffer(){return NULL;}
@@ -55,6 +57,7 @@ public:
 	bool create(int usage,int access,IndexFormat indexFormat,int size);
 	bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size);
 	bool create(int usage,int access,int pixelFormat,int width,int height,int depth);
+	bool create(int usage,int access,int size);
 	void destroy();
 
 	void resetCreate(){}

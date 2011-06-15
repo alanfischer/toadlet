@@ -64,8 +64,7 @@ bool GLTexture::create(int usage,Dimension dimension,int format,int width,int he
 	width=width>0?width:1;height=height>0?height:1;depth=depth>0?depth:1;
 
 	if((Math::isPowerOf2(width)==false || Math::isPowerOf2(height)==false || (dimension!=Dimension_CUBE && Math::isPowerOf2(depth)==false)) &&
-		mDevice->getCaps().textureNonPowerOf2==false &&
-		(mDevice->getCaps().textureNonPowerOf2Restricted==false || (usage&Usage_BIT_NPOT_RESTRICTED)==0))
+		mDevice->mNPOT==false && (mDevice->mNPOTR==false || (usage&Usage_BIT_NPOT_RESTRICTED)==0))
 	{
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"GLTexture: Cannot load a non power of 2 texture");

@@ -362,10 +362,6 @@ bool Engine::setRenderDevice(RenderDevice *renderDevice){
 			Logger::alert(Categories::TOADLET_TADPOLE,
 				String()+(char)9+"maxTextureSize:"+caps.maxTextureSize);
 			Logger::alert(Categories::TOADLET_TADPOLE,
-				String()+(char)9+"hardwareVertexBuffers:"+caps.hardwareVertexBuffers);
-			Logger::alert(Categories::TOADLET_TADPOLE,
-				String()+(char)9+"hardwareIndexBuffers:"+caps.hardwareIndexBuffers);
-			Logger::alert(Categories::TOADLET_TADPOLE,
 				String()+(char)9+"vertexShaders:"+caps.vertexShaders);
 			Logger::alert(Categories::TOADLET_TADPOLE,
 				String()+(char)9+"maxVertexShaderLocalParameters:"+caps.maxVertexShaderLocalParameters);
