@@ -161,7 +161,7 @@ vs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,vc);
 fs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,fc);
 //gs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_GEOMETRY,gc);
 cb=ConstantBuffer::ptr(getEngine()->getRenderDevice()->createConstantBuffer());
-cb->create(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,ConstantBuffer::ConstantFormat_FLOAT,16);
+cb->create(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,16);
 
 // Only looks good if running on device, in simulator its always a top down view
 #if 0

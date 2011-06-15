@@ -51,7 +51,7 @@ public:
 
 	bool create(int usage,int access,IndexFormat indexFormat,int size);
 	bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size);
-	bool create(int usage,int access,ConstantFormat constantFormat,int size);
+	bool create(int usage,int access,int size);
 	void destroy();
 
 	void resetCreate(){}
@@ -64,7 +64,6 @@ public:
 
 	IndexFormat getIndexFormat() const{return mIndexFormat;}
 	VertexFormat::ptr getVertexFormat() const{return mVertexFormat;}
-	ConstantFormat getConstantFormat() const{return mConstantFormat;}
 
 	uint8 *lock(int lockAccess);
 	bool unlock();
@@ -83,7 +82,6 @@ protected:
 
 	IndexFormat mIndexFormat;
 	VertexFormat::ptr mVertexFormat;
-	ConstantFormat mConstantFormat;
 
 	int mBindFlags;
 	ID3D10Buffer *mBuffer;

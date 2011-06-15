@@ -113,7 +113,6 @@ public:
 	int getCloseTextureFormat(int textureFormat,int usage);
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
 	bool getRenderCaps(RenderCaps &caps){caps.set(mCaps);return true;}
-	const RenderCaps &getCaps() const{return mCaps;}
 
 	/// @todo: Move these all to pointers once we have things working
 	void setBlendState(const BlendState &state);
@@ -127,7 +126,8 @@ public:
 	void setSamplerStatePostTexture(int i,SamplerState *state);
 	void setTextureStatePostTexture(int i,TextureState *state);
 
-	bool useMapping(GLBuffer *buffer) const;
+	bool hardwareBuffersSupported(GLBuffer *buffer) const;
+	bool hardwareMappingSupported(GLBuffer *buffer) const;
 
 	inline egg::mathfixed::fixed *colorArray(egg::mathfixed::fixed result[],const Vector4 &src){result[0]=egg::MathConversion::scalarToFixed(src.x);result[1]=egg::MathConversion::scalarToFixed(src.y);result[2]=egg::MathConversion::scalarToFixed(src.z);result[3]=egg::MathConversion::scalarToFixed(src.w);return result;}
 	inline float *colorArray(float result[],const Vector4 &src){result[0]=egg::MathConversion::scalarToFloat(src.x);result[1]=egg::MathConversion::scalarToFloat(src.y);result[2]=egg::MathConversion::scalarToFloat(src.z);result[3]=egg::MathConversion::scalarToFloat(src.w);return result;}
@@ -181,8 +181,9 @@ protected:
 
 	int mMatrixMode;
 
-	bool mPBuffersAvailable;
-	bool mFBOsAvailable;
+	bool mPBuffers,mFBOs;
+	bool mVBOs,mIBOs,mPBOs,mUBOs;
+	bool mNPOT,mNPOTR;
 
 	Viewport mViewport;
 	DepthState mDepthState;
@@ -229,6 +230,7 @@ protected:
 	#endif
 
 	friend class GLBuffer;
+	friend class GLTexture;
 	friend class GLVertexFormat;
 	friend class GLSLShader;
 	friend class GLSLProgram;

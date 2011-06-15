@@ -102,9 +102,6 @@ bool D3D10RenderDevice::create(RenderTarget *target,int *options){
 	RenderCaps &caps=mCaps;
 	{
 		caps.resetOnResize=false;
-		caps.hardwareTextures=true;
-		caps.hardwareIndexBuffers=true;
-		caps.hardwareVertexBuffers=true;
 		caps.pointSprites=false;
 		caps.maxLights=0;
 		caps.maxTextureStages=16;

@@ -43,7 +43,6 @@ D3D10Buffer::D3D10Buffer(D3D10RenderDevice *renderDevice):
 
 	mIndexFormat((IndexFormat)0),
 	//mVertexFormat,
-	mConstantFormat((ConstantFormat)0),
 
 	mBindFlags(0),
 	mBuffer(NULL),
@@ -114,7 +113,7 @@ bool D3D10Buffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int
 	return true;
 }
 
-bool D3D10Buffer::create(int usage,int access,ConstantFormat constantFormat,int size){
+bool D3D10Buffer::create(int usage,int access,int size){
 	if((usage&Usage_BIT_STATIC)>0 && (access&Access_BIT_READ)>0){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
 			"Buffer can not be static and readable");
@@ -124,18 +123,7 @@ bool D3D10Buffer::create(int usage,int access,ConstantFormat constantFormat,int 
 	mUsage=usage;
 	mAccess=access;
 	mSize=size;
-	mConstantFormat=constantFormat;
-	int elementSize=0;
-	switch(constantFormat){
-		case ConstantFormat_BOOL:
-			elementSize=1;
-		break;
-		case ConstantFormat_INT:
-		case ConstantFormat_FLOAT:
-			elementSize=4;
-		break;
-	}
-	mDataSize=elementSize*mSize;
+	mDataSize=mSize;
 
 	mBindFlags|=D3D10_BIND_CONSTANT_BUFFER;
 

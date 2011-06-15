@@ -874,9 +874,6 @@ void D3D9RenderDevice::setAmbientColor(const Vector4 &ambient){
 
 void D3D9RenderDevice::setCapsFromD3DCAPS9(RenderCaps &caps,const D3DCAPS9 &d3dcaps,bool renderToTexture,bool renderToDepthTexture){
 	caps.resetOnResize=true;
-	caps.hardwareTextures=true;
-	caps.hardwareIndexBuffers=true;
-	caps.hardwareVertexBuffers=true;
 	#if defined(TOADLET_SET_D3DM)
 		caps.pointSprites=false;
 	#else
