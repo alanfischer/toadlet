@@ -109,10 +109,15 @@ VertexFormat::ptr BufferManager::createVertexFormat(){
 	}
 	else{
 		vertexFormat=VertexFormat::ptr(mEngine->getRenderDevice()->createVertexFormat());
+		if(vertexFormat==NULL){
+			return NULL;
+		}
 		vertexFormat->create();
 	}
 
 	mVertexFormats.add(vertexFormat);
+
+	vertexFormat->setVertexFormatDestroyedListener(this);
 
 	return vertexFormat;
 }
@@ -130,6 +135,9 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuff
 	}
 	else{
 		buffer=IndexBuffer::ptr(mEngine->getRenderDevice()->createIndexBuffer());
+		if(buffer==NULL){
+			return NULL;
+		}
 		buffer->create(usage,access,indexFormat,size);
 	}
 
@@ -153,6 +161,9 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexF
 	}
 	else{
 		buffer=VertexBuffer::ptr(mEngine->getRenderDevice()->createVertexBuffer());
+		if(buffer==NULL){
+			return NULL;
+		}
 		buffer->create(usage,access,vertexFormat,size);
 	}
 
@@ -176,6 +187,9 @@ PixelBuffer::ptr BufferManager::createPixelBuffer(int usage,int access,int pixel
 	}
 	else{
 		buffer=PixelBuffer::ptr(mEngine->getRenderDevice()->createPixelBuffer());
+		if(buffer==NULL){
+			return NULL;
+		}
 		buffer->create(usage,access,pixelFormat,width,height,depth);
 	}
 
@@ -199,6 +213,9 @@ ConstantBuffer::ptr BufferManager::createConstantBuffer(int usage,int access,int
 	}
 	else{
 		buffer=ConstantBuffer::ptr(mEngine->getRenderDevice()->createConstantBuffer());
+		if(buffer==NULL){
+			return NULL;
+		}
 		buffer->create(usage,access,size);
 	}
 
@@ -408,6 +425,10 @@ void BufferManager::bufferDestroyed(Buffer *buffer){
 	mVertexBuffers.remove(buffer);
 	mPixelBuffers.remove(buffer);
 	mConstantBuffers.remove(buffer);
+}
+
+void BufferManager::vertexFormatDestroyed(VertexFormat *vertexFormat){
+	mVertexFormats.remove(vertexFormat);
 }
 
 bool BufferManager::useTriFan(){

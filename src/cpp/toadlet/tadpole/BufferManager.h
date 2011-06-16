@@ -36,7 +36,7 @@ namespace tadpole{
 
 class Engine;
 
-class TOADLET_API BufferManager:public peeper::BufferDestroyedListener{
+class TOADLET_API BufferManager:public peeper::BufferDestroyedListener,public peeper::VertexFormatDestroyedListener{
 public:
 	BufferManager(Engine *engine,bool backable);
 	virtual ~BufferManager();
@@ -58,6 +58,7 @@ public:
 	void postContextReset(peeper::RenderDevice *renderDevice);
 
 	void bufferDestroyed(peeper::Buffer *buffer);
+	void vertexFormatDestroyed(peeper::VertexFormat *vertexFormat);
 
 	bool useTriFan();
 

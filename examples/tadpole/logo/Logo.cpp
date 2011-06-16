@@ -68,10 +68,10 @@ Logo::Logo():Application(){
 
 Logo::~Logo(){
 }
-Shader::ptr vs,fs,gs;
+Shader::ptr vs,fs;
 ConstantBuffer::ptr cb;
 
-String vsp[]={
+String sp[]={
 	"glsl",
 	"hlsl"
 };
@@ -98,12 +98,7 @@ String vsc[]={
 	"	return vout;\n" \
 	"}"
 };
-
-String psp[]={
-	"glsl",
-	"hlsl"
-};
-String psc[]={
+String fsc[]={
 	"varying vec4 color;\n" \
 	"void main(){\n" \
 	" gl_FragColor = color;\n" \
@@ -119,7 +114,7 @@ String psc[]={
 };
 
 void Logo::create(){
-	Application::create("d3d10");
+	Application::create("gl");
 
 	mEngine->setDirectory("../../../data");
 
@@ -147,8 +142,8 @@ void Logo::create(){
 	cameraNode->setClearColor(Colors::BLUE);
 	scene->getRoot()->attach(cameraNode);
 
-vs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,vsp,vsc,3);
-fs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,psp,psc,3);
+vs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,sp,vsc,2);
+fs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,sp,fsc,2);
 cb=getEngine()->getBufferManager()->createConstantBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,16*4);
 
 // Only looks good if running on device, in simulator its always a top down view
@@ -180,7 +175,7 @@ void Logo::resized(int width,int height){
 }
 
 void Logo::render(RenderDevice *renderDevice){
-#if 1
+#if 0
 Matrix4x4 shaderMatrix;
 Math::transpose(shaderMatrix,cameraNode->getProjectionMatrix()*cameraNode->getViewMatrix());
 tbyte *data=cb->lock(Buffer::Access_BIT_WRITE);
@@ -190,10 +185,8 @@ cb->unlock();
 
 
 	renderDevice->beginScene();
-renderDevice->setShader(Shader::ShaderType_VERTEX,vs);
-renderDevice->setShader(Shader::ShaderType_FRAGMENT,fs);
-//renderDevice->setShader(Shader::ShaderType_GEOMETRY,gs);
-
+//renderDevice->setShader(Shader::ShaderType_VERTEX,vs);
+//renderDevice->setShader(Shader::ShaderType_FRAGMENT,fs);
 renderDevice->setConstantBuffer(Shader::ShaderType_VERTEX,cb);
 		cameraNode->render(renderDevice);
 	renderDevice->endScene();
