@@ -38,6 +38,10 @@ D3D10Shader::D3D10Shader(D3D10RenderDevice *renderDevice):BaseResource(),
 	mDevice(NULL),
 	mD3DDevice(NULL),
 
+	mShaderType((ShaderType)0),
+	//mProfile,
+	//mCode,
+
 	mBytecode(NULL),mLog(NULL),
 	mShader(NULL)
 {
@@ -51,13 +55,14 @@ D3D10Shader::~D3D10Shader(){
 	}
 }
 
-bool D3D10Shader::create(ShaderType shaderType,const String &code){
+bool D3D10Shader::create(ShaderType shaderType,const String &profile,const String &code){
 	mShaderType=shaderType;
+	mProfile=profile;
 	mCode=code;
 
 	bool result=createContext();
 
-	if(mDevice!=NULL){
+	if(result && mDevice!=NULL){
 		mDevice->shaderCreated(this);
 	}
 
@@ -85,20 +90,22 @@ bool D3D10Shader::createContext(){
 	ID3D10Device *device=mD3DDevice;
 
 	String function="main";
-	String profile;
-	if(mShaderType==ShaderType_VERTEX){
-		profile="vs_4_0";
+	String targetProfile;
+	switch(mShaderType){
+		case ShaderType_VERTEX:
+			targetProfile="vs_4_0";
+		break;
+		case ShaderType_FRAGMENT:
+			targetProfile="ps_4_0";
+		break;
+		case ShaderType_GEOMETRY:
+			targetProfile="gs_4_0";
+		break;
 	}
-	else if(mShaderType==ShaderType_FRAGMENT){
-		profile="ps_4_0";
-	}
-	else if(mShaderType==ShaderType_GEOMETRY){
-		profile="gs_4_0";
-	}
-	
+
 	HRESULT result=E_FAIL;
 	#if defined(TOADLET_SET_D3D10)
-		result=D3D10CompileShader(mCode,mCode.length(),NULL,NULL,NULL,function,profile,0,&mBytecode,&mLog);
+		result=D3DX10CompileFromMemory(mCode,mCode.length(),NULL,NULL,NULL,function,targetProfile,0,0,NULL,&mBytecode,&mLog,NULL);
 	#endif
 	if(FAILED(result)){
 		Error::unknown(Categories::TOADLET_PEEPER,(LPCSTR)mLog->GetBufferPointer());
@@ -134,7 +141,6 @@ bool D3D10Shader::destroyContext(){
 		mBytecode->Release();
 		mBytecode=NULL;
 	}
-
 
 	if(mLog!=NULL){
 		mLog->Release();

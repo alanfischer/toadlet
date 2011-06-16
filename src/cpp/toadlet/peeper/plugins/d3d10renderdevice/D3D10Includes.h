@@ -33,6 +33,7 @@
 #include <commctrl.h>
 #if defined(TOADLET_SET_D3D10)
 	#include <d3d10.h>
+	#include <d3dx10.h>
 #else
 	#include <d3d11.h>
 #endif

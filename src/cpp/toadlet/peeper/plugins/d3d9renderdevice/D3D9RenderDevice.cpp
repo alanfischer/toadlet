@@ -999,6 +999,10 @@ int D3D9RenderDevice::getCloseTextureFormat(int format){
 	}
 }
 
+bool D3D9RenderDevice::getShaderProfileSupported(const String &profile){
+	return profile=="hlsl";
+}
+
 bool D3D9RenderDevice::isD3DFORMATValid(D3DFORMAT textureFormat,DWORD usage){
 	return SUCCEEDED(mD3D->CheckDeviceFormat(mD3DAdapter,mD3DDevType,mD3DAdapterFormat,usage,D3DRTYPE_TEXTURE,textureFormat));
 }

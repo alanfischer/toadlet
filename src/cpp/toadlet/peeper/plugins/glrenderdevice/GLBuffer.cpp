@@ -308,8 +308,8 @@ bool GLBuffer::unlock(){
 			glBindBuffer(mTarget,0);
 		}
 
-		// Only delete our data if we have no desire to read it
-		if((mAccess&Access_BIT_READ)==0 && mData!=NULL){
+		// Only delete our data if we have no desire to read it and a hardware back 
+		if(mData!=NULL && (mAccess&Access_BIT_READ)==0 && mHandle!=0){
 			delete[] mData;
 			mData=NULL;
 		}

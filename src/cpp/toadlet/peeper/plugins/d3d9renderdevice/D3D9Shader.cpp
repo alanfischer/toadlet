@@ -37,6 +37,10 @@ D3D9Shader::D3D9Shader(D3D9RenderDevice *renderDevice):BaseResource(),
 	mDevice(NULL),
 	mD3DDevice(NULL),
 
+	mShaderType((ShaderType)0),
+	//mProfile,
+	//mCode,
+
 	mBytecode(NULL),mLog(NULL),
 	mShader(NULL)
 {
@@ -50,8 +54,9 @@ D3D9Shader::~D3D9Shader(){
 	}
 }
 
-bool D3D9Shader::create(ShaderType shaderType,const String &code){
+bool D3D9Shader::create(ShaderType shaderType,const String &profile,const String &code){
 	mShaderType=shaderType;
+	mProfile=profile;
 	mCode=code;
 
 	bool result=createContext();
@@ -67,16 +72,18 @@ bool D3D9Shader::createContext(){
 	IDirect3DDevice9 *device=mD3DDevice;
 
 	String function="main";
-	String profile;
-	if(mShaderType==ShaderType_VERTEX){
-		profile="vs_2_0";
-	}
-	else if(mShaderType==ShaderType_FRAGMENT){
-		profile="ps_2_0";
+	String targetProfile;
+	switch(mShaderType){
+		case ShaderType_VERTEX:
+			targetProfile="vs_3_0";
+		break;
+		case ShaderType_FRAGMENT:
+			targetProfile="ps_3_0";
+		break;
 	}
 	
 	HRESULT result=E_FAIL;
-	result=D3DXCompileShader(mCode,mCode.length(),NULL,NULL,function,profile,0,&mBytecode,&mLog,NULL);
+	result=D3DXCompileShader(mCode,mCode.length(),NULL,NULL,function,targetProfile,0,&mBytecode,&mLog,NULL);
 	if(FAILED(result)){
 		Error::unknown(Categories::TOADLET_PEEPER,(LPCSTR)mLog->GetBufferPointer());
 		return false;

@@ -486,6 +486,10 @@ int D3D10RenderDevice::getCloseTextureFormat(int textureFormat,int usage){
 	}
 }
 
+bool D3D10RenderDevice::getShaderProfileSupported(const String &profile){
+	return profile=="hlsl";
+}
+
 D3D10_PRIMITIVE_TOPOLOGY D3D10RenderDevice::getD3D10_PRIMITIVE_TOPOLOGY(IndexData::Primitive primitive){
 	switch(primitive){
 		case IndexData::Primitive_POINTS:

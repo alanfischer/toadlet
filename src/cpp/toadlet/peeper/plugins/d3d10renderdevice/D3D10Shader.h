@@ -45,10 +45,11 @@ public:
 
 	Shader *getRootShader(){return this;}
 
-	bool create(ShaderType shaderType,const egg::String &code);
+	bool create(ShaderType shaderType,const egg::String &profile,const egg::String &code);
 	void destroy();
 
 	ShaderType getShaderType() const{return mShaderType;}
+	const egg::String &getProfile() const{return mProfile;}
 
 	ID3D10InputLayout *findInputLayout(D3D10VertexFormat *vertexFormat);
 
@@ -60,6 +61,7 @@ protected:
 	ID3D10Device *mD3DDevice;
 
 	ShaderType mShaderType;
+	egg::String mProfile;
 	egg::String mCode;
 
 	ID3D10DeviceChild *mShader;
