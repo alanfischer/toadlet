@@ -99,6 +99,20 @@ bool BackableBuffer::create(int usage,int access,int pixelFormat,int width,int h
 	return true;
 }
 
+bool BackableBuffer::create(int usage,int access,int size){
+	mUsage=usage;
+	mAccess=access;
+	mSize=size;
+	mDataSize=mSize;
+
+	mHasData=false;
+	if(mData==NULL){
+		mData=new uint8[mDataSize];
+	}
+
+	return true;
+}
+
 void BackableBuffer::destroy(){
 	if(mBack!=NULL){
 		if(mIndexFormat!=(IndexFormat)0){
@@ -108,7 +122,10 @@ void BackableBuffer::destroy(){
 			((VertexBuffer*)(mBack.get()))->destroy();
 		}
 		else if(mPixelFormat!=0){
-			((VertexBuffer*)(mBack.get()))->destroy();
+			((PixelBuffer*)(mBack.get()))->destroy();
+		}
+		else{
+			((ConstantBuffer*)(mBack.get()))->destroy();
 		}
 		mBack=NULL;
 	}
@@ -128,6 +145,9 @@ void BackableBuffer::destroy(){
 		else if(mPixelFormat!=0){
 			mListener->bufferDestroyed((PixelBuffer*)this);
 		}
+		else{
+			mListener->bufferDestroyed((ConstantBuffer*)this);
+		}
 		mListener=NULL;
 	}
 }
@@ -143,6 +163,9 @@ void BackableBuffer::resetCreate(){
 		else if(mPixelFormat!=0){
 			((PixelBuffer*)(mBack.get()))->resetCreate();
 		}
+		else{
+			((ConstantBuffer*)(mBack.get()))->resetCreate();
+		}
 	}
 }
 
@@ -156,6 +179,9 @@ void BackableBuffer::resetDestroy(){
 		}
 		else if(mPixelFormat!=0){
 			((PixelBuffer*)(mBack.get()))->resetCreate();
+		}
+		else{
+			((ConstantBuffer*)(mBack.get()))->resetCreate();
 		}
 	}
 }
@@ -219,6 +245,23 @@ void BackableBuffer::setBack(PixelBuffer::ptr back,RenderDevice *renderDevice){
 		int newPixelFormat=renderDevice->getCloseTextureFormat(mPixelFormat,mUsage);
 
 		back->create(mUsage,mAccess,newPixelFormat,mWidth,mHeight,mDepth);
+
+		if(mHasData){
+			writeBack();
+		}
+	}
+}
+
+void BackableBuffer::setBack(ConstantBuffer::ptr back){
+	if(mBack.get()!=back.get() && mBack!=NULL){
+		((ConstantBuffer*)(mBack.get()))->destroy();
+	}
+
+	mBack=back;
+	
+	if(back!=NULL){
+		// Create on setting the back, otherwise D3D10 static resources will not load data in load
+		back->create(mUsage,mAccess,mSize);
 
 		if(mHasData){
 			writeBack();

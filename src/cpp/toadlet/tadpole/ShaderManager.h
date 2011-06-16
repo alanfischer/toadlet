@@ -38,7 +38,8 @@ class TOADLET_API ShaderManager:public ResourceManager{
 public:
 	ShaderManager(Engine *engine,bool backable);
 
-	peeper::Shader::ptr createShader(peeper::Shader::ShaderType type,const egg::String &code);
+	peeper::Shader::ptr createShader(peeper::Shader::ShaderType type,const egg::String profiles[],const egg::String codes[],int numCodes);
+	peeper::Shader::ptr createShader(peeper::Shader::ShaderType type,const egg::String &profile,const egg::String &code);
 
 //	void contextActivate(peeper::RenderDevice *renderDevice);
 //	void contextDeactivate(peeper::RenderDevice *renderDevice);

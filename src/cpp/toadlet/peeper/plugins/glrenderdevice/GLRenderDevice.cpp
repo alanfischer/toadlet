@@ -1711,6 +1711,10 @@ int GLRenderDevice::getCloseTextureFormat(int textureFormat,int usage){
 	}
 }
 
+bool GLRenderDevice::getShaderProfileSupported(const String &profile){
+	return profile=="glsl";
+}
+
 bool GLRenderDevice::hardwareBuffersSupported(GLBuffer *buffer) const{
 	if(buffer->mVertexFormat!=NULL){
 		return mVBOs;
@@ -1786,7 +1790,7 @@ void GLRenderDevice::setFixedVertexData(const VertexData *vertexData){
 		int numElements=glvertexFormat->mSemantics.size();
 		semanticBits|=(glvertexFormat->mSemanticBits&~(1<<VertexFormat::Semantic_TEXCOORD));
 
-		if(glvertexBuffer->mHandle!=0){
+		if(glvertexBuffer->mHandle==0){
 			if(mVBOs){
 				glBindBuffer(glvertexBuffer->mTarget,0);
 			}
@@ -1913,7 +1917,7 @@ void GLRenderDevice::setShaderVertexData(const VertexData *vertexData){
 
 		GLSLVertexLayout *gllayout=mLastProgram->findVertexLayout(glvertexFormat);
 
-		if(glvertexBuffer->mHandle!=0){
+		if(glvertexBuffer->mHandle==0){
 			if(mVBOs){
 				glBindBuffer(glvertexBuffer->mTarget,0);
 			}

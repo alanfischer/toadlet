@@ -35,6 +35,7 @@ GLSLShader::GLSLShader(GLRenderDevice *renderDevice):
 	mDevice(NULL),
 
 	mShaderType((ShaderType)0),
+	//mProfile,
 	//mCode,
 
 	mHandle(0),
@@ -47,15 +48,14 @@ GLSLShader::~GLSLShader(){
 	destroy();
 }
 
-bool GLSLShader::create(ShaderType shaderType,const String &code){
-	destroy();
-
+bool GLSLShader::create(ShaderType shaderType,const String &profile,const String &code){
 	mShaderType=shaderType;
+	mProfile=profile;
 	mCode=code;
 
 	bool result=createContext();
 
-	if(mDevice!=NULL){
+	if(result && mDevice!=NULL){
 		mDevice->shaderCreated(this);
 	}
 

@@ -46,10 +46,11 @@ public:
 
 	virtual Shader *getRootShader()=0;
 
-	virtual bool create(ShaderType shaderType,const egg::String &code)=0;
+	virtual bool create(ShaderType shaderType,const egg::String &profile,const egg::String &code)=0;
 	virtual void destroy()=0;
 	
 	virtual ShaderType getShaderType() const=0;
+	virtual const egg::String &getProfile() const=0;
 };
 
 }

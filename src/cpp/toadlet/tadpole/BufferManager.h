@@ -47,9 +47,10 @@ public:
 	peeper::IndexBuffer::ptr createIndexBuffer(int usage,int access,peeper::IndexBuffer::IndexFormat indexFormat,int size);
 	peeper::VertexBuffer::ptr createVertexBuffer(int usage,int access,peeper::VertexFormat::ptr vertexFormat,int size);
 	peeper::PixelBuffer::ptr createPixelBuffer(int usage,int access,int pixelFormat,int width,int height,int depth);
+	peeper::ConstantBuffer::ptr createConstantBuffer(int usage,int access,int size);
 	peeper::IndexBuffer::ptr cloneIndexBuffer(peeper::IndexBuffer::ptr oldIndexBuffer,int usage,int access,peeper::IndexBuffer::IndexFormat indexFormat,int size);
 	peeper::VertexBuffer::ptr cloneVertexBuffer(peeper::VertexBuffer::ptr oldVertexBuffer,int usage,int access,peeper::VertexFormat::ptr vertexFormat,int size);
-	/// @todo: clonePixelBuffer
+	/// @todo: clonePixelBuffer,cloneConstantBuffer
 
 	void contextActivate(peeper::RenderDevice *renderDevice);
 	void contextDeactivate(peeper::RenderDevice *renderDevice);
@@ -65,6 +66,7 @@ protected:
 	egg::Collection<peeper::VertexBuffer::ptr> mVertexBuffers;
 	egg::Collection<peeper::IndexBuffer::ptr> mIndexBuffers;
 	egg::Collection<peeper::PixelBuffer::ptr> mPixelBuffers;
+	egg::Collection<peeper::ConstantBuffer::ptr> mConstantBuffers;
 
 	Engine *mEngine;
 	bool mBackable;

@@ -43,11 +43,27 @@ ShaderManager::ShaderManager(Engine *engine,bool backable):ResourceManager(engin
 	mBackable=backable;
 }
 
-Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String &code){
+Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String profiles[],const String codes[],int numCodes){
+	RenderDevice *renderDevice=mEngine->getRenderDevice();
+
+	int i;
+	for(i=0;i<numCodes;++i){
+		if(renderDevice->getShaderProfileSupported(profiles[i])){
+			Shader::ptr shader=createShader(type,profiles[i],codes[i]);
+			if(shader!=NULL){
+				return shader;
+			}
+		}
+	}
+
+	return NULL;
+}
+
+Shader::ptr ShaderManager::createShader(Shader::ShaderType type,const String &profile,const String &code){
 	Logger::debug(Categories::TOADLET_TADPOLE,"ShaderManager::createShader");
 
 	Shader::ptr shader=Shader::ptr(mEngine->getRenderDevice()->createShader());
-	if(shader->create(type,code)==false){
+	if(shader->create(type,profile,code)==false){
 		return NULL;
 	}
 

@@ -115,6 +115,7 @@ public:
 
 	// Misc operations
 	virtual int getCloseTextureFormat(int format,int usage)=0;
+	virtual bool getShaderProfileSupported(const egg::String &profile)=0;
 	virtual void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result)=0;
 	virtual bool getRenderCaps(RenderCaps &caps)=0;
 };

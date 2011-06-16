@@ -45,10 +45,11 @@ public:
 
 	Shader *getRootShader(){return this;}
 
-	bool create(ShaderType shaderType,const egg::String &code);
+	bool create(ShaderType shaderType,const egg::String &profile,const egg::String &code);
 	void destroy();
 
 	ShaderType getShaderType() const{return mShaderType;}
+	const egg::String &getProfile() const{return mProfile;}
 
 protected:
 	bool createContext();
@@ -58,6 +59,7 @@ protected:
 	IDirect3DDevice9 *mD3DDevice;
 
 	ShaderType mShaderType;
+	egg::String mProfile;
 	egg::String mCode;
 
 	IUnknown *mShader;

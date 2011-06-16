@@ -68,25 +68,32 @@ void BufferManager::destroy(){
 	mVertexFormats.clear();
 
 	for(i=0;i<mIndexBuffers.size();++i){
-		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
-		indexBuffer->setBufferDestroyedListener(NULL);
-		indexBuffer->destroy();
+		IndexBuffer::ptr buffer=mIndexBuffers[i];
+		buffer->setBufferDestroyedListener(NULL);
+		buffer->destroy();
 	}
 	mIndexBuffers.clear();
 
 	for(i=0;i<mVertexBuffers.size();++i){
-		VertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
-		vertexBuffer->setBufferDestroyedListener(NULL);
-		vertexBuffer->destroy();
+		VertexBuffer::ptr buffer=mVertexBuffers[i];
+		buffer->setBufferDestroyedListener(NULL);
+		buffer->destroy();
 	}
 	mVertexBuffers.clear();
 
 	for(i=0;i<mPixelBuffers.size();++i){
-		PixelBuffer::ptr pixelBuffer=mPixelBuffers[i];
-		pixelBuffer->setBufferDestroyedListener(NULL);
-		pixelBuffer->destroy();
+		PixelBuffer::ptr buffer=mPixelBuffers[i];
+		buffer->setBufferDestroyedListener(NULL);
+		buffer->destroy();
 	}
 	mPixelBuffers.clear();
+
+	for(i=0;i<mConstantBuffers.size();++i){
+		ConstantBuffer::ptr buffer=mConstantBuffers[i];
+		buffer->setBufferDestroyedListener(NULL);
+		buffer->destroy();
+	}
+	mConstantBuffers.clear();
 }
 
 VertexFormat::ptr BufferManager::createVertexFormat(){
@@ -111,7 +118,7 @@ VertexFormat::ptr BufferManager::createVertexFormat(){
 }
 
 IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuffer::IndexFormat indexFormat,int size){
-	IndexBuffer::ptr indexBuffer;
+	IndexBuffer::ptr buffer;
 	if(mBackable || mEngine->getRenderDevice()==NULL){
 		BackableBuffer::ptr backableBuffer(new BackableBuffer());
 		backableBuffer->create(usage,access,indexFormat,size);
@@ -119,22 +126,22 @@ IndexBuffer::ptr BufferManager::createIndexBuffer(int usage,int access,IndexBuff
 			IndexBuffer::ptr back(mEngine->getRenderDevice()->createIndexBuffer());
 			backableBuffer->setBack(back);
 		}
-		indexBuffer=backableBuffer;
+		buffer=backableBuffer;
 	}
 	else{
-		indexBuffer=IndexBuffer::ptr(mEngine->getRenderDevice()->createIndexBuffer());
-		indexBuffer->create(usage,access,indexFormat,size);
+		buffer=IndexBuffer::ptr(mEngine->getRenderDevice()->createIndexBuffer());
+		buffer->create(usage,access,indexFormat,size);
 	}
 
-	mIndexBuffers.add(indexBuffer);
+	mIndexBuffers.add(buffer);
 
-	indexBuffer->setBufferDestroyedListener(this);
+	buffer->setBufferDestroyedListener(this);
 
-	return indexBuffer;
+	return buffer;
 }
 
 VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexFormat::ptr vertexFormat,int size){
-	VertexBuffer::ptr vertexBuffer;
+	VertexBuffer::ptr buffer;
 	if(mBackable || mEngine->getRenderDevice()==NULL){
 		BackableBuffer::ptr backableBuffer(new BackableBuffer());
 		backableBuffer->create(usage,access,vertexFormat,size);
@@ -142,22 +149,22 @@ VertexBuffer::ptr BufferManager::createVertexBuffer(int usage,int access,VertexF
 			VertexBuffer::ptr back(mEngine->getRenderDevice()->createVertexBuffer());
 			backableBuffer->setBack(back);
 		}
-		vertexBuffer=backableBuffer;
+		buffer=backableBuffer;
 	}
 	else{
-		vertexBuffer=VertexBuffer::ptr(mEngine->getRenderDevice()->createVertexBuffer());
-		vertexBuffer->create(usage,access,vertexFormat,size);
+		buffer=VertexBuffer::ptr(mEngine->getRenderDevice()->createVertexBuffer());
+		buffer->create(usage,access,vertexFormat,size);
 	}
 
-	mVertexBuffers.add(vertexBuffer);
+	mVertexBuffers.add(buffer);
 
-	vertexBuffer->setBufferDestroyedListener(this);
+	buffer->setBufferDestroyedListener(this);
 
-	return vertexBuffer;
+	return buffer;
 }
 
 PixelBuffer::ptr BufferManager::createPixelBuffer(int usage,int access,int pixelFormat,int width,int height,int depth){
-	PixelBuffer::ptr pixelBuffer;
+	PixelBuffer::ptr buffer;
 	if(mBackable || mEngine->getRenderDevice()==NULL){
 		BackableBuffer::ptr backableBuffer(new BackableBuffer());
 		backableBuffer->create(usage,access,pixelFormat,width,height,depth);
@@ -165,18 +172,41 @@ PixelBuffer::ptr BufferManager::createPixelBuffer(int usage,int access,int pixel
 			PixelBuffer::ptr back(mEngine->getRenderDevice()->createPixelBuffer());
 			backableBuffer->setBack(back,mEngine->getRenderDevice());
 		}
-		pixelBuffer=backableBuffer;
+		buffer=backableBuffer;
 	}
 	else{
-		pixelBuffer=PixelBuffer::ptr(mEngine->getRenderDevice()->createPixelBuffer());
-		pixelBuffer->create(usage,access,pixelFormat,width,height,depth);
+		buffer=PixelBuffer::ptr(mEngine->getRenderDevice()->createPixelBuffer());
+		buffer->create(usage,access,pixelFormat,width,height,depth);
 	}
 
-	mPixelBuffers.add(pixelBuffer);
+	mPixelBuffers.add(buffer);
 
-	pixelBuffer->setBufferDestroyedListener(this);
+	buffer->setBufferDestroyedListener(this);
 
-	return pixelBuffer;
+	return buffer;
+}
+
+ConstantBuffer::ptr BufferManager::createConstantBuffer(int usage,int access,int size){
+	ConstantBuffer::ptr buffer;
+	if(mBackable || mEngine->getRenderDevice()==NULL){
+		BackableBuffer::ptr backableBuffer(new BackableBuffer());
+		backableBuffer->create(usage,access,size);
+		if(mEngine->getRenderDevice()!=NULL){
+			ConstantBuffer::ptr back(mEngine->getRenderDevice()->createConstantBuffer());
+			backableBuffer->setBack(back);
+		}
+		buffer=backableBuffer;
+	}
+	else{
+		buffer=ConstantBuffer::ptr(mEngine->getRenderDevice()->createConstantBuffer());
+		buffer->create(usage,access,size);
+	}
+
+	mConstantBuffers.add(buffer);
+
+	buffer->setBufferDestroyedListener(this);
+
+	return buffer;
 }
 
 IndexBuffer::ptr BufferManager::cloneIndexBuffer(IndexBuffer::ptr oldIndexBuffer,int usage,int access,IndexBuffer::IndexFormat indexFormat,int size){
@@ -265,26 +295,34 @@ void BufferManager::contextActivate(RenderDevice *renderDevice){
 	}
 
 	for(i=0;i<mIndexBuffers.size();++i){
-		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
-		if(indexBuffer->getRootIndexBuffer()!=indexBuffer){
+		IndexBuffer::ptr buffer=mIndexBuffers[i];
+		if(buffer->getRootIndexBuffer()!=buffer){
 			IndexBuffer::ptr back(renderDevice->createIndexBuffer());
-			shared_static_cast<BackableBuffer>(indexBuffer)->setBack(back);
+			shared_static_cast<BackableBuffer>(buffer)->setBack(back);
 		}
 	}
 
 	for(i=0;i<mVertexBuffers.size();++i){
-		VertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
-		if(vertexBuffer->getRootVertexBuffer()!=vertexBuffer){
+		VertexBuffer::ptr buffer=mVertexBuffers[i];
+		if(buffer->getRootVertexBuffer()!=buffer){
 			VertexBuffer::ptr back(renderDevice->createVertexBuffer());
-			shared_static_cast<BackableBuffer>(vertexBuffer)->setBack(back);
+			shared_static_cast<BackableBuffer>(buffer)->setBack(back);
 		}
 	}
 
 	for(i=0;i<mPixelBuffers.size();++i){
-		PixelBuffer::ptr pixelBuffer=mPixelBuffers[i];
-		if(pixelBuffer->getRootPixelBuffer()!=pixelBuffer){
+		PixelBuffer::ptr buffer=mPixelBuffers[i];
+		if(buffer->getRootPixelBuffer()!=buffer){
 			PixelBuffer::ptr back(renderDevice->createPixelBuffer());
-			shared_static_cast<BackableBuffer>(pixelBuffer)->setBack(back,renderDevice);
+			shared_static_cast<BackableBuffer>(buffer)->setBack(back,renderDevice);
+		}
+	}
+
+	for(i=0;i<mConstantBuffers.size();++i){
+		ConstantBuffer::ptr buffer=mConstantBuffers[i];
+		if(buffer->getRootConstantBuffer()!=buffer){
+			ConstantBuffer::ptr back(renderDevice->createConstantBuffer());
+			shared_static_cast<BackableBuffer>(buffer)->setBack(back);
 		}
 	}
 }
@@ -293,24 +331,31 @@ void BufferManager::contextDeactivate(RenderDevice *renderDevice){
 	Logger::debug("BufferManager::contextDeactivate");
 
 	int i;
+	for(i=0;i<mConstantBuffers.size();++i){
+		ConstantBuffer::ptr buffer=mConstantBuffers[i];
+		if(buffer->getRootConstantBuffer()!=buffer){
+			shared_static_cast<BackableBuffer>(buffer)->setBack(ConstantBuffer::ptr());
+		}
+	}
+
 	for(i=0;i<mPixelBuffers.size();++i){
-		PixelBuffer::ptr pixelBuffer=mPixelBuffers[i];
-		if(pixelBuffer->getRootPixelBuffer()!=pixelBuffer){
-			shared_static_cast<BackableBuffer>(pixelBuffer)->setBack(PixelBuffer::ptr(),NULL);
+		PixelBuffer::ptr buffer=mPixelBuffers[i];
+		if(buffer->getRootPixelBuffer()!=buffer){
+			shared_static_cast<BackableBuffer>(buffer)->setBack(PixelBuffer::ptr(),NULL);
 		}
 	}
 
 	for(i=0;i<mVertexBuffers.size();++i){
-		VertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
-		if(vertexBuffer->getRootVertexBuffer()!=vertexBuffer){
-			shared_static_cast<BackableBuffer>(vertexBuffer)->setBack(VertexBuffer::ptr());
+		VertexBuffer::ptr buffer=mVertexBuffers[i];
+		if(buffer->getRootVertexBuffer()!=buffer){
+			shared_static_cast<BackableBuffer>(buffer)->setBack(VertexBuffer::ptr());
 		}
 	}
 
 	for(i=0;i<mIndexBuffers.size();++i){
-		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
-		if(indexBuffer->getRootIndexBuffer()!=indexBuffer){
-			shared_static_cast<BackableBuffer>(indexBuffer)->setBack(IndexBuffer::ptr());
+		IndexBuffer::ptr buffer=mIndexBuffers[i];
+		if(buffer->getRootIndexBuffer()!=buffer){
+			shared_static_cast<BackableBuffer>(buffer)->setBack(IndexBuffer::ptr());
 		}
 	}
 
@@ -326,17 +371,17 @@ void BufferManager::preContextReset(RenderDevice *renderDevice){
 	Logger::debug("BufferManager::preContextReset");
 
 	int i;
+	for(i=0;i<mConstantBuffers.size();++i){
+		mConstantBuffers[i]->resetDestroy();
+	}
 	for(i=0;i<mPixelBuffers.size();++i){
-		PixelBuffer::ptr pixelBuffer=mPixelBuffers[i];
-		pixelBuffer->resetDestroy();
+		mPixelBuffers[i]->resetDestroy();
 	}
 	for(i=0;i<mVertexBuffers.size();++i){
-		VertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
-		vertexBuffer->resetDestroy();
+		mVertexBuffers[i]->resetDestroy();
 	}
 	for(i=0;i<mIndexBuffers.size();++i){
-		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
-		indexBuffer->resetDestroy();
+		mIndexBuffers[i]->resetDestroy();
 	}
 }
 
@@ -345,16 +390,16 @@ void BufferManager::postContextReset(RenderDevice *renderDevice){
 
 	int i;
 	for(i=0;i<mVertexBuffers.size();++i){
-		VertexBuffer::ptr vertexBuffer=mVertexBuffers[i];
-		vertexBuffer->resetCreate();
+		mVertexBuffers[i]->resetCreate();
 	}
 	for(i=0;i<mIndexBuffers.size();++i){
-		IndexBuffer::ptr indexBuffer=mIndexBuffers[i];
-		indexBuffer->resetCreate();
+		mIndexBuffers[i]->resetCreate();
 	}
 	for(i=0;i<mPixelBuffers.size();++i){
-		PixelBuffer::ptr pixelBuffer=mPixelBuffers[i];
-		pixelBuffer->resetCreate();
+		mPixelBuffers[i]->resetCreate();
+	}
+	for(i=0;i<mConstantBuffers.size();++i){
+		mConstantBuffers[i]->resetCreate();
 	}
 }
 
@@ -362,6 +407,7 @@ void BufferManager::bufferDestroyed(Buffer *buffer){
 	mIndexBuffers.remove(buffer);
 	mVertexBuffers.remove(buffer);
 	mPixelBuffers.remove(buffer);
+	mConstantBuffers.remove(buffer);
 }
 
 bool BufferManager::useTriFan(){

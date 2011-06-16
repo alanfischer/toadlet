@@ -70,6 +70,54 @@ Logo::~Logo(){
 }
 Shader::ptr vs,fs,gs;
 ConstantBuffer::ptr cb;
+
+String vsp[]={
+	"glsl",
+	"hlsl"
+};
+String vsc[]={
+	"varying vec4 color;\n" \
+	"void main(){\n" \
+	" gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n" \
+	" color = vec4(gl_Normal.x,gl_Normal.y,gl_Normal.z,1.0);\n" \
+	"}",
+
+	"struct VIN{\n" \
+		"float4 position : POSITION;\n" \
+		"float3 normal : NORMAL;\n" \
+	"};\n" \
+	"struct VOUT{\n" \
+		"float4 position : SV_POSITION;\n" \
+		"float4 color : COLOR;\n" \
+	"};\n" \
+	"float4x4 ModelViewProjectionMatrix;\n" \
+	"VOUT main(VIN vin){\n" \
+	"	VOUT vout;\n" \
+	"	vout.position=mul(vin.position,ModelViewProjectionMatrix);\n" \
+	"	vout.color=float4(vin.normal.x,vin.normal.y,vin.normal.z,1.0);\n" \
+	"	return vout;\n" \
+	"}"
+};
+
+String psp[]={
+	"glsl",
+	"hlsl"
+};
+String psc[]={
+	"varying vec4 color;\n" \
+	"void main(){\n" \
+	" gl_FragColor = color;\n" \
+	"}",
+
+	"struct PIN{\n" \
+		"float4 position : SV_POSITION;\n" \
+		"float4 color: COLOR;\n" \
+	"};\n" \
+	"float4 main(PIN pin): SV_TARGET{" \
+	"	return pin.color;\n" \
+	"}"
+};
+
 void Logo::create(){
 	Application::create("d3d10");
 
@@ -99,69 +147,9 @@ void Logo::create(){
 	cameraNode->setClearColor(Colors::BLUE);
 	scene->getRoot()->attach(cameraNode);
 
-#if 0
-	const char *vc=
-		"varying vec4 color;\n" \
-		"void main(){\n" \
-		" gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n" \
-		" color = vec4(gl_Normal.x,gl_Normal.y,gl_Normal.z,1.0);\n" \
-		"}";
-	const char *fc=
-		"varying vec4 color;\n" \
-		"void main(){\n" \
-		" gl_FragColor = color;\n" \
-		"}";
-	const char *gc=
-		"#version 150\n" \
-		"layout(triangles) in;\n" \
-		"layout(line_strip, max_vertices = 3) out\n;" \
-		"void main(){\n" \
-		" for(int i=0;i<gl_in.length();i++){\n" \
-		"  gl_Position=gl_in[(i+1)%gl_in.length()].gl_Position;\n" \
-		"  EmitVertex();\n" \
-		" }\n" \
-		" EndPrimitive();\n" \
-		"}";
-#else
-	const char *vc=
-		"struct VIN{\n" \
-			"float4 position : POSITION;\n" \
-			"float3 normal : NORMAL;\n" \
-		"};\n" \
-		"struct VOUT{\n" \
-			"float4 position : SV_POSITION;\n" \
-			"float4 color : COLOR;\n" \
-		"};\n" \
-		"float4x4 ModelViewProjectionMatrix;\n" \
-		"VOUT main(VIN vin){\n" \
-		"	VOUT vout;\n" \
-		"	vout.position=mul(vin.position,ModelViewProjectionMatrix);\n" \
-		"	vout.color=float4(vin.normal.x,vin.normal.y,vin.normal.z,1.0);\n" \
-		"	return vout;\n" \
-		"}";
-	const char *fc=
-		"struct PIN{\n" \
-			"float4 position : SV_POSITION;\n" \
-			"float4 color: COLOR;\n" \
-		"};\n" \
-		"float4 main(PIN pin): SV_TARGET{" \
-		"	return pin.color;\n" \
-		"}";
-	const char *gc=
-		"struct GIN{\n" \
-			"float4 position : POSITION;\n" \
-		"};\n" \
-		"[maxvertexcount(4)]\n" \
-		"void main(GIN point[1],inout TriangleStream<PS_INPUT> triStream){" \
-			"PS_INPUT v;" \
-			"triStream.Append(v);" \
-		"}";
-#endif
-vs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,vc);
-fs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,fc);
-//gs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_GEOMETRY,gc);
-cb=ConstantBuffer::ptr(getEngine()->getRenderDevice()->createConstantBuffer());
-cb->create(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,16);
+vs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,vsp,vsc,3);
+fs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,psp,psc,3);
+cb=getEngine()->getBufferManager()->createConstantBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,16*4);
 
 // Only looks good if running on device, in simulator its always a top down view
 #if 0
