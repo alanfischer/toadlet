@@ -66,11 +66,6 @@ public:
 	Query *createQuery();
 	RenderState *createRenderState();
 
-	// Matrix operations
-	void setModelMatrix(const Matrix4x4 &matrix);
-	void setViewMatrix(const Matrix4x4 &matrix);
-	void setProjectionMatrix(const Matrix4x4 &matrix);
-
 	// Rendering operations
 	RenderTarget *getPrimaryRenderTarget(){return mPrimaryRenderTarget;}
 	bool setRenderTarget(RenderTarget *target);
@@ -86,11 +81,13 @@ public:
 	bool copySurface(IDirect3DSurface9 *dst,IDirect3DSurface9 *src);
 	void setDefaultState();
 	bool setRenderState(RenderState *renderState);
-	bool setShader(Shader::ShaderType type,Shader *shader);
-	bool setConstantBuffer(Shader::ShaderType type,ConstantBuffer *buffer){return false;}
+	bool setShader(Shader::ShaderType type,Shader *shader,ShaderData *shaderData);
 	void setTexture(int i,Texture *texture);
 
 	// Old fixed states
+	void setModelMatrix(const Matrix4x4 &matrix);
+	void setViewMatrix(const Matrix4x4 &matrix);
+	void setProjectionMatrix(const Matrix4x4 &matrix);
 	void setNormalize(const Normalize &normalize);
 	void setLightEnabled(int i,bool enable);
 	void setLightState(int i,const LightState &state);

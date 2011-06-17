@@ -523,7 +523,7 @@ bool D3D9RenderDevice::setRenderState(RenderState *renderState){
 	return true;
 }
 
-bool D3D9RenderDevice::setShader(Shader::ShaderType type,Shader *shader){
+bool D3D9RenderDevice::setShader(Shader::ShaderType type,Shader *shader,ShaderData *shaderData){
 	D3D9Shader *d3d9shader=(D3D9Shader*)shader->getRootShader();
 	IUnknown *id3d9shader=NULL;
 	if(shader!=NULL){

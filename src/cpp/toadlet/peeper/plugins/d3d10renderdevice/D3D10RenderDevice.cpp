@@ -214,7 +214,7 @@ bool D3D10RenderDevice::setRenderTarget(RenderTarget *target){
 	return true;
 }
 
-bool D3D10RenderDevice::setShader(Shader::ShaderType type,Shader *shader){
+bool D3D10RenderDevice::setShader(Shader::ShaderType type,Shader *shader,ShaderData *shaderData){
 	D3D10Shader *d3dShader=NULL;
 	if(shader!=NULL){
 		d3dShader=(D3D10Shader*)shader->getRootShader();

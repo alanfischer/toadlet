@@ -30,7 +30,7 @@
 #include <toadlet/peeper/Types.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
-#include <toadlet/peeper/Shader.h>
+#include <toadlet/peeper/ShaderData.h>
 
 namespace toadlet{
 namespace peeper{
@@ -100,8 +100,7 @@ public:
 	virtual bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src)=0;
 	virtual void setDefaultState()=0;
 	virtual bool setRenderState(RenderState *renderState)=0;
-	virtual bool setShader(Shader::ShaderType type,Shader *shader)=0;
-	virtual bool setConstantBuffer(Shader::ShaderType type,ConstantBuffer *buffer)=0;
+	virtual bool setShader(Shader::ShaderType type,Shader *shader,ShaderData *shaderData)=0;
 	virtual void setTexture(int i,Texture *texture)=0;
 
 	// Old fixed states

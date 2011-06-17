@@ -99,8 +99,7 @@ public:
 	bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src);
 	void setDefaultState();
 	bool setRenderState(RenderState *renderState);
-	bool setShader(Shader::ShaderType type,Shader *shader);
-	bool setConstantBuffer(Shader::ShaderType type,ConstantBuffer *buffer){return false;}
+	bool setShader(Shader::ShaderType type,Shader *shader,ShaderData *shaderData);
 	void setTexture(int i,Texture *texture);
 
 	// Old fixed states

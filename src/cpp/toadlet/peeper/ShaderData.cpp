@@ -23,39 +23,44 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_SHADER_H
-#define TOADLET_PEEPER_SHADER_H
+#include <toadlet/peeper/ShaderData.h>
 
-#include <toadlet/egg/Resource.h>
-#include <toadlet/egg/String.h>
+using namespace toadlet::egg;
 
 namespace toadlet{
 namespace peeper{
 
-class Shader:public egg::Resource{
-public:
-	TOADLET_SHARED_POINTERS(Shader);
+ShaderData::ShaderData(Shader::ptr shader,ConstantBuffer::ptr buffer){
+	this->shader=shader;
+	this->buffer=buffer;
+}
 
-	enum ShaderType{
-		ShaderType_VERTEX,
-		ShaderType_FRAGMENT,
-		ShaderType_GEOMETRY,
-	};
+ShaderData::~ShaderData(){
+	destroy();
+}
 
-	virtual ~Shader(){}
+void ShaderData::destroy(){
+	int i;
+	for(i=0;i<parameters.size();++i){
+		delete parameters[i];
+	}
+	parameters.clear();
+}
 
-	virtual Shader *getRootShader()=0;
+bool ShaderData::addParameter(const String &name,UpdateParameter::ptr parameter){
+	int location=shader->findConstant(name);
+	parameters.add(new ParameterData(name,parameter,location));
+	return true;
+}
 
-	virtual bool create(ShaderType shaderType,const egg::String &profile,const egg::String &code)=0;
-	virtual void destroy()=0;
-	
-	virtual ShaderType getShaderType() const=0;
-	virtual const egg::String &getProfile() const=0;
-
-	virtual int findConstant(const egg::String &name) const=0;
-};
+void ShaderData::update(){
+	int i;
+	for(i=0;i<parameters.size();++i){
+		ParameterData *data=parameters[i];
+		data->parameter->update();
+		buffer->setConstant(data->location,data->parameter->getData(),data->parameter->getSize());
+	}
+}
 
 }
 }
-
-#endif
