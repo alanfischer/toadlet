@@ -74,6 +74,9 @@ public:
 	virtual uint8 *lock(int lockAccess);
 	virtual bool unlock();
 
+	virtual void setConstant(int location,tbyte *value,int size){} /// @todo: Either remove the need for this in the ConstantBuffer interface, or add support for it to the BackableBuffer
+
+
 	virtual void setBack(IndexBuffer::ptr back);
 	virtual void setBack(VertexBuffer::ptr back);
 	virtual void setBack(PixelBuffer::ptr back,RenderDevice *renderDevice);

@@ -51,6 +51,8 @@ public:
 	ShaderType getShaderType() const{return mShaderType;}
 	const egg::String &getProfile() const{return mProfile;}
 
+	int findConstant(const egg::String &name) const{return -1;}
+
 	ID3D10InputLayout *findInputLayout(D3D10VertexFormat *vertexFormat);
 
 protected:

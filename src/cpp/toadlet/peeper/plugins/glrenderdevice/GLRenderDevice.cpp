@@ -956,7 +956,7 @@ bool GLRenderDevice::setRenderState(RenderState *renderState){
 
 /// @todo: To support non-GLSL shaders, we could simple have setShader call GLShader::activate()
 ///  And then GLSLShader::activate would call back into the device with setGLSLShader and then have this code
-bool GLRenderDevice::setShader(Shader::ShaderType type,Shader *shader){
+bool GLRenderDevice::setShader(Shader::ShaderType type,Shader *shader,ShaderData *shaderData){
 	switch(type){
 		case Shader::ShaderType_VERTEX:
 			mVertexShader=shader;

@@ -1,5 +1,6 @@
 # Source files for toadlet_peeper_d3d9renderdevice
 set (PEEPER_D3D9RENDERDEVICE_SRC
+	D3D9ConstantBuffer.cpp
 	D3D9IndexBuffer.cpp
 	D3D9PixelBuffer.cpp
 	D3D9PixelBufferRenderTarget.cpp
@@ -16,6 +17,7 @@ set (PEEPER_D3D9RENDERDEVICE_SRC
 
 # Headers
 set (PEEPER_D3D9RENDERDEVICE_HEADERS
+	D3D9ConstantBuffer.h
 	D3D9Includes.h
 	D3D9IndexBuffer.h
 	D3D9PixelBuffer.h

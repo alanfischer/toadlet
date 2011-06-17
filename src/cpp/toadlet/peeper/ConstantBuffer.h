@@ -46,6 +46,8 @@ public:
 	virtual void resetDestroy()=0;
 
 	virtual int getSize() const=0;
+
+	virtual void setConstant(int location,tbyte *data,int size)=0;
 };
 
 }

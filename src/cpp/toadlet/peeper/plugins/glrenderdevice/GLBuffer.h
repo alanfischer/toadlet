@@ -78,6 +78,8 @@ public:
 	uint8 *lock(int lockAccess);
 	bool unlock();
 
+	void setConstant(int location,tbyte *data,int size){} /// @todo
+
 protected:
 	bool createContext();
 	bool destroyContext();
