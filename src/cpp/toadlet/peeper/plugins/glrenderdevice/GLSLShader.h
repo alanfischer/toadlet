@@ -34,7 +34,7 @@ namespace toadlet{
 namespace peeper{
 
 class GLRenderDevice;
-class GLSLProgram;
+class GLSLShaderState;
 
 class GLSLShader:protected egg::BaseResource,public Shader{
 	TOADLET_BASERESOURCE_PASSTHROUGH(Shader);
@@ -68,7 +68,7 @@ protected:
 	GLenum mTarget;
 	
 	friend class GLRenderDevice;
-	friend class GLSLProgram;
+	friend class GLSLShaderState;
 };
 
 }

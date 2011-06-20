@@ -23,42 +23,58 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/peeper/ShaderData.h>
-
-using namespace toadlet::egg;
+#include <toadlet/peeper/BackableShaderState.h>
 
 namespace toadlet{
 namespace peeper{
 
-ShaderData::ShaderData(Shader::ptr shader,ConstantBuffer::ptr buffer){
-	this->shader=shader;
-	this->buffer=buffer;
-}
+BackableShaderState::BackableShaderState():
+	mListener(NULL)
+	//mShaders
+{}
 
-ShaderData::~ShaderData(){
-	destroy();
-}
-
-void ShaderData::destroy(){
-	int i;
-	for(i=0;i<parameters.size();++i){
-		delete parameters[i];
+void BackableShaderState::destroy(){
+	if(mBack!=NULL){
+		mBack->destroy();
+		mBack=NULL;
 	}
-	parameters.clear();
+
+	mShaders.clear();
+
+	if(mListener!=NULL){
+		mListener->shaderStateDestroyed(this);
+		mListener=NULL;
+	}
 }
 
-bool ShaderData::addParameter(const String &name,UpdateParameter::ptr parameter){
-	int location=shader->findConstant(name);
-	parameters.add(new ParameterData(name,parameter,location));
-	return true;
+void BackableShaderState::setShader(Shader::ShaderType type,Shader::ptr shader){
+	if(mShaders.size()<=type){
+		mShaders.resize(type+1);
+	}
+	
+	mShaders[type]=shader;
 }
 
-void ShaderData::update(){
-	int i;
-	for(i=0;i<parameters.size();++i){
-		ParameterData *data=parameters[i];
-		data->parameter->update();
-		buffer->setConstant(data->location,data->parameter->getData(),data->parameter->getSize());
+Shader::ptr BackableShaderState::getShader(Shader::ShaderType type){
+	if(mShaders.size()<=type){
+		return NULL;
+	}
+
+	return mShaders[type];
+}
+
+void BackableShaderState::setBack(ShaderState::ptr back){
+	if(back!=mBack && mBack!=NULL){
+		mBack->destroy();
+	}
+
+	mBack=back;
+	
+	if(mBack!=NULL){
+		int i;
+		for(i=0;i<mShaders.size();++i){
+			mBack->setShader((Shader::ShaderType)i,mShaders[i]);
+		}
 	}
 }
 

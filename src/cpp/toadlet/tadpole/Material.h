@@ -29,6 +29,7 @@
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/RenderState.h>
+#include <toadlet/peeper/ShaderState.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/RenderDevice.h>
@@ -46,7 +47,7 @@ public:
 		SortType_DEPTH,
 	};
 
-	Material(peeper::RenderState::ptr renderState=peeper::RenderState::ptr());
+	Material(peeper::RenderState::ptr renderState=peeper::RenderState::ptr(),peeper::ShaderState::ptr shaderState=peeper::ShaderState::ptr());
 	virtual ~Material();
 
 	void destroy();
@@ -91,6 +92,9 @@ public:
 	void setTextureName(int i,const egg::String &name);
 	egg::String getTextureName(int i=0) const{return i<mTextureNames.size()?mTextureNames[i]:(char*)NULL;}
 
+	void setShader(peeper::Shader::ShaderType type,peeper::Shader::ptr shader);
+	peeper::Shader::ptr getShader(peeper::Shader::ShaderType type);
+
 	void setSort(SortType sort){mSort=sort;}
 	inline SortType getSort() const{return mSort;}
 	bool isDepthSorted() const;
@@ -101,11 +105,13 @@ public:
 	bool getManaged(){return getUniqueHandle()!=0;}
 
 	peeper::RenderState::ptr getRenderState() const{return mRenderState;}
+	peeper::ShaderState::ptr getShaderState() const{return mShaderState;}
 
 	void setupRenderDevice(peeper::RenderDevice *renderDevice);
 	
 protected:
 	peeper::RenderState::ptr mRenderState;
+	peeper::ShaderState::ptr mShaderState;
 	egg::Collection<peeper::Texture::ptr> mTextures;
 	egg::Collection<egg::String> mTextureNames;
 	SortType mSort;

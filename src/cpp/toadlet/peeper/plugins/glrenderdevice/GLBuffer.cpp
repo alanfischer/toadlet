@@ -106,7 +106,7 @@ bool GLBuffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int si
 	int i;
 	for(i=0;i<mVertexFormat->getNumElements();++i){
 		if(mHandle!=0){
-			mElementOffsets.add((uint8*)mVertexFormat->getOffset(i));
+			mElementOffsets.add(reinterpret_cast<uint8*>(mVertexFormat->getOffset(i)));
 		}
 		else{
 			mElementOffsets.add(mData+mVertexFormat->getOffset(i));
@@ -318,6 +318,15 @@ bool GLBuffer::unlock(){
 	TOADLET_CHECK_GLERROR("GLBuffer::unlock");
 
 	return true;
+}
+
+void GLBuffer::setConstant(int location,float *data,int size){
+	if(mConstants.size()<location+size){
+		mConstants.resize(location+size);
+		mConstantSizes.resize(location+size);
+	}
+	memcpy(&mConstants[location],data,size*sizeof(float));
+	mConstantSizes[location]=size;
 }
 
 GLenum GLBuffer::getBufferUsage(int usage,int access){

@@ -49,6 +49,11 @@ namespace toadlet{
 namespace ribbit{
 namespace decoder{
 
+size_t read_func(void *ptr,size_t size,size_t nmemb,void *datasource);
+int seek_func(void *datasource,ogg_int64_t offset,int whence);
+int close_func(void *datasource);
+long tell_func(void *datasource);
+
 OggVorbisDecoder::OggVorbisDecoder():
 	mVorbisInfo(NULL),
 	mDataLength(0)
@@ -60,43 +65,6 @@ OggVorbisDecoder::OggVorbisDecoder():
 OggVorbisDecoder::~OggVorbisDecoder(){
 	stopStream();
 	delete mVorbisFile;
-}
-
-size_t OggVorbisDecoder::read_func(void *ptr,size_t size,size_t nmemb, void *datasource){
-	return ((Stream*)datasource)->read((tbyte*)ptr,size*nmemb);
-}
-
-int OggVorbisDecoder::seek_func(void *datasource, ogg_int64_t offset, int whence){
-	int length=((Stream*)datasource)->length();
-	int position=((Stream*)datasource)->position();
-	if(length>=0 && position>=0){
-		((Stream*)datasource)->reset();
-		int result=0;
-		switch(whence){
-			case SEEK_SET:
-				result=((Stream*)datasource)->seek(offset);
-			break;
-			case SEEK_CUR:
-				result=((Stream*)datasource)->seek(position+offset);
-			break;
-			case SEEK_END:
-				result=((Stream*)datasource)->seek(length+offset);
-			break;
-		}
-		return result<0?-1:0;
-	}
-	else{
-		return -1;
-	}
-}
-
-int OggVorbisDecoder::close_func(void *datasource){
-	((Stream*)datasource)->close();
-	return 0;
-};
-
-long OggVorbisDecoder::tell_func(void *datasource){
-	return ((Stream*)datasource)->position();
 }
 
 void OggVorbisDecoder::close(){
@@ -213,6 +181,43 @@ int OggVorbisDecoder::position(){
 
 bool OggVorbisDecoder::seek(int offs){
 	return ov_raw_seek(mVorbisFile,offs)>=0;
+}
+
+size_t read_func(void *ptr,size_t size,size_t nmemb, void *datasource){
+	return ((Stream*)datasource)->read((tbyte*)ptr,size*nmemb);
+}
+
+int seek_func(void *datasource, ogg_int64_t offset, int whence){
+	int length=((Stream*)datasource)->length();
+	int position=((Stream*)datasource)->position();
+	if(length>=0 && position>=0){
+		((Stream*)datasource)->reset();
+		int result=0;
+		switch(whence){
+			case SEEK_SET:
+				result=((Stream*)datasource)->seek(offset);
+			break;
+			case SEEK_CUR:
+				result=((Stream*)datasource)->seek(position+offset);
+			break;
+			case SEEK_END:
+				result=((Stream*)datasource)->seek(length+offset);
+			break;
+		}
+		return result<0?-1:0;
+	}
+	else{
+		return -1;
+	}
+}
+
+int close_func(void *datasource){
+	((Stream*)datasource)->close();
+	return 0;
+};
+
+long tell_func(void *datasource){
+	return ((Stream*)datasource)->position();
 }
 
 }

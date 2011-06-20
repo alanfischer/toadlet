@@ -23,34 +23,19 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_GLSLVERTEXLAYOUT_H
-#define TOADLET_PEEPER_GLSLVERTEXLAYOUT_H
-
-#include "GLIncludes.h"
-#include "GLVertexFormat.h"
+#ifndef TOADLET_PEEPER_SHADERSTATEDESTROYEDLISTENER_H
+#define TOADLET_PEEPER_SHADERSTATEDESTROYEDLISTENER_H
 
 namespace toadlet{
 namespace peeper{
 
-class GLRenderDevice;
-class GLSLShaderState;
+class ShaderState;
 
-class TOADLET_API GLSLVertexLayout{
+class ShaderStateDestroyedListener{
 public:
-	TOADLET_SHARED_POINTERS(GLSLVertexLayout);
+	virtual ~ShaderStateDestroyedListener(){}
 
-	GLSLVertexLayout(GLRenderDevice *renderDevice);
-	virtual ~GLSLVertexLayout();
-
-	bool create(GLVertexFormat *vertexFormat,GLSLShaderState *shaderState);
-	void destroy();
-
-protected:
-	GLRenderDevice *mDevice;
-
-	egg::Collection<int> mSemanticIndexes;
-
-	friend class GLRenderDevice;
+	virtual void shaderStateDestroyed(ShaderState *shaderState)=0;
 };
 
 }

@@ -23,38 +23,67 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "GLSLVertexLayout.h"
-#include "GLRenderDevice.h"
-#include "GLSLShaderState.h"
-
+#include "D3D9RenderState.h"
+ 
 namespace toadlet{
 namespace peeper{
 
-GLSLVertexLayout::GLSLVertexLayout(GLRenderDevice *renderDevice){
-	mDevice=renderDevice;
-}
+class D3D9RenderDevice;
 
-GLSLVertexLayout::~GLSLVertexLayout(){
+D3D9RenderState::D3D9RenderState(D3D9RenderDevice *renderDevice):
+	mListener(NULL),
+	mBlendState(NULL),
+	mDepthState(NULL),
+	mRasterizerState(NULL),
+	mFogState(NULL),
+	mPointState(NULL),
+	mMaterialState(NULL)
+{}
+
+D3D9RenderState::~D3D9RenderState(){
 	destroy();
 }
 
-bool GLSLVertexLayout::create(GLVertexFormat *vertexFormat,GLSLShaderState *shaderState){
-	mSemanticIndexes.resize(vertexFormat->getNumElements());
-
-	int i;
-	for(i=0;i<vertexFormat->getNumElements();++i){
-		int location=glGetAttribLocation(shaderState->mHandle,vertexFormat->getName(i));
-		if(location==-1){
-			location=GLRenderDevice::getFixedAttribFromSemantic(vertexFormat->getSemantic(i),vertexFormat->getIndex(i));
-		}
-		mSemanticIndexes[i]=location;
+void D3D9RenderState::destroy(){
+	if(mBlendState!=NULL){
+		delete mBlendState;
+		mBlendState=NULL;
+	}
+	if(mDepthState!=NULL){
+		delete mDepthState;
+		mDepthState=NULL;
+	}
+	if(mRasterizerState!=NULL){
+		delete mRasterizerState;
+		mRasterizerState=NULL;
+	}
+	if(mFogState!=NULL){
+		delete mFogState;
+		mFogState=NULL;
+	}
+	if(mPointState!=NULL){
+		delete mPointState;
+		mPointState=NULL;
+	}
+	if(mMaterialState!=NULL){
+		delete mMaterialState;
+		mMaterialState=NULL;
 	}
 
-	return true;
-}
+	int i;
+	for(i=0;i<mSamplerStates.size();++i){
+		delete mSamplerStates[i];
+	}
+	mSamplerStates.clear();
+	for(i=0;i<mTextureStates.size();++i){
+		delete mTextureStates[i];
+	}
+	mTextureStates.clear();
 
-void GLSLVertexLayout::destroy(){
-	mSemanticIndexes.clear();
+	if(mListener!=NULL){
+		mListener->renderStateDestroyed(this);
+		mListener=NULL;
+	}
 }
 
 }

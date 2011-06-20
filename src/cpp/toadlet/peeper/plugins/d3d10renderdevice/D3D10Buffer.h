@@ -68,6 +68,8 @@ public:
 	uint8 *lock(int lockAccess);
 	bool unlock();
 
+	void setConstant(int location,float *data,int size){}
+
 protected:
 	bool createContext();
 	bool destroyContext();

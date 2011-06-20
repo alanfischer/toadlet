@@ -26,7 +26,6 @@
 #ifndef TOADLET_PEEPER_RENDERSTATE_H
 #define TOADLET_PEEPER_RENDERSTATE_H
 
-#include <toadlet/egg/Resource.h>
 #include <toadlet/peeper/RenderStateDestroyedListener.h>
 #include <toadlet/peeper/BlendState.h>
 #include <toadlet/peeper/DepthState.h>

@@ -28,7 +28,6 @@
 
 #include "GLIncludes.h"
 #include "GLRenderTarget.h"
-#include "GLSLProgram.h"
 #include <toadlet/peeper/RenderDevice.h>
 #include <toadlet/peeper/BlendState.h>
 #include <toadlet/peeper/DepthState.h>
@@ -47,7 +46,9 @@ namespace peeper{
 
 class GLBuffer;
 class GLSLShader;
+class GLSLShaderState;
 class GLTexture;
+class GLVertexFormat;
 
 class TOADLET_API GLRenderDevice:public RenderDevice{
 public:
@@ -79,11 +80,7 @@ public:
 	Shader *createShader();
 	Query *createQuery();
 	RenderState *createRenderState();
-
-	// Matrix operations
-	void setModelMatrix(const Matrix4x4 &matrix);
-	void setViewMatrix(const Matrix4x4 &matrix);
-	void setProjectionMatrix(const Matrix4x4 &matrix);
+	ShaderState *createShaderState();
 
 	// Rendering operations
 	RenderTarget *getPrimaryRenderTarget(){return mPrimaryRenderTarget;}
@@ -99,10 +96,14 @@ public:
 	bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src);
 	void setDefaultState();
 	bool setRenderState(RenderState *renderState);
-	bool setShader(Shader::ShaderType type,Shader *shader,ShaderData *shaderData);
+	bool setShaderState(ShaderState *shaderState);
+	void setBuffer(int i,ConstantBuffer *buffer){}
 	void setTexture(int i,Texture *texture);
 
 	// Old fixed states
+	void setModelMatrix(const Matrix4x4 &matrix);
+	void setViewMatrix(const Matrix4x4 &matrix);
+	void setProjectionMatrix(const Matrix4x4 &matrix);
 	void setNormalize(const Normalize &normalize);
 	void setLightEnabled(int i,bool enable);
 	void setLightState(int i,const LightState &state);
@@ -174,10 +175,8 @@ protected:
 
 	void vertexFormatCreated(GLVertexFormat *format);
 	void vertexFormatDestroyed(GLVertexFormat *format);
-	void shaderCreated(GLSLShader *shader);
-	void shaderDestroyed(GLSLShader *shader);
-	void programCreated(GLSLProgram *program);
-	void programDestroyed(GLSLProgram *program);
+	void shaderStateCreated(GLSLShaderState *state);
+	void shaderStateDestroyed(GLSLShaderState *state);
 
 	int mMatrixMode;
 
@@ -199,6 +198,9 @@ protected:
 	int mLastFixedSemanticBits,mLastFixedTexCoordSemanticBits;
 	egg::Collection<short> mLastTexCoordIndexes;
 	int mLastShaderSemanticBits;
+	GLSLShaderState *mLastShaderState;
+	egg::Collection<GLSLShaderState*> mShaderStates;
+	egg::Collection<GLVertexFormat*> mVertexFormats;
 
 	#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
 		egg::mathfixed::Matrix4x4 mModelMatrix;
@@ -217,23 +219,11 @@ protected:
 	RenderTarget *mRenderTarget;
 	GLRenderTarget *mGLRenderTarget;
 
-	/// @todo: Merge the GLSLProgramMap and mPrograms together
-	Shader *mVertexShader,*mFragmentShader,*mGeometryShader;
-	egg::Map<uint64,GLSLProgram::ptr> mGLSLProgramMap;
-	bool mRebindGLSLProgram;
-	GLSLProgram *mLastProgram;
-	egg::Collection<GLSLProgram*> mPrograms;
-	egg::Collection<GLVertexFormat*> mVertexFormats;
-
-	#if defined(TOADLET_DEBUG)
-		int mBeginEndCounter;
-	#endif
-
 	friend class GLBuffer;
 	friend class GLTexture;
 	friend class GLVertexFormat;
 	friend class GLSLShader;
-	friend class GLSLProgram;
+	friend class GLSLShaderState;
 };
 
 }

@@ -23,34 +23,40 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_GLSLVERTEXLAYOUT_H
-#define TOADLET_PEEPER_GLSLVERTEXLAYOUT_H
+#ifndef TOADLET_PEEPER_BACKABLESHADERSTATE_H
+#define TOADLET_PEEPER_BACKABLESHADERSTATE_H
 
-#include "GLIncludes.h"
-#include "GLVertexFormat.h"
+#include <toadlet/egg/Collection.h>
+#include <toadlet/peeper/ShaderState.h>
 
 namespace toadlet{
 namespace peeper{
 
-class GLRenderDevice;
-class GLSLShaderState;
-
-class TOADLET_API GLSLVertexLayout{
+class TOADLET_API BackableShaderState:public ShaderState{
 public:
-	TOADLET_SHARED_POINTERS(GLSLVertexLayout);
+	TOADLET_SHARED_POINTERS(BackableShaderState);
 
-	GLSLVertexLayout(GLRenderDevice *renderDevice);
-	virtual ~GLSLVertexLayout();
+	BackableShaderState();
+	virtual ~BackableShaderState(){}
 
-	bool create(GLVertexFormat *vertexFormat,GLSLShaderState *shaderState);
-	void destroy();
+	virtual ShaderState *getRootShaderState(){return mBack;}
+
+	virtual void setShaderStateDestroyedListener(ShaderStateDestroyedListener *listener){mListener=listener;}
+
+	virtual bool create(){return true;}
+	virtual void destroy();
+
+	virtual void setShader(Shader::ShaderType type,Shader::ptr shader);
+	virtual Shader::ptr getShader(Shader::ShaderType type);
+	
+	virtual void setBack(ShaderState::ptr back);
+	virtual ShaderState::ptr getBack(){return mBack;}
 
 protected:
-	GLRenderDevice *mDevice;
+	ShaderStateDestroyedListener *mListener;
+	egg::Collection<Shader::ptr> mShaders;
 
-	egg::Collection<int> mSemanticIndexes;
-
-	friend class GLRenderDevice;
+	ShaderState::ptr mBack;
 };
 
 }

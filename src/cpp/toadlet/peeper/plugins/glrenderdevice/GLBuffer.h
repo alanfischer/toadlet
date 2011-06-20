@@ -78,7 +78,7 @@ public:
 	uint8 *lock(int lockAccess);
 	bool unlock();
 
-	void setConstant(int location,tbyte *data,int size){} /// @todo
+	void setConstant(int location,float *data,int size);
 
 protected:
 	bool createContext();
@@ -105,6 +105,9 @@ protected:
 	int mLockAccess;
 	bool mMapping;
 	uint8 *mData;
+
+	egg::Collection<float> mConstants;
+	egg::Collection<int> mConstantSizes;
 
 	friend class GLRenderDevice;
 };

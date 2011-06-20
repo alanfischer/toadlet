@@ -30,6 +30,7 @@
 #include "GLRenderState.h"
 #include "GLTexture.h"
 #include "GLSLShader.h"
+#include "GLSLShaderState.h"
 #include "GLSLVertexLayout.h"
 #if defined(TOADLET_HAS_GLFBOS)
 	#include "GLFBORenderTarget.h"
@@ -85,6 +86,9 @@ GLRenderDevice::GLRenderDevice():
 	mLastFixedSemanticBits(0),mLastFixedTexCoordSemanticBits(0),
 	//mLastTexCoordIndexes,
 	mLastShaderSemanticBits(0),
+	mLastShaderState(NULL),
+	//mShaderStates,
+	//mVertexFormats,
 
 	//mModelMatrix,
 	//mViewMatrix,
@@ -95,16 +99,7 @@ GLRenderDevice::GLRenderDevice():
 	mPrimaryRenderTarget(NULL),
 	mGLPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL),
-	mGLRenderTarget(NULL),
-
-	mGeometryShader(NULL),mVertexShader(NULL),mFragmentShader(NULL),
-	//mGLSLProgramMap,
-	mRebindGLSLProgram(false),
-	mLastProgram(NULL)
-
-	#if defined(TOADLET_DEBUG)
-		,mBeginEndCounter(0)
-	#endif
+	mGLRenderTarget(NULL)
 {}
 
 GLRenderDevice::~GLRenderDevice(){
@@ -437,6 +432,10 @@ RenderState *GLRenderDevice::createRenderState(){
 	return new GLRenderState(this);
 }
 
+ShaderState *GLRenderDevice::createShaderState(){
+	return new GLSLShaderState(this);
+}
+
 // Matrix operations
 void GLRenderDevice::setModelMatrix(const Matrix4x4 &matrix){
 	if(mMatrixMode!=GL_MODELVIEW){
@@ -609,30 +608,10 @@ void GLRenderDevice::swap(){
 }
 
 void GLRenderDevice::beginScene(){
-	TOADLET_CHECK_GLERROR("before beginScene");
-
-	#if defined(TOADLET_DEBUG)
-		mBeginEndCounter++;
-		if(mBeginEndCounter!=1){
-			mBeginEndCounter--;
-			Error::unknown(Categories::TOADLET_PEEPER,
-				"GLRenderDevice::beginScene: Unmached beginScene/endScene");
-		}
-	#endif
-
 	TOADLET_CHECK_GLERROR("beginScene");
 }
 
 void GLRenderDevice::endScene(){
-	#if defined(TOADLET_DEBUG)
-		mBeginEndCounter--;
-		if(mBeginEndCounter!=0){
-			mBeginEndCounter++;
-			Error::unknown(Categories::TOADLET_PEEPER,
-				"GLRenderDevice::endScene: Unmached beginScene/endScene");
-		}
-	#endif
-
 	setVertexData(NULL);
 
 	#if defined(TOADLET_HAS_GLIBOS)
@@ -663,23 +642,13 @@ void GLRenderDevice::endScene(){
 		setTexture(i,NULL);
 	}
 
-	mVertexShader=NULL;
-	mFragmentShader=NULL;
-	mGeometryShader=NULL;
-	mLastProgram=NULL;
+	mLastShaderState=NULL;
 
 	TOADLET_CHECK_GLERROR("endScene");
 }
 
 void GLRenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexData){
 	int i;
-	#if defined(TOADLET_DEBUG)
-		if(mBeginEndCounter!=1){
-			Error::unknown(Categories::TOADLET_PEEPER,
-				"GLRenderDevice::renderPrimitive called outside of begin/end scene");
-		}
-	#endif
-
 	if(vertexData==NULL || indexData==NULL){
 		Error::nullPointer(Categories::TOADLET_PEEPER,
 			"VertexData or IndexData is NULL");
@@ -714,51 +683,18 @@ void GLRenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexData
 		break;
 	}
 
-	if(mRebindGLSLProgram){
-		mRebindGLSLProgram=false;
-
-		uint64 hash=0;
-		if(mVertexShader!=NULL){
-			hash|=(uint64)mVertexShader->getUniqueHandle();
-		}
-		if(mFragmentShader!=NULL){
-			hash|=((uint64)mFragmentShader->getUniqueHandle()<<16);
-		}
-		if(mGeometryShader!=NULL){
-			hash|=((uint64)mGeometryShader->getUniqueHandle()<<32);
-		}
-
-		GLSLProgram::ptr program;
-		Map<uint64,GLSLProgram::ptr>::iterator it=mGLSLProgramMap.find(hash);
-		if(it==mGLSLProgramMap.end()){
-			if(hash!=0){
-				program=GLSLProgram::ptr(new GLSLProgram(this));
-				program->create();
-				if(mVertexShader!=NULL){
-					program->attachShader(mVertexShader);
+/*		GLBuffer *glbuffer=(GLBuffer*)mVertexShaderData->buffer->getRootConstantBuffer();
+		int i;
+		for(i=0;i<glbuffer->mConstantSizes.size();++i){
+			int size=glbuffer->mConstantsSizes[i];
+			if(size>0){
+				for(j=0;j<size;++j){
+					glUniform4fv(i+j*4,size,&glbuffer->mConstants[i+j*4]);
 				}
-				if(mFragmentShader!=NULL){
-					program->attachShader(mFragmentShader);
-				}
-				if(mGeometryShader!=NULL){
-					program->attachShader(mGeometryShader);
-				}
-				mGLSLProgramMap.add(hash,program);
+				i+=size;
 			}
 		}
-		else{
-			program=it->second;
-		}
-
-		if(program!=NULL){
-			mLastProgram=program;
-			program->activate();
-		}
-		else{
-			mLastProgram=NULL;
-			glUseProgram(0);
-		}
-	}
+*/
 
 	{
 		bool rebindTexCoords=false;
@@ -802,7 +738,7 @@ void GLRenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexData
 		}
 		else{
 			glBindBuffer(glindexBuffer->mTarget,glindexBuffer->mHandle);
-			glDrawElements(type,indexData->count,indexType,(uint8*)(indexData->start*glindexBuffer->mIndexFormat));
+			glDrawElements(type,indexData->count,indexType,reinterpret_cast<uint8*>(indexData->start*glindexBuffer->mIndexFormat));
 		}
 
 		TOADLET_CHECK_GLERROR("glDrawElements");
@@ -954,22 +890,27 @@ bool GLRenderDevice::setRenderState(RenderState *renderState){
 	return true;
 }
 
-/// @todo: To support non-GLSL shaders, we could simple have setShader call GLShader::activate()
-///  And then GLSLShader::activate would call back into the device with setGLSLShader and then have this code
-bool GLRenderDevice::setShader(Shader::ShaderType type,Shader *shader,ShaderData *shaderData){
-	switch(type){
-		case Shader::ShaderType_VERTEX:
-			mVertexShader=shader;
-		break;
-		case Shader::ShaderType_FRAGMENT:
-			mFragmentShader=shader;
-		break;
-		case Shader::ShaderType_GEOMETRY:
-			mGeometryShader=shader;
-		break;
+bool GLRenderDevice::setShaderState(ShaderState *shaderState){
+	GLSLShaderState *glshaderState=NULL;
+	if(shaderState!=NULL){
+		glshaderState=(GLSLShaderState*)shaderState->getRootShaderState();
+		if(glshaderState==NULL){
+			Error::nullPointer(Categories::TOADLET_PEEPER,
+				"ShaderState is not a GLShaderState");
+			return false;
+		}
 	}
 
-	mRebindGLSLProgram=true;
+	if(glshaderState!=NULL && glshaderState->mShaders.size()==0){
+		glshaderState=NULL;
+	}
+
+	mLastShaderState=glshaderState;
+	if(glshaderState!=NULL){
+		glshaderState->activate();
+	}
+
+	TOADLET_CHECK_GLERROR("setShaderState");
 
 	return true;
 }
@@ -1748,7 +1689,7 @@ bool GLRenderDevice::hardwareMappingSupported(GLBuffer *buffer) const{
 }
 
 void GLRenderDevice::setVertexData(const VertexData *vertexData){
-	if(mLastProgram==NULL){
+	if(mLastShaderState==NULL){
 		if(mLastShaderSemanticBits!=0){
 			setShaderVertexData(NULL);
 		}
@@ -1915,7 +1856,7 @@ void GLRenderDevice::setShaderVertexData(const VertexData *vertexData){
 		GLsizei vertexSize=glvertexFormat->mVertexSize;
 		int numElements=glvertexFormat->mSemantics.size();
 
-		GLSLVertexLayout *gllayout=mLastProgram->findVertexLayout(glvertexFormat);
+		GLSLVertexLayout *gllayout=mLastShaderState->findVertexLayout(glvertexFormat);
 
 		if(glvertexBuffer->mHandle==0){
 			if(mVBOs){
@@ -2471,14 +2412,14 @@ void GLRenderDevice::vertexFormatDestroyed(GLVertexFormat *format){
 	}
 
 	int i;
-	for(i=mPrograms.size()-1;i>=0;--i){
-		GLSLProgram *program=mPrograms[i];
-		if(handle<program->mLayouts.size()){
-			GLSLVertexLayout *layout=program->mLayouts[handle];
+	for(i=mShaderStates.size()-1;i>=0;--i){
+		GLSLShaderState *state=mShaderStates[i];
+		if(handle<state->mLayouts.size()){
+			GLSLVertexLayout *layout=state->mLayouts[handle];
 			if(layout!=NULL){
 				layout->destroy();
 			}
-			program->mLayouts.removeAt(handle);
+			state->mLayouts.removeAt(handle);
 		}
 	}
 	for(i=handle;i<mVertexFormats.size();++i){
@@ -2487,36 +2428,12 @@ void GLRenderDevice::vertexFormatDestroyed(GLVertexFormat *format){
 	mVertexFormats.removeAt(handle);
 }
 
-void GLRenderDevice::shaderCreated(GLSLShader *shader){
+void GLRenderDevice::shaderStateCreated(GLSLShaderState *state){
+	mShaderStates.add(state);
 }
 
-void GLRenderDevice::shaderDestroyed(GLSLShader *shader){
-	int i,j;
-	for(i=0;i<mPrograms.size();++i){
-		GLSLProgram *program=mPrograms[i];
-		for(j=0;j<program->mShaders.size();++j){
-			if(program->mShaders[j]==shader){
-				program->destroy();
-				mPrograms.remove(program);
-
-				Map<uint64,GLSLProgram::ptr>::iterator it;
-				for(it=mGLSLProgramMap.begin();it!=mGLSLProgramMap.end();++it){
-					if(it->second==program){
-						mGLSLProgramMap.erase(it);
-						break;
-					}
-				}
-			}
-		}
-	}
-}
-
-void GLRenderDevice::programCreated(GLSLProgram *program){
-	mPrograms.add(program);
-}
-
-void GLRenderDevice::programDestroyed(GLSLProgram *program){
-	mPrograms.remove(program);
+void GLRenderDevice::shaderStateDestroyed(GLSLShaderState *state){
+	mShaderStates.remove(state);
 }
 
 }

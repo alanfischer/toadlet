@@ -23,46 +23,34 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_SHADERDATA_H
-#define TOADLET_PEEPER_SHADERDATA_H
+#ifndef TOADLET_PEEPER_SHADERSTATE_H
+#define TOADLET_PEEPER_SHADERSTATE_H
 
 #include <toadlet/egg/Collection.h>
+#include <toadlet/peeper/ShaderStateDestroyedListener.h>
+#include <toadlet/peeper/Shader.h>
+#include <toadlet/peeper/Texture.h>
 #include <toadlet/peeper/ConstantBuffer.h>
 #include <toadlet/peeper/UpdateParameter.h>
-#include <toadlet/peeper/Shader.h>
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API ShaderData{
+class TOADLET_API ShaderState{
 public:
-	TOADLET_SHARED_POINTERS(ShaderData);
+	TOADLET_SHARED_POINTERS(ShaderState);
 
-	class ParameterData{
-	public:
-		ParameterData(const egg::String &inname,UpdateParameter::ptr inparameter,int inlocation):
-			name(inname),
-			parameter(inparameter),
-			location(inlocation)
-		{}
+	virtual ~ShaderState(){}
 
-		egg::String name;
-		UpdateParameter::ptr parameter;
-		int location;
-	};
+	virtual ShaderState *getRootShaderState()=0;
 
-	ShaderData(Shader::ptr shader,ConstantBuffer::ptr buffer);
-	virtual ~ShaderData();
+	virtual void setShaderStateDestroyedListener(ShaderStateDestroyedListener *listener)=0;
 
-	void destroy();
+	virtual bool create()=0;
+	virtual void destroy()=0;
 
-	bool addParameter(const egg::String &name,UpdateParameter::ptr parameter);
-
-	void update();
-
-	Shader::ptr shader;
-	ConstantBuffer::ptr buffer;
-	egg::Collection<ParameterData*> parameters;
+	virtual void setShader(Shader::ShaderType type,Shader::ptr shader)=0;
+	virtual Shader::ptr getShader(Shader::ShaderType type)=0;
 };
 
 }

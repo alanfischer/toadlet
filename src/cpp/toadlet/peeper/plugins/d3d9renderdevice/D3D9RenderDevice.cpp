@@ -24,12 +24,13 @@
  ********** Copyright header - do not remove **********/
 
 #include "D3D9RenderDevice.h"
-#include "D3D9Texture.h"
+#include "D3D9PixelBufferRenderTarget.h"
 #include "D3D9RenderTarget.h"
 #include "D3D9RenderState.h"
-#include "D3D9PixelBufferRenderTarget.h"
-#include "D3D9VertexBuffer.h"
+#include "D3D9ShaderState.h"
+#include "D3D9Texture.h"
 #include "D3D9IndexBuffer.h"
+#include "D3D9VertexBuffer.h"
 #include "D3D9VertexFormat.h"
 #if !defined(TOADLET_SET_D3DM)
 	#include "D3D9Query.h"
@@ -231,6 +232,10 @@ Query *D3D9RenderDevice::createQuery(){
 
 RenderState *D3D9RenderDevice::createRenderState(){
 	return new D3D9RenderState(this);
+}
+
+ShaderState *D3D9RenderDevice::createShaderState(){
+	return new D3D9ShaderState(this);
 }
 
 bool D3D9RenderDevice::setRenderTarget(RenderTarget *target){
@@ -523,24 +528,18 @@ bool D3D9RenderDevice::setRenderState(RenderState *renderState){
 	return true;
 }
 
-bool D3D9RenderDevice::setShader(Shader::ShaderType type,Shader *shader,ShaderData *shaderData){
-	D3D9Shader *d3d9shader=(D3D9Shader*)shader->getRootShader();
-	IUnknown *id3d9shader=NULL;
-	if(shader!=NULL){
-		id3d9shader=d3d9shader->mShader;
+bool D3D9RenderDevice::setShaderState(ShaderState *shaderState){
+	D3D9ShaderState *d3d9shaderState=NULL;
+	if(shaderState!=NULL){
+		d3d9shaderState=(D3D9ShaderState*)shaderState->getRootShaderState();
+		if(d3d9shaderState==NULL){
+			Error::nullPointer(Categories::TOADLET_PEEPER,
+				"ShaderState is not a D3D9ShaderState");
+			return false;
+		}
 	}
 
-	HRESULT result=E_FAIL;
-	switch(type){
-		case Shader::ShaderType_VERTEX:
-			mD3DDevice->SetVertexShader((IDirect3DVertexShader9*)id3d9shader);
-		break;
-		case Shader::ShaderType_FRAGMENT:
-			mD3DDevice->SetPixelShader((IDirect3DPixelShader9*)id3d9shader);
-		break;
-	}
-
-	return SUCCEEDED(result);
+	return d3d9shaderState->activate();
 }
 
 void D3D9RenderDevice::setBlendState(const BlendState &state){

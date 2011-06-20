@@ -23,9 +23,10 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_GLSLPROGRAM_H
-#define TOADLET_PEEPER_GLSLPROGRAM_H
+#ifndef TOADLET_PEEPER_GLSLSHADERSTATE_H
+#define TOADLET_PEEPER_GLSLSHADERSTATE_H
 
+#include <toadlet/peeper/ShaderState.h>
 #include "GLSLShader.h"
 #include "GLSLVertexLayout.h"
 
@@ -34,18 +35,22 @@ namespace peeper{
 
 class GLVertexFormat;
 
-class GLSLProgram{
+class GLSLShaderState:public ShaderState{
 public:
-	TOADLET_SHARED_POINTERS(GLSLProgram);
+	TOADLET_SHARED_POINTERS(GLSLShaderState);
 
-	GLSLProgram(GLRenderDevice *renderDevice);
-	virtual ~GLSLProgram();
-	
+	GLSLShaderState(GLRenderDevice *renderDevice);
+	virtual ~GLSLShaderState();
+
+	ShaderState *getRootShaderState(){return this;}
+
+	void setShaderStateDestroyedListener(ShaderStateDestroyedListener *listener){mListener=listener;}
+
 	bool create();
 	void destroy();
 
-	bool attachShader(Shader *shader);
-	bool removeShader(Shader *shader);
+	void setShader(Shader::ShaderType type,Shader::ptr shader);
+	Shader::ptr getShader(Shader::ShaderType type);
 
 	bool activate();
 
@@ -54,12 +59,14 @@ public:
 protected:
 	bool createContext();
 	bool destroyContext();
+	bool reflect();
 
 	GLRenderDevice *mDevice;
 
+	ShaderStateDestroyedListener *mListener;
 	GLuint mHandle;
 	bool mNeedsLink;
-	egg::Collection<GLSLShader*> mShaders;
+	egg::Collection<Shader::ptr> mShaders;
 	
 	egg::Collection<GLSLVertexLayout::ptr> mLayouts;
 

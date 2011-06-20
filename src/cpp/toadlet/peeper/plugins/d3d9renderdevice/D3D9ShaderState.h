@@ -23,34 +23,41 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_GLSLVERTEXLAYOUT_H
-#define TOADLET_PEEPER_GLSLVERTEXLAYOUT_H
+#ifndef TOADLET_PEEPER_D3D9SHADERSTATE_H
+#define TOADLET_PEEPER_D3D9SHADERSTATE_H
 
-#include "GLIncludes.h"
-#include "GLVertexFormat.h"
+#include "D3D9Includes.h"
+#include <toadlet/peeper/ShaderState.h>
 
 namespace toadlet{
 namespace peeper{
 
-class GLRenderDevice;
-class GLSLShaderState;
+class D3D9RenderDevice;
 
-class TOADLET_API GLSLVertexLayout{
+class TOADLET_API D3D9ShaderState:public ShaderState{
 public:
-	TOADLET_SHARED_POINTERS(GLSLVertexLayout);
+	D3D9ShaderState(D3D9RenderDevice *renderDevice);
+	virtual ~D3D9ShaderState();
 
-	GLSLVertexLayout(GLRenderDevice *renderDevice);
-	virtual ~GLSLVertexLayout();
+	ShaderState *getRootShaderState(){return this;}
 
-	bool create(GLVertexFormat *vertexFormat,GLSLShaderState *shaderState);
+	void setShaderStateDestroyedListener(ShaderStateDestroyedListener *listener){mListener=listener;}
+
+	bool create(){return true;}
 	void destroy();
 
+	void setShader(Shader::ShaderType type,Shader::ptr shader);
+	Shader::ptr getShader(Shader::ShaderType type);
+
+	bool activate();
+
 protected:
-	GLRenderDevice *mDevice;
+	D3D9RenderDevice *mDevice;
 
-	egg::Collection<int> mSemanticIndexes;
-
-	friend class GLRenderDevice;
+	ShaderStateDestroyedListener *mListener;
+	egg::Collection<Shader::ptr> mShaders;
+	
+	friend class D3D9RenderDevice;
 };
 
 }
