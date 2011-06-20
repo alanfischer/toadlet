@@ -56,6 +56,8 @@ public:
 protected:
 	bool createContext();
 	bool destroyContext();
+	bool reflect();
+	bool activate();
 
 	D3D9RenderDevice *mDevice;
 	IDirect3DDevice9 *mD3DDevice;
@@ -66,8 +68,10 @@ protected:
 
 	IUnknown *mShader;
 	ID3DXBuffer *mBytecode,*mLog;
+	ID3DXConstantTable *mConstantTable;
 
 	friend class D3D9RenderDevice;
+	friend class D3D9ShaderState;
 };
 
 }

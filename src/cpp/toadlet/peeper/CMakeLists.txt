@@ -7,10 +7,11 @@ set (PEEPER_SRC
 	BackableBuffer.cpp
 	BackableVertexFormat.cpp
 	BackablePixelBufferRenderTarget.cpp
+	BackableRenderState.cpp
+	BackableShaderState.cpp
 	BackableTexture.cpp
 	IndexBufferAccessor.cpp
 	IndexData.cpp
-	ShaderData.cpp
 	VertexBufferAccessor.cpp
 	VertexData.cpp
 	Version.cpp
@@ -25,6 +26,7 @@ set (PEEPER_HEADERS
 	BackableTexture.h
 	BackableTextureMipPixelBuffer.h
 	BackableRenderState.h
+	BackableShaderState.h
 	BlendState.h
 	Buffer.h
 	BufferDestroyedListener.h
@@ -48,7 +50,8 @@ set (PEEPER_HEADERS
 	RenderTarget.h
 	SamplerState.h
 	Shader.h
-	ShaderData.h>
+	ShaderState.h
+	ShaderStateDestroyedListener.h>
 	Texture.h
 	TextureState.h
 	Types.h

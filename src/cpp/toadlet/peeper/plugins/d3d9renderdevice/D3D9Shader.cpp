@@ -41,8 +41,9 @@ D3D9Shader::D3D9Shader(D3D9RenderDevice *renderDevice):BaseResource(),
 	//mProfile,
 	//mCode,
 
+	mShader(NULL),
 	mBytecode(NULL),mLog(NULL),
-	mShader(NULL)
+	mConstantTable(NULL)
 {
 	mDevice=renderDevice;
 	mD3DDevice=mDevice->getDirect3DDevice9();
@@ -83,7 +84,7 @@ bool D3D9Shader::createContext(){
 	}
 	
 	HRESULT result=E_FAIL;
-	result=D3DXCompileShader(mCode,mCode.length(),NULL,NULL,function,targetProfile,0,&mBytecode,&mLog,NULL);
+	result=D3DXCompileShader(mCode,mCode.length(),NULL,NULL,function,targetProfile,0,&mBytecode,&mLog,&mConstantTable);
 	if(FAILED(result)){
 		Error::unknown(Categories::TOADLET_PEEPER,(LPCSTR)mLog->GetBufferPointer());
 		return false;
@@ -99,8 +100,12 @@ bool D3D9Shader::createContext(){
 		default:
 			result=E_FAIL;
 	}
+	if(FAILED(result)){
+		Error::unknown(Categories::TOADLET_PEEPER,"unable to create shader");
+		return false;
+	}
 
-	return SUCCEEDED(result);
+	return reflect();
 }
 
 bool D3D9Shader::destroyContext(){
@@ -116,13 +121,62 @@ bool D3D9Shader::destroyContext(){
 		mBytecode=NULL;
 	}
 
-
 	if(mLog!=NULL){
 		mLog->Release();
 		mLog=NULL;
 	}
 
+	if(mConstantTable!=NULL){
+		mConstantTable->Release();
+		mConstantTable=NULL;
+	}
+
 	return SUCCEEDED(result);
+}
+
+bool D3D9Shader::reflect(){
+	D3DXCONSTANTTABLE_DESC tableDesc;
+	HRESULT result=mConstantTable->GetDesc(&tableDesc);
+	if(FAILED(result)){
+		Error::unknown(Categories::TOADLET_PEEPER,"unable to get constant table description");
+		return false;
+	}
+
+	Logger::alert(String("Num Constants:")+tableDesc.Constants);
+
+	int i;
+	for(i=0;i<tableDesc.Constants;++i){
+		D3DXHANDLE handle=mConstantTable->GetConstant(NULL,i);
+		D3DXCONSTANT_DESC constantDesc;
+        unsigned int params=1;
+        result=mConstantTable->GetConstantDesc(handle,&constantDesc,&params);
+
+		Logger::alert(String("Constant name:")+constantDesc.Name+","+constantDesc.RegisterIndex);
+	}
+
+	return true;
+}
+
+bool D3D9Shader::activate(){
+	IDirect3DDevice9 *device=mD3DDevice;
+
+	HRESULT result=S_OK;
+	switch(mShaderType){
+		case ShaderType_VERTEX:
+			result=device->SetVertexShader((IDirect3DVertexShader9*)mShader);
+		break;
+		case ShaderType_FRAGMENT:
+			result=device->SetPixelShader((IDirect3DPixelShader9*)mShader);
+		break;
+		default:
+			result=E_FAIL;
+	}
+	if(FAILED(result)){
+		Error::unknown(Categories::TOADLET_PEEPER,"unable to set shader");
+		return false;
+	}
+
+	return true;
 }
 
 }

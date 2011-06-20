@@ -42,6 +42,7 @@ namespace peeper{
 
 class D3D10Buffer;
 class D3D10Shader;
+class D3D10ShaderState;
 class D3D10VertexFormat;
 
 class D3D10RenderDevice:public RenderDevice{
@@ -67,6 +68,7 @@ public:
 	Shader *createShader();
 	Query *createQuery();
 	RenderState *createRenderState();
+	ShaderState *createShaderState();
 
 	// Rendering operations
 	RenderTarget *getPrimaryRenderTarget(){return mPrimaryRenderTarget;}
@@ -82,8 +84,9 @@ public:
 	bool copyPixelBuffer(PixelBuffer *dst,PixelBuffer *src);
 	void setDefaultState();
 	bool setRenderState(RenderState *renderState);
-	bool setShader(Shader::ShaderType type,Shader *shader,ShaderData *shaderData)=0;
-	void setTexture(int stage,Texture *texture);
+	bool setShaderState(ShaderState *shaderState);
+	void setBuffer(int i,ConstantBuffer *buffer);
+	void setTexture(int stage,Texture *texture){}
 
 	// Old fixed states
 	void setModelMatrix(const Matrix4x4 &matrix){}
@@ -131,7 +134,7 @@ protected:
 	RenderTarget *mRenderTarget;
 	D3D10RenderTarget *mD3DRenderTarget;
 
-	D3D10Shader *mD3DVertexShader,*mD3DFragmentShader,*mD3DGeometryShader;
+	D3D10ShaderState *mLastShaderState;
 	egg::Collection<D3D10Shader*> mVertexShaders;
 	egg::Collection<D3D10VertexFormat*> mVertexFormats;
 

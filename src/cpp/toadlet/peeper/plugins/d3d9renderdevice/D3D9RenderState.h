@@ -36,66 +36,15 @@ class D3D9RenderDevice;
 
 class TOADLET_API D3D9RenderState:public RenderState{
 public:
-	D3D9RenderState(D3D9RenderDevice *renderDevice):
-		mListener(NULL),
-		mBlendState(NULL),
-		mDepthState(NULL),
-		mRasterizerState(NULL),
-		mFogState(NULL),
-		mPointState(NULL),
-		mMaterialState(NULL)
-	{}
-	virtual ~D3D9RenderState(){
-		destroy();
-	}
+	D3D9RenderState(D3D9RenderDevice *renderDevice);
+	virtual ~D3D9RenderState();
 
 	RenderState *getRootRenderState(){return this;}
 
 	void setRenderStateDestroyedListener(RenderStateDestroyedListener *listener){mListener=listener;}
 
 	bool create(){return true;}
-
-	void destroy(){
-		if(mBlendState!=NULL){
-			delete mBlendState;
-			mBlendState=NULL;
-		}
-		if(mDepthState!=NULL){
-			delete mDepthState;
-			mDepthState=NULL;
-		}
-		if(mRasterizerState!=NULL){
-			delete mRasterizerState;
-			mRasterizerState=NULL;
-		}
-		if(mFogState!=NULL){
-			delete mFogState;
-			mFogState=NULL;
-		}
-		if(mPointState!=NULL){
-			delete mPointState;
-			mPointState=NULL;
-		}
-		if(mMaterialState!=NULL){
-			delete mMaterialState;
-			mMaterialState=NULL;
-		}
-
-		int i;
-		for(i=0;i<mSamplerStates.size();++i){
-			delete mSamplerStates[i];
-		}
-		mSamplerStates.clear();
-		for(i=0;i<mTextureStates.size();++i){
-			delete mTextureStates[i];
-		}
-		mTextureStates.clear();
-
-		if(mListener!=NULL){
-			mListener->renderStateDestroyed(this);
-			mListener=NULL;
-		}
-	}
+	void destroy();
 
 	void setBlendState(const BlendState &state){if(mBlendState==NULL){mBlendState=new BlendState(state);}else{mBlendState->set(state);}}
 	bool getBlendState(BlendState &state) const{if(mBlendState==NULL){return false;}else{state.set(*mBlendState);return true;}}

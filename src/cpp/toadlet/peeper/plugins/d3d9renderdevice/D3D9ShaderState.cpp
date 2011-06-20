@@ -23,37 +23,59 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_GLSLVERTEXLAYOUT_H
-#define TOADLET_PEEPER_GLSLVERTEXLAYOUT_H
-
-#include "GLIncludes.h"
-#include "GLVertexFormat.h"
-
+#include "D3D9ShaderState.h"
+#include "D3D9Shader.h"
+ 
 namespace toadlet{
 namespace peeper{
 
-class GLRenderDevice;
-class GLSLShaderState;
+class D3D9RenderDevice;
 
-class TOADLET_API GLSLVertexLayout{
-public:
-	TOADLET_SHARED_POINTERS(GLSLVertexLayout);
+D3D9ShaderState::D3D9ShaderState(D3D9RenderDevice *renderDevice):
+	mDevice(NULL),
+	
+	mListener(NULL)
+	//mShaders
+{
+	mDevice=renderDevice;
+}
 
-	GLSLVertexLayout(GLRenderDevice *renderDevice);
-	virtual ~GLSLVertexLayout();
+D3D9ShaderState::~D3D9ShaderState(){
+	destroy();
+}
 
-	bool create(GLVertexFormat *vertexFormat,GLSLShaderState *shaderState);
-	void destroy();
+void D3D9ShaderState::destroy(){
+	mShaders.clear();
+}
 
-protected:
-	GLRenderDevice *mDevice;
+void D3D9ShaderState::setShader(Shader::ShaderType type,Shader::ptr shader){
+	if(mShaders.size()<=type){
+		mShaders.resize(type+1);
+	}
 
-	egg::Collection<int> mSemanticIndexes;
+	mShaders[type]=shader;
+}
 
-	friend class GLRenderDevice;
-};
+Shader::ptr D3D9ShaderState::getShader(Shader::ShaderType type){
+	if(mShaders.size()<=type){
+		return NULL;
+	}
+
+	return mShaders[type];
+}
+
+bool D3D9ShaderState::activate(){
+	bool result=true;
+
+	int i;
+	for(i=0;i<mShaders.size();++i){
+		Shader *shader=mShaders[i];
+		D3D9Shader *d3d9shader=(shader!=NULL)?(D3D9Shader*)shader->getRootShader():NULL;
+		result|=d3d9shader->activate();
+	}
+
+	return result;
+}
 
 }
 }
-
-#endif

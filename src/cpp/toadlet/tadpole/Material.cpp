@@ -25,6 +25,7 @@
 
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/BackableRenderState.h>
+#include <toadlet/peeper/BackableShaderState.h>
 #include <toadlet/peeper/RenderCaps.h>
 #include <toadlet/tadpole/Material.h>
 
@@ -34,7 +35,7 @@ using namespace toadlet::peeper;
 namespace toadlet{
 namespace tadpole{
 
-Material::Material(RenderState::ptr renderState):BaseResource(),
+Material::Material(RenderState::ptr renderState,ShaderState::ptr shaderState):BaseResource(),
 	//mFogState,
 	//mBlendState,
 	mSort(SortType_MATERIAL),
@@ -48,6 +49,12 @@ Material::Material(RenderState::ptr renderState):BaseResource(),
 	}
 
 	mRenderState=renderState;
+
+	if(shaderState==NULL){
+		shaderState=ShaderState::ptr(new BackableShaderState());
+	}
+
+	mShaderState=shaderState;
 }
 
 Material::~Material(){
@@ -56,6 +63,7 @@ Material::~Material(){
 
 void Material::destroy(){
 	mRenderState->destroy();
+	mShaderState->destroy();
 
 	int i;
 	for(i=0;i<mTextures.size();++i){
@@ -97,6 +105,14 @@ void Material::setTextureName(int i,const String &name){
 	mTextureNames[i]=name;
 }
 
+void Material::setShader(Shader::ShaderType type,Shader::ptr shader){
+	mShaderState->setShader(type,shader);
+}
+
+Shader::ptr Material::getShader(Shader::ShaderType type){
+	return mShaderState->getShader(type);
+}
+
 bool Material::isDepthSorted() const{
 	switch(mSort){
 		case SortType_DEPTH:
@@ -113,6 +129,7 @@ bool Material::isDepthSorted() const{
 /// @todo: Optimize this so we're not resetting a ton of texture states, and not requesting the caps
 void Material::setupRenderDevice(RenderDevice *renderDevice){
 	renderDevice->setRenderState(mRenderState);
+	renderDevice->setShaderState(mShaderState);
 
 	RenderCaps caps;
 	renderDevice->getRenderCaps(caps);

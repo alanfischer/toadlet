@@ -26,6 +26,7 @@
 #ifndef TOADLET_PEEPER_BACKABLERENDERSTATE_H
 #define TOADLET_PEEPER_BACKABLERENDERSTATE_H
 
+#include <toadlet/egg/Collection.h>
 #include <toadlet/peeper/RenderState.h>
 
 namespace toadlet{
@@ -35,70 +36,15 @@ class TOADLET_API BackableRenderState:public RenderState{
 public:
 	TOADLET_SHARED_POINTERS(BackableRenderState);
 
-	BackableRenderState():
-		mListener(NULL),
-		mBlendState(NULL),
-		mDepthState(NULL),
-		mRasterizerState(NULL),
-		mFogState(NULL),
-		mPointState(NULL),
-		mMaterialState(NULL)
-	{}
+	BackableRenderState();
 	virtual ~BackableRenderState(){}
 
 	virtual RenderState *getRootRenderState(){return mBack;}
 
 	virtual void setRenderStateDestroyedListener(RenderStateDestroyedListener *listener){mListener=listener;}
 
-	virtual bool create(){
-		return true;
-	}
-
-	virtual void destroy(){
-		if(mBack!=NULL){
-			mBack->destroy();
-			mBack=NULL;
-		}
-
-		if(mBlendState!=NULL){
-			delete mBlendState;
-			mBlendState=NULL;
-		}
-		if(mDepthState!=NULL){
-			delete mDepthState;
-			mDepthState=NULL;
-		}
-		if(mRasterizerState!=NULL){
-			delete mRasterizerState;
-			mRasterizerState=NULL;
-		}
-		if(mFogState!=NULL){
-			delete mFogState;
-			mFogState=NULL;
-		}
-		if(mPointState!=NULL){
-			delete mPointState;
-			mPointState=NULL;
-		}
-		if(mMaterialState!=NULL){
-			delete mMaterialState;
-			mMaterialState=NULL;
-		}
-		int i;
-		for(i=0;i<mSamplerStates.size();++i){
-			delete mSamplerStates[i];
-		}
-		mSamplerStates.clear();
-		for(i=0;i<mTextureStates.size();++i){
-			delete mTextureStates[i];
-		}
-		mTextureStates.clear();
-
-		if(mListener!=NULL){
-			mListener->renderStateDestroyed(this);
-			mListener=NULL;
-		}
-	}
+	virtual bool create(){return true;}
+	virtual void destroy();
 
 	virtual void setBlendState(const BlendState &state){
 		if(mBlendState==NULL){mBlendState=new BlendState(state);}else{mBlendState->set(state);}
@@ -162,29 +108,7 @@ public:
 	}
 	virtual bool getTextureState(int i,TextureState &state) const{if(mTextureStates.size()<=i || mTextureStates[i]==NULL){return false;}else{state.set(*mTextureStates[i]);return true;}}
 
-	virtual void setBack(RenderState::ptr back){
-		if(back!=mBack && mBack!=NULL){
-			mBack->destroy();
-		}
-
-		mBack=back;
-		
-		if(mBack!=NULL){
-			if(mBlendState!=NULL){mBack->setBlendState(*mBlendState);}
-			if(mDepthState!=NULL){mBack->setDepthState(*mDepthState);}
-			if(mRasterizerState!=NULL){mBack->setRasterizerState(*mRasterizerState);}
-			if(mFogState!=NULL){mBack->setFogState(*mFogState);}
-			if(mPointState!=NULL){mBack->setPointState(*mPointState);}
-			if(mMaterialState!=NULL){mBack->setMaterialState(*mMaterialState);}
-			int i;
-			for(i=0;i<mSamplerStates.size();++i){
-				if(mSamplerStates[i]!=NULL){mBack->setSamplerState(i,*mSamplerStates[i]);}
-			}
-			for(i=0;i<mTextureStates.size();++i){
-				if(mTextureStates[i]!=NULL){mBack->setTextureState(i,*mTextureStates[i]);}
-			}
-		}
-	}
+	virtual void setBack(RenderState::ptr back);
 	virtual RenderState::ptr getBack(){return mBack;}
 
 protected:

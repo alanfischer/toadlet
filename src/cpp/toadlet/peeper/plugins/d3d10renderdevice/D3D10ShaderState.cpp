@@ -23,37 +23,63 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_GLSLVERTEXLAYOUT_H
-#define TOADLET_PEEPER_GLSLVERTEXLAYOUT_H
-
-#include "GLIncludes.h"
-#include "GLVertexFormat.h"
+#include "D3D10ShaderState.h"
+#include "D3D10RenderDevice.h"
+#include "D3D10Shader.h"
 
 namespace toadlet{
 namespace peeper{
 
-class GLRenderDevice;
-class GLSLShaderState;
+D3D10ShaderState::D3D10ShaderState(D3D10RenderDevice *renderDevice):
+	mDevice(NULL),
 
-class TOADLET_API GLSLVertexLayout{
-public:
-	TOADLET_SHARED_POINTERS(GLSLVertexLayout);
+	mListener(NULL)
+	//mShaders
+{
+	mDevice=renderDevice;
+}
 
-	GLSLVertexLayout(GLRenderDevice *renderDevice);
-	virtual ~GLSLVertexLayout();
+D3D10ShaderState::~D3D10ShaderState(){
+	destroy();
+}
 
-	bool create(GLVertexFormat *vertexFormat,GLSLShaderState *shaderState);
-	void destroy();
+void D3D10ShaderState::destroy(){
+	mShaders.clear();
 
-protected:
-	GLRenderDevice *mDevice;
+	if(mListener!=NULL){
+		mListener->shaderStateDestroyed(this);
+		mListener=NULL;
+	}
+}
 
-	egg::Collection<int> mSemanticIndexes;
+void D3D10ShaderState::setShader(Shader::ShaderType type,Shader::ptr shader){
+	if(mShaders.size()<=type){
+		mShaders.resize(type+1);
+	}
 
-	friend class GLRenderDevice;
-};
+	mShaders[type]=shader;
+}
+
+Shader::ptr D3D10ShaderState::getShader(Shader::ShaderType type){
+	if(mShaders.size()<=type){
+		return NULL;
+	}
+
+	return mShaders[type];
+}
+
+bool D3D10ShaderState::activate(){
+	bool result=true;
+
+	int i;
+	for(i=0;i<mShaders.size();++i){
+		Shader *shader=mShaders[i];
+		D3D10Shader *d3d10shader=(shader!=NULL)?(D3D10Shader*)shader->getRootShader():NULL;
+		result|=d3d10shader->activate();
+	}
+
+	return result;
+}
 
 }
 }
-
-#endif

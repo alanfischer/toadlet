@@ -23,7 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include "GLSLProgram.h"
+#include "GLSLShaderState.h"
 #include "GLVertexFormat.h"
 #include "GLSLVertexLayout.h"
 #include "GLRenderDevice.h"
@@ -33,9 +33,10 @@ using namespace toadlet::egg;
 namespace toadlet{
 namespace peeper{
 
-GLSLProgram::GLSLProgram(GLRenderDevice *renderDevice):
+GLSLShaderState::GLSLShaderState(GLRenderDevice *renderDevice):
 	mDevice(NULL),
 
+	mListener(NULL),
 	mHandle(0),
 	mNeedsLink(false)
 	//mShaders
@@ -43,27 +44,27 @@ GLSLProgram::GLSLProgram(GLRenderDevice *renderDevice):
 	mDevice=renderDevice;
 }
 
-GLSLProgram::~GLSLProgram(){
+GLSLShaderState::~GLSLShaderState(){
 	destroy();
 }
 
-bool GLSLProgram::create(){
+bool GLSLShaderState::create(){
 	bool result=createContext();
 
 	if(mDevice!=NULL){
-		mDevice->programCreated(this);
+		mDevice->shaderStateCreated(this);
 	}
 
 	return result;
 }
 
-void GLSLProgram::destroy(){
+void GLSLShaderState::destroy(){
 	destroyContext();
 
 	mShaders.clear();
 
 	if(mDevice!=NULL){
-		mDevice->programDestroyed(this);
+		mDevice->shaderStateDestroyed(this);
 	}
 
 	int i;
@@ -74,34 +75,45 @@ void GLSLProgram::destroy(){
 		}
 	}
 	mLayouts.clear();
+
+	if(mListener!=NULL){
+		mListener->shaderStateDestroyed(this);
+		mListener=NULL;
+	}
 }
 
-bool GLSLProgram::attachShader(Shader *shader){
+void GLSLShaderState::setShader(Shader::ShaderType type,Shader::ptr shader){
 	GLSLShader *glshader=(GLSLShader*)shader->getRootShader();
 
-	glAttachShader(mHandle,glshader->mHandle);
+	if(mShaders.size()<=type){
+		mShaders.resize(type+1);
+	}
 
-	mShaders.add(glshader);
+	if(mShaders[type]!=NULL){
+		glDetachShader(mHandle,glshader->mHandle);
+	}
 
-	mNeedsLink=true;
+	mShaders[type]=shader;
 
-	return true;
-}
-
-bool GLSLProgram::removeShader(Shader *shader){
-	GLSLShader *glshader=(GLSLShader*)shader->getRootShader();
-
-	glDetachShader(mHandle,glshader->mHandle);
-
-	mShaders.remove(glshader);
+	if(mShaders[type]!=NULL){
+		glAttachShader(mHandle,glshader->mHandle);
+	}
 
 	mNeedsLink=true;
-
-	return true;
 }
 
-bool GLSLProgram::activate(){
+Shader::ptr GLSLShaderState::getShader(Shader::ShaderType type){
+	if(mShaders.size()<=type){
+		return NULL;
+	}
+
+	return mShaders[type];
+}
+
+bool GLSLShaderState::activate(){
 	if(mNeedsLink){
+		mNeedsLink=false;
+
 		glLinkProgram(mHandle);
 
 		GLint status=0;
@@ -110,6 +122,8 @@ bool GLSLProgram::activate(){
 			Error::unknown("error linking program");
 			return false;
 		}
+
+		reflect();
 	}
 
 	glUseProgram(mHandle);
@@ -117,7 +131,7 @@ bool GLSLProgram::activate(){
 	return true;
 }
 
-GLSLVertexLayout *GLSLProgram::findVertexLayout(GLVertexFormat *vertexFormat){
+GLSLVertexLayout *GLSLShaderState::findVertexLayout(GLVertexFormat *vertexFormat){
 	int handle=vertexFormat->mUniqueHandle;
 	GLSLVertexLayout::ptr layout;
 	if(handle<mLayouts.size()){
@@ -132,13 +146,13 @@ GLSLVertexLayout *GLSLProgram::findVertexLayout(GLVertexFormat *vertexFormat){
 	return layout;
 }
 
-bool GLSLProgram::createContext(){
+bool GLSLShaderState::createContext(){
 	mHandle=glCreateProgram();
 	
 	return true;
 }
 
-bool GLSLProgram::destroyContext(){
+bool GLSLShaderState::destroyContext(){
 	if(mHandle!=0){
 		glDeleteProgram(mHandle);
 		mHandle=0;
@@ -147,6 +161,55 @@ bool GLSLProgram::destroyContext(){
 		TOADLET_CHECK_GLERROR("GLSLProgram::destroy");
 	}
 	
+	return true;
+}
+
+bool GLSLShaderState::reflect(){
+	int numUniforms=0;
+	glGetProgramiv(mHandle,GL_ACTIVE_UNIFORMS,&numUniforms);
+
+	GLchar name[128];
+	GLsizei nameLength=0;
+	GLint size=0;
+	GLenum type=0;
+
+	Logger::alert(String("Num Uniforms:")+numUniforms);
+
+	int i;
+	for(i=0;i<numUniforms;++i){
+		glGetActiveUniform(mHandle,i,sizeof(name),&nameLength,&size,&type,name);
+
+		//GL_UNIFORM_OFFSET,GL_UNIFORM_SIZE,GL_UNIFORM_ARRAY_STRIDE
+
+		Logger::alert(String("Uniform name:")+name);
+	}
+
+	#if defined(TOADLET_HAS_GLUBOS)
+		int numUniformBlocks=0;
+		glGetProgramiv(mHandle,GL_ACTIVE_UNIFORM_BLOCKS,&numUniformBlocks);
+
+		for(i=0;i<numUniformBlocks;++i){
+			glGetActiveUniformBlockName(mHandle,i,sizeof(name),&nameLength,name);
+
+			//GL_UNIFORM_BLOCK_DATA_SIZE
+
+			numUniforms=0;
+			glGetActiveUniformBlockiv(mHandle,i,GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS,&numUniforms);
+
+			Logger::alert(String("Uniform Block:")+name+" Uniforms:"+numUniforms);
+
+			GLint *indexes=new GLint[numUniforms];
+			glGetActiveUniformBlockiv(mHandle,i,GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES,indexes);
+
+			int j;
+			for(j=0;j<numUniforms;++j){
+				Logger::alert(String("Uniform block uniform index:")+indexes[j]);
+			}
+
+			delete[] indexes;
+		}
+	#endif
+
 	return true;
 }
 

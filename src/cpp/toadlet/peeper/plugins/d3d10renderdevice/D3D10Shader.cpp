@@ -43,7 +43,8 @@ D3D10Shader::D3D10Shader(D3D10RenderDevice *renderDevice):BaseResource(),
 	//mCode,
 
 	mBytecode(NULL),mLog(NULL),
-	mShader(NULL)
+	mShader(NULL),
+	mReflector(NULL)
 {
 	mDevice=renderDevice;
 	mD3DDevice=mDevice->getD3D10Device();
@@ -125,12 +126,29 @@ bool D3D10Shader::createContext(){
 		default:
 			result=E_FAIL;
 	}
+	if(FAILED(result)){
+		Error::unknown(Categories::TOADLET_PEEPER,"unable to create shader");
+		return false;
+	}
 
-	return SUCCEEDED(result);
+	#if defined(TOADLET_SET_D3D10)
+		result=D3D10ReflectShader(mBytecode->GetBufferPointer(),mBytecode->GetBufferSize(),&mReflector);
+	#endif
+	if(FAILED(result)){
+		Error::unknown(Categories::TOADLET_PEEPER,"unable to reflect shader");
+		return false;
+	}
+
+	return reflect();
 }
 
 bool D3D10Shader::destroyContext(){
 	HRESULT result=S_OK;
+
+	if(mReflector!=NULL){
+		result=mReflector->Release();
+		mReflector=NULL;
+	}
 
 	if(mShader!=NULL){
 		result=mShader->Release();
@@ -164,6 +182,60 @@ ID3D10InputLayout *D3D10Shader::findInputLayout(D3D10VertexFormat *vertexFormat)
 		mLayouts[handle]=layout;
 	}
 	return layout;
+}
+
+bool D3D10Shader::reflect(){
+	D3D10_SHADER_DESC desc;
+	HRESULT result=mReflector->GetDesc(&desc);
+	if(FAILED(result)){
+		Error::unknown(Categories::TOADLET_PEEPER,"unable to get reflection description");
+	}
+
+	Logger::alert(String("Num Constant Buffers:")+desc.ConstantBuffers);
+	int i;
+	for(i=0;i<desc.ConstantBuffers;++i){
+		ID3D10ShaderReflectionConstantBuffer *buffer=mReflector->GetConstantBufferByIndex(i);
+
+		D3D10_SHADER_BUFFER_DESC bufferDesc;
+		buffer->GetDesc(&bufferDesc);
+		Logger::alert(String("Buffer:")+bufferDesc.Name+" Variables:"+bufferDesc.Variables);
+
+		int j;
+		for(j=0;j<bufferDesc.Variables;++j){
+			ID3D10ShaderReflectionVariable *variable=buffer->GetVariableByIndex(j);
+
+			D3D10_SHADER_VARIABLE_DESC variableDesc;
+			variable->GetDesc(&variableDesc);
+			Logger::alert(String("Variable Name:")+variableDesc.Name);
+		}
+	}
+
+	Logger::alert(String("Num Resources:")+desc.BoundResources);
+	for(i=0;i<desc.BoundResources;++i){
+		D3D10_SHADER_INPUT_BIND_DESC bindDesc;
+		mReflector->GetResourceBindingDesc(i,&bindDesc);
+		Logger::alert(String("Resource Name:")+bindDesc.Name+" :"+bindDesc.BindPoint);
+	}
+
+	return true;
+}
+
+bool D3D10Shader::activate(){
+	ID3D10Device *device=mD3DDevice;
+
+	switch(mShaderType){
+		case ShaderType_VERTEX:
+			device->VSSetShader((ID3D10VertexShader*)mShader);
+		break;
+		case ShaderType_FRAGMENT:
+			device->PSSetShader((ID3D10PixelShader*)mShader);
+		break;
+		case ShaderType_GEOMETRY:
+			device->GSSetShader((ID3D10GeometryShader*)mShader);
+		break;
+	}
+
+	return true;
 }
 
 }

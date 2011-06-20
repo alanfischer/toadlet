@@ -47,7 +47,7 @@ public:
 
 	virtual int getSize() const=0;
 
-	virtual void setConstant(int location,tbyte *data,int size)=0;
+	virtual void setConstant(int location,float *data,int size)=0;
 };
 
 }

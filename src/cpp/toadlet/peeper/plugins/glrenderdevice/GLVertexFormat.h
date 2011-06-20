@@ -77,7 +77,7 @@ protected:
 
 	friend class GLRenderDevice;
 	friend class GLBuffer;
-	friend class GLSLProgram;
+	friend class GLSLShaderState;
 };
 
 }

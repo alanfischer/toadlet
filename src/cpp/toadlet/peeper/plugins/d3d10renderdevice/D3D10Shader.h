@@ -55,9 +55,12 @@ public:
 
 	ID3D10InputLayout *findInputLayout(D3D10VertexFormat *vertexFormat);
 
+	bool activate();
+
 protected:
 	bool createContext();
 	bool destroyContext();
+	bool reflect();
 
 	D3D10RenderDevice *mDevice;
 	ID3D10Device *mD3DDevice;
@@ -68,7 +71,8 @@ protected:
 
 	ID3D10DeviceChild *mShader;
 	ID3D10Blob *mBytecode,*mLog;
-	
+	ID3D10ShaderReflection *mReflector;
+
 	egg::Collection<ID3D10InputLayout*> mLayouts;
 
 	friend class D3D10RenderDevice;

@@ -65,6 +65,7 @@ public:
 	Shader *createShader();
 	Query *createQuery();
 	RenderState *createRenderState();
+	ShaderState *createShaderState();
 
 	// Rendering operations
 	RenderTarget *getPrimaryRenderTarget(){return mPrimaryRenderTarget;}
@@ -81,7 +82,8 @@ public:
 	bool copySurface(IDirect3DSurface9 *dst,IDirect3DSurface9 *src);
 	void setDefaultState();
 	bool setRenderState(RenderState *renderState);
-	bool setShader(Shader::ShaderType type,Shader *shader,ShaderData *shaderData);
+	bool setShaderState(ShaderState *shaderState);
+	void setBuffer(int i,ConstantBuffer *buffer){}
 	void setTexture(int i,Texture *texture);
 
 	// Old fixed states

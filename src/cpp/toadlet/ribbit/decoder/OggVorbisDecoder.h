@@ -62,11 +62,6 @@ public:
 	AudioFormat::ptr getAudioFormat(){return mFormat;}
 
 private:
-	static size_t read_func(void *ptr,size_t size,size_t nmemb, void *datasource);
-	static int seek_func(void *datasource, int64 offset, int whence);
-	static int close_func(void *datasource);
-	static long tell_func(void *datasource);
-
 	OggVorbis_File *mVorbisFile;
 	vorbis_info *mVorbisInfo;
 	char mDataBuffer[OGGPACKETSIZE];

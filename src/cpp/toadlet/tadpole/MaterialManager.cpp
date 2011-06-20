@@ -26,6 +26,7 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/BackableRenderState.h>
+#include <toadlet/peeper/BackableShaderState.h>
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/MaterialManager.h>
@@ -59,6 +60,8 @@ void MaterialManager::destroy(){
 
 Material::ptr MaterialManager::createMaterial(Texture::ptr texture,bool clamped,Material::ptr sharedSource){
 	RenderState::ptr renderState;
+	ShaderState::ptr shaderState;
+
 	if(sharedSource==NULL){
 		renderState=createRenderState();
 	}
@@ -66,7 +69,9 @@ Material::ptr MaterialManager::createMaterial(Texture::ptr texture,bool clamped,
 		renderState=sharedSource->getRenderState();
 	}
 
-	Material::ptr material(new Material(renderState));
+	shaderState=createShaderState();
+
+	Material::ptr material(new Material(renderState,shaderState));
 
 	if(sharedSource==NULL){
 		material->setBlendState(BlendState());
@@ -160,6 +165,35 @@ RenderState::ptr MaterialManager::createRenderState(){
 	return renderState;
 }
 
+ShaderState::ptr MaterialManager::createShaderState(){
+	ShaderState::ptr shaderState;
+
+	if(mBackable || mEngine->getRenderDevice()==NULL){
+		Logger::debug(Categories::TOADLET_TADPOLE,"creating BackableShaderState");
+
+		BackableShaderState::ptr backableShaderState(new BackableShaderState());
+		backableShaderState->create();
+		if(mEngine->getRenderDevice()!=NULL){
+			ShaderState::ptr back(mEngine->getRenderDevice()->createShaderState());
+			backableShaderState->setBack(back);
+		}
+		shaderState=backableShaderState;
+	}
+	else{
+		Logger::debug(Categories::TOADLET_TADPOLE,"creating ShaderState");
+
+		shaderState=ShaderState::ptr(mEngine->getRenderDevice()->createShaderState());
+		if(shaderState->create()==false){
+			return NULL;
+		}
+	}
+
+	shaderState->setShaderStateDestroyedListener(this);
+	mShaderStates.add(shaderState);
+
+	return shaderState;
+}
+
 void MaterialManager::modifyRenderState(RenderState::ptr dst,RenderState::ptr src){
 	BlendState blendState;
 	if(src->getBlendState(blendState)) dst->setBlendState(blendState);
@@ -213,6 +247,10 @@ void MaterialManager::contextDeactivate(RenderDevice *renderDevice){
 
 void MaterialManager::renderStateDestroyed(RenderState *renderState){
 	mRenderStates.remove(renderState);
+}
+
+void MaterialManager::shaderStateDestroyed(ShaderState *shaderState){
+	mShaderStates.remove(shaderState);
 }
 
 Resource::ptr MaterialManager::unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData){

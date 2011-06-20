@@ -31,6 +31,7 @@
 #include "D3D10RenderState.h"
 #include "D3D10RenderTarget.h"
 #include "D3D10Shader.h"
+#include "D3D10ShaderState.h"
 #include "D3D10Texture.h"
 #include "D3D10VertexFormat.h"
 #include <toadlet/egg/MathConversion.h>
@@ -69,7 +70,9 @@ D3D10RenderDevice::D3D10RenderDevice():
 	mRenderTarget(NULL),
 	mD3DRenderTarget(NULL),
 
-	mD3DVertexShader(NULL),mD3DFragmentShader(NULL),mD3DGeometryShader(NULL)
+	mLastShaderState(NULL)
+	//mVertexShaders,
+	//mVertexFormats
 {}
 
 D3D10RenderDevice::~D3D10RenderDevice(){
@@ -189,6 +192,10 @@ RenderState *D3D10RenderDevice::createRenderState(){
 	return new D3D10RenderState(this);
 }
 
+ShaderState *D3D10RenderDevice::createShaderState(){
+	return new D3D10ShaderState(this);
+}
+
 bool D3D10RenderDevice::setRenderTarget(RenderTarget *target){
 	D3D10RenderTarget *d3dtarget=NULL;
 	if(target!=NULL){
@@ -209,61 +216,6 @@ bool D3D10RenderDevice::setRenderTarget(RenderTarget *target){
 
 	if(mD3DRenderTarget!=NULL){
 		mD3DRenderTarget->activate();
-	}
-
-	return true;
-}
-
-bool D3D10RenderDevice::setShader(Shader::ShaderType type,Shader *shader,ShaderData *shaderData){
-	D3D10Shader *d3dShader=NULL;
-	if(shader!=NULL){
-		d3dShader=(D3D10Shader*)shader->getRootShader();
-	}
-
-	switch(type){
-		case Shader::ShaderType_VERTEX:
-			mD3DVertexShader=d3dShader;
-			if(d3dShader!=NULL){
-				mD3DDevice->VSSetShader((ID3D10VertexShader*)d3dShader->mShader);
-			}
-		break;
-		case Shader::ShaderType_FRAGMENT:
-			mD3DFragmentShader=d3dShader;
-			if(d3dShader!=NULL){
-				mD3DDevice->PSSetShader((ID3D10PixelShader*)d3dShader->mShader);
-			}
-		break;
-		case Shader::ShaderType_GEOMETRY:
-			mD3DGeometryShader=d3dShader;
-			if(d3dShader!=NULL){
-				mD3DDevice->GSSetShader((ID3D10GeometryShader*)d3dShader->mShader);
-			}
-		break;
-	}
-
-	return true;
-}
-
-bool D3D10RenderDevice::setConstantBuffer(Shader::ShaderType type,ConstantBuffer *buffer){
-	D3D10Buffer *d3dBuffer=NULL;
-	if(buffer!=NULL){
-		d3dBuffer=(D3D10Buffer*)buffer->getRootConstantBuffer();
-	}
-
-	if(d3dBuffer==NULL){
-		return true;
-	}
-
-	switch(type){
-		case Shader::ShaderType_VERTEX:
-			mD3DDevice->VSSetConstantBuffers(0,1,&d3dBuffer->mBuffer);
-		break;
-		case Shader::ShaderType_FRAGMENT:
-			mD3DDevice->PSSetConstantBuffers(0,1,&d3dBuffer->mBuffer);
-		break;
-		case Shader::ShaderType_GEOMETRY:
-			mD3DDevice->GSSetConstantBuffers(0,1,&d3dBuffer->mBuffer);
-		break;
 	}
 
 	return true;
@@ -301,11 +253,6 @@ void D3D10RenderDevice::endScene(){
 	mD3DDevice->IASetIndexBuffer(NULL,(DXGI_FORMAT)0,0);
 
 	mD3DDevice->IASetInputLayout(NULL);
-
-	int i;
-	for(i=0;i<mCaps.maxTextureStages;++i){
-		setTexture(i,NULL);
-	}
 }
 
 void D3D10RenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexData){
@@ -325,8 +272,11 @@ void D3D10RenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexD
 
 	// Set input layout
 	ID3D10InputLayout *id3dLayout=NULL;
-	if(mD3DVertexShader!=NULL){
-		id3dLayout=mD3DVertexShader->findInputLayout(d3dVertexFormat);
+	if(mLastShaderState!=NULL){
+		Shader *shader=mLastShaderState->getShader(Shader::ShaderType_VERTEX);
+		if(shader!=NULL){
+			id3dLayout=((D3D10Shader*)shader->getRootShader())->findInputLayout(d3dVertexFormat);
+		}
 	}
 	mD3DDevice->IASetInputLayout(id3dLayout);
 
@@ -447,16 +397,43 @@ effect->GetVariableByName("diffuseColor")->AsVector()->SetFloatVector((float*)d3
 	return true;
 }
 
-void D3D10RenderDevice::setTexture(int i,Texture *texture){
-	if(i>0)return;
-
-	ID3D10ShaderResourceView *textureView=NULL;
-	Matrix4x4 textureMatrix;
-	if(texture){
-		textureView=((D3D10Texture*)(texture->getRootTexture()))->mShaderResourceView;
+bool D3D10RenderDevice::setShaderState(ShaderState *shaderState){
+	D3D10ShaderState *d3dshaderState=NULL;
+	if(shaderState!=NULL){
+		d3dshaderState=(D3D10ShaderState*)shaderState->getRootShaderState();
+		if(d3dshaderState==NULL){
+			Error::nullPointer(Categories::TOADLET_PEEPER,
+				"RenderState is not a D3D10ShaderState");
+			return false;
+		}
 	}
-//effect->GetVariableByName("diffuseTexture")->AsShaderResource()->SetResource(textureView);
-//effect->GetVariableByName("useTexture")->AsScalar()->SetFloat(texture!=NULL);
+
+	mLastShaderState=d3dshaderState;
+
+	return d3dshaderState->activate();
+}
+
+void D3D10RenderDevice::setBuffer(int i,ConstantBuffer *buffer){
+	D3D10Buffer *d3dBuffer=NULL;
+	if(buffer!=NULL){
+		d3dBuffer=(D3D10Buffer*)buffer->getRootConstantBuffer();
+	}
+	ID3D10Buffer *id3dbuffer=NULL;
+	if(d3dBuffer!=NULL){
+		id3dbuffer=d3dBuffer->mBuffer;
+	}
+
+//	switch(type){
+//		case Shader::ShaderType_VERTEX:
+			mD3DDevice->VSSetConstantBuffers(i,1,&id3dbuffer);
+//		break;
+//		case Shader::ShaderType_FRAGMENT:
+			mD3DDevice->PSSetConstantBuffers(i,1,&id3dbuffer);
+//		break;
+//		case Shader::ShaderType_GEOMETRY:
+			mD3DDevice->GSSetConstantBuffers(i,1,&id3dbuffer);
+//		break;
+//	}
 }
 
 void D3D10RenderDevice::getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result){
