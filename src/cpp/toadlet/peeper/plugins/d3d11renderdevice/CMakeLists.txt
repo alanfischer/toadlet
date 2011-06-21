@@ -39,7 +39,7 @@ add_definitions(-DTOADLET_SET_D3D11)
 
 # Dependencies - note that D3D11 has already been found
 include_directories (${D3D11_INCLUDE_PATH})
-set (PEEPER_D3D11RENDERDEVICE_LIBS ${D3D11_LIBRARIES})
+# We don't add the D3D11_LIBRARIES, since those are dynamically loaded
 
 
 # Dynamic library

@@ -43,7 +43,7 @@ namespace peeper{
 
 D3D9WindowRenderTarget::D3D9WindowRenderTarget():D3D9RenderTarget(),
 	mSamples(0),
-	mLibrary(0),
+	mD3DLibrary(0),mD3DXLibrary(0),
 	mD3D(NULL),
 	mD3DDevice(NULL),
 	mColorSurface(NULL),
@@ -54,8 +54,7 @@ D3D9WindowRenderTarget::D3D9WindowRenderTarget():D3D9RenderTarget(),
 
 D3D9WindowRenderTarget::D3D9WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format):D3D9RenderTarget(),
 	mSamples(0),
-	mLibrary(0),
-	mD3D(NULL),
+	mD3DLibrary(0),mD3DXLibrary(0),
 	mD3DDevice(NULL),
 	mColorSurface(NULL),
 	mDepthSurface(NULL),
@@ -129,23 +128,41 @@ void D3D9WindowRenderTarget::reset(){
 bool D3D9WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *format){
 	HRESULT result;
 
-	mLibrary=LoadLibrary(format->debug?TOADLET_D3D9_DEBUG_DLL_NAME:TOADLET_D3D9_DLL_NAME);
-
-	if(mLibrary==0){
+	char *d3dName=format->debug?TOADLET_D3D9_DEBUG_DLL_NAME:TOADLET_D3D9_DLL_NAME;
+	mD3DLibrary=LoadLibrary(d3dName);
+	if(mD3DLibrary==0){
 		Error::libraryNotFound(Categories::TOADLET_PEEPER,
-			String("D3D9RenderWindow: Error loading ")+TOADLET_D3D9_DLL_NAME);
+			String("D3D9RenderWindow: Error loading ")+d3dName);
 		return false;
 	}
 
-	void *symbol=GetProcAddress(mLibrary,TOADLET_D3D9_CREATE_NAME);
-	if(symbol==NULL){
+	char *createName=TOADLET_D3D9_CREATE_NAME;
+	CreateSymbol=(Direct3DCreate9)GetProcAddress(mD3DLibrary,createName);
+	if(CreateSymbol==NULL){
 		Error::symbolNotFound(Categories::TOADLET_PEEPER,
-			String("D3D9RenderWindow: Error finding ")+TOADLET_D3D9_CREATE_NAME);
+			String("D3D9RenderWindow: Error finding ")+createName);
 		return NULL;
 	}
 
-	typedef IDirect3D9*(WINAPI *Direct3DCreate9)(UINT);
-	mD3D=((Direct3DCreate9)symbol)(D3D_SDK_VERSION);
+	#if defined(TOADLET_D3DX9_DLL_NAME)
+		char *d3dxName=format->debug?TOADLET_D3DX9_DEBUG_DLL_NAME:TOADLET_D3DX9_DLL_NAME;
+		mD3DXLibrary=LoadLibrary(d3dxName);
+		if(mD3DXLibrary==0){
+			Error::libraryNotFound(Categories::TOADLET_PEEPER,
+				String("D3D9RenderWindow: Error loading ")+d3dxName);
+			return false;
+		}
+
+		char *compileShaderName=TOADLET_D3DX9_COMPILE_SHADER_NAME;
+		CompileShaderSymbol=(D3DXCompileShader)GetProcAddress(mD3DXLibrary,compileShaderName);
+		if(CompileShaderSymbol==NULL){
+			Error::symbolNotFound(Categories::TOADLET_PEEPER,
+				String("D3D9RenderWindow: Error finding ")+compileShaderName);
+			return NULL;
+		}
+	#endif
+
+	mD3D=CreateSymbol(D3D_SDK_VERSION);
 	if(mD3D==NULL){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"D3D9RenderWindow: Error creating Direct3D object");
@@ -271,9 +288,14 @@ bool D3D9WindowRenderTarget::destroyContext(){
 		mD3D=NULL;
 	}
 
-	if(mLibrary!=0){
-		FreeLibrary(mLibrary);
-		mLibrary=0;
+	if(mD3DLibrary!=0){
+		FreeLibrary(mD3DLibrary);
+		mD3DLibrary=0;
+	}
+
+	if(mD3DXLibrary!=0){
+		FreeLibrary(mD3DXLibrary);
+		mD3DXLibrary=0;
 	}
 
 	return true;

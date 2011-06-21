@@ -33,7 +33,7 @@ add_definitions(-DTOADLET_SET_D3DM)
 
 # Dependencies - note that D3DM has already been found
 include_directories (${D3DM_INCLUDE_PATH})
-set (PEEPER_D3DMRENDERDEVICE_LIBS ${D3DM_LIBRARIES})
+# We don't add the D3DM_LIBRARIES, since those are dynamically loaded
 
 
 # Dynamic library

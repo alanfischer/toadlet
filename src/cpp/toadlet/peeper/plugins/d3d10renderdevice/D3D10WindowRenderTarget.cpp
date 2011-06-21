@@ -42,7 +42,7 @@ namespace peeper{
 #endif
 
 D3D10WindowRenderTarget::D3D10WindowRenderTarget():D3D10RenderTarget(),
-	mLibrary(0),
+	mD3DLibrary(0),mD3DXLibrary(0),
 	mDXGISwapChain(NULL),
 	mDXGIDevice(NULL),
 	mDXGIAdapter(NULL),
@@ -55,7 +55,7 @@ D3D10WindowRenderTarget::D3D10WindowRenderTarget():D3D10RenderTarget(),
 }
 
 D3D10WindowRenderTarget::D3D10WindowRenderTarget(HWND wnd,WindowRenderTargetFormat *format):D3D10RenderTarget(),
-	mLibrary(0),
+	mD3DLibrary(0),mD3DXLibrary(0),
 	mDXGISwapChain(NULL),
 	mDXGIDevice(NULL),
 	mDXGIAdapter(NULL),
@@ -88,11 +88,39 @@ void D3D10WindowRenderTarget::reset(){
 bool D3D10WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *format){
 	HRESULT result;
 
-	mLibrary=LoadLibrary(TOADLET_D3D10_DLL_NAME);
-	if(mLibrary==0){
+	mD3DLibrary=LoadLibrary(TOADLET_D3D10_DLL_NAME);
+	if(mD3DLibrary==0){
 		Error::libraryNotFound(Categories::TOADLET_PEEPER,
 			String("D3D10RenderWindow: Error loading ")+TOADLET_D3D10_DLL_NAME);
 		return false;
+	}
+
+	CreateDeviceAndSwapChainSymbol=(D3D10CreateDeviceAndSwapChain)GetProcAddress(mD3DLibrary,TOADLET_D3D10_CREATE_DEVICE_AND_SWAP_CHAIN_NAME);
+	if(CreateDeviceAndSwapChainSymbol==NULL){
+		Error::symbolNotFound(Categories::TOADLET_PEEPER,
+			String("D3D10RenderWindow: Error finding ")+TOADLET_D3D10_CREATE_DEVICE_AND_SWAP_CHAIN_NAME);
+		return NULL;
+	}
+
+	ReflectShaderSymbol=(D3D10ReflectShader)GetProcAddress(mD3DLibrary,TOADLET_D3D10_REFLECT_SHADER_NAME);
+	if(ReflectShaderSymbol==NULL){
+		Error::symbolNotFound(Categories::TOADLET_PEEPER,
+			String("D3D10RenderWindow: Error finding ")+TOADLET_D3D10_REFLECT_SHADER_NAME);
+		return NULL;
+	}
+
+	mD3DXLibrary=LoadLibrary(TOADLET_D3DX10_DLL_NAME);
+	if(mD3DXLibrary==0){
+		Error::libraryNotFound(Categories::TOADLET_PEEPER,
+			String("D3D10RenderWindow: Error loading ")+TOADLET_D3DX10_DLL_NAME);
+		return false;
+	}
+
+	CompileFromMemorySymbol=(D3DX10CompileFromMemory)GetProcAddress(mD3DXLibrary,TOADLET_D3DX10_COMPILE_FROM_MEMORY_NAME);
+	if(CompileFromMemorySymbol==NULL){
+		Error::symbolNotFound(Categories::TOADLET_PEEPER,
+			String("D3D10RenderWindow: Error finding ")+TOADLET_D3DX10_COMPILE_FROM_MEMORY_NAME);
+		return NULL;
 	}
 
 	mWindow=wnd;
@@ -112,13 +140,6 @@ bool D3D10WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *f
 	desc.SampleDesc.Quality=0;
 	desc.Windowed=TRUE;
 
-	void *symbol=GetProcAddress(mLibrary,TOADLET_D3D10_CREATE_DEVICE_AND_SWAP_CHAIN_NAME);
-	if(symbol==NULL){
-		Error::symbolNotFound(Categories::TOADLET_PEEPER,
-			String("D3D10RenderWindow: Error finding ")+TOADLET_D3D10_CREATE_DEVICE_AND_SWAP_CHAIN_NAME);
-		return NULL;
-	}
-
 	int flags=format->flags;
 
 	if(format->debug){
@@ -129,8 +150,7 @@ bool D3D10WindowRenderTarget::createContext(HWND wnd,WindowRenderTargetFormat *f
 		flags|=D3D10_CREATE_DEVICE_SINGLETHREADED;
 	}
 
-	typedef HRESULT(WINAPI *D3D10CreateDeviceAndSwapChain)(IDXGIAdapter *pAdapter,D3D10_DRIVER_TYPE DriverType,HMODULE Software,UINT Flags,UINT SDKVersion,DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,IDXGISwapChain **ppSwapChain,ID3D10Device **ppDevice);
-	result=((D3D10CreateDeviceAndSwapChain)symbol)(NULL,D3D10_DRIVER_TYPE_HARDWARE,NULL,flags,D3D10_SDK_VERSION,&desc,&mDXGISwapChain,&mD3DDevice);
+	result=CreateDeviceAndSwapChainSymbol(NULL,D3D10_DRIVER_TYPE_HARDWARE,NULL,flags,D3D10_SDK_VERSION,&desc,&mDXGISwapChain,&mD3DDevice);
 	if(FAILED(result) || mD3DDevice==NULL){
 		Error::unknown(Categories::TOADLET_PEEPER,
 			"D3D10RenderWindow: Error creating D3D10Device object");
@@ -192,9 +212,14 @@ bool D3D10WindowRenderTarget::destroyContext(){
 		mDXGIAdapter=NULL;
 	}
 
-	if(mLibrary!=0){
-		FreeLibrary(mLibrary);
-		mLibrary=0;
+	if(mD3DLibrary!=0){
+		FreeLibrary(mD3DLibrary);
+		mD3DLibrary=0;
+	}
+
+	if(mD3DXLibrary!=0){
+		FreeLibrary(mD3DXLibrary);
+		mD3DXLibrary=0;
 	}
 
 	return true;

@@ -44,7 +44,7 @@ add_definitions(-DTOADLET_SET_D3D9)
 
 # Dependencies - note that D3D9 has already been found
 include_directories (${D3D9_INCLUDE_PATH})
-set (PEEPER_D3D9RENDERDEVICE_LIBS ${D3D9_LIBRARIES})
+# We don't add the D3D9_LIBRARIES, since those are dynamically loaded
 
 
 # Dynamic library
