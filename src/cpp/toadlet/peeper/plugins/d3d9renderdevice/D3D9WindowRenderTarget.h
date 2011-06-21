@@ -60,6 +60,14 @@ public:
 	inline IDirect3DSurface9 *getColorSurface() const{return mColorSurface;}
 	inline IDirect3DSurface9 *getDepthSurface() const{return mDepthSurface;}
 
+	typedef IDirect3D9*(WINAPI *Direct3DCreate9)(UINT);
+	Direct3DCreate9 CreateSymbol;
+
+	#if defined(TOADLET_D3DX9_DLL_NAME)
+		typedef HRESULT(WINAPI *D3DXCompileShader)(LPCSTR,UINT,struct _D3DXMACRO *,interface ID3DXInclude *,LPCSTR,LPCSTR,DWORD,interface ID3DXBuffer **,interface ID3DXBuffer **,interface ID3DXConstantTable **);
+		D3DXCompileShader CompileShaderSymbol;
+	#endif
+
 protected:
 	int getClosestSamples(int samples);
 
@@ -71,7 +79,8 @@ protected:
 	#endif
 	int mSamples;
 	D3DPRESENT_PARAMETERS mPresentParameters;
-	HINSTANCE mLibrary;
+	HINSTANCE mD3DLibrary,mD3DXLibrary;
+
 	IDirect3D9 *mD3D;
 	IDirect3DDevice9 *mD3DDevice;
 	IDirect3DSurface9 *mColorSurface;

@@ -26,6 +26,7 @@
 #include "D3D10Shader.h"
 #include "D3D10RenderDevice.h"
 #include "D3D10VertexFormat.h"
+#include "D3D10WindowRenderTarget.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 
@@ -104,10 +105,7 @@ bool D3D10Shader::createContext(){
 		break;
 	}
 
-	HRESULT result=E_FAIL;
-	#if defined(TOADLET_SET_D3D10)
-		result=D3DX10CompileFromMemory(mCode,mCode.length(),NULL,NULL,NULL,function,targetProfile,0,0,NULL,&mBytecode,&mLog,NULL);
-	#endif
+	HRESULT result=((D3D10WindowRenderTarget*)mDevice->getPrimaryRenderTarget()->getRootRenderTarget())->CompileFromMemorySymbol(mCode,mCode.length(),NULL,NULL,NULL,function,targetProfile,0,0,NULL,&mBytecode,&mLog,NULL);
 	if(FAILED(result)){
 		Error::unknown(Categories::TOADLET_PEEPER,(LPCSTR)mLog->GetBufferPointer());
 		return false;
@@ -131,9 +129,7 @@ bool D3D10Shader::createContext(){
 		return false;
 	}
 
-	#if defined(TOADLET_SET_D3D10)
-		result=D3D10ReflectShader(mBytecode->GetBufferPointer(),mBytecode->GetBufferSize(),&mReflector);
-	#endif
+	result=((D3D10WindowRenderTarget*)mDevice->getPrimaryRenderTarget()->getRootRenderTarget())->ReflectShaderSymbol(mBytecode->GetBufferPointer(),mBytecode->GetBufferSize(),&mReflector);
 	if(FAILED(result)){
 		Error::unknown(Categories::TOADLET_PEEPER,"unable to reflect shader");
 		return false;

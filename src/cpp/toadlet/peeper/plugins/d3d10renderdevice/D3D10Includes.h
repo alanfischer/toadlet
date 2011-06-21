@@ -33,7 +33,7 @@
 #include <commctrl.h>
 #if defined(TOADLET_SET_D3D10)
 	#include <d3d10.h>
-	#include <d3dx10.h>
+//	#include <d3dx10.h>
 #else
 	#include <d3d11.h>
 #endif
@@ -86,10 +86,16 @@ namespace peeper{
 	#define TOADLET_D3D10_DLL_NAME TEXT("D3D11.DLL")
 	#define TOADLET_D3D10_CREATE_DEVICE_NAME TEXT("D3D11CreateDevice")
 	#define TOADLET_D3D10_CREATE_DEVICE_AND_SWAP_CHAIN_NAME TEXT("D3D11CreateDeviceAndSwapChain")
+	#define TOADLET_D3D10_REFLECT_SHADER_NAME TEXT("D3D11ReflectShader")
+	#define TOADLET_D3DX10_DLL_NAME TEXT("D3DX11.DLL")
+	#define TOADLET_D3DX10_COMPILE_FROM_MEMORY_NAME TEXT("D3DX11CompileFromMemory")
 #else
 	#define TOADLET_D3D10_DLL_NAME TEXT("D3D10.DLL")
 	#define TOADLET_D3D10_CREATE_DEVICE_NAME TEXT("D3D10CreateDevice")
 	#define TOADLET_D3D10_CREATE_DEVICE_AND_SWAP_CHAIN_NAME TEXT("D3D10CreateDeviceAndSwapChain")
+	#define TOADLET_D3D10_REFLECT_SHADER_NAME TEXT("D3D10ReflectShader")
+	#define TOADLET_D3DX10_DLL_NAME TEXT("D3DX10_33.DLL")
+	#define TOADLET_D3DX10_COMPILE_FROM_MEMORY_NAME TEXT("D3DX10CompileFromMemory")
 #endif
 
 #if defined(TOADLET_DEBUG)

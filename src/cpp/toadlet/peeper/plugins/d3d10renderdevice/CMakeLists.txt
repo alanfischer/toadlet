@@ -39,7 +39,7 @@ add_definitions(-DTOADLET_SET_D3D10)
 
 # Dependencies - note that D3D10 has already been found
 include_directories (${D3D10_INCLUDE_PATH})
-set (PEEPER_D3D10RENDERDEVICE_LIBS ${D3D10_LIBRARIES})
+# We don't add the D3D10_LIBRARIES, since those are dynamically loaded
 
 
 # Dynamic library

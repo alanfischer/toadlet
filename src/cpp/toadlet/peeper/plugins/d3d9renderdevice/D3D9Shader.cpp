@@ -25,6 +25,7 @@
 
 #include "D3D9Shader.h"
 #include "D3D9RenderDevice.h"
+#include "D3D9WindowRenderTarget.h"
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
 
@@ -84,7 +85,7 @@ bool D3D9Shader::createContext(){
 	}
 	
 	HRESULT result=E_FAIL;
-	result=D3DXCompileShader(mCode,mCode.length(),NULL,NULL,function,targetProfile,0,&mBytecode,&mLog,&mConstantTable);
+	result=((D3D9WindowRenderTarget*)mDevice->getPrimaryRenderTarget()->getRootRenderTarget())->CompileShaderSymbol(mCode,mCode.length(),NULL,NULL,function,targetProfile,0,&mBytecode,&mLog,&mConstantTable);
 	if(FAILED(result)){
 		Error::unknown(Categories::TOADLET_PEEPER,(LPCSTR)mLog->GetBufferPointer());
 		return false;
