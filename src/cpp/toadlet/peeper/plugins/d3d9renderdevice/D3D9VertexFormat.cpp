@@ -173,29 +173,28 @@ int D3D9VertexFormat::findElement(const egg::String &name){
 
 #if !defined(TOADLET_SET_D3DM)
 	BYTE D3D9VertexFormat::getD3DDECLTYPE(int format){
-		if(format==Format_COLOR_RGBA){
+		if(format==Format_TYPE_COLOR_RGBA){
 			return D3DDECLTYPE_D3DCOLOR;
 		}
-		else{
-			switch(format){
-				case Format_BIT_FLOAT_32|Format_BIT_COUNT_1:
-					return D3DDECLTYPE_FLOAT1;
-				case Format_BIT_FLOAT_32|Format_BIT_COUNT_2:
-					return D3DDECLTYPE_FLOAT2;
-				case Format_BIT_FLOAT_32|Format_BIT_COUNT_3:
-					return D3DDECLTYPE_FLOAT3;
-				case Format_BIT_FLOAT_32|Format_BIT_COUNT_4:
-					return D3DDECLTYPE_FLOAT4;
-				case Format_BIT_INT_16|Format_BIT_COUNT_2:
-					return D3DDECLTYPE_SHORT2;
-				case Format_BIT_INT_16|Format_BIT_COUNT_4:
-					return D3DDECLTYPE_SHORT4;
-				case Format_BIT_UINT_8|Format_BIT_COUNT_4:
-					return D3DDECLTYPE_UBYTE4;
-				default:
-					Error::unknown("unknown D3DDECLTYPE");
-					return -1;
-			}
+
+		switch(format){
+			case Format_TYPE_FLOAT_32|Format_COUNT_1:
+				return D3DDECLTYPE_FLOAT1;
+			case Format_TYPE_FLOAT_32|Format_COUNT_2:
+				return D3DDECLTYPE_FLOAT2;
+			case Format_TYPE_FLOAT_32|Format_COUNT_3:
+				return D3DDECLTYPE_FLOAT3;
+			case Format_TYPE_FLOAT_32|Format_COUNT_4:
+				return D3DDECLTYPE_FLOAT4;
+			case Format_TYPE_INT_16|Format_COUNT_2:
+				return D3DDECLTYPE_SHORT2;
+			case Format_TYPE_INT_16|Format_COUNT_4:
+				return D3DDECLTYPE_SHORT4;
+			case Format_TYPE_UINT_8|Format_COUNT_4:
+				return D3DDECLTYPE_UBYTE4;
+			default:
+				Error::unknown("unknown D3DDECLTYPE");
+				return -1;
 		}
 	}
 

@@ -64,8 +64,9 @@ public:
 	int getDepth() const{return 1;}
 	
 	/// @todo: Can these be implemented
-	uint8 *lock(int access){return NULL;}
+	tbyte *lock(int access){return NULL;}
 	bool unlock(){return false;}
+	bool update(tbyte *data,int start,int size){return false;}
 
 	inline GLuint getHandle() const{return mHandle;}
 

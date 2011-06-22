@@ -23,56 +23,51 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_D3D9CONSTANTBUFFER_H
-#define TOADLET_PEEPER_D3D9CONSTANTBUFFER_H
+#ifndef TOADLET_PEEPER_D3D9VARIABLEBUFFER_H
+#define TOADLET_PEEPER_D3D9VARIABLEBUFFER_H
 
 #include "D3D9Includes.h"
-#include <toadlet/peeper/ConstantBuffer.h>
+#include <toadlet/peeper/VariableBuffer.h>
 
 namespace toadlet{
 namespace peeper{
 
 class D3D9RenderDevice;
 
-class TOADLET_API D3D9ConstantBuffer:public ConstantBuffer{
+class TOADLET_API D3D9VariableBuffer:public VariableBuffer{
 public:
-	D3D9ConstantBuffer(D3D9RenderDevice *renderDevice);
-	virtual ~D3D9ConstantBuffer();
+	D3D9VariableBuffer(D3D9RenderDevice *renderDevice);
+	virtual ~D3D9VariableBuffer();
 
-	ConstantBuffer *getRootConstantBuffer(){return this;}
+	VariableBuffer *getRootVariableBuffer(){return this;}
 
 	void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
-	bool create(int usage,int access,int size);
+	bool create(int usage,int access,VariableBufferFormat::ptr variableFormat);
 	void destroy();
 
-	void resetCreate();
-	void resetDestroy();
+	void resetCreate(){}
+	void resetDestroy(){}
 
 	int getUsage() const{return mUsage;}
 	int getAccess() const{return mAccess;}
+	VariableBufferFormat::ptr getVariableBufferFormat() const{return mVariableFormat;}
 	int getDataSize() const{return mDataSize;}
-	int getSize() const{return mSize;}
 
-	uint8 *lock(int lockAccess){return NULL;}
+	tbyte *lock(int lockAccess){return NULL;}
 	bool unlock(){return false;}
-
-	void setConstant(int location,tbyte *value)=0;
+	bool update(tbyte *data,int start,int size);
 
 protected:
-	bool createContext(bool restore);
-	bool destroyContext(bool backup);
-
 	D3D9RenderDevice *mDevice;
 
 	BufferDestroyedListener *mListener;
 	int mUsage;
 	int mAccess;
-	int mSize;
+	VariableBufferFormat::ptr mVariableFormat;
 	int mDataSize;
 	
-	egg::Collection<int> mConstantLocations;
-	egg::Collection<int> mConstantSizes;
+	tbyte *mData;
 
 	friend D3D9RenderDevice;
 };

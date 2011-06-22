@@ -35,7 +35,6 @@ namespace toadlet{
 namespace peeper{
 
 class BlendState;
-class ConstantBuffer;
 class DepthState;
 class FogState;
 class IndexBuffer;
@@ -52,6 +51,7 @@ class RenderState;
 class Shader;
 class ShaderState;
 class Texture;
+class VariableBuffer;
 class VertexBuffer;
 class VertexLayout;
 class VertexFormat;
@@ -82,7 +82,7 @@ public:
 	virtual VertexFormat *createVertexFormat()=0;
 	virtual VertexBuffer *createVertexBuffer()=0;
 	virtual IndexBuffer *createIndexBuffer()=0;
-	virtual ConstantBuffer *createConstantBuffer()=0;
+	virtual VariableBuffer *createVariableBuffer()=0;
 	virtual Shader *createShader()=0;
 	virtual Query *createQuery()=0;
 	virtual RenderState *createRenderState()=0;
@@ -105,7 +105,7 @@ public:
 	virtual void setDefaultState()=0;
 	virtual bool setRenderState(RenderState *renderState)=0;
 	virtual bool setShaderState(ShaderState *shaderState)=0;
-	virtual void setBuffer(/*Shader::ShaderType type,*/int i,ConstantBuffer *buffer)=0;
+	virtual void setBuffer(/*Shader::ShaderType type,*/int i,VariableBuffer *buffer)=0;
 	virtual void setTexture(/*Shader::ShaderType type,*/int i,Texture *texture)=0;
 
 	// Old fixed states

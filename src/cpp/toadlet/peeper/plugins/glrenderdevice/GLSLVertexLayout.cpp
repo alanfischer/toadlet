@@ -27,6 +27,8 @@
 #include "GLRenderDevice.h"
 #include "GLSLShaderState.h"
 
+using namespace toadlet::egg;
+
 namespace toadlet{
 namespace peeper{
 
@@ -39,11 +41,14 @@ GLSLVertexLayout::~GLSLVertexLayout(){
 }
 
 bool GLSLVertexLayout::create(GLVertexFormat *vertexFormat,GLSLShaderState *shaderState){
+	Logger::excess("GLSLVertexLayout::create");
+
 	mSemanticIndexes.resize(vertexFormat->getNumElements());
 
 	int i;
 	for(i=0;i<vertexFormat->getNumElements();++i){
 		int location=glGetAttribLocation(shaderState->mHandle,vertexFormat->getName(i));
+		Logger::excess(String("Semantic name:")+vertexFormat->getName(i)+" found location:"+location);
 		if(location==-1){
 			location=GLRenderDevice::getFixedAttribFromSemantic(vertexFormat->getSemantic(i),vertexFormat->getIndex(i));
 		}

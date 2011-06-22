@@ -50,7 +50,7 @@ public:
 		textureNonPowerOf2Restricted(false),
 		textureNonPowerOf2(false),
 		textureAutogenMipMaps(false),
-		idealVertexFormatBit(VertexFormat::Format_BIT_FLOAT_32),
+		idealVertexFormatType(VertexFormat::Format_TYPE_FLOAT_32),
 		triangleFan(false),
 		fill(false),
 		texturePerspective(false),
@@ -74,7 +74,7 @@ public:
 		textureNonPowerOf2Restricted=caps.textureNonPowerOf2Restricted;
 		textureNonPowerOf2=caps.textureNonPowerOf2;
 		textureAutogenMipMaps=caps.textureAutogenMipMaps;
-		idealVertexFormatBit=caps.idealVertexFormatBit;
+		idealVertexFormatType=caps.idealVertexFormatType;
 		triangleFan=caps.triangleFan;
 		fill=caps.fill;
 		texturePerspective=caps.texturePerspective;
@@ -99,7 +99,7 @@ public:
 	bool textureNonPowerOf2Restricted;
 	bool textureNonPowerOf2;
 	bool textureAutogenMipMaps;
-	int idealVertexFormatBit;
+	int idealVertexFormatType;
 	bool triangleFan;
 	bool fill;
 	bool texturePerspective;

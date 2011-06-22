@@ -77,8 +77,10 @@ public:
 
 	virtual int getPixelFormat() const{return mBack!=NULL?mBack->getPixelFormat():0;}
 
-	virtual uint8 *lock(int lockAccess){return mBack!=NULL?mBack->lock(lockAccess):NULL;}
+	virtual tbyte *lock(int lockAccess){return mBack!=NULL?mBack->lock(lockAccess):NULL;}
 	virtual bool unlock(){return mBack!=NULL?mBack->unlock():false;}
+
+	virtual bool update(tbyte *data,int start,int size){return mBack!=NULL?mBack->update(data,start,size):false;}
 
 	virtual void setBack(PixelBuffer::ptr back){mBack=back;}
 	virtual Buffer::ptr getBack(){return mBack;}

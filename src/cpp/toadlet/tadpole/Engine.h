@@ -92,7 +92,7 @@ public:
 	void addContextListener(ContextListener *listener){mContextListeners.add(listener);}
 	void removeContextListener(ContextListener *listener){mContextListeners.remove(listener);}
 
-	int getIdealVertexFormatBit() const{return mIdealVertexFormatBit;}
+	int getIdealVertexFormatType() const{return mIdealVertexFormatType;}
 	const VertexFormats &getVertexFormats() const{return mVertexFormats;}
 	const peeper::RenderCaps &getRenderCaps() const{return mRenderCaps;}
 
@@ -116,7 +116,7 @@ protected:
 
 	egg::Collection<ContextListener*> mContextListeners;
 
-	int mIdealVertexFormatBit;
+	int mIdealVertexFormatType;
 	VertexFormats mVertexFormats;
 	peeper::RenderCaps mRenderCaps;
 

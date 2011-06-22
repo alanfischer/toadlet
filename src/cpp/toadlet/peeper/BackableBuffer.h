@@ -29,14 +29,14 @@
 #include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/VertexBuffer.h>
 #include <toadlet/peeper/PixelBuffer.h>
-#include <toadlet/peeper/ConstantBuffer.h>
+#include <toadlet/peeper/VariableBuffer.h>
 
 namespace toadlet{
 namespace peeper{
 
 class RenderDevice;
 
-class TOADLET_API BackableBuffer:public IndexBuffer,public VertexBuffer,public PixelBuffer,public ConstantBuffer{
+class TOADLET_API BackableBuffer:public IndexBuffer,public VertexBuffer,public PixelBuffer,public VariableBuffer{
 public:
 	TOADLET_SHARED_POINTERS(BackableBuffer);
 
@@ -46,14 +46,14 @@ public:
 	virtual IndexBuffer *getRootIndexBuffer(){return (mIndexFormat!=(IndexFormat)0)?(IndexBuffer*)mBack.get():NULL;}
 	virtual VertexBuffer *getRootVertexBuffer(){return (mVertexFormat!=NULL)?(VertexBuffer*)mBack.get():NULL;}
 	virtual PixelBuffer *getRootPixelBuffer(){return (mPixelFormat!=0)?(PixelBuffer*)mBack.get():NULL;}
-	virtual ConstantBuffer *getRootConstantBuffer(){return (ConstantBuffer*)mBack.get();}
+	virtual VariableBuffer *getRootVariableBuffer(){return (mVariableFormat!=0)?(VariableBuffer*)mBack.get():NULL;}
 
 	virtual void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
 	virtual bool create(int usage,int access,IndexFormat indexFormat,int size);
 	virtual bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size);
 	virtual bool create(int usage,int access,int pixelFormat,int width,int height,int depth);
-	virtual bool create(int usage,int access,int size);
+	virtual bool create(int usage,int access,VariableBufferFormat::ptr format);
 	virtual void destroy();
 
 	virtual void resetCreate();
@@ -70,21 +70,23 @@ public:
 	virtual IndexFormat getIndexFormat() const{return mIndexFormat;}
 	virtual VertexFormat::ptr getVertexFormat() const{return mVertexFormat;}
 	virtual int getPixelFormat() const{return mPixelFormat;}
+	virtual VariableBufferFormat::ptr getVariableBufferFormat() const{return mVariableFormat;}
 
-	virtual uint8 *lock(int lockAccess);
+	virtual tbyte *lock(int lockAccess);
 	virtual bool unlock();
 
-	virtual void setConstant(int location,float *value,int size){} /// @todo: Either remove the need for this in the ConstantBuffer interface, or add support for it to the BackableBuffer
+	virtual bool update(tbyte *data,int start,int size);
 
 	virtual void setBack(IndexBuffer::ptr back);
 	virtual void setBack(VertexBuffer::ptr back);
 	virtual void setBack(PixelBuffer::ptr back,RenderDevice *renderDevice);
-	virtual void setBack(ConstantBuffer::ptr back);
+	virtual void setBack(VariableBuffer::ptr back);
 	virtual Buffer::ptr getBack(){return mBack;}
 
 protected:
 	void readBack();
 	void writeBack();
+	void updateBack(int start,int size);
 
 	BufferDestroyedListener *mListener;
 	int mUsage;
@@ -93,6 +95,7 @@ protected:
 	IndexFormat mIndexFormat;
 	VertexFormat::ptr mVertexFormat;
 	int mPixelFormat;
+	VariableBufferFormat::ptr mVariableFormat;
 	int mSize;
 	int mWidth,mHeight,mDepth;
 

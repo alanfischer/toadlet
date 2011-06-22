@@ -29,6 +29,7 @@
 #include "D3D10Includes.h"
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/Shader.h>
+#include <toadlet/peeper/VariableBufferFormat.h>
 
 namespace toadlet{
 namespace peeper{
@@ -51,13 +52,36 @@ public:
 	ShaderType getShaderType() const{return mShaderType;}
 	const egg::String &getProfile() const{return mProfile;}
 
-	int findConstant(const egg::String &name) const{return -1;}
+	int getNumVariableBuffers(){return mVariableBufferFormats.size();}
+	VariableBufferFormat::ptr getVariableBufferFormat(int i){return mVariableBufferFormats[i];}
 
 	ID3D10InputLayout *findInputLayout(D3D10VertexFormat *vertexFormat);
 
 	bool activate();
 
 protected:
+	class D3D10VariableBufferFormat:public VariableBufferFormat{
+	public:
+		TOADLET_SHARED_POINTERS(D3D10VariableBufferFormat);
+
+		D3D10VariableBufferFormat(ID3D10ShaderReflectionConstantBuffer *buffer);
+		virtual ~D3D10VariableBufferFormat(){}
+
+		egg::String getName(){return mName;}
+		int getSize(){return mSize;}
+		int getNumVariables(){return mVariableNames.size();}
+		egg::String getVariableName(int i){return mVariableNames[i];}
+		int getVariableFormat(int i){return mVariableFormats[i];}
+		int getVariableOffset(int i){return mVariableOffsets[i];}
+
+	protected:
+		egg::String mName;
+		int mSize;
+		egg::Collection<egg::String> mVariableNames;
+		egg::Collection<int> mVariableFormats;
+		egg::Collection<int> mVariableOffsets;
+	};
+
 	bool createContext();
 	bool destroyContext();
 	bool reflect();
@@ -72,6 +96,8 @@ protected:
 	ID3D10DeviceChild *mShader;
 	ID3D10Blob *mBytecode,*mLog;
 	ID3D10ShaderReflection *mReflector;
+
+	egg::Collection<VariableBufferFormat::ptr> mVariableBufferFormats;
 
 	egg::Collection<ID3D10InputLayout*> mLayouts;
 

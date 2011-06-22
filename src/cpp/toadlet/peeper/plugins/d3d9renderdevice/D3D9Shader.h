@@ -51,8 +51,6 @@ public:
 	ShaderType getShaderType() const{return mShaderType;}
 	const egg::String &getProfile() const{return mProfile;}
 
-	int findConstant(const egg::String &name) const{return -1;}
-
 protected:
 	bool createContext();
 	bool destroyContext();

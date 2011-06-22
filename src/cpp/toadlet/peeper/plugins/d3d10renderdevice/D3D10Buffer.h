@@ -29,7 +29,7 @@
 #include "D3D10Includes.h"
 #include <toadlet/peeper/IndexBuffer.h>
 #include <toadlet/peeper/VertexBuffer.h>
-#include <toadlet/peeper/ConstantBuffer.h>
+#include <toadlet/peeper/VariableBuffer.h>
 #include <toadlet/egg/Collection.h>
 
 namespace toadlet{
@@ -37,21 +37,20 @@ namespace peeper{
 
 class D3D10RenderDevice;
 
-// Currently this class inherits all possible types, but perhaps it should just inherit Buffer, and then there would exist subclasses for each type of Buffer
-class TOADLET_API D3D10Buffer:public IndexBuffer,public VertexBuffer,public ConstantBuffer{
+class TOADLET_API D3D10Buffer:public IndexBuffer,public VertexBuffer,public VariableBuffer{
 public:
 	D3D10Buffer(D3D10RenderDevice *renderDevice);
 	virtual ~D3D10Buffer();
 
 	IndexBuffer *getRootIndexBuffer(){return this;}
 	VertexBuffer *getRootVertexBuffer(){return this;}
-	ConstantBuffer *getRootConstantBuffer(){return this;}
+	VariableBuffer *getRootVariableBuffer(){return this;}
 
 	void setBufferDestroyedListener(BufferDestroyedListener *listener){mListener=listener;}
 
 	bool create(int usage,int access,IndexFormat indexFormat,int size);
 	bool create(int usage,int access,VertexFormat::ptr vertexFormat,int size);
-	bool create(int usage,int access,int size);
+	bool create(int usage,int access,VariableBufferFormat::ptr variableFormat);
 	void destroy();
 
 	void resetCreate(){}
@@ -64,11 +63,13 @@ public:
 
 	IndexFormat getIndexFormat() const{return mIndexFormat;}
 	VertexFormat::ptr getVertexFormat() const{return mVertexFormat;}
+	VariableBufferFormat::ptr getVariableBufferFormat() const{return mVariableFormat;}
 
-	uint8 *lock(int lockAccess);
+	tbyte *lock(int lockAccess);
 	bool unlock();
+	bool update(tbyte *data,int start,int size);
 
-	void setConstant(int location,float *data,int size){}
+	void setConstant(int location,float *data,int size);
 
 protected:
 	bool createContext();
@@ -79,11 +80,12 @@ protected:
 	BufferDestroyedListener *mListener;
 	int mUsage;
 	int mAccess;
-	int mSize;
 	int mDataSize;
+	int mSize;
 
 	IndexFormat mIndexFormat;
 	VertexFormat::ptr mVertexFormat;
+	VariableBufferFormat::ptr mVariableFormat;
 
 	int mBindFlags;
 	ID3D10Buffer *mBuffer;

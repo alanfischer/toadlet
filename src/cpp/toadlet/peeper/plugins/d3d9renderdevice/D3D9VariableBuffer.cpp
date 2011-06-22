@@ -23,34 +23,58 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_CONSTANTBUFFER_H
-#define TOADLET_PEEPER_CONSTANTBUFFER_H
+#include "D3D9VariableBuffer.h"
+#include "D3D9RenderDevice.h"
+#include <toadlet/egg/Error.h>
+#include <toadlet/egg/Logger.h>
 
-#include <toadlet/peeper/Buffer.h>
+using namespace toadlet::egg;
 
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API ConstantBuffer:public Buffer{
-public:
-	TOADLET_SHARED_POINTERS(ConstantBuffer);
-	
-	virtual ~ConstantBuffer(){}
+D3D9VariableBuffer::D3D9VariableBuffer(D3D9RenderDevice *renderDevice):
+	mDevice(NULL),
 
-	virtual ConstantBuffer *getRootConstantBuffer()=0;
+	mListener(NULL),
+	mUsage(0),
+	mAccess(0),
+	mDataSize(0),
 
-	virtual bool create(int usage,int access,int size)=0;
-	virtual void destroy()=0;
+	mData(NULL)
+{
+	mDevice=renderDevice;
+}
 
-	virtual void resetCreate()=0;
-	virtual void resetDestroy()=0;
+D3D9VariableBuffer::~D3D9VariableBuffer(){
+	destroy();
+}
 
-	virtual int getSize() const=0;
+bool D3D9VariableBuffer::create(int usage,int access,VariableBufferFormat::ptr variableFormat){
+	mUsage=usage;
+	mAccess=access;
+	mVariableFormat=variableFormat;
+	mDataSize=variableFormat->getSize();
 
-	virtual void setConstant(int location,float *data,int size)=0;
-};
+	return true;
+}
+
+void D3D9VariableBuffer::destroy(){
+	if(mData!=NULL){
+		delete[] mData;
+		mData=NULL;
+	}
+
+	if(mListener!=NULL){
+		mListener->bufferDestroyed(this);
+		mListener=NULL;
+	}
+}
+
+bool D3D9VariableBuffer::update(tbyte *data,int start,int size){
+
+	return true;
+}
 
 }
 }
-
-#endif

@@ -30,7 +30,8 @@ set (PEEPER_HEADERS
 	BlendState.h
 	Buffer.h
 	BufferDestroyedListener.h
-	ConstantBuffer.h
+	VariableBuffer.h
+	VariableBufferFormat.h
 	DepthState.h
 	FogState.h
 	IndexBuffer.h

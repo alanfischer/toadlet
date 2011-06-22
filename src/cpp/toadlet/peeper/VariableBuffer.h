@@ -23,38 +23,30 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_SHADER_H
-#define TOADLET_PEEPER_SHADER_H
+#ifndef TOADLET_PEEPER_VARIABLEBUFFER_H
+#define TOADLET_PEEPER_VARIABLEBUFFER_H
 
-#include <toadlet/egg/Resource.h>
-#include <toadlet/egg/String.h>
+#include <toadlet/peeper/Buffer.h>
 #include <toadlet/peeper/VariableBufferFormat.h>
 
 namespace toadlet{
 namespace peeper{
 
-class Shader:public egg::Resource{
+class TOADLET_API VariableBuffer:public Buffer{
 public:
-	TOADLET_SHARED_POINTERS(Shader);
-
-	enum ShaderType{
-		ShaderType_VERTEX,
-		ShaderType_FRAGMENT,
-		ShaderType_GEOMETRY,
-	};
-
-	virtual ~Shader(){}
-
-	virtual Shader *getRootShader()=0;
-
-	virtual bool create(ShaderType shaderType,const egg::String &profile,const egg::String &code)=0;
-	virtual void destroy()=0;
+	TOADLET_SHARED_POINTERS(VariableBuffer);
 	
-	virtual ShaderType getShaderType() const=0;
-	virtual const egg::String &getProfile() const=0;
+	virtual ~VariableBuffer(){}
 
-virtual int getNumVariableBuffers(){return 0;}
-virtual VariableBufferFormat::ptr getVariableBufferFormat(int i){return NULL;}
+	virtual VariableBuffer *getRootVariableBuffer()=0;
+
+	virtual bool create(int usage,int access,VariableBufferFormat::ptr format)=0;
+	virtual void destroy()=0;
+
+	virtual void resetCreate()=0;
+	virtual void resetDestroy()=0;
+
+	virtual VariableBufferFormat::ptr getVariableBufferFormat() const=0;
 };
 
 }

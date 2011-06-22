@@ -38,11 +38,12 @@ D3D10Buffer::D3D10Buffer(D3D10RenderDevice *renderDevice):
 	mListener(NULL),
 	mUsage(0),
 	mAccess(0),
-	mSize(0),
 	mDataSize(0),
+	mSize(0),
 
 	mIndexFormat((IndexFormat)0),
 	//mVertexFormat,
+	//mVariableBufferFormat,
 
 	mBindFlags(0),
 	mBuffer(NULL),
@@ -113,7 +114,7 @@ bool D3D10Buffer::create(int usage,int access,VertexFormat::ptr vertexFormat,int
 	return true;
 }
 
-bool D3D10Buffer::create(int usage,int access,int size){
+bool D3D10Buffer::create(int usage,int access,VariableBufferFormat::ptr variableFormat){
 	if((usage&Usage_BIT_STATIC)>0 && (access&Access_BIT_READ)>0){
 		Error::invalidParameters(Categories::TOADLET_PEEPER,
 			"Buffer can not be static and readable");
@@ -122,8 +123,8 @@ bool D3D10Buffer::create(int usage,int access,int size){
 
 	mUsage=usage;
 	mAccess=access;
-	mSize=size;
-	mDataSize=mSize;
+	mVariableFormat=variableFormat;
+	mDataSize=variableFormat->getSize();
 
 	mBindFlags|=D3D10_BIND_CONSTANT_BUFFER;
 
@@ -151,8 +152,11 @@ void D3D10Buffer::destroy(){
 		if(mIndexFormat!=(IndexFormat)0){
 			mListener->bufferDestroyed((IndexBuffer*)this);
 		}
-		else{
+		else if(mVertexFormat!=NULL){
 			mListener->bufferDestroyed((VertexBuffer*)this);
+		}
+		else if(mVariableFormat!=NULL){
+			mListener->bufferDestroyed((VariableBuffer*)this);
 		}
 		mListener=NULL;
 	}
@@ -231,7 +235,7 @@ uint8 *D3D10Buffer::lock(int lockAccess){
 		if(mVertexFormat!=NULL){
 			int vertexSize=mVertexFormat->getVertexSize();
 			for(i=0;i<mVertexFormat->getNumElements();++i){
-				if(mVertexFormat->getFormat(i)==VertexFormat::Format_COLOR_RGBA){
+				if(mVertexFormat->getFormat(i)==VertexFormat::Format_TYPE_COLOR_RGBA){
 					tbyte *data=mData+mVertexFormat->getOffset(i);
 					for(j=0;j<mSize;++j){
 						uint32 &color=*(uint32*)(data+vertexSize*j);
@@ -260,7 +264,7 @@ bool D3D10Buffer::unlock(){
 		if(mVertexFormat!=NULL){
 			int vertexSize=mVertexFormat->getVertexSize();
 			for(i=0;i<mVertexFormat->getNumElements();++i){
-				if(mVertexFormat->getFormat(i)==VertexFormat::Format_COLOR_RGBA){
+				if(mVertexFormat->getFormat(i)==VertexFormat::Format_TYPE_COLOR_RGBA){
 					tbyte *data=mData+mVertexFormat->getOffset(i);
 					for(j=0;j<mSize;++j){
 						uint32 &color=*(uint32*)(data+vertexSize*j);
@@ -299,6 +303,22 @@ bool D3D10Buffer::unlock(){
 	}
 
 	return true;
+}
+
+bool D3D10Buffer::update(tbyte *data,int start,int size){
+	// UpdateSubresource does not allow partial buffer updates
+
+	tbyte *bdata=lock(Access_BIT_WRITE);
+	memcpy(bdata+start,data,size);
+	return unlock();
+}
+
+void D3D10Buffer::setConstant(int location,float *data,int size){
+	tbyte *buffer=lock(Access_BIT_WRITE);
+
+	memcpy(buffer+location*sizeof(float),data,size*sizeof(float));
+
+	unlock();
 }
 
 }
