@@ -323,9 +323,26 @@ bool GLBuffer::unlock(){
 bool GLBuffer::update(tbyte *data,int start,int size){
 	memcpy(mData+start,data,size);
 
-	glBindBuffer(mTarget,mHandle);
-	glBufferSubData(mTarget,start,size,data);
-	glBindBuffer(mTarget,0);
+	if(mHandle>0){
+		glBindBuffer(mTarget,mHandle);
+		glBufferSubData(mTarget,start,size,data);
+		glBindBuffer(mTarget,0);
+	}
+
+	return true;
+}
+
+bool GLBuffer::activateVariableBuffer(int i){
+	if(mHandle>0){
+		#if defined(TOADLET_HAS_UBOS)
+			glUniformBlockBinding(mLastShaderState->mHandle,0,0);
+			TOADLET_CHECK_GLERROR("setBuffer0");
+			glBindBufferBase(GL_UNIFORM_BUFFER,0,glbuffer->mHandle);
+		#endif
+	}
+	else{
+
+	}
 
 	return true;
 }

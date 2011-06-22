@@ -31,6 +31,7 @@
 namespace toadlet{
 namespace peeper{
 
+/// @todo: Move this to a struct style, and remove the subclasses of it in the renderer plugins
 class TOADLET_API VariableBufferFormat{
 public:
 	TOADLET_SHARED_POINTERS(VariableBufferFormat);
@@ -48,9 +49,6 @@ public:
 		Format_TYPE_FLOAT_32=	6,
 		Format_TYPE_DOUBLE_64=	7,
 		Format_TYPE_COLOR_RGBA=	8,
-		Format_TYPE_SAMPLER_1D=	9,
-		Format_TYPE_SAMPLER_2D=	10,
-		Format_TYPE_SAMPLER_3D=	11,
 
 		// Format counts
 		Format_SHIFT_COUNTS=	16,
@@ -70,6 +68,72 @@ public:
 		Format_COUNT_4X4=		13<<16,
 	};
 
+	// static methods aren't allowed in Interfaces, but technically enums shouldn't be either, so these need to be separated to an alongside class
+	static int getFormatSize(int format){
+		int size=0;
+		int type=(format&Format_MASK_TYPES);
+		if(type==Format_TYPE_UINT_8 || type==Format_TYPE_INT_8){
+			size=1;
+		}
+		else if(type==Format_TYPE_INT_16){
+			size=2;
+		}
+		else if(type==Format_TYPE_INT_32 || type==Format_TYPE_FIXED_32 || type==Format_TYPE_FLOAT_32){
+			size=4;
+		}
+		else if(type==Format_TYPE_DOUBLE_64){
+			size=8;
+		}
+		else if(format==Format_TYPE_COLOR_RGBA){
+			size=4;
+		}
+
+		int count=(format&Format_MASK_COUNTS);
+		switch(count){
+			case Format_COUNT_1:
+				size*=1;
+			break;
+			case Format_COUNT_2:
+				size*=2;
+			break;
+			case Format_COUNT_3:
+				size*=3;
+			break;
+			case Format_COUNT_4:
+				size*=4;
+			break;
+			case Format_COUNT_2X2:
+				size*=4;
+			break;
+			case Format_COUNT_2X3:
+				size*=6;
+			break;
+			case Format_COUNT_2X4:
+				size*=8;
+			break;
+			case Format_COUNT_3X2:
+				size*=6;
+			break;
+			case Format_COUNT_3X3:
+				size*=9;
+			break;
+			case Format_COUNT_3X4:
+				size*=12;
+			break;
+			case Format_COUNT_4X2:
+				size*=8;
+			break;
+			case Format_COUNT_4X3:
+				size*=12;
+			break;
+			case Format_COUNT_4X4:
+				size*=16;
+			break;
+		}
+
+		return size;
+	}
+	
 	virtual egg::String getName()=0;
 
 	virtual int getSize()=0;
@@ -78,6 +142,7 @@ public:
 	virtual egg::String getVariableName(int i)=0;
 	virtual int getVariableFormat(int i)=0;
 	virtual int getVariableOffset(int i)=0;
+	virtual int getVariableIndex(int i)=0;
 };
 
 }

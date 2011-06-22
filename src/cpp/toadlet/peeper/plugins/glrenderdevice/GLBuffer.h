@@ -80,6 +80,8 @@ public:
 	bool unlock();
 	bool update(tbyte *data,int start,int size);
 
+	bool activateVariableBuffer(int i);
+
 protected:
 	bool createContext();
 	bool destroyContext();
