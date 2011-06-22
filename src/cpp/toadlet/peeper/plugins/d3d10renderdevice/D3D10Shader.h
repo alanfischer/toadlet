@@ -73,6 +73,7 @@ protected:
 		egg::String getVariableName(int i){return mVariableNames[i];}
 		int getVariableFormat(int i){return mVariableFormats[i];}
 		int getVariableOffset(int i){return mVariableOffsets[i];}
+		int getVariableIndex(int i){return i;}
 
 	protected:
 		egg::String mName;

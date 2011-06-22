@@ -1326,12 +1326,7 @@ void GLRenderDevice::setTextureStatePostTexture(int i,TextureState *state){
 void GLRenderDevice::setBuffer(int i,VariableBuffer *buffer){
 	GLBuffer *glbuffer=buffer!=NULL?(GLBuffer*)buffer->getRootVariableBuffer():NULL;
 
-	TOADLET_CHECK_GLERROR("setBuffer-1");
-	glUniformBlockBinding(mLastShaderState->mHandle,0,0);
-	TOADLET_CHECK_GLERROR("setBuffer0");
-	glBindBufferBase(GL_UNIFORM_BUFFER,0,glbuffer->mHandle);
-
-	TOADLET_CHECK_GLERROR("setBuffer");
+	glbuffer->activateVariableBuffer(i);
 }
 
 void GLRenderDevice::setTexture(int i,Texture *texture){
@@ -1742,20 +1737,20 @@ void GLRenderDevice::setFixedVertexData(const VertexData *vertexData){
 
 	int i,j,k;
 	for(i=0;i<numVertexBuffers;++i){
-		GLBuffer *glvertexBuffer=(GLBuffer*)vertexData->vertexBuffers[i]->getRootVertexBuffer();
+		GLBuffer *glbuffer=(GLBuffer*)vertexData->vertexBuffers[i]->getRootVertexBuffer();
 
-		GLVertexFormat *glvertexFormat=(GLVertexFormat*)(glvertexBuffer->mVertexFormat->getRootVertexFormat());
+		GLVertexFormat *glvertexFormat=(GLVertexFormat*)(glbuffer->mVertexFormat->getRootVertexFormat());
 		GLsizei vertexSize=glvertexFormat->mVertexSize;
 		int numElements=glvertexFormat->mSemantics.size();
 		semanticBits|=(glvertexFormat->mSemanticBits&~(1<<VertexFormat::Semantic_TEXCOORD));
 
-		if(glvertexBuffer->mHandle==0){
+		if(glbuffer->mHandle==0){
 			if(mVBOs){
-				glBindBuffer(glvertexBuffer->mTarget,0);
+				glBindBuffer(glbuffer->mTarget,0);
 			}
 		}
 		else{
-			glBindBuffer(glvertexBuffer->mTarget,glvertexBuffer->mHandle);
+			glBindBuffer(glbuffer->mTarget,glbuffer->mHandle);
 		}
 
 		for(j=0;j<numElements;++j){
@@ -1768,13 +1763,13 @@ void GLRenderDevice::setFixedVertexData(const VertexData *vertexData){
 						glvertexFormat->mGLElementCounts[j],
 						glvertexFormat->mGLDataTypes[j],
 						vertexSize,
-						glvertexBuffer->mElementOffsets[j]);
+						glbuffer->mElementOffsets[j]);
 				break;
 				case VertexFormat::Semantic_NORMAL:
 					glNormalPointer(
 						glvertexFormat->mGLDataTypes[j],
 						vertexSize,
-						glvertexBuffer->mElementOffsets[j]);
+						glbuffer->mElementOffsets[j]);
 				break;
 				case VertexFormat::Semantic_COLOR:
 					if(index==0){
@@ -1782,7 +1777,7 @@ void GLRenderDevice::setFixedVertexData(const VertexData *vertexData){
 							glvertexFormat->mGLElementCounts[j],
 							glvertexFormat->mGLDataTypes[j],
 							vertexSize,
-							glvertexBuffer->mElementOffsets[j]);
+							glbuffer->mElementOffsets[j]);
 					}
 				break;
 				case VertexFormat::Semantic_TEXCOORD:
@@ -1796,7 +1791,7 @@ void GLRenderDevice::setFixedVertexData(const VertexData *vertexData){
 								glvertexFormat->mGLElementCounts[j],
 								glvertexFormat->mGLDataTypes[j],
 								vertexSize,
-								glvertexBuffer->mElementOffsets[j]);
+								glbuffer->mElementOffsets[j]);
 							mLastTexCoordIndexes[k]=index;
 						}
 					}
@@ -1868,21 +1863,21 @@ void GLRenderDevice::setShaderVertexData(const VertexData *vertexData){
 
 	int i,j;
 	for(i=0;i<numVertexBuffers;++i){
-		GLBuffer *glvertexBuffer=(GLBuffer*)vertexData->vertexBuffers[i]->getRootVertexBuffer();
+		GLBuffer *glbuffer=(GLBuffer*)vertexData->vertexBuffers[i]->getRootVertexBuffer();
 
-		GLVertexFormat *glvertexFormat=(GLVertexFormat*)(glvertexBuffer->mVertexFormat->getRootVertexFormat());
+		GLVertexFormat *glvertexFormat=(GLVertexFormat*)(glbuffer->mVertexFormat->getRootVertexFormat());
 		GLsizei vertexSize=glvertexFormat->mVertexSize;
 		int numElements=glvertexFormat->mSemantics.size();
 
 		GLSLVertexLayout *gllayout=mLastShaderState->findVertexLayout(glvertexFormat);
 
-		if(glvertexBuffer->mHandle==0){
+		if(glbuffer->mHandle==0){
 			if(mVBOs){
-				glBindBuffer(glvertexBuffer->mTarget,0);
+				glBindBuffer(glbuffer->mTarget,0);
 			}
 		}
 		else{
-			glBindBuffer(glvertexBuffer->mTarget,glvertexBuffer->mHandle);
+			glBindBuffer(glbuffer->mTarget,glbuffer->mHandle);
 		}
 
 		for(j=0;j<numElements;++j){
@@ -1899,7 +1894,7 @@ void GLRenderDevice::setShaderVertexData(const VertexData *vertexData){
 				glvertexFormat->mGLDataTypes[j],
 				normalized,
 				vertexSize,
-				glvertexBuffer->mElementOffsets[j]);
+				glbuffer->mElementOffsets[j]);
 		}
 	}
 

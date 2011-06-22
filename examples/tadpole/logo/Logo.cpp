@@ -173,10 +173,15 @@ String vsc[]={
 	"in vec4 POSITION;\n" \
 	"in vec3 NORMAL;\n" \
 	"out vec4 color;\n" \
+	"uniform vec4 blob;\n" \
 	"layout(row_major) uniform block{mat4 ModelViewProjectionMatrix;};\n" \
+	"uniform vec4 blob2;\n" \
+	"layout(row_major) uniform block{mat4 blob3;};\n" \
+	"uniform vec4 blob4;\n" \
+	"layout(row_major) uniform block{mat4 blob5;};\n" \
 	"void main(){\n" \
-		"gl_Position = ModelViewProjectionMatrix * POSITION;\n" \
-		"color = vec4(NORMAL.x,NORMAL.y,NORMAL.z,1.0);\n" \
+		"gl_Position = blob3 * blob5 * ModelViewProjectionMatrix * POSITION;\n" \
+		"color = vec4(NORMAL.x,NORMAL.y,NORMAL.z,1.0) + blob + blob2 + blob4;\n" \
 	"}",
 
 	"struct VIN{\n" \
@@ -211,7 +216,7 @@ String fsc[]={
 };
 
 void Logo::create(){
-	Application::create("d3d10");
+	Application::create("gl");
 
 	mEngine->setDirectory("../../../data");
 

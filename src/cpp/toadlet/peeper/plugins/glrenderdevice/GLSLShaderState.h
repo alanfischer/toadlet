@@ -57,6 +57,31 @@ public:
 	GLSLVertexLayout *findVertexLayout(GLVertexFormat *vertexFormat);
 
 protected:
+	class GLSLVariableBufferFormat:public VariableBufferFormat{
+	public:
+		TOADLET_SHARED_POINTERS(GLSLVariableBufferFormat);
+
+		GLSLVariableBufferFormat(){}
+		virtual ~GLSLVariableBufferFormat(){}
+
+		egg::String getName(){return name;}
+		int getSize(){return size;}
+		int getNumVariables(){return variableNames.size();}
+		egg::String getVariableName(int i){return variableNames[i];}
+		int getVariableFormat(int i){return variableFormats[i];}
+		int getVariableOffset(int i){return variableOffsets[i];}
+		int getVariableIndex(int i){return variableIndexes[i];}
+
+		egg::String name;
+		int size;
+		egg::Collection<egg::String> variableNames;
+		egg::Collection<int> variableFormats;
+		egg::Collection<int> variableOffsets;
+		egg::Collection<int> variableIndexes;
+
+		friend class GLSLShaderState;
+	};
+
 	bool createContext();
 	bool destroyContext();
 	bool reflect();
@@ -68,6 +93,8 @@ protected:
 	bool mNeedsLink;
 	egg::Collection<Shader::ptr> mShaders;
 	
+	egg::Collection<VariableBufferFormat::ptr> mVariableBufferFormats;
+
 	egg::Collection<GLSLVertexLayout::ptr> mLayouts;
 
 	friend class GLRenderDevice;
