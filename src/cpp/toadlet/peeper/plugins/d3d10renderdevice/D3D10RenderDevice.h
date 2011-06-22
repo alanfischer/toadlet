@@ -64,7 +64,7 @@ public:
 	VertexFormat *createVertexFormat();
 	VertexBuffer *createVertexBuffer();
 	IndexBuffer *createIndexBuffer();
-	ConstantBuffer *createConstantBuffer();
+	VariableBuffer *createVariableBuffer();
 	Shader *createShader();
 	Query *createQuery();
 	RenderState *createRenderState();
@@ -85,7 +85,7 @@ public:
 	void setDefaultState();
 	bool setRenderState(RenderState *renderState);
 	bool setShaderState(ShaderState *shaderState);
-	void setBuffer(int i,ConstantBuffer *buffer);
+	void setBuffer(int i,VariableBuffer *buffer);
 	void setTexture(int stage,Texture *texture){}
 
 	// Old fixed states
@@ -121,6 +121,7 @@ public:
 	static void getD3D10_DEPTH_STENCIL_DESC(D3D10_DEPTH_STENCIL_DESC &desc,const DepthState &state);
 	static void getD3D10_RASTERIZER_DESC(D3D10_RASTERIZER_DESC &desc,const RasterizerState &state);
 	static void getD3D10_SAMPLER_DESC(D3D10_SAMPLER_DESC &desc,const SamplerState &state);
+	static int getVariableFormat(const D3D10_SHADER_TYPE_DESC &type);
 
 protected:
 	void vertexFormatCreated(D3D10VertexFormat *format);

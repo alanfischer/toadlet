@@ -52,53 +52,48 @@ public:
 		Format_UNKNOWN=			0,
 
 		// Format types
-		Format_BIT_UINT_8=		1<<0,
-		Format_BIT_INT_8=		1<<1,
-		Format_BIT_INT_16=		1<<2,
-		Format_BIT_INT_32=		1<<3,
-		Format_BIT_FIXED_32=	1<<4,
-		Format_BIT_FLOAT_32=	1<<5,
-		Format_BIT_DOUBLE_64=	1<<6,
-		Format_MASK_TYPES=		0x3FF,
+		Format_MASK_TYPES=		0xFF,
+		Format_TYPE_UINT_8=		1,
+		Format_TYPE_INT_8=		2,
+		Format_TYPE_INT_16=		3,
+		Format_TYPE_INT_32=		4,
+		Format_TYPE_FIXED_32=	5,
+		Format_TYPE_FLOAT_32=	6,
+		Format_TYPE_DOUBLE_64=	7,
+		Format_TYPE_COLOR_RGBA=	8,
 
 		// Format counts
-		Format_COUNT_SHIFT=		10,
-		Format_BIT_COUNT_1=		1<<10,
-		Format_BIT_COUNT_2=		1<<11,
-		Format_BIT_COUNT_3=		1<<12,
-		Format_BIT_COUNT_4=		1<<13,
-		Format_MASK_COUNTS=		0xFFC00,
-		// Formats
-		Format_COLOR_RGBA=		1<<20,
+		Format_SHIFT_COUNTS=	16,
+		Format_MASK_COUNTS=		0xFF<<16,
+		Format_COUNT_1=			1<<16,
+		Format_COUNT_2=			2<<16,
+		Format_COUNT_3=			3<<16,
+		Format_COUNT_4=			4<<16,
 	};
 
 	// static methods aren't allowed in Interfaces, but technically enums shouldn't be either, so these need to be separated to an alongside class
 	static int getFormatSize(int format){
 		int size=0;
-		if((format&(Format_BIT_UINT_8|Format_BIT_INT_8))>0){
+		int type=(format&Format_MASK_TYPES);
+		if(type==Format_TYPE_UINT_8 || type==Format_TYPE_INT_8){
 			size=1;
 		}
-		else if((format&Format_BIT_INT_16)>0){
+		else if(type==Format_TYPE_INT_16){
 			size=2;
 		}
-		else if((format&(Format_BIT_INT_32|Format_BIT_FIXED_32|Format_BIT_FLOAT_32))>0){
+		else if(type==Format_TYPE_INT_32 || type==Format_TYPE_FIXED_32 || type==Format_TYPE_FLOAT_32){
 			size=4;
 		}
-		else if((format&Format_BIT_DOUBLE_64)>0){
+		else if(type==Format_TYPE_DOUBLE_64){
 			size=8;
 		}
-		else if(format==Format_COLOR_RGBA){
+		else if(format==Format_TYPE_COLOR_RGBA){
 			size=4;
 		}
 
-		if((format&Format_BIT_COUNT_2)>0){
-			size*=2;
-		}
-		else if((format&Format_BIT_COUNT_3)>0){
-			size*=3;
-		}
-		else if((format&Format_BIT_COUNT_4)>0){
-			size*=4;
+		int count=(format&Format_MASK_COUNTS)>>Format_SHIFT_COUNTS;
+		if(count>0){
+			size*=count;
 		}
 
 		return size;

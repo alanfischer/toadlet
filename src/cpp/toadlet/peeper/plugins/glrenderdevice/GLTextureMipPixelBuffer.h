@@ -76,8 +76,9 @@ public:
 	GLuint getTarget() const;
 
 	/// @todo: Implement these
-	uint8 *lock(int access){return NULL;}
+	tbyte *lock(int access){return NULL;}
 	bool unlock(){return false;}
+	bool update(tbyte *data,int start,int size){return false;}
 
 protected:
 	GLTexture *mTexture;

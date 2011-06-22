@@ -209,6 +209,18 @@ bool D3D9IndexBuffer::unlock(){
 	return SUCCEEDED(result);
 }
 
+
+bool D3D9IndexBuffer::update(tbyte *data,int start,int size){
+	tbyte *bdata=NULL;
+	HRESULT result=mIndexBuffer->Lock(start,size,(void**)&bdata,D3DLOCK_DISCARD);
+	if(bdata!=NULL){
+		memcpy(bdata,data,size);
+	}
+	result=mIndexBuffer->Unlock();
+
+	return SUCCEEDED(result);
+}
+
 bool D3D9IndexBuffer::needsReset(){
 	#if defined(TOADLET_SET_D3DM)
 		return false;

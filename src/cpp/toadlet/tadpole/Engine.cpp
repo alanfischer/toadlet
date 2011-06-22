@@ -185,9 +185,9 @@ Engine::Engine(bool backable):
 
 	// Make a guess at what the ideal format is.
 	#if defined(TOADLET_FIXED_POINT) && (defined(TOADLET_PLATFORM_WINCE) || defined(TOADLET_PLATFORM_IPHONE) || defined(TOADLET_PLATFORM_ANDROID))
-		mIdealVertexFormatBit=VertexFormat::Format_BIT_FIXED_32;
+		mIdealVertexFormatType=VertexFormat::Format_TYPE_FIXED_32;
 	#else
-		mIdealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
+		mIdealVertexFormatType=VertexFormat::Format_TYPE_FLOAT_32;
 	#endif
 	// Create initial BackableVertexFormats.  This doesn't need to be done, but without it, starting an application without a RenderDevice will crash.
 	updateVertexFormats();
@@ -385,7 +385,7 @@ bool Engine::setRenderDevice(RenderDevice *renderDevice){
 				String()+(char)9+"textureAutogenMipMaps:"+caps.textureAutogenMipMaps);
 		}
 
-		mIdealVertexFormatBit=caps.idealVertexFormatBit;
+		mIdealVertexFormatType=caps.idealVertexFormatType;
 	}
 
 	if(renderDevice!=mRenderDevice && mRenderDevice!=NULL){
@@ -409,52 +409,52 @@ RenderDevice *Engine::getRenderDevice() const{
 }
 
 void Engine::updateVertexFormats(){
-	int formatBit=mIdealVertexFormatBit;
+	int formatType=mIdealVertexFormatType;
 
 	VertexFormat::ptr format;
 
 	format=mBufferManager->createVertexFormat();
-	format->addElement(VertexFormat::Semantic_POSITION,0,formatBit|VertexFormat::Format_BIT_COUNT_3);
+	format->addElement(VertexFormat::Semantic_POSITION,0,formatType|VertexFormat::Format_COUNT_3);
 	mVertexFormats.POSITION=format;
 
 	format=mBufferManager->createVertexFormat();
-	format->addElement(VertexFormat::Semantic_POSITION,0,formatBit|VertexFormat::Format_BIT_COUNT_3);
-	format->addElement(VertexFormat::Semantic_NORMAL,0,formatBit|VertexFormat::Format_BIT_COUNT_3);
+	format->addElement(VertexFormat::Semantic_POSITION,0,formatType|VertexFormat::Format_COUNT_3);
+	format->addElement(VertexFormat::Semantic_NORMAL,0,formatType|VertexFormat::Format_COUNT_3);
 	mVertexFormats.POSITION_NORMAL=format;
 
 	format=mBufferManager->createVertexFormat();
-	format->addElement(VertexFormat::Semantic_POSITION,0,formatBit|VertexFormat::Format_BIT_COUNT_3);
-	format->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_COLOR_RGBA);
+	format->addElement(VertexFormat::Semantic_POSITION,0,formatType|VertexFormat::Format_COUNT_3);
+	format->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_TYPE_COLOR_RGBA);
 	mVertexFormats.POSITION_COLOR=format;
 
 	format=mBufferManager->createVertexFormat();
-	format->addElement(VertexFormat::Semantic_POSITION,0,formatBit|VertexFormat::Format_BIT_COUNT_3);
-	format->addElement(VertexFormat::Semantic_TEXCOORD,0,formatBit|VertexFormat::Format_BIT_COUNT_2);
+	format->addElement(VertexFormat::Semantic_POSITION,0,formatType|VertexFormat::Format_COUNT_3);
+	format->addElement(VertexFormat::Semantic_TEXCOORD,0,formatType|VertexFormat::Format_COUNT_2);
 	mVertexFormats.POSITION_TEX_COORD=format;
 
 	format=mBufferManager->createVertexFormat();
-	format->addElement(VertexFormat::Semantic_POSITION,0,formatBit|VertexFormat::Format_BIT_COUNT_3);
-	format->addElement(VertexFormat::Semantic_NORMAL,0,formatBit|VertexFormat::Format_BIT_COUNT_3);
-	format->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_COLOR_RGBA);
+	format->addElement(VertexFormat::Semantic_POSITION,0,formatType|VertexFormat::Format_COUNT_3);
+	format->addElement(VertexFormat::Semantic_NORMAL,0,formatType|VertexFormat::Format_COUNT_3);
+	format->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_TYPE_COLOR_RGBA);
 	mVertexFormats.POSITION_NORMAL_COLOR=format;
 
 	format=mBufferManager->createVertexFormat();
-	format->addElement(VertexFormat::Semantic_POSITION,0,formatBit|VertexFormat::Format_BIT_COUNT_3);
-	format->addElement(VertexFormat::Semantic_NORMAL,0,formatBit|VertexFormat::Format_BIT_COUNT_3);
-	format->addElement(VertexFormat::Semantic_TEXCOORD,0,formatBit|VertexFormat::Format_BIT_COUNT_2);
+	format->addElement(VertexFormat::Semantic_POSITION,0,formatType|VertexFormat::Format_COUNT_3);
+	format->addElement(VertexFormat::Semantic_NORMAL,0,formatType|VertexFormat::Format_COUNT_3);
+	format->addElement(VertexFormat::Semantic_TEXCOORD,0,formatType|VertexFormat::Format_COUNT_2);
 	mVertexFormats.POSITION_NORMAL_TEX_COORD=format;
 
 	format=mBufferManager->createVertexFormat();
-	format->addElement(VertexFormat::Semantic_POSITION,0,formatBit|VertexFormat::Format_BIT_COUNT_3);
-	format->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_COLOR_RGBA);
-	format->addElement(VertexFormat::Semantic_TEXCOORD,0,formatBit|VertexFormat::Format_BIT_COUNT_2);
+	format->addElement(VertexFormat::Semantic_POSITION,0,formatType|VertexFormat::Format_COUNT_3);
+	format->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_TYPE_COLOR_RGBA);
+	format->addElement(VertexFormat::Semantic_TEXCOORD,0,formatType|VertexFormat::Format_COUNT_2);
 	mVertexFormats.POSITION_COLOR_TEX_COORD=format;
 
 	format=mBufferManager->createVertexFormat();
-	format->addElement(VertexFormat::Semantic_POSITION,0,formatBit|VertexFormat::Format_BIT_COUNT_3);
-	format->addElement(VertexFormat::Semantic_NORMAL,0,formatBit|VertexFormat::Format_BIT_COUNT_3);
-	format->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_COLOR_RGBA);
-	format->addElement(VertexFormat::Semantic_TEXCOORD,0,formatBit|VertexFormat::Format_BIT_COUNT_2);
+	format->addElement(VertexFormat::Semantic_POSITION,0,formatType|VertexFormat::Format_COUNT_3);
+	format->addElement(VertexFormat::Semantic_NORMAL,0,formatType|VertexFormat::Format_COUNT_3);
+	format->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_TYPE_COLOR_RGBA);
+	format->addElement(VertexFormat::Semantic_TEXCOORD,0,formatType|VertexFormat::Format_COUNT_2);
 	mVertexFormats.POSITION_NORMAL_COLOR_TEX_COORD=format;
 }
 

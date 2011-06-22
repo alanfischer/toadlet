@@ -61,7 +61,7 @@ public:
 	VertexFormat *createVertexFormat();
 	VertexBuffer *createVertexBuffer();
 	IndexBuffer *createIndexBuffer();
-	ConstantBuffer *createConstantBuffer(){return NULL;}
+	VariableBuffer *createVariableBuffer();
 	Shader *createShader();
 	Query *createQuery();
 	RenderState *createRenderState();
@@ -83,7 +83,7 @@ public:
 	void setDefaultState();
 	bool setRenderState(RenderState *renderState);
 	bool setShaderState(ShaderState *shaderState);
-	void setBuffer(int i,ConstantBuffer *buffer){}
+	void setBuffer(int i,VariableBuffer *buffer);
 	void setTexture(int i,Texture *texture);
 
 	// Old fixed states

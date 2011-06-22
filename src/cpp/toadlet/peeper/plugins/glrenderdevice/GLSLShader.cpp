@@ -103,7 +103,7 @@ bool GLSLShader::createContext(){
 			logString=log;
 			delete log;
 		}
-		Error::unknown(Categories::TOADLET_PEEPER,"glsl compile error:"+logString);
+		Error::unknown(Categories::TOADLET_PEEPER,"glsl compile error:\n"+logString);
 		return false;
 	}
 	

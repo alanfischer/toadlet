@@ -55,8 +55,9 @@ public:
 	IndexFormat getIndexFormat() const{return mIndexFormat;}
 	int getSize() const{return mSize;}
 
-	uint8 *lock(int lockAccess);
+	tbyte *lock(int lockAccess);
 	bool unlock();
+	bool update(tbyte *data,int start,int size);
 
 	bool needsReset();
 

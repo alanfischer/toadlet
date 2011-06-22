@@ -162,26 +162,21 @@ Logo::~Logo(){
 }
 Shader::ptr vs,fs;
 ShaderState::ptr ss;
-ConstantBuffer::ptr cb;
+VariableBuffer::ptr vb;
 
 String sp[]={
 	"glsl",
 	"hlsl"
 };
 String vsc[]={
-	"varying vec4 color;\n" \
-	"uniform Block3{\n" \
-		"uniform vec4 voom;\n" \
-		"uniform vec4 voom2;\n" \
-	"} b3;\n" \
-	"uniform mat4 ModelViewProjectionMatrix;\n" \
-	"uniform Block{\n" \
-		"uniform vec4 voom;\n" \
-		"uniform vec4 voom2;\n" \
-	"} b;\n" \
+	"#version 150\n" \
+	"in vec4 POSITION;\n" \
+	"in vec3 NORMAL;\n" \
+	"out vec4 color;\n" \
+	"layout(row_major) uniform block{mat4 ModelViewProjectionMatrix;};\n" \
 	"void main(){\n" \
-		"gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n" \
-		"color = vec4(gl_Normal.x,gl_Normal.y,gl_Normal.z,1.0);\n" \
+		"gl_Position = ModelViewProjectionMatrix * POSITION;\n" \
+		"color = vec4(NORMAL.x,NORMAL.y,NORMAL.z,1.0);\n" \
 	"}",
 
 	"struct VIN{\n" \
@@ -201,7 +196,7 @@ String vsc[]={
 	"}"
 };
 String fsc[]={
-	"varying vec4 color;\n" \
+	"in vec4 color;\n" \
 	"void main(){\n" \
 		"gl_FragColor = color;\n" \
 	"}",
@@ -216,7 +211,7 @@ String fsc[]={
 };
 
 void Logo::create(){
-	Application::create("d3d9");
+	Application::create("d3d10");
 
 	mEngine->setDirectory("../../../data");
 
@@ -251,7 +246,7 @@ fs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,sp,
 		meshNode->getSubMesh(i)->material->setShader(Shader::ShaderType_FRAGMENT,fs);
 	}
 
-cb=getEngine()->getBufferManager()->createConstantBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,16*4);
+vb=getEngine()->getBufferManager()->createVariableBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,vs->getVariableBufferFormat(0));
 
 // Only looks good if running on device, in simulator its always a top down view
 #if 0
@@ -282,17 +277,21 @@ void Logo::resized(int width,int height){
 }
 
 void Logo::render(RenderDevice *renderDevice){
-#if 0
+#if 1
 Matrix4x4 shaderMatrix;
 Math::transpose(shaderMatrix,cameraNode->getProjectionMatrix()*cameraNode->getViewMatrix());
-tbyte *data=cb->lock(Buffer::Access_BIT_WRITE);
-memcpy(data,shaderMatrix.getData(),sizeof(shaderMatrix));
-cb->unlock();
+//shaderMatrix.set(cameraNode->getProjectionMatrix()*cameraNode->getViewMatrix());
+vb->update((tbyte*)shaderMatrix.getData(),0,16*4);
+//tbyte *data=cb->lock(Buffer::Access_BIT_WRITE);
+//memcpy(data,shaderMatrix.getData(),sizeof(shaderMatrix));
+//cb->unlock();
 #endif
 
+Logger::alert(String("NAME:")+vb->getVariableBufferFormat()->getName());
 
 	renderDevice->beginScene();
-renderDevice->setBuffer(0,cb);
+renderDevice->setShaderState(meshNode->getSubMesh(0)->material->getShaderState());
+renderDevice->setBuffer(0,vb);
 		cameraNode->render(renderDevice);
 	renderDevice->endScene();
 	renderDevice->swap();

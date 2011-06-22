@@ -68,7 +68,7 @@ void VertexBufferAccessor::lock(VertexBuffer *vertexBuffer,int access){
 		mElementOffsets32[i]=vertexFormat->getOffset(i)/sizeof(int32);
 	}
 
-	if((vertexFormat->getFormat(0)&VertexFormat::Format_BIT_FIXED_32)>0){
+	if((vertexFormat->getFormat(0)&VertexFormat::Format_MASK_TYPES)==VertexFormat::Format_TYPE_FIXED_32){
 		mNativeFixed=true;
 	}
 	else{

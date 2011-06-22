@@ -56,8 +56,9 @@ public:
 	VertexFormat::ptr getVertexFormat() const{return mVertexFormat;}
 	int getSize() const{return mSize;}
 
-	uint8 *lock(int lockAccess);
+	tbyte *lock(int lockAccess);
 	bool unlock();
+	bool update(tbyte *data,int start,int size);
 
 	bool needsReset();
 

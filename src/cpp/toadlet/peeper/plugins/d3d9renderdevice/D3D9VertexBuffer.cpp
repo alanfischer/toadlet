@@ -182,7 +182,7 @@ uint8 *D3D9VertexBuffer::lock(int lockAccess){
 		if(mVertexFormat!=NULL){
 			int vertexSize=mVertexFormat->getVertexSize();
 			for(i=0;i<mVertexFormat->getNumElements();++i){
-				if(mVertexFormat->getFormat(i)==VertexFormat::Format_COLOR_RGBA){
+				if(mVertexFormat->getFormat(i)==VertexFormat::Format_TYPE_COLOR_RGBA){
 					tbyte *data=mData+mVertexFormat->getOffset(i);
 					for(j=0;j<mSize;++j){
 						uint32 &color=*(uint32*)(data+vertexSize*j);
@@ -207,7 +207,7 @@ bool D3D9VertexBuffer::unlock(){
 		if(mVertexFormat!=NULL){
 			int vertexSize=mVertexFormat->getVertexSize();
 			for(i=0;i<mVertexFormat->getNumElements();++i){
-				if(mVertexFormat->getFormat(i)==VertexFormat::Format_COLOR_RGBA){
+				if(mVertexFormat->getFormat(i)==VertexFormat::Format_TYPE_COLOR_RGBA){
 					tbyte *data=mData+mVertexFormat->getOffset(i);
 					for(j=0;j<mSize;++j){
 						uint32 &color=*(uint32*)(data+vertexSize*j);
@@ -222,6 +222,17 @@ bool D3D9VertexBuffer::unlock(){
 	TOADLET_CHECK_D3D9ERROR(result,"D3D9VertexBuffer: Unlock");
 
 	mData=NULL;
+
+	return SUCCEEDED(result);
+}
+
+bool D3D9VertexBuffer::update(tbyte *data,int start,int size){
+	tbyte *bdata=NULL;
+	HRESULT result=mVertexBuffer->Lock(start,size,(void**)&bdata,D3DLOCK_DISCARD);
+	if(bdata!=NULL){
+		memcpy(bdata,data,size);
+	}
+	result=mVertexBuffer->Unlock();
 
 	return SUCCEEDED(result);
 }

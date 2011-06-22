@@ -144,19 +144,19 @@ bool GLBuffer::create(int usage,int access,int pixelFormat,int width,int height,
 	return true;
 }
 
-bool GLBuffer::create(int usage,int access,int size){
+bool GLBuffer::create(int usage,int access,VariableBufferFormat::ptr variableFormat){
 	destroy();
 
 	mUsage=usage;
 	mAccess=access;
-	mSize=size;
-	mDataSize=mSize;
+	mVariableFormat=variableFormat;
+	mDataSize=variableFormat->getSize();
 
 	#if defined(TOADLET_HAS_GLUBOS)
 		mTarget=GL_UNIFORM_BUFFER;
 	#else
 		Error::unknown(Categories::TOADLET_PEEPER,
-			"ConstantBuffers not supported");
+			"VariableBuffers not supported");
 		return false;
 	#endif
 	createContext();
@@ -190,7 +190,7 @@ void GLBuffer::destroy(){
 			mListener->bufferDestroyed((PixelBuffer*)this);
 		}
 		else{
-			mListener->bufferDestroyed((ConstantBuffer*)this);
+			mListener->bufferDestroyed((VariableBuffer*)this);
 		}
 		mListener=NULL;
 	}
@@ -260,7 +260,7 @@ uint8 *GLBuffer::lock(int lockAccess){
 			int vertexSize=mVertexFormat->getVertexSize();
 			int i,j;
 			for(i=0;i<mVertexFormat->getNumElements();++i){
-				if(mVertexFormat->getFormat(i)==VertexFormat::Format_COLOR_RGBA){
+				if(mVertexFormat->getFormat(i)==VertexFormat::Format_TYPE_COLOR_RGBA){
 					tbyte *data=mData+mVertexFormat->getOffset(i);
 					for(j=0;j<mSize;++j){
 						swap4(*(uint32*)(data+vertexSize*j));
@@ -282,7 +282,7 @@ bool GLBuffer::unlock(){
 			int vertexSize=mVertexFormat->getVertexSize();
 			int i,j;
 			for(i=0;i<mVertexFormat->getNumElements();++i){
-				if(mVertexFormat->getFormat(i)==VertexFormat::Format_COLOR_RGBA){
+				if(mVertexFormat->getFormat(i)==VertexFormat::Format_TYPE_COLOR_RGBA){
 					tbyte *data=mData+mVertexFormat->getOffset(i);
 					for(j=0;j<mSize;++j){
 						swap4(*(uint32*)(data+vertexSize*j));
@@ -320,13 +320,14 @@ bool GLBuffer::unlock(){
 	return true;
 }
 
-void GLBuffer::setConstant(int location,float *data,int size){
-	if(mConstants.size()<location+size){
-		mConstants.resize(location+size);
-		mConstantSizes.resize(location+size);
-	}
-	memcpy(&mConstants[location],data,size*sizeof(float));
-	mConstantSizes[location]=size;
+bool GLBuffer::update(tbyte *data,int start,int size){
+	memcpy(mData+start,data,size);
+
+	glBindBuffer(mTarget,mHandle);
+	glBufferSubData(mTarget,start,size,data);
+	glBindBuffer(mTarget,0);
+
+	return true;
 }
 
 GLenum GLBuffer::getBufferUsage(int usage,int access){

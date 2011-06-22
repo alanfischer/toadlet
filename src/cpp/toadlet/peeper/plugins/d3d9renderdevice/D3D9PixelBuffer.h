@@ -60,8 +60,9 @@ public:
 	int getHeight() const{return mHeight;}
 	int getDepth() const{return mDepth;}
 
-	uint8 *lock(int lockAccess);
+	tbyte *lock(int lockAccess);
 	bool unlock();
+	bool update(tbyte *data,int start,int size);
 
 	bool needsReset();
 

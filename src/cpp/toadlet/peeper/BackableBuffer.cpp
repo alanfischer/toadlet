@@ -99,10 +99,11 @@ bool BackableBuffer::create(int usage,int access,int pixelFormat,int width,int h
 	return true;
 }
 
-bool BackableBuffer::create(int usage,int access,int size){
+bool BackableBuffer::create(int usage,int access,VariableBufferFormat::ptr variableFormat){
 	mUsage=usage;
 	mAccess=access;
-	mSize=size;
+	mVariableFormat=variableFormat;
+	mSize=variableFormat->getSize();
 	mDataSize=mSize;
 
 	mHasData=false;
@@ -124,8 +125,8 @@ void BackableBuffer::destroy(){
 		else if(mPixelFormat!=0){
 			((PixelBuffer*)(mBack.get()))->destroy();
 		}
-		else{
-			((ConstantBuffer*)(mBack.get()))->destroy();
+		else if(mVariableFormat!=NULL){
+			((VariableBuffer*)(mBack.get()))->destroy();
 		}
 		mBack=NULL;
 	}
@@ -145,8 +146,8 @@ void BackableBuffer::destroy(){
 		else if(mPixelFormat!=0){
 			mListener->bufferDestroyed((PixelBuffer*)this);
 		}
-		else{
-			mListener->bufferDestroyed((ConstantBuffer*)this);
+		else if(mVariableFormat!=NULL){
+			mListener->bufferDestroyed((VariableBuffer*)this);
 		}
 		mListener=NULL;
 	}
@@ -163,8 +164,8 @@ void BackableBuffer::resetCreate(){
 		else if(mPixelFormat!=0){
 			((PixelBuffer*)(mBack.get()))->resetCreate();
 		}
-		else{
-			((ConstantBuffer*)(mBack.get()))->resetCreate();
+		else if(mVariableFormat!=0){
+			((VariableBuffer*)(mBack.get()))->resetCreate();
 		}
 	}
 }
@@ -180,8 +181,8 @@ void BackableBuffer::resetDestroy(){
 		else if(mPixelFormat!=0){
 			((PixelBuffer*)(mBack.get()))->resetCreate();
 		}
-		else{
-			((ConstantBuffer*)(mBack.get()))->resetCreate();
+		else if(mVariableFormat!=NULL){
+			((VariableBuffer*)(mBack.get()))->resetCreate();
 		}
 	}
 }
@@ -195,6 +196,18 @@ bool BackableBuffer::unlock(){
 
 	if(mBack!=NULL){
 		writeBack();
+	}
+
+	return true;
+}
+
+bool BackableBuffer::update(tbyte *data,int start,int size){
+	mHasData=true;
+
+	memcpy(mData+start,data,size);
+
+	if(mBack!=NULL){
+		updateBack(start,size);
 	}
 
 	return true;
@@ -252,16 +265,16 @@ void BackableBuffer::setBack(PixelBuffer::ptr back,RenderDevice *renderDevice){
 	}
 }
 
-void BackableBuffer::setBack(ConstantBuffer::ptr back){
+void BackableBuffer::setBack(VariableBuffer::ptr back){
 	if(mBack.get()!=back.get() && mBack!=NULL){
-		((ConstantBuffer*)(mBack.get()))->destroy();
+		((VariableBuffer*)(mBack.get()))->destroy();
 	}
 
 	mBack=back;
 	
 	if(back!=NULL){
 		// Create on setting the back, otherwise D3D10 static resources will not load data in load
-		back->create(mUsage,mAccess,mSize);
+		back->create(mUsage,mAccess,mVariableFormat);
 
 		if(mHasData){
 			writeBack();
@@ -293,6 +306,13 @@ void BackableBuffer::writeBack(){
 			}
 			mBack->unlock();
 		}
+	TOADLET_CATCH(const Exception &){}
+}
+
+void BackableBuffer::updateBack(int start,int size){
+	TOADLET_TRY
+		/// @todo: Convert image data if necessary
+		mBack->update(mData+start,start,size);
 	TOADLET_CATCH(const Exception &){}
 }
 

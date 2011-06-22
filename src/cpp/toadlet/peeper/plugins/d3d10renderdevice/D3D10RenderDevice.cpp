@@ -116,7 +116,7 @@ bool D3D10RenderDevice::create(RenderTarget *target,int *options){
 		caps.renderToTexture=true;
 		caps.renderToDepthTexture=true;
 		caps.renderToTextureNonPowerOf2Restricted=true;
-		caps.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
+		caps.idealVertexFormatType=VertexFormat::Format_TYPE_FLOAT_32;
 		caps.triangleFan=false;
 	}
 
@@ -176,7 +176,7 @@ IndexBuffer *D3D10RenderDevice::createIndexBuffer(){
 	return new D3D10Buffer(this);
 }
 
-ConstantBuffer *D3D10RenderDevice::createConstantBuffer(){
+VariableBuffer *D3D10RenderDevice::createVariableBuffer(){
 	return new D3D10Buffer(this);
 }
 
@@ -413,10 +413,10 @@ bool D3D10RenderDevice::setShaderState(ShaderState *shaderState){
 	return d3dshaderState->activate();
 }
 
-void D3D10RenderDevice::setBuffer(int i,ConstantBuffer *buffer){
+void D3D10RenderDevice::setBuffer(int i,VariableBuffer *buffer){
 	D3D10Buffer *d3dBuffer=NULL;
 	if(buffer!=NULL){
-		d3dBuffer=(D3D10Buffer*)buffer->getRootConstantBuffer();
+		d3dBuffer=(D3D10Buffer*)buffer->getRootVariableBuffer();
 	}
 	ID3D10Buffer *id3dbuffer=NULL;
 	if(d3dBuffer!=NULL){
@@ -506,42 +506,42 @@ DXGI_FORMAT D3D10RenderDevice::getIndexDXGI_FORMAT(IndexBuffer::IndexFormat form
 
 DXGI_FORMAT D3D10RenderDevice::getVertexDXGI_FORMAT(int format){
 	switch(format){
-		case VertexFormat::Format_BIT_UINT_8|VertexFormat::Format_BIT_COUNT_1:
+		case VertexFormat::Format_TYPE_UINT_8|VertexFormat::Format_COUNT_1:
 			return DXGI_FORMAT_R8_UINT;
-		case VertexFormat::Format_BIT_UINT_8|VertexFormat::Format_BIT_COUNT_2:
+		case VertexFormat::Format_TYPE_UINT_8|VertexFormat::Format_COUNT_2:
 			return DXGI_FORMAT_R8G8_UINT;
-		case VertexFormat::Format_BIT_UINT_8|VertexFormat::Format_BIT_COUNT_4:
-		case VertexFormat::Format_COLOR_RGBA:
+		case VertexFormat::Format_TYPE_UINT_8|VertexFormat::Format_COUNT_4:
+		case VertexFormat::Format_TYPE_COLOR_RGBA:
 			return DXGI_FORMAT_R8G8B8A8_UINT;
 
-		case VertexFormat::Format_BIT_INT_8|VertexFormat::Format_BIT_COUNT_1:
+		case VertexFormat::Format_TYPE_INT_8|VertexFormat::Format_COUNT_1:
 			return DXGI_FORMAT_R8_SINT;
-		case VertexFormat::Format_BIT_INT_8|VertexFormat::Format_BIT_COUNT_2:
+		case VertexFormat::Format_TYPE_INT_8|VertexFormat::Format_COUNT_2:
 			return DXGI_FORMAT_R8G8_SINT;
-		case VertexFormat::Format_BIT_INT_8|VertexFormat::Format_BIT_COUNT_4:
+		case VertexFormat::Format_TYPE_INT_8|VertexFormat::Format_COUNT_4:
 			return DXGI_FORMAT_R8G8B8A8_SINT;
 
-		case VertexFormat::Format_BIT_INT_16|VertexFormat::Format_BIT_COUNT_1:
+		case VertexFormat::Format_TYPE_INT_16|VertexFormat::Format_COUNT_1:
 			return DXGI_FORMAT_R16_SINT;
-		case VertexFormat::Format_BIT_INT_16|VertexFormat::Format_BIT_COUNT_2:
+		case VertexFormat::Format_TYPE_INT_16|VertexFormat::Format_COUNT_2:
 			return DXGI_FORMAT_R16G16_SINT;
-		case VertexFormat::Format_BIT_INT_16|VertexFormat::Format_BIT_COUNT_4:
+		case VertexFormat::Format_TYPE_INT_16|VertexFormat::Format_COUNT_4:
 			return DXGI_FORMAT_R16G16B16A16_SINT;
 
-		case VertexFormat::Format_BIT_INT_32|VertexFormat::Format_BIT_COUNT_1:
+		case VertexFormat::Format_TYPE_INT_32|VertexFormat::Format_COUNT_1:
 			return DXGI_FORMAT_R32_SINT;
-		case VertexFormat::Format_BIT_INT_32|VertexFormat::Format_BIT_COUNT_2:
+		case VertexFormat::Format_TYPE_INT_32|VertexFormat::Format_COUNT_2:
 			return DXGI_FORMAT_R32G32_SINT;
-		case VertexFormat::Format_BIT_INT_32|VertexFormat::Format_BIT_COUNT_4:
+		case VertexFormat::Format_TYPE_INT_32|VertexFormat::Format_COUNT_4:
 			return DXGI_FORMAT_R32G32B32A32_SINT;
 
-		case VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_1:
+		case VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_1:
 			return DXGI_FORMAT_R32_FLOAT;
-		case VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_2:
+		case VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_2:
 			return DXGI_FORMAT_R32G32_FLOAT;
-		case VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3:
+		case VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_3:
 			return DXGI_FORMAT_R32G32B32_FLOAT;
-		case VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_4:
+		case VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_4:
 			return DXGI_FORMAT_R32G32B32A32_FLOAT;
 		default:
 			Logger::error(Categories::TOADLET_PEEPER,
@@ -818,6 +818,63 @@ void D3D10RenderDevice::getD3D10_SAMPLER_DESC(D3D10_SAMPLER_DESC &desc,const Sam
 	toD3DColor(desc.BorderColor,state.borderColor);
 	desc.MinLOD=state.minLOD;
 	desc.MaxLOD=state.maxLOD;
+}
+
+int D3D10RenderDevice::getVariableFormat(const D3D10_SHADER_TYPE_DESC &type){
+	int format=0;
+
+	switch(type.Type){
+		case D3D10_SVT_BOOL:
+			format|=VariableBufferFormat::Format_TYPE_UINT_8;
+		break;
+		case D3D10_SVT_INT:
+			format|=VariableBufferFormat::Format_TYPE_INT_32;
+		break;
+		case D3D10_SVT_FLOAT:
+			format|=VariableBufferFormat::Format_TYPE_FLOAT_32;
+		break;
+	}
+
+	if(type.Rows>1){
+		if(type.Rows==2){
+			if(type.Columns==2){
+				format|=VariableBufferFormat::Format_COUNT_2X2;
+			}
+			else if(type.Columns==3){
+				format|=VariableBufferFormat::Format_COUNT_2X3;
+			}
+			else if(type.Columns==4){
+				format|=VariableBufferFormat::Format_COUNT_2X4;
+			}
+		}
+		if(type.Rows==3){
+			if(type.Columns==2){
+				format|=VariableBufferFormat::Format_COUNT_3X2;
+			}
+			else if(type.Columns==3){
+				format|=VariableBufferFormat::Format_COUNT_3X3;
+			}
+			else if(type.Columns==4){
+				format|=VariableBufferFormat::Format_COUNT_3X4;
+			}
+		}
+		if(type.Rows==4){
+			if(type.Columns==2){
+				format|=VariableBufferFormat::Format_COUNT_4X2;
+			}
+			else if(type.Columns==3){
+				format|=VariableBufferFormat::Format_COUNT_4X3;
+			}
+			else if(type.Columns==4){
+				format|=VariableBufferFormat::Format_COUNT_4X4;
+			}
+		}
+	}
+	else{
+		format|=(type.Columns<<VariableBufferFormat::Format_SHIFT_COUNTS);
+	}
+
+	return format;
 }
 
 void D3D10RenderDevice::vertexFormatCreated(D3D10VertexFormat *format){

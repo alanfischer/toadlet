@@ -308,9 +308,9 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 		#endif
 
 		#if defined(TOADLET_HAS_GLES) && defined(TOADLET_FIXED_POINT)
-			caps.idealVertexFormatBit=VertexFormat::Format_BIT_FIXED_32;
+			caps.idealVertexFormatType=VertexFormat::Format_TYPE_FIXED_32;
 		#else
-			caps.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
+			caps.idealVertexFormatType=VertexFormat::Format_TYPE_FLOAT_32;
 		#endif
 
 		// OSX needs a notification to update the back buffer on a resize
@@ -407,6 +407,10 @@ VertexBuffer *GLRenderDevice::createVertexBuffer(){
 }
 
 IndexBuffer *GLRenderDevice::createIndexBuffer(){
+	return new GLBuffer(this);
+}
+
+VariableBuffer *GLRenderDevice::createVariableBuffer(){
 	return new GLBuffer(this);
 }
 
@@ -1319,6 +1323,17 @@ void GLRenderDevice::setTextureStatePostTexture(int i,TextureState *state){
 	TOADLET_CHECK_GLERROR("setTextureState");
 }
 
+void GLRenderDevice::setBuffer(int i,VariableBuffer *buffer){
+	GLBuffer *glbuffer=buffer!=NULL?(GLBuffer*)buffer->getRootVariableBuffer():NULL;
+
+	TOADLET_CHECK_GLERROR("setBuffer-1");
+	glUniformBlockBinding(mLastShaderState->mHandle,0,0);
+	TOADLET_CHECK_GLERROR("setBuffer0");
+	glBindBufferBase(GL_UNIFORM_BUFFER,0,glbuffer->mHandle);
+
+	TOADLET_CHECK_GLERROR("setBuffer");
+}
+
 void GLRenderDevice::setTexture(int i,Texture *texture){
 	if(i>=mCaps.maxTextureStages){
 		return;
@@ -1666,8 +1681,11 @@ bool GLRenderDevice::hardwareBuffersSupported(GLBuffer *buffer) const{
 	else if(buffer->mPixelFormat>0){
 		return mPBOs;
 	}
-	else{
+	else if(buffer->mVariableFormat!=NULL){
 		return mUBOs;
+	}
+	else{
+		return false;
 	}
 }
 
@@ -2053,41 +2071,35 @@ GLenum GLRenderDevice::getGLShadeModel(MaterialState::ShadeType type){
 }
 
 GLint GLRenderDevice::getGLElementCount(int format){
-	switch(format&~VertexFormat::Format_MASK_TYPES){ // Mask out the types
-		case VertexFormat::Format_BIT_COUNT_1:
-			return 1;
-		case VertexFormat::Format_BIT_COUNT_2:
-			return 2;
-		case VertexFormat::Format_BIT_COUNT_3:
-			return 3;
-		case VertexFormat::Format_BIT_COUNT_4:
-		case VertexFormat::Format_COLOR_RGBA:
-			return 4;
-		default:
-			Error::unknown(Categories::TOADLET_PEEPER,
-				"getGLElementCount: Invalid element count");
-			return 0;
+	if(format==VertexFormat::Format_TYPE_COLOR_RGBA){
+		return 4;
+	}
+	else{
+		return (format&VertexFormat::Format_MASK_COUNTS)>>VertexFormat::Format_SHIFT_COUNTS;
 	}
 }
 
 GLenum GLRenderDevice::getGLDataType(int format){
-	switch(format&~VertexFormat::Format_MASK_COUNTS){ // Mask out the counts
-		case VertexFormat::Format_BIT_UINT_8:
-		case VertexFormat::Format_COLOR_RGBA:
+	if(format==VertexFormat::Format_TYPE_COLOR_RGBA){
+		return GL_UNSIGNED_BYTE;
+	}
+
+	switch(format&VertexFormat::Format_MASK_TYPES){ // Mask out the counts
+		case VertexFormat::Format_TYPE_UINT_8:
 			return GL_UNSIGNED_BYTE;
-		case VertexFormat::Format_BIT_INT_8:
+		case VertexFormat::Format_TYPE_INT_8:
 			return GL_BYTE;
-		case VertexFormat::Format_BIT_INT_16:
+		case VertexFormat::Format_TYPE_INT_16:
 			return GL_SHORT;
-		case VertexFormat::Format_BIT_FLOAT_32:
+		case VertexFormat::Format_TYPE_FLOAT_32:
 			return GL_FLOAT;
 		#if !defined(TOADLET_HAS_GLES)
-			case VertexFormat::Format_BIT_INT_32:
+			case VertexFormat::Format_TYPE_INT_32:
 				return GL_INT;
-			case VertexFormat::Format_BIT_DOUBLE_64:
+			case VertexFormat::Format_TYPE_DOUBLE_64:
 				return GL_DOUBLE;
 		#else
-			case VertexFormat::Format_BIT_FIXED_32:
+			case VertexFormat::Format_TYPE_FIXED_32:
 				return GL_FIXED;
 		#endif
 		default:

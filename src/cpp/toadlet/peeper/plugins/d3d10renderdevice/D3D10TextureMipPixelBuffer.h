@@ -61,8 +61,9 @@ public:
 	int getHeight() const{return mHeight;}
 	int getDepth() const{return mDepth;}
 
-	uint8 *lock(int lockAccess);
+	tbyte *lock(int lockAccess);
 	bool unlock();
+	bool update(tbyte *data,int start,int size){return false;}
 
 	inline D3D10Texture *getTexture() const{return mTexture;}
 	inline ID3D10RenderTargetView *getD3D10RenderTargetView() const{return mD3DRenderTargetView;}

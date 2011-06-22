@@ -30,6 +30,7 @@
 #include "D3D9ShaderState.h"
 #include "D3D9Texture.h"
 #include "D3D9IndexBuffer.h"
+#include "D3D9VariableBuffer.h"
 #include "D3D9VertexBuffer.h"
 #include "D3D9VertexFormat.h"
 #if !defined(TOADLET_SET_D3DM)
@@ -217,6 +218,10 @@ IndexBuffer *D3D9RenderDevice::createIndexBuffer(){
 	return new D3D9IndexBuffer(this);
 }
 
+VariableBuffer *D3D9RenderDevice::createVariableBuffer(){
+	return new D3D9VariableBuffer(this);
+}
+
 Shader *D3D9RenderDevice::createShader(){
 	return new D3D9Shader(this);
 }
@@ -297,24 +302,21 @@ void D3D9RenderDevice::clear(int clearFlags,const Vector4 &clearColor){
 void D3D9RenderDevice::swap(){
 	mD3DRenderTarget->swap();
 }
-Matrix4x4 mm,vm,pm;
+
 void D3D9RenderDevice::setModelMatrix(const Matrix4x4 &matrix){
 	toD3DMATRIX(cacheD3DMatrix,matrix);
-mm=matrix;
 	HRESULT result=mD3DDevice->SetTransform(D3DTS_WORLD,&cacheD3DMatrix TOADLET_D3DMFMT);
 	TOADLET_CHECK_D3D9ERROR(result,"setModelMatrix");
 }
 
 void D3D9RenderDevice::setViewMatrix(const Matrix4x4 &matrix){
 	toD3DMATRIX(cacheD3DMatrix,matrix);
-vm=matrix;
 	HRESULT result=mD3DDevice->SetTransform(D3DTS_VIEW,&cacheD3DMatrix TOADLET_D3DMFMT);
 	TOADLET_CHECK_D3D9ERROR(result,"setViewMatrix");
 }
 
 void D3D9RenderDevice::setProjectionMatrix(const Matrix4x4 &matrix){
 	D3DMATRIX &d3dmatrix=cacheD3DMatrix;
-pm=matrix;
 	toD3DMATRIX(d3dmatrix,matrix);
 
 	// Convert depth ranges from -1,1 to 0,1
@@ -355,10 +357,6 @@ void D3D9RenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexDa
 			"D3D9RenderDevice does not support multiple streams yet");
 		return;
 	}
-
-Matrix4x4 shaderMatrix;
-Math::transpose(shaderMatrix,pm*vm*mm);
-mD3DDevice->SetVertexShaderConstantF(0,shaderMatrix.getData(),4);
 
 	HRESULT result;
 	D3DPRIMITIVETYPE d3dpt;
@@ -794,6 +792,26 @@ void D3D9RenderDevice::setTextureState(int i,TextureState *state){
 	}
 }
 
+void D3D9RenderDevice::setBuffer(int i,VariableBuffer *buffer){
+	D3D9VariableBuffer *d3dbuffer=buffer!=NULL?(D3D9VariableBuffer*)buffer->getRootVariableBuffer():NULL;
+/*
+	int j;
+	for(i=0;i<d3dbuffer->mVariableSizes.size();++i){
+		if(d3dbuffer->mVariableSizes[i]>0){
+			int size=d3dbuffer->mVariableSizes[i];
+			for(j=0;j<size;j+=16){
+				int location=(i+j)/16;
+				float *data=(float*)&d3dbuffer->mConstantValues[i+j];
+
+				mD3DDevice->SetVertexShaderConstantF(location,data,size/16);
+
+				mD3DDevice->SetPixelShaderConstantF(location,data,size/16);
+			}
+		}
+	}
+*/
+}
+
 void D3D9RenderDevice::setTexture(int i,Texture *texture){
 	HRESULT result=S_OK;
 
@@ -897,9 +915,9 @@ void D3D9RenderDevice::setCapsFromD3DCAPS9(RenderCaps &caps,const D3DCAPS9 &d3dc
 	caps.renderToDepthTexture=renderToDepthTexture;
 	caps.renderToTextureNonPowerOf2Restricted=caps.textureNonPowerOf2Restricted && caps.renderToTexture;
 	#if defined(TOADLET_SET_D3DM) && defined(TOADLET_FIXED_POINT)
-		caps.idealVertexFormatBit=VertexFormat::Format_BIT_FIXED_32;
+		caps.idealVertexFormatType=VertexFormat::Format_TYPE_FIXED_32;
 	#else
-		caps.idealVertexFormatBit=VertexFormat::Format_BIT_FLOAT_32;
+		caps.idealVertexFormatType=VertexFormat::Format_TYPE_FLOAT_32;
 	#endif
 	caps.triangleFan=true;
 	caps.fill=true;
@@ -1320,27 +1338,27 @@ DWORD D3D9RenderDevice::getFVF(VertexFormat *vertexFormat){
 		int index=vertexFormat->getIndex(i);
 		int format=vertexFormat->getFormat(i);
 		#if defined(TOADLET_SET_D3DM)
-			if(semantic==VertexFormat::Semantic_POSITION && format==(VertexFormat::Format_BIT_FIXED_32|VertexFormat::Format_BIT_COUNT_3)){
+			if(semantic==VertexFormat::Semantic_POSITION && format==(VertexFormat::Format_TYPE_FIXED_32|VertexFormat::Format_COUNT_3)){
 				fvf|=D3DMFVF_XYZ_FIXED;
 			}
-			else if(semantic==VertexFormat::Semantic_POSITION && format==(VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3)){
+			else if(semantic==VertexFormat::Semantic_POSITION && format==(VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_3)){
 				fvf|=D3DMFVF_XYZ_FLOAT;
 			}
-			else if(semantic==VertexFormat::Semantic_NORMAL && format==(VertexFormat::Format_BIT_FIXED_32|VertexFormat::Format_BIT_COUNT_3)){
+			else if(semantic==VertexFormat::Semantic_NORMAL && format==(VertexFormat::Format_TYPE_FIXED_32|VertexFormat::Format_COUNT_3)){
 				fvf|=D3DMFVF_NORMAL_FIXED;
 			}
-			else if(semantic==VertexFormat::Semantic_NORMAL && format==(VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3)){
+			else if(semantic==VertexFormat::Semantic_NORMAL && format==(VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_3)){
 				fvf|=D3DMFVF_NORMAL_FLOAT;
 			}
 		#else
-			if(semantic==VertexFormat::Semantic_POSITION && format==(VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3)){
+			if(semantic==VertexFormat::Semantic_POSITION && format==(VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_3)){
 				fvf|=D3DFVF_XYZ;
 			}
-			else if(semantic==VertexFormat::Semantic_NORMAL && format==(VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3)){
+			else if(semantic==VertexFormat::Semantic_NORMAL && format==(VertexFormat::Format_TYPE_FLOAT_32|VertexFormat::Format_COUNT_3)){
 				fvf|=D3DFVF_NORMAL;
 			}
 		#endif
-		else if(semantic==VertexFormat::Semantic_COLOR && format==VertexFormat::Format_COLOR_RGBA){
+		else if(semantic==VertexFormat::Semantic_COLOR && format==VertexFormat::Format_TYPE_COLOR_RGBA){
 			if(index==0){
 				fvf|=D3DFVF_DIFFUSE;
 			}
@@ -1349,29 +1367,33 @@ DWORD D3D9RenderDevice::getFVF(VertexFormat *vertexFormat){
 			}
 		}
 		else if(semantic==VertexFormat::Semantic_TEXCOORD){
-			if((format&VertexFormat::Format_BIT_COUNT_1)>0){
-				fvf|=D3DFVF_TEXCOORDSIZE1(texCoordCount);
-			}
-			else if((format&VertexFormat::Format_BIT_COUNT_2)>0){
-				fvf|=D3DFVF_TEXCOORDSIZE2(texCoordCount);
-			}
-			else if((format&VertexFormat::Format_BIT_COUNT_3)>0){
-				fvf|=D3DFVF_TEXCOORDSIZE3(texCoordCount);
-			}
-			else if((format&VertexFormat::Format_BIT_COUNT_4)>0){
-				#if defined(TOADLET_SET_D3DM)
-					Logger::error(Categories::TOADLET_PEEPER,
-						"D3D9VertexBuffer: Invalid tex coord count");
-				#else
-					fvf|=D3DFVF_TEXCOORDSIZE4(texCoordCount);
-				#endif
+			int count=(format&VertexFormat::Format_MASK_COUNTS);
+			switch(count){
+				case VertexFormat::Format_COUNT_1:
+					fvf|=D3DFVF_TEXCOORDSIZE1(texCoordCount);
+				break;
+				case VertexFormat::Format_COUNT_2:
+					fvf|=D3DFVF_TEXCOORDSIZE2(texCoordCount);
+				break;
+				case VertexFormat::Format_COUNT_3:
+					fvf|=D3DFVF_TEXCOORDSIZE3(texCoordCount);
+				break;
+				case VertexFormat::Format_COUNT_4:
+					#if defined(TOADLET_SET_D3DM)
+						Logger::error(Categories::TOADLET_PEEPER,
+							"D3D9VertexBuffer: Invalid tex coord count");
+						return 0;
+					#else
+						fvf|=D3DFVF_TEXCOORDSIZE4(texCoordCount);
+					#endif
+				break;
 			}
 
 			#if defined(TOADLET_SET_D3DM)
-				if((format&VertexFormat::Format_BIT_FIXED_32)>0){
+				if((format&VertexFormat::Format_MASK_TYPES)==VertexFormat::Format_TYPE_FIXED_32){
 					fvf|=D3DMFVF_TEXCOORDFIXED(texCoordCount);
 				}
-				else if((format&VertexFormat::Format_BIT_FLOAT_32)>0){
+				else{
 					fvf|=D3DMFVF_TEXCOORDFLOAT(texCoordCount);
 				}
 			#endif
