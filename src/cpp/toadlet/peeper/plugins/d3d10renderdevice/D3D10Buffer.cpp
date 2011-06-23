@@ -26,6 +26,7 @@
 #include "D3D10Buffer.h"
 #include "D3D10RenderDevice.h"
 #include <toadlet/egg/Logger.h>
+#include <toadlet/peeper/BackableBuffer.h>
 
 using namespace toadlet::egg;
 
@@ -40,6 +41,7 @@ D3D10Buffer::D3D10Buffer(D3D10RenderDevice *renderDevice):
 	mAccess(0),
 	mDataSize(0),
 	mSize(0),
+	mHasTranspose(false),
 
 	mIndexFormat((IndexFormat)0),
 	//mVertexFormat,
@@ -124,13 +126,19 @@ bool D3D10Buffer::create(int usage,int access,VariableBufferFormat::ptr variable
 	mUsage=usage;
 	mAccess=access;
 	mVariableFormat=variableFormat;
-	mDataSize=variableFormat->getSize();
+	mDataSize=variableFormat->getDataSize();
 
 	mBindFlags|=D3D10_BIND_CONSTANT_BUFFER;
 
 	mMapping=(mUsage&(Usage_BIT_STATIC|Usage_BIT_STREAM))==0;
 	if(mMapping){
 		createContext();
+
+		mHasTranspose=false;
+		int i;
+		for(i=0;i<mVariableFormat->variableFormats.size();++i){
+			mHasTranspose|=((mVariableFormat->variableFormats[i]&VariableBufferFormat::Format_BIT_TRANSPOSE)!=0);
+		}
 	}
 	else{
 		mData=new uint8[mDataSize];
@@ -254,10 +262,18 @@ uint8 *D3D10Buffer::lock(int lockAccess){
 		}
 	}
 
+	if(mVariableFormat!=NULL && mHasTranspose){
+		BackableBuffer::transposeVariables(mVariableFormat,mData);
+	}
+
 	return mData;
 }
 
 bool D3D10Buffer::unlock(){
+	if(mVariableFormat!=NULL && mHasTranspose){
+		BackableBuffer::transposeVariables(mVariableFormat,mData);
+	}
+
 	// We do this even if its read only, since we have to do it in all situations for locking
 	if(mData!=NULL){
 		int i,j;
@@ -311,14 +327,6 @@ bool D3D10Buffer::update(tbyte *data,int start,int size){
 	tbyte *bdata=lock(Access_BIT_WRITE);
 	memcpy(bdata+start,data,size);
 	return unlock();
-}
-
-void D3D10Buffer::setConstant(int location,float *data,int size){
-	tbyte *buffer=lock(Access_BIT_WRITE);
-
-	memcpy(buffer+location*sizeof(float),data,size*sizeof(float));
-
-	unlock();
 }
 
 }

@@ -28,6 +28,7 @@
 
 #include "D3D9Includes.h"
 #include <toadlet/peeper/VariableBuffer.h>
+#include <toadlet/peeper/Shader.h>
 
 namespace toadlet{
 namespace peeper{
@@ -54,9 +55,11 @@ public:
 	VariableBufferFormat::ptr getVariableBufferFormat() const{return mVariableFormat;}
 	int getDataSize() const{return mDataSize;}
 
-	tbyte *lock(int lockAccess){return NULL;}
-	bool unlock(){return false;}
+	tbyte *lock(int lockAccess);
+	bool unlock();
 	bool update(tbyte *data,int start,int size);
+
+	void activateConstants(Shader::ShaderType type);
 
 protected:
 	D3D9RenderDevice *mDevice;
@@ -66,6 +69,7 @@ protected:
 	int mAccess;
 	VariableBufferFormat::ptr mVariableFormat;
 	int mDataSize;
+	bool mHasTranspose;
 	
 	tbyte *mData;
 

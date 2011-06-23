@@ -69,8 +69,6 @@ public:
 	bool unlock();
 	bool update(tbyte *data,int start,int size);
 
-	void setConstant(int location,float *data,int size);
-
 protected:
 	bool createContext();
 	bool destroyContext();
@@ -86,6 +84,7 @@ protected:
 	IndexFormat mIndexFormat;
 	VertexFormat::ptr mVertexFormat;
 	VariableBufferFormat::ptr mVariableFormat;
+	bool mHasTranspose;
 
 	int mBindFlags;
 	ID3D10Buffer *mBuffer;

@@ -207,10 +207,32 @@ bool D3D10Shader::reflect(){
 
 	mVariableBufferFormats.resize(desc.ConstantBuffers);
 
-	int i;
+	int i,j;
 	for(i=0;i<desc.ConstantBuffers;++i){
 		ID3D10ShaderReflectionConstantBuffer *buffer=mReflector->GetConstantBufferByIndex(i);
-		D3D10VariableBufferFormat::ptr format(new D3D10VariableBufferFormat(buffer));
+		D3D10_SHADER_BUFFER_DESC bufferDesc;
+		buffer->GetDesc(&bufferDesc);
+
+		VariableBufferFormat::ptr format(new VariableBufferFormat(bufferDesc.Name,bufferDesc.Size,bufferDesc.Variables));
+
+		if(format->getName()=="$Globals"){
+			format->default=true;
+		}
+
+		for(j=0;j<bufferDesc.Variables;++j){
+			ID3D10ShaderReflectionVariable *variable=buffer->GetVariableByIndex(j);
+			D3D10_SHADER_VARIABLE_DESC variableDesc;
+			variable->GetDesc(&variableDesc);
+			ID3D10ShaderReflectionType *type=variable->GetType();
+			D3D10_SHADER_TYPE_DESC typeDesc;
+			type->GetDesc(&typeDesc);
+
+			format->variableNames[j]=variableDesc.Name;
+			format->variableFormats[j]=D3D10RenderDevice::getVariableFormat(typeDesc) | VariableBufferFormat::Format_BIT_TRANSPOSE; // Only applies to the matrixes
+			format->variableOffsets[j]=variableDesc.StartOffset;
+			format->variableIndexes[j]=j;
+		}
+
 		mVariableBufferFormats[i]=format;
 	}
 
@@ -222,31 +244,6 @@ bool D3D10Shader::reflect(){
 	}
 
 	return true;
-}
-
-D3D10Shader::D3D10VariableBufferFormat::D3D10VariableBufferFormat(ID3D10ShaderReflectionConstantBuffer *buffer){
-	D3D10_SHADER_BUFFER_DESC bufferDesc;
-	buffer->GetDesc(&bufferDesc);
-
-	mName=bufferDesc.Name;
-	mSize=bufferDesc.Size;
-	mVariableNames.resize(bufferDesc.Variables);
-	mVariableFormats.resize(bufferDesc.Variables);
-	mVariableOffsets.resize(bufferDesc.Variables);
-
-	int i;
-	for(i=0;i<bufferDesc.Variables;++i){
-		ID3D10ShaderReflectionVariable *variable=buffer->GetVariableByIndex(i);
-		D3D10_SHADER_VARIABLE_DESC variableDesc;
-		variable->GetDesc(&variableDesc);
-		ID3D10ShaderReflectionType *type=variable->GetType();
-		D3D10_SHADER_TYPE_DESC typeDesc;
-		type->GetDesc(&typeDesc);
-
-		mVariableNames[i]=variableDesc.Name;
-		mVariableFormats[i]=D3D10RenderDevice::getVariableFormat(typeDesc);
-		mVariableOffsets[i]=variableDesc.StartOffset;
-	}
 }
 
 }

@@ -173,15 +173,10 @@ String vsc[]={
 	"in vec4 POSITION;\n" \
 	"in vec3 NORMAL;\n" \
 	"out vec4 color;\n" \
-	"uniform vec4 blob;\n" \
-	"layout(row_major) uniform block{mat4 ModelViewProjectionMatrix;};\n" \
-	"uniform vec4 blob2;\n" \
-	"layout(row_major) uniform block{mat4 blob3;};\n" \
-	"uniform vec4 blob4;\n" \
-	"layout(row_major) uniform block{mat4 blob5;};\n" \
+	"uniform mat4 ModelViewProjectionMatrix;;\n" \
 	"void main(){\n" \
-		"gl_Position = blob3 * blob5 * ModelViewProjectionMatrix * POSITION;\n" \
-		"color = vec4(NORMAL.x,NORMAL.y,NORMAL.z,1.0) + blob + blob2 + blob4;\n" \
+		"gl_Position = ModelViewProjectionMatrix * POSITION;\n" \
+		"color = vec4(NORMAL.x,NORMAL.y,NORMAL.z,1.0);\n" \
 	"}",
 
 	"struct VIN{\n" \
@@ -216,15 +211,15 @@ String fsc[]={
 };
 
 void Logo::create(){
-	Application::create("gl");
+	Application::create("d3d10");
 
 	mEngine->setDirectory("../../../data");
 
 	scene=Scene::ptr(new Scene(mEngine));
 
-	DecalShadowSceneRenderer::ptr sceneRenderer(new DecalShadowSceneRenderer(scene));
-	sceneRenderer->setPlane(Plane(Math::Z_UNIT_VECTOR3,-30));
-	scene->setSceneRenderer(sceneRenderer);
+//	DecalShadowSceneRenderer::ptr sceneRenderer(new DecalShadowSceneRenderer(scene));
+//	sceneRenderer->setPlane(Plane(Math::Z_UNIT_VECTOR3,-30));
+//	scene->setSceneRenderer(sceneRenderer);
 
 	LightNode::ptr light=getEngine()->createNodeType(LightNode::type(),scene);
 	LightState state;
@@ -246,12 +241,14 @@ void Logo::create(){
 
 vs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,sp,vsc,2);
 fs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,sp,fsc,2);
+VariableBufferFormat::ptr vbf;
 	for(int i=0;i<meshNode->getNumSubMeshes();++i){
 		meshNode->getSubMesh(i)->material->setShader(Shader::ShaderType_VERTEX,vs);
 		meshNode->getSubMesh(i)->material->setShader(Shader::ShaderType_FRAGMENT,fs);
+vbf=meshNode->getSubMesh(i)->material->getShaderState()->getVariableBufferFormat(Shader::ShaderType_VERTEX,0);
 	}
 
-vb=getEngine()->getBufferManager()->createVariableBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,vs->getVariableBufferFormat(0));
+vb=getEngine()->getBufferManager()->createVariableBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,vbf);
 
 // Only looks good if running on device, in simulator its always a top down view
 #if 0
@@ -284,15 +281,9 @@ void Logo::resized(int width,int height){
 void Logo::render(RenderDevice *renderDevice){
 #if 1
 Matrix4x4 shaderMatrix;
-Math::transpose(shaderMatrix,cameraNode->getProjectionMatrix()*cameraNode->getViewMatrix());
-//shaderMatrix.set(cameraNode->getProjectionMatrix()*cameraNode->getViewMatrix());
+shaderMatrix.set(cameraNode->getProjectionMatrix()*cameraNode->getViewMatrix());
 vb->update((tbyte*)shaderMatrix.getData(),0,16*4);
-//tbyte *data=cb->lock(Buffer::Access_BIT_WRITE);
-//memcpy(data,shaderMatrix.getData(),sizeof(shaderMatrix));
-//cb->unlock();
 #endif
-
-Logger::alert(String("NAME:")+vb->getVariableBufferFormat()->getName());
 
 	renderDevice->beginScene();
 renderDevice->setShaderState(meshNode->getSubMesh(0)->material->getShaderState());

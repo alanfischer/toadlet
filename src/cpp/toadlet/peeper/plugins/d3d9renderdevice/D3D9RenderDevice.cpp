@@ -794,22 +794,9 @@ void D3D9RenderDevice::setTextureState(int i,TextureState *state){
 
 void D3D9RenderDevice::setBuffer(int i,VariableBuffer *buffer){
 	D3D9VariableBuffer *d3dbuffer=buffer!=NULL?(D3D9VariableBuffer*)buffer->getRootVariableBuffer():NULL;
-/*
-	int j;
-	for(i=0;i<d3dbuffer->mVariableSizes.size();++i){
-		if(d3dbuffer->mVariableSizes[i]>0){
-			int size=d3dbuffer->mVariableSizes[i];
-			for(j=0;j<size;j+=16){
-				int location=(i+j)/16;
-				float *data=(float*)&d3dbuffer->mConstantValues[i+j];
 
-				mD3DDevice->SetVertexShaderConstantF(location,data,size/16);
-
-				mD3DDevice->SetPixelShaderConstantF(location,data,size/16);
-			}
-		}
-	}
-*/
+	d3dbuffer->activateConstants(Shader::ShaderType_VERTEX);
+	d3dbuffer->activateConstants(Shader::ShaderType_FRAGMENT);
 }
 
 void D3D9RenderDevice::setTexture(int i,Texture *texture){
@@ -1442,6 +1429,63 @@ DWORD D3D9RenderDevice::getFVF(VertexFormat *vertexFormat){
 	}
 
 	return fvf;
+}
+
+int D3D9RenderDevice::getVariableFormat(const D3DXCONSTANT_DESC &desc){
+	int format=0;
+
+	switch(desc.Type){
+		case D3DXPT_BOOL:
+			format|=VariableBufferFormat::Format_TYPE_UINT_8;
+		break;
+		case D3DXPT_INT:
+			format|=VariableBufferFormat::Format_TYPE_INT_32;
+		break;
+		case D3DXPT_FLOAT:
+			format|=VariableBufferFormat::Format_TYPE_FLOAT_32;
+		break;
+	}
+
+	if(desc.Rows>1){
+		if(desc.Rows==2){
+			if(desc.Columns==2){
+				format|=VariableBufferFormat::Format_COUNT_2X2;
+			}
+			else if(desc.Columns==3){
+				format|=VariableBufferFormat::Format_COUNT_2X3;
+			}
+			else if(desc.Columns==4){
+				format|=VariableBufferFormat::Format_COUNT_2X4;
+			}
+		}
+		if(desc.Rows==3){
+			if(desc.Columns==2){
+				format|=VariableBufferFormat::Format_COUNT_3X2;
+			}
+			else if(desc.Columns==3){
+				format|=VariableBufferFormat::Format_COUNT_3X3;
+			}
+			else if(desc.Columns==4){
+				format|=VariableBufferFormat::Format_COUNT_3X4;
+			}
+		}
+		if(desc.Rows==4){
+			if(desc.Columns==2){
+				format|=VariableBufferFormat::Format_COUNT_4X2;
+			}
+			else if(desc.Columns==3){
+				format|=VariableBufferFormat::Format_COUNT_4X3;
+			}
+			else if(desc.Columns==4){
+				format|=VariableBufferFormat::Format_COUNT_4X4;
+			}
+		}
+	}
+	else{
+		format|=(desc.Columns<<VariableBufferFormat::Format_SHIFT_COUNTS);
+	}
+
+	return format;
 }
 
 }

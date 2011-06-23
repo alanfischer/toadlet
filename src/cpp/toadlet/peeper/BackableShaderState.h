@@ -49,6 +49,9 @@ public:
 	virtual void setShader(Shader::ShaderType type,Shader::ptr shader);
 	virtual Shader::ptr getShader(Shader::ShaderType type);
 	
+	virtual int getNumVariableBuffers(Shader::ShaderType type){return mBack!=NULL?mBack->getNumVariableBuffers(type):0;}
+	virtual VariableBufferFormat::ptr getVariableBufferFormat(Shader::ShaderType type,int i){return mBack!=NULL?mBack->getVariableBufferFormat(type,i):NULL;}
+
 	virtual void setBack(ShaderState::ptr back);
 	virtual ShaderState::ptr getBack(){return mBack;}
 

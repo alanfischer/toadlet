@@ -143,8 +143,9 @@ bool D3D9Shader::reflect(){
 		return false;
 	}
 
-	Logger::alert(String("Num Constants:")+tableDesc.Constants);
+	VariableBufferFormat::ptr defaultFormat(new VariableBufferFormat((char*)NULL,0,tableDesc.Constants));
 
+	int dataSize=0;
 	int i;
 	for(i=0;i<tableDesc.Constants;++i){
 		D3DXHANDLE handle=mConstantTable->GetConstant(NULL,i);
@@ -152,8 +153,17 @@ bool D3D9Shader::reflect(){
         unsigned int params=1;
         result=mConstantTable->GetConstantDesc(handle,&constantDesc,&params);
 
-		Logger::alert(String("Constant name:")+constantDesc.Name+","+constantDesc.RegisterIndex);
+		defaultFormat->variableNames[i]=constantDesc.Name;
+		defaultFormat->variableFormats[i]=D3D9RenderDevice::getVariableFormat(constantDesc) | VariableBufferFormat::Format_BIT_TRANSPOSE;
+		defaultFormat->variableOffsets[i]=dataSize;
+		defaultFormat->variableIndexes[i]=constantDesc.RegisterIndex;
+
+		dataSize+=constantDesc.Bytes;
 	}
+
+	defaultFormat->dataSize=dataSize;
+
+	mVariableBufferFormats.add(defaultFormat);
 
 	return true;
 }

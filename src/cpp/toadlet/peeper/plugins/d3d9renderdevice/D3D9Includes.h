@@ -35,6 +35,7 @@
 	#include <d3dm.h>
 #else
 	#include <d3d9.h>
+	#include <d3dx9shader.h>
 #endif
 
 #include <toadlet/egg/EndianConversion.h>

@@ -166,6 +166,7 @@ public:
 	static GLuint getGLDepthTextureMode(TextureState::ShadowResult shadow);
 	static int getFixedAttribFromSemantic(int semantic,int index);
 	static GLuint getClientStateFromSemantic(int semantic,int index);
+	static int getVariableFormat(GLuint type);
 	static GLuint GLCubeFaces[6];
 
 protected:

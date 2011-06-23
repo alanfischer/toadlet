@@ -26,12 +26,12 @@
 #ifndef TOADLET_PEEPER_VARIABLEBUFFERFORMAT_H
 #define TOADLET_PEEPER_VARIABLEBUFFERFORMAT_H
 
+#include <toadlet/egg/Collection.h>
 #include <toadlet/peeper/Types.h>
 
 namespace toadlet{
 namespace peeper{
 
-/// @todo: Move this to a struct style, and remove the subclasses of it in the renderer plugins
 class TOADLET_API VariableBufferFormat{
 public:
 	TOADLET_SHARED_POINTERS(VariableBufferFormat);
@@ -66,6 +66,8 @@ public:
 		Format_COUNT_4X2=		11<<16,
 		Format_COUNT_4X3=		12<<16,
 		Format_COUNT_4X4=		13<<16,
+
+		Format_BIT_TRANSPOSE=	1<<31,
 	};
 
 	// static methods aren't allowed in Interfaces, but technically enums shouldn't be either, so these need to be separated to an alongside class
@@ -133,16 +135,73 @@ public:
 
 		return size;
 	}
-	
-	virtual egg::String getName()=0;
 
-	virtual int getSize()=0;
+	static int getFormatRows(int format){
+		switch(format&Format_MASK_COUNTS){
+			case Format_COUNT_2X2:
+			case Format_COUNT_2X3:
+			case Format_COUNT_2X4:
+				return 2;
+			case Format_COUNT_3X2:
+			case Format_COUNT_3X3:
+			case Format_COUNT_3X4:
+				return 3;
+			case Format_COUNT_4X2:
+			case Format_COUNT_4X3:
+			case Format_COUNT_4X4:
+				return 4;
+			default:
+				return 0;
+		}
+	}
 
-	virtual int getNumVariables()=0;
-	virtual egg::String getVariableName(int i)=0;
-	virtual int getVariableFormat(int i)=0;
-	virtual int getVariableOffset(int i)=0;
-	virtual int getVariableIndex(int i)=0;
+	static int getFormatColumns(int format){
+		switch(format&Format_MASK_COUNTS){
+			case Format_COUNT_2X2:
+			case Format_COUNT_3X2:
+			case Format_COUNT_4X2:
+				return 2;
+			case Format_COUNT_2X3:
+			case Format_COUNT_3X3:
+			case Format_COUNT_4X3:
+				return 3;
+			case Format_COUNT_2X4:
+			case Format_COUNT_3X4:
+			case Format_COUNT_4X4:
+				return 4;
+			default:
+				return 0;
+		}
+	}
+
+	VariableBufferFormat(const egg::String &name1,int dataSize1,int numVariables):
+		default(false),
+		name(name1),
+		dataSize(dataSize1)
+	{
+		variableNames.resize(numVariables);
+		variableFormats.resize(numVariables);
+		variableOffsets.resize(numVariables);
+		variableIndexes.resize(numVariables);
+	}
+
+	inline egg::String getName(){return name;}
+
+	inline int getDataSize(){return dataSize;}
+
+	inline int getNumVariables(){return variableNames.size();}
+	inline egg::String getVariableName(int i){return variableNames[i];}
+	inline int getVariableFormat(int i){return variableFormats[i];}
+	inline int getVariableOffset(int i){return variableOffsets[i];}
+	inline int getVariableIndex(int i){return variableIndexes[i];}
+
+	bool default;
+	egg::String name;
+	int dataSize;
+	egg::Collection<egg::String> variableNames;
+	egg::Collection<int> variableFormats;
+	egg::Collection<int> variableOffsets;
+	egg::Collection<int> variableIndexes;
 };
 
 }

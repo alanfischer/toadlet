@@ -60,29 +60,6 @@ public:
 	bool activate();
 
 protected:
-	class D3D10VariableBufferFormat:public VariableBufferFormat{
-	public:
-		TOADLET_SHARED_POINTERS(D3D10VariableBufferFormat);
-
-		D3D10VariableBufferFormat(ID3D10ShaderReflectionConstantBuffer *buffer);
-		virtual ~D3D10VariableBufferFormat(){}
-
-		egg::String getName(){return mName;}
-		int getSize(){return mSize;}
-		int getNumVariables(){return mVariableNames.size();}
-		egg::String getVariableName(int i){return mVariableNames[i];}
-		int getVariableFormat(int i){return mVariableFormats[i];}
-		int getVariableOffset(int i){return mVariableOffsets[i];}
-		int getVariableIndex(int i){return i;}
-
-	protected:
-		egg::String mName;
-		int mSize;
-		egg::Collection<egg::String> mVariableNames;
-		egg::Collection<int> mVariableFormats;
-		egg::Collection<int> mVariableOffsets;
-	};
-
 	bool createContext();
 	bool destroyContext();
 	bool reflect();

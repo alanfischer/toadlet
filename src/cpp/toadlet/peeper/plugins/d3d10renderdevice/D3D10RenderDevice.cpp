@@ -253,6 +253,8 @@ void D3D10RenderDevice::endScene(){
 	mD3DDevice->IASetIndexBuffer(NULL,(DXGI_FORMAT)0,0);
 
 	mD3DDevice->IASetInputLayout(NULL);
+
+	mLastShaderState=NULL;
 }
 
 void D3D10RenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexData){
@@ -268,6 +270,12 @@ void D3D10RenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexD
 		return;
 	}
 
+	if(mLastShaderState==NULL || mLastShaderState->mShaders.size()==0){
+		Error::unknown(Categories::TOADLET_PEEPER,
+			"D3D10RenderDevice requires a vertex and fragment shader");
+		return;
+	}
+
 	D3D10VertexFormat *d3dVertexFormat=(D3D10VertexFormat*)vertexData->getVertexFormat()->getRootVertexFormat();
 
 	// Set input layout
@@ -278,6 +286,7 @@ void D3D10RenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexD
 			id3dLayout=((D3D10Shader*)shader->getRootShader())->findInputLayout(d3dVertexFormat);
 		}
 	}
+
 	mD3DDevice->IASetInputLayout(id3dLayout);
 
 	// Set vertex buffer
