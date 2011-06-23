@@ -1326,7 +1326,17 @@ void GLRenderDevice::setTextureStatePostTexture(int i,TextureState *state){
 void GLRenderDevice::setBuffer(int i,VariableBuffer *buffer){
 	GLBuffer *glbuffer=buffer!=NULL?(GLBuffer*)buffer->getRootVariableBuffer():NULL;
 
-	glbuffer->activateVariableBuffer(i);
+	if(glbuffer->mHandle>0){
+		#if defined(TOADLET_HAS_GLUBOS)
+			glUniformBlockBinding(mLastShaderState->mHandle,0,0);
+			glBindBufferBase(GL_UNIFORM_BUFFER,0,glbuffer->mHandle);
+		#endif
+	}
+	else{
+		glbuffer->activateUniforms();
+	}
+
+	TOADLET_CHECK_GLERROR("setBuffer");
 }
 
 void GLRenderDevice::setTexture(int i,Texture *texture){
@@ -1676,7 +1686,7 @@ bool GLRenderDevice::hardwareBuffersSupported(GLBuffer *buffer) const{
 	else if(buffer->mPixelFormat>0){
 		return mPBOs;
 	}
-	else if(buffer->mVariableFormat!=NULL){
+	else if(buffer->mVariableFormat!=NULL && buffer->mVariableFormat->default==false){
 		return mUBOs;
 	}
 	else{
@@ -2393,6 +2403,55 @@ GLuint GLRenderDevice::getClientStateFromSemantic(int semantic,int index){
 			return 0;
 	}
 };
+
+int GLRenderDevice::getVariableFormat(GLuint type){
+	switch(type){
+		case GL_FLOAT:
+			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1;
+		case GL_FLOAT_VEC2:
+			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2;
+		case GL_FLOAT_VEC3:
+			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3;
+		case GL_FLOAT_VEC4:
+			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4;
+		case GL_INT:
+			return VariableBufferFormat::Format_TYPE_INT_32|VariableBufferFormat::Format_COUNT_1;
+		case GL_INT_VEC2:
+			return VariableBufferFormat::Format_TYPE_INT_32|VariableBufferFormat::Format_COUNT_2;
+		case GL_INT_VEC3:
+			return VariableBufferFormat::Format_TYPE_INT_32|VariableBufferFormat::Format_COUNT_3;
+		case GL_INT_VEC4:
+			return VariableBufferFormat::Format_TYPE_INT_32|VariableBufferFormat::Format_COUNT_4;
+		case GL_BOOL:
+			return VariableBufferFormat::Format_TYPE_UINT_8|VariableBufferFormat::Format_COUNT_1;
+		case GL_BOOL_VEC2:
+			return VariableBufferFormat::Format_TYPE_UINT_8|VariableBufferFormat::Format_COUNT_2;
+		case GL_BOOL_VEC3:
+			return VariableBufferFormat::Format_TYPE_UINT_8|VariableBufferFormat::Format_COUNT_3;
+		case GL_BOOL_VEC4:
+			return VariableBufferFormat::Format_TYPE_UINT_8|VariableBufferFormat::Format_COUNT_4;
+		case GL_FLOAT_MAT2:
+			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2X2;
+		case GL_FLOAT_MAT3:
+			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3X3;
+		case GL_FLOAT_MAT4:
+			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4;
+		case GL_FLOAT_MAT2x3:
+			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2X3;
+		case GL_FLOAT_MAT2x4:
+			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2X4;
+		case GL_FLOAT_MAT3x2:
+			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3X2;
+		case GL_FLOAT_MAT3x4:
+			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3X4;
+		case GL_FLOAT_MAT4x2:
+			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X2;
+		case GL_FLOAT_MAT4x3:
+			return VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X3;
+		default:
+			return 0;
+	}
+}
 
 #if !defined(TOADLET_HAS_GLES)
 	GLuint GLRenderDevice::GLCubeFaces[6]={

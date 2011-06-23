@@ -29,7 +29,6 @@
 #include "D3D9Includes.h"
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/Shader.h>
-#include <D3DX9Shader.h>
 
 namespace toadlet{
 namespace peeper{
@@ -51,6 +50,9 @@ public:
 	ShaderType getShaderType() const{return mShaderType;}
 	const egg::String &getProfile() const{return mProfile;}
 
+	int getNumVariableBuffers(){return mVariableBufferFormats.size();}
+	VariableBufferFormat::ptr getVariableBufferFormat(int i){return mVariableBufferFormats[i];}
+
 protected:
 	bool createContext();
 	bool destroyContext();
@@ -67,6 +69,8 @@ protected:
 	IUnknown *mShader;
 	ID3DXBuffer *mBytecode,*mLog;
 	ID3DXConstantTable *mConstantTable;
+
+	egg::Collection<VariableBufferFormat::ptr> mVariableBufferFormats;
 
 	friend class D3D9RenderDevice;
 	friend class D3D9ShaderState;

@@ -99,11 +99,6 @@ void GLSLShaderState::setShader(Shader::ShaderType type,Shader::ptr shader){
 		glAttachShader(mHandle,glshader->mHandle);
 	}
 
-/// HACK!!!
-if(type==Shader::ShaderType_FRAGMENT){
-activate();
-}
-
 	mNeedsLink=true;
 }
 
@@ -115,20 +110,25 @@ Shader::ptr GLSLShaderState::getShader(Shader::ShaderType type){
 	return mShaders[type];
 }
 
+int GLSLShaderState::getNumVariableBuffers(Shader::ShaderType type){
+	if(mNeedsLink){
+		link();
+	}
+
+	return mVariableBufferFormats.size();
+}
+
+VariableBufferFormat::ptr GLSLShaderState::getVariableBufferFormat(Shader::ShaderType type,int i){
+	if(mNeedsLink){
+		link();
+	}
+
+	return mVariableBufferFormats[i];
+}
+
 bool GLSLShaderState::activate(){
 	if(mNeedsLink){
-		mNeedsLink=false;
-
-		glLinkProgram(mHandle);
-
-		GLint status=0;
-		glGetProgramiv(mHandle,GL_LINK_STATUS,&status);
-		if(status==GL_FALSE){
-			Error::unknown("error linking program");
-			return false;
-		}
-
-		reflect();
+		link();
 	}
 
 	glUseProgram(mHandle);
@@ -169,6 +169,23 @@ bool GLSLShaderState::destroyContext(){
 	return true;
 }
 
+bool GLSLShaderState::link(){
+	glLinkProgram(mHandle);
+
+	GLint status=0;
+	glGetProgramiv(mHandle,GL_LINK_STATUS,&status);
+	if(status==GL_FALSE){
+		Error::unknown("error linking program");
+		return false;
+	}
+
+	reflect();
+
+	mNeedsLink=false;
+
+	return true;
+}
+
 bool GLSLShaderState::reflect(){
 	int numUniforms=0;
 	int dataSize=0;
@@ -179,25 +196,22 @@ bool GLSLShaderState::reflect(){
 
 	glGetProgramiv(mHandle,GL_ACTIVE_UNIFORMS,&numUniforms);
 
-	GLSLVariableBufferFormat::ptr defaultFormat(new GLSLVariableBufferFormat());
-	defaultFormat->variableNames.resize(numUniforms);
-	defaultFormat->variableFormats.resize(numUniforms);
-	defaultFormat->variableOffsets.resize(numUniforms);
-	defaultFormat->variableIndexes.resize(numUniforms);
+	VariableBufferFormat::ptr defaultFormat(new VariableBufferFormat((char*)NULL,0,numUniforms));
+	defaultFormat->default=true;
 
 	int i;
 	for(i=0;i<numUniforms;++i){
 		glGetActiveUniform(mHandle,i,sizeof(name),&nameLength,&size,&type,name);
 
 		defaultFormat->variableNames[i]=name;
-		defaultFormat->variableFormats[i]=VariableBufferFormat::Format_COUNT_1;//GLRenderDevice::getVariableFormat(type);
+		defaultFormat->variableFormats[i]=GLRenderDevice::getVariableFormat(type);
 		defaultFormat->variableOffsets[i]=dataSize;
 		defaultFormat->variableIndexes[i]=i;
 
 		dataSize+=VariableBufferFormat::getFormatSize(defaultFormat->variableFormats[i]);
 	}
 
-	defaultFormat->size=dataSize;
+	defaultFormat->dataSize=dataSize;
 
 	#if defined(TOADLET_HAS_GLUBOS)
 		int numUniformBlocks=0;
@@ -208,18 +222,12 @@ bool GLSLShaderState::reflect(){
 			glGetActiveUniformBlockiv(mHandle,i,GL_UNIFORM_BLOCK_DATA_SIZE,&dataSize);
 			glGetActiveUniformBlockiv(mHandle,i,GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS,&numUniforms);
 
-			GLSLVariableBufferFormat::ptr variableFormat(new GLSLVariableBufferFormat());
-			variableFormat->name=name;
-			variableFormat->size=dataSize;
-			variableFormat->variableNames.resize(numUniforms);
-			variableFormat->variableFormats.resize(numUniforms);
-			variableFormat->variableOffsets.resize(numUniforms);
-			variableFormat->variableIndexes.resize(numUniforms);
+			VariableBufferFormat::ptr variableFormat(new VariableBufferFormat(name,dataSize,numUniforms));
 
 			GLint *indexes=new GLint[numUniforms];
 			glGetActiveUniformBlockiv(mHandle,i,GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES,indexes);
 
-			int j,k;
+			int j;
 			for(j=0;j<numUniforms;++j){
 				Logger::alert(String("Uniform block uniform index:")+indexes[j]);
 
@@ -233,18 +241,24 @@ bool GLSLShaderState::reflect(){
 			}
 
 			delete[] indexes;
+
+			mVariableBufferFormats.add(variableFormat);
 		}
 
 		for(i=0;i<defaultFormat->variableOffsets.size();++i){
 			if(defaultFormat->variableIndexes[i]==-1){
 				defaultFormat->variableNames.removeAt(i);
 				defaultFormat->variableFormats.removeAt(i);
-				defaultFormat->variableOffset.removeAt(i);
+				defaultFormat->variableOffsets.removeAt(i);
 				defaultFormat->variableIndexes.removeAt(i);
 				i--;
 			}
 		}
 	#endif
+
+	if(defaultFormat->variableNames.size()>0){
+		mVariableBufferFormats.insert(mVariableBufferFormats.begin(),defaultFormat);
+	}
 
 	return true;
 }

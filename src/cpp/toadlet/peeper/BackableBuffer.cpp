@@ -23,6 +23,7 @@
  *
  ********** Copyright header - do not remove **********/
 
+#include <toadlet/egg/Logger.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/image/ImageFormatConversion.h>
 #include <toadlet/peeper/BackableBuffer.h>
@@ -103,8 +104,7 @@ bool BackableBuffer::create(int usage,int access,VariableBufferFormat::ptr varia
 	mUsage=usage;
 	mAccess=access;
 	mVariableFormat=variableFormat;
-	mSize=variableFormat->getSize();
-	mDataSize=mSize;
+	mDataSize=variableFormat->getDataSize();
 
 	mHasData=false;
 	if(mData==NULL){
@@ -278,6 +278,33 @@ void BackableBuffer::setBack(VariableBuffer::ptr back){
 
 		if(mHasData){
 			writeBack();
+		}
+	}
+}
+
+void BackableBuffer::transposeVariables(VariableBufferFormat *variableFormat,tbyte *data){
+	int i;
+	for(i=0;i<variableFormat->variableFormats.size();++i){
+		int format=variableFormat->variableFormats[i];
+		if((format&VariableBufferFormat::Format_BIT_TRANSPOSE)!=0){
+			transposeVariable(variableFormat,data,i);
+		}
+	}
+}
+
+void BackableBuffer::transposeVariable(VariableBufferFormat *variableFormat,tbyte *data,int i){
+	int format=variableFormat->variableFormats[i];
+	int offset=variableFormat->variableOffsets[i];
+	int rows=VariableBufferFormat::getFormatRows(format),cols=VariableBufferFormat::getFormatColumns(format);
+	TOADLET_ASSERT((format&VariableBufferFormat::Format_TYPE_FLOAT_32)!=0 && rows==cols);
+
+	float *m=(float*)(data+offset);
+	int j;
+	for(i=0;i<cols;++i){
+		for(j=i+1;j<rows;++j){
+			float t=m[i*cols+j];
+			m[i*cols+j]=m[j*rows+i];
+			m[j*rows+i]=t;
 		}
 	}
 }

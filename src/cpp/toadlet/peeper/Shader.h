@@ -52,9 +52,6 @@ public:
 	
 	virtual ShaderType getShaderType() const=0;
 	virtual const egg::String &getProfile() const=0;
-
-virtual int getNumVariableBuffers(){return 0;}
-virtual VariableBufferFormat::ptr getVariableBufferFormat(int i){return NULL;}
 };
 
 }

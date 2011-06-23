@@ -80,7 +80,7 @@ public:
 	bool unlock();
 	bool update(tbyte *data,int start,int size);
 
-	bool activateVariableBuffer(int i);
+	bool activateUniforms();
 
 protected:
 	bool createContext();
@@ -102,12 +102,13 @@ protected:
 	int mPixelFormat;
 	VariableBufferFormat::ptr mVariableFormat;
 	egg::Collection<tbyte*> mElementOffsets;
+	bool mHasTranspose;
 
 	GLuint mHandle;
 	GLenum mTarget;
 	int mLockAccess;
 	bool mMapping;
-	uint8 *mData;
+	tbyte *mData;
 
 	friend class GLRenderDevice;
 };

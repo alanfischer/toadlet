@@ -49,6 +49,9 @@ public:
 	void setShader(Shader::ShaderType type,Shader::ptr shader);
 	Shader::ptr getShader(Shader::ShaderType type);
 
+	int getNumVariableBuffers(Shader::ShaderType type);
+	VariableBufferFormat::ptr getVariableBufferFormat(Shader::ShaderType type,int i);
+
 	bool activate();
 
 protected:

@@ -50,6 +50,9 @@ public:
 
 	virtual void setShader(Shader::ShaderType type,Shader::ptr shader)=0;
 	virtual Shader::ptr getShader(Shader::ShaderType type)=0;
+
+	virtual int getNumVariableBuffers(Shader::ShaderType type)=0;
+	virtual VariableBufferFormat::ptr getVariableBufferFormat(Shader::ShaderType type,int i)=0;
 };
 
 }

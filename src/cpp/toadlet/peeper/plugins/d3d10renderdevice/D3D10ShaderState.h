@@ -51,11 +51,13 @@ public:
 	void setShader(Shader::ShaderType type,Shader::ptr shader);
 	Shader::ptr getShader(Shader::ShaderType type);
 
+	int getNumVariableBuffers(Shader::ShaderType type);
+	VariableBufferFormat::ptr getVariableBufferFormat(Shader::ShaderType type,int i);
+
 	bool activate();
 
 protected:
 	D3D10RenderDevice *mDevice;
-	ID3D10Device *mD3DDevice;
 
 	ShaderStateDestroyedListener *mListener;
 	egg::Collection<Shader::ptr> mShaders;

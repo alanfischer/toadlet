@@ -29,6 +29,7 @@
 #include <toadlet/egg/EndianConversion.h>
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Logger.h>
+#include <toadlet/peeper/BackableBuffer.h>
 #include <string.h>
 
 using namespace toadlet::egg;
@@ -51,6 +52,7 @@ GLBuffer::GLBuffer(GLRenderDevice *renderDevice):
 	//mVertexFormat,
 	mPixelFormat(0),
 	//mElementOffsets,
+	mHasTranspose(false),
 
 	mHandle(0),
 	mTarget(0),
@@ -150,20 +152,23 @@ bool GLBuffer::create(int usage,int access,VariableBufferFormat::ptr variableFor
 	mUsage=usage;
 	mAccess=access;
 	mVariableFormat=variableFormat;
-	mDataSize=variableFormat->getSize();
+	mDataSize=variableFormat->getDataSize();
 
 	#if defined(TOADLET_HAS_GLUBOS)
 		mTarget=GL_UNIFORM_BUFFER;
-	#else
-		Error::unknown(Categories::TOADLET_PEEPER,
-			"VariableBuffers not supported");
-		return false;
 	#endif
 	createContext();
 
 	mMapping=mDevice->hardwareMappingSupported(this);
 	if(mMapping==false){
 		mData=new uint8[mDataSize];
+	}
+	else{
+		mHasTranspose=false;
+		int i;
+		for(i=0;i<mVariableFormat->variableFormats.size();++i){
+			mHasTranspose|=((mVariableFormat->variableFormats[i]&VariableBufferFormat::Format_BIT_TRANSPOSE)!=0);
+		}
 	}
 
 	return true;
@@ -270,12 +275,20 @@ uint8 *GLBuffer::lock(int lockAccess){
 		}
 	#endif
 
+	if(mVariableFormat!=NULL && mHasTranspose){
+		BackableBuffer::transposeVariables(mVariableFormat,mData);
+	}
+
 	TOADLET_CHECK_GLERROR("GLBuffer::lock");
 	
 	return mData;
 }
 
 bool GLBuffer::unlock(){
+	if(mVariableFormat!=NULL && mHasTranspose){
+		BackableBuffer::transposeVariables(mVariableFormat,mData);
+	}
+
 	#if defined(TOADLET_LITTLE_ENDIAN)
 		if(mVertexFormat!=NULL){
 			// We do this even if its read only, since we have to do it in all situations for locking
@@ -323,26 +336,94 @@ bool GLBuffer::unlock(){
 bool GLBuffer::update(tbyte *data,int start,int size){
 	memcpy(mData+start,data,size);
 
+	if(mHasTranspose){
+		int i;
+		for(i=0;i<mVariableFormat->variableOffsets.size();++i){
+			int offset=mVariableFormat->variableOffsets[i];
+			if(offset>=start && offset<start+size){
+				BackableBuffer::transposeVariable(mVariableFormat,mData,i);
+			}
+		}
+	}
+
 	if(mHandle>0){
 		glBindBuffer(mTarget,mHandle);
-		glBufferSubData(mTarget,start,size,data);
+		glBufferSubData(mTarget,start,size,mData+start);
 		glBindBuffer(mTarget,0);
 	}
+
+	TOADLET_CHECK_GLERROR("GLBuffer::update");
 
 	return true;
 }
 
-bool GLBuffer::activateVariableBuffer(int i){
-	if(mHandle>0){
-		#if defined(TOADLET_HAS_UBOS)
-			glUniformBlockBinding(mLastShaderState->mHandle,0,0);
-			TOADLET_CHECK_GLERROR("setBuffer0");
-			glBindBufferBase(GL_UNIFORM_BUFFER,0,glbuffer->mHandle);
-		#endif
-	}
-	else{
+bool GLBuffer::activateUniforms(){
+	int i;
+	for(i=0;i<mVariableFormat->variableNames.size();++i){
+		int format=mVariableFormat->variableFormats[i];
+		int index=mVariableFormat->variableIndexes[i];
+		int offset=mVariableFormat->variableOffsets[i];
+		bool transpose=(format&VariableBufferFormat::Format_BIT_TRANSPOSE)!=0;
+		format&=~VariableBufferFormat::Format_BIT_TRANSPOSE;
 
+		switch(format){
+			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_1:
+				glUniform1fv(index,1,(float*)(mData+offset));
+			break;
+			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2:
+				glUniform2fv(index,1,(float*)(mData+offset));
+			break;
+			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3:
+				glUniform3fv(index,1,(float*)(mData+offset));
+			break;
+			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4:
+				glUniform4fv(index,1,(float*)(mData+offset));
+			break;
+
+			case VariableBufferFormat::Format_TYPE_INT_32|VariableBufferFormat::Format_COUNT_1:
+				glUniform1iv(index,1,(int*)(mData+offset));
+			break;
+			case VariableBufferFormat::Format_TYPE_INT_32|VariableBufferFormat::Format_COUNT_2:
+				glUniform2iv(index,1,(int*)(mData+offset));
+			break;
+			case VariableBufferFormat::Format_TYPE_INT_32|VariableBufferFormat::Format_COUNT_3:
+				glUniform3iv(index,1,(int*)(mData+offset));
+			break;
+			case VariableBufferFormat::Format_TYPE_INT_32|VariableBufferFormat::Format_COUNT_4:
+				glUniform4iv(index,1,(int*)(mData+offset));
+			break;
+
+			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2X2:
+				glUniformMatrix2fv(index,1,transpose,(float*)(mData+offset));
+			break;
+			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3X3:
+				glUniformMatrix3fv(index,1,transpose,(float*)(mData+offset));
+			break;
+			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X4:
+				glUniformMatrix4fv(index,1,transpose,(float*)(mData+offset));
+			break;
+			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2X3:
+				glUniformMatrix2x3fv(index,1,transpose,(float*)(mData+offset));
+			break;
+			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3X2:
+				glUniformMatrix3x2fv(index,1,transpose,(float*)(mData+offset));
+			break;
+			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_2X4:
+				glUniformMatrix2x4fv(index,1,transpose,(float*)(mData+offset));
+			break;
+			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X2:
+				glUniformMatrix4x2fv(index,1,transpose,(float*)(mData+offset));
+			break;
+			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_3X4:
+				glUniformMatrix3x4fv(index,1,transpose,(float*)(mData+offset));
+			break;
+			case VariableBufferFormat::Format_TYPE_FLOAT_32|VariableBufferFormat::Format_COUNT_4X3:
+				glUniformMatrix4x3fv(index,1,transpose,(float*)(mData+offset));
+			break;
+		}
 	}
+
+	TOADLET_CHECK_GLERROR("GLBuffer::activateUniforms");
 
 	return true;
 }

@@ -135,6 +135,7 @@ public:
 	static D3DCMPFUNC getD3DCMPFUNC(MaterialState::AlphaTest type);
 	static D3DCMPFUNC getD3DCMPFUNC(DepthState::DepthTest type);
 	static DWORD getFVF(VertexFormat *vertexFormat);
+	static int getVariableFormat(const D3DXCONSTANT_DESC &desc);
 
 protected:
 	static void setCapsFromD3DCAPS9(RenderCaps &caps,const D3DCAPS9 &d3dcaps,bool renderToTexture,bool renderToDepthTexture);
