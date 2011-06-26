@@ -166,8 +166,8 @@ bool GLBuffer::create(int usage,int access,VariableBufferFormat::ptr variableFor
 	else{
 		mHasTranspose=false;
 		int i;
-		for(i=0;i<mVariableFormat->variableFormats.size();++i){
-			mHasTranspose|=((mVariableFormat->variableFormats[i]&VariableBufferFormat::Format_BIT_TRANSPOSE)!=0);
+		for(i=0;i<mVariableFormat->getSize();++i){
+			mHasTranspose|=((mVariableFormat->getVariable(i)->getFormat()&VariableBufferFormat::Format_BIT_TRANSPOSE)!=0);
 		}
 	}
 
@@ -338,8 +338,8 @@ bool GLBuffer::update(tbyte *data,int start,int size){
 
 	if(mHasTranspose){
 		int i;
-		for(i=0;i<mVariableFormat->variableOffsets.size();++i){
-			int offset=mVariableFormat->variableOffsets[i];
+		for(i=0;i<mVariableFormat->getSize();++i){
+			int offset=mVariableFormat->getVariable(i)->getOffset();
 			if(offset>=start && offset<start+size){
 				BackableBuffer::transposeVariable(mVariableFormat,mData,i);
 			}
@@ -359,10 +359,11 @@ bool GLBuffer::update(tbyte *data,int start,int size){
 
 bool GLBuffer::activateUniforms(){
 	int i;
-	for(i=0;i<mVariableFormat->variableNames.size();++i){
-		int format=mVariableFormat->variableFormats[i];
-		int index=mVariableFormat->variableIndexes[i];
-		int offset=mVariableFormat->variableOffsets[i];
+	for(i=0;i<mVariableFormat->getSize();++i){
+		VariableBufferFormat::Variable *variable=mVariableFormat->getVariable(i);
+		int format=variable->getFormat();
+		int index=variable->getIndex();
+		int offset=variable->getOffset();
 		bool transpose=(format&VariableBufferFormat::Format_BIT_TRANSPOSE)!=0;
 		format&=~VariableBufferFormat::Format_BIT_TRANSPOSE;
 

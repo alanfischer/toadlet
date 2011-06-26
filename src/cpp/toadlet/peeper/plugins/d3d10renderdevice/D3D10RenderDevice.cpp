@@ -197,14 +197,9 @@ ShaderState *D3D10RenderDevice::createShaderState(){
 }
 
 bool D3D10RenderDevice::setRenderTarget(RenderTarget *target){
-	D3D10RenderTarget *d3dtarget=NULL;
-	if(target!=NULL){
-		d3dtarget=(D3D10RenderTarget*)target->getRootRenderTarget();
-		if(d3dtarget==NULL){
-			Error::nullPointer(Categories::TOADLET_PEEPER,
-				"RenderTarget is not a D3D10RenderTarget");
-			return false;
-		}
+	D3D10RenderTarget *d3dtarget=target!=NULL?(D3D10RenderTarget*)target->getRootRenderTarget():NULL;
+	if(d3dtarget==NULL){
+		return false;
 	}
 
 	if(mD3DRenderTarget!=NULL){
@@ -362,14 +357,9 @@ void D3D10RenderDevice::setDefaultState(){
 }
 
 bool D3D10RenderDevice::setRenderState(RenderState *renderState){
-	D3D10RenderState *d3drenderState=NULL;
-	if(renderState!=NULL){
-		d3drenderState=(D3D10RenderState*)renderState->getRootRenderState();
-		if(d3drenderState==NULL){
-			Error::nullPointer(Categories::TOADLET_PEEPER,
-				"RenderState is not a D3D10RenderState");
-			return false;
-		}
+	D3D10RenderState *d3drenderState=renderState!=NULL?(D3D10RenderState*)renderState->getRootRenderState():NULL;
+	if(d3drenderState==NULL){
+		return false;
 	}
 
 	if(d3drenderState->mD3DBlendState!=NULL){
@@ -382,39 +372,13 @@ bool D3D10RenderDevice::setRenderState(RenderState *renderState){
 		mD3DDevice->RSSetState(d3drenderState->mD3DRasterizerState);
 	}
 
-// These need to be moved/cleaned
-/*
-if(d3drenderState->mD3DSamplerStates.size()>0)samp=d3drenderState->mD3DSamplerStates[0];
-	mD3DDevice->VSSetSamplers(0,d3drenderState->mD3DSamplerStates.size(),d3drenderState->mD3DSamplerStates.begin());
-	mD3DDevice->PSSetSamplers(0,d3drenderState->mD3DSamplerStates.size(),d3drenderState->mD3DSamplerStates.begin());
-	mD3DDevice->GSSetSamplers(0,d3drenderState->mD3DSamplerStates.size(),d3drenderState->mD3DSamplerStates.begin());
-
-if(d3drenderState->mTextureStates.size()>0 && d3drenderState->mTextureStates[0]!=NULL){
-#if defined(TOADLET_FIXED_POINT)
-	float d3dmatrix[16];
-	toD3DMatrix(d3dmatrix,d3drenderState->mTextureStates[0]->matrix);
-#else
-	float *d3dmatrix=d3drenderState->mTextureStates[0]->matrix.data;
-#endif
-if(d3drenderState->mTextureStates.size()>0)effect->GetVariableByName("textureMatrix")->AsMatrix()->SetMatrix(d3dmatrix);
-}
-
-if(d3drenderState->mMaterialState!=NULL){
-effect->GetVariableByName("diffuseColor")->AsVector()->SetFloatVector((float*)d3drenderState->mMaterialState->diffuse.getData());
-}
-*/
 	return true;
 }
 
 bool D3D10RenderDevice::setShaderState(ShaderState *shaderState){
-	D3D10ShaderState *d3dshaderState=NULL;
-	if(shaderState!=NULL){
-		d3dshaderState=(D3D10ShaderState*)shaderState->getRootShaderState();
-		if(d3dshaderState==NULL){
-			Error::nullPointer(Categories::TOADLET_PEEPER,
-				"RenderState is not a D3D10ShaderState");
-			return false;
-		}
+	D3D10ShaderState *d3dshaderState=shaderState!=NULL?(D3D10ShaderState*)shaderState->getRootShaderState():NULL;
+	if(d3dshaderState==NULL){
+		return false;
 	}
 
 	mLastShaderState=d3dshaderState;
@@ -423,10 +387,7 @@ bool D3D10RenderDevice::setShaderState(ShaderState *shaderState){
 }
 
 void D3D10RenderDevice::setBuffer(int i,VariableBuffer *buffer){
-	D3D10Buffer *d3dBuffer=NULL;
-	if(buffer!=NULL){
-		d3dBuffer=(D3D10Buffer*)buffer->getRootVariableBuffer();
-	}
+	D3D10Buffer *d3dBuffer=buffer!=NULL?d3dBuffer=(D3D10Buffer*)buffer->getRootVariableBuffer():NULL;
 	ID3D10Buffer *id3dbuffer=NULL;
 	if(d3dBuffer!=NULL){
 		id3dbuffer=d3dBuffer->mBuffer;

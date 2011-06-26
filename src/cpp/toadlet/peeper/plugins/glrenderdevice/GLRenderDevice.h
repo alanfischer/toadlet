@@ -101,10 +101,7 @@ public:
 	void setTexture(int i,Texture *texture);
 
 	// Old fixed states
-	void setModelMatrix(const Matrix4x4 &matrix);
-	void setViewMatrix(const Matrix4x4 &matrix);
-	void setProjectionMatrix(const Matrix4x4 &matrix);
-	void setNormalize(const Normalize &normalize);
+	void setMatrix(MatrixType type,const Matrix4x4 &matrix);
 	void setLightEnabled(int i,bool enable);
 	void setLightState(int i,const LightState &state);
 	void setAmbientColor(const Vector4 &ambient);
@@ -178,8 +175,6 @@ protected:
 	void vertexFormatDestroyed(GLVertexFormat *format);
 	void shaderStateCreated(GLSLShaderState *state);
 	void shaderStateDestroyed(GLSLShaderState *state);
-
-	int mMatrixMode;
 
 	bool mPBuffers,mFBOs;
 	bool mVBOs,mIBOs,mPBOs,mUBOs;

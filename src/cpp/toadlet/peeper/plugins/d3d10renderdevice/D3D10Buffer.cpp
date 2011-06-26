@@ -136,8 +136,8 @@ bool D3D10Buffer::create(int usage,int access,VariableBufferFormat::ptr variable
 
 		mHasTranspose=false;
 		int i;
-		for(i=0;i<mVariableFormat->variableFormats.size();++i){
-			mHasTranspose|=((mVariableFormat->variableFormats[i]&VariableBufferFormat::Format_BIT_TRANSPOSE)!=0);
+		for(i=0;i<mVariableFormat->getSize();++i){
+			mHasTranspose|=((mVariableFormat->getVariable(i)->getFormat()&VariableBufferFormat::Format_BIT_TRANSPOSE)!=0);
 		}
 	}
 	else{

@@ -213,26 +213,26 @@ bool D3D10Shader::reflect(){
 		D3D10_SHADER_BUFFER_DESC bufferDesc;
 		buffer->GetDesc(&bufferDesc);
 
-		VariableBufferFormat::ptr format(new VariableBufferFormat(bufferDesc.Name,bufferDesc.Size,bufferDesc.Variables));
-
-		if(format->getName()=="$Globals"){
-			format->default=true;
-		}
+		bool primary=(strcmp(bufferDesc.Name,"$Globals")==0);
+		VariableBufferFormat::ptr format(new VariableBufferFormat(primary,bufferDesc.Name,bufferDesc.Size,bufferDesc.Variables));
 
 		for(j=0;j<bufferDesc.Variables;++j){
-			ID3D10ShaderReflectionVariable *variable=buffer->GetVariableByIndex(j);
+			ID3D10ShaderReflectionVariable *d3dvariable=buffer->GetVariableByIndex(j);
 			D3D10_SHADER_VARIABLE_DESC variableDesc;
-			variable->GetDesc(&variableDesc);
-			ID3D10ShaderReflectionType *type=variable->GetType();
+			d3dvariable->GetDesc(&variableDesc);
+			ID3D10ShaderReflectionType *type=d3dvariable->GetType();
 			D3D10_SHADER_TYPE_DESC typeDesc;
 			type->GetDesc(&typeDesc);
 
-			format->variableNames[j]=variableDesc.Name;
-			format->variableFormats[j]=D3D10RenderDevice::getVariableFormat(typeDesc) | VariableBufferFormat::Format_BIT_TRANSPOSE; // Only applies to the matrixes
-			format->variableOffsets[j]=variableDesc.StartOffset;
-			format->variableIndexes[j]=j;
+			VariableBufferFormat::Variable::ptr variable(new VariableBufferFormat::Variable());
+			variable->setName(variableDesc.Name);
+			variable->setFormat(D3D10RenderDevice::getVariableFormat(typeDesc) | VariableBufferFormat::Format_BIT_TRANSPOSE); // Only applies to the matrixes
+			variable->setOffset(variableDesc.StartOffset);
+			variable->setIndex(j);
+			format->setStructVariable(j,variable);
 		}
 
+		format->compile();
 		mVariableBufferFormats[i]=format;
 	}
 

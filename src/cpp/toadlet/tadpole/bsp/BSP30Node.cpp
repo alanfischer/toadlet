@@ -48,9 +48,9 @@ BSP30ModelNode::SubModel::SubModel(BSP30ModelNode *modelNode,BSP30Map *map){
 	this->faces=NULL;
 }
 
-void BSP30ModelNode::SubModel::render(peeper::RenderDevice *renderDevice) const{
-	map->renderFaces(renderDevice,faces);
-	renderDevice->setTexture(1,NULL);
+void BSP30ModelNode::SubModel::render(peeper::RenderDevice *device) const{
+	map->renderFaces(device,faces);
+	device->setTexture(1,NULL);
 }
 
 TOADLET_NODE_IMPLEMENT(BSP30ModelNode,Categories::TOADLET_TADPOLE_BSP+".BSP30ModelNode");
@@ -566,18 +566,18 @@ void BSP30Node::traceSegment(Collision &result,const Vector3 &position,const Seg
 	}
 }
 
-void BSP30Node::render(RenderDevice *renderDevice) const{
+void BSP30Node::render(RenderDevice *device) const{
 	int i;
 
-	renderDevice->setModelMatrix(Math::IDENTITY_MATRIX4X4); // Technically I dont need this anymore, since its a renderable.  But i'll keep it in case it ever gets changed again
+	device->setMatrix(RenderDevice::MatrixType_MODEL,Math::IDENTITY_MATRIX4X4); // Technically I dont need this anymore, since its a renderable.  But i'll keep it in case it ever gets changed again
 
 	for(i=0;i<mVisibleMaterialFaces.size();i++){
-		mMap->materials[i]->setupRenderDevice(renderDevice);
-		mMap->renderFaces(renderDevice,mVisibleMaterialFaces[i]);
+		mMap->materials[i]->setupRenderDevice(device);
+		mMap->renderFaces(device,mVisibleMaterialFaces[i]);
 	}
 
-	renderDevice->setTexture(0,NULL);
-	renderDevice->setTexture(1,NULL);
+	device->setTexture(0,NULL);
+	device->setTexture(1,NULL);
 }
 
 void BSP30Node::childTransformUpdated(Node *child){

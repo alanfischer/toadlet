@@ -143,7 +143,7 @@ bool D3D9Shader::reflect(){
 		return false;
 	}
 
-	VariableBufferFormat::ptr defaultFormat(new VariableBufferFormat((char*)NULL,0,tableDesc.Constants));
+	VariableBufferFormat::ptr primaryFormat(new VariableBufferFormat(true,(char*)NULL,0,tableDesc.Constants));
 
 	int dataSize=0;
 	int i;
@@ -153,17 +153,24 @@ bool D3D9Shader::reflect(){
         unsigned int params=1;
         result=mConstantTable->GetConstantDesc(handle,&constantDesc,&params);
 
-		defaultFormat->variableNames[i]=constantDesc.Name;
-		defaultFormat->variableFormats[i]=D3D9RenderDevice::getVariableFormat(constantDesc) | VariableBufferFormat::Format_BIT_TRANSPOSE;
-		defaultFormat->variableOffsets[i]=dataSize;
-		defaultFormat->variableIndexes[i]=constantDesc.RegisterIndex;
+		VariableBufferFormat::Variable::ptr variable(new VariableBufferFormat::Variable());
+		variable->setName(constantDesc.Name);
+		int format=D3D9RenderDevice::getVariableFormat(constantDesc);
+		if(VariableBufferFormat::getFormatRows(format)>1 && VariableBufferFormat::getFormatColumns(format)>1){
+			format|=VariableBufferFormat::Format_BIT_TRANSPOSE;
+		}
+		variable->setFormat(format);
+		variable->setOffset(dataSize);
+		variable->setIndex(constantDesc.RegisterIndex);
+		primaryFormat->setStructVariable(i,variable);
 
 		dataSize+=constantDesc.Bytes;
 	}
 
-	defaultFormat->dataSize=dataSize;
+	primaryFormat->setDataSize(dataSize);
 
-	mVariableBufferFormats.add(defaultFormat);
+	primaryFormat->compile();
+	mVariableBufferFormats.add(primaryFormat);
 
 	return true;
 }

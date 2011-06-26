@@ -244,14 +244,9 @@ ShaderState *D3D9RenderDevice::createShaderState(){
 }
 
 bool D3D9RenderDevice::setRenderTarget(RenderTarget *target){
-	D3D9RenderTarget *d3dtarget=NULL;
-	if(target!=NULL){
-		d3dtarget=(D3D9RenderTarget*)target->getRootRenderTarget();
-		if(d3dtarget==NULL){
-			Error::nullPointer(Categories::TOADLET_PEEPER,
-				"RenderTarget is not a D3D9RenderTarget");
-			return false;
-		}
+	D3D9RenderTarget *d3dtarget=target!=NULL?(D3D9RenderTarget*)target->getRootRenderTarget():NULL;
+	if(d3dtarget==NULL){
+		return false;
 	}
 
 	if(mD3DRenderTarget!=NULL){
@@ -284,13 +279,13 @@ void D3D9RenderDevice::setViewport(const Viewport &viewport){
 void D3D9RenderDevice::clear(int clearFlags,const Vector4 &clearColor){
 	int d3dclear=0;
 
-	if(clearFlags & ClearFlag_COLOR){
+	if(clearFlags & RenderDevice::ClearType_BIT_COLOR){
 		d3dclear|=D3DCLEAR_TARGET;
 	}
-	if(clearFlags & ClearFlag_DEPTH){
+	if(clearFlags & RenderDevice::ClearType_BIT_DEPTH){
 		d3dclear|=D3DCLEAR_ZBUFFER;
 	}
-	if(clearFlags & ClearFlag_STENCIL){
+	if(clearFlags & RenderDevice::ClearType_BIT_STENCIL){
 		d3dclear|=D3DCLEAR_STENCIL;
 	}
 
@@ -303,31 +298,32 @@ void D3D9RenderDevice::swap(){
 	mD3DRenderTarget->swap();
 }
 
-void D3D9RenderDevice::setModelMatrix(const Matrix4x4 &matrix){
-	toD3DMATRIX(cacheD3DMatrix,matrix);
-	HRESULT result=mD3DDevice->SetTransform(D3DTS_WORLD,&cacheD3DMatrix TOADLET_D3DMFMT);
-	TOADLET_CHECK_D3D9ERROR(result,"setModelMatrix");
-}
-
-void D3D9RenderDevice::setViewMatrix(const Matrix4x4 &matrix){
-	toD3DMATRIX(cacheD3DMatrix,matrix);
-	HRESULT result=mD3DDevice->SetTransform(D3DTS_VIEW,&cacheD3DMatrix TOADLET_D3DMFMT);
-	TOADLET_CHECK_D3D9ERROR(result,"setViewMatrix");
-}
-
-void D3D9RenderDevice::setProjectionMatrix(const Matrix4x4 &matrix){
+void D3D9RenderDevice::setMatrix(MatrixType type,const Matrix4x4 &matrix){
 	D3DMATRIX &d3dmatrix=cacheD3DMatrix;
 	toD3DMATRIX(d3dmatrix,matrix);
 
-	// Convert depth ranges from -1,1 to 0,1
-	//  Thanks to the OGRE project
-	int i;
-	for(i=0;i<4;++i){
-		d3dmatrix.m[i][2]=(d3dmatrix.m[i][2]+d3dmatrix.m[i][3])/2;
-	};
+	D3DTRANSFORMSTATETYPE d3dtype;
+	switch(type){
+		case MatrixType_PROJECTION:
+			d3dtype=D3DTS_PROJECTION;
 
-	HRESULT result=mD3DDevice->SetTransform(D3DTS_PROJECTION,&d3dmatrix TOADLET_D3DMFMT);
-	TOADLET_CHECK_D3D9ERROR(result,"setProjectionMatrix");
+			// Convert depth ranges from -1,1 to 0,1
+			//  Thanks to the OGRE project
+			int i;
+			for(i=0;i<4;++i){
+				d3dmatrix.m[i][2]=(d3dmatrix.m[i][2]+d3dmatrix.m[i][3])/2;
+			};
+		break;
+		case MatrixType_VIEW:
+			d3dtype=D3DTS_VIEW;
+		break;
+		case MatrixType_MODEL:
+			d3dtype=D3DTS_WORLD;
+		break;
+	}
+
+	HRESULT result=mD3DDevice->SetTransform(d3dtype,&d3dmatrix TOADLET_D3DMFMT);
+	TOADLET_CHECK_D3D9ERROR(result,"setMatrix");
 }
 
 void D3D9RenderDevice::beginScene(){
@@ -467,7 +463,6 @@ void D3D9RenderDevice::setDefaultState(){
 	setBlendState(BlendState::Combination_DISABLED);
 	setDepthState(DepthState());
 	setFogState(FogState());
-	setNormalize(Normalize_RESCALE);
 	setPointState(PointState());
 	setRasterizerState(RasterizerState());
 
@@ -487,14 +482,9 @@ void D3D9RenderDevice::setDefaultState(){
 }
 
 bool D3D9RenderDevice::setRenderState(RenderState *renderState){
-	D3D9RenderState *d3drenderState=NULL;
-	if(renderState!=NULL){
-		d3drenderState=(D3D9RenderState*)renderState->getRootRenderState();
-		if(d3drenderState==NULL){
-			Error::nullPointer(Categories::TOADLET_PEEPER,
-				"RenderState is not a D3D9RenderState");
-			return false;
-		}
+	D3D9RenderState *d3drenderState=renderState!=NULL?(D3D9RenderState*)renderState->getRootRenderState():NULL;
+	if(d3drenderState==NULL){
+		return false;
 	}
 
 	if(d3drenderState->mBlendState!=NULL){
@@ -527,17 +517,12 @@ bool D3D9RenderDevice::setRenderState(RenderState *renderState){
 }
 
 bool D3D9RenderDevice::setShaderState(ShaderState *shaderState){
-	D3D9ShaderState *d3d9shaderState=NULL;
-	if(shaderState!=NULL){
-		d3d9shaderState=(D3D9ShaderState*)shaderState->getRootShaderState();
-		if(d3d9shaderState==NULL){
-			Error::nullPointer(Categories::TOADLET_PEEPER,
-				"ShaderState is not a D3D9ShaderState");
-			return false;
-		}
+	D3D9ShaderState *d3dshaderState=shaderState!=NULL?(D3D9ShaderState*)shaderState->getRootShaderState():NULL;
+	if(d3dshaderState==NULL){
+		return false;
 	}
 
-	return d3d9shaderState->activate();
+	return d3dshaderState->activate();
 }
 
 void D3D9RenderDevice::setBlendState(const BlendState &state){
@@ -621,6 +606,7 @@ void D3D9RenderDevice::setMaterialState(const MaterialState &state){
 	}
 
 	mD3DDevice->SetRenderState(D3DRS_SHADEMODE,getD3DSHADEMODE(state.shade));
+	mD3DDevice->SetRenderState(D3DRS_NORMALIZENORMALS,state.normalize!=MaterialState::NormalizeType_RESCALE);
 
 	if(state.alphaTest==MaterialState::AlphaTest_NEVER){
 		mD3DDevice->SetRenderState(D3DRS_ALPHATESTENABLE,false);
@@ -810,15 +796,6 @@ void D3D9RenderDevice::setTexture(int i,Texture *texture){
 		result=mD3DDevice->SetTexture(i,NULL);
 	}
 	TOADLET_CHECK_D3D9ERROR(result,"SetTexture");
-}
-
-void D3D9RenderDevice::setNormalize(const Normalize &normalize){
-	if(normalize!=Normalize_NONE){
-		mD3DDevice->SetRenderState(D3DRS_NORMALIZENORMALS,TRUE);
-	}
-	else{
-		mD3DDevice->SetRenderState(D3DRS_NORMALIZENORMALS,FALSE);
-	}
 }
 
 void D3D9RenderDevice::setLightState(int i,const LightState &light){
