@@ -77,7 +77,7 @@ Node *CameraNode::create(Scene *scene){
 	setProjectionFovX(Math::HALF_PI,Math::ONE,Math::ONE,Math::fromInt(1000));
 	mViewportSet=false;
 	mViewport.reset();
-	mClearFlags=ClearFlag_COLOR|ClearFlag_DEPTH;
+	mClearFlags=RenderDevice::ClearType_BIT_COLOR|RenderDevice::ClearType_BIT_DEPTH;
 	mClearColor.reset();
 	mSkipFirstClear=false;
 
@@ -373,32 +373,32 @@ void CameraNode::updateWorldTransform(){
 	updateViewTransform();
 }
 
-void CameraNode::render(RenderDevice *renderDevice,Node *node){
+void CameraNode::render(RenderDevice *device,Node *node){
 	updateFramesPerSecond();
 
 	mVisibleCount=0;
 
-	mScene->render(renderDevice,this,node);
-	renderOverlayGamma(renderDevice);
+	mScene->render(device,this,node);
+	renderOverlayGamma(device);
 }
 
-Image::ptr CameraNode::renderToImage(RenderDevice *renderDevice,int format,int width,int height){
+Image::ptr CameraNode::renderToImage(RenderDevice *device,int format,int width,int height){
 	Texture::ptr renderTexture=mEngine->getTextureManager()->createTexture(Texture::Usage_BIT_RENDERTARGET,Texture::Dimension_D2,format,width,height,0,1);
 	PixelBufferRenderTarget::ptr renderTarget=mEngine->getTextureManager()->createPixelBufferRenderTarget();
 	renderTarget->attach(renderTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
 
-	RenderTarget *oldTarget=renderDevice->getRenderTarget();
+	RenderTarget *oldTarget=device->getRenderTarget();
 	Viewport oldViewport=getViewport();
 
-	renderDevice->setRenderTarget(renderTarget);
+	device->setRenderTarget(renderTarget);
 	setViewport(Viewport(0,0,width,height));
 
-	renderDevice->beginScene();
-		render(renderDevice);
-	renderDevice->endScene();
+	device->beginScene();
+		render(device);
+	device->endScene();
 
 	setViewport(oldViewport);
-	renderDevice->setRenderTarget(oldTarget);
+	device->setRenderTarget(oldTarget);
 
 	Image::ptr image=mEngine->getTextureManager()->createImage(renderTexture);
 
@@ -408,7 +408,7 @@ Image::ptr CameraNode::renderToImage(RenderDevice *renderDevice,int format,int w
 	return image;
 }
 
-Mesh::ptr CameraNode::renderToSkyBox(RenderDevice *renderDevice,int format,int size,scalar scale){
+Mesh::ptr CameraNode::renderToSkyBox(RenderDevice *device,int format,int size,scalar scale){
 	bool rtt=mEngine->getRenderCaps().renderToTexture;
 	int flags=Texture::Usage_BIT_RENDERTARGET;
 	Texture::ptr skyboxTexture[6];
@@ -429,7 +429,7 @@ Mesh::ptr CameraNode::renderToSkyBox(RenderDevice *renderDevice,int format,int s
 	forward[4]=Math::NEG_Y_UNIT_VECTOR3;	up[4]=Math::Z_UNIT_VECTOR3;
 	forward[5]=Math::Y_UNIT_VECTOR3;		up[5]=Math::Z_UNIT_VECTOR3;
 
-	RenderTarget *oldTarget=renderDevice->getRenderTarget();
+	RenderTarget *oldTarget=device->getRenderTarget();
 	Viewport oldViewport=getViewport();
 	Transform oldTransform=getTransform();
 	bool oldAlignment=getAlignmentCalculationsUseOrigin();
@@ -439,23 +439,23 @@ Mesh::ptr CameraNode::renderToSkyBox(RenderDevice *renderDevice,int format,int s
 	for(i=0;i<6;++i){
 		if(rtt){
 			renderTarget->attach(skyboxTexture[i]->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
-			renderDevice->setRenderTarget(renderTarget);
+			device->setRenderTarget(renderTarget);
 		}
 
 		setViewport(Viewport(0,0,skyboxTexture[i]->getWidth(),skyboxTexture[i]->getHeight()));
 		setLookDir(getTranslate(),forward[i],up[i]);
 		mScene->update(0);
-		renderDevice->beginScene();
-			render(renderDevice);
-		renderDevice->endScene();
+		device->beginScene();
+			render(device);
+		device->endScene();
 
 		if(rtt){
-			renderDevice->swap();
+			device->swap();
 			renderTarget->remove(skyboxTexture[i]->getMipPixelBuffer(0,0));
-			renderDevice->setRenderTarget(oldTarget);
+			device->setRenderTarget(oldTarget);
  		}
 		else{ 
-			renderDevice->copyFrameBufferToPixelBuffer(skyboxTexture[i]->getMipPixelBuffer(0,0));
+			device->copyFrameBufferToPixelBuffer(skyboxTexture[i]->getMipPixelBuffer(0,0));
 		}
 
 		skyboxMaterial[i]=mEngine->getMaterialManager()->createMaterial(skyboxTexture[i],true);
@@ -465,7 +465,7 @@ Mesh::ptr CameraNode::renderToSkyBox(RenderDevice *renderDevice,int format,int s
 	setAlignmentCalculationsUseOrigin(oldAlignment);
 	setTransform(oldTransform);
 	setViewport(oldViewport);
-	renderDevice->setRenderTarget(oldTarget);
+	device->setRenderTarget(oldTarget);
 
 	if(renderTarget!=NULL){
 		renderTarget->destroy();
@@ -567,14 +567,14 @@ void CameraNode::updateViewTransform(){
 	Math::normalize(mClipPlanes[5].set(vpt[3]+vpt[2], vpt[7]+vpt[6], vpt[11]+vpt[10], vpt[15]+vpt[14]));
 }
 
-void CameraNode::renderOverlayGamma(RenderDevice *renderDevice){
+void CameraNode::renderOverlayGamma(RenderDevice *device){
 	if(mGamma!=Math::ONE){
-		renderDevice->setAmbientColor(Math::ONE_VECTOR4);
-		mGammaMaterial->setupRenderDevice(renderDevice);
-		renderDevice->setProjectionMatrix(mOverlayMatrix);
-		renderDevice->setViewMatrix(Math::IDENTITY_MATRIX4X4);
-		renderDevice->setModelMatrix(Math::IDENTITY_MATRIX4X4);
-		renderDevice->renderPrimitive(mOverlayVertexData,mOverlayIndexData);
+		device->setAmbientColor(Math::ONE_VECTOR4);
+		mGammaMaterial->setupRenderDevice(device);
+		device->setMatrix(RenderDevice::MatrixType_PROJECTION,mOverlayMatrix);
+		device->setMatrix(RenderDevice::MatrixType_VIEW,Math::IDENTITY_MATRIX4X4);
+		device->setMatrix(RenderDevice::MatrixType_MODEL,Math::IDENTITY_MATRIX4X4);
+		device->renderPrimitive(mOverlayVertexData,mOverlayIndexData);
 	}
 }
 

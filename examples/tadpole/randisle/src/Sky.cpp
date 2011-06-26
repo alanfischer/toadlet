@@ -10,13 +10,8 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 	Vector3 lightDir(1,1,0.5);
 	bool advanced=true; // Use realtime bumpmapping, or precalculated
 
-	VertexFormat::ptr vertexFormat=mEngine->getBufferManager()->createVertexFormat();
-	vertexFormat->addElement(VertexFormat::Semantic_POSITION,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_3);
-	vertexFormat->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_COLOR_RGBA);
-	vertexFormat->addElement(VertexFormat::Semantic_TEXCOORD,0,VertexFormat::Format_BIT_FLOAT_32|VertexFormat::Format_BIT_COUNT_2);
-
  	int numSegments=16,numRings=16;
-	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_READ_WRITE,vertexFormat,mEngine->getMeshManager()->getSkyDomeVertexCount(numSegments,numRings));
+	VertexBuffer::ptr vertexBuffer=mEngine->getBufferManager()->createVertexBuffer(Buffer::Usage_BIT_STREAM,Buffer::Access_READ_WRITE,mEngine->getVertexFormats().POSITION_COLOR_TEX_COORD,mEngine->getMeshManager()->getSkyDomeVertexCount(numSegments,numRings));
 	IndexBuffer::ptr indexBuffer=mEngine->getBufferManager()->createIndexBuffer(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,IndexBuffer::IndexFormat_UINT16,mEngine->getMeshManager()->getSkyDomeIndexCount(numSegments,numRings));
 
 	Image::ptr cloud=createCloud(cloudSize,cloudSize,16,9,0.45,0.000025,0.75);

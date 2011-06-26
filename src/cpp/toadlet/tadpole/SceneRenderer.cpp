@@ -48,9 +48,9 @@ SceneRenderer::SceneRenderer(Scene *scene):
 SceneRenderer::~SceneRenderer(){
 }
 
-void SceneRenderer::renderScene(RenderDevice *renderDevice,Node *node,CameraNode *camera){
+void SceneRenderer::renderScene(RenderDevice *device,Node *node,CameraNode *camera){
 	gatherRenderables(mRenderableSet,node,camera);
-	renderRenderables(mRenderableSet,renderDevice,camera);
+	renderRenderables(mRenderableSet,device,camera);
 }
 
 void SceneRenderer::gatherRenderables(RenderableSet *set,Node *node,CameraNode *camera){
@@ -74,35 +74,35 @@ void SceneRenderer::gatherRenderables(RenderableSet *set,Node *node,CameraNode *
 	}
 }
 
-void SceneRenderer::renderRenderables(RenderableSet *set,RenderDevice *renderDevice,CameraNode *camera,bool useMaterials){
+void SceneRenderer::renderRenderables(RenderableSet *set,RenderDevice *device,CameraNode *camera,bool useMaterials){
 	Matrix4x4 matrix;
 	int i,j;
 
 	RenderListener *listener=mScene->getRenderListener();
 
 	if(listener!=NULL){
-		listener->preRenderRenderables(set,renderDevice,camera);
+		listener->preRenderRenderables(set,device,camera);
 	}
 
-	setupViewport(camera,renderDevice);
+	setupViewport(camera,device);
 
 	int clearFlags=camera->getClearFlags();
 	if(clearFlags!=0 && !camera->getSkipFirstClear()){
-		renderDevice->clear(clearFlags,camera->getClearColor());
+		device->clear(clearFlags,camera->getClearColor());
 	}
 
-	renderDevice->setProjectionMatrix(camera->getProjectionMatrix());
-	renderDevice->setViewMatrix(camera->getViewMatrix());
-	renderDevice->setModelMatrix(Math::IDENTITY_MATRIX4X4);
+	device->setMatrix(RenderDevice::MatrixType_PROJECTION,camera->getProjectionMatrix());
+	device->setMatrix(RenderDevice::MatrixType_VIEW,camera->getViewMatrix());
+	device->setMatrix(RenderDevice::MatrixType_MODEL,Math::IDENTITY_MATRIX4X4);
 
 	if(useMaterials){
-		renderDevice->setDefaultState();
+		device->setDefaultState();
 		if(camera->getDefaultState()!=NULL){
-			renderDevice->setRenderState(camera->getDefaultState());
+			device->setRenderState(camera->getDefaultState());
 		}
 	}
 
-	setupLights(set->getLightQueue(),renderDevice);
+	setupLights(set->getLightQueue(),device);
 
 	bool renderedDepthSorted=false;
 	const RenderableSet::IndexCollection &sortedIndexes=set->getLayerSortedQueueIndexes();
@@ -112,11 +112,11 @@ void SceneRenderer::renderRenderables(RenderableSet *set,RenderDevice *renderDev
 
 		if(renderedDepthSorted==false && (material!=NULL && material->getLayer()!=0)){
 			renderedDepthSorted=true;
-			renderDepthSortedRenderables(set,renderDevice,camera,useMaterials);
+			renderDepthSortedRenderables(set,device,camera,useMaterials);
 		}
 
 		if(useMaterials && material!=NULL){
-			material->setupRenderDevice(renderDevice);
+			material->setupRenderDevice(device);
 		}
 
 		for(i=0;i<renderableQueue.size();++i){
@@ -124,28 +124,28 @@ void SceneRenderer::renderRenderables(RenderableSet *set,RenderDevice *renderDev
 			Renderable *renderable=item.renderable;
 			renderable->getRenderTransform().getMatrix(matrix);
 
-			renderDevice->setAmbientColor(item.ambient);
-			renderDevice->setModelMatrix(matrix);
-			renderable->render(renderDevice);
+			device->setAmbientColor(item.ambient);
+			device->setMatrix(RenderDevice::MatrixType_MODEL,matrix);
+			renderable->render(device);
 		}
 
 		if(useMaterials){
 			if(camera->getDefaultState()!=NULL){
-				renderDevice->setRenderState(camera->getDefaultState());
+				device->setRenderState(camera->getDefaultState());
 			}
 		}
 	}
 
 	if(renderedDepthSorted==false){
-		renderDepthSortedRenderables(set,renderDevice,camera,useMaterials);
+		renderDepthSortedRenderables(set,device,camera,useMaterials);
 	}
 
 	if(listener!=NULL){
-		listener->postRenderRenderables(set,renderDevice,camera);
+		listener->postRenderRenderables(set,device,camera);
 	}
 }
 
-void SceneRenderer::renderDepthSortedRenderables(RenderableSet *set,RenderDevice *renderDevice,CameraNode *camera,bool useMaterials){
+void SceneRenderer::renderDepthSortedRenderables(RenderableSet *set,RenderDevice *device,CameraNode *camera,bool useMaterials){
 	Matrix4x4 matrix;
 	int i;
 	const RenderableSet::RenderableQueue &renderableQueue=set->getDepthSortedQueue();
@@ -156,42 +156,42 @@ void SceneRenderer::renderDepthSortedRenderables(RenderableSet *set,RenderDevice
 		renderable->getRenderTransform().getMatrix(matrix);
 
 		if(useMaterials && material!=NULL){
-			material->setupRenderDevice(renderDevice);
+			material->setupRenderDevice(device);
 		}
 
-		renderDevice->setAmbientColor(item.ambient);
-		renderDevice->setModelMatrix(matrix);
-		renderable->render(renderDevice);
+		device->setAmbientColor(item.ambient);
+		device->setMatrix(RenderDevice::MatrixType_MODEL,matrix);
+		renderable->render(device);
 
 		if(useMaterials){
 			if(camera->getDefaultState()!=NULL){
-				renderDevice->setRenderState(camera->getDefaultState());
+				device->setRenderState(camera->getDefaultState());
 			}
 		}
 	}
 }
 
-void SceneRenderer::setupViewport(CameraNode *camera,RenderDevice *renderDevice){
+void SceneRenderer::setupViewport(CameraNode *camera,RenderDevice *device){
 	if(camera->getViewportSet()){
-		renderDevice->setViewport(camera->getViewport());
+		device->setViewport(camera->getViewport());
 	}
 	else{
-		RenderTarget *renderTarget=renderDevice->getRenderTarget();
-		renderDevice->setViewport(Viewport(0,0,renderTarget->getWidth(),renderTarget->getHeight()));
+		RenderTarget *renderTarget=device->getRenderTarget();
+		device->setViewport(Viewport(0,0,renderTarget->getWidth(),renderTarget->getHeight()));
 	}
 }
 
-void SceneRenderer::setupLights(const RenderableSet::LightQueue &lightQueue,RenderDevice *renderDevice){
+void SceneRenderer::setupLights(const RenderableSet::LightQueue &lightQueue,RenderDevice *device){
 	int i;
 	int maxLights=mScene->getEngine()->getRenderCaps().maxLights;
 	for(i=0;i<maxLights;++i){
 		if(i<lightQueue.size()){
 			LightNode *light=lightQueue[i].light;
-			renderDevice->setLightState(i,light->getLightState());
-			renderDevice->setLightEnabled(i,light->getEnabled());
+			device->setLightState(i,light->getLightState());
+			device->setLightEnabled(i,light->getEnabled());
 		}
 		else{
-			renderDevice->setLightEnabled(i,false);
+			device->setLightEnabled(i,false);
 		}
 	}
 }

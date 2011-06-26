@@ -435,6 +435,25 @@ bool BufferManager::useTriFan(){
 	return !mBackable && mEngine->getRenderCaps().triangleFan;
 }
 
+void BufferManager::outputVariableBufferFormat(VariableBufferFormat::ptr format){
+	String string;
+
+	Logger::alert(Categories::TOADLET_TADPOLE,"VariableBufferFormat:"+format->getName()+" primary:"+format->getPrimary()+" dataSize:"+format->getDataSize()+" numVariables:"+format->getSize());
+	int i;
+	for(i=0;i<format->getSize();++i){
+		outputVariable(format->getVariable(i),"\t");
+	}
+}
+
+void BufferManager::outputVariable(VariableBufferFormat::Variable *variable,const String &tabs){
+	Logger::alert(Categories::TOADLET_TADPOLE,tabs+"Variable:"+variable->getName()+" format:"+variable->getFormat()+" offset:"+variable->getOffset()+" index:"+variable->getIndex()+" arraySize:"+variable->getArraySize()+" structSize:"+variable->getStructSize());
+
+	int i;
+	for(i=0;i<variable->getStructSize();++i){
+		outputVariable(variable->getStructVariable(i),tabs+"\t");
+	}
+}
+
 }
 }
 

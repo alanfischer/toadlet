@@ -63,8 +63,8 @@ bool D3D9VariableBuffer::create(int usage,int access,VariableBufferFormat::ptr v
 
 	mHasTranspose=false;
 	int i;
-	for(i=0;i<mVariableFormat->variableFormats.size();++i){
-		mHasTranspose|=((mVariableFormat->variableFormats[i]&VariableBufferFormat::Format_BIT_TRANSPOSE)!=0);
+	for(i=0;i<mVariableFormat->getSize();++i){
+		mHasTranspose|=((mVariableFormat->getVariable(i)->getFormat()&VariableBufferFormat::Format_BIT_TRANSPOSE)!=0);
 	}
 
 	return true;
@@ -103,8 +103,8 @@ bool D3D9VariableBuffer::update(tbyte *data,int start,int size){
 
 	if(mHasTranspose){
 		int i;
-		for(i=0;i<mVariableFormat->variableOffsets.size();++i){
-			int offset=mVariableFormat->variableOffsets[i];
+		for(i=0;i<mVariableFormat->getSize();++i){
+			int offset=mVariableFormat->getVariable(i)->getOffset();
 			if(offset>=start && offset<start+size){
 				BackableBuffer::transposeVariable(mVariableFormat,mData,i);
 			}
@@ -118,10 +118,11 @@ void D3D9VariableBuffer::activateConstants(Shader::ShaderType type){
 	IDirect3DDevice9 *device=mDevice->getDirect3DDevice9();
 
 	int i;
-	for(i=0;i<mVariableFormat->variableNames.size();++i){
-		int format=mVariableFormat->variableFormats[i];
-		int index=mVariableFormat->variableIndexes[i];
-		int offset=mVariableFormat->variableOffsets[i];
+	for(i=0;i<mVariableFormat->getSize();++i){
+		VariableBufferFormat::Variable *variable=mVariableFormat->getVariable(i);
+		int format=variable->getFormat();
+		int index=variable->getIndex();
+		int offset=variable->getOffset();
 		int count=0;
 		switch(format&VariableBufferFormat::Format_MASK_COUNTS){
 			case VariableBufferFormat::Format_COUNT_2X4:

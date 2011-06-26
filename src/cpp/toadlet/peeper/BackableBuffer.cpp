@@ -284,8 +284,8 @@ void BackableBuffer::setBack(VariableBuffer::ptr back){
 
 void BackableBuffer::transposeVariables(VariableBufferFormat *variableFormat,tbyte *data){
 	int i;
-	for(i=0;i<variableFormat->variableFormats.size();++i){
-		int format=variableFormat->variableFormats[i];
+	for(i=0;i<variableFormat->getSize();++i){
+		int format=variableFormat->getVariable(i)->getFormat();
 		if((format&VariableBufferFormat::Format_BIT_TRANSPOSE)!=0){
 			transposeVariable(variableFormat,data,i);
 		}
@@ -293,8 +293,9 @@ void BackableBuffer::transposeVariables(VariableBufferFormat *variableFormat,tby
 }
 
 void BackableBuffer::transposeVariable(VariableBufferFormat *variableFormat,tbyte *data,int i){
-	int format=variableFormat->variableFormats[i];
-	int offset=variableFormat->variableOffsets[i];
+	VariableBufferFormat::Variable *variable=variableFormat->getVariable(i);
+	int format=variable->getFormat();
+	int offset=variable->getOffset();
 	int rows=VariableBufferFormat::getFormatRows(format),cols=VariableBufferFormat::getFormatColumns(format);
 	TOADLET_ASSERT((format&VariableBufferFormat::Format_TYPE_FLOAT_32)!=0 && rows==cols);
 

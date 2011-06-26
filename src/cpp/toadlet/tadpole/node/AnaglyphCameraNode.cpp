@@ -103,46 +103,46 @@ void AnaglyphCameraNode::setRightColor(const Vector4 &color){
 	mRightMaterial->setMaterialState(MaterialState(mRightColor));
 }
 
-void AnaglyphCameraNode::render(RenderDevice *renderDevice,Node *node){
+void AnaglyphCameraNode::render(RenderDevice *device,Node *node){
 	Vector3 translate=getTranslate();
 
-	renderDevice->setRenderTarget(mLeftRenderTarget);
+	device->setRenderTarget(mLeftRenderTarget);
 	translate.x-=mSeparation;
 	setTranslate(translate);
 	updateWorldTransform();
-		mScene->render(renderDevice,this,NULL);
-	renderDevice->swap();
+		mScene->render(device,this,NULL);
+	device->swap();
 
-	renderDevice->setRenderTarget(mRightRenderTarget);
+	device->setRenderTarget(mRightRenderTarget);
 	translate.x+=2*mSeparation;
 	setTranslate(translate);
 	updateWorldTransform();
-		mScene->render(renderDevice,this,NULL);
-	renderDevice->swap();
+		mScene->render(device,this,NULL);
+	device->swap();
 
-	renderDevice->setRenderTarget(renderDevice->getPrimaryRenderTarget());
+	device->setRenderTarget(device->getPrimaryRenderTarget());
 	translate.x-=mSeparation;
 	setTranslate(translate);
 	updateWorldTransform();
 
 	if(getViewportSet()){
-		renderDevice->setViewport(getViewport());
+		device->setViewport(getViewport());
 	}
 	else{
-		RenderTarget *renderTarget=renderDevice->getRenderTarget();
+		RenderTarget *renderTarget=device->getRenderTarget();
 		Viewport viewport;
-		renderDevice->setViewport(viewport.set(0,0,renderTarget->getWidth(),renderTarget->getHeight()));
+		device->setViewport(viewport.set(0,0,renderTarget->getWidth(),renderTarget->getHeight()));
 	}
 
-	renderDevice->setProjectionMatrix(mOverlayMatrix);
-	renderDevice->setViewMatrix(Math::IDENTITY_MATRIX4X4);
-	renderDevice->setModelMatrix(Math::IDENTITY_MATRIX4X4);
-	mLeftMaterial->setupRenderDevice(renderDevice);
-	renderDevice->renderPrimitive(mOverlayVertexData,mOverlayIndexData);
-	mRightMaterial->setupRenderDevice(renderDevice);
-	renderDevice->renderPrimitive(mOverlayVertexData,mOverlayIndexData);
+	device->setMatrix(RenderDevice::MatrixType_PROJECTION,mOverlayMatrix);
+	device->setMatrix(RenderDevice::MatrixType_VIEW,Math::IDENTITY_MATRIX4X4);
+	device->setMatrix(RenderDevice::MatrixType_MODEL,Math::IDENTITY_MATRIX4X4);
+	mLeftMaterial->setupRenderDevice(device);
+	device->renderPrimitive(mOverlayVertexData,mOverlayIndexData);
+	mRightMaterial->setupRenderDevice(device);
+	device->renderPrimitive(mOverlayVertexData,mOverlayIndexData);
 
-	renderOverlayGamma(renderDevice);
+	renderOverlayGamma(device);
 }
 
 }

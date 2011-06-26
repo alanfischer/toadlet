@@ -41,18 +41,6 @@ namespace peeper{
 	using namespace toadlet::egg::math;
 #endif
 
-enum ClearFlag{
-	ClearFlag_COLOR=1,
-	ClearFlag_DEPTH=2,
-	ClearFlag_STENCIL=4,
-};
-
-enum Normalize{
-	Normalize_NONE,
-	Normalize_RESCALE,
-	Normalize_NORMALIZE,
-};
-
 }
 }
 

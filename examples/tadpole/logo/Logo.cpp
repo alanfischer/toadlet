@@ -173,9 +173,9 @@ String vsc[]={
 	"in vec4 POSITION;\n" \
 	"in vec3 NORMAL;\n" \
 	"out vec4 color;\n" \
-	"uniform mat4 ModelViewProjectionMatrix;;\n" \
+	"uniform mat4 ModelViewProjectionMatrix[2];\n" \
 	"void main(){\n" \
-		"gl_Position = ModelViewProjectionMatrix * POSITION;\n" \
+		"gl_Position = ModelViewProjectionMatrix[0] * POSITION;\n" \
 		"color = vec4(NORMAL.x,NORMAL.y,NORMAL.z,1.0);\n" \
 	"}",
 
@@ -187,10 +187,11 @@ String vsc[]={
 		"float4 position : SV_POSITION;\n" \
 		"float4 color : COLOR;\n" \
 	"};\n" \
-	"float4x4 ModelViewProjectionMatrix;\n" \
+	"struct mvps{float4x4 ModelViewProjectionMatrix1,ModelViewProjectionMatrix2;};\n " \
+	"mvps m;\n" \
 	"VOUT main(VIN vin){\n" \
 	"	VOUT vout;\n" \
-	"	vout.position=mul(vin.position,ModelViewProjectionMatrix);\n" \
+	"	vout.position=mul(vin.position,m.ModelViewProjectionMatrix1);\n" \
 	"	vout.color=float4(vin.normal.x,vin.normal.y,vin.normal.z,1.0);\n" \
 	"	return vout;\n" \
 	"}"
@@ -205,13 +206,19 @@ String fsc[]={
 		"float4 position : SV_POSITION;\n" \
 		"float4 color: COLOR;\n" \
 	"};\n" \
-	"float4 main(PIN pin): SV_TARGET{" \
+/*	"Texture2D MeshTexture;\n" \
+	"SamplerState MeshTextureSampler{\n" \
+		"Filter=MIN_MAG_MIP_LINEAR;\n" \
+		"AddressU=Wrap;\n" \
+		"AddressV=Wrap;\n" \
+	"};\n" \
+*/	"float4 main(PIN pin): SV_TARGET{" \
 	"	return pin.color;\n" \
 	"}"
 };
 
 void Logo::create(){
-	Application::create("d3d10");
+	Application::create("d3d9");
 
 	mEngine->setDirectory("../../../data");
 
@@ -248,6 +255,7 @@ VariableBufferFormat::ptr vbf;
 vbf=meshNode->getSubMesh(i)->material->getShaderState()->getVariableBufferFormat(Shader::ShaderType_VERTEX,0);
 	}
 
+getEngine()->getBufferManager()->outputVariableBufferFormat(vbf);
 vb=getEngine()->getBufferManager()->createVariableBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,vbf);
 
 // Only looks good if running on device, in simulator its always a top down view
@@ -279,11 +287,9 @@ void Logo::resized(int width,int height){
 }
 
 void Logo::render(RenderDevice *renderDevice){
-#if 1
 Matrix4x4 shaderMatrix;
 shaderMatrix.set(cameraNode->getProjectionMatrix()*cameraNode->getViewMatrix());
 vb->update((tbyte*)shaderMatrix.getData(),0,16*4);
-#endif
 
 	renderDevice->beginScene();
 renderDevice->setShaderState(meshNode->getSubMesh(0)->material->getShaderState());

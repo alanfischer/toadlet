@@ -73,8 +73,6 @@ TOADLET_C_API RenderDevice* new_GLRenderDevice(){
 #endif
 
 GLRenderDevice::GLRenderDevice():
-	mMatrixMode(-1),
-
 	mPBuffers(false),mFBOs(false),
 	mVBOs(false),mIBOs(false),mPBOs(false),mUBOs(false),
 
@@ -440,92 +438,55 @@ ShaderState *GLRenderDevice::createShaderState(){
 	return new GLSLShaderState(this);
 }
 
-// Matrix operations
-void GLRenderDevice::setModelMatrix(const Matrix4x4 &matrix){
-	if(mMatrixMode!=GL_MODELVIEW){
-		mMatrixMode=GL_MODELVIEW;
-		glMatrixMode(mMatrixMode);
-	}
+void GLRenderDevice::setMatrix(MatrixType type,const Matrix4x4 &matrix){
+	if(type==MatrixType_MODEL || type==MatrixType_VIEW){
+		if(type==MatrixType_MODEL){
+			#if defined(TOADLET_FIXED_POINT) && !defined(TOADLET_HAS_GLES)
+				MathConversion::scalarToFloat(mModelMatrix,matrix);
+			#else
+				mModelMatrix.set(matrix);
+			#endif
+		}
+		else{
+			#if defined(TOADLET_FIXED_POINT) && !defined(TOADLET_HAS_GLES)
+				MathConversion::scalarToFloat(mViewMatrix,matrix);
+			#else
+				mViewMatrix.set(matrix);
+			#endif
+		}
 
-	#if defined(TOADLET_FIXED_POINT)
-		#if defined(TOADLET_HAS_GLES)
-			mModelMatrix.set(matrix);
+		glMatrixMode(GL_MODELVIEW);
 
+		#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
 			glLoadMatrixx(mViewMatrix.data);
 			glMultMatrixx(mModelMatrix.data);
 		#else
-			MathConversion::scalarToFloat(mModelMatrix,matrix);
-
 			glLoadMatrixf(mViewMatrix.data);
 			glMultMatrixf(mModelMatrix.data);
 		#endif
-	#else
-		mModelMatrix.set(matrix);
+	}
+	else{
+		glMatrixMode(GL_PROJECTION);
 
-		glLoadMatrixf(mViewMatrix.data);
-		glMultMatrixf(mModelMatrix.data);
-	#endif
-
-	TOADLET_CHECK_GLERROR("setModelMatrix");
-}
-
-void GLRenderDevice::setViewMatrix(const Matrix4x4 &matrix){
-	if(mMatrixMode!=GL_MODELVIEW){
-		mMatrixMode=GL_MODELVIEW;
-		glMatrixMode(mMatrixMode);
+		#if defined(TOADLET_FIXED_POINT)
+			#if defined(TOADLET_HAS_GLES)
+				glLoadMatrixx(matrix.data);
+			#else
+				MathConversion::scalarToFloat(cacheMatrix4x4,matrix);
+				glLoadMatrixf(cacheMatrix4x4.data);
+			#endif
+		#else
+			glLoadMatrixf(matrix.data);
+		#endif
 	}
 
-	#if defined(TOADLET_FIXED_POINT)
-		#if defined(TOADLET_HAS_GLES)
-			mViewMatrix.set(matrix);
-
-			glLoadMatrixx(mViewMatrix.data);
-			glMultMatrixx(mModelMatrix.data);
-		#else
-			MathConversion::scalarToFloat(mViewMatrix,matrix);
-
-			glLoadMatrixf(mViewMatrix.data);
-			glMultMatrixf(mModelMatrix.data);
-		#endif
-	#else
-		mViewMatrix.set(matrix);
-
-		glLoadMatrixf(mViewMatrix.data);
-		glMultMatrixf(mModelMatrix.data);
-	#endif
-
-	TOADLET_CHECK_GLERROR("setViewMatrix");
-}
-
-void GLRenderDevice::setProjectionMatrix(const Matrix4x4 &matrix){
-	if(mMatrixMode!=GL_PROJECTION){
-		mMatrixMode=GL_PROJECTION;
-		glMatrixMode(mMatrixMode);
-	}
-
-	#if defined(TOADLET_FIXED_POINT)
-		#if defined(TOADLET_HAS_GLES)
-			glLoadMatrixx(matrix.data);
-		#else
-			MathConversion::scalarToFloat(cacheMatrix4x4,matrix);
-			glLoadMatrixf(cacheMatrix4x4.data);
-		#endif
-	#else
-		glLoadMatrixf(matrix.data);
-	#endif
-
-	TOADLET_CHECK_GLERROR("setProjectionMatrix");
+	TOADLET_CHECK_GLERROR("setMatrix");
 }
 
 bool GLRenderDevice::setRenderTarget(RenderTarget *target){
-	GLRenderTarget *gltarget=NULL;
-	if(target!=NULL){
-		gltarget=(GLRenderTarget*)target->getRootRenderTarget();
-		if(gltarget==NULL){
-			Error::nullPointer(Categories::TOADLET_PEEPER,
-				"RenderTarget is not a GLRenderTarget");
-			return false;
-		}
+	GLRenderTarget *gltarget=target!=NULL?(GLRenderTarget*)target->getRootRenderTarget():NULL;
+	if(gltarget==NULL){
+		return false;
 	}
 
 	// We only want to deactivate if it's not our PrimaryRenderTarget for OpenGL, otherwise we would lose our context to issue further GL commands
@@ -580,14 +541,14 @@ void GLRenderDevice::clear(int clearFlags,const Vector4 &clearColor){
 
 	TOADLET_CHECK_GLERROR("entering clear");
 
-	if((clearFlags & ClearFlag_COLOR)!=0){
+	if((clearFlags & RenderDevice::ClearType_BIT_COLOR)!=0){
 		bufferBits|=GL_COLOR_BUFFER_BIT;
 		glClearColor(clearColor.x,clearColor.y,clearColor.z,clearColor.w);
 	}
-	if((clearFlags & ClearFlag_DEPTH)!=0){
+	if((clearFlags & RenderDevice::ClearType_BIT_DEPTH)!=0){
 		bufferBits|=GL_DEPTH_BUFFER_BIT;
 	}
-	if((clearFlags & ClearFlag_STENCIL)!=0){
+	if((clearFlags & RenderDevice::ClearType_BIT_STENCIL)!=0){
 		bufferBits|=GL_STENCIL_BUFFER_BIT;
 	}
 
@@ -686,19 +647,6 @@ void GLRenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexData
 			type=GL_TRIANGLE_FAN;
 		break;
 	}
-
-/*		GLBuffer *glbuffer=(GLBuffer*)mVertexShaderData->buffer->getRootConstantBuffer();
-		int i;
-		for(i=0;i<glbuffer->mConstantSizes.size();++i){
-			int size=glbuffer->mConstantsSizes[i];
-			if(size>0){
-				for(j=0;j<size;++j){
-					glUniform4fv(i+j*4,size,&glbuffer->mConstants[i+j*4]);
-				}
-				i+=size;
-			}
-		}
-*/
 
 	{
 		bool rebindTexCoords=false;
@@ -831,7 +779,6 @@ void GLRenderDevice::setDefaultState(){
 	setBlendState(BlendState());
 	setDepthState(DepthState());
 	setFogState(FogState());
-	setNormalize(Normalize_RESCALE);
 	setPointState(PointState());
 	setRasterizerState(RasterizerState());
 	setMaterialState(MaterialState());
@@ -855,14 +802,9 @@ void GLRenderDevice::setDefaultState(){
 }
 
 bool GLRenderDevice::setRenderState(RenderState *renderState){
-	GLRenderState *glrenderState=NULL;
-	if(renderState!=NULL){
-		glrenderState=(GLRenderState*)renderState->getRootRenderState();
-		if(glrenderState==NULL){
-			Error::nullPointer(Categories::TOADLET_PEEPER,
-				"RenderState is not a GLRenderState");
-			return false;
-		}
+	GLRenderState *glrenderState=renderState!=NULL?(GLRenderState*)renderState->getRootRenderState():NULL;
+	if(glrenderState==NULL){
+		return false;
 	}
 
 	if(glrenderState->mBlendState!=NULL){
@@ -895,24 +837,14 @@ bool GLRenderDevice::setRenderState(RenderState *renderState){
 }
 
 bool GLRenderDevice::setShaderState(ShaderState *shaderState){
-	GLSLShaderState *glshaderState=NULL;
-	if(shaderState!=NULL){
-		glshaderState=(GLSLShaderState*)shaderState->getRootShaderState();
-		if(glshaderState==NULL){
-			Error::nullPointer(Categories::TOADLET_PEEPER,
-				"ShaderState is not a GLShaderState");
-			return false;
-		}
-	}
-
-	if(glshaderState!=NULL && glshaderState->mShaders.size()==0){
-		glshaderState=NULL;
+	GLSLShaderState *glshaderState=shaderState!=NULL?(GLSLShaderState*)shaderState->getRootShaderState():NULL;
+	if(glshaderState==NULL || glshaderState->mShaders.size()==0){
+		mLastShaderState=NULL;
+		return false;
 	}
 
 	mLastShaderState=glshaderState;
-	if(glshaderState!=NULL){
-		glshaderState->activate();
-	}
+	glshaderState->activate();
 
 	TOADLET_CHECK_GLERROR("setShaderState");
 
@@ -1034,6 +966,21 @@ void GLRenderDevice::setMaterialState(const MaterialState &state){
 	#endif
 
 	glShadeModel(getGLShadeModel(state.shade));
+
+	switch(state.normalize){
+		case MaterialState::NormalizeType_NONE:
+			glDisable(GL_NORMALIZE);
+			glDisable(GL_RESCALE_NORMAL);
+		break;
+		case MaterialState::NormalizeType_RESCALE:
+			glDisable(GL_NORMALIZE);
+			glEnable(GL_RESCALE_NORMAL);
+		break;
+		case MaterialState::NormalizeType_NORMALIZE:
+			glEnable(GL_NORMALIZE);
+			glDisable(GL_RESCALE_NORMAL);
+		break;
+	}
 
 	if(state.alphaTest==MaterialState::AlphaTest_NEVER){
 		glDisable(GL_ALPHA_TEST);
@@ -1204,10 +1151,7 @@ void GLRenderDevice::setTextureStatePostTexture(int i,TextureState *state){
 				calculation=TextureState::CalculationType_NORMAL;
 			}
 
-			if(mMatrixMode!=GL_TEXTURE){
-				mMatrixMode=GL_TEXTURE;
-				glMatrixMode(mMatrixMode);
-			}
+			glMatrixMode(GL_TEXTURE);
 			glLoadIdentity();
 
 			if(calculation!=TextureState::CalculationType_DISABLED){
@@ -1235,10 +1179,7 @@ void GLRenderDevice::setTextureStatePostTexture(int i,TextureState *state){
 				}
 				else if(calculation>TextureState::CalculationType_NORMAL){
 					#if !defined(TOADLET_HAS_GLES)
-						if(mMatrixMode!=GL_MODELVIEW){
-							mMatrixMode=GL_MODELVIEW;
-							glMatrixMode(mMatrixMode);
-						}
+						glMatrixMode(GL_MODELVIEW);
 
 						glPushMatrix();
 						glLoadIdentity();
@@ -1325,6 +1266,9 @@ void GLRenderDevice::setTextureStatePostTexture(int i,TextureState *state){
 
 void GLRenderDevice::setBuffer(int i,VariableBuffer *buffer){
 	GLBuffer *glbuffer=buffer!=NULL?(GLBuffer*)buffer->getRootVariableBuffer():NULL;
+	if(glbuffer==NULL){
+		return;
+	}
 
 	if(glbuffer->mHandle>0){
 		#if defined(TOADLET_HAS_GLUBOS)
@@ -1383,25 +1327,6 @@ void GLRenderDevice::setTexture(int i,Texture *texture){
 	setTextureStatePostTexture(i,mLastTextureStates[i]);
 
 	TOADLET_CHECK_GLERROR("setTexture");
-}
-
-void GLRenderDevice::setNormalize(const Normalize &normalize){
-	switch(normalize){
-		case Normalize_NONE:
-			glDisable(GL_NORMALIZE);
-			glDisable(GL_RESCALE_NORMAL);
-		break;
-		case Normalize_RESCALE:
-			glDisable(GL_NORMALIZE);
-			glEnable(GL_RESCALE_NORMAL);
-		break;
-		case Normalize_NORMALIZE:
-			glEnable(GL_NORMALIZE);
-			glDisable(GL_RESCALE_NORMAL);
-		break;
-	}
-
-	TOADLET_CHECK_GLERROR("setNormalize");
 }
 
 void GLRenderDevice::setPointState(const PointState &state){
@@ -1528,10 +1453,7 @@ void GLRenderDevice::setRasterizerState(const RasterizerState &state){
 void GLRenderDevice::setLightState(int i,const LightState &state){
 	GLenum l=GL_LIGHT0+i;
 
-	if(mMatrixMode!=GL_MODELVIEW){
-		mMatrixMode=GL_MODELVIEW;
-		glMatrixMode(mMatrixMode);
-	}
+	glMatrixMode(GL_MODELVIEW);
 
 	glPushMatrix();
 	#if	defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
@@ -1686,7 +1608,7 @@ bool GLRenderDevice::hardwareBuffersSupported(GLBuffer *buffer) const{
 	else if(buffer->mPixelFormat>0){
 		return mPBOs;
 	}
-	else if(buffer->mVariableFormat!=NULL && buffer->mVariableFormat->default==false){
+	else if(buffer->mVariableFormat!=NULL && buffer->mVariableFormat->getPrimary()==false){
 		return mUBOs;
 	}
 	else{

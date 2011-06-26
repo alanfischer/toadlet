@@ -62,6 +62,9 @@ public:
 
 	bool useTriFan();
 
+	void outputVariableBufferFormat(peeper::VariableBufferFormat::ptr format);
+	void outputVariable(peeper::VariableBufferFormat::Variable *variable,const egg::String &tabs);
+
 protected:
 	egg::Collection<peeper::VertexFormat::ptr> mVertexFormats;
 	egg::Collection<peeper::VertexBuffer::ptr> mVertexBuffers;

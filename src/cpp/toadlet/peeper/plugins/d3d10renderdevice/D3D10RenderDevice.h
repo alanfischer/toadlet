@@ -89,10 +89,7 @@ public:
 	void setTexture(int stage,Texture *texture){}
 
 	// Old fixed states
-	void setModelMatrix(const Matrix4x4 &matrix){}
-	void setViewMatrix(const Matrix4x4 &matrix){}
-	void setProjectionMatrix(const Matrix4x4 &matrix){}
-	void setNormalize(const Normalize &normalize){}
+	void setMatrix(MatrixType type,const Matrix4x4 &matrix){}
 	void setAmbientColor(const Vector4 &ambient){}
 	void setLightState(int i,const LightState &light){}
 	void setLightEnabled(int i,bool enable){}

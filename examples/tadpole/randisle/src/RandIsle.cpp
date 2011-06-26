@@ -26,7 +26,7 @@ RandIsle::~RandIsle(){
 void RandIsle::create(const String &directory){
 	Logger::debug("RandIsle::create");
 
-	Application::create("d3d10");
+	Application::create("gl");
 
 	mEngine->setDirectory(directory);
 
@@ -160,7 +160,7 @@ void RandIsle::resized(int width,int height){
 void RandIsle::render(RenderDevice *renderDevice){
 	renderDevice->beginScene();
 		/// @todo: This shouldn't be necessary, but depending on the sky to set the contents of the backbuffer doesn't appear to work
-		renderDevice->clear(ClearFlag_DEPTH|ClearFlag_COLOR,mCamera->getClearColor());
+		renderDevice->clear(RenderDevice::ClearType_BIT_DEPTH|RenderDevice::ClearType_BIT_COLOR,mCamera->getClearColor());
 #if 1
 		mCamera->render(renderDevice);
 

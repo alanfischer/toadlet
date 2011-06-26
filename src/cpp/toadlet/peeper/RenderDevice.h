@@ -59,10 +59,22 @@ class Viewport;
 
 class RenderDevice{
 public:
+	enum ClearType{
+		ClearType_BIT_COLOR=	1<<0,
+		ClearType_BIT_DEPTH=	1<<1,
+		ClearType_BIT_STENCIL=	1<<2,
+	};
+
 	enum DeviceStatus{
 		DeviceStatus_OK,
 		DeviceStatus_UNAVAILABLE,
 		DeviceStatus_NEEDSRESET,
+	};
+
+	enum MatrixType{
+		MatrixType_PROJECTION,
+		MatrixType_VIEW,
+		MatrixType_MODEL,
 	};
 
 	virtual ~RenderDevice(){}
@@ -109,10 +121,7 @@ public:
 	virtual void setTexture(/*Shader::ShaderType type,*/int i,Texture *texture)=0;
 
 	// Old fixed states
-	virtual void setModelMatrix(const Matrix4x4 &matrix)=0;
-	virtual void setViewMatrix(const Matrix4x4 &matrix)=0;
-	virtual void setProjectionMatrix(const Matrix4x4 &matrix)=0;
-	virtual void setNormalize(const Normalize &normalize)=0;
+	virtual void setMatrix(MatrixType type,const Matrix4x4 &matrix)=0;
 	virtual void setAmbientColor(const Vector4 &ambient)=0;
 	virtual void setLightState(int i,const LightState &light)=0;
 	virtual void setLightEnabled(int i,bool enable)=0;

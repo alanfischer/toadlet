@@ -196,22 +196,18 @@ bool GLSLShaderState::reflect(){
 
 	glGetProgramiv(mHandle,GL_ACTIVE_UNIFORMS,&numUniforms);
 
-	VariableBufferFormat::ptr defaultFormat(new VariableBufferFormat((char*)NULL,0,numUniforms));
-	defaultFormat->default=true;
+	Collection<VariableBufferFormat::Variable::ptr> primaryVariables(numUniforms);
 
 	int i;
 	for(i=0;i<numUniforms;++i){
 		glGetActiveUniform(mHandle,i,sizeof(name),&nameLength,&size,&type,name);
 
-		defaultFormat->variableNames[i]=name;
-		defaultFormat->variableFormats[i]=GLRenderDevice::getVariableFormat(type);
-		defaultFormat->variableOffsets[i]=dataSize;
-		defaultFormat->variableIndexes[i]=i;
-
-		dataSize+=VariableBufferFormat::getFormatSize(defaultFormat->variableFormats[i]);
+		VariableBufferFormat::Variable::ptr variable(new VariableBufferFormat::Variable());
+		variable->setName(name);
+		variable->setFormat(GLRenderDevice::getVariableFormat(type));
+		variable->setIndex(i);
+		primaryVariables[i]=variable;
 	}
-
-	defaultFormat->dataSize=dataSize;
 
 	#if defined(TOADLET_HAS_GLUBOS)
 		int numUniformBlocks=0;
@@ -222,7 +218,7 @@ bool GLSLShaderState::reflect(){
 			glGetActiveUniformBlockiv(mHandle,i,GL_UNIFORM_BLOCK_DATA_SIZE,&dataSize);
 			glGetActiveUniformBlockiv(mHandle,i,GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS,&numUniforms);
 
-			VariableBufferFormat::ptr variableFormat(new VariableBufferFormat(name,dataSize,numUniforms));
+			VariableBufferFormat::ptr variableFormat(new VariableBufferFormat(false,name,dataSize,numUniforms));
 
 			GLint *indexes=new GLint[numUniforms];
 			glGetActiveUniformBlockiv(mHandle,i,GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES,indexes);
@@ -232,32 +228,41 @@ bool GLSLShaderState::reflect(){
 				Logger::alert(String("Uniform block uniform index:")+indexes[j]);
 
 				int index=indexes[j];
-				variableFormat->variableNames[j]=defaultFormat->variableNames[index];
-				variableFormat->variableFormats[j]=defaultFormat->variableFormats[index];
-				variableFormat->variableOffsets[j]=defaultFormat->variableOffsets[index];
-				variableFormat->variableIndexes[j]=index;
+				variableFormat->setStructVariable(j,primaryVariables[index]);
+				variableFormat->getStructVariable(j)->setIndex(index);
 
-				defaultFormat->variableIndexes[index]=-1;
+				primaryVariables[index]=NULL;
 			}
 
 			delete[] indexes;
 
-			mVariableBufferFormats.add(variableFormat);
-		}
+			variableFormat->compile();
 
-		for(i=0;i<defaultFormat->variableOffsets.size();++i){
-			if(defaultFormat->variableIndexes[i]==-1){
-				defaultFormat->variableNames.removeAt(i);
-				defaultFormat->variableFormats.removeAt(i);
-				defaultFormat->variableOffsets.removeAt(i);
-				defaultFormat->variableIndexes.removeAt(i);
-				i--;
-			}
+			mVariableBufferFormats.add(variableFormat);
 		}
 	#endif
 
-	if(defaultFormat->variableNames.size()>0){
-		mVariableBufferFormats.insert(mVariableBufferFormats.begin(),defaultFormat);
+	dataSize=0;
+	for(i=0;i<primaryVariables.size();++i){
+		if(primaryVariables[i]!=NULL){
+			primaryVariables[i]->setOffset(dataSize);
+			dataSize+=VariableBufferFormat::getFormatSize(primaryVariables[i]->getFormat());
+		}
+		else{
+			primaryVariables.removeAt(i);
+			i--;
+		}
+	}
+
+	VariableBufferFormat::ptr primaryFormat(new VariableBufferFormat(true,(char*)NULL,dataSize,primaryVariables.size()));
+	for(i=0;i<primaryFormat->getStructSize();++i){
+		primaryFormat->setStructVariable(i,primaryVariables[i]);
+	}
+
+	if(primaryFormat->getStructSize()>0){
+		primaryFormat->compile();
+
+		mVariableBufferFormats.insert(mVariableBufferFormats.begin(),primaryFormat);
 	}
 
 	return true;
