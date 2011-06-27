@@ -187,11 +187,10 @@ String vsc[]={
 		"float4 position : SV_POSITION;\n" \
 		"float4 color : COLOR;\n" \
 	"};\n" \
-	"struct mvps{float4x4 ModelViewProjectionMatrix1,ModelViewProjectionMatrix2;};\n " \
-	"mvps m;\n" \
+	"float4x4 mvp;\n" \
 	"VOUT main(VIN vin){\n" \
 	"	VOUT vout;\n" \
-	"	vout.position=mul(vin.position,m.ModelViewProjectionMatrix1);\n" \
+	"	vout.position=mul(vin.position,mvp);\n" \
 	"	vout.color=float4(vin.normal.x,vin.normal.y,vin.normal.z,1.0);\n" \
 	"	return vout;\n" \
 	"}"
@@ -206,19 +205,14 @@ String fsc[]={
 		"float4 position : SV_POSITION;\n" \
 		"float4 color: COLOR;\n" \
 	"};\n" \
-/*	"Texture2D MeshTexture;\n" \
-	"SamplerState MeshTextureSampler{\n" \
-		"Filter=MIN_MAG_MIP_LINEAR;\n" \
-		"AddressU=Wrap;\n" \
-		"AddressV=Wrap;\n" \
-	"};\n" \
-*/	"float4 main(PIN pin): SV_TARGET{" \
-	"	return pin.color;\n" \
+	"float4x4 mvp,mvp2;\n" \
+	"float4 main(PIN pin): SV_TARGET{" \
+	"	return mul(mul(pin.color,mvp),mvp2);\n" \
 	"}"
 };
 
 void Logo::create(){
-	Application::create("d3d9");
+	Application::create("d3d10");
 
 	mEngine->setDirectory("../../../data");
 
@@ -252,10 +246,12 @@ VariableBufferFormat::ptr vbf;
 	for(int i=0;i<meshNode->getNumSubMeshes();++i){
 		meshNode->getSubMesh(i)->material->setShader(Shader::ShaderType_VERTEX,vs);
 		meshNode->getSubMesh(i)->material->setShader(Shader::ShaderType_FRAGMENT,fs);
-vbf=meshNode->getSubMesh(i)->material->getShaderState()->getVariableBufferFormat(Shader::ShaderType_VERTEX,0);
+VariableBufferFormat::ptr vv=meshNode->getSubMesh(i)->material->getShaderState()->getVariableBufferFormat(Shader::ShaderType_VERTEX,0);
+VariableBufferFormat::ptr fv=meshNode->getSubMesh(i)->material->getShaderState()->getVariableBufferFormat(Shader::ShaderType_FRAGMENT,0);
+getEngine()->getBufferManager()->outputVariableBufferFormat(vv);
+getEngine()->getBufferManager()->outputVariableBufferFormat(fv);
 	}
 
-getEngine()->getBufferManager()->outputVariableBufferFormat(vbf);
 vb=getEngine()->getBufferManager()->createVariableBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,vbf);
 
 // Only looks good if running on device, in simulator its always a top down view
