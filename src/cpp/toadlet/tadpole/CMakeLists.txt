@@ -19,6 +19,7 @@ set (TADPOLE_SRC
 	NodeManager.cpp
 	Noise.cpp
 	RenderableSet.cpp
+	RenderVariableSet.cpp
 	ResourceManager.cpp
 	Scene.cpp
 	SceneRenderer.cpp
@@ -143,6 +144,7 @@ set (TADPOLE_HEADERS
 	ResourceHandlerData.h
 	ResourceManager.h
 	RenderableSet.h
+	RenderVariableSet.h
 	Scene.h
 	SceneRenderer.h
 	ShaderManager.h
