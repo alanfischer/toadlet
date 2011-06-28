@@ -41,6 +41,7 @@ public:
 		ShaderType_VERTEX,
 		ShaderType_FRAGMENT,
 		ShaderType_GEOMETRY,
+		ShaderType_MAX,
 	};
 
 	virtual ~Shader(){}

@@ -44,7 +44,7 @@ public:
 	void destroy();
 
 	Material::ptr createMaterial(peeper::Texture::ptr texture=peeper::Texture::ptr(),bool clamped=false,Material::ptr shareSource=Material::ptr());
-
+ 
 	Material::ptr findMaterial(const egg::String &name){return egg::shared_static_cast<Material>(ResourceManager::find(name));}
 
 	Material::ptr cloneMaterial(Material::ptr material,bool manage,Material::ptr sharedSource=Material::ptr());
@@ -54,6 +54,7 @@ public:
 	peeper::ShaderState::ptr createShaderState();
 
 	void modifyRenderState(peeper::RenderState::ptr dst,peeper::RenderState::ptr src);
+	void modifyShaderState(peeper::ShaderState::ptr dst,peeper::ShaderState::ptr src);
 
 	void contextActivate(peeper::RenderDevice *renderDevice);
 	void contextDeactivate(peeper::RenderDevice *renderDevice);

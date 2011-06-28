@@ -68,9 +68,18 @@ bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr varia
 			}
 		}
 	}
-	if(set=NULL){
-		// Assume first buffer is primary, but we should check
-		set=&mBufferVariables[0];
+	if(set==NULL){
+		for(i=0;i<mBufferVariables.size();++i){
+			if(mBufferVariables[i].buffer->getVariableBufferFormat()->getPrimary()){
+				set=&mBufferVariables[i];
+				break;
+			}
+		}
+	}
+	if(set==NULL){
+		Error::unknown(Categories::TOADLET_TADPOLE,
+			"VariableBuffer not found for RenderVariable with name:"+name);
+		return false;
 	}
 
 	VariableBufferFormat *format=set->buffer->getVariableBufferFormat();
