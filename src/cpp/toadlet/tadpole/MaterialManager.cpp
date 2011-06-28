@@ -110,17 +110,21 @@ Material::ptr MaterialManager::createMaterial(Texture::ptr texture,bool clamped,
 
 Material::ptr MaterialManager::cloneMaterial(Material::ptr material,bool managed,Material::ptr sharedSource){
 	RenderState::ptr renderState;
+	ShaderState::ptr shaderState;
 	if(sharedSource==NULL){
 		renderState=createRenderState();
+		shaderState=createShaderState();
 	}
 	else{
 		renderState=sharedSource->getRenderState();
+		shaderState=sharedSource->getShaderState();
 	}
 
-	Material::ptr clonedMaterial(new Material(renderState));
+	Material::ptr clonedMaterial(new Material(renderState,shaderState));
 
 	if(sharedSource==NULL){
 		modifyRenderState(clonedMaterial->getRenderState(),material->getRenderState());
+		modifyShaderState(clonedMaterial->getShaderState(),material->getShaderState());
 	}
 
 	int i;
@@ -221,6 +225,14 @@ void MaterialManager::modifyRenderState(RenderState::ptr dst,RenderState::ptr sr
 	for(i=0;i<src->getNumTextureStates();++i){
 		TextureState textureState;
 		if(src->getTextureState(i,textureState)) dst->setTextureState(i,textureState);
+	}
+}
+
+void MaterialManager::modifyShaderState(ShaderState::ptr dst,ShaderState::ptr src){
+	int i;
+	for(i=0;i<Shader::ShaderType_MAX;++i){
+		Shader::ptr shader=src->getShader((Shader::ShaderType)i);
+		dst->setShader((Shader::ShaderType)i,shader);
 	}
 }
 
