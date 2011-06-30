@@ -44,9 +44,6 @@
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/Viewport.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::image;
-
 #if defined(TOADLET_PLATFORM_WIN32) && !defined(TOADLET_PLATFORM_WINCE)
 	#pragma comment(lib,"opengl32.lib")
 	#if defined(TOADLET_LIBGLEW_NAME)

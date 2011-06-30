@@ -28,9 +28,6 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/System.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::image;
-
 namespace toadlet{
 namespace peeper{
 

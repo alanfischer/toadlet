@@ -39,7 +39,7 @@ namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class TOADLET_API BSP30ModelNode:public node::Node,public Traceable,public Visible{
+class TOADLET_API BSP30ModelNode:public Node,public Traceable,public Visible{
 public:
 	TOADLET_NODE(BSP30ModelNode,Node);
 
@@ -52,7 +52,7 @@ public:
 		Material *getRenderMaterial() const{return material;}
 		const Transform &getRenderTransform() const{return modelNode->getWorldTransform();}
 		const Bound &getRenderBound() const{return modelNode->getWorldBound();}
-		void render(peeper::RenderDevice *renderDevice) const;
+		void render(RenderDevice *renderDevice) const;
 
 		BSP30ModelNode *modelNode;
 		BSP30Map *map;
@@ -67,7 +67,7 @@ public:
 
 	void *hasInterface(int type);
 
-	void setModel(BSP30Map::ptr map,const egg::String &name);
+	void setModel(BSP30Map::ptr map,const String &name);
 	void setModel(BSP30Map::ptr map,int index);
 	int getModel() const{return mModelIndex;}
 	BSP30Map::ptr getMap(){return mMap;}
@@ -80,8 +80,8 @@ public:
 	// Visible
 	bool getRendered() const{return mRendered;}
 	void setRendered(bool rendered){mRendered=rendered;}
-	peeper::RenderState::ptr getSharedRenderState();
-	void gatherRenderables(node::CameraNode *camera,RenderableSet *set);
+	RenderState::ptr getSharedRenderState();
+	void gatherRenderables(CameraNode *camera,RenderableSet *set);
 
 	// Traceable interface
 	const Bound &getBound() const{return super::getBound();}
@@ -90,13 +90,13 @@ public:
 protected:
 	BSP30Map::ptr mMap;
 	int mModelIndex;
-	egg::Collection<SubModel::ptr> mSubModels;
+	Collection<SubModel::ptr> mSubModels;
 	bool mRendered;
 };
 
-class TOADLET_API BSP30Node:public node::PartitionNode,public Traceable,public Renderable{
+class TOADLET_API BSP30Node:public PartitionNode,public Traceable,public Renderable{
 public:
-	TOADLET_NODE(BSP30Node,node::PartitionNode);
+	TOADLET_NODE(BSP30Node,PartitionNode);
 
 	BSP30Node();
 	virtual ~BSP30Node();
@@ -104,14 +104,14 @@ public:
 
 	void *hasInterface(int type){return type==InterfaceType_TRACEABLE?(Traceable*)this:NULL;}
 
-	void setMap(const egg::String &name);
+	void setMap(const String &name);
 	void setMap(BSP30Map::ptr map);
 	BSP30Map::ptr getMap() const{return mMap;}
 
-	void setSkyName(const egg::String &skyName);
-	const egg::String &getSkyName() const{return mSkyName;}
-	void setSkyTextures(const egg::String &skyDown,const egg::String &skyUp,const egg::String &skyWest,const egg::String &skyEast,const egg::String &skySouth,const egg::String &skyNorth);
-	node::MeshNode *getSkyNode() const{return mSkyNode;}
+	void setSkyName(const String &skyName);
+	const String &getSkyName() const{return mSkyName;}
+	void setSkyTextures(const String &skyDown,const String &skyUp,const String &skyWest,const String &skyEast,const String &skySouth,const String &skyNorth);
+	MeshNode *getSkyNode() const{return mSkyNode;}
 
 	void setStyleIntensity(int style,scalar intensity){mMap->styleIntensities[style]=255*intensity;}
 	scalar getStyleIntensity(int style){return (float)mMap->styleIntensities[style]/255.0;}
@@ -119,11 +119,11 @@ public:
 	// Node items
 	void nodeAttached(Node *node);
 	void nodeRemoved(Node *node);
-	void insertNodeLeafIndexes(const egg::Collection<int> &indexes,Node *node);
-	void removeNodeLeafIndexes(const egg::Collection<int> &indexes,Node *node);
+	void insertNodeLeafIndexes(const Collection<int> &indexes,Node *node);
+	void removeNodeLeafIndexes(const Collection<int> &indexes,Node *node);
 
 	void mergeWorldBound(Node *child,bool justAttached);
-	void gatherRenderables(node::CameraNode *camera,RenderableSet *set);
+	void gatherRenderables(CameraNode *camera,RenderableSet *set);
 
 	bool senseBoundingVolumes(SensorResultsListener *listener,const Bound &bound);
 	bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);
@@ -137,36 +137,36 @@ public:
 	Material *getRenderMaterial() const{return NULL;}
 	const Transform &getRenderTransform() const{return mWorldTransform;}
 	const Bound &getRenderBound() const{return mWorldBound;}
-	void render(peeper::RenderDevice *renderDevice) const;
+	void render(RenderDevice *renderDevice) const;
 
 protected:
 	void childTransformUpdated(Node *child);
-	void addLeafToVisible(bleaf *leaf,node::CameraNode *camera);
-	void findBoundLeafs(egg::Collection<int> &leafs,Node *node);
+	void addLeafToVisible(bleaf *leaf,CameraNode *camera);
+	void findBoundLeafs(Collection<int> &leafs,Node *node);
 
 	BSP30Map::ptr mMap;
-	egg::String mSkyName;
-	node::MeshNode::ptr mSkyNode;
+	String mSkyName;
+	MeshNode::ptr mSkyNode;
 
 	class childdata{
 	public:
 		childdata():counter(0){}
-		egg::Collection<int> leafs;
+		Collection<int> leafs;
 		int counter;
 	};
 
 	class leafdata{
 	public:
-		egg::Collection<Node*> occupants;
+		Collection<Node*> occupants;
 	};
 
-	egg::Collection<leafdata> mLeafData;
+	Collection<leafdata> mLeafData;
 	leafdata mGlobalLeafData;
 	uint8 *mMarkedFaces;
-	toadlet::egg::Collection<BSP30Map::facedata*> mVisibleMaterialFaces;
+	Collection<BSP30Map::facedata*> mVisibleMaterialFaces;
 
 	int mCounter;
-	egg::Collection<int> mLeafIndexes;
+	Collection<int> mLeafIndexes;
 };
 
 }

@@ -34,11 +34,11 @@ namespace event{
 
 // This event is sent from the server occasionally to update information about objects or possibly confirm the receipt of a ClientUpdateEvent
 //  The LastCounter could be replaced with a reliable packet sequence number, but that is not implemented yet
-class BaseServerUpdateEvent:public egg::Event{
+class BaseServerUpdateEvent:public Event{
 public:
 	TOADLET_SHARED_POINTERS(BaseServerUpdateEvent);
 
-	BaseServerUpdateEvent(int type):egg::Event(type),
+	BaseServerUpdateEvent(int type):Event(type),
 		mServerFrameNumber(0),
 		mLastClientFrameNumber(0),
 		mTime(0)
@@ -53,7 +53,7 @@ public:
 	int getLastClientFrameNumber(){return mLastClientFrameNumber;}
 	int getTime(){return mTime;}
 
-	virtual int read(egg::io::DataStream *stream){
+	virtual int read(DataStream *stream){
 		int amount=0;
 		mServerFrameNumber=stream->readBInt32();amount+=4;
 		mLastClientFrameNumber=stream->readBInt32();amount+=4;
@@ -61,7 +61,7 @@ public:
 		return amount;
 	}
 
-	virtual int write(egg::io::DataStream *stream){
+	virtual int write(DataStream *stream){
 		int amount=0;
 		amount+=stream->writeBInt32(mServerFrameNumber);
 		amount+=stream->writeBInt32(mLastClientFrameNumber);

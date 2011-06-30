@@ -42,7 +42,7 @@ public:
 	OSXFontHandler(TextureManager *textureManager);
 	virtual ~OSXFontHandler(){}
 
-	egg::Resource::ptr load(egg::io::Stream::ptr in,const ResourceHandlerData *handlerData);
+	Resource::ptr load(Stream::ptr in,const ResourceHandlerData *handlerData);
 
 protected:
 	TextureManager *mTextureManager;

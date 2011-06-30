@@ -29,9 +29,6 @@
 #include <toadlet/tadpole/plugins/hop/HopScene.h>
 #include <toadlet/tadpole/plugins/hop/HopEntity.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::tadpole::node;
-
 namespace toadlet{
 namespace tadpole{
 

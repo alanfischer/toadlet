@@ -29,6 +29,7 @@
 #include <toadlet/egg/SharedPointer.h>
 #include <toadlet/egg/WeakPointer.h>
 #include <toadlet/egg/Event.h>
+#include <toadlet/knot/Types.h>
 
 namespace toadlet{
 namespace knot{
@@ -50,9 +51,9 @@ public:
 	virtual void close()=0;
 
 	/// Send an Event
-	virtual bool send(egg::Event::ptr event)=0;
+	virtual bool send(Event::ptr event)=0;
 	/// Receive an Event
-	virtual egg::Event::ptr receive()=0;
+	virtual Event::ptr receive()=0;
 	
 	// Some EventConnections may requre an update by the main thread
 	virtual int update()=0;

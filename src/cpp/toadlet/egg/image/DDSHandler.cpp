@@ -30,8 +30,6 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/EndianConversion.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
 using namespace toadlet::egg::math;
 
 namespace toadlet{

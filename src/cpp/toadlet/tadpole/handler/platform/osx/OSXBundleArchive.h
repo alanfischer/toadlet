@@ -35,7 +35,7 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API OSXBundleArchive:public egg::io::Archive,public egg::BaseResource{
+class TOADLET_API OSXBundleArchive:public Archive,public BaseResource{
 	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 public:
 	TOADLET_SHARED_POINTERS(OSXBundleArchive);
@@ -47,14 +47,14 @@ public:
 
 	bool open(NSBundle *bundle);
 
-	egg::io::Stream::ptr openStream(const egg::String &name);
-	egg::Resource::ptr openResource(const egg::String &name){return NULL;}
+	Stream::ptr openStream(const String &name);
+	Resource::ptr openResource(const String &name){return NULL;}
 
-	egg::Collection<egg::String>::ptr getEntries();
+	Collection<String>::ptr getEntries();
 
 protected:
 	NSBundle *mBundle;
-	egg::Collection<egg::String>::ptr mEntries;
+	Collection<String>::ptr mEntries;
 };
 
 }

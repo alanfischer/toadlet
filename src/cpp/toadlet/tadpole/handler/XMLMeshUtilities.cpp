@@ -35,9 +35,7 @@
 	#pragma comment(lib,TOADLET_LIBMXML_NAME)
 #endif
 
-using namespace toadlet::egg;
 using namespace toadlet::egg::MathConversion;
-using namespace toadlet::peeper;
 
 namespace toadlet{
 namespace tadpole{

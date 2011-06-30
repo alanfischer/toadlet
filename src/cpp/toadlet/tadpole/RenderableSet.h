@@ -48,14 +48,14 @@ public:
 			//ambient,
 			depth(0){}
 	
-		RenderableQueueItem(Renderable *r,Material *m,const Vector4 &a,scalar d):
+		RenderableQueueItem(Renderable *r,material::Material *m,const Vector4 &a,scalar d):
 			renderable(r),
 			material(m),
 			ambient(a),
 			depth(d){}
 
 		Renderable *renderable;
-		Material *material;
+		material::Material *material;
 		Vector4 ambient;
 		scalar depth;
 	};
@@ -66,27 +66,27 @@ public:
 			light(NULL),
 			depth(0){}
 	
-		LightQueueItem(node::LightNode *l,scalar d):
+		LightQueueItem(LightNode *l,scalar d):
 			light(l),
 			depth(d){}
 
-		node::LightNode *light;
+		LightNode *light;
 		scalar depth;
 	};
 
-	typedef egg::Collection<RenderableQueueItem> RenderableQueue;
-	typedef egg::Collection<LightQueueItem> LightQueue;
-	typedef egg::Map<Material*,int> MaterialToQueueIndexMap;
-	typedef egg::Collection<int> IndexCollection;
+	typedef Collection<RenderableQueueItem> RenderableQueue;
+	typedef Collection<LightQueueItem> LightQueue;
+	typedef Map<Material*,int> MaterialToQueueIndexMap;
+	typedef Collection<int> IndexCollection;
 
 	RenderableSet(Scene *scene);
 	virtual ~RenderableSet();
 
-	virtual void setCamera(node::CameraNode *camera){mCamera=camera;}
+	virtual void setCamera(CameraNode *camera){mCamera=camera;}
 	virtual void startQueuing();
 	virtual void endQueuing();
 	virtual void queueRenderable(Renderable *renderable);
-	virtual void queueLight(node::LightNode *light);
+	virtual void queueLight(LightNode *light);
 
 	inline const RenderableQueue &getDepthSortedQueue() const{return mRenderableQueues[0];}
 	inline const RenderableQueue &getRenderableQueue(int i) const{return mRenderableQueues[i];}
@@ -97,9 +97,9 @@ public:
 
 protected:
 	Scene *mScene;
-	node::PartitionNode *mRoot;
-	node::CameraNode::ptr mCamera;
-	egg::Collection<RenderableQueue> mRenderableQueues;
+	PartitionNode *mRoot;
+	CameraNode::ptr mCamera;
+	Collection<RenderableQueue> mRenderableQueues;
 	int mRenderableQueueCount;
 	MaterialToQueueIndexMap mMaterialToQueueIndexMap;
 	IndexCollection mLayerSortedQueueIndexes;

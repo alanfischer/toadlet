@@ -41,9 +41,9 @@ public:
 
 	XMSHHandler(Engine *engine);
 
-	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
+	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData);
 
-	bool save(Mesh::ptr resource,egg::io::Stream::ptr stream,ProgressListener *listener=NULL);
+	bool save(Mesh::ptr resource,Stream::ptr stream,ProgressListener *listener=NULL);
 
 protected:
 	Mesh::ptr loadMeshVersion1(mxml_node_t *root);

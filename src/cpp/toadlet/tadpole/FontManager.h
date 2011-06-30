@@ -37,19 +37,19 @@ class Engine;
 
 class TOADLET_API FontManager:public ResourceManager{
 public:
-	FontManager(egg::io::Archive *archive);
+	FontManager(Archive *archive);
 
-	Font::ptr getFont(const egg::String &name,float pointSize){return egg::shared_static_cast<Font>(get(name+egg::String(":")+pointSize));}
-	Font::ptr findFont(const egg::String &name,float pointSize){return egg::shared_static_cast<Font>(find(name,FontData::ptr(new FontData(pointSize))));}
+	Font::ptr getFont(const String &name,float pointSize){return shared_static_cast<Font>(get(name+String(":")+pointSize));}
+	Font::ptr findFont(const String &name,float pointSize){return shared_static_cast<Font>(find(name,FontData::ptr(new FontData(pointSize))));}
 	Font::ptr getDefaultFont();
 	
-	egg::Resource::ptr manage(const egg::Resource::ptr &resource,const egg::String &name=(char*)NULL);
-	void unmanage(egg::Resource *resource);
+	Resource::ptr manage(const Resource::ptr &resource,const String &name=(char*)NULL);
+	void unmanage(Resource *resource);
 
-	egg::Resource::ptr find(const egg::String &name,ResourceHandlerData::ptr handlerData=ResourceHandlerData::ptr());
+	Resource::ptr find(const String &name,ResourceHandlerData::ptr handlerData=ResourceHandlerData::ptr());
 
 protected:
-	egg::String mDefaultCharacterSet;
+	String mDefaultCharacterSet;
 	Font::ptr mDefaultFont;
 };
 

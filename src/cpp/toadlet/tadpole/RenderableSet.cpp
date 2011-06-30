@@ -25,10 +25,8 @@
 
 #include <toadlet/egg/Logger.h>
 #include <toadlet/tadpole/RenderableSet.h>
-#include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/Scene.h>
-
-using namespace toadlet::egg;
+#include <toadlet/tadpole/material/Material.h>
 
 namespace toadlet{
 namespace tadpole{

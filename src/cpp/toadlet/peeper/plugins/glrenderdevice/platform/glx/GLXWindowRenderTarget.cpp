@@ -28,8 +28,6 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/egg/System.h>
 
-using namespace toadlet::egg;
-
 namespace toadlet{
 namespace peeper{
 

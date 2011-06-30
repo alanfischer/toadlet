@@ -65,8 +65,8 @@ protected:
 	NSView *mView;
 	NSOpenGLPixelFormat *mPixelFormat;
 	NSOpenGLContext *mContext;
-	egg::Collection<NSOpenGLContext*> mThreadContexts;
-	egg::Collection<int> mThreadIDs;
+	Collection<NSOpenGLContext*> mThreadContexts;
+	Collection<int> mThreadIDs;
 };
 
 }

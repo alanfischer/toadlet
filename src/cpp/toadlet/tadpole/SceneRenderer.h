@@ -39,15 +39,15 @@ public:
 	SceneRenderer(Scene *scene);
 	virtual ~SceneRenderer();
 
-	virtual void renderScene(peeper::RenderDevice *renderDevice,node::Node *node,node::CameraNode *camera);
+	virtual void renderScene(RenderDevice *renderDevice,Node *node,CameraNode *camera);
 
 protected:
-	virtual void gatherRenderables(RenderableSet *set,node::Node *node,node::CameraNode *camera);
-	virtual void renderRenderables(RenderableSet *set,peeper::RenderDevice *renderDevice,node::CameraNode *camera,bool useMaterials=true);
-	virtual void renderDepthSortedRenderables(RenderableSet *set,peeper::RenderDevice *renderDevice,node::CameraNode *camera,bool useMaterials);
+	virtual void gatherRenderables(RenderableSet *set,Node *node,CameraNode *camera);
+	virtual void renderRenderables(RenderableSet *set,RenderDevice *renderDevice,CameraNode *camera,bool useMaterials=true);
+	virtual void renderDepthSortedRenderables(RenderableSet *set,RenderDevice *renderDevice,CameraNode *camera,bool useMaterials);
 
-	void setupViewport(node::CameraNode *camera,peeper::RenderDevice *renderDevice);
-	void setupLights(const RenderableSet::LightQueue &lightQueue,peeper::RenderDevice *renderDevice);
+	void setupViewport(CameraNode *camera,RenderDevice *renderDevice);
+	void setupLights(const RenderableSet::LightQueue &lightQueue,RenderDevice *renderDevice);
 
 	Scene *mScene;
 	RenderableSet::ptr mRenderableSet;

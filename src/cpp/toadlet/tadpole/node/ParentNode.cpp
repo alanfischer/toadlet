@@ -28,8 +28,6 @@
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 
-using namespace toadlet::egg;
-
 namespace toadlet{
 namespace tadpole{
 namespace node{

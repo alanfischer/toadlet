@@ -36,7 +36,7 @@ namespace tadpole{
 
 class Engine;
 
-class TOADLET_API TextureManager:public ResourceManager,public peeper::RenderTargetDestroyedListener{
+class TOADLET_API TextureManager:public ResourceManager,public RenderTargetDestroyedListener{
 public:
 	TextureManager(Engine *engine,bool backable);
 	virtual ~TextureManager();
@@ -44,27 +44,27 @@ public:
 	void destroy();
 
 	/// @todo: We need a TextureFormat class, which has a PixelFormat, plus usage, dimension, width, height, depth, pitch, and mipLevels
-	peeper::Texture::ptr createTexture(egg::image::Image::ptr image);
-	peeper::Texture::ptr createTexture(int mipLevels,egg::image::Image::ptr mipImages[]);
-	peeper::Texture::ptr createTexture(int usage,peeper::Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]=NULL);
-	egg::image::Image::ptr createImage(peeper::Texture *texture);
-	peeper::PixelBufferRenderTarget::ptr createPixelBufferRenderTarget();
+	Texture::ptr createTexture(Image::ptr image);
+	Texture::ptr createTexture(int mipLevels,Image::ptr mipImages[]);
+	Texture::ptr createTexture(int usage,Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]=NULL);
+	Image::ptr createImage(Texture *texture);
+	PixelBufferRenderTarget::ptr createPixelBufferRenderTarget();
 
-	peeper::Texture::ptr findTexture(const egg::String &name){return egg::shared_static_cast<peeper::Texture>(ResourceManager::find(name));}
+	Texture::ptr findTexture(const String &name){return shared_static_cast<Texture>(ResourceManager::find(name));}
 
-	bool textureLoad(peeper::Texture::ptr texture,int pixelFormat,int width,int height,int depth,int mipLevel,tbyte *mipData);
+	bool textureLoad(Texture::ptr texture,int pixelFormat,int width,int height,int depth,int mipLevel,tbyte *mipData);
 
-	void contextActivate(peeper::RenderDevice *renderDevice);
-	void contextDeactivate(peeper::RenderDevice *renderDevice);
-	void preContextReset(peeper::RenderDevice *renderDevice);
-	void postContextReset(peeper::RenderDevice *renderDevice);
+	void contextActivate(RenderDevice *renderDevice);
+	void contextDeactivate(RenderDevice *renderDevice);
+	void preContextReset(RenderDevice *renderDevice);
+	void postContextReset(RenderDevice *renderDevice);
 
-	void renderTargetDestroyed(peeper::RenderTarget *renderTarget);
+	void renderTargetDestroyed(RenderTarget *renderTarget);
 
-	peeper::Texture::ptr createNormalization(int size);
+	Texture::ptr createNormalization(int size);
 
 protected:
-	egg::Collection<peeper::PixelBufferRenderTarget::ptr> mRenderTargets;
+	Collection<PixelBufferRenderTarget::ptr> mRenderTargets;
 
 	Engine *mEngine;
 	bool mBackable;

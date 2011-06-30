@@ -39,8 +39,8 @@ public:
 
 	SIDHandler(AudioBufferManager *audioBufferManager):AudioBufferHandler(audioBufferManager){}
 
-	ribbit::AudioStream::ptr createAudioStream(egg::io::Stream::ptr stream){
-		ribbit::AudioStream::ptr audioStream(new ribbit::decoder::SIDDecoder());
+	AudioStream::ptr createAudioStream(Stream::ptr stream){
+		AudioStream::ptr audioStream(new SIDDecoder());
 		if(audioStream->startStream(stream)==false){
 			audioStream=NULL;
 		}

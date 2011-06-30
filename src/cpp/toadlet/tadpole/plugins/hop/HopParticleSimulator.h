@@ -64,7 +64,7 @@ protected:
 	Vector3 mParticleInitialVelocity;
 	Vector3 mParticleInitialVariance;
 	Vector3 mLocalGravity;
-	egg::Random mRandom;
+	Random mRandom;
 
 	Segment mSegment;
 	hop::Collision mResult;

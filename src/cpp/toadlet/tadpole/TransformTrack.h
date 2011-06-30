@@ -45,7 +45,7 @@ public:
 
 	int index;
 	scalar length; // calculated by compile
-	egg::Collection<TransformKeyFrame> keyFrames;
+	Collection<TransformKeyFrame> keyFrames;
 };
 
 }

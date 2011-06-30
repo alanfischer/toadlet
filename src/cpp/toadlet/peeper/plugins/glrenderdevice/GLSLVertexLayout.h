@@ -48,7 +48,7 @@ public:
 protected:
 	GLRenderDevice *mDevice;
 
-	egg::Collection<int> mSemanticIndexes;
+	Collection<int> mSemanticIndexes;
 
 	friend class GLRenderDevice;
 };

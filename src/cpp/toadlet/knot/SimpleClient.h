@@ -37,7 +37,7 @@ class TOADLET_API SimpleClient:public SimpleEventConnection{
 public:
 	TOADLET_SHARED_POINTERS(SimpleClient);
 
-	SimpleClient(egg::EventFactory *eventFactory=NULL,Connector::ptr connector=Connector::ptr());
+	SimpleClient(EventFactory *eventFactory=NULL,Connector::ptr connector=Connector::ptr());
 	virtual ~SimpleClient();
 
 	virtual void close();
@@ -45,7 +45,7 @@ public:
 	virtual void setConnector(Connector::ptr connector);
 	virtual Connector::ptr getConnector(){return mConnector;}
 
-	virtual bool sendToClient(int toClientID,egg::Event::ptr event);
+	virtual bool sendToClient(int toClientID,Event::ptr event);
 
 	virtual int getClientID(){return mClientID;}
 

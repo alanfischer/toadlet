@@ -28,9 +28,6 @@
 #include <toadlet/tadpole/node/LightNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::peeper;
-
 namespace toadlet{
 namespace tadpole{
 namespace node{

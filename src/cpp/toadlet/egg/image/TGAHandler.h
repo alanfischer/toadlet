@@ -38,8 +38,8 @@ public:
 	TGAHandler();
 	virtual ~TGAHandler();
 
-	virtual Image *loadImage(io::Stream *stream);
-	virtual bool saveImage(Image *image,io::Stream *stream);
+	virtual Image *loadImage(Stream *stream);
+	virtual bool saveImage(Image *image,Stream *stream);
 };
 
 }

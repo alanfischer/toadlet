@@ -32,15 +32,32 @@
 #include <toadlet/egg/String.h>
 #include <toadlet/egg/SharedPointer.h>
 #include <toadlet/egg/WeakPointer.h>
+#include <toadlet/peeper/Types.h>
+#include <toadlet/ribbit/Types.h>
 
 namespace toadlet{
+namespace egg{}
 namespace tadpole{
+namespace animation{}
+namespace handler{}
+namespace material{}
+namespace node{}
+namespace sensor{}
 
 #if defined(TOADLET_FIXED_POINT)
 	using namespace toadlet::egg::mathfixed;
 #else
 	using namespace toadlet::egg::math;
 #endif
+
+using namespace toadlet::egg;
+using namespace toadlet::peeper;
+using namespace toadlet::ribbit;
+using namespace toadlet::tadpole::animation;
+using namespace toadlet::tadpole::handler;
+using namespace toadlet::tadpole::material;
+using namespace toadlet::tadpole::node;
+using namespace toadlet::tadpole::sensor;
 
 }
 }

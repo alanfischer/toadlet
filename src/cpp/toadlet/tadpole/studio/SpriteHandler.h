@@ -41,12 +41,12 @@ public:
 	SpriteHandler(Engine *engine);
 	virtual ~SpriteHandler();
 
-	virtual egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
+	virtual Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData);
 
 protected:
 	void buildTextures(SpriteModel *model);
 	void buildMaterials(SpriteModel *model);
-	peeper::Texture::ptr createTexture(spriteframe *frame,tbyte *data,tbyte *pal);
+	Texture::ptr createTexture(spriteframe *frame,tbyte *data,tbyte *pal);
 
 	Engine *mEngine;
 };

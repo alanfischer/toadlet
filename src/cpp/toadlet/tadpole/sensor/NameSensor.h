@@ -38,13 +38,13 @@ public:
 
 	NameSensor(Scene *scene);
 
-	void setName(const egg::String &name){mName=name;}
-	const egg::String &getName() const{return mName;}
+	void setName(const String &name){mName=name;}
+	const String &getName() const{return mName;}
 
 protected:
-	bool senseNode(node::Node *node);
+	bool senseNode(Node *node);
 
-	egg::String mName;
+	String mName;
 };
 
 }

@@ -41,10 +41,10 @@ public:
 	BSP30Handler(Engine *engine);
 	virtual ~BSP30Handler();
 
-	virtual egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
+	virtual Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData);
 
 protected:
-	void readLump(egg::io::Stream *stream,blump *lump,void **data,int size,int *count);
+	void readLump(Stream *stream,blump *lump,void **data,int size,int *count);
 	void parseVisibility(BSP30Map *map);
 	void parseEntities(BSP30Map *map);
 	void parseWADs(BSP30Map *map);

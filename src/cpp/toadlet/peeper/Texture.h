@@ -35,7 +35,7 @@
 namespace toadlet{
 namespace peeper{
 
-class Texture:public egg::Resource,public egg::image::ImageDefinitions{
+class Texture:public Resource,public ImageDefinitions{
 public:
 	TOADLET_SHARED_POINTERS(Texture);
 

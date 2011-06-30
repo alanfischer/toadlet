@@ -33,7 +33,7 @@ namespace toadlet{
 namespace tadpole{
 namespace studio{
 
-class StudioModelAnimation:public animation::Animatable{
+class StudioModelAnimation:public Animatable{
 public:
 	StudioModelAnimation(StudioModelNode::ptr node,bool gait){
 		mNode=node;
@@ -64,16 +64,16 @@ protected:
 	bool mGait;
 };
 
-class StudioModelController:public animation::Controller{
+class StudioModelController:public Controller{
 public:
 	TOADLET_SHARED_POINTERS(StudioModelController);
 
-	StudioModelController(StudioModelNode::ptr node,bool gait):animation::Controller(){
+	StudioModelController(StudioModelNode::ptr node,bool gait):Controller(){
 		mNode=node;
 		attach(StudioModelAnimation::ptr(new StudioModelAnimation(node,gait)));
 	}
 
-	void setSequence(const egg::String &name){
+	void setSequence(const String &name){
 		StudioModel *model=mNode->getModel();
 		if(model==NULL) return;
 		int i;

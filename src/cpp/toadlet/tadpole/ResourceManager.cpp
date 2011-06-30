@@ -28,9 +28,6 @@
 #include <toadlet/egg/Logger.h>
 #include <string.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-
 namespace toadlet{
 namespace tadpole{
 

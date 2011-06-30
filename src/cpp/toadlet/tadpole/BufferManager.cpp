@@ -28,9 +28,6 @@
 #include <toadlet/peeper/BackableBuffer.h>
 #include <string.h> //memcpy
 
-using namespace toadlet::egg;
-using namespace toadlet::peeper;
-
 namespace toadlet{
 namespace tadpole{
 

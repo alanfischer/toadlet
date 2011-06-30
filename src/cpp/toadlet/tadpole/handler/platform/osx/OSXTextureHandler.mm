@@ -33,11 +33,6 @@
 #	import <AppKit/AppKit.h>
 #endif
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::image;
-using namespace toadlet::egg::io;
-using namespace toadlet::peeper;
-
 namespace toadlet{
 namespace tadpole{
 namespace handler{

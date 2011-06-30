@@ -41,7 +41,6 @@
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/Viewport.h>
 
-using namespace toadlet::egg;
 using namespace toadlet::egg::MathConversion;
 
 namespace toadlet{

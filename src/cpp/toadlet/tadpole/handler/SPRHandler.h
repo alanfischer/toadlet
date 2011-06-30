@@ -40,8 +40,8 @@ public:
 
 	SPRHandler(Engine *engine):mHandler(engine){}
 
-	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData){
-		studio::SpriteModel::ptr sprite=egg::shared_static_cast<studio::SpriteModel>(mHandler.load(stream,NULL));
+	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+		studio::SpriteModel::ptr sprite=shared_static_cast<studio::SpriteModel>(mHandler.load(stream,NULL));
 
 		if(sprite!=NULL && sprite->textures.size()>0){
 			return sprite->textures[0];

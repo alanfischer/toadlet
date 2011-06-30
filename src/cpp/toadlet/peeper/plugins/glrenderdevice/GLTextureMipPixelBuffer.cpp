@@ -27,8 +27,6 @@
 #include "GLTexture.h"
 #include "GLRenderDevice.h"
 
-using namespace toadlet::egg::image;
-
 namespace toadlet{
 namespace peeper{
 

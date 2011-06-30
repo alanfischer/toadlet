@@ -33,9 +33,9 @@
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/RenderDevice.h>
-#include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Visible.h>
+#include <toadlet/tadpole/material/Material.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 
 namespace toadlet{
@@ -105,26 +105,26 @@ public:
 	// Visible
 	bool getRendered() const{return mRendered;}
 	void setRendered(bool rendered){mRendered=rendered;}
-	peeper::RenderState::ptr getSharedRenderState();
+	RenderState::ptr getSharedRenderState();
 	void gatherRenderables(CameraNode *camera,RenderableSet *set);
 
 	// Renderable
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Transform &getRenderTransform() const{return mWorldSpace==false?getWorldTransform():Node::identityTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
-	void render(peeper::RenderDevice *renderDevice) const;
+	void render(RenderDevice *renderDevice) const;
 
 	void updateVertexBuffer(CameraNode *camera);
 
-	peeper::VertexBufferAccessor vba;
-	peeper::IndexBufferAccessor iba;
+	VertexBufferAccessor vba;
+	IndexBufferAccessor iba;
 
 protected:
 	TOADLET_GIB_DEFINE(ParticleNode);
 
 	void createVertexBuffer();
 
-	egg::Collection<Particle> mParticles;
+	Collection<Particle> mParticles;
 
 	int mParticleType;
 	bool mWorldSpace;
@@ -132,8 +132,8 @@ protected:
 	bool mVelocityAligned;
 	bool mRendered;
 	Material::ptr mMaterial;
-	peeper::VertexData::ptr mVertexData;
-	peeper::IndexData::ptr mIndexData;
+	VertexData::ptr mVertexData;
+	IndexData::ptr mIndexData;
 };
 
 }

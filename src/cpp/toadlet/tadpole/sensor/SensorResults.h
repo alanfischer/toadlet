@@ -50,12 +50,12 @@ public:
 	int getScope() const{return mScope;}
 
 	int getNumResults() const{return mResults.size();}
-	node::Node *getResult(int i){return mResults[i];}
-	node::Node *getNextResult(node::Node *result);
+	Node *getResult(int i){return mResults[i];}
+	Node *getNextResult(Node *result);
 
 	virtual void sensingBeginning();
 	
-	virtual bool resultFound(node::Node *result,scalar distance);
+	virtual bool resultFound(Node *result,scalar distance);
 
 	virtual void sensingEnding();
 	
@@ -63,7 +63,7 @@ protected:
 	int mMaxResults;
 	bool mSortByHandle;
 	int mScope;
-	egg::Collection<node::Node*> mResults;
+	Collection<Node*> mResults;
 	scalar mMaxDistance;
 };
 

@@ -38,17 +38,17 @@ class TOADLET_API SimplePredictedClient:public SimpleClient{
 public:
 	TOADLET_SHARED_POINTERS(SimplePredictedClient);
 
-	SimplePredictedClient(egg::EventFactory *factory=NULL,Connector::ptr connector=Connector::ptr());
+	SimplePredictedClient(EventFactory *factory=NULL,Connector::ptr connector=Connector::ptr());
 	virtual ~SimplePredictedClient();
 
 	virtual void handleServerUpdateEvent(event::BaseServerUpdateEvent::ptr event);
 
 	virtual void sendClientUpdateEvent(event::BaseClientUpdateEvent::ptr event);
 
-	virtual egg::Collection<event::BaseClientUpdateEvent::ptr> enumerateClientUpdateEvents();
+	virtual Collection<event::BaseClientUpdateEvent::ptr> enumerateClientUpdateEvents();
 	
 protected:
-	egg::Collection<event::BaseClientUpdateEvent::ptr> mSentClientEvents;
+	Collection<event::BaseClientUpdateEvent::ptr> mSentClientEvents;
 	int mLastReceivedClientFrameNumber;
 	int mLastAppliedClientFrameNumber;
 };

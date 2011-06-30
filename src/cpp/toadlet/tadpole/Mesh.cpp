@@ -27,9 +27,6 @@
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/tadpole/Mesh.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::peeper;
-
 namespace toadlet{
 namespace tadpole{
 

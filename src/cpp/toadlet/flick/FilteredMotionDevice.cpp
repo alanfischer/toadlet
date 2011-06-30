@@ -24,10 +24,6 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/flick/FilteredMotionDevice.h>
-#include <toadlet/egg/math/Math.h>
-
-using namespace toadlet::egg;
-using namespace toadlet::egg::math;
 
 namespace toadlet{
 namespace flick{

@@ -41,10 +41,6 @@
 	#pragma comment(lib,"wininet.lib")
 #endif
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::egg::net;
-
 namespace toadlet{
 namespace knot{
 
@@ -285,7 +281,7 @@ void LANPeerEventConnector::pushThreadEvent(Event::ptr event){
 	mEventsMutex.unlock();
 }
 
-egg::Event::ptr LANPeerEventConnector::createEventType(int type){
+Event::ptr LANPeerEventConnector::createEventType(int type){
 	if(type==Event_CONNECTION){
 		return Event::ptr(new ConnectionEvent(this));
 	}

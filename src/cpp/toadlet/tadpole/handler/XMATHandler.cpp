@@ -28,9 +28,6 @@
 #include <toadlet/tadpole/handler/XMATHandler.h>
 #include <toadlet/tadpole/handler/XMLMeshUtilities.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-
 namespace toadlet{
 namespace tadpole{
 namespace handler{

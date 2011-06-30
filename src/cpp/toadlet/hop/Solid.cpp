@@ -27,8 +27,6 @@
 #include <toadlet/hop/Solid.h>
 #include <toadlet/hop/Simulator.h>
 
-using namespace toadlet::egg;
-
 namespace toadlet{
 namespace hop{
 

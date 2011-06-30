@@ -35,7 +35,7 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API Win32ResourceArchive:public egg::io::Archive,public egg::BaseResource{
+class TOADLET_API Win32ResourceArchive:public Archive,public BaseResource{
 	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 public:
 	TOADLET_SHARED_POINTERS(Win32ResourceArchive);
@@ -46,21 +46,21 @@ public:
 	void destroy();
 
 	bool open(void *module);
-	void setMap(egg::Map<egg::String,int>::ptr idMap);
+	void setMap(Map<String,int>::ptr idMap);
 
-	egg::io::Stream::ptr openStream(const egg::String &name);
-	egg::Resource::ptr openResource(const egg::String &name);
+	Stream::ptr openStream(const String &name);
+	Resource::ptr openResource(const String &name);
 
-	egg::Collection<egg::String>::ptr getEntries();
+	Collection<String>::ptr getEntries();
 
-	void resourceFound(const egg::String &name);
+	void resourceFound(const String &name);
 
 protected:
-	void *findResourceName(const egg::String &name);
+	void *findResourceName(const String &name);
 
 	void *mModule;
-	egg::Collection<egg::String>::ptr mEntries;
-	egg::Map<egg::String,int>::ptr mIDMap;
+	Collection<String>::ptr mEntries;
+	Map<String,int>::ptr mIDMap;
 
 	TextureManager *mTextureManager;
 };

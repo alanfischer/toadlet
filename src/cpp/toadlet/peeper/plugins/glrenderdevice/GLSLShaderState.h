@@ -71,11 +71,11 @@ protected:
 	ShaderStateDestroyedListener *mListener;
 	GLuint mHandle;
 	bool mNeedsLink;
-	egg::Collection<Shader::ptr> mShaders;
+	Collection<Shader::ptr> mShaders;
 	
-	egg::Collection<VariableBufferFormat::ptr> mVariableBufferFormats;
+	Collection<VariableBufferFormat::ptr> mVariableBufferFormats;
 
-	egg::Collection<GLSLVertexLayout::ptr> mLayouts;
+	Collection<GLSLVertexLayout::ptr> mLayouts;
 
 	friend class GLRenderDevice;
 	friend class GLSLVertexLayout;

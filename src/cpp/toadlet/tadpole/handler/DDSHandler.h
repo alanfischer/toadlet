@@ -40,8 +40,8 @@ public:
 
 	DDSHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 
-	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData){
-		egg::Collection<egg::image::Image::ptr> mipLevels;
+	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+		Collection<Image::ptr> mipLevels;
 		if(mHandler.loadImage(stream,mipLevels)){
 			return mTextureManager->createTexture(mipLevels.size(),mipLevels.begin());
 		}
@@ -50,7 +50,7 @@ public:
 		}
 	}
 
-	bool save(peeper::Texture::ptr resource,egg::io::Stream::ptr stream){
+	bool save(Texture::ptr resource,Stream::ptr stream){
 		return mHandler.saveImage(mTextureManager->createImage(resource),stream);
 	}
 

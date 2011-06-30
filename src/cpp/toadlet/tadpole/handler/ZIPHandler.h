@@ -39,11 +39,11 @@ public:
 
 	ZIPHandler(){}
 
-	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData){
-		egg::io::ZIPArchive::ptr archive(new egg::io::ZIPArchive());
+	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+		ZIPArchive::ptr archive(new ZIPArchive());
 		bool result=archive->open(stream);
 		if(result){
-			return egg::shared_static_cast<egg::io::Archive>(archive);
+			return shared_static_cast<Archive>(archive);
 		}
 		else{
 			return NULL;

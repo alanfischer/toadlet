@@ -39,9 +39,6 @@
 	#endif
 #endif
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-
 namespace toadlet{
 namespace ribbit{
 

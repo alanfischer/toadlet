@@ -40,7 +40,7 @@ public:
 	OSXTextureHandler(TextureManager *textureManager);
 	virtual ~OSXTextureHandler(){}
 
-	egg::Resource::ptr load(egg::io::Stream::ptr in,const ResourceHandlerData *handlerData);
+	Resource::ptr load(Stream::ptr in,const ResourceHandlerData *handlerData);
 
 protected:
 	TextureManager *mTextureManager;

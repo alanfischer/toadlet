@@ -29,8 +29,6 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/BackableBuffer.h>
 
-using namespace toadlet::egg;
-
 namespace toadlet{
 namespace peeper{
 

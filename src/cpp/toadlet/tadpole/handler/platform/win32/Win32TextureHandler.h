@@ -42,7 +42,7 @@ public:
 	virtual ~Win32TextureHandler();
 	bool valid();
 
-	egg::Resource::ptr load(egg::io::Stream::ptr in,const ResourceHandlerData *handlerData);
+	Resource::ptr load(Stream::ptr in,const ResourceHandlerData *handlerData);
 
 protected:
 	int getFormat(INT *gdiformat);

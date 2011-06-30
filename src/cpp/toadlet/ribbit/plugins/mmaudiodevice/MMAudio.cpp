@@ -32,9 +32,6 @@
 #include <toadlet/egg/MathConversion.h>
 #include <toadlet/ribbit/AudioFormatConversion.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-
 namespace toadlet{
 namespace ribbit{
 

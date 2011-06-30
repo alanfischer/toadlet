@@ -30,10 +30,6 @@
 #include <toadlet/knot/TCPConnector.h>
 #include <string.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::egg::net;
-
 namespace toadlet{
 namespace knot{
 
@@ -42,7 +38,7 @@ const char *TCPConnection::CONNECTION_PACKET="toadlet::knot::tcp";
 const int TCPConnection::CONNECTION_PACKET_LENGTH=18;
 const int TCPConnection::CONNECTION_VERSION=1;
 
-TCPConnection::TCPConnection(egg::net::Socket::ptr socket):
+TCPConnection::TCPConnection(Socket::ptr socket):
 	mClient(false),
 	//mSocket,
 	//mOutPacket,

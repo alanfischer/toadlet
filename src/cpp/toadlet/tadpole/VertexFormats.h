@@ -36,14 +36,14 @@ class VertexFormats{
 public:
 	VertexFormats(){}
 
-	peeper::VertexFormat::ptr POSITION;
-	peeper::VertexFormat::ptr POSITION_NORMAL;
-	peeper::VertexFormat::ptr POSITION_COLOR;
-	peeper::VertexFormat::ptr POSITION_TEX_COORD;
-	peeper::VertexFormat::ptr POSITION_NORMAL_COLOR;
-	peeper::VertexFormat::ptr POSITION_NORMAL_TEX_COORD;
-	peeper::VertexFormat::ptr POSITION_COLOR_TEX_COORD;
-	peeper::VertexFormat::ptr POSITION_NORMAL_COLOR_TEX_COORD;
+	VertexFormat::ptr POSITION;
+	VertexFormat::ptr POSITION_NORMAL;
+	VertexFormat::ptr POSITION_COLOR;
+	VertexFormat::ptr POSITION_TEX_COORD;
+	VertexFormat::ptr POSITION_NORMAL_COLOR;
+	VertexFormat::ptr POSITION_NORMAL_TEX_COORD;
+	VertexFormat::ptr POSITION_COLOR_TEX_COORD;
+	VertexFormat::ptr POSITION_NORMAL_COLOR_TEX_COORD;
 };
 
 }

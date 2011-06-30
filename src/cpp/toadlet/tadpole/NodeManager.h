@@ -38,29 +38,29 @@ class NodeHandler{
 public:
 	TOADLET_SHARED_POINTERS(NodeHandler);
 
-	virtual node::NodeResource *load(const egg::String &name,const ResourceHandlerData *handlerData)=0;
+	virtual NodeResource *load(const String &name,const ResourceHandlerData *handlerData)=0;
 };
 
 class TOADLET_API NodeManager:public ResourceManager{
 public:
 	NodeManager(Engine *engine);
 
-	node::NodeResource::ptr getNodeResource(int handle){return egg::shared_static_cast<node::NodeResource>(ResourceManager::get(handle));}
-	node::NodeResource::ptr findNodeResource(const egg::String &name){return egg::shared_static_cast<node::NodeResource>(ResourceManager::find(name));}
-	node::NodeResource::ptr createNodeResource(node::Node *node,const egg::String &name=(char*)NULL);
+	NodeResource::ptr getNodeResource(int handle){return shared_static_cast<NodeResource>(ResourceManager::get(handle));}
+	NodeResource::ptr findNodeResource(const String &name){return shared_static_cast<NodeResource>(ResourceManager::find(name));}
+	NodeResource::ptr createNodeResource(Node *node,const String &name=(char*)NULL);
 
-	node::Node::ptr createNode(int handle,Scene *scene){return createNode(getNodeResource(handle),scene);}
-	node::Node::ptr createNode(const egg::String &name,Scene *scene){return createNode(findNodeResource(name),scene);}
-	node::Node::ptr createNode(node::NodeResource *resource,Scene *scene);
+	Node::ptr createNode(int handle,Scene *scene){return createNode(getNodeResource(handle),scene);}
+	Node::ptr createNode(const String &name,Scene *scene){return createNode(findNodeResource(name),scene);}
+	Node::ptr createNode(NodeResource *resource,Scene *scene);
 	
-	void setNodeHandler(NodeHandler::ptr handler,const egg::String &extension);
-	NodeHandler::ptr getNodeHandler(const egg::String &extension);
+	void setNodeHandler(NodeHandler::ptr handler,const String &extension);
+	NodeHandler::ptr getNodeHandler(const String &extension);
 
 protected:
-	typedef egg::Map<egg::String,NodeHandler::ptr> ExtensionNodeHandlerMap;
+	typedef Map<String,NodeHandler::ptr> ExtensionNodeHandlerMap;
 
-	egg::Resource::ptr findFromFile(const egg::String &name,const ResourceHandlerData *handlerData);
-	NodeHandler::ptr findNodeHandler(const egg::String &extension);
+	Resource::ptr findFromFile(const String &name,const ResourceHandlerData *handlerData);
+	NodeHandler::ptr findNodeHandler(const String &extension);
 
 	Engine *mEngine;
 

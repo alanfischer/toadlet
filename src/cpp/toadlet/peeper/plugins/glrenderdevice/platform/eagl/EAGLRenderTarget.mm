@@ -29,8 +29,6 @@
 #include <toadlet/peeper/Texture.h>
 #import <QuartzCore/QuartzCore.h>
 
-using namespace toadlet::egg;
-
 namespace toadlet{
 namespace peeper{
 

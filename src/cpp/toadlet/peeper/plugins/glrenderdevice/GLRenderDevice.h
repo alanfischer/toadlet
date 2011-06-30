@@ -108,7 +108,7 @@ public:
 
 	// Misc operations
 	int getCloseTextureFormat(int textureFormat,int usage);
-	bool getShaderProfileSupported(const egg::String &profile);
+	bool getShaderProfileSupported(const String &profile);
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
 	bool getRenderCaps(RenderCaps &caps){caps.set(mCaps);return true;}
 
@@ -127,12 +127,12 @@ public:
 	bool hardwareBuffersSupported(GLBuffer *buffer) const;
 	bool hardwareMappingSupported(GLBuffer *buffer) const;
 
-	inline egg::mathfixed::fixed *colorArray(egg::mathfixed::fixed result[],const Vector4 &src){result[0]=egg::MathConversion::scalarToFixed(src.x);result[1]=egg::MathConversion::scalarToFixed(src.y);result[2]=egg::MathConversion::scalarToFixed(src.z);result[3]=egg::MathConversion::scalarToFixed(src.w);return result;}
-	inline float *colorArray(float result[],const Vector4 &src){result[0]=egg::MathConversion::scalarToFloat(src.x);result[1]=egg::MathConversion::scalarToFloat(src.y);result[2]=egg::MathConversion::scalarToFloat(src.z);result[3]=egg::MathConversion::scalarToFloat(src.w);return result;}
-	inline egg::mathfixed::fixed *lightDirArray(egg::mathfixed::fixed result[],const Vector3 &src){result[0]=egg::MathConversion::scalarToFixed(-src.x);result[1]=egg::MathConversion::scalarToFixed(-src.y);result[2]=egg::MathConversion::scalarToFixed(-src.z);result[3]=0;return result;}
-	inline float *lightDirArray(float result[],const Vector3 &src){result[0]=egg::MathConversion::scalarToFloat(-src.x);result[1]=egg::MathConversion::scalarToFloat(-src.y);result[2]=egg::MathConversion::scalarToFloat(-src.z);result[3]=0;return result;}
-	inline egg::mathfixed::fixed *lightPosArray(egg::mathfixed::fixed result[],const Vector3 &src){result[0]=egg::MathConversion::scalarToFixed(src.x);result[1]=egg::MathConversion::scalarToFixed(src.y);result[2]=egg::MathConversion::scalarToFixed(src.z);result[3]=egg::MathConversion::scalarToFixed(Math::ONE);return result;}
-	inline float *lightPosArray(float result[],const Vector3 &src){result[0]=egg::MathConversion::scalarToFloat(src.x);result[1]=egg::MathConversion::scalarToFloat(src.y);result[2]=egg::MathConversion::scalarToFloat(src.z);result[3]=egg::MathConversion::scalarToFloat(Math::ONE);return result;}
+	inline egg::mathfixed::fixed *colorArray(egg::mathfixed::fixed result[],const Vector4 &src){result[0]=MathConversion::scalarToFixed(src.x);result[1]=MathConversion::scalarToFixed(src.y);result[2]=MathConversion::scalarToFixed(src.z);result[3]=MathConversion::scalarToFixed(src.w);return result;}
+	inline float *colorArray(float result[],const Vector4 &src){result[0]=MathConversion::scalarToFloat(src.x);result[1]=MathConversion::scalarToFloat(src.y);result[2]=MathConversion::scalarToFloat(src.z);result[3]=MathConversion::scalarToFloat(src.w);return result;}
+	inline egg::mathfixed::fixed *lightDirArray(egg::mathfixed::fixed result[],const Vector3 &src){result[0]=MathConversion::scalarToFixed(-src.x);result[1]=MathConversion::scalarToFixed(-src.y);result[2]=MathConversion::scalarToFixed(-src.z);result[3]=0;return result;}
+	inline float *lightDirArray(float result[],const Vector3 &src){result[0]=MathConversion::scalarToFloat(-src.x);result[1]=MathConversion::scalarToFloat(-src.y);result[2]=MathConversion::scalarToFloat(-src.z);result[3]=0;return result;}
+	inline egg::mathfixed::fixed *lightPosArray(egg::mathfixed::fixed result[],const Vector3 &src){result[0]=MathConversion::scalarToFixed(src.x);result[1]=MathConversion::scalarToFixed(src.y);result[2]=MathConversion::scalarToFixed(src.z);result[3]=MathConversion::scalarToFixed(Math::ONE);return result;}
+	inline float *lightPosArray(float result[],const Vector3 &src){result[0]=MathConversion::scalarToFloat(src.x);result[1]=MathConversion::scalarToFloat(src.y);result[2]=MathConversion::scalarToFloat(src.z);result[3]=MathConversion::scalarToFloat(Math::ONE);return result;}
 
 	#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
 		egg::mathfixed::Matrix4x4 cacheMatrix4x4;
@@ -183,20 +183,20 @@ protected:
 	Viewport mViewport;
 	DepthState mDepthState;
 	PointState mPointState;
-	egg::Collection<GLTexture*> mLastTextures;
-	egg::Collection<SamplerState*> mLastSamplerStates;
-	egg::Collection<TextureState*> mLastTextureStates;
+	Collection<GLTexture*> mLastTextures;
+	Collection<SamplerState*> mLastSamplerStates;
+	Collection<TextureState*> mLastTextureStates;
 	short mMaxTexCoordIndex;
-	egg::Collection<short> mTexCoordIndexes;
+	Collection<short> mTexCoordIndexes;
 	short mLastMaxTexCoordIndex;
-	egg::Collection<GLenum> mLastTexTargets;
-	egg::Collection<VertexBuffer*> mLastVertexBuffers;
+	Collection<GLenum> mLastTexTargets;
+	Collection<VertexBuffer*> mLastVertexBuffers;
 	int mLastFixedSemanticBits,mLastFixedTexCoordSemanticBits;
-	egg::Collection<short> mLastTexCoordIndexes;
+	Collection<short> mLastTexCoordIndexes;
 	int mLastShaderSemanticBits;
 	GLSLShaderState *mLastShaderState;
-	egg::Collection<GLSLShaderState*> mShaderStates;
-	egg::Collection<GLVertexFormat*> mVertexFormats;
+	Collection<GLSLShaderState*> mShaderStates;
+	Collection<GLVertexFormat*> mVertexFormats;
 
 	#if defined(TOADLET_FIXED_POINT) && defined(TOADLET_HAS_GLES)
 		egg::mathfixed::Matrix4x4 mModelMatrix;

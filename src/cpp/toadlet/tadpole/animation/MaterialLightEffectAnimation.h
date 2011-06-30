@@ -38,7 +38,7 @@ class MaterialLightEffectAnimation:public Animatable{
 public:
 	TOADLET_SHARED_POINTERS(MaterialLightEffectAnimation);
 
-	MaterialLightEffectAnimation(Material::ptr target,const peeper::MaterialState &start,const peeper::MaterialState &end,scalar time){
+	MaterialLightEffectAnimation(Material::ptr target,const MaterialState &start,const MaterialState &end,scalar time){
 		mTarget=target;
 		mStart.set(start);
 		mEnd.set(end);
@@ -50,7 +50,7 @@ public:
 	void set(scalar value){
 		scalar t=Math::div(value,mEndTime);
 
-		peeper::MaterialState state;
+		MaterialState state;
 		Math::lerp(state.ambient,mStart.ambient,mEnd.ambient,t);
 		Math::lerp(state.diffuse,mStart.diffuse,mEnd.diffuse,t);
 		Math::lerp(state.specular,mStart.specular,mEnd.specular,t);
@@ -63,8 +63,8 @@ public:
 
 protected:
 	Material::ptr mTarget;
-	peeper::MaterialState mStart;
-	peeper::MaterialState mEnd;
+	MaterialState mStart;
+	MaterialState mEnd;
 	scalar mEndTime;
 };
 

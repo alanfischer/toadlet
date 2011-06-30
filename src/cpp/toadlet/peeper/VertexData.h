@@ -49,7 +49,7 @@ public:
 
 	inline VertexFormat::ptr getVertexFormat(){return vertexFormat;}
 
-	egg::Collection<VertexBuffer::ptr> vertexBuffers;
+	Collection<VertexBuffer::ptr> vertexBuffers;
 	VertexFormat::ptr vertexFormat;
 };
 

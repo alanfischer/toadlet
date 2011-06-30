@@ -51,9 +51,9 @@ public:
 		spotOuterRadius(Math::PI),
 		spotFalloff(Math::ONE),
 		#if defined(TOADLET_FIXED_POINT)
-			radius(Math::sqrt(egg::Extents::MAX_FIXED>>1)),
+			radius(Math::sqrt(Extents::MAX_FIXED>>1)),
 		#else
-			radius(Math::sqrt(egg::Extents::MAX_FLOAT)),
+			radius(Math::sqrt(Extents::MAX_FLOAT)),
 		#endif
 		//position,
 		direction(0,0,-Math::ONE)

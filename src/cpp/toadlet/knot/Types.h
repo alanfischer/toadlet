@@ -23,46 +23,23 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_RENDERVARIABLESET_H
-#define TOADLET_TADPOLE_RENDERVARIABLESET_H
+#ifndef TOADLET_KNOT_TYPES_H
+#define TOADLET_KNOT_TYPES_H
 
-#include <toadlet/peeper/VariableBuffer.h>
-#include <toadlet/tadpole/RenderVariable.h>
+#include <toadlet/Types.h>
+#include <toadlet/egg/SharedPointer.h>
+#include <toadlet/egg/WeakPointer.h>
+#include <toadlet/egg/io/Stream.h>
+#include <toadlet/egg/net/Socket.h>
 
 namespace toadlet{
-namespace tadpole{
+namespace knot{
+namespace event{}
 
-class RenderVariableSet{
-public:
-	TOADLET_SHARED_POINTERS(RenderVariableSet);
-
-	RenderVariableSet();
-	virtual ~RenderVariableSet();
-	
-	bool addBuffer(peeper::VariableBuffer::ptr buffer);
-	void removeBuffer(peeper::VariableBuffer::ptr buffer);
-	
-	bool addVariable(const egg::String &name,RenderVariable::ptr variable);
-	void removeVariable(RenderVariable::ptr variable);
-
-	void update();
-
-protected:
-	class VariableInfo{
-	public:
-		egg::String name;
-		int location;
-		RenderVariable::ptr variable;
-	};
-
-	class BufferVariableSet{
-	public:
-		peeper::VariableBuffer::ptr buffer;
-		egg::Collection<VariableInfo> variables;
-	};
-
-	egg::Collection<BufferVariableSet> mBufferVariables;
-};
+using namespace toadlet::egg;
+using namespace toadlet::egg::io;
+using namespace toadlet::egg::net;
+using namespace toadlet::knot::event;
 
 }
 }

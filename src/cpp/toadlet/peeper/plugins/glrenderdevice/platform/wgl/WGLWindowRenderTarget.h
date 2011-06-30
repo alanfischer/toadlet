@@ -57,8 +57,8 @@ protected:
 
 	HWND mWnd;
 	PIXELFORMATDESCRIPTOR mPFD;
-	egg::Collection<HGLRC> mThreadContexts;
-	egg::Collection<int> mThreadIDs;
+	Collection<HGLRC> mThreadContexts;
+	Collection<int> mThreadIDs;
 };
 
 }

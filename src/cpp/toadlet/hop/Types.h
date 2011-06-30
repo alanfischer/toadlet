@@ -41,6 +41,8 @@ namespace hop{
 	using namespace toadlet::egg::math;
 #endif
 
+using namespace toadlet::egg;
+
 }
 }
 

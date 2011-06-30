@@ -33,9 +33,6 @@
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::peeper;
-
 namespace toadlet{
 namespace tadpole{
 namespace node{

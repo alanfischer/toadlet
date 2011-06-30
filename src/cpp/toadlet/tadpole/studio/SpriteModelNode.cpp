@@ -30,11 +30,6 @@
 #include <toadlet/tadpole/studio/SpriteModelNode.h>
 #include <toadlet/tadpole/studio/SpriteHandler.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::peeper;
-using namespace toadlet::tadpole::node;
-
 namespace toadlet{
 namespace tadpole{
 namespace studio{
@@ -164,6 +159,21 @@ void SpriteModelNode::setModel(SpriteModel::ptr model){
 }
 
 RenderState::ptr SpriteModelNode::getSharedRenderState(){
+	RenderState::ptr renderState;
+	if(mSubModels[0]->material->ownsRenderState()){
+		renderState=mSubModels[0]->material->getRenderState();
+	}
+	else{
+		renderState=mSubModels[0]->material->getOwnRenderState();
+		int i;
+		for(i=1;i<mSubModels.size();++i){
+			mSubModels[i]->material->setRenderState(renderState);
+			mSubModels[i]->material->setSort(Material::SortType_AUTO);
+		}
+	}
+	return renderState;
+
+
 	Material::ptr sharedMaterial;
 	int i;
 	for(i=0;i<mMaterials.size();++i){

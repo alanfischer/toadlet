@@ -56,14 +56,14 @@ public:
 	// Visible
 	bool getRendered() const{return mRendered;}
 	void setRendered(bool rendered){mRendered=rendered;}
-	peeper::RenderState::ptr getSharedRenderState();
+	RenderState::ptr getSharedRenderState();
 	void gatherRenderables(CameraNode *camera,RenderableSet *set);
 
 	// Renderable
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
-	void render(peeper::RenderDevice *renderDevice) const;
+	void render(RenderDevice *renderDevice) const;
 
 protected:
 	TOADLET_GIB_DEFINE(SpriteNode);
@@ -73,8 +73,8 @@ protected:
 	int mAlignment;
 	Material::ptr mMaterial;
 	bool mRendered;
-	peeper::VertexData::ptr mVertexData;
-	peeper::IndexData::ptr mIndexData;
+	VertexData::ptr mVertexData;
+	IndexData::ptr mIndexData;
 };
 
 }

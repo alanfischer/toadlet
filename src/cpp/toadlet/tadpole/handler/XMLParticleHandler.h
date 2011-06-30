@@ -34,7 +34,7 @@ namespace handler{
 
 class XMLParticleHandler{
 public:
-	bool loadParticleFile(egg::Collection<Vector3> &points,const egg::String &file);
+	bool loadParticleFile(Collection<Vector3> &points,const String &file);
 }
 
 }

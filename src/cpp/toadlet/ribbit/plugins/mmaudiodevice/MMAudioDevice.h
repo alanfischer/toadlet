@@ -83,7 +83,7 @@ protected:
 	HWAVEOUT mDevice;
 	WAVEHDR *mBuffers;
 	tbyte *mBufferData;
-	egg::Collection<MMAudio*> mAudios;
+	Collection<MMAudio*> mAudios;
 	int mBufferFadeTime;
 	int mNumBuffers;
 	int mBufferSize;

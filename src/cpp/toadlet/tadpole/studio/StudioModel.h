@@ -28,13 +28,13 @@
 
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/tadpole/studio/StudioTypes.h>
-#include <toadlet/tadpole/Material.h>
+#include <toadlet/tadpole/material/Material.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace studio{
 
-class TOADLET_API StudioModel:public egg::BaseResource{
+class TOADLET_API StudioModel:public BaseResource{
 public:
 	TOADLET_BASERESOURCE_PASSTHROUGH(BaseResource);
 	TOADLET_SHARED_POINTERS(StudioModel);
@@ -58,7 +58,7 @@ public:
 		textures.clear();
 
 		for(i=0;i<materials.size();++i){
-			materials[i]->release();
+			materials[i]->destroy();
 		}
 		materials.clear();
 	}
@@ -82,7 +82,7 @@ public:
 
 	struct meshdata{
 		int vertexStart;
-		egg::Collection<peeper::IndexData::ptr> indexDatas;
+		Collection<IndexData::ptr> indexDatas;
 	};
 
 	meshdata *findmeshdata(int bodypartIndex,int modelIndex,int meshIndex){
@@ -104,9 +104,9 @@ public:
 
 	tbyte *data;
 	studiohdr *header;
-	egg::Collection<peeper::Texture::ptr> textures;
-	egg::Collection<Material::ptr> materials;
-	egg::Collection<meshdata> meshdatas;
+	Collection<Texture::ptr> textures;
+	Collection<Material::ptr> materials;
+	Collection<meshdata> meshdatas;
 	int vertexCount;
 };
 

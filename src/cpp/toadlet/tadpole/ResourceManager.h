@@ -37,58 +37,58 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API ResourceManager:public egg::ResourceFullyReleasedListener{
+class TOADLET_API ResourceManager:public ResourceFullyReleasedListener{
 public:
-	ResourceManager(egg::io::Archive *archive);
+	ResourceManager(Archive *archive);
 	virtual ~ResourceManager();
 
 	virtual void destroy();
 
-	virtual void setArchive(egg::io::Archive *archive){mArchive=archive;}
-	virtual egg::io::Archive *getArchive() const{return mArchive;}
+	virtual void setArchive(Archive *archive){mArchive=archive;}
+	virtual Archive *getArchive() const{return mArchive;}
 
-	virtual void addResourceArchive(egg::io::Archive::ptr archive);
-	virtual void removeResourceArchive(egg::io::Archive::ptr archive);
+	virtual void addResourceArchive(Archive::ptr archive);
+	virtual void removeResourceArchive(Archive::ptr archive);
 
-	virtual egg::Resource::ptr get(int handle);
-	virtual egg::Resource::ptr get(const egg::String &name);
-	virtual egg::Resource::ptr find(const egg::String &name,ResourceHandlerData::ptr handlerData=ResourceHandlerData::ptr());
-	virtual egg::Resource::ptr manage(const egg::Resource::ptr &resource,const egg::String &name=(char*)NULL);
-	virtual void unmanage(egg::Resource *resource);
+	virtual Resource::ptr get(int handle);
+	virtual Resource::ptr get(const String &name);
+	virtual Resource::ptr find(const String &name,ResourceHandlerData::ptr handlerData=ResourceHandlerData::ptr());
+	virtual Resource::ptr manage(const Resource::ptr &resource,const String &name=(char*)NULL);
+	virtual void unmanage(Resource *resource);
 
-	virtual void setHandler(ResourceHandler::ptr handler,const egg::String &extension);
-	virtual ResourceHandler::ptr getHandler(const egg::String &extension);
+	virtual void setHandler(ResourceHandler::ptr handler,const String &extension);
+	virtual ResourceHandler::ptr getHandler(const String &extension);
 
 	virtual void setDefaultHandler(ResourceHandler::ptr handler);
 	virtual ResourceHandler::ptr getDefaultHandler(){return mDefaultHandler;}
 
-	virtual void setDefaultExtension(const egg::String &extension){mDefaultExtension=extension;}
-	virtual const egg::String &getDefaultExtension(){return mDefaultExtension;}
+	virtual void setDefaultExtension(const String &extension){mDefaultExtension=extension;}
+	virtual const String &getDefaultExtension(){return mDefaultExtension;}
 
-	virtual void resourceFullyReleased(egg::Resource *resource);
+	virtual void resourceFullyReleased(Resource *resource);
 
-	static egg::String cleanFilename(const egg::String &name);
+	static String cleanFilename(const String &name);
 
 protected:
-	typedef egg::Map<egg::String,egg::Resource::ptr> NameResourceMap;
-	typedef egg::Map<egg::String,ResourceHandler::ptr> ExtensionHandlerMap;
+	typedef Map<String,Resource::ptr> NameResourceMap;
+	typedef Map<String,ResourceHandler::ptr> ExtensionHandlerMap;
 
-	virtual egg::Resource::ptr unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData);
-	virtual egg::Resource::ptr findFromFile(const egg::String &name,const ResourceHandlerData *handlerData);
+	virtual Resource::ptr unableToFindHandler(const String &name,const ResourceHandlerData *handlerData);
+	virtual Resource::ptr findFromFile(const String &name,const ResourceHandlerData *handlerData);
 
-	virtual void resourceLoaded(const egg::Resource::ptr &resource){}
-	virtual void resourceUnloaded(const egg::Resource::ptr &resource){}
+	virtual void resourceLoaded(const Resource::ptr &resource){}
+	virtual void resourceUnloaded(const Resource::ptr &resource){}
 
-	egg::io::Archive *mArchive;
-	egg::Collection<egg::io::Archive::ptr> mResourceArchives;
+	Archive *mArchive;
+	Collection<Archive::ptr> mResourceArchives;
 
-	egg::Collection<int> mFreeHandles;
-	egg::Collection<egg::Resource::ptr> mResources;
+	Collection<int> mFreeHandles;
+	Collection<Resource::ptr> mResources;
 	NameResourceMap mNameResourceMap;
 
 	ExtensionHandlerMap mExtensionHandlerMap;
 	ResourceHandler::ptr mDefaultHandler;
-	egg::String mDefaultExtension;
+	String mDefaultExtension;
 };
 
 }

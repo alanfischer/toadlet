@@ -49,8 +49,8 @@ public:
 	virtual bool sense(SensorResultsListener *results);
 
 protected:
-	virtual int senseNodes(node::Node *node,SensorResultsListener *results);
-	virtual bool senseNode(node::Node *node){return false;}
+	virtual int senseNodes(Node *node,SensorResultsListener *results);
+	virtual bool senseNode(Node *node){return false;}
 
 	Scene *mScene;
 	SensorResults::ptr mResults;

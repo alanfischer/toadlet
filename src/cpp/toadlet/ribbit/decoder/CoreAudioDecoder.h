@@ -49,7 +49,7 @@ public:
 	bool writeable(){return false;}
 	int write(const tbyte *buffer,int length){return -1;}
 
-	bool startStream(egg::io::Stream::ptr stream);
+	bool startStream(Stream::ptr stream);
 	bool stopStream();
 	bool reset();
 	int length(){return -1;}
@@ -71,7 +71,7 @@ private:
 	int mPosition;
 	int mSourceSize;
 	int mSourcePosition;
-	egg::io::Stream::ptr mIn;
+	Stream::ptr mIn;
 	AudioFileID mAudioFile;
 	AudioStreamBasicDescription mStreamDescription;
 };

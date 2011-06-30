@@ -37,11 +37,11 @@ class TOADLET_API CameraProjectionAnimation:public Animatable{
 public:
 	TOADLET_SHARED_POINTERS(CameraProjectionAnimation);
 
-	CameraProjectionAnimation(node::CameraNode::ptr target);
+	CameraProjectionAnimation(CameraNode::ptr target);
 	virtual ~CameraProjectionAnimation(){}
 
-	void setTarget(node::CameraNode::ptr target);
-	inline node::CameraNode::ptr getTarget() const{return mTarget;}
+	void setTarget(CameraNode::ptr target);
+	inline CameraNode::ptr getTarget() const{return mTarget;}
 
 	// HACK: Until we introduce a proper ProjectionKeyFrame, this will have to do
 	void setStart(scalar left,scalar right,scalar bottom,scalar top,scalar neard,scalar fard);
@@ -53,7 +53,7 @@ public:
 	scalar getMax() const{return mEndTime;}
 
 protected:
-	node::CameraNode::ptr mTarget;
+	CameraNode::ptr mTarget;
 	scalar mStartLeft,mStartRight,mStartBottom,mStartTop,mStartNear,mStartFar;
 	scalar mEndLeft,mEndRight,mEndBottom,mEndTop,mEndNear,mEndFar;
 	scalar mEndTime;

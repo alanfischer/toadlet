@@ -29,9 +29,6 @@
 #include <toadlet/tadpole/handler/platform/osx/OSXBundleArchive.h>
 #include <Foundation/Foundation.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-
 namespace toadlet{
 namespace tadpole{
 namespace handler{

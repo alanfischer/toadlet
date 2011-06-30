@@ -36,7 +36,7 @@ namespace peeper{
 
 class GLRenderDevice;
 
-class TOADLET_API GLTexture:protected egg::BaseResource,public Texture{
+class TOADLET_API GLTexture:protected BaseResource,public Texture{
 	TOADLET_BASERESOURCE_PASSTHROUGH(Texture);
 public:
 	GLTexture(GLRenderDevice *renderDevice);
@@ -90,7 +90,7 @@ protected:
 	GLenum mTarget;
 	Matrix4x4 mMatrix;
 	bool mManuallyGenerateMipLevels;
-	egg::Collection<PixelBuffer::ptr> mBuffers;
+	Collection<PixelBuffer::ptr> mBuffers;
 
 	friend class GLRenderDevice;
 };

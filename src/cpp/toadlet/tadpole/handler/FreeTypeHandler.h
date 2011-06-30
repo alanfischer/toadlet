@@ -50,7 +50,7 @@ public:
 	FreeTypeHandler(TextureManager *textureManager);
 	virtual ~FreeTypeHandler();
 
-	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
+	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData);
 
 protected:
 	TextureManager *mTextureManager;

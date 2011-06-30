@@ -39,17 +39,17 @@ public:
 	ShadowMappedSceneRenderer(Scene *scene);
 	virtual ~ShadowMappedSceneRenderer();
 
-	void setLight(node::LightNode *light){mLight=light;}
-	node::LightNode *getLight() const{return mLight;}
+	void setLight(LightNode *light){mLight=light;}
+	LightNode *getLight() const{return mLight;}
 
-	void renderScene(peeper::RenderDevice *renderDevice,node::Node *node,node::CameraNode *camera);
+	void renderScene(RenderDevice *renderDevice,Node *node,CameraNode *camera);
 
 protected:
-	peeper::Texture::ptr mShadowTexture;
-	peeper::PixelBufferRenderTarget::ptr mShadowTarget;
-	peeper::RenderState::ptr mShadowState,mLightState;
-	node::CameraNode::ptr mLightCamera;
-	node::LightNode::ptr mLight;
+	Texture::ptr mShadowTexture;
+	PixelBufferRenderTarget::ptr mShadowTarget;
+	RenderState::ptr mShadowState,mLightState;
+	CameraNode::ptr mLightCamera;
+	LightNode::ptr mLight;
 };
 
 }

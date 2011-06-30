@@ -26,10 +26,6 @@
 #include <toadlet/tadpole/MeshManager.h>
 #include <toadlet/tadpole/Engine.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::peeper;
-
 namespace toadlet{
 namespace tadpole{
 

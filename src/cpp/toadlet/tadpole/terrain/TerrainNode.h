@@ -36,22 +36,22 @@ namespace tadpole{
 namespace terrain{
 
 /// @todo: Use the quadtree to store child nodes and implement the commented out methods
-class TOADLET_API TerrainNode:public node::PartitionNode,public Traceable{
+class TOADLET_API TerrainNode:public PartitionNode,public Traceable{
 public:
-	TOADLET_NODE(TerrainNode,node::PartitionNode);
+	TOADLET_NODE(TerrainNode,PartitionNode);
 
 	TerrainNode();
 	virtual ~TerrainNode();
-	node::Node *create(Scene *scene);
+	Node *create(Scene *scene);
 	void destroy();
-	node::Node *set(node::Node *node);
+	Node *set(Node *node);
 	void *hasInterface(int type){return type==InterfaceType_TRACEABLE?(Traceable*)this:NULL;}
 
 	void setListener(TerrainNodeListener *listener){mListener=listener;}
 	TerrainNodeListener *getListener(){return mListener;}
 
-	void setTarget(node::Node *target);
-	node::Node *getTarget(){return mTarget;}
+	void setTarget(Node *target);
+	Node *getTarget(){return mTarget;}
 
 	void setUpdateTargetBias(scalar bias){mUpdateTargetBias=bias;}
 	scalar getUpdateTargetBias(){return mUpdateTargetBias;}
@@ -90,7 +90,7 @@ public:
 	scalar toWorldXf(scalar x){return Math::mul(x,mPatchSize*mPatchScale.x);}
 	scalar toWorldYf(scalar y){return Math::mul(y,mPatchSize*mPatchScale.y);}
 
-	void gatherRenderables(node::CameraNode *camera,RenderableSet *set);
+	void gatherRenderables(CameraNode *camera,RenderableSet *set);
 
 	void logicUpdate(int dt,int scope);
 
@@ -108,7 +108,7 @@ public:
 	void nodeRemoved(Node *node);
 
 	void mergeWorldBound(Node *child,bool justAttached);
-	void queueRenderables(node::CameraNode *camera,RenderQueue *queue);
+	void queueRenderables(CameraNode *camera,RenderQueue *queue);
 
 	bool senseBoundingVolumes(SensorResultsListener *listener,const Sphere &volume);
 	bool sensePotentiallyVisible(SensorResultsListener *listener,const Vector3 &point);
@@ -117,18 +117,18 @@ protected:
 //	void childTransformUpdated(Node *child);
 
 	TerrainNodeListener *mListener;
-	node::Node::ptr mTarget;
+	Node::ptr mTarget;
 	TerrainNodeDataSource *mDataSource;
 	int mSize,mHalfSize;
 	int mTerrainX,mTerrainY;
-	egg::Collection<TerrainPatchNode::ptr> mUnactivePatches;
-	egg::Collection<TerrainPatchNode::ptr> mPatchGrid;
+	Collection<TerrainPatchNode::ptr> mUnactivePatches;
+	Collection<TerrainPatchNode::ptr> mPatchGrid;
 	int mPatchSize;
 	Material::ptr mPatchMaterial;
 	Material::ptr mPatchWaterMaterial;
 	scalar mPatchTolerance;
 	Vector3 mPatchScale;
-	egg::Collection<scalar> mPatchData;
+	Collection<scalar> mPatchData;
 	scalar mUpdateTargetBias;
 };
 

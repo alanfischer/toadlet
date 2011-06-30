@@ -211,6 +211,21 @@ String fsc[]={
 	"}"
 };
 
+class PVMVariable:public RenderVariable{
+public:
+	PVMVariable(CameraNode::ptr camera){
+		this->camera=camera;
+	}
+
+	void updateData(tbyte *data){
+		Matrix4x4 projectionView=cameraNode->getProjectionMatrix()*cameraNode->getViewMatrix();
+		memcpy(data,projectionView.getData(),sizeof(Matrix4x4));
+	}
+
+protected:
+	CameraNode::ptr camera;
+};
+
 void Logo::create(){
 	Application::create("d3d10");
 
@@ -243,6 +258,7 @@ void Logo::create(){
 vs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,sp,vsc,2);
 fs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,sp,fsc,2);
 VariableBufferFormat::ptr vbf;
+
 	for(int i=0;i<meshNode->getNumSubMeshes();++i){
 		meshNode->getSubMesh(i)->material->setShader(Shader::ShaderType_VERTEX,vs);
 		meshNode->getSubMesh(i)->material->setShader(Shader::ShaderType_FRAGMENT,fs);
@@ -250,9 +266,12 @@ VariableBufferFormat::ptr vv=meshNode->getSubMesh(i)->material->getShaderState()
 VariableBufferFormat::ptr fv=meshNode->getSubMesh(i)->material->getShaderState()->getVariableBufferFormat(Shader::ShaderType_FRAGMENT,0);
 getEngine()->getBufferManager()->outputVariableBufferFormat(vv);
 getEngine()->getBufferManager()->outputVariableBufferFormat(fv);
+vbf=vv;
 	}
 
 vb=getEngine()->getBufferManager()->createVariableBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,vbf);
+PVMVariable::ptr pvm(new PVMVariable(cameraNode));
+
 
 // Only looks good if running on device, in simulator its always a top down view
 #if 0

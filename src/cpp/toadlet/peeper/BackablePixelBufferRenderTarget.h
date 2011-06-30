@@ -64,8 +64,8 @@ protected:
 	RenderTargetDestroyedListener *mListener;
 
 	PixelBufferRenderTarget::ptr mBack;
-	egg::Collection<PixelBuffer::ptr> mBuffers;
-	egg::Collection<Attachment> mBufferAttachments;
+	Collection<PixelBuffer::ptr> mBuffers;
+	Collection<Attachment> mBufferAttachments;
 };
 
 }

@@ -32,7 +32,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API Skeleton:public egg::BaseResource{
+class TOADLET_API Skeleton:public BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(Skeleton);
 
@@ -57,7 +57,7 @@ public:
 
 		AABox bound;
 
-		egg::String name;
+		String name;
 	};
 
 	Skeleton();
@@ -66,8 +66,8 @@ public:
 	void destroy();
 	void compile();
 
-	egg::Collection<Bone::ptr> bones;
-	egg::Collection<TransformSequence::ptr> sequences;
+	Collection<Bone::ptr> bones;
+	Collection<TransformSequence::ptr> sequences;
 };
 
 }

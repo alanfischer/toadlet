@@ -25,8 +25,6 @@
 
 #include <toadlet/tadpole/TransformSequence.h>
 
-using namespace toadlet::egg;
-
 namespace toadlet{
 namespace tadpole{
 

@@ -44,11 +44,11 @@ namespace knot{
  * It's usage requires that both sides of the connection send the same amount of packets, since
  * the packet header is used to determine which packets need to be resent.
  */
-class TOADLET_API PeerPacketConnection:public Connection,egg::Runnable{
+class TOADLET_API PeerPacketConnection:public Connection,Runnable{
 public:
 	TOADLET_SHARED_POINTERS(PeerPacketConnection);
 
-	PeerPacketConnection(egg::net::Socket::ptr socket);
+	PeerPacketConnection(Socket::ptr socket);
 	virtual ~PeerPacketConnection();
 
 	/// This is the amount of time(ms) that the Connection will wait before it assumes a packet is lost
@@ -139,27 +139,27 @@ protected:
 	const static int CONNECTION_PACKET_LENGTH;
 	const static int CONNECTION_VERSION;
 
-	int buildConnectionPacket(egg::io::DataStream *stream);
-	bool verifyConnectionPacket(egg::io::DataStream *stream);
+	int buildConnectionPacket(DataStream *stream);
+	bool verifyConnectionPacket(DataStream *stream);
 
-	egg::String toBinaryString(int n);
+	String toBinaryString(int n);
 	inline int frameToIndex(int frame){return frame-mMasterFrame-1 + mHalfWindowSize;}
 
 	bool updatePacketReceive();
 	bool updatePacketResend();
 	void updatePacketInfo(PeerPacket *packet);
 
-	int sendPacketsToSocket(const egg::Collection<PeerPacket::ptr> &packets,int numPackets);
-	int receivePacketsFromSocket(const egg::Collection<PeerPacket::ptr> &packets,int numPackets);
+	int sendPacketsToSocket(const Collection<PeerPacket::ptr> &packets,int numPackets);
+	int receivePacketsFromSocket(const Collection<PeerPacket::ptr> &packets,int numPackets);
 
-	egg::net::Socket::ptr mSocket;
-	egg::io::MemoryStream::ptr mOutPacket;
-	egg::io::DataStream::ptr mDataOutPacket;
-	egg::io::MemoryStream::ptr mInPacket;
-	egg::io::DataStream::ptr mDataInPacket;
+	Socket::ptr mSocket;
+	MemoryStream::ptr mOutPacket;
+	DataStream::ptr mDataOutPacket;
+	MemoryStream::ptr mInPacket;
+	DataStream::ptr mDataInPacket;
 
-	egg::Mutex::ptr mMutex;
-	egg::Thread::ptr mThread;
+	Mutex::ptr mMutex;
+	Thread::ptr mThread;
 	bool mRun;
 
 	int mPacketResendTime;
@@ -174,16 +174,16 @@ protected:
 	int mReceivedFrameBits;
 	int mRemoteReceivedFrameBits;
 	int mNumExtraPackets;
-	egg::Collection<PeerPacket::ptr> mLocalPackets;
-	egg::Collection<PeerPacket::ptr> mRemotePackets;
-	egg::Collection<PeerPacket::ptr> mSendingPackets;
-	egg::Collection<PeerPacket::ptr> mReceivingPackets;
+	Collection<PeerPacket::ptr> mLocalPackets;
+	Collection<PeerPacket::ptr> mRemotePackets;
+	Collection<PeerPacket::ptr> mSendingPackets;
+	Collection<PeerPacket::ptr> mReceivingPackets;
 
-	egg::Random mDebugRandom;
+	Random mDebugRandom;
 	int mDebugPacketDelayTime;
 	float mDebugPacketDropAmount;
 	bool mDebugDropNextPacket;
-	egg::Thread::ptr mDebugThread;
+	Thread::ptr mDebugThread;
 	bool mDebugRun;
 };
 

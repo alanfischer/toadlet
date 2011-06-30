@@ -35,7 +35,7 @@ namespace toadlet{
 namespace tadpole{
 namespace handler{
 
-class TOADLET_API WADArchive:public egg::io::Archive,public egg::BaseResource{
+class TOADLET_API WADArchive:public Archive,public BaseResource{
 	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 public:
 	TOADLET_SHARED_POINTERS(WADArchive);
@@ -45,12 +45,12 @@ public:
 
 	void destroy();
 
-	bool open(egg::io::Stream::ptr stream);
+	bool open(Stream::ptr stream);
 
-	egg::io::Stream::ptr openStream(const egg::String &name){return NULL;}
-	egg::Resource::ptr openResource(const egg::String &name);
+	Stream::ptr openStream(const String &name){return NULL;}
+	Resource::ptr openResource(const String &name);
 
-	egg::Collection<egg::String>::ptr getEntries();
+	Collection<String>::ptr getEntries();
 
 	struct wheader{
 		char identification[4]; // should be WAD2 or 2DAW
@@ -75,17 +75,17 @@ public:
 		unsigned int offsets[MIPLEVELS]; // four mip maps stored
 	};
 
-	static peeper::Texture::ptr createTexture(TextureManager *textureManager,wmiptex *miptex,tbyte *pal=NULL);
+	static Texture::ptr createTexture(TextureManager *textureManager,wmiptex *miptex,tbyte *pal=NULL);
 
 protected:
 	unsigned char mInBuffer[640*480*85/64]; // Maxlump
 
 	TextureManager *mTextureManager;
-	egg::io::DataStream::ptr mStream;
+	DataStream::ptr mStream;
 
 	wheader mHeader;
-	egg::Collection<wlumpinfo> mLumpinfos;
-	egg::Map<egg::String,int> mNameMap;
+	Collection<wlumpinfo> mLumpinfos;
+	Map<String,int> mNameMap;
 };
 
 }

@@ -89,7 +89,7 @@ public:
 	virtual void remove(Animatable::ptr animatable);
 
 protected:
-	egg::Collection<Animatable::ptr> mAnimatables;
+	Collection<Animatable::ptr> mAnimatables;
 
 	int mTime;
 	scalar mMinValue;

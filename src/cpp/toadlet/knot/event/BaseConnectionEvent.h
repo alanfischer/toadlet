@@ -27,12 +27,13 @@
 #define TOADLET_KNOT_EVENT_BASECONNECTIONEVENT_H
 
 #include <toadlet/egg/Event.h>
+#include <toadlet/knot/Types.h>
 
 namespace toadlet{
 namespace knot{
 namespace event{
 
-class BaseConnectionEvent:public egg::Event{
+class BaseConnectionEvent:public Event{
 public:
 	TOADLET_SHARED_POINTERS(BaseConnectionEvent);
 
@@ -45,13 +46,13 @@ public:
 
 	int getID(){return mID;}
 
-	virtual int read(egg::io::DataStream *stream){
+	virtual int read(DataStream *stream){
 		int amount=0;
 		mID=stream->readBInt32();amount+=4;
 		return amount;
 	}
 
-	virtual int write(egg::io::DataStream *stream){
+	virtual int write(DataStream *stream){
 		int amount=0;
 		amount+=stream->writeBInt32(mID);
 		return amount;

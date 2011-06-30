@@ -39,9 +39,9 @@ public:
 
 	GIFHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 
-	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData){
-		egg::Collection<egg::image::Image*> images;
-		egg::Collection<int> delays;
+	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+		Collection<Image*> images;
+		Collection<int> delays;
 
 		mHandler.loadAnimatedImage(stream,images,delays);
 
@@ -49,21 +49,21 @@ public:
 			return NULL;
 		}
 		else if(images.size()==1){
-			return mTextureManager->createTexture(egg::image::Image::ptr(images[0]));
+			return mTextureManager->createTexture(Image::ptr(images[0]));
 		}
 		else{
 /// @todo: Revive this somehow, probably as a 3d texture
-//			peeper::SequenceTexture::ptr sequence(new peeper::SequenceTexture(peeper::Texture::Dimension_D2,images.size()));
+//			SequenceTexture::ptr sequence(new SequenceTexture(Texture::Dimension_D2,images.size()));
 //			int i;
 //			for(i=0;i<images.size();++i){
-//				sequence->setTexture(i,mTextureManager->createTexture(egg::image::Image::ptr(images[i])),Math::fromMilli(delays[i]));
+//				sequence->setTexture(i,mTextureManager->createTexture(Image::ptr(images[i])),Math::fromMilli(delays[i]));
 //			}
-//			return egg::shared_static_cast<peeper::Texture>(sequence);
+//			return shared_static_cast<Texture>(sequence);
 return NULL;
 		}
 	}
 
-	bool save(peeper::Texture::ptr resource,egg::io::Stream::ptr stream){
+	bool save(Texture::ptr resource,Stream::ptr stream){
 		return mHandler.saveImage(mTextureManager->createImage(resource),stream);
 	}
 

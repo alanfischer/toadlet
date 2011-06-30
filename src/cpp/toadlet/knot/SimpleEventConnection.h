@@ -39,21 +39,21 @@
 namespace toadlet{
 namespace knot{
 
-class TOADLET_API SimpleEventConnection:public EventConnection,public ConnectionListener,public egg::Runnable{
+class TOADLET_API SimpleEventConnection:public EventConnection,public ConnectionListener,public Runnable{
 public:
 	TOADLET_SHARED_POINTERS(SimpleEventConnection);
 
 	const static int CONTROL_EVENT_FLAG=0x4000; // Switch to 0x4000 from 0x8000 since setting the sign bit for a short ended up confusing the bit operations in java
 	const static int CONTROL_EVENT_ROUTE=1;
 
-	SimpleEventConnection(egg::EventFactory *eventFactory=NULL,Connection::ptr connection=Connection::ptr());
+	SimpleEventConnection(EventFactory *eventFactory=NULL,Connection::ptr connection=Connection::ptr());
 	virtual ~SimpleEventConnection();
 
 	virtual bool opened(){return mRun;}
 	virtual void close();
 
-	virtual void setEventFactory(egg::EventFactory *eventFactory);
-	virtual egg::EventFactory *getEventFactory(){return mEventFactory;}
+	virtual void setEventFactory(EventFactory *eventFactory);
+	virtual EventFactory *getEventFactory(){return mEventFactory;}
 
 	virtual void setConnection(Connection::ptr connection);
 	virtual Connection::ptr getConnection(){return mConnection;}
@@ -61,8 +61,8 @@ public:
 	virtual void addEventConnectionListener(EventConnectionListener *listener,bool notifyAboutCurrent);
 	virtual void removeEventConnectionListener(EventConnectionListener *listener,bool notifyAboutCurrent);
 
-	virtual bool send(egg::Event::ptr event);
-	virtual egg::Event::ptr receive();
+	virtual bool send(Event::ptr event);
+	virtual Event::ptr receive();
 
 	virtual int update(){return 0;}
 
@@ -72,27 +72,27 @@ public:
 	virtual void run();
 
 protected:
-	virtual bool eventReceived(egg::Event::ptr event);
+	virtual bool eventReceived(Event::ptr event);
 
 	virtual void notifyListenersConnected(EventConnection *connection);
 	virtual void notifyListenersDisconnected(EventConnection *connection);
 
-	virtual int sendEvent(egg::Event::ptr event);
-	virtual int receiveEvent(egg::Event::ptr *event);
+	virtual int sendEvent(Event::ptr event);
+	virtual int receiveEvent(Event::ptr *event);
 
-	egg::EventFactory *mEventFactory;
-	egg::io::MemoryStream::ptr mPacketIn;
-	egg::io::DataStream::ptr mDataPacketIn;
-	egg::io::MemoryStream::ptr mPacketOut;
-	egg::io::DataStream::ptr mDataPacketOut;
+	EventFactory *mEventFactory;
+	MemoryStream::ptr mPacketIn;
+	DataStream::ptr mDataPacketIn;
+	MemoryStream::ptr mPacketOut;
+	DataStream::ptr mDataPacketOut;
 
 	Connection::ptr mConnection;
-	egg::Collection<egg::Event::ptr> mEvents;
-	egg::Mutex mEventsMutex;
-	egg::Collection<EventConnectionListener*> mListeners;
-	egg::Mutex mListenersMutex;
+	Collection<Event::ptr> mEvents;
+	Mutex mEventsMutex;
+	Collection<EventConnectionListener*> mListeners;
+	Mutex mListenersMutex;
 
-	egg::Thread::ptr mThread;
+	Thread::ptr mThread;
 	bool mRun;
 };
 

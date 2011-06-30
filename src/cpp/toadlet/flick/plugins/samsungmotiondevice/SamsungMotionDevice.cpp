@@ -26,9 +26,6 @@
 #include "SamsungMotionDevice.h"
 #include <toadlet/egg/Error.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::math;
-
 namespace toadlet{
 namespace flick{
 

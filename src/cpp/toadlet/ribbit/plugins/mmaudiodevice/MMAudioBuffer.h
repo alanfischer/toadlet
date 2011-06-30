@@ -33,7 +33,7 @@
 namespace toadlet{
 namespace ribbit{
 
-class TOADLET_API MMAudioBuffer:protected egg::BaseResource,public AudioBuffer{
+class TOADLET_API MMAudioBuffer:protected BaseResource,public AudioBuffer{
 	TOADLET_BASERESOURCE_PASSTHROUGH(AudioBuffer);
 public:
 	TOADLET_SHARED_POINTERS(MMAudioBuffer);

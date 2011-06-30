@@ -137,7 +137,7 @@ typedef struct tagNOTIFICATIONCONDITION {
 namespace toadlet{
 namespace flick{
 
-class HTCMotionDevice:public FilteredMotionDevice,public egg::Runnable{
+class HTCMotionDevice:public FilteredMotionDevice,public Runnable{
 public:
 	HTCMotionDevice();
 	virtual ~HTCMotionDevice();
@@ -171,7 +171,7 @@ protected:
 	bool mNative;
 	MotionDeviceListener *mListener;
 
-	egg::DynamicLibrary mSensorLibrary;
+	DynamicLibrary mSensorLibrary;
 	PFN_HTCSensorOpen pfnHTCSensorOpen;
 	PFN_HTCSensorClose pfnHTCSensorClose;
 	PFN_HTCSensorGetDataOutput pfnHTCSensorGetDataOutput;
@@ -182,10 +182,10 @@ protected:
 
 	// The Outer/Inner mutex setup is done so we can have the motion detecting loop call
 	// the listener, and have that callback safely null out the listener in the motion Device
-	egg::Mutex mOuterMutex;
-	egg::Mutex mInnerMutex;
+	Mutex mOuterMutex;
+	Mutex mInnerMutex;
 	bool mListenerLocked;
-	egg::Thread *mPollThread;
+	Thread *mPollThread;
 };
 
 }

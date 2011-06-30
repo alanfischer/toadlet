@@ -34,8 +34,6 @@
 	#define BI_RGB 0L
 #endif
 
-using namespace toadlet::egg::io;
-
 namespace toadlet{
 namespace egg{
 namespace image{

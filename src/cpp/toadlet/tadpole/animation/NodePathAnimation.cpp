@@ -26,9 +26,6 @@
 #include <toadlet/tadpole/animation/NodePathAnimation.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::tadpole::node;
-
 namespace toadlet{
 namespace tadpole{
 namespace animation{

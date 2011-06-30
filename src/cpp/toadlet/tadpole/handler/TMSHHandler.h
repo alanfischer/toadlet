@@ -47,31 +47,31 @@ public:
 
 	TMSHHandler(Engine *engine);
 
-	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
-	bool save(Mesh::ptr mesh,egg::io::Stream::ptr stream);
+	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData);
+	bool save(Mesh::ptr mesh,Stream::ptr stream);
 
 protected:
-	Mesh::ptr readMesh(egg::io::DataStream *stream,int blockSize);
-	peeper::IndexData::ptr readIndexData(egg::io::DataStream *stream);
-	peeper::IndexBuffer::ptr readIndexBuffer(egg::io::DataStream *stream);
-	peeper::VertexData::ptr readVertexData(egg::io::DataStream *stream);
-	peeper::VertexBuffer::ptr readVertexBuffer(egg::io::DataStream *stream);
-	peeper::VertexFormat::ptr readVertexFormat(egg::io::DataStream *stream);
-	void writeMesh(egg::io::DataStream *stream,Mesh::ptr mesh);
-	void writeIndexData(egg::io::DataStream *stream,peeper::IndexData::ptr indexData);
-	void writeIndexBuffer(egg::io::DataStream *stream,peeper::IndexBuffer::ptr buffer);
-	void writeVertexData(egg::io::DataStream *stream,peeper::VertexData::ptr vertexData);
-	void writeVertexBuffer(egg::io::DataStream *stream,peeper::VertexBuffer::ptr buffer);
-	void writeVertexFormat(egg::io::DataStream *stream,peeper::VertexFormat::ptr vertexFormat);
+	Mesh::ptr readMesh(DataStream *stream,int blockSize);
+	IndexData::ptr readIndexData(DataStream *stream);
+	IndexBuffer::ptr readIndexBuffer(DataStream *stream);
+	VertexData::ptr readVertexData(DataStream *stream);
+	VertexBuffer::ptr readVertexBuffer(DataStream *stream);
+	VertexFormat::ptr readVertexFormat(DataStream *stream);
+	void writeMesh(DataStream *stream,Mesh::ptr mesh);
+	void writeIndexData(DataStream *stream,IndexData::ptr indexData);
+	void writeIndexBuffer(DataStream *stream,IndexBuffer::ptr buffer);
+	void writeVertexData(DataStream *stream,VertexData::ptr vertexData);
+	void writeVertexBuffer(DataStream *stream,VertexBuffer::ptr buffer);
+	void writeVertexFormat(DataStream *stream,VertexFormat::ptr vertexFormat);
 
-	Material::ptr readMaterial(egg::io::DataStream *stream,int blockSize);
-	void writeMaterial(egg::io::DataStream *stream,Material::ptr material);
+	Material::ptr readMaterial(DataStream *stream,int blockSize);
+	void writeMaterial(DataStream *stream,Material::ptr material);
 
-	Skeleton::ptr readSkeleton(egg::io::DataStream *stream,int blockSize);
-	void writeSkeleton(egg::io::DataStream *stream,Skeleton::ptr skeleton);
+	Skeleton::ptr readSkeleton(DataStream *stream,int blockSize);
+	void writeSkeleton(DataStream *stream,Skeleton::ptr skeleton);
 
-	TransformSequence::ptr readSequence(egg::io::DataStream *stream,int blockSize);
-	void writeSequence(egg::io::DataStream *stream,TransformSequence::ptr sequence);
+	TransformSequence::ptr readSequence(DataStream *stream,int blockSize);
+	void writeSequence(DataStream *stream,TransformSequence::ptr sequence);
 
 	// Blocks for the tmsh format
 	enum Block{

@@ -31,8 +31,8 @@
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/Font.h>
-#include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/Renderable.h>
+#include <toadlet/tadpole/material/Material.h>
 #include <toadlet/tadpole/node/CameraAlignedNode.h>
 
 namespace toadlet{
@@ -51,8 +51,8 @@ public:
 	void setFont(const Font::ptr &font);
 	Font::ptr getFont() const{return mFont;}
 
-	void setText(const egg::String &text);
-	const egg::String &getText() const{return mText;}
+	void setText(const String &text);
+	const String &getText() const{return mText;}
 
 	void setAlignment(int alignment);
 	int getAlignment() const{return mAlignment;}
@@ -70,9 +70,9 @@ public:
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
-	void render(peeper::RenderDevice *renderDevice) const;
+	void render(RenderDevice *renderDevice) const;
 
-	peeper::VertexBufferAccessor vba;
+	VertexBufferAccessor vba;
 
 protected:
 	TOADLET_GIB_DEFINE(LabelNode);
@@ -80,18 +80,18 @@ protected:
 	void updateLabel();
 
 	/// @todo: Word wrapping and width need to be fixed so it makes sense.  Right now wordWrap only works in font space, not local space
-	static egg::String wordWrap(Font::ptr font,float width,const egg::String &text);
+	static String wordWrap(Font::ptr font,float width,const String &text);
 
 	Font::ptr mFont;
-	egg::String mText;
+	String mText;
 	int mAlignment;
 	bool mNormalized;
 	bool mWordWrap;
 	scalar mWidth;
 
 	Material::ptr mMaterial;
-	peeper::VertexData::ptr mVertexData;
-	peeper::IndexData::ptr mIndexData;
+	VertexData::ptr mVertexData;
+	IndexData::ptr mIndexData;
 };
 
 }

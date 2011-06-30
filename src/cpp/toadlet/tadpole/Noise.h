@@ -27,6 +27,7 @@
 #define TOADLET_TADPOLE_NOISE_H
 
 #include <toadlet/egg/Random.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -56,7 +57,7 @@ protected:
 	void init();
 	inline float scurve(float t){ return t*t*(3.0 - 2.0*t);}
 
-	egg::Random mRandom;
+	Random mRandom;
 	int mOctaves;
 	float mFrequency;
 	float mAmplitude;

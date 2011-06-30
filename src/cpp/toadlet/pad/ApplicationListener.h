@@ -27,12 +27,7 @@
 #define TOADLET_PAD_APPLICATIONLISTENER_H
 
 namespace toadlet{
-namespace peeper{
-
-class RenderDevice;
-
-}
-
+namespace peeper{class RenderDevice;}
 namespace pad{
 
 class ApplicationListener{

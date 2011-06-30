@@ -27,9 +27,6 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/knot/SynchronizedPeerEventConnection.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-
 namespace toadlet{
 namespace knot{
 

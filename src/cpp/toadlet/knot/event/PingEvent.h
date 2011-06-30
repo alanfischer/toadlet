@@ -31,18 +31,18 @@
 namespace toadlet{
 namespace knot{
 
-class PingEvent:public egg::Event{
+class PingEvent:public Event{
 public:
 	TOADLET_SHARED_POINTERS(PingEvent);
 
-	PingEvent():egg::Event(Type_PING),mSendTime(0){}
+	PingEvent():Event(Type_PING),mSendTime(0){}
 
-	int read(egg::io::DataStream *stream){
+	int read(DataStream *stream){
 		mSendTime=stream->readBInt64();
 		return 8;
 	}
 	
-	int write(egg::io::DataStream *stream){
+	int write(DataStream *stream){
 		return stream->writeBInt64(mSendTime);
 	}
 

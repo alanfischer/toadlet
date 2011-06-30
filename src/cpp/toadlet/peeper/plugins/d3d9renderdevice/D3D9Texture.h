@@ -37,7 +37,7 @@ namespace peeper{
 class D3D9RenderDevice;
 class D3D9TextureMipPixelBuffer;
 
-class TOADLET_API D3D9Texture:protected egg::BaseResource,public Texture{
+class TOADLET_API D3D9Texture:protected BaseResource,public Texture{
 	TOADLET_BASERESOURCE_PASSTHROUGH(Texture);
 public:
 	D3D9Texture(D3D9RenderDevice *renderDevice);
@@ -86,7 +86,7 @@ protected:
 	D3DPOOL mD3DPool;
 	IDirect3DBaseTexture9 *mTexture;
 	bool mManuallyGenerateMipLevels;
-	egg::Collection<PixelBuffer::ptr> mBuffers;
+	Collection<PixelBuffer::ptr> mBuffers;
 	D3D9PixelBuffer::ptr mBackingBuffer;
 
 	friend class D3D9RenderDevice;

@@ -26,8 +26,6 @@
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <stdlib.h>
 
-using namespace toadlet::egg;
-
 namespace toadlet{
 namespace peeper{
 

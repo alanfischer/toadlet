@@ -57,6 +57,9 @@
 
 namespace toadlet{
 namespace egg{
+namespace net{};
+using namespace net;
+
 namespace net{
 
 class TOADLET_API Socket{

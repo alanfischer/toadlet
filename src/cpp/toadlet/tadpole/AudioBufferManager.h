@@ -39,12 +39,12 @@ class TOADLET_API AudioBufferManager:public ResourceManager{
 public:
 	AudioBufferManager(Engine *engine);
 
-	ribbit::AudioBuffer::ptr createAudioBuffer(ribbit::AudioStream::ptr stream);
+	AudioBuffer::ptr createAudioBuffer(AudioStream::ptr stream);
 
-	ribbit::AudioStream::ptr findAudioStream(const egg::String &name);
-	ribbit::AudioBuffer::ptr findAudioBuffer(const egg::String &name){return egg::shared_static_cast<ribbit::AudioBuffer>(ResourceManager::find(name));}
+	AudioStream::ptr findAudioStream(const String &name);
+	AudioBuffer::ptr findAudioBuffer(const String &name){return shared_static_cast<AudioBuffer>(ResourceManager::find(name));}
 
-	ribbit::AudioDevice *getAudioDevice();
+	AudioDevice *getAudioDevice();
 
 protected:
 	Engine *mEngine;

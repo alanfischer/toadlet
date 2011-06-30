@@ -28,13 +28,6 @@
 #include <toadlet/tadpole/terrain/TerrainNode.h>
 #include <toadlet/tadpole/terrain/TerrainPatchNode.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::egg::image;
-using namespace toadlet::peeper;
-using namespace toadlet::tadpole::node;
-using namespace toadlet::tadpole::handler;
-
 namespace toadlet{
 namespace tadpole{
 namespace terrain{

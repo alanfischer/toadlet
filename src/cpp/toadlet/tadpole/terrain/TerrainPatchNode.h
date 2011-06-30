@@ -30,9 +30,9 @@ namespace toadlet{
 namespace tadpole{
 namespace terrain{
 
-class TOADLET_API TerrainPatchNode:public node::Node,public Renderable,public Traceable{
+class TOADLET_API TerrainPatchNode:public Node,public Renderable,public Traceable{
 public:
-	TOADLET_NODE(TerrainPatchNode,node::Node);
+	TOADLET_NODE(TerrainPatchNode,Node);
 
 	class Vertex{
 	public:
@@ -77,9 +77,9 @@ public:
 
 	TerrainPatchNode();
 	~TerrainPatchNode();
-	node::Node *create(Scene *scene);
+	Node *create(Scene *scene);
 	void destroy();
-	node::Node *set(node::Node *node);
+	Node *set(Node *node);
 
 	void *hasInterface(int type);
 
@@ -102,15 +102,15 @@ public:
 	void setScale1(float s1){mS1=s1;}
 	void setScale2(float s2){mS2=s2;}
 
-	void gatherRenderables(node::CameraNode *camera,RenderableSet *set);
-	void updateBlocks(node::CameraNode *camera);
+	void gatherRenderables(CameraNode *camera,RenderableSet *set);
+	void updateBlocks(CameraNode *camera);
 	void updateVertexes();
-	void updateIndexBuffers(node::CameraNode *camera);
-	void updateWaterIndexBuffers(node::CameraNode *camera);
+	void updateIndexBuffers(CameraNode *camera);
+	void updateWaterIndexBuffers(CameraNode *camera);
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
-	void render(peeper::RenderDevice *renderDevice) const{renderDevice->renderPrimitive(mVertexData,mIndexData);}
+	void render(RenderDevice *renderDevice) const{renderDevice->renderPrimitive(mVertexData,mIndexData);}
 
 	const Bound &getBound() const{return super::getBound();}
 	void traceSegment(Collision &result,const Vector3 &position,const Segment &segment,const Vector3 &size);
@@ -119,7 +119,7 @@ public:
 
 	inline Renderable *internal_getWaterRenderable(){return mWaterRenderable;}
 
-	peeper::VertexBufferAccessor vba;
+	VertexBufferAccessor vba;
 
 protected:
 	TOADLET_GIB_DEFINE(TerrainPatchNode);
@@ -134,7 +134,7 @@ protected:
 		Material *getRenderMaterial() const{return mTerrain->mWaterMaterial;}
 		const Transform &getRenderTransform() const{return mTerrain->getWorldTransform();}
 		const Bound &getRenderBound() const{return mTerrain->getRenderBound();}
-		void render(peeper::RenderDevice *renderDevice) const{renderDevice->renderPrimitive(mTerrain->mWaterVertexData,mTerrain->mWaterIndexData);}
+		void render(RenderDevice *renderDevice) const{renderDevice->renderPrimitive(mTerrain->mWaterVertexData,mTerrain->mWaterIndexData);}
 
 	protected:
 		TerrainPatchNode *mTerrain;
@@ -171,10 +171,10 @@ protected:
 	void simplifyBlocks(const Vector3 &cameraTranslate);
 	bool blockShouldSubdivide(Block *block,const Vector3 &cameraTranslate);
 	void computeDelta(Block *block,const Vector3 &cameraTranslate,float tolerance);
-	bool blockIntersectsCamera(const Block *block,node::CameraNode *camera,bool water) const;
+	bool blockIntersectsCamera(const Block *block,CameraNode *camera,bool water) const;
 	bool blockVisibleByWater(const Block *block,const Vector3 &cameraTranslate,bool water) const;
-	int gatherBlocks(peeper::IndexBuffer *indexBuffer,node::CameraNode *camera,bool water) const;
-	int gatherTriangle(peeper::IndexBufferAccessor &iba,int indexCount,int x0,int y0,int x1,int y1,int x2,int y2) const;
+	int gatherBlocks(IndexBuffer *indexBuffer,CameraNode *camera,bool water) const;
+	int gatherTriangle(IndexBufferAccessor &iba,int indexCount,int x0,int y0,int x1,int y1,int x2,int y2) const;
 
 	// BlockQueue methods
 	inline int getNumBlocksInQueue(){return mNumBlocksInQueue;}
@@ -207,9 +207,9 @@ protected:
 	}
 
 	int mSize;
-	egg::Collection<Vertex> mVertexes;
-	egg::Collection<Block> mBlocks;
-	egg::Collection<int> mBlockQueue;
+	Collection<Vertex> mVertexes;
+	Collection<Block> mBlocks;
+	Collection<int> mBlockQueue;
 	int mNumBlocks;
 	int mInitialStride;
 	int mBlockQueueSize;
@@ -229,16 +229,16 @@ protected:
 	scalar mS1,mS2;
 
 	Material::ptr mMaterial;
-	peeper::VertexBuffer::ptr mVertexBuffer;
-	peeper::IndexBuffer::ptr mIndexBuffer;
-	peeper::VertexData::ptr mVertexData;
-	peeper::IndexData::ptr mIndexData;
+	VertexBuffer::ptr mVertexBuffer;
+	IndexBuffer::ptr mIndexBuffer;
+	VertexData::ptr mVertexData;
+	IndexData::ptr mIndexData;
 
 	Material::ptr mWaterMaterial;
-	peeper::VertexBuffer::ptr mWaterVertexBuffer;
-	peeper::IndexBuffer::ptr mWaterIndexBuffer;
-	peeper::VertexData::ptr mWaterVertexData;
-	peeper::IndexData::ptr mWaterIndexData;
+	VertexBuffer::ptr mWaterVertexBuffer;
+	IndexBuffer::ptr mWaterIndexBuffer;
+	VertexData::ptr mWaterVertexData;
+	IndexData::ptr mWaterIndexData;
 	WaterRenderable::ptr mWaterRenderable;
 	friend class WaterRenderable;
 };

@@ -28,11 +28,6 @@
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/Scene.h>
 
-using namespace toadlet;
-using namespace toadlet::egg;
-using namespace toadlet::peeper;
-using namespace toadlet::tadpole::node;
-
 namespace toadlet{
 namespace tadpole{
 

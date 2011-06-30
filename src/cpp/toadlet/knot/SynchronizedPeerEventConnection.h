@@ -50,7 +50,7 @@ public:
 	const static int CONTROL_EVENT_FRAMEBUFFER=1;
 	const static int MAX_FRAME_DIFFERENCE=1000;
 
-	SynchronizedPeerEventConnection(Connection::ptr connection=NULL,egg::EventFactory *factory=NULL);
+	SynchronizedPeerEventConnection(Connection::ptr connection=NULL,EventFactory *factory=NULL);
 	virtual ~SynchronizedPeerEventConnection();
 
 	bool opened();
@@ -62,35 +62,35 @@ public:
 	inline int getFrameBuffer() const{return mFrameBuffer;}
 	inline int getFrameGroupSize() const{return mFrameGroupSize;}
 
-	bool send(egg::Event::ptr event);
-	egg::Event::ptr receive();
+	bool send(Event::ptr event);
+	Event::ptr receive();
 
 	int update();
 
 protected:
-	class EventGroup:public egg::Collection<egg::Event::ptr>{
+	class EventGroup:public Collection<Event::ptr>{
 	public:
 		TOADLET_SHARED_POINTERS(EventGroup);
 
-		EventGroup():egg::Collection<egg::Event::ptr>(),
+		EventGroup():Collection<Event::ptr>(),
 			mFrameBuffer(0),
 			mFrameGroup(0)
 		{}
 
-		EventGroup(EventGroup::ptr eventGroup):egg::Collection<egg::Event::ptr>(eventGroup),
+		EventGroup(EventGroup::ptr eventGroup):Collection<Event::ptr>(eventGroup),
 			mFrameBuffer(eventGroup->getFrameBuffer()),
 			mFrameGroup(eventGroup->getFrameGroup())
 		{}
 
 		void set(EventGroup::ptr eventGroup){
-			egg::Collection<egg::Event::ptr>::clear();
-			egg::Collection<egg::Event::ptr>::addAll(eventGroup);
+			Collection<Event::ptr>::clear();
+			Collection<Event::ptr>::addAll(eventGroup);
 			mFrameBuffer=eventGroup->getFrameBuffer();
 			mFrameGroup=eventGroup->getFrameGroup();
 		}
 
 		void clear(){
-			egg::Collection<egg::Event::ptr>::clear();
+			Collection<Event::ptr>::clear();
 			mFrameBuffer=0;
 			mFrameGroup=0;
 		}
@@ -108,12 +108,12 @@ protected:
 	bool adjustFrameBuffer(int frameBuffer,int frameGroupSize,bool force);
 
 	Connection::ptr mConnection;
-	egg::EventFactory *mEventFactory;
+	EventFactory *mEventFactory;
 
-	egg::io::MemoryStream::ptr mPacketIn;
-	egg::io::DataStream::ptr mDataPacketIn;
-	egg::io::MemoryStream::ptr mPacketOut;
-	egg::io::DataStream::ptr mDataPacketOut;
+	MemoryStream::ptr mPacketIn;
+	DataStream::ptr mDataPacketIn;
+	MemoryStream::ptr mPacketOut;
+	DataStream::ptr mDataPacketOut;
 
 	int mFrame;
 	int mFrameBuffer;
@@ -124,9 +124,9 @@ protected:
 	int mFrameGroupCount;
 	EventGroup::ptr mIncomingEvents;
 	EventGroup::ptr mOutgoingEvents;
-	egg::Collection<EventGroup::ptr> mLocalEventGroups;
-	egg::Collection<EventGroup::ptr> mRemoteEventGroups;
-	egg::Collection<EventGroup::ptr> mFreeEventGroups;
+	Collection<EventGroup::ptr> mLocalEventGroups;
+	Collection<EventGroup::ptr> mRemoteEventGroups;
+	Collection<EventGroup::ptr> mFreeEventGroups;
 };
 
 }

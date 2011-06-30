@@ -32,11 +32,6 @@
 #include <toadlet/tadpole/studio/StudioHandler.h>
 #include <string.h> // memset
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::peeper;
-using namespace toadlet::tadpole::node;
-
 namespace toadlet{
 namespace tadpole{
 namespace studio{
@@ -118,7 +113,7 @@ void StudioModelNode::destroy(){
 	}
 
 	if(mSkeletonMaterial!=NULL){
-		mSkeletonMaterial->release();
+		mSkeletonMaterial->destroy();
 		mSkeletonMaterial=NULL;
 
 		destroySkeletonBuffers();
@@ -429,19 +424,23 @@ void StudioModelNode::traceSegment(Collision &result,const Vector3 &position,con
 }
 
 RenderState::ptr StudioModelNode::getSharedRenderState(){
-	Material::ptr sharedMaterial;
-	int i;
-	for(i=0;i<mSubModels.size();++i){
-		SubModel *sub=mSubModels[i];
-		if(sub->material->getManaged()){
-			sub->material=mEngine->getMaterialManager()->cloneMaterial(sub->material,false,sharedMaterial);
-			sub->material->setSort(Material::SortType_AUTO);
-		}
-		if(i==0){
-			sharedMaterial=sub->material;
+	if(mSubModels.size()==0){
+		return NULL;
+	}
+
+	RenderState::ptr renderState;
+	if(mSubModels[0]->material->ownsRenderState()){
+		renderState=mSubModels[0]->material->getRenderState();
+	}
+	else{
+		renderState=mSubModels[0]->material->getOwnRenderState();
+		int i;
+		for(i=1;i<mSubModels.size();++i){
+			mSubModels[i]->material->setRenderState(renderState);
+			mSubModels[i]->material->setSort(Material::SortType_AUTO);
 		}
 	}
-	return sharedMaterial->getRenderState();
+	return renderState;
 }
 
 void StudioModelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){

@@ -31,13 +31,6 @@
 #include <toadlet/tadpole/bsp/BSP30Handler.h>
 #include <string.h> // memset
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::egg::image;
-using namespace toadlet::peeper;
-using namespace toadlet::tadpole::node;
-using namespace toadlet::tadpole::handler;
-
 namespace toadlet{
 namespace tadpole{
 namespace bsp{

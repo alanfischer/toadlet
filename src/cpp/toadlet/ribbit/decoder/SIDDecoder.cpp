@@ -45,9 +45,6 @@
 	#pragma comment(lib,TOADLET_LIBRESID_NAME)
 #endif
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-
 namespace toadlet{
 namespace ribbit{
 namespace decoder{

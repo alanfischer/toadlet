@@ -28,9 +28,6 @@
 #include <toadlet/egg/io/FileStream.h>
 #include <toadlet/tadpole/ArchiveManager.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-
 namespace toadlet{
 namespace tadpole{
 

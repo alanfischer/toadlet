@@ -28,10 +28,6 @@
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/ShaderManager.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::peeper;
-
 namespace toadlet{
 namespace tadpole{
 
