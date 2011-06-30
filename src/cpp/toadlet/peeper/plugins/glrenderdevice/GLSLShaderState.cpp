@@ -28,8 +28,6 @@
 #include "GLSLVertexLayout.h"
 #include "GLRenderDevice.h"
 
-using namespace toadlet::egg;
-
 namespace toadlet{
 namespace peeper{
 

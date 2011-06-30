@@ -42,8 +42,6 @@ extern "C"{
 	#pragma comment(lib,TOADLET_LIBJPEG_NAME)
 #endif
 
-using namespace toadlet::egg::io;
-
 namespace toadlet{
 namespace egg{
 namespace image{

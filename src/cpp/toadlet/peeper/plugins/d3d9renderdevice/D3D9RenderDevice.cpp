@@ -46,7 +46,6 @@
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/Viewport.h>
 
-using namespace toadlet::egg;
 using namespace toadlet::egg::MathConversion;
 
 #if defined(TOADLET_SET_D3DM)

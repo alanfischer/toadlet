@@ -26,8 +26,6 @@
 #include "D3D9WindowRenderTarget.h"
 #include <toadlet/egg/Error.h>
 
-using namespace toadlet::egg;
-
 namespace toadlet{
 namespace peeper{
 

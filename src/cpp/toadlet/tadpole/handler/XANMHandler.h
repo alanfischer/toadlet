@@ -41,8 +41,8 @@ public:
 
 	XANMHandler();
 
-	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
-	bool save(TransformSequence::ptr resource,egg::io::Stream::ptr stream,ProgressListener *listener=NULL);
+	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData);
+	bool save(TransformSequence::ptr resource,Stream::ptr stream,ProgressListener *listener=NULL);
 
 protected:
 	TransformSequence::ptr loadSequenceVersion1(mxml_node_t *root);

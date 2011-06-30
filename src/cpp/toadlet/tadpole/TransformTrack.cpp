@@ -25,8 +25,6 @@
 
 #include <toadlet/tadpole/TransformTrack.h>
 
-using namespace toadlet::egg;
-
 namespace toadlet{
 namespace tadpole{
 

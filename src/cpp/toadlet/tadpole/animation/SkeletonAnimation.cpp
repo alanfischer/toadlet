@@ -28,9 +28,6 @@
 #include <toadlet/tadpole/node/MeshNodeSkeleton.h>
 #include <toadlet/egg/Error.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::tadpole::node;
-
 namespace toadlet{
 namespace tadpole{
 namespace animation{

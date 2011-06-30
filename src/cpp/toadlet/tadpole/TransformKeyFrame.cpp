@@ -27,8 +27,6 @@
 #include <toadlet/tadpole/node/Node.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 
-using namespace toadlet::tadpole::node;
-
 namespace toadlet{
 namespace tadpole{
 

@@ -31,6 +31,9 @@
 
 namespace toadlet{
 namespace egg{
+namespace io{};
+using namespace io;
+
 namespace io{
 
 class Stream{

@@ -26,7 +26,6 @@
 #ifndef TOADLET_TADPOLE_HANDLER_XMLMESHUTILITIES_H
 #define TOADLET_TADPOLE_HANDLER_XMLMESHUTILITIES_H
 
-#include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/BufferManager.h>
 #include <toadlet/tadpole/MaterialManager.h>
 #include <toadlet/tadpole/TextureManager.h>
@@ -51,7 +50,7 @@ public:
 	static const char *mxmlSaveCallback(mxml_node_t *node,int ws);
 
 	static int parseInt(const char *string);
-	static egg::String makeInt(int i);
+	static String makeInt(int i);
 
 	static Material::ptr loadMaterial(mxml_node_t *node,int version,MaterialManager *materialManager,TextureManager *textureManager);
 	static mxml_node_t *saveMaterial(Material::ptr material,int version,ProgressListener *listener);

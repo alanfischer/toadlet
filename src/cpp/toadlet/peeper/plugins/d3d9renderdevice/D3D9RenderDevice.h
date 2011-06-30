@@ -96,7 +96,7 @@ public:
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
 	int getCloseTextureFormat(int format,int usage);
 	int getCloseTextureFormat(int format);
-	bool getShaderProfileSupported(const egg::String &profile);
+	bool getShaderProfileSupported(const String &profile);
 	bool getRenderCaps(RenderCaps &caps){caps.set(mCaps);return true;}
 	const RenderCaps &getCaps() const{return mCaps;}
 

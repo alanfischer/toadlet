@@ -27,9 +27,6 @@
 #include <toadlet/tadpole/node/PartitionNode.h>
 #include <toadlet/tadpole/Scene.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::peeper;
-
 namespace toadlet{
 namespace tadpole{
 namespace node{

@@ -37,12 +37,12 @@ class StreamIStream:public IStream{
 public:
 	TOADLET_INTRUSIVE_POINTERS(StreamIStream);
 	
-	StreamIStream(egg::io::Stream::ptr base):
-		mPointerCounter(new egg::PointerCounter(0)),
+	StreamIStream(Stream::ptr base):
+		mPointerCounter(new PointerCounter(0)),
 		mBase(base)
 	{}
 
-	egg::PointerCounter *pointerCounter(){return mPointerCounter;}
+	PointerCounter *pointerCounter(){return mPointerCounter;}
 
 	HRESULT STDMETHODCALLTYPE QueryInterface(const IID &riid,void **ppvObject){return E_NOINTERFACE;}
 	ULONG STDMETHODCALLTYPE AddRef(){return mPointerCounter->incSharedCount();}
@@ -96,8 +96,8 @@ public:
 	HRESULT STDMETHODCALLTYPE Clone(IStream **ppstm){return E_NOTIMPL;}
 
 protected:
-	egg::PointerCounter *mPointerCounter;
-	egg::io::Stream::ptr mBase;
+	PointerCounter *mPointerCounter;
+	Stream::ptr mBase;
 };
 
 }

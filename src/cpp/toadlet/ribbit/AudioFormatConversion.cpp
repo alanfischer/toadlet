@@ -29,9 +29,6 @@
 #include <toadlet/ribbit/AudioFormatConversion.h>
 #include <string.h> //memcpy
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-
 namespace toadlet{
 namespace ribbit{
 

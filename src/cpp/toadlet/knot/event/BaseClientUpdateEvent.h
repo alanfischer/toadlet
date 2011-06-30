@@ -27,6 +27,7 @@
 #define TOADLET_KNOT_EVENT_BASECLIENTUPDATEEVENT_H
 
 #include <toadlet/egg/Event.h>
+#include <toadlet/knot/Types.h>
 
 namespace toadlet{
 namespace knot{
@@ -34,7 +35,7 @@ namespace event{
 
 // This event is sent from the client each frame with the client dt and commands
 //  The Counter could be replaced with a reliable packet sequence number, but that is not implemented yet
-class BaseClientUpdateEvent:public egg::Event{
+class BaseClientUpdateEvent:public Event{
 public:
 	TOADLET_SHARED_POINTERS(BaseClientUpdateEvent);
 
@@ -53,7 +54,7 @@ public:
 	int getLastServerFrameNumber(){return mLastServerFrameNumber;}
 	int getDT(){return mDT;}
 
-	virtual int read(egg::io::DataStream *stream){
+	virtual int read(DataStream *stream){
 		int amount=0;
 		mClientFrameNumber=stream->readBInt32();amount+=4;
 		mLastServerFrameNumber=stream->readBInt32();amount+=4;
@@ -61,7 +62,7 @@ public:
 		return amount;
 	}
 
-	virtual int write(egg::io::DataStream *stream){
+	virtual int write(DataStream *stream){
 		int amount=0;
 		amount+=stream->writeBInt32(mClientFrameNumber);
 		amount+=stream->writeBInt32(mLastServerFrameNumber);

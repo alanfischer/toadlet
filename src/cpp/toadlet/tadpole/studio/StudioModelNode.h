@@ -40,7 +40,7 @@ namespace studio{
 
 class StudioModelController;
 
-class TOADLET_API StudioModelNode:public node::Node,public DetailTraceable,public Renderable,public Attachable,public Visible{
+class TOADLET_API StudioModelNode:public Node,public DetailTraceable,public Renderable,public Attachable,public Visible{
 public:
 	TOADLET_NODE(StudioModelNode,Node);
 
@@ -53,7 +53,7 @@ public:
 		Material *getRenderMaterial() const{return material;}
 		const Transform &getRenderTransform() const{return modelNode->getWorldTransform();}
 		const Bound &getRenderBound() const{return modelNode->getRenderBound();}
-		void render(peeper::RenderDevice *renderDevice) const;
+		void render(RenderDevice *renderDevice) const;
 
 		StudioModelNode *modelNode;
 		StudioModel::ptr model;
@@ -76,7 +76,7 @@ public:
 	void logicUpdate(int dt,int scope);
 	void frameUpdate(int dt,int scope);
 
-	void setModel(const egg::String &name);
+	void setModel(const String &name);
 	void setModel(StudioModel::ptr model);
 	StudioModel::ptr getModel() const{return mModel;}
 
@@ -124,19 +124,19 @@ public:
 	// Visible
 	bool getRendered() const{return mRendered;}
 	void setRendered(bool rendered){mRendered=rendered;}
-	peeper::RenderState::ptr getSharedRenderState();
-	void gatherRenderables(node::CameraNode *camera,RenderableSet *set);
+	RenderState::ptr getSharedRenderState();
+	void gatherRenderables(CameraNode *camera,RenderableSet *set);
 
 	// Renderable
 	Material *getRenderMaterial() const{return mSkeletonMaterial;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
-	void render(peeper::RenderDevice *renderDevice) const;
+	void render(RenderDevice *renderDevice) const;
 
 	// Attachable
 	int getNumAttachments(){return mModel->header->numattachments;}
-	egg::String getAttachmentName(int index){return mModel->attachment(index)->name;}
-	int getAttachmentIndex(const egg::String &name);
+	String getAttachmentName(int index){return mModel->attachment(index)->name;}
+	int getAttachmentIndex(const String &name);
 	bool getAttachmentTransform(Transform &result,int index);
 
 	static void setQuaternionFromEulerAngleStudio(Quaternion &r,const EulerAngle &euler);
@@ -155,7 +155,7 @@ protected:
 
 	bool mRendered;
 	StudioModel::ptr mModel;
-	egg::Collection<SubModel::ptr> mSubModels;
+	Collection<SubModel::ptr> mSubModels;
 
 	int mBodypartIndex;
 	int mModelIndex;
@@ -168,25 +168,25 @@ protected:
 	scalar mBlenderValues[4],mAdjustedBlenderValues[4];
 	StudioModelNode::ptr mLink;
 	StudioModel::ptr mLinkModel;
-	animation::Controller::ptr mController,mGaitController;
+	Controller::ptr mController,mGaitController;
 
 	Vector3 mChromeForward,mChromeRight;
-	egg::Collection<Vector3> mBoneTranslates;
-	egg::Collection<Quaternion> mBoneRotates;
-	egg::Collection<int16> mBoneLinks;
-	egg::Collection<Vector3> mTransformedVerts;
-	egg::Collection<Vector3> mTransformedNorms;
-	egg::Collection<Vector2> mTransformedChromes;
-	peeper::VertexBuffer::ptr mVertexBuffer;
-	peeper::VertexData::ptr mVertexData;
+	Collection<Vector3> mBoneTranslates;
+	Collection<Quaternion> mBoneRotates;
+	Collection<int16> mBoneLinks;
+	Collection<Vector3> mTransformedVerts;
+	Collection<Vector3> mTransformedNorms;
+	Collection<Vector2> mTransformedChromes;
+	VertexBuffer::ptr mVertexBuffer;
+	VertexData::ptr mVertexData;
 
 	Material::ptr mSkeletonMaterial;
-	peeper::VertexBuffer::ptr mSkeletonVertexBuffer;
-	peeper::VertexData::ptr mSkeletonVertexData;
-	peeper::IndexData::ptr mSkeletonIndexData;
-	peeper::VertexBuffer::ptr mHitBoxVertexBuffer;
-	peeper::VertexData::ptr mHitBoxVertexData;
-	peeper::IndexData::ptr mHitBoxIndexData;
+	VertexBuffer::ptr mSkeletonVertexBuffer;
+	VertexData::ptr mSkeletonVertexData;
+	IndexData::ptr mSkeletonIndexData;
+	VertexBuffer::ptr mHitBoxVertexBuffer;
+	VertexData::ptr mHitBoxVertexData;
+	IndexData::ptr mHitBoxIndexData;
 };
 
 }

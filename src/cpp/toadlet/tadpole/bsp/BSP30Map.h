@@ -31,8 +31,8 @@
 #include <toadlet/tadpole/bsp/BSP30Types.h>
 #include <toadlet/tadpole/Collision.h>
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/TextureManager.h>
+#include <toadlet/tadpole/material/Material.h>
 
 #include <string.h> // memset
 
@@ -40,7 +40,7 @@ namespace toadlet{
 namespace tadpole{
 namespace bsp{
 
-class TOADLET_API BSP30Map:public egg::BaseResource{
+class TOADLET_API BSP30Map:public BaseResource{
 public:
 	TOADLET_BASERESOURCE_PASSTHROUGH(BaseResource);
 	TOADLET_SHARED_POINTERS(BSP30Map);
@@ -61,11 +61,11 @@ public:
 	void updateFaceLights(int faceIndex);
 
 	// This assumes the material has already been set, and just sets the lightmap
-	void renderFaces(peeper::RenderDevice *renderDevice,facedata *faces);
+	void renderFaces(RenderDevice *renderDevice,facedata *faces);
 
 	static int findPointLeaf(bplane *planes,void *hull,int hullStride,int index,const Vector3 &point);
 	static bool hullTrace(Collision &result,bplane *planes,bleaf *leafs,void *hull,int hullStride,int index,scalar p1t,scalar p2t,const Vector3 &p1,const Vector3 &p2,scalar epsilon,int stopContentsBits,int *lastIndex);
-	static void findBoundLeafs(egg::Collection<int> &leafs,bnode *hull,int index,const AABox &box);
+	static void findBoundLeafs(Collection<int> &leafs,bnode *hull,int index,const AABox &box);
 
 	static bool testIntersection(bnode *node,const AABox &box){
 		return	!(Math::fromInt(node->mins[0])>box.maxs.x || Math::fromInt(node->mins[1])>box.maxs.y || Math::fromInt(node->mins[2])>box.maxs.z ||
@@ -76,7 +76,7 @@ public:
 		facedata():index(0),lightmapIndex(0),visible(true),next(NULL){memset(lastStyleIntensities,0,sizeof(lastStyleIntensities));}
 
 		int index;
-		peeper::IndexData::ptr indexData;
+		IndexData::ptr indexData;
 		int lightmapIndex;
 		int lightmapSize[2];
 		int lightmapCoord[2];
@@ -86,9 +86,9 @@ public:
 	};
 
 	struct keyvalue{
-		keyvalue(const egg::String &k=(char*)NULL,const egg::String &v=(char*)NULL):key(k),value(v){}
+		keyvalue(const String &k=(char*)NULL,const String &v=(char*)NULL):key(k),value(v){}
 
-		egg::String key,value;
+		String key,value;
 	};
 
 	bheader header;
@@ -110,19 +110,19 @@ public:
 
 	Engine *engine;
 	bmiptexlump *miptexlump;
-	egg::Collection<egg::Collection<int> > parsedVisibility;
-	egg::Collection<egg::Collection<keyvalue> > parsedEntities;
-	egg::Collection<peeper::Texture::ptr> parsedTextures;
-	egg::Collection<Material::ptr> materials;
-	peeper::VertexData::ptr vertexData;
-	egg::Collection<facedata> facedatas;
-	egg::image::Image::ptr lightmapImage;
-	egg::Collection<peeper::Texture::ptr> lightmapTextures;
-	egg::Collection<bool> lightmapDirties;
-egg::Collection<egg::image::Image::ptr> lightmapImages; /// @todo: Just modify portions of the texture
+	Collection<Collection<int> > parsedVisibility;
+	Collection<Collection<keyvalue> > parsedEntities;
+	Collection<Texture::ptr> parsedTextures;
+	Collection<Material::ptr> materials;
+	VertexData::ptr vertexData;
+	Collection<facedata> facedatas;
+	Image::ptr lightmapImage;
+	Collection<Texture::ptr> lightmapTextures;
+	Collection<bool> lightmapDirties;
+	Collection<Image::ptr> lightmapImages; /// @todo: Just modify portions of the texture
 	int lightmapAllocated[LIGHTMAP_SIZE];
 	uint8 styleIntensities[256];
-	egg::Collection<node::NodeResource::ptr> modelResources;
+	Collection<NodeResource::ptr> modelResources;
 };
 
 }

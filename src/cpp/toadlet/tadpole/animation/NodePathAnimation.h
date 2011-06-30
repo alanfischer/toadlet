@@ -38,11 +38,11 @@ class TOADLET_API NodePathAnimation:public Animatable{
 public:
 	TOADLET_SHARED_POINTERS(NodePathAnimation);
 
-	NodePathAnimation(node::Node::ptr target);
+	NodePathAnimation(Node::ptr target);
 	virtual ~NodePathAnimation(){}
 
-	void setTarget(node::Node::ptr target);
-	inline node::Node::ptr getTarget() const{return mTarget;}
+	void setTarget(Node::ptr target);
+	inline Node::ptr getTarget() const{return mTarget;}
 
 	void setTrack(TransformTrack::ptr track);
 	inline TransformTrack::ptr getTrack() const{return mTrack;}
@@ -56,7 +56,7 @@ public:
 	scalar getMax() const;
 
 protected:
-	node::Node::ptr mTarget;
+	Node::ptr mTarget;
 	TransformTrack::ptr mTrack;
 	bool mUseLookAt;
 	Vector3 mLookAt;

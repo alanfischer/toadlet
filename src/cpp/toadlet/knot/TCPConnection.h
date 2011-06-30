@@ -48,13 +48,13 @@ class TOADLET_API TCPConnection:public Connection{
 public:
 	TOADLET_SHARED_POINTERS(TCPConnection);
 
-	TCPConnection(egg::net::Socket::ptr socket=egg::net::Socket::ptr()); // Supply a socket to use, this lets the socket be controlled externally
+	TCPConnection(Socket::ptr socket=Socket::ptr()); // Supply a socket to use, this lets the socket be controlled externally
 	virtual ~TCPConnection();
 
 	bool connect(uint32 remoteHost,int remotePort);
-	bool connect(egg::net::Socket::ptr socket);
+	bool connect(Socket::ptr socket);
 	bool accept(int localPort);
-	bool accept(egg::net::Socket::ptr socket);
+	bool accept(Socket::ptr socket);
 
 	void close();
 	bool closed(){return mSocket->closed();}
@@ -62,7 +62,7 @@ public:
 	int send(const tbyte *data,int length);
 	int receive(tbyte *data,int length);
 
-	egg::net::Socket::ptr getSocket(){return mSocket;}
+	Socket::ptr getSocket(){return mSocket;}
 
 	// Due to the use of unintrusive smart pointers, we don't actually expose a setConnectionListener(ConnectionListener*) method
 	//  Instead that is left to the Connectors, since they can figure out which smart pointer cooresponds to a raw pointer
@@ -95,25 +95,25 @@ protected:
 	const static int CONNECTION_PACKET_LENGTH;
 	const static int CONNECTION_VERSION;
 
-	int buildConnectionPacket(egg::io::DataStream *stream);
-	bool verifyConnectionPacket(egg::io::DataStream *stream);
+	int buildConnectionPacket(DataStream *stream);
+	bool verifyConnectionPacket(DataStream *stream);
 
 	bool mClient;
 	bool mBlocking;
-	egg::net::Socket::ptr mSocket;
-	egg::io::MemoryStream::ptr mOutPacket;
-	egg::io::DataStream::ptr mDataOutPacket;
-	egg::io::MemoryStream::ptr mInPacket;
-	egg::io::DataStream::ptr mDataInPacket;
+	Socket::ptr mSocket;
+	MemoryStream::ptr mOutPacket;
+	DataStream::ptr mDataOutPacket;
+	MemoryStream::ptr mInPacket;
+	DataStream::ptr mDataInPacket;
 	TCPConnector *mConnectionListener;
 
-	egg::Mutex::ptr mMutex;
-	egg::Collection<Packet::ptr> mPackets;
-	egg::Collection<Packet::ptr> mFreePackets;
+	Mutex::ptr mMutex;
+	Collection<Packet::ptr> mPackets;
+	Collection<Packet::ptr> mFreePackets;
 	bool mReceiving;
 	bool mReceiveError;
 
-	egg::Random mDebugRandom;
+	Random mDebugRandom;
 	int mDebugPacketDelayMinTime;
 	int mDebugPacketDelayMaxTime;
 

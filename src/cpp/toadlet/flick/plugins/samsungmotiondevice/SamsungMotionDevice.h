@@ -48,7 +48,7 @@
 namespace toadlet{
 namespace flick{
 
-class SamsungMotionDevice:public FilteredMotionDevice,public egg::Runnable{
+class SamsungMotionDevice:public FilteredMotionDevice,public Runnable{
 public:
 	SamsungMotionDevice();
 	virtual ~SamsungMotionDevice();
@@ -84,10 +84,10 @@ protected:
 
 	// The Outer/Inner mutex setup is done so we can have the motion detecting loop call
 	// the listener, and have that callback safely null out the listener in the motion Device
-	egg::Mutex mOuterMutex;
-	egg::Mutex mInnerMutex;
+	Mutex mOuterMutex;
+	Mutex mInnerMutex;
 	bool mListenerLocked;
-	egg::Thread *mPollThread;
+	Thread *mPollThread;
 };
 
 }

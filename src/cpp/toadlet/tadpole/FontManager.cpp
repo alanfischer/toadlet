@@ -30,9 +30,6 @@
 	#include <shlobj.h>
 #endif
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-
 namespace toadlet{
 namespace tadpole{
 
@@ -40,7 +37,7 @@ FontManager::FontManager(Archive *archive):ResourceManager(archive){
 	mDefaultCharacterSet=String("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()_+|{}:\"'<>?`-=\\/[];,. \t");
 }
 
-Resource::ptr FontManager::manage(const Resource::ptr &resource,const egg::String &name){
+Resource::ptr FontManager::manage(const Resource::ptr &resource,const String &name){
 	if(name!=(char*)NULL){
 		ResourceManager::manage(resource,name+String(":")+shared_static_cast<Font>(resource)->getPointSize());
 	}

@@ -40,12 +40,12 @@ class TOADLET_API SimpleServer:public ConnectionListener{
 public:
 	TOADLET_SHARED_POINTERS(SimpleServer);
 
-	SimpleServer(egg::EventFactory *eventFactory=NULL,Connector::ptr connector=Connector::ptr());
+	SimpleServer(EventFactory *eventFactory=NULL,Connector::ptr connector=Connector::ptr());
 	virtual ~SimpleServer();
 
 	virtual void close();
-	virtual void setEventFactory(egg::EventFactory *eventFactory);
-	virtual egg::EventFactory *getEventFactory(){return mEventFactory;}
+	virtual void setEventFactory(EventFactory *eventFactory);
+	virtual EventFactory *getEventFactory(){return mEventFactory;}
 
 	virtual void setConnector(Connector::ptr connector);
 	virtual Connector::ptr getConnector(){return mConnector;}
@@ -53,9 +53,9 @@ public:
 	virtual void addEventConnectionListener(EventConnectionListener *listener,bool notifyAboutCurrent);
 	virtual void removeEventConnectionListener(EventConnectionListener *listener,bool notifyAboutCurrent);
 
-	virtual bool broadcast(egg::Event::ptr event);
-	virtual bool sendToClient(int toClientID,egg::Event::ptr event);
-	virtual egg::Event::ptr receive();
+	virtual bool broadcast(Event::ptr event);
+	virtual bool sendToClient(int toClientID,Event::ptr event);
+	virtual Event::ptr receive();
 	virtual EventConnection::ptr getClient(int i);
 	virtual EventConnection::ptr getClient(Connection::ptr connection);
 	virtual EventConnection::ptr getClient(EventConnection *connection); // Only needed to get the smart pointer
@@ -70,27 +70,27 @@ protected:
 	public:
 		TOADLET_SHARED_POINTERS(ServerClient);
 
-		ServerClient(SimpleServer *server,egg::EventFactory *factory,Connection::ptr connection);
+		ServerClient(SimpleServer *server,EventFactory *factory,Connection::ptr connection);
 
 	protected:
-		bool eventReceived(egg::Event::ptr event);
+		bool eventReceived(Event::ptr event);
 
 		SimpleServer *mServer;
 	};
 
-	virtual bool eventReceived(ServerClient *client,egg::Event::ptr event);
+	virtual bool eventReceived(ServerClient *client,Event::ptr event);
 	
 	virtual void notifyListenersConnected(EventConnection *connection);
 	virtual void notifyListenersDisconnected(EventConnection *connection);
 
-	egg::EventFactory *mEventFactory;
+	EventFactory *mEventFactory;
 	Connector::ptr mConnector;
-	egg::Collection<ServerClient::ptr> mClients;
-	egg::Collection<ServerClient::ptr> mDeadClients;
-	egg::Map<Connection::ptr,ServerClient::ptr> mConnectionClients;
-	egg::Mutex mClientsMutex;
-	egg::Collection<EventConnectionListener*> mListeners;
-	egg::Mutex mListenersMutex;
+	Collection<ServerClient::ptr> mClients;
+	Collection<ServerClient::ptr> mDeadClients;
+	Map<Connection::ptr,ServerClient::ptr> mConnectionClients;
+	Mutex mClientsMutex;
+	Collection<EventConnectionListener*> mListeners;
+	Mutex mListenersMutex;
 };
 
 }

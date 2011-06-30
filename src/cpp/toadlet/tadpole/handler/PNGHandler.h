@@ -40,8 +40,8 @@ public:
 
 	PNGHandler(TextureManager *textureManager){mTextureManager=textureManager;}
 
-	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData){
-		egg::image::Image::ptr image(mHandler.loadImage(stream));
+	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData){
+		Image::ptr image(mHandler.loadImage(stream));
 		if(image!=NULL){
 			return mTextureManager->createTexture(image);
 		}
@@ -50,7 +50,7 @@ public:
 		}
 	}
 
-	bool save(peeper::Texture::ptr resource,egg::io::Stream::ptr stream){
+	bool save(Texture::ptr resource,Stream::ptr stream){
 		return mHandler.saveImage(mTextureManager->createImage(resource),stream);
 	}
 

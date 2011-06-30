@@ -32,10 +32,6 @@
 #include <stdlib.h>
 #include <string.h> // memcpy
 
-using namespace toadlet::egg;
-using namespace toadlet::peeper;
-using namespace toadlet::tadpole::animation;
-
 namespace toadlet{
 namespace tadpole{
 namespace node{

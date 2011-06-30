@@ -47,31 +47,31 @@ public:
 	virtual void destroy();
 
 	virtual bool addElement(int semantic,int index,int format){return addElement(semantic,(char*)NULL,index,format);}
-	virtual bool addElement(const egg::String &name,int index,int format){return addElement(Semantic_UNKNOWN,name,index,format);}
-	virtual bool addElement(int semantic,const egg::String &name,int index,int format);
+	virtual bool addElement(const String &name,int index,int format){return addElement(Semantic_UNKNOWN,name,index,format);}
+	virtual bool addElement(int semantic,const String &name,int index,int format);
 	virtual int getNumElements() const{return mSemantics.size();}
 	virtual int getSemantic(int i) const{return mSemantics[i];}
-	virtual egg::String getName(int i) const{return mNames[i];}
+	virtual String getName(int i) const{return mNames[i];}
 	virtual int getIndex(int i) const{return mIndexes[i];}
 	virtual int getFormat(int i) const{return mFormats[i];}
 	virtual int getOffset(int i) const{return mOffsets[i];}
 	virtual int getVertexSize() const{return mVertexSize;}
 	virtual int findElement(int semantic);
-	virtual int findElement(const egg::String &name);
+	virtual int findElement(const String &name);
 
 	virtual void setBack(VertexFormat::ptr back);
 	virtual VertexFormat::ptr getBack(){return mBack;}
 	
-	static int getSemanticFromName(const egg::String &name);
-	static egg::String getNameFromSemantic(int semantic);
+	static int getSemanticFromName(const String &name);
+	static String getNameFromSemantic(int semantic);
 
 protected:
 	VertexFormatDestroyedListener *mListener;
-	egg::Collection<int> mSemantics;
-	egg::Collection<egg::String> mNames;
-	egg::Collection<int> mIndexes;
-	egg::Collection<int> mFormats;
-	egg::Collection<int> mOffsets;
+	Collection<int> mSemantics;
+	Collection<String> mNames;
+	Collection<int> mIndexes;
+	Collection<int> mFormats;
+	Collection<int> mOffsets;
 	int mVertexSize;
 	
 	VertexFormat::ptr mBack;

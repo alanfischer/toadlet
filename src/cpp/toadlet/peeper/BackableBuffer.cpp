@@ -30,9 +30,6 @@
 #include <toadlet/peeper/RenderDevice.h>
 #include <string.h> // memcpy
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::image;
-
 namespace toadlet{
 namespace peeper{
 

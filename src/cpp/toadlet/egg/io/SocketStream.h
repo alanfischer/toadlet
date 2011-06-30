@@ -28,7 +28,6 @@
 
 #include <toadlet/egg/io/Stream.h>
 #include <toadlet/egg/net/Socket.h>
-#include <stdio.h>
 
 namespace toadlet{
 namespace egg{
@@ -38,7 +37,7 @@ class TOADLET_API SocketStream:public Stream{
 public:
 	TOADLET_SHARED_POINTERS(SocketStream);
 
-	SocketStream(net::Socket::ptr socket);
+	SocketStream(Socket::ptr socket);
 	virtual ~SocketStream();
 
 	virtual void close(){mSocket->close();}
@@ -56,7 +55,7 @@ public:
 	virtual bool seek(int offs){return false;}
 
 protected:
-	net::Socket::ptr mSocket;
+	Socket::ptr mSocket;
 };
 
 }

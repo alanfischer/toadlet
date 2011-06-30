@@ -27,26 +27,27 @@
 #define TOADLET_KNOT_EVENT_ROUTEDEVENT_H
 
 #include <toadlet/egg/Event.h>
+#include <toadlet/knot/Types.h>
 
 namespace toadlet{
 namespace knot{
 namespace event{
 
 /// @todo: Replace IDs with an Address structure
-class RoutedEvent:public egg::Event{
+class RoutedEvent:public Event{
 public:
 	TOADLET_SHARED_POINTERS(RoutedEvent);
 
-	RoutedEvent(egg::Event::ptr event,int sourceID,int destinationID):egg::Event(Type_ROUTED),mEvent(event),mSourceID(sourceID),mDestinationID(destinationID){}
+	RoutedEvent(Event::ptr event,int sourceID,int destinationID):Event(Type_ROUTED),mEvent(event),mSourceID(sourceID),mDestinationID(destinationID){}
 
-	egg::Event *getRootEvent(){return mEvent;}
+	Event *getRootEvent(){return mEvent;}
 
 	// RoutedEvents do not send themselves over the connection, instead they are left to the Connections to deal with
-	int read(egg::io::DataStream *stream){return mEvent->read(stream);}
-	int write(egg::io::DataStream *stream){return mEvent->write(stream);}
+	int read(DataStream *stream){return mEvent->read(stream);}
+	int write(DataStream *stream){return mEvent->write(stream);}
 
-	void setEvent(egg::Event::ptr event){mEvent=event;}
-	egg::Event::ptr getEvent(){return mEvent;}
+	void setEvent(Event::ptr event){mEvent=event;}
+	Event::ptr getEvent(){return mEvent;}
 	
 	void setSourceID(int sourceID){mSourceID=sourceID;}
 	int getSourceID(){return mSourceID;}
@@ -55,7 +56,7 @@ public:
 	int getDestinationID(){return mDestinationID;}
 	
 protected:
-	egg::Event::ptr mEvent;
+	Event::ptr mEvent;
 	int mSourceID;
 	int mDestinationID;
 };

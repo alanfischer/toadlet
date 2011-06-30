@@ -25,8 +25,6 @@
 
 #include <toadlet/egg/io/SocketStream.h>
 
-using namespace toadlet::egg::net;
-
 namespace toadlet{
 namespace egg{
 namespace io{

@@ -28,17 +28,17 @@
 
 #include <toadlet/tadpole/Types.h>
 #include <toadlet/egg/BaseResource.h>
-#include <toadlet/tadpole/Material.h>
 #include <toadlet/peeper/IndexData.h>
 #include <toadlet/peeper/VertexData.h>
 #include <toadlet/tadpole/Bound.h>
 #include <toadlet/tadpole/Transform.h>
 #include <toadlet/tadpole/Skeleton.h>
+#include <toadlet/tadpole/material/MaterialResource.h>
 
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API Mesh:public egg::BaseResource{
+class TOADLET_API Mesh:public BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(Mesh);
 
@@ -49,13 +49,13 @@ public:
 		SubMesh():hasOwnTransform(false){}
 		virtual ~SubMesh(){}
 
-		peeper::VertexData::ptr vertexData;
-		peeper::IndexData::ptr indexData;
+		VertexData::ptr vertexData;
+		IndexData::ptr indexData;
 		
-		Material::ptr material; // Must be retained when assigned
-		egg::String materialName;
+		MaterialResource::ptr material;
+		String materialName;
 
-		egg::String name;
+		String name;
 
 		bool hasOwnTransform;
 		Transform transform;
@@ -76,7 +76,7 @@ public:
 		scalar weight;
 	};
 
-	typedef egg::Collection<VertexBoneAssignment> VertexBoneAssignmentList;
+	typedef Collection<VertexBoneAssignment> VertexBoneAssignmentList;
 
 	Mesh();
 	virtual ~Mesh();
@@ -96,24 +96,24 @@ public:
 	void removeSubMesh(SubMesh::ptr subMesh){mSubMeshes.remove(subMesh);}
 	int getNumSubMeshes() const{return mSubMeshes.size();}
 	SubMesh::ptr getSubMesh(int i){return mSubMeshes[i];}
-	SubMesh::ptr getSubMesh(const egg::String &name);
+	SubMesh::ptr getSubMesh(const String &name);
 
-	void setStaticVertexData(peeper::VertexData::ptr vertexData);
-	peeper::VertexData::ptr getStaticVertexData(){return mStaticVertexData;}
+	void setStaticVertexData(VertexData::ptr vertexData);
+	VertexData::ptr getStaticVertexData(){return mStaticVertexData;}
 
 	void setSkeleton(Skeleton::ptr skeleton);
 	Skeleton::ptr getSkeleton() const{return mSkeleton;}
 
-	void setVertexBoneAssignments(const egg::Collection<VertexBoneAssignmentList> &assignments){mVertexBoneAssignments=assignments;}
-	const egg::Collection<VertexBoneAssignmentList> &getVertexBoneAssignments() const{return mVertexBoneAssignments;}
+	void setVertexBoneAssignments(const Collection<VertexBoneAssignmentList> &assignments){mVertexBoneAssignments=assignments;}
+	const Collection<VertexBoneAssignmentList> &getVertexBoneAssignments() const{return mVertexBoneAssignments;}
 
 protected:
 	Transform mTransform;
 	Bound mBound;
-	egg::Collection<SubMesh::ptr> mSubMeshes;
-	peeper::VertexData::ptr mStaticVertexData;
+	Collection<SubMesh::ptr> mSubMeshes;
+	VertexData::ptr mStaticVertexData;
 	Skeleton::ptr mSkeleton;
-	egg::Collection<VertexBoneAssignmentList> mVertexBoneAssignments;
+	Collection<VertexBoneAssignmentList> mVertexBoneAssignments;
 };
 
 }

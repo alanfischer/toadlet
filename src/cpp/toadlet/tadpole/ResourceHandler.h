@@ -29,6 +29,7 @@
 #include <toadlet/egg/Resource.h>
 #include <toadlet/egg/io/Stream.h>
 #include <toadlet/tadpole/ResourceHandlerData.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -45,7 +46,7 @@ public:
 
 	virtual ~ResourceHandler(){}
 
-	virtual egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData)=0;
+	virtual Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData)=0;
 };
 
 }

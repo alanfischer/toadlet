@@ -96,7 +96,7 @@ public:
 
 	// Misc operations
 	int getCloseTextureFormat(int textureFormat,int usage);
-	bool getShaderProfileSupported(const egg::String &profile);
+	bool getShaderProfileSupported(const String &profile);
 	void getShadowBiasMatrix(const Texture *shadowTexture,Matrix4x4 &result);
 	bool getRenderCaps(RenderCaps &caps){caps.set(mCaps);return true;}
 
@@ -133,8 +133,8 @@ protected:
 	D3D10RenderTarget *mD3DRenderTarget;
 
 	D3D10ShaderState *mLastShaderState;
-	egg::Collection<D3D10Shader*> mVertexShaders;
-	egg::Collection<D3D10VertexFormat*> mVertexFormats;
+	Collection<D3D10Shader*> mVertexShaders;
+	Collection<D3D10VertexFormat*> mVertexFormats;
 
 	RenderCaps mCaps;
 

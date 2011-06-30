@@ -43,14 +43,14 @@ public:
 	virtual void destroy();
 	virtual Node *set(Node *node);
 
-	bool setAudioBuffer(const egg::String &name);
-	bool setAudioBuffer(const ribbit::AudioBuffer::ptr &audioBuffer);
+	bool setAudioBuffer(const String &name);
+	bool setAudioBuffer(const AudioBuffer::ptr &audioBuffer);
 
-	bool setAudioStream(const egg::String &name);
-	bool setAudioStream(ribbit::AudioStream::ptr stream);
+	bool setAudioStream(const String &name);
+	bool setAudioStream(AudioStream::ptr stream);
 
-	ribbit::AudioBuffer::ptr getAudioBuffer(){return mAudio->getAudioBuffer();}
-	ribbit::AudioStream::ptr getAudioStream(){return mAudio->getAudioStream();}
+	AudioBuffer::ptr getAudioBuffer(){return mAudio->getAudioBuffer();}
+	AudioStream::ptr getAudioStream(){return mAudio->getAudioStream();}
 	
 	inline bool play(){if(mAudio!=NULL){return mAudio->play();}else{return false;}}
 	inline bool stop(){if(mAudio!=NULL){return mAudio->stop();}else{return false;}}
@@ -77,7 +77,7 @@ public:
 	inline void setVelocity(const Vector3 &velocity){if(mAudio!=NULL){mAudio->setVelocity(velocity);}}
 
 protected:
-	ribbit::Audio::ptr mAudio;
+	Audio::ptr mAudio;
 };
 
 }

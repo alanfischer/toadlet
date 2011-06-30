@@ -54,8 +54,8 @@ public:
 
 protected:
 	XVisualInfo *mVisualInfo;
-	egg::Collection<GLXContext> mThreadContexts;
-	egg::Collection<int> mThreadIDs;
+	Collection<GLXContext> mThreadContexts;
+	Collection<int> mThreadIDs;
 };
 
 }

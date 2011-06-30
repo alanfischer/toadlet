@@ -33,17 +33,16 @@ namespace toadlet{
 namespace tadpole{
 namespace node{
 
-class TOADLET_API NodeResource:public egg::BaseResource{
+class TOADLET_API NodeResource:public BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(NodeResource);
 
-	NodeResource(Node::ptr node=NULL):egg::BaseResource(){setNode(node);}
+	NodeResource(Node::ptr node=NULL):BaseResource(){setNode(node);}
 	virtual ~NodeResource(){}
 	void destroy(){mNode->destroy();}
 	
 	void setNode(Node::ptr node){mNode=node;}
 	Node::ptr getNode() const{return mNode;}
-	Node::ptr createNode(Scene *scene) const{return mNode->clone(scene);}
 
 protected:
 	Node::ptr mNode;

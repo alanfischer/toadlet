@@ -26,10 +26,6 @@
 #include <toadlet/tadpole/NodeManager.h>
 #include <toadlet/tadpole/Engine.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::tadpole::node;
-
 namespace toadlet{
 namespace tadpole{
 
@@ -39,7 +35,7 @@ NodeManager::NodeManager(Engine *engine):ResourceManager(engine->getArchiveManag
 
 Node::ptr NodeManager::createNode(NodeResource *resource,Scene *scene){
 	if(resource!=NULL){
-		return resource->createNode(scene);
+		return resource->getNode()->clone(scene);
 	}
 	else{
 		return NULL;

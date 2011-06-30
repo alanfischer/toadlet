@@ -60,7 +60,7 @@ protected:
 	D3D10RenderDevice *mDevice;
 
 	ShaderStateDestroyedListener *mListener;
-	egg::Collection<Shader::ptr> mShaders;
+	Collection<Shader::ptr> mShaders;
 
 	friend class D3D10RenderDevice;
 };

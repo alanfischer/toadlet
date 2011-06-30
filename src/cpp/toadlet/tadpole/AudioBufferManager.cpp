@@ -27,11 +27,6 @@
 #include <toadlet/tadpole/handler/AudioBufferHandler.h>
 #include <toadlet/tadpole/Engine.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::ribbit;
-using namespace toadlet::tadpole::handler;
-
 namespace toadlet{
 namespace tadpole{
 

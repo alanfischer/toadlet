@@ -33,7 +33,7 @@
 namespace toadlet{
 namespace peeper{
 
-class TOADLET_API BackableTexture:public egg::BaseResource,public Texture{
+class TOADLET_API BackableTexture:public BaseResource,public Texture{
 	TOADLET_BASERESOURCE_PASSTHROUGH(Texture);
 public:
 	TOADLET_SHARED_POINTERS(BackableTexture);
@@ -84,7 +84,7 @@ protected:
 	int mDataSize;
 	tbyte *mData;
 	Texture::ptr mBack;
-	egg::Collection<PixelBuffer::ptr> mBuffers;
+	Collection<PixelBuffer::ptr> mBuffers;
 };
 
 }

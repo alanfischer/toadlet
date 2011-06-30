@@ -36,7 +36,7 @@ namespace peeper{
 class D3D10RenderDevice;
 class D3D10TextureMipPixelBuffer;
 
-class TOADLET_API D3D10Texture:protected egg::BaseResource,public Texture{
+class TOADLET_API D3D10Texture:protected BaseResource,public Texture{
 	TOADLET_BASERESOURCE_PASSTHROUGH(Texture);
 public:
 	D3D10Texture(D3D10RenderDevice *renderDevice);
@@ -86,7 +86,7 @@ protected:
 
 	ID3D10Resource *mTexture;
 	ID3D10ShaderResourceView *mShaderResourceView;
-	egg::Collection<PixelBuffer::ptr> mBuffers;
+	Collection<PixelBuffer::ptr> mBuffers;
 
 	friend class D3D10RenderDevice;
 	friend class D3D10TextureMipPixelBuffer;

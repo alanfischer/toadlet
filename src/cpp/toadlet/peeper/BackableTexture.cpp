@@ -29,9 +29,6 @@
 #include <toadlet/peeper/RenderCaps.h>
 #include <string.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::image;
-
 namespace toadlet{
 namespace peeper{
 
@@ -402,8 +399,8 @@ if(closestFormat==0)closestFormat=Texture::Format_RGBA_8;
 		format=closestFormat;
 	}
 
-	egg::Collection<Image::ptr> mipImages;
-	egg::Collection<tbyte*> mipDatas;
+	Collection<Image::ptr> mipImages;
+	Collection<tbyte*> mipDatas;
 
 	mipImages.add(finalImage);
 	mipDatas.add(finalImage->getData());

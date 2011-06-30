@@ -59,15 +59,15 @@ public:
 		TOADLET_CHECK_WRITE();
 		TOADLET_ASSERT(i>=0 && i<=getSize()); // "index out of bounds"
 		if(mIndexFormat==IndexBuffer::IndexFormat_UINT8){
-			TOADLET_ASSERT(x<egg::Extents::MAX_UINT8); // "out of datatype range"
+			TOADLET_ASSERT(x<Extents::MAX_UINT8); // "out of datatype range"
 			((uint8*)mData)[i]=x;
 		}
 		else if(mIndexFormat==IndexBuffer::IndexFormat_UINT16){
-			TOADLET_ASSERT(x<egg::Extents::MAX_UINT16); // "out of datatype range"
+			TOADLET_ASSERT(x<Extents::MAX_UINT16); // "out of datatype range"
 			((uint16*)mData)[i]=x;
 		}
 		else{ // IndexBuffer::IndexFormat_UINT32
-			TOADLET_ASSERT(x<egg::Extents::MAX_UINT32); // "out of datatype range"
+			TOADLET_ASSERT(x<Extents::MAX_UINT32); // "out of datatype range"
 			((uint32*)mData)[i]=x;
 		}
 	}

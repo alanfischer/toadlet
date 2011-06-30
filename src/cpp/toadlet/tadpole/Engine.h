@@ -57,44 +57,44 @@ public:
 
 	void destroy();
 
-	bool setRenderDevice(peeper::RenderDevice *renderDevice);
-	peeper::RenderDevice *getRenderDevice() const;
+	bool setRenderDevice(RenderDevice *renderDevice);
+	RenderDevice *getRenderDevice() const;
 	void updateVertexFormats();
 
-	bool setAudioDevice(ribbit::AudioDevice *audioDevice);
-	ribbit::AudioDevice *getAudioDevice() const;
+	bool setAudioDevice(AudioDevice *audioDevice);
+	AudioDevice *getAudioDevice() const;
 
-	void setDirectory(const egg::String &directory){mArchiveManager->setDirectory(directory);}
-	const egg::String &getDirectory() const{return mArchiveManager->getDirectory();}
-	egg::io::Stream::ptr openStream(const egg::String &name){return mArchiveManager->openStream(name);}
+	void setDirectory(const String &directory){mArchiveManager->setDirectory(directory);}
+	const String &getDirectory() const{return mArchiveManager->getDirectory();}
+	Stream::ptr openStream(const String &name){return mArchiveManager->openStream(name);}
 
 	// Node methods
-	void registerNodeType(egg::BaseType<node::Node> *type);
-	node::Node *allocNode(egg::BaseType<node::Node> *type);
-	node::Node *allocNode(const egg::String &fullName);
-	node::Node *createNode(egg::BaseType<node::Node> *type,Scene *scene);
-	node::Node *createNode(const egg::String &fullName,Scene *scene);
-	int internal_registerNode(node::Node *node);
-	void internal_deregisterNode(node::Node *node);
-	void destroyNode(node::Node *node);
-	void freeNode(node::Node *node);
+	void registerNodeType(BaseType<Node> *type);
+	Node *allocNode(BaseType<Node> *type);
+	Node *allocNode(const String &fullName);
+	Node *createNode(BaseType<Node> *type,Scene *scene);
+	Node *createNode(const String &fullName,Scene *scene);
+	int internal_registerNode(Node *node);
+	void internal_deregisterNode(Node *node);
+	void destroyNode(Node *node);
+	void freeNode(Node *node);
 
-	template<typename Type> Type *allocNodeType(egg::Type<Type,node::Node> *type){return (Type*)allocNode(type);}
-	template<typename Type> Type *createNodeType(egg::Type<Type,node::Node> *type,Scene *scene){return (Type*)createNode(type,scene);}
+	template<typename Type> Type *allocNodeType(egg::Type<Type,Node> *type){return (Type*)allocNode(type);}
+	template<typename Type> Type *createNodeType(egg::Type<Type,Node> *type,Scene *scene){return (Type*)createNode(type,scene);}
 
-	inline node::Node *getNodeByHandle(int handle){return (handle>=0 && handle<mHandles.size())?mHandles[handle]:NULL;}
+	inline Node *getNodeByHandle(int handle){return (handle>=0 && handle<mHandles.size())?mHandles[handle]:NULL;}
 
 	// Context methods
-	void contextReset(peeper::RenderDevice *renderDevice);
-	void contextActivate(peeper::RenderDevice *renderDevice);
-	void contextDeactivate(peeper::RenderDevice *renderDevice);
+	void contextReset(RenderDevice *renderDevice);
+	void contextActivate(RenderDevice *renderDevice);
+	void contextDeactivate(RenderDevice *renderDevice);
 
 	void addContextListener(ContextListener *listener){mContextListeners.add(listener);}
 	void removeContextListener(ContextListener *listener){mContextListeners.remove(listener);}
 
 	int getIdealVertexFormatType() const{return mIdealVertexFormatType;}
 	const VertexFormats &getVertexFormats() const{return mVertexFormats;}
-	const peeper::RenderCaps &getRenderCaps() const{return mRenderCaps;}
+	const RenderCaps &getRenderCaps() const{return mRenderCaps;}
 
 	inline ArchiveManager *getArchiveManager() const{return mArchiveManager;}
 	inline TextureManager *getTextureManager() const{return mTextureManager;}
@@ -108,17 +108,17 @@ public:
 
 protected:
 	bool mBackable;
-	egg::String mDirectory;
-	peeper::RenderDevice *mRenderDevice;
-	peeper::RenderDevice *mLastRenderDevice;
-	ribbit::AudioDevice *mAudioDevice;
-	ribbit::AudioDevice *mLastAudioDevice;
+	String mDirectory;
+	RenderDevice *mRenderDevice;
+	RenderDevice *mLastRenderDevice;
+	AudioDevice *mAudioDevice;
+	AudioDevice *mLastAudioDevice;
 
-	egg::Collection<ContextListener*> mContextListeners;
+	Collection<ContextListener*> mContextListeners;
 
 	int mIdealVertexFormatType;
 	VertexFormats mVertexFormats;
-	peeper::RenderCaps mRenderCaps;
+	RenderCaps mRenderCaps;
 
 	ArchiveManager *mArchiveManager;
 	TextureManager *mTextureManager;
@@ -129,10 +129,10 @@ protected:
 	MeshManager *mMeshManager;
 	AudioBufferManager *mAudioBufferManager;
 	NodeManager *mNodeManager;
-	egg::Collection<int> mFreeHandles;
-	egg::Collection<node::Node*> mHandles;
+	Collection<int> mFreeHandles;
+	Collection<Node*> mHandles;
 
-	egg::TypeFactory<node::Node> mNodeFactory;
+	TypeFactory<Node> mNodeFactory;
 };
 
 }

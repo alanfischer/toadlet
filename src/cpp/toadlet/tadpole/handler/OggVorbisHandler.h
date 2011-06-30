@@ -39,8 +39,8 @@ public:
 
 	OggVorbisHandler(AudioBufferManager *audioBufferManager):AudioBufferHandler(audioBufferManager){}
 
-	ribbit::AudioStream::ptr createAudioStream(egg::io::Stream::ptr stream){
-		ribbit::AudioStream::ptr audioStream(new ribbit::decoder::OggVorbisDecoder());
+	AudioStream::ptr createAudioStream(Stream::ptr stream){
+		AudioStream::ptr audioStream(new OggVorbisDecoder());
 		if(audioStream->startStream(stream)==false){
 			audioStream=NULL;
 		}

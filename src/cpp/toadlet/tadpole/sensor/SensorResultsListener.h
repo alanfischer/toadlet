@@ -41,7 +41,7 @@ public:
 	virtual void sensingBeginning()=0;
 
 	// Return true to continue sensing
-	virtual bool resultFound(node::Node *result,scalar distance)=0;
+	virtual bool resultFound(Node *result,scalar distance)=0;
 
 	virtual void sensingEnding()=0;
 };

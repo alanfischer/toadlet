@@ -29,10 +29,6 @@
 #include <toadlet/tadpole/node/MeshNodeSkeleton.h>
 #include <toadlet/tadpole/node/MeshNode.h>
 
-using namespace toadlet;
-using namespace toadlet::egg;
-using namespace toadlet::peeper;
-
 namespace toadlet{
 namespace tadpole{
 namespace node{

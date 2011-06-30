@@ -154,11 +154,11 @@ protected:
 	scalar mMaxPositionComponent;
 	scalar mMaxVelocityComponent;
 	scalar mMaxForceComponent;
-	egg::Collection<Collision> mCollisions;
+	Collection<Collision> mCollisions;
 	int mNumCollisions;
-	egg::Collection<Solid::ptr> mSolids;
-	egg::Collection<Constraint::ptr> mConstraints;
-	egg::Collection<Solid*> mSpacialCollection;
+	Collection<Solid::ptr> mSolids;
+	Collection<Constraint::ptr> mConstraints;
+	Collection<Solid*> mSpacialCollection;
 	int mNumSpacialCollection;
 	bool mReportingCollisions;
 

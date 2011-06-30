@@ -27,11 +27,6 @@
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/egg/Error.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::hop;
-using namespace toadlet::peeper;
-using namespace toadlet::tadpole::node;
-
 namespace toadlet{
 namespace tadpole{
 

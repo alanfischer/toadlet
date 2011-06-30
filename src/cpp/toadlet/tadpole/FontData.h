@@ -42,7 +42,7 @@ public:
 	}
 
 	float pointSize;
-	egg::String characterSet;
+	String characterSet;
 };
 
 }

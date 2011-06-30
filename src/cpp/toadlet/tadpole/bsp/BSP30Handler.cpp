@@ -30,13 +30,6 @@
 #include <stdlib.h>
 #include <string.h> // memset
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::egg::image;
-using namespace toadlet::peeper;
-using namespace toadlet::tadpole::handler;
-using namespace toadlet::tadpole::node;
-
 namespace toadlet{
 namespace tadpole{
 namespace bsp{
@@ -382,7 +375,6 @@ void BSP30Handler::buildMaterials(BSP30Map *map){
 	int i;
 	for(i=0;i<map->miptexlump->nummiptex;i++){
 		Material::ptr material=mEngine->getMaterialManager()->createMaterial(map->parsedTextures[i]);
-		material->retain();
 		material->setMaterialState(MaterialState(false,false,MaterialState::ShadeType_FLAT));
 		material->setRasterizerState(RasterizerState(RasterizerState::CullType_FRONT));
 

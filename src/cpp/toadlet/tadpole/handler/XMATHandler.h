@@ -27,8 +27,8 @@
 #define TOADLET_TADPOLE_HANDLER_XMATHANDLER_H
 
 #include <toadlet/tadpole/Engine.h>
-#include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/ResourceHandler.h>
+#include <toadlet/tadpole/material/Material.h>
 
 typedef struct mxml_node_s mxml_node_t;
 
@@ -42,8 +42,8 @@ public:
 
 	XMATHandler(Engine *engine);
 
-	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData);
-	bool save(Material::ptr resource,egg::io::Stream::ptr stream,ProgressListener *listener=NULL);
+	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData);
+	bool save(Material::ptr resource,Stream::ptr stream,ProgressListener *listener=NULL);
 
 protected:
 	Material::ptr loadMaterial(mxml_node_t *root,int version);

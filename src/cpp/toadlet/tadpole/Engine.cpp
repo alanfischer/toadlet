@@ -144,13 +144,6 @@
 	#include <toadlet/tadpole/studio/SpriteModelNode.h>
 #endif
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::peeper;
-using namespace toadlet::ribbit;
-using namespace toadlet::tadpole::node;
-using namespace toadlet::tadpole::handler;
-
 namespace toadlet{
 namespace tadpole{
 

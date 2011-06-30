@@ -37,7 +37,7 @@ namespace toadlet{
 namespace tadpole{
 namespace studio{
 
-class TOADLET_API SpriteModelNode:public node::CameraAlignedNode,public Renderable,public Visible{
+class TOADLET_API SpriteModelNode:public CameraAlignedNode,public Renderable,public Visible{
 public:
 	TOADLET_NODE(SpriteModelNode,CameraAlignedNode);
 
@@ -48,7 +48,7 @@ public:
 
 	void *hasInterface(int type);
 
-	void setModel(const egg::String &name);
+	void setModel(const String &name);
 	void setModel(SpriteModel::ptr model);
 	SpriteModel::ptr getModel() const{return mModel;}
 
@@ -58,14 +58,14 @@ public:
 	// Visible
 	bool getRendered() const{return mRendered;}
 	void setRendered(bool rendered){mRendered=rendered;}
-	peeper::RenderState::ptr getSharedRenderState();
-	void gatherRenderables(node::CameraNode *camera,RenderableSet *set);
+	RenderState::ptr getSharedRenderState();
+	void gatherRenderables(CameraNode *camera,RenderableSet *set);
 
 	// Renderable
 	Material *getRenderMaterial() const{return mSequenceTime<mMaterials.size()?mMaterials[Math::toInt(mSequenceTime)]:NULL;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
-	void render(peeper::RenderDevice *renderDevice) const;
+	void render(RenderDevice *renderDevice) const;
 
 protected:
 	TOADLET_GIB_DEFINE(SpriteModelNode);
@@ -77,9 +77,9 @@ protected:
 	SpriteModel::ptr mModel;
 	bool mRendered;
 	scalar mSequenceTime;
-	egg::Collection<Material::ptr> mMaterials;
-	peeper::VertexData::ptr mVertexData;
-	peeper::IndexData::ptr mIndexData;
+	Collection<Material::ptr> mMaterials;
+	VertexData::ptr mVertexData;
+	IndexData::ptr mIndexData;
 };
 
 }

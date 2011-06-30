@@ -85,12 +85,12 @@ public:
 protected:
 	ALCdevice *mDevice;
 	ALCcontext *mContext;
-	egg::Collection<ALAudio*> mAudios;
-	egg::Collection<unsigned int> mSourcePool;
-	egg::Collection<unsigned int> mAllSources;
+	Collection<ALAudio*> mAudios;
+	Collection<unsigned int> mSourcePool;
+	Collection<unsigned int> mAllSources;
 	int mBufferFadeTime;
 
-	egg::Mutex mMutex;
+	Mutex mMutex;
 
 	CapabilitySet mCapabilitySet;
 

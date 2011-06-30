@@ -32,7 +32,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API TransformSequence:public egg::BaseResource{
+class TOADLET_API TransformSequence:public BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(TransformSequence);
 
@@ -42,7 +42,7 @@ public:
 	void destroy();
 	void compile();
 
-	egg::Collection<TransformTrack::ptr> tracks;
+	Collection<TransformTrack::ptr> tracks;
 	scalar length; // calculated by compile
 	bool hasScale; // calculated by compile
 };

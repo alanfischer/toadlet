@@ -34,7 +34,7 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API Font:public egg::BaseResource{
+class TOADLET_API Font:public BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(Font);
 
@@ -70,31 +70,31 @@ public:
 		Alignment_BIT_VCENTER=	1<<5,
 	};
 
-	Font(float pointSize,int innerSpace,peeper::Texture::ptr texture,const wchar *charSet,Glyph **glyphs,int numChars);
+	Font(float pointSize,int innerSpace,Texture::ptr texture,const wchar *charSet,Glyph **glyphs,int numChars);
 	virtual ~Font();
 
 	void destroy();
 
-	bool updateVertexBufferForString(peeper::VertexBuffer::ptr vertexBuffer,const egg::String &string,const Vector4 &color,int alignment,bool pixelSpace,bool flip);
+	bool updateVertexBufferForString(VertexBuffer::ptr vertexBuffer,const String &string,const Vector4 &color,int alignment,bool pixelSpace,bool flip);
 
-	int getStringWidth(const egg::String &string) const{return getStringWidth(string,0,string.length());}
-	int getStringWidth(const egg::String &string,int start,int end) const;
+	int getStringWidth(const String &string) const{return getStringWidth(string,0,string.length());}
+	int getStringWidth(const String &string,int start,int end) const;
 
-	int getStringHeight(const egg::String &string) const{return getStringHeight(string,0,string.length());}
-	int getStringHeight(const egg::String &string,int start,int end) const;
+	int getStringHeight(const String &string) const{return getStringHeight(string,0,string.length());}
+	int getStringHeight(const String &string,int start,int end) const;
 
 	inline float getPointSize() const{return mPointSize;}
 	inline int getInnerSpace() const{return mInnerSpace;}
-	inline peeper::Texture::ptr getTexture() const{return mTexture;}
+	inline Texture::ptr getTexture() const{return mTexture;}
 	inline Glyph *getGlyph(int i) const{if(i<0 || i>=mGlyphs.size()){return NULL;}else{return mGlyphs[i];}}
 
-	peeper::VertexBufferAccessor vba;
+	VertexBufferAccessor vba;
 
 protected:
 	float mPointSize;
 	int mInnerSpace;
-	peeper::Texture::ptr mTexture;
-	egg::Collection<Glyph*> mGlyphs;
+	Texture::ptr mTexture;
+	Collection<Glyph*> mGlyphs;
 };
 
 }

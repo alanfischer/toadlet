@@ -35,7 +35,7 @@ namespace peeper{
 
 class D3D9RenderDevice;
 
-class TOADLET_API D3D9Shader:protected egg::BaseResource,public Shader{
+class TOADLET_API D3D9Shader:protected BaseResource,public Shader{
 	TOADLET_BASERESOURCE_PASSTHROUGH(Shader);
 public:
 	D3D9Shader(D3D9RenderDevice *renderDevice);
@@ -44,11 +44,11 @@ public:
 
 	Shader *getRootShader(){return this;}
 
-	bool create(ShaderType shaderType,const egg::String &profile,const egg::String &code);
+	bool create(ShaderType shaderType,const String &profile,const String &code);
 	void destroy();
 
 	ShaderType getShaderType() const{return mShaderType;}
-	const egg::String &getProfile() const{return mProfile;}
+	const String &getProfile() const{return mProfile;}
 
 	int getNumVariableBuffers(){return mVariableBufferFormats.size();}
 	VariableBufferFormat::ptr getVariableBufferFormat(int i){return mVariableBufferFormats[i];}
@@ -63,14 +63,14 @@ protected:
 	IDirect3DDevice9 *mD3DDevice;
 
 	ShaderType mShaderType;
-	egg::String mProfile;
-	egg::String mCode;
+	String mProfile;
+	String mCode;
 
 	IUnknown *mShader;
 	ID3DXBuffer *mBytecode,*mLog;
 	ID3DXConstantTable *mConstantTable;
 
-	egg::Collection<VariableBufferFormat::ptr> mVariableBufferFormats;
+	Collection<VariableBufferFormat::ptr> mVariableBufferFormats;
 
 	friend class D3D9RenderDevice;
 	friend class D3D9ShaderState;

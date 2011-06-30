@@ -11,7 +11,6 @@ set (TADPOLE_SRC
 	Engine.cpp
 	Font.cpp
 	FontManager.cpp
-	Material.cpp
 	MaterialManager.cpp
 	MathFormatter.cpp
 	Mesh.cpp
@@ -19,7 +18,6 @@ set (TADPOLE_SRC
 	NodeManager.cpp
 	Noise.cpp
 	RenderableSet.cpp
-	RenderVariableSet.cpp
 	ResourceManager.cpp
 	Scene.cpp
 	SceneRenderer.cpp
@@ -77,6 +75,11 @@ set (TADPOLE_HANDLER_PLATFORM_WIN32_GDIPLUS_SRC
 	handler/platform/win32/Win32TextureHandler.cpp
 )
 
+set (TADPOLE_MATERIAL_SRC
+	material/Material.cpp
+	material/RenderVariableSet.cpp
+)
+
 set (TADPOLE_NODE_SRC
 	node/AnaglyphCameraNode.cpp
 	node/AudioNode.cpp
@@ -131,7 +134,6 @@ set (TADPOLE_HEADERS
 	Font.h
 	FontData.h
 	FontManager.h
-	Material.h
 	MaterialManager.h
 	MathFormatter.h
 	Mesh.h
@@ -144,7 +146,6 @@ set (TADPOLE_HEADERS
 	ResourceHandlerData.h
 	ResourceManager.h
 	RenderableSet.h
-	RenderVariableSet.h
 	Scene.h
 	SceneRenderer.h
 	ShaderManager.h
@@ -223,6 +224,14 @@ set (TADPOLE_HANDLER_PLATFORM_WIN32_GDIPLUS_HEADERS
 	handler/platform/win32/Win32TextureHandler.h
 )
 
+set (TADPOLE_MATERIAL_HEADERS
+	material/Material.h
+	material/MaterialResource.h
+	material/RenderPass.h
+	material/RenderVariable.h
+	material/RenderVariableSet.h
+)
+
 set (TADPOLE_NODE_HEADERS
 	node/AnaglyphCameraNode.h
 	node/AudioNode.h
@@ -275,7 +284,7 @@ set (TADPOLE_TERRAIN_HEADERS
 # Bundle source
 source_group ("Source Files\\\\animation" FILES ${TADPOLE_ANIMATION_SRC})
 source_group ("Source Files\\\\handler" FILES ${TADPOLE_HANDLER_SRC})
-source_group ("Source Files\\\\mesh" FILES ${TADPOLE_MESH_SRC})
+source_group ("Source Files\\\\material" FILES ${TADPOLE_MATERIAL_SRC})
 source_group ("Source Files\\\\node" FILES ${TADPOLE_NODE_SRC})
 source_group ("Source Files\\\\sensor" FILES ${TADPOLE_SENSOR_SRC})
 source_group ("Source Files\\\\terrain" FILES ${TADPOLE_TERRAIN_SRC})
@@ -284,15 +293,15 @@ source_group ("Source Files\\\\terrain" FILES ${TADPOLE_TERRAIN_SRC})
 # Bundle headers
 source_group ("Header Files\\\\animation" FILES ${TADPOLE_ANIMATION_HEADERS})
 source_group ("Header Files\\\\handler" FILES ${TADPOLE_HANDLER_HEADERS})
-source_group ("Header Files\\\\mesh" FILES ${TADPOLE_MESH_HEADERS})
+source_group ("Header Files\\\\material" FILES ${TADPOLE_MATERIAL_HEADERS})
 source_group ("Header Files\\\\node" FILES ${TADPOLE_NODE_HEADERS})
 source_group ("Header Files\\\\sensor" FILES ${TADPOLE_SENSOR_HEADERS})
 source_group ("Header Files\\\\terrain" FILES ${TADPOLE_TERRAIN_HEADERS})
 
 
 # Source and headers
-set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_NODE_SRC} ${TADPOLE_SENSOR_SRC} ${TADPOLE_TERRAIN_SRC})
-set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_SENSOR_HEADERS} ${TADPOLE_TERRAIN_HEADERS})
+set (TADPOLE_SRC ${TADPOLE_SRC} ${TADPOLE_ANIMATION_SRC} ${TADPOLE_HANDLER_SRC} ${TADPOLE_MATERIAL_SRC} ${TADPOLE_NODE_SRC} ${TADPOLE_SENSOR_SRC} ${TADPOLE_TERRAIN_SRC})
+set (TADPOLE_HEADERS ${TADPOLE_HEADERS} ${TADPOLE_ANIMATION_HEADERS} ${TADPOLE_HANDLER_HEADERS} ${TADPOLE_MATERIAL_HEADERS} ${TADPOLE_NODE_HEADERS} ${TADPOLE_SENSOR_HEADERS} ${TADPOLE_TERRAIN_HEADERS})
 
 
 if (NOT TOADLET_FIXED_POINT)

@@ -26,6 +26,8 @@
 #ifndef TOADLET_PEEPER_RENDERSTATEDESTROYEDLISTENER_H
 #define TOADLET_PEEPER_RENDERSTATEDESTROYEDLISTENER_H
 
+#include <toadlet/peeper/Types.h>
+
 namespace toadlet{
 namespace peeper{
 

@@ -27,8 +27,6 @@
 #include "D3D9RenderDevice.h"
 #include <toadlet/egg/Logger.h>
 
-using namespace toadlet::egg;
-
 namespace toadlet{
 namespace peeper{
 

@@ -68,7 +68,7 @@ public:
 	scalar time;
 	Vector3 point; // This is the point at which the tracing node would stop
 	Vector3 normal;
-	node::Node *collider; // The node that blocked the trace
+	Node *collider; // The node that blocked the trace
 	int scope; // The OR'd scope of the collision point
 	int index; // A sub index of which part of the node was hit
 };

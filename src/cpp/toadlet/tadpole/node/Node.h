@@ -110,8 +110,8 @@ public:
 	virtual void removeNodeListener(NodeListener::ptr listener);
 	virtual void removeAllNodeListeners(){mNodeListeners=NULL;}
 
-	virtual void addController(animation::Controller::ptr controller);
-	virtual void removeController(animation::Controller::ptr controller);
+	virtual void addController(Controller::ptr controller);
+	virtual void removeController(Controller::ptr controller);
 	virtual void removeAllControllers(){mControllers=NULL;}
 
 	ParentNode *getParent() const{return (ParentNode*)(mParent.get());}
@@ -152,13 +152,13 @@ public:
 	inline const Bound &getBound() const{return mBound;}
 	inline const Bound &getWorldBound() const{return mWorldBound;}
 
-	virtual void handleEvent(const egg::Event::ptr &event){}
+	virtual void handleEvent(const Event::ptr &event){}
 
 	virtual void setScope(int scope){mScope=scope;}
 	inline int getScope() const{return mScope;}
 
-	virtual void setName(const egg::String &name){mName=name;}
-	inline const egg::String &getName() const{return mName;}
+	virtual void setName(const String &name){mName=name;}
+	inline const String &getName() const{return mName;}
 
 	virtual void logicUpdate(int dt,int scope);
 	virtual void frameUpdate(int dt,int scope);
@@ -179,7 +179,7 @@ public:
 	inline Engine *getEngine() const{return mEngine;}
 	inline Scene *getScene() const{return mScene;}
 
-	inline egg::PointerCounter *pointerCounter() const{return mPointerCounter;}
+	inline PointerCounter *pointerCounter() const{return mPointerCounter;}
 	inline void internal_setManaged(bool managed){mManaged=managed;}
 	inline bool internal_getManaged() const{return mManaged;}
 
@@ -188,7 +188,7 @@ protected:
 	virtual void frameUpdateListeners(int dt);
 
 	// Allocation items
-	egg::PointerCounter *mPointerCounter;
+	PointerCounter *mPointerCounter;
 	bool mManaged;
 
 	// Engine items
@@ -198,8 +198,8 @@ protected:
 	int mUniqueHandle;
 
 	// Node items
-	egg::Collection<NodeListener::ptr>::ptr mNodeListeners;
-	egg::Collection<animation::Controller::ptr>::ptr mControllers;
+	Collection<NodeListener::ptr>::ptr mNodeListeners;
+	Collection<Controller::ptr>::ptr mControllers;
 
 	Node::ptr mParent,mPrevious,mNext;
 	void *mParentData;
@@ -217,7 +217,7 @@ protected:
 	Transform mWorldTransform;
 	Bound mWorldBound;
 	int mScope;
-	egg::String mName;
+	String mName;
 
 	friend class ParentNode;
 };

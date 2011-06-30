@@ -50,7 +50,7 @@ public:
 
 protected:
 	ID3D10Device *mD3DDevice;
-	egg::Collection<ID3D10RenderTargetView*> mRenderTargetViews;
+	Collection<ID3D10RenderTargetView*> mRenderTargetViews;
 	ID3D10DepthStencilView *mDepthStencilView;
 };
 

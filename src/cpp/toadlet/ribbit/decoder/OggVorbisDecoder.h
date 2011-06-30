@@ -51,7 +51,7 @@ public:
 	bool writeable(){return false;}
 	int write(const tbyte *buffer,int length){return -1;}
 
-	bool startStream(egg::io::Stream::ptr stream);
+	bool startStream(Stream::ptr stream);
 	bool stopStream();
 
 	bool reset();
@@ -67,7 +67,7 @@ private:
 	char mDataBuffer[OGGPACKETSIZE];
 	int mDataLength;
 	AudioFormat::ptr mFormat;
-	egg::io::Stream::ptr mStream;
+	Stream::ptr mStream;
 };
 
 }

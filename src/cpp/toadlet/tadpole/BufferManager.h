@@ -36,41 +36,41 @@ namespace tadpole{
 
 class Engine;
 
-class TOADLET_API BufferManager:public peeper::BufferDestroyedListener,public peeper::VertexFormatDestroyedListener{
+class TOADLET_API BufferManager:public BufferDestroyedListener,public VertexFormatDestroyedListener{
 public:
 	BufferManager(Engine *engine,bool backable);
 	virtual ~BufferManager();
 
 	void destroy();
 
-	peeper::VertexFormat::ptr createVertexFormat();
-	peeper::IndexBuffer::ptr createIndexBuffer(int usage,int access,peeper::IndexBuffer::IndexFormat indexFormat,int size);
-	peeper::VertexBuffer::ptr createVertexBuffer(int usage,int access,peeper::VertexFormat::ptr vertexFormat,int size);
-	peeper::PixelBuffer::ptr createPixelBuffer(int usage,int access,int pixelFormat,int width,int height,int depth);
-	peeper::VariableBuffer::ptr createVariableBuffer(int usage,int access,peeper::VariableBufferFormat::ptr variableFormat);
-	peeper::IndexBuffer::ptr cloneIndexBuffer(peeper::IndexBuffer::ptr oldIndexBuffer,int usage,int access,peeper::IndexBuffer::IndexFormat indexFormat,int size);
-	peeper::VertexBuffer::ptr cloneVertexBuffer(peeper::VertexBuffer::ptr oldVertexBuffer,int usage,int access,peeper::VertexFormat::ptr vertexFormat,int size);
+	VertexFormat::ptr createVertexFormat();
+	IndexBuffer::ptr createIndexBuffer(int usage,int access,IndexBuffer::IndexFormat indexFormat,int size);
+	VertexBuffer::ptr createVertexBuffer(int usage,int access,VertexFormat::ptr vertexFormat,int size);
+	PixelBuffer::ptr createPixelBuffer(int usage,int access,int pixelFormat,int width,int height,int depth);
+	VariableBuffer::ptr createVariableBuffer(int usage,int access,VariableBufferFormat::ptr variableFormat);
+	IndexBuffer::ptr cloneIndexBuffer(IndexBuffer::ptr oldIndexBuffer,int usage,int access,IndexBuffer::IndexFormat indexFormat,int size);
+	VertexBuffer::ptr cloneVertexBuffer(VertexBuffer::ptr oldVertexBuffer,int usage,int access,VertexFormat::ptr vertexFormat,int size);
 	/// @todo: clonePixelBuffer,cloneConstantBuffer
 
-	void contextActivate(peeper::RenderDevice *renderDevice);
-	void contextDeactivate(peeper::RenderDevice *renderDevice);
-	void preContextReset(peeper::RenderDevice *renderDevice);
-	void postContextReset(peeper::RenderDevice *renderDevice);
+	void contextActivate(RenderDevice *renderDevice);
+	void contextDeactivate(RenderDevice *renderDevice);
+	void preContextReset(RenderDevice *renderDevice);
+	void postContextReset(RenderDevice *renderDevice);
 
-	void bufferDestroyed(peeper::Buffer *buffer);
-	void vertexFormatDestroyed(peeper::VertexFormat *vertexFormat);
+	void bufferDestroyed(Buffer *buffer);
+	void vertexFormatDestroyed(VertexFormat *vertexFormat);
 
 	bool useTriFan();
 
-	void outputVariableBufferFormat(peeper::VariableBufferFormat::ptr format);
-	void outputVariable(peeper::VariableBufferFormat::Variable *variable,const egg::String &tabs);
+	void outputVariableBufferFormat(VariableBufferFormat::ptr format);
+	void outputVariable(VariableBufferFormat::Variable *variable,const String &tabs);
 
 protected:
-	egg::Collection<peeper::VertexFormat::ptr> mVertexFormats;
-	egg::Collection<peeper::VertexBuffer::ptr> mVertexBuffers;
-	egg::Collection<peeper::IndexBuffer::ptr> mIndexBuffers;
-	egg::Collection<peeper::PixelBuffer::ptr> mPixelBuffers;
-	egg::Collection<peeper::VariableBuffer::ptr> mVariableBuffers;
+	Collection<VertexFormat::ptr> mVertexFormats;
+	Collection<VertexBuffer::ptr> mVertexBuffers;
+	Collection<IndexBuffer::ptr> mIndexBuffers;
+	Collection<PixelBuffer::ptr> mPixelBuffers;
+	Collection<VariableBuffer::ptr> mVariableBuffers;
 
 	Engine *mEngine;
 	bool mBackable;

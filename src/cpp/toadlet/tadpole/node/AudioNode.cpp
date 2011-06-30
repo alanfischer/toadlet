@@ -27,10 +27,6 @@
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/Engine.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::ribbit;
-
 namespace toadlet{
 namespace tadpole{
 namespace node{

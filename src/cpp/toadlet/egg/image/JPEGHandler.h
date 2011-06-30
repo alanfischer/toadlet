@@ -37,8 +37,8 @@ class TOADLET_API JPEGHandler{
 public:
 	JPEGHandler();
 	virtual ~JPEGHandler();
-	virtual Image *loadImage(io::Stream *stream);
-	virtual bool saveImage(Image *image,io::Stream *stream);
+	virtual Image *loadImage(Stream *stream);
+	virtual bool saveImage(Image *image,Stream *stream);
 };
 
 }

@@ -32,11 +32,6 @@
 #include <toadlet/tadpole/SceneRenderer.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::peeper;
-using namespace toadlet::ribbit;
-using namespace toadlet::tadpole::node;
-
 namespace toadlet{
 namespace tadpole{
 

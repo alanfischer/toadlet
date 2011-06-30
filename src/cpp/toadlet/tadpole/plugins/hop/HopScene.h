@@ -33,6 +33,7 @@
 #include <toadlet/tadpole/sensor/BoundingVolumeSensor.h>
 
 namespace toadlet{
+using namespace hop;
 namespace tadpole{
 
 class HopEntity;
@@ -44,7 +45,7 @@ public:
 	HopScene(Engine *engine);
 	virtual ~HopScene();
 
-	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits,node::Node *ignore);
+	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits,Node *ignore);
 	virtual void traceEntity(Collision &result,HopEntity *entity,const Segment &segment,int collideWithBits);
 	virtual void testEntity(Collision &result,HopEntity *entity1,const Segment &segment,HopEntity *entity2);
 
@@ -66,24 +67,24 @@ public:
 	virtual void logicUpdate(int dt,int scope){logicUpdate(dt,scope,NULL);}
 	virtual void logicUpdate(int dt,int scope,HopEntity *entity);
 
-	virtual hop::Solid::ptr getSolid(){return mSolid;}
+	virtual Solid::ptr getSolid(){return mSolid;}
 
 	// Hop items
-	inline hop::Simulator *getSimulator(){return mSimulator;}
+	inline Simulator *getSimulator(){return mSimulator;}
 
 	virtual void setTraceable(Traceable *traceable){mTraceable=traceable;}
-	virtual int findSolidsInAABox(const AABox &box,hop::Solid *solids[],int maxSolids);
+	virtual int findSolidsInAABox(const AABox &box,Solid *solids[],int maxSolids);
 	virtual void traceSegment(hop::Collision &result,const Segment &segment,int collideWithBits);
-	virtual void traceSolid(hop::Collision &result,hop::Solid *solid,const Segment &segment,int collideWithBits);
+	virtual void traceSolid(hop::Collision &result,Solid *solid,const Segment &segment,int collideWithBits);
 	virtual void preUpdate(int dt,scalar fdt){}
 	virtual void postUpdate(int dt,scalar fdt){}
-	virtual void preUpdate(hop::Solid *solid,int dt,scalar fdt){}
-	virtual void intraUpdate(hop::Solid *solid,int dt,scalar fdt){}
-	virtual bool collisionResponse(hop::Solid *solid,Vector3 &position,Vector3 &remainder,hop::Collision &collision){return false;}
-	virtual void postUpdate(hop::Solid *solid,int dt,scalar fdt){}
+	virtual void preUpdate(Solid *solid,int dt,scalar fdt){}
+	virtual void intraUpdate(Solid *solid,int dt,scalar fdt){}
+	virtual bool collisionResponse(Solid *solid,Vector3 &position,Vector3 &remainder,hop::Collision &collision){return false;}
+	virtual void postUpdate(Solid *solid,int dt,scalar fdt){}
 
 	static void set(tadpole::Collision &r,const hop::Collision &c);
-	static void set(hop::Collision &r,const tadpole::Collision &c,hop::Solid *collider,hop::Solid *collidee);
+	static void set(hop::Collision &r,const tadpole::Collision &c,Solid *collider,Solid *collidee);
 
 	hop::Collision cache_traceSegment_collision;
 
@@ -98,7 +99,7 @@ protected:
 			mCounter(0)
 		{}
 			
-		void setSolids(hop::Solid *solids[],int maxSolids){
+		void setSolids(Solid *solids[],int maxSolids){
 			mSolids=solids;
 			mMaxSolids=maxSolids;
 		}
@@ -107,21 +108,21 @@ protected:
 
 		void sensingBeginning(){mCounter=0;}
 
-		bool resultFound(node::Node *result,scalar distance);
+		bool resultFound(Node *result,scalar distance);
 
 		void sensingEnding(){}
 
 	protected:
-		hop::Solid **mSolids;
+		Solid **mSolids;
 		int mMaxSolids;
 		int mCounter;
 	};
 
-	hop::Simulator *mSimulator;
+	Simulator *mSimulator;
 	Traceable *mTraceable;
-	hop::Solid::ptr mSolid;
+	Solid::ptr mSolid;
 
-	sensor::BoundingVolumeSensor::ptr mVolumeSensor;
+	BoundingVolumeSensor::ptr mVolumeSensor;
 	SolidSensorResults::ptr mSensorResults;
 
 	friend class HopEntity;

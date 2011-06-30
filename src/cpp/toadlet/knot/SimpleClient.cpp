@@ -28,10 +28,6 @@
 #include <toadlet/knot/SimpleClient.h>
 #include <toadlet/knot/event/RoutedEvent.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::knot::event;
-
 namespace toadlet{
 namespace knot{
 

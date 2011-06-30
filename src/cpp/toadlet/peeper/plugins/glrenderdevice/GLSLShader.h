@@ -36,7 +36,7 @@ namespace peeper{
 class GLRenderDevice;
 class GLSLShaderState;
 
-class GLSLShader:protected egg::BaseResource,public Shader{
+class GLSLShader:protected BaseResource,public Shader{
 	TOADLET_BASERESOURCE_PASSTHROUGH(Shader);
 public:
 	TOADLET_SHARED_POINTERS(GLSLShader);
@@ -46,11 +46,11 @@ public:
 	
 	Shader *getRootShader(){return this;}
 
-	bool create(ShaderType shaderType,const egg::String &profile,const egg::String &code);
+	bool create(ShaderType shaderType,const String &profile,const String &code);
 	void destroy();
 
 	ShaderType getShaderType() const{return mShaderType;}
-	const egg::String &getProfile() const{return mProfile;}
+	const String &getProfile() const{return mProfile;}
 
 protected:
 	bool createContext();
@@ -59,8 +59,8 @@ protected:
 	GLRenderDevice *mDevice;
 
 	ShaderType mShaderType;
-	egg::String mProfile;
-	egg::String mCode;
+	String mProfile;
+	String mCode;
 
 	GLuint mHandle;
 	GLenum mTarget;

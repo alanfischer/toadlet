@@ -37,7 +37,7 @@ namespace tadpole{
 
 /// This ties a hop::Solid to a tadpole::node::ParentNode.  It will adjust its node transform based on the hop::Solid.
 ///  It's localBound is by default set to the localBound of the hop::Solid
-class TOADLET_API HopEntity:public node::ParentNode,public hop::TraceCallback,public hop::CollisionListener{
+class TOADLET_API HopEntity:public ParentNode,public TraceCallback,public CollisionListener{
 public:
 	enum TriggerType{
 		TriggerType_TOGGLE,
@@ -45,7 +45,7 @@ public:
 		TriggerType_OFF,
 	};
 
-	TOADLET_NODE(HopEntity,node::ParentNode);
+	TOADLET_NODE(HopEntity,ParentNode);
 
 	HopEntity();
 	virtual Node *create(Scene *scene);
@@ -102,23 +102,23 @@ public:
 
 	virtual void setNextThink(int think);
 
-	virtual void setTraceableShape(Traceable *traceable,node::Node *traceableNode=NULL);
-	virtual hop::Shape::ptr getTraceableShape() const{return mTraceableShape;}
-	virtual void addShape(hop::Shape::ptr shape);
-	virtual void removeShape(hop::Shape *shape);
+	virtual void setTraceableShape(Traceable *traceable,Node *traceableNode=NULL);
+	virtual Shape::ptr getTraceableShape() const{return mTraceableShape;}
+	virtual void addShape(Shape::ptr shape);
+	virtual void removeShape(Shape *shape);
 	virtual void removeAllShapes();
-	virtual hop::Shape::ptr getShape(int i) const{return mSolid->getShape(i);}
+	virtual Shape::ptr getShape(int i) const{return mSolid->getShape(i);}
 	virtual int getNumShapes() const{return mSolid->getNumShapes();}
 
 	// Shortcuts for a single shape
-	virtual void setShape(hop::Shape::ptr shape){if(mSolid->getNumShapes()>0){removeAllShapes();}addShape(shape);}
-	virtual hop::Shape::ptr getShape() const{return mSolid->getNumShapes()>0?mSolid->getShape(0):NULL;}
+	virtual void setShape(Shape::ptr shape){if(mSolid->getNumShapes()>0){removeAllShapes();}addShape(shape);}
+	virtual Shape::ptr getShape() const{return mSolid->getNumShapes()>0?mSolid->getShape(0):NULL;}
 
 	virtual void touch(const tadpole::Collision &c){}
 	virtual void think(){}
 	virtual void trigger(TriggerType type=TriggerType_TOGGLE,HopEntity *triggerer=NULL){if(mTriggerTarget!=NULL){mTriggerTarget->trigger(type,triggerer!=NULL?triggerer:this);}}
 
-	inline hop::Solid::ptr getSolid() const{return mSolid;}
+	inline Solid::ptr getSolid() const{return mSolid;}
 
 	virtual void setCollisionVolumesVisible(bool visible);
 
@@ -130,14 +130,14 @@ public:
 
 	// Node callbacks
 	virtual void spacialUpdated();
-	virtual void parentChanged(node::ParentNode *parent);
+	virtual void parentChanged(ParentNode *parent);
 	virtual void logicUpdate(int dt,int scope);
 	virtual void frameUpdate(int dt,int scope);
 
 	// TraceCallback callbacks
 	virtual void getBound(AABox &result);
 	virtual void traceSegment(hop::Collision &result,const Vector3 &position,const Segment &segment);
-	virtual void traceSolid(hop::Collision &result,hop::Solid *solid,const Vector3 &position,const Segment &segment);
+	virtual void traceSolid(hop::Collision &result,Solid *solid,const Vector3 &position,const Segment &segment);
 
 	// CollisionListener callbacks
 	virtual void collision(const hop::Collision &c);
@@ -145,13 +145,13 @@ public:
 protected:
 	virtual void updateCollisionVolumes();
 
-	hop::Solid::ptr mSolid;
+	Solid::ptr mSolid;
 	Vector3 mOldPosition,mNewPosition,mCurrentPosition;
 	bool mSkipNextPreSimulate;
-	hop::Shape::ptr mTraceableShape;
+	Shape::ptr mTraceableShape;
 	Traceable *mTraceable;
-	node::Node::ptr mTraceableNode;
-	node::ParentNode::ptr mVolumeNode;
+	Node::ptr mTraceableNode;
+	ParentNode::ptr mVolumeNode;
 	int mNextThink;
 	HopEntity::wptr mTriggerTarget;
 

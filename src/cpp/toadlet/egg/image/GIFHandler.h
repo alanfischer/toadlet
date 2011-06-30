@@ -41,13 +41,13 @@ public:
 	GIFHandler();
 	virtual ~GIFHandler();
 
-	virtual Image *loadImage(io::Stream *stream);
-	virtual bool saveImage(Image *image,io::Stream *stream);
+	virtual Image *loadImage(Stream *stream);
+	virtual bool saveImage(Image *image,Stream *stream);
 
-	virtual bool loadAnimatedImage(io::Stream *stream,Collection<Image*> &images,Collection<int> &frameDelays);
+	virtual bool loadAnimatedImage(Stream *stream,Collection<Image*> &images,Collection<int> &frameDelays);
 
 protected:
-	GifFileType *openFile(io::Stream *stream);
+	GifFileType *openFile(Stream *stream);
 	int closeFile(GifFileType *file);
 	void resetReader();
 	int getNextImage(GifFileType *gifFile,Image *&image,int &frameDelay);

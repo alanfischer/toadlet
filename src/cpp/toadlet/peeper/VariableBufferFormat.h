@@ -81,11 +81,11 @@ public:
 			mArraySize(0)
 		{}
 
-		inline void setName(const egg::String &name){mName=name;}
-		inline const egg::String &getName() const{return mName;}
+		inline void setName(const String &name){mName=name;}
+		inline const String &getName() const{return mName;}
 
-		inline void setFullName(const egg::String &name){mFullName=name;}
-		inline const egg::String &getFullName() const{return mFullName;}
+		inline void setFullName(const String &name){mFullName=name;}
+		inline const String &getFullName() const{return mFullName;}
 
 		inline void setFormat(int format){mFormat=format;}
 		inline int getFormat() const{return mFormat;}
@@ -106,13 +106,13 @@ public:
 		inline Variable::ptr getStructVariable(int i) const{return mStructVariables[i];}
 
 	protected:
-		egg::String mName;
-		egg::String mFullName;
+		String mName;
+		String mFullName;
 		int mFormat;
 		int mOffset;
 		int mIndex;
 		int mArraySize;
-		egg::Collection<Variable::ptr> mStructVariables;
+		Collection<Variable::ptr> mStructVariables;
 	};
 
 	// static methods aren't allowed in Interfaces, but technically enums shouldn't be either, so these need to be separated to an alongside class
@@ -219,7 +219,7 @@ public:
 		}
 	}
 
-	VariableBufferFormat(bool primary,const egg::String &name,int dataSize,int numVariables):
+	VariableBufferFormat(bool primary,const String &name,int dataSize,int numVariables):
 		mPrimary(primary),
 		mName(name),
 		mDataSize(dataSize)
@@ -231,8 +231,8 @@ public:
 	inline void setPrimary(bool primary){mPrimary=primary;}
 	inline bool getPrimary() const{return mPrimary;}
 
-	inline void setName(const egg::String &name){mName=name;}
-	inline const egg::String &getName() const{return mName;}
+	inline void setName(const String &name){mName=name;}
+	inline const String &getName() const{return mName;}
 
 	inline void setDataSize(int size){mDataSize=size;}
 	inline int getDataSize() const{return mDataSize;}
@@ -264,10 +264,10 @@ protected:
 	}
 
 	bool mPrimary;
-	egg::String mName;
+	String mName;
 	int mDataSize;
 	Variable::ptr mStructVariable;
-	egg::Collection<Variable::ptr> mFlatVariables;
+	Collection<Variable::ptr> mFlatVariables;
 };
 
 }

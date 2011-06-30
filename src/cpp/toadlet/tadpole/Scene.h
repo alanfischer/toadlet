@@ -49,10 +49,10 @@ public:
 
 	virtual Engine *getEngine(){return mEngine;}
 
-	virtual node::PartitionNode *getBackground(){return mBackground;}
+	virtual PartitionNode *getBackground(){return mBackground;}
 
-	virtual void setRoot(node::PartitionNode *root);
-	virtual node::PartitionNode *getRoot(){return mRoot;}
+	virtual void setRoot(PartitionNode *root);
+	virtual PartitionNode *getRoot(){return mRoot;}
 
 	virtual void setExcessiveDT(int dt){mExcessiveDT=dt;}
 	virtual int getExcessiveDT() const{return mExcessiveDT;}
@@ -87,24 +87,24 @@ public:
 	virtual void frameUpdate(int dt){frameUpdate(dt,-1);}
 	virtual void frameUpdate(int dt,int scope);
 	virtual void postFrameUpdate(int dt){}
-	virtual void queueDependent(node::Node *dependent);
+	virtual void queueDependent(Node *dependent);
 
-	virtual void render(peeper::RenderDevice *renderDevice,node::CameraNode *camera,node::Node *node);
+	virtual void render(RenderDevice *renderDevice,CameraNode *camera,Node *node);
 
-	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits=-1,node::Node *ignore=NULL){result.time=Math::ONE;}
+	virtual void traceSegment(Collision &result,const Segment &segment,int collideWithBits=-1,Node *ignore=NULL){result.time=Math::ONE;}
 
 	void setAmbientColor(const Vector4 &ambientColor){mAmbientColor.set(ambientColor);}
 	inline const Vector4 &getAmbientColor() const{return mAmbientColor;}
 
-	int countActiveNodes(node::Node *node=NULL);
-	void renderBoundingVolumes(peeper::RenderDevice *renderDevice,node::Node *node=NULL);
+	int countActiveNodes(Node *node=NULL);
+	void renderBoundingVolumes(RenderDevice *renderDevice,Node *node=NULL);
 
-	virtual void preContextReset(peeper::RenderDevice *renderDevice){}
-	virtual void postContextReset(peeper::RenderDevice *renderDevice){postContextActivate(renderDevice);}
-	virtual void preContextActivate(peeper::RenderDevice *renderDevice){}
-	virtual void postContextActivate(peeper::RenderDevice *renderDevice);
-	virtual void preContextDeactivate(peeper::RenderDevice *renderDevice){}
-	virtual void postContextDeactivate(peeper::RenderDevice *renderDevice){}
+	virtual void preContextReset(RenderDevice *renderDevice){}
+	virtual void postContextReset(RenderDevice *renderDevice){postContextActivate(renderDevice);}
+	virtual void preContextActivate(RenderDevice *renderDevice){}
+	virtual void postContextActivate(RenderDevice *renderDevice);
+	virtual void preContextDeactivate(RenderDevice *renderDevice){}
+	virtual void postContextDeactivate(RenderDevice *renderDevice){}
 
 protected:
 	UpdateListener *mUpdateListener;
@@ -117,12 +117,12 @@ protected:
 	int mLogicFrame;
 	int mAccumulatedDT;
 	int mFrame;
-	egg::Collection<node::Node::ptr> mDependents;
+	Collection<Node::ptr> mDependents;
 	bool mResetFrame;
 
 	Engine *mEngine;
-	node::PartitionNode::ptr mBackground;
-	node::PartitionNode::ptr mRoot;
+	PartitionNode::ptr mBackground;
+	PartitionNode::ptr mRoot;
 
 	Vector4 mAmbientColor;
 	SceneRenderer::ptr mSceneRenderer;

@@ -26,8 +26,6 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/knot/DebugListener.h>
 
-using namespace toadlet::egg;
-
 namespace toadlet{
 namespace knot{
 

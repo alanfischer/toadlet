@@ -38,12 +38,12 @@ class RenderListener{
 public:
 	virtual ~RenderListener(){}
 
-	virtual void preRender(peeper::RenderDevice *renderDevice,node::CameraNode *camera,node::Node *node)=0;
-	virtual void postRender(peeper::RenderDevice *renderDevice,node::CameraNode *camera,node::Node *node)=0;
-	virtual void preGatherRenderables(RenderableSet *set,node::Node *node,node::CameraNode *camera)=0;
-	virtual void postGatherRenderables(RenderableSet *set,node::Node *node,node::CameraNode *camera)=0;
-	virtual void preRenderRenderables(RenderableSet *set,peeper::RenderDevice *renderDevice,node::CameraNode *camera)=0;
-	virtual void postRenderRenderables(RenderableSet *set,peeper::RenderDevice *renderDevice,node::CameraNode *camera)=0;
+	virtual void preRender(RenderDevice *renderDevice,CameraNode *camera,Node *node)=0;
+	virtual void postRender(RenderDevice *renderDevice,CameraNode *camera,Node *node)=0;
+	virtual void preGatherRenderables(RenderableSet *set,Node *node,CameraNode *camera)=0;
+	virtual void postGatherRenderables(RenderableSet *set,Node *node,CameraNode *camera)=0;
+	virtual void preRenderRenderables(RenderableSet *set,RenderDevice *renderDevice,CameraNode *camera)=0;
+	virtual void postRenderRenderables(RenderableSet *set,RenderDevice *renderDevice,CameraNode *camera)=0;
 };
 
 }

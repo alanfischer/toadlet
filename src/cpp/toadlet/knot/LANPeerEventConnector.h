@@ -44,7 +44,7 @@ namespace knot{
 
 /// @todo: The LANPeerConnector could really just be a LANConnector, and would do broadcasting, and generate client/server connections.  Then we would have a PeerNegotiator, which would take connections, and do the whole "send events and see who is server" thing, and return a PeerEventSynchronizer.
 //  That would let us re-use the LANConnector in the server stuff to automatically find a server on the LAN
-class TOADLET_API LANPeerEventConnector:public Connector,public egg::EventFactory{
+class TOADLET_API LANPeerEventConnector:public Connector,public EventFactory{
 public:
 	TOADLET_SHARED_POINTERS(LANPeerEventConnector);
 
@@ -60,7 +60,7 @@ public:
 	LANPeerEventConnector();
 	virtual ~LANPeerEventConnector();
 
-	bool create(bool udp,int broadcastPort,int serverPort,const egg::String &uuid,int version,EventFactory *factory);
+	bool create(bool udp,int broadcastPort,int serverPort,const String &uuid,int version,EventFactory *factory);
 
 	void close();
 	bool closed(){return mConnection==NULL;}
@@ -69,7 +69,7 @@ public:
 	void removeConnectionListener(ConnectionListener *listener,bool notifyAboutCurrent);
 
 	// Start searching for a game
-	bool search(int seed,egg::Event::ptr localPayload);
+	bool search(int seed,Event::ptr localPayload);
 	// Cancel the search
 	void cancel();
 	// Returns a 1 upon connection, and the get* commands will return valid objects
@@ -78,14 +78,14 @@ public:
 
 	int getOrder() const{return mOrder;}
 	int getSeed() const{return mSeed;}
-	egg::Event::ptr getPayload(){return mPayload;}
+	Event::ptr getPayload(){return mPayload;}
 	Connection::ptr getConnection(){return mConnection;}
 	SynchronizedPeerEventConnection::ptr getEventConnection(){return mEventConnection;}
 
-	egg::Event::ptr createEventType(int type);
+	Event::ptr createEventType(int type);
 
 protected:
-	void pushThreadEvent(egg::Event::ptr event);
+	void pushThreadEvent(Event::ptr event);
 
 	bool startIPServer(int port);
 	void stopIPServer();
@@ -101,34 +101,34 @@ protected:
 	bool ensureConnectionAbility();
 
 	bool mUDP;
-	egg::Random mRandom;
+	Random mRandom;
 	int mBroadcastIP;
 	int mBroadcastPort;
-	egg::String mUUID;
+	String mUUID;
 	int mVersion;
 	int mLocalSeed;
-	egg::Event::ptr mLocalPayload;
-	egg::EventFactory *mEventFactory;
-	egg::net::Socket::ptr mLANListenerSocket;
-	egg::Thread::ptr mFindLANGameThread;
+	Event::ptr mLocalPayload;
+	EventFactory *mEventFactory;
+	Socket::ptr mLANListenerSocket;
+	Thread::ptr mFindLANGameThread;
 
 	int mServerPort;
-	egg::net::Socket::ptr mIPServerSocket;
-	egg::Thread::ptr mIPServerThread;
+	Socket::ptr mIPServerSocket;
+	Thread::ptr mIPServerThread;
 
-	egg::net::Socket::ptr mIPClientSocket;
-	egg::Thread::ptr mIPClientThread;
+	Socket::ptr mIPClientSocket;
+	Thread::ptr mIPClientThread;
 
 	int mOrder;
 	int mSeed;
-	egg::Event::ptr mPayload;
+	Event::ptr mPayload;
 	Connection::ptr mConnection;
-	egg::Mutex mConnectionMutex;
-	egg::Collection<ConnectionListener*> mListeners;
-	egg::Mutex mListenersMutex;
+	Mutex mConnectionMutex;
+	Collection<ConnectionListener*> mListeners;
+	Mutex mListenersMutex;
 	SynchronizedPeerEventConnection::ptr mEventConnection;
-	egg::Mutex mEventsMutex;
-	egg::Collection<egg::Event::ptr> mEvents;
+	Mutex mEventsMutex;
+	Collection<Event::ptr> mEvents;
 
 	friend class FindLANGameThread;
 	friend class IPClientThread;

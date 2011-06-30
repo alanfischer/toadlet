@@ -27,8 +27,6 @@
 #include <stdio.h>
 #include <string.h>
 
-using namespace toadlet::egg;
-
 namespace toadlet{
 namespace tadpole{
 

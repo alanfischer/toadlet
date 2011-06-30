@@ -53,17 +53,17 @@ public:
 	void setRightColor(const Vector4 &color);
 	const Vector4 &getRightColor() const{return mRightColor;}
 
-	virtual void render(peeper::RenderDevice *renderDevice,Node *node);
+	virtual void render(RenderDevice *renderDevice,Node *node);
 
 protected:
 	scalar mSeparation;
 
-	peeper::Texture::ptr mLeftTexture;
-	peeper::PixelBufferRenderTarget::ptr mLeftRenderTarget;
+	Texture::ptr mLeftTexture;
+	PixelBufferRenderTarget::ptr mLeftRenderTarget;
 	Vector4 mLeftColor;
 	Material::ptr mLeftMaterial;
-	peeper::Texture::ptr mRightTexture;
-	peeper::PixelBufferRenderTarget::ptr mRightRenderTarget;
+	Texture::ptr mRightTexture;
+	PixelBufferRenderTarget::ptr mRightRenderTarget;
 	Vector4 mRightColor;
 	Material::ptr mRightMaterial;
 };

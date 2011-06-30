@@ -34,7 +34,7 @@ namespace ribbit{
 
 class TOADLET_API AudioFormatConversion{
 public:
-	static bool decode(egg::io::Stream *stream,tbyte *&finalBuffer,int &finalLength);
+	static bool decode(Stream *stream,tbyte *&finalBuffer,int &finalLength);
 	static bool decode(AudioStream *stream,tbyte *&finalBuffer,int &finalLength);
 	/// @todo: Pass in an AudioFormat instead of individual elements
 	static bool convert(tbyte *src,AudioFormat *srcFormat,tbyte *dst,AudioFormat *dstFormat,int length);

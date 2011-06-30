@@ -83,10 +83,10 @@ protected:
 	ID3D10DepthStencilState *mD3DDepthStencilState;
 	RasterizerState *mRasterizerState;
 	ID3D10RasterizerState *mD3DRasterizerState;
-	egg::Collection<SamplerState*> mSamplerStates;
-	egg::Collection<ID3D10SamplerState*> mD3DSamplerStates;
+	Collection<SamplerState*> mSamplerStates;
+	Collection<ID3D10SamplerState*> mD3DSamplerStates;
 
-	egg::Collection<TextureState*> mTextureStates;
+	Collection<TextureState*> mTextureStates;
 	MaterialState *mMaterialState;
 
 	friend class D3D10RenderDevice;

@@ -29,8 +29,6 @@
 #include <toadlet/egg/Logger.h>
 #include <string.h> // memset
 
-using namespace toadlet::egg::io;
-
 namespace toadlet{
 namespace egg{
 namespace image{

@@ -27,34 +27,21 @@
 #include <toadlet/peeper/BackableRenderState.h>
 #include <toadlet/peeper/BackableShaderState.h>
 #include <toadlet/peeper/RenderCaps.h>
-#include <toadlet/tadpole/Material.h>
-
-using namespace toadlet::egg;
-using namespace toadlet::peeper;
+#include <toadlet/tadpole/material/Material.h>
 
 namespace toadlet{
 namespace tadpole{
+namespace material{
 
-Material::Material(RenderState::ptr renderState,ShaderState::ptr shaderState):BaseResource(),
-	//mFogState,
-	//mBlendState,
+Material::Material(MaterialManager *manager):BaseResource(),
+	mOwnsRenderState(false),
+	mOwnsShaderState(false),
 	mSort(SortType_MATERIAL),
-	//mDepthState,
-	//mPointState,
-	//mRasterizerState
 	mLayer(0)
 {
-	if(renderState==NULL){
-		renderState=RenderState::ptr(new BackableRenderState());
-	}
-
-	mRenderState=renderState;
-
-	if(shaderState==NULL){
-		shaderState=ShaderState::ptr(new BackableShaderState());
-	}
-
-	mShaderState=shaderState;
+	mManager=manager;
+	mRenderState=manager->createRenderState();
+	mShaderState=manager->createShaderState();
 }
 
 Material::~Material(){
@@ -62,8 +49,14 @@ Material::~Material(){
 }
 
 void Material::destroy(){
-	mRenderState->destroy();
-	mShaderState->destroy();
+	if(mOwnsRenderState && mRenderState!=NULL){
+		mRenderState->destroy();
+	}
+	mRenderState=NULL;
+	if(mOwnsShaderState && mShaderState!=NULL){
+		mShaderState->destroy();
+	}
+	mShaderState=NULL;
 
 	int i;
 	for(i=0;i<mTextures.size();++i){
@@ -126,6 +119,24 @@ bool Material::isDepthSorted() const{
 	}
 }
 
+RenderState::ptr Material::getOwnRenderState(){
+	if(mOwnsRenderState==false){
+		RenderState::ptr renderState=mManager->createRenderState();
+		mManager->modifyRenderState(renderState,mRenderState);
+		mRenderState=renderState;
+	}
+	return mRenderState;
+}
+
+ShaderState::ptr Material::getOwnShaderState(){
+	if(mOwnsShaderState==false){
+		ShaderState::ptr shaderState=mManager->createShaderState();
+		mManager->modifyShaderState(shaderState,mShaderState);
+		mShaderState=shaderState;
+	}
+	return mShaderState;
+}
+
 /// @todo: Optimize this so we're not resetting a ton of texture states, and not requesting the caps
 void Material::setupRenderDevice(RenderDevice *renderDevice){
 	renderDevice->setRenderState(mRenderState);
@@ -143,5 +154,6 @@ void Material::setupRenderDevice(RenderDevice *renderDevice){
 	}
 }
 
+}
 }
 }

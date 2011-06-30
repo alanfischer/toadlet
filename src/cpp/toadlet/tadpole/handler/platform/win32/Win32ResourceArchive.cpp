@@ -34,10 +34,6 @@
 	#define IS_INTRESOURCE(_r) ((((ULONG_PTR)(_r)) >> 16) == 0)
 #endif
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::egg::image;
-
 namespace toadlet{
 namespace tadpole{
 namespace handler{

@@ -28,10 +28,6 @@
 #include <toadlet/tadpole/Font.h>
 #include <string.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::image;
-using namespace toadlet::peeper;
-
 namespace toadlet{
 namespace tadpole{
 

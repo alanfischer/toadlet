@@ -26,8 +26,6 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/VertexData.h>
 
-using namespace toadlet::egg;
-
 namespace toadlet{
 namespace peeper{
 

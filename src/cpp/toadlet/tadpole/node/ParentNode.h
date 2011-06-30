@@ -56,7 +56,7 @@ public:
 	inline Node *getFirstChild() const{return mFirstChild;}
 	inline Node *getLastChild() const{return mLastChild;}
 
-	virtual void handleEvent(const egg::Event::ptr &event);
+	virtual void handleEvent(const Event::ptr &event);
 
 	virtual void logicUpdate(int dt,int scope);
 	virtual void frameUpdate(int dt,int scope);

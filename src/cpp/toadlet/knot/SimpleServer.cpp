@@ -28,10 +28,6 @@
 #include <toadlet/knot/SimpleServer.h>
 #include <toadlet/knot/event/RoutedEvent.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::knot::event;
-
 namespace toadlet{
 namespace knot{
 
@@ -68,7 +64,7 @@ void SimpleServer::close(){
 		mConnector->close();
 	}
 
-	egg::Collection<ServerClient::ptr> serverClients;
+	Collection<ServerClient::ptr> serverClients;
 	mClientsMutex.lock();
 		serverClients.addAll(mClients);
 	mClientsMutex.unlock();

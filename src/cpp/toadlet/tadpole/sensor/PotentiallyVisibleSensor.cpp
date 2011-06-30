@@ -26,8 +26,6 @@
 #include <toadlet/tadpole/sensor/PotentiallyVisibleSensor.h>
 #include <toadlet/tadpole/Scene.h>
 
-using namespace toadlet::tadpole::node;
-
 namespace toadlet{
 namespace tadpole{
 namespace sensor{

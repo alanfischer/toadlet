@@ -28,10 +28,6 @@
 #include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/node/AnaglyphCameraNode.h>
 
-using namespace toadlet;
-using namespace toadlet::egg;
-using namespace toadlet::peeper;
-
 namespace toadlet{
 namespace tadpole{
 namespace node{

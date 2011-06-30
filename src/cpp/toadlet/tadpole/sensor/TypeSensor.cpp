@@ -26,9 +26,6 @@
 #include <toadlet/tadpole/sensor/TypeSensor.h>
 #include <toadlet/tadpole/Scene.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::tadpole::node;
-
 namespace toadlet{
 namespace tadpole{
 namespace sensor{

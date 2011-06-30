@@ -26,15 +26,12 @@
 #ifndef TOADLET_TADPOLE_VISIBLE_H
 #define TOADLET_TADPOLE_VISIBLE_H
 
-#include <toadlet/tadpole/Material.h>
+#include <toadlet/peeper/RenderState.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
 namespace tadpole{
-namespace node{
-
-class CameraNode;
-
-}
+namespace node{class CameraNode;}
 
 class RenderableSet;
 
@@ -44,8 +41,8 @@ public:
 
 	virtual bool getRendered() const=0;
 	virtual void setRendered(bool visible)=0;
-	virtual peeper::RenderState::ptr getSharedRenderState()=0;
-	virtual void gatherRenderables(node::CameraNode *camera,RenderableSet *set)=0;
+	virtual RenderState::ptr getSharedRenderState()=0;
+	virtual void gatherRenderables(CameraNode *camera,RenderableSet *set)=0;
 };
 
 }

@@ -29,10 +29,6 @@
 #include <toadlet/knot/TCPConnector.h>
 #include <toadlet/knot/ConnectionListener.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::egg::net;
-
 namespace toadlet{
 namespace knot{
 

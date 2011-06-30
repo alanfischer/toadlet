@@ -29,8 +29,6 @@
 
 #include "D3D10Shader.h"
 
-using namespace toadlet::egg;
-
 namespace toadlet{
 namespace peeper{
 

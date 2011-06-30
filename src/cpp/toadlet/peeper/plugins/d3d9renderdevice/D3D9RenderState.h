@@ -100,8 +100,8 @@ protected:
 	FogState *mFogState;
 	PointState *mPointState;
 	MaterialState *mMaterialState;
-	egg::Collection<SamplerState*> mSamplerStates;
-	egg::Collection<TextureState*> mTextureStates;
+	Collection<SamplerState*> mSamplerStates;
+	Collection<TextureState*> mTextureStates;
 	
 	friend class D3D9RenderDevice;
 };

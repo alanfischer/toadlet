@@ -69,8 +69,8 @@ protected:
 	int mWidth;
 	int mHeight;
 	bool mNeedsCompile;
-	egg::Collection<PixelBuffer::ptr> mBuffers;
-	egg::Collection<Attachment> mBufferAttachments;
+	Collection<PixelBuffer::ptr> mBuffers;
+	Collection<Attachment> mBufferAttachments;
 	PixelBuffer::ptr mDepthBuffer;
 };
 

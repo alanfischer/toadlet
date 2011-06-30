@@ -39,8 +39,8 @@ public:
 
 	WaveHandler(AudioBufferManager *audioBufferManager):AudioBufferHandler(audioBufferManager){}
 
-	ribbit::AudioStream::ptr createAudioStream(egg::io::Stream::ptr stream){
-		ribbit::AudioStream::ptr audioStream(new ribbit::decoder::WaveDecoder());
+	AudioStream::ptr createAudioStream(Stream::ptr stream){
+		AudioStream::ptr audioStream(new WaveDecoder());
 		if(audioStream->startStream(stream)==false){
 			audioStream=NULL;
 		}

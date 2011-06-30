@@ -23,12 +23,8 @@
  *
  ********** Copyright header - do not remove **********/
 
-#include <toadlet/egg/math/Math.h>
 #include <toadlet/egg/Error.h>
 #include "IOSMotionDevice.h"
-
-using namespace toadlet::egg;
-using namespace toadlet::egg::math;
 
 @implementation ToadletAccelerometerDelegate
 

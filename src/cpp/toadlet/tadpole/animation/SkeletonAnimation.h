@@ -42,8 +42,8 @@ public:
 	SkeletonAnimation();
 	virtual ~SkeletonAnimation();
 
-	void setTarget(node::MeshNodeSkeleton::ptr target);
-	inline node::MeshNodeSkeleton::ptr getTarget() const{return mTarget;}
+	void setTarget(MeshNodeSkeleton::ptr target);
+	inline MeshNodeSkeleton::ptr getTarget() const{return mTarget;}
 
 	void setSequenceIndex(int sequenceIndex);
 	inline int getSequenceIndex() const{return mSequenceIndex;}
@@ -58,7 +58,7 @@ public:
 
 protected:
 	Controller *mController;
-	node::MeshNodeSkeleton::ptr mTarget;
+	MeshNodeSkeleton::ptr mTarget;
 	int mSequenceIndex;
 };
 

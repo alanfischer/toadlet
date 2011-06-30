@@ -29,10 +29,6 @@
 #include <toadlet/knot/PeerPacketConnection.h>
 #include <string.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::egg::net;
-
 namespace toadlet{
 namespace knot{
 
@@ -596,7 +592,7 @@ void PeerPacketConnection::updatePacketInfo(PeerPacket *packet){
 	packet->setTimeHandled(System::mtime());
 }
 
-int PeerPacketConnection::sendPacketsToSocket(const toadlet::egg::Collection<PeerPacket::ptr> &packets,int numPackets){
+int PeerPacketConnection::sendPacketsToSocket(const Collection<PeerPacket::ptr> &packets,int numPackets){
 	int i=0;
 	PeerPacket *packet=packets[0];
 	int amount=0;
@@ -633,7 +629,7 @@ int PeerPacketConnection::sendPacketsToSocket(const toadlet::egg::Collection<Pee
 	return numPackets;
 }
 
-int PeerPacketConnection::receivePacketsFromSocket(const toadlet::egg::Collection<PeerPacket::ptr> &packets,int maxNumPackets){
+int PeerPacketConnection::receivePacketsFromSocket(const Collection<PeerPacket::ptr> &packets,int maxNumPackets){
 	int i;
 	bool result=false;
 	int numPackets=0;

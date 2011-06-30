@@ -53,11 +53,11 @@ public:
 		Material *getRenderMaterial() const{return material;}
 		const Transform &getRenderTransform() const{return hasOwnTransform?worldTransform:meshNode->getWorldTransform();}
 		const Bound &getRenderBound() const{return hasOwnTransform?worldBound:meshNode->getWorldBound();}
-		void render(peeper::RenderDevice *renderDevice) const;
+		void render(RenderDevice *renderDevice) const;
 
 		Material::ptr material;
-		peeper::IndexData::ptr indexData;
-		peeper::VertexData::ptr vertexData;
+		IndexData::ptr indexData;
+		VertexData::ptr vertexData;
 		MeshNode *meshNode;
 		Mesh::SubMesh *meshSubMesh;
 
@@ -68,7 +68,7 @@ public:
 	};
 
 	/// Specialization of the Controller that allows for easy access to playing single sequences.
-	class TOADLET_API MeshController:public animation::Controller{
+	class TOADLET_API MeshController:public Controller{
 	public:
 		TOADLET_SHARED_POINTERS(MeshController);
 
@@ -81,7 +81,7 @@ public:
 
 	protected:
 		MeshNode *mMeshNode;
-		animation::SkeletonAnimation::ptr mAnimation;
+		SkeletonAnimation::ptr mAnimation;
 		int mStartingFrame;
 	};
 
@@ -92,13 +92,13 @@ public:
 
 	void *hasInterface(int type);
 
-	void setMesh(const egg::String &name);
+	void setMesh(const String &name);
 	void setMesh(Mesh::ptr mesh);
 	const Mesh::ptr &getMesh() const{return mMesh;}
 
 	inline int getNumSubMeshes() const{return mSubMeshes.size();}
 	SubMesh *getSubMesh(int i){return mSubMeshes[i];}
-	SubMesh *getSubMesh(const egg::String &name);
+	SubMesh *getSubMesh(const String &name);
 
 	inline MeshNodeSkeleton::ptr getSkeleton() const{return mSkeleton;}
 	void setSkeleton(MeshNodeSkeleton::ptr skeleton);
@@ -111,17 +111,17 @@ public:
 	// Visible
 	bool getRendered() const{return mRendered;}
 	void setRendered(bool rendered){mRendered=rendered;}
-	peeper::RenderState::ptr getSharedRenderState();
+	RenderState::ptr getSharedRenderState();
 	void gatherRenderables(CameraNode *camera,RenderableSet *set);
 
 	// Attachable
 	int getNumAttachments(){return mSkeleton!=NULL?mSkeleton->getNumAttachments():0;}
-	egg::String getAttachmentName(int index){return mSkeleton!=NULL?mSkeleton->getAttachmentName(index):(char*)NULL;}
-	int getAttachmentIndex(const egg::String &name){return mSkeleton!=NULL?mSkeleton->getAttachmentIndex(name):0;}
+	String getAttachmentName(int index){return mSkeleton!=NULL?mSkeleton->getAttachmentName(index):(char*)NULL;}
+	int getAttachmentIndex(const String &name){return mSkeleton!=NULL?mSkeleton->getAttachmentIndex(name):0;}
 	bool getAttachmentTransform(Transform &result,int index){return mSkeleton!=NULL?mSkeleton->getAttachmentTransform(result,index):false;}
 
-	peeper::VertexBufferAccessor svba;
-	peeper::VertexBufferAccessor dvba;
+	VertexBufferAccessor svba;
+	VertexBufferAccessor dvba;
 
 	void createVertexBuffer();
 	void updateVertexBuffer();
@@ -129,9 +129,9 @@ public:
 protected:
 	bool mRendered;
 	Mesh::ptr mMesh;
-	egg::Collection<SubMesh::ptr> mSubMeshes;
+	Collection<SubMesh::ptr> mSubMeshes;
 	MeshNodeSkeleton::ptr mSkeleton;
-	peeper::VertexData::ptr mDynamicVertexData;
+	VertexData::ptr mDynamicVertexData;
 
 	MeshController::ptr mController;
 };

@@ -26,8 +26,6 @@
 #include <toadlet/tadpole/sensor/SensorResults.h>
 #include <toadlet/tadpole/node/Node.h>
 
-using namespace toadlet::tadpole::node;
-
 namespace toadlet{
 namespace tadpole{
 namespace sensor{

@@ -28,13 +28,13 @@
 
 #include <toadlet/egg/BaseResource.h>
 #include <toadlet/tadpole/studio/SpriteTypes.h>
-#include <toadlet/tadpole/Material.h>
+#include <toadlet/tadpole/material/Material.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace studio{
 
-class TOADLET_API SpriteModel:public egg::BaseResource{
+class TOADLET_API SpriteModel:public BaseResource{
 public:
 	TOADLET_BASERESOURCE_PASSTHROUGH(BaseResource);
 	TOADLET_SHARED_POINTERS(SpriteModel);
@@ -59,7 +59,7 @@ public:
 		textures.clear();
 
 		for(i=0;i<materials.size();++i){
-			materials[i]->release();
+			materials[i]->destroy();
 		}
 		materials.clear();
 	}
@@ -88,8 +88,8 @@ public:
 	spritehdr *header;
 	int paletteSize;
 	tbyte *palette;
-	egg::Collection<peeper::Texture::ptr> textures;
-	egg::Collection<Material::ptr> materials;
+	Collection<Texture::ptr> textures;
+	Collection<Material::ptr> materials;
 };
 
 }

@@ -101,7 +101,7 @@ protected:
 	VertexFormat::ptr mVertexFormat;
 	int mPixelFormat;
 	VariableBufferFormat::ptr mVariableFormat;
-	egg::Collection<tbyte*> mElementOffsets;
+	Collection<tbyte*> mElementOffsets;
 	bool mHasTranspose;
 
 	GLuint mHandle;

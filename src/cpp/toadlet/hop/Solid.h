@@ -131,7 +131,7 @@ public:
 
 	void updateLocalBound();
 
-	egg::String name;
+	String name;
 
 protected:
 	void internal_setSimulator(Simulator *s);
@@ -154,12 +154,12 @@ protected:
 	scalar mCoefficientOfDynamicFriction;
 	scalar mCoefficientOfEffectiveDrag;
 
-	egg::Collection<Shape::ptr> mShapes;
+	Collection<Shape::ptr> mShapes;
 	int mShapeTypes;
 	AABox mLocalBound;
 	AABox mWorldBound;
 
-	egg::Collection<Constraint*> mConstraints;
+	Collection<Constraint*> mConstraints;
 
 	CollisionListener *mCollisionListener;
 	void *mUserData;

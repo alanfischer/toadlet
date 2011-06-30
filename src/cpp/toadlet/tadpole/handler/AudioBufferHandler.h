@@ -39,9 +39,9 @@ public:
 
 	AudioBufferHandler(AudioBufferManager *manager){mAudioBufferManager=manager;}
 
-	virtual ribbit::AudioStream::ptr createAudioStream(egg::io::Stream::ptr stream)=0;
+	virtual AudioStream::ptr createAudioStream(Stream::ptr stream)=0;
 
-	egg::Resource::ptr load(egg::io::Stream::ptr stream,const ResourceHandlerData *handlerData){
+	Resource::ptr load(Stream::ptr stream,const ResourceHandlerData *handlerData){
 		return mAudioBufferManager->createAudioBuffer(createAudioStream(stream));
 	}
 

@@ -37,7 +37,7 @@ namespace peeper{
 class D3D10RenderDevice;
 class D3D10VertexFormat;
 
-class TOADLET_API D3D10Shader:protected egg::BaseResource,public Shader{
+class TOADLET_API D3D10Shader:protected BaseResource,public Shader{
 	TOADLET_BASERESOURCE_PASSTHROUGH(Shader);
 public:
 	D3D10Shader(D3D10RenderDevice *renderDevice);
@@ -46,11 +46,11 @@ public:
 
 	Shader *getRootShader(){return this;}
 
-	bool create(ShaderType shaderType,const egg::String &profile,const egg::String &code);
+	bool create(ShaderType shaderType,const String &profile,const String &code);
 	void destroy();
 
 	ShaderType getShaderType() const{return mShaderType;}
-	const egg::String &getProfile() const{return mProfile;}
+	const String &getProfile() const{return mProfile;}
 
 	int getNumVariableBuffers(){return mVariableBufferFormats.size();}
 	VariableBufferFormat::ptr getVariableBufferFormat(int i){return mVariableBufferFormats[i];}
@@ -68,16 +68,16 @@ protected:
 	ID3D10Device *mD3DDevice;
 
 	ShaderType mShaderType;
-	egg::String mProfile;
-	egg::String mCode;
+	String mProfile;
+	String mCode;
 
 	ID3D10DeviceChild *mShader;
 	ID3D10Blob *mBytecode,*mLog;
 	ID3D10ShaderReflection *mReflector;
 
-	egg::Collection<VariableBufferFormat::ptr> mVariableBufferFormats;
+	Collection<VariableBufferFormat::ptr> mVariableBufferFormats;
 
-	egg::Collection<ID3D10InputLayout*> mLayouts;
+	Collection<ID3D10InputLayout*> mLayouts;
 
 	friend class D3D10RenderDevice;
 };

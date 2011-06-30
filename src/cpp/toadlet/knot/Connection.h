@@ -28,6 +28,7 @@
 
 #include <toadlet/egg/SharedPointer.h>
 #include <toadlet/egg/WeakPointer.h>
+#include <toadlet/knot/Types.h>
 
 namespace toadlet{
 namespace knot{

@@ -52,8 +52,8 @@ public:
 
 	inline int getType() const{return mType;}
 
-	virtual int read(io::DataStream *stream){return 0;}
-	virtual int write(io::DataStream *stream){return 0;}
+	virtual int read(DataStream *stream){return 0;}
+	virtual int write(DataStream *stream){return 0;}
 
 protected:
 	int mType;

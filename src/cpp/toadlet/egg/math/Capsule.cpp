@@ -26,8 +26,6 @@
 #include <toadlet/egg/math/Capsule.h>
 #include <toadlet/egg/math/Math.h>
 
-using namespace toadlet::egg::math::Math;
-
 namespace toadlet{
 namespace egg{
 namespace math{

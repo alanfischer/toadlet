@@ -33,13 +33,13 @@
 namespace toadlet{
 namespace ribbit{
 
-class AudioStream:public egg::io::Stream{
+class AudioStream:public Stream{
 public:
 	TOADLET_SHARED_POINTERS(AudioStream);
 
 	virtual ~AudioStream(){}
 
-	virtual bool startStream(egg::io::Stream::ptr stream)=0;
+	virtual bool startStream(Stream::ptr stream)=0;
 	virtual AudioFormat::ptr getAudioFormat()=0;
 };
 

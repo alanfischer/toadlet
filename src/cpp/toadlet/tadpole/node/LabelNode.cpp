@@ -31,10 +31,6 @@
 #include <toadlet/tadpole/node/LabelNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::image;
-using namespace toadlet::peeper;
-
 namespace toadlet{
 namespace tadpole{
 namespace node{

@@ -33,29 +33,29 @@
 namespace toadlet{
 namespace tadpole{
 
-class TOADLET_API ArchiveManager:public ResourceManager,public egg::io::Archive,public egg::BaseResource{
-	TOADLET_BASERESOURCE_PASSTHROUGH(egg::io::Archive);
+class TOADLET_API ArchiveManager:public ResourceManager,public Archive,public BaseResource{
+	TOADLET_BASERESOURCE_PASSTHROUGH(Archive);
 public:
 	ArchiveManager();
 	virtual ~ArchiveManager();
 
 	void destroy();
 
-	bool open(egg::io::Stream::ptr stream){return true;}
+	bool open(Stream::ptr stream){return true;}
 
-	egg::io::Archive::ptr findArchive(const egg::String &name){return egg::shared_static_cast<egg::io::Archive>(ResourceManager::find(name));}
+	Archive::ptr findArchive(const String &name){return shared_static_cast<Archive>(ResourceManager::find(name));}
 
-	void setDirectory(const egg::String &directory);
-	const egg::String &getDirectory() const{return mDirectory;}
+	void setDirectory(const String &directory);
+	const String &getDirectory() const{return mDirectory;}
 
 	// Searches through all archives for the file
-	egg::io::Stream::ptr openStream(const egg::String &name);
-	egg::Resource::ptr openResource(const egg::String &name){return NULL;}
+	Stream::ptr openStream(const String &name);
+	Resource::ptr openResource(const String &name){return NULL;}
 
-	egg::Collection<egg::String>::ptr getEntries(){return NULL;}
+	Collection<String>::ptr getEntries(){return NULL;}
 
 protected:
-	egg::String mDirectory;
+	String mDirectory;
 };
 
 }

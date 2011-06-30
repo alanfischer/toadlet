@@ -26,55 +26,59 @@
 #ifndef TOADLET_TADPOLE_MATERIALMANAGER_H
 #define TOADLET_TADPOLE_MATERIALMANAGER_H
 
-#include <toadlet/peeper/RenderState.h>
-#include <toadlet/peeper/ShaderState.h>
-#include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/ResourceManager.h>
-#include <toadlet/tadpole/TextureManager.h>
+#include <toadlet/tadpole/material/MaterialResource.h>
 
 namespace toadlet{
 namespace tadpole{
 
 class Engine;
 
-class TOADLET_API MaterialManager:public ResourceManager,public peeper::RenderStateDestroyedListener,public peeper::ShaderStateDestroyedListener{
+class TOADLET_API MaterialManager:public ResourceManager,public RenderStateDestroyedListener,public ShaderStateDestroyedListener{
 public:
 	MaterialManager(Engine *engine,bool backable);
 
 	void destroy();
 
-	Material::ptr createMaterial(peeper::Texture::ptr texture=peeper::Texture::ptr(),bool clamped=false,Material::ptr shareSource=Material::ptr());
+	MaterialResource::ptr getMaterialResource(int handle){return shared_static_cast<MaterialResource>(ResourceManager::get(handle));}
+	MaterialResource::ptr findMaterialResource(const String &name){return shared_static_cast<MaterialResource>(ResourceManager::find(name));}
+	MaterialResource::ptr createMaterialResource(Material *material,const String &name=(char*)NULL);
+
+	Material::ptr createMaterial(int handle){return createMaterial(getMaterialResource(handle));}
+	Material::ptr createMaterial(const String &name){return createMaterial(findMaterialResource(name));}
+	Material::ptr createMaterial(MaterialResource *resource=NULL);
+/*
+	Material::ptr createMaterial(Texture::ptr texture=Texture::ptr(),bool clamped=false,Material::ptr shareSource=Material::ptr());
  
-	Material::ptr findMaterial(const egg::String &name){return egg::shared_static_cast<Material>(ResourceManager::find(name));}
+	Material::ptr findMaterial(const String &name){return shared_static_cast<Material>(ResourceManager::find(name));}
 
 	Material::ptr cloneMaterial(Material::ptr material,bool manage,Material::ptr sharedSource=Material::ptr());
+*/
+	RenderState::ptr createRenderState();
+	ShaderState::ptr createShaderState();
 
-	peeper::RenderState::ptr createRenderState();
+	void modifyRenderState(RenderState::ptr dst,RenderState::ptr src);
+	void modifyShaderState(ShaderState::ptr dst,ShaderState::ptr src);
 
-	peeper::ShaderState::ptr createShaderState();
+	void contextActivate(RenderDevice *renderDevice);
+	void contextDeactivate(RenderDevice *renderDevice);
 
-	void modifyRenderState(peeper::RenderState::ptr dst,peeper::RenderState::ptr src);
-	void modifyShaderState(peeper::ShaderState::ptr dst,peeper::ShaderState::ptr src);
+	void renderStateDestroyed(RenderState *renderState);
+	void shaderStateDestroyed(ShaderState *shaderState);
 
-	void contextActivate(peeper::RenderDevice *renderDevice);
-	void contextDeactivate(peeper::RenderDevice *renderDevice);
+	Resource::ptr unableToFindHandler(const String &name,const ResourceHandlerData *handlerData);
 
-	void renderStateDestroyed(peeper::RenderState *renderState);
-	void shaderStateDestroyed(peeper::ShaderState *shaderState);
-
-	egg::Resource::ptr unableToFindHandler(const egg::String &name,const ResourceHandlerData *handlerData);
-
-	void setDefaultSamplerState(const peeper::SamplerState &samplerState){mDefaultSamplerState.set(samplerState);}
-	const peeper::SamplerState &getDefaultSamplerState(){return mDefaultSamplerState;}
+	void setDefaultSamplerState(const SamplerState &samplerState){mDefaultSamplerState.set(samplerState);}
+	const SamplerState &getDefaultSamplerState(){return mDefaultSamplerState;}
 
 protected:
 	Engine *mEngine;
 	bool mBackable;
 
-	egg::Collection<peeper::RenderState::ptr> mRenderStates;
-	egg::Collection<peeper::ShaderState::ptr> mShaderStates;
+	Collection<RenderState::ptr> mRenderStates;
+	Collection<ShaderState::ptr> mShaderStates;
 
-	peeper::SamplerState mDefaultSamplerState;
+	SamplerState mDefaultSamplerState;
 };
 
 }

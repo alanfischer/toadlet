@@ -42,7 +42,7 @@ public:
 	int getInterfaceID() const{return mInterfaceID;}
 
 protected:
-	bool senseNode(node::Node *node);
+	bool senseNode(Node *node);
 
 	int mInterfaceID;
 };

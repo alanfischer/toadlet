@@ -26,11 +26,6 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/tadpole/studio/SpriteHandler.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::egg::image;
-using namespace toadlet::peeper;
-
 namespace toadlet{
 namespace tadpole{
 namespace studio{

@@ -28,7 +28,6 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/Extents.h>
 
-using namespace toadlet::egg;
 #if defined(TOADLET_FIXED_POINT)
 	using namespace toadlet::egg::mathfixed::Math;
 #else

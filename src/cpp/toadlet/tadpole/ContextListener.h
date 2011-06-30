@@ -27,23 +27,18 @@
 #define TOADLET_TADPOLE_CONTEXTLISTENER_H
 
 namespace toadlet{
-namespace peeper{
-
-class RenderDevice;
-
-}
-
+namespace peeper{class RenderDevice;}
 namespace tadpole{
 
 class ContextListener{
 public:
-	virtual void preContextReset(peeper::RenderDevice *renderDevice)=0;
-	virtual void postContextReset(peeper::RenderDevice *renderDevice)=0;
+	virtual void preContextReset(RenderDevice *renderDevice)=0;
+	virtual void postContextReset(RenderDevice *renderDevice)=0;
 	
-	virtual void preContextActivate(peeper::RenderDevice *renderDevice)=0;
-	virtual void postContextActivate(peeper::RenderDevice *renderDevice)=0;
-	virtual void preContextDeactivate(peeper::RenderDevice *renderDevice)=0;
-	virtual void postContextDeactivate(peeper::RenderDevice *renderDevice)=0;
+	virtual void preContextActivate(RenderDevice *renderDevice)=0;
+	virtual void postContextActivate(RenderDevice *renderDevice)=0;
+	virtual void preContextDeactivate(RenderDevice *renderDevice)=0;
+	virtual void postContextDeactivate(RenderDevice *renderDevice)=0;
 };
 
 }

@@ -38,17 +38,17 @@ public:
 
 	TypeSensor(Scene *scene);
 
-	void setType(egg::BaseType<node::Node> *type){mType=type;}
-	egg::BaseType<node::Node> *getType() const{return mType;}
+	void setType(BaseType<Node> *type){mType=type;}
+	BaseType<Node> *getType() const{return mType;}
 
-	void setTypeName(const egg::String &typeName){mTypeName=typeName;}
-	const egg::String &getTypeName() const{return mTypeName;}
+	void setTypeName(const String &typeName){mTypeName=typeName;}
+	const String &getTypeName() const{return mTypeName;}
 
 protected:
-	bool senseNode(node::Node *node);
+	bool senseNode(Node *node);
 
-	egg::BaseType<node::Node> *mType;
-	egg::String mTypeName;
+	BaseType<Node> *mType;
+	String mTypeName;
 };
 
 }

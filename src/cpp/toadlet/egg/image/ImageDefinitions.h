@@ -30,6 +30,9 @@
 
 namespace toadlet{
 namespace egg{
+namespace image{};
+using namespace image;
+
 namespace image{
 
 /*	This may be an instance of the constant interface antipattern, but it achieves the purpose of

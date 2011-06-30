@@ -28,9 +28,6 @@
 #include <toadlet/egg/Logger.h>
 #include <memory.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-
 namespace toadlet{
 namespace ribbit{
 namespace decoder{

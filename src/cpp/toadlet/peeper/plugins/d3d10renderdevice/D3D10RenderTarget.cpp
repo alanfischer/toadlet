@@ -26,8 +26,6 @@
 #include "D3D10RenderTarget.h"
 #include "D3D10RenderDevice.h"
 
-using namespace toadlet::egg;
-
 namespace toadlet{
 namespace peeper{
 

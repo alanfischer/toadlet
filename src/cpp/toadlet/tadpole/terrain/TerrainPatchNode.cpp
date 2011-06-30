@@ -25,11 +25,6 @@
 
 #include <toadlet/egg/System.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::peeper;
-using namespace toadlet::tadpole;
-using namespace toadlet::tadpole::node;
-
 namespace toadlet{
 namespace tadpole{
 namespace terrain{
@@ -92,7 +87,7 @@ Node *TerrainPatchNode::create(Scene *scene){
 
 void TerrainPatchNode::destroy(){
 	if(mMaterial!=NULL){
-		mMaterial->release();
+		mMaterial->destroy();
 		mMaterial=NULL;
 	} 
 	if(mVertexBuffer!=NULL){

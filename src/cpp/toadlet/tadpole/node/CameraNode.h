@@ -28,7 +28,7 @@
 
 #include <toadlet/peeper/Viewport.h>
 #include <toadlet/peeper/RenderDevice.h>
-#include <toadlet/tadpole/Material.h>
+#include <toadlet/tadpole/material/Material.h>
 #include <toadlet/tadpole/node/ParentNode.h>
 #include <toadlet/tadpole/node/MeshNode.h>
 
@@ -83,10 +83,10 @@ public:
 	virtual void setLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up);
 	virtual void setWorldLookDir(const Vector3 &eye,const Vector3 &dir,const Vector3 &up);
 
-	virtual void setViewport(const peeper::Viewport &viewport);
+	virtual void setViewport(const Viewport &viewport);
 	virtual void setViewport(int x,int y,int width,int height);
 	inline bool getViewportSet() const{return mViewportSet;}
-	inline const peeper::Viewport &getViewport() const{return mViewport;}
+	inline const Viewport &getViewport() const{return mViewport;}
 	inline int getViewportX() const{return mViewport.x;}
 	inline int getViewportY() const{return mViewport.y;}
 	inline int getViewportWidth() const{return mViewport.width;}
@@ -101,8 +101,8 @@ public:
 	virtual void setSkipFirstClear(bool skip){mSkipFirstClear=skip;}
 	inline bool getSkipFirstClear() const{return mSkipFirstClear;}
 
-	virtual void setDefaultState(peeper::RenderState::ptr renderState){mDefaultState=renderState;}
-	inline peeper::RenderState::ptr getDefaultState() const{return mDefaultState;}
+	virtual void setDefaultState(RenderState::ptr renderState){mDefaultState=renderState;}
+	inline RenderState::ptr getDefaultState() const{return mDefaultState;}
 
 	virtual void setGamma(scalar gamma);
 	virtual scalar getGamma() const{return mGamma;}
@@ -117,10 +117,10 @@ public:
 	inline int getNumClipPlanes() const{return 6;}
 	inline const Plane &getClipPlane(int i) const{return mClipPlanes[i];}
 
-	virtual void render(peeper::RenderDevice *renderDevice,Node *node=NULL);
+	virtual void render(RenderDevice *renderDevice,Node *node=NULL);
 
-	egg::image::Image::ptr renderToImage(peeper::RenderDevice *renderDevice,int format,int width,int height);
-	Mesh::ptr renderToSkyBox(peeper::RenderDevice *renderDevice,int format,int size,scalar scale);
+	Image::ptr renderToImage(RenderDevice *renderDevice,int format,int width,int height);
+	Mesh::ptr renderToSkyBox(RenderDevice *renderDevice,int format,int size,scalar scale);
 
 	virtual bool culled(Node *node) const;
 	virtual bool culled(const Bound &bound) const;
@@ -137,7 +137,7 @@ public:
 protected:
 	virtual void projectionUpdated();
 	virtual void updateViewTransform();
-	virtual void renderOverlayGamma(peeper::RenderDevice *renderDevice);
+	virtual void renderOverlayGamma(RenderDevice *renderDevice);
 
 	ProjectionType mProjectionType;
 	scalar mFov,mAspect;
@@ -145,12 +145,12 @@ protected:
 	scalar mBottomDist,mTopDist;
 	scalar mNearDist,mFarDist;
 	bool mViewportSet;
-	peeper::Viewport mViewport;
+	Viewport mViewport;
 	int mClearFlags;
 	Vector4 mClearColor;
 	bool mSkipFirstClear;
 	bool mAlignmentCalculationsUseOrigin;
-	peeper::RenderState::ptr mDefaultState;
+	RenderState::ptr mDefaultState;
 
 	Matrix4x4 mProjectionMatrix;
 	scalar mProjectionRotation;
@@ -164,8 +164,8 @@ protected:
 	Vector3 mForward,mRight;
 
 	Matrix4x4 mOverlayMatrix;
-	peeper::VertexData::ptr mOverlayVertexData;
-	peeper::IndexData::ptr mOverlayIndexData;
+	VertexData::ptr mOverlayVertexData;
+	IndexData::ptr mOverlayIndexData;
 	scalar mGamma;
 	Material::ptr mGammaMaterial;
 

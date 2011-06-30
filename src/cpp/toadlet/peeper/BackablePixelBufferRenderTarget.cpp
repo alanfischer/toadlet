@@ -26,9 +26,6 @@
 #include <toadlet/egg/Logger.h>
 #include <toadlet/peeper/BackablePixelBufferRenderTarget.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::image;
-
 namespace toadlet{
 namespace peeper{
 

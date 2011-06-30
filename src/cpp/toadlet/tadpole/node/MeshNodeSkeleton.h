@@ -27,9 +27,9 @@
 #define TOADLET_TADPOLE_NODE_MESHNODESKELETON_H
 
 #include <toadlet/tadpole/Attachable.h>
-#include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/Renderable.h>
 #include <toadlet/tadpole/Skeleton.h>
+#include <toadlet/tadpole/material/Material.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -116,13 +116,13 @@ public:
 
 	inline int getNumBones() const{return mBones.size();}
 	inline Bone *getBone(int index) const{return (index>=0 && index<mBones.size())?mBones[index]:NULL;}
-	inline Bone *getBone(const egg::String &name) const{return getBone(getBoneIndex(name));}
+	inline Bone *getBone(const String &name) const{return getBone(getBoneIndex(name));}
 
-	int getBoneIndex(const egg::String &name) const;
+	int getBoneIndex(const String &name) const;
 	int getBoneIndex(Bone *bone) const{return bone->index;}
 
-	egg::String getBoneName(int index) const;
-	egg::String getBoneName(Bone *bone) const{return mSkeleton->bones[bone->index]->name;}
+	String getBoneName(int index) const;
+	String getBoneName(Bone *bone) const{return mSkeleton->bones[bone->index]->name;}
 
 	const AABox &getBound(){return mBound;}
 
@@ -135,12 +135,12 @@ public:
 	Material *getRenderMaterial() const{return mSkeletonMaterial;}
 	const Transform &getRenderTransform() const;
 	const Bound &getRenderBound() const;
-	void render(peeper::RenderDevice *renderDevice) const;
+	void render(RenderDevice *renderDevice) const;
 
 	// Attachable
 	int getNumAttachments(){return mBones.size();}
-	egg::String getAttachmentName(int index){return getBoneName(index);}
-	int getAttachmentIndex(const egg::String &name){return getBoneIndex(name);}
+	String getAttachmentName(int index){return getBoneName(index);}
+	int getAttachmentIndex(const String &name){return getBoneIndex(name);}
 	bool getAttachmentTransform(Transform &result,int index);
 
 protected:
@@ -154,22 +154,22 @@ protected:
 	Engine *mEngine;
 	MeshNode *mNode;
 	Skeleton::ptr mSkeleton;
-	egg::Collection<Bone::ptr> mBones;
+	Collection<Bone::ptr> mBones;
 	AABox mBound;
 	int mLastUpdateFrame;
 
 	TransformSequence::ptr mSequence;
 	scalar mSequenceTime;
-	egg::Collection<int> mTrackHints;
+	Collection<int> mTrackHints;
 
 	// For rendering the skeleton outline
 	Material::ptr mSkeletonMaterial;
-	peeper::VertexBuffer::ptr mSkeletonVertexBuffer;
-	peeper::IndexData::ptr mSkeletonIndexData;
-	peeper::VertexData::ptr mSkeletonVertexData;
-	peeper::VertexBuffer::ptr mHitBoxVertexBuffer;
-	peeper::VertexData::ptr mHitBoxVertexData;
-	peeper::IndexData::ptr mHitBoxIndexData;
+	VertexBuffer::ptr mSkeletonVertexBuffer;
+	IndexData::ptr mSkeletonIndexData;
+	VertexData::ptr mSkeletonVertexData;
+	VertexBuffer::ptr mHitBoxVertexBuffer;
+	VertexData::ptr mHitBoxVertexData;
+	IndexData::ptr mHitBoxIndexData;
 };
 
 }

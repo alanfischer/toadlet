@@ -26,8 +26,6 @@
 #include <toadlet/tadpole/animation/Controller.h>
 #include <toadlet/tadpole/Engine.h>
 
-using namespace toadlet::egg;
-
 namespace toadlet{
 namespace tadpole{
 namespace animation{

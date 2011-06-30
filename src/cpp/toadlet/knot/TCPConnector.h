@@ -35,7 +35,7 @@
 namespace toadlet{
 namespace knot{
 
-class TOADLET_API TCPConnector:public Connector,public egg::Runnable{
+class TOADLET_API TCPConnector:public Connector,public Runnable{
 public:
 	TOADLET_SHARED_POINTERS(TCPConnector);
 
@@ -66,13 +66,13 @@ protected:
 	void notifyListenersConnected(TCPConnection::ptr connection);
 	void notifyListenersDisconnected(TCPConnection::ptr connection);
 
-	egg::net::Socket::ptr mServerSocket;
-	egg::Thread::ptr mServerThread;
+	Socket::ptr mServerSocket;
+	Thread::ptr mServerThread;
 	bool mRun;
-	egg::Collection<TCPConnection::ptr> mConnections;
-	egg::Mutex mConnectionsMutex;
-	egg::Collection<ConnectionListener*> mListeners;
-	egg::Mutex mListenersMutex;
+	Collection<TCPConnection::ptr> mConnections;
+	Mutex mConnectionsMutex;
+	Collection<ConnectionListener*> mListeners;
+	Mutex mListenersMutex;
 
 	friend class TCPConnection;
 };

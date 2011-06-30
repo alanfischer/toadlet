@@ -28,8 +28,6 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/peeper/BackableVertexFormat.h>
 
-using namespace toadlet::egg;
-
 namespace toadlet{
 namespace peeper{
 
@@ -159,7 +157,7 @@ int D3D9VertexFormat::findElement(int semantic){
 	return -1;
 }
 
-int D3D9VertexFormat::findElement(const egg::String &name){
+int D3D9VertexFormat::findElement(const String &name){
 	TOADLET_ASSERT(mNames.size()!=0);
 
 	int i;

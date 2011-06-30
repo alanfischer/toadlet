@@ -42,9 +42,6 @@
 	#endif
 #endif
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-
 namespace toadlet{
 namespace ribbit{
 namespace decoder{
@@ -71,7 +68,7 @@ void OggVorbisDecoder::close(){
 	stopStream();
 }
 
-bool OggVorbisDecoder::startStream(egg::io::Stream::ptr stream){
+bool OggVorbisDecoder::startStream(Stream::ptr stream){
 	mStream=stream;
 
 	if(mStream==NULL){

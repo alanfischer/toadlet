@@ -27,9 +27,6 @@
 #include <toadlet/egg/Error.h>
 #include <toadlet/egg/image/ImageFormatConversion.h>
 
-using namespace toadlet::egg;
-using namespace toadlet::egg::image;
-
 namespace toadlet{
 namespace peeper{
 

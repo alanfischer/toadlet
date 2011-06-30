@@ -33,11 +33,6 @@
 	#pragma comment(lib,TOADLET_LIBFREETYPE_NAME)
 #endif
 
-using namespace toadlet::peeper;
-using namespace toadlet::egg;
-using namespace toadlet::egg::io;
-using namespace toadlet::egg::image;
-
 namespace toadlet{
 namespace tadpole{
 namespace handler{
