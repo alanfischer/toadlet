@@ -51,6 +51,8 @@ TOADLET_NODE_IMPLEMENT(BSP30ModelNode,Categories::TOADLET_TADPOLE_BSP+".BSP30Mod
 BSP30ModelNode::BSP30ModelNode():Node(),
 	//mMap,
 	mModelIndex(0),
+	//mSubModels,
+	//mOwnedMaterial,
 	mRendered(false)
 {}
 
@@ -63,6 +65,15 @@ Node *BSP30ModelNode::create(Scene *scene){
 	mRendered=true;
 
 	return this;
+}
+
+void BSP30ModelNode::destroy(){
+	if(mOwnedMaterial!=NULL){
+		mOwnedMaterial->release();
+		mOwnedMaterial=NULL;
+	}
+
+	super::destroy();
 }
 
 Node *BSP30ModelNode::set(Node *node){
@@ -101,6 +112,11 @@ void BSP30ModelNode::setModel(BSP30Map::ptr map,int index){
 		return;
 	}
 
+	if(mOwnedMaterial!=NULL){
+		mOwnedMaterial->release();
+		mOwnedMaterial=NULL;
+	}
+
 	mMap=map;
 	mModelIndex=index;
 	mSubModels.clear();
@@ -131,18 +147,19 @@ void BSP30ModelNode::setModel(BSP30Map::ptr map,int index){
 }
 
 RenderState::ptr BSP30ModelNode::getSharedRenderState(){
-	Material::ptr sharedMaterial;
-	int i;
-	for(i=0;i<mSubModels.size();++i){
-		SubModel *sub=mSubModels[i];
-		if(sub->material->getManaged()){
-			sub->material=mEngine->getMaterialManager()->cloneMaterial(sub->material,false,sharedMaterial);
+	if(mOwnedMaterial==NULL && mSubModels.size()>0){
+		mOwnedMaterial=mSubModels[0]->material=mEngine->getMaterialManager()->createMaterial(mSubModels[0]->material);
+		mSubModels[0]->material->setSort(Material::SortType_AUTO);
+		int i;
+		for(i=1;i<mSubModels.size();++i){
+			mSubModels[i]->material=mEngine->getMaterialManager()->cloneMaterial(mSubModels[i]->material);
+			mSubModels[i]->material->shareStates(mOwnedMaterial);
+			mSubModels[i]->material->setSort(Material::SortType_AUTO);
 		}
-		if(i==0){
-			sharedMaterial=sub->material;
-		}
+		mOwnedMaterial->retain();
 	}
-	return sharedMaterial->getRenderState();
+
+	return mOwnedMaterial!=NULL?mOwnedMaterial->getRenderState():NULL;
 }
 
 void BSP30ModelNode::showPlanarFaces(int plane){

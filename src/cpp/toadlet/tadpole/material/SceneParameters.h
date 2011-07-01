@@ -23,38 +23,35 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_PEEPER_UPDATEPARAMETER_H
-#define TOADLET_PEEPER_UPDATEPARAMETER_H
+#ifndef TOADLET_TADPOLE_MATERIAL_SCENEPARAMETERS_H
+#define TOADLET_TADPOLE_MATERIAL_SCENEPARAMETERS_H
 
-#include <toadlet/peeper/Types.h>
-#include <memory.h>
+#include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
-namespace peeper{
+namespace tadpole{
 
-class TOADLET_API UpdateParameter{
+class Renderable;
+class Scene;
+
+namespace material{
+
+class SceneParameters{
 public:
-	TOADLET_SHARED_POINTERS(UpdateParameter);
+	TOADLET_SHARED_POINTERS(SceneParameters);
 
-	UpdateParameter(int size){
-		mSize=size;
-		mData=new tbyte[size];
-	}
-	virtual ~UpdateParameter(){
-		delete[] mData;
-	}
+	inline void setScene(Scene *scene){mScene=scene;}
+	inline Scene *getScene(){return mScene;}
 
-	int getSize(){return mSize;}
-	void setData(tbyte *data){memcpy(mData,data,mSize);}
-	tbyte *getData() const{return mData;}
-	
-	virtual void update()=0;
+	inline void setRenderable(Renderable *renderable){mRenderable=renderable;}
+	inline Renderable *getRenderable(){return mRenderable;}
 
 protected:
-	int mSize;
-	tbyte *mData;
+	Scene *mScene;
+	Renderable *mRenderable;
 };
 
+}
 }
 }
 

@@ -112,6 +112,7 @@ void SceneRenderer::renderRenderables(RenderableSet *set,RenderDevice *device,Ca
 
 		if(useMaterials && material!=NULL){
 			material->setupRenderDevice(device);
+			material->setupRenderVariables(device,Material::Scope_MATERIAL,mScene,NULL);
 		}
 
 		for(i=0;i<renderableQueue.size();++i){
@@ -119,8 +120,13 @@ void SceneRenderer::renderRenderables(RenderableSet *set,RenderDevice *device,Ca
 			Renderable *renderable=item.renderable;
 			renderable->getRenderTransform().getMatrix(matrix);
 
+			// Fixed states
 			device->setAmbientColor(item.ambient);
 			device->setMatrix(RenderDevice::MatrixType_MODEL,matrix);
+
+			// Shader states
+			material->setupRenderVariables(device,Material::Scope_RENDERABLE,mScene,renderable);
+
 			renderable->render(device);
 		}
 
@@ -152,10 +158,16 @@ void SceneRenderer::renderDepthSortedRenderables(RenderableSet *set,RenderDevice
 
 		if(useMaterials && material!=NULL){
 			material->setupRenderDevice(device);
+			material->setupRenderVariables(device,Material::Scope_MATERIAL,mScene,NULL);
 		}
 
+		// Fixed states
 		device->setAmbientColor(item.ambient);
 		device->setMatrix(RenderDevice::MatrixType_MODEL,matrix);
+
+		// Shader states
+		material->setupRenderVariables(device,Material::Scope_RENDERABLE,mScene,renderable);
+
 		renderable->render(device);
 
 		if(useMaterials){

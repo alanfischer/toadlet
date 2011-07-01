@@ -33,7 +33,7 @@
 #include <toadlet/tadpole/Bound.h>
 #include <toadlet/tadpole/Transform.h>
 #include <toadlet/tadpole/Skeleton.h>
-#include <toadlet/tadpole/material/MaterialResource.h>
+#include <toadlet/tadpole/material/Material.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -52,7 +52,7 @@ public:
 		VertexData::ptr vertexData;
 		IndexData::ptr indexData;
 		
-		MaterialResource::ptr material;
+		Material::ptr material;
 		String materialName;
 
 		String name;

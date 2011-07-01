@@ -42,9 +42,10 @@ SpriteModelNode::SpriteModelNode():super(),
 	//mModel,
 	mRendered(false),
 	mSequenceTime(0)
-	//mMaterial,
+	//mMaterials,
 	//mVertexData,
-	//mIndexData
+	//mIndexData,
+	//mOwnedMaterial
 {
 }
 
@@ -73,6 +74,11 @@ void SpriteModelNode::destroy(){
 		mIndexData=NULL;
 	}
 	
+	if(mOwnedMaterial!=NULL){
+		mOwnedMaterial->release();
+		mOwnedMaterial=NULL;
+	}
+
 	super::destroy();
 }
 
@@ -110,6 +116,11 @@ void SpriteModelNode::setModel(const String &name){
 }
 
 void SpriteModelNode::setModel(SpriteModel::ptr model){
+	if(mOwnedMaterial!=NULL){
+		mOwnedMaterial->release();
+		mOwnedMaterial=NULL;
+	}
+
 	if(mModel!=NULL){
 		mModel->release();
 	}
@@ -159,33 +170,19 @@ void SpriteModelNode::setModel(SpriteModel::ptr model){
 }
 
 RenderState::ptr SpriteModelNode::getSharedRenderState(){
-	RenderState::ptr renderState;
-	if(mSubModels[0]->material->ownsRenderState()){
-		renderState=mSubModels[0]->material->getRenderState();
-	}
-	else{
-		renderState=mSubModels[0]->material->getOwnRenderState();
+	if(mOwnedMaterial==NULL && mMaterials.size()>0){
+		mMaterials[0]=mOwnedMaterial=mEngine->getMaterialManager()->createMaterial(mMaterials[0]);
+		mMaterials[0]->setSort(Material::SortType_AUTO);
 		int i;
-		for(i=1;i<mSubModels.size();++i){
-			mSubModels[i]->material->setRenderState(renderState);
-			mSubModels[i]->material->setSort(Material::SortType_AUTO);
-		}
-	}
-	return renderState;
-
-
-	Material::ptr sharedMaterial;
-	int i;
-	for(i=0;i<mMaterials.size();++i){
-		if(mMaterials[i]->getManaged()){
-			mMaterials[i]=mEngine->getMaterialManager()->cloneMaterial(mMaterials[i],false,sharedMaterial);
+		for(i=1;i<mMaterials.size();++i){
+			mMaterials[i]=mEngine->getMaterialManager()->cloneMaterial(mMaterials[i]);
+			mMaterials[i]->shareStates(mOwnedMaterial);
 			mMaterials[i]->setSort(Material::SortType_AUTO);
 		}
-		if(i==0){
-			sharedMaterial=mMaterials[i];
-		}
+		mOwnedMaterial->retain();
 	}
-	return sharedMaterial->getRenderState();
+
+	return mOwnedMaterial!=NULL?mOwnedMaterial->getRenderState():NULL;
 }
 
 void SpriteModelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){

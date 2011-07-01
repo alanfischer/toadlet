@@ -63,6 +63,7 @@ StudioModelNode::StudioModelNode():super(),
 	mRendered(false),
 	//mModel,
 	//mSubModels,
+	//mOwnedMaterial,
 
 	mBodypartIndex(0),
 	mModelIndex(0),
@@ -187,6 +188,10 @@ void StudioModelNode::setModel(const String &name){
 
 void StudioModelNode::setModel(StudioModel::ptr model){
 	mSubModels.clear();
+	if(mOwnedMaterial!=NULL){
+		mOwnedMaterial->release();
+		mOwnedMaterial=NULL;
+	}
 
 	if(mModel!=NULL){
 		mModel->release();
@@ -424,23 +429,19 @@ void StudioModelNode::traceSegment(Collision &result,const Vector3 &position,con
 }
 
 RenderState::ptr StudioModelNode::getSharedRenderState(){
-	if(mSubModels.size()==0){
-		return NULL;
-	}
-
-	RenderState::ptr renderState;
-	if(mSubModels[0]->material->ownsRenderState()){
-		renderState=mSubModels[0]->material->getRenderState();
-	}
-	else{
-		renderState=mSubModels[0]->material->getOwnRenderState();
+	if(mOwnedMaterial==NULL && mSubModels.size()>0){
+		mOwnedMaterial=mSubModels[0]->material=mEngine->getMaterialManager()->createMaterial(mSubModels[0]->material);
+		mSubModels[0]->material->setSort(Material::SortType_AUTO);
 		int i;
 		for(i=1;i<mSubModels.size();++i){
-			mSubModels[i]->material->setRenderState(renderState);
+			mSubModels[i]->material=mEngine->getMaterialManager()->cloneMaterial(mSubModels[i]->material);
+			mSubModels[i]->material->shareStates(mOwnedMaterial);
 			mSubModels[i]->material->setSort(Material::SortType_AUTO);
 		}
+		mOwnedMaterial->retain();
 	}
-	return renderState;
+
+	return mOwnedMaterial!=NULL?mOwnedMaterial->getRenderState():NULL;
 }
 
 void StudioModelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){

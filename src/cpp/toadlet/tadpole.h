@@ -37,7 +37,6 @@
 #include <toadlet/tadpole/Font.h>
 #include <toadlet/tadpole/FontData.h>
 #include <toadlet/tadpole/FontManager.h>
-#include <toadlet/tadpole/Material.h>
 #include <toadlet/tadpole/MaterialManager.h>
 #include <toadlet/tadpole/MathFormatter.h>
 #include <toadlet/tadpole/MeshManager.h>

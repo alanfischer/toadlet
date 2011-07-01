@@ -23,23 +23,27 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_RENDERVARIABLE_H
-#define TOADLET_TADPOLE_RENDERVARIABLE_H
+#ifndef TOADLET_TADPOLE_MATERIAL_RENDERVARIABLE_H
+#define TOADLET_TADPOLE_MATERIAL_RENDERVARIABLE_H
 
 #include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
 namespace tadpole{
+namespace material{
+
+class SceneParameters;
 
 class RenderVariable{
 public:
 	TOADLET_SHARED_POINTERS(RenderVariable);
 
-	virtual ~RenderVariable()=0;
+	virtual ~RenderVariable(){}
 
-	virtual void updateData(tbyte *data)=0;
+	virtual void update(tbyte *data,SceneParameters *parameters)=0;
 };
 
+}
 }
 }
 

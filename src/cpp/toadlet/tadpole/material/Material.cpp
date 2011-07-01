@@ -27,21 +27,40 @@
 #include <toadlet/peeper/BackableRenderState.h>
 #include <toadlet/peeper/BackableShaderState.h>
 #include <toadlet/peeper/RenderCaps.h>
+#include <toadlet/tadpole/BufferManager.h>
+#include <toadlet/tadpole/MaterialManager.h>
 #include <toadlet/tadpole/material/Material.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace material{
 
-Material::Material(MaterialManager *manager):BaseResource(),
-	mOwnsRenderState(false),
-	mOwnsShaderState(false),
+Material::Material(MaterialManager *manager,Material *source,bool clone):BaseResource(),
 	mSort(SortType_MATERIAL),
+	mOwnsStates(false),
 	mLayer(0)
 {
 	mManager=manager;
-	mRenderState=manager->createRenderState();
-	mShaderState=manager->createShaderState();
+	if(manager!=NULL && clone==false){
+		mRenderState=mManager->createRenderState();
+		mShaderState=mManager->createShaderState();
+		mOwnsStates=true;
+
+		if(source!=NULL){
+			manager->modifyRenderState(mRenderState,source->getRenderState());
+			manager->modifyRenderState(mRenderState,source->getRenderState());
+		}
+	}
+	else if(clone){
+		mRenderState=source->getRenderState();
+		mShaderState=source->getShaderState();
+		mOwnsStates=false;
+	}
+	else{
+		mRenderState=RenderState::ptr(new BackableRenderState());
+		mShaderState=ShaderState::ptr(new BackableShaderState());
+		mOwnsStates=true;
+	}
 }
 
 Material::~Material(){
@@ -49,13 +68,15 @@ Material::~Material(){
 }
 
 void Material::destroy(){
-	if(mOwnsRenderState && mRenderState!=NULL){
-		mRenderState->destroy();
+	if(mOwnsStates){
+		if(mRenderState!=NULL){
+			mRenderState->destroy();
+		}
+		if(mShaderState!=NULL){
+			mShaderState->destroy();
+		}
 	}
 	mRenderState=NULL;
-	if(mOwnsShaderState && mShaderState!=NULL){
-		mShaderState->destroy();
-	}
 	mShaderState=NULL;
 
 	int i;
@@ -65,6 +86,11 @@ void Material::destroy(){
 		}
 	}
 	mTextures.clear();
+
+	if(mVariables!=NULL){
+		mVariables->destroy();
+		mVariables=NULL;
+	}
 }
 
 void Material::setTexture(int i,Texture::ptr texture){
@@ -98,14 +124,6 @@ void Material::setTextureName(int i,const String &name){
 	mTextureNames[i]=name;
 }
 
-void Material::setShader(Shader::ShaderType type,Shader::ptr shader){
-	mShaderState->setShader(type,shader);
-}
-
-Shader::ptr Material::getShader(Shader::ShaderType type){
-	return mShaderState->getShader(type);
-}
-
 bool Material::isDepthSorted() const{
 	switch(mSort){
 		case SortType_DEPTH:
@@ -119,25 +137,40 @@ bool Material::isDepthSorted() const{
 	}
 }
 
-RenderState::ptr Material::getOwnRenderState(){
-	if(mOwnsRenderState==false){
-		RenderState::ptr renderState=mManager->createRenderState();
-		mManager->modifyRenderState(renderState,mRenderState);
-		mRenderState=renderState;
+void Material::shareStates(Material::ptr material){
+	if(mOwnsStates){
+		if(mRenderState!=NULL){
+			mRenderState->destroy();
+		}
+		if(mShaderState!=NULL){
+			mShaderState->destroy();
+		}
 	}
-	return mRenderState;
+	mRenderState=material->getRenderState();
+	mShaderState=material->getShaderState();
+	mOwnsStates=false;
 }
 
-ShaderState::ptr Material::getOwnShaderState(){
-	if(mOwnsShaderState==false){
-		ShaderState::ptr shaderState=mManager->createShaderState();
-		mManager->modifyShaderState(shaderState,mShaderState);
-		mShaderState=shaderState;
+RenderVariableSet::ptr Material::getVariables(){
+	if(mVariables!=NULL){
+		return mVariables;
 	}
-	return mShaderState;
+
+	mVariables=RenderVariableSet::ptr(new RenderVariableSet());
+
+	int i;
+	for(i=0;i<mShaderState->getNumVariableBuffers(Shader::ShaderType_VERTEX);++i){
+		VariableBufferFormat::ptr format=mShaderState->getVariableBufferFormat(Shader::ShaderType_VERTEX,i);
+		VariableBuffer::ptr buffer=mManager->getBufferManager()->createVariableBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,format);
+		mVariables->addBuffer(buffer);
+	}
+
+	mParameters=SceneParameters::ptr(new SceneParameters());
+
+	return mVariables;
 }
 
-/// @todo: Optimize this so we're not resetting a ton of texture states, and not requesting the caps
+/// @todo: This whole setup should be moved to the SceneRenderers, let them handle it
 void Material::setupRenderDevice(RenderDevice *renderDevice){
 	renderDevice->setRenderState(mRenderState);
 	renderDevice->setShaderState(mShaderState);
@@ -151,6 +184,19 @@ void Material::setupRenderDevice(RenderDevice *renderDevice){
 	}
 	for(;i<caps.maxTextureStages;++i){
 		renderDevice->setTexture(i,NULL);
+	}
+}
+
+void Material::setupRenderVariables(RenderDevice *renderDevice,int scope,Scene *scene,Renderable *renderable){
+	mParameters->setScene(scene);
+	mParameters->setRenderable(renderable);
+	mVariables->update(scope,mParameters);
+	int i;
+	for(i=0;i<mVariables->getNumBuffers();++i){
+		// If the buffer only changes for this scope
+		if(mVariables->getBufferScope(i)==scope){
+			renderDevice->setBuffer(i,mVariables->getBuffer(i));
+		}
 	}
 }
 

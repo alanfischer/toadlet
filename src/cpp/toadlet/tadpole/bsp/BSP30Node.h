@@ -63,6 +63,7 @@ public:
 	BSP30ModelNode();
 	virtual ~BSP30ModelNode();
 	Node *create(Scene *scene);
+	void destroy();
 	virtual Node *set(Node *node);
 
 	void *hasInterface(int type);
@@ -91,6 +92,7 @@ protected:
 	BSP30Map::ptr mMap;
 	int mModelIndex;
 	Collection<SubModel::ptr> mSubModels;
+	Material::ptr mOwnedMaterial;
 	bool mRendered;
 };
 

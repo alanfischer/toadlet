@@ -34,56 +34,69 @@ RenderVariableSet::RenderVariableSet(){
 }
 
 RenderVariableSet::~RenderVariableSet(){
+	destroy();
+}
+
+void RenderVariableSet::destroy(){
+	int i;
+	for(i=0;i<mBuffers.size();++i){
+		mBuffers[i].buffer->destroy();
+	}
+	mBuffers.clear();
 }
 
 bool RenderVariableSet::addBuffer(VariableBuffer::ptr buffer){
-	BufferVariableSet set;
+	BufferInfo set;
 	set.buffer=buffer;
-	mBufferVariables.add(set);
+	set.scope=0;
+	mBuffers.add(set);
 	return true;
 }
 
 void RenderVariableSet::removeBuffer(VariableBuffer::ptr buffer){
 	int i;
-	for(i=0;i<mBufferVariables.size();++i){
-		if(mBufferVariables[i].buffer==buffer){
-			mBufferVariables.removeAt(i);
+	for(i=0;i<mBuffers.size();++i){
+		if(mBuffers[i].buffer==buffer){
+			mBuffers.removeAt(i);
 			return;
 		}
 	}
 }
 
 // Search for the correct buffer and correct index
-bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr variable){
+bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr variable,int scope){
 	int i=name.find(".");
-	BufferVariableSet *set=NULL;
+	String fullName=name;
+	BufferInfo *buffer=NULL;
 	if(i>0){
 		String possibleBufferName=name.substr(0,i);
-		for(i=0;i<mBufferVariables.size();++i){
-			if(possibleBufferName.equals(mBufferVariables[i].buffer->getVariableBufferFormat()->getName())){
-				set=&mBufferVariables[i];
+		for(i=0;i<mBuffers.size();++i){
+			if(possibleBufferName.equals(mBuffers[i].buffer->getVariableBufferFormat()->getName())){
+				buffer=&mBuffers[i];
+				fullName=name.substr(i+1,name.length());
 				break;
 			}
 		}
 	}
-	if(set==NULL){
-		for(i=0;i<mBufferVariables.size();++i){
-			if(mBufferVariables[i].buffer->getVariableBufferFormat()->getPrimary()){
-				set=&mBufferVariables[i];
+	if(buffer==NULL){
+		for(i=0;i<mBuffers.size();++i){
+			if(mBuffers[i].buffer->getVariableBufferFormat()->getPrimary()){
+				buffer=&mBuffers[i];
+				String bufferName=buffer->buffer->getVariableBufferFormat()->getName();
 				break;
 			}
 		}
 	}
-	if(set==NULL){
+	if(buffer==NULL){
 		Error::unknown(Categories::TOADLET_TADPOLE,
 			"VariableBuffer not found for RenderVariable with name:"+name);
 		return false;
 	}
 
-	VariableBufferFormat *format=set->buffer->getVariableBufferFormat();
+	VariableBufferFormat *format=buffer->buffer->getVariableBufferFormat();
 	VariableBufferFormat::Variable *formatVariable=NULL;
 	for(i=0;i<format->getSize();++i){
-		if(name.equals(format->getVariable(i)->getFullName())){
+		if(fullName.equals(format->getVariable(i)->getFullName())){
 			formatVariable=format->getVariable(i);
 		}
 	}
@@ -97,36 +110,47 @@ bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr varia
 	VariableInfo v;
 	v.name=name;
 	v.location=formatVariable->getOffset();
+	v.scope=scope;
 	v.variable=variable;
-	set->variables.add(v);
+	buffer->variables.add(v);
+
+	buffer->scope|=scope;
 	
 	return true;
 }
 
 void RenderVariableSet::removeVariable(RenderVariable::ptr variable){
 	int i,j;
-	for(i=0;i<mBufferVariables.size();++i){
-		BufferVariableSet *set=&mBufferVariables[i];
-		for(j=0;j<set->variables.size();++j){
-			if(set->variables[j].variable==variable){
-				set->variables.removeAt(j);
-				return;
+	for(i=0;i<mBuffers.size();++i){
+		BufferInfo *buffer=&mBuffers[i];
+		buffer->scope=0;
+		for(j=0;j<buffer->variables.size();++j){
+			if(buffer->variables[j].variable==variable){
+				buffer->variables.removeAt(j);
+			}
+			else{
+				buffer->scope|=buffer->variables[j].scope;
 			}
 		}
 	}
 }
 
-void RenderVariableSet::update(){
+void RenderVariableSet::update(int scope,SceneParameters *parameters){
 	int i,j;
-	for(i=0;i<mBufferVariables.size();++i){
-		BufferVariableSet *set=&mBufferVariables[i];
-
-		tbyte *data=set->buffer->lock(Buffer::Access_BIT_WRITE);
-		for(j=0;j<set->variables.size();++j){
-			VariableInfo *info=&set->variables[j];
-			info->variable->updateData(data+info->location);
+	for(i=0;i<mBuffers.size();++i){
+		BufferInfo *buffer=&mBuffers[i];
+		if((buffer->scope&scope)==0){
+			continue;
 		}
-		set->buffer->unlock();
+
+		tbyte *data=buffer->buffer->lock(Buffer::Access_BIT_WRITE);
+		for(j=0;j<buffer->variables.size();++j){
+			VariableInfo *variable=&buffer->variables[j];
+			if((variable->scope&scope)!=0){
+				variable->variable->update(data+variable->location,parameters);
+			}
+		}
+		buffer->buffer->unlock();
 	}
 }
 

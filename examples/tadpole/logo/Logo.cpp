@@ -1,99 +1,5 @@
 #include "Logo.h"
 
-#include <toadlet/peeper/ShaderState.h>
-
-/*
-
-WHAT DO WE KNOW?
-
-We know how D3D9,D3D10,GLSL lay out constants: (Which I will rename to Uniform because Constant Variables is wtf)
-
-D3D9:
-	Set Uniform by CachedIndex
-
-D3D10:
-	Set BufferContents by CachedIndex;
-	Set Buffer by CachedIndex;
-
-GL:
-	Set Uniform by CachedIndex
-
-GLUBO:
-	Set Uniform by CachedIndex
-	Set BufferContents by CachedIndex;
-	Set Buffer by CachedIndex;
-
-So we need a Buffer abstraction to cover all those cases.
-
-D3D10:
-	Create a D3D10UniformBuffer
-	Find BufferIndex in Shader
-	Find UniformIndex in Buffer
-
-	Set Buffer Contents
-	Set Buffer to Shader
-
-D3D9:
-	Create a D3D9UniformBuffer
-	Find UniformIndex in Shader
-
-	Set Buffer Contents
-	Set Uniforms from Buffer Contents
-
-GL:
-	Create a GLUniformBuffer
-	Find UniformIndex in Program
-
-	Set Buffer Contents
-	Set Uniforms from Buffer Contents
-
-GLUBO:
-	Create a GLBuffer (our class for anything related to vertex_buffer_objects
-	Find BufferIndex in Program
-	Find UniformOffset in Buffer
-	
-	Set Buffer Contents
-	Set Buffer to Program
-
-Buffer interface must:
-	Set Buffer Contents
-
-Should the Number of Buffers created be up to the User?
-Or should something in the reflection tell us how many to allocate and what size?
-
-I think we should be able to query for the number of buffers, and size.  Then what is actually done is up to the user.
-That way they could create their own to force D3D9/GL to be more efficient instead of only getting 1 buffer that does everything, and needs to be reset every frame.
-
-... Constant Buffers ... SamplerStates ... Resources ...
-
-GL - Resources are in ConstantBuffers and Texture/Sampler are tied together
-D3D9 - Resources 
-
-ShaderState{
-	Shaders
-	UniformBuffers(Buffers)
-	Textures(Resources)
-	SamplerStates(extras)
-
-	void setVariable(...);
-	void setTexture(...);
-	void setSampler(...);
-}
-
-RenderState{
-	RenderStates
-	Textures
-	SamplerStates
-}
-
-Should a UniformBuffer be created with a Shader?  That would let you obtain the mappings, at least for D3D9/D3D10
-NO - a UniformBuffer doesn't need to know the mappings.  Its job is simply to map a block of memory, and maybe set individual parts
-	(Or would we need it for D3D9??)  Uniform buffer interface should not be concerned about shader reflection.
-
-
-
-*/
-
 class GravityFollower:public NodeListener,MotionDeviceListener{
 public:
 	GravityFollower(MotionDevice *device){
@@ -162,7 +68,6 @@ Logo::~Logo(){
 }
 Shader::ptr vs,fs;
 ShaderState::ptr ss;
-VariableBuffer::ptr vb;
 
 String sp[]={
 	"glsl",
@@ -173,10 +78,13 @@ String vsc[]={
 	"in vec4 POSITION;\n" \
 	"in vec3 NORMAL;\n" \
 	"out vec4 color;\n" \
-	"uniform mat4 ModelViewProjectionMatrix[2];\n" \
+	"uniform mat4 mvp;\n" \
+	"uniform float time;\n" \
 	"void main(){\n" \
-		"gl_Position = ModelViewProjectionMatrix[0] * POSITION;\n" \
-		"color = vec4(NORMAL.x,NORMAL.y,NORMAL.z,1.0);\n" \
+		"vec4 p=mvp * POSITION;\n" \
+		"p.y=p.y+sin(p.x/10)*10;\n" \
+		"gl_Position=p;\n" \
+		"color = vec4(sin(time),0,0,1.0);\n" \
 	"}",
 
 	"struct VIN{\n" \
@@ -205,9 +113,8 @@ String fsc[]={
 		"float4 position : SV_POSITION;\n" \
 		"float4 color: COLOR;\n" \
 	"};\n" \
-	"float4x4 mvp,mvp2;\n" \
 	"float4 main(PIN pin): SV_TARGET{" \
-	"	return mul(mul(pin.color,mvp),mvp2);\n" \
+	"	return pin.color;\n" \
 	"}"
 };
 
@@ -217,8 +124,8 @@ public:
 		this->camera=camera;
 	}
 
-	void updateData(tbyte *data){
-		Matrix4x4 projectionView=cameraNode->getProjectionMatrix()*cameraNode->getViewMatrix();
+	void update(tbyte *data,SceneParameters *parameters){
+		Matrix4x4 projectionView=camera->getProjectionMatrix()*camera->getViewMatrix();
 		memcpy(data,projectionView.getData(),sizeof(Matrix4x4));
 	}
 
@@ -226,8 +133,18 @@ protected:
 	CameraNode::ptr camera;
 };
 
+class TimeVariable:public RenderVariable{
+public:
+	TimeVariable(){}
+
+	void update(tbyte *data,SceneParameters *parameters){
+		float time=(float)parameters->getScene()->getTime()/1000.0f;
+		memcpy(data,&time,sizeof(time));
+	}
+};
+
 void Logo::create(){
-	Application::create("d3d10");
+	Application::create("gl");
 
 	mEngine->setDirectory("../../../data");
 
@@ -257,21 +174,13 @@ void Logo::create(){
 
 vs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,sp,vsc,2);
 fs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,sp,fsc,2);
-VariableBufferFormat::ptr vbf;
 
 	for(int i=0;i<meshNode->getNumSubMeshes();++i){
 		meshNode->getSubMesh(i)->material->setShader(Shader::ShaderType_VERTEX,vs);
 		meshNode->getSubMesh(i)->material->setShader(Shader::ShaderType_FRAGMENT,fs);
-VariableBufferFormat::ptr vv=meshNode->getSubMesh(i)->material->getShaderState()->getVariableBufferFormat(Shader::ShaderType_VERTEX,0);
-VariableBufferFormat::ptr fv=meshNode->getSubMesh(i)->material->getShaderState()->getVariableBufferFormat(Shader::ShaderType_FRAGMENT,0);
-getEngine()->getBufferManager()->outputVariableBufferFormat(vv);
-getEngine()->getBufferManager()->outputVariableBufferFormat(fv);
-vbf=vv;
+		meshNode->getSubMesh(i)->material->getVariables()->addVariable("mvp",RenderVariable::ptr(new PVMVariable(cameraNode)),Material::Scope_MATERIAL);
+		meshNode->getSubMesh(i)->material->getVariables()->addVariable("time",RenderVariable::ptr(new TimeVariable()),Material::Scope_MATERIAL);
 	}
-
-vb=getEngine()->getBufferManager()->createVariableBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,vbf);
-PVMVariable::ptr pvm(new PVMVariable(cameraNode));
-
 
 // Only looks good if running on device, in simulator its always a top down view
 #if 0
@@ -302,13 +211,7 @@ void Logo::resized(int width,int height){
 }
 
 void Logo::render(RenderDevice *renderDevice){
-Matrix4x4 shaderMatrix;
-shaderMatrix.set(cameraNode->getProjectionMatrix()*cameraNode->getViewMatrix());
-vb->update((tbyte*)shaderMatrix.getData(),0,16*4);
-
 	renderDevice->beginScene();
-renderDevice->setShaderState(meshNode->getSubMesh(0)->material->getShaderState());
-renderDevice->setBuffer(0,vb);
 		cameraNode->render(renderDevice);
 	renderDevice->endScene();
 	renderDevice->swap();

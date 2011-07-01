@@ -24,7 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/tadpole/handler/XMLMeshUtilities.h>
-#include <toadlet/tadpole/Material.h>
+#include <toadlet/tadpole/material/Material.h>
 #include <toadlet/peeper/VertexBufferAccessor.h>
 #include <toadlet/peeper/IndexBufferAccessor.h>
 #include <toadlet/egg/MathConversion.h>
@@ -250,7 +250,7 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 		material=materialManager->createMaterial();
 	}
 	else{
-		material=Material::ptr(new Material());
+		material=Material::ptr(new Material(NULL));
 	}
 
 	const char *prop=mxmlElementGetAttr(node,"Name");

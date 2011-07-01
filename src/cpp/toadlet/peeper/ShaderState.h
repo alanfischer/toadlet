@@ -30,7 +30,6 @@
 #include <toadlet/peeper/ShaderStateDestroyedListener.h>
 #include <toadlet/peeper/Shader.h>
 #include <toadlet/peeper/Texture.h>
-#include <toadlet/peeper/UpdateParameter.h>
 
 namespace toadlet{
 namespace peeper{

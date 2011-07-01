@@ -26,21 +26,21 @@
 #ifndef TOADLET_TADPOLE_MATERIAL_MATERIAL_H
 #define TOADLET_TADPOLE_MATERIAL_MATERIAL_H
 
-#include <toadlet/tadpole/Types.h>
+#include <toadlet/egg/BaseResource.h>
 #include <toadlet/peeper/RenderState.h>
 #include <toadlet/peeper/ShaderState.h>
-#include <toadlet/peeper/IndexData.h>
-#include <toadlet/peeper/VertexData.h>
 #include <toadlet/peeper/RenderDevice.h>
+#include <toadlet/tadpole/material/RenderVariableSet.h>
+#include <toadlet/tadpole/material/SceneParameters.h>
 
 namespace toadlet{
 namespace tadpole{
 
 class MaterialManager;
-	
+
 namespace material{
 
-class TOADLET_API Material{
+class TOADLET_API Material:public BaseResource{
 public:
 	TOADLET_SHARED_POINTERS(Material);
 
@@ -50,7 +50,12 @@ public:
 		SortType_DEPTH,
 	};
 
-	Material(MaterialManager *manager);
+	enum Scope{
+		Scope_MATERIAL	=1<<0,
+		Scope_RENDERABLE=1<<1,
+	};
+
+	Material(MaterialManager *manager,Material *source=NULL,bool clone=false);
 	virtual ~Material();
 
 	void destroy();
@@ -81,6 +86,9 @@ public:
 	void setTextureState(int i,const TextureState &state){return mRenderState->setTextureState(i,state);}
 	bool getTextureState(int i,TextureState &state) const{return mRenderState->getTextureState(i,state);}
 
+	void setShader(Shader::ShaderType type,Shader::ptr shader){mShaderState->setShader(type,shader);}
+	Shader::ptr getShader(Shader::ShaderType type){return mShaderState->getShader(type);}
+
 	int getNumTextures() const{return mTextures.size();}
 	void setTexture(Texture::ptr texture){setTexture(0,texture);}
 	void setTexture(int i,Texture::ptr texture);
@@ -89,8 +97,7 @@ public:
 	void setTextureName(int i,const String &name);
 	String getTextureName(int i=0) const{return i<mTextureNames.size()?mTextureNames[i]:(char*)NULL;}
 
-	void setShader(Shader::ShaderType type,Shader::ptr shader);
-	Shader::ptr getShader(Shader::ShaderType type);
+	RenderVariableSet::ptr getVariables();
 
 	void setSort(SortType sort){mSort=sort;}
 	inline SortType getSort() const{return mSort;}
@@ -99,26 +106,23 @@ public:
 	void setLayer(int layer){mLayer=layer;}
 	int getLayer() const{return mLayer;}
 
+	void shareStates(Material::ptr material);
+	inline bool ownsStates() const{return mOwnsStates;}
 	inline RenderState::ptr getRenderState() const{return mRenderState;}
-	inline void setRenderState(RenderState::ptr renderState){mRenderState=renderState;mOwnsRenderState=false;}
-	inline bool ownsRenderState() const{return mOwnsRenderState;}
-	RenderState::ptr getOwnRenderState();
-
 	inline ShaderState::ptr getShaderState() const{return mShaderState;}
-	inline void setShaderState(ShaderState::ptr shaderState){mShaderState=shaderState;mOwnsShaderState=false;}
-	inline bool ownsShaderState() const{return mOwnsRenderState;}
-	ShaderState::ptr getOwnShaderState();
 
 	void setupRenderDevice(RenderDevice *renderDevice);
-	
+	void setupRenderVariables(RenderDevice *renderDevice,int scope,Scene *scene,Renderable *renderable);
+
 protected:
 	MaterialManager *mManager;
 	RenderState::ptr mRenderState;
-	bool mOwnsRenderState;
 	ShaderState::ptr mShaderState;
-	bool mOwnsShaderState;
+	bool mOwnsStates;
 	Collection<Texture::ptr> mTextures;
 	Collection<String> mTextureNames;
+	RenderVariableSet::ptr mVariables;
+	SceneParameters::ptr mParameters;
 	SortType mSort;
 	int mLayer;
 };

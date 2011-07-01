@@ -48,7 +48,7 @@ public:
 	void *hasInterface(int type);
 
 	void setMaterial(Material::ptr material);
-	Material::ptr getMaterial() const{return mMaterial;}
+	Material::ptr getMaterial() const{return mOwnedMaterial!=NULL?mOwnedMaterial:mMaterial;}
 
 	void setAlignment(int alignment);
 	int getAlignment() const{return mAlignment;}
@@ -75,6 +75,7 @@ protected:
 	bool mRendered;
 	VertexData::ptr mVertexData;
 	IndexData::ptr mIndexData;
+	Material::ptr mOwnedMaterial;
 };
 
 }

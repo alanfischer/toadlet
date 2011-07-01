@@ -80,6 +80,7 @@ protected:
 	Collection<Material::ptr> mMaterials;
 	VertexData::ptr mVertexData;
 	IndexData::ptr mIndexData;
+	Material::ptr mOwnedMaterial;
 };
 
 }
