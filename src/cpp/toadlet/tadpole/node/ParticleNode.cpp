@@ -52,6 +52,7 @@ ParticleNode::ParticleNode():super(),
 	//mMaterial,
 	//mVertexData,
 	//mIndexData,
+	//mOwnedMaterial
 {}
 
 Node *ParticleNode::create(Scene *scene){
@@ -71,6 +72,11 @@ Node *ParticleNode::create(Scene *scene){
 void ParticleNode::destroy(){
 	mParticles.clear();
 
+	if(mMaterial!=NULL){
+		mMaterial->release();
+		mMaterial=NULL;
+	}
+
 	if(mVertexData!=NULL){
 		mVertexData->destroy();
 		mVertexData=NULL;
@@ -81,9 +87,9 @@ void ParticleNode::destroy(){
 		mIndexData=NULL;
 	}
 
-	if(mMaterial!=NULL){
-		mMaterial->release();
-		mMaterial=NULL;
+	if(mOwnedMaterial!=NULL){
+		mOwnedMaterial->release();
+		mOwnedMaterial=NULL;
 	}
 
 	super::destroy();
@@ -169,6 +175,11 @@ void ParticleNode::setWorldSpace(bool worldSpace){
 }
 
 void ParticleNode::setMaterial(Material::ptr material){
+	if(mOwnedMaterial!=NULL){
+		mOwnedMaterial->release();
+		mOwnedMaterial=NULL;
+	}
+
 	if(mMaterial!=NULL){
 		mMaterial->release();
 	}
@@ -199,13 +210,13 @@ void ParticleNode::frameUpdate(int dt,int scope){
 }
 
 RenderState::ptr ParticleNode::getSharedRenderState(){
-	if(mMaterial!=NULL){
-		if(mMaterial->getManaged()){
-			mMaterial=mEngine->getMaterialManager()->cloneMaterial(mMaterial,false);
-			mMaterial->setSort(Material::SortType_AUTO);
-		}
+	if(mOwnedMaterial==NULL && mMaterial!=NULL){
+		mOwnedMaterial=mEngine->getMaterialManager()->createMaterial(mMaterial);
+		mOwnedMaterial->setSort(Material::SortType_AUTO);
+		mOwnedMaterial->retain();
 	}
-	return mMaterial->getRenderState();
+
+	return mOwnedMaterial!=NULL?mOwnedMaterial->getRenderState():NULL;
 }
 
 void ParticleNode::gatherRenderables(CameraNode *camera,RenderableSet *set){

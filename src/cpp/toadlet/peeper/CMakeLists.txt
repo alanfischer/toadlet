@@ -12,6 +12,7 @@ set (PEEPER_SRC
 	BackableTexture.cpp
 	IndexBufferAccessor.cpp
 	IndexData.cpp
+	VariableBufferFormat.cpp
 	VertexBufferAccessor.cpp
 	VertexData.cpp
 	Version.cpp

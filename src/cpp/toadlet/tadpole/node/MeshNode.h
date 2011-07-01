@@ -130,6 +130,7 @@ protected:
 	bool mRendered;
 	Mesh::ptr mMesh;
 	Collection<SubMesh::ptr> mSubMeshes;
+	Material::ptr mOwnedMaterial;
 	MeshNodeSkeleton::ptr mSkeleton;
 	VertexData::ptr mDynamicVertexData;
 

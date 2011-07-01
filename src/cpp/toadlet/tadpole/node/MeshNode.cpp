@@ -111,6 +111,11 @@ void MeshNode::destroy(){
 		mMesh=NULL;
 	}
 
+	if(mOwnedMaterial!=NULL){
+		mOwnedMaterial->release();
+		mOwnedMaterial=NULL;
+	}
+
 	if(mSkeleton!=NULL){
 		mSkeleton->destroy();
 		mSkeleton=NULL;
@@ -158,6 +163,11 @@ void MeshNode::setMesh(Mesh::ptr mesh){
 	if(mMesh!=NULL){
 		mMesh->release();
 		mMesh=NULL;
+	}
+
+	if(mOwnedMaterial!=NULL){
+		mOwnedMaterial->release();
+		mOwnedMaterial=NULL;
 	}
 
 	if(mSkeleton!=NULL){
@@ -261,19 +271,19 @@ void MeshNode::updateWorldTransform(){
 }
 
 RenderState::ptr MeshNode::getSharedRenderState(){
-	Material::ptr sharedMaterial;
-	int i;
-	for(i=0;i<mSubMeshes.size();++i){
-		SubMesh *sub=mSubMeshes[i];
-		if(sub->material->getManaged()){
-			sub->material=mEngine->getMaterialManager()->cloneMaterial(sub->material,false,sharedMaterial);
-			sub->material->setSort(Material::SortType_AUTO);
+	if(mOwnedMaterial==NULL && mSubMeshes.size()>0){
+		mOwnedMaterial=mSubMeshes[0]->material=mEngine->getMaterialManager()->createMaterial(mSubMeshes[0]->material);
+		mSubMeshes[0]->material->setSort(Material::SortType_AUTO);
+		int i;
+		for(i=1;i<mSubMeshes.size();++i){
+			mSubMeshes[i]->material=mEngine->getMaterialManager()->cloneMaterial(mSubMeshes[i]->material);
+			mSubMeshes[i]->material->shareStates(mOwnedMaterial);
+			mSubMeshes[i]->material->setSort(Material::SortType_AUTO);
 		}
-		if(i==0){
-			sharedMaterial=sub->material;
-		}
+		mOwnedMaterial->retain();
 	}
-	return sharedMaterial->getRenderState();
+
+	return mOwnedMaterial!=NULL?mOwnedMaterial->getRenderState():NULL;
 }
 
 void MeshNode::gatherRenderables(CameraNode *camera,RenderableSet *set){

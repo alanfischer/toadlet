@@ -156,6 +156,7 @@ protected:
 	bool mRendered;
 	StudioModel::ptr mModel;
 	Collection<SubModel::ptr> mSubModels;
+	Material::ptr mOwnedMaterial;
 
 	int mBodypartIndex;
 	int mModelIndex;

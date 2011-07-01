@@ -226,10 +226,10 @@ set (TADPOLE_HANDLER_PLATFORM_WIN32_GDIPLUS_HEADERS
 
 set (TADPOLE_MATERIAL_HEADERS
 	material/Material.h
-	material/MaterialResource.h
 	material/RenderPass.h
 	material/RenderVariable.h
 	material/RenderVariableSet.h
+	material/SceneParameters.h
 )
 
 set (TADPOLE_NODE_HEADERS

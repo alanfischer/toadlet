@@ -27,12 +27,13 @@
 #define TOADLET_TADPOLE_MATERIALMANAGER_H
 
 #include <toadlet/tadpole/ResourceManager.h>
-#include <toadlet/tadpole/material/MaterialResource.h>
+#include <toadlet/tadpole/material/Material.h>
 
 namespace toadlet{
 namespace tadpole{
 
 class Engine;
+class BufferManager;
 
 class TOADLET_API MaterialManager:public ResourceManager,public RenderStateDestroyedListener,public ShaderStateDestroyedListener{
 public:
@@ -40,20 +41,12 @@ public:
 
 	void destroy();
 
-	MaterialResource::ptr getMaterialResource(int handle){return shared_static_cast<MaterialResource>(ResourceManager::get(handle));}
-	MaterialResource::ptr findMaterialResource(const String &name){return shared_static_cast<MaterialResource>(ResourceManager::find(name));}
-	MaterialResource::ptr createMaterialResource(Material *material,const String &name=(char*)NULL);
-
-	Material::ptr createMaterial(int handle){return createMaterial(getMaterialResource(handle));}
-	Material::ptr createMaterial(const String &name){return createMaterial(findMaterialResource(name));}
-	Material::ptr createMaterial(MaterialResource *resource=NULL);
-/*
-	Material::ptr createMaterial(Texture::ptr texture=Texture::ptr(),bool clamped=false,Material::ptr shareSource=Material::ptr());
- 
+	Material::ptr createMaterial(Material::ptr source=NULL);
+	Material::ptr cloneMaterial(Material::ptr source);
 	Material::ptr findMaterial(const String &name){return shared_static_cast<Material>(ResourceManager::find(name));}
 
-	Material::ptr cloneMaterial(Material::ptr material,bool manage,Material::ptr sharedSource=Material::ptr());
-*/
+	Material::ptr createDiffuseMaterial(Texture::ptr texture);
+
 	RenderState::ptr createRenderState();
 	ShaderState::ptr createShaderState();
 
@@ -70,6 +63,8 @@ public:
 
 	void setDefaultSamplerState(const SamplerState &samplerState){mDefaultSamplerState.set(samplerState);}
 	const SamplerState &getDefaultSamplerState(){return mDefaultSamplerState;}
+
+	BufferManager *getBufferManager();
 
 protected:
 	Engine *mEngine;

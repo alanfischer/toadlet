@@ -44,6 +44,7 @@ SpriteNode::SpriteNode():super(),
 	//mMaterial,
 	//mVertexData,
 	//mIndexData,
+	//mOwnedMaterial
 {}
 
 Node *SpriteNode::create(Scene *scene){
@@ -72,6 +73,11 @@ void SpriteNode::destroy(){
 		mIndexData=NULL;
 	}
 
+	if(mOwnedMaterial!=NULL){
+		mOwnedMaterial->release();
+		mOwnedMaterial=NULL;
+	}
+
 	super::destroy();
 }
 
@@ -97,6 +103,11 @@ void *SpriteNode::hasInterface(int type){
 }
 
 void SpriteNode::setMaterial(Material::ptr material){
+	if(mOwnedMaterial!=NULL){
+		mOwnedMaterial->release();
+		mOwnedMaterial=NULL;
+	}
+
 	if(mMaterial!=NULL){
 		mMaterial->release();
 	}
@@ -115,19 +126,19 @@ void SpriteNode::setAlignment(int alignment){
 }
 
 RenderState::ptr SpriteNode::getSharedRenderState(){
-	if(mMaterial!=NULL){
-		if(mMaterial->getManaged()){
-			mMaterial=mEngine->getMaterialManager()->cloneMaterial(mMaterial,false);
-			mMaterial->setSort(Material::SortType_AUTO);
-		}
+	if(mOwnedMaterial==NULL && mMaterial!=NULL){
+		mOwnedMaterial=mEngine->getMaterialManager()->createMaterial(mMaterial);
+		mOwnedMaterial->setSort(Material::SortType_AUTO);
+		mOwnedMaterial->retain();
 	}
-	return mMaterial->getRenderState();
+
+	return mOwnedMaterial!=NULL?mOwnedMaterial->getRenderState():NULL;
 }
 
 void SpriteNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 	super::gatherRenderables(camera,set);
 
-	if(mVertexData==NULL || mIndexData==NULL || mMaterial==NULL || mRendered==false){
+	if(mVertexData==NULL || mIndexData==NULL || mRendered==false){
 		return;
 	}
 

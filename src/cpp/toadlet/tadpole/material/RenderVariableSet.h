@@ -33,36 +33,43 @@ namespace toadlet{
 namespace tadpole{
 namespace material{
 
-class RenderVariableSet{
+class TOADLET_API RenderVariableSet{
 public:
 	TOADLET_SHARED_POINTERS(RenderVariableSet);
 
 	RenderVariableSet();
 	virtual ~RenderVariableSet();
 	
+	void destroy();
+
 	bool addBuffer(VariableBuffer::ptr buffer);
 	void removeBuffer(VariableBuffer::ptr buffer);
+	inline int getNumBuffers() const{return mBuffers.size();}
+	inline VariableBuffer::ptr getBuffer(int i){return mBuffers[i].buffer;}
+	inline int getBufferScope(int i){return mBuffers[i].scope;}
 	
-	bool addVariable(const String &name,RenderVariable::ptr variable);
+	bool addVariable(const String &name,RenderVariable::ptr variable,int scope);
 	void removeVariable(RenderVariable::ptr variable);
 
-	void update();
+	void update(int scope,SceneParameters *parameters);
 
 protected:
 	class VariableInfo{
 	public:
 		String name;
 		int location;
+		int scope;
 		RenderVariable::ptr variable;
 	};
 
-	class BufferVariableSet{
+	class BufferInfo{
 	public:
 		VariableBuffer::ptr buffer;
+		int scope;
 		Collection<VariableInfo> variables;
 	};
 
-	Collection<BufferVariableSet> mBufferVariables;
+	Collection<BufferInfo> mBuffers;
 };
 
 }

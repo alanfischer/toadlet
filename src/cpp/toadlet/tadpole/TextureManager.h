@@ -47,10 +47,11 @@ public:
 	Texture::ptr createTexture(Image::ptr image);
 	Texture::ptr createTexture(int mipLevels,Image::ptr mipImages[]);
 	Texture::ptr createTexture(int usage,Texture::Dimension dimension,int format,int width,int height,int depth,int mipLevels,tbyte *mipDatas[]=NULL);
-	Image::ptr createImage(Texture *texture);
-	PixelBufferRenderTarget::ptr createPixelBufferRenderTarget();
-
 	Texture::ptr findTexture(const String &name){return shared_static_cast<Texture>(ResourceManager::find(name));}
+
+	Image::ptr createImage(Texture *texture);
+
+	PixelBufferRenderTarget::ptr createPixelBufferRenderTarget();
 
 	bool textureLoad(Texture::ptr texture,int pixelFormat,int width,int height,int depth,int mipLevel,tbyte *mipData);
 

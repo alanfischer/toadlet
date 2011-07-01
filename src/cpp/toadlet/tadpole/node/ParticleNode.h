@@ -134,6 +134,7 @@ protected:
 	Material::ptr mMaterial;
 	VertexData::ptr mVertexData;
 	IndexData::ptr mIndexData;
+	Material::ptr mOwnedMaterial;
 };
 
 }

@@ -116,108 +116,9 @@ public:
 	};
 
 	// static methods aren't allowed in Interfaces, but technically enums shouldn't be either, so these need to be separated to an alongside class
-	static int getFormatSize(int format){
-		int size=0;
-		int type=(format&Format_MASK_TYPES);
-		if(type==Format_TYPE_UINT_8 || type==Format_TYPE_INT_8){
-			size=1;
-		}
-		else if(type==Format_TYPE_INT_16){
-			size=2;
-		}
-		else if(type==Format_TYPE_INT_32 || type==Format_TYPE_FIXED_32 || type==Format_TYPE_FLOAT_32){
-			size=4;
-		}
-		else if(type==Format_TYPE_DOUBLE_64){
-			size=8;
-		}
-		else if(format==Format_TYPE_COLOR_RGBA){
-			size=4;
-		}
-
-		int count=(format&Format_MASK_COUNTS);
-		switch(count){
-			case Format_COUNT_1:
-				size*=1;
-			break;
-			case Format_COUNT_2:
-				size*=2;
-			break;
-			case Format_COUNT_3:
-				size*=3;
-			break;
-			case Format_COUNT_4:
-				size*=4;
-			break;
-			case Format_COUNT_2X2:
-				size*=4;
-			break;
-			case Format_COUNT_2X3:
-				size*=6;
-			break;
-			case Format_COUNT_2X4:
-				size*=8;
-			break;
-			case Format_COUNT_3X2:
-				size*=6;
-			break;
-			case Format_COUNT_3X3:
-				size*=9;
-			break;
-			case Format_COUNT_3X4:
-				size*=12;
-			break;
-			case Format_COUNT_4X2:
-				size*=8;
-			break;
-			case Format_COUNT_4X3:
-				size*=12;
-			break;
-			case Format_COUNT_4X4:
-				size*=16;
-			break;
-		}
-
-		return size;
-	}
-
-	static int getFormatRows(int format){
-		switch(format&Format_MASK_COUNTS){
-			case Format_COUNT_2X2:
-			case Format_COUNT_2X3:
-			case Format_COUNT_2X4:
-				return 2;
-			case Format_COUNT_3X2:
-			case Format_COUNT_3X3:
-			case Format_COUNT_3X4:
-				return 3;
-			case Format_COUNT_4X2:
-			case Format_COUNT_4X3:
-			case Format_COUNT_4X4:
-				return 4;
-			default:
-				return 0;
-		}
-	}
-
-	static int getFormatColumns(int format){
-		switch(format&Format_MASK_COUNTS){
-			case Format_COUNT_2X2:
-			case Format_COUNT_3X2:
-			case Format_COUNT_4X2:
-				return 2;
-			case Format_COUNT_2X3:
-			case Format_COUNT_3X3:
-			case Format_COUNT_4X3:
-				return 3;
-			case Format_COUNT_2X4:
-			case Format_COUNT_3X4:
-			case Format_COUNT_4X4:
-				return 4;
-			default:
-				return 0;
-		}
-	}
+	static int getFormatSize(int format);
+	static int getFormatRows(int format);
+	static int getFormatColumns(int format);
 
 	VariableBufferFormat(bool primary,const String &name,int dataSize,int numVariables):
 		mPrimary(primary),
@@ -246,22 +147,10 @@ public:
 	inline int getSize() const{return mFlatVariables.size();}
 	inline Variable::ptr getVariable(int i) const{return mFlatVariables[i];}
 
-	inline void compile(){
-		mFlatVariables.clear();
-		int i;
-		for(i=0;i<mStructVariable->getStructSize();++i){
-			compile(mStructVariable->getStructVariable(i));
-		}
-	}
+	void compile();
 
 protected:
-	void compile(Variable::ptr variable){
-		mFlatVariables.add(variable);
-		int i;
-		for(i=0;i<variable->getStructSize();++i){
-			compile(variable->getStructVariable(i));
-		}
-	}
+	void compile(Variable::ptr variable,Variable *parent);
 
 	bool mPrimary;
 	String mName;

@@ -81,11 +81,15 @@ void SpriteHandler::buildTextures(SpriteModel *model){
 
 void SpriteHandler::buildMaterials(SpriteModel *model){
 	model->materials.resize(model->header->numframes);
-	int i;
-	for(i=0;i<model->header->numframes;i++){
-		Material::ptr material=mEngine->getMaterialManager()->createMaterial(model->textures[i],false,model->materials.size()>0?model->materials[0]:NULL);
+
+	if(model->header->numframes>0){
+		Material::ptr material=model->materials[0]=mEngine->getMaterialManager()->createDiffuseMaterial(model->textures[0]);
+		int i;
+		for(i=1;i<model->header->numframes;i++){
+			model->materials[i]=mEngine->getMaterialManager()->cloneMaterial(material);
+			model->materials[i]->setTexture(0,model->textures[i]);
+		}
 		material->retain();
-		model->materials[i]=material;
 	}
 }
 

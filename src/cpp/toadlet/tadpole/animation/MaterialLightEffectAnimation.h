@@ -28,7 +28,7 @@
 
 #include <toadlet/peeper/MaterialState.h>
 #include <toadlet/tadpole/animation/Animatable.h>
-#include <toadlet/tadpole/Material.h>
+#include <toadlet/tadpole/material/Material.h>
 
 namespace toadlet{
 namespace tadpole{

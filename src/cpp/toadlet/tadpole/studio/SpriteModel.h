@@ -59,7 +59,7 @@ public:
 		textures.clear();
 
 		for(i=0;i<materials.size();++i){
-			materials[i]->destroy();
+			materials[i]->release();
 		}
 		materials.clear();
 	}

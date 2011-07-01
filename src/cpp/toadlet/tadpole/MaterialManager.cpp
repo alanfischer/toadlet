@@ -54,86 +54,48 @@ void MaterialManager::destroy(){
 	mRenderStates.clear();
 }
 
-Material::ptr MaterialManager::createMaterial(Texture::ptr texture,bool clamped,Material::ptr sharedSource){
-	RenderState::ptr renderState;
-	ShaderState::ptr shaderState;
+Material::ptr MaterialManager::createMaterial(Material::ptr source){
+	Material::ptr material(new Material(this,source,false));
+	manage(material);
+	return material;
+}
 
-	if(sharedSource==NULL){
-		renderState=createRenderState();
-	}
-	else{
-		renderState=sharedSource->getRenderState();
-	}
+Material::ptr MaterialManager::cloneMaterial(Material::ptr source){
+	return Material::ptr(new Material(this,source,false));
+}
 
-	shaderState=createShaderState();
+Material::ptr MaterialManager::createDiffuseMaterial(Texture::ptr texture){
+	Material::ptr material(new Material(this));
 
-	Material::ptr material(new Material(renderState,shaderState));
-
-	if(sharedSource==NULL){
-		material->setBlendState(BlendState());
-		material->setDepthState(DepthState());
-		material->setRasterizerState(RasterizerState());
-		material->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
-	}
+	material->setBlendState(BlendState());
+	material->setDepthState(DepthState());
+	material->setRasterizerState(RasterizerState());
+	material->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
 
 	if(texture!=NULL){
-		material->setTexture(0,texture);
-
-		if(sharedSource==NULL){
-			SamplerState samplerState(mDefaultSamplerState);
-			if(texture->getNumMipLevels()==1){
-				samplerState.mipFilter=SamplerState::FilterType_NONE;
-			}
-			if(clamped || texture->getDimension()==Texture::Dimension_CUBE){
-				samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-				samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-				samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-			}
-			material->setSamplerState(0,samplerState);
-
-			TextureState textureState;
-			if((texture->getFormat()&Texture::Format_BIT_DEPTH)>0){
-				textureState.shadowResult=TextureState::ShadowResult_L;
-			}
-			material->setTextureState(0,textureState);
+		SamplerState samplerState(mDefaultSamplerState);
+		if(texture->getNumMipLevels()==1){
+			samplerState.mipFilter=SamplerState::FilterType_NONE;
 		}
+		if(texture->getDimension()==Texture::Dimension_CUBE){
+			samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+			samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+			samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+		}
+		material->setSamplerState(0,samplerState);
+
+		TextureState textureState;
+		if((texture->getFormat()&Texture::Format_BIT_DEPTH)>0){
+			textureState.shadowResult=TextureState::ShadowResult_L;
+		}
+		material->setTextureState(0,textureState);
+
+		material->setTexture(0,texture);
 	}
 
 	manage(material);
 
 	return material;
-}
-
-Material::ptr MaterialManager::cloneMaterial(Material::ptr material,bool managed,Material::ptr sharedSource){
-	RenderState::ptr renderState;
-	ShaderState::ptr shaderState;
-	if(sharedSource==NULL){
-		renderState=createRenderState();
-		shaderState=createShaderState();
-	}
-	else{
-		renderState=sharedSource->getRenderState();
-		shaderState=sharedSource->getShaderState();
-	}
-
-	Material::ptr clonedMaterial(new Material(renderState,shaderState));
-
-	if(sharedSource==NULL){
-		modifyRenderState(clonedMaterial->getRenderState(),material->getRenderState());
-		modifyShaderState(clonedMaterial->getShaderState(),material->getShaderState());
-	}
-
-	int i;
-	for(i=0;i<material->getNumTextures();++i){
-		clonedMaterial->setTexture(i,material->getTexture(i));
-		clonedMaterial->setTextureName(i,material->getTextureName(i));
-	}
-
-	if(managed){
-		manage(clonedMaterial);
-	}
-
-	return clonedMaterial;
 }
 
 RenderState::ptr MaterialManager::createRenderState(){
@@ -264,11 +226,15 @@ void MaterialManager::shaderStateDestroyed(ShaderState *shaderState){
 Resource::ptr MaterialManager::unableToFindHandler(const String &name,const ResourceHandlerData *handlerData){
 	Texture::ptr texture=mEngine->getTextureManager()->findTexture(name);
 	if(texture!=NULL){
-		return createMaterial(texture);
+		return createDiffuseMaterial(texture);
 	}
 	else{
 		return ResourceManager::unableToFindHandler(name,handlerData);
 	}
+}
+
+BufferManager *MaterialManager::getBufferManager(){
+	return mEngine->getBufferManager();
 }
 
 }
