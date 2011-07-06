@@ -27,6 +27,7 @@
 #define TOADLET_TADPOLE_MATERIAL_RENDERVARIABLES_H
 
 #include <toadlet/tadpole/Renderable.h>
+#include <toadlet/tadpole/Scene.h>
 #include <toadlet/tadpole/material/RenderVariable.h>
 #include <toadlet/tadpole/material/SceneParameters.h>
 #include <toadlet/tadpole/node/CameraNode.h>

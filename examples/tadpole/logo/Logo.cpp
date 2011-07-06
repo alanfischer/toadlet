@@ -68,7 +68,7 @@ Logo::~Logo(){
 }
 
 void Logo::create(){
-	Application::create("d3d9");
+	Application::create();
 
 	mEngine->setDirectory("../../../data");
 
@@ -90,8 +90,8 @@ void Logo::create(){
 	meshNode->getController()->start();
 	meshNode->getController()->setCycling(Controller::Cycling_REFLECT);
 	scene->getRoot()->attach(meshNode);
-//Material::ptr funkyMaterial=makeFunkyMaterial();
-//for(int i=0;i<meshNode->getNumSubMeshes();++i)meshNode->getSubMesh(i)->material=funkyMaterial;
+Material::ptr funkyMaterial=makeFunkyMaterial();
+for(int i=0;i<meshNode->getNumSubMeshes();++i)meshNode->getSubMesh(i)->material=funkyMaterial;
 
 	cameraNode=getEngine()->createNodeType(CameraNode::type(),scene);
 	cameraNode->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
@@ -146,8 +146,8 @@ String funkyVertexCode[]={
 	"in vec4 POSITION;\n" \
 	"in vec3 NORMAL;\n" \
 	"out vec4 color;\n" \
-	"uniform float time;\n" \
 	"uniform mat4 mvp;\n" \
+	"uniform float time;\n" \
 	"void main(){\n" \
 		"vec4 p=mvp * POSITION;\n" \
 		"p.y=p.y+sin(p.x/10)*10;\n" \
@@ -168,6 +168,7 @@ String funkyVertexCode[]={
 	"VOUT main(VIN vin){\n" \
 	"	VOUT vout;\n" \
 	"	vout.position=mul(vin.position,mvp);\n" \
+	"	vout.position.y=vout.position.y+sin(vout.position.x/10)*10;\n" \
 	"	vout.color=float4(sin(time),0,0,1.0);\n" \
 	"	return vout;\n" \
 	"}"
@@ -196,8 +197,10 @@ Material::ptr Logo::makeFunkyMaterial(){
 	RenderPass::ptr pass=material->getPass();
 	pass->setShader(Shader::ShaderType_VERTEX,funkyVertexShader);
 	pass->setShader(Shader::ShaderType_FRAGMENT,funkyFragmentShader);
-	pass->getVariables()->addVariable("mvp",RenderVariable::ptr(new MVPVariable()),Material::Scope_RENDERABLE);
+	pass->getVariables()->addVariable("mvp",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
 	pass->getVariables()->addVariable("time",RenderVariable::ptr(new TimeVariable()),Material::Scope_MATERIAL);
+
+	material->compile();
 
 	return material;
 }
