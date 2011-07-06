@@ -65,6 +65,12 @@
 #include <toadlet/tadpole/animation/NodePathAnimation.h>
 #include <toadlet/tadpole/animation/SkeletonAnimation.h>
 
+#include <toadlet/tadpole/material/Material.h>
+#include <toadlet/tadpole/material/RenderPath.h>
+#include <toadlet/tadpole/material/RenderPass.h>
+#include <toadlet/tadpole/material/RenderVariable.h>
+#include <toadlet/tadpole/material/RenderVariables.h>
+
 #include <toadlet/tadpole/node/AnaglyphCameraNode.h>
 #include <toadlet/tadpole/node/AudioNode.h>
 #include <toadlet/tadpole/node/CameraAlignedNode.h>
@@ -98,6 +104,7 @@ using namespace toadlet;
 using namespace toadlet::tadpole;
 using namespace toadlet::tadpole::animation;
 using namespace toadlet::tadpole::handler;
+using namespace toadlet::tadpole::material;
 using namespace toadlet::tadpole::node;
 using namespace toadlet::tadpole::sensor;
 using namespace toadlet::tadpole::terrain;
