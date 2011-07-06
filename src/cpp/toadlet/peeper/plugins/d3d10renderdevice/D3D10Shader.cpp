@@ -169,6 +169,7 @@ ID3D10InputLayout *D3D10Shader::findInputLayout(D3D10VertexFormat *vertexFormat)
 		layout=mLayouts[handle];
 	}
 	else{
+		/// @todo: See if we can modify the vertexElements to add or subtract ones to force it to match
 		mDevice->getD3D10Device()->CreateInputLayout(
 			vertexFormat->mElements,vertexFormat->mElements.size(),mBytecode->GetBufferPointer(),mBytecode->GetBufferSize(),&layout
 		);

@@ -325,7 +325,7 @@ void HopEntity::updateCollisionVolumes(){
 			subMesh->indexData->setIndexBuffer(NULL);
 			subMesh->indexData->destroy();
 			subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_LINES,indexBuffer));
-			subMesh->material->setMaterialState(MaterialState(false));
+			subMesh->material->getPass()->setMaterialState(MaterialState(false));
 			MeshNode *meshNode=mEngine->createNodeType(MeshNode::type(),mScene);
 			meshNode->setMesh(mesh);
 			mVolumeNode->attach(meshNode);

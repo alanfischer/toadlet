@@ -40,8 +40,10 @@ public:
 		maxTextureStages(0),
 		maxTextureSize(0),
 		pointSprites(false),
+		vertexFixedFunction(false),
 		vertexShaders(false),
 		maxVertexShaderLocalParameters(0),
+		fragmentFixedFunction(false),
 		fragmentShaders(false),
 		maxFragmentShaderLocalParameters(0),
 		renderToTexture(false),
@@ -63,8 +65,10 @@ public:
 		maxTextureStages=caps.maxTextureStages;
 		maxTextureSize=caps.maxTextureSize;
 		pointSprites=caps.pointSprites;
+		vertexFixedFunction=caps.vertexFixedFunction;
 		vertexShaders=caps.vertexShaders;
 		maxVertexShaderLocalParameters=caps.maxVertexShaderLocalParameters;
+		fragmentFixedFunction=caps.fragmentFixedFunction;
 		fragmentShaders=caps.fragmentShaders;
 		maxFragmentShaderLocalParameters=caps.maxFragmentShaderLocalParameters;
 		renderToTexture=caps.renderToTexture;
@@ -88,8 +92,10 @@ public:
 	int maxTextureStages;
 	int maxTextureSize;
 	bool pointSprites;
+	bool vertexFixedFunction;
 	bool vertexShaders;
 	int maxVertexShaderLocalParameters;
+	bool fragmentFixedFunction;
 	bool fragmentShaders;
 	int maxFragmentShaderLocalParameters;
 	bool renderToTexture;

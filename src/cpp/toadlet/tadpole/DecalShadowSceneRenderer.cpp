@@ -42,6 +42,8 @@ DecalShadowSceneRenderer::~DecalShadowSceneRenderer(){
 }
 
 void DecalShadowSceneRenderer::renderScene(RenderDevice *device,Node *node,CameraNode *camera){
+/// @todo:
+/*
 	gatherRenderables(mRenderableSet,node,camera);
 	renderRenderables(mRenderableSet,device,camera);
 
@@ -82,6 +84,7 @@ void DecalShadowSceneRenderer::renderScene(RenderDevice *device,Node *node,Camer
 			renderable->render(device);
 		}
 	}
+*/
 }
 
 }

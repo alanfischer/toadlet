@@ -67,10 +67,11 @@ public:
 	inline scalar getWidth() const{return mWidth;}
 
 	void gatherRenderables(CameraNode *camera,RenderableSet *set);
+
 	Material *getRenderMaterial() const{return mMaterial;}
 	const Transform &getRenderTransform() const{return getWorldTransform();}
 	const Bound &getRenderBound() const{return getWorldBound();}
-	void render(RenderDevice *renderDevice) const;
+	void render(SceneRenderer *renderer) const;
 
 	VertexBufferAccessor vba;
 

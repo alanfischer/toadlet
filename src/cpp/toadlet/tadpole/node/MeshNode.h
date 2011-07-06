@@ -53,7 +53,7 @@ public:
 		Material *getRenderMaterial() const{return material;}
 		const Transform &getRenderTransform() const{return hasOwnTransform?worldTransform:meshNode->getWorldTransform();}
 		const Bound &getRenderBound() const{return hasOwnTransform?worldBound:meshNode->getWorldBound();}
-		void render(RenderDevice *renderDevice) const;
+		void render(SceneRenderer *renderer) const;
 
 		Material::ptr material;
 		IndexData::ptr indexData;

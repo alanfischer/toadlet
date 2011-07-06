@@ -114,8 +114,7 @@ Mesh::ptr MeshManager::createBox(const AABox &box,Material::ptr material){
 	Mesh::SubMesh::ptr subMesh(new Mesh::SubMesh());
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
 	if(material==NULL){
-		material=mEngine->getMaterialManager()->createMaterial();
-		material->setMaterialState(MaterialState(true));
+		material=mEngine->getMaterialManager()->createDiffuseMaterial(NULL);
 	}
 	material->retain();
 	subMesh->material=material;
@@ -251,8 +250,7 @@ Mesh::ptr MeshManager::createGrid(scalar width,scalar height,int numWidth,int nu
 
 	Mesh::ptr mesh=createGrid(vertexBuffer,indexBuffer,width,height,numWidth,numHeight);
 	if(material==NULL){
-		material=mEngine->getMaterialManager()->createMaterial();
-		material->setMaterialState(MaterialState(true));
+		material=mEngine->getMaterialManager()->createDiffuseMaterial(NULL);
 	}
 	material->retain();
 	mesh->getSubMesh(0)->material=material;
@@ -339,8 +337,7 @@ Mesh::ptr MeshManager::createSphere(const Sphere &sphere,int numSegments,int num
 
 	Mesh::ptr mesh=createSphere(vertexBuffer,indexBuffer,sphere,numSegments,numRings);
 	if(material==NULL){
-		material=mEngine->getMaterialManager()->createMaterial();
-		material->setMaterialState(MaterialState(true));
+		material=mEngine->getMaterialManager()->createDiffuseMaterial(NULL);
 	}
 	material->retain();
 	mesh->getSubMesh(0)->material=material;
@@ -425,9 +422,7 @@ Mesh::ptr MeshManager::createSkyDome(const Sphere &sphere,int numSegments,int nu
 
 	Mesh::ptr mesh=createSkyDome(vertexBuffer,indexBuffer,sphere,numSegments,numRings,fade);
 	if(material==NULL){
-		material=mEngine->getMaterialManager()->createMaterial();
-		material->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-		material->setMaterialState(MaterialState(false));
+		material=mEngine->getMaterialManager()->createSkyboxMaterial(NULL);
 	}
 	material->retain();
 	mesh->getSubMesh(0)->material=material;
@@ -520,8 +515,7 @@ Mesh::ptr MeshManager::createGeoSphere(const Sphere &sphere,int depth,bool icosa
 
 	Mesh::ptr mesh=createGeoSphere(vertexBuffer,indexBuffer,sphere,depth,icosahedron);
 	if(material==NULL){
-		material=mEngine->getMaterialManager()->createMaterial();
-		material->setMaterialState(MaterialState(true));
+		material=mEngine->getMaterialManager()->createDiffuseMaterial(NULL);
 	}
 	material->retain();
 	mesh->getSubMesh(0)->material=material;
@@ -678,8 +672,7 @@ Mesh::ptr MeshManager::createTorus(scalar majorRadius,scalar minorRadius,int num
 
 	Mesh::ptr mesh=createTorus(vertexBuffer,majorRadius,minorRadius,numMajor,numMinor);
 	if(material==NULL){
-		material=mEngine->getMaterialManager()->createMaterial();
-		material->setMaterialState(MaterialState(true));
+		material=mEngine->getMaterialManager()->createDiffuseMaterial(NULL);
 	}
 	material->retain();
 	mesh->getSubMesh(0)->material=material;

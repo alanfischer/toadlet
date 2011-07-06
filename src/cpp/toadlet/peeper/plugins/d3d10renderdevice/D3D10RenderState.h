@@ -55,14 +55,14 @@ public:
 	void setRasterizerState(const RasterizerState &state);
 	bool getRasterizerState(RasterizerState &state) const;
 
-	void setFogState(const FogState &state){}
-	bool getFogState(FogState &state) const{return false;}
+	void setFogState(const FogState &state);
+	bool getFogState(FogState &state) const;
 
-	void setPointState(const PointState &state){}
-	bool getPointState(PointState &state) const{return false;}
+	void setPointState(const PointState &state);
+	bool getPointState(PointState &state) const;
 
-	void setMaterialState(const MaterialState &state){}
-	bool getMaterialState(MaterialState &state) const{return false;}
+	void setMaterialState(const MaterialState &state);
+	bool getMaterialState(MaterialState &state) const;
 
 	int getNumSamplerStates() const{return mSamplerStates.size();}
 	void setSamplerState(int i,const SamplerState &state);
@@ -78,16 +78,18 @@ protected:
 
 	RenderStateDestroyedListener *mListener;
 	BlendState *mBlendState;
-	ID3D10BlendState *mD3DBlendState;
 	DepthState *mDepthState;
-	ID3D10DepthStencilState *mD3DDepthStencilState;
 	RasterizerState *mRasterizerState;
-	ID3D10RasterizerState *mD3DRasterizerState;
-	Collection<SamplerState*> mSamplerStates;
-	Collection<ID3D10SamplerState*> mD3DSamplerStates;
-
-	Collection<TextureState*> mTextureStates;
+	FogState *mFogState;
+	PointState *mPointState;
 	MaterialState *mMaterialState;
+	Collection<SamplerState*> mSamplerStates;
+	Collection<TextureState*> mTextureStates;
+
+	ID3D10BlendState *mD3DBlendState;
+	ID3D10DepthStencilState *mD3DDepthStencilState;
+	ID3D10RasterizerState *mD3DRasterizerState;
+	Collection<ID3D10SamplerState*> mD3DSamplerStates;
 
 	friend class D3D10RenderDevice;
 };

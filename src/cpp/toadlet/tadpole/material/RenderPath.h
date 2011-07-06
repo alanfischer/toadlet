@@ -23,60 +23,33 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_MATERIAL_MATERIAL_H
-#define TOADLET_TADPOLE_MATERIAL_MATERIAL_H
+#ifndef TOADLET_TADPOLE_MATERIAL_RENDERPATH_H
+#define TOADLET_TADPOLE_MATERIAL_RENDERPATH_H
 
-#include <toadlet/egg/BaseResource.h>
-#include <toadlet/tadpole/material/RenderPath.h>
+#include <toadlet/tadpole/material/RenderPass.h>
 
 namespace toadlet{
 namespace tadpole{
 namespace material{
 
-class TOADLET_API Material:public BaseResource{
+class TOADLET_API RenderPath{
 public:
-	TOADLET_SHARED_POINTERS(Material);
+	TOADLET_SHARED_POINTERS(RenderPath);
 
-	enum SortType{
-		SortType_AUTO,
-		SortType_MATERIAL,
-		SortType_DEPTH,
-	};
-
-	enum Scope{
-		Scope_MATERIAL	=1<<0,
-		Scope_RENDERABLE=1<<1,
-	};
-
-	Material(MaterialManager *manager,Material *source=NULL,bool clone=false);
-	virtual ~Material();
+	RenderPath(MaterialManager *manager,RenderPath *source=NULL,bool clone=false);
+	virtual ~RenderPath();
 
 	void destroy();
 
-	inline int getNumPaths() const{return mPaths.size();}
-	inline RenderPath::ptr getPath(int i) const{return mPaths[i];}
-	RenderPath::ptr addPath();
-	RenderPath::ptr getBestPath(){return mBestPath;}
-	RenderPass::ptr getPass(int path=-1,int pass=-1);
+	inline int getNumPasses() const{return mPasses.size();}
+	inline RenderPass::ptr getPass(int i) const{return mPasses[i];}
+	RenderPass::ptr addPass();
 
-	inline void setSort(SortType sort){mSort=sort;}
-	inline SortType getSort() const{return mSort;}
-
-	inline void setLayer(int layer){mLayer=layer;}
-	inline int getLayer() const{return mLayer;}
-
-	bool isDepthSorted() const;
-
-	void shareStates(Material *source);
-
-	bool compile();
+	void shareStates(RenderPath *path);
 
 protected:
 	MaterialManager *mManager;
-	Collection<RenderPath::ptr> mPaths;
-	RenderPath::ptr mBestPath;
-	SortType mSort;
-	int mLayer;
+	Collection<RenderPass::ptr> mPasses;
 };
 
 }

@@ -29,6 +29,7 @@
 #include <toadlet/tadpole/node/SpriteNode.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/RenderableSet.h>
+#include <toadlet/tadpole/SceneRenderer.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -132,7 +133,7 @@ RenderState::ptr SpriteNode::getSharedRenderState(){
 		mOwnedMaterial->retain();
 	}
 
-	return mOwnedMaterial!=NULL?mOwnedMaterial->getRenderState():NULL;
+	return mOwnedMaterial!=NULL?mOwnedMaterial->getPass()->getRenderState():NULL;
 }
 
 void SpriteNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
@@ -149,8 +150,8 @@ void SpriteNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 #endif
 }
 
-void SpriteNode::render(RenderDevice *renderDevice) const{
-	renderDevice->renderPrimitive(mVertexData,mIndexData);
+void SpriteNode::render(SceneRenderer *renderer) const{
+	renderer->getDevice()->renderPrimitive(mVertexData,mIndexData);
 }
 
 void SpriteNode::updateSprite(){

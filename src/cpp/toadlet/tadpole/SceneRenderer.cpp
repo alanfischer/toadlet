@@ -38,14 +38,38 @@ SceneRenderer::SceneRenderer(Scene *scene):
 	//mRenderableSet
 {
 	mRenderableSet=RenderableSet::ptr(new RenderableSet(scene));
+	mSceneParameters=SceneParameters::ptr(new SceneParameters());
+	mSceneParameters->setScene(scene);
 }
 
 SceneRenderer::~SceneRenderer(){
 }
 
 void SceneRenderer::renderScene(RenderDevice *device,Node *node,CameraNode *camera){
+	mDevice=device;
+
+	mSceneParameters->setCamera(camera);
 	gatherRenderables(mRenderableSet,node,camera);
 	renderRenderables(mRenderableSet,device,camera);
+	mSceneParameters->setCamera(NULL);
+
+	mDevice=NULL;
+}
+
+/// @todo: Remember the previous pass to avoid setting duplicate states
+void SceneRenderer::setupPass(RenderPass *pass){
+	mDevice->setRenderState(pass->getRenderState());
+	mDevice->setShaderState(pass->getShaderState());
+
+	MaterialState materialState;
+	pass->getRenderState()->getMaterialState(materialState);
+	mSceneParameters->setMaterialState(materialState);
+	pass->setupRenderVariables(mDevice,Material::Scope_MATERIAL,mSceneParameters);
+
+	int i;
+	for(i=0;i<pass->getNumTextures();++i){
+		mDevice->setTexture(i,pass->getTexture(i));
+	}
 }
 
 void SceneRenderer::gatherRenderables(RenderableSet *set,Node *node,CameraNode *camera){
@@ -70,9 +94,6 @@ void SceneRenderer::gatherRenderables(RenderableSet *set,Node *node,CameraNode *
 }
 
 void SceneRenderer::renderRenderables(RenderableSet *set,RenderDevice *device,CameraNode *camera,bool useMaterials){
-	Matrix4x4 matrix;
-	int i,j;
-
 	RenderListener *listener=mScene->getRenderListener();
 
 	if(listener!=NULL){
@@ -101,8 +122,9 @@ void SceneRenderer::renderRenderables(RenderableSet *set,RenderDevice *device,Ca
 
 	bool renderedDepthSorted=false;
 	const RenderableSet::IndexCollection &sortedIndexes=set->getLayerSortedQueueIndexes();
-	for(j=0;j<sortedIndexes.size();++j){
-		const RenderableSet::RenderableQueue &renderableQueue=set->getRenderableQueue(sortedIndexes[j]);
+	int i;
+	for(i=0;i<sortedIndexes.size();++i){
+		const RenderableSet::RenderableQueue &renderableQueue=set->getRenderableQueue(sortedIndexes[i]);
 		Material *material=renderableQueue[0].material;
 
 		if(renderedDepthSorted==false && (material!=NULL && material->getLayer()!=0)){
@@ -110,31 +132,7 @@ void SceneRenderer::renderRenderables(RenderableSet *set,RenderDevice *device,Ca
 			renderDepthSortedRenderables(set,device,camera,useMaterials);
 		}
 
-		if(useMaterials && material!=NULL){
-			material->setupRenderDevice(device);
-			material->setupRenderVariables(device,Material::Scope_MATERIAL,mScene,NULL);
-		}
-
-		for(i=0;i<renderableQueue.size();++i){
-			const RenderableSet::RenderableQueueItem &item=renderableQueue[i];
-			Renderable *renderable=item.renderable;
-			renderable->getRenderTransform().getMatrix(matrix);
-
-			// Fixed states
-			device->setAmbientColor(item.ambient);
-			device->setMatrix(RenderDevice::MatrixType_MODEL,matrix);
-
-			// Shader states
-			material->setupRenderVariables(device,Material::Scope_RENDERABLE,mScene,renderable);
-
-			renderable->render(device);
-		}
-
-		if(useMaterials){
-			if(camera->getDefaultState()!=NULL){
-				device->setRenderState(camera->getDefaultState());
-			}
-		}
+		renderQueueItems((useMaterials && material!=NULL)?material:NULL,&renderableQueue[0],renderableQueue.size());
 	}
 
 	if(renderedDepthSorted==false){
@@ -147,33 +145,48 @@ void SceneRenderer::renderRenderables(RenderableSet *set,RenderDevice *device,Ca
 }
 
 void SceneRenderer::renderDepthSortedRenderables(RenderableSet *set,RenderDevice *device,CameraNode *camera,bool useMaterials){
-	Matrix4x4 matrix;
 	int i;
 	const RenderableSet::RenderableQueue &renderableQueue=set->getDepthSortedQueue();
 	for(i=0;i<renderableQueue.size();++i){
 		const RenderableSet::RenderableQueueItem &item=renderableQueue[i];
 		Material *material=item.material;
-		Renderable *renderable=item.renderable;
-		renderable->getRenderTransform().getMatrix(matrix);
+		renderQueueItems((useMaterials && material!=NULL)?material:NULL,&item,1);
+	}
+}
 
-		if(useMaterials && material!=NULL){
-			material->setupRenderDevice(device);
-			material->setupRenderVariables(device,Material::Scope_MATERIAL,mScene,NULL);
+/// @todo: This needs to be cleaned up, it should set the camera default states after each pass
+///  And we should see if the Pass is a Fixed or Shader pass, in which case we either set Fixed states, or setupRenderVariables
+///  And then maybe set Fixed states should be moved the pass, like setupRenderVariables
+///  And we no longer need to pass device & camera to the above functions
+void SceneRenderer::renderQueueItems(Material *material,const RenderableSet::RenderableQueueItem *items,int numItems){
+	Matrix4x4 matrix;
+	RenderPath *path=(material!=NULL)?material->getBestPath():NULL;
+	int numPasses=(path!=NULL?path->getNumPasses():1);
+	int i;
+	for(i=0;i<numPasses;++i){
+		RenderPass *pass=(path!=NULL)?path->getPass(i):NULL;
+		if(pass!=NULL){
+			setupPass(pass);
 		}
 
-		// Fixed states
-		device->setAmbientColor(item.ambient);
-		device->setMatrix(RenderDevice::MatrixType_MODEL,matrix);
+		for(i=0;i<numItems;++i){
+			const RenderableSet::RenderableQueueItem &item=items[i];
+			Renderable *renderable=item.renderable;
+			renderable->getRenderTransform().getMatrix(matrix);
 
-		// Shader states
-		material->setupRenderVariables(device,Material::Scope_RENDERABLE,mScene,renderable);
+			// Fixed states
+			mDevice->setAmbientColor(item.ambient);
+			mDevice->setMatrix(RenderDevice::MatrixType_MODEL,matrix);
 
-		renderable->render(device);
-
-		if(useMaterials){
-			if(camera->getDefaultState()!=NULL){
-				device->setRenderState(camera->getDefaultState());
+			// Shader states
+			if(pass!=NULL){
+				mSceneParameters->setRenderable(renderable);
+				mSceneParameters->setAmbient(item.ambient);
+				pass->setupRenderVariables(mDevice,Material::Scope_RENDERABLE,mSceneParameters);
+				mSceneParameters->setRenderable(NULL);
 			}
+
+			renderable->render(this);
 		}
 	}
 }
@@ -188,6 +201,7 @@ void SceneRenderer::setupViewport(CameraNode *camera,RenderDevice *device){
 	}
 }
 
+/// @todo: Do this only if the material is fixed function
 void SceneRenderer::setupLights(const RenderableSet::LightQueue &lightQueue,RenderDevice *device){
 	int i;
 	int maxLights=mScene->getEngine()->getRenderCaps().maxLights;

@@ -246,8 +246,8 @@ void MeshNodeSkeleton::setRenderSkeleton(bool skeleton){
 	if(skeleton){
 		if(mSkeletonMaterial==NULL){
 			mSkeletonMaterial=mEngine->getMaterialManager()->createMaterial();
-			mSkeletonMaterial->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-			mSkeletonMaterial->setPointState(PointState(true,Math::fromInt(8),false,0,0,0,0,0));
+			mSkeletonMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+			mSkeletonMaterial->getPass()->setPointState(PointState(true,Math::fromInt(8),false,0,0,0,0,0));
 		}
 	}
 	else{
@@ -341,14 +341,14 @@ const Bound &MeshNodeSkeleton::getRenderBound() const{
 	return mNode!=NULL?mNode->getWorldBound():Node::zeroBound();
 }
 
-void MeshNodeSkeleton::render(RenderDevice *renderDevice) const{
-	renderDevice->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
+void MeshNodeSkeleton::render(SceneRenderer *renderer) const{
+	renderer->getDevice()->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
 
 	mSkeletonIndexData->primitive=IndexData::Primitive_POINTS;
-	renderDevice->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
+	renderer->getDevice()->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
 	mSkeletonIndexData->primitive=IndexData::Primitive_LINES;
 
-	renderDevice->renderPrimitive(mHitBoxVertexData,mHitBoxIndexData);
+	renderer->getDevice()->renderPrimitive(mHitBoxVertexData,mHitBoxIndexData);
 }
 
 bool MeshNodeSkeleton::getAttachmentTransform(Transform &result,int index){

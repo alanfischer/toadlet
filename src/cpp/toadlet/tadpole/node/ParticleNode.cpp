@@ -216,7 +216,7 @@ RenderState::ptr ParticleNode::getSharedRenderState(){
 		mOwnedMaterial->retain();
 	}
 
-	return mOwnedMaterial!=NULL?mOwnedMaterial->getRenderState():NULL;
+	return mOwnedMaterial!=NULL?mOwnedMaterial->getPass()->getRenderState():NULL;
 }
 
 void ParticleNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
@@ -237,9 +237,9 @@ void ParticleNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 #endif
 }
 
-void ParticleNode::render(RenderDevice *renderDevice) const{
+void ParticleNode::render(SceneRenderer *renderer) const{
 	if(mVertexData!=NULL && mIndexData!=NULL){
-		renderDevice->renderPrimitive(mVertexData,mIndexData);
+		renderer->getDevice()->renderPrimitive(mVertexData,mIndexData);
 	}
 }
 

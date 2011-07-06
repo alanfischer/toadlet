@@ -46,6 +46,7 @@ public:
 	Material::ptr findMaterial(const String &name){return shared_static_cast<Material>(ResourceManager::find(name));}
 
 	Material::ptr createDiffuseMaterial(Texture::ptr texture);
+	Material::ptr createSkyboxMaterial(Texture::ptr texture);
 
 	RenderState::ptr createRenderState();
 	ShaderState::ptr createShaderState();
@@ -64,6 +65,7 @@ public:
 	void setDefaultSamplerState(const SamplerState &samplerState){mDefaultSamplerState.set(samplerState);}
 	const SamplerState &getDefaultSamplerState(){return mDefaultSamplerState;}
 
+	inline Engine *getEngine(){return mEngine;}
 	BufferManager *getBufferManager();
 
 protected:
@@ -74,6 +76,7 @@ protected:
 	Collection<ShaderState::ptr> mShaderStates;
 
 	SamplerState mDefaultSamplerState;
+	Shader::ptr mFixedVertexShader,mFixedFragmentShader;
 };
 
 }

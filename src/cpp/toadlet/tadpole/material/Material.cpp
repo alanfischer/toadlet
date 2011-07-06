@@ -27,8 +27,7 @@
 #include <toadlet/peeper/BackableRenderState.h>
 #include <toadlet/peeper/BackableShaderState.h>
 #include <toadlet/peeper/RenderCaps.h>
-#include <toadlet/tadpole/BufferManager.h>
-#include <toadlet/tadpole/MaterialManager.h>
+#include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/material/Material.h>
 
 namespace toadlet{
@@ -37,29 +36,16 @@ namespace material{
 
 Material::Material(MaterialManager *manager,Material *source,bool clone):BaseResource(),
 	mSort(SortType_MATERIAL),
-	mOwnsStates(false),
 	mLayer(0)
 {
 	mManager=manager;
-	if(manager!=NULL && clone==false){
-		mRenderState=mManager->createRenderState();
-		mShaderState=mManager->createShaderState();
-		mOwnsStates=true;
 
-		if(source!=NULL){
-			manager->modifyRenderState(mRenderState,source->getRenderState());
-			manager->modifyRenderState(mRenderState,source->getRenderState());
+	if(source!=NULL){
+		int i;
+		for(i=0;i<source->getNumPaths();++i){
+			RenderPath::ptr path(new RenderPath(manager,source->getPath(i),clone));
+			mPaths.add(path);
 		}
-	}
-	else if(clone){
-		mRenderState=source->getRenderState();
-		mShaderState=source->getShaderState();
-		mOwnsStates=false;
-	}
-	else{
-		mRenderState=RenderState::ptr(new BackableRenderState());
-		mShaderState=ShaderState::ptr(new BackableShaderState());
-		mOwnsStates=true;
 	}
 }
 
@@ -68,60 +54,57 @@ Material::~Material(){
 }
 
 void Material::destroy(){
-	if(mOwnsStates){
-		if(mRenderState!=NULL){
-			mRenderState->destroy();
-		}
-		if(mShaderState!=NULL){
-			mShaderState->destroy();
-		}
-	}
-	mRenderState=NULL;
-	mShaderState=NULL;
-
 	int i;
-	for(i=0;i<mTextures.size();++i){
-		if(mTextures[i]!=NULL){
-			mTextures[i]->release();
+	for(i=0;i<mPaths.size();++i){
+		mPaths[i]->destroy();
+	}
+	mPaths.clear();
+}
+
+RenderPath::ptr Material::addPath(){
+	RenderPath::ptr path(new RenderPath(mManager));
+	mPaths.add(path);
+	return path;
+}
+
+RenderPass::ptr Material::getPass(int pathIndex,int passIndex){
+	RenderPath::ptr path;
+	if(pathIndex==-1){
+		if(mBestPath!=NULL){
+			path=mBestPath;
+		}
+		else if(mPaths.size()>0){
+			path=mPaths[0];
+		}
+		else{
+			path=addPath();
 		}
 	}
-	mTextures.clear();
-
-	if(mVariables!=NULL){
-		mVariables->destroy();
-		mVariables=NULL;
-	}
-}
-
-void Material::setTexture(int i,Texture::ptr texture){
-	if(i>=mTextures.size()){
-		mTextures.resize(i+1);
-		mTextureNames.resize(i+1);
-	}
-	if(mTextures[i]!=NULL){
-		mTextures[i]->release();
-	}
-	mTextures[i]=texture;
-	if(mTextures[i]!=NULL){
-		mTextures[i]->retain();
+	else{
+		if(pathIndex<mPaths.size()){
+			path=mPaths[pathIndex];
+		}
+		else{
+			return NULL;
+		}
 	}
 
-	// Always add a default SamplerState and TextureState if non exists
-	{
-		SamplerState samplerState;
-		if(mRenderState->getSamplerState(i,samplerState)==false) mRenderState->setSamplerState(i,samplerState);
-
-		TextureState textureState;
-		if(mRenderState->getTextureState(i,textureState)==false) mRenderState->setTextureState(i,textureState);
+	if(passIndex==-1){
+		if(path->getNumPasses()>0){
+			return path->getPass(0);
+		}
+		else{
+			return path->addPass();
+		}
 	}
-}
-
-void Material::setTextureName(int i,const String &name){
-	if(i>=mTextures.size()){
-		mTextures.resize(i+1);
-		mTextureNames.resize(i+1);
+	else{
+		if(passIndex<path->getNumPasses()){
+			return path->getPass(passIndex);
+		}
+		else{
+			return NULL;
+		}
 	}
-	mTextureNames[i]=name;
 }
 
 bool Material::isDepthSorted() const{
@@ -131,73 +114,64 @@ bool Material::isDepthSorted() const{
 		case SortType_MATERIAL:
 			return false;
 		default:{
-			DepthState depth;
-			return mRenderState->getDepthState(depth) && depth.write==false;
+/// @todo
+//			DepthState depth;
+//			return mRenderState->getDepthState(depth) && depth.write==false;
+return false;
 		}
 	}
 }
 
-void Material::shareStates(Material::ptr material){
-	if(mOwnsStates){
-		if(mRenderState!=NULL){
-			mRenderState->destroy();
-		}
-		if(mShaderState!=NULL){
-			mShaderState->destroy();
-		}
-	}
-	mRenderState=material->getRenderState();
-	mShaderState=material->getShaderState();
-	mOwnsStates=false;
-}
-
-RenderVariableSet::ptr Material::getVariables(){
-	if(mVariables!=NULL){
-		return mVariables;
-	}
-
-	mVariables=RenderVariableSet::ptr(new RenderVariableSet());
-
+void Material::shareStates(Material *material){
 	int i;
-	for(i=0;i<mShaderState->getNumVariableBuffers(Shader::ShaderType_VERTEX);++i){
-		VariableBufferFormat::ptr format=mShaderState->getVariableBufferFormat(Shader::ShaderType_VERTEX,i);
-		VariableBuffer::ptr buffer=mManager->getBufferManager()->createVariableBuffer(Buffer::Usage_BIT_DYNAMIC,Buffer::Access_BIT_WRITE,format);
-		mVariables->addBuffer(buffer);
+	for(i=0;i<mPaths.size() && i<material->getNumPaths();++i){
+		mPaths[i]->shareStates(material->getPath(i));
 	}
-
-	mParameters=SceneParameters::ptr(new SceneParameters());
-
-	return mVariables;
 }
 
-/// @todo: This whole setup should be moved to the SceneRenderers, let them handle it
-void Material::setupRenderDevice(RenderDevice *renderDevice){
-	renderDevice->setRenderState(mRenderState);
-	renderDevice->setShaderState(mShaderState);
-
+/// @todo: Change the RenderCaps into an interface where we can query for the items, would let us move the TextureSupport and ProfileSupport into it
+bool Material::compile(){
+	RenderDevice *device=mManager->getEngine()->getRenderDevice();
 	RenderCaps caps;
-	renderDevice->getRenderCaps(caps);
+	device->getRenderCaps(caps);
+	int i,j;
+	for(i=0;i<getNumPaths();++i){
+		RenderPath::ptr path=getPath(i);
+		for(j=0;j<path->getNumPasses();++j){
+			RenderPass *pass=path->getPass(j);
+			ShaderState *state=pass->getShaderState();
 
-	int i;
-	for(i=0;i<getNumTextures();++i){
-		renderDevice->setTexture(i,getTexture(i));
-	}
-	for(;i<caps.maxTextureStages;++i){
-		renderDevice->setTexture(i,NULL);
-	}
-}
+			/// @todo: Use a new RenderCaps interface to check all types of shader programs
+			if(state->getShader(Shader::ShaderType_VERTEX)!=NULL){
+				if(caps.vertexShaders==false){
+					break;
+				}
+			}
+			else{
+				if(caps.vertexFixedFunction==false){
+					break;
+				}
+			}
 
-void Material::setupRenderVariables(RenderDevice *renderDevice,int scope,Scene *scene,Renderable *renderable){
-	mParameters->setScene(scene);
-	mParameters->setRenderable(renderable);
-	mVariables->update(scope,mParameters);
-	int i;
-	for(i=0;i<mVariables->getNumBuffers();++i){
-		// If the buffer only changes for this scope
-		if(mVariables->getBufferScope(i)==scope){
-			renderDevice->setBuffer(i,mVariables->getBuffer(i));
+			if(state->getShader(Shader::ShaderType_FRAGMENT)!=NULL){
+				if(caps.fragmentShaders==false){
+					break;
+				}
+			}
+			else{
+				if(caps.fragmentFixedFunction==false){
+					break;
+				}
+			}
+		}
+		if(j==path->getNumPasses()){
+			mBestPath=path;
+			return true;
 		}
 	}
+
+	mBestPath=NULL;
+	return false;
 }
 
 }

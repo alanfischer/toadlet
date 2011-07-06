@@ -39,17 +39,22 @@ public:
 	SceneRenderer(Scene *scene);
 	virtual ~SceneRenderer();
 
-	virtual void renderScene(RenderDevice *renderDevice,Node *node,CameraNode *camera);
+	virtual void renderScene(RenderDevice *device,Node *node,CameraNode *camera);
+	virtual RenderDevice *getDevice(){return mDevice;}
+	virtual void setupPass(RenderPass *pass);
 
 protected:
 	virtual void gatherRenderables(RenderableSet *set,Node *node,CameraNode *camera);
 	virtual void renderRenderables(RenderableSet *set,RenderDevice *renderDevice,CameraNode *camera,bool useMaterials=true);
 	virtual void renderDepthSortedRenderables(RenderableSet *set,RenderDevice *renderDevice,CameraNode *camera,bool useMaterials);
+	virtual void renderQueueItems(Material *material,const RenderableSet::RenderableQueueItem *items,int numItems);
 
 	void setupViewport(CameraNode *camera,RenderDevice *renderDevice);
 	void setupLights(const RenderableSet::LightQueue &lightQueue,RenderDevice *renderDevice);
 
 	Scene *mScene;
+	RenderDevice *mDevice;
+	SceneParameters::ptr mSceneParameters;
 	RenderableSet::ptr mRenderableSet;
 };
 

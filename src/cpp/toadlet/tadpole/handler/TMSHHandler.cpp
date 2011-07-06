@@ -384,6 +384,7 @@ void TMSHHandler::writeVertexFormat(DataStream *stream,VertexFormat::ptr vertexF
 	}
 };
 
+/// @todo: Support multi-path-pass materials
 Material::ptr TMSHHandler::readMaterial(DataStream *stream,int blockSize){
 	int i;
 
@@ -391,54 +392,56 @@ Material::ptr TMSHHandler::readMaterial(DataStream *stream,int blockSize){
 		return NULL;
 	}
 
-	Material::ptr material=mEngine->getMaterialManager()->createMaterial();
+	Material::ptr material=mEngine->getMaterialManager()->createDiffuseMaterial(NULL);
 
 	material->setName(stream->readNullTerminatedString());
 
 	BlendState blendState;
 	stream->read((tbyte*)&blendState,sizeof(blendState));
-	material->setBlendState(blendState);
+	material->getPass()->setBlendState(blendState);
 
 	DepthState depthState;
 	stream->read((tbyte*)&depthState,sizeof(depthState));
-	material->setDepthState(depthState);
+	material->getPass()->setDepthState(depthState);
 
 	RasterizerState rasterizerState;
 	stream->read((tbyte*)&rasterizerState,sizeof(rasterizerState));
-	material->setRasterizerState(rasterizerState);
+	material->getPass()->setRasterizerState(rasterizerState);
 
 	FogState fogState;
 	stream->read((tbyte*)&fogState,sizeof(fogState));
-	material->setFogState(fogState);
+	material->getPass()->setFogState(fogState);
 
 	PointState pointState;
 	stream->read((tbyte*)&pointState,sizeof(pointState));
-	material->setPointState(pointState);
+	material->getPass()->setPointState(pointState);
 
 	MaterialState materialState;
 	stream->read((tbyte*)&materialState,sizeof(materialState));
-	material->setMaterialState(materialState);
+	material->getPass()->setMaterialState(materialState);
 
 	int numSamplerStates=stream->readInt32();
 	for(i=0;i<numSamplerStates;++i){
 		SamplerState samplerState;
 		stream->read((tbyte*)&samplerState,sizeof(samplerState));
-		material->setSamplerState(i,samplerState);
+		material->getPass()->setSamplerState(i,samplerState);
 	}
 
 	int numTextureStates=stream->readInt32();
 	for(i=0;i<numTextureStates;++i){
 		TextureState textureState;
 		stream->read((tbyte*)&textureState,sizeof(textureState));
-		material->setTextureState(i,textureState);
+		material->getPass()->setTextureState(i,textureState);
 	}
 
 	int numTextures=stream->readInt32();
 	for(i=0;i<numTextures;++i){
 		String textureName=stream->readNullTerminatedString();
-		material->setTexture(i,mEngine->getTextureManager()->findTexture(textureName));
-		material->setTextureName(i,textureName);
+		material->getPass()->setTexture(i,mEngine->getTextureManager()->findTexture(textureName));
+		material->getPass()->setTextureName(i,textureName);
 	}
+
+	material->compile();
 
 	return material;
 }
@@ -456,47 +459,47 @@ void TMSHHandler::writeMaterial(DataStream *stream,Material::ptr material){
 	stream->writeNullTerminatedString(material->getName());
 
 	BlendState blendState;
-	material->getBlendState(blendState);
+	material->getPass()->getBlendState(blendState);
 	stream->write((tbyte*)&blendState,sizeof(blendState));
 
 	DepthState depthState;
-	material->getDepthState(depthState);
+	material->getPass()->getDepthState(depthState);
 	stream->write((tbyte*)&depthState,sizeof(depthState));
 
 	RasterizerState rasterizerState;
-	material->getRasterizerState(rasterizerState);
+	material->getPass()->getRasterizerState(rasterizerState);
 	stream->write((tbyte*)&rasterizerState,sizeof(rasterizerState));
 
 	FogState fogState;
-	material->getFogState(fogState);
+	material->getPass()->getFogState(fogState);
 	stream->write((tbyte*)&fogState,sizeof(fogState));
 
 	PointState pointState;
-	material->getPointState(pointState);
+	material->getPass()->getPointState(pointState);
 	stream->write((tbyte*)&pointState,sizeof(pointState));
 
 	MaterialState materialState;
-	material->getMaterialState(materialState);
+	material->getPass()->getMaterialState(materialState);
 	stream->write((tbyte*)&materialState,sizeof(materialState));
 
-	stream->writeInt32(material->getNumSamplerStates());
-	for(i=0;i<material->getNumSamplerStates();++i){
+	stream->writeInt32(material->getPass()->getNumSamplerStates());
+	for(i=0;i<material->getPass()->getNumSamplerStates();++i){
 		SamplerState samplerState;
-		material->getSamplerState(i,samplerState);
+		material->getPass()->getSamplerState(i,samplerState);
 		stream->write((tbyte*)&samplerState,sizeof(samplerState));
 	}
 
-	stream->writeInt32(material->getNumTextureStates());
-	for(i=0;i<material->getNumTextureStates();++i){
+	stream->writeInt32(material->getPass()->getNumTextureStates());
+	for(i=0;i<material->getPass()->getNumTextureStates();++i){
 		TextureState textureState;
-		material->getTextureState(i,textureState);
+		material->getPass()->getTextureState(i,textureState);
 		stream->write((tbyte*)&textureState,sizeof(textureState));
 	}
 
-	stream->writeInt32(material->getNumTextures());
-	for(i=0;i<material->getNumTextures();++i){
-		Texture::ptr texture=material->getTexture(i);
-		stream->writeNullTerminatedString(texture!=NULL?texture->getName():material->getTextureName(i));
+	stream->writeInt32(material->getPass()->getNumTextures());
+	for(i=0;i<material->getPass()->getNumTextures();++i){
+		Texture::ptr texture=material->getPass()->getTexture(i);
+		stream->writeNullTerminatedString(texture!=NULL?texture->getName():material->getPass()->getTextureName(i));
 	}
 }
 

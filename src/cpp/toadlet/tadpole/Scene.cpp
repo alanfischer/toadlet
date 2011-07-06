@@ -288,7 +288,8 @@ int Scene::countActiveNodes(Node *node){
 	
 	return count;
 }
-
+/// @todo
+/*
 void Scene::renderBoundingVolumes(RenderDevice *device,Node *node){
 	if(node==NULL){
 		mSphereMesh->getSubMesh(0)->material->setupRenderDevice(device);
@@ -325,7 +326,7 @@ void Scene::renderBoundingVolumes(RenderDevice *device,Node *node){
 		}
 	}
 }
-
+*/
 void Scene::postContextActivate(RenderDevice *device){
 	mResetFrame=true;
 	mRoot->activate();

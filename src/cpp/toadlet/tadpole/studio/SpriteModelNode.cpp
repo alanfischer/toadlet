@@ -182,7 +182,7 @@ RenderState::ptr SpriteModelNode::getSharedRenderState(){
 		mOwnedMaterial->retain();
 	}
 
-	return mOwnedMaterial!=NULL?mOwnedMaterial->getRenderState():NULL;
+	return mOwnedMaterial!=NULL?mOwnedMaterial->getPass()->getRenderState():NULL;
 }
 
 void SpriteModelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
@@ -199,8 +199,8 @@ void SpriteModelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 #endif
 }
 
-void SpriteModelNode::render(RenderDevice *renderDevice) const{
-	renderDevice->renderPrimitive(mVertexData,mIndexData);
+void SpriteModelNode::render(SceneRenderer *renderer) const{
+	renderer->getDevice()->renderPrimitive(mVertexData,mIndexData);
 }
 
 }

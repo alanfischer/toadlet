@@ -14,6 +14,8 @@ public:
 	void render(RenderDevice *renderDevice);
 	void update(int dt);
 
+	Material::ptr makeFunkyMaterial();
+
 	Scene::ptr scene;
 	CameraNode::ptr cameraNode;
 	MeshNode::ptr meshNode;
