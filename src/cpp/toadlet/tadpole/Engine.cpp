@@ -151,9 +151,9 @@ Engine::Engine(bool backable):
 	mBackable(false),
 	//mDirectory,
 	mRenderDevice(NULL),
-	mLastRenderDevice(NULL),
+	mRenderDeviceChanged(false),
 	mAudioDevice(NULL),
-	mLastAudioDevice(NULL)
+	mAudioDeviceChanged(false)
 
 	//mContextListeners
 {
@@ -335,12 +335,12 @@ void Engine::destroy(){
 
 bool Engine::setRenderDevice(RenderDevice *renderDevice){
 	if(renderDevice!=NULL){
-		if(mLastRenderDevice==NULL){
-			mLastRenderDevice=renderDevice;
-		}
-		else if(mBackable==false && mLastRenderDevice!=renderDevice){
+		if(mBackable==false && mRenderDeviceChanged){
 			Error::unknown(Categories::TOADLET_TADPOLE,"can not change RenderDevice in an unbacked engine");
 			return false;
+		}
+		else{
+			mRenderDeviceChanged=true;
 		}
 
 		renderDevice->getRenderCaps(mRenderCaps);
@@ -381,14 +381,17 @@ bool Engine::setRenderDevice(RenderDevice *renderDevice){
 		mIdealVertexFormatType=caps.idealVertexFormatType;
 	}
 
-	if(renderDevice!=mRenderDevice && mRenderDevice!=NULL){
-		contextDeactivate(mRenderDevice);
-	}
-	if(renderDevice!=mRenderDevice && renderDevice!=NULL){
-		contextActivate(renderDevice);
+	RenderDevice *lastRenderDevice=mRenderDevice;
+
+	if(renderDevice!=lastRenderDevice && lastRenderDevice!=NULL){
+		contextDeactivate(lastRenderDevice);
 	}
 
 	mRenderDevice=renderDevice;
+
+	if(renderDevice!=lastRenderDevice && renderDevice!=NULL){
+		contextActivate(renderDevice);
+	}
 
 	if(mRenderDevice!=NULL){
 		updateVertexFormats();
@@ -453,12 +456,12 @@ void Engine::updateVertexFormats(){
 
 bool Engine::setAudioDevice(AudioDevice *audioDevice){
 	if(audioDevice!=NULL){
-		if(mLastAudioDevice==NULL){
-			mLastAudioDevice=audioDevice;
-		}
-		else if(mBackable==false && mLastAudioDevice!=audioDevice){
+		if(mBackable==false && mAudioDeviceChanged){
 			Error::unknown(Categories::TOADLET_TADPOLE,"can not change AudioDevice in an unbacked engine");
 			return false;
+		}
+		else{
+			mAudioDeviceChanged=true;
 		}
 	}
 

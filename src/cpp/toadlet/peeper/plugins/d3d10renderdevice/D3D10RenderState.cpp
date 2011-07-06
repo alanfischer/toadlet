@@ -32,12 +32,15 @@ namespace peeper{
 D3D10RenderState::D3D10RenderState(D3D10RenderDevice *renderDevice):
 	mListener(NULL),
 	mBlendState(NULL),
-	mD3DBlendState(NULL),
 	mDepthState(NULL),
-	mD3DDepthStencilState(NULL),
 	mRasterizerState(NULL),
-	mD3DRasterizerState(NULL),
-	mMaterialState(NULL)
+	mFogState(NULL),
+	mPointState(NULL),
+	mMaterialState(NULL),
+
+	mD3DBlendState(NULL),
+	mD3DDepthStencilState(NULL),
+	mD3DRasterizerState(NULL)
 {
 	mDevice=renderDevice;
 	mD3DDevice=mDevice->getD3D10Device();
@@ -52,31 +55,61 @@ void D3D10RenderState::destroy(){
 		delete mBlendState;
 		mBlendState=NULL;
 	}
-	if(mD3DBlendState!=NULL){
-		mD3DBlendState->Release();
-		mD3DBlendState=NULL;
-	}
 	if(mDepthState!=NULL){
 		delete mDepthState;
 		mDepthState=NULL;
-	}
-	if(mD3DDepthStencilState!=NULL){
-		mD3DDepthStencilState->Release();
-		mD3DDepthStencilState=NULL;
 	}
 	if(mRasterizerState!=NULL){
 		delete mRasterizerState;
 		mRasterizerState=NULL;
 	}
-	if(mD3DRasterizerState!=NULL){
-		mD3DRasterizerState->Release();
-		mD3DRasterizerState=NULL;
+	if(mFogState!=NULL){
+		delete mFogState;
+		mFogState=NULL;
 	}
-
+	if(mPointState!=NULL){
+		delete mPointState;
+		mPointState=NULL;
+	}
 	if(mMaterialState!=NULL){
 		delete mMaterialState;
 		mMaterialState=NULL;
 	}
+	int i;
+	for(i=0;i<mSamplerStates.size();++i){
+		if(mSamplerStates[i]!=NULL){
+			delete mSamplerStates[i];
+			mSamplerStates[i]=NULL;
+		}
+	}
+	mSamplerStates.clear();
+	for(i=0;i<mSamplerStates.size();++i){
+		if(mTextureStates[i]!=NULL){
+			delete mTextureStates[i];
+			mTextureStates[i]=NULL;
+		}
+	}
+	mTextureStates.clear();
+
+	if(mD3DBlendState!=NULL){
+		mD3DBlendState->Release();
+		mD3DBlendState=NULL;
+	}
+	if(mD3DDepthStencilState!=NULL){
+		mD3DDepthStencilState->Release();
+		mD3DDepthStencilState=NULL;
+	}
+	if(mD3DRasterizerState!=NULL){
+		mD3DRasterizerState->Release();
+		mD3DRasterizerState=NULL;
+	}
+	for(i=0;i<mD3DSamplerStates.size();++i){
+		if(mD3DSamplerStates[i]!=NULL){
+			mD3DSamplerStates[i]->Release();
+			mD3DSamplerStates[i]=NULL;
+		}
+	}
+	mD3DSamplerStates.clear();
 
 	if(mListener!=NULL){
 		mListener->renderStateDestroyed(this);
@@ -115,6 +148,30 @@ void D3D10RenderState::setRasterizerState(const RasterizerState &state){
 
 bool D3D10RenderState::getRasterizerState(RasterizerState &state) const{
 	if(mRasterizerState==NULL){return false;}else{state.set(*mRasterizerState);return true;}
+}
+
+void D3D10RenderState::setFogState(const FogState &state){
+	if(mFogState==NULL){mFogState=new FogState(state);}else{mFogState->set(state);}
+}
+
+bool D3D10RenderState::getFogState(FogState &state) const{
+	if(mFogState==NULL){return false;}else{state.set(*mFogState);return true;}
+}
+
+void D3D10RenderState::setPointState(const PointState &state){
+	if(mPointState==NULL){mPointState=new PointState(state);}else{mPointState->set(state);}
+}
+
+bool D3D10RenderState::getPointState(PointState &state) const{
+	if(mPointState==NULL){return false;}else{state.set(*mPointState);return true;}
+}
+
+void D3D10RenderState::setMaterialState(const MaterialState &state){
+	if(mMaterialState==NULL){mMaterialState=new MaterialState(state);}else{mMaterialState->set(state);}
+}
+
+bool D3D10RenderState::getMaterialState(MaterialState &state) const{
+	if(mMaterialState==NULL){return false;}else{state.set(*mMaterialState);return true;}
 }
 
 void D3D10RenderState::setSamplerState(int i,const SamplerState &state){

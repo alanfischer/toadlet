@@ -49,8 +49,8 @@ MeshNode::SubMesh::SubMesh(MeshNode *meshNode,Mesh::SubMesh *meshSubMesh):
 	this->vertexData=meshSubMesh->vertexData;
 }
 
-void MeshNode::SubMesh::render(RenderDevice *renderDevice) const{
-	renderDevice->renderPrimitive(vertexData,indexData);
+void MeshNode::SubMesh::render(SceneRenderer *renderer) const{
+	renderer->getDevice()->renderPrimitive(vertexData,indexData);
 }
 
 MeshNode::MeshController::MeshController(MeshNode *node):Controller(),
@@ -283,7 +283,7 @@ RenderState::ptr MeshNode::getSharedRenderState(){
 		mOwnedMaterial->retain();
 	}
 
-	return mOwnedMaterial!=NULL?mOwnedMaterial->getRenderState():NULL;
+	return mOwnedMaterial!=NULL?mOwnedMaterial->getPass()->getRenderState():NULL;
 }
 
 void MeshNode::gatherRenderables(CameraNode *camera,RenderableSet *set){

@@ -884,6 +884,10 @@ void D3D9RenderDevice::setCapsFromD3DCAPS9(RenderCaps &caps,const D3DCAPS9 &d3dc
 	#endif
 	caps.triangleFan=true;
 	caps.fill=true;
+	caps.vertexFixedFunction=true;
+	caps.vertexShaders=true;
+	caps.fragmentFixedFunction=true;
+	caps.fragmentShaders=true;
 	#if !defined(TOADLET_SET_D3DM)
 		caps.texturePerspective=true;
 		caps.cubeMap=true;

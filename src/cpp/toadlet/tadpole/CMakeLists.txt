@@ -77,6 +77,8 @@ set (TADPOLE_HANDLER_PLATFORM_WIN32_GDIPLUS_SRC
 
 set (TADPOLE_MATERIAL_SRC
 	material/Material.cpp
+	material/RenderPass.cpp
+	material/RenderPath.cpp
 	material/RenderVariableSet.cpp
 )
 
@@ -227,6 +229,7 @@ set (TADPOLE_HANDLER_PLATFORM_WIN32_GDIPLUS_HEADERS
 set (TADPOLE_MATERIAL_HEADERS
 	material/Material.h
 	material/RenderPass.h
+	material/RenderPath.h
 	material/RenderVariable.h
 	material/RenderVariableSet.h
 	material/SceneParameters.h

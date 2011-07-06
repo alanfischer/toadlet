@@ -99,8 +99,8 @@ Node *CameraNode::create(Scene *scene){
 
 	mGamma=Math::ONE;
 	mGammaMaterial=mEngine->getMaterialManager()->createMaterial();
-	mGammaMaterial->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-	mGammaMaterial->setMaterialState(MaterialState(Math::ZERO_VECTOR4));
+	mGammaMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+	mGammaMaterial->getPass()->setMaterialState(MaterialState(Math::ZERO_VECTOR4));
 	mGammaMaterial->retain();
 
 	mFPSLastTime=0;
@@ -324,12 +324,12 @@ void CameraNode::setViewport(int x,int y,int width,int height){
 void CameraNode::setGamma(scalar gamma){
 	mGamma=gamma;
 	if(gamma>=Math::ONE){
-		mGammaMaterial->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
-		mGammaMaterial->setMaterialState(MaterialState(Vector4(Math::ONE,Math::ONE,Math::ONE,gamma-Math::ONE)));
+		mGammaMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
+		mGammaMaterial->getPass()->setMaterialState(MaterialState(Vector4(Math::ONE,Math::ONE,Math::ONE,gamma-Math::ONE)));
 	}
 	else{
-		mGammaMaterial->setBlendState(BlendState::Combination_ALPHA);
-		mGammaMaterial->setMaterialState(MaterialState(Vector4(0,0,0,Math::ONE-gamma)));
+		mGammaMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA);
+		mGammaMaterial->getPass()->setMaterialState(MaterialState(Vector4(0,0,0,Math::ONE-gamma)));
 	}
 }
 
@@ -375,7 +375,7 @@ void CameraNode::render(RenderDevice *device,Node *node){
 	mVisibleCount=0;
 
 	mScene->render(device,this,node);
-	renderOverlayGamma(device);
+//	renderOverlayGamma(device);
 }
 
 Image::ptr CameraNode::renderToImage(RenderDevice *device,int format,int width,int height){
@@ -454,8 +454,7 @@ Mesh::ptr CameraNode::renderToSkyBox(RenderDevice *device,int format,int size,sc
 			device->copyFrameBufferToPixelBuffer(skyboxTexture[i]->getMipPixelBuffer(0,0));
 		}
 
-		skyboxMaterial[i]=mEngine->getMaterialManager()->createDiffuseMaterial(skyboxTexture[i]);
-		skyboxMaterial[i]->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+		skyboxMaterial[i]=mEngine->getMaterialManager()->createSkyboxMaterial(skyboxTexture[i]);
 	}
 
 	setAlignmentCalculationsUseOrigin(oldAlignment);
@@ -561,8 +560,12 @@ void CameraNode::updateViewTransform(){
 	Math::normalize(mClipPlanes[4].set(vpt[3]-vpt[2], vpt[7]-vpt[6], vpt[11]-vpt[10], vpt[15]-vpt[14]));
 	// Near clipping plane.
 	Math::normalize(mClipPlanes[5].set(vpt[3]+vpt[2], vpt[7]+vpt[6], vpt[11]+vpt[10], vpt[15]+vpt[14]));
-}
 
+	// Update ViewProjection matrix;
+	Math::mul(mViewProjectionMatrix,mProjectionMatrix,mViewMatrix);
+}
+/*
+/// @todo: Fix me
 void CameraNode::renderOverlayGamma(RenderDevice *device){
 	if(mGamma!=Math::ONE){
 		device->setAmbientColor(Math::ONE_VECTOR4);
@@ -573,6 +576,7 @@ void CameraNode::renderOverlayGamma(RenderDevice *device){
 		device->renderPrimitive(mOverlayVertexData,mOverlayIndexData);
 	}
 }
+*/
 
 }
 }

@@ -135,7 +135,7 @@ public:
 	Material *getRenderMaterial() const{return mSkeletonMaterial;}
 	const Transform &getRenderTransform() const;
 	const Bound &getRenderBound() const;
-	void render(RenderDevice *renderDevice) const;
+	void render(SceneRenderer *renderer) const;
 
 	// Attachable
 	int getNumAttachments(){return mBones.size();}

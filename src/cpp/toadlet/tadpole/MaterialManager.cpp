@@ -30,6 +30,7 @@
 #include <toadlet/peeper/Texture.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/MaterialManager.h>
+#include <toadlet/tadpole/material/RenderVariables.h>
 
 namespace toadlet{
 namespace tadpole{
@@ -67,31 +68,69 @@ Material::ptr MaterialManager::cloneMaterial(Material::ptr source){
 Material::ptr MaterialManager::createDiffuseMaterial(Texture::ptr texture){
 	Material::ptr material(new Material(this));
 
-	material->setBlendState(BlendState());
-	material->setDepthState(DepthState());
-	material->setRasterizerState(RasterizerState());
-	material->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+	RenderPath::ptr fixedPath=material->addPath();
+	RenderPass::ptr fixedPass=fixedPath->addPass();
+	{
+		fixedPass->setBlendState(BlendState());
+		fixedPass->setDepthState(DepthState());
+		fixedPass->setRasterizerState(RasterizerState());
+		fixedPass->setMaterialState(MaterialState(true,false,MaterialState::ShadeType_GOURAUD));
+
+		if(texture!=NULL){
+			SamplerState samplerState(mDefaultSamplerState);
+			fixedPass->setSamplerState(0,samplerState);
+
+			TextureState textureState;
+			fixedPass->setTextureState(0,textureState);
+
+			fixedPass->setTexture(0,texture);
+		}
+	}
+
+	RenderPath::ptr shaderPath=material->addPath();
+	RenderPass::ptr shaderPass=shaderPath->addPass();
+	{
+		shaderPass->setShader(Shader::ShaderType_VERTEX,mFixedVertexShader);
+		shaderPass->setShader(Shader::ShaderType_FRAGMENT,mFixedFragmentShader);
+		shaderPass->getVariables()->addVariable("modelViewProjectionMatrix",RenderVariable::ptr(new MVPMatrixVariable()),Material::Scope_RENDERABLE);
+		shaderPass->getVariables()->addVariable("lightModelPosition",RenderVariable::ptr(new LightModelPositionVariable()),Material::Scope_RENDERABLE);
+		shaderPass->getVariables()->addVariable("lightColor",RenderVariable::ptr(new LightDiffuseVariable()),Material::Scope_MATERIAL);
+		shaderPass->getVariables()->addVariable("ambientColor",RenderVariable::ptr(new AmbientVariable()),Material::Scope_RENDERABLE);
+		shaderPass->getVariables()->addVariable("materialDiffuseColor",RenderVariable::ptr(new MaterialDiffuseVariable()),Material::Scope_MATERIAL);
+		shaderPass->getVariables()->addVariable("materialAmbientColor",RenderVariable::ptr(new MaterialAmbientVariable()),Material::Scope_MATERIAL);
+	}
+
+	manage(material);
+
+	material->compile();
+
+	return material;
+}
+
+Material::ptr MaterialManager::createSkyboxMaterial(Texture::ptr texture){
+	Material::ptr material(new Material(this));
+
+	RenderPath::ptr fixedPath=material->addPath();
+	RenderPass::ptr fixedPass=fixedPath->addPass();
+	fixedPass->setBlendState(BlendState());
+	fixedPass->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+	fixedPass->setRasterizerState(RasterizerState());
+	fixedPass->setMaterialState(MaterialState(false));
 
 	if(texture!=NULL){
 		SamplerState samplerState(mDefaultSamplerState);
-		if(texture->getNumMipLevels()==1){
-			samplerState.mipFilter=SamplerState::FilterType_NONE;
-		}
-		if(texture->getDimension()==Texture::Dimension_CUBE){
-			samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-			samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-			samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-		}
-		material->setSamplerState(0,samplerState);
+		samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+		samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+		samplerState.wAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
+		fixedPass->setSamplerState(0,samplerState);
 
 		TextureState textureState;
-		if((texture->getFormat()&Texture::Format_BIT_DEPTH)>0){
-			textureState.shadowResult=TextureState::ShadowResult_L;
-		}
-		material->setTextureState(0,textureState);
+		fixedPass->setTextureState(0,textureState);
 
-		material->setTexture(0,texture);
+		fixedPass->setTexture(0,texture);
 	}
+
+	material->compile();
 
 	manage(material);
 
@@ -195,6 +234,71 @@ void MaterialManager::modifyShaderState(ShaderState::ptr dst,ShaderState::ptr sr
 }
 
 void MaterialManager::contextActivate(RenderDevice *renderDevice){
+	String fixedProfiles[]={
+		"glsl",
+		"hlsl"
+	};
+
+	String fixedVertexCode[]={
+		"#version 150\n" \
+		"in vec4 POSITION;\n" \
+		"in vec3 NORMAL;\n" \
+		"out vec4 color;\n" \
+
+		"uniform mat4 modelViewProjectionMatrix;\n" \
+		"uniform vec4 materialDiffuseColor;\n" \
+		"uniform vec4 materialAmbientColor;\n" \
+		"uniform vec4 lightModelPosition;\n" \
+		"uniform vec4 lightColor;\n" \
+		"uniform vec4 ambientColor;\n" \
+
+		"void main(){\n" \
+			"gl_Position=modelViewProjectionMatrix * POSITION;\n" \
+			"color=-dot(lightModelPosition,vec4(NORMAL,1.0))*lightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n" \
+		"}",
+
+		"struct VIN{\n" \
+			"float4 position : POSITION;\n" \
+			"float3 normal : NORMAL;\n" \
+		"};\n" \
+		"struct VOUT{\n" \
+			"float4 position : SV_POSITION;\n" \
+			"float4 color : COLOR;\n" \
+		"};\n" \
+
+		"float4x4 modelViewProjectionMatrix;\n" \
+		"float4 materialDiffuseColor;\n" \
+		"float4 materialAmbientColor;\n" \
+		"float4 lightModelPosition;\n" \
+		"float4 lightColor;\n" \
+		"float4 ambientColor;\n" \
+
+		"VOUT main(VIN vin){\n" \
+		"	VOUT vout;\n" \
+		"	vout.position=mul(vin.position,modelViewProjectionMatrix);\n" \
+		"	vout.color=-dot(lightModelPosition,vin.normal)*lightColor*materialDiffuseColor + ambientColor*materialAmbientColor;\n" \
+		"	return vout;\n" \
+		"}"
+	};
+
+	String fixedFragmentCode[]={
+		"in vec4 color;\n" \
+		"void main(){\n" \
+			"gl_FragColor = color;\n" \
+		"}",
+
+		"struct PIN{\n" \
+			"float4 position : SV_POSITION;\n" \
+			"float4 color: COLOR;\n" \
+		"};\n" \
+		"float4 main(PIN pin): SV_TARGET{" \
+		"	return pin.color;\n" \
+		"}"
+	};
+
+	mFixedVertexShader=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,fixedProfiles,fixedVertexCode,2);
+	mFixedFragmentShader=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,fixedProfiles,fixedFragmentCode,2);
+
 	int i;
 	for(i=0;i<mRenderStates.size();++i){
 		RenderState::ptr renderState=mRenderStates[i];
@@ -206,6 +310,15 @@ void MaterialManager::contextActivate(RenderDevice *renderDevice){
 }
 
 void MaterialManager::contextDeactivate(RenderDevice *renderDevice){
+	if(mFixedVertexShader!=NULL){
+		mFixedVertexShader->release();
+		mFixedVertexShader=NULL;
+	}
+	if(mFixedFragmentShader!=NULL){
+		mFixedFragmentShader->release();
+		mFixedFragmentShader=NULL;
+	}
+
 	int i;
 	for(i=0;i<mRenderStates.size();++i){
 		RenderState::ptr renderState=mRenderStates[i];

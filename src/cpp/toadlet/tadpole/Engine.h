@@ -110,9 +110,9 @@ protected:
 	bool mBackable;
 	String mDirectory;
 	RenderDevice *mRenderDevice;
-	RenderDevice *mLastRenderDevice;
+	bool mRenderDeviceChanged;
 	AudioDevice *mAudioDevice;
-	AudioDevice *mLastAudioDevice;
+	bool mAudioDeviceChanged;
 
 	Collection<ContextListener*> mContextListeners;
 

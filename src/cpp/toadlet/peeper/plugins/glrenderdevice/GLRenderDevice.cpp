@@ -292,6 +292,9 @@ bool GLRenderDevice::create(RenderTarget *target,int *options){
 			caps.pointSprites=(gl_version>=11);
 		#endif
 
+		caps.vertexFixedFunction=true;
+		caps.fragmentFixedFunction=true;
+
 		#if defined(TOADLET_HAS_GLEW)
 			caps.vertexShaders=(GLEW_ARB_vertex_program>0);
 			if(caps.vertexShaders) glGetProgramivARB(GL_VERTEX_PROGRAM_ARB,GL_MAX_PROGRAM_ENV_PARAMETERS_ARB,(GLint*)&caps.maxVertexShaderLocalParameters);

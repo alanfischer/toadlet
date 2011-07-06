@@ -66,85 +66,9 @@ Logo::Logo():Application(){
 
 Logo::~Logo(){
 }
-Shader::ptr vs,fs;
-ShaderState::ptr ss;
-
-String sp[]={
-	"glsl",
-	"hlsl"
-};
-String vsc[]={
-	"#version 150\n" \
-	"in vec4 POSITION;\n" \
-	"in vec3 NORMAL;\n" \
-	"out vec4 color;\n" \
-	"uniform mat4 mvp;\n" \
-	"uniform float time;\n" \
-	"void main(){\n" \
-		"vec4 p=mvp * POSITION;\n" \
-		"p.y=p.y+sin(p.x/10)*10;\n" \
-		"gl_Position=p;\n" \
-		"color = vec4(sin(time),0,0,1.0);\n" \
-	"}",
-
-	"struct VIN{\n" \
-		"float4 position : POSITION;\n" \
-		"float3 normal : NORMAL;\n" \
-	"};\n" \
-	"struct VOUT{\n" \
-		"float4 position : SV_POSITION;\n" \
-		"float4 color : COLOR;\n" \
-	"};\n" \
-	"float4x4 mvp;\n" \
-	"VOUT main(VIN vin){\n" \
-	"	VOUT vout;\n" \
-	"	vout.position=mul(vin.position,mvp);\n" \
-	"	vout.color=float4(vin.normal.x,vin.normal.y,vin.normal.z,1.0);\n" \
-	"	return vout;\n" \
-	"}"
-};
-String fsc[]={
-	"in vec4 color;\n" \
-	"void main(){\n" \
-		"gl_FragColor = color;\n" \
-	"}",
-
-	"struct PIN{\n" \
-		"float4 position : SV_POSITION;\n" \
-		"float4 color: COLOR;\n" \
-	"};\n" \
-	"float4 main(PIN pin): SV_TARGET{" \
-	"	return pin.color;\n" \
-	"}"
-};
-
-class PVMVariable:public RenderVariable{
-public:
-	PVMVariable(CameraNode::ptr camera){
-		this->camera=camera;
-	}
-
-	void update(tbyte *data,SceneParameters *parameters){
-		Matrix4x4 projectionView=camera->getProjectionMatrix()*camera->getViewMatrix();
-		memcpy(data,projectionView.getData(),sizeof(Matrix4x4));
-	}
-
-protected:
-	CameraNode::ptr camera;
-};
-
-class TimeVariable:public RenderVariable{
-public:
-	TimeVariable(){}
-
-	void update(tbyte *data,SceneParameters *parameters){
-		float time=(float)parameters->getScene()->getTime()/1000.0f;
-		memcpy(data,&time,sizeof(time));
-	}
-};
 
 void Logo::create(){
-	Application::create("gl");
+	Application::create("d3d9");
 
 	mEngine->setDirectory("../../../data");
 
@@ -166,21 +90,13 @@ void Logo::create(){
 	meshNode->getController()->start();
 	meshNode->getController()->setCycling(Controller::Cycling_REFLECT);
 	scene->getRoot()->attach(meshNode);
+//Material::ptr funkyMaterial=makeFunkyMaterial();
+//for(int i=0;i<meshNode->getNumSubMeshes();++i)meshNode->getSubMesh(i)->material=funkyMaterial;
 
 	cameraNode=getEngine()->createNodeType(CameraNode::type(),scene);
 	cameraNode->setLookAt(Vector3(0,-Math::fromInt(150),0),Math::ZERO_VECTOR3,Math::Z_UNIT_VECTOR3);
 	cameraNode->setClearColor(Colors::BLUE);
 	scene->getRoot()->attach(cameraNode);
-
-vs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,sp,vsc,2);
-fs=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,sp,fsc,2);
-
-	for(int i=0;i<meshNode->getNumSubMeshes();++i){
-		meshNode->getSubMesh(i)->material->setShader(Shader::ShaderType_VERTEX,vs);
-		meshNode->getSubMesh(i)->material->setShader(Shader::ShaderType_FRAGMENT,fs);
-		meshNode->getSubMesh(i)->material->getVariables()->addVariable("mvp",RenderVariable::ptr(new PVMVariable(cameraNode)),Material::Scope_MATERIAL);
-		meshNode->getSubMesh(i)->material->getVariables()->addVariable("time",RenderVariable::ptr(new TimeVariable()),Material::Scope_MATERIAL);
-	}
 
 // Only looks good if running on device, in simulator its always a top down view
 #if 0
@@ -219,6 +135,71 @@ void Logo::render(RenderDevice *renderDevice){
 
 void Logo::update(int dt){
 	scene->update(dt);
+}
+
+String funkyProfiles[]={
+	"glsl",
+	"hlsl"
+};
+String funkyVertexCode[]={
+	"#version 150\n" \
+	"in vec4 POSITION;\n" \
+	"in vec3 NORMAL;\n" \
+	"out vec4 color;\n" \
+	"uniform float time;\n" \
+	"uniform mat4 mvp;\n" \
+	"void main(){\n" \
+		"vec4 p=mvp * POSITION;\n" \
+		"p.y=p.y+sin(p.x/10)*10;\n" \
+		"gl_Position=p;\n" \
+		"color = vec4(sin(time),0,0,1.0);\n" \
+	"}",
+
+	"struct VIN{\n" \
+		"float4 position : POSITION;\n" \
+		"float3 normal : NORMAL;\n" \
+	"};\n" \
+	"struct VOUT{\n" \
+		"float4 position : SV_POSITION;\n" \
+		"float4 color : COLOR;\n" \
+	"};\n" \
+	"float4x4 mvp;\n" \
+	"float time;\n" \
+	"VOUT main(VIN vin){\n" \
+	"	VOUT vout;\n" \
+	"	vout.position=mul(vin.position,mvp);\n" \
+	"	vout.color=float4(sin(time),0,0,1.0);\n" \
+	"	return vout;\n" \
+	"}"
+};
+String funkyFragmentCode[]={
+	"in vec4 color;\n" \
+	"void main(){\n" \
+		"gl_FragColor = color;\n" \
+	"}",
+
+	"struct PIN{\n" \
+		"float4 position : SV_POSITION;\n" \
+		"float4 color: COLOR;\n" \
+	"};\n" \
+	"float4 main(PIN pin): SV_TARGET{" \
+	"	return pin.color;\n" \
+	"}"
+};
+
+Material::ptr Logo::makeFunkyMaterial(){
+	Material::ptr material=mEngine->getMaterialManager()->createMaterial();
+
+	Shader::ptr funkyVertexShader=getEngine()->getShaderManager()->createShader(Shader::ShaderType_VERTEX,funkyProfiles,funkyVertexCode,2);
+	Shader::ptr funkyFragmentShader=getEngine()->getShaderManager()->createShader(Shader::ShaderType_FRAGMENT,funkyProfiles,funkyFragmentCode,2);
+
+	RenderPass::ptr pass=material->getPass();
+	pass->setShader(Shader::ShaderType_VERTEX,funkyVertexShader);
+	pass->setShader(Shader::ShaderType_FRAGMENT,funkyFragmentShader);
+	pass->getVariables()->addVariable("mvp",RenderVariable::ptr(new MVPVariable()),Material::Scope_RENDERABLE);
+	pass->getVariables()->addVariable("time",RenderVariable::ptr(new TimeVariable()),Material::Scope_MATERIAL);
+
+	return material;
 }
 
 int toadletMain(int argc,char **argv){

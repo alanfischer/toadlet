@@ -34,6 +34,8 @@ namespace toadlet{
 namespace tadpole{
 namespace animation{
 
+/// @todo: This should just be a MaterialStateAnimation
+/*
 class MaterialLightEffectAnimation:public Animatable{
 public:
 	TOADLET_SHARED_POINTERS(MaterialLightEffectAnimation);
@@ -67,7 +69,7 @@ protected:
 	MaterialState mEnd;
 	scalar mEndTime;
 };
-
+*/
 }
 }
 }

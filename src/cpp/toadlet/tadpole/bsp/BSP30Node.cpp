@@ -41,9 +41,8 @@ BSP30ModelNode::SubModel::SubModel(BSP30ModelNode *modelNode,BSP30Map *map){
 	this->faces=NULL;
 }
 
-void BSP30ModelNode::SubModel::render(peeper::RenderDevice *device) const{
-	map->renderFaces(device,faces);
-	device->setTexture(1,NULL);
+void BSP30ModelNode::SubModel::render(SceneRenderer *renderer) const{
+	map->renderFaces(renderer->getDevice(),faces);
 }
 
 TOADLET_NODE_IMPLEMENT(BSP30ModelNode,Categories::TOADLET_TADPOLE_BSP+".BSP30ModelNode");
@@ -159,7 +158,7 @@ RenderState::ptr BSP30ModelNode::getSharedRenderState(){
 		mOwnedMaterial->retain();
 	}
 
-	return mOwnedMaterial!=NULL?mOwnedMaterial->getRenderState():NULL;
+	return mOwnedMaterial!=NULL?mOwnedMaterial->getPass()->getRenderState():NULL;
 }
 
 void BSP30ModelNode::showPlanarFaces(int plane){
@@ -304,12 +303,12 @@ void BSP30Node::setSkyTextures(const String &skyDown,const String &skyUp,const S
 		for(i=0;i<mesh->getNumSubMeshes();++i){
 			Material *material=mesh->getSubMesh(i)->material;
 			if(material!=NULL){
-				material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-				material->setMaterialState(MaterialState(false,false,MaterialState::ShadeType_FLAT));
+				material->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+				material->getPass()->setMaterialState(MaterialState(false,false,MaterialState::ShadeType_FLAT));
 				SamplerState samplerState;
 				samplerState.uAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
 				samplerState.vAddress=SamplerState::AddressType_CLAMP_TO_EDGE;
-				material->setSamplerState(0,samplerState);
+				material->getPass()->setSamplerState(0,samplerState);
 			}
 		}
 
@@ -576,18 +575,15 @@ void BSP30Node::traceSegment(Collision &result,const Vector3 &position,const Seg
 	}
 }
 
-void BSP30Node::render(RenderDevice *device) const{
-	int i;
-
-	device->setMatrix(RenderDevice::MatrixType_MODEL,Math::IDENTITY_MATRIX4X4); // Technically I dont need this anymore, since its a renderable.  But i'll keep it in case it ever gets changed again
-
+void BSP30Node::render(SceneRenderer *renderer) const{
+	int i,j;
 	for(i=0;i<mVisibleMaterialFaces.size();i++){
-		mMap->materials[i]->setupRenderDevice(device);
-		mMap->renderFaces(device,mVisibleMaterialFaces[i]);
+		RenderPath *path=mMap->materials[i]->getBestPath();
+		for(j=0;j<path->getNumPasses();++j){
+			renderer->setupPass(path->getPass(j));
+			mMap->renderFaces(renderer->getDevice(),mVisibleMaterialFaces[i]);
+		}
 	}
-
-	device->setTexture(0,NULL);
-	device->setTexture(1,NULL);
 }
 
 void BSP30Node::childTransformUpdated(Node *child){

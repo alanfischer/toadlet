@@ -24,6 +24,7 @@
  ********** Copyright header - do not remove **********/
 
 #include <toadlet/egg/Error.h>
+#include <toadlet/egg/Logger.h>
 #include <toadlet/tadpole/material/RenderVariableSet.h>
 
 namespace toadlet{
@@ -88,7 +89,7 @@ bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr varia
 		}
 	}
 	if(buffer==NULL){
-		Error::unknown(Categories::TOADLET_TADPOLE,
+		Logger::warning(Categories::TOADLET_TADPOLE,
 			"VariableBuffer not found for RenderVariable with name:"+name);
 		return false;
 	}
@@ -102,7 +103,7 @@ bool RenderVariableSet::addVariable(const String &name,RenderVariable::ptr varia
 	}
 	
 	if(formatVariable==NULL){
-		Error::unknown(Categories::TOADLET_TADPOLE,
+		Logger::warning(Categories::TOADLET_TADPOLE,
 			"RenderVariable not found with name:"+name);
 		return false;
 	}
@@ -139,16 +140,15 @@ void RenderVariableSet::update(int scope,SceneParameters *parameters){
 	int i,j;
 	for(i=0;i<mBuffers.size();++i){
 		BufferInfo *buffer=&mBuffers[i];
-		if((buffer->scope&scope)==0){
+		// We update the whole buffer on it's largest scope, since updating the buffer in seconds doesn't work in D3D10 with dynamic usage.
+		if((buffer->scope&scope)==0 || (buffer->scope&~scope)>scope){
 			continue;
 		}
 
 		tbyte *data=buffer->buffer->lock(Buffer::Access_BIT_WRITE);
 		for(j=0;j<buffer->variables.size();++j){
 			VariableInfo *variable=&buffer->variables[j];
-			if((variable->scope&scope)!=0){
-				variable->variable->update(data+variable->location,parameters);
-			}
+			variable->variable->update(data+variable->location,parameters);
 		}
 		buffer->buffer->unlock();
 	}

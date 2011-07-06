@@ -23,22 +23,27 @@
  *
  ********** Copyright header - do not remove **********/
 
-#ifndef TOADLET_TADPOLE_RENDERPASS_H
-#define TOADLET_TADPOLE_RENDERPASS_H
+#ifndef TOADLET_TADPOLE_MATERIAL_RENDERPASS_H
+#define TOADLET_TADPOLE_MATERIAL_RENDERPASS_H
 
-#include <toadlet/tadpole/Types.h>
 #include <toadlet/peeper/RenderState.h>
 #include <toadlet/peeper/ShaderState.h>
 #include <toadlet/peeper/RenderDevice.h>
+#include <toadlet/tadpole/material/RenderVariableSet.h>
+#include <toadlet/tadpole/material/SceneParameters.h>
 
 namespace toadlet{
 namespace tadpole{
+
+class MaterialManager;
+
+namespace material{
 
 class TOADLET_API RenderPass{
 public:
 	TOADLET_SHARED_POINTERS(RenderPass);
 
-	RenderPass();
+	RenderPass(MaterialManager *manager,RenderPass *source=NULL,bool clone=false);
 	virtual ~RenderPass();
 
 	void destroy();
@@ -69,8 +74,8 @@ public:
 	void setTextureState(int i,const TextureState &state){return mRenderState->setTextureState(i,state);}
 	bool getTextureState(int i,TextureState &state) const{return mRenderState->getTextureState(i,state);}
 
-	void setShader(Shader::ShaderType type,Shader::ptr shader);
-	Shader::ptr getShader(Shader::ShaderType type);
+	void setShader(Shader::ShaderType type,Shader::ptr shader){mShaderState->setShader(type,shader);}
+	Shader::ptr getShader(Shader::ShaderType type){return mShaderState->getShader(type);}
 
 	int getNumTextures() const{return mTextures.size();}
 	void setTexture(Texture::ptr texture){setTexture(0,texture);}
@@ -80,49 +85,28 @@ public:
 	void setTextureName(int i,const String &name);
 	String getTextureName(int i=0) const{return i<mTextureNames.size()?mTextureNames[i]:(char*)NULL;}
 
-	RenderState::ptr getRenderState() const{return mRenderState;}
-	ShaderState::ptr getShaderState() const{return mShaderState;}
+	RenderVariableSet::ptr getVariables();
 
-	void setupRenderDevice(RenderDevice *renderDevice);
-	
+	void shareStates(RenderPass *pass);
+	inline bool ownsStates() const{return mOwnsStates;}
+	inline RenderState::ptr getRenderState() const{return mRenderState;}
+	inline ShaderState::ptr getShaderState() const{return mShaderState;}
+
+	/// @todo: There needs to be a better way of passing these in, instead of passing in all possible values, and setting them each time
+	void setupRenderVariables(RenderDevice *renderDevice,int scope,SceneParameters *parameters);
+
 protected:
+	MaterialManager *mManager;
 	RenderState::ptr mRenderState;
 	ShaderState::ptr mShaderState;
+	bool mOwnsStates;
 	Collection<Texture::ptr> mTextures;
 	Collection<String> mTextureNames;
+	RenderVariableSet::ptr mVariables;
 };
 
+}
 }
 }
 
 #endif
-
-/*
-#include <toadlet/egg/BaseResource.h>
-#include <toadlet/tadpole/RenderPass.h>
-
-namespace toadlet{
-namespace tadpole{
-
-class TOADLET_API Material:public BaseResource{
-public:
-	TOADLET_SHARED_POINTERS(Material);
-
-	Material();
-	virtual ~Material();
-
-	void destroy();
-	Material::ptr clone();
-
-	inline void getNumRenderPasses(){return mRenderPasses.size();}
-	inline RenderPass::ptr getRenderPass(int i){return mRenderPasses[i];}
-	RenderPass::ptr addRenderPass();
-	void removeRenderPass(RenderPass *pass);
-
-protected:
-	Collection<RenderPass::ptr> mRenderPasses;
-};
-
-}
-}
-*/

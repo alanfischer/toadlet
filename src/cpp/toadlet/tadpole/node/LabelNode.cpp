@@ -27,6 +27,7 @@
 #include <toadlet/egg/image/ImageFormatConversion.h>
 #include <toadlet/tadpole/Engine.h>
 #include <toadlet/tadpole/RenderableSet.h>
+#include <toadlet/tadpole/SceneRenderer.h>
 #include <toadlet/tadpole/node/CameraNode.h>
 #include <toadlet/tadpole/node/LabelNode.h>
 #include <toadlet/tadpole/node/ParentNode.h>
@@ -61,9 +62,9 @@ Node *LabelNode::create(Scene *scene){
 
 	mMaterial=getEngine()->getMaterialManager()->createMaterial();
 	mMaterial->retain();
-	mMaterial->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
-	mMaterial->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-	mMaterial->setMaterialState(MaterialState(true,true,MaterialState::ShadeType_FLAT));
+	mMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+	mMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+	mMaterial->getPass()->setMaterialState(MaterialState(true,true,MaterialState::ShadeType_FLAT));
 
 	return this;
 }
@@ -157,8 +158,8 @@ void LabelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 #endif
 }
 
-void LabelNode::render(RenderDevice *renderDevice) const{
-	renderDevice->renderPrimitive(mVertexData,mIndexData);
+void LabelNode::render(SceneRenderer *renderer) const{
+	renderer->getDevice()->renderPrimitive(mVertexData,mIndexData);
 }
 
 void LabelNode::updateLabel(){
@@ -216,12 +217,12 @@ void LabelNode::updateLabel(){
 
 	// Update material
 	Texture::ptr texture=mFont->getTexture();
-	mMaterial->setTexture(0,texture);
+	mMaterial->getPass()->setTexture(0,texture);
 	if(ImageFormatConversion::getAlphaBits(texture->getFormat())>0){
-		mMaterial->setBlendState(BlendState::Combination_ALPHA);
+		mMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA);
 	}
 	else{
-		mMaterial->setBlendState(BlendState::Combination_COLOR);
+		mMaterial->getPass()->setBlendState(BlendState::Combination_COLOR);
 	}
 
 	// Update bound

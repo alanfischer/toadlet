@@ -108,6 +108,7 @@ public:
 	virtual scalar getGamma() const{return mGamma;}
 
 	inline const Matrix4x4 &getViewMatrix() const{return mViewMatrix;}
+	inline const Matrix4x4 &getViewProjectionMatrix() const{return mViewProjectionMatrix;}
 	inline const Vector3 &getForward() const{return mForward;}
 	inline const Vector3 &getRight() const{return mRight;}
 
@@ -137,7 +138,7 @@ public:
 protected:
 	virtual void projectionUpdated();
 	virtual void updateViewTransform();
-	virtual void renderOverlayGamma(RenderDevice *renderDevice);
+//	virtual void renderOverlayGamma(RenderDevice *renderDevice);
 
 	ProjectionType mProjectionType;
 	scalar mFov,mAspect;

@@ -244,10 +244,11 @@ const char *makeBoneAssignment(char *buffer,const Mesh::VertexBoneAssignmentList
 	return buffer;
 }
 
+/// @todo: Support multi-path-pass materials
 Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,MaterialManager *materialManager,TextureManager *textureManager){
 	Material::ptr material;
 	if(materialManager!=NULL){
-		material=materialManager->createMaterial();
+		material=materialManager->createDiffuseMaterial(NULL);
 	}
 	else{
 		material=Material::ptr(new Material(NULL));
@@ -346,7 +347,7 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 			}
 		}
 	}
-	material->setMaterialState(materialState);
+	material->getPass()->setMaterialState(materialState);
 
 	RasterizerState rasterizerState;
 	{
@@ -367,7 +368,7 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 			}
 		}
 	}
-	material->setRasterizerState(rasterizerState);
+	material->getPass()->setRasterizerState(rasterizerState);
 
 	if(version<=2){
 		mxml_node_t *mapNode=node->child;
@@ -415,11 +416,11 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 					texture=textureManager->findTexture(textureName);
 				}
 				if(texture!=NULL){
-					material->setTexture(0,texture);
-					material->setTextureName(0,texture->getName());
+					material->getPass()->setTexture(0,texture);
+					material->getPass()->setTextureName(0,texture->getName());
 				}
 				else{
-					material->setTextureName(0,textureName);
+					material->getPass()->setTextureName(0,textureName);
 				}
 			}
 		}
@@ -448,16 +449,18 @@ Material::ptr XMLMeshUtilities::loadMaterial(mxml_node_t *node,int version,Mater
 						texture=textureManager->findTexture(textureName);
 					}
 					if(texture!=NULL){
-						material->setTexture(0,texture);
-						material->setTextureName(0,texture->getName());
+						material->getPass()->setTexture(0,texture);
+						material->getPass()->setTextureName(0,texture->getName());
 					}
 					else{
-						material->setTextureName(0,textureName);
+						material->getPass()->setTextureName(0,textureName);
 					}
 				}
 			}
 		}
 	}
+
+	material->compile();
 
 	return material;
 }
@@ -472,7 +475,7 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,P
 	mxmlElementSetAttr(materialNode,"Name",material->getName());
 
 	MaterialState materialState;
-	if(material->getMaterialState(materialState)){
+	if(material->getPass()->getMaterialState(materialState)){
 		mxml_node_t *lightingNode=mxmlNewElement(materialNode,"Lighting");
 		{
 			mxmlNewOpaque(lightingNode,makeBool(materialState.lighting));
@@ -528,7 +531,7 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,P
 	}
 
 	RasterizerState rasterizerState;
-	if(material->getRasterizerState(rasterizerState)){
+	if(material->getPass()->getRasterizerState(rasterizerState)){
 		mxml_node_t *faceCullingNode=mxmlNewElement(materialNode,"FaceCulling");
 		{
 			switch(rasterizerState.cull){
@@ -546,19 +549,19 @@ mxml_node_t *XMLMeshUtilities::saveMaterial(Material::ptr material,int version,P
 	}
 
 	int i;
-	for(i=0;i<material->getNumTextures();++i){
+	for(i=0;i<material->getPass()->getNumTextures();++i){
 		mxml_node_t *textureStageNode=mxmlNewElement(materialNode,"TextureStage");
 		{
 			mxml_node_t *textureNode=mxmlNewElement(textureStageNode,"Texture");
 			{
-				Texture *texture=material->getTexture(i);
+				Texture *texture=material->getPass()->getTexture(i);
 
 				String textureName;
 				if(texture!=NULL){
 					textureName=texture->getName();
 				}
 				else{
-					textureName=material->getTextureName(i);
+					textureName=material->getPass()->getTextureName(i);
 				}
 
 				mxmlElementSetAttr(textureNode,"File",textureName);

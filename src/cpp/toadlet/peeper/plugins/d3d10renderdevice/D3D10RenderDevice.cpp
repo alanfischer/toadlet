@@ -116,6 +116,10 @@ bool D3D10RenderDevice::create(RenderTarget *target,int *options){
 		caps.renderToDepthTexture=true;
 		caps.renderToTextureNonPowerOf2Restricted=true;
 		caps.idealVertexFormatType=VertexFormat::Format_TYPE_FLOAT_32;
+		caps.vertexFixedFunction=false;
+		caps.vertexShaders=true;
+		caps.fragmentFixedFunction=false;
+		caps.fragmentShaders=true;
 		caps.triangleFan=false;
 	}
 
@@ -248,7 +252,7 @@ void D3D10RenderDevice::endScene(){
 
 	mD3DDevice->IASetInputLayout(NULL);
 
-	mLastShaderState=NULL;
+	setShaderState(NULL);
 }
 
 void D3D10RenderDevice::renderPrimitive(VertexData *vertexData,IndexData *indexData){
@@ -376,13 +380,20 @@ bool D3D10RenderDevice::setRenderState(RenderState *renderState){
 
 bool D3D10RenderDevice::setShaderState(ShaderState *shaderState){
 	D3D10ShaderState *d3dshaderState=shaderState!=NULL?(D3D10ShaderState*)shaderState->getRootShaderState():NULL;
-	if(d3dshaderState==NULL){
-		return false;
+
+	bool result=true;
+	if(d3dshaderState!=NULL){
+		result=d3dshaderState->activate();
+	}
+	else{
+		mD3DDevice->VSSetShader(NULL);
+		mD3DDevice->PSSetShader(NULL);
+		mD3DDevice->GSSetShader(NULL);
 	}
 
 	mLastShaderState=d3dshaderState;
 
-	return d3dshaderState->activate();
+	return result;
 }
 
 void D3D10RenderDevice::setBuffer(int i,VariableBuffer *buffer){

@@ -53,16 +53,16 @@ Node *AnaglyphCameraNode::create(Scene *scene){
 	mRightRenderTarget->attach(mRightTexture->getMipPixelBuffer(0,0),PixelBufferRenderTarget::Attachment_COLOR_0);
 
 	mLeftMaterial=mEngine->getMaterialManager()->createMaterial();
-	mLeftMaterial->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-	mLeftMaterial->setMaterialState(MaterialState(Colors::RED));
-	mLeftMaterial->setTexture(0,mLeftTexture);
+	mLeftMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+	mLeftMaterial->getPass()->setMaterialState(MaterialState(Colors::RED));
+	mLeftMaterial->getPass()->setTexture(0,mLeftTexture);
 	mLeftMaterial->retain();
 
 	mRightMaterial=mEngine->getMaterialManager()->createMaterial();
-	mRightMaterial->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-	mRightMaterial->setMaterialState(MaterialState(Colors::CYAN));
-	mRightMaterial->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
-	mRightMaterial->setTexture(0,mRightTexture);
+	mRightMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+	mRightMaterial->getPass()->setMaterialState(MaterialState(Colors::CYAN));
+	mRightMaterial->getPass()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
+	mRightMaterial->getPass()->setTexture(0,mRightTexture);
 	mRightMaterial->retain();
 
 	return this;
@@ -91,12 +91,12 @@ Node *AnaglyphCameraNode::set(Node *node){
 
 void AnaglyphCameraNode::setLeftColor(const Vector4 &color){
 	mLeftColor.set(color);
-	mLeftMaterial->setMaterialState(MaterialState(mLeftColor));
+	mLeftMaterial->getPass()->setMaterialState(MaterialState(mLeftColor));
 }
 
 void AnaglyphCameraNode::setRightColor(const Vector4 &color){
 	mRightColor.set(color);
-	mRightMaterial->setMaterialState(MaterialState(mRightColor));
+	mRightMaterial->getPass()->setMaterialState(MaterialState(mRightColor));
 }
 
 void AnaglyphCameraNode::render(RenderDevice *device,Node *node){
@@ -133,12 +133,13 @@ void AnaglyphCameraNode::render(RenderDevice *device,Node *node){
 	device->setMatrix(RenderDevice::MatrixType_PROJECTION,mOverlayMatrix);
 	device->setMatrix(RenderDevice::MatrixType_VIEW,Math::IDENTITY_MATRIX4X4);
 	device->setMatrix(RenderDevice::MatrixType_MODEL,Math::IDENTITY_MATRIX4X4);
-	mLeftMaterial->setupRenderDevice(device);
+/// @todo: Fix me
+//	mLeftMaterial->setupRenderDevice(device);
 	device->renderPrimitive(mOverlayVertexData,mOverlayIndexData);
-	mRightMaterial->setupRenderDevice(device);
+//	mRightMaterial->setupRenderDevice(device);
 	device->renderPrimitive(mOverlayVertexData,mOverlayIndexData);
 
-	renderOverlayGamma(device);
+//	renderOverlayGamma(device);
 }
 
 }

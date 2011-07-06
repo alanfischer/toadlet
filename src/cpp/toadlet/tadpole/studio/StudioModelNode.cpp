@@ -52,10 +52,10 @@ StudioModelNode::SubModel::SubModel(StudioModelNode *modelNode,int bodypartIndex
 	material=model->materials[model->skin(model->header->numskinref*skinIndex+smesh->skinref)];
 }
 
-void StudioModelNode::SubModel::render(RenderDevice *renderDevice) const{
+void StudioModelNode::SubModel::render(SceneRenderer *renderer) const{
 	int i;
 	for(i=0;i<mdata->indexDatas.size();++i){
-		renderDevice->renderPrimitive(modelNode->mVertexData,mdata->indexDatas[i]);
+		renderer->getDevice()->renderPrimitive(modelNode->mVertexData,mdata->indexDatas[i]);
 	}
 }
 
@@ -256,8 +256,8 @@ void StudioModelNode::setRenderSkeleton(bool skeleton){
 	if(skeleton){
 		if(mSkeletonMaterial==NULL){
 			mSkeletonMaterial=mEngine->getMaterialManager()->createMaterial();
-			mSkeletonMaterial->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-			mSkeletonMaterial->setPointState(PointState(true,8,false,0,0,0,0,0));
+			mSkeletonMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+			mSkeletonMaterial->getPass()->setPointState(PointState(true,8,false,0,0,0,0,0));
 		}
 	}
 	else{
@@ -441,7 +441,7 @@ RenderState::ptr StudioModelNode::getSharedRenderState(){
 		mOwnedMaterial->retain();
 	}
 
-	return mOwnedMaterial!=NULL?mOwnedMaterial->getRenderState():NULL;
+	return mOwnedMaterial!=NULL?mOwnedMaterial->getPass()->getRenderState():NULL;
 }
 
 void StudioModelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
@@ -473,15 +473,14 @@ void StudioModelNode::gatherRenderables(CameraNode *camera,RenderableSet *set){
 	}
 }
 
-void StudioModelNode::render(RenderDevice *renderDevice) const{
-	renderDevice->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
+void StudioModelNode::render(SceneRenderer *renderer) const{
+	renderer->getDevice()->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
 
 	mSkeletonIndexData->primitive=IndexData::Primitive_POINTS;
-	renderDevice->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
+	renderer->getDevice()->renderPrimitive(mSkeletonVertexData,mSkeletonIndexData);
 	mSkeletonIndexData->primitive=IndexData::Primitive_LINES;
 
-	renderDevice
-		->renderPrimitive(mHitBoxVertexData,mHitBoxIndexData);
+	renderer->getDevice()->renderPrimitive(mHitBoxVertexData,mHitBoxIndexData);
 }
 
 int StudioModelNode::getAttachmentIndex(const String &name){

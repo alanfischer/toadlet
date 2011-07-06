@@ -26,6 +26,7 @@
 #ifndef TOADLET_TADPOLE_MATERIAL_SCENEPARAMETERS_H
 #define TOADLET_TADPOLE_MATERIAL_SCENEPARAMETERS_H
 
+#include <toadlet/peeper/LightState.h>
 #include <toadlet/tadpole/Types.h>
 
 namespace toadlet{
@@ -33,6 +34,7 @@ namespace tadpole{
 
 class Renderable;
 class Scene;
+namespace node{class CameraNode;}
 
 namespace material{
 
@@ -40,15 +42,37 @@ class SceneParameters{
 public:
 	TOADLET_SHARED_POINTERS(SceneParameters);
 
+	SceneParameters():
+		mScene(NULL),
+		mCamera(NULL),
+		mRenderable(NULL)
+	{}
+
 	inline void setScene(Scene *scene){mScene=scene;}
-	inline Scene *getScene(){return mScene;}
+	inline Scene *getScene() const{return mScene;}
+
+	inline void setCamera(CameraNode *camera){mCamera=camera;}
+	inline CameraNode *getCamera() const{return mCamera;}
 
 	inline void setRenderable(Renderable *renderable){mRenderable=renderable;}
-	inline Renderable *getRenderable(){return mRenderable;}
+	inline Renderable *getRenderable() const{return mRenderable;}
+
+	inline void setMaterialState(const MaterialState &state){mMaterialState.set(state);}
+	inline const MaterialState &getMaterialState() const{return mMaterialState;}
+
+	inline void setLightState(const LightState &state){mLightState.set(state);}
+	inline const LightState &getLightState() const{return mLightState;}
+
+	inline void setAmbient(const Vector4 &ambient){mAmbient.set(ambient);}
+	inline const Vector4 &getAmbient() const{return mAmbient;}
 
 protected:
 	Scene *mScene;
+	CameraNode *mCamera;
 	Renderable *mRenderable;
+	MaterialState mMaterialState;
+	LightState mLightState;
+	Vector4 mAmbient;
 };
 
 }
