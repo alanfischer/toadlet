@@ -45,6 +45,8 @@ public:
 	inline RenderPass::ptr getPass(int i) const{return mPasses[i];}
 	RenderPass::ptr addPass();
 
+	bool isDepthSorted() const;
+
 	void shareStates(RenderPath *path);
 
 protected:

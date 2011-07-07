@@ -18,10 +18,10 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 	Image::ptr bump=createBump(cloud,-1,-1,-32,4); // To debug any bump issues, try disabling fadeStage, make bump/cloud stage modulate, add a rotating sun, and use a zscale of 1
 
 	mSkyMaterial=mEngine->getMaterialManager()->createMaterial();
-	mSkyMaterial->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 	mSkyMaterial->setLayer(-1);
-	mSkyMaterial->setMaterialState(MaterialState(false,true));
-	mSkyMaterial->setFogState(FogState(FogState::FogType_NONE,1,0,0,Colors::BLACK));
+	mSkyMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+	mSkyMaterial->getPass()->setMaterialState(MaterialState(false,true));
+	mSkyMaterial->getPass()->setFogState(FogState(FogState::FogType_NONE,1,0,0,Colors::BLACK));
 	int state=0;
 	if(advanced){
 		Image::ptr fade=createFade(cloudSize/2,cloudSize/2,Vector4(fadeColor.x,fadeColor.y,fadeColor.z,0),fadeColor,1.1,0.01);
@@ -34,8 +34,8 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 		bumpState.colorOperation=TextureState::Operation_DOTPRODUCT;
 		bumpState.colorSource1=TextureState::Source_PREVIOUS;
 		bumpState.colorSource2=TextureState::Source_TEXTURE;
-		mSkyMaterial->setTexture(state,bumpTexture);
-		mSkyMaterial->setTextureState(state,bumpState);
+		mSkyMaterial->getPass()->setTexture(state,bumpTexture);
+		mSkyMaterial->getPass()->setTextureState(state,bumpState);
 		mBumpAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(mSkyMaterial,state++));
 
 		TextureState cloudState;
@@ -44,8 +44,8 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 		cloudState.colorSource2=TextureState::Source_TEXTURE;
 		cloudState.alphaOperation=TextureState::Operation_REPLACE;
 		cloudState.alphaSource1=TextureState::Source_TEXTURE;
-		mSkyMaterial->setTexture(state,cloudTexture);
-		mSkyMaterial->setTextureState(state,cloudState);
+		mSkyMaterial->getPass()->setTexture(state,cloudTexture);
+		mSkyMaterial->getPass()->setTextureState(state,cloudState);
 		mCloudAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(mSkyMaterial,state++));
 
 		TextureState colorState;
@@ -56,8 +56,8 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 		colorState.colorSource3=TextureState::Source_PREVIOUS;
 		colorState.alphaOperation=TextureState::Operation_REPLACE;
 		colorState.alphaSource1=TextureState::Source_PREVIOUS;
-		mSkyMaterial->setTexture(state,cloudTexture); // Need a texture for this state to function on OpenGL currently
-		mSkyMaterial->setTextureState(state,colorState);
+		mSkyMaterial->getPass()->setTexture(state,cloudTexture); // Need a texture for this state to function on OpenGL currently
+		mSkyMaterial->getPass()->setTextureState(state,colorState);
 		mColorAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(mSkyMaterial,state++));
 
 		TextureState fadeState;
@@ -67,19 +67,20 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 		fadeState.colorSource3=TextureState::Source_TEXTURE;
 		fadeState.alphaOperation=TextureState::Operation_REPLACE;
 		fadeState.alphaSource1=TextureState::Source_TEXTURE;
-		mSkyMaterial->setTexture(state,fadeTexture);
-		mSkyMaterial->setTextureState(state,fadeState);
+		mSkyMaterial->getPass()->setTexture(state,fadeTexture);
+		mSkyMaterial->getPass()->setTextureState(state,fadeState);
 		mFadeAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(mSkyMaterial,state++));
 	}
 	else{
-		mSkyMaterial->setBlendState(BlendState::Combination_ALPHA);
+		mSkyMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA);
 
 		Image::ptr composite=createComposite(cloud,bump,lightDir,skyColor);
 		Texture::ptr compositeTexture=mEngine->getTextureManager()->createTexture(composite);
 
-		mSkyMaterial->setTexture(state,compositeTexture);
+		mSkyMaterial->getPass()->setTexture(state,compositeTexture);
 		mCompositeAccessor=Matrix4x4Accessor::ptr(new TextureStateMatrix4x4Accessor(mSkyMaterial,state++));
 	}
+	mSkyMaterial->compile();
 	mSkyMaterial->retain();
 
 	Mesh::ptr mesh=mEngine->getMeshManager()->createSkyDome(vertexBuffer,indexBuffer,sphere,numSegments,numRings,0.35);
@@ -95,11 +96,12 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 
 	Image::ptr glow=createGlow(96,96);
 
-	Material::ptr sunMaterial=mEngine->getMaterialManager()->createMaterial(mEngine->getTextureManager()->createTexture(glow));
-	sunMaterial->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
-	sunMaterial->setMaterialState(MaterialState(false));
-	sunMaterial->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+	Material::ptr sunMaterial=mEngine->getMaterialManager()->createDiffuseMaterial(mEngine->getTextureManager()->createTexture(glow));
 	sunMaterial->setLayer(-1);
+	sunMaterial->getPass()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
+	sunMaterial->getPass()->setMaterialState(MaterialState(false));
+	sunMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+	sunMaterial->compile();
 
 	mSun=mEngine->createNodeType(SpriteNode::type(),mScene);
 	mSun->setMaterial(sunMaterial);
@@ -119,7 +121,10 @@ Node *Sky::create(Scene *scene,const Vector4 &skyColor,const Vector4 &fadeColor)
 }
 
 void Sky::destroy(){
-	mSkyMaterial->release();
+	if(mSkyMaterial!=NULL){
+		mSkyMaterial->release();
+		mSkyMaterial=NULL;
+	}
 
 	super::destroy();
 }

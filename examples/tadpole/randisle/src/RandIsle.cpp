@@ -26,7 +26,7 @@ RandIsle::~RandIsle(){
 void RandIsle::create(const String &directory){
 	Logger::debug("RandIsle::create");
 
-	Application::create("gl");
+	Application::create("d3d9");
 
 	mEngine->setDirectory(directory);
 
@@ -77,10 +77,10 @@ void RandIsle::create(const String &directory){
 	mPredictedVertexData=VertexData::ptr(new VertexData(predictedVertexBuffer));
 	mPredictedIndexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRISTRIP,NULL,0,predictedVertexBuffer->getSize()));
 	mPredictedMaterial=mEngine->getMaterialManager()->createMaterial();
-	mPredictedMaterial->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-	mPredictedMaterial->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
-	mPredictedMaterial->setMaterialState(MaterialState(true));
-	mPredictedMaterial->setBlendState(BlendState::Combination_ALPHA);
+	mPredictedMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+	mPredictedMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+	mPredictedMaterial->getPass()->setMaterialState(MaterialState(true));
+	mPredictedMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA);
 
 	mRustleSound=mEngine->createNodeType(AudioNode::type(),mScene);
 	mScene->getRoot()->attach(mRustleSound);
@@ -410,13 +410,13 @@ void RandIsle::frameUpdate(int dt){
 	mFollowNode->frameUpdate(0,-1);
 	{
 		TextureState textureState;
-		Resources::instance->water->getTextureState(0,textureState);
+		Resources::instance->water->getPass()->getTextureState(0,textureState);
 		Math::setMatrix4x4FromTranslate(textureState.matrix,Math::sin(Math::fromMilli(mScene->getTime())/4)/4,0,0);
-		Resources::instance->water->setTextureState(0,textureState);
+		Resources::instance->water->getPass()->setTextureState(0,textureState);
 
-		Resources::instance->water->getTextureState(1,textureState);
+		Resources::instance->water->getPass()->getTextureState(1,textureState);
 		Math::setMatrix4x4FromTranslate(textureState.matrix,0,Math::sin(Math::fromMilli(mScene->getTime())/4)/4,0);
-		Resources::instance->water->setTextureState(1,textureState);
+		Resources::instance->water->getPass()->setTextureState(1,textureState);
 	}
 
 	if(mPlayer->getPath()!=NULL){

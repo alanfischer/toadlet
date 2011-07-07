@@ -62,7 +62,7 @@ public:
 
 	tbyte *lock(int lockAccess);
 	bool unlock();
-	bool update(tbyte *data,int start,int size);
+	bool update(tbyte *data,int start,int size){return false;}
 
 	bool needsReset();
 
