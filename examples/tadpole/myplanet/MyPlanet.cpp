@@ -18,7 +18,7 @@ public:
 
 		Mesh::ptr mesh=getEngine()->getMeshManager()->createSphere(Sphere(Math::ONE));
 		{
-			mesh->getSubMesh(0)->material->setMaterialState(MaterialState(Colors::BLUE));
+			mesh->getSubMesh(0)->material->getPass()->setMaterialState(MaterialState(Colors::BLUE));
 		}
 		mMeshNode=getEngine()->createNodeType(MeshNode::type(),getScene());
 		mMeshNode->setMesh(mesh);
@@ -28,11 +28,11 @@ public:
 
 		mesh=MyPlanet::createDisc(getEngine(),Math::ONE);
 		{
-			Material::ptr material=getEngine()->getMaterialManager()->createMaterial(mEngine->getTextureManager()->findTexture("spark"));
-			material->setTextureState(0,TextureState(TextureState::Operation_MODULATE,TextureState::Source_PRIMARY_COLOR,TextureState::Source_TEXTURE));
-			material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-			material->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
-			material->setMaterialState(MaterialState(true,true));
+			Material::ptr material=getEngine()->getMaterialManager()->createDiffuseMaterial(mEngine->getTextureManager()->findTexture("spark"));
+			material->getPass()->setTextureState(0,TextureState(TextureState::Operation_MODULATE,TextureState::Source_PRIMARY_COLOR,TextureState::Source_TEXTURE));
+			material->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+			material->getPass()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
+			material->getPass()->setMaterialState(MaterialState(true,true));
 			mesh->getSubMesh(0)->material=material;
 		}
 		mSparkNode=getEngine()->createNodeType(MeshNode::type(),getScene());
@@ -48,8 +48,8 @@ public:
 	scalar getSize() const{return mMeshNode->getScale().x;}
 	void setSize(scalar s){mMeshNode->setScale(s,s,s);}
 
-	void setColor(const Vector4 &color){mMeshNode->getSubMesh(0)->material->setMaterialState(MaterialState(color));}
-	Vector4 getColor() const{MaterialState state;mMeshNode->getSubMesh(0)->material->getMaterialState(state);return state.diffuse;}
+	void setColor(const Vector4 &color){mMeshNode->getSubMesh(0)->material->getPass()->setMaterialState(MaterialState(color));}
+	Vector4 getColor() const{MaterialState state;mMeshNode->getSubMesh(0)->material->getPass()->getMaterialState(state);return state.diffuse;}
 	
 	void frameUpdate(int dt,int scope){
 		super::frameUpdate(dt,scope);
@@ -58,13 +58,13 @@ public:
 			scalar value=Math::fromMilli(getScene()->getTime()-mStartTime);
 			TextureState textureState;
 			Material *material=mSparkNode->getSubMesh(0)->getRenderMaterial();
-			material->getTextureState(0,textureState);
+			material->getPass()->getTextureState(0,textureState);
 			{
 				textureState.calculation=TextureState::CalculationType_NORMAL;
 				Math::setMatrix4x4FromTranslate(textureState.matrix,0,-value/2,0);
 				Math::setMatrix4x4FromScale(textureState.matrix,Math::fromInt(4),Math::HALF,Math::ONE);
 			}
-			material->setTextureState(0,textureState);
+			material->getPass()->setTextureState(0,textureState);
 
 			scalar maxSize=Math::fromMilli(400);
 			if(mFadeOutSparkTime>0){
@@ -120,14 +120,14 @@ public:
 
 		Mesh::ptr mesh=getEngine()->getMeshManager()->createTorus(size,thickness,16,4);
 		{
-			mMaterial=getEngine()->getMaterialManager()->createMaterial(createDash(128,1));
-			mMaterial->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
-			mMaterial->setMaterialState(MaterialState(Colors::BLACK,Colors::BLACK,Colors::BLACK,0));
-			mMaterial->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+			mMaterial=getEngine()->getMaterialManager()->createDiffuseMaterial(createDash(128,1));
+			mMaterial->getPass()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
+			mMaterial->getPass()->setMaterialState(MaterialState(Colors::BLACK,Colors::BLACK,Colors::BLACK,0));
+			mMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 			TextureState textureState;
 			textureState.calculation=TextureState::CalculationType_NORMAL;
 			Math::setMatrix4x4FromScale(textureState.matrix,Math::fromInt(32),Math::ONE,Math::ONE);
-			mMaterial->setTextureState(0,textureState);
+			mMaterial->getPass()->setTextureState(0,textureState);
 			mesh->getSubMesh(0)->material=mMaterial;
 		}
 
@@ -139,7 +139,7 @@ public:
 		mMeshNode->setScale(distance,distance,distance);
 		mEndDistance=distance;
 
-		mMaterial->getMaterialState(mMaterialState);
+		mMaterial->getPass()->getMaterialState(mMaterialState);
 		mStartColor=Colors::BLACK;
 		mEndColor=Colors::AZURE;
 		mVisible=true;
@@ -160,7 +160,7 @@ public:
 		}
 		mAlpha=Math::clamp(0,Math::ONE,mAlpha);
 		Math::lerp(mMaterialState.ambient,mStartColor,mEndColor,mAlpha);
-		mMaterial->setMaterialState(mMaterialState);
+		mMaterial->getPass()->setMaterialState(mMaterialState);
 
 		scalar distance=mPlanet->getTranslate().x+Math::mul(mEndDistance-mPlanet->getTranslate().x,Math::fromMilli(dt*4));
 		mPlanet->setTranslate(distance,0,0);
@@ -250,33 +250,33 @@ public:
 		Matrix4x4 scale;
 		TextureState textureState;
 
-		sunMaterial->getTextureState(0,textureState);
+		sunMaterial->getPass()->getTextureState(0,textureState);
 		textureState.calculation=TextureState::CalculationType_NORMAL;
 		Math::setMatrix4x4FromTranslate(textureState.matrix,value/32,Math::sin(value/8),0);
-		sunMaterial->setTextureState(0,textureState);
+		sunMaterial->getPass()->setTextureState(0,textureState);
 
-		sunMaterial->getTextureState(1,textureState);
+		sunMaterial->getPass()->getTextureState(1,textureState);
 		textureState.calculation=TextureState::CalculationType_NORMAL;
 		Math::setMatrix4x4FromTranslate(textureState.matrix,Math::cos(-value/12),Math::cos(-value/8),0);
-		sunMaterial->setTextureState(1,textureState);
+		sunMaterial->getPass()->setTextureState(1,textureState);
 
-		flareMaterial->getTextureState(0,textureState);
+		flareMaterial->getPass()->getTextureState(0,textureState);
 		textureState.calculation=TextureState::CalculationType_NORMAL;
 		Math::setMatrix4x4FromZ(textureState.matrix,Math::sin(value/2));
 		scalar s=Math::mul(Math::sin(value*2),Math::fromMilli(100))+Math::fromMilli(1100);
 		Math::setMatrix4x4FromScale(scale,s,s,0);
 		Math::postMul(textureState.matrix,scale);
 		Math::setMatrix4x4AsTextureRotation(textureState.matrix);
-		flareMaterial->setTextureState(0,textureState);
+		flareMaterial->getPass()->setTextureState(0,textureState);
 
-		flareMaterial->getTextureState(1,textureState);
+		flareMaterial->getPass()->getTextureState(1,textureState);
 		textureState.calculation=TextureState::CalculationType_NORMAL;
 		Math::setMatrix4x4FromZ(textureState.matrix,-Math::sin(value/2));
 		s=Math::mul(Math::sin(value*2),-Math::fromMilli(100))+Math::fromMilli(1100);
 		Math::setMatrix4x4FromScale(scale,s,s,0);
 		Math::postMul(textureState.matrix,scale);
 		Math::setMatrix4x4AsTextureRotation(textureState.matrix);
-		flareMaterial->setTextureState(1,textureState);
+		flareMaterial->getPass()->setTextureState(1,textureState);
 	}
 
 protected:
@@ -343,7 +343,7 @@ Mesh::ptr MyPlanet::createDisc(Engine *engine,scalar size){
 	subMesh->indexData=IndexData::ptr(new IndexData(IndexData::Primitive_TRIS,indexBuffer));
 	subMesh->material=engine->getMaterialManager()->createMaterial();
 	subMesh->material->retain();
-	subMesh->material->setMaterialState(MaterialState(false));
+	subMesh->material->getPass()->setMaterialState(MaterialState(false));
 
 	Mesh::ptr mesh(new Mesh());
 	mesh->addSubMesh(subMesh);
@@ -460,17 +460,18 @@ ParentNode::ptr MyPlanet::createSun(scalar size){
 		SpriteNode::ptr flareNode=mEngine->createNodeType(SpriteNode::type(),mScene);
 		Material::ptr material=mEngine->getMaterialManager()->createMaterial();
 		flareNode->setMaterial(material);
-		material->setTexture(0,mEngine->getTextureManager()->findTexture("sunflare1"));
-		material->setSamplerState(0,SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE));
-		material->setTextureState(0,TextureState(TextureState::Operation_MODULATE,TextureState::Source_PREVIOUS,TextureState::Source_TEXTURE));
-		material->setTexture(1,mEngine->getTextureManager()->findTexture("sunflare2"));
-		material->setSamplerState(1,SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE));
-		material->setTextureState(1,TextureState(TextureState::Operation_MODULATE,TextureState::Source_PREVIOUS,TextureState::Source_TEXTURE));
+		material->getPass()->setTexture(0,mEngine->getTextureManager()->findTexture("sunflare1"));
+		material->getPass()->setSamplerState(0,SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE));
+		material->getPass()->setTextureState(0,TextureState(TextureState::Operation_MODULATE,TextureState::Source_PREVIOUS,TextureState::Source_TEXTURE));
+		material->getPass()->setTexture(1,mEngine->getTextureManager()->findTexture("sunflare2"));
+		material->getPass()->setSamplerState(1,SamplerState(SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE));
+		material->getPass()->setTextureState(1,TextureState(TextureState::Operation_MODULATE,TextureState::Source_PREVIOUS,TextureState::Source_TEXTURE));
 		MaterialState materialState(Colors::ORANGE);
 		materialState.emissive.set(Colors::ORANGE);
-		material->setMaterialState(materialState);
-		material->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
-		material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+		material->getPass()->setMaterialState(materialState);
+		material->getPass()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
+		material->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+		material->compile();
 
 		scalar flareSize=Math::mul(size,Math::fromMilli(3200));
 		flareNode->setScale(flareSize,flareSize,Math::ONE);
@@ -481,13 +482,13 @@ ParentNode::ptr MyPlanet::createSun(scalar size){
 			Material::ptr material=mesh->getSubMesh(0)->material;
 			MaterialState materialState(Colors::YELLOW);
 			materialState.emissive.set(Colors::YELLOW);
-			material->setMaterialState(materialState);
-			material->setTexture(0,mEngine->getTextureManager()->findTexture("sun1"));
-			material->setSamplerState(0,SamplerState());
-			material->setTextureState(0,TextureState(TextureState::Operation_MODULATE,TextureState::Source_PRIMARY_COLOR,TextureState::Source_TEXTURE));
-			material->setTexture(1,mEngine->getTextureManager()->findTexture("sun2"));
-			material->setSamplerState(1,SamplerState());
-			material->setTextureState(1,TextureState(TextureState::Operation_ADD,TextureState::Source_PREVIOUS,TextureState::Source_TEXTURE));
+			material->getPass()->setMaterialState(materialState);
+			material->getPass()->setTexture(0,mEngine->getTextureManager()->findTexture("sun1"));
+			material->getPass()->setSamplerState(0,SamplerState());
+			material->getPass()->setTextureState(0,TextureState(TextureState::Operation_MODULATE,TextureState::Source_PRIMARY_COLOR,TextureState::Source_TEXTURE));
+			material->getPass()->setTexture(1,mEngine->getTextureManager()->findTexture("sun2"));
+			material->getPass()->setSamplerState(1,SamplerState());
+			material->getPass()->setTextureState(1,TextureState(TextureState::Operation_ADD,TextureState::Source_PREVIOUS,TextureState::Source_TEXTURE));
 		}
 		MeshNode::ptr meshNode=mEngine->createNodeType(MeshNode::type(),mScene);
 		meshNode->setMesh(mesh);
@@ -519,7 +520,7 @@ void MyPlanet::create(){
 	mScene=Scene::ptr(new Scene(mEngine));
 
 	mOverlay=mEngine->createNodeType(CameraNode::type(),mScene);
-	mOverlay->setClearFlags(ClearFlag_DEPTH);
+	mOverlay->setClearFlags(RenderDevice::ClearType_BIT_DEPTH);
 	mOverlay->setScope(1<<1);
 	mScene->getRoot()->attach(mOverlay);
 
@@ -544,23 +545,23 @@ void MyPlanet::create(){
 	mScene->getBackground()->attach(background);
 	bool backgroundToSkybox=true;
 	if(backgroundToSkybox){
-		Mesh::ptr skyBoxMesh=mCamera->renderToSkyBox(mRenderer,Image::Format_RGB_5_6_5,2048,Math::fromInt(10));
+		Mesh::ptr skyBoxMesh=mCamera->renderToSkyBox(mRenderDevice,Image::Format_RGB_5_6_5,2048,Math::fromInt(10));
 		MeshNode::ptr skyBox=mEngine->createNodeType(MeshNode::type(),mScene);
 		skyBox->setMesh(skyBoxMesh);
 		background->destroy();
 		mScene->getBackground()->attach(skyBox);
-		mCamera->setClearFlags(ClearFlag_DEPTH);
+		mCamera->setClearFlags(RenderDevice::ClearType_BIT_DEPTH);
 	}
 
 	mPlanetDisk=mEngine->createNodeType(ParticleNode::type(),mScene);
 	{
 		mPlanetDisk->setNumParticles(300,ParticleNode::ParticleType_SPRITE,Math::fromMilli(250));
 		{
-			Material::ptr material=mEngine->getMaterialManager()->createMaterial(createPoint(mEngine,64,64));
-			material->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
-			material->setMaterialState(MaterialState(true,true));
-			material->setBlendState(BlendState::Combination_COLOR);
-			material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+			Material::ptr material=mEngine->getMaterialManager()->createDiffuseMaterial(createPoint(mEngine,64,64));
+			material->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+			material->getPass()->setMaterialState(MaterialState(true,true));
+			material->getPass()->setBlendState(BlendState::Combination_COLOR);
+			material->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 			material->setLayer(1);
 			mPlanetDisk->setMaterial(material);
 		}
@@ -611,11 +612,11 @@ void MyPlanet::resized(int width,int height){
 	}
 }
 
-void MyPlanet::render(Renderer *renderer){
-	renderer->beginScene();
-		mCamera->render(renderer);
-	renderer->endScene();
-	renderer->swap();
+void MyPlanet::render(RenderDevice *device){
+	device->beginScene();
+		mCamera->render(device);
+	device->endScene();
+	device->swap();
 }
 
 void MyPlanet::update(int dt){
@@ -764,21 +765,18 @@ Node::ptr MyPlanet::createBackground(){
 	mScene->getRoot()->attach(camera);
 
 	Random random(System::mtime());
-	Material::ptr starMaterial=mEngine->getMaterialManager()->createMaterial();
-	starMaterial->setTexture(0,createPoint(mEngine,128,128));
-	starMaterial->setSamplerState(0,SamplerState());
-	starMaterial->setTextureState(0,TextureState());
-	starMaterial->setTexture(1,createPoint(mEngine,128,128));
-	starMaterial->setSamplerState(1,SamplerState());
+	Material::ptr starMaterial=mEngine->getMaterialManager()->createDiffuseMaterial(createPoint(mEngine,128,128));
+	starMaterial->getPass()->setTexture(1,createPoint(mEngine,128,128));
+	starMaterial->getPass()->setSamplerState(1,SamplerState());
 	{
 		TextureState textureState(TextureState::Operation_MODULATE,TextureState::Source_PREVIOUS,TextureState::Source_TEXTURE);
 		textureState.calculation=TextureState::CalculationType_NORMAL;
 		Math::setMatrix4x4FromScale(textureState.matrix,Math::fromMilli(700),Math::fromMilli(700),Math::fromMilli(700));
-		starMaterial->setTextureState(1,textureState);
+		starMaterial->getPass()->setTextureState(1,textureState);
 	}
-	starMaterial->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-	starMaterial->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
-	starMaterial->setMaterialState(MaterialState(true,true));
+	starMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+	starMaterial->getPass()->setBlendState(BlendState::Combination_COLOR_ADDITIVE);
+	starMaterial->getPass()->setMaterialState(MaterialState(true,true));
 
 	ParticleNode::ptr stars=mEngine->createNodeType(ParticleNode::type(),mScene);
 	stars->setNumParticles(2000,ParticleNode::ParticleType_SPRITE,Math::ONE);
@@ -816,13 +814,13 @@ Node::ptr MyPlanet::createBackground(){
 
 		{
 			SpriteNode::ptr flare=mEngine->createNodeType(SpriteNode::type(),mScene);
-			Material::ptr material=mEngine->getMaterialManager()->createMaterial(createNebula(mEngine,64,64,6,random.nextInt(),1.5));
-			material->setTextureState(0,TextureState(TextureState::Operation_MODULATE_4X,TextureState::Source_PREVIOUS,TextureState::Source_TEXTURE));
-			material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-			material->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
+			Material::ptr material=mEngine->getMaterialManager()->createDiffuseMaterial(createNebula(mEngine,64,64,6,random.nextInt(),1.5));
+			material->getPass()->setTextureState(0,TextureState(TextureState::Operation_MODULATE_4X,TextureState::Source_PREVIOUS,TextureState::Source_TEXTURE));
+			material->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+			material->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
 			Vector4 color;
 			Math::lerp(color,Colors::ORANGE,Colors::YELLOW,random.nextFloat());
-			material->setMaterialState(MaterialState(color));
+			material->getPass()->setMaterialState(MaterialState(color));
 			flare->setMaterial(material);
 			flare->setScale(Math::mul(size,random.nextScalar(Math::fromMilli(800),Math::ONE)),Math::mul(size,random.nextScalar(Math::fromMilli(800),Math::ONE)),Math::ONE);
 			flare->setTranslate(offset);
@@ -831,14 +829,14 @@ Node::ptr MyPlanet::createBackground(){
 
 		{
 			SpriteNode::ptr flare=mEngine->createNodeType(SpriteNode::type(),mScene);
-			Material::ptr material=mEngine->getMaterialManager()->createMaterial(createNebula(mEngine,64,64,6,random.nextInt(),1.5));
-			material->setTextureState(0,TextureState(TextureState::Operation_MODULATE_4X,TextureState::Source_PREVIOUS,TextureState::Source_TEXTURE));
-			material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+			Material::ptr material=mEngine->getMaterialManager()->createDiffuseMaterial(createNebula(mEngine,64,64,6,random.nextInt(),1.5));
+			material->getPass()->setTextureState(0,TextureState(TextureState::Operation_MODULATE_4X,TextureState::Source_PREVIOUS,TextureState::Source_TEXTURE));
+			material->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 			flare->setMaterial(material);
-			flare->getMaterial()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
+			flare->getMaterial()->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
 			Vector4 color;
 			Math::lerp(color,Colors::CYAN,Colors::VIOLET,random.nextFloat());
-			flare->getMaterial()->setMaterialState(MaterialState(color));
+			flare->getMaterial()->getPass()->setMaterialState(MaterialState(color));
 			flare->setScale(size*random.nextFloat(1.0,1.2),size*random.nextFloat(1.0,1.2),Math::ONE);
 			flare->setTranslate(offset);
 			node->attach(flare);

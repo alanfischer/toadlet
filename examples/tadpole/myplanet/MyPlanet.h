@@ -14,7 +14,7 @@ public:
 	void create();
 	void destroy();
 	void resized(int width,int height);
-	void render(Renderer *renderer);
+	void render(RenderDevice *device);
 	void update(int dt);
 	void mousePressed(int x,int y,int button);
 	void mouseMoved(int x,int y);
