@@ -11,12 +11,15 @@ void PeeperTest::create(){
 
 	RenderCaps caps;
 	getRenderDevice()->getRenderCaps(caps);
-	int typeBit=caps.idealVertexFormatBit;
+	int idealType=caps.idealVertexFormatType;
 	VertexBufferAccessor vba;
 
+	/// @todo: Update PeeperTest to have a shader path also
+	TOADLET_ASSERT(caps.vertexFixedFunction && caps.fragmentFixedFunction);
+
 	VertexFormat::ptr triVertexFormat=VertexFormat::ptr(getRenderDevice()->createVertexFormat());
-	triVertexFormat->addElement(VertexFormat::Semantic_POSITION,0,typeBit|VertexFormat::Format_BIT_COUNT_3);
-	triVertexFormat->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_COLOR_RGBA);
+	triVertexFormat->addElement(VertexFormat::Semantic_POSITION,0,idealType|VertexFormat::Format_COUNT_3);
+	triVertexFormat->addElement(VertexFormat::Semantic_COLOR,0,VertexFormat::Format_TYPE_COLOR_RGBA);
 	VertexBuffer::ptr triVertexBuffer=VertexBuffer::ptr(getRenderDevice()->createVertexBuffer());
 	triVertexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,triVertexFormat,3);
 	{
@@ -35,7 +38,7 @@ void PeeperTest::create(){
 	triRenderState->setMaterialState(MaterialState(false,true));
 
 	VertexFormat::ptr quadVertexFormat=VertexFormat::ptr(getRenderDevice()->createVertexFormat());
-	quadVertexFormat->addElement(VertexFormat::Semantic_POSITION,0,typeBit|VertexFormat::Format_BIT_COUNT_3);
+	quadVertexFormat->addElement(VertexFormat::Semantic_POSITION,0,idealType|VertexFormat::Format_COUNT_3);
 	VertexBuffer::ptr quadVertexBuffer=VertexBuffer::ptr(getRenderDevice()->createVertexBuffer());
 	quadVertexBuffer->create(Buffer::Usage_BIT_STATIC,Buffer::Access_BIT_WRITE,quadVertexFormat,4);
 	{
@@ -67,18 +70,18 @@ void PeeperTest::destroy(){
 void PeeperTest::render(RenderDevice *device){
 	device->setViewport(Viewport(0,0,getWidth(),getHeight()));
 
-	device->clear(ClearFlag_COLOR|ClearFlag_DEPTH,Math::ZERO_VECTOR4);
+	device->clear(RenderDevice::ClearType_BIT_COLOR|RenderDevice::ClearType_BIT_DEPTH,Math::ZERO_VECTOR4);
 	device->beginScene();
-		device->setProjectionMatrix(projectionMatrix);
-		device->setViewMatrix(viewMatrix);
+		device->setMatrix(RenderDevice::MatrixType_PROJECTION,projectionMatrix);
+		device->setMatrix(RenderDevice::MatrixType_VIEW,viewMatrix);
 
 		Math::setMatrix4x4FromTranslate(modelMatrix,Vector3(-Math::fromMilli(1500),0,-Math::fromInt(6)));
-		device->setModelMatrix(modelMatrix);
+		device->setMatrix(RenderDevice::MatrixType_MODEL,modelMatrix);
 		device->setRenderState(triRenderState);
 		device->renderPrimitive(triVertexData,triIndexData);
 
 		Math::setMatrix4x4FromTranslate(modelMatrix,Vector3(Math::fromMilli(1500),0,-Math::fromInt(6)));
-		device->setModelMatrix(modelMatrix);
+		device->setMatrix(RenderDevice::MatrixType_MODEL,modelMatrix);
 		device->setAmbientColor(Vector4(0,0,Math::ONE,Math::ONE));
 		device->setRenderState(quadRenderState);
 		device->renderPrimitive(quadVertexData,quadIndexData);
