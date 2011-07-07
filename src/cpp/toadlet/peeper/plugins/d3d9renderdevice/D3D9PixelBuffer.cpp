@@ -198,10 +198,6 @@ bool D3D9PixelBuffer::unlock(){
 	return SUCCEEDED(result);
 }
 
-bool D3D9PixelBuffer::update(tbyte *data,int start,int size){
-	return false;
-}
-
 bool D3D9PixelBuffer::needsReset(){
 	#if defined(TOADLET_SET_D3DM)
 		return false;

@@ -75,7 +75,7 @@ public:
 	GLuint getHandle() const;
 	GLuint getTarget() const;
 
-	/// @todo: Implement these
+	/// @todo: implement
 	tbyte *lock(int access){return NULL;}
 	bool unlock(){return false;}
 	bool update(tbyte *data,int start,int size){return false;}

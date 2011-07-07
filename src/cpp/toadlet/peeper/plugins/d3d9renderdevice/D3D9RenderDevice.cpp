@@ -87,7 +87,8 @@ D3D9RenderDevice::D3D9RenderDevice():
 	mPrimaryRenderTarget(NULL),
 	mD3DPrimaryRenderTarget(NULL),
 	mRenderTarget(NULL),
-	mD3DRenderTarget(NULL)
+	mD3DRenderTarget(NULL),
+	mLastRenderState(NULL)
 {
 }
 
@@ -334,7 +335,10 @@ void D3D9RenderDevice::endScene(){
 	int i;
 	for(i=0;i<mCaps.maxTextureStages;++i){
 		setTexture(i,NULL);
+		setTextureState(i,NULL);
 	}
+
+	mLastRenderState=NULL;
 
 	HRESULT result=mD3DDevice->EndScene();
 	TOADLET_CHECK_D3D9ERROR(result,"endScene");
@@ -508,9 +512,21 @@ bool D3D9RenderDevice::setRenderState(RenderState *renderState){
 	for(i=0;i<d3drenderState->mSamplerStates.size();++i){
 		setSamplerState(i,d3drenderState->mSamplerStates[i]);
 	}
+	if(mLastRenderState!=NULL){
+		for(;i<mLastRenderState->getNumSamplerStates();++i){
+			setSamplerState(i,NULL);
+		}
+	}
 	for(i=0;i<d3drenderState->mTextureStates.size();++i){
 		setTextureState(i,d3drenderState->mTextureStates[i]);
 	}
+	if(mLastRenderState!=NULL){
+		for(;i<mLastRenderState->getNumTextureStates();++i){
+			setTextureState(i,NULL);
+		}
+	}
+
+	mLastRenderState=d3drenderState;
 
 	return true;
 }
@@ -605,7 +621,7 @@ void D3D9RenderDevice::setMaterialState(const MaterialState &state){
 	}
 
 	mD3DDevice->SetRenderState(D3DRS_SHADEMODE,getD3DSHADEMODE(state.shade));
-	mD3DDevice->SetRenderState(D3DRS_NORMALIZENORMALS,state.normalize!=MaterialState::NormalizeType_RESCALE);
+	mD3DDevice->SetRenderState(D3DRS_NORMALIZENORMALS,state.normalize!=MaterialState::NormalizeType_NONE);
 
 	if(state.alphaTest==MaterialState::AlphaTest_NEVER){
 		mD3DDevice->SetRenderState(D3DRS_ALPHATESTENABLE,false);

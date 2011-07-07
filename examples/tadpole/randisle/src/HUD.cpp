@@ -44,8 +44,8 @@ Node *HUD::create(Scene *scene){
 	mAcornLabel->setAlignment(Font::Alignment_BIT_VCENTER|Font::Alignment_BIT_LEFT);
 	mAcornLabel->setTranslate(-0.60,0.80,0);
 	mAcornLabel->setScale(0.3,0.3,0.3);
-	mAcornLabel->getRenderMaterial()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-	mAcornLabel->getRenderMaterial()->setMaterialState(MaterialState(Colors::BROWN));
+	mAcornLabel->getRenderMaterial()->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+	mAcornLabel->getRenderMaterial()->getPass()->setMaterialState(MaterialState(Colors::BROWN));
 	attach(mAcornLabel);
 	updateAcornCount(0);
 
@@ -53,7 +53,7 @@ Node *HUD::create(Scene *scene){
 	mSystemLabel->setFont(Resources::instance->hudSystem);
 	mSystemLabel->setTranslate(-0.25,-0.80,0);
 	mSystemLabel->setScale(0.1,0.1,0.1);
-	mSystemLabel->getRenderMaterial()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+	mSystemLabel->getRenderMaterial()->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 	attach(mSystemLabel);
 
 	return this;
@@ -69,7 +69,7 @@ void HUD::frameUpdate(int dt,int scope){
 		mCompassSprite->setRotate(Math::Z_UNIT_VECTOR3,angle);
 
 		MaterialState materialState;
-		mFadeSprite->getMaterial()->getMaterialState(materialState);
+		mFadeSprite->getMaterial()->getPass()->getMaterialState(materialState);
 		Vector4 dangerColor=materialState.ambient;
 		dangerColor.w=mPlayer->getDanger();
 
@@ -78,7 +78,7 @@ void HUD::frameUpdate(int dt,int scope){
 			scalar amount=powf(5.0,Math::sin(Math::mul(chompamount,Math::PI)));
 
 			TextureState textureState;
-			mFadeSprite->getMaterial()->getTextureState(0,textureState);
+			mFadeSprite->getMaterial()->getPass()->getTextureState(0,textureState);
 			textureState.calculation=TextureState::CalculationType_NORMAL;
 			Matrix4x4 matrix,temp;
 			Math::setMatrix4x4FromTranslate(matrix,0,Math::HALF,0);
@@ -87,7 +87,7 @@ void HUD::frameUpdate(int dt,int scope){
 			Math::setMatrix4x4FromTranslate(temp,0,-Math::mul(Math::HALF,amount),0);
 			Math::postMul(matrix,temp);
 			textureState.matrix.set(matrix);
-			mFadeSprite->getMaterial()->setTextureState(0,textureState);
+			mFadeSprite->getMaterial()->getPass()->setTextureState(0,textureState);
 
 			if(chompamount>=Math::HALF){
 				dangerColor.w=Math::clamp(0,Math::ONE,(Math::ONE-chompamount*2)+Math::ONE);
@@ -95,7 +95,7 @@ void HUD::frameUpdate(int dt,int scope){
 		}
 
 		materialState.set(dangerColor);
-		mFadeSprite->getMaterial()->setMaterialState(materialState);
+		mFadeSprite->getMaterial()->getPass()->setMaterialState(materialState);
 		if(dangerColor.w>0){
 			mFadeSprite->setScope(-1);
 		}

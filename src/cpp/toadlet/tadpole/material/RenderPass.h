@@ -92,7 +92,8 @@ public:
 	inline RenderState::ptr getRenderState() const{return mRenderState;}
 	inline ShaderState::ptr getShaderState() const{return mShaderState;}
 
-	/// @todo: There needs to be a better way of passing these in, instead of passing in all possible values, and setting them each time
+	bool isDepthSorted() const;
+
 	void setupRenderVariables(RenderDevice *renderDevice,int scope,SceneParameters *parameters);
 
 protected:

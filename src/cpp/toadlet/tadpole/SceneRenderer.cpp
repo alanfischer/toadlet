@@ -34,8 +34,13 @@ namespace toadlet{
 namespace tadpole{
 
 SceneRenderer::SceneRenderer(Scene *scene):
-	mScene(scene)
-	//mRenderableSet
+	mScene(scene),
+	mDevice(NULL),
+	//mSceneParameters,
+	//mRenderableSet,
+	mLastPass(NULL),
+	mLastRenderState(NULL),
+	mLastShaderState(NULL)
 {
 	mRenderableSet=RenderableSet::ptr(new RenderableSet(scene));
 	mSceneParameters=SceneParameters::ptr(new SceneParameters());
@@ -53,13 +58,21 @@ void SceneRenderer::renderScene(RenderDevice *device,Node *node,CameraNode *came
 	renderRenderables(mRenderableSet,device,camera);
 	mSceneParameters->setCamera(NULL);
 
+	mLastPass=NULL;
+	mLastRenderState=NULL;
+	mLastShaderState=NULL;
 	mDevice=NULL;
 }
 
-/// @todo: Remember the previous pass to avoid setting duplicate states
 void SceneRenderer::setupPass(RenderPass *pass){
-	mDevice->setRenderState(pass->getRenderState());
-	mDevice->setShaderState(pass->getShaderState());
+	if(mLastRenderState==NULL || mLastRenderState!=pass->getRenderState()){
+		mLastRenderState=pass->getRenderState();
+		mDevice->setRenderState(mLastRenderState);
+	}
+	if(mLastShaderState==NULL || mLastShaderState!=pass->getShaderState()){
+		mLastShaderState=pass->getShaderState();
+		mDevice->setShaderState(mLastShaderState);
+	}
 
 	MaterialState materialState;
 	pass->getRenderState()->getMaterialState(materialState);
@@ -70,6 +83,13 @@ void SceneRenderer::setupPass(RenderPass *pass){
 	for(i=0;i<pass->getNumTextures();++i){
 		mDevice->setTexture(i,pass->getTexture(i));
 	}
+	if(mLastPass!=NULL){
+		for(;i<mLastPass->getNumTextures();++i){
+			mDevice->setTexture(i,NULL);
+		}
+	}
+
+	mLastPass=pass;
 }
 
 void SceneRenderer::gatherRenderables(RenderableSet *set,Node *node,CameraNode *camera){
@@ -127,16 +147,16 @@ void SceneRenderer::renderRenderables(RenderableSet *set,RenderDevice *device,Ca
 		const RenderableSet::RenderableQueue &renderableQueue=set->getRenderableQueue(sortedIndexes[i]);
 		Material *material=renderableQueue[0].material;
 
-		if(renderedDepthSorted==false && (material!=NULL && material->getLayer()!=0)){
+		if(renderedDepthSorted==false && (material!=NULL && material->getLayer()>0)){
 			renderedDepthSorted=true;
-			renderDepthSortedRenderables(set,device,camera,useMaterials);
+			renderDepthSortedRenderables(set,useMaterials);
 		}
 
 		renderQueueItems((useMaterials && material!=NULL)?material:NULL,&renderableQueue[0],renderableQueue.size());
 	}
 
 	if(renderedDepthSorted==false){
-		renderDepthSortedRenderables(set,device,camera,useMaterials);
+		renderDepthSortedRenderables(set,useMaterials);
 	}
 
 	if(listener!=NULL){
@@ -144,7 +164,7 @@ void SceneRenderer::renderRenderables(RenderableSet *set,RenderDevice *device,Ca
 	}
 }
 
-void SceneRenderer::renderDepthSortedRenderables(RenderableSet *set,RenderDevice *device,CameraNode *camera,bool useMaterials){
+void SceneRenderer::renderDepthSortedRenderables(RenderableSet *set,bool useMaterials){
 	int i;
 	const RenderableSet::RenderableQueue &renderableQueue=set->getDepthSortedQueue();
 	for(i=0;i<renderableQueue.size();++i){
@@ -154,10 +174,8 @@ void SceneRenderer::renderDepthSortedRenderables(RenderableSet *set,RenderDevice
 	}
 }
 
-/// @todo: This needs to be cleaned up, it should set the camera default states after each pass
-///  And we should see if the Pass is a Fixed or Shader pass, in which case we either set Fixed states, or setupRenderVariables
+/// @todo: We should see if the Pass is a Fixed or Shader pass, in which case we either set Fixed states, or setupRenderVariables
 ///  And then maybe set Fixed states should be moved the pass, like setupRenderVariables
-///  And we no longer need to pass device & camera to the above functions
 void SceneRenderer::renderQueueItems(Material *material,const RenderableSet::RenderableQueueItem *items,int numItems){
 	Matrix4x4 matrix;
 	RenderPath *path=(material!=NULL)?material->getBestPath():NULL;
@@ -187,6 +205,11 @@ void SceneRenderer::renderQueueItems(Material *material,const RenderableSet::Ren
 			}
 
 			renderable->render(this);
+		}
+
+		if(mSceneParameters->getCamera()->getDefaultState()!=NULL){
+			mDevice->setRenderState(mSceneParameters->getCamera()->getDefaultState());
+			mLastRenderState=NULL;
 		}
 	}
 }

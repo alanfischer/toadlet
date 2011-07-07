@@ -114,10 +114,7 @@ bool Material::isDepthSorted() const{
 		case SortType_MATERIAL:
 			return false;
 		default:{
-/// @todo
-//			DepthState depth;
-//			return mRenderState->getDepthState(depth) && depth.write==false;
-return false;
+			return mBestPath!=NULL?mBestPath->isDepthSorted():false;
 		}
 	}
 }

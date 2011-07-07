@@ -21,12 +21,11 @@ public:
 		grass=engine->getMaterialManager()->findMaterial("grass.png");
 		if(grass!=NULL){
 			TextureState textureState;
-			if(grass->getTextureState(0,textureState)){
+			if(grass->getPass()->getTextureState(0,textureState)){
 				textureState.calculation=TextureState::CalculationType_NORMAL;
 				Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-				grass->setTextureState(0,textureState);
+				grass->getPass()->setTextureState(0,textureState);
 			}
-//			grass->setLayer(-1);
 			grass->retain();
 		}
 
@@ -34,22 +33,24 @@ public:
 		if(water!=NULL){
 			Vector4 color=Colors::AZURE*1.5;
 			color.w=0.5f;
-			water->setMaterialState(MaterialState(color));
-			water->setBlendState(BlendState::Combination_ALPHA);
-			water->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-			water->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+			water->getPass()->setMaterialState(MaterialState(color));
+			water->getPass()->setBlendState(BlendState::Combination_ALPHA);
+			water->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+			water->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
 
 			TextureState textureState;
 			textureState.calculation=TextureState::CalculationType_NORMAL;
 
-			water->setTexture(0,engine->getTextureManager()->createTexture(createNoise(512,512,16,6,0.5,0.5)));
+			water->getPass()->setTexture(0,engine->getTextureManager()->createTexture(createNoise(512,512,16,6,0.5,0.5)));
 			Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-			water->setTextureState(0,textureState);
+			water->getPass()->setTextureState(0,textureState);
 
-			water->setTexture(1,engine->getTextureManager()->createTexture(createNoise(512,512,16,5,0.5,0.5)));
+			water->getPass()->setTexture(1,engine->getTextureManager()->createTexture(createNoise(512,512,16,5,0.5,0.5)));
 			Math::setMatrix4x4FromScale(textureState.matrix,16,16,16);
-			water->setTextureState(1,textureState);
+			water->getPass()->setTextureState(1,textureState);
 
+			water->setSort(Material::SortType_DEPTH);
+			water->compile();
 			water->retain();
 		}
 
@@ -64,10 +65,10 @@ public:
 		
 		shadow=engine->getMeshManager()->createBox(AABox(-4,-4,0,4,4,0));
 		{
-			Material::ptr material=engine->getMaterialManager()->createMaterial(engine->getTextureManager()->createTexture(createPoint(128,128)));
-			material->setBlendState(BlendState(BlendState::Operation_ONE_MINUS_SOURCE_ALPHA,BlendState::Operation_SOURCE_ALPHA));
-			material->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-			material->setMaterialState(MaterialState(Colors::BLACK));
+			Material::ptr material=engine->getMaterialManager()->createDiffuseMaterial(engine->getTextureManager()->createTexture(createPoint(128,128)));
+			material->getPass()->setBlendState(BlendState(BlendState::Operation_ONE_MINUS_SOURCE_ALPHA,BlendState::Operation_SOURCE_ALPHA));
+			material->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+			material->getPass()->setMaterialState(MaterialState(Colors::BLACK));
 			material->retain();
 			shadow->getSubMesh(0)->material=material;
 			shadow->retain();
@@ -80,17 +81,17 @@ public:
 
 		treeLeaf=engine->getMaterialManager()->findMaterial("leaf_top1_alpha.png");
 		if(treeLeaf!=NULL){
-			treeLeaf->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
-			treeLeaf->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-			treeLeaf->setBlendState(BlendState::Combination_ALPHA);
+			treeLeaf->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+			treeLeaf->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+			treeLeaf->getPass()->setBlendState(BlendState::Combination_ALPHA);
 			treeLeaf->retain();
 		}
 
 		if(treeBranch!=NULL){
-			treeBranchHighlighted=engine->getMaterialManager()->cloneMaterial(treeBranch,false);
+			treeBranchHighlighted=engine->getMaterialManager()->cloneMaterial(treeBranch);
 		}
 		if(treeBranchHighlighted!=NULL){
-			treeBranchHighlighted->setMaterialState(MaterialState(Vector4(2,2,2,2)));
+			treeBranchHighlighted->getPass()->setMaterialState(MaterialState(Vector4(2,2,2,2)));
 			treeBranchHighlighted->retain();
 		}
 
@@ -101,34 +102,34 @@ public:
 
 		acorn=engine->getMaterialManager()->findMaterial("acorn.png");
 		if(acorn!=NULL){
-			acorn->setMaterialState(MaterialState(false));
-			acorn->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
-			acorn->setBlendState(BlendState(BlendState::Combination_ALPHA));
+			acorn->getPass()->setMaterialState(MaterialState(false));
+			acorn->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+			acorn->getPass()->setBlendState(BlendState(BlendState::Combination_ALPHA));
 			acorn->retain();
 		}
 
 		// HUD
-		hudFade=engine->getMaterialManager()->createMaterial(engine->getTextureManager()->createTexture(createPoint(128,128)),true);
-		hudFade->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-		hudFade->setBlendState(BlendState::Combination_ALPHA);
-		hudFade->setMaterialState(MaterialState(Colors::TRANSPARENT_RED));
+		hudFade=engine->getMaterialManager()->createDiffuseMaterial(engine->getTextureManager()->createTexture(createPoint(128,128)));
+		hudFade->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+		hudFade->getPass()->setBlendState(BlendState::Combination_ALPHA);
+		hudFade->getPass()->setMaterialState(MaterialState(Colors::TRANSPARENT_RED));
 		hudFade->retain();
 		
 		hudCompass=engine->getMaterialManager()->findMaterial("compass.png");
 		if(hudCompass!=NULL){
-			hudCompass->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-			hudCompass->setBlendState(BlendState(BlendState::Operation_ZERO,BlendState::Operation_SOURCE_COLOR));
-			hudCompass->setMaterialState(MaterialState(false));
+			hudCompass->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+			hudCompass->getPass()->setBlendState(BlendState(BlendState::Operation_ZERO,BlendState::Operation_SOURCE_COLOR));
+			hudCompass->getPass()->setMaterialState(MaterialState(false));
 			hudCompass->retain();
 		}
 
 		if(acorn!=NULL){
-			hudAcorn=engine->getMaterialManager()->cloneMaterial(acorn,true);
+			hudAcorn=engine->getMaterialManager()->cloneMaterial(acorn);
 		}
 		if(hudAcorn!=NULL){
-			hudAcorn->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
-			hudAcorn->setBlendState(BlendState(BlendState::Combination_ALPHA));
-			hudAcorn->setMaterialState(MaterialState(false));
+			hudAcorn->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
+			hudAcorn->getPass()->setBlendState(BlendState(BlendState::Combination_ALPHA));
+			hudAcorn->getPass()->setMaterialState(MaterialState(false));
 			hudAcorn->retain();
 		}
 

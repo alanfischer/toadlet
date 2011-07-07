@@ -22,13 +22,13 @@ public:
 		mMaterial(material),mState(state){}
 
 	void setMatrix4x4(const Matrix4x4 &matrix){
-		mMaterial->getTextureState(mState,mTextureState);
+		mMaterial->getPass()->getTextureState(mState,mTextureState);
 		mTextureState.matrix.set(matrix);
-		mMaterial->setTextureState(mState,mTextureState);
+		mMaterial->getPass()->setTextureState(mState,mTextureState);
 	}
 
 	const Matrix4x4 &getMatrix4x4(){
-		mMaterial->getTextureState(mState,mTextureState);
+		mMaterial->getPass()->getTextureState(mState,mTextureState);
 		return mTextureState.matrix;
 	}
 

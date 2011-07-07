@@ -148,6 +148,7 @@ protected:
 	D3D9RenderTarget *mD3DPrimaryRenderTarget;
 	RenderTarget *mRenderTarget;
 	D3D9RenderTarget *mD3DRenderTarget;
+	RenderState *mLastRenderState;
 
 	RenderCaps mCaps;
 };

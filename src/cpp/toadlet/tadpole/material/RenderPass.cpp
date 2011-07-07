@@ -152,6 +152,11 @@ RenderVariableSet::ptr RenderPass::getVariables(){
 	return mVariables;
 }
 
+bool RenderPass::isDepthSorted() const{
+	DepthState state;
+	return mRenderState->getDepthState(state) && state.write==false;
+}
+
 void RenderPass::setupRenderVariables(RenderDevice *renderDevice,int scope,SceneParameters *parameters){
 	if(mVariables==NULL){
 		return;

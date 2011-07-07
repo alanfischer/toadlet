@@ -58,7 +58,17 @@ RenderPass::ptr RenderPath::addPass(){
 	mPasses.add(pass);
 	return pass;
 }
-	
+
+bool RenderPath::isDepthSorted() const{
+	int i;
+	for(i=0;i<mPasses.size();++i){
+		if(mPasses[i]->isDepthSorted()){
+			return true;
+		}
+	}
+	return false;
+}
+
 void RenderPath::shareStates(RenderPath *path){
 	int i;
 	for(i=0;i<mPasses.size() && i<path->getNumPasses();++i){
