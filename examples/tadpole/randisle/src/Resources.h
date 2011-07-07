@@ -110,6 +110,9 @@ public:
 
 		// HUD
 		hudFade=engine->getMaterialManager()->createDiffuseMaterial(engine->getTextureManager()->createTexture(createPoint(128,128)));
+		hudFade->getPass()->setSamplerState(0,SamplerState(
+			SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,SamplerState::FilterType_LINEAR,
+			SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE,SamplerState::AddressType_CLAMP_TO_EDGE));
 		hudFade->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 		hudFade->getPass()->setBlendState(BlendState::Combination_ALPHA);
 		hudFade->getPass()->setMaterialState(MaterialState(Colors::TRANSPARENT_RED));
@@ -117,9 +120,9 @@ public:
 		
 		hudCompass=engine->getMaterialManager()->findMaterial("compass.png");
 		if(hudCompass!=NULL){
+			hudCompass->getPass()->setMaterialState(MaterialState(false));
 			hudCompass->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 			hudCompass->getPass()->setBlendState(BlendState(BlendState::Operation_ZERO,BlendState::Operation_SOURCE_COLOR));
-			hudCompass->getPass()->setMaterialState(MaterialState(false));
 			hudCompass->retain();
 		}
 
@@ -127,9 +130,9 @@ public:
 			hudAcorn=engine->getMaterialManager()->cloneMaterial(acorn);
 		}
 		if(hudAcorn!=NULL){
+			hudAcorn->getPass()->setMaterialState(MaterialState(false));
 			hudAcorn->getPass()->setDepthState(DepthState(DepthState::DepthTest_NEVER,false));
 			hudAcorn->getPass()->setBlendState(BlendState(BlendState::Combination_ALPHA));
-			hudAcorn->getPass()->setMaterialState(MaterialState(false));
 			hudAcorn->retain();
 		}
 

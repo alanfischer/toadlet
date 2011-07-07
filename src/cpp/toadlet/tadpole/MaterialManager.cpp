@@ -55,14 +55,19 @@ void MaterialManager::destroy(){
 	mRenderStates.clear();
 }
 
+/// @todo: Should these two just be merged?
 Material::ptr MaterialManager::createMaterial(Material::ptr source){
 	Material::ptr material(new Material(this,source,false));
+	material->compile();
 	manage(material);
 	return material;
 }
 
 Material::ptr MaterialManager::cloneMaterial(Material::ptr source){
-	return Material::ptr(new Material(this,source,false));
+	Material::ptr material(new Material(this,source,false));
+	material->compile();
+	manage(material);
+	return material;
 }
 
 Material::ptr MaterialManager::createDiffuseMaterial(Texture::ptr texture){
