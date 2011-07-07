@@ -11,7 +11,7 @@ public:
 	void create();
 	void destroy();
 	void resized(int width,int height);
-	void render(Renderer *renderer);
+	void render(RenderDevice *device);
 	void update(int dt);
 	void keyPressed(int key);
 	void addSimulatedParticles(ParticleNode::ptr particles);

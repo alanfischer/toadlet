@@ -7,7 +7,7 @@ Particles::~Particles(){
 }
 
 void Particles::create(){
-	Application::create();
+	Application::create("d3d9");
 
 	mEngine->setDirectory("../../../data");
 
@@ -34,15 +34,15 @@ void Particles::create(){
 	};
 
 	Material::ptr pointMaterial=mEngine->getMaterialManager()->findMaterial("sparkle.png");
-	pointMaterial->setPointState(PointState(true,ten,false,Math::ONE,Math::ONE,Math::ONE,Math::ONE,Math::fromInt(100)));
-	pointMaterial->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
-	pointMaterial->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
-	pointMaterial->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+	pointMaterial->getPass()->setPointState(PointState(true,ten,false,Math::ONE,Math::ONE,Math::ONE,Math::ONE,Math::fromInt(100)));
+	pointMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
+	pointMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+	pointMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 
 	Material::ptr beamMaterial=mEngine->getMaterialManager()->findMaterial("fancyGlow.png");
-	beamMaterial->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
-	beamMaterial->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
-	beamMaterial->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
+	beamMaterial->getPass()->setBlendState(BlendState::Combination_ALPHA_ADDITIVE);
+	beamMaterial->getPass()->setRasterizerState(RasterizerState(RasterizerState::CullType_NONE));
+	beamMaterial->getPass()->setDepthState(DepthState(DepthState::DepthTest_LEQUAL,false));
 
  	pointNode=getEngine()->createNodeType(ParticleNode::type(),scene);
 	pointNode->setNumParticles(4,ParticleNode::ParticleType_POINTSPRITE,Math::ONE,pointPositions);
@@ -86,11 +86,11 @@ void Particles::resized(int width,int height){
 	}
 }
 
-void Particles::render(Renderer *renderer){
-	renderer->beginScene();
-		cameraNode->render(renderer);
-	renderer->endScene();
- 	renderer->swap();
+void Particles::render(RenderDevice *device){
+	device->beginScene();
+		cameraNode->render(device);
+	device->endScene();
+ 	device->swap();
 }
 
 void Particles::update(int dt){
