@@ -345,7 +345,7 @@ void RandIsle::logicUpdate(int dt){
 		mFollower->logicUpdated(position,dt);
 	}
 
-//	updateDanger(dt);
+	updateDanger(dt);
 
 	bool inWater=(mPlayer->getWorldTranslate().z-((Node*)mPlayer)->getBound().getSphere().radius)<=0;
 	if(!inWater && mPlayer->getCoefficientOfGravity()==0){

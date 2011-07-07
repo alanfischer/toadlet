@@ -58,6 +58,15 @@ RenderPass::RenderPass(MaterialManager *manager,RenderPass *source,bool clone):
 		mShaderState=ShaderState::ptr(new BackableShaderState());
 		mOwnsStates=true;
 	}
+
+	if(source!=NULL){
+		int i;
+		for(i=0;i<source->getNumTextures();++i){
+			setTexture(i,source->getTexture(i));
+			setTextureName(i,source->getTextureName(i));
+		}
+		/// @todo: Copy variables
+	}
 }
 
 RenderPass::~RenderPass(){
